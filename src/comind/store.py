@@ -77,3 +77,15 @@ def fetch_capture(capture_id: str) -> Optional[RawCapture]:
         return RawCapture.model_validate(dict(row))
     finally:
         conn.close()
+
+
+def fetch_all_captures() -> list[RawCapture]:
+    _initialize_database()
+    conn = _connect()
+    try:
+        rows = conn.execute(
+            "SELECT id, timestamp, source, text, hash, modality, pipeline_version FROM raw_capture"
+        ).fetchall()
+        return [RawCapture.model_validate(dict(row)) for row in rows]
+    finally:
+        conn.close()
