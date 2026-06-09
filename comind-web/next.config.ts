@@ -7,4 +7,7 @@ export default withPWA({
   dest: "public",
   disable: false,
   register: true,
+  fallbacks: {
+    document: "/offline",
+  },
 })(nextConfig);
