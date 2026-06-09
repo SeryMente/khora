@@ -13,10 +13,12 @@ def _stable_hash(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
-def add(text: str, source: str = "cli") -> RawCapture:
+def add(text: str, source: str = "cli", timestamp: Optional[datetime] = None) -> RawCapture:
+    if timestamp is None:
+        timestamp = datetime.now(timezone.utc)
     capture = RawCapture(
         id=uuid.uuid4().hex,
-        timestamp=datetime.now(timezone.utc),
+        timestamp=timestamp,
         source=source,
         text=text,
         hash=_stable_hash(text),
