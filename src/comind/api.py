@@ -1,10 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-
 from comind import inbox, store
-from comind.models import RawCapture
-
 
 app = FastAPI(title="CoMind API")
 
