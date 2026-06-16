@@ -1,71 +1,82 @@
-import { useEffect, useState } from "react";
-import { db, type LocalCaptura } from "./db";
-import { syncCaptura, setupAutoSync } from "./sync";
+import { useCallback, useEffect, useState } from "react";
+import { liveQuery } from "dexie";
+import { db, nuevoId, type Captura } from "./db";
+import { reintentarErrores, sync } from "./sync";
 
-export function useLocalCapturas() {
-  const [capturas, setCapturas] = useState<LocalCaptura[]>([]);
-  const [loading, setLoading] = useState(true);
+export function useCapturas() {
+	const [capturas, setCapturas] = useState<Captura[]>([]);
+	const [cargando, setCargando] = useState(true);
+	const [sincronizando, setSincronizando] = useState(false);
 
-  const loadCapturas = async () => {
-    setLoading(true);
-    try {
-      const all = await db.capturas.orderBy("timestamp").reverse().toArray();
-      setCapturas(all);
-    } finally {
-      setLoading(false);
-    }
-  };
+	// La base local es la ÚNICA fuente de verdad de la UI (local-first).
+	// liveQuery re-emite automáticamente ante cualquier cambio en Dexie.
+	useEffect(() => {
+		const sub = liveQuery(() =>
+			db.capturas.orderBy("timestamp").reverse().toArray(),
+		).subscribe({
+			next: (rows) => {
+				setCapturas(rows);
+				setCargando(false);
+			},
+			error: (err) => {
+				console.error("[useCapturas] liveQuery:", err);
+				setCargando(false);
+			},
+		});
+		return () => sub.unsubscribe();
+	}, []);
 
-  useEffect(() => {
-    loadCapturas();
-    setupAutoSync();
+	const sincronizar = useCallback(async () => {
+		setSincronizando(true);
+		try {
+			await sync();
+		} finally {
+			setSincronizando(false);
+		}
+	}, []);
 
-    // Escuchar cambios en la DB cada 500ms
-    const interval = setInterval(loadCapturas, 500);
-    return () => clearInterval(interval);
-  }, []);
+	// Sincroniza al montar, al recuperar conexión y al volver a la pestaña.
+	useEffect(() => {
+		void sincronizar();
+		const onOnline = () => void sincronizar();
+		const onVisible = () => {
+			if (document.visibilityState === "visible") void sincronizar();
+		};
+		window.addEventListener("online", onOnline);
+		document.addEventListener("visibilitychange", onVisible);
+		return () => {
+			window.removeEventListener("online", onOnline);
+			document.removeEventListener("visibilitychange", onVisible);
+		};
+	}, [sincronizar]);
 
-  // Setup de Background Sync
-  useEffect(() => {
-    if (!("serviceWorker" in navigator)) return;
+	const addCaptura = useCallback(
+		async (texto: string): Promise<void> => {
+			const limpio = texto.trim();
+			if (!limpio) return;
+			const captura: Captura = {
+				id: nuevoId(),
+				texto: limpio,
+				timestamp: new Date().toISOString(),
+				status: "pending",
+				intentos: 0,
+			};
+			// Escribe local primero → la UI se actualiza sola vía liveQuery (optimista).
+			await db.capturas.add(captura);
+			// Si hay red, intenta subir de inmediato (single-flight); si falla, queda pendiente.
+			if (navigator.onLine) void sincronizar();
+		},
+		[sincronizar],
+	);
 
-    navigator.serviceWorker.ready.then(async (reg) => {
-      // Intentar registrar sync
-      if ("sync" in reg) {
-        try {
-          await (reg.sync as any).register("sync-capturas");
-        } catch (error) {
-          console.debug("Background Sync no disponible, usando online event");
-        }
-      }
+	const reintentar = useCallback(async () => {
+		setSincronizando(true);
+		try {
+			await reintentarErrores();
+		} finally {
+			setSincronizando(false);
+		}
+	}, []);
 
-      // Escuchar mensaje desde el service worker
-      navigator.serviceWorker.addEventListener("message", (event) => {
-        if (event.data.type === "SYNC_COMPLETED") {
-          loadCapturas();
-        }
-      });
-    });
-  }, []);
-
-  const addCaptura = async (texto: string): Promise<LocalCaptura> => {
-    const captura: LocalCaptura = {
-      id: crypto.randomUUID(),
-      texto,
-      timestamp: new Date().toISOString(),
-      status: navigator.onLine ? "pending" : "offline",
-    };
-
-    await db.capturas.add(captura);
-    await loadCapturas();
-
-    // Intentar sincronizar inmediatamente si hay conexión
-    if (navigator.onLine) {
-      syncCaptura(captura);
-    }
-
-    return captura;
-  };
-
-  return { capturas, loading, addCaptura };
+	return { capturas, cargando, sincronizando, addCaptura, reintentar };
 }

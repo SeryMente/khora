@@ -1,193 +1,129 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useCapturas } from "@/lib/hooks";
+import type { Captura } from "@/lib/db";
 
-interface Captura {
-  id: string;
-  texto: string;
-  timestamp: string;
+function estadoNota(captura: Captura): { texto: string; clase: string } {
+	if (captura.status === "synced") {
+		return { texto: "sincronizado", clase: "text-green-500" };
+	}
+	if (captura.status === "error") {
+		return { texto: "no se pudo sincronizar", clase: "text-red-400" };
+	}
+	if (typeof navigator !== "undefined" && !navigator.onLine) {
+		return { texto: "sin conexión — se sincronizará", clase: "text-orange-400" };
+	}
+	return { texto: "pendiente", clase: "text-yellow-500" };
 }
 
-export default function Capturar() {
-  const [texto, setTexto] = useState("");
-  const [guardado, setGuardado] = useState(false);
-  const [cargando, setCargando] = useState(false);
-  const [capturas, setCapturas] = useState<Captura[]>([]);
-  const [cargandoTimeline, setCargandoTimeline] = useState(true);
-  const [errorTimeline, setErrorTimeline] = useState<string | null>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+function formatearFecha(iso: string): string {
+	return new Date(iso).toLocaleString("es-MX", {
+		day: "numeric",
+		month: "short",
+		year: "numeric",
+		hour: "2-digit",
+		minute: "2-digit",
+	});
+}
 
-  useEffect(() => {
-    textareaRef.current?.focus();
-  }, []);
+export default function Home() {
+	const { capturas, cargando, sincronizando, addCaptura, reintentar } = useCapturas();
+	const [texto, setTexto] = useState("");
+	const [guardando, setGuardando] = useState(false);
+	const textareaRef = useRef<HTMLTextAreaElement>(null);
+	const hayErrores = capturas.some((c) => c.status === "error");
 
-  useEffect(() => {
-    cargarCapturas();
-  }, [guardado]);
+	useEffect(() => {
+		textareaRef.current?.focus();
+	}, []);
 
-  const cargarCapturas = async () => {
-    setCargandoTimeline(true);
-    setErrorTimeline(null);
-    try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-      if (!apiUrl) {
-        console.error("NEXT_PUBLIC_API_URL no configurada");
-        setCargandoTimeline(false);
-        return;
-      }
+	async function guardar() {
+		if (!texto.trim() || guardando) return;
+		setGuardando(true);
+		try {
+			await addCaptura(texto);
+			setTexto("");
+			textareaRef.current?.focus();
+		} finally {
+			setGuardando(false);
+		}
+	}
 
-      const response = await fetch(`${apiUrl}/capturas`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        cache: "force-cache",
-      });
+	return (
+		<main className="min-h-screen bg-gray-950 text-white">
+			<div className="max-w-md mx-auto px-4 py-8 flex flex-col gap-8">
+				<section className="flex flex-col gap-4">
+					<textarea
+						ref={textareaRef}
+						value={texto}
+						onChange={(e) => setTexto(e.target.value)}
+						onKeyDown={(e) => {
+							if ((e.metaKey || e.ctrlKey) && e.key === "Enter") void guardar();
+						}}
+						placeholder="¿Qué quieres capturar?"
+						rows={6}
+						className="w-full p-4 bg-gray-900 text-white placeholder-gray-500 border border-gray-700 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500"
+					/>
+					<button
+						onClick={() => void guardar()}
+						disabled={!texto.trim() || guardando}
+						className="w-full py-3 rounded-xl bg-indigo-600 font-semibold transition-colors hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+					>
+						{guardando ? "Guardando…" : "Guardar"}
+					</button>
+				</section>
 
-      if (response.ok) {
-        const data = await response.json();
-        setCapturas(data.capturas || []);
-      } else {
-        setErrorTimeline("Error al cargar capturas");
-      }
-    } catch (error) {
-      console.error("Error al cargar capturas:", error);
-      setErrorTimeline("Sin conexión - mostrando última captura guardada");
-    } finally {
-      setCargandoTimeline(false);
-    }
-  };
+				{(sincronizando || hayErrores) && (
+					<div className="flex items-center justify-between text-xs" aria-live="polite">
+						<span className="text-gray-500">{sincronizando ? "Sincronizando…" : ""}</span>
+						{hayErrores && (
+							<button
+								onClick={() => void reintentar()}
+								className="text-indigo-400 hover:text-indigo-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+							>
+								Reintentar sincronización
+							</button>
+						)}
+					</div>
+				)}
 
-  const handleGuardar = async () => {
-    if (!texto.trim()) return;
-
-    setCargando(true);
-    try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-      if (!apiUrl) {
-        console.error("NEXT_PUBLIC_API_URL no configurada");
-        return;
-      }
-
-      const response = await fetch(`${apiUrl}/capturar`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ texto }),
-      });
-
-      if (response.ok) {
-        setGuardado(true);
-        setTexto("");
-        setTimeout(() => setGuardado(false), 2000);
-      }
-    } catch (error) {
-      console.error("Error al guardar:", error);
-    } finally {
-      setCargando(false);
-    }
-  };
-
-  const formatearFecha = (isoString: string) => {
-    const fecha = new Date(isoString);
-    return fecha.toLocaleDateString("es-ES", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
-  return (
-    <div className="min-h-screen bg-gray-950">
-      {/* Formulario de captura */}
-      <div className="flex flex-col justify-center items-center bg-gray-950 py-8">
-        <div className="max-w-md w-full px-4 flex flex-col gap-4">
-          <textarea
-            ref={textareaRef}
-            value={texto}
-            onChange={(e) => setTexto(e.target.value)}
-            placeholder="¿Qué quieres capturar?"
-            className="w-full p-4 bg-gray-900 text-white border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
-            rows={8}
-          />
-
-          <button
-            onClick={handleGuardar}
-            disabled={cargando || !texto.trim()}
-            className="w-full py-3 rounded-xl bg-indigo-600 text-white font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-          >
-            {cargando ? "Guardando..." : "Guardar"}
-          </button>
-
-          {guardado && (
-            <div className="text-center text-green-500 font-medium">
-              Guardado ✓
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Línea de tiempo */}
-      <div className="py-8 px-4">
-        <div className="max-w-md mx-auto">
-          {/* Loading */}
-          {cargandoTimeline && capturas.length === 0 && (
-            <div className="space-y-3">
-              {[1, 2, 3].map((i) => (
-                <div
-                  key={i}
-                  className="h-20 bg-gray-800 rounded-lg animate-pulse"
-                  aria-hidden="true"
-                />
-              ))}
-            </div>
-          )}
-
-          {/* Error */}
-          {errorTimeline && (
-            <div className="text-center">
-              <p className="text-gray-400 text-sm mb-3">{errorTimeline}</p>
-              <button
-                onClick={cargarCapturas}
-                className="px-4 py-2 text-indigo-600 border border-indigo-600 rounded-lg hover:bg-indigo-600 hover:text-white transition-colors focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-              >
-                Reintentar
-              </button>
-            </div>
-          )}
-
-          {/* Empty state */}
-          {!cargandoTimeline && capturas.length === 0 && !errorTimeline && (
-            <div className="text-center py-8">
-              <p className="text-gray-500">
-                Aún no hay capturas. ¡Comienza a guardar tus ideas!
-              </p>
-            </div>
-          )}
-
-          {/* Timeline */}
-          {capturas.length > 0 && (
-            <ul className="space-y-3" role="list">
-              {capturas.map((captura) => (
-                <li
-                  key={captura.id}
-                  className="p-4 bg-gray-900 border border-gray-700 rounded-lg hover:border-indigo-500 transition-colors focus-within:ring-2 focus-within:ring-indigo-500 focus-within:outline-none"
-                >
-                  <p className="text-white text-sm mb-2 leading-relaxed">
-                    {captura.texto}
-                  </p>
-                  <time className="text-sm text-gray-500">
-                    {formatearFecha(captura.timestamp)}
-                  </time>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </div>
-    </div>
-  );
+				<section aria-live="polite">
+					{cargando && capturas.length === 0 ? (
+						<ul className="space-y-3" aria-hidden="true">
+							{[0, 1, 2].map((i) => (
+								<li key={i} className="h-20 bg-gray-800 rounded-lg animate-pulse" />
+							))}
+						</ul>
+					) : capturas.length === 0 ? (
+						<p className="text-center text-gray-500 py-8">
+							Aún no hay capturas. Escribe tu primera idea.
+						</p>
+					) : (
+						<ul className="space-y-3" role="list">
+							{capturas.map((captura) => {
+								const e = estadoNota(captura);
+								return (
+									<li
+										key={captura.id}
+									className="p-4 bg-gray-900 border border-gray-700 rounded-lg"
+								>
+									<p className="text-sm leading-relaxed whitespace-pre-wrap">
+										{captura.texto}
+									</p>
+									<div className="mt-2 flex justify-between items-end gap-3">
+										<time className="text-sm text-gray-500" dateTime={captura.timestamp}>
+											{formatearFecha(captura.timestamp)}
+										</time>
+										<span className={`text-xs ${e.clase}`}>{e.texto}</span>
+									</div>
+								</li>
+							);
+						})}
+						</ul>
+					)}
+				</section>
+			</div>
+		</main>
+	);
 }
