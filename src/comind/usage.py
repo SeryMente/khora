@@ -58,3 +58,21 @@ def days_with_capture() -> set[str]:
     finally:
         conn.close()
     return {str(row[0]) for row in rows}
+
+
+def adherence_log(start: str, end: str) -> list[dict[str, object]]:
+    """Marca cada dia del rango [start, end] (ISO, inclusivo) como usado/no usado."""
+    from datetime import date, timedelta
+
+    first = date.fromisoformat(start)
+    last = date.fromisoformat(end)
+    if last < first:
+        raise ValueError("end debe ser >= start")
+    used = days_with_capture()
+    out: list[dict[str, object]] = []
+    cur = first
+    while cur <= last:
+        iso = cur.isoformat()
+        out.append({"day": iso, "used": iso in used})
+        cur += timedelta(days=1)
+    return out
