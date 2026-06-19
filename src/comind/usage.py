@@ -76,3 +76,40 @@ def adherence_log(start: str, end: str) -> list[dict[str, object]]:
         out.append({"day": iso, "used": iso in used})
         cur += timedelta(days=1)
     return out
+
+def adherence_summary(weeks: int = 4, today: "str | None" = None) -> dict:
+    """Resume la adherencia de las ultimas `weeks` semanas (ventana que termina hoy).
+
+    Reutiliza adherence_log() para no duplicar la logica de marcado diario.
+    `today` se inyecta (ISO) para determinismo.
+    """
+    from datetime import date, timedelta
+
+    if weeks < 1:
+        raise ValueError("weeks debe ser >= 1")
+    end = date.fromisoformat(today) if today is not None else date.today()
+    days_total = weeks * 7
+    start = end - timedelta(days=days_total - 1)
+    log = adherence_log(start.isoformat(), end.isoformat())
+    days_used = sum(1 for d in log if d["used"])
+    pct = round(days_used / days_total * 100, 1) if days_total else 0.0
+    per_week = []
+    for w in range(weeks):
+        chunk = log[w * 7 : (w + 1) * 7]
+        used = sum(1 for d in chunk if d["used"])
+        per_week.append(
+            {
+                "week": w + 1,
+                "start": chunk[0]["day"],
+                "end": chunk[-1]["day"],
+                "used": used,
+                "pct": round(used / 7 * 100, 1),
+            }
+        )
+    return {
+        "days_total": days_total,
+        "days_used": days_used,
+        "pct": pct,
+        "per_week": per_week,
+        "window": {"start": start.isoformat(), "end": end.isoformat()},
+    }

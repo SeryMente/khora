@@ -55,3 +55,9 @@ def obtener_capturas() -> CapturasResponse:
         for c in capturas_sorted
     ]
     return CapturasResponse(capturas=items)
+
+
+@app.get("/adherence")
+def adherence(weeks: int = 4):
+    """Resumen de adherencia de las ultimas `weeks` semanas."""
+    return usage.adherence_summary(weeks=weeks)

@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from comind import inbox, store
+from comind import usage
 
 app = FastAPI(title="CoMind API")
 
@@ -36,6 +37,7 @@ class CapturasResponse(BaseModel):
 @app.post("/capturar", response_model=CaptureResponse)
 def capturar(request: CaptureRequest) -> CaptureResponse:
     capture = inbox.add(request.texto, source="web")
+    usage.record_capture()
     return CaptureResponse(ok=True, id=capture.id)
 
 
