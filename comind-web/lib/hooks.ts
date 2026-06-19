@@ -35,7 +35,9 @@ export function useCapturas() {
 		}
 	}, []);
 
-	// Sincroniza al montar, al recuperar conexión y al volver a la pestaña.
+	// Sincroniza al montar, al recuperar conexión, al volver a la pestaña y de
+	// forma periódica (para que los reintentos con backoff se disparen aunque no
+	// haya un evento 'online' ni de visibilidad).
 	useEffect(() => {
 		void sincronizar();
 		const onOnline = () => void sincronizar();
@@ -44,9 +46,13 @@ export function useCapturas() {
 		};
 		window.addEventListener("online", onOnline);
 		document.addEventListener("visibilitychange", onVisible);
+		const intervalo = setInterval(() => {
+			if (navigator.onLine) void sincronizar();
+		}, 15_000);
 		return () => {
 			window.removeEventListener("online", onOnline);
 			document.removeEventListener("visibilitychange", onVisible);
+			clearInterval(intervalo);
 		};
 	}, [sincronizar]);
 

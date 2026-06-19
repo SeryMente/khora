@@ -2,7 +2,13 @@ import { db, type Captura } from "./db";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const TIMEOUT_MS = 10_000;
-const MAX_INTENTOS = 5;
+// Backoff exponencial para fallos TRANSITORIOS (sin red, timeout, 5xx).
+// Un fallo transitorio NUNCA marca la captura como "error": se queda "pending"
+// y se reintenta sola, con espera creciente y acotada. Si el backend está caído
+// horas, la captura no se pierde ni exige un toque manual: sube en cuanto el
+// servidor responde.
+const BACKOFF_BASE_MS = 5_000; // 5 s
+const BACKOFF_MAX_MS = 5 * 60_000; // tope: 5 min
 
 interface ServerCaptura {
 	id: string;
@@ -24,25 +30,36 @@ async function fetchConTimeout(url: string, init?: RequestInit): Promise<Respons
 	}
 }
 
-/** Cuenta un fallo transitorio; tras demasiados intentos marca la nota para revisión manual. */
+/** Próximo reintento con backoff exponencial acotado. */
+function calcularNextRetry(intentos: number): string {
+	const espera = Math.min(BACKOFF_BASE_MS * 2 ** (intentos - 1), BACKOFF_MAX_MS);
+	return new Date(Date.now() + espera).toISOString();
+}
+
+/**
+ * Fallo TRANSITORIO: la captura SIGUE "pending" (nunca "error") y se agenda su
+ * próximo intento con backoff. La recuperación es automática.
+ */
 async function registrarFallo(captura: Captura): Promise<void> {
 	const intentos = (captura.intentos ?? 0) + 1;
 	await db.capturas.update(captura.id, {
 		intentos,
-		status: intentos >= MAX_INTENTOS ? "error" : "pending",
+		status: "pending",
+		nextRetry: calcularNextRetry(intentos),
 	});
 }
 
-/** Sube al backend toda captura pendiente (outbox), de la más antigua a la más nueva. */
+/** Sube las capturas pendientes cuyo backoff ya venció, de la más antigua a la más nueva. */
 export async function pushPending(): Promise<number> {
 	if (!API_URL) {
 		console.error("[sync] NEXT_PUBLIC_API_URL no está configurada");
 		return 0;
 	}
 
-	const pendientes = (
-		await db.capturas.where("status").equals("pending").toArray()
-	).sort((a, b) => a.timestamp.localeCompare(b.timestamp));
+	const ahora = Date.now();
+	const pendientes = (await db.capturas.where("status").equals("pending").toArray())
+		.filter((c) => !c.nextRetry || Date.parse(c.nextRetry) <= ahora)
+		.sort((a, b) => a.timestamp.localeCompare(b.timestamp));
 
 	let sincronizadas = 0;
 	for (const captura of pendientes) {
@@ -66,22 +83,28 @@ export async function pushPending(): Promise<number> {
 							id: serverId,
 							status: "synced",
 							intentos: 0,
+							nextRetry: undefined,
 						});
 					});
 				} else {
-					await db.capturas.update(captura.id, { status: "synced", intentos: 0 });
+					await db.capturas.update(captura.id, {
+						status: "synced",
+						intentos: 0,
+						nextRetry: undefined,
+					});
 				}
 				sincronizadas++;
 			} else if (res.status >= 400 && res.status < 500) {
-				// Error permanente (p. ej. cuerpo inválido): no reintentar en bucle.
-				await db.capturas.update(captura.id, { status: "error" });
+				// Error PERMANENTE (p. ej. cuerpo inválido): no reintentar en bucle.
+				// Solo aquí marcamos "error" → el usuario lo reencola a mano.
+				await db.capturas.update(captura.id, { status: "error", nextRetry: undefined });
 				console.error(`[sync] nota ${captura.id} rechazada (${res.status})`);
 			} else {
-				// 5xx: transitorio.
+				// 5xx: transitorio → sigue pending con backoff.
 				await registrarFallo(captura);
 			}
 		} catch {
-			// Sin red, timeout o backend caído: transitorio.
+			// Sin red, timeout o backend caído: transitorio → sigue pending con backoff.
 			await registrarFallo(captura);
 		}
 	}
@@ -114,7 +137,11 @@ export async function pullServer(): Promise<void> {
 						intentos: 0,
 					});
 				} else if (local.status !== "synced") {
-					await db.capturas.update(s.id, { status: "synced", intentos: 0 });
+					await db.capturas.update(s.id, {
+						status: "synced",
+						intentos: 0,
+						nextRetry: undefined,
+					});
 				}
 			}
 		});
@@ -147,8 +174,15 @@ export function sync(): Promise<void> {
 	return sincronizando;
 }
 
-/** Reencola las notas en "error" para volver a intentarlas (acción manual del usuario). */
+/**
+ * Reencola las notas en "error" (fallo PERMANENTE) para reintentarlas.
+ * Acción manual: ahora los fallos transitorios ya no llegan aquí (se recuperan
+ * solos), así que este botón solo aplica a rechazos reales del backend.
+ */
 export async function reintentarErrores(): Promise<void> {
-	await db.capturas.where("status").equals("error").modify({ status: "pending", intentos: 0 });
+	await db.capturas
+		.where("status")
+		.equals("error")
+		.modify({ status: "pending", intentos: 0, nextRetry: undefined });
 	await sync();
 }

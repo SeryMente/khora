@@ -8,6 +8,7 @@ export interface Captura {
 	timestamp: string; // ISO-8601 (momento de captura)
 	status: CapturaStatus;
 	intentos?: number; // fallos transitorios de sincronización acumulados
+	nextRetry?: string; // ISO-8601: no reintentar antes de este instante (backoff)
 }
 
 class CoMindDB extends Dexie {
