@@ -8,8 +8,6 @@ export function useCapturas() {
 	const [cargando, setCargando] = useState(true);
 	const [sincronizando, setSincronizando] = useState(false);
 
-	// La base local es la ÚNICA fuente de verdad de la UI (local-first).
-	// liveQuery re-emite automáticamente ante cualquier cambio en Dexie.
 	useEffect(() => {
 		const sub = liveQuery(() =>
 			db.capturas.orderBy("timestamp").reverse().toArray(),
@@ -26,23 +24,24 @@ export function useCapturas() {
 		return () => sub.unsubscribe();
 	}, []);
 
-	const sincronizar = useCallback(async () => {
-		setSincronizando(true);
-		try {
-			await sync();
-		} finally {
-			setSincronizando(false);
-		}
-	}, []);
+	const sincronizar = useCallback(
+		async (opts?: { ignorarBackoff?: boolean }) => {
+			setSincronizando(true);
+			try {
+				await sync(opts);
+			} finally {
+				setSincronizando(false);
+			}
+		},
+		[],
+	);
 
-	// Sincroniza al montar, al recuperar conexión, al volver a la pestaña y de
-	// forma periódica (para que los reintentos con backoff se disparen aunque no
-	// haya un evento 'online' ni de visibilidad).
 	useEffect(() => {
-		void sincronizar();
-		const onOnline = () => void sincronizar();
+		void sincronizar({ ignorarBackoff: true });
+		const onOnline = () => void sincronizar({ ignorarBackoff: true });
 		const onVisible = () => {
-			if (document.visibilityState === "visible") void sincronizar();
+			if (document.visibilityState === "visible")
+				void sincronizar({ ignorarBackoff: true });
 		};
 		window.addEventListener("online", onOnline);
 		document.addEventListener("visibilitychange", onVisible);
@@ -67,10 +66,8 @@ export function useCapturas() {
 				status: "pending",
 				intentos: 0,
 			};
-			// Escribe local primero → la UI se actualiza sola vía liveQuery (optimista).
 			await db.capturas.add(captura);
-			// Si hay red, intenta subir de inmediato (single-flight); si falla, queda pendiente.
-			if (navigator.onLine) void sincronizar();
+			if (navigator.onLine) void sincronizar({ ignorarBackoff: true });
 		},
 		[sincronizar],
 	);
