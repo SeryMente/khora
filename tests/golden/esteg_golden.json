@@ -1,0 +1,38 @@
+[
+  {
+    "text": "hola mundo",
+    "bit": 0,
+    "carrier": "hola mundo!",
+    "decoded": 0
+  },
+  {
+    "text": "hola mundo",
+    "bit": 1,
+    "carrier": "hola mundo",
+    "decoded": 1
+  },
+  {
+    "text": "CoMind",
+    "bit": 0,
+    "carrier": "CoMind",
+    "decoded": 0
+  },
+  {
+    "text": "CoMind",
+    "bit": 1,
+    "carrier": "CoMind!",
+    "decoded": 1
+  },
+  {
+    "text": "ensamble esteg",
+    "bit": 1,
+    "carrier": "ensamble esteg",
+    "decoded": 1
+  },
+  {
+    "text": "grafo futuro",
+    "bit": 0,
+    "carrier": "grafo futuro",
+    "decoded": 0
+  }
+]
