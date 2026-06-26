@@ -1,0 +1,40 @@
+{
+  "results": [
+    {
+      "last_edited_time": "2026-06-25T12:00:00.000Z",
+      "properties": {
+        "Tarea": {"title": [{"plain_text": "Meditar 10 min"}]},
+        "Todoist ID": {"rich_text": [{"plain_text": "111"}]},
+        "Estado": {"status": {"name": "Hecho"}},
+        "\u00c1rea / Proyecto": {"select": {"name": "CoMind"}}
+      }
+    },
+    {
+      "last_edited_time": "2026-06-25T13:00:00.000Z",
+      "properties": {
+        "Tarea": {"title": [{"plain_text": "Leer"}]},
+        "Todoist ID": {"rich_text": [{"plain_text": "222"}]},
+        "Estado": {"status": {"name": "Hecho"}},
+        "\u00c1rea / Proyecto": {"select": {"name": "CoMind"}}
+      }
+    },
+    {
+      "last_edited_time": "2026-06-25T14:00:00.000Z",
+      "properties": {
+        "Tarea": {"title": [{"plain_text": "Pendiente"}]},
+        "Todoist ID": {"rich_text": [{"plain_text": "333"}]},
+        "Estado": {"status": {"name": "Por hacer"}},
+        "\u00c1rea / Proyecto": {"select": {"name": "CoMind"}}
+      }
+    },
+    {
+      "last_edited_time": "2026-06-25T15:00:00.000Z",
+      "properties": {
+        "Tarea": {"title": [{"plain_text": "Dup"}]},
+        "Todoist ID": {"rich_text": [{"plain_text": "111"}]},
+        "Estado": {"status": {"name": "Hecho"}},
+        "\u00c1rea / Proyecto": {"select": {"name": "CoMind"}}
+      }
+    }
+  ]
+}
