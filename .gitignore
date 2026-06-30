@@ -16,3 +16,5 @@ dist/
 # basura recurrente del agente
 from __future__ import annotations.py
 comind.db
+.env
+secrets.local.sh
