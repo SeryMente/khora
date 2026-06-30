@@ -1,0 +1,41 @@
+{
+  "manifest_version": 3,
+  "name": "Aisthesis (Halcon) - CoMind",
+  "version": "0.1.0",
+  "description": "Extension de percepcion de CoMind. Motor real Globo (captura minutos/llamadas -> Notion en vivo) + modulo caza (pendiente). Telemetria -> Logos.",
+  "permissions": [
+    "storage",
+    "tabs",
+    "alarms",
+    "notifications",
+    "idle",
+    "scripting",
+    "nativeMessaging"
+  ],
+  "host_permissions": [
+    "https://globohq.com/*",
+    "https://api.notion.com/*"
+  ],
+  "background": {
+    "service_worker": "engine/background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["engine/content.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://globohq.com/*"],
+      "js": ["engine/mainworld.js"],
+      "run_at": "document_idle",
+      "world": "MAIN"
+    }
+  ],
+  "options_page": "options.html",
+  "icons": { "16": "icon16.png", "48": "icon48.png", "128": "icon128.png" },
+  "action": {
+    "default_title": "Aisthesis - Halcon (clic abre el panel)",
+    "default_icon": { "16": "icon16.png", "48": "icon48.png", "128": "icon128.png" }
+  }
+}

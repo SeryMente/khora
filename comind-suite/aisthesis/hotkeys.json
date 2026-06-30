@@ -1,0 +1,13 @@
+{
+  "version": "3.32",
+  "mode": "in-page",
+  "hotkeys": [
+    { "id": "answer_video", "label": "Contestar VIDEO", "keysLabel": "Alt+Shift+V", "scope": "En la pestana de Globo (enfocada)" },
+    { "id": "answer_audio", "label": "Contestar audio / telefono (VR)", "keysLabel": "Alt+Shift+A", "scope": "En la pestana de Globo (enfocada)" },
+    { "id": "reject", "label": "Rechazar llamada", "keysLabel": "Alt+Shift+R", "scope": "En la pestana de Globo (enfocada)" },
+    { "id": "cheatsheet", "label": "Mostrar/ocultar chuleta", "keysLabel": "Alt+Shift+C", "scope": "Overlay en la pagina" },
+    { "id": "hud_toggle", "label": "Mostrar/ocultar panel flotante", "keysLabel": "Alt+Shift+P", "scope": "Overlay en la pagina" },
+    { "id": "viz_cycle", "label": "Rotar vista del panel flotante (1/2/3/4)", "keysLabel": "Alt+Shift+G", "scope": "Overlay en la pagina" },
+    { "id": "money_toggle", "label": "Mostrar/ocultar dinero ganado (tick sub-segundo)", "keysLabel": "Alt+Shift+M", "scope": "Overlay en la pagina" }
+  ]
+}

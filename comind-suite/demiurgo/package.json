@@ -1,0 +1,15 @@
+{
+  "name": "comind-capa-integracion",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Capa de Integracion de CoMind: captura always-on del Call Log de GLOBO y escritura a Notion (modulo globo de Demiurgo). Port en nube del Globo Scraper v3.32 (extension Chrome).",
+  "type": "commonjs",
+  "main": "src/worker.js",
+  "scripts": {
+    "start": "node src/worker.js",
+    "once": "GLOBO_RUN_ONCE=1 node src/worker.js",
+    "session": "node src/globo.js",
+    "check": "for f in src/*.js; do node --check \"$f\"; done"
+  },
+  "engines": { "node": ">=20" }
+}
