@@ -1,5 +1,5 @@
 from datetime import datetime, timezone, timedelta
-from comind import inbox, review
+from khora import inbox, review
 
 def test_today_filtra_por_fecha(tmp_store):
     ahora = datetime(2026, 6, 9, 10, 0, tzinfo=timezone.utc)

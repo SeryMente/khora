@@ -2,13 +2,13 @@ from datetime import datetime
 
 import pytest
 
-from comind import usage
+from khora import usage
 
 
 @pytest.fixture
 def tmp_store(tmp_path, monkeypatch):
-    db = tmp_path / "comind.db"
-    monkeypatch.setenv("COMIND_DB", str(db))
+    db = tmp_path / "khora.db"
+    monkeypatch.setenv("KHORA_DB", str(db))
     return db
 
 

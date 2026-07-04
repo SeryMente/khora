@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from comind import usage
+from khora import usage
 
 
 def test_registra_dias_con_captura(tmp_store):

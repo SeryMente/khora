@@ -1,4 +1,4 @@
-from comind import inbox
+from khora import inbox
 
 def test_add_then_get_roundtrip(tmp_store):
     c = inbox.add("comprar pan", source="cli")

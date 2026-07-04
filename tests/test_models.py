@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 import pytest
 from pydantic import ValidationError
-from comind.models import RawCapture, Modality, PIPELINE_VERSION
+from khora.models import RawCapture, Modality, PIPELINE_VERSION
 
 def test_rawcapture_exige_texto():
     with pytest.raises(ValidationError):

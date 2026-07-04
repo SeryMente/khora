@@ -3,9 +3,9 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "comind"
+name = "khora"
 version = "0.0.0"
-description = "CoMind"
+description = "Khora"
 requires-python = ">=3.11"
 dependencies = ["pydantic>=2", "fastapi", "uvicorn[standard]"]
 

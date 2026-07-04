@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from comind import inbox, search, review
+from khora import inbox, search, review
 
 def test_capturar_buscar_repasar(tmp_store):
     ahora = datetime(2026, 6, 12, 9, 0, tzinfo=timezone.utc)

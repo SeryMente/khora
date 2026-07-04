@@ -1,1 +1,1 @@
-# comind
+# khora

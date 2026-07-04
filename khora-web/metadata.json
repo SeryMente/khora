@@ -1,0 +1,6 @@
+{
+  "name": "Khora",
+  "description": "Bitácora continua 24/365 con dictado en tiempo real y guardado local seguro.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
