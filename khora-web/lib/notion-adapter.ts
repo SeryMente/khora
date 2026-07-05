@@ -19,40 +19,6 @@ export interface NotionPort {
 
 import { pushToNotion, isNotionConfigured, pullFromNotion } from './notion';
 
-export class NotionMock implements NotionPort {
-	private simulateError: boolean;
-
-	constructor(simulateError = false) {
-		this.simulateError = simulateError;
-	}
-
-	async pushEntry(entry: ServerCaptura): Promise<NotionResponse> {
-		return new Promise((resolve) => {
-			setTimeout(() => {
-				if (this.simulateError) {
-					resolve({ ok: false, error: "Error simulado de conexión a Notion" });
-				} else {
-					resolve({ ok: true, id: `mock-${Date.now()}` });
-				}
-			}, 800); // Retraso de red simulado
-		});
-	}
-
-	async pullEntries(): Promise<NotionPullResponse> {
-		return new Promise((resolve) => {
-			setTimeout(() => {
-				if (this.simulateError) {
-					resolve({ ok: false, error: "Error simulado de conexión a Notion al hacer pull" });
-				} else {
-					// En un mock real podríamos devolver un set estático o lo que haya en memoria del server.
-					// Aquí simplemente devolvemos vacío para no corromper la DB local a menos que queramos simular entradas remotas.
-					resolve({ ok: true, entries: [] });
-				}
-			}, 800);
-		});
-	}
-}
-
 export class NotionReal implements NotionPort {
 	async pushEntry(entry: ServerCaptura): Promise<NotionResponse> {
 		if (!isNotionConfigured()) {

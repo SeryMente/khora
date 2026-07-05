@@ -24,7 +24,7 @@ export default defineConfig({
 		command:
 			"NEXT_PUBLIC_API_URL=http://127.0.0.1:3999 npm run build && npm run start",
 		url: "http://localhost:3000",
-		reuseExistingServer: false,
+		reuseExistingServer: true,
 		timeout: 120_000,
 	},
 });

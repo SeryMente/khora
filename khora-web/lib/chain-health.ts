@@ -9,10 +9,13 @@ export interface ChainHealthResult {
 }
 
 export async function verifyChainHealth(): Promise<ChainHealthResult> {
-    const capturas = await db.capturas.orderBy("secuencia").toArray();
+    const allCapturas = await db.capturas.toArray();
+    const capturas = allCapturas
+        .filter(c => c.secuencia !== undefined && c.hash !== undefined)
+        .sort((a, b) => (a.secuencia || 0) - (b.secuencia || 0));
     
     if (capturas.length === 0) {
-        return { ok: true, message: "Cadena vacía ✓" };
+        return { ok: true, message: "Cadena vacía o sin registros secuenciados ✓" };
     }
 
     let expectedSecuencia = capturas[0].secuencia;

@@ -35,7 +35,11 @@ export async function pushToNotion(captura: ServerCaptura) {
 				]
 			},
 			"Contenido": {
-				rich_text: (captura.texto.match(/[\s\S]{1,1990}/g) ?? [captura.texto]).map(chunk => ({ text: { content: chunk } }))
+				rich_text: [
+					{
+						text: { content: captura.texto }
+					}
+				]
 			},
 			"Tipo": {
 				select: {
@@ -58,14 +62,86 @@ export async function pushToNotion(captura: ServerCaptura) {
 						text: { content: captura.forensics?.platform || "Desconocido" }
 					}
 				]
-			}
+			},
+			"Geo": {
+				rich_text: [
+					{
+						text: { content: captura.forensics?.geo ? JSON.stringify(captura.forensics.geo) : "" }
+					}
+				]
+			},
+			"IP": {
+				rich_text: [
+					{
+						text: { content: captura.forensics?.ip || "" }
+					}
+				]
+			},
+			"Plataforma": {
+				rich_text: [
+					{
+						text: { content: captura.forensics?.platform || "" }
+					}
+				]
+			},
+			"Resolución": {
+				rich_text: [
+					{
+						text: { content: captura.forensics?.resolution || "" }
+					}
+				]
+			},
+			"Zona horaria": {
+				rich_text: [
+					{
+						text: { content: captura.forensics?.timezone || "" }
+					}
+				]
+			},
+			"App versión": {
+				rich_text: [
+					{
+						text: { content: captura.forensics?.appVersion || "" }
+					}
+				]
+			},
+			...(captura.secuencia !== undefined ? { "Secuencia": { number: captura.secuencia } } : {}),
+			"Hash": {
+				rich_text: [
+					{
+						text: { content: captura.hash || "" }
+					}
+				]
+			},
+			"Hash previo": {
+				rich_text: [
+					{
+						text: { content: captura.hashPrevio || "" }
+					}
+				]
+			},
+			"Metadatos JSON": {
+				rich_text: [
+					{
+						text: { content: JSON.stringify(captura.metadata || {}) }
+					}
+				]
+			},
+			...((captura.forensics?.duracionCapturaMs !== undefined || captura.metadata?.duracionDictado !== undefined) ? {
+				"Duración captura": { number: captura.forensics?.duracionCapturaMs ?? captura.metadata?.duracionDictado }
+			} : {})
 		},
 		children: [
 			{
 				object: "block",
 				type: "paragraph",
 				paragraph: {
-					rich_text: (captura.texto.match(/[\s\S]{1,1990}/g) ?? [captura.texto]).map(chunk => ({ type: "text", text: { content: chunk } }))
+					rich_text: [
+						{
+							type: "text",
+							text: { content: captura.texto }
+						}
+					]
 				}
 			},
 			{
@@ -174,6 +250,27 @@ export async function pushToNotion(captura: ServerCaptura) {
 	}
 }
 
+function getRichTextValue(prop: any): string {
+	if (!prop || !prop.rich_text) return "";
+	return prop.rich_text.map((rt: any) => rt.plain_text).join("").trim();
+}
+
+function getTitleValue(prop: any): string {
+	if (!prop || !prop.title) return "";
+	return prop.title.map((t: any) => t.plain_text).join("").trim();
+}
+
+function getNumberValue(prop: any): number | undefined {
+	if (!prop) return undefined;
+	if (typeof prop.number === "number") return prop.number;
+	const text = getRichTextValue(prop);
+	if (text) {
+		const parsed = parseFloat(text);
+		if (!isNaN(parsed)) return parsed;
+	}
+	return undefined;
+}
+
 export async function pullFromNotion(): Promise<{success: boolean, entries?: ServerCaptura[], error?: any}> {
 	const apiKey = process.env.NOTION_API_KEY;
 	const databaseId = process.env.NOTION_DATABASE_ID;
@@ -194,13 +291,7 @@ export async function pullFromNotion(): Promise<{success: boolean, entries?: Ser
 			method: "POST",
 			headers,
 			body: JSON.stringify({
-				sorts: [
-					{
-						property: "Fecha",
-						direction: "descending"
-					}
-				],
-				page_size: 50
+				page_size: 100
 			})
 		});
 
@@ -221,19 +312,73 @@ export async function pullFromNotion(): Promise<{success: boolean, entries?: Ser
 				let origen = props.Origen?.select?.name || "keyboard";
 				let timestamp = props.Fecha?.date?.start || page.created_time;
 
-				// Por simplicidad, en el pull podríamos no tener la cadena completa si no parseamos los bloques hijos
-				// Para recuperar la secuencia y hash de los bloques se requeriría más iteraciones a la API.
-				// Por ahora extraemos lo básico de las propiedades.
-				
+				// Parsear campos forenses
+				let geo = undefined;
+				const geoStr = getRichTextValue(props.Geo);
+				if (geoStr) {
+					try {
+						geo = JSON.parse(geoStr);
+					} catch {
+						const match = geoStr.match(/(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)/);
+						if (match) {
+							geo = {
+								lat: parseFloat(match[1]),
+								long: parseFloat(match[2]),
+								accuracy: 0
+							};
+						}
+					}
+				}
+
+				const platform = getRichTextValue(props.Plataforma) || getRichTextValue(props.Dispositivo) || "Desconocido";
+				const resolution = getRichTextValue(props.Resolución) || "";
+				const timezone = getRichTextValue(props["Zona horaria"]) || "";
+				const appVersion = getRichTextValue(props["App versión"]) || "";
+				const duracionCapturaMs = getNumberValue(props["Duración captura"]);
+				const ip = getRichTextValue(props.IP) || "";
+
+				const forensics: ServerCaptura["forensics"] = {
+					geo,
+					platform,
+					resolution,
+					timezone,
+					appVersion,
+					duracionCapturaMs,
+					ip
+				};
+
+				const secuencia = getNumberValue(props.Secuencia);
+				const hash = getRichTextValue(props.Hash) || undefined;
+				const hashPrevio = getRichTextValue(props["Hash previo"]) || undefined;
+
+				let metadata: any = {};
+				const metadataJsonStr = getRichTextValue(props["Metadatos JSON"]);
+				if (metadataJsonStr) {
+					try {
+						metadata = JSON.parse(metadataJsonStr);
+					} catch {
+						// ignore
+					}
+				}
+
 				return {
 					id: page.id,
 					texto,
 					tipo,
 					origen,
 					timestamp,
-					status: "synced"
+					status: "synced",
+					secuencia,
+					hash,
+					hashPrevio,
+					forensics,
+					metadata
 				};
 			});
+
+			// Ordenar por "Fecha" (timestamp) ascendente
+			entries.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+
 			return { success: true, entries };
 		}
 		

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo, type FormEvent } from "react";
 import { useCapturas } from "@/lib/hooks";
 import { verifyChainHealth, type ChainHealthResult } from "@/lib/chain-health";
 import { normalizeDictatedText } from "@/lib/text-utils";
@@ -27,7 +27,12 @@ import {
 	Layers,
 	ChevronDown,
 	ChevronUp,
-	CheckCircle2
+	CheckCircle2,
+	Lock,
+	User,
+	Eye,
+	EyeOff,
+	LogIn
 } from "lucide-react";
 
 // Formateador de estado de persistencia
@@ -115,6 +120,32 @@ const TIPO_DECORATIONS = {
 export default function Home() {
 	const { capturas, cargando, sincronizando, addCaptura, reintentar } = useCapturas();
 	const [texto, setTexto] = useState("");
+
+  // --- Autenticacion local (client-side) ---
+  const [isAuth, setIsAuth] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
+  const [loginUser, setLoginUser] = useState("");
+  const [loginPass, setLoginPass] = useState("");
+  const [showPass, setShowPass] = useState(false);
+  const [loginError, setLoginError] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && localStorage.getItem("khora_auth") === "1") {
+      setIsAuth(true);
+    }
+    setAuthChecked(true);
+  }, []);
+
+  const handleLogin = (e: FormEvent) => {
+    e.preventDefault();
+    if (loginUser.trim() === "willfreeman" && loginPass === "A02122310a!") {
+      setIsAuth(true);
+      setLoginError(false);
+      if (typeof window !== "undefined") localStorage.setItem("khora_auth", "1");
+    } else {
+      setLoginError(true);
+    }
+  };
 	const [interimText, setInterimText] = useState("");
 	const [guardando, setGuardando] = useState(false);
 	const [dictando, setDictando] = useState(false);
@@ -125,10 +156,10 @@ export default function Home() {
 	const dictationTimerRef = useRef<NodeJS.Timeout | null>(null);
 
 	// Notion & Gemini configs (detectados desde el servidor)
-	const [simulateError, setSimulateError] = useState(false);
 	const [showDevPanel, setShowDevPanel] = useState(false);
 	const [notionConfigured, setNotionConfigured] = useState<boolean>(false);
 	const [chainHealth, setChainHealth] = useState<ChainHealthResult | null>(null);
+
 
 	const checkHealth = useCallback(async () => {
 		const health = await verifyChainHealth();
@@ -141,8 +172,8 @@ export default function Home() {
 		}
 	}, [showDevPanel, checkHealth]);
 
+
 	useEffect(() => {
-		setSimulateError(localStorage.getItem("khora_simulate_error") === "true");
 		fetch("/api/status").then(res => res.json()).then(data => setNotionConfigured(data.notionConfigured)).catch(() => setNotionConfigured(false));
 
 		const handleKeyDown = (e: KeyboardEvent) => {
@@ -155,11 +186,7 @@ export default function Home() {
 		return () => window.removeEventListener('keydown', handleKeyDown);
 	}, []);
 
-	const toggleSimulateError = () => {
-		const nextState = !simulateError;
-		setSimulateError(nextState);
-		localStorage.setItem("khora_simulate_error", nextState.toString());
-	};
+
 
 	// Filtros de búsqueda
 	const [searchQuery, setSearchQuery] = useState("");
@@ -567,6 +594,81 @@ export default function Home() {
 		}, 100);
 	};
 
+
+  if (!authChecked) {
+    return null;
+  }
+
+  if (!isAuth) {
+    return (
+      <main className="min-h-screen bg-[#111113] text-[#e3e3e6] antialiased selection:bg-indigo-500/20 flex items-center justify-center px-6 relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-600/10 rounded-full blur-[120px]" />
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-[120px]" />
+        </div>
+
+        <motion.div
+          initial={ { opacity: 0, y: 20, scale: 0.98 } }
+          animate={ { opacity: 1, y: 0, scale: 1 } }
+          transition={ { duration: 0.5, ease: "easeOut" } }
+          className="relative w-full max-w-sm"
+        >
+          <div className="flex flex-col items-center gap-3 mb-10">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+              <Lock className="w-6 h-6 text-white" />
+            </div>
+            <div className="text-center">
+              <span className="text-[10px] tracking-[0.2em] font-semibold text-indigo-400/90 font-mono uppercase block">Autobiografico</span>
+              <h1 className="text-2xl font-bold text-white tracking-tight mt-0.5">Khora</h1>
+            </div>
+          </div>
+
+          <form onSubmit={handleLogin} className="bg-[#18181b] border border-white/[0.06] rounded-2xl p-7 flex flex-col gap-5 shadow-xl">
+            <div className="flex flex-col gap-1">
+              <h2 className="text-base font-semibold text-white">Ingresa a tu bitacora</h2>
+              <p className="text-xs text-gray-500">Identificate para continuar</p>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 font-mono">Usuario</label>
+              <div className="flex items-center gap-2.5 bg-[#202024]/60 border border-white/[0.06] rounded-xl px-3.5 py-2.5 focus-within:border-indigo-500/50 transition-colors">
+                <User className="w-4 h-4 text-gray-500 shrink-0" />
+                <input type="text" value={loginUser} onChange={(e) => { setLoginUser(e.target.value); setLoginError(false); }} autoFocus autoComplete="username" placeholder="willfreeman" className="bg-transparent outline-none text-sm text-white placeholder:text-gray-600 w-full" />
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 font-mono">Contrasena</label>
+              <div className="flex items-center gap-2.5 bg-[#202024]/60 border border-white/[0.06] rounded-xl px-3.5 py-2.5 focus-within:border-indigo-500/50 transition-colors">
+                <Lock className="w-4 h-4 text-gray-500 shrink-0" />
+                <input type={showPass ? "text" : "password"} value={loginPass} onChange={(e) => { setLoginPass(e.target.value); setLoginError(false); }} autoComplete="current-password" placeholder="........" className="bg-transparent outline-none text-sm text-white placeholder:text-gray-600 w-full" />
+                <button type="button" onClick={() => setShowPass((v) => !v)} className="text-gray-500 hover:text-gray-300 transition-colors shrink-0" aria-label="Mostrar u ocultar contrasena">
+                  {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            <AnimatePresence>
+              {loginError && (
+                <motion.div initial={ { opacity: 0, height: 0 } } animate={ { opacity: 1, height: "auto" } } exit={ { opacity: 0, height: 0 } } className="flex items-center gap-2 text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+                  <X className="w-3.5 h-3.5 shrink-0" />
+                  <span>Usuario o contrasena incorrectos</span>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <button type="submit" className="mt-1 flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white text-sm font-semibold rounded-xl px-4 py-3 transition-colors shadow-lg shadow-indigo-600/20">
+              <LogIn className="w-4 h-4" />
+              <span>Entrar</span>
+            </button>
+          </form>
+
+          <p className="text-center text-[10px] text-gray-600 font-mono mt-6 tracking-wide">Khora - Registro autobiografico</p>
+        </motion.div>
+      </main>
+    );
+  }
+
 	return (
 		<main className="min-h-screen bg-[#111113] text-[#e3e3e6] antialiased selection:bg-indigo-500/20 pb-32">
 			{/* Header de la App - Visión de producción limpia */}
@@ -584,6 +686,7 @@ export default function Home() {
 							</h1>
 						</div>
 					</div>
+					
 				</div>
 			</header>
 
@@ -607,22 +710,11 @@ export default function Home() {
 							>
 								<span>Adapter Activo:</span>
 								<div className="flex items-center gap-1.5">
-									<span className={`w-1.5 h-1.5 rounded-full ${notionConfigured ? 'bg-green-400' : 'bg-blue-400'}`} />
-									<span>{notionConfigured ? 'NotionReal' : 'NotionMock'}</span>
+									<span className={`w-1.5 h-1.5 rounded-full ${notionConfigured ? 'bg-green-400' : 'bg-red-400'}`} />
+									<span>{notionConfigured ? 'NotionReal' : 'Notion no configurado'}</span>
 								</div>
 							</div>
 
-							<button
-								onClick={toggleSimulateError}
-								className={`text-[11px] font-mono px-3 py-2 rounded-md border transition-colors flex justify-between items-center ${
-									simulateError
-										? 'bg-red-500/10 text-red-400 border-red-500/20'
-										: 'bg-zinc-800/50 text-zinc-400 border-zinc-700/50 hover:bg-zinc-800'
-								}`}
-							>
-								<span>Forzar fallos de red</span>
-								<span>{simulateError ? 'ON' : 'OFF'}</span>
-							</button>
 
 							<div className="mt-2 border-t border-white/[0.05] pt-3 flex flex-col gap-2">
 								<div className="flex justify-between items-center text-[10px] text-gray-400 font-mono">

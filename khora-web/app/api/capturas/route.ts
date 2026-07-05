@@ -1,19 +1,9 @@
 import { NextResponse, NextRequest } from 'next/server';
-import { NotionPort, NotionMock, NotionReal } from '@/lib/notion-adapter';
-import { isNotionConfigured } from '@/lib/notion';
+import { NotionReal } from '@/lib/notion-adapter';
 
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   try {
-    const isSimulated = req.nextUrl.searchParams.get('simularNotion') === 'true';
-    const simulateError = req.nextUrl.searchParams.get('simulateError') === 'true';
-
-    let adapter: NotionPort;
-    if (isSimulated || !isNotionConfigured()) {
-      adapter = new NotionMock(simulateError);
-    } else {
-      adapter = new NotionReal();
-    }
-
+    const adapter = new NotionReal();
     const resAdapter = await adapter.pullEntries();
 
     if (!resAdapter.ok) {

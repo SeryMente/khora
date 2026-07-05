@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { inferirTipo } from '@/lib/classifier';
-import { NotionPort, NotionMock, NotionReal } from '@/lib/notion-adapter';
+import { NotionReal } from '@/lib/notion-adapter';
 import { isNotionConfigured } from '@/lib/notion';
 
 export async function POST(req: NextRequest) {
@@ -47,17 +47,8 @@ export async function POST(req: NextRequest) {
 			forensics
 		};
 		
-		// Usamos el Adapter según el entorno y la intención de simulación
-		const isSimulated = body.simularNotion === true;
-		const simulateError = body.simulateError === true;
-		
-		let adapter: NotionPort;
-		
-		if (isSimulated || !isNotionConfigured()) {
-			adapter = new NotionMock(simulateError);
-		} else {
-			adapter = new NotionReal();
-		}
+		// Persistencia real en Notion (única fuente de verdad).
+		const adapter = new NotionReal();
 		
 		const resAdapter = await adapter.pushEntry(captura as any);
 		

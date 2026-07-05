@@ -80,8 +80,6 @@ export async function pushPending(ignorarBackoff = false): Promise<number> {
 					hash: captura.hash,
 					hashPrevio: captura.hashPrevio,
 					forensics: captura.forensics,
-					simularNotion: typeof window !== 'undefined' ? localStorage.getItem("khora_simular_notion") === "true" : false,
-					simulateError: typeof window !== 'undefined' ? localStorage.getItem("khora_simulate_error") === "true" : false
 				}),
 			});
 
@@ -139,10 +137,7 @@ export async function pushPending(ignorarBackoff = false): Promise<number> {
 export async function pullServer(): Promise<void> {
 	if (!API_URL) return;
 	try {
-		const simulateError = typeof window !== 'undefined' ? localStorage.getItem("khora_simulate_error") === "true" : false;
-		const simularNotion = typeof window !== 'undefined' ? localStorage.getItem("khora_simular_notion") === "true" : false;
-		
-		const url = `${API_URL}/capturas?simularNotion=${simularNotion}&simulateError=${simulateError}`;
+		const url = `${API_URL}/capturas`;
 
 		const res = await fetchConTimeout(url, {
 			method: "GET",
@@ -202,8 +197,9 @@ export async function pullServer(): Promise<void> {
 				}
 			}
 		});
-	} catch (e) {
-		console.error("[pullServer] error details:", { message: (e as any).message, url: `${API_URL}/capturas` }, e);
+	} catch (e: any) {
+		if (e.name === 'AbortError' || e.message === 'Failed to fetch') return;
+		console.error("[pullServer] error details:", { message: e.message, url: `${API_URL}/capturas` }, e);
 	}
 }
 
