@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback, useMemo, type FormEvent } from "react";
+import { Splash } from "./components/Splash";
 import { useCapturas } from "@/lib/hooks";
 import { verifyChainHealth, type ChainHealthResult } from "@/lib/chain-health";
 import { normalizeDictatedText } from "@/lib/text-utils";
@@ -118,6 +119,7 @@ const TIPO_DECORATIONS = {
 };
 
 export default function Home() {
+  const [showSplash, setShowSplash] = useState(true);
 	const { capturas, cargando, sincronizando, addCaptura, reintentar } = useCapturas();
 	const [texto, setTexto] = useState("");
 
@@ -595,6 +597,7 @@ export default function Home() {
 	};
 
 
+  if (showSplash) { return <Splash onComplete={() => setShowSplash(false)} />; }
   if (!authChecked) {
     return null;
   }
