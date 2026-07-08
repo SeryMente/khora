@@ -1,0 +1,15 @@
+{
+  "id": "caza",
+  "name": "Cazagangas",
+  "version": "0.9.41",
+  "enabled": true,
+  "background": "modules/caza/background.js",
+  "content": [
+    { "matches": ["https://www.facebook.com/marketplace/*"], "js": ["modules/caza/content.js", "modules/caza/humano.js"], "run_at": "document_idle" }
+  ],
+  "hostPermissions": ["https://www.facebook.com/*", "https://api.notion.com/*"],
+  "permissions": ["cookies"],
+  "settings": ["NOTION_TOKEN"],
+  "cerebro": "modules/caza/runtime.html",
+  "note": "Port fiel de Cazagangas v0.9.41 (27 archivos). Token externalizado a chrome.storage (NOTION_TOKEN). El cerebro 'El Recorrido' (runtime.html) se abre desde el panel de la sombrilla."
+}
