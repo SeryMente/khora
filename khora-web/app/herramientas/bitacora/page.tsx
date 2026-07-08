@@ -32,8 +32,10 @@ import {
 	User,
 	Eye,
 	EyeOff,
-	LogIn
+	LogIn,
+	ChevronLeft
 } from "lucide-react";
+import Link from "next/link";
 
 // Formateador de estado de persistencia
 function estadoNota(captura: any, isSyncing: boolean): { texto: string; clase: string } {
@@ -675,6 +677,9 @@ export default function Home() {
 			<header className="border-b border-white/[0.06] bg-[#111113]/90 sticky top-0 z-40 backdrop-blur-md">
 				<div className="max-w-7xl mx-auto px-6 md:px-12 py-5 flex items-center justify-between">
 					<div className="flex items-center gap-4">
+						<Link href="/herramientas" className="mr-2 p-2 -ml-2 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-white/[0.05]">
+							<ChevronLeft className="w-5 h-5" />
+						</Link>
 						<div className="relative flex items-center justify-center">
 							<span className={`absolute w-3.5 h-3.5 rounded-full bg-indigo-500 opacity-20 ${dictando ? 'animate-ping' : ''}`} />
 							<span className={`w-2.5 h-2.5 rounded-full ${dictando ? 'bg-indigo-400 animate-pulse' : 'bg-indigo-500'}`} />
