@@ -7,19 +7,19 @@ import { verifyChainHealth, type ChainHealthResult } from "@/lib/chain-health";
 import { normalizeDictatedText } from "@/lib/text-utils";
 import type { Captura } from "@/lib/db";
 import { motion, AnimatePresence } from "motion/react";
-import { 
-	Mic, 
-	MicOff, 
-	Send, 
-	Bed, 
-	MapPin, 
-	FileText, 
-	Calendar, 
-	Lightbulb, 
-	Search, 
-	Info, 
-	Database, 
-	X, 
+import {
+	Mic,
+	MicOff,
+	Send,
+	Bed,
+	MapPin,
+	FileText,
+	Calendar,
+	Lightbulb,
+	Search,
+	Info,
+	Database,
+	X,
 	Keyboard,
 	Sparkles,
 	Flame,
@@ -39,26 +39,26 @@ import {
 // Formateador de estado de persistencia
 function estadoNota(captura: any, isSyncing: boolean): { texto: string; clase: string } {
 	if (captura.status === "synced") {
-		return { 
-			texto: "Sincronizado ✓", 
-			clase: "text-[#72BC8F] bg-[#72BC8F]/8 border border-[#72BC8F]/15 font-mono text-[10px] px-2.5 py-0.5 rounded-md font-semibold" 
+		return {
+			texto: "Sincronizado ✓",
+			clase: "text-[#72BC8F] bg-[#72BC8F]/8 border border-[#72BC8F]/15 font-mono text-[10px] px-2.5 py-0.5 rounded-md font-semibold"
 		};
 	}
 	if (captura.status === "error") {
-		return { 
-			texto: "Error ↻", 
-			clase: "text-[#E97366] bg-[#E97366]/8 border border-[#E97366]/15 font-mono text-[10px] px-2.5 py-0.5 rounded-md cursor-pointer font-semibold" 
+		return {
+			texto: "Error ↻",
+			clase: "text-[#E97366] bg-[#E97366]/8 border border-[#E97366]/15 font-mono text-[10px] px-2.5 py-0.5 rounded-md cursor-pointer font-semibold"
 		};
 	}
 	if (isSyncing && captura.status === "pending") {
-		return { 
-			texto: "Sincronizando...", 
-			clase: "text-amber-500 bg-amber-950/10 border border-amber-950/20 font-mono text-[10px] px-2.5 py-0.5 rounded-md animate-pulse font-semibold" 
+		return {
+			texto: "Sincronizando...",
+			clase: "text-amber-500 bg-amber-950/10 border border-amber-950/20 font-mono text-[10px] px-2.5 py-0.5 rounded-md animate-pulse font-semibold"
 		};
 	}
-	return { 
-		texto: "Pendiente", 
-		clase: "text-[#DE9255] bg-[#DE9255]/8 border border-[#DE9255]/15 font-mono text-[10px] px-2.5 py-0.5 rounded-md font-semibold" 
+	return {
+		texto: "Pendiente",
+		clase: "text-[#DE9255] bg-[#DE9255]/8 border border-[#DE9255]/15 font-mono text-[10px] px-2.5 py-0.5 rounded-md font-semibold"
 	};
 }
 
@@ -78,7 +78,7 @@ function formatearFecha(iso: string): string {
 	if (isToday) {
 		return `Hoy, ${time}`;
 	}
-	
+
 	const dateStr = date.toLocaleDateString("es-MX", {
 		day: "numeric",
 		month: "short",
@@ -251,7 +251,7 @@ export default function Home() {
 					setDictando(true);
 					dictationStartTimeRef.current = Date.now();
 				};
-				
+
 				recognition.onresult = (event: any) => {
 					let currentInterim = "";
 					let finalToAppend = "";
@@ -315,7 +315,7 @@ export default function Home() {
 			audioContextRef.current = audioContext;
 
 			const analyser = audioContext.createAnalyser();
-			analyser.fftSize = 64; 
+			analyser.fftSize = 64;
 			analyserRef.current = analyser;
 
 			const source = audioContext.createMediaStreamSource(stream);
@@ -412,7 +412,7 @@ export default function Home() {
 	async function guardar() {
 		let finalTexto = (texto + " " + interimText).trim();
 		if (!finalTexto || guardando) return;
-		
+
 		const saveStartTime = Date.now();
 		setGuardando(true);
 		let normalizedFlag = false;
@@ -443,7 +443,7 @@ export default function Home() {
 			};
 
 			await addCaptura(finalTexto, "nota", inputSource, metadata);
-			
+
 			// Limpiar e iniciar micro-interacción de éxito
 			setTexto("");
 			setInterimText("");
@@ -507,7 +507,7 @@ export default function Home() {
 		const today = new Date();
 		const getFormatted = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 		const todayStr = getFormatted(today);
-		
+
 		const yesterday = new Date();
 		yesterday.setDate(yesterday.getDate() - 1);
 		const yesterdayStr = getFormatted(yesterday);
@@ -689,14 +689,14 @@ export default function Home() {
 							</h1>
 						</div>
 					</div>
-					
+
 				</div>
 			</header>
 
 			{/* Panel Dev Oculto */}
 			<AnimatePresence>
 				{showDevPanel && (
-					<motion.div 
+					<motion.div
 						initial={{ opacity: 0, y: -10 }}
 						animate={{ opacity: 1, y: 0 }}
 						exit={{ opacity: 0, y: -10 }}
@@ -706,9 +706,9 @@ export default function Home() {
 							<span className="text-[10px] uppercase tracking-widest font-mono text-gray-400 font-semibold">Modo Dev</span>
 							<button onClick={() => setShowDevPanel(false)} className="text-gray-500 hover:text-white">✕</button>
 						</div>
-						
+
 						<div className="flex flex-col gap-2">
-							<div 
+							<div
 								className="text-[11px] text-gray-300 px-3 py-2 flex items-center justify-between gap-2 font-medium bg-white/[0.02] rounded-md border border-white/5"
 							>
 								<span>Adapter Activo:</span>
@@ -740,7 +740,7 @@ export default function Home() {
 			{/* Alerta de Éxito de Captura (Micro-interacción de Recompensa) */}
 			<AnimatePresence>
 				{showSuccessToast && (
-					<motion.div 
+					<motion.div
 						initial={{ opacity: 0, y: -20 }}
 						animate={{ opacity: 1, y: 0 }}
 						exit={{ opacity: 0, y: -20 }}
@@ -759,13 +759,13 @@ export default function Home() {
 			</AnimatePresence>
 
 			<div className="max-w-7xl mx-auto px-6 md:px-12 py-12">
-				
+
 				{/* Estructura Desktop Multi-zona (12 Columnas) */}
 				<div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-					
+
 					{/* COLUMNA IZQUIERDA: Stats de Dopamina Reales (4 cols) */}
 					<aside className="lg:col-span-4 flex flex-col gap-8">
-						
+
 						{/* Card de Dopamina Real: Streaks & Cobertura */}
 						<section className="bg-[#18181b] border border-white/[0.06] rounded-2xl p-6 flex flex-col gap-6 shadow-xs relative overflow-hidden">
 							<div className="flex items-center justify-between border-b border-white/[0.03] pb-4">
@@ -819,7 +819,7 @@ export default function Home() {
 									<span className="text-indigo-400 font-semibold font-mono">{isMounted ? hoursAttended.size : "-"} / 24h</span>
 								</div>
 								<div className="w-full bg-[#111113] rounded-full h-2 overflow-hidden border border-white/[0.05]">
-									<div 
+									<div
 										className="bg-indigo-500 h-full rounded-full transition-all duration-750 ease-out shadow-[0_0_12px_rgba(99,102,241,0.4)]"
 										style={{ width: `${isMounted ? Math.max(4, Math.min(100, coveragePercentage)) : 0}%` }}
 									/>
@@ -852,7 +852,7 @@ export default function Home() {
 
 					{/* COLUMNA DERECHA: Captura & Timeline & Corpus (8 cols) */}
 					<div className="lg:col-span-8 flex flex-col gap-8">
-						
+
 						{/* LA CAPTURA: Protagonista Absoluto */}
 						<section className="bg-[#18181b] border border-white/[0.06] rounded-2xl p-6 flex flex-col gap-5 shadow-xs relative overflow-hidden">
 							<div className="flex items-center justify-between border-b border-white/[0.03] pb-4">
@@ -885,7 +885,7 @@ export default function Home() {
 									placeholder={dictando ? "Escuchando voz en tiempo real... Habla libremente..." : "¿Qué acaba de pasar? Registra un evento, pernocta, nota o idea..."}
 									className="w-full bg-transparent text-white placeholder-zinc-600 resize-none focus:outline-none leading-relaxed text-sm md:text-base min-h-[110px] h-auto"
 								/>
-								
+
 								{/* Texto interino en vivo de Speech API */}
 								{interimText && (
 									<div className="text-indigo-400/90 italic text-xs mt-3 animate-pulse bg-indigo-500/5 p-3 rounded-lg border border-indigo-500/10 font-mono">
@@ -923,8 +923,8 @@ export default function Home() {
 									onClick={toggleDictation}
 									type="button"
 									className={`px-5 py-3 rounded-xl transition-all duration-350 flex items-center gap-2 text-xs font-semibold border cursor-pointer ${
-										dictando 
-											? "bg-indigo-500/15 border-indigo-500/30 text-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.2)]" 
+										dictando
+											? "bg-indigo-500/15 border-indigo-500/30 text-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.2)]"
 											: "bg-[#202024]/80 border-white/[0.04] hover:border-white/[0.1] text-gray-400 hover:text-white"
 									}`}
 								>
@@ -1034,8 +1034,8 @@ export default function Home() {
 											Bloque de las {isMounted ? selectedTimelineHour.toString().padStart(2, "0") : "--"}:00
 										</span>
 										<span className={`text-[9px] font-mono font-semibold px-2 py-0.5 rounded-md uppercase border ${
-											isMounted && hoursAttended.has(selectedTimelineHour) 
-												? "bg-[#72BC8F]/8 text-[#72BC8F] border-[#72BC8F]/15" 
+											isMounted && hoursAttended.has(selectedTimelineHour)
+												? "bg-[#72BC8F]/8 text-[#72BC8F] border-[#72BC8F]/15"
 												: "bg-[#E97366]/8 text-[#E97366]/85 border-[#E97366]/15"
 										}`}>
 											{isMounted && hoursAttended.has(selectedTimelineHour) ? "Registrada" : "Pendiente"}
@@ -1071,8 +1071,8 @@ export default function Home() {
 									</ul>
 								) : (
 									<p className="text-xs text-gray-500 italic leading-relaxed">
-										{selectedTimelineHour <= currentHour 
-											? "No hay notas guardadas en esta hora todavía. Registra tus actividades pasadas para cubrir la línea de tiempo." 
+										{selectedTimelineHour <= currentHour
+											? "No hay notas guardadas en esta hora todavía. Registra tus actividades pasadas para cubrir la línea de tiempo."
 											: "Bloque horario futuro. Completa tu bitácora cuando llegue el momento."}
 									</p>
 								)}
@@ -1081,7 +1081,7 @@ export default function Home() {
 
 						{/* REGISTROS HISTÓRICOS: Corpus Feed Unificado */}
 						<section className="flex flex-col gap-5 border-t border-white/[0.06] pt-8">
-							
+
 							{/* Fila de Cabecera y Buscador */}
 							<div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-0.5">
 								<div>
@@ -1166,8 +1166,8 @@ export default function Home() {
 											<Search className="w-5 h-5 text-gray-600" />
 										</div>
 										<p className="text-gray-400 text-sm font-semibold mt-1 px-6">
-											{searchQuery || tipoFilter 
-												? "No se hallaron coincidencias para la búsqueda actual." 
+											{searchQuery || tipoFilter
+												? "No se hallaron coincidencias para la búsqueda actual."
 												: "Tu bitácora está lista para tus memorias"}
 										</p>
 										<p className="text-gray-600 text-xs max-w-sm px-6 leading-relaxed">
@@ -1220,7 +1220,7 @@ export default function Home() {
 															</button>
 
 															{/* Especie de canal de captura */}
-															<span 
+															<span
 																className="text-[9px] text-gray-500 flex items-center gap-1.5 bg-[#202024]/60 border border-white/[0.04] px-2.5 py-1 rounded-md font-mono"
 																title={captura.origen === "voice" ? "Entrada dictada con voz" : "Entrada escrita con teclado"}
 															>
@@ -1279,7 +1279,7 @@ export default function Home() {
 																		<div className="flex justify-between">
 																			<span>Geolocalización:</span>
 																			<span className="text-gray-400">
-																				{captura.forensics.geo.lat.toFixed(4)}, {captura.forensics.geo.long.toFixed(4)} 
+																				{captura.forensics.geo.lat.toFixed(4)}, {captura.forensics.geo.long.toFixed(4)}
 																				(±{Math.round(captura.forensics.geo.accuracy)}m)
 																			</span>
 																		</div>
