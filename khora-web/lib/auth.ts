@@ -3,7 +3,7 @@ export interface KhoraAuthSession {
   timestamp: number;
 }
 
-const AUTH_TIMEOUT = 3600000; // 1 hour in ms
+const AUTH_TIMEOUT = 900000; // 15 minutes in ms
 const SESSION_KEY = "khora_auth_session";
 
 export function setAuthSession() {
