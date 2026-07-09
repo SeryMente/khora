@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test.describe('Shell Navegación v2', () => {
   test('Navega por todos los dominios y verifica la renderización', async ({ page }) => {
     const routes = [
-      { path: '/bitacora', expectedTitle: 'Acceso Restringido' }, // Ya que bitacora requiere pin, primero veremos el candado
+      { path: '/bitacora', expectedTitle: 'Configurar PIN' }, // Ya que bitacora requiere pin, primero veremos el candado
       { path: '/cabina', expectedTitle: 'Cabina' },
       { path: '/integracion', expectedTitle: 'Integración' },
       { path: '/nucleo', expectedTitle: 'Núcleo' },
