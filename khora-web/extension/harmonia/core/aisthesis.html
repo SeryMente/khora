@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Αἴσθησις · Aísthesis</title>
+<style>
+  /* ===== Hierofante · Silencio · Secretos de Grecia ===== */
+  :root{
+    --obsidiana:#0a0907; --obsidiana2:#100d09; --vel:#15110b;
+    --oro:#c9a24b; --oro-claro:#e8d39a; --oro-tenue:#6f5b30;
+    --marmol:#e7e0cf; --ceniza:#8c8472; --linea:#2a2318;
+    --ok:#7fae6b; --err:#c1554b; --serif:'Cormorant Garamond',Georgia,'Times New Roman',serif;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ height:100%; }
+  body{
+    margin:0; background:
+      radial-gradient(1200px 600px at 50% -10%, rgba(201,162,75,.10), transparent 60%),
+      radial-gradient(800px 500px at 100% 110%, rgba(201,162,75,.05), transparent 60%),
+      var(--obsidiana);
+    color:var(--marmol); font:14px/1.5 var(--serif);
+    display:flex; flex-direction:column; overflow:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  /* Cabecera del templo */
+  header.naos{
+    display:flex; align-items:center; gap:18px; padding:14px 26px;
+    border-bottom:1px solid var(--linea);
+    background:linear-gradient(180deg, rgba(20,16,9,.96), rgba(10,9,7,.96));
+    box-shadow:0 1px 0 rgba(201,162,75,.12);
+  }
+  .sello{ font-size:26px; filter:drop-shadow(0 0 10px rgba(201,162,75,.35)); }
+  .titulo{ display:flex; flex-direction:column; line-height:1.1; }
+  .titulo .gr{
+    font-size:23px; letter-spacing:.30em; color:var(--oro-claro);
+    text-transform:uppercase; font-weight:600; text-shadow:0 0 18px rgba(201,162,75,.25);
+  }
+  .titulo .lat{ font-size:11px; letter-spacing:.5em; color:var(--ceniza); text-transform:uppercase; margin-top:3px; }
+  .lema{ margin-left:6px; padding-left:18px; border-left:1px solid var(--linea);
+    color:var(--oro-tenue); font-size:12.5px; letter-spacing:.34em; text-transform:uppercase; white-space:nowrap; }
+  .lema span{ color:var(--ceniza); }
+  .estado{ margin-left:auto; display:flex; align-items:center; gap:14px; }
+  .ahk{ display:flex; align-items:center; gap:7px; font-size:11px; letter-spacing:.18em;
+    text-transform:uppercase; color:var(--ceniza); }
+  .ahk .luz{ width:8px; height:8px; border-radius:50%; background:var(--ceniza); box-shadow:0 0 8px rgba(0,0,0,.4); }
+  .ahk.ok .luz{ background:var(--ok); box-shadow:0 0 10px rgba(127,174,107,.7); }
+  .ahk.bloq .luz{ background:var(--err); box-shadow:0 0 10px rgba(193,85,75,.7); animation:lat 1.4s infinite; }
+  @keyframes lat{ 0%,100%{opacity:1} 50%{opacity:.25} }
+  /* Lentes (modos) */
+  nav.lentes{ display:flex; gap:2px; padding:0 22px; background:var(--obsidiana2);
+    border-bottom:1px solid var(--linea); }
+  .lente{ position:relative; background:transparent; border:none; cursor:pointer;
+    padding:13px 22px 12px; color:var(--ceniza); font-family:var(--serif);
+    display:flex; align-items:baseline; gap:10px; transition:color .25s; }
+  .lente .gr{ font-size:17px; letter-spacing:.22em; text-transform:uppercase; }
+  .lente .es{ font-size:11px; letter-spacing:.16em; color:var(--oro-tenue); text-transform:uppercase; }
+  .lente:hover{ color:var(--marmol); }
+  .lente.activa{ color:var(--oro-claro); }
+  .lente.activa .es{ color:var(--ceniza); }
+  .lente.activa::after{ content:""; position:absolute; left:14px; right:14px; bottom:-1px; height:2px;
+    background:linear-gradient(90deg, transparent, var(--oro), transparent); box-shadow:0 0 12px rgba(201,162,75,.6); }
+  /* Escenario */
+  main.cella{ position:relative; flex:1; min-height:0; }
+  .marco{ position:absolute; inset:0; border:none; width:100%; height:100%; background:var(--obsidiana);
+    opacity:0; pointer-events:none; transition:opacity .35s; }
+  .marco.viva{ opacity:1; pointer-events:auto; }
+  /* Velo de silencio (carga) */
+  .velo{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:14px; background:var(--obsidiana); z-index:3; transition:opacity .6s; }
+  .velo.ido{ opacity:0; pointer-events:none; }
+  .velo .sigilo{ font-size:40px; color:var(--oro); filter:drop-shadow(0 0 16px rgba(201,162,75,.4)); animation:resp 3s ease-in-out infinite; }
+  @keyframes resp{ 0%,100%{opacity:.55; transform:scale(.97)} 50%{opacity:1; transform:scale(1.02)} }
+  .velo .susurro{ font-size:13px; letter-spacing:.5em; text-transform:uppercase; color:var(--oro-tenue); }
+</style>
+</head>
+<body>
+  <header class="naos">
+    <span class="sello">🦅</span>
+    <div class="titulo">
+      <span class="gr">Αἴσθησις</span>
+      <span class="lat">Aísthesis · CoMind</span>
+    </div>
+    <div class="lema">Hierofante <span>·</span> Silencio <span>·</span> Secretos</div>
+    <div class="estado">
+      <div class="ahk" id="ahk"><span class="luz"></span><span id="ahkTxt">AHK · verificando</span></div>
+    </div>
+  </header>
+
+  <nav class="lentes" id="lentes">
+    <button class="lente activa" data-lente="chronos" data-src="../modules/globo/options.html">
+      <span class="gr">Χρόνος</span><span class="es">Chrónos · minutos → finanzas</span>
+    </button>
+    <button class="lente" data-lente="agora" data-src="../modules/caza/runtime.html">
+      <span class="gr">Ἀγορά</span><span class="es">Agorá · caza del mercado</span>
+    </button>
+  </nav>
+
+  <main class="cella" id="cella">
+    <div class="velo" id="velo">
+      <div class="sigilo">Ω</div>
+      <div class="susurro">Silencio…</div>
+    </div>
+  </main>
+
+  <script src="aisthesis.js"></script>
+</body>
+</html>

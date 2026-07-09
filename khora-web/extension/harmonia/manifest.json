@@ -1,0 +1,80 @@
+{
+  "manifest_version": 3,
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyAJMMET7XWdfID71Dm1xe0hJiWaq060QDBAH74QLx4mKTESI0GX42T15PJYPC0zVn9Km5h69mLVqbonu8mpMFNWBWTdJfGaxJQcA0tH8DKZMERHGpQz0eAam7FR88zm7M3f9euJakiM646aT0KnZkpJLBYh57r8gxl2f/wdoOBD7j+BGKs2Nh+shAMsaJSBxJy3Cumg43WDyH59WX3K+YrYmNRdYRICJwsiOi6XYXIBKYUs82pw/VjLb7KmNqI4bl4M0HxEfajB/VHyB3QTl74mozi/0MpjPMFTsO22igMoZc8bUynLXp6RqSb5yX3Q+2Gp6VCBj2Lsqv29zHD+9twIDAQAB",
+  "name": "Aisthesis (Halcon) - CoMind",
+  "version": "0.3.3",
+  "description": "Sombrilla de integraciones de CoMind. Shell modular MV3: cada integracion (globo, caza, ...) es un modulo enchufable conmutable. Secretos en Ajustes, telemetria -> Logos.",
+  "permissions": [
+    "storage",
+    "tabs",
+    "alarms",
+    "notifications",
+    "idle",
+    "scripting",
+    "nativeMessaging",
+    "cookies"
+  ],
+  "host_permissions": [
+    "https://globohq.com/*",
+    "https://api.notion.com/*",
+    "https://www.facebook.com/*"
+  ],
+  "background": {
+    "service_worker": "core/shell.sw.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "modules/globo/content.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://globohq.com/*"
+      ],
+      "js": [
+        "modules/globo/mainworld.js"
+      ],
+      "run_at": "document_idle",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "https://globohq.com/*"
+      ],
+      "js": [
+        "modules/globo/booster.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://www.facebook.com/marketplace/*"
+      ],
+      "js": [
+        "modules/caza/content.js",
+        "modules/caza/humano.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "options_page": "core/aisthesis.html",
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "action": {
+    "default_title": "Aisthesis - sombrilla CoMind",
+    "default_icon": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    }
+  }
+}

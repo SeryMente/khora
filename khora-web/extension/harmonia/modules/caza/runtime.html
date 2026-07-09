@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Cazagangas - cerebro</title>
+<script>
+(function(){
+  var BUILD="0.9.41";
+  function badge(){ try{ if(!document.body){ return setTimeout(badge,20); } var b=document.getElementById("cz-boot-badge"); if(!b){ b=document.createElement("div"); b.id="cz-boot-badge"; b.style.cssText="position:fixed;left:8px;bottom:8px;z-index:2147483647;background:#0b1220;color:#9fb4d8;font:11px/1.4 ui-monospace,Menlo,monospace;padding:4px 8px;border:1px solid #26395f;border-radius:7px;opacity:.9"; document.body.appendChild(b); } b.textContent="Cazagangas build "+BUILD+" \u00b7 cargando\u2026"; }catch(e){} }
+  function fatal(msg,src,line,col){ try{ if(!document.body){ return; } var d=document.getElementById("cz-fatal-inline")||document.createElement("div"); d.id="cz-fatal-inline"; d.style.cssText="position:fixed;left:0;right:0;top:0;z-index:2147483646;background:#3a0d12;color:#ffd9d4;font:12px/1.5 ui-monospace,Menlo,monospace;padding:12px 16px;white-space:pre-wrap;max-height:55vh;overflow:auto;border-bottom:2px solid #e0726a"; d.textContent="\u26a0 Error de script (build "+BUILD+"):\n"+msg+"\n"+(src||"")+(line?(" :"+line+":"+col):""); document.body.appendChild(d); }catch(e){} }
+  window.addEventListener("error",function(ev){ fatal((ev&&ev.message)||"error", ev&&ev.filename, ev&&ev.lineno, ev&&ev.colno); });
+  window.addEventListener("unhandledrejection",function(ev){ fatal("promesa: "+((ev&&ev.reason&&(ev.reason.message||ev.reason))||"rechazo")); });
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",badge); else badge();
+})();
+</script>
+<link rel="stylesheet" href="theme.css">
+<style>
+  /* Estilos minimos nativos; la carcasa (theme.css + shell.js) hace el resto. */
+  h1 { font-size: 18px; }
+  #latido { font-weight: bold; }
+  button { padding: 8px 12px; margin-right: 8px; cursor: pointer; }
+  #lista { list-style: none; padding: 0; }
+  #lista li { padding: 4px 0; }
+</style>
+</head>
+<body>
+  <h1>Cazagangas - cerebro</h1>
+  <div id="latido">iniciando...</div>
+  <div id="config">cargando configuracion...</div>
+  <div>
+    <button id="btnCosechar">Cosechar ahora</button>
+    <button id="btnPuntuar">Puntuar hallazgos</button>
+    <span id="resumen"></span>
+  </div>
+  <ul id="lista"></ul>
+  <script src="purga.js"></script>
+  <script src="autorecarga.js"></script>
+  <script src="telemetria.js"></script>
+  <script src="scoring.js"></script>
+  <script src="celular.js"></script>
+  <script src="aprendizaje.js"></script>
+  <script src="runtime.js"></script>
+  <script src="notion.js"></script>
+  <script src="opciones.js"></script>
+  <script src="enriquecer.js"></script>
+  <script src="notion-update.js"></script>
+  <script src="descubrir.js"></script>
+  <script src="sonda.js"></script>
+  <script src="notion-espejo.js"></script>
+  <script src="cosecha-auto.js"></script>
+  <script src="integridad.js"></script>
+  <script src="shell.js"></script>
+</body>
+</html>
