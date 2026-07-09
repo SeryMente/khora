@@ -1,6 +1,7 @@
 "use client";
 
 import { Network, Workflow, Cable } from "lucide-react";
+import { TelemetryViewer } from "../components/TelemetryViewer";
 
 export default function IntegracionPage() {
   return (
@@ -34,6 +35,8 @@ export default function IntegracionPage() {
             </div>
           </div>
         </div>
+
+        <TelemetryViewer />
       </div>
     </main>
   );
