@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { useCapturas } from "@/lib/hooks";
+import { checkAuthSession, setAuthSession, clearAuthSession } from "@/lib/auth";
+import { hasCryptoState, verifyPIN, setupCryptoEnvironment } from "@/lib/crypto";
 import { verifyChainHealth, type ChainHealthResult } from "@/lib/chain-health";
 import { motion, AnimatePresence } from "motion/react";
 import {
@@ -104,27 +106,46 @@ export default function BitacoraPage() {
   // --- Autenticacion local (client-side) ---
   const [isAuth, setIsAuth] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
-  const [loginUser, setLoginUser] = useState("");
   const [loginPass, setLoginPass] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [loginError, setLoginError] = useState(false);
+  const [isSetup, setIsSetup] = useState(false);
+  const [recoveryCode, setRecoveryCode] = useState<string | null>(null);
 
   useEffect(() => {
-    if (typeof window !== "undefined" && localStorage.getItem("khora_auth") === "1") {
-      setIsAuth(true);
+    if (typeof window !== "undefined") {
+      setIsAuth(checkAuthSession());
+      setIsSetup(!hasCryptoState());
     }
     setAuthChecked(true);
   }, []);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (loginUser.trim() === "willfreeman" && loginPass === "A02122310a!") {
-      setIsAuth(true);
-      setLoginError(false);
-      if (typeof window !== "undefined") localStorage.setItem("khora_auth", "1");
+    if (isSetup) {
+      if (loginPass.length < 4) {
+        setLoginError(true);
+        return;
+      }
+      const result = await setupCryptoEnvironment(loginPass);
+      setRecoveryCode(result.recoveryCode);
+      // Wait for user to dismiss recovery code
     } else {
-      setLoginError(true);
+      const valid = await verifyPIN(loginPass);
+      if (valid) {
+        setAuthSession();
+        setIsAuth(true);
+        setLoginError(false);
+      } else {
+        setLoginError(true);
+      }
     }
+  };
+
+  const handleContinueAfterSetup = () => {
+    setAuthSession();
+    setIsAuth(true);
+    setRecoveryCode(null);
   };
 
   // DevPanel/Health
@@ -194,58 +215,86 @@ export default function BitacoraPage() {
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-[#3FA7FF]/5 rounded-full blur-[150px]" />
         </div>
-        <div className="z-10 w-full max-w-sm bg-[#112A4F] border border-[#1F3C6A] rounded-2xl p-8 shadow-2xl flex flex-col items-center gap-6">
-          <div className="w-16 h-16 rounded-2xl bg-white/[0.03] border border-white/10 flex items-center justify-center">
-            <Lock className="w-8 h-8 text-[#3FA7FF]" />
-          </div>
-          <div className="text-center">
-            <h2 className="text-xl font-bold text-white tracking-tight">Acceso Restringido</h2>
-            <p className="text-[11px] text-gray-400 font-mono tracking-widest uppercase opacity-60 mt-2">Bitácora cifrada</p>
-          </div>
-          <form onSubmit={handleLogin} className="w-full flex flex-col gap-4">
-            <div className="relative">
-              <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Usuario"
-                value={loginUser}
-                onChange={(e) => setLoginUser(e.target.value)}
-                className="w-full bg-[#0B1F3B] border border-[#1F3C6A] rounded-xl py-3 pl-10 pr-4 text-white text-sm focus:outline-none focus:border-[#3FA7FF] transition-colors"
-                autoComplete="username"
-              />
+
+        {recoveryCode ? (
+          <div className="z-10 w-full max-w-sm bg-[#112A4F] border border-[#1F3C6A] rounded-2xl p-8 shadow-2xl flex flex-col items-center gap-6">
+            <div className="w-16 h-16 rounded-2xl bg-white/[0.03] border border-white/10 flex items-center justify-center">
+              <Lock className="w-8 h-8 text-[#72BC8F]" />
             </div>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
-                type={showPass ? "text" : "password"}
-                placeholder="PIN criptográfico"
-                value={loginPass}
-                onChange={(e) => setLoginPass(e.target.value)}
-                className="w-full bg-[#0B1F3B] border border-[#1F3C6A] rounded-xl py-3 pl-10 pr-10 text-white text-sm focus:outline-none focus:border-[#3FA7FF] transition-colors font-mono tracking-widest"
-                autoComplete="current-password"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPass(!showPass)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
-              >
-                {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
+            <div className="text-center">
+              <h2 className="text-xl font-bold text-white tracking-tight">PIN Configurado</h2>
+              <p className="text-[11px] text-gray-400 font-mono tracking-widest uppercase opacity-60 mt-2">Guarda este código</p>
             </div>
-            {loginError && (
-              <p className="text-red-400 text-xs font-mono text-center bg-red-400/10 py-2 rounded-lg border border-red-400/20">
-                Credenciales inválidas
-              </p>
-            )}
+
+            <div className="w-full bg-black/30 border border-white/10 rounded-xl p-4 text-center">
+              <p className="text-xs text-gray-400 mb-2">Código de recuperación (única vez):</p>
+              <p className="text-sm font-mono text-[#72BC8F] break-all">{recoveryCode}</p>
+            </div>
+
+            <p className="text-xs text-amber-400/80 text-center">
+              Guarda este código en un lugar seguro. Es la única forma de recuperar el acceso si olvidas el PIN.
+            </p>
+
             <button
-              type="submit"
+              onClick={handleContinueAfterSetup}
               className="w-full bg-[#3FA7FF] text-white py-3 rounded-xl font-medium shadow-[0_0_15px_rgba(63,167,255,0.2)] hover:shadow-[0_0_20px_rgba(63,167,255,0.4)] transition-all flex items-center justify-center gap-2 mt-2"
             >
-              <LogIn className="w-4 h-4" />
-              <span>Desbloquear Memoria</span>
+              <span>Entendido, Continuar</span>
             </button>
-          </form>
-        </div>
+          </div>
+        ) : (
+          <div className="z-10 w-full max-w-sm bg-[#112A4F] border border-[#1F3C6A] rounded-2xl p-8 shadow-2xl flex flex-col items-center gap-6">
+            <div className="w-16 h-16 rounded-2xl bg-white/[0.03] border border-white/10 flex items-center justify-center">
+              <Lock className="w-8 h-8 text-[#3FA7FF]" />
+            </div>
+            <div className="text-center">
+              <h2 className="text-xl font-bold text-white tracking-tight">
+                {isSetup ? "Configurar PIN" : "Acceso Restringido"}
+              </h2>
+              <p className="text-[11px] text-gray-400 font-mono tracking-widest uppercase opacity-60 mt-2">
+                {isSetup ? "Nueva bitácora cifrada" : "Bitácora cifrada"}
+              </p>
+            </div>
+            <form onSubmit={handleLogin} className="w-full flex flex-col gap-4">
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type={showPass ? "text" : "password"}
+                  placeholder={isSetup ? "Crea un PIN criptográfico" : "PIN criptográfico"}
+                  value={loginPass}
+                  onChange={(e) => setLoginPass(e.target.value)}
+                  className="w-full bg-[#0B1F3B] border border-[#1F3C6A] rounded-xl py-3 pl-10 pr-10 text-white text-sm focus:outline-none focus:border-[#3FA7FF] transition-colors font-mono tracking-widest"
+                  autoComplete={isSetup ? "new-password" : "current-password"}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPass(!showPass)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                >
+                  {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+              {loginError && (
+                <p className="text-red-400 text-xs font-mono text-center bg-red-400/10 py-2 rounded-lg border border-red-400/20">
+                  {isSetup ? "PIN inválido (mínimo 4 caracteres)" : "PIN incorrecto"}
+                </p>
+              )}
+              <button
+                type="submit"
+                className="w-full bg-[#3FA7FF] text-white py-3 rounded-xl font-medium shadow-[0_0_15px_rgba(63,167,255,0.2)] hover:shadow-[0_0_20px_rgba(63,167,255,0.4)] transition-all flex items-center justify-center gap-2 mt-2"
+              >
+                {isSetup ? (
+                  <span>Configurar PIN</span>
+                ) : (
+                  <>
+                    <LogIn className="w-4 h-4" />
+                    <span>Desbloquear Memoria</span>
+                  </>
+                )}
+              </button>
+            </form>
+          </div>
+        )}
       </div>
     );
   }
@@ -263,10 +312,22 @@ export default function BitacoraPage() {
                 Memoria Continua
               </span>
             </h1>
-            <p className="text-gray-400 text-sm mt-1.5 font-medium flex items-center gap-2">
-              <Activity className="w-4 h-4" />
-              Capturando la realidad empírica
-            </p>
+            <div className="flex items-center gap-4 mt-1.5">
+              <p className="text-gray-400 text-sm font-medium flex items-center gap-2">
+                <Activity className="w-4 h-4" />
+                Capturando la realidad empírica
+              </p>
+              <button
+                onClick={() => {
+                  clearAuthSession();
+                  setIsAuth(false);
+                }}
+                className="flex items-center gap-1.5 text-xs text-indigo-400 hover:text-indigo-300 transition-colors bg-indigo-500/10 hover:bg-indigo-500/20 px-2 py-1 rounded-md border border-indigo-500/20"
+              >
+                <Lock className="w-3 h-3" />
+                Bloquear
+              </button>
+            </div>
           </div>
         </header>
 
