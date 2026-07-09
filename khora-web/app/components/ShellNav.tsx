@@ -21,7 +21,7 @@ const NAV_ITEMS = [
   { href: "/integracion", label: "Integración", icon: Network },
   { href: "/nucleo", label: "Núcleo", icon: Cpu },
   { href: "/prisma", label: "Prisma", icon: Hexagon },
-  { href: "/sistemas", label: "Sistemas", icon: Server },
+  { href: "/sistema", label: "Sistema", icon: Server },
 ];
 
 export function ShellNav() {
