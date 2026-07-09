@@ -10,11 +10,15 @@ def test_information_object_contract_frozen():
     filepath = "khora-web/lib/information-object.ts"
     assert os.path.exists(filepath), f"El archivo {filepath} no existe."
 
-    with open(filepath, "r", encoding="utf-8") as f:
+    with open(filepath, "r", encoding="utf-8", newline="") as f:
         content = f.read()
 
+    # Normalizamos los saltos de línea a LF (\n) para evitar
+    # que el hash cambie por culpa de git core.autocrlf en CI.
+    content_normalized = content.replace("\r\n", "\n")
+
     # Calcular hash SHA-256 del contenido
-    sha256_hash = hashlib.sha256(content.encode("utf-8")).hexdigest()
+    sha256_hash = hashlib.sha256(content_normalized.encode("utf-8")).hexdigest()
 
     # Este es el hash esperado para la versión inicial del contrato.
     # Si la prueba falla porque cambiaste el contrato intencionalmente,
