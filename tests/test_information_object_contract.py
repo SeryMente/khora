@@ -1,6 +1,5 @@
 import os
 import hashlib
-import pytest
 
 def test_information_object_contract_frozen():
     """
