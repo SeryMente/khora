@@ -16,3 +16,4 @@ dist/
 # basura recurrente del agente
 from __future__ import annotations.py
 khora.db
+khora-web/public/downloads/*.zip
