@@ -1,0 +1,16 @@
+{
+  "id": "todoist",
+  "name": "Todoist Sincronizador",
+  "version": "1.0.0",
+  "enabled": true,
+  "background": "modules/todoist/background.js",
+  "content": [
+    {
+      "matches": ["https://todoist.com/app/*"],
+      "js": ["modules/todoist/content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "hostPermissions": ["https://todoist.com/*", "https://api.notion.com/*"],
+  "settings": ["TODOIST_NOTION_DB_ID"]
+}
