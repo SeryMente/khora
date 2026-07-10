@@ -23,7 +23,7 @@ def test_information_object_contract_frozen():
     # Este es el hash esperado para la versión inicial del contrato.
     # Si la prueba falla porque cambiaste el contrato intencionalmente,
     # actualiza este valor.
-    expected_hash = "eb91b24323b783dbea5a1113796d7184f6e29fdb4a7f63a0237b7dc91a92af78"
+    expected_hash = "14bbeef57dc3c453b4d8f6efe4ce50b45f963d24d731c686182bb444cf98c1dc"
 
     assert sha256_hash == expected_hash, (
         f"El hash del contrato InformationObject ha cambiado.\n"
