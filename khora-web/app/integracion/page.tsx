@@ -3,6 +3,7 @@
 import { Network, Workflow, Cable, Download, Puzzle } from "lucide-react";
 import manifest from "../../extension/harmonia/manifest.json";
 import { CopyBlock } from "../components/CopyBlock";
+import { TelemetryViewer } from "../components/TelemetryViewer";
 
 export default function IntegracionPage() {
   const version = manifest.version;
@@ -88,6 +89,8 @@ export default function IntegracionPage() {
             </div>
           </div>
         </div>
+
+        <TelemetryViewer />
       </div>
     </main>
   );
