@@ -8,7 +8,7 @@ test.describe('Shell Navegación v2', () => {
       { path: '/integracion', expectedTitle: 'Integración' },
       { path: '/nucleo', expectedTitle: 'Núcleo' },
       { path: '/prisma', expectedTitle: 'Prisma' },
-      { path: '/sistemas', expectedTitle: 'Sistemas' },
+      { path: '/sistema', expectedTitle: 'Sistema' },
       { path: '/preguntar', expectedTitle: 'Preguntar a la red' },
     ];
 
@@ -22,7 +22,7 @@ test.describe('Shell Navegación v2', () => {
   });
 
   test('El Modal "Capturar" se abre y cierra correctamente', async ({ page }) => {
-    await page.goto('http://localhost:3000/sistemas');
+    await page.goto('http://localhost:3000/sistema');
     await page.waitForLoadState('domcontentloaded');
 
     const captureButton = page.locator('button:has-text("Capturar")').first();

@@ -2,14 +2,14 @@
 
 import { Server, Shield, Cloud } from "lucide-react";
 
-export default function SistemasPage() {
+export default function SistemaPage() {
   return (
     <main className="min-h-screen bg-[#08080a] p-4 md:p-8 font-sans pb-32">
       <div className="max-w-4xl mx-auto space-y-8 mt-12">
         <header className="mb-10">
           <h1 className="text-3xl font-bold text-white tracking-tight flex items-center gap-3">
             <Server className="w-8 h-8 text-[#3FA7FF]" />
-            Sistemas
+            Sistema
           </h1>
           <p className="text-gray-400 mt-2">Configuración de despliegue, infraestructura y seguridad global.</p>
         </header>
