@@ -1,16 +1,17 @@
+// Importar adaptador Notion compartido
+if (typeof importScripts !== "undefined") { try { importScripts("../shared/notion-adapter.js"); } catch(e) {} }
+const notionFetch = self.NotionAdapter ? self.NotionAdapter.fetch : async () => null;
 const NOTION = "https://api.notion.com/v1";
 const NV = "2022-06-28";
 let DB_ID = "69b2a69b-e923-4c0f-b438-f38b0cd35b95"; // override desde Ajustes
-let TOKEN = ""; // NUNCA hardcodear: se carga desde Ajustes (chrome.storage.local.NOTION_TOKEN)
+
 // ===== Aisthesis: secretos desde Ajustes (chrome.storage), no hardcodeado =====
 try {
-  chrome.storage.local.get(["NOTION_TOKEN","GLOBO_CALLS_DB_ID"], (v)=>{
-    if (v && v.NOTION_TOKEN) TOKEN = v.NOTION_TOKEN;
+  chrome.storage.local.get(["GLOBO_CALLS_DB_ID"], (v)=>{
     if (v && v.GLOBO_CALLS_DB_ID) DB_ID = v.GLOBO_CALLS_DB_ID;
   });
   chrome.storage.onChanged.addListener((ch, area)=>{
     if (area !== "local") return;
-    if (ch.NOTION_TOKEN) TOKEN = ch.NOTION_TOKEN.newValue || "";
     if (ch.GLOBO_CALLS_DB_ID) DB_ID = ch.GLOBO_CALLS_DB_ID.newValue || DB_ID;
   });
 } catch (e) {}
@@ -457,22 +458,6 @@ async function runOperationalStartup(reason){
 // Notion NO permite comas en nombres de opciones de select. Las cambiamos por espacio
 // (coincide con las opciones ya existentes en la base, p.ej. "HealthNet  Inc").
 function selName(v){ return String(v == null ? "" : v).replace(/,/g," ").replace(/\s+/g," ").trim().slice(0,90); }
-
-async function notionFetch(url, opts, tries){
-  tries = tries || 4;
-  for(let i = 0; i < tries; i++){
-    let res;
-    try{ res = await fetch(url, opts); }
-    catch(e){ if(i === tries-1) throw e; await sleep(500 * (i+1)); continue; }
-    if(res.status === 429 || res.status >= 500){
-      const ra = parseInt(res.headers.get("Retry-After") || "0", 10);
-      await sleep(ra ? ra*1000 : 600 * (i+1));
-      continue;
-    }
-    return res;
-  }
-  return null;
-}
 
 async function getSeenIds(){
   const seen = new Set();

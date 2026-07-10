@@ -1,9 +1,8 @@
 // Cazagangas - Capa 4 - notion.js (v0.4.2): escritor a Notion, panel minimo (sin campos)
 (() => {
-  let TOKEN = ""; // externalizado a chrome.storage.local (NOTION_TOKEN) — NUNCA hardcodeado en el repo
-  function _czTok(){ try{ chrome.storage.local.get(["NOTION_TOKEN","cazagangas.token"], function(o){ TOKEN = (o && (o.NOTION_TOKEN || o["cazagangas.token"])) || ""; }); }catch(e){} }
-  _czTok();
-  try{ chrome.storage.onChanged.addListener(function(ch,area){ if(area==="local" && (ch.NOTION_TOKEN || ch["cazagangas.token"])) _czTok(); }); }catch(e){}
+  const notionFetch = self.NotionAdapter ? self.NotionAdapter.fetch : window.NotionAdapter ? window.NotionAdapter.fetch : async () => null;
+  const getToken = self.NotionAdapter ? self.NotionAdapter.getToken : window.NotionAdapter ? window.NotionAdapter.getToken : () => "";
+
   const DB_HINT = "hallazgos"; // para reconocer la base por su titulo
   const API = "https://api.notion.com/v1/pages";
   const SEARCH = "https://api.notion.com/v1/search";
@@ -18,7 +17,6 @@
   const gLocal = (k) => new Promise(r => chrome.storage.local.get(k, r));
   const gSync  = (k) => new Promise(r => chrome.storage.sync.get(k, r));
   const sLocal = (o) => new Promise(r => chrome.storage.local.set(o, r));
-  const headers = () => ({ "Authorization":"Bearer "+TOKEN, "Notion-Version":NV, "Content-Type":"application/json" });
 
   async function getConfig(){
     const s = await gSync(CFG); const l = await gLocal(CFG);
@@ -45,7 +43,7 @@
 
   async function resolverDbId(cfg){
     if (cfg.dbId) return limpiaId(cfg.dbId);
-    const res = await fetch(SEARCH, { method:"POST", headers:headers(), body: JSON.stringify({ query:"Cazagangas", filter:{ property:"object", value:"database" } }) });
+    const res = await notionFetch(SEARCH, { method:"POST", body: JSON.stringify({ query:"Cazagangas", filter:{ property:"object", value:"database" } }) });
     if (!res.ok) return "";
     const j = await res.json();
     const lista = j.results || [];
@@ -76,23 +74,15 @@
   }
   async function crear(h, dbId, cfg){
     const body = { parent: { database_id: dbId }, properties: props(h, cfg) };
-    for (let i = 0; i < 5; i++){
-      let res;
-      try { res = await fetch(API, { method:"POST", headers:headers(), body: JSON.stringify(body) }); }
-      catch(e){ await sleep(1200*(i+1)); continue; }
-      if (res.ok){ const j = await res.json(); return { ok:true, id:j.id }; }
-      if (res.status === 429 || res.status >= 500){
-        const ra = parseFloat(res.headers.get("Retry-After")) || (1.5*(i+1));
-        await sleep(ra*1000); continue;
-      }
-      let t=""; try{ t=await res.text(); }catch(e){}
-      return { ok:false, status:res.status, error:t.slice(0,300) };
-    }
-    return { ok:false, status:0, error:"reintentos agotados" };
+    const res = await notionFetch(API, { method:"POST", body: JSON.stringify(body) });
+    if (!res) return { ok:false, status:0, error:"reintentos agotados" };
+    if (res.ok){ const j = await res.json(); return { ok:true, id:j.id }; }
+    let t=""; try{ t=await res.text(); }catch(e){}
+    return { ok:false, status:res.status, error:t.slice(0,300) };
   }
   function status(m){ const s=$("#cg-n-status"); if(s) s.textContent=m; }
   async function sincronizar(){
-    if (!TOKEN){ status("Falta NOTION_TOKEN. Ponlo en Ajustes de la sombrilla (pestana Ajustes) y reintenta."); return; }
+    if (!getToken()){ status("Falta NOTION_TOKEN. Ponlo en Ajustes de la sombrilla (pestana Ajustes) y reintenta."); return; }
     const cfg = await getConfig();
     status("Resolviendo la base en Notion...");
     const dbId = await resolverDbId(cfg);

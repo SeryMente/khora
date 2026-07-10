@@ -2,10 +2,9 @@
 (() => {
   const VER = "0.9.2";
   const ENR="cazagangas.enriquecidos", SYN="cazagangas.synced", CFG="cazagangas.config", HAL="cazagangas.hallazgos";
-  let TOKEN=""; // externalizado a chrome.storage.local (NOTION_TOKEN) — NUNCA hardcodeado en el repo
-  function _czTok(){ try{ chrome.storage.local.get(["NOTION_TOKEN","cazagangas.token"], function(o){ TOKEN = (o && (o.NOTION_TOKEN || o["cazagangas.token"])) || ""; }); }catch(e){} }
-  _czTok();
-  try{ chrome.storage.onChanged.addListener(function(ch,area){ if(area==="local" && (ch.NOTION_TOKEN || ch["cazagangas.token"])) _czTok(); }); }catch(e){}
+  const notionFetch = self.NotionAdapter ? self.NotionAdapter.fetch : window.NotionAdapter ? window.NotionAdapter.fetch : async () => null;
+  const getToken = self.NotionAdapter ? self.NotionAdapter.getToken : window.NotionAdapter ? window.NotionAdapter.getToken : () => "";
+
   const NV="2022-06-28", API="https://api.notion.com/v1/pages/", GAP=420;
   const $=s=>document.querySelector(s);
   const sleep=ms=>new Promise(r=>setTimeout(r,ms));
@@ -38,7 +37,7 @@
   function ms(a){ return (a||[]).map(n=>({name:n})); }
   function rt(s){ return [{type:"text",text:{content:(s||"").slice(0,1900)}}]; }
   function props(rec){ const p={}; if(rec.estado) p["Estado"]={select:{name:rec.estado}}; if(rec.riesgo) p["Riesgo"]={select:{name:rec.riesgo}}; p["Banderas +"]={multi_select:ms(rec.banderasPos)}; p["Banderas -"]={multi_select:ms(rec.banderasNeg)}; if(rec.senal) p["Se\u00f1al de precio"]={select:{name:rec.senal}}; if(rec.veredicto) p["Veredicto"]={select:{name:rec.veredicto}}; p["Notas"]={rich_text:rt(rec.notas)}; return p; }
-  async function patch(pageId, properties){ if(!TOKEN) throw new Error("Falta NOTION_TOKEN (ponlo en Ajustes de la sombrilla)"); let i=0; while(true){ i++; let res; try{ res=await fetch(API+pageId,{method:"PATCH",headers:{"Authorization":"Bearer "+TOKEN,"Notion-Version":NV,"Content-Type":"application/json"},body:JSON.stringify({properties})}); }catch(e){ if(i>=5) throw new Error("red: "+((e&&e.message)||e)); await sleep(800*i); continue; } if(res.ok) return true; if((res.status===429||res.status>=500)&&i<5){ const ra=parseFloat(res.headers.get("Retry-After")||"0"); await sleep(ra>0?ra*1000:700*i); continue; } let msg=String(res.status); try{ const j=await res.json(); if(j&&j.message) msg+=" "+j.message; }catch(e){} throw new Error(msg); } }
+  async function patch(pageId, properties){ const res = await notionFetch(API+pageId,{method:"PATCH",body:JSON.stringify({properties})}); if(!res) throw new Error("reintentos agotados"); if(res.ok) return true; let msg=String(res.status); try{ const j=await res.json(); if(j&&j.message) msg+=" "+j.message; }catch(e){} throw new Error(msg); }
   async function datos(){ const enr=(await gLocal(ENR))[ENR]||{}; const syn=(await gLocal(SYN))[SYN]||{}; const arr=Object.keys(enr).map(k=>enr[k]).sort((a,b)=>b.score-a.score); return {arr,syn}; }
   async function halMap(){ const raw=(await gLocal(HAL))[HAL]; const list=Array.isArray(raw)?raw:(raw&&typeof raw==="object"?Object.keys(raw).map(k=>raw[k]):[]); const m={}; list.forEach(h=>{ const u=normUrl(h.url||h.enlace||""); if(!u) return; let pr=(h.precioNum!=null?h.precioNum:(h.precio!=null?h.precio:null)); if(typeof pr!=="number") pr=parseInt(String(pr||"").replace(/[^0-9]/g,""),10); if(isNaN(pr)) pr=null; m[u]={precio:pr, ref:(h.precioRef!=null?h.precioRef:null), pct:(h.pctDescuento!=null?h.pctDescuento:null)}; }); return m; }
 
