@@ -6,6 +6,7 @@ from khora import api
 
 
 def test_sellar_no_filtra_plano_ni_huella(tmp_path, monkeypatch):
+    monkeypatch.setenv("KHORA_DB", str(tmp_path / "khora.db"))
     monkeypatch.setenv("KHORA_BLACKBOX_ROOT", str(tmp_path))
     secreto = "dato-privado-irrepetible-xyz-123"
     huella = hashlib.sha256(secreto.encode("utf-8")).hexdigest()
