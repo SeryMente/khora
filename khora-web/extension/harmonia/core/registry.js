@@ -7,7 +7,7 @@ self.AISTHESIS_REGISTRY = [
     version: "3.34",
     enabled: true,
     background: "modules/globo/background.js",
-    settings: ["NOTION_TOKEN", "GLOBO_CALLS_DB_ID"],
+    settings: ["GLOBO_CALLS_DB_ID"],
     panel: "modules/globo/options.html"
   },
   {
@@ -16,7 +16,7 @@ self.AISTHESIS_REGISTRY = [
     version: "0.9.41",
     enabled: true,
     background: "modules/caza/background.js",
-    settings: ["NOTION_TOKEN"],
+    settings: [],
     cerebro: "modules/caza/runtime.html"
   }
 ];
