@@ -18,5 +18,13 @@ self.AISTHESIS_REGISTRY = [
     background: "modules/caza/background.js",
     settings: [],
     cerebro: "modules/caza/runtime.html"
+  },
+  {
+    id: "todoist",
+    name: "Todoist Sincronizador",
+    version: "1.0.0",
+    enabled: true,
+    background: "modules/todoist/background.js",
+    settings: ["TODOIST_NOTION_DB_ID"]
   }
 ];
