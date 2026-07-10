@@ -12,12 +12,14 @@
   },
   "dependencies": {
     "@google/genai": "^2.10.0",
+    "@types/pg": "^8.20.0",
     "dexie": "^4.4.3",
     "firebase": "^12.15.0",
     "lucide-react": "^1.23.0",
     "motion": "^12.42.2",
     "next": "^16.2.10",
     "nodemailer": "^9.0.3",
+    "pg": "^8.22.0",
     "react": "19.1.0",
     "react-dom": "19.1.0"
   },
