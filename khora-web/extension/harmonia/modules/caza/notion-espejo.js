@@ -8,10 +8,9 @@
 (function () {
   "use strict";
   var VER = "0.2.0";
-  var TOKEN = ""; // externalizado a chrome.storage.local (NOTION_TOKEN) — NUNCA hardcodeado en el repo
-  function _czTok(){ try{ chrome.storage.local.get(["NOTION_TOKEN","cazagangas.token"], function(o){ TOKEN = (o && (o.NOTION_TOKEN || o["cazagangas.token"])) || ""; }); }catch(e){} }
-  _czTok();
-  try{ chrome.storage.onChanged.addListener(function(ch,area){ if(area==="local" && (ch.NOTION_TOKEN || ch["cazagangas.token"])) _czTok(); }); }catch(e){}
+  var notionFetch = self.NotionAdapter ? self.NotionAdapter.fetch : window.NotionAdapter ? window.NotionAdapter.fetch : async () => null;
+  var getToken = self.NotionAdapter ? self.NotionAdapter.getToken : window.NotionAdapter ? window.NotionAdapter.getToken : () => "";
+
   var NV = "2022-06-28";
   var API = "https://api.notion.com/v1/pages/";
   var GAP = 420;
@@ -98,32 +97,20 @@
   }
 
   function patch(pageId, properties) {
-    var i = 0;
-    function intento() {
-      i++;
-      return fetch(API + pageId, {
-        method: "PATCH",
-        headers: { "Authorization": "Bearer " + TOKEN, "Notion-Version": NV, "Content-Type": "application/json" },
-        body: JSON.stringify({ properties: properties })
-      }).then(function (res) {
-        if (res.ok) return true;
-        if ((res.status === 429 || res.status >= 500) && i < 5) {
-          var ra = parseFloat((res.headers && res.headers.get && res.headers.get("Retry-After")) || "0");
-          return sleep(ra > 0 ? ra * 1000 : 700 * i).then(intento);
-        }
-        return Promise.resolve().then(function () { return res.json ? res.json() : {}; }).catch(function () { return {}; }).then(function (j) {
-          throw new Error(String(res.status) + (j && j.message ? (" " + j.message) : ""));
-        });
-      }, function (e) {
-        if (i < 5) return sleep(800 * i).then(intento);
-        throw new Error("red: " + ((e && e.message) || e));
+    return notionFetch(API + pageId, {
+      method: "PATCH",
+      body: JSON.stringify({ properties: properties })
+    }).then(function (res) {
+      if (!res) throw new Error("reintentos agotados");
+      if (res.ok) return true;
+      return Promise.resolve().then(function () { return res.json ? res.json() : {}; }).catch(function () { return {}; }).then(function (j) {
+        throw new Error(String(res.status) + (j && j.message ? (" " + j.message) : ""));
       });
-    }
-    return intento();
+    });
   }
 
   function sincronizarComprables(res) {
-    if (!TOKEN) { try { render({ ts: Date.now(), ver: VER, comprables: aLista(res).length, ok: 0, sinFila: 0, err: aLista(res).length, fallas: [{ t: "(token)", r: "Falta NOTION_TOKEN (ponlo en Ajustes de la sombrilla)" }], huerfanos: [] }); } catch (e) {} return Promise.resolve(ultimo); }
+    if (!getToken()) { try { render({ ts: Date.now(), ver: VER, comprables: aLista(res).length, ok: 0, sinFila: 0, err: aLista(res).length, fallas: [{ t: "(token)", r: "Falta NOTION_TOKEN (ponlo en Ajustes de la sombrilla)" }], huerfanos: [] }); } catch (e) {} return Promise.resolve(ultimo); }
     if (corriendo) return Promise.resolve(ultimo);
     corriendo = true;
     var lista = aLista(res);
