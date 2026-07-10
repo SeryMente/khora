@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { UpdatePrompt } from "./components/UpdatePrompt";
+import { ShellNav } from "./components/ShellNav";
+import { TelemetryProvider } from "./components/TelemetryProvider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -52,10 +54,15 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black text-white`}
       >
-        <UpdatePrompt />
-        <div className="min-h-screen w-full bg-[#08080a] text-gray-200">
-          {children}
-        </div>
+        <TelemetryProvider>
+          <UpdatePrompt />
+          <div className="flex min-h-screen w-full bg-[#08080a] text-gray-200">
+            <ShellNav />
+            <main className="flex-1 md:ml-64 w-full relative pb-32 md:pb-0 min-h-screen">
+              {children}
+            </main>
+          </div>
+        </TelemetryProvider>
       </body>
     </html>
   );

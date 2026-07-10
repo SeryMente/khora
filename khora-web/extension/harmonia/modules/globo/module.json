@@ -1,0 +1,15 @@
+{
+  "id": "globo",
+  "name": "Globo (Llamadas -> Notion)",
+  "version": "3.34",
+  "enabled": true,
+  "background": "modules/globo/background.js",
+  "content": [
+    { "matches": ["http://*/*", "https://*/*"], "js": ["modules/globo/content.js"], "run_at": "document_idle" },
+    { "matches": ["https://globohq.com/*"], "js": ["modules/globo/mainworld.js"], "world": "MAIN", "run_at": "document_idle" },
+    { "matches": ["https://globohq.com/*"], "js": ["modules/globo/booster.js"], "run_at": "document_idle" }
+  ],
+  "hostPermissions": ["https://globohq.com/*", "https://api.notion.com/*"],
+  "settings": ["NOTION_TOKEN", "GLOBO_CALLS_DB_ID", "GLOBO_TRANSCRIPT_SELECTOR"],
+  "panel": "modules/globo/options.html"
+}

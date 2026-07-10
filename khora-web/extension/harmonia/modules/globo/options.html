@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Globo Scraper - Panel</title>
+<style>
+  :root{ --bg:#0f1115; --card:#191c22; --line:#2a2f3a; --txt:#e6e9ef; --mut:#8b93a3; --ok:#3fb950; --info:#58a6ff; --warn:#d29922; --err:#f85149; }
+  *{ box-sizing:border-box; }
+  body{ margin:0; font:13px/1.45 -apple-system,Segoe UI,Roboto,sans-serif; background:var(--bg); color:var(--txt); }
+  header{ display:flex; align-items:center; gap:10px; padding:14px 18px; border-bottom:1px solid var(--line); position:sticky; top:0; background:rgba(15,17,21,.92); backdrop-filter:blur(8px); z-index:5; }
+  header h1{ font-size:15px; margin:0; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .dot{ width:10px; height:10px; border-radius:50%; background:var(--mut); transition:background .3s; }
+  .dot.on{ background:var(--ok); box-shadow:0 0 6px rgba(63,185,80,.6); } .dot.off{ background:var(--err); }
+  .btns{ margin-left:auto; display:flex; gap:8px; flex-wrap:wrap; }
+  button{ background:#222732; color:var(--txt); border:1px solid var(--line); border-radius:7px; padding:7px 12px; cursor:pointer; font-size:12px; transition:border-color .12s, background .12s, transform .08s; }
+  button:hover{ border-color:var(--info); background:#272d3a; }
+  button:active{ transform:translateY(1px); }
+  main{ padding:16px 18px; display:grid; gap:16px; max-width:1000px; }
+  .banner{ background:#3a2a12; border:1px solid var(--warn); color:#f0c674; border-radius:10px; padding:10px 14px; display:none; }
+  .banner.show{ display:block; }
+  .cards{ display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; }
+  .card{ background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px 14px; transition:transform .12s ease, border-color .12s ease, box-shadow .12s ease; }
+  .card:hover{ transform:translateY(-2px); border-color:var(--info); box-shadow:0 6px 16px rgba(0,0,0,.32); }
+  .card .k{ color:var(--mut); font-size:11px; text-transform:uppercase; letter-spacing:.04em; }
+  .card .v{ font-size:22px; font-weight:600; margin-top:4px; font-variant-numeric:tabular-nums; }
+  .card .s{ color:var(--mut); font-size:11px; margin-top:2px; }
+  section h2{ font-size:12px; color:var(--mut); text-transform:uppercase; letter-spacing:.05em; margin:0 0 8px; }
+  .barwrap{ height:16px; background:#0b0d11; border:1px solid var(--line); border-radius:9px; overflow:hidden; transition:box-shadow .3s, border-color .3s; }
+  .barwrap.done{ border-color:#58a6ff; box-shadow:0 0 0 1px rgba(88,166,255,.5), 0 0 14px rgba(88,166,255,.32); }
+  .bar{ height:100%; width:0; border-radius:8px; transition:width .5s cubic-bezier(.4,0,.2,1), background .4s ease; }
+  table{ width:100%; border-collapse:collapse; background:var(--card); border:1px solid var(--line); border-radius:10px; overflow:hidden; }
+  th,td{ text-align:left; padding:8px 10px; border-bottom:1px solid var(--line); font-size:12px; }
+  th{ color:var(--mut); font-weight:500; }
+  tr:last-child td{ border-bottom:none; }
+  tbody tr{ transition:background .12s; }
+  tbody tr:hover{ background:#1d2129; }
+  .log{ background:#0b0d11; border:1px solid var(--line); border-radius:10px; padding:8px; max-height:300px; overflow:auto; font-family:ui-monospace,Consolas,monospace; font-size:11.5px; }
+  .log div{ padding:2px 4px; white-space:pre-wrap; }
+  .ok{ color:var(--ok); } .info{ color:var(--info); } .warn{ color:var(--warn); } .err{ color:var(--err); } .mut{ color:var(--mut); }
+  .pill{ font-size:10px; padding:2px 8px; border-radius:20px; border:1px solid var(--line); color:var(--mut); }
+  .pill.goal{ color:var(--info); border-color:#2c3a55; background:rgba(88,166,255,.08); }
+  .src{ display:inline-flex; align-items:center; gap:6px; margin-right:14px; }
+  code{ color:var(--info); }
+  .liveband{ display:flex; flex-wrap:wrap; align-items:center; gap:18px; background:linear-gradient(90deg,#0e2018,#191c22); border:1px solid var(--line); border-radius:12px; padding:14px 18px; }
+  .liveband .seg{ display:flex; flex-direction:column; gap:2px; }
+  .liveband .lab{ color:var(--mut); font-size:11px; text-transform:uppercase; letter-spacing:.05em; }
+  .liveband .big{ font-size:28px; font-weight:700; font-variant-numeric:tabular-nums; transition:color .3s; }
+  .liveband .barwrap{ height:12px; }
+  .liveband .pulse{ width:12px; height:12px; border-radius:50%; background:var(--mut); }
+  .liveband .pulse.live{ background:var(--ok); animation:pl 1s infinite; }
+  @keyframes pl{ 0%{opacity:1} 50%{opacity:.2} 100%{opacity:1} }
+  .avtab{ width:100%; border-collapse:collapse; }
+  .avtab th{ text-align:right; color:var(--mut); font-weight:500; font-size:11px; padding:4px 12px; text-transform:uppercase; letter-spacing:.04em; }
+  .avtab th:first-child{ text-align:left; }
+  .avtab td{ padding:7px 12px; border-top:1px solid var(--line); font-variant-numeric:tabular-nums; font-size:15px; white-space:nowrap; text-align:right; }
+  .avtab td:first-child{ color:var(--txt); font-size:13px; text-align:left; }
+  .avtab .on{ color:#3fb950; font-weight:600; } .avtab .off{ color:#f0883e; font-weight:600; } .avtab .tot{ color:#8b93a3; }
+  .avfoot{ display:flex; flex-wrap:wrap; gap:16px; align-items:center; margin-top:10px; color:var(--mut); font-size:12px; }
+  .avfoot b{ font-variant-numeric:tabular-nums; color:var(--txt); }
+  .vizbtn{ font-size:11px; padding:3px 10px; }
+  .daybar{ display:flex; height:22px; background:#0b0d11; border:1px solid var(--line); border-radius:9px; overflow:hidden; }
+  .daybar > div{ transition:width .5s ease; }
+  .daylegend{ display:flex; flex-wrap:wrap; gap:14px; margin-top:8px; color:var(--mut); font-size:12px; }
+  .daylegend .li{ display:inline-flex; align-items:center; gap:6px; }
+  .daylegend .li i{ width:11px; height:11px; border-radius:3px; display:inline-block; }
+  .dayring{ display:flex; gap:20px; align-items:center; flex-wrap:wrap; }
+  .daygrid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; align-items:start; }
+  .daycard{ background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px 14px; }
+  .daycard .k{ color:var(--mut); font-size:11px; text-transform:uppercase; letter-spacing:.04em; }
+  .daycard .big{ font-size:26px; font-weight:700; font-variant-numeric:tabular-nums; }
+.waffle{ display:grid; gap:2px; width:max-content; }
+.waffle i{ display:block; border-radius:2px; }
+.wafwrap{ display:flex; gap:18px; flex-wrap:wrap; align-items:flex-start; }
+#vizsec h2,#moneysec h2{ border-left:3px solid var(--ok); padding-left:8px; }
+.wafhero{ display:flex; gap:22px; flex-wrap:wrap; align-items:flex-start; }
+.wafmain{ flex:0 0 auto; }
+.wafside{ flex:1 1 280px; display:grid; gap:12px; min-width:260px; }
+#moneysec .liveband{ border-color:#1f6f3f; box-shadow:0 0 0 1px rgba(63,185,80,.25); }
+.swt{ position:relative; display:inline-block; width:38px; height:20px; cursor:pointer; vertical-align:middle; }
+.swt input{ opacity:0; width:0; height:0; position:absolute; }
+.swt span{ position:absolute; inset:0; background:#2a2f3a; border-radius:20px; transition:background .15s; }
+.swt span:before{ content:""; position:absolute; width:14px; height:14px; left:3px; top:3px; background:#8b93a3; border-radius:50%; transition:transform .15s, background .15s; }
+.swt input:checked + span{ background:#1f6f3f; }
+.swt input:checked + span:before{ transform:translateX(18px); background:#3fb950; }
+.hkbtn{ font-size:11px; padding:3px 10px; }
+.hkbtn[disabled]{ opacity:.4; cursor:not-allowed; }
+.swt.off{ opacity:.45; }
+.swt input[disabled]{ cursor:not-allowed; }
+.swt.off, .swt.off span{ cursor:not-allowed; }
+#ahkpill.ok{ background:#143d23; color:#3fb950; }
+#ahkpill.warn{ background:#3a2d10; color:#d29922; }
+#ahkpill.err{ background:#3a1416; color:#f85149; }
+#ahkcmd{ width:100%; min-height:150px; background:#0b0d11; border:1px solid var(--line); border-radius:9px; color:var(--txt); padding:10px; font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:12px; white-space:pre; }
+.ahkgrid{ display:grid; gap:10px; }
+.ahkstatus{ padding:9px 11px; border:1px solid var(--line); border-radius:9px; background:#0b0d11; }
+.blockedNote{border:1px solid #f85149;background:#3a1416;color:#ffd1d5;border-radius:9px;padding:10px 12px;font-weight:700;}
+body.ahk-blocked main section:not(#ahk):not(#set-sec):not(#mod-sec){opacity:.38;pointer-events:none;}
+
+.tabs{ display:flex; gap:4px; padding:0 18px; border-bottom:1px solid var(--line); position:sticky; top:49px; background:rgba(15,17,21,.92); backdrop-filter:blur(8px); z-index:4; flex-wrap:wrap; }
+.tabbtn{ background:transparent; border:none; border-bottom:2px solid transparent; border-radius:0; padding:11px 13px; color:var(--mut); font-size:13px; cursor:pointer; }
+.tabbtn:hover{ color:var(--txt); background:transparent; border-color:transparent; }
+.tabbtn.active{ color:var(--txt); border-bottom-color:var(--ok); }
+.tab[hidden]{ display:none; }
+.money-hero{ background:linear-gradient(135deg,#0e2018,#12161d); border:1px solid #1f6f3f; border-radius:16px; padding:20px 22px; box-shadow:0 0 0 1px rgba(63,185,80,.16),0 10px 30px rgba(0,0,0,.4); }
+.mh-top{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+.mh-clock{ font-variant-numeric:tabular-nums; color:#8b93a3; font-size:13px; letter-spacing:.04em; }
+.mh-state{ font-size:12px; font-weight:600; padding:3px 10px; border-radius:20px; border:1px solid var(--line); white-space:nowrap; }
+.mh-state.on{ color:#3fb950; border-color:#1f6f3f; background:rgba(63,185,80,.1); }
+.mh-state.off{ color:#8b93a3; }
+.mh-money{ font-size:44px; font-weight:800; color:#3fb950; font-variant-numeric:tabular-nums; line-height:1.05; margin:10px 0 2px; text-shadow:0 0 24px rgba(63,185,80,.22); }
+.mh-sub{ color:#8b93a3; font-size:12px; text-transform:uppercase; letter-spacing:.06em; }
+.mh-meta{ margin-top:14px; }
+.mh-bar{ height:12px; background:#0b0d11; border:1px solid var(--line); border-radius:8px; overflow:hidden; }
+.mh-bar>div{ height:100%; border-radius:7px; transition:width .4s ease, background .3s; }
+.mh-metalab{ color:#8b93a3; font-size:12px; margin-top:6px; font-variant-numeric:tabular-nums; }
+.ovctl{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+.ovctl button.on{ border-color:#1f6f3f; background:#143d23; color:#3fb950; }
+
+</style>
+</head>
+<body>
+<header>
+  <span id="conn" class="dot"></span>
+  <h1>&#129413; Aisthesis <span class="pill" id="ver">v3.32</span> <span class="pill" id="ahkpill" title="Verificacion de AutoHotkey 2.0 por Native Messaging">AHK verificando...</span> <span class="pill goal" id="goalpill">meta 200 min (Notion)</span></h1>
+  <div class="btns">
+    <button id="sync">Sincronizar ahora</button>
+    <button id="openmiss">Abrir pestanas de Globo</button>
+    <button id="refresh">Refrescar</button>
+    <button id="export">Exportar registro</button>
+    <button id="clear">Limpiar registro</button>
+  </div>
+</header>
+<nav class="tabs">
+  <button class="tabbtn active" data-tab="cabina">&#128176; Cabina</button>
+  <button class="tabbtn" data-tab="disp">&#128338; Disponibilidad</button>
+  <button class="tabbtn" data-tab="notion">&#128221; Notion</button>
+  <button class="tabbtn" data-tab="sistema">&#9881;&#65039; Sistema</button>
+  <button class="tabbtn" data-tab="ajustes">&#128273; Ajustes</button>
+</nav>
+<main>
+<div class="tab" data-tab="cabina">
+  <div class="banner" id="banner"></div>
+  <section id="moneysec"><h2>&#128176; Cronometro de dinero &mdash; en vivo (al segundo)</h2><div id="moneyHero" class="money-hero"></div><div id="liveband" class="liveband" style="margin-top:12px"></div></section>
+  <section id="vizsec"><h2>&#129383; Waffle del dia &mdash; la meta, cuadrito por cuadrito</h2><div id="dayviz"></div></section>
+  <section><h2>&#129517; Panel flotante (overlay en globohq.com)</h2><div id="ovctl" class="ovctl"></div></section>
+  <section><h2>&#128737;&#65039; Modo seguro &amp; telemetria forense de audio</h2><div id="safectl"></div><div id="meter" class="mut" style="margin-top:8px">Medidor de audio: sin muestras todavia.</div><div id="awin" class="mut" style="margin-top:8px">Resumen forense por ventana (~30s): sin datos todavia.</div><div class="mut" style="margin-top:8px;font-size:11px">Protocolo: toma llamadas reales cambiando UN interruptor entre llamadas. La telemetria etiqueta cada ventana con la condicion activa y si la extension toco pestanas; en Notion se compara que condicion reduce los picos. Glitch CON jank alto + actividad de fondo = contencion del hilo (extension); glitch SIN jank ni actividad = red/plataforma.</div></section>
+  <section><h2>Estado en vivo</h2><div class="cards" id="cards"></div></section>
+  <section><h2>Minutos de hoy (historial)</h2><div id="spark"></div></section>
+</div>
+<div class="tab" data-tab="disp" hidden>
+  <section><h2>Tiempo por switch (hoy)</h2><div id="availband" class="liveband" style="flex-direction:column;align-items:stretch"></div></section>
+</div>
+<div class="tab" data-tab="notion" hidden>
+  <section><h2>Fuentes</h2><div id="srcopen" style="margin-bottom:8px"></div><table id="sources"><tbody></tbody></table></section>
+  <section><h2>Insercion en Notion</h2><table id="inserts"><tbody></tbody></table></section>
+  <section><h2>Llamadas de hoy por empresa</h2><table id="companies"><tbody></tbody></table></section>
+  <section><h2>Llamadas recientes (Dashboard)</h2><table id="recent"><tbody></tbody></table></section>
+</div>
+<div class="tab" data-tab="sistema" hidden>
+  <section id="ahk"><h2>Configurar AHK 2.0</h2>
+    <div class="ahkgrid">
+      <div id="ahkstatus" class="ahkstatus mut">Verificando AutoHotkey 2.0...</div>
+      <div class="mut">AHK 2.0 es obligatorio. Si ya está instalado pero el indicador sigue rojo, el problema es el conector Native Messaging de Chrome. Ejecuta el PowerShell: ahora también repara/copiará el host, registrará HKCU normal + WOW6432Node y probará que los archivos existan. Luego pulsa <b>Actualizar verificación</b>.</div>
+      <textarea id="ahkcmd" spellcheck="false" readonly></textarea>
+      <div style="display:flex;gap:10px;flex-wrap:wrap"><button id="copyahk">Copiar PowerShell</button><button id="checkahk">Actualizar verificación</button><span id="ahkcopy" class="mut"></span></div>
+    </div>
+  </section>
+  <section><h2>Atajos (dentro de la pagina de Globo)</h2><div id="hotkeys"></div></section>
+  <section><h2>Registro de actividad</h2><div class="log" id="log"></div></section>
+  <section><h2>Auto-inicio de sesion (opcional)</h2>
+    <div id="autologin" style="background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:grid;gap:10px;max-width:560px">
+      <div class="mut">Si tu sesion de Globo expira, la extension puede volver a entrar sola. El usuario y la contrasena se guardan SOLO en este navegador y nunca se envian a ningun lugar salvo el propio formulario de inicio de sesion de Globo. Desactivado por defecto.</div>
+      <label style="display:flex;gap:8px;align-items:center"><span style="width:96px;color:var(--mut)">Usuario</span><input id="al-user" type="text" autocomplete="off" spellcheck="false" style="flex:1;background:#0b0d11;border:1px solid var(--line);border-radius:7px;color:var(--txt);padding:7px 10px"></label>
+      <label style="display:flex;gap:8px;align-items:center"><span style="width:96px;color:var(--mut)">Contrasena</span><input id="al-pass" type="password" autocomplete="new-password" style="flex:1;background:#0b0d11;border:1px solid var(--line);border-radius:7px;color:var(--txt);padding:7px 10px"></label>
+      <label style="display:flex;gap:8px;align-items:center"><input id="al-enabled" type="checkbox"><span>Activar auto-inicio de sesion cuando la sesion expire</span></label>
+      <div style="display:flex;gap:10px;align-items:center"><button id="al-save">Guardar</button><span id="al-status" class="mut"></span></div>
+    </div>
+  </section>
+  <section><h2>Configuracion</h2><table id="config"><tbody></tbody></table></section>
+</div>
+<div class="tab" data-tab="ajustes" hidden>
+  <section id="set-sec"><h2>&#128273; Ajustes compartidos</h2>
+    <div style="background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:grid;gap:6px;max-width:620px">
+      <label style="color:var(--mut);font-size:12px">NOTION_TOKEN (Internal Integration Secret)</label>
+      <input id="set-tok" type="password" placeholder="ntn_..." autocomplete="off" spellcheck="false" style="background:#0b0d11;border:1px solid var(--line);border-radius:7px;color:var(--txt);padding:8px 10px">
+      <label style="color:var(--mut);font-size:12px;margin-top:6px">GLOBO_CALLS_DB_ID</label>
+      <input id="set-db" type="text" placeholder="69b2a69b-..." spellcheck="false" style="background:#0b0d11;border:1px solid var(--line);border-radius:7px;color:var(--txt);padding:8px 10px">
+      <div style="margin-top:12px;display:flex;gap:10px;align-items:center"><button id="set-save">Guardar</button><span id="set-msg" class="ok" style="font-size:12px"></span></div>
+      <p class="mut" style="font-size:12px;margin:6px 0 0">Se guarda en chrome.storage local del navegador. Nunca se versiona en el repo. Disponible aunque AHK este bloqueado.</p>
+    </div>
+  </section>
+  <section id="mod-sec"><h2>&#129413; Modulos de la sombrilla</h2>
+    <table id="modules"><tbody></tbody></table>
+  </section>
+</div>
+</main>
+<script src="options.js"></script>
+</body>
+</html>

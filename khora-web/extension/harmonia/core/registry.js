@@ -1,0 +1,22 @@
+// Registro de modulos de la sombrilla Aisthesis (fuente para el service worker).
+// Espejo de cada modules/<id>/module.json. El shell carga los "enabled".
+self.AISTHESIS_REGISTRY = [
+  {
+    id: "globo",
+    name: "Globo (Llamadas -> Notion)",
+    version: "3.34",
+    enabled: true,
+    background: "modules/globo/background.js",
+    settings: ["NOTION_TOKEN", "GLOBO_CALLS_DB_ID"],
+    panel: "modules/globo/options.html"
+  },
+  {
+    id: "caza",
+    name: "Cazagangas",
+    version: "0.9.41",
+    enabled: true,
+    background: "modules/caza/background.js",
+    settings: ["NOTION_TOKEN"],
+    cerebro: "modules/caza/runtime.html"
+  }
+];
