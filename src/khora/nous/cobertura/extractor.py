@@ -30,7 +30,8 @@ def _extract_via_regex(texto: str) -> Cobertura:
             if horas < 0:
                 horas += 24.0
             return Cobertura(
-                inicio=inicio_str, fin=fin_str,
+                inicio=inicio_str,
+                fin=fin_str,
                 horas_cubiertas=round(horas, 2),
                 evidencia=match.group(0), confianza="Alta",
                 nivel_evidencia="E1"
