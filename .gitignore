@@ -19,3 +19,4 @@ khora.db
 khora-web/public/downloads/*.zip
 .jules_activity_log.jsonl
 INSTRUCCIONES_JULES.md
+FETCH_HEAD
