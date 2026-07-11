@@ -1,0 +1,13 @@
+
+> khora-web@0.1.2 dev
+> next dev -p 3000 -H 0.0.0.0
+
+▲ Next.js 16.2.10 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://0.0.0.0:3000
+✓ Ready in 542ms
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+
+○ Compiling /mapa ...
+ GET /mapa 200 in 7.2s (next.js: 6.1s, proxy.ts: 126ms, application-code: 962ms)
+ GET /api/capturas 502 in 589ms (next.js: 544ms, proxy.ts: 16ms, application-code: 28ms)
