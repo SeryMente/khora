@@ -14,6 +14,7 @@ import {
   Zap
 } from "lucide-react";
 import { CapturarModal } from "./CapturarModal";
+import { ThemeToggle } from "./ThemeToggle";
 
 const NAV_ITEMS = [
   { href: "/bitacora", label: "Bitácora", icon: NotebookText },
@@ -53,6 +54,10 @@ export function ShellNav() {
           </button>
         </div>
 
+        <div className="absolute -top-[120px] right-4 pointer-events-auto">
+          <ThemeToggle />
+        </div>
+
         <div className="flex justify-between items-center px-2 py-3 overflow-x-auto no-scrollbar gap-1">
           {NAV_ITEMS.map((item) => {
             const isActive = pathname === item.href;
@@ -78,11 +83,12 @@ export function ShellNav() {
       </nav>
 
       {/* Desktop Sidebar - Visible solo en >= md */}
-      <aside className="hidden md:flex flex-col w-64 fixed top-0 left-0 bottom-0 z-40 bg-[#081222]/90 backdrop-blur-lg border-r border-[#1F3C6A]/50 p-4 pt-8">
-        <div className="mb-10 px-4">
-          <h1 className="font-semibold text-white tracking-[0.2em] uppercase text-sm">
+      <aside className="hidden md:flex flex-col w-64 fixed top-0 left-0 bottom-0 z-40 bg-cora-surface/90 backdrop-blur-lg border-r border-[#1F3C6A]/50 p-4 pt-8">
+        <div className="mb-10 px-4 flex justify-between items-center">
+          <h1 className="font-semibold text-cora-text tracking-[0.2em] uppercase text-sm">
             KHORA OS
           </h1>
+          <ThemeToggle />
         </div>
 
         <div className="flex flex-col gap-3 mb-10">
