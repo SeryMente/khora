@@ -1,0 +1,50 @@
+name: Post-Deploy Smoke Test
+
+on:
+  deployment_status:
+  workflow_dispatch:
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || (github.event.deployment_status.state == 'success' && github.event.deployment.environment == 'Production')
+    steps:
+      - name: Verify live deployment
+        run: |
+          TARGET_URL="https://khora-ten.vercel.app/"
+          MAX_RETRIES=2
+          WAIT_TIME=30
+          ATTEMPT=0
+
+          while [ $ATTEMPT -le $MAX_RETRIES ]; do
+            echo "Attempt $((ATTEMPT + 1)) of $((MAX_RETRIES + 1)) to fetch $TARGET_URL"
+
+            # Fetch HTTP status and body
+            HTTP_STATUS=$(curl -o response_body.txt -s -w "%{http_code}" "$TARGET_URL")
+
+            echo "Received HTTP status: $HTTP_STATUS"
+
+            if [ "$HTTP_STATUS" -eq 200 ]; then
+              if grep -q -E "VER-1|Khora" response_body.txt; then
+                echo "Smoke test passed: HTTP 200 and marker (VER-1 or Khora) found."
+                exit 0
+              else
+                echo "Error: Marker (VER-1 or Khora) not found in response body."
+              fi
+            else
+              echo "Error: Expected HTTP 200, got $HTTP_STATUS"
+            fi
+
+            if [ $ATTEMPT -lt $MAX_RETRIES ]; then
+              echo "Waiting ${WAIT_TIME}s before retry..."
+              sleep $WAIT_TIME
+            fi
+
+            ATTEMPT=$((ATTEMPT + 1))
+          done
+
+          echo "Smoke test failed after $((MAX_RETRIES + 1)) attempts."
+          echo "=== Response body ==="
+          cat response_body.txt || echo "No response body."
+          echo "====================="
+          exit 1
