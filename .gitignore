@@ -17,3 +17,6 @@ dist/
 from __future__ import annotations.py
 khora.db
 khora-web/public/downloads/*.zip
+.jules_activity_log.jsonl
+INSTRUCCIONES_JULES.md
+FETCH_HEAD
