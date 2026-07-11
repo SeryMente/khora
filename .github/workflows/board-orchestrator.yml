@@ -1,0 +1,14 @@
+name: Board Orchestrator
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  tick:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Orchestrator Tick
+        run: |
+          curl -X POST https://khora-ten.vercel.app/api/board/orchestrate/tick \
+            -H "x-internal-secret: ${{ secrets.INTERNAL_TRIGGER_SECRET }}"
