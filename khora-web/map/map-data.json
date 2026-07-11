@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "0.1",
+  "nodes": [
+    {
+      "id": "B-P10",
+      "condicion": "Usuario nuevo",
+      "pregunta": "¿Desea iniciar el tour interactivo?",
+      "alternativas": ["Sí, iniciar tour", "No, saltar tour"],
+      "consecuencia": "Configuración inicial guiada vs exploración libre",
+      "estado": "Activo",
+      "layout": {
+        "level": 0,
+        "order": 0
+      },
+      "set": "B",
+      "marks": ["prueba"],
+      "authorized": true
+    },
+    {
+      "id": "A-P01",
+      "condicion": "Exploración libre",
+      "pregunta": "¿Qué herramienta principal desea explorar primero?",
+      "alternativas": ["Bitácora", "Sistema", "Preguntar"],
+      "consecuencia": "Navega a la herramienta seleccionada",
+      "estado": "Activo",
+      "layout": {
+        "level": 1,
+        "order": -1
+      },
+      "set": "A",
+      "marks": ["aprobado"],
+      "authorized": true
+    },
+    {
+      "id": "C-P05",
+      "condicion": "Módulo experimental",
+      "pregunta": "¿Activar integraciones avanzadas (BETA)?",
+      "alternativas": ["Sí", "No"],
+      "consecuencia": "Habilita herramientas inestables",
+      "estado": "Borrador",
+      "layout": {
+        "level": 1,
+        "order": 1
+      },
+      "set": "C",
+      "marks": ["riesgo"],
+      "authorized": false
+    },
+    {
+      "id": "S-P03",
+      "condicion": "Configuración guiada",
+      "pregunta": "¿Conectar con Notion?",
+      "alternativas": ["Conectar ahora", "Más tarde"],
+      "consecuencia": "Redirige a la página de integración",
+      "estado": "Activo",
+      "layout": {
+        "level": 1,
+        "order": 0
+      },
+      "set": "S",
+      "marks": ["candado"],
+      "authorized": true
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-BP10-AP01",
+      "source": "B-P10",
+      "target": "A-P01",
+      "label": "No, saltar tour"
+    },
+    {
+      "id": "e-BP10-SP03",
+      "source": "B-P10",
+      "target": "S-P03",
+      "label": "Sí, iniciar tour"
+    }
+  ]
+}
