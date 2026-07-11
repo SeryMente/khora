@@ -1,0 +1,25 @@
+name: Ichnos - Cobertura Narrativa
+
+on:
+  repository_dispatch:
+    types: [entrada_bitacora]
+  workflow_dispatch:
+    inputs:
+      texto_entrada:
+        description: 'Texto de la entrada a evaluar'
+        required: true
+
+jobs:
+  evaluar_cobertura:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -e .
+      - name: Extraer Cobertura
+        env:
+          TEXTO_ENTRADA: ${{ github.event.inputs.texto_entrada || github.event.client_payload.texto_entrada }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: python scripts/ichnos_cobertura_runner.py
