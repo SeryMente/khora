@@ -9,13 +9,12 @@ dist/
 .venv/
 .pytest_cache/
 .ruff_cache/
-
 # Sistema
 .DS_Store
-
 # basura recurrente del agente
 from __future__ import annotations.py
 khora.db
 khora-web/public/downloads/*.zip
 .jules_activity_log.jsonl
 INSTRUCCIONES_JULES.md
+FETCH_HEAD
