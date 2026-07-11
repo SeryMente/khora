@@ -5,10 +5,6 @@ import os, sys, json, time, re, datetime, urllib.request, urllib.error, urllib.p
 KEY = os.environ.get("JULES_API_KEY", "")
 BASE = "https://jules.googleapis.com/v1alpha"
 REG = os.path.expanduser("~/.jules_sessions.json")
-GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
-GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
-GROQ_MODEL = "openai/gpt-oss-120b"
-AI_DECISIONS_LOG = os.path.expanduser("~/.khora_ai_decisions.log")
 SPIN = "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
 DONE_STATES = {"COMPLETED", "FAILED"}
 STAGES = ["QUEUED", "PLANNING", "AWAITING_PLAN_APPROVAL", "IN_PROGRESS", "AWAITING_USER_FEEDBACK", "PAUSED"]
@@ -136,40 +132,6 @@ def pr_label(url):
     return (m.group(1) + " #" + m.group(2)) if m else url
 
 def short(sid): return sid[:4] + "…" + sid[-4:] if len(sid) > 10 else sid
-
-def ask_groq_fallback(question, sid):
-    if not GROQ_API_KEY:
-        return None
-    try:
-        sys_prompt = "Sin preguntas adicionales: procede con la opcion mas simple y reversible que cumpla el Hecho-cuando de la tarjeta documentada en el PR, sin preguntar de vuelta, en español, menos de 80 palabras."
-        req_body = {
-            "model": GROQ_MODEL,
-            "messages": [
-                {"role": "system", "content": sys_prompt},
-                {"role": "user", "content": question}
-            ]
-        }
-        data = json.dumps(req_body).encode("utf-8")
-        req = urllib.request.Request(GROQ_URL, data=data,
-            headers={"Authorization": "Bearer " + GROQ_API_KEY, "Content-Type": "application/json"}, method="POST")
-        with urllib.request.urlopen(req, timeout=30) as r:
-            resp = json.load(r)
-            answer = resp.get("choices", [{}])[0].get("message", {}).get("content", "")
-            if answer:
-                try:
-                    with open(AI_DECISIONS_LOG, "a") as f:
-                        now_iso = datetime.datetime.now(datetime.timezone.utc).isoformat()
-                        f.write(f"[{now_iso}] sid={sid} question={repr(question)} answer={repr(answer)}\n")
-                except Exception: pass
-                return answer
-            return None
-    except Exception as e:
-        try:
-            with open(AI_DECISIONS_LOG, "a") as f:
-                now_iso = datetime.datetime.now(datetime.timezone.utc).isoformat()
-                f.write(f"[{now_iso}] sid={sid} question={repr(question)} error={repr(str(e))}\n")
-        except Exception: pass
-        return None
 
 def parse_ts(s):
     if not s: return None
@@ -342,17 +304,7 @@ try:
                         lat[_sid] = "pregunta simple -> auto-respondida"
                         _info["needs_human"] = False
                 else:
-                    _ans = ask_groq_fallback(_last, _sid)
-                    if _ans:
-                        _fr, _fe = api("POST", "/sessions/" + _sid + ":sendMessage", {"prompt": _ans})
-                        if _fr is not None:
-                            _info["fb_replies"] = _fb + 1
-                            lat[_sid] = "pregunta compleja -> auto-respondida (groq)"
-                            _info["needs_human"] = False
-                        else:
-                            _info["needs_human"] = True
-                    else:
-                        _info["needs_human"] = True
+                    _info["needs_human"] = True
         save_reg(reg)
 
         active_ids = [sid for sid, info in reg.items() if not info.get("done")]
