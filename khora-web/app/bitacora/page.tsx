@@ -300,7 +300,7 @@ export default function BitacoraPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#08080a] text-gray-200 p-4 md:p-8 font-sans pb-32">
+    <main className="min-h-screen bg-cora-bg text-cora-text p-4 md:p-8 font-sans pb-32">
       <div className="max-w-4xl mx-auto space-y-8">
 
         {/* Header y Dev Panel (si está activo) */}

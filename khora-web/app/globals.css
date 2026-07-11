@@ -1,28 +1,37 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Cora-OS Light Theme */
+  --cora-bg: #F4F2EF;
+  --cora-surface: #FFFFFF;
+  --cora-text: #1C1D1F;
+  --cora-silver: #B9BDC1;
+  --cora-accent: #8A9BA8;
+}
+
+.dark {
+  /* Cora-OS Dark Theme */
+  --cora-bg: #0A0A0B;
+  --cora-surface: #17181A;
+  --cora-text: #C7CCD1;
+  --cora-silver: #C7CCD1;
+  --cora-accent: #8A9BA8;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-cora-bg: var(--cora-bg);
+  --color-cora-surface: var(--cora-surface);
+  --color-cora-text: var(--cora-text);
+  --color-cora-silver: var(--cora-silver);
+  --color-cora-accent: var(--cora-accent);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--cora-bg);
+  color: var(--cora-text);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
 
 @keyframes splash-animation {
