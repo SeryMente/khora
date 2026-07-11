@@ -1,25 +1,52 @@
-name: Auto-Merge on Open
+name: Auto-Merge on Success
 
 on:
-  pull_request:
+  workflow_run:
+    workflows: ["khora-ok / gate"]
     types:
-      - opened
-      - reopened
-      - ready_for_review
+      - completed
 
 permissions:
   contents: write
   pull-requests: write
 
 jobs:
-  enable-auto-merge:
+  auto-merge:
     runs-on: ubuntu-latest
-    if: "!github.event.pull_request.draft && github.event.pull_request.base.ref == 'main'"
+    if: github.event.workflow_run.conclusion == 'success'
     steps:
-      - name: Enable Auto-Merge
+      - name: Attempt Auto-Merge
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          REPO: ${{ github.repository }}
         run: |
-          PR_NUMBER=${{ github.event.pull_request.number }}
-          echo "Enabling auto-merge for PR #$PR_NUMBER"
-          gh pr merge "$PR_NUMBER" --auto --squash --delete-branch --repo "$GITHUB_REPOSITORY"
+          # 1. Buscar PR asociado a la rama que disparó el check exitoso
+          PR_JSON=$(gh pr list --head "$HEAD_BRANCH" --repo "$REPO" --json number,isDraft,baseRefName,mergeStateStatus -q '.[0]')
+
+          if [ -z "$PR_JSON" ] || [ "$PR_JSON" == "null" ]; then
+            echo "No se encontró un PR activo para la rama $HEAD_BRANCH"
+            exit 0
+          fi
+
+          PR_NUMBER=$(echo "$PR_JSON" | jq -r '.number')
+          IS_DRAFT=$(echo "$PR_JSON" | jq -r '.isDraft')
+          BASE_REF=$(echo "$PR_JSON" | jq -r '.baseRefName')
+          MERGE_STATUS=$(echo "$PR_JSON" | jq -r '.mergeStateStatus')
+
+          if [ "$IS_DRAFT" == "true" ] || [ "$BASE_REF" != "main" ]; then
+            echo "El PR #$PR_NUMBER es draft ($IS_DRAFT) o su base no es main ($BASE_REF). Omitiendo auto-merge."
+            exit 0
+          fi
+
+          # 2. Revisar estado y actualizar rama si está por detrás de main
+          if [ "$MERGE_STATUS" == "BEHIND" ]; then
+            echo "El PR #$PR_NUMBER está por detrás de main. Actualizando rama..."
+            gh api -X PUT repos/$REPO/pulls/$PR_NUMBER/update-branch
+            echo "Rama actualizada. El nuevo commit disparará de nuevo el flujo. Abortando run actual."
+            exit 0
+          fi
+
+          # 3. Si está limpia (CLEAN) o si simplemente fallamos intentando (para capturar otras heurísticas), forzamos merge
+          echo "Ejecutando merge directo en PR #$PR_NUMBER"
+          gh pr merge "$PR_NUMBER" --squash --delete-branch --repo "$REPO"

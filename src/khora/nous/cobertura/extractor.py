@@ -27,11 +27,9 @@ def _extract_via_regex(texto: str) -> Cobertura:
             t_fin = datetime.strptime(fin_str, "%H:%M")
             delta = t_fin - t_inicio
             horas = delta.total_seconds() / 3600.0
-            if horas < 0:
-                horas += 24.0
+            if horas < 0: horas += 24.0
             return Cobertura(
-                inicio=inicio_str,
-                fin=fin_str,
+                inicio=inicio_str, fin=fin_str,
                 horas_cubiertas=round(horas, 2),
                 evidencia=match.group(0), confianza="Alta",
                 nivel_evidencia="E1"

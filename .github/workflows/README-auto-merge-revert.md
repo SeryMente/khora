@@ -4,16 +4,16 @@ Estos workflows automatizan la integración continua y el rollback en la rama `m
 
 ## Qué reemplaza a la revisión humana
 - **Tests pre-merge (Khora OK):** Valida que el código pasa build y pruebas de extremo a extremo. Es un check requerido.
-- **Auto-Merge on Open (`auto-merge-on-open.yml`):** Programa el PR para ser fusionado (`squash`) a `main` automáticamente apenas todos los checks requeridos pasen, y elimina la rama. Si múltiples PRs están abiertos, cada uno se arma de forma independiente. **Nota:** Requiere que "Allow auto-merge" esté habilitado en la configuración de repositorio de GitHub (administración).
+- **Auto-Merge on Success (`auto-merge-on-open.yml`):** Reacciona cuando los tests (Khora OK) pasan con éxito. Revisa el PR asociado: si la rama está desactualizada respecto a `main` (BEHIND), el script de forma automática actualiza la rama (update-branch) y aborta ese ciclo (lo que reanuda los tests en el nuevo commit). Si ya está actualizada y lista, realiza el merge (`squash`) a `main` y elimina la rama.
+  - *Contexto de arquitectura:* Este script reemplaza al auto-merge nativo de GitHub, debido a que en el plan de organización libre/privado las protecciones de rama requeridas que bloquean el auto-merge no están disponibles o provocan un bloqueo indefinido si hay conflictos de update branch.
 - **Post-Deploy Smoke Test & Auto-Revert (`post-deploy-smoke.yml` & `auto-revert-on-smoke-fail.yml`):** Tras el auto-merge y el despliegue, el smoke test verifica la disponibilidad en producción. Si falla, el auto-revert se encarga de deshacer (revertir) el último commit en `main` de manera inmediata para restaurar el servicio.
 
 ## Cómo leer los fallos
 
-### Fallo en Auto-Merge on Open
-- Si falla el setup del auto-merge, verifica los logs del run.
-- Generalmente fallará si la rama base no es `main` (por diseño, lo omite), o si "Allow auto-merge" no está habilitado a nivel repositorio.
-- Asegúrate de que el token tiene permisos `pull-requests: write`.
-- El fallo de este workflow no impide que el PR se fusione manualmente o que se intente armar con la interfaz de GitHub, pero rompe la automatización.
+### Fallo en Auto-Merge on Success
+- Si el workflow falla, revisa los logs del script.
+- Un escenario común es que un intento de actualización de rama falle por conflictos de git (si la rama base no hace un merge limpio hacia el PR). En ese caso, requerirá resolución de conflictos manual.
+- El script se omite silenciosamente y pasa de forma exitosa si el PR es un draft o apunta a una rama distinta de `main`.
 
 ### Fallo en Auto-Revert on Smoke Fail
 - Si este workflow está corriendo, significa que la aplicación web **cayó o tiene errores severos** en producción tras un merge.

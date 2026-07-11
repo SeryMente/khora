@@ -1,6 +1,7 @@
-from khora.nous.cobertura.extractor import extraer_cobertura
+from khora.nous.cobertura.extractor import extraer_cobertura, Cobertura
 import os
 from unittest.mock import patch
+import pytest
 
 def test_cobertura_clara():
     # Este test pasará por el fallback regex determinista al no haber key
