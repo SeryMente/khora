@@ -14,6 +14,7 @@
   "dependencies": {
     "@google/genai": "^2.10.0",
     "@types/pg": "^8.20.0",
+    "@xyflow/react": "^12.11.2",
     "dexie": "^4.4.3",
     "firebase": "^12.15.0",
     "lucide-react": "^1.23.0",
