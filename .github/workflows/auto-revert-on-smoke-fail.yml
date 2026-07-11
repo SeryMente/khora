@@ -1,0 +1,39 @@
+name: Auto-Revert on Smoke Fail
+
+on:
+  workflow_run:
+    workflows: ["Post-Deploy Smoke Test"]
+    types:
+      - completed
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-revert:
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'failure'
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Revert last commit
+        run: |
+          # Obtenemos el último SHA en main
+          LAST_SHA=$(git log -1 --format=%H)
+          echo "Reverting commit: $LAST_SHA due to Post-Deploy Smoke Test failure in run ID: ${{ github.event.workflow_run.id }}"
+
+          # Intentamos el revert, sin modificar mensaje y sin forzar si hay conflictos
+          git revert $LAST_SHA --no-edit
+
+          # Push a main
+          git push origin main

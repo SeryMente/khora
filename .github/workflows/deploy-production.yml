@@ -1,0 +1,98 @@
+name: Deploy to Production (Vercel)
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'khora-web/**'
+      - '.github/workflows/deploy-production.yml'
+  workflow_dispatch:
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+jobs:
+  deploy-and-notify:
+    runs-on: ubuntu-latest
+    permissions:
+      deployments: write
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create GitHub Deployment
+        id: create_deployment
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const response = await github.rest.repos.createDeployment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: context.sha,
+              environment: 'Production',
+              auto_merge: false,
+              required_contexts: [],
+              production_environment: true
+            });
+            return response.data.id;
+
+      - name: Install Node and Vercel CLI
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        working-directory: khora-web
+        run: npm ci
+
+      - name: Build Vercel Project
+        working-directory: khora-web
+        run: npx vercel build --prod --token=${VERCEL_TOKEN}
+
+      - name: Deploy to Vercel
+        id: vercel_deploy
+        working-directory: khora-web
+        run: |
+          DEPLOY_URL=$(npx vercel deploy --prebuilt --prod --token=${VERCEL_TOKEN})
+          echo "DEPLOY_URL=$DEPLOY_URL" >> $GITHUB_ENV
+          echo "Vercel Deployment URL: $DEPLOY_URL"
+
+      - name: Set Deployment Status (Success)
+        if: success()
+        env:
+          DEPLOYMENT_ID: ${{ steps.create_deployment.outputs.result }}
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            if (!process.env.DEPLOYMENT_ID) return;
+            await github.rest.repos.createDeploymentStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              deployment_id: parseInt(process.env.DEPLOYMENT_ID, 10),
+              state: 'success',
+              environment_url: process.env.DEPLOY_URL,
+              log_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
+            });
+
+      - name: Set Deployment Status (Failure)
+        if: failure()
+        env:
+          DEPLOYMENT_ID: ${{ steps.create_deployment.outputs.result }}
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            if (!process.env.DEPLOYMENT_ID) return;
+            await github.rest.repos.createDeploymentStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              deployment_id: parseInt(process.env.DEPLOYMENT_ID, 10),
+              state: 'failure',
+              log_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
+            });
