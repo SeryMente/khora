@@ -51,13 +51,31 @@ export async function POST(req: Request) {
         title: title
     } as any); // Casting as any for prompt/title compatibility because Jules Client types don't have prompt/title in createSession params right now
 
-    const pool = getDb();
-    await pool.query(`
-      INSERT INTO jules_sessions (jules_session_id, branch, state, created_at, updated_at)
-      VALUES ($1, $2, $3, now(), now())
-    `, [session.id, branch, session.state]);
+    let persisted = false;
+    let warning: string | undefined;
 
-    return NextResponse.json({ success: true, session }, { status: 200 });
+    if (!process.env.DATABASE_URL) {
+      warning = "La sesión fue creada en Jules, pero no se registró localmente en Neon por falta de DATABASE_URL.";
+      console.warn(warning);
+    } else {
+      try {
+        const pool = getDb();
+        await pool.query(`
+          INSERT INTO jules_sessions (jules_session_id, branch, state, created_at, updated_at)
+          VALUES ($1, $2, $3, now(), now())
+        `, [session.id, branch, session.state]);
+        persisted = true;
+      } catch (dbError) {
+        warning = "La sesión fue creada en Jules, pero ocurrió un error al registrar en la base de datos local.";
+        console.warn(warning, dbError);
+      }
+    }
+
+    if (warning) {
+      return NextResponse.json({ success: true, session, persisted, warning }, { status: 200 });
+    }
+
+    return NextResponse.json({ success: true, session, persisted }, { status: 200 });
 
   } catch (error: unknown) {
     console.error("Error en /api/jules/trigger:", error);
