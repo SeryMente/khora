@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Splash } from "./components/Splash";
-import { Wrench, Server } from "lucide-react";
+import { Wrench, Server, Kanban } from "lucide-react";
 
 export default function RootMenu() {
   const [showSplash, setShowSplash] = useState(true);
@@ -52,6 +52,19 @@ export default function RootMenu() {
             </div>
           </div>
         </Link>
+
+        <Link href="/roadmap" className="block outline-none focus:outline-none md:col-span-2">
+          <div className="bg-[#112A4F] border border-[#1F3C6A] hover:border-[#3FA7FF] hover:bg-[#112A4F]/80 transition-all duration-200 ease-in-out rounded-2xl p-10 flex flex-col items-center gap-6 shadow-2xl cursor-pointer group h-full">
+            <div className="w-16 h-16 rounded-2xl bg-white/[0.03] border border-white/10 group-hover:bg-white/[0.06] group-hover:border-[#3FA7FF]/30 flex items-center justify-center transition-all duration-200 ease-in-out">
+              <Kanban className="w-8 h-8 text-cora-surface group-hover:text-[#3FA7FF] transition-colors duration-200 ease-in-out" />
+            </div>
+
+            <div className="flex flex-col items-center gap-2">
+              <h2 className="text-xl font-bold text-cora-surface tracking-tight">Roadmap</h2>
+              <p className="text-[11px] text-cora-silver font-mono tracking-widest uppercase opacity-60 text-center">Kanban en vivo</p>
+            </div>
+          </div>
+        </Link>
       </div>
 
       {/* Footer text */}
@@ -61,3 +74,5 @@ export default function RootMenu() {
     </main>
   );
 }
+
+// TODO: Registrar la app Roadmap de nivel 1 en el manifest del launcher Cora-OS cuando UI-01 fusione.
