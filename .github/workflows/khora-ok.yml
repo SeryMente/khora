@@ -37,21 +37,9 @@ jobs:
         run: npm run e2e
         working-directory: khora-web
 
-      - name: Veredicto J-Gate
-        id: j-gate
-        run: |
-          echo "NO VERIFICADO: No existe fuente programática para el veredicto J-Gate."
-          echo "El operador realiza este chequeo manualmente o no ha sido automatizado."
-          echo "Dejamos pasar por ahora documentando el hueco real en el PR."
-          echo "pass=true" >> $GITHUB_OUTPUT
-
-      - name: Verificar Gate PR
-        run: |
-          if [ "${{ steps.j-gate.outputs.pass }}" != "true" ]; then
-            echo "Veredicto no es pass, abortando."
-            exit 1
-          fi
-
+      - name: Run Regression tests
+        run: npx playwright test tests/regression/smoke.spec.ts --project=chromium
+        working-directory: khora-web
   sync-repos:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
