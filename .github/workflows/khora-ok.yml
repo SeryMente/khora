@@ -2,50 +2,34 @@ name: khora-ok / gate
 
 on:
   pull_request:
-    branches:
-      - main
+    branches: [main]
     types: [opened, synchronize, reopened]
-  push:
-    branches:
-      - main
+
+concurrency:
+  group: khora-ok-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   khora-ok:
-    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: khora-web
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
-
-      - name: Install dependencies
-        run: npm ci
-        working-directory: khora-web
-
-      - name: Build Next.js
-        run: npm run build
-        working-directory: khora-web
-
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
-        working-directory: khora-web
-
-      - name: Run E2E tests
-        run: npm run e2e
-        working-directory: khora-web
-
-      - name: Run Regression tests
-        run: npx playwright test tests/regression/smoke.spec.ts --project=chromium
-        working-directory: khora-web
-  sync-repos:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Sync Ambos Repos
-        run: |
-          echo "NO VERIFICADO: Faltan credenciales y definición explícita de 'ambos repos'."
-          echo "Actualmente se ejecuta un echo tras el merge a main (push a main), cumpliendo con el trigger requerido por PM-2."
+          cache: 'npm'
+          cache-dependency-path: khora-web/package-lock.json
+      - run: npm ci
+      - run: npm run build
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: pw-${{ runner.os }}-${{ hashFiles('khora-web/package-lock.json') }}
+      - run: npx playwright install --with-deps
+      - run: npm run e2e
+      - run: npx playwright test tests/regression/smoke.spec.ts --project=chromium
