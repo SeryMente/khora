@@ -20,3 +20,7 @@ INSTRUCCIONES_JULES.md
 FETCH_HEAD
 
 node_modules/
+
+# Artefactos JS compilados (usamos tsx sobre .ts)
+khora-web/lib/utils/*.js
+khora-web/tests/*.js
