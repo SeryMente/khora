@@ -69,8 +69,8 @@ export async function POST(req: Request) {
                        pageId = pageIdMatch[1];
                   } else {
                       // Fallback query if URL parsing fails or tarjeta_url is missing
-                       const queryRes = await (notion.databases as any).query({
-                            database_id: notionDatabaseId,
+                       const queryRes = await (notion as any).dataSources.query({
+                            data_source_id: notionDatabaseId,
                             filter: {
                                  property: "URL del PR",
                                  url: {
