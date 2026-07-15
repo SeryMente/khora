@@ -56,6 +56,14 @@ async function migrate() {
     decision text,
     reason text
     );
+    create table if not exists jules_ai_decisions (
+    id uuid primary key default gen_random_uuid(),
+    session_id uuid references jules_sessions(id),
+    question text not null,
+    answer text,
+    fail_reason text,
+    created_at timestamptz not null default now()
+    );
   `;
 
   try {

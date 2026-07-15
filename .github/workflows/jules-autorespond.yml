@@ -1,0 +1,19 @@
+name: Jules Auto-Respond Cron
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+jobs:
+  auto-respond:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call auto-respond endpoint
+        env:
+          INTERNAL_TRIGGER_SECRET: ${{ secrets.INTERNAL_TRIGGER_SECRET }}
+        run: |
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            -H "x-internal-secret: ${INTERNAL_TRIGGER_SECRET}" \
+            https://khora-ten.vercel.app/api/jules/auto-respond
