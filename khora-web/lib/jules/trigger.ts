@@ -19,7 +19,7 @@ export async function triggerJulesSession(payload: { repo: string, branch: strin
             }
         },
         automationMode: "AUTO_CREATE_PR",
-        requirePlanApproval: true,
+        requirePlanApproval: false,
         prompt: prompt,
         title: title
     } as any);
