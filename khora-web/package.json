@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@google/genai": "^2.10.0",
+    "@notionhq/client": "^5.23.0",
     "@types/pg": "^8.20.0",
     "@xyflow/react": "^12.11.2",
     "dexie": "^4.4.3",

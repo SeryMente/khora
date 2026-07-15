@@ -11,7 +11,7 @@ async function migrate() {
   });
 
   const sql = `
-    create table jules_sessions (
+    create table if not exists jules_sessions (
     id uuid primary key default gen_random_uuid(),
     jules_session_id text unique not null,
     tarjeta_url text,
@@ -21,7 +21,7 @@ async function migrate() {
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
     );
-    create table jules_activities (
+    create table if not exists jules_activities (
     id uuid primary key default gen_random_uuid(),
     session_id uuid references jules_sessions(id),
     jules_activity_id text unique not null,
@@ -30,12 +30,12 @@ async function migrate() {
     activity_created_time timestamptz not null,
     processed_at timestamptz not null default now()
     );
-    create index on jules_activities (session_id, activity_created_time);
-    create table poll_cursors (
+    create index if not exists jules_activities_session_id_activity_created_time_idx on jules_activities (session_id, activity_created_time);
+    create table if not exists poll_cursors (
     session_id uuid primary key references jules_sessions(id),
     last_create_time timestamptz not null
     );
-    create table audit_verdicts (
+    create table if not exists audit_verdicts (
     id uuid primary key default gen_random_uuid(),
     session_id uuid references jules_sessions(id),
     rubric_version text not null,
@@ -44,6 +44,17 @@ async function migrate() {
     auditor text not null,
     signed_at timestamptz not null default now(),
     notes text
+    );
+    create table if not exists orchestrator_lock (
+    id int primary key default 1,
+    locked_until timestamptz not null
+    );
+    create table if not exists orchestrator_log (
+    id serial primary key,
+    timestamp timestamptz not null default now(),
+    card_url text,
+    decision text,
+    reason text
     );
   `;
 
