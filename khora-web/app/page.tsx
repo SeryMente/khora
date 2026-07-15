@@ -66,11 +66,6 @@ export default function RootMenu() {
           </div>
         </Link>
       </div>
-
-      {/* Footer text */}
-      <footer className="absolute bottom-8 left-0 w-full flex justify-center z-10 opacity-40">
-        <span className="text-[9px] text-cora-surface font-mono uppercase tracking-[0.3em]">Sistema Operativo Khora</span>
-      </footer>
     </main>
   );
 }
