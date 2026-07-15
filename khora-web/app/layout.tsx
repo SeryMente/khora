@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { UpdatePrompt } from "./components/UpdatePrompt";
 import { ShellNav } from "./components/ShellNav";
+import { GlobalFooter } from "./components/GlobalFooter";
 import { TelemetryProvider } from "./components/TelemetryProvider";
 import "./globals.css";
 
@@ -76,6 +77,7 @@ export default function RootLayout({
               {children}
             </main>
           </div>
+          <GlobalFooter />
         </TelemetryProvider>
       </body>
     </html>
