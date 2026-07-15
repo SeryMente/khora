@@ -3,6 +3,7 @@ import { getDb } from "@/lib/server/neon";
 import * as crypto from "crypto";
 import { Client } from "@notionhq/client";
 import { triggerJulesSession } from "@/lib/jules/trigger";
+import { extractPromptFromBlocks } from "@/lib/utils/extractPrompt";
 import { Pool } from 'pg';
 
 export async function POST(req: Request) {
@@ -175,19 +176,7 @@ export async function POST(req: Request) {
 
         let promptBlock = "";
         try {
-            const blocksResponse = await notion.blocks.children.list({ block_id: cand.id });
-            const pageText = blocksResponse.results.map((b: any) => b.type === "paragraph" && b.paragraph?.rich_text ? b.paragraph.rich_text.map((rt: any) => rt.plain_text).join("") : "").join("\n");
-
-            const startMarker = "👻 PROMPT PARA JULES";
-            const endMarker = "🖋️ FIRMA-JULES";
-
-            const startIndex = pageText.indexOf(startMarker);
-            const endIndex = pageText.indexOf(endMarker);
-
-            if (startIndex !== -1 && endIndex !== -1 && endIndex > startIndex) {
-                 const fullEndIndex = pageText.indexOf("\n", endIndex);
-                 promptBlock = pageText.substring(startIndex, fullEndIndex !== -1 ? fullEndIndex : pageText.length);
-            }
+            promptBlock = await extractPromptFromBlocks(notion, cand.id);
         } catch (e) {
              // ignore block retrieve error
         }
