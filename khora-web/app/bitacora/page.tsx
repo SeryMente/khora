@@ -1,13 +1,17 @@
 "use client";
 
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { useCapturas } from "@/lib/hooks";
 import { checkAuthSession, setAuthSession, clearAuthSession } from "@/lib/auth";
 import { hasCryptoState, verifyPIN, setupCryptoEnvironment } from "@/lib/crypto";
 import { verifyChainHealth, type ChainHealthResult } from "@/lib/chain-health";
 import { motion, AnimatePresence } from "motion/react";
+import { normalizeDictatedText } from "@/lib/text-utils";
 import {
   Mic,
+  MicOff,
+  Send,
+  Sparkles,
   Bed,
   MapPin,
   FileText,
@@ -100,10 +104,179 @@ const TIPO_DECORATIONS = {
   insight: { label: "Insight", icon: Lightbulb, color: "text-violet-400 border-violet-500/10 bg-violet-500/5", emoji: "💡" },
 };
 
-export default function BitacoraPage() {
-  const { capturas, cargando, sincronizando, reintentar } = useCapturas();
 
-  // --- Autenticacion local (client-side) ---
+// Detector de navegador/dispositivo
+function getDispositivo(): string {
+  if (typeof navigator === "undefined") return "PC";
+  const ua = navigator.userAgent;
+  if (ua.includes("Mobile") || ua.includes("Android") || ua.includes("iPhone"))
+    return "Móvil";
+  if (ua.includes("Macintosh")) return "MacBook";
+  if (ua.includes("Windows")) return "Windows PC";
+  return "Web App";
+}
+
+export default function BitacoraPage() {
+
+
+  const { capturas, cargando, sincronizando, reintentar, addCaptura } = useCapturas();
+
+  const [texto, setTexto] = useState("");
+  const [interimText, setInterimText] = useState("");
+  const [guardando, setGuardando] = useState(false);
+  const [dictando, setDictando] = useState(false);
+  const [speechSupported, setSpeechSupported] = useState(true);
+
+  // Tiempos de dictado
+  const [segundosGrabados, setSegundosGrabados] = useState(0);
+  const dictationTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const [showSuccessToast, setShowSuccessToast] = useState(false);
+  const [wasNormalized, setWasNormalized] = useState(false);
+  const [lastDictationDuration, setLastDictationDuration] = useState<number | null>(null);
+
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const recognitionRef = useRef<any>(null);
+  const finalTranscriptRef = useRef("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const SpeechRecognition =
+        (window as any).SpeechRecognition ||
+        (window as any).webkitSpeechRecognition;
+
+      if (SpeechRecognition) {
+        recognitionRef.current = new SpeechRecognition();
+        recognitionRef.current.continuous = true;
+        recognitionRef.current.interimResults = true;
+        recognitionRef.current.lang = "es-MX";
+
+        recognitionRef.current.onresult = (event: any) => {
+          let interim = "";
+          let final = "";
+
+          for (let i = event.resultIndex; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+              final += event.results[i][0].transcript;
+            } else {
+              interim += event.results[i][0].transcript;
+            }
+          }
+
+          if (final) {
+            finalTranscriptRef.current += " " + final;
+            setTexto((prev) => (prev + " " + final).trim());
+          }
+          setInterimText(interim);
+        };
+
+        recognitionRef.current.onerror = (event: any) => {
+          console.error("Speech recognition error", event.error);
+          setDictando(false);
+        };
+
+        recognitionRef.current.onend = () => {
+          setDictando(false);
+        };
+      } else {
+        setSpeechSupported(false);
+      }
+    }
+  }, []);
+
+  // Timer del dictado
+  useEffect(() => {
+    if (dictando) {
+      setSegundosGrabados(0);
+      dictationTimerRef.current = setInterval(() => {
+        setSegundosGrabados((s) => s + 1);
+      }, 1000);
+    } else {
+      if (dictationTimerRef.current) {
+        clearInterval(dictationTimerRef.current);
+        if (segundosGrabados > 0) {
+          setLastDictationDuration(segundosGrabados * 1000);
+        }
+      }
+    }
+    return () => {
+      if (dictationTimerRef.current) clearInterval(dictationTimerRef.current);
+    };
+  }, [dictando, segundosGrabados]);
+
+  const toggleDictado = useCallback(() => {
+    if (!speechSupported || !recognitionRef.current) return;
+    if (dictando) {
+      recognitionRef.current.stop();
+    } else {
+      setInterimText("");
+      setLastDictationDuration(null);
+      recognitionRef.current.start();
+      textareaRef.current?.focus();
+      setDictando(true);
+    }
+  }, [dictando, speechSupported]);
+
+  async function guardar() {
+    let finalTexto = (texto + " " + interimText).trim();
+    if (!finalTexto || guardando) return;
+
+    const saveStartTime = Date.now();
+    setGuardando(true);
+    let normalizedFlag = false;
+
+    try {
+      if (dictando && recognitionRef.current) {
+        recognitionRef.current.stop();
+        setDictando(false);
+      }
+
+      const duracionFinal =
+        lastDictationDuration ||
+        (segundosGrabados > 0 ? segundosGrabados * 1000 : undefined);
+
+      if (duracionFinal !== undefined && duracionFinal > 0) {
+        const normalized = await normalizeDictatedText(finalTexto);
+        if (normalized && normalized !== finalTexto) {
+          finalTexto = normalized;
+          normalizedFlag = true;
+        }
+      }
+
+      const latenciaGuardado = Date.now() - saveStartTime;
+
+      await addCaptura(
+        finalTexto,
+        "nota",
+        duracionFinal !== undefined ? "voice" : "keyboard",
+        {
+          dispositivo: getDispositivo(),
+          latenciaGuardado,
+          ...(duracionFinal !== undefined
+            ? { duracionDictado: duracionFinal }
+            : {}),
+        }
+      );
+
+      setTexto("");
+      setInterimText("");
+      finalTranscriptRef.current = "";
+      setSegundosGrabados(0);
+      setLastDictationDuration(null);
+
+      setWasNormalized(normalizedFlag);
+      setShowSuccessToast(true);
+      setTimeout(() => setShowSuccessToast(false), 3000);
+    } catch (e) {
+      console.error(e);
+      alert("Error al guardar la captura localmente.");
+    } finally {
+      setGuardando(false);
+    }
+  }
+
+  // --- Autenticacion local
+
   const [isAuth, setIsAuth] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
   const [loginPass, setLoginPass] = useState("");
@@ -363,9 +536,110 @@ export default function BitacoraPage() {
           </div>
         )}
 
+
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
           <div className="md:col-span-12 space-y-6">
+
+            {/* LA CAPTURA: Protagonista Absoluto */}
+            <section className="bg-[#18181b] border border-white/[0.06] rounded-2xl p-6 flex flex-col gap-5 shadow-xs relative overflow-hidden">
+              <div className="flex items-center justify-between border-b border-white/[0.03] pb-4">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-indigo-400" />
+                  <span className="text-xs font-semibold tracking-wider text-gray-400 uppercase font-mono">
+                    Captura libre
+                  </span>
+                </div>
+                {dictando && (
+                  <span className="text-[10px] text-indigo-400 font-mono font-semibold animate-pulse flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/20 px-2.5 py-1 rounded-lg">
+                    <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-ping" />
+                    Grabando voz... ({Math.floor(segundosGrabados / 60)}:{(segundosGrabados % 60).toString().padStart(2, "0")})
+                  </span>
+                )}
+              </div>
+
+              {/* Area de Entrada del Editor */}
+              <div className="relative group min-h-[160px] bg-[#202024]/50 border border-white/[0.04] rounded-xl p-5 transition-all duration-300 focus-within:border-white/[0.12] focus-within:bg-[#202024]/70">
+                <textarea
+                  ref={textareaRef}
+                  value={texto + (interimText ? " " + interimText : "")}
+                  onChange={(e) => {
+                    if (!dictando) setTexto(e.target.value);
+                  }}
+                  onKeyDown={(e) => {
+                    if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+                      e.preventDefault();
+                      void guardar();
+                    }
+                  }}
+                  placeholder={
+                    !speechSupported
+                    ? "Dictado no soportado en este navegador. Escribe aquí..."
+                    : dictando ? "Escuchando voz en tiempo real... Habla libremente..." : "¿Qué acaba de pasar? Registra un evento, pernocta, nota o idea..."}
+                  className="w-full bg-transparent text-white placeholder-zinc-600 resize-none focus:outline-none leading-relaxed text-sm md:text-base min-h-[110px] h-auto"
+                  disabled={guardando}
+                />
+              </div>
+
+              {/* Fila de controles de captura */}
+              <div className="flex items-center justify-between pt-1">
+                {/* Trigger de Dictado */}
+                <button
+                  onClick={toggleDictado}
+                  type="button"
+                  disabled={!speechSupported || guardando}
+                  className={`px-5 py-3 rounded-xl transition-all duration-300 flex items-center gap-2 text-xs font-semibold border cursor-pointer ${
+                    dictando
+                      ? "bg-indigo-500/15 border-indigo-500/30 text-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.2)] animate-pulse"
+                      : !speechSupported
+                      ? "bg-[#202024]/40 border-white/[0.02] text-gray-600 cursor-not-allowed"
+                      : "bg-[#202024]/80 border-white/[0.04] hover:border-white/[0.1] text-gray-400 hover:text-white"
+                  }`}
+                  title={!speechSupported ? "Dictado no soportado en este navegador" : ""}
+                >
+                  {dictando ? <Mic className="w-4 h-4 text-indigo-400" /> : <MicOff className="w-4 h-4 text-gray-500" />}
+                  {dictando ? "Escuchando... / Detener" : "Dictar entrada"}
+                </button>
+
+                {/* Meta info discreta */}
+                <div className="hidden md:flex items-center gap-2 text-[10px] text-gray-500 font-mono">
+                  <span>Dictado inteligente</span>
+                  <span>·</span>
+                  <span className="bg-black/30 border border-white/[0.03] px-2 py-0.5 rounded text-gray-400">⌘ + Enter</span>
+                </div>
+
+                {/* Botón Guardar */}
+                <button
+                  onClick={() => void guardar()}
+                  disabled={(!texto.trim() && !interimText.trim()) || guardando}
+                  className="px-6 py-3 rounded-xl bg-white text-black hover:bg-gray-200 text-xs font-bold transition-all flex items-center gap-2 disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer shadow-sm"
+                >
+                  {guardando ? (
+                    "Sincronizando…"
+                  ) : (
+                    <>
+                      Guardar entrada <Send className="w-3.5 h-3.5" />
+                    </>
+                  )}
+                </button>
+              </div>
+
+              <AnimatePresence>
+                {showSuccessToast && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="absolute top-4 right-4 bg-[#72BC8F]/10 border border-[#72BC8F]/20 text-[#72BC8F] px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-2"
+                  >
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    ¡Guardado! {wasNormalized && "(Autocorregido)"}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </section>
+
             <section className="space-y-4 relative">
+
 
               {/* Barra de Búsqueda y Filtros */}
               <div className="flex flex-col md:flex-row gap-3">
