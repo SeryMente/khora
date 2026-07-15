@@ -65,8 +65,8 @@ export async function POST(req: Request) {
 
     try {
         // Correct query method path
-        const queryResponse = await (notion.databases as any).query({
-            database_id: notionDatabaseId,
+        const queryResponse = await (notion as any).dataSources.query({
+            data_source_id: notionDatabaseId,
             filter: {
                 or: [
                     {
