@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export const config = { matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"] };
+export const config = { matcher: ["/((?!_next/static|_next/image|favicon.ico|api/).*)"] };
 
 export function middleware(req: NextRequest) {
   const USER = process.env.BASIC_AUTH_USER;
