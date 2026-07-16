@@ -50,6 +50,10 @@ jobs:
         working-directory: khora-web
         run: npm ci
 
+      - name: Pull Vercel Project Settings
+        working-directory: khora-web
+        run: npx vercel pull --yes --environment=production --token=${VERCEL_TOKEN}
+
       - name: Build Vercel Project
         working-directory: khora-web
         run: npx vercel build --prod --token=${VERCEL_TOKEN}
