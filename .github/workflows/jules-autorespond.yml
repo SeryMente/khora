@@ -16,4 +16,4 @@ jobs:
           curl -X POST \
             -H "Content-Type: application/json" \
             -H "x-internal-secret: ${INTERNAL_TRIGGER_SECRET}" \
-            https://khora-ten.vercel.app/api/jules/auto-respond
+            https://khora-ten.vercel.app/api/jules/autorespond

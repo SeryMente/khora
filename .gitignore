@@ -26,3 +26,4 @@ khora-web/lib/utils/*.js
 khora-web/tests/*.js
 .neon
 .vercel
+.env*
