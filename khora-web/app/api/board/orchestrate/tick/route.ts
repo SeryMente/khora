@@ -174,6 +174,11 @@ export async function POST(req: Request) {
             continue;
         }
 
+        if (cand.properties["🔓 OK operador"]?.checkbox !== true) {
+            await logDecision(cand.url, "skipped", "missing_operator_ok");
+            continue;
+        }
+
         let promptBlock = "";
         try {
             promptBlock = await extractPromptFromBlocks(notion, cand.id);
