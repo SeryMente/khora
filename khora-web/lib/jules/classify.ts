@@ -16,5 +16,5 @@ export function isSimpleQuestion(question: string): boolean {
   ];
 
   const hasKeyword = kw.some(k => lw.includes(k));
-  return question.length < 260 || hasKeyword;
+  return hasKeyword && question.length < 260;
 }
