@@ -37,23 +37,29 @@ export async function POST(req: Request) {
       const state = payload.pull_request.state;
       const action = payload.action;
       const merged = payload.pull_request.merged;
+      const body = payload.pull_request.body || "";
+
+      let jules_session_id = null;
+      const sessionMatch = body.match(/PR created automatically by Jules for task\s+(\S+)/);
+      if (sessionMatch) {
+        jules_session_id = sessionMatch[1];
+      }
 
       const pool = getDb();
 
-      const updateResult = await pool.query(`
-        UPDATE jules_sessions
-        SET pr_url = $1, state = $2, updated_at = now()
-        WHERE branch = $3
-        RETURNING tarjeta_url, jules_session_id
-      `, [pr_url, state, branch]);
-
       let tarjeta_url = null;
-      let jules_session_id = null;
-      if (updateResult.rowCount === 0) {
-        console.warn(`No se encontró ninguna sesión para la rama ${branch}`);
+      if (jules_session_id) {
+        const selectResult = await pool.query(`
+          SELECT tarjeta_url FROM jules_sessions WHERE jules_session_id = $1
+        `, [jules_session_id]);
+
+        if (selectResult.rowCount === 0) {
+          console.warn(`No se encontró ninguna sesión para jules_session_id ${jules_session_id}`);
+        } else {
+          tarjeta_url = selectResult.rows[0].tarjeta_url;
+        }
       } else {
-         tarjeta_url = updateResult.rows[0].tarjeta_url;
-         jules_session_id = updateResult.rows[0].jules_session_id;
+        console.warn(`No se encontró jules_session_id en el cuerpo del PR de la rama ${branch}`);
       }
 
       if (action === "closed" && merged) {
@@ -64,7 +70,19 @@ export async function POST(req: Request) {
              const notion = new Client({ auth: notionToken });
 
              try {
-                  const pageIdMatch = tarjeta_url ? tarjeta_url.match(/([a-f0-9]{32})/) : null;
+                  let pageIdMatch = null;
+                  if (tarjeta_url) {
+                      try {
+                          const parsedUrl = new URL(tarjeta_url);
+                          const m = parsedUrl.pathname.match(/([a-fA-F0-9]{32})$/);
+                          if (m) {
+                              pageIdMatch = m;
+                          }
+                      } catch (e) {
+                          // Invalid URL format, ignore
+                      }
+                  }
+
                   let pageId = null;
 
                   // First attempt: Search by ID tarea Jules (if we have jules_session_id)
