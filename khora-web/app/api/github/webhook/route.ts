@@ -44,14 +44,16 @@ export async function POST(req: Request) {
         UPDATE jules_sessions
         SET pr_url = $1, state = $2, updated_at = now()
         WHERE branch = $3
-        RETURNING tarjeta_url
+        RETURNING tarjeta_url, jules_session_id
       `, [pr_url, state, branch]);
 
       let tarjeta_url = null;
+      let jules_session_id = null;
       if (updateResult.rowCount === 0) {
         console.warn(`No se encontró ninguna sesión para la rama ${branch}`);
       } else {
          tarjeta_url = updateResult.rows[0].tarjeta_url;
+         jules_session_id = updateResult.rows[0].jules_session_id;
       }
 
       if (action === "closed" && merged) {
@@ -65,12 +67,26 @@ export async function POST(req: Request) {
                   const pageIdMatch = tarjeta_url ? tarjeta_url.match(/([a-f0-9]{32})/) : null;
                   let pageId = null;
 
-                  if (pageIdMatch) {
-                       pageId = pageIdMatch[1];
-                  } else {
-                      // Fallback query if URL parsing fails or tarjeta_url is missing
-                       const queryRes = await (notion as any).dataSources.query({
-                            data_source_id: notionDatabaseId,
+                  // First attempt: Search by ID tarea Jules (if we have jules_session_id)
+                  if (jules_session_id) {
+                      const queryResId = await (notion as any).databases.query({
+                          database_id: notionDatabaseId,
+                          filter: {
+                              property: "ID tarea Jules",
+                              rich_text: {
+                                  equals: jules_session_id
+                              }
+                          }
+                      });
+                      if (queryResId.results.length > 0) {
+                          pageId = queryResId.results[0].id;
+                      }
+                  }
+
+                  // Second attempt: Search by URL del PR
+                  if (!pageId && pr_url) {
+                       const queryResUrl = await (notion as any).databases.query({
+                            database_id: notionDatabaseId,
                             filter: {
                                  property: "URL del PR",
                                  url: {
@@ -78,23 +94,46 @@ export async function POST(req: Request) {
                                  }
                             }
                        });
-                       if (queryRes.results.length === 1) {
-                            pageId = queryRes.results[0].id;
+                       if (queryResUrl.results.length > 0) {
+                            pageId = queryResUrl.results[0].id;
                        } else {
-                            console.warn("sin match claro en Notion via URL del PR:", pr_url, "match count:", queryRes.results.length);
+                            console.warn("sin match claro en Notion via URL del PR:", pr_url, "match count:", queryResUrl.results.length);
                        }
                   }
 
+                  // Third attempt: Fallback from legacy tarjeta_url
+                  if (!pageId && pageIdMatch) {
+                       pageId = pageIdMatch[1];
+                  }
+
                   if (pageId) {
-                      const today = new Date().toISOString().split('T')[0];
+                      // Extract real merge date
+                      const mergedAt = payload.pull_request.merged_at;
+                      // NUNCA retro-datar ni inventar fechas. Do not update '🏁 Cerrada el' if merged_at is falsy.
+                      const propertiesUpdate: any = {
+                          "Estado": { status: { name: "Fusionado" } },
+                          "URL del PR": { url: pr_url }
+                      };
+
+                      if (mergedAt) {
+                          propertiesUpdate["🏁 Cerrada el"] = { date: { start: new Date(mergedAt).toISOString().split('T')[0] } };
+                      }
+
                       await notion.pages.update({
                            page_id: pageId,
-                           properties: {
-                                "Estado": { status: { name: "Fusionado" } },
-                                "🏁 Cerrada el": { date: { start: today } }
-                           }
+                           properties: propertiesUpdate
                       });
                       console.log("Updated Notion card to Fusionado:", pageId);
+
+                      await pool.query(
+                          "INSERT INTO orchestrator_log (card_url, decision, reason) VALUES ($1, $2, $3)",
+                          [tarjeta_url, "webhook_merge", "ok"]
+                      );
+                  } else {
+                      await pool.query(
+                          "INSERT INTO orchestrator_log (card_url, decision, reason) VALUES ($1, $2, $3)",
+                          [tarjeta_url, "webhook_merge", "card_not_found"]
+                      );
                   }
              } catch (e) {
                   console.error("Error updating Notion on PR merge:", e);
