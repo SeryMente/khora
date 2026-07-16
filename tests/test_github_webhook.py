@@ -1,4 +1,3 @@
-import pytest
 import hmac
 import hashlib
 import json
