@@ -4,6 +4,7 @@ import * as crypto from "crypto";
 import { Client } from "@notionhq/client";
 import { triggerJulesSession } from "@/lib/jules/trigger";
 import { extractPromptFromBlocks } from "@/lib/utils/extractPrompt";
+import { listActivities, listSessions } from "@/lib/jules/client";
 import { Pool } from 'pg';
 
 export async function POST(req: Request) {
@@ -113,12 +114,152 @@ export async function POST(req: Request) {
         return NextResponse.json({ ok: false, reason: "schema_mismatch" }, { status: 200 });
     }
 
+    const stats = {
+        despachadas: 0,
+        bloqueadas_por_dependencia: 0,
+        bloqueadas_por_zona: 0,
+        at_capacity: 0,
+        reconciliadas: 0,
+        reintentos: 0,
+        errores: 0
+    };
+
+    const activasJules = activas.filter(page => page.properties["Ejecutor"]?.select?.name === "🤖 Jules");
+    const activeColZones = new Set<string>();
+    activas.forEach(page => {
+        const zones = page.properties["Zona de colisión"]?.multi_select || [];
+        zones.forEach((z: any) => activeColZones.add(z.name));
+    });
+
     const maxConcurrent = parseInt(process.env.MAX_CONCURRENT_JULES_SESSIONS || "3", 10);
-    const capacityRemaining = maxConcurrent - activas.length;
+    let capacityRemaining = maxConcurrent - activasJules.length;
 
     const logDecision = async (url: string, decision: string, reason: string) => {
+        console.log(`[Orchestrator] URL: ${url} | Decision: ${decision} | Reason: ${reason}`);
         if (pool) {
            await pool.query(`INSERT INTO orchestrator_log (card_url, decision, reason) VALUES ($1, $2, $3)`, [url, decision, reason]);
+        }
+    }
+
+    // RECONCILIACIÓN por tick & SESIONES NACIDAS ROTAS
+    let allJulesSessions: any[] = [];
+    try {
+         const julesRes = await listSessions(100);
+         allJulesSessions = julesRes.sessions || [];
+    } catch (e: any) {
+         console.warn(`[Orchestrator] Failed to fetch Jules sessions for reconciliation: ${e.message}`);
+    }
+
+    const enJules = activas.filter(page => page.properties["Estado"]?.status?.name === "En Jules");
+
+    for (const page of enJules) {
+        const url = page.url;
+        const julesSessionId = page.properties["ID tarea Jules"]?.rich_text?.[0]?.plain_text;
+
+        if (!julesSessionId) continue;
+
+        try {
+            // Reconciliación: Check if session opened a PR
+            const remoteSession = allJulesSessions.find(s => s.id === julesSessionId);
+            if (remoteSession && remoteSession.state === "PR_CREATED") {
+                 let prUrl = remoteSession.url;
+
+                 await notion.pages.update({
+                      page_id: page.id,
+                      properties: {
+                           "Estado": { status: { name: "PR abierto" } },
+                           "URL del PR": { url: prUrl }
+                      }
+                 });
+
+                 stats.reconciliadas++;
+                 await logDecision(url, "reconciled", "pr_opened_via_poll");
+                 continue;
+            }
+
+            const res = await listActivities(julesSessionId);
+            const activities = res.activities || [];
+
+            let broken = false;
+            let setupFound = false;
+
+            for (const act of activities) {
+                 if (act.agentMessaged?.agentMessage) {
+                      const msg = act.agentMessaged.agentMessage.toLowerCase();
+                      if (msg.includes("initial commit") || msg.includes("completamente vacío") || msg.includes("repositorio vacío")) {
+                           broken = true;
+                           break;
+                      }
+                 }
+                 if (act.name || act.description) {
+                      setupFound = true;
+                 }
+            }
+
+            if (!broken && !setupFound && pool) {
+                 const sessionRes = await pool.query(`SELECT created_at FROM jules_sessions WHERE jules_session_id = $1`, [julesSessionId]);
+                 if (sessionRes.rowCount !== null && sessionRes.rowCount > 0) {
+                      const ageMs = Date.now() - new Date(sessionRes.rows[0].created_at).getTime();
+                      if (ageMs > 20 * 60 * 1000) {
+                           broken = true;
+                      }
+                 }
+            }
+
+            if (broken && pool) {
+                 const attemptsRes = await pool.query(`SELECT COUNT(*) as count FROM jules_sessions WHERE tarjeta_url = $1`, [url]);
+                 const attempts = parseInt(attemptsRes.rows[0].count, 10);
+
+                 if (attempts < 3) {
+                      console.log(`[Orchestrator] Sesh ${julesSessionId} rota, reintentando. Attempt ${attempts+1}/3`);
+
+                      const promptBlock = await extractPromptFromBlocks(notion, page.id);
+                      if (promptBlock) {
+                          const title = page.properties["Name"]?.title?.[0]?.plain_text || page.id;
+                          const repo = page.properties["Repo"]?.rich_text?.[0]?.plain_text || "SeryMente/khora";
+
+                          // Disconnect broken session from capacity and active zones
+                          const zones = page.properties["Zona de colisión"]?.multi_select || [];
+                          zones.forEach((z: any) => activeColZones.delete(z.name));
+
+                          const result = await triggerJulesSession({
+                              repo: repo,
+                              branch: "main",
+                              prompt: promptBlock + `\n\nURL DE LA TAREA: ${url}`,
+                              title: title,
+                              card_url: url
+                          });
+
+                          await notion.pages.update({
+                              page_id: page.id,
+                              properties: {
+                                  "ID tarea Jules": { rich_text: [{ text: { content: result.session.id } }] }
+                              }
+                          });
+
+                          zones.forEach((z: any) => activeColZones.add(z.name)); // Re-add zone for new session
+                          stats.reintentos++;
+                          await logDecision(url, "recreated", `broken_session_attempt_${attempts+1}`);
+                      }
+                 } else {
+                      console.error(`[CRÍTICO] Sesh ${julesSessionId} rota y agotó reintentos. Marcando bloqueada.`);
+                      await notion.pages.update({
+                           page_id: page.id,
+                           properties: {
+                               "Estado": { status: { name: "Bloqueado" } }
+                           }
+                      });
+
+                      capacityRemaining++;
+                      const zones = page.properties["Zona de colisión"]?.multi_select || [];
+                      zones.forEach((z: any) => activeColZones.delete(z.name));
+
+                      stats.errores++;
+                      await logDecision(url, "blocked", "max_retries_exceeded");
+                 }
+            }
+        } catch (e: any) {
+             console.warn(`Could not check activities for ${julesSessionId}:`, e.message);
         }
     }
 
@@ -127,16 +268,13 @@ export async function POST(req: Request) {
             await pool.query(`UPDATE orchestrator_lock SET locked_until = now() WHERE id = 1`);
         }
         for (const cand of candidatas) {
+            stats.at_capacity++;
             await logDecision(cand.url, "skipped", "at_capacity");
         }
-        return NextResponse.json({ ok: true, fired: [], reason: "at_capacity" }, { status: 200 });
-    }
 
-    const activeColZones = new Set<string>();
-    activas.forEach(page => {
-        const zones = page.properties["Zona de colisión"]?.multi_select || [];
-        zones.forEach((z: any) => activeColZones.add(z.name));
-    });
+        console.log(`[Orchestrator Stats]`, stats);
+        return NextResponse.json({ ok: true, fired: [], reason: "at_capacity", stats }, { status: 200 });
+    }
 
     const eligibleCandidates = [];
 
@@ -153,7 +291,8 @@ export async function POST(req: Request) {
             try {
                 const blockPage: any = await notion.pages.retrieve({ page_id: block.id });
                 const blockStatus = blockPage.properties["Estado"]?.status?.name;
-                if (!["Hecho", "Fusionado", "Integrada (khora-ok)", "Auditada", "Cancelado", "Anulada"].includes(blockStatus)) {
+                // Exigir estados terminales estrictamente exitosos para que las dependencias corran en secuencia
+                if (!["Hecho", "Fusionado", "Integrada (khora-ok)", "Auditada"].includes(blockStatus)) {
                     isBlocked = true;
                     break;
                 }
@@ -164,12 +303,14 @@ export async function POST(req: Request) {
         }
 
         if (isBlocked) {
+            stats.bloqueadas_por_dependencia++;
             await logDecision(cand.url, "skipped", "blocked_by_relation");
             continue;
         }
 
         const candZones = (cand.properties["Zona de colisión"]?.multi_select || []).map((z: any) => z.name);
         if (candZones.some((z: string) => activeColZones.has(z))) {
+            stats.bloqueadas_por_zona++;
             await logDecision(cand.url, "skipped", "collision_zone_conflict");
             continue;
         }
@@ -191,10 +332,12 @@ export async function POST(req: Request) {
              continue;
         }
 
+        const bypass = cand.properties["🚨 Urgente (bypass)"]?.checkbox === true;
         const order = cand.properties["Orden de disparo"]?.number || 999999;
 
         eligibleCandidates.push({
             cand,
+            bypass,
             order,
             url: cand.url,
             zones: candZones,
@@ -205,6 +348,7 @@ export async function POST(req: Request) {
     }
 
     eligibleCandidates.sort((a, b) => {
+        if (a.bypass !== b.bypass) return a.bypass ? -1 : 1;
         if (a.order !== b.order) return a.order - b.order;
         return a.url.localeCompare(b.url);
     });
@@ -221,10 +365,12 @@ export async function POST(req: Request) {
         }
 
         try {
+            const realPrompt = item.prompt + `\n\nURL DE LA TAREA: ${item.url}`;
+
             const result = await triggerJulesSession({
                 repo: item.repo,
                 branch: "main",
-                prompt: item.prompt,
+                prompt: realPrompt,
                 title: item.title,
                 card_url: item.url
             });
@@ -239,19 +385,27 @@ export async function POST(req: Request) {
 
             item.zones.forEach((z: string) => selectedZones.add(z));
             fired.push(item.url);
+            stats.despachadas++;
             await logDecision(item.url, "fired", "success");
 
         } catch (e: any) {
             console.error("Failed to trigger Jules for card", item.url, e);
+            stats.errores++;
             await logDecision(item.url, "failed", e.message || "trigger_error");
         }
     }
 
     if (pool) {
         await pool.query(`UPDATE orchestrator_lock SET locked_until = now() WHERE id = 1`);
+        await pool.query(
+            `INSERT INTO orchestrator_log (card_url, decision, reason) VALUES ($1, $2, $3)`,
+            ["tick_stats", "summary", JSON.stringify(stats)]
+        );
     }
 
-    return NextResponse.json({ ok: true, fired }, { status: 200 });
+    console.log(`[Orchestrator Stats]`, stats);
+
+    return NextResponse.json({ ok: true, fired, stats }, { status: 200 });
 
   } catch (error: any) {
     console.error("Error en /api/board/orchestrate/tick:", error);
