@@ -17,3 +17,4 @@ Si se requieren secretos (tokens, keys) de producción o de servicios de tercero
 | `Flujo de captura de bitácora acepta entrada` | Entregado / REG-01 | Protege el modal principal de captura manual por teclado asegurando que se despliega desde ShellNav y permite ingreso de datos. |
 | `Punto de entrada de dictado por micrófono existe` | Entregado / REG-01 | Protege que el botón del micrófono existe, aún si el sistema de captura de voz estuviera dañado o en mantenimiento (permite testing paralelo como en FIX-MIC sin colisiones). |
 | `Endpoints existentes responden (status)` | Entregado / REG-01 | Garantiza que las rutas del backend en Next.js (como el healthcheck) resuelven con 200 OK y no arrojan errores de servidor (500). |
+| `Muestra el widget de racha de días de captura` | KPI-03 | Asegura que el widget de racha se renderiza y muestra la información en la página de inicio. |
