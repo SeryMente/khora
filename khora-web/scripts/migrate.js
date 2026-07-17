@@ -64,6 +64,20 @@ async function migrate() {
     fail_reason text,
     created_at timestamptz not null default now()
     );
+
+    ALTER TABLE jules_ai_decisions ADD COLUMN IF NOT EXISTS activity_id text;
+
+    DO $$
+    BEGIN
+      IF NOT EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        WHERE conname = 'jules_ai_decisions_session_id_activity_id_key'
+      ) THEN
+        ALTER TABLE jules_ai_decisions ADD CONSTRAINT jules_ai_decisions_session_id_activity_id_key UNIQUE (session_id, activity_id);
+      END IF;
+    END
+    $$;
   `;
 
   try {

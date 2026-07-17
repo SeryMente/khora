@@ -50,6 +50,11 @@ export interface Activity {
   sessionFailed?: any;
 }
 
+export interface ListSessionsResponse {
+  sessions: Session[];
+  nextPageToken?: string;
+}
+
 export interface ListSourcesResponse {
   sources: Source[];
   nextPageToken?: string;
@@ -145,6 +150,19 @@ function getHeaders(): HeadersInit {
     "Content-Type": "application/json",
     "x-goog-api-key": apiKey,
   };
+}
+
+export async function listSessions(pageSize: number = 30, pageToken?: string): Promise<ListSessionsResponse> {
+  const url = new URL(`${JULES_API_BASE_URL}/sessions`);
+  url.searchParams.append("pageSize", pageSize.toString());
+  if (pageToken) {
+    url.searchParams.append("pageToken", pageToken);
+  }
+  const response = await fetchWithBackoff(url.toString(), {
+    method: "GET",
+    headers: getHeaders(),
+  });
+  return response.json();
 }
 
 export async function listSources(): Promise<ListSourcesResponse> {
