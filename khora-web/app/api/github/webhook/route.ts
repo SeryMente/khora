@@ -62,6 +62,20 @@ export async function POST(req: Request) {
         console.warn(`No se encontró jules_session_id en el cuerpo del PR de la rama ${branch}`);
       }
 
+      if (action === "opened") {
+        if (jules_session_id) {
+          try {
+            await pool.query(
+              "UPDATE jules_sessions SET branch = $1, pr_url = $2, updated_at = NOW() WHERE jules_session_id = $3",
+              [branch, pr_url, jules_session_id]
+            );
+          } catch (dbErr) {
+            console.error("Error updating jules_sessions on PR open:", dbErr);
+          }
+        }
+        console.log('[webhook] PR opened:', { session_id: jules_session_id, branch, pr_url });
+      }
+
       if (action === "closed" && merged || action === "opened" || action === "reopened") {
          const notionToken = process.env.NOTION_TOKEN;
          const notionDatabaseId = process.env.NOTION_ROADMAP_DATABASE_ID;
