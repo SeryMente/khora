@@ -215,7 +215,7 @@ export async function POST(req: Request) {
 
                       const promptBlock = await extractPromptFromBlocks(notion, page.id);
                       if (promptBlock) {
-                          const title = page.properties["Name"]?.title?.[0]?.plain_text || page.id;
+                          const title = page.properties["Tarea / Hito"]?.title?.[0]?.plain_text || `[sin título] ${url}`;
                           const repo = page.properties["Repo"]?.rich_text?.[0]?.plain_text || "SeryMente/khora";
 
                           // Disconnect broken session from capacity and active zones
@@ -343,7 +343,7 @@ export async function POST(req: Request) {
             zones: candZones,
             prompt: promptBlock,
             repo: cand.properties["Repo"]?.rich_text?.[0]?.plain_text || "SeryMente/khora",
-            title: cand.properties["Name"]?.title?.[0]?.plain_text || cand.id
+            title: cand.properties["Tarea / Hito"]?.title?.[0]?.plain_text || `[sin título] ${cand.url}`
         });
     }
 
