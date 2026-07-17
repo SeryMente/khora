@@ -29,7 +29,10 @@ export async function POST(req: Request) {
        return NextResponse.json({ error: "Faltan parámetros requeridos: repo, branch, prompt" }, { status: 400 });
     }
 
-    const result = await triggerJulesSession({ repo, branch, prompt, title, card_url });
+    // Solo guardar URLs reales, ignorando variables comprimidas como {{...}}
+    const validCardUrl = typeof card_url === "string" && card_url.startsWith("https://") ? card_url : undefined;
+
+    const result = await triggerJulesSession({ repo, branch, prompt, title, card_url: validCardUrl });
 
     if (result.warning) {
       return NextResponse.json({ success: true, session: result.session, persisted: result.persisted, warning: result.warning }, { status: 200 });

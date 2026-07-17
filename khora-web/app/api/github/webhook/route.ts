@@ -70,58 +70,60 @@ export async function POST(req: Request) {
              const notion = new Client({ auth: notionToken });
 
              try {
-                  let pageIdMatch = null;
+                  let pageId = null;
+
                   if (tarjeta_url) {
                       try {
                           const parsedUrl = new URL(tarjeta_url);
-                          const m = parsedUrl.pathname.match(/([a-fA-F0-9]{32})$/);
+                          const m = parsedUrl.pathname.match(/([a-fA-F0-9]{8}-?[a-fA-F0-9]{4}-?[a-fA-F0-9]{4}-?[a-fA-F0-9]{4}-?[a-fA-F0-9]{12})$/);
                           if (m) {
-                              pageIdMatch = m;
+                              pageId = m[1].replace(/-/g, '');
                           }
                       } catch (e) {
                           // Invalid URL format, ignore
                       }
                   }
 
-                  let pageId = null;
-
-                  // First attempt: Search by ID tarea Jules (if we have jules_session_id)
-                  if (jules_session_id) {
-                      const queryResId = await (notion as any).databases.query({
-                          database_id: notionDatabaseId,
-                          filter: {
-                              property: "ID tarea Jules",
-                              rich_text: {
-                                  equals: jules_session_id
+                  // First fallback: Search by ID tarea Jules (if we have jules_session_id)
+                  if (!pageId && jules_session_id) {
+                      try {
+                          const queryResId = await (notion as any).databases.query({
+                              database_id: notionDatabaseId,
+                              filter: {
+                                  property: "ID tarea Jules",
+                                  rich_text: {
+                                      equals: jules_session_id
+                                  }
                               }
+                          });
+                          if (queryResId.results.length > 0) {
+                              pageId = queryResId.results[0].id;
                           }
-                      });
-                      if (queryResId.results.length > 0) {
-                          pageId = queryResId.results[0].id;
+                      } catch (err) {
+                          console.warn("Error en fallback query por ID tarea Jules:", err);
                       }
                   }
 
-                  // Second attempt: Search by URL del PR
+                  // Second fallback: Search by URL del PR
                   if (!pageId && pr_url) {
-                       const queryResUrl = await (notion as any).databases.query({
-                            database_id: notionDatabaseId,
-                            filter: {
-                                 property: "URL del PR",
-                                 url: {
-                                      equals: pr_url
-                                 }
-                            }
-                       });
-                       if (queryResUrl.results.length > 0) {
-                            pageId = queryResUrl.results[0].id;
-                       } else {
-                            console.warn("sin match claro en Notion via URL del PR:", pr_url, "match count:", queryResUrl.results.length);
-                       }
-                  }
-
-                  // Third attempt: Fallback from legacy tarjeta_url
-                  if (!pageId && pageIdMatch) {
-                       pageId = pageIdMatch[1];
+                      try {
+                           const queryResUrl = await (notion as any).databases.query({
+                                database_id: notionDatabaseId,
+                                filter: {
+                                     property: "URL del PR",
+                                     url: {
+                                          equals: pr_url
+                                     }
+                                }
+                           });
+                           if (queryResUrl.results.length > 0) {
+                                pageId = queryResUrl.results[0].id;
+                           } else {
+                                console.warn("sin match claro en Notion via URL del PR:", pr_url, "match count:", queryResUrl.results.length);
+                           }
+                      } catch (err) {
+                           console.warn("Error en fallback query por URL del PR:", err);
+                      }
                   }
 
                   if (pageId) {
