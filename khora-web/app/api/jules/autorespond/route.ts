@@ -97,7 +97,7 @@ async function getFullContext(notionCard: any, activities: any[], question: stri
 
   // Last 20 activities
   const recentActivities = activities.slice(-20).map(a => {
-      let desc = a.description || (a.agentMessaged?.message) || (a.userMessaged?.message) || a.name;
+      let desc = a.agentMessaged?.agentMessage || a.agentMessaged?.message || a.userMessaged?.message || a.description || a.name;
       return `[${a.createTime}] ${a.originator}: ${desc}`;
   }).join("\n");
 
@@ -189,6 +189,8 @@ export async function POST(req: Request) {
     const sessions = result.rows;
 
     let inserted = 0;
+    let skipped = 0;
+    let errors = 0;
 
     for (const session of sessions) {
       if (Date.now() - startTime > maxExecutionTime) {
@@ -200,7 +202,11 @@ export async function POST(req: Request) {
         const activitiesRes = await listActivities(session.jules_session_id);
         const activities = activitiesRes.activities || [];
 
-        if (activities.length === 0) continue;
+        if (activities.length === 0) {
+            console.log(`Session ${session.jules_session_id}: skipped (sin actividades)`);
+            skipped++;
+            continue;
+        }
 
         const lastActivity = activities[activities.length - 1];
 
@@ -215,19 +221,29 @@ export async function POST(req: Request) {
            isWaitingForUs = false;
            // Update state if needed
            await pool.query(`UPDATE jules_sessions SET state = 'IN_PROGRESS' WHERE id = $1`, [session.id]);
+           console.log(`Session ${session.jules_session_id}: skipped (usuario ya respondió (userMessaged))`);
+           skipped++;
            continue;
         }
 
-        if (!isWaitingForUs) continue;
+        if (!isWaitingForUs) {
+            console.log(`Session ${session.jules_session_id}: skipped (última actividad no es pregunta ni plan)`);
+            skipped++;
+            continue;
+        }
 
         // Auto-approve plans
         if (lastActivity.planGenerated) {
              // Check if we already approved it
             const existingDecision = await pool.query(
-                `SELECT 1 FROM jules_ai_decisions WHERE session_id = $1 AND activity_id = $2`,
+                `SELECT 1 FROM jules_ai_decisions WHERE session_id = $1 AND activity_id = $2 AND answer IS NOT NULL`,
                 [session.id, lastActivity.id]
             );
-            if (existingDecision.rowCount && existingDecision.rowCount > 0) continue;
+            if (existingDecision.rowCount && existingDecision.rowCount > 0) {
+                console.log(`Session ${session.jules_session_id}: skipped (ya respondida (idempotencia))`);
+                skipped++;
+                continue;
+            }
 
             await approvePlan(session.jules_session_id);
             await pool.query(`
@@ -241,21 +257,24 @@ export async function POST(req: Request) {
         }
 
         // Process agent questions
-        let question = "";
-        if (lastActivity.description) {
-            question = lastActivity.description;
-        } else if (lastActivity.agentMessaged && lastActivity.agentMessaged.message) {
-            question = lastActivity.agentMessaged.message;
-        }
+        const question = lastActivity.agentMessaged?.agentMessage || lastActivity.agentMessaged?.message || lastActivity.description || "";
 
-        if (!question) continue;
+        if (!question) {
+            console.log(`Session ${session.jules_session_id}: skipped (pregunta vacía)`);
+            skipped++;
+            continue;
+        }
 
         // Idempotency check
         const existingDecision = await pool.query(
-            `SELECT 1 FROM jules_ai_decisions WHERE session_id = $1 AND activity_id = $2`,
+            `SELECT 1 FROM jules_ai_decisions WHERE session_id = $1 AND activity_id = $2 AND answer IS NOT NULL`,
             [session.id, lastActivity.id]
         );
-        if (existingDecision.rowCount && existingDecision.rowCount > 0) continue;
+        if (existingDecision.rowCount && existingDecision.rowCount > 0) {
+            console.log(`Session ${session.jules_session_id}: skipped (ya respondida (idempotencia))`);
+            skipped++;
+            continue;
+        }
 
         // Bot limit check
         const botResponses = await pool.query(`
@@ -263,12 +282,15 @@ export async function POST(req: Request) {
         `, [session.id]);
 
         if (parseInt(botResponses.rows[0].count) >= 3) {
-           console.log(`Session ${session.jules_session_id}: limite de 3 autorespuestas alcanzado. Requiere intervencion del operador.`);
+           console.log(`Session ${session.jules_session_id}: skipped (límite de respuestas por ciclo)`);
+           skipped++;
            continue;
         }
 
         if (isSimpleQuestion(question)) {
           // Si por alguna razon queremos ignorarla
+          console.log(`Session ${session.jules_session_id}: skipped (pregunta simple (isSimpleQuestion))`);
+          skipped++;
           continue;
         }
 
@@ -283,6 +305,7 @@ export async function POST(req: Request) {
               INSERT INTO jules_ai_decisions (session_id, activity_id, question, fail_reason)
               VALUES ($1, $2, $3, $4)
             `, [session.id, lastActivity.id, question, "Groq API falló o no devolvió respuesta"]);
+            errors++;
             continue;
         }
 
@@ -299,10 +322,11 @@ export async function POST(req: Request) {
 
       } catch (err: any) {
         console.error(`Error processing session ${session.jules_session_id}:`, err);
+        errors++;
       }
     }
 
-    return NextResponse.json({ success: true, inserted }, { status: 200 });
+    return NextResponse.json({ success: true, inserted, skipped, errors }, { status: 200 });
 
   } catch (error: any) {
     console.error("Error en /api/jules/autorespond:", error);
