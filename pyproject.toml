@@ -7,7 +7,7 @@ name = "khora"
 version = "0.0.0"
 description = "Khora"
 requires-python = ">=3.11"
-dependencies = ["pydantic>=2", "fastapi", "uvicorn[standard]", "cryptography", "httpx"]
+dependencies = ["pydantic>=2", "fastapi", "uvicorn[standard]", "cryptography", "httpx", "neo4j", "redis"]
 
 [tool.setuptools]
 package-dir = {"" = "src"}

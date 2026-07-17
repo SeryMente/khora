@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Splash } from "./components/Splash";
+import { MedicalKpiWidget } from "./components/MedicalKpiWidget";
 import { Wrench, Server, Kanban } from "lucide-react";
 
 export default function RootMenu() {
@@ -24,6 +25,11 @@ export default function RootMenu() {
       <header className="absolute top-0 left-0 w-full p-8 flex justify-center z-10">
         <h1 className="font-semibold text-cora-surface tracking-[0.2em] uppercase text-sm">ATHANOR</h1>
       </header>
+
+      {/* KPI Widget */}
+      <div className="z-10 w-full max-w-2xl mb-6">
+        <MedicalKpiWidget />
+      </div>
 
       {/* Center Link Cards */}
       <div className="z-10 w-full max-w-2xl grid grid-cols-1 md:grid-cols-2 gap-6">
