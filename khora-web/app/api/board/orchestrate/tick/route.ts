@@ -385,6 +385,13 @@ export async function POST(req: Request) {
 
             item.zones.forEach((z: string) => selectedZones.add(z));
             fired.push(item.url);
+
+            void fetch('https://khora-web.vercel.app/api/jules/autorespond', {
+                method: 'POST',
+                headers: { 'x-internal-secret': process.env.INTERNAL_TRIGGER_SECRET || '', 'Content-Type': 'application/json' },
+                body: JSON.stringify({ session_id: result.session.id, trigger: 'post_dispatch' })
+            }).catch(e => console.error('[tick] autorespond post-dispatch failed:', e));
+
             stats.despachadas++;
             await logDecision(item.url, "fired", "success");
 
@@ -404,6 +411,12 @@ export async function POST(req: Request) {
     }
 
     console.log(`[Orchestrator Stats]`, stats);
+
+    void fetch('https://khora-web.vercel.app/api/jules/autorespond', {
+        method: 'POST',
+        headers: { 'x-internal-secret': process.env.INTERNAL_TRIGGER_SECRET || '', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ trigger: 'orchestrator_tick' })
+    }).catch(e => console.error('[tick] autorespond sweep failed:', e));
 
     return NextResponse.json({ ok: true, fired, stats }, { status: 200 });
 
