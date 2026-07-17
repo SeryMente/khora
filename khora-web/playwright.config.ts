@@ -2,7 +2,7 @@ import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
 	testDir: "./",
-testMatch: ["e2e/**/*.spec.ts", "tests/regression/**/*.spec.ts"],
+	testMatch: ["e2e/**/*.spec.ts", "tests/regression/**/*.spec.ts"],
 	timeout: 60_000,
 	expect: {
 		timeout: 15_000,
@@ -14,6 +14,21 @@ testMatch: ["e2e/**/*.spec.ts", "tests/regression/**/*.spec.ts"],
 		baseURL: "http://localhost:3000",
 		trace: "on-first-retry",
 		video: "retain-on-failure",
+		storageState: {
+			cookies: [
+				{
+					name: 'khora_session',
+					value: 'dummy-token',
+					domain: 'localhost',
+					path: '/',
+					expires: -1,
+					httpOnly: true,
+					secure: false,
+					sameSite: 'Lax',
+				}
+			],
+			origins: []
+		}
 	},
 	projects: [
 		{

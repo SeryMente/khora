@@ -32,7 +32,10 @@ test.describe('Autenticación y PIN', () => {
     expect(page.url()).toContain('/login');
   });
 
-  test('Sesión expirada -> redirect automático a /login', async ({ page }) => {
+  test('Sesión expirada -> redirect automático a /login', async ({ page, context }) => {
+    // We added dummy-token globally, so we need to clear it for this specific test
+    await context.clearCookies();
+
     // If we go to /settings without a cookie, the middleware redirects to /login?expired=1
     await page.goto('/settings');
     await page.waitForURL('**/login?expired=1');
