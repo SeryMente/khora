@@ -112,6 +112,23 @@ export async function POST(req: Request) {
   const maxExecutionTime = 45000; // 45 seconds
 
   try {
+    let specificSessionId = null;
+    let trigger = 'cron';
+
+    // Attempt to read body for event-driven trigger
+    try {
+      const clonedReq = req.clone();
+      const body = await clonedReq.json();
+      if (body) {
+        if (body.session_id) specificSessionId = body.session_id;
+        if (body.trigger) trigger = body.trigger;
+      }
+    } catch (e) {
+      // No body or invalid json, fallback to cron mode
+    }
+
+    console.log(JSON.stringify({event:'autorespond_start',trigger,timestamp:new Date().toISOString()}));
+
     const internalSecret = req.headers.get("x-internal-secret");
     if (!internalSecret) {
       return NextResponse.json({ error: "Falta x-internal-secret" }, { status: 401 });
@@ -128,19 +145,6 @@ export async function POST(req: Request) {
 
     if (sigBuffer.length !== expectedBuffer.length || !crypto.timingSafeEqual(sigBuffer, expectedBuffer)) {
       return NextResponse.json({ error: "Firma inválida" }, { status: 401 });
-    }
-
-    let specificSessionId = null;
-
-    // Attempt to read body for event-driven trigger
-    try {
-      const clonedReq = req.clone();
-      const body = await clonedReq.json();
-      if (body && body.session_id) {
-        specificSessionId = body.session_id;
-      }
-    } catch (e) {
-      // No body or invalid json, fallback to cron mode
     }
 
     const pool = getDb();
@@ -325,6 +329,8 @@ export async function POST(req: Request) {
         errors++;
       }
     }
+
+    console.log(JSON.stringify({event:'autorespond_end',trigger,timestamp:new Date().toISOString(),sessions_checked:sessions.length,inserted,skipped,errors,duration_ms:Date.now()-startTime}));
 
     return NextResponse.json({ success: true, inserted, skipped, errors }, { status: 200 });
 
