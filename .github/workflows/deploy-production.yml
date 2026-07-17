@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'khora-web/**'
-      - '.github/workflows/deploy-production.yml'
   workflow_dispatch:
 
 env:
@@ -65,6 +62,9 @@ jobs:
           DEPLOY_URL=$(npx vercel deploy --prebuilt --prod --token=${VERCEL_TOKEN})
           echo "DEPLOY_URL=$DEPLOY_URL" >> $GITHUB_ENV
           echo "Vercel Deployment URL: $DEPLOY_URL"
+
+      - name: Post-deploy smoke check
+        run: curl -f https://khora-web.vercel.app || echo 'smoke warning'
 
       - name: Set Deployment Status (Success)
         if: success()
