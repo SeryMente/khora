@@ -11,4 +11,8 @@ jobs:
       - run: pip install -e . ruff pyright pytest
       - run: ruff check .
       - run: pyright
+      - name: Start Neo4j
+        run: docker compose up -d
+      - name: Wait for Neo4j and setup schema
+        run: python scripts/setup_neo4j.py
       - run: pytest
