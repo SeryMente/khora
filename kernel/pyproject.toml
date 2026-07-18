@@ -8,6 +8,9 @@ version = "0.1.0"
 requires-python = ">=3.11"
 dependencies = []
 
+[project.scripts]
+khora = "khora_kernel.registro.cli:main"
+
 [project.optional-dependencies]
 dev = ["pytest>=8", "pyright>=1.1", "ruff>=0.4", "import-linter>=2.0"]
 

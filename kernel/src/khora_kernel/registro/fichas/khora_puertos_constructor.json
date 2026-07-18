@@ -1,0 +1,11 @@
+{
+  "id": "khora.puertos.constructor",
+  "descripcion": "Constructor automático de software utilizando Jules (vendor)",
+  "version": "1.0.0",
+  "estado_ciclo": "Provisional",
+  "costo_reemplazo_talla": "L",
+  "costo_reemplazo_nota": "Alta complejidad por la dependencia en el orquestador Jules actual.",
+  "reemplazo_nombrado": "Constructor propio/LISA",
+  "fecha_inscripcion": "2026-07-18",
+  "puerto_satisfecho": "ConstructorDeApps"
+}

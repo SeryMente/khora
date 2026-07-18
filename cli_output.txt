@@ -1,0 +1,42 @@
+=======================================
+REGISTRO JERÁRQUICO DE COMPONENTES
+=======================================
+ID: khora.motor.socratico
+  Descripción : Motor socrático de U-1 (Samantha) para la interacción reflexiva
+  Versión     : 1.0.0 | Estado: Provisional
+  Costo Reemplazo: Talla L - Alta complejidad algorítmica y de diseño del comportamiento.
+  Reemplazo Nombrado: Implementación final validada
+  Fecha       : 2026-07-18
+---------------------------------------
+ID: khora.puertos.constructor
+  Descripción : Constructor automático de software utilizando Jules (vendor)
+  Versión     : 1.0.0 | Estado: Provisional
+  Costo Reemplazo: Talla L - Alta complejidad por la dependencia en el orquestador Jules actual.
+  Reemplazo Nombrado: Constructor propio/LISA
+  Fecha       : 2026-07-18
+  Puerto      : ConstructorDeApps
+---------------------------------------
+ID: khora.puertos.lenguaje
+  Descripción : Modelo de lenguaje grande para razonamiento y generación (vendor)
+  Versión     : 1.0.0 | Estado: Provisional
+  Costo Reemplazo: Talla S - Baja complejidad: es un simple cambio de API provider o usar un modelo local a través de ollama.
+  Reemplazo Nombrado: Modelo de lenguaje local open-source
+  Fecha       : 2026-07-18
+  Puerto      : ModeloDeLenguaje
+---------------------------------------
+ID: khora.puertos.memoria
+  Descripción : Memoria estructurada y organizada mediante un Grafo de Conocimiento (Neo4j)
+  Versión     : 1.0.0 | Estado: Provisional
+  Costo Reemplazo: Talla XL - Alta complejidad: requiere refactorizar el modelo de grafo a relacional o document.
+  Reemplazo Nombrado: Almacén local SQLite o motor vectorial open-source
+  Fecha       : 2026-07-18
+  Puerto      : MemoriaOrganizada
+---------------------------------------
+ID: khora.puertos.transcripcion
+  Descripción : Adaptador de transcripción de audio a texto utilizando proveedor externo (vendor)
+  Versión     : 1.0.0 | Estado: Provisional
+  Costo Reemplazo: Talla M - Complejidad media: migrar de vendor API a un modelo Whisper local.
+  Reemplazo Nombrado: Whisper open-source local
+  Fecha       : 2026-07-18
+  Puerto      : Transcripcion
+---------------------------------------

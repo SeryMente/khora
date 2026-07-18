@@ -1,0 +1,11 @@
+{
+  "id": "khora.puertos.transcripcion",
+  "descripcion": "Adaptador de transcripción de audio a texto utilizando proveedor externo (vendor)",
+  "version": "1.0.0",
+  "estado_ciclo": "Provisional",
+  "costo_reemplazo_talla": "M",
+  "costo_reemplazo_nota": "Complejidad media: migrar de vendor API a un modelo Whisper local.",
+  "reemplazo_nombrado": "Whisper open-source local",
+  "fecha_inscripcion": "2026-07-18",
+  "puerto_satisfecho": "Transcripcion"
+}
