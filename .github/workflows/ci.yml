@@ -8,11 +8,23 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: pip install -e . ruff pyright pytest
-      - run: ruff check .
-      - run: pyright
+      - name: Instalacion
+        run: |
+          cd kernel
+          pip install -e ".[dev]"
+      - name: ruff
+        run: |
+          cd kernel
+          ruff check .
+      - name: pyright
+        run: |
+          cd kernel
+          pyright
       - name: Start Neo4j
         run: docker compose up -d
       - name: Wait for Neo4j and setup schema
         run: python scripts/setup_neo4j.py
-      - run: pytest
+      - name: pytest
+        run: |
+          cd kernel
+          pytest

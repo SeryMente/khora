@@ -35,6 +35,7 @@ class DocumentoMemoria:
     es_publico: bool = False
 
 
+# @req: khora.puertos.memoria
 class MemoriaOrganizada(typing.Protocol):
     def ingestar(
         self, contenido: str, provenance: Provenance, es_publico: bool = False

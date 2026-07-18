@@ -1,0 +1,11 @@
+{
+  "id": "khora.puertos.memoria",
+  "descripcion": "Memoria estructurada y organizada mediante un Grafo de Conocimiento (Neo4j)",
+  "version": "1.0.0",
+  "estado_ciclo": "Provisional",
+  "costo_reemplazo_talla": "XL",
+  "costo_reemplazo_nota": "Alta complejidad: requiere refactorizar el modelo de grafo a relacional o document.",
+  "reemplazo_nombrado": "Almacén local SQLite o motor vectorial open-source",
+  "fecha_inscripcion": "2026-07-18",
+  "puerto_satisfecho": "MemoriaOrganizada"
+}

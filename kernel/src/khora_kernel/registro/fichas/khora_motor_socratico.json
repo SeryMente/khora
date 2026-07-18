@@ -1,0 +1,11 @@
+{
+  "id": "khora.motor.socratico",
+  "descripcion": "Motor socrático de U-1 (Samantha) para la interacción reflexiva",
+  "version": "1.0.0",
+  "estado_ciclo": "Provisional",
+  "costo_reemplazo_talla": "L",
+  "costo_reemplazo_nota": "Alta complejidad algorítmica y de diseño del comportamiento.",
+  "reemplazo_nombrado": "Implementación final validada",
+  "fecha_inscripcion": "2026-07-18",
+  "puerto_satisfecho": null
+}

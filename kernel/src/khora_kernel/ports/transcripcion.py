@@ -34,6 +34,7 @@ class ResultadoTranscripcion:
     idioma_detectado: str
 
 
+# @req: khora.puertos.transcripcion
 class Transcripcion(typing.Protocol):
     def transcribir_audio(self, audio_bytes: bytes) -> ResultadoTranscripcion:
         """Transcribe bytes de audio a texto estructurado."""
