@@ -27,3 +27,4 @@ khora-web/tests/*.js
 .neon
 .vercel
 .env*
+.env.local

@@ -1,1 +1,0 @@
-"""Caja Negra (sustrato)."""
