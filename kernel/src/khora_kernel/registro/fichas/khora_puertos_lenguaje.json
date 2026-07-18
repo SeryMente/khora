@@ -1,0 +1,11 @@
+{
+  "id": "khora.puertos.lenguaje",
+  "descripcion": "Modelo de lenguaje grande para razonamiento y generación (vendor)",
+  "version": "1.0.0",
+  "estado_ciclo": "Provisional",
+  "costo_reemplazo_talla": "S",
+  "costo_reemplazo_nota": "Baja complejidad: es un simple cambio de API provider o usar un modelo local a través de ollama.",
+  "reemplazo_nombrado": "Modelo de lenguaje local open-source",
+  "fecha_inscripcion": "2026-07-18",
+  "puerto_satisfecho": "ModeloDeLenguaje"
+}

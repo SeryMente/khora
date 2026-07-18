@@ -42,6 +42,7 @@ class AppConstruida:
     estado: str
 
 
+# @req: khora.puertos.constructor
 class ConstructorDeApps(typing.Protocol):
     def construir(self, requisitos: RequisitosApp) -> AppConstruida:
         """Construye una app basada en los requisitos dados, bloqueando hasta terminar y retorna el estado de construcción."""

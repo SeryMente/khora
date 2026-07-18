@@ -34,6 +34,7 @@ class RespuestaModelo:
     razon_finalizacion: str
 
 
+# @req: khora.puertos.lenguaje
 class ModeloDeLenguaje(typing.Protocol):
     def generar_texto(self, prompt: str, max_tokens: int = 1000) -> RespuestaModelo:
         """Genera texto a partir de un prompt."""
