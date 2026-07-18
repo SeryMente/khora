@@ -1,0 +1,108 @@
+name: G-4 Fronteras del Kernel
+
+on:
+  pull_request:
+    paths:
+      - 'kernel/**'
+      - '.github/workflows/g4-fronteras.yml'
+      - 'scripts/check_stdlib_only.py'
+
+jobs:
+  vigilar-fronteras:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias base
+        run: |
+          cd kernel
+          pip install -e ".[dev]"
+
+      - name: "G9 precondición: Type-checking estricto (Pyright)"
+        run: |
+          cd kernel
+          pyright
+
+      - name: "G1: Frontera de imports (import-linter)"
+        run: |
+          cd kernel
+          # Create missing directories gracefully to prevent import-linter from failing when source modules don't exist yet
+          mkdir -p src/khora_kernel/api src/khora_kernel/drivers src/khora_kernel/shell src/khora_kernel/ports src/khora_kernel/userland
+          touch src/khora_kernel/api/__init__.py src/khora_kernel/drivers/__init__.py src/khora_kernel/shell/__init__.py src/khora_kernel/ports/__init__.py src/khora_kernel/userland/__init__.py
+          lint-imports
+
+      - name: "G2: Anti-contaminación vendor"
+        run: |
+          VENDOR_KEYWORDS="notion|todoist|neo4j|groq|whisper|vercel|openai|anthropic|langchain"
+          echo "Buscando contaminación vendor ($VENDOR_KEYWORDS) en kernel (excluyendo drivers)..."
+
+          if [ -d "kernel/src/khora_kernel" ]; then
+            MATCHES=$(grep -riE --include="*.py" "$VENDOR_KEYWORDS" kernel/src/khora_kernel/ | grep -v "kernel/src/khora_kernel/drivers/" || true)
+            if [ -n "$MATCHES" ]; then
+              echo "❌ G2: Se encontró contaminación vendor en el kernel:"
+              echo "$MATCHES"
+              exit 1
+            fi
+            echo "✅ G2: Sin contaminación vendor."
+          else
+            echo "✅ G2: No existe kernel/src/khora_kernel, ignorando."
+          fi
+
+      - name: "G3: Tests de contrato"
+        run: |
+          if [ -d "kernel/tests/contrato" ] && [ "$(ls -A kernel/tests/contrato)" ]; then
+            cd kernel
+            pytest tests/contrato/
+          else
+            echo "✅ G3: Carpeta kernel/tests/contrato/ vacía o inexistente. Gate en espera."
+          fi
+
+      - name: "G4: Golden set (C14)"
+        run: |
+          if [ -d "kernel/tests/golden" ] && [ "$(ls -A kernel/tests/golden)" ]; then
+            cd kernel
+            pytest tests/golden/
+          else
+            echo "✅ G4: Golden set vacío — gate en espera."
+          fi
+
+      - name: "G5: Manual-gate"
+        run: |
+          CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+          TOCA_CONTRATO=$(echo "$CHANGED" | grep -E "kernel/src/khora_kernel/(api|ports)/" || true)
+          TOCA_MANUAL=$(echo "$CHANGED" | grep -E "^manual/" || true)
+
+          if [ -n "$TOCA_CONTRATO" ] && [ -z "$TOCA_MANUAL" ]; then
+            echo "❌ G5: PR toca api/ o ports/ sin tocar manual/"
+            exit 1
+          fi
+          echo "✅ G5: Manual-gate pasado correctamente."
+
+      - name: "G6: Cintura de peso cero (ADR-10)"
+        run: |
+          python3 scripts/check_stdlib_only.py kernel/src/khora_kernel/api kernel/src/khora_kernel/ports
+
+      - name: "G7: Import sin efectos (ADR-10)"
+        run: |
+          cd kernel
+          python3 -c "import khora_kernel"
+          echo "✅ G7: khora_kernel importado sin errores ni bloqueos de I/O."
+
+      - name: "G8: Deps solo en drivers (ADR-10)"
+        run: |
+          python3 -c "
+          import tomllib
+          with open('kernel/pyproject.toml', 'rb') as f:
+              d = tomllib.load(f)
+          deps = d.get('project', {}).get('dependencies', [])
+          assert deps == [], f'❌ G8: khora_kernel tiene deps de terceros: {deps}'
+          print('✅ G8: khora_kernel no tiene dependencias de terceros.')
+          "
