@@ -10,9 +10,9 @@ class ContextoDeVisibilidad(Enum):
 
 @dataclass(frozen=True)
 class Provenance:
-    origen: str          # "chat" | "dictado" | "archivo" | etc.
-    driver: str | None   # None si es ingesta directa
-    timestamp: str       # ISO-8601
+    origen: str  # "chat" | "dictado" | "archivo" | etc.
+    driver: str | None  # None si es ingesta directa
+    timestamp: str  # ISO-8601
 
 
 @dataclass(frozen=True)
@@ -41,7 +41,7 @@ class MotorDeConsulta(Protocol):
 
 
 class MotorDeOlvido(Protocol):
-    def olvidar(self, id: str) -> str: ...   # retorna acta de olvido
+    def olvidar(self, id: str) -> str: ...  # retorna acta de olvido
 
 
 VERSION = "0.1.0"

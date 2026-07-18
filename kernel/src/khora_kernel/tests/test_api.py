@@ -70,7 +70,7 @@ def test_consultar_con_contexto_transparente_no_devuelve_privadas() -> None:
     e1 = ingesta.ingestar("Público", prov, ContextoDeVisibilidad.TRANSPARENTE)
     e2 = ingesta.ingestar("Secreto", prov, ContextoDeVisibilidad.PRIVADO)
 
-    consulta: MotorDeConsulta = _MockConsulta(ingesta._store) # type: ignore
+    consulta: MotorDeConsulta = _MockConsulta(ingesta._store)  # type: ignore
 
     res_transparentes = consulta.consultar("query", ContextoDeVisibilidad.TRANSPARENTE)
 
