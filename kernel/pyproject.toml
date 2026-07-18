@@ -9,7 +9,7 @@ requires-python = ">=3.11"
 dependencies = []
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "pyright>=1.1", "ruff>=0.4"]
+dev = ["pytest>=8", "pyright>=1.1", "ruff>=0.4", "import-linter>=2.0"]
 
 [tool.pyright]
 include = ["src"]
@@ -24,3 +24,35 @@ ignore = ["E501"]
 
 [tool.pytest.ini_options]
 testpaths = ["src"]
+
+[tool.importlinter]
+root_packages = ["khora_kernel"]
+include_external_packages = true
+
+[[tool.importlinter.contracts]]
+name = "Frontera kernel — api solo usa stdlib"
+type = "forbidden"
+source_modules = ["khora_kernel.api"]
+forbidden_modules = ["khora_kernel.ports.mocks", "khora_kernel.drivers", "khora_kernel.shell"]
+unresolved_modules = ["ignore"]
+
+[[tool.importlinter.contracts]]
+name = "Drivers no importan shell"
+type = "forbidden"
+source_modules = ["khora_kernel.drivers"]
+forbidden_modules = ["khora_kernel.shell"]
+unresolved_modules = ["ignore"]
+
+[[tool.importlinter.contracts]]
+name = "Userland solo ve puertos"
+type = "forbidden"
+source_modules = ["khora_kernel.userland"]
+forbidden_modules = ["khora_kernel.api", "khora_kernel.drivers", "khora_kernel.shell", "khora_kernel.tests"]
+unresolved_modules = ["ignore"]
+
+[[tool.importlinter.contracts]]
+name = "Nadie importa khora-web"
+type = "forbidden"
+source_modules = ["khora_kernel"]
+forbidden_modules = ["khora_web"]
+unresolved_modules = ["ignore"]
