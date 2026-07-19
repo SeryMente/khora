@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import List, Protocol
+from typing import List, Protocol, runtime_checkable
 
 
 class ContextoDeVisibilidad(Enum):
@@ -94,4 +94,50 @@ class MotorDeOlvido(Protocol):
     def olvidar(self, id: str) -> str: ...  # retorna acta de olvido
 
 
+@dataclass(frozen=True)
+class SolicitudLLM:
+    prompt: str
+    sistema: str | None
+    formato_estricto: tuple[str, ...] | None
+    metadata: dict
+
+
+@dataclass(frozen=True)
+class RespuestaLLM:
+    texto: str
+    modelo: str
+    provenance: Provenance
+
+
+@runtime_checkable
+class PuertoLLM(Protocol):
+    def generar(self, solicitud: SolicitudLLM) -> RespuestaLLM: ...
+
+
+@runtime_checkable
+class PuertoEmbeddings(Protocol):
+    def incrustar(self, textos: list[str]) -> list[list[float]]: ...
+
+
 VERSION = "0.1.0"
+
+__all__ = [
+    "ContextoDeVisibilidad",
+    "NivelSuficiencia",
+    "Provenance",
+    "EntidadIngresada",
+    "ObjetoDeInformacion",
+    "Triple",
+    "NodoSubgrafo",
+    "AristaSubgrafo",
+    "SubgrafoRelevante",
+    "ResultadoDeConsulta",
+    "MotorDeIngesta",
+    "MotorDeConsulta",
+    "MotorDeOlvido",
+    "SolicitudLLM",
+    "RespuestaLLM",
+    "PuertoLLM",
+    "PuertoEmbeddings",
+    "VERSION",
+]
