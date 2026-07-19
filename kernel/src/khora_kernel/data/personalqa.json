@@ -1,0 +1,2059 @@
+{
+    "t_global": "2025-09-01 13:00",
+    "information_objects": [
+        {
+            "id": "obj_1",
+            "source": "Events",
+            "timestamp": "2025-07-09T15:00:00",
+            "content": "Synthetic content for Events 1",
+            "metadata": {
+                "type": "Events"
+            }
+        },
+        {
+            "id": "obj_2",
+            "source": "Events",
+            "timestamp": "2025-06-16T21:00:00",
+            "content": "Synthetic content for Events 2",
+            "metadata": {
+                "type": "Events"
+            }
+        },
+        {
+            "id": "obj_3",
+            "source": "Events",
+            "timestamp": "2025-06-22T21:00:00",
+            "content": "Synthetic content for Events 3",
+            "metadata": {
+                "type": "Events"
+            }
+        },
+        {
+            "id": "obj_4",
+            "source": "Events",
+            "timestamp": "2025-06-16T15:00:00",
+            "content": "Synthetic content for Events 4",
+            "metadata": {
+                "type": "Events"
+            }
+        },
+        {
+            "id": "obj_5",
+            "source": "Events",
+            "timestamp": "2025-07-27T19:00:00",
+            "content": "Synthetic content for Events 5",
+            "metadata": {
+                "type": "Events"
+            }
+        },
+        {
+            "id": "obj_6",
+            "source": "Events",
+            "timestamp": "2025-07-21T08:00:00",
+            "content": "Synthetic content for Events 6",
+            "metadata": {
+                "type": "Events"
+            }
+        },
+        {
+            "id": "obj_7",
+            "source": "Events",
+            "timestamp": "2025-08-22T17:00:00",
+            "content": "Synthetic content for Events 7",
+            "metadata": {
+                "type": "Events"
+            }
+        },
+        {
+            "id": "obj_8",
+            "source": "Events",
+            "timestamp": "2025-08-10T03:00:00",
+            "content": "Synthetic content for Events 8",
+            "metadata": {
+                "type": "Events"
+            }
+        },
+        {
+            "id": "obj_9",
+            "source": "Events",
+            "timestamp": "2025-07-21T18:00:00",
+            "content": "Synthetic content for Events 9",
+            "metadata": {
+                "type": "Events"
+            }
+        },
+        {
+            "id": "obj_10",
+            "source": "Events",
+            "timestamp": "2025-08-26T17:00:00",
+            "content": "Synthetic content for Events 10",
+            "metadata": {
+                "type": "Events"
+            }
+        },
+        {
+            "id": "obj_11",
+            "source": "Events",
+            "timestamp": "2025-06-06T05:00:00",
+            "content": "Synthetic content for Events 11",
+            "metadata": {
+                "type": "Events"
+            }
+        },
+        {
+            "id": "obj_12",
+            "source": "Events",
+            "timestamp": "2025-07-31T20:00:00",
+            "content": "Synthetic content for Events 12",
+            "metadata": {
+                "type": "Events"
+            }
+        },
+        {
+            "id": "obj_13",
+            "source": "Events",
+            "timestamp": "2025-06-01T07:00:00",
+            "content": "Synthetic content for Events 13",
+            "metadata": {
+                "type": "Events"
+            }
+        },
+        {
+            "id": "obj_14",
+            "source": "Events",
+            "timestamp": "2025-08-09T19:00:00",
+            "content": "Synthetic content for Events 14",
+            "metadata": {
+                "type": "Events"
+            }
+        },
+        {
+            "id": "obj_15",
+            "source": "Events",
+            "timestamp": "2025-05-29T20:00:00",
+            "content": "Synthetic content for Events 15",
+            "metadata": {
+                "type": "Events"
+            }
+        },
+        {
+            "id": "obj_16",
+            "source": "Events",
+            "timestamp": "2025-08-10T22:00:00",
+            "content": "Synthetic content for Events 16",
+            "metadata": {
+                "type": "Events"
+            }
+        },
+        {
+            "id": "obj_17",
+            "source": "Events",
+            "timestamp": "2025-06-30T02:00:00",
+            "content": "Synthetic content for Events 17",
+            "metadata": {
+                "type": "Events"
+            }
+        },
+        {
+            "id": "obj_18",
+            "source": "Events",
+            "timestamp": "2025-08-24T19:00:00",
+            "content": "Synthetic content for Events 18",
+            "metadata": {
+                "type": "Events"
+            }
+        },
+        {
+            "id": "obj_19",
+            "source": "Events",
+            "timestamp": "2025-08-05T09:00:00",
+            "content": "Synthetic content for Events 19",
+            "metadata": {
+                "type": "Events"
+            }
+        },
+        {
+            "id": "obj_20",
+            "source": "Events",
+            "timestamp": "2025-07-14T14:00:00",
+            "content": "Synthetic content for Events 20",
+            "metadata": {
+                "type": "Events"
+            }
+        },
+        {
+            "id": "obj_21",
+            "source": "Images",
+            "timestamp": "2025-06-19T12:00:00",
+            "content": "Synthetic content for Images 1",
+            "metadata": {
+                "type": "Images"
+            }
+        },
+        {
+            "id": "obj_22",
+            "source": "Images",
+            "timestamp": "2025-07-01T07:00:00",
+            "content": "Synthetic content for Images 2",
+            "metadata": {
+                "type": "Images"
+            }
+        },
+        {
+            "id": "obj_23",
+            "source": "Images",
+            "timestamp": "2025-07-13T19:00:00",
+            "content": "Synthetic content for Images 3",
+            "metadata": {
+                "type": "Images"
+            }
+        },
+        {
+            "id": "obj_24",
+            "source": "Images",
+            "timestamp": "2025-08-03T21:00:00",
+            "content": "Synthetic content for Images 4",
+            "metadata": {
+                "type": "Images"
+            }
+        },
+        {
+            "id": "obj_25",
+            "source": "Images",
+            "timestamp": "2025-07-16T05:00:00",
+            "content": "Synthetic content for Images 5",
+            "metadata": {
+                "type": "Images"
+            }
+        },
+        {
+            "id": "obj_26",
+            "source": "Images",
+            "timestamp": "2025-06-20T06:00:00",
+            "content": "Synthetic content for Images 6",
+            "metadata": {
+                "type": "Images"
+            }
+        },
+        {
+            "id": "obj_27",
+            "source": "Images",
+            "timestamp": "2025-06-24T08:00:00",
+            "content": "Synthetic content for Images 7",
+            "metadata": {
+                "type": "Images"
+            }
+        },
+        {
+            "id": "obj_28",
+            "source": "Images",
+            "timestamp": "2025-08-27T16:00:00",
+            "content": "Synthetic content for Images 8",
+            "metadata": {
+                "type": "Images"
+            }
+        },
+        {
+            "id": "obj_29",
+            "source": "Images",
+            "timestamp": "2025-07-29T06:00:00",
+            "content": "Synthetic content for Images 9",
+            "metadata": {
+                "type": "Images"
+            }
+        },
+        {
+            "id": "obj_30",
+            "source": "Images",
+            "timestamp": "2025-05-25T14:00:00",
+            "content": "Synthetic content for Images 10",
+            "metadata": {
+                "type": "Images"
+            }
+        },
+        {
+            "id": "obj_31",
+            "source": "Images",
+            "timestamp": "2025-07-26T00:00:00",
+            "content": "Synthetic content for Images 11",
+            "metadata": {
+                "type": "Images"
+            }
+        },
+        {
+            "id": "obj_32",
+            "source": "Images",
+            "timestamp": "2025-06-05T13:00:00",
+            "content": "Synthetic content for Images 12",
+            "metadata": {
+                "type": "Images"
+            }
+        },
+        {
+            "id": "obj_33",
+            "source": "Images",
+            "timestamp": "2025-07-06T13:00:00",
+            "content": "Synthetic content for Images 13",
+            "metadata": {
+                "type": "Images"
+            }
+        },
+        {
+            "id": "obj_34",
+            "source": "Images",
+            "timestamp": "2025-05-26T04:00:00",
+            "content": "Synthetic content for Images 14",
+            "metadata": {
+                "type": "Images"
+            }
+        },
+        {
+            "id": "obj_35",
+            "source": "Images",
+            "timestamp": "2025-07-06T15:00:00",
+            "content": "Synthetic content for Images 15",
+            "metadata": {
+                "type": "Images"
+            }
+        },
+        {
+            "id": "obj_36",
+            "source": "Notes",
+            "timestamp": "2025-07-24T16:00:00",
+            "content": "Synthetic content for Notes 1",
+            "metadata": {
+                "type": "Notes"
+            }
+        },
+        {
+            "id": "obj_37",
+            "source": "Notes",
+            "timestamp": "2025-05-31T19:00:00",
+            "content": "Synthetic content for Notes 2",
+            "metadata": {
+                "type": "Notes"
+            }
+        },
+        {
+            "id": "obj_38",
+            "source": "Notes",
+            "timestamp": "2025-07-25T18:00:00",
+            "content": "Synthetic content for Notes 3",
+            "metadata": {
+                "type": "Notes"
+            }
+        },
+        {
+            "id": "obj_39",
+            "source": "Notes",
+            "timestamp": "2025-07-25T12:00:00",
+            "content": "Synthetic content for Notes 4",
+            "metadata": {
+                "type": "Notes"
+            }
+        },
+        {
+            "id": "obj_40",
+            "source": "Notes",
+            "timestamp": "2025-07-01T00:00:00",
+            "content": "Synthetic content for Notes 5",
+            "metadata": {
+                "type": "Notes"
+            }
+        },
+        {
+            "id": "obj_41",
+            "source": "Notes",
+            "timestamp": "2025-06-06T14:00:00",
+            "content": "Synthetic content for Notes 6",
+            "metadata": {
+                "type": "Notes"
+            }
+        },
+        {
+            "id": "obj_42",
+            "source": "Notes",
+            "timestamp": "2025-08-21T01:00:00",
+            "content": "Synthetic content for Notes 7",
+            "metadata": {
+                "type": "Notes"
+            }
+        },
+        {
+            "id": "obj_43",
+            "source": "Notes",
+            "timestamp": "2025-05-24T18:00:00",
+            "content": "Synthetic content for Notes 8",
+            "metadata": {
+                "type": "Notes"
+            }
+        },
+        {
+            "id": "obj_44",
+            "source": "Notes",
+            "timestamp": "2025-06-16T22:00:00",
+            "content": "Synthetic content for Notes 9",
+            "metadata": {
+                "type": "Notes"
+            }
+        },
+        {
+            "id": "obj_45",
+            "source": "Notes",
+            "timestamp": "2025-06-16T12:00:00",
+            "content": "Synthetic content for Notes 10",
+            "metadata": {
+                "type": "Notes"
+            }
+        },
+        {
+            "id": "obj_46",
+            "source": "Notes",
+            "timestamp": "2025-08-26T07:00:00",
+            "content": "Synthetic content for Notes 11",
+            "metadata": {
+                "type": "Notes"
+            }
+        },
+        {
+            "id": "obj_47",
+            "source": "Notes",
+            "timestamp": "2025-05-29T21:00:00",
+            "content": "Synthetic content for Notes 12",
+            "metadata": {
+                "type": "Notes"
+            }
+        },
+        {
+            "id": "obj_48",
+            "source": "Notes",
+            "timestamp": "2025-06-02T19:00:00",
+            "content": "Synthetic content for Notes 13",
+            "metadata": {
+                "type": "Notes"
+            }
+        },
+        {
+            "id": "obj_49",
+            "source": "Notes",
+            "timestamp": "2025-05-26T17:00:00",
+            "content": "Synthetic content for Notes 14",
+            "metadata": {
+                "type": "Notes"
+            }
+        },
+        {
+            "id": "obj_50",
+            "source": "Notes",
+            "timestamp": "2025-06-30T02:00:00",
+            "content": "Synthetic content for Notes 15",
+            "metadata": {
+                "type": "Notes"
+            }
+        },
+        {
+            "id": "obj_51",
+            "source": "Docs",
+            "timestamp": "2025-08-23T08:00:00",
+            "content": "Synthetic content for Docs 1",
+            "metadata": {
+                "type": "Docs"
+            }
+        },
+        {
+            "id": "obj_52",
+            "source": "Docs",
+            "timestamp": "2025-08-11T02:00:00",
+            "content": "Synthetic content for Docs 2",
+            "metadata": {
+                "type": "Docs"
+            }
+        },
+        {
+            "id": "obj_53",
+            "source": "Docs",
+            "timestamp": "2025-06-15T15:00:00",
+            "content": "Synthetic content for Docs 3",
+            "metadata": {
+                "type": "Docs"
+            }
+        },
+        {
+            "id": "obj_54",
+            "source": "Docs",
+            "timestamp": "2025-05-28T10:00:00",
+            "content": "Synthetic content for Docs 4",
+            "metadata": {
+                "type": "Docs"
+            }
+        },
+        {
+            "id": "obj_55",
+            "source": "Docs",
+            "timestamp": "2025-08-27T20:00:00",
+            "content": "Synthetic content for Docs 5",
+            "metadata": {
+                "type": "Docs"
+            }
+        },
+        {
+            "id": "obj_56",
+            "source": "Docs",
+            "timestamp": "2025-05-26T08:00:00",
+            "content": "Synthetic content for Docs 6",
+            "metadata": {
+                "type": "Docs"
+            }
+        },
+        {
+            "id": "obj_57",
+            "source": "Docs",
+            "timestamp": "2025-06-23T21:00:00",
+            "content": "Synthetic content for Docs 7",
+            "metadata": {
+                "type": "Docs"
+            }
+        },
+        {
+            "id": "obj_58",
+            "source": "Docs",
+            "timestamp": "2025-06-09T01:00:00",
+            "content": "Synthetic content for Docs 8",
+            "metadata": {
+                "type": "Docs"
+            }
+        },
+        {
+            "id": "obj_59",
+            "source": "Docs",
+            "timestamp": "2025-07-14T04:00:00",
+            "content": "Synthetic content for Docs 9",
+            "metadata": {
+                "type": "Docs"
+            }
+        },
+        {
+            "id": "obj_60",
+            "source": "Calls",
+            "timestamp": "2025-07-30T15:00:00",
+            "content": "Synthetic content for Calls 1",
+            "metadata": {
+                "type": "Calls"
+            }
+        },
+        {
+            "id": "obj_61",
+            "source": "Calls",
+            "timestamp": "2025-08-19T22:00:00",
+            "content": "Synthetic content for Calls 2",
+            "metadata": {
+                "type": "Calls"
+            }
+        },
+        {
+            "id": "obj_62",
+            "source": "Calls",
+            "timestamp": "2025-07-31T17:00:00",
+            "content": "Synthetic content for Calls 3",
+            "metadata": {
+                "type": "Calls"
+            }
+        },
+        {
+            "id": "obj_63",
+            "source": "Calls",
+            "timestamp": "2025-08-05T05:00:00",
+            "content": "Synthetic content for Calls 4",
+            "metadata": {
+                "type": "Calls"
+            }
+        },
+        {
+            "id": "obj_64",
+            "source": "Calls",
+            "timestamp": "2025-06-07T00:00:00",
+            "content": "Synthetic content for Calls 5",
+            "metadata": {
+                "type": "Calls"
+            }
+        },
+        {
+            "id": "obj_65",
+            "source": "Calls",
+            "timestamp": "2025-08-03T10:00:00",
+            "content": "Synthetic content for Calls 6",
+            "metadata": {
+                "type": "Calls"
+            }
+        },
+        {
+            "id": "obj_66",
+            "source": "Alarms",
+            "timestamp": "2025-08-24T15:00:00",
+            "content": "Synthetic content for Alarms 1",
+            "metadata": {
+                "type": "Alarms"
+            }
+        },
+        {
+            "id": "obj_67",
+            "source": "Alarms",
+            "timestamp": "2025-05-27T23:00:00",
+            "content": "Synthetic content for Alarms 2",
+            "metadata": {
+                "type": "Alarms"
+            }
+        },
+        {
+            "id": "obj_68",
+            "source": "Alarms",
+            "timestamp": "2025-08-06T16:00:00",
+            "content": "Synthetic content for Alarms 3",
+            "metadata": {
+                "type": "Alarms"
+            }
+        },
+        {
+            "id": "obj_69",
+            "source": "Alarms",
+            "timestamp": "2025-07-01T02:00:00",
+            "content": "Synthetic content for Alarms 4",
+            "metadata": {
+                "type": "Alarms"
+            }
+        },
+        {
+            "id": "obj_70",
+            "source": "Contacts",
+            "timestamp": "2025-07-14T10:00:00",
+            "content": "Synthetic content for Contacts 1",
+            "metadata": {
+                "type": "Contacts"
+            }
+        },
+        {
+            "id": "obj_71",
+            "source": "Contacts",
+            "timestamp": "2025-07-24T21:00:00",
+            "content": "Synthetic content for Contacts 2",
+            "metadata": {
+                "type": "Contacts"
+            }
+        }
+    ],
+    "qa_pairs": [
+        {
+            "id": "qa_1",
+            "question": "Question involving Calls?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Calls"
+            ],
+            "dimensions": [
+                "Fact Retrieval",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_2",
+            "question": "Question involving Events?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Events"
+            ],
+            "dimensions": [
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_3",
+            "question": "Question involving Calls?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Calls"
+            ],
+            "dimensions": [
+                "Fact Retrieval",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_4",
+            "question": "Question involving Docs?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Docs"
+            ],
+            "dimensions": [
+                "Temporal",
+                "Fact Retrieval"
+            ]
+        },
+        {
+            "id": "qa_5",
+            "question": "Question involving Docs?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Docs"
+            ],
+            "dimensions": [
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_6",
+            "question": "Question involving Events?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Events"
+            ],
+            "dimensions": [
+                "Fact Retrieval"
+            ]
+        },
+        {
+            "id": "qa_7",
+            "question": "Question involving Docs?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Docs"
+            ],
+            "dimensions": [
+                "Fact Retrieval"
+            ]
+        },
+        {
+            "id": "qa_8",
+            "question": "Question involving Docs?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Docs"
+            ],
+            "dimensions": [
+                "Fact Retrieval"
+            ]
+        },
+        {
+            "id": "qa_9",
+            "question": "Question involving Alarms?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Alarms"
+            ],
+            "dimensions": [
+                "Fact Retrieval"
+            ]
+        },
+        {
+            "id": "qa_10",
+            "question": "Question involving Contacts?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Contacts"
+            ],
+            "dimensions": [
+                "Fact Retrieval"
+            ]
+        },
+        {
+            "id": "qa_11",
+            "question": "Question involving Contacts?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Contacts"
+            ],
+            "dimensions": [
+                "Fact Retrieval",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_12",
+            "question": "Question involving Contacts?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Contacts"
+            ],
+            "dimensions": [
+                "Temporal",
+                "Fact Retrieval"
+            ]
+        },
+        {
+            "id": "qa_13",
+            "question": "Question involving Notes?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Notes"
+            ],
+            "dimensions": [
+                "Fact Retrieval"
+            ]
+        },
+        {
+            "id": "qa_14",
+            "question": "Question involving Docs?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Docs"
+            ],
+            "dimensions": [
+                "Fact Retrieval"
+            ]
+        },
+        {
+            "id": "qa_15",
+            "question": "Question involving Contacts?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Contacts"
+            ],
+            "dimensions": [
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_16",
+            "question": "Question involving Alarms?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Alarms"
+            ],
+            "dimensions": [
+                "Fact Retrieval",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_17",
+            "question": "Question involving Alarms?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Alarms"
+            ],
+            "dimensions": [
+                "Fact Retrieval"
+            ]
+        },
+        {
+            "id": "qa_18",
+            "question": "Question involving Notes?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Notes"
+            ],
+            "dimensions": [
+                "Fact Retrieval",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_19",
+            "question": "Question involving Docs?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Docs"
+            ],
+            "dimensions": [
+                "Temporal",
+                "Fact Retrieval"
+            ]
+        },
+        {
+            "id": "qa_20",
+            "question": "Question involving Calls?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Calls"
+            ],
+            "dimensions": [
+                "Fact Retrieval",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_21",
+            "question": "Question involving Contacts?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Contacts"
+            ],
+            "dimensions": [
+                "Fact Retrieval",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_22",
+            "question": "Question involving Calls?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Calls"
+            ],
+            "dimensions": [
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_23",
+            "question": "Question involving Notes?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Notes"
+            ],
+            "dimensions": [
+                "Fact Retrieval",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_24",
+            "question": "Question involving Calls?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Calls"
+            ],
+            "dimensions": [
+                "Fact Retrieval"
+            ]
+        },
+        {
+            "id": "qa_25",
+            "question": "Question involving Contacts?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Contacts"
+            ],
+            "dimensions": [
+                "Fact Retrieval",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_26",
+            "question": "Question involving Events?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Events"
+            ],
+            "dimensions": [
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_27",
+            "question": "Question involving Docs?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Docs"
+            ],
+            "dimensions": [
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_28",
+            "question": "Question involving Contacts?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Contacts"
+            ],
+            "dimensions": [
+                "Fact Retrieval"
+            ]
+        },
+        {
+            "id": "qa_29",
+            "question": "Question involving Images?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Images"
+            ],
+            "dimensions": [
+                "Fact Retrieval",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_30",
+            "question": "Question involving Notes?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Notes"
+            ],
+            "dimensions": [
+                "Fact Retrieval",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_31",
+            "question": "Question involving Images?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Images"
+            ],
+            "dimensions": [
+                "Fact Retrieval",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_32",
+            "question": "Question involving Alarms?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Alarms"
+            ],
+            "dimensions": [
+                "Fact Retrieval",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_33",
+            "question": "Question involving Contacts?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Contacts"
+            ],
+            "dimensions": [
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_34",
+            "question": "Question involving Images?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Images"
+            ],
+            "dimensions": [
+                "Fact Retrieval"
+            ]
+        },
+        {
+            "id": "qa_35",
+            "question": "Question involving Calls?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Calls"
+            ],
+            "dimensions": [
+                "Fact Retrieval",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_36",
+            "question": "Question involving Calls?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Calls"
+            ],
+            "dimensions": [
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_37",
+            "question": "Question involving Docs?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Docs"
+            ],
+            "dimensions": [
+                "Fact Retrieval"
+            ]
+        },
+        {
+            "id": "qa_38",
+            "question": "Question involving Notes?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Notes"
+            ],
+            "dimensions": [
+                "Fact Retrieval"
+            ]
+        },
+        {
+            "id": "qa_39",
+            "question": "Question involving Calls?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Calls"
+            ],
+            "dimensions": [
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_40",
+            "question": "Question involving Contacts?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Contacts"
+            ],
+            "dimensions": [
+                "Fact Retrieval",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_41",
+            "question": "Question involving Notes?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Notes"
+            ],
+            "dimensions": [
+                "Fact Retrieval",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_42",
+            "question": "Question involving Events?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Events"
+            ],
+            "dimensions": [
+                "Temporal",
+                "Fact Retrieval"
+            ]
+        },
+        {
+            "id": "qa_43",
+            "question": "Question involving Images?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Images"
+            ],
+            "dimensions": [
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_44",
+            "question": "Question involving Notes?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Notes"
+            ],
+            "dimensions": [
+                "Temporal",
+                "Fact Retrieval"
+            ]
+        },
+        {
+            "id": "qa_45",
+            "question": "Question involving Notes?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Notes"
+            ],
+            "dimensions": [
+                "Temporal",
+                "Fact Retrieval"
+            ]
+        },
+        {
+            "id": "qa_46",
+            "question": "Question involving Events?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Events"
+            ],
+            "dimensions": [
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_47",
+            "question": "Question involving Notes?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Notes"
+            ],
+            "dimensions": [
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_48",
+            "question": "Question involving Images?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Images"
+            ],
+            "dimensions": [
+                "Fact Retrieval",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_49",
+            "question": "Question involving Events?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Events"
+            ],
+            "dimensions": [
+                "Fact Retrieval"
+            ]
+        },
+        {
+            "id": "qa_50",
+            "question": "Question involving Events?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Events"
+            ],
+            "dimensions": [
+                "Fact Retrieval",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_51",
+            "question": "Question involving Images?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Images"
+            ],
+            "dimensions": [
+                "Fact Retrieval",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_52",
+            "question": "Question involving Events?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Events"
+            ],
+            "dimensions": [
+                "Temporal",
+                "Fact Retrieval"
+            ]
+        },
+        {
+            "id": "qa_53",
+            "question": "Question involving Contacts?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Contacts"
+            ],
+            "dimensions": [
+                "Fact Retrieval",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_54",
+            "question": "Question involving Images?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Images"
+            ],
+            "dimensions": [
+                "Temporal",
+                "Fact Retrieval"
+            ]
+        },
+        {
+            "id": "qa_55",
+            "question": "Question involving Alarms?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Alarms"
+            ],
+            "dimensions": [
+                "Fact Retrieval"
+            ]
+        },
+        {
+            "id": "qa_56",
+            "question": "Question involving Alarms?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Alarms"
+            ],
+            "dimensions": [
+                "Fact Retrieval"
+            ]
+        },
+        {
+            "id": "qa_57",
+            "question": "Question involving Images?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Images"
+            ],
+            "dimensions": [
+                "Fact Retrieval",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_58",
+            "question": "Question involving Notes?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Notes"
+            ],
+            "dimensions": [
+                "Temporal",
+                "Fact Retrieval"
+            ]
+        },
+        {
+            "id": "qa_59",
+            "question": "Question involving Calls?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Calls"
+            ],
+            "dimensions": [
+                "Fact Retrieval"
+            ]
+        },
+        {
+            "id": "qa_60",
+            "question": "Question involving Docs?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Docs"
+            ],
+            "dimensions": [
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_61",
+            "question": "Question involving Calls?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Calls"
+            ],
+            "dimensions": [
+                "Temporal",
+                "Fact Retrieval"
+            ]
+        },
+        {
+            "id": "qa_62",
+            "question": "Question involving Events?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Events"
+            ],
+            "dimensions": [
+                "Temporal",
+                "Fact Retrieval"
+            ]
+        },
+        {
+            "id": "qa_63",
+            "question": "Question involving Alarms?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 1,
+            "involved_sources": [
+                "Alarms"
+            ],
+            "dimensions": [
+                "Fact Retrieval",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_64",
+            "question": "Question involving Docs, Alarms?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 2,
+            "involved_sources": [
+                "Docs",
+                "Alarms"
+            ],
+            "dimensions": [
+                "Cross-Source",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_65",
+            "question": "Question involving Images, Docs?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 2,
+            "involved_sources": [
+                "Images",
+                "Docs"
+            ],
+            "dimensions": [
+                "Cross-Source",
+                "Fact Retrieval"
+            ]
+        },
+        {
+            "id": "qa_66",
+            "question": "Question involving Docs, Events?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 2,
+            "involved_sources": [
+                "Docs",
+                "Events"
+            ],
+            "dimensions": [
+                "Cross-Source",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_67",
+            "question": "Question involving Alarms, Images?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 2,
+            "involved_sources": [
+                "Alarms",
+                "Images"
+            ],
+            "dimensions": [
+                "Cross-Source",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_68",
+            "question": "Question involving Images, Events?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 2,
+            "involved_sources": [
+                "Images",
+                "Events"
+            ],
+            "dimensions": [
+                "Cross-Source",
+                "Fact Retrieval"
+            ]
+        },
+        {
+            "id": "qa_69",
+            "question": "Question involving Events, Calls?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 2,
+            "involved_sources": [
+                "Events",
+                "Calls"
+            ],
+            "dimensions": [
+                "Cross-Source",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_70",
+            "question": "Question involving Alarms, Docs?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 2,
+            "involved_sources": [
+                "Alarms",
+                "Docs"
+            ],
+            "dimensions": [
+                "Cross-Source",
+                "Fact Retrieval"
+            ]
+        },
+        {
+            "id": "qa_71",
+            "question": "Question involving Contacts, Docs?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 2,
+            "involved_sources": [
+                "Contacts",
+                "Docs"
+            ],
+            "dimensions": [
+                "Cross-Source",
+                "Fact Retrieval"
+            ]
+        },
+        {
+            "id": "qa_72",
+            "question": "Question involving Docs, Contacts?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 2,
+            "involved_sources": [
+                "Docs",
+                "Contacts"
+            ],
+            "dimensions": [
+                "Cross-Source",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_73",
+            "question": "Question involving Alarms, Contacts?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 2,
+            "involved_sources": [
+                "Alarms",
+                "Contacts"
+            ],
+            "dimensions": [
+                "Cross-Source",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_74",
+            "question": "Question involving Images, Alarms?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 2,
+            "involved_sources": [
+                "Images",
+                "Alarms"
+            ],
+            "dimensions": [
+                "Cross-Source",
+                "Fact Retrieval"
+            ]
+        },
+        {
+            "id": "qa_75",
+            "question": "Question involving Notes, Alarms?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 2,
+            "involved_sources": [
+                "Notes",
+                "Alarms"
+            ],
+            "dimensions": [
+                "Cross-Source",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_76",
+            "question": "Question involving Calls, Images?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 2,
+            "involved_sources": [
+                "Calls",
+                "Images"
+            ],
+            "dimensions": [
+                "Cross-Source",
+                "Fact Retrieval"
+            ]
+        },
+        {
+            "id": "qa_77",
+            "question": "Question involving Images, Docs?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 2,
+            "involved_sources": [
+                "Images",
+                "Docs"
+            ],
+            "dimensions": [
+                "Cross-Source",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_78",
+            "question": "Question involving Calls, Events?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 2,
+            "involved_sources": [
+                "Calls",
+                "Events"
+            ],
+            "dimensions": [
+                "Cross-Source",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_79",
+            "question": "Question involving Docs, Alarms?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 2,
+            "involved_sources": [
+                "Docs",
+                "Alarms"
+            ],
+            "dimensions": [
+                "Cross-Source",
+                "Fact Retrieval"
+            ]
+        },
+        {
+            "id": "qa_80",
+            "question": "Question involving Events, Contacts?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 2,
+            "involved_sources": [
+                "Events",
+                "Contacts"
+            ],
+            "dimensions": [
+                "Cross-Source",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_81",
+            "question": "Question involving Docs, Alarms?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 2,
+            "involved_sources": [
+                "Docs",
+                "Alarms"
+            ],
+            "dimensions": [
+                "Cross-Source",
+                "Fact Retrieval"
+            ]
+        },
+        {
+            "id": "qa_82",
+            "question": "Question involving Calls, Contacts?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 2,
+            "involved_sources": [
+                "Calls",
+                "Contacts"
+            ],
+            "dimensions": [
+                "Cross-Source",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_83",
+            "question": "Question involving Alarms, Images?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 2,
+            "involved_sources": [
+                "Alarms",
+                "Images"
+            ],
+            "dimensions": [
+                "Cross-Source",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_84",
+            "question": "Question involving Calls, Contacts?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 2,
+            "involved_sources": [
+                "Calls",
+                "Contacts"
+            ],
+            "dimensions": [
+                "Cross-Source",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_85",
+            "question": "Question involving Notes, Calls?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 2,
+            "involved_sources": [
+                "Notes",
+                "Calls"
+            ],
+            "dimensions": [
+                "Cross-Source",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_86",
+            "question": "Question involving Images, Notes?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 2,
+            "involved_sources": [
+                "Images",
+                "Notes"
+            ],
+            "dimensions": [
+                "Cross-Source",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_87",
+            "question": "Question involving Alarms, Images?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 2,
+            "involved_sources": [
+                "Alarms",
+                "Images"
+            ],
+            "dimensions": [
+                "Cross-Source",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_88",
+            "question": "Question involving Events, Notes?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 2,
+            "involved_sources": [
+                "Events",
+                "Notes"
+            ],
+            "dimensions": [
+                "Cross-Source",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_89",
+            "question": "Question involving Calls, Alarms?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 2,
+            "involved_sources": [
+                "Calls",
+                "Alarms"
+            ],
+            "dimensions": [
+                "Cross-Source",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_90",
+            "question": "Question involving Docs, Calls?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 2,
+            "involved_sources": [
+                "Docs",
+                "Calls"
+            ],
+            "dimensions": [
+                "Cross-Source",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_91",
+            "question": "Question involving Docs, Alarms?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 2,
+            "involved_sources": [
+                "Docs",
+                "Alarms"
+            ],
+            "dimensions": [
+                "Cross-Source",
+                "Fact Retrieval"
+            ]
+        },
+        {
+            "id": "qa_92",
+            "question": "Question involving Calls, Contacts?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 2,
+            "involved_sources": [
+                "Calls",
+                "Contacts"
+            ],
+            "dimensions": [
+                "Cross-Source",
+                "Fact Retrieval"
+            ]
+        },
+        {
+            "id": "qa_93",
+            "question": "Question involving Calls, Events?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 2,
+            "involved_sources": [
+                "Calls",
+                "Events"
+            ],
+            "dimensions": [
+                "Cross-Source",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_94",
+            "question": "Question involving Images, Contacts?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 2,
+            "involved_sources": [
+                "Images",
+                "Contacts"
+            ],
+            "dimensions": [
+                "Cross-Source",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_95",
+            "question": "Question involving Events, Images?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 2,
+            "involved_sources": [
+                "Events",
+                "Images"
+            ],
+            "dimensions": [
+                "Cross-Source",
+                "Fact Retrieval"
+            ]
+        },
+        {
+            "id": "qa_96",
+            "question": "Question involving Contacts, Images, Docs?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 3,
+            "involved_sources": [
+                "Contacts",
+                "Images",
+                "Docs"
+            ],
+            "dimensions": [
+                "Cross-Source",
+                "Fact Retrieval"
+            ]
+        },
+        {
+            "id": "qa_97",
+            "question": "Question involving Events, Calls, Docs?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 3,
+            "involved_sources": [
+                "Events",
+                "Calls",
+                "Docs"
+            ],
+            "dimensions": [
+                "Cross-Source",
+                "Fact Retrieval"
+            ]
+        },
+        {
+            "id": "qa_98",
+            "question": "Question involving Calls, Images, Notes?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 3,
+            "involved_sources": [
+                "Calls",
+                "Images",
+                "Notes"
+            ],
+            "dimensions": [
+                "Cross-Source",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_99",
+            "question": "Question involving Events, Contacts, Images?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 3,
+            "involved_sources": [
+                "Events",
+                "Contacts",
+                "Images"
+            ],
+            "dimensions": [
+                "Cross-Source",
+                "Temporal"
+            ]
+        },
+        {
+            "id": "qa_100",
+            "question": "Question involving Images, Contacts, Events, Notes?",
+            "target_answer": "Short target answer.",
+            "et_answer": "EpisTwin generated answer.",
+            "involved_apps": 4,
+            "involved_sources": [
+                "Images",
+                "Contacts",
+                "Events",
+                "Notes"
+            ],
+            "dimensions": [
+                "Cross-Source",
+                "Fact Retrieval"
+            ]
+        }
+    ]
+}

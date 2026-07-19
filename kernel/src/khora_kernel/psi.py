@@ -1,5 +1,5 @@
 from typing import Any
-import sys
+
 
 def on_node_upserted(node_id: str, memoria: Any) -> None:
     # Evitar ciclos de importación, khora_kernel.embeddings solo lo usamos aquí de forma perezosa

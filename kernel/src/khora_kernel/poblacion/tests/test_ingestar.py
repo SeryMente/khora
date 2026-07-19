@@ -1,7 +1,7 @@
-import pytest
 from dataclasses import dataclass
-from typing import List, Optional, Any
-from unittest.mock import MagicMock
+from typing import Any, List, Optional
+
+import pytest
 
 from khora_kernel.api import (
     ActaDeIngesta,
@@ -9,10 +9,11 @@ from khora_kernel.api import (
     Provenance,
     PuertoEmbeddings,
     PuertoLLM,
-    Triple,
     RespuestaLLM,
+    Triple,
 )
-from khora_kernel.poblacion import ingestar, frecuencia, linea_temporal
+from khora_kernel.poblacion import frecuencia, ingestar, linea_temporal
+
 
 @dataclass
 class _MockEntity:
@@ -72,21 +73,27 @@ class MockMemoria:
         mock_graph = {e: [] for e in self.entidades.keys()}
 
         for t in self.triples:
-            if t.origen not in mock_graph: mock_graph[t.origen] = []
-            if t.destino not in mock_graph: mock_graph[t.destino] = []
+            if t.origen not in mock_graph:
+                mock_graph[t.origen] = []
+            if t.destino not in mock_graph:
+                mock_graph[t.destino] = []
             mock_graph[t.origen].append(t.destino)
 
         for t in triples:
-            if t.origen_id not in mock_graph: mock_graph[t.origen_id] = []
-            if t.destino_id not in mock_graph: mock_graph[t.destino_id] = []
+            if t.origen_id not in mock_graph:
+                mock_graph[t.origen_id] = []
+            if t.destino_id not in mock_graph:
+                mock_graph[t.destino_id] = []
             mock_graph[t.origen_id].append(t.destino_id)
 
         # Also include MATIZ_DE links
         for e_key, e in self.entidades.items():
             if e.matiz_de:
-                if e_key not in mock_graph: mock_graph[e_key] = []
+                if e_key not in mock_graph:
+                    mock_graph[e_key] = []
                 mock_graph[e_key].append(e.matiz_de)
-                if e.matiz_de not in mock_graph: mock_graph[e.matiz_de] = []
+                if e.matiz_de not in mock_graph:
+                    mock_graph[e.matiz_de] = []
                 mock_graph[e.matiz_de].append(e_key) # Bidirectional for reachability
 
         # BFS from User
@@ -221,7 +228,7 @@ def test_idempotencia():
         metadata={"autor": "User"}
     )
 
-    acta1 = ingestar(obj, memoria, llm, emb)
+    ingestar(obj, memoria, llm, emb)
     acta2 = ingestar(obj, memoria, llm, emb)
 
     assert acta2.ideas_novedosas == 0
