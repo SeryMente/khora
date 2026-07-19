@@ -124,6 +124,7 @@ def test_import_desde_fuera() -> None:
     assert khora_kernel.__all__ == [
         "ContextoDeVisibilidad",
         "EntidadIngresada",
+        "ObjetoDeInformacion",
         "MotorDeConsulta",
         "MotorDeIngesta",
         "MotorDeOlvido",
@@ -133,5 +134,6 @@ def test_import_desde_fuera() -> None:
         "SubgrafoRelevante",
         "NodoSubgrafo",
         "AristaSubgrafo",
+        "Triple",
         "VERSION",
     ]
