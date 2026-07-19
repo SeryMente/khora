@@ -4,7 +4,10 @@ from khora_kernel.api import (
     MotorDeConsulta,
     MotorDeIngesta,
     MotorDeOlvido,
+    NivelSuficiencia,
     Provenance,
+    ResultadoDeConsulta,
+    SubgrafoRelevante,
 )
 
 
@@ -33,9 +36,16 @@ class _MockConsulta:
         self._store = store
 
     def consultar(
-        self, query: str, contexto: ContextoDeVisibilidad
-    ) -> list[EntidadIngresada]:
-        return [e for e in self._store if e.visibilidad == contexto]
+        self, pregunta: str, contexto: ContextoDeVisibilidad
+    ) -> ResultadoDeConsulta:
+        fragmentos = [e for e in self._store if e.visibilidad == contexto]
+        suficiencia = NivelSuficiencia.SUFICIENTE if fragmentos else NivelSuficiencia.INSUFICIENTE
+        return ResultadoDeConsulta(
+            fragmentos=fragmentos,
+            subgrafo=SubgrafoRelevante(),
+            suficiencia=suficiencia,
+            resumenes_incluidos=False,
+        )
 
 
 class _MockOlvido:
@@ -72,11 +82,13 @@ def test_consultar_con_contexto_transparente_no_devuelve_privadas() -> None:
 
     consulta: MotorDeConsulta = _MockConsulta(ingesta._store)  # type: ignore
 
-    res_transparentes = consulta.consultar("query", ContextoDeVisibilidad.TRANSPARENTE)
+    res = consulta.consultar("query", ContextoDeVisibilidad.TRANSPARENTE)
+    res_transparentes = res.fragmentos
 
     assert len(res_transparentes) == 1
     assert res_transparentes[0] == e1
     assert e2 not in res_transparentes
+    assert res.suficiencia == NivelSuficiencia.SUFICIENTE
 
 
 def test_olvidar_id_retorna_acta() -> None:
@@ -98,6 +110,11 @@ def test_import_desde_fuera() -> None:
     assert hasattr(khora_kernel, "Provenance")
     assert hasattr(khora_kernel, "MotorDeConsulta")
     assert hasattr(khora_kernel, "MotorDeOlvido")
+    assert hasattr(khora_kernel, "ResultadoDeConsulta")
+    assert hasattr(khora_kernel, "NivelSuficiencia")
+    assert hasattr(khora_kernel, "SubgrafoRelevante")
+    assert hasattr(khora_kernel, "NodoSubgrafo")
+    assert hasattr(khora_kernel, "AristaSubgrafo")
     assert hasattr(khora_kernel, "VERSION")
 
     # Asegurar que implementaciones o módulos internos no se exporten
@@ -111,5 +128,10 @@ def test_import_desde_fuera() -> None:
         "MotorDeIngesta",
         "MotorDeOlvido",
         "Provenance",
+        "ResultadoDeConsulta",
+        "NivelSuficiencia",
+        "SubgrafoRelevante",
+        "NodoSubgrafo",
+        "AristaSubgrafo",
         "VERSION",
     ]

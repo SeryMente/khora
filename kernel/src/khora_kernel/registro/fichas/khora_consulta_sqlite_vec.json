@@ -1,0 +1,11 @@
+{
+  "id": "khora.consulta.sqlite_vec",
+  "descripcion": "Dependencia provisional para búsqueda vectorial usando sqlite-vec. Restringida a drivers.",
+  "version": "1.0.0",
+  "estado_ciclo": "Provisional",
+  "costo_reemplazo_talla": "M",
+  "costo_reemplazo_nota": "El motor de consulta tendría que reescribirse para apuntar a un nuevo mecanismo local de búsqueda vectorial.",
+  "reemplazo_nombrado": "Motor de búsqueda vectorial nativo local",
+  "fecha_inscripcion": "2026-07-18",
+  "puerto_satisfecho": null
+}

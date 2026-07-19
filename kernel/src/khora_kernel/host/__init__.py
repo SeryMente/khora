@@ -1,5 +1,11 @@
-from ._host import HostDeModulos, ErrorMontaje, ErrorPuertoNoDeclarado, ErrorImportacionProhibida, EventoRegistro
-from ._manifest import ManifiestoModulo, HostConfig
+from ._host import (
+    ErrorImportacionProhibida,
+    ErrorMontaje,
+    ErrorPuertoNoDeclarado,
+    EventoRegistro,
+    HostDeModulos,
+)
+from ._manifest import HostConfig, ManifiestoModulo
 
 __all__ = [
     "HostDeModulos",
