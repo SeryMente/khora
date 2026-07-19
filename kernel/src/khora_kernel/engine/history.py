@@ -1,8 +1,9 @@
 import json
-import sqlite3
 import os
-from dataclasses import dataclass, field, asdict
-from typing import List, Dict, Any, Optional
+import sqlite3
+from dataclasses import asdict, dataclass, field
+from typing import Any, List, Optional
+
 
 @dataclass(frozen=True)
 class HtStep:
@@ -21,9 +22,9 @@ class HtEvidence:
 class Ht:
     session_id: str
     created_at: str
-    steps: List[HtStep] = field(default_factory=list)
-    evidence: List[HtEvidence] = field(default_factory=list)
-    verdicts: List[Any] = field(default_factory=list)
+    steps: List[HtStep] = field(default_factory=lambda: [])
+    evidence: List[HtEvidence] = field(default_factory=lambda: [])
+    verdicts: List[Any] = field(default_factory=lambda: [])
 
 @dataclass(frozen=True)
 class Response:
@@ -44,14 +45,14 @@ def init_db(db_path: str = "data/khora_sessions.db"):
 
 def save_ht(ht: Ht, db_path: str = "data/khora_sessions.db"):
     init_db(db_path)
-    from datetime import datetime
+    from datetime import datetime, timezone
     with sqlite3.connect(db_path) as conn:
         conn.execute(
             """
             INSERT OR REPLACE INTO sessions (session_id, ht_json, updated_at)
             VALUES (?, ?, ?)
             """,
-            (ht.session_id, json.dumps(asdict(ht)), datetime.utcnow().isoformat() + "Z")
+            (ht.session_id, json.dumps(asdict(ht)), datetime.now(timezone.utc).isoformat() + "Z")
         )
 
 def load_ht(session_id: str, db_path: str = "data/khora_sessions.db") -> Optional[Ht]:
