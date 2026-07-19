@@ -1,11 +1,16 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
-from typing import Protocol
+from typing import Protocol, List, Optional
 
 
 class ContextoDeVisibilidad(Enum):
     PRIVADO = "privado"
     TRANSPARENTE = "transparente"
+
+
+class NivelSuficiencia(Enum):
+    SUFICIENTE = "suficiente"
+    INSUFICIENTE = "insuficiente"
 
 
 @dataclass(frozen=True)
@@ -23,6 +28,33 @@ class EntidadIngresada:
     visibilidad: ContextoDeVisibilidad
 
 
+@dataclass(frozen=True)
+class NodoSubgrafo:
+    id: str
+    etiqueta: str
+
+
+@dataclass(frozen=True)
+class AristaSubgrafo:
+    origen: str
+    destino: str
+    relacion: str
+
+
+@dataclass(frozen=True)
+class SubgrafoRelevante:
+    nodos: List[NodoSubgrafo] = field(default_factory=list)
+    aristas: List[AristaSubgrafo] = field(default_factory=list)
+
+
+@dataclass(frozen=True)
+class ResultadoDeConsulta:
+    fragmentos: List[EntidadIngresada]
+    subgrafo: SubgrafoRelevante
+    suficiencia: NivelSuficiencia
+    resumenes_incluidos: bool
+
+
 class MotorDeIngesta(Protocol):
     def ingestar(
         self,
@@ -35,9 +67,9 @@ class MotorDeIngesta(Protocol):
 class MotorDeConsulta(Protocol):
     def consultar(
         self,
-        query: str,
+        pregunta: str,
         contexto: ContextoDeVisibilidad,
-    ) -> list[EntidadIngresada]: ...
+    ) -> ResultadoDeConsulta: ...
 
 
 class MotorDeOlvido(Protocol):

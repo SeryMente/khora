@@ -6,6 +6,11 @@ from .api import (
     MotorDeIngesta,
     MotorDeOlvido,
     Provenance,
+    ResultadoDeConsulta,
+    NivelSuficiencia,
+    SubgrafoRelevante,
+    NodoSubgrafo,
+    AristaSubgrafo,
 )
 
 __all__ = [
@@ -15,5 +20,10 @@ __all__ = [
     "MotorDeIngesta",
     "MotorDeOlvido",
     "Provenance",
+    "ResultadoDeConsulta",
+    "NivelSuficiencia",
+    "SubgrafoRelevante",
+    "NodoSubgrafo",
+    "AristaSubgrafo",
     "VERSION",
 ]
