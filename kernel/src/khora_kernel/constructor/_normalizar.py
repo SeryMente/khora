@@ -1,9 +1,13 @@
 import os
 
-from khora_kernel.api import ObjetoDeInformacion
+from khora_kernel.api import (
+    ObjetoDeInformacion,
+    PuertoLLM,
+    SolicitudLLM,
+)
 
 
-def normalizar(objeto: ObjetoDeInformacion) -> str:
+def normalizar(objeto: ObjetoDeInformacion, puerto_llm: PuertoLLM | None = None) -> str:
     """
     η/τ: Normalización multimodal.
     Si es texto, devuelve identidad.
@@ -20,6 +24,16 @@ def normalizar(objeto: ObjetoDeInformacion) -> str:
         return objeto.texto
 
     # Es imagen -> MLLM Captioning
+    if puerto_llm:
+        solicitud = SolicitudLLM(
+            prompt=f"Describe esta imagen: {objeto.texto}",
+            sistema=None,
+            formato_estricto=None,
+            metadata={"temperature": 0.0},
+        )
+        resp = puerto_llm.generar(solicitud)
+        return resp.texto
+
     mllm_model = os.environ.get("KHORA_MLLM_MODEL")
     if not mllm_model or mllm_model == "mock":
         # Mock permitido SOLO en CI (documentado D2)

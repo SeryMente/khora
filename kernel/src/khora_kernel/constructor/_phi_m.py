@@ -1,4 +1,3 @@
-
 from khora_kernel.api import ObjetoDeInformacion, Triple
 
 
@@ -6,7 +5,7 @@ def phi_m(objeto: ObjetoDeInformacion) -> list[Triple]:
     """
     ΦM: Generación determinista de triples a partir de metadatos.
     """
-    triples = []
+    triples: list[Triple] = []
     mapa_conocido = {
         "fecha": "OCCURRED_AT",
         "date": "OCCURRED_AT",
@@ -38,5 +37,9 @@ def phi_m(objeto: ObjetoDeInformacion) -> list[Triple]:
             metadata={}
         )
         triples.append(triple)
+
+    # Si quisieras llamar al NER en J7 (fKGC), sería:
+    # (Pero como phi_m per se extrae lo explícito por metadata, el fKGC
+    # textual ocurre vía `extraer()`, ver _extraer.py)
 
     return triples

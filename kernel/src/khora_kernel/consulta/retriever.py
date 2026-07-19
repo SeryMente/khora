@@ -51,7 +51,7 @@ class RetrieverGraphRAG(MotorDeConsulta):
         if not db_path.exists():
             return self._retornar_insuficiente()
 
-        fragmentos = []
+        fragmentos: typing.List[EntidadIngresada] = []
         with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
             # Búsqueda degradada por keywords (simulando knn local)
@@ -99,8 +99,8 @@ class RetrieverGraphRAG(MotorDeConsulta):
         # Simular subgrafo topológico (1 salto) basado en entidades de la pregunta.
         # Como no hay modelo de entidades real ni GraphRAG completo indexado,
         # retornamos un subgrafo dummy vinculado a los fragmentos encontrados.
-        nodos = []
-        aristas = []
+        nodos: typing.List[NodoSubgrafo] = []
+        aristas: typing.List[AristaSubgrafo] = []
         for i, frag in enumerate(fragmentos):
             nodo_id = f"nodo_{frag.id}"
             nodos.append(NodoSubgrafo(id=nodo_id, etiqueta="Fragmento"))

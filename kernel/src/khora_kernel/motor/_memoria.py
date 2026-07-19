@@ -25,7 +25,7 @@ class Neo4jMemoriaOrganizada:
 
     def _conectar(self) -> None:
         try:
-            self._driver = GraphDatabase.driver(self._uri, auth=(self._user, self._password))
+            self._driver = GraphDatabase.driver(self._uri, auth=(self._user, self._password)) # type: ignore
         except Exception as e:
             raise Exception(f"No se pudo conectar a Neo4j: {str(e)}")
 
@@ -40,8 +40,8 @@ class Neo4jMemoriaOrganizada:
         """
         try:
             assert self._driver is not None
-            with self._driver.session() as session:
-                session.run(query_nodos)
+            with self._driver.session() as session: # type: ignore
+                session.run(query_nodos) # type: ignore
                 # Nota: El constraint de unicidad en relaciones (triples) requiere Neo4j Enterprise.
                 # Se omite para soportar la versión Community.
         except Exception as e:
@@ -71,8 +71,8 @@ class Neo4jMemoriaOrganizada:
 
         try:
             assert self._driver is not None
-            with self._driver.session() as session:
-                result = session.run(
+            with self._driver.session() as session: # type: ignore
+                result = session.run( # type: ignore
                     query,
                     id=doc_id,
                     contenido=contenido,
@@ -81,10 +81,10 @@ class Neo4jMemoriaOrganizada:
                     fecha_ingesta=provenance.fecha_ingesta,
                     metadatos=json.dumps(provenance.metadatos)
                 )
-                record = result.single()
+                record = result.single() # type: ignore
                 if not record:
                     raise IngestaFallidaError("No se pudo crear el nodo en Neo4j.")
-                return str(record["id"])
+                return str(record["id"]) # type: ignore
         except Exception as e:
             if isinstance(e, IngestaFallidaError):
                 raise
@@ -106,21 +106,21 @@ class Neo4jMemoriaOrganizada:
 
         try:
             assert self._driver is not None
-            with self._driver.session() as session:
-                result = session.run(query, query_str=query_str, incluir_publicos=incluir_publicos)
-                docs = []
-                for record in result:
-                    node = record["d"]
+            with self._driver.session() as session: # type: ignore
+                result = session.run(query, query_str=query_str, incluir_publicos=incluir_publicos) # type: ignore
+                docs: typing.List[DocumentoMemoria] = []
+                for record in result: # type: ignore
+                    node = record["d"] # type: ignore
                     prov = PortProvenance(
-                        origen=node["origen"],
-                        fecha_ingesta=node["fecha_ingesta"],
-                        metadatos=json.loads(node["metadatos"]) if node.get("metadatos") else {}
+                        origen=node["origen"], # type: ignore
+                        fecha_ingesta=node["fecha_ingesta"], # type: ignore
+                        metadatos=json.loads(node["metadatos"]) if node.get("metadatos") else {} # type: ignore
                     )
                     doc = DocumentoMemoria(
-                        id_documento=node["id"],
-                        contenido=node["contenido"],
+                        id_documento=node["id"], # type: ignore
+                        contenido=node["contenido"], # type: ignore
                         provenance=prov,
-                        es_publico=node["es_publico"]
+                        es_publico=node["es_publico"] # type: ignore
                     )
                     docs.append(doc)
                 return docs
@@ -148,8 +148,8 @@ class Neo4jMemoriaOrganizada:
 
         try:
             assert self._driver is not None
-            with self._driver.session() as session:
-                result = session.run(
+            with self._driver.session() as session: # type: ignore
+                result = session.run( # type: ignore
                     query,
                     origen_id=origen_id,
                     destino_id=destino_id,
@@ -160,7 +160,7 @@ class Neo4jMemoriaOrganizada:
                     timestamp_prov=provenance.timestamp,
                     metadata=json.dumps(metadata)
                 )
-                record = result.single()
+                record = result.single() # type: ignore
                 if not record:
                     raise Exception("No se pudo crear el triple (verifique que los IDs de origen y destino existan).")
 
