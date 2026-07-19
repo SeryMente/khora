@@ -119,9 +119,21 @@ class PuertoEmbeddings(Protocol):
     def incrustar(self, textos: list[str]) -> list[list[float]]: ...
 
 
+@dataclass(frozen=True)
+class ActaDeIngesta:
+    origen: str
+    timestamp: str
+    ideas_novedosas: int
+    ideas_repetidas: int
+    matices: int
+    needs_review: int
+    triples_escritos: int
+    linea_temporal_indexada: bool
+
 VERSION = "0.1.0"
 
 __all__ = [
+    "ActaDeIngesta",
     "ContextoDeVisibilidad",
     "NivelSuficiencia",
     "Provenance",
