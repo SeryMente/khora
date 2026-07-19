@@ -6,3 +6,4 @@
 - [38. Gravedad del dato](38-gravedad.md) — 📝 BORRADOR
 - [50. Shell Terminal de Captura](50-shell.md) — 📝 BORRADOR
 - [60. Motor Neo4j (Sustrato C1/C2)](60-motor.md)
+- [70. Constructor J7 (ΦM, η/τ, fKGC)](70-constructor.md)
