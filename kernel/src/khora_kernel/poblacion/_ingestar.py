@@ -64,6 +64,7 @@ def ingestar(
     memoria: Any,
     puerto_llm: PuertoLLM,
     puerto_embeddings: PuertoEmbeddings,
+    on_upsert=None,
 ) -> ActaDeIngesta:
     # 1. Normalizar
     texto_norm = normalizar(objeto, puerto_llm)
@@ -86,6 +87,13 @@ def ingestar(
 
     # 4. Escribir vía memoria SOLO con MERGE
     triples_escritos = memoria.escribir_ingesta(triples_resueltos, objeto.provenance)
+
+    if on_upsert:
+        # Pass the id or the entity logic to the callback.
+        # En J-C7 pide 'on_node_upserted(node_id)'
+        # Dado que phi_m(objeto) siempre extrae al menos la entidad principal
+        # con un ID basado en el objeto (o podemos pasar el objeto id), asumiremos objeto.id
+        on_upsert(objeto.id, memoria)
 
     linea_temporal_indexada = True  # Todos llevan timestamp en la provenance requerida por api.Provenance
 

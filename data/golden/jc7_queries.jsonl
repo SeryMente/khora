@@ -1,0 +1,10 @@
+{"query": "¿Qué significa RES y cuál es el objetivo O3 de Khora?", "expected_node_id": "khora-obj-003", "expected_node_label": "Objetivo"}
+{"query": "¿Qué es el principio de NO-SIMULACIÓN en el kernel?", "expected_node_id": "khora-ppio-001", "expected_node_label": "Principio"}
+{"query": "¿Qué es el Chasis y de qué componentes está hecho?", "expected_node_id": "khora-comp-001", "expected_node_label": "Componente"}
+{"query": "¿Qué modelo de embeddings usa Khora y cómo se configura?", "expected_node_id": "khora-comp-003", "expected_node_label": "Componente"}
+{"query": "¿Qué hace Leiden en el sistema y cuáles son sus parámetros?", "expected_node_id": "khora-comp-004", "expected_node_label": "Componente"}
+{"query": "¿Qué es EpisTwin y dónde vive su código?", "expected_node_id": "khora-comp-002", "expected_node_label": "Componente"}
+{"query": "¿Cómo funciona el flujo de tarjetas desde Por hacer hasta Fusionado?", "expected_node_id": "khora-proceso-002", "expected_node_label": "Proceso"}
+{"query": "¿Cuándo pueden correr dos sesiones de Jules en paralelo?", "expected_node_id": "khora-proceso-001", "expected_node_label": "Proceso"}
+{"query": "¿Qué es Globo y qué hace el port Misthos?", "expected_node_id": "khora-comp-005", "expected_node_label": "Componente"}
+{"query": "¿Cuál es la arquitectura de capas del kernel de Khora?", "expected_node_id": "khora-decision-001", "expected_node_label": "Decisión"}
