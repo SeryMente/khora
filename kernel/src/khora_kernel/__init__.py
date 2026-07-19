@@ -1,21 +1,24 @@
 from .api import (
     VERSION,
+    AristaSubgrafo,
     ContextoDeVisibilidad,
     EntidadIngresada,
     MotorDeConsulta,
     MotorDeIngesta,
     MotorDeOlvido,
+    NivelSuficiencia,
+    NodoSubgrafo,
+    ObjetoDeInformacion,
     Provenance,
     ResultadoDeConsulta,
-    NivelSuficiencia,
     SubgrafoRelevante,
-    NodoSubgrafo,
-    AristaSubgrafo,
+    Triple,
 )
 
 __all__ = [
     "ContextoDeVisibilidad",
     "EntidadIngresada",
+    "ObjetoDeInformacion",
     "MotorDeConsulta",
     "MotorDeIngesta",
     "MotorDeOlvido",
@@ -25,5 +28,6 @@ __all__ = [
     "SubgrafoRelevante",
     "NodoSubgrafo",
     "AristaSubgrafo",
+    "Triple",
     "VERSION",
 ]

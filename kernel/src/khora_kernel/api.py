@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Protocol, List, Optional
+from typing import List, Protocol
 
 
 class ContextoDeVisibilidad(Enum):
@@ -26,6 +26,24 @@ class EntidadIngresada:
     texto: str
     provenance: Provenance
     visibilidad: ContextoDeVisibilidad
+
+
+@dataclass(frozen=True)
+class ObjetoDeInformacion:
+    id: str
+    texto: str
+    provenance: Provenance
+    metadata: dict[str, str]
+
+
+@dataclass(frozen=True)
+class Triple:
+    id: str
+    origen_id: str
+    destino_id: str
+    relacion: str
+    provenance: Provenance
+    metadata: dict[str, str]
 
 
 @dataclass(frozen=True)

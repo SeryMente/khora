@@ -1,0 +1,1 @@
+I will leave the dependencies as they are in motor/pyproject.toml according to the memory rule Gate G-4 regarding architectural boundaries and zero dependencies in the main khora_kernel package. I will mention this in the PR.
