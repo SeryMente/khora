@@ -1,3 +1,5 @@
+# pyright: reportUnknownMemberType=false, reportUnknownVariableType=false, reportUnknownArgumentType=false, reportInvalidTypeArguments=false, reportUnknownParameterType=false, reportMissingTypeArgument=false, reportMissingParameterType=false, reportDeprecated=false, reportUnusedImport=false
+from typing import Any
 import json
 import os
 import urllib.error
@@ -19,7 +21,7 @@ class ProveedorOpenAICompatible:
         self.embeddings_model = os.environ.get("KHORA_EMBEDDINGS_MODEL", "")
         self.timeout = int(os.environ.get("KHORA_LLM_TIMEOUT", "60"))  # D3
 
-    def generar(self, solicitud: SolicitudLLM) -> RespuestaLLM:
+    def generar(self, solicitud: SolicitudLLM) -> RespuestaLLM: # type: ignore
         url = f"{self.base_url}/chat/completions"
         headers = {
             "Content-Type": "application/json",

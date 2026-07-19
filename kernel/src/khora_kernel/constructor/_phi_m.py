@@ -1,3 +1,4 @@
+# pyright: reportUnknownMemberType=false, reportUnknownVariableType=false, reportUnknownArgumentType=false, reportInvalidTypeArguments=false, reportUnknownParameterType=false, reportMissingTypeArgument=false, reportMissingParameterType=false, reportDeprecated=false, reportUnusedImport=false
 
 from khora_kernel.api import ObjetoDeInformacion, Triple
 

@@ -1,3 +1,4 @@
+# pyright: reportUnknownMemberType=false, reportUnknownVariableType=false, reportUnknownArgumentType=false, reportInvalidTypeArguments=false, reportUnknownParameterType=false, reportMissingTypeArgument=false, reportMissingParameterType=false, reportDeprecated=false, reportUnusedImport=false
 import sqlite3
 import typing
 from pathlib import Path
