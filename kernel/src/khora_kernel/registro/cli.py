@@ -3,20 +3,28 @@ import sys
 from pathlib import Path
 
 
-def main():
-    # If run as `python -m khora_kernel.registro`, sys.argv is ['<path>/__main__.py']
-    # If run via entrypoint, sys.argv is ['khora', 'registro']
+def obtener_host():
+    from khora_kernel.host import HostConfig, HostDeModulos
+    from khora_kernel.ports.mocks.mock_memoria_organizada import MockMemoriaOrganizada
 
-    if len(sys.argv) > 1 and sys.argv[0].endswith("khora") and sys.argv[1] != "registro":
-        print("Uso: khora registro")
-        sys.exit(1)
+    config = HostConfig()
 
-    base_dir = Path(__file__).resolve().parent.parent.parent
-    src_dir = base_dir / "khora_kernel"
-    # To support running directly or when installed
-    if not src_dir.exists():
-        src_dir = Path(__file__).resolve().parent.parent
+    # En un entorno de producción (CH-3), aquí se cargarían los drivers reales
+    # (ej. el de Neo4j) desde la carpeta drivers/ si estuviesen disponibles.
+    # Como fallback para que el CLI sea funcional en desarrollo, proveemos el mock.
+    puertos = {
+        "MemoriaOrganizada": MockMemoriaOrganizada()
+    }
 
+    host = HostDeModulos(
+        config=config,
+        registrar=lambda evento, contexto: None,
+        puertos_disponibles=puertos
+    )
+    return host
+
+
+def comando_registro(src_dir: Path):
     fichas_dir = src_dir / "registro" / "fichas"
 
     if not fichas_dir.exists():
@@ -29,7 +37,6 @@ def main():
         with open(file_path, "r", encoding="utf-8") as f:
             data = json.load(f)
             if isinstance(data, dict):
-                # type ignore is needed since json.load returns Any
                 fichas.append(data) # type: ignore
 
     # Sort for consistent output
@@ -50,6 +57,65 @@ def main():
         if puerto:
             print(f"  Puerto      : {puerto}")
         print("---------------------------------------")
+
+
+def comando_exportar(destino: str):
+    from khora_kernel.gravedad import exportar_grafo
+
+    host = obtener_host()
+    memoria = host.puertos_disponibles.get("MemoriaOrganizada")
+    if not memoria:
+        print("Error: Puerto MemoriaOrganizada no disponible en el Host.")
+        sys.exit(1)
+
+    print(f"Iniciando exportación hacia: {destino}")
+    exportar_grafo(memoria, destino)
+    print("Exportación completada exitosamente.")
+
+
+def comando_importar(origen: str):
+    from khora_kernel.gravedad import importar_grafo
+
+    host = obtener_host()
+    memoria = host.puertos_disponibles.get("MemoriaOrganizada")
+    if not memoria:
+        print("Error: Puerto MemoriaOrganizada no disponible en el Host.")
+        sys.exit(1)
+
+    print(f"Iniciando importación desde: {origen}")
+    importar_grafo(memoria, origen)
+    print("Importación completada exitosamente.")
+
+
+def main():
+    base_dir = Path(__file__).resolve().parent.parent.parent
+    src_dir = base_dir / "khora_kernel"
+    if not src_dir.exists():
+        src_dir = Path(__file__).resolve().parent.parent
+
+    # Parse arguments
+    args = sys.argv[1:]
+
+    # Support 'python -m khora_kernel.registro' backwards compatibility
+    if not args or args[0] == "registro":
+        comando_registro(src_dir)
+        sys.exit(0)
+
+    comando = args[0]
+
+    if comando == "exportar":
+        if len(args) < 2:
+            print("Uso: khora exportar <destino>")
+            sys.exit(1)
+        comando_exportar(args[1])
+    elif comando == "importar":
+        if len(args) < 2:
+            print("Uso: khora importar <origen>")
+            sys.exit(1)
+        comando_importar(args[1])
+    else:
+        print("Uso: khora [registro|exportar|importar]")
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()
