@@ -119,6 +119,11 @@ class PuertoEmbeddings(Protocol):
     def incrustar(self, textos: list[str]) -> list[list[float]]: ...
 
 
+@runtime_checkable
+class PuertoVision(Protocol):
+    def extraer_evidencia(self, referencia: str) -> str: ...
+
+
 @dataclass(frozen=True)
 class ActaDeIngesta:
     origen: str
@@ -151,5 +156,6 @@ __all__ = [
     "RespuestaLLM",
     "PuertoLLM",
     "PuertoEmbeddings",
+    "PuertoVision",
     "VERSION",
 ]
