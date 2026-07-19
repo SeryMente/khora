@@ -1,4 +1,5 @@
 
+import hashlib
 import math
 import os
 import unicodedata
@@ -52,14 +53,11 @@ Responde NEW si son diferentes o tienes duda."""
         metadata={"temperature": 0.0},
     )
 
-    try:
-        resp = puerto_llm.generar(solicitud)
-        texto = resp.texto.strip().upper()
-        if texto in ("MERGE", "NEW", "MATIZ"):
-            return texto
-        return "NEW"
-    except Exception:
-        return "NEW"
+    resp = puerto_llm.generar(solicitud)
+    texto = resp.texto.strip().upper()
+    if texto in ("MERGE", "NEW", "MATIZ"):
+        return texto
+    return "NEW"
 
 
 def resolver(
@@ -143,7 +141,7 @@ def resolver(
             # But if the Juez says MERGE, we don't.
             # BUT what if candidates is empty? Then any(...) is false, so it's just label_norm.
             if any(c["canonical_key"] == canonical for c in candidatos_memoria) and veredicto == "NEW":
-                canonical = f"{canonical}_{hash(desc_multi) % 10000}"
+                canonical = f"{canonical}_{hashlib.sha256(desc_multi.encode('utf-8')).hexdigest()[:8]}"
 
             memoria.merge_entidad(
                 canonical_key=canonical,

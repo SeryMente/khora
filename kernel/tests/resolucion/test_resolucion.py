@@ -19,8 +19,9 @@ class MockMemoria:
         self.relaciones = []
 
     def buscar_entidades_candidatas(self, label_norm: str) -> List[Dict[str, Any]]:
-        # En el código real, buscaríamos en la db. Aquí devolvemos todos para poder hacer fallback a similitud
-        return list(self.entidades.values())
+        # En el código real, buscaríamos en la db y priorizaríamos el match exacto.
+        candidatos = list(self.entidades.values())
+        return sorted(candidatos, key=lambda c: 0 if c["canonical_key"] == label_norm else 1)
 
     def merge_entidad(self, canonical_key: str, label_original: str, provenance_raw: str, embedding: List[float], matiz_de: str = None, needs_review: bool = False) -> None:
         if canonical_key in self.entidades:
@@ -207,7 +208,80 @@ def test_provenance_acumula():
     assert len(memoria.entidades["a"]["provenance"]) == 3 # A has 2 provenances from being origen, and B/C are distinct nodes.
 
 
-@pytest.mark.xfail(strict=True, reason="0 duplicados sobre data/golden/j8_pares.jsonl. NO-SIMULACIÓN: prohibido fabricar pares 'realistas'. Causa exacta: 0 pares reales disponibles en el entorno.")
+def test_candidatas_amplias():
+    memoria = MockMemoria()
+    llm = MockPuertoLLM(veredicto_forzado="MERGE")
+    emb = MockPuertoEmbeddings()
+
+    # "Sarah Connor" está en memoria, con canonical "sarah_connor"
+    memoria.merge_entidad("sarah_connor", "Sarah Connor", "prov", [1.0, 0.0])
+
+    # Llega "Sarah", cuya clave normalizada es "sarah". Antes F1, esto no recuperaría "sarah_connor"
+    # Ahora la búsqueda es amplia, los vectores de sarah (Mock) son [1.0, 0.0] -> similitud > umbral
+    # Juez forzado a MERGE -> deben quedar en 1 entidad
+    triples = [Triple("1", "Sarah", "X", "rel", _prov(), {})]
+
+    resolver(triples, memoria, llm, emb)
+
+    assert len(memoria.entidades) == 2  # sarah_connor, X
+    assert "sarah_connor" in memoria.entidades
+    assert "sarah" not in memoria.entidades
+
+
+def test_sufijo_determinista():
+    memoria = MockMemoria()
+    # Forzamos NEW para que cause colisión
+    llm = MockPuertoLLM(veredicto_forzado="NEW")
+    emb = MockPuertoEmbeddings()
+
+    memoria.merge_entidad("john", "John", "prov", [0.0, 1.0])
+
+    # "John" llega de nuevo.
+    triples1 = [Triple("1", "John", "Y", "rel", _prov(), {})]
+    resolver(triples1, memoria, llm, emb)
+
+    # Volvemos a procesar "John" con los MISMOS contextos, el hash debería ser idéntico
+    triples2 = [Triple("2", "John", "Y", "rel", _prov(), {})]
+
+    memoria2 = MockMemoria()
+    memoria2.merge_entidad("john", "John", "prov", [0.0, 1.0])
+
+    resolver(triples2, memoria2, llm, emb)
+
+    # Comparamos las entidades creadas. Ambas deben tener el mismo sufijo para "john".
+    entidades1 = list(memoria.entidades.keys())
+    entidades2 = list(memoria2.entidades.keys())
+
+    # Debería existir john_... en ambos
+    johns_con_sufijo1 = [k for k in entidades1 if k.startswith("john_")]
+    johns_con_sufijo2 = [k for k in entidades2 if k.startswith("john_")]
+
+    assert len(johns_con_sufijo1) == 1
+    assert len(johns_con_sufijo2) == 1
+    assert johns_con_sufijo1[0] == johns_con_sufijo2[0]
+
+
+def test_juez_caido():
+    class JuezCaido(MockPuertoLLM):
+        def generar(self, solicitud):
+            raise Exception("Juez caído")
+
+    memoria = MockMemoria()
+    llm = JuezCaido()
+    emb = MockPuertoEmbeddings()
+
+    memoria.merge_entidad("t_800", "T-800", "prov", [0.707, 0.707])
+
+    # T-800 es candidato para matchear, Juez debería fallar
+    triples = [Triple("1", "T-800", "X", "rel", _prov(), {})]
+
+    with pytest.raises(Exception, match="Juez caído"):
+        resolver(triples, memoria, llm, emb)
+
+    # Memoria no debería estar mutada
+    assert len(memoria.entidades) == 1
+
+@pytest.mark.xfail(strict=True, reason="0 duplicados sobre data/golden/j8_pares.jsonl. NO-SIMULACIÓN: prohibido fabricar pares \'realistas\'. Causa exacta: 0 pares reales disponibles en el entorno.")
 def test_golden():
     with open("data/golden/j8_pares.jsonl", "r") as f:
         content = f.read().strip()

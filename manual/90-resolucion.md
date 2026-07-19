@@ -19,5 +19,5 @@ Este módulo se encarga de la resolución de entidades extraídas del grafo de c
 - **D1**: Embeddings al vuelo + caché en propiedad `embedding` del nodo.
 - **D2**: Juez dudoso o respuesta no parseable → `NEW` + `needs_review=true`, declarado.
 - **D3**: `canonical_key` → label normalizado (casefold, sin acentos, espacios a guiones bajos). Si dos entidades distintas colisionan en clave, el juez decide (y si dice NEW, se crea uno único).
-- **D4**: Golden set sin pares reales → `xfail` declarado (patrón D5 de J7).
+- **D4**: Golden set `data/golden/j8_pares.jsonl` sin pares reales → `xfail` declarado (patrón D5 de J7).
 - **D5**: Cualquier otra ambigüedad → resuelta con la opción más simple y documentada.
