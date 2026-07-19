@@ -10,7 +10,7 @@ def obtener_host():
     config = HostConfig()
 
     # En un entorno de producción (CH-3), aquí se cargarían los drivers reales
-    # (ej. el de Neo4j) desde la carpeta drivers/ si estuviesen disponibles.
+    # desde la carpeta drivers/ si estuviesen disponibles.
     # Como fallback para que el CLI sea funcional en desarrollo, proveemos el mock.
     puertos = {
         "MemoriaOrganizada": MockMemoriaOrganizada()

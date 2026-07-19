@@ -3,16 +3,18 @@ on: [push, pull_request]
 jobs:
   calidad:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: kernel
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: pip install -e . ruff pyright pytest
-      - run: ruff check .
+      - run: pip install -e ".[dev]"
+      - run: python -m ruff check .
       - run: pyright
       - name: Start Neo4j
         run: docker compose up -d
-      - name: Wait for Neo4j and setup schema
-        run: python scripts/setup_neo4j.py
+        working-directory: kernel
       - run: pytest
