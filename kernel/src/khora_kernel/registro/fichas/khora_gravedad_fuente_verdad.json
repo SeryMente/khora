@@ -1,0 +1,11 @@
+{
+  "id": "khora.gravedad.fuente_verdad",
+  "descripcion": "Registro de fuentes de verdad provisionales (Notion, etc.) referenciadas en el desarrollo.",
+  "version": "1.0.0",
+  "estado_ciclo": "Provisional",
+  "costo_reemplazo_talla": "S",
+  "costo_reemplazo_nota": "Migrar fuera de Notion implica exportar a markdown y almacenarlo dentro de la bóveda o motor interno.",
+  "reemplazo_nombrado": "Almacenamiento nativo en la bóveda de Cora",
+  "fecha_inscripcion": "2026-07-18",
+  "puerto_satisfecho": null
+}
