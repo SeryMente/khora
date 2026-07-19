@@ -51,6 +51,8 @@ def ask_with_fallback(
         # le inyectamos la evidencia efímera explícitamente en la query en forma de contexto,
         # para que la vea sin tocar la lógica interna de Core.ask().
         ht_despues_fallback = load_ht(current_session_id, db_path)
+        if not ht_despues_fallback:
+            raise RuntimeError("No se pudo cargar el historial de sesión tras fallback")
 
         # Recuperamos la evidencia recién inyectada (las últimas en Ht)
         # Filtramos por las que se generaron en fallback
