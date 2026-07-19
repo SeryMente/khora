@@ -10,3 +10,5 @@
 - [80. Puerto LLM Oficial del Kernel](80-puerto-llm.md)
 
 - [📝 BORRADOR: Resolución de Entidades](90-resolucion.md)
+
+- [95. Población del Grafo (Ψ)](95-poblacion.md)

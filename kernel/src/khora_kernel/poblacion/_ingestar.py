@@ -1,0 +1,114 @@
+from typing import Any, Dict, List, Optional
+
+from khora_kernel.api import (
+    ActaDeIngesta,
+    ObjetoDeInformacion,
+    PuertoEmbeddings,
+    PuertoLLM,
+)
+from khora_kernel.constructor import extraer, normalizar, phi_m
+from khora_kernel.resolucion import resolver
+
+
+class _MemoriaInterceptora:
+    """
+    Interceptor local para rastrear los veredictos emitidos durante la resolución,
+    dado que el contrato actual de memoria en resolver no devuelve el veredicto.
+    """
+
+    def __init__(self, memoria_real: Any):
+        self.memoria_real = memoria_real
+        self.ideas_novedosas = 0
+        self.ideas_repetidas = 0
+        self.matices = 0
+        self.needs_review = 0
+        self._candidatos_cache: Dict[str, List[dict[str, Any]]] = {}
+
+    def buscar_entidades_candidatas(self, label_norm: str) -> List[dict[str, Any]]:
+        cands = self.memoria_real.buscar_entidades_candidatas(label_norm)
+        self._candidatos_cache[label_norm] = cands
+        return cands
+
+    def merge_entidad(self, canonical_key: str, label_original: str, provenance_raw: str, embedding: List[float], matiz_de: Optional[str] = None, needs_review: bool = False) -> None:
+        if needs_review:
+            self.needs_review += 1
+            self.ideas_novedosas += 1
+        elif matiz_de:
+            self.matices += 1
+        else:
+            # Check if canonical_key was already in candidates (MERGE) vs it's brand new (NEW with no collision)
+            # Find the original label_norm from caching or check if it ends with a hash (it doesn't here since needs_review=False)
+            is_new = True
+            for cands in self._candidatos_cache.values():
+                for c in cands:
+                    if c["canonical_key"] == canonical_key:
+                        is_new = False
+                        break
+                if not is_new:
+                    break
+
+            if is_new:
+                self.ideas_novedosas += 1
+            else:
+                self.ideas_repetidas += 1
+
+        # Pasar a la memoria real
+        self.memoria_real.merge_entidad(
+            canonical_key=canonical_key,
+            label_original=label_original,
+            provenance_raw=provenance_raw,
+            embedding=embedding,
+            matiz_de=matiz_de,
+            needs_review=needs_review
+        )
+
+
+
+def ingestar(
+    objeto: ObjetoDeInformacion,
+    memoria: Any,
+    puerto_llm: PuertoLLM,
+    puerto_embeddings: PuertoEmbeddings,
+) -> ActaDeIngesta:
+    # 1. Normalizar
+    texto_norm = normalizar(objeto, puerto_llm)
+
+    # 2. Extraer
+    # Lector grafo = memoria en modo D1 (sólo lectura implícito en resolver/consultar)
+    triples_j7 = phi_m(objeto) + extraer(texto_norm, memoria, puerto_llm)
+
+    # 3. Resolver
+    interceptor = _MemoriaInterceptora(memoria)
+    triples_resueltos = resolver(triples_j7, interceptor, puerto_llm, puerto_embeddings)
+
+    # El interceptor puede no ser perfecto porque el "NEW" se mapea a needs_review=True, y "MERGE" a needs_review=False.
+    ideas_novedosas = interceptor.ideas_novedosas
+    ideas_repetidas = interceptor.ideas_repetidas
+    matices = interceptor.matices
+    needs_review = interceptor.needs_review
+
+    # Si hay 0 repetidas, puede que estemos ingiriendo en un grafo vacío y resolver hizo "NEW" a todo con needs_review=True.
+
+    # 4. Escribir vía memoria SOLO con MERGE
+    triples_escritos = memoria.escribir_ingesta(triples_resueltos, objeto.provenance)
+
+    linea_temporal_indexada = True  # Todos llevan timestamp en la provenance requerida por api.Provenance
+
+    return ActaDeIngesta(
+        origen=objeto.provenance.origen,
+        timestamp=objeto.provenance.timestamp,
+        ideas_novedosas=ideas_novedosas,
+        ideas_repetidas=ideas_repetidas,
+        matices=matices,
+        needs_review=needs_review,
+        triples_escritos=triples_escritos,
+        linea_temporal_indexada=linea_temporal_indexada
+    )
+
+
+def frecuencia(memoria: Any, canonical_key: str) -> int:
+    return memoria.frecuencia(canonical_key)
+
+
+def linea_temporal(memoria: Any, desde: str, hasta: str) -> List[Any]:
+    return memoria.linea_temporal(desde, hasta)

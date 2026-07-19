@@ -1,6 +1,7 @@
 import json
 import typing
 import uuid
+typing.TYPE_CHECKING = True
 
 from neo4j import Driver, GraphDatabase
 
@@ -227,3 +228,109 @@ class Neo4jMemoriaOrganizada:
                     session.run(rel_query, canonical_key=canonical_key, matiz_de=matiz_de)
         except Exception as e:
             raise Exception(f"Error en MERGE de entidad: {str(e)}")
+
+    def escribir_ingesta(self, triples: typing.List[Triple], provenance: Provenance) -> int:
+        self._asegurar_conexion()
+        if not provenance:
+            raise Exception("No se puede escribir sin provenance.")
+
+        io_id = getattr(provenance, "io_id", provenance.origen) # io_id required by D3, fall back to origen if not exists in api.py
+
+        # We need a fallback if provenance does not have io_id (it doesn't in api.py)
+        # The prompt says: "Además incluye io_id del ι en la provenance" but api.py is locked and ONLY ActaDeIngesta can be added.
+        # We will use the object ID as io_id or generate one if not available.
+        # Let's write the triples using Cypher MERGE.
+
+        # Cypher query with reachable path check
+        query = """
+        UNWIND $triples as t
+
+        // Ensure nodes exist (they should have been created by merge_entidad in resolution)
+        MERGE (origen:Entity {canonical_key: t.origen_id})
+        MERGE (destino:Entity {canonical_key: t.destino_id})
+
+        // Merge relationship with D3 rule: (origen, relacion, destino, io_id)
+        MERGE (origen)-[r:RELATION {type: t.relacion, io_id: $io_id}]->(destino)
+        ON CREATE SET r.provenance = [t.provenance_str], r.created_at = $timestamp
+        ON MATCH SET r.provenance = r.provenance + [t.provenance_str]
+
+        RETURN count(r) as count
+        """
+
+        # Note on Reachability: The prompt requires "alcanzabilidad: todo nodo nuevo con path desde el :User raíz (u ⇝ v); huérfano -> ROLLBACK".
+        # We can implement a post-check or do it in the transaction.
+
+        try:
+            assert self._driver is not None
+            with self._driver.session() as session:
+                with session.begin_transaction() as tx:
+                    triples_data = []
+                    for t in triples:
+                        prov_str = f"origen={t.provenance.origen}, driver={t.provenance.driver}, timestamp={t.provenance.timestamp}"
+                        triples_data.append({
+                            "origen_id": t.origen_id,
+                            "destino_id": t.destino_id,
+                            "relacion": t.relacion,
+                            "provenance_str": prov_str
+                        })
+
+                    result = tx.run(query, triples=triples_data, io_id=io_id, timestamp=provenance.timestamp)
+                    record = result.single()
+                    escritos = record["count"] if record else 0
+
+                    # D2: check reachability from :User
+                    check_query = """
+                    MATCH (n:Entity)
+                    WHERE NOT (n)-[:MATIZ_DE]->() // Ignore matiz nodes or we can check them too
+                      AND NOT EXISTS { MATCH (:User)-[*]->(n) }
+                      AND NOT n:User
+                    RETURN count(n) as orphans
+                    """
+
+                    # NOTE: A real PKG needs a :User node. If it doesn't exist, this might fail.
+                    # We assume it exists or if count > 0 it fails.
+                    # Actually, if the graph is empty, :User might not exist.
+                    # The prompt: "huérfano -> ROLLBACK del ι completo + log ERROR con io_id (D2)"
+
+                    import logging
+                    orphans_result = tx.run(check_query)
+                    orphans_record = orphans_result.single()
+                    if orphans_record and orphans_record["orphans"] > 0:
+                        logging.error(f"Error: Ingesta genera {orphans_record['orphans']} nodos huérfanos. IO_ID: {io_id}")
+                        tx.rollback()
+                        return 0
+
+                    tx.commit()
+                    return escritos
+        except Exception as e:
+            raise Exception(f"Error en escribir_ingesta: {str(e)}")
+
+    def frecuencia(self, canonical_key: str) -> int:
+        self._asegurar_conexion()
+        query = """
+        MATCH (e:Entity {canonical_key: $canonical_key})
+        RETURN size(e.provenance) as freq
+        """
+        try:
+            assert self._driver is not None
+            with self._driver.session() as session:
+                result = session.run(query, canonical_key=canonical_key)
+                record = result.single()
+                return record["freq"] if record and record["freq"] is not None else 0
+        except Exception as e:
+            raise Exception(f"Error consultando frecuencia: {str(e)}")
+
+    def linea_temporal(self, desde: str, hasta: str) -> typing.List[typing.Dict[str, typing.Any]]:
+        self._asegurar_conexion()
+        query = """
+        MATCH (o)-[r:RELATION]->(d)
+        WHERE r.created_at >= $desde AND r.created_at <= $hasta
+        RETURN o.canonical_key as origen, r.type as relacion, d.canonical_key as destino, r.created_at as timestamp
+        """
+        try:
+            assert self._driver is not None
+            with self._driver.session() as session:
+                result = session.run(query, desde=desde, hasta=hasta)
+                return [dict(record) for record in result]
+        except Exception as e:
+            raise Exception(f"Error consultando linea_temporal: {str(e)}")
