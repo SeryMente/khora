@@ -4,9 +4,9 @@ from khora_kernel.api import (
     MotorDeConsulta,
     MotorDeIngesta,
     MotorDeOlvido,
+    NivelSuficiencia,
     Provenance,
     ResultadoDeConsulta,
-    NivelSuficiencia,
     SubgrafoRelevante,
 )
 

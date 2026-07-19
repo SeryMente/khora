@@ -1,21 +1,18 @@
-import os
 import sqlite3
 import typing
-from dataclasses import dataclass
 from pathlib import Path
 
 from khora_kernel.api import (
+    AristaSubgrafo,
     ContextoDeVisibilidad,
     EntidadIngresada,
     MotorDeConsulta,
     NivelSuficiencia,
+    NodoSubgrafo,
     Provenance,
     ResultadoDeConsulta,
     SubgrafoRelevante,
-    NodoSubgrafo,
-    AristaSubgrafo,
 )
-
 
 # @req: khora.consulta.sqlite_vec
 # @req: khora.consulta.embeddings
