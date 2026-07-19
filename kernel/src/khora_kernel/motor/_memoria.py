@@ -177,15 +177,19 @@ class Neo4jMemoriaOrganizada:
 
     def buscar_entidades_candidatas(self, label_norm: str) -> typing.List[typing.Dict[str, typing.Any]]:
         self._asegurar_conexion()
+        import os
+        limit = int(os.environ.get("KHORA_ER_CAND_LIMIT", "500"))
         query = """
         MATCH (e:Entity)
-        WHERE e.canonical_key = $label_norm
+        WITH e
+        ORDER BY CASE WHEN e.canonical_key = $label_norm THEN 0 ELSE 1 END
         RETURN e.canonical_key AS canonical_key, e.embedding AS embedding, e.provenance AS provenance
+        LIMIT $lim
         """
         try:
             assert self._driver is not None
             with self._driver.session() as session:
-                result = session.run(query, label_norm=label_norm)
+                result = session.run(query, label_norm=label_norm, lim=limit)
                 candidatos = []
                 for record in result:
                     candidatos.append({
