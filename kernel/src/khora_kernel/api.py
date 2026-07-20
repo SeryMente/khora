@@ -100,6 +100,7 @@ class SolicitudLLM:
     sistema: str | None
     formato_estricto: tuple[str, ...] | None
     metadata: dict
+    imagenes_base64: list[str] | None = None
 
 
 @dataclass(frozen=True)
