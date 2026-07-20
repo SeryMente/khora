@@ -46,7 +46,7 @@ export default function RootMenu() {
           </div>
         </Link>
 
-        <Link href="/sistemas" className="block outline-none focus:outline-none">
+        <Link href="/sistema" className="block outline-none focus:outline-none">
           <div className="bg-[#112A4F] border border-[#1F3C6A] hover:border-[#3FA7FF] hover:bg-[#112A4F]/80 transition-all duration-200 ease-in-out rounded-2xl p-10 flex flex-col items-center gap-6 shadow-2xl cursor-pointer group h-full">
             <div className="w-16 h-16 rounded-2xl bg-white/[0.03] border border-white/10 group-hover:bg-white/[0.06] group-hover:border-[#3FA7FF]/30 flex items-center justify-center transition-all duration-200 ease-in-out">
               <Server className="w-8 h-8 text-cora-surface group-hover:text-[#3FA7FF] transition-colors duration-200 ease-in-out" />
