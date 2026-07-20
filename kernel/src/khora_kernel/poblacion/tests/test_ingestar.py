@@ -279,7 +279,7 @@ def test_provenance():
     # Attempt to write without provenance => rejected
     memoria = MockMemoria()
     try:
-        memoria.escribir_ingesta([], None)
+        memoria.escribir_ingesta([], None) # type: ignore
         assert False, "Should have raised exception"
     except Exception as e:
         assert "provenance" in str(e).lower()

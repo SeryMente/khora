@@ -71,6 +71,7 @@ class ResultadoDeConsulta:
     subgrafo: SubgrafoRelevante
     suficiencia: NivelSuficiencia
     resumenes_incluidos: bool
+    degradacion_declarada: str | None = None
 
 
 class MotorDeIngesta(Protocol):

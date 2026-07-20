@@ -26,12 +26,13 @@ class ProveedorOpenAICompatible:
             "Authorization": f"Bearer {self.api_key}",
         }
 
-        messages = []
+        import typing
+        messages: typing.List[typing.Dict[str, typing.Any]] = []
         if solicitud.sistema:
             messages.append({"role": "system", "content": solicitud.sistema})
 
         if solicitud.imagenes_base64:
-            content_list = [{"type": "text", "text": solicitud.prompt}]
+            content_list: typing.List[typing.Dict[str, typing.Any]] = [{"type": "text", "text": solicitud.prompt}]
             for img_b64 in solicitud.imagenes_base64:
                 # We assume the caller might send the prefix or not.
                 # If they just send raw base64, we need the prefix. If they send a URL, we need to handle it.
