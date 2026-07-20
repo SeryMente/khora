@@ -1,6 +1,12 @@
-export interface InformationObject<TContent = unknown> {
+export interface Provenance {
+  origen: string;
+  driver: string | null;
+  timestamp: string;
+}
+
+export interface ObjetoDeInformacion {
   id: string;
-  timestamp: number;
-  source: 'bitacora' | 'cabina_opi_vri' | 'harmonia';
-  content: TContent;
+  texto: string;
+  provenance: Provenance;
+  metadata: Record<string, string>;
 }
