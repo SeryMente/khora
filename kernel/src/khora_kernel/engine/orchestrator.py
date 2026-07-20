@@ -41,6 +41,7 @@ def ask_with_fallback(
         # 4. Fallback inyecta en Ht
         fallback(
             session_id=current_session_id,
+            pregunta=question,
             referencia_modalidad=referencia_modalidad,
             puerto_vision=puerto_vision,
             db_path=db_path
