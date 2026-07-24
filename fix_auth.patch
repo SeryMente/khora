@@ -1,0 +1,19 @@
+--- khora-web/auth.ts
++++ khora-web/auth.ts
+@@ -12,11 +12,10 @@
+       clientSecret: process.env.OIDC_CLIENT_SECRET,
+     },
+   ],
+-  secret: process.env.AUTH_SECRET,
++  secret: (() => {
++    const s = process.env.AUTH_SECRET;
++    if (!s) throw new Error("AUTH_SECRET env var is required — no fallback allowed");
++    return s;
++  })(),
+   trustHost: true, // We trust the host where Next-Auth is running (especially in playwright and standard vercel deploys)
+ });
+-
+-// Fail early if no AUTH_SECRET is provided (prevents production leaks)
+-if (!process.env.AUTH_SECRET) {
+-  throw new Error("AUTH_SECRET is missing. Server startup aborted to prevent insecure fallback.");
+-}
