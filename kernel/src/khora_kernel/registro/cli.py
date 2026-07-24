@@ -1,3 +1,4 @@
+# @l0 L0-002-R · @req KA-00/REQ-2 · @acr ACR-2.1
 import json
 import sys
 from pathlib import Path
@@ -113,8 +114,18 @@ def main():
             print("Uso: khora importar <origen>")
             sys.exit(1)
         comando_importar(args[1])
+
+    elif comando == "audit":
+        import subprocess
+        kernel_dir = Path(__file__).resolve().parent.parent.parent.parent
+        audit_script = kernel_dir / "tools" / "khora_audit.py"
+        if not audit_script.exists():
+            print(f"Error: No se encontró khora_audit.py en {audit_script}")
+            sys.exit(1)
+        result = subprocess.run([sys.executable, str(audit_script)] + args[1:])
+        sys.exit(result.returncode)
     else:
-        print("Uso: khora [registro|exportar|importar]")
+        print("Uso: khora [registro|exportar|importar|audit]")
         sys.exit(1)
 
 if __name__ == "__main__":
