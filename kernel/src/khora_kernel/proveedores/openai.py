@@ -27,7 +27,8 @@ class ProveedorOpenAICompatible:
             "Authorization": f"Bearer {self.api_key}",
         }
 
-        messages = []
+        import typing
+        messages: list[typing.Any] = []
         if solicitud.sistema:
             messages.append({"role": "system", "content": solicitud.sistema})
 
@@ -39,7 +40,7 @@ class ProveedorOpenAICompatible:
                 # OpenAI format: {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{img_b64}"}}
                 # If the string already starts with "data:image" or "http", use as is. Otherwise prepend.
                 url_str = img_b64 if img_b64.startswith("data:image") or img_b64.startswith("http") else f"data:image/jpeg;base64,{img_b64}"
-                content_list.append({"type": "image_url", "image_url": {"url": url_str}})
+                content_list.append(typing.cast(typing.Any, {"type": "image_url", "image_url": {"url": url_str}}))
             messages.append({"role": "user", "content": content_list})
         else:
             messages.append({"role": "user", "content": solicitud.prompt})

@@ -1,8 +1,12 @@
 # @l0 L0-002-R · @req KA-00/REQ-2 · @acr ACR-2.1
-import json
 from typing import Any, List, Optional
 
-from khora_kernel.api import ActaDeIngesta, ObjetoDeInformacion, PuertoEmbeddings, PuertoLLM
+from khora_kernel.api import (
+    ActaDeIngesta,
+    ObjetoDeInformacion,
+    PuertoEmbeddings,
+    PuertoLLM,
+)
 from khora_kernel.constructor import extraer, normalizar, phi_m
 from khora_kernel.resolucion import resolver
 

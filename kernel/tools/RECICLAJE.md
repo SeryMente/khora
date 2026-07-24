@@ -1,19 +1,6 @@
-# Censo de Módulos Pre-PCA
+# Protocolo de Reciclaje (Fase 0)
+## Componente: `kernel/src/khora_kernel/motor/` y Schema J6
 
-| Módulo | Veredicto | Evidencia |
-| :--- | :--- | :--- |
-| `khora_kernel.engine.core` | REFACTORIZA | Implementa agente principal pero requiere añadir cabeceras. |
-| `khora_kernel.engine.fallback` | REFACTORIZA | Implementa Fallback pero requiere añadir cabeceras. |
-| `khora_kernel.engine.fval` | REFACTORIZA | Implementa fVAL pero requiere añadir cabeceras. |
-| `khora_kernel.poblacion._ingestar` | REFACTORIZA | Implementa ingesta pero requiere añadir cabeceras. |
-| `khora_kernel.constructor` | REFACTORIZA | Implementa constructor pero requiere añadir cabeceras. |
-| `khora_kernel.resolucion` | REFACTORIZA | Implementa resolución de entidades pero requiere añadir cabeceras. |
-| `khora_kernel.embeddings` | REFACTORIZA | Implementa generación de embeddings pero requiere añadir cabeceras. |
-| `khora_kernel.communities` | REFACTORIZA | Implementa comunidades (Leiden) pero requiere añadir cabeceras. |
-| `khora_kernel.summaries` | REFACTORIZA | Implementa resúmenes pero requiere añadir cabeceras. |
-| `khora_kernel.consulta` | REFACTORIZA | Implementa RAG/retrieval pero requiere añadir cabeceras. |
-| `khora_kernel.psi` | REFACTORIZA | Implementa orquestación de embeddings pero requiere añadir cabeceras. |
-| `khora_kernel.proveedores` | REFACTORIZA | Proveedor LLM requiere añadir cabeceras. |
-| `kernel/tests/*` | REFACTORIZA | Tests requieren añadir cabeceras y verificar que no hay mocks mezclados con `@acr` en pruebas reales. |
-| `kernel/tools/khora_audit.py` | RECICLA | Instrumento de auditoría post-merge (KA-00) |
-| `kernel/tests/test_tvis_refinamiento.py` | CUARENTENA | Usa mocks y rompe Z-CIA. Movido fuera del árbol del núcleo a `cuarentena/`. |
+- **Decisión:** RECONSTRUYE
+- **Motivo:** El sustrato actual (schema J6) no es un modelo bi-temporal `G=(N,R,T)` donde los conjuntos de nodos sean estrictamente disjuntos (`N = Ne U L U B`). La tarea `PKG-00` (PCA v0.2) exige un rediseño que cumpla con los requerimientos UA-01 a UA-04.
+- **Acción:** Se deprecará la implementación del esquema antiguo en `motor/`, conservando `api.py` como contrato, y se rehará como un sustrato bi-temporal puro asegurando alcanzabilidad desde el nodo raíz `:User`.
