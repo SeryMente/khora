@@ -1,3 +1,4 @@
+# @l0 L0-002-R · @req KA-00/REQ-2 · @acr ACR-2.1
 from khora_kernel.engine.core import ask
 from khora_kernel.engine.history import Ht, HtStep, HtEvidence, Response
 from khora_kernel.engine.fval import fval, ValidatedResponse, get_verdict
