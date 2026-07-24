@@ -1,9 +1,9 @@
 # @l0 L0-002-R · @req KA-00/REQ-1 · @acr ACR-1.1
+import argparse
 import os
 import re
-import sys
-import argparse
 import subprocess
+import sys
 from pathlib import Path
 
 # Headers tracking
@@ -186,19 +186,19 @@ def main():
     if pass_a:
         print("[PASS] REQ-1 (a): Cabecera de trazabilidad en todo archivo nuevo o modificado.")
     else:
-        print(f"[FAIL] REQ-1 (a): Archivos sin cabecera encontrada:\n  " + "\n  ".join(orphans))
+        print("[FAIL] REQ-1 (a): Archivos sin cabecera encontrada:\n  " + "\n  ".join(orphans))
         all_passed = False
 
     if pass_b:
         print("[PASS] REQ-1 (b): Traza cabecera -> ACR ratificado.")
     else:
-        print(f"[FAIL] REQ-1 (b): Cabeceras con ACR faltante en:\n  " + "\n  ".join(missing_acr))
+        print("[FAIL] REQ-1 (b): Cabeceras con ACR faltante en:\n  " + "\n  ".join(missing_acr))
         all_passed = False
 
     if pass_e:
         print("[PASS] REQ-2 (e): Conformidad LISA total del árbol del núcleo (cero huérfanos).")
     else:
-        print(f"[FAIL] REQ-2 (e): Archivos huérfanos encontrados:\n  " + "\n  ".join(orphans))
+        print("[FAIL] REQ-2 (e): Archivos huérfanos encontrados:\n  " + "\n  ".join(orphans))
         all_passed = False
 
     # (c)
@@ -206,7 +206,7 @@ def main():
     if pass_c:
         print("[PASS] REQ-1 (c): Pruebas por ACR con salida real, nunca declarada (sin mocks).")
     else:
-        print(f"[FAIL] REQ-1 (c): Pruebas simuladas etiquetadas como reales en:\n  " + "\n  ".join(failing_tests))
+        print("[FAIL] REQ-1 (c): Pruebas simuladas etiquetadas como reales en:\n  " + "\n  ".join(failing_tests))
         all_passed = False
 
     # (d)
@@ -222,7 +222,7 @@ def main():
     if pass_f:
         print("[PASS] REQ-2 (f): Registro de reciclaje en PR para módulos pre-PCA.")
     else:
-        print(f"[FAIL] REQ-2 (f): Falla en registro de reciclaje:\n  " + "\n  ".join(f_errors))
+        print("[FAIL] REQ-2 (f): Falla en registro de reciclaje:\n  " + "\n  ".join(f_errors))
         all_passed = False
 
     print("\n" + "="*50 + "\n")

@@ -1,8 +1,8 @@
-# @l0 L0-002-R · @req KA-00/REQ-2 · @acr ACR-2.1
+# @l0 L0-002 · @req ING-01/REQ-1 · @acr ACR-1.1,ACR-1.2,ACR-1.3 · @ua UA-06
 
+import hashlib
 import math
 import os
-import hashlib
 import unicodedata
 from collections import defaultdict
 from typing import Any
@@ -161,7 +161,10 @@ def resolver(
             destino_id=mapeo_claves.get(t.destino_id, t.destino_id),
             relacion=t.relacion,
             provenance=t.provenance,
-            metadata=t.metadata
+            metadata=t.metadata,
+            valid_at=t.valid_at,
+            invalid_at=t.invalid_at,
+            created_at=t.created_at
         )
         triples_resueltos.append(nuevo_t)
 

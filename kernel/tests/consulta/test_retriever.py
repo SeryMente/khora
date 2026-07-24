@@ -1,14 +1,10 @@
 # @l0 L0-002-R · @req KA-00/REQ-2 · @acr ACR-2.1
-from pathlib import Path
 
 import pytest
 
-from khora_kernel.api import (
-    ContextoDeVisibilidad,
-    NivelSuficiencia,
-    PuertoEmbeddings
-)
+from khora_kernel.api import ContextoDeVisibilidad, NivelSuficiencia, PuertoEmbeddings
 from khora_kernel.consulta.retriever import RetrieverGraphRAG
+
 
 class MockPuertoEmbeddings(PuertoEmbeddings):
     def incrustar(self, textos: list[str]) -> list[list[float]]:
@@ -41,7 +37,12 @@ class MockMemoriaMultiHop:
         }
 
     def mock_multi_hop(self, semillas_ids, contexto, max_hops):
-        from khora_kernel.api import EntidadIngresada, NodoSubgrafo, AristaSubgrafo, Provenance
+        from khora_kernel.api import (
+            AristaSubgrafo,
+            EntidadIngresada,
+            NodoSubgrafo,
+            Provenance,
+        )
 
         if not semillas_ids:
             return None
@@ -107,6 +108,8 @@ class MockMemoriaMultiHop:
 
 # Monkeypatch knn for testing
 import khora_kernel.embeddings
+
+
 def mock_knn(query: str, k: int):
     if "khora" in query.lower():
         return [("khora", 1.0)]
@@ -175,6 +178,7 @@ def test_insuficiente(retriever: RetrieverGraphRAG):
 
 import os
 
+
 @pytest.mark.skipif(not os.environ.get('KHORA_NEO4J_TEST_URI'), reason="Requiere base de datos Neo4j real (patrón M-1)")
 def test_integracion_neo4j(retriever: RetrieverGraphRAG):
     """Prueba real contra base de datos Neo4j."""
@@ -182,6 +186,7 @@ def test_integracion_neo4j(retriever: RetrieverGraphRAG):
     # la expansión de subgrafo en un DB.
     # Dado que es un test skip-if-no-docker, validaremos instanciando Neo4jMemoriaOrganizada
     import os
+
     from khora_kernel.motor._memoria import Neo4jMemoriaOrganizada
 
     uri = os.environ.get("KHORA_NEO4J_TEST_URI", "bolt://localhost:7687")

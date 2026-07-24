@@ -3,8 +3,8 @@ from typing import Optional
 
 from khora_kernel.api import PuertoVision
 from khora_kernel.engine.core import ask
-from khora_kernel.engine.fval import fval
 from khora_kernel.engine.fallback import fallback
+from khora_kernel.engine.fval import fval
 from khora_kernel.engine.history import load_ht
 
 

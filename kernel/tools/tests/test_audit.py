@@ -1,6 +1,7 @@
 # @l0 L0-002-R · @req KA-00/REQ-1 · @acr ACR-1.1
-import subprocess
 import os
+import subprocess
+
 
 def test_khora_audit_cli():
     env = os.environ.copy()

@@ -1,15 +1,23 @@
 # @l0 L0-002-R · @req KA-00/REQ-2 · @acr ACR-2.1
 import os
-import uuid
 import re
+import uuid
 from datetime import datetime
-from typing import Optional, List, Tuple
+from typing import List, Optional
 
-from khora_kernel.engine.history import Ht, HtStep, HtEvidence, Response, save_ht, load_ht
+from khora_kernel.api import PuertoLLM, SolicitudLLM
 from khora_kernel.embeddings import knn
-from khora_kernel.summaries import get_all_communities
-from khora_kernel.api import SolicitudLLM, PuertoLLM
+from khora_kernel.engine.history import (
+    Ht,
+    HtEvidence,
+    HtStep,
+    Response,
+    load_ht,
+    save_ht,
+)
 from khora_kernel.proveedores.openai import ProveedorOpenAICompatible
+from khora_kernel.summaries import get_all_communities
+
 
 def is_local_query(question: str) -> bool:
     """
