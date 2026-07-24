@@ -12,6 +12,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       clientSecret: process.env.OIDC_CLIENT_SECRET,
     },
   ],
-  secret: process.env.AUTH_SECRET || "fallback-secret-for-dev",
+  secret: (() => { const s = process.env.AUTH_SECRET; if (!s) throw new Error("AUTH_SECRET env var is required — no fallback allowed"); return s; })(),
   trustHost: true, // We trust the host where Next-Auth is running (especially in playwright and standard vercel deploys)
 });
