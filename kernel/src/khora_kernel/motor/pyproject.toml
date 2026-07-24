@@ -1,9 +1,8 @@
-# @l0 L0-002 · @req PKG-00/REQ-1 · @acr ACR-1.1
-# @ua UA-01, UA-02, UA-03, UA-04
 [project]
 name = "khora-motor"
 version = "0.1.0"
 requires-python = ">=3.11"
 dependencies = [
-    "neo4j>=5.0.0"
+    "neo4j>=5.0.0",
+    "testcontainers>=4.7.1"
 ]

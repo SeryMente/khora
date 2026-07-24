@@ -24,8 +24,12 @@ def test_acr_1_1_restriccion_union_disjunta(neo4j_driver, neo4j_config):
         password=neo4j_config["password"]
     )
 
+    # Simulate a transaction that creates a double-labeled node, which should trigger rollback logic.
+    # Note: the python client logic enforces this on merge_entidad / escribir_ingesta.
+
+    # Let's bypass the API and write a bad node, then try to run `escribir_ingesta` which should catch it and rollback.
     with neo4j_driver.session() as session:
-        session.run("CREATE (n:Entity:Literal {id: 'doble_clase'})")
+        session.run("CREATE (n:Entity:Literal {canonical_key: 'doble_clase'})")
 
     provenance = Provenance("test", "driver1", "2026-07-23T12:00:00Z")
     triple = Triple(
@@ -41,7 +45,7 @@ def test_acr_1_1_restriccion_union_disjunta(neo4j_driver, neo4j_config):
         memoria.escribir_ingesta([triple], provenance)
 
     with neo4j_driver.session() as session:
-        session.run("MATCH (n:Entity:Literal {id: 'doble_clase'}) DETACH DELETE n")
+        session.run("MATCH (n:Entity:Literal {canonical_key: 'doble_clase'}) DETACH DELETE n")
 
 
 def test_acr_1_2_alcanzabilidad(neo4j_driver, neo4j_config):
@@ -57,6 +61,8 @@ def test_acr_1_2_alcanzabilidad(neo4j_driver, neo4j_config):
 
     provenance = Provenance("test", "driver1", "2026-07-23T12:00:00Z")
 
+    # Try inserting an orphan node
+    # Since `escribir_ingesta` creates the root node, if we just link two new nodes, they will be orphans.
     triple_orphan = Triple(
         id="t2",
         origen_id="n1",
@@ -66,9 +72,11 @@ def test_acr_1_2_alcanzabilidad(neo4j_driver, neo4j_config):
         metadata={}
     )
 
-    with pytest.raises(ValueError, match="nodos huérfanos"):
-        memoria.escribir_ingesta([triple_orphan], provenance)
+    # This should return 0 (rollback)
+    escritos = memoria.escribir_ingesta([triple_orphan], provenance)
+    assert escritos == 0
 
+    # Try inserting a reachable node
     triple_reachable = Triple(
         id="t3",
         origen_id="root",
@@ -81,6 +89,7 @@ def test_acr_1_2_alcanzabilidad(neo4j_driver, neo4j_config):
     escritos = memoria.escribir_ingesta([triple_reachable], provenance)
     assert escritos == 1
 
+    # Verify 100% reachability from root
     with neo4j_driver.session() as session:
         res = session.run("MATCH (n) WHERE NOT (n:User AND n.id='root') AND NOT EXISTS { MATCH (:User {id:'root'})-[*]->(n) } RETURN count(n) as orphans")
         orphans = res.single()["orphans"]
@@ -96,7 +105,8 @@ def test_acr_2_1_campos_bitemporales(neo4j_driver, neo4j_config):
     )
 
     with neo4j_driver.session() as session:
-        session.run("CREATE (n:Entity {id: 'n_invalid'})")
+        # Intentionally create a node missing bitemporal fields
+        session.run("CREATE (n:Entity {canonical_key: 'n_invalid'})")
 
     provenance = Provenance("test", "driver1", "2026-07-23T12:00:00Z")
     triple = Triple(
@@ -108,5 +118,6 @@ def test_acr_2_1_campos_bitemporales(neo4j_driver, neo4j_config):
         metadata={}
     )
 
+    # Ingestion should catch the invalid node and rollback
     with pytest.raises(ValueError, match="Violación de restricción bi-temporal"):
         memoria.escribir_ingesta([triple], provenance)
