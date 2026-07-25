@@ -1,0 +1,193 @@
+﻿[13:02:55][STEP] Versionado v6.4.9
+[13:02:55][OK  ] Version v6.4.9 ya archivada en versions\.
+[13:02:55][OK  ] Nombre de archivo coherente con la version interna.
+[13:02:55][STEP] PREFLIGHT - diagnostico de compatibilidad
+[13:02:55][OK  ] PowerShell 5.1.26100.8875
+[13:02:56][OK  ] Internet -> github.com (63ms)
+[13:02:56][OK  ] Git: git version 2.45.2.windows.1
+[13:02:56][OK  ] winget disponible.
+[13:02:56][OK  ] Escritura en workdir OK (C:\Users\fila4\AppData\Local\khora-session)
+[13:02:56][OK  ] Chrome detectado.
+[13:02:56][OK  ] VS Code detectado.
+[13:02:56][OK  ] ExecutionPolicy: RemoteSigned
+[13:02:56][STEP] Escaneo de keyloggers (heuristico)
+[13:02:56][WARN] No reemplaza un antivirus.
+[13:02:56][INFO] Procesos activos...
+[13:02:56][INFO] Entradas de inicio (registro)...
+[13:02:56][INFO] Startup OK: OneDriveSetup
+[13:02:56][INFO] Startup OK: SecurityHealth
+[13:02:56][INFO] Startup OK: Sentinel Agent
+[13:02:56][INFO] Filtros de teclado (UpperFilters del driver HID)...
+[13:02:56][OK  ] Filtros normales detectados: kbdclass
+[13:02:56][OK  ] RESULTADO: Sin keyloggers conocidos detectados (0 sospechosos).
+[13:02:56][INFO] Escaneo keyloggers completado: 0 sospechosos
+[13:02:56][STEP] Monitor de acceso remoto / exfiltracion (RAT)
+[13:02:56][WARN] Heuristico: no reemplaza un EDR/antivirus.
+[13:02:56][INFO] Buscando software de control remoto en ejecucion...
+[13:02:56][OK  ] Sin software de control remoto conocido en ejecucion.
+[13:02:56][INFO] Sesiones de escritorio remoto (RDP) entrantes...
+[13:02:57][OK  ] Sin sesiones RDP entrantes activas.
+[13:02:57][INFO] Conexiones externas de procesos de control remoto...
+[13:02:59][OK  ] Sin conexiones externas atribuibles a control remoto.
+[13:02:59][INFO] Conexiones externas establecidas en total: 47
+[13:03:01][OK  ] Linea base de red registrada (14237 MB enviados acumulados).
+[13:03:01][OK  ] RESULTADO: sin indicios de acceso remoto activo (0 alertas).
+[13:03:01][INFO] Scan-RemoteAccess: 0 alertas, 47 conexiones externas
+[13:03:01][INFO] RAM libre: 8.1GB | Disco: 76.2GB
+[13:03:01][OK  ] Internet OK
+[13:03:01][WARN] Sin repo.
+[13:03:01][OK  ] Git user.name limpio.
+[13:03:01][OK  ] Sin token en memoria.
+[13:03:01][INFO] Guardian inactivo.
+[13:03:01][INFO] Diagnostico automatico de arranque completado (preflight + keyloggers + estado).
+[13:03:02][INFO] Menu principal activo. La ventana de log ya muestra el diagnostico de arranque.
+[13:05:43][INFO] Tecla: [1]
+[13:05:43][STEP] === INICIO DE SESION === 2026-07-25 13:05:43 === fila4 @ PC10RCIF4EI4 ===
+[13:05:43][INFO] Script v6.4.9 | Path: C:\Users\fila4\Desktop\khora\khora-v6.4.9.ps1
+[13:05:43][INFO] Workdir: C:\Users\fila4\AppData\Local\khora-session
+[13:05:43][INFO] Log principal: C:\Users\fila4\Desktop\khora\logs\2026-07-25.log
+[13:05:43][INFO] Log workdir:   C:\Users\fila4\AppData\Local\khora-session\session-2026-07-25.log
+[13:05:43][INFO] Repo destino:  C:\Users\fila4\AppData\Local\khora-session\repo
+[13:05:43][INFO] PowerShell: 5.1.26100.8875 | OS: Microsoft Windows NT 10.0.26200.0
+[13:05:43][INFO] Elevated: True
+[13:05:43][STEP] Perfil de trabajo
+[13:05:43][INFO] DeteccionUsuarioReal [M1 WMI ComputerSystem] EXITO -> 'CENTRAL\fila4' (corto: 'fila4')
+[13:05:43][INFO] DeteccionUsuarioReal [DECISION] usuario real 'fila4' == usuario del proceso 'fila4': mismo usuario, sin redireccion necesaria.
+[13:05:43][OK  ] Deteccion usuario real: metodo con exito = M1: WMI Win32_ComputerSystem.UserName -> detectado: fila4
+[13:05:43][OK  ] Usuario real (fila4) == usuario del proceso: mismo usuario, sin redireccion necesaria.
+[13:05:43][OK  ] Usuario : fila4  |  Perfil : C:\Users\fila4
+[13:05:43][INFO] Proceso elevado (admin) con la MISMA cuenta que el usuario de trabajo. OK.
+[13:05:43][STEP] PREFLIGHT - diagnostico de compatibilidad
+[13:05:43][OK  ] PowerShell 5.1.26100.8875
+[13:05:43][OK  ] Internet -> github.com (64ms)
+[13:05:43][OK  ] Git: git version 2.45.2.windows.1
+[13:05:43][OK  ] winget disponible.
+[13:05:43][OK  ] Escritura en workdir OK (C:\Users\fila4\AppData\Local\khora-session)
+[13:05:43][OK  ] Chrome detectado.
+[13:05:43][OK  ] VS Code detectado.
+[13:05:43][OK  ] ExecutionPolicy: RemoteSigned
+[13:05:43][STEP] Politica de ejecucion
+[13:05:43][OK  ] ExecutionPolicy OK: RemoteSigned
+[13:05:43][STEP] Cifrado en reposo (EFS)
+[13:05:44][WARN] EFS deshabilitado por directiva del dominio (cert. de recuperacion no valido).
+[13:05:44][WARN]   Respaldo vigente: limpieza nuclear [X] + DeepFreeze del cyber.
+[13:05:44][STEP] Autenticacion GitHub (token en SecureString)
+[13:05:44][INFO] Copia el token al portapapeles (Ctrl+C), luego presiona ENTER (intento 1/3)...
+[13:05:47][OK  ] Token capturado del portapapeles. Portapapeles limpiado.
+[13:05:47][INFO] Validando token con la API...
+[13:05:49][OK  ] Token valido. Acceso confirmado a SeryMente/khora
+[13:05:49][STEP] Configuracion Git
+[13:05:49][OK  ] user.name  = Black Sheep
+[13:05:49][OK  ] user.email = blacksheepsup@gmail.com
+[13:05:49][OK  ] credential.helper = vacio (sin credenciales en disco)
+[13:05:49][OK  ] core.autocrlf = input
+[13:05:49][OK  ] core.longpaths = true
+[13:05:49][OK  ] Prompts interactivos de Git/GCM deshabilitados (solo token por header).
+[13:05:49][STEP] Clonando SeryMente/khora (metodo: URL-token efimera, token NO queda en disco)
+[13:05:49][INFO] git clone -- intento 1/3... [metodo: x-access-token@github.com | GCM bypaseado por diseno]
+[13:05:56][OK  ] Repo clonado. Branch: main | Archivos: 378
+[13:05:56][OK  ] Ultimo commit: ab0efb6 feat(kernel): tVIS co-rutina de refinamiento visual efímera (VIS-01) (#114)
+[13:05:56][WARN] Repo SIN cifrado en disco (EFS no disponible). Protegen: limpieza [X] + DeepFreeze.
+[13:05:56][OK  ] Entrada escrita en repo/logs/sessions.log
+[13:05:56][OK  ] Rama de respaldo creada: wip/auto-2026-07-25-21300
+[13:06:01][OK  ] Rama WIP publicada y VERIFICADA en remoto.
+[13:06:01][STEP] Entorno de desarrollo (Python + Node + Docker + Vercel + Render)
+[13:06:01][OK  ] Vars LLM cargadas desde: C:\Users\fila4\Desktop\khora\.khora.env
+[13:06:01][OK  ] .env escrito en repo para uvicorn.
+[13:06:01][INFO] === Ensure-Python311: buscando Python 3.11+ ===
+[13:06:01][INFO]   Candidato python en C:\Users\MantenimientoRCI\AppData\Local\Programs\Python\Python311\python.exe: Python 3.11.9
+[13:06:01][OK  ] Python OK: Python 3.11.9 (C:\Users\MantenimientoRCI\AppData\Local\Programs\Python\Python311\python.exe)
+[13:06:01][INFO] === Setup-Venv: configurando entorno virtual Python ===
+[13:08:42][INFO] pip install -e . (dependencias Python) completado en 02:24
+[13:08:42][INFO] pip:   error: subprocess-exited-with-error
+[13:08:42][INFO] pip:   
+[13:08:42][INFO] pip:   Getting requirements to build editable did not run successfully.
+[13:08:42][INFO] pip:   exit code: 1
+[13:08:42][INFO] pip:   
+[13:08:42][INFO] pip:   [2 lines of output]
+[13:08:42][INFO] pip: [notice] A new release of pip is available: 24.0 -> 26.1.2
+[13:08:42][INFO] pip: [notice] To update, run: C:\Users\fila4\AppData\Local\khora-session\venv\Scripts\python.exe -m pip install --upgrade pip
+[13:08:42][OK  ] Venv Python listo: C:\Users\fila4\AppData\Local\khora-session\venv
+[13:08:42][INFO] === Ensure-Node: verificando Node.js ===
+[13:08:43][INFO] Node en PATH: C:\Program Files\nodejs\node.exe vv24.0.0
+[13:08:43][OK  ] Node OK: v24.0.0
+[13:09:05][INFO] npm ci (khora-web) completado en 00:21
+[13:09:05][INFO] npm: npm warn ERESOLVE overriding peer dependency
+[13:09:05][INFO] npm: npm warn While resolving: @auth/core@0.41.3
+[13:09:05][INFO] npm: npm warn Found: nodemailer@9.0.3
+[13:09:05][INFO] npm: npm warn node_modules/nodemailer
+[13:09:05][INFO] npm: npm warn   nodemailer@"^9.0.3" from the root project
+[13:09:05][INFO] npm: npm warn
+[13:09:05][INFO] npm: npm warn Could not resolve dependency:
+[13:09:05][INFO] npm: npm warn peerOptional nodemailer@"^7.0.7 || ^8.0.5" from @auth/core@0.41.3
+[13:09:05][INFO] npm: npm warn node_modules/@auth/core
+[13:09:05][INFO] npm: npm warn   @auth/core@"0.41.3" from next-auth@5.0.0-beta.32
+[13:09:05][INFO] npm: npm warn   node_modules/next-auth
+[13:09:05][INFO] npm: npm warn
+[13:09:05][INFO] npm: npm warn Conflicting peer dependency: nodemailer@8.0.11
+[13:09:05][INFO] npm: npm warn node_modules/nodemailer
+[13:09:05][INFO] npm: npm warn   peerOptional nodemailer@"^7.0.7 || ^8.0.5" from @auth/core@0.41.3
+[13:09:05][INFO] npm: npm warn   node_modules/@auth/core
+[13:09:05][INFO] npm: npm warn     @auth/core@"0.41.3" from next-auth@5.0.0-beta.32
+[13:09:05][INFO] npm: npm warn     node_modules/next-auth
+[13:09:05][INFO] npm: npm error code ERESOLVE
+[13:09:05][INFO] npm: npm error   nodemailer@"^9.0.3" from the root project
+[13:09:05][INFO] npm: npm error
+[13:09:05][INFO] npm: npm error Could not resolve dependency:
+[13:09:05][INFO] npm: npm error peerOptional nodemailer@"^7.0.7 || ^8.0.5" from next-auth@5.0.0-beta.32
+[13:09:05][INFO] npm: npm error node_modules/next-auth
+[13:09:05][INFO] npm: npm error   next-auth@"^5.0.0-beta.32" from the root project
+[13:09:05][INFO] npm: npm error
+[13:09:05][INFO] npm: npm error Conflicting peer dependency: nodemailer@8.0.11
+[13:09:05][INFO] npm: npm error node_modules/nodemailer
+[13:09:05][INFO] npm: npm error   peerOptional nodemailer@"^7.0.7 || ^8.0.5" from next-auth@5.0.0-beta.32
+[13:09:05][INFO] npm: npm error   node_modules/next-auth
+[13:09:05][INFO] npm: npm error     next-auth@"^5.0.0-beta.32" from the root project
+[13:09:05][INFO] npm: npm error
+[13:09:05][INFO] npm: npm error Fix the upstream dependency conflict, or retry
+[13:09:05][INFO] npm: npm error this command with --force or --legacy-peer-deps
+[13:09:05][INFO] npm: npm error to accept an incorrect (and potentially broken) dependency resolution.
+[13:09:06][INFO] npm: npm error C:\Users\fila4\AppData\Local\npm-cache\_logs\2026-07-25T19_08_51_748Z-eresolve-report.txt
+[13:09:06][INFO] npm: npm error A complete log of this run can be found in: C:\Users\fila4\AppData\Local\npm-cache\_logs\2026-07-25T19_08_51_748Z-debug-0.log
+[13:09:06][OK  ] khora-web: dependencias instaladas (npm ci).
+[13:09:06][OK  ] Vercel CLI disponible.
+[13:09:09][INFO] Instalando Render CLI completado en 00:02
+[13:09:09][INFO] npm: npm error code E404
+[13:09:09][INFO] npm: npm error 404 Not Found - GET https://registry.npmjs.org/@render-com%2fcli - Not found
+[13:09:09][INFO] npm: npm error 404
+[13:09:09][INFO] npm: npm error 404  '@render-com/cli@*' is not in this registry.
+[13:09:09][INFO] npm: npm error 404
+[13:09:09][INFO] npm: npm error 404 Note that you can also install from a
+[13:09:09][INFO] npm: npm error 404 tarball, folder, http url, or git url.
+[13:09:09][INFO] npm: npm error A complete log of this run can be found in: C:\Users\fila4\AppData\Local\npm-cache\_logs\2026-07-25T19_09_07_804Z-debug-0.log
+[13:09:09][WARN] Render CLI no pudo instalarse. Intenta: npm install -g @render-com/cli
+[13:09:09][INFO] Docker Desktop no encontrado. Instalando (puede tardar varios minutos)...
+[13:09:30][INFO] Instalando Docker Desktop completado en 00:20
+[13:09:30][INFO] winget: Failed in attempting to update the source: winget
+[13:09:30][INFO] winget: Failed when searching source: winget
+[13:09:30][INFO] winget: An unexpected error occurred while executing the command: 
+[13:09:30][INFO] winget: 0x8a15000f : Data required by the source is missing
+[13:09:30][INFO] winget: 
+[13:09:30][INFO] winget: No packages were found among the working sources.
+[13:09:30][WARN] Docker no disponible post-instalacion. Puede requerir reinicio.
+[13:09:30][STEP] VS Code
+[13:09:30][OK  ] VS Code encontrado: C:\Users\fila4\AppData\Local\Programs\Microsoft VS Code\Code.exe
+[13:09:30][STEP] VS Code: importando configuracion desde el repo
+[13:09:30][INFO] Primera vez: cree tools\vscode\ en el repo; al cierre se exportara tu config real y quedara respaldada.
+[13:09:32][OK  ] VS Code abierto (PID 4804)
+[13:09:32][STEP] Navegador (inteligente)
+[13:09:32][WARN] LastPass NO instalado. Se abrira la Chrome Web Store.
+[13:09:32][INFO] Chrome inteligente: 5 URLs | login=False | lastpass=False | running=True
+[13:09:32][OK  ] Chrome ya activo: 5 pestanas nuevas agregadas.
+[13:09:32][STEP] Guardian KHORA (red de seguridad)
+[13:09:32][OK  ] Guardian activo (PID 21232) - inactividad 15min + panico Ctrl+Alt+K
+[13:09:35][OK  ] Deadline registrado: limpieza automatica a las 20:00 (2026-07-25)
+[13:09:35][STEP] Servidores de desarrollo (AUTO-INICIO garantizado)
+[13:09:35][INFO] Arrancando dev servers automaticamente post-token (API + Next.js)...
+[13:09:35][INFO] === Start-DevServers: arrancando API (:8000) + Next.js (:3000) ===
+[13:09:35][OK  ] API uvicorn -> http://localhost:8000  (nueva ventana)
+[13:09:35][INFO] Dev server API uvicorn lanzado en :8000
+[13:09:36][OK  ] Next.js dev -> http://localhost:3000  (nueva ventana)
+[13:09:36][INFO] Dev server Next.js lanzado en :3000
+[13:09:36][INFO] Dev servers iniciados. Sistema listo para trabajar.
+[13:09:36][INFO] SESION LISTA en 403s
