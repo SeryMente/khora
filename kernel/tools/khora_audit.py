@@ -172,7 +172,7 @@ def generate_matrix(kernel_dir):
 def main():
     parser = argparse.ArgumentParser(description="khora-audit: Instrumento determinista de auditoria post-merge")
     parser.add_argument("--dir", default="kernel", help="Kernel directory to scan")
-    args = parser.add_argument_group()
+    parser.add_argument_group()
 
     parsed = parser.parse_args()
     kernel_dir = parsed.dir

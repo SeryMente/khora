@@ -1,8 +1,15 @@
-# @l0 L0-002-R · @req KA-00/REQ-2 · @acr ACR-2.1
+import os
 
+# @l0 L0-002-R · @req KA-00/REQ-2 · @acr ACR-2.1
 import pytest
 
-from khora_kernel.api import ContextoDeVisibilidad, NivelSuficiencia, PuertoEmbeddings
+import khora_kernel.embeddings
+from khora_kernel.api import (
+    ContextoDeVisibilidad,
+    NivelSuficiencia,
+    PuertoEmbeddings,
+    ResultadoDeConsulta,
+)
 from khora_kernel.consulta.retriever import RetrieverGraphRAG
 
 
@@ -107,7 +114,9 @@ class MockMemoriaMultiHop:
 
 
 # Monkeypatch knn for testing
-import khora_kernel.embeddings
+
+
+
 
 
 def mock_knn(query: str, k: int):
@@ -176,7 +185,7 @@ def test_insuficiente(retriever: RetrieverGraphRAG):
     assert res.resumenes_incluidos is False
     assert "Sin semilla knn" in res.degradacion_declarada
 
-import os
+
 
 
 @pytest.mark.skipif(not os.environ.get('KHORA_NEO4J_TEST_URI'), reason="Requiere base de datos Neo4j real (patrón M-1)")
@@ -185,7 +194,6 @@ def test_integracion_neo4j(retriever: RetrieverGraphRAG):
     # Instanciamos el retriever con el driver real y probamos
     # la expansión de subgrafo en un DB.
     # Dado que es un test skip-if-no-docker, validaremos instanciando Neo4jMemoriaOrganizada
-    import os
 
     from khora_kernel.motor._memoria import Neo4jMemoriaOrganizada
 
