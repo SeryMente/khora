@@ -212,3 +212,9 @@
 [16:09:54][INFO] Dev server Next.js lanzado en :3000
 [16:09:54][INFO] Dev servers iniciados. Sistema listo para trabajar.
 [16:09:54][INFO] SESION LISTA en 849s
+[16:09:55][INFO] Auto-WIP: logs copiados a repo/logs/ (incluidos en el commit)
+[16:09:56][INFO] git add: OK warning: in the working copy of 'logs/2026-07-25.log', CRLF will be replaced by LF the next time Git touches it warning: in the working copy of 'logs/session-2026-07-25.log', CRLF will be replaced by LF the next time Git touches it
+[16:09:56][INFO] Guardian iniciado: inactividad 900s, panico Ctrl+Alt+K.
+[16:09:56][INFO] git commit: OK [wip/auto-2026-07-25-2744 377268d] wip: auto-guardado 16:09:56  3 files changed, 377 insertions(+), 213 deletions(-)
+[16:09:57][INFO] Monitor de exfiltracion/RAT activo (cada 30s, umbral 25 MB/min).
+[16:09:59][INFO] Auto-WIP VERIFICADO: 1 cambio(s) respaldados en wip/auto-2026-07-25-2744
