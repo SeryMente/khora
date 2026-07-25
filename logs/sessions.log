@@ -365,3 +365,13 @@
 [16:55:24][INFO] git commit: OK [wip/auto-2026-07-25-2744 e810a8e] wip: auto-guardado 16:55:24  3 files changed, 12 insertions(+)
 [16:55:27][INFO] Auto-WIP VERIFICADO: 1 cambio(s) respaldados en wip/auto-2026-07-25-2744
 [17:00:27][INFO] Auto-WIP: logs copiados a repo/logs/ (incluidos en el commit)
+[17:00:27][INFO] git add: OK warning: in the working copy of 'logs/2026-07-25.log', CRLF will be replaced by LF the next time Git touches it warning: in the working copy of 'logs/session-2026-07-25.log', CRLF will be replaced by LF the next time Git touches it
+[17:00:27][INFO] git commit: OK [wip/auto-2026-07-25-2744 5052322] wip: auto-guardado 17:00:27  3 files changed, 12 insertions(+)
+[17:00:30][INFO] Auto-WIP VERIFICADO: 1 cambio(s) respaldados en wip/auto-2026-07-25-2744
+[17:01:17][INFO] Tecla: [2]
+[17:01:17][STEP] === LIMPIEZA NUCLEAR (motivo: manual) === 17:01:17 ===
+[17:01:17][STEP] Respaldo final al repo
+
+--- SESION CERRADA --- 2026-07-25 17:01:17 --- motivo:manual --- dur:65.5min ---
+[17:01:17][OK  ] VS Code: settings.json exportado al repo.
+[17:01:17][INFO] Auto-WIP: logs copiados a repo/logs/ (incluidos en el commit)
