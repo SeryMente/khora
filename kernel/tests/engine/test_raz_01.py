@@ -1,12 +1,13 @@
 # @l0 L0-002 · @req RAZ-01/REQ-1,REQ-2 · @acr ACR-1.1,ACR-1.2,ACR-1.3 · @ua —
 import json
-import os
-import pytest
-from unittest import mock
 
-from khora_kernel.api import PuertoLLM, RespuestaLLM, SolicitudLLM, Provenance
-from khora_kernel.engine.core import ejecutar_ciclo, ask, Λ, Σ
-from khora_kernel.engine.history import Ht, HtStep, HtEvidence, Response, load_ht, save_ht
+from khora_kernel.api import Provenance, PuertoLLM, RespuestaLLM, SolicitudLLM
+from khora_kernel.engine.core import ejecutar_ciclo
+from khora_kernel.engine.history import (
+    load_ht,
+    save_ht,
+)
+
 
 class MockPuertoLLM(PuertoLLM):
     def __init__(self, forced_responses):
@@ -48,7 +49,7 @@ def test_raz_01_acr_1_1_ciclo_completo(tmp_path, monkeypatch):
 
     session_id = "test_sess_1"
 
-    response = ejecutar_ciclo(session_id, "Hola?", mock_llm, None)
+    ejecutar_ciclo(session_id, "Hola?", mock_llm, None)
 
     assert response.ht_ref == session_id
     assert mock_llm.call_count == 2
@@ -80,7 +81,7 @@ def test_raz_01_acr_1_2_invalido_reintento_stop(tmp_path, monkeypatch):
 
     session_id = "test_sess_2"
 
-    response = ejecutar_ciclo(session_id, "Hola?", mock_llm, None)
+    ejecutar_ciclo(session_id, "Hola?", mock_llm, None)
 
     # 1 intention + 1 retry = 2 calls to generating in the first step
     assert mock_llm.call_count == 2

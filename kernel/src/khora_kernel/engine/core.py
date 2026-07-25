@@ -9,7 +9,6 @@ from enum import Enum
 from typing import List, Optional
 
 from khora_kernel.api import PuertoLLM, SolicitudLLM
-from khora_kernel.embeddings import knn
 from khora_kernel.engine.history import (
     Ht,
     HtEvidence,
@@ -19,7 +18,6 @@ from khora_kernel.engine.history import (
     save_ht,
 )
 from khora_kernel.proveedores.openai import ProveedorOpenAICompatible
-from khora_kernel.summaries import get_all_communities
 
 
 @dataclass

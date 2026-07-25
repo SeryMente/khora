@@ -1,6 +1,11 @@
 # @l0 L0-002 · @req API-00/REQ-1,REQ-2,REQ-3 · @acr ACR-1.1,ACR-1.2,ACR-2.1,ACR-3.1 · @ua —
+import sys
 import os
 import pytest
+
+# Asegurar que api es importable desde pytest
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+
 from fastapi.testclient import TestClient
 
 from api.main import app, neo4j_driver

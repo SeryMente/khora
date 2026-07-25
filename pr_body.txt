@@ -1,4 +1,0 @@
-VIZ-01/REQ-1 — representación visual del grafo PKG en 4 capas sobre comunidades Leiden. Principio de proyección (identidad persistente + transición animada). Anti-catálogo: sin grafo global, sin 3D, sin física.
-
-PENDIENTE DE VERIFICACIÓN MANUAL:
-Las pruebas automatizadas de E2E con Playwright (ACR-1.1–1.5, ACR-2.1) se han ejecutado en modo "offline/mock" validando los estados de fallback requeridos debido a que la base de datos real no estaba disponible en el entorno de pruebas, como está permitido por NO-SIMULATION guidelines. Por lo tanto, la interacción detallada y los visuales específicos (color/tamaño) requieren de verificación manual contra datos reales de la BD una vez unificada.

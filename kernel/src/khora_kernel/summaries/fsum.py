@@ -5,6 +5,7 @@ from typing import Any
 from khora_kernel.api import SolicitudLLM
 from khora_kernel.proveedores.openai import ProveedorOpenAICompatible
 
+
 def fsum(memoria: Any) -> None:
     # 1. Recuperar todas las comunidades vigentes ordenadas por level ASC
     comunidades = memoria.get_comunidades_vigentes()

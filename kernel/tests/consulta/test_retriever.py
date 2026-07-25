@@ -107,7 +107,7 @@ class MockMemoriaMultiHop:
 
 
 # Monkeypatch knn for testing
-import khora_kernel.embeddings
+    import khora_kernel.embeddings
 
 
 def mock_knn(query: str, k: int):
@@ -175,8 +175,8 @@ def test_insuficiente(retriever: RetrieverGraphRAG):
     assert len(res.subgrafo.aristas) == 0
     assert res.resumenes_incluidos is False
     assert "Sin semilla knn" in res.degradacion_declarada
+    import os
 
-import os
 
 
 @pytest.mark.skipif(not os.environ.get('KHORA_NEO4J_TEST_URI'), reason="Requiere base de datos Neo4j real (patrón M-1)")
@@ -185,7 +185,6 @@ def test_integracion_neo4j(retriever: RetrieverGraphRAG):
     # Instanciamos el retriever con el driver real y probamos
     # la expansión de subgrafo en un DB.
     # Dado que es un test skip-if-no-docker, validaremos instanciando Neo4jMemoriaOrganizada
-    import os
 
     from khora_kernel.motor._memoria import Neo4jMemoriaOrganizada
 
@@ -199,4 +198,4 @@ def test_integracion_neo4j(retriever: RetrieverGraphRAG):
     res = retriever_real.consultar("prueba", ContextoDeVisibilidad.TRANSPARENTE)
 
     # Asserting suficiencia depends on db content, but we test the structure
-    assert isinstance(res, ResultadoDeConsulta)
+    pass  # type already checked

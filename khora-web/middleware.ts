@@ -6,7 +6,7 @@ export const config = { matcher: ["/((?!_next/static|_next/image|favicon.ico|api
 
 export default auth((req) => {
   // Skip auth checks when running Playwright E2E tests
-  if (process.env.PLAYWRIGHT_TEST_RUN === '1') {
+  if (process.env.PLAYWRIGHT_TEST_RUN === '1' && process.env.NODE_ENV !== 'production') {
     return NextResponse.next();
   }
 

@@ -1,4 +1,5 @@
 fastapi
 uvicorn[standard]
 pydantic
--e ./kernel
+neo4j
+-e ../kernel

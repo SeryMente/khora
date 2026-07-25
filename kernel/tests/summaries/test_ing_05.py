@@ -1,9 +1,11 @@
 # @l0 L0-002 · @req ING-05/REQ-1 · @acr ACR-1.1,ACR-1.2 · @ua —
+
 import pytest
-import os
+
+from khora_kernel.api import Provenance, PuertoLLM, RespuestaLLM, SolicitudLLM
 from khora_kernel.motor._memoria import Neo4jMemoriaOrganizada
 from khora_kernel.summaries.fsum import fsum
-from khora_kernel.api import PuertoLLM, SolicitudLLM, RespuestaLLM, Provenance
+
 
 class MockPuertoLLM(PuertoLLM):
     def __init__(self):
@@ -15,6 +17,7 @@ class MockPuertoLLM(PuertoLLM):
 
 # Parcheamos fsum.py para inyectar nuestro mock si no hay variables de entorno LLM
 import khora_kernel.summaries.fsum as fsum_module
+
 
 @pytest.fixture(scope="module")
 def neo4j_driver(neo4j_config):
