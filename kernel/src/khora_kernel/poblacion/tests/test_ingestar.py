@@ -74,21 +74,27 @@ class MockMemoria:
         mock_graph = {e: [] for e in self.entidades.keys()}
 
         for t in self.triples:
-            if t.origen not in mock_graph: mock_graph[t.origen] = []
-            if t.destino not in mock_graph: mock_graph[t.destino] = []
+            if t.origen not in mock_graph:
+                mock_graph[t.origen] = []
+            if t.destino not in mock_graph:
+                mock_graph[t.destino] = []
             mock_graph[t.origen].append(t.destino)
 
         for t in triples:
-            if t.origen_id not in mock_graph: mock_graph[t.origen_id] = []
-            if t.destino_id not in mock_graph: mock_graph[t.destino_id] = []
+            if t.origen_id not in mock_graph:
+                mock_graph[t.origen_id] = []
+            if t.destino_id not in mock_graph:
+                mock_graph[t.destino_id] = []
             mock_graph[t.origen_id].append(t.destino_id)
 
         # Also include MATIZ_DE links
         for e_key, e in self.entidades.items():
             if e.matiz_de:
-                if e_key not in mock_graph: mock_graph[e_key] = []
+                if e_key not in mock_graph:
+                    mock_graph[e_key] = []
                 mock_graph[e_key].append(e.matiz_de)
-                if e.matiz_de not in mock_graph: mock_graph[e.matiz_de] = []
+                if e.matiz_de not in mock_graph:
+                    mock_graph[e.matiz_de] = []
                 mock_graph[e.matiz_de].append(e_key) # Bidirectional for reachability
 
         # BFS from User

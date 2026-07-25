@@ -1,14 +1,16 @@
 # @l0 L0-002 · @req ING-04/REQ-1,REQ-2 · @acr ACR-1.1,ACR-2.1 · @ua UA-10,UA-11,UA-12,UA-13
-import pytest
-from datetime import datetime
 import logging
-from khora_kernel.motor._memoria import Neo4jMemoriaOrganizada
+
+import pytest
+
 from khora_kernel.api import ObjetoDeInformacion, Provenance
+from khora_kernel.motor._memoria import Neo4jMemoriaOrganizada
 from khora_kernel.poblacion import ingestar
+
 
 class DummyPuertoLLM:
     def generar(self, solicitud):
-        from khora_kernel.api import RespuestaLLM, Provenance
+        from khora_kernel.api import Provenance, RespuestaLLM
         return RespuestaLLM(
             texto="Dummy response",
             modelo="dummy",
@@ -27,7 +29,7 @@ def memoria_limpia(neo4j_config):
         mem = Neo4jMemoriaOrganizada(uri=neo4j_config["uri"], user=neo4j_config["user"], password=neo4j_config["password"])
         with mem._driver.session() as session:
             session.run("MATCH (n) DETACH DELETE n")
-    except Exception as e:
+    except Exception:
         pytest.skip("PENDIENTE DE VERIFICACIÓN MANUAL - Neo4j no disponible en sandbox")
 
     yield mem
@@ -101,7 +103,7 @@ def test_ing_04_acr_invalidacion(memoria_limpia):
     ingestar(objeto1, memoria_limpia, DummyPuertoLLM(), DummyPuertoEmbeddings(), on_upsert=on_node_upserted)
 
     with memoria_limpia._driver.session() as session:
-        res1 = session.run("MATCH (c:Community) WHERE c.invalid_at IS NULL RETURN count(c) AS cnt").single()["cnt"]
+        session.run("MATCH (c:Community) WHERE c.invalid_at IS NULL RETURN count(c) AS cnt").single()["cnt"]
 
     # second insert
     ts2 = "2024-05-02T12:00:00Z"
