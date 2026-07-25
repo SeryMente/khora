@@ -383,6 +383,93 @@ class Neo4jMemoriaOrganizada:
             raise Exception(f"Error consultando linea_temporal: {str(e)}")
 
 
+
+
+
+    def get_comunidades_vigentes(self) -> List[Dict[str, Any]]:
+        self._asegurar_conexion()
+        query = """
+        MATCH (c:Community)
+        WHERE c.invalid_at IS NULL
+        RETURN c.community_id AS community_id, c.level AS level, c.gamma AS gamma, c.theta AS theta, c.summary AS summary
+        ORDER BY c.level ASC
+        """
+        comunidades = []
+        try:
+            assert self._driver is not None
+            with self._driver.session() as session:
+                result = session.run(query)
+                for record in result:
+                    comunidades.append(dict(record))
+            return comunidades
+        except Exception as e:
+            raise Exception(f"Error consultando comunidades vigentes: {str(e)}")
+
+    def get_comunidad_contexto(self, comunidad_id: str) -> List[Dict[str, Any]]:
+        self._asegurar_conexion()
+        query = """
+        MATCH (c:Community {community_id: $cid})
+        WHERE c.invalid_at IS NULL
+
+        // 1. Obtener miembros (hojas) y relaciones internas evitando producto cartesiano usando WITH y UNION
+        // Primero, sacamos solo los miembros y relaciones, y los agrupamos/procesamos,
+        // o lo hacemos mediante llamadas separadas vía UNION para evitar multiplicación de filas.
+        // Haremos UNION de resultados heterogéneos para mantener la firma (origen, destino, etc)
+        // o devolverlos de manera controlada.
+
+        // A: Miembros y sus relaciones internas (o solo miembros si no tienen relación)
+        MATCH (e1:Entity)-[r1:IN_COMMUNITY]->(c)
+        WHERE e1.invalid_at IS NULL AND r1.invalid_at IS NULL
+        OPTIONAL MATCH (e1)-[rel:RELATION]->(e2:Entity)-[r2:IN_COMMUNITY]->(c)
+        WHERE rel.invalid_at IS NULL AND e2.invalid_at IS NULL AND r2.invalid_at IS NULL
+        RETURN
+            e1.id AS origen_id,
+            e1.canonical_key AS origen_desc,
+            e2.id AS destino_id,
+            e2.canonical_key AS destino_desc,
+            type(rel) AS relacion_interna,
+            null AS child_id,
+            null AS child_summary
+
+        UNION ALL
+
+        // B: Subcomunidades (hijas)
+        MATCH (child:Community)-[r_parent:PARENT_COMMUNITY]->(c:Community {community_id: $cid})
+        WHERE child.invalid_at IS NULL AND c.invalid_at IS NULL AND r_parent.invalid_at IS NULL
+        RETURN
+            null AS origen_id,
+            null AS origen_desc,
+            null AS destino_id,
+            null AS destino_desc,
+            null AS relacion_interna,
+            child.community_id AS child_id,
+            child.summary AS child_summary
+        """
+        contexto = []
+        try:
+            assert self._driver is not None
+            with self._driver.session() as session:
+                result = session.run(query, cid=comunidad_id)
+                for record in result:
+                    contexto.append(dict(record))
+            return contexto
+        except Exception as e:
+            raise Exception(f"Error consultando contexto de comunidad {comunidad_id}: {str(e)}")
+
+    def set_resumen_comunidad(self, comunidad_id: str, summary: str) -> None:
+        self._asegurar_conexion()
+        query = """
+        MATCH (c:Community {community_id: $cid})
+        WHERE c.invalid_at IS NULL
+        SET c.summary = $summary
+        """
+        try:
+            assert self._driver is not None
+            with self._driver.session() as session:
+                session.run(query, cid=comunidad_id, summary=summary)
+        except Exception as e:
+            raise Exception(f"Error guardando resumen de comunidad {comunidad_id}: {str(e)}")
+
     def reificar_comunidades(self, comunidades, io_id: str, ts: str) -> None:
         self._asegurar_conexion()
 
