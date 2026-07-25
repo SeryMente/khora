@@ -1,7 +1,6 @@
 # @l0 L0-002-R · @req KA-00/REQ-2 · @acr ACR-2.1
 import json
 import os
-from datetime import datetime
 from typing import Any, Dict, List
 
 from khora_kernel.api import PuertoLLM, SolicitudLLM
@@ -12,7 +11,7 @@ def tokenize(text: str) -> int:
     return int(len(text.split()) * 1.3)
 
 
-def get_community_info(memoria_neo4j, cid: str) -> Dict[str, Any]:
+def get_community_info(memoria_neo4j: Any, cid: str) -> Dict[str, Any]:
     """Recupera la informacion de la comunidad."""
     query = """
     MATCH (c:Community {community_id: $cid})
@@ -32,7 +31,7 @@ def get_community_info(memoria_neo4j, cid: str) -> Dict[str, Any]:
     return {}
 
 
-def get_community_edges(memoria_neo4j, cid: str) -> List[Dict[str, Any]]:
+def get_community_edges(memoria_neo4j: Any, cid: str) -> List[Dict[str, Any]]:
     """Obtiene aristas de la comunidad, calculando el grado global de los extremos (en todo el grafo)
     o dentro de la comunidad. Asumimos grado en el grafo."""
 
@@ -74,7 +73,7 @@ def get_community_edges(memoria_neo4j, cid: str) -> List[Dict[str, Any]]:
     return edges
 
 
-def get_subcommunities(memoria_neo4j, cid: str) -> List[Dict[str, Any]]:
+def get_subcommunities(memoria_neo4j: Any, cid: str) -> List[Dict[str, Any]]:
     query = """
     MATCH (child:Community)-[:PARENT_COMMUNITY]->(parent:Community {community_id: $cid})
     RETURN child.community_id AS cid, child.summary AS summary, child.summary_tokens AS tokens
@@ -94,7 +93,7 @@ def get_subcommunities(memoria_neo4j, cid: str) -> List[Dict[str, Any]]:
     return children
 
 
-def get_single_node_community(memoria_neo4j, cid: str):
+def get_single_node_community(memoria_neo4j: Any, cid: str) -> List[Dict[str, Any]]:
     query = """
     MATCH (e:Entity)-[:IN_COMMUNITY]->(c:Community {community_id: $cid})
     RETURN e.description AS desc
@@ -112,7 +111,7 @@ def get_single_node_community(memoria_neo4j, cid: str):
     return nodes
 
 
-def persist_summary(memoria_neo4j, cid: str, summary: str, summary_tokens: int):
+def persist_summary(memoria_neo4j: Any, cid: str, summary: str, summary_tokens: int) -> None:
     query = """
     MATCH (c:Community {community_id: $cid})
     SET c.summary = $summary,
@@ -129,7 +128,7 @@ def persist_summary(memoria_neo4j, cid: str, summary: str, summary_tokens: int):
     except Exception:
         pass
 
-def get_all_communities(memoria_neo4j) -> List[Dict[str, Any]]:
+def get_all_communities(memoria_neo4j: Any) -> List[Dict[str, Any]]:
     query = """
     MATCH (c:Community)
     RETURN c.community_id AS cid, c.level AS level
@@ -148,10 +147,11 @@ def get_all_communities(memoria_neo4j) -> List[Dict[str, Any]]:
     return communities
 
 
-def log_costs(cid: str, level: int, prompt_tokens: int, completion_tokens: int, model: str):
+def log_costs(cid: str, level: int, prompt_tokens: int, completion_tokens: int, model: str) -> None:
     log_file = "logs/fsum_costs.jsonl"
     os.makedirs(os.path.dirname(log_file), exist_ok=True)
-    ts = datetime.utcnow().isoformat() + "Z"
+    import datetime as dt
+    ts = dt.datetime.now(dt.timezone.utc).isoformat() + "Z"
     entry = {
         "community_id": cid,
         "level": level,
@@ -164,7 +164,7 @@ def log_costs(cid: str, level: int, prompt_tokens: int, completion_tokens: int, 
         f.write(json.dumps(entry) + "\n")
 
 
-def summarize_community(memoria_neo4j, cid: str, puerto_llm: PuertoLLM) -> str:
+def summarize_community(memoria_neo4j: Any, cid: str, puerto_llm: PuertoLLM) -> str:
     window_size = int(os.environ.get("KHORA_FSUM_WINDOW", "8000"))
 
     info = get_community_info(memoria_neo4j, cid)
@@ -187,7 +187,7 @@ def summarize_community(memoria_neo4j, cid: str, puerto_llm: PuertoLLM) -> str:
     children = get_subcommunities(memoria_neo4j, cid)
 
     # D3: arista sin descripción -> usar relation + labels de extremos
-    def format_edge(e):
+    def format_edge(e: Dict[str, Any]) -> str:
         src_desc = e.get("source_desc") or str(e.get("source_labels", []))
         tgt_desc = e.get("target_desc") or str(e.get("target_labels", []))
         rel = e.get("relation") or ""
@@ -249,7 +249,7 @@ def summarize_community(memoria_neo4j, cid: str, puerto_llm: PuertoLLM) -> str:
     return summary
 
 
-def summarize_all(memoria_neo4j, puerto_llm: PuertoLLM):
+def summarize_all(memoria_neo4j: Any, puerto_llm: PuertoLLM) -> None:
     communities = get_all_communities(memoria_neo4j)
 
     # Sort by level ascending (hojas primero)

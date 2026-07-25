@@ -13,7 +13,7 @@ from khora_kernel.api import (
 
 
 class ProveedorOpenAICompatible:
-    def __init__(self, api_url: str = None, api_key: str = None, model: str = None):
+    def __init__(self, api_url: str | None = None, api_key: str | None = None, model: str | None = None):
         self.base_url = api_url or os.environ.get("KHORA_LLM_BASE_URL", "").rstrip("/")
         self.api_key = api_key or os.environ.get("KHORA_LLM_API_KEY", "")
         self.llm_model = model or os.environ.get("KHORA_LLM_MODEL", "")

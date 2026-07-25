@@ -29,9 +29,9 @@ def fsum(memoria: Any) -> None:
 
         # Si es nivel hoja (o encontramos nodos), agregar información de las entidades y relaciones
         # Si es nivel raíz (o encontramos hijos), agregar los resúmenes de las hijas
-        hojas = set()
-        relaciones_hojas = set()
-        hijos = set()
+        hojas: set[str] = set()
+        relaciones_hojas: set[str] = set()
+        hijos: set[tuple[str, str]] = set()
 
         for ctx in contexto:
             if ctx.get("origen_id") and ctx.get("destino_id"):
@@ -40,11 +40,13 @@ def fsum(memoria: Any) -> None:
                 relacion = ctx.get("relacion_interna")
                 if relacion:
                     relaciones_hojas.add(f"- {origen} -> [{relacion}] -> {destino}")
-                hojas.add(origen)
-                hojas.add(destino)
+                if isinstance(origen, str):
+                    hojas.add(origen)
+                if isinstance(destino, str):
+                    hojas.add(destino)
 
             if ctx.get("child_id"):
-                hijos.add((ctx["child_id"], ctx.get("child_summary") or "Sin resumen"))
+                hijos.add((str(ctx["child_id"]), str(ctx.get("child_summary") or "Sin resumen")))
 
         if hojas:
             prompt += "Miembros y relaciones de la comunidad:\n"

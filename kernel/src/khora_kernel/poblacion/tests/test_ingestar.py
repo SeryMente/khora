@@ -71,7 +71,7 @@ class MockMemoria:
         # Reachability BFS
         # To avoid orphans, we need to check if there is a path from 'User' to the new nodes
         # In a mock, let's build the graph including these potential new edges
-        mock_graph = {e: [] for e in self.entidades.keys()}
+        mock_graph: dict[str, list[str]] = {e: [] for e in self.entidades.keys()}
 
         for t in self.triples:
             if t.origen not in mock_graph:
@@ -80,12 +80,12 @@ class MockMemoria:
                 mock_graph[t.destino] = []
             mock_graph[t.origen].append(t.destino)
 
-        for t in triples:
-            if t.origen_id not in mock_graph:
-                mock_graph[t.origen_id] = []
-            if t.destino_id not in mock_graph:
-                mock_graph[t.destino_id] = []
-            mock_graph[t.origen_id].append(t.destino_id)
+        for tr in triples:
+            if tr.origen_id not in mock_graph:
+                mock_graph[tr.origen_id] = []
+            if tr.destino_id not in mock_graph:
+                mock_graph[tr.destino_id] = []
+            mock_graph[tr.origen_id].append(tr.destino_id)
 
         # Also include MATIZ_DE links
         for e_key, e in self.entidades.items():
@@ -98,9 +98,9 @@ class MockMemoria:
                 mock_graph[e.matiz_de].append(e_key) # Bidirectional for reachability
 
         # BFS from User
-        visited = set()
+        visited: set[str] = set()
         if "User" in mock_graph:
-            queue = ["User"]
+            queue: list[str] = ["User"]
             while queue:
                 curr = queue.pop(0)
                 if curr not in visited:
@@ -108,10 +108,10 @@ class MockMemoria:
                     queue.extend(mock_graph.get(curr, []))
 
         # Verify no orphans (all nodes in self.entidades + triples must be visited)
-        nodes_to_check = set(self.entidades.keys())
-        for t in triples:
-            nodes_to_check.add(t.origen_id)
-            nodes_to_check.add(t.destino_id)
+        nodes_to_check: set[str] = set(self.entidades.keys())
+        for tr in triples:
+            nodes_to_check.add(tr.origen_id)
+            nodes_to_check.add(tr.destino_id)
 
         # In testing, we might want to bypass reachability check or simulate it.
         # For simplicity, if 'rollback_test' is true, we fail.
@@ -123,19 +123,19 @@ class MockMemoria:
             return 0
 
         escritos = 0
-        for t in triples:
+        for tr in triples:
             # Cypher MERGE logic for relation
             rel_exists = False
             for exist_t in self.triples:
-                if exist_t.origen == t.origen_id and exist_t.destino == t.destino_id and exist_t.relacion == t.relacion and exist_t.io_id == io_id:
+                if exist_t.origen == tr.origen_id and exist_t.destino == tr.destino_id and exist_t.relacion == tr.relacion and exist_t.io_id == str(io_id):
                     rel_exists = True
                     break
             if not rel_exists:
                 self.triples.append(_MockTriple(
-                    origen=t.origen_id,
-                    relacion=t.relacion,
-                    destino=t.destino_id,
-                    io_id=io_id,
+                    origen=tr.origen_id,
+                    relacion=tr.relacion,
+                    destino=tr.destino_id,
+                    io_id=str(io_id),
                     timestamp=provenance.timestamp
                 ))
                 escritos += 1
@@ -287,7 +287,7 @@ def test_provenance():
     # Attempt to write without provenance => rejected
     memoria = MockMemoria()
     try:
-        memoria.escribir_ingesta([], None)
+        memoria.escribir_ingesta([], None) # type: ignore
         assert False, "Should have raised exception"
     except Exception as e:
         assert "provenance" in str(e).lower()
