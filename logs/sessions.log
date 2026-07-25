@@ -332,3 +332,12 @@
 [16:20:02][INFO] git commit: OK [wip/auto-2026-07-25-2744 009b330] wip: auto-guardado 16:20:02  3 files changed, 12 insertions(+)
 [16:20:05][INFO] Auto-WIP VERIFICADO: 1 cambio(s) respaldados en wip/auto-2026-07-25-2744
 [16:25:05][INFO] Auto-WIP: logs copiados a repo/logs/ (incluidos en el commit)
+[16:25:05][INFO] git add: OK warning: in the working copy of 'logs/2026-07-25.log', CRLF will be replaced by LF the next time Git touches it warning: in the working copy of 'logs/session-2026-07-25.log', CRLF will be replaced by LF the next time Git touches it
+[16:25:06][INFO] git commit: OK [wip/auto-2026-07-25-2744 c4f78e6] wip: auto-guardado 16:25:05  3 files changed, 12 insertions(+)
+[16:25:08][INFO] Auto-WIP VERIFICADO: 1 cambio(s) respaldados en wip/auto-2026-07-25-2744
+[16:26:12][FAIL] ALERTA EXFILTRACION/RAT: subida sostenida 131.6 MB/min (posible exfiltracion)
+[16:26:43][FAIL] ALERTA EXFILTRACION/RAT: subida sostenida 29.2 MB/min (posible exfiltracion)
+[16:27:13][FAIL] ALERTA EXFILTRACION/RAT: subida sostenida 58.4 MB/min (posible exfiltracion)
+[16:27:43][FAIL] ALERTA EXFILTRACION/RAT: subida sostenida 60.3 MB/min (posible exfiltracion)
+[16:28:17][FAIL] ALERTA EXFILTRACION/RAT: subida sostenida 44.5 MB/min (posible exfiltracion)
+[16:30:08][INFO] Auto-WIP: logs copiados a repo/logs/ (incluidos en el commit)
