@@ -1,5 +1,3 @@
-import pytest
-from io import StringIO
 import sys
 import os
 
@@ -10,9 +8,6 @@ from shell.terminal.repl import TerminalRepl
 from khora_kernel import (
     ContextoDeVisibilidad,
     EntidadIngresada,
-    MotorDeConsulta,
-    MotorDeIngesta,
-    MotorDeOlvido,
     NivelSuficiencia,
     Provenance,
     ResultadoDeConsulta,

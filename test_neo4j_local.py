@@ -1,6 +1,5 @@
 import pytest
 from neo4j import GraphDatabase
-import os
 from testcontainers.neo4j import Neo4jContainer
 
 @pytest.fixture(scope="session")

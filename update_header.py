@@ -1,4 +1,3 @@
-import sys
 
 def update_header(filepath):
     with open(filepath, 'r') as f:
