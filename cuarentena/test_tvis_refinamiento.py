@@ -1,10 +1,8 @@
 # @l0 L0-002-R · @req KA-00/REQ-2 · @acr ACR-2.1
 import pytest
-import os
 import sqlite3
 import uuid
-from dataclasses import dataclass
-from khora_kernel.api import PuertoVision, ContextoDeVisibilidad, Provenance, ResultadoDeConsulta, EntidadIngresada, NodoSubgrafo, AristaSubgrafo, SubgrafoRelevante, NivelSuficiencia
+from khora_kernel.api import PuertoVision, Provenance
 from khora_kernel.engine.orchestrator import ask_with_fallback
 from khora_kernel.engine.history import load_ht
 from unittest.mock import MagicMock, patch
@@ -51,7 +49,7 @@ def test_tvis_refinamiento_no_writes_to_pkg(mock_ask, mock_generar, mock_fval, t
     """
     from khora_kernel.engine.history import Response
     from khora_kernel.engine.fval import ValidatedResponse
-    from khora_kernel.api import RespuestaLLM, Provenance
+    from khora_kernel.api import RespuestaLLM
     from datetime import datetime
 
     # 1. Setup mocks

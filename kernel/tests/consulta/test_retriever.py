@@ -1,8 +1,10 @@
 # @l0 L0-002-R · @req KA-00/REQ-2 · @acr ACR-2.1
 
 import os
+
 import pytest
 
+import khora_kernel.embeddings
 from khora_kernel.api import ContextoDeVisibilidad, NivelSuficiencia, PuertoEmbeddings
 from khora_kernel.consulta.retriever import RetrieverGraphRAG
 
@@ -106,11 +108,6 @@ class MockMemoriaMultiHop:
 
         return fragmentos, list(subgrafo_nodos.values()), subgrafo_aristas, resumenes_incluidos, missing_sum
 
-
-# Monkeypatch knn for testing
-import khora_kernel.embeddings
-
-
 def mock_knn(query: str, k: int):
     if "khora" in query.lower():
         return [("khora", 1.0)]
@@ -195,7 +192,7 @@ def test_integracion_neo4j(retriever: RetrieverGraphRAG):
     memoria_real = Neo4jMemoriaOrganizada(uri, user, password)
     retriever_real = RetrieverGraphRAG(memoria_neo4j=memoria_real, puerto_embeddings=MockPuertoEmbeddings())
 
-    res = retriever_real.consultar("prueba", ContextoDeVisibilidad.TRANSPARENTE)
+    retriever_real.consultar("prueba", ContextoDeVisibilidad.TRANSPARENTE)
 
     # Asserting suficiencia depends on db content, but we test the structure
     pass  # type already checked
