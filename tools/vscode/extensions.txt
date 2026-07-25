@@ -1,0 +1,1 @@
+﻿# Un ID de extension por linea (ej. ms-python.python)

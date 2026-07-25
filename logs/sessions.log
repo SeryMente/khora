@@ -1,0 +1,142 @@
+﻿[10:53:24][OK  ] Repo clonado. Branch: main | Archivos: 373
+[10:53:24][OK  ] Ultimo commit: eefd22d feat(web): CORA-02 ingesta texto y archivos desde la UI (#112)
+[10:53:24][WARN] Repo SIN cifrado en disco (EFS no disponible). Protegen: limpieza [X] + DeepFreeze.
+
+================================================================
+ SESION INICIADA
+ Fecha:    2026-07-25 10:53:24
+ Host:     PC10RCIF4EI4
+ Usuario:  fila4
+ Branch:   main  |  Commit: eefd22d feat(web): CORA-02 ingesta texto y archivos desde la UI (#112)  |  Archivos: 373
+================================================================
+[10:53:24][OK  ] Entrada escrita en repo/logs/sessions.log
+[10:53:24][OK  ] Rama de respaldo creada: wip/auto-2026-07-25-7192
+[10:53:28][OK  ] Rama WIP publicada y VERIFICADA en remoto.
+[10:53:28][STEP] Entorno de desarrollo (Python + Node + Docker + Vercel + Render)
+[10:53:28][STEP] Configuracion LLM (primera vez en esta PC)
+[10:53:28][INFO] No se encontro .khora.env. Solo 4 datos, el resto es automatico (ENTER para omitir):
+[10:54:04][OK  ] Guardado en: C:\Users\fila4\Desktop\khora\.khora.env
+[10:54:04][OK  ] Guardado en: C:\Users\fila4\AppData\Local\khora-session\.khora.env
+[10:54:04][INFO] Secrets .khora.env cifrados con EFS (si esta edicion de Windows lo soporta).
+[10:54:04][OK  ] .env escrito en repo para uvicorn.
+[10:54:04][INFO] === Ensure-Python311: buscando Python 3.11+ ===
+[10:54:04][INFO]   Candidato python en C:\Users\MantenimientoRCI\AppData\Local\Programs\Python\Python311\python.exe: Python 3.11.9
+[10:54:04][OK  ] Python OK: Python 3.11.9 (C:\Users\MantenimientoRCI\AppData\Local\Programs\Python\Python311\python.exe)
+[10:54:04][INFO] === Setup-Venv: configurando entorno virtual Python ===
+[10:54:14][INFO] pip install -e . (dependencias Python) completado en 00:07
+[10:54:14][INFO] pip:   error: subprocess-exited-with-error
+[10:54:14][INFO] pip:   
+[10:54:14][INFO] pip:   Getting requirements to build editable did not run successfully.
+[10:54:14][INFO] pip:   exit code: 1
+[10:54:14][INFO] pip:   
+[10:54:14][INFO] pip:   [2 lines of output]
+[10:54:14][INFO] pip:   running egg_info
+[10:54:14][INFO] pip:   error: error in 'egg_base' option: 'src' does not exist or is not a directory
+[10:54:14][INFO] pip:   [end of output]
+[10:54:14][INFO] pip:   
+[10:54:14][INFO] pip:   note: This error originates from a subprocess, and is likely not a problem with pip.
+[10:54:14][INFO] pip: error: subprocess-exited-with-error
+[10:54:14][INFO] pip: System.Management.Automation.RemoteException
+[10:54:14][INFO] pip: Getting requirements to build editable did not run successfully.
+[10:54:14][INFO] pip: exit code: 1
+[10:54:14][INFO] pip: System.Management.Automation.RemoteException
+[10:54:14][INFO] pip: See above for output.
+[10:54:14][INFO] pip: System.Management.Automation.RemoteException
+[10:54:14][INFO] pip: note: This error originates from a subprocess, and is likely not a problem with pip.
+[10:54:14][INFO] pip: System.Management.Automation.RemoteException
+[10:54:14][INFO] pip: [notice] A new release of pip is available: 24.0 -> 26.1.2
+[10:54:14][INFO] pip: [notice] To update, run: C:\Users\fila4\AppData\Local\khora-session\venv\Scripts\python.exe -m pip install --upgrade pip
+[10:54:14][OK  ] Venv Python listo: C:\Users\fila4\AppData\Local\khora-session\venv
+[10:54:14][INFO] === Ensure-Node: verificando Node.js ===
+[10:54:14][INFO] Node en PATH: C:\Program Files\nodejs\node.exe vv24.0.0
+[10:54:14][OK  ] Node OK: v24.0.0
+[10:54:18][INFO] npm ci (khora-web) completado en 00:03
+[10:54:18][INFO] npm: npm warn ERESOLVE overriding peer dependency
+[10:54:18][INFO] npm: npm warn While resolving: @auth/core@0.41.3
+[10:54:18][INFO] npm: npm warn Found: nodemailer@9.0.3
+[10:54:18][INFO] npm: npm warn node_modules/nodemailer
+[10:54:18][INFO] npm: npm warn   nodemailer@"^9.0.3" from the root project
+[10:54:18][INFO] npm: npm warn
+[10:54:18][INFO] npm: npm warn Could not resolve dependency:
+[10:54:18][INFO] npm: npm warn peerOptional nodemailer@"^7.0.7 || ^8.0.5" from @auth/core@0.41.3
+[10:54:18][INFO] npm: npm warn node_modules/@auth/core
+[10:54:18][INFO] npm: npm warn   @auth/core@"0.41.3" from next-auth@5.0.0-beta.32
+[10:54:18][INFO] npm: npm warn   node_modules/next-auth
+[10:54:18][INFO] npm: npm warn
+[10:54:18][INFO] npm: npm warn Conflicting peer dependency: nodemailer@8.0.11
+[10:54:18][INFO] npm: npm warn node_modules/nodemailer
+[10:54:18][INFO] npm: npm warn   peerOptional nodemailer@"^7.0.7 || ^8.0.5" from @auth/core@0.41.3
+[10:54:18][INFO] npm: npm warn   node_modules/@auth/core
+[10:54:18][INFO] npm: npm warn     @auth/core@"0.41.3" from next-auth@5.0.0-beta.32
+[10:54:18][INFO] npm: npm warn     node_modules/next-auth
+[10:54:18][INFO] npm: npm error code ERESOLVE
+[10:54:18][INFO] npm: npm error ERESOLVE could not resolve
+[10:54:18][INFO] npm: npm error
+[10:54:18][INFO] npm: npm error While resolving: next-auth@5.0.0-beta.32
+[10:54:18][INFO] npm: npm error Found: nodemailer@9.0.3
+[10:54:18][INFO] npm: npm error node_modules/nodemailer
+[10:54:18][INFO] npm: npm error   nodemailer@"^9.0.3" from the root project
+[10:54:18][INFO] npm: npm error
+[10:54:18][INFO] npm: npm error Could not resolve dependency:
+[10:54:18][INFO] npm: npm error peerOptional nodemailer@"^7.0.7 || ^8.0.5" from next-auth@5.0.0-beta.32
+[10:54:18][INFO] npm: npm error node_modules/next-auth
+[10:54:18][INFO] npm: npm error   next-auth@"^5.0.0-beta.32" from the root project
+[10:54:18][INFO] npm: npm error
+[10:54:18][INFO] npm: npm error Conflicting peer dependency: nodemailer@8.0.11
+[10:54:18][INFO] npm: npm error node_modules/nodemailer
+[10:54:18][INFO] npm: npm error   peerOptional nodemailer@"^7.0.7 || ^8.0.5" from next-auth@5.0.0-beta.32
+[10:54:18][INFO] npm: npm error   node_modules/next-auth
+[10:54:18][INFO] npm: npm error     next-auth@"^5.0.0-beta.32" from the root project
+[10:54:18][INFO] npm: npm error
+[10:54:18][INFO] npm: npm error Fix the upstream dependency conflict, or retry
+[10:54:18][INFO] npm: npm error this command with --force or --legacy-peer-deps
+[10:54:18][INFO] npm: npm error to accept an incorrect (and potentially broken) dependency resolution.
+[10:54:18][INFO] npm: npm error
+[10:54:18][INFO] npm: npm error
+[10:54:18][INFO] npm: npm error For a full report see:
+[10:54:18][INFO] npm: npm error C:\Users\fila4\AppData\Local\npm-cache\_logs\2026-07-25T16_54_15_918Z-eresolve-report.txt
+[10:54:18][INFO] npm: npm error A complete log of this run can be found in: C:\Users\fila4\AppData\Local\npm-cache\_logs\2026-07-25T16_54_15_918Z-debug-0.log
+[10:54:18][OK  ] khora-web: dependencias instaladas (npm ci).
+[10:54:18][OK  ] Vercel CLI disponible.
+[10:54:20][INFO] Instalando Render CLI completado en 00:01
+[10:54:20][INFO] npm: npm error code E404
+[10:54:20][INFO] npm: npm error 404 Not Found - GET https://registry.npmjs.org/@render-com%2fcli - Not found
+[10:54:20][INFO] npm: npm error 404
+[10:54:20][INFO] npm: npm error 404  '@render-com/cli@*' is not in this registry.
+[10:54:20][INFO] npm: npm error 404
+[10:54:20][INFO] npm: npm error 404 Note that you can also install from a
+[10:54:20][INFO] npm: npm error 404 tarball, folder, http url, or git url.
+[10:54:20][INFO] npm: npm error A complete log of this run can be found in: C:\Users\fila4\AppData\Local\npm-cache\_logs\2026-07-25T16_54_19_820Z-debug-0.log
+[10:54:20][WARN] Render CLI no pudo instalarse. Intenta: npm install -g @render-com/cli
+[10:54:21][INFO] Docker Desktop no encontrado. Instalando (puede tardar varios minutos)...
+[10:54:32][INFO] Instalando Docker Desktop completado en 00:10
+[10:54:32][INFO] winget: Failed when searching source: winget
+[10:54:32][INFO] winget: An unexpected error occurred while executing the command: 
+[10:54:32][INFO] winget: 0x8a15000f : Data required by the source is missing
+[10:54:32][INFO] winget: 
+[10:54:32][INFO] winget: No packages were found among the working sources.
+[10:54:32][WARN] Docker no disponible post-instalacion. Puede requerir reinicio.
+[10:54:32][STEP] VS Code
+[10:54:32][OK  ] VS Code encontrado: C:\Users\fila4\AppData\Local\Programs\Microsoft VS Code\Code.exe
+[10:54:32][STEP] VS Code: importando configuracion desde el repo
+[10:54:32][INFO] Primera vez: cree tools\vscode\ en el repo; al cierre se exportara tu config real y quedara respaldada.
+[10:54:33][OK  ] VS Code abierto (PID 15880)
+[10:54:33][STEP] Navegador (inteligente)
+[10:54:33][WARN] LastPass NO instalado. Se abrira la Chrome Web Store.
+[10:54:33][INFO] Chrome inteligente: 5 URLs | login=False | lastpass=False | running=True
+[10:54:33][OK  ] Chrome ya activo: 5 pestanas nuevas agregadas.
+[10:54:33][STEP] Guardian KHORA (red de seguridad)
+[10:54:33][OK  ] Guardian activo (PID 6188) - inactividad 15min + panico Ctrl+Alt+K
+[10:54:37][OK  ] Deadline registrado: limpieza automatica a las 20:00 (2026-07-25)
+[10:54:37][STEP] Servidores de desarrollo (AUTO-INICIO garantizado)
+[10:54:37][INFO] Arrancando dev servers automaticamente post-token (API + Next.js)...
+[10:54:37][INFO] === Start-DevServers: arrancando API (:8000) + Next.js (:3000) ===
+[10:54:37][OK  ] API uvicorn -> http://localhost:8000  (nueva ventana)
+[10:54:37][INFO] Dev server API uvicorn lanzado en :8000
+[10:54:37][OK  ] Next.js dev -> http://localhost:3000  (nueva ventana)
+[10:54:37][INFO] Dev server Next.js lanzado en :3000
+[10:54:37][INFO] Dev servers iniciados. Sistema listo para trabajar.
+[10:54:37][INFO] SESION LISTA en 94s
+[10:54:37][INFO] Guardian iniciado: inactividad 900s, panico Ctrl+Alt+K.
+[10:54:40][INFO] Monitor de exfiltracion/RAT activo (cada 30s, umbral 25 MB/min).
+[10:58:10][INFO] Auto-WIP: logs copiados a repo/logs/ (incluidos en el commit)
