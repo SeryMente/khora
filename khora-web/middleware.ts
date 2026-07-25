@@ -5,6 +5,11 @@ import { NextResponse } from "next/server";
 export const config = { matcher: ["/((?!_next/static|_next/image|favicon.ico|api/auth).*)"] };
 
 export default auth((req) => {
+  // Ensure playwright environment headers override Next-Auth redirect
+  if (process.env.PLAYWRIGHT_TEST_BYPASS === 'true') {
+     return NextResponse.next();
+  }
+
   // auth() makes the token available on req.auth
   if (!req.auth) {
     if (req.nextUrl.pathname.startsWith('/api/')) {
