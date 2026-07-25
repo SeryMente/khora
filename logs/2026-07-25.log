@@ -203,3 +203,8 @@
 [10:54:37][INFO] SESION LISTA en 94s
 [10:54:37][INFO] Guardian iniciado: inactividad 900s, panico Ctrl+Alt+K.
 [10:54:40][INFO] Monitor de exfiltracion/RAT activo (cada 30s, umbral 25 MB/min).
+[10:58:10][INFO] Auto-WIP: logs copiados a repo/logs/ (incluidos en el commit)
+[10:58:10][INFO] git add: OK warning: in the working copy of 'logs/2026-07-25.log', CRLF will be replaced by LF the next time Git touches it warning: in the working copy of 'logs/sessions.log', CRLF will be replaced by LF the next time Git touches it warning: in the working copy of 'tools/vscode/extensions.txt', CRLF will be replaced by LF the next time Git touches it warning: in the working copy of 'tools/vscode/settings.user.json', CRLF will be replaced by LF the next time Git touches it
+[10:58:10][INFO] git commit: OK [wip/auto-2026-07-25-7192 a06c0f1] wip: auto-guardado 10:58:10  5 files changed, 349 insertions(+)  create mode 100644 logs/2026-07-25.log  create mode 100644 logs/session-2026-07-25.log  create mode 100644 logs/sessions.log  create mode 100644 tools/vscode/extensions.txt  create mode 100644 tools/vscode/settings.user.json
+[10:58:17][INFO] Auto-WIP VERIFICADO: 2 cambio(s) respaldados en wip/auto-2026-07-25-7192
+[10:59:18][FAIL] ALERTA EXFILTRACION/RAT: subida sostenida 56.8 MB/min (posible exfiltracion)
