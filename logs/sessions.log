@@ -155,3 +155,114 @@
 [13:27:48][INFO] Tecla: []
 [13:27:53][INFO] Tecla: [ ]
 [13:29:59][INFO] Auto-WIP: logs copiados a repo/logs/ (incluidos en el commit)
+[15:49:04][OK  ] Repo clonado. Branch: main | Archivos: 384
+[15:49:04][OK  ] Ultimo commit: e0014ba Merge pull request #119 from SeryMente/feat/khora-token-persistence-3746046179220437657
+[15:49:04][OK  ] REPO CIFRADO EN DISCO (EFS): ilegible fuera de esta cuenta/sesion.
+
+================================================================
+ SESION INICIADA
+ Fecha:    2026-07-25 15:49:04
+ Host:     PC-14
+ Usuario:  PC 13
+ Branch:   main  |  Commit: e0014ba Merge pull request #119 from SeryMente/feat/khora-token-persistence-3746046179220437657  |  Archivos: 384
+================================================================
+[15:49:04][OK  ] Entrada escrita en repo/logs/sessions.log
+[15:49:04][OK  ] Rama de respaldo creada: wip/auto-2026-07-25-4912
+[15:49:07][OK  ] Rama WIP publicada y VERIFICADA en remoto.
+[15:49:07][STEP] Entorno de desarrollo (Python + Node + Docker + Vercel + Render)
+[15:49:07][STEP] Configuracion LLM (primera vez en esta PC)
+[15:49:07][INFO] No se encontro .khora.env. Solo 4 datos, el resto es automatico (ENTER para omitir):
+[15:49:24][OK  ] Guardado en: C:\Users\PC 13\Desktop\khora\.khora.env
+[15:49:24][OK  ] Guardado en: C:\Users\PC 13\AppData\Local\khora-session\.khora.env
+[15:49:24][INFO] Secrets .khora.env cifrados con EFS (si esta edicion de Windows lo soporta).
+[15:49:24][OK  ] .env escrito en repo para uvicorn.
+[15:49:24][INFO] === Ensure-Python311: buscando Python 3.11+ ===
+[15:49:24][INFO]   Candidato python en C:\Users\PC 13\AppData\Local\Microsoft\WindowsApps\python.exe: Python was not found; run without arguments to install from the Microsoft Store, or disable this shortcut from Settings > Apps > Advanced app settings > App execution aliases.
+[15:49:24][INFO]   Candidato python3 en C:\Users\PC 13\AppData\Local\Microsoft\WindowsApps\python3.exe: Python was not found; run without arguments to install from the Microsoft Store, or disable this shortcut from Settings > Apps > Advanced app settings > App execution aliases.
+[15:49:25][INFO]   python3.11: no en PATH
+[15:49:25][INFO] Python 3.11+ no encontrado. Instalando con animacion (puede tardar)...
+[15:49:27][INFO] Instalando Python 3.11 completado en 00:01
+[15:49:27][INFO] winget: The `msstore` source requires that you view the following agreements before using.
+[15:49:27][INFO] winget: Terms of Transaction: https://aka.ms/microsoft-store-terms-of-transaction
+[15:49:27][INFO] winget: The source requires the current machine's 2-letter geographic region to be sent to the backend service to function properly (ex. "US").
+[15:49:27][INFO] winget: 
+[15:49:27][INFO] winget: Do you agree to all the source agreements terms?
+[15:49:27][INFO] winget: [Y] Yes  [N] No: An unexpected error occurred while executing the command: 
+[15:49:27][INFO] winget: 0x8a150042 : Error reading input in prompt
+[15:49:27][OK  ] Python instalado: Python was not found; run without arguments to install from the Microsoft Store, or disable this shortcut from Settings > Apps > Advanced app settings > App execution aliases.
+[15:49:27][INFO] === Setup-Venv: configurando entorno virtual Python ===
+[15:49:27][INFO] === Ensure-Python311: buscando Python 3.11+ ===
+[15:49:27][INFO]   Candidato python en C:\Users\PC 13\AppData\Local\Microsoft\WindowsApps\python.exe: Python was not found; run without arguments to install from the Microsoft Store, or disable this shortcut from Settings > Apps > Advanced app settings > App execution aliases.
+[15:49:27][INFO]   Candidato python3 en C:\Users\PC 13\AppData\Local\Microsoft\WindowsApps\python3.exe: Python was not found; run without arguments to install from the Microsoft Store, or disable this shortcut from Settings > Apps > Advanced app settings > App execution aliases.
+[15:49:27][INFO]   python3.11: no en PATH
+[15:49:27][INFO] Python 3.11+ no encontrado. Instalando con animacion (puede tardar)...
+[15:49:29][INFO] Instalando Python 3.11 completado en 00:01
+[15:49:29][INFO] winget: The `msstore` source requires that you view the following agreements before using.
+[15:49:29][INFO] winget: Terms of Transaction: https://aka.ms/microsoft-store-terms-of-transaction
+[15:49:29][INFO] winget: The source requires the current machine's 2-letter geographic region to be sent to the backend service to function properly (ex. "US").
+[15:49:29][INFO] winget: 
+[15:49:29][INFO] winget: Do you agree to all the source agreements terms?
+[15:49:29][INFO] winget: [Y] Yes  [N] No: An unexpected error occurred while executing the command: 
+[15:49:29][INFO] winget: 0x8a150042 : Error reading input in prompt
+[15:49:29][OK  ] Python instalado: Python was not found; run without arguments to install from the Microsoft Store, or disable this shortcut from Settings > Apps > Advanced app settings > App execution aliases.
+[15:49:31][INFO] Creando entorno virtual Python completado en 00:01
+[15:49:31][INFO] venv: Python was not found; run without arguments to install from the Microsoft Store, or disable this shortcut from Settings > Apps > Advanced app settings > App execution aliases.
+[15:49:31][WARN] Venv no creado. Verifica Python 3.11+.
+[15:49:31][INFO] === Ensure-Node: verificando Node.js ===
+[15:49:31][INFO] Node.js no encontrado. Instalando con animacion...
+[15:49:32][INFO] Instalando Node.js LTS completado en 00:01
+[15:49:32][INFO] winget: The `msstore` source requires that you view the following agreements before using.
+[15:49:32][INFO] winget: Terms of Transaction: https://aka.ms/microsoft-store-terms-of-transaction
+[15:49:32][INFO] winget: The source requires the current machine's 2-letter geographic region to be sent to the backend service to function properly (ex. "US").
+[15:49:32][INFO] winget: 
+[15:49:32][INFO] winget: Do you agree to all the source agreements terms?
+[15:49:32][INFO] winget: [Y] Yes  [N] No: An unexpected error occurred while executing the command: 
+[15:49:32][INFO] winget: 0x8a150042 : Error reading input in prompt
+[15:49:32][WARN] Node.js no disponible. Instala manualmente.
+[15:49:32][WARN] Node no disponible; omitiendo npm ci.
+[15:49:32][WARN] npm no disponible; no se puede instalar Vercel CLI.
+[15:49:33][WARN] npm no disponible; no se puede instalar Render CLI.
+[15:49:33][INFO] Docker Desktop no encontrado. Instalando (puede tardar varios minutos)...
+[15:49:34][INFO] Instalando Docker Desktop completado en 00:01
+[15:49:34][INFO] winget: The `msstore` source requires that you view the following agreements before using.
+[15:49:34][INFO] winget: Terms of Transaction: https://aka.ms/microsoft-store-terms-of-transaction
+[15:49:34][INFO] winget: The source requires the current machine's 2-letter geographic region to be sent to the backend service to function properly (ex. "US").
+[15:49:34][INFO] winget: 
+[15:49:34][INFO] winget: Do you agree to all the source agreements terms?
+[15:49:34][INFO] winget: [Y] Yes  [N] No: An unexpected error occurred while executing the command: 
+[15:49:34][INFO] winget: 0x8a150042 : Error reading input in prompt
+[15:49:34][WARN] Docker no disponible post-instalacion. Puede requerir reinicio.
+[15:49:34][STEP] VS Code
+[15:49:35][WARN] VS Code no encontrado. Intentando winget...
+[15:49:35][INFO] winget: The `msstore` source requires that you view the following agreements before using.
+[15:49:35][INFO] winget: Terms of Transaction: https://aka.ms/microsoft-store-terms-of-transaction
+[15:49:35][INFO] winget: The source requires the current machine's 2-letter geographic region to be sent to the backend service to function properly (ex. "US").
+[15:49:35][INFO] winget: 
+[15:49:36][INFO] winget: Found Microsoft Visual Studio Code [Microsoft.VisualStudioCode] Version 1.129.0
+[15:49:36][INFO] winget: This application is licensed to you by its owner.
+[15:49:36][INFO] winget: Microsoft is not responsible for, nor does it grant any licenses to, third-party packages.
+[15:49:36][INFO] winget: Downloading https://vscode.download.prss.microsoft.com/dbazure/download/stable/125df4672b8a6a34975303c6b0baa124e560a4f7/VSCodeUserSetup-x64-1.129.0.exe
+[15:49:42][INFO] winget: Successfully verified installer hash
+[15:49:42][INFO] winget: Starting package install...
+[15:50:16][INFO] winget: Successfully installed
+[15:50:16][OK  ] VS Code instalado via winget.
+[15:50:16][STEP] VS Code: importando configuracion desde el repo
+[15:50:16][OK  ] settings.json aplicado desde el repo.
+[15:50:16][INFO] Lista de extensiones vacia.
+[15:50:16][OK  ] VS Code abierto (PID 17828)
+[15:50:16][STEP] Navegador (inteligente)
+[15:50:16][OK  ] LastPass detectado en Chrome.
+[15:50:16][INFO] Chrome inteligente: 4 URLs | login=False | lastpass=True | running=True
+[15:50:16][OK  ] Chrome ya activo: 4 pestanas nuevas agregadas.
+[15:50:16][STEP] Guardian KHORA (red de seguridad)
+[15:50:16][OK  ] Guardian activo (PID 6300) - inactividad 15min + panico Ctrl+Alt+K
+[15:50:17][OK  ] Deadline registrado: limpieza automatica a las 20:00 (2026-07-25)
+[15:50:17][STEP] Servidores de desarrollo (AUTO-INICIO garantizado)
+[15:50:17][INFO] Arrancando dev servers automaticamente post-token (API + Next.js)...
+[15:50:17][INFO] === Start-DevServers: arrancando API (:8000) + Next.js (:3000) ===
+[15:50:17][WARN] Venv no encontrado. Inicia sesion ([1]) para crearlo.
+[15:50:17][OK  ] Next.js dev -> http://localhost:3000  (nueva ventana)
+[15:50:17][INFO] Dev server Next.js lanzado en :3000
+[15:50:17][INFO] Dev servers iniciados. Sistema listo para trabajar.
+[15:50:17][INFO] SESION LISTA en 312s
+[15:50:18][INFO] Auto-WIP: logs copiados a repo/logs/ (incluidos en el commit)
