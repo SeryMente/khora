@@ -191,3 +191,9 @@
 [13:09:36][INFO] Dev server Next.js lanzado en :3000
 [13:09:36][INFO] Dev servers iniciados. Sistema listo para trabajar.
 [13:09:36][INFO] SESION LISTA en 403s
+[13:09:37][INFO] Auto-WIP: logs copiados a repo/logs/ (incluidos en el commit)
+[13:09:37][INFO] git add: OK warning: in the working copy of 'logs/2026-07-25.log', CRLF will be replaced by LF the next time Git touches it warning: in the working copy of 'logs/sessions.log', CRLF will be replaced by LF the next time Git touches it warning: in the working copy of 'tools/vscode/extensions.txt', CRLF will be replaced by LF the next time Git touches it warning: in the working copy of 'tools/vscode/settings.user.json', CRLF will be replaced by LF the next time Git touches it
+[13:09:38][INFO] git commit: OK [wip/auto-2026-07-25-21300 d5633d3] wip: auto-guardado 13:09:37  5 files changed, 332 insertions(+)  create mode 100644 logs/2026-07-25.log  create mode 100644 logs/session-2026-07-25.log  create mode 100644 logs/sessions.log  create mode 100644 tools/vscode/extensions.txt  create mode 100644 tools/vscode/settings.user.json
+[13:09:43][INFO] Guardian iniciado: inactividad 900s, panico Ctrl+Alt+K.
+[13:09:43][INFO] Auto-WIP VERIFICADO: 2 cambio(s) respaldados en wip/auto-2026-07-25-21300
+[13:09:45][INFO] Monitor de exfiltracion/RAT activo (cada 30s, umbral 25 MB/min).
