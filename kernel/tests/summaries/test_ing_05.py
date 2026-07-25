@@ -2,6 +2,7 @@
 
 import pytest
 
+import khora_kernel.summaries.fsum as fsum_module
 from khora_kernel.api import Provenance, PuertoLLM, RespuestaLLM, SolicitudLLM
 from khora_kernel.motor._memoria import Neo4jMemoriaOrganizada
 from khora_kernel.summaries.fsum import fsum
@@ -16,7 +17,6 @@ class MockPuertoLLM(PuertoLLM):
         return RespuestaLLM(texto="Resumen mockeado", modelo="mock", provenance=Provenance("mock", None, "2026-07-23T12:00:00Z"))
 
 # Parcheamos fsum.py para inyectar nuestro mock si no hay variables de entorno LLM
-import khora_kernel.summaries.fsum as fsum_module
 
 
 @pytest.fixture(scope="module")
