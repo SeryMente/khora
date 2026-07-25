@@ -1,4 +1,4 @@
-# @l0 L0-002 · @req RAZ-01/REQ-1,REQ-2 · @acr ACR-1.1,ACR-1.2,ACR-1.3 · @ua —
+# @l0 L0-002 · @req RAZ-01/REQ-1,REQ-2,RAZ-02/REQ-2 · @acr ACR-1.1,ACR-1.2,ACR-1.3 · @ua —
 import json
 
 from khora_kernel.api import Provenance, PuertoLLM, RespuestaLLM, SolicitudLLM
@@ -13,10 +13,10 @@ class MockPuertoLLM(PuertoLLM):
     def __init__(self, forced_responses):
         self.forced_responses = forced_responses
         self.call_count = 0
-        self.last_solicitud = None
+        self.solicitudes = []
 
     def generar(self, solicitud: SolicitudLLM) -> RespuestaLLM:
-        self.last_solicitud = solicitud
+        self.solicitudes.append(solicitud)
         if self.call_count < len(self.forced_responses):
             resp = self.forced_responses[self.call_count]
         else:
@@ -44,15 +44,16 @@ def test_raz_01_acr_1_1_ciclo_completo(tmp_path, monkeypatch):
 
     mock_llm = MockPuertoLLM([
         json.dumps({"accion": "RETRIEVE", "justificacion": "Buscando contexto"}),
-        json.dumps({"accion": "ANSWER", "justificacion": "Tengo la respuesta"})
+        json.dumps({"accion": "ANSWER", "justificacion": "Tengo la respuesta"}),
+        json.dumps({"verdict": "SUFFICIENT", "deficit_type": None, "reason": "mock"})
     ])
 
     session_id = "test_sess_1"
 
-    ejecutar_ciclo(session_id, "Hola?", mock_llm, None)
+    val_resp = ejecutar_ciclo(session_id, "Hola?", mock_llm, None)
 
-    assert response.ht_ref == session_id
-    assert mock_llm.call_count == 2
+    assert val_resp.response.ht_ref == session_id
+    assert mock_llm.call_count == 3
 
     # Verify persistence
     ht_loaded = mock_load_ht(session_id)
@@ -81,7 +82,7 @@ def test_raz_01_acr_1_2_invalido_reintento_stop(tmp_path, monkeypatch):
 
     session_id = "test_sess_2"
 
-    ejecutar_ciclo(session_id, "Hola?", mock_llm, None)
+    _ = ejecutar_ciclo(session_id, "Hola?", mock_llm, None)
 
     # 1 intention + 1 retry = 2 calls to generating in the first step
     assert mock_llm.call_count == 2
@@ -107,15 +108,16 @@ def test_raz_01_acr_1_3_lectura_ht_prompt(tmp_path, monkeypatch):
 
     mock_llm = MockPuertoLLM([
         json.dumps({"accion": "RETRIEVE", "justificacion": "Buscando contexto"}),
-        json.dumps({"accion": "ANSWER", "justificacion": "Respuesta final"})
+        json.dumps({"accion": "ANSWER", "justificacion": "Respuesta final"}),
+        json.dumps({"verdict": "SUFFICIENT", "deficit_type": None, "reason": "mock"})
     ])
 
     session_id = "test_sess_3"
 
-    ejecutar_ciclo(session_id, "Pregunta?", mock_llm, None)
+    _ = ejecutar_ciclo(session_id, "Pregunta?", mock_llm, None)
 
     # The last prompt (for the 2nd step) should contain the history from step 1
-    prompt_sent = mock_llm.last_solicitud.prompt
+    prompt_sent = mock_llm.solicitudes[1].prompt if len(mock_llm.solicitudes) > 1 else ""
     assert "[Historial]" in prompt_sent
     assert "Paso 1: estado=RETRIEVE detalle=Buscando contexto" in prompt_sent
     assert "[Fin historial]" in prompt_sent

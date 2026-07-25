@@ -1,14 +1,15 @@
-# @l0 L0-002 · @req RAZ-01/REQ-1,REQ-2 · @acr ACR-1.1,ACR-1.2,ACR-1.3 · @ua —
+# @l0 L0-002 · @req RAZ-01/REQ-1,REQ-2,RAZ-02/REQ-1,REQ-2 · @acr ACR-1.1,ACR-1.2,ACR-1.3 · @ua —
 import json
 import os
 import re
 import uuid
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 from khora_kernel.api import PuertoLLM, SolicitudLLM
+from khora_kernel.engine.fval import get_verdict
 from khora_kernel.engine.history import (
     Ht,
     HtEvidence,
@@ -18,6 +19,16 @@ from khora_kernel.engine.history import (
     save_ht,
 )
 from khora_kernel.proveedores.openai import ProveedorOpenAICompatible
+
+
+@dataclass
+class ValidatedResponse:
+    response: Response
+    verdict: str
+    deficit_type: Optional[str]
+    reason: str
+    delta_fb: bool
+    derived_from: str = "RAZ-02/fVAL"
 
 
 @dataclass
@@ -65,7 +76,7 @@ def _add_step(ht: Ht, state: str, detail: str) -> Ht:
     step = HtStep(
         n=len(ht.steps) + 1,
         state=state,
-        ts=datetime.utcnow().isoformat() + "Z",
+        ts=datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         detail=detail
     )
     # Re-create Ht as it's frozen
@@ -86,34 +97,38 @@ def _add_evidence(ht: Ht, evidence_list: List[HtEvidence]) -> Ht:
         verdicts=ht.verdicts
     )
 
-def _get_node_content(memoria_neo4j, node_id: str) -> str:
+def _get_node_content(memoria_neo4j: Any, node_id: str) -> str:
     """Gets description of node for synthesizing."""
-    if not hasattr(memoria_neo4j, "_driver") or memoria_neo4j._driver is None:
+    if not hasattr(memoria_neo4j, "_driver") or getattr(memoria_neo4j, "_driver") is None:
         return ""
     query = """
     MATCH (n) WHERE n.id = $id RETURN n.description AS desc, n.text as text
     """
     try:
-        with memoria_neo4j._driver.session() as session:
+        with getattr(memoria_neo4j, "_driver").session() as session:
             res = session.run(query, {"id": node_id})
             record = res.single()
             if record:
-                return record["desc"] or record["text"] or ""
+                return str(record["desc"] or record["text"] or "")
     except Exception:
         pass
     return ""
 
 
-def ejecutar_ciclo(session_id: str, pregunta: str, puerto_llm: PuertoLLM, memoria) -> Response:
+def ejecutar_ciclo(session_id: str, pregunta: str, puerto_llm: PuertoLLM, memoria: Any) -> ValidatedResponse:
     ht = load_ht(session_id)
     if not ht:
         ht = Ht(
             session_id=session_id,
-            created_at=datetime.utcnow().isoformat() + "Z"
+            created_at=datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
         )
 
     estado = Σ(session_id=session_id, pregunta=pregunta, ht=ht)
     max_pasos = int(os.environ.get("RAZ_MAX_PASOS", "5"))
+
+    final_verdict: Optional[Dict[str, Any]] = None
+    accion_valida = None
+    justificacion = ""
 
     while estado.paso_actual <= max_pasos and not estado.terminado:
         # Build history string
@@ -144,7 +159,7 @@ def ejecutar_ciclo(session_id: str, pregunta: str, puerto_llm: PuertoLLM, memori
         respuesta_llm_texto = ""
 
         # Intento principal + 1 reintento
-        for intento in range(2):
+        for _ in range(2):
             try:
                 resp = puerto_llm.generar(solicitud)
                 respuesta_llm_texto = resp.texto
@@ -166,8 +181,27 @@ def ejecutar_ciclo(session_id: str, pregunta: str, puerto_llm: PuertoLLM, memori
         estado.ht = _add_step(estado.ht, accion_valida.value, justificacion)
 
         if accion_valida == Λ.ANSWER:
-            estado.terminado = True
-            break
+            # RAZ-02: fVAL validador de suficiencia
+            contexto: List[Dict[str, Any]] = [{"paso": s.n, "estado": s.state, "detalle": s.detail} for s in estado.ht.steps]
+            if estado.ht.evidence:
+                contexto.extend([{"tipo": "evidence", "node_id": e.node_id} for e in estado.ht.evidence])
+            if not contexto:
+                contexto = [{"paso": 0, "estado": "sin_contexto"}]
+
+            verdict_dict = get_verdict(justificacion, contexto, puerto_llm)
+            final_verdict = verdict_dict
+
+            if verdict_dict.get("verdict") == "SUFFICIENT":
+                estado.terminado = True
+                break
+            elif verdict_dict.get("verdict") == "INSUFFICIENT" and verdict_dict.get("deficit_type") == "VISUAL":
+                # ΔFB SOLO si INSUFFICIENT+VISUAL
+                estado.terminado = True
+                break
+            else:
+                # INSUFFICIENT+TEXTUAL -> continuar loop
+                pass
+
         elif accion_valida == Λ.STOP:
             estado.terminado = True
             break
@@ -181,15 +215,36 @@ def ejecutar_ciclo(session_id: str, pregunta: str, puerto_llm: PuertoLLM, memori
     save_ht(estado.ht)
 
     # Construir respuesta final (mock answer for now, since actual synthesis isn't explicitly defined here)
-    answer_text = justificacion if accion_valida == Λ.ANSWER else "Proceso detenido."
+    answer_text = "Proceso detenido."
+    if accion_valida is not None and accion_valida == Λ.ANSWER:
+        answer_text = str(justificacion)
 
-    return Response(
+    base_response = Response(
         answer=answer_text,
         citations=[],
         ht_ref=estado.ht.session_id
     )
 
-def ask(question: str, session_id: Optional[str] = None, db_path: str = "data/khora_sessions.db", memoria_neo4j=None) -> Response:
+    # Defaults si nunca llegó a ANSWER
+    if final_verdict is None:
+        final_verdict = {
+            "verdict": "INSUFFICIENT",
+            "deficit_type": "TEXTUAL",
+            "reason": "Loop agotado o STOP sin ANSWER previo"
+        }
+
+    is_visual = bool(final_verdict.get("verdict") == "INSUFFICIENT" and final_verdict.get("deficit_type") == "VISUAL")
+
+    return ValidatedResponse(
+        response=base_response,
+        verdict=str(final_verdict.get("verdict", "INSUFFICIENT")),
+        deficit_type=str(final_verdict.get("deficit_type")) if final_verdict.get("deficit_type") else None,
+        reason=str(final_verdict.get("reason", "")),
+        delta_fb=is_visual,
+        derived_from="RAZ-02/fVAL"
+    )
+
+def ask(question: str, session_id: Optional[str] = None, db_path: str = "data/khora_sessions.db", memoria_neo4j: Any = None) -> ValidatedResponse:
     if not session_id:
         session_id = str(uuid.uuid4())
     puerto_llm = _get_provider()

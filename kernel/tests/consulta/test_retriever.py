@@ -1,5 +1,6 @@
 # @l0 L0-002-R · @req KA-00/REQ-2 · @acr ACR-2.1
 
+import os
 import pytest
 
 from khora_kernel.api import ContextoDeVisibilidad, NivelSuficiencia, PuertoEmbeddings
@@ -107,7 +108,7 @@ class MockMemoriaMultiHop:
 
 
 # Monkeypatch knn for testing
-    import khora_kernel.embeddings
+import khora_kernel.embeddings
 
 
 def mock_knn(query: str, k: int):
@@ -175,7 +176,6 @@ def test_insuficiente(retriever: RetrieverGraphRAG):
     assert len(res.subgrafo.aristas) == 0
     assert res.resumenes_incluidos is False
     assert "Sin semilla knn" in res.degradacion_declarada
-    import os
 
 
 

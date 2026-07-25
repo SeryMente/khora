@@ -229,7 +229,7 @@ def test_idempotencia():
         metadata={"autor": "User"}
     )
 
-            ingestar(obj, memoria, llm, emb)
+    acta1 = ingestar(obj, memoria, llm, emb)
     acta2 = ingestar(obj, memoria, llm, emb)
 
     assert acta2.ideas_novedosas == 0
