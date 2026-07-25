@@ -25,6 +25,8 @@ jobs:
           cache-dependency-path: khora-web/package-lock.json
       - run: npm ci
       - run: npm run build
+        env:
+          AUTH_SECRET: mock-secret
       - name: Cache Playwright browsers
         uses: actions/cache@v4
         with:
@@ -32,4 +34,8 @@ jobs:
           key: pw-${{ runner.os }}-${{ hashFiles('khora-web/package-lock.json') }}
       - run: npx playwright install --with-deps
       - run: npm run e2e
+        env:
+          AUTH_SECRET: mock-secret
       - run: npx playwright test tests/regression/smoke.spec.ts --project=chromium
+        env:
+          AUTH_SECRET: mock-secret
