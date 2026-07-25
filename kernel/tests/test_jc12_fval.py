@@ -1,12 +1,11 @@
 # @l0 L0-002-R · @req KA-00/REQ-2 · @acr ACR-2.1
-import pytest
 import os
-import sqlite3
-import sys
-from typing import Optional, List
 
-from khora_kernel.engine.history import Response, Ht, HtEvidence, save_ht
+import pytest
+
 from khora_kernel.engine.fval import fval, get_verdict, split_claims
+from khora_kernel.engine.history import Ht, HtEvidence, Response, save_ht
+
 
 # Dummy provider para tests sin red
 class ProveedorDummy:

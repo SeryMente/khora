@@ -1,4 +1,4 @@
-# @l0 L0-002-R · @req KA-00/REQ-2 · @acr ACR-2.1
+# @l0 L0-002 · @req ING-01/REQ-1 · @acr ACR-1.1,ACR-1.2,ACR-1.3 · @ua UA-06
 import hashlib
 import os
 
@@ -126,7 +126,10 @@ def extraer(texto: str, lector_grafo, puerto_llm: PuertoLLM | None = None) -> li
                 destino_id=dest,
                 relacion=rel,
                 provenance=prov,
-                metadata={}
+                metadata={},
+                valid_at=prov.timestamp,
+                invalid_at=None,
+                created_at=prov.timestamp
             )
             triples_extraidos.append(triple)
 

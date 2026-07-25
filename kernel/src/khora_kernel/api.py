@@ -1,4 +1,4 @@
-# @l0 L0-002-R · @req KA-00/REQ-2 · @acr ACR-2.1
+# @l0 L0-002 · @req ING-01/REQ-1 · @acr ACR-1.1,ACR-1.2,ACR-1.3 · @ua UA-06
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import List, Protocol, runtime_checkable
@@ -45,6 +45,9 @@ class Triple:
     relacion: str
     provenance: Provenance
     metadata: dict[str, str]
+    valid_at: str
+    invalid_at: str | None
+    created_at: str
 
 
 @dataclass(frozen=True)

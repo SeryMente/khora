@@ -1,9 +1,6 @@
 # @l0 L0-002-R · @req PKG-00/REQ-1 · @acr ACR-1.1
 # @ua UA-01, UA-02, UA-03, UA-04
-import json
-import typing
-import uuid
-from typing import List, Dict, Any, Optional
+from typing import Any, Dict, List, Optional
 
 from neo4j import GraphDatabase
 

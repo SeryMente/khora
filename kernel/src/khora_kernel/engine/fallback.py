@@ -1,9 +1,7 @@
 # @l0 L0-002-R · @req KA-00/REQ-2 · @acr ACR-2.1
-import uuid
-from typing import Optional
 
 from khora_kernel.api import PuertoVision
-from khora_kernel.engine.history import Ht, HtEvidence, load_ht, save_ht
+from khora_kernel.engine.history import HtEvidence, load_ht, save_ht
 
 
 def fallback(
@@ -29,8 +27,8 @@ def fallback(
     imagen_cruda = puerto_vision.extraer_evidencia(referencia_modalidad)
 
     # 2. Neural VQA Injection
-    from khora_kernel.proveedores.openai import ProveedorOpenAICompatible
     from khora_kernel.api import SolicitudLLM
+    from khora_kernel.proveedores.openai import ProveedorOpenAICompatible
 
     proveedor = ProveedorOpenAICompatible()
     solicitud = SolicitudLLM(

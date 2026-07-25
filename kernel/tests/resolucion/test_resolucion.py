@@ -1,4 +1,4 @@
-# @l0 L0-002-R · @req KA-00/REQ-2 · @acr ACR-2.1
+# @l0 L0-002 · @req ING-01/REQ-1 · @acr ACR-1.1,ACR-1.2,ACR-1.3 · @ua UA-06
 from typing import Any, Dict, List
 
 import pytest
@@ -102,8 +102,8 @@ def test_sarah():
     emb = MockPuertoEmbeddings()
 
     triples = [
-        Triple("1", "Sarah Connor", "Target", "protects", _prov(), {}),
-        Triple("2", "Sarah", "Target", "protects", _prov(), {})
+        Triple("1", "Sarah Connor", "Target", "protects", _prov(), {}, valid_at="2026-07-19T00:00:00Z", invalid_at=None, created_at="2026-07-19T00:00:00Z"),
+        Triple("2", "Sarah", "Target", "protects", _prov(), {}, valid_at="2026-07-19T00:00:00Z", invalid_at=None, created_at="2026-07-19T00:00:00Z")
     ]
 
     # Resolver la primera entidad
@@ -125,7 +125,7 @@ def test_no_dup():
     emb = MockPuertoEmbeddings()
 
     triples = [
-        Triple("1", "Terminator", "John", "hunts", _prov(), {})
+        Triple("1", "Terminator", "John", "hunts", _prov(), {}, valid_at="2026-07-19T00:00:00Z", invalid_at=None, created_at="2026-07-19T00:00:00Z")
     ]
 
     res1 = resolver(triples, memoria, llm, emb)
@@ -148,7 +148,7 @@ def test_judge_gate():
     memoria.merge_entidad("sarah_connor", "Sarah Connor", "prov", [1.0, 0.0])
 
     triples = [
-        Triple("1", "Sarah", "Target", "protects", _prov(), {})
+        Triple("1", "Sarah", "Target", "protects", _prov(), {}, valid_at="2026-07-19T00:00:00Z", invalid_at=None, created_at="2026-07-19T00:00:00Z")
     ]
 
     resolver(triples, memoria, llm, emb)
@@ -165,7 +165,7 @@ def test_matiz():
     memoria.merge_entidad("t_800", "T-800", "prov", [0.707, 0.707])
 
     triples = [
-        Triple("1", "T-800 Bueno", "John", "protects", _prov(), {})
+        Triple("1", "T-800 Bueno", "John", "protects", _prov(), {}, valid_at="2026-07-19T00:00:00Z", invalid_at=None, created_at="2026-07-19T00:00:00Z")
     ]
 
     resolver(triples, memoria, llm, emb)
@@ -183,7 +183,7 @@ def test_polaridad():
     memoria.merge_entidad("skynet", "Skynet", "odio humanos", [0.707, 0.707])
 
     triples = [
-        Triple("1", "Skynet Pacifista", "humanos", "ama", _prov(), {})
+        Triple("1", "Skynet Pacifista", "humanos", "ama", _prov(), {}, valid_at="2026-07-19T00:00:00Z", invalid_at=None, created_at="2026-07-19T00:00:00Z")
     ]
 
     resolver(triples, memoria, llm, emb)
@@ -196,10 +196,10 @@ def test_provenance_acumula():
     emb = MockPuertoEmbeddings()
 
     triples1 = [
-        Triple("1", "A", "B", "R", _prov(), {})
+        Triple("1", "A", "B", "R", _prov(), {}, valid_at="2026-07-19T00:00:00Z", invalid_at=None, created_at="2026-07-19T00:00:00Z")
     ]
     triples2 = [
-        Triple("2", "A", "C", "R", _prov(), {})
+        Triple("2", "A", "C", "R", _prov(), {}, valid_at="2026-07-19T00:00:00Z", invalid_at=None, created_at="2026-07-19T00:00:00Z")
     ]
 
     resolver(triples1, memoria, llm, emb)
@@ -220,7 +220,7 @@ def test_candidatas_amplias():
     # Llega "Sarah", cuya clave normalizada es "sarah". Antes F1, esto no recuperaría "sarah_connor"
     # Ahora la búsqueda es amplia, los vectores de sarah (Mock) son [1.0, 0.0] -> similitud > umbral
     # Juez forzado a MERGE -> deben quedar en 1 entidad
-    triples = [Triple("1", "Sarah", "X", "rel", _prov(), {})]
+    triples = [Triple("1", "Sarah", "X", "rel", _prov(), {}, valid_at="2026-07-19T00:00:00Z", invalid_at=None, created_at="2026-07-19T00:00:00Z")]
 
     resolver(triples, memoria, llm, emb)
 
@@ -238,11 +238,11 @@ def test_sufijo_determinista():
     memoria.merge_entidad("john", "John", "prov", [0.0, 1.0])
 
     # "John" llega de nuevo.
-    triples1 = [Triple("1", "John", "Y", "rel", _prov(), {})]
+    triples1 = [Triple("1", "John", "Y", "rel", _prov(), {}, valid_at="2026-07-19T00:00:00Z", invalid_at=None, created_at="2026-07-19T00:00:00Z")]
     resolver(triples1, memoria, llm, emb)
 
     # Volvemos a procesar "John" con los MISMOS contextos, el hash debería ser idéntico
-    triples2 = [Triple("2", "John", "Y", "rel", _prov(), {})]
+    triples2 = [Triple("2", "John", "Y", "rel", _prov(), {}, valid_at="2026-07-19T00:00:00Z", invalid_at=None, created_at="2026-07-19T00:00:00Z")]
 
     memoria2 = MockMemoria()
     memoria2.merge_entidad("john", "John", "prov", [0.0, 1.0])
@@ -274,7 +274,7 @@ def test_juez_caido():
     memoria.merge_entidad("t_800", "T-800", "prov", [0.707, 0.707])
 
     # T-800 es candidato para matchear, Juez debería fallar
-    triples = [Triple("1", "T-800", "X", "rel", _prov(), {})]
+    triples = [Triple("1", "T-800", "X", "rel", _prov(), {}, valid_at="2026-07-19T00:00:00Z", invalid_at=None, created_at="2026-07-19T00:00:00Z")]
 
     with pytest.raises(Exception, match="Juez caído"):
         resolver(triples, memoria, llm, emb)

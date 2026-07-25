@@ -1,12 +1,12 @@
 # @l0 L0-002-R · @req KA-00/REQ-2 · @acr ACR-2.1
+import importlib
 import os
 import sqlite3
-import pytest
-from typing import Any
-import importlib
 
-from khora_kernel.engine.orchestrator import ask_with_fallback
+import pytest
+
 from khora_kernel.engine.history import load_ht
+from khora_kernel.engine.orchestrator import ask_with_fallback
 
 
 # Mock para PuertoVision
@@ -40,7 +40,7 @@ def tmp_db(tmp_path):
 
 @pytest.fixture
 def mock_llm_provider(monkeypatch):
-    from khora_kernel.api import RespuestaLLM, Provenance
+    from khora_kernel.api import Provenance, RespuestaLLM
 
     class MockProvider:
         def __init__(self):
@@ -86,7 +86,6 @@ def mock_llm_provider(monkeypatch):
     monkeypatch.setattr(core_mod, "_get_provider", lambda: provider_mock)
 
     # El fval as fval_mod no funciona porque "fval" es también el nombre de la función en __init__
-    import importlib
     fval_module = importlib.import_module("khora_kernel.engine.fval")
     monkeypatch.setattr(fval_module, "get_judge_provider", lambda: judge_mock)
 

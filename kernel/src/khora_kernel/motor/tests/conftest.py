@@ -1,8 +1,8 @@
 # @l0 L0-002-R · @req PKG-00/REQ-1 · @acr ACR-1.1
 # @ua UA-01, UA-02, UA-03, UA-04
-import pytest
 import os
-import unittest.mock
+
+import pytest
 
 # The CI environment's overlayfs cannot extract neo4j images due to whiteout file errors, blocking testcontainers.
 # However, NO-SIMULACION strictly forbids mocking a DB layer if testing ACR-2.2 (which we are).
@@ -16,6 +16,7 @@ import unittest.mock
 
 os.environ["TESTCONTAINERS_RYUK_DISABLED"] = "true"
 from testcontainers.neo4j import Neo4jContainer
+
 
 class SafeNeo4jContainer(Neo4jContainer):
     def start(self):

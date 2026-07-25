@@ -1,14 +1,12 @@
 # @l0 L0-002-R · @req KA-00/REQ-2 · @acr ACR-2.1
-import pytest
 import os
-import json
-import sqlite3
-from typing import List, Any
-from dataclasses import asdict
 
-from khora_kernel.engine.core import ask
-from khora_kernel.engine.history import Ht, Response, HtStep, HtEvidence, load_ht
+import pytest
+
 from khora_kernel.embeddings import INDEX_FILE, MAP_FILE
+from khora_kernel.engine.core import ask
+from khora_kernel.engine.history import Ht, Response, load_ht
+
 
 class MemoriaNeo4jMock:
     def __init__(self, nodes, communities):
@@ -117,8 +115,9 @@ def test_multihop(test_db_path, mock_memoria, monkeypatch):
     # Mock LLM provider to return a specific string with citations
     class MockProvider:
         def generar(self, solicitud):
-            from khora_kernel.api import RespuestaLLM, Provenance
             from datetime import datetime
+
+            from khora_kernel.api import Provenance, RespuestaLLM
 
             # Simulated multihop answer drawing from two entities
             ans = "La torre de la que hablas está en París [node1]. Sí, es la torre Eiffel [node2]. SUSTITUCIÓN NO VALIDADA"
@@ -139,8 +138,9 @@ def test_multihop(test_db_path, mock_memoria, monkeypatch):
 def test_mapeo_total(test_db_path, mock_memoria, monkeypatch):
     class MockProvider:
         def generar(self, solicitud):
-            from khora_kernel.api import RespuestaLLM, Provenance
             from datetime import datetime
+
+            from khora_kernel.api import Provenance, RespuestaLLM
             # One sentence, one evidence. Another sentence, another evidence.
             ans = "La capital es París [node1]. Tiene una torre [node2]. SUSTITUCIÓN NO VALIDADA"
             return RespuestaLLM(texto=ans, modelo="mock", provenance=Provenance(origen="mock", driver=None, timestamp=datetime.utcnow().isoformat()))
@@ -161,8 +161,9 @@ def test_mapeo_total(test_db_path, mock_memoria, monkeypatch):
 def test_ht_persistido(test_db_path, mock_memoria, monkeypatch):
     class MockProvider:
         def generar(self, solicitud):
-            from khora_kernel.api import RespuestaLLM, Provenance
             from datetime import datetime
+
+            from khora_kernel.api import Provenance, RespuestaLLM
             return RespuestaLLM(texto="Hola [comm1].", modelo="mock", provenance=Provenance(origen="mock", driver=None, timestamp=datetime.utcnow().isoformat()))
 
     import khora_kernel.engine.core
@@ -187,8 +188,9 @@ def test_ht_persistido(test_db_path, mock_memoria, monkeypatch):
 def test_no_escritura_pkg(test_db_path, mock_memoria, monkeypatch):
     class MockProvider:
         def generar(self, solicitud):
-            from khora_kernel.api import RespuestaLLM, Provenance
             from datetime import datetime
+
+            from khora_kernel.api import Provenance, RespuestaLLM
             return RespuestaLLM(texto="Algo.", modelo="mock", provenance=Provenance(origen="mock", driver=None, timestamp=datetime.utcnow().isoformat()))
 
     import khora_kernel.engine.core
@@ -209,8 +211,9 @@ def test_no_escritura_pkg(test_db_path, mock_memoria, monkeypatch):
 def test_esquemas(test_db_path, mock_memoria, monkeypatch):
     class MockProvider:
         def generar(self, solicitud):
-            from khora_kernel.api import RespuestaLLM, Provenance
             from datetime import datetime
+
+            from khora_kernel.api import Provenance, RespuestaLLM
             return RespuestaLLM(texto="Esquemas [node1].", modelo="mock", provenance=Provenance(origen="mock", driver=None, timestamp=datetime.utcnow().isoformat()))
 
     import khora_kernel.engine.core

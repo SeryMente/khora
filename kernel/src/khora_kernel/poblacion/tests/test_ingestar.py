@@ -1,8 +1,8 @@
 # @l0 L0-002-R · @req KA-00/REQ-2 · @acr ACR-2.1
-import pytest
 from dataclasses import dataclass
-from typing import List, Optional, Any
-from unittest.mock import MagicMock
+from typing import Any, List, Optional
+
+import pytest
 
 from khora_kernel.api import (
     ActaDeIngesta,
@@ -10,10 +10,11 @@ from khora_kernel.api import (
     Provenance,
     PuertoEmbeddings,
     PuertoLLM,
-    Triple,
     RespuestaLLM,
+    Triple,
 )
-from khora_kernel.poblacion import ingestar, frecuencia, linea_temporal
+from khora_kernel.poblacion import frecuencia, ingestar, linea_temporal
+
 
 @dataclass
 class _MockEntity:

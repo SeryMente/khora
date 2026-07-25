@@ -1,10 +1,10 @@
-# @l0 L0-002-R · @req PKG-00/REQ-1 · @acr ACR-1.1
-# @ua UA-01, UA-02, UA-03, UA-04
-import os
+# @l0 L0-002 · @req ING-01/REQ-1 · @acr ACR-1.1,ACR-1.2,ACR-1.3 · @ua UA-06
 import pytest
-from neo4j import GraphDatabase, exceptions
+from neo4j import GraphDatabase
+
+from khora_kernel.api import Provenance, Triple
 from khora_kernel.motor._memoria import Neo4jMemoriaOrganizada
-from khora_kernel.api import Provenance, Triple, ObjetoDeInformacion
+
 
 @pytest.fixture(scope="module")
 def neo4j_driver(neo4j_config):
@@ -37,7 +37,10 @@ def test_acr_1_1_restriccion_union_disjunta(neo4j_driver, neo4j_config):
         destino_id="otro_nodo",
         relacion="TEST",
         provenance=provenance,
-        metadata={}
+        metadata={},
+        valid_at=provenance.timestamp,
+        invalid_at=None,
+        created_at=provenance.timestamp
     )
 
     with pytest.raises(ValueError, match="Violación de restricción real: nodo con doble clase"):
@@ -68,7 +71,10 @@ def test_acr_1_2_alcanzabilidad(neo4j_driver, neo4j_config):
         destino_id="n2",
         relacion="TEST",
         provenance=provenance,
-        metadata={}
+        metadata={},
+        valid_at=provenance.timestamp,
+        invalid_at=None,
+        created_at=provenance.timestamp
     )
 
     # This should return 0 (rollback)
@@ -82,7 +88,10 @@ def test_acr_1_2_alcanzabilidad(neo4j_driver, neo4j_config):
         destino_id="n1",
         relacion="TEST",
         provenance=provenance,
-        metadata={}
+        metadata={},
+        valid_at=provenance.timestamp,
+        invalid_at=None,
+        created_at=provenance.timestamp
     )
 
     escritos = memoria.escribir_ingesta([triple_reachable], provenance)
@@ -114,7 +123,10 @@ def test_acr_2_1_campos_bitemporales(neo4j_driver, neo4j_config):
         destino_id="n_invalid",
         relacion="TEST",
         provenance=provenance,
-        metadata={}
+        metadata={},
+        valid_at=provenance.timestamp,
+        invalid_at=None,
+        created_at=provenance.timestamp
     )
 
     # Ingestion should catch the invalid node and rollback

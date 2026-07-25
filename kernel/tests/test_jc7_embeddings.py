@@ -1,12 +1,19 @@
 # @l0 L0-002-R · @req KA-00/REQ-2 · @acr ACR-2.1
 import json
 import os
+
 import pytest
-from typing import Any
+
 from khora_kernel.embeddings import (
-    embed_text, index_all, knn, on_node_upserted,
-    INDEX_FILE, MAP_FILE, get_model_call_count, reset_model_call_count
+    INDEX_FILE,
+    MAP_FILE,
+    embed_text,
+    get_model_call_count,
+    index_all,
+    knn,
+    reset_model_call_count,
 )
+
 
 class MemoriaMock:
     def __init__(self, nodes):
