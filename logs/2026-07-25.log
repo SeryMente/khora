@@ -208,3 +208,7 @@
 [10:58:10][INFO] git commit: OK [wip/auto-2026-07-25-7192 a06c0f1] wip: auto-guardado 10:58:10  5 files changed, 349 insertions(+)  create mode 100644 logs/2026-07-25.log  create mode 100644 logs/session-2026-07-25.log  create mode 100644 logs/sessions.log  create mode 100644 tools/vscode/extensions.txt  create mode 100644 tools/vscode/settings.user.json
 [10:58:17][INFO] Auto-WIP VERIFICADO: 2 cambio(s) respaldados en wip/auto-2026-07-25-7192
 [10:59:18][FAIL] ALERTA EXFILTRACION/RAT: subida sostenida 56.8 MB/min (posible exfiltracion)
+[11:03:18][INFO] Auto-WIP: logs copiados a repo/logs/ (incluidos en el commit)
+[11:03:18][INFO] git add: OK warning: in the working copy of 'logs/2026-07-25.log', CRLF will be replaced by LF the next time Git touches it warning: in the working copy of 'logs/sessions.log', CRLF will be replaced by LF the next time Git touches it
+[11:03:18][INFO] git commit: OK [wip/auto-2026-07-25-7192 d2e2801] wip: auto-guardado 11:03:18  3 files changed, 11 insertions(+)
+[11:03:23][INFO] Auto-WIP VERIFICADO: 1 cambio(s) respaldados en wip/auto-2026-07-25-7192
