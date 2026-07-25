@@ -1,4 +1,5 @@
-# @l0 L0-002-R · @req KA-00/REQ-2 · @acr ACR-2.1
+# @l0 L0-002 · @req ING-04/REQ-1,REQ-2 · @acr ACR-1.1,ACR-2.1 · @ua UA-10,UA-11,UA-12,UA-13
+import logging
 import os
 from typing import Dict, List
 
@@ -13,7 +14,6 @@ KHORA_LEIDEN_SEED = int(os.getenv("KHORA_LEIDEN_SEED", "42"))
 
 class ComunidadesReificadas:
     def __init__(self):
-        self.cypher_queries = []
         self.estructura: Dict[str, Dict] = {}
 
     def add_community(
@@ -33,36 +33,6 @@ class ComunidadesReificadas:
             "miembros": miembros or [],
         }
 
-        # Cypher con parámetros inyectados en la consulta, usaremos dicts para persistir
-        self.cypher_queries.append(
-            {
-                "type": "Community",
-                "params": {
-                    "community_id": cid,
-                    "level": level,
-                    "gamma": gamma,
-                    "theta": theta,
-                    "summary_placeholder": True,
-                },
-            }
-        )
-
-        if parent_cid:
-            self.cypher_queries.append(
-                {
-                    "type": "Parent",
-                    "params": {"child_id": cid, "parent_id": parent_cid},
-                }
-            )
-
-        for m in miembros or []:
-            self.cypher_queries.append(
-                {
-                    "type": "Member",
-                    "params": {"entity_id": m, "community_id": cid},
-                }
-            )
-
 
 def extraer_subgrafo(memoria_neo4j) -> nx.Graph:
     """Exportación vía Cypher plano a networkx."""
@@ -70,8 +40,10 @@ def extraer_subgrafo(memoria_neo4j) -> nx.Graph:
     if not hasattr(memoria_neo4j, "_driver") or memoria_neo4j._driver is None:
         return G
 
+    # Solo las relaciones y nodos vigentes (invalid_at IS NULL)
     query = """
     MATCH (n:Entity)-[r]->(m:Entity)
+    WHERE n.invalid_at IS NULL AND m.invalid_at IS NULL AND r.invalid_at IS NULL
     RETURN n.id AS origen, m.id AS destino
     """
     try:
@@ -96,37 +68,6 @@ def nx_to_igraph(G: nx.Graph) -> tuple[ig.Graph, list]:
         edges.append((nodos_list.index(u), nodos_list.index(v)))
     g_ig.add_edges(edges)
     return g_ig, nodos_list
-
-
-def reificar_en_neo4j(memoria_neo4j, reificadas: ComunidadesReificadas):
-    if not hasattr(memoria_neo4j, "_driver") or memoria_neo4j._driver is None:
-        return
-
-    query_community = """
-    MERGE (c:Community {community_id: $community_id})
-    SET c.level = $level, c.gamma = $gamma, c.theta = $theta, c.summary_placeholder = $summary_placeholder, c.created_at = timestamp()
-    """
-    query_parent = """
-    MATCH (child:Community {community_id: $child_id}), (parent:Community {community_id: $parent_id})
-    MERGE (child)-[:PARENT_COMMUNITY]->(parent)
-    """
-    query_member = """
-    MATCH (e:Entity {id: $entity_id}), (c:Community {community_id: $community_id})
-    MERGE (e)-[:IN_COMMUNITY]->(c)
-    """
-    try:
-        with memoria_neo4j._driver.session() as session:
-            with session.begin_transaction() as tx:
-                for q in reificadas.cypher_queries:
-                    if q["type"] == "Community":
-                        tx.run(query_community, **q["params"])
-                    elif q["type"] == "Parent":
-                        tx.run(query_parent, **q["params"])
-                    elif q["type"] == "Member":
-                        tx.run(query_member, **q["params"])
-                tx.commit()
-    except Exception:
-        pass
 
 
 def jerarquia_leiden(
@@ -176,3 +117,19 @@ def jerarquia_leiden(
 
     _recursivo(G, 0, None, max_size, G)
     return reificadas
+
+
+def recalcular_leiden(io_id: str, memoria_neo4j, ts: str):
+    """
+    Dispara el recálculo total de la jerarquía Leiden y persiste los nodos reificados.
+    """
+    G = extraer_subgrafo(memoria_neo4j)
+    reificadas = jerarquia_leiden(G)
+
+    if hasattr(memoria_neo4j, 'reificar_comunidades'):
+        memoria_neo4j.reificar_comunidades(reificadas, io_id, ts)
+
+    num_comunidades = len(reificadas.estructura)
+    max_nivel = max([c["level"] for c in reificadas.estructura.values()]) if num_comunidades > 0 else 0
+
+    logging.info(f"[LEIDEN] recalculo disparado por ingesta={io_id} ts={ts} comunidades={num_comunidades} niveles={max_nivel}")

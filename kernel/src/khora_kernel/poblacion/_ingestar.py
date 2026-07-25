@@ -1,4 +1,4 @@
-# @l0 L0-002 · @req ING-03/REQ-1 · @acr ACR-1.1,ACR-1.2 · @ua UA-05
+# @l0 L0-002 · @req ING-04/REQ-1,REQ-2 · @acr ACR-1.1,ACR-2.1 · @ua UA-10,UA-11,UA-12,UA-13
 from typing import Any, List, Optional
 
 from khora_kernel.api import (
@@ -102,7 +102,7 @@ def ingestar(
         # En J-C7 pide 'on_node_upserted(node_id)'
         # Dado que phi_m(objeto) siempre extrae al menos la entidad principal
         # con un ID basado en el objeto (o podemos pasar el objeto id), asumiremos objeto.id
-        on_upsert(objeto.id, memoria)
+        on_upsert(objeto.id, memoria, objeto.provenance.timestamp)
 
     linea_temporal_indexada = True  # Todos llevan timestamp en la provenance requerida por api.Provenance
 
