@@ -155,3 +155,166 @@
 [13:27:48][INFO] Tecla: []
 [13:27:53][INFO] Tecla: [ ]
 [13:29:59][INFO] Auto-WIP: logs copiados a repo/logs/ (incluidos en el commit)
+[15:57:20][OK  ] Repo clonado. Branch: main | Archivos: 384
+[15:57:20][OK  ] Ultimo commit: e0014ba Merge pull request #119 from SeryMente/feat/khora-token-persistence-3746046179220437657
+[15:57:20][OK  ] REPO CIFRADO EN DISCO (EFS): ilegible fuera de esta cuenta/sesion.
+
+================================================================
+ SESION INICIADA
+ Fecha:    2026-07-25 15:57:20
+ Host:     PC-14
+ Usuario:  PC 13
+ Branch:   main  |  Commit: e0014ba Merge pull request #119 from SeryMente/feat/khora-token-persistence-3746046179220437657  |  Archivos: 384
+================================================================
+[15:57:20][OK  ] Entrada escrita en repo/logs/sessions.log
+[15:57:20][OK  ] Rama de respaldo creada: wip/auto-2026-07-25-2744
+[15:57:23][OK  ] Rama WIP publicada y VERIFICADA en remoto.
+[15:57:23][STEP] Entorno de desarrollo (Python + Node + Docker + Vercel + Render)
+[15:57:23][STEP] Configuracion LLM (primera vez en esta PC)
+[15:57:23][INFO] No se encontro .khora.env. Solo 4 datos, el resto es automatico (ENTER para omitir):
+[15:57:59][OK  ] Guardado en: C:\Users\PC 13\Desktop\khora\.khora.env
+[15:57:59][OK  ] Guardado en: C:\Users\PC 13\AppData\Local\khora-session\.khora.env
+[15:57:59][INFO] Secrets .khora.env cifrados con EFS (si esta edicion de Windows lo soporta).
+[15:57:59][OK  ] .env escrito en repo para uvicorn.
+[15:57:59][INFO] === Ensure-Python311: buscando Python 3.11+ ===
+[15:57:59][INFO]   Candidato python en C:\Users\PC 13\AppData\Local\Microsoft\WindowsApps\python.exe: Python was not found; run without arguments to install from the Microsoft Store, or disable this shortcut from Settings > Apps > Advanced app settings > App execution aliases.
+[15:57:59][INFO]   Candidato python3 en C:\Users\PC 13\AppData\Local\Microsoft\WindowsApps\python3.exe: Python was not found; run without arguments to install from the Microsoft Store, or disable this shortcut from Settings > Apps > Advanced app settings > App execution aliases.
+[15:57:59][INFO]   python3.11: no en PATH
+[15:57:59][INFO] Python 3.11+ no encontrado. Instalando con animacion (puede tardar)...
+[15:59:10][INFO] Instalando Python 3.11 completado en 01:09
+[15:59:10][INFO] winget: Found Python 3.11 [Python.Python.3.11] Version 3.11.9
+[15:59:10][INFO] winget: This application is licensed to you by its owner.
+[15:59:10][INFO] winget: Microsoft is not responsible for, nor does it grant any licenses to, third-party packages.
+[15:59:10][INFO] winget: Downloading https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[15:59:10][INFO] winget: Successfully verified installer hash
+[15:59:10][INFO] winget: Starting package install...
+[15:59:10][INFO] winget: Successfully installed
+[15:59:10][OK  ] Python instalado: Python 3.11.9
+[15:59:10][INFO] === Setup-Venv: configurando entorno virtual Python ===
+[15:59:10][INFO] === Ensure-Python311: buscando Python 3.11+ ===
+[15:59:10][INFO]   Candidato python en C:\Users\PC 13\AppData\Local\Programs\Python\Python311\python.exe: Python 3.11.9
+[15:59:10][OK  ] Python OK: Python 3.11.9 (C:\Users\PC 13\AppData\Local\Programs\Python\Python311\python.exe)
+[15:59:24][INFO] Creando entorno virtual Python completado en 00:14
+[15:59:34][INFO] pip install -e . (dependencias Python) completado en 00:10
+[15:59:35][INFO] pip:   error: subprocess-exited-with-error
+[15:59:35][INFO] pip:   
+[15:59:35][INFO] pip:   Getting requirements to build editable did not run successfully.
+[15:59:35][INFO] pip:   exit code: 1
+[15:59:35][INFO] pip:   
+[15:59:35][INFO] pip:   [2 lines of output]
+[15:59:35][INFO] pip:   running egg_info
+[15:59:35][INFO] pip:   error: error in 'egg_base' option: 'src' does not exist or is not a directory
+[15:59:35][INFO] pip:   [end of output]
+[15:59:35][INFO] pip:   
+[15:59:35][INFO] pip:   note: This error originates from a subprocess, and is likely not a problem with pip.
+[15:59:35][INFO] pip: error: subprocess-exited-with-error
+[15:59:35][INFO] pip: System.Management.Automation.RemoteException
+[15:59:35][INFO] pip: Getting requirements to build editable did not run successfully.
+[15:59:35][INFO] pip: exit code: 1
+[15:59:35][INFO] pip: System.Management.Automation.RemoteException
+[15:59:35][INFO] pip: See above for output.
+[15:59:35][INFO] pip: System.Management.Automation.RemoteException
+[15:59:35][INFO] pip: note: This error originates from a subprocess, and is likely not a problem with pip.
+[15:59:35][INFO] pip: System.Management.Automation.RemoteException
+[15:59:35][INFO] pip: [notice] A new release of pip is available: 24.0 -> 26.1.2
+[15:59:35][INFO] pip: [notice] To update, run: C:\Users\PC 13\AppData\Local\khora-session\venv\Scripts\python.exe -m pip install --upgrade pip
+[15:59:35][OK  ] Venv Python listo: C:\Users\PC 13\AppData\Local\khora-session\venv
+[15:59:35][INFO] === Ensure-Node: verificando Node.js ===
+[15:59:35][INFO] Node.js no encontrado. Instalando con animacion...
+[15:59:56][INFO] Instalando Node.js LTS completado en 00:21
+[15:59:56][INFO] winget: Found Node.js (LTS) [OpenJS.NodeJS.LTS] Version 24.18.0
+[15:59:56][INFO] winget: This application is licensed to you by its owner.
+[15:59:56][INFO] winget: Microsoft is not responsible for, nor does it grant any licenses to, third-party packages.
+[15:59:56][INFO] winget: Downloading https://nodejs.org/dist/v24.18.0/node-v24.18.0-x64.msi
+[15:59:56][INFO] winget: Successfully verified installer hash
+[15:59:56][INFO] winget: Starting package install...
+[15:59:56][INFO] winget: Successfully installed
+[15:59:56][OK  ] Node instalado: v24.18.0
+[16:05:09][INFO] npm ci (khora-web) completado en 05:12
+[16:05:09][INFO] npm: npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead
+[16:05:09][INFO] npm: 
+[16:05:09][INFO] npm: added 527 packages, and audited 528 packages in 5m
+[16:05:09][INFO] npm: 
+[16:05:09][INFO] npm: 157 packages are looking for funding
+[16:05:09][INFO] npm:   run `npm fund` for details
+[16:05:09][INFO] npm: 
+[16:05:09][INFO] npm: 13 high severity vulnerabilities
+[16:05:09][INFO] npm: 
+[16:05:09][INFO] npm: To address issues that do not require attention, run:
+[16:05:09][INFO] npm:   npm audit fix
+[16:05:09][INFO] npm: 
+[16:05:09][INFO] npm: To address all issues (including breaking changes), run:
+[16:05:09][INFO] npm:   npm audit fix --force
+[16:05:09][INFO] npm: 
+[16:05:09][INFO] npm: Run `npm audit` for details.
+[16:05:09][INFO] npm: npm warn allow-scripts 5 packages have install scripts not yet covered by allowScripts:
+[16:05:09][INFO] npm: npm warn allow-scripts   @firebase/util@1.15.1 (postinstall: node ./postinstall.js)
+[16:05:09][INFO] npm: npm warn allow-scripts   @google/genai@2.13.0 (preinstall: echo 'preinstall: no-op')
+[16:05:09][INFO] npm: npm warn allow-scripts   protobufjs@7.6.5 (postinstall: node scripts/postinstall)
+[16:05:09][INFO] npm: npm warn allow-scripts   sharp@0.34.5 (install: node install/check.js || npm run build)
+[16:05:09][INFO] npm: npm warn allow-scripts   unrs-resolver@1.12.2 (postinstall: node postinstall.js)
+[16:05:09][INFO] npm: npm warn allow-scripts
+[16:05:09][INFO] npm: npm warn allow-scripts Run `npm approve-scripts --allow-scripts-pending` to review, or `npm approve-scripts <pkg>` to allow.
+[16:05:09][INFO] npm: npm notice
+[16:05:09][INFO] npm: npm notice New major version of npm available! 11.16.0 -> 12.0.1
+[16:05:09][INFO] npm: npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.0.1
+[16:05:09][INFO] npm: npm notice To update run: npm install -g npm@12.0.1
+[16:05:09][INFO] npm: npm notice
+[16:05:09][OK  ] khora-web: dependencias instaladas (npm ci).
+[16:05:45][INFO] Instalando Vercel CLI completado en 00:35
+[16:05:45][INFO] npm: npm warn deprecated stream-to-promise@2.2.0: Deprecated. Use node:stream/promises and node:stream/consumers instead.
+[16:05:45][INFO] npm: npm warn deprecated tar@7.5.7: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+[16:05:45][INFO] npm: 
+[16:05:45][INFO] npm: added 278 packages in 34s
+[16:05:45][INFO] npm: 
+[16:05:45][INFO] npm: 35 packages are looking for funding
+[16:05:45][INFO] npm:   run `npm fund` for details
+[16:05:45][INFO] npm: npm warn allow-scripts 1 package has install scripts not yet covered by allowScripts:
+[16:05:45][INFO] npm: npm warn allow-scripts   esbuild@0.27.0 (postinstall: node install.js)
+[16:05:45][INFO] npm: npm warn allow-scripts
+[16:05:45][INFO] npm: npm warn allow-scripts Run `npm approve-scripts --allow-scripts-pending` to review, or `npm approve-scripts <pkg>` to allow.
+[16:05:45][OK  ] Vercel CLI instalado.
+[16:05:48][INFO] Instalando Render CLI completado en 00:02
+[16:05:48][INFO] npm: npm error code E404
+[16:05:48][INFO] npm: npm error 404 Not Found - GET https://registry.npmjs.org/@render-com%2fcli - Not found
+[16:05:48][INFO] npm: npm error 404
+[16:05:48][INFO] npm: npm error 404  The requested resource '@render-com/cli@*' could not be found or you do not have permission to access it.
+[16:05:48][INFO] npm: npm error 404
+[16:05:48][INFO] npm: npm error 404 Note that you can also install from a
+[16:05:48][INFO] npm: npm error 404 tarball, folder, http url, or git url.
+[16:05:48][INFO] npm: npm error A complete log of this run can be found in: C:\Users\PC 13\AppData\Local\npm-cache\_logs\2026-07-25T22_05_47_557Z-debug-0.log
+[16:05:48][WARN] Render CLI no pudo instalarse. Intenta: npm install -g @render-com/cli
+[16:05:48][INFO] Docker Desktop no encontrado. Instalando (puede tardar varios minutos)...
+[16:07:58][INFO] Instalando Docker Desktop completado en 02:10
+[16:07:58][INFO] winget: Found Docker Desktop [Docker.DockerDesktop] Version 4.83.0
+[16:07:58][INFO] winget: This application is licensed to you by its owner.
+[16:07:58][INFO] winget: Microsoft is not responsible for, nor does it grant any licenses to, third-party packages.
+[16:07:58][INFO] winget: Downloading https://desktop.docker.com/win/main/amd64/234302/Docker%20Desktop%20Installer.exe
+[16:07:58][INFO] winget: Successfully verified installer hash
+[16:07:58][INFO] winget: Starting package install...
+[16:07:58][INFO] winget: Successfully installed
+[16:07:58][INFO] Docker instalado pero daemon inactivo. Iniciando Docker Desktop...
+[16:09:54][WARN] Docker daemon no respondio en 90s. Verifica Docker Desktop manualmente.
+[16:09:54][STEP] VS Code
+[16:09:54][OK  ] VS Code encontrado: C:\Users\PC 13\AppData\Local\Programs\Microsoft VS Code\Code.exe
+[16:09:54][STEP] VS Code: importando configuracion desde el repo
+[16:09:54][OK  ] settings.json aplicado desde el repo.
+[16:09:54][INFO] Lista de extensiones vacia.
+[16:09:54][OK  ] VS Code abierto (PID 13460)
+[16:09:54][STEP] Navegador (inteligente)
+[16:09:54][OK  ] LastPass detectado en Chrome.
+[16:09:54][INFO] Chrome inteligente: 4 URLs | login=False | lastpass=True | running=True
+[16:09:54][OK  ] Chrome ya activo: 4 pestanas nuevas agregadas.
+[16:09:54][STEP] Guardian KHORA (red de seguridad)
+[16:09:54][OK  ] Guardian activo (PID 19256) - inactividad 15min + panico Ctrl+Alt+K
+[16:09:54][OK  ] Deadline registrado: limpieza automatica a las 20:00 (2026-07-25)
+[16:09:54][STEP] Servidores de desarrollo (AUTO-INICIO garantizado)
+[16:09:54][INFO] Arrancando dev servers automaticamente post-token (API + Next.js)...
+[16:09:54][INFO] === Start-DevServers: arrancando API (:8000) + Next.js (:3000) ===
+[16:09:54][OK  ] API uvicorn -> http://localhost:8000  (nueva ventana)
+[16:09:54][INFO] Dev server API uvicorn lanzado en :8000
+[16:09:54][OK  ] Next.js dev -> http://localhost:3000  (nueva ventana)
+[16:09:54][INFO] Dev server Next.js lanzado en :3000
+[16:09:54][INFO] Dev servers iniciados. Sistema listo para trabajar.
+[16:09:54][INFO] SESION LISTA en 849s
+[16:09:55][INFO] Auto-WIP: logs copiados a repo/logs/ (incluidos en el commit)
