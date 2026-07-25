@@ -300,3 +300,6 @@
 --- SESION CERRADA --- 2026-07-25 15:51:51 --- motivo:manual --- dur:6.8min ---
 [15:51:51][OK  ] VS Code: settings.json exportado al repo.
 [15:51:52][INFO] Auto-WIP: logs copiados a repo/logs/ (incluidos en el commit)
+[15:51:52][INFO] git add: OK warning: in the working copy of 'logs/2026-07-25.log', CRLF will be replaced by LF the next time Git touches it warning: in the working copy of 'logs/session-2026-07-25.log', CRLF will be replaced by LF the next time Git touches it
+[15:51:52][INFO] git commit: OK [wip/auto-2026-07-25-4912 5f15b79] wip: auto-guardado 15:51:52  3 files changed, 96 insertions(+)
+[15:51:54][INFO] Auto-WIP VERIFICADO: 1 cambio(s) respaldados en wip/auto-2026-07-25-4912
