@@ -260,3 +260,7 @@
 [12:04:19][INFO] git add: OK warning: in the working copy of 'logs/2026-07-25.log', CRLF will be replaced by LF the next time Git touches it warning: in the working copy of 'logs/sessions.log', CRLF will be replaced by LF the next time Git touches it
 [12:04:20][INFO] git commit: OK [wip/auto-2026-07-25-7192 587505c] wip: auto-guardado 12:04:19  3 files changed, 8 insertions(+)
 [12:04:24][INFO] Auto-WIP VERIFICADO: 1 cambio(s) respaldados en wip/auto-2026-07-25-7192
+[12:09:24][INFO] Auto-WIP: logs copiados a repo/logs/ (incluidos en el commit)
+[12:09:24][INFO] git add: OK warning: in the working copy of 'logs/2026-07-25.log', CRLF will be replaced by LF the next time Git touches it warning: in the working copy of 'logs/sessions.log', CRLF will be replaced by LF the next time Git touches it
+[12:09:25][INFO] git commit: OK [wip/auto-2026-07-25-7192 74bb917] wip: auto-guardado 12:09:24  3 files changed, 8 insertions(+)
+[12:09:29][INFO] Auto-WIP VERIFICADO: 1 cambio(s) respaldados en wip/auto-2026-07-25-7192
