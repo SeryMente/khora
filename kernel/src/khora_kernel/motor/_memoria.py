@@ -1,4 +1,4 @@
-# @l0 L0-002 · @req ING-03/REQ-1 · @acr ACR-1.1,ACR-1.2 · @ua UA-05
+# @l0 L0-002 · @req ING-04/REQ-1,REQ-2 · @acr ACR-1.1,ACR-2.1 · @ua UA-10,UA-11,UA-12,UA-13
 from typing import Any, Dict, List, Optional
 
 from neo4j import GraphDatabase
@@ -381,3 +381,89 @@ class Neo4jMemoriaOrganizada:
                 return [{"origen": record["origen"], "relacion": record["relacion"], "destino": record["destino"], "timestamp": str(record["timestamp"])} for record in result]
         except Exception as e:
             raise Exception(f"Error consultando linea_temporal: {str(e)}")
+
+
+    def reificar_comunidades(self, comunidades, io_id: str, ts: str) -> None:
+        self._asegurar_conexion()
+
+        # We need to invalidate previous communities and their relations
+        query_invalidate = """
+        MATCH (c:Community)
+        WHERE c.invalid_at IS NULL
+        SET c.invalid_at = datetime($ts)
+        WITH c
+        OPTIONAL MATCH (c)-[r]-()
+        WHERE r.invalid_at IS NULL AND (type(r) = 'IN_COMMUNITY' OR type(r) = 'PARENT_COMMUNITY')
+        SET r.invalid_at = datetime($ts)
+        """
+
+        query_community = """
+        UNWIND $communities AS comm
+        CREATE (c:Community {community_id: comm.cid})
+        SET c.level = comm.level,
+            c.gamma = comm.gamma,
+            c.theta = comm.theta,
+            c.summary_placeholder = true,
+            c.created_at = datetime($ts),
+            c.valid_at = datetime($ts),
+            c.invalid_at = null
+        """
+
+        query_member = """
+        UNWIND $members AS m
+        MATCH (e:Entity {id: m.entity_id})
+        MATCH (c:Community {community_id: m.community_id})
+        WHERE c.invalid_at IS NULL AND e.invalid_at IS NULL
+        CREATE (e)-[r:IN_COMMUNITY {io_id: $io_id}]->(c)
+        SET r.created_at = datetime($ts),
+            r.valid_at = datetime($ts),
+            r.invalid_at = null
+        """
+
+        query_parent = """
+        UNWIND $parents AS p
+        MATCH (child:Community {community_id: p.child_id})
+        MATCH (parent:Community {community_id: p.parent_id})
+        WHERE child.invalid_at IS NULL AND parent.invalid_at IS NULL
+        CREATE (child)-[r:PARENT_COMMUNITY {io_id: $io_id}]->(parent)
+        SET r.created_at = datetime($ts),
+            r.valid_at = datetime($ts),
+            r.invalid_at = null
+        """
+
+        communities_list = []
+        members_list = []
+        parents_list = []
+
+        for cid, info in comunidades.estructura.items():
+            communities_list.append({
+                "cid": cid,
+                "level": info["level"],
+                "gamma": info["gamma"],
+                "theta": info["theta"]
+            })
+            for m in info["miembros"]:
+                members_list.append({
+                    "entity_id": m,
+                    "community_id": cid
+                })
+            if info["parent"]:
+                parents_list.append({
+                    "child_id": cid,
+                    "parent_id": info["parent"]
+                })
+
+        try:
+            assert self._driver is not None
+            with self._driver.session() as session:
+                with session.begin_transaction() as tx:
+                    tx.run(query_invalidate, ts=ts)
+                    if communities_list:
+                        tx.run(query_community, communities=communities_list, ts=ts)
+                    if members_list:
+                        tx.run(query_member, members=members_list, io_id=io_id, ts=ts)
+                    if parents_list:
+                        tx.run(query_parent, parents=parents_list, io_id=io_id, ts=ts)
+                    tx.commit()
+        except Exception as e:
+            raise Exception(f"Error en reificar_comunidades: {str(e)}")
