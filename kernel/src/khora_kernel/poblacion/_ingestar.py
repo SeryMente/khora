@@ -1,4 +1,4 @@
-# @l0 L0-002-R · @req KA-00/REQ-2 · @acr ACR-2.1
+# @l0 L0-002 · @req ING-03/REQ-1 · @acr ACR-1.1,ACR-1.2 · @ua UA-05
 from typing import Any, List, Optional
 
 from khora_kernel.api import (
@@ -25,7 +25,7 @@ class _MemoriaInterceptora:
         self.needs_review = 0
         self._candidatos_cache = {}
 
-    def buscar_entidades_candidatas(self, label_norm: str) -> List[dict]:
+    def buscar_entidades_candidatas(self, label_norm: str) -> List[Any]:
         cands = self.memoria_real.buscar_entidades_candidatas(label_norm)
         self._candidatos_cache[label_norm] = cands
         return cands
@@ -65,11 +65,12 @@ class _MemoriaInterceptora:
 
 
 def ingestar(
+
     objeto: ObjetoDeInformacion,
     memoria: Any,
     puerto_llm: PuertoLLM,
     puerto_embeddings: PuertoEmbeddings,
-    on_upsert=None,
+    on_upsert: Optional[Any] = None,
 ) -> ActaDeIngesta:
     # 1. Normalizar
     texto_norm = normalizar(objeto, puerto_llm)
@@ -90,8 +91,11 @@ def ingestar(
 
     # Si hay 0 repetidas, puede que estemos ingiriendo en un grafo vacío y resolver hizo "NEW" a todo con needs_review=True.
 
-    # 4. Escribir vía memoria SOLO con MERGE
-    triples_escritos = memoria.escribir_ingesta(triples_resueltos, objeto.provenance)
+        # 4. Escribir vía memoria SOLO con MERGE o FUSIÓN
+    if hasattr(memoria, 'fusionar_ingesta'):
+        triples_escritos = memoria.fusionar_ingesta(triples_resueltos, objeto.provenance)
+    else:
+        triples_escritos = memoria.escribir_ingesta(triples_resueltos, objeto.provenance)
 
     if on_upsert:
         # Pass the id or the entity logic to the callback.
