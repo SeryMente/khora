@@ -171,7 +171,7 @@ def test_ht_persistido(test_db_path, mock_memoria, monkeypatch):
 
     session_id = "test-session-123"
     # lowercase words to trigger global
-    res = ask("cuentame sobre europa", session_id=session_id, db_path=test_db_path, memoria_neo4j=mock_memoria)
+    ask("cuentame sobre europa", session_id=session_id, db_path=test_db_path, memoria_neo4j=mock_memoria)
 
     ht = load_ht(session_id, test_db_path)
     assert ht is not None

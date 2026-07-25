@@ -1,0 +1,5 @@
+[project]
+name = "cora_audio"
+version = "0.1.0"
+description = "Adaptador de audio Cora para Khora"
+dependencies = []
