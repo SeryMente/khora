@@ -165,3 +165,33 @@
 [15:50:17][INFO] Dev server Next.js lanzado en :3000
 [15:50:17][INFO] Dev servers iniciados. Sistema listo para trabajar.
 [15:50:17][INFO] SESION LISTA en 312s
+[15:50:18][INFO] Auto-WIP: logs copiados a repo/logs/ (incluidos en el commit)
+[15:50:18][INFO] git add: OK warning: in the working copy of 'logs/2026-07-25.log', CRLF will be replaced by LF the next time Git touches it warning: in the working copy of 'logs/session-2026-07-25.log', CRLF will be replaced by LF the next time Git touches it
+[15:50:19][INFO] git commit: OK [wip/auto-2026-07-25-4912 2eb732d] wip: auto-guardado 15:50:18  3 files changed, 278 insertions(+), 213 deletions(-)
+[15:50:19][INFO] Guardian iniciado: inactividad 900s, panico Ctrl+Alt+K.
+[15:50:20][INFO] Monitor de exfiltracion/RAT activo (cada 30s, umbral 25 MB/min).
+[15:50:22][INFO] Auto-WIP VERIFICADO: 1 cambio(s) respaldados en wip/auto-2026-07-25-4912
+[15:51:37][INFO] Tecla: [3]
+[15:51:37][INFO] RAM libre: 46.3GB | Disco: 1073.4GB
+[15:51:37][OK  ] Internet OK
+[15:51:37][OK  ] Repo: wip/auto-2026-07-25-4912 | pendientes: 1
+[15:51:37][WARN] Git user.name activo.
+[15:51:44][INFO] Tecla: [T]
+[15:51:44][STEP] Monitor de acceso remoto / exfiltracion (RAT)
+[15:51:44][WARN] Heuristico: no reemplaza un EDR/antivirus.
+[15:51:44][INFO] Buscando software de control remoto en ejecucion...
+[15:51:44][OK  ] Sin software de control remoto conocido en ejecucion.
+[15:51:44][INFO] Sesiones de escritorio remoto (RDP) entrantes...
+[15:51:44][OK  ] Sin sesiones RDP entrantes activas.
+[15:51:44][INFO] Conexiones externas de procesos de control remoto...
+[15:51:44][OK  ] Sin conexiones externas atribuibles a control remoto.
+[15:51:44][INFO] Conexiones externas establecidas en total: 51
+[15:51:44][OK  ] Linea base de red registrada (199.1 MB enviados acumulados).
+[15:51:44][OK  ] RESULTADO: sin indicios de acceso remoto activo (0 alertas).
+[15:51:44][INFO] Scan-RemoteAccess: 0 alertas, 51 conexiones externas
+[15:51:48][INFO] Tecla: [R]
+[15:51:48][WARN] Render CLI no disponible. Ejecuta [1] Iniciar sesion para instalarlo.
+[15:51:51][INFO] Tecla: [2]
+[15:51:51][STEP] === LIMPIEZA NUCLEAR (motivo: manual) === 15:51:51 ===
+[15:51:51][STEP] Respaldo final al repo
+[15:51:51][OK  ] VS Code: settings.json exportado al repo.
