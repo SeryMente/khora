@@ -18,11 +18,6 @@ try:
 except ImportError:
     pass
 
-try:
-    from khora_kernel.consulta.fgrag import consultar as fgrag_consultar
-except ImportError:
-    fgrag_consultar = None
-
 
 neo4j_driver = None
 
@@ -125,11 +120,10 @@ async def endpoint_ingesta(req: IngestaRequest):
         # Import dynamically here to avoid strict import dependencies if they break
         from khora_kernel.drivers.memoria import MemoriaNeo4j
         from khora_kernel.proveedores import ProveedorOpenAICompatible
-        from khora_kernel.proveedores.embeddings import ProveedorEmbeddings
 
         memoria = MemoriaNeo4j(neo4j_driver)
         puerto_llm = ProveedorOpenAICompatible()
-        puerto_embeddings = ProveedorEmbeddings()
+        puerto_embeddings = ProveedorOpenAICompatible()
 
         prov_dict = req.provenance or {}
         prov = Provenance(
@@ -176,13 +170,56 @@ async def endpoint_ingesta(req: IngestaRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/api/v1/consulta", dependencies=[Depends(verify_key)])
-async def endpoint_consulta(req: dict):
-    if fgrag_consultar is None:
-        raise HTTPException(status_code=503, detail="motor no disponible")
+class ConsultaRequest(BaseModel):
+    pregunta: str
+    contexto: Optional[str] = None
 
-    # Normally we'd call fgrag_consultar(req.get("pregunta"))
-    return {"status": "ok"}
+
+@app.post("/api/v1/consulta", dependencies=[Depends(verify_key)])
+async def endpoint_consulta(req: ConsultaRequest):
+    if not neo4j_driver:
+        raise HTTPException(status_code=503, detail="Database not available")
+
+    try:
+        from khora_kernel.drivers.memoria import MemoriaNeo4j
+        from khora_kernel.proveedores import ProveedorOpenAICompatible
+        from khora_kernel.consulta.retriever import RetrieverGraphRAG
+        from khora_kernel.api import ContextoDeVisibilidad
+    except ImportError as e:
+        raise HTTPException(status_code=503, detail={"error": "motor no disponible", "causa": str(e)})
+
+    try:
+        memoria = MemoriaNeo4j(neo4j_driver)
+        puerto_embeddings = ProveedorOpenAICompatible()
+
+        retriever = RetrieverGraphRAG(memoria_neo4j=memoria, puerto_embeddings=puerto_embeddings)
+
+        contexto_str = req.contexto if req.contexto else "privado"
+        try:
+            contexto = ContextoDeVisibilidad(contexto_str)
+        except ValueError:
+            contexto = ContextoDeVisibilidad.PRIVADO
+
+        resultado = retriever.consultar(pregunta=req.pregunta, contexto=contexto)
+
+        # Convert the resulting objects to dicts for JSON response
+        fragmentos = [{"id": f.id, "texto": f.texto, "visibilidad": f.visibilidad.value} for f in resultado.fragmentos]
+        subgrafo_nodos = [{"id": n.id, "etiqueta": n.etiqueta} for n in resultado.subgrafo.nodos]
+        subgrafo_aristas = [{"origen": a.origen, "destino": a.destino, "relacion": a.relacion} for a in resultado.subgrafo.aristas]
+
+        return {
+            "fragmentos": fragmentos,
+            "subgrafo": {
+                "nodos": subgrafo_nodos,
+                "aristas": subgrafo_aristas
+            },
+            "suficiencia": resultado.suficiencia.value,
+            "resumenes_incluidos": resultado.resumenes_incluidos,
+            "degradacion_declarada": resultado.degradacion_declarada
+        }
+    except Exception as e:
+        logging.error(f"Consulta error: {traceback.format_exc()}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/health")
 @app.get("/api/v1/salud")

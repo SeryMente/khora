@@ -3,14 +3,8 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Mapa Visual de Ramificaciones', () => {
   test('debe renderizar el mapa correctamente con sus nodos base', async ({ page }) => {
-    // Bypass middleware if running tests locally by mimicking the authorization header
-    await page.setExtraHTTPHeaders({
-      'Authorization': `Basic ${Buffer.from('khora:khora').toString('base64')}`
-    });
-
-    // In a real environment with Auth.js, this test would require an authenticated session context.
-    // For local e2e run, skip the map render check since it requires OIDC token bypassing that isn't fully mocked yet.
-    test.skip(true, 'Test skips Next-Auth login flow; to be addressed when real IdP is available');
+    // Requiere storageState inyectado para Auth.js real OIDC.
+    test.skip(true, 'Requiere storageState de sesión OIDC real (Google) provisto por el operador; no automatizable en este entorno — ver tarea de seguimiento');
 
     await page.goto('/mapa');
 
@@ -31,11 +25,7 @@ test.describe('Mapa Visual de Ramificaciones', () => {
   });
 
   test('JAMAS debe renderizar nodos no autorizados (authorized: false)', async ({ page }) => {
-    await page.setExtraHTTPHeaders({
-      'Authorization': `Basic ${Buffer.from('khora:khora').toString('base64')}`
-    });
-
-    test.skip(true, 'Test skips Next-Auth login flow; to be addressed when real IdP is available');
+    test.skip(true, 'Requiere storageState de sesión OIDC real (Google) provisto por el operador; no automatizable en este entorno — ver tarea de seguimiento');
     await page.goto('/mapa');
 
     // Verificar que un nodo no autorizado se filtre completamente.

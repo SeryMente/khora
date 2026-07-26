@@ -3,3 +3,5 @@ uvicorn[standard]
 pydantic
 neo4j
 -e ../kernel
+faiss-cpu
+numpy
