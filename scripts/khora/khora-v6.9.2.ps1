@@ -2842,6 +2842,7 @@ function Run-Main {
     Clear-PendingInput   # descartar residuos del pegado antes de esperar tecla real
     Focus-Window         # auto-enfoque de la ventana principal
     L "INFO" "Menu principal activo. La ventana de log ya muestra el diagnostico de arranque."
+    }
     # Cierre garantizado si se cierra con la X o error
     try { Register-EngineEvent PowerShell.Exiting -Action { if ($script:SES_ACTIVE) { Invoke-Cleanup "salida-forzada" } } | Out-Null } catch {}
     $nextWip  = (Get-Date).AddMinutes($CFG.autoWipMinutes)
