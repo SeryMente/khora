@@ -675,6 +675,10 @@ function Confirm-GhCliAuth {
 function Ensure-VSCode {
     $code = Resolve-Exe "code" (Get-CodePaths) "Code.exe"
     if ($code) { Ok "VS Code encontrado: $code"; return $code }
+    if (Wait-ProactiveDepPrep -Key 'vscode' -Label 'VS Code') {
+        $code = Resolve-Exe "code" (Get-CodePaths) "Code.exe"
+        if ($code) { Ok "VS Code encontrado: $code"; return $code }
+    }
     Warn "VS Code no encontrado. Intentando winget..."
     if (Test-Cmd winget) {
         try {
@@ -1107,6 +1111,51 @@ function Invoke-SecureDeleteFile {
     Remove-Item $file -Force -ErrorAction SilentlyContinue
 }
 # ================================================================
+#  INSTALACION PROACTIVA EN SEGUNDO PLANO (Background Jobs)
+# ================================================================
+function Start-ProactiveDepPrep {
+    if ($script:PrepJobsStarted) { return }
+    $script:PrepJobsStarted = $true
+    $script:PrepJobs = @{}
+    L "INFO" "Iniciando comprobacion de dependencias proactiva en segundo plano..."
+
+    if (-not (Test-Cmd python) -and -not (Test-Cmd python3) -and -not (Test-Cmd python3.11)) {
+        $script:PrepJobs['python'] = Start-Job { winget install --id Python.Python.3.11 -e --silent --accept-package-agreements --accept-source-agreements 2>&1 }
+        L "INFO" "Job proactivo lanzado para Python 3.11"
+    }
+
+    if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
+        $script:PrepJobs['node'] = Start-Job { winget install --id OpenJS.NodeJS.LTS -e --silent --accept-package-agreements --accept-source-agreements 2>&1 }
+        L "INFO" "Job proactivo lanzado para Node.js LTS"
+    }
+
+    if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
+        $script:PrepJobs['docker'] = Start-Job { winget install --id Docker.DockerDesktop -e --silent --accept-package-agreements --accept-source-agreements 2>&1 }
+        L "INFO" "Job proactivo lanzado para Docker Desktop"
+    }
+
+    if (-not (Resolve-Exe "code" (Get-CodePaths) "Code.exe")) {
+        $script:PrepJobs['vscode'] = Start-Job { winget install --id Microsoft.VisualStudioCode -e --scope user --silent --accept-package-agreements --accept-source-agreements 2>&1 }
+        L "INFO" "Job proactivo lanzado para VS Code"
+    }
+}
+
+function Wait-ProactiveDepPrep {
+    param([string]$Key, [string]$Label)
+    if ($script:PrepJobs -and $script:PrepJobs[$Key]) {
+        $j = $script:PrepJobs[$Key]
+        $out = Spin-Job "Esperando instalacion proactiva: $Label" -ArgList @($j) -Tips @('verificando job en segundo plano...','instalando...','preparando...') -Block {
+            param($job)
+            Receive-Job -Job $job -Wait -AutoRemoveJob 2>&1
+        }
+        $out | ForEach-Object { L "INFO" "$Label (proactivo): $_" }
+        $script:PrepJobs.Remove($Key)
+        $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+        return $true
+    }
+    return $false
+}
+# ================================================================
 #  ENTORNO DE DESARROLLO (Python + Node + Docker + Vercel)
 # ================================================================
 function Ensure-Python311 {
@@ -1118,6 +1167,13 @@ function Ensure-Python311 {
             L "INFO" "  Candidato $cmd en $($c.Source): $v"
             if ("$v" -match '3\.(1[1-9]|[2-9]\d)') { Ok "Python OK: $v ($($c.Source))"; return $c.Source }
         } else { L "INFO" "  ${cmd}: no en PATH" }
+    }
+    if (Wait-ProactiveDepPrep -Key 'python' -Label 'Python 3.11') {
+        $c = Get-Command python -ErrorAction SilentlyContinue
+        if ($c) {
+            $v = & $c --version 2>&1
+            if ("$v" -match '3\.(1[1-9]|[2-9]\d)') { Ok "Python OK: $v ($($c.Source))"; return $c.Source }
+        }
     }
     Info "Python 3.11+ no encontrado. Instalando con animacion (puede tardar)..."
     $out = Spin-Job "Instalando Python 3.11" -Tips @('descargando instalador...','verificando firma...','instalando componentes...','actualizando PATH...','casi listo...') -Block {
@@ -1154,6 +1210,10 @@ function Ensure-Node {
     L "INFO" "=== Ensure-Node: verificando Node.js ==="
     $n = Get-Command node -ErrorAction SilentlyContinue
     if ($n) { $v = & node --version 2>&1; L "INFO" "Node en PATH: $($n.Source) v$v"; Ok "Node OK: $v"; return $n.Source }
+    if (Wait-ProactiveDepPrep -Key 'node' -Label 'Node.js LTS') {
+        $n = Get-Command node -ErrorAction SilentlyContinue
+        if ($n) { $v = & node --version 2>&1; Ok "Node OK: $v"; return $n.Source }
+    }
     Info "Node.js no encontrado. Instalando con animacion..."
     $out = Spin-Job "Instalando Node.js LTS" -Tips @('descargando Node.js...','instalando NPM...','configurando entorno...','actualizando PATH...','casi listo...') -Block {
         winget install --id OpenJS.NodeJS.LTS -e --silent 2>&1
@@ -1166,6 +1226,11 @@ function Ensure-Node {
 }
 function Ensure-Docker {
     $dockerCmd = Get-Command docker -ErrorAction SilentlyContinue
+    if (-not $dockerCmd) {
+        if (Wait-ProactiveDepPrep -Key 'docker' -Label 'Docker Desktop') {
+            $dockerCmd = Get-Command docker -ErrorAction SilentlyContinue
+        }
+    }
     if (-not $dockerCmd) {
         Info "Docker Desktop no encontrado. Instalando (puede tardar varios minutos)..."
         $out = Spin-Job "Instalando Docker Desktop" -Tips @('descargando Docker Desktop...','extrayendo componentes...','instalando WSL2 backend...','configurando servicios...','registrando Docker Engine...','casi listo...','ultimo paso...') -Block {
@@ -2826,6 +2891,7 @@ function Run-Main {
     }
     Open-LogWindow
     Start-Sleep -Milliseconds 700
+    Start-ProactiveDepPrep
     # --- VERSIONADO: auto-archivo + coherencia nombre<->version ---
     Step "Versionado v$SCRIPT_VERSION"
     $verFile = Join-Path $VER_DIR "khora-v$SCRIPT_VERSION.ps1"
