@@ -1,4 +1,4 @@
-# @l0 L0-002 · @req ING-04/REQ-1,REQ-2 · @acr ACR-1.1,ACR-2.1 · @ua UA-10,UA-11,UA-12,UA-13
+# @l0 L0-002 · @req ING-03/REQ-1 · @acr ACR-1.1,ACR-1.2 · @ua UA-05
 from typing import Any, Dict, List, Optional
 
 from neo4j import GraphDatabase

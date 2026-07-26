@@ -1,10 +1,10 @@
-# @l0 L0-002 · @req API-00/REQ-1,REQ-2,REQ-3 · @acr ACR-1.1,ACR-1.2,ACR-2.1,ACR-3.1 · @ua —
+# @l0 L0-002-R · @req API-00/REQ-1,REQ-2,REQ-3,DEPLOY-01/REQ-1,DEPLOY-01/REQ-2,DEPLOY-01/REQ-3 · @acr ACR-1.1,ACR-1.2,ACR-2.1,ACR-3.1 · @ua —
 import os
 import uuid
 import datetime
 import traceback
 from typing import Optional
-from fastapi import FastAPI, Depends, HTTPException, Header
+from fastapi import FastAPI, Depends, HTTPException, Header, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, model_validator
 import logging
@@ -29,17 +29,33 @@ neo4j_driver = None
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global neo4j_driver
-    uri = os.getenv("NEO4J_URI", "bolt://localhost:7687")
-    user = os.getenv("NEO4J_USER", "neo4j")
-    password = os.getenv("NEO4J_PASSWORD", "password")
+    missing_vars = []
+
+    uri = os.getenv("NEO4J_URI")
+    user = os.getenv("NEO4J_USER")
+    password = os.getenv("NEO4J_PASSWORD")
+
+    if not uri:
+        missing_vars.append("NEO4J_URI")
+    if not user:
+        missing_vars.append("NEO4J_USER")
+    if not password:
+        missing_vars.append("NEO4J_PASSWORD")
+
+    if missing_vars:
+        raise RuntimeError(f"Missing required Neo4j environment variables: {', '.join(missing_vars)}")
+
+    if "aura" in uri.lower() and not uri.startswith("neo4j+s://"):
+        logging.info("Forcing neo4j+s:// scheme for AuraDB connection")
+        uri = uri.replace("neo4j://", "neo4j+s://").replace("bolt://", "neo4j+s://")
 
     try:
         neo4j_driver = GraphDatabase.driver(uri, auth=(user, password))
         # Test connection early
         neo4j_driver.verify_connectivity()
     except Exception as e:
-        logging.warning(f"Neo4j connection failed on startup: {e}")
-        neo4j_driver = None
+        # We fail fast here if Neo4j is unreachable during startup.
+        raise RuntimeError(f"Neo4j connection failed on startup: {e}")
 
     yield
 
@@ -51,21 +67,37 @@ app = FastAPI(title="Khora API Bridge", lifespan=lifespan)
 origins = []
 if "KHORA_WEB_ORIGIN" in os.environ:
     origins.append(os.environ["KHORA_WEB_ORIGIN"])
+else:
+    # REQ-3: CORS restricted exclusively to KHORA_WEB_ORIGIN
+    logging.warning("KHORA_WEB_ORIGIN not set, no CORS origins allowed")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins if origins else ["*"],
+    allow_origins=origins if origins else [], # Restrict CORS strictly
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-async def verify_key(x_khora_key: str = Header(default=None)):
-    if x_khora_key is None:
-        raise HTTPException(status_code=401, detail="unauthorized")
+@app.middleware("http")
+async def security_middleware(request: Request, call_next):
+    # Exclude OPTIONS (CORS preflight) and healthcheck endpoints
+    if request.method == "OPTIONS" or request.url.path in ["/health", "/api/v1/salud"]:
+        return await call_next(request)
+
+    x_khora_key = request.headers.get("X-Khora-Key")
     expected_key = os.getenv("KHORA_API_KEY")
+
     if not expected_key or x_khora_key != expected_key:
-        raise HTTPException(status_code=401, detail="unauthorized")
+        from fastapi.responses import JSONResponse
+        return JSONResponse(status_code=401, content={"detail": "unauthorized"})
+
+    return await call_next(request)
+
+# Keep verify_key around just in case endpoints depend on it explicitly via Depends,
+# though the middleware handles it globally now.
+async def verify_key(x_khora_key: str = Header(default=None)):
+    pass
 
 class IngestaRequest(BaseModel):
     texto: Optional[str] = None
@@ -152,6 +184,7 @@ async def endpoint_consulta(req: dict):
     # Normally we'd call fgrag_consultar(req.get("pregunta"))
     return {"status": "ok"}
 
+@app.get("/health")
 @app.get("/api/v1/salud")
 async def endpoint_salud():
     if not neo4j_driver:

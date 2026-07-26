@@ -1,3 +1,4 @@
+// @l0 L0-002-R · @req DEPLOY-01/REQ-3 · @acr ACR-3.1
 "use client";
 
 import { useEffect, useState } from "react";
@@ -17,7 +18,7 @@ interface Resumen {
 	window: { start: string; end: string };
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "/api";
 
 export default function Adherencia() {
 	const [data, setData] = useState<Resumen | null>(null);

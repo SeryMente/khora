@@ -1,0 +1,28 @@
+# @l0 L0-002-R · @req DEPLOY-01/REQ-4 · @acr ACR-4.1
+name: Khora API Healthcheck (DEPLOY-01)
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+jobs:
+  healthcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Health
+        run: |
+          API_URL="${{ secrets.KHORA_API_PRODUCTION_URL }}"
+          if [ -z "$API_URL" ]; then
+            echo "URL no configurada, fallando silenciosamente en forks."
+          else
+            STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$API_URL/health")
+
+            if [ "$STATUS_CODE" -ne 200 ] && [ "$STATUS_CODE" -ne 301 ] && [ "$STATUS_CODE" -ne 302 ]; then
+               echo "Healthcheck falló con código $STATUS_CODE"
+               # Instead of using 'exit 1', we can return 1 from the block.
+               false
+            else
+               echo "Healthcheck OK: $STATUS_CODE"
+            fi
+          fi
