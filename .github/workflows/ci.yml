@@ -16,7 +16,7 @@ jobs:
       - name: Start Neo4j
         run: docker compose up -d
       - name: Wait for Neo4j and setup schema
-        run: python scripts/setup_neo4j.py
+        run: python kernel/scripts/setup_neo4j.py
       - run: pytest
         working-directory: kernel
 
