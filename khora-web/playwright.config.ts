@@ -18,7 +18,11 @@ testMatch: ["e2e/**/*.spec.ts", "tests/regression/**/*.spec.ts"],
 	projects: [
 		{
 			name: "chromium",
-			use: { ...devices["Desktop Chrome"] },
+			use: {
+				...devices["Desktop Chrome"],
+				// Support external storage state mapping without auto-generating it
+				...(process.env.PLAYWRIGHT_STORAGE_STATE_PATH && { storageState: process.env.PLAYWRIGHT_STORAGE_STATE_PATH })
+			},
 		},
 	],
 	webServer: {

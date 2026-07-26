@@ -5,14 +5,14 @@ from typing import Any, List, Tuple
 
 import faiss
 import numpy as np
-from sentence_transformers import SentenceTransformer
 
 _MODEL = None
 _MODEL_CALL_COUNT = 0
 
-def get_model() -> SentenceTransformer:
+def get_model() -> Any:
     global _MODEL
     if _MODEL is None:
+        from sentence_transformers import SentenceTransformer
         model_name = os.getenv("KHORA_EMB_MODEL", "BAAI/bge-m3")
         _MODEL = SentenceTransformer(model_name)
     return _MODEL
