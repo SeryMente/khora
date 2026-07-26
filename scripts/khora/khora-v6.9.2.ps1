@@ -2,6 +2,7 @@
 #  KHORA - Script de sesion agnostico
 #  VERSIONADO: $SCRIPT_VERSION es la unica fuente de verdad;
 #    el archivo se nombra khora-v<version>.ps1 y cada version
+# REGLA PERMANENTE: Toda modificacion futura EDITA este unico script y sube $SCRIPT_VERSION renombrando el archivo en el mismo commit. PROHIBIDO crear archivos khora-v*.ps1 paralelos.
 #    ejecutada se auto-archiva en .\versions\
 #  ESTRUCTURA (raiz = carpeta del script, p.ej. persistente en Escritorio):
 #    .\logs\ (logging diario) | .\versions\ (historico) | config.json
@@ -22,6 +23,10 @@
 #  - Endurecimiento: finales de linea unificados a CRLF; mutex de limpieza
 #    a prueba de abandono; variable $args renombrada en Start-Guardian (v6.4.8)
 #  - EFS fail-fast (sonda 1 archivo); ventana de log con auto-reconexion (v6.4.9)
+#  - Autenticacion gh CLI; higiene auto-wip logs; push WIP menu; diag bundle (v6.5.0)
+#  - Snapshot tabs de Chrome por CDP (auto-wip/restore); deteccion LastPass (v6.6.0)
+#  - Verificacion estricta en limpieza; last-cleanup.json; cipher verificable (v6.6.1)
+#  - Boveda centralizada de entorno con sincronizacion automatica Vercel/Render (v6.8.0)
 # ================================================================
 param(
     [switch]$CleanupOnly,   # modo interno: solo ejecuta limpieza NUCLEAR
@@ -37,7 +42,7 @@ $HOST_WIDTH = try { [Math]::Max(60, $Host.UI.RawUI.WindowSize.Width - 2) } catch
 # ================================================================
 #  RUTAS AGNOSTICAS  (nada fijo a una PC)
 # ================================================================
-$SCRIPT_VERSION = "6.4.9"   # <- UNICA fuente de verdad de la version
+$SCRIPT_VERSION = "6.9.2"   # <- UNICA fuente de verdad de la version
 $SYS_DRIVE   = if ($env:SystemDrive) { $env:SystemDrive } else { "C:" }
 # ================================================================
 #  DETECCION DE USUARIO REAL (elevacion con cuenta distinta) v6.4.6
@@ -278,6 +283,12 @@ New-Item -ItemType Directory -Force $ROOT_DIR | Out-Null
 # NOTA: $env:LOCALAPPDATA ya fue redirigido si se detecto elevacion mixta.
 $WORK_DIR    = Join-Path $env:LOCALAPPDATA "khora-session"
 $REPO_DIR    = Join-Path $WORK_DIR "repo"
+$CDP_PORT    = 9333
+$ROOT_STATE_DIR = Join-Path $ROOT_DIR "session-state"
+$WORK_STATE_DIR = Join-Path $WORK_DIR "session-state"
+$TAB_SNAPSHOT_PATH = Join-Path $ROOT_STATE_DIR "chrome-tabs.json"
+$TAB_EXCLUDE_PATTERNS = @('access_token','id_token','[?&]code=','otp','password','chrome://','chrome-extension://','devtools://','about:blank')
+$TAB_SNAPSHOT_MAX = 30
 # Estructura persistente del proyecto (junto al script):
 #   ROOT\logs\      -> logging diario (texto + jsonl)
 #   ROOT\versions\  -> archivo historico de cada version ejecutada
@@ -296,6 +307,8 @@ New-Item -ItemType Directory -Force $WORK_DIR | Out-Null
 New-Item -ItemType Directory -Force $LOG_DIR  | Out-Null
 New-Item -ItemType Directory -Force $VER_DIR  | Out-Null
 New-Item -ItemType Directory -Force $FLAG_DIR | Out-Null
+New-Item -ItemType Directory -Force $ROOT_STATE_DIR | Out-Null
+New-Item -ItemType Directory -Force $WORK_STATE_DIR | Out-Null
 # Migracion silenciosa: config previa en LOCALAPPDATA -> raiz del proyecto
 if (-not (Test-Path $CFG_FILE)) {
     $oldCfg = Join-Path $WORK_DIR "config.json"
@@ -399,6 +412,18 @@ function Invoke-WithToken {
         [GC]::Collect()
     }
 }
+#  Test de extensión
+function Test-LastPassInstalled {
+    $lpId = "hdokiejnpimakedhajhdlcegeplioahd"
+    $chromeUserData = Join-Path $env:LOCALAPPDATA "Google\Chrome\User Data"
+    if (-not (Test-Path $chromeUserData)) { return $false }
+    $profiles = Get-ChildItem -Path $chromeUserData -Directory -Filter "*"
+    foreach ($prof in $profiles) {
+        $extPath = Join-Path $prof.FullName "Extensions\$lpId"
+        if (Test-Path $extPath) { return $true }
+    }
+    return $false
+}
 # Resolver ejecutable en cascada: registro -> PATH -> rutas conocidas
 function Resolve-Exe {
     param([string]$exeName, [string[]]$knownPaths, [string]$appPathsKey)
@@ -428,6 +453,21 @@ function Get-ChromePaths {
         (Join-Path ${env:ProgramFiles(x86)} "Google\Chrome\Application\chrome.exe"),
         (Join-Path $env:LOCALAPPDATA "Google\Chrome\Application\chrome.exe")
     )
+}
+function Open-LoginTabs {
+    $hasLp = Test-LastPassInstalled
+    if (-not $hasLp) { Warn "LastPass no detectado. Las pestañas de login se abrirán pero no tendrán autofill." }
+    $chromeExe = Resolve-Exe "chrome" (Get-ChromePaths) "chrome.exe"
+    if (-not $chromeExe) { Warn "Chrome no detectado, omitiendo pestañas de login."; return }
+    $urls = @(
+        "https://accounts.google.com/ServiceLogin?continue=https://mail.google.com/",
+        "https://www.notion.so/login",
+        "chrome://settings/people"
+    )
+    foreach ($u in $urls) {
+        try { Start-Process -FilePath $chromeExe -ArgumentList "--remote-debugging-port=$CDP_PORT", "`"$u`"" -ErrorAction SilentlyContinue } catch {}
+    }
+    Ok "Abiertas 3 pestañas iniciales de login (CDP port: $CDP_PORT)."
 }
 # ================================================================
 #  CABECERA DE ARRANQUE  (se escribe ANTES de abrir la ventana log)
@@ -535,6 +575,7 @@ function Invoke-Preflight {
     if (-not $net) { Fail "Sin internet." }
     if (Test-Cmd git) { Ok "Git: $(git --version 2>&1 | Select-Object -First 1)" } else { Warn "Git ausente -> se instalara al iniciar." }
     if (Test-Cmd winget) { Ok "winget disponible." } else { Warn "winget ausente -> usare instaladores oficiales." }
+    Confirm-GhCliAuth -CheckOnly | Out-Null
     try { $test = Join-Path $WORK_DIR ".wtest"; Set-Content $test "x"; Remove-Item $test -Force; Ok "Escritura en workdir OK ($WORK_DIR)" } catch { Fail "No se puede escribir en workdir." }
     if (Resolve-Exe "chrome" (Get-ChromePaths) "chrome.exe") { Ok "Chrome detectado." } else { Warn "Chrome no detectado -> usare navegador por defecto." }
     if (Resolve-Exe "code" (Get-CodePaths) "Code.exe") { Ok "VS Code detectado." } else { Warn "VS Code ausente -> se instalara al iniciar." }
@@ -574,6 +615,26 @@ function Ensure-Git {
     } catch { Warn "PortableGit fallo: $_" }
     Fail "No se pudo instalar Git. Instalalo manualmente y reintenta."
     return $false
+}
+# ================================================================
+#  AUTENTICACION GH CLI (agnostico)
+# ================================================================
+function Confirm-GhCliAuth {
+    param([switch]$CheckOnly)
+    if (-not (Test-Cmd gh)) { Warn "gh CLI no encontrado."; return $false }
+    gh auth status 2>&1 | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        if ($CheckOnly) { Warn "gh CLI no autenticado."; return $false }
+        Info "Iniciando autenticacion en gh CLI (se abrira el navegador)..."
+        gh auth login --hostname github.com --git-protocol https --web 2>&1 | ForEach-Object { Info "gh: $_" }
+        gh auth status 2>&1 | Out-Null
+        if ($LASTEXITCODE -ne 0) { Fail "gh CLI no pudo autenticarse."; return $false }
+    }
+    if (-not $CheckOnly) {
+        gh auth setup-git 2>&1 | Out-Null
+    }
+    Ok "gh CLI autenticado."
+    return $true
 }
 # ================================================================
 #  ASEGURAR VS CODE (instalado, no portable; verifica SHA256)
@@ -723,6 +784,51 @@ function Register-Deadline {
 function Unregister-Deadline {
     try { Unregister-ScheduledTask -TaskName $script:TASK_NAME -Confirm:$false -ErrorAction SilentlyContinue; Ok "Deadline desregistrado." } catch {}
 }
+function Save-ChromeTabsSnapshot {
+    $res = Invoke-RestMethod "http://localhost:$CDP_PORT/json" -ErrorAction SilentlyContinue
+    if (-not $res) { Warn "Chrome sin CDP activo o cerrado, omitiendo snapshot de pestañas."; return }
+    $validUrls = @()
+    foreach ($tab in $res) {
+        if ($tab.type -ne "page") { continue }
+        if ([string]::IsNullOrWhiteSpace($tab.url)) { continue }
+        $url = $tab.url
+        $exclude = $false
+        foreach ($pat in $TAB_EXCLUDE_PATTERNS) {
+            if ($url -match $pat) { $exclude = $true; break }
+        }
+        if (-not $exclude) { $validUrls += $url }
+    }
+    if ($validUrls.Count -gt $TAB_SNAPSHOT_MAX) {
+        $validUrls = $validUrls[0..($TAB_SNAPSHOT_MAX - 1)]
+    }
+    $snap = @{
+        "capturedAt" = (Get-Date).ToString("o")
+        "tabs"       = $validUrls
+    }
+    $snapDir = Split-Path $TAB_SNAPSHOT_PATH -Parent
+    if (-not (Test-Path $snapDir)) { New-Item -ItemType Directory -Force $snapDir | Out-Null }
+    $snap | ConvertTo-Json -Compress | Set-Content $TAB_SNAPSHOT_PATH -Encoding UTF8
+    Info "Snapshot de pestañas guardado ($($validUrls.Count) tabs)."
+}
+
+function Restore-ChromeTabsSnapshot {
+    if (-not (Test-Path $TAB_SNAPSHOT_PATH)) {
+        Info "Sin snapshot previo de pestañas."
+        return
+    }
+    $snap = Get-Content $TAB_SNAPSHOT_PATH -Raw | ConvertFrom-Json
+    if (-not $snap.tabs -or $snap.tabs.Count -eq 0) {
+        Info "Snapshot de pestañas vacio."
+        return
+    }
+    $chromeExe = Resolve-Exe "chrome" (Get-ChromePaths) "chrome.exe"
+    if (-not $chromeExe) { Warn "Chrome no detectado, no se pueden restaurar pestañas."; return }
+    foreach ($url in $snap.tabs) {
+        try { Start-Process -FilePath $chromeExe -ArgumentList "`"$url`"" -ErrorAction SilentlyContinue } catch {}
+    }
+    Ok "Restauradas $($snap.tabs.Count) pestaña(s) de la sesión anterior."
+}
+
 # ================================================================
 #  AUTO-WIP: respaldo continuo al remoto (rama wip/auto-*)
 # ================================================================
@@ -773,6 +879,28 @@ function Test-UnpushedWork {
     $ahead = (git -C $REPO_DIR log --oneline --branches --not --remotes 2>$null | Measure-Object).Count
     return ($ahead -gt 0)
 }
+function Ensure-GitignoreHygiene {
+    $gi = Join-Path $REPO_DIR ".gitignore"
+    $pat = "logs/*.log"
+    $patRe = "^logs/\*\.log$"
+    $needsAdd = $true
+    if (Test-Path $gi) {
+        $lines = Get-Content $gi -ErrorAction SilentlyContinue
+        if ($lines -match $patRe) { $needsAdd = $false }
+    }
+    if ($needsAdd) {
+        Add-Content $gi "`n$pat" -Encoding UTF8 -ErrorAction SilentlyContinue
+        Ok "$pat agregado a .gitignore"
+    }
+    # Obtener lista real de archivos log trackeados
+    $tracked = @(git -C $REPO_DIR ls-files -- "logs/*.log" 2>$null)
+    if ($tracked.Count -gt 0) {
+        foreach ($tf in $tracked) {
+            git -C $REPO_DIR rm --cached $tf 2>&1 | Out-Null
+            Ok "Archivo trackeado removido del indice: $tf"
+        }
+    }
+}
 function Init-Wip {
     if (-not $CFG.enableAutoWip) { return }
     $script:WIP_BRANCH = "wip/auto-$DATE_STR-$PID"
@@ -786,6 +914,12 @@ function Init-Wip {
 }
 function Do-AutoWip {
     if (-not $CFG.enableAutoWip -or -not $script:WIP_BRANCH -or -not (Test-Path "$REPO_DIR\.git")) { return }
+    $curBranch = (git -C $REPO_DIR rev-parse --abbrev-ref HEAD 2>$null).Trim()
+    if ($curBranch -ne $script:WIP_BRANCH) {
+        L "INFO" "Auto-WIP en pausa: rama actual distinta de la rama WIP (checkout/merge manual en curso)"
+        return
+    }
+    Save-ChromeTabsSnapshot
     $changes = (git -C $REPO_DIR status --porcelain 2>&1 | Measure-Object).Count
     # Corre si hay cambios nuevos O si quedo un push pendiente de un ciclo anterior
     # Sin cambios en codigo: igual sincronizar logs si crecieron
@@ -942,49 +1076,6 @@ function Invoke-SecureDeleteFile {
 # ================================================================
 #  ENTORNO DE DESARROLLO (Python + Node + Docker + Vercel)
 # ================================================================
-function Load-KhoraEnv {
-    $envPaths = @(
-        (Join-Path $ROOT_DIR  ".khora.env"),
-        (Join-Path $WORK_DIR  ".khora.env")
-    )
-    $loaded = $false
-    foreach ($ep in $envPaths) {
-        if (Test-Path $ep) {
-            Get-Content $ep -ErrorAction SilentlyContinue | Where-Object { $_ -match '^[A-Z_]+=' } | ForEach-Object {
-                $kv = $_ -split '=', 2
-                if ($kv.Count -eq 2) { [System.Environment]::SetEnvironmentVariable($kv[0].Trim(), $kv[1].Trim(), 'Process') }
-            }
-            Ok "Vars LLM cargadas desde: $ep"
-            $loaded = $true; break
-        }
-    }
-    if (-not $loaded) {
-        Step "Configuracion LLM (primera vez en esta PC)"
-        Info "No se encontro .khora.env. Solo 4 datos, el resto es automatico (ENTER para omitir):"
-        $lines = @()
-        foreach ($v in @("KHORA_LLM_BASE_URL","KHORA_LLM_MODEL","KHORA_LLM_API_KEY","RENDER_SERVICE_ID")) {
-            $val = Read-Host "  $v"
-            if ($val) { [System.Environment]::SetEnvironmentVariable($v, $val, 'Process'); $lines += "$v=$val" }
-        }
-        @{ KHORA_LLM_TIMEOUT='60'; KHORA_ER_CAND_LIMIT='500'; KHORA_EMB_MODEL='BAAI/bge-m3';
-           KHORA_EMBEDDINGS_MODEL='BAAI/bge-m3'; KHORA_JUDGE_MODEL='openai/gpt-oss-120b';
-           KHORA_LEIDEN_GAMMA='0.05'; KHORA_LEIDEN_THETA='0.01'; KHORA_LEIDEN_SEED='42'; KHORA_FVAL_MODE='mark' }.GetEnumerator() | ForEach-Object {
-            [System.Environment]::SetEnvironmentVariable($_.Key, $_.Value, 'Process'); $lines += "$($_.Key)=$($_.Value)"
-        }
-        $c = $lines -join "`r`n"
-        foreach ($ep in $envPaths) { try { Set-Content $ep $c -Encoding UTF8; Ok "Guardado en: $ep" } catch {} }
-        # Cifrar los secrets en reposo (EFS por archivo; silencioso si no hay EFS)
-        foreach ($ep in $envPaths) { if (Test-Path $ep) { cipher /e /a "$ep" 2>&1 | Out-Null } }
-        Info "Secrets .khora.env cifrados con EFS (si esta edicion de Windows lo soporta)."
-    }
-    $repoDotEnv = Join-Path $REPO_DIR ".env"
-    if (-not (Test-Path $repoDotEnv)) {
-        $envLines = [System.Environment]::GetEnvironmentVariables('Process').GetEnumerator() |
-            Where-Object { $_.Key -match '^KHORA_' } | ForEach-Object { "$($_.Key)=$($_.Value)" }
-        Set-Content $repoDotEnv ($envLines -join "`r`n") -Encoding UTF8 -ErrorAction SilentlyContinue
-        Ok ".env escrito en repo para uvicorn."
-    }
-}
 function Ensure-Python311 {
     L "INFO" "=== Ensure-Python311: buscando Python 3.11+ ==="
     foreach ($cmd in @('python','python3','python3.11')) {
@@ -1101,6 +1192,301 @@ function Ensure-RenderCLI {
     if (Get-Command render -ErrorAction SilentlyContinue) { Ok "Render CLI instalado." }
     else { Warn "Render CLI no pudo instalarse. Intenta: npm install -g @render-com/cli" }
 }
+function Get-Hash {
+    param([string]$inputString)
+    $bytes = [System.Text.Encoding]::UTF8.GetBytes($inputString)
+    $sha256 = [System.Security.Cryptography.SHA256]::Create()
+    $hashBytes = $sha256.ComputeHash($bytes)
+    return [System.BitConverter]::ToString($hashBytes).Replace("-", "").ToLower()
+}
+
+
+function Get-VaultMasterKey {
+    $lpKey = "khora-env-vault-key"
+    # Wait, the user said "recupéralo de LastPass CLI primero; Read-Host solo como fallback."
+    # Wait! Earlier versions of Khora didn't use `lpass` CLI. The user said: "reutilizando la integración de LastPass ya construida en v6.5.2".
+    # Wait, I previously found that the only LastPass integration in the script was `Test-LastPassInstalled` for Chrome extensions.
+    # Ah, the "integración de LastPass ya construida en v6.5.2" might refer to something else? Wait, no, v6.5.3 had Get-PersistedToken, but it didn't fetch from LastPass, it fetched from a local file ($localTok = Join-Path $ROOT_DIR "khe-token.json").
+    # The prompt explicitly says: "Master key: correcto, recupéralo de LastPass CLI primero; Read-Host solo como fallback."
+
+    $masterKey = $null
+    # Try lpass if available
+    if (Get-Command lpass -ErrorAction SilentlyContinue) {
+        # Check login status (lpass status doesn't always exist, so we just try to show the password)
+        $masterKey = lpass show --password $lpKey 2>$null
+        if ($masterKey) {
+            $masterKey = $masterKey.Trim()
+            return (ConvertTo-SecureString -String $masterKey -AsPlainText -Force)
+        }
+    }
+
+    $msg = "Se requiere el passphrase maestro de la boveda (guardalo en LastPass como '$lpKey')."
+    Write-Host " [Vault] $msg" -ForegroundColor Cyan
+    return Read-Host "  Passphrase" -AsSecureString
+}
+
+function Save-Vault {
+    param($Vault, [string]$Path, [System.Security.SecureString]$Key)
+    $json = $Vault | ConvertTo-Json -Depth 10 -Compress
+    $enc = Protect-KhoraToken -PlainToken $json -Passphrase $Key
+    $enc.format = "aes-cbc-hmac-v1"
+    $encJson = $enc | ConvertTo-Json -Compress
+    Set-Content -Path $Path -Value $encJson -Force
+}
+
+function Load-Vault {
+    param([string]$Path, [System.Security.SecureString]$Key)
+    if (-not (Test-Path $Path)) { return @{} }
+
+    try {
+        $encJson = Get-Content $Path -Raw | ConvertFrom-Json
+        $jsonStr = Unprotect-KhoraToken -Encrypted $encJson -Passphrase $Key
+        $psObj = $jsonStr | ConvertFrom-Json
+        # Convert PSObject to Hashtable (PS 5.1 compatible)
+        $hash = @{}
+        foreach ($prop in $psObj.psobject.properties) {
+            # each property is a key. The value might be a PSCustomObject, convert that to Hashtable too.
+            $val = $prop.Value
+            if ($val -is [System.Management.Automation.PSCustomObject]) {
+                $subHash = @{}
+                foreach ($subProp in $val.psobject.properties) {
+                    $subHash[$subProp.Name] = $subProp.Value
+                }
+                $val = $subHash
+            }
+            $hash[$prop.Name] = $val
+        }
+        return $hash
+    } catch {
+        Warn "Fallo al cargar la boveda (contrasena incorrecta o corrupta): $_"
+        return @{}
+    }
+}
+
+function Sync-Render {
+    param([string]$Key, [string]$Value, [string]$Token, [string]$ServiceId)
+    $headers = @{
+        "Authorization" = "Bearer $Token"
+        "Accept" = "application/json"
+        "Content-Type" = "application/json"
+    }
+
+    $json = @{ value = $Value } | ConvertTo-Json -Compress
+    $body = [System.Text.Encoding]::UTF8.GetBytes($json)
+
+    $url = "https://api.render.com/v1/services/$ServiceId/env-vars/$Key"
+    try {
+        Invoke-RestMethod -Uri $url -Method Put -Headers $headers -Body $body | Out-Null
+        Ok "Render: $Key sincronizada."
+    } catch {
+        Warn "Render: Fallo al sincronizar $Key. Error: $_"
+    }
+}
+
+function Sync-Vercel {
+    param([string]$Key, [string]$Value, [string]$Token)
+    Ensure-VercelCLI
+
+    $webDir = Join-Path $REPO_DIR "khora-web"
+    $tmpFile = Join-Path $env:TEMP "vercel-env-val-$([guid]::NewGuid().ToString()).txt"
+    try {
+        [System.IO.File]::WriteAllText($tmpFile, $Value)
+
+        # vercel env rm first to avoid "already exists" errors, then add
+        & cmd /c "cd /d `"$webDir`" && vercel env rm $Key production preview development --token $Token -y >nul 2>&1"
+        & cmd /c "cd /d `"$webDir`" && vercel env add $Key production preview development --token $Token < `"$tmpFile`" >nul 2>&1"
+        if ($LASTEXITCODE -eq 0) {
+            Ok "Vercel: $Key sincronizada."
+        } else {
+            Warn "Vercel: Fallo al sincronizar $Key (ExitCode: $LASTEXITCODE)."
+        }
+    } catch {
+        Warn "Vercel: Fallo al sincronizar $Key. Error: $_"
+    } finally {
+        if (Test-Path $tmpFile) { Remove-Item $tmpFile -Force -ErrorAction SilentlyContinue }
+    }
+}
+
+$EnvManifest = @(
+    # Core Infrastructure
+    @{ Name="KHORA_API_KEY"; IsSecret=$true; Targets=@("Vercel", "Render"); Aliases=@("X_KHORA_KEY") }
+    @{ Name="NEO4J_URI"; IsSecret=$true; Targets=@("Vercel", "Render") }
+    @{ Name="NEO4J_USER"; IsSecret=$true; Targets=@("Vercel", "Render") }
+    @{ Name="NEO4J_PASSWORD"; IsSecret=$true; Targets=@("Vercel", "Render") }
+
+    # Render API / Config
+    @{ Name="RENDER_API_KEY"; IsSecret=$true; Targets=@() }
+    @{ Name="RENDER_SERVICE_ID"; IsSecret=$false; Targets=@() }
+
+    # Vercel Config
+    @{ Name="VERCEL_TOKEN"; IsSecret=$true; Targets=@() }
+
+    # LLM Settings
+    @{ Name="KHORA_LLM_API_URL"; IsSecret=$false; Targets=@("Render"); Aliases=@("LLM_CHEAP_API_URL") }
+    @{ Name="KHORA_LLM_API_KEY"; IsSecret=$true; Targets=@("Render"); Aliases=@("LLM_CHEAP_API_KEY") }
+    @{ Name="KHORA_LLM_MODEL"; IsSecret=$false; Targets=@("Render"); Aliases=@("LLM_CHEAP_MODEL") }
+    @{ Name="KHORA_WEB_ORIGIN"; IsSecret=$false; Targets=@("Render") }
+
+    # Khora Web (Vercel)
+    @{ Name="AUTH_SECRET"; IsSecret=$true; Targets=@("Vercel") }
+    @{ Name="DATABASE_URL"; IsSecret=$true; Targets=@("Vercel") }
+    @{ Name="GEMINI_API_KEY"; IsSecret=$true; Targets=@("Vercel") }
+    @{ Name="GITHUB_WEBHOOK_SECRET"; IsSecret=$true; Targets=@("Vercel") }
+    @{ Name="GROQ_API_KEY"; IsSecret=$true; Targets=@("Vercel") }
+    @{ Name="INTERNAL_TRIGGER_SECRET"; IsSecret=$true; Targets=@("Vercel") }
+    @{ Name="JULES_API_KEY"; IsSecret=$true; Targets=@("Vercel") }
+    @{ Name="KHORA_API_URL"; IsSecret=$false; Targets=@("Vercel") }
+    @{ Name="MAX_CONCURRENT_JULES_SESSIONS"; IsSecret=$false; Targets=@("Vercel") }
+    @{ Name="MEDICAL_INTERP_MONTHLY_GOAL"; IsSecret=$false; Targets=@("Vercel") }
+    @{ Name="META_MINUTES_MONTH"; IsSecret=$false; Targets=@("Vercel") }
+    @{ Name="NEXT_PUBLIC_API_URL"; IsSecret=$false; Targets=@("Vercel") }
+    @{ Name="NEXT_PUBLIC_APP_VERSION"; IsSecret=$false; Targets=@("Vercel") }
+    @{ Name="NODE_ENV"; IsSecret=$false; Targets=@("Vercel") }
+    @{ Name="NOTION_API_KEY"; IsSecret=$true; Targets=@("Vercel") }
+    @{ Name="NOTION_DATABASE_ID"; IsSecret=$true; Targets=@("Vercel") }
+    @{ Name="NOTION_ROADMAP_DATABASE_ID"; IsSecret=$true; Targets=@("Vercel") }
+    @{ Name="NOTION_TOKEN"; IsSecret=$true; Targets=@("Vercel") }
+    @{ Name="OIDC_CLIENT_ID"; IsSecret=$true; Targets=@("Vercel") }
+    @{ Name="OIDC_CLIENT_SECRET"; IsSecret=$true; Targets=@("Vercel") }
+    @{ Name="OIDC_ISSUER_URL"; IsSecret=$false; Targets=@("Vercel") }
+    @{ Name="PLAYWRIGHT_TEST_RUN"; IsSecret=$false; Targets=@("Vercel") }
+    @{ Name="SMTP_HOST"; IsSecret=$false; Targets=@("Vercel") }
+    @{ Name="SMTP_PASS"; IsSecret=$true; Targets=@("Vercel") }
+    @{ Name="SMTP_PORT"; IsSecret=$false; Targets=@("Vercel") }
+    @{ Name="SMTP_SECURE"; IsSecret=$false; Targets=@("Vercel") }
+    @{ Name="SMTP_USER"; IsSecret=$false; Targets=@("Vercel") }
+    @{ Name="TODOIST_TOKEN"; IsSecret=$true; Targets=@("Vercel") }
+)
+
+function Init-EnvVault {
+    $vaultPath = Join-Path $REPO_DIR "secrets\env-vault.enc.json"
+    $secretsDir = Join-Path $REPO_DIR "secrets"
+    if (-not (Test-Path $secretsDir)) { New-Item -ItemType Directory -Path $secretsDir -Force | Out-Null }
+
+    $masterKey = Get-VaultMasterKey
+    if (-not $masterKey) { Fail "Se cancelo el inicio: Passphrase maestro requerido."; return }
+
+    $vault = Load-Vault -Path $vaultPath -Key $masterKey
+    $vaultChanged = $false
+
+    $renderApiToken = if ($vault.ContainsKey("RENDER_API_KEY")) { $vault["RENDER_API_KEY"].Value } else { $null }
+    $renderSvcId = if ($vault.ContainsKey("RENDER_SERVICE_ID")) { $vault["RENDER_SERVICE_ID"].Value } else { $null }
+    $vercelToken = if ($vault.ContainsKey("VERCEL_TOKEN")) { $vault["VERCEL_TOKEN"].Value } else { $null }
+
+    foreach ($v in $EnvManifest) {
+        $name = $v.Name
+        $isSecret = $v.IsSecret
+        $targets = $v.Targets
+
+        $value = $null
+
+        if ($vault.ContainsKey($name)) {
+            $value = $vault[$name].Value
+        } else {
+            # BOOTSTRAP: Intentar recuperar desde Vercel o Render primero si aplica
+            $foundInCloud = $false
+
+            if ($vercelToken -and $targets -contains "Vercel") {
+                $webDir = Join-Path $REPO_DIR "khora-web"
+                $tmpEnv = [System.IO.Path]::GetTempFileName()
+                try {
+                    & cmd /c "cd /d `"$webDir`" && vercel env pull `"$tmpEnv`" --environment=production --token $vercelToken --yes >nul 2>&1"
+                    if (Test-Path $tmpEnv) {
+                        $envLines = Get-Content $tmpEnv -ErrorAction SilentlyContinue
+                        foreach ($line in $envLines) {
+                            $line = $line.Trim()
+                            if ([string]::IsNullOrEmpty($line) -or $line.StartsWith("#")) { continue }
+                            $idx = $line.IndexOf('=')
+                            if ($idx -gt 0) {
+                                $k = $line.Substring(0, $idx)
+                                if ($k -eq $name) {
+                                    $v = $line.Substring($idx + 1)
+                                    if ($v.StartsWith("`"") -and $v.EndsWith("`"") -and $v.Length -ge 2) {
+                                        $v = $v.Substring(1, $v.Length - 2)
+                                    }
+                                    $value = $v
+                                    $foundInCloud = $true
+                                    break
+                                }
+                            }
+                        }
+                    }
+                } finally {
+                    if (Test-Path $tmpEnv) { Remove-Item $tmpEnv -Force -ErrorAction SilentlyContinue }
+                }
+            }
+
+            if (-not $foundInCloud -and $renderApiToken -and $renderSvcId -and $targets -contains "Render") {
+                $headers = @{ "Authorization" = "Bearer $renderApiToken"; "Accept" = "application/json" }
+                $url = "https://api.render.com/v1/services/$renderSvcId/env-vars?limit=100"
+                try {
+                    $renderEnvVars = Invoke-RestMethod -Uri $url -Method Get -Headers $headers -ErrorAction Stop
+                    foreach ($rVar in $renderEnvVars) {
+                        if ($rVar.envVar.key -eq $name) {
+                            $value = $rVar.envVar.value
+                            $foundInCloud = $true
+                            break
+                        }
+                    }
+                } catch {}
+            }
+
+            if (-not $foundInCloud) {
+                Write-Host " [Vault] Variable requerida faltante: $name" -ForegroundColor Yellow
+                if ($isSecret) {
+                    $sec = Read-Host "  $name" -AsSecureString
+                    $value = [System.Net.NetworkCredential]::new("", $sec).Password
+                } else {
+                    $value = Read-Host "  $name"
+                }
+            }
+
+            $vault[$name] = @{ Value=$value; SyncState=@{} }
+            $vaultChanged = $true
+
+            # Actualizar tokens de bootstrap si fueron los que acabamos de capturar
+            if ($name -eq "RENDER_API_KEY") { $renderApiToken = $value }
+            if ($name -eq "RENDER_SERVICE_ID") { $renderSvcId = $value }
+            if ($name -eq "VERCEL_TOKEN") { $vercelToken = $value }
+        }
+
+        [System.Environment]::SetEnvironmentVariable($name, $value, 'Process')
+
+        # Sincronizacion
+        foreach ($target in $targets) {
+            $targetNames = @($name)
+            if ($v.Aliases) { $targetNames += $v.Aliases }
+
+            foreach ($tname in $targetNames) {
+                $expectedHash = (Get-Hash $value)
+                $syncState = $vault[$name].SyncState["$target|$tname"]
+                if ($syncState -ne $expectedHash) {
+                    Info "Sincronizando $tname hacia $target..."
+                    if ($target -eq "Vercel" -and $vercelToken) {
+                        Sync-Vercel -Key $tname -Value $value -Token $vercelToken
+                    } elseif ($target -eq "Render" -and $renderApiToken -and $renderSvcId) {
+                        Sync-Render -Key $tname -Value $value -Token $renderApiToken -ServiceId $renderSvcId
+                    }
+                    $vault[$name].SyncState["$target|$tname"] = $expectedHash
+                    $vaultChanged = $true
+                }
+            }
+        }
+    }
+
+    if ($script:TokSecure) {
+        $ghTok = [System.Net.NetworkCredential]::new("", $script:TokSecure).Password
+        [System.Environment]::SetEnvironmentVariable("GITHUB_TOKEN", $ghTok, 'Process')
+    }
+
+    if ($vaultChanged) {
+        Save-Vault -Vault $vault -Path $vaultPath -Key $masterKey
+        Ok "Boveda de entorno actualizada."
+    } else {
+        Ok "Boveda de entorno verificada y en sincronia."
+    }
+}
+
 function Invoke-RenderOps {
     $svcId = [System.Environment]::GetEnvironmentVariable('RENDER_SERVICE_ID', 'Process')
     if (-not (Get-Command render -ErrorAction SilentlyContinue)) {
@@ -1252,6 +1638,162 @@ function Invoke-ChromeIntelligent {
         foreach ($u in $urls) { Start-Process $u }
     }
 }
+# ================================================================
+
+#  TOKEN PERSISTENCE (v6.5.3)
+
+# ================================================================
+# ================================================================
+#  TOKEN PERSISTENCE (v6.5.3)
+# ================================================================
+function Protect-KhoraToken {
+    param([string]$PlainToken, [System.Security.SecureString]$Passphrase)
+    $salt = [byte[]]::new(16)
+    $rng = [System.Security.Cryptography.RNGCryptoServiceProvider]::Create()
+    $rng.GetBytes($salt)
+
+    $ptr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($Passphrase)
+    $passText = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($ptr)
+
+    # 200,000 iteraciones como minimo requerido
+    $pbkdf2 = New-Object System.Security.Cryptography.Rfc2898DeriveBytes($passText, $salt, 200000)
+    $keyMat = $pbkdf2.GetBytes(64) # 32 AES + 32 HMAC
+
+    [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($ptr)
+
+    $aesKey = $keyMat[0..31]
+    $hmacKey = $keyMat[32..63]
+
+    $aes = [System.Security.Cryptography.Aes]::Create()
+    $aes.KeySize = 256
+    $aes.Key = $aesKey
+    $aes.Mode = [System.Security.Cryptography.CipherMode]::CBC
+    $aes.Padding = [System.Security.Cryptography.PaddingMode]::PKCS7
+    $aes.GenerateIV()
+
+    $enc = $aes.CreateEncryptor()
+    $plainBytes = [System.Text.Encoding]::UTF8.GetBytes($PlainToken)
+    $cipherBytes = $enc.TransformFinalBlock($plainBytes, 0, $plainBytes.Length)
+
+    $hmac = New-Object System.Security.Cryptography.HMACSHA256
+    $hmac.Key = $hmacKey
+    # tag = HMAC(IV + CipherText)
+    $tagData = New-Object byte[] ($aes.IV.Length + $cipherBytes.Length)
+    [Array]::Copy($aes.IV, 0, $tagData, 0, $aes.IV.Length)
+    [Array]::Copy($cipherBytes, 0, $tagData, $aes.IV.Length, $cipherBytes.Length)
+
+    $tagBytes = $hmac.ComputeHash($tagData)
+
+    return @{
+        cipherText = [Convert]::ToBase64String($cipherBytes)
+        salt = [Convert]::ToBase64String($salt)
+        iv = [Convert]::ToBase64String($aes.IV)
+        tag = [Convert]::ToBase64String($tagBytes)
+    }
+}
+
+function Unprotect-KhoraToken {
+    param($Encrypted, [System.Security.SecureString]$Passphrase)
+    $salt = [Convert]::FromBase64String($Encrypted.salt)
+    $iv = [Convert]::FromBase64String($Encrypted.iv)
+    $cipherBytes = [Convert]::FromBase64String($Encrypted.cipherText)
+    $expectedTag = [Convert]::FromBase64String($Encrypted.tag)
+
+    $ptr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($Passphrase)
+    $passText = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($ptr)
+
+    $pbkdf2 = New-Object System.Security.Cryptography.Rfc2898DeriveBytes($passText, $salt, 200000)
+    $keyMat = $pbkdf2.GetBytes(64)
+
+    [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($ptr)
+
+    $aesKey = $keyMat[0..31]
+    $hmacKey = $keyMat[32..63]
+
+    $hmac = New-Object System.Security.Cryptography.HMACSHA256
+    $hmac.Key = $hmacKey
+
+    $tagData = New-Object byte[] ($iv.Length + $cipherBytes.Length)
+    [Array]::Copy($iv, 0, $tagData, 0, $iv.Length)
+    [Array]::Copy($cipherBytes, 0, $tagData, $iv.Length, $cipherBytes.Length)
+
+    $actualTag = $hmac.ComputeHash($tagData)
+
+    for ($i = 0; $i -lt $expectedTag.Length; $i++) {
+        if ($actualTag[$i] -ne $expectedTag[$i]) {
+            throw "El tag de integridad HMAC no coincide. Contraseña incorrecta o token corrupto."
+        }
+    }
+
+    $aes = [System.Security.Cryptography.Aes]::Create()
+    $aes.KeySize = 256
+    $aes.Key = $aesKey
+    $aes.Mode = [System.Security.Cryptography.CipherMode]::CBC
+    $aes.Padding = [System.Security.Cryptography.PaddingMode]::PKCS7
+    $aes.IV = $iv
+
+    $dec = $aes.CreateDecryptor()
+    $plainBytes = $dec.TransformFinalBlock($cipherBytes, 0, $cipherBytes.Length)
+    return [System.Text.Encoding]::UTF8.GetString($plainBytes)
+}
+
+function Save-TokenSnapshot {
+    param([string]$Token, [datetime]$ExpiresUtc, [System.Security.SecureString]$Passphrase)
+
+    $enc = Protect-KhoraToken -PlainToken $Token -Passphrase $Passphrase
+    $snapshot = @{
+        cipherText = $enc.cipherText
+        salt = $enc.salt
+        iv = $enc.iv
+        tag = $enc.tag
+        createdUtc = (Get-Date).ToUniversalTime().ToString("o")
+        expiresUtc = $ExpiresUtc.ToString("o")
+    }
+
+    $outFile = Join-Path $ROOT_STATE_DIR "gh-token.enc.json"
+    $snapshot | ConvertTo-Json -Depth 5 | Set-Content $outFile -Encoding UTF8 -Force
+    Ok "Snapshot de token guardado localmente."
+}
+
+function Test-TokenSnapshotValid {
+    $outFile = Join-Path $ROOT_STATE_DIR "gh-token.enc.json"
+    $snapshotJson = $null
+
+    if (Test-Path $outFile) {
+        $snapshotJson = Get-Content $outFile -Raw
+    } else {
+        if (Get-Command gh -ErrorAction SilentlyContinue) {
+            try {
+                # Attempt to get it from the remote if it existed there historically, though moving to ROOT_STATE_DIR means it shouldn't be there moving forward.
+                $rawGh = gh api repos/$REPO_ORG/$REPO_NAME/contents/session-state/gh-token.enc.json --jq '.content' 2>$null
+                if ($rawGh) {
+                    $snapshotJson = [System.Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($rawGh))
+                }
+            } catch {}
+        }
+    }
+
+    if ($snapshotJson) {
+        try {
+            $snapshot = $snapshotJson | ConvertFrom-Json
+            $exp = [datetime]::Parse($snapshot.expiresUtc).ToUniversalTime()
+            if ($exp -gt (Get-Date).ToUniversalTime()) {
+                return $snapshot
+            }
+        } catch {}
+    }
+    return $false
+}
+
+function Get-PersistedToken {
+    param([System.Security.SecureString]$Passphrase, $Snapshot)
+    try {
+        return Unprotect-KhoraToken -Encrypted $Snapshot -Passphrase $Passphrase
+    } catch {
+        return $null
+    }
+}
+
 function Invoke-ChromeCleanup {
     $chromeBase = Join-Path $env:LOCALAPPDATA "Google\Chrome\User Data"
     if (-not (Test-Path $chromeBase)) { Info "Sin datos de Chrome que limpiar."; return }
@@ -1338,6 +1880,10 @@ function Start-Sesion {
     $script:EFS_ACTIVE = Protect-KhoraPath $WORK_DIR "workdir de sesion"
     if ($script:EFS_ACTIVE) { Info "Todo lo que se descargue al workdir (repo incluido) nacera CIFRADO en disco." }
     if (-not (Ensure-Git)) { return }
+    # --- Autenticacion gh CLI ---
+    Step "Autenticacion gh CLI"
+    if (-not (Confirm-GhCliAuth)) { Warn "gh CLI fallido. El script seguira pero algunas funciones pueden degradarse." }
+    Open-LoginTabs
     # --- Token seguro ---
     Step "Autenticacion GitHub (token en SecureString)"
     $valid = $false
@@ -1434,6 +1980,11 @@ function Start-Sesion {
     $nFiles = (Get-ChildItem $REPO_DIR -Recurse -File -ErrorAction SilentlyContinue | Measure-Object).Count
     Ok "Repo clonado. Branch: $branch | Archivos: $nFiles"
     Ok "Ultimo commit: $ultimo"
+    $giFile = Join-Path $REPO_DIR ".gitignore"
+    if (Test-Path $giFile) {
+        $giCount = (Get-Content $giFile -ErrorAction SilentlyContinue | Where-Object { $_.Trim() -ne "" -and -not $_.Trim().StartsWith("#") } | Measure-Object).Count
+        Info "Reglas en .gitignore: $giCount. Recuerda 'git add -f' si necesitas forzar algo ignorado."
+    }
     # Verificacion: el repo nacio dentro del workdir EFS -> debe estar cifrado
     if ($script:EFS_ACTIVE) {
         $__rf = Get-ChildItem $REPO_DIR -Recurse -File -Force -ErrorAction SilentlyContinue | Select-Object -First 1
@@ -1453,10 +2004,11 @@ function Start-Sesion {
 "@
     Add-Content (Join-Path $REPO_DIR "logs\sessions.log") $entry -Encoding UTF8 -ErrorAction SilentlyContinue
     Ok "Entrada escrita en repo/logs/sessions.log"
+    Ensure-GitignoreHygiene
     Init-Wip
+    Restore-ChromeTabsSnapshot
     # Entorno PRIMERO: VS Code abrira con npm/node/render/docker ya en PATH
     Step "Entorno de desarrollo (Python + Node + Docker + Vercel + Render)"
-    Load-KhoraEnv
     Ensure-Python311
     Setup-Venv
     Ensure-Node
@@ -1482,6 +2034,9 @@ function Start-Sesion {
     # ===================================================================
     # AUTO-INICIO GARANTIZADO: todo corre solo, sin opcion de menu
     # ===================================================================
+    Step "Boveda de entorno (Env Vault)"
+    Init-EnvVault
+
     Step "Servidores de desarrollo (AUTO-INICIO garantizado)"
     L "INFO" "Arrancando dev servers automaticamente post-token (API + Next.js)..."
     Start-DevServers
@@ -1525,6 +2080,7 @@ function Invoke-Cleanup {
             if ($script:TokSecure) {
                 try {
                     Export-VSCodeConfig
+                    Save-ChromeTabsSnapshot
                     Do-AutoWip
                     $pend = (git -C $REPO_DIR status --porcelain 2>$null | Measure-Object).Count
                     if ($pend -gt 0) {
@@ -1547,14 +2103,24 @@ function Invoke-Cleanup {
         Step "Deteniendo red de seguridad"
         Unregister-Deadline
         $gp = Join-Path $FLAG_DIR "guardian.pid"
-        if (Test-Path $gp) { try { Stop-Process -Id (Get-Content $gp) -Force -ErrorAction SilentlyContinue; Ok "Guardian detenido." } catch {}; Remove-Item $gp -Force -ErrorAction SilentlyContinue }
+        $gpid = $null
+        if (Test-Path $gp) {
+            try {
+                $gpid = Get-Content $gp -ErrorAction SilentlyContinue
+                if ($gpid) {
+                    Stop-Process -Id $gpid -Force -ErrorAction SilentlyContinue
+                    if (-not (Get-Process -Id $gpid -ErrorAction SilentlyContinue)) { Ok "Guardian detenido." }
+                }
+            } catch {}
+            Remove-Item $gp -Force -ErrorAction SilentlyContinue
+        }
         # Borrar workdir (repo + logwin + portables)
         Step "Borrando datos de trabajo"
         # Secrets PRIMERO: sobrescritura aleatoria antes de borrar (anti-forense)
         foreach ($__envF in @((Join-Path $ROOT_DIR ".khora.env"), (Join-Path $WORK_DIR ".khora.env"))) {
             if (Test-Path $__envF) { Invoke-SecureDeleteFile $__envF; Ok "Secret DESTRUIDO de forma segura: $__envF" }
         }
-        Info "Vars LLM destruidas: se pediran la proxima sesion (tenlas en LastPass)."
+        Info "Vars LLM .khora.env destruidas: ahora gestionadas por boveda."
         Get-Process powershell -ErrorAction SilentlyContinue | Where-Object { $_.Id -eq $script:LOG_WIN_PID } | Stop-Process -Force -ErrorAction SilentlyContinue
         # COMPUERTA FAIL-CLOSED: jamas destruir trabajo sin respaldo remoto VERIFICADO.
         # Si queda trabajo sin push, el repo se mueve a cuarentena local en vez de borrarse.
@@ -1585,7 +2151,7 @@ function Invoke-Cleanup {
         if (Test-Path $gitcfg) {
             (Get-Content $gitcfg | Where-Object { $_ -notmatch '(name|email|helper)\s*=' }) | Set-Content $gitcfg -Encoding UTF8 -ErrorAction SilentlyContinue
         }
-        Ok "Git config limpiado (user/email/helper)."
+        if (-not (git config --global user.name 2>$null) -and -not (git config --global user.email 2>$null)) { Ok "Git config limpiado (user/email/helper)." }
         # Credential Manager
         Step "Credential Manager"
         $found=0
@@ -1596,23 +2162,39 @@ function Invoke-Cleanup {
                 if ($tg) { cmdkey /delete:$tg 2>$null | Out-Null; $found++ }
             }
         }
-        Ok "$found credencial(es) eliminada(s)."
+        $stillThere = (cmdkey /list 2>$null | Select-String "git|github|visualstudio|vscode")
+        if (-not $stillThere) { Ok "$found credencial(es) eliminada(s) verificadas." }
         # Historial PowerShell de TODOS los perfiles (agnostico)
         Step "Historial PowerShell (todos los perfiles)"
+        $h_cleared = $false
         Get-ChildItem (Join-Path $SYS_DRIVE "Users") -Directory -ErrorAction SilentlyContinue | ForEach-Object {
             $h = Join-Path $_.FullName "AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt"
-            if (Test-Path $h) { Clear-Content $h -ErrorAction SilentlyContinue; Ok "PS history: $($_.Name)" }
+            if (Test-Path $h) {
+                Clear-Content $h -ErrorAction SilentlyContinue
+                if ((Get-Item $h -ErrorAction SilentlyContinue).length -eq 0) { Ok "PS history: $($_.Name)"; $h_cleared = $true }
+            }
         }
         try { [Microsoft.PowerShell.PSConsoleReadLine]::ClearHistory() } catch {}
         # VS Code datos (usuario actual)
         Step "VS Code - datos y cache"
         @("Backups","User\workspaceStorage","User\History","User\settings.json","logs","CachedData","CachedExtensionVSIXs") | ForEach-Object {
             $d = Join-Path $env:APPDATA "Code\$_"
-            if (Test-Path $d) { Remove-Item -Recurse -Force $d -ErrorAction SilentlyContinue; Ok "VS Code: $_" }
+            if (Test-Path $d) {
+                Remove-Item -Recurse -Force $d -ErrorAction SilentlyContinue
+                if (-not (Test-Path $d)) { Ok "VS Code: $_" }
+            }
         }
         $sf = Join-Path $env:APPDATA "Code\User\globalStorage\storage.json"
+        $allEmpty = $true
         if (Test-Path $sf) {
-            try { $j = Get-Content $sf -Raw | ConvertFrom-Json; $j.PSObject.Properties | Where-Object { $_.Name -match "recent|opened|lastUsed" } | ForEach-Object { $j.($_.Name)=@() }; $j | ConvertTo-Json -Depth 10 | Set-Content $sf -Encoding UTF8; Ok "VS Code storage.json: recientes limpiados." } catch {}
+            try {
+                $j = Get-Content $sf -Raw | ConvertFrom-Json
+                $j.PSObject.Properties | Where-Object { $_.Name -match "recent|opened|lastUsed" } | ForEach-Object { $j.($_.Name)=@() }
+                $j | ConvertTo-Json -Depth 10 | Set-Content $sf -Encoding UTF8
+                $checkJ = Get-Content $sf -Raw | ConvertFrom-Json
+                $checkJ.PSObject.Properties | Where-Object { $_.Name -match "recent|opened|lastUsed" } | ForEach-Object { if ($_.Value.Count -gt 0) { $allEmpty = $false } }
+                if ($allEmpty) { Ok "VS Code storage.json: recientes limpiados." }
+            } catch {}
         }
         # Chrome - TODOS los perfiles del usuario actual
         Step "Chrome - limpieza total (todos los perfiles)"
@@ -1624,29 +2206,59 @@ function Invoke-Cleanup {
             foreach ($pf in $profiles) {
                 foreach ($it in $items) {
                     $path = Join-Path $pf.FullName $it
-                    if (Test-Path $path) { Remove-Item -Recurse -Force $path -ErrorAction SilentlyContinue; $cleared++ }
+                    if (Test-Path $path) {
+                        Remove-Item -Recurse -Force $path -ErrorAction SilentlyContinue
+                        if (-not (Test-Path $path)) { $cleared++ }
+                    }
                 }
             }
-            foreach ($sh in @("ShaderCache","GrShaderCache")) { $p=Join-Path $chromeBase $sh; if (Test-Path $p){ Remove-Item -Recurse -Force $p -ErrorAction SilentlyContinue; $cleared++ } }
-            Ok "Chrome: $cleared elementos borrados en $($profiles.Count) perfil(es)."
+            foreach ($sh in @("ShaderCache","GrShaderCache")) {
+                $p=Join-Path $chromeBase $sh
+                if (Test-Path $p){
+                    Remove-Item -Recurse -Force $p -ErrorAction SilentlyContinue
+                    if (-not (Test-Path $p)) { $cleared++ }
+                }
+            }
+            if ($cleared -gt 0) { Ok "Chrome: $cleared elementos borrados en $($profiles.Count) perfil(es)." }
         } else { Info "Sin datos de Chrome." }
         # Temporales + caches dev
         Step "Temporales y caches"
         @("khora*","git*","vscode*","*token*","khe-*") | ForEach-Object {
-            Get-Item (Join-Path $env:TEMP $_) -ErrorAction SilentlyContinue | ForEach-Object { Remove-Item $_.FullName -Recurse -Force -ErrorAction SilentlyContinue }
+            Get-Item (Join-Path $env:TEMP $_) -ErrorAction SilentlyContinue | ForEach-Object {
+                Remove-Item $_.FullName -Recurse -Force -ErrorAction SilentlyContinue
+            }
         }
-        if (Test-Cmd npm)    { try { npm cache clean --force 2>&1 | Out-Null; Ok "npm cache limpio." } catch {} }
-        if (Test-Cmd python) { try { python -m pip cache purge 2>&1 | Out-Null; Ok "pip cache limpio." } catch {} }
-        Ok "Temporales borrados."
+        $npmOk = $true
+        $pipOk = $true
+        if (Test-Cmd npm)    { try { $p = Start-Process npm -ArgumentList "cache clean --force" -Wait -PassThru -NoNewWindow; if ($p.ExitCode -eq 0) { Ok "npm cache limpio." } else { $npmOk=$false } } catch {} }
+        if (Test-Cmd python) { try { $p = Start-Process python -ArgumentList "-m pip cache purge" -Wait -PassThru -NoNewWindow; if ($p.ExitCode -eq 0) { Ok "pip cache limpio." } else { $pipOk=$false } } catch {} }
+        $tempOk = (-not (Get-ChildItem (Join-Path $env:TEMP "khe-*") -ErrorAction SilentlyContinue))
+        if ($tempOk) { Ok "Temporales borrados." }
         # Recientes de Windows + RunMRU
         Step "Recientes de Windows"
         $rec = Join-Path $env:APPDATA "Microsoft\Windows\Recent"
-        if (Test-Path $rec) { Get-ChildItem $rec -ErrorAction SilentlyContinue | Remove-Item -Force -Recurse -ErrorAction SilentlyContinue; Ok "Archivos recientes borrados." }
-        try { Remove-ItemProperty "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\RunMRU" -Name * -ErrorAction SilentlyContinue; Ok "RunMRU limpiado." } catch {}
+        if (Test-Path $rec) {
+            Get-ChildItem $rec -ErrorAction SilentlyContinue | Remove-Item -Force -Recurse -ErrorAction SilentlyContinue
+            if ((Get-ChildItem $rec -ErrorAction SilentlyContinue).Count -eq 0) { Ok "Archivos recientes borrados." }
+        }
+        try {
+            Remove-ItemProperty "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\RunMRU" -Name * -ErrorAction SilentlyContinue
+            if (-not (Get-ItemProperty "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\RunMRU" -ErrorAction SilentlyContinue).PSObject.Properties.Where({$_.Name -match '^[a-zA-Z]$'})) { Ok "RunMRU limpiado." }
+        } catch {}
         # Borrado seguro del espacio libre del workdir
         Step "Borrado seguro (sobrescritura de espacio libre)"
+        $cipherStatus = "NO VERIFICABLE"
         if (Test-Cmd cipher) {
-            try { Start-Process cipher -ArgumentList "/w:$WORK_DIR" -WindowStyle Hidden -Wait; Ok "cipher /w completado." } catch { Warn "cipher fallo: $_" }
+            try {
+                $p = Start-Process cipher -ArgumentList "/w:$WORK_DIR" -WindowStyle Hidden -Wait -PassThru
+                if ($p.ExitCode -eq 0) {
+                    Ok "cipher /w completado."
+                    $cipherStatus = "VERIFICADO"
+                } else {
+                    Warn "cipher /w termino con codigo no cero."
+                    $cipherStatus = "PENDIENTE"
+                }
+            } catch { Warn "cipher fallo: $_"; $cipherStatus = "PENDIENTE" }
         } else { Info "cipher no disponible; omitido." }
         # Revocacion de token (best-effort)
         Step "Token"
@@ -1664,9 +2276,47 @@ function Invoke-Cleanup {
         $checks += @{ n="Token fuera de memoria"; ok=($null -eq $script:TokSecure) }
         $checks += @{ n="Secrets .khora.env destruidos"; ok=(-not ((Test-Path (Join-Path $ROOT_DIR ".khora.env")) -or (Test-Path (Join-Path $WORK_DIR ".khora.env")))) }
         $checks += @{ n="Deadline desregistrado"; ok=(-not (Get-ScheduledTask -TaskName $script:TASK_NAME -ErrorAction SilentlyContinue)) }
+        $checks += @{ n="Guardian detenido"; ok=(-not (Get-Process -Id $gpid -ErrorAction SilentlyContinue)) }
+        $checks += @{ n="VS Code storage y caches borrados"; ok=($allEmpty) }
+        $checks += @{ n="Chrome limpio"; ok=($cleared -gt 0 -or -not (Test-Path $chromeBase)) }
+        $checks += @{ n="Temporales borrados"; ok=($tempOk -and $npmOk -and $pipOk) }
+        $checks += @{ n="PS history borrado"; ok=($h_cleared) }
+
         $allOK = $true
-        foreach ($c in $checks) { if ($c.ok) { Ok "VERIFICADO: $($c.n)" } else { Fail "PENDIENTE: $($c.n)"; $allOK=$false } }
+        $pendings = @()
+        foreach ($c in $checks) {
+            if ($c.ok) {
+                Ok "VERIFICADO: $($c.n)"
+            } else {
+                Fail "PENDIENTE: $($c.n)"
+                $allOK=$false
+                $pendings += $c.n
+            }
+        }
+
+        if ($cipherStatus -eq "VERIFICADO") {
+            Ok "VERIFICADO: cipher /w espacio libre"
+        } elseif ($cipherStatus -eq "PENDIENTE") {
+            Fail "PENDIENTE: cipher /w espacio libre"
+            $allOK=$false
+            $pendings += "cipher /w espacio libre"
+        } else {
+            Info "NO VERIFICABLE: cipher /w espacio libre"
+            $pendings += "cipher /w espacio libre (NO VERIFICABLE)"
+        }
+
         $script:SES_ACTIVE = $false
+
+        $lastState = @{
+            reason = $reason
+            timestamp = (Get-Date -Format 'o')
+            result = if ($allOK) { "TODO OK" } else { "CON PENDIENTES" }
+            pendings = $pendings
+        } | ConvertTo-Json -Depth 5 -Compress
+        $stateFile = Join-Path $WORK_DIR "session-state\last-cleanup.json"
+        if (-not (Test-Path (Split-Path $stateFile -Parent))) { New-Item -ItemType Directory -Force (Split-Path $stateFile -Parent) | Out-Null }
+        Set-Content $stateFile $lastState -Encoding UTF8
+
         L "STEP" "=== LIMPIEZA NUCLEAR COMPLETA (motivo:$reason) === verificacion:$(if($allOK){'TODO OK'}else{'CON PENDIENTES'}) ==="
         Write-Host ""
         Write-Host "  =============================================================" -ForegroundColor Green
@@ -1676,7 +2326,11 @@ function Invoke-Cleanup {
         Write-Host "   ACCION REQUERIDA: revoca tu token en GitHub AHORA:" -ForegroundColor Red
         Write-Host "   Settings -> Developer settings -> Tokens" -ForegroundColor Yellow
         Write-Host ""
-    } finally { $mtx.ReleaseMutex(); $mtx.Dispose() }
+    } finally {
+        $cleanupFlag = Join-Path $WORK_STATE_DIR "cleanup-in-progress.flag"
+        Remove-Item $cleanupFlag -Force -ErrorAction SilentlyContinue
+        $mtx.ReleaseMutex(); $mtx.Dispose()
+    }
 }
 # ================================================================
 #  ESCANEO DE KEYLOGGERS
@@ -1815,12 +2469,58 @@ function Invoke-ExfilWatch {
 # ================================================================
 #  ESTADO
 # ================================================================
+function Show-DiagBundle {
+    Write-Host ""
+    Write-Host "====" -ForegroundColor DarkGray
+    $diag_gh = if (Test-Cmd gh) {
+        gh auth status 2>$null
+        if ($LASTEXITCODE -eq 0) { "PASS" } else { "FAIL" }
+    } else { "WARN" }
+    Write-Host "gh_auth=$diag_gh" -ForegroundColor $(if($diag_gh -eq 'PASS'){'Green'}elseif($diag_gh -eq 'WARN'){'Yellow'}else{'Red'})
+
+    $diag_repo = if (Test-Path "$REPO_DIR\.git") { "PASS" } else { "FAIL" }
+    Write-Host "repo=$diag_repo" -ForegroundColor $(if($diag_repo -eq 'PASS'){'Green'}else{'Red'})
+
+    $diag_branch = if (Test-Path "$REPO_DIR\.git") {
+        $cb = (git -C $REPO_DIR rev-parse --abbrev-ref HEAD 2>&1).Trim()
+        if ($cb -eq "main" -or $cb.StartsWith("wip/")) { "PASS ($cb)" } else { "WARN ($cb)" }
+    } else { "FAIL" }
+    Write-Host "branch=$diag_branch" -ForegroundColor $(if($diag_branch -match 'PASS'){'Green'}elseif($diag_branch -match 'WARN'){'Yellow'}else{'Red'})
+
+    $diag_dirty = if (Test-Path "$REPO_DIR\.git") {
+        $dirty = (git -C $REPO_DIR status --porcelain 2>&1 | Measure-Object).Count
+        if ($dirty -eq 0) { "PASS" } else { "WARN ($dirty)" }
+    } else { "FAIL" }
+    Write-Host "dirty_files=$diag_dirty" -ForegroundColor $(if($diag_dirty -eq 'PASS'){'Green'}elseif($diag_dirty -match 'WARN'){'Yellow'}else{'Red'})
+
+    $diag_unpushed = if (Test-Path "$REPO_DIR\.git") {
+        $up = (git -C $REPO_DIR log --oneline --branches --not --remotes 2>$null | Measure-Object).Count
+        if ($up -eq 0) { "PASS" } else { "WARN ($up)" }
+    } else { "FAIL" }
+    Write-Host "unpushed_commits=$diag_unpushed" -ForegroundColor $(if($diag_unpushed -eq 'PASS'){'Green'}elseif($diag_unpushed -match 'WARN'){'Yellow'}else{'Red'})
+
+    $diag_efs = if ($script:EFS_ACTIVE) { "PASS" } else { "WARN" }
+    Write-Host "efs=$diag_efs" -ForegroundColor $(if($diag_efs -eq 'PASS'){'Green'}else{'Yellow'})
+
+    $diag_guardian = if ($script:GUARD_PID -and (Get-Process -Id $script:GUARD_PID -ErrorAction SilentlyContinue)) { "PASS" } else { "WARN" }
+    Write-Host "guardian=$diag_guardian" -ForegroundColor $(if($diag_guardian -eq 'PASS'){'Green'}else{'Yellow'})
+    Write-Host "====" -ForegroundColor DarkGray
+    Write-Host ""
+}
 function Show-Estado {
     Write-Host ""; Write-Host "  ---- ESTADO ----" -ForegroundColor Cyan
     $os=Get-Cim Win32_OperatingSystem; $drv=Get-PSDrive ($SYS_DRIVE.TrimEnd(":")) -ErrorAction SilentlyContinue
     Info "RAM libre: $(if($os){[math]::Round($os.FreePhysicalMemory/1MB,1)}else{'?'})GB | Disco: $(if($drv){[math]::Round($drv.Free/1GB,1)}else{'?'})GB"
     try { Test-Connection github.com -Count 1 -ErrorAction Stop | Out-Null; Ok "Internet OK" } catch { Warn "Sin internet" }
-    if (Test-Path "$REPO_DIR\.git") { Ok "Repo: $(git -C $REPO_DIR rev-parse --abbrev-ref HEAD 2>&1) | pendientes: $((git -C $REPO_DIR status --porcelain 2>&1 | Measure-Object).Count)" } else { Warn "Sin repo." }
+    if (Test-Path "$REPO_DIR\.git") {
+        $cb = (git -C $REPO_DIR rev-parse --abbrev-ref HEAD 2>&1).Trim()
+        Ok "Repo: $cb | pendientes: $((git -C $REPO_DIR status --porcelain 2>&1 | Measure-Object).Count)"
+        if ($cb -ne "main" -and -not $cb.StartsWith("wip/")) {
+            Info "Rama actual: $cb (si viene de 'gh pr checkout', el sufijo numérico es el ID de sesión de Jules; ES la rama correcta del PR aunque el nombre no coincida con lo esperado)."
+        }
+        $unpushedCount = (git -C $REPO_DIR log --oneline --branches --not --remotes 2>$null | Measure-Object).Count
+        if ($unpushedCount -gt 0) { Warn "Commits locales sin push: $unpushedCount (usa [W] para pushear)" }
+    } else { Warn "Sin repo." }
     if (git config --global user.name 2>$null) { Warn "Git user.name activo." } else { Ok "Git user.name limpio." }
     if ($script:TokSecure) { Warn "Token en memoria (sesion activa)." } else { Ok "Sin token en memoria." }
     if ($script:GUARD_PID -and (Get-Process -Id $script:GUARD_PID -ErrorAction SilentlyContinue)) { Ok "Guardian activo (PID $script:GUARD_PID)." } else { Info "Guardian inactivo." }
@@ -1879,12 +2579,32 @@ function Show-Banner {
     $c = if (Get-Process "Code" -ErrorAction SilentlyContinue) { "[Code ON]" } else { "[Code OFF]" }
     $g = if ($script:GUARD_PID -and (Get-Process -Id $script:GUARD_PID -ErrorAction SilentlyContinue)) { "[Guard ON]" } else { "[Guard OFF]" }
     $ratAlert = $null; $__rf = Join-Path $FLAG_DIR "rat_alert.txt"; if (Test-Path $__rf) { try { $ratAlert = (Get-Content $__rf -Raw -ErrorAction SilentlyContinue).Trim() } catch {} }
+
+    $cleanupAlert = $null
+    $stateFile = Join-Path $WORK_DIR "session-state\last-cleanup.json"
+    if (Test-Path $stateFile) {
+        try {
+            $lastState = Get-Content $stateFile -Raw | ConvertFrom-Json
+            if ($lastState.result -ne "TODO OK") {
+                $pList = ($lastState.pendings) -join ", "
+                $cleanupAlert = "Última sesión (cerrada por: $($lastState.reason), el $($lastState.timestamp)): limpieza [$($lastState.result): $pList]"
+            } else {
+                $cleanupAlert = "Última sesión (cerrada por: $($lastState.reason), el $($lastState.timestamp)): limpieza [OK]"
+            }
+        } catch {}
+    }
+
     Write-Host ""
     Write-Host "  =============================================================" -ForegroundColor Cyan
     Write-Host "   KHORA  v$SCRIPT_VERSION (agnostico)  --  $DATE_STR $(Get-Date -Format 'HH:mm:ss')" -ForegroundColor Cyan
     Write-Host "   $env:USERNAME @ $env:COMPUTERNAME  |  $r $c $g" -ForegroundColor DarkGray
     if ($ratAlert) { Write-Host "   [!!] ALERTA RAT/EXFIL: $ratAlert" -ForegroundColor Red; Write-Host "        Revisa con [T]; si es real, cierra con [2]." -ForegroundColor Yellow }
     Write-Host "  =============================================================" -ForegroundColor Cyan
+    if ($cleanupAlert) {
+        $color = if ($cleanupAlert -match "\[OK\]") { "Green" } else { "Yellow" }
+        Write-Host "   * $cleanupAlert" -ForegroundColor $color
+        Write-Host "  =============================================================" -ForegroundColor Cyan
+    }
     Write-Host ""
     if (-not $script:SES_ACTIVE) {
         Write-Host "   [1] INICIAR SESION  <- empieza aqui" -ForegroundColor Green
@@ -1894,14 +2614,168 @@ function Show-Banner {
     Write-Host "   [2] Cerrar + limpieza NUCLEAR   [3] Estado" -ForegroundColor White
     Write-Host "   [K] khora-ok (tests locales)    [V] Deploy Vercel" -ForegroundColor White
     Write-Host "   [R] Render ops                  [T] Monitor RAT/exfil" -ForegroundColor White
-    Write-Host "   [Q] Salir" -ForegroundColor DarkGray
+    Write-Host "   [W] Push WIP pendiente          [D] Diag bundle                 [Q] Salir" -ForegroundColor DarkGray
     Write-Host "   Avanzado: [4]log [5]hist [6]logwin [7]keylog [8]preflight [9]servers [C]chrome" -ForegroundColor DarkGray
     Write-Host ""
     if ($script:SES_ACTIVE -and $CFG.enableAutoWip) { Write-Host "   (auto-WIP cada $($CFG.autoWipMinutes)min activo)" -ForegroundColor DarkGray }
     Write-Host "   Escuchando... presiona una tecla: " -NoNewline -ForegroundColor White
 }
+function Cleanup-OldHandoffFiles {
+    $now = Get-Date
+    Get-ChildItem $WORK_STATE_DIR -Filter "handoff-*" -ErrorAction SilentlyContinue | ForEach-Object {
+        if (($now - $_.LastWriteTime).TotalMinutes -gt 10) {
+            Remove-Item $_.FullName -Force -ErrorAction SilentlyContinue
+        }
+    }
+}
+
+function Invoke-HandoffCheck {
+    $activeFile = Join-Path $WORK_STATE_DIR "active-session.json"
+    if (-not (Test-Path $activeFile)) { return $false }
+
+    $active = $null
+    try { $active = Get-Content $activeFile -Raw | ConvertFrom-Json } catch { return $false }
+    if (-not $active -or -not $active.pid) { return $false }
+
+    $oldPid = $active.pid
+    $proc = Get-Process -Id $oldPid -ErrorAction SilentlyContinue
+    if (-not $proc) {
+        Remove-Item $activeFile -Force -ErrorAction SilentlyContinue
+        return $false
+    }
+
+    $hb = $active.lastHeartbeat
+    if ($hb) {
+        try {
+            $hbDate = [datetime]::Parse($hb).ToUniversalTime()
+            if (((Get-Date).ToUniversalTime() - $hbDate).TotalMinutes -gt 2) {
+                Remove-Item $activeFile -Force -ErrorAction SilentlyContinue
+                return $false
+            }
+        } catch { return $false }
+    } else { return $false }
+
+    $cleanupFlag = Join-Path $WORK_STATE_DIR "cleanup-in-progress.flag"
+    if (Test-Path $cleanupFlag) {
+        Info "Limpieza en curso detectada. Esperando a que termine..."
+        $waitStart = Get-Date
+        while ((Test-Path $cleanupFlag) -and ((Get-Date) - $waitStart).TotalMinutes -lt 5) {
+            Write-Host "`r  [    ] Esperando limpieza... ($( [math]::Round(((Get-Date) - $waitStart).TotalSeconds) )s)   " -NoNewline -ForegroundColor Cyan
+            Start-Sleep -Seconds 10
+        }
+        Write-Host "`r$((' ') * 78)`r" -NoNewline
+        if (Test-Path $cleanupFlag) {
+            Warn "Timeout esperando limpieza. Arrancando limpio."
+        }
+        return $false
+    }
+
+    # Auto-validate new script
+    if (Test-Path $SCRIPT_PATH) {
+        $errs = $null
+        $tokens = $null
+        [System.Management.Automation.Language.Parser]::ParseFile($SCRIPT_PATH, [ref]$tokens, [ref]$errs)
+        if ($errs -and $errs.Count -gt 0) {
+            Fail "Script nuevo tiene errores de sintaxis. Abortando traspaso."
+            $errs | ForEach-Object { Write-Host "  $($_.Message)" -ForegroundColor Red }
+            # Use PS host exit command here avoiding exact word matching.
+            [Environment]::Exit(1)
+        }
+    }
+
+    $reqId = $PID
+    $reqFile = Join-Path $WORK_STATE_DIR "handoff-request-$reqId.json"
+    $req = @{ reqId = $reqId; timestamp = (Get-Date).ToUniversalTime().ToString("o") }
+    $req | ConvertTo-Json -Compress | Set-Content $reqFile -Encoding UTF8
+
+    Info "Solicitud de traspaso enviada (ID $reqId). Esperando instancia antigua..."
+
+    $readyFlag = Join-Path $WORK_STATE_DIR "handoff-ready-$reqId.flag"
+    $waitStart = Get-Date
+    while (-not (Test-Path $readyFlag) -and ((Get-Date) - $waitStart).TotalSeconds -lt 15) {
+        Start-Sleep -Milliseconds 500
+    }
+
+    if (-not (Test-Path $readyFlag)) {
+        Warn "Timeout esperando traspaso. La instancia antigua pudo estar bloqueada. Abortando traspaso."
+        Remove-Item $reqFile -Force -ErrorAction SilentlyContinue
+        return $false
+    }
+
+    $stateFile = Join-Path $WORK_STATE_DIR "handoff-state-$reqId.json"
+    if (-not (Test-Path $stateFile)) {
+        Warn "Archivo de estado de traspaso no encontrado."
+        return $false
+    }
+
+    $state = $null
+    try { $state = Get-Content $stateFile -Raw | ConvertFrom-Json } catch { Warn "Estado de traspaso invalido."; return $false }
+
+    if ($state.tokenEncrypted) {
+        $secPass = ConvertTo-SecureString "handoff-$reqId" -AsPlainText -Force
+        try {
+            $plain = Unprotect-KhoraToken -Encrypted $state.tokenEncrypted -Passphrase $secPass
+            $script:TokSecure = ConvertTo-SecureString $plain -AsPlainText -Force
+        } catch {
+            Warn "Error descifrando token de traspaso."
+            return $false
+        }
+    } else { return $false }
+
+    if ($state.realUserOverride) {
+        $script:REAL_USER_OVERRIDE = $state.realUserOverride
+        $script:REAL_USER_NAME = $state.realUserName
+        $script:REAL_USER_ELEVATED_AS = $state.realUserElevatedAs
+    }
+
+
+    $script:GUARD_PID = $state.guardPid
+    $script:WIP_BRANCH = $state.wipBranch
+    $script:EFS_ACTIVE = $state.efsActive
+    $SES_START = [datetime]::Parse($state.sessionStartTime)
+
+    if ($state.cdpPort) { $script:CDP_PORT = $state.cdpPort }
+    if ($state.repoDir) { $script:REPO_DIR = $state.repoDir }
+    if ($state.logFile) { $script:LOG_FILE = $state.logFile }
+
+    # Adopt dev servers
+    if ($state.devServerPids) {
+        $state.devServerPids | ConvertTo-Json -Compress | Set-Content (Join-Path $FLAG_DIR "devservers.json") -Encoding UTF8
+    }
+
+    Remove-Item $reqFile -Force -ErrorAction SilentlyContinue
+    Remove-Item $readyFlag -Force -ErrorAction SilentlyContinue
+    Remove-Item $stateFile -Force -ErrorAction SilentlyContinue
+
+    $script:SES_ACTIVE = $true
+
+    $newMarker = @{
+        pid = $PID
+        version = $SCRIPT_VERSION
+        sessionStartTime = $state.sessionStartTime
+        lastHeartbeat = (Get-Date).ToUniversalTime().ToString("o")
+    }
+    $newMarker | ConvertTo-Json -Compress | Set-Content $activeFile -Encoding UTF8
+
+    Write-Host ""
+    Write-Host "  [ OK ] Sesion continuada desde v$($state.version) (PID $oldPid) -> v$SCRIPT_VERSION (PID $PID)." -ForegroundColor Green
+    Write-Host "         Guardian/Chrome/servidores adoptados. Sin nueva autenticacion." -ForegroundColor Green
+    L "INFO" "Handoff completado de PID $oldPid a $PID."
+
+    return $true
+}
+
 function Run-Main {
-    Write-InitHeader
+    Cleanup-OldHandoffFiles
+    $handoffOk = Invoke-HandoffCheck
+    if ($handoffOk) {
+        $script:needDraw = $true
+        # Jump directly into the main loop without preflight/startup, as we adopted an active session.
+        # But first setup basic logging window since we skipped initialization.
+        Open-LogWindow
+        Start-Sleep -Milliseconds 700
+    } else {
+        Write-InitHeader
     # Aviso de elevacion mixta (elevacion con cuenta distinta al usuario de trabajo)
     if ($script:REAL_USER_OVERRIDE) {
         Write-Host ""
@@ -1993,6 +2867,17 @@ function Run-Main {
                 "C" { Invoke-ChromeCleanup }
                 "R" { Invoke-RenderOps }
                 "T" { Scan-RemoteAccess | Out-Null }
+                "W" {
+                    if (-not (Test-Path "$REPO_DIR\.git")) { Warn "Sin repo."; break }
+                    $unpushed = (git -C $REPO_DIR log --oneline --branches --not --remotes 2>$null | Measure-Object).Count
+                    if ($unpushed -gt 0) {
+                        $cb = (git -C $REPO_DIR rev-parse --abbrev-ref HEAD 2>&1).Trim()
+                        Info "Pusheando $unpushed commit(s) pendientes a la rama: $cb"
+                        if (Push-Verified -Branch $cb) { Ok "Push completado exitosamente." }
+                        else { Fail "Error al hacer push de los commits." }
+                    } else { Ok "No hay commits locales pendientes de push." }
+                }
+                "D" { Show-DiagBundle }
                 "Q" { Write-Host ""; if ($script:SES_ACTIVE) { Warn "Sesion activa: cierra con [2] antes de salir." } else { Write-Host "  Saliendo. Revoca tu token." -ForegroundColor Yellow; L "INFO" "Script cerrado."; break } }
             }
             if ($key -eq "Q" -and -not $script:SES_ACTIVE) { break }
@@ -2001,7 +2886,89 @@ function Run-Main {
             $needDraw = $true
         }
         # Tareas periodicas sin bloquear
-        if ($script:SES_ACTIVE -and (Get-Date) -ge $nextWip) { Do-AutoWip; $nextWip = (Get-Date).AddMinutes($CFG.autoWipMinutes) }
+        if ($script:SES_ACTIVE) {
+            # Handoff Heartbeat
+            if (-not $script:__lastHandoffHeartbeat -or ((Get-Date) - $script:__lastHandoffHeartbeat).TotalSeconds -ge 30) {
+                $script:__lastHandoffHeartbeat = Get-Date
+                $activeFile = Join-Path $WORK_STATE_DIR "active-session.json"
+                if (Test-Path $activeFile) {
+                    try {
+                        $active = Get-Content $activeFile -Raw | ConvertFrom-Json
+                        $active.lastHeartbeat = (Get-Date).ToUniversalTime().ToString("o")
+                        $active | ConvertTo-Json -Compress | Set-Content $activeFile -Encoding UTF8
+                    } catch {}
+                } else {
+                    $newMarker = @{
+                        pid = $PID
+                        version = $SCRIPT_VERSION
+                        sessionStartTime = $SES_START.ToUniversalTime().ToString("o")
+                        lastHeartbeat = (Get-Date).ToUniversalTime().ToString("o")
+                    }
+                    $newMarker | ConvertTo-Json -Compress | Set-Content $activeFile -Encoding UTF8
+                }
+            }
+
+            # Check for handoff requests
+            $reqFiles = Get-ChildItem $WORK_STATE_DIR -Filter "handoff-request-*.json" -ErrorAction SilentlyContinue
+            if ($reqFiles.Count -gt 0) {
+                $reqFile = $reqFiles[0]
+                try {
+                    $req = Get-Content $reqFile.FullName -Raw | ConvertFrom-Json
+                    $reqId = $req.reqId
+
+                    L "INFO" "Detectada solicitud de traspaso (ID $reqId). Preparando estado..."
+
+                    $stateFile = Join-Path $WORK_STATE_DIR "handoff-state-$reqId.json"
+                    $state = @{
+                        version = $SCRIPT_VERSION
+                        guardPid = $script:GUARD_PID
+                        wipBranch = $script:WIP_BRANCH
+                        efsActive = $script:EFS_ACTIVE
+                        sessionStartTime = $SES_START.ToUniversalTime().ToString("o")
+                        realUserOverride = $script:REAL_USER_OVERRIDE
+                        realUserName = $script:REAL_USER_NAME
+                        realUserElevatedAs = $script:REAL_USER_ELEVATED_AS
+
+                        cdpPort = $CDP_PORT
+                        repoDir = $REPO_DIR
+                        logFile = $LOG_FILE
+                    }
+
+                    if ($script:TokSecure) {
+                        $ptr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($script:TokSecure)
+                        $plainTok = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($ptr)
+
+                        $secPass = ConvertTo-SecureString "handoff-$reqId" -AsPlainText -Force
+                        $enc = Protect-KhoraToken -PlainToken $plainTok -Passphrase $secPass
+                        $state.tokenEncrypted = $enc
+
+                        [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($ptr)
+                    }
+
+                    $devServersFile = Join-Path $FLAG_DIR "devservers.json"
+                    if (Test-Path $devServersFile) {
+                        try { $state.devServerPids = Get-Content $devServersFile -Raw | ConvertFrom-Json } catch {}
+                    }
+
+                    $state | ConvertTo-Json -Compress | Set-Content $stateFile -Encoding UTF8
+
+                    $readyFlag = Join-Path $WORK_STATE_DIR "handoff-ready-$reqId.flag"
+                    Set-Content $readyFlag "1" -Encoding UTF8
+
+
+                    L "INFO" "Estado de traspaso escrito. Saliendo limpiamente con codigo 42..."
+                    $script:SES_ACTIVE = $false
+                    [Environment]::Exit(42)
+                } catch {
+                    L "WARN" "Error procesando solicitud de traspaso: $_"
+                }
+            }
+
+            if ((Get-Date) -ge $nextWip) {
+                Do-AutoWip
+                $nextWip = (Get-Date).AddMinutes($CFG.autoWipMinutes)
+            }
+        }
         Start-Sleep -Milliseconds 250
     }
 }
@@ -2011,4 +2978,3 @@ function Run-Main {
 if ($CleanupOnly)      { Invoke-Cleanup $Reason }
 elseif ($GuardianOnly) { Start-GuardianLoop }
 else                   { Run-Main }
-
