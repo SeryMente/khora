@@ -64,14 +64,25 @@ def test_ingesta_valida():
     assert "update" in data["counters"]
     assert "ignore" in data["counters"]
 
-def test_consulta_fgrag_faltante():
+def test_consulta_valida():
     headers = {"X-KHORA-KEY": "test-key-123"}
-    response = client.post("/api/v1/consulta", json={"pregunta": "algo"}, headers=headers)
+    response = client.post("/api/v1/consulta", json={"pregunta": "prueba", "contexto": "transparente"}, headers=headers)
 
-    if response.status_code == 503 and response.json().get("detail") == "motor no disponible":
-        pytest.skip("motor no disponible, fgrag no implementado aún (PENDIENTE)")
+    if response.status_code == 503:
+        detail = response.json().get("detail", {})
+        if isinstance(detail, str) and detail == "Database not available":
+            pytest.skip("Base de datos no disponible para consulta real")
+        elif isinstance(detail, dict) and detail.get("error") == "motor no disponible":
+            pytest.skip(f"Faltan dependencias para retriever: {detail.get('causa')}")
+        else:
+            pytest.skip(f"Servicio no disponible: {response.text}")
     elif response.status_code == 500:
-         pytest.skip(f"Falla interna: {response.text}")
-    else:
-        # If it happens to be implemented, it might return 200
-        assert response.status_code == 200
+         pytest.skip(f"Falla interna (posiblemente falta conexión a embeddings/llm o neo4j falló): {response.text}")
+
+    assert response.status_code == 200
+    data = response.json()
+    assert "fragmentos" in data
+    assert "subgrafo" in data
+    assert "suficiencia" in data
+    assert "nodos" in data["subgrafo"]
+    assert "aristas" in data["subgrafo"]

@@ -28,3 +28,8 @@ khora-web/tests/*.js
 .vercel
 .env*
 .env.local
+
+# Playwright artifacts
+test-results/
+khora-web/test-results/
+khora-web/playwright/.auth/
