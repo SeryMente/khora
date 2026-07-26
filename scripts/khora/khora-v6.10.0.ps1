@@ -2874,6 +2874,7 @@ function Run-Main {
     Scan-RemoteAccess | Out-Null
     Show-Estado
     L "INFO" "Diagnostico automatico de arranque completado (preflight + keyloggers + estado)."
+    Write-Host ""
     Clear-PendingInput   # descartar residuos del pegado antes de esperar tecla real
     Focus-Window         # auto-enfoque de la ventana principal
     L "INFO" "Menu principal activo. La ventana de log ya muestra el diagnostico de arranque."
@@ -2917,6 +2918,7 @@ function Run-Main {
                 "Q" { Write-Host ""; if ($script:SES_ACTIVE) { Warn "Sesion activa: cierra con [2] antes de salir." } else { Write-Host "  Saliendo. Revoca tu token." -ForegroundColor Yellow; Write-Host ""; L "INFO" "Script cerrado."; break } }
             }
             if ($key -eq "Q" -and -not $script:SES_ACTIVE) { break }
+            Write-Host ""
             Clear-PendingInput
             Start-Sleep -Milliseconds 900
             $needDraw = $true
