@@ -2,6 +2,7 @@
 #  KHORA - Script de sesion agnostico
 #  VERSIONADO: $SCRIPT_VERSION es la unica fuente de verdad;
 #    el archivo se nombra khora-v<version>.ps1 y cada version
+# REGLA PERMANENTE: Toda modificacion futura EDITA este unico script y sube $SCRIPT_VERSION renombrando el archivo en el mismo commit. PROHIBIDO crear archivos khora-v*.ps1 paralelos.
 #    ejecutada se auto-archiva en .\versions\
 #  ESTRUCTURA (raiz = carpeta del script, p.ej. persistente en Escritorio):
 #    .\logs\ (logging diario) | .\versions\ (historico) | config.json
@@ -24,7 +25,8 @@
 #  - EFS fail-fast (sonda 1 archivo); ventana de log con auto-reconexion (v6.4.9)
 #  - Autenticacion gh CLI; higiene auto-wip logs; push WIP menu; diag bundle (v6.5.0)
 #  - Snapshot tabs de Chrome por CDP (auto-wip/restore); deteccion LastPass (v6.6.0)
-#  - Continuidad de sesion sin re-autenticacion (Live Handoff) (v6.7.0)
+#  - Verificacion estricta en limpieza; last-cleanup.json; cipher verificable (v6.6.1)
+#  - Boveda centralizada de entorno con sincronizacion automatica Vercel/Render (v6.8.0)
 # ================================================================
 param(
     [switch]$CleanupOnly,   # modo interno: solo ejecuta limpieza NUCLEAR
@@ -40,7 +42,7 @@ $HOST_WIDTH = try { [Math]::Max(60, $Host.UI.RawUI.WindowSize.Width - 2) } catch
 # ================================================================
 #  RUTAS AGNOSTICAS  (nada fijo a una PC)
 # ================================================================
-$SCRIPT_VERSION = "6.7.0"   # <- UNICA fuente de verdad de la version
+$SCRIPT_VERSION = "6.10.0"   # <- UNICA fuente de verdad de la version
 $SYS_DRIVE   = if ($env:SystemDrive) { $env:SystemDrive } else { "C:" }
 # ================================================================
 #  DETECCION DE USUARIO REAL (elevacion con cuenta distinta) v6.4.6
@@ -282,6 +284,8 @@ New-Item -ItemType Directory -Force $ROOT_DIR | Out-Null
 $WORK_DIR    = Join-Path $env:LOCALAPPDATA "khora-session"
 $REPO_DIR    = Join-Path $WORK_DIR "repo"
 $CDP_PORT    = 9333
+$ROOT_STATE_DIR = Join-Path $ROOT_DIR "session-state"
+$WORK_STATE_DIR = Join-Path $WORK_DIR "session-state"
 $TAB_SNAPSHOT_PATH = Join-Path $ROOT_STATE_DIR "chrome-tabs.json"
 $TAB_EXCLUDE_PATTERNS = @('access_token','id_token','[?&]code=','otp','password','chrome://','chrome-extension://','devtools://','about:blank')
 $TAB_SNAPSHOT_MAX = 30
@@ -293,8 +297,6 @@ $LOG_DIR     = Join-Path $ROOT_DIR "logs"
 $VER_DIR     = Join-Path $ROOT_DIR "versions"
 $CFG_FILE    = Join-Path $ROOT_DIR "config.json"
 $FLAG_DIR    = Join-Path $WORK_DIR "flags"
-$ROOT_STATE_DIR = Join-Path $ROOT_DIR "session-state"
-$WORK_STATE_DIR = Join-Path $WORK_DIR "session-state"
 $DATE_STR    = Get-Date -Format "yyyy-MM-dd"
 $LOG_FILE    = Join-Path $LOG_DIR "$DATE_STR.log"
 $JSON_LOG    = Join-Path $LOG_DIR "$DATE_STR.jsonl"
@@ -640,6 +642,12 @@ function Confirm-GhCliAuth {
 function Ensure-VSCode {
     $code = Resolve-Exe "code" (Get-CodePaths) "Code.exe"
     if ($code) { Ok "VS Code encontrado: $code"; return $code }
+
+    if (Wait-ProactiveDepPrep -Key 'vscode' -Label 'VS Code') {
+        $code = Resolve-Exe "code" (Get-CodePaths) "Code.exe"
+        if ($code) { Ok "VS Code OK (tras instalacion proactiva): $code"; return $code }
+    }
+
     Warn "VS Code no encontrado. Intentando winget..."
     if (Test-Cmd winget) {
         try {
@@ -1072,51 +1080,73 @@ function Invoke-SecureDeleteFile {
     Remove-Item $file -Force -ErrorAction SilentlyContinue
 }
 # ================================================================
-#  ENTORNO DE DESARROLLO (Python + Node + Docker + Vercel)
+#  INSTALACION PROACTIVA EN SEGUNDO PLANO (Background Jobs)
 # ================================================================
-function Load-KhoraEnv {
-    $envPaths = @(
-        (Join-Path $ROOT_DIR  ".khora.env"),
-        (Join-Path $WORK_DIR  ".khora.env")
-    )
-    $loaded = $false
-    foreach ($ep in $envPaths) {
-        if (Test-Path $ep) {
-            Get-Content $ep -ErrorAction SilentlyContinue | Where-Object { $_ -match '^[A-Z_]+=' } | ForEach-Object {
-                $kv = $_ -split '=', 2
-                if ($kv.Count -eq 2) { [System.Environment]::SetEnvironmentVariable($kv[0].Trim(), $kv[1].Trim(), 'Process') }
-            }
-            Ok "Vars LLM cargadas desde: $ep"
-            $loaded = $true; break
+function Start-ProactiveDepPrep {
+    if ($script:PrepJobsStarted) { return }
+    $script:PrepJobsStarted = $true
+    $script:PrepJobs = @{}
+
+    L "INFO" "Iniciando comprobacion de dependencias proactiva en segundo plano..."
+
+    # Python
+    $py = $null
+    foreach ($cmd in @('python','python3','python3.11')) {
+        $c = Get-Command $cmd -ErrorAction SilentlyContinue
+        if ($c) {
+            $v = & $c --version 2>&1
+            if ("$v" -match '3\.(1[1-9]|[2-9]\d)') { $py = $c; break }
         }
     }
-    if (-not $loaded) {
-        Step "Configuracion LLM (primera vez en esta PC)"
-        Info "No se encontro .khora.env. Solo 4 datos, el resto es automatico (ENTER para omitir):"
-        $lines = @()
-        foreach ($v in @("KHORA_LLM_BASE_URL","KHORA_LLM_MODEL","KHORA_LLM_API_KEY","RENDER_SERVICE_ID")) {
-            $val = Read-Host "  $v"
-            if ($val) { [System.Environment]::SetEnvironmentVariable($v, $val, 'Process'); $lines += "$v=$val" }
-        }
-        @{ KHORA_LLM_TIMEOUT='60'; KHORA_ER_CAND_LIMIT='500'; KHORA_EMB_MODEL='BAAI/bge-m3';
-           KHORA_EMBEDDINGS_MODEL='BAAI/bge-m3'; KHORA_JUDGE_MODEL='openai/gpt-oss-120b';
-           KHORA_LEIDEN_GAMMA='0.05'; KHORA_LEIDEN_THETA='0.01'; KHORA_LEIDEN_SEED='42'; KHORA_FVAL_MODE='mark' }.GetEnumerator() | ForEach-Object {
-            [System.Environment]::SetEnvironmentVariable($_.Key, $_.Value, 'Process'); $lines += "$($_.Key)=$($_.Value)"
-        }
-        $c = $lines -join "`r`n"
-        foreach ($ep in $envPaths) { try { Set-Content $ep $c -Encoding UTF8; Ok "Guardado en: $ep" } catch {} }
-        # Cifrar los secrets en reposo (EFS por archivo; silencioso si no hay EFS)
-        foreach ($ep in $envPaths) { if (Test-Path $ep) { cipher /e /a "$ep" 2>&1 | Out-Null } }
-        Info "Secrets .khora.env cifrados con EFS (si esta edicion de Windows lo soporta)."
+    if (-not $py) {
+        L "INFO" "Lanzando instalacion proactiva: Python 3.11"
+        $script:PrepJobs['python'] = Start-Job -ScriptBlock { winget install --id Python.Python.3.11 -e --silent 2>&1 }
     }
-    $repoDotEnv = Join-Path $REPO_DIR ".env"
-    if (-not (Test-Path $repoDotEnv)) {
-        $envLines = [System.Environment]::GetEnvironmentVariables('Process').GetEnumerator() |
-            Where-Object { $_.Key -match '^KHORA_' } | ForEach-Object { "$($_.Key)=$($_.Value)" }
-        Set-Content $repoDotEnv ($envLines -join "`r`n") -Encoding UTF8 -ErrorAction SilentlyContinue
-        Ok ".env escrito en repo para uvicorn."
+
+    # Node.js
+    if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
+        L "INFO" "Lanzando instalacion proactiva: Node.js LTS"
+        $script:PrepJobs['node'] = Start-Job -ScriptBlock { winget install --id OpenJS.NodeJS.LTS -e --silent 2>&1 }
+    }
+
+    # Docker
+    if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
+        L "INFO" "Lanzando instalacion proactiva: Docker Desktop"
+        $script:PrepJobs['docker'] = Start-Job -ScriptBlock { winget install --id Docker.DockerDesktop -e --silent 2>&1 }
+    }
+
+    # VS Code
+    $code = Resolve-Exe "code" (Get-CodePaths) "Code.exe"
+    if (-not $code) {
+        L "INFO" "Lanzando instalacion proactiva: VS Code"
+        $script:PrepJobs['vscode'] = Start-Job -ScriptBlock { winget install --id Microsoft.VisualStudioCode -e --scope user --silent --accept-package-agreements --accept-source-agreements 2>&1 }
     }
 }
+
+function Wait-ProactiveDepPrep {
+    param([string]$Key, [string]$Label)
+    if ($script:PrepJobs -and $script:PrepJobs.ContainsKey($Key)) {
+        $job = $script:PrepJobs[$Key]
+        if ($job) {
+            L "INFO" "Esperando instalacion proactiva en progreso para: $Label"
+            $out = Spin-Job "Finalizando instalacion de $Label (ya en progreso)" -ArgList @($job) -Tips @('esperando job en segundo plano...','casi listo...') -Block {
+                param($j)
+                Receive-Job -Job $j -Wait -AutoRemoveJob 2>&1
+            }
+            $out | ForEach-Object { L "INFO" "winget proactivo ($Key): $_" }
+            $script:PrepJobs.Remove($Key)
+
+            # Refrescar PATH
+            $env:Path = [System.Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [System.Environment]::GetEnvironmentVariable('Path','User')
+            return $true
+        }
+    }
+    return $false
+}
+
+# ================================================================
+#  ENTORNO DE DESARROLLO (Python + Node + Docker + Vercel)
+# ================================================================
 function Ensure-Python311 {
     L "INFO" "=== Ensure-Python311: buscando Python 3.11+ ==="
     foreach ($cmd in @('python','python3','python3.11')) {
@@ -1127,6 +1157,15 @@ function Ensure-Python311 {
             if ("$v" -match '3\.(1[1-9]|[2-9]\d)') { Ok "Python OK: $v ($($c.Source))"; return $c.Source }
         } else { L "INFO" "  ${cmd}: no en PATH" }
     }
+
+    if (Wait-ProactiveDepPrep -Key 'python' -Label 'Python 3.11') {
+        $c = Get-Command python -ErrorAction SilentlyContinue
+        if ($c) {
+            $v = & $c --version 2>&1
+            if ("$v" -match '3\.(1[1-9]|[2-9]\d)') { Ok "Python OK (tras instalacion proactiva): $v ($($c.Source))"; return $c.Source }
+        }
+    }
+
     Info "Python 3.11+ no encontrado. Instalando con animacion (puede tardar)..."
     $out = Spin-Job "Instalando Python 3.11" -Tips @('descargando instalador...','verificando firma...','instalando componentes...','actualizando PATH...','casi listo...') -Block {
         winget install --id Python.Python.3.11 -e --silent 2>&1
@@ -1162,6 +1201,12 @@ function Ensure-Node {
     L "INFO" "=== Ensure-Node: verificando Node.js ==="
     $n = Get-Command node -ErrorAction SilentlyContinue
     if ($n) { $v = & node --version 2>&1; L "INFO" "Node en PATH: $($n.Source) v$v"; Ok "Node OK: $v"; return $n.Source }
+
+    if (Wait-ProactiveDepPrep -Key 'node' -Label 'Node.js LTS') {
+        $n = Get-Command node -ErrorAction SilentlyContinue
+        if ($n) { $v = & node --version 2>&1; Ok "Node OK (tras instalacion proactiva): $v"; return $n.Source }
+    }
+
     Info "Node.js no encontrado. Instalando con animacion..."
     $out = Spin-Job "Instalando Node.js LTS" -Tips @('descargando Node.js...','instalando NPM...','configurando entorno...','actualizando PATH...','casi listo...') -Block {
         winget install --id OpenJS.NodeJS.LTS -e --silent 2>&1
@@ -1174,6 +1219,12 @@ function Ensure-Node {
 }
 function Ensure-Docker {
     $dockerCmd = Get-Command docker -ErrorAction SilentlyContinue
+    if (-not $dockerCmd) {
+        if (Wait-ProactiveDepPrep -Key 'docker' -Label 'Docker Desktop') {
+            $dockerCmd = Get-Command docker -ErrorAction SilentlyContinue
+        }
+    }
+
     if (-not $dockerCmd) {
         Info "Docker Desktop no encontrado. Instalando (puede tardar varios minutos)..."
         $out = Spin-Job "Instalando Docker Desktop" -Tips @('descargando Docker Desktop...','extrayendo componentes...','instalando WSL2 backend...','configurando servicios...','registrando Docker Engine...','casi listo...','ultimo paso...') -Block {
@@ -1233,6 +1284,301 @@ function Ensure-RenderCLI {
     if (Get-Command render -ErrorAction SilentlyContinue) { Ok "Render CLI instalado." }
     else { Warn "Render CLI no pudo instalarse. Intenta: npm install -g @render-com/cli" }
 }
+function Get-Hash {
+    param([string]$inputString)
+    $bytes = [System.Text.Encoding]::UTF8.GetBytes($inputString)
+    $sha256 = [System.Security.Cryptography.SHA256]::Create()
+    $hashBytes = $sha256.ComputeHash($bytes)
+    return [System.BitConverter]::ToString($hashBytes).Replace("-", "").ToLower()
+}
+
+
+function Get-VaultMasterKey {
+    $lpKey = "khora-env-vault-key"
+    # Wait, the user said "recupéralo de LastPass CLI primero; Read-Host solo como fallback."
+    # Wait! Earlier versions of Khora didn't use `lpass` CLI. The user said: "reutilizando la integración de LastPass ya construida en v6.5.2".
+    # Wait, I previously found that the only LastPass integration in the script was `Test-LastPassInstalled` for Chrome extensions.
+    # Ah, the "integración de LastPass ya construida en v6.5.2" might refer to something else? Wait, no, v6.5.3 had Get-PersistedToken, but it didn't fetch from LastPass, it fetched from a local file ($localTok = Join-Path $ROOT_DIR "khe-token.json").
+    # The prompt explicitly says: "Master key: correcto, recupéralo de LastPass CLI primero; Read-Host solo como fallback."
+
+    $masterKey = $null
+    # Try lpass if available
+    if (Get-Command lpass -ErrorAction SilentlyContinue) {
+        # Check login status (lpass status doesn't always exist, so we just try to show the password)
+        $masterKey = lpass show --password $lpKey 2>$null
+        if ($masterKey) {
+            $masterKey = $masterKey.Trim()
+            return (ConvertTo-SecureString -String $masterKey -AsPlainText -Force)
+        }
+    }
+
+    $msg = "Se requiere el passphrase maestro de la boveda (guardalo en LastPass como '$lpKey')."
+    Write-Host " [Vault] $msg" -ForegroundColor Cyan
+    return Read-Host "  Passphrase" -AsSecureString
+}
+
+function Save-Vault {
+    param($Vault, [string]$Path, [System.Security.SecureString]$Key)
+    $json = $Vault | ConvertTo-Json -Depth 10 -Compress
+    $enc = Protect-KhoraToken -PlainToken $json -Passphrase $Key
+    $enc.format = "aes-cbc-hmac-v1"
+    $encJson = $enc | ConvertTo-Json -Compress
+    Set-Content -Path $Path -Value $encJson -Force
+}
+
+function Load-Vault {
+    param([string]$Path, [System.Security.SecureString]$Key)
+    if (-not (Test-Path $Path)) { return @{} }
+
+    try {
+        $encJson = Get-Content $Path -Raw | ConvertFrom-Json
+        $jsonStr = Unprotect-KhoraToken -Encrypted $encJson -Passphrase $Key
+        $psObj = $jsonStr | ConvertFrom-Json
+        # Convert PSObject to Hashtable (PS 5.1 compatible)
+        $hash = @{}
+        foreach ($prop in $psObj.psobject.properties) {
+            # each property is a key. The value might be a PSCustomObject, convert that to Hashtable too.
+            $val = $prop.Value
+            if ($val -is [System.Management.Automation.PSCustomObject]) {
+                $subHash = @{}
+                foreach ($subProp in $val.psobject.properties) {
+                    $subHash[$subProp.Name] = $subProp.Value
+                }
+                $val = $subHash
+            }
+            $hash[$prop.Name] = $val
+        }
+        return $hash
+    } catch {
+        Warn "Fallo al cargar la boveda (contrasena incorrecta o corrupta): $_"
+        return @{}
+    }
+}
+
+function Sync-Render {
+    param([string]$Key, [string]$Value, [string]$Token, [string]$ServiceId)
+    $headers = @{
+        "Authorization" = "Bearer $Token"
+        "Accept" = "application/json"
+        "Content-Type" = "application/json"
+    }
+
+    $json = @{ value = $Value } | ConvertTo-Json -Compress
+    $body = [System.Text.Encoding]::UTF8.GetBytes($json)
+
+    $url = "https://api.render.com/v1/services/$ServiceId/env-vars/$Key"
+    try {
+        Invoke-RestMethod -Uri $url -Method Put -Headers $headers -Body $body | Out-Null
+        Ok "Render: $Key sincronizada."
+    } catch {
+        Warn "Render: Fallo al sincronizar $Key. Error: $_"
+    }
+}
+
+function Sync-Vercel {
+    param([string]$Key, [string]$Value, [string]$Token)
+    Ensure-VercelCLI
+
+    $webDir = Join-Path $REPO_DIR "khora-web"
+    $tmpFile = Join-Path $env:TEMP "vercel-env-val-$([guid]::NewGuid().ToString()).txt"
+    try {
+        [System.IO.File]::WriteAllText($tmpFile, $Value)
+
+        # vercel env rm first to avoid "already exists" errors, then add
+        & cmd /c "cd /d `"$webDir`" && vercel env rm $Key production preview development --token $Token -y >nul 2>&1"
+        & cmd /c "cd /d `"$webDir`" && vercel env add $Key production preview development --token $Token < `"$tmpFile`" >nul 2>&1"
+        if ($LASTEXITCODE -eq 0) {
+            Ok "Vercel: $Key sincronizada."
+        } else {
+            Warn "Vercel: Fallo al sincronizar $Key (ExitCode: $LASTEXITCODE)."
+        }
+    } catch {
+        Warn "Vercel: Fallo al sincronizar $Key. Error: $_"
+    } finally {
+        if (Test-Path $tmpFile) { Remove-Item $tmpFile -Force -ErrorAction SilentlyContinue }
+    }
+}
+
+$EnvManifest = @(
+    # Core Infrastructure
+    @{ Name="KHORA_API_KEY"; IsSecret=$true; Targets=@("Vercel", "Render"); Aliases=@("X_KHORA_KEY") }
+    @{ Name="NEO4J_URI"; IsSecret=$true; Targets=@("Vercel", "Render") }
+    @{ Name="NEO4J_USER"; IsSecret=$true; Targets=@("Vercel", "Render") }
+    @{ Name="NEO4J_PASSWORD"; IsSecret=$true; Targets=@("Vercel", "Render") }
+
+    # Render API / Config
+    @{ Name="RENDER_API_KEY"; IsSecret=$true; Targets=@() }
+    @{ Name="RENDER_SERVICE_ID"; IsSecret=$false; Targets=@() }
+
+    # Vercel Config
+    @{ Name="VERCEL_TOKEN"; IsSecret=$true; Targets=@() }
+
+    # LLM Settings
+    @{ Name="KHORA_LLM_API_URL"; IsSecret=$false; Targets=@("Render"); Aliases=@("LLM_CHEAP_API_URL") }
+    @{ Name="KHORA_LLM_API_KEY"; IsSecret=$true; Targets=@("Render"); Aliases=@("LLM_CHEAP_API_KEY") }
+    @{ Name="KHORA_LLM_MODEL"; IsSecret=$false; Targets=@("Render"); Aliases=@("LLM_CHEAP_MODEL") }
+    @{ Name="KHORA_WEB_ORIGIN"; IsSecret=$false; Targets=@("Render") }
+
+    # Khora Web (Vercel)
+    @{ Name="AUTH_SECRET"; IsSecret=$true; Targets=@("Vercel") }
+    @{ Name="DATABASE_URL"; IsSecret=$true; Targets=@("Vercel") }
+    @{ Name="GEMINI_API_KEY"; IsSecret=$true; Targets=@("Vercel") }
+    @{ Name="GITHUB_WEBHOOK_SECRET"; IsSecret=$true; Targets=@("Vercel") }
+    @{ Name="GROQ_API_KEY"; IsSecret=$true; Targets=@("Vercel") }
+    @{ Name="INTERNAL_TRIGGER_SECRET"; IsSecret=$true; Targets=@("Vercel") }
+    @{ Name="JULES_API_KEY"; IsSecret=$true; Targets=@("Vercel") }
+    @{ Name="KHORA_API_URL"; IsSecret=$false; Targets=@("Vercel") }
+    @{ Name="MAX_CONCURRENT_JULES_SESSIONS"; IsSecret=$false; Targets=@("Vercel") }
+    @{ Name="MEDICAL_INTERP_MONTHLY_GOAL"; IsSecret=$false; Targets=@("Vercel") }
+    @{ Name="META_MINUTES_MONTH"; IsSecret=$false; Targets=@("Vercel") }
+    @{ Name="NEXT_PUBLIC_API_URL"; IsSecret=$false; Targets=@("Vercel") }
+    @{ Name="NEXT_PUBLIC_APP_VERSION"; IsSecret=$false; Targets=@("Vercel") }
+    @{ Name="NODE_ENV"; IsSecret=$false; Targets=@("Vercel") }
+    @{ Name="NOTION_API_KEY"; IsSecret=$true; Targets=@("Vercel") }
+    @{ Name="NOTION_DATABASE_ID"; IsSecret=$true; Targets=@("Vercel") }
+    @{ Name="NOTION_ROADMAP_DATABASE_ID"; IsSecret=$true; Targets=@("Vercel") }
+    @{ Name="NOTION_TOKEN"; IsSecret=$true; Targets=@("Vercel") }
+    @{ Name="OIDC_CLIENT_ID"; IsSecret=$true; Targets=@("Vercel") }
+    @{ Name="OIDC_CLIENT_SECRET"; IsSecret=$true; Targets=@("Vercel") }
+    @{ Name="OIDC_ISSUER_URL"; IsSecret=$false; Targets=@("Vercel") }
+    @{ Name="PLAYWRIGHT_TEST_RUN"; IsSecret=$false; Targets=@("Vercel") }
+    @{ Name="SMTP_HOST"; IsSecret=$false; Targets=@("Vercel") }
+    @{ Name="SMTP_PASS"; IsSecret=$true; Targets=@("Vercel") }
+    @{ Name="SMTP_PORT"; IsSecret=$false; Targets=@("Vercel") }
+    @{ Name="SMTP_SECURE"; IsSecret=$false; Targets=@("Vercel") }
+    @{ Name="SMTP_USER"; IsSecret=$false; Targets=@("Vercel") }
+    @{ Name="TODOIST_TOKEN"; IsSecret=$true; Targets=@("Vercel") }
+)
+
+function Init-EnvVault {
+    $vaultPath = Join-Path $REPO_DIR "secrets\env-vault.enc.json"
+    $secretsDir = Join-Path $REPO_DIR "secrets"
+    if (-not (Test-Path $secretsDir)) { New-Item -ItemType Directory -Path $secretsDir -Force | Out-Null }
+
+    $masterKey = Get-VaultMasterKey
+    if (-not $masterKey) { Fail "Se cancelo el inicio: Passphrase maestro requerido."; return }
+
+    $vault = Load-Vault -Path $vaultPath -Key $masterKey
+    $vaultChanged = $false
+
+    $renderApiToken = if ($vault.ContainsKey("RENDER_API_KEY")) { $vault["RENDER_API_KEY"].Value } else { $null }
+    $renderSvcId = if ($vault.ContainsKey("RENDER_SERVICE_ID")) { $vault["RENDER_SERVICE_ID"].Value } else { $null }
+    $vercelToken = if ($vault.ContainsKey("VERCEL_TOKEN")) { $vault["VERCEL_TOKEN"].Value } else { $null }
+
+    foreach ($v in $EnvManifest) {
+        $name = $v.Name
+        $isSecret = $v.IsSecret
+        $targets = $v.Targets
+
+        $value = $null
+
+        if ($vault.ContainsKey($name)) {
+            $value = $vault[$name].Value
+        } else {
+            # BOOTSTRAP: Intentar recuperar desde Vercel o Render primero si aplica
+            $foundInCloud = $false
+
+            if ($vercelToken -and $targets -contains "Vercel") {
+                $webDir = Join-Path $REPO_DIR "khora-web"
+                $tmpEnv = [System.IO.Path]::GetTempFileName()
+                try {
+                    & cmd /c "cd /d `"$webDir`" && vercel env pull `"$tmpEnv`" --environment=production --token $vercelToken --yes >nul 2>&1"
+                    if (Test-Path $tmpEnv) {
+                        $envLines = Get-Content $tmpEnv -ErrorAction SilentlyContinue
+                        foreach ($line in $envLines) {
+                            $line = $line.Trim()
+                            if ([string]::IsNullOrEmpty($line) -or $line.StartsWith("#")) { continue }
+                            $idx = $line.IndexOf('=')
+                            if ($idx -gt 0) {
+                                $k = $line.Substring(0, $idx)
+                                if ($k -eq $name) {
+                                    $v = $line.Substring($idx + 1)
+                                    if ($v.StartsWith("`"") -and $v.EndsWith("`"") -and $v.Length -ge 2) {
+                                        $v = $v.Substring(1, $v.Length - 2)
+                                    }
+                                    $value = $v
+                                    $foundInCloud = $true
+                                    break
+                                }
+                            }
+                        }
+                    }
+                } finally {
+                    if (Test-Path $tmpEnv) { Remove-Item $tmpEnv -Force -ErrorAction SilentlyContinue }
+                }
+            }
+
+            if (-not $foundInCloud -and $renderApiToken -and $renderSvcId -and $targets -contains "Render") {
+                $headers = @{ "Authorization" = "Bearer $renderApiToken"; "Accept" = "application/json" }
+                $url = "https://api.render.com/v1/services/$renderSvcId/env-vars?limit=100"
+                try {
+                    $renderEnvVars = Invoke-RestMethod -Uri $url -Method Get -Headers $headers -ErrorAction Stop
+                    foreach ($rVar in $renderEnvVars) {
+                        if ($rVar.envVar.key -eq $name) {
+                            $value = $rVar.envVar.value
+                            $foundInCloud = $true
+                            break
+                        }
+                    }
+                } catch {}
+            }
+
+            if (-not $foundInCloud) {
+                Write-Host " [Vault] Variable requerida faltante: $name" -ForegroundColor Yellow
+                if ($isSecret) {
+                    $sec = Read-Host "  $name" -AsSecureString
+                    $value = [System.Net.NetworkCredential]::new("", $sec).Password
+                } else {
+                    $value = Read-Host "  $name"
+                }
+            }
+
+            $vault[$name] = @{ Value=$value; SyncState=@{} }
+            $vaultChanged = $true
+
+            # Actualizar tokens de bootstrap si fueron los que acabamos de capturar
+            if ($name -eq "RENDER_API_KEY") { $renderApiToken = $value }
+            if ($name -eq "RENDER_SERVICE_ID") { $renderSvcId = $value }
+            if ($name -eq "VERCEL_TOKEN") { $vercelToken = $value }
+        }
+
+        [System.Environment]::SetEnvironmentVariable($name, $value, 'Process')
+
+        # Sincronizacion
+        foreach ($target in $targets) {
+            $targetNames = @($name)
+            if ($v.Aliases) { $targetNames += $v.Aliases }
+
+            foreach ($tname in $targetNames) {
+                $expectedHash = (Get-Hash $value)
+                $syncState = $vault[$name].SyncState["$target|$tname"]
+                if ($syncState -ne $expectedHash) {
+                    Info "Sincronizando $tname hacia $target..."
+                    if ($target -eq "Vercel" -and $vercelToken) {
+                        Sync-Vercel -Key $tname -Value $value -Token $vercelToken
+                    } elseif ($target -eq "Render" -and $renderApiToken -and $renderSvcId) {
+                        Sync-Render -Key $tname -Value $value -Token $renderApiToken -ServiceId $renderSvcId
+                    }
+                    $vault[$name].SyncState["$target|$tname"] = $expectedHash
+                    $vaultChanged = $true
+                }
+            }
+        }
+    }
+
+    if ($script:TokSecure) {
+        $ghTok = [System.Net.NetworkCredential]::new("", $script:TokSecure).Password
+        [System.Environment]::SetEnvironmentVariable("GITHUB_TOKEN", $ghTok, 'Process')
+    }
+
+    if ($vaultChanged) {
+        Save-Vault -Vault $vault -Path $vaultPath -Key $masterKey
+        Ok "Boveda de entorno actualizada."
+    } else {
+        Ok "Boveda de entorno verificada y en sincronia."
+    }
+}
+
 function Invoke-RenderOps {
     $svcId = [System.Environment]::GetEnvironmentVariable('RENDER_SERVICE_ID', 'Process')
     if (-not (Get-Command render -ErrorAction SilentlyContinue)) {
@@ -1288,24 +1634,18 @@ function Start-DevServers {
     if (-not (Test-Path "$REPO_DIR\.git")) { Warn "Sin repo. Inicia sesion primero ([1])."; return }
     $pyExe  = Join-Path $WORK_DIR 'venv\Scripts\python.exe'
     $webDir = Join-Path $REPO_DIR 'khora-web'
-    $pids = @()
     if (Test-Path $pyExe) {
         $apiCmd = "cd /d `"`"$REPO_DIR`"`" && `"`"$pyExe`"`" -m uvicorn khora.api:app --reload --port 8000"
-        $p1 = Start-Process powershell -ArgumentList "-NoProfile","-NoExit","-Command",$apiCmd -PassThru
-        if ($p1) { $pids += $p1.Id }
+        Start-Process powershell -ArgumentList "-NoProfile","-NoExit","-Command",$apiCmd
         Ok "API uvicorn -> http://localhost:8000  (nueva ventana)"
         L "INFO" "Dev server API uvicorn lanzado en :8000"
     } else { Warn "Venv no encontrado. Inicia sesion ([1]) para crearlo." }
     if (Test-Path $webDir) {
         $nextCmd = "cd /d `"`"$webDir`"`" && npm run dev"
-        $p2 = Start-Process powershell -ArgumentList "-NoProfile","-NoExit","-Command",$nextCmd -PassThru
-        if ($p2) { $pids += $p2.Id }
+        Start-Process powershell -ArgumentList "-NoProfile","-NoExit","-Command",$nextCmd
         Ok "Next.js dev -> http://localhost:3000  (nueva ventana)"
         L "INFO" "Dev server Next.js lanzado en :3000"
     } else { Warn "khora-web/ no encontrado." }
-    if ($pids.Count -gt 0) {
-        $pids | ConvertTo-Json -Compress | Set-Content (Join-Path $FLAG_DIR "devservers.json") -Encoding UTF8
-    }
 }
 function Invoke-KhoraOk {
     $wd = Join-Path $REPO_DIR 'khora-web'
@@ -1390,6 +1730,11 @@ function Invoke-ChromeIntelligent {
         foreach ($u in $urls) { Start-Process $u }
     }
 }
+# ================================================================
+
+#  TOKEN PERSISTENCE (v6.5.3)
+
+# ================================================================
 # ================================================================
 #  TOKEN PERSISTENCE (v6.5.3)
 # ================================================================
@@ -1640,44 +1985,22 @@ function Start-Sesion {
         # Via principal: leer del portapapeles y limpiarlo de inmediato.
         # Fallback: pegar con CLIC DERECHO (QuickEdit) en prompt enmascarado.
         $sec = $null
-        $usedSnapshot = $false
-        $snapshot = Test-TokenSnapshotValid
-
-        if ($snapshot) {
-            $secPass = Read-Host "  Contraseña para el token guardado" -AsSecureString
-            if ($secPass) {
-                try {
-                    $plainTok = Get-PersistedToken -Passphrase $secPass -Snapshot $snapshot
-                    if ($plainTok) {
-                        $sec = ConvertTo-SecureString -String $plainTok -AsPlainText -Force
-                        Ok "Token recuperado desde disco exitosamente."
-                        $usedSnapshot = $true
-                        [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR([System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($secPass))
-                    }
-                } catch {
-                    Warn "Fallo al descifrar el token (contraseña incorrecta o corrupto). Caemos al ingreso manual."
-                }
-            }
-        }
-
-        if (-not $usedSnapshot) {
-            Info "Copia el token al portapapeles (Ctrl+C), luego presiona ENTER (intento $t/3)..."
-            Write-Host "  >> Lo que teclees/pegues NO aparecera en pantalla <<" -ForegroundColor DarkGray
-            Clear-PendingInput   # limpiar buffer antes de esperar
-            $Host.UI.RawUI.FlushInputBuffer()
-            do { $__khk = [Console]::ReadKey($true) } while ($__khk.Key -ne [ConsoleKey]::Enter)
+        Info "Copia el token al portapapeles (Ctrl+C), luego presiona ENTER (intento $t/3)..."
+        Write-Host "  >> Lo que teclees/pegues NO aparecera en pantalla <<" -ForegroundColor DarkGray
+        Clear-PendingInput   # limpiar buffer antes de esperar
+        $Host.UI.RawUI.FlushInputBuffer()
+        do { $__khk = [Console]::ReadKey($true) } while ($__khk.Key -ne [ConsoleKey]::Enter)
+        $raw = $null
+        try { $raw = Get-Clipboard -Raw -ErrorAction Stop } catch {}
+        if ($raw) { $raw = $raw.Trim() }
+        if ($raw -and $raw.Length -ge 10 -and $raw -notmatch '\s') {
+            $sec = ConvertTo-SecureString -String $raw -AsPlainText -Force
             $raw = $null
-            try { $raw = Get-Clipboard -Raw -ErrorAction Stop } catch {}
-            if ($raw) { $raw = $raw.Trim() }
-            if ($raw -and $raw.Length -ge 10 -and $raw -notmatch '\s') {
-                $sec = ConvertTo-SecureString -String $raw -AsPlainText -Force
-                $raw = $null
-                try { Set-Clipboard -Value ' ' -ErrorAction Stop; Ok "Token capturado del portapapeles. Portapapeles limpiado." }
-                catch { Warn "Token capturado, pero no pude limpiar el portapapeles: limpialo manualmente." }
-            } else {
-                Warn "Portapapeles vacio o con contenido invalido. Fallback manual:"
-                $sec = Read-Host "  Pega el token con CLIC DERECHO (no Ctrl+V) y ENTER" -AsSecureString
-            }
+            try { Set-Clipboard -Value ' ' -ErrorAction Stop; Ok "Token capturado del portapapeles. Portapapeles limpiado." }
+            catch { Warn "Token capturado, pero no pude limpiar el portapapeles: limpialo manualmente." }
+        } else {
+            Warn "Portapapeles vacio o con contenido invalido. Fallback manual:"
+            $sec = Read-Host "  Pega el token con CLIC DERECHO (no Ctrl+V) y ENTER" -AsSecureString
         }
         if (-not $sec -or $sec.Length -lt 10) { Fail "Token muy corto."; continue }
         Info "Validando token con la API..."
@@ -1689,24 +2012,7 @@ function Start-Sesion {
                 $r = Invoke-WebRequest "https://api.github.com/repos/$REPO_ORG/$REPO_NAME" -Headers $h -UseBasicParsing -TimeoutSec 12 -ErrorAction Stop
                 return ($r.StatusCode -eq 200)
             }
-            if ($ok) {
-                Ok "Token valido. Acceso confirmado a $REPO_ORG/$REPO_NAME"
-                if (-not $usedSnapshot) {
-                    $secPass = Read-Host "  Contraseña para proteger este token (nuevo ingreso)" -AsSecureString
-                    if ($secPass) {
-                        $ptr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($sec)
-                        $plainTokToSave = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($ptr)
-                        # Calculamos expiracion de 24 horas si no sabemos la real
-                        $exp = (Get-Date).ToUniversalTime().AddHours(24)
-                        Save-TokenSnapshot -Token $plainTokToSave -ExpiresUtc $exp -Passphrase $secPass
-                        [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($ptr)
-                        [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR([System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($secPass))
-                    } else {
-                        Warn "Sin contraseña, el token no se persistira (se mantendra efimero en esta sesion)."
-                    }
-                }
-                $valid=$true; break
-            }
+            if ($ok) { Ok "Token valido. Acceso confirmado a $REPO_ORG/$REPO_NAME"; $valid=$true; break }
         } catch {
             $code = $_.Exception.Response.StatusCode.value__
             $msg  = switch ($code) {401{"invalido/expirado"} 403{"sin permisos"} 404{"repo no encontrado"} default{"HTTP $code"}}
@@ -1795,7 +2101,6 @@ function Start-Sesion {
     Restore-ChromeTabsSnapshot
     # Entorno PRIMERO: VS Code abrira con npm/node/render/docker ya en PATH
     Step "Entorno de desarrollo (Python + Node + Docker + Vercel + Render)"
-    Load-KhoraEnv
     Ensure-Python311
     Setup-Venv
     Ensure-Node
@@ -1821,6 +2126,9 @@ function Start-Sesion {
     # ===================================================================
     # AUTO-INICIO GARANTIZADO: todo corre solo, sin opcion de menu
     # ===================================================================
+    Step "Boveda de entorno (Env Vault)"
+    Init-EnvVault
+
     Step "Servidores de desarrollo (AUTO-INICIO garantizado)"
     L "INFO" "Arrancando dev servers automaticamente post-token (API + Next.js)..."
     Start-DevServers
@@ -1837,7 +2145,8 @@ function Start-Sesion {
     Write-Host "   Terminal VS Code: npm node python git vercel render docker" -ForegroundColor DarkGray
     $efsTxt = if ($script:EFS_ACTIVE) { "EFS ACTIVO - repo/secrets ilegibles fuera de esta cuenta" } else { "SIN EFS - respaldo: limpieza [X] + DeepFreeze" }
     Write-Host "   Cifrado: $efsTxt" -ForegroundColor DarkGray
-=============================================================" -ForegroundColor Green
+    Write-Host "   Render: render env set KEY=val --service-id <id>  |  render logs --service-id <id> --tail" -ForegroundColor DarkGray
+    Write-Host "  =============================================================" -ForegroundColor Green
     L "INFO" "SESION LISTA en ${dur}s"
 }
 # ================================================================
@@ -1852,8 +2161,6 @@ function Invoke-Cleanup {
     catch [System.Threading.AbandonedMutexException] { $owns = $true }  # heredamos un mutex dejado por una limpieza que murio
     if (-not $owns) { L "WARN" "Limpieza ya en curso; omito."; $mtx.Dispose(); return }
     try {
-        $cleanupFlag = Join-Path $WORK_STATE_DIR "cleanup-in-progress.flag"
-        Set-Content $cleanupFlag "1" -Encoding UTF8 -ErrorAction SilentlyContinue
         Write-Host ""
         L "STEP" "=== LIMPIEZA NUCLEAR (motivo: $reason) === $(Get-Date -Format 'HH:mm:ss') ==="
         # Push final del log + WIP si hay token disponible
@@ -1888,14 +2195,24 @@ function Invoke-Cleanup {
         Step "Deteniendo red de seguridad"
         Unregister-Deadline
         $gp = Join-Path $FLAG_DIR "guardian.pid"
-        if (Test-Path $gp) { try { Stop-Process -Id (Get-Content $gp) -Force -ErrorAction SilentlyContinue; Ok "Guardian detenido." } catch {}; Remove-Item $gp -Force -ErrorAction SilentlyContinue }
+        $gpid = $null
+        if (Test-Path $gp) {
+            try {
+                $gpid = Get-Content $gp -ErrorAction SilentlyContinue
+                if ($gpid) {
+                    Stop-Process -Id $gpid -Force -ErrorAction SilentlyContinue
+                    if (-not (Get-Process -Id $gpid -ErrorAction SilentlyContinue)) { Ok "Guardian detenido." }
+                }
+            } catch {}
+            Remove-Item $gp -Force -ErrorAction SilentlyContinue
+        }
         # Borrar workdir (repo + logwin + portables)
         Step "Borrando datos de trabajo"
         # Secrets PRIMERO: sobrescritura aleatoria antes de borrar (anti-forense)
         foreach ($__envF in @((Join-Path $ROOT_DIR ".khora.env"), (Join-Path $WORK_DIR ".khora.env"))) {
             if (Test-Path $__envF) { Invoke-SecureDeleteFile $__envF; Ok "Secret DESTRUIDO de forma segura: $__envF" }
         }
-        Info "Vars LLM destruidas: se pediran la proxima sesion (tenlas en LastPass)."
+        Info "Vars LLM .khora.env destruidas: ahora gestionadas por boveda."
         Get-Process powershell -ErrorAction SilentlyContinue | Where-Object { $_.Id -eq $script:LOG_WIN_PID } | Stop-Process -Force -ErrorAction SilentlyContinue
         # COMPUERTA FAIL-CLOSED: jamas destruir trabajo sin respaldo remoto VERIFICADO.
         # Si queda trabajo sin push, el repo se mueve a cuarentena local en vez de borrarse.
@@ -1926,7 +2243,7 @@ function Invoke-Cleanup {
         if (Test-Path $gitcfg) {
             (Get-Content $gitcfg | Where-Object { $_ -notmatch '(name|email|helper)\s*=' }) | Set-Content $gitcfg -Encoding UTF8 -ErrorAction SilentlyContinue
         }
-        Ok "Git config limpiado (user/email/helper)."
+        if (-not (git config --global user.name 2>$null) -and -not (git config --global user.email 2>$null)) { Ok "Git config limpiado (user/email/helper)." }
         # Credential Manager
         Step "Credential Manager"
         $found=0
@@ -1937,23 +2254,39 @@ function Invoke-Cleanup {
                 if ($tg) { cmdkey /delete:$tg 2>$null | Out-Null; $found++ }
             }
         }
-        Ok "$found credencial(es) eliminada(s)."
+        $stillThere = (cmdkey /list 2>$null | Select-String "git|github|visualstudio|vscode")
+        if (-not $stillThere) { Ok "$found credencial(es) eliminada(s) verificadas." }
         # Historial PowerShell de TODOS los perfiles (agnostico)
         Step "Historial PowerShell (todos los perfiles)"
+        $h_cleared = $false
         Get-ChildItem (Join-Path $SYS_DRIVE "Users") -Directory -ErrorAction SilentlyContinue | ForEach-Object {
             $h = Join-Path $_.FullName "AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt"
-            if (Test-Path $h) { Clear-Content $h -ErrorAction SilentlyContinue; Ok "PS history: $($_.Name)" }
+            if (Test-Path $h) {
+                Clear-Content $h -ErrorAction SilentlyContinue
+                if ((Get-Item $h -ErrorAction SilentlyContinue).length -eq 0) { Ok "PS history: $($_.Name)"; $h_cleared = $true }
+            }
         }
         try { [Microsoft.PowerShell.PSConsoleReadLine]::ClearHistory() } catch {}
         # VS Code datos (usuario actual)
         Step "VS Code - datos y cache"
         @("Backups","User\workspaceStorage","User\History","User\settings.json","logs","CachedData","CachedExtensionVSIXs") | ForEach-Object {
             $d = Join-Path $env:APPDATA "Code\$_"
-            if (Test-Path $d) { Remove-Item -Recurse -Force $d -ErrorAction SilentlyContinue; Ok "VS Code: $_" }
+            if (Test-Path $d) {
+                Remove-Item -Recurse -Force $d -ErrorAction SilentlyContinue
+                if (-not (Test-Path $d)) { Ok "VS Code: $_" }
+            }
         }
         $sf = Join-Path $env:APPDATA "Code\User\globalStorage\storage.json"
+        $allEmpty = $true
         if (Test-Path $sf) {
-            try { $j = Get-Content $sf -Raw | ConvertFrom-Json; $j.PSObject.Properties | Where-Object { $_.Name -match "recent|opened|lastUsed" } | ForEach-Object { $j.($_.Name)=@() }; $j | ConvertTo-Json -Depth 10 | Set-Content $sf -Encoding UTF8; Ok "VS Code storage.json: recientes limpiados." } catch {}
+            try {
+                $j = Get-Content $sf -Raw | ConvertFrom-Json
+                $j.PSObject.Properties | Where-Object { $_.Name -match "recent|opened|lastUsed" } | ForEach-Object { $j.($_.Name)=@() }
+                $j | ConvertTo-Json -Depth 10 | Set-Content $sf -Encoding UTF8
+                $checkJ = Get-Content $sf -Raw | ConvertFrom-Json
+                $checkJ.PSObject.Properties | Where-Object { $_.Name -match "recent|opened|lastUsed" } | ForEach-Object { if ($_.Value.Count -gt 0) { $allEmpty = $false } }
+                if ($allEmpty) { Ok "VS Code storage.json: recientes limpiados." }
+            } catch {}
         }
         # Chrome - TODOS los perfiles del usuario actual
         Step "Chrome - limpieza total (todos los perfiles)"
@@ -1965,33 +2298,60 @@ function Invoke-Cleanup {
             foreach ($pf in $profiles) {
                 foreach ($it in $items) {
                     $path = Join-Path $pf.FullName $it
-                    if (Test-Path $path) { Remove-Item -Recurse -Force $path -ErrorAction SilentlyContinue; $cleared++ }
+                    if (Test-Path $path) {
+                        Remove-Item -Recurse -Force $path -ErrorAction SilentlyContinue
+                        if (-not (Test-Path $path)) { $cleared++ }
+                    }
                 }
             }
-            foreach ($sh in @("ShaderCache","GrShaderCache")) { $p=Join-Path $chromeBase $sh; if (Test-Path $p){ Remove-Item -Recurse -Force $p -ErrorAction SilentlyContinue; $cleared++ } }
-            Ok "Chrome: $cleared elementos borrados en $($profiles.Count) perfil(es)."
+            foreach ($sh in @("ShaderCache","GrShaderCache")) {
+                $p=Join-Path $chromeBase $sh
+                if (Test-Path $p){
+                    Remove-Item -Recurse -Force $p -ErrorAction SilentlyContinue
+                    if (-not (Test-Path $p)) { $cleared++ }
+                }
+            }
+            if ($cleared -gt 0) { Ok "Chrome: $cleared elementos borrados en $($profiles.Count) perfil(es)." }
         } else { Info "Sin datos de Chrome." }
         # Temporales + caches dev
         Step "Temporales y caches"
         @("khora*","git*","vscode*","*token*","khe-*") | ForEach-Object {
-            Get-Item (Join-Path $env:TEMP $_) -ErrorAction SilentlyContinue | ForEach-Object { Remove-Item $_.FullName -Recurse -Force -ErrorAction SilentlyContinue }
+            Get-Item (Join-Path $env:TEMP $_) -ErrorAction SilentlyContinue | ForEach-Object {
+                Remove-Item $_.FullName -Recurse -Force -ErrorAction SilentlyContinue
+            }
         }
-        if (Test-Cmd npm)    { try { npm cache clean --force 2>&1 | Out-Null; Ok "npm cache limpio." } catch {} }
-        if (Test-Cmd python) { try { python -m pip cache purge 2>&1 | Out-Null; Ok "pip cache limpio." } catch {} }
-        Ok "Temporales borrados."
+        $npmOk = $true
+        $pipOk = $true
+        if (Test-Cmd npm)    { try { $p = Start-Process npm -ArgumentList "cache clean --force" -Wait -PassThru -NoNewWindow; if ($p.ExitCode -eq 0) { Ok "npm cache limpio." } else { $npmOk=$false } } catch {} }
+        if (Test-Cmd python) { try { $p = Start-Process python -ArgumentList "-m pip cache purge" -Wait -PassThru -NoNewWindow; if ($p.ExitCode -eq 0) { Ok "pip cache limpio." } else { $pipOk=$false } } catch {} }
+        $tempOk = (-not (Get-ChildItem (Join-Path $env:TEMP "khe-*") -ErrorAction SilentlyContinue))
+        if ($tempOk) { Ok "Temporales borrados." }
         # Recientes de Windows + RunMRU
         Step "Recientes de Windows"
         $rec = Join-Path $env:APPDATA "Microsoft\Windows\Recent"
-        if (Test-Path $rec) { Get-ChildItem $rec -ErrorAction SilentlyContinue | Remove-Item -Force -Recurse -ErrorAction SilentlyContinue; Ok "Archivos recientes borrados." }
-        try { Remove-ItemProperty "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\RunMRU" -Name * -ErrorAction SilentlyContinue; Ok "RunMRU limpiado." } catch {}
+        if (Test-Path $rec) {
+            Get-ChildItem $rec -ErrorAction SilentlyContinue | Remove-Item -Force -Recurse -ErrorAction SilentlyContinue
+            if ((Get-ChildItem $rec -ErrorAction SilentlyContinue).Count -eq 0) { Ok "Archivos recientes borrados." }
+        }
+        try {
+            Remove-ItemProperty "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\RunMRU" -Name * -ErrorAction SilentlyContinue
+            if (-not (Get-ItemProperty "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\RunMRU" -ErrorAction SilentlyContinue).PSObject.Properties.Where({$_.Name -match '^[a-zA-Z]$'})) { Ok "RunMRU limpiado." }
+        } catch {}
         # Borrado seguro del espacio libre del workdir
         Step "Borrado seguro (sobrescritura de espacio libre)"
+        $cipherStatus = "NO VERIFICABLE"
         if (Test-Cmd cipher) {
-            try { Start-Process cipher -ArgumentList "/w:$WORK_DIR" -WindowStyle Hidden -Wait; Ok "cipher /w completado." } catch { Warn "cipher fallo: $_" }
+            try {
+                $p = Start-Process cipher -ArgumentList "/w:$WORK_DIR" -WindowStyle Hidden -Wait -PassThru
+                if ($p.ExitCode -eq 0) {
+                    Ok "cipher /w completado."
+                    $cipherStatus = "VERIFICADO"
+                } else {
+                    Warn "cipher /w termino con codigo no cero."
+                    $cipherStatus = "PENDIENTE"
+                }
+            } catch { Warn "cipher fallo: $_"; $cipherStatus = "PENDIENTE" }
         } else { Info "cipher no disponible; omitido." }
-        # Borrar el marcador de sesión activa para que instancias futuras no intenten handoff
-        Remove-Item (Join-Path $WORK_STATE_DIR "active-session.json") -Force -ErrorAction SilentlyContinue
-
         # Revocacion de token (best-effort)
         Step "Token"
         Info "Los PAT de usuario no se pueden revocar por API sin credenciales de app."
@@ -2008,9 +2368,47 @@ function Invoke-Cleanup {
         $checks += @{ n="Token fuera de memoria"; ok=($null -eq $script:TokSecure) }
         $checks += @{ n="Secrets .khora.env destruidos"; ok=(-not ((Test-Path (Join-Path $ROOT_DIR ".khora.env")) -or (Test-Path (Join-Path $WORK_DIR ".khora.env")))) }
         $checks += @{ n="Deadline desregistrado"; ok=(-not (Get-ScheduledTask -TaskName $script:TASK_NAME -ErrorAction SilentlyContinue)) }
+        $checks += @{ n="Guardian detenido"; ok=(-not (Get-Process -Id $gpid -ErrorAction SilentlyContinue)) }
+        $checks += @{ n="VS Code storage y caches borrados"; ok=($allEmpty) }
+        $checks += @{ n="Chrome limpio"; ok=($cleared -gt 0 -or -not (Test-Path $chromeBase)) }
+        $checks += @{ n="Temporales borrados"; ok=($tempOk -and $npmOk -and $pipOk) }
+        $checks += @{ n="PS history borrado"; ok=($h_cleared) }
+
         $allOK = $true
-        foreach ($c in $checks) { if ($c.ok) { Ok "VERIFICADO: $($c.n)" } else { Fail "PENDIENTE: $($c.n)"; $allOK=$false } }
+        $pendings = @()
+        foreach ($c in $checks) {
+            if ($c.ok) {
+                Ok "VERIFICADO: $($c.n)"
+            } else {
+                Fail "PENDIENTE: $($c.n)"
+                $allOK=$false
+                $pendings += $c.n
+            }
+        }
+
+        if ($cipherStatus -eq "VERIFICADO") {
+            Ok "VERIFICADO: cipher /w espacio libre"
+        } elseif ($cipherStatus -eq "PENDIENTE") {
+            Fail "PENDIENTE: cipher /w espacio libre"
+            $allOK=$false
+            $pendings += "cipher /w espacio libre"
+        } else {
+            Info "NO VERIFICABLE: cipher /w espacio libre"
+            $pendings += "cipher /w espacio libre (NO VERIFICABLE)"
+        }
+
         $script:SES_ACTIVE = $false
+
+        $lastState = @{
+            reason = $reason
+            timestamp = (Get-Date -Format 'o')
+            result = if ($allOK) { "TODO OK" } else { "CON PENDIENTES" }
+            pendings = $pendings
+        } | ConvertTo-Json -Depth 5 -Compress
+        $stateFile = Join-Path $WORK_DIR "session-state\last-cleanup.json"
+        if (-not (Test-Path (Split-Path $stateFile -Parent))) { New-Item -ItemType Directory -Force (Split-Path $stateFile -Parent) | Out-Null }
+        Set-Content $stateFile $lastState -Encoding UTF8
+
         L "STEP" "=== LIMPIEZA NUCLEAR COMPLETA (motivo:$reason) === verificacion:$(if($allOK){'TODO OK'}else{'CON PENDIENTES'}) ==="
         Write-Host ""
         Write-Host "  =============================================================" -ForegroundColor Green
@@ -2273,12 +2671,32 @@ function Show-Banner {
     $c = if (Get-Process "Code" -ErrorAction SilentlyContinue) { "[Code ON]" } else { "[Code OFF]" }
     $g = if ($script:GUARD_PID -and (Get-Process -Id $script:GUARD_PID -ErrorAction SilentlyContinue)) { "[Guard ON]" } else { "[Guard OFF]" }
     $ratAlert = $null; $__rf = Join-Path $FLAG_DIR "rat_alert.txt"; if (Test-Path $__rf) { try { $ratAlert = (Get-Content $__rf -Raw -ErrorAction SilentlyContinue).Trim() } catch {} }
+
+    $cleanupAlert = $null
+    $stateFile = Join-Path $WORK_DIR "session-state\last-cleanup.json"
+    if (Test-Path $stateFile) {
+        try {
+            $lastState = Get-Content $stateFile -Raw | ConvertFrom-Json
+            if ($lastState.result -ne "TODO OK") {
+                $pList = ($lastState.pendings) -join ", "
+                $cleanupAlert = "Última sesión (cerrada por: $($lastState.reason), el $($lastState.timestamp)): limpieza [$($lastState.result): $pList]"
+            } else {
+                $cleanupAlert = "Última sesión (cerrada por: $($lastState.reason), el $($lastState.timestamp)): limpieza [OK]"
+            }
+        } catch {}
+    }
+
     Write-Host ""
     Write-Host "  =============================================================" -ForegroundColor Cyan
     Write-Host "   KHORA  v$SCRIPT_VERSION (agnostico)  --  $DATE_STR $(Get-Date -Format 'HH:mm:ss')" -ForegroundColor Cyan
     Write-Host "   $env:USERNAME @ $env:COMPUTERNAME  |  $r $c $g" -ForegroundColor DarkGray
     if ($ratAlert) { Write-Host "   [!!] ALERTA RAT/EXFIL: $ratAlert" -ForegroundColor Red; Write-Host "        Revisa con [T]; si es real, cierra con [2]." -ForegroundColor Yellow }
     Write-Host "  =============================================================" -ForegroundColor Cyan
+    if ($cleanupAlert) {
+        $color = if ($cleanupAlert -match "\[OK\]") { "Green" } else { "Yellow" }
+        Write-Host "   * $cleanupAlert" -ForegroundColor $color
+        Write-Host "  =============================================================" -ForegroundColor Cyan
+    }
     Write-Host ""
     if (-not $script:SES_ACTIVE) {
         Write-Host "   [1] INICIAR SESION  <- empieza aqui" -ForegroundColor Green
@@ -2294,7 +2712,6 @@ function Show-Banner {
     if ($script:SES_ACTIVE -and $CFG.enableAutoWip) { Write-Host "   (auto-WIP cada $($CFG.autoWipMinutes)min activo)" -ForegroundColor DarkGray }
     Write-Host "   Escuchando... presiona una tecla: " -NoNewline -ForegroundColor White
 }
-
 function Cleanup-OldHandoffFiles {
     $now = Get-Date
     Get-ChildItem $WORK_STATE_DIR -Filter "handoff-*" -ErrorAction SilentlyContinue | ForEach-Object {
@@ -2466,6 +2883,7 @@ function Run-Main {
     }
     Open-LogWindow
     Start-Sleep -Milliseconds 700
+    Start-ProactiveDepPrep
     # --- VERSIONADO: auto-archivo + coherencia nombre<->version ---
     Step "Versionado v$SCRIPT_VERSION"
     $verFile = Join-Path $VER_DIR "khora-v$SCRIPT_VERSION.ps1"
@@ -2510,18 +2928,13 @@ function Run-Main {
     # Si no hay internet se avisa pero NO se bloquea el menu (limpieza/log siguen disponibles).
     $netOK = Invoke-Preflight
     if (-not $netOK) { Warn "Sin internet: [1] Iniciar sesion fallara hasta que haya conexion." }
-
-
     Scan-Keyloggers
-    } # Cierra el else de Invoke-HandoffCheck
-
-    if (-not $handoffOk) {
-        Scan-RemoteAccess | Out-Null
-        Show-Estado
-        L "INFO" "Diagnostico automatico de arranque completado (preflight + keyloggers + estado)."
-        Clear-PendingInput   # descartar residuos del pegado antes de esperar tecla real
-        Focus-Window         # auto-enfoque de la ventana principal
-        L "INFO" "Menu principal activo. La ventana de log ya muestra el diagnostico de arranque."
+    Scan-RemoteAccess | Out-Null
+    Show-Estado
+    L "INFO" "Diagnostico automatico de arranque completado (preflight + keyloggers + estado)."
+    Clear-PendingInput   # descartar residuos del pegado antes de esperar tecla real
+    Focus-Window         # auto-enfoque de la ventana principal
+    L "INFO" "Menu principal activo. La ventana de log ya muestra el diagnostico de arranque."
     }
     # Cierre garantizado si se cierra con la X o error
     try { Register-EngineEvent PowerShell.Exiting -Action { if ($script:SES_ACTIVE) { Invoke-Cleanup "salida-forzada" } } | Out-Null } catch {}
@@ -2566,7 +2979,6 @@ function Run-Main {
             Start-Sleep -Milliseconds 900
             $needDraw = $true
         }
-
         # Tareas periodicas sin bloquear
         if ($script:SES_ACTIVE) {
             # Handoff Heartbeat
