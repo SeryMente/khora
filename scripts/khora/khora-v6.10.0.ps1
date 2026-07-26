@@ -322,6 +322,39 @@ $script:SES_ACTIVE   = $false
 $script:WIP_UNPUSHED = $false   # true => hay trabajo local sin respaldo remoto verificado
 $script:EFS_ACTIVE   = $false   # true => workdir/repo cifrados en reposo con EFS
 # ================================================================
+#  HUD STATE VARIABLES
+# ================================================================
+$script:HUD_OK = 0
+$script:HUD_WARN = 0
+$script:HUD_FAIL = 0
+$script:HUD_STEP = "Inicializando"
+
+function Init-HUD {
+    $script:HUD_OK = 0
+    $script:HUD_WARN = 0
+    $script:HUD_FAIL = 0
+    $script:HUD_STEP = "Inicializando"
+}
+
+function Update-HUD {
+    param([string]$level, [string]$msg, [string]$color="White")
+
+    $hudPrefix = "[OK:$($script:HUD_OK) WARN:$($script:HUD_WARN) FAIL:$($script:HUD_FAIL)] ($($script:HUD_STEP))  $level  "
+    $fullMsg = $hudPrefix + $msg
+
+    # Truncate if necessary
+    if ($fullMsg.Length -gt $HOST_WIDTH) {
+        $fullMsg = $fullMsg.Substring(0, $HOST_WIDTH - 3) + "..."
+    }
+
+    # Pad to overwrite previous text
+    $padLength = [Math]::Max(0, $HOST_WIDTH - $fullMsg.Length)
+    $fullMsg += " " * $padLength
+
+    Write-Host "`r$fullMsg" -NoNewline -ForegroundColor $color
+}
+
+# ================================================================
 #  CONFIG (externa, autogenerada -> agnostico de proyecto)
 # ================================================================
 $DEFAULT_CFG = [ordered]@{
@@ -376,13 +409,13 @@ function L {
         Add-Content $repoLog $line -Encoding UTF8 -ErrorAction SilentlyContinue
     }
 }
-function Ok   { param([string]$m) Write-Host "  [ OK ] $m" -ForegroundColor Green;  L "OK  " $m }
-function Fail { param([string]$m) Write-Host "  [FAIL] $m" -ForegroundColor Red;    L "FAIL" $m }
-function Info { param([string]$m) Write-Host "  [INFO] $m" -ForegroundColor Cyan;   L "INFO" $m }
-function Warn { param([string]$m) Write-Host "  [WARN] $m" -ForegroundColor Yellow; L "WARN" $m }
+function Ok   { param([string]$m) $script:HUD_OK++; Update-HUD "OK  " $m "Green"; L "OK  " $m }
+function Fail { param([string]$m) $script:HUD_FAIL++; Update-HUD "FAIL" $m "Red"; L "FAIL" $m }
+function Info { param([string]$m) Update-HUD "INFO" $m "Cyan"; L "INFO" $m }
+function Warn { param([string]$m) $script:HUD_WARN++; Update-HUD "WARN" $m "Yellow"; L "WARN" $m }
 function Step { param([string]$m)
-    $sep = "-" * ([Math]::Max(0, $HOST_WIDTH - $m.Length - 8))
-    Write-Host "`n  === $m $sep" -ForegroundColor Magenta
+    $script:HUD_STEP = $m
+    Update-HUD "STEP" $m "Magenta"
     L "STEP" $m
 }
 # ================================================================
@@ -628,7 +661,7 @@ function Confirm-GhCliAuth {
         Info "Iniciando autenticacion en gh CLI (se abrira el navegador)..."
         gh auth login --hostname github.com --git-protocol https --web 2>&1 | ForEach-Object { Info "gh: $_" }
         gh auth status 2>&1 | Out-Null
-        if ($LASTEXITCODE -ne 0) { Fail "gh CLI no pudo autenticarse."; return $false }
+if ($LASTEXITCODE -ne 0) { Fail "gh CLI no pudo autenticarse."; Write-Host ""; Write-Host "SESIÓN DETENIDA: gh CLI falló."; return $false }
     }
     if (-not $CheckOnly) {
         gh auth setup-git 2>&1 | Out-Null
@@ -642,12 +675,10 @@ function Confirm-GhCliAuth {
 function Ensure-VSCode {
     $code = Resolve-Exe "code" (Get-CodePaths) "Code.exe"
     if ($code) { Ok "VS Code encontrado: $code"; return $code }
-
-    if (Wait-ProactiveDepPrep -Key 'vscode' -Label 'VS Code') {
-        $code = Resolve-Exe "code" (Get-CodePaths) "Code.exe"
-        if ($code) { Ok "VS Code OK (tras instalacion proactiva): $code"; return $code }
-    }
-
+if (Wait-ProactiveDepPrep -Key 'vscode' -Label 'VS Code') {
+    $code = Resolve-Exe "code" (Get-CodePaths) "Code.exe"
+    if ($code) { Ok "VS Code OK (tras instalacion proactiva): $code"; return $code }
+}
     Warn "VS Code no encontrado. Intentando winget..."
     if (Test-Cmd winget) {
         try {
@@ -674,7 +705,7 @@ function Ensure-VSCode {
             if ($expectedHash) {
                 $actual = (Get-FileHash $installer -Algorithm SHA256).Hash
                 if ($actual -ieq $expectedHash) { Ok "SHA256 verificado. Instalador integro." }
-                else { Remove-Item $installer -Force -ErrorAction SilentlyContinue; Fail "SHA256 NO coincide. Instalador descartado por seguridad."; return $null }
+else { Remove-Item $installer -Force -ErrorAction SilentlyContinue; Fail "SHA256 NO coincide. Instalador descartado por seguridad."; Write-Host ""; Write-Host "SESIÓN DETENIDA: SHA256 no coincide."; return $null }
             }
             Info "Instalando VS Code (modo usuario, sin admin)..."
             $p = Start-Process $installer -ArgumentList "/VERYSILENT","/NORESTART","/MERGETASKS=!runcode,addtopath" -PassThru -Wait
@@ -762,7 +793,7 @@ function Export-VSCodeConfig {
 # ================================================================
 function Start-Guardian {
     if (-not $CFG.enableGuardian) { Info "Guardian deshabilitado en config."; return }
-    if (-not (Test-Path $SCRIPT_PATH)) { Fail "Guardian NO lanzado: no existe [$SCRIPT_PATH]. Guarda el script como archivo y reinicia."; return }
+if (-not (Test-Path $SCRIPT_PATH)) { Fail "Guardian NO lanzado: no existe [$SCRIPT_PATH]. Guarda el script como archivo y reinicia."; Write-Host ""; Write-Host "SESIÓN DETENIDA: Falta archivo script."; return }
     $guardArgs = @("-NoProfile","-ExecutionPolicy","Bypass","-WindowStyle","Hidden","-File","`"$SCRIPT_PATH`"","-GuardianOnly")
     try {
         $proc = Start-Process powershell -ArgumentList $guardArgs -PassThru -WindowStyle Hidden
@@ -776,7 +807,7 @@ function Start-Guardian {
 # ================================================================
 function Register-Deadline {
     if (-not (Test-Cmd Register-ScheduledTask)) { Warn "ScheduledTask no disponible; deadline cubierto solo por Guardian."; return }
-    if (-not (Test-Path $SCRIPT_PATH)) { Fail "Deadline NO registrado: no existe [$SCRIPT_PATH]. Guarda el script como archivo y reinicia."; return }
+if (-not (Test-Path $SCRIPT_PATH)) { Fail "Deadline NO registrado: no existe [$SCRIPT_PATH]. Guarda el script como archivo y reinicia."; Write-Host ""; Write-Host "SESIÓN DETENIDA: Falta archivo script para deadline."; return }
     try {
         $now = Get-Date
         $dl  = Get-Date -Hour $CFG.deadlineHour -Minute 0 -Second 0
@@ -1086,64 +1117,62 @@ function Start-ProactiveDepPrep {
     if ($script:PrepJobsStarted) { return }
     $script:PrepJobsStarted = $true
     $script:PrepJobs = @{}
+L "INFO" "Iniciando comprobacion de dependencias proactiva en segundo plano..."
 
-    L "INFO" "Iniciando comprobacion de dependencias proactiva en segundo plano..."
+# Python
+$py = $null
+foreach ($cmd in @('python','python3','python3.11')) {
+$c = Get-Command $cmd -ErrorAction SilentlyContinue
+if ($c) {
+$v = & $c --version 2>&1
+if ("$v" -match '3\.(1[1-9]|[2-9]\d)') { $py = $c; break }
+}
+}
+if (-not $py) {
+L "INFO" "Lanzando instalacion proactiva: Python 3.11"
+$script:PrepJobs['python'] = Start-Job -ScriptBlock { winget install --id Python.Python.3.11 -e --silent 2>&1 }
+}
 
-    # Python
-    $py = $null
-    foreach ($cmd in @('python','python3','python3.11')) {
-        $c = Get-Command $cmd -ErrorAction SilentlyContinue
-        if ($c) {
-            $v = & $c --version 2>&1
-            if ("$v" -match '3\.(1[1-9]|[2-9]\d)') { $py = $c; break }
-        }
-    }
-    if (-not $py) {
-        L "INFO" "Lanzando instalacion proactiva: Python 3.11"
-        $script:PrepJobs['python'] = Start-Job -ScriptBlock { winget install --id Python.Python.3.11 -e --silent 2>&1 }
-    }
+# Node.js
+if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
+L "INFO" "Lanzando instalacion proactiva: Node.js LTS"
+$script:PrepJobs['node'] = Start-Job -ScriptBlock { winget install --id OpenJS.NodeJS.LTS -e --silent 2>&1 }
+}
 
-    # Node.js
-    if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
-        L "INFO" "Lanzando instalacion proactiva: Node.js LTS"
-        $script:PrepJobs['node'] = Start-Job -ScriptBlock { winget install --id OpenJS.NodeJS.LTS -e --silent 2>&1 }
-    }
+# Docker
+if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
+L "INFO" "Lanzando instalacion proactiva: Docker Desktop"
+$script:PrepJobs['docker'] = Start-Job -ScriptBlock { winget install --id Docker.DockerDesktop -e --silent 2>&1 }
+}
 
-    # Docker
-    if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
-        L "INFO" "Lanzando instalacion proactiva: Docker Desktop"
-        $script:PrepJobs['docker'] = Start-Job -ScriptBlock { winget install --id Docker.DockerDesktop -e --silent 2>&1 }
-    }
-
-    # VS Code
-    $code = Resolve-Exe "code" (Get-CodePaths) "Code.exe"
-    if (-not $code) {
-        L "INFO" "Lanzando instalacion proactiva: VS Code"
-        $script:PrepJobs['vscode'] = Start-Job -ScriptBlock { winget install --id Microsoft.VisualStudioCode -e --scope user --silent --accept-package-agreements --accept-source-agreements 2>&1 }
+# VS Code
+$code = Resolve-Exe "code" (Get-CodePaths) "Code.exe"
+if (-not $code) {
+L "INFO" "Lanzando instalacion proactiva: VS Code"
+$script:PrepJobs['vscode'] = Start-Job -ScriptBlock { winget install --id Microsoft.VisualStudioCode -e --scope user --silent --accept-package-agreements --accept-source-agreements 2>&1 }
     }
 }
 
 function Wait-ProactiveDepPrep {
     param([string]$Key, [string]$Label)
-    if ($script:PrepJobs -and $script:PrepJobs.ContainsKey($Key)) {
-        $job = $script:PrepJobs[$Key]
-        if ($job) {
-            L "INFO" "Esperando instalacion proactiva en progreso para: $Label"
-            $out = Spin-Job "Finalizando instalacion de $Label (ya en progreso)" -ArgList @($job) -Tips @('esperando job en segundo plano...','casi listo...') -Block {
-                param($j)
-                Receive-Job -Job $j -Wait -AutoRemoveJob 2>&1
-            }
-            $out | ForEach-Object { L "INFO" "winget proactivo ($Key): $_" }
-            $script:PrepJobs.Remove($Key)
-
-            # Refrescar PATH
-            $env:Path = [System.Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [System.Environment]::GetEnvironmentVariable('Path','User')
-            return $true
-        }
-    }
-    return $false
+if ($script:PrepJobs -and $script:PrepJobs.ContainsKey($Key)) {
+$job = $script:PrepJobs[$Key]
+if ($job) {
+L "INFO" "Esperando instalacion proactiva en progreso para: $Label"
+$out = Spin-Job "Finalizando instalacion de $Label (ya en progreso)" -ArgList @($job) -Tips @('esperando job en segundo plano...','casi listo...') -Block {
+param($j)
+Receive-Job -Job $j -Wait -AutoRemoveJob 2>&1
 }
+$out | ForEach-Object { L "INFO" "winget proactivo ($Key): $*" }
+$script:PrepJobs.Remove($Key)
 
+# Refrescar PATH
+$env:Path = [System.Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [System.Environment]::GetEnvironmentVariable('Path','User')
+return $true
+}
+}
+return $false
+}
 # ================================================================
 #  ENTORNO DE DESARROLLO (Python + Node + Docker + Vercel)
 # ================================================================
@@ -1162,10 +1191,9 @@ function Ensure-Python311 {
         $c = Get-Command python -ErrorAction SilentlyContinue
         if ($c) {
             $v = & $c --version 2>&1
-            if ("$v" -match '3\.(1[1-9]|[2-9]\d)') { Ok "Python OK (tras instalacion proactiva): $v ($($c.Source))"; return $c.Source }
-        }
-    }
-
+if ("$v" -match '3\.(1[1-9]|[2-9]\d)') { Ok "Python OK (tras instalacion proactiva): $v ($($c.Source))"; return $c.Source }
+}
+}
     Info "Python 3.11+ no encontrado. Instalando con animacion (puede tardar)..."
     $out = Spin-Job "Instalando Python 3.11" -Tips @('descargando instalador...','verificando firma...','instalando componentes...','actualizando PATH...','casi listo...') -Block {
         winget install --id Python.Python.3.11 -e --silent 2>&1
@@ -1202,10 +1230,10 @@ function Ensure-Node {
     $n = Get-Command node -ErrorAction SilentlyContinue
     if ($n) { $v = & node --version 2>&1; L "INFO" "Node en PATH: $($n.Source) v$v"; Ok "Node OK: $v"; return $n.Source }
 
-    if (Wait-ProactiveDepPrep -Key 'node' -Label 'Node.js LTS') {
-        $n = Get-Command node -ErrorAction SilentlyContinue
-        if ($n) { $v = & node --version 2>&1; Ok "Node OK (tras instalacion proactiva): $v"; return $n.Source }
-    }
+if (Wait-ProactiveDepPrep -Key 'node' -Label 'Node.js LTS') {
+$n = Get-Command node -ErrorAction SilentlyContinue
+if ($n) { $v = & node --version 2>&1; Ok "Node OK (tras instalacion proactiva): $v"; return $n.Source }
+}
 
     Info "Node.js no encontrado. Instalando con animacion..."
     $out = Spin-Job "Instalando Node.js LTS" -Tips @('descargando Node.js...','instalando NPM...','configurando entorno...','actualizando PATH...','casi listo...') -Block {
@@ -1456,7 +1484,7 @@ function Init-EnvVault {
     if (-not (Test-Path $secretsDir)) { New-Item -ItemType Directory -Path $secretsDir -Force | Out-Null }
 
     $masterKey = Get-VaultMasterKey
-    if (-not $masterKey) { Fail "Se cancelo el inicio: Passphrase maestro requerido."; return }
+if (-not $masterKey) { Fail "Se cancelo el inicio: Passphrase maestro requerido."; Write-Host ""; Write-Host "SESIÓN DETENIDA: Passphrase requerida."; return }
 
     $vault = Load-Vault -Path $vaultPath -Key $masterKey
     $vaultChanged = $false
@@ -1927,6 +1955,7 @@ function Invoke-ChromeCleanup {
 #  INICIO DE SESION
 # ================================================================
 function Start-Sesion {
+Init-HUD
     Write-Host ""
     L "STEP" "=== INICIO DE SESION === $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') === $env:USERNAME @ $env:COMPUTERNAME ==="
     L "INFO" "Script v$SCRIPT_VERSION | Path: $SCRIPT_PATH"
@@ -1960,7 +1989,7 @@ function Start-Sesion {
         Warn "No se pudo determinar el usuario real (ningun metodo tuvo exito): se usa el contexto actual."
         Ok   "Usuario : $env:USERNAME  |  Perfil : $env:USERPROFILE"
     }
-    if (-not (Invoke-Preflight)) { Fail "Preflight fallo (sin internet). Sesion cancelada."; return }
+if (-not (Invoke-Preflight)) { Fail "Preflight fallo (sin internet). Sesion cancelada."; Write-Host ""; Write-Host "SESIÓN DETENIDA: Preflight falló."; return }
     Step "Politica de ejecucion"
     $ep = Get-ExecutionPolicy -Scope CurrentUser
     if ($ep -in @("Restricted","AllSigned")) {
@@ -2020,7 +2049,7 @@ function Start-Sesion {
             $script:TokSecure = $null
         }
     }
-    if (-not $valid) { Fail "3 intentos fallidos. Sesion cancelada."; $script:TokSecure=$null; return }
+if (-not $valid) { Fail "3 intentos fallidos. Sesion cancelada."; Write-Host ""; Write-Host "SESIÓN DETENIDA: Fallaron 3 intentos de token."; $script:TokSecure=$null; return }
     Step "Configuracion Git"
     git config --global user.name  $GIT_NAME  2>&1 | Out-Null; Ok "user.name  = $GIT_NAME"
     git config --global user.email $GIT_EMAIL 2>&1 | Out-Null; Ok "user.email = $GIT_EMAIL"
@@ -2065,7 +2094,7 @@ function Start-Sesion {
         Warn "Intento $i fallido. Causa: $__diag"
         if ($i -lt 3) { Start-Sleep ($i*3) }
     }
-    if (-not $cloneOK) { Fail "No se pudo clonar tras 3 intentos."; return }
+if (-not $cloneOK) { Fail "No se pudo clonar tras 3 intentos."; Write-Host ""; Write-Host "SESIÓN DETENIDA: Fallo al clonar repositorio."; return }
     # URL remota limpiada al terminar el clone (remote set-url sin token)
     $branch = git -C $REPO_DIR rev-parse --abbrev-ref HEAD 2>&1
     $ultimo = git -C $REPO_DIR log --oneline -1 2>&1
@@ -2666,6 +2695,7 @@ function Trigger-Cleanup {
 #  BANNER + LOOP PRINCIPAL
 # ================================================================
 function Show-Banner {
+Write-Host ""
     Clear-Host
     $r = if (Test-Path "$REPO_DIR\.git") { "[REPO OK]" } else { "[sin repo]" }
     $c = if (Get-Process "Code" -ErrorAction SilentlyContinue) { "[Code ON]" } else { "[Code OFF]" }
@@ -2932,6 +2962,7 @@ function Run-Main {
     Scan-RemoteAccess | Out-Null
     Show-Estado
     L "INFO" "Diagnostico automatico de arranque completado (preflight + keyloggers + estado)."
+Write-Host ""
     Clear-PendingInput   # descartar residuos del pegado antes de esperar tecla real
     Focus-Window         # auto-enfoque de la ventana principal
     L "INFO" "Menu principal activo. La ventana de log ya muestra el diagnostico de arranque."
@@ -2972,9 +3003,10 @@ function Run-Main {
                     } else { Ok "No hay commits locales pendientes de push." }
                 }
                 "D" { Show-DiagBundle }
-                "Q" { Write-Host ""; if ($script:SES_ACTIVE) { Warn "Sesion activa: cierra con [2] antes de salir." } else { Write-Host "  Saliendo. Revoca tu token." -ForegroundColor Yellow; L "INFO" "Script cerrado."; break } }
-            }
-            if ($key -eq "Q" -and -not $script:SES_ACTIVE) { break }
+"Q" { Write-Host ""; if ($script:SES_ACTIVE) { Warn "Sesion activa: cierra con [2] antes de salir." } else { Write-Host "  Saliendo. Revoca tu token." -ForegroundColor Yellow; Write-Host ""; L "INFO" "Script cerrado."; break } }
+}
+if ($key -eq "Q" -and -not $script:SES_ACTIVE) { break }
+Write-Host ""
             Clear-PendingInput
             Start-Sleep -Milliseconds 900
             $needDraw = $true
