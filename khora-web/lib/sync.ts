@@ -1,3 +1,4 @@
+// @l0 L0-002-R · @req DEPLOY-01/REQ-3 · @acr ACR-3.1
 import { db, type Captura } from "./db";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || (typeof window !== "undefined" ? "/api" : "");

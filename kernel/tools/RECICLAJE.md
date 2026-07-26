@@ -25,3 +25,8 @@
 - khora_kernel.psi
 - khora_kernel.proveedores
 - kernel/tests/*
+
+## Componente: `api/main.py`
+- **Decisión:** REFACTORIZA
+- **Motivo:** DEPLOY-01 exige validación estricta de credenciales de Neo4j en el arranque (fail-fast), middleware de seguridad restrictivo con CORS específico, alias de `/health` y no exponer endpoints internos sin autenticación (excepto opciones CORS y health checks).
+- **Acción:** Se añade lógica fail-fast para Neo4j en el arranque, middleware estricto con `X-Khora-Key` en lugar de inyecciones parciales, y un endpoint `/health` equivalente a `/api/v1/salud`.
