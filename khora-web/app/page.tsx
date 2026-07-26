@@ -1,79 +1,35 @@
-"use client";
+﻿import Link from "next/link";
+import { Zap, MessageSquareShare, Network, Map } from "lucide-react";
 
-import { useState } from "react";
-import Link from "next/link";
-import { Splash } from "./components/Splash";
-import { MedicalKpiWidget } from "./components/MedicalKpiWidget";
-import { Wrench, Server, Kanban } from "lucide-react";
+const ACCIONES = [
+  { href: "/sistema/ingesta", titulo: "Ingesta", detalle: "Capturar hacia la memoria continua", Icono: Zap },
+  { href: "/sistema/consulta", titulo: "Consulta", detalle: "Preguntar a la red · GraphRAG", Icono: MessageSquareShare },
+  { href: "/grafo", titulo: "Grafo", detalle: "Visualización del sustrato PKG", Icono: Network },
+  { href: "/mapa", titulo: "Mapa", detalle: "Mapa de decisiones", Icono: Map },
+];
 
-export default function RootMenu() {
-  const [showSplash, setShowSplash] = useState(true);
-
-  if (showSplash) {
-    return <Splash onComplete={() => setShowSplash(false)} />;
-  }
-
+export default function Home() {
   return (
-    <main className="bg-[#0B1F3B] min-h-screen flex flex-col items-center justify-center p-6 selection:bg-[#3FA7FF]/20 relative overflow-hidden">
-      {/* Decorative ambient lighting */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-[#3FA7FF]/5 rounded-full blur-[150px]" />
-        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-[#112A4F]/20 rounded-full blur-[120px]" />
-      </div>
-
-      {/* Header */}
-      <header className="absolute top-0 left-0 w-full p-8 flex justify-center z-10">
-        <h1 className="font-semibold text-cora-surface tracking-[0.2em] uppercase text-sm">ATHANOR</h1>
+    <main className="min-h-screen bg-cora-bg text-cora-text flex flex-col items-center justify-center p-6">
+      <header className="mb-12 text-center">
+        <h1 className="text-3xl font-semibold tracking-[0.3em] uppercase text-cora-text">Khora</h1>
+        <p className="text-cora-silver font-mono text-xs tracking-widest mt-3 uppercase">Memoria continua · v0.9</p>
       </header>
-
-      {/* KPI Widget */}
-      <div className="z-10 w-full max-w-2xl mb-6">
-        <MedicalKpiWidget />
-      </div>
-
-      {/* Center Link Cards */}
-      <div className="z-10 w-full max-w-2xl grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Link href="/herramientas" className="block outline-none focus:outline-none">
-          <div className="bg-[#112A4F] border border-[#1F3C6A] hover:border-[#3FA7FF] hover:bg-[#112A4F]/80 transition-all duration-200 ease-in-out rounded-2xl p-10 flex flex-col items-center gap-6 shadow-2xl cursor-pointer group h-full">
-            <div className="w-16 h-16 rounded-2xl bg-white/[0.03] border border-white/10 group-hover:bg-white/[0.06] group-hover:border-[#3FA7FF]/30 flex items-center justify-center transition-all duration-200 ease-in-out">
-              <Wrench className="w-8 h-8 text-cora-surface group-hover:text-[#3FA7FF] transition-colors duration-200 ease-in-out" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-2xl">
+        {ACCIONES.map(({ href, titulo, detalle, Icono }) => (
+          <Link key={href} href={href} className="block outline-none focus:outline-none">
+            <div className="bg-cora-surface border border-cora-silver/15 hover:border-cora-silver/40 transition-colors rounded-2xl p-6 flex items-start gap-4 h-full">
+              <div className="p-3 rounded-xl bg-white/[0.04] border border-white/10">
+                <Icono className="w-5 h-5 text-cora-silver" />
+              </div>
+              <div>
+                <h2 className="font-semibold text-cora-text">{titulo}</h2>
+                <p className="text-xs text-cora-silver mt-1">{detalle}</p>
+              </div>
             </div>
-
-            <div className="flex flex-col items-center gap-2">
-              <h2 className="text-xl font-bold text-cora-surface tracking-tight">Herramientas</h2>
-              <p className="text-[11px] text-cora-silver font-mono tracking-widest uppercase opacity-60 text-center">Utilidades</p>
-            </div>
-          </div>
-        </Link>
-
-        <Link href="/sistema" className="block outline-none focus:outline-none">
-          <div className="bg-[#112A4F] border border-[#1F3C6A] hover:border-[#3FA7FF] hover:bg-[#112A4F]/80 transition-all duration-200 ease-in-out rounded-2xl p-10 flex flex-col items-center gap-6 shadow-2xl cursor-pointer group h-full">
-            <div className="w-16 h-16 rounded-2xl bg-white/[0.03] border border-white/10 group-hover:bg-white/[0.06] group-hover:border-[#3FA7FF]/30 flex items-center justify-center transition-all duration-200 ease-in-out">
-              <Server className="w-8 h-8 text-cora-surface group-hover:text-[#3FA7FF] transition-colors duration-200 ease-in-out" />
-            </div>
-
-            <div className="flex flex-col items-center gap-2">
-              <h2 className="text-xl font-bold text-cora-surface tracking-tight">Sistemas</h2>
-              <p className="text-[11px] text-cora-silver font-mono tracking-widest uppercase opacity-60 text-center">Núcleo y Seguridad</p>
-            </div>
-          </div>
-        </Link>
-      
-        <Link href="/roadmap" className="block outline-none focus:outline-none md:col-span-2">
-          <div className="bg-[#112A4F] border border-[#1F3C6A] hover:border-[#3FA7FF] hover:bg-[#112A4F]/80 transition-all duration-200 ease-in-out rounded-2xl p-10 flex flex-col items-center gap-6 shadow-2xl cursor-pointer group h-full">
-            <div className="w-16 h-16 rounded-2xl bg-white/[0.03] border border-white/10 group-hover:bg-white/[0.06] group-hover:border-[#3FA7FF]/30 flex items-center justify-center transition-all duration-200 ease-in-out">
-              <Kanban className="w-8 h-8 text-cora-surface group-hover:text-[#3FA7FF] transition-colors duration-200 ease-in-out" />
-            </div>
-
-            <div className="flex flex-col items-center gap-2">
-              <h2 className="text-xl font-bold text-cora-surface tracking-tight">Roadmap</h2>
-              <p className="text-[11px] text-cora-silver font-mono tracking-widest uppercase opacity-60 text-center">Kanban en vivo</p>
-            </div>
-          </div>
-        </Link>
+          </Link>
+        ))}
       </div>
     </main>
   );
 }
-
-// TODO: Registrar la app Roadmap de nivel 1 en el manifest del launcher Cora-OS cuando UI-01 fusione.

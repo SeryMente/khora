@@ -1,7 +1,6 @@
-import type { Metadata, Viewport } from "next";
+﻿import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { UpdatePrompt } from "./components/UpdatePrompt";
-import { ShellNav } from "./components/ShellNav";
 import { GlobalFooter } from "./components/GlobalFooter";
 import { TelemetryProvider } from "./components/TelemetryProvider";
 import "./globals.css";
@@ -18,7 +17,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Khora",
-  description: "Your intelligent companion",
+  description: "Memoria continua",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
@@ -71,12 +70,9 @@ export default function RootLayout({
       >
         <TelemetryProvider>
           <UpdatePrompt />
-          <div className="flex min-h-screen w-full bg-cora-bg text-cora-text">
-            <ShellNav />
-            <main className="flex-1 md:ml-64 w-full relative pb-32 md:pb-0 min-h-screen">
-              {children}
-            </main>
-          </div>
+          <main className="min-h-screen w-full bg-cora-bg text-cora-text">
+            {children}
+          </main>
           <GlobalFooter />
         </TelemetryProvider>
       </body>
