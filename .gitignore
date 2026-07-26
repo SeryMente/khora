@@ -28,3 +28,7 @@ khora-web/tests/*.js
 .vercel
 .env*
 .env.local
+
+logs/*.log
+
+secrets/
