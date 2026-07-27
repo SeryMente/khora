@@ -96,7 +96,7 @@ def extraer(texto: str, lector_grafo, puerto_llm: PuertoLLM | None = None) -> li
 
     # (c) correferencia SOLO-LECTURA
     # lector_grafo.consultar(...)
-    if lector_grafo:
+    if lector_grafo and hasattr(lector_grafo, "consultar"):
         # Simulamos una lectura al grafo sin escribir
         _ = lector_grafo.consultar("¿Qué entidades existen?", ContextoDeVisibilidad.TRANSPARENTE)
 

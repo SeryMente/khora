@@ -27,6 +27,9 @@ def reset_model_call_count() -> None:
 def embed_text(text: str) -> List[float]:
     global _MODEL_CALL_COUNT
     _MODEL_CALL_COUNT += 1
+    if os.getenv("KHORA_LLM_BASE_URL"):
+        from khora_kernel.proveedores import ProveedorOpenAICompatible
+        return ProveedorOpenAICompatible().incrustar([text])[0]
     model = get_model()
     emb = model.encode(text, normalize_embeddings=True)
     if isinstance(emb, np.ndarray):
@@ -75,7 +78,12 @@ def knn(query: str, k: int) -> List[Tuple[str, float]]:
     if index.ntotal == 0:
         return []
 
-    query_emb = embed_text(query)
+    try:
+        query_emb = embed_text(query)
+    except Exception:
+        return []
+    if len(query_emb) != index.d:
+        return []
     q_vec = np.array([query_emb], dtype=np.float32)
 
     distances, indices = index.search(q_vec, k)
