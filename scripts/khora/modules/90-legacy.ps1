@@ -2,7 +2,7 @@
 #  KHORA - Script de sesion agnostico
 #  VERSIONADO: $SCRIPT_VERSION es la unica fuente de verdad;
 #    el archivo se nombra khora-v<version>.ps1 y cada version
-# REGLA PERMANENTE: Toda modificacion futura EDITA este unico script y sube $SCRIPT_VERSION renombrando el archivo en el mismo commit. PROHIBIDO crear archivos khora-v*.ps1 paralelos.
+# REGLA PERMANENTE (v7): El único punto de entrada es khora.ps1 (gate). PROHIBIDO crear scripts de entrada paralelos o copias khora-v*.ps1. Un componente = un archivo en modules/; el orden de carga lo define khora.barrel.ps1. Toda modificación sube $SCRIPT_VERSION en el mismo commit.
 #    ejecutada se auto-archiva en .\versions\
 #  ESTRUCTURA (raiz = carpeta del script, p.ej. persistente en Escritorio):
 #    .\logs\ (logging diario) | .\versions\ (historico) | config.json
@@ -14,12 +14,6 @@
 #  - Cifrado en reposo (EFS): repo y secrets ilegibles en el disco publico (v6.4.2)
 #  - Monitor de exfiltracion/RAT: guardian vigila control remoto y subida de red (v6.4.3)
 #  - Elevacion con cuenta distinta: rutas siempre en el perfil del usuario real (v6.4.4)
-#  - Auto-sesion: dev servers garantizados; menu solo muestra decisiones humanas (v6.4.5)
-#  - Log muy verboso, doble copia (workdir+repo), push en cada auto-WIP (v6.4.5)
-#  - Deteccion multi-metodo del usuario real: WMI + query session + explorer
-#    + cadena de procesos padre + registro LogonUI, con bitacora en log (v6.4.6)
-#  - FIX RAIZ: deteccion corre ANTES de ROOT_DIR; ROOT_DIR = Escritorio
-#    del usuario REAL, no del admin elevado (v6.4.7)
 #  - Endurecimiento: finales de linea unificados a CRLF; mutex de limpieza
 #    a prueba de abandono; variable $args renombrada en Start-Guardian (v6.4.8)
 #  - EFS fail-fast (sonda 1 archivo); ventana de log con auto-reconexion (v6.4.9)
@@ -27,6 +21,7 @@
 #  - Snapshot tabs de Chrome por CDP (auto-wip/restore); deteccion LastPass (v6.6.0)
 #  - Verificacion estricta en limpieza; last-cleanup.json; cipher verificable (v6.6.1)
 #  - Boveda centralizada de entorno con sincronizacion automatica Vercel/Render (v6.8.0)
+#  - v7.0.0: arquitectura gate+barril+modulos; monolito preservado como 90-legacy.ps1 (F0)
 # ================================================================
 param(
     [switch]$CleanupOnly,   # modo interno: solo ejecuta limpieza NUCLEAR
@@ -42,7 +37,7 @@ $HOST_WIDTH = try { [Math]::Max(60, $Host.UI.RawUI.WindowSize.Width - 2) } catch
 # ================================================================
 #  RUTAS AGNOSTICAS  (nada fijo a una PC)
 # ================================================================
-$SCRIPT_VERSION = "6.10.0"   # <- UNICA fuente de verdad de la version
+$SCRIPT_VERSION = "7.0.0"   # <- UNICA fuente de verdad de la version
 $SYS_DRIVE   = if ($env:SystemDrive) { $env:SystemDrive } else { "C:" }
 # ================================================================
 #  DETECCION DE USUARIO REAL (elevacion con cuenta distinta) v6.4.6
@@ -257,8 +252,7 @@ Resolve-RealUserPaths
 #  Si hay redireccion, ROOT_DIR = Escritorio del usuario REAL.
 # ================================================================
 $script:NO_SCRIPT_FILE = $false
-$SCRIPT_PATH = $MyInvocation.MyCommand.Path
-if (-not $SCRIPT_PATH) { $SCRIPT_PATH = $PSCommandPath }
+    $SCRIPT_PATH = $script:GATE_PATH   # v7.0.0: el gate es el unico punto de entrada
 if ($script:REAL_USER_OVERRIDE) {
     # Elevado con cuenta distinta: ROOT_DIR = Escritorio del usuario REAL
     # (no la carpeta del .ps1, que puede estar en el Desktop del admin)
@@ -321,39 +315,6 @@ $script:TASK_NAME    = "KHORA_Deadline_$PID"
 $script:SES_ACTIVE   = $false
 $script:WIP_UNPUSHED = $false   # true => hay trabajo local sin respaldo remoto verificado
 $script:EFS_ACTIVE   = $false   # true => workdir/repo cifrados en reposo con EFS
-# ================================================================
-#  HUD STATE VARIABLES
-# ================================================================
-$script:HUD_OK = 0
-$script:HUD_WARN = 0
-$script:HUD_FAIL = 0
-$script:HUD_STEP = "Inicializando"
-
-function Init-HUD {
-    $script:HUD_OK = 0
-    $script:HUD_WARN = 0
-    $script:HUD_FAIL = 0
-    $script:HUD_STEP = "Inicializando"
-}
-
-function Update-HUD {
-    param([string]$level, [string]$msg, [string]$color="White")
-
-    $hudPrefix = "[OK:$($script:HUD_OK) WARN:$($script:HUD_WARN) FAIL:$($script:HUD_FAIL)] ($($script:HUD_STEP))  $level  "
-    $fullMsg = $hudPrefix + $msg
-
-    # Truncate if necessary
-    if ($fullMsg.Length -gt $HOST_WIDTH) {
-        $fullMsg = $fullMsg.Substring(0, $HOST_WIDTH - 3) + "..."
-    }
-
-    # Pad to overwrite previous text
-    $padLength = [Math]::Max(0, $HOST_WIDTH - $fullMsg.Length)
-    $fullMsg += " " * $padLength
-
-    Write-Host "`r$fullMsg" -NoNewline -ForegroundColor $color
-}
-
 # ================================================================
 #  CONFIG (externa, autogenerada -> agnostico de proyecto)
 # ================================================================
@@ -3099,8 +3060,3 @@ Write-Host ""
     }
 }
 # ================================================================
-#  ENTRY POINT
-# ================================================================
-if ($CleanupOnly)      { Invoke-Cleanup $Reason }
-elseif ($GuardianOnly) { Start-GuardianLoop }
-else                   { Run-Main }
