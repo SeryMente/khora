@@ -28,6 +28,7 @@ jobs:
         env:
           OIDC_ISSUER_URL: http://localhost:8080/realms/mock
           AUTH_SECRET: mock-secret
+          PLAYWRIGHT_TEST_RUN: 1
       - name: Cache Playwright browsers
         uses: actions/cache@v4
         with:
@@ -38,7 +39,9 @@ jobs:
         env:
           OIDC_ISSUER_URL: http://localhost:8080/realms/mock
           AUTH_SECRET: mock-secret
+          PLAYWRIGHT_TEST_RUN: 1
       - run: npx playwright test tests/regression/smoke.spec.ts --project=chromium
         env:
           OIDC_ISSUER_URL: http://localhost:8080/realms/mock
           AUTH_SECRET: mock-secret
+          PLAYWRIGHT_TEST_RUN: 1
