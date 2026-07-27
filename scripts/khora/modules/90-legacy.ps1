@@ -23,14 +23,6 @@
 #  - Boveda centralizada de entorno con sincronizacion automatica Vercel/Render (v6.8.0)
 #  - v7.0.0: arquitectura gate+barril+modulos; monolito preservado como 90-legacy.ps1 (F0)
 # ================================================================
-param(
-    [switch]$CleanupOnly,   # modo interno: solo ejecuta limpieza NUCLEAR
-    [switch]$GuardianOnly,  # modo interno: solo corre el vigilante
-    [string]$Reason = "manual"
-)
-Set-StrictMode -Off
-$ErrorActionPreference = "Continue"
-$ProgressPreference    = "SilentlyContinue"
 # --- Encoding agnostico (acentos/codepage) ---
 try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch {}
 $HOST_WIDTH = try { [Math]::Max(60, $Host.UI.RawUI.WindowSize.Width - 2) } catch { 78 }
