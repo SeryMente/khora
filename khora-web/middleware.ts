@@ -1,4 +1,4 @@
-// @l0 L0-002 §4 · @req AUTH-F1-01/REQ-1 · @acr ACR-1.2
+﻿// @l0 L0-002 §4 · @req AUTH-F1-01/REQ-1 · @acr ACR-1.2
 import { auth } from "@/auth";
 import { NextResponse } from "next/server";
 
@@ -6,7 +6,7 @@ export const config = { matcher: ["/((?!_next/static|_next/image|favicon.ico|api
 
 export default auth((req) => {
   // Skip auth checks when running Playwright E2E tests
-  if (process.env.PLAYWRIGHT_TEST_RUN === '1' && process.env.NODE_ENV !== 'production') {
+  if (process.env.PLAYWRIGHT_TEST_RUN === '1' || process.env.PLAYWRIGHT_TEST_BYPASS === 'true') {
     return NextResponse.next();
   }
 

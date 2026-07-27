@@ -1,4 +1,4 @@
-﻿name: CI
+name: CI
 on: [push, pull_request]
 jobs:
   calidad:
@@ -15,7 +15,6 @@ jobs:
         working-directory: kernel
       - name: Start Neo4j
         run: docker compose up -d
-        working-directory: kernel
       - name: Wait for Neo4j and setup schema
         run: python kernel/scripts/setup_neo4j.py
       - run: pytest
