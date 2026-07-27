@@ -2,6 +2,6 @@ fastapi
 uvicorn[standard]
 pydantic
 neo4j
--e ../kernel
+-e ./kernel
 faiss-cpu
 numpy

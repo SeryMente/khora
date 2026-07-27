@@ -26,6 +26,7 @@ jobs:
       - run: npm ci
       - run: npm run build
         env:
+          OIDC_ISSUER_URL: http://localhost:8080/realms/mock
           AUTH_SECRET: mock-secret
       - name: Cache Playwright browsers
         uses: actions/cache@v4
@@ -35,7 +36,9 @@ jobs:
       - run: npx playwright install --with-deps
       - run: npm run e2e
         env:
+          OIDC_ISSUER_URL: http://localhost:8080/realms/mock
           AUTH_SECRET: mock-secret
       - run: npx playwright test tests/regression/smoke.spec.ts --project=chromium
         env:
+          OIDC_ISSUER_URL: http://localhost:8080/realms/mock
           AUTH_SECRET: mock-secret
