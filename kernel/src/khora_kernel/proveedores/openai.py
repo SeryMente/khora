@@ -116,7 +116,7 @@ class ProveedorOpenAICompatible:
 
                 if "data" in resp_data:
                     # Ordenar por índice por si acaso y extraer embedding
-                    embeddings = [item["embedding"] for item in sorted(resp_data["data"], key=lambda x: x["index"])]
+                    embeddings = [item["embedding"] for item in sorted(resp_data["data"], key=lambda x: x.get("index", 0))]
                     return embeddings
                 return []
         except urllib.error.URLError as e:
