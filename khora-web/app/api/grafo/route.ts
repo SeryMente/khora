@@ -18,10 +18,10 @@ export async function GET(request: Request) {
     // We are querying Community supernodes. The task asks for Leiden supernodes labeled with their summary.
     // Also we need provenance + verification state.
     const nodesQuery = `
-      MATCH (c:Community)
+      MATCH (c:Entity)
       RETURN
         elementId(c) AS id,
-        c.summary AS summary,
+        coalesce(c.label_original, c.canonical_key) AS summary,
         c.community_id AS community,
         c.level AS level,
         c.centrality AS centrality,
@@ -31,7 +31,7 @@ export async function GET(request: Request) {
     `;
 
     const edgesQuery = `
-      MATCH (c1:Community)-[r]->(c2:Community)
+      MATCH (c1:Entity)-[r:RELATION]->(c2:Entity)
       RETURN
         elementId(r) AS id,
         elementId(c1) AS source,
