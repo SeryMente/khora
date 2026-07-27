@@ -33,3 +33,5 @@ khora-web/tests/*.js
 test-results/
 khora-web/test-results/
 khora-web/playwright/.auth/
+
+logs/*.log
