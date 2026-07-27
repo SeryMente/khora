@@ -165,7 +165,7 @@ class Neo4jMemoriaOrganizada:
         UNION ALL
         MATCH ()-[r]->()
         WHERE r.valid_at IS NULL OR r.created_at IS NULL
-        RETURN count(r) as aristas_invalidas
+        RETURN count(r) as nodos_invalidos
         """
 
         try:
@@ -299,7 +299,7 @@ class Neo4jMemoriaOrganizada:
         UNION ALL
         MATCH ()-[r]->()
         WHERE r.valid_at IS NULL OR r.created_at IS NULL
-        RETURN count(r) as aristas_invalidas
+        RETURN count(r) as nodos_invalidos
         """
 
         try:
