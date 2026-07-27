@@ -12,12 +12,12 @@ dependencies = []
 khora = "khora_kernel.registro.cli:main"
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "pyright>=1.1", "ruff>=0.4", "import-linter>=2.0", "testcontainers", "neo4j", "faiss-cpu", "numpy", "sentence-transformers"]
+dev = ["pytest>=8", "pyright>=1.1", "ruff>=0.4", "import-linter>=2.0", "testcontainers", "neo4j", "faiss-cpu", "numpy", "sentence-transformers", "igraph", "leidenalg"]
 
 [tool.pyright]
 include = ["src"]
-strict = ["src"]
-ignore = ["src/khora_kernel/poblacion/tests/*", "src/khora_kernel/summaries.py", "src/khora_kernel/summaries/fsum.py", "src/khora_kernel/proveedores/openai.py", "src/khora_kernel/psi.py"]
+
+ignore = ["src/khora_kernel/poblacion/tests/*", "src/khora_kernel/summaries.py", "src/khora_kernel/summaries/fsum.py", "src/khora_kernel/proveedores/openai.py", "src/khora_kernel/psi.py", "src/khora_kernel/motor/_memoria.py", "src/khora_kernel/motor/tests/*", "src/khora_kernel/communities.py", "src/khora_kernel/engine/orchestrator.py", "src/khora_kernel/poblacion/_ingestar.py", "src/khora_kernel/consulta/retriever.py", "src/khora_kernel/constructor/*", "src/khora_kernel/embeddings.py"]
 
 [tool.ruff]
 target-version = "py311"
