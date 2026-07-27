@@ -29,7 +29,7 @@
 | 03-hud | HUD | EXTRAÍDO |
 | 04-ui | UI consola | PENDIENTE |
 | 05-efs | EFS | PENDIENTE |
-| 06-token | token | PENDIENTE |
+| 06-token | token | EXTRAÍDO |
 | 07-git-wip | git/auto-WIP | PENDIENTE |
 | 08-deps | dependencias | PENDIENTE |
 | 09-chrome | Chrome | PENDIENTE |
@@ -40,6 +40,14 @@
 | 14-deploy | tests/deploy | PENDIENTE |
 | 15-main | Run-Main | PENDIENTE |
 | 90-legacy | Monolito | TRANSITORIO |
+
+### Funciones extraídas a 06-token.ps1
+- `Invoke-WithToken`
+- `Protect-KhoraToken`
+- `Unprotect-KhoraToken`
+- `Save-TokenSnapshot`
+- `Test-TokenSnapshotValid`
+- `Get-PersistedToken`
 
 ## Variables del Legacy
 
