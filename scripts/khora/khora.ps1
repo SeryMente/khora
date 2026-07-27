@@ -14,6 +14,9 @@ $ProgressPreference    = "SilentlyContinue"
 $script:GATE_PATH = $PSCommandPath
 $script:GATE_DIR  = Split-Path -Parent $PSCommandPath
 . (Join-Path $script:GATE_DIR "khora.barrel.ps1")
+
+# Precarga paralela de dependencias
+Start-DepsPreload
 # ================================================================
 #  ENTRY POINT
 # ================================================================

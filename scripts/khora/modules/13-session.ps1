@@ -67,7 +67,29 @@ if (-not (Invoke-Preflight)) { Fail "Preflight fallo (sin internet). Sesion canc
         Write-Host "  >> Lo que teclees/pegues NO aparecera en pantalla <<" -ForegroundColor DarkGray
         Clear-PendingInput   # limpiar buffer antes de esperar
         $Host.UI.RawUI.FlushInputBuffer()
-        do { $__khk = [Console]::ReadKey($true) } while ($__khk.Key -ne [ConsoleKey]::Enter)
+        do {
+            if ([Console]::KeyAvailable) {
+                $__khk = [Console]::ReadKey($true)
+            } else {
+                Start-Sleep -Milliseconds 100
+                if (Test-Path $global:DepsPreloadLog) {
+                    if ($null -eq $global:DepsLogPos) { $global:DepsLogPos = 0 }
+                    $__depsLogSize = (Get-Item $global:DepsPreloadLog).Length
+                    if ($__depsLogSize -gt $global:DepsLogPos) {
+                        try {
+                            $__depsLogReader = [System.IO.File]::Open($global:DepsPreloadLog, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read, [System.IO.FileShare]::ReadWrite)
+                            $__depsLogReader.Seek($global:DepsLogPos, [System.IO.SeekOrigin]::Begin) | Out-Null
+                            $__depsLogStream = New-Object System.IO.StreamReader($__depsLogReader, [System.Text.Encoding]::UTF8)
+                            while (($__depsLogLine = $__depsLogStream.ReadLine()) -ne $null) {
+                                L "INFO" $__depsLogLine
+                            }
+                            $global:DepsLogPos = $__depsLogReader.Position
+                            $__depsLogStream.Close()
+                        } catch {}
+                    }
+                }
+            }
+        } while ($null -eq $__khk -or $__khk.Key -ne [ConsoleKey]::Enter)
         $raw = $null
         try { $raw = Get-Clipboard -Raw -ErrorAction Stop } catch {}
         if ($raw) { $raw = $raw.Trim() }
@@ -179,6 +201,7 @@ if (-not $cloneOK) { Fail "No se pudo clonar tras 3 intentos."; Write-Host ""; W
     Restore-ChromeTabsSnapshot
     # Entorno PRIMERO: VS Code abrira con npm/node/render/docker ya en PATH
     Step "Entorno de desarrollo (Python + Node + Docker + Vercel + Render)"
+    Wait-DepsPreload -Job $global:DepsPreloadJob
     Ensure-Python311
     Setup-Venv
     Ensure-Node
