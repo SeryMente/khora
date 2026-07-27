@@ -38,7 +38,7 @@ jobs:
           [System.Management.Automation.Language.Parser]::ParseFile($scriptPath, [ref]$tokens, [ref]$errs)
 
           if ($errs -and $errs.Count -gt 0) {
-            Write-Host "Syntax Errors Found in $scriptPath:"
+            Write-Host "Syntax Errors Found in $($scriptPath):"
             $errs | ForEach-Object { Write-Host $_.Message }
             exit 1
           }

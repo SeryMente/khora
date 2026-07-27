@@ -1837,7 +1837,7 @@ function Start-Sesion {
     Write-Host "   Terminal VS Code: npm node python git vercel render docker" -ForegroundColor DarkGray
     $efsTxt = if ($script:EFS_ACTIVE) { "EFS ACTIVO - repo/secrets ilegibles fuera de esta cuenta" } else { "SIN EFS - respaldo: limpieza [X] + DeepFreeze" }
     Write-Host "   Cifrado: $efsTxt" -ForegroundColor DarkGray
-=============================================================" -ForegroundColor Green
+    Write-Host "  =============================================================" -ForegroundColor Green
     L "INFO" "SESION LISTA en ${dur}s"
 }
 # ================================================================
@@ -2056,7 +2056,7 @@ function Scan-Keyloggers {
         } else { Ok "Sin filtros UpperFilters extra en driver teclado." }
     } catch { L "WARN" "No se pudo leer UpperFilters del registro: $_" }
     Write-Host ""
-    if ($susp -eq 0) { Ok "RESULTADO: Sin keyloggers conocidos detectados ($susp sospechosos)." }
+    if ($susp -eq 0) { Ok "RESULTADO: Sin keyloggers conocidos detectados ($($susp) sospechosos)." }
     else { Fail "RESULTADO: $susp sospechoso(s) encontrado(s). No ingreses datos sensibles en esta sesion." }
     L "INFO" "Escaneo keyloggers completado: $susp sospechosos"
 }
