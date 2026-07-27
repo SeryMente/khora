@@ -160,11 +160,11 @@ class Neo4jMemoriaOrganizada:
 
         campos_faltantes_query = """
         MATCH (n)
-        WHERE n.valid_at IS NULL OR n.created_at IS NULL OR NOT exists(n.invalid_at)
+        WHERE n.valid_at IS NULL OR n.created_at IS NULL
         RETURN count(n) as nodos_invalidos
         UNION ALL
         MATCH ()-[r]->()
-        WHERE r.valid_at IS NULL OR r.created_at IS NULL OR NOT exists(r.invalid_at)
+        WHERE r.valid_at IS NULL OR r.created_at IS NULL
         RETURN count(r) as aristas_invalidas
         """
 
@@ -294,11 +294,11 @@ class Neo4jMemoriaOrganizada:
 
         campos_faltantes_query = """
         MATCH (n)
-        WHERE n.valid_at IS NULL OR n.created_at IS NULL OR NOT exists(n.invalid_at)
+        WHERE n.valid_at IS NULL OR n.created_at IS NULL
         RETURN count(n) as nodos_invalidos
         UNION ALL
         MATCH ()-[r]->()
-        WHERE r.valid_at IS NULL OR r.created_at IS NULL OR NOT exists(r.invalid_at)
+        WHERE r.valid_at IS NULL OR r.created_at IS NULL
         RETURN count(r) as aristas_invalidas
         """
 
