@@ -25,20 +25,20 @@
 |---|---|---|
 | 00-config | config/rutas/globals | PENDIENTE |
 | 01-realuser | detección usuario real | PENDIENTE |
-| 02-logging | logging | PENDIENTE |
+| 02-logging | logging | EXTRAÍDO |
 | 03-hud | HUD | EXTRAÍDO |
-| 04-ui | UI consola | PENDIENTE |
-| 05-efs | EFS | PENDIENTE |
+| 04-ui | UI consola | EXTRAÍDO |
+| 05-efs | EFS | EXTRAÍDO |
 | 06-token | token | EXTRAÍDO |
-| 07-git-wip | git/auto-WIP | PENDIENTE |
-| 08-deps | dependencias | PENDIENTE |
-| 09-chrome | Chrome | PENDIENTE |
-| 10-guardian | guardian/seguridad | PENDIENTE |
-| 11-cleanup | limpieza nuclear | PENDIENTE |
-| 12-handoff | Live Handoff | PENDIENTE |
-| 13-session | Start-Sesion | PENDIENTE |
-| 14-deploy | tests/deploy | PENDIENTE |
-| 15-main | Run-Main | PENDIENTE |
+| 07-git-wip | git/auto-WIP | EXTRAÍDO |
+| 08-deps | dependencias | EXTRAÍDO |
+| 09-chrome | Chrome | EXTRAÍDO |
+| 10-guardian | guardian/seguridad | EXTRAÍDO |
+| 11-cleanup | limpieza nuclear | EXTRAÍDO |
+| 12-handoff | Live Handoff | EXTRAÍDO |
+| 13-session | Start-Sesion | EXTRAÍDO |
+| 14-deploy | tests/deploy | EXTRAÍDO |
+| 15-main | Run-Main | EXTRAÍDO |
 | 90-legacy | Monolito | TRANSITORIO |
 
 ### Funciones extraídas a 06-token.ps1
@@ -48,6 +48,109 @@
 - `Save-TokenSnapshot`
 - `Test-TokenSnapshotValid`
 - `Get-PersistedToken`
+
+### Funciones extraídas a 02-logging.ps1
+- `L`
+- `Ok`
+- `Fail`
+- `Info`
+- `Warn`
+- `Step`
+
+### Funciones extraídas a 04-ui.ps1
+- `Test-Cmd`
+- `Clear-PendingInput`
+- `Get-Cim`
+- `Resolve-Exe`
+- `Write-InitHeader`
+- `Open-LogWindow`
+- `Invoke-Preflight`
+- `Spin-Job`
+- `Focus-Window`
+- `Show-DiagBundle`
+- `Show-Estado`
+- `Show-Banner`
+
+### Funciones extraídas a 05-efs.ps1
+- `Test-KhoraEncrypted`
+- `Protect-KhoraPath`
+- `Invoke-SecureDeleteFile`
+
+### Funciones extraídas a 07-git-wip.ps1
+- `$script:WIP_BRANCH = $null`
+- `Invoke-GitTokenCmd`
+- `Push-Verified`
+- `Test-UnpushedWork`
+- `Ensure-GitignoreHygiene`
+- `Init-Wip`
+- `Do-AutoWip`
+
+### Funciones extraídas a 08-deps.ps1
+- `Ensure-Git`
+- `Confirm-GhCliAuth`
+- `Ensure-VSCode`
+- `Get-CodeCli`
+- `Get-CodePaths`
+- `Sync-VSCodeConfig`
+- `Export-VSCodeConfig`
+- `Start-ProactiveDepPrep`
+- `Wait-ProactiveDepPrep`
+- `Ensure-Python311`
+- `Setup-Venv`
+- `Ensure-Node`
+- `Ensure-Docker`
+- `Setup-KhoraWeb`
+- `Ensure-VercelCLI`
+- `Ensure-RenderCLI`
+
+### Funciones extraídas a 09-chrome.ps1
+- `Test-LastPassInstalled`
+- `Get-ChromePaths`
+- `Open-LoginTabs`
+- `Save-ChromeTabsSnapshot`
+- `Restore-ChromeTabsSnapshot`
+- `Invoke-ChromeIntelligent`
+- `Invoke-ChromeCleanup`
+
+### Funciones extraídas a 10-guardian.ps1
+- `Start-Guardian`
+- `Register-Deadline`
+- `Unregister-Deadline`
+- `Start-GuardianLoop`
+- `Scan-Keyloggers`
+- `Get-KnownRemoteTools`
+- `Get-ExternalConns`
+- `Get-NetSentBytes`
+- `Scan-RemoteAccess`
+- `Invoke-ExfilWatch`
+
+### Funciones extraídas a 11-cleanup.ps1
+- `Invoke-Cleanup`
+- `Trigger-Cleanup`
+
+### Funciones extraídas a 12-handoff.ps1
+- `Cleanup-OldHandoffFiles`
+- `Invoke-HandoffCheck`
+
+### Funciones extraídas a 13-session.ps1
+- `Start-Sesion`
+
+### Funciones extraídas a 14-deploy.ps1
+- `Get-Hash`
+- `Get-VaultMasterKey`
+- `Save-Vault`
+- `Load-Vault`
+- `Sync-Render`
+- `Sync-Vercel`
+- `$EnvManifest = @( ... )`
+- `Init-EnvVault`
+- `Invoke-RenderOps`
+- `Start-DevServers`
+- `Invoke-KhoraOk`
+- `Deploy-Vercel`
+
+### Funciones extraídas a 15-main.ps1
+- `Run-Main`
 
 ## Variables del Legacy
 
