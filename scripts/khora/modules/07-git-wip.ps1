@@ -16,7 +16,10 @@ function Invoke-GitTokenCmd {
         $script:__gitOut  = git -C $REPO_DIR @ga 2>&1
         $script:__gitCode = $LASTEXITCODE
         git -C $REPO_DIR remote set-url origin "https://github.com/$REPO_ORG/$REPO_NAME.git" 2>&1 | Out-Null
+        $t = $null
+        $__cmdUrl = $null
     }
+    $script:__gitOut = Mask-Token -Text "$($script:__gitOut)"
     return @{ code = $script:__gitCode; out = (("$($script:__gitOut)" | Out-String)).Trim() }
 }
 function Push-Verified {

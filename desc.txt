@@ -1,0 +1,69 @@
+1) ParseFile Output sobre archivos modificados:
+
+Running parser...
+Output for scripts/khora/modules/02-logging.ps1:
+  0 syntax errors.
+Output for scripts/khora/modules/03-hud.ps1:
+  0 syntax errors.
+Output for scripts/khora/modules/04-ui.ps1:
+  0 syntax errors.
+Output for scripts/khora/modules/07-git-wip.ps1:
+  0 syntax errors.
+Output for scripts/khora/modules/13-session.ps1:
+  0 syntax errors.
+Output for scripts/khora/modules/14-deploy.ps1:
+  0 syntax errors.
+Output for scripts/khora/modules/90-legacy.ps1:
+  0 syntax errors.
+
+2) BOM verificado:
+
+OK (BOM detected): scripts/khora/modules/02-logging.ps1
+OK (BOM detected): scripts/khora/modules/03-hud.ps1
+OK (BOM detected): scripts/khora/modules/04-ui.ps1
+OK (BOM detected): scripts/khora/modules/07-git-wip.ps1
+OK (BOM detected): scripts/khora/modules/13-session.ps1
+OK (BOM detected): scripts/khora/modules/14-deploy.ps1
+OK (BOM detected): scripts/khora/modules/90-legacy.ps1
+
+3) Regex ampliado:
+
+gh[pousr]_[A-Za-z0-9]{36}
+\b[0-9a-fA-F]{40}\b
+
+4) Confirmación explícita:
+
+NO se tocó ni se creó NINGÚN archivo khora-v*.ps1. Se respetó la regla anti-fragmentación.
+
+---
+
+Inventario completo de exposiciones
+
+He analizado el código fuente (scripts en scripts/khora/modules/ y el gate scripts/khora/khora.ps1) y localizado las siguientes posibles vías de exposición del PAT:
+
+1. scripts/khora/modules/13-session.ps1 (Clone):
+- Se construye la URL con el token embebido: `$__cloneUrl = "https://x-access-token:${t}@github.com/$REPO_ORG/$REPO_NAME.git"`
+- La salida de git clone se guarda en `$script:__cloneErr`. Si git clone falla, la salida de error de git a menudo escupe la URL remota fallida incluyendo las credenciales en texto plano.
+- Posteriormente, `$script:__cloneErr` puede llegar a las funciones de logging mediante `$__diag`: `elseif ($__ce) { "git dijo: $__ce" }` invocando `L "WARN" "..."` y `Warn "..."`.
+- Invoke-WebRequest podría exponer la URL o headers en el stacktrace de error, ya que no estamos filtrando la representación del error `$_.Exception`.
+
+2. scripts/khora/modules/07-git-wip.ps1 (Invoke-GitTokenCmd):
+- Se configura temporalmente la URL remota con el token: `$__cmdUrl = "https://x-access-token:${t}@github.com/$REPO_ORG/$REPO_NAME.git"`
+- Se ejecuta el comando git `git -C $REPO_DIR @ga 2>&1`, y su salida se captura en `$script:__gitOut`.
+- Si el comando falla (p.ej. un error de red al hacer push), git podría imprimir la URL. Luego Push-Verified registra la salida en el log: `L "WARN" "Push-Verified: push fallo (intento $i/$Retries): $($r.out)"`.
+
+3. Background Jobs (Spin-Job en 04-ui.ps1, 08-deps.ps1, 14-deploy.ps1):
+- Spin-Job usa Receive-Job $job 2>&1 y retorna el output que luego se itera y se hace `Write-Host " $_"` y `L "INFO" ...`. Si en un futuro (o en los scripts actuales de render/vercel) se pasa un token u ocurre un leak en la salida del job, llegaría directo a Write-Host sin ser filtrado.
+
+4. Almacenamiento (Disco y HUD):
+- L escribe directamente en disco a `$LOG_FILE`, `$WORK_LOG`, `$JSON_LOG` y `$repoLog`.
+- Update-HUD (03-hud.ps1) emite directamente a pantalla usando Write-Host lo que se le pase.
+
+Estrategia de enmascaramiento y correcciones
+
+Para cumplir estrictamente con las reglas:
+- Regla B (Logs y HUD) y F (Archivos de disco): Crearemos un helper de sanitización en 02-logging.ps1 que emplee Regex (`gh[pousr]_[A-Za-z0-9]{36}`, `github_pat_[A-Za-z0-9_]{82}`, y `\b[0-9a-fA-F]{40}\b`) y elimine cualquier patrón tipo `https://[^@]+@github.com` (reemplazando por `https://github.com`). Aplicaremos este helper dentro de L, Update-HUD y todo helper de la familia Ok/Fail/Info/Warn/Step.
+- Regla C (URLs con token): Aplicar el mismo reemplazo en el helper de logs, y adicionalmente limpiar preventivamente `$script:__cloneErr` y `$script:__gitOut` antes de que salgan de Invoke-WithToken.
+- Regla D (Headers): Nos aseguraremos de que las llamadas Invoke-WebRequest/Invoke-RestMethod no usen -Debug o -Verbose, lo cual ya se cumple. En caso de catch `$_.Exception`, las trazas en PS no dumpean el header explícitamente, pero el filtro regex atrapará el token en cualquier parte del cuerpo del error.
+- Regla A (Almacenamiento Interno y Scraping de memoria): El código ya convierte el token a SecureString (`$script:TokSecure`) apenas se captura en 13-session.ps1. Además, se asegura el borrado de las variables que tienen la representación plana (`$t`) inmediatamente después del paso de clonación y peticiones web (`$t = $null`) en 13-session.ps1 y 07-git-wip.ps1.
+- Filtrado Job / Deploy: El output en 14-deploy.ps1 que consume Jobs se filtra antes de mandarlo a L y a Write-Host. Spin-Job filtra su estado visual (HUD/Label/Tips).
