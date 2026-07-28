@@ -46,7 +46,7 @@ function KhoraVault-Encrypt {
     $plainBytes = [System.Text.Encoding]::UTF8.GetBytes($PlainText)
     $cipherBytes = New-Object byte[] $plainBytes.Length
     $tag = New-Object byte[] 16
-    $gcm = New-Object System.Security.Cryptography.AesGcm($Key)
+    $gcm = New-Object System.Security.Cryptography.AesGcm($Key, 16)
     $gcm.Encrypt($nonce, $plainBytes, $cipherBytes, $tag)
     $gcm.Dispose()
     [PSCustomObject]@{ nonce = [Convert]::ToBase64String($nonce); cipher = [Convert]::ToBase64String($cipherBytes); tag = [Convert]::ToBase64String($tag) }
@@ -57,7 +57,7 @@ function KhoraVault-Decrypt {
     $cipherBytes = [Convert]::FromBase64String($Entry.cipher)
     $tag = [Convert]::FromBase64String($Entry.tag)
     $plainBytes = New-Object byte[] $cipherBytes.Length
-    $gcm = New-Object System.Security.Cryptography.AesGcm($Key)
+    $gcm = New-Object System.Security.Cryptography.AesGcm($Key, 16)
     $gcm.Decrypt($nonce, $cipherBytes, $tag, $plainBytes)
     $gcm.Dispose()
     [System.Text.Encoding]::UTF8.GetString($plainBytes)
@@ -111,5 +111,34 @@ function KhoraVault-GetMasterKey {
     }
     $secure = Read-Host "Token GitHub fine-grained de hoy (llave maestra diaria de la boveda Khora)" -AsSecureString
     $Global:KhoraVaultMasterKey = KhoraVault-SecureToPlain $secure
+    return $Global:KhoraVaultMasterKey
+}
+
+# --- Ciclo 28: la llave maestra SIEMPRE es SecureString ---
+function KhoraVault-GetMasterKey {
+    if ($Global:KhoraVaultMasterKey) { return $Global:KhoraVaultMasterKey }
+    $candidateVars = @('GITHUB_TOKEN','GH_TOKEN','KHORA_ACCESS_TOKEN','KHORA_TOKEN','KHORA_PAT')
+    foreach ($varName in $candidateVars) {
+        $val = [System.Environment]::GetEnvironmentVariable($varName)
+        if (-not [string]::IsNullOrWhiteSpace($val)) {
+            $Global:KhoraVaultMasterKey = ConvertTo-SecureString -String $val -AsPlainText -Force
+            return $Global:KhoraVaultMasterKey
+        }
+    }
+    $secure = Read-Host "Token GitHub fine-grained de hoy (llave maestra diaria de la boveda Khora)" -AsSecureString
+    $Global:KhoraVaultMasterKey = $secure
+    return $Global:KhoraVaultMasterKey
+}
+
+# --- Ciclo 29: llave maestra = password fija (no rota con el token de GitHub) ---
+function KhoraVault-GetMasterKey {
+    if ($Global:KhoraVaultMasterKey) { return $Global:KhoraVaultMasterKey }
+    $envPw = [System.Environment]::GetEnvironmentVariable('KHORA_VAULT_PASSWORD')
+    if (-not [string]::IsNullOrWhiteSpace($envPw)) {
+        $Global:KhoraVaultMasterKey = ConvertTo-SecureString -String $envPw -AsPlainText -Force
+        return $Global:KhoraVaultMasterKey
+    }
+    $secure = Read-Host "Password maestra de la boveda Khora (la misma siempre, NO tu token de GitHub)" -AsSecureString
+    $Global:KhoraVaultMasterKey = $secure
     return $Global:KhoraVaultMasterKey
 }
