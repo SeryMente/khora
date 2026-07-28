@@ -12,7 +12,7 @@ dependencies = []
 khora = "khora_kernel.registro.cli:main"
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "pyright>=1.1", "ruff>=0.4", "import-linter>=2.0", "testcontainers", "neo4j", "faiss-cpu", "numpy", "sentence-transformers", "igraph", "leidenalg"]
+dev = ["pytest>=8", "pytest-mock", "pyright>=1.1", "ruff>=0.4", "import-linter>=2.0", "testcontainers", "neo4j", "faiss-cpu", "numpy", "sentence-transformers", "igraph", "leidenalg"]
 
 [tool.pyright]
 include = ["src"]
