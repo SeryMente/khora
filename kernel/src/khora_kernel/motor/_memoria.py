@@ -83,6 +83,7 @@ class Neo4jMemoriaOrganizada:
 
         rel_query = """
         # Restricción transaccional G=(N,R,T) N_e, L, B
+        """
         restriccion_query = """
         MATCH (n {canonical_key: $canonical_key})
         WITH n, labels(n) as lbls
