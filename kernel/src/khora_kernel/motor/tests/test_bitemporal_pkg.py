@@ -86,7 +86,7 @@ def test_acr_1_2_alcanzabilidad(neo4j_driver, neo4j_config):
         assert res.single()["count"] >= 1
 
         # Verify 100% reachability from root (Global scan gives 0 orphans)
-        res = session.run("MATCH (n:Entity) WHERE NOT (n)-[:MATIZ_DE]->() AND NOT (n:User AND n.id='root') AND NOT EXISTS { MATCH (:User {id:'root'})-[*]->(n) } RETURN count(n) as orphans")
+        res = session.run("MATCH (n:Entity) WHERE NOT (n:User AND n.id='root') AND NOT EXISTS { MATCH (:User {id:'root'})-[*]->(n) } RETURN count(n) as orphans")
         assert res.single()["orphans"] == 0
 
 def test_acr_1_2_alcanzabilidad_reanclaje(neo4j_driver, neo4j_config):
@@ -124,7 +124,7 @@ def test_acr_1_2_alcanzabilidad_reanclaje(neo4j_driver, neo4j_config):
         res = session.run("MATCH (:User {id:'root'})-[:OWNS]->(:InformationObject)-[:MENTIONS]->(:Entity {canonical_key:'n1'}) RETURN count(1) as count")
         assert res.single()["count"] >= 1
 
-        res = session.run("MATCH (n:Entity) WHERE NOT (n)-[:MATIZ_DE]->() AND NOT (n:User AND n.id='root') AND NOT EXISTS { MATCH (:User {id:'root'})-[*]->(n) } RETURN count(n) as orphans")
+        res = session.run("MATCH (n:Entity) WHERE NOT (n:User AND n.id='root') AND NOT EXISTS { MATCH (:User {id:'root'})-[*]->(n) } RETURN count(n) as orphans")
         assert res.single()["orphans"] == 0
 
 def test_acr_1_2_alcanzabilidad_excepcion_contrato(mocker):

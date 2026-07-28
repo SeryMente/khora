@@ -24,7 +24,7 @@ def get_driver():
 
 QUERY_ORPHANS = """
 MATCH (n:Entity)
-WHERE NOT (n)-[:MATIZ_DE]->()
+WHERE 1=1
 AND NOT (n:User AND n.id = 'root')
 AND NOT (n:InformationObject)
 AND NOT EXISTS { MATCH (:User {id: 'root'})-[*]->(n) }
