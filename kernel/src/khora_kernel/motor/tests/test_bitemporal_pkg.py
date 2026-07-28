@@ -130,7 +130,10 @@ def test_acr_1_2_alcanzabilidad_reanclaje(neo4j_driver, neo4j_config):
 def test_acr_1_2_alcanzabilidad_excepcion_contrato(mocker):
     # Prueba B: Contrato test con dobles. Inyecta orfandad para asegurar HuerfanosDetectadosError y rollback.
     # No simula contra la base real Neo4j, valida puramente la guardia del contrato.
-    from khora_kernel.motor._memoria import Neo4jMemoriaOrganizada, HuerfanosDetectadosError
+    from khora_kernel.motor._memoria import (
+        HuerfanosDetectadosError,
+        Neo4jMemoriaOrganizada,
+    )
 
     memoria = Neo4jMemoriaOrganizada(uri="bolt://dummy", user="dummy", password="pwd")
 
@@ -176,7 +179,6 @@ def test_acr_1_2_alcanzabilidad_excepcion_contrato(mocker):
     )
 
     import pytest
-    from khora_kernel.motor._memoria import HuerfanosDetectadosError
 
     with pytest.raises(HuerfanosDetectadosError) as exc_info:
         memoria.escribir_ingesta([triple], provenance)
