@@ -29,7 +29,7 @@ $HOST_WIDTH = try { [Math]::Max(60, $Host.UI.RawUI.WindowSize.Width - 2) } catch
 # ================================================================
 #  RUTAS AGNOSTICAS  (nada fijo a una PC)
 # ================================================================
-$SCRIPT_VERSION = "7.0.0"   # <- UNICA fuente de verdad de la version
+$SCRIPT_VERSION = "7.0.1"   # <- UNICA fuente de verdad de la version
 $SYS_DRIVE   = if ($env:SystemDrive) { $env:SystemDrive } else { "C:" }
 # ================================================================
 #  DETECCION DE USUARIO REAL (elevacion con cuenta distinta) v6.4.6
@@ -267,8 +267,15 @@ New-Item -ItemType Directory -Force $ROOT_DIR | Out-Null
 # ================================================================
 # Workdir en LOCALAPPDATA (nunca sincronizado a OneDrive, siempre escribible)
 # NOTA: $env:LOCALAPPDATA ya fue redirigido si se detecto elevacion mixta.
-$WORK_DIR    = Join-Path $env:LOCALAPPDATA "khora-session"
+$WORK_DIR    = Join-Path $ROOT_DIR "session-data"
 $REPO_DIR    = Join-Path $WORK_DIR "repo"
+
+$__desktop = Join-Path $env:USERPROFILE "Desktop"
+if ($REPO_DIR -notmatch "^$([regex]::Escape($__desktop))") {
+    Write-Host "[SECURITY] REPO_PATH fuera de Desktop: $REPO_DIR — abortando." -ForegroundColor Red
+    exit 1
+}
+
 $CDP_PORT    = 9333
 $ROOT_STATE_DIR = Join-Path $ROOT_DIR "session-state"
 $WORK_STATE_DIR = Join-Path $WORK_DIR "session-state"

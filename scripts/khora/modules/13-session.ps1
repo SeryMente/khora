@@ -150,6 +150,11 @@ if (-not $cloneOK) { Fail "No se pudo clonar tras 3 intentos."; Write-Host ""; W
     $nFiles = (Get-ChildItem $REPO_DIR -Recurse -File -ErrorAction SilentlyContinue | Measure-Object).Count
     Ok "Repo clonado. Branch: $branch | Archivos: $nFiles"
     Ok "Ultimo commit: $ultimo"
+
+    if (Test-Path (Join-Path $REPO_DIR ".vercel")) {
+        L "WARN" "[WARN] .vercel/ presente — será borrada al cerrar sesión."
+    }
+
     $giFile = Join-Path $REPO_DIR ".gitignore"
     if (Test-Path $giFile) {
         $giCount = (Get-Content $giFile -ErrorAction SilentlyContinue | Where-Object { $_.Trim() -ne "" -and -not $_.Trim().StartsWith("#") } | Measure-Object).Count
