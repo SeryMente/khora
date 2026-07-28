@@ -1,4 +1,4 @@
-﻿# ================================================================
+# ================================================================
 #  KHORA - Script de sesion agnostico
 #  VERSIONADO: $SCRIPT_VERSION es la unica fuente de verdad;
 #    el archivo se nombra khora-v<version>.ps1 y cada version
@@ -269,8 +269,15 @@ New-Item -ItemType Directory -Force $ROOT_DIR | Out-Null
 # ================================================================
 # Workdir en LOCALAPPDATA (nunca sincronizado a OneDrive, siempre escribible)
 # NOTA: $env:LOCALAPPDATA ya fue redirigido si se detecto elevacion mixta.
-$WORK_DIR    = Join-Path $env:LOCALAPPDATA "khora-session"
+$WORK_DIR    = Join-Path $ROOT_DIR "session-data"
 $REPO_DIR    = Join-Path $WORK_DIR "repo"
+
+$__desktop = Join-Path $env:USERPROFILE "Desktop"
+if ($REPO_DIR -notmatch "^$([regex]::Escape($__desktop))") {
+    Write-Host "[SECURITY] REPO_PATH fuera de Desktop: $REPO_DIR — abortando." -ForegroundColor Red
+    exit 1
+}
+
 $CDP_PORT    = 9333
 $ROOT_STATE_DIR = Join-Path $ROOT_DIR "session-state"
 $WORK_STATE_DIR = Join-Path $WORK_DIR "session-state"

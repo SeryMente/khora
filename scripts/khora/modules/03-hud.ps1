@@ -16,6 +16,7 @@ function Init-HUD {
 function Update-HUD {
     param([string]$level, [string]$msg, [string]$color="White")
 
+    $msg = Mask-Token -Text $msg
     $hudPrefix = "[OK:$($script:HUD_OK) WARN:$($script:HUD_WARN) FAIL:$($script:HUD_FAIL)] ($($script:HUD_STEP))  $level  "
     $fullMsg = $hudPrefix + $msg
 

@@ -1,4 +1,4 @@
-# @l0 L0-002-R · @req API-00/REQ-1,REQ-2,REQ-3,DEPLOY-01/REQ-1,DEPLOY-01/REQ-2,DEPLOY-01/REQ-3 · @acr ACR-1.1,ACR-1.2,ACR-2.1,ACR-3.1 · @ua —
+# @l0 L0-002-R · @req API-00/REQ-1,REQ-2,REQ-3,DEPLOY-01/REQ-1,DEPLOY-01/REQ-2,DEPLOY-01/REQ-3,ING-03/REQ-1,GRAFO-01/REQ-1 · @acr ACR-1.1,ACR-1.2,ACR-2.1,ACR-3.1 · @ua UA-03,UA-04,UA-05,UA-06
 import os
 import uuid
 import datetime
@@ -165,9 +165,18 @@ async def endpoint_ingesta(req: IngestaRequest):
                 "update": acta.matices,
                 "ignore": acta.ideas_repetidas
             },
+            "triples_escritos": acta.triples_escritos,
             "ts": acta.timestamp
         }
+    except HTTPException:
+        raise
     except Exception as e:
+        if type(e).__name__ in ("HuerfanosDetectadosError", "IngestaFallidaError"):
+            detail_payload = {"error": "ingesta revertida", "causa": str(e)}
+            if hasattr(e, "huerfanos"):
+                detail_payload["huerfanos"] = e.huerfanos
+            raise HTTPException(status_code=409, detail=detail_payload)
+
         logging.error(f"Ingest error: {traceback.format_exc()}")
         if isinstance(e, ImportError):
             raise HTTPException(status_code=503, detail={"error": "motor no disponible", "causa": str(e)})
@@ -206,16 +215,22 @@ async def endpoint_consulta(req: ConsultaRequest):
 
         resultado = retriever.consultar(pregunta=req.pregunta, contexto=contexto)
 
-        # Convert the resulting objects to dicts for JSON response
-        fragmentos = [{"id": f.id, "texto": f.texto, "visibilidad": f.visibilidad.value} for f in resultado.fragmentos]
+        from puentes.unificador import UnificadorAlLeer
+        # Initialize driver properly if injected
+        unificador = UnificadorAlLeer(neo4j_driver)
+
         subgrafo_nodos = [{"id": n.id, "etiqueta": n.etiqueta} for n in resultado.subgrafo.nodos]
         subgrafo_aristas = [{"origen": a.origen, "destino": a.destino, "relacion": a.relacion} for a in resultado.subgrafo.aristas]
+        fragmentos = [{"id": f.id, "texto": f.texto, "visibilidad": f.visibilidad.value} for f in resultado.fragmentos]
+        subgrafo_dict = {"nodos": subgrafo_nodos, "aristas": subgrafo_aristas}
+        subgrafo_unificado = unificador.aplicar_puentes_a_subgrafo(subgrafo_dict)
+
 
         return {
             "fragmentos": fragmentos,
             "subgrafo": {
-                "nodos": subgrafo_nodos,
-                "aristas": subgrafo_aristas
+                "nodos": subgrafo_unificado["nodos"],
+                "aristas": subgrafo_unificado["aristas"]
             },
             "suficiencia": resultado.suficiencia.value,
             "resumenes_incluidos": resultado.resumenes_incluidos,

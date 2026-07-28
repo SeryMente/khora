@@ -1,68 +1,32 @@
 name: Khora Single Script Guard
-
 on:
   pull_request:
-    paths:
-      - 'scripts/khora/**'
+    paths: [scripts/khora/**, .github/workflows/khora-single-script.yml]
   push:
-    branches:
-      - main
-    paths:
-      - 'scripts/khora/**'
-
+    branches: [main]
+    paths: [scripts/khora/**, .github/workflows/khora-single-script.yml]
 jobs:
-  validate-khora-script:
+  validate-khora-tree:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Check script uniqueness
+      - uses: actions/checkout@v4
+      - name: Anti-fragmentation and gate+barrel presence
         run: |
-          COUNT=$(ls scripts/khora/khora-v*.ps1 2>/dev/null | wc -l)
-          if [ "$COUNT" -ne 1 ]; then
-            echo "Error: There must be exactly one khora-v*.ps1 script. Found $COUNT."
-            exit 1
-          fi
-
-      - name: Validate Integrity (Parser & Denylist)
+          C=$(ls scripts/khora/khora-v*.ps1 2>/dev/null | wc -l)
+          [ "$C" -eq 0 ] || { echo "khora-v*.ps1 monolith(s) present (v7 prohibits)"; ls scripts/khora/khora-v*.ps1; exit 1; }
+          test -f scripts/khora/khora.ps1 || { echo missing khora.ps1; exit 1; }
+          test -f scripts/khora/khora.barrel.ps1 || { echo missing khora.barrel.ps1; exit 1; }
+          echo OK
+      - name: Parse and denylist across tree
         shell: pwsh
         run: |
-          $scriptPath = Get-ChildItem -Path scripts/khora/khora-v*.ps1 | Select-Object -First 1 -ExpandProperty FullName
-          if (-not $scriptPath) {
-            Write-Host "No script found."
-            exit 1
+          $fail = $false
+          $deny = @('CipherMode]::GCM','AesGcm','RandomNumberGenerator]::Fill','-AsHashtable')
+          Get-ChildItem -Path scripts/khora -Recurse -Filter *.ps1 -File | ForEach-Object {
+            $e = $null; $t = $null
+            [System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$t, [ref]$e) | Out-Null
+            if ($e -and $e.Count -gt 0) { Write-Host "PARSE-ERR $($_.FullName)"; $e | ForEach-Object { Write-Host $_.Message }; $fail = $true } else { Write-Host "OK-PARSE $($_.FullName)" }
+            $c = Get-Content -Raw $_.FullName
+            foreach ($p in $deny) { if ($c -match [regex]::Escape($p)) { Write-Host "DENY $p in $($_.FullName)"; $fail = $true } }
           }
-
-          $errs = $null
-          $tokens = $null
-          [System.Management.Automation.Language.Parser]::ParseFile($scriptPath, [ref]$tokens, [ref]$errs)
-
-          if ($errs -and $errs.Count -gt 0) {
-            Write-Host "Syntax Errors Found in $($scriptPath):"
-            $errs | ForEach-Object { Write-Host $_.Message }
-            exit 1
-          }
-
-          # Denylist check
-          $denylist = @(
-            "CipherMode]::GCM",
-            "AesGcm",
-            "RandomNumberGenerator]::Fill",
-            "-AsHashtable",
-            "echo `$Value"
-          )
-
-          $content = Get-Content -Raw $scriptPath
-          $foundInvalid = $false
-          foreach ($pattern in $denylist) {
-            if ($content -match [regex]::Escape($pattern)) {
-              Write-Host "Error: Prohibited pattern '$pattern' found in the script."
-              $foundInvalid = $true
-            }
-          }
-
-          if ($foundInvalid) {
-            exit 1
-          }
-
-          Write-Host "Validation passed successfully."
+          if ($fail) { exit 1 } else { Write-Host "Validation passed successfully." }

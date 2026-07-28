@@ -67,7 +67,29 @@ if (-not (Invoke-Preflight)) { Fail "Preflight fallo (sin internet). Sesion canc
         Write-Host "  >> Lo que teclees/pegues NO aparecera en pantalla <<" -ForegroundColor DarkGray
         Clear-PendingInput   # limpiar buffer antes de esperar
         $Host.UI.RawUI.FlushInputBuffer()
-        do { $__khk = [Console]::ReadKey($true) } while ($__khk.Key -ne [ConsoleKey]::Enter)
+        do {
+            if ([Console]::KeyAvailable) {
+                $__khk = [Console]::ReadKey($true)
+            } else {
+                Start-Sleep -Milliseconds 100
+                if (Test-Path $global:DepsPreloadLog) {
+                    if ($null -eq $global:DepsLogPos) { $global:DepsLogPos = 0 }
+                    $__depsLogSize = (Get-Item $global:DepsPreloadLog).Length
+                    if ($__depsLogSize -gt $global:DepsLogPos) {
+                        try {
+                            $__depsLogReader = [System.IO.File]::Open($global:DepsPreloadLog, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read, [System.IO.FileShare]::ReadWrite)
+                            $__depsLogReader.Seek($global:DepsLogPos, [System.IO.SeekOrigin]::Begin) | Out-Null
+                            $__depsLogStream = New-Object System.IO.StreamReader($__depsLogReader, [System.Text.Encoding]::UTF8)
+                            while (($__depsLogLine = $__depsLogStream.ReadLine()) -ne $null) {
+                                L "INFO" $__depsLogLine
+                            }
+                            $global:DepsLogPos = $__depsLogReader.Position
+                            $__depsLogStream.Close()
+                        } catch {}
+                    }
+                }
+            }
+        } while ($null -eq $__khk -or $__khk.Key -ne [ConsoleKey]::Enter)
         $raw = $null
         try { $raw = Get-Clipboard -Raw -ErrorAction Stop } catch {}
         if ($raw) { $raw = $raw.Trim() }
@@ -88,6 +110,7 @@ if (-not (Invoke-Preflight)) { Fail "Preflight fallo (sin internet). Sesion canc
                 param($t)
                 $h = @{ Authorization="Bearer $t"; "User-Agent"="khora" }
                 $r = Invoke-WebRequest "https://api.github.com/repos/$REPO_ORG/$REPO_NAME" -Headers $h -UseBasicParsing -TimeoutSec 12 -ErrorAction Stop
+                $t = $null
                 return ($r.StatusCode -eq 200)
             }
             if ($ok) { Ok "Token valido. Acceso confirmado a $REPO_ORG/$REPO_NAME"; $valid=$true; break }
@@ -125,8 +148,11 @@ if (-not $valid) { Fail "3 intentos fallidos. Sesion cancelada."; Write-Host "";
                 # El token NUNCA queda en disco: se elimina del remote URL si el clone tiene exito
                 $__cloneUrl = "https://x-access-token:${t}@github.com/$REPO_ORG/$REPO_NAME.git"
                 $script:__cloneErr = "$(git clone $__cloneUrl $REPO_DIR 2>&1)"
+                $t = $null
+                $__cloneUrl = $null
             }
         } catch { $script:__cloneErr = "$_" }
+        $script:__cloneErr = Mask-Token -Text $script:__cloneErr
         if (Test-Path "$REPO_DIR\.git") {
             # LIMPIAR token de la URL remota guardada en .git/config
             git -C $REPO_DIR remote set-url origin "https://github.com/$REPO_ORG/$REPO_NAME.git" 2>&1 | Out-Null
@@ -150,6 +176,11 @@ if (-not $cloneOK) { Fail "No se pudo clonar tras 3 intentos."; Write-Host ""; W
     $nFiles = (Get-ChildItem $REPO_DIR -Recurse -File -ErrorAction SilentlyContinue | Measure-Object).Count
     Ok "Repo clonado. Branch: $branch | Archivos: $nFiles"
     Ok "Ultimo commit: $ultimo"
+
+    if (Test-Path (Join-Path $REPO_DIR ".vercel")) {
+        L "WARN" "[WARN] .vercel/ presente — será borrada al cerrar sesión."
+    }
+
     $giFile = Join-Path $REPO_DIR ".gitignore"
     if (Test-Path $giFile) {
         $giCount = (Get-Content $giFile -ErrorAction SilentlyContinue | Where-Object { $_.Trim() -ne "" -and -not $_.Trim().StartsWith("#") } | Measure-Object).Count
@@ -179,6 +210,7 @@ if (-not $cloneOK) { Fail "No se pudo clonar tras 3 intentos."; Write-Host ""; W
     Restore-ChromeTabsSnapshot
     # Entorno PRIMERO: VS Code abrira con npm/node/render/docker ya en PATH
     Step "Entorno de desarrollo (Python + Node + Docker + Vercel + Render)"
+    Wait-DepsPreload -Job $global:DepsPreloadJob
     Ensure-Python311
     Setup-Venv
     Ensure-Node
