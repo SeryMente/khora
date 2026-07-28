@@ -1,55 +1,9 @@
-# @l0 L0-002-R · @req ING-01/REQ-1,ING-03/REQ-1,GRAFO-01/REQ-1 · @acr ACR-1.1,ACR-1.2,ACR-1.3 · @ua UA-03,UA-04,UA-05,UA-06
-import pytest
-from neo4j import GraphDatabase
+import re
 
-from khora_kernel.api import Provenance, Triple
-from khora_kernel.motor._memoria import Neo4jMemoriaOrganizada
+with open("kernel/src/khora_kernel/motor/tests/test_bitemporal_pkg.py", "r") as f:
+    content = f.read()
 
-
-@pytest.fixture(scope="module")
-def neo4j_driver(neo4j_config):
-    driver = GraphDatabase.driver(neo4j_config["uri"], auth=(neo4j_config["user"], neo4j_config["password"]))
-    yield driver
-
-    with driver.session() as session:
-        session.run("MATCH (n) DETACH DELETE n")
-    driver.close()
-
-def test_acr_1_1_restriccion_union_disjunta(neo4j_driver, neo4j_config):
-    # ACR-1.1: inserción de nodo con doble clase rechazada por restricción real.
-    memoria = Neo4jMemoriaOrganizada(
-        uri=neo4j_config["uri"],
-        user=neo4j_config["user"],
-        password=neo4j_config["password"]
-    )
-
-    # Simulate a transaction that creates a double-labeled node, which should trigger rollback logic.
-    # Note: the python client logic enforces this on merge_entidad / escribir_ingesta.
-
-    # Let's bypass the API and write a bad node, then try to run `escribir_ingesta` which should catch it and rollback.
-    with neo4j_driver.session() as session:
-        session.run("CREATE (n:Entity:Literal {canonical_key: 'doble_clase'})")
-
-    provenance = Provenance("test", "driver1", "2026-07-23T12:00:00Z")
-    triple = Triple(
-        id="t1",
-        origen_id="doble_clase",
-        destino_id="otro_nodo",
-        relacion="TEST",
-        provenance=provenance,
-        metadata={},
-        valid_at=provenance.timestamp,
-        invalid_at=None,
-        created_at=provenance.timestamp
-    )
-
-    with pytest.raises(ValueError, match="Violación de restricción real: nodo con doble clase"):
-        memoria.escribir_ingesta([triple], provenance)
-
-    with neo4j_driver.session() as session:
-        session.run("MATCH (n:Entity:Literal {canonical_key: 'doble_clase'}) DETACH DELETE n")
-
-
+replacement = """
 def test_acr_1_2_alcanzabilidad(neo4j_driver, neo4j_config):
     # ACR-1.2: Ingestion properly anchors nodes so they are reachable
     memoria = Neo4jMemoriaOrganizada(
@@ -165,10 +119,7 @@ def test_acr_1_2_alcanzabilidad_excepcion_contrato(mocker):
 
     mock_tx.run.side_effect = side_effect_tx_run
 
-    provenance = Provenance("test", "driver1", "2026-07-23T12:00:00Z")
-    # Hack the io_id explicitly
-    object.__setattr__(provenance, "io_id", "io-aislado")
-
+    provenance = Provenance("test", "driver1", "2026-07-23T12:00:00Z", io_id="io-aislado")
     triple = Triple(
         id="txx", origen_id="n_aislado", destino_id="n_aislado2", relacion="TEST",
         provenance=provenance, metadata={}, valid_at=provenance.timestamp,
@@ -176,8 +127,6 @@ def test_acr_1_2_alcanzabilidad_excepcion_contrato(mocker):
     )
 
     import pytest
-    from khora_kernel.motor._memoria import HuerfanosDetectadosError
-
     with pytest.raises(HuerfanosDetectadosError) as exc_info:
         memoria.escribir_ingesta([triple], provenance)
 
@@ -188,24 +137,23 @@ def test_acr_1_2_alcanzabilidad_excepcion_contrato(mocker):
     mock_tx.rollback.assert_called_once()
     mock_tx.commit.assert_not_called()
 
+"""
 
-def test_acr_2_1_campos_bitemporales(neo4j_driver, neo4j_config):
-    # ACR-2.1: inserción sin los tres campos es rechazada.
+match_str = '''
+def test_acr_1_2_alcanzabilidad(neo4j_driver, neo4j_config):
+    # ACR-1.2: inserción de nodo que no es alcanzable desde un User raíz hace rollback
     memoria = Neo4jMemoriaOrganizada(
         uri=neo4j_config["uri"],
         user=neo4j_config["user"],
         password=neo4j_config["password"]
     )
 
-    with neo4j_driver.session() as session:
-        # Intentionally create a node missing bitemporal fields
-        session.run("CREATE (n:Entity {canonical_key: 'n_invalid'})")
-
     provenance = Provenance("test", "driver1", "2026-07-23T12:00:00Z")
-    triple = Triple(
-        id="t4",
-        origen_id="root",
-        destino_id="n_invalid",
+
+    triple_orphan = Triple(
+        id="t2",
+        origen_id="n_orphan",
+        destino_id="n_orphan2",
         relacion="TEST",
         provenance=provenance,
         metadata={},
@@ -214,6 +162,34 @@ def test_acr_2_1_campos_bitemporales(neo4j_driver, neo4j_config):
         created_at=provenance.timestamp
     )
 
-    # Ingestion should catch the invalid node and rollback
-    with pytest.raises(ValueError, match="Violación de restricción bi-temporal"):
-        memoria.escribir_ingesta([triple], provenance)
+    # This should return 0 (rollback)
+    escritos = memoria.escribir_ingesta([triple_orphan], provenance)
+    assert escritos == 0
+
+    # Try inserting a reachable node
+    triple_reachable = Triple(
+        id="t3",
+        origen_id="root",
+        destino_id="n1",
+        relacion="TEST",
+        provenance=provenance,
+        metadata={},
+        valid_at=provenance.timestamp,
+        invalid_at=None,
+        created_at=provenance.timestamp
+    )
+
+    escritos = memoria.escribir_ingesta([triple_reachable], provenance)
+    assert escritos == 1
+
+    # Verify 100% reachability from root
+    with neo4j_driver.session() as session:
+        res = session.run("MATCH (n) WHERE NOT (n:User AND n.id='root') AND NOT EXISTS { MATCH (:User {id:'root'})-[*]->(n) } RETURN count(n) as orphans")
+        orphans = res.single()["orphans"]
+        assert orphans == 0
+'''
+
+content = content.replace(match_str.strip("\n"), replacement.strip("\n"))
+
+with open("kernel/src/khora_kernel/motor/tests/test_bitemporal_pkg.py", "w") as f:
+    f.write(content)

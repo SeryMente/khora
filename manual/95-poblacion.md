@@ -32,7 +32,7 @@ class ActaDeIngesta:
 ## Decisiones Tomadas
 
 - **D1 (Lectura de Grafo):** El `lector_grafo` para la extracción se delega a la propia instancia de memoria organizada para simular las lecturas previas.
-- **D2 (Control de Huérfanos):** Al momento de la escritura Cypher en `escribir_ingesta()`, se comprueba mediante un `EXISTS { MATCH (:User)-[*]->(n) }` que todo nodo en el grafo esté alcanzable desde un nodo `:User`. De generarse huérfanos, la ingesta hace ROLLBACK completo y se loguea un error, rechazando la escritura.
+- **D2 (Control de Huérfanos):** Al momento de la escritura, se aplica un anclaje explícito `u -[:OWNS]-> nι -[:MENTIONS]-> e` para todas las entidades tocadas en la ingesta. La guardia de alcanzabilidad se ejecuta dentro de la misma transacción y está **estrictamente acotada** a los nodos de la ingesta en curso, prohibiéndose el rollback silencioso: si se detectan huérfanos se aborta con `HuerfanosDetectadosError`.
 - **D3 (Idempotencia y Claves Naturales):** Se utiliza `canonical_key` para la unicidad de los nodos y el conjunto `(origen, relacion, destino, io_id)` para garantizar la idempotencia de las aristas.
 - **D4 (Golden QA):** Se declara un XFAIL estricto (`test_golden_personalqa`) ya que la política de `NO-SIMULACIÓN` prohíbe inventar datos reales (como un dump de Notion) para pruebas end-to-end simuladas.
 - **D5 (Frecuencia On-Query):** Las frecuencias de entidades se calculan contando directamente la longitud de su lista de `provenance` sobre Cypher, para evitar materializar contadores en nodos.
