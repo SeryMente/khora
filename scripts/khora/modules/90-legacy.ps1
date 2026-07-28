@@ -1,4 +1,4 @@
-# ================================================================
+﻿# ================================================================
 #  KHORA - Script de sesion agnostico
 #  VERSIONADO: $SCRIPT_VERSION es la unica fuente de verdad;
 #    el archivo se nombra khora-v<version>.ps1 y cada version
