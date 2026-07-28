@@ -154,6 +154,9 @@
 
 ## Variables del Legacy
 
+- `$KH_DOCKER_TIMEOUT_SEC = 60`
+- `$KH_DOCKER_STARTUP_TIMEOUT_SEC = 20`
+
 - `$script:CDP_PORT`
 - `$script:EFS_ACTIVE`
 - `$script:GATE_PATH`

@@ -40,7 +40,9 @@ $HOST_WIDTH = try { [Math]::Max(60, $Host.UI.RawUI.WindowSize.Width - 2) } catch
 # ================================================================
 #  RUTAS AGNOSTICAS  (nada fijo a una PC)
 # ================================================================
-$SCRIPT_VERSION = "6.7.0"   # <- UNICA fuente de verdad de la version
+$SCRIPT_VERSION = "7.1.0"   # <- UNICA fuente de verdad de la version
+$KH_DOCKER_TIMEOUT_SEC = 60
+$KH_DOCKER_STARTUP_TIMEOUT_SEC = 20
 $SYS_DRIVE   = if ($env:SystemDrive) { $env:SystemDrive } else { "C:" }
 # ================================================================
 #  DETECCION DE USUARIO REAL (elevacion con cuenta distinta) v6.4.6
@@ -1172,8 +1174,50 @@ function Ensure-Node {
     if ($n) { $v = & node --version 2>&1; Ok "Node instalado: $v"; return $n.Source }
     Warn "Node.js no disponible. Instala manualmente."; return $null
 }
+function Test-DockerReady {
+    $sw = [System.Diagnostics.Stopwatch]::StartNew()
+    $envArgs = if ($env:DOCKER_HOST) { "-H $env:DOCKER_HOST " } else { "" }
+    $proc = Start-Process docker -ArgumentList ("$envArgs info --format '{{.ServerVersion}}'").Trim() -PassThru -NoNewWindow -ErrorAction SilentlyContinue
+    if ($proc) {
+        $proc | Wait-Process -Timeout 3 -ErrorAction SilentlyContinue
+        if ($proc.HasExited -and $proc.ExitCode -eq 0) {
+            return $true
+        }
+        if (-not $proc.HasExited) { $proc.Kill() }
+    }
+
+    Start-Service 'com.docker.service' -ErrorAction SilentlyContinue
+    $sw.Restart()
+    while ($sw.Elapsed.TotalSeconds -lt $KH_DOCKER_STARTUP_TIMEOUT_SEC) {
+        $testProc = Start-Process docker -ArgumentList ("$envArgs info").Trim().Trim() -PassThru -NoNewWindow -ErrorAction SilentlyContinue
+        if ($testProc) {
+            $testProc | Wait-Process -Timeout 2 -ErrorAction SilentlyContinue
+            if ($testProc.HasExited -and $testProc.ExitCode -eq 0) {
+                return $true
+            }
+            if (-not $testProc.HasExited) { $testProc.Kill() }
+        }
+        Start-Sleep -Seconds 2
+    }
+
+    $svc = Get-Service 'com.docker.service' -ErrorAction SilentlyContinue
+    $svcStatus = if ($svc) { $svc.Status } else { "No Encontrado" }
+    $evt = Get-EventLog -LogName Application -Source Docker -Newest 1 -ErrorAction SilentlyContinue
+    $evtMsg = if ($evt) { $evt.Message.Replace("`n"," ").Replace("`r","").Substring(0, [math]::Min($evt.Message.Length, 100)) } else { "Sin eventos recientes" }
+
+    L "WARN" "[DOCKER] No disponible tras $($KH_DOCKER_STARTUP_TIMEOUT_SEC)s. Continua sin Docker. Servicio: $svcStatus | Evento: $evtMsg"
+    L "WARN" "[DOCKER] Si Docker Desktop no corre, abrelo manualmente. El sistema continuara sin el."
+    return $false
+}
+
 function Ensure-Docker {
     $dockerCmd = Get-Command docker -ErrorAction SilentlyContinue
+    if (-not $dockerCmd) {
+        if (Wait-ProactiveDepPrep -Key 'docker' -Label 'Docker Desktop') {
+            $dockerCmd = Get-Command docker -ErrorAction SilentlyContinue
+        }
+    }
+
     if (-not $dockerCmd) {
         Info "Docker Desktop no encontrado. Instalando (puede tardar varios minutos)..."
         $out = Spin-Job "Instalando Docker Desktop" -Tips @('descargando Docker Desktop...','extrayendo componentes...','instalando WSL2 backend...','configurando servicios...','registrando Docker Engine...','casi listo...','ultimo paso...') -Block {
@@ -1184,24 +1228,22 @@ function Ensure-Docker {
         $dockerCmd = Get-Command docker -ErrorAction SilentlyContinue
         if (-not $dockerCmd) { Warn "Docker no disponible post-instalacion. Puede requerir reinicio."; return }
     }
-    # Verificar daemon activo
-    $test = & docker ps 2>&1
-    if ($LASTEXITCODE -eq 0) { Ok "Docker daemon corriendo."; return }
-    Info "Docker instalado pero daemon inactivo. Iniciando Docker Desktop..."
-    $ddExe = "$env:ProgramFiles\Docker\Docker\Docker Desktop.exe"
-    if (Test-Path $ddExe) { Start-Process $ddExe } else { Start-Process 'Docker Desktop' -ErrorAction SilentlyContinue }
-    # Spinner esperando daemon (max 90s)
-    $fr = @('[    ]','[=   ]','[==  ]','[=== ]','[====]','[ ===]','[  ==]','[   =]')
-    $i = 0; $sw = [System.Diagnostics.Stopwatch]::StartNew(); $ready = $false
-    while ($sw.Elapsed.TotalSeconds -lt 90 -and -not $ready) {
-        $f = $fr[$i % $fr.Length]; $e = $sw.Elapsed.ToString('mm\:ss')
-        Write-Host "`r  $f  Esperando Docker daemon...  [$e] (max 90s)  " -NoNewline -ForegroundColor Cyan
-        $test2 = & docker ps 2>&1
-        if ($LASTEXITCODE -eq 0) { $ready = $true } else { Start-Sleep -Seconds 2; $i++ }
+
+    $isReady = Test-DockerReady
+    if ($isReady) {
+        Ok "Docker daemon listo."
+        L "INFO" "[DOCKER] Pull en progreso... (neo4j:5-community)"
+        $pullJobArgs = @($LOG_FILE)
+        Start-Job -ArgumentList $pullJobArgs -ScriptBlock {
+            param($log)
+            docker pull neo4j:5-community 2>&1
+            if ($log -and (Test-Path $log)) {
+                "[DOCKER] Pull completado." | Out-File -Append -FilePath $log -Encoding UTF8
+            }
+        } | Out-Null
+    } else {
+        Warn "Docker no disponible - saltando paso Docker."
     }
-    Write-Host "`r$((' ') * 78)`r" -NoNewline
-    if ($ready) { Ok "Docker daemon listo en $($sw.Elapsed.ToString('mm\:ss'))." }
-    else { Warn "Docker daemon no respondio en 90s. Verifica Docker Desktop manualmente." }
 }
 function Setup-KhoraWeb {
     $wd = Join-Path $REPO_DIR 'khora-web'
@@ -1284,11 +1326,36 @@ function Invoke-RenderOps {
     }
 }
 function Start-DevServers {
-    L "INFO" "=== Start-DevServers: arrancando API (:8000) + Next.js (:3000) ==="
+    L "INFO" "=== Start-DevServers: arrancando API (:8000) + Next.js (:3000) + Motor (Docker) ==="
     if (-not (Test-Path "$REPO_DIR\.git")) { Warn "Sin repo. Inicia sesion primero ([1])."; return }
     $pyExe  = Join-Path $WORK_DIR 'venv\Scripts\python.exe'
     $webDir = Join-Path $REPO_DIR 'khora-web'
+    $kernelDir = Join-Path $REPO_DIR 'kernel'
+
     $pids = @()
+
+    # Motor Docker (opcional/no bloqueante)
+    if (Test-Path $kernelDir) {
+        $isDockerReady = Test-DockerReady
+        if ($isDockerReady) {
+            Info "Arrancando motor local en Docker (timeout 60s)..."
+            $composeCmd = "cd /d `"`"$kernelDir`"`" && docker compose up -d"
+            $dproc = Start-Process docker -ArgumentList "compose up -d" -WorkingDirectory "$kernelDir" -PassThru -NoNewWindow -ErrorAction SilentlyContinue
+            if ($dproc) {
+                $dproc | Wait-Process -Timeout $KH_DOCKER_TIMEOUT_SEC -ErrorAction SilentlyContinue
+                if (-not $dproc.HasExited) {
+                    $dproc.Kill()
+                    L "WARN" "[DOCKER] Timeout en comando docker compose — proceso terminado."
+                    Warn "Docker timeout tras $($KH_DOCKER_TIMEOUT_SEC)s. El motor local podria no estar disponible."
+                } else {
+                    Ok "Docker compose up ejecutado."
+                }
+            }
+        } else {
+            Warn "[DOCKER] No disponible — saltando paso Docker (motor local)."
+        }
+    }
+
     if (Test-Path $pyExe) {
         $apiCmd = "cd /d `"`"$REPO_DIR`"`" && `"`"$pyExe`"`" -m uvicorn khora.api:app --reload --port 8000"
         $p1 = Start-Process powershell -ArgumentList "-NoProfile","-NoExit","-Command",$apiCmd -PassThru
@@ -1296,6 +1363,7 @@ function Start-DevServers {
         Ok "API uvicorn -> http://localhost:8000  (nueva ventana)"
         L "INFO" "Dev server API uvicorn lanzado en :8000"
     } else { Warn "Venv no encontrado. Inicia sesion ([1]) para crearlo." }
+
     if (Test-Path $webDir) {
         $nextCmd = "cd /d `"`"$webDir`"`" && npm run dev"
         $p2 = Start-Process powershell -ArgumentList "-NoProfile","-NoExit","-Command",$nextCmd -PassThru
@@ -1303,6 +1371,7 @@ function Start-DevServers {
         Ok "Next.js dev -> http://localhost:3000  (nueva ventana)"
         L "INFO" "Dev server Next.js lanzado en :3000"
     } else { Warn "khora-web/ no encontrado." }
+
     if ($pids.Count -gt 0) {
         $pids | ConvertTo-Json -Compress | Set-Content (Join-Path $FLAG_DIR "devservers.json") -Encoding UTF8
     }

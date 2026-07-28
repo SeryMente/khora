@@ -29,7 +29,9 @@ $HOST_WIDTH = try { [Math]::Max(60, $Host.UI.RawUI.WindowSize.Width - 2) } catch
 # ================================================================
 #  RUTAS AGNOSTICAS  (nada fijo a una PC)
 # ================================================================
-$SCRIPT_VERSION = "7.0.0"   # <- UNICA fuente de verdad de la version
+$SCRIPT_VERSION = "7.1.0"   # <- UNICA fuente de verdad de la version
+$KH_DOCKER_TIMEOUT_SEC = 60
+$KH_DOCKER_STARTUP_TIMEOUT_SEC = 20
 $SYS_DRIVE   = if ($env:SystemDrive) { $env:SystemDrive } else { "C:" }
 # ================================================================
 #  DETECCION DE USUARIO REAL (elevacion con cuenta distinta) v6.4.6
