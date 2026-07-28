@@ -1,4 +1,4 @@
-# Khora v7 Modules Contract
+﻿# Khora v7 Modules Contract
 
 ## Orden de carga (khora.barrel.ps1)
 1. 00-config.ps1
@@ -86,6 +86,8 @@
 - `Do-AutoWip`
 
 ### Funciones extraídas a 08-deps.ps1
+- `Start-DepsPreload`
+- `Wait-DepsPreload`
 - `Ensure-Git`
 - `Confirm-GhCliAuth`
 - `Ensure-VSCode`
@@ -162,6 +164,9 @@
 - `$script:LOG_WIN_PID`
 - `$script:NO_SCRIPT_FILE`
 - `$script:PrepJobs`
+- `$global:DepsPreloadJob`
+- `$global:DepsPreloadLog`
+- `$global:DepsLogPos`
 - `$script:PrepJobsStarted`
 - `$script:REAL_USER_DETECT_LOG`
 - `$script:REAL_USER_ELEVATED_AS`
