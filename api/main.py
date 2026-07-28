@@ -215,16 +215,22 @@ async def endpoint_consulta(req: ConsultaRequest):
 
         resultado = retriever.consultar(pregunta=req.pregunta, contexto=contexto)
 
-        # Convert the resulting objects to dicts for JSON response
-        fragmentos = [{"id": f.id, "texto": f.texto, "visibilidad": f.visibilidad.value} for f in resultado.fragmentos]
+        from puentes.unificador import UnificadorAlLeer
+        # Initialize driver properly if injected
+        unificador = UnificadorAlLeer(neo4j_driver)
+
         subgrafo_nodos = [{"id": n.id, "etiqueta": n.etiqueta} for n in resultado.subgrafo.nodos]
         subgrafo_aristas = [{"origen": a.origen, "destino": a.destino, "relacion": a.relacion} for a in resultado.subgrafo.aristas]
+        fragmentos = [{"id": f.id, "texto": f.texto, "visibilidad": f.visibilidad.value} for f in resultado.fragmentos]
+        subgrafo_dict = {"nodos": subgrafo_nodos, "aristas": subgrafo_aristas}
+        subgrafo_unificado = unificador.aplicar_puentes_a_subgrafo(subgrafo_dict)
+
 
         return {
             "fragmentos": fragmentos,
             "subgrafo": {
-                "nodos": subgrafo_nodos,
-                "aristas": subgrafo_aristas
+                "nodos": subgrafo_unificado["nodos"],
+                "aristas": subgrafo_unificado["aristas"]
             },
             "suficiencia": resultado.suficiencia.value,
             "resumenes_incluidos": resultado.resumenes_incluidos,
