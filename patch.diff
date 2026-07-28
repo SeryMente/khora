@@ -1,0 +1,14 @@
+--- kernel/src/khora_kernel/motor/_memoria.py
++++ kernel/src/khora_kernel/motor/_memoria.py
+@@ -10,6 +10,12 @@
+ class IngestaFallidaError(Exception):
+     pass
+
++class HuerfanosDetectadosError(IngestaFallidaError):
++    def __init__(self, io_id: str, huerfanos: List[str]):
++        super().__init__(f"Ingesta genera {len(huerfanos)} nodos huérfanos. IO_ID: {io_id}")
++        self.io_id = io_id
++        self.huerfanos = huerfanos
++
+ class ConsultaFallidaError(Exception):
+     pass

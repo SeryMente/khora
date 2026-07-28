@@ -1,4 +1,4 @@
-# @l0 L0-002-R · @req API-00/REQ-1,REQ-2,REQ-3,DEPLOY-01/REQ-1,DEPLOY-01/REQ-2,DEPLOY-01/REQ-3 · @acr ACR-1.1,ACR-1.2,ACR-2.1,ACR-3.1 · @ua —
+# @l0 L0-002-R · @req API-00/REQ-1,REQ-2,REQ-3,DEPLOY-01/REQ-1,DEPLOY-01/REQ-2,DEPLOY-01/REQ-3,ING-03/REQ-1,GRAFO-01/REQ-1 · @acr ACR-1.1,ACR-1.2,ACR-2.1,ACR-3.1 · @ua UA-03,UA-04,UA-05,UA-06
 import os
 import uuid
 import datetime
@@ -165,9 +165,18 @@ async def endpoint_ingesta(req: IngestaRequest):
                 "update": acta.matices,
                 "ignore": acta.ideas_repetidas
             },
+            "triples_escritos": acta.triples_escritos,
             "ts": acta.timestamp
         }
+    except HTTPException:
+        raise
     except Exception as e:
+        if type(e).__name__ in ("HuerfanosDetectadosError", "IngestaFallidaError"):
+            detail_payload = {"error": "ingesta revertida", "causa": str(e)}
+            if hasattr(e, "huerfanos"):
+                detail_payload["huerfanos"] = e.huerfanos
+            raise HTTPException(status_code=409, detail=detail_payload)
+
         logging.error(f"Ingest error: {traceback.format_exc()}")
         if isinstance(e, ImportError):
             raise HTTPException(status_code=503, detail={"error": "motor no disponible", "causa": str(e)})

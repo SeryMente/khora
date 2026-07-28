@@ -9,12 +9,6 @@ from khora_kernel.api import Provenance, Triple
 class IngestaFallidaError(Exception):
     pass
 
-class HuerfanosDetectadosError(IngestaFallidaError):
-    def __init__(self, io_id: str, huerfanos: List[str]):
-        super().__init__(f"Ingesta genera {len(huerfanos)} nodos huérfanos. IO_ID: {io_id}")
-        self.io_id = io_id
-        self.huerfanos = huerfanos
-
 class ConsultaFallidaError(Exception):
     pass
 
@@ -151,39 +145,11 @@ class Neo4jMemoriaOrganizada:
         """
 
         check_huerfanos = """
-        UNWIND $claves AS clave
-        MATCH (n:Entity {canonical_key: clave})
-        WHERE NOT (n)-[:MATIZ_DE]->()
-          AND NOT (n:User AND n.id='root')
-          AND NOT EXISTS { MATCH (:User {id:'root'})-[*]->(n) }
-        RETURN collect(DISTINCT n.canonical_key) AS huerfanos
-        """
-
-        check_huerfanos_global = """
         MATCH (n:Entity)
         WHERE NOT (n)-[:MATIZ_DE]->()
           AND NOT EXISTS { MATCH (:User {id: 'root'})-[*]->(n) }
           AND NOT (n:User AND n.id = 'root')
         RETURN count(n) as orphans
-        """
-
-        anclaje_query = """
-        MERGE (u:Entity:User {id:'root'})
-        ON CREATE SET u.canonical_key='root', u.created_at=datetime($ts),
-                      u.valid_at=datetime($ts), u.invalid_at=null
-        MERGE (io:Entity:InformationObject {canonical_key:$io_key})
-        ON CREATE SET io.io_id=$io_id, io.provenance=[$prov_str],
-                      io.created_at=datetime($ts), io.valid_at=datetime($ts), io.invalid_at=null
-        ON MATCH SET io.provenance = io.provenance + [$prov_str]
-        MERGE (u)-[owns:OWNS {io_id:$io_id}]->(io)
-        ON CREATE SET owns.created_at=datetime($ts), owns.valid_at=datetime($ts), owns.invalid_at=null
-        WITH io
-        UNWIND $claves AS clave
-        MERGE (e:Entity {canonical_key: clave})
-        ON CREATE SET e.created_at=datetime($ts), e.valid_at=datetime($ts), e.invalid_at=null
-        MERGE (io)-[m:MENTIONS {io_id:$io_id}]->(e)
-        ON CREATE SET m.created_at=datetime($ts), m.valid_at=datetime($ts), m.invalid_at=null
-        RETURN count(m) AS anclados
         """
 
         restriccion_query = """
@@ -206,15 +172,10 @@ class Neo4jMemoriaOrganizada:
             assert self._driver is not None
             with self._driver.session() as session:
                 with session.begin_transaction() as tx:
-                    import datetime
-                    ts = getattr(provenance, "timestamp", None)
-                    if not ts:
-                        ts = datetime.datetime.now(datetime.timezone.utc).isoformat().replace("+00:00", "Z")
-                    prov_str_io = f"origen={provenance.origen}, driver={provenance.driver}, timestamp={ts}"
-                    io_key = 'io:' + io_id
+                    # Garantizar que el nodo raíz existe
+                    tx.run("MERGE (u:Entity:User {id: 'root'}) ON CREATE SET u.canonical_key='root', u.created_at=datetime(), u.valid_at=datetime(), u.invalid_at=null")
 
                     triples_data = []
-                    claves_set = set()
                     for t in triples:
                         prov_str = f"origen={t.provenance.origen}, driver={t.provenance.driver}, timestamp={t.provenance.timestamp}"
                         triples_data.append({
@@ -223,15 +184,10 @@ class Neo4jMemoriaOrganizada:
                             "relacion": t.relacion,
                             "provenance_str": prov_str
                         })
-                        claves_set.add(t.origen_id)
-                        claves_set.add(t.destino_id)
-                    claves_list = list(claves_set)
 
                     result = tx.run(query, triples=triples_data, io_id=io_id)
                     record = result.single()
                     escritos = record["count"] if record else 0
-
-                    tx.run(anclaje_query, ts=ts, io_id=io_id, io_key=io_key, prov_str=prov_str_io, claves=claves_list)
 
                     # Verificar Unión Disjunta
                     res_viol = tx.run(restriccion_query)
@@ -247,28 +203,18 @@ class Neo4jMemoriaOrganizada:
                         tx.rollback()
                         raise ValueError("Violación de restricción bi-temporal: valid_at, invalid_at o created_at faltante.")
 
-                    # Verificar Alcanzabilidad Scoped
-                    orphans_result = tx.run(check_huerfanos, claves=claves_list)
+                    # Verificar Alcanzabilidad
+                    orphans_result = tx.run(check_huerfanos)
                     orphans_record = orphans_result.single()
-                    huerfanos_list = orphans_record["huerfanos"] if orphans_record else []
-                    if huerfanos_list:
-                        tx.rollback()
-                        raise HuerfanosDetectadosError(io_id=io_id, huerfanos=huerfanos_list)
-
-                    # Verificar Alcanzabilidad Global Diagnóstico
-                    global_result = tx.run(check_huerfanos_global)
-                    global_record = global_result.single()
-                    if global_record and global_record["orphans"] > 0:
+                    if orphans_record and orphans_record["orphans"] > 0:
                         import logging
-                        logging.warning(
-                            "GRAFO-01: %s nodo(s) huérfano(s) heredados en el grafo (NO bloquean esta ingesta). "
-                            "Remediar con scripts/migraciones/2026_07_28_grafo01_backfill_alcanzabilidad.py",
-                            global_record["orphans"]
-                        )
+                        logging.error(f"Error: Ingesta genera {orphans_record['orphans']} nodos huérfanos. IO_ID: {io_id}")
+                        tx.rollback()
+                        return 0
 
                     tx.commit()
                     return escritos
-        except (ValueError, IngestaFallidaError) as e:
+        except ValueError as e:
             raise e
         except Exception as e:
             raise Exception(f"Error en escribir_ingesta: {str(e)}")
@@ -333,39 +279,11 @@ class Neo4jMemoriaOrganizada:
         """
 
         check_huerfanos = """
-        UNWIND $claves AS clave
-        MATCH (n:Entity {canonical_key: clave})
-        WHERE NOT (n)-[:MATIZ_DE]->()
-          AND NOT (n:User AND n.id='root')
-          AND NOT EXISTS { MATCH (:User {id:'root'})-[*]->(n) }
-        RETURN collect(DISTINCT n.canonical_key) AS huerfanos
-        """
-
-        check_huerfanos_global = """
         MATCH (n:Entity)
         WHERE NOT (n)-[:MATIZ_DE]->()
           AND NOT EXISTS { MATCH (:User {id: 'root'})-[*]->(n) }
           AND NOT (n:User AND n.id = 'root')
         RETURN count(n) as orphans
-        """
-
-        anclaje_query = """
-        MERGE (u:Entity:User {id:'root'})
-        ON CREATE SET u.canonical_key='root', u.created_at=datetime($ts),
-                      u.valid_at=datetime($ts), u.invalid_at=null
-        MERGE (io:Entity:InformationObject {canonical_key:$io_key})
-        ON CREATE SET io.io_id=$io_id, io.provenance=[$prov_str],
-                      io.created_at=datetime($ts), io.valid_at=datetime($ts), io.invalid_at=null
-        ON MATCH SET io.provenance = io.provenance + [$prov_str]
-        MERGE (u)-[owns:OWNS {io_id:$io_id}]->(io)
-        ON CREATE SET owns.created_at=datetime($ts), owns.valid_at=datetime($ts), owns.invalid_at=null
-        WITH io
-        UNWIND $claves AS clave
-        MERGE (e:Entity {canonical_key: clave})
-        ON CREATE SET e.created_at=datetime($ts), e.valid_at=datetime($ts), e.invalid_at=null
-        MERGE (io)-[m:MENTIONS {io_id:$io_id}]->(e)
-        ON CREATE SET m.created_at=datetime($ts), m.valid_at=datetime($ts), m.invalid_at=null
-        RETURN count(m) AS anclados
         """
 
         restriccion_query = """
@@ -388,15 +306,9 @@ class Neo4jMemoriaOrganizada:
             assert self._driver is not None
             with self._driver.session() as session:
                 with session.begin_transaction() as tx:
-                    import datetime
-                    ts = getattr(provenance, "timestamp", None)
-                    if not ts:
-                        ts = datetime.datetime.now(datetime.timezone.utc).isoformat().replace("+00:00", "Z")
-                    prov_str_io = f"origen={provenance.origen}, driver={provenance.driver}, timestamp={ts}"
-                    io_key = 'io:' + io_id
+                    tx.run("MERGE (u:Entity:User {id: 'root'}) ON CREATE SET u.canonical_key='root', u.created_at=datetime($ts), u.valid_at=datetime($ts), u.invalid_at=null", ts=ts_valid_at)
 
                     triples_data = []
-                    claves_set = set()
                     for t in triples:
                         prov_str = f"origen={t.provenance.origen}, driver={t.provenance.driver}, timestamp={t.provenance.timestamp}"
                         triples_data.append({
@@ -405,15 +317,10 @@ class Neo4jMemoriaOrganizada:
                             "relacion": t.relacion,
                             "provenance_str": prov_str
                         })
-                        claves_set.add(t.origen_id)
-                        claves_set.add(t.destino_id)
-                    claves_list = list(claves_set)
 
                     result = tx.run(query, triples=triples_data, io_id=io_id, ts=ts_valid_at)
                     summary = result.consume()
                     escritos = summary.counters.nodes_created + summary.counters.relationships_created + summary.counters.properties_set
-
-                    tx.run(anclaje_query, ts=ts, io_id=io_id, io_key=io_key, prov_str=prov_str_io, claves=claves_list)
 
                     # Verificar Unión Disjunta
                     res_viol = tx.run(restriccion_query)
@@ -429,28 +336,18 @@ class Neo4jMemoriaOrganizada:
                         tx.rollback()
                         raise ValueError("Violación de restricción bi-temporal: valid_at, invalid_at o created_at faltante.")
 
-                    # Verificar Alcanzabilidad Scoped
-                    orphans_result = tx.run(check_huerfanos, claves=claves_list)
+                    # Verificar Alcanzabilidad
+                    orphans_result = tx.run(check_huerfanos)
                     orphans_record = orphans_result.single()
-                    huerfanos_list = orphans_record["huerfanos"] if orphans_record else []
-                    if huerfanos_list:
-                        tx.rollback()
-                        raise HuerfanosDetectadosError(io_id=io_id, huerfanos=huerfanos_list)
-
-                    # Verificar Alcanzabilidad Global Diagnóstico
-                    global_result = tx.run(check_huerfanos_global)
-                    global_record = global_result.single()
-                    if global_record and global_record["orphans"] > 0:
+                    if orphans_record and orphans_record["orphans"] > 0:
                         import logging
-                        logging.warning(
-                            "GRAFO-01: %s nodo(s) huérfano(s) heredados en el grafo (NO bloquean esta ingesta). "
-                            "Remediar con scripts/migraciones/2026_07_28_grafo01_backfill_alcanzabilidad.py",
-                            global_record["orphans"]
-                        )
+                        logging.error(f"Error: Ingesta genera {orphans_record['orphans']} nodos huérfanos. IO_ID: {io_id}")
+                        tx.rollback()
+                        return 0
 
                     tx.commit()
                     return escritos
-        except (ValueError, IngestaFallidaError) as e:
+        except ValueError as e:
             raise e
         except Exception as e:
             raise Exception(f"Error en fusionar_ingesta: {str(e)}")
