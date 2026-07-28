@@ -14,14 +14,3 @@ Dado que el artículo original "The EpisTwin: A Knowledge Graph-Grounded Neuro-S
 - **Cobertura y Redacción**: Las preguntas han sido redactadas para abarcar los distintos casos de cruce de fuentes y razonamiento temporal basándose exclusivamente en el conocimiento general, sin acceso a las preguntas específicas utilizadas por los autores.
 
 URL DE LA TAREA: [PROPORCIONADA AL FINAL DE LA TAREA]
-
-## Resolución de entidades por puentes (Adición)
-- **Categoría N (UA de EpisTwin):** El paper original NO define resolución de entidades. Por lo tanto, esta funcionalidad es una adición de ingeniería propia.
-- **Implementación No Destructiva:** Se respeta la inmutabilidad de la extracción original (Cero borrado y cero fusión destructiva, prohibición de colapsar "distinto" en "mismo" dentro del núcleo).
-- **Módulo de Anillo:** Toda reconciliación semántica (unificación al leer) ocurre aguas abajo de la extracción, a través de una capa de puentes de equivalencia que inyecta aristas de unificación y anotación, cumpliendo con UA-08, UA-25 y UA-30.
-
-## Correcciones por revisión de código (R5, R6, R10)
-- **R5 Reconciliación de predicados:** Se agregó reconciliación a `UnificadorAlLeer` mapeando verbos equivalentes ("está_construida_sobre" -> "construida_sobre") y colapsando aristas duplicadas producto de la misma.
-- **R6 Aristas de predicado compuesto:** En el script de operador se corrigió el query cypher `MATCH (o)-[r]->(d)` quitando `:RELATION` ya que los predicados dinámicos adoptan el nombre literal del tipo de relación en Neo4j.
-- **R10 Auditoría:** Se incluyó un archivo `query_auditoria_r10.md` para documentar la consulta Cypher exacta que permite ver las unificaciones y el motivo de cada una (procedencia, evidencia). Se documentará la misma en la descripción del Submit.
-- **Performance:** La consulta del unificador se acotó a recuperar únicamente puentes para las entidades devueltas en el subgrafo, usando 1-2 saltos desde `subgrafo_ids` en vez de bajar el árbol completo.

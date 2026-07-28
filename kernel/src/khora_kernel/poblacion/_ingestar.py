@@ -30,10 +30,12 @@ class _MemoriaInterceptora:
         self._candidatos_cache[label_norm] = cands
         return cands
 
-    def merge_entidad(self, canonical_key: str, label_original: str, provenance_raw: str, embedding: List[float], needs_review: bool = False) -> None:
+    def merge_entidad(self, canonical_key: str, label_original: str, provenance_raw: str, embedding: List[float], matiz_de: Optional[str] = None, needs_review: bool = False) -> None:
         if needs_review:
             self.needs_review += 1
             self.ideas_novedosas += 1
+        elif matiz_de:
+            self.matices += 1
         else:
             # Check if canonical_key was already in candidates (MERGE) vs it's brand new (NEW with no collision)
             # Find the original label_norm from caching or check if it ends with a hash (it doesn't here since needs_review=False)
@@ -57,6 +59,7 @@ class _MemoriaInterceptora:
             label_original=label_original,
             provenance_raw=provenance_raw,
             embedding=embedding,
+            matiz_de=matiz_de,
             needs_review=needs_review
         )
 

@@ -5,11 +5,6 @@
 
 function Invoke-Cleanup {
     param([string]$reason = "manual")
-
-    if ($REPO_DIR -and (Test-Path (Join-Path $REPO_DIR ".vercel"))) {
-        L "WARN" "[WARN] .vercel/ presente — será borrada al cerrar sesión."
-    }
-
     # Evitar limpieza concurrente
     $mtx = New-Object System.Threading.Mutex($false, "Global\KHORA_Cleanup")
     $owns = $false
@@ -81,12 +76,12 @@ function Invoke-Cleanup {
                 L "FAIL" "Cuarentena de repo: $quarantine (motivo limpieza: $reason). Recuperalo y haz push manual."
             } catch { Fail "No pude mover el repo a cuarentena ($_). Repo NO borrado para no perder trabajo." }
         } elseif (Test-Path $REPO_DIR) {
-            Remove-Item -Recurse -Force -LiteralPath $REPO_DIR -ErrorAction SilentlyContinue
+            Remove-Item -Recurse -Force $REPO_DIR -ErrorAction SilentlyContinue
             if (Test-Path $REPO_DIR) {
                 $empty = Join-Path $env:TEMP "khe-$(Get-Random)"; New-Item -ItemType Directory -Force $empty | Out-Null
                 if (Test-Cmd robocopy) { robocopy $empty $REPO_DIR /purge /njh /njs /nc /ns /np 2>&1 | Out-Null }
-                Remove-Item -Recurse -Force -LiteralPath $REPO_DIR -ErrorAction SilentlyContinue
-                Remove-Item -Force -LiteralPath $empty -ErrorAction SilentlyContinue
+                Remove-Item -Recurse -Force $REPO_DIR -ErrorAction SilentlyContinue
+                Remove-Item -Force $empty -ErrorAction SilentlyContinue
             }
             if (-not (Test-Path $REPO_DIR)) { Ok "Repo local eliminado (trabajo previamente respaldado y verificado)." } else { Warn "Repo no se pudo borrar del todo." }
         }
@@ -171,38 +166,9 @@ function Invoke-Cleanup {
         } else { Info "Sin datos de Chrome." }
         # Temporales + caches dev
         Step "Temporales y caches"
-        $sweepPaths = @($env:TEMP, $env:APPDATA, $env:LOCALAPPDATA, (Join-Path $env:USERPROFILE "Documents"))
-        $checkedPaths = @()
-        foreach ($sp in $sweepPaths) {
-            if (Test-Path $sp) {
-                $checkedPaths += $sp
-                Get-ChildItem -Path $sp -Filter "khora*" -ErrorAction SilentlyContinue | ForEach-Object {
-                    L "STEP" "[CLEANUP] Residuo detectado y eliminado: $($_.FullName)"
-                    Remove-Item -Recurse -Force -LiteralPath $_.FullName -ErrorAction SilentlyContinue
-                }
-                Get-ChildItem -Path $sp -Filter "khor~*" -ErrorAction SilentlyContinue | ForEach-Object {
-                    L "STEP" "[CLEANUP] Residuo detectado y eliminado: $($_.FullName)"
-                    Remove-Item -Recurse -Force -LiteralPath $_.FullName -ErrorAction SilentlyContinue
-                }
-                @(".env", "secrets.*", "*.token", "*.pat") | ForEach-Object {
-                    Get-ChildItem -Path $sp -Filter $_ -File -ErrorAction SilentlyContinue | ForEach-Object {
-                        L "STEP" "[CLEANUP] Residuo detectado y eliminado: $($_.FullName)"
-                        Remove-Item -Force -LiteralPath $_.FullName -ErrorAction SilentlyContinue
-                    }
-                }
-            }
-        }
-
-        if ($REPO_DIR) {
-            $vDir = Join-Path $REPO_DIR ".vercel"
-            if (Test-Path $vDir) {
-                Remove-Item -Recurse -Force -LiteralPath $vDir -ErrorAction SilentlyContinue
-            }
-        }
-
-        @("git*","vscode*","*token*","khe-*") | ForEach-Object {
+        @("khora*","git*","vscode*","*token*","khe-*") | ForEach-Object {
             Get-Item (Join-Path $env:TEMP $_) -ErrorAction SilentlyContinue | ForEach-Object {
-                Remove-Item -LiteralPath $_.FullName -Recurse -Force -ErrorAction SilentlyContinue
+                Remove-Item $_.FullName -Recurse -Force -ErrorAction SilentlyContinue
             }
         }
         $npmOk = $true
@@ -294,7 +260,6 @@ function Invoke-Cleanup {
         if (-not (Test-Path (Split-Path $stateFile -Parent))) { New-Item -ItemType Directory -Force (Split-Path $stateFile -Parent) | Out-Null }
         Set-Content $stateFile $lastState -Encoding UTF8
 
-        L "STEP" "[CLEANUP] Limpieza completa. Rutas verificadas: $($checkedPaths -join ', ')."
         L "STEP" "=== LIMPIEZA NUCLEAR COMPLETA (motivo:$reason) === verificacion:$(if($allOK){'TODO OK'}else{'CON PENDIENTES'}) ==="
         Write-Host ""
         Write-Host "  =============================================================" -ForegroundColor Green

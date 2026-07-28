@@ -35,22 +35,3 @@ khora-web/test-results/
 khora-web/playwright/.auth/
 
 logs/*.log
-
-# --- anti-recaida: andamiaje de Jules ---
-patch*.diff
-patch_*.py
-*.py.orig
-desc.txt
-pr_body.txt
-report*.txt
-report_pr.md
-cli_output.txt
-dependency_decision.txt
-docker_status.txt
-run_local_mock.py
-test_neo4j_local.py
-test_empty_dependencies.py
-update_header.py
-
-# --- anti-fragmentacion: monolitos khora-v*.ps1 ---
-scripts/khora/khora-v*.ps1

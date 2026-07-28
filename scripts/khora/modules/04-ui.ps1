@@ -146,9 +146,7 @@ function Spin-Job {
         $f = $fr[$i % $fr.Length]
         $e = $sw.Elapsed.ToString('mm\:ss')
         $t = $Tips[$ti % $Tips.Count]
-        $mL = Mask-Token -Text $Label
-        $t = Mask-Token -Text $t
-        Write-Host "`r  $f  $mL  [$e]  $t   " -NoNewline -ForegroundColor Cyan
+        Write-Host "`r  $f  $Label  [$e]  $t   " -NoNewline -ForegroundColor Cyan
         Start-Sleep -Milliseconds 180
         $i++
         if ($i % 22 -eq 0) { $ti++ }
@@ -157,8 +155,7 @@ function Spin-Job {
     $out = Receive-Job $job 2>&1
     Remove-Job $job -Force
     $sw.Stop()
-    $mL = Mask-Token -Text $Label
-    L "INFO" "$mL completado en $($sw.Elapsed.ToString('mm\:ss'))"
+    L "INFO" "$Label completado en $($sw.Elapsed.ToString('mm\:ss'))"
     return $out
 }
 function Focus-Window {

@@ -314,10 +314,7 @@ function Invoke-RenderOps {
             $out = Spin-Job "Deploying a Render" -ArgList @($svcId) -Tips @('subiendo cambios...','esperando build...','reiniciando servicio...','verificando health...') -Block {
                 param($id); & render deploy --service-id $id 2>&1
             }
-            $out | ForEach-Object {
-                $m = Mask-Token -Text "$_"
-                Write-Host "  $m" -ForegroundColor DarkGray; L "INFO" "render: $m"
-            }
+            $out | ForEach-Object { Write-Host "  $_" -ForegroundColor DarkGray; L "INFO" "render: $_" }
             Ok "Deploy completado. Revisa dashboard.render.com"
         }
         '2' {
@@ -328,20 +325,14 @@ function Invoke-RenderOps {
         }
         '3' {
             $out = & render services list 2>&1
-            $out | ForEach-Object {
-                $m = Mask-Token -Text "$_"
-                Write-Host "  $m" -ForegroundColor Cyan
-            }
+            $out | ForEach-Object { Write-Host "  $_" -ForegroundColor Cyan }
             L "INFO" "render services list ejecutado"
         }
         '4' {
             if (-not $svcId) { $svcId = Read-Host '  Service ID (ej: srv-xxxxx)' }
             $key = Read-Host '  Nombre de la variable (ej: LLM_CHEAP_API_KEY)'
             $val = Read-Host "  Valor para $key"
-            & render env set "${key}=${val}" --service-id $svcId 2>&1 | ForEach-Object {
-                $m = Mask-Token -Text "$_"
-                Write-Host "  $m"
-            }
+            & render env set "${key}=${val}" --service-id $svcId 2>&1 | ForEach-Object { Write-Host "  $_" }
             Ok "Var $key actualizada en Render."
             L "INFO" "render env set $key en $svcId"
         }
@@ -396,34 +387,22 @@ function Invoke-KhoraOk {
     $outB = Spin-Job "npm run build (Next.js)" -ArgList @($wd) -Tips @('analizando modulos...','compilando TypeScript...','optimizando bundles...','generando paginas estaticas...','verificando tipos...','tree-shaking...','minificando CSS...','casi listo...') -Block {
         param($webDir); & cmd /c "cd /d `"`"$webDir`"`" && npm run build 2>&1"
     }
-    $outB | ForEach-Object {
-        $m = Mask-Token -Text "$_"
-        L "INFO" "build: $m"
-    }
+    $outB | ForEach-Object { L "INFO" "build: $_" }
     $buildFail = ($outB | Where-Object { "$_" -match 'error TS|Build error|Failed to compile' })
     if ($buildFail) {
         Fail "Build FALLO. Revisa el log:"
-        $buildFail | ForEach-Object {
-            $m = Mask-Token -Text "$_"
-            Write-Host "  $m" -ForegroundColor Red
-        }
+        $buildFail | ForEach-Object { Write-Host "  $_" -ForegroundColor Red }
         return
     }
     Ok "Build OK."
     $outE = Spin-Job "npm run e2e (Playwright)" -ArgList @($wd) -Tips @('iniciando Chromium...','cargando pagina de prueba...','test: smoke regression...','test: login flow...','test: navegacion...','verificando assertions...','capturando screenshots...','recopilando resultados...') -Block {
         param($webDir); & cmd /c "cd /d `"`"$webDir`"`" && npm run e2e 2>&1"
     }
-    $outE | ForEach-Object {
-        $m = Mask-Token -Text "$_"
-        L "INFO" "e2e: $m"
-    }
+    $outE | ForEach-Object { L "INFO" "e2e: $_" }
     $e2eFail = ($outE | Where-Object { "$_" -match ' failed|FAILED|Error:' })
     if ($e2eFail) {
         Fail "khora-ok FAIL. Corrige los tests antes de desplegar."
-        $e2eFail | ForEach-Object {
-            $m = Mask-Token -Text "$_"
-            Write-Host "  $m" -ForegroundColor Red
-        }
+        $e2eFail | ForEach-Object { Write-Host "  $_" -ForegroundColor Red }
     } else { Ok "khora-ok local PASS. Listo para [V] Deploy." }
     L "INFO" "khora-ok local completado."
 }
@@ -435,10 +414,7 @@ function Deploy-Vercel {
     $out = Spin-Job "vercel deploy --prod" -ArgList @($wd) -Tips @('autenticando con Vercel...','subiendo archivos...','compilando en Vercel Cloud...','ejecutando build remoto...','optimizando assets...','publicando deployment...','casi listo...') -Block {
         param($webDir); & cmd /c "cd /d `"`"$webDir`"`" && vercel deploy --prod 2>&1"
     }
-    $out | ForEach-Object {
-        $m = Mask-Token -Text "$_"
-        Write-Host "  $m" -ForegroundColor DarkGray; L "INFO" "vercel: $m"
-    }
+    $out | ForEach-Object { Write-Host "  $_" -ForegroundColor DarkGray; L "INFO" "vercel: $_" }
     $fail = ($out | Where-Object { "$_" -match '^Error|failed' })
     if ($fail) { Fail "Deploy fallo. Revisa salida arriba." }
     else { Ok "Deploy exitoso. Revisa el dashboard de Vercel." }
