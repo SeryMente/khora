@@ -351,14 +351,12 @@ function Start-DevServers {
         $isDockerReady = Test-DockerReady
         if ($isDockerReady) {
             Info "Arrancando motor local en Docker (timeout 60s)..."
-            $composeCmd = "cd /d `"`"$kernelDir`"`" && docker compose up -d"
             $dproc = Start-Process docker -ArgumentList "compose up -d" -WorkingDirectory "$kernelDir" -PassThru -NoNewWindow -ErrorAction SilentlyContinue
             if ($dproc) {
-                $dproc | Wait-Process -Timeout $KH_DOCKER_TIMEOUT_SEC -ErrorAction SilentlyContinue
-                if (-not $dproc.HasExited) {
-                    $dproc.Kill()
+                if (-not $dproc.WaitForExit($KH_DOCKER_TIMEOUT_SEC * 1000)) {
+                    try { $dproc.Kill() } catch {}
                     L "WARN" "[DOCKER] Timeout en comando docker compose — proceso terminado."
-                    Warn "Docker timeout tras $($KH_DOCKER_TIMEOUT_SEC)s. El motor local podria no estar disponible."
+                    Warn "[DOCKER] timeout $($KH_DOCKER_TIMEOUT_SEC)s - proceso terminado"
                 } else {
                     Ok "Docker compose up ejecutado."
                 }

@@ -297,26 +297,28 @@ if ($n) { $v = & node --version 2>&1; Ok "Node OK (tras instalacion proactiva): 
 }
 function Test-DockerReady {
     $sw = [System.Diagnostics.Stopwatch]::StartNew()
-    $envArgs = if ($env:DOCKER_HOST) { "-H $env:DOCKER_HOST " } else { "" }
+    $envArgs = if ($env:DOCKER_HOST) { "-H $env:DOCKER_HOST" } else { "" }
+
     $proc = Start-Process docker -ArgumentList ("$envArgs info --format '{{.ServerVersion}}'").Trim() -PassThru -NoNewWindow -ErrorAction SilentlyContinue
     if ($proc) {
-        $proc | Wait-Process -Timeout 3 -ErrorAction SilentlyContinue
-        if ($proc.HasExited -and $proc.ExitCode -eq 0) {
-            return $true
+        if ($proc.WaitForExit(3000)) {
+            if ($proc.ExitCode -eq 0) { return $true }
+        } else {
+            try { $proc.Kill() } catch {}
         }
-        if (-not $proc.HasExited) { $proc.Kill() }
     }
 
-    Start-Service 'com.docker.service' -ErrorAction SilentlyContinue
+    try { Start-Service 'com.docker.service' -ErrorAction Stop } catch { L "INFO" "[DOCKER] Servicio com.docker.service no disponible o ya iniciado." }
+
     $sw.Restart()
     while ($sw.Elapsed.TotalSeconds -lt $KH_DOCKER_STARTUP_TIMEOUT_SEC) {
-        $testProc = Start-Process docker -ArgumentList ("$envArgs info").Trim().Trim() -PassThru -NoNewWindow -ErrorAction SilentlyContinue
+        $testProc = Start-Process docker -ArgumentList ("$envArgs info").Trim() -PassThru -NoNewWindow -ErrorAction SilentlyContinue
         if ($testProc) {
-            $testProc | Wait-Process -Timeout 2 -ErrorAction SilentlyContinue
-            if ($testProc.HasExited -and $testProc.ExitCode -eq 0) {
-                return $true
+            if ($testProc.WaitForExit(2000)) {
+                if ($testProc.ExitCode -eq 0) { return $true }
+            } else {
+                try { $testProc.Kill() } catch {}
             }
-            if (-not $testProc.HasExited) { $testProc.Kill() }
         }
         Start-Sleep -Seconds 2
     }
