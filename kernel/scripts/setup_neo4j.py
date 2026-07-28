@@ -1,4 +1,3 @@
-import os
 import sys
 
 print("Initializing local Neo4j configuration from environment setup ...")
