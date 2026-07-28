@@ -88,6 +88,7 @@ if (-not (Invoke-Preflight)) { Fail "Preflight fallo (sin internet). Sesion canc
                 param($t)
                 $h = @{ Authorization="Bearer $t"; "User-Agent"="khora" }
                 $r = Invoke-WebRequest "https://api.github.com/repos/$REPO_ORG/$REPO_NAME" -Headers $h -UseBasicParsing -TimeoutSec 12 -ErrorAction Stop
+                $t = $null
                 return ($r.StatusCode -eq 200)
             }
             if ($ok) { Ok "Token valido. Acceso confirmado a $REPO_ORG/$REPO_NAME"; $valid=$true; break }
@@ -125,8 +126,11 @@ if (-not $valid) { Fail "3 intentos fallidos. Sesion cancelada."; Write-Host "";
                 # El token NUNCA queda en disco: se elimina del remote URL si el clone tiene exito
                 $__cloneUrl = "https://x-access-token:${t}@github.com/$REPO_ORG/$REPO_NAME.git"
                 $script:__cloneErr = "$(git clone $__cloneUrl $REPO_DIR 2>&1)"
+                $t = $null
+                $__cloneUrl = $null
             }
         } catch { $script:__cloneErr = "$_" }
+        $script:__cloneErr = Mask-Token -Text $script:__cloneErr
         if (Test-Path "$REPO_DIR\.git") {
             # LIMPIAR token de la URL remota guardada en .git/config
             git -C $REPO_DIR remote set-url origin "https://github.com/$REPO_ORG/$REPO_NAME.git" 2>&1 | Out-Null
