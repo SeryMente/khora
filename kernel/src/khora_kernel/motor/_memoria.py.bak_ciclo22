@@ -83,7 +83,6 @@ class Neo4jMemoriaOrganizada:
 
         rel_query = """
         # Restricción transaccional G=(N,R,T) N_e, L, B
-        """
         restriccion_query = """
         MATCH (n {canonical_key: $canonical_key})
         WITH n, labels(n) as lbls
@@ -110,13 +109,12 @@ class Neo4jMemoriaOrganizada:
         except Exception as e:
             raise Exception(f"Error en MERGE de entidad: {str(e)}")
 
-    def escribir_ingesta(self, triples: List[Triple], provenance: Provenance, io_id=None, terna_volcado: Optional[dict] = None) -> int:
+    def escribir_ingesta(self, triples: List[Triple], provenance: Provenance) -> int:
         self._asegurar_conexion()
         if not provenance:
             raise Exception("No se puede escribir sin provenance.")
 
-        if not io_id:
-            raise ValueError('io_id ausente: la escritura exige el identificador del Objeto de Informacion (ACR-1.2).')
+        io_id = getattr(provenance, "io_id", provenance.origen)
 
         # En la ingesta actual los nodos se asumen como Entity
         query = """
@@ -223,13 +221,7 @@ class Neo4jMemoriaOrganizada:
                     record = result.single()
                     escritos = record["count"] if record else 0
 
-                    volcado = terna_volcado.get("volcado_id") if terna_volcado else None
-                    version = int(terna_volcado.get("version")) if terna_volcado and "version" in terna_volcado else None
-                    sha256 = terna_volcado.get("sha256") if terna_volcado else None
-                    tx.run(anclaje_query, ts=ts, io_id=io_id, io_key=io_key, prov_str=prov_str_io, claves=claves_list, volcado_id=volcado, version=version, sha256=sha256)
-                    if volcado:
-                        chk = tx.run("MATCH (io:InformationObject {io_id:$io}) RETURN io.volcado_id AS v, io.version AS ver, io.sha256 AS s", io=io_id).single()
-                        if chk and (chk["v"] != volcado or chk["ver"] != version or chk["s"] != sha256): raise Exception(f"Conflicto terna io_id={io_id}")
+                    tx.run(anclaje_query, ts=ts, io_id=io_id, io_key=io_key, prov_str=prov_str_io, claves=claves_list)
 
                     # Verificar Unión Disjunta
                     res_viol = tx.run(restriccion_query)
@@ -272,13 +264,12 @@ class Neo4jMemoriaOrganizada:
             raise Exception(f"Error en escribir_ingesta: {str(e)}")
 
 
-    def fusionar_ingesta(self, triples: List[Triple], provenance: Provenance, io_id=None, terna_volcado: Optional[dict] = None) -> int:
+    def fusionar_ingesta(self, triples: List[Triple], provenance: Provenance) -> int:
         self._asegurar_conexion()
         if not provenance:
             raise Exception("No se puede escribir sin provenance.")
 
-        if not io_id:
-            raise ValueError('io_id ausente: la escritura exige el identificador del Objeto de Informacion (ACR-1.2).')
+        io_id = getattr(provenance, "io_id", provenance.origen)
         ts_valid_at = provenance.timestamp
 
         # ACR-1.1 & ACR-1.2 logic:
@@ -295,7 +286,7 @@ class Neo4jMemoriaOrganizada:
             destino.created_at = datetime($ts), destino.valid_at = datetime($ts), destino.invalid_at = null
 
         // Buscamos si existe la relación activa (invalid_at is null) con los mismos datos base
-        OPTIONAL MATCH (origen)-[r_act:RELATION {type: t.relacion}]->(destino)
+        OPTIONAL MATCH (origen)-[r_act:RELATION {type: t.relacion, io_id: $io_id}]->(destino)
         WHERE r_act.invalid_at IS NULL
 
         // Validar si la relacion activa ya tiene exactamente los mismos atributos (idempotencia)
@@ -412,13 +403,7 @@ class Neo4jMemoriaOrganizada:
                     summary = result.consume()
                     escritos = summary.counters.nodes_created + summary.counters.relationships_created + summary.counters.properties_set
 
-                    volcado = terna_volcado.get("volcado_id") if terna_volcado else None
-                    version = int(terna_volcado.get("version")) if terna_volcado and "version" in terna_volcado else None
-                    sha256 = terna_volcado.get("sha256") if terna_volcado else None
-                    tx.run(anclaje_query, ts=ts, io_id=io_id, io_key=io_key, prov_str=prov_str_io, claves=claves_list, volcado_id=volcado, version=version, sha256=sha256)
-                    if volcado:
-                        chk = tx.run("MATCH (io:InformationObject {io_id:$io}) RETURN io.volcado_id AS v, io.version AS ver, io.sha256 AS s", io=io_id).single()
-                        if chk and (chk["v"] != volcado or chk["ver"] != version or chk["s"] != sha256): raise Exception(f"Conflicto terna io_id={io_id}")
+                    tx.run(anclaje_query, ts=ts, io_id=io_id, io_key=io_key, prov_str=prov_str_io, claves=claves_list)
 
                     # Verificar Unión Disjunta
                     res_viol = tx.run(restriccion_query)
