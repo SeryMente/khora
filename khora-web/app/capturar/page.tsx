@@ -20,7 +20,7 @@ export default function CapturarPage() {
     setResult(null);
 
     try {
-      const res = await fetch("/api/ingest", {
+      const res = await fetch("/api/ingesta", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

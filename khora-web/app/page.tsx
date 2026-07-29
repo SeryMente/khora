@@ -1,7 +1,8 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { Zap, MessageSquareShare, Network, Map } from "lucide-react";
 
 const ACCIONES = [
+  { href: "/sistema/volcados", titulo: "Volcados", detalle: "Archivo verbatim e inventario", Icono: Zap },
   { href: "/sistema/ingesta", titulo: "Ingesta", detalle: "Capturar hacia la memoria continua", Icono: Zap },
   { href: "/sistema/consulta", titulo: "Consulta", detalle: "Preguntar a la red · GraphRAG", Icono: MessageSquareShare },
   { href: "/grafo", titulo: "Grafo", detalle: "Visualización del sustrato PKG", Icono: Network },

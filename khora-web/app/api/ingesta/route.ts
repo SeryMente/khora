@@ -32,9 +32,9 @@ export async function POST(req: Request) {
       archivo_base64,
       mime,
       provenance: {
-        source: "cora-ui",
-        user: session.user.email,
-        ts: new Date().toISOString(),
+        origen: "cora-ui",
+        driver: "web",
+        timestamp: new Date().toISOString(),
       }
     };
 
