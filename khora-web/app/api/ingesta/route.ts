@@ -1,6 +1,7 @@
 // @l0 L0-002 · @req CORA-02/REQ-1,REQ-2,REQ-3 · @acr ACR-1.1,ACR-1.2,ACR-2.1,ACR-3.1 · @ua —
 import { NextResponse } from "next/server";
 import { auth } from "../../../auth";
+import { listarVersiones, sha256de } from "../../../lib/server/correcciones";
 
 export async function POST(req: Request) {
   const session = await auth();
@@ -27,14 +28,39 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Must provide file or text" }, { status: 400 });
     }
 
+    const volcadoId = (formData.get("volcado_id") as string | null) ?? null;
+    const versionCruda = (formData.get("version") as string | null) ?? null;
+    if (!volcadoId || !versionCruda) {
+      return NextResponse.json({ error: "procedencia ausente: se exigen volcado_id y version" }, { status: 400 });
+    }
+    if (file) {
+      return NextResponse.json({ error: "el carril de archivo aun no tiene volcado versionado" }, { status: 409 });
+    }
+    const versionPedida = Number(versionCruda);
+    const versiones = await listarVersiones(volcadoId);
+    const fila: any = versiones.find((v: any) => Number(v.version) === versionPedida);
+    if (!fila) {
+      return NextResponse.json({ error: "version inexistente para ese volcado" }, { status: 404 });
+    }
+    texto = String(fila.texto ?? "");
+    archivo_base64 = null;
+    mime = null;
+    const shaServidor = sha256de(texto);
+    if (shaServidor !== String(fila.sha256).toLowerCase()) {
+      return NextResponse.json({ error: "integridad rota: sha256 de la version no coincide" }, { status: 409 });
+    }
+
     const payload = {
       texto,
       archivo_base64,
       mime,
       provenance: {
-        origen: "cora-ui",
+        origen: "khora-ui",
         driver: "web",
         timestamp: new Date().toISOString(),
+        volcado_id: volcadoId,
+        version: versionPedida,
+        sha256: shaServidor,
       }
     };
 
