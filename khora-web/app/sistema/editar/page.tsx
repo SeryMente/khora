@@ -126,7 +126,7 @@ export default function EditarPage() {
               <textarea value={texto} onChange={(e) => setTexto(e.target.value)} rows={16} style={{ width: "100%", padding: 8, fontFamily: "inherit", lineHeight: 1.6 }} />
               <div style={{ display: "flex", gap: 8, marginTop: 8, alignItems: "center" }}>
                 <button onClick={guardar} disabled={cargando}>{cargando ? "guardando..." : "Guardar correcciones"}</button>
-                <button onClick={ingerir} disabled={ingiriendo || versiones.length === 0}>{ingiriendo ? "ingiriendo..." : "Ingerir esta version"}</button>
+                <button onClick={ingerir} disabled={ingiriendo || versiones.length === 0}>{ingiriendo ? "ingiriendo..." : "Ingerir esta versión"}</button>
                 <span style={{ fontSize: 12, opacity: 0.7 }}>{texto.length} caracteres / ediciones previas: {String(sel.ediciones ?? 0)}</span>
               </div>
               {sel.texto_original && sel.texto_original !== texto && (
