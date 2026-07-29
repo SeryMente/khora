@@ -165,7 +165,8 @@ class Neo4jMemoriaOrganizada:
                       u.valid_at=datetime($ts), u.invalid_at=null
         MERGE (io:Entity:InformationObject {canonical_key:$io_key})
         ON CREATE SET io.io_id=$io_id, io.provenance=[$prov_str],
-                      io.created_at=datetime($ts), io.valid_at=datetime($ts), io.invalid_at=null
+                      io.created_at=datetime($ts), io.valid_at=datetime($ts), io.invalid_at=null,
+                      io.volcado_id=$volcado_id, io.version=$version, io.sha256=$sha256
         ON MATCH SET io.provenance = io.provenance + [$prov_str]
         MERGE (u)-[owns:OWNS {io_id:$io_id}]->(io)
         ON CREATE SET owns.created_at=datetime($ts), owns.valid_at=datetime($ts), owns.invalid_at=null
@@ -354,7 +355,8 @@ class Neo4jMemoriaOrganizada:
                       u.valid_at=datetime($ts), u.invalid_at=null
         MERGE (io:Entity:InformationObject {canonical_key:$io_key})
         ON CREATE SET io.io_id=$io_id, io.provenance=[$prov_str],
-                      io.created_at=datetime($ts), io.valid_at=datetime($ts), io.invalid_at=null
+                      io.created_at=datetime($ts), io.valid_at=datetime($ts), io.invalid_at=null,
+                      io.volcado_id=$volcado_id, io.version=$version, io.sha256=$sha256
         ON MATCH SET io.provenance = io.provenance + [$prov_str]
         MERGE (u)-[owns:OWNS {io_id:$io_id}]->(io)
         ON CREATE SET owns.created_at=datetime($ts), owns.valid_at=datetime($ts), owns.invalid_at=null
