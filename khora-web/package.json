@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "khora-web",
   "version": "0.1.2",
   "private": true,
@@ -44,5 +44,8 @@
     "eslint-config-next": "^16.2.10",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "overrides": {
+    "nodemailer": "^8.0.5"
   }
 }
