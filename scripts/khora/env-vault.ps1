@@ -1,4 +1,4 @@
-$Global:KhoraVaultPath = Join-Path (Get-Location) 'secrets/env-vault.enc.json'
+$Global:KhoraVaultPath = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..\secrets\env-vault.enc.json'))
 $Global:KhoraVaultMasterKey = $null
 
 function KhoraVault-SecureToPlain {
