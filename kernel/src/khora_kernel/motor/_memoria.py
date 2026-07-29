@@ -1,4 +1,4 @@
-﻿# @l0 L0-002-R · @req ING-03/REQ-1,GRAFO-01/REQ-1 · @acr ACR-1.1,ACR-1.2 · @ua UA-03,UA-04,UA-05,UA-06
+# @l0 L0-002-R · @req ING-03/REQ-1,GRAFO-01/REQ-1 · @acr ACR-1.1,ACR-1.2 · @ua UA-03,UA-04,UA-05,UA-06
 from typing import Any, Dict, List, Optional
 
 from neo4j import GraphDatabase
@@ -83,6 +83,7 @@ class Neo4jMemoriaOrganizada:
 
         rel_query = """
         # Restricción transaccional G=(N,R,T) N_e, L, B
+        """
         restriccion_query = """
         MATCH (n {canonical_key: $canonical_key})
         WITH n, labels(n) as lbls
