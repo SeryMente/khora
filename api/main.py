@@ -163,6 +163,15 @@ async def endpoint_ingesta(req: IngestaRequest):
         clave_version = "khora:volcado:" + str(prov_terna["volcado_id"]) + ":v" + str(int(prov_terna["version"]))
         objeto_id = str(uuid.uuid5(uuid.NAMESPACE_URL, clave_version))
 
+        version_terna = int(prov_terna["version"])
+        sha_terna = str(prov_terna["sha256"]).lower()
+        with neo4j_driver.session() as session:
+            existente = session.run("MATCH (io:InformationObject {io_id:$io}) RETURN io.volcado_id AS v, io.version AS ver, io.sha256 AS s", io=objeto_id).single()
+        if existente:
+            if existente["v"] == str(prov_terna["volcado_id"]) and existente["ver"] == version_terna and existente["s"] == sha_terna:
+                return {"io_id": objeto_id, "counters": {"create": 0, "update": 0, "ignore": 0}, "ts": datetime.datetime.utcnow().isoformat() + "Z", "idempotent": True}
+            raise Exception(f"Conflicto terna io_id={objeto_id}")
+
         texto_final = req.texto
         if not texto_final and req.archivo_base64:
              texto_final = f"Archivo base64 ({req.mime})"
