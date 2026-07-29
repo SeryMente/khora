@@ -396,6 +396,16 @@ class Neo4jMemoriaOrganizada:
                     prov_str_io = f"origen={provenance.origen}, driver={provenance.driver}, timestamp={ts}"
                     io_key = 'io:' + io_id
 
+                    volcado = terna_volcado.get("volcado_id") if terna_volcado else None
+                    version = int(terna_volcado.get("version")) if terna_volcado and "version" in terna_volcado else None
+                    sha256 = terna_volcado.get("sha256") if terna_volcado else None
+                    if volcado:
+                        existente = tx.run("MATCH (io:InformationObject {io_id:$io}) RETURN io.volcado_id AS v, io.version AS ver, io.sha256 AS s", io=io_id).single()
+                        if existente:
+                            if existente["v"] == volcado and existente["ver"] == version and existente["s"] == sha256:
+                                return 0
+                            raise Exception(f"Conflicto terna io_id={io_id}")
+
                     triples_data = []
                     claves_set = set()
                     for t in triples:
