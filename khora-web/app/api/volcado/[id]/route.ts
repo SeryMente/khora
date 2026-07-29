@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import { getDb } from "../../../../lib/server/neon";
 import { asegurarEsquema } from "../../../../lib/server/correcciones";
+import { descifrarTexto } from "../../../../lib/server/cripto";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -13,7 +14,9 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
     const db = getDb();
     const r = await db.query("SELECT * FROM volcado WHERE id = $1", [id]);
     if (r.rows.length === 0) return NextResponse.json({ detail: "volcado no encontrado" }, { status: 404 });
-    return NextResponse.json({ volcado: r.rows[0] });
+    const fila: any = r.rows[0];
+    const claro = { ...fila, texto: descifrarTexto(String(fila.texto ?? "")), texto_original: fila.texto_original ? descifrarTexto(String(fila.texto_original)) : null };
+    return NextResponse.json({ volcado: claro });
   } catch (e) {
     return NextResponse.json({ detail: "no se pudo leer el volcado", causa: String(e) }, { status: 500 });
   }

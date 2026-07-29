@@ -24,6 +24,8 @@ export async function asegurarColumnasDictado(): Promise<void> {
   columnasListas = true;
 }
 
+import { cifrarTexto } from "./cripto";
+
 export type EntradaDictado = {
   texto: string;
   titulo?: string | null;
@@ -43,7 +45,7 @@ export async function guardarDictado(entrada: EntradaDictado) {
     "INSERT INTO volcado (id, texto, sha256, chars, titulo, origen, driver, usuario, estado, fuente, audio_url, audio_bytes, duracion_seg, pulido_aplicado) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)",
     [
       id,
-      entrada.texto,
+      cifrarTexto(entrada.texto),
       sha,
       entrada.texto.length,
       entrada.titulo ?? null,

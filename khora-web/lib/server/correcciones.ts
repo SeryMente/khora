@@ -25,6 +25,8 @@ export async function asegurarEsquema(): Promise<void> {
   listo = true;
 }
 
+import { cifrarTexto, descifrarTexto } from "./cripto";
+
 export function sha256de(t: string): string {
   return createHash("sha256").update(t, "utf8").digest("hex");
 }
@@ -83,7 +85,7 @@ export async function crearVersion(volcadoId: string, texto: string, motivo: str
   const r = await db.query("SELECT COALESCE(MAX(version), 0)::int AS ultima FROM volcado_version WHERE volcado_id = $1", [volcadoId]);
   const version = Number((r.rows[0] as any).ultima) + 1;
   const sha = sha256de(texto);
-  await db.query("INSERT INTO volcado_version (id, volcado_id, version, texto, sha256, chars, motivo) VALUES ($1,$2,$3,$4,$5,$6,$7)", [randomUUID(), volcadoId, version, texto, sha, texto.length, motivo]);
+  await db.query("INSERT INTO volcado_version (id, volcado_id, version, texto, sha256, chars, motivo) VALUES ($1,$2,$3,$4,$5,$6,$7)", [randomUUID(), volcadoId, version, cifrarTexto(texto), sha, texto.length, motivo]);
   return { version, sha256: sha, chars: texto.length };
 }
 
@@ -95,14 +97,14 @@ export async function asegurarVersionInicial(volcadoId: string) {
   const v = await db.query("SELECT texto, texto_original FROM volcado WHERE id = $1", [volcadoId]);
   if (v.rows.length === 0) throw new Error("volcado no encontrado");
   const fila: any = v.rows[0];
-  const base: string = fila.texto_original ?? fila.texto ?? "";
+  const base: string = descifrarTexto(String(fila.texto_original ?? fila.texto ?? ""));
   await crearVersion(volcadoId, base, "transcripcion original del dictado");
 }
 
 export async function listarVersiones(volcadoId: string) {
   await asegurarEsquema();
   const db = getDb();
-  const r = await db.query("SELECT version, texto, sha256, chars, motivo, creado_en FROM volcado_version WHERE volcado_id = $1 ORDER BY version ASC", [volcadoId]);
+  const r = await db.query("SELECT version, texto, sha256, chars, motivo, creado_en FROM volcado_version WHERE volcado_id = $1 ORDER BY version ASC", [volcadoId]); r.rows = r.rows.map((f: any) => ({ ...f, texto: descifrarTexto(String(f.texto ?? "")) }));
   return r.rows;
 }
 
@@ -112,14 +114,14 @@ export async function guardarEdicion(volcadoId: string, textoEditado: string) {
   const db = getDb();
   const u = await db.query("SELECT version, texto FROM volcado_version WHERE volcado_id = $1 ORDER BY version DESC LIMIT 1", [volcadoId]);
   const ultima: any = u.rows[0];
-  const base: string = ultima.texto;
+  const base: string = descifrarTexto(String(ultima.texto ?? ""));
   const versionDesde = Number(ultima.version);
   if (base === textoEditado) {
     return { pares: [] as Par[], guardadas: 0, version: versionDesde, sinCambios: true, sha256: sha256de(textoEditado), chars: textoEditado.length };
   }
   const pares = calcularDelta(base, textoEditado);
   const nueva = await crearVersion(volcadoId, textoEditado, "edicion manual del operador");
-  await db.query("UPDATE volcado SET texto_original = COALESCE(texto_original, texto), texto = $2, sha256 = $3, chars = $4, editado_en = now(), ediciones = COALESCE(ediciones, 0) + 1 WHERE id = $1", [volcadoId, textoEditado, nueva.sha256, textoEditado.length]);
+  await db.query("UPDATE volcado SET texto_original = COALESCE(texto_original, texto), texto = $2, sha256 = $3, chars = $4, editado_en = now(), ediciones = COALESCE(ediciones, 0) + 1 WHERE id = $1", [volcadoId, cifrarTexto(textoEditado), nueva.sha256, textoEditado.length]);
   let guardadas = 0;
   for (const p of pares) {
     if (p.antes.length === 0 || p.despues.length === 0) continue;

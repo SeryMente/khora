@@ -39,6 +39,8 @@ export async function asegurarTabla(): Promise<void> {
   listo = true;
 }
 
+import { cifrarTexto, descifrarTexto } from "./cripto";
+
 export function hashTexto(texto: string): string {
   return createHash("sha256").update(texto, "utf8").digest("hex");
 }
@@ -49,7 +51,7 @@ export async function archivarVolcado(args: { texto: string; titulo?: string | n
   const id = randomUUID();
   const sha = hashTexto(args.texto);
   const sql = "INSERT INTO volcado (id, texto, sha256, chars, titulo, origen, driver, usuario, estado, intentos) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,0) RETURNING *";
-  const res = await db.query(sql, [id, args.texto, sha, args.texto.length, args.titulo ?? null, args.origen, args.driver ?? null, args.usuario ?? null, "archivado"]);
+  const res = await db.query(sql, [id, cifrarTexto(args.texto), sha, args.texto.length, args.titulo ?? null, args.origen, args.driver ?? null, args.usuario ?? null, "archivado"]);
   return res.rows[0] as Volcado;
 }
 
@@ -57,7 +59,7 @@ export async function listarVolcados(limite: number = 200): Promise<Volcado[]> {
   await asegurarTabla();
   const db = getDb();
   const sql = "SELECT id, texto, sha256, chars, titulo, origen, driver, usuario, recibido_en, estado, io_id, intentos, ultimo_error, ultimo_intento FROM volcado ORDER BY recibido_en DESC LIMIT $1";
-  const res = await db.query(sql, [limite]);
+  const res = await db.query(sql, [limite]); res.rows = res.rows.map((f: any) => ({ ...f, texto: descifrarTexto(String(f.texto ?? "")) }));
   return res.rows as Volcado[];
 }
 
