@@ -90,9 +90,9 @@ def ingestar(
 
         # 4. Escribir vía memoria SOLO con MERGE o FUSIÓN
     if hasattr(memoria, 'fusionar_ingesta'):
-        triples_escritos = memoria.fusionar_ingesta(triples_resueltos, objeto.provenance)
+        triples_escritos = memoria.fusionar_ingesta(triples_resueltos, objeto.provenance, io_id=objeto.id)
     else:
-        triples_escritos = memoria.escribir_ingesta(triples_resueltos, objeto.provenance)
+        triples_escritos = memoria.escribir_ingesta(triples_resueltos, objeto.provenance, io_id=objeto.id)
 
     if on_upsert:
         # Pass the id or the entity logic to the callback.
