@@ -85,7 +85,7 @@ export default function IngestaPage() {
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || "Failed to ingest");
+        throw new Error((data.detail ?? data.error ?? "fallo la ingesta") + (data.causa ? " :: " + data.causa : ""));
       }
 
       setResult(data);
