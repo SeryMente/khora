@@ -14,14 +14,22 @@ function KhoraVault-SecureToPlain {
 }
 
 function KhoraVault-GetMasterKey {
-    if ($Global:KhoraVaultMasterKey) { return $Global:KhoraVaultMasterKey }
-    $envPw = [System.Environment]::GetEnvironmentVariable('KHORA_VAULT_PASSWORD')
-    if (-not [string]::IsNullOrWhiteSpace($envPw)) {
-        $Global:KhoraVaultMasterKey = ConvertTo-SecureString -String $envPw -AsPlainText -Force
+    $currentTime = [DateTimeOffset]::UtcNow
+    if ($Global:KhoraVaultMasterKey -and $Global:KhoraVaultMasterKeyExpiresAt -and $currentTime -lt $Global:KhoraVaultMasterKeyExpiresAt) {
         return $Global:KhoraVaultMasterKey
     }
-    $secure = Read-Host "Password maestra de la boveda Khora (la misma siempre, NO tu token de GitHub)" -AsSecureString
-    $Global:KhoraVaultMasterKey = $secure
+    if ($Global:KhoraVaultMasterKey -is [System.IDisposable]) { $Global:KhoraVaultMasterKey.Dispose() }
+    Remove-Variable -Name KhoraVaultMasterKey -Scope Global -ErrorAction SilentlyContinue
+    Remove-Variable -Name KhoraVaultMasterKeyExpiresAt -Scope Global -ErrorAction SilentlyContinue
+    $environmentPassword = [System.Environment]::GetEnvironmentVariable('KHORA_VAULT_PASSWORD')
+    if (-not [string]::IsNullOrWhiteSpace($environmentPassword)) {
+        $Global:KhoraVaultMasterKey = ConvertTo-SecureString -String $environmentPassword -AsPlainText -Force
+        $Global:KhoraVaultMasterKeyExpiresAt = $currentTime.AddHours(1)
+        return $Global:KhoraVaultMasterKey
+    }
+    $securePassword = Read-Host "Password maestra de la boveda Khora (la misma siempre, NO tu token de GitHub)" -AsSecureString
+    $Global:KhoraVaultMasterKey = $securePassword
+    $Global:KhoraVaultMasterKeyExpiresAt = $currentTime.AddHours(1)
     return $Global:KhoraVaultMasterKey
 }
 
