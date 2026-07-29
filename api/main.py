@@ -112,6 +112,31 @@ class IngestaRequest(BaseModel):
             raise ValueError("texto y archivo_base64 son mutuamente excluyentes")
         return self
 
+    @model_validator(mode="after")
+    def check_procedencia(self):
+        import hashlib
+        import re
+        prov = self.provenance or {}
+        faltantes = [c for c in ("volcado_id", "version", "sha256") if prov.get(c) in (None, "")]
+        if faltantes:
+            raise ValueError("procedencia incompleta: faltan " + ", ".join(faltantes))
+        if not re.fullmatch(r"[0-9a-fA-F-]{36}", str(prov["volcado_id"])):
+            raise ValueError("volcado_id no es un UUID de 36 caracteres")
+        try:
+            version_num = int(prov["version"])
+        except (TypeError, ValueError):
+            raise ValueError("version no es un entero")
+        if version_num < 1:
+            raise ValueError("version debe ser >= 1")
+        sha_declarado = str(prov["sha256"]).lower()
+        if not re.fullmatch(r"[0-9a-f]{64}", sha_declarado):
+            raise ValueError("sha256 no es un digest hexadecimal de 64 caracteres")
+        if self.texto is not None:
+            sha_real = hashlib.sha256(self.texto.encode("utf-8")).hexdigest()
+            if sha_real != sha_declarado:
+                raise ValueError("sha256 no coincide con el texto recibido")
+        return self
+
 
 @app.post("/api/v1/ingesta", dependencies=[Depends(verify_key)])
 async def endpoint_ingesta(req: IngestaRequest):
@@ -134,13 +159,20 @@ async def endpoint_ingesta(req: IngestaRequest):
             timestamp=prov_dict.get("timestamp", datetime.datetime.utcnow().isoformat() + "Z")
         )
 
-        objeto_id = str(uuid.uuid4())
+        prov_terna = req.provenance or {}
+        clave_version = "khora:volcado:" + str(prov_terna["volcado_id"]) + ":v" + str(int(prov_terna["version"]))
+        objeto_id = str(uuid.uuid5(uuid.NAMESPACE_URL, clave_version))
 
         texto_final = req.texto
         if not texto_final and req.archivo_base64:
              texto_final = f"Archivo base64 ({req.mime})"
 
-        metadata = {}
+        metadata = {
+            "volcado_id": str(prov_terna["volcado_id"]),
+            "version": str(int(prov_terna["version"])),
+            "sha256": str(prov_terna["sha256"]).lower(),
+            "clave_version": clave_version,
+        }
         if req.archivo_base64:
             metadata["payload_uri"] = f"data:{req.mime};base64,{req.archivo_base64[:20]}..."
 
