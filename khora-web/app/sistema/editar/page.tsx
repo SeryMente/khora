@@ -95,9 +95,9 @@ export default function EditarPage() {
                 <p style={{ margin: 0, fontSize: 13, fontWeight: 600 }}>Grabacion</p>
                 {sel.audio_url ? (
                   <div>
-                    <audio controls preload="metadata" src={sel.audio_url} style={{ width: "100%", marginTop: 6 }} />
+                    <audio controls preload="metadata" src={"/api/audio/" + sel.id} style={{ width: "100%", marginTop: 6 }} />
                     <p style={{ margin: "6px 0 0", fontSize: 12, opacity: 0.7 }}>
-                      duracion: {String(sel.duracion_seg ?? "?")} s / tamano: {sel.audio_bytes ? Math.round(Number(sel.audio_bytes) / 1024) + " KB" : "?"} / <a href={sel.audio_url} target="_blank" rel="noreferrer">abrir en pestana nueva</a>
+                      duracion: {String(sel.duracion_seg ?? "?")} s / tamano: {sel.audio_bytes ? Math.round(Number(sel.audio_bytes) / 1024) + " KB" : "?"} / <a href={"/api/audio/" + sel.id} target="_blank" rel="noreferrer">abrir en pestana nueva</a>
                     </p>
                   </div>
                 ) : (
