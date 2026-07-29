@@ -1,4 +1,4 @@
-# @l0 L0-002-R · @req ING-03/REQ-1,GRAFO-01/REQ-1 · @acr ACR-1.1,ACR-1.2 · @ua UA-03,UA-04,UA-05,UA-06
+﻿# @l0 L0-002-R · @req ING-03/REQ-1,GRAFO-01/REQ-1 · @acr ACR-1.1,ACR-1.2 · @ua UA-03,UA-04,UA-05,UA-06
 from typing import Any, Dict, List, Optional
 
 from neo4j import GraphDatabase
@@ -286,7 +286,7 @@ class Neo4jMemoriaOrganizada:
             destino.created_at = datetime($ts), destino.valid_at = datetime($ts), destino.invalid_at = null
 
         // Buscamos si existe la relación activa (invalid_at is null) con los mismos datos base
-        OPTIONAL MATCH (origen)-[r_act:RELATION {type: t.relacion, io_id: $io_id}]->(destino)
+        OPTIONAL MATCH (origen)-[r_act:RELATION {type: t.relacion}]->(destino)
         WHERE r_act.invalid_at IS NULL
 
         // Validar si la relacion activa ya tiene exactamente los mismos atributos (idempotencia)
