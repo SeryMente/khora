@@ -1,9 +1,18 @@
 # @l0 L0-002 · @req KA-00/REQ-2 · @acr ACR-2.1
 
+
 import pytest
-from typing import Optional
-from khora_kernel.api import Triple, PuertoLLM, SolicitudLLM, RespuestaLLM, Provenance, PuertoEmbeddings
+
+from khora_kernel.api import (
+    Provenance,
+    PuertoEmbeddings,
+    PuertoLLM,
+    RespuestaLLM,
+    SolicitudLLM,
+    Triple,
+)
 from khora_kernel.resolucion._resolver import resolver
+
 
 class MockMemoria:
     def __init__(self):

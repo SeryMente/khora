@@ -81,9 +81,6 @@ class Neo4jMemoriaOrganizada:
             e.provenance = e.provenance + [$provenance_raw]
         """
 
-        rel_query = """
-        # Restricción transaccional G=(N,R,T) N_e, L, B
-        """
         restriccion_query = """
         MATCH (n {canonical_key: $canonical_key})
         WITH n, labels(n) as lbls
@@ -230,7 +227,8 @@ class Neo4jMemoriaOrganizada:
                     tx.run(anclaje_query, ts=ts, io_id=io_id, io_key=io_key, prov_str=prov_str_io, claves=claves_list, volcado_id=volcado, version=version, sha256=sha256)
                     if volcado:
                         chk = tx.run("MATCH (io:InformationObject {io_id:$io}) RETURN io.volcado_id AS v, io.version AS ver, io.sha256 AS s", io=io_id).single()
-                        if chk and (chk["v"] != volcado or chk["ver"] != version or chk["s"] != sha256): raise Exception(f"Conflicto terna io_id={io_id}")
+                        if chk and (chk["v"] != volcado or chk["ver"] != version or chk["s"] != sha256):
+                            raise Exception(f"Conflicto terna io_id={io_id}")
 
                     # Verificar Unión Disjunta
                     res_viol = tx.run(restriccion_query)
@@ -430,7 +428,8 @@ class Neo4jMemoriaOrganizada:
                     tx.run(anclaje_query, ts=ts, io_id=io_id, io_key=io_key, prov_str=prov_str_io, claves=claves_list, volcado_id=volcado, version=version, sha256=sha256)
                     if volcado:
                         chk = tx.run("MATCH (io:InformationObject {io_id:$io}) RETURN io.volcado_id AS v, io.version AS ver, io.sha256 AS s", io=io_id).single()
-                        if chk and (chk["v"] != volcado or chk["ver"] != version or chk["s"] != sha256): raise Exception(f"Conflicto terna io_id={io_id}")
+                        if chk and (chk["v"] != volcado or chk["ver"] != version or chk["s"] != sha256):
+                            raise Exception(f"Conflicto terna io_id={io_id}")
 
                     # Verificar Unión Disjunta
                     res_viol = tx.run(restriccion_query)
