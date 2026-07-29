@@ -54,3 +54,5 @@ update_header.py
 
 # --- anti-fragmentacion: monolitos khora-v*.ps1 ---
 scripts/khora/khora-v*.ps1
+
+*.bak_*
