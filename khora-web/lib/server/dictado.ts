@@ -2,6 +2,7 @@
 import { randomUUID, createHash } from "crypto";
 import { getDb } from "./neon";
 import { asegurarTabla } from "./volcados";
+import { crearVersion } from "./correcciones";
 
 const ALTERS = [
   "ALTER TABLE volcado ADD COLUMN IF NOT EXISTS audio_url TEXT",
@@ -57,5 +58,6 @@ export async function guardarDictado(entrada: EntradaDictado) {
       entrada.pulidoAplicado === true,
     ]
   );
+  await crearVersion(id, entrada.texto, "transcripcion original del dictado");
   return { id, sha256: sha, chars: entrada.texto.length };
 }

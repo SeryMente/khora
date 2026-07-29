@@ -15,6 +15,7 @@ export default function EditarPage() {
   const [error, setError] = useState("");
   const [aviso, setAviso] = useState("");
   const [cargando, setCargando] = useState(false);
+  const [versiones, setVersiones] = useState<any[]>([]);
 
   const cargar = useCallback(async () => {
     setError("");
@@ -40,6 +41,7 @@ export default function EditarPage() {
     setAviso("");
     setError("");
     try {
+      try { const rv = await fetch("/api/versiones?id=" + f.id); const dv = await rv.json(); setVersiones(Array.isArray(dv?.versiones) ? dv.versiones : []); } catch (e) { setVersiones([]); }
       const r = await fetch("/api/volcado/" + f.id);
       const d = await r.json();
       if (r.ok && d?.volcado) {
@@ -63,7 +65,8 @@ export default function EditarPage() {
       if (!r.ok) { setError(String(d?.detail) + " " + String(d?.causa ?? "")); }
       else {
         setPares(Array.isArray(d?.pares) ? d.pares : []);
-        setAviso("guardado. correcciones registradas: " + String(d?.guardadas));
+        setAviso(d?.sinCambios === true ? "no habia cambios, no se creo version nueva" : "guardado como version " + String(d?.version) + ". correcciones registradas: " + String(d?.guardadas));
+        try { const rv2 = await fetch("/api/versiones?id=" + sel.id); const dv2 = await rv2.json(); setVersiones(Array.isArray(dv2?.versiones) ? dv2.versiones : []); } catch (e) {}
         void cargar();
       }
     } catch (e) { setError(String(e)); } finally { setCargando(false); }
@@ -116,6 +119,18 @@ export default function EditarPage() {
           )}
         </div>
       </div>
+      {versiones.length > 0 && (
+        <div style={{ marginTop: 16 }}>
+          <h2 style={{ fontSize: 16 }}>Historial de versiones</h2>
+          <table style={{ width: "100%", fontSize: 13, borderCollapse: "collapse" }}>
+            <thead><tr><th style={{ textAlign: "left" }}>v</th><th style={{ textAlign: "left" }}>cuando</th><th style={{ textAlign: "left" }}>car</th><th style={{ textAlign: "left" }}>sha</th><th style={{ textAlign: "left" }}>motivo</th><th style={{ textAlign: "left" }}>texto</th></tr></thead>
+            <tbody>
+              {versiones.map((v, i) => (<tr key={i}><td style={{ borderTop: "1px solid #444" }}>{String(v.version)}</td><td style={{ borderTop: "1px solid #444" }}>{String(v.creado_en ?? "").slice(0, 16)}</td><td style={{ borderTop: "1px solid #444" }}>{String(v.chars)}</td><td style={{ borderTop: "1px solid #444", fontFamily: "monospace" }}>{String(v.sha256).slice(0, 8)}</td><td style={{ borderTop: "1px solid #444" }}>{String(v.motivo ?? "")}</td><td style={{ borderTop: "1px solid #444" }}><button onClick={() => setTexto(String(v.texto))}>cargar</button></td></tr>))}
+            </tbody>
+          </table>
+          <p style={{ fontSize: 12, opacity: 0.7 }}>Las versiones no se sobrescriben nunca. La version 1 es la transcripcion del dictado.</p>
+        </div>
+      )}
       {aviso.length > 0 && <p style={{ color: "#7c7" }}>{aviso}</p>}
       {error.length > 0 && <p style={{ color: "#f77" }}>{error}</p>}
       {pares.length > 0 && (
