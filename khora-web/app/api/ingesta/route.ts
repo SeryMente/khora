@@ -24,8 +24,6 @@ export async function POST(req: Request) {
       archivo_base64 = Buffer.from(arrayBuffer).toString("base64");
     } else if (textInput) {
       texto = textInput;
-    } else {
-      return NextResponse.json({ error: "Must provide file or text" }, { status: 400 });
     }
 
     const volcadoId = (formData.get("volcado_id") as string | null) ?? null;

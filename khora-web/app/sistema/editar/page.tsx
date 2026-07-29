@@ -16,6 +16,7 @@ export default function EditarPage() {
   const [aviso, setAviso] = useState("");
   const [cargando, setCargando] = useState(false);
   const [versiones, setVersiones] = useState<any[]>([]);
+  const [ingiriendo, setIngiriendo] = useState(false);
 
   const cargar = useCallback(async () => {
     setError("");
@@ -72,6 +73,24 @@ export default function EditarPage() {
     } catch (e) { setError(String(e)); } finally { setCargando(false); }
   }, [sel, texto, cargar]);
 
+  const ingerir = useCallback(async () => {
+    if (!sel) return;
+    const ultima = versiones.reduce((max: number, v: any) => Math.max(max, Number(v.version)), 0);
+    if (ultima < 1) { setError("este volcado no tiene versiones registradas"); return; }
+    setIngiriendo(true);
+    setError("");
+    setAviso("");
+    try {
+      const cuerpo = new FormData();
+      cuerpo.append("volcado_id", sel.id);
+      cuerpo.append("version", String(ultima));
+      const r = await fetch("/api/ingesta", { method: "POST", body: cuerpo });
+      const d = await r.json();
+      if (!r.ok) { setError("ingesta rechazada: " + String(d?.error ?? d?.detail ?? "") + " " + String(d?.causa ?? "")); }
+      else { setAviso("version " + String(ultima) + " ingerida. io_id: " + String(d?.io_id ?? "?")); }
+    } catch (e) { setError(String(e)); } finally { setIngiriendo(false); }
+  }, [sel, versiones]);
+
   return (
     <main style={{ maxWidth: 1000, margin: "0 auto", padding: 24 }}>
       <h1>Editar transcripciones</h1>
@@ -107,6 +126,7 @@ export default function EditarPage() {
               <textarea value={texto} onChange={(e) => setTexto(e.target.value)} rows={16} style={{ width: "100%", padding: 8, fontFamily: "inherit", lineHeight: 1.6 }} />
               <div style={{ display: "flex", gap: 8, marginTop: 8, alignItems: "center" }}>
                 <button onClick={guardar} disabled={cargando}>{cargando ? "guardando..." : "Guardar correcciones"}</button>
+                <button onClick={ingerir} disabled={ingiriendo || versiones.length === 0}>{ingiriendo ? "ingiriendo..." : "Ingerir esta version"}</button>
                 <span style={{ fontSize: 12, opacity: 0.7 }}>{texto.length} caracteres / ediciones previas: {String(sel.ediciones ?? 0)}</span>
               </div>
               {sel.texto_original && sel.texto_original !== texto && (
