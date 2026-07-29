@@ -62,7 +62,7 @@ class MockMemoria:
                 matiz_de=None
             )
 
-    def escribir_ingesta(self, triples: List[Triple], provenance: Provenance) -> int:
+    def escribir_ingesta(self, triples: List[Triple], provenance: Provenance, io_id=None) -> int:
         if not provenance:
             raise Exception("No se puede escribir sin provenance.")
 

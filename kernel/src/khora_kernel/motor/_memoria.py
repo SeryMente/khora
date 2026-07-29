@@ -110,12 +110,13 @@ class Neo4jMemoriaOrganizada:
         except Exception as e:
             raise Exception(f"Error en MERGE de entidad: {str(e)}")
 
-    def escribir_ingesta(self, triples: List[Triple], provenance: Provenance) -> int:
+    def escribir_ingesta(self, triples: List[Triple], provenance: Provenance, io_id=None) -> int:
         self._asegurar_conexion()
         if not provenance:
             raise Exception("No se puede escribir sin provenance.")
 
-        io_id = getattr(provenance, "io_id", provenance.origen)
+        if not io_id:
+            raise ValueError('io_id ausente: la escritura exige el identificador del Objeto de Informacion (ACR-1.2).')
 
         # En la ingesta actual los nodos se asumen como Entity
         query = """
@@ -265,12 +266,13 @@ class Neo4jMemoriaOrganizada:
             raise Exception(f"Error en escribir_ingesta: {str(e)}")
 
 
-    def fusionar_ingesta(self, triples: List[Triple], provenance: Provenance) -> int:
+    def fusionar_ingesta(self, triples: List[Triple], provenance: Provenance, io_id=None) -> int:
         self._asegurar_conexion()
         if not provenance:
             raise Exception("No se puede escribir sin provenance.")
 
-        io_id = getattr(provenance, "io_id", provenance.origen)
+        if not io_id:
+            raise ValueError('io_id ausente: la escritura exige el identificador del Objeto de Informacion (ACR-1.2).')
         ts_valid_at = provenance.timestamp
 
         # ACR-1.1 & ACR-1.2 logic:
