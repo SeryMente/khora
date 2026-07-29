@@ -1,8 +1,8 @@
-﻿// @l0 L0-002 §4 · @req AUTH-F1-01/REQ-1 · @acr ACR-1.2
+// @l0 L0-002 §4 · @req AUTH-F1-01/REQ-1 · @acr ACR-1.2
 import { auth } from "@/auth";
 import { NextResponse } from "next/server";
 
-export const config = { matcher: ["/((?!_next/static|_next/image|favicon.ico|api/auth).*)"] };
+export const config = { matcher: ["/((?!_next/static|_next/image|favicon.ico|api/auth|api/version).*)"] };
 
 export default auth((req) => {
   // Skip auth checks when running Playwright E2E tests
