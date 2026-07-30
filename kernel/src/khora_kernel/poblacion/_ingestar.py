@@ -88,12 +88,12 @@ def ingestar(
 
     # Si hay 0 repetidas, puede que estemos ingiriendo en un grafo vacío y resolver hizo "NEW" a todo con needs_review=True.
 
-        # 4. Escribir vía memoria SOLO con MERGE o FUSIÓN
+    # 4. Escribir vía memoria SOLO con MERGE o FUSIÓN
+    terna = objeto.metadata if hasattr(objeto, "metadata") and objeto.metadata and "volcado_id" in objeto.metadata else None
     if hasattr(memoria, 'fusionar_ingesta'):
-        triples_escritos = terna = objeto.metadata if hasattr(objeto, "metadata") and objeto.metadata and "volcado_id" in objeto.metadata else None
         triples_escritos = memoria.fusionar_ingesta(triples_resueltos, objeto.provenance, io_id=objeto.id, terna_volcado=terna)
     else:
-        triples_escritos = triples_escritos = memoria.escribir_ingesta(triples_resueltos, objeto.provenance, io_id=objeto.id, terna_volcado=terna)
+        triples_escritos = memoria.escribir_ingesta(triples_resueltos, objeto.provenance, io_id=objeto.id, terna_volcado=terna)
 
     if on_upsert:
         # Pass the id or the entity logic to the callback.

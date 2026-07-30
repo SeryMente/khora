@@ -18,8 +18,8 @@ from khora_kernel.api import (
 # @req: khora.consulta.embeddings
 
 class RetrieverGraphRAG(MotorDeConsulta):
-    def __init__(self, memoria_neo4j: typing.Any, puerto_embeddings: PuertoEmbeddings):
-        self.memoria = memoria_neo4j
+    def __init__(self, memoria_grafo: typing.Any, puerto_embeddings: PuertoEmbeddings):
+        self.memoria = memoria_grafo
         self.puerto_embeddings = puerto_embeddings
         self.max_hops = 2
 
@@ -151,7 +151,7 @@ class RetrieverGraphRAG(MotorDeConsulta):
 
             except Exception as e:
                 import logging
-                logging.error(f"Error querying Neo4j: {e}")
+                logging.error(f"Error querying grafo: {e}")
                 return self._retornar_insuficiente(degradacion)
 
         if not fragmentos:
@@ -179,11 +179,11 @@ class RetrieverGraphRAG(MotorDeConsulta):
             m_driv = re.search(r"driver=([^,]+)", prov_str)
             m_time = re.search(r"timestamp=([^,]+)", prov_str)
             return Provenance(
-                origen=m_orig.group(1).strip() if m_orig else "neo4j",
+                origen=m_orig.group(1).strip() if m_orig else "grafo",
                 driver=m_driv.group(1).strip() if m_driv and m_driv.group(1).strip() != "None" else None,
                 timestamp=m_time.group(1).strip() if m_time else ""
             )
-        return Provenance(origen="neo4j", driver=None, timestamp="")
+        return Provenance(origen="grafo", driver=None, timestamp="")
 
     def _retornar_insuficiente(self, degradacion: list[str]) -> ResultadoDeConsulta:
         return ResultadoDeConsulta(

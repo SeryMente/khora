@@ -3,7 +3,7 @@ import os
 from typing import Any
 
 from khora_kernel.api import SolicitudLLM
-from khora_kernel.proveedores.openai import ProveedorOpenAICompatible
+from khora_kernel.proveedores.llm_generico import ProveedorLLMGenerico
 
 
 def fsum(memoria: Any) -> None:
@@ -11,7 +11,7 @@ def fsum(memoria: Any) -> None:
     comunidades = memoria.get_comunidades_vigentes()
 
     # Proveedor con MOD-CON
-    proveedor = ProveedorOpenAICompatible(
+    proveedor = ProveedorLLMGenerico(
         api_url=os.getenv("LLM_CHEAP_API_URL"),
         api_key=os.getenv("LLM_CHEAP_API_KEY"),
         model=os.getenv("LLM_CHEAP_MODEL")
