@@ -231,6 +231,7 @@ def test_idempotencia():
     ingestar(obj, memoria, llm, emb)
 ingestar(obj, memoria, llm, emb)
 
+
     # assert acta2.ideas_novedosas == 0 # Cambiado por nueva lógica NEW estricta
     # The graph cardinality should be identical
     # assert acta2.triples_escritos == 0 # Idempotencia se maneja de otra forma ahora (todo se inserta con hash si hay colision)
