@@ -28,8 +28,8 @@ def embed_text(text: str) -> List[float]:
     global _MODEL_CALL_COUNT
     _MODEL_CALL_COUNT += 1
     if os.getenv("KHORA_LLM_BASE_URL"):
-        from khora_kernel.proveedores import ProveedorOpenAICompatible
-        return ProveedorOpenAICompatible().incrustar([text])[0]
+        from khora_kernel.proveedores import ProveedorLLMGenerico
+        return ProveedorLLMGenerico().incrustar([text])[0]
     model = get_model()
     emb = model.encode(text, normalize_embeddings=True)
     if isinstance(emb, np.ndarray):
@@ -57,7 +57,7 @@ def _save_index(index: Any, id_map: List[str]) -> None:
 
 def index_all(memoria: Any) -> None:
     index, id_map = _load_or_create_index()
-    # D1 / D6: as we don't have the Neo4j API directly here, we expect the mock to provide nodes
+    # D1 / D6: as we don't have the grafo API directly here, we expect the mock to provide nodes
     nodes = memoria.get_all_nodes()
 
     for node in nodes:

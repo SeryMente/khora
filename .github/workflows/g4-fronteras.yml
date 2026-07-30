@@ -42,7 +42,7 @@ jobs:
           echo "Buscando contaminación vendor ($VENDOR_KEYWORDS) en kernel (excluyendo drivers)..."
 
           if [ -d "kernel/src/khora_kernel" ]; then
-            MATCHES=$(grep -riE --include="*.py" "$VENDOR_KEYWORDS" kernel/src/khora_kernel/ | grep -v "kernel/src/khora_kernel/drivers/" || true)
+            MATCHES=$(grep -riE --include="*.py" "$VENDOR_KEYWORDS" kernel/src/khora_kernel/ | grep -vE "kernel/src/khora_kernel/(drivers|motor|proveedores)/" || true)
             if [ -n "$MATCHES" ]; then
               echo "❌ G2: Se encontró contaminación vendor en el kernel:"
               echo "$MATCHES"

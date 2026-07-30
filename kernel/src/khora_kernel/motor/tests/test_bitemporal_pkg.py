@@ -44,7 +44,7 @@ def test_acr_1_1_restriccion_union_disjunta(neo4j_driver, neo4j_config):
     )
 
     with pytest.raises(ValueError, match="Violación de restricción real: nodo con doble clase"):
-        memoria.escribir_ingesta([triple], provenance)
+        memoria.escribir_ingesta([triple], provenance, io_id='io-aislado')
 
     with neo4j_driver.session() as session:
         session.run("MATCH (n:Entity:Literal {canonical_key: 'doble_clase'}) DETACH DELETE n")
@@ -127,7 +127,8 @@ def test_acr_1_2_alcanzabilidad_reanclaje(neo4j_driver, neo4j_config):
         res = session.run("MATCH (n:Entity) WHERE NOT (n:User AND n.id='root') AND NOT EXISTS { MATCH (:User {id:'root'})-[*]->(n) } RETURN count(n) as orphans")
         assert res.single()["orphans"] == 0
 
-def test_acr_1_2_alcanzabilidad_excepcion_contrato(mocker):
+def test_acr_1_2_alcanzabilidad_excepcion_contrato():
+    from unittest.mock import MagicMock
     # Prueba B: Contrato test con dobles. Inyecta orfandad para asegurar HuerfanosDetectadosError y rollback.
     # No simula contra la base real Neo4j, valida puramente la guardia del contrato.
     from khora_kernel.motor._memoria import (
@@ -138,10 +139,10 @@ def test_acr_1_2_alcanzabilidad_excepcion_contrato(mocker):
     memoria = Neo4jMemoriaOrganizada(uri="bolt://dummy", user="dummy", password="pwd")
 
     # Create mock session and tx
-    mock_session = mocker.MagicMock()
-    mock_tx = mocker.MagicMock()
+    mock_session = MagicMock()
+    mock_tx = MagicMock()
 
-    memoria._driver = mocker.MagicMock()
+    memoria._driver = MagicMock()
     memoria._driver.session.return_value.__enter__.return_value = mock_session
     mock_session.begin_transaction.return_value.__enter__.return_value = mock_tx
 
@@ -153,7 +154,7 @@ def test_acr_1_2_alcanzabilidad_excepcion_contrato(mocker):
     # 5. orphans check (returns mocked huerfanos list)
 
     def side_effect_tx_run(query, **kwargs):
-        mock_result = mocker.MagicMock()
+        mock_result = MagicMock()
         if "count(r) as count" in query:
              mock_result.single.return_value = {"count": 1}
         elif "count(n) as violaciones" in query:
@@ -181,7 +182,7 @@ def test_acr_1_2_alcanzabilidad_excepcion_contrato(mocker):
     import pytest
 
     with pytest.raises(HuerfanosDetectadosError) as exc_info:
-        memoria.escribir_ingesta([triple], provenance)
+memoria.escribir_ingesta([triple], provenance, io_id='io-aislado')
 
     assert exc_info.value.io_id == "io-aislado"
     assert "n_aislado" in exc_info.value.huerfanos
@@ -218,4 +219,4 @@ def test_acr_2_1_campos_bitemporales(neo4j_driver, neo4j_config):
 
     # Ingestion should catch the invalid node and rollback
     with pytest.raises(ValueError, match="Violación de restricción bi-temporal"):
-        memoria.escribir_ingesta([triple], provenance)
+        memoria.escribir_ingesta([triple], provenance, io_id='io-aislado')

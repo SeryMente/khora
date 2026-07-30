@@ -14,7 +14,7 @@ def ask_with_fallback(
     puerto_vision: PuertoVision,
     session_id: Optional[str] = None,
     db_path: str = "data/khora_sessions.db",
-    memoria_neo4j=None
+    memoria_grafo=None
 ):
     """
     Orquestador de nivel superior para Core.ask() + fVAL + Fallback.
@@ -26,7 +26,7 @@ def ask_with_fallback(
     6. Retorna la respuesta validada final.
     """
     # 1. Primera pasada
-    resp = ask(question, session_id=session_id, db_path=db_path, memoria_neo4j=memoria_neo4j)
+    resp = ask(question, session_id=session_id, db_path=db_path, memoria_grafo=memoria_grafo)
 
     # Asegurarnos de tener el session_id que se usó/generó
     current_session_id = resp.ht_ref
@@ -67,7 +67,7 @@ def ask_with_fallback(
             pregunta_con_contexto,
             session_id=current_session_id,
             db_path=db_path,
-            memoria_neo4j=memoria_neo4j
+            memoria_grafo=memoria_grafo
         )
 
         val_resp_reintento = fval(resp_reintento, ht_despues_fallback, db_path=db_path)
