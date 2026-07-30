@@ -19,7 +19,7 @@ from khora_kernel.engine.history import (
     load_ht,
     save_ht,
 )
-from khora_kernel.proveedores.openai import ProveedorOpenAICompatible
+from khora_kernel.proveedores.llm_generico import ProveedorLLMGenerico
 
 
 @dataclass
@@ -71,7 +71,7 @@ def is_local_query(question: str) -> bool:
 def _get_provider() -> PuertoLLM:
     """D3: Modelo de síntesis. Usar proveedor del repo."""
     # The instructions say D3: modelo de sintesis -> docs/model-stack.md; ausente -> proveedor del repo + "SUSTITUCIÓN NO VALIDADA"
-    return ProveedorOpenAICompatible()
+    return ProveedorLLMGenerico()
 
 def _add_step(ht: Ht, state: str, detail: str) -> Ht:
     step = HtStep(
@@ -98,15 +98,15 @@ def _add_evidence(ht: Ht, evidence_list: List[HtEvidence]) -> Ht:
         verdicts=ht.verdicts
     )
 
-def _get_node_content(memoria_neo4j: Any, node_id: str) -> str:
+def _get_node_content(memoria_grafo: Any, node_id: str) -> str:
     """Gets description of node for synthesizing."""
-    if not hasattr(memoria_neo4j, "_driver") or getattr(memoria_neo4j, "_driver") is None:
+    if not hasattr(memoria_grafo, "_driver") or getattr(memoria_grafo, "_driver") is None:
         return ""
     query = """
     MATCH (n) WHERE n.id = $id RETURN n.description AS desc, n.text as text
     """
     try:
-        with getattr(memoria_neo4j, "_driver").session() as session:
+        with getattr(memoria_grafo, "_driver").session() as session:
             res = session.run(query, {"id": node_id})
             record = res.single()
             if record:
@@ -245,10 +245,10 @@ def ejecutar_ciclo(session_id: str, pregunta: str, puerto_llm: PuertoLLM, memori
         derived_from="RAZ-02/fVAL"
     )
 
-def ask(question: str, session_id: Optional[str] = None, db_path: str = "data/khora_sessions.db", memoria_neo4j: Any = None) -> ValidatedResponse:
+def ask(question: str, session_id: Optional[str] = None, db_path: str = "data/khora_sessions.db", memoria_grafo: Any = None) -> ValidatedResponse:
     if not session_id:
         session_id = str(uuid.uuid4())
     puerto_llm = _get_provider()
     # Note: We temporarily overwrite db_path in save_ht/load_ht calls if needed,
     # but the instruction specifically uses default path. For tests we might want to mock it.
-    return ejecutar_ciclo(session_id, question, puerto_llm, memoria_neo4j)
+    return ejecutar_ciclo(session_id, question, puerto_llm, memoria_grafo)

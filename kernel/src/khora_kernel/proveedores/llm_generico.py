@@ -4,6 +4,7 @@ import os
 import urllib.error
 import urllib.request
 from datetime import datetime
+from typing import Any, Dict, List, Optional
 
 from khora_kernel.api import (
     Provenance,
@@ -12,8 +13,8 @@ from khora_kernel.api import (
 )
 
 
-class ProveedorOpenAICompatible:
-    def __init__(self, api_url: str = None, api_key: str = None, model: str = None):
+class ProveedorLLMGenerico:
+    def __init__(self, api_url: Optional[str] = None, api_key: Optional[str] = None, model: Optional[str] = None):
         self.base_url = api_url or os.environ.get("KHORA_LLM_BASE_URL", "").rstrip("/")
         self.api_key = api_key or os.environ.get("KHORA_LLM_API_KEY", "")
         self.llm_model = model or os.environ.get("KHORA_LLM_MODEL", "")
@@ -27,12 +28,12 @@ class ProveedorOpenAICompatible:
             "Authorization": f"Bearer {self.api_key}",
         }
 
-        messages = []
+        messages: List[Dict[str, Any]] = []
         if solicitud.sistema:
             messages.append({"role": "system", "content": solicitud.sistema})
 
         if solicitud.imagenes_base64:
-            content_list = [{"type": "text", "text": solicitud.prompt}]
+            content_list: List[Dict[str, Any]] = [{"type": "text", "text": solicitud.prompt}]
             for img_b64 in solicitud.imagenes_base64:
                 # We assume the caller might send the prefix or not.
                 # If they just send raw base64, we need the prefix. If they send a URL, we need to handle it.
@@ -82,10 +83,11 @@ class ProveedorOpenAICompatible:
                             # Fallback D4
                             content = solicitud.formato_estricto[0]
 
+                from datetime import timezone
                 prov = Provenance(
                     origen=f"llm:{self.llm_model}",
-                    driver="proveedor_openai_compatible",
-                    timestamp=datetime.utcnow().isoformat() + "Z",
+                    driver="proveedor_llm_generico",
+                    timestamp=datetime.now(timezone.utc).isoformat(),
                 )
                 return RespuestaLLM(texto=content, modelo=self.llm_model, provenance=prov)
         except urllib.error.URLError as e:

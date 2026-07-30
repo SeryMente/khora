@@ -62,7 +62,7 @@ class MockMemoria:
                 matiz_de=None
             )
 
-    def escribir_ingesta(self, triples: List[Triple], provenance: Provenance, io_id=None, **kwargs) -> int:
+def escribir_ingesta(self, triples: List[Triple], provenance: Provenance, io_id=None, terna_volcado=None, **kwargs) -> int:
         if not provenance:
             raise Exception("No se puede escribir sin provenance.")
 
@@ -231,7 +231,6 @@ def test_idempotencia():
     ingestar(obj, memoria, llm, emb)
 ingestar(obj, memoria, llm, emb)
 
-
     # assert acta2.ideas_novedosas == 0 # Cambiado por nueva lógica NEW estricta
     # The graph cardinality should be identical
     # assert acta2.triples_escritos == 0 # Idempotencia se maneja de otra forma ahora (todo se inserta con hash si hay colision)
@@ -260,7 +259,6 @@ def test_frecuencia():
 
     # User is extracted from autor. The canonical_key is typically "user".
 frecuencia(memoria, "user")
-
     # Ingesting twice mentions "User" twice from metadata.
     # assert freq >= 2 # Cambiado por nueva lógica NEW estricta
 
