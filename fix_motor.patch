@@ -1,0 +1,33 @@
+--- kernel/src/khora_kernel/motor/_memoria.py
++++ kernel/src/khora_kernel/motor/_memoria.py
+@@ -81,10 +81,6 @@
+         Esto es un error de estado (HuerfanosDetectadosError) grave que debe ser gestionado por la capa de lógica, abortando la ingesta completa y notificando.
+         """
+
+-        rel_query = """
+-        # Restricción transaccional G=(N,R,T) N_e, L, B
+-        """
+-
+         try:
+             # Transaction with constraints enforcement
+             # Validar 1) Que el UUID del volcado y la versión coincidan
+@@ -230,7 +226,8 @@
+                     # Verificar volcado y version y sha si existiera
+                     if volcado:
+                         chk = tx.run("MATCH (io:InformationObject {io_id:$io}) RETURN io.volcado_id AS v, io.version AS ver, io.sha256 AS s", io=io_id).single()
+-                        if chk and (chk["v"] != volcado or chk["ver"] != version or chk["s"] != sha256): raise Exception(f"Conflicto terna io_id={io_id}")
++                        if chk and (chk["v"] != volcado or chk["ver"] != version or chk["s"] != sha256):
++                            raise Exception(f"Conflicto terna io_id={io_id}")
+
+                     # Verificar Unión Disjunta
+                     ud_chk = tx.run("""
+@@ -430,7 +427,8 @@
+                     # Verificar volcado y version y sha si existiera
+                     if volcado:
+                         chk = tx.run("MATCH (io:InformationObject {io_id:$io}) RETURN io.volcado_id AS v, io.version AS ver, io.sha256 AS s", io=io_id).single()
+-                        if chk and (chk["v"] != volcado or chk["ver"] != version or chk["s"] != sha256): raise Exception(f"Conflicto terna io_id={io_id}")
++                        if chk and (chk["v"] != volcado or chk["ver"] != version or chk["s"] != sha256):
++                            raise Exception(f"Conflicto terna io_id={io_id}")
+
+                     # Verificar Unión Disjunta
+                     ud_chk = tx.run("""

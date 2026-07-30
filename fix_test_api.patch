@@ -1,0 +1,19 @@
+--- api/tests/test_api_00.py
++++ api/tests/test_api_00.py
+@@ -48,7 +48,15 @@
+     headers = {"X-KHORA-KEY": "test-key-123"}
+     # This may fail if Neo4j is not connected (returns 503) or if it fails processing (500)
+     # The requirement says: "ingesta real -> counters"
+-    response = client.post("/api/v1/ingesta", json={"texto": "texto de prueba"}, headers=headers)
++    payload = {
++        "texto": "texto de prueba",
++        "provenance": {
++            "volcado_id": "00000000-0000-0000-0000-000000000000",
++            "version": 1,
++            "sha256": "af297c87191fb56d612ddeaabbb93a70da1f8e407cc7037f043480dc6c670db0"
++        }
++    }
++    response = client.post("/api/v1/ingesta", json=payload, headers=headers)
+
+     # We should skip if DB is not available per standard practice or handle 503 as skip
+     if response.status_code == 503:
