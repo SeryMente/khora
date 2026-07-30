@@ -1,12 +1,11 @@
 # @l0 L0-002 · @req ING-01/REQ-1 · @acr ACR-1.1,ACR-1.2,ACR-1.3 · @ua UA-06,UA-08,UA-25,UA-30
 
 import hashlib
-import os
 import unicodedata
 from collections import defaultdict
 from typing import Any
 
-from khora_kernel.api import PuertoEmbeddings, PuertoLLM, SolicitudLLM, Triple
+from khora_kernel.api import PuertoEmbeddings, PuertoLLM, Triple
 
 
 def _normalizar_label(label: str) -> str:

@@ -131,8 +131,8 @@ export default function GrafoPage() {
   // Elemento seleccionado (Capa 4)
   const [selectedElement, setSelectedElement] = useState<{ type: 'node' | 'edge', data: any } | null>(null);
 
-  // Fecha de la "ingesta anterior"
-  const [lastIngestDate] = useState<Date>(new Date(Date.now() - 24 * 60 * 60 * 1000)); // Ayer por defecto
+  // Fecha de la "ingesta anterior" para simular el delta
+  const [lastIngestDate, setLastIngestDate] = useState<Date>(new Date(Date.now() - 24 * 60 * 60 * 1000)); // Ayer por defecto
 
   const fetchGraphData = useCallback(async () => {
     setLoading(true);
@@ -235,6 +235,13 @@ export default function GrafoPage() {
     setSelectedElement(null);
   };
 
+  // Simular avance de tiempo para la capa 3
+  const simulateNewIngestion = () => {
+    setLastIngestDate(new Date());
+    fetchGraphData(); // Recarga y re-evalúa el delta
+    setLayer3Active(true);
+  };
+
   if (loading && nodes.length === 0) return <div className="p-8">Cargando proyecciones del grafo...</div>;
   if (error) return <div className="p-8 text-red-500">Error: {error}</div>;
 
@@ -265,6 +272,12 @@ export default function GrafoPage() {
             />
             <span>Capa 3: Delta</span>
           </label>
+          <button
+            onClick={simulateNewIngestion}
+            className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 transition"
+          >
+            Avanzar Reloj (Test Delta)
+          </button>
         </div>
       </header>
 
