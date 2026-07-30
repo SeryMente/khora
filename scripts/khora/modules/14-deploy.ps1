@@ -354,7 +354,7 @@ function Start-DevServers {
     $pyExe  = Join-Path $WORK_DIR 'venv\Scripts\python.exe'
     $webDir = Join-Path $REPO_DIR 'khora-web'
     if (Test-Path $pyExe) {
-        $apiCmd = "cd /d `"`"$REPO_DIR`"`" && `"`"$pyExe`"`" -m uvicorn khora.api:app --reload --port 8000"
+        $apiCmd = "cd /d `"`"$REPO_DIR`"`" && set `"PYTHONPATH=$REPO_DIR`" && `"`"$pyExe`"`" -m uvicorn api.main:app --reload --port 8000"
         Start-Process powershell -ArgumentList "-NoProfile","-NoExit","-Command",$apiCmd
         Ok "API uvicorn -> http://localhost:8000  (nueva ventana)"
         L "INFO" "Dev server API uvicorn lanzado en :8000"

@@ -23,8 +23,8 @@
 
 | Módulo | Componente | Estado |
 |---|---|---|
-| 00-config | config/rutas/globals | PENDIENTE |
-| 01-realuser | detección usuario real | PENDIENTE |
+| 00-config | config/rutas/globals | EXTRAÍDO |
+| 01-realuser | detección usuario real | EXTRAÍDO |
 | 02-logging | logging | EXTRAÍDO |
 | 03-hud | HUD | EXTRAÍDO |
 | 04-ui | UI consola | EXTRAÍDO |
@@ -195,3 +195,9 @@
 - Un componente = un archivo.
 - Los módulos definen funciones y sus propias variables `$script:`.
 - Prohibido crear archivos/directorios, lanzar procesos o leer input al cargarse (excepción transitoria: 90-legacy.ps1).
+
+
+## Rutas del Sistema (D1)
+- `$ROOT_DIR`: Directorio principal del sistema. Si el usuario actual es distinto al original (elevación mixta), apunta a `Desktop\khora` del usuario *real*. De lo contrario, apunta a la carpeta donde reside el script.
+- `$WORK_DIR`: Directorio de trabajo local. Ahora apunta a `$env:LOCALAPPDATA\khora-session`. Esta ruta asegura que el repositorio nunca se sincronice con OneDrive y siempre sea escribible.
+- `$REPO_DIR`: Directorio del repositorio clonado. Apunta a `$WORK_DIR\repo`. Debe residir estrictamente bajo `$env:LOCALAPPDATA` o el `Desktop` del usuario real.
