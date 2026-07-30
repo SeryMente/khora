@@ -15,6 +15,12 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const geist600 = Geist({
+  weight: "600",
+  variable: "--font-geist",
+  subsets: ["latin"],
+});
+
 export const metadata: Metadata = {
   title: "Khora",
   description: "Memoria continua",
@@ -45,7 +51,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" suppressHydrationWarning>
+    <html lang="es" suppressHydrationWarning className={geist600.variable}>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta name="theme-color" content="#0a0a0b" />
@@ -54,7 +60,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               try {
-                var theme = localStorage.getItem('theme');
+                var theme = localStorage.getItem('khora-theme');
                 if (theme === 'light') {
                   document.documentElement.classList.remove('dark');
                 } else {

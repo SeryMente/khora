@@ -29,7 +29,7 @@ async def refinar_visual(
     Co-rutina efímera para refinamiento visual (tVIS).
     Toma bytes de imagen crudos, los pasa a Base64, e invoca al PuertoLLM para VQA
     basado en las entidades topológicamente relevantes.
-    NO persiste nada a Neo4j (estrictamente efímera).
+    NO persiste nada a grafo (estrictamente efímera).
     """
     # ACR-1.2: Trazabilidad del subconjunto consultado (topológicamente relevante)
     logger.info(f"[tVIS] Iniciando refinamiento visual. Entidades relevantes: {entidades_relevantes}")

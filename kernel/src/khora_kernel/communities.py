@@ -35,10 +35,10 @@ class ComunidadesReificadas:
         }
 
 
-def extraer_subgrafo(memoria_neo4j) -> nx.Graph:
+def extraer_subgrafo(memoria_grafo) -> nx.Graph:
     """Exportación vía Cypher plano a networkx."""
     G = nx.Graph()
-    if not hasattr(memoria_neo4j, "_driver") or memoria_neo4j._driver is None:
+    if not hasattr(memoria_grafo, "_driver") or memoria_grafo._driver is None:
         return G
 
     # Solo las relaciones y nodos vigentes (invalid_at IS NULL)
@@ -48,7 +48,7 @@ def extraer_subgrafo(memoria_neo4j) -> nx.Graph:
     RETURN n.id AS origen, m.id AS destino
     """
     try:
-        with memoria_neo4j._driver.session() as session:
+        with memoria_grafo._driver.session() as session:
             result = session.run(query)
             for record in result:
                 G.add_edge(record["origen"], record["destino"])
@@ -120,15 +120,15 @@ def jerarquia_leiden(
     return reificadas
 
 
-def recalcular_leiden(io_id: str, memoria_neo4j, ts: str):
+def recalcular_leiden(io_id: str, memoria_grafo, ts: str):
     """
     Dispara el recálculo total de la jerarquía Leiden y persiste los nodos reificados.
     """
-    G = extraer_subgrafo(memoria_neo4j)
+    G = extraer_subgrafo(memoria_grafo)
     reificadas = jerarquia_leiden(G)
 
-    if hasattr(memoria_neo4j, 'reificar_comunidades'):
-        memoria_neo4j.reificar_comunidades(reificadas, io_id, ts)
+    if hasattr(memoria_grafo, 'reificar_comunidades'):
+        memoria_grafo.reificar_comunidades(reificadas, io_id, ts)
 
     num_comunidades = len(reificadas.estructura)
     max_nivel = max([c["level"] for c in reificadas.estructura.values()]) if num_comunidades > 0 else 0

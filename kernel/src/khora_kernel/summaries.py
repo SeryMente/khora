@@ -12,17 +12,17 @@ def tokenize(text: str) -> int:
     return int(len(text.split()) * 1.3)
 
 
-def get_community_info(memoria_neo4j, cid: str) -> Dict[str, Any]:
+def get_community_info(memoria_grafo, cid: str) -> Dict[str, Any]:
     """Recupera la informacion de la comunidad."""
     query = """
     MATCH (c:Community {community_id: $cid})
     RETURN c.level AS level, c.summary AS summary, c.summary_tokens AS tokens
     """
-    if not hasattr(memoria_neo4j, "_driver") or memoria_neo4j._driver is None:
+    if not hasattr(memoria_grafo, "_driver") or memoria_grafo._driver is None:
         return {}
 
     try:
-        with memoria_neo4j._driver.session() as session:
+        with memoria_grafo._driver.session() as session:
             res = session.run(query, {"cid": cid})
             record = res.single()
             if record:
@@ -32,7 +32,7 @@ def get_community_info(memoria_neo4j, cid: str) -> Dict[str, Any]:
     return {}
 
 
-def get_community_edges(memoria_neo4j, cid: str) -> List[Dict[str, Any]]:
+def get_community_edges(memoria_grafo, cid: str) -> List[Dict[str, Any]]:
     """Obtiene aristas de la comunidad, calculando el grado global de los extremos (en todo el grafo)
     o dentro de la comunidad. Asumimos grado en el grafo."""
 
@@ -61,11 +61,11 @@ def get_community_edges(memoria_neo4j, cid: str) -> List[Dict[str, Any]]:
     ORDER BY combined_degree DESC
     """
     edges = []
-    if not hasattr(memoria_neo4j, "_driver") or memoria_neo4j._driver is None:
+    if not hasattr(memoria_grafo, "_driver") or memoria_grafo._driver is None:
         return edges
 
     try:
-        with memoria_neo4j._driver.session() as session:
+        with memoria_grafo._driver.session() as session:
             res = session.run(query, {"cid": cid})
             for record in res:
                 edges.append(dict(record))
@@ -74,18 +74,18 @@ def get_community_edges(memoria_neo4j, cid: str) -> List[Dict[str, Any]]:
     return edges
 
 
-def get_subcommunities(memoria_neo4j, cid: str) -> List[Dict[str, Any]]:
+def get_subcommunities(memoria_grafo, cid: str) -> List[Dict[str, Any]]:
     query = """
     MATCH (child:Community)-[:PARENT_COMMUNITY]->(parent:Community {community_id: $cid})
     RETURN child.community_id AS cid, child.summary AS summary, child.summary_tokens AS tokens
     ORDER BY child.summary_tokens DESC
     """
     children = []
-    if not hasattr(memoria_neo4j, "_driver") or memoria_neo4j._driver is None:
+    if not hasattr(memoria_grafo, "_driver") or memoria_grafo._driver is None:
         return children
 
     try:
-        with memoria_neo4j._driver.session() as session:
+        with memoria_grafo._driver.session() as session:
             res = session.run(query, {"cid": cid})
             for record in res:
                 children.append(dict(record))
@@ -94,16 +94,16 @@ def get_subcommunities(memoria_neo4j, cid: str) -> List[Dict[str, Any]]:
     return children
 
 
-def get_single_node_community(memoria_neo4j, cid: str):
+def get_single_node_community(memoria_grafo, cid: str):
     query = """
     MATCH (e:Entity)-[:IN_COMMUNITY]->(c:Community {community_id: $cid})
     RETURN e.description AS desc
     """
     nodes = []
-    if not hasattr(memoria_neo4j, "_driver") or memoria_neo4j._driver is None:
+    if not hasattr(memoria_grafo, "_driver") or memoria_grafo._driver is None:
         return []
     try:
-        with memoria_neo4j._driver.session() as session:
+        with memoria_grafo._driver.session() as session:
             res = session.run(query, {"cid": cid})
             for record in res:
                 nodes.append(dict(record))
@@ -112,7 +112,7 @@ def get_single_node_community(memoria_neo4j, cid: str):
     return nodes
 
 
-def persist_summary(memoria_neo4j, cid: str, summary: str, summary_tokens: int):
+def persist_summary(memoria_grafo, cid: str, summary: str, summary_tokens: int):
     query = """
     MATCH (c:Community {community_id: $cid})
     SET c.summary = $summary,
@@ -120,26 +120,26 @@ def persist_summary(memoria_neo4j, cid: str, summary: str, summary_tokens: int):
         c.summarized_at = timestamp(),
         c.summary_placeholder = false
     """
-    if not hasattr(memoria_neo4j, "_driver") or memoria_neo4j._driver is None:
+    if not hasattr(memoria_grafo, "_driver") or memoria_grafo._driver is None:
         return
 
     try:
-        with memoria_neo4j._driver.session() as session:
+        with memoria_grafo._driver.session() as session:
             session.run(query, {"cid": cid, "summary": summary, "tokens": summary_tokens})
     except Exception:
         pass
 
-def get_all_communities(memoria_neo4j) -> List[Dict[str, Any]]:
+def get_all_communities(memoria_grafo) -> List[Dict[str, Any]]:
     query = """
     MATCH (c:Community)
     RETURN c.community_id AS cid, c.level AS level
     """
     communities = []
-    if not hasattr(memoria_neo4j, "_driver") or memoria_neo4j._driver is None:
+    if not hasattr(memoria_grafo, "_driver") or memoria_grafo._driver is None:
         return communities
 
     try:
-        with memoria_neo4j._driver.session() as session:
+        with memoria_grafo._driver.session() as session:
             res = session.run(query)
             for record in res:
                 communities.append(dict(record))
@@ -164,27 +164,27 @@ def log_costs(cid: str, level: int, prompt_tokens: int, completion_tokens: int, 
         f.write(json.dumps(entry) + "\n")
 
 
-def summarize_community(memoria_neo4j, cid: str, puerto_llm: PuertoLLM) -> str:
+def summarize_community(memoria_grafo, cid: str, puerto_llm: PuertoLLM) -> str:
     window_size = int(os.environ.get("KHORA_FSUM_WINDOW", "8000"))
 
-    info = get_community_info(memoria_neo4j, cid)
+    info = get_community_info(memoria_grafo, cid)
     level = info.get("level", 0)
 
     # Check if single node
-    single_nodes = get_single_node_community(memoria_neo4j, cid)
+    single_nodes = get_single_node_community(memoria_grafo, cid)
     if len(single_nodes) == 1:
         # D2: comunidad de 1 solo nodo -> summary = descripción del nodo (sin LLM)
         summary = single_nodes[0].get("desc") or "Sin descripción"
         tokens = tokenize(summary)
-        persist_summary(memoria_neo4j, cid, summary, tokens)
+        persist_summary(memoria_grafo, cid, summary, tokens)
         log_costs(cid, level, 0, tokens, "None")
         return summary
 
     prompt = f"Resume la siguiente comunidad (ID: {cid}):\n"
     current_tokens = tokenize(prompt)
 
-    edges = get_community_edges(memoria_neo4j, cid)
-    children = get_subcommunities(memoria_neo4j, cid)
+    edges = get_community_edges(memoria_grafo, cid)
+    children = get_subcommunities(memoria_grafo, cid)
 
     # D3: arista sin descripción -> usar relation + labels de extremos
     def format_edge(e):
@@ -243,17 +243,17 @@ def summarize_community(memoria_neo4j, cid: str, puerto_llm: PuertoLLM) -> str:
     summary = resp.texto
     comp_tokens = tokenize(summary)
 
-    persist_summary(memoria_neo4j, cid, summary, comp_tokens)
+    persist_summary(memoria_grafo, cid, summary, comp_tokens)
     log_costs(cid, level, current_tokens, comp_tokens, resp.modelo)
 
     return summary
 
 
-def summarize_all(memoria_neo4j, puerto_llm: PuertoLLM):
-    communities = get_all_communities(memoria_neo4j)
+def summarize_all(memoria_grafo, puerto_llm: PuertoLLM):
+    communities = get_all_communities(memoria_grafo)
 
     # Sort by level ascending (hojas primero)
     communities_sorted = sorted(communities, key=lambda x: x.get("level", 0))
 
     for c in communities_sorted:
-        summarize_community(memoria_neo4j, c["cid"], puerto_llm)
+        summarize_community(memoria_grafo, c["cid"], puerto_llm)

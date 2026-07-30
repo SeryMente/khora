@@ -16,7 +16,7 @@ def fallback(
     Se activa cuando fVAL emite vt=Insuficiente.
     Accede a la modalidad cruda (ej. imagen) a través de PuertoVision,
     extrae evidencia y la inyecta al historial Ht como contexto efímero de la sesión.
-    JAMÁS escribe al PKG (Neo4j).
+    JAMÁS escribe al PKG (grafo).
     """
     ht = load_ht(session_id, db_path)
     if not ht:
@@ -28,9 +28,9 @@ def fallback(
 
     # 2. Neural VQA Injection
     from khora_kernel.api import SolicitudLLM
-    from khora_kernel.proveedores.openai import ProveedorOpenAICompatible
+    from khora_kernel.proveedores.llm_generico import ProveedorLLMGenerico
 
-    proveedor = ProveedorOpenAICompatible()
+    proveedor = ProveedorLLMGenerico()
     solicitud = SolicitudLLM(
         prompt=f"Por favor, responde a la siguiente pregunta observando la imagen provista: {pregunta}",
         sistema="Eres un asistente experto analizando imágenes. Debes extraer la evidencia solicitada con precisión.",

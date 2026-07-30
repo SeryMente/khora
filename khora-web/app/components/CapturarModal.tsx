@@ -10,7 +10,6 @@ import {
   Send,
   X,
   Keyboard,
-  Sparkles,
   CheckCircle2,
 } from "lucide-react";
 
@@ -212,7 +211,6 @@ export function CapturarModal({
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-[#1F3C6A]">
             <h2 className="text-white font-semibold flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-[#3FA7FF]" />
               Capturar en Bitácora
             </h2>
             <button
@@ -244,7 +242,7 @@ export function CapturarModal({
                   disabled={!speechSupported || guardando}
                   className={`p-3 rounded-xl transition-all cursor-pointer ${
                     dictando
-                      ? "bg-red-500/20 text-red-400 border border-red-500/30 animate-pulse"
+                      ? "bg-red-500/20 text-red-400 border border-red-500/30"
                       : "bg-[#0B1F3B] text-gray-400 border border-[#1F3C6A] hover:text-[#3FA7FF] hover:border-[#3FA7FF]/50"
                   }`}
                   title={
