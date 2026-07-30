@@ -46,24 +46,20 @@ def test_ingesta_exclusividad_modelo():
 def test_ingesta_valida():
     import hashlib
     import uuid
-    headers = {"X-KHORA-KEY": "test-key-123"}
-    texto = "texto de prueba"
-    sha_hash = hashlib.sha256(texto.encode("utf-8")).hexdigest()
-
-    # This may fail if Neo4j is not connected (returns 503) or if it fails processing (500)
-    # The requirement says: "ingesta real -> counters"
-    response = client.post(
-        "/api/v1/ingesta",
-        json={
-            "texto": texto,
-            "provenance": {
-                "volcado_id": str(uuid.uuid4()),
-                "version": 1,
-                "sha256": sha_hash
-            }
-        },
-        headers=headers
-    )
+texto = "texto de prueba"
+sha = hashlib.sha256(texto.encode("utf-8")).hexdigest()
+headers = {"X-KHORA-KEY": "test-key-123"}
+payload = {
+    "texto": texto,
+    "provenance": {
+        "volcado_id": str(uuid.uuid4()),
+        "version": "1",
+        "sha256": sha
+    }
+}
+# This may fail if Neo4j is not connected (returns 503) or if it fails processing (500)
+# The requirement says: "ingesta real -> counters"
+response = client.post("/api/v1/ingesta", json=payload, headers=headers)
 
     # We should skip if DB is not available per standard practice or handle 503 as skip
     if response.status_code == 503:

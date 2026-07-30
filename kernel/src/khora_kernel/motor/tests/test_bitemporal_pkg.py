@@ -44,7 +44,7 @@ def test_acr_1_1_restriccion_union_disjunta(neo4j_driver, neo4j_config):
     )
 
     with pytest.raises(ValueError, match="Violación de restricción real: nodo con doble clase"):
-        memoria.escribir_ingesta([triple], provenance)
+        memoria.escribir_ingesta([triple], provenance, io_id='io-aislado')
 
     with neo4j_driver.session() as session:
         session.run("MATCH (n:Entity:Literal {canonical_key: 'doble_clase'}) DETACH DELETE n")
@@ -182,7 +182,7 @@ def test_acr_1_2_alcanzabilidad_excepcion_contrato():
     import pytest
 
     with pytest.raises(HuerfanosDetectadosError) as exc_info:
-        memoria.escribir_ingesta([triple], provenance, io_id="io-aislado")
+memoria.escribir_ingesta([triple], provenance, io_id='io-aislado')
 
     assert exc_info.value.io_id == "io-aislado"
     assert "n_aislado" in exc_info.value.huerfanos
@@ -219,4 +219,4 @@ def test_acr_2_1_campos_bitemporales(neo4j_driver, neo4j_config):
 
     # Ingestion should catch the invalid node and rollback
     with pytest.raises(ValueError, match="Violación de restricción bi-temporal"):
-        memoria.escribir_ingesta([triple], provenance)
+        memoria.escribir_ingesta([triple], provenance, io_id='io-aislado')

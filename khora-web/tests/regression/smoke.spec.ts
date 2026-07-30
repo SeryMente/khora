@@ -1,10 +1,10 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Regresión: Smoke tests de funciones entregadas', () => {
-  test('PWA arranca y renderiza el shell (ATHANOR)', async ({ page }) => {
+  test('PWA arranca y renderiza el shell (Khora)', async ({ page }) => {
     await page.goto('/');
     // Check if splash screen is visible, it should complete after a moment or interaction
-    const h1 = page.locator('h1:has-text("ATHANOR")');
+    const h1 = page.locator('h1:has-text("Khora")');
     await expect(h1).toBeVisible({ timeout: 15000 });
   });
 
