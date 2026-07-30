@@ -229,7 +229,7 @@ def test_idempotencia():
     )
 
     ingestar(obj, memoria, llm, emb)
-    # acta2 = ingestar(obj, memoria, llm, emb)
+ingestar(obj, memoria, llm, emb)
 
     # assert acta2.ideas_novedosas == 0 # Cambiado por nueva lógica NEW estricta
     # The graph cardinality should be identical
@@ -258,7 +258,7 @@ def test_frecuencia():
     ingestar(obj2, memoria, llm, emb)
 
     # User is extracted from autor. The canonical_key is typically "user".
-    # freq = frecuencia(memoria, "user")
+frecuencia(memoria, "user")
     # Ingesting twice mentions "User" twice from metadata.
     # assert freq >= 2 # Cambiado por nueva lógica NEW estricta
 
