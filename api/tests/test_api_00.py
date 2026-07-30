@@ -44,8 +44,8 @@ def test_ingesta_exclusividad_modelo():
     assert res2.status_code == 422
 
 def test_ingesta_valida():
-    import hashlib
-    import uuid
+import hashlib
+import uuid
 texto = "texto de prueba"
 sha = hashlib.sha256(texto.encode("utf-8")).hexdigest()
 headers = {"X-KHORA-KEY": "test-key-123"}
