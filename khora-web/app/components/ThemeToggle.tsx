@@ -9,7 +9,7 @@ export function ThemeToggle() {
 
   useEffect(() => {
     setMounted(true);
-    const theme = localStorage.getItem("theme");
+    const theme = localStorage.getItem("khora-theme");
     if (theme === "light") {
       setIsDark(false);
     } else {
@@ -22,11 +22,11 @@ export function ThemeToggle() {
   const toggleTheme = () => {
     if (isDark) {
       document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
+      localStorage.setItem("khora-theme", "light");
       setIsDark(false);
     } else {
       document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
+      localStorage.setItem("khora-theme", "dark");
       setIsDark(true);
     }
   };
