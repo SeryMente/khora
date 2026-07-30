@@ -25,7 +25,6 @@ interface GraphNodeData {
   origen: string;
   timestamp: string;
   verificacion: string;
-  isNew?: boolean; // Capa 3: Delta
 }
 
 interface GraphEdgeData {
@@ -33,7 +32,6 @@ interface GraphEdgeData {
   origen: string;
   timestamp: string;
   verificacion: string;
-  isNew?: boolean; // Capa 3: Delta
 }
 
 // --- Layout Determinista (Dagre) ---
@@ -45,8 +43,6 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = "TB") => 
   dagreGraph.setGraph({ rankdir: direction });
 
   nodes.forEach((node) => {
-    // Estimamos tamaño según centralidad para el layout,
-    // pero limitamos para no desbordar
     const data = node.data as unknown as GraphNodeData;
     const baseSize = 100;
     const sizeMultiplier = 1 + (data?.centrality || 0) * 0.5;
@@ -93,13 +89,11 @@ const CustomGraphNode = ({ data, selected }: { data: GraphNodeData; selected: bo
   const sizeMultiplier = 1 + (data.centrality || 0) * 0.5;
   const size = Math.min(baseSize * sizeMultiplier, 300);
 
-  // Capa 3: Resaltado si es nuevo
-  const deltaStyles = data.isNew ? "ring-4 ring-yellow-400 animate-pulse" : "";
   const selectedStyles = selected ? "ring-4 ring-black" : "";
 
   return (
     <div
-      className={`rounded-full flex items-center justify-center text-white text-xs p-2 text-center shadow-lg transition-all duration-500 ${deltaStyles} ${selectedStyles}`}
+      className={`rounded-full flex items-center justify-center text-white text-xs p-2 text-center shadow-lg transition-all duration-500 ${selectedStyles}`}
       style={{
         width: size,
         height: size,
@@ -124,15 +118,13 @@ export default function GrafoPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [viewMode, setViewMode] = useState<'list' | 'graph'>('list');
+
   // Estado de las capas
   const [layer2Active, setLayer2Active] = useState(true);
-  const [layer3Active, setLayer3Active] = useState(false);
 
   // Elemento seleccionado (Capa 4)
   const [selectedElement, setSelectedElement] = useState<{ type: 'node' | 'edge', data: any } | null>(null);
-
-  // Fecha de la "ingesta anterior" para simular el delta
-  const [lastIngestDate, setLastIngestDate] = useState<Date>(new Date(Date.now() - 24 * 60 * 60 * 1000)); // Ayer por defecto
 
   const fetchGraphData = useCallback(async () => {
     setLoading(true);
@@ -144,7 +136,7 @@ export default function GrafoPage() {
       const initialNodes: Node[] = data.nodes.map((n: any) => ({
         id: n.id,
         type: "custom",
-        position: { x: 0, y: 0 }, // Inicial, se calcula después
+        position: { x: 0, y: 0 },
         data: {
           summary: n.summary,
           community: n.community,
@@ -153,8 +145,6 @@ export default function GrafoPage() {
           origen: n.origen,
           timestamp: n.timestamp,
           verificacion: n.verificacion,
-          // Capa 3 lógica inicial
-          isNew: new Date(n.timestamp) > lastIngestDate,
         },
       }));
 
@@ -162,15 +152,13 @@ export default function GrafoPage() {
         id: e.id,
         source: e.source,
         target: e.target,
-        animated: true, // Animación sutil de transición, requerida por principio de proyección
-        style: { strokeWidth: 1 + (e.weight || 0) * 2 }, // Capa 2: Grosor de arista
+        style: { strokeWidth: 1 + (e.weight || 0) * 2 },
         markerEnd: { type: MarkerType.ArrowClosed },
         data: {
           weight: e.weight,
           origen: e.origen,
           timestamp: e.timestamp,
           verificacion: e.verificacion,
-          isNew: new Date(e.timestamp) > lastIngestDate,
         },
       }));
 
@@ -184,7 +172,7 @@ export default function GrafoPage() {
     } finally {
       setLoading(false);
     }
-  }, [lastIngestDate, setNodes, setEdges]);
+  }, [setNodes, setEdges]);
 
   useEffect(() => {
     fetchGraphData();
@@ -198,16 +186,12 @@ export default function GrafoPage() {
         ...n,
         data: {
           ...n.data,
-          // Si Capa 2 inactiva (puramente teórica, por defecto está activa),
-          // podríamos resetear colores/tamaños aquí, pero la tarea dice que C1 es default y C2 es codificación.
-          // Para no romper la animacion rastreable, dejamos la C2 on/off
           centrality: layer2Active ? ndata.centrality : 0,
           community: layer2Active ? ndata.community : 0,
-          isNew: layer3Active ? ndata.isNew : false,
         }
       }
     });
-  }, [nodes, layer2Active, layer3Active]);
+  }, [nodes, layer2Active]);
 
   const visibleEdges = useMemo(() => {
     return edges.map(e => {
@@ -216,12 +200,11 @@ export default function GrafoPage() {
         ...e,
         style: {
           strokeWidth: layer2Active ? 1 + (edata.weight || 0) * 2 : 2,
-          stroke: layer3Active && edata.isNew ? "#eab308" : "#b1b1b7"
+          stroke: "#b1b1b7"
         },
-        animated: true, // Mantenemos la transición animada siempre
       }
     });
-  }, [edges, layer2Active, layer3Active]);
+  }, [edges, layer2Active]);
 
   const onNodeClick = (event: React.MouseEvent, node: Node) => {
     setSelectedElement({ type: 'node', data: node.data });
@@ -235,13 +218,6 @@ export default function GrafoPage() {
     setSelectedElement(null);
   };
 
-  // Simular avance de tiempo para la capa 3
-  const simulateNewIngestion = () => {
-    setLastIngestDate(new Date());
-    fetchGraphData(); // Recarga y re-evalúa el delta
-    setLayer3Active(true);
-  };
-
   if (loading && nodes.length === 0) return <div className="p-8">Cargando proyecciones del grafo...</div>;
   if (error) return <div className="p-8 text-red-500">Error: {error}</div>;
 
@@ -250,119 +226,140 @@ export default function GrafoPage() {
       <header className="bg-white p-4 shadow-sm z-10 border-b border-gray-200 flex justify-between items-center">
         <div>
           <h1 className="text-xl font-bold tracking-wider text-gray-800">Grafo PKG - Proyección Leiden</h1>
-          <p className="text-sm text-gray-500">Vista de 4 Capas (Zoom Semántico)</p>
+          <p className="text-sm text-gray-500">Vista de Entidades</p>
         </div>
 
-        <div className="flex gap-4">
-          <label className="flex items-center space-x-2 text-sm cursor-pointer">
-            <input
-              type="checkbox"
-              checked={layer2Active}
-              onChange={e => setLayer2Active(e.target.checked)}
-              className="rounded"
-            />
-            <span>Capa 2: Codificación Visual</span>
-          </label>
-          <label className="flex items-center space-x-2 text-sm cursor-pointer">
-            <input
-              type="checkbox"
-              checked={layer3Active}
-              onChange={e => setLayer3Active(e.target.checked)}
-              className="rounded"
-            />
-            <span>Capa 3: Delta</span>
-          </label>
+        <div className="flex gap-4 items-center">
           <button
-            onClick={simulateNewIngestion}
-            className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 transition"
+            onClick={() => setViewMode('list')}
+            className={`px-3 py-1 rounded text-sm transition ${viewMode === 'list' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}
           >
-            Avanzar Reloj (Test Delta)
+            Vista Lista
           </button>
+          <button
+            onClick={() => setViewMode('graph')}
+            className={`px-3 py-1 rounded text-sm transition ${viewMode === 'graph' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}
+          >
+            Vista Grafo
+          </button>
+
+          {viewMode === 'graph' && (
+            <label className="flex items-center space-x-2 text-sm cursor-pointer ml-4">
+              <input
+                type="checkbox"
+                checked={layer2Active}
+                onChange={e => setLayer2Active(e.target.checked)}
+                className="rounded"
+              />
+              <span>Capa 2: Codificación Visual</span>
+            </label>
+          )}
         </div>
       </header>
 
-      <div className="flex-1 relative">
+      <div className="flex-1 relative overflow-auto">
         {nodes.length === 0 ? (
           <div className="absolute inset-0 flex items-center justify-center text-gray-400">
             El grafo está vacío. (Válido para ACR-1.1 si DB está vacía)
           </div>
         ) : (
-          <ReactFlow
-            nodes={visibleNodes}
-            edges={visibleEdges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            onNodeClick={onNodeClick}
-            onEdgeClick={onEdgeClick}
-            onPaneClick={onPaneClick}
-            nodeTypes={nodeTypes}
-            fitView
-            minZoom={0.1}
-            maxZoom={2}
-            className="bg-gray-100 transition-all duration-700" // Animaciones suaves de layout
-          >
-            <Background color="#ccc" gap={16} />
-            <Controls />
-
-            {/* Capa 4: Inspección */}
-            {selectedElement && (
-              <Panel position="top-right" className="bg-white p-4 rounded-lg shadow-xl border border-gray-200 w-80 max-h-[80vh] overflow-auto z-50">
-                <div className="flex justify-between items-center mb-4 pb-2 border-b">
-                  <h3 className="font-bold text-gray-800">
-                    {selectedElement.type === 'node' ? 'Inspección de Comunidad' : 'Inspección de Relación'}
-                  </h3>
-                  <button onClick={() => setSelectedElement(null)} className="text-gray-500 hover:text-black">✕</button>
-                </div>
-
-                <div className="space-y-3 text-sm">
-                  {selectedElement.type === 'node' && (
-                    <>
-                      <div>
-                        <span className="font-semibold block text-gray-600">Resumen (Zoom Semántico)</span>
-                        <p className="mt-1">{selectedElement.data.summary}</p>
-                      </div>
-                      <div className="grid grid-cols-2 gap-2">
-                        <div><span className="font-semibold text-gray-600">Comunidad:</span> {selectedElement.data.community}</div>
-                        <div><span className="font-semibold text-gray-600">Nivel:</span> {selectedElement.data.level}</div>
-                        <div><span className="font-semibold text-gray-600">Centralidad:</span> {selectedElement.data.centrality}</div>
-                      </div>
-                    </>
-                  )}
-
-                  {selectedElement.type === 'edge' && (
-                    <div>
-                      <span className="font-semibold block text-gray-600">Peso de Arista</span>
-                      <p className="mt-1">{selectedElement.data.weight}</p>
-                    </div>
-                  )}
-
-                  <div className="bg-gray-50 p-3 rounded border">
-                    <span className="font-semibold block text-gray-600 mb-2">Procedencia (Capa 4)</span>
-                    <div className="break-all space-y-1">
-                      <p><span className="text-gray-500">Origen:</span> {selectedElement.data.origen}</p>
-                      <p><span className="text-gray-500">Timestamp:</span> {selectedElement.data.timestamp}</p>
-                      <p>
-                        <span className="text-gray-500">Verificación:</span>
-                        <span className={`ml-2 px-2 py-0.5 rounded text-xs ${
-                          selectedElement.data.verificacion === 'Suficiente' ? 'bg-green-100 text-green-800' :
-                          selectedElement.data.verificacion === 'Pendiente' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-red-100 text-red-800'
-                        }`}>
-                          {selectedElement.data.verificacion}
-                        </span>
-                      </p>
+          viewMode === 'list' ? (
+            <div className="p-8 max-w-5xl mx-auto space-y-4">
+              <h2 className="text-lg font-semibold text-gray-700 mb-6">Lista Accesible de Nodos</h2>
+              {nodes.map(node => {
+                const data = node.data as unknown as GraphNodeData;
+                return (
+                  <div key={node.id} className="bg-white p-4 rounded shadow-sm border border-gray-200 flex flex-col gap-2">
+                    <p className="font-medium text-gray-800">{data.summary}</p>
+                    <div className="flex gap-4 text-sm text-gray-500">
+                      <span>Comunidad: {data.community}</span>
+                      <span>Nivel: {data.level}</span>
+                      <span>Centralidad: {data.centrality}</span>
+                      <span>Origen: {data.origen}</span>
+                      <span className={`px-2 py-0.5 rounded text-xs ${
+                        data.verificacion === 'Suficiente' ? 'bg-green-100 text-green-800' :
+                        data.verificacion === 'Pendiente' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-red-100 text-red-800'
+                      }`}>
+                        {data.verificacion}
+                      </span>
                     </div>
                   </div>
+                );
+              })}
+            </div>
+          ) : (
+            <ReactFlow
+              nodes={visibleNodes}
+              edges={visibleEdges}
+              onNodesChange={onNodesChange}
+              onEdgesChange={onEdgesChange}
+              onNodeClick={onNodeClick}
+              onEdgeClick={onEdgeClick}
+              onPaneClick={onPaneClick}
+              nodeTypes={nodeTypes}
+              fitView
+              minZoom={0.1}
+              maxZoom={2}
+              className="bg-gray-100 transition-all duration-700"
+            >
+              <Background color="#ccc" gap={16} />
+              <Controls />
 
-                  {layer3Active && selectedElement.data.isNew && (
-                    <div className="bg-yellow-50 text-yellow-800 p-2 rounded text-xs font-semibold border border-yellow-200">
-                      ✨ Elemento nuevo en la última ingesta
+              {/* Capa 4: Inspección */}
+              {selectedElement && (
+                <Panel position="top-right" className="bg-white p-4 rounded-lg shadow-xl border border-gray-200 w-80 max-h-[80vh] overflow-auto z-50">
+                  <div className="flex justify-between items-center mb-4 pb-2 border-b">
+                    <h3 className="font-bold text-gray-800">
+                      {selectedElement.type === 'node' ? 'Inspección de Comunidad' : 'Inspección de Relación'}
+                    </h3>
+                    <button onClick={() => setSelectedElement(null)} className="text-gray-500 hover:text-black">✕</button>
+                  </div>
+
+                  <div className="space-y-3 text-sm">
+                    {selectedElement.type === 'node' && (
+                      <>
+                        <div>
+                          <span className="font-semibold block text-gray-600">Resumen (Zoom Semántico)</span>
+                          <p className="mt-1">{selectedElement.data.summary}</p>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div><span className="font-semibold text-gray-600">Comunidad:</span> {selectedElement.data.community}</div>
+                          <div><span className="font-semibold text-gray-600">Nivel:</span> {selectedElement.data.level}</div>
+                          <div><span className="font-semibold text-gray-600">Centralidad:</span> {selectedElement.data.centrality}</div>
+                        </div>
+                      </>
+                    )}
+
+                    {selectedElement.type === 'edge' && (
+                      <div>
+                        <span className="font-semibold block text-gray-600">Peso de Arista</span>
+                        <p className="mt-1">{selectedElement.data.weight}</p>
+                      </div>
+                    )}
+
+                    <div className="bg-gray-50 p-3 rounded border">
+                      <span className="font-semibold block text-gray-600 mb-2">Procedencia (Capa 4)</span>
+                      <div className="break-all space-y-1">
+                        <p><span className="text-gray-500">Origen:</span> {selectedElement.data.origen}</p>
+                        <p><span className="text-gray-500">Timestamp:</span> {selectedElement.data.timestamp}</p>
+                        <p>
+                          <span className="text-gray-500">Verificación:</span>
+                          <span className={`ml-2 px-2 py-0.5 rounded text-xs ${
+                            selectedElement.data.verificacion === 'Suficiente' ? 'bg-green-100 text-green-800' :
+                            selectedElement.data.verificacion === 'Pendiente' ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-red-100 text-red-800'
+                          }`}>
+                            {selectedElement.data.verificacion}
+                          </span>
+                        </p>
+                      </div>
                     </div>
-                  )}
-                </div>
-              </Panel>
-            )}
-          </ReactFlow>
+                  </div>
+                </Panel>
+              )}
+            </ReactFlow>
+          )
         )}
       </div>
     </div>
