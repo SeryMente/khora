@@ -129,6 +129,7 @@ def test_acr_1_2_alcanzabilidad_reanclaje(neo4j_driver, neo4j_config):
 
 def test_acr_1_2_alcanzabilidad_excepcion_contrato():
     from unittest.mock import MagicMock
+
     # Prueba B: Contrato test con dobles. Inyecta orfandad para asegurar HuerfanosDetectadosError y rollback.
     # No simula contra la base real Neo4j, valida puramente la guardia del contrato.
     from khora_kernel.motor._memoria import (
@@ -182,7 +183,7 @@ def test_acr_1_2_alcanzabilidad_excepcion_contrato():
     import pytest
 
     with pytest.raises(HuerfanosDetectadosError) as exc_info:
-memoria.escribir_ingesta([triple], provenance, io_id='io-aislado')
+        memoria.escribir_ingesta([triple], provenance, io_id='io-aislado')
 
     assert exc_info.value.io_id == "io-aislado"
     assert "n_aislado" in exc_info.value.huerfanos
