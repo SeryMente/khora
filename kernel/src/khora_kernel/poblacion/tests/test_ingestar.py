@@ -62,7 +62,7 @@ class MockMemoria:
                 matiz_de=None
             )
 
-    def escribir_ingesta(self, triples: List[Triple], provenance: Provenance, io_id=None) -> int:
+    def escribir_ingesta(self, triples: List[Triple], provenance: Provenance, io_id=None, **kwargs) -> int:
         if not provenance:
             raise Exception("No se puede escribir sin provenance.")
 
@@ -259,6 +259,7 @@ def test_frecuencia():
 
     # User is extracted from autor. The canonical_key is typically "user".
 frecuencia(memoria, "user")
+
     # Ingesting twice mentions "User" twice from metadata.
     # assert freq >= 2 # Cambiado por nueva lógica NEW estricta
 
