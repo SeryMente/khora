@@ -59,7 +59,7 @@ def test_ingesta_valida():
     }
     # This may fail if Neo4j is not connected (returns 503) or if it fails processing (500)
     # The requirement says: "ingesta real -> counters"
-    response = client.post("/api/v1/ingesta", json=payload, headers=headers)
+response = client.post("/api/v1/ingesta", json=payload, headers=headers)
 
     # We should skip if DB is not available per standard practice or handle 503 as skip
     if response.status_code == 503:
