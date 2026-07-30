@@ -1,36 +1,52 @@
 @import "tailwindcss";
 
 :root {
-  /* Cora-OS Light Theme */
-  --cora-bg: #F4F2EF;
-  --cora-surface: #FFFFFF;
-  --cora-text: #1C1D1F;
-  --cora-silver: #B9BDC1;
-  --cora-accent: #8A9BA8;
+  /* Khora Dark Theme (Default) */
+  --khora-bg: #0A0A0B;
+  --khora-surface: #17181A;
+  --khora-ink: #C7CCD1;
+  --khora-accent: #8A9BA8;
+  --khora-absolute: #000000;
 }
 
-.dark {
-  /* Cora-OS Dark Theme */
-  --cora-bg: #0A0A0B;
-  --cora-surface: #17181A;
-  --cora-text: #C7CCD1;
-  --cora-silver: #C7CCD1;
-  --cora-accent: #8A9BA8;
+.khora-theme-dark {
+  --khora-bg: #0A0A0B;
+  --khora-surface: #17181A;
+  --khora-ink: #C7CCD1;
+  --khora-accent: #8A9BA8;
+  --khora-absolute: #000000;
+}
+
+.khora-theme-light {
+  --khora-bg: #F4F2EF;
+  --khora-surface: #FFFFFF;
+  --khora-ink: #1C1D1F;
+  --khora-border: #B9BDC1;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not(.khora-theme-dark):not(.khora-theme-light) {
+    --khora-bg: #F4F2EF;
+    --khora-surface: #FFFFFF;
+    --khora-ink: #1C1D1F;
+    --khora-border: #B9BDC1;
+  }
 }
 
 @theme inline {
-  --color-cora-bg: var(--cora-bg);
-  --color-cora-surface: var(--cora-surface);
-  --color-cora-text: var(--cora-text);
-  --color-cora-silver: var(--cora-silver);
-  --color-cora-accent: var(--cora-accent);
+  --color-khora-bg: var(--khora-bg);
+  --color-khora-surface: var(--khora-surface);
+  --color-khora-ink: var(--khora-ink);
+  --color-khora-accent: var(--khora-accent);
+  --color-khora-absolute: var(--khora-absolute);
+  --color-khora-border: var(--khora-border);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 body {
-  background: var(--cora-bg);
-  color: var(--cora-text);
+  background: var(--khora-bg);
+  color: var(--khora-ink);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
 
