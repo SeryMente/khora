@@ -25,6 +25,12 @@ export default function VolcadosPage() {
   const [error, setError] = useState<string | null>(null);
   const [aviso, setAviso] = useState<string | null>(null);
 
+  const [sel, setSel] = useState<Volcado | null>(null);
+  const [versiones, setVersiones] = useState<any[]>([]);
+  const [ingiriendo, setIngiriendo] = useState<{ [key: string]: boolean }>({});
+  const [ingestaRes, setIngestaRes] = useState<{ [key: string]: any }>({});
+
+
   const cargar = async () => {
     try {
       const res = await fetch("/api/volcado");
@@ -36,6 +42,22 @@ export default function VolcadosPage() {
       setItems(data.items ?? []);
     } catch (e: any) {
       setError(e?.message ?? String(e));
+    }
+  };
+
+
+  const elegir = async (v: Volcado) => {
+    setSel(v);
+    setVersiones([]);
+    setIngestaRes({});
+    try {
+      const res = await fetch("/api/versiones?id=" + v.id);
+      const data = await res.json();
+      if (res.ok) {
+        setVersiones(Array.isArray(data.versiones) ? data.versiones : []);
+      }
+    } catch (e) {
+      console.error(e);
     }
   };
 
@@ -70,6 +92,49 @@ export default function VolcadosPage() {
       setError(e?.message ?? String(e));
     } finally {
       setGuardando(false);
+    }
+  };
+
+
+  const ingerir = async (v: any) => {
+    if (!sel) return;
+    setIngiriendo((prev) => ({ ...prev, [v.version]: true }));
+    try {
+      const formData = new FormData();
+      formData.append("volcado_id", sel.id);
+      formData.append("version", String(v.version));
+      formData.append("sha256", v.sha256);
+
+      const res = await fetch("/api/ingesta", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+
+      let estadoCanonical = "fallo";
+      if (res.status === 201) estadoCanonical = "escritura nueva";
+      else if (res.status === 200) estadoCanonical = "terna repetida";
+      else if (res.status === 409) estadoCanonical = "conflicto";
+
+      setIngestaRes((prev) => ({
+        ...prev,
+        [v.version]: {
+          estado: estadoCanonical,
+          status: res.status,
+          data
+        }
+      }));
+    } catch (e: any) {
+      setIngestaRes((prev) => ({
+        ...prev,
+        [v.version]: {
+          estado: "fallo",
+          status: 500,
+          data: { error: e.message }
+        }
+      }));
+    } finally {
+      setIngiriendo((prev) => ({ ...prev, [v.version]: false }));
     }
   };
 
@@ -132,7 +197,7 @@ export default function VolcadosPage() {
               <tr><td className="p-3 text-gray-500" colSpan={6}>sin volcados todavia</td></tr>
             )}
             {items.map((v) => (
-              <tr key={v.id} className="border-t align-top">
+              <tr key={v.id} className={`border-t align-top cursor-pointer hover:bg-gray-100 ${sel?.id === v.id ? 'bg-gray-100' : ''}`} onClick={() => elegir(v)}>
                 <td className="p-2 whitespace-nowrap">{new Date(v.recibido_en).toLocaleString()}</td>
                 <td className="p-2">{v.titulo ?? "—"}</td>
                 <td className="p-2">{v.chars}</td>
@@ -144,6 +209,60 @@ export default function VolcadosPage() {
           </tbody>
         </table>
       </div>
+
+      {sel && (
+        <div className="mt-8 border rounded-md p-4 bg-gray-50">
+          <h2 className="text-lg font-semibold mb-2">Detalle del Volcado: {sel.id}</h2>
+          <div className="mb-4 text-sm">
+            <strong>Texto original:</strong>
+            <pre className="mt-1 p-2 bg-white border rounded text-xs whitespace-pre-wrap">{sel.texto}</pre>
+          </div>
+
+          <h3 className="text-md font-semibold mb-2">Versiones</h3>
+          {versiones.length === 0 ? (
+            <p className="text-sm text-gray-500">No hay versiones disponibles.</p>
+          ) : (
+            <div className="space-y-4">
+              {versiones.map((v) => {
+                const res = ingestaRes[v.version];
+                return (
+                  <div key={v.version} className="border rounded p-3 bg-white">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="font-semibold">Versión {v.version}</span>
+                      <span className="text-xs font-mono text-gray-500">sha256: {v.sha256}</span>
+                    </div>
+                    <pre className="text-xs bg-gray-50 p-2 rounded mb-2 whitespace-pre-wrap">{v.texto}</pre>
+
+                    <button
+                      onClick={() => ingerir(v)}
+                      disabled={ingiriendo[v.version]}
+                      className="bg-blue-600 text-white px-3 py-1 text-sm rounded disabled:opacity-50"
+                    >
+                      {ingiriendo[v.version] ? "Ingiriendo..." : "Ingerir esta versión"}
+                    </button>
+
+                    {res && (
+                      <div className={`mt-2 p-2 text-sm rounded ${res.status === 201 || res.status === 200 ? 'bg-green-50 text-green-800' : res.status === 409 ? 'bg-yellow-50 text-yellow-800' : 'bg-red-50 text-red-800'}`}>
+                        <strong>Resultado:</strong> {res.estado} <br/>
+                        {res.data.error && <span>{res.data.error}</span>}
+                        {res.data.detail && <span>{res.data.detail}</span>}
+                        {res.data.io_id && <span>io_id: {res.data.io_id}</span>}
+
+                        <div className="mt-1 text-xs opacity-75">
+                          CTR-PROP-01: REQUIERE BACKEND <br/>
+                          CTR-DELTA-01: REQUIERE BACKEND
+                        </div>
+                        {/* Hidden states: Revisión, Ratificación, Delta */}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
     </div>
   );
 }
