@@ -51,7 +51,7 @@ function Run-Main {
                 if ($script:LOG_WIN_PID) { Stop-Process -Id $script:LOG_WIN_PID -Force -ErrorAction SilentlyContinue }
                 Start-Process powershell -ArgumentList "-NoProfile","-ExecutionPolicy","Bypass","-File","`"$SCRIPT_PATH`""
                 Start-Sleep -Seconds 3
-                exit
+                return
             } catch { Warn "No pude auto-guardar el script pegado: $_" }
         } else {
             Warn "Modo copy-paste: el portapapeles ya no contiene esta version del script; no puedo auto-guardarlo."
@@ -200,7 +200,7 @@ Write-Host ""
 
                     L "INFO" "Estado de traspaso escrito. Saliendo limpiamente con codigo 42..."
                     $script:SES_ACTIVE = $false
-                    [Environment]::Exit(42)
+                    throw "KHORA_HANDOFF_READY"
                 } catch {
                     L "WARN" "Error procesando solicitud de traspaso: $_"
                 }
