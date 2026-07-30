@@ -198,24 +198,27 @@ export function CapturarModal({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+        className="fixed inset-0 z-50 flex items-center justify-center p-4"
+        style={{ backgroundColor: "var(--khora-absolute)" }}
         onClick={onClose}
       >
         <motion.div
-          initial={{ scale: 0.95, y: 20 }}
-          animate={{ scale: 1, y: 0 }}
-          exit={{ scale: 0.95, y: 20 }}
+          initial={{ y: 20 }}
+          animate={{ y: 0 }}
+          exit={{ y: 20 }}
           onClick={(e) => e.stopPropagation()}
-          className="w-full max-w-lg bg-[#0B1F3B] border border-[#1F3C6A] rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+          className="w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+          style={{ backgroundColor: "var(--khora-surface)", border: "1px solid var(--khora-border)" }}
         >
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-[#1F3C6A]">
-            <h2 className="text-white font-semibold flex items-center gap-2">
+          <div className="flex items-center justify-between p-4 border-b" style={{ borderColor: "var(--khora-border)" }}>
+            <h2 className="font-semibold flex items-center gap-2" style={{ color: "var(--khora-ink)" }}>
               Capturar en Bitácora
             </h2>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-white p-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
+              className="p-2 rounded-lg transition-colors cursor-pointer"
+              style={{ color: "var(--khora-accent)" }}
             >
               <X className="w-5 h-5" />
             </button>
@@ -231,7 +234,12 @@ export function CapturarModal({
                   if (!dictando) setTexto(e.target.value);
                 }}
                 placeholder="Escribe o dicta tu entrada aquí..."
-                className="w-full h-40 bg-[#112A4F] border border-[#1F3C6A] rounded-xl p-4 text-white placeholder-gray-500 focus:outline-none focus:border-[#3FA7FF] resize-none transition-colors"
+                className="w-full h-40 rounded-xl p-4 focus:outline-none resize-none transition-colors"
+                style={{
+                  backgroundColor: "var(--khora-bg)",
+                  color: "var(--khora-ink)",
+                  border: "1px solid var(--khora-border)"
+                }}
                 disabled={guardando}
               />
 
@@ -240,11 +248,12 @@ export function CapturarModal({
                   type="button"
                   onClick={toggleDictado}
                   disabled={!speechSupported || guardando}
-                  className={`p-3 rounded-xl transition-all cursor-pointer ${
-                    dictando
-                      ? "bg-red-500/20 text-red-400 border border-red-500/30"
-                      : "bg-[#0B1F3B] text-gray-400 border border-[#1F3C6A] hover:text-[#3FA7FF] hover:border-[#3FA7FF]/50"
-                  }`}
+                  className={`p-3 rounded-xl transition-all cursor-pointer`}
+                  style={{
+                    backgroundColor: dictando ? "var(--khora-bg)" : "var(--khora-surface)",
+                    color: dictando ? "var(--khora-ink)" : "var(--khora-accent)",
+                    border: "1px solid var(--khora-border)"
+                  }}
                   title={
                     !speechSupported
                       ? "Dictado no soportado en este navegador"
@@ -265,11 +274,12 @@ export function CapturarModal({
                   disabled={
                     (!texto.trim() && !interimText.trim()) || guardando
                   }
-                  className={`px-4 py-3 rounded-xl flex items-center gap-2 font-medium transition-all cursor-pointer ${
-                    (!texto.trim() && !interimText.trim()) || guardando
-                      ? "bg-[#112A4F] text-gray-500 border border-[#1F3C6A]"
-                      : "bg-[#3FA7FF] text-white border border-[#3FA7FF] shadow-[0_0_15px_rgba(63,167,255,0.4)] hover:bg-[#3FA7FF]/90"
-                  }`}
+                  className={`px-4 py-3 rounded-xl flex items-center gap-2 font-medium transition-all cursor-pointer`}
+                  style={{
+                    backgroundColor: (!texto.trim() && !interimText.trim()) || guardando ? "var(--khora-bg)" : "var(--khora-ink)",
+                    color: (!texto.trim() && !interimText.trim()) || guardando ? "var(--khora-accent)" : "var(--khora-surface)",
+                    border: "1px solid var(--khora-border)"
+                  }}
                 >
                   <Send className="w-4 h-4" />
                   <span>{guardando ? "Guardando..." : "Guardar"}</span>
@@ -284,10 +294,14 @@ export function CapturarModal({
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="flex items-center gap-3 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2"
+                  className="flex items-center gap-3 rounded-xl px-4 py-2"
+                  style={{
+                    backgroundColor: "var(--khora-bg)",
+                    border: "1px solid var(--khora-border)"
+                  }}
                 >
-                  <div className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
-                  <span className="text-xs font-mono text-red-400">
+                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: "var(--khora-ink)" }} />
+                  <span className="text-xs font-mono" style={{ color: "var(--khora-ink)" }}>
                     Escuchando...{" "}
                     {Math.floor(segundosGrabados / 60)}:
                     {(segundosGrabados % 60).toString().padStart(2, "0")}
