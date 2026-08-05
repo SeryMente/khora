@@ -19,15 +19,21 @@ export default function DictadoPage() {
   const [resultado, setResultado] = useState("");
   const [soportado, setSoportado] = useState(true);
   const [conAudio, setConAudio] = useState(false);
+  const [escuchando, setEscuchando] = useState(false);
+  const [reconexiones, setReconexiones] = useState(0);
   const recRef = useRef<any>(null);
   const grabRef = useRef<any>(null);
+  const flujoRef = useRef<any>(null);
   const trozosRef = useRef<Blob[]>([]);
   const pendienteRef = useRef("");
   const bloquesRef = useRef<string[]>([]);
   const relojRef = useRef<any>(null);
+  const rearmeRef = useRef<any>(null);
   const activoRef = useRef(false);
   const inicioRef = useRef(0);
   const duracionRef = useRef(0);
+  const abortosRef = useRef(0);
+  const audioPermitidoRef = useRef(true);
 
   useEffect(() => {
     const w = window as any;
@@ -64,28 +70,37 @@ export default function DictadoPage() {
     if (bloque.length > 0) void pulirBloque(bloque);
   }, [pulirBloque]);
 
-  const iniciar = useCallback(async () => {
-    setError("");
-    setAviso("");
-    setResultado("");
-    const w = window as any;
-    const SR = w.SpeechRecognition || w.webkitSpeechRecognition;
-    if (!SR) { setError("Este navegador no soporta dictado en vivo. Usa Chrome o Edge."); return; }
+  const detenerGrabacion = useCallback(() => {
+    try { grabRef.current?.stop(); } catch (e) {}
+    grabRef.current = null;
+    try { flujoRef.current?.getTracks?.().forEach((pista: any) => pista.stop()); } catch (e) {}
+    flujoRef.current = null;
+  }, []);
+
+  const arrancarGrabacion = useCallback(async () => {
+    if (!audioPermitidoRef.current || !activoRef.current || grabRef.current) return;
     try {
       const flujo = await navigator.mediaDevices.getUserMedia({ audio: true });
+      if (!activoRef.current || !audioPermitidoRef.current) { try { flujo.getTracks().forEach((pista: any) => pista.stop()); } catch (e) {} return; }
+      flujoRef.current = flujo;
       const grabadora = new MediaRecorder(flujo);
-      trozosRef.current = [];
       grabadora.ondataavailable = (ev: any) => { if (ev.data && ev.data.size > 0) { trozosRef.current.push(ev.data); setConAudio(true); } };
       grabadora.start(1000);
       grabRef.current = grabadora;
-      inicioRef.current = Date.now();
     } catch (e) {
       setAviso("dictado sin grabacion de voz: " + String(e));
     }
+  }, []);
+
+  const arrancarReconocedor = useCallback(() => {
+    const w = window as any;
+    const SR = w.SpeechRecognition || w.webkitSpeechRecognition;
+    if (!SR) { setError("Este navegador no soporta dictado en vivo. Usa Chrome o Edge."); return false; }
     const rec = new SR();
     rec.lang = "es-MX";
     rec.continuous = true;
     rec.interimResults = true;
+    rec.onstart = () => { setEscuchando(true); abortosRef.current = 0; };
     rec.onresult = (ev: any) => {
       let interino = "";
       for (let i = ev.resultIndex; i < ev.results.length; i++) {
@@ -102,25 +117,98 @@ export default function DictadoPage() {
       }
       setParcial(interino.trim());
     };
-    rec.onerror = (ev: any) => { if (ev?.error && ev.error !== "no-speech") setError("reconocimiento: " + ev.error); };
-    rec.onend = () => { if (activoRef.current) { try { rec.start(); } catch (e) {} } };
+    rec.onerror = (ev: any) => {
+      const clase = String(ev?.error ?? "");
+      if (clase === "not-allowed" || clase === "service-not-allowed") {
+        activoRef.current = false;
+        setEscuchando(false);
+        setEstado("inactivo");
+        setError("permiso de microfono denegado para el reconocimiento de voz");
+        return;
+      }
+      if (clase === "aborted" || clase === "audio-capture") {
+        abortosRef.current = abortosRef.current + 1;
+        if (grabRef.current || flujoRef.current) {
+          audioPermitidoRef.current = false;
+          detenerGrabacion();
+          setConAudio(false);
+          setAviso("grabacion de audio desactivada: el microfono queda solo para el reconocimiento");
+          return;
+        }
+        if (abortosRef.current >= 6) {
+          activoRef.current = false;
+          setEscuchando(false);
+          setEstado("inactivo");
+          setError("reconocimiento: " + clase + " persistente tras " + abortosRef.current + " intentos");
+        }
+        return;
+      }
+      if (clase.length > 0 && clase !== "no-speech") setAviso("reconocimiento: " + clase);
+    };
+    rec.onend = () => {
+      setEscuchando(false);
+      setParcial("");
+      if (!activoRef.current) return;
+      if (rearmeRef.current) clearTimeout(rearmeRef.current);
+      rearmeRef.current = setTimeout(() => {
+        if (!activoRef.current) return;
+        setReconexiones((n) => n + 1);
+        try {
+          rec.start();
+        } catch (e) {
+          try { rec.abort(); } catch (e2) {}
+          rearmeRef.current = setTimeout(() => {
+            if (!activoRef.current) return;
+            try { rec.start(); } catch (e3) { activoRef.current = false; setEstado("inactivo"); setError("reconocimiento no reanudable: " + String(e3)); }
+          }, 700);
+        }
+      }, 350);
+    };
     recRef.current = rec;
+    try { rec.start(); } catch (e) { setError("no se pudo iniciar el reconocimiento: " + String(e)); return false; }
+    return true;
+  }, [cerrarBloque, detenerGrabacion]);
+
+  const iniciar = useCallback(async () => {
+    setError("");
+    setAviso("");
+    setResultado("");
+    setReconexiones(0);
+    abortosRef.current = 0;
+    audioPermitidoRef.current = true;
+    trozosRef.current = [];
     activoRef.current = true;
-    rec.start();
+    const arrancado = arrancarReconocedor();
+    if (!arrancado) { activoRef.current = false; return; }
+    inicioRef.current = Date.now();
     setEstado("dictando");
-  }, [cerrarBloque]);
+    setTimeout(() => { void arrancarGrabacion(); }, 900);
+  }, [arrancarReconocedor, arrancarGrabacion]);
 
   const detener = useCallback(() => {
     activoRef.current = false;
+    if (rearmeRef.current) clearTimeout(rearmeRef.current);
     try { recRef.current?.stop(); } catch (e) {}
     recRef.current = null;
-    try { grabRef.current?.stop(); } catch (e) {}
+    detenerGrabacion();
     if (inicioRef.current > 0) duracionRef.current = Math.round((Date.now() - inicioRef.current) / 1000);
     if (relojRef.current) clearTimeout(relojRef.current);
     setParcial("");
+    setEscuchando(false);
     cerrarBloque();
     setEstado("inactivo");
-  }, [cerrarBloque]);
+  }, [cerrarBloque, detenerGrabacion]);
+
+  useEffect(() => {
+    return () => {
+      activoRef.current = false;
+      if (relojRef.current) clearTimeout(relojRef.current);
+      if (rearmeRef.current) clearTimeout(rearmeRef.current);
+      try { recRef.current?.abort?.(); } catch (e) {}
+      try { grabRef.current?.stop(); } catch (e) {}
+      try { flujoRef.current?.getTracks?.().forEach((pista: any) => pista.stop()); } catch (e) {}
+    };
+  }, []);
 
   const guardar = useCallback(async () => {
     setError("");
@@ -151,7 +239,7 @@ export default function DictadoPage() {
     }
   }, [titulo, pulidosOk]);
 
-  const limpiar = useCallback(() => { bloquesRef.current = []; setBloques([]); pendienteRef.current = ""; setPendiente(""); setParcial(""); trozosRef.current = []; duracionRef.current = 0; setConAudio(false); setPulidosOk(0); setPulidosNo(0); setResultado(""); setError(""); setAviso(""); }, []);
+  const limpiar = useCallback(() => { bloquesRef.current = []; setBloques([]); pendienteRef.current = ""; setPendiente(""); setParcial(""); trozosRef.current = []; duracionRef.current = 0; setConAudio(false); setPulidosOk(0); setPulidosNo(0); setResultado(""); setError(""); setAviso(""); setReconexiones(0); }, []);
 
   const totalChars = [...bloques, pendiente].filter((s) => s.trim().length > 0).join("\n\n").length;
 
@@ -160,7 +248,7 @@ export default function DictadoPage() {
       <h1>Dictado</h1>
       {!soportado && <p style={{ color: "#b00" }}>Este navegador no soporta dictado en vivo. Usa Chrome o Edge.</p>}
       <input value={titulo} onChange={(e) => setTitulo(e.target.value)} placeholder="titulo opcional" style={{ width: "100%", padding: 8, marginBottom: 12 }} />
-      <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+      <div style={{ display: "flex", gap: 8, marginBottom: 12, alignItems: "center" }}>
         {estado === "inactivo" ? (
           <button onClick={iniciar} disabled={!soportado}>Iniciar dictado</button>
         ) : (
@@ -168,13 +256,14 @@ export default function DictadoPage() {
         )}
         <button onClick={guardar} disabled={guardando || estado === "dictando"}>{guardando ? "archivando..." : "Archivar volcado"}</button>
         <button onClick={limpiar} disabled={estado === "dictando"}>Limpiar</button>
+        {estado === "dictando" && <span style={{ fontSize: 12, opacity: 0.8 }}>{escuchando ? "escuchando" : "reconectando..."}</span>}
       </div>
       <div style={{ border: "1px solid #ccc", borderRadius: 6, padding: 12, minHeight: 240, whiteSpace: "pre-wrap", lineHeight: 1.6 }}>
         {bloques.map((b, i) => (<p key={i} style={{ margin: "0 0 12px" }}>{b}</p>))}
         {pendiente.length > 0 && <p style={{ margin: "0 0 12px", opacity: 0.85 }}>{pendiente}</p>}
         {parcial.length > 0 && <span style={{ opacity: 0.5 }}>{parcial}</span>}
       </div>
-      <p style={{ fontSize: 12, opacity: 0.75 }}>estado: {estado} / caracteres: {totalChars} / bloques pulidos: {pulidosOk} / bloques sin pulir: {pulidosNo} / audio: {conAudio ? "si" : "no"}</p>
+      <p style={{ fontSize: 12, opacity: 0.75 }}>estado: {estado} / escuchando: {escuchando ? "si" : "no"} / caracteres: {totalChars} / bloques pulidos: {pulidosOk} / bloques sin pulir: {pulidosNo} / audio: {conAudio ? "si" : "no"} / reconexiones: {reconexiones}</p>
       {aviso.length > 0 && <p style={{ color: "#a60" }}>{aviso}</p>}
       {error.length > 0 && <p style={{ color: "#b00" }}>{error}</p>}
       {resultado.length > 0 && <p style={{ color: "#070" }}>{resultado}</p>}
