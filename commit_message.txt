@@ -1,0 +1,9 @@
+feat(web): implementar ingesta directa de versión en volcados
+
+Implementa la vista de detalle en la página de Volcados para listar las versiones
+de un volcado seleccionado y permitir su ingesta directa al pipeline.
+- Envía explícitamente `volcado_id`, `version` y `sha256` a `api/ingesta`.
+- Muestra el estado canónico devuelto por el backend (escritura nueva, terna
+  repetida, conflicto, fallo).
+- Nunca asume o infiere estados ocultos, indicando expresamente
+  REQUIERE BACKEND para CTR-PROP-01 y CTR-DELTA-01.

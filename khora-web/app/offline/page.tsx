@@ -1,3 +1,4 @@
+// @l0 L0-002-R · @req PWA-03,PWA-04,IF-SW-01
 export const metadata = {
 	title: "Sin conexión · Khora",
 };

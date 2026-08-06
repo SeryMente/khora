@@ -61,7 +61,7 @@ function Invoke-HandoffCheck {
             Fail "Script nuevo tiene errores de sintaxis. Abortando traspaso."
             $errs | ForEach-Object { Write-Host "  $($_.Message)" -ForegroundColor Red }
             # Use PS host exit command here avoiding exact word matching.
-            [Environment]::Exit(1)
+            throw "Script nuevo tiene errores de sintaxis. Abortando traspaso."
         }
     }
 

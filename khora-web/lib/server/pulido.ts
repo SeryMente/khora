@@ -52,6 +52,7 @@ export async function pulir(crudo: string): Promise<ResultadoPulido> {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: "Bearer " + clave },
     body: JSON.stringify(cuerpo),
+    signal: AbortSignal.timeout(25000),
   });
   if (!r.ok) {
     const t = await r.text();

@@ -13,5 +13,7 @@ $__khoraModules = @(
     "90-legacy.ps1"
 )
 foreach ($__khm in $__khoraModules) {
+    Write-Output "[BARRIL] Cargando modulo: $__khm"
     . (Join-Path (Join-Path $script:GATE_DIR "modules") $__khm)
 }
+Write-Output "[BARRIL] Modulos cargados. ROOT_DIR: $ROOT_DIR, WORK_DIR: $WORK_DIR, REPO_DIR: $REPO_DIR"

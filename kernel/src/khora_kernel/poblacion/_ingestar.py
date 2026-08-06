@@ -89,7 +89,7 @@ def ingestar(
     # Si hay 0 repetidas, puede que estemos ingiriendo en un grafo vacío y resolver hizo "NEW" a todo con needs_review=True.
 
 # 4. Escribir vía memoria SOLO con MERGE o FUSIÓN
-terna = objeto.metadata if hasattr(objeto, 'metadata') and objeto.metadata and 'volcado_id' in objeto.metadata else None
+    terna = objeto.metadata if hasattr(objeto, 'metadata') and objeto.metadata and 'volcado_id' in objeto.metadata else None
     if hasattr(memoria, 'fusionar_ingesta'):
         triples_escritos = memoria.fusionar_ingesta(triples_resueltos, objeto.provenance, io_id=objeto.id, terna_volcado=terna)
     else:
@@ -116,8 +116,8 @@ terna = objeto.metadata if hasattr(objeto, 'metadata') and objeto.metadata and '
     )
 
 
-def frecuencia(memoria: Any, canonical_key: str) -> int:
-    return memoria.frecuencia(canonical_key)
+    def frecuencia(memoria: Any, canonical_key: str) -> int:
+        return memoria.frecuencia(canonical_key)
 
 
 def linea_temporal(memoria: Any, desde: str, hasta: str) -> List[Any]:
