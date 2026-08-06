@@ -1,0 +1,10 @@
+STATUS: PASS
+TASK_ID: J-22
+BASE_COMMIT: $(git rev-parse HEAD~1)
+COMMIT: $(git rev-parse HEAD)
+ARCHIVOS_MODIFICADOS: khora-web/e2e/shell-v2.spec.ts, khora-web/e2e/bitacora-dictado.spec.ts, khora-web/e2e/cora-ingesta.spec.ts, khora-web/tests/regression/smoke.spec.ts
+EXPECTATIVAS_RETIRADAS: ATHANOR, /bitacora, /cabina, /nucleo, /prisma
+PRUEBAS_EJECUTADAS: npx playwright test e2e/shell-v2.spec.ts e2e/bitacora-dictado.spec.ts e2e/cora-ingesta.spec.ts tests/regression/smoke.spec.ts
+RESULTADOS: All tests passed or correctly fell back to visible errors for unavailable services (Grafo PKG).
+RUTA_SISTEMA_EDITAR_PRESERVADA: true
+BLOQUEO: ninguno
