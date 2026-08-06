@@ -82,7 +82,7 @@ export default function ConsultaPage() {
       </form>
 
       {error && (
-        <div className="p-4 mb-6 bg-red-50 border border-red-200 rounded-lg text-red-700 flex flex-col">
+        <div className="p-4 mb-6 bg-gray-50 border border-gray-200 rounded-lg text-gray-700 flex flex-col">
           <span className="font-semibold mb-1">Error al consultar</span>
           <span>{error}</span>
         </div>
@@ -90,55 +90,63 @@ export default function ConsultaPage() {
 
       {resultado && (
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden">
-          {/* Header con badges */}
-          <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex flex-wrap gap-3 items-center bg-gray-50 dark:bg-gray-900/50">
-            {resultado.suficiencia ? (
-              <span className="px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-full border border-green-200 flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-green-500"></span>
-                Suficiencia Confirmada
+          {typeof resultado.suficiencia !== "boolean" && (
+            <div className="p-6 text-center text-gray-500">
+              Contrato incompleto
+            </div>
+          )}
+          {typeof resultado.suficiencia === "boolean" && (
+            <>
+              {/* Header con badges */}
+              <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex flex-wrap gap-3 items-center bg-gray-50 dark:bg-gray-900/50">
+                {resultado.suficiencia ? (
+              <span className="px-3 py-1 bg-gray-100 text-gray-800 text-sm font-medium rounded-full border border-gray-200 flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-gray-500"></span>
+                Con evidencia suficiente
               </span>
             ) : (
-              <span className="px-3 py-1 bg-amber-100 text-amber-800 text-sm font-medium rounded-full border border-amber-200 flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-amber-500"></span>
-                Suficiencia Parcial / Dudosa
+              <span className="px-3 py-1 bg-gray-100 text-gray-800 text-sm font-medium rounded-full border border-gray-200 flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-gray-500"></span>
+                Sin evidencia suficiente
               </span>
             )}
 
             {resultado.no_anclada && (
-              <span className="px-3 py-1 bg-red-100 text-red-800 text-sm font-bold rounded-full border border-red-200 flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-                NO-ANCLADA
+              <span className="px-3 py-1 bg-gray-100 text-gray-800 text-sm font-bold rounded-full border border-gray-200 flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-gray-500 "></span>
+                Sin anclaje
               </span>
             )}
           </div>
 
           {/* Respuesta principal */}
-          <div className="p-6">
-            <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wide">Respuesta</h3>
-            <div className="prose dark:prose-invert max-w-none text-gray-900 dark:text-gray-100">
-              <p className="whitespace-pre-wrap">{resultado.respuesta}</p>
+          {resultado.respuesta !== null && (
+            <div className="p-6">
+              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wide">Respuesta</h3>
+              <div className="prose dark:prose-invert max-w-none text-gray-900 dark:text-gray-100">
+                <p className="whitespace-pre-wrap">{resultado.respuesta}</p>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Degradación declarada */}
           {resultado.degradacion_declarada && (
-            <div className="mx-6 mb-6 p-4 bg-orange-50 dark:bg-orange-900/20 border-l-4 border-orange-500 rounded-r-lg">
-              <h4 className="text-sm font-bold text-orange-800 dark:text-orange-300 mb-1">Aviso de Degradación</h4>
-              <p className="text-orange-700 dark:text-orange-400 text-sm">{resultado.degradacion_declarada}</p>
+            <div className="mx-6 mb-6 p-4 bg-gray-50 dark:bg-gray-900/20 border-l-4 border-gray-500 rounded-r-lg">
+              <h4 className="text-sm font-bold text-gray-800 dark:text-gray-300 mb-1">Aviso de Degradación</h4>
+              <p className="text-gray-700 dark:text-gray-400 text-sm">{resultado.degradacion_declarada}</p>
             </div>
           )}
 
           {/* Panel de Evidencia */}
-          {resultado.evidencia && resultado.evidencia.length > 0 && (
-            <div className="border-t border-gray-200 dark:border-gray-700">
+          <div className="border-t border-gray-200 dark:border-gray-700">
               <button
                 onClick={() => setEvidenciaAbierta(!evidenciaAbierta)}
                 className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors focus:outline-none"
               >
                 <div className="flex items-center gap-2">
-                  <span className="font-semibold text-gray-700 dark:text-gray-300">Evidencia del Razonamiento</span>
+                  <span className="font-semibold text-gray-700 dark:text-gray-300">Fuentes</span>
                   <span className="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-xs py-0.5 px-2 rounded-full">
-                    {resultado.evidencia.length}
+                    {resultado.evidencia ? resultado.evidencia.length : 0}
                   </span>
                 </div>
                 {evidenciaAbierta ? (
@@ -150,10 +158,13 @@ export default function ConsultaPage() {
 
               {evidenciaAbierta && (
                 <div className="px-6 pb-6 pt-2 bg-gray-50 dark:bg-gray-800/50">
-                  <div className="space-y-4">
-                    {resultado.evidencia.map((ev, index) => (
+                  {(!resultado.evidencia || resultado.evidencia.length === 0) ? (
+                    <div className="text-gray-500 text-sm">No se encontraron fuentes</div>
+                  ) : (
+                    <div className="space-y-4">
+                      {resultado.evidencia.map((ev, index) => (
                       <div key={index} className="bg-white dark:bg-gray-900 p-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
-                        <div className="font-mono text-sm mb-2 text-indigo-700 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 p-2 rounded break-all">
+                        <div className="font-mono text-sm mb-2 text-gray-700 dark:text-gray-400 bg-gray-50 dark:bg-gray-900/30 p-2 rounded break-all">
                           {ev.tripleta}
                         </div>
                         <div className="flex flex-col sm:flex-row gap-2 sm:gap-6 text-xs text-gray-500 dark:text-gray-400 mt-3">
@@ -169,9 +180,11 @@ export default function ConsultaPage() {
                       </div>
                     ))}
                   </div>
+                  )}
                 </div>
               )}
             </div>
+            </>
           )}
         </div>
       )}
