@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { UpdatePrompt } from "./components/UpdatePrompt";
-import { GlobalFooter } from "./components/GlobalFooter";
 import { TelemetryProvider } from "./components/TelemetryProvider";
 import KhoraSplash from "./components/os/KhoraSplash";
 import KhoraShell from "./components/os/KhoraShell";
@@ -68,7 +67,6 @@ export default function RootLayout({
                     <UpdatePrompt />
                     <KhoraSplash />
                     <KhoraShell>{children}</KhoraShell>
-                    <GlobalFooter />
                 </TelemetryProvider>
             </body>
         </html>
