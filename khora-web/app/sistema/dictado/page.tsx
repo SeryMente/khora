@@ -1,7 +1,8 @@
-// @l0 L0-002 · @req CORA-02/REQ-1 · @acr ACR-1.2
+// @l0 L0-002-R · @req CORA-02/REQ-1 · @acr ACR-1.2
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import * as Icons from "lucide-react";
 
 type Estado = "inactivo" | "dictando";
 
@@ -244,29 +245,151 @@ export default function DictadoPage() {
   const totalChars = [...bloques, pendiente].filter((s) => s.trim().length > 0).join("\n\n").length;
 
   return (
-    <main style={{ maxWidth: 900, margin: "0 auto", padding: 24 }}>
-      <h1>Dictado</h1>
-      {!soportado && <p style={{ color: "#b00" }}>Este navegador no soporta dictado en vivo. Usa Chrome o Edge.</p>}
-      <input value={titulo} onChange={(e) => setTitulo(e.target.value)} placeholder="titulo opcional" style={{ width: "100%", padding: 8, marginBottom: 12 }} />
-      <div style={{ display: "flex", gap: 8, marginBottom: 12, alignItems: "center" }}>
-        {estado === "inactivo" ? (
-          <button onClick={iniciar} disabled={!soportado}>Iniciar dictado</button>
-        ) : (
-          <button onClick={detener}>Detener</button>
-        )}
-        <button onClick={guardar} disabled={guardando || estado === "dictando"}>{guardando ? "archivando..." : "Archivar volcado"}</button>
-        <button onClick={limpiar} disabled={estado === "dictando"}>Limpiar</button>
-        {estado === "dictando" && <span style={{ fontSize: 12, opacity: 0.8 }}>{escuchando ? "escuchando" : "reconectando..."}</span>}
+    <main
+      className="max-w-4xl mx-auto p-6 space-y-6"
+      style={{
+        backgroundColor: "var(--khora-bg)",
+        color: "var(--khora-ink)",
+        paddingBottom: "6rem",
+      }}
+    >
+      {/* Cabecera de Sección */}
+      <div className="border-b pb-4" style={{ borderColor: "var(--khora-border)" }}>
+        <h1 className="text-2xl font-bold flex items-center gap-2">
+          <Icons.Mic size={32} strokeWidth={1.75} style={{ color: "var(--khora-accent)" }} />
+          Dictado
+        </h1>
+        <p className="text-sm mt-1" style={{ color: "var(--khora-accent)" }}>
+          El texto se archiva integro con su hash antes de tocar el pipeline. Guardar nunca depende de que la ingesta funcione.
+        </p>
       </div>
-      <div style={{ border: "1px solid #ccc", borderRadius: 6, padding: 12, minHeight: 240, whiteSpace: "pre-wrap", lineHeight: 1.6 }}>
-        {bloques.map((b, i) => (<p key={i} style={{ margin: "0 0 12px" }}>{b}</p>))}
-        {pendiente.length > 0 && <p style={{ margin: "0 0 12px", opacity: 0.85 }}>{pendiente}</p>}
-        {parcial.length > 0 && <span style={{ opacity: 0.5 }}>{parcial}</span>}
+
+      {!soportado && (
+        <div className="p-3 border rounded-none text-sm flex items-center gap-2" style={{ borderColor: "var(--khora-border)", backgroundColor: "var(--khora-surface)", color: "var(--khora-accent)" }}>
+          <Icons.TriangleAlert size={32} strokeWidth={1.75} className="shrink-0" />
+          <span>Este navegador no soporta dictado en vivo. Usa Chrome o Edge.</span>
+        </div>
+      )}
+
+      {/* Inputs y Controles */}
+      <div className="space-y-4">
+        <input
+          value={titulo}
+          onChange={(e) => setTitulo(e.target.value)}
+          placeholder="titulo opcional"
+          className="w-full p-2.5 border rounded-none text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)] focus-visible:border-[var(--khora-accent)]"
+          style={{
+            backgroundColor: "var(--khora-surface)",
+            color: "var(--khora-ink)",
+            borderColor: "var(--khora-border)",
+          }}
+        />
+
+        <div className="flex flex-wrap items-center gap-3">
+          {estado === "inactivo" ? (
+            <button
+              onClick={iniciar}
+              disabled={!soportado}
+              className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
+              style={{
+                backgroundColor: "var(--khora-accent)",
+                color: "var(--khora-bg)",
+                borderColor: "var(--khora-accent)",
+              }}
+            >
+              <Icons.Mic size={32} strokeWidth={1.75} />
+              Iniciar dictado
+            </button>
+          ) : (
+            <button
+              onClick={detener}
+              className="px-4 py-2 border rounded-none cursor-pointer flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
+              style={{
+                backgroundColor: "var(--khora-surface)",
+                color: "var(--khora-ink)",
+                borderColor: "var(--khora-border)",
+              }}
+            >
+              <Icons.Pause size={32} strokeWidth={1.75} />
+              Detener
+            </button>
+          )}
+
+          <button
+            onClick={guardar}
+            disabled={guardando || estado === "dictando"}
+            className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
+            style={{
+              backgroundColor: "var(--khora-surface)",
+              color: "var(--khora-ink)",
+              borderColor: "var(--khora-border)",
+            }}
+          >
+            <Icons.Check size={32} strokeWidth={1.75} />
+            {guardando ? "archivando..." : "Archivar volcado"}
+          </button>
+
+          <button
+            onClick={limpiar}
+            disabled={estado === "dictando"}
+            className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
+            style={{
+              backgroundColor: "var(--khora-surface)",
+              color: "var(--khora-ink)",
+              borderColor: "var(--khora-border)",
+            }}
+          >
+            <Icons.RotateCcw size={32} strokeWidth={1.75} />
+            Limpiar
+          </button>
+
+          {estado === "dictando" && (
+            <span className="flex items-center gap-2 text-xs font-semibold" style={{ color: "var(--khora-accent)" }}>
+              <Icons.Activity size={32} strokeWidth={1.75} />
+              {escuchando ? "escuchando" : "reconectando..."}
+            </span>
+          )}
+        </div>
       </div>
-      <p style={{ fontSize: 12, opacity: 0.75 }}>estado: {estado} / escuchando: {escuchando ? "si" : "no"} / caracteres: {totalChars} / bloques pulidos: {pulidosOk} / bloques sin pulir: {pulidosNo} / audio: {conAudio ? "si" : "no"} / reconexiones: {reconexiones}</p>
-      {aviso.length > 0 && <p style={{ color: "#a60" }}>{aviso}</p>}
-      {error.length > 0 && <p style={{ color: "#b00" }}>{error}</p>}
-      {resultado.length > 0 && <p style={{ color: "#070" }}>{resultado}</p>}
+
+      {/* Area de Transcripción */}
+      <div
+        className="p-4 min-h-[240px] whitespace-pre-wrap leading-relaxed border rounded-none text-sm"
+        style={{
+          backgroundColor: "var(--khora-surface)",
+          borderColor: "var(--khora-border)",
+          color: "var(--khora-ink)",
+        }}
+      >
+        {bloques.map((b, i) => (<p key={i} className="mb-3">{b}</p>))}
+        {pendiente.length > 0 && <p className="mb-3 opacity-80">{pendiente}</p>}
+        {parcial.length > 0 && <span className="opacity-50">{parcial}</span>}
+      </div>
+
+      {/* Estadísticas */}
+      <p className="text-xs font-medium" style={{ color: "var(--khora-accent)" }}>
+        estado: {estado} / escuchando: {escuchando ? "si" : "no"} / caracteres: {totalChars} / bloques pulidos: {pulidosOk} / bloques sin pulir: {pulidosNo} / audio: {conAudio ? "si" : "no"} / reconexiones: {reconexiones}
+      </p>
+
+      {/* Alertas y Mensajes de Retorno */}
+      {aviso.length > 0 && (
+        <div className="p-3 border rounded-none text-sm flex items-center gap-2" style={{ borderColor: "var(--khora-border)", backgroundColor: "var(--khora-surface)", color: "var(--khora-accent)" }}>
+          <Icons.TriangleAlert size={32} strokeWidth={1.75} className="shrink-0" />
+          <span>{aviso}</span>
+        </div>
+      )}
+      {error.length > 0 && (
+        <div className="p-3 border rounded-none text-sm flex items-center gap-2" style={{ borderColor: "var(--khora-border)", backgroundColor: "var(--khora-surface)", color: "var(--khora-accent)" }}>
+          <Icons.ShieldX size={32} strokeWidth={1.75} className="shrink-0" />
+          <span>{error}</span>
+        </div>
+      )}
+      {resultado.length > 0 && (
+        <div className="p-3 border rounded-none text-sm flex items-center gap-2" style={{ borderColor: "var(--khora-border)", backgroundColor: "var(--khora-surface)", color: "var(--khora-ink)" }}>
+          <Icons.CircleDot size={32} strokeWidth={1.75} className="shrink-0" />
+          <span>{resultado}</span>
+        </div>
+      )}
     </main>
   );
 }
