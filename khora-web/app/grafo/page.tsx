@@ -79,26 +79,25 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = "TB") => 
 
 // --- Componente Nodo Personalizado ---
 const CustomGraphNode = ({ data, selected }: { data: GraphNodeData; selected: boolean }) => {
-  // Capa 2: Color por comunidad, tamaño por centralidad
-  const communityColors = [
-    "#ef4444", "#3b82f6", "#10b981", "#f59e0b", "#8b5cf6", "#ec4899", "#14b8a6", "#f97316"
+  // Capa 2: Grayscale per community
+  const communityGrays = [
+    "#1c1d1f", "#2d3748", "#4a5568", "#718096", "#a0aec0", "#cbd5e0", "#e2e8f0", "#7f8c8d"
   ];
-  const bgColor = communityColors[(data.community || 0) % communityColors.length];
+  const bgColor = communityGrays[(data.community || 0) % communityGrays.length];
 
   const baseSize = 100;
   const sizeMultiplier = 1 + (data.centrality || 0) * 0.5;
   const size = Math.min(baseSize * sizeMultiplier, 300);
 
-  const selectedStyles = selected ? "ring-4 ring-black" : "";
-
   return (
     <div
-      className={`rounded-full flex items-center justify-center text-white text-xs p-2 text-center shadow-lg transition-all duration-500 ${selectedStyles}`}
+      className="rounded-full flex items-center justify-center text-white text-xs p-2 text-center shadow-lg transition-all duration-300"
       style={{
         width: size,
         height: size,
         backgroundColor: bgColor,
-        border: "2px solid rgba(255,255,255,0.2)"
+        border: selected ? "3px solid var(--khora-accent)" : "2px solid rgba(128,128,128,0.5)",
+        boxShadow: selected ? "0 0 10px var(--khora-accent)" : "none"
       }}
     >
       <div className="line-clamp-4 overflow-hidden pointer-events-none">
@@ -196,11 +195,12 @@ export default function GrafoPage() {
   const visibleEdges = useMemo(() => {
     return edges.map(e => {
       const edata = e.data as unknown as GraphEdgeData;
+      const strokeColor = e.selected ? "var(--khora-accent)" : "rgba(128, 128, 128, 0.6)";
       return {
         ...e,
         style: {
           strokeWidth: layer2Active ? 1 + (edata.weight || 0) * 2 : 2,
-          stroke: "#b1b1b7"
+          stroke: strokeColor
         },
       }
     });
@@ -218,38 +218,76 @@ export default function GrafoPage() {
     setSelectedElement(null);
   };
 
-  if (loading && nodes.length === 0) return <div className="p-8">Cargando proyecciones del grafo...</div>;
-  if (error) return <div className="p-8 text-red-500">Error: {error}</div>;
+  if (loading && nodes.length === 0) {
+    return (
+      <div
+        style={{ backgroundColor: "var(--khora-bg)", color: "var(--khora-ink)" }}
+        className="p-8 w-full h-screen"
+      >
+        Cargando proyecciones del grafo...
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <div
+        style={{ backgroundColor: "var(--khora-bg)", color: "var(--khora-ink)" }}
+        className="p-8 w-full h-screen"
+      >
+        Error: {error}
+      </div>
+    );
+  }
 
   return (
-    <div className="w-full h-screen relative bg-gray-50 flex flex-col overflow-hidden">
-      <header className="bg-white p-4 shadow-sm z-10 border-b border-gray-200 flex justify-between items-center">
+    <div
+      style={{ backgroundColor: "var(--khora-bg)", color: "var(--khora-ink)" }}
+      className="w-full h-screen relative flex flex-col overflow-hidden"
+    >
+      <header
+        style={{ backgroundColor: "var(--khora-surface)", borderBottom: "1px solid rgba(128, 128, 128, 0.3)" }}
+        className="p-4 shadow-sm z-10 flex justify-between items-center"
+      >
         <div>
-          <h1 className="text-xl font-bold tracking-wider text-gray-800">Grafo PKG - Proyección Leiden</h1>
-          <p className="text-sm text-gray-500">Vista de Entidades</p>
+          <h1 style={{ color: "var(--khora-ink)" }} className="text-xl font-bold tracking-wider">
+            Grafo PKG - Proyección Leiden
+          </h1>
+          <p style={{ color: "var(--khora-ink)", opacity: 0.7 }} className="text-sm">
+            Vista de Entidades
+          </p>
         </div>
 
         <div className="flex gap-4 items-center">
           <button
             onClick={() => setViewMode('list')}
-            className={`px-3 py-1 rounded text-sm transition ${viewMode === 'list' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}
+            style={
+              viewMode === 'list'
+                ? { backgroundColor: "var(--khora-accent)", color: "var(--khora-bg)" }
+                : { backgroundColor: "var(--khora-surface)", color: "var(--khora-ink)", border: "1px solid rgba(128, 128, 128, 0.5)" }
+            }
+            className="px-3 py-1 rounded text-sm transition cursor-pointer font-medium"
           >
             Vista Lista
           </button>
           <button
             onClick={() => setViewMode('graph')}
-            className={`px-3 py-1 rounded text-sm transition ${viewMode === 'graph' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}
+            style={
+              viewMode === 'graph'
+                ? { backgroundColor: "var(--khora-accent)", color: "var(--khora-bg)" }
+                : { backgroundColor: "var(--khora-surface)", color: "var(--khora-ink)", border: "1px solid rgba(128, 128, 128, 0.5)" }
+            }
+            className="px-3 py-1 rounded text-sm transition cursor-pointer font-medium"
           >
             Vista Grafo
           </button>
 
           {viewMode === 'graph' && (
-            <label className="flex items-center space-x-2 text-sm cursor-pointer ml-4">
+            <label style={{ color: "var(--khora-ink)" }} className="flex items-center space-x-2 text-sm cursor-pointer ml-4">
               <input
                 type="checkbox"
                 checked={layer2Active}
                 onChange={e => setLayer2Active(e.target.checked)}
-                className="rounded"
+                className="rounded accent-zinc-500"
               />
               <span>Capa 2: Codificación Visual</span>
             </label>
@@ -259,28 +297,35 @@ export default function GrafoPage() {
 
       <div className="flex-1 relative overflow-auto">
         {nodes.length === 0 ? (
-          <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+          <div style={{ color: "var(--khora-ink)", opacity: 0.7 }} className="absolute inset-0 flex items-center justify-center">
             El grafo está vacío. (Válido para ACR-1.1 si DB está vacía)
           </div>
         ) : (
           viewMode === 'list' ? (
             <div className="p-8 max-w-5xl mx-auto space-y-4">
-              <h2 className="text-lg font-semibold text-gray-700 mb-6">Lista Accesible de Nodos</h2>
+              <h2 style={{ color: "var(--khora-ink)" }} className="text-lg font-semibold mb-6">Lista Accesible de Nodos</h2>
               {nodes.map(node => {
                 const data = node.data as unknown as GraphNodeData;
                 return (
-                  <div key={node.id} className="bg-white p-4 rounded shadow-sm border border-gray-200 flex flex-col gap-2">
-                    <p className="font-medium text-gray-800">{data.summary}</p>
-                    <div className="flex gap-4 text-sm text-gray-500">
+                  <div
+                    key={node.id}
+                    style={{ backgroundColor: "var(--khora-surface)", border: "1px solid rgba(128, 128, 128, 0.3)" }}
+                    className="p-4 rounded shadow-sm flex flex-col gap-2"
+                  >
+                    <p style={{ color: "var(--khora-ink)" }} className="font-medium">{data.summary}</p>
+                    <div style={{ color: "var(--khora-ink)", opacity: 0.8 }} className="flex gap-4 text-sm">
                       <span>Comunidad: {data.community}</span>
                       <span>Nivel: {data.level}</span>
                       <span>Centralidad: {data.centrality}</span>
                       <span>Origen: {data.origen}</span>
-                      <span className={`px-2 py-0.5 rounded text-xs ${
-                        data.verificacion === 'Suficiente' ? 'bg-green-100 text-green-800' :
-                        data.verificacion === 'Pendiente' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-red-100 text-red-800'
-                      }`}>
+                      <span
+                        style={{
+                          border: "1px solid rgba(128, 128, 128, 0.5)",
+                          backgroundColor: "var(--khora-bg)",
+                          color: "var(--khora-ink)"
+                        }}
+                        className="px-2 py-0.5 rounded text-xs"
+                      >
                         {data.verificacion}
                       </span>
                     </div>
@@ -301,55 +346,98 @@ export default function GrafoPage() {
               fitView
               minZoom={0.1}
               maxZoom={2}
-              className="bg-gray-100 transition-all duration-700"
+              style={{ backgroundColor: "var(--khora-bg)" }}
+              className="transition-all duration-700"
             >
-              <Background color="#ccc" gap={16} />
+              <Background color="var(--khora-accent)" gap={16} />
               <Controls />
 
               {/* Capa 4: Inspección */}
               {selectedElement && (
-                <Panel position="top-right" className="bg-white p-4 rounded-lg shadow-xl border border-gray-200 w-80 max-h-[80vh] overflow-auto z-50">
-                  <div className="flex justify-between items-center mb-4 pb-2 border-b">
-                    <h3 className="font-bold text-gray-800">
+                <Panel
+                  position="top-right"
+                  style={{
+                    backgroundColor: "var(--khora-surface)",
+                    color: "var(--khora-ink)",
+                    border: "1px solid rgba(128, 128, 128, 0.4)"
+                  }}
+                  className="p-4 rounded-lg shadow-xl w-80 max-h-[80vh] overflow-auto z-50"
+                >
+                  <div
+                    style={{ borderBottom: "1px solid rgba(128, 128, 128, 0.3)" }}
+                    className="flex justify-between items-center mb-4 pb-2"
+                  >
+                    <h3 style={{ color: "var(--khora-ink)" }} className="font-bold">
                       {selectedElement.type === 'node' ? 'Inspección de Comunidad' : 'Inspección de Relación'}
                     </h3>
-                    <button onClick={() => setSelectedElement(null)} className="text-gray-500 hover:text-black">✕</button>
+                    <button
+                      onClick={() => setSelectedElement(null)}
+                      style={{ color: "var(--khora-ink)" }}
+                      className="cursor-pointer hover:opacity-75"
+                    >
+                      ✕
+                    </button>
                   </div>
 
                   <div className="space-y-3 text-sm">
                     {selectedElement.type === 'node' && (
                       <>
                         <div>
-                          <span className="font-semibold block text-gray-600">Resumen (Zoom Semántico)</span>
-                          <p className="mt-1">{selectedElement.data.summary}</p>
+                          <span style={{ color: "var(--khora-ink)", opacity: 0.7 }} className="font-semibold block">
+                            Resumen (Zoom Semántico)
+                          </span>
+                          <p style={{ color: "var(--khora-ink)" }} className="mt-1">
+                            {selectedElement.data.summary}
+                          </p>
                         </div>
                         <div className="grid grid-cols-2 gap-2">
-                          <div><span className="font-semibold text-gray-600">Comunidad:</span> {selectedElement.data.community}</div>
-                          <div><span className="font-semibold text-gray-600">Nivel:</span> {selectedElement.data.level}</div>
-                          <div><span className="font-semibold text-gray-600">Centralidad:</span> {selectedElement.data.centrality}</div>
+                          <div>
+                            <span style={{ color: "var(--khora-ink)", opacity: 0.7 }} className="font-semibold">Comunidad:</span> {selectedElement.data.community}
+                          </div>
+                          <div>
+                            <span style={{ color: "var(--khora-ink)", opacity: 0.7 }} className="font-semibold">Nivel:</span> {selectedElement.data.level}
+                          </div>
+                          <div>
+                            <span style={{ color: "var(--khora-ink)", opacity: 0.7 }} className="font-semibold">Centralidad:</span> {selectedElement.data.centrality}
+                          </div>
                         </div>
                       </>
                     )}
 
                     {selectedElement.type === 'edge' && (
                       <div>
-                        <span className="font-semibold block text-gray-600">Peso de Arista</span>
-                        <p className="mt-1">{selectedElement.data.weight}</p>
+                        <span style={{ color: "var(--khora-ink)", opacity: 0.7 }} className="font-semibold block">
+                          Peso de Arista
+                        </span>
+                        <p style={{ color: "var(--khora-ink)" }} className="mt-1">
+                          {selectedElement.data.weight}
+                        </p>
                       </div>
                     )}
 
-                    <div className="bg-gray-50 p-3 rounded border">
-                      <span className="font-semibold block text-gray-600 mb-2">Procedencia (Capa 4)</span>
+                    <div
+                      style={{
+                        backgroundColor: "var(--khora-bg)",
+                        border: "1px solid rgba(128, 128, 128, 0.3)"
+                      }}
+                      className="p-3 rounded"
+                    >
+                      <span style={{ color: "var(--khora-ink)", opacity: 0.7 }} className="font-semibold block mb-2">
+                        Procedencia (Capa 4)
+                      </span>
                       <div className="break-all space-y-1">
-                        <p><span className="text-gray-500">Origen:</span> {selectedElement.data.origen}</p>
-                        <p><span className="text-gray-500">Timestamp:</span> {selectedElement.data.timestamp}</p>
+                        <p><span style={{ color: "var(--khora-ink)", opacity: 0.7 }}>Origen:</span> {selectedElement.data.origen}</p>
+                        <p><span style={{ color: "var(--khora-ink)", opacity: 0.7 }}>Timestamp:</span> {selectedElement.data.timestamp}</p>
                         <p>
-                          <span className="text-gray-500">Verificación:</span>
-                          <span className={`ml-2 px-2 py-0.5 rounded text-xs ${
-                            selectedElement.data.verificacion === 'Suficiente' ? 'bg-green-100 text-green-800' :
-                            selectedElement.data.verificacion === 'Pendiente' ? 'bg-yellow-100 text-yellow-800' :
-                            'bg-red-100 text-red-800'
-                          }`}>
+                          <span style={{ color: "var(--khora-ink)", opacity: 0.7 }}>Verificación:</span>
+                          <span
+                            style={{
+                              border: "1px solid rgba(128, 128, 128, 0.5)",
+                              backgroundColor: "var(--khora-surface)",
+                              color: "var(--khora-ink)"
+                            }}
+                            className="ml-2 px-2 py-0.5 rounded text-xs"
+                          >
                             {selectedElement.data.verificacion}
                           </span>
                         </p>

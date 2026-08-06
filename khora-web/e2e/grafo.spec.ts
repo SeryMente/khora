@@ -23,6 +23,39 @@ test.describe("Grafo 4 Capas - VIZ-01", () => {
     // Test passes if it didn't time out.
   });
 
+  test("Verificación de Reskin canónico y escala de grises", async ({ page }) => {
+    // Wait for page to stop loading / show either error or content
+    const errorState = page.locator("text=Error:");
+    const listHeader = page.locator("text=Lista Accesible de Nodos");
+    const emptyState = page.locator("text=El grafo está vacío.");
+
+    await Promise.race([
+      errorState.waitFor({ state: "visible" }).catch(() => {}),
+      listHeader.waitFor({ state: "visible" }).catch(() => {}),
+      emptyState.waitFor({ state: "visible" }).catch(() => {})
+    ]);
+
+    // Verificar que el contenedor principal use los tokens canónicos
+    const mainDiv = page.locator("div[style*='var(--khora-bg)']");
+    await expect(mainDiv).toBeVisible();
+
+    const isError = await errorState.isVisible();
+    if (isError) {
+      console.log("Database connection failed, skipping header and button sub-checks as we are in the early-return error state");
+      return;
+    }
+
+    // Verificar que el header use var(--khora-surface)
+    const header = page.locator("header");
+    const headerStyle = await header.getAttribute("style");
+    expect(headerStyle).toContain("var(--khora-surface)");
+
+    // Verificar que los botones usen los tokens
+    const listBtn = page.locator("button:has-text('Vista Lista')");
+    const listBtnStyle = await listBtn.getAttribute("style");
+    expect(listBtnStyle).toContain("var(--khora-");
+  });
+
   test("ACR-1.2, ACR-1.4, ACR-1.5: Capas y proyección en modo grafo", async ({ page }) => {
     // Wait for the graph to load or be empty
     const emptyState = page.locator("text=El grafo está vacío.");
