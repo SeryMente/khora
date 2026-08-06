@@ -6,7 +6,18 @@ const uri = process.env.NEO4J_URI || "bolt://localhost:7687";
 const user = process.env.NEO4J_USER || "neo4j";
 const password = process.env.NEO4J_PASSWORD || "password";
 
-const driver = neo4j.driver(uri, neo4j.auth.basic(user, password));
+let _driver: ReturnType<typeof neo4j.driver> | null = null;
+
+const driver = {
+    session(...args: unknown[]) {
+        if (!_driver) {
+            _driver = neo4j.driver(uri, neo4j.auth.basic(user, password));
+        }
+        return (_driver as unknown as { session: (...a: unknown[]) => unknown }).session(...args);
+    },
+} as unknown as ReturnType<typeof neo4j.driver>;
+
+export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
