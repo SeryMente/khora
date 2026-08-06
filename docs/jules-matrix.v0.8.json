@@ -1,0 +1,82 @@
+{
+  "olas": [
+    {
+      "ola": 0,
+      "tareas": [
+        {"id": "J-01", "archivos": ["app/globals.css"]},
+        {"id": "J-02", "archivos": ["app/layout.tsx", "e2e/themes.spec.ts"]},
+        {"id": "J-03", "archivos": ["public/manifest.json", "public/icons/**"]},
+        {"id": "J-23", "archivos": ["kernel/src/khora_kernel/motor/_memoria.py"]},
+        {"id": "J-24", "archivos": ["kernel/src/khora_kernel/puentes/unificador.py"]},
+        {"id": "J-25", "archivos": ["kernel/src/khora_kernel/poblacion/_ingestar.py"]},
+        {"id": "J-27", "archivos": [".gitignore", "scripts/khora/env-vault.ps1.bak_ciclo27", "scripts/khora/env-vault.ps1.bak_ciclo28", "scripts/khora/env-vault.ps1.bak_ciclo29", "scripts/khora/env-vault.ps1.bak_prehardening"]}
+      ]
+    },
+    {
+      "ola": 1,
+      "tareas": [
+        {"id": "J-04", "archivos": ["app/components/os/KhoraSplash.tsx", "e2e/splash.spec.ts"]},
+        {"id": "J-06", "archivos": ["app/components/os/SystemBar.tsx", "e2e/contracts/system-bar.spec.ts"]},
+        {"id": "J-07", "archivos": ["app/components/os/AppIcon.tsx", "e2e/contracts/app-icon.spec.ts"]},
+        {"id": "J-09", "archivos": ["app/components/CapturarModal.tsx"]},
+        {"id": "J-10", "archivos": ["app/capturar/page.tsx", "app/capturar/compartir/page.tsx"]},
+        {"id": "J-12", "archivos": ["app/sistema/volcados/page.tsx"]},
+        {"id": "J-13", "archivos": ["app/sistema/consulta/page.tsx"]},
+        {"id": "J-14", "archivos": ["app/grafo/page.tsx", "e2e/grafo.spec.ts"]},
+        {"id": "J-15", "archivos": ["app/sistema/boveda/page.tsx"]},
+        {"id": "J-17", "archivos": ["public/sw.js", "app/offline/page.tsx"]},
+        {"id": "J-19", "archivos": ["lib/crypto-local.ts", "e2e/contracts/crypto-local.spec.ts"]},
+        {"id": "J-22", "archivos": ["e2e/shell-v2.spec.ts", "e2e/bitacora-dictado.spec.ts", "e2e/cora-ingesta.spec.ts", "tests/regression/smoke.spec.ts"]},
+        {"id": "J-26", "archivos": ["kernel/src/khora_kernel/motor/_memoria.py"]},
+        {"id": "J-28", "archivos": ["app/components/ThemeToggle.tsx"]}
+      ]
+    },
+    {
+      "ola": 2,
+      "tareas": [
+        {"id": "J-05", "archivos": ["app/components/os/KhoraShell.tsx", "e2e/contracts/khora-shell.spec.ts"]},
+        {"id": "J-08", "archivos": ["app/page.tsx", "e2e/desktop-axis.spec.ts"]},
+        {"id": "J-16", "archivos": ["e2e/capability-baseline.spec.ts"]},
+        {"id": "J-18", "archivos": ["lib/db.ts", "lib/queue.ts", "e2e/contracts/queue.spec.ts"]}
+      ]
+    },
+    {
+      "ola": 3,
+      "tareas": [
+        {"id": "J-11", "archivos": ["app/sistema/dictado/page.tsx"]},
+        {"id": "J-20", "archivos": ["app/components/InstallControl.tsx", "app/components/UpdatePrompt.tsx", "e2e/install-update.spec.ts"]},
+        {"id": "J-30", "archivos": ["app/layout.tsx", "e2e/themes.spec.ts", "e2e/contracts/layout-ownership.spec.ts"]},
+        {"id": "J-31", "archivos": ["app/nucleo/page.tsx", "e2e/nucleo.spec.ts"]},
+        {"id": "J-32", "archivos": ["app/sistema/estado/page.tsx", "e2e/system-state.spec.ts"]}
+      ]
+    },
+    {
+      "ola": 4,
+      "tareas": [
+        {"id": "J-21", "archivos": ["e2e/offline-capture.spec.ts", "e2e/pwa-integral.spec.ts"]},
+        {"id": "J-29", "archivos": ["public/screenshots/**"]}
+      ]
+    }
+  ],
+  "dependencias": {
+    "todas": ["B-00"],
+    "J-28": ["J-01", "J-02"],
+    "J-05": ["J-06", "J-07"],
+    "J-08": ["J-07"],
+    "J-16": ["J-12", "J-13", "J-14", "J-15"],
+    "J-18": ["J-19"],
+    "J-26": ["J-23"],
+    "J-11": ["J-18", "J-19"],
+    "J-20": ["J-05", "J-17", "J-18"],
+    "J-30": ["J-04", "J-05", "J-06"],
+    "J-31": ["J-05"],
+    "J-32": ["J-05"],
+    "J-21": ["J-11", "J-20", "J-30", "J-31", "J-32"],
+    "J-29": ["J-08", "J-30"]
+  },
+  "prohibidos": [
+    "khora-web/app/api/ingesta/route.ts",
+    "khora-web/app/sistema/editar/page.tsx",
+    "secrets/env-vault.enc.json"
+  ]
+}
