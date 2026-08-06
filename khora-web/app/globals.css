@@ -1,69 +1,61 @@
 @import "tailwindcss";
 
+/* Khora OS v0.9 - tokens canonicos. Tema oscuro por defecto, sin excepcion. */
 :root {
-  /* Khora Dark Theme (Default) */
-  --khora-bg: #0A0A0B;
-  --khora-surface: #17181A;
-  --khora-ink: #C7CCD1;
-  --khora-accent: #8A9BA8;
-  --khora-absolute: #000000;
+    --khora-bg: #0A0A0B;
+    --khora-absolute: #000000;
+    --khora-surface: #17181A;
+    --khora-ink: #C7CCD1;
+    --khora-accent: #8A9BA8;
+    --khora-border: #23252A;
+    --khora-light-bg: #F4F2EF;
+    --khora-light-surface: #FFFFFF;
+    --khora-light-border: #B9BDC1;
+    --khora-light-ink: #1C1D1F;
 }
 
+html[data-theme="dark"],
 .khora-theme-dark {
-  --khora-bg: #0A0A0B;
-  --khora-surface: #17181A;
-  --khora-ink: #C7CCD1;
-  --khora-accent: #8A9BA8;
-  --khora-absolute: #000000;
+    --khora-bg: #0A0A0B;
+    --khora-absolute: #000000;
+    --khora-surface: #17181A;
+    --khora-ink: #C7CCD1;
+    --khora-border: #23252A;
 }
 
+html[data-theme="light"],
 .khora-theme-light {
-  --khora-bg: #F4F2EF;
-  --khora-surface: #FFFFFF;
-  --khora-ink: #1C1D1F;
-  --khora-border: #B9BDC1;
-}
-
-@media (prefers-color-scheme: light) {
-  :root:not(.khora-theme-dark):not(.khora-theme-light) {
     --khora-bg: #F4F2EF;
+    --khora-absolute: #FFFFFF;
     --khora-surface: #FFFFFF;
     --khora-ink: #1C1D1F;
     --khora-border: #B9BDC1;
-  }
 }
 
 @theme inline {
-  --color-khora-bg: var(--khora-bg);
-  --color-khora-surface: var(--khora-surface);
-  --color-khora-ink: var(--khora-ink);
-  --color-khora-accent: var(--khora-accent);
-  --color-khora-absolute: var(--khora-absolute);
-  --color-khora-border: var(--khora-border);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+    --color-khora-bg: var(--khora-bg);
+    --color-khora-surface: var(--khora-surface);
+    --color-khora-ink: var(--khora-ink);
+    --color-khora-accent: var(--khora-accent);
+    --color-khora-absolute: var(--khora-absolute);
+    --color-khora-border: var(--khora-border);
+    --font-sans: var(--font-geist-sans);
+    --font-mono: var(--font-geist-mono);
 }
 
 body {
-  background: var(--khora-bg);
-  color: var(--khora-ink);
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+    background: var(--khora-bg);
+    color: var(--khora-ink);
+    font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
 
 @keyframes splash-animation {
-  0% {
-    opacity: 0;
-  }
-  32% {
-    /* 0.8s / 2.5s = 32% (fade-in phase) */
-    opacity: 1;
-  }
-  88% {
-    /* 2.2s / 2.5s = 88% (static phase) */
-    opacity: 1;
-  }
-  100% {
-    /* 2.5s (fade-out phase) */
-    opacity: 0;
-  }
+    0% { opacity: 0; }
+    20% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    [data-testid="khora-splash"] { animation: none !important; }
 }

@@ -1,38 +1,68 @@
-import Link from "next/link";
-import { Zap, MessageSquareShare, Network, Map } from "lucide-react";
+import AppIcon from "./components/os/AppIcon";
 
-const ACCIONES = [
-  { href: "/sistema/dictado", titulo: "Dictado", detalle: "Hablar y archivar verbatim", Icono: Zap },
-  { href: "/sistema/editar", titulo: "Editar", detalle: "Corregir transcripciones y construir lexico", Icono: Zap },
-  { href: "/sistema/volcados", titulo: "Volcados", detalle: "Archivo verbatim e inventario", Icono: Zap },
-  { href: "/sistema/ingesta", titulo: "Ingesta", detalle: "Capturar hacia la memoria continua", Icono: Zap },
-  { href: "/sistema/consulta", titulo: "Consulta", detalle: "Preguntar a la red · GraphRAG", Icono: MessageSquareShare },
-  { href: "/grafo", titulo: "Grafo", detalle: "Visualización del sustrato PKG", Icono: Network },
-  { href: "/mapa", titulo: "Mapa", detalle: "Mapa de decisiones", Icono: Map },
+const SUPERFICIES = [
+    { href: "/capturar", etiqueta: "Captura", icono: "Mic" },
+    { href: "/sistema/dictado", etiqueta: "Dictado", icono: "Activity" },
+    { href: "/sistema/volcados", etiqueta: "Archivo", icono: "Files" },
+    { href: "/sistema/consulta", etiqueta: "Consulta", icono: "MessageSquareShare" },
+    { href: "/grafo", etiqueta: "Nucleo", icono: "Network" },
+    { href: "/sistema/boveda", etiqueta: "Boveda", icono: "LockKeyhole" },
 ];
 
 export default function Home() {
-  return (
-    <main className="min-h-screen bg-cora-bg text-cora-text flex flex-col items-center justify-center p-6">
-      <header className="mb-12 text-center">
-        <h1 className="text-3xl font-semibold tracking-[0.3em] uppercase text-cora-text">Khora</h1>
-        <p className="text-cora-silver font-mono text-xs tracking-widest mt-3 uppercase">Memoria continua · v0.9</p>
-      </header>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-2xl">
-        {ACCIONES.map(({ href, titulo, detalle, Icono }) => (
-          <Link key={href} href={href} className="block outline-none focus:outline-none">
-            <div className="bg-cora-surface border border-cora-silver/15 hover:border-cora-silver/40 transition-colors rounded-2xl p-6 flex items-start gap-4 h-full">
-              <div className="p-3 rounded-xl bg-white/[0.04] border border-white/10">
-                <Icono className="w-5 h-5 text-cora-silver" />
-              </div>
-              <div>
-                <h2 className="font-semibold text-cora-text">{titulo}</h2>
-                <p className="text-xs text-cora-silver mt-1">{detalle}</p>
-              </div>
+    return (
+        <div
+            data-testid="khora-desktop"
+            style={{
+                minHeight: "100%",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "2rem 1.5rem",
+            }}
+        >
+            <header style={{ marginBottom: "3rem", textAlign: "center" }}>
+                <h1
+                    style={{
+                        fontSize: "1.75rem",
+                        fontWeight: 600,
+                        letterSpacing: "0.42em",
+                        textTransform: "uppercase",
+                        paddingLeft: "0.42em",
+                        color: "var(--khora-ink)",
+                    }}
+                >
+                    Khora
+                </h1>
+                <p
+                    style={{
+                        marginTop: "0.75rem",
+                        fontFamily: "var(--font-mono), monospace",
+                        fontSize: "0.6875rem",
+                        letterSpacing: "0.24em",
+                        textTransform: "uppercase",
+                        color: "var(--khora-accent)",
+                    }}
+                >
+                    Memoria continua
+                </p>
+            </header>
+
+            <div
+                data-testid="desktop-axis"
+                style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+                    gap: "1.5rem",
+                    width: "100%",
+                    maxWidth: "24rem",
+                }}
+            >
+                {SUPERFICIES.map((s) => (
+                    <AppIcon key={s.href} href={s.href} etiqueta={s.etiqueta} icono={s.icono} />
+                ))}
             </div>
-          </Link>
-        ))}
-      </div>
-    </main>
-  );
+        </div>
+    );
 }
