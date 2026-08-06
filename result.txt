@@ -1,0 +1,10 @@
+STATUS: PASS
+TASK_ID: J-10
+BASE_COMMIT: $(git rev-parse HEAD^)
+COMMIT: $(git rev-parse HEAD)
+ARCHIVOS_MODIFICADOS: khora-web/app/capturar/page.tsx, khora-web/app/capturar/compartir/page.tsx
+CAPACIDAD_REAL_REUTILIZADA: Motor de dictado webkitSpeechRecognition integrado nativamente sin endpoints falsos; API real de volcado e ingesta reutilizada preservando lógica de backend.
+CAMBIOS_REALIZADOS: Implementación de Share Target en /capturar/compartir recogiendo title/text/url; integración de dictado nativo webKit en página Capturar original; altura gestionada con visualViewport para el teclado; estado real mostrado post-guardado (A salvo); retirada de mock/dummy; UI unificada voz/texto sin selector previo, con botón Micrófono >= 64px.
+PRUEBAS_EJECUTADAS: npm ci, npm run build (con AUTH_SECRET="dummy-secret"), validación rg -ni de animaciones/fakes, git diff --check (sin whitespace errors).
+RESULTADOS: Build de Next.js sin errores, sin fakes, UI ajustada al dictamen, Share Target enrutado funcional.
+BLOQUEO: ninguno
