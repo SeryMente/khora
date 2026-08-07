@@ -57,7 +57,8 @@ if (-not (Invoke-Preflight)) { Fail "Preflight fallo (sin internet). Sesion canc
     # --- Token seguro ---
     Step "Autenticacion GitHub (token en SecureString)"
     $valid = $false
-    for ($t=1; $t -le 3; $t++) {
+    if ($script:TokSecure) { Ok "Token ya validado desde el portapapeles: captura omitida."; $valid = $true }
+    for ($t=1; ($t -le 3) -and (-not $valid); $t++) {
         # Captura robusta: Ctrl+V NO funciona en prompts -AsSecureString (conhost
         # entrega un solo caracter de control 0x16 -> aparece 1 asterisco).
         # Via principal: leer del portapapeles y limpiarlo de inmediato.
