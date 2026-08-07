@@ -116,8 +116,8 @@ def ingestar(
     )
 
 
-    def frecuencia(memoria: Any, canonical_key: str) -> int:
-        return memoria.frecuencia(canonical_key)
+def frecuencia(memoria: Any, canonical_key: str) -> int:
+    return memoria.frecuencia(canonical_key)
 
 
 def linea_temporal(memoria: Any, desde: str, hasta: str) -> List[Any]:
