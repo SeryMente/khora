@@ -1,4 +1,4 @@
-// @l0 L0-002-R · @req CORA-02/REQ-1 · @acr ACR-1.2
+// @l0 L0-002-R Â· @req CORA-02/REQ-1 Â· @acr ACR-1.2
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -224,10 +224,16 @@ export default function DictadoPage() {
         const blob = new Blob(trozosRef.current, { type: "audio/webm" });
         const forma = new FormData();
         forma.append("audio", blob, "dictado.webm");
-        const ra = await fetch("/api/audio", { method: "POST", body: forma });
-        const da = await ra.json();
-        if (ra.ok && typeof da?.url === "string") { audioUrl = da.url; audioBytes = typeof da?.bytes === "number" ? da.bytes : blob.size; }
-        else { setAviso("audio no guardado: " + String(da?.detail) + " " + String(da?.causa)); }
+        try {
+          const ra = await fetch("/api/audio", { method: "POST", body: forma });
+          const crudo = await ra.text();
+          let da: any = null;
+          try { da = JSON.parse(crudo); } catch (eParse) { da = null; }
+          if (ra.ok && typeof da?.url === "string") { audioUrl = da.url; audioBytes = typeof da?.bytes === "number" ? da.bytes : blob.size; }
+          else { setAviso("audio no guardado (" + String(ra.status) + "): " + (da ? String(da?.detail) + " " + String(da?.causa) : crudo.slice(0, 120)) + " - " + (blob.size / 1048576).toFixed(1) + " MB"); }
+        } catch (eRed) {
+          setAviso("audio no guardado (fallo de red o tamano): " + String(eRed) + " - " + (blob.size / 1048576).toFixed(1) + " MB");
+        }
       }
       const rv = await fetch("/api/dictado", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ texto, titulo: titulo.trim().length > 0 ? titulo.trim() : null, audioUrl, audioBytes, duracionSeg: duracionRef.current, pulidoAplicado: pulidosOk > 0 }) });
       const dv = await rv.json();
@@ -253,7 +259,7 @@ export default function DictadoPage() {
         paddingBottom: "6rem",
       }}
     >
-      {/* Cabecera de Sección */}
+      {/* Cabecera de SecciÃ³n */}
       <div className="border-b pb-4" style={{ borderColor: "var(--khora-border)" }}>
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <Icons.Mic size={32} strokeWidth={1.75} style={{ color: "var(--khora-accent)" }} />
@@ -352,7 +358,7 @@ export default function DictadoPage() {
         </div>
       </div>
 
-      {/* Area de Transcripción */}
+      {/* Area de TranscripciÃ³n */}
       <div
         className="p-4 min-h-[240px] whitespace-pre-wrap leading-relaxed border rounded-none text-sm"
         style={{
@@ -366,7 +372,7 @@ export default function DictadoPage() {
         {parcial.length > 0 && <span className="opacity-50">{parcial}</span>}
       </div>
 
-      {/* Estadísticas */}
+      {/* EstadÃ­sticas */}
       <p className="text-xs font-medium" style={{ color: "var(--khora-accent)" }}>
         estado: {estado} / escuchando: {escuchando ? "si" : "no"} / caracteres: {totalChars} / bloques pulidos: {pulidosOk} / bloques sin pulir: {pulidosNo} / audio: {conAudio ? "si" : "no"} / reconexiones: {reconexiones}
       </p>
