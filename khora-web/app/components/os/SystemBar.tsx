@@ -1,8 +1,10 @@
+// @l0 L0-002-R · @req UI-03/THEME-TOGGLE
 "use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import * as Icons from "lucide-react";
+import ThemeToggle from "./ThemeToggle";
 
 export default function SystemBar() {
   const pathname = usePathname();
@@ -63,6 +65,8 @@ export default function SystemBar() {
         <Icons.LockKeyhole size={32} strokeWidth={1.75} absoluteStrokeWidth={true} />
         <span className="text-xs mt-1 font-medium">Bóveda</span>
       </Link>
+
+      <ThemeToggle />
     </nav>
   );
 }

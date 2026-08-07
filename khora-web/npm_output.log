@@ -1,21 +1,8 @@
 
-> khora-web@0.1.2 dev
-> next dev -p 3000 -H 0.0.0.0
+> khora-web@0.1.2 start
+> next start
 
-   ▲ Next.js 15.1.7
-   - Local:        http://localhost:3000
-   - Network:      http://0.0.0.0:3000
-
- ✓ Starting...
- ✓ Ready in 1835ms
- ○ Compiling /middleware ...
- ✓ Compiled /middleware in 1104ms (98 modules)
- ○ Compiling / ...
- ✓ Compiled / in 6.3s (694 modules)
- GET / 200 in 6994ms
- ○ Compiling /bitacora ...
- ✓ Compiled /bitacora in 4.5s (1542 modules)
- GET /bitacora 200 in 4632ms
- GET /bitacora 200 in 21ms
- ○ Compiling /api/capturas ...
- ✓ Compiled /api/capturas in 900ms (1550 modules)
+▲ Next.js 16.2.11
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.2:3000
+✓ Ready in 198ms
