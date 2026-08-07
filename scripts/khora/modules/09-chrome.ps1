@@ -37,7 +37,7 @@ function Open-LoginTabs {
     Ok "Abiertas 3 pestañas iniciales de login (CDP port: $CDP_PORT)."
 }
 function Save-ChromeTabsSnapshot {
-    $res = Invoke-RestMethod "http://localhost:$CDP_PORT/json" -ErrorAction SilentlyContinue
+    $res = $null; try { $res = Invoke-RestMethod ("http://localhost:" + $CDP_PORT + "/json") -TimeoutSec 3 -ErrorAction Stop } catch { $res = $null }
     if (-not $res) { Warn "Chrome sin CDP activo o cerrado, omitiendo snapshot de pestañas."; return }
     $validUrls = @()
     foreach ($tab in $res) {

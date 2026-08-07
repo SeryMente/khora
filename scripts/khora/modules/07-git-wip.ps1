@@ -81,7 +81,6 @@ function Init-Wip {
     Ok "Auto-WIP sobre la rama actual: $__cur"
     $global:LASTEXITCODE = 0
     if ($LASTEXITCODE -eq 0) {
-        Ok "Rama de respaldo creada: $script:WIP_BRANCH"
         # Publicar de inmediato: el remoto conoce la rama desde el minuto cero
         if (Push-Verified -Branch $script:WIP_BRANCH -Retries 2) { Ok "Rama WIP publicada y VERIFICADA en remoto." }
         else { Warn "Rama WIP aun sin publicar; el auto-WIP reintentara en el proximo ciclo." }

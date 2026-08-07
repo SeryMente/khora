@@ -4,7 +4,7 @@
 # ESTADO: EXTRAÍDO
 # ================================================================
 
-$SCRIPT_VERSION = "7.1.3"   # <- UNICA fuente de verdad de la version
+$SCRIPT_VERSION = "7.1.4"   # <- UNICA fuente de verdad de la version
 function Initialize-KhoraPaths {
 $SYS_DRIVE   = if ($env:SystemDrive) { $env:SystemDrive } else { "C:" }
 # ================================================================
@@ -131,8 +131,8 @@ $script:EFS_ACTIVE   = $false   # true => workdir/repo cifrados en reposo con EF
 $DEFAULT_CFG = [ordered]@{
     repoOrg           = "SeryMente"
     repoName          = "khora"
-    gitName           = "Black Sheep"
-    gitEmail          = "blacksheepsup@gmail.com"
+    gitName           = "Victor Hugo Torres"
+    gitEmail          = "280919.29061988@proton.me"
     openUrls          = @("https://accounts.google.com/signin/chrome/sync","https://mail.google.com")
     inactivityMinutes = 15
     deadlineHour      = 20
