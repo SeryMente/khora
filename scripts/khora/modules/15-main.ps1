@@ -66,7 +66,7 @@ function Run-Main {
         } else { Ok "Version v$SCRIPT_VERSION ya archivada en versions\." }
         $expected = "khora-v$SCRIPT_VERSION.ps1"
         $actual   = Split-Path $SCRIPT_PATH -Leaf
-        if ($actual -ne $expected) { Warn "Nombre de archivo [$actual] no coincide con la version interna (esperado: $expected). Renombralo para mantener coherencia." }
+        if ($actual -ne $expected) { L "INFO" "Nombre de archivo [$actual] no coincide con la version interna (esperado: $expected). Renombralo para mantener coherencia." }
         else { Ok "Nombre de archivo coherente con la version interna." }
     }
     # --- ARRANQUE AUTOMATICO: todo diagnostico read-only corre solo, sin opcion ---
@@ -89,12 +89,13 @@ Write-Host ""
     $needDraw = $true
     while ($true) {
         if ($needDraw) { Show-Banner; $needDraw = $false }
+            if ((-not $script:SES_ACTIVE) -and (-not $script:TokSecure) -and ((-not $script:ClipNextCheck) -or ((Get-Date) -gt $script:ClipNextCheck))) { $script:ClipNextCheck = (Get-Date).AddSeconds(2); Watch-ClipboardToken }
         if ([Console]::KeyAvailable) {
             $k = [Console]::ReadKey($true); Write-Host $k.KeyChar
             $key = $k.KeyChar.ToString().ToUpper()
             L "INFO" "Tecla: [$key]"
             switch ($key) {
-                "1" { Start-Sesion }
+                "1" { $script:SES_START = Get-Date; Start-Sesion }
                 "2" { Invoke-Cleanup "manual" }
                 "3" { Show-Estado }
                 "4" { Write-Host ""; Write-Host "  ---- LOG DE HOY ----" -ForegroundColor Cyan; if (Test-Path $LOG_FILE) { Get-Content $LOG_FILE | ForEach-Object { Write-Host "  $_" -ForegroundColor DarkGray } } else { Info "Sin log." } }
