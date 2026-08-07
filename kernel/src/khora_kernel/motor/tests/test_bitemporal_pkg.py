@@ -72,7 +72,7 @@ def test_acr_1_2_alcanzabilidad(neo4j_driver, neo4j_config):
         created_at=provenance.timestamp
     )
 
-    escritos = memoria.escribir_ingesta([triple_reachable], provenance)
+    escritos = memoria.escribir_ingesta([triple_reachable], provenance, io_id='io1')
     assert escritos == 1
 
     # Verify relationships created
@@ -116,7 +116,7 @@ def test_acr_1_2_alcanzabilidad_reanclaje(neo4j_driver, neo4j_config):
     )
 
     # Should re-anchor properly and return 1, NOT 0
-    escritos = memoria.escribir_ingesta([triple_reanchor], provenance)
+    escritos = memoria.escribir_ingesta([triple_reanchor], provenance, io_id='io2')
     assert escritos == 1
 
     with neo4j_driver.session() as session:
