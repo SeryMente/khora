@@ -9,7 +9,8 @@ from khora_kernel.ports.memoria_organizada import Provenance as PortProvenance
 
 def test_frontera_motor_no_importado_directamente():
     """Prueba de frontera: motor no debe ser importado directamente fuera de api.py"""
-    with open("kernel/pyproject.toml") as f:
+    path = "pyproject.toml" if os.path.exists("pyproject.toml") else "kernel/pyproject.toml"
+    with open(path) as f:
         content = f.read()
     assert "khora_kernel.motor" not in content # Import linter handles this but we add a sanity check here.
 
