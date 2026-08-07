@@ -1,10 +1,21 @@
-// @l0 L0-002-R · @req CORA-02/REQ-1 · @acr ACR-1.2
+// @l0 L0-002-R · @req FIX-DICTADO/D2-D8
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import * as Icons from "lucide-react";
 
 type Estado = "inactivo" | "dictando";
+
+function generarSesionId() {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
 
 export default function DictadoPage() {
   const [bloques, setBloques] = useState<string[]>([]);
@@ -22,6 +33,11 @@ export default function DictadoPage() {
   const [conAudio, setConAudio] = useState(false);
   const [escuchando, setEscuchando] = useState(false);
   const [reconexiones, setReconexiones] = useState(0);
+
+  // New states for parts
+  const [partesContador, setPartesContador] = useState(0);
+  const [bytesAcumulados, setBytesAcumulados] = useState(0);
+
   const recRef = useRef<any>(null);
   const grabRef = useRef<any>(null);
   const flujoRef = useRef<any>(null);
@@ -36,6 +52,14 @@ export default function DictadoPage() {
   const abortosRef = useRef(0);
   const audioPermitidoRef = useRef(true);
 
+  // New refs for session & parts
+  const sesionIdRef = useRef<string>("");
+  const parteConsecutivaRef = useRef<number>(0);
+  const partesSubidasRef = useRef<{ parte: number; url: string; bytes: number }[]>([]);
+  const parteTrozosRef = useRef<Blob[]>([]);
+  const parteInicioRef = useRef<number>(0);
+  const subidaEnCursoRef = useRef<Promise<void> | null>(null);
+
   useEffect(() => {
     const w = window as any;
     if (!w.SpeechRecognition && !w.webkitSpeechRecognition) setSoportado(false);
@@ -47,7 +71,14 @@ export default function DictadoPage() {
     setBloques(bloquesRef.current);
     try {
       const r = await fetch("/api/pulir", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ texto: bloque }) });
-      const data = await r.json();
+      const textoRespuesta = await r.text();
+      let data: any = {};
+      try {
+        data = JSON.parse(textoRespuesta);
+      } catch (parseErr) {
+        data = { motivo: "Respuesta no-JSON de pulido: " + textoRespuesta.slice(0, 100) };
+      }
+
       if (r.ok && data?.aceptado === true && typeof data?.texto === "string") {
         const copia = [...bloquesRef.current];
         copia[indice] = data.texto;
@@ -71,6 +102,59 @@ export default function DictadoPage() {
     if (bloque.length > 0) void pulirBloque(bloque);
   }, [pulirBloque]);
 
+  const subirParteActual = useCallback(async () => {
+    if (parteTrozosRef.current.length === 0) return;
+
+    const trozosParaSubir = [...parteTrozosRef.current];
+    parteTrozosRef.current = [];
+
+    const parteActual = parteConsecutivaRef.current;
+    parteConsecutivaRef.current += 1;
+    parteInicioRef.current = Date.now();
+
+    const blob = new Blob(trozosParaSubir, { type: "audio/webm" });
+    const sesionId = sesionIdRef.current;
+
+    const forma = new FormData();
+    forma.append("audio", blob, `dictado-parte-${parteActual}.webm`);
+    forma.append("sesionId", sesionId);
+    forma.append("parte", String(parteActual));
+
+    const ejecutarSubida = async () => {
+      try {
+        const ra = await fetch("/api/audio", { method: "POST", body: forma });
+        const textoRespuesta = await ra.text();
+        let da: any = {};
+        try {
+          da = JSON.parse(textoRespuesta);
+        } catch (parseErr) {
+          da = { detail: "Respuesta no-JSON de la API de audio: " + textoRespuesta.slice(0, 100) };
+        }
+
+        if (ra.ok && typeof da?.url === "string") {
+          const bytesSubidos = typeof da?.bytes === "number" ? da.bytes : blob.size;
+          partesSubidasRef.current.push({
+            parte: parteActual,
+            url: da.url,
+            bytes: bytesSubidos,
+          });
+          setPartesContador(partesSubidasRef.current.length);
+          setBytesAcumulados((total) => total + bytesSubidos);
+          setConAudio(true);
+        } else {
+          setAviso(`audio parte ${parteActual} no guardada: ${String(da?.detail || "")} ${String(da?.causa || "")}`);
+        }
+      } catch (e) {
+        setAviso(`audio parte ${parteActual} no guardada por error: ${String(e)}`);
+      }
+    };
+
+    const anteriorSubida = subidaEnCursoRef.current || Promise.resolve();
+    const nuevaSubida = anteriorSubida.then(ejecutarSubida);
+    subidaEnCursoRef.current = nuevaSubida;
+    await nuevaSubida;
+  }, []);
+
   const detenerGrabacion = useCallback(() => {
     try { grabRef.current?.stop(); } catch (e) {}
     grabRef.current = null;
@@ -85,13 +169,31 @@ export default function DictadoPage() {
       if (!activoRef.current || !audioPermitidoRef.current) { try { flujo.getTracks().forEach((pista: any) => pista.stop()); } catch (e) {} return; }
       flujoRef.current = flujo;
       const grabadora = new MediaRecorder(flujo);
-      grabadora.ondataavailable = (ev: any) => { if (ev.data && ev.data.size > 0) { trozosRef.current.push(ev.data); setConAudio(true); } };
+
+      grabadora.ondataavailable = (ev: any) => {
+        if (ev.data && ev.data.size > 0) {
+          parteTrozosRef.current.push(ev.data);
+          setConAudio(true);
+
+          const totalSize = parteTrozosRef.current.reduce((sum, chunk) => sum + chunk.size, 0);
+          const elapsed = Date.now() - parteInicioRef.current;
+
+          if (totalSize >= 2 * 1024 * 1024 || elapsed >= 120 * 1000) {
+            void subirParteActual();
+          }
+        }
+      };
+
+      grabadora.onstop = async () => {
+        await subirParteActual();
+      };
+
       grabadora.start(1000);
       grabRef.current = grabadora;
     } catch (e) {
       setAviso("dictado sin grabacion de voz: " + String(e));
     }
-  }, []);
+  }, [subirParteActual]);
 
   const arrancarReconocedor = useCallback(() => {
     const w = window as any;
@@ -178,6 +280,17 @@ export default function DictadoPage() {
     abortosRef.current = 0;
     audioPermitidoRef.current = true;
     trozosRef.current = [];
+
+    // Reset session & parts refs/states
+    sesionIdRef.current = generarSesionId();
+    parteConsecutivaRef.current = 0;
+    partesSubidasRef.current = [];
+    parteTrozosRef.current = [];
+    parteInicioRef.current = Date.now();
+    subidaEnCursoRef.current = null;
+    setPartesContador(0);
+    setBytesAcumulados(0);
+
     activoRef.current = true;
     const arrancado = arrancarReconocedor();
     if (!arrancado) { activoRef.current = false; return; }
@@ -218,21 +331,56 @@ export default function DictadoPage() {
     if (texto.trim().length === 0) { setError("no hay nada que archivar"); return; }
     setGuardando(true);
     try {
+      // Ensure any pending upload finishes first
+      if (subidaEnCursoRef.current) {
+        await subidaEnCursoRef.current;
+      }
+
       let audioUrl: string | null = null;
       let audioBytes: number | null = null;
-      if (trozosRef.current.length > 0) {
-        const blob = new Blob(trozosRef.current, { type: "audio/webm" });
-        const forma = new FormData();
-        forma.append("audio", blob, "dictado.webm");
-        const ra = await fetch("/api/audio", { method: "POST", body: forma });
-        const da = await ra.json();
-        if (ra.ok && typeof da?.url === "string") { audioUrl = da.url; audioBytes = typeof da?.bytes === "number" ? da.bytes : blob.size; }
-        else { setAviso("audio no guardado: " + String(da?.detail) + " " + String(da?.causa)); }
+      const partes = partesSubidasRef.current;
+
+      if (partes.length > 0) {
+        const ordenadas = [...partes].sort((a, b) => a.parte - b.parte);
+        const parte0 = ordenadas.find((p) => p.parte === 0) || ordenadas[0];
+        audioUrl = parte0 ? parte0.url : null;
+        audioBytes = ordenadas.reduce((sum, p) => sum + p.bytes, 0);
       }
-      const rv = await fetch("/api/dictado", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ texto, titulo: titulo.trim().length > 0 ? titulo.trim() : null, audioUrl, audioBytes, duracionSeg: duracionRef.current, pulidoAplicado: pulidosOk > 0 }) });
-      const dv = await rv.json();
-      if (!rv.ok) { setError(String(dv?.detail) + " " + String(dv?.causa ?? "")); }
-      else { setResultado("archivado " + String(dv?.chars) + " caracteres, sha " + String(dv?.sha256).slice(0, 8) + (audioUrl ? ", con audio" : ", sin audio")); }
+
+      const payload = {
+        texto,
+        titulo: titulo.trim().length > 0 ? titulo.trim() : null,
+        audioUrl,
+        audioBytes,
+        duracionSeg: duracionRef.current,
+        pulidoAplicado: pulidosOk > 0,
+        audioPartes: partes.length > 0 ? partes : null,
+      };
+
+      let rv: Response;
+      let dv: any = {};
+      try {
+        rv = await fetch("/api/dictado", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        const textoRespuesta = await rv.text();
+        try {
+          dv = JSON.parse(textoRespuesta);
+        } catch (parseErr) {
+          dv = { detail: "Respuesta no-JSON de dictado: " + textoRespuesta.slice(0, 200) };
+        }
+
+        if (!rv.ok) {
+          setError(String(dv?.detail || "Error desconocido") + " " + String(dv?.causa ?? ""));
+        } else {
+          setResultado("archivado " + String(dv?.chars) + " caracteres, sha " + String(dv?.sha256).slice(0, 8) + (audioUrl ? `, con audio (${partes.length} partes)` : ", sin audio"));
+        }
+      } catch (err) {
+        setError("Error de red al guardar: " + String(err));
+      }
     } catch (e) {
       setError(String(e));
     } finally {
@@ -240,7 +388,31 @@ export default function DictadoPage() {
     }
   }, [titulo, pulidosOk]);
 
-  const limpiar = useCallback(() => { bloquesRef.current = []; setBloques([]); pendienteRef.current = ""; setPendiente(""); setParcial(""); trozosRef.current = []; duracionRef.current = 0; setConAudio(false); setPulidosOk(0); setPulidosNo(0); setResultado(""); setError(""); setAviso(""); setReconexiones(0); }, []);
+  const limpiar = useCallback(() => {
+    bloquesRef.current = [];
+    setBloques([]);
+    pendienteRef.current = "";
+    setPendiente("");
+    setParcial("");
+    trozosRef.current = [];
+    duracionRef.current = 0;
+    setConAudio(false);
+    setPulidosOk(0);
+    setPulidosNo(0);
+    setResultado("");
+    setError("");
+    setAviso("");
+    setReconexiones(0);
+
+    // Reset new states and refs
+    sesionIdRef.current = "";
+    parteConsecutivaRef.current = 0;
+    partesSubidasRef.current = [];
+    parteTrozosRef.current = [];
+    subidaEnCursoRef.current = null;
+    setPartesContador(0);
+    setBytesAcumulados(0);
+  }, []);
 
   const totalChars = [...bloques, pendiente].filter((s) => s.trim().length > 0).join("\n\n").length;
 
@@ -368,7 +540,7 @@ export default function DictadoPage() {
 
       {/* Estadísticas */}
       <p className="text-xs font-medium" style={{ color: "var(--khora-accent)" }}>
-        estado: {estado} / escuchando: {escuchando ? "si" : "no"} / caracteres: {totalChars} / bloques pulidos: {pulidosOk} / bloques sin pulir: {pulidosNo} / audio: {conAudio ? "si" : "no"} / reconexiones: {reconexiones}
+        estado: {estado} / escuchando: {escuchando ? "si" : "no"} / caracteres: {totalChars} / bloques pulidos: {pulidosOk} / bloques sin pulir: {pulidosNo} / audio: {conAudio ? "si" : "no"} / partes subidas: {partesContador} ({ (bytesAcumulados / (1024 * 1024)).toFixed(2) } MB) / reconexiones: {reconexiones}
       </p>
 
       {/* Alertas y Mensajes de Retorno */}

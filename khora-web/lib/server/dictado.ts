@@ -1,4 +1,4 @@
-// @l0 L0-002-R · @req ING-03/REQ-1 · @acr ACR-1.2
+// @l0 L0-002-R · @req FIX-DICTADO/D2-D8
 import { randomUUID, createHash } from "crypto";
 import { getDb } from "./neon";
 import { asegurarTabla } from "./volcados";
@@ -10,6 +10,7 @@ const ALTERS = [
   "ALTER TABLE volcado ADD COLUMN IF NOT EXISTS duracion_seg INTEGER",
   "ALTER TABLE volcado ADD COLUMN IF NOT EXISTS fuente TEXT DEFAULT $$texto$$",
   "ALTER TABLE volcado ADD COLUMN IF NOT EXISTS pulido_aplicado BOOLEAN DEFAULT false",
+  "ALTER TABLE volcado ADD COLUMN IF NOT EXISTS audio_partes JSONB",
 ];
 
 let columnasListas = false;
@@ -26,6 +27,12 @@ export async function asegurarColumnasDictado(): Promise<void> {
 
 import { cifrarTexto } from "./cripto";
 
+export type AudioParte = {
+  parte: number;
+  url: string;
+  bytes: number;
+};
+
 export type EntradaDictado = {
   texto: string;
   titulo?: string | null;
@@ -34,6 +41,7 @@ export type EntradaDictado = {
   duracionSeg?: number | null;
   pulidoAplicado?: boolean;
   usuario?: string | null;
+  audioPartes?: AudioParte[] | null;
 };
 
 export async function guardarDictado(entrada: EntradaDictado) {
@@ -42,7 +50,7 @@ export async function guardarDictado(entrada: EntradaDictado) {
   const id = randomUUID();
   const sha = createHash("sha256").update(entrada.texto, "utf8").digest("hex");
   await db.query(
-    "INSERT INTO volcado (id, texto, sha256, chars, titulo, origen, driver, usuario, estado, fuente, audio_url, audio_bytes, duracion_seg, pulido_aplicado) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)",
+    "INSERT INTO volcado (id, texto, sha256, chars, titulo, origen, driver, usuario, estado, fuente, audio_url, audio_bytes, duracion_seg, pulido_aplicado, audio_partes) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)",
     [
       id,
       cifrarTexto(entrada.texto),
@@ -58,6 +66,7 @@ export async function guardarDictado(entrada: EntradaDictado) {
       entrada.audioBytes ?? null,
       entrada.duracionSeg ?? null,
       entrada.pulidoAplicado === true,
+      entrada.audioPartes ? JSON.stringify(entrada.audioPartes) : null,
     ]
   );
   await crearVersion(id, entrada.texto, "transcripcion original del dictado");
