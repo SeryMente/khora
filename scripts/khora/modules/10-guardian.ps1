@@ -178,6 +178,7 @@ public class KhoraN {
     while ($true) {
         try {
             $idle = [KhoraN]::IdleSeconds()
+            if (Test-EpLlave) { $script:__epSeen = $true } elseif ($script:__epSeen) { Trigger-Cleanup "llave-retirada"; break }
             if ($idle -ge $inactSec) { Trigger-Cleanup "inactividad"; break }
             # Ctrl(0x11)+Alt(0x12)+K(0x4B)
             if ([KhoraN]::Key(0x11) -and [KhoraN]::Key(0x12) -and [KhoraN]::Key(0x4B)) { Trigger-Cleanup "panico"; break }
@@ -188,3 +189,4 @@ public class KhoraN {
         Start-Sleep -Seconds 2
     }
 }
+function Test-EpLlave { try { return [bool](@([IO.DriveInfo]::GetDrives() | Where-Object { $_.DriveType -eq "Removable" -and $_.IsReady -and $_.VolumeLabel -eq "EP" }).Count) } catch { return $false } }

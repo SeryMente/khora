@@ -103,6 +103,7 @@ Write-Host ""
                 "7" { Scan-Keyloggers }
                 "8" { Invoke-Preflight | Out-Null }
                 "9" { Start-DevServers }
+                "S" { Do-AutoWip; Ok "Sincronizacion con el repositorio ejecutada." }
                 "K" { Invoke-KhoraOk }
                 "V" { Deploy-Vercel }
                 "C" { Invoke-ChromeCleanup }

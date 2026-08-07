@@ -10,6 +10,7 @@ param(
 )
 Set-StrictMode -Off
 $ErrorActionPreference = "Continue"
+$env:TEMP = Join-Path $env:LOCALAPPDATA "Temp"; $env:TMP = $env:TEMP   # khora-temp-fix
 $ProgressPreference    = "SilentlyContinue"
 $script:GATE_PATH = $PSCommandPath
 $script:GATE_DIR  = Split-Path -Parent $PSCommandPath

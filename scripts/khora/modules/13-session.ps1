@@ -211,13 +211,15 @@ if (-not $cloneOK) { Fail "No se pudo clonar tras 3 intentos."; Write-Host ""; W
     # Entorno PRIMERO: VS Code abrira con npm/node/render/docker ya en PATH
     Step "Entorno de desarrollo (Python + Node + Docker + Vercel + Render)"
     Wait-DepsPreload -Job $global:DepsPreloadJob
+    $code = Ensure-VSCode
+    $code = Ensure-VSCode
     Ensure-Python311
     Setup-Venv
     Ensure-Node
     Setup-KhoraWeb
     Ensure-VercelCLI
     Ensure-RenderCLI
-    Ensure-Docker
+    # Ensure-Docker desactivado en v7.1.2
     # VS Code abre DESPUES de instalar tools
     # -> su terminal integrada tiene npm, node, python, render, vercel, docker listos
     Step "VS Code"
@@ -237,8 +239,7 @@ if (-not $cloneOK) { Fail "No se pudo clonar tras 3 intentos."; Write-Host ""; W
     # AUTO-INICIO GARANTIZADO: todo corre solo, sin opcion de menu
     # ===================================================================
     Step "Boveda de entorno (Env Vault)"
-    Init-EnvVault
-
+    . (Join-Path $REPO_DIR "scripts\khora\env-vault.ps1"); Import-KhoraEnvVault | Out-Null
     Step "Servidores de desarrollo (AUTO-INICIO garantizado)"
     L "INFO" "Arrancando dev servers automaticamente post-token (API + Next.js)..."
     Start-DevServers

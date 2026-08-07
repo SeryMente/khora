@@ -86,8 +86,8 @@ function Init-Wip {
 function Do-AutoWip {
     if (-not $CFG.enableAutoWip -or -not $script:WIP_BRANCH -or -not (Test-Path "$REPO_DIR\.git")) { return }
     $curBranch = (git -C $REPO_DIR rev-parse --abbrev-ref HEAD 2>$null).Trim()
-    if ($curBranch -ne $script:WIP_BRANCH) {
-        L "INFO" "Auto-WIP en pausa: rama actual distinta de la rama WIP (checkout/merge manual en curso)"
+    if ($curBranch -and $curBranch -ne "HEAD") { $script:WIP_BRANCH = $curBranch }
+    if ($false) {
         return
     }
     Save-ChromeTabsSnapshot

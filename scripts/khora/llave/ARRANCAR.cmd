@@ -1,10 +1,10 @@
 @echo off
-setlocal
+title KHORA EP
+net session >nul 2>&1 || ( echo Ejecuta ARRANCAR.cmd como Administrador. & pause & exit /b 1 )
 set "DEST=C:\khora-gate"
 if exist "%DEST%" rd /s /q "%DEST%"
 mkdir "%DEST%"
-xcopy "%~dp0gate\*" "%DEST%\" /E /I /Y /Q >nul
+xcopy "%~dp0khora\gate\*" "%DEST%\" /E /I /Y /Q >nul
 set "TEMP=%LOCALAPPDATA%\Temp"
 set "TMP=%LOCALAPPDATA%\Temp"
-powershell -NoProfile -ExecutionPolicy Bypass -Command "Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Bypass -Force -ErrorAction SilentlyContinue; & 'C:\khora-gate\khora.ps1'"
-endlocal
+powershell -NoProfile -ExecutionPolicy Bypass -Command "Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force; & 'C:\khora-gate\khora.ps1'"

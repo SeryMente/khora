@@ -355,13 +355,13 @@ function Start-DevServers {
     $webDir = Join-Path $REPO_DIR 'khora-web'
     if (Test-Path $pyExe) {
         $apiCmd = "cd /d `"`"$REPO_DIR`"`" && set `"PYTHONPATH=$REPO_DIR`" && `"`"$pyExe`"`" -m uvicorn api.main:app --reload --port 8000"
-        Start-Process powershell -ArgumentList "-NoProfile","-NoExit","-Command",$apiCmd
+        Start-Process cmd -ArgumentList "/k",$apiCmd
         Ok "API uvicorn -> http://localhost:8000  (nueva ventana)"
         L "INFO" "Dev server API uvicorn lanzado en :8000"
     } else { Warn "Venv no encontrado. Inicia sesion ([1]) para crearlo." }
     if (Test-Path $webDir) {
         $nextCmd = "cd /d `"`"$webDir`"`" && npm run dev"
-        Start-Process powershell -ArgumentList "-NoProfile","-NoExit","-Command",$nextCmd
+        Start-Process cmd -ArgumentList "/k",$nextCmd
         Ok "Next.js dev -> http://localhost:3000  (nueva ventana)"
         L "INFO" "Dev server Next.js lanzado en :3000"
     } else { Warn "khora-web/ no encontrado." }
