@@ -74,8 +74,12 @@ function Ensure-GitignoreHygiene {
 }
 function Init-Wip {
     if (-not $CFG.enableAutoWip) { return }
-    $script:WIP_BRANCH = "wip/auto-$DATE_STR-$PID"
-    git -C $REPO_DIR checkout -b $script:WIP_BRANCH 2>&1 | Out-Null
+    $__cur = (git -C $REPO_DIR rev-parse --abbrev-ref HEAD 2>$null)
+    if ($__cur) { $__cur = $__cur.Trim() }
+    if (-not $__cur -or $__cur -eq "HEAD") { $__cur = "main" }
+    $script:WIP_BRANCH = $__cur
+    Ok "Auto-WIP sobre la rama actual: $__cur"
+    $global:LASTEXITCODE = 0
     if ($LASTEXITCODE -eq 0) {
         Ok "Rama de respaldo creada: $script:WIP_BRANCH"
         # Publicar de inmediato: el remoto conoce la rama desde el minuto cero
