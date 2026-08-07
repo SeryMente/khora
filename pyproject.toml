@@ -12,9 +12,8 @@ dependencies = ["pydantic>=2", "fastapi", "uvicorn[standard]", "cryptography", "
 [tool.setuptools]
 py-modules = []
 
-
 [tool.ruff]
 line-length = 100
 
 [tool.pyright]
-include = ["src", "tests"]
+include = ["api", "kernel", "shell", "puentes", "drivers", "tools"]
