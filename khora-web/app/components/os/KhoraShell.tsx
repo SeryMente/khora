@@ -11,7 +11,6 @@ export default function KhoraShell({ children }: { children: ReactNode }) {
                 minHeight: "100dvh",
                 display: "flex",
                 flexDirection: "column",
-                backgroundColor: "var(--khora-bg)",
                 color: "var(--khora-ink)",
             }}
         >
