@@ -174,4 +174,4 @@ function Resolve-RealUserPaths {
 
 Resolve-RealUserPaths
 
-Initialize-KhoraPaths
+. Initialize-KhoraPaths

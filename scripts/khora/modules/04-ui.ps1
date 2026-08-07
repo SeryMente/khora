@@ -228,7 +228,7 @@ function Show-Estado {
         $unpushedCount = (git -C $REPO_DIR log --oneline --branches --not --remotes 2>$null | Measure-Object).Count
         if ($unpushedCount -gt 0) { Warn "Commits locales sin push: $unpushedCount (usa [W] para pushear)" }
     } else { Warn "Sin repo." }
-    if (git config --global user.name 2>$null) { Warn "Git user.name activo." } else { Ok "Git user.name limpio." }
+    if (Test-Cmd git) { if (git config --global user.name 2>$null) { Warn "Git user.name activo." } else { Ok "Git user.name limpio." } } else { Warn "Git ausente (se instala al iniciar)." }
     if ($script:TokSecure) { Warn "Token en memoria (sesion activa)." } else { Ok "Sin token en memoria." }
     if ($script:GUARD_PID -and (Get-Process -Id $script:GUARD_PID -ErrorAction SilentlyContinue)) { Ok "Guardian activo (PID $script:GUARD_PID)." } else { Info "Guardian inactivo." }
     Write-Host ""

@@ -169,7 +169,7 @@ function Export-VSCodeConfig {
 }
 function Start-DepsPreload {
     $global:DepsPreloadLog = Join-Path $env:TEMP "khora-deps-preload.log"
-    if (Test-Path $global:DepsPreloadLog) { Remove-Item $global:DepsPreloadLog -Force -ErrorAction SilentlyContinue }
+    if (Test-Path -LiteralPath $global:DepsPreloadLog) { Remove-Item -LiteralPath $global:DepsPreloadLog -Force -ErrorAction SilentlyContinue }
 
     L "INFO" "Iniciando precarga paralela de dependencias (background job)..."
     $global:DepsPreloadJob = Start-Job -ScriptBlock {
