@@ -34,6 +34,17 @@ export default function SystemBar() {
       </Link>
 
       <Link
+        href="/sistema/ingreso"
+        className="flex flex-col items-center justify-center p-2"
+        style={{
+          color: pathname === "/sistema/ingreso" ? "var(--khora-ink)" : "var(--khora-accent)"
+        }}
+      >
+        <Icons.Keyboard size={32} strokeWidth={1.75} absoluteStrokeWidth={true} />
+        <span className="text-xs mt-1 font-medium">Ingreso</span>
+      </Link>
+
+      <Link
         href="/grafo"
         className="flex flex-col items-center justify-center p-2"
         style={{
