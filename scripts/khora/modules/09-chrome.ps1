@@ -5,7 +5,7 @@
 
 function Test-LastPassInstalled {
     $lpId = "hdokiejnpimakedhajhdlcegeplioahd"
-    $chromeUserData = Join-Path $env:LOCALAPPDATA "Google\Chrome\User Data"
+    $chromeUserData = Get-KhoraChromeProfile
     if (-not (Test-Path $chromeUserData)) { return $false }
     $profiles = Get-ChildItem -Path $chromeUserData -Directory -Filter "*"
     foreach ($prof in $profiles) {
@@ -22,6 +22,7 @@ function Get-ChromePaths {
     )
 }
 function Open-LoginTabs {
+    $script:CHROME_PROFILE = Get-KhoraChromeProfile
     $hasLp = Test-LastPassInstalled
     if (-not $hasLp) { Warn "LastPass no detectado. Las pestañas de login se abrirán pero no tendrán autofill." }
     $chromeExe = Resolve-Exe "chrome" (Get-ChromePaths) "chrome.exe"
@@ -32,12 +33,12 @@ function Open-LoginTabs {
         "chrome://settings/people"
     )
     foreach ($u in $urls) {
-        try { Start-Process -FilePath $chromeExe -ArgumentList "--remote-debugging-port=$CDP_PORT", "`"$u`"" -ErrorAction SilentlyContinue } catch {}
+        try { Start-Process -FilePath $chromeExe -ArgumentList ("--user-data-dir=" + $script:CHROME_PROFILE), "--no-first-run", "--no-default-browser-check", "--remote-debugging-port=$CDP_PORT", "`"$u`"" -ErrorAction SilentlyContinue } catch {}
     }
     Ok "Abiertas 3 pestañas iniciales de login (CDP port: $CDP_PORT)."
 }
 function Save-ChromeTabsSnapshot {
-    $res = Invoke-RestMethod "http://localhost:$CDP_PORT/json" -ErrorAction SilentlyContinue
+    $res = $null; try { $res = Invoke-RestMethod ("http://localhost:" + $CDP_PORT + "/json") -TimeoutSec 3 -ErrorAction Stop } catch { $res = $null }
     if (-not $res) { Warn "Chrome sin CDP activo o cerrado, omitiendo snapshot de pestañas."; return }
     $validUrls = @()
     foreach ($tab in $res) {
@@ -158,4 +159,20 @@ function Invoke-ChromeCleanup {
     $mb = [math]::Round($totalBytes / 1MB, 1)
     Ok "Chrome limpio: $cleared elementos borrados ($mb MB liberados)."
     L "INFO" "Chrome cleanup: $cleared items, $mb MB eliminados"
+}
+
+# ================================================================
+#  PERFIL DE CHROME EN LA LLAVE (v7.1.7)
+# ================================================================
+function Get-KhoraChromeProfile {
+    $letra = $null
+    foreach ($u in [IO.DriveInfo]::GetDrives()) {
+        if ($u.DriveType -ne "Removable") { continue }
+        if (-not $u.IsReady) { continue }
+        if ($u.VolumeLabel -eq "EP") { $letra = $u.Name; break }
+    }
+    if (-not $letra) { $ruta = Join-Path $env:LOCALAPPDATA "khora-session\chrome-data" }
+    else { $ruta = Join-Path $letra "khora\chrome\data" }
+    if (-not (Test-Path $ruta)) { try { New-Item -ItemType Directory -Force -Path $ruta | Out-Null } catch {} }
+    return $ruta
 }

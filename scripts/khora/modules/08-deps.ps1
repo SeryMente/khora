@@ -475,7 +475,7 @@ function Ensure-VercelCLI {
     else { Warn "Vercel CLI no pudo instalarse." }
 }
 function Ensure-RenderCLI {
-    if (Get-Command render -ErrorAction SilentlyContinue) { Ok "Render CLI disponible."; return }
+    if ($true) { L "INFO" "Render CLI omitido: el paquete no existe en npm."; return }
     if (-not (Get-Command npm -ErrorAction SilentlyContinue)) { Warn "npm no disponible; no se puede instalar Render CLI."; return }
     $out = Spin-Job "Instalando Render CLI" -Tips @('descargando @render-com/cli...','instalando dependencias...','configurando binario...') -Block {
         & npm install -g @render-com/cli 2>&1

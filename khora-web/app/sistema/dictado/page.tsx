@@ -1,4 +1,4 @@
-// @l0 L0-002-R · @req FIX-DICTADO/D2-D8
+// @l0 L0-002-R · @req CORA-02/REQ-1 · @req FIX-DICTADO/D2-D8 · @acr ACR-1.2
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -338,48 +338,68 @@ export default function DictadoPage() {
 
       let audioUrl: string | null = null;
       let audioBytes: number | null = null;
-      const partes = partesSubidasRef.current;
+const guardar = useCallback(async () => {
+  setError("");
+  setResultado("");
+  const texto = [...bloquesRef.current, pendienteRef.current].filter((s) => s.trim().length > 0).join("\n\n");
+  if (texto.trim().length === 0) { setError("no hay nada que archivar"); return; }
+  setGuardando(true);
+  try {
+    if (subidaEnCursoRef.current) {
+      await subidaEnCursoRef.current;
+    }
 
-      if (partes.length > 0) {
-        const ordenadas = [...partes].sort((a, b) => a.parte - b.parte);
-        const parte0 = ordenadas.find((p) => p.parte === 0) || ordenadas[0];
-        audioUrl = parte0 ? parte0.url : null;
-        audioBytes = ordenadas.reduce((sum, p) => sum + p.bytes, 0);
+    let audioUrl: string | null = null;
+    let audioBytes: number | null = null;
+    const partes = partesSubidasRef.current;
+
+    if (partes.length > 0) {
+      const ordenadas = [...partes].sort((a, b) => a.parte - b.parte);
+      const parte0 = ordenadas.find((p) => p.parte === 0) || ordenadas[0];
+      audioUrl = parte0 ? parte0.url : null;
+      audioBytes = ordenadas.reduce((sum, p) => sum + p.bytes, 0);
+    }
+
+    const payload = {
+      texto,
+      titulo: titulo.trim().length > 0 ? titulo.trim() : null,
+      audioUrl,
+      audioBytes,
+      duracionSeg: duracionRef.current,
+      pulidoAplicado: pulidosOk > 0,
+      audioPartes: partes.length > 0 ? partes : null,
+    };
+
+    let rv: Response;
+    let dv: any = {};
+    try {
+      rv = await fetch("/api/dictado", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const textoRespuesta = await rv.text();
+      try {
+        dv = JSON.parse(textoRespuesta);
+      } catch (parseErr) {
+        dv = { detail: "Respuesta no-JSON de dictado: " + textoRespuesta.slice(0, 200) };
       }
 
-      const payload = {
-        texto,
-        titulo: titulo.trim().length > 0 ? titulo.trim() : null,
-        audioUrl,
-        audioBytes,
-        duracionSeg: duracionRef.current,
-        pulidoAplicado: pulidosOk > 0,
-        audioPartes: partes.length > 0 ? partes : null,
-      };
-
-      let rv: Response;
-      let dv: any = {};
-      try {
-        rv = await fetch("/api/dictado", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-
-        const textoRespuesta = await rv.text();
-        try {
-          dv = JSON.parse(textoRespuesta);
-        } catch (parseErr) {
-          dv = { detail: "Respuesta no-JSON de dictado: " + textoRespuesta.slice(0, 200) };
-        }
-
-        if (!rv.ok) {
-          setError(String(dv?.detail || "Error desconocido") + " " + String(dv?.causa ?? ""));
-        } else {
-          setResultado("archivado " + String(dv?.chars) + " caracteres, sha " + String(dv?.sha256).slice(0, 8) + (audioUrl ? `, con audio (${partes.length} partes)` : ", sin audio"));
-        }
-      } catch (err) {
-        setError("Error de red al guardar: " + String(err));
+      if (!rv.ok) {
+        setError(String(dv?.detail || "Error desconocido") + " " + String(dv?.causa ?? ""));
+      } else {
+        setResultado("archivado " + String(dv?.chars) + " caracteres, sha " + String(dv?.sha256).slice(0, 8) + (audioUrl ? `, con audio (${partes.length} partes)` : ", sin audio"));
+      }
+    } catch (err) {
+      setError("Error de red al guardar: " + String(err));
+    }
+  } catch (e) {
+    setError(String(e));
+  } finally {
+    setGuardando(false);
+  }
+}, [titulo, pulidosOk]);
       }
     } catch (e) {
       setError(String(e));
@@ -425,7 +445,7 @@ export default function DictadoPage() {
         paddingBottom: "6rem",
       }}
     >
-      {/* Cabecera de Sección */}
+      {/* Cabecera de SecciÃ³n */}
       <div className="border-b pb-4" style={{ borderColor: "var(--khora-border)" }}>
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <Icons.Mic size={32} strokeWidth={1.75} style={{ color: "var(--khora-accent)" }} />
@@ -524,7 +544,7 @@ export default function DictadoPage() {
         </div>
       </div>
 
-      {/* Area de Transcripción */}
+      {/* Area de TranscripciÃ³n */}
       <div
         className="p-4 min-h-[240px] whitespace-pre-wrap leading-relaxed border rounded-none text-sm"
         style={{
@@ -538,7 +558,7 @@ export default function DictadoPage() {
         {parcial.length > 0 && <span className="opacity-50">{parcial}</span>}
       </div>
 
-      {/* Estadísticas */}
+      {/* EstadÃ­sticas */}
       <p className="text-xs font-medium" style={{ color: "var(--khora-accent)" }}>
         estado: {estado} / escuchando: {escuchando ? "si" : "no"} / caracteres: {totalChars} / bloques pulidos: {pulidosOk} / bloques sin pulir: {pulidosNo} / audio: {conAudio ? "si" : "no"} / partes subidas: {partesContador} ({ (bytesAcumulados / (1024 * 1024)).toFixed(2) } MB) / reconexiones: {reconexiones}
       </p>

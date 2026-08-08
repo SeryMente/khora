@@ -167,3 +167,38 @@ function Get-PersistedToken {
         return $null
     }
 }
+
+# ================================================================
+#  VIGILANCIA DE PORTAPAPELES (v7.1.5) - ingesta silenciosa del token
+# ================================================================
+function Watch-ClipboardToken {
+    $raw = ""
+    try { $raw = Get-Clipboard -Raw -ErrorAction Stop } catch { return }
+    if (-not $raw) { return }
+    $cand = ([string]$raw).Split([char]10)[0].Trim()
+    if ($cand.Length -lt 40) { return }
+    if ($cand.Contains(" ")) { return }
+    if (-not ($cand.StartsWith("ghp_") -or $cand.StartsWith("github_pat_"))) { return }
+    if ($cand -eq $script:ClipTokenSeen) { return }
+    $script:ClipTokenSeen = $cand
+    try { Set-Clipboard -Value " " -ErrorAction Stop } catch {}
+    $bien = $false
+    try {
+        $cab = @{ Authorization = ("Bearer " + $cand); "User-Agent" = "khora"; Accept = "application/vnd.github+json" }
+        $resp = Invoke-WebRequest ("https://api.github.com/repos/" + $REPO_ORG + "/" + $REPO_NAME) -Headers $cab -UseBasicParsing -TimeoutSec 12 -ErrorAction Stop
+        if ($resp.StatusCode -eq 200) { $bien = $true }
+    } catch { $bien = $false }
+    if ($bien) {
+        $script:TokSecure = ConvertTo-SecureString $cand -AsPlainText -Force
+        $cand = $null
+        L "INFO" "Token detectado en el portapapeles y validado: arranque automatico."
+        Ok "Token valido detectado. Arrancando sesion sin intervencion."
+        $script:SES_START = Get-Date
+        Start-Sesion
+        return
+    }
+    $cand = $null
+    L "WARN" "Token del portapapeles rechazado por GitHub."
+    Warn "El texto copiado parece un token pero GitHub lo rechazo. Portapapeles limpiado."
+    try { Add-Type -AssemblyName System.Windows.Forms -ErrorAction Stop; [void][System.Windows.Forms.MessageBox]::Show("Copiaste algo con forma de token de GitHub, pero GitHub lo rechazo para este repositorio. Revisa que sea el token correcto, que no haya expirado y que tenga permiso de escritura.","KHORA - token no valido",0,48) } catch {}
+}

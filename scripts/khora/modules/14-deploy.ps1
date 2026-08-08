@@ -354,14 +354,20 @@ function Start-DevServers {
     $pyExe  = Join-Path $WORK_DIR 'venv\Scripts\python.exe'
     $webDir = Join-Path $REPO_DIR 'khora-web'
     if (Test-Path $pyExe) {
-        $apiCmd = "cd /d `"`"$REPO_DIR`"`" && set `"PYTHONPATH=$REPO_DIR`" && `"`"$pyExe`"`" -m uvicorn api.main:app --reload --port 8000"
-        Start-Process cmd -ArgumentList "/k",$apiCmd
+        $qch = [char]34
+        $apiFile = Join-Path $env:TEMP "khora-api.cmd"
+        $apiTxt = @("@echo off","title KHORA API 8000","cd /d " + $qch + $REPO_DIR + $qch,"set PYTHONPATH=" + $REPO_DIR,"start " + $qch + $qch + " /b /low " + $qch + $pyExe + $qch + " -m uvicorn api.main:app --reload --port 8000")
+        [IO.File]::WriteAllLines($apiFile,[string[]]$apiTxt,(New-Object System.Text.ASCIIEncoding))
+        Start-Process cmd -ArgumentList ("/k " + $qch + $apiFile + $qch) -WindowStyle Minimized
         Ok "API uvicorn -> http://localhost:8000  (nueva ventana)"
         L "INFO" "Dev server API uvicorn lanzado en :8000"
     } else { Warn "Venv no encontrado. Inicia sesion ([1]) para crearlo." }
     if (Test-Path $webDir) {
-        $nextCmd = "cd /d `"`"$webDir`"`" && npm run dev"
-        Start-Process cmd -ArgumentList "/k",$nextCmd
+        $qcw = [char]34
+        $nextFile = Join-Path $env:TEMP "khora-next.cmd"
+        $nextTxt = @("@echo off","title KHORA WEB 3000","cd /d " + $qcw + $webDir + $qcw,"start " + $qcw + $qcw + " /b /low npm.cmd run dev")
+        [IO.File]::WriteAllLines($nextFile,[string[]]$nextTxt,(New-Object System.Text.ASCIIEncoding))
+        Start-Process cmd -ArgumentList ("/k " + $qcw + $nextFile + $qcw) -WindowStyle Minimized
         Ok "Next.js dev -> http://localhost:3000  (nueva ventana)"
         L "INFO" "Dev server Next.js lanzado en :3000"
     } else { Warn "khora-web/ no encontrado." }
