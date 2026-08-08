@@ -45,7 +45,7 @@ test.describe("Bóveda Page Reskin - BOVEDA-01", () => {
     expect(inputStyle).toContain("var(--khora-border)");
 
     // Find submit button and check its styling variables
-    const actionBtn = page.locator("button");
+    const actionBtn = page.locator(".max-w-md button");
     await expect(actionBtn).toBeVisible();
 
     const btnStyle = await actionBtn.getAttribute("style");

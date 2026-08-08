@@ -1,4 +1,4 @@
-// @l0 L0-002 · @req CORA-02/REQ-1 · @acr ACR-1.2
+// @l0 L0-002-R · @req FIX-DICTADO/D2-D8
 import { put } from "@vercel/blob";
 import { NextResponse } from "next/server";
 import { cifrarBytes } from "../../../lib/server/cripto";
@@ -18,8 +18,19 @@ export async function POST(req: Request) {
       return NextResponse.json({ detail: "el audio llego vacio" }, { status: 400 });
     }
     const cifrado = cifrarBytes(crudo);
-    const marca = new Date().toISOString().replace(/[:.]/g, "-");
-    const subido = await put("dictado/" + marca + ".webm.khc", cifrado, { access: "public", addRandomSuffix: true, contentType: "application/octet-stream" });
+
+    const sesionId = forma.get("sesionId");
+    const parte = forma.get("parte");
+
+    let destino: string;
+    if (typeof sesionId === "string" && sesionId.trim().length > 0 && typeof parte === "string" && parte.trim().length > 0) {
+      destino = "dictado/" + sesionId + "/" + parte + ".webm.khc";
+    } else {
+      const marca = new Date().toISOString().replace(/[:.]/g, "-");
+      destino = "dictado/" + marca + ".webm.khc";
+    }
+
+    const subido = await put(destino, cifrado, { access: "public", addRandomSuffix: true, contentType: "application/octet-stream" });
     return NextResponse.json({ url: subido.url, bytes: crudo.length, cifrado: true });
   } catch (e) {
     return NextResponse.json({ detail: "no se pudo guardar el audio", causa: String(e) }, { status: 500 });
