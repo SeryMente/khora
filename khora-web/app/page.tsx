@@ -4,6 +4,7 @@ const SUPERFICIES = [
     { href: "/capturar", etiqueta: "Captura", icono: "Mic" },
     { href: "/sistema/dictado", etiqueta: "Dictado", icono: "Activity" },
     { href: "/sistema/volcados", etiqueta: "Archivo", icono: "Files" },
+    { href: "/sistema/ingreso", etiqueta: "Ingreso", icono: "Keyboard" },
     { href: "/sistema/consulta", etiqueta: "Consulta", icono: "MessageSquareShare" },
     { href: "/grafo", etiqueta: "Nucleo", icono: "Network" },
     { href: "/sistema/boveda", etiqueta: "Boveda", icono: "LockKeyhole" },
