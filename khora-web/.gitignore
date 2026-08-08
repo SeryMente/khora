@@ -46,3 +46,5 @@ playwright-report/
 playwright/.cache/
 
 node_modules/
+
+.env*

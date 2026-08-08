@@ -56,3 +56,5 @@ update_header.py
 scripts/khora/khora-v*.ps1
 
 *.bak_*
+.vercel
+.env*
