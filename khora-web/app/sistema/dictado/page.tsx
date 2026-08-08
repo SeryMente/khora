@@ -331,75 +331,54 @@ export default function DictadoPage() {
     if (texto.trim().length === 0) { setError("no hay nada que archivar"); return; }
     setGuardando(true);
     try {
-      // Ensure any pending upload finishes first
       if (subidaEnCursoRef.current) {
         await subidaEnCursoRef.current;
       }
 
       let audioUrl: string | null = null;
       let audioBytes: number | null = null;
-const guardar = useCallback(async () => {
-  setError("");
-  setResultado("");
-  const texto = [...bloquesRef.current, pendienteRef.current].filter((s) => s.trim().length > 0).join("\n\n");
-  if (texto.trim().length === 0) { setError("no hay nada que archivar"); return; }
-  setGuardando(true);
-  try {
-    if (subidaEnCursoRef.current) {
-      await subidaEnCursoRef.current;
-    }
+      const partes = partesSubidasRef.current;
 
-    let audioUrl: string | null = null;
-    let audioBytes: number | null = null;
-    const partes = partesSubidasRef.current;
+      if (partes.length > 0) {
+        const ordenadas = [...partes].sort((a, b) => a.parte - b.parte);
+        const parte0 = ordenadas.find((p) => p.parte === 0) || ordenadas[0];
+        audioUrl = parte0 ? parte0.url : null;
+        audioBytes = ordenadas.reduce((sum, p) => sum + p.bytes, 0);
+      }
 
-    if (partes.length > 0) {
-      const ordenadas = [...partes].sort((a, b) => a.parte - b.parte);
-      const parte0 = ordenadas.find((p) => p.parte === 0) || ordenadas[0];
-      audioUrl = parte0 ? parte0.url : null;
-      audioBytes = ordenadas.reduce((sum, p) => sum + p.bytes, 0);
-    }
+      const payload = {
+        texto,
+        titulo: titulo.trim().length > 0 ? titulo.trim() : null,
+        audioUrl,
+        audioBytes,
+        duracionSeg: duracionRef.current,
+        pulidoAplicado: pulidosOk > 0,
+        audioPartes: partes.length > 0 ? partes : null,
+      };
 
-    const payload = {
-      texto,
-      titulo: titulo.trim().length > 0 ? titulo.trim() : null,
-      audioUrl,
-      audioBytes,
-      duracionSeg: duracionRef.current,
-      pulidoAplicado: pulidosOk > 0,
-      audioPartes: partes.length > 0 ? partes : null,
-    };
-
-    let rv: Response;
-    let dv: any = {};
-    try {
-      rv = await fetch("/api/dictado", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      const textoRespuesta = await rv.text();
+      let rv: Response;
+      let dv: any = {};
       try {
-        dv = JSON.parse(textoRespuesta);
-      } catch (parseErr) {
-        dv = { detail: "Respuesta no-JSON de dictado: " + textoRespuesta.slice(0, 200) };
-      }
+        rv = await fetch("/api/dictado", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
 
-      if (!rv.ok) {
-        setError(String(dv?.detail || "Error desconocido") + " " + String(dv?.causa ?? ""));
-      } else {
-        setResultado("archivado " + String(dv?.chars) + " caracteres, sha " + String(dv?.sha256).slice(0, 8) + (audioUrl ? `, con audio (${partes.length} partes)` : ", sin audio"));
-      }
-    } catch (err) {
-      setError("Error de red al guardar: " + String(err));
-    }
-  } catch (e) {
-    setError(String(e));
-  } finally {
-    setGuardando(false);
-  }
-}, [titulo, pulidosOk]);
+        const textoRespuesta = await rv.text();
+        try {
+          dv = JSON.parse(textoRespuesta);
+        } catch (parseErr) {
+          dv = { detail: "Respuesta no-JSON de dictado: " + textoRespuesta.slice(0, 200) };
+        }
+
+        if (!rv.ok) {
+          setError(String(dv?.detail || "Error desconocido") + " " + String(dv?.causa ?? ""));
+        } else {
+          setResultado("archivado " + String(dv?.chars) + " caracteres, sha " + String(dv?.sha256).slice(0, 8) + (audioUrl ? `, con audio (${partes.length} partes)` : ", sin audio"));
+        }
+      } catch (err) {
+        setError("Error de red al guardar: " + String(err));
       }
     } catch (e) {
       setError(String(e));
