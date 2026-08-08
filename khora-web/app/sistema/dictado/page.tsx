@@ -115,12 +115,15 @@ export default function DictadoPage() {
     const blob = new Blob(trozosParaSubir, { type: "audio/webm" });
     const sesionId = sesionIdRef.current;
 
-    const forma = new FormData();
-    forma.append("audio", blob, `dictado-parte-${parteActual}.webm`);
-    forma.append("sesionId", sesionId);
-    forma.append("parte", String(parteActual));
+    const maxParteBytes = 3 * 1024 * 1024; // 3 MB safety limit
+    const totalBytes = blob.size;
 
-    const ejecutarSubida = async () => {
+    const ejecutarSubidaDeBlob = async (blobASubir: Blob, numParte: number) => {
+      const forma = new FormData();
+      forma.append("audio", blobASubir, `dictado-parte-${numParte}.webm`);
+      forma.append("sesionId", sesionId);
+      forma.append("parte", String(numParte));
+
       try {
         const ra = await fetch("/api/audio", { method: "POST", body: forma });
         const textoRespuesta = await ra.text();
@@ -132,9 +135,9 @@ export default function DictadoPage() {
         }
 
         if (ra.ok && typeof da?.url === "string") {
-          const bytesSubidos = typeof da?.bytes === "number" ? da.bytes : blob.size;
+          const bytesSubidos = typeof da?.bytes === "number" ? da.bytes : blobASubir.size;
           partesSubidasRef.current.push({
-            parte: parteActual,
+            parte: numParte,
             url: da.url,
             bytes: bytesSubidos,
           });
@@ -142,15 +145,37 @@ export default function DictadoPage() {
           setBytesAcumulados((total) => total + bytesSubidos);
           setConAudio(true);
         } else {
-          setAviso(`audio parte ${parteActual} no guardada: ${String(da?.detail || "")} ${String(da?.causa || "")}`);
+          setAviso(`audio parte ${numParte} no guardada: ${String(da?.detail || "")} ${String(da?.causa || "")}`);
         }
       } catch (e) {
-        setAviso(`audio parte ${parteActual} no guardada por error: ${String(e)}`);
+        setAviso(`audio parte ${numParte} no guardada por error: ${String(e)}`);
+      }
+    };
+
+    const ejecutarSubidas = async () => {
+      if (totalBytes <= maxParteBytes) {
+        await ejecutarSubidaDeBlob(blob, parteActual);
+      } else {
+        let offset = 0;
+        let subParteIndex = 0;
+        while (offset < totalBytes) {
+          const fin = Math.min(offset + maxParteBytes, totalBytes);
+          const subBlob = blob.slice(offset, fin, "audio/webm");
+
+          const actualSubParteNum = (subParteIndex === 0) ? parteActual : parteConsecutivaRef.current;
+          if (subParteIndex > 0) {
+            parteConsecutivaRef.current += 1;
+          }
+
+          await ejecutarSubidaDeBlob(subBlob, actualSubParteNum);
+          offset = fin;
+          subParteIndex++;
+        }
       }
     };
 
     const anteriorSubida = subidaEnCursoRef.current || Promise.resolve();
-    const nuevaSubida = anteriorSubida.then(ejecutarSubida);
+    const nuevaSubida = anteriorSubida.then(ejecutarSubidas);
     subidaEnCursoRef.current = nuevaSubida;
     await nuevaSubida;
   }, []);
@@ -178,7 +203,7 @@ export default function DictadoPage() {
           const totalSize = parteTrozosRef.current.reduce((sum, chunk) => sum + chunk.size, 0);
           const elapsed = Date.now() - parteInicioRef.current;
 
-          if (totalSize >= 2 * 1024 * 1024 || elapsed >= 120 * 1000) {
+          if (totalSize >= 1.5 * 1024 * 1024 || elapsed >= 45 * 1000) {
             void subirParteActual();
           }
         }
