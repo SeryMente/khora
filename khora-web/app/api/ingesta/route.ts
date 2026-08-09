@@ -1,6 +1,8 @@
 // @l0 L0-002 · @req CORA-02/REQ-1,REQ-2,REQ-3 · @acr ACR-1.1,ACR-1.2,ACR-2.1,ACR-3.1 · @ua —
 import { NextResponse } from "next/server";
 import { auth } from "../../../auth";
+import { randomUUID } from "crypto";
+import { getDb } from "../../../lib/server/neon";
 import { listarVersiones, sha256de } from "../../../lib/server/correcciones";
 
 export async function POST(req: Request) {
@@ -35,6 +37,25 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "el carril de archivo aun no tiene volcado versionado" }, { status: 409 });
     }
     const versionPedida = Number(versionCruda);
+
+    const db = getDb();
+    const vRes = await db.query("SELECT estado, version_aprobada, sha256_aprobado FROM volcado WHERE id = $1", [volcadoId]);
+    if (vRes.rows.length === 0) {
+      return NextResponse.json({ error: "volcado no encontrado" }, { status: 404 });
+    }
+    const volcado = vRes.rows[0];
+
+    // Validación estricta de aprobación
+    if (volcado.estado !== "listo_ingesta") {
+      return NextResponse.json({ error: `La ingesta exige que el volcado este en estado listo_ingesta. Estado actual: ${volcado.estado}` }, { status: 428 });
+    }
+    if (volcado.version_aprobada === null || volcado.sha256_aprobado === null) {
+      return NextResponse.json({ error: "El volcado no tiene una version aprobada activa" }, { status: 428 });
+    }
+    if (versionPedida !== Number(volcado.version_aprobada)) {
+      return NextResponse.json({ error: "La version solicitada no coincide con la version aprobada para este volcado" }, { status: 409 });
+    }
+
     const versiones = await listarVersiones(volcadoId);
     const fila: any = versiones.find((v: any) => Number(v.version) === versionPedida);
     if (!fila) {
@@ -46,6 +67,9 @@ export async function POST(req: Request) {
     const shaServidor = sha256de(texto);
     if (shaServidor !== String(fila.sha256).toLowerCase()) {
       return NextResponse.json({ error: "integridad rota: sha256 de la version no coincide" }, { status: 409 });
+    }
+    if (shaServidor !== String(volcado.sha256_aprobado).trim().toLowerCase()) {
+      return NextResponse.json({ error: "integridad rota: el SHA256 de la version no coincide con el SHA256 aprobado" }, { status: 409 });
     }
 
     const payload = {
@@ -82,9 +106,32 @@ export async function POST(req: Request) {
       clearTimeout(timeout);
 
       const data = await apiResponse.json();
+
+      if (apiResponse.ok) {
+        // Éxito: actualizar estado operativo a 'ingerido' y registrar auditoría
+        await db.query("UPDATE volcado SET estado = 'ingerido' WHERE id = $1", [volcadoId]);
+        await db.query(
+          "INSERT INTO volcado_revision_auditoria (id, volcado_id, accion, estado_anterior, estado_nuevo, version, sha256, usuario) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)",
+          [randomUUID(), volcadoId, "ingestado", "listo_ingesta", "ingerido", versionPedida, shaServidor, session?.user?.email ?? null]
+        );
+      } else {
+        // Fallo: actualizar estado operativo a 'fallido' y registrar auditoría
+        await db.query("UPDATE volcado SET estado = 'fallido' WHERE id = $1", [volcadoId]);
+        await db.query(
+          "INSERT INTO volcado_revision_auditoria (id, volcado_id, accion, estado_anterior, estado_nuevo, version, sha256, usuario) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)",
+          [randomUUID(), volcadoId, "ingesta_fallida", "listo_ingesta", "fallido", versionPedida, shaServidor, session?.user?.email ?? null]
+        );
+      }
+
       return NextResponse.json(data, { status: apiResponse.status });
     } catch (fetchError: any) {
       clearTimeout(timeout);
+      // Fallo de red/timeout: actualizar estado operativo a 'fallido' y registrar auditoría
+      await db.query("UPDATE volcado SET estado = 'fallido' WHERE id = $1", [volcadoId]);
+      await db.query(
+        "INSERT INTO volcado_revision_auditoria (id, volcado_id, accion, estado_anterior, estado_nuevo, version, sha256, usuario) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)",
+        [randomUUID(), volcadoId, "ingesta_fallida", "listo_ingesta", "fallido", versionPedida, shaServidor, session?.user?.email ?? null]
+      );
       if (fetchError.name === "AbortError") {
         return NextResponse.json({ error: "Request to kernel timed out" }, { status: 504 });
       }
