@@ -13,6 +13,7 @@ const DDL = [
   "CREATE INDEX IF NOT EXISTS correccion_antes_idx ON correccion (antes)",
   "CREATE TABLE IF NOT EXISTS volcado_version (id UUID PRIMARY KEY, volcado_id UUID NOT NULL, version INTEGER NOT NULL, texto TEXT NOT NULL, sha256 CHAR(64) NOT NULL, chars INTEGER NOT NULL, motivo TEXT, creado_en TIMESTAMPTZ NOT NULL DEFAULT now())",
   "CREATE UNIQUE INDEX IF NOT EXISTS volcado_version_uniq ON volcado_version (volcado_id, version)",
+  "ALTER TABLE volcado ADD COLUMN IF NOT EXISTS version_aprobada INTEGER",
 ];
 
 let listo = false;

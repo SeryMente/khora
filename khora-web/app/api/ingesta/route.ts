@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "../../../auth";
 import { listarVersiones, sha256de } from "../../../lib/server/correcciones";
+import { getDb } from "../../../lib/server/neon";
 
 export async function POST(req: Request) {
   const session = await auth();
@@ -40,6 +41,20 @@ export async function POST(req: Request) {
     if (!fila) {
       return NextResponse.json({ error: "version inexistente para ese volcado" }, { status: 404 });
     }
+
+    const db = getDb();
+    const volRes = await db.query("SELECT estado, version_aprobada FROM volcado WHERE id = $1", [volcadoId]);
+    if (volRes.rows.length === 0) {
+      return NextResponse.json({ error: "volcado no encontrado" }, { status: 404 });
+    }
+    const vol = volRes.rows[0];
+    if (vol.estado !== "listo_ingesta" && vol.estado !== "ingerido" && vol.estado !== "fallido") {
+      return NextResponse.json({ error: "el volcado debe estar aprobado para ingesta" }, { status: 400 });
+    }
+    if (vol.version_aprobada !== versionPedida) {
+      return NextResponse.json({ error: `la versión pedida (${versionPedida}) no coincide con la versión aprobada (${vol.version_aprobada})` }, { status: 400 });
+    }
+
     texto = String(fila.texto ?? "");
     archivo_base64 = null;
     mime = null;
@@ -82,9 +97,46 @@ export async function POST(req: Request) {
       clearTimeout(timeout);
 
       const data = await apiResponse.json();
+
+      if (apiResponse.ok && data.io_id) {
+        await db.query(
+          `UPDATE volcado
+           SET io_id = $2,
+               estado = 'ingerido',
+               ultimo_intento = now(),
+               intentos = intentos + 1,
+               ultimo_error = null
+           WHERE id = $1`,
+          [volcadoId, data.io_id]
+        );
+      } else {
+        const errMsg = data.error || data.causa || data.detail || "Error desconocido en kernel";
+        await db.query(
+          `UPDATE volcado
+           SET estado = 'fallido',
+               ultimo_intento = now(),
+               intentos = intentos + 1,
+               ultimo_error = $2
+           WHERE id = $1`,
+          [volcadoId, typeof errMsg === "object" ? JSON.stringify(errMsg) : String(errMsg)]
+        );
+      }
+
       return NextResponse.json(data, { status: apiResponse.status });
     } catch (fetchError: any) {
       clearTimeout(timeout);
+
+      const errMsg = fetchError.name === "AbortError" ? "Request to kernel timed out" : (fetchError.message || "Kernel request failed");
+      await db.query(
+        `UPDATE volcado
+         SET estado = 'fallido',
+             ultimo_intento = now(),
+             intentos = intentos + 1,
+             ultimo_error = $2
+         WHERE id = $1`,
+        [volcadoId, errMsg]
+      );
+
       if (fetchError.name === "AbortError") {
         return NextResponse.json({ error: "Request to kernel timed out" }, { status: 504 });
       }
