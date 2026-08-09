@@ -1,7 +1,7 @@
 // @l0 L0-002-R · @req PIPELINE-OBSERVABILITY/REQ-1
 import { NextResponse } from "next/server";
-import { auth } from "../../../auth";
-import { obtenerPipelineAggregated } from "../../../lib/server/pipeline";
+import { auth } from "@/auth";
+import { obtenerPipelineAggregated } from "@/lib/server/pipeline";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
