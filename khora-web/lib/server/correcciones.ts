@@ -32,17 +32,6 @@ export async function asegurarEsquema(): Promise<void> {
   }
   listo = true;
 }
-];
-
-let listo = false;
-
-export async function asegurarEsquema(): Promise<void> {
-  if (listo) return;
-  await asegurarTabla();
-  const db = getDb();
-  for (const sql of DDL) { await db.query(sql); }
-  listo = true;
-}
 
 import { cifrarTexto, descifrarTexto } from "./cripto";
 
