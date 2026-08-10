@@ -12,17 +12,6 @@ export default function SystemBar() {
   return (
     <nav className="fixed bottom-0 w-full flex justify-around items-center p-2 z-50">
       <Link
-        href="/capturar"
-        className="flex flex-col items-center justify-center p-2"
-        style={{
-          color: pathname === "/capturar" ? "var(--khora-ink)" : "var(--khora-accent)"
-        }}
-      >
-        <Icons.Mic size={32} strokeWidth={1.75} absoluteStrokeWidth={true} />
-        <span className="text-xs mt-1 font-medium">Captura</span>
-      </Link>
-
-      <Link
         href="/sistema/volcados"
         className="flex flex-col items-center justify-center p-2"
         style={{
@@ -30,7 +19,7 @@ export default function SystemBar() {
         }}
       >
         <Icons.Files size={32} strokeWidth={1.75} absoluteStrokeWidth={true} />
-        <span className="text-xs mt-1 font-medium">Archivo</span>
+        <span className="text-xs mt-1 font-medium">Volcados</span>
       </Link>
 
       <Link
@@ -52,7 +41,7 @@ export default function SystemBar() {
         }}
       >
         <Icons.Network size={32} strokeWidth={1.75} absoluteStrokeWidth={true} />
-        <span className="text-xs mt-1 font-medium">Núcleo</span>
+        <span className="text-xs mt-1 font-medium">Grafo</span>
       </Link>
 
       <Link
