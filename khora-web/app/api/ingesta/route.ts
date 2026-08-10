@@ -4,6 +4,7 @@ import { auth } from "../../../auth";
 import { randomUUID } from "crypto";
 import { getDb } from "../../../lib/server/neon";
 import { listarVersiones, sha256de } from "../../../lib/server/correcciones";
+import { getDb } from "../../../lib/server/neon";
 
 export async function POST(req: Request) {
   const session = await auth();
@@ -61,6 +62,20 @@ export async function POST(req: Request) {
     if (!fila) {
       return NextResponse.json({ error: "version inexistente para ese volcado" }, { status: 404 });
     }
+
+    const db = getDb();
+    const volRes = await db.query("SELECT estado, version_aprobada FROM volcado WHERE id = $1", [volcadoId]);
+    if (volRes.rows.length === 0) {
+      return NextResponse.json({ error: "volcado no encontrado" }, { status: 404 });
+    }
+    const vol = volRes.rows[0];
+    if (vol.estado !== "listo_ingesta" && vol.estado !== "ingerido" && vol.estado !== "fallido") {
+      return NextResponse.json({ error: "el volcado debe estar aprobado para ingesta" }, { status: 400 });
+    }
+    if (vol.version_aprobada !== versionPedida) {
+      return NextResponse.json({ error: `la versión pedida (${versionPedida}) no coincide con la versión aprobada (${vol.version_aprobada})` }, { status: 400 });
+    }
+
     texto = String(fila.texto ?? "");
     archivo_base64 = null;
     mime = null;
@@ -107,31 +122,103 @@ export async function POST(req: Request) {
 
       const data = await apiResponse.json();
 
-      if (apiResponse.ok) {
-        // Éxito: actualizar estado operativo a 'ingerido' y registrar auditoría
-        await db.query("UPDATE volcado SET estado = 'ingerido' WHERE id = $1", [volcadoId]);
-        await db.query(
-          "INSERT INTO volcado_revision_auditoria (id, volcado_id, accion, estado_anterior, estado_nuevo, version, sha256, usuario) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)",
-          [randomUUID(), volcadoId, "ingestado", "listo_ingesta", "ingerido", versionPedida, shaServidor, session?.user?.email ?? null]
-        );
-      } else {
-        // Fallo: actualizar estado operativo a 'fallido' y registrar auditoría
-        await db.query("UPDATE volcado SET estado = 'fallido' WHERE id = $1", [volcadoId]);
-        await db.query(
-          "INSERT INTO volcado_revision_auditoria (id, volcado_id, accion, estado_anterior, estado_nuevo, version, sha256, usuario) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)",
-          [randomUUID(), volcadoId, "ingesta_fallida", "listo_ingesta", "fallido", versionPedida, shaServidor, session?.user?.email ?? null]
+if (apiResponse.ok) {
+  // Éxito: actualizar estado operativo a 'ingerido' y registrar auditoría
+  await db.query(
+    `UPDATE volcado
+     SET estado = 'ingerido',
+         ultimo_intento = now(),
+         intentos = intentos + 1,
+         ultimo_error = NULL
+     WHERE id = $1`,
+    [volcadoId]
+  );
+
+  await db.query(
+    "INSERT INTO volcado_revision_auditoria (id, volcado_id, accion, estado_anterior, estado_nuevo, version, sha256, usuario) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)",
+    [
+      randomUUID(),
+      volcadoId,
+      "ingestado",
+      "listo_ingesta",
+      "ingerido",
+      versionPedida,
+      shaServidor,
+      session?.user?.email ?? null,
+    ]
+  );
+} else {
+  // Fallo: actualizar estado operativo a 'fallido' y registrar auditoría
+  await db.query(
+    `UPDATE volcado
+     SET estado = 'fallido',
+         ultimo_intento = now(),
+         intentos = intentos + 1,
+         ultimo_error = $2
+     WHERE id = $1`,
+    [volcadoId, `Kernel returned HTTP ${apiResponse.status}`]
+  );
+
+  await db.query(
+    "INSERT INTO volcado_revision_auditoria (id, volcado_id, accion, estado_anterior, estado_nuevo, version, sha256, usuario) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)",
+    [
+      randomUUID(),
+      volcadoId,
+      "ingesta_fallida",
+      "listo_ingesta",
+      "fallido",
+      versionPedida,
+      shaServidor,
+      session?.user?.email ?? null,
+    ]
+  );
+}
         );
       }
 
       return NextResponse.json(data, { status: apiResponse.status });
     } catch (fetchError: any) {
       clearTimeout(timeout);
-      // Fallo de red/timeout: actualizar estado operativo a 'fallido' y registrar auditoría
-      await db.query("UPDATE volcado SET estado = 'fallido' WHERE id = $1", [volcadoId]);
-      await db.query(
-        "INSERT INTO volcado_revision_auditoria (id, volcado_id, accion, estado_anterior, estado_nuevo, version, sha256, usuario) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)",
-        [randomUUID(), volcadoId, "ingesta_fallida", "listo_ingesta", "fallido", versionPedida, shaServidor, session?.user?.email ?? null]
-      );
+const errMsg =
+  fetchError.name === "AbortError"
+    ? "Request to kernel timed out"
+    : (fetchError.message || "Kernel request failed");
+
+await db.query(
+  `UPDATE volcado
+   SET estado = 'fallido',
+       ultimo_intento = now(),
+       intentos = intentos + 1,
+       ultimo_error = $2
+   WHERE id = $1`,
+  [volcadoId, errMsg]
+);
+
+await db.query(
+  "INSERT INTO volcado_revision_auditoria (id, volcado_id, accion, estado_anterior, estado_nuevo, version, sha256, usuario) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)",
+  [
+    randomUUID(),
+    volcadoId,
+    "ingesta_fallida",
+    "listo_ingesta",
+    "fallido",
+    versionPedida,
+    shaServidor,
+    session?.user?.email ?? null,
+  ]
+);
+
+if (fetchError.name === "AbortError") {
+  return NextResponse.json(
+    { error: "Request to kernel timed out" },
+    { status: 504 }
+  );
+}
+
+return NextResponse.json(
+  { error: "Kernel request failed", details: errMsg },
+  { status: 502 }
+);
       if (fetchError.name === "AbortError") {
         return NextResponse.json({ error: "Request to kernel timed out" }, { status: 504 });
       }
