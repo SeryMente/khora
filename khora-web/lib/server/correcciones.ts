@@ -1,4 +1,4 @@
-// @l0 L0-002-R · @req ING-03/REQ-1 · @acr ACR-1.2
+// @l0 L0-002-R · @req ING-03/REQ-1,PIPELINE/REQ-3 · @acr ACR-1.2
 import { randomUUID, createHash } from "crypto";
 import { getDb } from "./neon";
 import { asegurarTabla } from "./volcados";
@@ -13,6 +13,7 @@ const DDL = [
   "CREATE INDEX IF NOT EXISTS correccion_antes_idx ON correccion (antes)",
   "CREATE TABLE IF NOT EXISTS volcado_version (id UUID PRIMARY KEY, volcado_id UUID NOT NULL, version INTEGER NOT NULL, texto TEXT NOT NULL, sha256 CHAR(64) NOT NULL, chars INTEGER NOT NULL, motivo TEXT, creado_en TIMESTAMPTZ NOT NULL DEFAULT now())",
   "CREATE UNIQUE INDEX IF NOT EXISTS volcado_version_uniq ON volcado_version (volcado_id, version)",
+  "CREATE TABLE IF NOT EXISTS volcado_revision (volcado_id UUID PRIMARY KEY, version_aprobada INTEGER, sha256_aprobado CHAR(64), aprobado_en TIMESTAMPTZ NOT NULL DEFAULT now(), aprobador TEXT, estado TEXT DEFAULT 'en_revision')",
 ];
 
 let listo = false;

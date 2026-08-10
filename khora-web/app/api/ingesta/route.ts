@@ -1,7 +1,8 @@
-// @l0 L0-002 · @req CORA-02/REQ-1,REQ-2,REQ-3 · @acr ACR-1.1,ACR-1.2,ACR-2.1,ACR-3.1 · @ua —
+// @l0 L0-002 · @req CORA-02/REQ-1,REQ-2,REQ-3,PIPELINE/REQ-3 · @acr ACR-1.1,ACR-1.2,ACR-2.1,ACR-3.1 · @ua —
 import { NextResponse } from "next/server";
 import { auth } from "../../../auth";
 import { listarVersiones, sha256de } from "../../../lib/server/correcciones";
+import { getDb } from "../../../lib/server/neon";
 
 export async function POST(req: Request) {
   const session = await auth();
@@ -82,9 +83,42 @@ export async function POST(req: Request) {
       clearTimeout(timeout);
 
       const data = await apiResponse.json();
+
+      // Persist status and io_id in PostgreSQL
+      try {
+        const db = getDb();
+        if (apiResponse.status === 200 || apiResponse.status === 201) {
+          const ioId = data.io_id || null;
+          await db.query(
+            "UPDATE volcado SET estado = 'ingerido', io_id = $1, ultimo_error = NULL, ultimo_intento = NOW(), intentos = intentos + 1 WHERE id = $2",
+            [ioId, volcadoId]
+          );
+        } else {
+          const errorMsg = data.error || data.detail || JSON.stringify(data) || "Kernel returned error";
+          await db.query(
+            "UPDATE volcado SET estado = 'fallido', ultimo_error = $1, ultimo_intento = NOW(), intentos = intentos + 1 WHERE id = $2",
+            [errorMsg, volcadoId]
+          );
+        }
+      } catch (dbErr: any) {
+        console.error("Failed to update volcado state in DB:", dbErr);
+      }
+
       return NextResponse.json(data, { status: apiResponse.status });
     } catch (fetchError: any) {
       clearTimeout(timeout);
+
+      // Update volcado to fallido state on fetch error
+      try {
+        const db = getDb();
+        await db.query(
+          "UPDATE volcado SET estado = 'fallido', ultimo_error = $1, ultimo_intento = NOW(), intentos = intentos + 1 WHERE id = $2",
+          [fetchError.message || "Fetch to kernel failed", volcadoId]
+        );
+      } catch (dbErr) {
+        console.error("Failed to update volcado state in DB on fetch error:", dbErr);
+      }
+
       if (fetchError.name === "AbortError") {
         return NextResponse.json({ error: "Request to kernel timed out" }, { status: 504 });
       }
