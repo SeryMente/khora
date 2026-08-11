@@ -121,15 +121,16 @@ export async function POST(req: Request) {
       const data = await apiResponse.json();
 
       if (apiResponse.ok) {
-        // Éxito: actualizar estado operativo a 'ingerido' y registrar auditoría
+        // Éxito: actualizar estado operativo a 'ingerido', guardar el io_id y registrar auditoría
         await db.query(
           `UPDATE volcado
            SET estado = 'ingerido',
+               io_id = $2,
                ultimo_intento = now(),
                intentos = intentos + 1,
                ultimo_error = NULL
            WHERE id = $1`,
-          [volcadoId]
+          [volcadoId, data.io_id]
         );
 
         await db.query(
