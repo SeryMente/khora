@@ -314,7 +314,7 @@ const mockAristasCounts = [
 ];
 
 // Override Pool's query method
-Pool.prototype.query = async function (sql: string, params?: any[]) {
+(Pool.prototype as any).query = async function (sql: any, params?: any[]) {
   mockQueryCount++;
   queryLogs.push({ sql, params });
 

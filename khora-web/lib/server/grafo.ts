@@ -1,5 +1,6 @@
 // @l0 L0-003 · @req GRAFO/TABLAS
 import { getDb } from "./neon";
+import neo4j from "neo4j-driver";
 
 const DDL = [
   `CREATE TABLE IF NOT EXISTS nodos (
@@ -125,6 +126,91 @@ export async function obtenerNodos(): Promise<NodoPG[]> {
     marca_temporal_hecho: row.marca_temporal_hecho ? new Date(row.marca_temporal_hecho).toISOString() : null,
     marca_captura: row.marca_captura ? new Date(row.marca_captura).toISOString() : new Date().toISOString()
   }));
+}
+
+export interface VerificacionCircuitoResult {
+  exists: boolean;
+  node_count: number;
+  relation_count: number;
+  details: {
+    io_id: string;
+    volcado_id: string | null;
+    version: number | null;
+    sha256: string | null;
+  } | null;
+}
+
+export async function verificarCircuitoCompletoNeo4j(ioId: string): Promise<VerificacionCircuitoResult> {
+  const uri = process.env.NEO4J_URI;
+  const user = process.env.NEO4J_USER;
+  const password = process.env.NEO4J_PASSWORD;
+
+  if (!uri || !user || !password) {
+    throw new Error("Missing Neo4j environment variables for verification");
+  }
+
+  const driverInstance = neo4j.driver(uri, neo4j.auth.basic(user, password));
+  try {
+    const session = driverInstance.session();
+    try {
+      // 1. Verify InformationObject exists
+      const ioRes = await session.run(
+        `MATCH (io:InformationObject {io_id: $ioId})
+         RETURN io.volcado_id AS volcado_id, io.version AS version, io.sha256 AS sha256
+         LIMIT 1`,
+        { ioId }
+      );
+
+      if (ioRes.records.length === 0) {
+        return {
+          exists: false,
+          node_count: 0,
+          relation_count: 0,
+          details: null
+        };
+      }
+
+      const rec = ioRes.records[0];
+      const volcado_id = rec.get("volcado_id") || null;
+      const versionRaw = rec.get("version");
+      const version = versionRaw !== null && versionRaw !== undefined
+        ? (typeof versionRaw === "object" && "toNumber" in versionRaw ? (versionRaw as any).toNumber() : Number(versionRaw))
+        : null;
+      const sha256 = rec.get("sha256") || null;
+
+      // 2. Count MENTIONS nodes
+      const nodesRes = await session.run(
+        `MATCH (:InformationObject {io_id: $ioId})-[m:MENTIONS {io_id: $ioId}]->(e:Entity)
+         RETURN count(e) AS node_count`,
+        { ioId }
+      );
+      const node_count = Number(nodesRes.records[0].get("node_count") || 0);
+
+      // 3. Count RELATION edges
+      const relsRes = await session.run(
+        `MATCH ()-[r:RELATION {io_id: $ioId}]->()
+         RETURN count(r) AS relation_count`,
+        { ioId }
+      );
+      const relation_count = Number(relsRes.records[0].get("relation_count") || 0);
+
+      return {
+        exists: true,
+        node_count,
+        relation_count,
+        details: {
+          io_id: ioId,
+          volcado_id,
+          version,
+          sha256
+        }
+      };
+    } finally {
+      await session.close();
+    }
+  } finally {
+    await driverInstance.close();
+  }
 }
 
 export async function obtenerAristas(): Promise<AristaPG[]> {

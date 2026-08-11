@@ -153,7 +153,10 @@ export async function POST(req: Request) {
     // La fuente de verdad para esta ruta es listarVersiones().
     // ----------------------------------------------------------
 
-    if (textInput !== null && textInput.trim().length > 0) {
+    if (
+      textInput !== null &&
+      textInput.trim().length > 0
+    ) {
       texto = textInput;
     }
 
@@ -585,15 +588,11 @@ export async function POST(req: Request) {
 
       // --------------------------------------------------------
       // 25. ESTADO DE FALLO
+      //
+      // La llamada HTTP sí llegó al kernel, pero el kernel
+      // rechazó o procesó con error la solicitud.
       // --------------------------------------------------------
 
-      //
-      // En este punto la llamada HTTP sí llegó al kernel,
-      // pero el kernel rechazó/procesó con error la solicitud.
-      //
-      // El volcado estaba en listo_ingesta, por lo que pasa
-      // a fallido.
-      //
       const nuevoEstado = "fallido";
 
       try {
@@ -695,14 +694,11 @@ export async function POST(req: Request) {
 
       // --------------------------------------------------------
       // 30. ESTADO OPERATIVO DE FALLO
-      // --------------------------------------------------------
-
       //
       // Si hubo timeout/error de red no tenemos confirmación
       // de que el kernel haya procesado la solicitud.
-      //
-      // Por eso se conserva el estado explícito de fallido.
-      //
+      // --------------------------------------------------------
+
       const nuevoEstado = "fallido";
 
       try {
