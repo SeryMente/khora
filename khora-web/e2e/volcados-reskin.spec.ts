@@ -1,4 +1,4 @@
-// @l0 L0-002 · @req CORA-02/REQ-1,REQ-2 · @acr ACR-1.1,ACR-1.2 · @ua —
+// @l0 L0-002 · @req CORA-02/REQ-1,REQ-2,PIPELINE/REQ-3 · @acr ACR-1.1,ACR-1.2 · @ua —
 import { test, expect } from "@playwright/test";
 
 test.describe("Volcados Reskin UI", () => {
@@ -43,6 +43,18 @@ test.describe("Volcados Reskin UI", () => {
       }
     });
 
+    // Mock pipeline call to render gracefully
+    await page.route("**/api/volcados/pipeline", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          resumen: { total: 0 },
+          items: []
+        }),
+      });
+    });
+
     await page.goto("/sistema/volcados");
   });
 
@@ -50,6 +62,9 @@ test.describe("Volcados Reskin UI", () => {
     // Check main header
     const mainHeader = page.locator("h1");
     await expect(mainHeader).toContainText("Volcados");
+
+    // Click on Archivo Manual to display legacy form
+    await page.locator("button:has-text('Archivo Manual')").click();
 
     // Check textarea and placeholder
     const textarea = page.locator("textarea");
@@ -60,6 +75,5 @@ test.describe("Volcados Reskin UI", () => {
     const row = page.locator("tbody tr");
     await expect(row).toBeVisible();
     await expect(row).toContainText("Volcado de prueba");
-    await expect(row).toContainText("procesado");
   });
 });

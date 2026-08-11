@@ -8,16 +8,24 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   const session = await auth();
+
   if (!session?.user?.email) {
-    return NextResponse.json({ detail: "no autenticado" }, { status: 401 });
+    return NextResponse.json(
+      { detail: "no autenticado" },
+      { status: 401 }
+    );
   }
 
   try {
     const data = await obtenerPipelineAggregated();
+
     return NextResponse.json(data);
   } catch (e: any) {
     return NextResponse.json(
-      { detail: "lectura del pipeline fallida", causa: e?.message ?? String(e) },
+      {
+        detail: "lectura del pipeline fallida",
+        causa: e?.message ?? String(e),
+      },
       { status: 500 }
     );
   }
