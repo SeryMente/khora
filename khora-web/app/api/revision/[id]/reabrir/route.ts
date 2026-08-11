@@ -1,7 +1,7 @@
 // @l0 L0-002-R · @req REVISION/REQ-1
 import { NextResponse } from "next/server";
 import { auth } from "../../../../../auth";
-import { reabrirRevision } from "../../../../../lib/server/correcciones";
+import { reabrirRevision } from "../../../../../lib/server/volcados";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";

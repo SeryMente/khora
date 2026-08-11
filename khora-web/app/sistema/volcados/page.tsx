@@ -87,6 +87,8 @@ export default function VolcadosPage() {
   // Drawer focus trap ref
   const drawerRef = useRef<HTMLDivElement>(null);
 
+  const [mobileShowDetail, setMobileShowDetail] = useState(false);
+
   // Theme support local state
   const [themeMode, setThemeMode] = useState("dark");
 
@@ -98,20 +100,23 @@ export default function VolcadosPage() {
   }, []);
 
   // Fetch Pipeline Data
-  const fetchPipeline = useCallback(async () => {
+  const fetchPipeline = useCallback(async (currentSelectedId?: string | null) => {
     setLoadingPipeline(true);
     try {
       const res = await fetch("/api/volcados/pipeline");
       const data = await res.json();
       if (res.ok) {
-        setPipelineItems(data.items || []);
+        const items = data.items || [];
+        setPipelineItems(items);
         setResumen(data.resumen || null);
+        return items;
       }
     } catch (err) {
       console.error("Error loading pipeline:", err);
     } finally {
       setLoadingPipeline(false);
     }
+    return [];
   }, []);
 
   // Fetch Legacy Volcados list
@@ -128,16 +133,25 @@ export default function VolcadosPage() {
   }, []);
 
   useEffect(() => {
-    void fetchPipeline();
+    async function init() {
+      const items = await fetchPipeline();
+      if (items && items.length > 0 && !selectedId) {
+        await selectVolcadoItem(items[0].id, true);
+      }
+    }
+    void init();
     void fetchLegacyVolcados();
   }, [fetchPipeline, fetchLegacyVolcados]);
 
   // Handle volcado selection
-  const selectVolcadoItem = async (id: string) => {
+  const selectVolcadoItem = async (id: string, skipMobileToggle?: boolean) => {
     setSelectedId(id);
     setIngestaResult(null);
     setDrawerSubTab("trace");
     setDeltaPairs([]);
+    if (!skipMobileToggle) {
+      setMobileShowDetail(true);
+    }
 
     // Find in current pipeline items
     const item = pipelineItems.find((i) => i.id === id);
@@ -409,6 +423,21 @@ export default function VolcadosPage() {
     return true;
   });
 
+  // Watch filters & search query to adjust selectedId if the current selection is excluded.
+  // When the list updates, automatically select the first item if current selection isn't there anymore.
+  useEffect(() => {
+    if (activeTab === "pipeline" && !loadingPipeline) {
+      const stillExists = filteredPipelineItems.some(it => it.id === selectedId);
+      if (!stillExists && filteredPipelineItems.length > 0) {
+        void selectVolcadoItem(filteredPipelineItems[0].id, true);
+      } else if (filteredPipelineItems.length === 0) {
+        // Clear selection if list becomes empty
+        setSelectedId(null);
+        setSelectedItem(null);
+      }
+    }
+  }, [filter, searchQuery, pipelineItems, activeTab, loadingPipeline]);
+
   // Legacy Archiving logic
   const handleArchivarLegacy = async () => {
     if (texto.trim().length === 0) {
@@ -663,639 +692,596 @@ export default function VolcadosPage() {
             </div>
           </div>
 
-          {/* Density-optimized Control Tower table */}
-          <div className="overflow-x-auto border rounded-none shadow-none" style={{ borderColor: "var(--khora-border)" }}>
-            <table className="w-full text-left text-xs border-collapse">
-              <thead style={{ backgroundColor: "var(--khora-surface)" }}>
-                <tr className="border-b" style={{ borderColor: "var(--khora-border)" }}>
-                  <th className="p-3 font-semibold uppercase tracking-wider opacity-70">Identificador</th>
-                  <th className="p-3 font-semibold uppercase tracking-wider opacity-70">Título / Vista Previa</th>
-                  <th className="p-3 font-semibold uppercase tracking-wider opacity-70">Recibido</th>
-                  <th className="p-3 font-semibold uppercase tracking-wider opacity-70">Estado Pipeline</th>
-                  <th className="p-3 font-semibold uppercase tracking-wider opacity-70">Audio</th>
-                  <th className="p-3 font-semibold uppercase tracking-wider opacity-70">Revisión</th>
-                  <th className="p-3 font-semibold uppercase tracking-wider opacity-70">Integridad</th>
-                  <th className="p-3 font-semibold uppercase tracking-wider opacity-70">io_id</th>
-                  <th className="p-3 font-semibold uppercase tracking-wider opacity-70">Grafo PG</th>
-                </tr>
-              </thead>
-              <tbody>
-                {loadingPipeline ? (
-                  <tr>
-                    <td colSpan={9} className="p-8 text-center text-xs opacity-60">
-                      Cargando torre de control de volcados...
-                    </td>
-                  </tr>
-                ) : filteredPipelineItems.length === 0 ? (
-                  <tr>
-                    <td colSpan={9} className="p-8 text-center text-xs opacity-60">
-                      Ningún volcado coincide con el filtro activo.
-                    </td>
-                  </tr>
-                ) : (
-                  filteredPipelineItems.map((item) => {
+          {/* Layout Master-Detail */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-[600px] items-stretch">
+            {/* LEFT INDEX COLUMN: Trazabilidad Index de todos los volcados */}
+            <div className={`lg:col-span-5 flex flex-col space-y-3 ${mobileShowDetail ? "hidden lg:flex" : "flex"}`}>
+              <div className="flex justify-between items-baseline border-b pb-1 mb-1" style={{ borderColor: "var(--khora-border)" }}>
+                <span className="text-[10px] font-mono tracking-wider uppercase opacity-60">Volcados Disponibles</span>
+                <span className="text-[10px] font-mono opacity-60">{filteredPipelineItems.length} items</span>
+              </div>
+
+              {loadingPipeline ? (
+                <div className="p-8 text-center text-xs opacity-60 border" style={{ backgroundColor: "var(--khora-surface)", borderColor: "var(--khora-border)" }}>
+                  Cargando torre de control de volcados...
+                </div>
+              ) : filteredPipelineItems.length === 0 ? (
+                <div className="p-8 text-center text-xs opacity-60 border" style={{ backgroundColor: "var(--khora-surface)", borderColor: "var(--khora-border)" }}>
+                  Ningún volcado coincide con el filtro activo.
+                </div>
+              ) : (
+                <div className="space-y-2 overflow-y-auto max-h-[700px] pr-1">
+                  {filteredPipelineItems.map((item) => {
                     const isSelected = selectedId === item.id;
 
-                    // Compute pipeline status badge color & label
-                    let stateColor = "text-zinc-400 border-zinc-400/20 bg-zinc-400/5";
-                    let stateLabel = item.estado;
-                    if (item.estado === "archivado") {
-                      stateColor = "text-blue-400 border-blue-400/20 bg-blue-400/5";
-                      stateLabel = "🎙 Archivador";
-                    } else if (item.estado === "en_revision" || item.estado === "pendiente_revision") {
-                      stateColor = "text-purple-400 border-purple-400/20 bg-purple-400/5";
-                      stateLabel = "✎ Revisión";
-                    } else if (item.estado === "listo_ingesta") {
-                      stateColor = "text-amber-400 border-amber-400/20 bg-amber-400/5";
-                      stateLabel = "⚙ Listo";
-                    } else if (item.estado === "ingerido") {
-                      stateColor = "text-emerald-400 border-emerald-400/20 bg-emerald-400/5";
-                      stateLabel = "◎ Ingerido";
-                    } else if (item.estado === "fallido") {
-                      stateColor = "text-red-400 border-red-400/20 bg-red-400/5";
-                      stateLabel = "✕ Fallido";
-                    }
+                    // Inline steps representation: Captura (🎙), Transcripción (📝), Revisión (✎), Aprobación (✓), Ingesta (⚙)
+                    // We determine their states sequentially:
+                    const step1_captura = "ok"; // Captura is always complete
+                    const step2_transcripcion = item.integrity === "audio_without_text" ? "error" : "ok";
+                    const step3_revision = (item.estado === "archivado" || item.estado === "pendiente_revision") ? "pending" : "ok";
+                    const step4_aprobacion = item.version_aprobada ? "ok" : "pending";
+                    const step5_ingesta = item.estado === "ingerido" ? "ok" : (item.estado === "fallido" ? "error" : "pending");
 
-                    // Compute audio status icon & text
-                    let audioIcon = <Icons.VolumeX className="w-3.5 h-3.5 text-red-500" />;
-                    let audioText = "Sin audio";
-                    if (item.audioStatus === "audio_texto") {
-                      audioIcon = <Icons.Volume2 className="w-3.5 h-3.5 text-emerald-500" />;
-                      audioText = "Audio+Texto";
-                    } else if (item.audioStatus === "texto_sin_audio") {
-                      audioIcon = <Icons.VolumeX className="w-3.5 h-3.5 text-orange-500" />;
-                      audioText = "Sin audio";
-                    } else if (item.audioStatus === "audio_sin_texto") {
-                      audioIcon = <Icons.Volume2 className="w-3.5 h-3.5 text-red-500" />;
-                      audioText = "Sin texto";
-                    } else if (item.audioStatus === "audio_parcial") {
-                      audioIcon = <Icons.Volume1 className="w-3.5 h-3.5 text-orange-500" />;
-                      audioText = "Parcial";
-                    }
+                    const getStepColor = (status: string) => {
+                      if (status === "ok") return "text-emerald-500";
+                      if (status === "error") return "text-red-500";
+                      return "text-zinc-500 opacity-40";
+                    };
 
-                    // Compute integrity state colors
-                    let integrityColor = "text-zinc-400 border-zinc-400/20 bg-zinc-400/5";
-                    let integrityLabel = "Desconocida";
-                    if (item.integrity === "sync") {
-                      integrityColor = "text-emerald-400 border-emerald-400/20 bg-emerald-400/5";
-                      integrityLabel = "🟢 Sincronizado";
-                    } else if (item.integrity === "text_edited") {
-                      integrityColor = "text-yellow-400 border-yellow-400/20 bg-yellow-400/5";
-                      integrityLabel = "🟡 Modificado";
-                    } else if (
-                      item.integrity === "text_without_audio" ||
-                      item.integrity === "audio_without_text" ||
-                      item.integrity === "audio_partial"
-                    ) {
-                      integrityColor = "text-orange-400 border-orange-400/20 bg-orange-400/5";
-                      integrityLabel = "🟠 Incompleto";
-                    } else if (item.integrity === "broken_provenance") {
-                      integrityColor = "text-red-400 border-red-400/20 bg-red-400/5";
-                      integrityLabel = "🔴 Inconsistente";
+                    // Badges for quick scan
+                    let integrityLabel = "";
+                    let integrityBg = "";
+                    if (item.integrity !== "sync") {
+                      if (item.integrity === "text_edited") {
+                        integrityLabel = "Modificado";
+                        integrityBg = "text-yellow-400 border-yellow-400/20 bg-yellow-400/5";
+                      } else if (item.integrity === "broken_provenance") {
+                        integrityLabel = "Inconsistente";
+                        integrityBg = "text-red-400 border-red-400/20 bg-red-400/5";
+                      } else {
+                        integrityLabel = "Incompleto";
+                        integrityBg = "text-orange-400 border-orange-400/20 bg-orange-400/5";
+                      }
                     }
 
                     return (
-                      <tr
+                      <div
                         key={item.id}
                         onClick={() => selectVolcadoItem(item.id)}
-                        className={`border-b last:border-b-0 hover:bg-zinc-800/20 cursor-pointer transition-colors ${
-                          isSelected ? "bg-zinc-800/30" : ""
+                        className={`p-3 border cursor-pointer transition-all flex flex-col space-y-2 rounded-none hover:bg-zinc-800/10 ${
+                          isSelected ? "bg-zinc-800/30 ring-1 ring-[var(--khora-accent)]" : "bg-[var(--khora-surface)]"
                         }`}
-                        style={{ borderColor: "var(--khora-border)" }}
+                        style={{
+                          borderColor: isSelected ? "var(--khora-accent)" : "var(--khora-border)"
+                        }}
                       >
-                        <td className="p-3 font-mono font-semibold text-[11px] whitespace-nowrap">
-                          {item.id.slice(0, 8)}...
-                        </td>
-                        <td className="p-3 max-w-[200px] truncate font-medium">
-                          {item.titulo ? (
-                            <span className="block truncate font-semibold text-[11px]">{item.titulo}</span>
-                          ) : (
-                            <span className="italic opacity-60">Sin título</span>
-                          )}
-                        </td>
-                        <td className="p-3 whitespace-nowrap opacity-75">
-                          {new Date(item.recibido_en).toLocaleString()}
-                        </td>
-                        <td className="p-3">
-                          <span className={`px-2 py-0.5 border text-[10px] font-mono rounded-none uppercase ${stateColor}`}>
-                            {stateLabel}
-                          </span>
-                        </td>
-                        <td className="p-3 whitespace-nowrap">
-                          <div className="flex items-center gap-1.5">
-                            {audioIcon}
-                            <span>{audioText}</span>
+                        {/* Title / Id bar */}
+                        <div className="flex justify-between items-start gap-2">
+                          <div className="min-w-0">
+                            {item.titulo ? (
+                              <h3 className="font-bold text-[11px] truncate">{item.titulo}</h3>
+                            ) : (
+                              <h3 className="italic text-[11px] opacity-60">Sin título</h3>
+                            )}
+                            <span className="text-[9px] font-mono opacity-50 block mt-0.5">ID: {item.id.slice(0, 8)}...</span>
                           </div>
-                        </td>
-                        <td className="p-3 whitespace-nowrap">
-                          {item.version_aprobada ? (
-                            <span className="text-emerald-500 font-bold flex items-center gap-1">
-                              <Icons.Check className="w-3.5 h-3.5" /> v{item.version_aprobada}
-                            </span>
-                          ) : (
-                            <span className="font-mono text-zinc-500 text-[10px]">v{item.version_actual} actual</span>
-                          )}
-                        </td>
-                        <td className="p-3 whitespace-nowrap">
-                          <span className={`px-2 py-0.5 border text-[10px] font-mono rounded-none uppercase ${integrityColor}`}>
-                            {integrityLabel}
+                          <span className="text-[9px] opacity-60 font-mono shrink-0">
+                            {new Date(item.recibido_en).toLocaleDateString()}
                           </span>
-                        </td>
-                        <td className="p-3 font-mono text-[11px] whitespace-nowrap opacity-75">
-                          {item.io_id ? item.io_id.slice(0, 8) + "..." : "—"}
-                        </td>
-                        <td className="p-3 whitespace-nowrap">
-                          {item.nodos_count > 0 || item.aristas_count > 0 ? (
-                            <span className="font-mono text-[10px] border border-blue-500/20 bg-blue-500/5 text-blue-400 px-1.5 py-0.5">
-                              {item.nodos_count}n / {item.aristas_count}r
-                            </span>
-                          ) : (
-                            <span className="text-zinc-500">—</span>
-                          )}
-                        </td>
-                      </tr>
+                        </div>
+
+                        {/* Lifecycle mini representation */}
+                        <div className="flex items-center justify-between pt-1 border-t border-zinc-800/10">
+                          <div className="flex items-center gap-2.5">
+                            <span className={`text-xs ${getStepColor(step1_captura)}`} title="Captura">🎙</span>
+                            <span className="text-zinc-700 text-[10px]">&gt;</span>
+                            <span className={`text-xs ${getStepColor(step2_transcripcion)}`} title="Transcripción">📝</span>
+                            <span className="text-zinc-700 text-[10px]">&gt;</span>
+                            <span className={`text-xs ${getStepColor(step3_revision)}`} title="Revisión">✎</span>
+                            <span className="text-zinc-700 text-[10px]">&gt;</span>
+                            <span className={`text-xs ${getStepColor(step4_aprobacion)}`} title="Aprobación">✓</span>
+                            <span className="text-zinc-700 text-[10px]">&gt;</span>
+                            <span className={`text-xs ${getStepColor(step5_ingesta)}`} title="Ingesta">⚙</span>
+                          </div>
+
+                          {/* Quick details */}
+                          <div className="flex items-center gap-1.5 font-mono text-[9px] opacity-75">
+                            {item.nodos_count > 0 && (
+                              <span className="border border-blue-500/20 bg-blue-500/5 text-blue-400 px-1 py-0.5" title="Grafo PG">
+                                {item.nodos_count}n / {item.aristas_count}r
+                              </span>
+                            )}
+                            {integrityLabel && (
+                              <span className={`px-1 py-0.5 border ${integrityBg}`}>
+                                {integrityLabel}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
                     );
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Right Sliding Drawer */}
-          {selectedId && selectedItem && (
-            <div
-              className="fixed inset-y-0 right-0 z-50 w-full max-w-xl shadow-2xl flex flex-col border-l transition-transform duration-200"
-              style={{
-                backgroundColor: "var(--khora-surface)",
-                borderColor: "var(--khora-border)",
-              }}
-              ref={drawerRef}
-            >
-              {/* Drawer Header */}
-              <div
-                className="p-4 border-b flex justify-between items-center"
-                style={{ borderColor: "var(--khora-border)" }}
-              >
-                <div className="space-y-1">
-                  <span className="text-[10px] font-mono tracking-widest uppercase opacity-60">
-                    DETALLE DEL PIPELINE
-                  </span>
-                  <h2 className="text-sm font-bold font-mono">
-                    {selectedItem.id}
-                  </h2>
+                  })}
                 </div>
-                <div className="flex items-center gap-4">
-                  {/* Sub Tab Buttons */}
-                  <div className="flex border rounded-none overflow-hidden" style={{ borderColor: "var(--khora-border)" }}>
-                    <button
-                      onClick={() => setDrawerSubTab("trace")}
-                      className="px-3 py-1 text-[10px] uppercase font-semibold cursor-pointer"
-                      style={{
-                        backgroundColor: drawerSubTab === "trace" ? "var(--khora-accent)" : "transparent",
-                        color: drawerSubTab === "trace" ? "var(--khora-bg)" : "var(--khora-ink)",
-                      }}
-                    >
-                      Trace
-                    </button>
-                    <button
-                      onClick={() => setDrawerSubTab("revision")}
-                      className="px-3 py-1 text-[10px] uppercase font-semibold cursor-pointer"
-                      style={{
-                        backgroundColor: drawerSubTab === "revision" ? "var(--khora-accent)" : "transparent",
-                        color: drawerSubTab === "revision" ? "var(--khora-bg)" : "var(--khora-ink)",
-                      }}
-                    >
-                      Revisión
-                    </button>
-                  </div>
+              )}
+            </div>
 
-                  <button
-                    onClick={() => {
-                      setSelectedId(null);
-                      setSelectedItem(null);
-                    }}
-                    className="p-1 rounded cursor-pointer hover:bg-zinc-800 transition-colors focus-visible:outline focus-visible:outline-2"
-                  >
-                    <Icons.X className="w-5 h-5 text-zinc-400" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Drawer Content */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-6">
-                {drawerSubTab === "trace" ? (
-                  <div className="space-y-6">
-                    {/* TRACE VIEW (Chronological Sequence) */}
-                    <div className="text-xs uppercase font-mono tracking-widest opacity-65 border-b pb-1 mb-2" style={{ borderColor: "var(--khora-border)" }}>
-                      Traceability Tree Map
+            {/* RIGHT DETAIL COLUMN: Trace, Revisión y Operaciones del volcado seleccionado */}
+            <div className={`lg:col-span-7 flex flex-col space-y-4 ${!mobileShowDetail ? "hidden lg:flex" : "flex"}`}>
+              {selectedId && selectedItem ? (
+                <div
+                  className="border p-4 shadow-none flex flex-col space-y-6 h-full rounded-none"
+                  style={{
+                    backgroundColor: "var(--khora-surface)",
+                    borderColor: "var(--khora-border)",
+                  }}
+                >
+                  {/* Detail Header & Mobile back navigation */}
+                  <div className="border-b pb-3 flex justify-between items-center" style={{ borderColor: "var(--khora-border)" }}>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        {/* Mobile Back Button */}
+                        <button
+                          onClick={() => setMobileShowDetail(false)}
+                          className="lg:hidden p-1 mr-1 border rounded-none cursor-pointer"
+                          style={{ borderColor: "var(--khora-border)" }}
+                        >
+                          <Icons.ChevronLeft className="w-4 h-4 text-zinc-400" />
+                        </button>
+                        <span className="text-[10px] font-mono tracking-widest uppercase opacity-60">
+                          Trazabilidad Operacional
+                        </span>
+                      </div>
+                      <h2 className="text-sm font-bold font-mono">
+                        {selectedItem.titulo || selectedItem.id}
+                      </h2>
                     </div>
 
-                    <div className="relative pl-6 border-l-2 space-y-6" style={{ borderColor: "var(--khora-border)" }}>
-                      {/* 🎙 CAPTURA */}
-                      <div className="relative">
-                        <div
-                          className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full flex items-center justify-center border"
-                          style={{
-                            backgroundColor: "var(--khora-bg)",
-                            borderColor: "var(--khora-accent)",
-                          }}
-                        >
-                          <Icons.Mic className="w-2.5 h-2.5 text-zinc-400" />
-                        </div>
-                        <div className="space-y-1">
-                          <h4 className="font-bold text-xs flex items-center gap-1.5">
-                            🎙 Captura <span className="text-emerald-500">✓ Completado</span>
-                          </h4>
-                          <div className="text-[11px] opacity-75 space-y-0.5 font-mono">
-                            <div>Fecha: {new Date(selectedItem.recibido_en).toLocaleString()}</div>
-                            <div>Origen: cora-ui (web)</div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* 💾 ARCHIVO */}
-                      <div className="relative">
-                        <div
-                          className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full flex items-center justify-center border"
-                          style={{
-                            backgroundColor: "var(--khora-bg)",
-                            borderColor: "var(--khora-accent)",
-                          }}
-                        >
-                          <Icons.Save className="w-2.5 h-2.5 text-zinc-400" />
-                        </div>
-                        <div className="space-y-1">
-                          <h4 className="font-bold text-xs">
-                            💾 Archivo <span className="text-emerald-500">✓ Salvaguardado</span>
-                          </h4>
-                          <div className="text-[11px] opacity-75 space-y-0.5 font-mono">
-                            <div>Total caracteres: {selectedItem.chars}</div>
-                            <div>Integridad: Verbatim Append-only</div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* 📝 TRANSCRIPCIÓN */}
-                      <div className="relative">
-                        <div
-                          className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full flex items-center justify-center border"
-                          style={{
-                            backgroundColor: "var(--khora-bg)",
-                            borderColor: "var(--khora-accent)",
-                          }}
-                        >
-                          <Icons.FileText className="w-2.5 h-2.5 text-zinc-400" />
-                        </div>
-                        <div className="space-y-1">
-                          <h4 className="font-bold text-xs">
-                            📝 Transcripción <span className="text-emerald-500">✓ Versión Inicial v1</span>
-                          </h4>
-                          <div className="text-[11px] opacity-75 space-y-0.5 font-mono">
-                            {selectedItem.audio_url ? (
-                              <>
-                                <div className="text-emerald-500">✓ Grabación disponible</div>
-                                <div>Duración: {selectedItem.duracion_seg} segundos</div>
-                              </>
-                            ) : (
-                              <div className="text-orange-500">⚠ Grabación ausente</div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* ✎ HISTORIAL / REVISIÓN */}
-                      <div className="relative">
-                        <div
-                          className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full flex items-center justify-center border"
-                          style={{
-                            backgroundColor: "var(--khora-bg)",
-                            borderColor: "var(--khora-accent)",
-                          }}
-                        >
-                          <Icons.GitCommit className="w-2.5 h-2.5 text-zinc-400" />
-                        </div>
-                        <div className="space-y-1">
-                          <h4 className="font-bold text-xs">
-                            ✎ Historial de Versiones
-                          </h4>
-                          <div className="text-[11px] opacity-75 space-y-1 font-mono">
-                            <div>Total versiones: {selectedItem.total_versiones}</div>
-                            {versiones.length > 0 && (
-                              <div className="border border-zinc-700/40 p-1.5 mt-1 bg-zinc-800/10 space-y-0.5 max-h-32 overflow-y-auto">
-                                {versiones.map((v) => (
-                                  <div key={v.version} className="flex justify-between">
-                                    <span>v{v.version} ({v.chars} car)</span>
-                                    <span className="opacity-60">{String(v.sha256).slice(0, 8)}</span>
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* ✓ APROBACIÓN */}
-                      <div className="relative">
-                        <div
-                          className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full flex items-center justify-center border"
-                          style={{
-                            backgroundColor: "var(--khora-bg)",
-                            borderColor: "var(--khora-accent)",
-                          }}
-                        >
-                          <Icons.CheckCircle className="w-2.5 h-2.5 text-zinc-400" />
-                        </div>
-                        <div className="space-y-1">
-                          <h4 className="font-bold text-xs flex items-center gap-1">
-                            ✓ Aprobación{" "}
-                            {selectedItem.version_aprobada ? (
-                              <span className="text-emerald-500">✓ v{selectedItem.version_aprobada} Aprobada</span>
-                            ) : (
-                              <span className="text-orange-500">○ Pendiente de aprobación</span>
-                            )}
-                          </h4>
-                          {selectedItem.version_aprobada && (
-                            <div className="text-[11px] opacity-75 space-y-0.5 font-mono">
-                              <div>Aprobador: {selectedItem.aprobador}</div>
-                              <div>Fecha: {new Date(selectedItem.aprobado_en!).toLocaleString()}</div>
-                              <div className="break-all font-semibold">Hash: {selectedItem.sha256_aprobado}</div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* ⚙ INGESTA */}
-                      <div className="relative">
-                        <div
-                          className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full flex items-center justify-center border"
-                          style={{
-                            backgroundColor: "var(--khora-bg)",
-                            borderColor: "var(--khora-accent)",
-                          }}
-                        >
-                          <Icons.Settings className="w-2.5 h-2.5 text-zinc-400" />
-                        </div>
-                        <div className="space-y-1">
-                          <h4 className="font-bold text-xs">
-                            ⚙ Ingesta{" "}
-                            {selectedItem.estado === "ingerido" ? (
-                              <span className="text-emerald-500">✓ Ingerido exitosamente</span>
-                            ) : selectedItem.estado === "fallido" ? (
-                              <span className="text-red-500">✕ Error en ingesta</span>
-                            ) : (
-                              <span className="text-orange-500">○ En espera</span>
-                            )}
-                          </h4>
-                          {selectedItem.ultimo_error && (
-                            <div className="text-[11px] text-red-400 font-mono mt-1 border border-red-500/10 p-1.5 bg-red-500/5">
-                              {selectedItem.ultimo_error}
-                            </div>
-                          )}
-                          {selectedItem.io_id && (
-                            <div className="text-[11px] opacity-75 font-mono">
-                              io_id: {selectedItem.io_id}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* ◎ GRAFO PKG */}
-                      <div className="relative">
-                        <div
-                          className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full flex items-center justify-center border"
-                          style={{
-                            backgroundColor: "var(--khora-bg)",
-                            borderColor: "var(--khora-accent)",
-                          }}
-                        >
-                          <Icons.Activity className="w-2.5 h-2.5 text-zinc-400" />
-                        </div>
-                        <div className="space-y-1">
-                          <h4 className="font-bold text-xs">
-                            ◎ Grafo PKG Proyecciones
-                          </h4>
-                          <div className="text-[11px] opacity-75 font-mono">
-                            {selectedItem.nodos_count > 0 ? (
-                              <div className="text-emerald-500 font-semibold space-y-0.5">
-                                <div>✓ Nodos creados: {selectedItem.nodos_count}</div>
-                                <div>✓ Aristas creadas: {selectedItem.aristas_count}</div>
-                              </div>
-                            ) : (
-                              <div className="text-zinc-500">Sin representación física en el grafo aún.</div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-6">
-                    {/* REVISION AND EDIT VIEW */}
-
-                    {/* Audio controller section */}
-                    <div className="p-3 border space-y-2 rounded-none" style={{ backgroundColor: "var(--khora-bg)", borderColor: "var(--khora-border)" }}>
-                      <div className="flex justify-between items-center text-[10px] font-mono tracking-wider opacity-60 uppercase">
-                        <span>Grabación Asociada</span>
-                        <span>{selectedItem.audio_url ? "✓ Audio disponible" : "Sin Grabación"}</span>
-                      </div>
-                      {selectedItem.audio_url ? (
-                        <div className="space-y-1.5">
-                          <audio
-                            src={`/api/audio/${selectedItem.id}`}
-                            controls
-                            preload="metadata"
-                            className="w-full h-8"
-                          />
-                          <p className="text-[10px] opacity-70">
-                            Duración: {selectedItem.duracion_seg || "?"} segundos · Tamaño:{" "}
-                            {selectedItem.audio_bytes ? Math.round(selectedItem.audio_bytes / 1024) + " KB" : "?"}
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="text-zinc-500 italic text-xs">
-                          No hay audio en vivo registrado para este volcado.
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Version Selector for edits */}
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="font-mono">Editar versión:</span>
-                      <select
-                        value={selectedVersionNum}
-                        onChange={(e) => changeSelectedVersion(Number(e.target.value))}
-                        className="p-1 border rounded-none text-xs font-mono"
+                    {/* Sub Tab Buttons */}
+                    <div className="flex border rounded-none overflow-hidden shrink-0" style={{ borderColor: "var(--khora-border)" }}>
+                      <button
+                        onClick={() => setDrawerSubTab("trace")}
+                        className="px-3 py-1.5 text-[10px] uppercase font-semibold cursor-pointer"
                         style={{
-                          backgroundColor: "var(--khora-bg)",
-                          borderColor: "var(--khora-border)",
-                          color: "var(--khora-ink)",
+                          backgroundColor: drawerSubTab === "trace" ? "var(--khora-accent)" : "transparent",
+                          color: drawerSubTab === "trace" ? "var(--khora-bg)" : "var(--khora-ink)",
                         }}
                       >
-                        {versiones.map((v) => (
-                          <option key={v.version} value={v.version}>
-                            Versión {v.version} {selectedItem.version_aprobada === v.version ? "★" : ""}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    {/* Editable Text Area */}
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-mono tracking-wider uppercase opacity-60 block">
-                        Transcripción Editable
-                      </label>
-                      <textarea
-                        value={editableTexto}
-                        onChange={(e) => setEditableTexto(e.target.value)}
-                        className="w-full p-2.5 border rounded-none font-mono text-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
-                        rows={10}
+                        Trace
+                      </button>
+                      <button
+                        onClick={() => setDrawerSubTab("revision")}
+                        className="px-3 py-1.5 text-[10px] uppercase font-semibold cursor-pointer"
                         style={{
-                          backgroundColor: "var(--khora-bg)",
-                          color: "var(--khora-ink)",
-                          borderColor: "var(--khora-border)",
+                          backgroundColor: drawerSubTab === "revision" ? "var(--khora-accent)" : "transparent",
+                          color: drawerSubTab === "revision" ? "var(--khora-bg)" : "var(--khora-ink)",
                         }}
-                      />
+                      >
+                        Revisión
+                      </button>
                     </div>
+                  </div>
 
-                    {/* Delta View diff */}
-                    {versiones.length > 1 && (
-                      <div className="border p-3 space-y-2 rounded-none" style={{ borderColor: "var(--khora-border)" }}>
-                        <div className="flex justify-between items-center">
-                          <span className="text-[10px] font-mono tracking-wider uppercase opacity-60">
-                            Delta Changes
-                          </span>
-                          <div className="flex items-center gap-1 text-[11px]">
-                            <span>Comparar con:</span>
-                            <select
-                              value={selectedDeltaFrom}
-                              onChange={(e) => setSelectedDeltaFrom(Number(e.target.value))}
-                              className="p-0.5 border rounded-none font-mono text-[10px]"
+                  {/* Detail Content */}
+                  <div className="flex-1 space-y-6 overflow-y-auto">
+                    {drawerSubTab === "trace" ? (
+                      <div className="space-y-6">
+                        {/* TRACE VIEW (Chronological Sequence) */}
+                        <div className="text-xs uppercase font-mono tracking-widest opacity-65 border-b pb-1 mb-2" style={{ borderColor: "var(--khora-border)" }}>
+                          Traceability Tree Map
+                        </div>
+
+                        <div className="relative pl-6 border-l-2 space-y-6" style={{ borderColor: "var(--khora-border)" }}>
+                          {/* 🎙 CAPTURA */}
+                          <div className="relative">
+                            <div
+                              className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full flex items-center justify-center border"
                               style={{
                                 backgroundColor: "var(--khora-bg)",
-                                borderColor: "var(--khora-border)",
-                                color: "var(--khora-ink)",
+                                borderColor: "var(--khora-accent)",
                               }}
                             >
-                              {versiones
-                                .filter((v) => v.version !== selectedVersionNum)
-                                .map((v) => (
-                                  <option key={v.version} value={v.version}>
-                                    v{v.version}
-                                  </option>
-                                ))}
-                            </select>
+                              <Icons.Mic className="w-2.5 h-2.5 text-zinc-400" />
+                            </div>
+                            <div className="space-y-1">
+                              <h4 className="font-bold text-xs flex items-center gap-1.5">
+                                🎙 Captura <span className="text-emerald-500">✓ Completado</span>
+                              </h4>
+                              <div className="text-[11px] opacity-75 space-y-0.5 font-mono">
+                                <div>Fecha: {new Date(selectedItem.recibido_en).toLocaleString()}</div>
+                                <div>Origen: cora-ui (web)</div>
+                              </div>
+                            </div>
                           </div>
-                        </div>
 
-                        {loadingDelta ? (
-                          <div className="text-[10px] opacity-60 font-mono">Calculando pares delta...</div>
-                        ) : deltaPairs.length === 0 ? (
-                          <div className="text-[10px] opacity-55 font-mono">Sin diferencias entre v{selectedDeltaFrom} y v{selectedVersionNum}.</div>
-                        ) : (
-                          <div className="space-y-1 max-h-40 overflow-y-auto border border-zinc-700/20 p-2 font-mono text-[10px]">
-                            {deltaPairs.map((p, idx) => (
-                              <div key={idx} className="border-b last:border-b-0 py-1 space-y-0.5 border-zinc-700/10">
-                                {p.antes && (
-                                  <div className="text-red-500 bg-red-500/10 px-1 font-mono">
-                                    − {p.antes}
-                                  </div>
+                          {/* 💾 ARCHIVO */}
+                          <div className="relative">
+                            <div
+                              className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full flex items-center justify-center border"
+                              style={{
+                                backgroundColor: "var(--khora-bg)",
+                                borderColor: "var(--khora-accent)",
+                              }}
+                            >
+                              <Icons.Save className="w-2.5 h-2.5 text-zinc-400" />
+                            </div>
+                            <div className="space-y-1">
+                              <h4 className="font-bold text-xs">
+                                💾 Archivo <span className="text-emerald-500">✓ Salvaguardado</span>
+                              </h4>
+                              <div className="text-[11px] opacity-75 space-y-0.5 font-mono">
+                                <div>Total caracteres: {selectedItem.chars}</div>
+                                <div>Integridad: Verbatim Append-only</div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* 📝 TRANSCRIPCIÓN */}
+                          <div className="relative">
+                            <div
+                              className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full flex items-center justify-center border"
+                              style={{
+                                backgroundColor: "var(--khora-bg)",
+                                borderColor: "var(--khora-accent)",
+                              }}
+                            >
+                              <Icons.FileText className="w-2.5 h-2.5 text-zinc-400" />
+                            </div>
+                            <div className="space-y-1">
+                              <h4 className="font-bold text-xs">
+                                📝 Transcripción <span className="text-emerald-500">✓ Versión Inicial v1</span>
+                              </h4>
+                              <div className="text-[11px] opacity-75 space-y-0.5 font-mono">
+                                {selectedItem.audio_url ? (
+                                  <>
+                                    <div className="text-emerald-500">✓ Grabación disponible</div>
+                                    <div>Duración: {selectedItem.duracion_seg} segundos</div>
+                                  </>
+                                ) : (
+                                  <div className="text-orange-500">⚠ Grabación ausente</div>
                                 )}
-                                {p.despues && (
-                                  <div className="text-green-500 bg-green-500/10 px-1 font-mono">
-                                    + {p.despues}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* ✎ HISTORIAL / REVISIÓN */}
+                          <div className="relative">
+                            <div
+                              className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full flex items-center justify-center border"
+                              style={{
+                                backgroundColor: "var(--khora-bg)",
+                                borderColor: "var(--khora-accent)",
+                              }}
+                            >
+                              <Icons.GitCommit className="w-2.5 h-2.5 text-zinc-400" />
+                            </div>
+                            <div className="space-y-1">
+                              <h4 className="font-bold text-xs">
+                                ✎ Historial de Versiones
+                              </h4>
+                              <div className="text-[11px] opacity-75 space-y-1 font-mono">
+                                <div>Total versiones: {selectedItem.total_versiones}</div>
+                                {versiones.length > 0 && (
+                                  <div className="border border-zinc-700/40 p-1.5 mt-1 bg-zinc-800/10 space-y-0.5 max-h-32 overflow-y-auto">
+                                    {versiones.map((v) => (
+                                      <div key={v.version} className="flex justify-between">
+                                        <span>v{v.version} ({v.chars} car)</span>
+                                        <span className="opacity-60">{String(v.sha256).slice(0, 8)}</span>
+                                      </div>
+                                    ))}
                                   </div>
                                 )}
                               </div>
-                            ))}
+                            </div>
                           </div>
-                        )}
-                      </div>
-                    )}
 
-                    {/* Action buttons */}
-                    <div className="grid grid-cols-2 gap-2">
-                      <button
-                        onClick={handleSaveEdits}
-                        disabled={savingVersion || !editableTexto.trim()}
-                        className="px-3 py-2 border rounded-none font-semibold text-xs cursor-pointer flex items-center justify-center gap-1 bg-zinc-800 text-zinc-200 border-zinc-700 hover:bg-zinc-700 transition-colors"
-                      >
-                        <Icons.Save size={14} />
-                        {savingVersion ? "Guardando..." : "Guardar versión"}
-                      </button>
+                          {/* ✓ APROBACIÓN */}
+                          <div className="relative">
+                            <div
+                              className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full flex items-center justify-center border"
+                              style={{
+                                backgroundColor: "var(--khora-bg)",
+                                borderColor: "var(--khora-accent)",
+                              }}
+                            >
+                              <Icons.CheckCircle className="w-2.5 h-2.5 text-zinc-400" />
+                            </div>
+                            <div className="space-y-1">
+                              <h4 className="font-bold text-xs flex items-center gap-1">
+                                ✓ Aprobación{" "}
+                                {selectedItem.version_aprobada ? (
+                                  <span className="text-emerald-500">✓ v{selectedItem.version_aprobada} Aprobada</span>
+                                ) : (
+                                  <span className="text-orange-500">○ Pendiente de aprobación</span>
+                                )}
+                              </h4>
+                              {selectedItem.version_aprobada && (
+                                <div className="text-[11px] opacity-75 space-y-0.5 font-mono">
+                                  <div>Aprobador: {selectedItem.aprobador}</div>
+                                  <div>Fecha: {new Date(selectedItem.aprobado_en!).toLocaleString()}</div>
+                                  <div className="break-all font-semibold">Hash: {selectedItem.sha256_aprobado}</div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
 
-                      <button
-                        onClick={handleApproveVersion}
-                        disabled={approvingVersion || !selectedVersionNum}
-                        className="px-3 py-2 border rounded-none font-semibold text-xs cursor-pointer flex items-center justify-center gap-1"
-                        style={{
-                          backgroundColor: "var(--khora-accent)",
-                          color: "var(--khora-bg)",
-                          borderColor: "var(--khora-accent)",
-                        }}
-                      >
-                        <Icons.CheckCircle size={14} />
-                        {approvingVersion ? "Aprobando..." : `Aprobar v${selectedVersionNum}`}
-                      </button>
-                    </div>
+                          {/* ⚙ INGESTA */}
+                          <div className="relative">
+                            <div
+                              className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full flex items-center justify-center border"
+                              style={{
+                                backgroundColor: "var(--khora-bg)",
+                                borderColor: "var(--khora-accent)",
+                              }}
+                            >
+                              <Icons.Settings className="w-2.5 h-2.5 text-zinc-400" />
+                            </div>
+                            <div className="space-y-1">
+                              <h4 className="font-bold text-xs">
+                                ⚙ Ingesta{" "}
+                                {selectedItem.estado === "ingerido" ? (
+                                  <span className="text-emerald-500">✓ Ingerido exitosamente</span>
+                                ) : selectedItem.estado === "fallido" ? (
+                                  <span className="text-red-500">✕ Error en ingesta</span>
+                                ) : (
+                                  <span className="text-orange-500">○ En espera</span>
+                                )}
+                              </h4>
+                              {selectedItem.ultimo_error && (
+                                <div className="text-[11px] text-red-400 font-mono mt-1 border border-red-500/10 p-1.5 bg-red-500/5">
+                                  {selectedItem.ultimo_error}
+                                </div>
+                              )}
+                              {selectedItem.io_id && (
+                                <div className="text-[11px] opacity-75 font-mono">
+                                  io_id: {selectedItem.io_id}
+                                </div>
+                              )}
+                            </div>
+                          </div>
 
-                    {/* Approved version warning block */}
-                    {selectedItem.version_aprobada ? (
-                      <div className="border border-emerald-500/20 bg-emerald-500/5 p-3 space-y-2">
-                        <div className="flex items-center gap-2 text-emerald-400 font-bold text-xs">
-                          <Icons.CheckCircle size={16} />
-                          <span>v{selectedItem.version_aprobada} APROBADA</span>
+                          {/* ◎ GRAFO PKG */}
+                          <div className="relative">
+                            <div
+                              className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full flex items-center justify-center border"
+                              style={{
+                                backgroundColor: "var(--khora-bg)",
+                                borderColor: "var(--khora-accent)",
+                              }}
+                            >
+                              <Icons.Activity className="w-2.5 h-2.5 text-zinc-400" />
+                            </div>
+                            <div className="space-y-1">
+                              <h4 className="font-bold text-xs">
+                                ◎ Grafo PKG Proyecciones
+                              </h4>
+                              <div className="text-[11px] opacity-75 font-mono">
+                                {selectedItem.nodos_count > 0 ? (
+                                  <div className="text-emerald-500 font-semibold space-y-0.5">
+                                    <div>✓ Nodos creados: {selectedItem.nodos_count}</div>
+                                    <div>✓ Aristas creadas: {selectedItem.aristas_count}</div>
+                                  </div>
+                                ) : (
+                                  <div className="text-zinc-500">Sin representación física en el grafo aún.</div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                        <p className="text-[11px] opacity-80">
-                          Esta versión está lista para ser ingerida en la base de datos de conocimiento del kernel.
-                        </p>
-                        <button
-                          onClick={handleIngestApproved}
-                          disabled={ingesting}
-                          className="w-full px-3 py-2 border border-emerald-500 text-emerald-500 hover:bg-emerald-500 hover:text-black font-semibold text-xs cursor-pointer transition-colors"
-                        >
-                          {ingesting ? "Ingiriendo en Kernel..." : `[ Ingerir versión v${selectedItem.version_aprobada} ]`}
-                        </button>
                       </div>
                     ) : (
-                      <div className="border border-red-500/20 bg-red-500/5 p-3 text-xs text-red-400 flex items-start gap-2">
-                        <Icons.AlertCircle size={16} className="shrink-0" />
-                        <div>
-                          <strong>Bloqueado para Ingesta:</strong> Debes aprobar una versión antes de mandarla al grafo del kernel.
-                        </div>
-                      </div>
-                    )}
+                      <div className="space-y-6">
+                        {/* REVISION AND EDIT VIEW */}
 
-                    {/* Ingestion results panel */}
-                    {ingestaResult && (
-                      <div
-                        className={`p-3 border text-xs space-y-1 ${
-                          ingestaResult.success
-                            ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
-                            : "border-red-500/30 bg-red-500/10 text-red-400"
-                        }`}
-                      >
-                        {ingestaResult.success ? (
-                          <>
-                            <div className="font-bold flex items-center gap-1 text-[11px]">
-                              <Icons.CheckCircle size={14} /> ✓ INGESTADO
+                        {/* Audio controller section */}
+                        <div className="p-3 border space-y-2 rounded-none" style={{ backgroundColor: "var(--khora-bg)", borderColor: "var(--khora-border)" }}>
+                          <div className="flex justify-between items-center text-[10px] font-mono tracking-wider opacity-60 uppercase">
+                            <span>Grabación Asociada</span>
+                            <span>{selectedItem.audio_url ? "✓ Audio disponible" : "Sin Grabación"}</span>
+                          </div>
+                          {selectedItem.audio_url ? (
+                            <div className="space-y-1.5">
+                              <audio
+                                src={`/api/audio/${selectedItem.id}`}
+                                controls
+                                preload="metadata"
+                                className="w-full h-8"
+                              />
+                              <p className="text-[10px] opacity-70">
+                                Duración: {selectedItem.duracion_seg || "?"} segundos · Tamaño:{" "}
+                                {selectedItem.audio_bytes ? Math.round(selectedItem.audio_bytes / 1024) + " KB" : "?"}
+                              </p>
                             </div>
-                            <div className="font-mono text-[10px]">io_id: {ingestaResult.io_id}</div>
-                          </>
+                          ) : (
+                            <div className="text-zinc-500 italic text-xs">
+                              No hay audio en vivo registrado para este volcado.
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Version Selector for edits */}
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="font-mono">Editar versión:</span>
+                          <select
+                            value={selectedVersionNum}
+                            onChange={(e) => changeSelectedVersion(Number(e.target.value))}
+                            className="p-1 border rounded-none text-xs font-mono"
+                            style={{
+                              backgroundColor: "var(--khora-bg)",
+                              borderColor: "var(--khora-border)",
+                              color: "var(--khora-ink)",
+                            }}
+                          >
+                            {versiones.map((v) => (
+                              <option key={v.version} value={v.version}>
+                                Versión {v.version} {selectedItem.version_aprobada === v.version ? "★" : ""}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        {/* Editable Text Area */}
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-mono tracking-wider uppercase opacity-60 block">
+                            Transcripción Editable
+                          </label>
+                          <textarea
+                            value={editableTexto}
+                            onChange={(e) => setEditableTexto(e.target.value)}
+                            className="w-full p-2.5 border rounded-none font-mono text-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
+                            rows={10}
+                            style={{
+                              backgroundColor: "var(--khora-bg)",
+                              color: "var(--khora-ink)",
+                              borderColor: "var(--khora-border)",
+                            }}
+                          />
+                        </div>
+
+                        {/* Delta View diff */}
+                        {versiones.length > 1 && (
+                          <div className="border p-3 space-y-2 rounded-none" style={{ borderColor: "var(--khora-border)" }}>
+                            <div className="flex justify-between items-center">
+                              <span className="text-[10px] font-mono tracking-wider uppercase opacity-60">
+                                Delta Changes
+                              </span>
+                              <div className="flex items-center gap-1 text-[11px]">
+                                <span>Comparar con:</span>
+                                <select
+                                  value={selectedDeltaFrom}
+                                  onChange={(e) => setSelectedDeltaFrom(Number(e.target.value))}
+                                  className="p-0.5 border rounded-none font-mono text-[10px]"
+                                  style={{
+                                    backgroundColor: "var(--khora-bg)",
+                                    borderColor: "var(--khora-border)",
+                                    color: "var(--khora-ink)",
+                                  }}
+                                >
+                                  {versiones
+                                    .filter((v) => v.version !== selectedVersionNum)
+                                    .map((v) => (
+                                      <option key={v.version} value={v.version}>
+                                        v{v.version}
+                                      </option>
+                                    ))}
+                                </select>
+                              </div>
+                            </div>
+
+                            {loadingDelta ? (
+                              <div className="text-[10px] opacity-60 font-mono">Calculando pares delta...</div>
+                            ) : deltaPairs.length === 0 ? (
+                              <div className="text-[10px] opacity-55 font-mono">Sin diferencias entre v{selectedDeltaFrom} y v{selectedVersionNum}.</div>
+                            ) : (
+                              <div className="space-y-1 max-h-40 overflow-y-auto border border-zinc-700/20 p-2 font-mono text-[10px]">
+                                {deltaPairs.map((p, idx) => (
+                                  <div key={idx} className="border-b last:border-b-0 py-1 space-y-0.5 border-zinc-700/10">
+                                    {p.antes && (
+                                      <div className="text-red-500 bg-red-500/10 px-1 font-mono">
+                                        − {p.antes}
+                                      </div>
+                                    )}
+                                    {p.despues && (
+                                      <div className="text-green-500 bg-green-500/10 px-1 font-mono">
+                                        + {p.despues}
+                                      </div>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Action buttons */}
+                        <div className="grid grid-cols-2 gap-2">
+                          <button
+                            onClick={handleSaveEdits}
+                            disabled={savingVersion || !editableTexto.trim()}
+                            className="px-3 py-2 border rounded-none font-semibold text-xs cursor-pointer flex items-center justify-center gap-1 bg-zinc-800 text-zinc-200 border-zinc-700 hover:bg-zinc-700 transition-colors"
+                          >
+                            <Icons.Save size={14} />
+                            {savingVersion ? "Guardando..." : "Guardar versión"}
+                          </button>
+
+                          <button
+                            onClick={handleApproveVersion}
+                            disabled={approvingVersion || !selectedVersionNum}
+                            className="px-3 py-2 border rounded-none font-semibold text-xs cursor-pointer flex items-center justify-center gap-1"
+                            style={{
+                              backgroundColor: "var(--khora-accent)",
+                              color: "var(--khora-bg)",
+                              borderColor: "var(--khora-accent)",
+                            }}
+                          >
+                            <Icons.CheckCircle size={14} />
+                            {approvingVersion ? "Aprobando..." : `Aprobar v${selectedVersionNum}`}
+                          </button>
+                        </div>
+
+                        {/* Approved version warning block */}
+                        {selectedItem.version_aprobada ? (
+                          <div className="border border-emerald-500/20 bg-emerald-500/5 p-3 space-y-2">
+                            <div className="flex items-center gap-2 text-emerald-400 font-bold text-xs">
+                              <Icons.CheckCircle size={16} />
+                              <span>v{selectedItem.version_aprobada} APROBADA</span>
+                            </div>
+                            <p className="text-[11px] opacity-80">
+                              Esta versión está lista para ser ingerida en la base de datos de conocimiento del kernel.
+                            </p>
+                            <button
+                              onClick={handleIngestApproved}
+                              disabled={ingesting}
+                              className="w-full px-3 py-2 border border-emerald-500 text-emerald-500 hover:bg-emerald-500 hover:text-black font-semibold text-xs cursor-pointer transition-colors"
+                            >
+                              {ingesting ? "Ingiriendo en Kernel..." : `[ Ingerir versión v${selectedItem.version_aprobada} ]`}
+                            </button>
+                          </div>
                         ) : (
-                          <>
-                            <div className="font-bold flex items-center gap-1 text-[11px]">
-                              <Icons.AlertCircle size={14} /> Error en Ingesta
+                          <div className="border border-red-500/20 bg-red-500/5 p-3 text-xs text-red-400 flex items-start gap-2">
+                            <Icons.AlertCircle size={16} className="shrink-0" />
+                            <div>
+                              <strong>Bloqueado para Ingesta:</strong> Debes aprobar una versión antes de mandarla al grafo del kernel.
                             </div>
-                            <p className="font-mono text-[10px]">{ingestaResult.error}</p>
-                          </>
+                          </div>
+                        )}
+
+                        {/* Ingestion results panel */}
+                        {ingestaResult && (
+                          <div
+                            className={`p-3 border text-xs space-y-1 ${
+                              ingestaResult.success
+                                ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
+                                : "border-red-500/30 bg-red-500/10 text-red-400"
+                            }`}
+                          >
+                            {ingestaResult.success ? (
+                              <>
+                                <div className="font-bold flex items-center gap-1 text-[11px]">
+                                  <Icons.CheckCircle size={14} /> ✓ INGESTADO
+                                </div>
+                                <div className="font-mono text-[10px]">io_id: {ingestaResult.io_id}</div>
+                              </>
+                            ) : (
+                              <>
+                                <div className="font-bold flex items-center gap-1 text-[11px]">
+                                  <Icons.AlertCircle size={14} /> Error en Ingesta
+                                </div>
+                                <p className="font-mono text-[10px]">{ingestaResult.error}</p>
+                              </>
+                            )}
+                          </div>
                         )}
                       </div>
                     )}
                   </div>
-                )}
-              </div>
+                </div>
+              ) : (
+                <div className="border p-8 text-center text-xs opacity-60 flex items-center justify-center h-full rounded-none" style={{ backgroundColor: "var(--khora-surface)", borderColor: "var(--khora-border)" }}>
+                  Selecciona un volcado de la lista para ver su trazabilidad y operaciones.
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
