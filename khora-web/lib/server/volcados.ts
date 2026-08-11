@@ -77,13 +77,16 @@ export async function iniciarRevision(volcadoId: string): Promise<void> {
   await db.query("UPDATE volcado SET estado = 'en_revision' WHERE id = $1", [volcadoId]);
 }
 
-export async function aprobarVersion(volcadoId: string, version: number): Promise<void> {
+export async function aprobarVersion(volcadoId: string, version: number, aprobador?: string | null): Promise<{ version: number; sha256: string }> {
   await asegurarTabla();
   const db = getDb();
   await db.query("UPDATE volcado SET estado = 'listo_ingesta', version_aprobada = $2 WHERE id = $1", [volcadoId, version]);
+  const res = await db.query("SELECT sha256 FROM volcado_version WHERE volcado_id = $1 AND version = $2", [volcadoId, version]);
+  const sha256 = res.rows[0]?.sha256 || "";
+  return { version, sha256 };
 }
 
-export async function reabrirRevision(volcadoId: string): Promise<void> {
+export async function reabrirRevision(volcadoId: string, usuario?: string | null): Promise<void> {
   await asegurarTabla();
   const db = getDb();
   await db.query("UPDATE volcado SET estado = 'en_revision' WHERE id = $1", [volcadoId]);

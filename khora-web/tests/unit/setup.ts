@@ -19,4 +19,4 @@ require.cache[nextAuthPath] = {
   filename: nextAuthPath,
   loaded: true,
   exports: mockNextAuth
-};
+} as any;
