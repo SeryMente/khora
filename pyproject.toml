@@ -17,3 +17,8 @@ line-length = 100
 
 [tool.pyright]
 include = ["api", "kernel", "shell", "puentes", "drivers", "tools"]
+
+[dependency-groups]
+dev = [
+    "pytest (>=9.1.1,<10.0.0)"
+]
