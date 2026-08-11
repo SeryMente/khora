@@ -1,7 +1,8 @@
+# @l0 L0-002-R · @req JULES-3/REQ-1
 # @l0 L0-002 · @req ING-01/REQ-1 · @acr ACR-1.1,ACR-1.2,ACR-1.3 · @ua UA-06
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import List, Protocol, runtime_checkable
+from typing import List, Optional, Protocol, runtime_checkable
 
 
 class ContextoDeVisibilidad(Enum):
@@ -67,6 +68,18 @@ class AristaSubgrafo:
 class SubgrafoRelevante:
     nodos: List[NodoSubgrafo] = field(default_factory=list)
     aristas: List[AristaSubgrafo] = field(default_factory=list)
+
+
+@dataclass(frozen=True)
+class Proposal:
+    source: ObjetoDeInformacion
+    volcado_id: Optional[str]
+    version: Optional[int]
+    sha256: Optional[str]
+    io_id: Optional[str]
+    entities: List[str]
+    relations: List[Triple]
+    provenance: Provenance
 
 
 @dataclass(frozen=True)
@@ -164,4 +177,5 @@ __all__ = [
     "PuertoEmbeddings",
     "PuertoVision",
     "VERSION",
+    "Proposal",
 ]
