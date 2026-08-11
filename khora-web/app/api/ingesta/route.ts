@@ -45,9 +45,9 @@ export async function POST(req: Request) {
     }
     const volcado = vRes.rows[0];
 
-    // Validación estricta de aprobación
-    if (volcado.estado !== "listo_ingesta") {
-      return NextResponse.json({ error: `La ingesta exige que el volcado este en estado listo_ingesta. Estado actual: ${volcado.estado}` }, { status: 428 });
+    // Validación de estado de aprobación/reintento
+    if (volcado.estado !== "listo_ingesta" && volcado.estado !== "ingerido" && volcado.estado !== "fallido") {
+      return NextResponse.json({ error: `La ingesta exige que el volcado este aprobado. Estado actual: ${volcado.estado}` }, { status: 428 });
     }
     if (volcado.version_aprobada === null || volcado.sha256_aprobado === null) {
       return NextResponse.json({ error: "El volcado no tiene una version aprobada activa" }, { status: 428 });
@@ -60,18 +60,6 @@ export async function POST(req: Request) {
     const fila: any = versiones.find((v: any) => Number(v.version) === versionPedida);
     if (!fila) {
       return NextResponse.json({ error: "version inexistente para ese volcado" }, { status: 404 });
-    }
-
-    const volRes = await db.query("SELECT estado, version_aprobada FROM volcado WHERE id = $1", [volcadoId]);
-    if (volRes.rows.length === 0) {
-      return NextResponse.json({ error: "volcado no encontrado" }, { status: 404 });
-    }
-    const vol = volRes.rows[0];
-    if (vol.estado !== "listo_ingesta" && vol.estado !== "ingerido" && vol.estado !== "fallido") {
-      return NextResponse.json({ error: "el volcado debe estar aprobado para ingesta" }, { status: 400 });
-    }
-    if (vol.version_aprobada !== versionPedida) {
-      return NextResponse.json({ error: `la versión pedida (${versionPedida}) no coincide con la versión aprobada (${vol.version_aprobada})` }, { status: 400 });
     }
 
     texto = String(fila.texto ?? "");
@@ -121,15 +109,16 @@ export async function POST(req: Request) {
       const data = await apiResponse.json();
 
       if (apiResponse.ok) {
-        // Éxito: actualizar estado operativo a 'ingerido' y registrar auditoría
+        // Éxito: actualizar estado operativo a 'ingerido', registrar io_id y auditoría
         await db.query(
           `UPDATE volcado
            SET estado = 'ingerido',
+               io_id = $2,
                ultimo_intento = now(),
                intentos = intentos + 1,
                ultimo_error = NULL
            WHERE id = $1`,
-          [volcadoId]
+          [volcadoId, data.io_id || null]
         );
 
         await db.query(
@@ -138,7 +127,7 @@ export async function POST(req: Request) {
             randomUUID(),
             volcadoId,
             "ingestado",
-            "listo_ingesta",
+            volcado.estado,
             "ingerido",
             versionPedida,
             shaServidor,
@@ -146,15 +135,18 @@ export async function POST(req: Request) {
           ]
         );
       } else {
-        // Fallo: actualizar estado operativo a 'fallido' y registrar auditoría
+        // Fallo: actualizar estado operativo (evitando degradar 'ingerido' a 'fallido')
+        const nuevoEstado = volcado.estado === "ingerido" ? "ingerido" : "fallido";
+        const errMsg = data.error || data.detail || `Kernel returned HTTP ${apiResponse.status}`;
+
         await db.query(
           `UPDATE volcado
-           SET estado = 'fallido',
+           SET estado = $3,
                ultimo_intento = now(),
                intentos = intentos + 1,
                ultimo_error = $2
            WHERE id = $1`,
-          [volcadoId, `Kernel returned HTTP ${apiResponse.status}`]
+          [volcadoId, errMsg, nuevoEstado]
         );
 
         await db.query(
@@ -162,9 +154,9 @@ export async function POST(req: Request) {
           [
             randomUUID(),
             volcadoId,
-            "ingesta_fallida",
-            "listo_ingesta",
-            "fallido",
+            nuevoEstado === "ingerido" ? "ingesta_reintento_fallido" : "ingesta_fallida",
+            volcado.estado,
+            nuevoEstado,
             versionPedida,
             shaServidor,
             session?.user?.email ?? null,
@@ -180,14 +172,16 @@ export async function POST(req: Request) {
           ? "Request to kernel timed out"
           : (fetchError.message || "Kernel request failed");
 
+      const nuevoEstado = volcado.estado === "ingerido" ? "ingerido" : "fallido";
+
       await db.query(
         `UPDATE volcado
-         SET estado = 'fallido',
+         SET estado = $3,
              ultimo_intento = now(),
              intentos = intentos + 1,
              ultimo_error = $2
          WHERE id = $1`,
-        [volcadoId, errMsg]
+        [volcadoId, errMsg, nuevoEstado]
       );
 
       await db.query(
@@ -195,9 +189,9 @@ export async function POST(req: Request) {
         [
           randomUUID(),
           volcadoId,
-          "ingesta_fallida",
-          "listo_ingesta",
-          "fallido",
+          nuevoEstado === "ingerido" ? "ingesta_reintento_fallido" : "ingesta_fallida",
+          volcado.estado,
+          nuevoEstado,
           versionPedida,
           shaServidor,
           session?.user?.email ?? null,
