@@ -1,18 +1,19 @@
 # @l0 L0-002-R · @req JULES-3/REQ-3
 import uuid
-import pytest
-from typing import Any, List, Optional
-from dataclasses import dataclass
 
 from khora_kernel.api import (
-    ObjetoDeInformacion,
-    Provenance,
-    Proposal,
-    Triple,
     ActaDeIngesta,
+    ObjetoDeInformacion,
+    Proposal,
+    Provenance,
+    Triple,
 )
-from khora_kernel.poblacion import transducir, persistir, ingestar
-from khora_kernel.poblacion.tests.test_ingestar import MockMemoria, MockPuertoLLM, MockPuertoEmbeddings
+from khora_kernel.poblacion import ingestar, persistir, transducir
+from khora_kernel.poblacion.tests.test_ingestar import (
+    MockMemoria,
+    MockPuertoEmbeddings,
+    MockPuertoLLM,
+)
 
 
 def test_proposal_lifecycle_and_requirements():

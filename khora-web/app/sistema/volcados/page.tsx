@@ -1,4 +1,4 @@
-// @l0 L0-002-R · @req PIPELINE/REQ-3,UI-02/RESKIN · @acr ACR-1.2
+// @l0 L0-002-R · @req PIPELINE/REQ-3,UI-02/RESKIN,UI-NOMENCLATURA/REQ-1 · @acr ACR-1.2
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
@@ -501,7 +501,7 @@ export default function VolcadosPage() {
               color: activeTab === "pipeline" ? "var(--khora-bg)" : "var(--khora-ink)",
             }}
           >
-            Pipeline Tower
+            Trazabilidad
           </button>
           <button
             onClick={() => setActiveTab("volcados")}
@@ -511,7 +511,7 @@ export default function VolcadosPage() {
               color: activeTab === "volcados" ? "var(--khora-bg)" : "var(--khora-ink)",
             }}
           >
-            Archivo Manual
+            Archivar
           </button>
         </div>
       </div>
