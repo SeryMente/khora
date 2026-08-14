@@ -394,6 +394,7 @@ export default function DictadoPage() {
 
       const payload = {
         texto,
+        sessionId: sesionIdRef.current || null,
         titulo: titulo.trim().length > 0 ? titulo.trim() : null,
         audioUrl,
         audioBytes,

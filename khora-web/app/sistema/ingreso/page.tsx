@@ -399,6 +399,7 @@ function IngresoContenido() {
 
       const payload = {
         texto,
+        sessionId: sesionIdRef.current || null,
         titulo: titulo.trim().length > 0 ? titulo.trim() : null,
         audioUrl,
         audioBytes,
