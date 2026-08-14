@@ -6,6 +6,7 @@ import * as Icons from "lucide-react";
 
 type Volcado = {
   id: string;
+  folio: number;
   texto: string;
   sha256: string;
   chars: number;
@@ -230,6 +231,7 @@ export default function VolcadosPage() {
           <table className="w-full text-sm">
             <thead style={{ backgroundColor: "var(--khora-surface)" }}>
               <tr className="border-b text-left" style={{ borderColor: "var(--khora-accent)" }}>
+                <th className="p-3 font-semibold text-xs uppercase tracking-wider" style={{ color: "var(--khora-accent)" }}>folio</th>
                 <th className="p-3 font-semibold text-xs uppercase tracking-wider" style={{ color: "var(--khora-accent)" }}>recibido</th>
                 <th className="p-3 font-semibold text-xs uppercase tracking-wider" style={{ color: "var(--khora-accent)" }}>titulo</th>
                 <th className="p-3 font-semibold text-xs uppercase tracking-wider" style={{ color: "var(--khora-accent)" }}>chars</th>
@@ -241,7 +243,7 @@ export default function VolcadosPage() {
             <tbody>
               {items.length === 0 && (
                 <tr>
-                  <td className="p-6 text-center" colSpan={6} style={{ color: "var(--khora-accent)" }}>
+                  <td className="p-6 text-center" colSpan={7} style={{ color: "var(--khora-accent)" }}>
                     sin volcados todavia
                   </td>
                 </tr>
@@ -258,6 +260,7 @@ export default function VolcadosPage() {
                     }}
                     onClick={() => elegir(v)}
                   >
+                    <td className="p-3 font-mono font-semibold">#{v.folio}</td>
                     <td className="p-3 whitespace-nowrap">{new Date(v.recibido_en).toLocaleString()}</td>
                     <td className="p-3">{v.titulo ?? "—"}</td>
                     <td className="p-3">{v.chars}</td>
@@ -284,7 +287,7 @@ export default function VolcadosPage() {
           <div className="border-b pb-2" style={{ borderColor: "var(--khora-accent)" }}>
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <Icons.FileText size={18} style={{ color: "var(--khora-accent)" }} />
-              Detalle del Volcado: {sel.id}
+              Detalle del Volcado: #{sel.folio} {sel.titulo ? `· ${sel.titulo}` : ""} ({sel.id})
             </h2>
           </div>
 
