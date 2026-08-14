@@ -682,7 +682,6 @@ export default function VolcadosPage() {
                 Modificados
               </button>
             </div>
-          </div>
 
             {/* Quick Search */}
             <div className="relative">
@@ -1452,3 +1451,4 @@ export default function VolcadosPage() {
     </div>
   );
 }
+
