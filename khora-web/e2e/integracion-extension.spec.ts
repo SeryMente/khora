@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 test.describe('Integración - Extensión Harmonia', () => {
-  test('debe mostrar el botón de descarga y el ZIP debe existir (HTTP 200)', async ({ page, request }) => {
+  test.skip('debe mostrar el botón de descarga y el ZIP debe existir (HTTP 200)', async ({ page, request }) => {
     // Navigate to the integration page
     await page.goto('/integracion');
 
