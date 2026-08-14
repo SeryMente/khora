@@ -1,10 +1,16 @@
-// @l0 L0-002-R · @req PIPELINE-OBSERVABILITY/REQ-1
+// @l0 L0-002-R · @req PIPELINE-OBSERVABILITY/REQ-1 · @req TRACE-SESSION/010
 import { getDb } from "./neon";
 import { descifrarTexto } from "./cripto";
 import { driver as neo4jDriver, auth as neo4jAuth } from "neo4j-driver";
 
 export interface PipelineVolcado {
   id: string;
+  folio: number | null;
+  session_id: string | null;
+  session_estado: string | null;
+  audio_status: "disponible" | "encontrado_no_vinculado" | "incompleto" | "no_recuperable";
+  partes_count: number;
+  blob_paths: string[];
   estado: string;
   version_original: number;
   version_actual: number;
@@ -111,7 +117,7 @@ export async function obtenerPipelineAggregated(): Promise<PipelineAggregatedRes
   // Bulk query all volcados
   const vRes = await db.query(`
     SELECT
-      id, texto, texto_original, sha256, chars, titulo, origen, driver, usuario,
+      id, folio, session_id, texto, texto_original, sha256, chars, titulo, origen, driver, usuario,
       recibido_en, estado, io_id, intentos, ultimo_error, ultimo_intento,
       audio_url, audio_bytes, duracion_seg, fuente, pulido_aplicado, audio_partes, version_aprobada
     FROM volcado
@@ -143,6 +149,26 @@ export async function obtenerPipelineAggregated(): Promise<PipelineAggregatedRes
     versionsMap.get(row.volcado_id)!.push(row);
   }
 
+  // Bulk query sessions
+  const sRes = await db.query("SELECT session_id, volcado_id, estado, total_partes FROM dictado_session");
+  const sessionMap = new Map<string, any>();
+  for (const s of sRes.rows) {
+    sessionMap.set(s.session_id, s);
+    if (s.volcado_id) sessionMap.set(s.volcado_id, s);
+  }
+
+  // Bulk query dictado_audio_parte
+  const pRes = await db.query("SELECT session_id, volcado_id, part_index, blob_url, blob_path, bytes FROM dictado_audio_parte");
+  const partesMap = new Map<string, any[]>();
+  for (const p of pRes.rows) {
+    const key = p.session_id || p.volcado_id;
+    if (key) {
+      const listP = partesMap.get(key) || [];
+      listP.push(p);
+      partesMap.set(key, listP);
+    }
+  }
+
   // Bulk query PG graph nodes count
   const nRes = await db.query(
     "SELECT volcado_id, count(*)::int AS n FROM nodos WHERE volcado_id = ANY($1) GROUP BY volcado_id",
@@ -171,9 +197,8 @@ export async function obtenerPipelineAggregated(): Promise<PipelineAggregatedRes
     const vId = String(v.id);
     const vers = versionsMap.get(vId) || [];
 
-    // Version indicators
     const versionOriginal = 1;
-    const versionActual = vers.length > 0 ? Math.max(...vers.map((v: any) => v.version)) : 1;
+    const versionActual = vers.length > 0 ? Math.max(...vers.map((vr: any) => vr.version)) : 1;
     const versionAprobada = v.version_aprobada !== null ? Number(v.version_aprobada) : null;
 
     const v1 = vers.find((vr: any) => vr.version === 1);
@@ -185,35 +210,59 @@ export async function obtenerPipelineAggregated(): Promise<PipelineAggregatedRes
       sha256Aprobada = vAprobada ? vAprobada.sha256 : null;
     }
 
-    // Audio extraction
-    let audioPartes: any[] = [];
+    // Audio parts & session details
+    const sessionId = v.session_id ? String(v.session_id).trim() : null;
+    const sesionObj = sessionId ? sessionMap.get(sessionId) : sessionMap.get(vId);
+
+    let audioPartesJson: any[] = [];
     if (v.audio_partes) {
       try {
-        audioPartes = typeof v.audio_partes === "string" ? JSON.parse(v.audio_partes) : v.audio_partes;
-      } catch (e) {
-        audioPartes = [];
-      }
+        audioPartesJson = typeof v.audio_partes === "string" ? JSON.parse(v.audio_partes) : v.audio_partes;
+      } catch (e) {}
     }
 
-    const hasAudio = !!v.audio_url || (Array.isArray(audioPartes) && audioPartes.length > 0);
+    const partesDb = (sessionId ? partesMap.get(sessionId) : null) || partesMap.get(vId) || [];
+    const blobPaths = Array.from(new Set([
+      ...partesDb.map((p) => p.blob_path || p.blob_url),
+      ...(Array.isArray(audioPartesJson) ? audioPartesJson.map((p) => p.url) : []),
+      ...(v.audio_url ? [v.audio_url] : []),
+    ])).filter(Boolean);
+
+    const partesCount = Math.max(partesDb.length, Array.isArray(audioPartesJson) ? audioPartesJson.length : 0);
+    const hasAudio = !!v.audio_url || partesCount > 0;
     const hasText = !!v.texto && descifrarTexto(v.texto).trim().length > 0;
 
     let audioBytes = v.audio_bytes !== null ? Number(v.audio_bytes) : 0;
-    if (audioBytes === 0 && Array.isArray(audioPartes)) {
-      audioBytes = audioPartes.reduce((sum: number, p: any) => sum + (p.bytes || 0), 0);
+    if (audioBytes === 0 && partesDb.length > 0) {
+      audioBytes = partesDb.reduce((sum: number, p: any) => sum + (p.bytes || 0), 0);
+    } else if (audioBytes === 0 && Array.isArray(audioPartesJson)) {
+      audioBytes = audioPartesJson.reduce((sum: number, p: any) => sum + (p.bytes || 0), 0);
     }
 
-    // Integrity classification
+    // Determine precise Audio Status Badge:
+    let audioStatus: "disponible" | "encontrado_no_vinculado" | "incompleto" | "no_recuperable" = "no_recuperable";
+    if (hasAudio && (sessionId || v.audio_url)) {
+      if (sesionObj?.total_partes && partesCount < sesionObj.total_partes) {
+        audioStatus = "incompleto";
+      } else {
+        audioStatus = "disponible";
+      }
+    } else if (hasAudio && !sessionId) {
+      audioStatus = "encontrado_no_vinculado";
+    } else if (!hasAudio && (v.duracion_seg > 0 || v.audio_bytes > 0)) {
+      audioStatus = "no_recuperable";
+    } else {
+      audioStatus = "no_recuperable";
+    }
+
     let status: "sync" | "text_without_audio" | "audio_without_text" | "audio_partial" | "text_edited" | "broken_provenance" | "unknown" = "sync";
     const flags: string[] = [];
 
-    // A. Check Broken Provenance
     if (v.estado === "ingerido" && !v.io_id) {
       status = "broken_provenance";
       flags.push("Estado 'ingerido' pero io_id está ausente");
     }
 
-    // B. Check Audio & Text presence
     if (status === "sync") {
       if (hasText && !hasAudio) {
         status = "text_without_audio";
@@ -224,40 +273,12 @@ export async function obtenerPipelineAggregated(): Promise<PipelineAggregatedRes
       }
     }
 
-    // C. Check Audio Partiality
-    let audioComplete: boolean | "unknown" = "unknown";
-    if (hasAudio) {
-      if (v.audio_url) {
-        audioComplete = true;
-      } else if (Array.isArray(audioPartes) && audioPartes.length > 0) {
-        // Simple heuristic: if parts are consecutive
-        const indices = audioPartes.map((p: any) => Number(p.parte)).sort((a, b) => a - b);
-        let isConsecutive = true;
-        for (let i = 0; i < indices.length; i++) {
-          if (indices[i] !== i + 1) {
-            isConsecutive = false;
-          }
-        }
-        if (!isConsecutive) {
-          audioComplete = false;
-          if (status === "sync") {
-            status = "audio_partial";
-            flags.push("Faltan partes consecutivas del audio");
-          }
-        } else {
-          audioComplete = true;
-        }
-      }
-    }
-
-    // D. Check Text Edited
     const isEdited = v.ediciones > 0 || (v.texto_original && v.texto_original !== v.texto) || (vers.length > 1);
     if (status === "sync" && isEdited) {
       status = "text_edited";
       flags.push("El texto actual difiere de la transcripción original");
     }
 
-    // Update Counts
     const est = v.estado as keyof typeof counts;
     if (counts[est] !== undefined) {
       counts[est]++;
@@ -269,6 +290,12 @@ export async function obtenerPipelineAggregated(): Promise<PipelineAggregatedRes
 
     processedVolcados.push({
       id: vId,
+      folio: v.folio ? Number(v.folio) : null,
+      session_id: sessionId,
+      session_estado: sesionObj?.estado || null,
+      audio_status: audioStatus,
+      partes_count: partesCount,
+      blob_paths: blobPaths,
       estado: v.estado,
       version_original: versionOriginal,
       version_actual: versionActual,
@@ -277,7 +304,7 @@ export async function obtenerPipelineAggregated(): Promise<PipelineAggregatedRes
       sha256_aprobada: sha256Aprobada,
       audio: {
         present: hasAudio,
-        complete: audioComplete,
+        complete: audioStatus === "disponible",
         bytes: audioBytes,
         duration_sec: v.duracion_seg !== null ? Number(v.duracion_seg) : 0
       },
@@ -315,13 +342,12 @@ export async function obtenerPipelineAggregated(): Promise<PipelineAggregatedRes
 export async function obtenerPipelineDetalle(id: string): Promise<any> {
   const db = getDb();
 
-  // Query base volcado
   const vRes = await db.query(
     `SELECT
-      id, texto, texto_original, sha256, chars, titulo, origen, driver, usuario,
+      id, folio, session_id, texto, texto_original, sha256, chars, titulo, origen, driver, usuario,
       recibido_en, estado, io_id, intentos, ultimo_error, ultimo_intento,
       audio_url, audio_bytes, duracion_seg, fuente, pulido_aplicado, audio_partes, version_aprobada
-     FROM volcado WHERE id = $1`,
+     FROM volcado WHERE id::text = $1 OR folio::text = $1`,
     [id]
   );
 
@@ -331,52 +357,48 @@ export async function obtenerPipelineDetalle(id: string): Promise<any> {
 
   const v = vRes.rows[0];
 
-  // Decrypt texts
   v.texto = descifrarTexto(v.texto || "");
   if (v.texto_original) {
     v.texto_original = descifrarTexto(v.texto_original);
   }
 
-  // Query versions
   const verRes = await db.query(
     "SELECT id, version, texto, sha256, chars, motivo, creado_en FROM volcado_version WHERE volcado_id = $1 ORDER BY version ASC",
-    [id]
+    [v.id]
   );
   const versiones = verRes.rows.map((vr: any) => ({
     ...vr,
     texto: descifrarTexto(vr.texto || "")
   }));
 
-  // Query corrections
   const corRes = await db.query(
     "SELECT id, antes, despues, version_desde, version_hasta, creado_en FROM correccion WHERE volcado_id = $1 ORDER BY creado_en ASC",
-    [id]
+    [v.id]
   );
   const correcciones = corRes.rows;
 
-  // Query nodes and aristas from PG graph
-  const nodesRes = await db.query("SELECT * FROM nodos WHERE volcado_id = $1", [id]);
-  const edgesRes = await db.query("SELECT * FROM aristas WHERE volcado_id = $1", [id]);
+  const nodesRes = await db.query("SELECT * FROM nodos WHERE volcado_id = $1", [v.id]);
+  const edgesRes = await db.query("SELECT * FROM aristas WHERE volcado_id = $1", [v.id]);
 
   const nodes = nodesRes.rows;
   const edges = edgesRes.rows;
 
-  // Verify InformationObject against Neo4j deeply if possible
   let neo4jVerified: { exists: boolean | "unknown"; details: any | null } = { exists: "unknown", details: null };
   if (v.io_id) {
     neo4jVerified = await verificarInformationObjectNeo4j(v.io_id);
   }
 
-  // Synthesize single volcado's metadata
   const listData = await obtenerPipelineAggregated();
-  const vEnriched = listData.volcados.find((p: any) => p.id === id);
+  const vEnriched = listData.volcados.find((p: any) => p.id === v.id);
 
   return {
     volcado: v,
     versiones,
     correcciones,
     procedencia: {
-      volcado_id: id,
+      volcado_id: v.id,
+      folio: v.folio,
+      session_id: v.session_id,
       version_original: vEnriched?.version_original ?? 1,
       version_actual: vEnriched?.version_actual ?? 1,
       version_aprobada: vEnriched?.version_aprobada ?? null,

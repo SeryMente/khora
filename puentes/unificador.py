@@ -1,6 +1,4 @@
 ﻿# @l0 L0-002-R · @req ING-01/REQ-1,KA-00/REQ-2 · @acr ACR-1.1,ACR-1.2,ACR-2.1 · @ua RAKG/UA-19,RAKG/UA-20
-import uuid
-import datetime
 
 class UnificadorAlLeer:
     def __init__(self, neo4j_driver):

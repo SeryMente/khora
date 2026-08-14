@@ -1,4 +1,4 @@
-// @l0 L0-002-R · @req PIPELINE/REQ-3,UI-02/RESKIN,UI-PIPELINE-FIX/REQ-1 · @acr ACR-1.2
+// @l0 L0-002-R · @req PIPELINE/REQ-3,UI-02/RESKIN,UI-PIPELINE-FIX/REQ-1 · @acr ACR-1.2 · @req TRACE-SESSION/010
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
@@ -6,6 +6,12 @@ import * as Icons from "lucide-react";
 
 type PipelineItem = {
   id: string;
+  folio: number | null;
+  session_id: string | null;
+  session_estado: string | null;
+  audio_status: "disponible" | "encontrado_no_vinculado" | "incompleto" | "no_recuperable";
+  partes_count: number;
+  blob_paths: string[];
   titulo: string | null;
   recibido_en: string;
   estado: string;
@@ -25,6 +31,12 @@ type PipelineItem = {
   aristas_count: number;
   integrity: string;
   audioStatus: string;
+  audio?: {
+    present: boolean;
+    complete: boolean | string;
+    bytes: number;
+    duration_sec: number;
+  };
 };
 
 type Volcado = {
@@ -100,8 +112,23 @@ export default function VolcadosPage() {
     }
   }, []);
 
+  // Helper for rendering Audio Status Badges
+  const renderAudioStatusBadge = (status: string) => {
+    switch (status) {
+      case "disponible":
+        return <span className="text-emerald-400 font-semibold text-[10px] flex items-center gap-1">🟢 Audio disponible</span>;
+      case "encontrado_no_vinculado":
+        return <span className="text-yellow-400 font-semibold text-[10px] flex items-center gap-1">🟡 Audio no vinculado</span>;
+      case "incompleto":
+        return <span className="text-amber-500 font-semibold text-[10px] flex items-center gap-1">🟠 Audio incompleto</span>;
+      case "no_recuperable":
+      default:
+        return <span className="text-red-400 font-semibold text-[10px] flex items-center gap-1">🔴 Audio no recuperable</span>;
+    }
+  };
+
   // Fetch Pipeline Data
-  const fetchPipeline = useCallback(async (currentSelectedId?: string | null) => {
+  const fetchPipeline = useCallback(async () => {
     setLoadingPipeline(true);
     try {
       const res = await fetch("/api/volcados/pipeline");
@@ -162,19 +189,16 @@ export default function VolcadosPage() {
       setMobileShowDetail(true);
     }
 
-    // Find in current pipeline items
     const item = pipelineItems.find((i) => i.id === id);
     if (item) {
       setSelectedItem(item);
     }
 
-    // Load versions
     try {
       const res = await fetch("/api/versiones?id=" + id);
       const data = await res.json();
       if (res.ok && Array.isArray(data.versiones)) {
         setVersiones(data.versiones);
-        // Default to editing the latest available version
         const latestVersionNum = data.versiones.reduce((max: number, v: any) => Math.max(max, Number(v.version)), 1);
         setSelectedVersionNum(latestVersionNum);
 
@@ -183,7 +207,6 @@ export default function VolcadosPage() {
           setEditableTexto(activeVer.texto || "");
         }
 
-        // Set from-version for delta calculations (default to predecessor)
         setSelectedDeltaFrom(Math.max(1, latestVersionNum - 1));
       } else {
         setVersiones([]);
@@ -194,7 +217,6 @@ export default function VolcadosPage() {
     }
   };
 
-  // Switch edited version
   const changeSelectedVersion = (vNum: number) => {
     setSelectedVersionNum(vNum);
     const ver = versiones.find((v) => v.version === vNum);
@@ -205,7 +227,6 @@ export default function VolcadosPage() {
     setDeltaPairs([]);
   };
 
-  // Fetch Delta Diffs
   const fetchDeltaDiff = async () => {
     if (!selectedId || !selectedVersionNum) return;
     setLoadingDelta(true);
@@ -232,7 +253,6 @@ export default function VolcadosPage() {
     }
   }, [selectedVersionNum, selectedDeltaFrom, selectedId]);
 
-  // Save edits as a new version
   const handleSaveEdits = async () => {
     if (!selectedId || !editableTexto.trim()) return;
     setSavingVersion(true);
@@ -244,9 +264,7 @@ export default function VolcadosPage() {
       });
       const data = await res.json();
       if (res.ok) {
-        // Reload versions & pipeline
         await fetchPipeline();
-        // Update selected item status to 'en_revision'
         await selectVolcadoItem(selectedId);
       } else {
         alert("Error al guardar: " + (data.detail || data.error || "Desconocido"));
@@ -258,13 +276,9 @@ export default function VolcadosPage() {
     }
   };
 
-  // Approve a version
   const handleApproveVersion = async () => {
-    console.log("handleApproveVersion clicked: selectedId =", selectedId, "selectedVersionNum =", selectedVersionNum);
-    console.log("versiones list =", JSON.stringify(versiones));
     if (!selectedId || !selectedVersionNum) return;
     const currentVer = versiones.find((v) => Number(v.version) === Number(selectedVersionNum));
-    console.log("found currentVer =", JSON.stringify(currentVer));
     if (!currentVer) return;
 
     setApprovingVersion(true);
@@ -279,9 +293,7 @@ export default function VolcadosPage() {
       });
       const data = await res.json();
       if (res.ok) {
-        // Reload
         await fetchPipeline();
-        // Update selected state locally
         if (selectedItem) {
           setSelectedItem({
             ...selectedItem,
@@ -300,7 +312,6 @@ export default function VolcadosPage() {
     }
   };
 
-  // Ingest approved version
   const handleIngestApproved = async () => {
     if (!selectedItem || !selectedItem.version_aprobada || !selectedItem.sha256_aprobado) return;
     setIngesting(true);
@@ -323,7 +334,6 @@ export default function VolcadosPage() {
           io_id: data.io_id || "Generado",
           details: data,
         });
-        // Update local item details immediately
         setSelectedItem({
           ...selectedItem,
           estado: "ingerido",
@@ -347,7 +357,6 @@ export default function VolcadosPage() {
     }
   };
 
-  // Keyboard Escape and Focus Trap inside the Drawer
   useEffect(() => {
     if (!selectedId) return;
 
@@ -358,96 +367,46 @@ export default function VolcadosPage() {
       }
     };
 
-    const getFocusables = () => {
-      if (!drawerRef.current) return [];
-      return Array.from(
-        drawerRef.current.querySelectorAll<HTMLElement>(
-          'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
-        )
-      ).filter((el) => {
-        const rect = el.getBoundingClientRect();
-        return rect.width > 0 && rect.height > 0;
-      });
-    };
-
-    const handleTab = (e: KeyboardEvent) => {
-      if (e.key !== "Tab") return;
-      const focusables = getFocusables();
-      if (focusables.length === 0) {
-        e.preventDefault();
-        return;
-      }
-      const first = focusables[0];
-      const last = focusables[focusables.length - 1];
-
-      if (e.shiftKey) {
-        if (document.activeElement === first) {
-          last.focus();
-          e.preventDefault();
-        }
-      } else {
-        if (document.activeElement === last) {
-          first.focus();
-          e.preventDefault();
-        }
-      }
-    };
-
     window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("keydown", handleTab);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("keydown", handleTab);
-    };
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [selectedId]);
 
-  // Filter pipeline items
   const filteredPipelineItems = pipelineItems.filter((item) => {
-    // Search query matches title, id, or io_id
     const matchesSearch =
       searchQuery === "" ||
       item.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (item.titulo || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (item.io_id || "").toLowerCase().includes(searchQuery.toLowerCase());
+      (item.folio ? String(item.folio).includes(searchQuery) : false) ||
+      (item.session_id || "").toLowerCase().includes(searchQuery.toLowerCase());
 
     if (!matchesSearch) return false;
 
     if (filter === "todos") return true;
     if (filter === "attention") {
-      return (
-        item.integrity !== "sync" ||
-        item.estado === "fallido"
-      );
+      return item.audio_status !== "disponible" || item.estado === "fallido";
     }
     if (filter === "archivados") return item.estado === "archivado";
     if (filter === "revision") return item.estado === "en_revision" || item.estado === "pendiente_revision";
     if (filter === "listos") return item.estado === "listo_ingesta";
     if (filter === "ingeridos") return item.estado === "ingerido";
     if (filter === "fallidos") return item.estado === "fallido";
-    if (filter === "anomalies") return item.integrity !== "sync";
-    if (filter === "sin_audio") return item.integrity === "text_without_audio";
-    if (filter === "modificados") return item.integrity === "text_edited";
+    if (filter === "sin_audio") return item.audio_status === "no_recuperable";
 
     return true;
   });
 
-  // Watch filters & search query to adjust selectedId if the current selection is excluded.
-  // When the list updates, automatically select the first item if current selection isn't there anymore.
   useEffect(() => {
     if (activeTab === "pipeline" && !loadingPipeline) {
-      const stillExists = filteredPipelineItems.some(it => it.id === selectedId);
+      const stillExists = filteredPipelineItems.some((it) => it.id === selectedId);
       if (!stillExists && filteredPipelineItems.length > 0) {
         void selectVolcadoItem(filteredPipelineItems[0].id, true);
       } else if (filteredPipelineItems.length === 0) {
-        // Clear selection if list becomes empty
         setSelectedId(null);
         setSelectedItem(null);
       }
     }
   }, [filter, searchQuery, pipelineItems, activeTab, loadingPipeline]);
 
-  // Legacy Archiving logic
   const handleArchivarLegacy = async () => {
     if (texto.trim().length === 0) {
       setVolcadosError("no hay texto que archivar");
@@ -467,7 +426,7 @@ export default function VolcadosPage() {
         setVolcadosError((data.detail ?? "archivo fallido") + (data.causa ? " :: " + data.causa : ""));
         return;
       }
-      setVolcadosAviso("archivado " + String(data.sha256).slice(0, 8) + " · " + data.chars + " caracteres · el texto ya esta a salvo");
+      setVolcadosAviso("archivado " + String(data.sha256).slice(0, 8) + " · " + data.chars + " caracteres");
       setTexto("");
       setTitulo("");
       await fetchLegacyVolcados();
@@ -477,10 +436,6 @@ export default function VolcadosPage() {
     } finally {
       setGuardandoVolcado(false);
     }
-  };
-
-  const selectLegacyVolcadoItem = async (v: Volcado) => {
-    setSelectedLegacyVolcado(v);
   };
 
   return (
@@ -496,7 +451,7 @@ export default function VolcadosPage() {
             Archivo de Volcados
           </h1>
           <p className="text-sm mt-1" style={{ color: "var(--khora-accent)" }}>
-            Control de ingestas, correcciones de transcripción y trazabilidad completa del ciclo de vida.
+            Control de ingestas, correcciones de transcripción y trazabilidad completa de sesión y audio.
           </p>
         </div>
 
@@ -605,17 +560,6 @@ export default function VolcadosPage() {
                 <Icons.AlertCircle size={12} /> Requiere atención
               </button>
               <button
-                onClick={() => setFilter("archivados")}
-                className="px-2.5 py-1.5 text-xs font-semibold uppercase tracking-wider border cursor-pointer hover:opacity-85 transition-opacity"
-                style={{
-                  backgroundColor: filter === "archivados" ? "var(--khora-accent)" : "var(--khora-surface)",
-                  color: filter === "archivados" ? "var(--khora-bg)" : "var(--khora-ink)",
-                  borderColor: "var(--khora-border)",
-                }}
-              >
-                Archivados
-              </button>
-              <button
                 onClick={() => setFilter("revision")}
                 className="px-2.5 py-1.5 text-xs font-semibold uppercase tracking-wider border cursor-pointer hover:opacity-85 transition-opacity"
                 style={{
@@ -648,46 +592,13 @@ export default function VolcadosPage() {
               >
                 Ingeridos
               </button>
-              <button
-                onClick={() => setFilter("anomalies")}
-                className="px-2.5 py-1.5 text-xs font-semibold uppercase tracking-wider border cursor-pointer hover:opacity-85 transition-opacity"
-                style={{
-                  backgroundColor: filter === "anomalies" ? "var(--khora-accent)" : "var(--khora-surface)",
-                  color: filter === "anomalies" ? "var(--khora-bg)" : "var(--khora-ink)",
-                  borderColor: "var(--khora-border)",
-                }}
-              >
-                Anomalías
-              </button>
-              <button
-                onClick={() => setFilter("sin_audio")}
-                className="px-2.5 py-1.5 text-xs font-semibold uppercase tracking-wider border cursor-pointer hover:opacity-85 transition-opacity"
-                style={{
-                  backgroundColor: filter === "sin_audio" ? "var(--khora-accent)" : "var(--khora-surface)",
-                  color: filter === "sin_audio" ? "var(--khora-bg)" : "var(--khora-ink)",
-                  borderColor: "var(--khora-border)",
-                }}
-              >
-                Sin audio
-              </button>
-              <button
-                onClick={() => setFilter("modificados")}
-                className="px-2.5 py-1.5 text-xs font-semibold uppercase tracking-wider border cursor-pointer hover:opacity-85 transition-opacity"
-                style={{
-                  backgroundColor: filter === "modificados" ? "var(--khora-accent)" : "var(--khora-surface)",
-                  color: filter === "modificados" ? "var(--khora-bg)" : "var(--khora-ink)",
-                  borderColor: "var(--khora-border)",
-                }}
-              >
-                Modificados
-              </button>
             </div>
 
             {/* Quick Search */}
             <div className="relative">
               <input
                 type="text"
-                placeholder="Buscar por ID, título..."
+                placeholder="Buscar por Folio, UUID, Session..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full md:w-64 pl-8 pr-3 py-1.5 text-xs border rounded-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)] focus-visible:border-[var(--khora-accent)]"
@@ -703,7 +614,7 @@ export default function VolcadosPage() {
 
           {/* Layout Master-Detail */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-[600px] items-stretch">
-            {/* LEFT INDEX COLUMN: Trazabilidad Index de todos los volcados */}
+            {/* LEFT INDEX COLUMN */}
             <div className={`lg:col-span-5 flex flex-col space-y-3 ${mobileShowDetail ? "hidden lg:flex" : "flex"}`}>
               <div className="flex justify-between items-baseline border-b pb-1 mb-1" style={{ borderColor: "var(--khora-border)" }}>
                 <span className="text-[10px] font-mono tracking-wider uppercase opacity-60">Volcados Disponibles</span>
@@ -722,36 +633,8 @@ export default function VolcadosPage() {
                 <div className="space-y-2 overflow-y-auto max-h-[700px] pr-1">
                   {filteredPipelineItems.map((item) => {
                     const isSelected = selectedId === item.id;
-
-                    // Inline steps representation: Captura (🎙), Transcripción (📝), Revisión (✎), Aprobación (✓), Ingesta (⚙)
-                    // We determine their states sequentially:
-                    const step1_captura = "ok"; // Captura is always complete
-                    const step2_transcripcion = item.integrity === "audio_without_text" ? "error" : "ok";
-                    const step3_revision = (item.estado === "archivado" || item.estado === "pendiente_revision") ? "pending" : "ok";
-                    const step4_aprobacion = item.version_aprobada ? "ok" : "pending";
-                    const step5_ingesta = item.estado === "ingerido" ? "ok" : (item.estado === "fallido" ? "error" : "pending");
-
-                    const getStepColor = (status: string) => {
-                      if (status === "ok") return "text-emerald-500";
-                      if (status === "error") return "text-red-500";
-                      return "text-zinc-500 opacity-40";
-                    };
-
-                    // Badges for quick scan
-                    let integrityLabel = "";
-                    let integrityBg = "";
-                    if (item.integrity !== "sync") {
-                      if (item.integrity === "text_edited") {
-                        integrityLabel = "Modificado";
-                        integrityBg = "text-yellow-400 border-yellow-400/20 bg-yellow-400/5";
-                      } else if (item.integrity === "broken_provenance") {
-                        integrityLabel = "Inconsistente";
-                        integrityBg = "text-red-400 border-red-400/20 bg-red-400/5";
-                      } else {
-                        integrityLabel = "Incompleto";
-                        integrityBg = "text-orange-400 border-orange-400/20 bg-orange-400/5";
-                      }
-                    }
+                    const duration = item.audio?.duration_sec || item.duracion_seg || 0;
+                    const partesNum = item.partes_count || 0;
 
                     return (
                       <div
@@ -764,48 +647,30 @@ export default function VolcadosPage() {
                           borderColor: isSelected ? "var(--khora-accent)" : "var(--khora-border)"
                         }}
                       >
-                        {/* Title / Id bar */}
+                        {/* Title / Folio / Id bar */}
                         <div className="flex justify-between items-start gap-2">
                           <div className="min-w-0">
-                            {item.titulo ? (
-                              <h3 className="font-bold text-[11px] truncate">{item.titulo}</h3>
-                            ) : (
-                              <h3 className="italic text-[11px] opacity-60">Sin título</h3>
-                            )}
-                            <span className="text-[9px] font-mono opacity-50 block mt-0.5">ID: {item.id.slice(0, 8)}...</span>
+                            <div className="flex items-center gap-2">
+                              {item.folio && (
+                                <span className="font-mono text-[10px] px-1 py-0.5 bg-zinc-800 border border-zinc-700 text-amber-400 font-bold shrink-0">
+                                  #{item.folio}
+                                </span>
+                              )}
+                              <h3 className="font-bold text-[11px] truncate">{item.titulo || "Sin título"}</h3>
+                            </div>
+                            <span className="text-[9px] font-mono opacity-50 block mt-0.5">UUID: {item.id.slice(0, 8)}...</span>
                           </div>
                           <span className="text-[9px] opacity-60 font-mono shrink-0">
                             {new Date(item.recibido_en).toLocaleDateString()}
                           </span>
                         </div>
 
-                        {/* Lifecycle mini representation */}
-                        <div className="flex items-center justify-between pt-1 border-t border-zinc-800/10">
-                          <div className="flex items-center gap-2.5">
-                            <span className={`text-xs ${getStepColor(step1_captura)}`} title="Captura">🎙</span>
-                            <span className="text-zinc-700 text-[10px]">&gt;</span>
-                            <span className={`text-xs ${getStepColor(step2_transcripcion)}`} title="Transcripción">📝</span>
-                            <span className="text-zinc-700 text-[10px]">&gt;</span>
-                            <span className={`text-xs ${getStepColor(step3_revision)}`} title="Revisión">✎</span>
-                            <span className="text-zinc-700 text-[10px]">&gt;</span>
-                            <span className={`text-xs ${getStepColor(step4_aprobacion)}`} title="Aprobación">✓</span>
-                            <span className="text-zinc-700 text-[10px]">&gt;</span>
-                            <span className={`text-xs ${getStepColor(step5_ingesta)}`} title="Ingesta">⚙</span>
-                          </div>
-
-                          {/* Quick details */}
-                          <div className="flex items-center gap-1.5 font-mono text-[9px] opacity-75">
-                            {item.nodos_count > 0 && (
-                              <span className="border border-blue-500/20 bg-blue-500/5 text-blue-400 px-1 py-0.5" title="Grafo PG">
-                                {item.nodos_count}n / {item.aristas_count}r
-                              </span>
-                            )}
-                            {integrityLabel && (
-                              <span className={`px-1 py-0.5 border ${integrityBg}`}>
-                                {integrityLabel}
-                              </span>
-                            )}
-                          </div>
+                        {/* Audio Status & Parts Compact Line */}
+                        <div className="flex items-center justify-between pt-1 border-t border-zinc-800/10 font-mono text-[10px]">
+                          {renderAudioStatusBadge(item.audio_status)}
+                          <span className="opacity-70 text-[9px]">
+                            {partesNum} {partesNum === 1 ? "parte" : "partes"} · {duration}s
+                          </span>
                         </div>
                       </div>
                     );
@@ -814,21 +679,21 @@ export default function VolcadosPage() {
               )}
             </div>
 
-            {/* RIGHT DETAIL COLUMN: Trace, Revisión y Operaciones del volcado seleccionado */}
+            {/* RIGHT DETAIL COLUMN */}
             <div className={`lg:col-span-7 flex flex-col space-y-4 ${!mobileShowDetail ? "hidden lg:flex" : "flex"}`}>
               {selectedId && selectedItem ? (
                 <div
+                  ref={drawerRef}
                   className="border p-4 shadow-none flex flex-col space-y-6 h-full rounded-none"
                   style={{
                     backgroundColor: "var(--khora-surface)",
                     borderColor: "var(--khora-border)",
                   }}
                 >
-                  {/* Detail Header & Mobile back navigation */}
+                  {/* Detail Header */}
                   <div className="border-b pb-3 flex justify-between items-center" style={{ borderColor: "var(--khora-border)" }}>
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        {/* Mobile Back Button */}
                         <button
                           onClick={() => setMobileShowDetail(false)}
                           className="lg:hidden p-1 mr-1 border rounded-none cursor-pointer"
@@ -837,11 +702,11 @@ export default function VolcadosPage() {
                           <Icons.ChevronLeft className="w-4 h-4 text-zinc-400" />
                         </button>
                         <span className="text-[10px] font-mono tracking-widest uppercase opacity-60">
-                          Trazabilidad Operacional
+                          Trazabilidad Operacional y Audio
                         </span>
                       </div>
                       <h2 className="text-sm font-bold font-mono">
-                        {selectedItem.titulo || selectedItem.id}
+                        {selectedItem.folio ? `Folio #${selectedItem.folio} — ` : ""}{selectedItem.titulo || selectedItem.id}
                       </h2>
                     </div>
 
@@ -874,205 +739,84 @@ export default function VolcadosPage() {
                   <div className="flex-1 space-y-6 overflow-y-auto">
                     {drawerSubTab === "trace" ? (
                       <div className="space-y-6">
-                        {/* TRACE VIEW (Chronological Sequence) */}
+                        {/* Audio and Session Metadata Box */}
+                        <div className="p-3 border space-y-3 font-mono text-xs rounded-none bg-zinc-950/40" style={{ borderColor: "var(--khora-border)" }}>
+                          <div className="flex justify-between items-center border-b pb-1 border-zinc-800">
+                            <span className="text-[10px] uppercase tracking-wider opacity-60">Estado de Audio</span>
+                            {renderAudioStatusBadge(selectedItem.audio_status)}
+                          </div>
+                          <div className="grid grid-cols-2 gap-2 text-[11px]">
+                            <div><span className="opacity-60">Folio:</span> #{selectedItem.folio || "N/A"}</div>
+                            <div><span className="opacity-60">Session ID:</span> {selectedItem.session_id ? selectedItem.session_id.slice(0, 12) + "..." : "Sin sesión"}</div>
+                            <div><span className="opacity-60">Estado Sesión:</span> {selectedItem.session_estado || "completo"}</div>
+                            <div><span className="opacity-60">Partes:</span> {selectedItem.partes_count || 0}</div>
+                            <div><span className="opacity-60">Bytes Audio:</span> {selectedItem.audio?.bytes || selectedItem.audio_bytes || 0} B</div>
+                            <div><span className="opacity-60">Duración:</span> {selectedItem.audio?.duration_sec || selectedItem.duracion_seg || 0} seg</div>
+                          </div>
+                          {selectedItem.blob_paths && selectedItem.blob_paths.length > 0 && (
+                            <div className="border-t pt-2 border-zinc-800 text-[10px] space-y-1">
+                              <span className="opacity-60 block">Ruta(s) de Blobs:</span>
+                              {selectedItem.blob_paths.map((p, idx) => (
+                                <div key={idx} className="truncate text-zinc-400 bg-zinc-900/80 p-1 border border-zinc-800">{p}</div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* TRACE MAP */}
                         <div className="text-xs uppercase font-mono tracking-widest opacity-65 border-b pb-1 mb-2" style={{ borderColor: "var(--khora-border)" }}>
-                          Traceability Tree Map
+                          Árbol de Trazabilidad
                         </div>
 
                         <div className="relative pl-6 border-l-2 space-y-6" style={{ borderColor: "var(--khora-border)" }}>
-                          {/* 🎙 CAPTURA */}
+                          {/* 🎙 CAPTURA / SESION */}
                           <div className="relative">
-                            <div
-                              className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full flex items-center justify-center border"
-                              style={{
-                                backgroundColor: "var(--khora-bg)",
-                                borderColor: "var(--khora-accent)",
-                              }}
-                            >
+                            <div className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full flex items-center justify-center border" style={{ backgroundColor: "var(--khora-bg)", borderColor: "var(--khora-accent)" }}>
                               <Icons.Mic className="w-2.5 h-2.5 text-zinc-400" />
                             </div>
                             <div className="space-y-1">
                               <h4 className="font-bold text-xs flex items-center gap-1.5">
-                                🎙 Captura <span className="text-emerald-500">✓ Completado</span>
+                                🎙 Captura y Sesión <span className="text-emerald-500">✓ Registrado</span>
                               </h4>
                               <div className="text-[11px] opacity-75 space-y-0.5 font-mono">
                                 <div>Fecha: {new Date(selectedItem.recibido_en).toLocaleString()}</div>
-                                <div>Origen: cora-ui (web)</div>
+                                <div>Session ID: {selectedItem.session_id || "N/A"}</div>
                               </div>
                             </div>
                           </div>
 
                           {/* 💾 ARCHIVO */}
                           <div className="relative">
-                            <div
-                              className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full flex items-center justify-center border"
-                              style={{
-                                backgroundColor: "var(--khora-bg)",
-                                borderColor: "var(--khora-accent)",
-                              }}
-                            >
+                            <div className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full flex items-center justify-center border" style={{ backgroundColor: "var(--khora-bg)", borderColor: "var(--khora-accent)" }}>
                               <Icons.Save className="w-2.5 h-2.5 text-zinc-400" />
                             </div>
                             <div className="space-y-1">
                               <h4 className="font-bold text-xs">
-                                💾 Archivo <span className="text-emerald-500">✓ Salvaguardado</span>
+                                💾 Volcado <span className="text-emerald-500">✓ Persistido</span>
                               </h4>
                               <div className="text-[11px] opacity-75 space-y-0.5 font-mono">
                                 <div>Total caracteres: {selectedItem.chars}</div>
-                                <div>Integridad: Verbatim Append-only</div>
+                                <div>UUID: {selectedItem.id}</div>
                               </div>
-                            </div>
-                          </div>
-
-                          {/* 📝 TRANSCRIPCIÓN */}
-                          <div className="relative">
-                            <div
-                              className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full flex items-center justify-center border"
-                              style={{
-                                backgroundColor: "var(--khora-bg)",
-                                borderColor: "var(--khora-accent)",
-                              }}
-                            >
-                              <Icons.FileText className="w-2.5 h-2.5 text-zinc-400" />
-                            </div>
-                            <div className="space-y-1">
-                              <h4 className="font-bold text-xs">
-                                📝 Transcripción <span className="text-emerald-500">✓ Versión Inicial v1</span>
-                              </h4>
-                              <div className="text-[11px] opacity-75 space-y-0.5 font-mono">
-                                {selectedItem.audio_url ? (
-                                  <>
-                                    <div className="text-emerald-500">✓ Grabación disponible</div>
-                                    <div>Duración: {selectedItem.duracion_seg} segundos</div>
-                                  </>
-                                ) : (
-                                  <div className="text-orange-500">⚠ Grabación ausente</div>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* ✎ HISTORIAL / REVISIÓN */}
-                          <div className="relative">
-                            <div
-                              className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full flex items-center justify-center border"
-                              style={{
-                                backgroundColor: "var(--khora-bg)",
-                                borderColor: "var(--khora-accent)",
-                              }}
-                            >
-                              <Icons.GitCommit className="w-2.5 h-2.5 text-zinc-400" />
-                            </div>
-                            <div className="space-y-1">
-                              <h4 className="font-bold text-xs">
-                                ✎ Historial de Versiones
-                              </h4>
-                              <div className="text-[11px] opacity-75 space-y-1 font-mono">
-                                <div>Total versiones: {selectedItem.total_versiones}</div>
-                                {versiones.length > 0 && (
-                                  <div className="border border-zinc-700/40 p-1.5 mt-1 bg-zinc-800/10 space-y-0.5 max-h-32 overflow-y-auto">
-                                    {versiones.map((v) => (
-                                      <div key={v.version} className="flex justify-between">
-                                        <span>v{v.version} ({v.chars} car)</span>
-                                        <span className="opacity-60">{String(v.sha256).slice(0, 8)}</span>
-                                      </div>
-                                    ))}
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* ✓ APROBACIÓN */}
-                          <div className="relative">
-                            <div
-                              className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full flex items-center justify-center border"
-                              style={{
-                                backgroundColor: "var(--khora-bg)",
-                                borderColor: "var(--khora-accent)",
-                              }}
-                            >
-                              <Icons.CheckCircle className="w-2.5 h-2.5 text-zinc-400" />
-                            </div>
-                            <div className="space-y-1">
-                              <h4 className="font-bold text-xs flex items-center gap-1">
-                                ✓ Aprobación{" "}
-                                {selectedItem.version_aprobada ? (
-                                  <span className="text-emerald-500">✓ v{selectedItem.version_aprobada} Aprobada</span>
-                                ) : (
-                                  <span className="text-orange-500">○ Pendiente de aprobación</span>
-                                )}
-                              </h4>
-                              {selectedItem.version_aprobada && (
-                                <div className="text-[11px] opacity-75 space-y-0.5 font-mono">
-                                  <div>Aprobador: {selectedItem.aprobador}</div>
-                                  <div>Fecha: {new Date(selectedItem.aprobado_en!).toLocaleString()}</div>
-                                  <div className="break-all font-semibold">Hash: {selectedItem.sha256_aprobado}</div>
-                                </div>
-                              )}
                             </div>
                           </div>
 
                           {/* ⚙ INGESTA */}
                           <div className="relative">
-                            <div
-                              className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full flex items-center justify-center border"
-                              style={{
-                                backgroundColor: "var(--khora-bg)",
-                                borderColor: "var(--khora-accent)",
-                              }}
-                            >
+                            <div className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full flex items-center justify-center border" style={{ backgroundColor: "var(--khora-bg)", borderColor: "var(--khora-accent)" }}>
                               <Icons.Settings className="w-2.5 h-2.5 text-zinc-400" />
                             </div>
                             <div className="space-y-1">
                               <h4 className="font-bold text-xs">
-                                ⚙ Ingesta{" "}
+                                ⚙ Ingesta Kernel{" "}
                                 {selectedItem.estado === "ingerido" ? (
-                                  <span className="text-emerald-500">✓ Ingerido exitosamente</span>
+                                  <span className="text-emerald-500">✓ Ingerido</span>
                                 ) : selectedItem.estado === "fallido" ? (
                                   <span className="text-red-500">✕ Error en ingesta</span>
                                 ) : (
                                   <span className="text-orange-500">○ En espera</span>
                                 )}
                               </h4>
-                              {selectedItem.ultimo_error && (
-                                <div className="text-[11px] text-red-400 font-mono mt-1 border border-red-500/10 p-1.5 bg-red-500/5">
-                                  {selectedItem.ultimo_error}
-                                </div>
-                              )}
-                              {selectedItem.io_id && (
-                                <div className="text-[11px] opacity-75 font-mono">
-                                  io_id: {selectedItem.io_id}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-
-                          {/* ◎ GRAFO PKG */}
-                          <div className="relative">
-                            <div
-                              className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full flex items-center justify-center border"
-                              style={{
-                                backgroundColor: "var(--khora-bg)",
-                                borderColor: "var(--khora-accent)",
-                              }}
-                            >
-                              <Icons.Activity className="w-2.5 h-2.5 text-zinc-400" />
-                            </div>
-                            <div className="space-y-1">
-                              <h4 className="font-bold text-xs">
-                                ◎ Grafo PKG Proyecciones
-                              </h4>
-                              <div className="text-[11px] opacity-75 font-mono">
-                                {selectedItem.nodos_count > 0 ? (
-                                  <div className="text-emerald-500 font-semibold space-y-0.5">
-                                    <div>✓ Nodos creados: {selectedItem.nodos_count}</div>
-                                    <div>✓ Aristas creadas: {selectedItem.aristas_count}</div>
-                                  </div>
-                                ) : (
-                                  <div className="text-zinc-500">Sin representación física en el grafo aún.</div>
-                                )}
-                              </div>
                             </div>
                           </div>
                         </div>
@@ -1080,14 +824,12 @@ export default function VolcadosPage() {
                     ) : (
                       <div className="space-y-6">
                         {/* REVISION AND EDIT VIEW */}
-
-                        {/* Audio controller section */}
                         <div className="p-3 border space-y-2 rounded-none" style={{ backgroundColor: "var(--khora-bg)", borderColor: "var(--khora-border)" }}>
                           <div className="flex justify-between items-center text-[10px] font-mono tracking-wider opacity-60 uppercase">
-                            <span>Grabación Asociada</span>
-                            <span>{selectedItem.audio_url ? "✓ Audio disponible" : "Sin Grabación"}</span>
+                            <span>Reproducción de Audio</span>
+                            {renderAudioStatusBadge(selectedItem.audio_status)}
                           </div>
-                          {selectedItem.audio_url ? (
+                          {selectedItem.audio_status !== "no_recuperable" ? (
                             <div className="space-y-1.5">
                               <audio
                                 src={`/api/audio/${selectedItem.id}`}
@@ -1095,14 +837,13 @@ export default function VolcadosPage() {
                                 preload="metadata"
                                 className="w-full h-8"
                               />
-                              <p className="text-[10px] opacity-70">
-                                Duración: {selectedItem.duracion_seg || "?"} segundos · Tamaño:{" "}
-                                {selectedItem.audio_bytes ? Math.round(selectedItem.audio_bytes / 1024) + " KB" : "?"}
+                              <p className="text-[10px] opacity-70 font-mono">
+                                Duración: {selectedItem.audio?.duration_sec || selectedItem.duracion_seg || 0} segundos · Partes: {selectedItem.partes_count || 1}
                               </p>
                             </div>
                           ) : (
-                            <div className="text-zinc-500 italic text-xs">
-                              No hay audio en vivo registrado para este volcado.
+                            <div className="text-red-400 italic text-xs">
+                              Audio no disponible o inaccesible para reproducción.
                             </div>
                           )}
                         </div>
@@ -1146,61 +887,6 @@ export default function VolcadosPage() {
                           />
                         </div>
 
-                        {/* Delta View diff */}
-                        {versiones.length > 1 && (
-                          <div className="border p-3 space-y-2 rounded-none" style={{ borderColor: "var(--khora-border)" }}>
-                            <div className="flex justify-between items-center">
-                              <span className="text-[10px] font-mono tracking-wider uppercase opacity-60">
-                                Delta Changes
-                              </span>
-                              <div className="flex items-center gap-1 text-[11px]">
-                                <span>Comparar con:</span>
-                                <select
-                                  value={selectedDeltaFrom}
-                                  onChange={(e) => setSelectedDeltaFrom(Number(e.target.value))}
-                                  className="p-0.5 border rounded-none font-mono text-[10px]"
-                                  style={{
-                                    backgroundColor: "var(--khora-bg)",
-                                    borderColor: "var(--khora-border)",
-                                    color: "var(--khora-ink)",
-                                  }}
-                                >
-                                  {versiones
-                                    .filter((v) => v.version !== selectedVersionNum)
-                                    .map((v) => (
-                                      <option key={v.version} value={v.version}>
-                                        v{v.version}
-                                      </option>
-                                    ))}
-                                </select>
-                              </div>
-                            </div>
-
-                            {loadingDelta ? (
-                              <div className="text-[10px] opacity-60 font-mono">Calculando pares delta...</div>
-                            ) : deltaPairs.length === 0 ? (
-                              <div className="text-[10px] opacity-55 font-mono">Sin diferencias entre v{selectedDeltaFrom} y v{selectedVersionNum}.</div>
-                            ) : (
-                              <div className="space-y-1 max-h-40 overflow-y-auto border border-zinc-700/20 p-2 font-mono text-[10px]">
-                                {deltaPairs.map((p, idx) => (
-                                  <div key={idx} className="border-b last:border-b-0 py-1 space-y-0.5 border-zinc-700/10">
-                                    {p.antes && (
-                                      <div className="text-red-500 bg-red-500/10 px-1 font-mono">
-                                        − {p.antes}
-                                      </div>
-                                    )}
-                                    {p.despues && (
-                                      <div className="text-green-500 bg-green-500/10 px-1 font-mono">
-                                        + {p.despues}
-                                      </div>
-                                    )}
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        )}
-
                         {/* Action buttons */}
                         <div className="grid grid-cols-2 gap-2">
                           <button
@@ -1226,60 +912,6 @@ export default function VolcadosPage() {
                             {approvingVersion ? "Aprobando..." : `Aprobar v${selectedVersionNum}`}
                           </button>
                         </div>
-
-                        {/* Approved version warning block */}
-                        {selectedItem.version_aprobada ? (
-                          <div className="border border-emerald-500/20 bg-emerald-500/5 p-3 space-y-2">
-                            <div className="flex items-center gap-2 text-emerald-400 font-bold text-xs">
-                              <Icons.CheckCircle size={16} />
-                              <span>v{selectedItem.version_aprobada} APROBADA</span>
-                            </div>
-                            <p className="text-[11px] opacity-80">
-                              Esta versión está lista para ser ingerida en la base de datos de conocimiento del kernel.
-                            </p>
-                            <button
-                              onClick={handleIngestApproved}
-                              disabled={ingesting}
-                              className="w-full px-3 py-2 border border-emerald-500 text-emerald-500 hover:bg-emerald-500 hover:text-black font-semibold text-xs cursor-pointer transition-colors"
-                            >
-                              {ingesting ? "Ingiriendo en Kernel..." : `[ Ingerir versión v${selectedItem.version_aprobada} ]`}
-                            </button>
-                          </div>
-                        ) : (
-                          <div className="border border-red-500/20 bg-red-500/5 p-3 text-xs text-red-400 flex items-start gap-2">
-                            <Icons.AlertCircle size={16} className="shrink-0" />
-                            <div>
-                              <strong>Bloqueado para Ingesta:</strong> Debes aprobar una versión antes de mandarla al grafo del kernel.
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Ingestion results panel */}
-                        {ingestaResult && (
-                          <div
-                            className={`p-3 border text-xs space-y-1 ${
-                              ingestaResult.success
-                                ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
-                                : "border-red-500/30 bg-red-500/10 text-red-400"
-                            }`}
-                          >
-                            {ingestaResult.success ? (
-                              <>
-                                <div className="font-bold flex items-center gap-1 text-[11px]">
-                                  <Icons.CheckCircle size={14} /> ✓ INGESTADO
-                                </div>
-                                <div className="font-mono text-[10px]">io_id: {ingestaResult.io_id}</div>
-                              </>
-                            ) : (
-                              <>
-                                <div className="font-bold flex items-center gap-1 text-[11px]">
-                                  <Icons.AlertCircle size={14} /> Error en Ingesta
-                                </div>
-                                <p className="font-mono text-[10px]">{ingestaResult.error}</p>
-                              </>
-                            )}
-                          </div>
-                        )}
                       </div>
                     )}
                   </div>
@@ -1295,8 +927,6 @@ export default function VolcadosPage() {
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* ARCHIVE MANUAL & LEGACY INVENTORY VIEW */}
-
-          {/* Left Column: Formulario de Archivo */}
           <div className="lg:col-span-1 space-y-4">
             <div
               className="border p-4 space-y-4 rounded-none shadow-none"
@@ -1349,29 +979,9 @@ export default function VolcadosPage() {
                   {texto.length} car
                 </span>
               </div>
-
-              {volcadosError && (
-                <div
-                  className="p-2 border text-xs flex items-start gap-2"
-                  style={{ borderColor: "var(--khora-border)", backgroundColor: "var(--khora-bg)" }}
-                >
-                  <Icons.AlertCircle size={14} className="shrink-0 mt-0.5 text-red-500" />
-                  <span>{volcadosError}</span>
-                </div>
-              )}
-              {volcadosAviso && (
-                <div
-                  className="p-2 border text-xs flex items-start gap-2"
-                  style={{ borderColor: "var(--khora-border)", backgroundColor: "var(--khora-bg)" }}
-                >
-                  <Icons.CheckCircle size={14} className="shrink-0 mt-0.5 text-emerald-500" />
-                  <span>{volcadosAviso}</span>
-                </div>
-              )}
             </div>
           </div>
 
-          {/* Right Column: Existing Inventario List & Details */}
           <div className="lg:col-span-2 space-y-4">
             <div className="border p-4 rounded-none space-y-4" style={{ borderColor: "var(--khora-border)" }}>
               <div className="flex justify-between items-baseline border-b pb-1">
@@ -1387,63 +997,30 @@ export default function VolcadosPage() {
                 <table className="w-full text-left text-xs">
                   <thead>
                     <tr className="border-b" style={{ borderColor: "var(--khora-border)" }}>
+                      <th className="pb-2 font-semibold">Folio</th>
                       <th className="pb-2 font-semibold">Recibido</th>
                       <th className="pb-2 font-semibold">Título</th>
                       <th className="pb-2 font-semibold">Chars</th>
                       <th className="pb-2 font-semibold">Estado</th>
-                      <th className="pb-2 font-semibold">SHA</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {volcadosItems.length === 0 ? (
-                      <tr>
-                        <td colSpan={5} className="py-4 text-center text-zinc-500">
-                          Sin volcados todavía
+                    {volcadosItems.map((v) => (
+                      <tr key={v.id} className="border-b last:border-b-0">
+                        <td className="py-2.5 font-mono">#{v.folio}</td>
+                        <td className="py-2.5">{new Date(v.recibido_en).toLocaleDateString()}</td>
+                        <td className="py-2.5 truncate max-w-[150px] font-semibold">{v.titulo || "—"}</td>
+                        <td className="py-2.5 font-mono">{v.chars}</td>
+                        <td className="py-2.5">
+                          <span className="border border-zinc-700 bg-zinc-800/40 text-[10px] font-mono px-1 py-0.5">
+                            {v.estado}
+                          </span>
                         </td>
                       </tr>
-                    ) : (
-                      volcadosItems.map((v) => {
-                        const isSelected = selectedLegacyVolcado?.id === v.id;
-                        return (
-                          <tr
-                            key={v.id}
-                            onClick={() => selectLegacyVolcadoItem(v)}
-                            className={`border-b last:border-b-0 hover:bg-zinc-800/20 cursor-pointer ${
-                              isSelected ? "bg-zinc-800/30" : ""
-                            }`}
-                            style={{ borderColor: "var(--khora-border)" }}
-                          >
-                            <td className="py-2.5">{new Date(v.recibido_en).toLocaleDateString()}</td>
-                            <td className="py-2.5 truncate max-w-[150px] font-semibold">{v.titulo || "—"}</td>
-                            <td className="py-2.5 font-mono">{v.chars}</td>
-                            <td className="py-2.5">
-                              <span className="border border-zinc-700 bg-zinc-800/40 text-[10px] font-mono px-1 py-0.5">
-                                {v.estado}
-                              </span>
-                            </td>
-                            <td className="py-2.5 font-mono text-zinc-500">{v.sha256.slice(0, 8)}</td>
-                          </tr>
-                        );
-                      })
-                    )}
+                    ))}
                   </tbody>
                 </table>
               </div>
-
-              {selectedLegacyVolcado && (
-                <div
-                  className="border p-4 space-y-3 rounded-none"
-                  style={{ backgroundColor: "var(--khora-bg)", borderColor: "var(--khora-border)" }}
-                >
-                  <div className="border-b pb-1">
-                    <span className="text-[10px] font-mono block opacity-60">ID: {selectedLegacyVolcado.id}</span>
-                    <strong className="text-xs">Detalles del texto</strong>
-                  </div>
-                  <pre className="text-[10px] font-mono whitespace-pre-wrap p-2 border bg-zinc-950 border-zinc-800/60 leading-relaxed max-h-48 overflow-y-auto">
-                    {selectedLegacyVolcado.texto}
-                  </pre>
-                </div>
-              )}
             </div>
           </div>
         </div>
@@ -1451,4 +1028,3 @@ export default function VolcadosPage() {
     </div>
   );
 }
-
