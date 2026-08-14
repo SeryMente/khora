@@ -29,6 +29,7 @@ type PipelineItem = {
 
 type Volcado = {
   id: string;
+  folio: number;
   texto: string;
   sha256: string;
   chars: number;
@@ -681,6 +682,7 @@ export default function VolcadosPage() {
                 Modificados
               </button>
             </div>
+          </div>
 
             {/* Quick Search */}
             <div className="relative">

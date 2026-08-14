@@ -28,7 +28,7 @@ export async function POST(req: Request) {
       driver: "web",
       usuario: session.user.email,
     });
-    return NextResponse.json({ id: v.id, sha256: v.sha256, chars: v.chars, estado: v.estado, recibido_en: v.recibido_en }, { status: 201 });
+    return NextResponse.json({ id: v.id, folio: v.folio, sha256: v.sha256, chars: v.chars, estado: v.estado, recibido_en: v.recibido_en }, { status: 201 });
   } catch (e: any) {
     return NextResponse.json({ detail: "archivo verbatim fallido", causa: e?.message ?? String(e) }, { status: 500 });
   }

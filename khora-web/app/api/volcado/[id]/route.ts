@@ -12,8 +12,16 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
     const { id } = await ctx.params;
     await asegurarEsquema();
     const db = getDb();
-    const r = await db.query("SELECT * FROM volcado WHERE id = $1", [id]);
-    if (r.rows.length === 0) return NextResponse.json({ detail: "volcado no encontrado" }, { status: 404 });
+    const esFolio = /^\d+$/.test(id);
+    const r = esFolio
+      ? await db.query("SELECT * FROM volcado WHERE folio = $1", [parseInt(id, 10)])
+      : await db.query("SELECT * FROM volcado WHERE id = $1", [id]);
+    if (r.rows.length === 0) {
+      return NextResponse.json(
+        { detail: esFolio ? `no existe volcado con folio ${id}` : "volcado no encontrado" },
+        { status: 404 }
+      );
+    }
     const fila: any = r.rows[0];
     const claro = { ...fila, texto: descifrarTexto(String(fila.texto ?? "")), texto_original: fila.texto_original ? descifrarTexto(String(fila.texto_original)) : null };
     return NextResponse.json({ volcado: claro });

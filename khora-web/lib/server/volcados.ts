@@ -6,6 +6,7 @@ export type EstadoVolcado = "archivado" | "pendiente_revision" | "en_revision" |
 
 export interface Volcado {
   id: string;
+  folio: number;
   texto: string;
   sha256: string;
   chars: number;
@@ -27,6 +28,13 @@ const DDL: string[] = [
   "CREATE INDEX IF NOT EXISTS volcado_recibido_idx ON volcado (recibido_en DESC)",
   "CREATE INDEX IF NOT EXISTS volcado_estado_idx ON volcado (estado)",
   "CREATE INDEX IF NOT EXISTS volcado_sha_idx ON volcado (sha256)",
+  "ALTER TABLE volcado ADD COLUMN IF NOT EXISTS folio INTEGER",
+  "WITH base AS (SELECT COALESCE(max(folio), 0) AS m FROM volcado), ordenados AS (SELECT id, row_number() OVER (ORDER BY recibido_en ASC, id ASC) AS n FROM volcado WHERE folio IS NULL) UPDATE volcado v SET folio = base.m + o.n FROM ordenados o, base WHERE v.id = o.id AND v.folio IS NULL",
+  "CREATE SEQUENCE IF NOT EXISTS volcado_folio_seq",
+  "SELECT setval('volcado_folio_seq', COALESCE((SELECT max(folio) FROM volcado), 0), true)",
+  "ALTER TABLE volcado ALTER COLUMN folio SET DEFAULT nextval('volcado_folio_seq')",
+  "ALTER SEQUENCE volcado_folio_seq OWNED BY volcado.folio",
+  "CREATE UNIQUE INDEX IF NOT EXISTS volcado_folio_uniq ON volcado (folio)",
   "ALTER TABLE volcado ADD COLUMN IF NOT EXISTS version_aprobada INTEGER",
 ];
 
@@ -52,7 +60,7 @@ export async function archivarVolcado(args: { texto: string; titulo?: string | n
   const db = getDb();
   const id = randomUUID();
   const sha = hashTexto(args.texto);
-  const sql = "INSERT INTO volcado (id, texto, sha256, chars, titulo, origen, driver, usuario, estado, intentos) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,0) RETURNING *";
+  const sql = "INSERT INTO volcado (id, texto, sha256, chars, titulo, origen, driver, usuario, estado, intentos) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,0) RETURNING id, folio, texto, sha256, chars, titulo, origen, driver, usuario, recibido_en, estado, io_id, intentos, ultimo_error, ultimo_intento";
   const res = await db.query(sql, [id, cifrarTexto(args.texto), sha, args.texto.length, args.titulo ?? null, args.origen, args.driver ?? null, args.usuario ?? null, "archivado"]);
   return res.rows[0] as Volcado;
 }
@@ -60,7 +68,7 @@ export async function archivarVolcado(args: { texto: string; titulo?: string | n
 export async function listarVolcados(limite: number = 200): Promise<Volcado[]> {
   await asegurarTabla();
   const db = getDb();
-  const sql = "SELECT id, texto, sha256, chars, titulo, origen, driver, usuario, recibido_en, estado, io_id, intentos, ultimo_error, ultimo_intento, version_aprobada FROM volcado ORDER BY recibido_en DESC LIMIT $1";
+  const sql = "SELECT id, folio, texto, sha256, chars, titulo, origen, driver, usuario, recibido_en, estado, io_id, intentos, ultimo_error, ultimo_intento, version_aprobada FROM volcado ORDER BY recibido_en DESC LIMIT $1";
   const res = await db.query(sql, [limite]); res.rows = res.rows.map((f: any) => ({ ...f, texto: descifrarTexto(String(f.texto ?? "")) }));
   return res.rows as Volcado[];
 }
