@@ -1,4 +1,4 @@
-// @l0 L0-002-R · @req FIX-DICTADO/ESPEJO-NOTION · @acr ACR-1.2
+// @l0 L0-002-R · @req FIX-DICTADO/ESPEJO-NOTION · @acr ACR-1.2 · @req TRACE-SESSION/010
 import { NextResponse } from "next/server";
 import { guardarDictado } from "../../../lib/server/dictado";
 import { espejarVolcado } from "../../../lib/server/espejoNotion";
@@ -15,6 +15,7 @@ export async function POST(req: Request) {
     }
     const r = await guardarDictado({
       texto,
+      sessionId: c?.sessionId ?? c?.sesionId ?? null,
       titulo: c?.titulo ?? null,
       audioUrl: c?.audioUrl ?? null,
       audioBytes: c?.audioBytes ?? null,
@@ -24,16 +25,11 @@ export async function POST(req: Request) {
     });
 
     try {
-      // Deestructuramos y preparamos los datos de espejo
-      // Al guardarDictado con éxito, ya se conocen r.id (volcado_id), r.version (aunque guardarDictado devuelve {id, sha256, chars}, el volcado inicial es versión 1)
       const volcado_id = r.id;
-      const version = 1; // guardarDictado inserta en volcado con version_inicial 1
+      const version = 1;
       const sha256 = r.sha256;
       const caracteres = r.chars;
 
-      // c?.audioPartes tiene partes, si hay partes podemos contar la longitud o pasarlo si se conoce.
-      // Pero el requerimiento dice:
-      // "Audio" (url), "Partes de audio" (number), "Pulido aplicado" (checkbox), "Reconexiones" (number)
       const audio = c?.audioUrl || null;
       const partesAudio = Array.isArray(c?.audioPartes) ? c.audioPartes.length : null;
       const pulidoAplicado = c?.pulidoAplicado === true;

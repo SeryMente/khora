@@ -13,6 +13,7 @@ const DDL = [
   "CREATE INDEX IF NOT EXISTS correccion_antes_idx ON correccion (antes)",
   "CREATE TABLE IF NOT EXISTS volcado_version (id UUID PRIMARY KEY, volcado_id UUID NOT NULL, version INTEGER NOT NULL, texto TEXT NOT NULL, sha256 CHAR(64) NOT NULL, chars INTEGER NOT NULL, motivo TEXT, creado_en TIMESTAMPTZ NOT NULL DEFAULT now())",
   "CREATE UNIQUE INDEX IF NOT EXISTS volcado_version_uniq ON volcado_version (volcado_id, version)",
+  "CREATE TABLE IF NOT EXISTS volcado_revision_auditoria (id UUID PRIMARY KEY, volcado_id UUID NOT NULL, accion TEXT NOT NULL, estado_anterior TEXT, estado_nuevo TEXT, version INTEGER, sha256 TEXT, usuario TEXT, created_at TIMESTAMPTZ NOT NULL DEFAULT now())",
 ];
 
 let listo = false;
@@ -121,7 +122,8 @@ export async function guardarEdicion(volcadoId: string, textoEditado: string, us
   }
   const pares = calcularDelta(base, textoEditado);
   const nueva = await crearVersion(volcadoId, textoEditado, "edicion manual del operador");
-  await db.query("UPDATE volcado SET texto_original = COALESCE(texto_original, texto), texto = $2, sha256 = $3, chars = $4, editado_en = now(), ediciones = COALESCE(ediciones, 0) + 1 WHERE id = $1", [volcadoId, cifrarTexto(textoEditado), nueva.sha256, textoEditado.length]);
+  await db.query("UPDATE volcado SET texto_original = COALESCE(texto_original, texto), texto = $2, sha256 = $3, chars = $4, estado = $5, editado_en = now(), ediciones = COALESCE(ediciones, 0) + 1 WHERE id = $1", [volcadoId, cifrarTexto(textoEditado), nueva.sha256, textoEditado.length, "en_revision"]);
+  await db.query("INSERT INTO volcado_revision_auditoria (id, volcado_id, accion, estado_anterior, estado_nuevo, version, sha256, usuario) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)", [randomUUID(), volcadoId, "version_guardada", "archivado", "en_revision", nueva.version, nueva.sha256, usuario ?? null]);
   let guardadas = 0;
   for (const p of pares) {
     if (p.antes.length === 0 || p.despues.length === 0) continue;
@@ -138,3 +140,5 @@ export async function listarLexico(limite = 200) {
   const r = await db.query("SELECT antes, despues, COUNT(*)::int AS veces FROM correccion GROUP BY antes, despues ORDER BY veces DESC, antes ASC LIMIT $1", [limite]);
   return r.rows;
 }
+
+export { marcarPendienteRevision, iniciarRevision, aprobarVersion, reabrirRevision } from "./volcados";
