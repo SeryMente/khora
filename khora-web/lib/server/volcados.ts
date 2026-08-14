@@ -1,6 +1,7 @@
-// @l0 L0-002-R · @req ING-03/REQ-1 · @acr ACR-1.2
+// @l0 L0-002-R · @req ING-03/REQ-1,UI-ARCHIVO-MANUAL/REQ-1 · @acr ACR-1.2
 import { createHash, randomUUID } from "crypto";
 import { getDb } from "./neon";
+import { crearVersion } from "./correcciones";
 
 export type EstadoVolcado = "archivado" | "pendiente_revision" | "en_revision" | "listo_ingesta" | "ingerido" | "fallido";
 
@@ -54,6 +55,7 @@ export async function archivarVolcado(args: { texto: string; titulo?: string | n
   const sha = hashTexto(args.texto);
   const sql = "INSERT INTO volcado (id, texto, sha256, chars, titulo, origen, driver, usuario, estado, intentos) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,0) RETURNING *";
   const res = await db.query(sql, [id, cifrarTexto(args.texto), sha, args.texto.length, args.titulo ?? null, args.origen, args.driver ?? null, args.usuario ?? null, "archivado"]);
+  await crearVersion(id, args.texto, "transcripcion original del dictado");
   return res.rows[0] as Volcado;
 }
 
@@ -80,16 +82,79 @@ export async function iniciarRevision(volcadoId: string): Promise<void> {
 export async function aprobarVersion(volcadoId: string, version: number, aprobador?: string | null): Promise<{ version: number; sha256: string }> {
   await asegurarTabla();
   const db = getDb();
-  await db.query("UPDATE volcado SET estado = 'listo_ingesta', version_aprobada = $2 WHERE id = $1", [volcadoId, version]);
-  const res = await db.query("SELECT sha256 FROM volcado_version WHERE volcado_id = $1 AND version = $2", [volcadoId, version]);
-  const sha256 = res.rows[0]?.sha256 || "";
-  return { version, sha256 };
+
+  // Get version info
+  const verRes = await db.query("SELECT sha256, texto FROM volcado_version WHERE volcado_id = $1 AND version = $2", [volcadoId, version]);
+  if (verRes.rows.length === 0) {
+    throw new Error("La versión solicitada no existe");
+  }
+  const filaVer = verRes.rows[0];
+  const textoReal = descifrarTexto(String(filaVer.texto ?? ""));
+  const shaCalculado = hashTexto(textoReal);
+  if (shaCalculado !== filaVer.sha256) {
+    throw new Error("Integridad rota: el SHA256 no coincide con el contenido");
+  }
+
+  // Get current state
+  const currentRes = await db.query("SELECT estado FROM volcado WHERE id = $1", [volcadoId]);
+  const estadoAnterior = currentRes.rows[0]?.estado || "en_revision";
+
+  // Update volcado table
+  await db.query(
+    "UPDATE volcado SET estado = 'listo_ingesta', version_aprobada = $2, sha256_aprobado = $3, aprobado_en = now(), aprobador = $4 WHERE id = $1",
+    [volcadoId, version, filaVer.sha256, aprobador ?? null]
+  );
+
+  // Insert audit record
+  await db.query(
+    `INSERT INTO volcado_revision_auditoria (id, volcado_id, accion, estado_anterior, estado_nuevo, version, sha256, usuario)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+    [
+      randomUUID(),
+      volcadoId,
+      "version_aprobada",
+      estadoAnterior,
+      "listo_ingesta",
+      version,
+      filaVer.sha256,
+      aprobador ?? null
+    ]
+  );
+
+  return { version, sha256: filaVer.sha256 };
 }
 
 export async function reabrirRevision(volcadoId: string, usuario?: string | null): Promise<void> {
   await asegurarTabla();
   const db = getDb();
-  await db.query("UPDATE volcado SET estado = 'en_revision' WHERE id = $1", [volcadoId]);
+
+  // Get current approved version and sha before clearing
+  const currentRes = await db.query("SELECT estado, version_aprobada, sha256_aprobado FROM volcado WHERE id = $1", [volcadoId]);
+  const current = currentRes.rows[0];
+  const estadoAnterior = current?.estado || "listo_ingesta";
+  const versionAprobada = current?.version_aprobada || null;
+  const shaAprobado = current?.sha256_aprobado || null;
+
+  await db.query(
+    "UPDATE volcado SET estado = 'en_revision', version_aprobada = NULL, sha256_aprobado = NULL, aprobado_en = NULL, aprobador = NULL WHERE id = $1",
+    [volcadoId]
+  );
+
+  // Insert audit record
+  await db.query(
+    `INSERT INTO volcado_revision_auditoria (id, volcado_id, accion, estado_anterior, estado_nuevo, version, sha256, usuario)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+    [
+      randomUUID(),
+      volcadoId,
+      "revision_reabierta",
+      estadoAnterior,
+      "en_revision",
+      versionAprobada,
+      shaAprobado,
+      usuario ?? null
+    ]
+  );
 }
 
 export async function resumenVolcados(): Promise<Array<{ estado: string; n: number; chars: number }>> {

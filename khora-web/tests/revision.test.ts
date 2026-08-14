@@ -14,12 +14,14 @@ import {
   crearVersion,
   asegurarVersionInicial,
   listarVersiones,
-  guardarEdicion,
+  guardarEdicion
+} from "../lib/server/correcciones";
+import {
   marcarPendienteRevision,
   iniciarRevision,
   aprobarVersion,
   reabrirRevision
-} from "../lib/server/correcciones";
+} from "../lib/server/volcados";
 
 // Estructuras de datos en memoria para simulación SQL
 let volcadosMemory: any[] = [];
@@ -149,7 +151,7 @@ db.query = (async (sql: string, params?: any[]): Promise<any> => {
       v.texto = p[1];
       v.sha256 = p[2];
       v.chars = p[3];
-      v.estado = p[4];
+      v.estado = "en_revision";
       v.ediciones = (v.ediciones || 0) + 1;
       v.version_aprobada = null;
       v.sha256_aprobado = null;

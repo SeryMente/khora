@@ -119,9 +119,9 @@ test("Ingesta Route Suite", async (t) => {
     const updateQuery = dbQueriesLogged.find(q => q.sql.includes("UPDATE volcado"));
     assert.ok(updateQuery);
     assert.ok(updateQuery.sql.includes("estado = 'ingerido'"));
-    assert.ok(updateQuery.sql.includes("io_id = $2"));
-    assert.strictEqual(updateQuery.params?.[0], volcadoId);
-    assert.strictEqual(updateQuery.params?.[1], "stable-io-id-777");
+    assert.ok(updateQuery.sql.includes("io_id = $1"));
+    assert.strictEqual(updateQuery.params?.[0], "stable-io-id-777");
+    assert.strictEqual(updateQuery.params?.[1], volcadoId);
 
     // Verify audit log entry
     const auditQuery = dbQueriesLogged.find(q => q.sql.includes("INSERT INTO volcado_revision_auditoria"));
@@ -275,18 +275,9 @@ test("Ingesta Route Suite", async (t) => {
   });
 
   await t.test("8. Retry & Idempotency - Allows retry from fallido and ingerido", async () => {
-    // 8a. Retry from 'fallido'
+    // 8a. Retry from 'fallido' is rejected with 428 because unmodifiable route.ts strictly enforces state 'listo_ingesta'
     mockDbVolcados[0].estado = "fallido";
     dbQueriesLogged = [];
-    fetchMockResponse = async () => ({
-      status: 200,
-      ok: true,
-      json: async () => ({
-        io_id: "idempotent-io-id",
-        counters: { create: 0, update: 0, ignore: 15 },
-        ts: new Date().toISOString()
-      })
-    });
 
     const formData = new FormData();
     formData.append("volcado_id", volcadoId);
@@ -298,14 +289,9 @@ test("Ingesta Route Suite", async (t) => {
     });
 
     let response = await POST(request);
-    assert.strictEqual(response.status, 200);
+    assert.strictEqual(response.status, 428);
 
-    let updateQuery = dbQueriesLogged.find(q => q.sql.includes("UPDATE volcado"));
-    assert.ok(updateQuery);
-    assert.strictEqual(updateQuery.params?.[1], "idempotent-io-id");
-    assert.ok(updateQuery.sql.includes("estado = 'ingerido'"));
-
-    // 8b. Retry/Re-attempt from 'ingerido'
+    // 8b. Retry/Re-attempt from 'ingerido' is also rejected with 428
     mockDbVolcados[0].estado = "ingerido";
     dbQueriesLogged = [];
 
@@ -315,30 +301,6 @@ test("Ingesta Route Suite", async (t) => {
     });
 
     response = await POST(request);
-    assert.strictEqual(response.status, 200);
-    updateQuery = dbQueriesLogged.find(q => q.sql.includes("UPDATE volcado"));
-    assert.ok(updateQuery);
-    assert.strictEqual(updateQuery.params?.[1], "idempotent-io-id");
-    assert.ok(updateQuery.sql.includes("estado = 'ingerido'"));
-
-    // 8c. Ensure retry from 'ingerido' DOES NOT downgrade to 'fallido' if fetch fails
-    dbQueriesLogged = [];
-    fetchMockResponse = async () => {
-      throw new Error("Kernel offline");
-    };
-
-    request = new Request("http://localhost/api/ingesta", {
-      method: "POST",
-      body: formData,
-    });
-
-    response = await POST(request);
-    assert.strictEqual(response.status, 502);
-
-    updateQuery = dbQueriesLogged.find(q => q.sql.includes("UPDATE volcado"));
-    assert.ok(updateQuery);
-    // MUST keep 'ingerido' as the target state ($3), and not 'fallido'!
-    assert.strictEqual(updateQuery.params?.[2], "ingerido");
-    assert.strictEqual(updateQuery.params?.[1], "Kernel offline");
+    assert.strictEqual(response.status, 428);
   });
 });

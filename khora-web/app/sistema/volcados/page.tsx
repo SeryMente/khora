@@ -1,4 +1,4 @@
-// @l0 L0-002-R · @req PIPELINE/REQ-3,UI-02/RESKIN · @acr ACR-1.2
+// @l0 L0-002-R · @req PIPELINE/REQ-3,UI-02/RESKIN,UI-ARCHIVO-MANUAL/REQ-1 · @acr ACR-1.2
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
@@ -257,6 +257,16 @@ export default function VolcadosPage() {
     const currentVer = versiones.find((v) => Number(v.version) === Number(selectedVersionNum));
     console.log("found currentVer =", JSON.stringify(currentVer));
     if (!currentVer) return;
+
+    const esOriginal =
+      versiones.length === 1 &&
+      Number(versiones[0].version) === 1 &&
+      !selectedItem?.version_aprobada;
+
+    if (esOriginal) {
+      const ok = window.confirm("¿Aprobar la transcripción original como versión 1 lista para ingesta?");
+      if (!ok) return;
+    }
 
     setApprovingVersion(true);
     try {
@@ -1214,7 +1224,13 @@ export default function VolcadosPage() {
                             }}
                           >
                             <Icons.CheckCircle size={14} />
-                            {approvingVersion ? "Aprobando..." : `Aprobar v${selectedVersionNum}`}
+                            {approvingVersion
+                              ? "Aprobando..."
+                              : (versiones.length === 1 &&
+                                 Number(versiones[0].version) === 1 &&
+                                 !selectedItem?.version_aprobada)
+                                ? "Aprobar transcripción original"
+                                : `Aprobar v${selectedVersionNum}`}
                           </button>
                         </div>
 
