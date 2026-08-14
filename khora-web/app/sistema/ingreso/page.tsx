@@ -1,8 +1,9 @@
-// @l0 L0-002-R · @req CORA-02/REQ-1 · @req FIX-DICTADO/D2-D8 · @acr ACR-1.2
+// @l0 L0-002-R · @req UI-04/INGRESO-INTEGRADO
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, Suspense } from "react";
 import * as Icons from "lucide-react";
+import Link from "next/link";
 
 type Estado = "inactivo" | "dictando";
 
@@ -17,7 +18,15 @@ function generarSesionId() {
   });
 }
 
-export default function DictadoPage() {
+export default function IngresoPage() {
+  return (
+    <Suspense fallback={<p style={{ padding: "2rem", color: "var(--khora-accent)" }}>Cargando…</p>}>
+      <IngresoContenido />
+    </Suspense>
+  );
+}
+
+function IngresoContenido() {
   const [bloques, setBloques] = useState<string[]>([]);
   const [pendiente, setPendiente] = useState("");
   const [parcial, setParcial] = useState("");
@@ -28,11 +37,17 @@ export default function DictadoPage() {
   const [pulidosOk, setPulidosOk] = useState(0);
   const [pulidosNo, setPulidosNo] = useState(0);
   const [guardando, setGuardando] = useState(false);
+  const [generandoTitulo, setGenerandoTitulo] = useState(false);
   const [resultado, setResultado] = useState("");
   const [soportado, setSoportado] = useState(true);
   const [conAudio, setConAudio] = useState(false);
   const [escuchando, setEscuchando] = useState(false);
   const [reconexiones, setReconexiones] = useState(0);
+
+  // Editable textarea states
+  const [texto, setTexto] = useState("");
+  const [editando, setEditando] = useState(false);
+  const [estabaDictando, setEstabaDictando] = useState(false);
 
   // New states for parts
   const [partesContador, setPartesContador] = useState(0);
@@ -64,6 +79,18 @@ export default function DictadoPage() {
     const w = window as any;
     if (!w.SpeechRecognition && !w.webkitSpeechRecognition) setSoportado(false);
   }, []);
+
+  // Update unified textarea content when NOT editing
+  useEffect(() => {
+    if (!editando) {
+      const parts = [...bloques, pendiente].filter((s) => s.trim().length > 0);
+      let unified = parts.join("\n\n");
+      if (parcial) {
+        unified += (unified ? " " : "") + parcial;
+      }
+      setTexto(unified);
+    }
+  }, [bloques, pendiente, parcial, editando]);
 
   const pulirBloque = useCallback(async (bloque: string) => {
     const indice = bloquesRef.current.length;
@@ -115,15 +142,12 @@ export default function DictadoPage() {
     const blob = new Blob(trozosParaSubir, { type: "audio/webm" });
     const sesionId = sesionIdRef.current;
 
-    const maxParteBytes = 3 * 1024 * 1024; // 3 MB safety limit
-    const totalBytes = blob.size;
+    const forma = new FormData();
+    forma.append("audio", blob, `dictado-parte-${parteActual}.webm`);
+    forma.append("sesionId", sesionId);
+    forma.append("parte", String(parteActual));
 
-    const ejecutarSubidaDeBlob = async (blobASubir: Blob, numParte: number) => {
-      const forma = new FormData();
-      forma.append("audio", blobASubir, `dictado-parte-${numParte}.webm`);
-      forma.append("sesionId", sesionId);
-      forma.append("parte", String(numParte));
-
+    const ejecutarSubida = async () => {
       try {
         const ra = await fetch("/api/audio", { method: "POST", body: forma });
         const textoRespuesta = await ra.text();
@@ -135,9 +159,9 @@ export default function DictadoPage() {
         }
 
         if (ra.ok && typeof da?.url === "string") {
-          const bytesSubidos = typeof da?.bytes === "number" ? da.bytes : blobASubir.size;
+          const bytesSubidos = typeof da?.bytes === "number" ? da.bytes : blob.size;
           partesSubidasRef.current.push({
-            parte: numParte,
+            parte: parteActual,
             url: da.url,
             bytes: bytesSubidos,
           });
@@ -145,37 +169,15 @@ export default function DictadoPage() {
           setBytesAcumulados((total) => total + bytesSubidos);
           setConAudio(true);
         } else {
-          setAviso(`audio parte ${numParte} no guardada: ${String(da?.detail || "")} ${String(da?.causa || "")}`);
+          setAviso(`audio parte ${parteActual} no guardada: ${String(da?.detail || "")} ${String(da?.causa || "")}`);
         }
       } catch (e) {
-        setAviso(`audio parte ${numParte} no guardada por error: ${String(e)}`);
-      }
-    };
-
-    const ejecutarSubidas = async () => {
-      if (totalBytes <= maxParteBytes) {
-        await ejecutarSubidaDeBlob(blob, parteActual);
-      } else {
-        let offset = 0;
-        let subParteIndex = 0;
-        while (offset < totalBytes) {
-          const fin = Math.min(offset + maxParteBytes, totalBytes);
-          const subBlob = blob.slice(offset, fin, "audio/webm");
-
-          const actualSubParteNum = (subParteIndex === 0) ? parteActual : parteConsecutivaRef.current;
-          if (subParteIndex > 0) {
-            parteConsecutivaRef.current += 1;
-          }
-
-          await ejecutarSubidaDeBlob(subBlob, actualSubParteNum);
-          offset = fin;
-          subParteIndex++;
-        }
+        setAviso(`audio parte ${parteActual} no guardada por error: ${String(e)}`);
       }
     };
 
     const anteriorSubida = subidaEnCursoRef.current || Promise.resolve();
-    const nuevaSubida = anteriorSubida.then(ejecutarSubidas);
+    const nuevaSubida = anteriorSubida.then(ejecutarSubida);
     subidaEnCursoRef.current = nuevaSubida;
     await nuevaSubida;
   }, []);
@@ -203,7 +205,7 @@ export default function DictadoPage() {
           const totalSize = parteTrozosRef.current.reduce((sum, chunk) => sum + chunk.size, 0);
           const elapsed = Date.now() - parteInicioRef.current;
 
-          if (totalSize >= 1.5 * 1024 * 1024 || elapsed >= 45 * 1000) {
+          if (totalSize >= 2 * 1024 * 1024 || elapsed >= 120 * 1000) {
             void subirParteActual();
           }
         }
@@ -321,6 +323,8 @@ export default function DictadoPage() {
     if (!arrancado) { activoRef.current = false; return; }
     inicioRef.current = Date.now();
     setEstado("dictando");
+    setEditando(false);
+    setEstabaDictando(false);
     setTimeout(() => { void arrancarGrabacion(); }, 900);
   }, [arrancarReconocedor, arrancarGrabacion]);
 
@@ -338,6 +342,29 @@ export default function DictadoPage() {
     setEstado("inactivo");
   }, [cerrarBloque, detenerGrabacion]);
 
+  // Special stop/pause when manual editing triggers
+  const pausarDictadoPorEdicion = useCallback(() => {
+    activoRef.current = false;
+    if (rearmeRef.current) clearTimeout(rearmeRef.current);
+    try { recRef.current?.stop(); } catch (e) {}
+    try { grabRef.current?.stop(); } catch (e) {}
+    if (relojRef.current) clearTimeout(relojRef.current);
+    setParcial("");
+    setEscuchando(false);
+    setEstado("inactivo");
+  }, []);
+
+  const reanudarDictadoSinDemora = useCallback(async () => {
+    setError("");
+    setAviso("");
+    setResultado("");
+    activoRef.current = true;
+    const arrancado = arrancarReconocedor();
+    if (!arrancado) { activoRef.current = false; return; }
+    setEstado("dictando");
+    await arrancarGrabacion();
+  }, [arrancarReconocedor, arrancarGrabacion]);
+
   useEffect(() => {
     return () => {
       activoRef.current = false;
@@ -352,7 +379,6 @@ export default function DictadoPage() {
   const guardar = useCallback(async () => {
     setError("");
     setResultado("");
-    const texto = [...bloquesRef.current, pendienteRef.current].filter((s) => s.trim().length > 0).join("\n\n");
     if (texto.trim().length === 0) { setError("no hay nada que archivar"); return; }
     setGuardando(true);
     try {
@@ -410,7 +436,7 @@ export default function DictadoPage() {
     } finally {
       setGuardando(false);
     }
-  }, [titulo, pulidosOk]);
+  }, [texto, titulo, pulidosOk]);
 
   const limpiar = useCallback(() => {
     bloquesRef.current = [];
@@ -427,6 +453,9 @@ export default function DictadoPage() {
     setError("");
     setAviso("");
     setReconexiones(0);
+    setTexto("");
+    setEditando(false);
+    setEstabaDictando(false);
 
     // Reset new states and refs
     sesionIdRef.current = "";
@@ -438,7 +467,56 @@ export default function DictadoPage() {
     setBytesAcumulados(0);
   }, []);
 
-  const totalChars = [...bloques, pendiente].filter((s) => s.trim().length > 0).join("\n\n").length;
+  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const val = e.target.value;
+    if (!editando) {
+      setEditando(true);
+      if (estado === "dictando") {
+        setEstabaDictando(true);
+        pausarDictadoPorEdicion();
+      } else {
+        setEstabaDictando(false);
+      }
+    }
+    setTexto(val);
+  };
+
+  const confirmarEdicion = () => {
+    setEditando(false);
+    bloquesRef.current = [texto];
+    setBloques([texto]);
+    pendienteRef.current = "";
+    setPendiente("");
+    setParcial("");
+
+    if (estabaDictando) {
+      setEstabaDictando(false);
+      void reanudarDictadoSinDemora();
+    }
+  };
+
+  const generarTituloConIA = async () => {
+    if (!texto.trim()) return;
+    setGenerandoTitulo(true);
+    setError("");
+    try {
+      const r = await fetch("/api/dictado-archivo/titulo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ texto }),
+      });
+      const data = await r.json();
+      if (r.ok && data?.titulo) {
+        setTitulo(data.titulo);
+      } else {
+        setError(data.detail || "Error al generar título.");
+      }
+    } catch (e: any) {
+      setError("Fallo la llamada a Groq: " + String(e));
+    } finally {
+      setGenerandoTitulo(false);
+    }
+  };
 
   return (
     <main
@@ -449,43 +527,58 @@ export default function DictadoPage() {
         paddingBottom: "6rem",
       }}
     >
-      {/* Cabecera de SecciÃ³n */}
+      {/* Cabecera de Sección */}
       <div className="border-b pb-4" style={{ borderColor: "var(--khora-border)" }}>
         <h1 className="text-2xl font-bold flex items-center gap-2">
-          <Icons.Mic size={32} strokeWidth={1.75} style={{ color: "var(--khora-accent)" }} />
-          Dictado
+          <Icons.Keyboard size={32} strokeWidth={1.75} style={{ color: "var(--khora-accent)" }} />
+          Ingreso Integrado
         </h1>
         <p className="text-sm mt-1" style={{ color: "var(--khora-accent)" }}>
-          El texto se archiva integro con su hash antes de tocar el pipeline. Guardar nunca depende de que la ingesta funcione.
+          Método universal combinado: Dicta en vivo, escribe o pega directamente. La transcripción es editable de forma ipso facto e in-situ.
         </p>
       </div>
 
       {!soportado && (
         <div className="p-3 border rounded-none text-sm flex items-center gap-2" style={{ borderColor: "var(--khora-border)", backgroundColor: "var(--khora-surface)", color: "var(--khora-accent)" }}>
           <Icons.TriangleAlert size={32} strokeWidth={1.75} className="shrink-0" />
-          <span>Este navegador no soporta dictado en vivo. Usa Chrome o Edge.</span>
+          <span>Este navegador no soporta dictado en vivo. Puedes utilizar escritura o copiar y pegar contenido.</span>
         </div>
       )}
 
       {/* Inputs y Controles */}
       <div className="space-y-4">
-        <input
-          value={titulo}
-          onChange={(e) => setTitulo(e.target.value)}
-          placeholder="titulo opcional"
-          className="w-full p-2.5 border rounded-none text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)] focus-visible:border-[var(--khora-accent)]"
-          style={{
-            backgroundColor: "var(--khora-surface)",
-            color: "var(--khora-ink)",
-            borderColor: "var(--khora-border)",
-          }}
-        />
+        <div className="flex gap-2 items-center">
+          <input
+            value={titulo}
+            onChange={(e) => setTitulo(e.target.value)}
+            placeholder="Título opcional (escribe o genera con IA)"
+            className="flex-1 p-2.5 border rounded-none text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)] focus-visible:border-[var(--khora-accent)]"
+            style={{
+              backgroundColor: "var(--khora-surface)",
+              color: "var(--khora-ink)",
+              borderColor: "var(--khora-border)",
+            }}
+          />
+          <button
+            onClick={generarTituloConIA}
+            disabled={generandoTitulo || !texto.trim()}
+            className="px-3 py-2.5 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)] text-xs"
+            style={{
+              backgroundColor: "var(--khora-surface)",
+              color: "var(--khora-ink)",
+              borderColor: "var(--khora-border)",
+            }}
+          >
+            <Icons.Sparkles size={16} strokeWidth={1.75} />
+            {generandoTitulo ? "Generando..." : "Título con IA"}
+          </button>
+        </div>
 
         <div className="flex flex-wrap items-center gap-3">
           {estado === "inactivo" ? (
             <button
               onClick={iniciar}
-              disabled={!soportado}
+              disabled={!soportado || editando}
               className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
               style={{
                 backgroundColor: "var(--khora-accent)",
@@ -513,7 +606,7 @@ export default function DictadoPage() {
 
           <button
             onClick={guardar}
-            disabled={guardando || estado === "dictando"}
+            disabled={guardando || estado === "dictando" || editando}
             className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
             style={{
               backgroundColor: "var(--khora-surface)",
@@ -527,7 +620,7 @@ export default function DictadoPage() {
 
           <button
             onClick={limpiar}
-            disabled={estado === "dictando"}
+            disabled={estado === "dictando" || editando}
             className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
             style={{
               backgroundColor: "var(--khora-surface)",
@@ -548,23 +641,43 @@ export default function DictadoPage() {
         </div>
       </div>
 
-      {/* Area de TranscripciÃ³n */}
-      <div
-        className="p-4 min-h-[240px] whitespace-pre-wrap leading-relaxed border rounded-none text-sm"
-        style={{
-          backgroundColor: "var(--khora-surface)",
-          borderColor: "var(--khora-border)",
-          color: "var(--khora-ink)",
-        }}
-      >
-        {bloques.map((b, i) => (<p key={i} className="mb-3">{b}</p>))}
-        {pendiente.length > 0 && <p className="mb-3 opacity-80">{pendiente}</p>}
-        {parcial.length > 0 && <span className="opacity-50">{parcial}</span>}
+      {/* Banner de Edición Activa */}
+      {editando && (
+        <div className="p-3 border rounded-none text-sm flex items-center justify-between gap-4 animate-pulse" style={{ borderColor: "var(--khora-accent)", backgroundColor: "var(--khora-surface)", color: "var(--khora-ink)" }}>
+          <div className="flex items-center gap-2">
+            <Icons.PenTool size={32} strokeWidth={1.75} style={{ color: "var(--khora-accent)" }} />
+            <span>
+              <strong>Edición in-situ activa:</strong> El dictado está pausado. Confirma los cambios para reanudar.
+            </span>
+          </div>
+          <button
+            onClick={confirmarEdicion}
+            className="px-3 py-1 bg-[var(--khora-accent)] text-[var(--khora-bg)] font-bold text-xs rounded-none cursor-pointer hover:opacity-90"
+          >
+            Confirmar edición
+          </button>
+        </div>
+      )}
+
+      {/* Área de Texto Editable */}
+      <div className="relative">
+        <textarea
+          value={texto}
+          onChange={handleTextareaChange}
+          placeholder="Escribe, pega o inicia el dictado para transcribir..."
+          className="w-full p-4 min-h-[260px] whitespace-pre-wrap leading-relaxed border rounded-none text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)] focus-visible:border-[var(--khora-accent)]"
+          style={{
+            backgroundColor: "var(--khora-surface)",
+            borderColor: "var(--khora-border)",
+            color: "var(--khora-ink)",
+            resize: "vertical"
+          }}
+        />
       </div>
 
-      {/* EstadÃ­sticas */}
+      {/* Estadísticas */}
       <p className="text-xs font-medium" style={{ color: "var(--khora-accent)" }}>
-        estado: {estado} / escuchando: {escuchando ? "si" : "no"} / caracteres: {totalChars} / bloques pulidos: {pulidosOk} / bloques sin pulir: {pulidosNo} / audio: {conAudio ? "si" : "no"} / partes subidas: {partesContador} ({ (bytesAcumulados / (1024 * 1024)).toFixed(2) } MB) / reconexiones: {reconexiones}
+        estado: {estado} / editando: {editando ? "sí" : "no"} / caracteres: {texto.length} / bloques pulidos: {pulidosOk} / bloques sin pulir: {pulidosNo} / audio: {conAudio ? "sí" : "no"} / partes subidas: {partesContador} ({ (bytesAcumulados / (1024 * 1024)).toFixed(2) } MB) / reconexiones: {reconexiones}
       </p>
 
       {/* Alertas y Mensajes de Retorno */}

@@ -1,9 +1,11 @@
+# @l0 L0-002-R · @req JULES-3/REQ-2
 # @l0 L0-002 · @req ING-03/REQ-1 · @acr ACR-1.1,ACR-1.2 · @ua UA-05
 from typing import Any, List, Optional
 
 from khora_kernel.api import (
     ActaDeIngesta,
     ObjetoDeInformacion,
+    Proposal,
     PuertoEmbeddings,
     PuertoLLM,
 )
@@ -61,14 +63,11 @@ class _MemoriaInterceptora:
         )
 
 
-def ingestar(
-
+def transducir(
     objeto: ObjetoDeInformacion,
     memoria: Any,
     puerto_llm: PuertoLLM,
-    puerto_embeddings: PuertoEmbeddings,
-    on_upsert: Optional[Any] = None,
-) -> ActaDeIngesta:
+) -> Proposal:
     # 1. Normalizar
     texto_norm = normalizar(objeto, puerto_llm)
 
@@ -76,37 +75,73 @@ def ingestar(
     # Lector grafo = memoria en modo D1 (sólo lectura implícito en resolver/consultar)
     triples_j7 = phi_m(objeto) + extraer(texto_norm, memoria, puerto_llm)
 
+    entities_set = set()
+    for t in triples_j7:
+        entities_set.add(t.origen_id)
+        entities_set.add(t.destino_id)
+    entities = sorted(list(entities_set))
+
+    meta = objeto.metadata or {}
+    volcado_id = meta.get("volcado_id")
+
+    version = meta.get("version")
+    if version is not None:
+        try:
+            version = int(version)
+        except (ValueError, TypeError):
+            pass
+
+    sha256 = meta.get("sha256")
+    io_id = objeto.id
+
+    return Proposal(
+        source=objeto,
+        volcado_id=volcado_id,
+        version=version,
+        sha256=sha256,
+        io_id=io_id,
+        entities=entities,
+        relations=triples_j7,
+        provenance=objeto.provenance
+    )
+
+
+def persistir(
+    proposal: Proposal,
+    memoria: Any,
+    puerto_llm: PuertoLLM,
+    puerto_embeddings: PuertoEmbeddings,
+    on_upsert: Optional[Any] = None,
+) -> ActaDeIngesta:
     # 3. Resolver
     interceptor = _MemoriaInterceptora(memoria)
-    triples_resueltos = resolver(triples_j7, interceptor, puerto_llm, puerto_embeddings)
+    triples_resueltos = resolver(proposal.relations, interceptor, puerto_llm, puerto_embeddings)
 
-    # El interceptor puede no ser perfecto porque el "NEW" se mapea a needs_review=True, y "MERGE" a needs_review=False.
     ideas_novedosas = interceptor.ideas_novedosas
     ideas_repetidas = interceptor.ideas_repetidas
     matices = interceptor.matices
     needs_review = interceptor.needs_review
 
-    # Si hay 0 repetidas, puede que estemos ingiriendo en un grafo vacío y resolver hizo "NEW" a todo con needs_review=True.
-
-# 4. Escribir vía memoria SOLO con MERGE o FUSIÓN
+    # 4. Escribir vía memoria SOLO con MERGE o FUSIÓN
+    objeto = proposal.source
     terna = objeto.metadata if hasattr(objeto, 'metadata') and objeto.metadata and 'volcado_id' in objeto.metadata else None
     if hasattr(memoria, 'fusionar_ingesta'):
-        triples_escritos = memoria.fusionar_ingesta(triples_resueltos, objeto.provenance, io_id=objeto.id, terna_volcado=terna)
+        triples_escritos = memoria.fusionar_ingesta(triples_resueltos, proposal.provenance, io_id=proposal.io_id, terna_volcado=terna)
     else:
-        triples_escritos = memoria.escribir_ingesta(triples_resueltos, objeto.provenance, io_id=objeto.id, terna_volcado=terna)
+        triples_escritos = memoria.escribir_ingesta(triples_resueltos, proposal.provenance, io_id=proposal.io_id, terna_volcado=terna)
 
     if on_upsert:
         # Pass the id or the entity logic to the callback.
         # En J-C7 pide 'on_node_upserted(node_id)'
         # Dado que phi_m(objeto) siempre extrae al menos la entidad principal
         # con un ID basado en el objeto (o podemos pasar el objeto id), asumiremos objeto.id
-        on_upsert(objeto.id, memoria, objeto.provenance.timestamp)
+        on_upsert(proposal.io_id, memoria, proposal.provenance.timestamp)
 
     linea_temporal_indexada = True  # Todos llevan timestamp en la provenance requerida por api.Provenance
 
     return ActaDeIngesta(
-        origen=objeto.provenance.origen,
-        timestamp=objeto.provenance.timestamp,
+        origen=proposal.provenance.origen,
+        timestamp=proposal.provenance.timestamp,
         ideas_novedosas=ideas_novedosas,
         ideas_repetidas=ideas_repetidas,
         matices=matices,
@@ -114,6 +149,17 @@ def ingestar(
         triples_escritos=triples_escritos,
         linea_temporal_indexada=linea_temporal_indexada
     )
+
+
+def ingestar(
+    objeto: ObjetoDeInformacion,
+    memoria: Any,
+    puerto_llm: PuertoLLM,
+    puerto_embeddings: PuertoEmbeddings,
+    on_upsert: Optional[Any] = None,
+) -> ActaDeIngesta:
+    proposal = transducir(objeto, memoria, puerto_llm)
+    return persistir(proposal, memoria, puerto_llm, puerto_embeddings, on_upsert)
 
 
 def frecuencia(memoria: Any, canonical_key: str) -> int:

@@ -108,7 +108,7 @@ export async function listarVersiones(volcadoId: string) {
   return r.rows;
 }
 
-export async function guardarEdicion(volcadoId: string, textoEditado: string) {
+export async function guardarEdicion(volcadoId: string, textoEditado: string, usuario?: string | null) {
   await asegurarEsquema();
   await asegurarVersionInicial(volcadoId);
   const db = getDb();
