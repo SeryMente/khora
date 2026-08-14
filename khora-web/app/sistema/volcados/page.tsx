@@ -1,4 +1,4 @@
-// @l0 L0-002-R · @req PIPELINE/REQ-3,UI-02/RESKIN · @acr ACR-1.2
+// @l0 L0-002-R · @req PIPELINE/REQ-3,UI-02/RESKIN,UI-PIPELINE-FIX/REQ-1 · @acr ACR-1.2
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
@@ -106,9 +106,17 @@ export default function VolcadosPage() {
       const res = await fetch("/api/volcados/pipeline");
       const data = await res.json();
       if (res.ok) {
-        const items = data.items || [];
+        const items = data.volcados || data.items || [];
         setPipelineItems(items);
-        setResumen(data.resumen || null);
+        setResumen({
+          total: data.total ?? data.resumen?.total ?? 0,
+          en_revision: data.counts?.en_revision ?? data.resumen?.en_revision ?? 0,
+          pendiente_revision: data.counts?.pendiente_revision ?? data.resumen?.pendiente_revision ?? 0,
+          listo_ingesta: data.counts?.listo_ingesta ?? data.resumen?.listo_ingesta ?? 0,
+          ingerido: data.counts?.ingerido ?? data.resumen?.ingerido ?? 0,
+          anomalies: data.integrity ? ((data.total ?? 0) - (data.integrity?.sync ?? 0)) : (data.resumen?.anomalies ?? 0),
+          sin_audio: data.integrity?.text_without_audio ?? data.resumen?.sin_audio ?? 0,
+        });
         return items;
       }
     } catch (err) {
