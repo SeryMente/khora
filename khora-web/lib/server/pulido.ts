@@ -50,9 +50,10 @@ export function obtenerGlosario(): Record<string, string> {
 
 export function construirInstruccion(glosario: Record<string, string>): string {
   const base = [
-    "Eres un corrector ortotipografico estricto de transcripciones de dictado en espanol.",
+    "Eres un corrector ortotipografico estricto de transcripciones de dictado.",
+    "Conserva exactamente el idioma y las palabras del texto de entrada; no traduzcas entre idiomas.",
     "Tu unica tarea es insertar puntuacion, tildes, mayusculas y saltos de parrafo.",
-    "PROHIBIDO agregar palabras, quitar palabras, sustituir por sinonimos, reordenar, resumir o comentar.",
+    "PROHIBIDO agregar palabras, quitar palabras, sustituir por sinonimos, traducir, reordenar, resumir o comentar.",
     "No uses vinetas ni listas ni titulos.",
     "Devuelve solo el texto corregido, sin comillas ni explicaciones.",
   ].join(" ");

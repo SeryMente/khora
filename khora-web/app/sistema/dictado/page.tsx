@@ -4,7 +4,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import * as Icons from "lucide-react";
 
-type Estado = "inactivo" | "dictando";
+type Estado = "inactivo" | "dictando" | "finalizando";
 
 function generarSesionId() {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -28,6 +28,7 @@ export default function DictadoPage() {
   const [pulidosOk, setPulidosOk] = useState(0);
   const [pulidosNo, setPulidosNo] = useState(0);
   const [guardando, setGuardando] = useState(false);
+  const [audioFinalizando, setAudioFinalizando] = useState(false);
   const [resultado, setResultado] = useState("");
   const [soportado, setSoportado] = useState(true);
   const [conAudio, setConAudio] = useState(false);
@@ -59,6 +60,8 @@ export default function DictadoPage() {
   const parteTrozosRef = useRef<Blob[]>([]);
   const parteInicioRef = useRef<number>(0);
   const subidaEnCursoRef = useRef<Promise<void> | null>(null);
+  const finalizacionAudioRef = useRef<Promise<void> | null>(null);
+  const resolverFinalizacionAudioRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     const w = window as any;
@@ -210,9 +213,17 @@ export default function DictadoPage() {
       };
 
       grabadora.onstop = async () => {
-        await subirParteActual();
+        try {
+          const finalizacion = subirParteActual();
+          subidaEnCursoRef.current = finalizacion;
+          await finalizacion;
+        } finally {
+          resolverFinalizacionAudioRef.current?.();
+          resolverFinalizacionAudioRef.current = null;
+        }
       };
 
+      finalizacionAudioRef.current = new Promise<void>((resolve) => { resolverFinalizacionAudioRef.current = resolve; });
       grabadora.start(1000);
       grabRef.current = grabadora;
     } catch (e) {
@@ -324,8 +335,10 @@ export default function DictadoPage() {
     setTimeout(() => { void arrancarGrabacion(); }, 900);
   }, [arrancarReconocedor, arrancarGrabacion]);
 
-  const detener = useCallback(() => {
+  const detener = useCallback(async () => {
     activoRef.current = false;
+    setAudioFinalizando(true);
+    setEstado("finalizando");
     if (rearmeRef.current) clearTimeout(rearmeRef.current);
     try { recRef.current?.stop(); } catch (e) {}
     recRef.current = null;
@@ -335,7 +348,15 @@ export default function DictadoPage() {
     setParcial("");
     setEscuchando(false);
     cerrarBloque();
-    setEstado("inactivo");
+    try {
+      if (finalizacionAudioRef.current) await finalizacionAudioRef.current;
+      if (subidaEnCursoRef.current) await subidaEnCursoRef.current;
+    } finally {
+      finalizacionAudioRef.current = null;
+      subidaEnCursoRef.current = null;
+      setAudioFinalizando(false);
+      setEstado("inactivo");
+    }
   }, [cerrarBloque, detenerGrabacion]);
 
   useEffect(() => {
@@ -513,7 +534,7 @@ export default function DictadoPage() {
 
           <button
             onClick={guardar}
-            disabled={guardando || estado === "dictando"}
+            disabled={guardando || audioFinalizando || estado !== "inactivo"}
             className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
             style={{
               backgroundColor: "var(--khora-surface)",
@@ -522,12 +543,12 @@ export default function DictadoPage() {
             }}
           >
             <Icons.Check size={32} strokeWidth={1.75} />
-            {guardando ? "archivando..." : "Archivar volcado"}
+            {guardando ? "archivando..." : audioFinalizando ? "finalizando audio..." : "Archivar volcado"}
           </button>
 
           <button
             onClick={limpiar}
-            disabled={estado === "dictando"}
+            disabled={estado !== "inactivo"}
             className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
             style={{
               backgroundColor: "var(--khora-surface)",

@@ -41,6 +41,20 @@ test.describe('Dictado por partes contract test', () => {
       });
     });
 
+    // Aislar este contrato de audio del servicio externo de pulido.
+    await page.route('**/api/pulir', async (route) => {
+      const body = JSON.parse(route.request().postData() || '{}');
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          texto: body.texto,
+          aceptado: true,
+          motivo: 'ok',
+          motivoRechazo: null
+        })
+      });
+    });
     // Stub SpeechRecognition
     await page.addInitScript(() => {
       class MockSpeechRecognition {
@@ -177,6 +191,20 @@ test.describe('Dictado por partes contract test', () => {
       });
     });
 
+    // Aislar este contrato de audio del servicio externo de pulido.
+    await page.route('**/api/pulir', async (route) => {
+      const body = JSON.parse(route.request().postData() || '{}');
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          texto: body.texto,
+          aceptado: true,
+          motivo: 'ok',
+          motivoRechazo: null
+        })
+      });
+    });
     // Stub SpeechRecognition
     await page.addInitScript(() => {
       class MockSpeechRecognition {

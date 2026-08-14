@@ -27,7 +27,7 @@ testMatch: ["e2e/**/*.spec.ts", "tests/regression/**/*.spec.ts"],
 	],
 	webServer: {
 		command:
-			"NEXT_PUBLIC_API_URL=http://127.0.0.1:3999 npm run build && npm run start",
+			"cmd /c \"set NEXT_PUBLIC_API_URL=http://127.0.0.1:3999&& npm run build && npm run start\"",
 		url: "http://localhost:3000",
 		reuseExistingServer: true,
 		timeout: 120_000,
