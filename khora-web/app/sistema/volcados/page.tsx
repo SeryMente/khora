@@ -3,6 +3,10 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import * as Icons from "lucide-react";
+"use client";
+
+import { useEffect, useState, useRef, useCallback } from "react";
+import * as Icons from "lucide-react";
 
 type PipelineItem = {
   id: string;
@@ -511,7 +515,7 @@ export default function VolcadosPage() {
               color: activeTab === "pipeline" ? "var(--khora-bg)" : "var(--khora-ink)",
             }}
           >
-            Pipeline Tower
+            Trazabilidad
           </button>
           <button
             onClick={() => setActiveTab("volcados")}
@@ -521,7 +525,7 @@ export default function VolcadosPage() {
               color: activeTab === "volcados" ? "var(--khora-bg)" : "var(--khora-ink)",
             }}
           >
-            Archivo Manual
+            Archivar
           </button>
         </div>
       </div>

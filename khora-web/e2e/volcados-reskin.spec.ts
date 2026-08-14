@@ -63,8 +63,8 @@ test.describe("Volcados Reskin UI", () => {
     const mainHeader = page.locator("h1");
     await expect(mainHeader).toContainText("Volcados");
 
-    // Click on Archivo Manual to display legacy form
-    await page.locator("button:has-text('Archivo Manual')").click();
+    // Click on Archivar to display legacy form
+    await page.locator("button:has-text('Archivar')").click();
 
     // Check textarea and placeholder
     const textarea = page.locator("textarea");
