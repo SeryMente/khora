@@ -19,3 +19,11 @@ export function getDb(): Pool {
   }
   return pool;
 }
+
+export function setDbForTesting(mockPool: any) {
+  pool = mockPool;
+}
+
+export function resetDbForTesting() {
+  pool = undefined;
+}

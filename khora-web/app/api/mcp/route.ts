@@ -19,7 +19,7 @@ export const runtime = "nodejs";
 
 function makeUnauthorizedResponse(config: ReturnType<typeof getMcpConfig>) {
   const metadataUrl = config
-    ? `${config.canonicalUrl}/.well-known/oauth-protected-resource`
+    ? `${config.issuer}/.well-known/oauth-protected-resource`
     : "";
   return new NextResponse(
     JSON.stringify({ error: "unauthorized", error_description: "Valid Bearer token required" }),
@@ -62,15 +62,25 @@ async function handleMcpRequest(req: NextRequest) {
     return makeUnauthorizedResponse(config);
   }
 
-  // Verificar audiencia
-  const expectedAud = `${config.canonicalUrl}/api/mcp`;
-  if (payload.aud !== expectedAud) {
+  // Verificar issuer (iss)
+  if (payload.iss !== config.issuer) {
+    return makeUnauthorizedResponse(config);
+  }
+
+  // Verificar audiencia (aud)
+  if (payload.aud !== config.canonicalUrl) {
+    return makeUnauthorizedResponse(config);
+  }
+
+  // Verificar scope ("volcados:read")
+  const scopes = (payload.scope || "").split(/\s+/).filter(Boolean);
+  if (!scopes.includes("volcados:read")) {
     return makeUnauthorizedResponse(config);
   }
 
   // Verificar revocación de generación
   const currentGen = await obtenerGeneracionRevocacion(payload.sub);
-  if (payload.gen !== currentGen) {
+  if (typeof payload.gen !== "number" || payload.gen !== currentGen) {
     return makeUnauthorizedResponse(config);
   }
 
