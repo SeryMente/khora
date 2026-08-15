@@ -50,128 +50,128 @@ if (-not (Invoke-Preflight)) { Fail "Preflight fallo (sin internet). Sesion canc
     $script:EFS_ACTIVE = Protect-KhoraPath $WORK_DIR "workdir de sesion"
     if ($script:EFS_ACTIVE) { Info "Todo lo que se descargue al workdir (repo incluido) nacera CIFRADO en disco." }
     if (-not (Ensure-Git)) { return }
-    # --- Autenticacion gh CLI ---
-    Step "Autenticacion gh CLI"
-    if (-not (Confirm-GhCliAuth)) { Warn "gh CLI fallido. El script seguira pero algunas funciones pueden degradarse." }
+    # --- Autenticacion GitHub: requisito previo a cualquier operacion Git ---
+    Step "Autenticacion GitHub / GitHub CLI"
+    if (-not (Confirm-GhCliAuth)) { Fail "Autenticacion GitHub no disponible. La sesion se detiene antes de clone/fetch/push."; return }
     Open-LoginTabs
-    # --- Token seguro ---
-    Step "Autenticacion GitHub (token en SecureString)"
+    # --- Credencial API GitHub: heredada de gh, sin pedir PAT al usuario ---
+    Step "Credencial API GitHub"
     $valid = $false
-    if ($script:TokSecure) { Ok "Token ya validado desde el portapapeles: captura omitida."; $valid = $true }
-    for ($t=1; ($t -le 3) -and (-not $valid); $t++) {
-        # Captura robusta: Ctrl+V NO funciona en prompts -AsSecureString (conhost
-        # entrega un solo caracter de control 0x16 -> aparece 1 asterisco).
-        # Via principal: leer del portapapeles y limpiarlo de inmediato.
-        # Fallback: pegar con CLIC DERECHO (QuickEdit) en prompt enmascarado.
-        $sec = $null
-        Info "Copia el token al portapapeles (Ctrl+C), luego presiona ENTER (intento $t/3)..."
-        Write-Host "  >> Lo que teclees/pegues NO aparecera en pantalla <<" -ForegroundColor DarkGray
-        Clear-PendingInput   # limpiar buffer antes de esperar
-        $Host.UI.RawUI.FlushInputBuffer()
-        do {
-            if ([Console]::KeyAvailable) {
-                $__khk = [Console]::ReadKey($true)
-            } else {
-                Start-Sleep -Milliseconds 100
-                if (Test-Path $global:DepsPreloadLog) {
-                    if ($null -eq $global:DepsLogPos) { $global:DepsLogPos = 0 }
-                    $__depsLogSize = (Get-Item $global:DepsPreloadLog).Length
-                    if ($__depsLogSize -gt $global:DepsLogPos) {
-                        try {
-                            $__depsLogReader = [System.IO.File]::Open($global:DepsPreloadLog, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read, [System.IO.FileShare]::ReadWrite)
-                            $__depsLogReader.Seek($global:DepsLogPos, [System.IO.SeekOrigin]::Begin) | Out-Null
-                            $__depsLogStream = New-Object System.IO.StreamReader($__depsLogReader, [System.Text.Encoding]::UTF8)
-                            while (($__depsLogLine = $__depsLogStream.ReadLine()) -ne $null) {
-                                L "INFO" $__depsLogLine
-                            }
-                            $global:DepsLogPos = $__depsLogReader.Position
-                            $__depsLogStream.Close()
-                        } catch {}
+
+    if ($script:TokSecure) {
+        Ok "Credencial API GitHub ya disponible en memoria."
+        $valid = $true
+    } else {
+        if (Test-Cmd gh) {
+            try {
+                $apiToken = @(gh auth token 2>$null)
+                $apiCode = $LASTEXITCODE
+                if ($apiCode -eq 0 -and $apiToken.Count -gt 0) {
+                    $apiToken = ($apiToken -join "").Trim()
+                    if ($apiToken -and $apiToken.Length -ge 10) {
+                        $script:TokSecure = ConvertTo-SecureString -String $apiToken -AsPlainText -Force
+                        $apiToken = $null
+                        $valid = $true
+                        Ok "Credencial API GitHub recuperada desde gh (sin introducir token manualmente)."
+                    } else {
+                        $apiToken = $null
                     }
                 }
+            } catch {
+                $apiToken = $null
             }
-        } while ($null -eq $__khk -or $__khk.Key -ne [ConsoleKey]::Enter)
-        $raw = $null
-        try { $raw = Get-Clipboard -Raw -ErrorAction Stop } catch {}
-        if ($raw) { $raw = $raw.Trim() }
-        if ($raw -and $raw.Length -ge 10 -and $raw -notmatch '\s') {
-            $sec = ConvertTo-SecureString -String $raw -AsPlainText -Force
-            $raw = $null
-            try { Set-Clipboard -Value ' ' -ErrorAction Stop; Ok "Token capturado del portapapeles. Portapapeles limpiado." }
-            catch { Warn "Token capturado, pero no pude limpiar el portapapeles: limpialo manualmente." }
-        } else {
-            Warn "Portapapeles vacio o con contenido invalido. Fallback manual:"
-            $sec = Read-Host "  Pega el token con CLIC DERECHO (no Ctrl+V) y ENTER" -AsSecureString
         }
-        if (-not $sec -or $sec.Length -lt 10) { Fail "Token muy corto."; continue }
-        Info "Validando token con la API..."
-        $script:TokSecure = $sec
-        try {
-            $ok = Invoke-WithToken {
-                param($t)
-                $h = @{ Authorization="Bearer $t"; "User-Agent"="khora" }
-                $r = Invoke-WebRequest "https://api.github.com/repos/$REPO_ORG/$REPO_NAME" -Headers $h -UseBasicParsing -TimeoutSec 12 -ErrorAction Stop
-                $t = $null
-                return ($r.StatusCode -eq 200)
+
+        if ($valid) {
+            try {
+                $ok = Invoke-WithToken {
+                    param($t)
+                    $h = @{ Authorization = "Bearer $t"; "User-Agent" = "khora"; Accept = "application/vnd.github+json" }
+                    $r = Invoke-WebRequest "https://api.github.com/repos/$REPO_ORG/$REPO_NAME" -Headers $h -UseBasicParsing -TimeoutSec 12 -ErrorAction Stop
+                    return ($r.StatusCode -eq 200)
+                }
+                if (-not $ok) {
+                    $script:TokSecure = $null
+                    $valid = $false
+                }
+            } catch {
+                $script:TokSecure = $null
+                $valid = $false
             }
-            if ($ok) { Ok "Token valido. Acceso confirmado a $REPO_ORG/$REPO_NAME"; $valid=$true; break }
-        } catch {
-            $code = $_.Exception.Response.StatusCode.value__
-            $msg  = switch ($code) {401{"invalido/expirado"} 403{"sin permisos"} 404{"repo no encontrado"} default{"HTTP $code"}}
-            Fail "Token rechazado: $msg"
-            $script:TokSecure = $null
         }
     }
-if (-not $valid) { Fail "3 intentos fallidos. Sesion cancelada."; Write-Host ""; Write-Host "SESIÓN DETENIDA: Fallaron 3 intentos de token."; $script:TokSecure=$null; return }
+
+    if (-not $valid) {
+        Fail "No se pudo recuperar una credencial API válida desde gh."
+        Write-Host ""
+        Write-Host "SESIÓN DETENIDA: gh está autenticado para Git, pero no pudo proporcionar una credencial API válida." -ForegroundColor Red
+        return
+    }
     Step "Configuracion Git"
     git config --global user.name  $GIT_NAME  2>&1 | Out-Null; Ok "user.name  = $GIT_NAME"
     git config --global user.email $GIT_EMAIL 2>&1 | Out-Null; Ok "user.email = $GIT_EMAIL"
-    git config --global credential.helper ""  2>&1 | Out-Null; Ok "credential.helper = vacio (sin credenciales en disco)"
+    # gh auth setup-git configura el helper especifico de github.com; no se fuerza un helper global.
     git config --global core.autocrlf input   2>&1 | Out-Null; Ok "core.autocrlf = input"
     git config --global core.longpaths true   2>&1 | Out-Null; Ok "core.longpaths = true"
     # Git Credential Manager (GCM) puede interceptar la autenticacion con su propio
     # flujo OAuth por navegador ("please complete authentication in your browser"),
     # IGNORANDO nuestro token efimero por header. Lo bloqueamos a nivel de proceso:
     $env:GIT_TERMINAL_PROMPT = "0"      # git: jamas preguntar credenciales interactivas
-    $env:GCM_INTERACTIVE     = "Never"  # GCM: prohibido abrir flujo OAuth en el navegador
+    Remove-Item Env:GCM_INTERACTIVE -ErrorAction SilentlyContinue
     Ok "Prompts interactivos de Git/GCM deshabilitados (solo token por header)."
-    Step "Clonando $REPO_ORG/$REPO_NAME (metodo: URL-token efimera, token NO queda en disco)"
+    Step "Clonando $REPO_ORG/$REPO_NAME (Git autenticado mediante GitHub CLI)"
     $cloneOK = $false
+    $cloneErr = $null
+
     for ($i=1; $i -le 3; $i++) {
-        # Limpiar SIEMPRE antes de cada intento: un intento previo interceptado por GCM
-        # puede dejar un .git parcial que rompe el siguiente intento con un error distinto.
-        if (Test-Path $REPO_DIR) { Remove-Item -Recurse -Force $REPO_DIR -ErrorAction SilentlyContinue }
-        Info "git clone -- intento $i/3... [metodo: x-access-token@github.com | GCM bypaseado por diseno]"
-        try {
-            Invoke-WithToken {
-                param($t)
-                # URL-token: bypasea GCM y el bug de quoting de PS con http.extraheader
-                # El token NUNCA queda en disco: se elimina del remote URL si el clone tiene exito
-                $__cloneUrl = "https://x-access-token:${t}@github.com/$REPO_ORG/$REPO_NAME.git"
-                $script:__cloneErr = "$(git clone $__cloneUrl $REPO_DIR 2>&1)"
-                $t = $null
-                $__cloneUrl = $null
-            }
-        } catch { $script:__cloneErr = "$_" }
-        $script:__cloneErr = Mask-Token -Text $script:__cloneErr
-        if (Test-Path "$REPO_DIR\.git") {
-            # LIMPIAR token de la URL remota guardada en .git/config
-            git -C $REPO_DIR remote set-url origin "https://github.com/$REPO_ORG/$REPO_NAME.git" 2>&1 | Out-Null
-            $cloneOK=$true; break
+        if (Test-Path $REPO_DIR) {
+            Remove-Item -LiteralPath $REPO_DIR -Recurse -Force -ErrorAction SilentlyContinue
         }
-        $__ce = $script:__cloneErr
-        $__diag = if     ($__ce -match 'Repository not found')              { "Repo $REPO_ORG/$REPO_NAME no existe o el token no tiene acceso de lectura." }
-                  elseif ($__ce -match 'Authentication failed|401|bad cred') { "Token rechazado por GitHub (expirado, revocado o scope 'repo' faltante)." }
-                  elseif ($__ce -match 'could not resolve host|SSL')         { "Error de red/DNS al contactar github.com." }
-                  elseif ($__ce -match 'already exists and is not an empty') { "Carpeta $REPO_DIR no se pudo limpiar (antivirus o permisos)." }
-                  elseif ($__ce)                                              { "git dijo: $__ce" }
-                  else                                                        { "git termino sin salida (posible bloqueo de antivirus o permisos de red)." }
-        L "WARN" "Clone intento $i/3 FALLIDO. Causa detectada: $__diag"
-        Warn "Intento $i fallido. Causa: $__diag"
-        if ($i -lt 3) { Start-Sleep ($i*3) }
+
+        Info ("git clone -- intento {0}/3... [credential.helper=gh]" -f $i)
+
+        try {
+            $cloneOutput = @(git clone "https://github.com/$REPO_ORG/$REPO_NAME.git" $REPO_DIR 2>&1)
+            $cloneCode = $LASTEXITCODE
+            $cloneErr = (($cloneOutput | Out-String).Trim())
+        } catch {
+            $cloneCode = 1
+            $cloneErr = "$_"
+        }
+
+        $cloneErr = Mask-Token -Text $cloneErr
+
+        if (($cloneCode -eq 0) -and (Test-Path -LiteralPath (Join-Path $REPO_DIR ".git"))) {
+            $cloneOK = $true
+            Ok "Repositorio clonado correctamente mediante autenticación GitHub CLI."
+            break
+        }
+
+        $__diag = if ($cloneErr -match 'Repository not found') {
+            "Repo $REPO_ORG/$REPO_NAME no existe o la identidad autenticada no tiene acceso."
+        } elseif ($cloneErr -match 'Authentication failed|401|403|bad cred|Invalid username or token|Permission denied') {
+            "GitHub rechazó la autenticación de Git. Verifica gh auth status y permisos."
+        } elseif ($cloneErr -match 'could not resolve host|SSL|Could not resolve') {
+            "Error de red/DNS al contactar github.com."
+        } elseif ($cloneErr -match 'already exists and is not an empty') {
+            "La carpeta $REPO_DIR no pudo limpiarse."
+        } elseif ($cloneErr) {
+            "git dijo: $cloneErr"
+        } else {
+            "git terminó sin salida."
+        }
+
+        L "WARN" ("Clone intento {0}/3 FALLIDO. Causa detectada: {1}" -f $i,$__diag)
+        Warn ("Intento {0} fallido. Causa: {1}" -f $i,$__diag)
+        if ($i -lt 3) { Start-Sleep -Seconds 2 }
     }
-if (-not $cloneOK) { Fail "No se pudo clonar tras 3 intentos."; Write-Host ""; Write-Host "SESIÓN DETENIDA: Fallo al clonar repositorio."; return }
-    # URL remota limpiada al terminar el clone (remote set-url sin token)
+
+    if (-not $cloneOK) {
+        Fail "No se pudo clonar tras 3 intentos con la autenticación GitHub CLI."
+        Write-Host ""
+        Write-Host "SESIÓN DETENIDA: Fallo al clonar repositorio." -ForegroundColor Red
+        return
+    }
     $branch = git -C $REPO_DIR rev-parse --abbrev-ref HEAD 2>&1
     $ultimo = git -C $REPO_DIR log --oneline -1 2>&1
     $nFiles = (Get-ChildItem $REPO_DIR -Recurse -File -ErrorAction SilentlyContinue | Measure-Object).Count

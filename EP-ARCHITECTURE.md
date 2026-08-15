@@ -1,7 +1,7 @@
 ﻿# KHORA — Entorno Persistente (EP) — DEFINICIÓN ARQUITECTÓNICA CANÓNICA
 
 **ESTADO:** CANÓNICO / VIGENTE / PARTE DEL EP
-**VERSIÓN DEL EP:** KHORA v7.1.16
+**VERSIÓN DEL EP:** KHORA v7.1.19
 **REGLA PRINCIPAL:** este archivo es memoria estructural del EP y contrato de contexto para agentes humanos y de IA. Debe leerse antes de modificar KHORA.
 
 ## CANONICAL AGENT ENTRY
@@ -257,19 +257,16 @@ La bóveda de variables de entorno es un componente arquitectónico central y ca
 **Implementación canónica vigente:** `env-vault.ps1` contiene `KhoraVault-Load`, `KhoraVault-Save`, `KhoraVault-Encrypt`, `KhoraVault-Decrypt`, `Set-KhoraEnvVaultVariable` e `Import-KhoraEnvVault`. `14-deploy.ps1` consume este mecanismo y no mantiene una implementación paralela de Vault ni recupera secretos desde Vercel/Render.
 ## Autenticación GitHub y credenciales de Git
 
-La autenticación GitHub es una dependencia operativa del arranque de KHORA. En cualquier máquina donde KHORA deba clonar, hacer `fetch`, crear WIP o publicar cambios, el entorno DEBE disponer de un mecanismo seguro de autenticación Git para `github.com`.
+La autenticación GitHub es una dependencia operativa obligatoria del arranque de KHORA. Antes de cualquier `clone`, `fetch`, WIP, `push` o sincronización con el remoto canónico, KHORA DEBE disponer de autenticación Git funcional.
 
-**Mecanismo preferente en Windows:** Git for Windows con **Git Credential Manager (GCM)**. GCM debe utilizarse como `credential.helper`, con GitHub como proveedor, y almacenar las credenciales mediante el almacén seguro de credenciales de Windows. No se deben almacenar tokens de GitHub en archivos del repositorio, URLs remotas, scripts permanentes, archivos temporales persistentes ni variables persistentes de usuario.
+**Mecanismo canónico en Windows:** GitHub CLI (`gh`) gestionado por `08-deps.ps1`. Si `gh` no existe, KHORA DEBE intentar instalarlo por usuario mediante `winget`, localizar el ejecutable aun cuando el `PATH` del shell actual todavía no se haya actualizado y ejecutar `gh auth setup-git` tras autenticar.
 
-**Regla de arranque:** el preflight DEBE verificar antes de iniciar operaciones Git contra el remoto que:
-1. Git está disponible.
-2. Un credential helper seguro está configurado.
-3. Git Credential Manager está disponible cuando el sistema sea Windows y Git for Windows lo proporcione.
-4. La autenticación de GitHub es funcional para el repositorio canónico.
-5. Si GCM no está disponible, KHORA DEBE intentar provisionarlo mediante el mecanismo permitido por la máquina antes de declarar el entorno Git como listo. No se debe continuar silenciosamente con un `git push` condenado a `403`.
+**Helper de GitHub:** `gh auth setup-git` es la autoridad para configurar el helper específico de `github.com`. KHORA NO DEBE imponer `credential.helper=gh` como configuración global para sustituir este mecanismo.
 
-**Autenticación interactiva:** cuando sea necesaria la primera autenticación en una máquina nueva, KHORA debe ofrecer/abrir el flujo de autenticación de GitHub mediante navegador o device flow de GCM. El usuario no debe tener que descubrir manualmente cómo configurar Git antes de poder continuar.
+**Autenticación inicial:** `Confirm-GhCliAuth` DEBE comprobar `gh auth status`; si no existe una sesión válida, DEBE iniciar `gh auth login --hostname github.com --git-protocol https --web` y posteriormente ejecutar `gh auth setup-git`.
 
-**Validación efectiva:** comprobar `git fetch`/acceso al remoto canónico; `gh auth status` por sí solo NO sustituye la autenticación efectiva de Git, porque `gh` y Git pueden utilizar mecanismos de credenciales diferentes.
+**Regla de bloqueo:** si GitHub no queda autenticado, la sesión DEBE detenerse antes de clonar o publicar. No se permite continuar hasta descubrir un `401`, `403`, `Invalid username or token` o `Permission denied`.
 
-**Regla preventiva:** un fallo `401`, `403`, `Invalid username or token` o `Permission denied` durante operaciones Git debe clasificarse como fallo de autenticación del entorno y resolverse en el preflight. No se debe tratar como fallo del repositorio ni como causa para crear tokens duplicados.
+**Credencial API:** Git y API son mecanismos desacoplados. Tras autenticar `gh`, KHORA DEBE poder obtener la credencial API necesaria mediante `gh auth token`, mantenerla únicamente en memoria mediante `SecureString` y validarla contra el repositorio canónico. El usuario NO debe volver a introducir manualmente el PAT durante el arranque de una máquina ya autenticada.
+
+**Regla preventiva:** la capacidad efectiva de `git fetch` y el acceso API mediante la credencial derivada de `gh` forman parte del preflight. `gh auth status` por sí solo no sustituye la prueba efectiva de Git/API.

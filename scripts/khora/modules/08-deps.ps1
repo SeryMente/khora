@@ -40,21 +40,82 @@ function Ensure-Git {
     Fail "No se pudo instalar Git. Instalalo manualmente y reintenta."
     return $false
 }
+function Ensure-GhCli {
+    if (Test-Cmd gh) { return $true }
+    Warn "GitHub CLI no encontrado. Instalando por usuario..."
+    if (Test-Cmd winget) {
+        try {
+            winget install --id GitHub.cli -e --scope user --silent --accept-package-agreements --accept-source-agreements 2>&1 | ForEach-Object { Info "winget gh: $_" }
+        } catch {
+            Warn ("Instalación de GitHub CLI falló: {0}" -f $_.Exception.Message)
+        }
+    } else {
+        Warn "winget no disponible; no se puede instalar GitHub CLI automáticamente."
+        return $false
+    }
+    $candidates = @(
+        (Join-Path $env:LOCALAPPDATA 'Programs\GitHub CLI\gh.exe'),
+        (Join-Path $env:LOCALAPPDATA 'Microsoft\WinGet\Packages\GitHub.cli_Microsoft.Winget.Source_8wekyb3d8bbwe\bin\gh.exe'),
+        (Join-Path $env:ProgramFiles 'GitHub CLI\gh.exe')
+    )
+    $gh = $null
+    foreach ($candidate in $candidates) {
+        if (Test-Path -LiteralPath $candidate) { $gh = $candidate; break }
+    }
+    if (-not $gh) {
+        $cmd = Get-Command gh -ErrorAction SilentlyContinue
+        if ($cmd) { $gh = $cmd.Source }
+    }
+    if ($gh) {
+        $dir = Split-Path -Parent $gh
+        if ($env:Path -notlike "*$dir*") { $env:Path = "$dir;$env:Path" }
+        Ok "GitHub CLI disponible: $gh"
+        return $true
+    }
+    Warn "GitHub CLI fue solicitado pero no quedó disponible."
+    return $false
+}
 function Confirm-GhCliAuth {
     param([switch]$CheckOnly)
-    if (-not (Test-Cmd gh)) { Warn "gh CLI no encontrado."; return $false }
-    gh auth status 2>&1 | Out-Null
+
+    if (-not (Ensure-GhCli)) {
+        Warn "GitHub CLI no disponible."
+        return $false
+    }
+
+    $authOutput = @(gh auth status 2>&1)
+    $authCode = $LASTEXITCODE
+
+    if ($authCode -ne 0) {
+        if ($CheckOnly) {
+            Warn "GitHub CLI no autenticado."
+            return $false
+        }
+
+        Info "Autenticando GitHub por navegador..."
+        gh auth login --hostname github.com --git-protocol https --web 2>&1 | ForEach-Object {
+            Info "gh: $_"
+        }
+
+        $authOutput = @(gh auth status 2>&1)
+        $authCode = $LASTEXITCODE
+
+        if ($authCode -ne 0) {
+            Fail "GitHub CLI no pudo autenticarse."
+            return $false
+        }
+    }
+
+    gh auth setup-git 2>&1 | ForEach-Object {
+        Info "gh setup-git: $_"
+    }
+
     if ($LASTEXITCODE -ne 0) {
-        if ($CheckOnly) { Warn "gh CLI no autenticado."; return $false }
-        Info "Iniciando autenticacion en gh CLI (se abrira el navegador)..."
-        gh auth login --hostname github.com --git-protocol https --web 2>&1 | ForEach-Object { Info "gh: $_" }
-        gh auth status 2>&1 | Out-Null
-if ($LASTEXITCODE -ne 0) { Fail "gh CLI no pudo autenticarse."; Write-Host ""; Write-Host "SESIÓN DETENIDA: gh CLI falló."; return $false }
+        Fail "gh auth setup-git falló."
+        return $false
     }
-    if (-not $CheckOnly) {
-        gh auth setup-git 2>&1 | Out-Null
-    }
-    Ok "gh CLI autenticado."
+
+    Ok "GitHub CLI autenticado y Git configurado para usar sus credenciales."
     return $true
 }
 function Ensure-VSCode {
