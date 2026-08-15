@@ -1,7 +1,7 @@
 ﻿# KHORA — Entorno Persistente (EP) — DEFINICIÓN ARQUITECTÓNICA CANÓNICA
 
 **ESTADO:** CANÓNICO / VIGENTE / PARTE DEL EP
-**VERSIÓN DEL EP:** KHORA v7.1.14
+**VERSIÓN DEL EP:** KHORA v7.1.15
 **REGLA PRINCIPAL:** este archivo es memoria estructural del EP y contrato de contexto para agentes humanos y de IA. Debe leerse antes de modificar KHORA.
 
 ## CANONICAL AGENT ENTRY
@@ -238,3 +238,20 @@ El código determina el comportamiento real; este archivo constituye el modelo e
 
 ## 16. Prueba de comprensión
 Un modelo que lea solamente este objeto debe poder explicar el EP, ubicar cada componente, reconstruir el ciclo de vida, saber qué estado es canónico frente a temporal, entender la Vault, Git/WIP, VS Code, Chrome, Guardian, Handoff y Cleanup, y saber que este mismo objeto debe actualizarse cuando modifique la arquitectura.
+## Bóveda canónica de variables de entorno
+
+La bóveda de variables de entorno es un componente arquitectónico central y canónico de KHORA. Su objetivo es que cada variable de entorno se introduzca una sola vez y quede disponible como fuente única para cualquier proveedor o servicio que la requiera.
+
+**Fuente canónica:** `secrets/env-vault.enc.json`, gestionada mediante `scripts/khora/env-vault.ps1`.
+
+**Alta de variables:** las variables nuevas DEBEN incorporarse mediante `Set-KhoraEnvVaultVariable`. La entrada preferida es `-UseClipboard`, copiando previamente el valor al portapapeles y evitando revelar visualmente el secreto; como alternativa válida, puede utilizarse una entrada segura con `Read-Host -AsSecureString`. El valor no debe solicitarse mediante texto plano visible en terminal, scripts o archivos temporales.
+
+**Unicidad:** si una variable ya existe en la bóveda, `Set-KhoraEnvVaultVariable` debe omitir el alta salvo una rotación explícita mediante `-Rotate`. La introducción duplicada de una misma variable en proveedores no constituye una nueva fuente: todos los destinos reciben el valor desde la bóveda.
+
+**Consumo:** `Import-KhoraEnvVault` descifra la bóveda y carga sus variables en el entorno de proceso. Los módulos de aprovisionamiento, actualmente `14-deploy.ps1`, DEBEN consumir la bóveda canónica para proporcionar variables a Vercel, Render, AuraDB/Neo4j u otros proveedores futuros.
+
+**Regla de autoridad:** Vercel, Render, AuraDB/Neo4j y cualquier otro proveedor son destinos, no fuentes canónicas. KHORA NO DEBE recuperar variables desde esos proveedores para reconstruir o completar la bóveda. Si una variable requerida no existe en la bóveda, debe darse de alta en la bóveda utilizando el flujo seguro establecido y posteriormente sincronizarse hacia los proveedores correspondientes.
+
+**Persistencia y seguridad:** los valores de la bóveda deben permanecer cifrados en `secrets/env-vault.enc.json`; los secretos no deben imprimirse, registrarse en logs ni persistirse en archivos temporales como mecanismo de tránsito normal. La bóveda constituye la única fuente central desde la que se aprovisionan las variables de entorno a los proveedores.
+
+**Implementación canónica vigente:** `env-vault.ps1` contiene `KhoraVault-Load`, `KhoraVault-Save`, `KhoraVault-Encrypt`, `KhoraVault-Decrypt`, `Set-KhoraEnvVaultVariable` e `Import-KhoraEnvVault`. `14-deploy.ps1` consume este mecanismo y no mantiene una implementación paralela de Vault ni recupera secretos desde Vercel/Render.

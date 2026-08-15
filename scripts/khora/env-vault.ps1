@@ -1,4 +1,4 @@
-$Global:KhoraVaultPath = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..\secrets\env-vault.enc.json'))
+﻿$Global:KhoraVaultPath = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..\secrets\env-vault.enc.json'))
 $Global:KhoraVaultMasterKey = $null
 
 $Global:KhoraVaultValidators = @{
