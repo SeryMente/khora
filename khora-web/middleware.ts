@@ -2,7 +2,11 @@
 import { auth } from "@/auth";
 import { NextResponse } from "next/server";
 
-export const config = { matcher: ["/((?!_next/static|_next/image|favicon.ico|api/auth|api/version).*)"] };
+export const config = {
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|api/auth|api/version|api/mcp|\\.well-known|api/oauth/token).*)",
+  ],
+};
 
 export default auth((req) => {
   // Skip auth checks when running Playwright E2E tests
@@ -19,7 +23,7 @@ export default auth((req) => {
     // For UI routes, redirect to Next-Auth's default sign-in flow (which will trigger OIDC).
     // The signIn flow redirects to /api/auth/signin which is excluded in the matcher.
     const url = new URL("/api/auth/signin", req.nextUrl.origin);
-    url.searchParams.set("callbackUrl", req.nextUrl.pathname);
+    url.searchParams.set("callbackUrl", req.nextUrl.pathname + req.nextUrl.search);
     return NextResponse.redirect(url);
   }
 
