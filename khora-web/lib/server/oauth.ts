@@ -99,41 +99,31 @@ export async function rotarRefreshToken(
   const tokenHash = hashString(rawToken);
   const db = getDb();
 
-  // Buscar el token actual
-  const existing = await db.query<RefreshTokenRecord>(
-    `SELECT id, token_hash, usuario, resource, emitido_en, expira_en, rotado_a
-     FROM oauth_refresh_tokens
-     WHERE token_hash = $1`,
-    [tokenHash]
-  );
-
-  if (existing.rowCount === 0) {
-    return null;
-  }
-
-  const record = existing.rows[0];
-
-  // Si ya fue rotado, o expiró, devolver null (invalid_grant)
-  if (record.rotado_a || record.expira_en < new Date()) {
-    return null;
-  }
-
-  // Generar nuevo refresh token
   const newRawToken = generateRandomToken(32);
   const newTokenHash = hashString(newRawToken);
   const newExpiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
 
-  // Rotar en transacción
   const client = await db.connect();
   try {
     await client.query("BEGIN");
 
-    await client.query(
+    // UPDATE atómico condicional como única autoridad
+    const updateRes = await client.query<RefreshTokenRecord>(
       `UPDATE oauth_refresh_tokens
        SET rotado_a = $1
-       WHERE id = $2 AND rotado_a IS NULL`,
-      [newTokenHash, record.id]
+       WHERE token_hash = $2
+         AND rotado_a IS NULL
+         AND expira_en > NOW()
+       RETURNING id, token_hash, usuario, resource, emitido_en, expira_en, rotado_a`,
+      [newTokenHash, tokenHash]
     );
+
+    if (updateRes.rowCount !== 1) {
+      await client.query("ROLLBACK");
+      return null;
+    }
+
+    const record = updateRes.rows[0];
 
     await client.query(
       `INSERT INTO oauth_refresh_tokens (token_hash, usuario, resource, expira_en)
@@ -142,14 +132,13 @@ export async function rotarRefreshToken(
     );
 
     await client.query("COMMIT");
+    return { record, newToken: newRawToken };
   } catch (e) {
     await client.query("ROLLBACK");
     throw e;
   } finally {
     client.release();
   }
-
-  return { record, newToken: newRawToken };
 }
 
 export async function obtenerGeneracionRevocacion(usuario: string): Promise<number> {

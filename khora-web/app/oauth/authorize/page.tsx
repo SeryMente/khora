@@ -131,7 +131,7 @@ export default async function AuthorizePage(props: {
     const code = await crearCodigoAutorizacion({
       codeChallenge: code_challenge,
       redirectUri: redirect_uri,
-      resource: resource || `${config.canonicalUrl}/api/mcp`,
+      resource: resource || config.canonicalUrl,
       usuario: userEmail,
     });
 

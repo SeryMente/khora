@@ -9,8 +9,8 @@ export async function GET() {
   }
 
   const metadata = {
-    resource: `${config.canonicalUrl}/api/mcp`,
-    authorization_servers: [config.canonicalUrl],
+    resource: config.canonicalUrl,
+    authorization_servers: [config.issuer],
     scopes_supported: ["volcados:read"],
   };
 

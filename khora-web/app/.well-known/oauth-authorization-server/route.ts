@@ -9,9 +9,9 @@ export async function GET() {
   }
 
   const metadata = {
-    issuer: config.canonicalUrl,
-    authorization_endpoint: `${config.canonicalUrl}/oauth/authorize`,
-    token_endpoint: `${config.canonicalUrl}/api/oauth/token`,
+    issuer: config.issuer,
+    authorization_endpoint: `${config.issuer}/oauth/authorize`,
+    token_endpoint: `${config.issuer}/api/oauth/token`,
     code_challenge_methods_supported: ["S256"],
     scopes_supported: ["volcados:read", "offline_access"],
     grant_types_supported: ["authorization_code", "refresh_token"],

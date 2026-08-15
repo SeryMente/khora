@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
 
     const accessToken = signJwt(
       {
-        iss: config.canonicalUrl,
+        iss: config.issuer,
         sub: record.usuario,
         aud: record.resource,
         scope: "volcados:read",
@@ -141,7 +141,7 @@ export async function POST(req: NextRequest) {
 
     const accessToken = signJwt(
       {
-        iss: config.canonicalUrl,
+        iss: config.issuer,
         sub: record.usuario,
         aud: record.resource,
         scope: "volcados:read",

@@ -6,7 +6,8 @@ export interface McpConfig {
   redirectUris: string[];
   jwtSecret: string;
   allowedEmail: string;
-  canonicalUrl: string;
+  canonicalUrl: string; // Protected Resource URL (e.g., https://khora.example.com/api/mcp)
+  issuer: string; // Authorization Server Issuer (e.g., https://khora.example.com)
   readonlyDatabaseUrl?: string;
 }
 
@@ -16,13 +17,37 @@ export function getMcpConfig(): McpConfig | null {
   const redirectUrisRaw = process.env.MCP_OAUTH_REDIRECT_URIS;
   const jwtSecret = process.env.MCP_JWT_SECRET;
   const allowedEmail = process.env.MCP_ALLOWED_EMAIL;
-  const canonicalUrl = process.env.MCP_CANONICAL_URL || (process.env.PLAYWRIGHT_TEST_RUN === '1' ? 'http://localhost:3000' : undefined);
+  const rawCanonicalUrl =
+    process.env.MCP_CANONICAL_URL ||
+    (process.env.PLAYWRIGHT_TEST_RUN === "1"
+      ? "http://localhost:3000/api/mcp"
+      : undefined);
 
-  if (!clientId || !clientSecret || !redirectUrisRaw || !jwtSecret || !allowedEmail || !canonicalUrl) {
+  if (
+    !clientId ||
+    !clientSecret ||
+    !redirectUrisRaw ||
+    !jwtSecret ||
+    !allowedEmail ||
+    !rawCanonicalUrl
+  ) {
     return null;
   }
 
-  const redirectUris = redirectUrisRaw.split(',').map(s => s.trim()).filter(Boolean);
+  let parsedUrl: URL;
+  try {
+    parsedUrl = new URL(rawCanonicalUrl);
+  } catch {
+    return null;
+  }
+
+  const canonicalUrl = rawCanonicalUrl.replace(/\/$/, "");
+  const issuer = parsedUrl.origin;
+
+  const redirectUris = redirectUrisRaw
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
   const readonlyDatabaseUrl = process.env.KHORA_READONLY_DATABASE_URL;
 
   return {
@@ -31,7 +56,8 @@ export function getMcpConfig(): McpConfig | null {
     redirectUris,
     jwtSecret,
     allowedEmail,
-    canonicalUrl: canonicalUrl.replace(/\/$/, ""),
-    readonlyDatabaseUrl
+    canonicalUrl,
+    issuer,
+    readonlyDatabaseUrl,
   };
 }
