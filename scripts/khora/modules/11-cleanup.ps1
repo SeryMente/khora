@@ -27,6 +27,10 @@ function Invoke-Cleanup {
             Add-Content $repoLog "`n--- SESION CERRADA --- $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') --- motivo:$reason --- dur:${durMin}min ---" -Encoding UTF8 -ErrorAction SilentlyContinue
             if ($script:TokSecure) {
                 try {
+                    $liveClose = Sync-EpLiveLog -Reason 'cleanup-start'
+                    if ($liveClose) { Ok 'EP-LIVE-LOG final pre-cleanup sincronizado y verificado.' } else { Warn 'EP-LIVE-LOG final pre-cleanup no pudo verificarse.' }
+                } catch { Warn 'EP-LIVE-LOG final pre-cleanup fallo: $_' }
+                try {
                     Export-VSCodeConfig
                     Save-ChromeTabsSnapshot
                     Do-AutoWip

@@ -1,4 +1,4 @@
-﻿# ================================================================
+# ================================================================
 # KHORA v7 - MODULO 15-main.ps1
 # Componente: 15 main
 # ================================================================
@@ -105,6 +105,7 @@ Write-Host ""
                 "8" { Invoke-Preflight | Out-Null }
                 "9" { Start-DevServers }
                 "S" { Do-AutoWip; Ok "Sincronizacion con el repositorio ejecutada." }
+                "E" { $live = Sync-EpLiveLog -Reason 'manual-menu'; if ($live) { Ok 'EP-LIVE-LOG sincronizado y verificado en GitHub.' } else { Warn 'EP-LIVE-LOG no pudo sincronizarse o verificarse.' } }
                 "K" { Invoke-KhoraOk }
                 "V" { Deploy-Vercel }
                 "C" { Invoke-ChromeCleanup }

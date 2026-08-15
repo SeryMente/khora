@@ -4,7 +4,7 @@
 # ESTADO: EXTRAÍDO
 # ================================================================
 
-$SCRIPT_VERSION = "7.1.7"   # <- UNICA fuente de verdad de la version
+$SCRIPT_VERSION = "7.1.14"   # <- UNICA fuente de verdad de la version
 function Initialize-KhoraPaths {
 $SYS_DRIVE   = if ($env:SystemDrive) { $env:SystemDrive } else { "C:" }
 # ================================================================

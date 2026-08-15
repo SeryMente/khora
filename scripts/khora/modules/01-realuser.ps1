@@ -14,6 +14,36 @@ function Resolve-RealUserPaths {
     $__candidate = $null
     $__method    = $null
 
+    # ---- Metodo 0: usuario de la sesion grafica activa (console) ----
+    # La cuenta que ejecuta/elevó PowerShell NO define el usuario de trabajo.
+    # La sesion console activa define el perfil operativo del EP.
+    if (-not $__candidate) {
+        try {
+            $__q = @()
+            try { $__q = @(query session 2>$null) } catch { $__q = @() }
+            if (-not $__q) { try { $__q = @(qwinsta 2>$null) } catch { $__q = @() } }
+            $__consoleUser = $null
+            $__consoleSession = $null
+            foreach ($__ln in $__q) {
+                $__t = ("" -replace '^[>\s]+','').Trim()
+                if ($__t -match '(?i)^console\s+(\S+)\s+(\d+)\s+(?:Active|Activo)\b') {
+                    $__consoleUser = $Matches[1].Trim()
+                    $__consoleSession = [int]$Matches[2]
+                    break
+                }
+            }
+            if ($__consoleUser -and (Test-KhoraRealUserName $__consoleUser)) {
+                $__candidate = $__consoleUser
+                $__method = "M0: query session console activa"
+                $script:REAL_USER_DETECT_LOG += "[M0 console-session] EXITO -> '$__candidate' session $__consoleSession (proceso: $__procUser)"
+            } else {
+                $script:REAL_USER_DETECT_LOG += "[M0 console-session] sin usuario activo resoluble; proceso actual='$__procUser'"
+            }
+        } catch {
+            $script:REAL_USER_DETECT_LOG += "[M0 console-session] ERROR: $(.Exception.Message)"
+        }
+    }
+
     # ---- Metodo 1: WMI Win32_ComputerSystem.UserName (puede venir vacio) ----
     try {
         $__u = (Get-CimInstance Win32_ComputerSystem -ErrorAction Stop).UserName
@@ -162,6 +192,26 @@ function Resolve-RealUserPaths {
         $env:APPDATA      = Join-Path $__realProfile "AppData\Roaming"
         $env:HOMEDRIVE    = $env:SystemDrive
         $env:HOMEPATH     = "\Users\$__candidate"
+        # Rebase del PATH al usuario operativo: no heredar silenciosamente herramientas del admin que elevo PowerShell.
+        try {
+            $__machinePath = [Environment]::GetEnvironmentVariable('Path','Machine')
+            $__userPath = $null
+            try {
+                $__sid = ([System.Security.Principal.NTAccount]"").Translate([System.Security.Principal.SecurityIdentifier]).Value
+                $__userPath = (Get-ItemProperty "Registry::HKEY_USERS\\Environment" -Name Path -ErrorAction SilentlyContinue).Path
+            } catch {}
+            $__targetPaths = @(
+                (Join-Path $__realProfile 'AppData\Local\Programs\Microsoft VS Code\bin'),
+                (Join-Path $__realProfile 'AppData\Local\Programs\Python\Python311'),
+                (Join-Path $__realProfile 'AppData\Local\Programs\Python\Python311\Scripts'),
+                (Join-Path $__realProfile 'AppData\Roaming\npm')
+            ) | Where-Object { $_ -and (Test-Path -LiteralPath $_) }
+            $env:Path = (($__targetPaths + ($__userPath -split ';') + ($__machinePath -split ';')) | Where-Object { $_ -and $_ -notmatch [regex]::Escape() } | Select-Object -Unique) -join ';'
+            Remove-Item Function:\python -ErrorAction SilentlyContinue
+            $script:REAL_USER_DETECT_LOG += "[PATH REBASE] PATH reconstruido para '' con rutas de usuario antes de rutas heredadas."
+        } catch {
+            $script:REAL_USER_DETECT_LOG += "[PATH REBASE] ERROR: $(.Exception.Message)"
+        }
         $script:REAL_USER_OVERRIDE = $true
         $script:REAL_USER_DETECT_LOG += "[DECISION] REDIRECCION: usuario real '$__candidate' != proceso elevado '$__procUser' -> perfil $__realProfile"
     } else {

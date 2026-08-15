@@ -1,4 +1,4 @@
-# Python
+﻿# Python
 __pycache__/
 *.py[cod]
 *.egg-info/
@@ -58,3 +58,6 @@ scripts/khora/khora-v*.ps1
 *.bak_*
 .vercel
 .env*
+scripts/khora/config.json
+scripts/khora/logs/
+scripts/khora/versions/

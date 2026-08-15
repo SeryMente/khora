@@ -212,8 +212,6 @@ if (-not $cloneOK) { Fail "No se pudo clonar tras 3 intentos."; Write-Host ""; W
     # Entorno PRIMERO: VS Code abrira con npm/node/render/docker ya en PATH
     Step "Entorno de desarrollo (Python + Node + Docker + Vercel + Render)"
     Wait-DepsPreload -Job $global:DepsPreloadJob
-    $code = Ensure-VSCode
-    $code = Ensure-VSCode
     Ensure-Python311
     Setup-Venv
     Ensure-Node
@@ -260,4 +258,6 @@ if (-not $cloneOK) { Fail "No se pudo clonar tras 3 intentos."; Write-Host ""; W
     Write-Host "   Render: render env set KEY=val --service-id <id>  |  render logs --service-id <id> --tail" -ForegroundColor DarkGray
     Write-Host "  =============================================================" -ForegroundColor Green
     L "INFO" "SESION LISTA en ${dur}s"
+    $live = Sync-EpLiveLog -Reason 'session-ready'
+    if ($live) { Ok 'EP-LIVE-LOG sincronizado y verificado en GitHub.' } else { Warn 'EP-LIVE-LOG no pudo sincronizarse en la instancia inicial.' }
 }

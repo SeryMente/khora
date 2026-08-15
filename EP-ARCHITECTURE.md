@@ -1,8 +1,24 @@
-# KHORA — Entorno Persistente (EP) — DEFINICIÓN ARQUITECTÓNICA CANÓNICA
+﻿# KHORA — Entorno Persistente (EP) — DEFINICIÓN ARQUITECTÓNICA CANÓNICA
 
 **ESTADO:** CANÓNICO / VIGENTE / PARTE DEL EP
-**VERSIÓN DEL EP:** KHORA v7.1.7
+**VERSIÓN DEL EP:** KHORA v7.1.14
 **REGLA PRINCIPAL:** este archivo es memoria estructural del EP y contrato de contexto para agentes humanos y de IA. Debe leerse antes de modificar KHORA.
+
+## CANONICAL AGENT ENTRY
+
+**SYSTEM / AGENT CONTRACT — KHORA EP**
+
+- **Sistema:** KHORA
+- **Dominio:** Entorno Persistente (EP)
+- **Arquitectura canónica:** EP-ARCHITECTURE.md
+- **Contrato de agentes:** AGENTS.md
+- **Orden obligatorio de lectura:** EP-ARCHITECTURE.md -> AGENTS.md -> implementación relevante de la tarea
+- **Repositorio público:** el descubrimiento arquitectónico y de código DEBE comenzar por Internet/GitHub sobre el repositorio remoto/canónico.
+- **Clon local:** %LOCALAPPDATA%\khora-session\repo es una instancia temporal de trabajo; NO es la fuente primaria para descubrir la arquitectura pública.
+- **Precedencia:** para descubrimiento del sistema público, el canon remoto tiene precedencia sobre la instancia local.
+- **Declaración obligatoria:** toda salida de trabajo del agente DEBE indicar la versión de arquitectura respetada con el formato EP Architecture respetada: KHORA vX.Y.Z.
+- **Divergencia:** si la copia local difiere del canon remoto, el agente DEBE declararlo antes de continuar.
+- **Prohibición:** NO redescubrir la arquitectura desde cero ni inventar una arquitectura paralela cuando este objeto y AGENTS.md ya proporcionan el contexto canónico.
 
 ## 1. Propósito
 KHORA implementa un Entorno Persistente agnóstico de máquina: la máquina actual es una instancia temporal; el estado persistente permitido se reconstruye desde GitHub, la llave y los mecanismos del repositorio.
@@ -11,10 +27,10 @@ KHORA implementa un Entorno Persistente agnóstico de máquina: la máquina actu
 GITHUB/CANON -> LLAVE -> ARRANCAR -> GATE -> BARRIL -> MODULOS -> AUTENTICACION TEMPORAL -> CLONE/INSTANCIACION -> %LOCALAPPDATA%\\khora-session\\repo -> VAULT -> VS CODE/CONTEXTO -> TRABAJO -> AUTO-WIP/PUSH-VERIFIED -> HANDOFF/GUARDIAN -> CLEANUP -> COMMIT/PUSH/SHA VERIFICADO -> GITHUB.
 
 ## 3. Fuentes de verdad
-- GitHub/SeryMente/khora: fuente canónica del código y estado versionado.
+- **GitHub/SeryMente/khora: fuente canónica primaria para descubrimiento, arquitectura, código y estado versionado cuando el repositorio es público.** La exploración de agentes debe realizarse primero sobre este origen remoto mediante Internet/GitHub.
 - USB física: instanciador transportable.
 - Desktop\\USB: sustituto local funcional de la misma llave.
-- %LOCALAPPDATA%\\khora-session: instancia temporal.
+- **%LOCALAPPDATA%\\khora-session: instancia temporal de trabajo y ejecución.** No es fuente primaria para descubrir la arquitectura pública; se utiliza para ejecutar KHORA, reproducir comportamientos, modificar código y validar cambios locales.
 - secrets/env-vault.enc.json: bóveda canónica cifrada de variables.
 - tools/vscode/*: persistencia de configuración VS Code cuando existe.
 
@@ -37,7 +53,7 @@ ARRANCAR.cmd inicia el GATE mediante ruta relativa a su propia ubicación. khora
 ## 6. Componentes y responsabilidades
 - 00-config: rutas, configuración y estado global.
 - 01-realuser: resolución del usuario real y rutas de perfil.
-- 02-logging: logging y sanitización.
+- 02-logging: logging, sanitización y publicación de EP-LIVE-LOG.
 - 03-hud: HUD de estado.
 - 04-ui: preflight, diagnóstico, interfaz y estado Git.
 - 05-efs: cifrado/protección local EFS.
@@ -50,7 +66,7 @@ ARRANCAR.cmd inicia el GATE mediante ruta relativa a su propia ubicación. khora
 - 12-handoff: transferencia entre procesos/sesiones mediante estado y heartbeat.
 - 13-session: creación de sesión, clone, origin limpio, VS Code, Chrome, Guardian y Vault.
 - 14-deploy: Vault/deploy/Render/Vercel/servidores de desarrollo.
-- 15-main: orquestación de sesión, menú, heartbeat, handoff y Auto-WIP periódico.
+- 15-main: orquestación de sesión, menú, heartbeat, handoff, Auto-WIP periódico y publicación manual del estado EP.
 - 90-legacy: código histórico/transitorio; no debe crear una segunda arquitectura.
 - env-vault.ps1: implementación de la Vault canónica.
 
@@ -77,8 +93,34 @@ Export-VSCodeConfig -> Save-ChromeTabsSnapshot -> Do-AutoWip -> commit -> Push-V
 8. REPO_DIR es temporal y reconstruible.
 9. El orden del BARRIL es contractual.
 10. Cambios arquitectónicos obligan a actualizar este documento.
+11. **La validación estática no es suficiente.** Un módulo PowerShell puede pasar `System.Management.Automation.Language.Parser::ParseFile()` y aun así fallar durante la instanciación real del BARRIL.
+12. **La cadena real de arranque es una prueba contractual.** Todo cambio relevante en módulos, GATE, ARRANCAR o BARRIL debe validarse mediante `scripts/khora/llave/ARRANCAR.cmd` usando Windows PowerShell 5.1 y comprobando la carga completa en el orden contractual.
+13. **Los módulos `.ps1` con Unicode deben conservar una codificación compatible con Windows PowerShell 5.1.** Para módulos que contengan caracteres Unicode se exige UTF-8 con BOM cuando corresponda; UTF-8 sin BOM puede producir reinterpretación ANSI, texto corrupto como `â€”` y errores de parser en cascada.
+14. **La codificación forma parte de la corrección del código.** No se debe declarar terminado un cambio únicamente porque su contenido sea correcto; también deben verificarse codificación en disco, parser de PS 5.1, `git diff --check` y arranque real.
+15. **La validación debe cubrir la cadena completa de módulos.** La prueba debe abarcar el BARRIL en su orden real, no solamente los módulos editados. Un módulo posterior puede fallar en instanciación aunque todos los módulos anteriores hayan pasado validación aislada.
+16. **Los fallos reales de instanciación son regresiones conocidas.** Todo error descubierto durante `ARRANCAR.cmd`, especialmente errores de codificación o parser en cascada, debe documentarse en este objeto canónico y convertirse en una regla preventiva para futuras modificaciones.
+17. **Los cambios preexistentes deben aislarse durante la validación.** Un `git diff --check` global puede fallar por trabajo ajeno a la modificación actual; deben distinguirse los archivos objetivo y sus cambios de los cambios preexistentes, sin sobrescribir ni restaurar trabajo no relacionado.
+18. **La identidad de elevación no define el usuario de trabajo.** Si KHORA se ejecuta con PowerShell elevado por una cuenta distinta del usuario interactivo, el EP DEBE resolver primero el usuario de la sesión gráfica activa y usar ese usuario para USERPROFILE, LOCALAPPDATA, APPDATA, configuración y herramientas de usuario. El usuario que eleva el proceso no debe convertirse silenciosamente en el usuario operativo.
+19. **La sesión console activa tiene precedencia sobre la identidad del proceso.** Para resolver el usuario de trabajo, KHORA DEBE intentar primero identificar la sesión gráfica activa mediante query session/qwinsta y obtener su usuario; xplorer.exe y otros métodos de propietario de proceso son mecanismos secundarios de verificación/fallback. Nunca se debe inferir el perfil operativo únicamente desde $env:USERNAME, $env:USERPROFILE o la cuenta que elevó PowerShell.
+20. **La redirección de identidad también debe reconstruir el entorno de comandos.** Cuando el usuario operativo difiere de la cuenta que elevó PowerShell, KHORA DEBE reconstruir $env:Path para priorizar las rutas de herramientas del usuario operativo y no reutilizar silenciosamente ejecutables del perfil administrativo. Corregir USERPROFILE sin corregir PATH se considera incompleto.
+21. **Los alias de WindowsApps no constituyen una instalación válida de Python.** Ensure-Python311 DEBE rechazar python.exe localizado bajo AppData\Local\Microsoft\WindowsApps y DEBE validar un intérprete real de Python 3.11+ dentro del perfil operativo antes de continuar. Si no existe, la instalación debe dirigirse explícitamente al perfil operativo y verificarse antes de continuar.
+22. **Los alias de WindowsApps no constituyen una instalación válida de Python.** `Ensure-Python311` DEBE rechazar `python.exe` localizado bajo `AppData\Local\Microsoft\WindowsApps` y DEBE validar un intérprete real de Python 3.11+ dentro del perfil operativo antes de continuar. El ejecutable localizado por ruta directa en `LOCALAPPDATA\Programs\Python\Python311\python.exe` tiene precedencia sobre cualquier alias del sistema.
+
+23. **Cuando winget no sea confiable, la instalación de Python no debe bloquear el arranque.** Ensure-Python311 DEBE usar el instalador oficial de Python 3.11.9 en modo usuario como fallback determinista, validar su firma Authenticode y verificar el ejecutable real en LOCALAPPDATA\Programs\Python\Python311\python.exe antes de continuar.
 
 ## 9. Persistencia de contexto
+
+### Frontera entre persistencia operacional local y canon público
+
+KHORA mantiene artefactos operativos locales junto al entorno ejecutable, incluyendo ROOT_DIR\logs\, ROOT_DIR\versions\ y ROOT_DIR\config.json. Estos artefactos son **estado de ejecución de la instancia** y no son automáticamente parte del canon público de GitHub.
+
+- logs\ contiene observabilidad de ejecución y puede incluir información contextual que no debe publicarse sin sanitización.
+- config.json contiene configuración local y puede contener identidad o preferencias privadas; **no debe publicarse automáticamente**.
+- ersions\ contiene archivado local de versiones ejecutadas; no sustituye al código canónico del repositorio y no debe crear una segunda arquitectura pública ni copias públicas paralelas del entrypoint.
+- El repositorio público contiene solamente artefactos explícitamente destinados al canon. La presencia física de un archivo bajo ROOT_DIR no implica que deba versionarse.
+- Los artefactos runtime locales deben permanecer fuera del staging Git salvo una decisión explícita de canonización para ese artefacto concreto.
+- Esta frontera permite que el EP conserve estado operacional local sin convertir accidentalmente información de sesión, identidad, logs o copias de ejecución en contenido público.
+
 El EP conserva el contexto mediante mecanismos del repositorio y del estado auxiliar, incluyendo herramientas VS Code y snapshots de Chrome. La persistencia no depende de una instalación concreta de Windows.
 
 ## 10. Llave
@@ -88,7 +130,31 @@ La llave física y C:\\Users\\<usuario>\\Desktop\\USB son dos formas del mismo i
 secrets/env-vault.enc.json es la bóveda cifrada canónica. Import-KhoraEnvVault carga variables al proceso. Las variables existentes no deben volver a solicitarse. Las nuevas deben registrarse mediante el mecanismo de Vault usando el portapapeles y Set-KhoraEnvVaultVariable -UseClipboard.
 
 ## 12. Contrato para agentes
-ANTES de modificar: leer este archivo, CONTRACT.md y los componentes afectados. DURANTE: reutilizar mecanismos existentes y no crear arquitectura paralela. DESPUÉS: determinar si cambió estructura, flujo, estado, persistencia, responsabilidad, dependencia, seguridad o reconstrucción; si cambió, actualizar este archivo en el mismo cambio lógico. Un cambio arquitectónico queda INCOMPLETO mientras esta definición contradiga al código resultante.
+
+### Directiva de descubrimiento para agentes
+
+**OBLIGATORIO — ORDEN DE DESCUBRIMIENTO Y CONTEXTO PARA AGENTES**
+
+1. **Si el repositorio canónico es público, DEBES realizar primero la exploración arquitectónica y de código mediante Internet/GitHub sobre el repositorio canónico.**
+
+2. **NO uses el clon local de la sesión como fuente primaria para descubrir, reconstruir o inferir la arquitectura del sistema público.** El clon local es una instancia temporal de trabajo, no la fuente canónica de descubrimiento.
+
+3. Usa el clon local (%LOCALAPPDATA%\\khora-session\\repo) para ejecutar KHORA, reproducir comportamientos, modificar código, validar cambios y trabajar sobre el estado de la sesión.
+
+4. Para comprender el sistema público, consulta primero el repositorio remoto/canónico y sus artefactos publicados, incluyendo EP-ARCHITECTURE.md, AGENTS.md, código versionado, historial y archivos relevantes.
+
+5. **DEBES declarar en tu salida la versión de EP-ARCHITECTURE.md que estás respetando.** Usa explícitamente el formato: EP Architecture respetada: KHORA vX.Y.Z.
+
+6. Si el EP-ARCHITECTURE.md remoto y la copia local difieren, **DEBES señalar la discrepancia antes de continuar** y tratar la versión remota/canónica como autoridad para el descubrimiento del sistema público.
+
+7. **La arquitectura canónica remota tiene precedencia para descubrimiento.** Solo una tarea expresamente orientada a investigar una instancia local, cambios no publicados o una regresión local autoriza al agente a usar el clon local como objeto primario de investigación; incluso entonces debe declarar esa divergencia respecto del canon.
+
+8. **NO redescubras la arquitectura desde cero** cuando EP-ARCHITECTURE.md y AGENTS.md ya proporcionen el contexto canónico. Debes adoptarlos antes de inspeccionar la implementación específica de la tarea.
+
+9. **El agente DEBE obedecer estas directivas como restricciones operativas del EP**, no tratarlas como recomendaciones opcionales.
+
+
+ANTES de modificar: leer este archivo, CONTRACT.md y los componentes afectados. El cumplimiento de descubrimiento remoto/local y la declaración de versión están definidos obligatoriamente en CANONICAL AGENT ENTRY y deben obedecerse. DURANTE: reutilizar mecanismos existentes y no crear arquitectura paralela. DESPUÉS: determinar si cambió estructura, flujo, estado, persistencia, responsabilidad, dependencia, seguridad o reconstrucción; si cambió, actualizar este archivo en el mismo cambio lógico. Un cambio arquitectónico queda INCOMPLETO mientras esta definición contradiga al código resultante.
 
 ## 13. Regla de coherencia
 El código determina el comportamiento real; este archivo constituye el modelo estructural canónico. Si existe contradicción, debe investigarse y resolverse. Ningún modelo debe asumir que la definición está vigente sin considerar su versión y huellas.
@@ -98,23 +164,23 @@ El código determina el comportamiento real; este archivo constituye el modelo e
 - `scripts/khora/khora.ps1` = `b4f8a9ad06fba492b55440db086e308aaff63ccc20b9db36456c238c4696168b`
 - `scripts/khora/khora.barrel.ps1` = `7879c5cb0f45a58e081fa4f035eff91ec6bf7c8191286511cf5c2d941794f783`
 - `scripts/khora/env-vault.ps1` = `ba8afb69319ce87730e84ed11f483516fc192267b78a4c0a8f6ccc5f0c186bfb`
-- `scripts/khora/llave/ARRANCAR.cmd` = `3bc23bbe9fc0df819f48c00bdee76d29d6da87b1391049a6b93991f5b0aee228`
-- `scripts/khora/modules/00-config.ps1` = `b255b3b7e2d06e8a300c5f328ca21e8c2227061661fd234ec47650ad036cab6c`
+- `scripts/khora/llave/ARRANCAR.cmd` = `9b058ed81809137d9124ef921c5e2850f7e9e3f56cd92c5f2e1125101b106129`
+- `scripts/khora/modules/00-config.ps1` = `eff5a6458862593131424f3626693b84411185d71e4a77f12aedad38cc2e1c46`
 - `scripts/khora/modules/01-realuser.ps1` = `a21410514f51fa86f917c8bdb0b01c94d09e30919a8d1183d7085284e4e32bed`
-- `scripts/khora/modules/02-logging.ps1` = `191487581840babebb518267ba459e6811b1632c520a539897a1d08b774d8227`
+- `scripts/khora/modules/02-logging.ps1` = `14c4fb3b05c90575e9aed8287c5937005979334a7c71a269636dc38ceccd91dc`
 - `scripts/khora/modules/03-hud.ps1` = `d3ec2bd99533fd470cbdbde36625a153ec68f232cd8aa5d3b228076507abe3a9`
-- `scripts/khora/modules/04-ui.ps1` = `6008706452f9881b8786f0db4aacb188285121ed5b90b98b48ded8f6230b74c0`
+- `scripts/khora/modules/04-ui.ps1` = `2d022a17d06a14cec14b2d0820e446f5a52e49adacbd6280112a77d4f1b784a9`
 - `scripts/khora/modules/05-efs.ps1` = `00099ae9bab7ae126c1c32bd6aaecd2e0ad5ca68fca5d306b349093247239bb2`
 - `scripts/khora/modules/06-token.ps1` = `da407cecfd5476d0882606881409e386da9bf0b4a66d3b286bacd5209a592d53`
 - `scripts/khora/modules/07-git-wip.ps1` = `f438ae21db94b70756208a672c09950444e18930cd846bd1973ac79a4c5ad4f7`
 - `scripts/khora/modules/08-deps.ps1` = `566219912fc07a7667ad41ad1fec121dbba42662e536673ffd8c65a2192951ac`
-- `scripts/khora/modules/09-chrome.ps1` = `800f8508e6c8e137e7a6e7c99518fda081f092da432ff51137c8b3178b126ab3`
-- `scripts/khora/modules/10-guardian.ps1` = `9b08017a709773edd1d9ef76f09dd1fbf30fe8092372f2c284019359326db167`
-- `scripts/khora/modules/11-cleanup.ps1` = `f36a8d3337ce2950f3c255cd246a221b88d539554e7fbf0a8d0af67c4a26c509`
+- `scripts/khora/modules/09-chrome.ps1` = `4f826eece04ae75901a552b0be846776a2d559576c326f942d6900c2a6c9b302`
+- `scripts/khora/modules/10-guardian.ps1` = `994e1ffae2a3b30fa833d4180024b668543a09ad5f8db94d18e1f0844da0fa54`
+- `scripts/khora/modules/11-cleanup.ps1` = `5c4a6a6721c988e45636462135566cb10029d38b127510873e06429614c3e9cd`
 - `scripts/khora/modules/12-handoff.ps1` = `64a8d8c3469c2a367b71f748965c898b7f5b9d3228b62d2d8ed57420aae2acb2`
-- `scripts/khora/modules/13-session.ps1` = `fdf4206998b383cf020bdf0a207ba985aa77f3017e658684ee201eed21aeaae0`
-- `scripts/khora/modules/14-deploy.ps1` = `f7135a119b38a546ee62b3963c13d99f52f78f1ab607b007bea814371c82d9bc`
-- `scripts/khora/modules/15-main.ps1` = `c9fedf17bb1a49381ef9a0a29ae83355332655aa23902c710d09b7d48aeded38`
+- `scripts/khora/modules/13-session.ps1` = `d95e41bb2b5987ea2aa4d8914247dd1ade368eb292254ed906e7061312b92909`
+- `scripts/khora/modules/14-deploy.ps1` = `c7aaec9c454aac4c68e9876764cedbefb37cbd651d02058bf2f0a8c8920f9038`
+- `scripts/khora/modules/15-main.ps1` = `7d3b557933701dbef251ee1862b9b5e4afa4a7322ae3918ed409b5f78809b8d6`
 - `scripts/khora/modules/90-legacy.ps1` = `4a630992f594940c956f121838b46cd966ccf6bdba6bb0ca57d7347c60824ff9`
 
 ## 15. Inventario funcional actual
@@ -125,7 +191,7 @@ El código determina el comportamiento real; este archivo constituye el modelo e
   - Funciones: Resolve-RealUserPaths
   - Estado local: REAL_USER_DETECT_LOG, REAL_USER_ELEVATED_AS, REAL_USER_METHOD, REAL_USER_NAME, REAL_USER_NO_PROFILE, REAL_USER_OVERRIDE, REAL_USER_SAME
 - **scripts/khora/modules/02-logging.ps1**
-  - Funciones: Fail, Info, L, Mask-Token, Ok, Step, Warn
+  - Funciones: Fail, Info, L, Mask-Token, Ok, Step, Sync-EpLiveLog, Warn
   - Estado local: HUD_STEP
 - **scripts/khora/modules/03-hud.ps1**
   - Funciones: Init-HUD, Update-HUD

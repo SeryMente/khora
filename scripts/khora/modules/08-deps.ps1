@@ -204,7 +204,7 @@ function Start-DepsPreload {
 
         # pip bootstrap si falta
         $c = Get-Command python -ErrorAction SilentlyContinue
-        if ($c) {
+        if ($c -and $c.Source -and (Test-Path -LiteralPath $c.Source) -and ($c.Source -notmatch "(?i)\\WindowsApps\\")) {
             $pip = Get-Command pip -ErrorAction SilentlyContinue
             if (-not $pip) {
                 Log "[DEPS] pip no encontrado. Bootstrapping..."
@@ -299,7 +299,7 @@ L "INFO" "Iniciando comprobacion de dependencias proactiva en segundo plano..."
 $py = $null
 foreach ($cmd in @('python','python3','python3.11')) {
 $c = Get-Command $cmd -ErrorAction SilentlyContinue
-if ($c) {
+        if ($c -and $c.Source -and (Test-Path -LiteralPath $c.Source) -and ($c.Source -notmatch "(?i)\\WindowsApps\\")) {
 $v = & $c --version 2>&1
 if ("$v" -match '3\.(1[1-9]|[2-9]\d)') { $py = $c; break }
 }
@@ -349,32 +349,56 @@ return $true
 return $false
 }
 function Ensure-Python311 {
-    L "INFO" "=== Ensure-Python311: buscando Python 3.11+ ==="
-    foreach ($cmd in @('python','python3','python3.11')) {
+    L "INFO" "=== Ensure-Python311: buscando Python 3.11+ del usuario operativo ==="
+    $target = Join-Path $env:LOCALAPPDATA "Programs\Python\Python311\python.exe"
+    if (Test-Path -LiteralPath $target) {
+        try {
+            $v = & $target --version 2>&1
+            if ("$v" -match "^Python 3\.(1[1-9]|[2-9]\d)") {
+                Ok "Python OK: $v ($target)"
+                return $target
+            }
+        } catch {}
+    }
+    foreach ($cmd in @("python","python3","python3.11")) {
         $c = Get-Command $cmd -ErrorAction SilentlyContinue
-        if ($c) {
-            $v = & $c --version 2>&1
-            L "INFO" "  Candidato $cmd en $($c.Source): $v"
-            if ("$v" -match '3\.(1[1-9]|[2-9]\d)') { Ok "Python OK: $v ($($c.Source))"; return $c.Source }
-        } else { L "INFO" "  ${cmd}: no en PATH" }
+        if ($c -and $c.Source -and (Test-Path -LiteralPath $c.Source) -and ($c.Source -notmatch "(?i)\\WindowsApps\\")) {
+            try {
+                $v = & $c.Source --version 2>&1
+                L "INFO" ("  Candidato {0} en {1}: {2}" -f $cmd,$c.Source,$v)
+                if ("$v" -match "^Python 3\.(1[1-9]|[2-9]\d)") {
+                    Ok "Python OK: $v ($($c.Source))"
+                    return $c.Source
+                }
+            } catch {}
+        }
     }
-
-    if (Wait-ProactiveDepPrep -Key 'python' -Label 'Python 3.11') {
-        $c = Get-Command python -ErrorAction SilentlyContinue
-        if ($c) {
-            $v = & $c --version 2>&1
-if ("$v" -match '3\.(1[1-9]|[2-9]\d)') { Ok "Python OK (tras instalacion proactiva): $v ($($c.Source))"; return $c.Source }
-}
-}
-    Info "Python 3.11+ no encontrado. Instalando con animacion (puede tardar)..."
-    $out = Spin-Job "Instalando Python 3.11" -Tips @('descargando instalador...','verificando firma...','instalando componentes...','actualizando PATH...','casi listo...') -Block {
-        winget install --id Python.Python.3.11 -e --silent 2>&1
+    Info "Python 3.11+ no encontrado. Descargando instalador oficial 3.11.9 para usuario..."
+    $installer = Join-Path $env:TEMP "python-3.11.9-amd64.exe"
+    $url = "https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe"
+    try {
+        if (Test-Path -LiteralPath $installer) { Remove-Item -LiteralPath $installer -Force -ErrorAction SilentlyContinue }
+        Invoke-WebRequest -Uri $url -OutFile $installer -UseBasicParsing -TimeoutSec 120
+        if (-not (Test-Path -LiteralPath $installer)) { throw "No se descargó el instalador de Python." }
+        $sig = Get-AuthenticodeSignature -FilePath $installer
+        if ($sig.Status -ne "Valid") { throw "Firma Authenticode inválida: $($sig.Status)" }
+        $targetDir = Join-Path $env:LOCALAPPDATA "Programs\Python\Python311"
+        New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
+        $args = "/quiet InstallAllUsers=0 PrependPath=0 Include_pip=1 Include_test=0 TargetDir=`"$targetDir`""
+        $p = Start-Process -FilePath $installer -ArgumentList $args -PassThru -Wait -WindowStyle Hidden
+        if ($p.ExitCode -ne 0) { throw "Instalador Python devolvió exit code $($p.ExitCode)." }
+        if (-not (Test-Path -LiteralPath $target)) { throw "Python no quedó instalado en $target." }
+        $v = & $target --version 2>&1
+        if ("$v" -notmatch "^Python 3\.(1[1-9]|[2-9]\d)") { throw "Versión Python inesperada: $v" }
+        $env:Path = "$env:LOCALAPPDATA\Programs\Python\Python311;$env:LOCALAPPDATA\Programs\Python\Python311\Scripts;$env:Path"
+        Remove-Item -LiteralPath $installer -Force -ErrorAction SilentlyContinue
+        Ok "Python OK: $v ($target)"
+        return $target
+    } catch {
+        Remove-Item -LiteralPath $installer -Force -ErrorAction SilentlyContinue
+        Warn "No se pudo instalar Python del usuario operativo: $($_.Exception.Message)"
+        return $null
     }
-    $out | ForEach-Object { L "INFO" "winget: $_" }
-    $env:Path = [System.Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [System.Environment]::GetEnvironmentVariable('Path','User')
-    $c = Get-Command python -ErrorAction SilentlyContinue
-    if ($c) { $v = & $c --version 2>&1; Ok "Python instalado: $v"; return $c.Source }
-    Warn "Python 3.11+ no disponible tras instalacion. Instala manualmente."; return $null
 }
 function Setup-Venv {
     L "INFO" "=== Setup-Venv: configurando entorno virtual Python ==="

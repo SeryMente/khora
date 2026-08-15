@@ -275,7 +275,7 @@ Write-Host ""
     Write-Host "   [2] Cerrar + limpieza NUCLEAR   [3] Estado" -ForegroundColor White
     Write-Host "   [K] khora-ok (tests locales)    [V] Deploy Vercel" -ForegroundColor White
     Write-Host "   [R] Render ops                  [T] Monitor RAT/exfil" -ForegroundColor White
-    Write-Host "   [S] Sincronizar ya  [W] Push pendiente          [D] Diag bundle                 [Q] Salir" -ForegroundColor DarkGray
+    Write-Host "   [S] Sincronizar ya  [E] Publicar estado EP      [W] Push pendiente          [D] Diag bundle                 [Q] Salir" -ForegroundColor DarkGray
     Write-Host "   Avanzado: [4]log [5]hist [6]logwin [7]keylog [8]preflight [9]servers [C]chrome" -ForegroundColor DarkGray
     Write-Host ""
     if ($script:SES_ACTIVE -and $CFG.enableAutoWip) { Write-Host "   (auto-WIP cada $($CFG.autoWipMinutes)min activo)" -ForegroundColor DarkGray }
