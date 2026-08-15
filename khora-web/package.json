@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@google/genai": "^2.10.0",
+    "@modelcontextprotocol/sdk": "^1.30.0",
     "@notionhq/client": "^5.23.0",
     "@types/dagre": "^0.7.54",
     "@types/pg": "^8.20.0",
@@ -29,7 +30,8 @@
     "nodemailer": "^8.0.5",
     "pg": "^8.22.0",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@playwright/test": "^1.61.1",
