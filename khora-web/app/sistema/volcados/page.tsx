@@ -120,6 +120,8 @@ export default function VolcadosPage() {
       case "encontrado_no_vinculado":
         return <span className="text-yellow-400 font-semibold text-[10px] flex items-center gap-1">🟡 Audio no vinculado</span>;
       case "incompleto":
+      case "audio_parcial":
+      case "audio_partial":
         return <span className="text-amber-500 font-semibold text-[10px] flex items-center gap-1">🟠 Audio incompleto</span>;
       case "no_recuperable":
       default:
@@ -667,8 +669,9 @@ export default function VolcadosPage() {
 
                         {/* Audio Status & Parts Compact Line */}
                         <div className="flex items-center justify-between pt-1 border-t border-zinc-800/10 font-mono text-[10px]">
-                          {renderAudioStatusBadge(item.audio_status)}
+                          {renderAudioStatusBadge(item.audio_status || item.integrity)}
                           <span className="opacity-70 text-[9px]">
+                            {item.nodos_count > 0 || item.aristas_count > 0 ? `${item.nodos_count}n / ${item.aristas_count}r · ` : ""}
                             {partesNum} {partesNum === 1 ? "parte" : "partes"} · {duration}s
                           </span>
                         </div>
@@ -765,7 +768,7 @@ export default function VolcadosPage() {
 
                         {/* TRACE MAP */}
                         <div className="text-xs uppercase font-mono tracking-widest opacity-65 border-b pb-1 mb-2" style={{ borderColor: "var(--khora-border)" }}>
-                          Árbol de Trazabilidad
+                          Árbol de Trazabilidad (Traceability Tree Map)
                         </div>
 
                         <div className="relative pl-6 border-l-2 space-y-6" style={{ borderColor: "var(--khora-border)" }}>
@@ -886,6 +889,44 @@ export default function VolcadosPage() {
                             }}
                           />
                         </div>
+
+                        {/* Delta section */}
+                        {deltaPairs.length > 0 && (
+                          <div className="space-y-1">
+                            <label className="text-[10px] font-mono tracking-wider uppercase opacity-60 block">
+                              Delta Changes
+                            </label>
+                            {deltaPairs.map((p, i) => (
+                              <div key={i} className="text-xs font-mono p-2 border border-zinc-800 bg-zinc-950/40">
+                                <div className="text-red-400">− {p.antes}</div>
+                                <div className="text-emerald-400">+ {p.despues}</div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Ingest warning if not approved */}
+                        {selectedItem.estado !== "listo_ingesta" && selectedItem.estado !== "ingerido" && (
+                          <div className="text-amber-400 text-xs font-mono p-2 border border-amber-500/30 bg-amber-500/10">
+                            Bloqueado para Ingesta: Requiere aprobación explícita de versión.
+                          </div>
+                        )}
+
+                        {selectedItem.estado === "listo_ingesta" && (
+                          <button
+                            onClick={handleIngestApproved}
+                            disabled={ingesting}
+                            className="w-full py-2 border font-bold text-xs bg-emerald-500 text-zinc-950 border-emerald-400 hover:opacity-90"
+                          >
+                            {ingesting ? "Ingiriendo..." : "Ingerir versión aprobada"}
+                          </button>
+                        )}
+
+                        {selectedItem.estado === "ingerido" && (
+                          <div className="text-emerald-400 text-xs font-mono p-2 border border-emerald-500/30 bg-emerald-500/10">
+                            ✓ INGESTADO — io_id: {selectedItem.io_id || "Generado"}
+                          </div>
+                        )}
 
                         {/* Action buttons */}
                         <div className="grid grid-cols-2 gap-2">
