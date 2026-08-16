@@ -3,8 +3,10 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import * as Icons from "lucide-react";
+import { ensamblarParrafos, Fragmento } from "../../../lib/transcripcion/ensamblar";
 
 type Estado = "inactivo" | "dictando" | "finalizando";
+type EstadoReconciliacion = "preview_live" | "procesando_whisper" | "reconciliado_whisper" | "fallback_preview";
 
 function generarSesionId() {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -35,6 +37,10 @@ export default function DictadoPage() {
   const [escuchando, setEscuchando] = useState(false);
   const [reconexiones, setReconexiones] = useState(0);
 
+  // Reconciliation & Authoritative STT state
+  const [estadoReconciliacion, setEstadoReconciliacion] = useState<EstadoReconciliacion>("preview_live");
+  const [reconciliacionMensaje, setReconciliacionMensaje] = useState("");
+
   // New states for parts
   const [partesContador, setPartesContador] = useState(0);
   const [bytesAcumulados, setBytesAcumulados] = useState(0);
@@ -43,6 +49,8 @@ export default function DictadoPage() {
   const grabRef = useRef<any>(null);
   const flujoRef = useRef<any>(null);
   const trozosRef = useRef<Blob[]>([]);
+  const fragmentosRef = useRef<Fragmento[]>([]);
+  const ultimaMarcaTiempoRef = useRef<number>(0);
   const pendienteRef = useRef("");
   const bloquesRef = useRef<string[]>([]);
   const relojRef = useRef<any>(null);
@@ -99,11 +107,53 @@ export default function DictadoPage() {
   }, []);
 
   const cerrarBloque = useCallback(() => {
+    if (fragmentosRef.current.length > 0) {
+      const ensamblado = ensamblarParrafos(fragmentosRef.current, { umbralMs: 3500 });
+      if (ensamblado.trim().length > 0) {
+        fragmentosRef.current = [];
+        pendienteRef.current = "";
+        setPendiente("");
+        void pulirBloque(ensamblado);
+        return;
+      }
+    }
     const bloque = pendienteRef.current.trim();
     pendienteRef.current = "";
     setPendiente("");
     if (bloque.length > 0) void pulirBloque(bloque);
   }, [pulirBloque]);
+
+  const ejecutarTranscripcionAutoritativa = useCallback(async () => {
+    if (trozosRef.current.length === 0) return;
+    setEstadoReconciliacion("procesando_whisper");
+    const blob = new Blob(trozosRef.current, { type: "audio/webm" });
+    const textoPreview = [...bloquesRef.current, pendienteRef.current].filter((s) => s.trim().length > 0).join("\n\n");
+
+    const forma = new FormData();
+    forma.append("audio", blob, "dictado-completo.webm");
+    forma.append("previewText", textoPreview);
+
+    try {
+      const r = await fetch("/api/transcribir", { method: "POST", body: forma });
+      const data = await r.json();
+      if (r.ok && data?.exito && typeof data?.textoFinal === "string") {
+        const textoReconciliado = data.textoFinal;
+        const parrafos = textoReconciliado.split("\n\n").filter((p: string) => p.trim().length > 0);
+        bloquesRef.current = parrafos;
+        setBloques(parrafos);
+        setPendiente("");
+        pendienteRef.current = "";
+        setEstadoReconciliacion("reconciliado_whisper");
+        setReconciliacionMensaje(data.motivoReconciliacion || "Transcripción autoritativa Groq Whisper (whisper-large-v3) reconciliada con éxito.");
+      } else {
+        setEstadoReconciliacion("fallback_preview");
+        setReconciliacionMensaje(`Groq Whisper no disponible: ${data?.detail || "Conservando previsualización ASR en vivo."}`);
+      }
+    } catch (e) {
+      setEstadoReconciliacion("fallback_preview");
+      setReconciliacionMensaje(`Fallo al solicitar transcripción autoritativa: ${String(e)}.`);
+    }
+  }, []);
 
   const subirParteActual = useCallback(async () => {
     if (parteTrozosRef.current.length === 0) return;
@@ -200,6 +250,7 @@ export default function DictadoPage() {
 
       grabadora.ondataavailable = (ev: any) => {
         if (ev.data && ev.data.size > 0) {
+          trozosRef.current.push(ev.data);
           parteTrozosRef.current.push(ev.data);
           setConAudio(true);
 
@@ -242,14 +293,22 @@ export default function DictadoPage() {
     rec.onstart = () => { setEscuchando(true); abortosRef.current = 0; };
     rec.onresult = (ev: any) => {
       let interino = "";
+      const ahora = Date.now();
       for (let i = ev.resultIndex; i < ev.results.length; i++) {
         const res = ev.results[i];
-        const txt = res[0].transcript;
-        if (res.isFinal) {
-          pendienteRef.current = (pendienteRef.current + " " + txt).trim();
-          setPendiente(pendienteRef.current);
+        const txt = res[0].transcript.trim();
+        if (res.isFinal && txt.length > 0) {
+          const pausaMsAntes = ultimaMarcaTiempoRef.current > 0 ? ahora - ultimaMarcaTiempoRef.current : 0;
+          ultimaMarcaTiempoRef.current = ahora;
+
+          fragmentosRef.current.push({ texto: txt, pausaMsAntes });
+          const ensamblado = ensamblarParrafos(fragmentosRef.current, { umbralMs: 3500 });
+          pendienteRef.current = ensamblado;
+          setPendiente(ensamblado);
+
           if (relojRef.current) clearTimeout(relojRef.current);
-          relojRef.current = setTimeout(cerrarBloque, 1600);
+          // Permitir que el bloque permanezca abierto en pausas breves; se consolida a los 4000ms de inactividad o al detener
+          relojRef.current = setTimeout(cerrarBloque, 4000);
         } else {
           interino = interino + " " + txt;
         }
@@ -351,6 +410,7 @@ export default function DictadoPage() {
     try {
       if (finalizacionAudioRef.current) await finalizacionAudioRef.current;
       if (subidaEnCursoRef.current) await subidaEnCursoRef.current;
+      await ejecutarTranscripcionAutoritativa();
     } finally {
       finalizacionAudioRef.current = null;
       subidaEnCursoRef.current = null;
@@ -437,6 +497,8 @@ export default function DictadoPage() {
   const limpiar = useCallback(() => {
     bloquesRef.current = [];
     setBloques([]);
+    fragmentosRef.current = [];
+    ultimaMarcaTiempoRef.current = 0;
     pendienteRef.current = "";
     setPendiente("");
     setParcial("");
@@ -449,6 +511,8 @@ export default function DictadoPage() {
     setError("");
     setAviso("");
     setReconexiones(0);
+    setEstadoReconciliacion("preview_live");
+    setReconciliacionMensaje("");
 
     // Reset new states and refs
     sesionIdRef.current = "";
@@ -471,14 +535,28 @@ export default function DictadoPage() {
         paddingBottom: "6rem",
       }}
     >
-      {/* Cabecera de SecciÃ³n */}
+      {/* Cabecera de Sección */}
       <div className="border-b pb-4" style={{ borderColor: "var(--khora-border)" }}>
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <Icons.Mic size={32} strokeWidth={1.75} style={{ color: "var(--khora-accent)" }} />
-          Dictado
+          Dictado Clean Verbatim Semántico
         </h1>
         <p className="text-sm mt-1" style={{ color: "var(--khora-accent)" }}>
-          El texto se archiva integro con su hash antes de tocar el pipeline. Guardar nunca depende de que la ingesta funcione.
+          Arquitectura desacoplada: Previsualización ASR en vivo + Transcripción autoritativa Groq Whisper + Corrección con Invariancia Lexical Estricta.
+        </p>
+      </div>
+
+      {/* Nota Explicativa ASR vs Autoritativo */}
+      <div className="p-3 border rounded-none text-xs space-y-1" style={{ borderColor: "var(--khora-border)", backgroundColor: "var(--khora-surface)", color: "var(--khora-ink)" }}>
+        <div className="font-semibold flex items-center gap-1.5">
+          <Icons.Info size={16} strokeWidth={1.75} style={{ color: "var(--khora-accent)" }} />
+          <span>Diferencia entre Previsualización Browser ASR y Transcripción Autoritativa:</span>
+        </div>
+        <p className="opacity-90">
+          <strong>Previsualización ASR:</strong> Reconocimiento de voz local del navegador con respuesta inmediata word-by-word. Las pausas cortas no fuerzan saltos de párrafo.
+        </p>
+        <p className="opacity-90">
+          <strong>Transcripción Autoritativa:</strong> Procesamiento con <code>whisper-large-v3</code> mediante Groq sobre el audio grabado para garantizar máxima fidelidad ortotipográfica y lexical.
         </p>
       </div>
 
@@ -570,18 +648,41 @@ export default function DictadoPage() {
         </div>
       </div>
 
-      {/* Area de TranscripciÃ³n */}
+      {/* Badges de Estado Visual */}
+      <div className="flex flex-wrap items-center gap-2 text-xs">
+        <span className="px-2 py-0.5 border font-semibold" style={{ borderColor: "var(--khora-border)", backgroundColor: "var(--khora-surface)", color: "var(--khora-ink)" }}>
+          {estadoReconciliacion === "reconciliado_whisper"
+            ? "🟢 Autoritativo: Groq Whisper"
+            : estadoReconciliacion === "procesando_whisper"
+            ? "🟡 Procesando Groq Whisper..."
+            : estadoReconciliacion === "fallback_preview"
+            ? "🟠 Previsualización ASR (Groq indisponible)"
+            : "🔵 Previsualización ASR en vivo"}
+        </span>
+        <span className="px-2 py-0.5 border font-semibold" style={{ borderColor: "var(--khora-border)", backgroundColor: "var(--khora-surface)", color: "var(--khora-accent)" }}>
+          Bloques pulidos: {pulidosOk} / Sin pulir: {pulidosNo}
+        </span>
+      </div>
+
+      {/* Area de Transcripción */}
       <div
-        className="p-4 min-h-[240px] whitespace-pre-wrap leading-relaxed border rounded-none text-sm"
+        className="p-4 min-h-[240px] whitespace-pre-wrap leading-relaxed border rounded-none text-sm relative"
         style={{
           backgroundColor: "var(--khora-surface)",
           borderColor: "var(--khora-border)",
           color: "var(--khora-ink)",
         }}
       >
+        {bloques.length === 0 && pendiente.length === 0 && parcial.length === 0 && (
+          <span className="opacity-40 italic">Pulsa "Iniciar dictado" y comienza a hablar...</span>
+        )}
         {bloques.map((b, i) => (<p key={i} className="mb-3">{b}</p>))}
-        {pendiente.length > 0 && <p className="mb-3 opacity-80">{pendiente}</p>}
-        {parcial.length > 0 && <span className="opacity-50">{parcial}</span>}
+        {pendiente.length > 0 && <p className="mb-3 opacity-90">{pendiente}</p>}
+        {parcial.length > 0 && (
+          <span className="opacity-60 italic bg-amber-500/10 px-1 border-b border-dashed border-amber-500">
+            [provisional]: {parcial}
+          </span>
+        )}
       </div>
 
       {/* EstadÃ­sticas */}
@@ -590,6 +691,12 @@ export default function DictadoPage() {
       </p>
 
       {/* Alertas y Mensajes de Retorno */}
+      {reconciliacionMensaje.length > 0 && (
+        <div className="p-3 border rounded-none text-xs flex items-center gap-2" style={{ borderColor: "var(--khora-border)", backgroundColor: "var(--khora-surface)", color: "var(--khora-ink)" }}>
+          <Icons.Sparkles size={20} strokeWidth={1.75} className="shrink-0" style={{ color: "var(--khora-accent)" }} />
+          <span>{reconciliacionMensaje}</span>
+        </div>
+      )}
       {aviso.length > 0 && (
         <div className="p-3 border rounded-none text-sm flex items-center gap-2" style={{ borderColor: "var(--khora-border)", backgroundColor: "var(--khora-surface)", color: "var(--khora-accent)" }}>
           <Icons.TriangleAlert size={32} strokeWidth={1.75} className="shrink-0" />

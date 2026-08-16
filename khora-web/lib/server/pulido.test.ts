@@ -9,50 +9,51 @@ import {
 } from "./pulido.js";
 import { aplicarGlosario } from "../transcripcion/ensamblar";
 
-test("1. Un pulido que devuelve menos palabras se rechaza y se conserva el original", () => {
-  const crudo = "hola buenos dias como estan todos ustedes hoy por aqui";
-  const pulido = "hola buenos dias como estan todos ustedes hoy"; // Perdió "por aqui" (2 palabras menos)
+test("1. Guardian Invariancia Lexical: Cambios RECHAZADOS", () => {
+  // Cambiar una palabra por un sinónimo
+  const resSinonimo = guardian("el perro corre", "el can corre");
+  assert.strictEqual(resSinonimo.aceptado, false, "Sinónimo debe ser rechazado");
+  assert.strictEqual(resSinonimo.texto, "el perro corre");
+  assert.match(resSinonimo.motivo, /Invariancia lexical violada/);
 
-  const resultado = guardian(crudo, pulido);
+  // Eliminar una palabra
+  const resEliminar = guardian("el perro corre rapido", "el perro corre");
+  assert.strictEqual(resEliminar.aceptado, false, "Eliminación de palabra debe ser rechazada");
 
-  assert.strictEqual(resultado.aceptado, false, "Debe ser rechazado");
-  assert.strictEqual(resultado.texto, crudo, "Debe conservar el texto crudo original");
-  assert.match(resultado.motivo, /numero de palabras alterado/, "Debe indicar la causa");
-  assert.strictEqual(resultado.motivoRechazo, resultado.motivo, "motivoRechazo debe ser igual a motivo");
+  // Agregar una palabra
+  const resAgregar = guardian("el perro corre", "el perro corre muy rapido");
+  assert.strictEqual(resAgregar.aceptado, false, "Adición de palabra debe ser rechazada");
+
+  // Reordenar palabras
+  const resReordenar = guardian("el perro corre", "corre el perro");
+  assert.strictEqual(resReordenar.aceptado, false, "Reordenamiento de palabras debe ser rechazado");
 });
 
-test("2. Un pulido que solo añade puntuacion y corrige ortografía se acepta", () => {
-  const crudo = "hola buenos dias como estan todos";
-  const pulido = "¡Hola! Buenos días, ¿cómo están todos?"; // Añade signos y tildes/mayúsculas, mismo conteo
+test("2. Guardian Invariancia Lexical: Cambios ACEPTADOS", () => {
+  // Añadir punto
+  const resPunto = guardian("hola mundo", "hola mundo.");
+  assert.strictEqual(resPunto.aceptado, true, "Añadir punto debe ser aceptado");
 
-  const resultado = guardian(crudo, pulido);
+  // Añadir coma
+  const resComa = guardian("hola amigo mio", "hola, amigo mio.");
+  assert.strictEqual(resComa.aceptado, true, "Añadir coma debe ser aceptado");
 
-  assert.strictEqual(resultado.aceptado, true, "Debe ser aceptado");
-  assert.strictEqual(resultado.texto, pulido, "Debe retornar el texto pulido");
-  assert.strictEqual(resultado.motivo, "ok");
-  assert.strictEqual(resultado.motivoRechazo, null);
-});
+  // Corregir mayúscula
+  const resMayus = guardian("hola mundo", "Hola Mundo.");
+  assert.strictEqual(resMayus.aceptado, true, "Corregir mayúscula debe ser aceptado");
 
-test("3. Un pulido con aumento de hasta 2 palabras se acepta, pero mas de 2 se rechaza", () => {
-  const crudo = "voy al grano"; // 3 palabras
+  // Corregir tilde
+  const resTilde = guardian("esta bien", "Está bien.");
+  assert.strictEqual(resTilde.aceptado, true, "Corregir tilde debe ser aceptado");
 
-  // Aumento de 1 palabra (p. ej. separación de contracción)
-  const pulidoAceptable = "voy a el grano"; // 4 palabras (+1)
-  const res1 = guardian(crudo, pulidoAceptable);
-  assert.strictEqual(res1.aceptado, true, "Debe aceptar un incremento de 1 palabra");
-  assert.strictEqual(res1.texto, pulidoAceptable);
+  // Separar en párrafos
+  const resParrafos = guardian("hola mundo feliz dia", "Hola mundo.\n\nFeliz día.");
+  assert.strictEqual(resParrafos.aceptado, true, "Separar en párrafos debe ser aceptado");
 
-  // Aumento de 2 palabras
-  const pulidoAceptable2 = "yo voy a el grano"; // 5 palabras (+2)
-  const res2 = guardian(crudo, pulidoAceptable2);
-  assert.strictEqual(res2.aceptado, true, "Debe aceptar un incremento de 2 palabras");
-
-  // Aumento de 3 palabras (más de la tolerancia de 2)
-  const pulidoExcesivo = "yo voy a el gran grano"; // 6 palabras (+3)
-  const res3 = guardian(crudo, pulidoExcesivo);
-  assert.strictEqual(res3.aceptado, false, "Debe rechazar un incremento de más de 2 palabras");
-  assert.strictEqual(res3.texto, crudo);
-  assert.match(res3.motivo, /numero de palabras alterado/);
+  // Aplicar sustitución explícita del glosario
+  const dummyGlosario = { "agente de ia": "agente de IA", "vercel": "Vercel" };
+  const resGlosario = guardian("el agente de ia esta en vercel", "El agente de IA está en Vercel.", dummyGlosario);
+  assert.strictEqual(resGlosario.aceptado, true, "Sustitución explícita de glosario debe ser aceptada");
 });
 
 test("4. Los terminos del glosario sobreviven al pulido sin deformarse", () => {
