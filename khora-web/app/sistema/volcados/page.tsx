@@ -812,9 +812,9 @@ export default function VolcadosPage() {
                               <h4 className="font-bold text-xs">
                                 📝 Transcripción <span className="text-emerald-500">✓ Registrada</span>
                               </h4>
-                              <div className="text-[11px] opacity-75 space-y-0.5 font-mono">
-                                <div>Versión actual: v{selectedItem.version_actual || 1}</div>
-                              </div>
+<div className="text-[11px] opacity-75 space-y-0.5 font-mono">
+  <div>Versión actual: v{selectedItem.version_actual || 1}</div>
+</div>
                             </div>
                           </div>
 
