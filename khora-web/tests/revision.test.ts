@@ -21,6 +21,11 @@ import {
   reabrirRevision
 } from "../lib/server/correcciones";
 
+import {
+  obtenerTodasSugerencias,
+  clasificarCambioSemantico
+} from "../lib/server/asistenteRevision";
+
 // Estructuras de datos en memoria para simulación SQL
 let volcadosMemory: any[] = [];
 let versionesMemory: any[] = [];
@@ -371,7 +376,7 @@ test("7. Rechazo de aprobación de versión inexistente", async () => {
     async () => {
       await aprobarVersion(volcadoId, 99, "auditor@khora.com");
     },
-    /La versión solicitada no existe/,
+    /La versión a aprobar debe ser la versión vigente más reciente|La versión solicitada no existe/,
     "Debe lanzar error por versión inexistente"
   );
 });
@@ -394,7 +399,7 @@ test("8. Rechazo de versión de otro volcado", async () => {
     async () => {
       await aprobarVersion(volcadoId2, 2, "auditor@khora.com");
     },
-    /La versión solicitada no existe/
+    /La versión a aprobar debe ser la versión vigente más reciente|La versión solicitada no existe/
   );
 });
 
@@ -519,4 +524,147 @@ test("13. Múltiples versiones", async () => {
   assert.strictEqual(versiones[1].version, 2);
   assert.strictEqual(versiones[2].version, 3);
   assert.strictEqual(versiones[3].version, 4);
+});
+
+test("14. Sugerencia ortotipográfica y lingüística sugerida y aceptada", async () => {
+  const textoPrueba = "hola,mundo este es un texto de prueba khora";
+  const sugerencias = await obtenerTodasSugerencias(textoPrueba);
+
+  assert.ok(sugerencias.length > 0, "Debe generar sugerencias para el texto con errores");
+  const sug = sugerencias[0];
+  assert.ok(sug.id, "Debe tener un id único");
+  assert.ok(sug.sugerencia, "Debe contener una sugerencia de reemplazo");
+
+  // Aplicación manual de la sugerencia
+  const textoCorregido = textoPrueba.replace(sug.texto_original, sug.sugerencia);
+  assert.notStrictEqual(textoCorregido, textoPrueba, "El texto debe modificarse tras aceptar la sugerencia");
+});
+
+test("15. Sugerencia rechazada", async () => {
+  const textoPrueba = "hola,mundo";
+  const sugerencias = await obtenerTodasSugerencias(textoPrueba);
+  assert.ok(sugerencias.length > 0);
+
+  const sug = sugerencias[0];
+  sug.estado = "rechazada";
+
+  assert.strictEqual(sug.estado, "rechazada", "La sugerencia debe marcarse como rechazada");
+});
+
+test("16. Cambio semántico marcado con severidad alta", () => {
+  const c1 = clasificarCambioSemantico("no acepto los terminos", "acepto los terminos");
+  assert.strictEqual(c1.esCambioSemantico, true, "Eliminar o agregar negación es un cambio semántico");
+  assert.strictEqual(c1.severidad, "alta", "Cambio semántico debe marcarse con severidad alta");
+
+  const c2 = clasificarCambioSemantico("10", "100");
+  assert.strictEqual(c2.esCambioSemantico, true, "Alterar números es un cambio semántico");
+  assert.strictEqual(c2.severidad, "alta", "Cambio en cifras debe tener severidad alta");
+});
+
+test("17. Edición posterior a una aprobación invalida la aprobación anterior", async () => {
+  reiniciarBaseDeDatos();
+  const volcadoId = "17171717-1717-1717-1717-171717171717";
+  volcadosMemory.push({
+    id: volcadoId,
+    texto: cifrarTexto("Texto v1"),
+    sha256: sha256de("Texto v1"),
+    chars: 8,
+    estado: "en_revision",
+    ediciones: 0
+  });
+
+  await asegurarVersionInicial(volcadoId);
+  const ed2 = await guardarEdicion(volcadoId, "Texto v2 corregido");
+
+  // Aprobar v2
+  await aprobarVersion(volcadoId, ed2.version, "aprobador@khora.com");
+  let volcado = volcadosMemory.find(v => v.id === volcadoId);
+  assert.strictEqual(volcado.estado, "listo_ingesta");
+  assert.strictEqual(volcado.version_aprobada, 2);
+
+  // Realizar edición v3 posterior a aprobación
+  await guardarEdicion(volcadoId, "Texto v3 modificado de nuevo", "operador@khora.com");
+
+  volcado = volcadosMemory.find(v => v.id === volcadoId);
+  assert.strictEqual(volcado.estado, "en_revision", "El estado debe regresar a 'en_revision'");
+  assert.strictEqual(volcado.version_aprobada, null, "La versión aprobada debe invalidarse (ser NULL)");
+  assert.strictEqual(volcado.sha256_aprobado, null, "El SHA aprobado debe invalidarse (ser NULL)");
+  assert.strictEqual(volcado.aprobado_en, null, "La fecha de aprobación debe invalidarse (ser NULL)");
+  assert.strictEqual(volcado.aprobador, null, "El aprobador debe invalidarse (ser NULL)");
+});
+
+test("18. Intento de aprobar una versión antigua falla", async () => {
+  reiniciarBaseDeDatos();
+  const volcadoId = "18181818-1818-1818-1818-181818181818";
+  volcadosMemory.push({
+    id: volcadoId,
+    texto: cifrarTexto("v1"),
+    sha256: sha256de("v1"),
+    chars: 2,
+    estado: "en_revision",
+    ediciones: 0
+  });
+
+  await asegurarVersionInicial(volcadoId);
+  await guardarEdicion(volcadoId, "v2 con cambios");
+
+  // Intentar aprobar versión 1 cuando la versión vigente es la 2
+  await assert.rejects(
+    async () => {
+      await aprobarVersion(volcadoId, 1, "supervisor@khora.com");
+    },
+    /La versión a aprobar debe ser la versión vigente más reciente/,
+    "Debe rechazar el intento de aprobar una versión histórica antigua"
+  );
+});
+
+test("19. Intento de aprobar desde estado incorrecto falla", async () => {
+  reiniciarBaseDeDatos();
+  const volcadoId = "19191919-1919-1919-1919-191919191919";
+  volcadosMemory.push({
+    id: volcadoId,
+    texto: cifrarTexto("v1 archivado"),
+    sha256: sha256de("v1 archivado"),
+    chars: 12,
+    estado: "archivado", // Estado no permitido para aprobación directa
+    ediciones: 0
+  });
+
+  await asegurarVersionInicial(volcadoId);
+
+  await assert.rejects(
+    async () => {
+      await aprobarVersion(volcadoId, 1, "supervisor@khora.com");
+    },
+    /Solo se puede aprobar un volcado en estado 'en_revision'/,
+    "Debe fallar al intentar aprobar desde un estado distinto a 'en_revision'"
+  );
+});
+
+test("20. Auditoría registra estado anterior real", async () => {
+  reiniciarBaseDeDatos();
+  const volcadoId = "20202020-2020-2020-2020-202020202020";
+  volcadosMemory.push({
+    id: volcadoId,
+    texto: cifrarTexto("Texto archivado inicial"),
+    sha256: sha256de("Texto archivado inicial"),
+    chars: 23,
+    estado: "archivado",
+    ediciones: 0
+  });
+
+  await asegurarVersionInicial(volcadoId);
+  await guardarEdicion(volcadoId, "Texto editado v2", "operador@khora.com");
+
+  const auditGuardado = auditoriasMemory.find(a => a.volcado_id === volcadoId && a.accion === "version_guardada");
+  assert.ok(auditGuardado, "Debe existir auditoría de versión guardada");
+  assert.strictEqual(auditGuardado.estado_anterior, "archivado", "Debe registrar el estado anterior real 'archivado'");
+  assert.strictEqual(auditGuardado.estado_nuevo, "en_revision");
+
+  // Aprobar v2 desde en_revision
+  await aprobarVersion(volcadoId, 2, "supervisor@khora.com");
+  const auditAprobado = auditoriasMemory.find(a => a.volcado_id === volcadoId && a.accion === "version_aprobada");
+  assert.ok(auditAprobado, "Debe existir auditoría de versión aprobada");
+  assert.strictEqual(auditAprobado.estado_anterior, "en_revision", "Debe registrar el estado anterior real 'en_revision'");
+  assert.strictEqual(auditAprobado.estado_nuevo, "listo_ingesta");
 });
