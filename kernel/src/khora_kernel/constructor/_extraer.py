@@ -1,6 +1,7 @@
 # @l0 L0-002 · @req ING-01/REQ-1 · @acr ACR-1.1,ACR-1.2,ACR-1.3 · @ua UA-06
 import hashlib
 import os
+from datetime import datetime, timezone
 
 from khora_kernel.api import (
     ContextoDeVisibilidad,
@@ -30,9 +31,10 @@ def _chunk_text(texto: str) -> list[str]:
         chunks.append(chunk)
         i += (chunk_size - overlap)
         if chunk_size - overlap <= 0:
-            break # Evitar loop infinito si hay mala config
+            break  # Evitar loop infinito si hay mala config
 
     return chunks
+
 
 def _mock_ner(chunk: str) -> list[tuple[str, str, str]]:
     # Mock de NER para pre-entidades (origen, relacion, destino)
@@ -43,11 +45,19 @@ def _mock_ner(chunk: str) -> list[tuple[str, str, str]]:
         triples.append((words[0], "related_to", words[-1]))
     return triples
 
-def _llm_ner(chunk: str, puerto_llm: PuertoLLM) -> list[tuple[str, str, str]]:
+
+def _llm_ner(chunk: str, puerto_llm: PuertoLLM) -> list[tuple]:
     # NER real con LLM
+    sistema_prompt = (
+        "Eres un extractor de grafos de conocimiento de alta precisión. Devuelve tu respuesta como una lista en formato CSV (origen, relacion, destino, tipo_opcional).\n"
+        "Instrucciones estrictas:\n"
+        "1. NUNCA extraigas un verbo conjugado como entidad (origen o destino); usa únicamente sustantivos, nombres propios o frases nominales.\n"
+        "2. Devuelve el tipo de entidad cuando sea inferible (Persona, Lugar, Organización, Concepto, Evento) como cuarta columna opcional en el CSV.\n"
+        "3. NO inventes relaciones que no estén sustentadas literalmente en el texto del chunk."
+    )
     solicitud = SolicitudLLM(
         prompt=f"Extrae entidades y relaciones de este texto:\n\n{chunk}",
-        sistema="Eres un extractor de grafos de conocimiento. Devuelve tu respuesta como una lista separada por comas (origen, relacion, destino).",
+        sistema=sistema_prompt,
         formato_estricto=None,
         metadata={"temperature": 0.0},
     )
@@ -55,10 +65,19 @@ def _llm_ner(chunk: str, puerto_llm: PuertoLLM) -> list[tuple[str, str, str]]:
     triples = []
     for line in resp.texto.splitlines():
         if "," in line:
-            parts = [p.strip() for p in line.split(",")[:3]]
-            if len(parts) == 3:
-                triples.append(tuple(parts)) # type: ignore
+            parts = [p.strip() for p in line.split(",")]
+            if len(parts) >= 3:
+                orig = parts[0]
+                rel = parts[1]
+                dest = parts[2]
+                tipo = parts[3] if len(parts) >= 4 and parts[3] else None
+                if orig and rel and dest:
+                    if tipo:
+                        triples.append((orig, rel, dest, tipo))
+                    else:
+                        triples.append((orig, rel, dest))
     return triples
+
 
 def _gleaning_loop(chunk: str, pre_entidades: list, puerto_llm: PuertoLLM | None = None) -> list:
     # (d) gleaning
@@ -87,6 +106,7 @@ def _gleaning_loop(chunk: str, pre_entidades: list, puerto_llm: PuertoLLM | None
 
     return pre_entidades
 
+
 def extraer(texto: str, lector_grafo, puerto_llm: PuertoLLM | None = None) -> list[Triple]:
     """
     fKGC: Extracción de contenido con gleaning.
@@ -95,9 +115,7 @@ def extraer(texto: str, lector_grafo, puerto_llm: PuertoLLM | None = None) -> li
     chunks = _chunk_text(texto)
 
     # (c) correferencia SOLO-LECTURA
-    # lector_grafo.consultar(...)
     if lector_grafo and hasattr(lector_grafo, "consultar"):
-        # Simulamos una lectura al grafo sin escribir
         _ = lector_grafo.consultar("¿Qué entidades existen?", ContextoDeVisibilidad.TRANSPARENTE)
 
     for chunk in chunks:
@@ -108,17 +126,20 @@ def extraer(texto: str, lector_grafo, puerto_llm: PuertoLLM | None = None) -> li
 
         final_entidades = _gleaning_loop(chunk, pre_entidades, puerto_llm)
 
-        for orig, rel, dest in final_entidades:
+        for item in final_entidades:
+            orig = item[0]
+            rel = item[1]
+            dest = item[2]
+            tipo = item[3] if len(item) >= 4 and item[3] else None
+
             # Hash para id determinista
             id_str = f"{orig}-{rel}-{dest}"
             id_hash = hashlib.sha256(id_str.encode()).hexdigest()[:16]
 
-            # Un Triple sin procedencia es INVÁLIDO.
-            # Como fKGC crea nuevos triples derivados, les asignamos un provenance derivado o exigimos que el que llama los emita con uno.
-            # En la firma 'extraer(texto, lector_grafo)', no recibimos provenance.
-            # ¡Espera! El validador (nuestra propia lógica) rechaza un Triple sin procedencia.
-            # Así que creamos un provenance default derivado del proceso "fKGC".
-            prov = Provenance(origen="fKGC_extractor", driver="fKGC", timestamp="2026-07-19T00:00:00Z")
+            ts_actual = datetime.now(timezone.utc).isoformat()
+            prov = Provenance(origen="fKGC_extractor", driver="fKGC", timestamp=ts_actual)
+
+            metadata = {"tipo": tipo} if tipo else {}
 
             triple = Triple(
                 id=f"t-{id_hash}",
@@ -126,10 +147,10 @@ def extraer(texto: str, lector_grafo, puerto_llm: PuertoLLM | None = None) -> li
                 destino_id=dest,
                 relacion=rel,
                 provenance=prov,
-                metadata={},
-                valid_at=prov.timestamp,
+                metadata=metadata,
+                valid_at=ts_actual,
                 invalid_at=None,
-                created_at=prov.timestamp
+                created_at=ts_actual,
             )
             triples_extraidos.append(triple)
 
