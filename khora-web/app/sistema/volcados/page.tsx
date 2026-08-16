@@ -795,7 +795,7 @@ export default function VolcadosPage() {
                             </div>
                             <div className="space-y-1">
                               <h4 className="font-bold text-xs">
-                                💾 Volcado <span className="text-emerald-500">✓ Persistido</span>
+                                💾 Archivo <span className="text-emerald-500">✓ Persistido</span>
                               </h4>
                               <div className="text-[11px] opacity-75 space-y-0.5 font-mono">
                                 <div>Total caracteres: {selectedItem.chars}</div>
