@@ -12,32 +12,69 @@ export async function POST(req: Request) {
 
     if (contentType.includes("multipart/form-data")) {
       const forma = await req.formData();
-      const archivo = forma.get("audio");
+      const archivos = forma.getAll("audio").filter((item): item is File => typeof item !== "string" && item instanceof Blob);
       const previewText = typeof forma.get("previewText") === "string" ? String(forma.get("previewText")) : "";
 
-      if (!(archivo instanceof Blob)) {
-        return NextResponse.json({ detail: "falta el archivo de audio" }, { status: 400 });
+      if (archivos.length === 0) {
+        return NextResponse.json({ detail: "falta el archivo de audio o las partes" }, { status: 400 });
       }
 
-      const buffer = Buffer.from(await archivo.arrayBuffer());
-      if (buffer.length === 0) {
-        return NextResponse.json({ detail: "el audio llegó vacío" }, { status: 400 });
+      if (archivos.length === 1) {
+        const buffer = Buffer.from(await archivos[0].arrayBuffer());
+        if (buffer.length === 0) {
+          return NextResponse.json({ detail: "el audio llegó vacío" }, { status: 400 });
+        }
+
+        const res = await transcribirAudioConGroq(buffer, (archivos[0] as any).name || "dictado.webm", { verboseJson: true });
+        if (!res.exito) {
+          return NextResponse.json({ detail: res.motivo, exito: false, modelo: res.modelo }, { status: 502 });
+        }
+
+        const rec = reconciliarTranscripcion(previewText, res.texto);
+
+        return NextResponse.json({
+          exito: true,
+          textoAutoritativo: res.texto,
+          textoFinal: rec.textoFinal,
+          reconciliado: rec.reconciliado,
+          motivoReconciliacion: rec.motivo,
+          modelo: res.modelo,
+          segmentos: res.segmentos,
+        });
       }
 
-      const res = await transcribirAudioConGroq(buffer, archivo.name || "dictado.webm");
-      if (!res.exito) {
-        return NextResponse.json({ detail: res.motivo, exito: false, modelo: res.modelo }, { status: 502 });
+      // Múltiples partes / chunks de audio recibidos: procesamiento incremental con deduplicación de overlap
+      const buffers: Buffer[] = [];
+      for (const a of archivos) {
+        const buf = Buffer.from(await a.arrayBuffer());
+        if (buf.length > 0) buffers.push(buf);
       }
 
-      const rec = reconciliarTranscripcion(previewText, res.texto);
+      const { procesarChunksIncrementales } = await import("../../../lib/server/transcribir");
+      const resChunking = await procesarChunksIncrementales(buffers);
+
+      if (!resChunking.exito) {
+        return NextResponse.json(
+          {
+            detail: "Fallo la transcripción de las partes de audio",
+            exito: false,
+            detalles: resChunking.detallesFallos,
+          },
+          { status: 502 }
+        );
+      }
+
+      const rec = reconciliarTranscripcion(previewText, resChunking.textoAutoritativo);
 
       return NextResponse.json({
         exito: true,
-        textoAutoritativo: res.texto,
+        textoAutoritativo: resChunking.textoAutoritativo,
         textoFinal: rec.textoFinal,
         reconciliado: rec.reconciliado,
         motivoReconciliacion: rec.motivo,
-        modelo: res.modelo,
+        partesProcesadas: resChunking.partesProcesadas,
+        fallos: resChunking.fallos,
+        modelo: "whisper-large-v3",
       });
     }
 
