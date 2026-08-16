@@ -1,4 +1,5 @@
 # @l0 L0-002 · @req ING-01/REQ-1 · @acr ACR-1.1,ACR-1.2,ACR-1.3 · @ua UA-06
+
 import pytest
 
 from khora_kernel.api import (
@@ -6,6 +7,7 @@ from khora_kernel.api import (
     NivelSuficiencia,
     ObjetoDeInformacion,
     Provenance,
+    RespuestaLLM,
     ResultadoDeConsulta,
     SubgrafoRelevante,
 )
@@ -75,30 +77,63 @@ def test_chunks_600_100(monkeypatch):
     monkeypatch.setenv("KHORA_CHUNK_SIZE", "5")
     monkeypatch.setenv("KHORA_CHUNK_OVERLAP", "2")
 
-    # Texto de 10 palabras -> words: 1 2 3 4 5 6 7 8 9 10
     texto = "uno dos tres cuatro cinco seis siete ocho nueve diez"
     from khora_kernel.constructor._extraer import _chunk_text
 
     chunks = _chunk_text(texto)
     assert len(chunks) > 1
-    # Primer chunk: 5 palabras
     assert len(chunks[0].split()) == 5
-    # Overlap de 2: cinco debe estar en el segundo
     assert chunks[1].split()[0] == "cuatro"
 
 def test_gleaning_tope(monkeypatch):
-    # Asegurar que respeta el tope max
     monkeypatch.setenv("KHORA_GLEANING_MAX_ROUNDS", "1")
     from khora_kernel.constructor._extraer import _gleaning_loop
-    # Como es un mock sin llamadas reales, solo verificamos que no crashea
-    # y devuelve pre_entidades
     res = _gleaning_loop("texto", [("a", "b", "c")])
     assert res == [("a", "b", "c")]
 
+def test_llm_ner_3_and_4_columns():
+    class MockPuertoLLM3:
+        def generar(self, solicitud):
+            # Verify system prompt has verb restriction and instructions
+            assert "NUNCA extraigas un verbo conjugado" in solicitud.sistema
+            assert "cuarta columna opcional" in solicitud.sistema
+            assert "NO inventes relaciones" in solicitud.sistema
+            return RespuestaLLM(
+                texto="Juan, trabaja_en, Khora\nMadrid, es_una, Ciudad, Lugar\n",
+                modelo="mock",
+                provenance=Provenance(origen="mock", driver=None, timestamp=""),
+            )
+
+    puerto_3 = MockPuertoLLM3()
+    from khora_kernel.constructor._extraer import _llm_ner
+
+    res = _llm_ner("texto de prueba", puerto_3)
+    assert len(res) == 2
+    assert res[0] == ("Juan", "trabaja_en", "Khora")
+    assert res[1] == ("Madrid", "es_una", "Ciudad", "Lugar")
+
+def test_extraer_utc_timestamp_and_tipo_metadata():
+    class MockPuertoLLM4:
+        def generar(self, solicitud):
+            return RespuestaLLM(
+                texto="Juan, vive_en, Madrid, Persona\n",
+                modelo="mock",
+                provenance=Provenance(origen="mock", driver=None, timestamp=""),
+            )
+
+    puerto_4 = MockPuertoLLM4()
+    triples = extraer("Juan vive en Madrid", None, puerto_llm=puerto_4)
+
+    assert len(triples) == 1
+    t = triples[0]
+    assert t.metadata == {"tipo": "Persona"}
+    assert t.provenance.timestamp != "2026-07-19T00:00:00Z"
+    assert "T" in t.provenance.timestamp
+    assert t.valid_at == t.provenance.timestamp
+    assert t.created_at == t.provenance.timestamp
+
 @pytest.mark.xfail(reason="NO-SIMULACIÓN: Faltan fragmentos reales en data/golden/j7_golden.jsonl, evaluando éxito parcial D5.")
 def test_f1():
-    # Golden set data/golden/j7_golden.jsonl: SOLO fragmentos REALES accesibles en el entorno (D5).
-    # NO-SIMULACIÓN: prohibido fabricar fragmentos «realistas».
     assert False, "Faltan fragmentos reales"
 
 class LectorGrafoMock:
@@ -121,6 +156,5 @@ def test_cero_escrituras():
 
     assert lector.escrituras == 0
     assert len(triples) > 0
-    # Validador de procedencia
     for t in triples:
         assert t.provenance is not None
