@@ -804,6 +804,38 @@ export default function VolcadosPage() {
                             </div>
                           </div>
 
+                          {/* 📝 TRANSCRIPCION */}
+                          <div className="relative">
+                            <div className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full flex items-center justify-center border" style={{ backgroundColor: "var(--khora-bg)", borderColor: "var(--khora-accent)" }}>
+                              <Icons.FileText className="w-2.5 h-2.5 text-zinc-400" />
+                            </div>
+                            <div className="space-y-1">
+                              <h4 className="font-bold text-xs">
+                                📝 Transcripción <span className="text-emerald-500">✓ Registrada</span>
+                              </h4>
+                              <div className="text-[11px] opacity-75 space-y-0.5 font-mono">
+                                <div>Versión actual: v{selectedItem.version_actual || 1}</div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* ✓ APROBACION */}
+                          <div className="relative">
+                            <div className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full flex items-center justify-center border" style={{ backgroundColor: "var(--khora-bg)", borderColor: "var(--khora-accent)" }}>
+                              <Icons.CheckCircle className="w-2.5 h-2.5 text-zinc-400" />
+                            </div>
+                            <div className="space-y-1">
+                              <h4 className="font-bold text-xs">
+                                ✓ Aprobación{" "}
+                                {selectedItem.version_aprobada ? (
+                                  <span className="text-emerald-500">✓ Aprobado v{selectedItem.version_aprobada}</span>
+                                ) : (
+                                  <span className="text-amber-500">○ Pendiente</span>
+                                )}
+                              </h4>
+                            </div>
+                          </div>
+
                           {/* ⚙ INGESTA */}
                           <div className="relative">
                             <div className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full flex items-center justify-center border" style={{ backgroundColor: "var(--khora-bg)", borderColor: "var(--khora-accent)" }}>
