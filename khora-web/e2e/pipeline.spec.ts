@@ -167,8 +167,8 @@ test.describe("Pipeline Control Tower E2E Tests", () => {
     // 6. Mock Revision Approve endpoint using a bulletproof pattern that handles both GET and POST safely
     await page.route("**/api/revision/**", async (route) => {
       console.log(`MOCK REVISION CALLED: method=${route.request().method()}, url=${route.request().url()}`);
-      // Exclude delta checks so they fall through to the delta mock
-      if (route.request().url().includes("/delta")) {
+      // Exclude delta and sugerencias checks so they fall through to their respective handlers
+      if (route.request().url().includes("/delta") || route.request().url().includes("/sugerencias")) {
         return route.fallback();
       }
 
@@ -302,7 +302,7 @@ test.describe("Pipeline Control Tower E2E Tests", () => {
 
     // 13. Verify newly generated io_id is shown successfully
     await expect(page.locator("text=✓ INGESTADO")).toBeVisible();
-    await expect(page.locator("text=io_id: io-newly-ingested-id")).toBeVisible();
+    await expect(page.locator("text=io_id: io-newly-ingested-id").first()).toBeVisible();
   });
 
   test("14. visualizar estado de grafo", async ({ page }) => {
