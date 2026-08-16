@@ -4,7 +4,7 @@ import { Pool } from "pg";
 let mcpPool: Pool | undefined;
 
 export function isProductionEnv(): boolean {
-  return process.env.VERCEL_ENV === "production" || process.env.NODE_ENV === "production";
+  return process.env.VERCEL_ENV === "production";
 }
 
 export function getMcpReadOnlyDb(): Pool {

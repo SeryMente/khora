@@ -172,15 +172,24 @@ export default function VolcadosPage() {
     async function init() {
       const items = await fetchPipeline();
       if (items && items.length > 0 && !selectedId) {
-        await selectVolcadoItem(items[0].id, true);
+        await selectVolcadoItem(items[0].id, true, items);
       }
     }
     void init();
     void fetchLegacyVolcados();
   }, [fetchPipeline, fetchLegacyVolcados]);
 
+  useEffect(() => {
+    if (selectedId && pipelineItems.length > 0) {
+      const found = pipelineItems.find((i) => i.id === selectedId);
+      if (found) {
+        setSelectedItem(found);
+      }
+    }
+  }, [pipelineItems, selectedId]);
+
   // Handle volcado selection
-  const selectVolcadoItem = async (id: string, skipMobileToggle?: boolean) => {
+  const selectVolcadoItem = async (id: string, skipMobileToggle?: boolean, itemsList?: PipelineItem[]) => {
     setSelectedId(id);
     setIngestaResult(null);
     setDrawerSubTab("trace");
@@ -189,7 +198,8 @@ export default function VolcadosPage() {
       setMobileShowDetail(true);
     }
 
-    const item = pipelineItems.find((i) => i.id === id);
+    const currentItems = itemsList && itemsList.length > 0 ? itemsList : pipelineItems;
+    const item = currentItems.find((i) => i.id === id);
     if (item) {
       setSelectedItem(item);
     }
@@ -283,7 +293,7 @@ export default function VolcadosPage() {
 
     setApprovingVersion(true);
     try {
-      const res = await fetch(`/api/revision/${selectedId}`, {
+      let res = await fetch(`/api/volcado/${selectedId}/aprobar`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -291,6 +301,16 @@ export default function VolcadosPage() {
           sha256: currentVer.sha256,
         }),
       });
+      if (!res.ok) {
+        res = await fetch(`/api/revision/${selectedId}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            version: selectedVersionNum,
+            sha256: currentVer.sha256,
+          }),
+        });
+      }
       const data = await res.json();
       if (res.ok) {
         await fetchPipeline();

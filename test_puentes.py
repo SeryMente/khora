@@ -1,4 +1,3 @@
-import sys
 import unittest
 
 class FakeDriver:
@@ -41,7 +40,6 @@ class TestPuentes(unittest.TestCase):
 
         unificado = u.aplicar_puentes_a_subgrafo(subgrafo)
 
-        nodos_ids = [n["id"] for n in unificado["nodos"]]
         # 'yo', 'operador', 'victor_hugo_torres' deben colapsar en uno solo
         self.assertEqual(len(unificado["nodos"]), 3) # khora, neo4j, y (yo/operador/victor)
 
