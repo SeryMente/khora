@@ -134,3 +134,32 @@ test("9. Umbral personalizado de pausa en opciones", () => {
   assert.strictEqual(resultadoPersonalizado.split("\n\n").length, 1);
   assert.strictEqual(resultadoPersonalizado, "Hola amigo");
 });
+
+test("10. Una sola idea con varias pausas artificiales produce UN solo párrafo (Escenario A)", () => {
+  const fragmentos: Fragmento[] = [
+    { texto: "No quiero cambiar la forma en que funciona el sistema", pausaMsAntes: 0 },
+    { texto: "porque la experiencia actual es buena", pausaMsAntes: 4500 }, // Pausa larga pero con conector 'porque'
+    { texto: "pero quiero mejorar su precisión.", pausaMsAntes: 5000 }, // Pausa larga con conector 'pero'
+  ];
+
+  const resultado = ensamblarParrafos(fragmentos);
+  const parrafos = resultado.split("\n\n");
+  assert.strictEqual(parrafos.length, 1, "Debe ser un único párrafo sin divisiones artificiales");
+  assert.strictEqual(
+    resultado,
+    "No quiero cambiar la forma en que funciona el sistema porque la experiencia actual es buena pero quiero mejorar su precisión."
+  );
+});
+
+test("11. Dos ideas independientes con punto de cierre y pausa corta producen DOS párrafos (Escenario B)", () => {
+  const fragmentos: Fragmento[] = [
+    { texto: "Quiero mejorar el reconocimiento.", pausaMsAntes: 0 },
+    { texto: "También quiero mejorar la revisión.", pausaMsAntes: 1200 }, // Pausa corta pero tras oración terminada con punto
+  ];
+
+  const resultado = ensamblarParrafos(fragmentos);
+  const parrafos = resultado.split("\n\n");
+  assert.strictEqual(parrafos.length, 2, "Debe separar en dos párrafos debido al punto terminal");
+  assert.strictEqual(parrafos[0], "Quiero mejorar el reconocimiento.");
+  assert.strictEqual(parrafos[1], "También quiero mejorar la revisión.");
+});

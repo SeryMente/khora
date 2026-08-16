@@ -6,7 +6,7 @@ import * as Icons from "lucide-react";
 import { ensamblarParrafos, Fragmento } from "../../../lib/transcripcion/ensamblar";
 
 type Estado = "inactivo" | "dictando" | "finalizando";
-type EstadoReconciliacion = "preview_live" | "procesando_whisper" | "reconciliado_whisper" | "fallback_preview";
+type EstadoReconciliacion = "preview_live" | "procesando_whisper" | "reconciliado_whisper" | "fallback_preview" | "editado_manual";
 
 function generarSesionId() {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -40,6 +40,7 @@ export default function DictadoPage() {
   // Reconciliation & Authoritative STT state
   const [estadoReconciliacion, setEstadoReconciliacion] = useState<EstadoReconciliacion>("preview_live");
   const [reconciliacionMensaje, setReconciliacionMensaje] = useState("");
+  const [editadoManualmente, setEditadoManualmente] = useState(false);
 
   // New states for parts
   const [partesContador, setPartesContador] = useState(0);
@@ -124,36 +125,44 @@ export default function DictadoPage() {
   }, [pulirBloque]);
 
   const ejecutarTranscripcionAutoritativa = useCallback(async () => {
-    if (trozosRef.current.length === 0) return;
+    if (trozosRef.current.length === 0 && partesSubidasRef.current.length === 0) return;
     setEstadoReconciliacion("procesando_whisper");
-    const blob = new Blob(trozosRef.current, { type: "audio/webm" });
     const textoPreview = [...bloquesRef.current, pendienteRef.current].filter((s) => s.trim().length > 0).join("\n\n");
 
     const forma = new FormData();
-    forma.append("audio", blob, "dictado-completo.webm");
     forma.append("previewText", textoPreview);
+
+    // Adjuntar todas las partes de audio si existen
+    if (trozosRef.current.length > 0) {
+      const blobCompleto = new Blob(trozosRef.current, { type: "audio/webm" });
+      forma.append("audio", blobCompleto, "dictado-completo.webm");
+    }
 
     try {
       const r = await fetch("/api/transcribir", { method: "POST", body: forma });
       const data = await r.json();
       if (r.ok && data?.exito && typeof data?.textoFinal === "string") {
-        const textoReconciliado = data.textoFinal;
-        const parrafos = textoReconciliado.split("\n\n").filter((p: string) => p.trim().length > 0);
-        bloquesRef.current = parrafos;
-        setBloques(parrafos);
-        setPendiente("");
-        pendienteRef.current = "";
-        setEstadoReconciliacion("reconciliado_whisper");
-        setReconciliacionMensaje(data.motivoReconciliacion || "Transcripción autoritativa Groq Whisper (whisper-large-v3) reconciliada con éxito.");
+        if (!editadoManualmente) {
+          const textoReconciliado = data.textoFinal;
+          const parrafos = textoReconciliado.split("\n\n").filter((p: string) => p.trim().length > 0);
+          bloquesRef.current = parrafos;
+          setBloques(parrafos);
+          setPendiente("");
+          pendienteRef.current = "";
+          setEstadoReconciliacion("reconciliado_whisper");
+        } else {
+          setEstadoReconciliacion("editado_manual");
+        }
+        setReconciliacionMensaje(data.motivoReconciliacion || "Transcripción autoritativa Groq Whisper (whisper-large-v3) procesada con éxito.");
       } else {
-        setEstadoReconciliacion("fallback_preview");
+        setEstadoReconciliacion(editadoManualmente ? "editado_manual" : "fallback_preview");
         setReconciliacionMensaje(`Groq Whisper no disponible: ${data?.detail || "Conservando previsualización ASR en vivo."}`);
       }
     } catch (e) {
-      setEstadoReconciliacion("fallback_preview");
+      setEstadoReconciliacion(editadoManualmente ? "editado_manual" : "fallback_preview");
       setReconciliacionMensaje(`Fallo al solicitar transcripción autoritativa: ${String(e)}.`);
     }
-  }, []);
+  }, [editadoManualmente]);
 
   const subirParteActual = useCallback(async () => {
     if (parteTrozosRef.current.length === 0) return;
@@ -513,6 +522,7 @@ export default function DictadoPage() {
     setReconexiones(0);
     setEstadoReconciliacion("preview_live");
     setReconciliacionMensaje("");
+    setEditadoManualmente(false);
 
     // Reset new states and refs
     sesionIdRef.current = "";
@@ -651,7 +661,9 @@ export default function DictadoPage() {
       {/* Badges de Estado Visual */}
       <div className="flex flex-wrap items-center gap-2 text-xs">
         <span className="px-2 py-0.5 border font-semibold" style={{ borderColor: "var(--khora-border)", backgroundColor: "var(--khora-surface)", color: "var(--khora-ink)" }}>
-          {estadoReconciliacion === "reconciliado_whisper"
+          {estadoReconciliacion === "editado_manual"
+            ? "✏️ Editado manualmente por operador (Protegido)"
+            : estadoReconciliacion === "reconciliado_whisper"
             ? "🟢 Autoritativo: Groq Whisper"
             : estadoReconciliacion === "procesando_whisper"
             ? "🟡 Procesando Groq Whisper..."

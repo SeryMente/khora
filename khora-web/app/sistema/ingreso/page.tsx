@@ -7,7 +7,7 @@ import Link from "next/link";
 import { ensamblarParrafos, Fragmento } from "../../../lib/transcripcion/ensamblar";
 
 type Estado = "inactivo" | "dictando";
-type EstadoReconciliacion = "preview_live" | "procesando_whisper" | "reconciliado_whisper" | "fallback_preview";
+type EstadoReconciliacion = "preview_live" | "procesando_whisper" | "reconciliado_whisper" | "fallback_preview" | "editado_manual";
 
 function generarSesionId() {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -53,6 +53,7 @@ function IngresoContenido() {
   // Editable textarea states
   const [texto, setTexto] = useState("");
   const [editando, setEditando] = useState(false);
+  const [editadoManualmente, setEditadoManualmente] = useState(false);
   const [estabaDictando, setEstabaDictando] = useState(false);
 
   // New states for parts
@@ -148,36 +149,44 @@ function IngresoContenido() {
   }, [pulirBloque]);
 
   const ejecutarTranscripcionAutoritativa = useCallback(async () => {
-    if (trozosRef.current.length === 0) return;
+    if (trozosRef.current.length === 0 && partesSubidasRef.current.length === 0) return;
     setEstadoReconciliacion("procesando_whisper");
-    const blob = new Blob(trozosRef.current, { type: "audio/webm" });
-    const textoPreview = [...bloquesRef.current, pendienteRef.current].filter((s) => s.trim().length > 0).join("\n\n");
+    const textoPreview = editadoManualmente ? texto : [...bloquesRef.current, pendienteRef.current].filter((s) => s.trim().length > 0).join("\n\n");
 
     const forma = new FormData();
-    forma.append("audio", blob, "dictado-completo.webm");
     forma.append("previewText", textoPreview);
+
+    if (trozosRef.current.length > 0) {
+      const blobCompleto = new Blob(trozosRef.current, { type: "audio/webm" });
+      forma.append("audio", blobCompleto, "dictado-completo.webm");
+    }
 
     try {
       const r = await fetch("/api/transcribir", { method: "POST", body: forma });
       const data = await r.json();
       if (r.ok && data?.exito && typeof data?.textoFinal === "string") {
-        const textoReconciliado = data.textoFinal;
-        const parrafos = textoReconciliado.split("\n\n").filter((p: string) => p.trim().length > 0);
-        bloquesRef.current = parrafos;
-        setBloques(parrafos);
-        setPendiente("");
-        pendienteRef.current = "";
-        setEstadoReconciliacion("reconciliado_whisper");
-        setReconciliacionMensaje(data.motivoReconciliacion || "Transcripción autoritativa Groq Whisper (whisper-large-v3) reconciliada con éxito.");
+        if (!editadoManualmente) {
+          const textoReconciliado = data.textoFinal;
+          const parrafos = textoReconciliado.split("\n\n").filter((p: string) => p.trim().length > 0);
+          bloquesRef.current = parrafos;
+          setBloques(parrafos);
+          setPendiente("");
+          pendienteRef.current = "";
+          setTexto(textoReconciliado);
+          setEstadoReconciliacion("reconciliado_whisper");
+        } else {
+          setEstadoReconciliacion("editado_manual");
+        }
+        setReconciliacionMensaje(data.motivoReconciliacion || "Transcripción autoritativa Groq Whisper (whisper-large-v3) procesada con éxito.");
       } else {
-        setEstadoReconciliacion("fallback_preview");
+        setEstadoReconciliacion(editadoManualmente ? "editado_manual" : "fallback_preview");
         setReconciliacionMensaje(`Groq Whisper no disponible: ${data?.detail || "Conservando previsualización ASR en vivo."}`);
       }
     } catch (e) {
-      setEstadoReconciliacion("fallback_preview");
+      setEstadoReconciliacion(editadoManualmente ? "editado_manual" : "fallback_preview");
       setReconciliacionMensaje(`Fallo al solicitar transcripción autoritativa: ${String(e)}.`);
     }
-  }, []);
+  }, [editadoManualmente, texto]);
 
   const subirParteActual = useCallback(async () => {
     if (parteTrozosRef.current.length === 0) return;
@@ -517,6 +526,7 @@ function IngresoContenido() {
     setReconexiones(0);
     setTexto("");
     setEditando(false);
+    setEditadoManualmente(false);
     setEstabaDictando(false);
     setEstadoReconciliacion("preview_live");
     setReconciliacionMensaje("");
@@ -535,12 +545,17 @@ function IngresoContenido() {
     const val = e.target.value;
     if (!editando) {
       setEditando(true);
+      setEditadoManualmente(true);
+      setEstadoReconciliacion("editado_manual");
       if (estado === "dictando") {
         setEstabaDictando(true);
         pausarDictadoPorEdicion();
       } else {
         setEstabaDictando(false);
       }
+    } else {
+      setEditadoManualmente(true);
+      setEstadoReconciliacion("editado_manual");
     }
     setTexto(val);
   };

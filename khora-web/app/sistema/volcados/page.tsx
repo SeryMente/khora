@@ -119,10 +119,9 @@ export default function VolcadosPage() {
       case "encontrado_no_vinculado":
         return <span className="text-yellow-400 font-semibold text-[10px] flex items-center gap-1">🟡 Audio no vinculado</span>;
       case "incompleto":
-case "incompleto":
-case "audio_parcial":
-case "audio_partial":
-  return <span className="text-amber-500 font-semibold text-[10px] flex items-center gap-1">🟠 Audio incompleto</span>;
+      case "audio_parcial":
+      case "audio_partial":
+        return <span className="text-amber-500 font-semibold text-[10px] flex items-center gap-1">🟠 Audio incompleto</span>;
       case "no_recuperable":
       default:
         return <span className="text-red-400 font-semibold text-[10px] flex items-center gap-1">🔴 Audio no recuperable</span>;
@@ -669,13 +668,11 @@ case "audio_partial":
 
                         {/* Audio Status & Graph / Anomaly Badges Line */}
                         <div className="flex items-center justify-between pt-1 border-t border-zinc-800/10 font-mono text-[10px]">
-<div className="flex items-center justify-between pt-1 border-t border-zinc-800/10 font-mono text-[10px]">
-  {renderAudioStatusBadge(item.audio_status || item.integrity)}
-  <span className="opacity-70 text-[9px]">
-    {item.nodos_count > 0 || item.aristas_count > 0 ? `${item.nodos_count}n / ${item.aristas_count}r · ` : ""}
-    {partesNum} {partesNum === 1 ? "parte" : "partes"} · {duration}s
-  </span>
-</div>
+                          {renderAudioStatusBadge(item.audio_status || item.integrity)}
+                          <span className="opacity-70 text-[9px]">
+                            {item.nodos_count > 0 || item.aristas_count > 0 ? `${item.nodos_count}n / ${item.aristas_count}r · ` : ""}
+                            {partesNum} {partesNum === 1 ? "parte" : "partes"} · {duration}s
+                          </span>
                         </div>
                       </div>
                     );
@@ -770,9 +767,7 @@ case "audio_partial":
 
                         {/* TRACE MAP */}
                         <div className="text-xs uppercase font-mono tracking-widest opacity-65 border-b pb-1 mb-2" style={{ borderColor: "var(--khora-border)" }}>
-<div className="text-xs uppercase font-mono tracking-widest opacity-65 border-b pb-1 mb-2" style={{ borderColor: "var(--khora-border)" }}>
-  Árbol de Trazabilidad (Traceability Tree Map)
-</div>
+                          Árbol de Trazabilidad (Traceability Tree Map)
                         </div>
 
                         <div className="relative pl-6 border-l-2 space-y-6" style={{ borderColor: "var(--khora-border)" }}>
