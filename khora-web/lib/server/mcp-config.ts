@@ -12,15 +12,18 @@ export interface McpConfig {
 }
 
 export function getMcpConfig(): McpConfig | null {
-  const isPlaywright = process.env.PLAYWRIGHT_TEST_RUN === "1";
-  const clientId = process.env.MCP_OAUTH_CLIENT_ID || (isPlaywright ? "mock-client-id" : undefined);
-  const clientSecret = process.env.MCP_OAUTH_CLIENT_SECRET || (isPlaywright ? "mock-client-secret" : undefined);
-  const redirectUrisRaw = process.env.MCP_OAUTH_REDIRECT_URIS || (isPlaywright ? "http://localhost:3000/callback" : undefined);
-  const jwtSecret = process.env.MCP_JWT_SECRET || (isPlaywright ? "mock-jwt-secret-at-least-32-chars-long" : undefined);
-  const allowedEmail = process.env.MCP_ALLOWED_EMAIL || (isPlaywright ? "test@example.com" : undefined);
-  const rawCanonicalUrl =
-    process.env.MCP_CANONICAL_URL ||
-    (isPlaywright ? "http://localhost:3000/api/mcp" : undefined);
+const isTest = process.env.PLAYWRIGHT_TEST_RUN === "1" || process.env.NODE_ENV === "test";
+
+const clientId = process.env.MCP_OAUTH_CLIENT_ID || (isTest ? "test-client-id" : undefined);
+const clientSecret = process.env.MCP_OAUTH_CLIENT_SECRET || (isTest ? "test-client-secret" : undefined);
+const redirectUrisRaw = process.env.MCP_OAUTH_REDIRECT_URIS || (isTest ? "http://localhost:3000/callback" : undefined);
+const jwtSecret = process.env.MCP_JWT_SECRET || (isTest ? "test-jwt-secret-min-32-chars-long" : undefined);
+const allowedEmail = process.env.MCP_ALLOWED_EMAIL || (isTest ? "test@example.com" : undefined);
+const rawCanonicalUrl =
+  process.env.MCP_CANONICAL_URL ||
+  (isTest
+    ? "http://localhost:3000/api/mcp"
+    : undefined);
 
   if (
     !clientId ||

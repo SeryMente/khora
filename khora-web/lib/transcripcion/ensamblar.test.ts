@@ -38,10 +38,10 @@ test("2. Pausa de 4000 ms produce DOS párrafos.", () => {
   assert.strictEqual(parrafos[1], "Cómo estás");
 });
 
-test("3. Un fragmento de una sola palabra tras pausa larga SÍ aparece en la salida.", () => {
+test("3. Un fragmento de una sola palabra tras pausa larga (>= 3500ms) SÍ aparece en la salida como párrafo nuevo.", () => {
   const fragmentos: Fragmento[] = [
     { texto: "hola", pausaMsAntes: 0 },
-    { texto: "sí", pausaMsAntes: 3000 },
+    { texto: "sí", pausaMsAntes: 4000 },
   ];
 
   const resultado = ensamblarParrafos(fragmentos);
@@ -121,9 +121,13 @@ test("9. Umbral personalizado de pausa en opciones", () => {
     { texto: "amigo", pausaMsAntes: 3000 },
   ];
 
-  // Con umbral por defecto (2500 ms), debería separar
+  // Con umbral por defecto (3500 ms), 3000 ms se mantiene en un solo párrafo
   const resultadoDefecto = ensamblarParrafos(fragmentos);
-  assert.strictEqual(resultadoDefecto.split("\n\n").length, 2);
+  assert.strictEqual(resultadoDefecto.split("\n\n").length, 1);
+
+  // Con umbral personalizado menor (2000 ms), debería separar
+  const resultadoUmbralMenor = ensamblarParrafos(fragmentos, { umbralMs: 2000 });
+  assert.strictEqual(resultadoUmbralMenor.split("\n\n").length, 2);
 
   // Con umbral de 5000 ms, debería unir en un solo párrafo
   const resultadoPersonalizado = ensamblarParrafos(fragmentos, { umbralMs: 5000 });

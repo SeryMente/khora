@@ -262,7 +262,7 @@ test.describe('Dictado por partes contract test', () => {
 
     // Text should save successfully even though audio failed with 502 (non-JSON)
     expect(dictadoPayload).not.toBeNull();
-    expect(dictadoPayload.texto).toContain('saving even with failed audio upload');
+    expect(dictadoPayload.texto.toLowerCase()).toContain('saving even with failed audio upload');
     expect(dictadoPayload.audioPartes).toBeNull(); // No parts successfully uploaded
 
     // Success message should show up

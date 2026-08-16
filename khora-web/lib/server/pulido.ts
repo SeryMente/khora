@@ -66,14 +66,19 @@ export function construirInstruccion(glosario: Record<string, string>): string {
   return base;
 }
 
-export function guardian(crudo: string, pulido: string): ResultadoPulido {
-  const a = palabrasNormalizadas(crudo);
-  const b = palabrasNormalizadas(pulido);
-  const totalCrudo = a.length;
-  const totalPulido = b.length;
+export function guardian(
+  crudo: string,
+  pulido: string,
+  glosario?: Record<string, string>
+): ResultadoPulido {
+  const g = glosario ?? obtenerGlosario();
+  const crudoNormalizadoConGlosario = aplicarGlosario(crudo, g);
 
-  if (totalPulido < totalCrudo) {
-    const msg = "numero de palabras alterado: " + totalCrudo + " -> " + totalPulido;
+  const a = palabrasNormalizadas(crudoNormalizadoConGlosario);
+  const b = palabrasNormalizadas(pulido);
+
+  if (a.length !== b.length) {
+    const msg = `Invariancia lexical violada: número de palabras difiere (${a.length} vs ${b.length}). Prohibido añadir, eliminar o resumir.`;
     return {
       texto: crudo,
       aceptado: false,
@@ -82,14 +87,16 @@ export function guardian(crudo: string, pulido: string): ResultadoPulido {
     };
   }
 
-  if (totalPulido > totalCrudo + 2) {
-    const msg = "numero de palabras alterado: " + totalCrudo + " -> " + totalPulido;
-    return {
-      texto: crudo,
-      aceptado: false,
-      motivo: msg,
-      motivoRechazo: msg,
-    };
+  for (let i = 0; i < a.length; i++) {
+    if (a[i] !== b[i]) {
+      const msg = `Invariancia lexical violada en la palabra ${i + 1}: esperada "${a[i]}", obtenida "${b[i]}". Prohibido parafrasear, reordenar o cambiar palabras.`;
+      return {
+        texto: crudo,
+        aceptado: false,
+        motivo: msg,
+        motivoRechazo: msg,
+      };
+    }
   }
 
   return {
@@ -156,5 +163,5 @@ export async function pulir(crudo: string): Promise<ResultadoPulido> {
   const salidaLimpia = salida.trim();
   const salidaPostGlosario = aplicarGlosario(salidaLimpia, glosario);
 
-  return guardian(crudo, salidaPostGlosario);
+  return guardian(crudo, salidaPostGlosario, glosario);
 }

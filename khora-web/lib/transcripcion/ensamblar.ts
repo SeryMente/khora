@@ -21,7 +21,7 @@ export function ensamblarParrafos(
     return "";
   }
 
-  const umbralMs = opciones?.umbralMs ?? 2500;
+  const umbralMs = opciones?.umbralMs ?? 3500;
   const parrafos: string[][] = [];
   let parrafoActual: string[] = [];
 
@@ -54,10 +54,8 @@ export function ensamblarParrafos(
     // Limpiar espacios iniciales y finales
     text = text.trim();
 
-    // Capitalizar la primera letra del párrafo
-    if (text.length > 0) {
-      text = text.charAt(0).toUpperCase() + text.slice(1);
-    }
+    // Capitalizar inicio de oraciones dentro del párrafo (después de . ? !)
+    text = text.replace(/(^|[.?!]\s+)(\p{L})/gu, (match, prefix, char) => prefix + char.toUpperCase());
 
     return text;
   });
