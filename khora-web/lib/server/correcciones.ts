@@ -113,17 +113,35 @@ export async function guardarEdicion(volcadoId: string, textoEditado: string, us
   await asegurarEsquema();
   await asegurarVersionInicial(volcadoId);
   const db = getDb();
+
+  // Consultar estado anterior real antes del update
+  const stateRes = await db.query("SELECT estado FROM volcado WHERE id = $1", [volcadoId]);
+  const estadoAnteriorReal = stateRes.rows.length > 0 ? String(stateRes.rows[0].estado ?? "archivado") : "archivado";
+
   const u = await db.query("SELECT version, texto FROM volcado_version WHERE volcado_id = $1 ORDER BY version DESC LIMIT 1", [volcadoId]);
   const ultima: any = u.rows[0];
   const base: string = descifrarTexto(String(ultima.texto ?? ""));
   const versionDesde = Number(ultima.version);
+
   if (base === textoEditado) {
     return { pares: [] as Par[], guardadas: 0, version: versionDesde, sinCambios: true, sha256: sha256de(textoEditado), chars: textoEditado.length };
   }
+
   const pares = calcularDelta(base, textoEditado);
   const nueva = await crearVersion(volcadoId, textoEditado, "edicion manual del operador");
-  await db.query("UPDATE volcado SET texto_original = COALESCE(texto_original, texto), texto = $2, sha256 = $3, chars = $4, estado = $5, editado_en = now(), ediciones = COALESCE(ediciones, 0) + 1 WHERE id = $1", [volcadoId, cifrarTexto(textoEditado), nueva.sha256, textoEditado.length, "en_revision"]);
-  await db.query("INSERT INTO volcado_revision_auditoria (id, volcado_id, accion, estado_anterior, estado_nuevo, version, sha256, usuario) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)", [randomUUID(), volcadoId, "version_guardada", "archivado", "en_revision", nueva.version, nueva.sha256, usuario ?? null]);
+
+  // Al crear una nueva versión, se retorna al estado 'en_revision' e invalidan aprobaciones anteriores
+  await db.query(
+    "UPDATE volcado SET texto_original = COALESCE(texto_original, texto), texto = $2, sha256 = $3, chars = $4, estado = $5, version_aprobada = NULL, sha256_aprobado = NULL, aprobado_en = NULL, aprobador = NULL, editado_en = now(), ediciones = COALESCE(ediciones, 0) + 1 WHERE id = $1",
+    [volcadoId, cifrarTexto(textoEditado), nueva.sha256, textoEditado.length, "en_revision"]
+  );
+
+  // Registro en auditoría con el estado anterior real de la BD
+  await db.query(
+    "INSERT INTO volcado_revision_auditoria (id, volcado_id, accion, estado_anterior, estado_nuevo, version, sha256, usuario) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)",
+    [randomUUID(), volcadoId, "version_guardada", estadoAnteriorReal, "en_revision", nueva.version, nueva.sha256, usuario ?? null]
+  );
+
   let guardadas = 0;
   for (const p of pares) {
     if (p.antes.length === 0 || p.despues.length === 0) continue;

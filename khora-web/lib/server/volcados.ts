@@ -92,6 +92,25 @@ export async function iniciarRevision(volcadoId: string): Promise<void> {
 export async function aprobarVersion(volcadoId: string, version: number, aprobador?: string | null): Promise<{ version: number; sha256: string }> {
   await asegurarTabla();
   const db = getDb();
+
+  // 1. Validar que el volcado existe y su estado es exactamente 'en_revision'
+  const vRes = await db.query("SELECT estado FROM volcado WHERE id = $1", [volcadoId]);
+  if (vRes.rows.length === 0) {
+    throw new Error("Volcado no encontrado");
+  }
+  const estadoAnteriorReal = String(vRes.rows[0].estado ?? "");
+  if (estadoAnteriorReal !== "en_revision") {
+    throw new Error(`Solo se puede aprobar un volcado en estado 'en_revision'. Estado actual: '${estadoAnteriorReal}'`);
+  }
+
+  // 2. Validar que la versión sea la versión vigente más reciente
+  const maxRes = await db.query("SELECT COALESCE(MAX(version), 0)::int AS ultima FROM volcado_version WHERE volcado_id = $1", [volcadoId]);
+  const versionVigente = Number(maxRes.rows[0]?.ultima ?? 0);
+  if (version !== versionVigente) {
+    throw new Error(`La versión a aprobar debe ser la versión vigente más reciente (${versionVigente}). Se solicitó la versión ${version}`);
+  }
+
+  // 3. Obtener la versión y validar integridad de SHA256
   const res = await db.query("SELECT sha256, texto FROM volcado_version WHERE volcado_id = $1 AND version = $2", [volcadoId, version]);
   if (res.rows.length === 0) {
     throw new Error("La versión solicitada no existe");
@@ -104,16 +123,23 @@ export async function aprobarVersion(volcadoId: string, version: number, aprobad
     throw new Error("Integridad rota: el SHA256 no coincide");
   }
 
+  // 4. Transición de estado: en_revision -> listo_ingesta
   await db.query("UPDATE volcado SET estado = 'listo_ingesta', version_aprobada = $2, sha256_aprobado = $3, aprobado_en = now(), aprobador = $4 WHERE id = $1", [volcadoId, version, sha256, aprobador ?? null]);
-  await db.query("INSERT INTO volcado_revision_auditoria (id, volcado_id, accion, estado_anterior, estado_nuevo, version, sha256, usuario) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)", [randomUUID(), volcadoId, "version_aprobada", "en_revision", "listo_ingesta", version, sha256, aprobador ?? null]);
+
+  // 5. Registro de auditoría con estado anterior real
+  await db.query("INSERT INTO volcado_revision_auditoria (id, volcado_id, accion, estado_anterior, estado_nuevo, version, sha256, usuario) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)", [randomUUID(), volcadoId, "version_aprobada", estadoAnteriorReal, "listo_ingesta", version, sha256, aprobador ?? null]);
+
   return { version, sha256 };
 }
 
 export async function reabrirRevision(volcadoId: string, usuario?: string | null): Promise<void> {
   await asegurarTabla();
   const db = getDb();
+  const vRes = await db.query("SELECT estado FROM volcado WHERE id = $1", [volcadoId]);
+  const estadoAnteriorReal = vRes.rows.length > 0 ? String(vRes.rows[0].estado ?? "listo_ingesta") : "listo_ingesta";
+
   await db.query("UPDATE volcado SET estado = 'en_revision', version_aprobada = NULL, sha256_aprobado = NULL, aprobado_en = NULL, aprobador = NULL WHERE id = $1", [volcadoId]);
-  await db.query("INSERT INTO volcado_revision_auditoria (id, volcado_id, accion, estado_anterior, estado_nuevo, usuario) VALUES ($1,$2,$3,$4,$5,$6)", [randomUUID(), volcadoId, "revision_reabierta", "listo_ingesta", "en_revision", usuario ?? null]);
+  await db.query("INSERT INTO volcado_revision_auditoria (id, volcado_id, accion, estado_anterior, estado_nuevo, usuario) VALUES ($1,$2,$3,$4,$5,$6)", [randomUUID(), volcadoId, "revision_reabierta", estadoAnteriorReal, "en_revision", usuario ?? null]);
 }
 
 export async function resumenVolcados(): Promise<Array<{ estado: string; n: number; chars: number }>> {

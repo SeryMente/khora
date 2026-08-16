@@ -12,16 +12,15 @@ export interface McpConfig {
 }
 
 export function getMcpConfig(): McpConfig | null {
-  const clientId = process.env.MCP_OAUTH_CLIENT_ID;
-  const clientSecret = process.env.MCP_OAUTH_CLIENT_SECRET;
-  const redirectUrisRaw = process.env.MCP_OAUTH_REDIRECT_URIS;
-  const jwtSecret = process.env.MCP_JWT_SECRET;
-  const allowedEmail = process.env.MCP_ALLOWED_EMAIL;
+  const isPlaywright = process.env.PLAYWRIGHT_TEST_RUN === "1";
+  const clientId = process.env.MCP_OAUTH_CLIENT_ID || (isPlaywright ? "mock-client-id" : undefined);
+  const clientSecret = process.env.MCP_OAUTH_CLIENT_SECRET || (isPlaywright ? "mock-client-secret" : undefined);
+  const redirectUrisRaw = process.env.MCP_OAUTH_REDIRECT_URIS || (isPlaywright ? "http://localhost:3000/callback" : undefined);
+  const jwtSecret = process.env.MCP_JWT_SECRET || (isPlaywright ? "mock-jwt-secret-at-least-32-chars-long" : undefined);
+  const allowedEmail = process.env.MCP_ALLOWED_EMAIL || (isPlaywright ? "test@example.com" : undefined);
   const rawCanonicalUrl =
     process.env.MCP_CANONICAL_URL ||
-    (process.env.PLAYWRIGHT_TEST_RUN === "1"
-      ? "http://localhost:3000/api/mcp"
-      : undefined);
+    (isPlaywright ? "http://localhost:3000/api/mcp" : undefined);
 
   if (
     !clientId ||
