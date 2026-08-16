@@ -815,9 +815,8 @@ case "audio_partial":
                             </div>
                             <div className="space-y-1">
                               <h4 className="font-bold text-xs">
-<h4 className="font-bold text-xs">
-  📝 Transcripción <span className="text-emerald-500">✓ Registrada</span>
-</h4>
+                                📝 Transcripción <span className="text-emerald-500">✓ Registrada</span>
+                              </h4>
 <div className="text-[11px] opacity-75 space-y-0.5 font-mono">
   <div>Versión actual: v{selectedItem.version_actual || 1}</div>
 </div>
