@@ -259,7 +259,8 @@ export default function EditarPage() {
   return (
     <main style={{ maxWidth: 1200, margin: "0 auto", padding: 24, paddingBottom: "6rem" }}>
       <header style={{ marginBottom: 20 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 700, margin: 0 }}>Estación de Control de Calidad y Revisión</h1>
+        <h1 style={{ fontSize: 24, fontWeight: 700, margin: 0 }}>Editar transcripciones</h1>
+        <h2 style={{ fontSize: 16, margin: "4px 0 0", fontWeight: 600, opacity: 0.9 }}>Estación de Control de Calidad y Revisión</h2>
         <p style={{ fontSize: 13, opacity: 0.8, marginTop: 4 }}>
           Asistente de revisión manual asistida. La automatización sugiere; el operador decide. La transcripción original se conserva intacta.
         </p>

@@ -95,7 +95,6 @@ export default function VolcadosPage() {
   const [volcadosError, setVolcadosError] = useState<string | null>(null);
   const [volcadosAviso, setVolcadosAviso] = useState<string | null>(null);
   const [volcadosItems, setVolcadosItems] = useState<Volcado[]>([]);
-  const [selectedLegacyVolcado, setSelectedLegacyVolcado] = useState<Volcado | null>(null);
 
   // Drawer focus trap ref
   const drawerRef = useRef<HTMLDivElement>(null);
@@ -120,7 +119,7 @@ export default function VolcadosPage() {
       case "encontrado_no_vinculado":
         return <span className="text-yellow-400 font-semibold text-[10px] flex items-center gap-1">🟡 Audio no vinculado</span>;
       case "incompleto":
-        return <span className="text-amber-500 font-semibold text-[10px] flex items-center gap-1">🟠 Audio incompleto</span>;
+        return <span className="text-amber-500 font-semibold text-[10px] flex items-center gap-1">Incompleto</span>;
       case "no_recuperable":
       default:
         return <span className="text-red-400 font-semibold text-[10px] flex items-center gap-1">🔴 Audio no recuperable</span>;
@@ -283,7 +282,7 @@ export default function VolcadosPage() {
 
     setApprovingVersion(true);
     try {
-      const res = await fetch(`/api/revision/${selectedId}`, {
+      const res = await fetch(`/api/revision/${selectedId}/aprobar`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -303,7 +302,7 @@ export default function VolcadosPage() {
           });
         }
       } else {
-        alert("Error al aprobar: " + (data.error || "Desconocido"));
+        alert("Error al aprobar: " + (data.error || data.detail || "Desconocido"));
       }
     } catch (err: any) {
       alert("Error de red: " + err.message);
@@ -658,19 +657,31 @@ export default function VolcadosPage() {
                               )}
                               <h3 className="font-bold text-[11px] truncate">{item.titulo || "Sin título"}</h3>
                             </div>
-                            <span className="text-[9px] font-mono opacity-50 block mt-0.5">UUID: {item.id.slice(0, 8)}...</span>
+                            <span className="text-[9px] font-mono opacity-50 block mt-0.5">UUID: {item.id}</span>
                           </div>
                           <span className="text-[9px] opacity-60 font-mono shrink-0">
                             {new Date(item.recibido_en).toLocaleDateString()}
                           </span>
                         </div>
 
-                        {/* Audio Status & Parts Compact Line */}
+                        {/* Audio Status & Graph / Anomaly Badges Line */}
                         <div className="flex items-center justify-between pt-1 border-t border-zinc-800/10 font-mono text-[10px]">
-                          {renderAudioStatusBadge(item.audio_status)}
-                          <span className="opacity-70 text-[9px]">
-                            {partesNum} {partesNum === 1 ? "parte" : "partes"} · {duration}s
-                          </span>
+                          <div className="flex items-center gap-2">
+                            {renderAudioStatusBadge(item.audio_status)}
+                            {(item.integrity === "audio_partial" || item.integrity === "text_without_audio" || item.audio_status === "incompleto" || item.audio_status === "no_recuperable") && (
+                              <span className="text-amber-500 font-semibold text-[10px]">Incompleto</span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2 text-[9px] opacity-80">
+                            {(item.nodos_count > 0 || item.aristas_count > 0) && (
+                              <span className="font-mono px-1 py-0.5 bg-zinc-800 border border-zinc-700 text-zinc-300">
+                                {item.nodos_count}n / {item.aristas_count}r
+                              </span>
+                            )}
+                            <span className="opacity-70">
+                              {partesNum} {partesNum === 1 ? "parte" : "partes"} · {duration}s
+                            </span>
+                          </div>
                         </div>
                       </div>
                     );
@@ -765,18 +776,18 @@ export default function VolcadosPage() {
 
                         {/* TRACE MAP */}
                         <div className="text-xs uppercase font-mono tracking-widest opacity-65 border-b pb-1 mb-2" style={{ borderColor: "var(--khora-border)" }}>
-                          Árbol de Trazabilidad
+                          Traceability Tree Map
                         </div>
 
                         <div className="relative pl-6 border-l-2 space-y-6" style={{ borderColor: "var(--khora-border)" }}>
-                          {/* 🎙 CAPTURA / SESION */}
+                          {/* 🎙 CAPTURA */}
                           <div className="relative">
                             <div className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full flex items-center justify-center border" style={{ backgroundColor: "var(--khora-bg)", borderColor: "var(--khora-accent)" }}>
                               <Icons.Mic className="w-2.5 h-2.5 text-zinc-400" />
                             </div>
                             <div className="space-y-1">
                               <h4 className="font-bold text-xs flex items-center gap-1.5">
-                                🎙 Captura y Sesión <span className="text-emerald-500">✓ Registrado</span>
+                                🎙 Captura <span className="text-emerald-500">✓ Registrado</span>
                               </h4>
                               <div className="text-[11px] opacity-75 space-y-0.5 font-mono">
                                 <div>Fecha: {new Date(selectedItem.recibido_en).toLocaleString()}</div>
@@ -792,12 +803,42 @@ export default function VolcadosPage() {
                             </div>
                             <div className="space-y-1">
                               <h4 className="font-bold text-xs">
-                                💾 Volcado <span className="text-emerald-500">✓ Persistido</span>
+                                💾 Archivo <span className="text-emerald-500">✓ Persistido</span>
                               </h4>
                               <div className="text-[11px] opacity-75 space-y-0.5 font-mono">
                                 <div>Total caracteres: {selectedItem.chars}</div>
                                 <div>UUID: {selectedItem.id}</div>
                               </div>
+                            </div>
+                          </div>
+
+                          {/* 📝 TRANSCRIPCION */}
+                          <div className="relative">
+                            <div className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full flex items-center justify-center border" style={{ backgroundColor: "var(--khora-bg)", borderColor: "var(--khora-accent)" }}>
+                              <Icons.FileText className="w-2.5 h-2.5 text-zinc-400" />
+                            </div>
+                            <div className="space-y-1">
+                              <h4 className="font-bold text-xs">
+                                📝 Transcripción <span className="text-emerald-500">✓ Procesada</span>
+                              </h4>
+                              <div className="text-[11px] opacity-75 font-mono">Versión actual: v{selectedItem.version_actual || 1}</div>
+                            </div>
+                          </div>
+
+                          {/* ✓ APROBACION */}
+                          <div className="relative">
+                            <div className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full flex items-center justify-center border" style={{ backgroundColor: "var(--khora-bg)", borderColor: "var(--khora-accent)" }}>
+                              <Icons.CheckCircle className="w-2.5 h-2.5 text-zinc-400" />
+                            </div>
+                            <div className="space-y-1">
+                              <h4 className="font-bold text-xs">
+                                ✓ Aprobación{" "}
+                                {selectedItem.version_aprobada ? (
+                                  <span className="text-emerald-500">✓ Aprobado v{selectedItem.version_aprobada}</span>
+                                ) : (
+                                  <span className="text-orange-500">○ Pendiente de aprobación</span>
+                                )}
+                              </h4>
                             </div>
                           </div>
 
@@ -808,7 +849,7 @@ export default function VolcadosPage() {
                             </div>
                             <div className="space-y-1">
                               <h4 className="font-bold text-xs">
-                                ⚙ Ingesta Kernel{" "}
+                                ⚙ Ingesta{" "}
                                 {selectedItem.estado === "ingerido" ? (
                                   <span className="text-emerald-500">✓ Ingerido</span>
                                 ) : selectedItem.estado === "fallido" ? (
@@ -819,11 +860,30 @@ export default function VolcadosPage() {
                               </h4>
                             </div>
                           </div>
+
+                          {/* ◎ GRAFO PKG PROYECCIONES */}
+                          <div className="relative">
+                            <div className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full flex items-center justify-center border" style={{ backgroundColor: "var(--khora-bg)", borderColor: "var(--khora-accent)" }}>
+                              <Icons.Share2 className="w-2.5 h-2.5 text-zinc-400" />
+                            </div>
+                            <div className="space-y-1">
+                              <h4 className="font-bold text-xs">◎ Grafo PKG Proyecciones</h4>
+                              <div className="text-[11px] opacity-75 font-mono">
+                                Nodos: {selectedItem.nodos_count || 0} · Aristas: {selectedItem.aristas_count || 0}
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     ) : (
                       <div className="space-y-6">
                         {/* REVISION AND EDIT VIEW */}
+                        {!selectedItem.version_aprobada && (
+                          <div className="p-2.5 bg-amber-900/30 text-amber-300 border border-amber-800/50 text-xs font-mono">
+                            Bloqueado para Ingesta: Requiere aprobación explícita de versión.
+                          </div>
+                        )}
+
                         <div className="p-3 border space-y-2 rounded-none" style={{ backgroundColor: "var(--khora-bg)", borderColor: "var(--khora-border)" }}>
                           <div className="flex justify-between items-center text-[10px] font-mono tracking-wider opacity-60 uppercase">
                             <span>Reproducción de Audio</span>
@@ -878,13 +938,30 @@ export default function VolcadosPage() {
                             value={editableTexto}
                             onChange={(e) => setEditableTexto(e.target.value)}
                             className="w-full p-2.5 border rounded-none font-mono text-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
-                            rows={10}
+                            rows={8}
                             style={{
                               backgroundColor: "var(--khora-bg)",
                               color: "var(--khora-ink)",
                               borderColor: "var(--khora-border)",
                             }}
                           />
+                        </div>
+
+                        {/* Delta section */}
+                        <div className="space-y-2 border-t pt-3" style={{ borderColor: "var(--khora-border)" }}>
+                          <h4 className="text-xs font-mono uppercase tracking-wider font-bold">Delta Changes</h4>
+                          {deltaPairs.length > 0 ? (
+                            <div className="space-y-1 font-mono text-xs">
+                              {deltaPairs.map((p, idx) => (
+                                <div key={idx} className="p-1.5 bg-zinc-900 border border-zinc-800 rounded-none">
+                                  {p.antes && <div className="text-red-400">− {p.antes}</div>}
+                                  {p.despues && <div className="text-emerald-400">+ {p.despues}</div>}
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="text-xs opacity-60 font-mono italic">Sin cambios en el delta.</div>
+                          )}
                         </div>
 
                         {/* Action buttons */}
@@ -912,6 +989,36 @@ export default function VolcadosPage() {
                             {approvingVersion ? "Aprobando..." : `Aprobar v${selectedVersionNum}`}
                           </button>
                         </div>
+
+                        {/* Ingestion Action if Approved */}
+                        {selectedItem.version_aprobada && (
+                          <div className="p-3 border space-y-2 bg-emerald-950/20 border-emerald-800/40 text-xs font-mono">
+                            <div className="flex justify-between items-center text-emerald-400 font-bold">
+                              <span>✓ VERSIÓN APROBADA v{selectedItem.version_aprobada}</span>
+                              {selectedItem.estado === "ingerido" && <span className="text-emerald-300">✓ INGESTADO</span>}
+                            </div>
+
+                            {selectedItem.io_id && (
+                              <div className="text-[11px] text-emerald-300">
+                                io_id: {selectedItem.io_id}
+                              </div>
+                            )}
+
+                            <button
+                              onClick={handleIngestApproved}
+                              disabled={ingesting}
+                              className="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold cursor-pointer transition-colors"
+                            >
+                              {ingesting ? "Ingiriendo..." : "Ingerir en Grafo PKG"}
+                            </button>
+
+                            {ingestaResult && (
+                              <div className={`p-2 text-[11px] border ${ingestaResult.success ? "border-emerald-600 bg-emerald-900/40 text-emerald-200" : "border-red-600 bg-red-900/40 text-red-200"}`}>
+                                {ingestaResult.success ? `Ingesta completada. io_id: ${ingestaResult.io_id}` : `Error: ${ingestaResult.error}`}
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
