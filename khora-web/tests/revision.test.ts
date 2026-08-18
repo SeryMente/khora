@@ -1,4 +1,4 @@
-// @l0 L0-002-R · @req REVISION/REQ-1
+// @l0 L0-002-R · @req REVISION/REQ-1,UI-TRANSICION-REVISION/REQ-1
 import test from "node:test";
 import assert from "node:assert";
 
@@ -171,6 +171,8 @@ db.query = (async (sql: string, params?: any[]): Promise<any> => {
     if (v) {
       if (normSql.includes("'pendiente_revision'")) {
         v.estado = "pendiente_revision";
+      } else if (normSql.includes("'en_revision'")) {
+        v.estado = "en_revision";
       } else {
         v.estado = p[1];
       }
@@ -667,4 +669,25 @@ test("20. Auditoría registra estado anterior real", async () => {
   assert.ok(auditAprobado, "Debe existir auditoría de versión aprobada");
   assert.strictEqual(auditAprobado.estado_anterior, "en_revision", "Debe registrar el estado anterior real 'en_revision'");
   assert.strictEqual(auditAprobado.estado_nuevo, "listo_ingesta");
+});
+
+test("21. Transición de inicio de revisión (archivado -> pendiente_revision -> en_revision)", async () => {
+  reiniciarBaseDeDatos();
+  const volcadoId = "21212121-2121-2121-2121-212121212121";
+  volcadosMemory.push({
+    id: volcadoId,
+    texto: cifrarTexto("Volcado recien archivado"),
+    sha256: sha256de("Volcado recien archivado"),
+    chars: 24,
+    estado: "archivado",
+    ediciones: 0
+  });
+
+  await marcarPendienteRevision(volcadoId);
+  let volcado = volcadosMemory.find(v => v.id === volcadoId);
+  assert.strictEqual(volcado.estado, "pendiente_revision", "Debe pasar a pendiente_revision");
+
+  await iniciarRevision(volcadoId);
+  volcado = volcadosMemory.find(v => v.id === volcadoId);
+  assert.strictEqual(volcado.estado, "en_revision", "Debe pasar a en_revision");
 });
