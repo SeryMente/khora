@@ -1,4 +1,4 @@
-// @l0 L0-002-R · @req PIPELINE/REQ-3,UI-02/RESKIN,UI-PIPELINE-FIX/REQ-1 · @acr ACR-1.2 · @req TRACE-SESSION/010
+// @l0 L0-002-R · @req PIPELINE/REQ-3,UI-02/RESKIN,UI-PIPELINE-FIX/REQ-1,UI-TRANSICION-REVISION/REQ-1 · @acr ACR-1.2 · @req TRACE-SESSION/010
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
@@ -79,6 +79,7 @@ export default function VolcadosPage() {
   const [versiones, setVersiones] = useState<any[]>([]);
   const [selectedVersionNum, setSelectedVersionNum] = useState<number>(1);
   const [savingVersion, setSavingVersion] = useState(false);
+  const [startingRevision, setStartingRevision] = useState(false);
   const [approvingVersion, setApprovingVersion] = useState(false);
   const [ingesting, setIngesting] = useState(false);
   const [ingestaResult, setIngestaResult] = useState<any>(null);
@@ -253,6 +254,35 @@ export default function VolcadosPage() {
       void fetchDeltaDiff();
     }
   }, [selectedVersionNum, selectedDeltaFrom, selectedId]);
+
+  const handleIniciarRevision = async () => {
+    if (!selectedId) return;
+    setStartingRevision(true);
+    try {
+      const res = await fetch(`/api/revision/${selectedId}/iniciar`, {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (res.ok) {
+        const items = await fetchPipeline();
+        const updated = items.find((i: PipelineItem) => i.id === selectedId);
+        if (updated) {
+          setSelectedItem(updated);
+        } else if (selectedItem) {
+          setSelectedItem({
+            ...selectedItem,
+            estado: "en_revision",
+          });
+        }
+      } else {
+        alert("Error al iniciar revisión: " + (data.detail || data.error || "Desconocido"));
+      }
+    } catch (err: any) {
+      alert("Error de red: " + err.message);
+    } finally {
+      setStartingRevision(false);
+    }
+  };
 
   const handleSaveEdits = async () => {
     if (!selectedId || !editableTexto.trim()) return;
@@ -739,6 +769,22 @@ export default function VolcadosPage() {
 
                   {/* Detail Content */}
                   <div className="flex-1 space-y-6 overflow-y-auto">
+                    {(selectedItem.estado === "archivado" || selectedItem.estado === "pendiente_revision") && (
+                      <div className="p-3 border border-amber-500/40 bg-amber-500/10 flex items-center justify-between gap-2 text-xs font-mono">
+                        <span className="text-amber-300 font-semibold">
+                          Estado: {selectedItem.estado}. Inicia la revisión para habilitar la aprobación e ingesta.
+                        </span>
+                        <button
+                          onClick={handleIniciarRevision}
+                          disabled={startingRevision}
+                          className="px-3 py-1.5 border font-bold text-xs bg-amber-500 text-zinc-950 border-amber-400 hover:opacity-90 cursor-pointer shrink-0 transition-colors flex items-center gap-1"
+                        >
+                          <Icons.Play size={14} />
+                          {startingRevision ? "Iniciando..." : "Iniciar revisión"}
+                        </button>
+                      </div>
+                    )}
+
                     {drawerSubTab === "trace" ? (
                       <div className="space-y-6">
                         {/* Audio and Session Metadata Box */}
