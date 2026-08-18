@@ -1,81 +1,165 @@
 // @l0 L0-002-R · @req FIX-DICTADO/D3-D4
+import { logTelemetryEvent } from "../telemetry";
+
+export type MotivoLimiteParrafo =
+  | "cierre_linguistico"
+  | "cambio_discursivo"
+  | "longitud_segura"
+  | "finalizacion_dictado"
+  | "recuperacion_error"
+  | "decision_manual";
 
 export type Fragmento = {
+  id?: string;
   texto: string;
   pausaMsAntes: number;
+  start_ms?: number;
+  end_ms?: number;
+  estabilizado?: boolean;
+  motivoLimite?: MotivoLimiteParrafo;
 };
 
 export interface OpcionesEnsamblar {
   umbralMs?: number;
+  maxPalabrasObjetivo?: number;
+  maxPalabrasTecho?: number;
+  sessionId?: string;
+  emitirTelemetria?: boolean;
 }
 
-/**
- * Une fragmentos de transcripción en párrafos de redacción normal (estándar "clean verbatim").
- * El salto de párrafo lo produce el cambio de tema / pausa mayor o igual al umbral.
- */
-// Palabras y conectores subordinantes / de continuidad que indican pausa de respiración dentro de una misma idea
-const RE_CONTINUACION_INICIO = /^(porque|pero|y|o|que|sino|aunque|para|donde|como|si|cuando|pues|mientras)\b/i;
+export interface ResultadoEnsamblado {
+  texto: string;
+  parrafos: string[];
+  motivosLimites: { indiceParrafo: number; motivo: MotivoLimiteParrafo }[];
+}
+
+// Conectores subordinantes / de continuidad que indican pausa de respiración o encadenamiento dentro de la misma idea
+const RE_CONTINUACION_INICIO = /^(porque|pero|y|o|que|sino|aunque|para|donde|como|si|cuando|pues|mientras|corrijo|más bien|mejor dicho|o sea)\b/i;
+
+// Conectores adversativos / de enlace intra-párrafo que enlazan oraciones dentro del mismo párrafo
+const RE_ENLACE_INTRAPARRAFO = /^(sin embargo|por lo tanto|no obstante|entonces|por consiguiente|en consecuencia|de hecho|además|así que)\b/i;
+
+// Expresiones de autocorrección y reinicio que deben conservarse dentro del mismo bloque
+const RE_AUTOCORRECCION = /^(corrijo|más bien|mejor dicho|o sea)\b/i;
 
 // Palabras o preposiciones con las que no puede cerrar un párrafo de forma natural
 const RE_INCOMPLETO_FINAL = /(?:^|\s)(?:de|del|la|el|los|las|un|una|unos|unas|con|sin|en|por|para|que|porque|pero|y|o|ni|como|si|cuando|donde|a|al|hacia|hasta|sobre|tras|entre|durante|mediante)$/i;
 
-/**
- * Evalúa si un fragmento consecutivo debe iniciar un nuevo párrafo.
- * Prioridad conceptual:
- * 1. Cierre de unidad lingüística / terminal de oración (. ? ! ...)
- * 2. Estructura y contexto de subordinación vs independencia discursiva
- * 3. Silencio / pausa únicamente como señal auxiliar
- */
-function esNuevoParrafo(
-  textoPrevio: string,
-  textoNuevo: string,
-  pausaMs: number,
-  umbralMs: number
-): boolean {
-  const prevTrim = textoPrevio.trim();
-  const nuevoTrim = textoNuevo.trim();
+// Conectores de transición o cambio discursivo fuerte (solo separan con evidencia explícita de cambio de tema)
+const RE_CAMBIO_DISCURSIVO = /^(por otro lado|cambiando de tema|en otro orden de ideas|por otra parte|en cuanto a)\b/i;
 
-  if (!prevTrim || !nuevoTrim) return false;
-
-  const tienePuntuacionTerminal = /[.?!…]$/.test(prevTrim);
-  const esComaOFinalIncompleto = /[,;:]$/.test(prevTrim) || RE_INCOMPLETO_FINAL.test(prevTrim);
-  const empiezaConContinuacion = RE_CONTINUACION_INICIO.test(nuevoTrim);
-
-  // Si el texto previo termina con coma, preposición o el nuevo empieza con conector de continuidad (porque, pero, y, etc.)
-  // se trata de una pausa de respiración dentro de la misma idea, a menos que el silencio sea extremadamente largo (>= 12000ms)
-  if ((esComaOFinalIncompleto || empiezaConContinuacion) && !tienePuntuacionTerminal) {
-    return pausaMs >= 12000;
-  }
-
-  // 1. Si la oración anterior cerró formalmente con punto/signo terminal:
-  if (tienePuntuacionTerminal) {
-    // Si hay una pausa razonable (>= 1000ms) o la pausa por defecto o el nuevo texto es una nueva oración independiente
-    return pausaMs >= 1000 || pausaMs >= umbralMs;
-  }
-
-  // 2. Si no hay puntuación terminal explícita pero hay una pausa auxiliar fuerte (>= umbralMs)
-  // y la unidad previa no está sintácticamente incompleta ni la nueva es subordinada:
-  if (pausaMs >= umbralMs) {
-    return true;
-  }
-
-  return false;
+function contarPalabras(texto: string): number {
+  const matches = texto.match(/[\p{L}\p{N}]+/gu);
+  return matches ? matches.length : 0;
 }
 
 /**
- * Une fragmentos de transcripción en párrafos de redacción normal (estándar "clean verbatim").
- * El salto de párrafo responde prioritariamente a la clausura sintáctica y discursiva.
+ * Evalúa si un fragmento consecutivo debe iniciar un nuevo párrafo.
+ *
+ * Jerarquía de decisión multiseñal (Regla Invariante Fase 2):
+ * 1. Cierre lingüístico y sintáctico verificable (. ? ! …)
+ * 2. Continuidad o cambio discursivo (conectores, marcadores discursivos)
+ * 3. Relación con la unidad previa
+ * 4. Puntuación y estructura sintáctica
+ * 5. Salvaguarda de longitud (~180-240 palabras)
+ * 6. Silencio únicamente como señal auxiliar (NUNCA es condición suficiente por sí solo)
+ */
+function evaluarLimiteParrafo(
+  textoPrevio: string,
+  textoNuevo: string,
+  pausaMs: number,
+  opciones?: OpcionesEnsamblar
+): { esNuevo: boolean; motivo?: MotivoLimiteParrafo } {
+  const prevTrim = textoPrevio.trim();
+  const nuevoTrim = textoNuevo.trim();
+
+  if (!prevTrim || !nuevoTrim) return { esNuevo: false };
+
+  const maxObjetivo = opciones?.maxPalabrasObjetivo ?? 180;
+  const maxTecho = opciones?.maxPalabrasTecho ?? 240;
+  const palabrasAcumuladas = contarPalabras(prevTrim);
+
+  const tienePuntuacionTerminal = /[.?!…]$/.test(prevTrim);
+  const esComaOIncompleto = /[,;:]$/.test(prevTrim) || RE_INCOMPLETO_FINAL.test(prevTrim);
+  const empiezaConContinuacion = RE_CONTINUACION_INICIO.test(nuevoTrim);
+  const empiezaConEnlaceIntra = RE_ENLACE_INTRAPARRAFO.test(nuevoTrim);
+  const esAutocorreccion = RE_AUTOCORRECCION.test(nuevoTrim);
+  const esCambioDiscursivo = RE_CAMBIO_DISCURSIVO.test(nuevoTrim);
+
+  // 1. INVARIANTE DURA: Las autocorrecciones ("Corrijo", "más bien", "mejor dicho", "o sea")
+  // pertenecen a la misma unidad discursiva y jamás abren un párrafo por sí solas.
+  if (esAutocorreccion) {
+    return { esNuevo: false };
+  }
+
+  // 2. INVARIANTE DURA: Salvaguarda de longitud
+  // Si las palabras acumuladas superan el objetivo (~180) o el techo (~240), se aplica un límite de longitud segura.
+  if (palabrasAcumuladas >= maxObjetivo) {
+    if (tienePuntuacionTerminal || /[.,;:!?]$/.test(prevTrim) || palabrasAcumuladas >= maxTecho) {
+      return { esNuevo: true, motivo: "longitud_segura" };
+    }
+  }
+
+  // 3. INVARIANTE DURA: Si la frase previa está sintácticamente incompleta o el nuevo texto
+  // es una continuación/enlace directo ("porque", "pero", "sin embargo", "por lo tanto", "y", "para", etc.),
+  // NO se crea un nuevo párrafo, manteniéndolo en la misma unidad discursiva.
+  if ((esComaOIncompleto || empiezaConContinuacion || empiezaConEnlaceIntra) && (!tienePuntuacionTerminal || empiezaConEnlaceIntra)) {
+    return { esNuevo: false };
+  }
+
+  // 4. Cambio discursivo explícito ("por otro lado", "cambiando de tema")
+  if (esCambioDiscursivo && tienePuntuacionTerminal) {
+    return { esNuevo: true, motivo: "cambio_discursivo" };
+  }
+
+  // 5. Cierre lingüístico / sintáctico: Si la oración anterior cerró con punto o signo terminal
+  // y la siguiente oración es una unidad independiente que abre una nueva idea:
+  if (tienePuntuacionTerminal) {
+    // Si inicia con conector de enlace intra-párrafo ("sin embargo", "por lo tanto"), permanece en el mismo párrafo
+    if (empiezaConEnlaceIntra) {
+      return { esNuevo: false };
+    }
+
+    // Si es un cambio discursivo o unidad independiente
+    if (esCambioDiscursivo) {
+      return { esNuevo: true, motivo: "cambio_discursivo" };
+    }
+
+    // Si hay una pausa significativa o es una oración independiente
+    if (pausaMs >= 1000 || !empiezaConContinuacion) {
+      return { esNuevo: true, motivo: "cierre_linguistico" };
+    }
+  }
+
+  // El silencio solo es una evidencia auxiliar secundaria cuando YA existe evidencia de cierre lingüístico previa.
+  // El silencio aislado NUNCA produce un nuevo párrafo.
+  return { esNuevo: false };
+}
+
+/**
+ * Une fragmentos de transcripción en párrafos estructurados por unidades discursivas y sintácticas.
+ * Cumple el estándar Clean Verbatim Semántico de Khora.
  */
 export function ensamblarParrafos(
   fragmentos: Fragmento[],
   opciones?: OpcionesEnsamblar
 ): string {
+  return ensamblarParrafosEstructurado(fragmentos, opciones).texto;
+}
+
+/**
+ * Versión estructurada del ensamblador que devuelve el texto, el desglose de párrafos y los motivos de cada límite.
+ */
+export function ensamblarParrafosEstructurado(
+  fragmentos: Fragmento[],
+  opciones?: OpcionesEnsamblar
+): ResultadoEnsamblado {
   if (!fragmentos || fragmentos.length === 0) {
-    return "";
+    return { texto: "", parrafos: [], motivosLimites: [] };
   }
 
-  const umbralMs = opciones?.umbralMs ?? 3500;
   const parrafos: string[][] = [];
+  const motivosLimites: { indiceParrafo: number; motivo: MotivoLimiteParrafo }[] = [];
   let parrafoActual: string[] = [];
 
   for (let i = 0; i < fragmentos.length; i++) {
@@ -86,9 +170,15 @@ export function ensamblarParrafos(
     }
 
     const textoPrevio = parrafoActual.join(" ");
-    if (esNuevoParrafo(textoPrevio, frag.texto, frag.pausaMsAntes, umbralMs)) {
+    const evaluacion = evaluarLimiteParrafo(textoPrevio, frag.texto, frag.pausaMsAntes, opciones);
+
+    if (evaluacion.esNuevo) {
       if (parrafoActual.length > 0) {
         parrafos.push(parrafoActual);
+        motivosLimites.push({
+          indiceParrafo: parrafos.length - 1,
+          motivo: evaluacion.motivo ?? "cierre_linguistico",
+        });
       }
       parrafoActual = [frag.texto];
     } else {
@@ -118,7 +208,30 @@ export function ensamblarParrafos(
     return text;
   });
 
-  return parrafosFormateados.filter((p) => p.length > 0).join("\n\n");
+  const textoFinal = parrafosFormateados.filter((p) => p.length > 0).join("\n\n");
+
+  // Registrar telemetría estructurada sin texto ni audio si está activada
+  if (opciones?.emitirTelemetria !== false && motivosLimites.length > 0 && typeof window !== "undefined") {
+    for (const item of motivosLimites) {
+      void logTelemetryEvent({
+        moduleId: "ensamblador_semantico",
+        sessionId: opciones?.sessionId ?? "session-ensamblar",
+        action: "LIMITE_PARRAFO_DETECTADO",
+        severity: "INFO",
+        payload: {
+          indiceParrafo: item.indiceParrafo,
+          motivo: item.motivo,
+          cantidadPalabrasParrafo: contarPalabras(parrafosFormateados[item.indiceParrafo] ?? ""),
+        },
+      });
+    }
+  }
+
+  return {
+    texto: textoFinal,
+    parrafos: parrafosFormateados,
+    motivosLimites,
+  };
 }
 
 /**

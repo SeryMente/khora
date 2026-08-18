@@ -1,6 +1,5 @@
 // @l0 L0-002-R · @req FIX-DICTADO/D1-D4
-import fs from "fs";
-import path from "path";
+import glosarioJson from "../transcripcion/glosario.json";
 import { aplicarGlosario } from "../transcripcion/ensamblar";
 
 const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
@@ -24,28 +23,13 @@ export function palabrasNormalizadas(t: string): string[] {
 }
 
 export function obtenerGlosario(): Record<string, string> {
-  try {
-    let baseDir = process.cwd();
-    if (!baseDir.includes("khora-web")) {
-      baseDir = path.join(baseDir, "khora-web");
+  const glosario: Record<string, string> = {};
+  for (const [k, v] of Object.entries(glosarioJson)) {
+    if (!k.startsWith("_") && typeof v === "string") {
+      glosario[k] = v;
     }
-    const filePath = path.join(baseDir, "lib", "transcripcion", "glosario.json");
-    if (!fs.existsSync(filePath)) {
-      return {};
-    }
-    const content = fs.readFileSync(filePath, "utf-8");
-    const parsed = JSON.parse(content);
-    const glosario: Record<string, string> = {};
-    for (const [k, v] of Object.entries(parsed)) {
-      if (!k.startsWith("_") && typeof v === "string") {
-        glosario[k] = v;
-      }
-    }
-    return glosario;
-  } catch (e) {
-    console.error("Error al cargar el glosario:", e);
-    return {};
   }
+  return glosario;
 }
 
 export function construirInstruccion(glosario: Record<string, string>): string {

@@ -2,6 +2,8 @@
   "_comment": "@l0 L0-002-R · @req FIX-DICTADO/D1-D4",
   "csec": "CSEC",
   "khora": "Khora",
+  "groq": "Groq",
+  "github": "GitHub",
   "github pages": "GitHub Pages",
   "iar": "IAR",
   "ideacion asincrona recuperable": "ideación asíncrona recuperable",
@@ -10,5 +12,8 @@
   "agente de IA": "agente de IA",
   "neo4j": "Neo4j",
   "vercel": "Vercel",
-  "jules": "Jules"
+  "jules": "Jules",
+  "job": "Job",
+  "dabrowski": "Dąbrowski",
+  "da browski": "Dąbrowski"
 }
