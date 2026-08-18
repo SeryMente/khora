@@ -10,11 +10,19 @@ import {
 import { aplicarGlosario } from "../transcripcion/ensamblar";
 
 test("1. Guardian Invariancia Lexical: Cambios RECHAZADOS", () => {
-  // Cambiar una palabra por un sinónimo
+  // Cambiar una palabra por un sinónimo (misma cantidad de palabras)
   const resSinonimo = guardian("el perro corre", "el can corre");
   assert.strictEqual(resSinonimo.aceptado, false, "Sinónimo debe ser rechazado");
   assert.strictEqual(resSinonimo.texto, "el perro corre");
   assert.match(resSinonimo.motivo, /Invariancia lexical violada/);
+
+  // Cambiar palabra manteninedo exactamente la misma cantidad de palabras
+  const resSustitucionMismaCantidad = guardian(
+    "Quiero revisar el sistema de memoria.",
+    "Quiero mejorar el sistema de memoria."
+  );
+  assert.strictEqual(resSustitucionMismaCantidad.aceptado, false, "Sustitución de palabra con igual número de palabras debe ser rechazada");
+  assert.match(resSustitucionMismaCantidad.motivo, /esperada "revisar", obtenida "mejorar"/);
 
   // Eliminar una palabra
   const resEliminar = guardian("el perro corre rapido", "el perro corre");
@@ -56,32 +64,34 @@ test("2. Guardian Invariancia Lexical: Cambios ACEPTADOS", () => {
   assert.strictEqual(resGlosario.aceptado, true, "Sustitución explícita de glosario debe ser aceptada");
 });
 
-test("4. Los terminos del glosario sobreviven al pulido sin deformarse", () => {
+test("4. Los términos del glosario sobreviven al pulido sin deformarse", () => {
   const glosario = obtenerGlosario();
 
   // Verificar que el glosario cargado contiene los términos requeridos
   assert.ok(glosario["csec"], "Debe contener csec");
   assert.strictEqual(glosario["csec"], "CSEC");
   assert.strictEqual(glosario["khora"], "Khora");
+  assert.strictEqual(glosario["groq"], "Groq");
+  assert.strictEqual(glosario["github"], "GitHub");
   assert.strictEqual(glosario["github pages"], "GitHub Pages");
-  assert.strictEqual(glosario["iar"], "IAR");
-  assert.strictEqual(glosario["ideacion asincrona recuperable"], "ideación asíncrona recuperable");
-  assert.strictEqual(glosario["agente de ia"], "agente de IA");
+  assert.strictEqual(glosario["job"], "Job");
+  assert.strictEqual(glosario["dabrowski"], "Dąbrowski");
+  assert.strictEqual(glosario["da browski"], "Dąbrowski");
   assert.strictEqual(glosario["neo4j"], "Neo4j");
   assert.strictEqual(glosario["vercel"], "Vercel");
   assert.strictEqual(glosario["jules"], "Jules");
 
   // Verificar que aplicarGlosario funciona de manera integrada
-  const textoCrudo = "ayer use github pages con iar y vercel para desplegar el agente de ia jules";
+  const textoCrudo = "ayer use groq con github pages e ingrese como job para ver a dabrowski";
   const textoProcesado = aplicarGlosario(textoCrudo, glosario);
 
   assert.strictEqual(
     textoProcesado,
-    "ayer use GitHub Pages con IAR y Vercel para desplegar el agente de IA Jules"
+    "ayer use Groq con GitHub Pages e ingrese como Job para ver a Dąbrowski"
   );
 });
 
-test("5. construirInstruccion genera un prompt que incluye los terminos del glosario", () => {
+test("5. construirInstruccion genera un prompt que incluye los términos del glosario", () => {
   const glosarioDummy = {
     "csec": "CSEC",
     "jules": "Jules",

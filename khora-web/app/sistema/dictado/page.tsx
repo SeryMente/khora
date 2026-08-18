@@ -4,6 +4,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import * as Icons from "lucide-react";
 import { ensamblarParrafos, Fragmento } from "../../../lib/transcripcion/ensamblar";
+import { SegmentoReconciliado, reconciliarSegmentos } from "../../../lib/server/transcribir";
 
 type Estado = "inactivo" | "dictando" | "finalizando";
 type EstadoReconciliacion = "preview_live" | "procesando_whisper" | "reconciliado_whisper" | "fallback_preview" | "editado_manual";
@@ -20,7 +21,7 @@ function generarSesionId() {
 }
 
 export default function DictadoPage() {
-  const [bloques, setBloques] = useState<string[]>([]);
+  const [segmentos, setSegmentos] = useState<SegmentoReconciliado[]>([]);
   const [pendiente, setPendiente] = useState("");
   const [parcial, setParcial] = useState("");
   const [estado, setEstado] = useState<Estado>("inactivo");
@@ -40,7 +41,6 @@ export default function DictadoPage() {
   // Reconciliation & Authoritative STT state
   const [estadoReconciliacion, setEstadoReconciliacion] = useState<EstadoReconciliacion>("preview_live");
   const [reconciliacionMensaje, setReconciliacionMensaje] = useState("");
-  const [editadoManualmente, setEditadoManualmente] = useState(false);
 
   // New states for parts
   const [partesContador, setPartesContador] = useState(0);
@@ -53,7 +53,7 @@ export default function DictadoPage() {
   const fragmentosRef = useRef<Fragmento[]>([]);
   const ultimaMarcaTiempoRef = useRef<number>(0);
   const pendienteRef = useRef("");
-  const bloquesRef = useRef<string[]>([]);
+  const segmentosRef = useRef<SegmentoReconciliado[]>([]);
   const relojRef = useRef<any>(null);
   const rearmeRef = useRef<any>(null);
   const activoRef = useRef(false);
@@ -77,62 +77,58 @@ export default function DictadoPage() {
     if (!w.SpeechRecognition && !w.webkitSpeechRecognition) setSoportado(false);
   }, []);
 
-  const pulirBloque = useCallback(async (bloque: string) => {
-    const indice = bloquesRef.current.length;
-    bloquesRef.current = [...bloquesRef.current, bloque];
-    setBloques(bloquesRef.current);
-    try {
-      const r = await fetch("/api/pulir", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ texto: bloque }) });
-      const textoRespuesta = await r.text();
-      let data: any = {};
-      try {
-        data = JSON.parse(textoRespuesta);
-      } catch (parseErr) {
-        data = { motivo: "Respuesta no-JSON de pulido: " + textoRespuesta.slice(0, 100) };
-      }
-
-      if (r.ok && data?.aceptado === true && typeof data?.texto === "string") {
-        const copia = [...bloquesRef.current];
-        copia[indice] = data.texto;
-        bloquesRef.current = copia;
-        setBloques(copia);
-        setPulidosOk((n) => n + 1);
-      } else {
-        setPulidosNo((n) => n + 1);
-        setAviso(typeof data?.motivo === "string" ? "bloque sin pulir: " + data.motivo : "bloque sin pulir");
-      }
-    } catch (e) {
-      setPulidosNo((n) => n + 1);
-      setAviso("bloque sin pulir: " + String(e));
-    }
-  }, []);
-
-  const cerrarBloque = useCallback(() => {
+  /**
+   * Estabiliza el avance de la emisión de voz sin forzar saltos de párrafo ni vaciar el contexto discursivo.
+   * La inactividad de 4 segundos estabiliza el avance provisional pero el párrafo solo se divide por evidencia sintáctica.
+   */
+  const estabilizarEmision = useCallback(() => {
     if (fragmentosRef.current.length > 0) {
       const ensamblado = ensamblarParrafos(fragmentosRef.current, { umbralMs: 3500 });
       if (ensamblado.trim().length > 0) {
-        fragmentosRef.current = [];
-        pendienteRef.current = "";
-        setPendiente("");
-        void pulirBloque(ensamblado);
-        return;
+        setPendiente(ensamblado);
+        pendienteRef.current = ensamblado;
+
+        // Actualizar segmentos estructurados manteniendo el contexto discursivo
+        const parrafos = ensamblado.split("\n\n").filter((p) => p.trim().length > 0);
+        const existentes = [...segmentosRef.current];
+
+        const nuevosSegmentos: SegmentoReconciliado[] = parrafos.map((p, idx) => {
+          const segExistente = existentes[idx];
+          if (segExistente && (segExistente.estado === "editado_manual" || segExistente.modificadoManualmente)) {
+            return segExistente;
+          }
+          return {
+            id: segExistente?.id ?? `seg-${idx + 1}-${Date.now()}`,
+            texto: p,
+            estado: "provisional_asr",
+          };
+        });
+
+        segmentosRef.current = nuevosSegmentos;
+        setSegmentos(nuevosSegmentos);
       }
     }
-    const bloque = pendienteRef.current.trim();
-    pendienteRef.current = "";
-    setPendiente("");
-    if (bloque.length > 0) void pulirBloque(bloque);
-  }, [pulirBloque]);
+  }, []);
 
   const ejecutarTranscripcionAutoritativa = useCallback(async () => {
     if (trozosRef.current.length === 0 && partesSubidasRef.current.length === 0) return;
     setEstadoReconciliacion("procesando_whisper");
-    const textoPreview = [...bloquesRef.current, pendienteRef.current].filter((s) => s.trim().length > 0).join("\n\n");
+
+    const textoPreview = segmentosRef.current.map((s) => s.texto).join("\n\n") || pendienteRef.current;
 
     const forma = new FormData();
     forma.append("previewText", textoPreview);
 
-    // Adjuntar todas las partes de audio si existen
+    if (partesSubidasRef.current.length > 0) {
+      const chunkMeta = partesSubidasRef.current.map((p) => ({
+        part_index: p.parte,
+        start_ms: (p.parte - 1) * 45000,
+        end_ms: p.parte * 45000,
+        session_id: sesionIdRef.current,
+      }));
+      forma.append("chunkMeta", JSON.stringify(chunkMeta));
+    }
+
     if (trozosRef.current.length > 0) {
       const blobCompleto = new Blob(trozosRef.current, { type: "audio/webm" });
       forma.append("audio", blobCompleto, "dictado-completo.webm");
@@ -141,28 +137,28 @@ export default function DictadoPage() {
     try {
       const r = await fetch("/api/transcribir", { method: "POST", body: forma });
       const data = await r.json();
+
       if (r.ok && data?.exito && typeof data?.textoFinal === "string") {
-        if (!editadoManualmente) {
-          const textoReconciliado = data.textoFinal;
-          const parrafos = textoReconciliado.split("\n\n").filter((p: string) => p.trim().length > 0);
-          bloquesRef.current = parrafos;
-          setBloques(parrafos);
-          setPendiente("");
-          pendienteRef.current = "";
-          setEstadoReconciliacion("reconciliado_whisper");
-        } else {
-          setEstadoReconciliacion("editado_manual");
-        }
-        setReconciliacionMensaje(data.motivoReconciliacion || "Transcripción autoritativa Groq Whisper (whisper-large-v3) procesada con éxito.");
+        const resultadoReconciliacion = reconciliarSegmentos(segmentosRef.current, data.textoFinal);
+        segmentosRef.current = resultadoReconciliacion.segmentos;
+        setSegmentos(resultadoReconciliacion.segmentos);
+        setPendiente("");
+        pendienteRef.current = "";
+
+        const hayManual = resultadoReconciliacion.segmentos.some((s) => s.estado === "editado_manual" || s.modificadoManualmente);
+        setEstadoReconciliacion(hayManual ? "editado_manual" : "reconciliado_whisper");
+        setReconciliacionMensaje(data.motivoReconciliacion || "Transcripción autoritativa Groq Whisper procesada con éxito.");
       } else {
-        setEstadoReconciliacion(editadoManualmente ? "editado_manual" : "fallback_preview");
+        const hayManual = segmentosRef.current.some((s) => s.estado === "editado_manual" || s.modificadoManualmente);
+        setEstadoReconciliacion(hayManual ? "editado_manual" : "fallback_preview");
         setReconciliacionMensaje(`Groq Whisper no disponible: ${data?.detail || "Conservando previsualización ASR en vivo."}`);
       }
     } catch (e) {
-      setEstadoReconciliacion(editadoManualmente ? "editado_manual" : "fallback_preview");
+      const hayManual = segmentosRef.current.some((s) => s.estado === "editado_manual" || s.modificadoManualmente);
+      setEstadoReconciliacion(hayManual ? "editado_manual" : "fallback_preview");
       setReconciliacionMensaje(`Fallo al solicitar transcripción autoritativa: ${String(e)}.`);
     }
-  }, [editadoManualmente]);
+  }, []);
 
   const subirParteActual = useCallback(async () => {
     if (parteTrozosRef.current.length === 0) return;
@@ -177,7 +173,7 @@ export default function DictadoPage() {
     const blob = new Blob(trozosParaSubir, { type: "audio/webm" });
     const sesionId = sesionIdRef.current;
 
-    const maxParteBytes = 3 * 1024 * 1024; // 3 MB safety limit
+    const maxParteBytes = 3 * 1024 * 1024;
     const totalBytes = blob.size;
 
     const ejecutarSubidaDeBlob = async (blobASubir: Blob, numParte: number) => {
@@ -192,7 +188,7 @@ export default function DictadoPage() {
         let da: any = {};
         try {
           da = JSON.parse(textoRespuesta);
-        } catch (parseErr) {
+        } catch {
           da = { detail: "Respuesta no-JSON de la API de audio: " + textoRespuesta.slice(0, 100) };
         }
 
@@ -207,7 +203,7 @@ export default function DictadoPage() {
           setBytesAcumulados((total) => total + bytesSubidos);
           setConAudio(true);
         } else {
-          setAviso(`audio parte ${numParte} no guardada: ${String(da?.detail || "")} ${String(da?.causa || "")}`);
+          setAviso(`audio parte ${numParte} no guardada: ${String(da?.detail || "")}`);
         }
       } catch (e) {
         setAviso(`audio parte ${numParte} no guardada por error: ${String(e)}`);
@@ -243,9 +239,9 @@ export default function DictadoPage() {
   }, []);
 
   const detenerGrabacion = useCallback(() => {
-    try { grabRef.current?.stop(); } catch (e) {}
+    try { grabRef.current?.stop(); } catch {}
     grabRef.current = null;
-    try { flujoRef.current?.getTracks?.().forEach((pista: any) => pista.stop()); } catch (e) {}
+    try { flujoRef.current?.getTracks?.().forEach((pista: any) => pista.stop()); } catch {}
     flujoRef.current = null;
   }, []);
 
@@ -253,7 +249,7 @@ export default function DictadoPage() {
     if (!audioPermitidoRef.current || !activoRef.current || grabRef.current) return;
     try {
       const flujo = await navigator.mediaDevices.getUserMedia({ audio: true });
-      if (!activoRef.current || !audioPermitidoRef.current) { try { flujo.getTracks().forEach((pista: any) => pista.stop()); } catch (e) {} return; }
+      if (!activoRef.current || !audioPermitidoRef.current) { try { flujo.getTracks().forEach((pista: any) => pista.stop()); } catch {} return; }
       flujoRef.current = flujo;
       const grabadora = new MediaRecorder(flujo);
 
@@ -311,13 +307,11 @@ export default function DictadoPage() {
           ultimaMarcaTiempoRef.current = ahora;
 
           fragmentosRef.current.push({ texto: txt, pausaMsAntes });
-          const ensamblado = ensamblarParrafos(fragmentosRef.current, { umbralMs: 3500 });
-          pendienteRef.current = ensamblado;
-          setPendiente(ensamblado);
+          estabilizarEmision();
 
           if (relojRef.current) clearTimeout(relojRef.current);
-          // Permitir que el bloque permanezca abierto en pausas breves; se consolida a los 4000ms de inactividad o al detener
-          relojRef.current = setTimeout(cerrarBloque, 4000);
+          // Inactividad de 4s estabiliza avance sin cerrar ni crear párrafo mecánico
+          relojRef.current = setTimeout(estabilizarEmision, 4000);
         } else {
           interino = interino + " " + txt;
         }
@@ -362,8 +356,8 @@ export default function DictadoPage() {
         setReconexiones((n) => n + 1);
         try {
           rec.start();
-        } catch (e) {
-          try { rec.abort(); } catch (e2) {}
+        } catch {
+          try { rec.abort(); } catch {}
           rearmeRef.current = setTimeout(() => {
             if (!activoRef.current) return;
             try { rec.start(); } catch (e3) { activoRef.current = false; setEstado("inactivo"); setError("reconocimiento no reanudable: " + String(e3)); }
@@ -374,7 +368,7 @@ export default function DictadoPage() {
     recRef.current = rec;
     try { rec.start(); } catch (e) { setError("no se pudo iniciar el reconocimiento: " + String(e)); return false; }
     return true;
-  }, [cerrarBloque, detenerGrabacion]);
+  }, [estabilizarEmision, detenerGrabacion]);
 
   const iniciar = useCallback(async () => {
     setError("");
@@ -385,7 +379,6 @@ export default function DictadoPage() {
     audioPermitidoRef.current = true;
     trozosRef.current = [];
 
-    // Reset session & parts refs/states
     sesionIdRef.current = generarSesionId();
     parteConsecutivaRef.current = 0;
     partesSubidasRef.current = [];
@@ -408,14 +401,14 @@ export default function DictadoPage() {
     setAudioFinalizando(true);
     setEstado("finalizando");
     if (rearmeRef.current) clearTimeout(rearmeRef.current);
-    try { recRef.current?.stop(); } catch (e) {}
+    try { recRef.current?.stop(); } catch {}
     recRef.current = null;
     detenerGrabacion();
     if (inicioRef.current > 0) duracionRef.current = Math.round((Date.now() - inicioRef.current) / 1000);
     if (relojRef.current) clearTimeout(relojRef.current);
     setParcial("");
     setEscuchando(false);
-    cerrarBloque();
+    estabilizarEmision();
     try {
       if (finalizacionAudioRef.current) await finalizacionAudioRef.current;
       if (subidaEnCursoRef.current) await subidaEnCursoRef.current;
@@ -426,23 +419,23 @@ export default function DictadoPage() {
       setAudioFinalizando(false);
       setEstado("inactivo");
     }
-  }, [cerrarBloque, detenerGrabacion]);
+  }, [estabilizarEmision, detenerGrabacion, ejecutarTranscripcionAutoritativa]);
 
   useEffect(() => {
     return () => {
       activoRef.current = false;
       if (relojRef.current) clearTimeout(relojRef.current);
       if (rearmeRef.current) clearTimeout(rearmeRef.current);
-      try { recRef.current?.abort?.(); } catch (e) {}
-      try { grabRef.current?.stop(); } catch (e) {}
-      try { flujoRef.current?.getTracks?.().forEach((pista: any) => pista.stop()); } catch (e) {}
+      try { recRef.current?.abort?.(); } catch {}
+      try { grabRef.current?.stop(); } catch {}
+      try { flujoRef.current?.getTracks?.().forEach((pista: any) => pista.stop()); } catch {}
     };
   }, []);
 
   const guardar = useCallback(async () => {
     setError("");
     setResultado("");
-    const texto = [...bloquesRef.current, pendienteRef.current].filter((s) => s.trim().length > 0).join("\n\n");
+    const texto = segmentosRef.current.map((s) => s.texto).join("\n\n") || pendienteRef.current;
     if (texto.trim().length === 0) { setError("no hay nada que archivar"); return; }
     setGuardando(true);
     try {
@@ -484,7 +477,7 @@ export default function DictadoPage() {
         const textoRespuesta = await rv.text();
         try {
           dv = JSON.parse(textoRespuesta);
-        } catch (parseErr) {
+        } catch {
           dv = { detail: "Respuesta no-JSON de dictado: " + textoRespuesta.slice(0, 200) };
         }
 
@@ -504,8 +497,8 @@ export default function DictadoPage() {
   }, [titulo, pulidosOk]);
 
   const limpiar = useCallback(() => {
-    bloquesRef.current = [];
-    setBloques([]);
+    segmentosRef.current = [];
+    setSegmentos([]);
     fragmentosRef.current = [];
     ultimaMarcaTiempoRef.current = 0;
     pendienteRef.current = "";
@@ -522,9 +515,7 @@ export default function DictadoPage() {
     setReconexiones(0);
     setEstadoReconciliacion("preview_live");
     setReconciliacionMensaje("");
-    setEditadoManualmente(false);
 
-    // Reset new states and refs
     sesionIdRef.current = "";
     parteConsecutivaRef.current = 0;
     partesSubidasRef.current = [];
@@ -534,7 +525,23 @@ export default function DictadoPage() {
     setBytesAcumulados(0);
   }, []);
 
-  const totalChars = [...bloques, pendiente].filter((s) => s.trim().length > 0).join("\n\n").length;
+  const totalChars = (segmentos.map((s) => s.texto).join("\n\n") || pendiente).length;
+
+  // Edición granular de segmento por el operador
+  const handleEditarSegmento = (idx: number, nuevoTexto: string) => {
+    const copia = [...segmentosRef.current];
+    if (copia[idx]) {
+      copia[idx] = {
+        ...copia[idx],
+        texto: nuevoTexto,
+        estado: "editado_manual",
+        modificadoManualmente: true,
+      };
+      segmentosRef.current = copia;
+      setSegmentos(copia);
+      setEstadoReconciliacion("editado_manual");
+    }
+  };
 
   return (
     <main
@@ -552,7 +559,7 @@ export default function DictadoPage() {
           Dictado Clean Verbatim Semántico
         </h1>
         <p className="text-sm mt-1" style={{ color: "var(--khora-accent)" }}>
-          Arquitectura desacoplada: Previsualización ASR en vivo + Transcripción autoritativa Groq Whisper + Corrección con Invariancia Lexical Estricta.
+          Arquitectura desacoplada: Previsualización ASR en vivo + Transcripción autoritativa Groq Whisper + Protección Segmentaria de Edición Manual.
         </p>
       </div>
 
@@ -662,7 +669,7 @@ export default function DictadoPage() {
       <div className="flex flex-wrap items-center gap-2 text-xs">
         <span className="px-2 py-0.5 border font-semibold" style={{ borderColor: "var(--khora-border)", backgroundColor: "var(--khora-surface)", color: "var(--khora-ink)" }}>
           {estadoReconciliacion === "editado_manual"
-            ? "✏️ Editado manualmente por operador (Protegido)"
+            ? "✏️ Segmento editado manualmente por operador (Protegido)"
             : estadoReconciliacion === "reconciliado_whisper"
             ? "🟢 Autoritativo: Groq Whisper"
             : estadoReconciliacion === "procesando_whisper"
@@ -676,20 +683,39 @@ export default function DictadoPage() {
         </span>
       </div>
 
-      {/* Area de Transcripción */}
+      {/* Area de Transcripción por Segmentos Structurados */}
       <div
-        className="p-4 min-h-[240px] whitespace-pre-wrap leading-relaxed border rounded-none text-sm relative"
+        className="p-4 min-h-[240px] whitespace-pre-wrap leading-relaxed border rounded-none text-sm relative space-y-3"
         style={{
           backgroundColor: "var(--khora-surface)",
           borderColor: "var(--khora-border)",
           color: "var(--khora-ink)",
         }}
       >
-        {bloques.length === 0 && pendiente.length === 0 && parcial.length === 0 && (
+        {segmentos.length === 0 && pendiente.length === 0 && parcial.length === 0 && (
           <span className="opacity-40 italic">Pulsa "Iniciar dictado" y comienza a hablar...</span>
         )}
-        {bloques.map((b, i) => (<p key={i} className="mb-3">{b}</p>))}
-        {pendiente.length > 0 && <p className="mb-3 opacity-90">{pendiente}</p>}
+
+        {segmentos.map((seg, i) => (
+          <div key={seg.id || i} className="relative group">
+            <textarea
+              value={seg.texto}
+              onChange={(e) => handleEditarSegmento(i, e.target.value)}
+              rows={Math.max(1, Math.ceil(seg.texto.length / 80))}
+              className="w-full p-2 bg-transparent border-b border-transparent group-hover:border-[var(--khora-border)] focus:border-[var(--khora-accent)] focus-visible:outline-none resize-none font-sans text-sm"
+            />
+            {seg.estado === "editado_manual" && (
+              <span className="absolute right-1 top-1 text-[10px] text-amber-500 font-bold bg-amber-500/10 px-1 border border-amber-500/30">
+                [editado manual - protegido]
+              </span>
+            )}
+          </div>
+        ))}
+
+        {pendiente.length > 0 && segmentos.length === 0 && (
+          <p className="opacity-90">{pendiente}</p>
+        )}
+
         {parcial.length > 0 && (
           <span className="opacity-60 italic bg-amber-500/10 px-1 border-b border-dashed border-amber-500">
             [provisional]: {parcial}
@@ -697,7 +723,7 @@ export default function DictadoPage() {
         )}
       </div>
 
-      {/* EstadÃ­sticas */}
+      {/* Estadísticas */}
       <p className="text-xs font-medium" style={{ color: "var(--khora-accent)" }}>
         estado: {estado} / escuchando: {escuchando ? "si" : "no"} / caracteres: {totalChars} / bloques pulidos: {pulidosOk} / bloques sin pulir: {pulidosNo} / audio: {conAudio ? "si" : "no"} / partes subidas: {partesContador} ({ (bytesAcumulados / (1024 * 1024)).toFixed(2) } MB) / reconexiones: {reconexiones}
       </p>

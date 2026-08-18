@@ -1,6 +1,11 @@
 // @l0 L0-002-R · @req FIX-DICTADO/AUTHORITATIVE-STT
 import { NextResponse } from "next/server";
-import { transcribirAudioConGroq, reconciliarTranscripcion } from "../../../lib/server/transcribir";
+import {
+  transcribirAudioConGroq,
+  reconciliarTranscripcion,
+  procesarChunksIncrementalesConTiempos,
+  InputChunkData,
+} from "../../../lib/server/transcribir";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -14,6 +19,16 @@ export async function POST(req: Request) {
       const forma = await req.formData();
       const archivos = forma.getAll("audio").filter((item): item is File => typeof item !== "string" && item instanceof Blob);
       const previewText = typeof forma.get("previewText") === "string" ? String(forma.get("previewText")) : "";
+      const chunkMetaRaw = typeof forma.get("chunkMeta") === "string" ? String(forma.get("chunkMeta")) : "";
+
+      let chunkMetaList: { part_index: number; start_ms: number; end_ms: number; session_id?: string }[] = [];
+      if (chunkMetaRaw) {
+        try {
+          chunkMetaList = JSON.parse(chunkMetaRaw);
+        } catch {
+          // Fallback a derivación por índice si no es JSON válido
+        }
+      }
 
       if (archivos.length === 0) {
         return NextResponse.json({ detail: "falta el archivo de audio o las partes" }, { status: 400 });
@@ -44,14 +59,27 @@ export async function POST(req: Request) {
       }
 
       // Múltiples partes / chunks de audio recibidos: procesamiento incremental con deduplicación de overlap
-      const buffers: Buffer[] = [];
-      for (const a of archivos) {
+      const chunksData: InputChunkData[] = [];
+      for (let i = 0; i < archivos.length; i++) {
+        const a = archivos[i];
         const buf = Buffer.from(await a.arrayBuffer());
-        if (buf.length > 0) buffers.push(buf);
+        if (buf.length > 0) {
+          const meta = chunkMetaList.find((m) => m.part_index === i + 1) || {
+            part_index: i + 1,
+            start_ms: i * 45000,
+            end_ms: (i + 1) * 45000,
+          };
+          chunksData.push({
+            buffer: buf,
+            part_index: meta.part_index,
+            start_ms: meta.start_ms,
+            end_ms: meta.end_ms,
+            session_id: meta.session_id,
+          });
+        }
       }
 
-      const { procesarChunksIncrementales } = await import("../../../lib/server/transcribir");
-      const resChunking = await procesarChunksIncrementales(buffers);
+      const resChunking = await procesarChunksIncrementalesConTiempos(chunksData);
 
       if (!resChunking.exito) {
         return NextResponse.json(
@@ -74,6 +102,7 @@ export async function POST(req: Request) {
         motivoReconciliacion: rec.motivo,
         partesProcesadas: resChunking.partesProcesadas,
         fallos: resChunking.fallos,
+        detallesChunks: resChunking.detallesChunks,
         modelo: "whisper-large-v3",
       });
     }
