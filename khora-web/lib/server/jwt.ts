@@ -1,5 +1,5 @@
 // @l0 L0-002 §4 · @req MCP-JWT-01/REQ-1
-import { createHmac } from "node:crypto";
+import { createHmac, createHash, timingSafeEqual } from "node:crypto";
 
 export interface JwtPayload {
   iss: string;
@@ -75,14 +75,19 @@ export function verifyJwt(token: string, secret: string): JwtPayload | null {
 
 export function verifyPkceS256(verifier: string, challenge: string): boolean {
   try {
-    const hash = createHmac("sha256", "")
-      .update(verifier)
-      .digest(); // wait, PKCE S256 uses standard SHA-256 digest of verifier in base64url format
-  } catch (e) {}
+    if (!verifier || !challenge) return false;
+    const computedHash = createHash("sha256").update(verifier).digest();
+    const computedChallenge = base64UrlEncode(computedHash);
 
-  const crypto = require("node:crypto");
-  const computedHash = crypto.createHash("sha256").update(verifier).digest();
-  const computedChallenge = base64UrlEncode(computedHash);
+    const bufA = Buffer.from(computedChallenge);
+    const bufB = Buffer.from(challenge);
 
-  return computedChallenge === challenge;
+    if (bufA.length !== bufB.length) {
+      return false;
+    }
+
+    return timingSafeEqual(bufA, bufB);
+  } catch {
+    return false;
+  }
 }

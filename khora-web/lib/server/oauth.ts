@@ -41,20 +41,18 @@ export async function crearCodigoAutorizacion(params: {
   return rawCode;
 }
 
-export async function consumirCodigoAutorizacion(
+export async function obtenerCodigoAutorizacionValido(
   rawCode: string
 ): Promise<AuthCodeRecord | null> {
   const codeHash = hashString(rawCode);
   const db = getDb();
 
-  // Consumo atómico: marcar usado_en si no estaba usado y no está expirado
   const result = await db.query<AuthCodeRecord>(
-    `UPDATE oauth_codes
-     SET usado_en = NOW()
+    `SELECT id, code_hash, code_challenge, redirect_uri, resource, usuario, expira_en, usado_en
+     FROM oauth_codes
      WHERE code_hash = $1
        AND usado_en IS NULL
-       AND expira_en > NOW()
-     RETURNING id, code_hash, code_challenge, redirect_uri, resource, usuario, expira_en, usado_en`,
+       AND expira_en > NOW()`,
     [codeHash]
   );
 
@@ -63,6 +61,27 @@ export async function consumirCodigoAutorizacion(
   }
 
   return result.rows[0];
+}
+
+export async function marcarCodigoComoUsado(id: number): Promise<boolean> {
+  const db = getDb();
+  const result = await db.query(
+    `UPDATE oauth_codes
+     SET usado_en = NOW()
+     WHERE id = $1 AND usado_en IS NULL`,
+    [id]
+  );
+  return result.rowCount === 1;
+}
+
+export async function consumirCodigoAutorizacion(
+  rawCode: string
+): Promise<AuthCodeRecord | null> {
+  const record = await obtenerCodigoAutorizacionValido(rawCode);
+  if (!record) return null;
+  const marcado = await marcarCodigoComoUsado(record.id);
+  if (!marcado) return null;
+  return record;
 }
 
 export interface RefreshTokenRecord {
