@@ -1,18 +1,12 @@
 // @l0 L0-002 §4 · @req MCP-OAUTH-01/REQ-4
 import { NextResponse } from "next/server";
-import { getMcpConfig } from "@/lib/server/mcp-config";
+import { getProtectedResourceMetadata } from "@/lib/server/mcp-config";
 
 export async function GET() {
-  const config = getMcpConfig();
-  if (!config) {
+  const metadata = getProtectedResourceMetadata();
+  if (!metadata) {
     return NextResponse.json({ error: "MCP authorization server not configured" }, { status: 503 });
   }
-
-  const metadata = {
-    resource: config.canonicalUrl,
-    authorization_servers: [config.issuer],
-    scopes_supported: ["volcados:read"],
-  };
 
   return NextResponse.json(metadata, {
     status: 200,

@@ -63,3 +63,12 @@ const rawCanonicalUrl =
     readonlyDatabaseUrl,
   };
 }
+
+export function getProtectedResourceMetadata(config = getMcpConfig()) {
+  if (!config) return null;
+  return {
+    resource: config.canonicalUrl,
+    authorization_servers: [config.issuer],
+    scopes_supported: ["volcados:read"],
+  };
+}

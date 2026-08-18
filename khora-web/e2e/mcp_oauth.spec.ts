@@ -18,13 +18,21 @@ test.describe("MCP OAuth Authorization Server & Protected Resource", () => {
     expect(body.grant_types_supported).toEqual(["authorization_code", "refresh_token"]);
   });
 
-  test("/.well-known/oauth-protected-resource returns RFC 9728 metadata", async ({ request }) => {
-    const res = await request.get("/.well-known/oauth-protected-resource");
-    expect(res.status()).toBe(200);
-    const body = await res.json();
-    expect(body.resource).toContain("/api/mcp");
-    expect(body.authorization_servers).toBeDefined();
-    expect(body.scopes_supported).toContain("volcados:read");
+  test("/.well-known/oauth-protected-resource and specific endpoint return identical RFC 9728 metadata", async ({ request }) => {
+    const res1 = await request.get("/.well-known/oauth-protected-resource");
+    expect(res1.status()).toBe(200);
+    const body1 = await res1.json();
+
+    const res2 = await request.get("/.well-known/oauth-protected-resource/api/mcp");
+    expect(res2.status()).toBe(200);
+    const body2 = await res2.json();
+
+    expect(body1).toEqual(body2);
+    expect(body1.resource).not.toContain("/api/mcp/api/mcp");
+    expect(body1.resource).toContain("/api/mcp");
+    expect(body1.authorization_servers).toBeDefined();
+    expect(body1.authorization_servers[0]).not.toContain("/api/mcp");
+    expect(body1.scopes_supported).toContain("volcados:read");
   });
 
   test("/api/mcp without token responds with 401 and WWW-Authenticate header", async ({ request }) => {

@@ -8,7 +8,11 @@ import { setDbForTesting, resetDbForTesting } from "../../lib/server/neon.js";
 import { NextRequest } from "next/server";
 import { GET as getMcpRoute } from "../../app/api/mcp/route.js";
 import { GET as getProtectedResourceMetadata } from "../../app/.well-known/oauth-protected-resource/route.js";
+import { GET as getSpecificProtectedResourceMetadata } from "../../app/.well-known/oauth-protected-resource/api/mcp/route.js";
 import { GET as getAuthServerMetadata } from "../../app/.well-known/oauth-authorization-server/route.js";
+import { POST as postTokenRoute } from "../../app/api/oauth/token/route.js";
+import { verifyPkceS256, verifyJwt } from "../../lib/server/jwt.js";
+import { hashString } from "../../lib/server/oauth.js";
 import {
   toolKhoraResumen,
   toolKhoraListarVolcados,
@@ -93,7 +97,7 @@ test("1. Concurrent refresh token rotation produces exactly 1 success and 1 inva
   }
 });
 
-test("2. MCP_CANONICAL_URL semantics and metadata endpoints", async () => {
+test("2. MCP_CANONICAL_URL semantics and metadata endpoints consistency", async () => {
   const config = getMcpConfig();
   assert.ok(config);
   assert.equal(config.canonicalUrl, "https://khora.example.com/api/mcp");
@@ -101,7 +105,15 @@ test("2. MCP_CANONICAL_URL semantics and metadata endpoints", async () => {
 
   const protectedRes = await getProtectedResourceMetadata();
   const protectedMeta = await protectedRes.json();
+
+  const specificRes = await getSpecificProtectedResourceMetadata();
+  const specificMeta = await specificRes.json();
+
+  // Root endpoint and specific endpoint MUST return identical responses
+  assert.deepEqual(protectedMeta, specificMeta);
+
   assert.equal(protectedMeta.resource, "https://khora.example.com/api/mcp");
+  assert.ok(!protectedMeta.resource.includes("/api/mcp/api/mcp"));
   assert.deepEqual(protectedMeta.authorization_servers, ["https://khora.example.com"]);
   assert.deepEqual(protectedMeta.scopes_supported, ["volcados:read"]);
 
@@ -110,6 +122,185 @@ test("2. MCP_CANONICAL_URL semantics and metadata endpoints", async () => {
   assert.equal(authMeta.issuer, "https://khora.example.com");
   assert.equal(authMeta.authorization_endpoint, "https://khora.example.com/oauth/authorize");
   assert.equal(authMeta.token_endpoint, "https://khora.example.com/api/oauth/token");
+});
+
+test("2b. PKCE S256 verification behavior", () => {
+  const verifier = "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk";
+  const validChallenge = "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM"; // BASE64URL(SHA256(verifier))
+
+  assert.ok(verifyPkceS256(verifier, validChallenge));
+  assert.equal(verifyPkceS256(verifier, "wrong-challenge"), false);
+  assert.equal(verifyPkceS256("wrong-verifier", validChallenge), false);
+  assert.equal(verifyPkceS256("", validChallenge), false);
+  assert.equal(verifyPkceS256(verifier, ""), false);
+});
+
+test("2c. Atomic authorization code consumption & resource validation in /api/oauth/token", async () => {
+  const codeVerifier = "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk";
+  const codeChallenge = "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM";
+  const rawCode = "valid-test-code-123456789";
+  const codeHash = hashString(rawCode);
+
+  let mockCodeRecord = {
+    id: 55,
+    code_hash: codeHash,
+    code_challenge: codeChallenge,
+    redirect_uri: "https://app.notion.com/workflows/mcp/oauth/callback",
+    resource: "https://khora.example.com/api/mcp",
+    usuario: "operador@khora.app",
+    expira_en: new Date(Date.now() + 60000),
+    usado_en: null as Date | null,
+  };
+
+  const mockDbPool = {
+    query: async (sql: string, params: any[]) => {
+      if (sql.includes("FROM oauth_codes")) {
+        if (mockCodeRecord.usado_en !== null) {
+          return { rowCount: 0, rows: [] };
+        }
+        if (params[0] === codeHash) {
+          return { rowCount: 1, rows: [mockCodeRecord] };
+        }
+        return { rowCount: 0, rows: [] };
+      }
+      if (sql.includes("UPDATE oauth_codes")) {
+        if (mockCodeRecord.id === params[0] && mockCodeRecord.usado_en === null) {
+          mockCodeRecord.usado_en = new Date();
+          return { rowCount: 1, rows: [] };
+        }
+        return { rowCount: 0, rows: [] };
+      }
+      if (sql.includes("mcp_revocacion")) {
+        return { rowCount: 1, rows: [{ generacion: 1 }] };
+      }
+      if (sql.includes("INSERT INTO oauth_refresh_tokens")) {
+        return { rowCount: 1, rows: [] };
+      }
+      return { rowCount: 0, rows: [] };
+    },
+  };
+
+  setDbForTesting(mockDbPool);
+
+  try {
+    // 1. Invalid client credentials -> invalid_client (401)
+    const formDataBadClient = new FormData();
+    formDataBadClient.set("grant_type", "authorization_code");
+    formDataBadClient.set("client_id", "bad-id");
+    formDataBadClient.set("client_secret", "bad-secret");
+    formDataBadClient.set("code", rawCode);
+    formDataBadClient.set("redirect_uri", mockCodeRecord.redirect_uri);
+    formDataBadClient.set("code_verifier", codeVerifier);
+
+    const reqBadClient = new NextRequest("https://khora.example.com/api/oauth/token", {
+      method: "POST",
+      body: formDataBadClient,
+    });
+    const resBadClient = await postTokenRoute(reqBadClient);
+    assert.equal(resBadClient.status, 401);
+    const bodyBadClient = await resBadClient.json();
+    assert.equal(bodyBadClient.error, "invalid_client");
+    assert.equal(mockCodeRecord.usado_en, null); // Not consumed
+
+    // 2. Mismatched redirect_uri -> invalid_grant (400), code NOT consumed
+    const formDataBadRedirect = new FormData();
+    formDataBadRedirect.set("grant_type", "authorization_code");
+    formDataBadRedirect.set("client_id", "test-client-id");
+    formDataBadRedirect.set("client_secret", "test-client-secret");
+    formDataBadRedirect.set("code", rawCode);
+    formDataBadRedirect.set("redirect_uri", "https://evil.com/callback");
+    formDataBadRedirect.set("code_verifier", codeVerifier);
+
+    const reqBadRedirect = new NextRequest("https://khora.example.com/api/oauth/token", {
+      method: "POST",
+      body: formDataBadRedirect,
+    });
+    const resBadRedirect = await postTokenRoute(reqBadRedirect);
+    assert.equal(resBadRedirect.status, 400);
+    const bodyBadRedirect = await resBadRedirect.json();
+    assert.equal(bodyBadRedirect.error, "invalid_grant");
+    assert.equal(mockCodeRecord.usado_en, null); // Still not consumed!
+
+    // 3. Mismatched code_verifier -> invalid_grant (400), code NOT consumed
+    const formDataBadVerifier = new FormData();
+    formDataBadVerifier.set("grant_type", "authorization_code");
+    formDataBadVerifier.set("client_id", "test-client-id");
+    formDataBadVerifier.set("client_secret", "test-client-secret");
+    formDataBadVerifier.set("code", rawCode);
+    formDataBadVerifier.set("redirect_uri", mockCodeRecord.redirect_uri);
+    formDataBadVerifier.set("code_verifier", "wrong-code-verifier");
+
+    const reqBadVerifier = new NextRequest("https://khora.example.com/api/oauth/token", {
+      method: "POST",
+      body: formDataBadVerifier,
+    });
+    const resBadVerifier = await postTokenRoute(reqBadVerifier);
+    assert.equal(resBadVerifier.status, 400);
+    const bodyBadVerifier = await resBadVerifier.json();
+    assert.equal(bodyBadVerifier.error, "invalid_grant");
+    assert.equal(mockCodeRecord.usado_en, null); // Still not consumed!
+
+    // 4. Mismatched resource parameter -> invalid_grant (400), code NOT consumed
+    const formDataBadResource = new FormData();
+    formDataBadResource.set("grant_type", "authorization_code");
+    formDataBadResource.set("client_id", "test-client-id");
+    formDataBadResource.set("client_secret", "test-client-secret");
+    formDataBadResource.set("code", rawCode);
+    formDataBadResource.set("redirect_uri", mockCodeRecord.redirect_uri);
+    formDataBadResource.set("code_verifier", codeVerifier);
+    formDataBadResource.set("resource", "https://khora.example.com/other-resource");
+
+    const reqBadResource = new NextRequest("https://khora.example.com/api/oauth/token", {
+      method: "POST",
+      body: formDataBadResource,
+    });
+    const resBadResource = await postTokenRoute(reqBadResource);
+    assert.equal(resBadResource.status, 400);
+    const bodyBadResource = await resBadResource.json();
+    assert.equal(bodyBadResource.error, "invalid_grant");
+    assert.equal(mockCodeRecord.usado_en, null); // Still not consumed!
+
+    // 5. Subsequent VALID exchange -> 200 OK, code is consumed exactly once
+    const formDataValid = new FormData();
+    formDataValid.set("grant_type", "authorization_code");
+    formDataValid.set("client_id", "test-client-id");
+    formDataValid.set("client_secret", "test-client-secret");
+    formDataValid.set("code", rawCode);
+    formDataValid.set("redirect_uri", mockCodeRecord.redirect_uri);
+    formDataValid.set("code_verifier", codeVerifier);
+    formDataValid.set("resource", "https://khora.example.com/api/mcp");
+
+    const reqValid = new NextRequest("https://khora.example.com/api/oauth/token", {
+      method: "POST",
+      body: formDataValid,
+    });
+    const resValid = await postTokenRoute(reqValid);
+    assert.equal(resValid.status, 200);
+    const bodyValid = await resValid.json();
+    assert.ok(bodyValid.access_token);
+    assert.ok(bodyValid.refresh_token);
+    assert.equal(bodyValid.scope, "volcados:read");
+    assert.ok(mockCodeRecord.usado_en !== null); // Marked consumed!
+
+    // Validate JWT claims
+    const payload = verifyJwt(bodyValid.access_token, process.env.MCP_JWT_SECRET!);
+    assert.ok(payload);
+    assert.equal(payload.iss, "https://khora.example.com");
+    assert.equal(payload.aud, "https://khora.example.com/api/mcp");
+    assert.equal(payload.scope, "volcados:read");
+
+    // 6. Second exchange with same code -> invalid_grant (400)
+    const reqSecond = new NextRequest("https://khora.example.com/api/oauth/token", {
+      method: "POST",
+      body: formDataValid,
+    });
+    const resSecond = await postTokenRoute(reqSecond);
+    assert.equal(resSecond.status, 400);
+    const bodySecond = await resSecond.json();
+    assert.equal(bodySecond.error, "invalid_grant");
+  } finally {
+    resetDbForTesting();
+  }
 });
 
 test("3. JWT validation on /api/mcp (iss, aud, scope, gen, exp)", async () => {

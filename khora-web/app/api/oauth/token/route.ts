@@ -2,7 +2,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getMcpConfig } from "@/lib/server/mcp-config";
 import {
-  consumirCodigoAutorizacion,
+  obtenerCodigoAutorizacionValido,
+  marcarCodigoComoUsado,
   crearRefreshToken,
   rotarRefreshToken,
   obtenerGeneracionRevocacion,
@@ -45,6 +46,7 @@ export async function POST(req: NextRequest) {
     const code = formData.get("code")?.toString();
     const redirectUri = formData.get("redirect_uri")?.toString();
     const codeVerifier = formData.get("code_verifier")?.toString();
+    const resourceParam = formData.get("resource")?.toString();
 
     if (!code || !redirectUri || !codeVerifier) {
       return NextResponse.json(
@@ -53,27 +55,53 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Consumir código atómicamente
-    const record = await consumirCodigoAutorizacion(code);
+    // 1. Obtener código sin marcar usado aún
+    const record = await obtenerCodigoAutorizacionValido(code);
     if (!record) {
       return NextResponse.json(
-        { error: "invalid_grant", error_description: "Authorization code invalid or already used" },
+        { error: "invalid_grant", error_description: "Invalid grant" },
         { status: 400 }
       );
     }
 
-    // Verificar redirect_uri
+    // 2. Verificar redirect_uri
     if (record.redirect_uri !== redirectUri) {
       return NextResponse.json(
-        { error: "invalid_grant", error_description: "Redirect URI mismatch" },
+        { error: "invalid_grant", error_description: "Invalid grant" },
         { status: 400 }
       );
     }
 
-    // Verificar PKCE
+    // 3. Verificar PKCE
     if (!verifyPkceS256(codeVerifier, record.code_challenge)) {
       return NextResponse.json(
-        { error: "invalid_grant", error_description: "Invalid code_verifier" },
+        { error: "invalid_grant", error_description: "Invalid grant" },
+        { status: 400 }
+      );
+    }
+
+    // 4. Verificar resource
+    if (resourceParam) {
+      if (resourceParam !== record.resource || resourceParam !== config.canonicalUrl) {
+        return NextResponse.json(
+          { error: "invalid_grant", error_description: "Invalid grant" },
+          { status: 400 }
+        );
+      }
+    } else {
+      if (record.resource !== config.canonicalUrl) {
+        return NextResponse.json(
+          { error: "invalid_grant", error_description: "Invalid grant" },
+          { status: 400 }
+        );
+      }
+    }
+
+    // 5. Consumo atómico: marcar como usado solo tras pasar todas las validaciones
+    const marcado = await marcarCodigoComoUsado(record.id);
+    if (!marcado) {
+      return NextResponse.json(
+        { error: "invalid_grant", error_description: "Invalid grant" },
         { status: 400 }
       );
     }
@@ -85,7 +113,7 @@ export async function POST(req: NextRequest) {
       {
         iss: config.issuer,
         sub: record.usuario,
-        aud: record.resource,
+        aud: config.canonicalUrl,
         scope: "volcados:read",
         gen,
         exp: nowSec + 3600,
@@ -97,7 +125,7 @@ export async function POST(req: NextRequest) {
 
     const refreshToken = await crearRefreshToken({
       usuario: record.usuario,
-      resource: record.resource,
+      resource: config.canonicalUrl,
     });
 
     return NextResponse.json(
@@ -118,6 +146,7 @@ export async function POST(req: NextRequest) {
     );
   } else if (grantType === "refresh_token") {
     const rawRefreshToken = formData.get("refresh_token")?.toString();
+    const resourceParam = formData.get("resource")?.toString();
 
     if (!rawRefreshToken) {
       return NextResponse.json(
@@ -128,14 +157,29 @@ export async function POST(req: NextRequest) {
 
     const rotated = await rotarRefreshToken(rawRefreshToken);
     if (!rotated) {
-      // Retornar código literal invalid_grant según RFC 6749
       return NextResponse.json(
-        { error: "invalid_grant", error_description: "Invalid, expired, or already rotated refresh token" },
+        { error: "invalid_grant", error_description: "Invalid grant" },
         { status: 400 }
       );
     }
 
     const { record, newToken } = rotated;
+
+    // Verificar coherencia del recurso almacenado y parámetro opcional
+    if (record.resource !== config.canonicalUrl) {
+      return NextResponse.json(
+        { error: "invalid_grant", error_description: "Invalid grant" },
+        { status: 400 }
+      );
+    }
+
+    if (resourceParam && (resourceParam !== record.resource || resourceParam !== config.canonicalUrl)) {
+      return NextResponse.json(
+        { error: "invalid_grant", error_description: "Invalid grant" },
+        { status: 400 }
+      );
+    }
+
     const gen = await obtenerGeneracionRevocacion(record.usuario);
     const nowSec = Math.floor(Date.now() / 1000);
 
@@ -143,7 +187,7 @@ export async function POST(req: NextRequest) {
       {
         iss: config.issuer,
         sub: record.usuario,
-        aud: record.resource,
+        aud: config.canonicalUrl,
         scope: "volcados:read",
         gen,
         exp: nowSec + 3600,
