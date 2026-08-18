@@ -3,8 +3,8 @@
 
 import { useCallback, useEffect, useRef, useState, Suspense } from "react";
 import * as Icons from "lucide-react";
-import Link from "next/link";
 import { ensamblarParrafos, Fragmento } from "../../../lib/transcripcion/ensamblar";
+import { SegmentoReconciliado, reconciliarSegmentos } from "../../../lib/server/transcribir";
 
 type Estado = "inactivo" | "dictando";
 type EstadoReconciliacion = "preview_live" | "procesando_whisper" | "reconciliado_whisper" | "fallback_preview" | "editado_manual";
@@ -29,7 +29,7 @@ export default function IngresoPage() {
 }
 
 function IngresoContenido() {
-  const [bloques, setBloques] = useState<string[]>([]);
+  const [segmentos, setSegmentos] = useState<SegmentoReconciliado[]>([]);
   const [pendiente, setPendiente] = useState("");
   const [parcial, setParcial] = useState("");
   const [estado, setEstado] = useState<Estado>("inactivo");
@@ -53,7 +53,6 @@ function IngresoContenido() {
   // Editable textarea states
   const [texto, setTexto] = useState("");
   const [editando, setEditando] = useState(false);
-  const [editadoManualmente, setEditadoManualmente] = useState(false);
   const [estabaDictando, setEstabaDictando] = useState(false);
 
   // New states for parts
@@ -67,7 +66,7 @@ function IngresoContenido() {
   const fragmentosRef = useRef<Fragmento[]>([]);
   const ultimaMarcaTiempoRef = useRef<number>(0);
   const pendienteRef = useRef("");
-  const bloquesRef = useRef<string[]>([]);
+  const segmentosRef = useRef<SegmentoReconciliado[]>([]);
   const relojRef = useRef<any>(null);
   const rearmeRef = useRef<any>(null);
   const activoRef = useRef(false);
@@ -89,72 +88,66 @@ function IngresoContenido() {
     if (!w.SpeechRecognition && !w.webkitSpeechRecognition) setSoportado(false);
   }, []);
 
-  // Update unified textarea content when NOT editing
+  // Update unified textarea content when NOT actively editing
   useEffect(() => {
     if (!editando) {
-      const parts = [...bloques, pendiente].filter((s) => s.trim().length > 0);
+      const parts = segmentos.map((s) => s.texto).filter((s) => s.trim().length > 0);
       let unified = parts.join("\n\n");
+      if (!unified && pendiente) {
+        unified = pendiente;
+      }
       if (parcial) {
         unified += (unified ? " " : "") + parcial;
       }
       setTexto(unified);
     }
-  }, [bloques, pendiente, parcial, editando]);
+  }, [segmentos, pendiente, parcial, editando]);
 
-  const pulirBloque = useCallback(async (bloque: string) => {
-    const indice = bloquesRef.current.length;
-    bloquesRef.current = [...bloquesRef.current, bloque];
-    setBloques(bloquesRef.current);
-    try {
-      const r = await fetch("/api/pulir", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ texto: bloque }) });
-      const textoRespuesta = await r.text();
-      let data: any = {};
-      try {
-        data = JSON.parse(textoRespuesta);
-      } catch (parseErr) {
-        data = { motivo: "Respuesta no-JSON de pulido: " + textoRespuesta.slice(0, 100) };
-      }
-
-      if (r.ok && data?.aceptado === true && typeof data?.texto === "string") {
-        const copia = [...bloquesRef.current];
-        copia[indice] = data.texto;
-        bloquesRef.current = copia;
-        setBloques(copia);
-        setPulidosOk((n) => n + 1);
-      } else {
-        setPulidosNo((n) => n + 1);
-        setAviso(typeof data?.motivo === "string" ? "bloque sin pulir: " + data.motivo : "bloque sin pulir");
-      }
-    } catch (e) {
-      setPulidosNo((n) => n + 1);
-      setAviso("bloque sin pulir: " + String(e));
-    }
-  }, []);
-
-  const cerrarBloque = useCallback(() => {
+  const estabilizarEmision = useCallback(() => {
     if (fragmentosRef.current.length > 0) {
       const ensamblado = ensamblarParrafos(fragmentosRef.current, { umbralMs: 3500 });
       if (ensamblado.trim().length > 0) {
-        fragmentosRef.current = [];
-        pendienteRef.current = "";
-        setPendiente("");
-        void pulirBloque(ensamblado);
-        return;
+        setPendiente(ensamblado);
+        pendienteRef.current = ensamblado;
+
+        const parrafos = ensamblado.split("\n\n").filter((p) => p.trim().length > 0);
+        const existentes = [...segmentosRef.current];
+
+        const nuevosSegmentos: SegmentoReconciliado[] = parrafos.map((p, idx) => {
+          const segExistente = existentes[idx];
+          if (segExistente && (segExistente.estado === "editado_manual" || segExistente.modificadoManualmente)) {
+            return segExistente;
+          }
+          return {
+            id: segExistente?.id ?? `seg-${idx + 1}-${Date.now()}`,
+            texto: p,
+            estado: "provisional_asr",
+          };
+        });
+
+        segmentosRef.current = nuevosSegmentos;
+        setSegmentos(nuevosSegmentos);
       }
     }
-    const bloque = pendienteRef.current.trim();
-    pendienteRef.current = "";
-    setPendiente("");
-    if (bloque.length > 0) void pulirBloque(bloque);
-  }, [pulirBloque]);
+  }, []);
 
   const ejecutarTranscripcionAutoritativa = useCallback(async () => {
     if (trozosRef.current.length === 0 && partesSubidasRef.current.length === 0) return;
     setEstadoReconciliacion("procesando_whisper");
-    const textoPreview = editadoManualmente ? texto : [...bloquesRef.current, pendienteRef.current].filter((s) => s.trim().length > 0).join("\n\n");
+    const textoPreview = texto || segmentosRef.current.map((s) => s.texto).join("\n\n");
 
     const forma = new FormData();
     forma.append("previewText", textoPreview);
+
+    if (partesSubidasRef.current.length > 0) {
+      const chunkMeta = partesSubidasRef.current.map((p) => ({
+        part_index: p.parte,
+        start_ms: (p.parte - 1) * 45000,
+        end_ms: p.parte * 45000,
+        session_id: sesionIdRef.current,
+      }));
+      forma.append("chunkMeta", JSON.stringify(chunkMeta));
+    }
 
     if (trozosRef.current.length > 0) {
       const blobCompleto = new Blob(trozosRef.current, { type: "audio/webm" });
@@ -164,29 +157,29 @@ function IngresoContenido() {
     try {
       const r = await fetch("/api/transcribir", { method: "POST", body: forma });
       const data = await r.json();
+
       if (r.ok && data?.exito && typeof data?.textoFinal === "string") {
-        if (!editadoManualmente) {
-          const textoReconciliado = data.textoFinal;
-          const parrafos = textoReconciliado.split("\n\n").filter((p: string) => p.trim().length > 0);
-          bloquesRef.current = parrafos;
-          setBloques(parrafos);
-          setPendiente("");
-          pendienteRef.current = "";
-          setTexto(textoReconciliado);
-          setEstadoReconciliacion("reconciliado_whisper");
-        } else {
-          setEstadoReconciliacion("editado_manual");
-        }
-        setReconciliacionMensaje(data.motivoReconciliacion || "Transcripción autoritativa Groq Whisper (whisper-large-v3) procesada con éxito.");
+        const resultadoReconciliacion = reconciliarSegmentos(segmentosRef.current, data.textoFinal);
+        segmentosRef.current = resultadoReconciliacion.segmentos;
+        setSegmentos(resultadoReconciliacion.segmentos);
+        setTexto(resultadoReconciliacion.textoFinal);
+        setPendiente("");
+        pendienteRef.current = "";
+
+        const hayManual = resultadoReconciliacion.segmentos.some((s) => s.estado === "editado_manual" || s.modificadoManualmente);
+        setEstadoReconciliacion(hayManual ? "editado_manual" : "reconciliado_whisper");
+        setReconciliacionMensaje(data.motivoReconciliacion || "Transcripción autoritativa Groq Whisper procesada con éxito.");
       } else {
-        setEstadoReconciliacion(editadoManualmente ? "editado_manual" : "fallback_preview");
+        const hayManual = segmentosRef.current.some((s) => s.estado === "editado_manual" || s.modificadoManualmente);
+        setEstadoReconciliacion(hayManual ? "editado_manual" : "fallback_preview");
         setReconciliacionMensaje(`Groq Whisper no disponible: ${data?.detail || "Conservando previsualización ASR en vivo."}`);
       }
     } catch (e) {
-      setEstadoReconciliacion(editadoManualmente ? "editado_manual" : "fallback_preview");
+      const hayManual = segmentosRef.current.some((s) => s.estado === "editado_manual" || s.modificadoManualmente);
+      setEstadoReconciliacion(hayManual ? "editado_manual" : "fallback_preview");
       setReconciliacionMensaje(`Fallo al solicitar transcripción autoritativa: ${String(e)}.`);
     }
-  }, [editadoManualmente, texto]);
+  }, [texto]);
 
   const subirParteActual = useCallback(async () => {
     if (parteTrozosRef.current.length === 0) return;
@@ -213,7 +206,7 @@ function IngresoContenido() {
         let da: any = {};
         try {
           da = JSON.parse(textoRespuesta);
-        } catch (parseErr) {
+        } catch {
           da = { detail: "Respuesta no-JSON de la API de audio: " + textoRespuesta.slice(0, 100) };
         }
 
@@ -228,7 +221,7 @@ function IngresoContenido() {
           setBytesAcumulados((total) => total + bytesSubidos);
           setConAudio(true);
         } else {
-          setAviso(`audio parte ${parteActual} no guardada: ${String(da?.detail || "")} ${String(da?.causa || "")}`);
+          setAviso(`audio parte ${parteActual} no guardada: ${String(da?.detail || "")}`);
         }
       } catch (e) {
         setAviso(`audio parte ${parteActual} no guardada por error: ${String(e)}`);
@@ -242,9 +235,9 @@ function IngresoContenido() {
   }, []);
 
   const detenerGrabacion = useCallback(() => {
-    try { grabRef.current?.stop(); } catch (e) {}
+    try { grabRef.current?.stop(); } catch {}
     grabRef.current = null;
-    try { flujoRef.current?.getTracks?.().forEach((pista: any) => pista.stop()); } catch (e) {}
+    try { flujoRef.current?.getTracks?.().forEach((pista: any) => pista.stop()); } catch {}
     flujoRef.current = null;
   }, []);
 
@@ -252,7 +245,7 @@ function IngresoContenido() {
     if (!audioPermitidoRef.current || !activoRef.current || grabRef.current) return;
     try {
       const flujo = await navigator.mediaDevices.getUserMedia({ audio: true });
-      if (!activoRef.current || !audioPermitidoRef.current) { try { flujo.getTracks().forEach((pista: any) => pista.stop()); } catch (e) {} return; }
+      if (!activoRef.current || !audioPermitidoRef.current) { try { flujo.getTracks().forEach((pista: any) => pista.stop()); } catch {} return; }
       flujoRef.current = flujo;
       const grabadora = new MediaRecorder(flujo);
 
@@ -302,12 +295,10 @@ function IngresoContenido() {
           ultimaMarcaTiempoRef.current = ahora;
 
           fragmentosRef.current.push({ texto: txt, pausaMsAntes });
-          const ensamblado = ensamblarParrafos(fragmentosRef.current, { umbralMs: 3500 });
-          pendienteRef.current = ensamblado;
-          setPendiente(ensamblado);
+          estabilizarEmision();
 
           if (relojRef.current) clearTimeout(relojRef.current);
-          relojRef.current = setTimeout(cerrarBloque, 4000);
+          relojRef.current = setTimeout(estabilizarEmision, 4000);
         } else {
           interino = interino + " " + txt;
         }
@@ -352,8 +343,8 @@ function IngresoContenido() {
         setReconexiones((n) => n + 1);
         try {
           rec.start();
-        } catch (e) {
-          try { rec.abort(); } catch (e2) {}
+        } catch {
+          try { rec.abort(); } catch {}
           rearmeRef.current = setTimeout(() => {
             if (!activoRef.current) return;
             try { rec.start(); } catch (e3) { activoRef.current = false; setEstado("inactivo"); setError("reconocimiento no reanudable: " + String(e3)); }
@@ -364,7 +355,7 @@ function IngresoContenido() {
     recRef.current = rec;
     try { rec.start(); } catch (e) { setError("no se pudo iniciar el reconocimiento: " + String(e)); return false; }
     return true;
-  }, [cerrarBloque, detenerGrabacion]);
+  }, [estabilizarEmision, detenerGrabacion]);
 
   const iniciar = useCallback(async () => {
     setError("");
@@ -375,7 +366,6 @@ function IngresoContenido() {
     audioPermitidoRef.current = true;
     trozosRef.current = [];
 
-    // Reset session & parts refs/states
     sesionIdRef.current = generarSesionId();
     parteConsecutivaRef.current = 0;
     partesSubidasRef.current = [];
@@ -398,24 +388,23 @@ function IngresoContenido() {
   const detener = useCallback(async () => {
     activoRef.current = false;
     if (rearmeRef.current) clearTimeout(rearmeRef.current);
-    try { recRef.current?.stop(); } catch (e) {}
+    try { recRef.current?.stop(); } catch {}
     recRef.current = null;
     detenerGrabacion();
     if (inicioRef.current > 0) duracionRef.current = Math.round((Date.now() - inicioRef.current) / 1000);
     if (relojRef.current) clearTimeout(relojRef.current);
     setParcial("");
     setEscuchando(false);
-    cerrarBloque();
+    estabilizarEmision();
     await ejecutarTranscripcionAutoritativa();
     setEstado("inactivo");
-  }, [cerrarBloque, detenerGrabacion, ejecutarTranscripcionAutoritativa]);
+  }, [estabilizarEmision, detenerGrabacion, ejecutarTranscripcionAutoritativa]);
 
-  // Special stop/pause when manual editing triggers
   const pausarDictadoPorEdicion = useCallback(() => {
     activoRef.current = false;
     if (rearmeRef.current) clearTimeout(rearmeRef.current);
-    try { recRef.current?.stop(); } catch (e) {}
-    try { grabRef.current?.stop(); } catch (e) {}
+    try { recRef.current?.stop(); } catch {}
+    try { grabRef.current?.stop(); } catch {}
     if (relojRef.current) clearTimeout(relojRef.current);
     setParcial("");
     setEscuchando(false);
@@ -438,9 +427,9 @@ function IngresoContenido() {
       activoRef.current = false;
       if (relojRef.current) clearTimeout(relojRef.current);
       if (rearmeRef.current) clearTimeout(rearmeRef.current);
-      try { recRef.current?.abort?.(); } catch (e) {}
-      try { grabRef.current?.stop(); } catch (e) {}
-      try { flujoRef.current?.getTracks?.().forEach((pista: any) => pista.stop()); } catch (e) {}
+      try { recRef.current?.abort?.(); } catch {}
+      try { grabRef.current?.stop(); } catch {}
+      try { flujoRef.current?.getTracks?.().forEach((pista: any) => pista.stop()); } catch {}
     };
   }, []);
 
@@ -488,7 +477,7 @@ function IngresoContenido() {
         const textoRespuesta = await rv.text();
         try {
           dv = JSON.parse(textoRespuesta);
-        } catch (parseErr) {
+        } catch {
           dv = { detail: "Respuesta no-JSON de dictado: " + textoRespuesta.slice(0, 200) };
         }
 
@@ -508,8 +497,8 @@ function IngresoContenido() {
   }, [texto, titulo, pulidosOk]);
 
   const limpiar = useCallback(() => {
-    bloquesRef.current = [];
-    setBloques([]);
+    segmentosRef.current = [];
+    setSegmentos([]);
     fragmentosRef.current = [];
     ultimaMarcaTiempoRef.current = 0;
     pendienteRef.current = "";
@@ -526,12 +515,10 @@ function IngresoContenido() {
     setReconexiones(0);
     setTexto("");
     setEditando(false);
-    setEditadoManualmente(false);
     setEstabaDictando(false);
     setEstadoReconciliacion("preview_live");
     setReconciliacionMensaje("");
 
-    // Reset new states and refs
     sesionIdRef.current = "";
     parteConsecutivaRef.current = 0;
     partesSubidasRef.current = [];
@@ -545,7 +532,6 @@ function IngresoContenido() {
     const val = e.target.value;
     if (!editando) {
       setEditando(true);
-      setEditadoManualmente(true);
       setEstadoReconciliacion("editado_manual");
       if (estado === "dictando") {
         setEstabaDictando(true);
@@ -554,18 +540,33 @@ function IngresoContenido() {
         setEstabaDictando(false);
       }
     } else {
-      setEditadoManualmente(true);
       setEstadoReconciliacion("editado_manual");
     }
     setTexto(val);
   };
 
+  /**
+   * Confirma la edición manual de forma segmentaria sin colapsar el documento completo en un solo bloque interno.
+   */
   const confirmarEdicion = () => {
     setEditando(false);
-    bloquesRef.current = [texto];
-    setBloques([texto]);
-    pendienteRef.current = "";
+    const parrafos = texto.split("\n\n").filter((p) => p.trim().length > 0);
+    const existentes = [...segmentosRef.current];
+
+    const nuevosSegmentos: SegmentoReconciliado[] = parrafos.map((p, idx) => {
+      const segExistente = existentes[idx];
+      return {
+        id: segExistente?.id ?? `seg-${idx + 1}-${Date.now()}`,
+        texto: p,
+        estado: "editado_manual",
+        modificadoManualmente: true,
+      };
+    });
+
+    segmentosRef.current = nuevosSegmentos;
+    setSegmentos(nuevosSegmentos);
     setPendiente("");
+    pendienteRef.current = "";
     setParcial("");
 
     if (estabaDictando) {
@@ -613,7 +614,7 @@ function IngresoContenido() {
           Ingreso Integrado
         </h1>
         <p className="text-sm mt-1" style={{ color: "var(--khora-accent)" }}>
-          Método universal combinado: Dicta en vivo, escribe o pega directamente. La transcripción es editable de forma ipso facto e in-situ.
+          Método universal combinado: Dicta en vivo, escribe o pega directamente. La transcripción es editable in-situ con protección segmentaria.
         </p>
       </div>
 
@@ -760,6 +761,12 @@ function IngresoContenido() {
       </p>
 
       {/* Alertas y Mensajes de Retorno */}
+      {reconciliacionMensaje.length > 0 && (
+        <div className="p-3 border rounded-none text-xs flex items-center gap-2" style={{ borderColor: "var(--khora-border)", backgroundColor: "var(--khora-surface)", color: "var(--khora-ink)" }}>
+          <Icons.Sparkles size={20} strokeWidth={1.75} className="shrink-0" style={{ color: "var(--khora-accent)" }} />
+          <span>{reconciliacionMensaje}</span>
+        </div>
+      )}
       {aviso.length > 0 && (
         <div className="p-3 border rounded-none text-sm flex items-center gap-2" style={{ borderColor: "var(--khora-border)", backgroundColor: "var(--khora-surface)", color: "var(--khora-accent)" }}>
           <Icons.TriangleAlert size={32} strokeWidth={1.75} className="shrink-0" />

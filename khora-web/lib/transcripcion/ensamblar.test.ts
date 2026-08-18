@@ -4,6 +4,7 @@ import test from "node:test";
 import assert from "node:assert";
 import {
   ensamblarParrafos,
+  ensamblarParrafosEstructurado,
   aplicarGlosario,
 } from "./ensamblar.js";
 import type { Fragmento } from "./ensamblar.js";
@@ -13,7 +14,7 @@ function contarPalabras(texto: string): number {
   return matches ? matches.length : 0;
 }
 
-test("1. Tres fragmentos con pausas cortas producen UN párrafo.", () => {
+test("1. Tres fragmentos con pausas cortas producen UN solo párrafo.", () => {
   const fragmentos: Fragmento[] = [
     { texto: "hola", pausaMsAntes: 0 },
     { texto: "buenos", pausaMsAntes: 200 },
@@ -25,32 +26,37 @@ test("1. Tres fragmentos con pausas cortas producen UN párrafo.", () => {
   assert.ok(!resultado.includes("\n"));
 });
 
-test("2. Pausa de 4000 ms produce DOS párrafos.", () => {
+test("2. Pausa de 4000 ms dentro de una oración NUNCA produce dos párrafos (Invariante Silencio Auxiliar).", () => {
   const fragmentos: Fragmento[] = [
-    { texto: "hola", pausaMsAntes: 0 },
-    { texto: "cómo estás", pausaMsAntes: 4000 },
+    { texto: "Quiero revisar el sistema de memoria", pausaMsAntes: 0 },
+    { texto: "para asegurar que la estructura funciona bien", pausaMsAntes: 4000 },
   ];
 
   const resultado = ensamblarParrafos(fragmentos);
   const parrafos = resultado.split("\n\n");
-  assert.strictEqual(parrafos.length, 2);
-  assert.strictEqual(parrafos[0], "Hola");
-  assert.strictEqual(parrafos[1], "Cómo estás");
+  assert.strictEqual(parrafos.length, 1, "La pausa por sí sola jamás debe crear un salto de párrafo");
+  assert.strictEqual(
+    resultado,
+    "Quiero revisar el sistema de memoria para asegurar que la estructura funciona bien"
+  );
 });
 
-test("3. Un fragmento de una sola palabra tras pausa larga (>= 3500ms) SÍ aparece en la salida como párrafo nuevo.", () => {
+test("3. Pausa de 12000 ms con conector subordinante ('porque') mantiene UN solo párrafo.", () => {
   const fragmentos: Fragmento[] = [
-    { texto: "hola", pausaMsAntes: 0 },
-    { texto: "sí", pausaMsAntes: 4000 },
+    { texto: "No queremos modificar la arquitectura actual", pausaMsAntes: 0 },
+    { texto: "porque la experiencia de usuario ha sido sólida", pausaMsAntes: 12000 },
   ];
 
   const resultado = ensamblarParrafos(fragmentos);
   const parrafos = resultado.split("\n\n");
-  assert.strictEqual(parrafos.length, 2);
-  assert.strictEqual(parrafos[1], "Sí");
+  assert.strictEqual(parrafos.length, 1);
+  assert.strictEqual(
+    resultado,
+    "No queremos modificar la arquitectura actual porque la experiencia de usuario ha sido sólida"
+  );
 });
 
-test("4. La palabra 'digo' repetida dos veces aparece DOS veces.", () => {
+test("4. La repetición oral o palabra repetida aparece el número exacto de veces que fue dicha.", () => {
   const fragmentos: Fragmento[] = [
     { texto: "digo", pausaMsAntes: 0 },
     { texto: "digo", pausaMsAntes: 100 },
@@ -59,12 +65,11 @@ test("4. La palabra 'digo' repetida dos veces aparece DOS veces.", () => {
   const resultado = ensamblarParrafos(fragmentos);
   assert.strictEqual(resultado, "Digo digo");
 
-  // Verificar conteo de palabras específicas
   const matches = resultado.match(/digo/gi);
   assert.strictEqual(matches?.length, 2);
 });
 
-test("5. La suma de palabras de entrada es igual a la de salida (invariante de no-pérdida).", () => {
+test("5. La suma de palabras de entrada es exactamente igual a la de salida (Invariante de No-Pérdida).", () => {
   const fragmentos: Fragmento[] = [
     { texto: "hola", pausaMsAntes: 0 },
     { texto: "esto es un", pausaMsAntes: 1000 },
@@ -81,7 +86,7 @@ test("5. La suma de palabras de entrada es igual a la de salida (invariante de n
   const resultado = ensamblarParrafos(fragmentos);
   const palabrasSalida = contarPalabras(resultado);
 
-  assert.strictEqual(palabrasSalida, palabrasEntrada, "La suma de palabras debe ser exactly equal");
+  assert.strictEqual(palabrasSalida, palabrasEntrada, "La suma de palabras debe ser idéntica");
 });
 
 test("6. aplicarGlosario convierte 'se sec' en 'CSEC' y 'cora' en 'Khora', sin tocar 'corazón'.", () => {
@@ -99,7 +104,7 @@ test("6. aplicarGlosario convierte 'se sec' en 'CSEC' y 'cora' en 'Khora', sin t
   );
 });
 
-test("7. Normalización de espacios antes de signos de puntuación", () => {
+test("7. Normalización de espacios antes de signos de puntuación.", () => {
   const fragmentos: Fragmento[] = [
     { texto: "hola", pausaMsAntes: 0 },
     { texto: " , qué tal", pausaMsAntes: 100 },
@@ -110,36 +115,16 @@ test("7. Normalización de espacios antes de signos de puntuación", () => {
   assert.strictEqual(resultado, "Hola, qué tal?");
 });
 
-test("8. Manejo de array vacío de fragmentos", () => {
+test("8. Manejo de array vacío de fragmentos.", () => {
   const resultado = ensamblarParrafos([]);
   assert.strictEqual(resultado, "");
 });
 
-test("9. Umbral personalizado de pausa en opciones", () => {
-  const fragmentos: Fragmento[] = [
-    { texto: "hola", pausaMsAntes: 0 },
-    { texto: "amigo", pausaMsAntes: 3000 },
-  ];
-
-  // Con umbral por defecto (3500 ms), 3000 ms se mantiene en un solo párrafo
-  const resultadoDefecto = ensamblarParrafos(fragmentos);
-  assert.strictEqual(resultadoDefecto.split("\n\n").length, 1);
-
-  // Con umbral personalizado menor (2000 ms), debería separar
-  const resultadoUmbralMenor = ensamblarParrafos(fragmentos, { umbralMs: 2000 });
-  assert.strictEqual(resultadoUmbralMenor.split("\n\n").length, 2);
-
-  // Con umbral de 5000 ms, debería unir en un solo párrafo
-  const resultadoPersonalizado = ensamblarParrafos(fragmentos, { umbralMs: 5000 });
-  assert.strictEqual(resultadoPersonalizado.split("\n\n").length, 1);
-  assert.strictEqual(resultadoPersonalizado, "Hola amigo");
-});
-
-test("10. Una sola idea con varias pausas artificiales produce UN solo párrafo (Escenario A)", () => {
+test("9. Una sola idea con varias pausas artificiales produce UN solo párrafo (Escenario A).", () => {
   const fragmentos: Fragmento[] = [
     { texto: "No quiero cambiar la forma en que funciona el sistema", pausaMsAntes: 0 },
-    { texto: "porque la experiencia actual es buena", pausaMsAntes: 4500 }, // Pausa larga pero con conector 'porque'
-    { texto: "pero quiero mejorar su precisión.", pausaMsAntes: 5000 }, // Pausa larga con conector 'pero'
+    { texto: "porque la experiencia actual es buena", pausaMsAntes: 4500 },
+    { texto: "pero quiero mejorar su precisión.", pausaMsAntes: 5000 },
   ];
 
   const resultado = ensamblarParrafos(fragmentos);
@@ -151,15 +136,55 @@ test("10. Una sola idea con varias pausas artificiales produce UN solo párrafo 
   );
 });
 
-test("11. Dos ideas independientes con punto de cierre y pausa corta producen DOS párrafos (Escenario B)", () => {
+test("10. Dos ideas independientes con punto de cierre y pausa corta producen DOS párrafos (Escenario B).", () => {
   const fragmentos: Fragmento[] = [
     { texto: "Quiero mejorar el reconocimiento.", pausaMsAntes: 0 },
-    { texto: "También quiero mejorar la revisión.", pausaMsAntes: 1200 }, // Pausa corta pero tras oración terminada con punto
+    { texto: "También quiero mejorar la revisión.", pausaMsAntes: 1200 },
   ];
 
   const resultado = ensamblarParrafos(fragmentos);
   const parrafos = resultado.split("\n\n");
-  assert.strictEqual(parrafos.length, 2, "Debe separar en dos párrafos debido al punto terminal");
+  assert.strictEqual(parrafos.length, 2, "Debe separar en dos párrafos debido a la clausura terminal explícita");
   assert.strictEqual(parrafos[0], "Quiero mejorar el reconocimiento.");
   assert.strictEqual(parrafos[1], "También quiero mejorar la revisión.");
+});
+
+test("11. Autocorrecciones ('Corrijo') permanecen en la misma unidad discursiva sin eliminar el texto previo.", () => {
+  const fragmentos: Fragmento[] = [
+    { texto: "La misión principal es la agilidad...", pausaMsAntes: 0 },
+    { texto: "Corrijo, la visión principal es la precisión.", pausaMsAntes: 1500 },
+  ];
+
+  const resultado = ensamblarParrafos(fragmentos);
+  const parrafos = resultado.split("\n\n");
+
+  assert.strictEqual(parrafos.length, 1, "La autocorrección debe agruparse con la unidad discursiva que corrige");
+  assert.ok(resultado.includes("misión"));
+  assert.ok(resultado.includes("Corrijo"));
+  assert.ok(resultado.includes("visión"));
+});
+
+test("12. Conector discursivo ('Sin embargo') no produce un párrafo aislado automáticamente.", () => {
+  const fragmentos: Fragmento[] = [
+    { texto: "El sistema actual funciona de manera muy fluida.", pausaMsAntes: 0 },
+    { texto: "Sin embargo todavía requiere mayor precisión en la segmentación.", pausaMsAntes: 800 },
+  ];
+
+  const resultado = ensamblarParrafos(fragmentos);
+  assert.ok(
+    resultado.includes("El sistema actual funciona de manera muy fluida. Sin embargo todavía requiere mayor precisión"),
+    "El conector no debe quedar aislado en un párrafo aparte"
+  );
+});
+
+test("13. Salvaguarda de longitud divide párrafos al superar el objetivo de palabras en un límite seguro.", () => {
+  const muchasPalabras = Array(190).fill("palabra").join(" ") + ".";
+  const fragmentos: Fragmento[] = [
+    { texto: muchasPalabras, pausaMsAntes: 0 },
+    { texto: "Esta es una nueva oración independiente.", pausaMsAntes: 1000 },
+  ];
+
+  const resultadoEstructurado = ensamblarParrafosEstructurado(fragmentos, { maxPalabrasObjetivo: 180 });
+  assert.strictEqual(resultadoEstructurado.parrafos.length, 2);
+  assert.strictEqual(resultadoEstructurado.motivosLimites[0].motivo, "longitud_segura");
 });

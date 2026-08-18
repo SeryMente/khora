@@ -285,7 +285,7 @@ test.describe("Pipeline Control Tower E2E Tests", () => {
     await page.locator("div.border-b button:has-text('Revisión')").click();
 
     // 11. Verify ingestion is blocked beforehand (shows blocked warning)
-    await expect(page.locator("text=Bloqueado para Ingesta:")).toBeVisible();
+    await expect(page.locator("text=Bloqueado para Ingesta:").first()).toBeVisible();
 
     // Wait a brief moment to ensure React is fully hydrated and interactive
     await page.waitForTimeout(600);
@@ -294,14 +294,14 @@ test.describe("Pipeline Control Tower E2E Tests", () => {
     await page.locator("button:has-text('Aprobar v3')").click();
 
     // Ingestion should unlock and show ingest action
-    const ingestBtn = page.locator("button:has-text('Ingerir')");
+    const ingestBtn = page.locator("button:has-text('Ingerir versión aprobada')");
     await expect(ingestBtn).toBeVisible();
 
     // 12. Ingerir versión aprobada
     await ingestBtn.click();
 
     // 13. Verify newly generated io_id is shown successfully
-    await expect(page.locator("text=✓ INGESTADO")).toBeVisible();
+    await expect(page.locator("text=✓ INGESTADO").first()).toBeVisible();
     await expect(page.locator("text=io_id: io-newly-ingested-id").first()).toBeVisible();
   });
 
