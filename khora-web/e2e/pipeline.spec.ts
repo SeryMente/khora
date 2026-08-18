@@ -30,18 +30,24 @@ test.describe("Pipeline Control Tower E2E Tests", () => {
         status: 200,
         contentType: "application/json",
         body: JSON.stringify({
-          resumen: {
-            total: 3,
+          total: 3,
+          counts: {
             archivado: 1,
             pendiente_revision: 0,
             en_revision: v002Approved ? 0 : 1,
             listo_ingesta: (v002Approved && !v002Ingested) ? 1 : 0,
             ingerido: v002Ingested ? 2 : 1,
-            fallido: 0,
-            anomalies: 2,
-            sin_audio: 1
+            fallido: 0
           },
-          items: [
+          integrity: {
+            sync: 1,
+            text_edited: 0,
+            text_without_audio: 1,
+            audio_without_text: 0,
+            audio_partial: 1,
+            broken_provenance: 0
+          },
+          volcados: [
             {
               id: "v-001",
               titulo: "Volcado de Ingesta Exitoso",

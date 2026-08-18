@@ -136,16 +136,16 @@ export default function VolcadosPage() {
       const res = await fetch("/api/volcados/pipeline");
       const data = await res.json();
       if (res.ok) {
-        const items = data.volcados || data.items || [];
+        const items = data.volcados ?? [];
         setPipelineItems(items);
         setResumen({
-          total: data.total ?? data.resumen?.total ?? 0,
-          en_revision: data.counts?.en_revision ?? data.resumen?.en_revision ?? 0,
-          pendiente_revision: data.counts?.pendiente_revision ?? data.resumen?.pendiente_revision ?? 0,
-          listo_ingesta: data.counts?.listo_ingesta ?? data.resumen?.listo_ingesta ?? 0,
-          ingerido: data.counts?.ingerido ?? data.resumen?.ingerido ?? 0,
-          anomalies: data.integrity ? ((data.total ?? 0) - (data.integrity?.sync ?? 0)) : (data.resumen?.anomalies ?? 0),
-          sin_audio: data.integrity?.text_without_audio ?? data.resumen?.sin_audio ?? 0,
+          total: data.total ?? 0,
+          en_revision: data.counts?.en_revision ?? 0,
+          pendiente_revision: data.counts?.pendiente_revision ?? 0,
+          listo_ingesta: data.counts?.listo_ingesta ?? 0,
+          ingerido: data.counts?.ingerido ?? 0,
+          anomalies: (data.total ?? 0) - (data.integrity?.sync ?? 0),
+          sin_audio: data.integrity?.text_without_audio ?? 0,
         });
         return items;
       }
