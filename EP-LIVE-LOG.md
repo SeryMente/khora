@@ -3,20 +3,16 @@
 **Propósito:** registro operativo público y sanitizado del Entorno Persistente.
 **Versión:** KHORA v7.2.0
 **Estado:** ACTIVE
-**Última sincronización:** 2026-08-19 16:22:12
+**Última sincronización:** 2026-08-19 16:24:34
 **Motivo:** periodic-active-session
 **Branch publicado:** main
-**HEAD observado:** e090c7d6b63d6dcfea4ee9cf6440c7698810bc36
+**HEAD observado:** 2278f2bfc232c0e064764950761367fa4e759122
 
 > Este archivo es un registro operativo, no sustituye EP-ARCHITECTURE.md.
 > Se actualiza bajo demanda, al quedar lista una sesión y al iniciar el cierre de sesión.
 
 ## Eventos recientes
 
-[16:08:00][INFO] vercel link: Retrieving project…
-[16:08:00][INFO] vercel link: > Downloading a fresh `VERCEL_OIDC_TOKEN` for victorhugotorresmendez-8991s-projects/khora-web
-[16:08:00][INFO] vercel link: Downloading
-[16:08:00][INFO] vercel link: System.Management.Automation.RemoteException
 [16:08:00][INFO] vercel link: ✓ Created         .env.local file and added it to .gitignore
 [16:09:41][INFO] vercel prod: Vercel CLI 59.1.4 (Node.js 24.19.0)
 [16:09:41][INFO] vercel prod: Deploying khora-web
@@ -253,12 +249,12 @@
 [16:21:22][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
 [16:21:33][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
 [16:21:33][WARN] Auto-WIP NO VERIFICADO: trabajo local sin respaldo remoto (reintento en el proximo ciclo).
+[16:22:15][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
+[16:22:22][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
+[16:22:33][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
+[16:22:33][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
 
 --- HISTORIAL DE SESIONES (ULTIMAS LINEAS) ---
-[16:10:22][INFO] npm: npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead
-[16:10:22][INFO] npm: 
-[16:10:22][INFO] npm: added 616 packages, and audited 617 packages in 26s
-[16:10:22][INFO] npm: 
 [16:10:22][INFO] npm: 185 packages are looking for funding
 [16:10:22][INFO] npm:   run `npm fund` for details
 [16:10:22][INFO] npm: 
@@ -335,3 +331,7 @@
 [16:21:22][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
 [16:21:33][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
 [16:21:33][WARN] Auto-WIP NO VERIFICADO: trabajo local sin respaldo remoto (reintento en el proximo ciclo).
+[16:22:15][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
+[16:22:22][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
+[16:22:33][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
+[16:22:33][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
