@@ -3,24 +3,16 @@
 **Propósito:** registro operativo público y sanitizado del Entorno Persistente.
 **Versión:** KHORA v7.2.0
 **Estado:** ACTIVE
-**Última sincronización:** 2026-08-19 16:10:26
-**Motivo:** session-ready
+**Última sincronización:** 2026-08-19 16:12:47
+**Motivo:** periodic-active-session
 **Branch publicado:** main
-**HEAD observado:** bd7ea41b84f783ec959d172a1e7c2e28328be236
+**HEAD observado:** c27a3db2e9b06556c55482977941135c4f3675d1
 
 > Este archivo es un registro operativo, no sustituye EP-ARCHITECTURE.md.
 > Se actualiza bajo demanda, al quedar lista una sesión y al iniciar el cierre de sesión.
 
 ## Eventos recientes
 
-[16:07:57][OK  ] PowerShell 5.1.26100.8894
-[16:07:57][OK  ] Git: git version 2.55.0.windows.3
-[16:07:57][OK  ] winget disponible.
-[16:07:58][OK  ] GitHub CLI autenticado y Git configurado para usar sus credenciales.
-[16:07:58][OK  ] Escritura en workdir OK (C:\Users\<USER>\AppData\Local\khora-session)
-[16:07:58][OK  ] Chrome detectado.
-[16:07:58][OK  ] VS Code detectado.
-[16:07:58][OK  ] ExecutionPolicy: Undefined
 [16:07:58][STEP] Politica de ejecucion
 [16:07:58][OK  ] ExecutionPolicy OK: Undefined
 [16:07:58][STEP] Cifrado en reposo (EFS)
@@ -253,13 +245,16 @@
 [16:10:25][INFO] Dev server Next.js lanzado en :3000
 [16:10:25][INFO] Dev servers iniciados. Sistema listo para trabajar.
 [16:10:25][INFO] SESION LISTA en 152s
+[16:10:26][INFO] Iniciando precarga paralela de dependencias (background job)...
+[16:10:26][INFO] Guardian iniciado: inactividad 900s, panico Ctrl+Alt+K.
+[16:10:27][INFO] Monitor de exfiltracion/RAT activo (cada 30s, umbral 25 MB/min).
+[16:10:29][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
+[16:10:35][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
+[16:10:47][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
+[16:10:47][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
+[16:10:47][WARN] EP-LIVE-LOG no pudo sincronizarse en la instancia inicial.
 
 --- HISTORIAL DE SESIONES (ULTIMAS LINEAS) ---
-[16:09:41][WARN] El repo no heredo EFS; aplicando cifrado directo...
-[16:09:41][OK  ] EFS ACTIVO: repo clonado marcado. Nuevos archivos heredaran cifrado.
-
-================================================================
- SESION INICIADA
  Fecha:    2026-08-19 16:09:41
  Host:     <HOST>
  Usuario:  <USER>
@@ -335,3 +330,8 @@
 [16:10:25][INFO] Dev server Next.js lanzado en :3000
 [16:10:25][INFO] Dev servers iniciados. Sistema listo para trabajar.
 [16:10:25][INFO] SESION LISTA en 152s
+[16:10:29][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
+[16:10:35][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
+[16:10:47][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
+[16:10:47][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
+[16:10:47][WARN] EP-LIVE-LOG no pudo sincronizarse en la instancia inicial.
