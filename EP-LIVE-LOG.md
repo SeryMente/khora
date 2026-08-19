@@ -3,25 +3,16 @@
 **Propósito:** registro operativo público y sanitizado del Entorno Persistente.
 **Versión:** KHORA v7.2.0
 **Estado:** ACTIVE
-**Última sincronización:** 2026-08-19 16:24:34
+**Última sincronización:** 2026-08-19 16:26:58
 **Motivo:** periodic-active-session
 **Branch publicado:** main
-**HEAD observado:** 2278f2bfc232c0e064764950761367fa4e759122
+**HEAD observado:** da5eea8eb445f701b42bb4205c70a4e3bfceeb62
 
 > Este archivo es un registro operativo, no sustituye EP-ARCHITECTURE.md.
 > Se actualiza bajo demanda, al quedar lista una sesión y al iniciar el cierre de sesión.
 
 ## Eventos recientes
 
-[16:08:00][INFO] vercel link: ✓ Created         .env.local file and added it to .gitignore
-[16:09:41][INFO] vercel prod: Vercel CLI 59.1.4 (Node.js 24.19.0)
-[16:09:41][INFO] vercel prod: Deploying khora-web
-[16:09:41][INFO] vercel prod: Uploading [--------------------] (0.0B/49.8KB)
-[16:09:41][INFO] vercel prod: Uploading [========------------] (21.0KB/49.8KB)
-[16:09:41][INFO] vercel prod: Uploading [==============------] (37.0KB/49.8KB)
-[16:09:41][INFO] vercel prod: Uploading [====================] (49.8KB/49.8KB)
-[16:09:41][INFO] vercel prod:   Inspect         https://vercel.com/victorhugotorresmendez-8991s-projects/khora-web/DEnkRjtUXUmk99srCDmHhAffZmuu
-[16:09:41][INFO] vercel prod:   Production      https://khora-4st8lp6bl-victorhugotorresmendez-8991s-projects.vercel.app
 [16:09:41][INFO] vercel prod: Building…
 [16:09:41][INFO] vercel prod: Building…
 [16:09:41][INFO] vercel prod: Running build in Washington, D.C., USA (East) – iad1
@@ -253,17 +244,17 @@
 [16:22:22][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
 [16:22:33][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
 [16:22:33][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
+[16:24:37][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
+[16:24:45][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
+[16:24:57][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
+[16:24:57][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
+[16:26:36][WARN] Chrome sin CDP activo o cerrado, omitiendo snapshot de pestañas.
+[16:26:38][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
+[16:26:44][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
+[16:26:56][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
+[16:26:56][WARN] Auto-WIP NO VERIFICADO: trabajo local sin respaldo remoto (reintento en el proximo ciclo).
 
 --- HISTORIAL DE SESIONES (ULTIMAS LINEAS) ---
-[16:10:22][INFO] npm: 185 packages are looking for funding
-[16:10:22][INFO] npm:   run `npm fund` for details
-[16:10:22][INFO] npm: 
-[16:10:22][INFO] npm: 10 high severity vulnerabilities
-[16:10:22][INFO] npm: 
-[16:10:22][INFO] npm: To address issues that do not require attention, run:
-[16:10:22][INFO] npm:   npm audit fix
-[16:10:22][INFO] npm: 
-[16:10:22][INFO] npm: To address all issues (including breaking changes), run:
 [16:10:22][INFO] npm:   npm audit fix --force
 [16:10:22][INFO] npm: 
 [16:10:22][INFO] npm: Run `npm audit` for details.
@@ -335,3 +326,12 @@
 [16:22:22][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
 [16:22:33][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
 [16:22:33][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
+[16:24:37][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
+[16:24:45][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
+[16:24:57][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
+[16:24:57][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
+[16:26:36][WARN] Chrome sin CDP activo o cerrado, omitiendo snapshot de pestañas.
+[16:26:38][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
+[16:26:44][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
+[16:26:56][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
+[16:26:56][WARN] Auto-WIP NO VERIFICADO: trabajo local sin respaldo remoto (reintento en el proximo ciclo).
