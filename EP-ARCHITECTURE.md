@@ -20,6 +20,8 @@
 - **Divergencia:** si la copia local difiere del canon remoto, el agente DEBE declararlo antes de continuar.
 - **Prohibición:** NO redescubrir la arquitectura desde cero ni inventar una arquitectura paralela cuando este objeto y AGENTS.md ya proporcionan el contexto canónico.
 
+EP Architecture respetada: KHORA v7.1.19
+
 ## 1. Propósito
 KHORA implementa un Entorno Persistente agnóstico de máquina: la máquina actual es una instancia temporal; el estado persistente permitido se reconstruye desde GitHub, la llave y los mecanismos del repositorio.
 
@@ -74,7 +76,38 @@ ARRANCAR.cmd inicia el GATE mediante ruta relativa a su propia ubicación. khora
 ### Arranque
 Llave -> ARRANCAR -> GATE -> BARRIL -> Run-Main.
 ### Instanciación
-Start-Sesion -> validar GitHub -> obtener token temporal -> clone autenticado -> limpiar origin -> configurar repo -> Init-Wip -> restaurar contexto -> VS Code -> Chrome -> Guardian -> Import-KhoraEnvVault.
+
+#### Instanciación persistente
+La llave física USB sigue siendo el instanciador transportable previsto para una reconstrucción persistente.
+
+#### Instanciación provisional sin USB
+Mientras la USB no esté disponible, KHORA DEBE poder reconstruirse desde el repositorio canónico remoto mediante una instancia temporal local. Esta modalidad NO constituye una segunda arquitectura: es una vía alternativa de materialización del mismo EP.
+
+Flujo obligatorio de bootstrap provisional:
+Repositorio canónico -> instancia local -> GATE -> BARRIL -> Run-Main -> autenticación GitHub -> autenticación Vercel -> redeploy de producción -> VS Code -> contexto del modelo
+
+La instancia provisional puede residir en Desktop\KHORA-EP\repo como copia operativa de la sesión, pero GitHub sigue siendo la autoridad canónica para arquitectura y código.
+
+#### Bootstrap no interactivo de credenciales
+Cuando el operador proporcione un token de GitHub, el bootstrap DEBE autenticar GitHub antes de cualquier clone, fetch, sincronización o publicación. Debe preferirse GH_TOKEN o gh auth login --hostname github.com --git-protocol https --with-token. El flujo --web/device-code queda como fallback cuando no exista un token válido disponible.
+
+Después de autenticar GitHub, KHORA DEBE ejecutar gh auth setup-git, validar gh auth status y comprobar una operación efectiva contra el repositorio canónico.
+
+Inmediatamente después, KHORA DEBE resolver Vercel utilizando VERCEL_TOKEN desde la Vault canónica o el mecanismo seguro de alta de secretos, validar vercel whoami, vincular explícitamente khora-web en el scope victorhugotorresmendez-8991s-projects y ejecutar vercel --prod. El resultado de producción DEBE verificarse.
+
+Orden contractual:
+1. Materializar instancia local.
+2. Resolver GitHub.
+3. Validar Git/API.
+4. Resolver Vercel.
+5. Validar identidad y proyecto Vercel.
+6. Ejecutar redeploy de producción.
+7. Verificar producción.
+8. Abrir/restaurar contexto de VS Code.
+9. Entregar al modelo el contexto canónico y ordenar la revisión de EP-ARCHITECTURE.md.
+
+Si falla GitHub, el bootstrap se detiene. Si falla Vercel o el redeploy, se informa el bloqueo y NO se declara completada la instancia.
+
 ### Persistencia
 Cambios -> Do-AutoWip -> commit -> push -> comparar SHA local/remoto -> respaldo verificado.
 ### Handoff
@@ -263,10 +296,24 @@ La autenticación GitHub es una dependencia operativa obligatoria del arranque d
 
 **Helper de GitHub:** `gh auth setup-git` es la autoridad para configurar el helper específico de `github.com`. KHORA NO DEBE imponer `credential.helper=gh` como configuración global para sustituir este mecanismo.
 
-**Autenticación inicial:** `Confirm-GhCliAuth` DEBE comprobar `gh auth status`; si no existe una sesión válida, DEBE iniciar `gh auth login --hostname github.com --git-protocol https --web` y posteriormente ejecutar `gh auth setup-git`.
+**Autenticación inicial:** `Confirm-GhCliAuth` DEBE comprobar `gh auth status`. Si no existe una sesión válida y existe un token suministrado por el operador o mediante la Vault, DEBE utilizar primero autenticación headless mediante `GH_TOKEN` o `gh auth login --hostname github.com --git-protocol https --with-token`. SOLO sin token válido podrá recurrirse a `--web`/device-code. Después DEBE ejecutar `gh auth setup-git`.
 
 **Regla de bloqueo:** si GitHub no queda autenticado, la sesión DEBE detenerse antes de clonar o publicar. No se permite continuar hasta descubrir un `401`, `403`, `Invalid username or token` o `Permission denied`.
 
 **Credencial API:** Git y API son mecanismos desacoplados. Tras autenticar `gh`, KHORA DEBE poder obtener la credencial API necesaria mediante `gh auth token`, mantenerla únicamente en memoria mediante `SecureString` y validarla contra el repositorio canónico. El usuario NO debe volver a introducir manualmente el PAT durante el arranque de una máquina ya autenticada.
 
 **Regla preventiva:** la capacidad efectiva de `git fetch` y el acceso API mediante la credencial derivada de `gh` forman parte del preflight. `gh auth status` por sí solo no sustituye la prueba efectiva de Git/API.
+
+## Autenticación Vercel y redeploy de producción
+
+La autenticación Vercel forma parte del bootstrap de la instancia provisional cuando el objetivo incluye recuperar y publicar producción.
+
+**Modo headless:** KHORA DEBE utilizar `VERCEL_TOKEN` como credencial de automatización. El secreto DEBE proceder de la Vault canónica o del flujo seguro de alta y no debe escribirse en archivos del repositorio, logs ni argumentos persistentes.
+
+**Validación:** después de cargar `VERCEL_TOKEN`, KHORA DEBE comprobar `vercel whoami`.
+
+**Proyecto canónico:** el deployment de producción DEBE apuntar explícitamente al proyecto `khora-web` dentro del scope `victorhugotorresmendez-8991s-projects`.
+
+**Redeploy:** una vez autenticada Vercel y vinculado el proyecto, KHORA DEBE ejecutar `vercel --prod` y verificar la URL/estado resultante antes de declarar completa la instancia.
+
+**Orden:** GitHub validado -> Vercel validado -> khora-web vinculado -> redeploy producción -> verificación.
