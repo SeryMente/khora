@@ -2,16 +2,23 @@
 import { getDb } from "./neon";
 import { descifrarTexto } from "./cripto";
 import { driver as neo4jDriver, auth as neo4jAuth } from "neo4j-driver";
+import { esAudioEsperado } from "./domainAudio";
 
 export interface PipelineVolcado {
   id: string;
   folio: number | null;
   session_id: string | null;
   session_estado: string | null;
-  audio_status: "disponible" | "encontrado_no_vinculado" | "incompleto" | "no_recuperable";
+  audio_status: "disponible" | "encontrado_no_vinculado" | "incompleto" | "no_recuperable" | "no_aplica";
   partes_count: number;
   blob_paths: string[];
+  titulo: string | null;
+  recibido_en: string;
   estado: string;
+  origen: string;
+  driver: string | null;
+  usuario: string | null;
+  audio_expected: boolean;
   version_original: number;
   version_actual: number;
   version_aprobada: number | null;
@@ -232,6 +239,13 @@ export async function obtenerPipelineAggregated(): Promise<PipelineAggregatedRes
     const hasAudio = !!v.audio_url || partesCount > 0;
     const hasText = !!v.texto && descifrarTexto(v.texto).trim().length > 0;
 
+    const audioEsperado = esAudioEsperado({
+      fuente: v.fuente,
+      driver: v.driver,
+      origen: v.origen,
+      session_id: sessionId
+    });
+
     let audioBytes = v.audio_bytes !== null ? Number(v.audio_bytes) : 0;
     if (audioBytes === 0 && partesDb.length > 0) {
       audioBytes = partesDb.reduce((sum: number, p: any) => sum + (p.bytes || 0), 0);
@@ -240,19 +254,21 @@ export async function obtenerPipelineAggregated(): Promise<PipelineAggregatedRes
     }
 
     // Determine precise Audio Status Badge:
-    let audioStatus: "disponible" | "encontrado_no_vinculado" | "incompleto" | "no_recuperable" = "no_recuperable";
-    if (hasAudio && (sessionId || v.audio_url)) {
-      if (sesionObj?.total_partes && partesCount < sesionObj.total_partes) {
-        audioStatus = "incompleto";
+    let audioStatus: "disponible" | "encontrado_no_vinculado" | "incompleto" | "no_recuperable" | "no_aplica" = "no_aplica";
+    if (hasAudio) {
+      if (sessionId || v.audio_url) {
+        if (sesionObj?.total_partes && partesCount < sesionObj.total_partes) {
+          audioStatus = "incompleto";
+        } else {
+          audioStatus = "disponible";
+        }
       } else {
-        audioStatus = "disponible";
+        audioStatus = "encontrado_no_vinculado";
       }
-    } else if (hasAudio && !sessionId) {
-      audioStatus = "encontrado_no_vinculado";
-    } else if (!hasAudio && (v.duracion_seg > 0 || v.audio_bytes > 0)) {
+    } else if (audioEsperado) {
       audioStatus = "no_recuperable";
     } else {
-      audioStatus = "no_recuperable";
+      audioStatus = "no_aplica";
     }
 
     let status: "sync" | "text_without_audio" | "audio_without_text" | "audio_partial" | "text_edited" | "broken_provenance" | "unknown" = "sync";
@@ -264,12 +280,15 @@ export async function obtenerPipelineAggregated(): Promise<PipelineAggregatedRes
     }
 
     if (status === "sync") {
-      if (hasText && !hasAudio) {
+      if (hasText && !hasAudio && audioEsperado) {
         status = "text_without_audio";
         flags.push("Texto presente pero no hay audio");
       } else if (hasAudio && !hasText) {
         status = "audio_without_text";
         flags.push("Audio presente pero no hay texto");
+      } else if (hasAudio && audioStatus === "incompleto") {
+        status = "audio_partial";
+        flags.push("Audio incompleto");
       }
     }
 
@@ -296,7 +315,13 @@ export async function obtenerPipelineAggregated(): Promise<PipelineAggregatedRes
       audio_status: audioStatus,
       partes_count: partesCount,
       blob_paths: blobPaths,
+      titulo: v.titulo ?? null,
+      recibido_en: v.recibido_en ? new Date(v.recibido_en).toISOString() : new Date().toISOString(),
       estado: v.estado,
+      origen: v.origen || "manual",
+      driver: v.driver ?? null,
+      usuario: v.usuario ?? null,
+      audio_expected: audioEsperado,
       version_original: versionOriginal,
       version_actual: versionActual,
       version_aprobada: versionAprobada,

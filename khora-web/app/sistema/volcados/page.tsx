@@ -9,7 +9,7 @@ type PipelineItem = {
   folio: number | null;
   session_id: string | null;
   session_estado: string | null;
-  audio_status: "disponible" | "encontrado_no_vinculado" | "incompleto" | "no_recuperable";
+  audio_status: "disponible" | "encontrado_no_vinculado" | "incompleto" | "no_recuperable" | "no_aplica";
   partes_count: number;
   blob_paths: string[];
   titulo: string | null;
@@ -132,26 +132,29 @@ export default function VolcadosPage() {
   const [selectedItem, setSelectedItem] = useState<PipelineItem | null>(null);
   const [drawerSubTab, setDrawerSubTab] = useState<"cockpit" | "trace">("cockpit");
 
-  // Cockpit Synchronous Revision states
+  // Cockpit Mode (Reading vs Editing)
+  const [viewMode, setViewMode] = useState<"lectura" | "edicion">("lectura");
   const [editableTexto, setEditableTexto] = useState("");
   const [versiones, setVersiones] = useState<any[]>([]);
   const [selectedVersionNum, setSelectedVersionNum] = useState<number>(1);
   const [savingVersion, setSavingVersion] = useState(false);
-  const [startingRevision, setStartingRevision] = useState(false);
+  const [generatingTitle, setGeneratingTitle] = useState(false);
 
   // Audio Sync & Playback states
   const [manifiestoPartes, setManifiestoPartes] = useState<AudioParteManifiesto[]>([]);
   const [currentPartIndex, setCurrentPartIndex] = useState<number>(1);
   const [audioSourceUrl, setAudioSourceUrl] = useState<string>("");
   const [currentTimeMs, setCurrentTimeMs] = useState<number>(0);
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [palabrasTiming, setPalabrasTiming] = useState<PalabraTiming[]>([]);
   const [activePalabraIdx, setActivePalabraIdx] = useState<number | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Incident & Findings states
-  const [incidentes, setIncidentes] = useState<Incidente[]>([]);
+  // Findings Navigation states
   const [hallazgos, setHallazgos] = useState<Hallazgo[]>([]);
+  const [activeHallazgoIndex, setActiveHallazgoIndex] = useState<number>(0);
+
+  // Incident & Gate states
+  const [incidentes, setIncidentes] = useState<Incidente[]>([]);
   const [gateDecision, setGateDecision] = useState<GateDecision | null>(null);
   const [loadingGate, setLoadingGate] = useState<boolean>(false);
 
@@ -172,9 +175,6 @@ export default function VolcadosPage() {
   const [texto, setTexto] = useState("");
   const [titulo, setTitulo] = useState("");
   const [guardandoVolcado, setGuardandoVolcado] = useState(false);
-  const [volcadosError, setVolcadosError] = useState<string | null>(null);
-  const [volcadosAviso, setVolcadosAviso] = useState<string | null>(null);
-  const [volcadosItems, setVolcadosItems] = useState<Volcado[]>([]);
 
   const drawerRef = useRef<HTMLDivElement>(null);
   const holdTimerRef = useRef<any>(null);
@@ -190,6 +190,8 @@ export default function VolcadosPage() {
       case "incompleto":
       case "audio_parcial":
         return <span className="text-amber-500 font-semibold text-[10px] flex items-center gap-1">🟠 Audio incompleto</span>;
+      case "no_aplica":
+        return <span className="text-sky-400 font-semibold text-[10px] flex items-center gap-1">⚪ Entrada manual · Audio no esperado</span>;
       case "no_recuperable":
       default:
         return <span className="text-red-400 font-semibold text-[10px] flex items-center gap-1">🔴 Audio no recuperable</span>;
@@ -224,18 +226,6 @@ export default function VolcadosPage() {
     return [];
   }, []);
 
-  const fetchLegacyVolcados = useCallback(async () => {
-    try {
-      const res = await fetch("/api/volcado");
-      const data = await res.json();
-      if (res.ok) {
-        setVolcadosItems(data.items || []);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  }, []);
-
   useEffect(() => {
     async function init() {
       const items = await fetchPipeline();
@@ -244,8 +234,7 @@ export default function VolcadosPage() {
       }
     }
     void init();
-    void fetchLegacyVolcados();
-  }, [fetchPipeline, fetchLegacyVolcados]);
+  }, [fetchPipeline]);
 
   // Cargar datos de Cockpit, Manifiesto, Incidentes y Gate
   const loadCockpitData = async (id: string, versionNum: number) => {
@@ -285,7 +274,9 @@ export default function VolcadosPage() {
       const resHal = await fetch(`/api/revision/${id}/hallazgos?version=${versionNum}`);
       if (resHal.ok) {
         const dataHal = await resHal.json();
-        setHallazgos(dataHal.hallazgos || []);
+        const pending = (dataHal.hallazgos || []).filter((h: Hallazgo) => h.estado === "pendiente");
+        setHallazgos(pending);
+        setActiveHallazgoIndex(0);
       } else {
         setHallazgos([]);
       }
@@ -333,26 +324,26 @@ export default function VolcadosPage() {
     }
   };
 
-  const handleIniciarRevision = async () => {
-    if (!selectedId) return;
-    setStartingRevision(true);
+  const handleRegenerarTitulo = async () => {
+    if (!editableTexto.trim()) return;
+    setGeneratingTitle(true);
     try {
-      const res = await fetch(`/api/revision/${selectedId}/iniciar`, {
+      const res = await fetch("/api/dictado-archivo/titulo", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ texto: editableTexto }),
       });
       const data = await res.json();
-      if (res.ok) {
-        const items = await fetchPipeline();
-        const updated = items.find((i: PipelineItem) => i.id === selectedId);
-        if (updated) setSelectedItem(updated);
-        await loadCockpitData(selectedId, selectedVersionNum);
-      } else {
-        alert("Error al iniciar revisión: " + (data.detail || data.error || "Desconocido"));
+      if (res.ok && data.title && selectedId) {
+        if (selectedItem) {
+          setSelectedItem({ ...selectedItem, titulo: data.title });
+        }
+        await fetchPipeline();
       }
-    } catch (err: any) {
-      alert("Error de red: " + err.message);
+    } catch (err) {
+      console.error("Error regenerando título:", err);
     } finally {
-      setStartingRevision(false);
+      setGeneratingTitle(false);
     }
   };
 
@@ -376,6 +367,26 @@ export default function VolcadosPage() {
       alert("Error de red: " + err.message);
     } finally {
       setSavingVersion(false);
+    }
+  };
+
+  const handleResolveHallazgo = async (accion: "aceptar" | "rechazar") => {
+    if (!selectedId || hallazgos.length === 0) return;
+    const currentH = hallazgos[activeHallazgoIndex];
+    if (!currentH) return;
+
+    try {
+      const res = await fetch(`/api/revision/${selectedId}/hallazgos/${currentH.id}/resolver`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ accion }),
+      });
+      if (res.ok) {
+        await fetchPipeline();
+        await selectVolcadoItem(selectedId);
+      }
+    } catch (err) {
+      console.error("Error resolviendo hallazgo:", err);
     }
   };
 
@@ -439,10 +450,10 @@ export default function VolcadosPage() {
     }
   };
 
-  // Resolver Incidente de Audio con Código Específico
+  // Resolver Incidente con Código Específico
   const handleResolveAudioIncident = async () => {
     if (!selectedId) return;
-    const incAudio = incidentes.find((i) => i.tipo === "audio_no_recuperable" && i.estado !== "resuelto");
+    const incAudio = incidentes.find((i) => (i.tipo === "audio_no_recuperable" || i.tipo === "audio_no_vinculado") && i.estado !== "resuelto");
     if (!incAudio) return;
 
     try {
@@ -510,35 +521,34 @@ export default function VolcadosPage() {
     }
   };
 
-  // Seek audio por clic en palabra o milisegundo
-  const seekToMs = (ms: number) => {
-    if (!manifiestoPartes || manifiestoPartes.length === 0) {
-      if (audioRef.current) {
-        audioRef.current.currentTime = ms / 1000;
-        void audioRef.current.play();
-      }
-      return;
+  const activeHallazgo = hallazgos[activeHallazgoIndex];
+
+  // Render highlighted prose text securely without dangerouslySetInnerHTML
+  const renderProseConResalte = (textoFuente: string, hallazgoActual?: Hallazgo) => {
+    if (!hallazgoActual || hallazgoActual.posicion.inicio === undefined) {
+      return <span>{textoFuente}</span>;
     }
 
-    const parteOffset = manifiestoPartes.find((p) => ms >= p.start_ms && ms <= p.end_ms);
-    if (parteOffset) {
-      const msRelativo = ms - parteOffset.start_ms;
-      if (parteOffset.part_index !== currentPartIndex) {
-        setCurrentPartIndex(parteOffset.part_index);
-        setAudioSourceUrl(parteOffset.download_path);
-        setTimeout(() => {
-          if (audioRef.current) {
-            audioRef.current.currentTime = msRelativo / 1000;
-            void audioRef.current.play();
-          }
-        }, 150);
-      } else {
-        if (audioRef.current) {
-          audioRef.current.currentTime = msRelativo / 1000;
-          void audioRef.current.play();
-        }
-      }
+    const start = hallazgoActual.posicion.inicio;
+    const end = hallazgoActual.posicion.fin;
+
+    if (start < 0 || end > textoFuente.length || start >= end) {
+      return <span>{textoFuente}</span>;
     }
+
+    const antes = textoFuente.slice(0, start);
+    const marcado = textoFuente.slice(start, end);
+    const despues = textoFuente.slice(end);
+
+    return (
+      <span className="font-serif leading-relaxed text-base">
+        {antes}
+        <mark className="bg-amber-400/30 text-amber-200 px-1 py-0.5 rounded font-bold underline decoration-amber-400">
+          {marcado}
+        </mark>
+        {despues}
+      </span>
+    );
   };
 
   const filteredPipelineItems = pipelineItems.filter((item) => {
@@ -740,8 +750,16 @@ export default function VolcadosPage() {
                     <div className="flex justify-between items-center">
                       <div>
                         <span className="text-[10px] font-mono uppercase tracking-widest opacity-60">Mesa de Revisión Sincrónica</span>
-                        <h2 className="text-base font-bold font-mono">
+                        <h2 className="text-base font-bold font-mono flex items-center gap-2">
                           {selectedItem.folio ? `Folio #${selectedItem.folio} — ` : ""}{selectedItem.titulo || selectedItem.id}
+                          <button
+                            onClick={handleRegenerarTitulo}
+                            disabled={generatingTitle}
+                            title="Regenerar título con IA"
+                            className="p-1 hover:bg-zinc-800 rounded text-amber-400 cursor-pointer"
+                          >
+                            <Icons.Sparkles size={14} />
+                          </button>
                         </h2>
                       </div>
                       <div className="flex gap-2">
@@ -793,11 +811,11 @@ export default function VolcadosPage() {
 
                   {drawerSubTab === "cockpit" ? (
                     <div className="flex-1 space-y-6">
-                      {/* Audio Resolution Banner if audio is unrecoverable */}
-                      {selectedItem.audio_status === "no_recuperable" && (
+                      {/* Audio Resolution Banner if audio is unrecoverable or unlinked */}
+                      {(selectedItem.audio_status === "no_recuperable" || selectedItem.audio_status === "encontrado_no_vinculado") && (
                         <div className="p-3 border border-red-500/40 bg-red-950/20 text-xs font-mono flex justify-between items-center">
                           <div className="text-red-300">
-                            🔴 Audio no disponible. Se requiere resolución explícita del operador para habilitar la aprobación.
+                            🔴 Causa de audio detectada: {selectedItem.audio_status}. Se requiere resolución explícita del operador para habilitar la aprobación.
                           </div>
                           <button
                             onClick={() => setShowAudioResolveModal(true)}
@@ -813,21 +831,40 @@ export default function VolcadosPage() {
                         {/* Reading Column */}
                         <div className="lg:col-span-8 space-y-3">
                           <div className="flex justify-between items-center text-xs font-mono opacity-60 uppercase">
-                            <span>Lectura y Transcripción (v{selectedVersionNum})</span>
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => setViewMode("lectura")}
+                                className={`px-2 py-0.5 border ${viewMode === "lectura" ? "bg-amber-400 text-zinc-950 font-bold" : ""}`}
+                              >
+                                Modo Lectura
+                              </button>
+                              <button
+                                onClick={() => setViewMode("edicion")}
+                                className={`px-2 py-0.5 border ${viewMode === "edicion" ? "bg-amber-400 text-zinc-950 font-bold" : ""}`}
+                              >
+                                Modo Edición
+                              </button>
+                            </div>
                             <span>{editableTexto.length} car</span>
                           </div>
 
-                          <textarea
-                            value={editableTexto}
-                            onChange={(e) => setEditableTexto(e.target.value)}
-                            rows={12}
-                            className="w-full p-4 border font-mono text-sm leading-relaxed rounded-none focus:outline-none focus:ring-1 focus:ring-[var(--khora-accent)] max-w-prose"
-                            style={{
-                              backgroundColor: "var(--khora-bg)",
-                              color: "var(--khora-ink)",
-                              borderColor: "var(--khora-border)",
-                            }}
-                          />
+                          {viewMode === "lectura" ? (
+                            <div className="p-6 border bg-zinc-900/40 border-zinc-800 rounded-none max-w-prose min-h-[280px]">
+                              {renderProseConResalte(editableTexto, activeHallazgo)}
+                            </div>
+                          ) : (
+                            <textarea
+                              value={editableTexto}
+                              onChange={(e) => setEditableTexto(e.target.value)}
+                              rows={12}
+                              className="w-full p-4 border font-mono text-sm leading-relaxed rounded-none focus:outline-none focus:ring-1 focus:ring-[var(--khora-accent)] max-w-prose"
+                              style={{
+                                backgroundColor: "var(--khora-bg)",
+                                color: "var(--khora-ink)",
+                                borderColor: "var(--khora-border)",
+                              }}
+                            />
+                          )}
 
                           <div className="flex justify-between items-center pt-1">
                             <button
@@ -841,11 +878,65 @@ export default function VolcadosPage() {
                           </div>
                         </div>
 
-                        {/* Side Panel: Findings & Incidents */}
+                        {/* Side Panel: Interactive Findings Navigation */}
                         <div className="lg:col-span-4 space-y-4">
                           <h3 className="text-xs font-mono uppercase font-bold tracking-wider opacity-70 border-b pb-1">
-                            Hallazgos e Incidentes
+                            Navegador de Hallazgos ({hallazgos.length > 0 ? `${activeHallazgoIndex + 1} de ${hallazgos.length}` : "0 de 0"})
                           </h3>
+
+                          {hallazgos.length > 0 && activeHallazgo ? (
+                            <div className="p-3 border bg-zinc-900 border-zinc-800 space-y-3 font-mono text-xs">
+                              <div className="flex justify-between items-center">
+                                <span className="font-bold text-amber-300">{activeHallazgo.regla}</span>
+                                <span className="uppercase text-[9px] border px-1 border-amber-500/40">{activeHallazgo.tipo_categoria}</span>
+                              </div>
+
+                              <div className="space-y-1">
+                                <div className="text-zinc-400">Texto original: <strong className="text-red-400">"{activeHallazgo.texto_original}"</strong></div>
+                                <div className="text-zinc-300">Sugerencia: <strong className="text-emerald-400">"{activeHallazgo.sugerencia}"</strong></div>
+                                {activeHallazgo.explicacion && <p className="text-[11px] opacity-70 italic">{activeHallazgo.explicacion}</p>}
+                              </div>
+
+                              {/* Findings Navigation Controls */}
+                              <div className="flex justify-between items-center pt-2 border-t border-zinc-800">
+                                <div className="flex gap-1">
+                                  <button
+                                    onClick={() => setActiveHallazgoIndex((prev) => Math.max(0, prev - 1))}
+                                    disabled={activeHallazgoIndex === 0}
+                                    className="p-1 border border-zinc-700 hover:bg-zinc-800 disabled:opacity-30 cursor-pointer"
+                                  >
+                                    <Icons.ChevronLeft size={14} />
+                                  </button>
+                                  <button
+                                    onClick={() => setActiveHallazgoIndex((prev) => Math.min(hallazgos.length - 1, prev + 1))}
+                                    disabled={activeHallazgoIndex >= hallazgos.length - 1}
+                                    className="p-1 border border-zinc-700 hover:bg-zinc-800 disabled:opacity-30 cursor-pointer"
+                                  >
+                                    <Icons.ChevronRight size={14} />
+                                  </button>
+                                </div>
+
+                                <div className="flex gap-2">
+                                  <button
+                                    onClick={() => handleResolveHallazgo("rechazar")}
+                                    className="px-2 py-1 bg-red-950 text-red-300 border border-red-800 font-bold cursor-pointer text-[11px]"
+                                  >
+                                    Rechazar
+                                  </button>
+                                  <button
+                                    onClick={() => handleResolveHallazgo("aceptar")}
+                                    className="px-2 py-1 bg-emerald-950 text-emerald-300 border border-emerald-800 font-bold cursor-pointer text-[11px]"
+                                  >
+                                    Aceptar
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="p-3 border bg-zinc-900/40 border-zinc-800 text-xs font-mono opacity-50 italic">
+                              Sin hallazgos pendientes en esta versión.
+                            </div>
+                          )}
 
                           {/* Blockers List */}
                           {gateDecision && gateDecision.blockers.length > 0 && (
@@ -858,23 +949,6 @@ export default function VolcadosPage() {
                               ))}
                             </div>
                           )}
-
-                          {/* Hallazgos List */}
-                          <div className="space-y-2 max-h-60 overflow-y-auto">
-                            {hallazgos.length === 0 ? (
-                              <div className="text-xs font-mono opacity-50 italic">Sin hallazgos pendientes en esta versión.</div>
-                            ) : (
-                              hallazgos.map((h) => (
-                                <div key={h.id} className="p-2.5 border bg-zinc-900/80 border-zinc-800 text-xs font-mono space-y-1">
-                                  <div className="flex justify-between font-bold text-amber-300">
-                                    <span>{h.regla}</span>
-                                    <span className="uppercase text-[9px] border px-1">{h.tipo_categoria}</span>
-                                  </div>
-                                  <div className="text-zinc-400">"{h.texto_original}" → <span className="text-emerald-400">{h.sugerencia}</span></div>
-                                </div>
-                              ))
-                            )}
-                          </div>
                         </div>
                       </div>
 
@@ -887,7 +961,7 @@ export default function VolcadosPage() {
                           {renderAudioStatusBadge(selectedItem.audio_status)}
                         </div>
 
-                        {selectedItem.audio_status !== "no_recuperable" ? (
+                        {selectedItem.audio_status !== "no_recuperable" && selectedItem.audio_status !== "no_aplica" ? (
                           <audio
                             ref={audioRef}
                             src={audioSourceUrl}
@@ -896,7 +970,7 @@ export default function VolcadosPage() {
                             className="w-full h-8"
                           />
                         ) : (
-                          <div className="text-xs font-mono text-red-400 italic">Audio no disponible para reproducción.</div>
+                          <div className="text-xs font-mono opacity-60 italic">Audio no disponible para reproducción.</div>
                         )}
                       </div>
 

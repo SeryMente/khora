@@ -161,19 +161,19 @@ const mockVolcados = [
     audio_partes: null,
     version_aprobada: 1
   },
-  // 7. texto sin audio
+  // 7. dictado sin audio
   {
     id: "uuid-7",
-    texto: "Texto sin audio",
+    texto: "Texto dictado sin audio",
     texto_original: null,
     sha256: "sha-7",
-    chars: 15,
+    chars: 23,
     titulo: "A7",
-    origen: "cora-ui",
-    driver: "web",
+    origen: "dictado",
+    driver: "dictado",
     usuario: "user@example.com",
     recibido_en: new Date().toISOString(),
-    estado: "archivado",
+    estado: "en_revision",
     io_id: null,
     intentos: 0,
     ultimo_error: null,
@@ -181,7 +181,7 @@ const mockVolcados = [
     audio_url: null,
     audio_bytes: null,
     duracion_seg: null,
-    fuente: "texto",
+    fuente: "dictado",
     pulido_aplicado: false,
     audio_partes: null,
     version_aprobada: null
@@ -194,11 +194,11 @@ const mockVolcados = [
     sha256: "sha-8",
     chars: 0,
     titulo: "A8",
-    origen: "cora-ui",
-    driver: "web",
+    origen: "dictado",
+    driver: "dictado",
     usuario: "user@example.com",
     recibido_en: new Date().toISOString(),
-    estado: "archivado",
+    estado: "en_revision",
     io_id: null,
     intentos: 0,
     ultimo_error: null,
@@ -206,7 +206,7 @@ const mockVolcados = [
     audio_url: "http://audio.url/8",
     audio_bytes: 200,
     duracion_seg: 25,
-    fuente: "texto",
+    fuente: "dictado",
     pulido_aplicado: false,
     audio_partes: null,
     version_aprobada: null
@@ -214,28 +214,29 @@ const mockVolcados = [
   // 9. audio parcial
   {
     id: "uuid-9",
+    session_id: "s-9",
     texto: "Audio parcial texto",
     texto_original: null,
     sha256: "sha-9",
     chars: 19,
     titulo: "A9",
-    origen: "cora-ui",
-    driver: "web",
+    origen: "dictado",
+    driver: "dictado",
     usuario: "user@example.com",
     recibido_en: new Date().toISOString(),
-    estado: "archivado",
+    estado: "en_revision",
     io_id: null,
     intentos: 0,
     ultimo_error: null,
     ultimo_intento: null,
-    audio_url: null,
-    audio_bytes: null,
+    audio_url: "http://audio.url/9",
+    audio_bytes: 100,
     duracion_seg: 30,
-    fuente: "texto",
+    fuente: "dictado",
     pulido_aplicado: false,
     audio_partes: JSON.stringify([
       { parte: 1, url: "http://part1", bytes: 50 },
-      { parte: 3, url: "http://part3", bytes: 50 } // Gap: no part 2!
+      { parte: 3, url: "http://part3", bytes: 50 }
     ]),
     version_aprobada: null
   },
@@ -251,7 +252,7 @@ const mockVolcados = [
     driver: "web",
     usuario: "user@example.com",
     recibido_en: new Date().toISOString(),
-    estado: "archivado",
+    estado: "en_revision",
     io_id: null,
     intentos: 0,
     ultimo_error: null,
@@ -288,6 +289,31 @@ const mockVolcados = [
     pulido_aplicado: false,
     audio_partes: null,
     version_aprobada: 1
+  },
+  // 12. entrada manual sin audio (no_aplica)
+  {
+    id: "uuid-12",
+    texto: "Entrada manual legitima sin audio",
+    texto_original: null,
+    sha256: "sha-12",
+    chars: 32,
+    titulo: "Manual A12",
+    origen: "manual",
+    driver: "web",
+    usuario: "user@example.com",
+    recibido_en: new Date().toISOString(),
+    estado: "en_revision",
+    io_id: null,
+    intentos: 0,
+    ultimo_error: null,
+    ultimo_intento: null,
+    audio_url: null,
+    audio_bytes: null,
+    duracion_seg: null,
+    fuente: "texto",
+    pulido_aplicado: false,
+    audio_partes: null,
+    version_aprobada: null
   }
 ];
 
@@ -298,11 +324,16 @@ const mockVersions = [
   { volcado_id: "uuid-4", version: 1, sha256: "sha-4-original", chars: 14 },
   { volcado_id: "uuid-5", version: 1, sha256: "sha-5", chars: 14 },
   { volcado_id: "uuid-6", version: 1, sha256: "sha-6", chars: 13 },
-  { volcado_id: "uuid-7", version: 1, sha256: "sha-7", chars: 15 },
+  { volcado_id: "uuid-7", version: 1, sha256: "sha-7", chars: 23 },
   { volcado_id: "uuid-9", version: 1, sha256: "sha-9", chars: 19 },
   { volcado_id: "uuid-10", version: 1, sha256: "sha-10-original", chars: 14 },
   { volcado_id: "uuid-10", version: 2, sha256: "sha-10-current", chars: 13 },
-  { volcado_id: "uuid-11", version: 1, sha256: "sha-11", chars: 21 }
+  { volcado_id: "uuid-11", version: 1, sha256: "sha-11", chars: 21 },
+  { volcado_id: "uuid-12", version: 1, sha256: "sha-12", chars: 32 }
+];
+
+const mockSessions = [
+  { session_id: "s-9", volcado_id: "uuid-9", estado: "parcial", total_partes: 3 }
 ];
 
 const mockNodosCounts = [
@@ -320,8 +351,15 @@ const mockAristasCounts = [
 
   const sqlNormalized = sql.trim().toLowerCase();
 
+  if (sqlNormalized.includes("select") && sqlNormalized.includes("dictado_session")) {
+    return { rows: mockSessions };
+  }
+
+  if (sqlNormalized.includes("select") && sqlNormalized.includes("dictado_audio_parte")) {
+    return { rows: [] };
+  }
+
   if (sqlNormalized.includes("select") && sqlNormalized.includes("volcado") && !sqlNormalized.includes("volcado_version")) {
-    // If querying single volcado
     if (params && params.length > 0 && typeof params[0] === "string" && params[0].startsWith("uuid-")) {
       const match = mockVolcados.find(v => v.id === params[0]);
       return { rows: match ? [match] : [] };
@@ -383,14 +421,13 @@ const mockAristasCounts = [
 
 // Now import the pipeline module after overriding Pool
 import { obtenerPipelineAggregated, obtenerPipelineDetalle } from "../../lib/server/pipeline";
-import { marcarPendienteRevision, iniciarRevision, aprobarVersion, reabrirRevision } from "../../lib/server/volcados";
 
 test("Pipeline Suite", async (t) => {
   await t.test("1. pipeline completo", async () => {
     mockQueryCount = 0;
     const res = await obtenerPipelineAggregated();
-    assert.strictEqual(res.total, 11);
-    assert.strictEqual(res.volcados.length, 11);
+    assert.strictEqual(res.total, 12);
+    assert.strictEqual(res.volcados.length, 12);
   });
 
   await t.test("2. volcado archivado", async () => {
@@ -440,11 +477,12 @@ test("Pipeline Suite", async (t) => {
     assert.strictEqual(v.ingesta.last_error, "Kernel uncontactable");
   });
 
-  await t.test("8. texto sin audio", async () => {
+  await t.test("8. dictado sin audio", async () => {
     const res = await obtenerPipelineAggregated();
     const v = res.volcados.find(x => x.id === "uuid-7");
     assert.ok(v);
     assert.strictEqual(v.integrity.status, "text_without_audio");
+    assert.strictEqual(v.audio_status, "no_recuperable");
   });
 
   await t.test("9. audio sin texto", async () => {
@@ -458,6 +496,7 @@ test("Pipeline Suite", async (t) => {
     const res = await obtenerPipelineAggregated();
     const v = res.volcados.find(x => x.id === "uuid-9");
     assert.ok(v);
+    assert.strictEqual(v.audio_status, "incompleto");
     assert.strictEqual(v.integrity.status, "audio_partial");
   });
 
@@ -475,18 +514,27 @@ test("Pipeline Suite", async (t) => {
     assert.strictEqual(v.integrity.status, "broken_provenance");
   });
 
-  await t.test("13. io_id correctamente relacionado", async () => {
+  await t.test("13. entrada manual sin audio no genera anomalía", async () => {
+    const res = await obtenerPipelineAggregated();
+    const v = res.volcados.find(x => x.id === "uuid-12");
+    assert.ok(v);
+    assert.strictEqual(v.audio_expected, false);
+    assert.strictEqual(v.audio_status, "no_aplica");
+    assert.strictEqual(v.integrity.status, "sync");
+  });
+
+  await t.test("14. io_id correctamente relacionado", async () => {
     const res = await obtenerPipelineAggregated();
     const v = res.volcados.find(x => x.id === "uuid-5");
     assert.ok(v);
     assert.strictEqual(v.ingesta.io_id, "io-555");
   });
 
-  await t.test("14. agregaciones", async () => {
+  await t.test("15. agregaciones", async () => {
     const res = await obtenerPipelineAggregated();
-    assert.strictEqual(res.counts.archivado, 5);
+    assert.strictEqual(res.counts.archivado, 1);
     assert.strictEqual(res.counts.pendiente_revision, 1);
-    assert.strictEqual(res.counts.en_revision, 1);
+    assert.strictEqual(res.counts.en_revision, 6);
     assert.strictEqual(res.counts.listo_ingesta, 1);
     assert.strictEqual(res.counts.ingerido, 2);
     assert.strictEqual(res.counts.fallido, 1);
@@ -498,15 +546,14 @@ test("Pipeline Suite", async (t) => {
     assert.strictEqual(res.integrity.broken_provenance, 1);
   });
 
-  await t.test("15. ausencia de N+1 evidente", async () => {
+  await t.test("16. ausencia de N+1 evidente", async () => {
     mockQueryCount = 0;
     await obtenerPipelineAggregated();
-    // For 11 volcados, it must perform exactly 4 database queries in bulk
-    assert.strictEqual(mockQueryCount, 4);
+    // For 12 volcados, it performs exactly 6 bulk database queries
+    assert.strictEqual(mockQueryCount, 6);
   });
 
-  await t.test("16. idempotencia", async () => {
-    // Calling detail view on the same volcado twice should produce the same structural trace
+  await t.test("17. idempotencia", async () => {
     const detail1 = await obtenerPipelineDetalle("uuid-5");
     const detail2 = await obtenerPipelineDetalle("uuid-5");
     assert.deepStrictEqual(detail1.procedencia.io_id, detail2.procedencia.io_id);
