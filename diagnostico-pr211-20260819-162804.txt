@@ -1,0 +1,299 @@
+﻿**********************
+Inicio de la transcripción de Windows PowerShell
+Hora de inicio: 20260819162804
+Nombre de usuario: PC-14\PC 13
+Usuario RunAs: PC-14\PC 13
+Nombre de la configuración: 
+Máquina: PC-14 (Microsoft Windows NT 10.0.26200.0)
+Aplicación host: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noexit -command try { . "c:\Users\PC 13\AppData\Local\Programs\Microsoft VS Code\df53daabb1\resources\app\out\vs\workbench\contrib\terminal\common\scripts\shellIntegration.ps1" } catch {}
+Id. de proceso: 26132
+PSVersion: 5.1.26100.8894
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.26100.8894
+BuildVersion: 10.0.26100.8894
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+La transcripción ha comenzado. El archivo de salida es C:\Users\PC 13\Desktop\KHORA-EP\verify-20260819-160742\diagnostico-pr211-20260819-162804.txt
+
+============================================================
+1. IDENTIDAD Y ESTADO DEL REPOSITORIO
+============================================================
+
+
+SHALLOW=true
+Completando historial del clon...
+
+
+
+
+
+SNAPSHOT_HEAD=8863e19cd558698ab201b9c2dc5f54fab4e5c9f4
+ORIGIN_MAIN=8863e19cd558698ab201b9c2dc5f54fab4e5c9f4
+BRANCH=main
+ULTIMOS_COMMITS:
+
+
+============================================================
+2. VERIFICACIÓN DE PR #211 EN MAIN
+============================================================
+
+MERGE_OBJECT_AVAILABLE=True
+
+MERGE_IS_ANCESTOR_EXIT=0
+RESULTADO_LOCAL=PR_211_CONTENIDA_EN_MAIN
+
+COMPARACIÓN REMOTA GITHUB:
+
+
+PR:
+
+
+ARCHIVOS DE LA PR:
+
+
+COMMITS DE LA PR:
+
+
+REVISIONES:
+
+
+COMENTARIOS DE REVISIÓN:
+
+
+CHECKS:
+
+
+============================================================
+3. DEPLOYMENTS DEL SNAPSHOT
+============================================================
+STATUS DE GITHUB PARA 8863e19cd558698ab201b9c2dc5f54fab4e5c9f4
+
+
+DEPLOYMENTS REGISTRADOS:
+
+
+DEPLOYMENT QUE SIRVE EL ALIAS PRODUCTIVO:
+npx : No se puede cargar el archivo C:\Program Files\nodejs\npx.ps1 porque la ejecución de scripts está deshabilitada 
+en este sistema. Para obtener más información, consulta el tema about_Execution_Policies en 
+https:/go.microsoft.com/fwlink/?LinkID=135170.
+En línea: 115 Carácter: 1
++ npx --yes vercel@latest inspect "https://khora-web.vercel.app" `
++ ~~~
+    + CategoryInfo          : SecurityError: (:) [], PSSecurityException
+    + FullyQualifiedErrorId : UnauthorizedAccess
+npx : No se puede cargar el archivo C:\Program Files\nodejs\npx.ps1 porque la ejecución de scripts está deshabilitada en este sistema. Para obtener más información, consulta el tema about_Execution_Policies en https:/go.microsoft.com/fwlink/?LinkID=135170.
+En línea: 115 Carácter: 1
++ npx --yes vercel@latest inspect "https://khora-web.vercel.app" `
++ ~~~
+    + CategoryInfo          : SecurityError: (:) [], PSSecurityException
+    + FullyQualifiedErrorId : UnauthorizedAccess
+
+LOGS DEL DEPLOYMENT QUE SIRVE EL ALIAS:
+npx : No se puede cargar el archivo C:\Program Files\nodejs\npx.ps1 porque la ejecución de scripts está deshabilitada 
+en este sistema. Para obtener más información, consulta el tema about_Execution_Policies en 
+https:/go.microsoft.com/fwlink/?LinkID=135170.
+En línea: 119 Carácter: 1
++ npx --yes vercel@latest inspect "https://khora-web.vercel.app" `
++ ~~~
+    + CategoryInfo          : SecurityError: (:) [], PSSecurityException
+    + FullyQualifiedErrorId : UnauthorizedAccess
+npx : No se puede cargar el archivo C:\Program Files\nodejs\npx.ps1 porque la ejecución de scripts está deshabilitada en este sistema. Para obtener más información, consulta el tema about_Execution_Policies en https:/go.microsoft.com/fwlink/?LinkID=135170.
+En línea: 119 Carácter: 1
++ npx --yes vercel@latest inspect "https://khora-web.vercel.app" `
++ ~~~
+    + CategoryInfo          : SecurityError: (:) [], PSSecurityException
+    + FullyQualifiedErrorId : UnauthorizedAccess
+
+============================================================
+4. BUILD LOCAL LIMPIO
+============================================================
+NODE=v24.19.0
+npm : No se puede cargar el archivo C:\Program Files\nodejs\npm.ps1 porque la ejecución de scripts está deshabilitada 
+en este sistema. Para obtener más información, consulta el tema about_Execution_Policies en 
+https:/go.microsoft.com/fwlink/?LinkID=135170.
+En línea: 128 Carácter: 19
++ Write-Host "NPM=$(npm --version)"
++                   ~~~
+    + CategoryInfo          : SecurityError: (:) [], PSSecurityException
+    + FullyQualifiedErrorId : UnauthorizedAccess
+npm : No se puede cargar el archivo C:\Program Files\nodejs\npm.ps1 porque la ejecución de scripts está deshabilitada en este sistema. Para obtener más información, consulta el tema about_Execution_Policies en https:/go.microsoft.com/fwlink/?LinkID=135170.
+En línea: 128 Carácter: 19
++ Write-Host "NPM=$(npm --version)"
++                   ~~~
+    + CategoryInfo          : SecurityError: (:) [], PSSecurityException
+    + FullyQualifiedErrorId : UnauthorizedAccess
+NPM=
+npm : No se puede cargar el archivo C:\Program Files\nodejs\npm.ps1 porque la ejecución de scripts está deshabilitada 
+en este sistema. Para obtener más información, consulta el tema about_Execution_Policies en 
+https:/go.microsoft.com/fwlink/?LinkID=135170.
+En línea: 130 Carácter: 1
++ npm ci
++ ~~~
+    + CategoryInfo          : SecurityError: (:) [], PSSecurityException
+    + FullyQualifiedErrorId : UnauthorizedAccess
+npm : No se puede cargar el archivo C:\Program Files\nodejs\npm.ps1 porque la ejecución de scripts está deshabilitada en este sistema. Para obtener más información, consulta el tema about_Execution_Policies en https:/go.microsoft.com/fwlink/?LinkID=135170.
+En línea: 130 Carácter: 1
++ npm ci
++ ~~~
+    + CategoryInfo          : SecurityError: (:) [], PSSecurityException
+    + FullyQualifiedErrorId : UnauthorizedAccess
+NPM_CI_EXIT=0
+npm : No se puede cargar el archivo C:\Program Files\nodejs\npm.ps1 porque la ejecución de scripts está deshabilitada 
+en este sistema. Para obtener más información, consulta el tema about_Execution_Policies en 
+https:/go.microsoft.com/fwlink/?LinkID=135170.
+En línea: 138 Carácter: 5
++     npm run build
++     ~~~
+    + CategoryInfo          : SecurityError: (:) [], PSSecurityException
+    + FullyQualifiedErrorId : UnauthorizedAccess
+npm : No se puede cargar el archivo C:\Program Files\nodejs\npm.ps1 porque la ejecución de scripts está deshabilitada en este sistema. Para obtener más información, consulta el tema about_Execution_Policies en https:/go.microsoft.com/fwlink/?LinkID=135170.
+En línea: 138 Carácter: 5
++     npm run build
++     ~~~
+    + CategoryInfo          : SecurityError: (:) [], PSSecurityException
+    + FullyQualifiedErrorId : UnauthorizedAccess
+BUILD_EXIT=0
+
+E2E FOCALIZADOS:
+npm : No se puede cargar el archivo C:\Program Files\nodejs\npm.ps1 porque la ejecución de scripts está deshabilitada 
+en este sistema. Para obtener más información, consulta el tema about_Execution_Policies en 
+https:/go.microsoft.com/fwlink/?LinkID=135170.
+En línea: 147 Carácter: 5
++     npm run e2e -- e2e/revision-cockpit.spec.ts e2e/pipeline.spec.ts  ...
++     ~~~
+    + CategoryInfo          : SecurityError: (:) [], PSSecurityException
+    + FullyQualifiedErrorId : UnauthorizedAccess
+npm : No se puede cargar el archivo C:\Program Files\nodejs\npm.ps1 porque la ejecución de scripts está deshabilitada en este sistema. Para obtener más información, consulta el tema about_Execution_Policies en https:/go.microsoft.com/fwlink/?LinkID=135170.
+En línea: 147 Carácter: 5
++     npm run e2e -- e2e/revision-cockpit.spec.ts e2e/pipeline.spec.ts  ...
++     ~~~
+    + CategoryInfo          : SecurityError: (:) [], PSSecurityException
+    + FullyQualifiedErrorId : UnauthorizedAccess
+E2E_EXIT=0
+
+============================================================
+5. DEFECTOS CONOCIDOS QUE SIGUEN EN EL SNAPSHOT
+============================================================
+
+>>> BUSCAR: if (!incAudio) return
+
+
+>>> BUSCAR: parteConsecutivaRef.current = 0
+
+
+>>> BUSCAR: blob.slice
+
+
+>>> BUSCAR: "archivado"
+
+
+>>> BUSCAR: chunks.slice(0, 3)
+
+
+============================================================
+6. INTEGRACIÓN REAL DE TÍTULOS Y TILDES
+============================================================
+
+>>> BUSCAR: asignarTituloVolcado
+
+
+>>> BUSCAR: generarTituloEstructurado
+
+
+>>> BUSCAR: autoaplicarTildesSeguras
+
+
+>>> BUSCAR: tildesSeguras
+
+
+============================================================
+7. HALLAZGOS, CIFRADO Y RESOLUCIÓN
+============================================================
+
+>>> BUSCAR: descifrarTexto
+
+
+>>> BUSCAR: resolverHallazgo
+
+
+>>> BUSCAR: audio_recuperado
+
+
+>>> BUSCAR: resolverIncidente
+
+
+============================================================
+8. ESTADO Y VERSIONADO DE REVISIÓN
+============================================================
+
+>>> BUSCAR: prepararVolcadoParaRevision
+
+
+>>> BUSCAR: en_revision
+
+
+>>> BUSCAR: volcado_versiones
+
+(sin coincidencias)
+
+============================================================
+9. MIGRACIONES Y BACKFILLS
+============================================================
+
+MIGRACIÓN 013:
+-- @l0 L0-002-R Â· MigraciÃ³n idempotente para normalizar Ã­ndices de partes de dictado a 1-based
+
+DO $$
+BEGIN
+    -- Comprobar si existen registros 0-based en dictado_audio_parte
+    IF EXISTS (SELECT 1 FROM dictado_audio_parte WHERE part_index = 0) THEN
+        -- Desplazar temporalmente a valores negativos para evitar colisiones UNIQUE
+        UPDATE dictado_audio_parte
+        SET part_index = - (part_index + 1)
+        WHERE session_id IN (
+            SELECT session_id FROM dictado_audio_parte WHERE part_index = 0
+        );
+
+        -- Convertir de valores negativos a 1-based ( -(-val) )
+        UPDATE dictado_audio_parte
+        SET part_index = -part_index
+        WHERE part_index < 0;
+    END IF;
+END $$;
+
+MIGRACIÓN 014:
+-- @l0 L0-002-R Â· MigraciÃ³n idempotente para cambiar el valor por defecto de estado en volcado a 'en_revision'
+
+DO $$
+BEGIN
+    -- 1. Alterar DEFAULT de la columna estado
+    ALTER TABLE volcado ALTER COLUMN estado SET DEFAULT 'en_revision';
+
+    -- 2. Migrar registros histÃ³ricos en estado 'archivado' a 'en_revision'
+    UPDATE volcado
+    SET estado = 'en_revision'
+    WHERE estado = 'archivado';
+END $$;
+
+REFERENCIAS AL EJECUTOR DE MIGRACIONES:
+
+
+SCRIPTS DE PACKAGE.JSON:
+
+
+============================================================
+10. RESUMEN DE SALIDAS
+============================================================
+SNAPSHOT_HEAD=8863e19cd558698ab201b9c2dc5f54fab4e5c9f4
+MERGE_OBJECT_AVAILABLE=True
+NPM_CI_EXIT=0
+BUILD_EXIT=0
+E2E_EXIT=0
+
+**********************
+Fin de la transcripción de Windows PowerShell
+Hora de finalización: 20260819162853
+**********************
