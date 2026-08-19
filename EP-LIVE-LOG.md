@@ -3,28 +3,16 @@
 **Propósito:** registro operativo público y sanitizado del Entorno Persistente.
 **Versión:** KHORA v7.2.0
 **Estado:** ACTIVE
-**Última sincronización:** 2026-08-19 16:36:26
+**Última sincronización:** 2026-08-19 16:38:48
 **Motivo:** periodic-active-session
 **Branch publicado:** main
-**HEAD observado:** 5f0a5a400da61827e30d72eaef4b8741d01ed3ab
+**HEAD observado:** 143de68f710488fc4076f358b1209eae1c5b5718
 
 > Este archivo es un registro operativo, no sustituye EP-ARCHITECTURE.md.
 > Se actualiza bajo demanda, al quedar lista una sesión y al iniciar el cierre de sesión.
 
 ## Eventos recientes
 
-[16:09:41][INFO] vercel prod: > node scripts/build-extension.mjs
-[16:09:41][INFO] vercel prod: Building extension zip for version 0.3.3...
-[16:09:41][INFO] vercel prod: Successfully created /vercel/path0/khora-web/public/downloads/harmonia-v0.3.3.zip
-[16:09:41][INFO] vercel prod: > khora-web@0.1.2 build
-[16:09:41][INFO] vercel prod: > next build
-[16:09:41][INFO] vercel prod: Applying modifyConfig from Vercel
-[16:09:41][INFO] vercel prod: ▲ Next.js 16.2.11 (Turbopack)
-[16:09:41][INFO] vercel prod: - Experiments (use with caution):
-[16:09:41][INFO] vercel prod: · serverActions
-[16:09:41][INFO] vercel prod: ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
-[16:09:41][INFO] vercel prod: Creating an optimized production build ...
-[16:09:41][INFO] vercel prod: ✓ Generating static pages using 1 worker (47/47) in 566ms
 [16:09:41][INFO] vercel prod: Finalizing page optimization ...
 [16:09:41][INFO] vercel prod: Running onBuildComplete from Vercel
 [16:09:41][INFO] vercel prod: Route (app)                                         Revalidate  Expire
@@ -253,20 +241,20 @@
 [16:34:15][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
 [16:34:26][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
 [16:34:26][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
+[16:36:30][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
+[16:36:36][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
+[16:36:48][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
+[16:36:48][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
+[16:37:35][WARN] Chrome sin CDP activo o cerrado, omitiendo snapshot de pestañas.
+[16:37:35][INFO] Auto-WIP: logs copiados a repo/logs/ (incluidos en el commit)
+[16:37:35][INFO] git add: OK 
+[16:37:35][INFO] git commit: OK [main 143de68] wip: auto-guardado 16:37:35  1 file changed, 0 insertions(+), 0 deletions(-)
+[16:37:38][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
+[16:37:44][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
+[16:37:55][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
+[16:37:55][WARN] Auto-WIP NO VERIFICADO: trabajo local sin respaldo remoto (reintento en el proximo ciclo).
 
 --- HISTORIAL DE SESIONES (ULTIMAS LINEAS) ---
-[16:10:23][OK  ] Guardian activo (PID 20336) - inactividad 15min + panico Ctrl+Alt+K
-[16:10:23][OK  ] Deadline registrado: limpieza automatica a las 20:00 (2026-08-19)
-[16:10:23][STEP] Boveda de entorno (Env Vault)
-[16:10:25][STEP] Servidores de desarrollo (AUTO-INICIO garantizado)
-[16:10:25][INFO] Arrancando dev servers automaticamente post-token (API + Next.js)...
-[16:10:25][INFO] === Start-DevServers: arrancando API (:8000) + Next.js (:3000) ===
-[16:10:25][OK  ] API uvicorn -> http://localhost:8000  (nueva ventana)
-[16:10:25][INFO] Dev server API uvicorn lanzado en :8000
-[16:10:25][OK  ] Next.js dev -> http://localhost:3000  (nueva ventana)
-[16:10:25][INFO] Dev server Next.js lanzado en :3000
-[16:10:25][INFO] Dev servers iniciados. Sistema listo para trabajar.
-[16:10:25][INFO] SESION LISTA en 152s
 [16:10:29][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
 [16:10:35][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
 [16:10:47][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
@@ -335,3 +323,15 @@
 [16:34:15][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
 [16:34:26][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
 [16:34:26][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
+[16:36:30][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
+[16:36:36][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
+[16:36:48][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
+[16:36:48][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
+[16:37:35][WARN] Chrome sin CDP activo o cerrado, omitiendo snapshot de pestañas.
+[16:37:35][INFO] Auto-WIP: logs copiados a repo/logs/ (incluidos en el commit)
+[16:37:35][INFO] git add: OK 
+[16:37:35][INFO] git commit: OK [main 143de68] wip: auto-guardado 16:37:35  1 file changed, 0 insertions(+), 0 deletions(-)
+[16:37:38][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
+[16:37:44][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
+[16:37:55][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
+[16:37:55][WARN] Auto-WIP NO VERIFICADO: trabajo local sin respaldo remoto (reintento en el proximo ciclo).
