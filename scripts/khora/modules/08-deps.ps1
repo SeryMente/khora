@@ -186,7 +186,7 @@ function Sync-VSCodeConfig {
     $extFile = Join-Path $dir "extensions.txt"
     $setFile = Join-Path $dir "settings.user.json"
     if (-not (Test-Path $extFile) -and -not (Test-Path $setFile)) {
-        if(-not(Test-Path -LiteralPath $dir)){New-Item -ItemType Directory -LiteralPath $dir -Force | Out-Null}
+        if(-not(Test-Path -LiteralPath $dir)){New-Item -ItemType Directory -Path $dir -Force | Out-Null}
         Set-Content $extFile "# Un ID de extension por linea (ej. ms-python.python)" -Encoding UTF8
         Set-Content $setFile "{}" -Encoding UTF8
         Info "Primera vez: creando almacenamiento persistente de VS Code en %LOCALAPPDATA%\KHORA\VSCode."
@@ -219,7 +219,7 @@ function Sync-VSCodeConfig {
 function Export-VSCodeConfig {
     if (-not (Test-Path "$REPO_DIR\.git")) { return }
     $dir = Join-Path $env:LOCALAPPDATA "KHORA\VSCode"
-    if(-not(Test-Path -LiteralPath $dir)){New-Item -ItemType Directory -LiteralPath $dir -Force | Out-Null}
+    if(-not(Test-Path -LiteralPath $dir)){New-Item -ItemType Directory -Path $dir -Force | Out-Null}
     $src = Join-Path $env:APPDATA "Code\User\settings.json"
     if (Test-Path $src) { Copy-Item $src (Join-Path $dir "settings.user.json") -Force -ErrorAction SilentlyContinue; Ok "VS Code: settings.json exportado a persistencia externa." }
     $cli = Get-CodeCli
