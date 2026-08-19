@@ -3,25 +3,16 @@
 **Propósito:** registro operativo público y sanitizado del Entorno Persistente.
 **Versión:** KHORA v7.2.0
 **Estado:** ACTIVE
-**Última sincronización:** 2026-08-19 16:15:08
+**Última sincronización:** 2026-08-19 16:17:29
 **Motivo:** periodic-active-session
 **Branch publicado:** main
-**HEAD observado:** 60a863475c67498660f7709f41c09bd030541ec2
+**HEAD observado:** 36a639797ff1480ff46ef4c936a3fc9c60b729a3
 
 > Este archivo es un registro operativo, no sustituye EP-ARCHITECTURE.md.
 > Se actualiza bajo demanda, al quedar lista una sesión y al iniciar el cierre de sesión.
 
 ## Eventos recientes
 
-[16:07:58][INFO] Todo lo que se descargue al workdir (repo incluido) nacera CIFRADO en disco.
-[16:07:58][WARN] LastPass no detectado. Las pestañas de login se abrirán pero no tendrán autofill.
-[16:07:58][OK  ] Abiertas 3 pestañas iniciales de login (CDP port: 9333).
-[16:07:58][STEP] Credencial API GitHub
-[16:07:58][OK  ] Credencial API GitHub recuperada desde gh (sin introducir token manualmente).
-[16:07:59][STEP] Configuracion Git
-[16:07:59][OK  ] user.name  = Victor Hugo Torres
-[16:07:59][OK  ] user.email = <EMAIL>
-[16:07:59][OK  ] core.autocrlf = input
 [16:07:59][OK  ] core.longpaths = true
 [16:07:59][OK  ] Prompts interactivos de Git/GCM deshabilitados (solo token por header).
 [16:07:59][OK  ] Bootstrap provisional: reutilizando instancia ya materializada.
@@ -253,17 +244,17 @@
 [16:12:56][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
 [16:13:08][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
 [16:13:08][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
+[16:15:11][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
+[16:15:17][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
+[16:15:29][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
+[16:15:29][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
+[16:15:50][WARN] Chrome sin CDP activo o cerrado, omitiendo snapshot de pestañas.
+[16:15:51][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
+[16:15:59][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
+[16:16:10][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
+[16:16:10][WARN] Auto-WIP NO VERIFICADO: trabajo local sin respaldo remoto (reintento en el proximo ciclo).
 
 --- HISTORIAL DE SESIONES (ULTIMAS LINEAS) ---
-================================================================
-[16:09:41][OK  ] Entrada escrita en repo/logs/sessions.log
-[16:09:41][OK  ] Auto-WIP sobre la rama actual: main
-[16:09:43][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/2).
-[16:09:50][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/2).
-[16:09:50][WARN] Rama WIP aun sin publicar; el auto-WIP reintentara en el proximo ciclo.
-[16:09:50][INFO] Sin snapshot previo de pestañas.
-[16:09:50][STEP] Entorno de desarrollo (Python + Node + Docker + Vercel + Render)
-[16:09:50][INFO] Esperando finalizacion de precarga de dependencias en background...
 [16:09:50][OK  ] [DEPS] Precarga completada. Estado: OK 2026-08-19 16:09:50
 [16:09:50][INFO] === Ensure-Python311: buscando Python 3.11+ del usuario operativo ===
 [16:09:50][OK  ] Python OK: Python 3.11.9 (C:\Users\<USER>\AppData\Local\Programs\Python\Python311\python.exe)
@@ -335,3 +326,12 @@
 [16:12:56][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
 [16:13:08][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
 [16:13:08][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
+[16:15:11][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
+[16:15:17][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
+[16:15:29][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
+[16:15:29][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
+[16:15:50][WARN] Chrome sin CDP activo o cerrado, omitiendo snapshot de pestañas.
+[16:15:51][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
+[16:15:59][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
+[16:16:10][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
+[16:16:10][WARN] Auto-WIP NO VERIFICADO: trabajo local sin respaldo remoto (reintento en el proximo ciclo).
