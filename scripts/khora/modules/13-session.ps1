@@ -128,17 +128,32 @@ if (-not (Invoke-Preflight)) { Fail "Preflight fallo (sin internet). Sesion canc
             Remove-Item -LiteralPath $REPO_DIR -Recurse -Force -ErrorAction SilentlyContinue
         }
 
-        Info ("git clone -- intento {0}/3... [credential.helper=gh]" -f $i)
-
+        Info ("git clone -- intento {0}/3... [TokSecure/GIT_ASKPASS]" -f $i)
+        $askPass = Join-Path $env:TEMP ("khora-git-askpass-" + $PID + ".cmd")
+        $askText = "@echo off`r`nif /I `"%~1`"==`"Username for https://github.com:`" (echo x-access-token) else (echo %KHORA_GIT_TOKEN%)"
+        [IO.File]::WriteAllText($askPass,$askText,(New-Object System.Text.ASCIIEncoding))
         try {
-            $cloneOutput = @(git clone "https://github.com/$REPO_ORG/$REPO_NAME.git" $REPO_DIR 2>&1)
-            $cloneCode = $LASTEXITCODE
-            $cloneErr = (($cloneOutput | Out-String).Trim())
+            $cloneCode = 1
+            $cloneErr = ""
+            Invoke-WithToken {
+                param($t)
+                $env:KHORA_GIT_TOKEN = $t
+                $env:GIT_ASKPASS = $askPass
+                $env:GIT_TERMINAL_PROMPT = "0"
+                $cloneOutput = @(git -c credential.helper= -c core.askPass="$askPass" clone "https://github.com/$REPO_ORG/$REPO_NAME.git" $REPO_DIR 2>&1)
+                $script:__cloneCode = $LASTEXITCODE
+                $script:__cloneErr = (($cloneOutput | Out-String).Trim())
+            } | Out-Null
+            $cloneCode = $script:__cloneCode
+            $cloneErr = $script:__cloneErr
         } catch {
             $cloneCode = 1
             $cloneErr = "$_"
+        } finally {
+            Remove-Item Env:KHORA_GIT_TOKEN -ErrorAction SilentlyContinue
+            Remove-Item Env:GIT_ASKPASS -ErrorAction SilentlyContinue
+            Remove-Item -LiteralPath $askPass -Force -ErrorAction SilentlyContinue
         }
-
         $cloneErr = Mask-Token -Text $cloneErr
 
         if (($cloneCode -eq 0) -and (Test-Path -LiteralPath (Join-Path $REPO_DIR ".git"))) {
