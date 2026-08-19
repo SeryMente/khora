@@ -322,7 +322,7 @@ function Initialize-VercelBootstrapAuth {
         return $false
     }
 
-    $who = @(& vercel whoami --token $vtoken 2>&1)
+    $vercelCmd=(Get-Command vercel.cmd -ErrorAction SilentlyContinue).Source;if([string]::IsNullOrWhiteSpace($vercelCmd)){Fail "vercel.cmd no disponible.";return $false};$who = @(& $vercelCmd whoami --token $vtoken 2>&1)
     $whoCode = $LASTEXITCODE
     if ($whoCode -ne 0) {
         Fail "Vercel no autenticado."
@@ -333,6 +333,9 @@ function Initialize-VercelBootstrapAuth {
     return $true
 }
 function Bootstrap-VercelProduction {
+    $vercelCmd=(Get-Command vercel.cmd -ErrorAction SilentlyContinue).Source
+    if([string]::IsNullOrWhiteSpace($vercelCmd)){Fail 'vercel.cmd no disponible en Bootstrap-VercelProduction.';return $false}
+
     $vtoken = [Environment]::GetEnvironmentVariable("VERCEL_TOKEN","Process")
     if ([string]::IsNullOrWhiteSpace($vtoken)) {
         Fail "VERCEL_TOKEN no disponible tras autenticacion Vercel."
@@ -347,7 +350,7 @@ function Bootstrap-VercelProduction {
 
     Push-Location $webDir
     try {
-        $linkOut = @(& vercel link --project khora-web --scope victorhugotorresmendez-8991s-projects --yes --token $vtoken 2>&1)
+        $linkOut = @(& $vercelCmd link --project khora-web --scope victorhugotorresmendez-8991s-projects --yes --token $vtoken 2>&1)
         $linkCode = $LASTEXITCODE
         $linkOut | ForEach-Object {
             L "INFO" ("vercel link: " + (Mask-Token -Text "$_"))
@@ -357,7 +360,7 @@ function Bootstrap-VercelProduction {
             return $false
         }
 
-        $deployOut = @(& vercel --prod --token $vtoken 2>&1)
+        $deployOut = @(& $vercelCmd --prod --token $vtoken 2>&1)
         $deployCode = $LASTEXITCODE
         $deployOut | ForEach-Object {
             L "INFO" ("vercel prod: " + (Mask-Token -Text "$_"))
