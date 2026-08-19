@@ -3,21 +3,16 @@
 **Propósito:** registro operativo público y sanitizado del Entorno Persistente.
 **Versión:** KHORA v7.2.0
 **Estado:** ACTIVE
-**Última sincronización:** 2026-08-19 16:59:54
+**Última sincronización:** 2026-08-19 17:02:15
 **Motivo:** periodic-active-session
 **Branch publicado:** main
-**HEAD observado:** bb5131b1aa9e1b2ce8cd7f0f710a3ffa8988c889
+**HEAD observado:** 2ce51f36114ccd84d1c0cd7f7244d96868bf53b0
 
 > Este archivo es un registro operativo, no sustituye EP-ARCHITECTURE.md.
 > Se actualiza bajo demanda, al quedar lista una sesión y al iniciar el cierre de sesión.
 
 ## Eventos recientes
 
-[16:09:41][INFO] vercel prod: ├ ○ /offline
-[16:09:41][INFO] vercel prod: ├ ○ /roadmap
-[16:09:41][INFO] vercel prod: ├ ○ /sistema/boveda
-[16:09:41][INFO] vercel prod: ├ ○ /sistema/consulta
-[16:09:41][INFO] vercel prod: ├ ○ /sistema/dictado
 [16:09:41][INFO] vercel prod: ├ ○ /sistema/editar
 [16:09:41][INFO] vercel prod: ├ ○ /sistema/ingesta
 [16:09:41][INFO] vercel prod: ├ ○ /sistema/ingreso
@@ -253,12 +248,13 @@
 [16:59:27][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
 [16:59:38][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
 [16:59:38][WARN] Auto-WIP NO VERIFICADO: trabajo local sin respaldo remoto (reintento en el proximo ciclo).
+[16:59:57][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
+[17:00:03][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
+[17:00:14][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
+[17:00:14][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
+[17:00:58][FAIL] ALERTA EXFILTRACION/RAT: subida sostenida 25.7 MB/min (posible exfiltracion)
 
 --- HISTORIAL DE SESIONES (ULTIMAS LINEAS) ---
-[16:32:09][WARN] Chrome sin CDP activo o cerrado, omitiendo snapshot de pestañas.
-[16:32:09][INFO] Auto-WIP: logs copiados a repo/logs/ (incluidos en el commit)
-[16:32:09][INFO] git add: OK warning: in the working copy of 'diagnostico-pr211-20260819-162804.txt', CRLF will be replaced by LF the next time Git touches it
-[16:32:09][INFO] git commit: OK [main 2af9c6c] wip: auto-guardado 16:32:09  2 files changed, 299 insertions(+)  create mode 100644 diagnostico-pr211-20260819-162804.txt  create mode 100644 diagnostico-pr211-final-20260819-163140.txt
 [16:32:12][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
 [16:32:20][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
 [16:32:32][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
@@ -335,3 +331,7 @@
 [16:59:27][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
 [16:59:38][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
 [16:59:38][WARN] Auto-WIP NO VERIFICADO: trabajo local sin respaldo remoto (reintento en el proximo ciclo).
+[16:59:57][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
+[17:00:03][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
+[17:00:14][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
+[17:00:14][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
