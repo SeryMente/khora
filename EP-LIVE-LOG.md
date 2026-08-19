@@ -3,20 +3,16 @@
 **Propósito:** registro operativo público y sanitizado del Entorno Persistente.
 **Versión:** KHORA v7.2.0
 **Estado:** ACTIVE
-**Última sincronización:** 2026-08-19 16:26:58
+**Última sincronización:** 2026-08-19 16:29:20
 **Motivo:** periodic-active-session
 **Branch publicado:** main
-**HEAD observado:** da5eea8eb445f701b42bb4205c70a4e3bfceeb62
+**HEAD observado:** 8863e19cd558698ab201b9c2dc5f54fab4e5c9f4
 
 > Este archivo es un registro operativo, no sustituye EP-ARCHITECTURE.md.
 > Se actualiza bajo demanda, al quedar lista una sesión y al iniciar el cierre de sesión.
 
 ## Eventos recientes
 
-[16:09:41][INFO] vercel prod: Building…
-[16:09:41][INFO] vercel prod: Building…
-[16:09:41][INFO] vercel prod: Running build in Washington, D.C., USA (East) – iad1
-[16:09:41][INFO] vercel prod: Build machine configuration: 2 cores, 8 GB
 [16:09:41][INFO] vercel prod: Retrieving list of deployment files...
 [16:09:41][INFO] vercel prod: Downloading 553 deployment files...
 [16:09:41][INFO] vercel prod: Restored build cache from previous deployment (FE3RAUB19gaMj2nvJPL2EVPuTM3D)
@@ -253,12 +249,12 @@
 [16:26:44][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
 [16:26:56][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
 [16:26:56][WARN] Auto-WIP NO VERIFICADO: trabajo local sin respaldo remoto (reintento en el proximo ciclo).
+[16:27:00][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
+[16:27:06][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
+[16:27:20][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
+[16:27:20][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
 
 --- HISTORIAL DE SESIONES (ULTIMAS LINEAS) ---
-[16:10:22][INFO] npm:   npm audit fix --force
-[16:10:22][INFO] npm: 
-[16:10:22][INFO] npm: Run `npm audit` for details.
-[16:10:22][INFO] npm: npm warn allow-scripts 5 packages have install scripts not yet covered by allowScripts:
 [16:10:22][INFO] npm: npm warn allow-scripts   @firebase/util@1.15.1 (postinstall: node ./postinstall.js)
 [16:10:22][INFO] npm: npm warn allow-scripts   @google/genai@2.13.0 (preinstall: echo 'preinstall: no-op')
 [16:10:22][INFO] npm: npm warn allow-scripts   protobufjs@7.6.5 (postinstall: node scripts/postinstall)
@@ -335,3 +331,7 @@
 [16:26:44][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
 [16:26:56][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
 [16:26:56][WARN] Auto-WIP NO VERIFICADO: trabajo local sin respaldo remoto (reintento en el proximo ciclo).
+[16:27:00][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
+[16:27:06][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
+[16:27:20][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
+[16:27:20][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
