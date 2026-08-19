@@ -1,4 +1,4 @@
-# ================================================================
+﻿# ================================================================
 # KHORA v7 - MODULO 15-main.ps1
 # Componente: 15 main
 # ================================================================
@@ -86,6 +86,7 @@ Write-Host ""
     # Cierre garantizado si se cierra con la X o error
     try { Register-EngineEvent PowerShell.Exiting -Action { if ($script:SES_ACTIVE) { Invoke-Cleanup "salida-forzada" } } | Out-Null } catch {}
     $nextWip  = (Get-Date).AddMinutes($CFG.autoWipMinutes)
+    $nextLiveSync = (Get-Date).AddMinutes(2)
     $needDraw = $true
     while ($true) {
         if ($needDraw) { Show-Banner; $needDraw = $false }
@@ -129,6 +130,16 @@ Write-Host ""
             Clear-PendingInput
             Start-Sleep -Milliseconds 900
             $needDraw = $true
+        }
+        # EP-LIVE-LOG: respaldo remoto periodico de la sesion activa
+        if ((Get-Date) -ge $nextLiveSync) {
+            try {
+                if ($script:SES_ACTIVE -and $script:TokSecure) {
+                    $livePeriodic = Sync-EpLiveLog -Reason 'periodic-active-session'
+                    if ($livePeriodic) { L "INFO" "EP-LIVE-LOG periodico publicado y verificado en GitHub." }
+                }
+            } catch { L "WARN" "EP-LIVE-LOG periodico fallo: $_" }
+            $nextLiveSync = (Get-Date).AddMinutes(2)
         }
         # Tareas periodicas sin bloquear
         if ($script:SES_ACTIVE) {
