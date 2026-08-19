@@ -3,20 +3,16 @@
 **Propósito:** registro operativo público y sanitizado del Entorno Persistente.
 **Versión:** KHORA v7.2.0
 **Estado:** ACTIVE
-**Última sincronización:** 2026-08-19 16:12:47
+**Última sincronización:** 2026-08-19 16:15:08
 **Motivo:** periodic-active-session
 **Branch publicado:** main
-**HEAD observado:** c27a3db2e9b06556c55482977941135c4f3675d1
+**HEAD observado:** 60a863475c67498660f7709f41c09bd030541ec2
 
 > Este archivo es un registro operativo, no sustituye EP-ARCHITECTURE.md.
 > Se actualiza bajo demanda, al quedar lista una sesión y al iniciar el cierre de sesión.
 
 ## Eventos recientes
 
-[16:07:58][STEP] Politica de ejecucion
-[16:07:58][OK  ] ExecutionPolicy OK: Undefined
-[16:07:58][STEP] Cifrado en reposo (EFS)
-[16:07:58][OK  ] EFS ACTIVO: workdir de sesion marcado. Nuevos archivos heredaran cifrado.
 [16:07:58][INFO] Todo lo que se descargue al workdir (repo incluido) nacera CIFRADO en disco.
 [16:07:58][WARN] LastPass no detectado. Las pestañas de login se abrirán pero no tendrán autofill.
 [16:07:58][OK  ] Abiertas 3 pestañas iniciales de login (CDP port: 9333).
@@ -253,12 +249,12 @@
 [16:10:47][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
 [16:10:47][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
 [16:10:47][WARN] EP-LIVE-LOG no pudo sincronizarse en la instancia inicial.
+[16:12:50][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
+[16:12:56][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
+[16:13:08][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
+[16:13:08][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
 
 --- HISTORIAL DE SESIONES (ULTIMAS LINEAS) ---
- Fecha:    2026-08-19 16:09:41
- Host:     <HOST>
- Usuario:  <USER>
- Branch:   main  |  Commit: bd7ea41 fix: restore PowerShell 5.1 New-Item compatibility  |  Archivos: 557
 ================================================================
 [16:09:41][OK  ] Entrada escrita en repo/logs/sessions.log
 [16:09:41][OK  ] Auto-WIP sobre la rama actual: main
@@ -335,3 +331,7 @@
 [16:10:47][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
 [16:10:47][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
 [16:10:47][WARN] EP-LIVE-LOG no pudo sincronizarse en la instancia inicial.
+[16:12:50][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
+[16:12:56][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
+[16:13:08][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
+[16:13:08][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
