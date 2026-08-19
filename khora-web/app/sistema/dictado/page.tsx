@@ -4,7 +4,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import * as Icons from "lucide-react";
 import { ensamblarParrafos, Fragmento } from "../../../lib/transcripcion/ensamblar";
-import { SegmentoReconciliado, reconciliarSegmentos } from "../../../lib/server/transcribir";
+import { reconciliarSegmentos, type SegmentoReconciliado } from "../../../lib/transcripcion/reconciliar";
 
 type Estado = "inactivo" | "dictando" | "finalizando";
 type EstadoReconciliacion = "preview_live" | "procesando_whisper" | "reconciliado_whisper" | "fallback_preview" | "editado_manual";
