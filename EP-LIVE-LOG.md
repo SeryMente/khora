@@ -3,20 +3,16 @@
 **Propósito:** registro operativo público y sanitizado del Entorno Persistente.
 **Versión:** KHORA v7.2.0
 **Estado:** ACTIVE
-**Última sincronización:** 2026-08-19 16:17:29
+**Última sincronización:** 2026-08-19 16:19:51
 **Motivo:** periodic-active-session
 **Branch publicado:** main
-**HEAD observado:** 36a639797ff1480ff46ef4c936a3fc9c60b729a3
+**HEAD observado:** c24362c518be6f131331ec56bd0e468f3cd1fd38
 
 > Este archivo es un registro operativo, no sustituye EP-ARCHITECTURE.md.
 > Se actualiza bajo demanda, al quedar lista una sesión y al iniciar el cierre de sesión.
 
 ## Eventos recientes
 
-[16:07:59][OK  ] core.longpaths = true
-[16:07:59][OK  ] Prompts interactivos de Git/GCM deshabilitados (solo token por header).
-[16:07:59][OK  ] Bootstrap provisional: reutilizando instancia ya materializada.
-[16:07:59][OK  ] Repo activo: C:\Users\<USER>\Desktop\KHORA-EP\verify-20260819-160742
 [16:07:59][STEP] Bootstrap Vercel / redeploy produccion
 [16:08:00][INFO] vercel link: Vercel CLI 59.1.4 (Node.js 24.19.0)
 [16:08:00][INFO] vercel link: System.Management.Automation.RemoteException
@@ -253,12 +249,12 @@
 [16:15:59][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
 [16:16:10][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
 [16:16:10][WARN] Auto-WIP NO VERIFICADO: trabajo local sin respaldo remoto (reintento en el proximo ciclo).
+[16:17:32][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
+[16:17:38][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
+[16:17:51][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
+[16:17:51][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
 
 --- HISTORIAL DE SESIONES (ULTIMAS LINEAS) ---
-[16:09:50][OK  ] [DEPS] Precarga completada. Estado: OK 2026-08-19 16:09:50
-[16:09:50][INFO] === Ensure-Python311: buscando Python 3.11+ del usuario operativo ===
-[16:09:50][OK  ] Python OK: Python 3.11.9 (C:\Users\<USER>\AppData\Local\Programs\Python\Python311\python.exe)
-[16:09:50][INFO] === Setup-Venv: configurando entorno virtual Python ===
 [16:09:55][INFO] pip install -e . (dependencias Python) completado en 00:05
 [16:09:55][INFO] pip: System.Management.Automation.RemoteException
 [16:09:55][INFO] pip: [notice] A new release of pip is available: 24.0 -> 26.2.1
@@ -335,3 +331,7 @@
 [16:15:59][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
 [16:16:10][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
 [16:16:10][WARN] Auto-WIP NO VERIFICADO: trabajo local sin respaldo remoto (reintento en el proximo ciclo).
+[16:17:32][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
+[16:17:38][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
+[16:17:51][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
+[16:17:51][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
