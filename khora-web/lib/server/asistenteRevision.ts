@@ -1,5 +1,5 @@
 // @l0 L0-002-R · @req REVISION/REQ-1 · @acr ACR-1.2 · @req REVISION-COCKPIT/REQ-1
-import { createHash, randomUUID } from "crypto";
+import { createHash } from "crypto";
 import { obtenerGlosario } from "./pulido";
 import { getDb } from "./neon";
 
@@ -297,6 +297,23 @@ export async function generarYPersistirHallazgos(
     }
   }
 
+  // Regla 5: Groq LLM hallazgos de sentido
+  const sugerenciasLLM = await obtenerSugerenciasLLM(texto);
+  for (const sug of sugerenciasLLM) {
+    borradorHallazgos.push({
+      origen: "llm",
+      posicion: sug.posicion,
+      texto_original: sug.texto_original,
+      sugerencia: sug.sugerencia,
+      regla: sug.regla,
+      tipo_categoria: sug.tipo_categoria,
+      severidad: sug.severidad,
+      confianza: sug.confianza,
+      familia: "observacion_editorial",
+      explicacion: sug.explicacion,
+    });
+  }
+
   // Persistir idempotentemente hallazgos para esta versión
   const hallazgosPersistidos: Hallazgo[] = [];
 
@@ -444,10 +461,89 @@ export async function obtenerSugerenciasOrtotipograficas(texto: string) {
   return [];
 }
 
-export async function obtenerSugerenciasLLM(texto: string) {
-  return [];
+export async function obtenerSugerenciasLLM(texto: string): Promise<Array<{
+  posicion: { inicio: number; fin: number };
+  texto_original: string;
+  sugerencia: string;
+  regla: string;
+  tipo_categoria: TipoCategoriaSugerencia;
+  severidad: SeveridadSugerencia;
+  confianza: number;
+  explicacion: string;
+}>> {
+  const apiKey = process.env.GROQ_API_KEY;
+  if (!apiKey || !texto || texto.trim().length === 0) {
+    return [];
+  }
+
+  const prompt = `Analiza el siguiente texto en español y detecta únicamente observaciones de sentido u oraciones inconclusas/ambiguas.
+Devuelve un JSON en este formato:
+{
+  "observaciones": [
+    {
+      "cita": "texto literal exacto",
+      "sugerencia": "sugerencia o aclaración",
+      "regla": "Oración incompleta o incoherencia local",
+      "categoria": "sintaxis",
+      "severidad": "media",
+      "explicacion": "Explicación breve"
+    }
+  ]
+}
+
+Texto:
+"""
+${texto.slice(0, 3000)}
+"""`;
+
+  try {
+    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: "llama-3.3-70b-versatile",
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.1,
+        response_format: { type: "json_object" },
+      }),
+    });
+
+    if (!res.ok) return [];
+
+    const json = await res.json();
+    const content = json.choices?.[0]?.message?.content;
+    if (!content) return [];
+
+    const parsed = JSON.parse(content);
+    const obsList = Array.isArray(parsed?.observaciones) ? parsed.observaciones : [];
+
+    const sugerencias = [];
+    for (const obs of obsList) {
+      if (!obs.cita || typeof obs.cita !== "string") continue;
+      const idx = texto.indexOf(obs.cita);
+      if (idx !== -1) {
+        sugerencias.push({
+          posicion: { inicio: idx, fin: idx + obs.cita.length },
+          texto_original: obs.cita,
+          sugerencia: String(obs.sugerencia || obs.cita),
+          regla: String(obs.regla || "Observación editorial de sentido"),
+          tipo_categoria: (obs.categoria as TipoCategoriaSugerencia) || "sintaxis",
+          severidad: (obs.severidad as SeveridadSugerencia) || "media",
+          confianza: 0.88,
+          explicacion: String(obs.explicacion || "Observación de coherencia local respaldada"),
+        });
+      }
+    }
+
+    return sugerencias;
+  } catch {
+    return [];
+  }
 }
 
 export async function obtenerTodasSugerencias(texto: string) {
-  return [];
+  return await obtenerSugerenciasLLM(texto);
 }

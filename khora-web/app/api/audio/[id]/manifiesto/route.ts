@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/server/neon";
 import { COOKIE_BOVEDA, desbloqueoVigente } from "@/lib/server/boveda";
 import { reportarIncidente } from "@/lib/server/incidentes";
+import { esAudioEsperado } from "@/lib/server/domainAudio";
 
 export const runtime = "nodejs";
 
@@ -18,8 +19,8 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
     const db = getDb();
     const volcadoRes = await db.query(
       isNumeric
-        ? "SELECT id, audio_url, audio_partes, session_id, duracion_seg, audio_bytes FROM volcado WHERE folio = $1"
-        : "SELECT id, audio_url, audio_partes, session_id, duracion_seg, audio_bytes FROM volcado WHERE id::text = $1",
+        ? "SELECT id, audio_url, audio_partes, session_id, duracion_seg, audio_bytes, fuente, driver, origen FROM volcado WHERE folio = $1"
+        : "SELECT id, audio_url, audio_partes, session_id, duracion_seg, audio_bytes, fuente, driver, origen FROM volcado WHERE id::text = $1",
       [isNumeric ? parseInt(id.trim(), 10) : id.trim()]
     );
 
@@ -30,6 +31,13 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
     const volcado = volcadoRes.rows[0];
     const volcadoId = volcado.id;
     const sessionId = volcado.session_id ? String(volcado.session_id).trim() : null;
+
+    const audioEsperado = esAudioEsperado({
+      fuente: volcado.fuente,
+      driver: volcado.driver,
+      origen: volcado.origen,
+      session_id: sessionId,
+    });
 
     // Buscar partes registradas en dictado_audio_parte
     let partesDb: any[] = [];
@@ -121,6 +129,19 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
     }
 
     if (partesManifiesto.length === 0) {
+      if (!audioEsperado) {
+        return NextResponse.json({
+          volcado_id: volcadoId,
+          session_id: sessionId,
+          audio_expected: false,
+          audio_status: "no_aplica",
+          total_partes: 0,
+          duracion_total_ms: 0,
+          bytes_totales: 0,
+          partes: [],
+        });
+      }
+
       await reportarIncidente({
         volcadoId,
         tipo: "audio_no_vinculado",
@@ -141,6 +162,8 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
     return NextResponse.json({
       volcado_id: volcadoId,
       session_id: sessionId,
+      audio_expected: true,
+      audio_status: "disponible",
       total_partes: partesManifiesto.length,
       duracion_total_ms: duracionTotalMs,
       bytes_totales: bytesTotales,
