@@ -3,20 +3,16 @@
 **Propósito:** registro operativo público y sanitizado del Entorno Persistente.
 **Versión:** KHORA v7.2.0
 **Estado:** ACTIVE
-**Última sincronización:** 2026-08-19 17:28:02
+**Última sincronización:** 2026-08-19 17:30:23
 **Motivo:** periodic-active-session
 **Branch publicado:** main
-**HEAD observado:** 7025aef7e6903289bbc6d6a4586d420740c5bc01
+**HEAD observado:** 133db57e731099471d4f14afb416e23b4bed8d6a
 
 > Este archivo es un registro operativo, no sustituye EP-ARCHITECTURE.md.
 > Se actualiza bajo demanda, al quedar lista una sesión y al iniciar el cierre de sesión.
 
 ## Eventos recientes
 
-[16:10:22][INFO] npm: npm warn allow-scripts Run `npm approve-scripts --allow-scripts-pending` to review, or `npm approve-scripts <pkg>` to allow.
-[16:10:22][OK  ] khora-web: dependencias instaladas (npm ci).
-[16:10:22][OK  ] Vercel CLI disponible.
-[16:10:22][INFO] Render CLI omitido: el paquete no existe en npm.
 [16:10:22][STEP] VS Code
 [16:10:22][OK  ] VS Code encontrado: C:\Users\<USER>\AppData\Local\Programs\Microsoft VS Code\Code.exe
 [16:10:22][STEP] VS Code: importando configuracion desde el repo
@@ -253,12 +249,12 @@
 [17:26:54][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
 [17:27:05][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
 [17:27:05][WARN] Auto-WIP NO VERIFICADO: trabajo local sin respaldo remoto (reintento en el proximo ciclo).
+[17:28:05][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
+[17:28:11][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
+[17:28:22][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
+[17:28:22][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
 
 --- HISTORIAL DE SESIONES (ULTIMAS LINEAS) ---
-[16:57:54][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
-[16:57:54][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
-[16:59:19][WARN] Chrome sin CDP activo o cerrado, omitiendo snapshot de pestañas.
-[16:59:20][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
 [16:59:27][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
 [16:59:38][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
 [16:59:38][WARN] Auto-WIP NO VERIFICADO: trabajo local sin respaldo remoto (reintento en el proximo ciclo).
@@ -335,3 +331,7 @@
 [17:26:54][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
 [17:27:05][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
 [17:27:05][WARN] Auto-WIP NO VERIFICADO: trabajo local sin respaldo remoto (reintento en el proximo ciclo).
+[17:28:05][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
+[17:28:11][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
+[17:28:22][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
+[17:28:22][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
