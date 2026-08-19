@@ -182,14 +182,14 @@ function Get-CodeCli {
 }
 function Sync-VSCodeConfig {
     Step "VS Code: importando configuracion desde el repo"
-    $dir = Join-Path $REPO_DIR "tools\vscode"
+    $dir = Join-Path $env:LOCALAPPDATA "KHORA\VSCode"
     $extFile = Join-Path $dir "extensions.txt"
     $setFile = Join-Path $dir "settings.user.json"
     if (-not (Test-Path $extFile) -and -not (Test-Path $setFile)) {
-        New-Item -ItemType Directory -Force $dir | Out-Null
+        if(-not(Test-Path -LiteralPath $dir)){New-Item -ItemType Directory -LiteralPath $dir -Force | Out-Null}
         Set-Content $extFile "# Un ID de extension por linea (ej. ms-python.python)" -Encoding UTF8
         Set-Content $setFile "{}" -Encoding UTF8
-        Info "Primera vez: cree tools\vscode\ en el repo; al cierre se exportara tu config real y quedara respaldada."
+        Info "Primera vez: creando almacenamiento persistente de VS Code en %LOCALAPPDATA%\KHORA\VSCode."
         return
     }
     if (Test-Path $setFile) {
@@ -197,7 +197,7 @@ function Sync-VSCodeConfig {
         try {
             New-Item -ItemType Directory -Force (Split-Path $dst -Parent) | Out-Null
             Copy-Item $setFile $dst -Force
-            Ok "settings.json aplicado desde el repo."
+            Ok "settings.json aplicado desde persistencia externa de VS Code."
         } catch { Warn "No pude aplicar settings.json: $_" }
     }
     $cli = Get-CodeCli
@@ -218,14 +218,14 @@ function Sync-VSCodeConfig {
 }
 function Export-VSCodeConfig {
     if (-not (Test-Path "$REPO_DIR\.git")) { return }
-    $dir = Join-Path $REPO_DIR "tools\vscode"
-    New-Item -ItemType Directory -Force $dir | Out-Null
+    $dir = Join-Path $env:LOCALAPPDATA "KHORA\VSCode"
+    if(-not(Test-Path -LiteralPath $dir)){New-Item -ItemType Directory -LiteralPath $dir -Force | Out-Null}
     $src = Join-Path $env:APPDATA "Code\User\settings.json"
-    if (Test-Path $src) { Copy-Item $src (Join-Path $dir "settings.user.json") -Force -ErrorAction SilentlyContinue; Ok "VS Code: settings.json exportado al repo." }
+    if (Test-Path $src) { Copy-Item $src (Join-Path $dir "settings.user.json") -Force -ErrorAction SilentlyContinue; Ok "VS Code: settings.json exportado a persistencia externa." }
     $cli = Get-CodeCli
     if ($cli) {
         $ext = @(& $cli --list-extensions 2>$null)
-        if ($ext.Count -gt 0) { Set-Content (Join-Path $dir "extensions.txt") ($ext -join "`r`n") -Encoding UTF8; Ok "VS Code: $($ext.Count) extension(es) exportadas al repo." }
+        if ($ext.Count -gt 0) { Set-Content (Join-Path $dir "extensions.txt") ($ext -join "`r`n") -Encoding UTF8; Ok "VS Code: $($ext.Count) extension(es) exportadas a persistencia externa." }
     }
 }
 function Start-DepsPreload {

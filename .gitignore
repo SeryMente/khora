@@ -61,3 +61,6 @@ scripts/khora/khora-v*.ps1
 scripts/khora/config.json
 scripts/khora/logs/
 scripts/khora/versions/
+
+.vercel
+.env*

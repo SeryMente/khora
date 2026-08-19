@@ -300,6 +300,88 @@ function Invoke-KhoraOk {
     } else { Ok "khora-ok local PASS. Listo para [V] Deploy." }
     L "INFO" "khora-ok local completado."
 }
+function Initialize-VercelBootstrapAuth {
+    if (-not (Get-Command vercel -ErrorAction SilentlyContinue)) {
+        Ensure-VercelCLI
+    }
+    if (-not (Get-Command vercel -ErrorAction SilentlyContinue)) {
+        Fail "Vercel CLI no disponible."
+        return $false
+    }
+
+    try {
+        Import-KhoraEnvVault | Out-Null
+    } catch {
+        Warn "No se pudo cargar la Vault canonica para Vercel: $_"
+        return $false
+    }
+
+    $vtoken = [Environment]::GetEnvironmentVariable("VERCEL_TOKEN","Process")
+    if ([string]::IsNullOrWhiteSpace($vtoken)) {
+        Warn "VERCEL_TOKEN no disponible en la Vault."
+        return $false
+    }
+
+    $who = @(& vercel whoami --token $vtoken 2>&1)
+    $whoCode = $LASTEXITCODE
+    if ($whoCode -ne 0) {
+        Fail "Vercel no autenticado."
+        return $false
+    }
+
+    Ok ("Vercel autenticado: " + (($who | Out-String).Trim()))
+    return $true
+}
+function Bootstrap-VercelProduction {
+    $vtoken = [Environment]::GetEnvironmentVariable("VERCEL_TOKEN","Process")
+    if ([string]::IsNullOrWhiteSpace($vtoken)) {
+        Fail "VERCEL_TOKEN no disponible tras autenticacion Vercel."
+        return $false
+    }
+
+        $webDir = Join-Path $REPO_DIR "khora-web"
+    if (-not (Test-Path -LiteralPath $webDir)) {
+        Fail "khora-web no existe tras el clone."
+        return $false
+    }
+
+    Push-Location $webDir
+    try {
+        $linkOut = @(& vercel link --project khora-web --scope victorhugotorresmendez-8991s-projects --yes --token $vtoken 2>&1)
+        $linkCode = $LASTEXITCODE
+        $linkOut | ForEach-Object {
+            L "INFO" ("vercel link: " + (Mask-Token -Text "$_"))
+        }
+        if ($linkCode -ne 0) {
+            Fail "No se pudo vincular khora-web."
+            return $false
+        }
+
+        $deployOut = @(& vercel --prod --token $vtoken 2>&1)
+        $deployCode = $LASTEXITCODE
+        $deployOut | ForEach-Object {
+            L "INFO" ("vercel prod: " + (Mask-Token -Text "$_"))
+        }
+        if ($deployCode -ne 0) {
+            Fail "Redeploy Vercel fallo."
+            return $false
+        }
+
+        $deployText = ($deployOut -join "`n")
+        if ($deployText -match 'Ready|Production|khora-web\.vercel\.app') {
+            Ok "Redeploy Vercel --prod completado y verificado."
+        }
+        else {
+            Warn "Vercel devolvio exit 0 sin señal explicita de produccion."
+        }
+
+        return $true
+    }
+    finally {
+        Pop-Location
+        $vtoken = $null
+    }
+}
 function Deploy-Vercel {
     $wd = Join-Path $REPO_DIR 'khora-web'
     if (-not (Test-Path $wd)) { Warn "khora-web/ no encontrado."; return }

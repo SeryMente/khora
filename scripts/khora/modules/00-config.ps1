@@ -3,8 +3,7 @@
 # Componente: 00 config/rutas/globals
 # ESTADO: EXTRAÍDO
 # ================================================================
-
-$SCRIPT_VERSION = "7.1.19"   # <- UNICA fuente de verdad de la version
+$SCRIPT_VERSION = "7.2.0"   # <- UNICA fuente de verdad de la version
 function Initialize-KhoraPaths {
 $SYS_DRIVE   = if ($env:SystemDrive) { $env:SystemDrive } else { "C:" }
 # ================================================================

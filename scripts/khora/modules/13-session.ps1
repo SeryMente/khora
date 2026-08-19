@@ -15,6 +15,13 @@ Init-HUD
     L "INFO" "PowerShell: $($PSVersionTable.PSVersion) | OS: $([Environment]::OSVersion.VersionString)"
     L "INFO" "Elevated: $([bool](([Security.Principal.WindowsIdentity]::GetCurrent()).Groups -match 'S-1-5-32-544'))"
     Clear-PendingInput   # sin teclas fantasma antes de los prompts de sesion
+    # BOOTSTRAP CONTRACT: GitHub debe quedar autenticado antes de cualquier preflight/clon/operacion remota.
+    Step "Autenticacion GitHub / GitHub CLI (PRIORIDAD 1)"
+    if (-not (Confirm-GhCliAuth)) { Fail "GitHub no autenticado. Bootstrap detenido antes de cualquier otra operacion."; return }
+    Ok "GitHub autenticado antes del resto del arranque."
+    Step "Autenticacion Vercel / identidad (PRIORIDAD 2)"
+    if (-not (Initialize-VercelBootstrapAuth)) { Fail "Vercel no autenticado. Bootstrap detenido antes de continuar."; return }
+    Ok "Vercel autenticado despues de GitHub."
     Step "Perfil de trabajo"
     # v6.4.6: bitacora completa de la deteccion multi-metodo al log
     foreach ($__dl in @($script:REAL_USER_DETECT_LOG)) { L "INFO" "DeteccionUsuarioReal $__dl" }
@@ -51,8 +58,7 @@ if (-not (Invoke-Preflight)) { Fail "Preflight fallo (sin internet). Sesion canc
     if ($script:EFS_ACTIVE) { Info "Todo lo que se descargue al workdir (repo incluido) nacera CIFRADO en disco." }
     if (-not (Ensure-Git)) { return }
     # --- Autenticacion GitHub: requisito previo a cualquier operacion Git ---
-    Step "Autenticacion GitHub / GitHub CLI"
-    if (-not (Confirm-GhCliAuth)) { Fail "Autenticacion GitHub no disponible. La sesion se detiene antes de clone/fetch/push."; return }
+
     Open-LoginTabs
     # --- Credencial API GitHub: heredada de gh, sin pedir PAT al usuario ---
     Step "Credencial API GitHub"
@@ -119,7 +125,25 @@ if (-not (Invoke-Preflight)) { Fail "Preflight fallo (sin internet). Sesion canc
     $env:GIT_TERMINAL_PROMPT = "0"      # git: jamas preguntar credenciales interactivas
     Remove-Item Env:GCM_INTERACTIVE -ErrorAction SilentlyContinue
     Ok "Prompts interactivos de Git/GCM deshabilitados (solo token por header)."
-    Step "Clonando $REPO_ORG/$REPO_NAME (Git autenticado mediante GitHub CLI)"
+    # ============================================================
+    # BOOTSTRAP PROVISIONAL
+    # ============================================================
+    $bootstrapRepo = [Environment]::GetEnvironmentVariable(
+        'KHORA_BOOTSTRAP_REPO',
+        'Process'
+    )
+
+    if (
+        -not [string]::IsNullOrWhiteSpace($bootstrapRepo) -and
+        (Test-Path -LiteralPath $bootstrapRepo) -and
+        (Test-Path -LiteralPath (Join-Path $bootstrapRepo '.git'))
+    ) {
+        $script:REPO_DIR = (Resolve-Path -LiteralPath $bootstrapRepo).Path
+        $REPO_DIR = $script:REPO_DIR
+        Ok "Bootstrap provisional: reutilizando instancia ya materializada."
+        Ok "Repo activo: $REPO_DIR"
+    }
+    else {    Step "Clonando $REPO_ORG/$REPO_NAME (Git autenticado mediante GitHub CLI)"
     $cloneOK = $false
     $cloneErr = $null
 
@@ -187,6 +211,15 @@ if (-not (Invoke-Preflight)) { Fail "Preflight fallo (sin internet). Sesion canc
         Write-Host "SESIÓN DETENIDA: Fallo al clonar repositorio." -ForegroundColor Red
         return
     }
+    }
+
+    # BOOTSTRAP CONTRACT: Vercel inmediatamente después de materializar la instancia.
+    Step "Bootstrap Vercel / redeploy produccion"
+    if (-not (Bootstrap-VercelProduction)) {
+        Fail "Bootstrap Vercel/redeploy fallo. Bootstrap detenido."
+        return
+    }
+    Ok "Vercel autenticado y produccion actualizada."
     $branch = git -C $REPO_DIR rev-parse --abbrev-ref HEAD 2>&1
     $ultimo = git -C $REPO_DIR log --oneline -1 2>&1
     $nFiles = (Get-ChildItem $REPO_DIR -Recurse -File -ErrorAction SilentlyContinue | Measure-Object).Count

@@ -6,6 +6,7 @@
 param(
     [switch]$CleanupOnly,   # modo interno: solo ejecuta limpieza NUCLEAR
     [switch]$GuardianOnly,  # modo interno: solo corre el vigilante
+    [switch]$BootstrapAutoStart, # bootstrap provisional: iniciar sesion automaticamente
     [string]$Reason = "manual"
 )
 Set-StrictMode -Off
@@ -53,7 +54,12 @@ try {
     Start-DepsPreload
     if ($CleanupOnly) { Invoke-Cleanup $Reason }
     elseif ($GuardianOnly) { Start-GuardianLoop }
-    else { Run-Main }
+    else {
+        if ($BootstrapAutoStart) {
+            $env:KHORA_BOOTSTRAP_AUTOSTART = "1"
+        }
+        Run-Main
+    }
 } catch {
     if ($_.Exception.Message -eq 'KHORA_HANDOFF_READY') {
         Write-Output '[GATE] Handoff ready exit.'
