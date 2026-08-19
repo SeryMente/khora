@@ -186,7 +186,13 @@ function Watch-ClipboardToken {
     try {
         $cab = @{ Authorization = ("Bearer " + $cand); "User-Agent" = "khora"; Accept = "application/vnd.github+json" }
         $resp = Invoke-WebRequest ("https://api.github.com/repos/" + $REPO_ORG + "/" + $REPO_NAME) -Headers $cab -UseBasicParsing -TimeoutSec 12 -ErrorAction Stop
-        if ($resp.StatusCode -eq 200) { $bien = $true }
+        if ($resp.StatusCode -eq 200) {
+            $repoMeta = $resp.Content | ConvertFrom-Json
+            $bien = [bool]($repoMeta.permissions.push -or $repoMeta.permissions.admin -or $repoMeta.permissions.maintain)
+            if (-not $bien) {
+                L "WARN" "Token del portapapeles rechazado: autenticado sin permiso de escritura sobre $REPO_ORG/$REPO_NAME."
+            }
+        }
     } catch { $bien = $false }
     if ($bien) {
         $script:TokSecure = ConvertTo-SecureString $cand -AsPlainText -Force
