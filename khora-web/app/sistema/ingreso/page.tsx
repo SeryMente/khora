@@ -4,10 +4,16 @@
 import { useCallback, useEffect, useRef, useState, Suspense } from "react";
 import * as Icons from "lucide-react";
 import { ensamblarParrafos, Fragmento } from "../../../lib/transcripcion/ensamblar";
-import { SegmentoReconciliado, reconciliarSegmentos } from "../../../lib/server/transcribir";
 
 type Estado = "inactivo" | "dictando";
 type EstadoReconciliacion = "preview_live" | "procesando_whisper" | "reconciliado_whisper" | "fallback_preview" | "editado_manual";
+
+export type SegmentoReconciliado = {
+  id: string;
+  texto: string;
+  estado: string;
+  modificadoManualmente?: boolean;
+};
 
 function generarSesionId() {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -159,24 +165,18 @@ function IngresoContenido() {
       const data = await r.json();
 
       if (r.ok && data?.exito && typeof data?.textoFinal === "string") {
-        const resultadoReconciliacion = reconciliarSegmentos(segmentosRef.current, data.textoFinal);
-        segmentosRef.current = resultadoReconciliacion.segmentos;
-        setSegmentos(resultadoReconciliacion.segmentos);
-        setTexto(resultadoReconciliacion.textoFinal);
+        setTexto(data.textoFinal);
         setPendiente("");
         pendienteRef.current = "";
 
-        const hayManual = resultadoReconciliacion.segmentos.some((s) => s.estado === "editado_manual" || s.modificadoManualmente);
-        setEstadoReconciliacion(hayManual ? "editado_manual" : "reconciliado_whisper");
+        setEstadoReconciliacion("reconciliado_whisper");
         setReconciliacionMensaje(data.motivoReconciliacion || "Transcripción autoritativa Groq Whisper procesada con éxito.");
       } else {
-        const hayManual = segmentosRef.current.some((s) => s.estado === "editado_manual" || s.modificadoManualmente);
-        setEstadoReconciliacion(hayManual ? "editado_manual" : "fallback_preview");
+        setEstadoReconciliacion("fallback_preview");
         setReconciliacionMensaje(`Groq Whisper no disponible: ${data?.detail || "Conservando previsualización ASR en vivo."}`);
       }
     } catch (e) {
-      const hayManual = segmentosRef.current.some((s) => s.estado === "editado_manual" || s.modificadoManualmente);
-      setEstadoReconciliacion(hayManual ? "editado_manual" : "fallback_preview");
+      setEstadoReconciliacion("fallback_preview");
       setReconciliacionMensaje(`Fallo al solicitar transcripción autoritativa: ${String(e)}.`);
     }
   }, [texto]);

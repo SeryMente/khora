@@ -1,6 +1,9 @@
-// @l0 L0-002-R · @req ING-03/REQ-1 · @acr ACR-1.2
+// @l0 L0-002-R · @req ING-03/REQ-1 · @acr ACR-1.2 · @req REVISION-COCKPIT/REQ-1
 import { createHash, randomUUID } from "crypto";
 import { getDb } from "./neon";
+import { reportarIncidente } from "./incidentes";
+import { crearVersion } from "./correcciones";
+import { cifrarTexto, descifrarTexto } from "./cripto";
 
 export type EstadoVolcado = "archivado" | "pendiente_revision" | "en_revision" | "listo_ingesta" | "ingerido" | "fallido";
 
@@ -53,10 +56,115 @@ export async function asegurarTabla(): Promise<void> {
   listo = true;
 }
 
-import { cifrarTexto, descifrarTexto } from "./cripto";
-
 export function hashTexto(texto: string): string {
   return createHash("sha256").update(texto, "utf8").digest("hex");
+}
+
+/**
+ * Función centralizada, transaccional e idempotente que asegura la preparación
+ * de un volcado para la mesa de revisión.
+ *
+ * Flujo: creación / archivado → pendiente_revision → versión v1 asegurada → detectores iniciales → en_revision
+ * Si falla la preparación, pasa a 'fallido' y abre un incidente bloqueante 'preparacion_revision_fallida'.
+ */
+export async function prepararVolcadoParaRevision(volcadoId: string, actor?: string | null): Promise<Volcado> {
+  await asegurarTabla();
+  const db = getDb();
+
+  // Transacción con bloqueo FOR UPDATE para evitar carreras
+  const client = await db.connect();
+  try {
+    await client.query("BEGIN");
+
+    const selRes = await client.query("SELECT * FROM volcado WHERE id = $1 FOR UPDATE", [volcadoId]);
+    if (selRes.rows.length === 0) {
+      throw new Error(`Volcado no encontrado: ${volcadoId}`);
+    }
+
+    const v = selRes.rows[0];
+    const estadoAnterior = v.estado;
+
+    // Si ya está ingerido o en_revision con versión, retornar directamente
+    if (v.estado === "ingerido" || v.estado === "en_revision" || v.estado === "listo_ingesta") {
+      await client.query("COMMIT");
+      return {
+        ...v,
+        texto: descifrarTexto(String(v.texto ?? "")),
+      } as Volcado;
+    }
+
+    // 1. Transición intermedia: -> pendiente_revision
+    await client.query("UPDATE volcado SET estado = 'pendiente_revision' WHERE id = $1", [volcadoId]);
+    await client.query(
+      "INSERT INTO volcado_revision_auditoria (id, volcado_id, accion, estado_anterior, estado_nuevo, usuario) VALUES ($1, $2, $3, $4, $5, $6)",
+      [randomUUID(), volcadoId, "transicion_pendiente_revision", estadoAnterior, "pendiente_revision", actor ?? null]
+    );
+
+    // 2. Asegurar versión inicial v1
+    const textoClaro = descifrarTexto(String(v.texto ?? ""));
+    const verRes = await client.query("SELECT version FROM volcado_version WHERE volcado_id = $1 AND version = 1", [volcadoId]);
+    if (verRes.rows.length === 0) {
+      if (!textoClaro) {
+        throw new Error("Transcripción vacía al preparar versión v1");
+      }
+      await crearVersion(volcadoId, textoClaro, "transcripcion original del dictado");
+    }
+
+    // 3. Ejecutar detectores iniciales e inspección de audio/transcripción
+    if (!textoClaro.trim()) {
+      await reportarIncidente({
+        volcadoId,
+        tipo: "transcripcion_ausente",
+        severidad: "alta",
+        origen: "detector_preparacion",
+        evidencia: { motivo: "El texto transcrito está totalmente vacío." },
+      });
+    }
+
+    // 4. Transición final exitosa: -> en_revision
+    const updRes = await client.query(
+      "UPDATE volcado SET estado = 'en_revision' WHERE id = $1 RETURNING id, folio, texto, sha256, chars, titulo, origen, driver, usuario, recibido_en, estado, io_id, intentos, ultimo_error, ultimo_intento, version_aprobada",
+      [volcadoId]
+    );
+
+    await client.query(
+      "INSERT INTO volcado_revision_auditoria (id, volcado_id, accion, estado_anterior, estado_nuevo, usuario) VALUES ($1, $2, $3, $4, $5, $6)",
+      [randomUUID(), volcadoId, "preparacion_revision_completada", "pendiente_revision", "en_revision", actor ?? null]
+    );
+
+    await client.query("COMMIT");
+
+    const volcadoFinal = updRes.rows[0];
+    return {
+      ...volcadoFinal,
+      texto: descifrarTexto(String(volcadoFinal.texto ?? "")),
+    } as Volcado;
+  } catch (err: any) {
+    await client.query("ROLLBACK");
+
+    // En caso de fallo en la preparación, registrar en estado 'fallido' + incidente bloqueante
+    await db.query(
+      "UPDATE volcado SET estado = 'fallido', ultimo_error = $2, ultimo_intento = NOW() WHERE id = $1",
+      [volcadoId, String(err?.message ?? err)]
+    );
+
+    await reportarIncidente({
+      volcadoId,
+      tipo: "preparacion_revision_fallida",
+      severidad: "alta",
+      origen: "prepararVolcadoParaRevision",
+      evidencia: { error: String(err?.message ?? err) },
+    });
+
+    await db.query(
+      "INSERT INTO volcado_revision_auditoria (id, volcado_id, accion, estado_anterior, estado_nuevo, usuario) VALUES ($1, $2, $3, $4, $5, $6)",
+      [randomUUID(), volcadoId, "preparacion_revision_fallida", "pendiente_revision", "fallido", actor ?? null]
+    );
+
+    throw err;
+  } finally {
+    client.release();
+  }
 }
 
 export async function archivarVolcado(args: { texto: string; titulo?: string | null; origen: string; driver?: string | null; usuario?: string | null }): Promise<Volcado> {
@@ -66,14 +174,19 @@ export async function archivarVolcado(args: { texto: string; titulo?: string | n
   const sha = hashTexto(args.texto);
   const sql = "INSERT INTO volcado (id, texto, sha256, chars, titulo, origen, driver, usuario, estado, intentos) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,0) RETURNING id, folio, texto, sha256, chars, titulo, origen, driver, usuario, recibido_en, estado, io_id, intentos, ultimo_error, ultimo_intento";
   const res = await db.query(sql, [id, cifrarTexto(args.texto), sha, args.texto.length, args.titulo ?? null, args.origen, args.driver ?? null, args.usuario ?? null, "archivado"]);
-  return res.rows[0] as Volcado;
+
+  const volcadoArchivado = res.rows[0] as Volcado;
+
+  // Entrada automática síncrona a revisión
+  return await prepararVolcadoParaRevision(volcadoArchivado.id, args.usuario);
 }
 
 export async function listarVolcados(limite: number = 200): Promise<Volcado[]> {
   await asegurarTabla();
   const db = getDb();
   const sql = "SELECT id, folio, texto, sha256, chars, titulo, origen, driver, usuario, recibido_en, estado, io_id, intentos, ultimo_error, ultimo_intento, version_aprobada FROM volcado ORDER BY recibido_en DESC LIMIT $1";
-  const res = await db.query(sql, [limite]); res.rows = res.rows.map((f: any) => ({ ...f, texto: descifrarTexto(String(f.texto ?? "")) }));
+  const res = await db.query(sql, [limite]);
+  res.rows = res.rows.map((f: any) => ({ ...f, texto: descifrarTexto(String(f.texto ?? "")) }));
   return res.rows as Volcado[];
 }
 
@@ -84,9 +197,7 @@ export async function marcarPendienteRevision(volcadoId: string): Promise<void> 
 }
 
 export async function iniciarRevision(volcadoId: string): Promise<void> {
-  await asegurarTabla();
-  const db = getDb();
-  await db.query("UPDATE volcado SET estado = 'en_revision' WHERE id = $1", [volcadoId]);
+  await prepararVolcadoParaRevision(volcadoId);
 }
 
 export async function aprobarVersion(volcadoId: string, version: number, aprobador?: string | null): Promise<{ version: number; sha256: string }> {

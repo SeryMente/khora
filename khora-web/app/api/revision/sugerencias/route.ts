@@ -1,4 +1,4 @@
-// @l0 L0-002-R · @req REVISION/REQ-1 · @acr ACR-1.2
+// @l0 L0-002-R · @req REVISION/REQ-1 · @acr ACR-1.2 · @req REVISION-COCKPIT/REQ-1
 import { NextResponse } from "next/server";
 import { auth } from "../../../../auth";
 import { obtenerTodasSugerencias } from "../../../../lib/server/asistenteRevision";
@@ -29,11 +29,11 @@ export async function POST(req: Request) {
 
     const contadores = {
       total: sugerencias.length,
-      alta: sugerencias.filter(s => s.severidad === "alta").length,
-      media: sugerencias.filter(s => s.severidad === "media").length,
-      baja: sugerencias.filter(s => s.severidad === "baja").length,
-      ortotipografico: sugerencias.filter(s => s.origen === "ortotipografico").length,
-      llm: sugerencias.filter(s => s.origen === "llm").length
+      alta: sugerencias.filter((s: any) => s.severidad === "alta").length,
+      media: sugerencias.filter((s: any) => s.severidad === "media").length,
+      baja: sugerencias.filter((s: any) => s.severidad === "baja").length,
+      ortotipografico: sugerencias.filter((s: any) => s.origen === "ortotipografico").length,
+      llm: sugerencias.filter((s: any) => s.origen === "llm").length
     };
 
     return NextResponse.json({
