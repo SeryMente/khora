@@ -3,28 +3,16 @@
 **Propósito:** registro operativo público y sanitizado del Entorno Persistente.
 **Versión:** KHORA v7.2.0
 **Estado:** ACTIVE
-**Última sincronización:** 2026-08-19 16:31:43
+**Última sincronización:** 2026-08-19 16:34:06
 **Motivo:** periodic-active-session
 **Branch publicado:** main
-**HEAD observado:** 15281a487cae1d2d22da652624981ad7424c2b6e
+**HEAD observado:** 2af9c6ca37b3d1305bd7999eb5e73d7cfd7fdd5b
 
 > Este archivo es un registro operativo, no sustituye EP-ARCHITECTURE.md.
 > Se actualiza bajo demanda, al quedar lista una sesión y al iniciar el cierre de sesión.
 
 ## Eventos recientes
 
-[16:09:41][INFO] vercel prod: Vercel CLI 59.1.4
-[16:09:41][INFO] vercel prod: Installing dependencies...
-[16:09:41][INFO] vercel prod: up to date in 1s
-[16:09:41][INFO] vercel prod: 189 packages are looking for funding
-[16:09:41][INFO] vercel prod: run `npm fund` for details
-[16:09:41][INFO] vercel prod: npm warn allow-scripts 5 packages have install scripts not yet covered by allowScripts:
-[16:09:41][INFO] vercel prod: npm warn allow-scripts   @firebase/util@1.15.1 (postinstall: node ./postinstall.js)
-[16:09:41][INFO] vercel prod: npm warn allow-scripts   @google/genai@2.13.0 (preinstall: echo 'preinstall: no-op')
-[16:09:41][INFO] vercel prod: npm warn allow-scripts   protobufjs@7.6.5 (postinstall: node scripts/postinstall)
-[16:09:41][INFO] vercel prod: npm warn allow-scripts   sharp@0.34.5 (install: node install/check.js || npm run build)
-[16:09:41][INFO] vercel prod: npm warn allow-scripts   unrs-resolver@1.12.2 (postinstall: node postinstall.js)
-[16:09:41][INFO] vercel prod: npm warn allow-scripts
 [16:09:41][INFO] vercel prod: npm warn allow-scripts Run `npm approve-scripts --allow-scripts-pending` to review, or `npm approve-scripts <pkg>` to allow.
 [16:09:41][INFO] vercel prod: Detected Next.js version: 16.2.11
 [16:09:41][INFO] vercel prod: Running "npm run build"
@@ -253,20 +241,20 @@
 [16:29:31][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
 [16:29:42][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
 [16:29:42][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
+[16:31:46][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
+[16:31:54][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
+[16:32:05][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
+[16:32:05][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
+[16:32:09][WARN] Chrome sin CDP activo o cerrado, omitiendo snapshot de pestañas.
+[16:32:09][INFO] Auto-WIP: logs copiados a repo/logs/ (incluidos en el commit)
+[16:32:09][INFO] git add: OK warning: in the working copy of 'diagnostico-pr211-20260819-162804.txt', CRLF will be replaced by LF the next time Git touches it
+[16:32:09][INFO] git commit: OK [main 2af9c6c] wip: auto-guardado 16:32:09  2 files changed, 299 insertions(+)  create mode 100644 diagnostico-pr211-20260819-162804.txt  create mode 100644 diagnostico-pr211-final-20260819-163140.txt
+[16:32:12][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
+[16:32:20][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
+[16:32:32][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
+[16:32:32][WARN] Auto-WIP NO VERIFICADO: trabajo local sin respaldo remoto (reintento en el proximo ciclo).
 
 --- HISTORIAL DE SESIONES (ULTIMAS LINEAS) ---
-[16:10:22][INFO] npm: npm warn allow-scripts   unrs-resolver@1.12.2 (postinstall: node postinstall.js)
-[16:10:22][INFO] npm: npm warn allow-scripts
-[16:10:22][INFO] npm: npm warn allow-scripts Run `npm approve-scripts --allow-scripts-pending` to review, or `npm approve-scripts <pkg>` to allow.
-[16:10:22][OK  ] khora-web: dependencias instaladas (npm ci).
-[16:10:22][OK  ] Vercel CLI disponible.
-[16:10:22][INFO] Render CLI omitido: el paquete no existe en npm.
-[16:10:22][STEP] VS Code
-[16:10:22][OK  ] VS Code encontrado: C:\Users\<USER>\AppData\Local\Programs\Microsoft VS Code\Code.exe
-[16:10:22][STEP] VS Code: importando configuracion desde el repo
-[16:10:22][INFO] Primera vez: creando almacenamiento persistente de VS Code en %LOCALAPPDATA%\KHORA\VSCode.
-[16:10:22][OK  ] VS Code abierto (PID 25872)
-[16:10:22][STEP] Navegador (inteligente)
 [16:10:22][OK  ] LastPass detectado en Chrome.
 [16:10:22][INFO] Chrome inteligente: 4 URLs | login=False | lastpass=True | running=True
 [16:10:22][OK  ] Chrome ya activo: 4 pestanas nuevas agregadas.
@@ -335,3 +323,15 @@
 [16:29:31][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
 [16:29:42][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
 [16:29:42][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
+[16:31:46][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
+[16:31:54][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
+[16:32:05][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
+[16:32:05][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
+[16:32:09][WARN] Chrome sin CDP activo o cerrado, omitiendo snapshot de pestañas.
+[16:32:09][INFO] Auto-WIP: logs copiados a repo/logs/ (incluidos en el commit)
+[16:32:09][INFO] git add: OK warning: in the working copy of 'diagnostico-pr211-20260819-162804.txt', CRLF will be replaced by LF the next time Git touches it
+[16:32:09][INFO] git commit: OK [main 2af9c6c] wip: auto-guardado 16:32:09  2 files changed, 299 insertions(+)  create mode 100644 diagnostico-pr211-20260819-162804.txt  create mode 100644 diagnostico-pr211-final-20260819-163140.txt
+[16:32:12][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
+[16:32:20][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
+[16:32:32][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
+[16:32:32][WARN] Auto-WIP NO VERIFICADO: trabajo local sin respaldo remoto (reintento en el proximo ciclo).
