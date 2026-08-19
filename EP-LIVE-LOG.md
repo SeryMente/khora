@@ -3,20 +3,16 @@
 **Propósito:** registro operativo público y sanitizado del Entorno Persistente.
 **Versión:** KHORA v7.2.0
 **Estado:** ACTIVE
-**Última sincronización:** 2026-08-19 16:34:06
+**Última sincronización:** 2026-08-19 16:36:26
 **Motivo:** periodic-active-session
 **Branch publicado:** main
-**HEAD observado:** 2af9c6ca37b3d1305bd7999eb5e73d7cfd7fdd5b
+**HEAD observado:** 5f0a5a400da61827e30d72eaef4b8741d01ed3ab
 
 > Este archivo es un registro operativo, no sustituye EP-ARCHITECTURE.md.
 > Se actualiza bajo demanda, al quedar lista una sesión y al iniciar el cierre de sesión.
 
 ## Eventos recientes
 
-[16:09:41][INFO] vercel prod: npm warn allow-scripts Run `npm approve-scripts --allow-scripts-pending` to review, or `npm approve-scripts <pkg>` to allow.
-[16:09:41][INFO] vercel prod: Detected Next.js version: 16.2.11
-[16:09:41][INFO] vercel prod: Running "npm run build"
-[16:09:41][INFO] vercel prod: > khora-web@0.1.2 prebuild
 [16:09:41][INFO] vercel prod: > node scripts/build-extension.mjs
 [16:09:41][INFO] vercel prod: Building extension zip for version 0.3.3...
 [16:09:41][INFO] vercel prod: Successfully created /vercel/path0/khora-web/public/downloads/harmonia-v0.3.3.zip
@@ -253,12 +249,12 @@
 [16:32:20][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
 [16:32:32][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
 [16:32:32][WARN] Auto-WIP NO VERIFICADO: trabajo local sin respaldo remoto (reintento en el proximo ciclo).
+[16:34:08][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
+[16:34:15][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
+[16:34:26][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
+[16:34:26][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
 
 --- HISTORIAL DE SESIONES (ULTIMAS LINEAS) ---
-[16:10:22][OK  ] LastPass detectado en Chrome.
-[16:10:22][INFO] Chrome inteligente: 4 URLs | login=False | lastpass=True | running=True
-[16:10:22][OK  ] Chrome ya activo: 4 pestanas nuevas agregadas.
-[16:10:22][STEP] Guardian KHORA (red de seguridad)
 [16:10:23][OK  ] Guardian activo (PID 20336) - inactividad 15min + panico Ctrl+Alt+K
 [16:10:23][OK  ] Deadline registrado: limpieza automatica a las 20:00 (2026-08-19)
 [16:10:23][STEP] Boveda de entorno (Env Vault)
@@ -335,3 +331,7 @@
 [16:32:20][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
 [16:32:32][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
 [16:32:32][WARN] Auto-WIP NO VERIFICADO: trabajo local sin respaldo remoto (reintento en el proximo ciclo).
+[16:34:08][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
+[16:34:15][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
+[16:34:26][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
+[16:34:26][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
