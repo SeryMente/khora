@@ -6,18 +6,44 @@
 $script:WIP_BRANCH = $null
 function Invoke-GitTokenCmd {
     param([string[]]$GitArgs)
-    $script:__gitArgs = $GitArgs; $script:__gitOut = $null; $script:__gitCode = 1
-    Invoke-WithToken {
-        param($t)
-        $ga = $script:__gitArgs
-        # URL-token temporal: set -> ejecutar -> restaurar (token no queda en .git/config)
-        $__cmdUrl = "https://x-access-token:${t}@github.com/$REPO_ORG/$REPO_NAME.git"
-        git -C $REPO_DIR remote set-url origin $__cmdUrl 2>&1 | Out-Null
-        $script:__gitOut  = git -C $REPO_DIR @ga 2>&1
-        $script:__gitCode = $LASTEXITCODE
-        git -C $REPO_DIR remote set-url origin "https://github.com/$REPO_ORG/$REPO_NAME.git" 2>&1 | Out-Null
-        $t = $null
-        $__cmdUrl = $null
+    $script:__gitArgs = $GitArgs
+    $script:__gitOut = $null
+    $script:__gitCode = 1
+    $askPass = Join-Path $env:TEMP ("khora-git-askpass-" + $PID + ".cmd")
+    $askText = "@echo off`r`nif /I `"%~1`"==`"Username for https://github.com:`" (echo x-access-token) else (echo %KHORA_GIT_TOKEN%)"
+    [IO.File]::WriteAllText($askPass,$askText,(New-Object System.Text.ASCIIEncoding))
+    try {
+        $token = $null
+        if (Test-Cmd gh) {
+            $token = (gh auth token 2>$null | Out-String).Trim()
+            if ([string]::IsNullOrWhiteSpace($token)) { $token = $null }
+        }
+        if ($token) {
+            $env:KHORA_GIT_TOKEN = $token
+            $env:GIT_ASKPASS = $askPass
+            $env:GIT_TERMINAL_PROMPT = "0"
+            $ga = $script:__gitArgs
+            $script:__gitOut = git -C $REPO_DIR -c credential.helper= -c core.askPass="$askPass" @ga 2>&1
+            $script:__gitCode = $LASTEXITCODE
+        } elseif ($script:TokSecure) {
+            Invoke-WithToken {
+                param($t)
+                $env:KHORA_GIT_TOKEN = $t
+                $env:GIT_ASKPASS = $askPass
+                $env:GIT_TERMINAL_PROMPT = "0"
+                $ga = $script:__gitArgs
+                $script:__gitOut = git -C $REPO_DIR -c credential.helper= -c core.askPass="$askPass" @ga 2>&1
+                $script:__gitCode = $LASTEXITCODE
+            } | Out-Null
+        } else {
+            $script:__gitOut = "No hay credencial GitHub utilizable."
+            $script:__gitCode = 1
+        }
+    } finally {
+        Remove-Item Env:KHORA_GIT_TOKEN -ErrorAction SilentlyContinue
+        Remove-Item Env:GIT_ASKPASS -ErrorAction SilentlyContinue
+        $token = $null
+        Remove-Item -LiteralPath $askPass -Force -ErrorAction SilentlyContinue
     }
     $script:__gitOut = Mask-Token -Text "$($script:__gitOut)"
     return @{ code = $script:__gitCode; out = (("$($script:__gitOut)" | Out-String)).Trim() }
