@@ -3,25 +3,16 @@
 **Propósito:** registro operativo público y sanitizado del Entorno Persistente.
 **Versión:** KHORA v7.2.0
 **Estado:** ACTIVE
-**Última sincronización:** 2026-08-19 16:19:51
+**Última sincronización:** 2026-08-19 16:22:12
 **Motivo:** periodic-active-session
 **Branch publicado:** main
-**HEAD observado:** c24362c518be6f131331ec56bd0e468f3cd1fd38
+**HEAD observado:** e090c7d6b63d6dcfea4ee9cf6440c7698810bc36
 
 > Este archivo es un registro operativo, no sustituye EP-ARCHITECTURE.md.
 > Se actualiza bajo demanda, al quedar lista una sesión y al iniciar el cierre de sesión.
 
 ## Eventos recientes
 
-[16:07:59][STEP] Bootstrap Vercel / redeploy produccion
-[16:08:00][INFO] vercel link: Vercel CLI 59.1.4 (Node.js 24.19.0)
-[16:08:00][INFO] vercel link: System.Management.Automation.RemoteException
-[16:08:00][INFO] vercel link:   Directory       ~\Desktop\KHORA-EP\verify-20260819-160742
-[16:08:00][INFO] vercel link: System.Management.Automation.RemoteException
-[16:08:00][INFO] vercel link: Searching for existing projects…
-[16:08:00][INFO] vercel link: System.Management.Automation.RemoteException
-[16:08:00][INFO] vercel link: ✓ Linked          victorhugotorresmendez-8991s-projects/khora-web
-[16:08:00][INFO] vercel link: System.Management.Automation.RemoteException
 [16:08:00][INFO] vercel link: Retrieving project…
 [16:08:00][INFO] vercel link: > Downloading a fresh `VERCEL_OIDC_TOKEN` for victorhugotorresmendez-8991s-projects/khora-web
 [16:08:00][INFO] vercel link: Downloading
@@ -253,17 +244,17 @@
 [16:17:38][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
 [16:17:51][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
 [16:17:51][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
+[16:19:54][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
+[16:20:00][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
+[16:20:12][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
+[16:20:12][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
+[16:21:13][WARN] Chrome sin CDP activo o cerrado, omitiendo snapshot de pestañas.
+[16:21:15][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
+[16:21:22][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
+[16:21:33][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
+[16:21:33][WARN] Auto-WIP NO VERIFICADO: trabajo local sin respaldo remoto (reintento en el proximo ciclo).
 
 --- HISTORIAL DE SESIONES (ULTIMAS LINEAS) ---
-[16:09:55][INFO] pip install -e . (dependencias Python) completado en 00:05
-[16:09:55][INFO] pip: System.Management.Automation.RemoteException
-[16:09:55][INFO] pip: [notice] A new release of pip is available: 24.0 -> 26.2.1
-[16:09:55][INFO] pip: [notice] To update, run: C:\Users\<USER>\AppData\Local\khora-session\venv\Scripts\python.exe -m pip install --upgrade pip
-[16:09:55][OK  ] Venv Python listo: C:\Users\<USER>\AppData\Local\khora-session\venv
-[16:09:55][INFO] === Ensure-Node: verificando Node.js ===
-[16:09:55][INFO] Node en PATH: C:\Program Files\nodejs\node.exe vv24.19.0
-[16:09:55][OK  ] Node OK: v24.19.0
-[16:10:22][INFO] npm ci (khora-web) completado en 00:26
 [16:10:22][INFO] npm: npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead
 [16:10:22][INFO] npm: 
 [16:10:22][INFO] npm: added 616 packages, and audited 617 packages in 26s
@@ -335,3 +326,12 @@
 [16:17:38][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
 [16:17:51][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
 [16:17:51][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
+[16:19:54][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
+[16:20:00][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
+[16:20:12][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
+[16:20:12][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
+[16:21:13][WARN] Chrome sin CDP activo o cerrado, omitiendo snapshot de pestañas.
+[16:21:15][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
+[16:21:22][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
+[16:21:33][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
+[16:21:33][WARN] Auto-WIP NO VERIFICADO: trabajo local sin respaldo remoto (reintento en el proximo ciclo).
