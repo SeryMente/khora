@@ -348,7 +348,7 @@ function Bootstrap-VercelProduction {
         return $false
     }
 
-    Push-Location $webDir
+    Push-Location $REPO_DIR
     try {
         $linkOut = @(& $vercelCmd link --project khora-web --scope victorhugotorresmendez-8991s-projects --yes --token $vtoken 2>&1)
         $linkCode = $LASTEXITCODE
