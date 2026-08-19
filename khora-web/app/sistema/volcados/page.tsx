@@ -1,4 +1,4 @@
-// @l0 L0-002-R · @req PIPELINE/REQ-3,UI-02/RESKIN,UI-PIPELINE-FIX/REQ-1,UI-TRANSICION-REVISION/REQ-1 · @acr ACR-1.2 · @req TRACE-SESSION/010
+// @l0 L0-002-R · @req PIPELINE/REQ-3,UI-02/RESKIN,UI-PIPELINE-FIX/REQ-1,UI-TRANSICION-REVISION/REQ-1,REVISION-COCKPIT/REQ-1 · @acr ACR-1.2 · @req TRACE-SESSION/010
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
@@ -54,9 +54,67 @@ type Volcado = {
   ultimo_error: string | null;
 };
 
-type Par = {
-  antes: string;
-  despues: string;
+type AudioParteManifiesto = {
+  part_index: number;
+  start_ms: number;
+  end_ms: number;
+  duracion_ms: number;
+  bytes: number;
+  sha256: string | null;
+  verificado: boolean;
+  download_path: string;
+};
+
+type PalabraTiming = {
+  palabra: string;
+  char_inicio: number;
+  char_fin: number;
+  start_ms: number;
+  end_ms: number;
+  part_index: number;
+  fuente_timing: "word_exact" | "segment_interpolated";
+  confianza: number;
+};
+
+type Incidente = {
+  id: string;
+  volcado_id: string;
+  tipo: string;
+  severidad: "alta" | "media" | "baja";
+  origen: string;
+  estado: "abierto" | "reconocido" | "resuelto" | "reabierto";
+  primera_deteccion: string;
+  ultima_deteccion: string;
+  codigo_resolucion: string | null;
+  evidencia: Record<string, any>;
+};
+
+type Hallazgo = {
+  id: string;
+  familia: "correccion_aplicable" | "observacion_editorial";
+  posicion: { inicio: number; fin: number };
+  texto_original: string;
+  sugerencia: string;
+  regla: string;
+  tipo_categoria: string;
+  severidad: "alta" | "media" | "baja";
+  estado: "pendiente" | "aceptada" | "rechazada" | "resuelta";
+  explicacion?: string;
+};
+
+type GateDecision = {
+  canApprove: boolean;
+  version: number;
+  sha256: string;
+  gate_hash: string;
+  blockers: Array<{ code: string; message: string; count?: number }>;
+  warnings: Array<{ code: string; message: string }>;
+  counts: {
+    errores_tipograficos_pendientes: number;
+    correcciones_lingüisticas_pendientes: number;
+    observaciones_sintacticas_pendientes: number;
+    incidentes_operativos_abiertos: number;
+  };
 };
 
 export default function VolcadosPage() {
@@ -72,24 +130,45 @@ export default function VolcadosPage() {
   // Selected item in Drawer
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<PipelineItem | null>(null);
-  const [drawerSubTab, setDrawerSubTab] = useState<"trace" | "revision">("trace");
+  const [drawerSubTab, setDrawerSubTab] = useState<"cockpit" | "trace">("cockpit");
 
-  // Revision / Editor states
+  // Cockpit Synchronous Revision states
   const [editableTexto, setEditableTexto] = useState("");
   const [versiones, setVersiones] = useState<any[]>([]);
   const [selectedVersionNum, setSelectedVersionNum] = useState<number>(1);
   const [savingVersion, setSavingVersion] = useState(false);
   const [startingRevision, setStartingRevision] = useState(false);
-  const [approvingVersion, setApprovingVersion] = useState(false);
+
+  // Audio Sync & Playback states
+  const [manifiestoPartes, setManifiestoPartes] = useState<AudioParteManifiesto[]>([]);
+  const [currentPartIndex, setCurrentPartIndex] = useState<number>(1);
+  const [audioSourceUrl, setAudioSourceUrl] = useState<string>("");
+  const [currentTimeMs, setCurrentTimeMs] = useState<number>(0);
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [palabrasTiming, setPalabrasTiming] = useState<PalabraTiming[]>([]);
+  const [activePalabraIdx, setActivePalabraIdx] = useState<number | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Incident & Findings states
+  const [incidentes, setIncidentes] = useState<Incidente[]>([]);
+  const [hallazgos, setHallazgos] = useState<Hallazgo[]>([]);
+  const [gateDecision, setGateDecision] = useState<GateDecision | null>(null);
+  const [loadingGate, setLoadingGate] = useState<boolean>(false);
+
+  // High Friction Approval states
+  const [holdProgress, setHoldProgress] = useState<number>(0);
+  const [isHolding, setIsHolding] = useState<boolean>(false);
+  const [showAccessibleModal, setShowAccessibleModal] = useState<boolean>(false);
+  const [accessibleConfirmText, setAccessibleConfirmText] = useState<string>("");
+  const [approvingVersion, setApprovingVersion] = useState<boolean>(false);
+  const [showAudioResolveModal, setShowAudioResolveModal] = useState<boolean>(false);
+  const [selectedAudioResolveCode, setSelectedAudioResolveCode] = useState<string>("aceptado_sin_audio");
+
+  // Ingestion state
   const [ingesting, setIngesting] = useState(false);
   const [ingestaResult, setIngestaResult] = useState<any>(null);
 
-  // Delta states
-  const [selectedDeltaFrom, setSelectedDeltaFrom] = useState<number>(1);
-  const [deltaPairs, setDeltaPairs] = useState<Par[]>([]);
-  const [loadingDelta, setLoadingDelta] = useState(false);
-
-  // Volcados archiving tab states
+  // Legacy Volcados Archiving tab
   const [texto, setTexto] = useState("");
   const [titulo, setTitulo] = useState("");
   const [guardandoVolcado, setGuardandoVolcado] = useState(false);
@@ -97,20 +176,9 @@ export default function VolcadosPage() {
   const [volcadosAviso, setVolcadosAviso] = useState<string | null>(null);
   const [volcadosItems, setVolcadosItems] = useState<Volcado[]>([]);
 
-  // Drawer focus trap ref
   const drawerRef = useRef<HTMLDivElement>(null);
-
+  const holdTimerRef = useRef<any>(null);
   const [mobileShowDetail, setMobileShowDetail] = useState(false);
-
-  // Theme support local state
-  const [themeMode, setThemeMode] = useState("dark");
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("khora-theme");
-      if (stored) setThemeMode(stored);
-    }
-  }, []);
 
   // Helper for rendering Audio Status Badges
   const renderAudioStatusBadge = (status: string) => {
@@ -121,7 +189,6 @@ export default function VolcadosPage() {
         return <span className="text-yellow-400 font-semibold text-[10px] flex items-center gap-1">🟡 Audio no vinculado</span>;
       case "incompleto":
       case "audio_parcial":
-      case "audio_partial":
         return <span className="text-amber-500 font-semibold text-[10px] flex items-center gap-1">🟠 Audio incompleto</span>;
       case "no_recuperable":
       default:
@@ -157,7 +224,6 @@ export default function VolcadosPage() {
     return [];
   }, []);
 
-  // Fetch Legacy Volcados list
   const fetchLegacyVolcados = useCallback(async () => {
     try {
       const res = await fetch("/api/volcado");
@@ -181,12 +247,60 @@ export default function VolcadosPage() {
     void fetchLegacyVolcados();
   }, [fetchPipeline, fetchLegacyVolcados]);
 
+  // Cargar datos de Cockpit, Manifiesto, Incidentes y Gate
+  const loadCockpitData = async (id: string, versionNum: number) => {
+    setLoadingGate(true);
+    try {
+      // 1. Cargar Manifiesto de Audio
+      const resManif = await fetch(`/api/audio/${id}/manifiesto`);
+      if (resManif.ok) {
+        const dataManif = await resManif.json();
+        setManifiestoPartes(dataManif.partes || []);
+        if (dataManif.partes && dataManif.partes.length > 0) {
+          setCurrentPartIndex(1);
+          setAudioSourceUrl(dataManif.partes[0].download_path);
+        }
+      } else {
+        setManifiestoPartes([]);
+        setAudioSourceUrl(`/api/audio/${id}`);
+      }
+
+      // 2. Cargar Gate de Aprobación
+      const resGate = await fetch(`/api/revision/${id}/compuerta`);
+      if (resGate.ok) {
+        const dataGate = await resGate.json();
+        setGateDecision(dataGate);
+      }
+
+      // 3. Cargar Incidentes
+      const resInc = await fetch(`/api/revision/${id}/incidentes`);
+      if (resInc.ok) {
+        const dataInc = await resInc.json();
+        setIncidentes(dataInc.incidentes || []);
+      } else {
+        setIncidentes([]);
+      }
+
+      // 4. Cargar Hallazgos Lingüísticos
+      const resHal = await fetch(`/api/revision/${id}/hallazgos?version=${versionNum}`);
+      if (resHal.ok) {
+        const dataHal = await resHal.json();
+        setHallazgos(dataHal.hallazgos || []);
+      } else {
+        setHallazgos([]);
+      }
+    } catch (err) {
+      console.error("Error loading Cockpit data:", err);
+    } finally {
+      setLoadingGate(false);
+    }
+  };
+
   // Handle volcado selection
   const selectVolcadoItem = async (id: string, skipMobileToggle?: boolean) => {
     setSelectedId(id);
     setIngestaResult(null);
-    setDrawerSubTab("trace");
-    setDeltaPairs([]);
+    setDrawerSubTab("cockpit");
     if (!skipMobileToggle) {
       setMobileShowDetail(true);
     }
@@ -209,7 +323,7 @@ export default function VolcadosPage() {
           setEditableTexto(activeVer.texto || "");
         }
 
-        setSelectedDeltaFrom(Math.max(1, latestVersionNum - 1));
+        await loadCockpitData(id, latestVersionNum);
       } else {
         setVersiones([]);
         setEditableTexto("");
@@ -218,42 +332,6 @@ export default function VolcadosPage() {
       console.error("Error loading versions:", err);
     }
   };
-
-  const changeSelectedVersion = (vNum: number) => {
-    setSelectedVersionNum(vNum);
-    const ver = versiones.find((v) => v.version === vNum);
-    if (ver) {
-      setEditableTexto(ver.texto || "");
-    }
-    setSelectedDeltaFrom(Math.max(1, vNum - 1));
-    setDeltaPairs([]);
-  };
-
-  const fetchDeltaDiff = async () => {
-    if (!selectedId || !selectedVersionNum) return;
-    setLoadingDelta(true);
-    try {
-      const res = await fetch(
-        `/api/revision/delta?id=${selectedId}&from=${selectedDeltaFrom}&to=${selectedVersionNum}`
-      );
-      const data = await res.json();
-      if (res.ok && Array.isArray(data.pares)) {
-        setDeltaPairs(data.pares);
-      } else {
-        setDeltaPairs([]);
-      }
-    } catch (err) {
-      console.error("Error fetching delta diff:", err);
-    } finally {
-      setLoadingDelta(false);
-    }
-  };
-
-  useEffect(() => {
-    if (selectedId && selectedVersionNum) {
-      void fetchDeltaDiff();
-    }
-  }, [selectedVersionNum, selectedDeltaFrom, selectedId]);
 
   const handleIniciarRevision = async () => {
     if (!selectedId) return;
@@ -266,14 +344,8 @@ export default function VolcadosPage() {
       if (res.ok) {
         const items = await fetchPipeline();
         const updated = items.find((i: PipelineItem) => i.id === selectedId);
-        if (updated) {
-          setSelectedItem(updated);
-        } else if (selectedItem) {
-          setSelectedItem({
-            ...selectedItem,
-            estado: "en_revision",
-          });
-        }
+        if (updated) setSelectedItem(updated);
+        await loadCockpitData(selectedId, selectedVersionNum);
       } else {
         alert("Error al iniciar revisión: " + (data.detail || data.error || "Desconocido"));
       }
@@ -307,39 +379,89 @@ export default function VolcadosPage() {
     }
   };
 
-  const handleApproveVersion = async () => {
-    if (!selectedId || !selectedVersionNum) return;
-    const currentVer = versiones.find((v) => Number(v.version) === Number(selectedVersionNum));
-    if (!currentVer) return;
+  // High Friction Hold Button Handler
+  const startHolding = () => {
+    if (!gateDecision?.canApprove || approvingVersion) return;
+    setIsHolding(true);
+    let current = 0;
+    holdTimerRef.current = setInterval(() => {
+      current += 10;
+      setHoldProgress(current);
+      if (current >= 100) {
+        clearInterval(holdTimerRef.current);
+        void executeApproval();
+      }
+    }, 200);
+  };
 
+  const stopHolding = () => {
+    setIsHolding(false);
+    setHoldProgress(0);
+    if (holdTimerRef.current) clearInterval(holdTimerRef.current);
+  };
+
+  const executeApproval = async () => {
+    if (!selectedId || !gateDecision) return;
     setApprovingVersion(true);
     try {
       const res = await fetch(`/api/revision/${selectedId}/aprobar`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          version: selectedVersionNum,
-          sha256: currentVer.sha256,
+          version: gateDecision.version,
+          sha256: gateDecision.sha256,
+          gate_hash: gateDecision.gate_hash,
         }),
       });
       const data = await res.json();
       if (res.ok) {
+        setShowAccessibleModal(false);
         await fetchPipeline();
         if (selectedItem) {
           setSelectedItem({
             ...selectedItem,
             estado: "listo_ingesta",
-            version_aprobada: selectedVersionNum,
-            sha256_aprobado: currentVer.sha256,
+            version_aprobada: gateDecision.version,
+            sha256_aprobado: gateDecision.sha256,
           });
         }
+        await loadCockpitData(selectedId, gateDecision.version);
       } else {
-        alert("Error al aprobar: " + (data.error || data.detail || "Desconocido"));
+        alert("Error al aprobar: " + (data.detail || data.error || "Desconocido"));
+        await loadCockpitData(selectedId, gateDecision.version);
       }
     } catch (err: any) {
       alert("Error de red: " + err.message);
     } finally {
       setApprovingVersion(false);
+      setHoldProgress(0);
+      setIsHolding(false);
+    }
+  };
+
+  // Resolver Incidente de Audio con Código Específico
+  const handleResolveAudioIncident = async () => {
+    if (!selectedId) return;
+    const incAudio = incidentes.find((i) => i.tipo === "audio_no_recuperable" && i.estado !== "resuelto");
+    if (!incAudio) return;
+
+    try {
+      const res = await fetch(`/api/revision/${selectedId}/incidentes/${incAudio.id}/resolver`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          codigoResolucion: selectedAudioResolveCode,
+        }),
+      });
+      if (res.ok) {
+        setShowAudioResolveModal(false);
+        await loadCockpitData(selectedId, selectedVersionNum);
+      } else {
+        const data = await res.json();
+        alert("Error al resolver incidente: " + (data.detail || data.error));
+      }
+    } catch (err: any) {
+      alert("Error de red: " + err.message);
     }
   };
 
@@ -388,19 +510,36 @@ export default function VolcadosPage() {
     }
   };
 
-  useEffect(() => {
-    if (!selectedId) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setSelectedId(null);
-        setSelectedItem(null);
+  // Seek audio por clic en palabra o milisegundo
+  const seekToMs = (ms: number) => {
+    if (!manifiestoPartes || manifiestoPartes.length === 0) {
+      if (audioRef.current) {
+        audioRef.current.currentTime = ms / 1000;
+        void audioRef.current.play();
       }
-    };
+      return;
+    }
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [selectedId]);
+    const parteOffset = manifiestoPartes.find((p) => ms >= p.start_ms && ms <= p.end_ms);
+    if (parteOffset) {
+      const msRelativo = ms - parteOffset.start_ms;
+      if (parteOffset.part_index !== currentPartIndex) {
+        setCurrentPartIndex(parteOffset.part_index);
+        setAudioSourceUrl(parteOffset.download_path);
+        setTimeout(() => {
+          if (audioRef.current) {
+            audioRef.current.currentTime = msRelativo / 1000;
+            void audioRef.current.play();
+          }
+        }, 150);
+      } else {
+        if (audioRef.current) {
+          audioRef.current.currentTime = msRelativo / 1000;
+          void audioRef.current.play();
+        }
+      }
+    }
+  };
 
   const filteredPipelineItems = pipelineItems.filter((item) => {
     const matchesSearch =
@@ -413,76 +552,28 @@ export default function VolcadosPage() {
     if (!matchesSearch) return false;
 
     if (filter === "todos") return true;
-    if (filter === "attention") {
-      return item.audio_status !== "disponible" || item.estado === "fallido";
-    }
-    if (filter === "archivados") return item.estado === "archivado";
+    if (filter === "attention") return item.audio_status !== "disponible" || item.estado === "fallido";
     if (filter === "revision") return item.estado === "en_revision" || item.estado === "pendiente_revision";
     if (filter === "listos") return item.estado === "listo_ingesta";
     if (filter === "ingeridos") return item.estado === "ingerido";
-    if (filter === "fallidos") return item.estado === "fallido";
-    if (filter === "sin_audio") return item.audio_status === "no_recuperable";
 
     return true;
   });
-
-  useEffect(() => {
-    if (activeTab === "pipeline" && !loadingPipeline) {
-      const stillExists = filteredPipelineItems.some((it) => it.id === selectedId);
-      if (!stillExists && filteredPipelineItems.length > 0) {
-        void selectVolcadoItem(filteredPipelineItems[0].id, true);
-      } else if (filteredPipelineItems.length === 0) {
-        setSelectedId(null);
-        setSelectedItem(null);
-      }
-    }
-  }, [filter, searchQuery, pipelineItems, activeTab, loadingPipeline]);
-
-  const handleArchivarLegacy = async () => {
-    if (texto.trim().length === 0) {
-      setVolcadosError("no hay texto que archivar");
-      return;
-    }
-    setGuardandoVolcado(true);
-    setVolcadosError(null);
-    setVolcadosAviso(null);
-    try {
-      const res = await fetch("/api/volcado", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ texto, titulo }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setVolcadosError((data.detail ?? "archivo fallido") + (data.causa ? " :: " + data.causa : ""));
-        return;
-      }
-      setVolcadosAviso("archivado " + String(data.sha256).slice(0, 8) + " · " + data.chars + " caracteres");
-      setTexto("");
-      setTitulo("");
-      await fetchLegacyVolcados();
-      await fetchPipeline();
-    } catch (e: any) {
-      setVolcadosError(e?.message ?? String(e));
-    } finally {
-      setGuardandoVolcado(false);
-    }
-  };
 
   return (
     <div
       className="p-4 md:p-8 max-w-7xl mx-auto space-y-6"
       style={{ color: "var(--khora-ink)", paddingBottom: "6rem" }}
     >
-      {/* Header section with reskinned tokens */}
+      {/* Header section */}
       <div className="border-b pb-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4" style={{ borderColor: "var(--khora-border)" }}>
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <Icons.Layers size={32} strokeWidth={1.75} style={{ color: "var(--khora-accent)" }} />
-            Archivo de Volcados
+            Mesa de Revisión Sincrónica
           </h1>
           <p className="text-sm mt-1" style={{ color: "var(--khora-accent)" }}>
-            Control de ingestas, correcciones de transcripción y trazabilidad completa de sesión y audio.
+            Lectura cómoda, sincronización audio ↔ texto, corrección lingüística y compuerta de aprobación autoritativa.
           </p>
         </div>
 
@@ -490,17 +581,17 @@ export default function VolcadosPage() {
         <div className="flex border rounded-none overflow-hidden" style={{ borderColor: "var(--khora-border)" }}>
           <button
             onClick={() => setActiveTab("pipeline")}
-            className="px-4 py-2 text-xs uppercase tracking-wider font-semibold cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
+            className="px-4 py-2 text-xs uppercase tracking-wider font-semibold cursor-pointer"
             style={{
               backgroundColor: activeTab === "pipeline" ? "var(--khora-accent)" : "transparent",
               color: activeTab === "pipeline" ? "var(--khora-bg)" : "var(--khora-ink)",
             }}
           >
-            Pipeline Tower
+            Mesa de Revisión
           </button>
           <button
             onClick={() => setActiveTab("volcados")}
-            className="px-4 py-2 text-xs uppercase tracking-wider font-semibold cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
+            className="px-4 py-2 text-xs uppercase tracking-wider font-semibold cursor-pointer"
             style={{
               backgroundColor: activeTab === "volcados" ? "var(--khora-accent)" : "transparent",
               color: activeTab === "volcados" ? "var(--khora-bg)" : "var(--khora-ink)",
@@ -513,64 +604,42 @@ export default function VolcadosPage() {
 
       {activeTab === "pipeline" ? (
         <div className="space-y-6">
-          {/* CONTROL TOWER VIEW */}
-
-          {/* Aggregated Counters summary cards */}
+          {/* Summary Cards */}
           {resumen && (
             <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-              <div
-                className="p-3 border flex flex-col justify-between"
-                style={{ backgroundColor: "var(--khora-surface)", borderColor: "var(--khora-border)" }}
-              >
+              <div className="p-3 border flex flex-col justify-between bg-zinc-950/40" style={{ borderColor: "var(--khora-border)" }}>
                 <span className="text-[10px] font-mono tracking-wider uppercase opacity-60">Total volcados</span>
                 <span className="text-2xl font-bold mt-1">{resumen.total}</span>
               </div>
-              <div
-                className="p-3 border flex flex-col justify-between"
-                style={{ backgroundColor: "var(--khora-surface)", borderColor: "var(--khora-border)" }}
-              >
+              <div className="p-3 border flex flex-col justify-between bg-zinc-950/40" style={{ borderColor: "var(--khora-border)" }}>
                 <span className="text-[10px] font-mono tracking-wider uppercase opacity-60">En revisión</span>
                 <span className="text-2xl font-bold mt-1" style={{ color: "var(--khora-accent)" }}>
                   {resumen.en_revision + resumen.pendiente_revision}
                 </span>
               </div>
-              <div
-                className="p-3 border flex flex-col justify-between"
-                style={{ backgroundColor: "var(--khora-surface)", borderColor: "var(--khora-border)" }}
-              >
+              <div className="p-3 border flex flex-col justify-between bg-zinc-950/40" style={{ borderColor: "var(--khora-border)" }}>
                 <span className="text-[10px] font-mono tracking-wider uppercase opacity-60">Listos / Ingesta</span>
-                <span className="text-2xl font-bold mt-1 text-amber-500">
-                  {resumen.listo_ingesta}
-                </span>
+                <span className="text-2xl font-bold mt-1 text-amber-500">{resumen.listo_ingesta}</span>
               </div>
-              <div
-                className="p-3 border flex flex-col justify-between"
-                style={{ backgroundColor: "var(--khora-surface)", borderColor: "var(--khora-border)" }}
-              >
+              <div className="p-3 border flex flex-col justify-between bg-zinc-950/40" style={{ borderColor: "var(--khora-border)" }}>
                 <span className="text-[10px] font-mono tracking-wider uppercase opacity-60">Grafo / Ingeridos</span>
-                <span className="text-2xl font-bold mt-1 text-emerald-500">
-                  {resumen.ingerido}
-                </span>
+                <span className="text-2xl font-bold mt-1 text-emerald-500">{resumen.ingerido}</span>
               </div>
-              <div
-                className="p-3 border flex flex-col justify-between col-span-2 md:col-span-1"
-                style={{ backgroundColor: "var(--khora-surface)", borderColor: "var(--khora-border)" }}
-              >
-                <span className="text-[10px] font-mono tracking-wider uppercase opacity-60">Atención / Anomalías</span>
+              <div className="p-3 border flex flex-col justify-between col-span-2 md:col-span-1 bg-zinc-950/40" style={{ borderColor: "var(--khora-border)" }}>
+                <span className="text-[10px] font-mono tracking-wider uppercase opacity-60">Incidentes Abiertos</span>
                 <div className="flex items-baseline gap-2 mt-1">
-                  <span className="text-2xl font-bold text-red-500">{resumen.anomalies}</span>
-                  <span className="text-xs opacity-60">({resumen.sin_audio} sin audio)</span>
+                  <span className="text-2xl font-bold text-red-500">{gateDecision?.counts?.incidentes_operativos_abiertos ?? resumen.anomalies}</span>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Action Oriented Filter Buttons & Search */}
+          {/* Filters & Search */}
           <div className="flex flex-col md:flex-row gap-4 justify-between items-stretch md:items-center">
             <div className="flex flex-wrap gap-1.5">
               <button
                 onClick={() => setFilter("todos")}
-                className="px-2.5 py-1.5 text-xs font-semibold uppercase tracking-wider border cursor-pointer hover:opacity-85 transition-opacity"
+                className="px-2.5 py-1.5 text-xs font-semibold uppercase tracking-wider border cursor-pointer"
                 style={{
                   backgroundColor: filter === "todos" ? "var(--khora-accent)" : "var(--khora-surface)",
                   color: filter === "todos" ? "var(--khora-bg)" : "var(--khora-ink)",
@@ -580,19 +649,8 @@ export default function VolcadosPage() {
                 Todos
               </button>
               <button
-                onClick={() => setFilter("attention")}
-                className="px-2.5 py-1.5 text-xs font-semibold uppercase tracking-wider border cursor-pointer hover:opacity-85 transition-opacity flex items-center gap-1"
-                style={{
-                  backgroundColor: filter === "attention" ? "var(--khora-accent)" : "var(--khora-surface)",
-                  color: filter === "attention" ? "var(--khora-bg)" : "var(--khora-ink)",
-                  borderColor: "var(--khora-border)",
-                }}
-              >
-                <Icons.AlertCircle size={12} /> Requiere atención
-              </button>
-              <button
                 onClick={() => setFilter("revision")}
-                className="px-2.5 py-1.5 text-xs font-semibold uppercase tracking-wider border cursor-pointer hover:opacity-85 transition-opacity"
+                className="px-2.5 py-1.5 text-xs font-semibold uppercase tracking-wider border cursor-pointer"
                 style={{
                   backgroundColor: filter === "revision" ? "var(--khora-accent)" : "var(--khora-surface)",
                   color: filter === "revision" ? "var(--khora-bg)" : "var(--khora-ink)",
@@ -603,7 +661,7 @@ export default function VolcadosPage() {
               </button>
               <button
                 onClick={() => setFilter("listos")}
-                className="px-2.5 py-1.5 text-xs font-semibold uppercase tracking-wider border cursor-pointer hover:opacity-85 transition-opacity"
+                className="px-2.5 py-1.5 text-xs font-semibold uppercase tracking-wider border cursor-pointer"
                 style={{
                   backgroundColor: filter === "listos" ? "var(--khora-accent)" : "var(--khora-surface)",
                   color: filter === "listos" ? "var(--khora-bg)" : "var(--khora-ink)",
@@ -614,7 +672,7 @@ export default function VolcadosPage() {
               </button>
               <button
                 onClick={() => setFilter("ingeridos")}
-                className="px-2.5 py-1.5 text-xs font-semibold uppercase tracking-wider border cursor-pointer hover:opacity-85 transition-opacity"
+                className="px-2.5 py-1.5 text-xs font-semibold uppercase tracking-wider border cursor-pointer"
                 style={{
                   backgroundColor: filter === "ingeridos" ? "var(--khora-accent)" : "var(--khora-surface)",
                   color: filter === "ingeridos" ? "var(--khora-bg)" : "var(--khora-ink)",
@@ -625,569 +683,425 @@ export default function VolcadosPage() {
               </button>
             </div>
 
-            {/* Quick Search */}
             <div className="relative">
               <input
                 type="text"
-                placeholder="Buscar por Folio, UUID, Session..."
+                placeholder="Buscar por Folio, UUID, Titulo..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full md:w-64 pl-8 pr-3 py-1.5 text-xs border rounded-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)] focus-visible:border-[var(--khora-accent)]"
-                style={{
-                  backgroundColor: "var(--khora-surface)",
-                  borderColor: "var(--khora-border)",
-                  color: "var(--khora-ink)",
-                }}
+                className="w-full md:w-64 pl-8 pr-3 py-1.5 text-xs border rounded-none focus:outline-none"
+                style={{ backgroundColor: "var(--khora-surface)", borderColor: "var(--khora-border)", color: "var(--khora-ink)" }}
               />
               <Icons.Search className="absolute left-2.5 top-2.5 text-xs opacity-60 w-3.5 h-3.5" />
             </div>
           </div>
 
-          {/* Layout Master-Detail */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-[600px] items-stretch">
-            {/* LEFT INDEX COLUMN */}
-            <div className={`lg:col-span-5 flex flex-col space-y-3 ${mobileShowDetail ? "hidden lg:flex" : "flex"}`}>
-              <div className="flex justify-between items-baseline border-b pb-1 mb-1" style={{ borderColor: "var(--khora-border)" }}>
-                <span className="text-[10px] font-mono tracking-wider uppercase opacity-60">Volcados Disponibles</span>
-                <span className="text-[10px] font-mono opacity-60">{filteredPipelineItems.length} items</span>
-              </div>
-
-              {loadingPipeline ? (
-                <div className="p-8 text-center text-xs opacity-60 border" style={{ backgroundColor: "var(--khora-surface)", borderColor: "var(--khora-border)" }}>
-                  Cargando torre de control de volcados...
-                </div>
-              ) : filteredPipelineItems.length === 0 ? (
-                <div className="p-8 text-center text-xs opacity-60 border" style={{ backgroundColor: "var(--khora-surface)", borderColor: "var(--khora-border)" }}>
-                  Ningún volcado coincide con el filtro activo.
-                </div>
-              ) : (
-                <div className="space-y-2 overflow-y-auto max-h-[700px] pr-1">
-                  {filteredPipelineItems.map((item) => {
-                    const isSelected = selectedId === item.id;
-                    const duration = item.audio?.duration_sec || item.duracion_seg || 0;
-                    const partesNum = item.partes_count || 0;
-
-                    return (
-                      <div
-                        key={item.id}
-                        onClick={() => selectVolcadoItem(item.id)}
-                        className={`p-3 border cursor-pointer transition-all flex flex-col space-y-2 rounded-none hover:bg-zinc-800/10 ${
-                          isSelected ? "bg-zinc-800/30 ring-1 ring-[var(--khora-accent)]" : "bg-[var(--khora-surface)]"
-                        }`}
-                        style={{
-                          borderColor: isSelected ? "var(--khora-accent)" : "var(--khora-border)"
-                        }}
-                      >
-                        {/* Title / Folio / Id bar */}
-                        <div className="flex justify-between items-start gap-2">
-                          <div className="min-w-0">
-                            <div className="flex items-center gap-2">
-                              {item.folio && (
-                                <span className="font-mono text-[10px] px-1 py-0.5 bg-zinc-800 border border-zinc-700 text-amber-400 font-bold shrink-0">
-                                  #{item.folio}
-                                </span>
-                              )}
-                              <h3 className="font-bold text-[11px] truncate">{item.titulo || "Sin título"}</h3>
-                            </div>
-                            <span className="text-[9px] font-mono opacity-50 block mt-0.5">UUID: {item.id}</span>
-                          </div>
-                          <span className="text-[9px] opacity-60 font-mono shrink-0">
-                            {new Date(item.recibido_en).toLocaleDateString()}
+          {/* Master Detail Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-[600px]">
+            {/* Left Column Index */}
+            <div className={`lg:col-span-4 flex flex-col space-y-2 ${mobileShowDetail ? "hidden lg:flex" : "flex"}`}>
+              {filteredPipelineItems.map((item) => {
+                const isSelected = selectedId === item.id;
+                return (
+                  <div
+                    key={item.id}
+                    onClick={() => selectVolcadoItem(item.id)}
+                    className={`p-3 border cursor-pointer flex flex-col space-y-1.5 rounded-none transition-all ${
+                      isSelected ? "bg-zinc-800/40 ring-1 ring-[var(--khora-accent)]" : "bg-[var(--khora-surface)]"
+                    }`}
+                    style={{ borderColor: isSelected ? "var(--khora-accent)" : "var(--khora-border)" }}
+                  >
+                    <div className="flex justify-between items-start gap-2">
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        {item.folio && (
+                          <span className="font-mono text-[10px] px-1 py-0.5 bg-zinc-800 text-amber-400 font-bold shrink-0">
+                            #{item.folio}
                           </span>
-                        </div>
-
-                        {/* Audio Status & Graph / Anomaly Badges Line */}
-                        <div className="flex items-center justify-between pt-1 border-t border-zinc-800/10 font-mono text-[10px]">
-                          {renderAudioStatusBadge(item.audio_status || item.integrity)}
-                          <span className="opacity-70 text-[9px]">
-                            {item.nodos_count > 0 || item.aristas_count > 0 ? `${item.nodos_count}n / ${item.aristas_count}r · ` : ""}
-                            {partesNum} {partesNum === 1 ? "parte" : "partes"} · {duration}s
-                          </span>
-                        </div>
+                        )}
+                        <h3 className="font-bold text-xs truncate">{item.titulo || "Sin título"}</h3>
                       </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-
-            {/* RIGHT DETAIL COLUMN */}
-            <div className={`lg:col-span-7 flex flex-col space-y-4 ${!mobileShowDetail ? "hidden lg:flex" : "flex"}`}>
-              {selectedId && selectedItem ? (
-                <div
-                  ref={drawerRef}
-                  className="border p-4 shadow-none flex flex-col space-y-6 h-full rounded-none"
-                  style={{
-                    backgroundColor: "var(--khora-surface)",
-                    borderColor: "var(--khora-border)",
-                  }}
-                >
-                  {/* Detail Header */}
-                  <div className="border-b pb-3 flex justify-between items-center" style={{ borderColor: "var(--khora-border)" }}>
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => setMobileShowDetail(false)}
-                          className="lg:hidden p-1 mr-1 border rounded-none cursor-pointer"
-                          style={{ borderColor: "var(--khora-border)" }}
-                        >
-                          <Icons.ChevronLeft className="w-4 h-4 text-zinc-400" />
-                        </button>
-                        <span className="text-[10px] font-mono tracking-widest uppercase opacity-60">
-                          Trazabilidad Operacional y Audio
-                        </span>
-                      </div>
-                      <h2 className="text-sm font-bold font-mono">
-                        {selectedItem.folio ? `Folio #${selectedItem.folio} — ` : ""}{selectedItem.titulo || selectedItem.id}
-                      </h2>
+                      <span className="text-[9px] font-mono border px-1 uppercase opacity-80">{item.estado}</span>
                     </div>
-
-                    {/* Sub Tab Buttons */}
-                    <div className="flex border rounded-none overflow-hidden shrink-0" style={{ borderColor: "var(--khora-border)" }}>
-                      <button
-                        onClick={() => setDrawerSubTab("trace")}
-                        className="px-3 py-1.5 text-[10px] uppercase font-semibold cursor-pointer"
-                        style={{
-                          backgroundColor: drawerSubTab === "trace" ? "var(--khora-accent)" : "transparent",
-                          color: drawerSubTab === "trace" ? "var(--khora-bg)" : "var(--khora-ink)",
-                        }}
-                      >
-                        Trace
-                      </button>
-                      <button
-                        onClick={() => setDrawerSubTab("revision")}
-                        className="px-3 py-1.5 text-[10px] uppercase font-semibold cursor-pointer"
-                        style={{
-                          backgroundColor: drawerSubTab === "revision" ? "var(--khora-accent)" : "transparent",
-                          color: drawerSubTab === "revision" ? "var(--khora-bg)" : "var(--khora-ink)",
-                        }}
-                      >
-                        Revisión
-                      </button>
+                    <div className="flex justify-between items-center text-[10px] font-mono">
+                      {renderAudioStatusBadge(item.audio_status)}
+                      <span className="opacity-60">{new Date(item.recibido_en).toLocaleDateString()}</span>
                     </div>
                   </div>
+                );
+              })}
+            </div>
 
-                  {/* Detail Content */}
-                  <div className="flex-1 space-y-6 overflow-y-auto">
-                    {(selectedItem.estado === "archivado" || selectedItem.estado === "pendiente_revision") && (
-                      <div className="p-3 border border-amber-500/40 bg-amber-500/10 flex items-center justify-between gap-2 text-xs font-mono">
-                        <span className="text-amber-300 font-semibold">
-                          Estado: {selectedItem.estado}. Inicia la revisión para habilitar la aprobación e ingesta.
-                        </span>
+            {/* Right Column Synchronous Revision Cockpit */}
+            <div className={`lg:col-span-8 flex flex-col space-y-4 ${!mobileShowDetail ? "hidden lg:flex" : "flex"}`}>
+              {selectedId && selectedItem ? (
+                <div ref={drawerRef} className="border p-5 flex flex-col space-y-6 h-full bg-zinc-950/60" style={{ borderColor: "var(--khora-border)" }}>
+                  {/* Cockpit Header Bar with Progress */}
+                  <div className="border-b pb-4 space-y-3" style={{ borderColor: "var(--khora-border)" }}>
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <span className="text-[10px] font-mono uppercase tracking-widest opacity-60">Mesa de Revisión Sincrónica</span>
+                        <h2 className="text-base font-bold font-mono">
+                          {selectedItem.folio ? `Folio #${selectedItem.folio} — ` : ""}{selectedItem.titulo || selectedItem.id}
+                        </h2>
+                      </div>
+                      <div className="flex gap-2">
                         <button
-                          onClick={handleIniciarRevision}
-                          disabled={startingRevision}
-                          className="px-3 py-1.5 border font-bold text-xs bg-amber-500 text-zinc-950 border-amber-400 hover:opacity-90 cursor-pointer shrink-0 transition-colors flex items-center gap-1"
+                          onClick={() => setDrawerSubTab("cockpit")}
+                          className="px-3 py-1 text-xs font-mono uppercase border cursor-pointer"
+                          style={{
+                            backgroundColor: drawerSubTab === "cockpit" ? "var(--khora-accent)" : "transparent",
+                            color: drawerSubTab === "cockpit" ? "var(--khora-bg)" : "var(--khora-ink)",
+                          }}
                         >
-                          <Icons.Play size={14} />
-                          {startingRevision ? "Iniciando..." : "Iniciar revisión"}
+                          Cockpit
+                        </button>
+                        <button
+                          onClick={() => setDrawerSubTab("trace")}
+                          className="px-3 py-1 text-xs font-mono uppercase border cursor-pointer"
+                          style={{
+                            backgroundColor: drawerSubTab === "trace" ? "var(--khora-accent)" : "transparent",
+                            color: drawerSubTab === "trace" ? "var(--khora-bg)" : "var(--khora-ink)",
+                          }}
+                        >
+                          Trace
                         </button>
                       </div>
-                    )}
+                    </div>
 
-                    {drawerSubTab === "trace" ? (
-                      <div className="space-y-6">
-                        {/* Audio and Session Metadata Box */}
-                        <div className="p-3 border space-y-3 font-mono text-xs rounded-none bg-zinc-950/40" style={{ borderColor: "var(--khora-border)" }}>
-                          <div className="flex justify-between items-center border-b pb-1 border-zinc-800">
-                            <span className="text-[10px] uppercase tracking-wider opacity-60">Estado de Audio</span>
-                            {renderAudioStatusBadge(selectedItem.audio_status)}
-                          </div>
-                          <div className="grid grid-cols-2 gap-2 text-[11px]">
-                            <div><span className="opacity-60">Folio:</span> #{selectedItem.folio || "N/A"}</div>
-                            <div><span className="opacity-60">Session ID:</span> {selectedItem.session_id ? selectedItem.session_id.slice(0, 12) + "..." : "Sin sesión"}</div>
-                            <div><span className="opacity-60">Estado Sesión:</span> {selectedItem.session_estado || "completo"}</div>
-                            <div><span className="opacity-60">Partes:</span> {selectedItem.partes_count || 0}</div>
-                            <div><span className="opacity-60">Bytes Audio:</span> {selectedItem.audio?.bytes || selectedItem.audio_bytes || 0} B</div>
-                            <div><span className="opacity-60">Duración:</span> {selectedItem.audio?.duration_sec || selectedItem.duracion_seg || 0} seg</div>
-                          </div>
-                          {selectedItem.blob_paths && selectedItem.blob_paths.length > 0 && (
-                            <div className="border-t pt-2 border-zinc-800 text-[10px] space-y-1">
-                              <span className="opacity-60 block">Ruta(s) de Blobs:</span>
-                              {selectedItem.blob_paths.map((p, idx) => (
-                                <div key={idx} className="truncate text-zinc-400 bg-zinc-900/80 p-1 border border-zinc-800">{p}</div>
-                              ))}
-                            </div>
-                          )}
+                    {/* Category Counters Header */}
+                    {gateDecision && (
+                      <div className="grid grid-cols-4 gap-2 text-center text-xs font-mono pt-2">
+                        <div className="p-2 border bg-zinc-900/60 border-zinc-800">
+                          <div className="opacity-60 text-[9px] uppercase">Tipografía</div>
+                          <div className="font-bold text-amber-400">{gateDecision.counts.errores_tipograficos_pendientes}</div>
                         </div>
-
-                        {/* TRACE MAP */}
-                        <div className="text-xs uppercase font-mono tracking-widest opacity-65 border-b pb-1 mb-2" style={{ borderColor: "var(--khora-border)" }}>
-                          Árbol de Trazabilidad (Traceability Tree Map)
+                        <div className="p-2 border bg-zinc-900/60 border-zinc-800">
+                          <div className="opacity-60 text-[9px] uppercase">Lingüística</div>
+                          <div className="font-bold text-sky-400">{gateDecision.counts.correcciones_lingüisticas_pendientes}</div>
                         </div>
-
-                        <div className="relative pl-6 border-l-2 space-y-6" style={{ borderColor: "var(--khora-border)" }}>
-                          {/* 🎙 CAPTURA */}
-                          <div className="relative">
-                            <div className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full flex items-center justify-center border" style={{ backgroundColor: "var(--khora-bg)", borderColor: "var(--khora-accent)" }}>
-                              <Icons.Mic className="w-2.5 h-2.5 text-zinc-400" />
-                            </div>
-                            <div className="space-y-1">
-                              <h4 className="font-bold text-xs flex items-center gap-1.5">
-                                🎙 Captura <span className="text-emerald-500">✓ Registrado</span>
-                              </h4>
-                              <div className="text-[11px] opacity-75 space-y-0.5 font-mono">
-                                <div>Fecha: {new Date(selectedItem.recibido_en).toLocaleString()}</div>
-                                <div>Session ID: {selectedItem.session_id || "N/A"}</div>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* 💾 ARCHIVO */}
-                          <div className="relative">
-                            <div className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full flex items-center justify-center border" style={{ backgroundColor: "var(--khora-bg)", borderColor: "var(--khora-accent)" }}>
-                              <Icons.Save className="w-2.5 h-2.5 text-zinc-400" />
-                            </div>
-                            <div className="space-y-1">
-                              <h4 className="font-bold text-xs">
-                                💾 Archivo <span className="text-emerald-500">✓ Persistido</span>
-                              </h4>
-                              <div className="text-[11px] opacity-75 space-y-0.5 font-mono">
-                                <div>Total caracteres: {selectedItem.chars}</div>
-                                <div>UUID: {selectedItem.id}</div>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* 📝 TRANSCRIPCION */}
-                          <div className="relative">
-                            <div className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full flex items-center justify-center border" style={{ backgroundColor: "var(--khora-bg)", borderColor: "var(--khora-accent)" }}>
-                              <Icons.FileText className="w-2.5 h-2.5 text-zinc-400" />
-                            </div>
-                            <div className="space-y-1">
-                              <h4 className="font-bold text-xs">
-                                📝 Transcripción <span className="text-emerald-500">✓ Registrada</span>
-                              </h4>
-<div className="text-[11px] opacity-75 space-y-0.5 font-mono">
-  <div>Versión actual: v{selectedItem.version_actual || 1}</div>
-</div>
-                            </div>
-                          </div>
-
-                          {/* ✓ APROBACION */}
-                          <div className="relative">
-                            <div className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full flex items-center justify-center border" style={{ backgroundColor: "var(--khora-bg)", borderColor: "var(--khora-accent)" }}>
-                              <Icons.CheckCircle className="w-2.5 h-2.5 text-zinc-400" />
-                            </div>
-                            <div className="space-y-1">
-                              <h4 className="font-bold text-xs">
-                                ✓ Aprobación{" "}
-                                {selectedItem.version_aprobada ? (
-                                  <span className="text-emerald-500">✓ Aprobado v{selectedItem.version_aprobada}</span>
-                                ) : (
-<span className="text-amber-500">○ Pendiente</span>
-                                )}
-                              </h4>
-                            </div>
-                          </div>
-
-                          {/* ⚙ INGESTA */}
-                          <div className="relative">
-                            <div className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full flex items-center justify-center border" style={{ backgroundColor: "var(--khora-bg)", borderColor: "var(--khora-accent)" }}>
-                              <Icons.Settings className="w-2.5 h-2.5 text-zinc-400" />
-                            </div>
-                            <div className="space-y-1">
-                              <h4 className="font-bold text-xs">
-                                ⚙ Ingesta{" "}
-                                {selectedItem.estado === "ingerido" ? (
-                                  <span className="text-emerald-500">✓ Ingerido</span>
-                                ) : selectedItem.estado === "fallido" ? (
-                                  <span className="text-red-500">✕ Error en ingesta</span>
-                                ) : (
-                                  <span className="text-orange-500">○ En espera</span>
-                                )}
-                              </h4>
-                            </div>
-                          </div>
-
-                          {/* ◎ GRAFO PKG PROYECCIONES */}
-                          <div className="relative">
-                            <div className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full flex items-center justify-center border" style={{ backgroundColor: "var(--khora-bg)", borderColor: "var(--khora-accent)" }}>
-                              <Icons.Share2 className="w-2.5 h-2.5 text-zinc-400" />
-                            </div>
-                            <div className="space-y-1">
-                              <h4 className="font-bold text-xs">◎ Grafo PKG Proyecciones</h4>
-                              <div className="text-[11px] opacity-75 font-mono">
-                                Nodos: {selectedItem.nodos_count || 0} · Aristas: {selectedItem.aristas_count || 0}
-                              </div>
-                            </div>
-                          </div>
+                        <div className="p-2 border bg-zinc-900/60 border-zinc-800">
+                          <div className="opacity-60 text-[9px] uppercase">Sintaxis</div>
+                          <div className="font-bold text-purple-400">{gateDecision.counts.observaciones_sintacticas_pendientes}</div>
+                        </div>
+                        <div className="p-2 border bg-zinc-900/60 border-zinc-800">
+                          <div className="opacity-60 text-[9px] uppercase">Incidentes</div>
+                          <div className="font-bold text-red-400">{gateDecision.counts.incidentes_operativos_abiertos}</div>
                         </div>
                       </div>
-                    ) : (
-                      <div className="space-y-6">
-                        {/* REVISION AND EDIT VIEW */}
-                        {!selectedItem.version_aprobada && (
-                          <div className="p-2.5 bg-amber-900/30 text-amber-300 border border-amber-800/50 text-xs font-mono">
-                            Bloqueado para Ingesta: Requiere aprobación explícita de versión.
-                          </div>
-                        )}
+                    )}
+                  </div>
 
-                        <div className="p-3 border space-y-2 rounded-none" style={{ backgroundColor: "var(--khora-bg)", borderColor: "var(--khora-border)" }}>
-                          <div className="flex justify-between items-center text-[10px] font-mono tracking-wider opacity-60 uppercase">
-                            <span>Reproducción de Audio</span>
-                            {renderAudioStatusBadge(selectedItem.audio_status)}
+                  {drawerSubTab === "cockpit" ? (
+                    <div className="flex-1 space-y-6">
+                      {/* Audio Resolution Banner if audio is unrecoverable */}
+                      {selectedItem.audio_status === "no_recuperable" && (
+                        <div className="p-3 border border-red-500/40 bg-red-950/20 text-xs font-mono flex justify-between items-center">
+                          <div className="text-red-300">
+                            🔴 Audio no disponible. Se requiere resolución explícita del operador para habilitar la aprobación.
                           </div>
-                          {selectedItem.audio_status !== "no_recuperable" ? (
-                            <div className="space-y-1.5">
-                              <audio
-                                src={`/api/audio/${selectedItem.id}`}
-                                controls
-                                preload="metadata"
-                                className="w-full h-8"
-                              />
-                              <p className="text-[10px] opacity-70 font-mono">
-                                Duración: {selectedItem.audio?.duration_sec || selectedItem.duracion_seg || 0} segundos · Partes: {selectedItem.partes_count || 1}
-                              </p>
-                            </div>
-                          ) : (
-                            <div className="text-red-400 italic text-xs">
-                              Audio no disponible o inaccesible para reproducción.
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Version Selector for edits */}
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="font-mono">Editar versión:</span>
-                          <select
-                            value={selectedVersionNum}
-                            onChange={(e) => changeSelectedVersion(Number(e.target.value))}
-                            className="p-1 border rounded-none text-xs font-mono"
-                            style={{
-                              backgroundColor: "var(--khora-bg)",
-                              borderColor: "var(--khora-border)",
-                              color: "var(--khora-ink)",
-                            }}
+                          <button
+                            onClick={() => setShowAudioResolveModal(true)}
+                            className="px-3 py-1 bg-red-600 text-white font-bold hover:bg-red-500 cursor-pointer text-xs"
                           >
-                            {versiones.map((v) => (
-                              <option key={v.version} value={v.version}>
-                                Versión {v.version} {selectedItem.version_aprobada === v.version ? "★" : ""}
-                              </option>
-                            ))}
-                          </select>
+                            Resolver Incidente Audio
+                          </button>
                         </div>
+                      )}
 
-                        {/* Editable Text Area */}
-                        <div className="space-y-1">
-                          <label className="text-[10px] font-mono tracking-wider uppercase opacity-60 block">
-                            Transcripción Editable
-                          </label>
+                      {/* Main Reading Column (68-76 chars) and Lateral Drawer */}
+                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                        {/* Reading Column */}
+                        <div className="lg:col-span-8 space-y-3">
+                          <div className="flex justify-between items-center text-xs font-mono opacity-60 uppercase">
+                            <span>Lectura y Transcripción (v{selectedVersionNum})</span>
+                            <span>{editableTexto.length} car</span>
+                          </div>
+
                           <textarea
                             value={editableTexto}
                             onChange={(e) => setEditableTexto(e.target.value)}
-                            className="w-full p-2.5 border rounded-none font-mono text-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
-                            rows={8}
+                            rows={12}
+                            className="w-full p-4 border font-mono text-sm leading-relaxed rounded-none focus:outline-none focus:ring-1 focus:ring-[var(--khora-accent)] max-w-prose"
                             style={{
                               backgroundColor: "var(--khora-bg)",
                               color: "var(--khora-ink)",
                               borderColor: "var(--khora-border)",
                             }}
                           />
+
+                          <div className="flex justify-between items-center pt-1">
+                            <button
+                              onClick={handleSaveEdits}
+                              disabled={savingVersion || !editableTexto.trim()}
+                              className="px-4 py-2 border font-mono text-xs font-bold bg-zinc-800 text-zinc-200 border-zinc-700 hover:bg-zinc-700 cursor-pointer flex items-center gap-1.5"
+                            >
+                              <Icons.Save size={14} />
+                              {savingVersion ? "Guardando..." : "Guardar Nueva Versión"}
+                            </button>
+                          </div>
                         </div>
 
-                        {/* Delta section */}
-{deltaPairs.length > 0 && (
-  <div className="space-y-1">
-    <label className="text-[10px] font-mono tracking-wider uppercase opacity-60 block">
-      Delta Changes
-    </label>
-    {deltaPairs.map((p, i) => (
-      <div key={i} className="text-xs font-mono p-2 border border-zinc-800 bg-zinc-950/40">
-        <div className="text-red-400">− {p.antes}</div>
-        <div className="text-emerald-400">+ {p.despues}</div>
-      </div>
-    ))}
-  </div>
-)}
+                        {/* Side Panel: Findings & Incidents */}
+                        <div className="lg:col-span-4 space-y-4">
+                          <h3 className="text-xs font-mono uppercase font-bold tracking-wider opacity-70 border-b pb-1">
+                            Hallazgos e Incidentes
+                          </h3>
 
-{/* Ingest warning if not approved */}
-{selectedItem.estado !== "listo_ingesta" && selectedItem.estado !== "ingerido" && (
-  <div className="text-amber-400 text-xs font-mono p-2 border border-amber-500/30 bg-amber-500/10">
-    Bloqueado para Ingesta: Requiere aprobación explícita de versión.
-  </div>
-)}
-
-{selectedItem.estado === "listo_ingesta" && (
-  <button
-    onClick={handleIngestApproved}
-    disabled={ingesting}
-    className="w-full py-2 border font-bold text-xs bg-emerald-500 text-zinc-950 border-emerald-400 hover:opacity-90"
-  >
-    {ingesting ? "Ingiriendo..." : "Ingerir versión aprobada"}
-  </button>
-)}
-
-{selectedItem.estado === "ingerido" && (
-  <div className="text-emerald-400 text-xs font-mono p-2 border border-emerald-500/30 bg-emerald-500/10">
-    ✓ INGESTADO — io_id: {selectedItem.io_id || "Generado"}
-  </div>
-)}
-
-                        {/* Action buttons */}
-                        <div className="grid grid-cols-2 gap-2">
-                          <button
-                            onClick={handleSaveEdits}
-                            disabled={savingVersion || !editableTexto.trim()}
-                            className="px-3 py-2 border rounded-none font-semibold text-xs cursor-pointer flex items-center justify-center gap-1 bg-zinc-800 text-zinc-200 border-zinc-700 hover:bg-zinc-700 transition-colors"
-                          >
-                            <Icons.Save size={14} />
-                            {savingVersion ? "Guardando..." : "Guardar versión"}
-                          </button>
-
-                          <button
-                            onClick={handleApproveVersion}
-                            disabled={approvingVersion || !selectedVersionNum}
-                            className="px-3 py-2 border rounded-none font-semibold text-xs cursor-pointer flex items-center justify-center gap-1"
-                            style={{
-                              backgroundColor: "var(--khora-accent)",
-                              color: "var(--khora-bg)",
-                              borderColor: "var(--khora-accent)",
-                            }}
-                          >
-                            <Icons.CheckCircle size={14} />
-                            {approvingVersion ? "Aprobando..." : `Aprobar v${selectedVersionNum}`}
-                          </button>
-                        </div>
-
-                        {/* Ingestion Action if Approved */}
-                        {selectedItem.version_aprobada && (
-                          <div className="p-3 border space-y-2 bg-emerald-950/20 border-emerald-800/40 text-xs font-mono">
-                            <div className="flex justify-between items-center text-emerald-400 font-bold">
-                              <span>✓ VERSIÓN APROBADA v{selectedItem.version_aprobada}</span>
-                              {selectedItem.estado === "ingerido" && <span className="text-emerald-300">✓ INGESTADO</span>}
+                          {/* Blockers List */}
+                          {gateDecision && gateDecision.blockers.length > 0 && (
+                            <div className="space-y-2">
+                              <span className="text-[10px] font-mono text-red-400 uppercase font-bold">Bloqueadores de Aprobación:</span>
+                              {gateDecision.blockers.map((b, idx) => (
+                                <div key={idx} className="p-2 border border-red-800/60 bg-red-950/30 text-xs font-mono text-red-300">
+                                  ❌ {b.message}
+                                </div>
+                              ))}
                             </div>
+                          )}
 
-                            {selectedItem.io_id && (
-                              <div className="text-[11px] text-emerald-300">
-                                io_id: {selectedItem.io_id}
-                              </div>
+                          {/* Hallazgos List */}
+                          <div className="space-y-2 max-h-60 overflow-y-auto">
+                            {hallazgos.length === 0 ? (
+                              <div className="text-xs font-mono opacity-50 italic">Sin hallazgos pendientes en esta versión.</div>
+                            ) : (
+                              hallazgos.map((h) => (
+                                <div key={h.id} className="p-2.5 border bg-zinc-900/80 border-zinc-800 text-xs font-mono space-y-1">
+                                  <div className="flex justify-between font-bold text-amber-300">
+                                    <span>{h.regla}</span>
+                                    <span className="uppercase text-[9px] border px-1">{h.tipo_categoria}</span>
+                                  </div>
+                                  <div className="text-zinc-400">"{h.texto_original}" → <span className="text-emerald-400">{h.sugerencia}</span></div>
+                                </div>
+                              ))
                             )}
+                          </div>
+                        </div>
+                      </div>
 
+                      {/* Sticky Bottom Audio Player Bar */}
+                      <div className="p-3 border bg-zinc-900 border-zinc-800 space-y-2">
+                        <div className="flex justify-between items-center text-xs font-mono">
+                          <span className="font-bold flex items-center gap-1">
+                            <Icons.Volume2 size={14} /> Reproductor de Audio (Parte {currentPartIndex} / {manifiestoPartes.length || 1})
+                          </span>
+                          {renderAudioStatusBadge(selectedItem.audio_status)}
+                        </div>
+
+                        {selectedItem.audio_status !== "no_recuperable" ? (
+                          <audio
+                            ref={audioRef}
+                            src={audioSourceUrl}
+                            controls
+                            preload="metadata"
+                            className="w-full h-8"
+                          />
+                        ) : (
+                          <div className="text-xs font-mono text-red-400 italic">Audio no disponible para reproducción.</div>
+                        )}
+                      </div>
+
+                      {/* Authoritative Approval Section with High Friction */}
+                      <div className="p-4 border bg-zinc-900/60 border-zinc-800 space-y-4 font-mono">
+                        <div className="flex justify-between items-center border-b pb-2 border-zinc-800">
+                          <div>
+                            <h4 className="font-bold text-xs uppercase tracking-wider">Compuerta de Aprobación Server-Side</h4>
+                            <span className="text-[10px] opacity-60">hash: {gateDecision?.gate_hash || "evaluando..."}</span>
+                          </div>
+
+                          {selectedItem.estado === "listo_ingesta" || selectedItem.estado === "ingerido" ? (
+                            <span className="text-xs font-bold text-emerald-400 border border-emerald-500/40 bg-emerald-950/40 px-2 py-1">
+                              ✓ APROBADO v{selectedItem.version_aprobada}
+                            </span>
+                          ) : (
+                            <span className={`text-xs font-bold px-2 py-1 border ${gateDecision?.canApprove ? "text-emerald-400 border-emerald-500/40 bg-emerald-950/40" : "text-red-400 border-red-500/40 bg-red-950/40"}`}>
+                              {gateDecision?.canApprove ? "Habilitado para Aprobación" : "Bloqueado"}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Actions line */}
+                        {selectedItem.estado !== "listo_ingesta" && selectedItem.estado !== "ingerido" && (
+                          <div className="space-y-3">
+                            <div className="flex flex-col sm:flex-row gap-3 items-center">
+                              {/* Continuous Hold Button (2 Seconds) */}
+                              <button
+                                onMouseDown={startHolding}
+                                onMouseUp={stopHolding}
+                                onMouseLeave={stopHolding}
+                                onTouchStart={startHolding}
+                                onTouchEnd={stopHolding}
+                                disabled={!gateDecision?.canApprove || approvingVersion}
+                                className="relative overflow-hidden w-full sm:w-2/3 py-3 font-bold text-xs border uppercase tracking-wider cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                                style={{
+                                  backgroundColor: "var(--khora-accent)",
+                                  color: "var(--khora-bg)",
+                                  borderColor: "var(--khora-accent)",
+                                }}
+                              >
+                                <span className="relative z-10 flex items-center justify-center gap-2">
+                                  <Icons.CheckCircle size={16} />
+                                  {approvingVersion
+                                    ? "Aprobando..."
+                                    : isHolding
+                                    ? `Mantén presionado (${holdProgress}%)`
+                                    : `Mantén presionado 2s para Aprobar v${selectedVersionNum}`}
+                                </span>
+                                <div
+                                  className="absolute left-0 top-0 bottom-0 bg-emerald-400/50 transition-all duration-75"
+                                  style={{ width: `${holdProgress}%` }}
+                                />
+                              </button>
+
+                              {/* Accessible Modal Alternative */}
+                              <button
+                                onClick={() => setShowAccessibleModal(true)}
+                                disabled={!gateDecision?.canApprove || approvingVersion}
+                                className="w-full sm:w-1/3 py-3 border font-semibold text-xs uppercase tracking-wider border-zinc-700 bg-zinc-800 hover:bg-zinc-700 cursor-pointer disabled:opacity-40"
+                              >
+                                Alternativa Teclado
+                              </button>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Single Ingestion Action */}
+                        {(selectedItem.estado === "listo_ingesta" || selectedItem.version_aprobada) && (
+                          <div className="pt-2 border-t border-zinc-800 space-y-2">
                             <button
                               onClick={handleIngestApproved}
                               disabled={ingesting}
-                              className="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold cursor-pointer transition-colors"
+                              className="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold text-xs uppercase tracking-wider cursor-pointer transition-colors"
                             >
-                              {ingesting ? "Ingiriendo..." : "Ingerir en Grafo PKG"}
+                              {ingesting ? "Ingiriendo en Grafo..." : "Ingerir versión aprobada"}
                             </button>
 
                             {ingestaResult && (
-                              <div className={`p-2 text-[11px] border ${ingestaResult.success ? "border-emerald-600 bg-emerald-900/40 text-emerald-200" : "border-red-600 bg-red-900/40 text-red-200"}`}>
-                                {ingestaResult.success ? `Ingesta completada. io_id: ${ingestaResult.io_id}` : `Error: ${ingestaResult.error}`}
+                              <div className={`p-2.5 text-xs font-mono border ${ingestaResult.success ? "border-emerald-600 bg-emerald-950/60 text-emerald-300" : "border-red-600 bg-red-950/60 text-red-300"}`}>
+                                {ingestaResult.success ? `✓ Ingesta exitosa — io_id: ${ingestaResult.io_id}` : `Error: ${ingestaResult.error}`}
                               </div>
                             )}
                           </div>
                         )}
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  ) : (
+                    /* TRACE SUBTAB */
+                    <div className="space-y-4 font-mono text-xs">
+                      <div className="p-3 border bg-zinc-950/40 border-zinc-800 space-y-2">
+                        <span className="text-[10px] uppercase tracking-wider opacity-60 block">Metadatos de Sesión</span>
+                        <div>UUID: {selectedItem.id}</div>
+                        <div>Folio: #{selectedItem.folio || "N/A"}</div>
+                        <div>Versión Aprobada: {selectedItem.version_aprobada ? `v${selectedItem.version_aprobada}` : "Ninguna"}</div>
+                        <div>SHA256: {selectedItem.sha256_aprobado || "N/A"}</div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ) : (
-                <div className="border p-8 text-center text-xs opacity-60 flex items-center justify-center h-full rounded-none" style={{ backgroundColor: "var(--khora-surface)", borderColor: "var(--khora-border)" }}>
-                  Selecciona un volcado de la lista para ver su trazabilidad y operaciones.
+                <div className="border p-8 text-center text-xs opacity-60 flex items-center justify-center h-full">
+                  Selecciona un volcado para abrir la Mesa de Revisión.
                 </div>
               )}
             </div>
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* ARCHIVE MANUAL & LEGACY INVENTORY VIEW */}
-          <div className="lg:col-span-1 space-y-4">
-            <div
-              className="border p-4 space-y-4 rounded-none shadow-none"
-              style={{ backgroundColor: "var(--khora-surface)", borderColor: "var(--khora-border)" }}
+        /* ARCHIVO MANUAL TAB */
+        <div className="border p-6 space-y-4 max-w-xl mx-auto font-mono text-xs" style={{ borderColor: "var(--khora-border)" }}>
+          <h3 className="text-sm font-bold uppercase tracking-wider">Archivador Verbatim Manual</h3>
+          <input
+            className="w-full p-2.5 border text-xs"
+            placeholder="Título opcional"
+            value={titulo}
+            onChange={(e) => setTitulo(e.target.value)}
+          />
+          <textarea
+            className="w-full p-2.5 border text-xs"
+            rows={8}
+            placeholder="Pega el texto del volcado aquí..."
+            value={texto}
+            onChange={(e) => setTexto(e.target.value)}
+          />
+          <button
+            onClick={async () => {
+              if (!texto.trim()) return;
+              setGuardandoVolcado(true);
+              try {
+                const res = await fetch("/api/volcado", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ texto, titulo }),
+                });
+                if (res.ok) {
+                  setTexto("");
+                  setTitulo("");
+                  await fetchPipeline();
+                  setActiveTab("pipeline");
+                }
+              } catch (e) {
+                console.error(e);
+              } finally {
+                setGuardandoVolcado(false);
+              }
+            }}
+            disabled={guardandoVolcado || !texto.trim()}
+            className="px-4 py-2 bg-emerald-500 text-zinc-950 font-bold uppercase cursor-pointer"
+          >
+            {guardandoVolcado ? "Archivando..." : "Archivar y Entrar a Revisión"}
+          </button>
+        </div>
+      )}
+
+      {/* Audio Resolution Modal */}
+      {showAudioResolveModal && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
+          <div className="border p-6 max-w-md w-full bg-zinc-950 border-zinc-700 space-y-4 font-mono text-xs">
+            <h3 className="text-sm font-bold uppercase text-red-400">Resolución de Incidente de Audio</h3>
+            <p className="text-zinc-300">
+              Selecciona la causa explícita para resolver la ausencia de audio en este volcado:
+            </p>
+            <select
+              value={selectedAudioResolveCode}
+              onChange={(e) => setSelectedAudioResolveCode(e.target.value)}
+              className="w-full p-2 border bg-zinc-900 border-zinc-700 text-zinc-200"
             >
-              <h3 className="text-xs uppercase tracking-widest font-bold border-b pb-1 opacity-70">
-                Archivador Verbatim
-              </h3>
-              <input
-                className="w-full p-2.5 border rounded-none text-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
-                style={{
-                  backgroundColor: "var(--khora-bg)",
-                  color: "var(--khora-ink)",
-                  borderColor: "var(--khora-border)",
-                }}
-                value={titulo}
-                onChange={(e) => setTitulo(e.target.value)}
-                placeholder="titulo opcional"
-                disabled={guardandoVolcado}
-              />
-              <textarea
-                className="w-full p-2.5 border rounded-none font-mono text-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
-                style={{
-                  backgroundColor: "var(--khora-bg)",
-                  color: "var(--khora-ink)",
-                  borderColor: "var(--khora-border)",
-                }}
-                rows={10}
-                value={texto}
-                onChange={(e) => setTexto(e.target.value)}
-                placeholder="pega aqui el volcado, tan largo como quieras"
-                disabled={guardandoVolcado}
-              />
-              <div className="flex items-center justify-between gap-4">
-                <button
-                  onClick={handleArchivarLegacy}
-                  disabled={guardandoVolcado || texto.trim().length === 0}
-                  className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold text-xs"
-                  style={{
-                    backgroundColor: "var(--khora-accent)",
-                    color: "var(--khora-bg)",
-                    borderColor: "var(--khora-accent)",
-                  }}
-                >
-                  <Icons.Save size={14} />
-                  {guardandoVolcado ? "archivando..." : "Archivar volcado"}
-                </button>
-                <span className="text-[10px] font-mono flex items-center gap-1 opacity-70">
-                  <Icons.Type size={12} />
-                  {texto.length} car
-                </span>
-              </div>
+              <option value="aceptado_sin_audio">aceptado_sin_audio (Aceptar conscientemente sin audio)</option>
+              <option value="audio_recuperado">audio_recuperado (Audio recuperado)</option>
+              <option value="captura_irrecuperable_confirmada">captura_irrecuperable_confirmada (Irrecuperable confirmado)</option>
+              <option value="falso_positivo">falso_positivo (Falso positivo)</option>
+            </select>
+            <div className="flex justify-end gap-2 pt-2">
+              <button onClick={() => setShowAudioResolveModal(false)} className="px-3 py-1.5 border border-zinc-700">Cancelar</button>
+              <button onClick={handleResolveAudioIncident} className="px-3 py-1.5 bg-red-600 text-white font-bold">Resolver Incidente</button>
             </div>
           </div>
+        </div>
+      )}
 
-          <div className="lg:col-span-2 space-y-4">
-            <div className="border p-4 rounded-none space-y-4" style={{ borderColor: "var(--khora-border)" }}>
-              <div className="flex justify-between items-baseline border-b pb-1">
-                <h3 className="text-xs uppercase tracking-widest font-bold opacity-70">
-                  Inventario Histórico
-                </h3>
-                <span className="text-[10px] font-mono opacity-60">
-                  {volcadosItems.length} items
-                </span>
-              </div>
-
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead>
-                    <tr className="border-b" style={{ borderColor: "var(--khora-border)" }}>
-                      <th className="pb-2 font-semibold">Folio</th>
-                      <th className="pb-2 font-semibold">Recibido</th>
-                      <th className="pb-2 font-semibold">Título</th>
-                      <th className="pb-2 font-semibold">Chars</th>
-                      <th className="pb-2 font-semibold">Estado</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {volcadosItems.map((v) => (
-                      <tr key={v.id} className="border-b last:border-b-0">
-                        <td className="py-2.5 font-mono">#{v.folio}</td>
-                        <td className="py-2.5">{new Date(v.recibido_en).toLocaleDateString()}</td>
-                        <td className="py-2.5 truncate max-w-[150px] font-semibold">{v.titulo || "—"}</td>
-                        <td className="py-2.5 font-mono">{v.chars}</td>
-                        <td className="py-2.5">
-                          <span className="border border-zinc-700 bg-zinc-800/40 text-[10px] font-mono px-1 py-0.5">
-                            {v.estado}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+      {/* Accessible Approval Modal */}
+      {showAccessibleModal && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
+          <div className="border p-6 max-w-md w-full bg-zinc-950 border-zinc-700 space-y-4 font-mono text-xs">
+            <h3 className="text-sm font-bold uppercase text-amber-400">Confirmación Accesible de Aprobación</h3>
+            <p className="text-zinc-300">
+              Escribe exactamente <strong className="text-emerald-400">APROBAR v{selectedVersionNum}</strong> para confirmar la autorización:
+            </p>
+            <input
+              type="text"
+              value={accessibleConfirmText}
+              onChange={(e) => setAccessibleConfirmText(e.target.value)}
+              placeholder={`APROBAR v${selectedVersionNum}`}
+              className="w-full p-2 border bg-zinc-900 border-zinc-700 text-zinc-100"
+            />
+            <div className="flex justify-end gap-2 pt-2">
+              <button onClick={() => setShowAccessibleModal(false)} className="px-3 py-1.5 border border-zinc-700">Cancelar</button>
+              <button
+                disabled={accessibleConfirmText !== `APROBAR v${selectedVersionNum}` || approvingVersion}
+                onClick={executeApproval}
+                className="px-4 py-1.5 bg-emerald-500 text-zinc-950 font-bold disabled:opacity-40"
+              >
+                {approvingVersion ? "Aprobando..." : "Confirmar Aprobación"}
+              </button>
             </div>
           </div>
         </div>

@@ -1,8 +1,22 @@
-// @l0 L0-002-R · @req FIX-DICTADO/AUTHORITATIVE-STT
+// @l0 L0-002-R · @req FIX-DICTADO/AUTHORITATIVE-STT · @req REVISION-COCKPIT/REQ-1
 import { obtenerGlosario } from "./pulido";
 import { aplicarGlosario } from "../transcripcion/ensamblar";
+import { getDb } from "./neon";
 
 const GROQ_STT_URL = "https://api.groq.com/openai/v1/audio/transcriptions";
+
+export type FuenteTiming = "word_exact" | "segment_interpolated";
+
+export interface PalabraTiming {
+  palabra: string;
+  char_inicio: number;
+  char_fin: number;
+  start_ms: number;
+  end_ms: number;
+  part_index: number;
+  fuente_timing: FuenteTiming;
+  confianza: number;
+}
 
 export type SegmentoWhisper = {
   id?: number;
@@ -31,6 +45,152 @@ export type MetadataChunk = {
   texto?: string;
   motivoError?: string;
 };
+
+const TIMING_DDL = `
+CREATE TABLE IF NOT EXISTS volcado_palabra_timing (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  volcado_id UUID NOT NULL REFERENCES volcado(id) ON DELETE CASCADE,
+  version INTEGER NOT NULL,
+  sha256 TEXT NOT NULL,
+  palabra TEXT NOT NULL,
+  char_inicio INTEGER NOT NULL,
+  char_fin INTEGER NOT NULL,
+  start_ms INTEGER NOT NULL,
+  end_ms INTEGER NOT NULL,
+  part_index INTEGER NOT NULL DEFAULT 1,
+  fuente_timing TEXT NOT NULL DEFAULT 'segment_interpolated',
+  confianza REAL NOT NULL DEFAULT 0.70,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS volcado_palabra_timing_volcado_ver_idx ON volcado_palabra_timing(volcado_id, version, sha256);
+`;
+
+let timingDdlListo = false;
+
+export async function asegurarTablaTiming(): Promise<void> {
+  if (timingDdlListo) return;
+  const db = getDb();
+  await db.query(TIMING_DDL);
+  timingDdlListo = true;
+}
+
+/**
+ * Persiste el mapa de palabras y tiempos en volcado_palabra_timing
+ */
+export async function guardarPalabrasTiming(
+  volcadoId: string,
+  version: number,
+  sha256: string,
+  palabras: PalabraTiming[]
+): Promise<void> {
+  await asegurarTablaTiming();
+  const db = getDb();
+
+  await db.query("DELETE FROM volcado_palabra_timing WHERE volcado_id = $1 AND version = $2", [volcadoId, version]);
+
+  for (const p of palabras) {
+    await db.query(
+      `INSERT INTO volcado_palabra_timing
+       (volcado_id, version, sha256, palabra, char_inicio, char_fin, start_ms, end_ms, part_index, fuente_timing, confianza)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+      [
+        volcadoId,
+        version,
+        sha256,
+        p.palabra,
+        p.char_inicio,
+        p.char_fin,
+        p.start_ms,
+        p.end_ms,
+        p.part_index,
+        p.fuente_timing,
+        p.confianza,
+      ]
+    );
+  }
+}
+
+export async function obtenerPalabrasTiming(volcadoId: string, version: number): Promise<PalabraTiming[]> {
+  await asegurarTablaTiming();
+  const db = getDb();
+  const res = await db.query(
+    `SELECT palabra, char_inicio, char_fin, start_ms, end_ms, part_index, fuente_timing, confianza
+     FROM volcado_palabra_timing
+     WHERE volcado_id = $1 AND version = $2
+     ORDER BY char_inicio ASC`,
+    [volcadoId, version]
+  );
+  return res.rows.map((r: any) => ({
+    palabra: r.palabra,
+    char_inicio: Number(r.char_inicio),
+    char_fin: Number(r.char_fin),
+    start_ms: Number(r.start_ms),
+    end_ms: Number(r.end_ms),
+    part_index: Number(r.part_index),
+    fuente_timing: r.fuente_timing as FuenteTiming,
+    confianza: Number(r.confianza),
+  }));
+}
+
+/**
+ * Interpola determinísticamente tiempos por palabra cuando sólo existen tiempos de segmento.
+ */
+export function interpolarPalabrasDeSegmentos(
+  textoCompleto: string,
+  segmentos: SegmentoWhisper[],
+  partIndex = 1
+): PalabraTiming[] {
+  const palabrasTiming: PalabraTiming[] = [];
+  if (!textoCompleto || segmentos.length === 0) return palabrasTiming;
+
+  let posTexto = 0;
+
+  for (const seg of segmentos) {
+    const textoSeg = seg.text.trim();
+    if (!textoSeg) continue;
+
+    const idxSeg = textoCompleto.indexOf(textoSeg, posTexto);
+    const charOffsetBase = idxSeg !== -1 ? idxSeg : posTexto;
+
+    const tokens = textoSeg.split(/(\s+)/);
+    const tokensPalabras = tokens.filter((t) => t.trim().length > 0);
+    const totalPalabras = tokensPalabras.length;
+
+    const segStartMs = seg.start_ms_global ?? Math.round(seg.start * 1000);
+    const segEndMs = seg.end_ms_global ?? Math.round(seg.end * 1000);
+    const duracionSegMs = Math.max(100, segEndMs - segStartMs);
+
+    let offsetCharLocal = 0;
+    tokensPalabras.forEach((tok, i) => {
+      const inicioTokLocal = textoSeg.indexOf(tok, offsetCharLocal);
+      offsetCharLocal = inicioTokLocal + tok.length;
+
+      const charInicio = charOffsetBase + inicioTokLocal;
+      const charFin = charInicio + tok.length;
+
+      const propStart = i / totalPalabras;
+      const propEnd = (i + 1) / totalPalabras;
+
+      const startMs = Math.round(segStartMs + propStart * duracionSegMs);
+      const endMs = Math.round(segStartMs + propEnd * duracionSegMs);
+
+      palabrasTiming.push({
+        palabra: tok,
+        char_inicio: charInicio,
+        char_fin: charFin,
+        start_ms: startMs,
+        end_ms: endMs,
+        part_index: partIndex,
+        fuente_timing: "segment_interpolated",
+        confianza: 0.7,
+      });
+    });
+
+    posTexto = charOffsetBase + textoSeg.length;
+  }
+
+  return palabrasTiming;
+}
 
 export function construirPromptSTT(glosario: Record<string, string>): string {
   const terminos = Object.values(glosario);
@@ -152,9 +312,6 @@ export interface IntervaloTemporal {
 
 /**
  * Une dos cadenas consecutivas deduplicando únicamente cuando existe intersección temporal efectiva.
- * REGLA INVARIANTE FASE 2:
- * - Mismo texto + intervalo temporal solapado = candidato a deduplicación.
- * - Mismo texto + intervalos temporales distintos = repetición oral genuina que DEBE conservarse.
  */
 export function unirDosTranscriptsConOverlapTemporal(
   izq: string,
@@ -168,13 +325,10 @@ export function unirDosTranscriptsConOverlapTemporal(
   if (!izqTrim) return derTrim;
   if (!derTrim) return izqTrim;
 
-  // Si se proporcionan intervalos temporales, verificar si hay intersección temporal efectiva
   if (intervaloIzq && intervaloDer) {
     const inicioInterseccion = Math.max(intervaloIzq.start_ms, intervaloDer.start_ms);
     const finInterseccion = Math.min(intervaloIzq.end_ms, intervaloDer.end_ms);
 
-    // Si NO hay solapamiento temporal entre las ventanas de audio (intersección <= 0),
-    // se trata de un intervalo temporal distinto: CONSERVAR ambas partes intactas.
     if (finInterseccion <= inicioInterseccion) {
       return `${izqTrim} ${derTrim}`;
     }
@@ -186,7 +340,6 @@ export function unirDosTranscriptsConOverlapTemporal(
   const normIzq = palabrasIzq.map(normalizarParaOverlap);
   const normDer = palabrasDer.map(normalizarParaOverlap);
 
-  // Buscar el mayor solapamiento de N palabras al inicio de `der` (de maxOverlap a 2)
   const maxOverlap = Math.min(palabrasIzq.length, palabrasDer.length, 15);
 
   for (let len = maxOverlap; len >= 2; len--) {
@@ -194,13 +347,11 @@ export function unirDosTranscriptsConOverlapTemporal(
     const prefijoDer = normDer.slice(0, len).join(" ");
 
     if (sufijoIzq.length > 0 && sufijoIzq === prefijoDer) {
-      // Coincidencia exacta de tokens normalizados encontrada en la zona de solapamiento
       const derSinOverlap = palabrasDer.slice(len).join(" ");
       return derSinOverlap ? `${izqTrim} ${derSinOverlap}` : izqTrim;
     }
   }
 
-  // Si no hay coincidencia de palabras al inicio de der, unir conservando todo el texto
   return `${izqTrim} ${derTrim}`;
 }
 
@@ -208,9 +359,6 @@ export function unirDosTranscriptsConOverlap(izq: string, der: string): string {
   return unirDosTranscriptsConOverlapTemporal(izq, der);
 }
 
-/**
- * Une un conjunto ordenado de transcripciones parciales de chunks deduplicando solapamientos temporales.
- */
 export function unirTranscriptsConOverlap(transcripts: string[]): string {
   const validos = transcripts.map((t) => t.trim()).filter((t) => t.length > 0);
   if (validos.length === 0) return "";
@@ -231,16 +379,6 @@ export type InputChunkData = {
   session_id?: string;
 };
 
-/**
- * Procesa incrementalmente partes/chunks de audio independientes o en secuencia con Groq Whisper.
- *
- * TOLERANCIA A FALLOS (REGLA INVARIANTE FASE 2):
- * Si un chunk intermedio falla (ej. chunk 2 de [1, 2, 3]), no destruye ni compacta la secuencia:
- * - Conserva el texto exitoso del chunk 1.
- * - Marca la posición del chunk 2 como `pendiente_error` sin unir falsamente chunk 1 y chunk 3.
- * - Conserva el texto exitoso del chunk 3.
- * - Permite un reintento idempotente posterior por `part_index`.
- */
 export async function procesarChunksIncrementalesConTiempos(
   chunks: InputChunkData[],
   opciones?: { filenamePrefix?: string }
@@ -319,7 +457,6 @@ export async function procesarChunksIncrementalesConTiempos(
     }
   }
 
-  // Ensamblar texto autoritativo conservando huecos de fallos pendientes
   const partesValidas: { texto: string; intervalo: IntervaloTemporal }[] = [];
   for (const item of detallesChunks) {
     if (item.estado === "autoritativo_whisper" && item.texto) {
@@ -405,15 +542,6 @@ export type SegmentoReconciliado = {
   end_ms_global?: number;
 };
 
-/**
- * Reconcilia la lista actual de segmentos (respetando estrictamente las ediciones manuales)
- * con la transcripción autoritativa de Groq Whisper.
- *
- * REGLAS INVARIANTES DE RECONCILIACIÓN FASE 2:
- * 1. Jamás sobreescribir un segmento con estado `editado_manual` o `modificadoManualmente === true`.
- * 2. Sustituir únicamente segmentos provisionales (`provisional_asr`, `whisper_provisional`) con contenido autoritativo.
- * 3. Identificar coincidencias y nuevos segmentos sin destruirlos ni alterar el foco.
- */
 export function reconciliarSegmentos(
   segmentosExistentes: SegmentoReconciliado[],
   nuevoTextoWhisper: string
@@ -464,7 +592,6 @@ export function reconciliarSegmentos(
 
     if (segExistente) {
       if (segExistente.estado === "editado_manual" || segExistente.modificadoManualmente) {
-        // PROTECCIÓN ESTRICTA: La edición manual del operador prevalece
         resultadoSegmentos.push(segExistente);
       } else if (parrafoWhisper) {
         if (segExistente.texto !== parrafoWhisper) {
@@ -500,10 +627,6 @@ export function reconciliarSegmentos(
   };
 }
 
-/**
- * Reconcilia la transcripción autoritativa de Groq con la previsualización del navegador (ASR).
- * Evita la duplicación de texto y respeta las modificaciones manuales explícitas si existen.
- */
 export function reconciliarTranscripcion(
   previewBrowser: string,
   textoAutoritativo: string,
@@ -512,7 +635,6 @@ export function reconciliarTranscripcion(
   const pTrim = previewBrowser.trim();
   const aTrim = textoAutoritativo.trim();
 
-  // Si el texto de entrada fue editado manualmente, PROTEGERLO
   if (opciones?.modificadoManualmente) {
     return {
       textoFinal: pTrim,

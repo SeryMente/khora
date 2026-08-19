@@ -1,8 +1,7 @@
-// @l0 L0-002-R · @req FIX-DICTADO/D2-D8 · @req TRACE-SESSION/010
+// @l0 L0-002-R · @req FIX-DICTADO/D2-D8 · @req TRACE-SESSION/010 · @req REVISION-COCKPIT/REQ-1
 import { randomUUID, createHash } from "crypto";
 import { getDb } from "./neon";
-import { asegurarTabla } from "./volcados";
-import { crearVersion } from "./correcciones";
+import { asegurarTabla, prepararVolcadoParaRevision } from "./volcados";
 import { cifrarTexto } from "./cripto";
 
 const ALTERS = [
@@ -42,11 +41,22 @@ CREATE TABLE IF NOT EXISTS dictado_audio_parte (
     sha256 TEXT,
     estado TEXT NOT NULL DEFAULT 'uploaded',
     uploaded_at TIMESTAMPTZ DEFAULT NOW(),
+    start_ms INTEGER,
+    end_ms INTEGER,
+    duracion_ms INTEGER,
+    estado_verificacion TEXT DEFAULT 'pendiente',
     CONSTRAINT dictado_audio_parte_session_part_uniq UNIQUE (session_id, part_index)
 );
 
 CREATE INDEX IF NOT EXISTS dictado_audio_parte_session_id_idx ON dictado_audio_parte (session_id);
 CREATE INDEX IF NOT EXISTS dictado_audio_parte_volcado_id_idx ON dictado_audio_parte (volcado_id);
+`;
+
+const EXTENDED_COLUMNS_SQL = `
+ALTER TABLE dictado_audio_parte ADD COLUMN IF NOT EXISTS start_ms INTEGER;
+ALTER TABLE dictado_audio_parte ADD COLUMN IF NOT EXISTS end_ms INTEGER;
+ALTER TABLE dictado_audio_parte ADD COLUMN IF NOT EXISTS duracion_ms INTEGER;
+ALTER TABLE dictado_audio_parte ADD COLUMN IF NOT EXISTS estado_verificacion TEXT DEFAULT 'pendiente';
 `;
 
 let columnasListas = false;
@@ -59,6 +69,7 @@ export async function asegurarColumnasDictado(): Promise<void> {
     await db.query(sql);
   }
   await db.query(SESSION_TABLES_SQL);
+  await db.query(EXTENDED_COLUMNS_SQL);
   columnasListas = true;
 }
 
@@ -68,6 +79,9 @@ export type AudioParte = {
   bytes: number;
   path?: string;
   sha256?: string;
+  start_ms?: number;
+  end_ms?: number;
+  duracion_ms?: number;
 };
 
 export type EntradaDictado = {
@@ -89,6 +103,9 @@ export async function registrarParteAudio(params: {
   blobPath?: string;
   bytes: number;
   sha256?: string;
+  startMs?: number;
+  endMs?: number;
+  duracionMs?: number;
 }) {
   await asegurarColumnasDictado();
   const db = getDb();
@@ -103,13 +120,16 @@ export async function registrarParteAudio(params: {
 
   // Registrar/Actualizar parte
   await db.query(
-    `INSERT INTO dictado_audio_parte (session_id, part_index, blob_url, blob_path, bytes, sha256)
-     VALUES ($1, $2, $3, $4, $5, $6)
+    `INSERT INTO dictado_audio_parte (session_id, part_index, blob_url, blob_path, bytes, sha256, start_ms, end_ms, duracion_ms)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
      ON CONFLICT (session_id, part_index) DO UPDATE
      SET blob_url = EXCLUDED.blob_url,
          blob_path = EXCLUDED.blob_path,
          bytes = EXCLUDED.bytes,
          sha256 = EXCLUDED.sha256,
+         start_ms = COALESCE(EXCLUDED.start_ms, dictado_audio_parte.start_ms),
+         end_ms = COALESCE(EXCLUDED.end_ms, dictado_audio_parte.end_ms),
+         duracion_ms = COALESCE(EXCLUDED.duracion_ms, dictado_audio_parte.duracion_ms),
          uploaded_at = NOW()`,
     [
       params.sessionId,
@@ -118,6 +138,9 @@ export async function registrarParteAudio(params: {
       params.blobPath ?? null,
       params.bytes,
       params.sha256 ?? null,
+      params.startMs ?? null,
+      params.endMs ?? null,
+      params.duracionMs ?? null,
     ]
   );
 }
@@ -154,8 +177,6 @@ export async function guardarDictado(entrada: EntradaDictado) {
     ]
   );
 
-  await crearVersion(id, entrada.texto, "transcripcion original del dictado");
-
   // Si existe sessionId, vincularlo bidireccionalmente y actualizar estado
   if (sessionId) {
     const totalPartes = Array.isArray(entrada.audioPartes) ? entrada.audioPartes.length : null;
@@ -178,6 +199,9 @@ export async function guardarDictado(entrada: EntradaDictado) {
       [id, sessionId]
     );
   }
+
+  // Preparar automáticamente y con semántica síncrona/transaccional hacia 'en_revision'
+  await prepararVolcadoParaRevision(id, entrada.usuario);
 
   return { id, sha256: sha, chars: entrada.texto.length, sessionId };
 }
