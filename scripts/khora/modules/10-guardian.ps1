@@ -3,7 +3,7 @@ function Get-KhoraIdleSeconds {
     if(-not('KhoraLastInput' -as[type])){Add-Type @'
 using System;using System.Runtime.InteropServices;public static class KhoraLastInput{[StructLayout(LayoutKind.Sequential)]public struct LASTINPUTINFO{public uint cbSize;public uint dwTime;}[DllImport("user32.dll")]static extern bool GetLastInputInfo(ref LASTINPUTINFO p);public static uint Seconds(){LASTINPUTINFO i=new LASTINPUTINFO();i.cbSize=(uint)Marshal.SizeOf(i);return GetLastInputInfo(ref i)?((uint)Environment.TickCount-i.dwTime)/1000:0;}}
 '@}
-    return[KhoraLastInput]::Seconds()
+    return [KhoraLastInput]::Seconds()
 }
 function Start-GuardianLoop {
     param([int]$WatchPid)

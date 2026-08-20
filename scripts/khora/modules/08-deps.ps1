@@ -189,7 +189,7 @@ function Start-KhoraDependencyHydration {
     if(Test-Path(Join-Path $web 'package-lock.json')){$script:DependencyJobs['node']=Start-Job -ArgumentList @($npm,$web) -ScriptBlock {param($npmPath,$directory)& $npmPath --prefix $directory ci --no-audit --no-fund;if($LASTEXITCODE-ne0){throw'npm ci falló'}}}
 }
 function Wait-KhoraDependencyHydration {
-    foreach($name in @($script:DependencyJobs.Keys)){$job=$script:DependencyJobs[$name];Wait-Job $job|Out-Null;$output=@(Receive-Job $job -ErrorAction SilentlyContinue);$output|ForEach-Object{Info ("dependency $name: "+[string]$_)};if($job.State-ne'Completed'){throw"Dependencias $name fallaron."};Remove-Job $job -Force}
+    foreach($name in @($script:DependencyJobs.Keys)){$job=$script:DependencyJobs[$name];Wait-Job $job|Out-Null;$output=@(Receive-Job $job -ErrorAction SilentlyContinue);$output|ForEach-Object{Info ("dependency ${name}: "+[string]$_)};if($job.State-ne'Completed'){throw"Dependencias $name fallaron."};Remove-Job $job -Force}
     $script:DependencyJobs=@{}
 }
 function Start-DepsPreload{Start-KhoraPrefetch}

@@ -33,7 +33,7 @@ function Protect-KhoraSecureStringBlob {
 }
 function Get-KhoraBootstrapHeaders {
     param([string]$Token)
-    return@{Authorization=('Bearer '+$Token);'Content-Type'='application/json';'User-Agent'='khora-ep-medio-v1'}
+    return @{Authorization=('Bearer '+$Token);'Content-Type'='application/json';'User-Agent'='khora-ep-medio-v1'}
 }
 function Send-KhoraBootstrapEvent {
     param([string]$Id,[string]$State,[string]$Message,[Nullable[long]]$DurationMs=$null)

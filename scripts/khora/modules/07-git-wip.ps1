@@ -35,7 +35,7 @@ function Get-KhoraStageablePaths {
         if([string]::IsNullOrWhiteSpace($line)-or$line.Length-lt4){continue};$path=$line.Substring(3).Trim('"');if($path-match' -> '){$path=($path-split' -> ')[-1].Trim('"')}
         if($path-match'(^|[\\/])\.env($|\.)|(^|[\\/])session-state([\\/]|$)|(^|[\\/])logs([\\/]|$)|\.token$|\.pat$'){Warn('Ruta sensible omitida: '+$path);continue};$paths.Add($path)
     }
-    return@($paths|Select-Object -Unique)
+    return @($paths|Select-Object -Unique)
 }
 function Push-Verified {
     param([string]$Branch=$script:WIP_BRANCH)
