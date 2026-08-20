@@ -43,10 +43,10 @@ function Publish-KhoraMain {
         $proof=[ordered]@{schema='khora-live-main/v1';branch='main';commitSha=$ExpectedSha;publishedUtc=[DateTime]::UtcNow.ToString('o')}
         $public=Join-Path $web 'public';New-Item -ItemType Directory -Path $public -Force|Out-Null
         [IO.File]::WriteAllText((Join-Path $public 'ep-main-live.json'),($proof|ConvertTo-Json -Compress),(New-Object Text.UTF8Encoding($false)))
-        $output=@(& $VercelPath link --yes --cwd $web --scope $CFG.vercelScope --project $CFG.vercelProject 2>&1);$exit=$LASTEXITCODE
+        $output=@(& $VercelPath link --yes --cwd $deployRoot --scope $CFG.vercelScope --project $CFG.vercelProject 2>&1);$exit=$LASTEXITCODE
         Write-KhoraVercelOutput -Lines $output -Prefix 'vercel link'
         if($exit-ne0){throw'vercel link fallo.'}
-        $output=@(& $VercelPath deploy --prod --cwd $web --scope $CFG.vercelScope 2>&1);$exit=$LASTEXITCODE
+        $output=@(& $VercelPath deploy --prod --cwd $deployRoot --scope $CFG.vercelScope 2>&1);$exit=$LASTEXITCODE
         Write-KhoraVercelOutput -Lines $output -Prefix 'vercel deploy production'
         if($exit-ne0){throw'vercel deploy --prod fallo.'}
         $canonical=([string]$CFG.vercelCanonicalUrl).TrimEnd('/')
