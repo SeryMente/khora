@@ -7,6 +7,7 @@
 - Codificación UTF-8 con marca de orden de bytes y finales CRLF para PowerShell: **OK**.
 - Delimitadores léxicos de PowerShell: **OK**.
 - Parser oficial de Windows PowerShell 5.1 para todos los scripts: **OK**.
+- Separacion lexica del keyword `return` y sus operandos, con prueba de ejecucion de la boveda: **OK**.
 - Pruebas unitarias completas de Seguridad y Entorno Persistente (`khora-web/tests/unit/ep_security.test.ts`): **OK** (75 tests pasando).
 - Contrato multiplataforma `POST /api/ep/token` con descriptor `launcher` y rechazo 400 `unsupported_platform`: **OK**.
 - Contrato estático de publicación obligatoria del SHA exacto de `main` en `EP-IN-080`, con `vercel deploy --prod`, árbol desechable y `ep-main-live.json`: **OK**.

@@ -1,7 +1,7 @@
 ﻿# Interfaz discreta con identificadores visibles.
 $script:UI_INDEX=@{'EP-IN-070'=7;'EP-IN-080'=8;'EP-IN-090'=9;'EP-IN-100'=10;'EP-IN-110'=11;'EP-IN-120'=12;'EP-IN-130'=13}
 $script:STATUS_FILE=Join-Path $WORK_DIR 'KHORA-STATUS.md'
-function Test-Cmd {param([string]$Name)return[bool](Get-Command $Name -ErrorAction SilentlyContinue)}
+function Test-Cmd {param([string]$Name)return [bool](Get-Command $Name -ErrorAction SilentlyContinue)}
 function Initialize-KhoraConsoleApi {
     if(-not('KhoraConsoleWindow' -as[type])){Add-Type @'
 using System;using System.Runtime.InteropServices;public static class KhoraConsoleWindow{[DllImport("kernel32.dll")]public static extern IntPtr GetConsoleWindow();[DllImport("user32.dll")]public static extern bool ShowWindow(IntPtr h,int n);}
@@ -29,10 +29,10 @@ function Write-KhoraUiReady {
 function Hide-KhoraUiConsole {try{Initialize-KhoraConsoleApi;[KhoraConsoleWindow]::ShowWindow([KhoraConsoleWindow]::GetConsoleWindow(),0)|Out-Null}catch{}}
 function Show-KhoraUiConsole {try{Initialize-KhoraConsoleApi;[KhoraConsoleWindow]::ShowWindow([KhoraConsoleWindow]::GetConsoleWindow(),5)|Out-Null}catch{}}
 function Write-InitHeader {Write-KhoraUiHeader}
-function Invoke-Preflight {return(Test-KhoraEncryptedWorkspace)}
-function Show-Estado {return[pscustomobject]@{session=$SESSION_ID;encrypted=(Test-KhoraEncryptedWorkspace);vscode=$script:VSCODE_PID}}
-function Open-LogWindow {return$script:SESSION.logPid}
+function Invoke-Preflight {return (Test-KhoraEncryptedWorkspace)}
+function Show-Estado {return [pscustomobject]@{session=$SESSION_ID;encrypted=(Test-KhoraEncryptedWorkspace);vscode=$script:VSCODE_PID}}
+function Open-LogWindow {return $script:SESSION.logPid}
 function Clear-PendingInput {}
 function Focus-Window {}
 function Show-Banner {}
-function Spin-Job {param($Label,$Block,$ArgList=@())return(& $Block @ArgList)}
+function Spin-Job {param($Label,$Block,$ArgList=@())return (& $Block @ArgList)}

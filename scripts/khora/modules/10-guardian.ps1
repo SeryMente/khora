@@ -16,12 +16,12 @@ function Start-GuardianLoop {
         if($vscodePid-gt0-and-not(Get-Process -Id $vscodePid -ErrorAction SilentlyContinue)){$reason='vscode-closed'}
         if((Get-KhoraIdleSeconds)-ge($CFG.inactivityMinutes*60)){$reason='deadman-inactivity'}
         if((Get-Date)-$lastHeartbeat-ge[TimeSpan]::FromSeconds(60)){try{Write-KhoraEvent -Id 'EP-RUN-020' -State INFO -Message 'Guardian activo' -RemoteOptional}catch{};$lastHeartbeat=Get-Date}
-        if($reason){try{Write-KhoraEvent -Id 'EP-RUN-030' -State INFO -Message ('Cierre solicitado: '+$reason) -RemoteOptional}catch{};Invoke-Cleanup -Reason $reason -Emergency;return}
+        if($reason){try{Write-KhoraEvent -Id 'EP-RUN-030' -State INFO -Message ('Cierre solicitado: '+$reason) -RemoteOptional}catch{};Invoke-Cleanup -Reason $reason -Emergency;return }
         Start-Sleep -Seconds 2
     }
 }
 function Start-Guardian {
     param([int]$WatchPid)
     $arguments=@('-NoProfile','-ExecutionPolicy','Bypass','-WindowStyle','Hidden','-File',('"'+$script:GATE_PATH+'"'),'-GuardianOnly','-SessionManifest',('"'+$script:SESSION_MANIFEST_PATH+'"'),'-WatchPid',$WatchPid)
-    $process=Start-Process powershell.exe -ArgumentList $arguments -WindowStyle Hidden -PassThru;$script:GUARD_PID=$process.Id;return$process
+    $process=Start-Process powershell.exe -ArgumentList $arguments -WindowStyle Hidden -PassThru;$script:GUARD_PID=$process.Id;return $process
 }

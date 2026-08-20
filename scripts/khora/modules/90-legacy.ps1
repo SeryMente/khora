@@ -1,1 +1,1 @@
-﻿function Assert-NoLegacyExecution{return$true}
+﻿function Assert-NoLegacyExecution{return $true}

@@ -2,7 +2,7 @@
 function Test-KhoraEncryptedWorkspace {
     try {
         $volume=Get-BitLockerVolume -MountPoint $MOUNT_POINT -ErrorAction Stop
-        return([string]$volume.ProtectionStatus -eq 'On' -and [int]$volume.EncryptionPercentage -eq 100 -and (Test-Path $VHD_PATH))
+        return ([string]$volume.ProtectionStatus -eq 'On' -and [int]$volume.EncryptionPercentage -eq 100 -and (Test-Path $VHD_PATH))
     } catch { return $false }
 }
 function Stop-KhoraWorkspaceProcesses {
@@ -22,19 +22,19 @@ function Stop-KhoraWorkspaceProcesses {
 function Lock-KhoraEncryptedVolume {
     try{Set-Location $env:SystemRoot}catch{}
     if(Test-Path($MOUNT_POINT+'\')){Lock-BitLocker -MountPoint $MOUNT_POINT -ForceDismount -ErrorAction Stop|Out-Null}
-    return$true
+    return $true
 }
 function Dismount-KhoraVhd {
     $file=Join-Path $env:SystemRoot ('Temp\khora-detach-'+[guid]::NewGuid().ToString('N')+'.txt')
     [IO.File]::WriteAllLines($file,@("select vdisk file=`"$VHD_PATH`"",'detach vdisk noerr'),(New-Object Text.ASCIIEncoding))
     try{& diskpart.exe /s $file|Out-Null}finally{Remove-Item -LiteralPath $file -Force -ErrorAction SilentlyContinue}
-    return(-not(Test-Path($MOUNT_POINT+'\')))
+    return (-not(Test-Path($MOUNT_POINT+'\')))
 }
 function Remove-KhoraContainer {
     Remove-Item -LiteralPath $VHD_PATH -Force -ErrorAction SilentlyContinue
     Remove-Item -LiteralPath $ROOT_DIR -Recurse -Force -ErrorAction SilentlyContinue
-    return(-not(Test-Path $ROOT_DIR))
+    return (-not(Test-Path $ROOT_DIR))
 }
-function Test-KhoraEncrypted { param($Path) return(Test-KhoraEncryptedWorkspace) }
-function Protect-KhoraPath { if(-not(Test-KhoraEncryptedWorkspace)){throw'Workspace sin BitLocker.'};return$true }
+function Test-KhoraEncrypted { param($Path) return (Test-KhoraEncryptedWorkspace) }
+function Protect-KhoraPath { if(-not(Test-KhoraEncryptedWorkspace)){throw'Workspace sin BitLocker.'};return $true }
 function Invoke-SecureDeleteFile { param($File) Remove-Item -LiteralPath $File -Force -ErrorAction SilentlyContinue }
