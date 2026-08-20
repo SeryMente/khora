@@ -1,62 +1,40 @@
-﻿# ================================================================
-# KHORA v7 - MODULO 05-efs.ps1
-# Componente: 05 efs
-# ================================================================
-
-function Test-KhoraEncrypted {
-    param([string]$path)
+﻿# Almacenamiento cifrado; no existe fallback de cifrado alternativo.
+function Test-KhoraEncryptedWorkspace {
     try {
-        $it = Get-Item $path -Force -ErrorAction Stop
-        return (($it.Attributes -band [IO.FileAttributes]::Encrypted) -ne 0)
+        $volume=Get-BitLockerVolume -MountPoint $MOUNT_POINT -ErrorAction Stop
+        return([string]$volume.ProtectionStatus -eq 'On' -and [int]$volume.EncryptionPercentage -eq 100 -and (Test-Path $VHD_PATH))
     } catch { return $false }
 }
-function Protect-KhoraPath {
-    param([string]$path, [string]$label = "carpeta")
-    if (-not (Test-Path $path)) { Warn "Ruta inexistente, no se puede cifrar: $path"; return $false }
-    if (-not (Test-Cmd cipher)) { Warn "cipher.exe no disponible: sin EFS para $label."; return $false }
-    # Sonda rapida: probar EFS en UN archivo temporal sin recorrer todo el arbol.
-    # Evita colgarse durante minutos si EFS esta bloqueado por directiva de dominio.
-    $probe = Join-Path $path (".efsprobe_$PID.tmp")
-    $canEfs = $false
-    try {
-        Set-Content -LiteralPath $probe -Value "efs-probe" -Encoding ASCII -ErrorAction Stop
-        $pout = cipher /e /a "$probe" 2>&1
-        $canEfs = (Test-KhoraEncrypted $probe)
-        if (-not $canEfs) {
-            $joined = ($pout | Out-String)
-            if ($joined -match "recuperaci" -or $joined -match "recovery") {
-                Warn "EFS deshabilitado por directiva del dominio (cert. de recuperacion no valido)."
-            } else {
-                Warn "EFS no disponible (Windows Home o GPO restrictiva)."
-            }
-        }
-    } catch {
-        Warn "No se pudo probar EFS: $_"
-    } finally {
-        Remove-Item -LiteralPath $probe -Force -ErrorAction SilentlyContinue
+function Stop-KhoraWorkspaceProcesses {
+    param([switch]$KeepLog)
+    $identifiers=@($script:VSCODE_PID,$script:GUARD_PID)
+    try{$identifiers+=@([int]$script:SESSION.supervisorPid,[int]$script:SESSION.guardianPid)}catch{}
+    if(-not$KeepLog){$identifiers+=@([int]$script:SESSION.logPid)}
+    foreach($identifier in ($identifiers|Select-Object -Unique)){
+        if([int]$identifier -gt 0 -and [int]$identifier -ne $PID){Stop-Process -Id $identifier -Force -ErrorAction SilentlyContinue}
     }
-    if (-not $canEfs) {
-        Warn "  Respaldo vigente: limpieza nuclear [X] + DeepFreeze del cyber."
-        return $false
+    foreach($name in @('Code','node','python','pythonw')){
+        Get-Process -Name $name -ErrorAction SilentlyContinue |
+            Where-Object{$_.Path -and $_.Path.StartsWith($WORK_DIR,[StringComparison]::OrdinalIgnoreCase)} |
+            Stop-Process -Force -ErrorAction SilentlyContinue
     }
-    # EFS funciona: marcar solo el directorio raiz SIN /s.
-    # Los archivos nuevos dentro heredaran cifrado; el arbol existente no se toca.
-    cipher /e "$path" 2>&1 | Out-Null
-    Ok "EFS ACTIVO: $label marcado. Nuevos archivos heredaran cifrado."
-    return $true
 }
-function Invoke-SecureDeleteFile {
-    # Anti-forense: sobrescribe con bytes aleatorios criptograficos antes de borrar,
-    # para que el contenido original no sea recuperable del disco.
-    param([string]$file)
-    if (-not (Test-Path $file)) { return }
-    try {
-        $len = [Math]::Max([int](Get-Item $file -Force).Length, 4096)
-        $rnd = New-Object byte[] $len
-        $rng = New-Object System.Security.Cryptography.RNGCryptoServiceProvider
-        $rng.GetBytes($rnd)
-        [IO.File]::WriteAllBytes($file, $rnd)
-        $rng.Dispose()
-    } catch {}
-    Remove-Item $file -Force -ErrorAction SilentlyContinue
+function Lock-KhoraEncryptedVolume {
+    try{Set-Location $env:SystemRoot}catch{}
+    if(Test-Path($MOUNT_POINT+'\')){Lock-BitLocker -MountPoint $MOUNT_POINT -ForceDismount -ErrorAction Stop|Out-Null}
+    return$true
 }
+function Dismount-KhoraVhd {
+    $file=Join-Path $env:SystemRoot ('Temp\khora-detach-'+[guid]::NewGuid().ToString('N')+'.txt')
+    [IO.File]::WriteAllLines($file,@("select vdisk file=`"$VHD_PATH`"",'detach vdisk noerr'),(New-Object Text.ASCIIEncoding))
+    try{& diskpart.exe /s $file|Out-Null}finally{Remove-Item -LiteralPath $file -Force -ErrorAction SilentlyContinue}
+    return(-not(Test-Path($MOUNT_POINT+'\')))
+}
+function Remove-KhoraContainer {
+    Remove-Item -LiteralPath $VHD_PATH -Force -ErrorAction SilentlyContinue
+    Remove-Item -LiteralPath $ROOT_DIR -Recurse -Force -ErrorAction SilentlyContinue
+    return(-not(Test-Path $ROOT_DIR))
+}
+function Test-KhoraEncrypted { param($Path) return(Test-KhoraEncryptedWorkspace) }
+function Protect-KhoraPath { if(-not(Test-KhoraEncryptedWorkspace)){throw'Workspace sin BitLocker.'};return$true }
+function Invoke-SecureDeleteFile { param($File) Remove-Item -LiteralPath $File -Force -ErrorAction SilentlyContinue }

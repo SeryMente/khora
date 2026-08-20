@@ -1,127 +1,63 @@
-﻿# ================================================================
-# KHORA v7 - MODULO 02-logging.ps1
-# Componente: 02 logging
-# ================================================================
-
+﻿# KHORA EP Medio v1.0 - registro local y remoto persistente
 function Mask-Token {
-    param([string]$Text)
-    if (-not $Text) { return $Text }
-
-    # 1. Regex general para tokens de github
-    $Text = $Text -replace 'gh[pousr]_[A-Za-z0-9]{36}', '***'
-    $Text = $Text -replace 'github_pat_[A-Za-z0-9_]{82}', '***'
-    $Text = $Text -replace '\b[0-9a-fA-F]{40}\b', '***'
-
-    # 2. Regex para URLs de github con auth: https://xxx@github.com -> https://github.com
-    $Text = $Text -replace 'https://[^@]+@github\.com', 'https://github.com'
-
-    return $Text
+    param([AllowNull()][string]$Text)
+    if ($null -eq $Text) { return '' }
+    $masked = $Text -replace '(ghp_[A-Za-z0-9_]{12})[A-Za-z0-9_]+','$1***'
+    $masked = $masked -replace '(github_pat_[A-Za-z0-9_]{12})[A-Za-z0-9_]+','$1***'
+    $masked = $masked -replace '(Bearer\s+[A-Za-z0-9._~-]{12})[A-Za-z0-9._~-]+','$1***'
+    return $masked
 }
-
-function Sync-EpLiveLog {
-    param([string]$Reason = "manual")
-    if (-not $REPO_DIR -or -not (Test-Path (Join-Path $REPO_DIR ".git"))) {
-        L "WARN" "EP-LIVE-LOG: sin repositorio local."
-        return $false
+function Invoke-WithKhoraToken {
+    param([ScriptBlock]$Action)
+    if (-not $script:KhoraTokenSecure) { throw 'Token Khora ausente.' }
+    $pointer = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($script:KhoraTokenSecure)
+    try { $plain = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($pointer); return (& $Action $plain) }
+    finally { [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($pointer); $plain = $null }
+}
+function Send-KhoraRemoteEvent {
+    param($Event)
+    $json = @{ events = @($Event) } | ConvertTo-Json -Depth 8 -Compress
+    $lastError = $null
+    foreach ($attempt in 1..3) {
+        try {
+            Invoke-WithKhoraToken -Action { param($token) Invoke-RestMethod -Method Post -Uri ($KHORA_API_BASE.TrimEnd('/') + '/events') -Headers @{Authorization=('Bearer '+$token);'Content-Type'='application/json'} -Body $json -TimeoutSec 20 | Out-Null } | Out-Null
+            return
+        } catch { $lastError = $_; Start-Sleep -Milliseconds (250 * $attempt) }
     }
-    if (-not $script:TokSecure) {
-        L "WARN" "EP-LIVE-LOG: sin token en memoria; publicacion omitida."
-        return $false
-    }
+    throw ('Bitácora remota no disponible: ' + $lastError.Exception.Message)
+}
+function Write-KhoraEvent {
+    param([ValidatePattern('^EP-(IN|RUN|OUT)-[0-9]{3}$')][string]$Id,[ValidateSet('START','OK','FAIL','INFO','SKIP')][string]$State,[string]$Message='',[Nullable[long]]$DurationMs=$null,[switch]$RemoteOptional)
+    $safe = Mask-Token $Message
+    $timestamp = [DateTime]::UtcNow.ToString('o')
+    $record = [ordered]@{timestamp=$timestamp;sessionId=$SESSION_ID;id=$Id;state=$State;message=$safe}
+    if ($null -ne $DurationMs) { $record.durationMs = [long]$DurationMs }
     try {
-        $target = Join-Path $REPO_DIR "EP-LIVE-LOG.md"
-        $branch = "$(git -C $REPO_DIR rev-parse --abbrev-ref HEAD 2>$null)".Trim()
-        if (-not $branch -or $branch -eq "HEAD") { $branch = "main" }
-        $head = "$(git -C $REPO_DIR rev-parse HEAD 2>$null)".Trim()
-        $status = if ($script:SES_ACTIVE) { "ACTIVE" } else { "CLOSING/CLOSED" }
-        $now = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-        $eventLines = @()
-        if (Test-Path $LOG_FILE) {
-            $eventLines += @(Get-Content -LiteralPath $LOG_FILE -Tail 240 -ErrorAction SilentlyContinue)
-        }
-        $sessionHistory = Join-Path $REPO_DIR "logs\sessions.log"
-        if (Test-Path $sessionHistory) {
-            $eventLines += @("","--- HISTORIAL DE SESIONES (ULTIMAS LINEAS) ---")
-            $eventLines += @(Get-Content -LiteralPath $sessionHistory -Tail 80 -ErrorAction SilentlyContinue)
-        }
-        $safe = foreach ($line in $eventLines) {
-            $s = Mask-Token -Text ([string]$line)
-            if ($env:USERNAME) { $s = $s.Replace($env:USERNAME,"<USER>") }
-            if ($env:COMPUTERNAME) { $s = $s.Replace($env:COMPUTERNAME,"<HOST>") }
-            if ($env:USERPROFILE) { $s = $s.Replace($env:USERPROFILE,"<USERPROFILE>") }
-            $s = $s -replace '(?i)C:\\Users\\[^\\\s]+','C:\Users\<USER>'
-            $s = $s -replace '(?i)\b[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}\b','<EMAIL>'
-            $s = $s -replace '\b(?:\d{1,3}\.){3}\d{1,3}\b','<IP>'
-            $s = $s -replace '(?i)Bearer\s+[A-Za-z0-9._~+/=-]+','Bearer [REDACTED]'
-            $s
-        }
-        $body = @(
-            "# KHORA EP — LIVE LOG"
-            ""
-            "**Propósito:** registro operativo público y sanitizado del Entorno Persistente."
-            "**Versión:** KHORA v$SCRIPT_VERSION"
-            "**Estado:** $status"
-            "**Última sincronización:** $now"
-            "**Motivo:** $Reason"
-            "**Branch publicado:** $branch"
-            "**HEAD observado:** $head"
-            ""
-            "> Este archivo es un registro operativo, no sustituye `EP-ARCHITECTURE.md`."
-            "> Se actualiza bajo demanda, al quedar lista una sesión y al iniciar el cierre de sesión."
-            ""
-            "## Eventos recientes"
-            ""
-        ) + $safe
-        [IO.File]::WriteAllText($target,($body -join "`r`n"),(New-Object System.Text.UTF8Encoding($false)))
-        git -C $REPO_DIR add -- "EP-LIVE-LOG.md" 2>&1 | Out-Null
-        if ($LASTEXITCODE -ne 0) { throw "git add EP-LIVE-LOG.md fallo." }
-        $staged = @(git -C $REPO_DIR diff --cached --name-only 2>$null)
-        if (($staged.Count -ne 1) -or ($staged[0] -ne "EP-LIVE-LOG.md")) {
-            git -C $REPO_DIR reset -- "EP-LIVE-LOG.md" 2>$null | Out-Null
-            throw "EP-LIVE-LOG: el staging no contiene exclusivamente EP-LIVE-LOG.md."
-        }
-        git -C $REPO_DIR diff --cached --quiet -- "EP-LIVE-LOG.md"
-        if ($LASTEXITCODE -eq 0) {
-            git -C $REPO_DIR reset -- "EP-LIVE-LOG.md" 2>$null | Out-Null
-            return $true
-        }
-        $msg = "ep-live-log: $Reason $(Get-Date -Format 'HH:mm:ss')"
-        git -C $REPO_DIR commit -m $msg 2>&1 | Out-Null
-        if ($LASTEXITCODE -ne 0) {
-            git -C $REPO_DIR reset -- "EP-LIVE-LOG.md" 2>$null | Out-Null
-            throw "commit EP-LIVE-LOG fallo."
-        }
-        if (Push-Verified -Branch $branch -Retries 3) { return $true }
-        $script:WIP_UNPUSHED = $true
-        Warn "EP-LIVE-LOG: commit creado pero push no verificado."
-        return $false
-    }
-    catch {
-        Warn "EP-LIVE-LOG: $_"
-        return $false
-    }
+        Add-Content -LiteralPath $LOG_FILE -Value ('{0} [{1}][{2}] {3}' -f $timestamp,$Id,$State,$safe) -Encoding UTF8
+        Add-Content -LiteralPath $JSON_LOG -Value ($record | ConvertTo-Json -Compress) -Encoding UTF8
+    } catch {}
+    try { Send-KhoraRemoteEvent -Event $record } catch { if (-not $RemoteOptional) { throw } else { try { Add-Content -LiteralPath $LOG_FILE -Value ('[REMOTE-WARN] '+$_.Exception.Message) -Encoding UTF8 } catch {} } }
 }
-function L {
-    param([string]$level, [string]$msg)
-    $msg = Mask-Token -Text $msg
-    $ts   = Get-Date -Format "HH:mm:ss"
-    $line = "[$ts][$level] $msg"
-    Add-Content $LOG_FILE $line -Encoding UTF8 -ErrorAction SilentlyContinue
-    Add-Content $WORK_LOG $line -Encoding UTF8 -ErrorAction SilentlyContinue
-    $j = [ordered]@{ t=(Get-Date -Format o); level=$level.Trim(); msg=$msg } | ConvertTo-Json -Compress
-    Add-Content $JSON_LOG $j -Encoding UTF8 -ErrorAction SilentlyContinue
-    $repoLog = Join-Path $REPO_DIR "logs\sessions.log"
-    if (Test-Path (Split-Path $repoLog -Parent)) {
-        Add-Content $repoLog $line -Encoding UTF8 -ErrorAction SilentlyContinue
-    }
+function Invoke-KhoraStage {
+    param([string]$Id,[string]$Label,[ScriptBlock]$Action)
+    $previous = $script:CURRENT_STAGE_ID;$script:CURRENT_STAGE_ID = $Id
+    Write-KhoraEvent -Id $Id -State START -Message $Label
+    Write-KhoraUiStage -Id $Id -State START -Label $Label
+    $watch = [Diagnostics.Stopwatch]::StartNew()
+    try {
+        $result = & $Action;$watch.Stop()
+        Write-KhoraEvent -Id $Id -State OK -Message $Label -DurationMs $watch.ElapsedMilliseconds
+        Write-KhoraUiStage -Id $Id -State OK -Label $Label -DurationMs $watch.ElapsedMilliseconds
+        return $result
+    } catch {
+        $watch.Stop();try { Write-KhoraEvent -Id $Id -State FAIL -Message ($Label+': '+$_.Exception.Message) -DurationMs $watch.ElapsedMilliseconds } catch {}
+        Write-KhoraUiStage -Id $Id -State FAIL -Label $Label -DurationMs $watch.ElapsedMilliseconds
+        throw
+    } finally { $script:CURRENT_STAGE_ID = $previous }
 }
-function Ok   { param([string]$m) $m = Mask-Token $m; $script:HUD_OK++; Update-HUD "OK  " $m "Green"; L "OK  " $m }
-function Fail { param([string]$m) $m = Mask-Token $m; $script:HUD_FAIL++; Update-HUD "FAIL" $m "Red"; L "FAIL" $m }
-function Info { param([string]$m) $m = Mask-Token $m; Update-HUD "INFO" $m "Cyan"; L "INFO" $m }
-function Warn { param([string]$m) $m = Mask-Token $m; $script:HUD_WARN++; Update-HUD "WARN" $m "Yellow"; L "WARN" $m }
-function Step { param([string]$m)
-    $m = Mask-Token $m
-    $script:HUD_STEP = $m
-    Update-HUD "STEP" $m "Magenta"
-    L "STEP" $m
-}
+function L { param([string]$Level,[string]$Message) $id=if($script:CURRENT_STAGE_ID){$script:CURRENT_STAGE_ID}else{'EP-RUN-020'};try{Add-Content -LiteralPath $LOG_FILE -Value ('{0} [{1}][{2}] {3}' -f [DateTime]::UtcNow.ToString('o'),$id,$Level,(Mask-Token $Message)) -Encoding UTF8}catch{} }
+function Step { param($Message) L -Level STEP -Message $Message }
+function Info { param($Message) L -Level INFO -Message $Message }
+function Ok { param($Message) L -Level OK -Message $Message }
+function Warn { param($Message) L -Level WARN -Message $Message }
+function Fail { param($Message) L -Level FAIL -Message $Message }

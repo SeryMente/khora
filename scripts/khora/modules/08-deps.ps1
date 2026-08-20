@@ -1,571 +1,202 @@
-﻿# ================================================================
-# KHORA v7 - MODULO 08-deps.ps1
-# Componente: 08 deps
-# ================================================================
+﻿# Toolchain efímero y precarga paralela.
+$script:PrefetchJobs = @{}
+$script:PrefetchPlan = @{}
+$script:DependencyJobs = @{}
 
-function Get-CodePaths {
-    @(
-        (Join-Path $env:LOCALAPPDATA "Programs\Microsoft VS Code\Code.exe"),
-        (Join-Path ${env:ProgramFiles} "Microsoft VS Code\Code.exe"),
-        (Join-Path ${env:ProgramFiles(x86)} "Microsoft VS Code\Code.exe")
-    )
+function Add-KhoraPath {
+    param([string]$Path)
+    if ($Path -and (Test-Path $Path) -and (($env:Path -split ';') -notcontains $Path)) { $env:Path = $Path + ';' + $env:Path }
 }
+
+function Start-KhoraDownloadJob {
+    param([string]$Name,[string]$Uri,[string]$Path)
+    if (Test-Path $Path) { return }
+    New-Item -ItemType Directory -Path (Split-Path -Parent $Path) -Force | Out-Null
+    $script:PrefetchPlan[$Name] = @{ Uri=$Uri; Path=$Path }
+    $script:PrefetchJobs[$Name] = Start-Job -ArgumentList @($Uri,$Path) -ScriptBlock {
+        param($source,$destination)
+        $ProgressPreference='SilentlyContinue'
+        [Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12
+        Invoke-WebRequest -Uri $source -OutFile $destination -UseBasicParsing -TimeoutSec 1200
+    }
+}
+
+function Start-KhoraPrefetch {
+    $directory = Join-Path $WORK_DIR 'prefetch'
+    New-Item -ItemType Directory -Path $directory -Force | Out-Null
+    if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
+        $release=Invoke-RestMethod -Uri 'https://api.github.com/repos/git-for-windows/git/releases/latest' -Headers @{'User-Agent'='khora-ep'}
+        $asset=$release.assets|Where-Object{$_.name -match '^PortableGit-.*-64-bit\.7z\.exe$'}|Select-Object -First 1
+        if(-not$asset){throw'No se encontró PortableGit.'}
+        Start-KhoraDownloadJob -Name git -Uri $asset.browser_download_url -Path (Join-Path $directory $asset.name)
+    }
+    if (-not (Get-Command gh -ErrorAction SilentlyContinue)) {
+        $release=Invoke-RestMethod -Uri 'https://api.github.com/repos/cli/cli/releases/latest' -Headers @{'User-Agent'='khora-ep'}
+        $asset=$release.assets|Where-Object{$_.name -match '^gh_.*_windows_amd64\.zip$'}|Select-Object -First 1
+        $sums=$release.assets|Where-Object{$_.name -match 'checksums\.txt$'}|Select-Object -First 1
+        if(-not$asset-or-not$sums){throw'No se encontró GitHub CLI.'}
+        Start-KhoraDownloadJob -Name gh -Uri $asset.browser_download_url -Path (Join-Path $directory $asset.name)
+        Start-KhoraDownloadJob -Name ghSums -Uri $sums.browser_download_url -Path (Join-Path $directory $sums.name)
+    }
+    if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
+        $index=Invoke-RestMethod -Uri 'https://nodejs.org/dist/index.json'
+        $release=$index|Where-Object{$_.lts -and ($_.files -contains 'win-x64-zip')}|Select-Object -First 1
+        if(-not$release){throw'No se encontró Node.js LTS.'}
+        $name='node-'+$release.version+'-win-x64.zip';$base='https://nodejs.org/dist/'+$release.version
+        Start-KhoraDownloadJob -Name node -Uri ($base+'/'+$name) -Path (Join-Path $directory $name)
+        Start-KhoraDownloadJob -Name nodeSums -Uri ($base+'/SHASUMS256.txt') -Path (Join-Path $directory 'node-SHASUMS256.txt')
+    }
+    if (-not (Get-Command python -ErrorAction SilentlyContinue)) {
+        Start-KhoraDownloadJob -Name python -Uri 'https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe' -Path (Join-Path $directory 'python-3.11.9-amd64.exe')
+    }
+    $metadata=Invoke-RestMethod -Uri 'https://update.code.visualstudio.com/api/update/win32-x64-archive/stable/latest'
+    $script:PrefetchPlan['vscodeHash']=[string]$metadata.sha256hash
+    Start-KhoraDownloadJob -Name vscode -Uri 'https://update.code.visualstudio.com/latest/win32-x64-archive/stable' -Path (Join-Path $directory 'vscode.zip')
+}
+
+function Wait-KhoraPrefetch {
+    param([string]$Name)
+    $job=$script:PrefetchJobs[$Name]
+    if($job){
+        Wait-Job $job|Out-Null
+        $output=@(Receive-Job $job -ErrorAction SilentlyContinue)
+        if($job.State -ne 'Completed'){throw("Descarga $Name falló: "+($output -join ' '))}
+        Remove-Job $job -Force
+        $script:PrefetchJobs.Remove($Name)
+    }
+    $plan=$script:PrefetchPlan[$Name]
+    if($plan -and (Test-Path $plan.Path)){return[string]$plan.Path}
+    return$null
+}
+
 function Ensure-Git {
-    if (Test-Cmd git) { return $true }
-    Warn "Git no encontrado. Instalando..."
-    if (Test-Cmd winget) {
-        try {
-            winget install --id Git.Git -e --source winget --silent --accept-package-agreements --accept-source-agreements 2>&1 | ForEach-Object { Info "winget: $_" }
-            $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
-            if (Test-Cmd git) { Ok "Git instalado via winget."; return $true }
-        } catch { Warn "winget fallo: $_" }
-    }
-    try {
-        Info "Descargando PortableGit..."
-        $api = Invoke-RestMethod "https://api.github.com/repos/git-for-windows/git/releases/latest" -Headers @{ "User-Agent"="khora" } -TimeoutSec 20
-        $asset = $api.assets | Where-Object { $_.name -match "PortableGit.*64-bit\.7z\.exe$" } | Select-Object -First 1
-        if ($asset) {
-            $dst = Join-Path $WORK_DIR "PortableGit.exe"
-            Invoke-WebRequest $asset.browser_download_url -OutFile $dst -UseBasicParsing -TimeoutSec 600
-            $gitDir = Join-Path $WORK_DIR "PortableGit"
-            Start-Process $dst -ArgumentList "-o`"$gitDir`"","-y" -Wait
-            $gitCmd = Join-Path $gitDir "cmd"
-            if (Test-Path (Join-Path $gitCmd "git.exe")) {
-                $env:Path = "$gitCmd;$env:Path"
-                Remove-Item $dst -Force -ErrorAction SilentlyContinue
-                if (Test-Cmd git) { Ok "PortableGit listo."; return $true }
-            }
-        }
-    } catch { Warn "PortableGit fallo: $_" }
-    Fail "No se pudo instalar Git. Instalalo manualmente y reintenta."
-    return $false
+    if(Get-Command git -ErrorAction SilentlyContinue){return$true}
+    $installer=Wait-KhoraPrefetch -Name git
+    if(-not$installer){throw'PortableGit ausente.'}
+    if((Get-AuthenticodeSignature $installer).Status -ne 'Valid'){throw'Firma PortableGit inválida.'}
+    $target=Join-Path $WORK_DIR 'tools\git';New-Item -ItemType Directory -Path $target -Force|Out-Null
+    $process=Start-Process $installer -ArgumentList @("-o`"$target`"",'-y') -Wait -PassThru
+    if($process.ExitCode -ne 0){throw'Extracción Git falló.'}
+    Add-KhoraPath -Path (Join-Path $target 'cmd')
+    return[bool](Get-Command git -ErrorAction SilentlyContinue)
 }
+
 function Ensure-GhCli {
-    if (Test-Cmd gh) { return $true }
-    Warn "GitHub CLI no encontrado. Instalando por usuario..."
-    if (Test-Cmd winget) {
-        try {
-            winget install --id GitHub.cli -e --scope user --silent --accept-package-agreements --accept-source-agreements 2>&1 | ForEach-Object { Info "winget gh: $_" }
-        } catch {
-            Warn ("Instalación de GitHub CLI falló: {0}" -f $_.Exception.Message)
-        }
-    } else {
-        Warn "winget no disponible; no se puede instalar GitHub CLI automáticamente."
-        return $false
-    }
-    $candidates = @(
-        (Join-Path $env:LOCALAPPDATA 'Programs\GitHub CLI\gh.exe'),
-        (Join-Path $env:LOCALAPPDATA 'Microsoft\WinGet\Packages\GitHub.cli_Microsoft.Winget.Source_8wekyb3d8bbwe\bin\gh.exe'),
-        (Join-Path $env:ProgramFiles 'GitHub CLI\gh.exe')
-    )
-    $gh = $null
-    foreach ($candidate in $candidates) {
-        if (Test-Path -LiteralPath $candidate) { $gh = $candidate; break }
-    }
-    if (-not $gh) {
-        $cmd = Get-Command gh -ErrorAction SilentlyContinue
-        if ($cmd) { $gh = $cmd.Source }
-    }
-    if ($gh) {
-        $dir = Split-Path -Parent $gh
-        if ($env:Path -notlike "*$dir*") { $env:Path = "$dir;$env:Path" }
-        Ok "GitHub CLI disponible: $gh"
-        return $true
-    }
-    Warn "GitHub CLI fue solicitado pero no quedó disponible."
-    return $false
+    $existing=Get-Command gh -ErrorAction SilentlyContinue;if($existing){return$existing.Source}
+    $zip=Wait-KhoraPrefetch -Name gh;$sumFile=Wait-KhoraPrefetch -Name ghSums
+    if(-not$zip-or-not$sumFile){throw'GitHub CLI ausente.'}
+    $line=Get-Content $sumFile|Where-Object{$_ -match [regex]::Escape((Split-Path $zip -Leaf))}|Select-Object -First 1
+    if(-not$line){throw'Checksum GitHub CLI ausente.'}
+    if((Get-FileHash $zip -Algorithm SHA256).Hash -ine (($line -split '\s+')[0])){throw'Checksum GitHub CLI inválido.'}
+    $target=Join-Path $WORK_DIR 'tools\gh';Expand-Archive -LiteralPath $zip -DestinationPath $target -Force
+    $gh=Get-ChildItem $target -Filter gh.exe -Recurse|Select-Object -First 1;if(-not$gh){throw'gh.exe ausente.'}
+    Add-KhoraPath -Path $gh.DirectoryName;return$gh.FullName
 }
+
 function Confirm-GhCliAuth {
-    param([switch]$CheckOnly)
-
-    if (-not (Ensure-GhCli)) {
-        Warn "GitHub CLI no disponible."
-        return $false
-    }
-
-    $authOutput = @(gh auth status 2>&1)
-    $authCode = $LASTEXITCODE
-
-    if ($authCode -ne 0) {
-        if ($CheckOnly) {
-            Warn "GitHub CLI no autenticado."
-            return $false
-        }
-
-        Info "Autenticando GitHub por navegador..."
-        gh auth login --hostname github.com --git-protocol https --web 2>&1 | ForEach-Object {
-            Info "gh: $_"
-        }
-
-        $authOutput = @(gh auth status 2>&1)
-        $authCode = $LASTEXITCODE
-
-        if ($authCode -ne 0) {
-            Fail "GitHub CLI no pudo autenticarse."
-            return $false
-        }
-    }
-
-    gh auth setup-git 2>&1 | ForEach-Object {
-        Info "gh setup-git: $_"
-    }
-
-    if ($LASTEXITCODE -ne 0) {
-        Fail "gh auth setup-git falló."
-        return $false
-    }
-
-    Ok "GitHub CLI autenticado y Git configurado para usar sus credenciales."
-    return $true
-}
-function Ensure-VSCode {
-    $code = Resolve-Exe "code" (Get-CodePaths) "Code.exe"
-    if ($code) { Ok "VS Code encontrado: $code"; return $code }
-if (Wait-ProactiveDepPrep -Key 'vscode' -Label 'VS Code') {
-    $code = Resolve-Exe "code" (Get-CodePaths) "Code.exe"
-    if ($code) { Ok "VS Code OK (tras instalacion proactiva): $code"; return $code }
-}
-    Warn "VS Code no encontrado. Intentando winget..."
-    if (Test-Cmd winget) {
-        try {
-            winget install --id Microsoft.VisualStudioCode -e --scope user --silent --accept-package-agreements --accept-source-agreements 2>&1 | ForEach-Object { Info "winget: $_" }
-            $code = Resolve-Exe "code" (Get-CodePaths) "Code.exe"
-            if ($code) { Ok "VS Code instalado via winget."; return $code }
-        } catch { Warn "winget fallo: $_" }
-    }
-    Warn "Descargando instalador oficial de VS Code (user setup)..."
-    $installer = Join-Path $WORK_DIR "VSCodeSetup.exe"
-    $url  = "https://update.code.visualstudio.com/latest/win32-x64-user/stable"
-    $expectedHash = $null
-    try {
-        $meta = Invoke-RestMethod "https://update.code.visualstudio.com/api/update/win32-x64-user/stable/latest" -TimeoutSec 20
-        if ($meta.sha256hash) { $expectedHash = $meta.sha256hash; Info "SHA256 esperado obtenido de la API." }
-    } catch { Warn "No se pudo obtener SHA256 de la API (continuo sin verificar)." }
-    for ($i=1; $i -le 3; $i++) {
-        try {
-            Info "Descargando VS Code (intento $i/3)..."
-            Invoke-WebRequest $url -OutFile $installer -UseBasicParsing -TimeoutSec 900
-            $sz = (Get-Item $installer -ErrorAction SilentlyContinue).Length
-            if (-not $sz -or $sz -lt 1000000) { throw "Archivo invalido: $sz bytes" }
-            Ok "Descarga: $([math]::Round($sz/1MB,1)) MB"
-            if ($expectedHash) {
-                $actual = (Get-FileHash $installer -Algorithm SHA256).Hash
-                if ($actual -ieq $expectedHash) { Ok "SHA256 verificado. Instalador integro." }
-else { Remove-Item $installer -Force -ErrorAction SilentlyContinue; Fail "SHA256 NO coincide. Instalador descartado por seguridad."; Write-Host ""; Write-Host "SESIÓN DETENIDA: SHA256 no coincide."; return $null }
-            }
-            Info "Instalando VS Code (modo usuario, sin admin)..."
-            $p = Start-Process $installer -ArgumentList "/VERYSILENT","/NORESTART","/MERGETASKS=!runcode,addtopath" -PassThru -Wait
-            Remove-Item $installer -Force -ErrorAction SilentlyContinue
-            if ($p.ExitCode -eq 0) {
-                $code = Resolve-Exe "code" (Get-CodePaths) "Code.exe"
-                if ($code) { Ok "VS Code instalado: $code"; return $code }
-            } else { throw "exit code $($p.ExitCode)" }
-        } catch {
-            Warn "Intento $i fallido: $_"
-            if (Test-Path $installer) { Remove-Item $installer -Force -ErrorAction SilentlyContinue }
-            Start-Sleep ($i*3)
-        }
-    }
-    Fail "No se pudo instalar VS Code."
-    return $null
-}
-function Get-CodeCli {
-    if (Test-Cmd code) { return "code" }
-    foreach ($exe in (Get-CodePaths)) {
-        if ($exe -and (Test-Path $exe)) {
-            $cli = Join-Path (Split-Path $exe -Parent) "bin\code.cmd"
-            if (Test-Path $cli) { return $cli }
-            return $exe
-        }
-    }
-    return $null
-}
-function Sync-VSCodeConfig {
-    Step "VS Code: importando configuracion desde el repo"
-    $dir = Join-Path $env:LOCALAPPDATA "KHORA\VSCode"
-    $extFile = Join-Path $dir "extensions.txt"
-    $setFile = Join-Path $dir "settings.user.json"
-    if (-not (Test-Path $extFile) -and -not (Test-Path $setFile)) {
-        if(-not(Test-Path -LiteralPath $dir)){New-Item -ItemType Directory -Path $dir -Force | Out-Null}
-        Set-Content $extFile "# Un ID de extension por linea (ej. ms-python.python)" -Encoding UTF8
-        Set-Content $setFile "{}" -Encoding UTF8
-        Info "Primera vez: creando almacenamiento persistente de VS Code en %LOCALAPPDATA%\KHORA\VSCode."
-        return
-    }
-    if (Test-Path $setFile) {
-        $dst = Join-Path $env:APPDATA "Code\User\settings.json"
-        try {
-            New-Item -ItemType Directory -Force (Split-Path $dst -Parent) | Out-Null
-            Copy-Item $setFile $dst -Force
-            Ok "settings.json aplicado desde persistencia externa de VS Code."
-        } catch { Warn "No pude aplicar settings.json: $_" }
-    }
-    $cli = Get-CodeCli
-    if (-not $cli) { Warn "CLI de VS Code no disponible; extensiones no sincronizadas."; return }
-    if (Test-Path $extFile) {
-        $wanted = @(Get-Content $extFile -ErrorAction SilentlyContinue | Where-Object { $_ -and $_ -notmatch '^\s*#' } | ForEach-Object { $_.Trim() })
-        if ($wanted.Count -eq 0) { Info "Lista de extensiones vacia."; return }
-        $have = @(& $cli --list-extensions 2>$null)
-        $n = 0
-        foreach ($e in $wanted) {
-            if ($have -notcontains $e) {
-                & $cli --install-extension $e --force 2>&1 | Out-Null
-                if ($LASTEXITCODE -eq 0) { $n++; Ok "Extension instalada: $e" } else { Warn "No se pudo instalar: $e" }
-            }
-        }
-        Ok "Extensiones sincronizadas: $($wanted.Count) en lista, $n instalada(s) ahora."
-    }
-}
-function Export-VSCodeConfig {
-    if (-not (Test-Path "$REPO_DIR\.git")) { return }
-    $dir = Join-Path $env:LOCALAPPDATA "KHORA\VSCode"
-    if(-not(Test-Path -LiteralPath $dir)){New-Item -ItemType Directory -Path $dir -Force | Out-Null}
-    $src = Join-Path $env:APPDATA "Code\User\settings.json"
-    if (Test-Path $src) { Copy-Item $src (Join-Path $dir "settings.user.json") -Force -ErrorAction SilentlyContinue; Ok "VS Code: settings.json exportado a persistencia externa." }
-    $cli = Get-CodeCli
-    if ($cli) {
-        $ext = @(& $cli --list-extensions 2>$null)
-        if ($ext.Count -gt 0) { Set-Content (Join-Path $dir "extensions.txt") ($ext -join "`r`n") -Encoding UTF8; Ok "VS Code: $($ext.Count) extension(es) exportadas a persistencia externa." }
-    }
-}
-function Start-DepsPreload {
-    $global:DepsPreloadLog = Join-Path $env:TEMP "khora-deps-preload.log"
-    if (Test-Path -LiteralPath $global:DepsPreloadLog) { Remove-Item -LiteralPath $global:DepsPreloadLog -Force -ErrorAction SilentlyContinue }
-
-    L "INFO" "Iniciando precarga paralela de dependencias (background job)..."
-    $global:DepsPreloadJob = Start-Job -ScriptBlock {
-        param($logFile, $repoDir)
-        function Log($msg) { Add-Content $logFile $msg -Encoding UTF8 }
-
-        Log "[DEPS] Iniciando precarga de dependencias..."
-
-        # Git
-        if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
-            Log "[DEPS] Git no encontrado. Intentando instalar via winget..."
-            winget install --id Git.Git -e --source winget --silent --accept-package-agreements --accept-source-agreements 2>&1 | Out-Null
-            if (Get-Command git -ErrorAction SilentlyContinue) { Log "[DEPS] Git instalado correctamente." } else { Log "[DEPS] [WARN] Git no pudo ser instalado." }
-        } else {
-            Log "[DEPS] Git ya esta instalado."
-        }
-
-        # Python 3.11
-        $py = $null
-        foreach ($cmd in @('python','python3','python3.11')) {
-            $c = Get-Command $cmd -ErrorAction SilentlyContinue
-            if ($c) { $v = & $c --version 2>&1; if ("$v" -match '3\.(1[1-9]|[2-9]\d)') { $py = $c; break } }
-        }
-        if (-not $py) {
-            Log "[DEPS] Python 3.11+ no encontrado. Instalando via winget..."
-            winget install --id Python.Python.3.11 -e --silent 2>&1 | Out-Null
-            $env:Path = [System.Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [System.Environment]::GetEnvironmentVariable('Path','User')
-            if (Get-Command python -ErrorAction SilentlyContinue) { Log "[DEPS] Python instalado correctamente." } else { Log "[DEPS] [WARN] Python no pudo ser instalado." }
-        } else {
-            Log "[DEPS] Python ya esta instalado."
-        }
-
-        # pip bootstrap si falta
-        $c = Get-Command python -ErrorAction SilentlyContinue
-        if ($c -and $c.Source -and (Test-Path -LiteralPath $c.Source) -and ($c.Source -notmatch "(?i)\\WindowsApps\\")) {
-            $pip = Get-Command pip -ErrorAction SilentlyContinue
-            if (-not $pip) {
-                Log "[DEPS] pip no encontrado. Bootstrapping..."
-                & $c -m ensurepip 2>&1 | Out-Null
-            }
-        }
-
-        # pip install -e .
-        if ($repoDir -and (Test-Path $repoDir)) {
-            Log "[DEPS] Ejecutando pip install -e . en $repoDir..."
-            $vDir = Join-Path $repoDir 'venv'
-            $pyExe = Join-Path $vDir 'Scripts\python.exe'
-            if (Test-Path $pyExe) {
-                & $pyExe -m pip install -e $repoDir -q 2>&1 | Out-Null
-                Log "[DEPS] pip install -e . ejecutado con exito."
-            } else {
-                Log "[DEPS] [WARN] No se encontro entorno virtual para pip install."
-            }
-        }
-
-        # Node.js
-        if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
-            Log "[DEPS] Node.js no encontrado. Instalando via winget..."
-            winget install --id OpenJS.NodeJS.LTS -e --silent 2>&1 | Out-Null
-            $env:Path = [System.Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [System.Environment]::GetEnvironmentVariable('Path','User')
-            if (Get-Command node -ErrorAction SilentlyContinue) { Log "[DEPS] Node.js instalado correctamente." } else { Log "[DEPS] [WARN] Node.js no pudo ser instalado." }
-        } else {
-            Log "[DEPS] Node.js ya esta instalado."
-        }
-
-        # Vercel CLI
-        if (-not (Get-Command vercel -ErrorAction SilentlyContinue)) {
-            if (Get-Command npm -ErrorAction SilentlyContinue) {
-                Log "[DEPS] Vercel CLI no encontrado. Instalando via npm..."
-                & npm install -g vercel 2>&1 | Out-Null
-                Log "[DEPS] Vercel CLI instalado."
-            } else { Log "[DEPS] [WARN] npm no disponible para instalar Vercel CLI." }
-        } else {
-            Log "[DEPS] Vercel CLI ya esta instalado."
-        }
-
-        # Docker Desktop
-        if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
-            Log "[DEPS] [WARN] Docker no encontrado. Instalalo manualmente."
-        } else {
-            Log "[DEPS] Verificando daemon de Docker..."
-            & docker ps 2>&1 | Out-Null
-            if ($LASTEXITCODE -ne 0) {
-                Log "[DEPS] Docker daemon inactivo. Intentando iniciar el servicio..."
-                $ddExe = "$env:ProgramFiles\Docker\Docker\Docker Desktop.exe"
-                if (Test-Path $ddExe) { Start-Process $ddExe } else { Start-Process 'Docker Desktop' -ErrorAction SilentlyContinue }
-                $sw = [System.Diagnostics.Stopwatch]::StartNew()
-                $ready = $false
-                while ($sw.Elapsed.TotalSeconds -lt 15 -and -not $ready) {
-                    & docker ps 2>&1 | Out-Null
-                    if ($LASTEXITCODE -eq 0) { $ready = $true } else { Start-Sleep -Seconds 2 }
-                }
-                if ($ready) { Log "[DEPS] Docker daemon activo tras timeout." } else { Log "[DEPS] [WARN] Docker daemon no respondio en 15s." }
-            } else {
-                Log "[DEPS] Docker daemon ya esta corriendo."
-            }
-        }
-
-        Log "[DEPS] Precarga en segundo plano finalizada."
-    } -ArgumentList $global:DepsPreloadLog, $script:REPO_DIR
+    if(-not(Ensure-Git)){return$false};$gh=Ensure-GhCli
+    Invoke-WithToken -Action {
+        param($token)
+        $env:GH_TOKEN=$token
+        try{$token|& $gh auth login --hostname github.com --git-protocol https --with-token --insecure-storage 2>&1|ForEach-Object{Info ('gh: '+(Mask-Token([string]$_)))}}
+        finally{Remove-Item Env:GH_TOKEN -ErrorAction SilentlyContinue}
+    }|Out-Null
+    if($LASTEXITCODE -ne 0){return$false}
+    & $gh auth setup-git --hostname github.com|Out-Null
+    return($LASTEXITCODE -eq 0 -and (Test-KhoraGitHubToken))
 }
 
-function Wait-DepsPreload {
-    param($Job)
-    if ($Job) {
-        L "INFO" "Esperando finalizacion de precarga de dependencias en background..."
-        $res = Receive-Job -Job $Job -Wait -AutoRemoveJob 2>&1
-        $ts = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
-        if ($res.Exception -and $res.Exception.Count -gt 0) {
-            foreach ($err in $res.Exception) { Warn "[DEPS] Error en job: $err" }
-            Warn "[DEPS] Precarga completada con advertencias. Estado: WARN $ts"
-        } else {
-            Ok "[DEPS] Precarga completada. Estado: OK $ts"
-        }
-
-        $env:Path = [System.Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [System.Environment]::GetEnvironmentVariable('Path','User')
-    }
-}
-
-function Start-ProactiveDepPrep {
-    if ($script:PrepJobsStarted) { return }
-    $script:PrepJobsStarted = $true
-    $script:PrepJobs = @{}
-L "INFO" "Iniciando comprobacion de dependencias proactiva en segundo plano..."
-
-# Python
-$py = $null
-foreach ($cmd in @('python','python3','python3.11')) {
-$c = Get-Command $cmd -ErrorAction SilentlyContinue
-        if ($c -and $c.Source -and (Test-Path -LiteralPath $c.Source) -and ($c.Source -notmatch "(?i)\\WindowsApps\\")) {
-$v = & $c --version 2>&1
-if ("$v" -match '3\.(1[1-9]|[2-9]\d)') { $py = $c; break }
-}
-}
-if (-not $py) {
-L "INFO" "Lanzando instalacion proactiva: Python 3.11"
-$script:PrepJobs['python'] = Start-Job -ScriptBlock { winget install --id Python.Python.3.11 -e --silent 2>&1 }
-}
-
-# Node.js
-if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
-L "INFO" "Lanzando instalacion proactiva: Node.js LTS"
-$script:PrepJobs['node'] = Start-Job -ScriptBlock { winget install --id OpenJS.NodeJS.LTS -e --silent 2>&1 }
-}
-
-# Docker
-if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
-L "INFO" "Lanzando instalacion proactiva: Docker Desktop"
-$script:PrepJobs['docker'] = Start-Job -ScriptBlock { winget install --id Docker.DockerDesktop -e --silent 2>&1 }
-}
-
-# VS Code
-$code = Resolve-Exe "code" (Get-CodePaths) "Code.exe"
-if (-not $code) {
-L "INFO" "Lanzando instalacion proactiva: VS Code"
-$script:PrepJobs['vscode'] = Start-Job -ScriptBlock { winget install --id Microsoft.VisualStudioCode -e --scope user --silent --accept-package-agreements --accept-source-agreements 2>&1 }
-    }
-}
-function Wait-ProactiveDepPrep {
-    param([string]$Key, [string]$Label)
-if ($script:PrepJobs -and $script:PrepJobs.ContainsKey($Key)) {
-$job = $script:PrepJobs[$Key]
-if ($job) {
-L "INFO" "Esperando instalacion proactiva en progreso para: $Label"
-$out = Spin-Job "Finalizando instalacion de $Label (ya en progreso)" -ArgList @($job) -Tips @('esperando job en segundo plano...','casi listo...') -Block {
-param($j)
-Receive-Job -Job $j -Wait -AutoRemoveJob 2>&1
-}
-$out | ForEach-Object { L "INFO" "winget proactivo ($Key): $*" }
-$script:PrepJobs.Remove($Key)
-
-# Refrescar PATH
-$env:Path = [System.Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [System.Environment]::GetEnvironmentVariable('Path','User')
-return $true
-}
-}
-return $false
-}
-function Ensure-Python311 {
-    L "INFO" "=== Ensure-Python311: buscando Python 3.11+ del usuario operativo ==="
-    $target = Join-Path $env:LOCALAPPDATA "Programs\Python\Python311\python.exe"
-    if (Test-Path -LiteralPath $target) {
-        try {
-            $v = & $target --version 2>&1
-            if ("$v" -match "^Python 3\.(1[1-9]|[2-9]\d)") {
-                Ok "Python OK: $v ($target)"
-                return $target
-            }
-        } catch {}
-    }
-    foreach ($cmd in @("python","python3","python3.11")) {
-        $c = Get-Command $cmd -ErrorAction SilentlyContinue
-        if ($c -and $c.Source -and (Test-Path -LiteralPath $c.Source) -and ($c.Source -notmatch "(?i)\\WindowsApps\\")) {
-            try {
-                $v = & $c.Source --version 2>&1
-                L "INFO" ("  Candidato {0} en {1}: {2}" -f $cmd,$c.Source,$v)
-                if ("$v" -match "^Python 3\.(1[1-9]|[2-9]\d)") {
-                    Ok "Python OK: $v ($($c.Source))"
-                    return $c.Source
-                }
-            } catch {}
-        }
-    }
-    Info "Python 3.11+ no encontrado. Descargando instalador oficial 3.11.9 para usuario..."
-    $installer = Join-Path $env:TEMP "python-3.11.9-amd64.exe"
-    $url = "https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe"
-    try {
-        if (Test-Path -LiteralPath $installer) { Remove-Item -LiteralPath $installer -Force -ErrorAction SilentlyContinue }
-        Invoke-WebRequest -Uri $url -OutFile $installer -UseBasicParsing -TimeoutSec 120
-        if (-not (Test-Path -LiteralPath $installer)) { throw "No se descargó el instalador de Python." }
-        $sig = Get-AuthenticodeSignature -FilePath $installer
-        if ($sig.Status -ne "Valid") { throw "Firma Authenticode inválida: $($sig.Status)" }
-        $targetDir = Join-Path $env:LOCALAPPDATA "Programs\Python\Python311"
-        New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
-        $args = "/quiet InstallAllUsers=0 PrependPath=0 Include_pip=1 Include_test=0 TargetDir=`"$targetDir`""
-        $p = Start-Process -FilePath $installer -ArgumentList $args -PassThru -Wait -WindowStyle Hidden
-        if ($p.ExitCode -ne 0) { throw "Instalador Python devolvió exit code $($p.ExitCode)." }
-        if (-not (Test-Path -LiteralPath $target)) { throw "Python no quedó instalado en $target." }
-        $v = & $target --version 2>&1
-        if ("$v" -notmatch "^Python 3\.(1[1-9]|[2-9]\d)") { throw "Versión Python inesperada: $v" }
-        $env:Path = "$env:LOCALAPPDATA\Programs\Python\Python311;$env:LOCALAPPDATA\Programs\Python\Python311\Scripts;$env:Path"
-        Remove-Item -LiteralPath $installer -Force -ErrorAction SilentlyContinue
-        Ok "Python OK: $v ($target)"
-        return $target
-    } catch {
-        Remove-Item -LiteralPath $installer -Force -ErrorAction SilentlyContinue
-        Warn "No se pudo instalar Python del usuario operativo: $($_.Exception.Message)"
-        return $null
-    }
-}
-function Setup-Venv {
-    L "INFO" "=== Setup-Venv: configurando entorno virtual Python ==="
-    $vDir  = Join-Path $WORK_DIR 'venv'
-    $pyExe = Join-Path $vDir 'Scripts\python.exe'
-    if (-not (Test-Path $pyExe)) {
-        $py = Ensure-Python311
-        if ($py) {
-            $out = Spin-Job "Creando entorno virtual Python" -ArgList @($vDir, $py) -Tips @('inicializando venv...','copiando interprete...','configurando pip...','preparando stdlib...') -Block {
-                param($vd, $pe); & $pe -m venv $vd 2>&1
-            }
-            $out | ForEach-Object { L "INFO" "venv: $_" }
-        }
-    }
-    if (Test-Path $pyExe) {
-        $out = Spin-Job "pip install -e . (dependencias Python)" -ArgList @($REPO_DIR, $pyExe) -Tips @('leyendo pyproject.toml...','descargando paquetes...','instalando FastAPI...','instalando uvicorn...','instalando neo4j driver...','instalando cryptography...','resolviendo dependencias...','compilando extensiones...','casi listo...') -Block {
-            param($rd, $pe); & $pe -m pip install -e $rd -q 2>&1
-        }
-        $out | ForEach-Object { L "INFO" "pip: $_" }
-        Ok "Venv Python listo: $vDir"
-    } else { Warn "Venv no creado. Verifica Python 3.11+." }
-}
 function Ensure-Node {
-    L "INFO" "=== Ensure-Node: verificando Node.js ==="
-    $n = Get-Command node -ErrorAction SilentlyContinue
-    if ($n) { $v = & node --version 2>&1; L "INFO" "Node en PATH: $($n.Source) v$v"; Ok "Node OK: $v"; return $n.Source }
-
-if (Wait-ProactiveDepPrep -Key 'node' -Label 'Node.js LTS') {
-$n = Get-Command node -ErrorAction SilentlyContinue
-if ($n) { $v = & node --version 2>&1; Ok "Node OK (tras instalacion proactiva): $v"; return $n.Source }
+    $existing=Get-Command node -ErrorAction SilentlyContinue;if($existing){return$existing.Source}
+    $zip=Wait-KhoraPrefetch -Name node;$sumFile=Wait-KhoraPrefetch -Name nodeSums
+    if(-not$zip-or-not$sumFile){throw'Node.js ausente.'}
+    $line=Get-Content $sumFile|Where-Object{$_ -match [regex]::Escape((Split-Path $zip -Leaf))}|Select-Object -First 1
+    if(-not$line-or(Get-FileHash $zip -Algorithm SHA256).Hash -ine (($line.Trim() -split '\s+')[0])){throw'Checksum Node.js inválido.'}
+    $target=Join-Path $WORK_DIR 'tools\node';Expand-Archive -LiteralPath $zip -DestinationPath $target -Force
+    $node=Get-ChildItem $target -Filter node.exe -Recurse|Select-Object -First 1;if(-not$node){throw'node.exe ausente.'}
+    Add-KhoraPath -Path $node.DirectoryName;return$node.FullName
 }
 
-    Info "Node.js no encontrado. Instalando con animacion..."
-    $out = Spin-Job "Instalando Node.js LTS" -Tips @('descargando Node.js...','instalando NPM...','configurando entorno...','actualizando PATH...','casi listo...') -Block {
-        winget install --id OpenJS.NodeJS.LTS -e --silent 2>&1
-    }
-    $out | ForEach-Object { L "INFO" "winget: $_" }
-    $env:Path = [System.Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [System.Environment]::GetEnvironmentVariable('Path','User')
-    $n = Get-Command node -ErrorAction SilentlyContinue
-    if ($n) { $v = & node --version 2>&1; Ok "Node instalado: $v"; return $n.Source }
-    Warn "Node.js no disponible. Instala manualmente."; return $null
+function Ensure-Python311 {
+    $existing=Get-Command python -ErrorAction SilentlyContinue
+    if($existing -and $existing.Source -notmatch '\\WindowsApps\\'){if((& $existing.Source --version 2>&1) -match '^Python 3\.(1[1-9]|[2-9]\d)'){return$existing.Source}}
+    $installer=Wait-KhoraPrefetch -Name python;if(-not$installer){throw'Python ausente.'}
+    if((Get-AuthenticodeSignature $installer).Status -ne 'Valid'){throw'Firma Python inválida.'}
+    $target=Join-Path $WORK_DIR 'tools\python311';New-Item -ItemType Directory -Path $target -Force|Out-Null
+    $arguments='/quiet InstallAllUsers=0 PrependPath=0 Include_pip=1 Include_test=0 TargetDir="'+$target+'"'
+    $process=Start-Process $installer -ArgumentList $arguments -Wait -PassThru -WindowStyle Hidden
+    $python=Join-Path $target 'python.exe';if($process.ExitCode -ne 0 -or -not(Test-Path $python)){throw'Instalación Python falló.'}
+    Add-KhoraPath -Path $target;return$python
 }
-function Ensure-Docker {
-    $dockerCmd = Get-Command docker -ErrorAction SilentlyContinue
-    if (-not $dockerCmd) {
-        if (Wait-ProactiveDepPrep -Key 'docker' -Label 'Docker Desktop') {
-            $dockerCmd = Get-Command docker -ErrorAction SilentlyContinue
-        }
-    }
 
-    if (-not $dockerCmd) {
-        Info "Docker Desktop no encontrado. Instalando (puede tardar varios minutos)..."
-        $out = Spin-Job "Instalando Docker Desktop" -Tips @('descargando Docker Desktop...','extrayendo componentes...','instalando WSL2 backend...','configurando servicios...','registrando Docker Engine...','casi listo...','ultimo paso...') -Block {
-            winget install --id Docker.DockerDesktop -e --silent 2>&1
-        }
-        $out | ForEach-Object { L "INFO" "winget: $_" }
-        $env:Path = [System.Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [System.Environment]::GetEnvironmentVariable('Path','User')
-        $dockerCmd = Get-Command docker -ErrorAction SilentlyContinue
-        if (-not $dockerCmd) { Warn "Docker no disponible post-instalacion. Puede requerir reinicio."; return }
+function Ensure-VSCode {
+    $target=Join-Path $WORK_DIR 'tools\vscode';$code=Join-Path $target 'Code.exe'
+    if(-not(Test-Path $code)){
+        $zip=Wait-KhoraPrefetch -Name vscode;if(-not$zip){throw'Visual Studio Code ausente.'}
+        $expected=[string]$script:PrefetchPlan['vscodeHash'];if($expected -and (Get-FileHash $zip -Algorithm SHA256).Hash -ine $expected){throw'Checksum Visual Studio Code inválido.'}
+        Expand-Archive -LiteralPath $zip -DestinationPath $target -Force
+        if(-not(Test-Path $code)-or(Get-AuthenticodeSignature $code).Status -ne 'Valid'){throw'Firma Visual Studio Code inválida.'}
     }
-    # Verificar daemon activo
-    $test = & docker ps 2>&1
-    if ($LASTEXITCODE -eq 0) { Ok "Docker daemon corriendo."; return }
-    Info "Docker instalado pero daemon inactivo. Iniciando Docker Desktop..."
-    $ddExe = "$env:ProgramFiles\Docker\Docker\Docker Desktop.exe"
-    if (Test-Path $ddExe) { Start-Process $ddExe } else { Start-Process 'Docker Desktop' -ErrorAction SilentlyContinue }
-    # Spinner esperando daemon (max 90s)
-    $fr = @('[    ]','[=   ]','[==  ]','[=== ]','[====]','[ ===]','[  ==]','[   =]')
-    $i = 0; $sw = [System.Diagnostics.Stopwatch]::StartNew(); $ready = $false
-    while ($sw.Elapsed.TotalSeconds -lt 90 -and -not $ready) {
-        $f = $fr[$i % $fr.Length]; $e = $sw.Elapsed.ToString('mm\:ss')
-        Write-Host "`r  $f  Esperando Docker daemon...  [$e] (max 90s)  " -NoNewline -ForegroundColor Cyan
-        $test2 = & docker ps 2>&1
-        if ($LASTEXITCODE -eq 0) { $ready = $true } else { Start-Sleep -Seconds 2; $i++ }
-    }
-    Write-Host "`r$((' ') * 78)`r" -NoNewline
-    if ($ready) { Ok "Docker daemon listo en $($sw.Elapsed.ToString('mm\:ss'))." }
-    else { Warn "Docker daemon no respondio en 90s. Verifica Docker Desktop manualmente." }
+    foreach($path in @((Join-Path $target 'data\user-data'),(Join-Path $target 'data\extensions'),(Join-Path $target 'data\tmp'))){New-Item -ItemType Directory -Path $path -Force|Out-Null}
+    return$code
 }
-function Setup-KhoraWeb {
-    $wd = Join-Path $REPO_DIR 'khora-web'
-    if (-not (Test-Path $wd))  { Warn "khora-web/ no existe en el repo."; return }
-    if (-not (Get-Command node -ErrorAction SilentlyContinue)) { Warn "Node no disponible; omitiendo npm ci."; return }
-    $out = Spin-Job "npm ci (khora-web)" -ArgList @($wd) -Tips @('leyendo package-lock.json...','descargando paquetes npm...','instalando Next.js...','instalando Playwright...','instalando dependencias dev...','instalando TypeScript...','resolviendo arbol de modulos...','casi listo...') -Block {
-        param($webDir); & cmd /c "cd /d `"`"$webDir`"`" && npm ci 2>&1"
-    }
-    $out | ForEach-Object { L "INFO" "npm: $_" }
-    Ok "khora-web: dependencias instaladas (npm ci)."
-}
+
+function Get-CodeCli {$code=Ensure-VSCode;return(Join-Path (Split-Path -Parent $code) 'bin\code.cmd')}
 function Ensure-VercelCLI {
-    if (Get-Command vercel -ErrorAction SilentlyContinue) { Ok "Vercel CLI disponible."; return }
-    if (-not (Get-Command npm -ErrorAction SilentlyContinue)) { Warn "npm no disponible; no se puede instalar Vercel CLI."; return }
-    $out = Spin-Job "Instalando Vercel CLI" -Tips @('descargando vercel...','instalando dependencias CLI...','configurando binario...') -Block {
-        & npm install -g vercel 2>&1
-    }
-    $out | ForEach-Object { L "INFO" "npm: $_" }
-    if (Get-Command vercel -ErrorAction SilentlyContinue) { Ok "Vercel CLI instalado." }
-    else { Warn "Vercel CLI no pudo instalarse." }
+    $node=Ensure-Node;$npm=Join-Path (Split-Path -Parent $node) 'npm.cmd';if(-not(Test-Path $npm)){$npm=(Get-Command npm.cmd -ErrorAction Stop).Source}
+    $target=Join-Path $WORK_DIR 'tools\vercel';$vercel=Join-Path $target 'node_modules\.bin\vercel.cmd'
+    if(-not(Test-Path $vercel)){& $npm install --prefix $target --no-save --no-audit --no-fund vercel@latest 2>&1|ForEach-Object{Info ('npm vercel: '+[string]$_)};if($LASTEXITCODE -ne 0){throw'Instalación Vercel CLI falló.'}}
+    return$vercel
 }
-function Ensure-RenderCLI {
-    if ($true) { L "INFO" "Render CLI omitido: el paquete no existe en npm."; return }
-    if (-not (Get-Command npm -ErrorAction SilentlyContinue)) { Warn "npm no disponible; no se puede instalar Render CLI."; return }
-    $out = Spin-Job "Instalando Render CLI" -Tips @('descargando @render-com/cli...','instalando dependencias...','configurando binario...') -Block {
-        & npm install -g @render-com/cli 2>&1
-    }
-    $out | ForEach-Object { L "INFO" "npm: $_" }
-    if (Get-Command render -ErrorAction SilentlyContinue) { Ok "Render CLI instalado." }
-    else { Warn "Render CLI no pudo instalarse. Intenta: npm install -g @render-com/cli" }
+
+function Sync-VSCodeConfig {
+    $code=Ensure-VSCode;$data=Join-Path (Split-Path -Parent $code) 'data';$encrypted=Join-Path $REPO_DIR 'ep-state\vscode-profile.v1.enc'
+    if(-not(Test-Path $encrypted)){return}
+    $zip=Join-Path $env:TEMP 'vscode-profile.zip';$stage=Join-Path $env:TEMP 'vscode-profile'
+    Unprotect-KhoraFile -InputFile $encrypted -OutputFile $zip;Expand-Archive -LiteralPath $zip -DestinationPath $stage -Force
+    if(Test-Path(Join-Path $stage 'user-data')){Copy-Item -Path (Join-Path $stage 'user-data\*') -Destination (Join-Path $data 'user-data') -Recurse -Force -ErrorAction SilentlyContinue}
+    $list=Join-Path $stage 'extensions.txt';if(Test-Path $list){$cli=Get-CodeCli;Get-Content $list|Where-Object{$_}|ForEach-Object{& $cli --install-extension $_ --force|Out-Null}}
+    Remove-Item -LiteralPath $zip,$stage -Recurse -Force -ErrorAction SilentlyContinue
 }
+
+function Export-VSCodeConfig {
+    $code=Ensure-VSCode;$base=Split-Path -Parent $code;$stage=Join-Path $env:TEMP 'vscode-export'
+    Remove-Item -LiteralPath $stage -Recurse -Force -ErrorAction SilentlyContinue;New-Item -ItemType Directory -Path $stage -Force|Out-Null
+    Copy-Item -Path (Join-Path $base 'data\user-data') -Destination (Join-Path $stage 'user-data') -Recurse -Force -ErrorAction SilentlyContinue
+    $cli=Join-Path $base 'bin\code.cmd';if(Test-Path $cli){@(& $cli --list-extensions)|Set-Content -LiteralPath (Join-Path $stage 'extensions.txt') -Encoding UTF8}
+    $zip=Join-Path $env:TEMP 'vscode-profile.zip';Remove-Item -LiteralPath $zip -Force -ErrorAction SilentlyContinue
+    Compress-Archive -Path (Join-Path $stage '*') -DestinationPath $zip -CompressionLevel Optimal
+    $encrypted=Join-Path $REPO_DIR 'ep-state\vscode-profile.v1.enc';New-Item -ItemType Directory -Path (Split-Path -Parent $encrypted) -Force|Out-Null
+    Protect-KhoraFile -InputFile $zip -OutputFile $encrypted
+    Remove-Item -LiteralPath $zip,$stage -Recurse -Force -ErrorAction SilentlyContinue
+}
+
+function New-KhoraWorkspaceFile {
+    $file=Join-Path $WORK_DIR 'KHORA.code-workspace';$request=Join-Path $STATE_DIR 'cleanup.request'
+    $command="Set-Content -LiteralPath '"+$request.Replace("'","''")+"' -Value 'manual-vscode' -Encoding UTF8"
+    $object=[ordered]@{folders=@(@{path=$REPO_DIR});settings=@{'terminal.integrated.cwd'=$REPO_DIR};tasks=@{version='2.0.0';tasks=@(@{label='KHORA: Finalizar sesión';type='shell';command='powershell.exe';args=@('-NoProfile','-Command',$command);problemMatcher=@()})}}
+    [IO.File]::WriteAllText($file,($object|ConvertTo-Json -Depth 10),(New-Object Text.UTF8Encoding($false)));return$file
+}
+function Start-KhoraVSCode {
+    $code=Ensure-VSCode;$workspace=New-KhoraWorkspaceFile
+    $process=Start-Process $code -ArgumentList @('-n',("`"{0}`""-f$workspace),("`"{0}`""-f$script:STATUS_FILE)) -PassThru
+    $script:VSCODE_PID=$process.Id;return$process
+}
+
+function Start-KhoraDependencyHydration {
+    $python=Ensure-Python311;$node=Ensure-Node;$venv=Join-Path $WORK_DIR 'venv';$web=Join-Path $REPO_DIR 'khora-web';$npm=Join-Path (Split-Path -Parent $node) 'npm.cmd'
+    if(Test-Path(Join-Path $REPO_DIR 'pyproject.toml')){$script:DependencyJobs['python']=Start-Job -ArgumentList @($python,$venv,$REPO_DIR) -ScriptBlock {param($py,$ve,$repo)& $py -m venv $ve;if($LASTEXITCODE-ne0){throw'venv falló'};& (Join-Path $ve 'Scripts\python.exe') -m pip install -e $repo --disable-pip-version-check;if($LASTEXITCODE-ne0){throw'pip falló'}}}
+    if(Test-Path(Join-Path $web 'package-lock.json')){$script:DependencyJobs['node']=Start-Job -ArgumentList @($npm,$web) -ScriptBlock {param($npmPath,$directory)& $npmPath --prefix $directory ci --no-audit --no-fund;if($LASTEXITCODE-ne0){throw'npm ci falló'}}}
+}
+function Wait-KhoraDependencyHydration {
+    foreach($name in @($script:DependencyJobs.Keys)){$job=$script:DependencyJobs[$name];Wait-Job $job|Out-Null;$output=@(Receive-Job $job -ErrorAction SilentlyContinue);$output|ForEach-Object{Info ("dependency $name: "+[string]$_)};if($job.State-ne'Completed'){throw"Dependencias $name fallaron."};Remove-Job $job -Force}
+    $script:DependencyJobs=@{}
+}
+function Start-DepsPreload{Start-KhoraPrefetch}
+function Wait-DepsPreload{}
+function Setup-Venv{}
+function Setup-KhoraWeb{}
+function Start-ProactiveDepPrep{}
+function Wait-ProactiveDepPrep{return$false}
+function Ensure-Docker{Info 'Docker bajo demanda.'}
+function Ensure-RenderCLI{Info 'Render bajo demanda.'}

@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|api/auth|api/version|api/mcp|\\.well-known|api/oauth/token).*)",
+    "/((?!_next/static|_next/image|favicon.ico|api/auth|api/version|api/mcp|api/ep/(?:bootstrap|events|logs)|\\.well-known|api/oauth/token).*)",
   ],
 };
 

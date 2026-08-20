@@ -1,0 +1,12 @@
+{
+    "schema":  "khora-ep-build-report/v1",
+    "version":  "1.0.0",
+    "generatedUtc":  "2026-08-20T17:03:07.930851+00:00",
+    "staticValidation":  "passed",
+    "typescriptSyntax":  "passed",
+    "esbuildSyntax":  "passed",
+    "windowsRuntime":  "not_verified",
+    "nextBuild":  "passed_on_windows_11",
+    "postgresMigration":  "not_applied",
+    "windowsBuildUtc":  "2026-08-20T18:00:18.5119790Z"
+}

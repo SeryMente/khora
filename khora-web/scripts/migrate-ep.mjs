@@ -1,0 +1,3 @@
+import fs from "node:fs/promises";import path from "node:path";import pg from "pg";
+if(!process.env.DATABASE_URL)throw new Error("DATABASE_URL es obligatorio");
+const file=path.join(process.cwd(),"db/migrations/016_ep_persistent_sessions.sql");const sql=await fs.readFile(file,"utf8");const pool=new pg.Pool({connectionString:process.env.DATABASE_URL,ssl:process.env.DATABASE_URL.includes("localhost")?false:{rejectUnauthorized:false}});try{await pool.query("BEGIN");await pool.query(sql);await pool.query("COMMIT");console.log("Migracion EP 016 aplicada.")}catch(error){await pool.query("ROLLBACK");throw error}finally{await pool.end()}
