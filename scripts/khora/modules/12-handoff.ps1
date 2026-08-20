@@ -1,2 +1,2 @@
-﻿function Ensure-Handoff{return$true}
-function Get-HandoffStatus{return[pscustomobject]@{active=$false}}
+﻿function Ensure-Handoff{return $true}
+function Get-HandoffStatus{return [pscustomobject]@{active=$false}}

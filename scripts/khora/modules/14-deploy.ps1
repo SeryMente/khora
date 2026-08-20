@@ -10,7 +10,7 @@ function Connect-KhoraVercel {
     $output=@(& $vercel whoami 2>&1);$exit=$LASTEXITCODE
     Write-KhoraVercelOutput -Lines $output -Prefix 'vercel whoami'
     if($exit-ne0){throw'Vercel no autorizado.'}
-    return$vercel
+    return $vercel
 }
 function Test-KhoraRemoteMainExact {
     param([string]$ExpectedSha)
@@ -18,7 +18,7 @@ function Test-KhoraRemoteMainExact {
     if($remote.Code-ne0-or$remote.Output.Count-eq0){throw'No se pudo resolver origin/main antes del despliegue.'}
     $remoteSha=((([string]$remote.Output[0]).Trim())-split'\s+')[0]
     if($remoteSha-ne$ExpectedSha){throw'main cambio durante el arranque; reinicia para publicar el commit nuevo.'}
-    return$true
+    return $true
 }
 function Publish-KhoraMain {
     param([Parameter(Mandatory=$true)][string]$VercelPath,[Parameter(Mandatory=$true)][string]$ExpectedSha)
@@ -57,15 +57,15 @@ function Publish-KhoraMain {
             Start-Sleep -Seconds 2
         }
         if(-not$verified){throw'El alias canonico no acredita el SHA exacto de main.'}
-        return[pscustomobject]@{Sha=$ExpectedSha;Url=$canonical;ProofUrl=$proofUri;PublishedUtc=[string]$proof.publishedUtc}
+        return [pscustomobject]@{Sha=$ExpectedSha;Url=$canonical;ProofUrl=$proofUri;PublishedUtc=[string]$proof.publishedUtc}
     } finally {
         Remove-Item -LiteralPath $archive,$deployRoot -Recurse -Force -ErrorAction SilentlyContinue
     }
 }
-function Ensure-VercelAuth{return(Connect-KhoraVercel)}
+function Ensure-VercelAuth{return (Connect-KhoraVercel)}
 function Deploy-Production {
     param([string]$ExpectedSha=[string]$script:SESSION.commitSha)
     $vercel=Connect-KhoraVercel
-    return(Publish-KhoraMain -VercelPath $vercel -ExpectedSha $ExpectedSha)
+    return (Publish-KhoraMain -VercelPath $vercel -ExpectedSha $ExpectedSha)
 }
-function Invoke-KhoraDeploy{return(Deploy-Production)}
+function Invoke-KhoraDeploy{return (Deploy-Production)}

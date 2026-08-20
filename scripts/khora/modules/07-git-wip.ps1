@@ -12,7 +12,7 @@ function Invoke-GitTokenCommand {
             $script:GitOutput=@(& git -C $REPO_DIR @Arguments 2>&1);$script:GitExit=$LASTEXITCODE
         } finally { Remove-Item Env:KHORA_GIT_TOKEN,Env:GIT_ASKPASS -ErrorAction SilentlyContinue;Remove-Item -LiteralPath $askPass -Force -ErrorAction SilentlyContinue }
     }|Out-Null
-    return[pscustomobject]@{Code=$script:GitExit;Output=@($script:GitOutput)}
+    return [pscustomobject]@{Code=$script:GitExit;Output=@($script:GitOutput)}
 }
 function Initialize-KhoraRepository {
     if(-not(Get-Command git -ErrorAction SilentlyContinue)){throw'Git no disponible.'}
@@ -39,14 +39,14 @@ function Get-KhoraStageablePaths {
 }
 function Push-Verified {
     param([string]$Branch=$script:WIP_BRANCH)
-    $push=Invoke-GitTokenCommand -Arguments @('push','-u','origin',$Branch);if($push.Code-ne0){return$false}
+    $push=Invoke-GitTokenCommand -Arguments @('push','-u','origin',$Branch);if($push.Code-ne0){return $false}
     $local=(& git -C $REPO_DIR rev-parse HEAD).Trim();$remote=Invoke-GitTokenCommand -Arguments @('ls-remote','origin',('refs/heads/'+$Branch))
-    if($remote.Code-ne0-or$remote.Output.Count-eq0){return$false};return($local-eq((([string]$remote.Output[0])-split'\s+')[0]))
+    if($remote.Code-ne0-or$remote.Output.Count-eq0){return $false};return ($local-eq((([string]$remote.Output[0])-split'\s+')[0]))
 }
 function Do-AutoWip {
     foreach($path in Get-KhoraStageablePaths){& git -C $REPO_DIR add -- $path|Out-Null;if($LASTEXITCODE-ne0){throw"No se pudo stagear $path"}}
     if(@(& git -C $REPO_DIR diff --cached --name-only).Count-gt0){& git -C $REPO_DIR commit -m ('ep: continuidad '+(Get-Date -Format 'yyyy-MM-dd HH:mm:ss'))|Out-Null;if($LASTEXITCODE-ne0){throw'Commit WIP falló.'}}
-    return(Push-Verified)
+    return (Push-Verified)
 }
-function Test-UnpushedWork{return[bool]((Get-KhoraStageablePaths).Count-gt0)}
+function Test-UnpushedWork{return [bool]((Get-KhoraStageablePaths).Count-gt0)}
 function Ensure-GitignoreHygiene{}
