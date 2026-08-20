@@ -24,7 +24,7 @@ e6658f8e66ab47f5f959b0c75c99baf5755ab2a4208f9a28a50844dfac7472ce  ./AGENTS.md
 2053ff2eaeddaa0efd9fa7cab2b1a95866a50849d5491f9f22aeed221213c463  ./EP-ARCHITECTURE.md
 3a00fc8cf4b6381f3bd85692304fa78ef2a34438c8dde01c557f1e26ec0c69a1  ./EP-BUILD-REPORT.json
 24e4857233368f5f9ba98c07fc5c389edfbfb8408766ffbf1052106b351c76ad  ./EP-LIVE-LOG.md
-f4704bdbe3a894d53ec1207a63f3165258c9e363ae270aa689bc90d47b37d2b7  ./EP-VALIDATION.md
+75c04c4d9b6e48a295edfe1e1fae8f50af75ac828d634b330b20bf8dd917511f  ./EP-VALIDATION.md
 21716ecd89f1974acbc9b66176b484285cec1dcb936c0d0e1461a6b20d7a4e25  ./README.md
 5a890251051567612c9866443227eb0eb9023c77114394e62e7c0196261bc357  ./api/README.md
 076b19169cbdf9a4d82585d518670ac7975fce6795f2146be05495d706be1aeb  ./api/main.py
@@ -398,7 +398,7 @@ bc861b8bcbbda5a0fa2dbb76bdab3a667d5e5590d6b357d83abec36e9d26f05d  ./khora-web/li
 c93f62364fca15a8956a32e49a326f09e87e74c272424d58f65fe3b1909e501b  ./khora-web/lib/server/cripto.ts
 280fa07379a2625ef987246cd700453ac6f59bf7be5e043d3ba340353e84097b  ./khora-web/lib/server/dictado.ts
 cdf6901d41c5f3139be7fa44dd415f2fb047aee9ddc6c3a6b5143bb4f9b0ba45  ./khora-web/lib/server/domainAudio.ts
-15b41a0e876b73c8c8b5181d5209c9c9565ae8d5ac44c2acb905db963bf4d628  ./khora-web/lib/server/ep-bootstrap-content.ts
+e76f9ea2b3049f75dd1533f0ffc8d6cef8c6809cd272536f5ddb962681d74691  ./khora-web/lib/server/ep-bootstrap-content.ts
 b73dfb4893aaf2a4e93b55ebaf3200f6ea0c4137e48c6e5ac2019356c407c6d6  ./khora-web/lib/server/ep.ts
 a07bd679df43f4d298db4356424bdbb877d89570cec897cef889769221f3f5ae  ./khora-web/lib/server/espejoNotion.test.ts
 a8d511a539793e7c0977192da632cc2f72f7652f747eac956b65e069cc72df2d  ./khora-web/lib/server/espejoNotion.ts
@@ -526,9 +526,9 @@ d0b69ccc072e4695292e790fa90d5ad9f70f721ce96fa6f4d18636a5e54d1e71  ./push.sh
 0b4d8dbe914441f7b86b1cda64f8fc96852b8aafeb490faa09650b44e3ef6720  ./render.yaml
 67ab9f736027b508dcc2ded11eb71098e3dedc5ebbd5f160c22d75e3f1e65d05  ./result.txt
 5eeda95d677f4875fb3bd210102e64f59f33ce84ebf3d4d94e873267f3a8bef8  ./scripts/check_stdlib_only.py
-f3b86728b15e9174dd95bfcfa356766c879a9252c7842d1071588f3b956a3a72  ./scripts/khora/env-vault.ps1
-1fa1a0686c1363607a29f51876fa33af914596df656a549dbf898f2736ab2796  ./scripts/khora/khora.barrel.ps1
-572776475afd22fb1a15b5a45263f058eaac2ebdf71dedefb31927076c3e0757  ./scripts/khora/khora.ps1
+21fc1a0a502c487824d11ad441ea2e40c5c64313fd4755d781bc91fdd27dcd1c  ./scripts/khora/env-vault.ps1
+adb40b1287302032a0d63a3abb8c68e27d90342185cb2efab9ff23256cd6548a  ./scripts/khora/khora.barrel.ps1
+0bb22d7890deed7d186af63f6196ae1f7fc9ad30e93f970a8c1c24cff49a8d6b  ./scripts/khora/khora.ps1
 ac9f1e8d1492c135b4629447896164e35c9f866b6293bda21f985eb90640ccf5  ./scripts/khora/llave/ARRANCAR.cmd
 01f071e5aa618095671bb10926148a293da9033877d9477c3c94e3ae685c6e91  ./scripts/khora/modules/00-config.ps1
 713c6a99f766da6364e004ce6af182e1e13fbf0115ed5fce833c335aaf1f1eab  ./scripts/khora/modules/01-realuser.ps1
@@ -537,10 +537,10 @@ acdebce7b73a6680e2c0383cda0f735f3e8ff40237ada04988df7c41442e26e4  ./scripts/khor
 96d757fe138f050f6e654d0eba6af445ddb4d5f38a62a6a7f43c1603ba64ff05  ./scripts/khora/modules/04-ui.ps1
 113c5f2e0619123a050cfb9b299449622c897ced392ac22ba73f5f798a86caa8  ./scripts/khora/modules/05-efs.ps1
 07adf61e7ec4b23179127d83e3f432885df235f982e749c5c148504e97b90433  ./scripts/khora/modules/06-token.ps1
-b1e3c8fa72828ee8100639b7d3d87dfe7f0e7fd3f4cd7eb89338680cf697ae21  ./scripts/khora/modules/07-git-wip.ps1
-36840b440f673064d34c44ee34a359befb01626b3ba521712a3796a8f76e8f82  ./scripts/khora/modules/08-deps.ps1
+3529855e033065f37bc80b72f66252abc285c3b804957214ce7cca5b959d6a98  ./scripts/khora/modules/07-git-wip.ps1
+6f31452d7dc68da6bac2768154d3cf8d688c2b64ff6a8b76b5e78270537cce74  ./scripts/khora/modules/08-deps.ps1
 f53be3dc7ae8b1e1132d8f6844cca70bedcfee3279f637daae68fc903ccde54a  ./scripts/khora/modules/09-chrome.ps1
-f6898d0337d9fcbb50fd92e89595bac48e2a8f96fef104da7cf11faf572e7254  ./scripts/khora/modules/10-guardian.ps1
+829105ca7bfa795cc28f87b75f568a3b5a17aa1451a827d7a752f89cfa1467a8  ./scripts/khora/modules/10-guardian.ps1
 dbec86ed7bf63e85f8562bc3733ded33fa84dfa9691c0f9dca6fbc01a19ff2d0  ./scripts/khora/modules/11-cleanup.ps1
 61dd02662960c0a5dca82efaf6de96510ba5441fc296bd035093915402ae3306  ./scripts/khora/modules/12-handoff.ps1
 eb78f6d5ef9e42c262c2fb482655ae4715d2f069cd87718555949e304b462bae  ./scripts/khora/modules/13-session.ps1
@@ -548,7 +548,7 @@ eb78f6d5ef9e42c262c2fb482655ae4715d2f069cd87718555949e304b462bae  ./scripts/khor
 378994ec9b772f3513152daf21ca5107fe0d8083e6f7020ed56d76ea8b9d173d  ./scripts/khora/modules/15-main.ps1
 c5766b129f5fb880c1e4b694519c430c05c73c4bdc06ccc82a8f4ca811f46f2a  ./scripts/khora/modules/90-legacy.ps1
 31120b014d77734ee25902fc6d68acdcb24b494f709cd1a5b3ce43bae618fe87  ./scripts/khora/modules/CONTRACT.md
-f4d7dd1f21bce24bebd0022ff61ef59367ac8fde8339b52d10f4ae30db73de96  ./scripts/khora/tests/Test-Arranque.ps1
+87828db4d8e4bd9e312fd55e06ffff9908e4f2e742e64196d4e1e475f4612cec  ./scripts/khora/tests/Test-Arranque.ps1
 c407c09af2bea14a2c32b2079e7cf95206fa4bf711d16981da34984cac3558ad  ./scripts/khora/volcados.ps1
 3ce025e18530d33840775facf8a4233ab6350006bfe8538575d134581d41a353  ./scripts/migraciones/2026_07_28_grafo01_backfill_alcanzabilidad.py
 5c365013611e68454baad349a18b2a9b0fab14730d03cc94e714fd08b928ca98  ./scripts/migraciones/retrofit_ua03_tipado.py
@@ -563,7 +563,7 @@ a8db67b32d48d800e02502b5eb1c74a7eefadfe04c511177793c0e555c30659c  ./test.js
 b71c1b74af260fa9fb38a45d4f58d7f5768178b0348bc0be5733277ddb5a4381  ./test_puentes.py
 da48f883dbbb32f23889a472abc82e58dbad79e76640ce3ef0f3fd3e7681f4a8  ./test_puentes2.py
 2eb003d4a314559620e249bc3f54fec55a5bdc4af5bf9bff46549d9e4d512998  ./test_script.js
-f675f19613e17cbcbe6ea0695d92ad476c0cc521d2c2ebf2e87342c19b4f226e  ./tests/validate_ep.py
+3da7e8746afe0d95f0dc487ca2802b82ed5894056b4f2bf5eb17fd65b4b148da  ./tests/validate_ep.py
 82aeef6a665be8b9ebee4511d2a0aeb47a1a6497bd80b94bb3dcc3c0335fbefa  ./tools/vscode/extensions.txt
 ec2f00596f643c3181e6f3c6bfb64bb07cf8994f019df013681c886bee0d8b6a  ./tools/vscode/settings.user.json
 0781138d74646a88e45ed0314d18cecb6bcd76d22cbb555740c72013dd8a4e4a  ./update_tests.sh

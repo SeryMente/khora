@@ -60,13 +60,13 @@ function KhoraVault-ValidateValue {
 function Import-KhoraEnvVault {
     param([string[]]$Names)
     $vault=KhoraVault-Load;$available=@($vault.entries.PSObject.Properties.Name)
-    $targets=if($Names){@($Names)}else{$available};if($targets.Count-eq0){return@()}
+    $targets=if($Names){@($Names)}else{$available};if($targets.Count-eq0){return @()}
     $missing=@($targets|Where-Object{$available-notcontains$_});if($missing.Count){throw('Variables ausentes en bóveda: '+($missing-join', '))}
     $key=KhoraVault-DeriveKey -MasterSecure (KhoraVault-GetMasterKey) -Salt ([Convert]::FromBase64String($vault.salt))
     $loaded=New-Object 'System.Collections.Generic.List[string]'
     foreach($name in $targets){$value=KhoraVault-Decrypt -Entry $vault.entries.$name -Key $key;[Environment]::SetEnvironmentVariable($name,$value,'Process');$loaded.Add($name);$value=$null}
     $Global:KhoraVaultLoadedNames=@($Global:KhoraVaultLoadedNames+$loaded|Select-Object -Unique);$script:VaultLoadedNames=$Global:KhoraVaultLoadedNames
-    return@($loaded)
+    return @($loaded)
 }
 function Set-KhoraEnvVaultVariable {
     param([string]$Name,[switch]$Rotate,[switch]$UseClipboard)
