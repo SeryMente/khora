@@ -1,7 +1,9 @@
 // @l0 L0-002-R · @req REVISION/REQ-1 · @acr ACR-1.2 · @req REVISION-COCKPIT/REQ-1
 import { createHash } from "crypto";
+import { z } from "zod";
 import { obtenerGlosario } from "./pulido";
 import { getDb } from "./neon";
+import { reportarIncidente } from "./incidentes";
 
 export type TipoFamiliaHallazgo = "correccion_aplicable" | "observacion_editorial";
 
@@ -298,7 +300,7 @@ export async function generarYPersistirHallazgos(
   }
 
   // Regla 5: Groq LLM hallazgos de sentido
-  const sugerenciasLLM = await obtenerSugerenciasLLM(texto);
+  const sugerenciasLLM = await obtenerSugerenciasLLM(texto, volcadoId);
   for (const sug of sugerenciasLLM) {
     borradorHallazgos.push({
       origen: "llm",
@@ -461,7 +463,23 @@ export async function obtenerSugerenciasOrtotipograficas(texto: string) {
   return [];
 }
 
-export async function obtenerSugerenciasLLM(texto: string): Promise<Array<{
+const ObservacionesLLMSchema = z.object({
+  observaciones: z.array(
+    z.object({
+      cita: z.string(),
+      sugerencia: z.string(),
+      regla: z.string().default("Observación editorial de sentido"),
+      categoria: z.enum(["ortografia", "tildes", "puntuacion", "mayusculas", "error_tipografico", "lexico", "semantico", "sintaxis", "discurso"]).default("sintaxis"),
+      severidad: z.enum(["alta", "media", "baja"]).default("media"),
+      explicacion: z.string().default("Observación de coherencia local"),
+    })
+  )
+});
+
+export async function obtenerSugerenciasLLM(
+  texto: string,
+  volcadoId?: string
+): Promise<Array<{
   posicion: { inicio: number; fin: number };
   texto_original: string;
   sugerencia: string;
@@ -477,7 +495,9 @@ export async function obtenerSugerenciasLLM(texto: string): Promise<Array<{
   }
 
   const prompt = `Analiza el siguiente texto en español y detecta únicamente observaciones de sentido u oraciones inconclusas/ambiguas.
-Devuelve un JSON en este formato:
+Reglas:
+1. "cita" DEBE ser una cita literal de palabras contiguas que existan exactas en el texto.
+2. Devuelve un JSON en este formato:
 {
   "observaciones": [
     {
@@ -511,35 +531,69 @@ ${texto.slice(0, 3000)}
       }),
     });
 
-    if (!res.ok) return [];
+    if (!res.ok) {
+      if (volcadoId) {
+        await reportarIncidente({
+          volcadoId,
+          tipo: "analisis_llm_fallido",
+          severidad: "baja",
+          origen: "asistenteRevision",
+          evidencia: { status: res.status, motivo: "Groq respondió con error HTTP al analizar sugerencias." },
+        });
+      }
+      return [];
+    }
 
     const json = await res.json();
     const content = json.choices?.[0]?.message?.content;
     if (!content) return [];
 
-    const parsed = JSON.parse(content);
-    const obsList = Array.isArray(parsed?.observaciones) ? parsed.observaciones : [];
+    const parsed = ObservacionesLLMSchema.safeParse(JSON.parse(content));
+    if (!parsed.success) {
+      if (volcadoId) {
+        await reportarIncidente({
+          volcadoId,
+          tipo: "analisis_llm_fallido",
+          severidad: "baja",
+          origen: "asistenteRevision",
+          evidencia: { motivo: "Respuesta de Groq no superó la validación Zod." },
+        });
+      }
+      return [];
+    }
 
+    const obsList = parsed.data.observaciones;
     const sugerencias = [];
+
     for (const obs of obsList) {
-      if (!obs.cita || typeof obs.cita !== "string") continue;
+      if (!obs.cita) continue;
       const idx = texto.indexOf(obs.cita);
+      // Validar grounding verificable sobre el texto completo
       if (idx !== -1) {
         sugerencias.push({
           posicion: { inicio: idx, fin: idx + obs.cita.length },
           texto_original: obs.cita,
-          sugerencia: String(obs.sugerencia || obs.cita),
-          regla: String(obs.regla || "Observación editorial de sentido"),
-          tipo_categoria: (obs.categoria as TipoCategoriaSugerencia) || "sintaxis",
-          severidad: (obs.severidad as SeveridadSugerencia) || "media",
+          sugerencia: obs.sugerencia,
+          regla: obs.regla,
+          tipo_categoria: obs.categoria as TipoCategoriaSugerencia,
+          severidad: obs.severidad as SeveridadSugerencia,
           confianza: 0.88,
-          explicacion: String(obs.explicacion || "Observación de coherencia local respaldada"),
+          explicacion: obs.explicacion,
         });
       }
     }
 
     return sugerencias;
-  } catch {
+  } catch (err) {
+    if (volcadoId) {
+      await reportarIncidente({
+        volcadoId,
+        tipo: "analisis_llm_fallido",
+        severidad: "baja",
+        origen: "asistenteRevision",
+        evidencia: { error: String(err) },
+      });
+    }
     return [];
   }
 }

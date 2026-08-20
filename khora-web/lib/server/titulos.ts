@@ -115,8 +115,27 @@ export function segmentarTextoEnChunks(texto: string, maxCharsPerChunk = 3000, o
   return chunks;
 }
 
+const FRASES_GENERICAS_PROHIBIDAS = [
+  "resumen del contenido",
+  "dictado sin contenido",
+  "sin titulo",
+  "sin título",
+  "contenido del dictado",
+  "puntos clave",
+  "transcripcion del dictado",
+  "transcripción del dictado",
+  "resumen del dictado",
+];
+
+export function esTituloGenericoOInvalido(titulo: string): boolean {
+  if (!titulo || titulo.trim().length < 5) return true;
+  const norm = normalizarParaGrounding(titulo);
+  return FRASES_GENERICAS_PROHIBIDAS.some((fg) => norm.includes(fg));
+}
+
 /**
  * Fallback determinista basado en frecuencia ponderada, frases nominales y eliminación de stopwords.
+ * Prohíbe explícitamente títulos genéricos como "Resumen del contenido...".
  */
 export function generarTituloFallback(texto: string): TitleGenerationResult {
   const stopwords = new Set([
@@ -126,25 +145,40 @@ export function generarTituloFallback(texto: string): TitleGenerationResult {
   ]);
 
   const oraciones = texto.match(/[^.!?]+[.!?]+/g) || [texto];
-  const primeraOracion = oraciones[0] || texto;
+  let acumuladoPalabras: string[] = [];
 
-  const palabras = primeraOracion
-    .replace(/[^a-zA-ZáéíóúñÁÉÍÓÚÑ0-9\s]/g, " ")
-    .split(/\s+/)
-    .filter((w) => w.length > 2 && !stopwords.has(w.toLowerCase()));
+  for (const oracion of oraciones) {
+    const palabras = oracion
+      .replace(/[^a-zA-ZáéíóúñÁÉÍÓÚÑ0-9\s]/g, " ")
+      .split(/\s+/)
+      .filter((w) => w.length > 2 && !stopwords.has(w.toLowerCase()));
 
-  const palabrasClave = palabras.slice(0, 8).join(" ");
-  let tituloLimpio = palabrasClave.charAt(0).toUpperCase() + palabrasClave.slice(1);
+    acumuladoPalabras.push(...palabras);
+    if (acumuladoPalabras.length >= 6) break;
+  }
 
-  if (tituloLimpio.length < 10) {
-    tituloLimpio = "Resumen del contenido del dictado y puntos clave";
+  const palabrasClave = acumuladoPalabras.slice(0, 8).join(" ");
+  let tituloLimpio = palabrasClave ? palabrasClave.charAt(0).toUpperCase() + palabrasClave.slice(1) : "";
+
+  // Remover comillas
+  tituloLimpio = tituloLimpio.replace(/["'«»]/g, "").trim();
+
+  if (esTituloGenericoOInvalido(tituloLimpio)) {
+    return {
+      title: "",
+      mode: "single_thread",
+      threads: [],
+      confidence: 0.0,
+      model: "fallback_invalido",
+      fallback_used: true,
+    };
   }
 
   if (tituloLimpio.length > 130) {
     tituloLimpio = tituloLimpio.slice(0, 130) + "...";
   }
 
-  const citaLiteral = primeraOracion.slice(0, 50).trim();
+  const citaLiteral = (oraciones[0] || texto).slice(0, 50).trim();
 
   return {
     title: tituloLimpio,
@@ -183,18 +217,32 @@ export async function generarTituloEstructurado(texto: string): Promise<TitleGen
   }
 
   const chunks = segmentarTextoEnChunks(texto);
-  const textoParaAnalizar = chunks.slice(0, 3).join("\n\n");
+  let textoParaAnalizar = "";
+
+  // Map/Reduce sobre todos los chunks con límites controlados
+  if (chunks.length === 1) {
+    textoParaAnalizar = chunks[0];
+  } else {
+    // Map: Extraer las primeras 2 oraciones de cada chunk para sintetizar la totalidad del texto
+    const extractosMap = chunks.slice(0, 10).map((c) => {
+      const oraciones = c.match(/[^.!?]+[.!?]+/g) || [c];
+      return oraciones.slice(0, 2).join(" ").trim();
+    });
+    // Reduce: Sintetizar la totalidad del documento
+    textoParaAnalizar = extractosMap.join("\n\n");
+  }
 
   const prompt = `Analiza el siguiente texto y extrae en JSON estructurado las ideas e hilos temáticos principales.
 Reglas estrictas:
 1. "evidence" DEBE ser una cita literal de palabras contiguas que existan exactas en el texto.
-2. Devuelve un objeto JSON exactamente con este formato:
+2. Prohibidos títulos genéricos como "Resumen del contenido...", "Dictado sin contenido" o "Sin título".
+3. Devuelve un objeto JSON exactamente con este formato:
 {
   "ideas": [
     { "label": "descripción breve", "evidence": ["cita literal exacta del texto"], "keywords": ["palabra"], "importance": 0.9 }
   ],
   "thread_candidates": [
-    { "label": "Nombre del hilo", "idea_indexes": [0], "evidence": ["cita literal exacta"] }
+    { "label": "Nombre del hilo o título conciso", "idea_indexes": [0], "evidence": ["cita literal exacta"] }
   ]
 }
 
@@ -263,6 +311,10 @@ ${textoParaAnalizar}
     tituloFinal = tituloFinal.replace(/["'«»]/g, "").trim();
     if (tituloFinal.length > 140) {
       tituloFinal = tituloFinal.slice(0, 137) + "...";
+    }
+
+    if (esTituloGenericoOInvalido(tituloFinal)) {
+      return generarTituloFallback(texto);
     }
 
     return {

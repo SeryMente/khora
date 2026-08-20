@@ -9,47 +9,69 @@ export async function backfillTitulos(opciones?: { dryRun?: boolean; limit?: num
   const limit = opciones?.limit ?? 50;
 
   const db = getDb();
-  const res = await db.query(
-    `SELECT id, folio, texto, titulo FROM volcado
-     WHERE titulo IS NULL OR TRIM(titulo) = '' OR LOWER(TRIM(titulo)) = 'sin título' OR LOWER(TRIM(titulo)) = 'sin titulo'
-     ORDER BY recibido_en DESC LIMIT $1`,
-    [limit]
-  );
-
-  const volcadosSinTitulo = res.rows;
-  console.log(`Encontrados ${volcadosSinTitulo.length} volcados sin título válido. Dry-run: ${dryRun}`);
-
+  let totalProcesados = 0;
   let generadosGroq = 0;
   let generadosFallback = 0;
   let fallidos = 0;
+  let offset = 0;
 
-  for (const v of volcadosSinTitulo) {
-    const textoClaro = descifrarTexto(v.texto || "");
-    if (!textoClaro.trim()) {
-      fallidos++;
-      continue;
-    }
+  while (true) {
+    const res = await db.query(
+      `SELECT id, folio, texto, titulo FROM volcado
+       WHERE titulo IS NULL OR TRIM(titulo) = '' OR LOWER(TRIM(titulo)) IN ('sin título', 'sin titulo', 'resumen del contenido', 'dictado sin contenido')
+       ORDER BY recibido_en DESC LIMIT $1 OFFSET $2`,
+      [limit, offset]
+    );
 
-    try {
-      const resTitulo = await generarTituloEstructurado(textoClaro);
-      if (resTitulo.fallback_used) {
-        generadosFallback++;
-      } else {
-        generadosGroq++;
+    const batch = res.rows;
+    if (batch.length === 0) break;
+
+    console.log(`Lote de ${batch.length} volcados sin título válido (OFFSET ${offset}). Dry-run: ${dryRun}`);
+
+    for (const v of batch) {
+      totalProcesados++;
+      const textoClaro = descifrarTexto(v.texto || "");
+      if (!textoClaro.trim()) {
+        fallidos++;
+        continue;
       }
 
-      console.log(`[Volcado #${v.folio || v.id}] Título generado (${resTitulo.model}): "${resTitulo.title}"`);
+      try {
+        const resTitulo = await generarTituloEstructurado(textoClaro);
+        if (!resTitulo.title) {
+          fallidos++;
+          console.warn(`[Volcado #${v.folio || v.id}] No se pudo generar un título válido.`);
+          continue;
+        }
 
-      if (!dryRun) {
-        await asignarTituloVolcado(v.id, resTitulo.title, "backfill_titulos");
+        if (resTitulo.fallback_used) {
+          generadosFallback++;
+        } else {
+          generadosGroq++;
+        }
+
+        console.log(`[Volcado #${v.folio || v.id}] Título generado (${resTitulo.model}): "${resTitulo.title}"`);
+
+        if (!dryRun) {
+          await asignarTituloVolcado(v.id, resTitulo.title, "backfill_titulos");
+        }
+      } catch (e) {
+        fallidos++;
+        console.error(`Error generando título para volcado ${v.id}:`, e);
       }
-    } catch (e) {
-      fallidos++;
-      console.error(`Error generando título para volcado ${v.id}:`, e);
     }
+
+    offset += limit;
+    if (batch.length < limit) break;
   }
 
-  return { total: volcadosSinTitulo.length, generadosGroq, generadosFallback, fallidos, dryRun };
+  return {
+    totalProcesados,
+    generadosGroq,
+    generadosFallback,
+    fallidos,
+    dryRun,
+  };
 }
 
 if (require.main === module) {

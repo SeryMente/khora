@@ -67,6 +67,12 @@ describe("Aprobar Volcado Route Suite", () => {
   test("3. Retorna 200 con { version, sha256 } en exito", async () => {
     const mockDb = {
       query: async (sql: string, params: any[]) => {
+        if (sql.includes("FROM volcado WHERE id")) {
+          return { rows: [{ estado: "en_revision" }] };
+        }
+        if (sql.includes("MAX(version)")) {
+          return { rows: [{ ultima: 1 }] };
+        }
         if (sql.includes("FROM volcado_version")) {
           const crypto = await import("crypto");
           const texto = "Texto de prueba";

@@ -9,7 +9,9 @@
     "start": "next start",
     "e2e": "playwright test",
     "e2e:report": "playwright show-report",
-    "prebuild": "node scripts/build-extension.mjs"
+    "prebuild": "node scripts/build-extension.mjs",
+    "backfill:titulos": "tsx scripts/backfill_titulos.ts",
+    "repair:volcados": "tsx scripts/repair_volcados.ts"
   },
   "dependencies": {
     "@google/genai": "^2.10.0",

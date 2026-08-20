@@ -450,11 +450,77 @@ export default function VolcadosPage() {
     }
   };
 
+  const [resolvingAudioIncident, setResolvingAudioIncident] = useState(false);
+  const [audioIncidentError, setAudioIncidentError] = useState<string | null>(null);
+
+  // Abrir Modal de Resolución de Incidente de Audio (nunca retorna silenciosamente)
+  const handleOpenAudioResolveModal = async () => {
+    if (!selectedId) return;
+    setAudioIncidentError(null);
+    setResolvingAudioIncident(true);
+
+    try {
+      let openInc = incidentes.find(
+        (i) => (i.tipo === "audio_no_recuperable" || i.tipo === "audio_no_vinculado" || i.tipo === "audio_incompleto" || i.tipo === "audio_parcial") && i.estado !== "resuelto"
+      );
+
+      if (!openInc) {
+        // Cargar incidentes actualizados del servidor
+        const resInc = await fetch(`/api/revision/${selectedId}/incidentes`);
+        if (resInc.ok) {
+          const dataInc = await resInc.json();
+          const list = dataInc.incidentes || [];
+          setIncidentes(list);
+          openInc = list.find(
+            (i: Incidente) => (i.tipo === "audio_no_recuperable" || i.tipo === "audio_no_vinculado" || i.tipo === "audio_incompleto" || i.tipo === "audio_parcial") && i.estado !== "resuelto"
+          );
+        }
+      }
+
+      if (!openInc) {
+        // Reportar inconsistencia y mostrar error recuperable si no existía registrado
+        await fetch(`/api/revision/${selectedId}/incidentes`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            tipo: "audio_no_recuperable",
+            severidad: "alta",
+            origen: "mesa_revision_ui",
+            evidencia: { motivo: "Inconsistencia detectada en UI de revisión sin incidente previo registrado" },
+          }),
+        });
+
+        // Recargar incidentes
+        const resInc2 = await fetch(`/api/revision/${selectedId}/incidentes`);
+        if (resInc2.ok) {
+          const dataInc2 = await resInc2.json();
+          setIncidentes(dataInc2.incidentes || []);
+        }
+      }
+
+      setShowAudioResolveModal(true);
+    } catch (err: any) {
+      setAudioIncidentError("Error al verificar incidentes de audio: " + err.message);
+    } finally {
+      setResolvingAudioIncident(false);
+    }
+  };
+
   // Resolver Incidente con Código Específico
   const handleResolveAudioIncident = async () => {
     if (!selectedId) return;
-    const incAudio = incidentes.find((i) => (i.tipo === "audio_no_recuperable" || i.tipo === "audio_no_vinculado") && i.estado !== "resuelto");
-    if (!incAudio) return;
+    setResolvingAudioIncident(true);
+    setAudioIncidentError(null);
+
+    const incAudio = incidentes.find(
+      (i) => (i.tipo === "audio_no_recuperable" || i.tipo === "audio_no_vinculado" || i.tipo === "audio_incompleto" || i.tipo === "audio_parcial") && i.estado !== "resuelto"
+    );
+
+    if (!incAudio) {
+      setAudioIncidentError("No existe un incidente de audio abierto para resolver en este volcado.");
+      setResolvingAudioIncident(false);
+      return;
+    }
 
     try {
       const res = await fetch(`/api/revision/${selectedId}/incidentes/${incAudio.id}/resolver`, {
@@ -464,15 +530,20 @@ export default function VolcadosPage() {
           codigoResolucion: selectedAudioResolveCode,
         }),
       });
+
+      const data = await res.json().catch(() => ({ detail: "Respuesta no-JSON del servidor" }));
+
       if (res.ok) {
         setShowAudioResolveModal(false);
+        await fetchPipeline();
         await loadCockpitData(selectedId, selectedVersionNum);
       } else {
-        const data = await res.json();
-        alert("Error al resolver incidente: " + (data.detail || data.error));
+        setAudioIncidentError(`Error HTTP ${res.status}: ${data.detail || data.error || "Desconocido"}`);
       }
     } catch (err: any) {
-      alert("Error de red: " + err.message);
+      setAudioIncidentError("Error de red: " + err.message);
+    } finally {
+      setResolvingAudioIncident(false);
     }
   };
 
@@ -787,7 +858,7 @@ export default function VolcadosPage() {
                     </div>
 
                     {/* Category Counters Header */}
-                    {gateDecision && (
+                    {gateDecision?.counts && (
                       <div className="grid grid-cols-4 gap-2 text-center text-xs font-mono pt-2">
                         <div className="p-2 border bg-zinc-900/60 border-zinc-800">
                           <div className="opacity-60 text-[9px] uppercase">Tipografía</div>
@@ -812,16 +883,17 @@ export default function VolcadosPage() {
                   {drawerSubTab === "cockpit" ? (
                     <div className="flex-1 space-y-6">
                       {/* Audio Resolution Banner if audio is unrecoverable or unlinked */}
-                      {(selectedItem.audio_status === "no_recuperable" || selectedItem.audio_status === "encontrado_no_vinculado") && (
+                      {(selectedItem.audio_status === "no_recuperable" || selectedItem.audio_status === "encontrado_no_vinculado" || selectedItem.audio_status === "incompleto") && (
                         <div className="p-3 border border-red-500/40 bg-red-950/20 text-xs font-mono flex justify-between items-center">
                           <div className="text-red-300">
                             🔴 Causa de audio detectada: {selectedItem.audio_status}. Se requiere resolución explícita del operador para habilitar la aprobación.
                           </div>
                           <button
-                            onClick={() => setShowAudioResolveModal(true)}
-                            className="px-3 py-1 bg-red-600 text-white font-bold hover:bg-red-500 cursor-pointer text-xs"
+                            onClick={handleOpenAudioResolveModal}
+                            disabled={resolvingAudioIncident}
+                            className="px-3 py-1 bg-red-600 text-white font-bold hover:bg-red-500 cursor-pointer text-xs disabled:opacity-50"
                           >
-                            Resolver Incidente Audio
+                            {resolvingAudioIncident ? "Cargando..." : "Resolver Incidente Audio"}
                           </button>
                         </div>
                       )}
@@ -962,13 +1034,49 @@ export default function VolcadosPage() {
                         </div>
 
                         {selectedItem.audio_status !== "no_recuperable" && selectedItem.audio_status !== "no_aplica" ? (
-                          <audio
-                            ref={audioRef}
-                            src={audioSourceUrl}
-                            controls
-                            preload="metadata"
-                            className="w-full h-8"
-                          />
+                          <div className="space-y-2">
+                            <audio
+                              ref={audioRef}
+                              src={audioSourceUrl}
+                              controls
+                              preload="metadata"
+                              className="w-full h-8"
+                            />
+                            {manifiestoPartes.length > 1 && (
+                              <div className="flex justify-between items-center text-xs font-mono">
+                                <button
+                                  disabled={currentPartIndex <= 1}
+                                  onClick={() => {
+                                    const nextIdx = currentPartIndex - 1;
+                                    setCurrentPartIndex(nextIdx);
+                                    if (manifiestoPartes[nextIdx - 1]) {
+                                      setAudioSourceUrl(manifiestoPartes[nextIdx - 1].download_path);
+                                    }
+                                  }}
+                                  className="px-2 py-1 border border-zinc-700 hover:bg-zinc-800 disabled:opacity-40"
+                                >
+                                  Parte anterior
+                                </button>
+                                <span>Parte {currentPartIndex} de {manifiestoPartes.length}</span>
+                                <button
+                                  disabled={currentPartIndex >= manifiestoPartes.length}
+                                  onClick={() => {
+                                    const nextIdx = currentPartIndex + 1;
+                                    setCurrentPartIndex(nextIdx);
+                                    if (manifiestoPartes[nextIdx - 1]) {
+                                      setAudioSourceUrl(manifiestoPartes[nextIdx - 1].download_path);
+                                    }
+                                  }}
+                                  className="px-2 py-1 border border-zinc-700 hover:bg-zinc-800 disabled:opacity-40"
+                                >
+                                  Parte siguiente
+                                </button>
+                              </div>
+                            )}
+                            <div className="text-[11px] font-mono text-zinc-400">
+                              {palabrasTiming.length > 0 ? `Sincronizado (${palabrasTiming.length} marcas)` : "sin marcas temporales"}
+                            </div>
+                          </div>
                         ) : (
                           <div className="text-xs font-mono opacity-60 italic">Audio no disponible para reproducción.</div>
                         )}
@@ -1144,9 +1252,20 @@ export default function VolcadosPage() {
               <option value="captura_irrecuperable_confirmada">captura_irrecuperable_confirmada (Irrecuperable confirmado)</option>
               <option value="falso_positivo">falso_positivo (Falso positivo)</option>
             </select>
+            {audioIncidentError && (
+              <div className="p-2 border border-red-600 bg-red-950/60 text-red-300">
+                {audioIncidentError}
+              </div>
+            )}
             <div className="flex justify-end gap-2 pt-2">
               <button onClick={() => setShowAudioResolveModal(false)} className="px-3 py-1.5 border border-zinc-700">Cancelar</button>
-              <button onClick={handleResolveAudioIncident} className="px-3 py-1.5 bg-red-600 text-white font-bold">Resolver Incidente</button>
+              <button
+                onClick={handleResolveAudioIncident}
+                disabled={resolvingAudioIncident}
+                className="px-3 py-1.5 bg-red-600 text-white font-bold disabled:opacity-50"
+              >
+                {resolvingAudioIncident ? "Resolviendo..." : "Resolver Incidente"}
+              </button>
             </div>
           </div>
         </div>

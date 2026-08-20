@@ -4,6 +4,7 @@ import { getDb } from "@/lib/server/neon";
 import { COOKIE_BOVEDA, desbloqueoVigente } from "@/lib/server/boveda";
 import { reportarIncidente } from "@/lib/server/incidentes";
 import { esAudioEsperado } from "@/lib/server/domainAudio";
+import { obtenerPalabrasTiming } from "@/lib/server/transcribir";
 
 export const runtime = "nodejs";
 
@@ -159,15 +160,41 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
     const duracionTotalMs = partesManifiesto.reduce((acc, p) => acc + p.duracion_ms, 0);
     const bytesTotales = partesManifiesto.reduce((acc, p) => acc + p.bytes, 0);
 
+    // Detectar huecos en los índices de partes (ej. falta la parte 2 si existen 1 y 3) o bytes 0
+    let tieneHuecos = false;
+    for (let i = 0; i < partesManifiesto.length; i++) {
+      if (partesManifiesto[i].part_index !== i + 1 || partesManifiesto[i].bytes <= 0) {
+        tieneHuecos = true;
+        break;
+      }
+    }
+
+    const computedStatus = tieneHuecos ? "incompleto" : "disponible";
+
+    // Obtener timing de palabras si existe
+    let timing: any[] = [];
+    try {
+      const verRes = await db.query(
+        "SELECT version FROM volcado_version WHERE volcado_id = $1 ORDER BY version DESC LIMIT 1",
+        [volcadoId]
+      );
+      if (verRes.rows.length > 0) {
+        timing = await obtenerPalabrasTiming(volcadoId, Number(verRes.rows[0].version));
+      }
+    } catch {
+      timing = [];
+    }
+
     return NextResponse.json({
       volcado_id: volcadoId,
       session_id: sessionId,
       audio_expected: true,
-      audio_status: "disponible",
+      audio_status: computedStatus,
       total_partes: partesManifiesto.length,
       duracion_total_ms: duracionTotalMs,
       bytes_totales: bytesTotales,
       partes: partesManifiesto,
+      timing,
     });
   } catch (err: any) {
     return NextResponse.json({ error: "error_interno", detail: String(err) }, { status: 500 });
