@@ -66,6 +66,17 @@ export default function SystemBar() {
         <span className="text-xs mt-1 font-medium">Bóveda</span>
       </Link>
 
+      <Link
+        href="/sistema/seguridad"
+        className="flex flex-col items-center justify-center p-2"
+        style={{
+          color: pathname?.startsWith("/sistema/seguridad") ? "var(--khora-ink)" : "var(--khora-accent)"
+        }}
+      >
+        <Icons.ShieldCheck size={32} strokeWidth={1.75} absoluteStrokeWidth={true} />
+        <span className="text-xs mt-1 font-medium">Seguridad</span>
+      </Link>
+
       <ThemeToggle />
     </nav>
   );

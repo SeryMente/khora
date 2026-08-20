@@ -3,8 +3,15 @@ import { builtinModules } from "module";
 
 // Mock next-auth before anyone imports it
 const mockNextAuth = function () {
+  const authFn = function (handler?: any) {
+    if (typeof handler === "function") {
+      return async (req: any, ctx: any) => handler(req, ctx);
+    }
+    return Promise.resolve({ user: { email: "test@example.com", name: "Test Operator" } });
+  };
+
   return {
-    auth: async () => ({ user: { email: "test@example.com", name: "Test Operator" } }),
+    auth: authFn,
     handlers: {},
     signIn: async () => {},
     signOut: async () => {}

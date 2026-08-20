@@ -58,6 +58,14 @@ export async function createEpSessionToken(email: string, origin: string) {
   const client = await db.connect();
   try {
     await client.query("BEGIN");
+    const rateCheck = await client.query(
+      `SELECT COUNT(*)::int AS cnt FROM ep_bootstrap_tokens
+       WHERE usuario=$1 AND emitido_en > (NOW() - INTERVAL '15 minutes')`,
+      [payload.sub]
+    );
+    if ((rateCheck.rows[0]?.cnt ?? 0) >= 5) {
+      throw new Error("rate_limit_exceeded");
+    }
     await client.query(
       `UPDATE ep_bootstrap_tokens SET revocado_en=NOW()
        WHERE usuario=$1 AND revocado_en IS NULL AND expira_en>NOW()`, [payload.sub]

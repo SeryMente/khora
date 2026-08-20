@@ -7,6 +7,7 @@ const SUPERFICIES = [
     { href: "/sistema/consulta", etiqueta: "Consulta", icono: "MessageSquareShare" },
     { href: "/grafo", etiqueta: "Grafo", icono: "Network" },
     { href: "/sistema/boveda", etiqueta: "Boveda", icono: "LockKeyhole" },
+    { href: "/sistema/seguridad", etiqueta: "Seguridad", icono: "ShieldCheck" },
 ];
 
 export default function Home() {

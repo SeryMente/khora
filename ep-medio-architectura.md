@@ -50,21 +50,24 @@ Una sesión válida cumple simultáneamente:
 
 El token Khora no sustituye el Personal Access Token de GitHub ni la llave de la bóveda. Su paso ocurre **antes de la instanciación** y, por ello, no altera el orden interno no negociable.
 
-### 3.2 Emisión por Google OpenID Connect
+### 3.2 Emisión por Google OpenID Connect y Sección Seguridad
 
-1. El usuario abre `/sistema/entorno-persistente` en Khora.
+1. El usuario navega a la sección principal **Seguridad** (`/sistema/seguridad`) o mediante la redirección HTTP 308 desde `/sistema/entorno-persistente` hacia `/sistema/seguridad#entorno-persistente`.
 2. Auth.js valida la sesión mediante el proveedor configurado por `OIDC_ISSUER_URL`, `OIDC_CLIENT_ID` y `OIDC_CLIENT_SECRET`.
 3. El proveedor valida firma, emisor y reclamación de audiencia (`aud`) de Google.
 4. Khora compara el correo con `EP_ALLOWED_EMAIL` y falla cerrado si no coincide.
-5. `POST /api/ep/token` crea un identificador de sesión y emite un JSON Web Token HMAC-SHA256 con:
+5. `POST /api/ep/token` acepta el parámetro opcional de plataforma (`{ "platform": "windows" }`, por defecto `"windows"` si se omite). Plataformas no soportadas como `"linux"` o `"macos"` devuelven HTTP 400 con `unsupported_platform`.
+6. Se aplica un límite de tasa en base de datos (`ep_bootstrap_tokens`): máximo 5 emisiones por usuario cada 15 minutos (HTTP 429 `rate_limit_exceeded`).
+7. `POST /api/ep/token` crea un identificador de sesión y emite un JSON Web Token HMAC-SHA256 con:
    - `iss = khora-ep`;
    - `aud = EP_CANONICAL_URL`;
    - `sub = correo autenticado`;
    - `sid = identificador de sesión`;
    - `scope = ep:bootstrap ep:logs:write ep:logs:read`;
    - `jti`, `iat`, `exp` y `typ = ep-session`.
-6. Emitir un token nuevo revoca cualquier token de Entorno Persistente todavía activo del mismo usuario. Por eso se requiere una generación nueva por sesión.
-7. El servidor guarda únicamente SHA-256 de `jti`; el token completo se muestra una sola vez.
+8. Devuelve además el descriptor del lanzador (`launcher`: id, platform, shell, minimumVersion, storageBackend, status, command) e incluye los encabezados `Cache-Control: no-store` y `Pragma: no-cache`.
+9. Emitir un token nuevo revoca cualquier token de Entorno Persistente todavía activo del mismo usuario. Por eso se requiere una generación nueva por sesión.
+10. El servidor guarda únicamente SHA-256 de `jti`; el token completo se muestra una sola vez.
 
 Variables de producción obligatorias:
 
