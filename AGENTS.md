@@ -47,4 +47,4 @@ Antes de crear código nuevo para una capacidad del EP, el agente DEBE localizar
 - Mantén el punto de entrada único `scripts/khora/khora.ps1`.
 - Conserva identificadores `EP-*`; no renumeres identificadores publicados.
 - Todo cambio de flujo, seguridad, token, bitácora, persistencia o limpieza exige actualizar la arquitectura y `ep-integrity-manifest.sha256`.
-- Nunca añadas acceso anónimo, fallback sin BitLocker, secretos en logs, `git add -A` o despliegue de producción al arranque.
+- Nunca añadas acceso anónimo, fallback sin BitLocker, secretos en logs o `git add -A`. Conserva el despliegue obligatorio y verificable del SHA exacto de `main` en `EP-IN-080`; nunca despliegues `ep-wip/*`.
