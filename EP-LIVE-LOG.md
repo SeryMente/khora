@@ -3,25 +3,16 @@
 **Propósito:** registro operativo público y sanitizado del Entorno Persistente.
 **Versión:** KHORA v7.2.0
 **Estado:** ACTIVE
-**Última sincronización:** 2026-08-19 18:24:51
+**Última sincronización:** 2026-08-19 18:27:12
 **Motivo:** periodic-active-session
 **Branch publicado:** main
-**HEAD observado:** ceb0782d047582554fb8bffffb7f1001d44da8df
+**HEAD observado:** 72e7778b0e75755a61657ff5e77afb2e71fd9be6
 
 > Este archivo es un registro operativo, no sustituye EP-ARCHITECTURE.md.
 > Se actualiza bajo demanda, al quedar lista una sesión y al iniciar el cierre de sesión.
 
 ## Eventos recientes
 
-[16:53:58][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
-[16:54:04][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
-[16:54:16][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
-[16:54:16][WARN] Auto-WIP NO VERIFICADO: trabajo local sin respaldo remoto (reintento en el proximo ciclo).
-[16:54:20][FAIL] ALERTA EXFILTRACION/RAT: subida sostenida 25.4 MB/min (posible exfiltracion)
-[16:55:15][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
-[16:55:22][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
-[16:55:33][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
-[16:55:33][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
 [16:57:36][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
 [16:57:42][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
 [16:57:54][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
@@ -253,17 +244,17 @@
 [18:22:39][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
 [18:22:50][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
 [18:22:50][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
+[18:24:53][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
+[18:25:00][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
+[18:25:11][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
+[18:25:11][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
+[18:26:36][WARN] Chrome sin CDP activo o cerrado, omitiendo snapshot de pestañas.
+[18:26:37][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
+[18:26:44][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
+[18:26:55][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
+[18:26:55][WARN] Auto-WIP NO VERIFICADO: trabajo local sin respaldo remoto (reintento en el proximo ciclo).
 
 --- HISTORIAL DE SESIONES (ULTIMAS LINEAS) ---
-[17:54:10][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
-[17:54:22][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
-[17:54:22][WARN] Auto-WIP NO VERIFICADO: trabajo local sin respaldo remoto (reintento en el proximo ciclo).
-[17:54:25][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
-[17:54:31][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
-[17:54:43][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
-[17:54:43][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
-[17:56:45][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
-[17:56:52][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
 [17:57:03][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
 [17:57:03][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
 [17:59:06][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
@@ -335,3 +326,12 @@
 [18:22:39][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
 [18:22:50][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
 [18:22:50][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
+[18:24:53][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
+[18:25:00][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
+[18:25:11][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
+[18:25:11][WARN] EP-LIVE-LOG: commit creado pero push no verificado.
+[18:26:36][WARN] Chrome sin CDP activo o cerrado, omitiendo snapshot de pestañas.
+[18:26:37][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 1/3).
+[18:26:44][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 2/3).
+[18:26:55][WARN] Push-Verified: push OK pero remoto[***] != local[***] (intento 3/3).
+[18:26:55][WARN] Auto-WIP NO VERIFICADO: trabajo local sin respaldo remoto (reintento en el proximo ciclo).
