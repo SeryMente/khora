@@ -11,7 +11,8 @@
     "e2e:report": "playwright show-report",
     "prebuild": "node scripts/build-extension.mjs",
     "backfill:titulos": "tsx scripts/backfill_titulos.ts",
-    "repair:volcados": "tsx scripts/repair_volcados.ts"
+    "repair:volcados": "tsx scripts/repair_volcados.ts",
+    "migrate:ep": "node scripts/migrate-ep.mjs"
   },
   "dependencies": {
     "@google/genai": "^2.10.0",

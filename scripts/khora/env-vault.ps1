@@ -1,180 +1,101 @@
-﻿$Global:KhoraVaultPath = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..\secrets\env-vault.enc.json'))
-$Global:KhoraVaultMasterKey = $null
-
-$Global:KhoraVaultValidators = @{
-    'NEO4J_URI' = '^(neo4j(\+s)?|bolt(\+s)?|https)://\S+$'
-    'NEO4J_USER' = '^[A-Za-z0-9\-]{1,64}$'
-    'NEO4J_PASSWORD' = '^\S{8,}$'
-}
+﻿# Bóveda compatible con el formato existente y cifrado de perfil.
+$Global:KhoraVaultPath=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..\secrets\env-vault.enc.json'))
+if(-not(Get-Variable KhoraVaultMasterKey -Scope Global -ErrorAction SilentlyContinue)){$Global:KhoraVaultMasterKey=$null}
+if(-not(Get-Variable KhoraVaultLoadedNames -Scope Global -ErrorAction SilentlyContinue)){$Global:KhoraVaultLoadedNames=@()}
+$Global:KhoraVaultValidators=@{'NEO4J_URI'='^(neo4j(\+s)?|bolt(\+s)?|https)://\S+$';'NEO4J_USER'='^[A-Za-z0-9\-]{1,64}$';'NEO4J_PASSWORD'='^\S{8,}$'}
 
 function KhoraVault-SecureToPlain {
-    param([System.Security.SecureString]$Secure)
-    $bstr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($Secure)
-    try { [System.Runtime.InteropServices.Marshal]::PtrToStringUni($bstr) } finally { [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr) }
+    param([Security.SecureString]$Secure)
+    $pointer=[Runtime.InteropServices.Marshal]::SecureStringToBSTR($Secure)
+    try{return[Runtime.InteropServices.Marshal]::PtrToStringBSTR($pointer)}finally{[Runtime.InteropServices.Marshal]::ZeroFreeBSTR($pointer)}
 }
-
 function KhoraVault-GetMasterKey {
-    if ($Global:KhoraVaultMasterKey) { return $Global:KhoraVaultMasterKey }
-    $envPw = [System.Environment]::GetEnvironmentVariable('KHORA_VAULT_PASSWORD')
-    if (-not [string]::IsNullOrWhiteSpace($envPw)) {
-        $Global:KhoraVaultMasterKey = ConvertTo-SecureString -String $envPw -AsPlainText -Force
-        return $Global:KhoraVaultMasterKey
-    }
-    $secure = Read-Host "Password maestra de la boveda Khora (la misma siempre, NO tu token de GitHub)" -AsSecureString
-    $Global:KhoraVaultMasterKey = $secure
-    return $Global:KhoraVaultMasterKey
+    if($Global:KhoraVaultMasterKey){return$Global:KhoraVaultMasterKey}
+    $Global:KhoraVaultMasterKey=Read-Host 'Llave de la bóveda' -AsSecureString
+    return$Global:KhoraVaultMasterKey
 }
-
 function KhoraVault-DeriveKey {
-    param([System.Security.SecureString]$MasterSecure, [byte[]]$Salt)
-    $plain = KhoraVault-SecureToPlain -Secure $MasterSecure
-    $deriver = New-Object System.Security.Cryptography.Rfc2898DeriveBytes($plain, $Salt, 200000, [System.Security.Cryptography.HashAlgorithmName]::SHA256)
-    $deriver.GetBytes(64)
+    param([Security.SecureString]$MasterSecure,[byte[]]$Salt)
+    $plain=KhoraVault-SecureToPlain -Secure $MasterSecure
+    try{$deriver=New-Object Security.Cryptography.Rfc2898DeriveBytes($plain,$Salt,200000,[Security.Cryptography.HashAlgorithmName]::SHA256);return$deriver.GetBytes(64)}finally{$plain=$null}
 }
-
 function KhoraVault-Load {
-    if (Test-Path $Global:KhoraVaultPath) {
-        Get-Content $Global:KhoraVaultPath -Raw | ConvertFrom-Json
-    } else {
-        $s = New-Object byte[] 16
-        [System.Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($s)
-        [PSCustomObject]@{ salt = [Convert]::ToBase64String($s); entries = [PSCustomObject]@{} }
-    }
+    if(Test-Path $Global:KhoraVaultPath){return(Get-Content -LiteralPath $Global:KhoraVaultPath -Raw|ConvertFrom-Json)}
+    $salt=New-Object byte[] 16;[Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($salt)
+    return[pscustomobject]@{salt=[Convert]::ToBase64String($salt);entries=[pscustomobject]@{}}
 }
-
 function KhoraVault-Save {
     param($VaultObj)
-    $dir = Split-Path $Global:KhoraVaultPath -Parent
-    if ($dir -and (-not (Test-Path $dir))) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
-    $json = $VaultObj | ConvertTo-Json -Depth 10
-    [System.IO.File]::WriteAllText($Global:KhoraVaultPath, $json, (New-Object System.Text.UTF8Encoding($false)))
+    New-Item -ItemType Directory -Path (Split-Path -Parent $Global:KhoraVaultPath) -Force|Out-Null
+    [IO.File]::WriteAllText($Global:KhoraVaultPath,($VaultObj|ConvertTo-Json -Depth 10),(New-Object Text.UTF8Encoding($false)))
 }
-
+function Test-KhoraBytesEqual {
+    param([byte[]]$A,[byte[]]$B)
+    if($A.Length-ne$B.Length){return$false};$difference=0
+    for($index=0;$index-lt$A.Length;$index++){$difference=$difference-bor($A[$index]-bxor$B[$index])}
+    return($difference-eq0)
+}
 function KhoraVault-Encrypt {
-    param([string]$PlainText, [byte[]]$Key)
-    $aesKey = [byte[]]($Key[0..31])
-    $hmacKey = [byte[]]($Key[32..63])
-    $aes = [System.Security.Cryptography.Aes]::Create()
-    $aes.Key = $aesKey
-    $aes.GenerateIV()
-    $iv = $aes.IV
-    $encryptor = $aes.CreateEncryptor()
-    $plainBytes = [System.Text.Encoding]::UTF8.GetBytes($PlainText)
-    $cipherBytes = $encryptor.TransformFinalBlock($plainBytes, 0, $plainBytes.Length)
-    $aes.Dispose()
-    $hmac = New-Object System.Security.Cryptography.HMACSHA256(,$hmacKey)
-    $tag = $hmac.ComputeHash($iv + $cipherBytes)
-    $hmac.Dispose()
-    [PSCustomObject]@{ nonce = [Convert]::ToBase64String($iv); cipher = [Convert]::ToBase64String($cipherBytes); tag = [Convert]::ToBase64String($tag) }
+    param([string]$PlainText,[byte[]]$Key)
+    $aes=[Security.Cryptography.Aes]::Create();$aes.Key=[byte[]]$Key[0..31];$aes.GenerateIV()
+    $bytes=[Text.Encoding]::UTF8.GetBytes($PlainText);$cipher=$aes.CreateEncryptor().TransformFinalBlock($bytes,0,$bytes.Length)
+    $hmac=New-Object Security.Cryptography.HMACSHA256(,[byte[]]$Key[32..63]);$tag=$hmac.ComputeHash($aes.IV+$cipher)
+    $result=[pscustomobject]@{nonce=[Convert]::ToBase64String($aes.IV);cipher=[Convert]::ToBase64String($cipher);tag=[Convert]::ToBase64String($tag)}
+    $hmac.Dispose();$aes.Dispose();return$result
 }
-
 function KhoraVault-Decrypt {
-    param($Entry, [byte[]]$Key)
-    $aesKey = [byte[]]($Key[0..31])
-    $hmacKey = [byte[]]($Key[32..63])
-    $iv = [Convert]::FromBase64String($Entry.nonce)
-    $cipherBytes = [Convert]::FromBase64String($Entry.cipher)
-    $tag = [Convert]::FromBase64String($Entry.tag)
-    $hmac = New-Object System.Security.Cryptography.HMACSHA256(,$hmacKey)
-    $expectedTag = $hmac.ComputeHash($iv + $cipherBytes)
-    $hmac.Dispose()
-    if ([Convert]::ToBase64String($tag) -ne [Convert]::ToBase64String($expectedTag)) {
-        throw "KhoraVault: verificacion HMAC fallo - dato corrupto o llave incorrecta."
-    }
-    $aes = [System.Security.Cryptography.Aes]::Create()
-    $aes.Key = $aesKey
-    $aes.IV = $iv
-    $decryptor = $aes.CreateDecryptor()
-    $plainBytes = $decryptor.TransformFinalBlock($cipherBytes, 0, $cipherBytes.Length)
-    $aes.Dispose()
-    [System.Text.Encoding]::UTF8.GetString($plainBytes)
+    param($Entry,[byte[]]$Key)
+    $iv=[Convert]::FromBase64String($Entry.nonce);$cipher=[Convert]::FromBase64String($Entry.cipher);$tag=[Convert]::FromBase64String($Entry.tag)
+    $hmac=New-Object Security.Cryptography.HMACSHA256(,[byte[]]$Key[32..63]);$expected=$hmac.ComputeHash($iv+$cipher);$hmac.Dispose()
+    if(-not(Test-KhoraBytesEqual -A $tag -B $expected)){throw'Bóveda: HMAC inválido o llave incorrecta.'}
+    $aes=[Security.Cryptography.Aes]::Create();$aes.Key=[byte[]]$Key[0..31];$aes.IV=$iv
+    $plain=$aes.CreateDecryptor().TransformFinalBlock($cipher,0,$cipher.Length);$aes.Dispose()
+    return[Text.Encoding]::UTF8.GetString($plain)
 }
-
 function KhoraVault-ValidateValue {
-param([Parameter(Mandatory=$true)][string]$Name, [Parameter(Mandatory=$true)][string]$Value)
-if ($Global:KhoraVaultValidators.ContainsKey($Name)) {
-return [bool]($Value -match $Global:KhoraVaultValidators[$Name])
+    param([string]$Name,[string]$Value)
+    if($Global:KhoraVaultValidators.ContainsKey($Name)){return[bool]($Value-match$Global:KhoraVaultValidators[$Name])}
+    return($Value.Length-ge4)
 }
-return ($Value.Length -ge 4)
-}
-
 function Import-KhoraEnvVault {
-    $vault = KhoraVault-Load
-    $names = @($vault.entries.PSObject.Properties.Name)
-    if ($names.Count -eq 0) { Write-Host 'Boveda vacia o inexistente todavia.'; return @() }
-    $master = KhoraVault-GetMasterKey
-    $key = KhoraVault-DeriveKey -MasterSecure $master -Salt ([Convert]::FromBase64String($vault.salt))
-    $loaded = New-Object System.Collections.Generic.List[string]
-    $failed = New-Object System.Collections.Generic.List[string]
-    foreach ($name in $names) {
-        try {
-            $value = KhoraVault-Decrypt -Entry $vault.entries.$name -Key $key
-            [System.Environment]::SetEnvironmentVariable($name, $value, 'Process')
-            $loaded.Add($name)
-        } catch {
-            Write-Host ("FALLO al descifrar " + $name + ": " + $_.Exception.Message) -ForegroundColor Red
-            $failed.Add($name)
-        }
-    }
-    Write-Host ('Cargadas ' + $loaded.Count + ' variables desde la boveda: ' + ($loaded -join ', '))
-    if ($failed.Count -gt 0) { Write-Host ('FALLARON ' + $failed.Count + ': ' + ($failed -join ', ')) -ForegroundColor Yellow }
-    $loaded
+    param([string[]]$Names)
+    $vault=KhoraVault-Load;$available=@($vault.entries.PSObject.Properties.Name)
+    $targets=if($Names){@($Names)}else{$available};if($targets.Count-eq0){return@()}
+    $missing=@($targets|Where-Object{$available-notcontains$_});if($missing.Count){throw('Variables ausentes en bóveda: '+($missing-join', '))}
+    $key=KhoraVault-DeriveKey -MasterSecure (KhoraVault-GetMasterKey) -Salt ([Convert]::FromBase64String($vault.salt))
+    $loaded=New-Object 'System.Collections.Generic.List[string]'
+    foreach($name in $targets){$value=KhoraVault-Decrypt -Entry $vault.entries.$name -Key $key;[Environment]::SetEnvironmentVariable($name,$value,'Process');$loaded.Add($name);$value=$null}
+    $Global:KhoraVaultLoadedNames=@($Global:KhoraVaultLoadedNames+$loaded|Select-Object -Unique);$script:VaultLoadedNames=$Global:KhoraVaultLoadedNames
+    return@($loaded)
 }
-
 function Set-KhoraEnvVaultVariable {
-param([Parameter(Mandatory=$true)][string]$Name, [switch]$Rotate, [switch]$UseClipboard)
-$vault = KhoraVault-Load
-$existingNames = @($vault.entries.PSObject.Properties.Name)
-if (($existingNames -contains $Name) -and (-not $Rotate)) {
-Write-Host ($Name + ' ya existe en la boveda - se omite (usa -Rotate para forzar).')
-return
-}
-if ($UseClipboard) {
-Write-Host ("Copia el valor real de " + $Name + " al portapapeles y presiona Enter aqui:")
-Read-Host | Out-Null
-$plainValue = $null
-for ($i = 0; $i -lt 3 -and [string]::IsNullOrEmpty($plainValue); $i++) {
-try { $plainValue = Get-Clipboard } catch { Start-Sleep -Milliseconds 300 }
-}
-} else {
-$secureValue = Read-Host -AsSecureString -Prompt ('Valor para ' + $Name)
-$plainValue = KhoraVault-SecureToPlain -Secure $secureValue
-}
-if ([string]::IsNullOrWhiteSpace($plainValue)) {
-Write-Host ("FALLO: valor vacio para " + $Name + ". Abortando.") -ForegroundColor Red
-return
-}
-if (-not (KhoraVault-ValidateValue -Name $Name -Value $plainValue)) {
-Write-Host ("FALLO DE VALIDACION DE FORMATO para " + $Name + ". Abortando SIN GUARDAR.") -ForegroundColor Red
-$plainValue = $null
-return
-}
-$master = KhoraVault-GetMasterKey
-$key = KhoraVault-DeriveKey -MasterSecure $master -Salt ([Convert]::FromBase64String($vault.salt))
-$entry = KhoraVault-Encrypt -PlainText $plainValue -Key $key
-$len = $plainValue.Length
-if ($existingNames -contains $Name) { $vault.entries.$Name = $entry } else { $vault.entries | Add-Member -MemberType NoteProperty -Name $Name -Value $entry }
-KhoraVault-Save -VaultObj $vault
-$verifyVault = KhoraVault-Load
-$verifyKey = KhoraVault-DeriveKey -MasterSecure $master -Salt ([Convert]::FromBase64String($verifyVault.salt))
-$roundTripOk = $false
-try {
-$decrypted = KhoraVault-Decrypt -Entry $verifyVault.entries.$Name -Key $verifyKey
-if (($decrypted -ceq $plainValue) -and (KhoraVault-ValidateValue -Name $Name -Value $decrypted)) { $roundTripOk = $true }
-} catch { $roundTripOk = $false }
-$plainValue = $null
-if ($roundTripOk) {
-Write-Host ($Name + ' guardada en la boveda (longitud ' + $len + ') - verificacion round-trip OK.') -ForegroundColor Green
-} else {
-Write-Host ('FALLO CRITICO: ' + $Name + ' se guardo pero la verificacion round-trip post-guardado NO coincide. Revisa manualmente antes de confiar en este valor.') -ForegroundColor Red
-}
-}
-function Initialize-Khora09EnvVars {
-    $names = @('AUTH_SECRET','OIDC_ISSUER_URL','OIDC_CLIENT_ID','OIDC_CLIENT_SECRET','KHORA_API_URL','NEXT_PUBLIC_API_URL','KHORA_API_KEY','X_KHORA_KEY','DATABASE_URL','NEO4J_URI','NEO4J_USER','NEO4J_PASSWORD','GROQ_API_KEY','KHORA_LLM_BASE_URL','KHORA_LLM_API_KEY','KHORA_LLM_MODEL','KHORA_EMBEDDINGS_MODEL','KHORA_WEB_ORIGIN')
-    foreach ($n in $names) { Set-KhoraEnvVaultVariable -Name $n }
+    param([string]$Name,[switch]$Rotate,[switch]$UseClipboard)
+    $vault=KhoraVault-Load;$names=@($vault.entries.PSObject.Properties.Name);if(($names-contains$Name)-and-not$Rotate){return}
+    if($UseClipboard){$value=([string](Get-Clipboard -Raw)).Trim();Set-Clipboard -Value' '}else{$value=KhoraVault-SecureToPlain -Secure (Read-Host ('Valor para '+$Name) -AsSecureString)}
+    if([string]::IsNullOrWhiteSpace($value)-or-not(KhoraVault-ValidateValue -Name $Name -Value $value)){throw'Valor de bóveda inválido.'}
+    $key=KhoraVault-DeriveKey -MasterSecure (KhoraVault-GetMasterKey) -Salt ([Convert]::FromBase64String($vault.salt));$entry=KhoraVault-Encrypt -PlainText $value -Key $key
+    if($names-contains$Name){$vault.entries.$Name=$entry}else{$vault.entries|Add-Member -MemberType NoteProperty -Name $Name -Value $entry}
+    KhoraVault-Save -VaultObj $vault;$value=$null
 }
 
-function Initialize-Khora091EnvVars {
-    $names = @('GEMINI_API_KEY','LLM_CHEAP_BASE_URL','LLM_CHEAP_API_KEY','LLM_CHEAP_MODEL')
-    foreach ($n in $names) { Set-KhoraEnvVaultVariable -Name $n }
+function Protect-KhoraFile {
+    param([string]$InputFile,[string]$OutputFile)
+    $plain=[IO.File]::ReadAllBytes($InputFile);$salt=New-Object byte[] 16;[Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($salt)
+    $key=KhoraVault-DeriveKey -MasterSecure (KhoraVault-GetMasterKey) -Salt $salt
+    $aes=[Security.Cryptography.Aes]::Create();$aes.Key=[byte[]]$key[0..31];$aes.GenerateIV();$cipher=$aes.CreateEncryptor().TransformFinalBlock($plain,0,$plain.Length)
+    $magic=[Text.Encoding]::ASCII.GetBytes('KHORAEP1');$hmac=New-Object Security.Cryptography.HMACSHA256(,[byte[]]$key[32..63]);$tag=$hmac.ComputeHash($magic+$salt+$aes.IV+$cipher)
+    New-Item -ItemType Directory -Path (Split-Path -Parent $OutputFile) -Force|Out-Null;$stream=[IO.File]::Open($OutputFile,[IO.FileMode]::Create)
+    try{$stream.Write($magic,0,8);$stream.Write($salt,0,16);$stream.Write($aes.IV,0,16);$stream.Write($tag,0,32);$stream.Write($cipher,0,$cipher.Length)}finally{$stream.Dispose();$hmac.Dispose();$aes.Dispose();[Array]::Clear($plain,0,$plain.Length)}
 }
+function Unprotect-KhoraFile {
+    param([string]$InputFile,[string]$OutputFile)
+    $all=[IO.File]::ReadAllBytes($InputFile);if($all.Length-lt73-or[Text.Encoding]::ASCII.GetString($all,0,8)-ne'KHORAEP1'){throw'Perfil cifrado inválido.'}
+    $salt=[byte[]]$all[8..23];$iv=[byte[]]$all[24..39];$tag=[byte[]]$all[40..71];$cipher=[byte[]]$all[72..($all.Length-1)]
+    $key=KhoraVault-DeriveKey -MasterSecure (KhoraVault-GetMasterKey) -Salt $salt;$hmac=New-Object Security.Cryptography.HMACSHA256(,[byte[]]$key[32..63]);$expected=$hmac.ComputeHash([Text.Encoding]::ASCII.GetBytes('KHORAEP1')+$salt+$iv+$cipher)
+    if(-not(Test-KhoraBytesEqual -A $tag -B $expected)){throw'Perfil cifrado: HMAC inválido.'}
+    $aes=[Security.Cryptography.Aes]::Create();$aes.Key=[byte[]]$key[0..31];$aes.IV=$iv;$plain=$aes.CreateDecryptor().TransformFinalBlock($cipher,0,$cipher.Length)
+    [IO.File]::WriteAllBytes($OutputFile,$plain);$hmac.Dispose();$aes.Dispose();[Array]::Clear($plain,0,$plain.Length)
+}
+function Clear-KhoraEnvVaultSession {foreach($name in $Global:KhoraVaultLoadedNames){[Environment]::SetEnvironmentVariable($name,$null,'Process')};$Global:KhoraVaultLoadedNames=@();$Global:KhoraVaultMasterKey=$null;[GC]::Collect()}
+function Initialize-Khora09EnvVars{}
+function Initialize-Khora091EnvVars{}

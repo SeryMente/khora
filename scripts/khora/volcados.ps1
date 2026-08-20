@@ -1,4 +1,4 @@
-function Get-KhoraDir { $d = "$env:USERPROFILE\khora-volcados"; New-Item -ItemType Directory -Force -Path $d | Out-Null; $d }
+﻿function Get-KhoraDir { $d = "$env:USERPROFILE\khora-volcados"; New-Item -ItemType Directory -Force -Path $d | Out-Null; $d }
 function Get-KhoraSha([string]$t) { ([BitConverter]::ToString([Security.Cryptography.SHA256]::Create().ComputeHash([Text.Encoding]::UTF8.GetBytes($t))) -replace "-","").ToLower() }
 function Write-KhoraJson($obj,$path) { [IO.File]::WriteAllText($path, ($obj | ConvertTo-Json -Depth 8), (New-Object Text.UTF8Encoding($false))) }
 function Add-KhoraBitacora($rec) { Add-Content -Path (Join-Path (Get-KhoraDir) "bitacora.jsonl") -Value ($rec | ConvertTo-Json -Compress -Depth 8) -Encoding utf8 }
