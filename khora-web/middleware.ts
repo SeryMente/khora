@@ -9,6 +9,10 @@ export const config = {
 };
 
 export default auth((req) => {
+  if (req.nextUrl.pathname === "/sistema/entorno-persistente") {
+    return NextResponse.redirect(new URL("/sistema/seguridad#entorno-persistente", req.nextUrl.origin), 308);
+  }
+
   // Skip auth checks when running Playwright E2E tests
   if (process.env.PLAYWRIGHT_TEST_RUN === '1' || process.env.PLAYWRIGHT_TEST_BYPASS === 'true') {
     return NextResponse.next();
