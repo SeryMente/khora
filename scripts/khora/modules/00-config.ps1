@@ -32,4 +32,4 @@ $env:PIP_CACHE_DIR = Join-Path $WORK_DIR 'cache\pip'
 $env:XDG_CONFIG_HOME = Join-Path $STATE_DIR 'xdg-config'
 $env:XDG_DATA_HOME = Join-Path $STATE_DIR 'xdg-data'
 foreach ($path in @($env:TEMP,$env:GH_CONFIG_DIR,(Split-Path -Parent $env:GIT_CONFIG_GLOBAL),$env:NPM_CONFIG_CACHE,$env:PIP_CACHE_DIR,$env:XDG_CONFIG_HOME,$env:XDG_DATA_HOME)) { New-Item -ItemType Directory -Path $path -Force | Out-Null }
-$CFG = [ordered]@{repoOrg='SeryMente';repoName='khora';branch='main';gitName='Victor Hugo Torres';gitEmail='280919.29061988@proton.me';inactivityMinutes=15;autoWipMinutes=5;vercelScope='victorhugotorresmendez-8991s-projects';vercelProject='khora-web'}
+$CFG = [ordered]@{repoOrg='SeryMente';repoName='khora';branch='main';gitName='Victor Hugo Torres';gitEmail='280919.29061988@proton.me';inactivityMinutes=15;autoWipMinutes=5;vercelScope='victorhugotorresmendez-8991s-projects';vercelProject='khora-web';vercelCanonicalUrl='https://khora-web.vercel.app'}

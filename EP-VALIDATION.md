@@ -8,6 +8,7 @@
 - Delimitadores léxicos de PowerShell: **OK**.
 - Pruebas unitarias completas de Seguridad y Entorno Persistente (`khora-web/tests/unit/ep_security.test.ts`): **OK** (75 tests pasando).
 - Contrato multiplataforma `POST /api/ep/token` con descriptor `launcher` y rechazo 400 `unsupported_platform`: **OK**.
+- Contrato estático de publicación obligatoria del SHA exacto de `main` en `EP-IN-080`, con `vercel deploy --prod`, árbol desechable y `ep-main-live.json`: **OK**.
 - Límite de tasa por base de datos (5 emisiones / 15 min): **OK**.
 - Redirección HTTP 308 desde `/sistema/entorno-persistente` a `/sistema/seguridad#entorno-persistente`: **OK**.
 - Módulo `/sistema/seguridad` con navegación `ShieldCheck`, flujo visible de 4 pasos, accesibilidad por teclado, anuncios `aria-live` y visor de bitácora inline: **OK**.

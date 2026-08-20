@@ -9,11 +9,11 @@
 - token Khora efímero por sesión, emitido tras Google OpenID Connect;
 - continuidad cifrada de Visual Studio Code;
 - salida manual, Guardian, mecanismo de hombre muerto y limpieza al reinicio;
-- ausencia de despliegue automático de producción.
+- despliegue obligatorio del SHA exacto de `main` durante `EP-IN-080`, con prueba de procedencia en el alias canónico.
 
 ## Verificación pendiente fuera de este paquete
 
 - ejecución integral en Windows con BitLocker;
 - aplicación de la migración PostgreSQL en producción;
 - compilación Next.js con dependencias instaladas;
-- despliegue y prueba real de Google OpenID Connect.
+- despliegue real, verificación del alias canónico y prueba de Google OpenID Connect.

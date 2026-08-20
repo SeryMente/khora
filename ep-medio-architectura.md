@@ -34,7 +34,7 @@ Una sesión válida cumple simultáneamente:
 - presenta identificadores estables en la interfaz y en el registro técnico;
 - conserva continuidad mediante rama remota `ep-wip/*` y perfil cifrado;
 - limpia por finalización manual, cierre de Visual Studio Code, muerte de la terminal lanzadora o supervisor, mecanismo de hombre muerto, inactividad o reinicio, lo que ocurra primero;
-- nunca despliega producción durante el arranque;
+- publica en `EP-IN-080` el SHA exacto de `main` como producción y verifica el alias canónico antes de continuar;
 - nunca continúa sin cifrado, sin registro remoto crítico o sin limpieza al reinicio.
 
 ## 3. Modelo de acceso privado
@@ -79,6 +79,20 @@ Variables de producción obligatorias:
 - `OIDC_ISSUER_URL`, `OIDC_CLIENT_ID` y `OIDC_CLIENT_SECRET`.
 
 La migración requerida es `khora-web/db/migrations/016_ep_persistent_sessions.sql` y se aplica con `npm run migrate:ep`.
+
+### 3.3 Publicación obligatoria de `main` al instanciar
+
+Después de autenticar GitHub y antes de abrir Visual Studio Code, `EP-IN-080` debe:
+
+1. confirmar que `origin/main` sigue siendo el SHA fijado en `EP-IN-060`;
+2. autorizar y enlazar el proyecto Vercel sin persistir el token fuera del volumen cifrado;
+3. exportar el SHA mediante `git archive`, añadir únicamente la prueba de procedencia y ejecutar `vercel deploy --prod` desde ese árbol desechable;
+4. insertar en el artefacto estático `ep-main-live.json` con rama, SHA y hora UTC;
+5. consultar el alias canónico hasta que devuelva exactamente el SHA publicado;
+6. fallar cerrado si `main` cambia durante la secuencia o si el alias no acredita el SHA;
+7. eliminar el archivo local de variables descargado por Vercel y solo entonces restaurar la rama `ep-wip/*`.
+
+Esta publicación es parte constitutiva de la instanciación, no una acción opcional ni un despliegue del trabajo WIP.
 
 ### 3.3 Comando sin secreto en el historial
 
@@ -129,8 +143,8 @@ Los identificadores son API de observabilidad. **Nunca se renumeran ni reutiliza
 
 Formato visible amigable:
 
-- `› [EP-IN-080] Autorizando Vercel…`
-- `✓ [EP-IN-080] Vercel listo · 3.2 s`
+- `› [EP-IN-080] Autorizando Vercel y publicando main…`
+- `✓ [EP-IN-080] main está live y verificado · 3.2 s`
 - `! [EP-IN-080] No se pudo completar. Reporta EP-IN-080.`
 
 Formato técnico:
@@ -147,8 +161,8 @@ Formato técnico:
 | `EP-IN-040` | limpieza al reinicio | tarea `AtStartup`, `SYSTEM`, privilegio máximo registrada |
 | `EP-IN-050` | GitHub | Personal Access Token identifica usuario y permite escritura al repositorio privado |
 | `EP-IN-060` | commit exacto | archivo `zipball/{sha}` autenticado, extraído dentro del volumen |
-| `EP-IN-070` | continuidad GitHub | Git, GitHub CLI, `fetch`, SHA, rama `ep-wip/*` y autenticación verificados |
-| `EP-IN-080` | Vercel | llave valida la bóveda; `VERCEL_TOKEN`, `whoami` y `link` verificados |
+| `EP-IN-070` | GitHub y main exacto | Git, GitHub CLI, `fetch`, autenticación y SHA de `main` verificados |
+| `EP-IN-080` | Vercel y main live | `VERCEL_TOKEN`, `whoami`, `link`, build y despliegue del SHA exacto; el alias canónico devuelve `ep-main-live.json` con ese SHA; después se restaura `ep-wip/*` |
 | `EP-IN-090` | Visual Studio Code | distribución portátil verificada, perfil restaurado y proceso iniciado |
 | `EP-IN-100` | bóveda completa | variables de la bóveda importadas solo al proceso supervisor |
 | `EP-IN-110` | dependencias | Python, Node.js y gestores hidratándose dentro del volumen |
@@ -227,7 +241,7 @@ La seguridad define las compuertas; el paralelismo empieza después de ellas:
 2. Tras `EP-IN-050`, se precargan en paralelo Visual Studio Code, Python, Node.js, Git y GitHub CLI que falten.
 3. Herramientas existentes se reutilizan solo si cumplen versión/firma y toda su configuración puede redirigirse al volumen.
 4. Visual Studio Code se abre en `EP-IN-090`; Python y Node.js se hidratan paralelamente antes de declarar `EP-IN-130`.
-5. No se ejecutan durante arranque: navegador, Docker, Render, compilación completa, pruebas completas, servidores de desarrollo ni despliegue.
+5. No se ejecutan durante arranque: navegador, Docker, Render, pruebas completas ni servidores de desarrollo. La excepción obligatoria es el despliegue remoto de producción del árbol limpio de `main` en `EP-IN-080`.
 6. Cada etapa registra `durationMs`; la optimización se basa en medición Windows real y no en tiempos inventados.
 
 ## 9. Visual Studio Code y continuidad
