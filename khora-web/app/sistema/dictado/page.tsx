@@ -64,7 +64,7 @@ export default function DictadoPage() {
 
   // New refs for session & parts
   const sesionIdRef = useRef<string>("");
-  const parteConsecutivaRef = useRef<number>(0);
+  const parteConsecutivaRef = useRef<number>(1);
   const partesSubidasRef = useRef<{ parte: number; url: string; bytes: number }[]>([]);
   const parteTrozosRef = useRef<Blob[]>([]);
   const parteInicioRef = useRef<number>(0);
@@ -173,14 +173,11 @@ export default function DictadoPage() {
     const blob = new Blob(trozosParaSubir, { type: "audio/webm" });
     const sesionId = sesionIdRef.current;
 
-    const maxParteBytes = 3 * 1024 * 1024;
-    const totalBytes = blob.size;
-
-    const ejecutarSubidaDeBlob = async (blobASubir: Blob, numParte: number) => {
+    const ejecutarSubidas = async () => {
       const forma = new FormData();
-      forma.append("audio", blobASubir, `dictado-parte-${numParte}.webm`);
+      forma.append("audio", blob, `dictado-parte-${parteActual}.webm`);
       forma.append("sesionId", sesionId);
-      forma.append("parte", String(numParte));
+      forma.append("parte", String(parteActual));
 
       try {
         const ra = await fetch("/api/audio", { method: "POST", body: forma });
@@ -193,9 +190,9 @@ export default function DictadoPage() {
         }
 
         if (ra.ok && typeof da?.url === "string") {
-          const bytesSubidos = typeof da?.bytes === "number" ? da.bytes : blobASubir.size;
+          const bytesSubidos = typeof da?.bytes === "number" ? da.bytes : blob.size;
           partesSubidasRef.current.push({
-            parte: numParte,
+            parte: parteActual,
             url: da.url,
             bytes: bytesSubidos,
           });
@@ -203,32 +200,10 @@ export default function DictadoPage() {
           setBytesAcumulados((total) => total + bytesSubidos);
           setConAudio(true);
         } else {
-          setAviso(`audio parte ${numParte} no guardada: ${String(da?.detail || "")}`);
+          setAviso(`audio parte ${parteActual} no guardada: ${String(da?.detail || "")}`);
         }
       } catch (e) {
-        setAviso(`audio parte ${numParte} no guardada por error: ${String(e)}`);
-      }
-    };
-
-    const ejecutarSubidas = async () => {
-      if (totalBytes <= maxParteBytes) {
-        await ejecutarSubidaDeBlob(blob, parteActual);
-      } else {
-        let offset = 0;
-        let subParteIndex = 0;
-        while (offset < totalBytes) {
-          const fin = Math.min(offset + maxParteBytes, totalBytes);
-          const subBlob = blob.slice(offset, fin, "audio/webm");
-
-          const actualSubParteNum = (subParteIndex === 0) ? parteActual : parteConsecutivaRef.current;
-          if (subParteIndex > 0) {
-            parteConsecutivaRef.current += 1;
-          }
-
-          await ejecutarSubidaDeBlob(subBlob, actualSubParteNum);
-          offset = fin;
-          subParteIndex++;
-        }
+        setAviso(`audio parte ${parteActual} no guardada por error: ${String(e)}`);
       }
     };
 
@@ -380,7 +355,7 @@ export default function DictadoPage() {
     trozosRef.current = [];
 
     sesionIdRef.current = generarSesionId();
-    parteConsecutivaRef.current = 0;
+    parteConsecutivaRef.current = 1;
     partesSubidasRef.current = [];
     parteTrozosRef.current = [];
     parteInicioRef.current = Date.now();
@@ -449,8 +424,8 @@ export default function DictadoPage() {
 
       if (partes.length > 0) {
         const ordenadas = [...partes].sort((a, b) => a.parte - b.parte);
-        const parte0 = ordenadas.find((p) => p.parte === 0) || ordenadas[0];
-        audioUrl = parte0 ? parte0.url : null;
+        const parte1 = ordenadas.find((p) => p.parte === 1) || ordenadas[0];
+        audioUrl = parte1 ? parte1.url : null;
         audioBytes = ordenadas.reduce((sum, p) => sum + p.bytes, 0);
       }
 
@@ -517,7 +492,7 @@ export default function DictadoPage() {
     setReconciliacionMensaje("");
 
     sesionIdRef.current = "";
-    parteConsecutivaRef.current = 0;
+    parteConsecutivaRef.current = 1;
     partesSubidasRef.current = [];
     parteTrozosRef.current = [];
     subidaEnCursoRef.current = null;

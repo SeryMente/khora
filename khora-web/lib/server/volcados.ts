@@ -4,6 +4,8 @@ import { getDb } from "./neon";
 import { reportarIncidente } from "./incidentes";
 import { crearVersion } from "./correcciones";
 import { cifrarTexto, descifrarTexto } from "./cripto";
+import { generarTituloEstructurado, asignarTituloVolcado, esTituloGenericoOInvalido } from "./titulos";
+import { autoaplicarTildesSeguras } from "./tildesSeguras";
 
 export type EstadoVolcado = "archivado" | "pendiente_revision" | "en_revision" | "listo_ingesta" | "ingerido" | "fallido";
 
@@ -100,12 +102,23 @@ export async function prepararVolcadoParaRevision(volcadoId: string, actor?: str
       [randomUUID(), volcadoId, "transicion_pendiente_revision", estadoAnterior, "pendiente_revision", actor ?? null]
     );
 
-    // 2. Asegurar versión inicial v1
-    const textoClaro = descifrarTexto(String(v.texto ?? ""));
+    // 2. Ejecutar autoaplicación de tildes seguras sobre texto plano antes de crear la primera versión revisable (v1)
+    let textoClaro = descifrarTexto(String(v.texto ?? ""));
     const verRes = await client.query("SELECT version FROM volcado_version WHERE volcado_id = $1 AND version = 1", [volcadoId]);
     if (verRes.rows.length === 0) {
       if (!textoClaro) {
         throw new Error("Transcripción vacía al preparar versión v1");
+      }
+      const resTildes = autoaplicarTildesSeguras(textoClaro);
+      if (resTildes.cambioRealizado) {
+        textoClaro = resTildes.textoNuevo;
+        const nuevoSha = hashTexto(textoClaro);
+        await client.query("UPDATE volcado SET texto = $2, sha256 = $3, chars = $4 WHERE id = $1", [
+          volcadoId,
+          cifrarTexto(textoClaro),
+          nuevoSha,
+          textoClaro.length,
+        ]);
       }
       await crearVersion(volcadoId, textoClaro, "transcripcion original del dictado");
     }
@@ -119,6 +132,32 @@ export async function prepararVolcadoParaRevision(volcadoId: string, actor?: str
         origen: "detector_preparacion",
         evidencia: { motivo: "El texto transcrito está totalmente vacío." },
       });
+    }
+
+    // Asegurar título válido y no genérico antes de pasar a en_revision
+    if (!v.titulo || esTituloGenericoOInvalido(v.titulo)) {
+      try {
+        const resTitulo = await generarTituloEstructurado(textoClaro);
+        if (resTitulo.title && !esTituloGenericoOInvalido(resTitulo.title)) {
+          await asignarTituloVolcado(volcadoId, resTitulo.title, actor || "prepararVolcadoParaRevision");
+        } else {
+          await reportarIncidente({
+            volcadoId,
+            tipo: "titulo_ausente",
+            severidad: "media",
+            origen: "prepararVolcadoParaRevision",
+            evidencia: { motivo: "El generador de títulos no produjo un título válido." },
+          });
+        }
+      } catch (tErr) {
+        await reportarIncidente({
+          volcadoId,
+          tipo: "titulo_ausente",
+          severidad: "media",
+          origen: "prepararVolcadoParaRevision",
+          evidencia: { error: String(tErr) },
+        });
+      }
     }
 
     // 4. Transición final exitosa: -> en_revision

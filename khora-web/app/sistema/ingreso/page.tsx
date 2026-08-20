@@ -83,7 +83,7 @@ function IngresoContenido() {
 
   // New refs for session & parts
   const sesionIdRef = useRef<string>("");
-  const parteConsecutivaRef = useRef<number>(0);
+  const parteConsecutivaRef = useRef<number>(1);
   const partesSubidasRef = useRef<{ parte: number; url: string; bytes: number }[]>([]);
   const parteTrozosRef = useRef<Blob[]>([]);
   const parteInicioRef = useRef<number>(0);
@@ -367,7 +367,7 @@ function IngresoContenido() {
     trozosRef.current = [];
 
     sesionIdRef.current = generarSesionId();
-    parteConsecutivaRef.current = 0;
+    parteConsecutivaRef.current = 1;
     partesSubidasRef.current = [];
     parteTrozosRef.current = [];
     parteInicioRef.current = Date.now();
@@ -449,8 +449,8 @@ function IngresoContenido() {
 
       if (partes.length > 0) {
         const ordenadas = [...partes].sort((a, b) => a.parte - b.parte);
-        const parte0 = ordenadas.find((p) => p.parte === 0) || ordenadas[0];
-        audioUrl = parte0 ? parte0.url : null;
+        const parte1 = ordenadas.find((p) => p.parte === 1) || ordenadas[0];
+        audioUrl = parte1 ? parte1.url : null;
         audioBytes = ordenadas.reduce((sum, p) => sum + p.bytes, 0);
       }
 
@@ -520,7 +520,7 @@ function IngresoContenido() {
     setReconciliacionMensaje("");
 
     sesionIdRef.current = "";
-    parteConsecutivaRef.current = 0;
+    parteConsecutivaRef.current = 1;
     partesSubidasRef.current = [];
     parteTrozosRef.current = [];
     subidaEnCursoRef.current = null;

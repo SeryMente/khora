@@ -40,12 +40,14 @@ export async function POST(req: Request) {
 
     if (isSession && isParte) {
       const partIndex = parseInt(parteStr, 10);
-      const validPartIndex = Number.isNaN(partIndex) ? 1 : partIndex;
+      if (Number.isNaN(partIndex) || partIndex < 1) {
+        return NextResponse.json({ detail: "Índice de parte inválido (debe ser mayor o igual a 1)" }, { status: 400 });
+      }
 
       try {
         await registrarParteAudio({
           sessionId: String(sesionId).trim(),
-          partIndex: validPartIndex,
+          partIndex,
           blobUrl: subido.url,
           blobPath: destino,
           bytes: crudo.length,

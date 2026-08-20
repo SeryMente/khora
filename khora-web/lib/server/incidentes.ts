@@ -12,6 +12,8 @@ export type TipoIncidente =
   | "blob_inaccesible"
   | "checksum_audio_invalido"
   | "transcripcion_ausente"
+  | "titulo_ausente"
+  | "analisis_llm_fallido"
   | "chunk_pendiente_error"
   | "preparacion_revision_fallida"
   | "integridad_procedencia_rota"

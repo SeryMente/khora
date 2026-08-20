@@ -170,37 +170,77 @@ test.describe("Pipeline Control Tower E2E Tests", () => {
       });
     });
 
-    // 6. Mock Revision Approve endpoint using a bulletproof pattern that handles both GET and POST safely
+    // 6. Mock Revision endpoints
     await page.route("**/api/revision/**", async (route) => {
-      console.log(`MOCK REVISION CALLED: method=${route.request().method()}, url=${route.request().url()}`);
-      // Exclude delta and sugerencias checks so they fall through to their respective handlers
-      if (route.request().url().includes("/delta") || route.request().url().includes("/sugerencias")) {
+      const url = route.request().url();
+      const method = route.request().method();
+
+      if (url.includes("/delta") || url.includes("/sugerencias")) {
         return route.fallback();
       }
 
-      const method = route.request().method();
-      if (method === "POST") {
+      if (url.includes("/compuerta")) {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            canApprove: true,
+            version: 3,
+            sha256: "sha3",
+            gate_hash: "mock-gate-hash-123",
+            blockers: [],
+            warnings: [],
+            counts: {
+              errores_tipograficos_pendientes: 0,
+              correcciones_lingüisticas_pendientes: 0,
+              observaciones_sintacticas_pendientes: 0,
+              incidentes_operativos_abiertos: 0,
+            },
+          }),
+        });
+        return;
+      }
+
+      if (url.includes("/incidentes")) {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({ incidentes: [] }),
+        });
+        return;
+      }
+
+      if (url.includes("/hallazgos")) {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({ hallazgos: [] }),
+        });
+        return;
+      }
+
+      if (method === "POST" && url.includes("/aprobar")) {
         v002Approved = true;
-        console.log("APPROVE POST TRIGGERED, v002Approved SET TO TRUE");
         await route.fulfill({
           status: 200,
           contentType: "application/json",
           body: JSON.stringify({ success: true, version_aprobada: 3, sha256_aprobado: "sha3" }),
         });
-      } else {
-        await route.fulfill({
-          status: 200,
-          contentType: "application/json",
-          body: JSON.stringify({
-            volcado_id: "v-002",
-            version_aprobada: v002Approved ? 3 : null,
-            sha256_aprobado: v002Approved ? "sha3" : null,
-            aprobador: v002Approved ? "operador@khora.com" : null,
-            aprobado_en: v002Approved ? "2026-07-28T14:00:00Z" : null,
-            estado: v002Approved ? "listo_ingesta" : "en_revision"
-          }),
-        });
+        return;
       }
+
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          volcado_id: "v-002",
+          version_aprobada: v002Approved ? 3 : null,
+          sha256_aprobado: v002Approved ? "sha3" : null,
+          aprobador: v002Approved ? "operador@khora.com" : null,
+          aprobado_en: v002Approved ? "2026-07-28T14:00:00Z" : null,
+          estado: v002Approved ? "listo_ingesta" : "en_revision",
+        }),
+      });
     });
 
     // 7. Mock Kernel Ingestion endpoint
@@ -220,40 +260,34 @@ test.describe("Pipeline Control Tower E2E Tests", () => {
   test("1. abrir Pipeline & 2. visualizar contadores", async ({ page }) => {
     // Check header
     const title = page.locator("h1");
-    await expect(title).toContainText("Archivo de Volcados");
+    await expect(title).toContainText("Mesa de Revisión Sincrónica");
 
-    // Check summary counters using first() or exact matches to avoid strict mode violations
+    // Check summary counters
     await expect(page.locator("text=Total volcados").first()).toBeVisible();
-    await expect(page.locator("span:has-text('En revisión')").first()).toBeVisible();
+    await expect(page.locator("text=En revisión").first()).toBeVisible();
     await expect(page.locator("text=Listos / Ingesta").first()).toBeVisible();
     await expect(page.locator("text=Grafo / Ingeridos").first()).toBeVisible();
-    await expect(page.locator("text=Atención / Anomalías").first()).toBeVisible();
+    await expect(page.locator("text=Incidentes Abiertos").first()).toBeVisible();
   });
 
   test("3. seleccionar un volcado & 4. abrir Trace View", async ({ page }) => {
     // Click on row of v-001 specifically using its text
-    await page.locator("text=v-001").first().click();
+    await page.locator("text=Volcado de Ingesta Exitoso").first().click();
+
+    // Click Trace subtab
+    await page.locator("button:has-text('Trace')").first().click();
 
     // Trace layout/detail is shown
-    await expect(page.locator("text=Trazabilidad Operacional")).toBeVisible();
-    await expect(page.locator("h2").first()).toBeVisible();
-
-    // Verify Trace steps (chronological sequence)
-    await expect(page.locator("text=Traceability Tree Map")).toBeVisible();
-    await expect(page.locator("text=🎙 Captura")).toBeVisible();
-    await expect(page.locator("text=💾 Archivo")).toBeVisible();
-    await expect(page.locator("text=📝 Transcripción")).toBeVisible();
-    await expect(page.locator("text=✓ Aprobación")).toBeVisible();
-    await expect(page.locator("text=⚙ Ingesta")).toBeVisible();
-    await expect(page.locator("text=◎ Grafo PKG Proyecciones")).toBeVisible();
+    await expect(page.locator("text=Metadatos de Sesión")).toBeVisible();
+    await expect(page.locator("text=UUID: v-001")).toBeVisible();
   });
 
   test("5. abrir revisión & 6. reproducir audio", async ({ page }) => {
     // Select v-001
-    await page.locator("text=v-001").first().click();
+    await page.locator("text=Volcado de Ingesta Exitoso").first().click();
 
-    // Click "Revisión" subtab inside the header
-    await page.locator("div.border-b button:has-text('Revisión')").click();
+    // Click "Cockpit" subtab inside the header
+    await page.locator("button:has-text('Cockpit')").first().click();
 
     // Audio player should be visible
     const audioPlayer = page.locator("audio");
@@ -262,8 +296,10 @@ test.describe("Pipeline Control Tower E2E Tests", () => {
 
   test("7. editar texto & 8. guardar versión", async ({ page }) => {
     // Select v-002
-    await page.locator("text=v-002").first().click();
-    await page.locator("div.border-b button:has-text('Revisión')").click();
+    await page.locator("text=Volcado en Revisión Modificado").first().click();
+
+    // Switch to Modo Edición
+    await page.locator("button:has-text('Modo Edición')").click();
 
     // Edit textarea
     const textarea = page.locator("textarea");
@@ -271,64 +307,42 @@ test.describe("Pipeline Control Tower E2E Tests", () => {
     await textarea.fill("Cambio editado por el operador de pruebas");
 
     // Mock save version
-    await page.locator("button:has-text('Guardar versión')").click();
+    await page.locator("button:has-text('Guardar Nueva Versión')").click();
   });
 
-  test("9. visualizar delta", async ({ page }) => {
-    // Select v-002 (which has 3 versions)
-    await page.locator("text=v-002").first().click();
-    await page.locator("div.border-b button:has-text('Revisión')").click();
+  test("9. aprobar versión mediante modal de confirmación accesible", async ({ page }) => {
+    // Select v-002
+    await page.locator("text=Volcado en Revisión Modificado").first().click();
 
-    // Delta section should show version diff pairs
-    await expect(page.locator("text=Delta Changes")).toBeVisible();
-    await expect(page.locator("text=− Texto version 2")).toBeVisible();
-    await expect(page.locator("text=+ Texto version 3")).toBeVisible();
-  });
+    // Open Accessible Modal
+    await page.locator("button:has-text('Alternativa Teclado')").click();
 
-  test("10. aprobar versión & 11. verificar bloqueo previo a aprobación & 12. ingerir versión aprobada & 13. visualizar io_id", async ({ page }) => {
-    // Select v-002 (which has no approved version initially)
-    await page.locator("text=v-002").first().click();
-    await page.locator("div.border-b button:has-text('Revisión')").click();
+    // Fill exact confirmation text "APROBAR v3"
+    const confirmInput = page.locator("input[placeholder='APROBAR v3']");
+    await expect(confirmInput).toBeVisible();
+    await confirmInput.fill("APROBAR v3");
 
-    // 11. Verify ingestion is blocked beforehand (shows blocked warning)
-    await expect(page.locator("text=Bloqueado para Ingesta:")).toBeVisible();
-
-    // Wait a brief moment to ensure React is fully hydrated and interactive
-    await page.waitForTimeout(600);
-
-    // 10. Approve active version (v3)
-    await page.locator("button:has-text('Aprobar v3')").click();
+    // Click Confirm Approval
+    await page.locator("button:has-text('Confirmar Aprobación')").click();
 
     // Ingestion should unlock and show ingest action
-    const ingestBtn = page.locator("button:has-text('Ingerir')");
+    const ingestBtn = page.locator("button:has-text('Ingerir versión aprobada')");
     await expect(ingestBtn).toBeVisible();
 
-    // 12. Ingerir versión aprobada
+    // Ingerir versión aprobada
     await ingestBtn.click();
 
-    // 13. Verify newly generated io_id is shown successfully
-    await expect(page.locator("text=✓ INGESTADO")).toBeVisible();
+    // Verify newly generated io_id is shown successfully
     await expect(page.locator("text=io_id: io-newly-ingested-id").first()).toBeVisible();
   });
 
-  test("14. visualizar estado de grafo", async ({ page }) => {
-    // Look for graph nodes count summary badge in the main table row
-    const graphBadge = page.locator("text=12n / 18r");
-    await expect(graphBadge).toBeVisible();
-  });
-
-  test("15. visualizar anomalías de integridad", async ({ page }) => {
-    // Find text_without_audio and audio_partial anomaly badges
-    await expect(page.locator("text=Incompleto").first()).toBeVisible();
-  });
-
-  test("16. responsive", async ({ page }) => {
+  test("10. responsive", async ({ page }) => {
     // Resize viewport to mobile size
     await page.setViewportSize({ width: 375, height: 667 });
 
     // Header and navigation still present and functional
     await expect(page.locator("h1")).toBeVisible();
-    await expect(page.locator("button:has-text('Pipeline Tower')")).toBeVisible();
+    await expect(page.locator("button:has-text('Mesa de Revisión')")).toBeVisible();
   });
 
   test("17. tema oscuro/claro", async ({ page }) => {

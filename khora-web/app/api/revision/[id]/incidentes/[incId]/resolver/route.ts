@@ -57,10 +57,30 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
     // Check if audio_recuperado requires audio verification
     if (codigoResolucion === "audio_recuperado") {
       const v = volcadoRes.rows[0];
-      const hasAudio = !!v.audio_url || !!v.session_id || !!v.audio_partes;
-      if (!hasAudio) {
+      const sessionId = v.session_id ? String(v.session_id).trim() : null;
+      let valid = false;
+
+      const pRes = await db.query(
+        "SELECT bytes FROM dictado_audio_parte WHERE session_id = $1 OR volcado_id = $2",
+        [sessionId, realVolcadoId]
+      );
+      if (pRes.rows.length > 0) {
+        const hasValidBytes = pRes.rows.every((row: any) => Number(row.bytes || 0) > 0);
+        if (hasValidBytes) valid = true;
+      } else if (v.audio_partes) {
+        try {
+          const jsonPartes = typeof v.audio_partes === "string" ? JSON.parse(v.audio_partes) : v.audio_partes;
+          if (Array.isArray(jsonPartes) && jsonPartes.length > 0 && jsonPartes.every((p: any) => Number(p.bytes || 0) > 0)) {
+            valid = true;
+          }
+        } catch {}
+      } else if (v.audio_url) {
+        valid = true;
+      }
+
+      if (!valid) {
         return NextResponse.json(
-          { detail: "No se puede resolver como 'audio_recuperado': el audio aún no es accesible ni reproducible." },
+          { detail: "No se puede resolver como 'audio_recuperado': el manifiesto y los bytes de audio no son válidos." },
           { status: 422 }
         );
       }
