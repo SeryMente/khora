@@ -146,8 +146,19 @@ export default function DictadoPage() {
         pendienteRef.current = "";
 
         const hayManual = resultadoReconciliacion.segmentos.some((s) => s.estado === "editado_manual" || s.modificadoManualmente);
-        setEstadoReconciliacion(hayManual ? "editado_manual" : "reconciliado_whisper");
-        setReconciliacionMensaje(data.motivoReconciliacion || "Transcripción autoritativa Groq Whisper procesada con éxito.");
+        const perdida = data.perdidaDetectada || resultadoReconciliacion.perdidaDetectada;
+
+        if (hayManual) {
+          setEstadoReconciliacion("editado_manual");
+        } else if (perdida) {
+          setEstadoReconciliacion("fallback_preview");
+        } else {
+          setEstadoReconciliacion("reconciliado_whisper");
+        }
+
+        setReconciliacionMensaje(
+          data.motivoReconciliacion || resultadoReconciliacion.motivo || "Transcripción autoritativa Groq Whisper procesada con éxito."
+        );
       } else {
         const hayManual = segmentosRef.current.some((s) => s.estado === "editado_manual" || s.modificadoManualmente);
         setEstadoReconciliacion(hayManual ? "editado_manual" : "fallback_preview");

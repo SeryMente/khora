@@ -151,4 +151,84 @@ test.describe('Dictado sin perdida anti-regresion guard', () => {
     expect(normalizedText).toContain('hola');
     expect(normalizedText).toContain('solo');
   });
+
+  test('prevents loss when authoritative backend returns truncated response (@req FIX-DICTADO/D9)', async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem('khora_auth_session', JSON.stringify({ authenticated: true, timestamp: Date.now() }));
+    });
+
+    await page.addInitScript(() => {
+      class MockSpeechRecognition {
+        continuous = true;
+        interimResults = true;
+        lang = 'es-MX';
+        onstart: any = null;
+        onresult: any = null;
+        onerror: any = null;
+        onend: any = null;
+        _started = false;
+
+        start() {
+          if (this._started) return;
+          this._started = true;
+          if (this.onstart) {
+            setTimeout(() => {
+              if (!this._started) return;
+              this.onstart();
+              const event = {
+                resultIndex: 0,
+                results: [
+                  { 0: { transcript: 'hola esto es una prueba importante de dictado sin pérdida' }, isFinal: true, length: 1 }
+                ]
+              };
+              if (this.onresult) this.onresult(event);
+            }, 50);
+          }
+        }
+
+        stop() { this._started = false; if (this.onend) setTimeout(() => this.onend(), 50); }
+        abort() { this._started = false; if (this.onend) setTimeout(() => this.onend(), 50); }
+      }
+
+      (window as any).SpeechRecognition = MockSpeechRecognition;
+      (window as any).webkitSpeechRecognition = MockSpeechRecognition;
+    });
+
+    // Mock API /api/transcribir to return a truncated response with exito: true
+    await page.route('/api/transcribir', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          exito: true,
+          textoAutoritativo: 'hola esto es una prueba',
+          textoFinal: 'hola esto es una prueba importante de dictado sin pérdida',
+          reconciliado: false,
+          perdidaDetectada: true,
+          motivoReconciliacion: 'Pérdida de contenido detectada en Whisper. Se conservó la previsualización ASR en vivo.',
+          modelo: 'whisper-large-v3'
+        }),
+      });
+    });
+
+    await page.goto('/sistema/dictado');
+    await expect(page.locator('h1')).toBeVisible();
+
+    const startBtn = page.locator('button:has-text("Iniciar dictado")');
+    await startBtn.click();
+    await page.waitForTimeout(1000);
+
+    const stopBtn = page.locator('button:has-text("Detener")');
+    await stopBtn.click();
+
+    const transcriptionArea = page.locator('main div.p-4.min-h-\\[240px\\]').first();
+    await expect(transcriptionArea).toBeVisible();
+
+    const textContent = await transcriptionArea.textContent() || '';
+    const normalizedText = textContent.toLowerCase();
+
+    // Verify content was preserved despite truncated Whisper response
+    expect(normalizedText).toContain('dictado sin pérdida');
+    expect(normalizedText).toContain('importante');
+  });
 });

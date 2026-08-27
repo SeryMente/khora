@@ -53,6 +53,7 @@ export async function POST(req: Request) {
           textoFinal: rec.textoFinal,
           reconciliado: rec.reconciliado,
           motivoReconciliacion: rec.motivo,
+          perdidaDetectada: rec.perdidaDetectada ?? false,
           modelo: res.modelo,
           segmentos: res.segmentos,
         });
@@ -100,6 +101,7 @@ export async function POST(req: Request) {
         textoFinal: rec.textoFinal,
         reconciliado: rec.reconciliado,
         motivoReconciliacion: rec.motivo,
+        perdidaDetectada: rec.perdidaDetectada ?? false,
         partesProcesadas: resChunking.partesProcesadas,
         fallos: resChunking.fallos,
         detallesChunks: resChunking.detallesChunks,
