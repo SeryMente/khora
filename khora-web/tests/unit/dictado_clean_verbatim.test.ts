@@ -78,3 +78,49 @@ test("Prueba 6: Caso en que Groq esté indisponible (fallback grace)", () => {
   assert.strictEqual(rec.reconciliado, false);
   assert.strictEqual(rec.textoFinal, previewASR, "Debe conservar la previsualización ASR intacta sin desplomarse");
 });
+
+// @req FIX-DICTADO/D9 - Tests de Guardián de Cobertura de Contenido y No-Pérdida
+
+test("Prueba 7 (@req FIX-DICTADO/D9): Whisper responde con exito pero truncado (falta una cláusula completa) -> no pierde texto", () => {
+  const previewASR = "el operador estuvo dictando la primera cláusula del acta y luego continúo con la segunda cláusula importante";
+  const whisperTruncado = "el operador estuvo dictando la primera cláusula del acta";
+
+  const rec = reconciliarTranscripcion(previewASR, whisperTruncado);
+  assert.strictEqual(rec.perdidaDetectada, true, "Debe detectar pérdida de contenido");
+  assert.ok(rec.textoFinal.includes("segunda cláusula importante"), "No debe perder la frase omitida por Whisper");
+});
+
+test("Prueba 8 (@req FIX-DICTADO/D9): Whisper responde con exito y corrige UNA palabra mal oída -> el guardián ACEPTA Whisper", () => {
+  const previewASR = "el informe técnico de jora fue recibido hoy por la mañana";
+  const whisperCorregido = "El informe técnico de Khora fue recibido hoy por la mañana.";
+
+  const rec = reconciliarTranscripcion(previewASR, whisperCorregido);
+  assert.strictEqual(rec.reconciliado, true, "Debe aceptar la transcripción autoritativa de Whisper");
+  assert.strictEqual(rec.perdidaDetectada, false, "No debe marcar pérdida cuando solo se corrige una palabra");
+  assert.strictEqual(rec.textoFinal, whisperCorregido, "Debe adoptar el texto autoritativo de Whisper");
+});
+
+test("Prueba 9 (@req FIX-DICTADO/D9): Repetición real de palabras ('digo digo') sobrevive íntegra de punta a punta", () => {
+  const previewASR = "solo digo digo que la prueba debe pasar";
+  const whisperRepeticion = "Solo digo digo que la prueba debe pasar.";
+
+  const rec = reconciliarTranscripcion(previewASR, whisperRepeticion);
+  assert.strictEqual(rec.reconciliado, true);
+  assert.ok(rec.textoFinal.includes("digo digo"), "La repetición legítima debe sobrevivir sin alteración");
+});
+
+test("Prueba 10 (@req FIX-DICTADO/D9): Desajuste en el número de párrafos entre ASR y Whisper no pierde contenido en reconciliarSegmentos", () => {
+  const { reconciliarSegmentos } = require("../../lib/transcripcion/reconciliar.js");
+
+  const segmentosASR = [
+    { id: "seg-1", texto: "Primera idea del dictado.", estado: "provisional_asr" },
+    { id: "seg-2", texto: "Segunda idea del dictado.", estado: "provisional_asr" },
+    { id: "seg-3", texto: "Tercera idea del dictado.", estado: "provisional_asr" },
+  ];
+
+  const whisperUnSoloParrafo = "Primera idea del dictado. Segunda idea del dictado. Tercera idea del dictado.";
+
+  const res = reconciliarSegmentos(segmentosASR, whisperUnSoloParrafo);
+  assert.strictEqual(res.perdidaDetectada, false, "No debe marcar pérdida cuando todo el contenido está presente");
+  assert.ok(res.textoFinal.includes("Tercera idea"), "No debe perder párrafos por desalineación posicional");
+});

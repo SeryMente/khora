@@ -528,11 +528,13 @@ export async function procesarChunksIncrementales(
 export { reconciliarSegmentos } from "../transcripcion/reconciliar";
 export type { EstadoSegmento, SegmentoReconciliado } from "../transcripcion/reconciliar";
 
+import { evaluarCoberturaYReconciliar } from "../transcripcion/reconciliar";
+
 export function reconciliarTranscripcion(
   previewBrowser: string,
   textoAutoritativo: string,
   opciones?: { modificadoManualmente?: boolean }
-): { textoFinal: string; reconciliado: boolean; motivo: string } {
+): { textoFinal: string; reconciliado: boolean; motivo: string; perdidaDetectada?: boolean } {
   const pTrim = previewBrowser.trim();
   const aTrim = textoAutoritativo.trim();
 
@@ -541,6 +543,7 @@ export function reconciliarTranscripcion(
       textoFinal: pTrim,
       reconciliado: false,
       motivo: "Protección de edición manual activa: la transcripción autoritativa no sobrescribió la corrección manual del operador.",
+      perdidaDetectada: false,
     };
   }
 
@@ -549,6 +552,7 @@ export function reconciliarTranscripcion(
       textoFinal: pTrim,
       reconciliado: false,
       motivo: "Sin transcripción autoritativa disponible; conservando previsualización ASR del navegador.",
+      perdidaDetectada: false,
     };
   }
 
@@ -557,12 +561,16 @@ export function reconciliarTranscripcion(
       textoFinal: aTrim,
       reconciliado: true,
       motivo: "Previsualización vacía; adoptando transcripción autoritativa directamente.",
+      perdidaDetectada: false,
     };
   }
 
+  const evaluacion = evaluarCoberturaYReconciliar(pTrim, aTrim);
+
   return {
-    textoFinal: aTrim,
-    reconciliado: true,
-    motivo: "Reconciliación exitosa: transcripción autoritativa Groq Whisper aplicada sobre previsualización ASR.",
+    textoFinal: evaluacion.textoResultado,
+    reconciliado: evaluacion.aceptado,
+    motivo: evaluacion.motivo,
+    perdidaDetectada: evaluacion.perdidaDetectada,
   };
 }
