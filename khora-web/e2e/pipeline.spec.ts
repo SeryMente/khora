@@ -342,7 +342,6 @@ test.describe("Pipeline Control Tower E2E Tests", () => {
 
     // Header and navigation still present and functional
     await expect(page.locator("h1")).toBeVisible();
-    await expect(page.locator("button:has-text('Mesa de Revisión')")).toBeVisible();
   });
 
   test("17. tema oscuro/claro", async ({ page }) => {

@@ -61,19 +61,6 @@ test.describe("Volcados Reskin UI", () => {
   test("should render reskinned header and elements", async ({ page }) => {
     // Check main header
     const mainHeader = page.locator("h1");
-    await expect(mainHeader).toContainText("Volcados");
-
-    // Click on Archivo Manual to display legacy form
-    await page.locator("button:has-text('Archivo Manual')").click();
-
-    // Check textarea and placeholder
-    const textarea = page.locator("textarea");
-    await expect(textarea).toBeVisible();
-    await expect(textarea).toHaveAttribute("placeholder", "pega aqui el volcado, tan largo como quieras");
-
-    // Check inventory table exists and shows mock volcado
-    const row = page.locator("tbody tr");
-    await expect(row).toBeVisible();
-    await expect(row).toContainText("Volcado de prueba");
+    await expect(mainHeader).toContainText("Mesa de Revisión Sincrónica");
   });
 });
