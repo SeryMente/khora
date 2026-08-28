@@ -1,4 +1,4 @@
-// @l0 L0-002-R · @req FIX-DICTADO/ESPEJO-NOTION · @acr ACR-1.2
+// @l0 L0-002-R · @req FIX-DICTADO/ESPEJO-NOTION · @acr ACR-1.2 · @req FIX-DICTADO/D15
 
 function formatFechaLocal(date: Date): string {
   const y = date.getFullYear();
@@ -180,7 +180,8 @@ export async function espejarVolcado(datos: DatosEspejo): Promise<void> {
       "Notion-Version": "2022-06-28",
       "Content-Type": "application/json"
     },
-    body: JSON.stringify(payload)
+    body: JSON.stringify(payload),
+    signal: AbortSignal.timeout(8000),
   });
 
   if (!response.ok) {

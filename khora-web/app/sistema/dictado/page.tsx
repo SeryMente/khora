@@ -1,4 +1,4 @@
-// @l0 L0-002-R · @req CORA-02/REQ-1 · @req FIX-DICTADO/D2-D8 · @acr ACR-1.2
+// @l0 L0-002-R · @req CORA-02/REQ-1 · @req FIX-DICTADO/D2-D8 · @acr ACR-1.2 · @req FIX-DICTADO/D12 · @req FIX-DICTADO/D13 · @req FIX-DICTADO/D14 · @req FIX-DICTADO/D15
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -9,15 +9,21 @@ import { reconciliarSegmentos, type SegmentoReconciliado } from "../../../lib/tr
 type Estado = "inactivo" | "dictando" | "finalizando";
 type EstadoReconciliacion = "preview_live" | "procesando_whisper" | "reconciliado_whisper" | "fallback_preview" | "editado_manual";
 
-function generarSesionId() {
-  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
-    return crypto.randomUUID();
+function generarSesionId(): string {
+  if (typeof crypto !== "undefined") {
+    if (typeof crypto.randomUUID === "function") {
+      return crypto.randomUUID();
+    }
+    if (typeof crypto.getRandomValues === "function") {
+      const bytes = new Uint8Array(16);
+      crypto.getRandomValues(bytes);
+      bytes[6] = (bytes[6] & 0x0f) | 0x40;
+      bytes[8] = (bytes[8] & 0x3f) | 0x80;
+      const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+      return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+    }
   }
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
-    const r = (Math.random() * 16) | 0;
-    const v = c === "x" ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
+  throw new Error("No hay disponibilidad de Web Crypto API en este entorno para generar un UUID seguro.");
 }
 
 export default function DictadoPage() {
@@ -31,6 +37,9 @@ export default function DictadoPage() {
   const [pulidosOk, setPulidosOk] = useState(0);
   const [pulidosNo, setPulidosNo] = useState(0);
   const [guardando, setGuardando] = useState(false);
+  const [generandoTitulo, setGenerandoTitulo] = useState(false);
+  const [retranscribiendo, setRetranscribiendo] = useState(false);
+  const [adjuntandoAudio, setAdjuntandoAudio] = useState(false);
   const [audioFinalizando, setAudioFinalizando] = useState(false);
   const [resultado, setResultado] = useState("");
   const [soportado, setSoportado] = useState(true);
@@ -41,6 +50,7 @@ export default function DictadoPage() {
   // Reconciliation & Authoritative STT state
   const [estadoReconciliacion, setEstadoReconciliacion] = useState<EstadoReconciliacion>("preview_live");
   const [reconciliacionMensaje, setReconciliacionMensaje] = useState("");
+  const [estadoTranscripcionUI, setEstadoTranscripcionUI] = useState<"completo" | "parcial" | "fallido" | null>(null);
 
   // New states for parts
   const [partesContador, setPartesContador] = useState(0);
@@ -61,13 +71,16 @@ export default function DictadoPage() {
   const duracionRef = useRef(0);
   const abortosRef = useRef(0);
   const audioPermitidoRef = useRef(true);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // New refs for session & parts
+  // New refs for session, parts & raw blobs
   const sesionIdRef = useRef<string>("");
   const parteConsecutivaRef = useRef<number>(1);
   const partesSubidasRef = useRef<{ parte: number; url: string; bytes: number }[]>([]);
+  const partesRawRef = useRef<{ parte: number; blob: Blob }[]>([]);
   const parteTrozosRef = useRef<Blob[]>([]);
   const parteInicioRef = useRef<number>(0);
+  const estadoTranscripcionRef = useRef<string | null>(null);
   const subidaEnCursoRef = useRef<Promise<void> | null>(null);
   const finalizacionAudioRef = useRef<Promise<void> | null>(null);
   const resolverFinalizacionAudioRef = useRef<(() => void) | null>(null);
@@ -79,7 +92,6 @@ export default function DictadoPage() {
 
   /**
    * Estabiliza el avance de la emisión de voz sin forzar saltos de párrafo ni vaciar el contexto discursivo.
-   * La inactividad de 4 segundos estabiliza el avance provisional pero el párrafo solo se divide por evidencia sintáctica.
    */
   const estabilizarEmision = useCallback(() => {
     if (fragmentosRef.current.length > 0) {
@@ -88,7 +100,6 @@ export default function DictadoPage() {
         setPendiente(ensamblado);
         pendienteRef.current = ensamblado;
 
-        // Actualizar segmentos estructurados manteniendo el contexto discursivo
         const parrafos = ensamblado.split("\n\n").filter((p) => p.trim().length > 0);
         const existentes = [...segmentosRef.current];
 
@@ -110,67 +121,6 @@ export default function DictadoPage() {
     }
   }, []);
 
-  const ejecutarTranscripcionAutoritativa = useCallback(async () => {
-    if (trozosRef.current.length === 0 && partesSubidasRef.current.length === 0) return;
-    setEstadoReconciliacion("procesando_whisper");
-
-    const textoPreview = segmentosRef.current.map((s) => s.texto).join("\n\n") || pendienteRef.current;
-
-    const forma = new FormData();
-    forma.append("previewText", textoPreview);
-
-    if (partesSubidasRef.current.length > 0) {
-      const chunkMeta = partesSubidasRef.current.map((p) => ({
-        part_index: p.parte,
-        start_ms: (p.parte - 1) * 45000,
-        end_ms: p.parte * 45000,
-        session_id: sesionIdRef.current,
-      }));
-      forma.append("chunkMeta", JSON.stringify(chunkMeta));
-    }
-
-    if (trozosRef.current.length > 0) {
-      const blobCompleto = new Blob(trozosRef.current, { type: "audio/webm" });
-      forma.append("audio", blobCompleto, "dictado-completo.webm");
-    }
-
-    try {
-      const r = await fetch("/api/transcribir", { method: "POST", body: forma });
-      const data = await r.json();
-
-      if (r.ok && data?.exito && typeof data?.textoFinal === "string") {
-        const resultadoReconciliacion = reconciliarSegmentos(segmentosRef.current, data.textoFinal);
-        segmentosRef.current = resultadoReconciliacion.segmentos;
-        setSegmentos(resultadoReconciliacion.segmentos);
-        setPendiente("");
-        pendienteRef.current = "";
-
-        const hayManual = resultadoReconciliacion.segmentos.some((s) => s.estado === "editado_manual" || s.modificadoManualmente);
-        const perdida = data.perdidaDetectada || resultadoReconciliacion.perdidaDetectada;
-
-        if (hayManual) {
-          setEstadoReconciliacion("editado_manual");
-        } else if (perdida) {
-          setEstadoReconciliacion("fallback_preview");
-        } else {
-          setEstadoReconciliacion("reconciliado_whisper");
-        }
-
-        setReconciliacionMensaje(
-          data.motivoReconciliacion || resultadoReconciliacion.motivo || "Transcripción autoritativa Groq Whisper procesada con éxito."
-        );
-      } else {
-        const hayManual = segmentosRef.current.some((s) => s.estado === "editado_manual" || s.modificadoManualmente);
-        setEstadoReconciliacion(hayManual ? "editado_manual" : "fallback_preview");
-        setReconciliacionMensaje(`Groq Whisper no disponible: ${data?.detail || "Conservando previsualización ASR en vivo."}`);
-      }
-    } catch (e) {
-      const hayManual = segmentosRef.current.some((s) => s.estado === "editado_manual" || s.modificadoManualmente);
-      setEstadoReconciliacion(hayManual ? "editado_manual" : "fallback_preview");
-      setReconciliacionMensaje(`Fallo al solicitar transcripción autoritativa: ${String(e)}.`);
-    }
-  }, []);
-
   const subirParteActual = useCallback(async () => {
     if (parteTrozosRef.current.length === 0) return;
 
@@ -182,6 +132,9 @@ export default function DictadoPage() {
     parteInicioRef.current = Date.now();
 
     const blob = new Blob(trozosParaSubir, { type: "audio/webm" });
+    // Retener cada parte cruda en partesRawRef ANTES de vaciar los trozos
+    partesRawRef.current.push({ parte: parteActual, blob });
+
     const sesionId = sesionIdRef.current;
 
     const ejecutarSubidas = async () => {
@@ -222,6 +175,86 @@ export default function DictadoPage() {
     const nuevaSubida = anteriorSubida.then(ejecutarSubidas);
     subidaEnCursoRef.current = nuevaSubida;
     await nuevaSubida;
+  }, []);
+
+  const ejecutarTranscripcionAutoritativa = useCallback(async () => {
+    if (partesRawRef.current.length === 0 && trozosRef.current.length === 0 && partesSubidasRef.current.length === 0) return;
+    setEstadoReconciliacion("procesando_whisper");
+
+    const textoPreview = segmentosRef.current.map((s) => s.texto).join("\n\n") || pendienteRef.current;
+
+    const forma = new FormData();
+    forma.append("previewText", textoPreview);
+
+    if (partesRawRef.current.length > 0) {
+      // D12: candado por partes - enviar cada parte como archivo independiente + chunkMeta
+      const chunkMeta = partesRawRef.current.map((p) => ({
+        part_index: p.parte,
+        start_ms: (p.parte - 1) * 45000,
+        end_ms: p.parte * 45000,
+        session_id: sesionIdRef.current,
+      }));
+      forma.append("chunkMeta", JSON.stringify(chunkMeta));
+
+      for (const p of partesRawRef.current) {
+        forma.append("audio", p.blob, `dictado-parte-${p.parte}.webm`);
+      }
+    } else if (trozosRef.current.length > 0) {
+      const blobCompleto = new Blob(trozosRef.current, { type: "audio/webm" });
+      forma.append("audio", blobCompleto, "dictado-completo.webm");
+    }
+
+    try {
+      const r = await fetch("/api/transcribir", { method: "POST", body: forma });
+      const data = await r.json();
+
+      if (r.ok && data?.exito && typeof data?.textoFinal === "string") {
+        const resultadoReconciliacion = reconciliarSegmentos(segmentosRef.current, data.textoFinal);
+        segmentosRef.current = resultadoReconciliacion.segmentos;
+        setSegmentos(resultadoReconciliacion.segmentos);
+        setPendiente("");
+        pendienteRef.current = "";
+
+        const hayManual = resultadoReconciliacion.segmentos.some((s) => s.estado === "editado_manual" || s.modificadoManualmente);
+        const perdida = data.perdidaDetectada || resultadoReconciliacion.perdidaDetectada;
+
+        if (data?.estadoTranscripcion) {
+          estadoTranscripcionRef.current = data.estadoTranscripcion;
+          setEstadoTranscripcionUI(data.estadoTranscripcion);
+        }
+
+        if (hayManual) {
+          setEstadoReconciliacion("editado_manual");
+        } else if (perdida) {
+          setEstadoReconciliacion("fallback_preview");
+          setAviso("Posible omisión detectada · se conservó lo capturado");
+        } else {
+          setEstadoReconciliacion("reconciliado_whisper");
+        }
+
+        if (data?.estadoTranscripcion === "parcial") {
+          setAviso("Transcripción parcial · audio guardado para re-transcribir");
+        }
+
+        setReconciliacionMensaje(
+          data.motivoReconciliacion || resultadoReconciliacion.motivo || "Transcripción autoritativa Groq Whisper procesada con éxito."
+        );
+      } else {
+        const hayManual = segmentosRef.current.some((s) => s.estado === "editado_manual" || s.modificadoManualmente);
+        setEstadoReconciliacion(hayManual ? "editado_manual" : "fallback_preview");
+        setEstadoTranscripcionUI("fallido");
+        estadoTranscripcionRef.current = "fallido";
+        setAviso("Groq no disponible");
+        setReconciliacionMensaje(`Groq Whisper no disponible: ${data?.detail || "Conservando previsualización ASR en vivo."}`);
+      }
+    } catch (e) {
+      const hayManual = segmentosRef.current.some((s) => s.estado === "editado_manual" || s.modificadoManualmente);
+      setEstadoReconciliacion(hayManual ? "editado_manual" : "fallback_preview");
+      setEstadoTranscripcionUI("fallido");
+      estadoTranscripcionRef.current = "fallido";
+      setAviso("Groq no disponible");
+      setReconciliacionMensaje(`Fallo al solicitar transcripción autoritativa: ${String(e)}.`);
+    }
   }, []);
 
   const detenerGrabacion = useCallback(() => {
@@ -296,7 +329,6 @@ export default function DictadoPage() {
           estabilizarEmision();
 
           if (relojRef.current) clearTimeout(relojRef.current);
-          // Inactividad de 4s estabiliza avance sin cerrar ni crear párrafo mecánico
           relojRef.current = setTimeout(estabilizarEmision, 4000);
         } else {
           interino = interino + " " + txt;
@@ -368,9 +400,12 @@ export default function DictadoPage() {
     sesionIdRef.current = generarSesionId();
     parteConsecutivaRef.current = 1;
     partesSubidasRef.current = [];
+    partesRawRef.current = [];
     parteTrozosRef.current = [];
     parteInicioRef.current = Date.now();
     subidaEnCursoRef.current = null;
+    estadoTranscripcionRef.current = null;
+    setEstadoTranscripcionUI(null);
     setPartesContador(0);
     setBytesAcumulados(0);
 
@@ -449,6 +484,7 @@ export default function DictadoPage() {
         duracionSeg: duracionRef.current,
         pulidoAplicado: pulidosOk > 0,
         audioPartes: partes.length > 0 ? partes : null,
+        estadoTranscripcion: estadoTranscripcionRef.current || null,
       };
 
       let rv: Response;
@@ -458,6 +494,7 @@ export default function DictadoPage() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
+          signal: AbortSignal.timeout(60000),
         });
 
         const textoRespuesta = await rv.text();
@@ -470,6 +507,9 @@ export default function DictadoPage() {
         if (!rv.ok) {
           setError(String(dv?.detail || "Error desconocido") + " " + String(dv?.causa ?? ""));
         } else {
+          if (dv?.titulo && !titulo) {
+            setTitulo(dv.titulo);
+          }
           setResultado("archivado " + String(dv?.chars) + " caracteres, sha " + String(dv?.sha256).slice(0, 8) + (audioUrl ? `, con audio (${partes.length} partes)` : ", sin audio"));
         }
       } catch (err) {
@@ -481,6 +521,140 @@ export default function DictadoPage() {
       setGuardando(false);
     }
   }, [titulo, pulidosOk]);
+
+  // Botón "Generar título con IA"
+  const handleGenerarTitulo = async () => {
+    const texto = segmentosRef.current.map((s) => s.texto).join("\n\n") || pendienteRef.current;
+    if (!texto.trim()) {
+      setError("No hay texto suficiente para generar un título.");
+      return;
+    }
+    setGenerandoTitulo(true);
+    setError("");
+    try {
+      const res = await fetch("/api/dictado-archivo/titulo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ texto }),
+      });
+      const data = await res.json();
+      const tituloObtenido = data.title ?? data.titulo;
+      if (res.ok && tituloObtenido) {
+        setTitulo(tituloObtenido);
+      } else {
+        setError(data.detail || "No se pudo generar un título con IA.");
+      }
+    } catch (err) {
+      setError("Error al solicitar generación de título: " + String(err));
+    } finally {
+      setGenerandoTitulo(false);
+    }
+  };
+
+  // Botón "Re-transcribir audio" (D13)
+  const handleRetranscribirAudio = async () => {
+    if (!sesionIdRef.current) {
+      setError("No hay una sesión de audio activa para re-transcribir.");
+      return;
+    }
+    setRetranscribiendo(true);
+    setError("");
+    setAviso("");
+    try {
+      const textoPreview = segmentosRef.current.map((s) => s.texto).join("\n\n") || pendienteRef.current;
+      const res = await fetch("/api/transcribir/sesion", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sessionId: sesionIdRef.current,
+          previewText: textoPreview,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data?.exito && typeof data?.textoFinal === "string") {
+        const resultadoReconciliacion = reconciliarSegmentos(segmentosRef.current, data.textoFinal);
+        segmentosRef.current = resultadoReconciliacion.segmentos;
+        setSegmentos(resultadoReconciliacion.segmentos);
+
+        if (data?.estadoTranscripcion) {
+          estadoTranscripcionRef.current = data.estadoTranscripcion;
+          setEstadoTranscripcionUI(data.estadoTranscripcion);
+        }
+
+        setReconciliacionMensaje(
+          data.motivoReconciliacion || resultadoReconciliacion.motivo || "Re-transcripción completada con éxito."
+        );
+      } else {
+        setError(data.detail || "Fallo la re-transcripción del audio.");
+      }
+    } catch (err) {
+      setError("Error al solicitar re-transcripción: " + String(err));
+    } finally {
+      setRetranscribiendo(false);
+    }
+  };
+
+  // Botón "Adjuntar audio" (D14)
+  const handleAdjuntarAudio = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setAdjuntandoAudio(true);
+    setError("");
+    setAviso("");
+
+    const forma = new FormData();
+    forma.append("audio", file);
+    const textoPreview = segmentosRef.current.map((s) => s.texto).join("\n\n") || pendienteRef.current;
+    forma.append("previewText", textoPreview);
+    if (!sesionIdRef.current) {
+      sesionIdRef.current = generarSesionId();
+    }
+    forma.append("sessionId", sesionIdRef.current);
+
+    try {
+      const res = await fetch("/api/transcribir/archivo", { method: "POST", body: forma });
+      const data = await res.json();
+
+      if (data?.sessionId) {
+        sesionIdRef.current = data.sessionId;
+      }
+
+      if (data?.audioUrl) {
+        partesSubidasRef.current = [
+          {
+            parte: 1,
+            url: data.audioUrl,
+            bytes: data.audioBytes || file.size,
+          },
+        ];
+        setPartesContador(1);
+        setBytesAcumulados(data.audioBytes || file.size);
+        setConAudio(true);
+      }
+
+      if (data?.estadoTranscripcion) {
+        estadoTranscripcionRef.current = data.estadoTranscripcion;
+        setEstadoTranscripcionUI(data.estadoTranscripcion);
+      }
+
+      if (res.ok && data?.exito && typeof data?.textoFinal === "string") {
+        const resultadoReconciliacion = reconciliarSegmentos(segmentosRef.current, data.textoFinal);
+        segmentosRef.current = resultadoReconciliacion.segmentos;
+        setSegmentos(resultadoReconciliacion.segmentos);
+        setReconciliacionMensaje(
+          data.motivoReconciliacion || resultadoReconciliacion.motivo || "Audio adjuntado y transcrito exitosamente."
+        );
+      } else {
+        setAviso(data.detail || "Audio adjuntado, pero se requiere re-transcribir.");
+      }
+    } catch (err) {
+      setError("Error al adjuntar archivo de audio: " + String(err));
+    } finally {
+      setAdjuntandoAudio(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
 
   const limpiar = useCallback(() => {
     segmentosRef.current = [];
@@ -501,19 +675,21 @@ export default function DictadoPage() {
     setReconexiones(0);
     setEstadoReconciliacion("preview_live");
     setReconciliacionMensaje("");
+    setEstadoTranscripcionUI(null);
 
     sesionIdRef.current = "";
     parteConsecutivaRef.current = 1;
     partesSubidasRef.current = [];
+    partesRawRef.current = [];
     parteTrozosRef.current = [];
     subidaEnCursoRef.current = null;
+    estadoTranscripcionRef.current = null;
     setPartesContador(0);
     setBytesAcumulados(0);
   }, []);
 
   const totalChars = (segmentos.map((s) => s.texto).join("\n\n") || pendiente).length;
 
-  // Edición granular de segmento por el operador
   const handleEditarSegmento = (idx: number, nuevoTexto: string) => {
     const copia = [...segmentosRef.current];
     if (copia[idx]) {
@@ -572,17 +748,32 @@ export default function DictadoPage() {
 
       {/* Inputs y Controles */}
       <div className="space-y-4">
-        <input
-          value={titulo}
-          onChange={(e) => setTitulo(e.target.value)}
-          placeholder="titulo opcional"
-          className="w-full p-2.5 border rounded-none text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)] focus-visible:border-[var(--khora-accent)]"
-          style={{
-            backgroundColor: "var(--khora-surface)",
-            color: "var(--khora-ink)",
-            borderColor: "var(--khora-border)",
-          }}
-        />
+        <div className="flex gap-2">
+          <input
+            value={titulo}
+            onChange={(e) => setTitulo(e.target.value)}
+            placeholder="titulo opcional"
+            className="flex-1 p-2.5 border rounded-none text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)] focus-visible:border-[var(--khora-accent)]"
+            style={{
+              backgroundColor: "var(--khora-surface)",
+              color: "var(--khora-ink)",
+              borderColor: "var(--khora-border)",
+            }}
+          />
+          <button
+            onClick={handleGenerarTitulo}
+            disabled={generandoTitulo || estado !== "inactivo"}
+            className="px-3 py-2 border rounded-none text-xs font-semibold cursor-pointer disabled:opacity-40 flex items-center gap-1 hover:opacity-90 transition-opacity shrink-0"
+            style={{
+              backgroundColor: "var(--khora-surface)",
+              color: "var(--khora-ink)",
+              borderColor: "var(--khora-border)",
+            }}
+          >
+            <Icons.Sparkles size={16} strokeWidth={1.75} />
+            {generandoTitulo ? "Generando..." : "Generar título con IA"}
+          </button>
+        </div>
 
         <div className="flex flex-wrap items-center gap-3">
           {estado === "inactivo" ? (
@@ -629,6 +820,42 @@ export default function DictadoPage() {
           </button>
 
           <button
+            onClick={handleRetranscribirAudio}
+            disabled={retranscribiendo || !sesionIdRef.current || estado !== "inactivo"}
+            className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
+            style={{
+              backgroundColor: "var(--khora-surface)",
+              color: "var(--khora-ink)",
+              borderColor: "var(--khora-border)",
+            }}
+          >
+            <Icons.RefreshCw size={20} strokeWidth={1.75} />
+            {retranscribiendo ? "Re-transcribiendo..." : "Re-transcribir audio"}
+          </button>
+
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleAdjuntarAudio}
+            accept="audio/*"
+            className="hidden"
+          />
+
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={adjuntandoAudio || estado !== "inactivo"}
+            className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
+            style={{
+              backgroundColor: "var(--khora-surface)",
+              color: "var(--khora-ink)",
+              borderColor: "var(--khora-border)",
+            }}
+          >
+            <Icons.Paperclip size={20} strokeWidth={1.75} />
+            {adjuntandoAudio ? "Adjuntando..." : "Adjuntar audio"}
+          </button>
+
+          <button
             onClick={limpiar}
             disabled={estado !== "inactivo"}
             className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
@@ -664,6 +891,17 @@ export default function DictadoPage() {
             ? "🟠 Previsualización ASR (Groq indisponible)"
             : "🔵 Previsualización ASR en vivo"}
         </span>
+
+        {estadoTranscripcionUI && (
+          <span className="px-2 py-0.5 border font-semibold" style={{ borderColor: "var(--khora-border)", backgroundColor: "var(--khora-surface)", color: "var(--khora-ink)" }}>
+            {estadoTranscripcionUI === "completo"
+              ? "🟢 Transcripción completa"
+              : estadoTranscripcionUI === "parcial"
+              ? "🟡 Transcripción parcial"
+              : "🔴 Transcripción fallida"}
+          </span>
+        )}
+
         <span className="px-2 py-0.5 border font-semibold" style={{ borderColor: "var(--khora-border)", backgroundColor: "var(--khora-surface)", color: "var(--khora-accent)" }}>
           Bloques pulidos: {pulidosOk} / Sin pulir: {pulidosNo}
         </span>
@@ -679,7 +917,7 @@ export default function DictadoPage() {
         }}
       >
         {segmentos.length === 0 && pendiente.length === 0 && parcial.length === 0 && (
-          <span className="opacity-40 italic">Pulsa "Iniciar dictado" y comienza a hablar...</span>
+          <span className="opacity-40 italic">Pulsa "Iniciar dictado" o "Adjuntar audio" y comienza...</span>
         )}
 
         {segmentos.map((seg, i) => (
