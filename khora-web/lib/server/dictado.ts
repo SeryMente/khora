@@ -1,4 +1,4 @@
-// @l0 L0-002-R · @req FIX-DICTADO/D2-D8 · @req TRACE-SESSION/010 · @req REVISION-COCKPIT/REQ-1
+// @l0 L0-002-R · @req FIX-DICTADO/D2-D8 · @req TRACE-SESSION/010 · @req REVISION-COCKPIT/REQ-1 · @req FIX-DICTADO/D13
 import { randomUUID, createHash } from "crypto";
 import { getDb } from "./neon";
 import { asegurarTabla, prepararVolcadoParaRevision } from "./volcados";
@@ -12,6 +12,7 @@ const ALTERS = [
   "ALTER TABLE volcado ADD COLUMN IF NOT EXISTS pulido_aplicado BOOLEAN DEFAULT false",
   "ALTER TABLE volcado ADD COLUMN IF NOT EXISTS audio_partes JSONB",
   "ALTER TABLE volcado ADD COLUMN IF NOT EXISTS session_id TEXT",
+  "ALTER TABLE volcado ADD COLUMN IF NOT EXISTS estado_transcripcion TEXT",
 ];
 
 const SESSION_TABLES_SQL = `
@@ -94,6 +95,7 @@ export type EntradaDictado = {
   pulidoAplicado?: boolean;
   usuario?: string | null;
   audioPartes?: AudioParte[] | null;
+  estadoTranscripcion?: string | null;
 };
 
 export async function registrarParteAudio(params: {
@@ -155,8 +157,8 @@ export async function guardarDictado(entrada: EntradaDictado) {
 
   await db.query(
     `INSERT INTO volcado
-     (id, texto, sha256, chars, titulo, origen, driver, usuario, estado, fuente, audio_url, audio_bytes, duracion_seg, pulido_aplicado, audio_partes, session_id)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)`,
+     (id, texto, sha256, chars, titulo, origen, driver, usuario, estado, fuente, audio_url, audio_bytes, duracion_seg, pulido_aplicado, audio_partes, session_id, estado_transcripcion)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)`,
     [
       id,
       cifrarTexto(entrada.texto),
@@ -174,6 +176,7 @@ export async function guardarDictado(entrada: EntradaDictado) {
       entrada.pulidoAplicado === true,
       entrada.audioPartes ? JSON.stringify(entrada.audioPartes) : null,
       sessionId,
+      entrada.estadoTranscripcion ?? null,
     ]
   );
 
