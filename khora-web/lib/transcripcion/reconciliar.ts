@@ -37,10 +37,24 @@ export type ResultadoCobertura = {
   textoResultado: string;
   motivo: string;
   perdidaDetectada: boolean;
+  deficit?: number;
 };
 
 /**
- * Guardián de cobertura de contenido (@req FIX-DICTADO/D9).
+ * Tramo faltante en el texto anterior para evaluación de déficit.
+ */
+type TramoFaltante = {
+  inicioAnt: number;
+  finAnt: number;
+  largo: number;
+  anclaPrevNuev: number | null;
+  anclaPostNuev: number | null;
+  espacioNuevo: number;
+  deficit: number;
+};
+
+/**
+ * Guardián de cobertura de contenido por DÉFICIT (@req FIX-DICTADO/D12).
  * Evalúa la correspondencia entre el texto previamente capturado y la nueva propuesta autoritativa
  * mediante alineación por subsecuencia común más larga (LCS) a nivel de palabras.
  * Previene la sobreescritura silenciosa cuando Whisper omite palabras o tramos completos.
@@ -62,6 +76,7 @@ export function evaluarCoberturaYReconciliar(
       textoResultado: nuevTrim,
       motivo: "Texto anterior vacío; adoptando transcripción autoritativa.",
       perdidaDetectada: false,
+      deficit: 0,
     };
   }
 
@@ -74,6 +89,7 @@ export function evaluarCoberturaYReconciliar(
       textoResultado: antTrim,
       motivo: "Transcripción autoritativa vacía; conservando previsualización ASR en vivo.",
       perdidaDetectada: true,
+      deficit: antTrim.split(/\s+/).length,
     };
   }
 
@@ -89,13 +105,14 @@ export function evaluarCoberturaYReconciliar(
       textoResultado: nuevTrim,
       motivo: "Sin tokens significativos en la previsualización; aceptando transcripción autoritativa.",
       perdidaDetectada: false,
+      deficit: 0,
     };
   }
 
   const n = tokAnt.length;
   const m = tokNuev.length;
 
-  // Matriz LCS (Programación Dinámica O(n*m))
+  // 1 & 2. Matriz LCS por Programación Dinámica O(n*m) + Backtracking
   const dp: number[][] = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(0));
 
   for (let i = 1; i <= n; i++) {
@@ -108,7 +125,6 @@ export function evaluarCoberturaYReconciliar(
     }
   }
 
-  // Backtracking para identificar posiciones del texto anterior presentes en la LCS
   const coincidenciasAnt = new Array<boolean>(n).fill(false);
   const pareos: { iAnt: number; jNuev: number }[] = [];
 
@@ -130,37 +146,48 @@ export function evaluarCoberturaYReconciliar(
   const numCoincidentes = dp[n][m];
   const cobertura = numCoincidentes / n;
 
-  // Medición de huecos contiguos en el texto anterior
+  // 3. Agrupa los tokens de "anterior" NO coincidentes en tramos contiguos
+  const tramos: TramoFaltante[] = [];
   let huecoActual = 0;
   let huecoMaximo = 0;
-  let rachaInicioAnt = -1;
-
-  type TramoFaltante = {
-    inicioAnt: number;
-    finAnt: number;
-    anclaPrevNuev: number | null;
-    anclaPostNuev: number | null;
-  };
-  const tramosFaltantes: TramoFaltante[] = [];
+  let inicioTramo = -1;
 
   for (let idx = 0; idx < n; idx++) {
     if (!coincidenciasAnt[idx]) {
       if (huecoActual === 0) {
-        rachaInicioAnt = idx;
+        inicioTramo = idx;
       }
       huecoActual++;
     } else {
       if (huecoActual > 0) {
         if (huecoActual > huecoMaximo) huecoMaximo = huecoActual;
 
-        const pareoPrev = pareos.find((p) => p.iAnt === rachaInicioAnt - 1);
+        const finTramo = idx - 1;
+        const pareoPrev = pareos.find((p) => p.iAnt === inicioTramo - 1);
         const pareoPost = pareos.find((p) => p.iAnt === idx);
 
-        tramosFaltantes.push({
-          inicioAnt: rachaInicioAnt,
-          finAnt: idx - 1,
-          anclaPrevNuev: pareoPrev ? pareoPrev.jNuev : null,
-          anclaPostNuev: pareoPost ? pareoPost.jNuev : null,
+        const anclaPrev = pareoPrev ? pareoPrev.jNuev : null;
+        const anclaPost = pareoPost ? pareoPost.jNuev : null;
+
+        const largo = finTramo - inicioTramo + 1;
+        const espacioNuevo =
+          anclaPrev !== null && anclaPost !== null
+            ? anclaPost - anclaPrev - 1
+            : anclaPrev !== null
+            ? m - 1 - anclaPrev
+            : anclaPost !== null
+            ? anclaPost
+            : m;
+        const deficit = Math.max(0, largo - espacioNuevo);
+
+        tramos.push({
+          inicioAnt: inicioTramo,
+          finAnt: finTramo,
+          largo,
+          anclaPrevNuev: anclaPrev,
+          anclaPostNuev: anclaPost,
+          espacioNuevo,
+          deficit,
         });
         huecoActual = 0;
       }
@@ -169,48 +196,66 @@ export function evaluarCoberturaYReconciliar(
 
   if (huecoActual > 0) {
     if (huecoActual > huecoMaximo) huecoMaximo = huecoActual;
-    const pareoPrev = pareos.find((p) => p.iAnt === rachaInicioAnt - 1);
-    tramosFaltantes.push({
-      inicioAnt: rachaInicioAnt,
-      finAnt: n - 1,
-      anclaPrevNuev: pareoPrev ? pareoPrev.jNuev : null,
-      anclaPostNuev: null,
+    const finTramo = n - 1;
+    const pareoPrev = pareos.find((p) => p.iAnt === inicioTramo - 1);
+    const anclaPrev = pareoPrev ? pareoPrev.jNuev : null;
+    const anclaPost = null;
+
+    const largo = finTramo - inicioTramo + 1;
+    const espacioNuevo = anclaPrev !== null ? m - 1 - anclaPrev : m;
+    const deficit = Math.max(0, largo - espacioNuevo);
+
+    tramos.push({
+      inicioAnt: inicioTramo,
+      finAnt: finTramo,
+      largo,
+      anclaPrevNuev: anclaPrev,
+      anclaPostNuev: anclaPost,
+      espacioNuevo,
+      deficit,
     });
   }
 
-  const umbral = opciones?.umbralCobertura ?? 0.85;
-  const maxHueco = opciones?.maxHuecoContiguo ?? 8;
+  // 4. Sumatoria de déficits y tramos con déficit
+  const deficitTotal = tramos.reduce((sum, t) => sum + t.deficit, 0);
+  const tramosConDeficit = tramos.filter((t) => t.deficit > 0);
 
-  // Jerarquía a: Cobertura alta y sin huecos extensos -> Aceptar Whisper (incluye correcciones de palabras)
-  if (cobertura >= umbral && huecoMaximo <= maxHueco) {
+  const umbralPiso = opciones?.umbralCobertura ?? 0.5;
+
+  // 5. DECISIÓN (Jerarquía estricta por DÉFICIT):
+  // a) deficitTotal === 0 -> ACEPTA "nuevo" (correcciones/inserciones; sin pérdida real).
+  if (deficitTotal === 0) {
     return {
       aceptado: true,
       fusionado: false,
       cobertura,
       huecoMaximo,
       textoResultado: nuevTrim,
-      motivo: `Reconciliación exitosa: transcripción autoritativa Whisper aplicada (cobertura ${(cobertura * 100).toFixed(1)}%).`,
+      motivo: `Reconciliación exitosa por déficit cero: transcripción autoritativa aceptada (cobertura ${(cobertura * 100).toFixed(1)}%).`,
       perdidaDetectada: false,
+      deficit: 0,
     };
   }
 
-  // Jerarquía b: Hueco aislado extenso con anclas claras en ambos extremos -> Fusionar tramo omitido
-  const huecosGrandes = tramosFaltantes.filter((t) => t.finAnt - t.inicioAnt + 1 > maxHueco);
-  const huecosGrandesFusionables = huecosGrandes.filter(
-    (t) => t.anclaPrevNuev !== null && t.anclaPostNuev !== null
-  );
+  // b) deficitTotal > 0 y TODOS los tramosConDeficit anclados a ambos lados y cobertura >= 0.5 -> FUSIONA
+  const todosAnclados =
+    tramosConDeficit.length > 0 &&
+    tramosConDeficit.every((t) => t.anclaPrevNuev !== null && t.anclaPostNuev !== null);
 
-  if (
-    huecosGrandes.length > 0 &&
-    huecosGrandes.length === huecosGrandesFusionables.length &&
-    cobertura >= 0.5
-  ) {
+  if (deficitTotal > 0 && todosAnclados && cobertura >= umbralPiso) {
     const palabrasOriginalesAnt = antTrim.split(/\s+/);
     const tokensNuevOriginal = nuevTrim.split(/\s+/);
     let offset = 0;
 
-    for (const tramo of huecosGrandesFusionables) {
-      const textoFaltanteOriginal = palabrasOriginalesAnt.slice(tramo.inicioAnt, tramo.finAnt + 1).join(" ");
+    // Insertar en orden ascendente de posición en nuevo
+    const tramosOrdenados = [...tramosConDeficit].sort(
+      (a, b) => (a.anclaPrevNuev ?? 0) - (b.anclaPrevNuev ?? 0)
+    );
+
+    for (const tramo of tramosOrdenados) {
+      const textoFaltanteOriginal = palabrasOriginalesAnt
+        .slice(tramo.inicioAnt, tramo.finAnt + 1)
+        .join(" ");
       const posInsercion = (tramo.anclaPrevNuev ?? 0) + 1 + offset;
       tokensNuevOriginal.splice(posInsercion, 0, textoFaltanteOriginal);
       offset++;
@@ -224,20 +269,22 @@ export function evaluarCoberturaYReconciliar(
       cobertura,
       huecoMaximo,
       textoResultado: textoFusionado,
-      motivo: `Pérdida parcial de contenido detectada en Whisper (cobertura ${(cobertura * 100).toFixed(1)}%). Se fusionó el tramo omitido conservando el contenido capturado.`,
+      motivo: `Déficit parcial recuperado (${deficitTotal} palabras): se fusionó el contenido faltante conservando el texto dictado.`,
       perdidaDetectada: true,
+      deficit: deficitTotal,
     };
   }
 
-  // Jerarquía c: Rechazar sobreescritura y conservar previsualización ASR en vivo
+  // c) resto -> RECHAZA: textoResultado = "anterior" íntegro.
   return {
     aceptado: false,
     fusionado: false,
     cobertura,
     huecoMaximo,
     textoResultado: antTrim,
-    motivo: `Pérdida de contenido detectada en Whisper (cobertura ${(cobertura * 100).toFixed(1)}% < ${(umbral * 100).toFixed(1)}% o hueco máx: ${huecoMaximo} palabras). Se conservó la previsualización ASR en vivo.`,
+    motivo: `Pérdida de contenido detectada (déficit: ${deficitTotal} palabras, cobertura ${(cobertura * 100).toFixed(1)}%). Se conservó el texto previo.`,
     perdidaDetectada: true,
+    deficit: deficitTotal,
   };
 }
 
@@ -285,7 +332,7 @@ export function reconciliarSegmentos(
     };
   }
 
-  // Evaluar cobertura del texto global para evitar pérdidas silenciosas entre párrafos o tramos
+  // Evaluar cobertura del texto global por DÉFICIT
   const evaluacion = evaluarCoberturaYReconciliar(textoActual, whisperTrim);
 
   if (!evaluacion.aceptado) {

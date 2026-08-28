@@ -1,4 +1,4 @@
-// @l0 L0-002-R · @req FIX-DICTADO/D1
+// @l0 L0-002-R · @req FIX-DICTADO/D1 · @req FIX-DICTADO/D12
 import { test, expect } from '@playwright/test';
 
 test.use({
@@ -121,8 +121,6 @@ test.describe('Dictado sin perdida anti-regresion guard', () => {
     await startBtn.click();
 
     // Wait for the full speech sequence to be emitted and settle
-    // The sequence takes 0 + 3000 + 300 + 300 = 3600 ms, plus some padding.
-    // 5000 ms is a safe threshold to let everything emit.
     await page.waitForTimeout(5000);
 
     // Click "Detener" to finalize and commit the pending block
@@ -139,15 +137,12 @@ test.describe('Dictado sin perdida anti-regresion guard', () => {
     console.log('TRANSCRIPTION PANEL CONTENT:', textContent);
 
     // Assertions
-    // 1. Must contain "solo"
     expect(normalizedText).toContain('solo');
 
-    // 2. Must contain "digo" exactly TWO times
     const matches = normalizedText.match(/\bdigo\b/g);
     const count = matches ? matches.length : 0;
     expect(count).toBe(2);
 
-    // 3. Must contain all four words emitted (hola, solo, digo, digo)
     expect(normalizedText).toContain('hola');
     expect(normalizedText).toContain('solo');
   });
@@ -194,7 +189,7 @@ test.describe('Dictado sin perdida anti-regresion guard', () => {
       (window as any).webkitSpeechRecognition = MockSpeechRecognition;
     });
 
-    // Mock API /api/transcribir to return a truncated response with exito: true
+    // Mock API /api/transcribir to return a truncated response with exito: true and full shape
     await page.route('/api/transcribir', async (route) => {
       await route.fulfill({
         status: 200,
@@ -205,6 +200,8 @@ test.describe('Dictado sin perdida anti-regresion guard', () => {
           textoFinal: 'hola esto es una prueba importante de dictado sin pérdida',
           reconciliado: false,
           perdidaDetectada: true,
+          estadoTranscripcion: 'parcial',
+          partesFallidas: [1],
           motivoReconciliacion: 'Pérdida de contenido detectada en Whisper. Se conservó la previsualización ASR en vivo.',
           modelo: 'whisper-large-v3'
         }),
@@ -230,5 +227,8 @@ test.describe('Dictado sin perdida anti-regresion guard', () => {
     // Verify content was preserved despite truncated Whisper response
     expect(normalizedText).toContain('dictado sin pérdida');
     expect(normalizedText).toContain('importante');
+
+    // Verify UI reflects status badge or warning message
+    await expect(page.locator('text=Posible omisión detectada')).toBeVisible();
   });
 });

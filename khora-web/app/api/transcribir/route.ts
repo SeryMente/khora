@@ -1,4 +1,4 @@
-// @l0 L0-002-R · @req FIX-DICTADO/AUTHORITATIVE-STT
+// @l0 L0-002-R · @req FIX-DICTADO/AUTHORITATIVE-STT · @req FIX-DICTADO/D12
 import { NextResponse } from "next/server";
 import {
   transcribirAudioConGroq,
@@ -6,6 +6,7 @@ import {
   procesarChunksIncrementalesConTiempos,
   InputChunkData,
 } from "../../../lib/server/transcribir";
+import { evaluarCoberturaYReconciliar } from "../../../lib/transcripcion/reconciliar";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -42,7 +43,16 @@ export async function POST(req: Request) {
 
         const res = await transcribirAudioConGroq(buffer, (archivos[0] as any).name || "dictado.webm", { verboseJson: true });
         if (!res.exito) {
-          return NextResponse.json({ detail: res.motivo, exito: false, modelo: res.modelo }, { status: 502 });
+          return NextResponse.json(
+            {
+              detail: res.motivo,
+              exito: false,
+              estadoTranscripcion: "fallido",
+              partesFallidas: [1],
+              modelo: res.modelo,
+            },
+            { status: 502 }
+          );
         }
 
         const rec = reconciliarTranscripcion(previewText, res.texto);
@@ -54,6 +64,8 @@ export async function POST(req: Request) {
           reconciliado: rec.reconciliado,
           motivoReconciliacion: rec.motivo,
           perdidaDetectada: rec.perdidaDetectada ?? false,
+          estadoTranscripcion: "completo",
+          partesFallidas: [],
           modelo: res.modelo,
           segmentos: res.segmentos,
         });
@@ -82,26 +94,36 @@ export async function POST(req: Request) {
 
       const resChunking = await procesarChunksIncrementalesConTiempos(chunksData);
 
-      if (!resChunking.exito) {
-        return NextResponse.json(
-          {
-            detail: "Fallo la transcripción de las partes de audio",
-            exito: false,
-            detalles: resChunking.detallesFallos,
-          },
-          { status: 502 }
-        );
-      }
+      // Derivar estadoTranscripcion y partesFallidas
+      const partesFallidas = resChunking.detallesChunks
+        .filter((c) => c.estado === "pendiente_error")
+        .map((c) => c.part_index);
 
-      const rec = reconciliarTranscripcion(previewText, resChunking.textoAutoritativo);
+      const estadoTranscripcion =
+        resChunking.fallos === 0
+          ? "completo"
+          : resChunking.partesProcesadas > 0
+          ? "parcial"
+          : "fallido";
+
+      // Limpiar marcadores de [transcripción pendiente en parte N] antes de reconciliar
+      const textoAutoritativoLimpio = resChunking.textoAutoritativo
+        .replace(/\[transcripción pendiente en parte \d+\]/gi, "")
+        .replace(/\s+/g, " ")
+        .trim();
+
+      // Reconciliar contra previewText con el guardián D12
+      const evaluacion = evaluarCoberturaYReconciliar(previewText, textoAutoritativoLimpio);
 
       return NextResponse.json({
-        exito: true,
+        exito: resChunking.exito,
         textoAutoritativo: resChunking.textoAutoritativo,
-        textoFinal: rec.textoFinal,
-        reconciliado: rec.reconciliado,
-        motivoReconciliacion: rec.motivo,
-        perdidaDetectada: rec.perdidaDetectada ?? false,
+        textoFinal: evaluacion.textoResultado,
+        reconciliado: evaluacion.aceptado,
+        motivoReconciliacion: evaluacion.motivo,
+        perdidaDetectada: evaluacion.perdidaDetectada,
+        estadoTranscripcion,
+        partesFallidas,
         partesProcesadas: resChunking.partesProcesadas,
         fallos: resChunking.fallos,
         detallesChunks: resChunking.detallesChunks,
