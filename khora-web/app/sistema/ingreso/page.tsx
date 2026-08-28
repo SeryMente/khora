@@ -4,16 +4,10 @@
 import { useCallback, useEffect, useRef, useState, Suspense } from "react";
 import * as Icons from "lucide-react";
 import { ensamblarParrafos, Fragmento } from "../../../lib/transcripcion/ensamblar";
+import { reconciliarSegmentos, type SegmentoReconciliado } from "../../../lib/transcripcion/reconciliar";
 
 type Estado = "inactivo" | "dictando";
 type EstadoReconciliacion = "preview_live" | "procesando_whisper" | "reconciliado_whisper" | "fallback_preview" | "editado_manual";
-
-export type SegmentoReconciliado = {
-  id: string;
-  texto: string;
-  estado: string;
-  modificadoManualmente?: boolean;
-};
 
 function generarSesionId() {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -46,6 +40,8 @@ function IngresoContenido() {
   const [pulidosNo, setPulidosNo] = useState(0);
   const [guardando, setGuardando] = useState(false);
   const [generandoTitulo, setGenerandoTitulo] = useState(false);
+  const [retranscribiendo, setRetranscribiendo] = useState(false);
+  const [adjuntandoAudio, setAdjuntandoAudio] = useState(false);
   const [resultado, setResultado] = useState("");
   const [soportado, setSoportado] = useState(true);
   const [conAudio, setConAudio] = useState(false);
@@ -80,6 +76,7 @@ function IngresoContenido() {
   const duracionRef = useRef(0);
   const abortosRef = useRef(0);
   const audioPermitidoRef = useRef(true);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // New refs for session & parts
   const sesionIdRef = useRef<string>("");
@@ -165,18 +162,35 @@ function IngresoContenido() {
       const data = await r.json();
 
       if (r.ok && data?.exito && typeof data?.textoFinal === "string") {
-        setTexto(data.textoFinal);
+        const resultadoReconciliacion = reconciliarSegmentos(segmentosRef.current, data.textoFinal);
+        segmentosRef.current = resultadoReconciliacion.segmentos;
+        setSegmentos(resultadoReconciliacion.segmentos);
         setPendiente("");
         pendienteRef.current = "";
 
-        setEstadoReconciliacion("reconciliado_whisper");
-        setReconciliacionMensaje(data.motivoReconciliacion || "Transcripción autoritativa Groq Whisper procesada con éxito.");
+        const hayManual = resultadoReconciliacion.segmentos.some((s) => s.estado === "editado_manual" || s.modificadoManualmente);
+        const perdida = data.perdidaDetectada || resultadoReconciliacion.perdidaDetectada;
+
+        if (hayManual) {
+          setEstadoReconciliacion("editado_manual");
+        } else if (perdida) {
+          setEstadoReconciliacion("fallback_preview");
+          setAviso("Posible omisión detectada · se conservó lo capturado");
+        } else {
+          setEstadoReconciliacion("reconciliado_whisper");
+        }
+
+        setReconciliacionMensaje(
+          data.motivoReconciliacion || resultadoReconciliacion.motivo || "Transcripción autoritativa Groq Whisper procesada con éxito."
+        );
       } else {
-        setEstadoReconciliacion("fallback_preview");
+        const hayManual = segmentosRef.current.some((s) => s.estado === "editado_manual" || s.modificadoManualmente);
+        setEstadoReconciliacion(hayManual ? "editado_manual" : "fallback_preview");
         setReconciliacionMensaje(`Groq Whisper no disponible: ${data?.detail || "Conservando previsualización ASR en vivo."}`);
       }
     } catch (e) {
-      setEstadoReconciliacion("fallback_preview");
+      const hayManual = segmentosRef.current.some((s) => s.estado === "editado_manual" || s.modificadoManualmente);
+      setEstadoReconciliacion(hayManual ? "editado_manual" : "fallback_preview");
       setReconciliacionMensaje(`Fallo al solicitar transcripción autoritativa: ${String(e)}.`);
     }
   }, [texto]);
@@ -575,6 +589,99 @@ function IngresoContenido() {
     }
   };
 
+  const handleRetranscribirAudio = async () => {
+    if (!sesionIdRef.current) {
+      setError("No hay una sesión de audio activa para re-transcribir.");
+      return;
+    }
+    setRetranscribiendo(true);
+    setError("");
+    setAviso("");
+    try {
+      const textoPreview = segmentosRef.current.map((s) => s.texto).join("\n\n") || pendienteRef.current;
+      const res = await fetch("/api/transcribir/sesion", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sessionId: sesionIdRef.current,
+          previewText: textoPreview,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data?.exito && typeof data?.textoFinal === "string") {
+        const resultadoReconciliacion = reconciliarSegmentos(segmentosRef.current, data.textoFinal);
+        segmentosRef.current = resultadoReconciliacion.segmentos;
+        setSegmentos(resultadoReconciliacion.segmentos);
+
+        setReconciliacionMensaje(
+          data.motivoReconciliacion || resultadoReconciliacion.motivo || "Re-transcripción completada con éxito."
+        );
+      } else {
+        setError(data.detail || "Fallo la re-transcripción del audio.");
+      }
+    } catch (err) {
+      setError("Error al solicitar re-transcripción: " + String(err));
+    } finally {
+      setRetranscribiendo(false);
+    }
+  };
+
+  const handleAdjuntarAudio = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setAdjuntandoAudio(true);
+    setError("");
+    setAviso("");
+
+    const forma = new FormData();
+    forma.append("audio", file);
+    const textoPreview = segmentosRef.current.map((s) => s.texto).join("\n\n") || pendienteRef.current;
+    forma.append("previewText", textoPreview);
+    if (!sesionIdRef.current) {
+      sesionIdRef.current = generarSesionId();
+    }
+    forma.append("sessionId", sesionIdRef.current);
+
+    try {
+      const res = await fetch("/api/transcribir/archivo", { method: "POST", body: forma });
+      const data = await res.json();
+
+      if (data?.sessionId) {
+        sesionIdRef.current = data.sessionId;
+      }
+
+      if (data?.audioUrl) {
+        partesSubidasRef.current = [
+          {
+            parte: 1,
+            url: data.audioUrl,
+            bytes: data.audioBytes || file.size,
+          },
+        ];
+        setPartesContador(1);
+        setBytesAcumulados(data.audioBytes || file.size);
+        setConAudio(true);
+      }
+
+      if (res.ok && data?.exito && typeof data?.textoFinal === "string") {
+        const resultadoReconciliacion = reconciliarSegmentos(segmentosRef.current, data.textoFinal);
+        segmentosRef.current = resultadoReconciliacion.segmentos;
+        setSegmentos(resultadoReconciliacion.segmentos);
+        setReconciliacionMensaje(
+          data.motivoReconciliacion || resultadoReconciliacion.motivo || "Audio adjuntado y transcrito exitosamente."
+        );
+      } else {
+        setAviso(data.detail || "Audio adjuntado, pero se requiere re-transcribir.");
+      }
+    } catch (err) {
+      setError("Error al adjuntar archivo de audio: " + String(err));
+    } finally {
+      setAdjuntandoAudio(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
   const generarTituloConIA = async () => {
     if (!texto.trim()) return;
     setGenerandoTitulo(true);
@@ -658,7 +765,7 @@ function IngresoContenido() {
           {estado === "inactivo" ? (
             <button
               onClick={iniciar}
-              disabled={!soportado || editando}
+              disabled={!soportado || editando || adjuntandoAudio || retranscribiendo}
               className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
               style={{
                 backgroundColor: "var(--khora-accent)",
@@ -686,7 +793,7 @@ function IngresoContenido() {
 
           <button
             onClick={guardar}
-            disabled={guardando || estado === "dictando" || editando}
+            disabled={guardando || estado === "dictando" || editando || adjuntandoAudio || retranscribiendo}
             className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
             style={{
               backgroundColor: "var(--khora-surface)",
@@ -699,8 +806,44 @@ function IngresoContenido() {
           </button>
 
           <button
+            onClick={handleRetranscribirAudio}
+            disabled={retranscribiendo || adjuntandoAudio || !sesionIdRef.current || estado !== "inactivo"}
+            className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
+            style={{
+              backgroundColor: "var(--khora-surface)",
+              color: "var(--khora-ink)",
+              borderColor: "var(--khora-border)",
+            }}
+          >
+            <Icons.RefreshCw size={20} strokeWidth={1.75} />
+            {retranscribiendo ? "Re-transcribiendo..." : "Re-transcribir audio"}
+          </button>
+
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleAdjuntarAudio}
+            accept="audio/*"
+            className="hidden"
+          />
+
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={adjuntandoAudio || retranscribiendo || estado !== "inactivo"}
+            className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
+            style={{
+              backgroundColor: "var(--khora-surface)",
+              color: "var(--khora-ink)",
+              borderColor: "var(--khora-border)",
+            }}
+          >
+            <Icons.Paperclip size={20} strokeWidth={1.75} />
+            {adjuntandoAudio ? "Adjuntando..." : "Adjuntar audio"}
+          </button>
+
+          <button
             onClick={limpiar}
-            disabled={estado === "dictando" || editando}
+            disabled={estado === "dictando" || editando || adjuntandoAudio || retranscribiendo}
             className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
             style={{
               backgroundColor: "var(--khora-surface)",

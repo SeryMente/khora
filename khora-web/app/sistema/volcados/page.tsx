@@ -118,7 +118,7 @@ type GateDecision = {
 };
 
 export default function VolcadosPage() {
-  const [activeTab, setActiveTab] = useState<"pipeline" | "volcados">("pipeline");
+  const activeTab = "pipeline" as const;
 
   // Pipeline states
   const [pipelineItems, setPipelineItems] = useState<PipelineItem[]>([]);
@@ -170,11 +170,6 @@ export default function VolcadosPage() {
   // Ingestion state
   const [ingesting, setIngesting] = useState(false);
   const [ingestaResult, setIngestaResult] = useState<any>(null);
-
-  // Legacy Volcados Archiving tab
-  const [texto, setTexto] = useState("");
-  const [titulo, setTitulo] = useState("");
-  const [guardandoVolcado, setGuardandoVolcado] = useState(false);
 
   const drawerRef = useRef<HTMLDivElement>(null);
   const holdTimerRef = useRef<any>(null);
@@ -657,34 +652,9 @@ export default function VolcadosPage() {
             Lectura cómoda, sincronización audio ↔ texto, corrección lingüística y compuerta de aprobación autoritativa.
           </p>
         </div>
-
-        {/* Tab switch buttons */}
-        <div className="flex border rounded-none overflow-hidden" style={{ borderColor: "var(--khora-border)" }}>
-          <button
-            onClick={() => setActiveTab("pipeline")}
-            className="px-4 py-2 text-xs uppercase tracking-wider font-semibold cursor-pointer"
-            style={{
-              backgroundColor: activeTab === "pipeline" ? "var(--khora-accent)" : "transparent",
-              color: activeTab === "pipeline" ? "var(--khora-bg)" : "var(--khora-ink)",
-            }}
-          >
-            Mesa de Revisión
-          </button>
-          <button
-            onClick={() => setActiveTab("volcados")}
-            className="px-4 py-2 text-xs uppercase tracking-wider font-semibold cursor-pointer"
-            style={{
-              backgroundColor: activeTab === "volcados" ? "var(--khora-accent)" : "transparent",
-              color: activeTab === "volcados" ? "var(--khora-bg)" : "var(--khora-ink)",
-            }}
-          >
-            Archivo Manual
-          </button>
-        </div>
       </div>
 
-      {activeTab === "pipeline" ? (
-        <div className="space-y-6">
+      <div className="space-y-6">
           {/* Summary Cards */}
           {resumen && (
             <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
@@ -1187,52 +1157,6 @@ export default function VolcadosPage() {
             </div>
           </div>
         </div>
-      ) : (
-        /* ARCHIVO MANUAL TAB */
-        <div className="border p-6 space-y-4 max-w-xl mx-auto font-mono text-xs" style={{ borderColor: "var(--khora-border)" }}>
-          <h3 className="text-sm font-bold uppercase tracking-wider">Archivador Verbatim Manual</h3>
-          <input
-            className="w-full p-2.5 border text-xs"
-            placeholder="Título opcional"
-            value={titulo}
-            onChange={(e) => setTitulo(e.target.value)}
-          />
-          <textarea
-            className="w-full p-2.5 border text-xs"
-            rows={8}
-            placeholder="Pega el texto del volcado aquí..."
-            value={texto}
-            onChange={(e) => setTexto(e.target.value)}
-          />
-          <button
-            onClick={async () => {
-              if (!texto.trim()) return;
-              setGuardandoVolcado(true);
-              try {
-                const res = await fetch("/api/volcado", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ texto, titulo }),
-                });
-                if (res.ok) {
-                  setTexto("");
-                  setTitulo("");
-                  await fetchPipeline();
-                  setActiveTab("pipeline");
-                }
-              } catch (e) {
-                console.error(e);
-              } finally {
-                setGuardandoVolcado(false);
-              }
-            }}
-            disabled={guardandoVolcado || !texto.trim()}
-            className="px-4 py-2 bg-emerald-500 text-zinc-950 font-bold uppercase cursor-pointer"
-          >
-            {guardandoVolcado ? "Archivando..." : "Archivar y Entrar a Revisión"}
-          </button>
-        </div>
-      )}
 
       {/* Audio Resolution Modal */}
       {showAudioResolveModal && (
