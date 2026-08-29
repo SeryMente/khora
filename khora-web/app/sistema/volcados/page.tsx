@@ -1,4 +1,4 @@
-// @l0 L0-002-R · @req PIPELINE/REQ-3,UI-02/RESKIN,UI-PIPELINE-FIX/REQ-1,UI-TRANSICION-REVISION/REQ-1,REVISION-COCKPIT/REQ-1 · @acr ACR-1.2 · @req TRACE-SESSION/010
+// @l0 L0-002-R · @req PIPELINE/REQ-3,UI-02/RESKIN,UI-PIPELINE-FIX/REQ-1,UI-TRANSICION-REVISION/REQ-1,REVISION-COCKPIT/REQ-1 · @acr ACR-1.2 · @req TRACE-SESSION/010 · @req TITULOS-LLM/REQ-2
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
@@ -139,6 +139,8 @@ export default function VolcadosPage() {
   const [selectedVersionNum, setSelectedVersionNum] = useState<number>(1);
   const [savingVersion, setSavingVersion] = useState(false);
   const [generatingTitle, setGeneratingTitle] = useState(false);
+  const [titulandoItemMap, setTitulandoItemMap] = useState<Record<string, boolean>>({});
+  const [titleError, setTitleError] = useState<string | null>(null);
 
   // Audio Sync & Playback states
   const [manifiestoPartes, setManifiestoPartes] = useState<AudioParteManifiesto[]>([]);
@@ -320,25 +322,56 @@ export default function VolcadosPage() {
   };
 
   const handleRegenerarTitulo = async () => {
-    if (!editableTexto.trim()) return;
+    if (!selectedId) return;
     setGeneratingTitle(true);
+    setTitleError(null);
     try {
       const res = await fetch("/api/dictado-archivo/titulo", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ texto: editableTexto }),
+        body: JSON.stringify({ id: selectedId, texto: editableTexto || undefined }),
       });
       const data = await res.json();
-      if (res.ok && data.title && selectedId) {
+      if (res.ok && data.title) {
         if (selectedItem) {
           setSelectedItem({ ...selectedItem, titulo: data.title });
         }
         await fetchPipeline();
+      } else {
+        setTitleError(data.detail || data.error || "No se pudo generar el título");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error regenerando título:", err);
+      setTitleError("Error de red: " + (err?.message ?? String(err)));
     } finally {
       setGeneratingTitle(false);
+    }
+  };
+
+  const handleTitularTarjeta = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setTitulandoItemMap((prev) => ({ ...prev, [id]: true }));
+    setTitleError(null);
+    try {
+      const res = await fetch("/api/dictado-archivo/titulo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      const data = await res.json();
+      if (res.ok && data.title) {
+        if (selectedId === id && selectedItem) {
+          setSelectedItem({ ...selectedItem, titulo: data.title });
+        }
+        await fetchPipeline();
+      } else {
+        setTitleError(data.detail || data.error || "No se pudo titular el volcado");
+      }
+    } catch (err: any) {
+      console.error("Error titulando volcado:", err);
+      setTitleError("Error de red: " + (err?.message ?? String(err)));
+    } finally {
+      setTitulandoItemMap((prev) => ({ ...prev, [id]: false }));
     }
   };
 
@@ -632,6 +665,7 @@ export default function VolcadosPage() {
     if (filter === "revision") return item.estado === "en_revision" || item.estado === "pendiente_revision";
     if (filter === "listos") return item.estado === "listo_ingesta";
     if (filter === "ingeridos") return item.estado === "ingerido";
+    if (filter === "archivados") return item.estado === "archivado";
 
     return true;
   });
@@ -685,6 +719,13 @@ export default function VolcadosPage() {
             </div>
           )}
 
+          {titleError && (
+            <div className="p-3 border border-red-500/40 bg-red-950/20 text-xs font-mono text-red-300 flex justify-between items-center">
+              <span>⚠️ {titleError}</span>
+              <button onClick={() => setTitleError(null)} className="text-xs underline hover:text-red-200">Cerrar</button>
+            </div>
+          )}
+
           {/* Filters & Search */}
           <div className="flex flex-col md:flex-row gap-4 justify-between items-stretch md:items-center">
             <div className="flex flex-wrap gap-1.5">
@@ -732,6 +773,17 @@ export default function VolcadosPage() {
               >
                 Ingeridos
               </button>
+              <button
+                onClick={() => setFilter("archivados")}
+                className="px-2.5 py-1.5 text-xs font-semibold uppercase tracking-wider border cursor-pointer"
+                style={{
+                  backgroundColor: filter === "archivados" ? "var(--khora-accent)" : "var(--khora-surface)",
+                  color: filter === "archivados" ? "var(--khora-bg)" : "var(--khora-ink)",
+                  borderColor: "var(--khora-border)",
+                }}
+              >
+                Archivados
+              </button>
             </div>
 
             <div className="relative">
@@ -753,6 +805,9 @@ export default function VolcadosPage() {
             <div className={`lg:col-span-4 flex flex-col space-y-2 ${mobileShowDetail ? "hidden lg:flex" : "flex"}`}>
               {filteredPipelineItems.map((item) => {
                 const isSelected = selectedId === item.id;
+                const sinTitulo = !item.titulo || item.titulo.trim() === "";
+                const estaTitulando = titulandoItemMap[item.id] === true;
+
                 return (
                   <div
                     key={item.id}
@@ -770,6 +825,16 @@ export default function VolcadosPage() {
                           </span>
                         )}
                         <h3 className="font-bold text-xs truncate">{item.titulo || "Sin título"}</h3>
+                        {sinTitulo && (
+                          <button
+                            onClick={(e) => handleTitularTarjeta(item.id, e)}
+                            disabled={estaTitulando}
+                            title="Generar y guardar título"
+                            className="px-1.5 py-0.5 text-[10px] font-mono font-bold border border-amber-500/50 text-amber-400 bg-amber-950/30 hover:bg-amber-900/50 cursor-pointer shrink-0 disabled:opacity-50"
+                          >
+                            {estaTitulando ? "..." : "Titular"}
+                          </button>
+                        )}
                       </div>
                       <span className="text-[9px] font-mono border px-1 uppercase opacity-80">{item.estado}</span>
                     </div>
@@ -797,9 +862,9 @@ export default function VolcadosPage() {
                             onClick={handleRegenerarTitulo}
                             disabled={generatingTitle}
                             title="Regenerar título con IA"
-                            className="p-1 hover:bg-zinc-800 rounded text-amber-400 cursor-pointer"
+                            className="p-1 hover:bg-zinc-800 rounded text-amber-400 cursor-pointer disabled:opacity-50"
                           >
-                            <Icons.Sparkles size={14} />
+                            <Icons.Sparkles size={14} className={generatingTitle ? "animate-spin" : ""} />
                           </button>
                         </h2>
                       </div>

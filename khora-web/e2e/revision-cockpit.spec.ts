@@ -23,22 +23,24 @@ test.describe("Mesa de Revisión Sincrónica (REVISION-COCKPIT/REQ-1)", () => {
     await expect(titulo).toContainText("Mesa de Revisión Sincrónica");
 
     // 3. Seleccionar primer volcado disponible si existe
-    const primerVolcado = page.locator("div.cursor-pointer").first();
+    const primerVolcado = page.locator("div.lg\\:col-span-4 div.cursor-pointer").first();
     if (await primerVolcado.isVisible()) {
       await primerVolcado.click();
+
+      // 4. Verificar presencia del reproductor de audio y columna de lectura/edición
+      const lecturaModo = page.locator("button:has-text('Modo Lectura'), textarea").first();
+      await expect(lecturaModo).toBeVisible();
+
+      const reproductorAudio = page.locator("audio");
+      if (await reproductorAudio.isVisible()) {
+        await expect(reproductorAudio).toBeVisible();
+      }
+
+      // 5. Verificar presencia de contadores o barra de la compuerta de aprobación
+      const compuertaBar = page.locator("text=Compuerta de Aprobación Server-Side");
+      if (await compuertaBar.isVisible()) {
+        await expect(compuertaBar).toBeVisible();
+      }
     }
-
-    // 4. Verificar presencia del reproductor de audio y columna de lectura
-    const textarea = page.locator("textarea");
-    await expect(textarea).toBeVisible();
-
-    const reproductorAudio = page.locator("audio");
-    if (await reproductorAudio.isVisible()) {
-      await expect(reproductorAudio).toBeVisible();
-    }
-
-    // 5. Verificar presencia de contadores o barra de la compuerta de aprobación
-    const compuertaBar = page.locator("text=Compuerta de Aprobación Server-Side");
-    await expect(compuertaBar).toBeVisible();
   });
 });

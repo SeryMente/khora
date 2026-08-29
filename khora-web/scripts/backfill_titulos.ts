@@ -1,7 +1,7 @@
-// @l0 L0-002-R · Script idempotente de backfill para títulos nulos o genéricos
+// @l0 L0-002-R · Script idempotente de backfill para títulos nulos o genéricos · @req TITULOS-LLM/REQ-2
 
 import { getDb } from "../lib/server/neon";
-import { generarTituloEstructurado, asignarTituloVolcado } from "../lib/server/titulos";
+import { generarTituloConGarantia, asignarTituloVolcado } from "../lib/server/titulos";
 import { descifrarTexto } from "../lib/server/cripto";
 
 export async function backfillTitulos(opciones?: { dryRun?: boolean; limit?: number }) {
@@ -12,6 +12,7 @@ export async function backfillTitulos(opciones?: { dryRun?: boolean; limit?: num
   let totalProcesados = 0;
   let generadosGroq = 0;
   let generadosFallback = 0;
+  let generadosUltimoRecurso = 0;
   let fallidos = 0;
   let offset = 0;
 
@@ -31,26 +32,19 @@ export async function backfillTitulos(opciones?: { dryRun?: boolean; limit?: num
     for (const v of batch) {
       totalProcesados++;
       const textoClaro = descifrarTexto(v.texto || "");
-      if (!textoClaro.trim()) {
-        fallidos++;
-        continue;
-      }
 
       try {
-        const resTitulo = await generarTituloEstructurado(textoClaro);
-        if (!resTitulo.title) {
-          fallidos++;
-          console.warn(`[Volcado #${v.folio || v.id}] No se pudo generar un título válido.`);
-          continue;
-        }
+        const resTitulo = await generarTituloConGarantia(textoClaro, v.folio);
 
-        if (resTitulo.fallback_used) {
+        if (resTitulo.nivel === "ia") {
+          generadosGroq++;
+        } else if (resTitulo.nivel === "fallback_determinista") {
           generadosFallback++;
         } else {
-          generadosGroq++;
+          generadosUltimoRecurso++;
         }
 
-        console.log(`[Volcado #${v.folio || v.id}] Título generado (${resTitulo.model}): "${resTitulo.title}"`);
+        console.log(`[Volcado #${v.folio || v.id}] Título generado (${resTitulo.model} / ${resTitulo.nivel}): "${resTitulo.title}"`);
 
         if (!dryRun) {
           await asignarTituloVolcado(v.id, resTitulo.title, "backfill_titulos");
@@ -69,6 +63,7 @@ export async function backfillTitulos(opciones?: { dryRun?: boolean; limit?: num
     totalProcesados,
     generadosGroq,
     generadosFallback,
+    generadosUltimoRecurso,
     fallidos,
     dryRun,
   };

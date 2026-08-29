@@ -1,7 +1,7 @@
-// @l0 L0-002-R · @req TITULOS-LLM/REQ-1
+// @l0 L0-002-R · @req TITULOS-LLM/REQ-1 · @req TITULOS-LLM/REQ-2
 import { z } from "zod";
 import { getDb } from "./neon";
-import { reportarIncidente } from "./incidentes";
+import { conTimeout } from "./utils";
 
 export interface ThreadIdea {
   label: string;
@@ -23,6 +23,10 @@ export interface TitleGenerationResult {
   confidence: number;
   model: string;
   fallback_used: boolean;
+}
+
+export interface TituloConGarantiaResult extends TitleGenerationResult {
+  nivel: "ia" | "fallback_determinista" | "ultimo_recurso";
 }
 
 const GroqResponseSchema = z.object({
@@ -131,6 +135,26 @@ export function esTituloGenericoOInvalido(titulo: string): boolean {
   if (!titulo || titulo.trim().length < 5) return true;
   const norm = normalizarParaGrounding(titulo);
   return FRASES_GENERICAS_PROHIBIDAS.some((fg) => norm.includes(fg));
+}
+
+/**
+ * Último recurso: genera un título SIEMPRE no vacío, sin depender de LLM ni de
+ * heurísticas que puedan rechazar el resultado. No debe lanzar excepciones.
+ */
+export function generarTituloDeUltimoRecurso(texto: string, folio?: number | null): string {
+  try {
+    const limpio = (texto || "").replace(/\s+/g, " ").trim();
+    if (limpio.length > 0) {
+      const recorte = limpio.slice(0, 80).trim();
+      const sinCortarPalabra = recorte.replace(/\s+\S*$/, "") || recorte;
+      return sinCortarPalabra.length >= 5 ? sinCortarPalabra : limpio.slice(0, 80);
+    }
+    const fecha = new Date().toISOString().slice(0, 16).replace("T", " ");
+    return folio ? `Volcado #${folio} — ${fecha}` : `Volcado sin transcripción — ${fecha}`;
+  } catch {
+    const fecha = new Date().toISOString().slice(0, 16).replace("T", " ");
+    return folio ? `Volcado #${folio} — ${fecha}` : `Volcado sin transcripción — ${fecha}`;
+  }
 }
 
 /**
@@ -332,6 +356,44 @@ ${textoParaAnalizar}
   } catch {
     return generarTituloFallback(texto);
   }
+}
+
+/**
+ * Genera y devuelve un título garantizando que `title` NUNCA sea vacío.
+ * No lanza excepciones bajo ninguna circunstancia.
+ */
+export async function generarTituloConGarantia(
+  texto: string,
+  folio?: number | null
+): Promise<TituloConGarantiaResult> {
+  try {
+    const resIA = await conTimeout(generarTituloEstructurado(texto), 9000, null);
+    if (resIA && resIA.title && !esTituloGenericoOInvalido(resIA.title)) {
+      return { ...resIA, nivel: resIA.fallback_used ? "fallback_determinista" : "ia" };
+    }
+  } catch {
+    // continúa al siguiente nivel
+  }
+
+  try {
+    const resFallback = generarTituloFallback(texto);
+    if (resFallback && resFallback.title && !esTituloGenericoOInvalido(resFallback.title)) {
+      return { ...resFallback, nivel: "fallback_determinista" };
+    }
+  } catch {
+    // continúa al siguiente nivel
+  }
+
+  const tituloFinal = generarTituloDeUltimoRecurso(texto, folio ?? null);
+  return {
+    title: tituloFinal,
+    mode: "single_thread",
+    threads: [{ label: tituloFinal, ideas: [tituloFinal], evidence: [] }],
+    confidence: 0.3,
+    model: "ultimo_recurso_deterministico",
+    fallback_used: true,
+    nivel: "ultimo_recurso",
+  };
 }
 
 /**

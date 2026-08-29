@@ -1,10 +1,11 @@
-// @l0 L0-002-R · @req PIPELINE/REQ-3 · @acr ACR-1.2
+// @l0 L0-002-R · @req PIPELINE/REQ-3 · @acr ACR-1.2 · @req TITULOS-LLM/REQ-2
 import { test, expect } from "@playwright/test";
 
 test.describe("Pipeline Control Tower E2E Tests", () => {
   test.beforeEach(async ({ page }) => {
     let v002Approved = false;
     let v002Ingested = false;
+    let v003TituloGenerado = false;
 
     // Log console from browser
     page.on("console", (msg) => {
@@ -25,7 +26,7 @@ test.describe("Pipeline Control Tower E2E Tests", () => {
 
     // 2. Mock Pipeline API endpoint with full mock items representing different integrity/pipeline states
     await page.route("**/api/volcados/pipeline", async (route) => {
-      console.log(`MOCK PIPELINE CALLED: v002Approved=${v002Approved}, v002Ingested=${v002Ingested}`);
+      console.log(`MOCK PIPELINE CALLED: v002Approved=${v002Approved}, v002Ingested=${v002Ingested}, v003TituloGenerado=${v003TituloGenerado}`);
       await route.fulfill({
         status: 200,
         contentType: "application/json",
@@ -94,7 +95,7 @@ test.describe("Pipeline Control Tower E2E Tests", () => {
             },
             {
               id: "v-003",
-              titulo: "Volcado de Texto Sin Audio",
+              titulo: v003TituloGenerado ? "Título Garantizado Generado" : "",
               recibido_en: "2026-07-28T10:00:00Z",
               estado: "archivado",
               io_id: null,
@@ -119,7 +120,27 @@ test.describe("Pipeline Control Tower E2E Tests", () => {
       });
     });
 
-    // 3. Mock Versions API endpoint
+    // 3. Mock Title Generation API endpoint
+    await page.route("**/api/dictado-archivo/titulo", async (route) => {
+      const body = route.request().postDataJSON() || {};
+      console.log("MOCK TITULO API CALLED with body:", body);
+      v003TituloGenerado = true;
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          title: "Título Garantizado Generado",
+          mode: "single_thread",
+          threads: [],
+          confidence: 0.95,
+          model: "mock-model",
+          fallback_used: false,
+          nivel: "ia",
+        }),
+      });
+    });
+
+    // 4. Mock Versions API endpoint
     await page.route("**/api/versiones**", async (route) => {
       const url = new URL(route.request().url());
       const id = url.searchParams.get("id");
@@ -148,7 +169,7 @@ test.describe("Pipeline Control Tower E2E Tests", () => {
       }
     });
 
-    // 4. Mock Revision delta API
+    // 5. Mock Revision delta API
     await page.route("**/api/revision/delta**", async (route) => {
       await route.fulfill({
         status: 200,
@@ -161,7 +182,7 @@ test.describe("Pipeline Control Tower E2E Tests", () => {
       });
     });
 
-    // 5. Mock Revision Save endpoint
+    // 6. Mock Revision Save endpoint
     await page.route("**/api/edicion", async (route) => {
       await route.fulfill({
         status: 200,
@@ -170,7 +191,7 @@ test.describe("Pipeline Control Tower E2E Tests", () => {
       });
     });
 
-    // 6. Mock Revision endpoints
+    // 7. Mock Revision endpoints
     await page.route("**/api/revision/**", async (route) => {
       const url = route.request().url();
       const method = route.request().method();
@@ -243,7 +264,7 @@ test.describe("Pipeline Control Tower E2E Tests", () => {
       });
     });
 
-    // 7. Mock Kernel Ingestion endpoint
+    // 8. Mock Kernel Ingestion endpoint
     await page.route("**/api/ingesta", async (route) => {
       console.log("MOCK INGESTA CALLED");
       v002Ingested = true;
@@ -336,7 +357,22 @@ test.describe("Pipeline Control Tower E2E Tests", () => {
     await expect(page.locator("text=io_id: io-newly-ingested-id").first()).toBeVisible();
   });
 
-  test("10. responsive", async ({ page }) => {
+  test("10. botón 'Titular' en tarjeta sin título y filtro 'Archivados'", async ({ page }) => {
+    // Filter by "Archivados"
+    await page.locator("button:has-text('Archivados')").click();
+
+    // Should see v-003 without title card, which has a "Titular" button
+    const titularBtn = page.locator("button:has-text('Titular')").first();
+    await expect(titularBtn).toBeVisible();
+
+    // Click "Titular" button
+    await titularBtn.click();
+
+    // After API response, card should update to new title "Título Garantizado Generado"
+    await expect(page.locator("text=Título Garantizado Generado").first()).toBeVisible();
+  });
+
+  test("11. responsive", async ({ page }) => {
     // Resize viewport to mobile size
     await page.setViewportSize({ width: 375, height: 667 });
 
@@ -344,7 +380,7 @@ test.describe("Pipeline Control Tower E2E Tests", () => {
     await expect(page.locator("h1")).toBeVisible();
   });
 
-  test("17. tema oscuro/claro", async ({ page }) => {
+  test("12. tema oscuro/claro", async ({ page }) => {
     // Make sure we have standard visual backgrounds applying
     const mainContainer = page.locator("h1").first();
     await expect(mainContainer).toBeVisible();

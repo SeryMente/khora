@@ -1,10 +1,10 @@
-// @l0 L0-002-R · @req ING-03/REQ-1 · @acr ACR-1.2 · @req REVISION-COCKPIT/REQ-1
+// @l0 L0-002-R · @req ING-03/REQ-1 · @acr ACR-1.2 · @req REVISION-COCKPIT/REQ-1 · @req TITULOS-LLM/REQ-2
 import { createHash, randomUUID } from "crypto";
 import { getDb } from "./neon";
 import { reportarIncidente } from "./incidentes";
 import { crearVersion } from "./correcciones";
 import { cifrarTexto, descifrarTexto } from "./cripto";
-import { generarTituloEstructurado, asignarTituloVolcado, esTituloGenericoOInvalido } from "./titulos";
+import { generarTituloConGarantia, asignarTituloVolcado, esTituloGenericoOInvalido } from "./titulos";
 import { autoaplicarTildesSeguras } from "./tildesSeguras";
 
 export type EstadoVolcado = "archivado" | "pendiente_revision" | "en_revision" | "listo_ingesta" | "ingerido" | "fallido";
@@ -136,26 +136,16 @@ export async function prepararVolcadoParaRevision(volcadoId: string, actor?: str
 
     // Asegurar título válido y no genérico antes de pasar a en_revision
     if (!v.titulo || esTituloGenericoOInvalido(v.titulo)) {
-      try {
-        const resTitulo = await generarTituloEstructurado(textoClaro);
-        if (resTitulo.title && !esTituloGenericoOInvalido(resTitulo.title)) {
-          await asignarTituloVolcado(volcadoId, resTitulo.title, actor || "prepararVolcadoParaRevision");
-        } else {
-          await reportarIncidente({
-            volcadoId,
-            tipo: "titulo_ausente",
-            severidad: "media",
-            origen: "prepararVolcadoParaRevision",
-            evidencia: { motivo: "El generador de títulos no produjo un título válido." },
-          });
-        }
-      } catch (tErr) {
+      const resGarantia = await generarTituloConGarantia(textoClaro, v.folio);
+      await asignarTituloVolcado(volcadoId, resGarantia.title, actor || "prepararVolcadoParaRevision");
+
+      if (resGarantia.nivel === "ultimo_recurso") {
         await reportarIncidente({
           volcadoId,
           tipo: "titulo_ausente",
-          severidad: "media",
+          severidad: "baja",
           origen: "prepararVolcadoParaRevision",
-          evidencia: { error: String(tErr) },
+          evidencia: { motivo: "El generador de títulos cayó a último recurso determinístico." },
         });
       }
     }
