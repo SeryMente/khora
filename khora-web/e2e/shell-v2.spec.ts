@@ -5,7 +5,7 @@ test.describe('Shell Navegación v2', () => {
     const routes = [
       { path: '/sistema/dictado', expectedTitle: 'Dictado' },
       { path: '/sistema/editar', expectedTitle: 'Editar transcripciones' },
-      { path: '/sistema/volcados', expectedTitle: 'Volcados' },
+      { path: '/sistema/volcados', expectedTitle: 'Mesa de Revisión Sincrónica' },
       { path: '/sistema/ingesta', expectedTitle: 'Ingesta' },
       { path: '/sistema/consulta', expectedTitle: 'Consola de Consulta' },
       { path: '/grafo', expectedTitle: 'Grafo PKG - Proyección Leiden' },

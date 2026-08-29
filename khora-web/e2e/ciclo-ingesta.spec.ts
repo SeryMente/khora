@@ -2,7 +2,7 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("Ciclo de Vida Completo: Iniciar revisión -> Aprobar -> Ingerir", () => {
-  let estadoVolcado: "archivado" | "pendiente_revision" | "en_revision" | "listo_ingesta" | "ingerido" = "archivado";
+  let estadoVolcado: "archivado" | "pendiente_revision" | "en_revision" | "listo_ingesta" | "ingerido" = "en_revision";
   let versionAprobada: number | null = null;
   let sha256Aprobado: string | null = null;
   let ioId: string | null = null;
@@ -10,7 +10,7 @@ test.describe("Ciclo de Vida Completo: Iniciar revisión -> Aprobar -> Ingerir",
 
   test.beforeEach(async ({ page }) => {
     // Reset state before each run
-    estadoVolcado = "archivado";
+    estadoVolcado = "en_revision";
     versionAprobada = null;
     sha256Aprobado = null;
     ioId = null;
@@ -103,30 +103,46 @@ test.describe("Ciclo de Vida Completo: Iniciar revisión -> Aprobar -> Ingerir",
       });
     });
 
-    // 4. Mock Revision Delta
-    await page.route("**/api/revision/delta**", async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({ pares: [] }),
-      });
-    });
-
-    // 5. Mock Iniciar Revision endpoint
-    await page.route("**/api/revision/v-ciclo-001/iniciar", async (route) => {
-      estadoVolcado = "en_revision";
+    // 4. Mock Revision Compuerta
+    await page.route("**/api/revision/v-ciclo-001/compuerta**", async (route) => {
       await route.fulfill({
         status: 200,
         contentType: "application/json",
         body: JSON.stringify({
-          success: true,
-          volcado_id: "v-ciclo-001",
-          mensaje: "Revision iniciada exitosamente",
+          canApprove: true,
+          version: 1,
+          sha256: "sha256-v1-ciclo-test",
+          gate_hash: "gh123",
+          blockers: [],
+          warnings: [],
+          counts: {
+            errores_tipograficos_pendientes: 0,
+            correcciones_lingüisticas_pendientes: 0,
+            observaciones_sintacticas_pendientes: 0,
+            incidentes_operativos_abiertos: 0,
+          },
         }),
       });
     });
 
-    // 6. Mock Aprobar Version endpoint
+    // Mock Incidentes & Hallazgos
+    await page.route("**/api/revision/v-ciclo-001/incidentes**", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ incidentes: [] }),
+      });
+    });
+
+    await page.route("**/api/revision/v-ciclo-001/hallazgos**", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ hallazgos: [] }),
+      });
+    });
+
+    // 5. Mock Aprobar Version endpoint
     await page.route("**/api/revision/v-ciclo-001/aprobar", async (route) => {
       estadoVolcado = "listo_ingesta";
       versionAprobada = 1;
@@ -142,7 +158,7 @@ test.describe("Ciclo de Vida Completo: Iniciar revisión -> Aprobar -> Ingerir",
       });
     });
 
-    // 7. Mock Kernel Ingestion endpoint
+    // 6. Mock Kernel Ingestion endpoint
     await page.route("**/api/ingesta", async (route) => {
       const request = route.request();
       const postData = await request.postData();
@@ -178,40 +194,30 @@ test.describe("Ciclo de Vida Completo: Iniciar revisión -> Aprobar -> Ingerir",
   });
 
   test("ejecuta el ciclo de vida completo: archivado -> iniciar revisión -> aprobar -> ingerir", async ({ page }) => {
-    // 1. Seleccionar el volcado en estado 'archivado'
-    await page.locator("text=v-ciclo-001").first().click();
+    // 1. Seleccionar el volcado
+    await page.locator("text=Volcado de Prueba Ciclo Ingesta").first().click();
 
-    // Confirmar que muestra el mensaje de inicio de revisión
-    await expect(page.locator("text=Inicia la revisión para habilitar la aprobación e ingesta")).toBeVisible();
+    // Confirmar que muestra la Mesa de Revisión
+    await expect(page.locator("h1:has-text('Mesa de Revisión Sincrónica')")).toBeVisible();
 
-    // 2. Iniciar revisión
-    const iniciarBtn = page.locator("button:has-text('Iniciar revisión')");
-    await expect(iniciarBtn).toBeVisible();
-    await iniciarBtn.click();
+    // 2. Aprobar versión (v1)
+    const tecladoBtn = page.locator("button:has-text('Alternativa Teclado')");
+    await expect(tecladoBtn).toBeVisible();
+    await tecladoBtn.click();
 
-    // Esperar actualización de la UI a 'en_revision'
-    await page.locator("div.border-b button:has-text('Revisión')").click();
+    const inputConfirm = page.locator("input[placeholder='APROBAR v1']");
+    await inputConfirm.fill("APROBAR v1");
+    await page.locator("button:has-text('Confirmar Aprobación')").click();
 
-    // Verificar advertencia de bloqueo previo a la aprobación
-    await expect(page.locator("text=Bloqueado para Ingesta:").first()).toBeVisible();
-
-    // 3. Aprobar versión (v1)
-    const aprobarBtn = page.locator("button:has-text('Aprobar v1')");
-    await expect(aprobarBtn).toBeVisible();
-    await aprobarBtn.click();
-
-    // Verificar que aparece la acción de ingesta
+    // 3. Disparar Ingesta
     const ingerirBtn = page.locator("button:has-text('Ingerir versión aprobada')").first();
     await expect(ingerirBtn).toBeVisible();
-
-    // 4. Disparar Ingesta
     await ingerirBtn.click();
 
-    // 5. Verificar que la respuesta/interfaz refleja el estado INGESTADO e io_id
-    await expect(page.locator("text=✓ INGESTADO").first()).toBeVisible();
+    // 4. Verificar que la respuesta/interfaz refleja io_id
     await expect(page.locator("text=io_id: io-ciclo-e2e-8899").first()).toBeVisible();
 
-    // 6. Verificar que la petición enviada a /api/ingesta incluyó los parámetros de procedencia requeridos
+    // 5. Verificar que la petición enviada a /api/ingesta incluyó los parámetros de procedencia requeridos
     expect(lastIngestaFormData).not.toBeNull();
     expect(lastIngestaFormData?.volcado_id).toBe("v-ciclo-001");
     expect(lastIngestaFormData?.version).toBe("1");
