@@ -203,8 +203,8 @@ export async function guardarDictado(entrada: EntradaDictado) {
     );
   }
 
-  // Preparar automáticamente y con semántica síncrona/transaccional hacia 'en_revision'
-  await prepararVolcadoParaRevision(id, entrada.usuario);
+  // Preparar automáticamente y con semántica síncrona/transaccional hacia 'en_revision' (keep_captura)
+  await prepararVolcadoParaRevision(id, entrada.usuario, { onFailure: "keep_captura" });
 
   return { id, sha256: sha, chars: entrada.texto.length, sessionId };
 }

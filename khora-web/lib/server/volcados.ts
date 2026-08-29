@@ -69,7 +69,11 @@ export function hashTexto(texto: string): string {
  * Flujo: creación / archivado → pendiente_revision → versión v1 asegurada → detectores iniciales → en_revision
  * Si falla la preparación, pasa a 'fallido' y abre un incidente bloqueante 'preparacion_revision_fallida'.
  */
-export async function prepararVolcadoParaRevision(volcadoId: string, actor?: string | null): Promise<Volcado> {
+export async function prepararVolcadoParaRevision(
+  volcadoId: string,
+  actor?: string | null,
+  options?: { onFailure?: "keep_captura" | "mark_fallido" }
+): Promise<Volcado> {
   await asegurarTabla();
   const db = getDb();
 
@@ -171,7 +175,40 @@ export async function prepararVolcadoParaRevision(volcadoId: string, actor?: str
   } catch (err: any) {
     await client.query("ROLLBACK");
 
-    // En caso de fallo en la preparación, registrar en estado 'fallido' + incidente bloqueante
+    const mode = options?.onFailure ?? "mark_fallido";
+
+    if (mode === "keep_captura") {
+      await db.query(
+        "UPDATE volcado SET estado = 'archivado', ultimo_error = $2, ultimo_intento = NOW() WHERE id = $1",
+        [volcadoId, String(err?.message ?? err)]
+      );
+
+      console.error(
+        JSON.stringify({
+          evento: "promocion_revision_fallida",
+          volcadoId,
+          error: String(err?.message ?? err),
+          actor: actor ?? null,
+          politica: "keep_captura",
+        })
+      );
+
+      const rollbackRes = await db.query(
+        "SELECT id, folio, texto, sha256, chars, titulo, origen, driver, usuario, recibido_en, estado, io_id, intentos, ultimo_error, ultimo_intento, version_aprobada FROM volcado WHERE id = $1",
+        [volcadoId]
+      );
+      if (rollbackRes.rows.length > 0) {
+        const vRec = rollbackRes.rows[0];
+        return {
+          ...vRec,
+          texto: descifrarTexto(String(vRec.texto ?? "")),
+        } as Volcado;
+      } else {
+        throw err;
+      }
+    }
+
+    // En caso de fallo en la preparación con politica mark_fallido
     await db.query(
       "UPDATE volcado SET estado = 'fallido', ultimo_error = $2, ultimo_intento = NOW() WHERE id = $1",
       [volcadoId, String(err?.message ?? err)]
@@ -206,8 +243,8 @@ export async function archivarVolcado(args: { texto: string; titulo?: string | n
 
   const volcadoArchivado = res.rows[0] as Volcado;
 
-  // Entrada automática síncrona a revisión
-  return await prepararVolcadoParaRevision(volcadoArchivado.id, args.usuario);
+  // Entrada automática síncrona a revisión con política de fallo keep_captura
+  return await prepararVolcadoParaRevision(volcadoArchivado.id, args.usuario, { onFailure: "keep_captura" });
 }
 
 export async function listarVolcados(limite: number = 200): Promise<Volcado[]> {
