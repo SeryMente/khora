@@ -1,10 +1,12 @@
-// @l0 L0-002-R · @req TITULOS-LLM/REQ-1
+// @l0 L0-002-R · @req TITULOS-LLM/REQ-1 · @req TITULOS-LLM/REQ-2
 import assert from "assert";
 import test from "node:test";
 import {
   segmentarTextoEnChunks,
   generarTituloFallback,
-  generarTituloEstructurado
+  generarTituloEstructurado,
+  generarTituloDeUltimoRecurso,
+  generarTituloConGarantia,
 } from "../../lib/server/titulos";
 
 test("Titulos Suite", async (t) => {
@@ -39,5 +41,25 @@ test("Titulos Suite", async (t) => {
     assert.ok(res.title);
     assert.strictEqual(res.fallback_used, true);
     assert.ok(res.threads.length > 0);
+  });
+
+  await t.test("4. generarTituloDeUltimoRecurso nunca devuelve string vacío", () => {
+    assert.ok(generarTituloDeUltimoRecurso("", 12).includes("Volcado #12"));
+    assert.ok(generarTituloDeUltimoRecurso("", null).includes("Volcado sin transcripción"));
+    assert.strictEqual(generarTituloDeUltimoRecurso("hola", 5), "hola");
+    const textoLargo = "Esta es una transcripcion normal de un dictado para probar la truncacion de ultimo recurso";
+    const res = generarTituloDeUltimoRecurso(textoLargo, 10);
+    assert.ok(res.length >= 5 && res.length <= 80);
+  });
+
+  await t.test("5. generarTituloConGarantia cae a ultimo recurso si el texto es vacio o no produce titulo valido", async () => {
+    delete process.env.GROQ_API_KEY;
+    const resVacio = await generarTituloConGarantia("", 42);
+    assert.ok(resVacio.title.includes("Volcado #42"));
+    assert.strictEqual(resVacio.nivel, "ultimo_recurso");
+
+    const resInvalido = await generarTituloConGarantia("...", 99);
+    assert.strictEqual(resInvalido.nivel, "ultimo_recurso");
+    assert.ok(resInvalido.title.length > 0);
   });
 });
