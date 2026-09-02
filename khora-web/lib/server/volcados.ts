@@ -27,6 +27,8 @@ export interface Volcado {
   ultimo_error: string | null;
   ultimo_intento: string | null;
   version_aprobada: number | null;
+  texto_estructurado?: string | null;
+  estructura_ratificada_en?: string | null;
 }
 
 const DDL: string[] = [
@@ -45,6 +47,8 @@ const DDL: string[] = [
   "ALTER TABLE volcado ADD COLUMN IF NOT EXISTS sha256_aprobado TEXT",
   "ALTER TABLE volcado ADD COLUMN IF NOT EXISTS aprobado_en TIMESTAMPTZ",
   "ALTER TABLE volcado ADD COLUMN IF NOT EXISTS aprobador TEXT",
+  "ALTER TABLE volcado ADD COLUMN IF NOT EXISTS texto_estructurado TEXT",
+  "ALTER TABLE volcado ADD COLUMN IF NOT EXISTS estructura_ratificada_en TIMESTAMPTZ",
   "CREATE TABLE IF NOT EXISTS volcado_revision_auditoria (id UUID PRIMARY KEY, volcado_id UUID NOT NULL, accion TEXT NOT NULL, estado_anterior TEXT, estado_nuevo TEXT, version INTEGER, sha256 TEXT, usuario TEXT, created_at TIMESTAMPTZ NOT NULL DEFAULT now())",
 ];
 
