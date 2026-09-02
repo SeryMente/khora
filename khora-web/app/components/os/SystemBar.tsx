@@ -1,4 +1,4 @@
-// @l0 L0-002-R · @req UI-03/THEME-TOGGLE
+// @l0 L0-002-R · @req UI-03/THEME-TOGGLE · @req SISTEMA-MENU/E1,E2
 "use client";
 
 import Link from "next/link";
@@ -56,14 +56,14 @@ export default function SystemBar() {
       </Link>
 
       <Link
-        href="/sistema/boveda"
+        href="/sistema/registro"
         className="flex flex-col items-center justify-center p-2"
         style={{
-          color: pathname === "/sistema/boveda" ? "var(--khora-ink)" : "var(--khora-accent)"
+          color: pathname?.startsWith("/sistema/registro") ? "var(--khora-ink)" : "var(--khora-accent)"
         }}
       >
-        <Icons.LockKeyhole size={32} strokeWidth={1.75} absoluteStrokeWidth={true} />
-        <span className="text-xs mt-1 font-medium">Bóveda</span>
+        <Icons.ScrollText size={32} strokeWidth={1.75} absoluteStrokeWidth={true} />
+        <span className="text-xs mt-1 font-medium">Sistema</span>
       </Link>
 
       <Link

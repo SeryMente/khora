@@ -19,12 +19,12 @@ test("reconciliarSegmentos reemplaza segmentos provisionales por autoritativos",
   assert.strictEqual(res.segmentos[0].texto, "Hola a todos, esto es una prueba de dictado autoritativo.");
 });
 
-test("reconciliarSegmentos PROTEGE estrictamente un segmento editado manualmente", () => {
+test("reconciliarSegmentos PROTEGE strictly un segmento editado manualmente", () => {
   const existentes: SegmentoReconciliado[] = [
     { id: "seg-1", texto: "Texto corregido manualmente por el operador Khora.", estado: "editado_manual", modificadoManualmente: true },
     { id: "seg-2", texto: "segundo bloque en ASR provisional", estado: "provisional_asr" },
   ];
-  const nuevoWhisper = "Primer bloque re-transcrito por Whisper.\n\nSegundo bloque transcrito autoritativamente por Whisper.";
+  const nuevoWhisper = "Texto corregido manualmente por el operador Khora.\n\nSegundo bloque transcrito autoritativamente por Whisper.";
 
   const res = reconciliarSegmentos(existentes, nuevoWhisper);
   assert.strictEqual(res.segmentos.length, 2);

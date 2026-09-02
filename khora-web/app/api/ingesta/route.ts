@@ -1,21 +1,5 @@
-// @l0 L0-002 · @req CORA-02/REQ-1,REQ-2,REQ-3,PIPELINE/REQ-3
-// @acr ACR-1.1,ACR-1.2,ACR-2.1,ACR-3.1 · @ua —
-//
-// Endpoint de ingesta versionada.
-//
-// Flujo:
-// 1. Autenticación.
-// 2. Validación de volcado_id + version.
-// 3. Validación de estado listo_ingesta.
-// 4. Validación de versión aprobada.
-// 5. Recuperación de la versión persistida.
-// 6. Validación SHA-256 de la versión.
-// 7. Validación SHA-256 contra la versión aprobada.
-// 8. Envío al kernel.
-// 9. Actualización operacional de volcado.
-// 10. Registro de auditoría.
-// 11. Manejo de errores HTTP, red y timeout.
-
+// @l0 L0-002 · @req CORA-02/REQ-1,REQ-2,PIPELINE/REQ-3
+// @acr ACR-1.1,ACR-1.2,ACR-2.1,ACR-3.1 · @req SISTEMA-MENU/E4
 import { NextResponse } from "next/server";
 import { randomUUID } from "crypto";
 
@@ -25,6 +9,7 @@ import {
   listarVersiones,
   sha256de,
 } from "../../../lib/server/correcciones";
+import { registrarEvento } from "../../../lib/server/eventos";
 
 type VolcadoRow = {
   estado: string;
@@ -48,10 +33,6 @@ type KernelResponse = {
 export async function POST(req: Request) {
   const session = await auth();
 
-  // ------------------------------------------------------------
-  // 1. AUTENTICACIÓN
-  // ------------------------------------------------------------
-
   if (!session?.user?.email) {
     return NextResponse.json(
       {
@@ -63,19 +44,11 @@ export async function POST(req: Request) {
     );
   }
 
-  // ------------------------------------------------------------
-  // Variables de trabajo
-  // ------------------------------------------------------------
-
   let texto: string | null = null;
   let archivo_base64: string | null = null;
   let mime: string | null = null;
 
   try {
-    // ----------------------------------------------------------
-    // 2. LECTURA DEL FORM DATA
-    // ----------------------------------------------------------
-
     const formData = await req.formData();
 
     const fileValue = formData.get("file");
@@ -91,10 +64,6 @@ export async function POST(req: Request) {
         ? textValue
         : null;
 
-    // ----------------------------------------------------------
-    // 3. LECTURA DE PROCEDENCIA
-    // ----------------------------------------------------------
-
     const volcadoIdValue = formData.get("volcado_id");
     const versionValue = formData.get("version");
 
@@ -109,6 +78,13 @@ export async function POST(req: Request) {
         : null;
 
     if (!volcadoId || !versionCruda) {
+      await registrarEvento({
+        fase: "ingesta",
+        eventId: "ING-002",
+        estado: "FAIL",
+        mensaje: "Rechazo de ingesta por procedencia incompleta (Etapa 6 L0-003)",
+        detalle: { volcadoId, versionCruda },
+      });
       return NextResponse.json(
         {
           error:
@@ -119,13 +95,6 @@ export async function POST(req: Request) {
         }
       );
     }
-
-    // ----------------------------------------------------------
-    // 4. CARRIL DE ARCHIVO
-    //
-    // Actualmente la ingesta versionada se realiza únicamente
-    // mediante la versión textual persistida.
-    // ----------------------------------------------------------
 
     if (file) {
       mime = file.type || null;
@@ -146,23 +115,12 @@ export async function POST(req: Request) {
       );
     }
 
-    // ----------------------------------------------------------
-    // 5. CARRIL TEXTUAL DIRECTO
-    //
-    // El texto recibido no sustituye a la versión persistida.
-    // La fuente de verdad para esta ruta es listarVersiones().
-    // ----------------------------------------------------------
-
     if (
       textInput !== null &&
       textInput.trim().length > 0
     ) {
       texto = textInput;
     }
-
-    // ----------------------------------------------------------
-    // 6. VALIDACIÓN DE VERSIÓN
-    // ----------------------------------------------------------
 
     const versionPedida = Number(versionCruda);
 
@@ -180,15 +138,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // ----------------------------------------------------------
-    // 7. CONEXIÓN A BASE DE DATOS
-    // ----------------------------------------------------------
-
     const db = getDb();
-
-    // ----------------------------------------------------------
-    // 8. OBTENER VOLCADO
-    // ----------------------------------------------------------
 
     const vRes = await db.query(
       `
@@ -216,10 +166,6 @@ export async function POST(req: Request) {
     const volcado =
       vRes.rows[0] as VolcadoRow;
 
-    // ----------------------------------------------------------
-    // 9. VALIDACIÓN ESTRICTA DE ESTADO
-    // ----------------------------------------------------------
-
     if (volcado.estado !== "listo_ingesta") {
       return NextResponse.json(
         {
@@ -233,16 +179,22 @@ export async function POST(req: Request) {
       );
     }
 
-    // ----------------------------------------------------------
-    // 10. VALIDACIÓN DE VERSIÓN APROBADA
-    // ----------------------------------------------------------
-
     if (
       volcado.version_aprobada === null ||
       volcado.version_aprobada === undefined ||
       volcado.sha256_aprobado === null ||
       volcado.sha256_aprobado === undefined
     ) {
+      await registrarEvento({
+        fase: "ingesta",
+        eventId: "ING-002",
+        estado: "FAIL",
+        mensaje: "Rechazo de ingesta por falta de versión/sha256 aprobados (Etapa 6 L0-003)",
+        detalle: { volcadoId, versionPedida },
+        volcadoId,
+        version: versionPedida,
+        correlacionId: volcadoId,
+      });
       return NextResponse.json(
         {
           error:
@@ -284,10 +236,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // ----------------------------------------------------------
-    // 11. OBTENER VERSION PERSISTIDA
-    // ----------------------------------------------------------
-
     const versiones =
       await listarVersiones(volcadoId);
 
@@ -310,18 +258,10 @@ export async function POST(req: Request) {
       );
     }
 
-    // ----------------------------------------------------------
-    // 12. LA FUENTE DE VERDAD ES LA VERSION PERSISTIDA
-    // ----------------------------------------------------------
-
     texto = String(fila.texto ?? "");
 
     archivo_base64 = null;
     mime = null;
-
-    // ----------------------------------------------------------
-    // 13. VALIDACIÓN DE CONTENIDO
-    // ----------------------------------------------------------
 
     if (texto.length === 0) {
       return NextResponse.json(
@@ -334,10 +274,6 @@ export async function POST(req: Request) {
         }
       );
     }
-
-    // ----------------------------------------------------------
-    // 14. VALIDACIÓN SHA-256 DE LA VERSIÓN
-    // ----------------------------------------------------------
 
     const shaServidor =
       sha256de(texto)
@@ -354,65 +290,27 @@ export async function POST(req: Request) {
         .trim()
         .toLowerCase();
 
-    if (!shaVersion) {
+    if (!shaVersion || !shaAprobado || shaServidor !== shaVersion || shaServidor !== shaAprobado) {
+      await registrarEvento({
+        fase: "ingesta",
+        eventId: "ING-002",
+        estado: "FAIL",
+        mensaje: "Rechazo de escritura sin terna de procedencia completa e íntegra (Etapa 6 L0-003)",
+        detalle: { shaServidor, shaVersion, shaAprobado, volcadoId, versionPedida },
+        volcadoId,
+        version: versionPedida,
+        sha256: shaServidor,
+        correlacionId: volcadoId,
+      });
       return NextResponse.json(
         {
-          error:
-            "La version persistida no tiene SHA256",
+          error: "integridad rota: sha256 de la version no coincide",
         },
         {
           status: 409,
         }
       );
     }
-
-    if (!shaAprobado) {
-      return NextResponse.json(
-        {
-          error:
-            "El volcado no tiene SHA256 aprobado",
-        },
-        {
-          status: 409,
-        }
-      );
-    }
-
-    // ----------------------------------------------------------
-    // 15. INTEGRIDAD DE LA VERSIÓN
-    // ----------------------------------------------------------
-
-    if (shaServidor !== shaVersion) {
-      return NextResponse.json(
-        {
-          error:
-            "integridad rota: sha256 de la version no coincide",
-        },
-        {
-          status: 409,
-        }
-      );
-    }
-
-    // ----------------------------------------------------------
-    // 16. INTEGRIDAD CONTRA APROBACIÓN
-    // ----------------------------------------------------------
-
-    if (shaServidor !== shaAprobado) {
-      return NextResponse.json(
-        {
-          error:
-            "integridad rota: el SHA256 de la version no coincide con el SHA256 aprobado",
-        },
-        {
-          status: 409,
-        }
-      );
-    }
-
-    // ----------------------------------------------------------
-    // 17. CONSTRUIR PAYLOAD
-    // ----------------------------------------------------------
 
     const payload = {
       texto,
@@ -427,10 +325,6 @@ export async function POST(req: Request) {
         sha256: shaServidor,
       },
     };
-
-    // ----------------------------------------------------------
-    // 18. CONFIGURACIÓN DEL KERNEL
-    // ----------------------------------------------------------
 
     const kernelUrl = (
       process.env.KHORA_API_URL ||
@@ -452,10 +346,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // ----------------------------------------------------------
-    // 19. TIMEOUT
-    // ----------------------------------------------------------
-
     const abortController =
       new AbortController();
 
@@ -464,10 +354,6 @@ export async function POST(req: Request) {
     }, 60000);
 
     try {
-      // --------------------------------------------------------
-      // 20. LLAMADA AL KERNEL
-      // --------------------------------------------------------
-
       const apiResponse = await fetch(
         `${kernelUrl}/api/v1/ingesta`,
         {
@@ -483,10 +369,6 @@ export async function POST(req: Request) {
 
       clearTimeout(timeout);
 
-      // --------------------------------------------------------
-      // 21. PARSEAR RESPUESTA
-      // --------------------------------------------------------
-
       let data: KernelResponse;
 
       try {
@@ -498,10 +380,6 @@ export async function POST(req: Request) {
             "Kernel returned a non-JSON response",
         };
       }
-
-      // --------------------------------------------------------
-      // 22. KERNEL EXITOSO
-      // --------------------------------------------------------
 
       if (apiResponse.ok) {
         const ioId =
@@ -525,10 +403,6 @@ export async function POST(req: Request) {
             volcadoId,
           ]
         );
-
-        // ------------------------------------------------------
-        // 23. AUDITORÍA DE ÉXITO
-        // ------------------------------------------------------
 
         await db.query(
           `
@@ -567,6 +441,18 @@ export async function POST(req: Request) {
           ]
         );
 
+        await registrarEvento({
+          fase: "ingesta",
+          eventId: "ING-001",
+          estado: "OK",
+          mensaje: `Ingesta ejecutada con éxito en Kernel Python (io_id: ${ioId})`,
+          detalle: { ioId, volcadoId, version: versionPedida },
+          volcadoId,
+          version: versionPedida,
+          sha256: shaServidor,
+          correlacionId: volcadoId,
+        });
+
         return NextResponse.json(
           data,
           {
@@ -575,23 +461,12 @@ export async function POST(req: Request) {
         );
       }
 
-      // --------------------------------------------------------
-      // 24. ERROR DEVUELTO POR EL KERNEL
-      // --------------------------------------------------------
-
       const errorMsg =
         typeof data.error === "string"
           ? data.error
           : typeof data.detail === "string"
             ? data.detail
             : `Kernel returned HTTP ${apiResponse.status}`;
-
-      // --------------------------------------------------------
-      // 25. ESTADO DE FALLO
-      //
-      // La llamada HTTP sí llegó al kernel, pero el kernel
-      // rechazó o procesó con error la solicitud.
-      // --------------------------------------------------------
 
       const nuevoEstado = "fallido";
 
@@ -613,10 +488,6 @@ export async function POST(req: Request) {
           ]
         );
 
-        // ------------------------------------------------------
-        // 26. AUDITORÍA DEL FALLO DEL KERNEL
-        // ------------------------------------------------------
-
         await db.query(
           `
             INSERT INTO volcado_revision_auditoria
@@ -654,16 +525,23 @@ export async function POST(req: Request) {
           ]
         );
       } catch (dbError) {
-        // No ocultar el error original del kernel.
         console.error(
           "Error registrando fallo de ingesta en PostgreSQL:",
           dbError
         );
       }
 
-      // --------------------------------------------------------
-      // 27. DEVOLVER ERROR DEL KERNEL
-      // --------------------------------------------------------
+      await registrarEvento({
+        fase: "ingesta",
+        eventId: "ING-001",
+        estado: "FAIL",
+        mensaje: `Fallo de ingesta en Kernel Python (HTTP ${apiResponse.status}): ${errorMsg}`,
+        detalle: { errorMsg, status: apiResponse.status, volcadoId, version: versionPedida },
+        volcadoId,
+        version: versionPedida,
+        sha256: shaServidor,
+        correlacionId: volcadoId,
+      });
 
       return NextResponse.json(
         data,
@@ -672,15 +550,7 @@ export async function POST(req: Request) {
         }
       );
     } catch (fetchError: unknown) {
-      // --------------------------------------------------------
-      // 28. LIMPIAR TIMEOUT
-      // --------------------------------------------------------
-
       clearTimeout(timeout);
-
-      // --------------------------------------------------------
-      // 29. NORMALIZAR ERROR DE RED/TIMEOUT
-      // --------------------------------------------------------
 
       const isAbortError =
         fetchError instanceof Error &&
@@ -691,13 +561,6 @@ export async function POST(req: Request) {
         : fetchError instanceof Error
           ? fetchError.message
           : "Kernel request failed";
-
-      // --------------------------------------------------------
-      // 30. ESTADO OPERATIVO DE FALLO
-      //
-      // Si hubo timeout/error de red no tenemos confirmación
-      // de que el kernel haya procesado la solicitud.
-      // --------------------------------------------------------
 
       const nuevoEstado = "fallido";
 
@@ -719,10 +582,6 @@ export async function POST(req: Request) {
           ]
         );
 
-        // ------------------------------------------------------
-        // 31. AUDITORÍA DEL ERROR DE TRANSPORTE
-        // ------------------------------------------------------
-
         await db.query(
           `
             INSERT INTO volcado_revision_auditoria
@@ -760,19 +619,23 @@ export async function POST(req: Request) {
           ]
         );
       } catch (dbError) {
-        // ------------------------------------------------------
-        // 32. ERROR SECUNDARIO DE AUDITORÍA/DB
-        // ------------------------------------------------------
-
         console.error(
           "Error registrando fallo de ingesta en PostgreSQL:",
           dbError
         );
       }
 
-      // --------------------------------------------------------
-      // 33. RESPUESTA DE TIMEOUT
-      // --------------------------------------------------------
+      await registrarEvento({
+        fase: "ingesta",
+        eventId: "ING-001",
+        estado: "FAIL",
+        mensaje: `Error de transporte/timeout al invocar ingesta en Kernel Python: ${errMsg}`,
+        detalle: { errMsg, isAbortError, volcadoId, version: versionPedida },
+        volcadoId,
+        version: versionPedida,
+        sha256: shaServidor,
+        correlacionId: volcadoId,
+      });
 
       if (isAbortError) {
         return NextResponse.json(
@@ -786,10 +649,6 @@ export async function POST(req: Request) {
         );
       }
 
-      // --------------------------------------------------------
-      // 34. RESPUESTA DE ERROR DE RED
-      // --------------------------------------------------------
-
       return NextResponse.json(
         {
           error:
@@ -802,10 +661,6 @@ export async function POST(req: Request) {
       );
     }
   } catch (err: unknown) {
-    // ----------------------------------------------------------
-    // 35. ERROR GENERAL DE LA RUTA
-    // ----------------------------------------------------------
-
     console.error(
       "Error en endpoint de ingesta:",
       err

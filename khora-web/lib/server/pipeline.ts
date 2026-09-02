@@ -1,8 +1,9 @@
-// @l0 L0-002-R · @req PIPELINE-OBSERVABILITY/REQ-1 · @req TRACE-SESSION/010
+// @l0 L0-002-R · @req PIPELINE-OBSERVABILITY/REQ-1 · @req TRACE-SESSION/010 · @req SISTEMA-MENU/E4
 import { getDb } from "./neon";
 import { descifrarTexto } from "./cripto";
 import { driver as neo4jDriver, auth as neo4jAuth } from "neo4j-driver";
 import { esAudioEsperado } from "./domainAudio";
+import { registrarEvento } from "./eventos";
 
 export interface PipelineVolcado {
   id: string;
@@ -80,6 +81,13 @@ export async function verificarInformationObjectNeo4j(ioId: string): Promise<{ e
   const password = process.env.NEO4J_PASSWORD;
 
   if (!uri || !user || !password) {
+    await registrarEvento({
+      fase: "grafo",
+      eventId: "GRA-002",
+      estado: "SKIP",
+      mensaje: `Verificación InformationObject Neo4j omitida por falta de credenciales Neo4j`,
+      detalle: { ioId },
+    });
     return { exists: "unknown", details: null };
   }
 
@@ -94,21 +102,44 @@ export async function verificarInformationObjectNeo4j(ioId: string): Promise<{ e
       );
       if (res.records.length > 0) {
         const rec = res.records[0];
-        return {
-          exists: true,
-          details: {
-            volcado_id: rec.get("volcado_id"),
-            version: rec.get("version") ? Number(rec.get("version")) : null,
-            sha256: rec.get("sha256")
-          }
+        const details = {
+          volcado_id: rec.get("volcado_id"),
+          version: rec.get("version") ? Number(rec.get("version")) : null,
+          sha256: rec.get("sha256")
         };
+        await registrarEvento({
+          fase: "grafo",
+          eventId: "GRA-002",
+          estado: "OK",
+          mensaje: `InformationObject con io_id ${ioId} verificado exitosamente en Neo4j`,
+          detalle: { ioId, details },
+          volcadoId: details.volcado_id,
+          version: details.version,
+          sha256: details.sha256,
+          correlacionId: details.volcado_id || undefined,
+        });
+        return { exists: true, details };
       } else {
+        await registrarEvento({
+          fase: "grafo",
+          eventId: "GRA-002",
+          estado: "FAIL",
+          mensaje: `InformationObject con io_id ${ioId} NO fue encontrado en Neo4j`,
+          detalle: { ioId },
+        });
         return { exists: false, details: null };
       }
     } finally {
       await session.close();
     }
   } catch (err) {
+    await registrarEvento({
+      fase: "grafo",
+      eventId: "GRA-002",
+      estado: "FAIL",
+      mensaje: `Error al verificar InformationObject Neo4j para io_id ${ioId}: ${String(err)}`,
+      detalle: { ioId, error: String(err) },
+    });
     console.warn("Error consultando Neo4j:", err);
     return { exists: "unknown", details: null };
   } finally {
@@ -121,7 +152,6 @@ export async function verificarInformationObjectNeo4j(ioId: string): Promise<{ e
 export async function obtenerPipelineAggregated(): Promise<PipelineAggregatedResult> {
   const db = getDb();
 
-  // Bulk query all volcados
   const vRes = await db.query(`
     SELECT
       id, folio, session_id, texto, texto_original, sha256, chars, titulo, origen, driver, usuario,
@@ -143,7 +173,6 @@ export async function obtenerPipelineAggregated(): Promise<PipelineAggregatedRes
 
   const ids = volcados.map((v: any) => v.id);
 
-  // Bulk query versions
   const verRes = await db.query(
     "SELECT volcado_id, version, sha256, chars, creado_en FROM volcado_version WHERE volcado_id = ANY($1) ORDER BY version ASC",
     [ids]
@@ -156,7 +185,6 @@ export async function obtenerPipelineAggregated(): Promise<PipelineAggregatedRes
     versionsMap.get(row.volcado_id)!.push(row);
   }
 
-  // Bulk query sessions
   const sRes = await db.query("SELECT session_id, volcado_id, estado, total_partes FROM dictado_session");
   const sessionMap = new Map<string, any>();
   for (const s of sRes.rows) {
@@ -164,7 +192,6 @@ export async function obtenerPipelineAggregated(): Promise<PipelineAggregatedRes
     if (s.volcado_id) sessionMap.set(s.volcado_id, s);
   }
 
-  // Bulk query dictado_audio_parte
   const pRes = await db.query("SELECT session_id, volcado_id, part_index, blob_url, blob_path, bytes FROM dictado_audio_parte");
   const partesMap = new Map<string, any[]>();
   for (const p of pRes.rows) {
@@ -176,7 +203,6 @@ export async function obtenerPipelineAggregated(): Promise<PipelineAggregatedRes
     }
   }
 
-  // Bulk query PG graph nodes count
   const nRes = await db.query(
     "SELECT volcado_id, count(*)::int AS n FROM nodos WHERE volcado_id = ANY($1) GROUP BY volcado_id",
     [ids]
@@ -186,7 +212,6 @@ export async function obtenerPipelineAggregated(): Promise<PipelineAggregatedRes
     nodesCountMap.set(row.volcado_id, row.n);
   }
 
-  // Bulk query PG graph edges count
   const eRes = await db.query(
     "SELECT volcado_id, count(*)::int AS n FROM aristas WHERE volcado_id = ANY($1) GROUP BY volcado_id",
     [ids]
@@ -217,7 +242,6 @@ export async function obtenerPipelineAggregated(): Promise<PipelineAggregatedRes
       sha256Aprobada = vAprobada ? vAprobada.sha256 : null;
     }
 
-    // Audio parts & session details
     const sessionId = v.session_id ? String(v.session_id).trim() : null;
     const sesionObj = sessionId ? sessionMap.get(sessionId) : sessionMap.get(vId);
 
@@ -253,7 +277,6 @@ export async function obtenerPipelineAggregated(): Promise<PipelineAggregatedRes
       audioBytes = audioPartesJson.reduce((sum: number, p: any) => sum + (p.bytes || 0), 0);
     }
 
-    // Determine precise Audio Status Badge:
     let audioStatus: "disponible" | "encontrado_no_vinculado" | "incompleto" | "no_recuperable" | "no_aplica" = "no_aplica";
     if (hasAudio) {
       if (sessionId || v.audio_url) {

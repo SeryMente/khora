@@ -1,8 +1,9 @@
-// @l0 L0-002-R · @req FIX-DICTADO/D2-D8 · @req TRACE-SESSION/010 · @req REVISION-COCKPIT/REQ-1 · @req FIX-DICTADO/D13
+// @l0 L0-002-R · @req FIX-DICTADO/D2-D8 · @req TRACE-SESSION/010 · @req REVISION-COCKPIT/REQ-1 · @req FIX-DICTADO/D13 · @req SISTEMA-MENU/E4
 import { randomUUID, createHash } from "crypto";
 import { getDb } from "./neon";
 import { asegurarTabla, prepararVolcadoParaRevision } from "./volcados";
 import { cifrarTexto } from "./cripto";
+import { registrarEvento } from "./eventos";
 
 const ALTERS = [
   "ALTER TABLE volcado ADD COLUMN IF NOT EXISTS audio_url TEXT",
@@ -112,39 +113,67 @@ export async function registrarParteAudio(params: {
   await asegurarColumnasDictado();
   const db = getDb();
 
-  // Asegurar sesión
-  await db.query(
-    `INSERT INTO dictado_session (session_id, estado, actualizado_en)
-     VALUES ($1, 'uploading', NOW())
-     ON CONFLICT (session_id) DO UPDATE SET actualizado_en = NOW()`,
-    [params.sessionId]
-  );
+  try {
+    // Asegurar sesión
+    await db.query(
+      `INSERT INTO dictado_session (session_id, estado, actualizado_en)
+       VALUES ($1, 'uploading', NOW())
+       ON CONFLICT (session_id) DO UPDATE SET actualizado_en = NOW()`,
+      [params.sessionId]
+    );
 
-  // Registrar/Actualizar parte
-  await db.query(
-    `INSERT INTO dictado_audio_parte (session_id, part_index, blob_url, blob_path, bytes, sha256, start_ms, end_ms, duracion_ms)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-     ON CONFLICT (session_id, part_index) DO UPDATE
-     SET blob_url = EXCLUDED.blob_url,
-         blob_path = EXCLUDED.blob_path,
-         bytes = EXCLUDED.bytes,
-         sha256 = EXCLUDED.sha256,
-         start_ms = COALESCE(EXCLUDED.start_ms, dictado_audio_parte.start_ms),
-         end_ms = COALESCE(EXCLUDED.end_ms, dictado_audio_parte.end_ms),
-         duracion_ms = COALESCE(EXCLUDED.duracion_ms, dictado_audio_parte.duracion_ms),
-         uploaded_at = NOW()`,
-    [
-      params.sessionId,
-      params.partIndex,
-      params.blobUrl,
-      params.blobPath ?? null,
-      params.bytes,
-      params.sha256 ?? null,
-      params.startMs ?? null,
-      params.endMs ?? null,
-      params.duracionMs ?? null,
-    ]
-  );
+    // Registrar/Actualizar parte
+    await db.query(
+      `INSERT INTO dictado_audio_parte (session_id, part_index, blob_url, blob_path, bytes, sha256, start_ms, end_ms, duracion_ms)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+       ON CONFLICT (session_id, part_index) DO UPDATE
+       SET blob_url = EXCLUDED.blob_url,
+           blob_path = EXCLUDED.blob_path,
+           bytes = EXCLUDED.bytes,
+           sha256 = EXCLUDED.sha256,
+           start_ms = COALESCE(EXCLUDED.start_ms, dictado_audio_parte.start_ms),
+           end_ms = COALESCE(EXCLUDED.end_ms, dictado_audio_parte.end_ms),
+           duracion_ms = COALESCE(EXCLUDED.duracion_ms, dictado_audio_parte.duracion_ms),
+           uploaded_at = NOW()`,
+      [
+        params.sessionId,
+        params.partIndex,
+        params.blobUrl,
+        params.blobPath ?? null,
+        params.bytes,
+        params.sha256 ?? null,
+        params.startMs ?? null,
+        params.endMs ?? null,
+        params.duracionMs ?? null,
+      ]
+    );
+
+    await registrarEvento({
+      fase: "dictado",
+      eventId: "DIC-002",
+      estado: "OK",
+      mensaje: `Parte de audio ${params.partIndex} registrada exitosamente para la sesión ${params.sessionId}`,
+      detalle: {
+        sessionId: params.sessionId,
+        partIndex: params.partIndex,
+        bytes: params.bytes,
+        sha256: params.sha256,
+        startMs: params.startMs,
+        endMs: params.endMs,
+      },
+      correlacionId: params.sessionId,
+    });
+  } catch (err) {
+    await registrarEvento({
+      fase: "dictado",
+      eventId: "DIC-002",
+      estado: "FAIL",
+      mensaje: `Fallo al registrar parte de audio ${params.partIndex} en sesión ${params.sessionId}: ${String(err)}`,
+      detalle: { error: String(err), params },
+      correlacionId: params.sessionId,
+    });
+    throw err;
+  }
 }
 
 export async function guardarDictado(entrada: EntradaDictado) {
@@ -154,57 +183,87 @@ export async function guardarDictado(entrada: EntradaDictado) {
   const sha = createHash("sha256").update(entrada.texto, "utf8").digest("hex");
 
   const sessionId = entrada.sessionId?.trim() || null;
+  const correlacionId = sessionId || id;
 
-  await db.query(
-    `INSERT INTO volcado
-     (id, texto, sha256, chars, titulo, origen, driver, usuario, estado, fuente, audio_url, audio_bytes, duracion_seg, pulido_aplicado, audio_partes, session_id, estado_transcripcion)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)`,
-    [
-      id,
-      cifrarTexto(entrada.texto),
-      sha,
-      entrada.texto.length,
-      entrada.titulo ?? null,
-      "web",
-      "dictado",
-      entrada.usuario ?? null,
-      "archivado",
-      "dictado",
-      entrada.audioUrl ?? null,
-      entrada.audioBytes ?? null,
-      entrada.duracionSeg ?? null,
-      entrada.pulidoAplicado === true,
-      entrada.audioPartes ? JSON.stringify(entrada.audioPartes) : null,
-      sessionId,
-      entrada.estadoTranscripcion ?? null,
-    ]
-  );
-
-  // Si existe sessionId, vincularlo bidireccionalmente y actualizar estado
-  if (sessionId) {
-    const totalPartes = Array.isArray(entrada.audioPartes) ? entrada.audioPartes.length : null;
-
+  try {
     await db.query(
-      `INSERT INTO dictado_session (session_id, volcado_id, estado, total_partes, duracion_seg, cerrado_en, actualizado_en)
-       VALUES ($1, $2, 'complete', $3, $4, NOW(), NOW())
-       ON CONFLICT (session_id) DO UPDATE SET
-         volcado_id = EXCLUDED.volcado_id,
-         estado = 'complete',
-         total_partes = COALESCE(EXCLUDED.total_partes, dictado_session.total_partes),
-         duracion_seg = COALESCE(EXCLUDED.duracion_seg, dictado_session.duracion_seg),
-         cerrado_en = NOW(),
-         actualizado_en = NOW()`,
-      [sessionId, id, totalPartes, entrada.duracionSeg ?? null]
+      `INSERT INTO volcado
+       (id, texto, sha256, chars, titulo, origen, driver, usuario, estado, fuente, audio_url, audio_bytes, duracion_seg, pulido_aplicado, audio_partes, session_id, estado_transcripcion)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)`,
+      [
+        id,
+        cifrarTexto(entrada.texto),
+        sha,
+        entrada.texto.length,
+        entrada.titulo ?? null,
+        "web",
+        "dictado",
+        entrada.usuario ?? null,
+        "archivado",
+        "dictado",
+        entrada.audioUrl ?? null,
+        entrada.audioBytes ?? null,
+        entrada.duracionSeg ?? null,
+        entrada.pulidoAplicado === true,
+        entrada.audioPartes ? JSON.stringify(entrada.audioPartes) : null,
+        sessionId,
+        entrada.estadoTranscripcion ?? null,
+      ]
     );
 
-    await db.query(
-      `UPDATE dictado_audio_parte SET volcado_id = $1 WHERE session_id = $2`,
-      [id, sessionId]
-    );
+    if (sessionId) {
+      const totalPartes = Array.isArray(entrada.audioPartes) ? entrada.audioPartes.length : null;
+
+      await db.query(
+        `INSERT INTO dictado_session (session_id, volcado_id, estado, total_partes, duracion_seg, cerrado_en, actualizado_en)
+         VALUES ($1, $2, 'complete', $3, $4, NOW(), NOW())
+         ON CONFLICT (session_id) DO UPDATE SET
+           volcado_id = EXCLUDED.volcado_id,
+           estado = 'complete',
+           total_partes = COALESCE(EXCLUDED.total_partes, dictado_session.total_partes),
+           duracion_seg = COALESCE(EXCLUDED.duracion_seg, dictado_session.duracion_seg),
+           cerrado_en = NOW(),
+           actualizado_en = NOW()`,
+        [sessionId, id, totalPartes, entrada.duracionSeg ?? null]
+      );
+
+      await db.query(
+        `UPDATE dictado_audio_parte SET volcado_id = $1 WHERE session_id = $2`,
+        [id, sessionId]
+      );
+    }
+
+    await prepararVolcadoParaRevision(id, entrada.usuario, { onFailure: "keep_captura" });
+
+    await registrarEvento({
+      fase: "dictado",
+      eventId: "DIC-001",
+      estado: "OK",
+      mensaje: `Dictado archivado e inicializado exitosamente para revisión`,
+      detalle: {
+        volcadoId: id,
+        sessionId,
+        chars: entrada.texto.length,
+        pulidoAplicado: entrada.pulidoAplicado,
+      },
+      volcadoId: id,
+      version: 1,
+      sha256: sha,
+      correlacionId,
+    });
+
+    return { id, sha256: sha, chars: entrada.texto.length, sessionId };
+  } catch (err) {
+    await registrarEvento({
+      fase: "dictado",
+      eventId: "DIC-001",
+      estado: "FAIL",
+      mensaje: `Fallo al guardar dictado: ${String(err)}`,
+      detalle: { error: String(err), sessionId },
+      volcadoId: id,
+      sha256: sha,
+      correlacionId,
+    });
+    throw err;
   }
-
-  // Preparar automáticamente y con semántica síncrona/transaccional hacia 'en_revision' (keep_captura)
-  await prepararVolcadoParaRevision(id, entrada.usuario, { onFailure: "keep_captura" });
-
-  return { id, sha256: sha, chars: entrada.texto.length, sessionId };
 }

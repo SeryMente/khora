@@ -1,9 +1,10 @@
-// @l0 L0-002-R · @req REVISION-COCKPIT/REQ-1
+// @l0 L0-002-R · @req REVISION-COCKPIT/REQ-1 · @req SISTEMA-MENU/E4
 import { createHash } from "crypto";
 import { getDb } from "./neon";
 import { descifrarTexto } from "./cripto";
 import { listarIncidentesAbiertos } from "./incidentes";
 import { listarHallazgos } from "./asistenteRevision";
+import { registrarEvento } from "./eventos";
 
 export interface Blocker {
   code: string;
@@ -39,7 +40,6 @@ export async function evaluarCompuertaAprobacion(
 ): Promise<GateDecision> {
   const db = getDb();
 
-  // 1. Obtener volcado
   const vRes = await db.query(
     "SELECT id, estado, texto, sha256, version_aprobada, session_id, audio_url, audio_partes FROM volcado WHERE id = $1",
     [volcadoId]
@@ -49,7 +49,6 @@ export async function evaluarCompuertaAprobacion(
   }
   const volcado = vRes.rows[0];
 
-  // 2. Obtener versión vigente más reciente
   const verRes = await db.query(
     "SELECT version, sha256, texto FROM volcado_version WHERE volcado_id = $1 ORDER BY version DESC LIMIT 1",
     [volcadoId]
@@ -65,7 +64,6 @@ export async function evaluarCompuertaAprobacion(
   const blockers: Blocker[] = [];
   const warnings: Warning[] = [];
 
-  // Regla A: Estado debe ser exactamente 'en_revision'
   if (volcado.estado !== "en_revision") {
     blockers.push({
       code: "ESTADO_INVALIDO",
@@ -73,7 +71,6 @@ export async function evaluarCompuertaAprobacion(
     });
   }
 
-  // Regla B: Transcripción no vacía
   if (!textoVigente || textoVigente.trim().length === 0) {
     blockers.push({
       code: "TRANSCRIPCION_VACIA",
@@ -81,10 +78,8 @@ export async function evaluarCompuertaAprobacion(
     });
   }
 
-  // Regla C: Incidentes abiertos
   const incidentesAbiertos = await listarIncidentesAbiertos(volcadoId);
   const incidentesBloqueantes = incidentesAbiertos.filter((inc) => {
-    // Si es audio_no_recuperable y fue resuelto previamente o aceptado sin audio, no bloquea
     return true;
   });
 
@@ -99,7 +94,6 @@ export async function evaluarCompuertaAprobacion(
     });
   }
 
-  // Regla D: Hallazgos pendientes de la versión vigente
   const hallazgos = await listarHallazgos(volcadoId, versionVigente);
   const hallazgosPendientes = hallazgos.filter((h) => h.estado === "pendiente");
 
@@ -125,7 +119,6 @@ export async function evaluarCompuertaAprobacion(
     });
   }
 
-  // Excepción explicita para audio
   const resueltoSinAudio = incidentesAbiertos.some(
     (i) => i.tipo === "audio_no_recuperable" && i.codigo_resolucion === "aceptado_sin_audio"
   );
@@ -138,7 +131,6 @@ export async function evaluarCompuertaAprobacion(
 
   const canApprove = blockers.length === 0;
 
-  // Derivar gate_hash estable de la evaluación
   const gatePayload = JSON.stringify({
     volcadoId,
     version: versionVigente,
@@ -149,6 +141,25 @@ export async function evaluarCompuertaAprobacion(
   });
 
   const gateHash = createHash("sha256").update(gatePayload, "utf8").digest("hex");
+
+  await registrarEvento({
+    fase: "autorizacion",
+    eventId: "AUT-002",
+    estado: canApprove ? "OK" : "SKIP",
+    mensaje: `Evaluación de compuerta de aprobación: ${canApprove ? "Aprobación autorizada" : "Aprobación bloqueada por reglas de integridad"}`,
+    detalle: {
+      canApprove,
+      blockersCount: blockers.length,
+      blockerCodes: blockers.map((b) => b.code),
+      warningsCount: warnings.length,
+      gateHash,
+      solicitante,
+    },
+    volcadoId,
+    version: versionVigente,
+    sha256: sha256Vigente,
+    correlacionId: volcadoId,
+  });
 
   return {
     canApprove,
