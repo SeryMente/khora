@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import { setDbForTesting, resetDbForTesting } from "../../lib/server/neon.js";
 import { createEpSessionToken, getEpConfig } from "../../lib/server/ep.js";
 import { POST as postEpTokenRoute } from "../../app/api/ep/token/route.js";
-import middleware from "../../middleware.ts";
+import middleware from "../../middleware";
 import { NextRequest } from "next/server";
 import { verifyJwt } from "../../lib/server/jwt.js";
 
@@ -143,7 +143,7 @@ test("EP Security: POST /api/ep/token platform parameter handling and command se
   const mockDbPool = {
     connect: async () => {
       return {
-        query: async () => ({ rowCount: 1, rows: [{ cnt: 0 }] }),
+        query: async (sql: string, params: any[]) => ({ rowCount: 1, rows: [{ cnt: 0 }] }),
         release: () => {},
       };
     },
@@ -220,7 +220,7 @@ test("EP Security: POST /api/ep/token platform parameter handling and command se
 
 test("EP Security: Middleware 308 redirect from /sistema/entorno-persistente to /sistema/seguridad#entorno-persistente", async () => {
   const req = new NextRequest("https://khora.example.com/sistema/entorno-persistente");
-  const res = (await middleware(req as any)) as any;
+  const res = (await middleware(req as any, {} as any)) as any;
 
   assert.ok(res);
   assert.equal(res.status, 308);

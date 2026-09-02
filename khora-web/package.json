@@ -10,6 +10,8 @@
     "e2e": "playwright test",
     "e2e:report": "playwright show-report",
     "prebuild": "node scripts/build-extension.mjs",
+    "test:unit": "AUTH_SECRET=\"test-secret-12345678901234567890123456789012\" tsx --import ./tests/unit/setup.ts --test tests/unit/*.test.ts",
+    "typecheck": "tsc --noEmit",
     "backfill:titulos": "tsx scripts/backfill_titulos.ts",
     "repair:volcados": "tsx scripts/repair_volcados.ts",
     "migrate:ep": "node scripts/migrate-ep.mjs"
@@ -48,6 +50,7 @@
     "eslint": "^9.39.4",
     "eslint-config-next": "^16.2.10",
     "tailwindcss": "^4",
+    "tsx": "^4.19.2",
     "typescript": "^5"
   },
   "overrides": {
