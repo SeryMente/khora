@@ -6,7 +6,7 @@ d896857375fb4de94a7d8bca4ffd06b7ef71163d92d266f935bf3cfa31562ab6  ./.github/work
 955ae32596d06e706e2012d89b0bc4bc33057d786eb2c6c7c7f80d0ba4f391ed  ./.github/workflows/auto-merge-on-open.yml
 3d97ed288bfdaea505f302337d67ff2237b42e0dee8a54a4366b101acb728ecb  ./.github/workflows/auto-revert-on-smoke-fail.yml
 887df5a17f7872919d10f712cb2db9285792e5e25c41738d703691a9231b6b0c  ./.github/workflows/board-orchestrator.yml
-e6f9422ddb9d84456f54f1159e462012c463a2aa9f073a697d942ef979848356  ./.github/workflows/ci.yml
+66dec233e388ebda1ce29765d0ac26cec87b8838f1b96f9ce6c7cac1766f2212  ./.github/workflows/ci.yml
 f9b4af6561828f8eca0f4284ffaed0221176448322c8f21e0e4ccc080a531179  ./.github/workflows/deploy-production.yml
 c4b4525728150cb3b9c640f6383cdd1da4e78402baad0cbd1c26e316e7fef7f7  ./.github/workflows/g4-fronteras.yml
 1397b1454845cbeede376325a7efddf89144a6bcf1420126e468c3cc2a7abf1d  ./.github/workflows/healthcheck-khora-api.yml
@@ -438,8 +438,8 @@ dac4f7655cc8f3b18c50ccd9cee11d780f8841ac24368d318f3d9daa8dd0577a  ./khora-web/ma
 0a3e191a99ace83480b259685a68f951068c9cff2a4de2cfa0f53c169f9df114  ./khora-web/next.config.ts
 618ccffb75c9c6c54e839a92f4f939c1b14accdacf693fcae6aabce9c4ef6dad  ./khora-web/next_run.log
 3ca68ba3c85340df144b3b0116650009ed1453df8bc29102166e1034e8e86868  ./khora-web/npm_output.log
-be7c616f687f9b3b55ae875378defcfc6ec6fcae97c52c31c9ce41f225a8724e  ./khora-web/package-lock.json
-525147daeadd0c0af8d9aa70a21f94705191ea68b928656bc8882d7fb85071a4  ./khora-web/package.json
+bf72693ae9faec8a67f2ca4db792564b8e1502835536796630df69de2bb9602b  ./khora-web/package-lock.json
+ecf476bd7d8d347cf6a62dee98ef695ba0ffff3d431baed7bd95e59ef611d91e  ./khora-web/package.json
 5a9ffe983477f3858670e151c19534377d6c523cc8ceadc838cc69fafed5411e  ./khora-web/pages/404.tsx
 7b2dfe403ee98aacec3e6c3e6126ab4223c5e5d8b2cea31a1ce96452af253502  ./khora-web/pages/_app.tsx
 3e76fbd3eba01f49986c63dcb38be111b44844906f56a275dd0629ad2e693000  ./khora-web/playwright.config.ts
@@ -468,7 +468,7 @@ c59868c0e05a1771e41b06c3d713a3267377972192f6cd8ebca230c330ec998b  ./khora-web/sc
 d7732a968d9a13da75ad80b450ba012874bb5295c0d4e156390cea8d4f9780a6  ./khora-web/tests/circuito.test.ts
 7b82417c62e5b8c240d90b1d81cc68c976e2d9756b2e05645acca32d07ad215c  ./khora-web/tests/regression/REGISTRO.md
 35399ab923064ab2357b78c7cda12aaad65ca6456949b49786d34463a77678b3  ./khora-web/tests/regression/smoke.spec.ts
-270fd8190c481db9c69eacba28084146a862fe9db24765865d0aeef9c8705a56  ./khora-web/tests/revision.test.ts
+c9d537efbe95eb270deecc6093f2c9d9ea80a8003998f01d9bf9115184153069  ./khora-web/tests/revision.test.ts
 321a014c3384093f88941c3b6ce81f617390910305c25f5856acf33559524264  ./khora-web/tests/test_extraction.ts
 93a67200a6b4b44d55f295cce7d9a390e884b411bded6c8af30032c958167991  ./khora-web/tests/test_orchestrator_gate.ts
 54cc74287ab5387737396b7f878eeab6520e9835f2615035875e500ff9046b49  ./khora-web/tests/traceability_session.test.ts
@@ -476,10 +476,10 @@ d7732a968d9a13da75ad80b450ba012874bb5295c0d4e156390cea8d4f9780a6  ./khora-web/te
 6dd4bffbc7a825d408d57e0526c80ffd5cf58d4df2260edd4a6c7df4491a92f2  ./khora-web/tests/unit/audio_range_timing.test.ts
 46cc546f8a1da5a7c15de924da7e51ea8ce41588614d8b76423b9c354e8c64ef  ./khora-web/tests/unit/compuerta.test.ts
 156d67383dcf876705fc6e176e1a9e69066991dd38c80e913144b8df7bf68f66  ./khora-web/tests/unit/dictado_clean_verbatim.test.ts
-3d10742a1b72b1f58daa949bbe4e693bbaafb64f43f0d4d285ce51ebb76d171f  ./khora-web/tests/unit/ep_security.test.ts
+efcb7c7c4f2180a690983f75321e469471a29161e0938e7924fb78c17cd57fdc  ./khora-web/tests/unit/ep_security.test.ts
 7cb43776253a622c9b56e9a4ce4ceae77fd83b6c91d77c509785c0dc2193d6ea  ./khora-web/tests/unit/ep_token.test.ts
-f21261e4f516affb62cb147a63b0ae2b7896449d1de7bebb01516bedab2d9462  ./khora-web/tests/unit/folio.test.ts
-a7531152805299d5c05ef7e8b252010f186c771931d84c4b1d14bbf0cf3b8048  ./khora-web/tests/unit/ingesta.test.ts
+0d94d97b9941db994dfc6e5a0e67cc07692ab9c793c2c34c33017cf1060b76fd  ./khora-web/tests/unit/folio.test.ts
+251f1fd4a494035e55bc211d7b596e4577e08c632298bc0662dc95b6ca32bfaa  ./khora-web/tests/unit/ingesta.test.ts
 5b7eb0c6bf8c40b63ba7cf58602046237cbe8f1004ff015e4c8ee65e7da06a1b  ./khora-web/tests/unit/mcp_oauth.test.ts
 f6b775825039cb25b791e26e6c5e8f1dea99875b7d7177a6e6cea188926b00d2  ./khora-web/tests/unit/oauth.test.ts
 c230791252e607f762387754bf4ce1b22b54235d05b129c0f9126bf2c6b32f12  ./khora-web/tests/unit/pipeline.test.ts

@@ -35,7 +35,7 @@ let mockDbVersions: any[] = [];
 let dbQueriesLogged: { sql: string; params?: any[] }[] = [];
 
 // Override Pool.prototype.query
-Pool.prototype.query = async function (sql: string, params?: any[]) {
+Pool.prototype.query = (async function (this: any, sql: any, params?: any[]) {
   dbQueriesLogged.push({ sql, params });
   const sqlNormalized = sql.trim().toLowerCase();
 
@@ -55,7 +55,7 @@ Pool.prototype.query = async function (sql: string, params?: any[]) {
 
   // 3. UPDATE/INSERT queries
   return { rows: [] };
-};
+}) as any;
 
 import { POST } from "../../app/api/ingesta/route";
 import { sha256de } from "../../lib/server/correcciones";
