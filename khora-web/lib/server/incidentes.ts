@@ -1,6 +1,7 @@
-// @l0 L0-002-R · @req REVISION-COCKPIT/REQ-1
+// @l0 L0-002-R · @req REVISION-COCKPIT/REQ-1 · @req SISTEMA-MENU/E4
 import { randomUUID } from "crypto";
 import { getDb } from "./neon";
+import { registrarEvento } from "./eventos";
 
 export type EstadoIncidente = "abierto" | "reconocido" | "resuelto" | "reabierto";
 export type SeveridadIncidente = "alta" | "media" | "baja";
@@ -91,9 +92,6 @@ export async function asegurarTablaIncidentes(): Promise<void> {
   tablaIncidenteLista = true;
 }
 
-/**
- * Reporta o reabre de forma idempotente un incidente para un volcado.
- */
 export async function reportarIncidente(params: {
   volcadoId: string;
   tipo: TipoIncidente;
@@ -142,6 +140,24 @@ export async function reportarIncidente(params: {
     [inc.id, inc.volcado_id, inc.estado, evidenciaJson]
   );
 
+  await registrarEvento({
+    fase: "revision",
+    eventId: "REV-002",
+    estado: "INFO",
+    mensaje: `Incidente reportado o reabierto: ${inc.tipo} (${inc.severidad})`,
+    detalle: {
+      incidenteId: inc.id,
+      tipo: inc.tipo,
+      severidad: inc.severidad,
+      origen: inc.origen,
+      evidencia: inc.evidencia,
+    },
+    volcadoId: inc.volcado_id,
+    version: inc.version_afectada,
+    sha256: inc.sha256_afectado,
+    correlacionId: inc.volcado_id,
+  });
+
   return inc;
 }
 
@@ -175,7 +191,7 @@ export async function reconocerIncidente(incidenteId: string, usuario: string): 
   await asegurarTablaIncidentes();
   const db = getDb();
 
-  const prev = await db.query(`SELECT id, volcado_id, estado FROM volcado_incidente WHERE id = $1`, [incidenteId]);
+  const prev = await db.query(`SELECT id, volcado_id, estado, tipo FROM volcado_incidente WHERE id = $1`, [incidenteId]);
   if (prev.rows.length === 0) throw new Error("Incidente no encontrado");
 
   const estadoAnterior = prev.rows[0].estado;
@@ -195,6 +211,16 @@ export async function reconocerIncidente(incidenteId: string, usuario: string): 
      VALUES ($1, $2, 'reconocido', $3, 'reconocido', $4);`,
     [inc.id, inc.volcado_id, estadoAnterior, usuario]
   );
+
+  await registrarEvento({
+    fase: "revision",
+    eventId: "REV-002",
+    estado: "INFO",
+    mensaje: `Incidente reconocido por el operador (${usuario}): ${inc.tipo}`,
+    detalle: { incidenteId: inc.id, tipo: inc.tipo, usuario },
+    volcadoId: inc.volcado_id,
+    correlacionId: inc.volcado_id,
+  });
 
   return inc;
 }
@@ -246,6 +272,22 @@ export async function resolverIncidente(params: {
      VALUES ($1, $2, 'resuelto', $3, 'resuelto', $4, $5, $6);`,
     [inc.id, inc.volcado_id, estadoAnterior, params.usuario, params.codigoResolucion, JSON.stringify(params.evidenciaResolucion ?? {})]
   );
+
+  await registrarEvento({
+    fase: "revision",
+    eventId: "REV-002",
+    estado: "OK",
+    mensaje: `Incidente resuelto (${inc.codigo_resolucion}) por el operador (${params.usuario}): ${inc.tipo}`,
+    detalle: {
+      incidenteId: inc.id,
+      tipo: inc.tipo,
+      codigoResolucion: inc.codigo_resolucion,
+      usuario: params.usuario,
+      evidenciaResolucion: params.evidenciaResolucion,
+    },
+    volcadoId: inc.volcado_id,
+    correlacionId: inc.volcado_id,
+  });
 
   return inc;
 }

@@ -54,6 +54,8 @@ test.describe("Bóveda Page Reskin - BOVEDA-01", () => {
   });
 
   test("iconography is lucide-react with size 32 and strokeWidth 1.75", async ({ page }) => {
+    await expect(page.locator(".max-w-md")).toBeVisible();
+
     // Wait for the SVG elements specifically inside our vault card container
     const svgElements = page.locator(".max-w-md svg");
     const count = await svgElements.count();
@@ -72,6 +74,8 @@ test.describe("Bóveda Page Reskin - BOVEDA-01", () => {
   });
 
   test("no literal colors and no cora-* classes exist in any elements", async ({ page }) => {
+    await expect(page.locator(".max-w-md")).toBeVisible();
+
     // Check all elements inside the max-w-md card
     const allElements = page.locator(".max-w-md *");
     const count = await allElements.count();

@@ -1,6 +1,7 @@
-// @l0 L0-003 · @req GRAFO/TABLAS
+// @l0 L0-003 · @req GRAFO/TABLAS · @req SISTEMA-MENU/E4
 import { getDb } from "./neon";
 import neo4j from "neo4j-driver";
+import { registrarEvento } from "./eventos";
 
 const DDL = [
   `CREATE TABLE IF NOT EXISTS nodos (
@@ -96,36 +97,47 @@ export interface AristaPG {
 }
 
 export async function obtenerNodos(): Promise<NodoPG[]> {
-  await asegurarGrafoEsquema();
-  const db = getDb();
-  const res = await db.query(`
-    SELECT
-      id,
-      summary,
-      community,
-      level,
-      coalesce(centrality, 1.0)::float AS centrality,
-      origen,
-      timestamp,
-      verificacion,
-      tipo,
-      volcado_id,
-      version,
-      sha256,
-      posicion_inicio,
-      posicion_fin,
-      sello_version_pipeline,
-      marca_temporal_hecho,
-      marca_captura
-    FROM nodos
-  `);
-  return res.rows.map((row: any) => ({
-    ...row,
-    id: String(row.id),
-    timestamp: row.timestamp ? new Date(row.timestamp).toISOString() : new Date().toISOString(),
-    marca_temporal_hecho: row.marca_temporal_hecho ? new Date(row.marca_temporal_hecho).toISOString() : null,
-    marca_captura: row.marca_captura ? new Date(row.marca_captura).toISOString() : new Date().toISOString()
-  }));
+  try {
+    await asegurarGrafoEsquema();
+    const db = getDb();
+    const res = await db.query(`
+      SELECT
+        id,
+        summary,
+        community,
+        level,
+        coalesce(centrality, 1.0)::float AS centrality,
+        origen,
+        timestamp,
+        verificacion,
+        tipo,
+        volcado_id,
+        version,
+        sha256,
+        posicion_inicio,
+        posicion_fin,
+        sello_version_pipeline,
+        marca_temporal_hecho,
+        marca_captura
+      FROM nodos
+    `);
+    return res.rows.map((row: any) => ({
+      ...row,
+      id: String(row.id),
+      timestamp: row.timestamp ? new Date(row.timestamp).toISOString() : new Date().toISOString(),
+      marca_temporal_hecho: row.marca_temporal_hecho ? new Date(row.marca_temporal_hecho).toISOString() : null,
+      marca_captura: row.marca_captura ? new Date(row.marca_captura).toISOString() : new Date().toISOString()
+    }));
+  } catch (err) {
+    await registrarEvento({
+      fase: "grafo",
+      eventId: "GRA-001",
+      estado: "FAIL",
+      mensaje: `Fallo al leer nodos de la proyección Postgres: ${String(err)}`,
+      detalle: { error: String(err) },
+    });
+    throw err;
+  }
 }
 
 export interface VerificacionCircuitoResult {
@@ -146,6 +158,13 @@ export async function verificarCircuitoCompletoNeo4j(ioId: string): Promise<Veri
   const password = process.env.NEO4J_PASSWORD;
 
   if (!uri || !user || !password) {
+    await registrarEvento({
+      fase: "grafo",
+      eventId: "GRA-002",
+      estado: "SKIP",
+      mensaje: `Verificación Neo4j omitida por falta de variables de entorno`,
+      detalle: { ioId },
+    });
     throw new Error("Missing Neo4j environment variables for verification");
   }
 
@@ -153,7 +172,6 @@ export async function verificarCircuitoCompletoNeo4j(ioId: string): Promise<Veri
   try {
     const session = driverInstance.session();
     try {
-      // 1. Verify InformationObject exists
       const ioRes = await session.run(
         `MATCH (io:InformationObject {io_id: $ioId})
          RETURN io.volcado_id AS volcado_id, io.version AS version, io.sha256 AS sha256
@@ -162,6 +180,13 @@ export async function verificarCircuitoCompletoNeo4j(ioId: string): Promise<Veri
       );
 
       if (ioRes.records.length === 0) {
+        await registrarEvento({
+          fase: "grafo",
+          eventId: "GRA-002",
+          estado: "FAIL",
+          mensaje: `InformationObject con io_id ${ioId} NO existe en Neo4j`,
+          detalle: { ioId },
+        });
         return {
           exists: false,
           node_count: 0,
@@ -178,7 +203,6 @@ export async function verificarCircuitoCompletoNeo4j(ioId: string): Promise<Veri
         : null;
       const sha256 = rec.get("sha256") || null;
 
-      // 2. Count MENTIONS nodes
       const nodesRes = await session.run(
         `MATCH (:InformationObject {io_id: $ioId})-[m:MENTIONS {io_id: $ioId}]->(e:Entity)
          RETURN count(e) AS node_count`,
@@ -186,13 +210,24 @@ export async function verificarCircuitoCompletoNeo4j(ioId: string): Promise<Veri
       );
       const node_count = Number(nodesRes.records[0].get("node_count") || 0);
 
-      // 3. Count RELATION edges
       const relsRes = await session.run(
         `MATCH ()-[r:RELATION {io_id: $ioId}]->()
          RETURN count(r) AS relation_count`,
         { ioId }
       );
       const relation_count = Number(relsRes.records[0].get("relation_count") || 0);
+
+      await registrarEvento({
+        fase: "grafo",
+        eventId: "GRA-002",
+        estado: "OK",
+        mensaje: `Verificación en Neo4j exitosa para io_id ${ioId}: ${node_count} nodos, ${relation_count} relaciones`,
+        detalle: { ioId, node_count, relation_count, volcado_id, version, sha256 },
+        volcadoId: volcado_id,
+        version,
+        sha256,
+        correlacionId: volcado_id || undefined,
+      });
 
       return {
         exists: true,
@@ -208,41 +243,61 @@ export async function verificarCircuitoCompletoNeo4j(ioId: string): Promise<Veri
     } finally {
       await session.close();
     }
+  } catch (err) {
+    await registrarEvento({
+      fase: "grafo",
+      eventId: "GRA-002",
+      estado: "FAIL",
+      mensaje: `Fallo durante la verificación en Neo4j para io_id ${ioId}: ${String(err)}`,
+      detalle: { ioId, error: String(err) },
+    });
+    throw err;
   } finally {
     await driverInstance.close();
   }
 }
 
 export async function obtenerAristas(): Promise<AristaPG[]> {
-  await asegurarGrafoEsquema();
-  const db = getDb();
-  const res = await db.query(`
-    SELECT
-      id,
-      source,
-      target,
-      type,
-      coalesce(weight, 1.0)::float AS weight,
-      origen,
-      timestamp,
-      verificacion,
-      volcado_id,
-      version,
-      sha256,
-      posicion_inicio,
-      posicion_fin,
-      sello_version_pipeline,
-      marca_temporal_hecho,
-      marca_captura
-    FROM aristas
-  `);
-  return res.rows.map((row: any) => ({
-    ...row,
-    id: String(row.id),
-    source: String(row.source),
-    target: String(row.target),
-    timestamp: row.timestamp ? new Date(row.timestamp).toISOString() : new Date().toISOString(),
-    marca_temporal_hecho: row.marca_temporal_hecho ? new Date(row.marca_temporal_hecho).toISOString() : null,
-    marca_captura: row.marca_captura ? new Date(row.marca_captura).toISOString() : new Date().toISOString()
-  }));
+  try {
+    await asegurarGrafoEsquema();
+    const db = getDb();
+    const res = await db.query(`
+      SELECT
+        id,
+        source,
+        target,
+        type,
+        coalesce(weight, 1.0)::float AS weight,
+        origen,
+        timestamp,
+        verificacion,
+        volcado_id,
+        version,
+        sha256,
+        posicion_inicio,
+        posicion_fin,
+        sello_version_pipeline,
+        marca_temporal_hecho,
+        marca_captura
+      FROM aristas
+    `);
+    return res.rows.map((row: any) => ({
+      ...row,
+      id: String(row.id),
+      source: String(row.source),
+      target: String(row.target),
+      timestamp: row.timestamp ? new Date(row.timestamp).toISOString() : new Date().toISOString(),
+      marca_temporal_hecho: row.marca_temporal_hecho ? new Date(row.marca_temporal_hecho).toISOString() : null,
+      marca_captura: row.marca_captura ? new Date(row.marca_captura).toISOString() : new Date().toISOString()
+    }));
+  } catch (err) {
+    await registrarEvento({
+      fase: "grafo",
+      eventId: "GRA-001",
+      estado: "FAIL",
+      mensaje: `Fallo al leer aristas de la proyección Postgres: ${String(err)}`,
+      detalle: { error: String(err) },
+    });
+    throw err;
+  }
 }

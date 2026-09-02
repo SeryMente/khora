@@ -1,4 +1,4 @@
-// @l0 L0-002-R · @req ING-03/REQ-1 · @acr ACR-1.2 · @req REVISION-COCKPIT/REQ-1 · @req TITULOS-LLM/REQ-2
+// @l0 L0-002-R · @req ING-03/REQ-1 · @acr ACR-1.2 · @req REVISION-COCKPIT/REQ-1 · @req TITULOS-LLM/REQ-2 · @req SISTEMA-MENU/E4
 import { createHash, randomUUID } from "crypto";
 import { getDb } from "./neon";
 import { reportarIncidente } from "./incidentes";
@@ -6,6 +6,7 @@ import { crearVersion } from "./correcciones";
 import { cifrarTexto, descifrarTexto } from "./cripto";
 import { generarTituloConGarantia, asignarTituloVolcado, esTituloGenericoOInvalido } from "./titulos";
 import { autoaplicarTildesSeguras } from "./tildesSeguras";
+import { registrarEvento } from "./eventos";
 
 export type EstadoVolcado = "archivado" | "pendiente_revision" | "en_revision" | "listo_ingesta" | "ingerido" | "fallido";
 
@@ -62,13 +63,6 @@ export function hashTexto(texto: string): string {
   return createHash("sha256").update(texto, "utf8").digest("hex");
 }
 
-/**
- * Función centralizada, transaccional e idempotente que asegura la preparación
- * de un volcado para la mesa de revisión.
- *
- * Flujo: creación / archivado → pendiente_revision → versión v1 asegurada → detectores iniciales → en_revision
- * Si falla la preparación, pasa a 'fallido' y abre un incidente bloqueante 'preparacion_revision_fallida'.
- */
 export async function prepararVolcadoParaRevision(
   volcadoId: string,
   actor?: string | null,
@@ -77,7 +71,6 @@ export async function prepararVolcadoParaRevision(
   await asegurarTabla();
   const db = getDb();
 
-  // Transacción con bloqueo FOR UPDATE para evitar carreras
   const client = await db.connect();
   try {
     await client.query("BEGIN");
@@ -90,7 +83,6 @@ export async function prepararVolcadoParaRevision(
     const v = selRes.rows[0];
     const estadoAnterior = v.estado;
 
-    // Si ya está ingerido o en_revision con versión, retornar directamente
     if (v.estado === "ingerido" || v.estado === "en_revision" || v.estado === "listo_ingesta") {
       await client.query("COMMIT");
       return {
@@ -99,14 +91,12 @@ export async function prepararVolcadoParaRevision(
       } as Volcado;
     }
 
-    // 1. Transición intermedia: -> pendiente_revision
     await client.query("UPDATE volcado SET estado = 'pendiente_revision' WHERE id = $1", [volcadoId]);
     await client.query(
       "INSERT INTO volcado_revision_auditoria (id, volcado_id, accion, estado_anterior, estado_nuevo, usuario) VALUES ($1, $2, $3, $4, $5, $6)",
       [randomUUID(), volcadoId, "transicion_pendiente_revision", estadoAnterior, "pendiente_revision", actor ?? null]
     );
 
-    // 2. Ejecutar autoaplicación de tildes seguras sobre texto plano antes de crear la primera versión revisable (v1)
     let textoClaro = descifrarTexto(String(v.texto ?? ""));
     const verRes = await client.query("SELECT version FROM volcado_version WHERE volcado_id = $1 AND version = 1", [volcadoId]);
     if (verRes.rows.length === 0) {
@@ -127,7 +117,6 @@ export async function prepararVolcadoParaRevision(
       await crearVersion(volcadoId, textoClaro, "transcripcion original del dictado");
     }
 
-    // 3. Ejecutar detectores iniciales e inspección de audio/transcripción
     if (!textoClaro.trim()) {
       await reportarIncidente({
         volcadoId,
@@ -138,7 +127,6 @@ export async function prepararVolcadoParaRevision(
       });
     }
 
-    // Asegurar título válido y no genérico antes de pasar a en_revision
     if (!v.titulo || esTituloGenericoOInvalido(v.titulo)) {
       const resGarantia = await generarTituloConGarantia(textoClaro, v.folio);
       await asignarTituloVolcado(volcadoId, resGarantia.title, actor || "prepararVolcadoParaRevision");
@@ -154,7 +142,6 @@ export async function prepararVolcadoParaRevision(
       }
     }
 
-    // 4. Transición final exitosa: -> en_revision
     const updRes = await client.query(
       "UPDATE volcado SET estado = 'en_revision' WHERE id = $1 RETURNING id, folio, texto, sha256, chars, titulo, origen, driver, usuario, recibido_en, estado, io_id, intentos, ultimo_error, ultimo_intento, version_aprobada",
       [volcadoId]
@@ -166,6 +153,18 @@ export async function prepararVolcadoParaRevision(
     );
 
     await client.query("COMMIT");
+
+    await registrarEvento({
+      fase: "revision",
+      eventId: "REV-001",
+      estado: "OK",
+      mensaje: `Transición de estado del volcado: ${estadoAnterior} -> en_revision`,
+      detalle: { estadoAnterior, estadoNuevo: "en_revision", actor },
+      volcadoId,
+      version: 1,
+      sha256: v.sha256,
+      correlacionId: volcadoId,
+    });
 
     const volcadoFinal = updRes.rows[0];
     return {
@@ -193,6 +192,16 @@ export async function prepararVolcadoParaRevision(
         })
       );
 
+      await registrarEvento({
+        fase: "revision",
+        eventId: "REV-001",
+        estado: "FAIL",
+        mensaje: `Promoción a revisión fallida (keep_captura): ${String(err?.message ?? err)}`,
+        detalle: { error: String(err?.message ?? err), politica: "keep_captura", actor },
+        volcadoId,
+        correlacionId: volcadoId,
+      });
+
       const rollbackRes = await db.query(
         "SELECT id, folio, texto, sha256, chars, titulo, origen, driver, usuario, recibido_en, estado, io_id, intentos, ultimo_error, ultimo_intento, version_aprobada FROM volcado WHERE id = $1",
         [volcadoId]
@@ -208,7 +217,6 @@ export async function prepararVolcadoParaRevision(
       }
     }
 
-    // En caso de fallo en la preparación con politica mark_fallido
     await db.query(
       "UPDATE volcado SET estado = 'fallido', ultimo_error = $2, ultimo_intento = NOW() WHERE id = $1",
       [volcadoId, String(err?.message ?? err)]
@@ -227,6 +235,16 @@ export async function prepararVolcadoParaRevision(
       [randomUUID(), volcadoId, "preparacion_revision_fallida", "pendiente_revision", "fallido", actor ?? null]
     );
 
+    await registrarEvento({
+      fase: "revision",
+      eventId: "REV-001",
+      estado: "FAIL",
+      mensaje: `Promoción a revisión fallida (mark_fallido): ${String(err?.message ?? err)}`,
+      detalle: { error: String(err?.message ?? err), politica: "mark_fallido", actor },
+      volcadoId,
+      correlacionId: volcadoId,
+    });
+
     throw err;
   } finally {
     client.release();
@@ -243,7 +261,6 @@ export async function archivarVolcado(args: { texto: string; titulo?: string | n
 
   const volcadoArchivado = res.rows[0] as Volcado;
 
-  // Entrada automática síncrona a revisión con política de fallo keep_captura
   return await prepararVolcadoParaRevision(volcadoArchivado.id, args.usuario, { onFailure: "keep_captura" });
 }
 
@@ -260,6 +277,14 @@ export async function marcarPendienteRevision(volcadoId: string): Promise<void> 
   await asegurarTabla();
   const db = getDb();
   await db.query("UPDATE volcado SET estado = 'pendiente_revision' WHERE id = $1", [volcadoId]);
+  await registrarEvento({
+    fase: "revision",
+    eventId: "REV-001",
+    estado: "OK",
+    mensaje: "Volcado marcado como pendiente_revision",
+    volcadoId,
+    correlacionId: volcadoId,
+  });
 }
 
 export async function iniciarRevision(volcadoId: string): Promise<void> {
@@ -270,7 +295,6 @@ export async function aprobarVersion(volcadoId: string, version: number, aprobad
   await asegurarTabla();
   const db = getDb();
 
-  // 1. Validar que el volcado existe y su estado es exactamente 'en_revision'
   const vRes = await db.query("SELECT estado FROM volcado WHERE id = $1", [volcadoId]);
   if (vRes.rows.length === 0) {
     throw new Error("Volcado no encontrado");
@@ -280,14 +304,12 @@ export async function aprobarVersion(volcadoId: string, version: number, aprobad
     throw new Error(`Solo se puede aprobar un volcado en estado 'en_revision'. Estado actual: '${estadoAnteriorReal}'`);
   }
 
-  // 2. Validar que la versión sea la versión vigente más reciente
   const maxRes = await db.query("SELECT COALESCE(MAX(version), 0)::int AS ultima FROM volcado_version WHERE volcado_id = $1", [volcadoId]);
   const versionVigente = Number(maxRes.rows[0]?.ultima ?? 0);
   if (version !== versionVigente) {
     throw new Error(`La versión a aprobar debe ser la versión vigente más reciente (${versionVigente}). Se solicitó la versión ${version}`);
   }
 
-  // 3. Obtener la versión y validar integridad de SHA256
   const res = await db.query("SELECT sha256, texto FROM volcado_version WHERE volcado_id = $1 AND version = $2", [volcadoId, version]);
   if (res.rows.length === 0) {
     throw new Error("La versión solicitada no existe");
@@ -300,11 +322,21 @@ export async function aprobarVersion(volcadoId: string, version: number, aprobad
     throw new Error("Integridad rota: el SHA256 no coincide");
   }
 
-  // 4. Transición de estado: en_revision -> listo_ingesta
   await db.query("UPDATE volcado SET estado = 'listo_ingesta', version_aprobada = $2, sha256_aprobado = $3, aprobado_en = now(), aprobador = $4 WHERE id = $1", [volcadoId, version, sha256, aprobador ?? null]);
 
-  // 5. Registro de auditoría con estado anterior real
   await db.query("INSERT INTO volcado_revision_auditoria (id, volcado_id, accion, estado_anterior, estado_nuevo, version, sha256, usuario) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)", [randomUUID(), volcadoId, "version_aprobada", estadoAnteriorReal, "listo_ingesta", version, sha256, aprobador ?? null]);
+
+  await registrarEvento({
+    fase: "autorizacion",
+    eventId: "AUT-001",
+    estado: "OK",
+    mensaje: `Versión v${version} ratificada e independizada formalmente para ingesta por el operador`,
+    detalle: { version, sha256, aprobador },
+    volcadoId,
+    version,
+    sha256,
+    correlacionId: volcadoId,
+  });
 
   return { version, sha256 };
 }
@@ -317,6 +349,16 @@ export async function reabrirRevision(volcadoId: string, usuario?: string | null
 
   await db.query("UPDATE volcado SET estado = 'en_revision', version_aprobada = NULL, sha256_aprobado = NULL, aprobado_en = NULL, aprobador = NULL WHERE id = $1", [volcadoId]);
   await db.query("INSERT INTO volcado_revision_auditoria (id, volcado_id, accion, estado_anterior, estado_nuevo, usuario) VALUES ($1,$2,$3,$4,$5,$6)", [randomUUID(), volcadoId, "revision_reabierta", estadoAnteriorReal, "en_revision", usuario ?? null]);
+
+  await registrarEvento({
+    fase: "revision",
+    eventId: "REV-001",
+    estado: "OK",
+    mensaje: "Revisión reabierta para el volcado",
+    detalle: { estadoAnterior: estadoAnteriorReal, estadoNuevo: "en_revision", usuario },
+    volcadoId,
+    correlacionId: volcadoId,
+  });
 }
 
 export async function resumenVolcados(): Promise<Array<{ estado: string; n: number; chars: number }>> {

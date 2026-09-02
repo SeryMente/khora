@@ -1,7 +1,8 @@
-// @l0 L0-002-R · @req FIX-DICTADO/AUTHORITATIVE-STT · @req REVISION-COCKPIT/REQ-1
+// @l0 L0-002-R · @req FIX-DICTADO/AUTHORITATIVE-STT · @req REVISION-COCKPIT/REQ-1 · @req SISTEMA-MENU/E4
 import { obtenerGlosario } from "./pulido";
 import { aplicarGlosario } from "../transcripcion/ensamblar";
 import { getDb } from "./neon";
+import { registrarEvento } from "./eventos";
 
 const GROQ_STT_URL = "https://api.groq.com/openai/v1/audio/transcriptions";
 
@@ -74,9 +75,6 @@ export async function asegurarTablaTiming(): Promise<void> {
   timingDdlListo = true;
 }
 
-/**
- * Persiste el mapa de palabras y tiempos en volcado_palabra_timing
- */
 export async function guardarPalabrasTiming(
   volcadoId: string,
   version: number,
@@ -132,9 +130,6 @@ export async function obtenerPalabrasTiming(volcadoId: string, version: number):
   }));
 }
 
-/**
- * Interpola determinísticamente tiempos por palabra cuando sólo existen tiempos de segmento.
- */
 export function interpolarPalabrasDeSegmentos(
   textoCompleto: string,
   segmentos: SegmentoWhisper[],
@@ -200,9 +195,6 @@ export function construirPromptSTT(glosario: Record<string, string>): string {
   return `Transcripción de dictado en español para el sistema Khora. Términos clave y nombres propios: ${terminos.join(", ")}.`;
 }
 
-/**
- * Realiza una transcripción autoritativa de un buffer/blob de audio usando Groq Whisper (whisper-large-v3).
- */
 export async function transcribirAudioConGroq(
   audioBuffer: Buffer,
   filename = "dictado.webm",
@@ -215,12 +207,20 @@ export async function transcribirAudioConGroq(
     "whisper-large-v3";
 
   if (!clave) {
-    return {
+    const res = {
       texto: "",
       exito: false,
       modelo,
       motivo: "GROQ_API_KEY no está configurada.",
     };
+    await registrarEvento({
+      fase: "transcripcion",
+      eventId: "TRS-001",
+      estado: "FAIL",
+      mensaje: `Fallo de transcripción Groq: ${res.motivo}`,
+      detalle: { modelo, filename },
+    });
+    return res;
   }
 
   try {
@@ -249,11 +249,19 @@ export async function transcribirAudioConGroq(
 
     if (!res.ok) {
       const errorText = await res.text();
+      const errorMotivo = `Groq STT HTTP ${res.status}: ${errorText.slice(0, 200)}`;
+      await registrarEvento({
+        fase: "transcripcion",
+        eventId: "TRS-001",
+        estado: "FAIL",
+        mensaje: `Fallo HTTP Groq Whisper: ${errorMotivo}`,
+        detalle: { modelo, status: res.status, filename },
+      });
       return {
         texto: "",
         exito: false,
         modelo,
-        motivo: `Groq STT HTTP ${res.status}: ${errorText.slice(0, 200)}`,
+        motivo: errorMotivo,
       };
     }
 
@@ -261,6 +269,13 @@ export async function transcribirAudioConGroq(
     const textoRaw = typeof data?.text === "string" ? data.text.trim() : "";
 
     if (!textoRaw) {
+      await registrarEvento({
+        fase: "transcripcion",
+        eventId: "TRS-001",
+        estado: "FAIL",
+        mensaje: "Respuesta vacía de transcripción Groq Whisper",
+        detalle: { modelo, filename },
+      });
       return {
         texto: "",
         exito: false,
@@ -282,6 +297,14 @@ export async function transcribirAudioConGroq(
         }))
       : undefined;
 
+    await registrarEvento({
+      fase: "transcripcion",
+      eventId: "TRS-001",
+      estado: "OK",
+      mensaje: `Transcripción Groq Whisper completada con éxito (${textoConGlosario.length} caracteres)`,
+      detalle: { modelo, filename, chars: textoConGlosario.length, segmentosCount: segmentos?.length || 0 },
+    });
+
     return {
       texto: textoConGlosario,
       exito: true,
@@ -289,18 +312,23 @@ export async function transcribirAudioConGroq(
       segmentos,
     };
   } catch (e) {
+    const errorMotivo = `Error al conectar con Groq STT: ${String(e)}`;
+    await registrarEvento({
+      fase: "transcripcion",
+      eventId: "TRS-001",
+      estado: "FAIL",
+      mensaje: errorMotivo,
+      detalle: { error: String(e), modelo, filename },
+    });
     return {
       texto: "",
       exito: false,
       modelo,
-      motivo: `Error al conectar con Groq STT: ${String(e)}`,
+      motivo: errorMotivo,
     };
   }
 }
 
-/**
- * Normaliza una palabra para comparación en solapamiento (remueve mayúsculas y puntuación).
- */
 function normalizarParaOverlap(token: string): string {
   return token.toLowerCase().replace(/[^\p{L}\p{N}]/gu, "");
 }
@@ -310,9 +338,6 @@ export interface IntervaloTemporal {
   end_ms: number;
 }
 
-/**
- * Une dos cadenas consecutivas deduplicando únicamente cuando existe intersección temporal efectiva.
- */
 export function unirDosTranscriptsConOverlapTemporal(
   izq: string,
   der: string,
@@ -325,34 +350,57 @@ export function unirDosTranscriptsConOverlapTemporal(
   if (!izqTrim) return derTrim;
   if (!derTrim) return izqTrim;
 
+  let resultado = "";
+
   if (intervaloIzq && intervaloDer) {
     const inicioInterseccion = Math.max(intervaloIzq.start_ms, intervaloDer.start_ms);
     const finInterseccion = Math.min(intervaloIzq.end_ms, intervaloDer.end_ms);
 
     if (finInterseccion <= inicioInterseccion) {
-      return `${izqTrim} ${derTrim}`;
+      resultado = `${izqTrim} ${derTrim}`;
     }
   }
 
-  const palabrasIzq = izqTrim.split(/\s+/);
-  const palabrasDer = derTrim.split(/\s+/);
+  if (!resultado) {
+    const palabrasIzq = izqTrim.split(/\s+/);
+    const palabrasDer = derTrim.split(/\s+/);
 
-  const normIzq = palabrasIzq.map(normalizarParaOverlap);
-  const normDer = palabrasDer.map(normalizarParaOverlap);
+    const normIzq = palabrasIzq.map(normalizarParaOverlap);
+    const normDer = palabrasDer.map(normalizarParaOverlap);
 
-  const maxOverlap = Math.min(palabrasIzq.length, palabrasDer.length, 15);
+    const maxOverlap = Math.min(palabrasIzq.length, palabrasDer.length, 15);
 
-  for (let len = maxOverlap; len >= 2; len--) {
-    const sufijoIzq = normIzq.slice(normIzq.length - len).join(" ");
-    const prefijoDer = normDer.slice(0, len).join(" ");
+    for (let len = maxOverlap; len >= 2; len--) {
+      const sufijoIzq = normIzq.slice(normIzq.length - len).join(" ");
+      const prefijoDer = normDer.slice(0, len).join(" ");
 
-    if (sufijoIzq.length > 0 && sufijoIzq === prefijoDer) {
-      const derSinOverlap = palabrasDer.slice(len).join(" ");
-      return derSinOverlap ? `${izqTrim} ${derSinOverlap}` : izqTrim;
+      if (sufijoIzq.length > 0 && sufijoIzq === prefijoDer) {
+        const derSinOverlap = palabrasDer.slice(len).join(" ");
+        resultado = derSinOverlap ? `${izqTrim} ${derSinOverlap}` : izqTrim;
+        break;
+      }
+    }
+
+    if (!resultado) {
+      resultado = `${izqTrim} ${derTrim}`;
     }
   }
 
-  return `${izqTrim} ${derTrim}`;
+  registrarEvento({
+    fase: "transcripcion",
+    eventId: "TRS-003",
+    estado: "INFO",
+    mensaje: `Overlap temporal evaluado entre dos fragmentos de transcripción`,
+    detalle: {
+      longitudIzq: izqTrim.length,
+      longitudDer: derTrim.length,
+      longitudResultado: resultado.length,
+      intervaloIzq,
+      intervaloDer,
+    },
+  });
+
+  return resultado;
 }
 
 export function unirDosTranscriptsConOverlap(izq: string, der: string): string {
@@ -391,7 +439,7 @@ export async function procesarChunksIncrementalesConTiempos(
   detallesFallos?: string[];
 }> {
   if (!chunks || chunks.length === 0) {
-    return {
+    const res = {
       textoAutoritativo: "",
       exito: false,
       partesProcesadas: 0,
@@ -399,6 +447,14 @@ export async function procesarChunksIncrementalesConTiempos(
       detallesChunks: [],
       detallesFallos: ["No se proporcionaron buffers de audio para procesar."],
     };
+    await registrarEvento({
+      fase: "transcripcion",
+      eventId: "TRS-002",
+      estado: "FAIL",
+      mensaje: "Sin chunks de audio proporcionados para procesamiento incremental",
+      detalle: { error: res.detallesFallos[0] },
+    });
+    return res;
   }
 
   const detallesChunks: MetadataChunk[] = [];
@@ -488,6 +544,23 @@ export async function procesarChunksIncrementalesConTiempos(
     }
   }
 
+  const estadoTranscripcion = fallos === 0 ? "completo" : exitos > 0 ? "parcial" : "fallido";
+
+  await registrarEvento({
+    fase: "transcripcion",
+    eventId: "TRS-002",
+    estado: estadoTranscripcion === "fallido" ? "FAIL" : "OK",
+    mensaje: `Procesamiento incremental de chunks finalizado (${estadoTranscripcion}): ${exitos} exitosos, ${fallos} fallidos`,
+    detalle: {
+      estadoTranscripcion,
+      partesProcesadas: exitos,
+      fallos,
+      detallesFallos,
+      sessionId: chunks[0]?.session_id,
+    },
+    correlacionId: chunks[0]?.session_id,
+  });
+
   return {
     textoAutoritativo: textoAcumulado,
     exito: exitos > 0,
@@ -566,6 +639,20 @@ export function reconciliarTranscripcion(
   }
 
   const evaluacion = evaluarCoberturaYReconciliar(pTrim, aTrim);
+
+  if (evaluacion.perdidaDetectada) {
+    registrarEvento({
+      fase: "dictado",
+      eventId: "DIC-003",
+      estado: "INFO",
+      mensaje: `Perdida detectada en reconciliacion de segmentos: guardián protegió contenido previo`,
+      detalle: {
+        motivo: evaluacion.motivo,
+        cobertura: evaluacion.cobertura,
+        deficit: evaluacion.deficit,
+      },
+    });
+  }
 
   return {
     textoFinal: evaluacion.textoResultado,

@@ -1,12 +1,15 @@
-// @l0 L0-002 · @req CORA-01/REQ-2 · @acr ACR-2.1 · @ua —
+// @l0 L0-002 · @req CORA-01/REQ-2 · @acr ACR-2.1 · @req SISTEMA-MENU/E4
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
+import { registrarEvento } from "@/lib/server/eventos";
 
 export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
+
+  const t0 = Date.now();
 
   try {
     const { pregunta } = await req.json();
@@ -38,8 +41,17 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({ pregunta }),
     });
 
+    const latenciaMs = Date.now() - t0;
+
     if (!backendResponse.ok) {
       console.error(`Error del backend: ${backendResponse.status}`);
+      await registrarEvento({
+        fase: "grafo",
+        eventId: "GRA-003",
+        estado: "FAIL",
+        mensaje: `Consulta RAG fallida (HTTP ${backendResponse.status})`,
+        detalle: { status: backendResponse.status, latenciaMs },
+      });
       return NextResponse.json(
         { error: "Error al consultar el servicio backend" },
         { status: backendResponse.status }
@@ -47,9 +59,29 @@ export async function POST(req: NextRequest) {
     }
 
     const data = await backendResponse.json();
+
+    await registrarEvento({
+      fase: "grafo",
+      eventId: "GRA-003",
+      estado: "OK",
+      mensaje: `Consulta RAG completada con éxito en ${latenciaMs}ms`,
+      detalle: {
+        latenciaMs,
+        fuentesCount: Array.isArray(data?.fuentes) ? data.fuentes.length : 0,
+        fuentes: data?.fuentes,
+      },
+    });
+
     return NextResponse.json(data);
   } catch (error) {
     console.error("Error en proxy de consulta:", error);
+    await registrarEvento({
+      fase: "grafo",
+      eventId: "GRA-003",
+      estado: "FAIL",
+      mensaje: `Excepción en consulta RAG: ${String(error)}`,
+      detalle: { error: String(error), latenciaMs: Date.now() - t0 },
+    });
     return NextResponse.json(
       { error: "Error interno del servidor" },
       { status: 500 }

@@ -1,4 +1,5 @@
-// @l0 L0-002-R · @req FIX-DICTADO/ESPEJO-NOTION · @acr ACR-1.2 · @req FIX-DICTADO/D15
+// @l0 L0-002-R · @req FIX-DICTADO/ESPEJO-NOTION · @acr ACR-1.2 · @req FIX-DICTADO/D15 · @req SISTEMA-MENU/E4
+import { registrarEvento } from "./eventos";
 
 function formatFechaLocal(date: Date): string {
   const y = date.getFullYear();
@@ -58,6 +59,17 @@ export async function espejarVolcado(datos: DatosEspejo): Promise<void> {
   const dbId = process.env.NOTION_DB_VOLCADOS;
 
   if (!token || !dbId) {
+    await registrarEvento({
+      fase: "dictado",
+      eventId: "DIC-004",
+      estado: "SKIP",
+      mensaje: "Espejo Notion omitido por falta de NOTION_TOKEN o NOTION_DB_VOLCADOS",
+      detalle: { volcado_id: datos.volcado_id, version: datos.version },
+      volcadoId: datos.volcado_id,
+      version: datos.version,
+      sha256: datos.sha256,
+      correlacionId: datos.volcado_id,
+    });
     return;
   }
 
@@ -173,19 +185,46 @@ export async function espejarVolcado(datos: DatosEspejo): Promise<void> {
     children
   };
 
-  const response = await fetch("https://api.notion.com/v1/pages", {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${token}`,
-      "Notion-Version": "2022-06-28",
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(payload),
-    signal: AbortSignal.timeout(8000),
-  });
+  try {
+    const response = await fetch("https://api.notion.com/v1/pages", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Notion-Version": "2022-06-28",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(8000),
+    });
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Notion API error: ${response.status} - ${errorText}`);
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Notion API error: ${response.status} - ${errorText}`);
+    }
+
+    await registrarEvento({
+      fase: "dictado",
+      eventId: "DIC-004",
+      estado: "OK",
+      mensaje: `Volcado espejado exitosamente en Notion`,
+      detalle: { volcado_id: datos.volcado_id, version: datos.version, titulo: tituloFinal },
+      volcadoId: datos.volcado_id,
+      version: datos.version,
+      sha256: datos.sha256,
+      correlacionId: datos.volcado_id,
+    });
+  } catch (err) {
+    await registrarEvento({
+      fase: "dictado",
+      eventId: "DIC-004",
+      estado: "FAIL",
+      mensaje: `Fallo/Timeout al espejar volcado en Notion: ${String(err)}`,
+      detalle: { error: String(err), volcado_id: datos.volcado_id, version: datos.version },
+      volcadoId: datos.volcado_id,
+      version: datos.version,
+      sha256: datos.sha256,
+      correlacionId: datos.volcado_id,
+    });
+    throw err;
   }
 }
