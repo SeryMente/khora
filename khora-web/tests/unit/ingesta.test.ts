@@ -35,7 +35,7 @@ let mockDbVersions: any[] = [];
 let dbQueriesLogged: { sql: string; params?: any[] }[] = [];
 
 // Override Pool.prototype.query
-Pool.prototype.query = async function (sql: string, params?: any[]) {
+(Pool.prototype as any).query = async function (sql: string, params?: any[]) {
   dbQueriesLogged.push({ sql, params });
   const sqlNormalized = sql.trim().toLowerCase();
 

@@ -22,7 +22,7 @@ test("009_folio.sql migration file contains exact required DDL and backfill stat
 
 test("folio logic: backfill SQL simulation", () => {
   // Simulate database rows before migration
-  const rows = [
+  const rows: Array<{ id: string; folio: number | null; titulo: string; recibido_en: string }> = [
     { id: "uuid-2", folio: null, titulo: "Volcado 2", recibido_en: "2026-01-01T11:00:00Z" },
     { id: "uuid-1", folio: null, titulo: "Volcado 1", recibido_en: "2026-01-01T10:00:00Z" },
     { id: "uuid-3", folio: null, titulo: "Volcado 3", recibido_en: "2026-01-01T12:00:00Z" },

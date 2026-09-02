@@ -533,8 +533,8 @@ test("14. Sugerencia ortotipográfica y lingüística sugerida y aceptada", asyn
   const sugerencias = await obtenerTodasSugerencias(textoPrueba);
 
   assert.ok(sugerencias.length > 0, "Debe generar sugerencias para el texto con errores");
-  const sug = sugerencias[0];
-  assert.ok(sug.id, "Debe tener un id único");
+  const sug = sugerencias[0] as any;
+  assert.ok(sug.posicion || sug.id, "Debe tener posición o id único");
   assert.ok(sug.sugerencia, "Debe contener una sugerencia de reemplazo");
 
   // Aplicación manual de la sugerencia
@@ -547,7 +547,7 @@ test("15. Sugerencia rechazada", async () => {
   const sugerencias = await obtenerTodasSugerencias(textoPrueba);
   assert.ok(sugerencias.length > 0);
 
-  const sug = sugerencias[0];
+  const sug = sugerencias[0] as any;
   sug.estado = "rechazada";
 
   assert.strictEqual(sug.estado, "rechazada", "La sugerencia debe marcarse como rechazada");

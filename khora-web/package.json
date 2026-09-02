@@ -9,6 +9,8 @@
     "start": "next start",
     "e2e": "playwright test",
     "e2e:report": "playwright show-report",
+    "test:unit": "AUTH_SECRET=test-secret X_KHORA_KEY=deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef tsx --test tests/unit/*.ts",
+    "typecheck": "tsc --noEmit",
     "prebuild": "node scripts/build-extension.mjs",
     "backfill:titulos": "tsx scripts/backfill_titulos.ts",
     "repair:volcados": "tsx scripts/repair_volcados.ts",
@@ -48,6 +50,7 @@
     "eslint": "^9.39.4",
     "eslint-config-next": "^16.2.10",
     "tailwindcss": "^4",
+    "tsx": "^4.19.2",
     "typescript": "^5"
   },
   "overrides": {
