@@ -1,8 +1,8 @@
 # @l0 L0-002-R · @req JULES-3/REQ-2
 # @l0 L0-002 · @req ING-03/REQ-1 · @acr ACR-1.1,ACR-1.2 · @ua UA-05
+import uuid
 from datetime import datetime, timezone
 from typing import Any, List, Optional, Union
-import uuid
 
 from khora_kernel.api import (
     ActaDeIngesta,
@@ -11,19 +11,17 @@ from khora_kernel.api import (
     PuertoEmbeddings,
     PuertoLLM,
 )
+from khora_kernel.constructor import extraer, normalizar, phi_m
 from khora_kernel.contracts.proposal import (
     Anchor,
     Judgment,
     ProposalEnvelope,
     ProposalItem,
     ProposalTriple,
-    SettlementAct,
     SourceTriplet,
     compute_item_id,
     compute_payload_hash,
-    validate_proposal_envelope,
 )
-from khora_kernel.constructor import extraer, normalizar, phi_m
 from khora_kernel.resolucion import resolver
 
 
@@ -188,14 +186,8 @@ def ratificar_propuesta(
 
     if isinstance(proposal, ProposalEnvelope):
         raw_items = proposal.items
-        raw_triplet = proposal.source_triplet
-        pipeline_ver = proposal.pipeline_version
-        created_at = proposal.created_at
     else:
         raw_items = proposal["items"]
-        raw_triplet = proposal["source_triplet"]
-        pipeline_ver = proposal["pipeline_version"]
-        created_at = proposal["created_at"]
 
     judgments: List[Judgment] = []
     ts_now = datetime.now(timezone.utc).isoformat()
@@ -257,7 +249,6 @@ def asentar(
 
     if not items_aceptados and items_rechazados:
         # Todos rechazados
-        act_id = str(uuid.uuid4())
         ts_now = datetime.now(timezone.utc).isoformat()
         acta = ActaDeIngesta(
             origen="p5b-kernel",

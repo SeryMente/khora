@@ -1,14 +1,8 @@
 from datetime import datetime, timezone
-import pytest
 
 from khora_kernel.contracts import (
-    Anchor,
     CURRENT_SCHEMA_VERSION,
-    Judgment,
     ProposalEnvelope,
-    ProposalItem,
-    ResolutionCandidate,
-    SettlementAct,
     SourceTriplet,
     compute_item_id,
     compute_payload_hash,
