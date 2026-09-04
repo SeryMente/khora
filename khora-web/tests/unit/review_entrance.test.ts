@@ -368,7 +368,6 @@ if (
 if (sql.includes("volcado_version")) {
   return { rows: [{ n: 1, version: 1 }] };
 }
-        }
         return { rows: [] };
       },
       connect: async () => ({
