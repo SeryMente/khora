@@ -143,7 +143,7 @@ test("EP Security: POST /api/ep/token platform parameter handling and command se
   const mockDbPool = {
     connect: async () => {
       return {
-        query: async () => ({ rowCount: 1, rows: [{ cnt: 0 }] }),
+        query: async (sql: string, params: any[]) => ({ rowCount: 1, rows: [{ cnt: 0 }] }),
         release: () => {},
       };
     },

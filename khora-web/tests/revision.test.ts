@@ -534,7 +534,7 @@ test("14. Sugerencia ortotipográfica y lingüística sugerida y aceptada", asyn
 
   assert.ok(sugerencias.length > 0, "Debe generar sugerencias para el texto con errores");
   const sug = sugerencias[0] as any;
-  assert.ok(sug.posicion || sug.id, "Debe tener posición o id único");
+  assert.ok(sug.id || sug.regla, "Debe contener identificador o regla");
   assert.ok(sug.sugerencia, "Debe contener una sugerencia de reemplazo");
 
   // Aplicación manual de la sugerencia
