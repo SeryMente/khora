@@ -87,36 +87,29 @@ export async function prepararVolcadoParaRevision(
     const v = selRes.rows[0];
     const estadoAnterior = v.estado;
 
-    if (v.estado === "ingerido" || v.estado === "en_revision" || v.estado === "listo_ingesta") {
+    let textoClaro = descifrarTexto(String(v.texto ?? ""));
+    const verRes = await client.query("SELECT version FROM volcado_version WHERE volcado_id = $1 AND version = 1", [volcadoId]);
+    const tieneV1 = verRes.rows.length > 0;
+
+    if (v.estado === "ingerido" || v.estado === "listo_ingesta" || (v.estado === "en_revision" && tieneV1)) {
       await client.query("COMMIT");
       return {
         ...v,
-        texto: descifrarTexto(String(v.texto ?? "")),
+        texto: textoClaro,
       } as Volcado;
     }
 
-    await client.query("UPDATE volcado SET estado = 'pendiente_revision' WHERE id = $1", [volcadoId]);
-    await client.query(
-      "INSERT INTO volcado_revision_auditoria (id, volcado_id, accion, estado_anterior, estado_nuevo, usuario) VALUES ($1, $2, $3, $4, $5, $6)",
-      [randomUUID(), volcadoId, "transicion_pendiente_revision", estadoAnterior, "pendiente_revision", actor ?? null]
-    );
+    if (v.estado !== "en_revision") {
+      await client.query("UPDATE volcado SET estado = 'pendiente_revision' WHERE id = $1", [volcadoId]);
+      await client.query(
+        "INSERT INTO volcado_revision_auditoria (id, volcado_id, accion, estado_anterior, estado_nuevo, usuario) VALUES ($1, $2, $3, $4, $5, $6)",
+        [randomUUID(), volcadoId, "transicion_pendiente_revision", estadoAnterior, "pendiente_revision", actor ?? null]
+      );
+    }
 
-    let textoClaro = descifrarTexto(String(v.texto ?? ""));
-    const verRes = await client.query("SELECT version FROM volcado_version WHERE volcado_id = $1 AND version = 1", [volcadoId]);
-    if (verRes.rows.length === 0) {
+    if (!tieneV1) {
       if (!textoClaro) {
         throw new Error("Transcripción vacía al preparar versión v1");
-      }
-      const resTildes = autoaplicarTildesSeguras(textoClaro);
-      if (resTildes.cambioRealizado) {
-        textoClaro = resTildes.textoNuevo;
-        const nuevoSha = hashTexto(textoClaro);
-        await client.query("UPDATE volcado SET texto = $2, sha256 = $3, chars = $4 WHERE id = $1", [
-          volcadoId,
-          cifrarTexto(textoClaro),
-          nuevoSha,
-          textoClaro.length,
-        ]);
       }
       await crearVersion(volcadoId, textoClaro, "transcripcion original del dictado");
     }
@@ -150,6 +143,11 @@ export async function prepararVolcadoParaRevision(
       "UPDATE volcado SET estado = 'en_revision' WHERE id = $1 RETURNING id, folio, texto, sha256, chars, titulo, origen, driver, usuario, recibido_en, estado, io_id, intentos, ultimo_error, ultimo_intento, version_aprobada",
       [volcadoId]
     );
+
+    const vFinalCheck = updRes.rows[0];
+    if (vFinalCheck.sha256 !== v.sha256 || vFinalCheck.texto !== v.texto || Number(vFinalCheck.chars) !== Number(v.chars)) {
+      throw new Error(`Barrera de integridad violada en volcado ID ${volcadoId}: sha256/texto/chars alterado antes de COMMIT`);
+    }
 
     await client.query(
       "INSERT INTO volcado_revision_auditoria (id, volcado_id, accion, estado_anterior, estado_nuevo, usuario) VALUES ($1, $2, $3, $4, $5, $6)",
