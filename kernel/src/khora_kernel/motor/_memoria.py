@@ -65,6 +65,119 @@ class Neo4jMemoriaOrganizada:
         except Exception as e:
             raise Exception(f"Error buscando entidades: {str(e)}")
 
+    def asentar_transaccional(
+        self,
+        entidades: List[Dict[str, Any]],
+        relaciones: List[Dict[str, Any]],
+        source_triplet: Dict[str, Any],
+        io_id: str,
+        timestamp: str,
+    ) -> int:
+        self._asegurar_conexion()
+        if not io_id:
+            raise ValueError("io_id ausente: el asentamiento exige el identificador del Objeto de Información (ACR-1.2).")
+
+        query_entidades = """
+        UNWIND $entidades AS e
+        MERGE (n:Entity {canonical_key: e.canonical_key})
+        ON CREATE SET
+            n.label_original = e.label_original,
+            n.embedding = e.embedding,
+            n.provenance = [e.provenance_raw],
+            n.needs_review = e.needs_review,
+            n.created_at = datetime($ts),
+            n.valid_at = datetime($ts),
+            n.invalid_at = null
+        ON MATCH SET
+            n.provenance = n.provenance + [e.provenance_raw]
+        """
+
+        query_relaciones = """
+        UNWIND $relaciones AS r
+        MATCH (origen:Entity {canonical_key: r.origen_id})
+        MATCH (destino:Entity {canonical_key: r.destino_id})
+        MERGE (origen)-[rel:RELATION {type: r.relacion, io_id: $io_id}]->(destino)
+        ON CREATE SET
+            rel.provenance = [r.provenance],
+            rel.created_at = datetime($ts),
+            rel.valid_at = datetime($ts),
+            rel.invalid_at = null
+        ON MATCH SET
+            rel.provenance = rel.provenance + [r.provenance]
+        RETURN count(rel) as count
+        """
+
+        anclaje_query = """
+        MERGE (u:Entity:User {id:'root'})
+        ON CREATE SET u.canonical_key='root', u.created_at=datetime($ts),
+                      u.valid_at=datetime($ts), u.invalid_at=null
+        MERGE (io:Entity:InformationObject {canonical_key:$io_key})
+        ON CREATE SET io.io_id=$io_id, io.provenance=[$prov_str],
+                      io.created_at=datetime($ts), io.valid_at=datetime($ts), io.invalid_at=null,
+                      io.volcado_id=$volcado_id, io.version=$version, io.sha256=$sha256
+        ON MATCH SET io.provenance = io.provenance + [$prov_str]
+        MERGE (u)-[owns:OWNS {io_id:$io_id}]->(io)
+        ON CREATE SET owns.created_at=datetime($ts), owns.valid_at=datetime($ts), owns.invalid_at=null
+        WITH io
+        UNWIND $claves AS clave
+        MERGE (e:Entity {canonical_key: clave})
+        ON CREATE SET e.created_at=datetime($ts), e.valid_at=datetime($ts), e.invalid_at=null
+        MERGE (io)-[m:MENTIONS {io_id:$io_id}]->(e)
+        ON CREATE SET m.created_at=datetime($ts), m.valid_at=datetime($ts), m.invalid_at=null
+        RETURN count(m) AS anclados
+        """
+
+        restriccion_query = """
+        MATCH (n)
+        WHERE size([l IN labels(n) WHERE l IN ['Entity', 'Literal', 'Blank']]) > 1
+        RETURN count(n) as violaciones
+        """
+
+        try:
+            assert self._driver is not None
+            with self._driver.session() as session:
+                with session.begin_transaction() as tx:
+                    ts = timestamp
+                    io_key = 'io:' + io_id
+                    prov_str_io = f"asentamiento=p5b, timestamp={ts}"
+
+                    # Verificar terna existente y conflicto antes de mutar
+                    volcado = source_triplet.get("volcado_id")
+                    version = int(source_triplet.get("version")) if "version" in source_triplet and source_triplet["version"] is not None else None
+                    sha256 = source_triplet.get("sha256")
+
+                    if volcado:
+                        existente = tx.run("MATCH (io:InformationObject {io_id:$io}) RETURN io.volcado_id AS v, io.version AS ver, io.sha256 AS s", io=io_id).single()
+                        if existente:
+                            if existente["v"] == volcado and existente["ver"] == version and existente["s"] == sha256:
+                                return 0
+                            raise Exception(f"Conflicto terna io_id={io_id}")
+
+                    if entidades:
+                        tx.run(query_entidades, entidades=entidades, ts=ts)
+
+                    escritos = 0
+                    if relaciones:
+                        res_rel = tx.run(query_relaciones, relaciones=relaciones, io_id=io_id, ts=ts)
+                        record = res_rel.single()
+                        escritos = record["count"] if record else 0
+
+                    claves_list = list(set([e["canonical_key"] for e in entidades] + [r["origen_id"] for r in relaciones] + [r["destino_id"] for r in relaciones]))
+                    if claves_list:
+                        tx.run(anclaje_query, ts=ts, io_id=io_id, io_key=io_key, prov_str=prov_str_io, claves=claves_list, volcado_id=volcado, version=version, sha256=sha256)
+
+                    # Verificar Unión Disjunta
+                    res_viol = tx.run(restriccion_query)
+                    viol_count = sum([r[0] for r in res_viol])
+                    if viol_count > 0:
+                        tx.rollback()
+                        raise ValueError("Violación de restricción real: nodo con doble clase (Entity, Literal, Blank).")
+
+                    tx.commit()
+                    return escritos
+        except Exception as e:
+            raise Exception(f"Error en asentamiento transaccional único: {str(e)}")
+
     def merge_entidad(self, canonical_key: str, label_original: str, provenance_raw: str, embedding: List[float], needs_review: bool = False) -> None:
         self._asegurar_conexion()
         query = """

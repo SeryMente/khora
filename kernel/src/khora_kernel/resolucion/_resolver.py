@@ -1,12 +1,45 @@
 # @l0 L0-002 · @req ING-01/REQ-1 · @acr ACR-1.1,ACR-1.2,ACR-1.3 · @ua UA-06,UA-08,UA-25,UA-30
 
+import math
 import os
 import re
 import unicodedata
 from collections import defaultdict
-from typing import Any
+from dataclasses import dataclass, field
+from typing import Any, List, Optional
 
 from khora_kernel.api import PuertoEmbeddings, PuertoLLM, Triple
+from khora_kernel.contracts.proposal import ResolutionCandidate
+
+
+@dataclass(frozen=True)
+class EntidadResolucion:
+    raw_label: str
+    canonical_key: str
+    decision: str  # "NEW" | "MERGE" | "MATIZ" | "REVIEW"
+    needs_review: bool
+    candidates: List[ResolutionCandidate]
+    embedding: Optional[List[float]] = None
+    provenance_context: Optional[str] = None
+
+
+class TriplesResueltos(list):
+    entidades: dict[str, EntidadResolucion]
+
+    def __init__(self, triples: list[Triple], entidades: dict[str, EntidadResolucion]):
+        super().__init__(triples)
+        self.entidades = entidades
+
+
+def _coseno(v1: List[float], v2: List[float]) -> float:
+    if not v1 or not v2 or len(v1) != len(v2):
+        return 0.0
+    dot = sum(a * b for a, b in zip(v1, v2))
+    norm1 = math.sqrt(sum(a * a for a in v1))
+    norm2 = math.sqrt(sum(b * b for b in v2))
+    if norm1 == 0 or norm2 == 0:
+        return 0.0
+    return dot / (norm1 * norm2)
 
 
 def _quitar_articulo_inicial(texto: str) -> str:
@@ -39,11 +72,11 @@ def resolver(
     memoria: Any,
     puerto_llm: PuertoLLM,
     puerto_embeddings: PuertoEmbeddings,
-) -> list[Triple]:
+) -> TriplesResueltos:
     """
-    Resuelve entidades hacia canonical_keys en memoria.
-    Regla determinista explícita de autorreferencia (L0-003 §2 Etapa 3) y
-    fusión real acumulativa de procedencia (L0-003 §2 Etapa 4).
+    Resuelve entidades hacia canonical_keys consultando memoria en MODO LECTURA PURA (READ-ONLY).
+    CERO escrituras (no llama merge_entidad ni ejecuta Cypher de mutación).
+    Calcula scores con embeddings verdaderos cuando existen candidatos.
     """
     contextos_por_id: dict[str, list[str]] = defaultdict(list)
     etiquetas_por_id: dict[str, str] = {}
@@ -55,6 +88,7 @@ def resolver(
         etiquetas_por_id[t.destino_id] = t.destino_id
 
     mapeo_claves: dict[str, str] = {}
+    entidades_resolucion: dict[str, EntidadResolucion] = {}
 
     operador_canonical_raw = os.environ.get("KHORA_OPERADOR_CANONICAL_KEY", "root")
     operador_norm = _quitar_acentos_casefold(operador_canonical_raw)
@@ -63,31 +97,84 @@ def resolver(
     for crudo_id, descripcion_lista in contextos_por_id.items():
         crudo_norm = _quitar_acentos_casefold(crudo_id)
 
-        # Regla determinista de autorreferencia (L0-003 §2 Etapa 3)
+        # Regla determinista de autorreferencia
         if crudo_norm in vocabulario_autorreferencia or crudo_norm == operador_norm:
             canonical = operador_canonical_raw
         else:
             canonical = _normalizar_label(crudo_id)
 
-        candidatos_memoria = memoria.buscar_entidades_candidatas(canonical)
-        vec_nuevo = puerto_embeddings.incrustar([crudo_id])[0]
+        candidatos_memoria = memoria.buscar_entidades_candidatas(canonical) if hasattr(memoria, "buscar_entidades_candidatas") else []
+        vec_nuevo = puerto_embeddings.incrustar([crudo_id])[0] if puerto_embeddings else None
 
-        # Fusión real: si hay coincidencia EXACTA con un canonical_key en memoria, reutilizar
-        coincidencia_exacta = any(
-            isinstance(c, dict) and c.get("canonical_key") == canonical
-            for c in candidatos_memoria
-        )
+        candidates_list: List[ResolutionCandidate] = []
+        exact_match = False
+        best_cand_key = canonical
+        best_score = 0.0
 
-        needs_review = not coincidencia_exacta
+        for cand in candidatos_memoria:
+            cand_key = cand.get("canonical_key") if isinstance(cand, dict) else getattr(cand, "canonical_key", None)
+            cand_emb = cand.get("embedding") if isinstance(cand, dict) else getattr(cand, "embedding", None)
+            cand_label = cand.get("label_original", cand_key) if isinstance(cand, dict) else cand_key
 
-        memoria.merge_entidad(
-            canonical_key=canonical,
-            label_original=crudo_id,
-            provenance_raw=str(descripcion_lista),
-            embedding=vec_nuevo,
+            score = 0.0
+            if cand_key == canonical:
+                exact_match = True
+                score = 1.0
+                best_score = 1.0
+                best_cand_key = cand_key
+            elif vec_nuevo and cand_emb:
+                score = _coseno(vec_nuevo, cand_emb)
+                if score > best_score:
+                    best_score = score
+                    best_cand_key = cand_key
+
+            cand_review = not (cand_key == canonical)
+            candidates_list.append(
+                ResolutionCandidate(
+                    canonical_key=cand_key,
+                    score=float(score),
+                    label=str(cand_label),
+                    needs_review=cand_review,
+                )
+            )
+
+        if exact_match:
+            decision = "MERGE"
+            needs_review = False
+            chosen_canonical = canonical
+        elif best_score >= 0.85:
+            decision = "MATIZ"
+            needs_review = True
+            chosen_canonical = best_cand_key
+        elif candidatos_memoria:
+            decision = "REVIEW"
+            needs_review = True
+            chosen_canonical = canonical
+        else:
+            decision = "NEW"
+            needs_review = False
+            chosen_canonical = canonical
+
+        if not candidates_list:
+            candidates_list.append(
+                ResolutionCandidate(
+                    canonical_key=chosen_canonical,
+                    score=1.0,
+                    label=crudo_id,
+                    needs_review=needs_review,
+                )
+            )
+
+        entidades_resolucion[crudo_id] = EntidadResolucion(
+            raw_label=crudo_id,
+            canonical_key=chosen_canonical,
+            decision=decision,
             needs_review=needs_review,
+            candidates=candidates_list,
+            embedding=vec_nuevo,
+            provenance_context=str(descripcion_lista),
         )
-        mapeo_claves[crudo_id] = canonical
+        mapeo_claves[crudo_id] = chosen_canonical
 
     triples_resueltos: list[Triple] = []
     for t in triples:
@@ -104,4 +191,4 @@ def resolver(
         )
         triples_resueltos.append(nuevo_t)
 
-    return triples_resueltos
+    return TriplesResueltos(triples_resueltos, entidades_resolucion)
