@@ -105,7 +105,10 @@ def test_autorreferencia():
         assert resueltos[0].origen_id == "Juan Pérez"
         assert resueltos[1].origen_id == "Juan Pérez"
         assert resueltos[2].origen_id == "Juan Pérez"
-        assert "Juan Pérez" in memoria.entidades
+        # Memoria sigue intacta (READ-ONLY)
+        assert len(memoria.entidades) == 0
+        assert "yo" in resueltos.entidades
+        assert resueltos.entidades["yo"].canonical_key == "Juan Pérez"
     finally:
         del os.environ["KHORA_OPERADOR_CANONICAL_KEY"]
 
@@ -121,14 +124,12 @@ def test_fusion_real_coincidencia_exacta():
     triples1 = [Triple("1", "John", "Y", "rel", _prov(), {}, valid_at="2026-07-19T00:00:00Z", invalid_at=None, created_at="2026-07-19T00:00:00Z")]
     resueltos = resolver(triples1, memoria, llm, emb)
 
-    # Debe reutilizar "john" exactamente sin crear sufijos hash
+    # Debe reutilizar "john" exactamente sin modificar la memoria durante la resolución
     assert resueltos[0].origen_id == "john"
     assert "john" in memoria.entidades
-    assert len(memoria.entidades) == 2  # "john" y "y"
-    # needs_review debe ser False tras la fusión real por coincidencia exacta
-    assert memoria.entidades["john"]["needs_review"] is False
-    # La procedencia acumulada debe contener ambas fuentes
-    assert len(memoria.entidades["john"]["provenance"]) == 2
+    assert len(memoria.entidades) == 1  # Solo la precargada, ninguna nueva escrita
+    assert resueltos.entidades["John"].decision == "MERGE"
+    assert resueltos.entidades["John"].needs_review is False
 
 
 def test_no_fusion():
@@ -141,12 +142,14 @@ def test_no_fusion():
         Triple("2", "Sarah", "Target", "protects", _prov(), {}, valid_at="2026-07-19T00:00:00Z", invalid_at=None, created_at="2026-07-19T00:00:00Z")
     ]
 
-    resolver(triples, memoria, llm, emb)
+    resueltos = resolver(triples, memoria, llm, emb)
 
-    # No hay coincidencia previa entre Sarah Connor y Sarah sin memoria previa
-    assert "sarah_connor" in memoria.entidades
-    assert "target" in memoria.entidades
-    assert "sarah" in memoria.entidades
+    # Cero escrituras en memoria
+    assert len(memoria.entidades) == 0
+    assert "Sarah Connor" in resueltos.entidades
+    assert "Target" in resueltos.entidades
+    assert "Sarah" in resueltos.entidades
+    assert resueltos.entidades["Sarah Connor"].decision == "NEW"
 
 
 @pytest.mark.xfail(strict=True, reason="0 duplicados sobre data/golden/j8_pares.jsonl.")

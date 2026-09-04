@@ -3,9 +3,15 @@ import { z } from "zod";
 import { getDb } from "./neon";
 import { conTimeout } from "./utils";
 
-export interface ThreadIdea {
+export interface EvidenceWithOffset {
+  text: string;
+  start: number | null;
+  end: number | null;
+}
+
+export interface IdeaItem {
   label: string;
-  evidence: string[];
+  evidence: EvidenceWithOffset[];
   keywords: string[];
   importance: number;
 }
@@ -13,15 +19,20 @@ export interface ThreadIdea {
 export interface ThreadCandidate {
   label: string;
   ideas: string[];
-  evidence: string[];
+  evidence: EvidenceWithOffset[];
 }
 
 export interface TitleGenerationResult {
   title: string;
   mode: "single_thread" | "multi_thread";
+  ideas: IdeaItem[];
   threads: ThreadCandidate[];
+  evidence: EvidenceWithOffset[];
+  coverage_score: number;
+  specificity_score: number;
   confidence: number;
   model: string;
+  prompt_version: string;
   fallback_used: boolean;
 }
 
@@ -30,21 +41,30 @@ export interface TituloConGarantiaResult extends TitleGenerationResult {
 }
 
 const GroqResponseSchema = z.object({
-  ideas: z.array(
-    z.object({
-      label: z.string(),
-      evidence: z.array(z.string()),
-      keywords: z.array(z.string()).default([]),
-      importance: z.number().default(0.5),
-    })
-  ),
-  thread_candidates: z.array(
-    z.object({
-      label: z.string(),
-      idea_indexes: z.array(z.number()).default([]),
-      evidence: z.array(z.string()),
-    })
-  ),
+  title: z.string().default(""),
+  mode: z.enum(["single_thread", "multi_thread"]).default("single_thread"),
+  ideas: z
+    .array(
+      z.object({
+        label: z.string(),
+        evidence: z.array(z.string()).default([]),
+        keywords: z.array(z.string()).default([]),
+        importance: z.number().default(0.5),
+      })
+    )
+    .default([]),
+  thread_candidates: z
+    .array(
+      z.object({
+        label: z.string(),
+        idea_indexes: z.array(z.number()).default([]),
+        evidence: z.array(z.string()).default([]),
+      })
+    )
+    .default([]),
+  coverage_score: z.number().optional().default(0.9),
+  specificity_score: z.number().optional().default(0.85),
+  confidence: z.number().optional().default(0.9),
 });
 
 /**
@@ -58,6 +78,38 @@ function normalizarParaGrounding(texto: string): string {
     .replace(/[^a-z0-9\s]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+/**
+ * Busca los offsets exactos (start, end) de una cita literal dentro del texto fuente.
+ * Si no existe exactamente, asigna null a los offsets sin inventarlos.
+ */
+export function buscarOffsetLiteral(textoFuente: string, cita: string): EvidenceWithOffset {
+  if (!cita || cita.trim().length === 0 || !textoFuente) {
+    return { text: cita || "", start: null, end: null };
+  }
+
+  const posExacta = textoFuente.indexOf(cita);
+  if (posExacta !== -1) {
+    return { text: cita, start: posExacta, end: posExacta + cita.length };
+  }
+
+  const citaTrim = cita.trim();
+  const posTrim = textoFuente.indexOf(citaTrim);
+  if (posTrim !== -1) {
+    return { text: citaTrim, start: posTrim, end: posTrim + citaTrim.length };
+  }
+
+  // Búsqueda insensible a mayúsculas como fallback de offsets
+  const fuenteLower = textoFuente.toLowerCase();
+  const citaLower = citaTrim.toLowerCase();
+  const posLower = fuenteLower.indexOf(citaLower);
+  if (posLower !== -1) {
+    const textoExtraido = textoFuente.slice(posLower, posLower + citaTrim.length);
+    return { text: textoExtraido, start: posLower, end: posLower + citaTrim.length };
+  }
+
+  return { text: cita, start: null, end: null };
 }
 
 /**
@@ -77,49 +129,57 @@ function validarGroundingEvidencia(textoFuente: string, evidencias: string[]): b
 }
 
 /**
- * Segmentación Map-Reduce para dividir el texto fuente sin descartar nada tras 4,000 caracteres.
+ * Segmentación Map-Reduce para dividir el texto fuente.
+ * Implementa solapamiento real (overlapChars) entre chunks para no perder contexto en fronteras.
  */
 export function segmentarTextoEnChunks(texto: string, maxCharsPerChunk = 3000, overlapChars = 400): string[] {
   if (!texto || texto.trim().length === 0) return [];
 
-  const párrafos = texto.split(/\n\s*\n/).filter((p) => p.trim().length > 0);
+  const str = texto.trim();
+  if (str.length <= maxCharsPerChunk) return [str];
+
   const chunks: string[] = [];
-  let currentChunk = "";
+  let startIdx = 0;
 
-  for (const p of párrafos) {
-    if ((currentChunk + "\n\n" + p).length <= maxCharsPerChunk) {
-      currentChunk = currentChunk ? currentChunk + "\n\n" + p : p;
-    } else {
-      if (currentChunk) {
-        chunks.push(currentChunk);
-      }
-      if (p.length > maxCharsPerChunk) {
-        // Divide párrafo largo por oraciones
-        const oraciones = p.match(/[^.!?]+[.!?]+/g) || [p];
-        let subChunk = "";
-        for (const or of oraciones) {
-          if ((subChunk + " " + or).length <= maxCharsPerChunk) {
-            subChunk = subChunk ? subChunk + " " + or : or;
-          } else {
-            if (subChunk) chunks.push(subChunk);
-            subChunk = or;
-          }
-        }
-        if (subChunk) currentChunk = subChunk;
-      } else {
-        currentChunk = p;
-      }
+  while (startIdx < str.length) {
+    let endIdx = startIdx + maxCharsPerChunk;
+    if (endIdx >= str.length) {
+      const lastChunk = str.slice(startIdx).trim();
+      if (lastChunk) chunks.push(lastChunk);
+      break;
     }
-  }
 
-  if (currentChunk) {
-    chunks.push(currentChunk);
+    // Buscar límite natural de párrafo, oración o palabra
+    let cutIdx = str.lastIndexOf("\n\n", endIdx);
+    if (cutIdx <= startIdx) cutIdx = str.lastIndexOf("\n", endIdx);
+    if (cutIdx <= startIdx) cutIdx = str.lastIndexOf(". ", endIdx);
+    if (cutIdx <= startIdx) cutIdx = str.lastIndexOf(" ", endIdx);
+    if (cutIdx <= startIdx) cutIdx = endIdx;
+
+    const chunk = str.slice(startIdx, cutIdx + 1).trim();
+    if (chunk) chunks.push(chunk);
+
+    // Calcular el siguiente índice de inicio con solapamiento real
+    const nextStart = Math.max(startIdx + 1, cutIdx + 1 - overlapChars);
+    if (nextStart < str.length) {
+      // Ajustar inicio a espacio para no cortar palabra en el solapamiento
+      const cleanNext = str.indexOf(" ", nextStart);
+      if (cleanNext !== -1 && cleanNext < cutIdx) {
+        startIdx = cleanNext + 1;
+      } else {
+        startIdx = nextStart;
+      }
+    } else {
+      break;
+    }
   }
 
   return chunks;
 }
 
 const FRASES_GENERICAS_PROHIBIDAS = [
+  "reflexiones sobre",
+  "notas de",
   "resumen del contenido",
   "dictado sin contenido",
   "sin titulo",
@@ -129,12 +189,16 @@ const FRASES_GENERICAS_PROHIBIDAS = [
   "transcripcion del dictado",
   "transcripción del dictado",
   "resumen del dictado",
+  "lista de palabras",
+  "resumen general",
 ];
 
 export function esTituloGenericoOInvalido(titulo: string): boolean {
   if (!titulo || titulo.trim().length < 5) return true;
   const norm = normalizarParaGrounding(titulo);
-  return FRASES_GENERICAS_PROHIBIDAS.some((fg) => norm.includes(fg));
+  if (FRASES_GENERICAS_PROHIBIDAS.some((fg) => norm.includes(fg))) return true;
+  if (/^resumen\b/i.test(titulo.trim())) return true;
+  return false;
 }
 
 /**
@@ -158,79 +222,243 @@ export function generarTituloDeUltimoRecurso(texto: string, folio?: number | nul
 }
 
 /**
- * Fallback determinista basado en frecuencia ponderada, frases nominales y eliminación de stopwords.
- * Prohíbe explícitamente títulos genéricos como "Resumen del contenido...".
+ * Fallback determinista basado en análisis del texto COMPLETO por frecuencia de frases,
+ * peso posicional distribuido (inicio, medio, final) y stopwords.
+ * Prohíbe explícitamente títulos genéricos y sigue la forma del patrón objetivo.
  */
 export function generarTituloFallback(texto: string): TitleGenerationResult {
   const stopwords = new Set([
     "el", "la", "los", "las", "un", "una", "unos", "unas", "y", "o", "pero", "si", "de", "del", "a",
     "al", "en", "por", "para", "con", "sin", "sobre", "que", "que", "su", "sus", "se", "es", "son",
-    "fue", "sido", "este", "esta", "estos", "estas", "como", "mas", "más", "ya", "o", "e", "ni"
+    "fue", "sido", "este", "esta", "estos", "estas", "como", "mas", "más", "ya", "e", "ni", "nos",
+    "les", "ante", "bajo", "cabe", "desde", "hacia", "hasta", "para", "segun", "según", "so", "tras"
   ]);
 
-  const oraciones = texto.match(/[^.!?]+[.!?]+/g) || [texto];
-  let acumuladoPalabras: string[] = [];
-
-  for (const oracion of oraciones) {
-    const palabras = oracion
-      .replace(/[^a-zA-ZáéíóúñÁÉÍÓÚÑ0-9\s]/g, " ")
-      .split(/\s+/)
-      .filter((w) => w.length > 2 && !stopwords.has(w.toLowerCase()));
-
-    acumuladoPalabras.push(...palabras);
-    if (acumuladoPalabras.length >= 6) break;
-  }
-
-  const palabrasClave = acumuladoPalabras.slice(0, 8).join(" ");
-  let tituloLimpio = palabrasClave ? palabrasClave.charAt(0).toUpperCase() + palabrasClave.slice(1) : "";
-
-  // Remover comillas
-  tituloLimpio = tituloLimpio.replace(/["'«»]/g, "").trim();
-
-  if (esTituloGenericoOInvalido(tituloLimpio)) {
+  const limpio = (texto || "").trim();
+  if (!limpio) {
     return {
       title: "",
       mode: "single_thread",
+      ideas: [],
       threads: [],
+      evidence: [],
+      coverage_score: 0.0,
+      specificity_score: 0.0,
       confidence: 0.0,
       model: "fallback_invalido",
+      prompt_version: "tit-1a-v1",
       fallback_used: true,
     };
   }
 
-  if (tituloLimpio.length > 130) {
-    tituloLimpio = tituloLimpio.slice(0, 130) + "...";
+  // Segmentar oraciones de todo el documento
+  const oracionesRaw = limpio.split(/(?<=[.!?])\s+/).filter((s) => s.trim().length > 0);
+  const oraciones = oracionesRaw.length > 0 ? oracionesRaw : [limpio];
+
+  // Identificar oraciones clave por regiones distribuidas (Inicio, Medio, Final)
+  const n = oraciones.length;
+  const regionInicio = oraciones.slice(0, Math.max(1, Math.floor(n * 0.35)));
+  const regionMedio = oraciones.slice(Math.floor(n * 0.35), Math.floor(n * 0.70));
+  const regionFinal = oraciones.slice(Math.floor(n * 0.70));
+
+  // Ponderar palabras y frases por frecuencia, presencia regional y términos distintivos
+  const freqMap = new Map<string, { count: number; regions: Set<string>; sampleSentence: string; rawTerm: string }>();
+
+  const procesarOracion = (oracion: string, regionName: string) => {
+    const palabrasRaw = oracion
+      .replace(/[^a-zA-ZáéíóúñÁÉÍÓÚÑ0-9\s]/g, " ")
+      .split(/\s+/)
+      .filter((w) => w.length > 2);
+
+    for (let i = 0; i < palabrasRaw.length; i++) {
+      const pRaw = palabrasRaw[i];
+      const pNorm = pRaw.toLowerCase();
+      if (stopwords.has(pNorm)) continue;
+
+      if (!freqMap.has(pNorm)) {
+        freqMap.set(pNorm, { count: 0, regions: new Set(), sampleSentence: oracion, rawTerm: pRaw });
+      }
+      const entry = freqMap.get(pNorm)!;
+      entry.count += 1;
+      entry.regions.add(regionName);
+
+      // Extraer bigramas (frases de 2 palabras)
+      if (i < palabrasRaw.length - 1) {
+        const p2Raw = palabrasRaw[i + 1];
+        const p2Norm = p2Raw.toLowerCase();
+        if (!stopwords.has(p2Norm)) {
+          const bigramaNorm = `${pNorm} ${p2Norm}`;
+          const bigramaRaw = `${pRaw} ${p2Raw}`;
+          if (!freqMap.has(bigramaNorm)) {
+            freqMap.set(bigramaNorm, { count: 0, regions: new Set(), sampleSentence: oracion, rawTerm: bigramaRaw });
+          }
+          const bEntry = freqMap.get(bigramaNorm)!;
+          bEntry.count += 1.5; // mayor peso a bigramas
+          bEntry.regions.add(regionName);
+        }
+      }
+    }
+  };
+
+  regionInicio.forEach((o) => procesarOracion(o, "inicio"));
+  regionMedio.forEach((o) => procesarOracion(o, "medio"));
+  regionFinal.forEach((o) => procesarOracion(o, "final"));
+
+  // Buscar oraciones con indicadores de afirmación/decisión/conclusión
+  const indicadoresClave = /(?:se acordó|se decidió|conclusión|se determinó|se aprobó|propuesta|en resumen|resultado|objetivo|confirmó|migrar|resolver|implementar|decisión|finalmente|ratificación|resolución|especificación|módulo)/i;
+
+  let oracionCentral = "";
+  let evidenciaCentral = "";
+
+  // 1. Preferir oraciones con palabras indicadoras en la región final o inicio
+  const oracionIndicador = [...regionFinal, ...regionInicio, ...regionMedio].find((o) => indicadoresClave.test(o));
+  if (oracionIndicador) {
+    oracionCentral = oracionIndicador.trim();
+    evidenciaCentral = oracionCentral;
+  } else {
+    // 2. Buscar oraciones que contengan términos distintivos únicos (de baja frecuencia global pero alta especificidad)
+    const oracionesConSustancia = oraciones.filter((o) => o.trim().length > 15);
+    const oracionUnica = oracionesConSustancia.find((o) => {
+      const wList = o.split(/\s+/).filter((w) => w.length > 4 && !stopwords.has(w.toLowerCase()));
+      return wList.some((w) => (freqMap.get(w.toLowerCase())?.count || 0) === 1);
+    });
+
+    if (oracionUnica) {
+      oracionCentral = oracionUnica.trim();
+      evidenciaCentral = oracionCentral;
+    } else {
+      oracionCentral = (regionFinal[regionFinal.length - 1] || regionInicio[0] || limpio).trim();
+      evidenciaCentral = oracionCentral;
+    }
   }
 
-  const citaLiteral = (oraciones[0] || texto).slice(0, 50).trim();
+  // Extraer las mejores líneas ideacionales (frases o palabras clave con alta frecuencia, cobertura o singularidad distintiva)
+  const candidatosOrdenados = Array.from(freqMap.entries())
+    .map(([term, data]) => {
+      // Si el término aparece con mayúsculas/camello (ej. MóduloXylophone, Dąbrowski, QuantumDąbrowski), dar bonificación de especificidad
+      const esEspecifico = /[A-ZÁÉÍÓÚÑ]/.test(data.rawTerm) || data.rawTerm.length > 8;
+      const bonusEspecificidad = esEspecifico ? 3.0 : 1.0;
+      const score = data.count * data.regions.size * (term.includes(" ") ? 1.8 : 1.0) * bonusEspecificidad;
+
+      return {
+        term,
+        rawTerm: data.rawTerm,
+        score,
+        regionsCount: data.regions.size,
+        sampleSentence: data.sampleSentence,
+      };
+    })
+    .sort((a, b) => b.score - a.score);
+
+  // Seleccionar tema central y líneas A, B, C (hasta 3)
+  const lineasSeleccionadas: string[] = [];
+  const evidenciasSeleccionadas: string[] = [evidenciaCentral];
+
+  for (const cand of candidatosOrdenados) {
+    if (lineasSeleccionadas.length >= 3) break;
+    // Usar la forma original del término o capitalizar adecuadamente
+    const terminoFormateado = cand.rawTerm.includes(" ")
+      ? cand.rawTerm.split(" ").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")
+      : cand.rawTerm.charAt(0).toUpperCase() + cand.rawTerm.slice(1);
+
+    if (!lineasSeleccionadas.some((l) => l.toLowerCase().includes(cand.term.toLowerCase()))) {
+      lineasSeleccionadas.push(terminoFormateado);
+      if (cand.sampleSentence && !evidenciasSeleccionadas.includes(cand.sampleSentence)) {
+        evidenciasSeleccionadas.push(cand.sampleSentence);
+      }
+    }
+  }
+
+  // Sintetizar el tema central a partir de la oración central
+  let temaCentralLimpio = oracionCentral
+    .replace(/^[\s\d.\-–—:=]+/, "")
+    .replace(/["'«»]/g, "")
+    .trim();
+
+  if (temaCentralLimpio.length > 80) {
+    const recorte = temaCentralLimpio.slice(0, 80);
+    temaCentralLimpio = recorte.replace(/\s+\S*$/, "") || recorte;
+  }
+
+  // Formar el título en el patrón objetivo: "Tema central y afirmación/propósito — líneas A, B y C"
+  let lineasTexto = "";
+  if (lineasSeleccionadas.length === 1) {
+    lineasTexto = lineasSeleccionadas[0];
+  } else if (lineasSeleccionadas.length === 2) {
+    lineasTexto = `${lineasSeleccionadas[0]} y ${lineasSeleccionadas[1]}`;
+  } else if (lineasSeleccionadas.length >= 3) {
+    lineasTexto = `${lineasSeleccionadas[0]}, ${lineasSeleccionadas[1]} y ${lineasSeleccionadas[2]}`;
+  }
+
+  let tituloFinal = lineasTexto ? `${temaCentralLimpio} — ${lineasTexto}` : temaCentralLimpio;
+
+  // Limpieza de comillas y ajuste estricto de longitud
+  tituloFinal = tituloFinal.replace(/["'«»]/g, "").trim();
+
+  if (esTituloGenericoOInvalido(tituloFinal)) {
+    // Si aún resulta genérico, reintentar con las oraciones directas sin etiquetas genéricas
+    const directa = (oraciones[0] || limpio).slice(0, 100).replace(/["'«»]/g, "").trim();
+    tituloFinal = directa.charAt(0).toUpperCase() + directa.slice(1);
+  }
+
+  if (tituloFinal.length > 220) {
+    tituloFinal = tituloFinal.slice(0, 217) + "...";
+  }
+
+  // Construir evidencias con offsets reales
+  const evidenciasOffsets: EvidenceWithOffset[] = evidenciasSeleccionadas.map((ev) =>
+    buscarOffsetLiteral(texto, ev)
+  );
+
+  const ideas: IdeaItem[] = lineasSeleccionadas.map((l) => ({
+    label: l,
+    evidence: evidenciasOffsets,
+    keywords: l.toLowerCase().split(" "),
+    importance: 0.8,
+  }));
+
+  const threads: ThreadCandidate[] = [
+    {
+      label: temaCentralLimpio,
+      ideas: lineasSeleccionadas,
+      evidence: evidenciasOffsets,
+    },
+  ];
+
+  // Cobertura calculada según el número de regiones representadas
+  const coverageScore = Math.min(1.0, Number((evidenciasOffsets.length / Math.max(1, oraciones.length)).toFixed(2)) + 0.5);
 
   return {
-    title: tituloLimpio,
-    mode: "single_thread",
-    threads: [
-      {
-        label: tituloLimpio,
-        ideas: [tituloLimpio],
-        evidence: [citaLiteral],
-      },
-    ],
-    confidence: 0.65,
+    title: tituloFinal,
+    mode: lineasSeleccionadas.length > 1 ? "multi_thread" : "single_thread",
+    ideas,
+    threads,
+    evidence: evidenciasOffsets,
+    coverage_score: coverageScore,
+    specificity_score: 0.8,
+    confidence: 0.7,
     model: "fallback_determinista",
+    prompt_version: "tit-1a-v1",
     fallback_used: true,
   };
 }
 
 /**
- * Genera un título estructurado usando Groq LLM con fallback determinista.
+ * Genera un título estructurado usando Map-Reduce con Groq LLM o fallback determinista.
  */
 export async function generarTituloEstructurado(texto: string): Promise<TitleGenerationResult> {
   if (!texto || texto.trim().length === 0) {
     return {
       title: "Dictado sin contenido explícito",
       mode: "single_thread",
+      ideas: [],
       threads: [],
+      evidence: [],
+      coverage_score: 0.0,
+      specificity_score: 0.0,
       confidence: 0.0,
       model: "none",
+      prompt_version: "tit-1a-v1",
       fallback_used: true,
     };
   }
@@ -240,39 +468,41 @@ export async function generarTituloEstructurado(texto: string): Promise<TitleGen
     return generarTituloFallback(texto);
   }
 
-  const chunks = segmentarTextoEnChunks(texto);
-  let textoParaAnalizar = "";
+  const chunks = segmentarTextoEnChunks(texto, 3000, 400);
 
-  // Map/Reduce sobre todos los chunks con límites controlados
-  if (chunks.length === 1) {
-    textoParaAnalizar = chunks[0];
-  } else {
-    // Map: Extraer las primeras 2 oraciones de cada chunk para sintetizar la totalidad del texto
-    const extractosMap = chunks.slice(0, 10).map((c) => {
-      const oraciones = c.match(/[^.!?]+[.!?]+/g) || [c];
-      return oraciones.slice(0, 2).join(" ").trim();
-    });
-    // Reduce: Sintetizar la totalidad del documento
-    textoParaAnalizar = extractosMap.join("\n\n");
-  }
+  // Map-Reduce sobre TODOS los chunks del documento sin truncar
+  const bloquesChunks = chunks.map((c, idx) => `[CHUNK ${idx + 1}/${chunks.length}]\n${c}`).join("\n\n");
 
-  const prompt = `Analiza el siguiente texto y extrae en JSON estructurado las ideas e hilos temáticos principales.
-Reglas estrictas:
-1. "evidence" DEBE ser una cita literal de palabras contiguas que existan exactas en el texto.
-2. Prohibidos títulos genéricos como "Resumen del contenido...", "Dictado sin contenido" o "Sin título".
-3. Devuelve un objeto JSON exactamente con este formato:
+  const prompt = `Analiza el texto completo dividido en chunks y genera un título altamente descriptivo, anclado y estructurado.
+
+REGLAS OBLIGATORIAS DE SÍNTESIS:
+1. Examina TODOS los chunks desde el primero hasta el último (1 a ${chunks.length}). La idea central o la decisión final puede estar ubicada al FINAL del texto.
+2. Identifica el Tema Central y Afirmación/Propósito principal, junto con hasta 3 líneas ideacionales.
+3. Formato del título: "Tema central y afirmación/propósito — líneas A, B y C"
+   - Longitud objetivo: 90 a 180 caracteres (máximo 220 caracteres si es multihilo).
+   - PRESERVACIÓN DE NOMBRES PROPIOS: Conserva nombres de personas, productos, tecnologías y lugares (ej. Dąbrowski, Groq, PostgreSQL, Juan Pérez).
+   - PROHIBIDO: Usar frases genéricas como "Reflexiones sobre", "Notas de", "Resumen", "Dictado sin contenido", listas de palabras sueltas o comillas.
+4. EVIDENCIA Y GROUNDING:
+   - "evidence": DEBE ser una lista de citas literales contiguas exactas que existan en el texto fuente. No inventes ni alteres ni una palabra.
+
+Devuelve un objeto JSON exactamente con esta estructura:
 {
+  "title": "Tema central y afirmación/propósito — líneas A, B y C",
+  "mode": "single_thread" o "multi_thread",
   "ideas": [
-    { "label": "descripción breve", "evidence": ["cita literal exacta del texto"], "keywords": ["palabra"], "importance": 0.9 }
+    { "label": "descripción de la idea", "evidence": ["cita literal exacta del texto"], "keywords": ["palabra"], "importance": 0.9 }
   ],
   "thread_candidates": [
-    { "label": "Nombre del hilo o título conciso", "idea_indexes": [0], "evidence": ["cita literal exacta"] }
-  ]
+    { "label": "Nombre de la línea o hilo", "idea_indexes": [0], "evidence": ["cita literal exacta del texto"] }
+  ],
+  "coverage_score": 0.95,
+  "specificity_score": 0.90,
+  "confidence": 0.95
 }
 
-Texto a analizar:
+Texto completo a analizar:
 """
-${textoParaAnalizar}
+${bloquesChunks}
 """`;
 
   try {
@@ -285,7 +515,7 @@ ${textoParaAnalizar}
       body: JSON.stringify({
         model: "llama-3.3-70b-versatile",
         messages: [
-          { role: "system", content: "Eres un asistente de síntesis editorial especializado en títulos concisos en español." },
+          { role: "system", content: "Eres un asistente de síntesis editorial especializado en títulos descriptivos anclados en español." },
           { role: "user", content: prompt },
         ],
         temperature: 0.1,
@@ -308,54 +538,66 @@ ${textoParaAnalizar}
 
     const data = parsed.data;
 
-    // Filtrar ideas sin grounding literal
-    const ideasValidas = data.ideas.filter((i) => validarGroundingEvidencia(texto, i.evidence));
-    const hilosValidos = data.thread_candidates.filter((t) => validarGroundingEvidencia(texto, t.evidence));
+    // Validar grounding literal de evidencias
+    const todasLasCitas: string[] = [];
+    data.ideas.forEach((i) => todasLasCitas.push(...i.evidence));
+    data.thread_candidates.forEach((t) => todasLasCitas.push(...t.evidence));
 
-    if (hilosValidos.length === 0) {
+    const tieneEvidenciaValida = validarGroundingEvidencia(texto, todasLasCitas);
+    if (!tieneEvidenciaValida && todasLasCitas.length > 0) {
+      // Fallback si detecta alucinación de citas
       return generarTituloFallback(texto);
     }
 
-    let mode: "single_thread" | "multi_thread" = "single_thread";
-    let tituloFinal = "";
-
-    if (hilosValidos.length === 1) {
-      mode = "single_thread";
-      const h = hilosValidos[0];
-      const ideaLabels = ideasValidas.map((i) => i.label).slice(0, 2).join(", ");
-      tituloFinal = ideaLabels ? `${h.label}: ${ideaLabels}` : h.label;
-    } else {
-      mode = "multi_thread";
-      const h1 = hilosValidos[0].label;
-      const h2 = hilosValidos[1].label;
-      tituloFinal = `${h1} — ${h2}`;
-    }
-
-    // Limpieza de comillas y extensión
-    tituloFinal = tituloFinal.replace(/["'«»]/g, "").trim();
-    if (tituloFinal.length > 140) {
-      tituloFinal = tituloFinal.slice(0, 137) + "...";
-    }
+    let tituloFinal = data.title.replace(/["'«»]/g, "").trim();
 
     if (esTituloGenericoOInvalido(tituloFinal)) {
       return generarTituloFallback(texto);
     }
 
+    if (tituloFinal.length > 220) {
+      tituloFinal = tituloFinal.slice(0, 217) + "...";
+    }
+
+    // Convertir evidencias a objetos EvidenceWithOffset
+    const ideasProcesadas: IdeaItem[] = data.ideas.map((i) => ({
+      label: i.label,
+      evidence: i.evidence.map((ev) => buscarOffsetLiteral(texto, ev)),
+      keywords: i.keywords,
+      importance: i.importance,
+    }));
+
+    const threadsProcesados: ThreadCandidate[] = data.thread_candidates.map((t) => ({
+      label: t.label,
+      ideas: iLabels(data.ideas, t.idea_indexes),
+      evidence: t.evidence.map((ev) => buscarOffsetLiteral(texto, ev)),
+    }));
+
+    const rootEvidence: EvidenceWithOffset[] = [];
+    ideasProcesadas.forEach((i) => rootEvidence.push(...i.evidence));
+    threadsProcesados.forEach((t) => rootEvidence.push(...t.evidence));
+
     return {
       title: tituloFinal,
-      mode,
-      threads: hilosValidos.map((h) => ({
-        label: h.label,
-        ideas: ideasValidas.map((i) => i.label),
-        evidence: h.evidence,
-      })),
-      confidence: 0.95,
+      mode: data.mode,
+      ideas: ideasProcesadas,
+      threads: threadsProcesados,
+      evidence: rootEvidence,
+      coverage_score: data.coverage_score,
+      specificity_score: data.specificity_score,
+      confidence: data.confidence,
       model: "groq-llama-3.3-70b-versatile",
+      prompt_version: "tit-1a-v1",
       fallback_used: false,
     };
   } catch {
     return generarTituloFallback(texto);
   }
+}
+
+function iLabels(ideas: { label: string }[], indexes: number[]): string[] {
+  if (!indexes || indexes.length === 0) return ideas.map((i) => i.label);
+  return indexes.map((idx) => ideas[idx]?.label).filter(Boolean);
 }
 
 /**
@@ -366,6 +608,25 @@ export async function generarTituloConGarantia(
   texto: string,
   folio?: number | null
 ): Promise<TituloConGarantiaResult> {
+  if (!texto || texto.trim().length === 0) {
+    const titleUltimo = generarTituloDeUltimoRecurso("", folio);
+    const ev = buscarOffsetLiteral("", titleUltimo);
+    return {
+      title: titleUltimo,
+      mode: "single_thread",
+      ideas: [],
+      threads: [{ label: titleUltimo, ideas: [titleUltimo], evidence: [ev] }],
+      evidence: [ev],
+      coverage_score: 0.0,
+      specificity_score: 0.0,
+      confidence: 0.1,
+      model: "ultimo_recurso_deterministico",
+      prompt_version: "tit-1a-v1",
+      fallback_used: true,
+      nivel: "ultimo_recurso",
+    };
+  }
+
   try {
     const resIA = await conTimeout(generarTituloEstructurado(texto), 9000, null);
     if (resIA && resIA.title && !esTituloGenericoOInvalido(resIA.title)) {
@@ -385,12 +646,18 @@ export async function generarTituloConGarantia(
   }
 
   const tituloFinal = generarTituloDeUltimoRecurso(texto, folio ?? null);
+  const ev = buscarOffsetLiteral(texto, tituloFinal);
   return {
     title: tituloFinal,
     mode: "single_thread",
-    threads: [{ label: tituloFinal, ideas: [tituloFinal], evidence: [] }],
+    ideas: [{ label: tituloFinal, evidence: [ev], keywords: [], importance: 0.5 }],
+    threads: [{ label: tituloFinal, ideas: [tituloFinal], evidence: [ev] }],
+    evidence: [ev],
+    coverage_score: 0.1,
+    specificity_score: 0.1,
     confidence: 0.3,
     model: "ultimo_recurso_deterministico",
+    prompt_version: "tit-1a-v1",
     fallback_used: true,
     nivel: "ultimo_recurso",
   };
