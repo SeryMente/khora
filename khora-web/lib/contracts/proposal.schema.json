@@ -1,0 +1,263 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://khora.io/schemas/proposal.schema.json",
+  "title": "ProposalEnvelope",
+  "description": "Contrato canónico versionado de propuesta de ingesta entre el pipeline extractor Python (5B) y la persistencia/juicio TS/SQL (5A).",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "source_triplet",
+    "pipeline_version",
+    "payload_hash",
+    "created_at",
+    "updated_at",
+    "items",
+    "judgments"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^1\\.[0-9]+\\.[0-9]+$",
+      "description": "Versión del esquema de contrato. Actualmente 1.x.x"
+    },
+    "source_triplet": {
+      "type": "object",
+      "description": "Terna de procedencia obligatoria del volcado fuente.",
+      "required": ["volcado_id", "version", "sha256"],
+      "properties": {
+        "volcado_id": {
+          "type": "string",
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+          "description": "UUID v4 de 36 caracteres del volcado."
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Versión entera del volcado (>= 1)."
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-fA-F]{64}$",
+          "description": "Digest SHA-256 hexadecimal de 64 caracteres del texto fuente aprobado."
+        }
+      },
+      "additionalProperties": false
+    },
+    "pipeline_version": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Versión del pipeline de extracción (ej. 5b-v1.0.0)."
+    },
+    "payload_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{64}$",
+      "description": "SHA-256 en minúsculas del JSON canónico de los ítems derivados exclusivamente (Zona Derivada)."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp ISO 8601 de creación del envelope."
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp ISO 8601 de última actualización."
+    },
+    "items": {
+      "type": "array",
+      "description": "Lista de ítems extraídos derivados del contenido (Zona Derivada).",
+      "items": {
+        "$ref": "#/$defs/ProposalItem"
+      }
+    },
+    "judgments": {
+      "type": "array",
+      "description": "Historial append-only de dictámenes/juicios aplicados por el usuario u orquestador (Zona de Juicio).",
+      "items": {
+        "$ref": "#/$defs/Judgment"
+      }
+    },
+    "settlement_act": {
+      "oneOf": [
+        { "type": "null" },
+        { "$ref": "#/$defs/SettlementAct" }
+      ],
+      "description": "Acta de cierre/liquidación inmutable una vez emitida (Zona de Juicio)."
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "Anchor": {
+      "type": "object",
+      "description": "Anclaje de localización en el texto fuente del volcado.",
+      "required": ["exact_text"],
+      "properties": {
+        "exact_text": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Texto exacto o fragmento referenciado en el volcado."
+        },
+        "start_char": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Desplazamiento inicial de carácter (opcional)."
+        },
+        "end_char": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Desplazamiento final de carácter (opcional)."
+        },
+        "segment_index": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Índice de párrafo/segmento (opcional)."
+        }
+      },
+      "additionalProperties": false
+    },
+    "ResolutionCandidate": {
+      "type": "object",
+      "description": "Candidato de resolución de entidad/nodo.",
+      "required": ["canonical_key", "score", "label", "needs_review"],
+      "properties": {
+        "canonical_key": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Clave canónica del nodo en la memoria organizada/grafo."
+        },
+        "score": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Puntaje de similitud o confianza (0.0 a 1.0)."
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Etiqueta visible de la entidad."
+        },
+        "needs_review": {
+          "type": "boolean",
+          "description": "Indicador de si requiere revisión humana."
+        }
+      },
+      "additionalProperties": false
+    },
+    "ProposalItem": {
+      "type": "object",
+      "description": "Ítem individual propuesto (entidad o relación/triple).",
+      "required": ["id", "kind", "label", "anchor", "candidates"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+          "description": "UUIDv5 determinista derivado de la terna fuente + identificador/índice de contenido."
+        },
+        "kind": {
+          "type": "string",
+          "enum": ["entity", "relation"],
+          "description": "Tipo de ítem propuesto."
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Nombre de la entidad o nombre de la relación."
+        },
+        "anchor": {
+          "$ref": "#/$defs/Anchor"
+        },
+        "candidates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ResolutionCandidate"
+          }
+        },
+        "triple": {
+          "type": "object",
+          "description": "Estructura del triple (solo si kind == 'relation').",
+          "required": ["origen_id", "destino_id", "relacion"],
+          "properties": {
+            "origen_id": { "type": "string", "minLength": 1 },
+            "destino_id": { "type": "string", "minLength": 1 },
+            "relacion": { "type": "string", "minLength": 1 }
+          },
+          "additionalProperties": false
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "Judgment": {
+      "type": "object",
+      "description": "Dictamen append-only sobre un ítem individual.",
+      "required": ["judgment_id", "item_id", "decision", "actor", "timestamp"],
+      "properties": {
+        "judgment_id": {
+          "type": "string",
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+          "description": "UUIDv4 o UUIDv5 del juicio registrado."
+        },
+        "item_id": {
+          "type": "string",
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+          "description": "ID del ProposalItem dictaminado."
+        },
+        "decision": {
+          "type": "string",
+          "enum": ["accept", "reject", "modify"],
+          "description": "Decisión aplicada sobre el ítem."
+        },
+        "actor": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Usuario u orquestador que emitió el juicio."
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp ISO 8601 en que se registró el juicio."
+        },
+        "override_data": {
+          "type": "object",
+          "description": "Datos de modificación opcionales si decision == 'modify'."
+        }
+      },
+      "additionalProperties": false
+    },
+    "SettlementAct": {
+      "type": "object",
+      "description": "Acta de cierre/liquidación inmutable de la propuesta.",
+      "required": ["act_id", "status", "settled_at", "settled_by", "summary"],
+      "properties": {
+        "act_id": {
+          "type": "string",
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+          "description": "UUID del acta."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "approved", "rejected", "partially_approved"],
+          "description": "Estado final de liquidación."
+        },
+        "settled_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp ISO 8601 del cierre."
+        },
+        "settled_by": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Operador o agente que liquidó la propuesta."
+        },
+        "summary": {
+          "type": "string",
+          "description": "Resumen o justificación del cierre."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
