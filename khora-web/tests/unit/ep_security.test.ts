@@ -220,7 +220,7 @@ test("EP Security: POST /api/ep/token platform parameter handling and command se
 
 test("EP Security: Middleware 308 redirect from /sistema/entorno-persistente to /sistema/seguridad#entorno-persistente", async () => {
   const req = new NextRequest("https://khora.example.com/sistema/entorno-persistente");
-  const res = (await middleware(req as any, {} as any)) as any;
+  const res = (await (middleware as any)(req, {} as any)) as any;
 
   assert.ok(res);
   assert.equal(res.status, 308);

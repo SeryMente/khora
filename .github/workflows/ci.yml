@@ -31,19 +31,16 @@ jobs:
       - run: pip install pytest httpx
       - run: pytest api/tests/
 
-  web-quality-gate:
+  khora-web-gate:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: khora-web  
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - name: Install web dependencies
-        run: npm ci
-        working-directory: khora-web
-      - name: TypeScript unit tests
-        run: npm run test:unit
-        working-directory: khora-web
-      - name: Typecheck
-        run: npm run typecheck
-        working-directory: khora-web
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run test:unit

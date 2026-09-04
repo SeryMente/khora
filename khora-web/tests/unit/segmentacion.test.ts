@@ -30,7 +30,10 @@ class MockDb {
       return { rows: [] };
     }
 
-    if (queryStr.includes("select * from volcado where id = $1") || queryStr.includes("select id, texto, sha256, estado")) {
+    if (
+      queryStr.includes("from volcado where id = $1") ||
+      (queryStr.includes("from volcado") && queryStr.includes("where id = $1"))
+    ) {
       const id = params?.[0];
       const v = this.volcados.get(id);
       return { rows: v ? [v] : [] };
@@ -172,13 +175,13 @@ describe("Segmentación en Párrafos Re-ejecutable y Guardián Duro", () => {
 
     // Primera ejecución
     await segmentarEnParrafos(id, {
-      mockLLM: async () => "Uno dos tres cuatro cinco.\n\nseis siete ocho nueve diez.",
+      mockLLM: async () => "Uno dos tres cuatro cinco\n\nseis siete ocho nueve diez.",
     });
     const v1 = mockDb.volcados.get(id).texto_estructurado;
 
     // Segunda ejecución con diferente formato de párrafos
     await segmentarEnParrafos(id, {
-      mockLLM: async () => "Uno dos.\n\ntres cuatro cinco.\n\nseis siete ocho.\n\nnueve diez.",
+      mockLLM: async () => "Uno dos\n\ntres cuatro cinco\n\nseis siete ocho\n\nnueve diez.",
     });
     const v2 = mockDb.volcados.get(id).texto_estructurado;
 
