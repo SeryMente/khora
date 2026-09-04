@@ -2,7 +2,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { getDb } from "@/lib/server/neon";
-import { asegurarTablaEventosSistema, FaseEvento } from "@/lib/server/eventos";
+import {
+  asegurarTablaEventosSistema,
+  registrarEventosBatch,
+  FaseEvento,
+} from "@/lib/server/eventos";
 
 export const runtime = "nodejs";
 
@@ -10,7 +14,9 @@ export async function GET(req: NextRequest) {
   const session = await auth();
 
   // If PLAYWRIGHT_TEST_RUN is active, bypass session requirement to align with middleware
-  const isTest = process.env.PLAYWRIGHT_TEST_RUN === "1" || process.env.PLAYWRIGHT_TEST_BYPASS === "true";
+  const isTest =
+    process.env.PLAYWRIGHT_TEST_RUN === "1" ||
+    process.env.PLAYWRIGHT_TEST_BYPASS === "true";
   if (!session && !isTest) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
@@ -57,7 +63,7 @@ export async function GET(req: NextRequest) {
     values.push(limit);
 
     const query = `
-      SELECT id, fase, event_id, estado, mensaje, detalle, volcado_id, version, sha256, correlacion_id, servidor_en, cliente_en, hash_anterior, event_hash
+      SELECT id, fase, event_id, estado, mensaje, detalle, volcado_id, version, sha256, correlacion_id, servidor_en, cliente_en, hash_anterior, event_hash, event_uuid, idempotency_key, schema_version, outcome, component, causation_id, attempt_id, sequence, session_id, release_sha, duration_ms, metrics, reason_code, privacy_class
       FROM eventos_sistema
       ${whereSql}
       ORDER BY id ASC
@@ -68,7 +74,9 @@ export async function GET(req: NextRequest) {
     const eventos = res.rows;
 
     if (format === "ndjson") {
-      const lines = eventos.map((evt) => JSON.stringify(evt)).join("\n") + (eventos.length > 0 ? "\n" : "");
+      const lines =
+        eventos.map((evt) => JSON.stringify(evt)).join("\n") +
+        (eventos.length > 0 ? "\n" : "");
       return new NextResponse(lines, {
         headers: {
           "Content-Type": "application/x-ndjson; charset=utf-8",
@@ -85,6 +93,76 @@ export async function GET(req: NextRequest) {
     console.error("Error en GET /api/eventos:", error);
     return NextResponse.json(
       { error: "Error interno consultando eventos", detail: String(error) },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(req: NextRequest) {
+  const session = await auth();
+
+  const isTest =
+    process.env.PLAYWRIGHT_TEST_RUN === "1" ||
+    process.env.PLAYWRIGHT_TEST_BYPASS === "true";
+  if (!session && !isTest) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
+
+  try {
+    let body: any;
+    try {
+      const rawText = await req.text();
+      body = JSON.parse(rawText || "{}");
+    } catch {
+      return NextResponse.json({ error: "Cuerpo JSON inválido" }, { status: 400 });
+    }
+
+    const batchIdempotencyKey =
+      req.headers.get("x-idempotency-key") ||
+      req.headers.get("idempotency-key") ||
+      body.idempotency_key ||
+      null;
+
+    let items: any[] = [];
+    if (Array.isArray(body)) {
+      items = body;
+    } else if (Array.isArray(body.events)) {
+      items = body.events;
+    } else if (Array.isArray(body.items)) {
+      items = body.items;
+    } else if (typeof body === "object" && body !== null) {
+      items = [body];
+    }
+
+    if (items.length === 0) {
+      return NextResponse.json(
+        { error: "Se requiere al menos un evento en el lote" },
+        { status: 400 }
+      );
+    }
+
+    const result = await registrarEventosBatch(items, batchIdempotencyKey);
+
+    return NextResponse.json(
+      {
+        ok: true,
+        summary: {
+          accepted: result.accepted,
+          duplicates: result.duplicates,
+          rejected: result.rejected,
+          total: items.length,
+        },
+        results: result.results,
+      },
+      {
+        status: 200,
+        headers: { "Cache-Control": "no-store" },
+      }
+    );
+  } catch (error) {
+    console.error("Error en POST /api/eventos:", error);
+    return NextResponse.json(
+      { error: "Error interno procesando eventos durables", detail: String(error) },
       { status: 500 }
     );
   }
