@@ -2,12 +2,11 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, Suspense } from "react";
-import * as Icons from "lucide-react";
 import { ensamblarParrafos, Fragmento } from "../../../lib/transcripcion/ensamblar";
 import { reconciliarSegmentos, type SegmentoReconciliado } from "../../../lib/transcripcion/reconciliar";
+import { IngresoView } from "../../components/shared/IngresoView";
 
 type Estado = "inactivo" | "dictando";
-type EstadoReconciliacion = "preview_live" | "procesando_whisper" | "reconciliado_whisper" | "fallback_preview" | "editado_manual";
 
 function generarSesionId() {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -53,16 +52,12 @@ function IngresoContenido() {
   const [escuchando, setEscuchando] = useState(false);
   const [reconexiones, setReconexiones] = useState(0);
 
-  // Reconciliation & Authoritative STT state
-  const [estadoReconciliacion, setEstadoReconciliacion] = useState<EstadoReconciliacion>("preview_live");
   const [reconciliacionMensaje, setReconciliacionMensaje] = useState("");
 
-  // Editable textarea states
   const [texto, setTexto] = useState("");
   const [editando, setEditando] = useState(false);
   const [estabaDictando, setEstabaDictando] = useState(false);
 
-  // New states for parts
   const [partesContador, setPartesContador] = useState(0);
   const [bytesAcumulados, setBytesAcumulados] = useState(0);
 
@@ -81,9 +76,7 @@ function IngresoContenido() {
   const duracionRef = useRef(0);
   const abortosRef = useRef(0);
   const audioPermitidoRef = useRef(true);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // New refs for session & parts
   const sesionIdRef = useRef<string>("");
   const parteConsecutivaRef = useRef<number>(1);
   const partesSubidasRef = useRef<{ parte: number; url: string; bytes: number }[]>([]);
@@ -96,7 +89,6 @@ function IngresoContenido() {
     if (!w.SpeechRecognition && !w.webkitSpeechRecognition) setSoportado(false);
   }, []);
 
-  // Update unified textarea content when NOT actively editing
   useEffect(() => {
     if (!editando) {
       const parts = segmentos.map((s) => s.texto).filter((s) => s.trim().length > 0);
@@ -141,7 +133,6 @@ function IngresoContenido() {
 
   const ejecutarTranscripcionAutoritativa = useCallback(async () => {
     if (trozosRef.current.length === 0 && partesSubidasRef.current.length === 0) return;
-    setEstadoReconciliacion("procesando_whisper");
     const textoPreview = texto || segmentosRef.current.map((s) => s.texto).join("\n\n");
 
     const forma = new FormData();
@@ -173,29 +164,13 @@ function IngresoContenido() {
         setPendiente("");
         pendienteRef.current = "";
 
-        const hayManual = resultadoReconciliacion.segmentos.some((s) => s.estado === "editado_manual" || s.modificadoManualmente);
-        const perdida = data.perdidaDetectada || resultadoReconciliacion.perdidaDetectada;
-
-        if (hayManual) {
-          setEstadoReconciliacion("editado_manual");
-        } else if (perdida) {
-          setEstadoReconciliacion("fallback_preview");
-          setAviso("Posible omisión detectada · se conservó lo capturado");
-        } else {
-          setEstadoReconciliacion("reconciliado_whisper");
-        }
-
         setReconciliacionMensaje(
           data.motivoReconciliacion || resultadoReconciliacion.motivo || "Transcripción autoritativa Groq Whisper procesada con éxito."
         );
       } else {
-        const hayManual = segmentosRef.current.some((s) => s.estado === "editado_manual" || s.modificadoManualmente);
-        setEstadoReconciliacion(hayManual ? "editado_manual" : "fallback_preview");
         setReconciliacionMensaje(`Groq Whisper no disponible: ${data?.detail || "Conservando previsualización ASR en vivo."}`);
       }
     } catch (e) {
-      const hayManual = segmentosRef.current.some((s) => s.estado === "editado_manual" || s.modificadoManualmente);
-      setEstadoReconciliacion(hayManual ? "editado_manual" : "fallback_preview");
       setReconciliacionMensaje(`Fallo al solicitar transcripción autoritativa: ${String(e)}.`);
     }
   }, [texto]);
@@ -419,39 +394,6 @@ function IngresoContenido() {
     setEstado("inactivo");
   }, [estabilizarEmision, detenerGrabacion, ejecutarTranscripcionAutoritativa]);
 
-  const pausarDictadoPorEdicion = useCallback(() => {
-    activoRef.current = false;
-    if (rearmeRef.current) clearTimeout(rearmeRef.current);
-    try { recRef.current?.stop(); } catch {}
-    try { grabRef.current?.stop(); } catch {}
-    if (relojRef.current) clearTimeout(relojRef.current);
-    setParcial("");
-    setEscuchando(false);
-    setEstado("inactivo");
-  }, []);
-
-  const reanudarDictadoSinDemora = useCallback(async () => {
-    setError("");
-    setAviso("");
-    setResultado("");
-    activoRef.current = true;
-    const arrancado = arrancarReconocedor();
-    if (!arrancado) { activoRef.current = false; return; }
-    setEstado("dictando");
-    await arrancarGrabacion();
-  }, [arrancarReconocedor, arrancarGrabacion]);
-
-  useEffect(() => {
-    return () => {
-      activoRef.current = false;
-      if (relojRef.current) clearTimeout(relojRef.current);
-      if (rearmeRef.current) clearTimeout(rearmeRef.current);
-      try { recRef.current?.abort?.(); } catch {}
-      try { grabRef.current?.stop(); } catch {}
-      try { flujoRef.current?.getTracks?.().forEach((pista: any) => pista.stop()); } catch {}
-    };
-  }, []);
-
   const guardar = useCallback(async () => {
     setError("");
     setResultado("");
@@ -535,7 +477,6 @@ function IngresoContenido() {
     setTexto("");
     setEditando(false);
     setEstabaDictando(false);
-    setEstadoReconciliacion("preview_live");
     setReconciliacionMensaje("");
 
     sesionIdRef.current = "";
@@ -547,26 +488,17 @@ function IngresoContenido() {
     setBytesAcumulados(0);
   }, []);
 
-  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const val = e.target.value;
+  const handleTextoChange = (val: string) => {
     if (!editando) {
       setEditando(true);
-      setEstadoReconciliacion("editado_manual");
       if (estado === "dictando") {
         setEstabaDictando(true);
-        pausarDictadoPorEdicion();
-      } else {
-        setEstabaDictando(false);
+        detener();
       }
-    } else {
-      setEstadoReconciliacion("editado_manual");
     }
     setTexto(val);
   };
 
-  /**
-   * Confirma la edición manual de forma segmentaria sin colapsar el documento completo en un solo bloque interno.
-   */
   const confirmarEdicion = () => {
     setEditando(false);
     const parrafos = texto.split("\n\n").filter((p) => p.trim().length > 0);
@@ -584,107 +516,6 @@ function IngresoContenido() {
 
     segmentosRef.current = nuevosSegmentos;
     setSegmentos(nuevosSegmentos);
-    setPendiente("");
-    pendienteRef.current = "";
-    setParcial("");
-
-    if (estabaDictando) {
-      setEstabaDictando(false);
-      void reanudarDictadoSinDemora();
-    }
-  };
-
-  const handleRetranscribirAudio = async () => {
-    if (!sesionIdRef.current) {
-      setError("No hay una sesión de audio activa para re-transcribir.");
-      return;
-    }
-    setRetranscribiendo(true);
-    setError("");
-    setAviso("");
-    try {
-      const textoPreview = segmentosRef.current.map((s) => s.texto).join("\n\n") || pendienteRef.current;
-      const res = await fetch("/api/transcribir/sesion", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          sessionId: sesionIdRef.current,
-          previewText: textoPreview,
-        }),
-      });
-      const data = await res.json();
-      if (res.ok && data?.exito && typeof data?.textoFinal === "string") {
-        const resultadoReconciliacion = reconciliarSegmentos(segmentosRef.current, data.textoFinal);
-        segmentosRef.current = resultadoReconciliacion.segmentos;
-        setSegmentos(resultadoReconciliacion.segmentos);
-
-        setReconciliacionMensaje(
-          data.motivoReconciliacion || resultadoReconciliacion.motivo || "Re-transcripción completada con éxito."
-        );
-      } else {
-        setError(data.detail || "Fallo la re-transcripción del audio.");
-      }
-    } catch (err) {
-      setError("Error al solicitar re-transcripción: " + String(err));
-    } finally {
-      setRetranscribiendo(false);
-    }
-  };
-
-  const handleAdjuntarAudio = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setAdjuntandoAudio(true);
-    setError("");
-    setAviso("");
-
-    const forma = new FormData();
-    forma.append("audio", file);
-    const textoPreview = segmentosRef.current.map((s) => s.texto).join("\n\n") || pendienteRef.current;
-    forma.append("previewText", textoPreview);
-    if (!sesionIdRef.current) {
-      sesionIdRef.current = generarSesionId();
-    }
-    forma.append("sessionId", sesionIdRef.current);
-
-    try {
-      const res = await fetch("/api/transcribir/archivo", { method: "POST", body: forma });
-      const data = await res.json();
-
-      if (data?.sessionId) {
-        sesionIdRef.current = data.sessionId;
-      }
-
-      if (data?.audioUrl) {
-        partesSubidasRef.current = [
-          {
-            parte: 1,
-            url: data.audioUrl,
-            bytes: data.audioBytes || file.size,
-          },
-        ];
-        setPartesContador(1);
-        setBytesAcumulados(data.audioBytes || file.size);
-        setConAudio(true);
-      }
-
-      if (res.ok && data?.exito && typeof data?.textoFinal === "string") {
-        const resultadoReconciliacion = reconciliarSegmentos(segmentosRef.current, data.textoFinal);
-        segmentosRef.current = resultadoReconciliacion.segmentos;
-        setSegmentos(resultadoReconciliacion.segmentos);
-        setReconciliacionMensaje(
-          data.motivoReconciliacion || resultadoReconciliacion.motivo || "Audio adjuntado y transcrito exitosamente."
-        );
-      } else {
-        setAviso(data.detail || "Audio adjuntado, pero se requiere re-transcribir.");
-      }
-    } catch (err) {
-      setError("Error al adjuntar archivo de audio: " + String(err));
-    } finally {
-      setAdjuntandoAudio(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
-    }
   };
 
   const generarTituloConIA = async () => {
@@ -711,228 +542,39 @@ function IngresoContenido() {
   };
 
   return (
-    <main
-      className="max-w-4xl mx-auto p-6 space-y-6"
-      style={{
-        backgroundColor: "var(--khora-bg)",
-        color: "var(--khora-ink)",
-        paddingBottom: "6rem",
+    <IngresoView
+      state={{
+        titulo,
+        texto,
+        estado,
+        editando,
+        soportado,
+        escuchando,
+        guardando,
+        generandoTitulo,
+        retranscribiendo,
+        adjuntandoAudio,
+        conAudio,
+        partesContador,
+        bytesAcumulados,
+        reconexiones,
+        pulidosOk,
+        pulidosNo,
+        reconciliacionMensaje,
+        aviso,
+        error,
+        resultado,
       }}
-    >
-      {/* Cabecera de Sección */}
-      <div className="border-b pb-4" style={{ borderColor: "var(--khora-border)" }}>
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <Icons.Keyboard size={32} strokeWidth={1.75} style={{ color: "var(--khora-accent)" }} />
-          Ingreso Integrado
-        </h1>
-        <p className="text-sm mt-1" style={{ color: "var(--khora-accent)" }}>
-          Método universal combinado: Dicta en vivo, escribe o pega directamente. La transcripción es editable in-situ con protección segmentaria.
-        </p>
-      </div>
-
-      {!soportado && (
-        <div className="p-3 border rounded-none text-sm flex items-center gap-2" style={{ borderColor: "var(--khora-border)", backgroundColor: "var(--khora-surface)", color: "var(--khora-accent)" }}>
-          <Icons.TriangleAlert size={32} strokeWidth={1.75} className="shrink-0" />
-          <span>Este navegador no soporta dictado en vivo. Puedes utilizar escritura o copiar y pegar contenido.</span>
-        </div>
-      )}
-
-      {/* Inputs y Controles */}
-      <div className="space-y-4">
-        <div className="flex gap-2 items-center">
-          <input
-            value={titulo}
-            onChange={(e) => setTitulo(e.target.value)}
-            placeholder="Título opcional (escribe o genera con IA)"
-            className="flex-1 p-2.5 border rounded-none text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)] focus-visible:border-[var(--khora-accent)]"
-            style={{
-              backgroundColor: "var(--khora-surface)",
-              color: "var(--khora-ink)",
-              borderColor: "var(--khora-border)",
-            }}
-          />
-          <button
-            onClick={generarTituloConIA}
-            disabled={generandoTitulo || !texto.trim()}
-            className="px-3 py-2.5 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)] text-xs"
-            style={{
-              backgroundColor: "var(--khora-surface)",
-              color: "var(--khora-ink)",
-              borderColor: "var(--khora-border)",
-            }}
-          >
-            <Icons.Sparkles size={16} strokeWidth={1.75} />
-            {generandoTitulo ? "Generando..." : "Título con IA"}
-          </button>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-3">
-          {estado === "inactivo" ? (
-            <button
-              onClick={iniciar}
-              disabled={!soportado || editando || adjuntandoAudio || retranscribiendo}
-              className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
-              style={{
-                backgroundColor: "var(--khora-accent)",
-                color: "var(--khora-bg)",
-                borderColor: "var(--khora-accent)",
-              }}
-            >
-              <Icons.Mic size={32} strokeWidth={1.75} />
-              Iniciar dictado
-            </button>
-          ) : (
-            <button
-              onClick={detener}
-              className="px-4 py-2 border rounded-none cursor-pointer flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
-              style={{
-                backgroundColor: "var(--khora-surface)",
-                color: "var(--khora-ink)",
-                borderColor: "var(--khora-border)",
-              }}
-            >
-              <Icons.Pause size={32} strokeWidth={1.75} />
-              Detener
-            </button>
-          )}
-
-          <button
-            onClick={guardar}
-            disabled={guardando || estado === "dictando" || editando || adjuntandoAudio || retranscribiendo}
-            className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
-            style={{
-              backgroundColor: "var(--khora-surface)",
-              color: "var(--khora-ink)",
-              borderColor: "var(--khora-border)",
-            }}
-          >
-            <Icons.Check size={32} strokeWidth={1.75} />
-            {guardando ? "archivando..." : "Archivar volcado"}
-          </button>
-
-          <button
-            onClick={handleRetranscribirAudio}
-            disabled={retranscribiendo || adjuntandoAudio || !sesionIdRef.current || estado !== "inactivo"}
-            className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
-            style={{
-              backgroundColor: "var(--khora-surface)",
-              color: "var(--khora-ink)",
-              borderColor: "var(--khora-border)",
-            }}
-          >
-            <Icons.RefreshCw size={20} strokeWidth={1.75} />
-            {retranscribiendo ? "Re-transcribiendo..." : "Re-transcribir audio"}
-          </button>
-
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleAdjuntarAudio}
-            accept="audio/*"
-            className="hidden"
-          />
-
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            disabled={adjuntandoAudio || retranscribiendo || estado !== "inactivo"}
-            className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
-            style={{
-              backgroundColor: "var(--khora-surface)",
-              color: "var(--khora-ink)",
-              borderColor: "var(--khora-border)",
-            }}
-          >
-            <Icons.Paperclip size={20} strokeWidth={1.75} />
-            {adjuntandoAudio ? "Adjuntando..." : "Adjuntar audio"}
-          </button>
-
-          <button
-            onClick={limpiar}
-            disabled={estado === "dictando" || editando || adjuntandoAudio || retranscribiendo}
-            className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
-            style={{
-              backgroundColor: "var(--khora-surface)",
-              color: "var(--khora-ink)",
-              borderColor: "var(--khora-border)",
-            }}
-          >
-            <Icons.RotateCcw size={32} strokeWidth={1.75} />
-            Limpiar
-          </button>
-
-          {estado === "dictando" && (
-            <span className="flex items-center gap-2 text-xs font-semibold" style={{ color: "var(--khora-accent)" }}>
-              <Icons.Activity size={32} strokeWidth={1.75} />
-              {escuchando ? "escuchando" : "reconectando..."}
-            </span>
-          )}
-        </div>
-      </div>
-
-      {/* Banner de Edición Activa */}
-      {editando && (
-        <div className="p-3 border rounded-none text-sm flex items-center justify-between gap-4 animate-pulse" style={{ borderColor: "var(--khora-accent)", backgroundColor: "var(--khora-surface)", color: "var(--khora-ink)" }}>
-          <div className="flex items-center gap-2">
-            <Icons.PenTool size={32} strokeWidth={1.75} style={{ color: "var(--khora-accent)" }} />
-            <span>
-              <strong>Edición in-situ activa:</strong> El dictado está pausado. Confirma los cambios para reanudar.
-            </span>
-          </div>
-          <button
-            onClick={confirmarEdicion}
-            className="px-3 py-1 bg-[var(--khora-accent)] text-[var(--khora-bg)] font-bold text-xs rounded-none cursor-pointer hover:opacity-90"
-          >
-            Confirmar edición
-          </button>
-        </div>
-      )}
-
-      {/* Área de Texto Editable */}
-      <div className="relative">
-        <textarea
-          value={texto}
-          onChange={handleTextareaChange}
-          placeholder="Escribe, pega o inicia el dictado para transcribir..."
-          className="w-full p-4 min-h-[260px] whitespace-pre-wrap leading-relaxed border rounded-none text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)] focus-visible:border-[var(--khora-accent)]"
-          style={{
-            backgroundColor: "var(--khora-surface)",
-            borderColor: "var(--khora-border)",
-            color: "var(--khora-ink)",
-            resize: "vertical"
-          }}
-        />
-      </div>
-
-      {/* Estadísticas */}
-      <p className="text-xs font-medium" style={{ color: "var(--khora-accent)" }}>
-        estado: {estado} / editando: {editando ? "sí" : "no"} / caracteres: {texto.length} / bloques pulidos: {pulidosOk} / bloques sin pulir: {pulidosNo} / audio: {conAudio ? "sí" : "no"} / partes subidas: {partesContador} ({ (bytesAcumulados / (1024 * 1024)).toFixed(2) } MB) / reconexiones: {reconexiones}
-      </p>
-
-      {/* Alertas y Mensajes de Retorno */}
-      {reconciliacionMensaje.length > 0 && (
-        <div className="p-3 border rounded-none text-xs flex items-center gap-2" style={{ borderColor: "var(--khora-border)", backgroundColor: "var(--khora-surface)", color: "var(--khora-ink)" }}>
-          <Icons.Sparkles size={20} strokeWidth={1.75} className="shrink-0" style={{ color: "var(--khora-accent)" }} />
-          <span>{reconciliacionMensaje}</span>
-        </div>
-      )}
-      {aviso.length > 0 && (
-        <div className="p-3 border rounded-none text-sm flex items-center gap-2" style={{ borderColor: "var(--khora-border)", backgroundColor: "var(--khora-surface)", color: "var(--khora-accent)" }}>
-          <Icons.TriangleAlert size={32} strokeWidth={1.75} className="shrink-0" />
-          <span>{aviso}</span>
-        </div>
-      )}
-      {error.length > 0 && (
-        <div className="p-3 border rounded-none text-sm flex items-center gap-2" style={{ borderColor: "var(--khora-border)", backgroundColor: "var(--khora-surface)", color: "var(--khora-accent)" }}>
-          <Icons.ShieldX size={32} strokeWidth={1.75} className="shrink-0" />
-          <span>{error}</span>
-        </div>
-      )}
-      {resultado.length > 0 && (
-        <div className="p-3 border rounded-none text-sm flex items-center gap-2" style={{ borderColor: "var(--khora-border)", backgroundColor: "var(--khora-surface)", color: "var(--khora-ink)" }}>
-          <Icons.CircleDot size={32} strokeWidth={1.75} className="shrink-0" />
-          <span>{resultado}</span>
-        </div>
-      )}
-    </main>
+      actions={{
+        onTituloChange: setTitulo,
+        onTextoChange: handleTextoChange,
+        onGenerarTitulo: generarTituloConIA,
+        onIniciar: iniciar,
+        onDetener: detener,
+        onGuardar: guardar,
+        onLimpiar: limpiar,
+        onConfirmarEdicion: confirmarEdicion,
+      }}
+    />
   );
 }
