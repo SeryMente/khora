@@ -23,6 +23,9 @@
 # misc
 .DS_Store
 *.pem
+*.log
+ui-review-export*
+public/downloads/*.zip
 
 # debug
 npm-debug.log*
