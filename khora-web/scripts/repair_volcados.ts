@@ -116,8 +116,8 @@ export async function repairVolcados(opciones?: { dryRun?: boolean; limit?: numb
       if (!dryRun && (v.estado === "archivado" || v.estado === "pendiente_revision" || (v.estado === "en_revision" && totalEnRevisionSinV1 > 0))) {
         try {
           await prepararVolcadoParaRevision(volcadoId, "script_reparador");
-        } catch (e) {
-          console.error(`Error reparando volcado ${volcadoId}:`, e);
+        } catch (e: any) {
+          console.error(`Error reparando volcado ${volcadoId}:`, String(e?.message ?? e));
         }
       }
     }

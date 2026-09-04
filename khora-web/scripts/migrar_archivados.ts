@@ -10,77 +10,127 @@ export async function migrarArchivados(opciones?: { dryRun?: boolean; batchSize?
 
   // Imprimir conteo groupBy(estado) previo
   let conteoPrevio: Record<string, number> = {};
+  let huerfanosV1Previo = 0;
+
   try {
     const countRes = await db.query("SELECT estado, COUNT(*)::int AS n FROM volcado GROUP BY estado ORDER BY estado");
     for (const r of countRes.rows) {
       conteoPrevio[String(r.estado)] = Number(r.n);
     }
+    const huerfanosRes = await db.query(
+      "SELECT COUNT(*)::int AS n FROM volcado v WHERE v.estado = 'en_revision' AND NOT EXISTS (SELECT 1 FROM volcado_version vv WHERE vv.volcado_id = v.id AND vv.version = 1)"
+    );
+    huerfanosV1Previo = Number(huerfanosRes.rows[0]?.n || 0);
+
     console.log("CONTEO DE ESTADOS ANTES:", JSON.stringify(conteoPrevio));
+    console.log("HUÉRFANOS V1 EN REVISIÓN ANTES:", huerfanosV1Previo);
   } catch (err) {
     console.log("CONTEO DE ESTADOS ANTES: pendiente de ejecución por el operador (sin BD conectada)");
   }
 
-  const res = await db.query(
-    "SELECT id, folio, titulo, sha256, texto FROM volcado WHERE estado = 'archivado' ORDER BY recibido_en ASC LIMIT $1",
-    [batchSize]
-  );
-
-  const pendientes = res.rows;
-  console.log(`Encontrados ${pendientes.length} volcados en estado 'archivado' (S_CAPTURA). Dry-run: ${dryRun}`);
-
+  let totalElegibles = 0;
   let procesados = 0;
   let fallidos = 0;
 
-  for (const v of pendientes) {
-    const shaAntes = v.sha256;
-    const textoAntes = v.texto;
+  while (true) {
+    // Buscar filas elegibles: estado 'archivado' o 'en_revision' sin v1
+    const res = await db.query(
+      `SELECT v.id, v.folio, v.estado, v.sha256, v.texto, v.chars
+       FROM volcado v
+       WHERE v.estado = 'archivado'
+          OR (v.estado = 'en_revision' AND NOT EXISTS (SELECT 1 FROM volcado_version vv WHERE vv.volcado_id = v.id AND vv.version = 1))
+       ORDER BY v.recibido_en ASC
+       LIMIT $1`,
+      [batchSize]
+    );
 
-    if (dryRun) {
-      console.log(`[DRY-RUN] Se migraría volcado ID ${v.id} (#${v.folio}) de 'archivado' a 'en_revision'`);
-      procesados++;
-      continue;
+    const pendientes = res.rows;
+    if (pendientes.length === 0) {
+      break;
     }
 
-    try {
-      await prepararVolcadoParaRevision(v.id, "script_migrar_archivados", { onFailure: "keep_captura" });
+    if (totalElegibles === 0) {
+      totalElegibles = pendientes.length;
+    } else {
+      totalElegibles += pendientes.length;
+    }
 
-      // Verificación estricta de inmutabilidad de verbatim / sha256
-      const postRes = await db.query("SELECT estado, sha256, texto FROM volcado WHERE id = $1", [v.id]);
-      const vPost = postRes.rows[0];
+    console.log(`Lote de ${pendientes.length} volcados elegibles. Dry-run: ${dryRun}`);
 
-      if (vPost) {
-        if (vPost.sha256 !== shaAntes || vPost.texto !== textoAntes) {
-          console.error(`❌ ALERTA INTEGRIDAD ROTA en volcado ID ${v.id}: sha256/verbatim alterado`);
-        }
-        if (vPost.estado === "en_revision") {
-          procesados++;
-          console.log(`✓ Migrado volcado ID ${v.id} (#${v.folio}) a 'en_revision'`);
-        } else {
-          fallidos++;
-          console.error(`⚠️ Volcado ID ${v.id} permaneció en '${vPost.estado}' tras intento de preparación`);
-        }
+    for (const v of pendientes) {
+      const shaAntes = String(v.sha256);
+      const textoAntes = String(v.texto);
+      const charsAntes = Number(v.chars);
+
+      if (dryRun) {
+        console.log(`[DRY-RUN] Se procesaría volcado ID ${v.id} (#${v.folio}) estado '${v.estado}'`);
+        procesados++;
+        continue;
       }
-    } catch (e) {
-      fallidos++;
-      console.error(`❌ Error migrando volcado ID ${v.id}:`, e);
+
+      try {
+        await prepararVolcadoParaRevision(v.id, "script_migrar_archivados", { onFailure: "keep_captura" });
+
+        // Verificación estricta de inmutabilidad de verbatim / sha256 / chars
+        const postRes = await db.query("SELECT estado, sha256, texto, chars FROM volcado WHERE id = $1", [v.id]);
+        const vPost = postRes.rows[0];
+
+        if (vPost) {
+          if (String(vPost.sha256) !== shaAntes || String(vPost.texto) !== textoAntes || Number(vPost.chars) !== charsAntes) {
+            fallidos++;
+            console.error(`❌ BARRERA INTEGRIDAD VIOLADA en volcado ID ${v.id}: sha256/texto/chars alterado`);
+            continue;
+          }
+
+          const v1Res = await db.query(
+            "SELECT COUNT(*)::int AS n FROM volcado_version WHERE volcado_id = $1 AND version = 1",
+            [v.id]
+          );
+          const tieneV1 = Number(v1Res.rows[0]?.n || 0) > 0;
+
+          if (vPost.estado === "en_revision" && tieneV1) {
+            procesados++;
+            console.log(`✓ Procesado volcado ID ${v.id} (#${v.folio}) a 'en_revision' con v1`);
+          } else {
+            fallidos++;
+            console.error(`⚠️ Volcado ID ${v.id} no quedó en 'en_revision' con v1 (estado=${vPost.estado}, v1=${tieneV1})`);
+          }
+        }
+      } catch (e: any) {
+        fallidos++;
+        console.error(`❌ Error procesando volcado ID ${v.id}:`, String(e?.message ?? e));
+      }
+    }
+
+    if (dryRun) {
+      // En dry-run no iteramos infinitamente ya que la consulta de la BD devolverá el mismo lote sin mutar
+      break;
     }
   }
 
   // Imprimir conteo groupBy(estado) posterior si no fue dry-run
   let conteoPost: Record<string, number> = {};
+  let huerfanosV1Post = 0;
+
   if (!dryRun) {
     try {
       const countPostRes = await db.query("SELECT estado, COUNT(*)::int AS n FROM volcado GROUP BY estado ORDER BY estado");
       for (const r of countPostRes.rows) {
         conteoPost[String(r.estado)] = Number(r.n);
       }
+      const huerfanosPostRes = await db.query(
+        "SELECT COUNT(*)::int AS n FROM volcado v WHERE v.estado = 'en_revision' AND NOT EXISTS (SELECT 1 FROM volcado_version vv WHERE vv.volcado_id = v.id AND vv.version = 1)"
+      );
+      huerfanosV1Post = Number(huerfanosPostRes.rows[0]?.n || 0);
+
       console.log("CONTEO DE ESTADOS DESPUÉS:", JSON.stringify(conteoPost));
+      console.log("HUÉRFANOS V1 EN REVISIÓN DESPUÉS:", huerfanosV1Post);
     } catch (err) {
       console.log("CONTEO DE ESTADOS DESPUÉS: pendiente de ejecución por el operador (sin BD conectada)");
     }
   }
 
-  return { total: pendientes.length, procesados, fallidos, dryRun, conteoPrevio, conteoPost };
+  return { total: totalElegibles, procesados, fallidos, dryRun, conteoPrevio, conteoPost, huerfanosV1Previo, huerfanosV1Post };
 }
 
 if (require.main === module) {
