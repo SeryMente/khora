@@ -332,8 +332,8 @@ test("Review Entrance & Incident Engine Backend", async (t) => {
 
   await t.test("3, 4, 5. Backfill idempotente, sha256 inmutable y conteo de archivados", async () => {
     const dbState = [
-      { id: "id-1", folio: 1, texto: "Texto 1", sha256: hashTexto("Texto 1"), estado: "archivado" },
-      { id: "id-2", folio: 2, texto: "Texto 2", sha256: hashTexto("Texto 2"), estado: "archivado" },
+      { id: "id-1", folio: 1, texto: "Texto 1", sha256: hashTexto("Texto 1"), chars: 7, estado: "archivado" },
+      { id: "id-2", folio: 2, texto: "Texto 2", sha256: hashTexto("Texto 2"), chars: 7, estado: "archivado" },
     ];
 
     const backfillMockDb = {
@@ -345,13 +345,16 @@ test("Review Entrance & Incident Engine Backend", async (t) => {
           }
           return { rows: Object.entries(counts).map(([estado, n]) => ({ estado, n })) };
         }
-        if (sql.includes("SELECT id, folio, titulo, sha256, texto FROM volcado WHERE estado = 'archivado'")) {
+        if (sql.includes("FROM volcado v") || sql.includes("WHERE v.estado = 'archivado'")) {
           const pendientes = dbState.filter((item) => item.estado === "archivado");
           return { rows: pendientes };
         }
-        if (sql.includes("SELECT estado, sha256, texto FROM volcado WHERE id")) {
+        if (sql.includes("SELECT estado, sha256, texto")) {
           const found = dbState.find((item) => item.id === params[0]);
           return { rows: found ? [found] : [] };
+        }
+        if (sql.includes("FROM volcado_version")) {
+          return { rows: [{ n: 1 }] };
         }
         return { rows: [] };
       },
