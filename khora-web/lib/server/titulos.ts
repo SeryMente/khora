@@ -261,35 +261,41 @@ export function generarTituloFallback(texto: string): TitleGenerationResult {
   const regionMedio = oraciones.slice(Math.floor(n * 0.35), Math.floor(n * 0.70));
   const regionFinal = oraciones.slice(Math.floor(n * 0.70));
 
-  // Ponderar palabras y frases por frecuencia y presencia regional
-  const freqMap = new Map<string, { count: number; regions: Set<string>; sampleSentence: string }>();
+  // Ponderar palabras y frases por frecuencia, presencia regional y términos distintivos
+  const freqMap = new Map<string, { count: number; regions: Set<string>; sampleSentence: string; rawTerm: string }>();
 
   const procesarOracion = (oracion: string, regionName: string) => {
-    const palabras = oracion
+    const palabrasRaw = oracion
       .replace(/[^a-zA-ZáéíóúñÁÉÍÓÚÑ0-9\s]/g, " ")
       .split(/\s+/)
-      .filter((w) => w.length > 2 && !stopwords.has(w.toLowerCase()));
+      .filter((w) => w.length > 2);
 
-    for (let i = 0; i < palabras.length; i++) {
-      const p = palabras[i];
-      const pNorm = p.toLowerCase();
+    for (let i = 0; i < palabrasRaw.length; i++) {
+      const pRaw = palabrasRaw[i];
+      const pNorm = pRaw.toLowerCase();
+      if (stopwords.has(pNorm)) continue;
+
       if (!freqMap.has(pNorm)) {
-        freqMap.set(pNorm, { count: 0, regions: new Set(), sampleSentence: oracion });
+        freqMap.set(pNorm, { count: 0, regions: new Set(), sampleSentence: oracion, rawTerm: pRaw });
       }
       const entry = freqMap.get(pNorm)!;
       entry.count += 1;
       entry.regions.add(regionName);
 
       // Extraer bigramas (frases de 2 palabras)
-      if (i < palabras.length - 1) {
-        const p2 = palabras[i + 1];
-        const bigrama = `${pNorm} ${p2.toLowerCase()}`;
-        if (!freqMap.has(bigrama)) {
-          freqMap.set(bigrama, { count: 0, regions: new Set(), sampleSentence: oracion });
+      if (i < palabrasRaw.length - 1) {
+        const p2Raw = palabrasRaw[i + 1];
+        const p2Norm = p2Raw.toLowerCase();
+        if (!stopwords.has(p2Norm)) {
+          const bigramaNorm = `${pNorm} ${p2Norm}`;
+          const bigramaRaw = `${pRaw} ${p2Raw}`;
+          if (!freqMap.has(bigramaNorm)) {
+            freqMap.set(bigramaNorm, { count: 0, regions: new Set(), sampleSentence: oracion, rawTerm: bigramaRaw });
+          }
+          const bEntry = freqMap.get(bigramaNorm)!;
+          bEntry.count += 1.5; // mayor peso a bigramas
+          bEntry.regions.add(regionName);
         }
-        const bEntry = freqMap.get(bigrama)!;
-        bEntry.count += 1.5; // mayor peso a bigramas
-        bEntry.regions.add(regionName);
       }
     }
   };
@@ -299,7 +305,7 @@ export function generarTituloFallback(texto: string): TitleGenerationResult {
   regionFinal.forEach((o) => procesarOracion(o, "final"));
 
   // Buscar oraciones con indicadores de afirmación/decisión/conclusión
-  const indicadoresClave = /(?:se acordó|se decidió|conclusión|se determinó|se aprobó|propuesta|en resumen|resultado|objetivo|confirmó|migrar|resolver|implementar|decisión|finalmente)/i;
+  const indicadoresClave = /(?:se acordó|se decidió|conclusión|se determinó|se aprobó|propuesta|en resumen|resultado|objetivo|confirmó|migrar|resolver|implementar|decisión|finalmente|ratificación|resolución|especificación|módulo)/i;
 
   let oracionCentral = "";
   let evidenciaCentral = "";
@@ -310,32 +316,50 @@ export function generarTituloFallback(texto: string): TitleGenerationResult {
     oracionCentral = oracionIndicador.trim();
     evidenciaCentral = oracionCentral;
   } else {
-    // 2. Si no hay indicador explícito, tomar la primera oración sustancial de la región final si es relevante o del inicio
-    oracionCentral = (regionFinal[regionFinal.length - 1] || regionInicio[0] || limpio).trim();
-    evidenciaCentral = oracionCentral;
+    // 2. Buscar oraciones que contengan términos distintivos únicos (de baja frecuencia global pero alta especificidad)
+    const oracionesConSustancia = oraciones.filter((o) => o.trim().length > 15);
+    const oracionUnica = oracionesConSustancia.find((o) => {
+      const wList = o.split(/\s+/).filter((w) => w.length > 4 && !stopwords.has(w.toLowerCase()));
+      return wList.some((w) => (freqMap.get(w.toLowerCase())?.count || 0) === 1);
+    });
+
+    if (oracionUnica) {
+      oracionCentral = oracionUnica.trim();
+      evidenciaCentral = oracionCentral;
+    } else {
+      oracionCentral = (regionFinal[regionFinal.length - 1] || regionInicio[0] || limpio).trim();
+      evidenciaCentral = oracionCentral;
+    }
   }
 
-  // Extraer las mejores líneas ideacionales (frases o palabras clave con alta frecuencia y cobertura)
+  // Extraer las mejores líneas ideacionales (frases o palabras clave con alta frecuencia, cobertura o singularidad distintiva)
   const candidatosOrdenados = Array.from(freqMap.entries())
-    .map(([term, data]) => ({
-      term,
-      score: data.count * data.regions.size * (term.includes(" ") ? 1.8 : 1.0),
-      regionsCount: data.regions.size,
-      sampleSentence: data.sampleSentence,
-    }))
+    .map(([term, data]) => {
+      // Si el término aparece con mayúsculas/camello (ej. MóduloXylophone, Dąbrowski, QuantumDąbrowski), dar bonificación de especificidad
+      const esEspecifico = /[A-ZÁÉÍÓÚÑ]/.test(data.rawTerm) || data.rawTerm.length > 8;
+      const bonusEspecificidad = esEspecifico ? 3.0 : 1.0;
+      const score = data.count * data.regions.size * (term.includes(" ") ? 1.8 : 1.0) * bonusEspecificidad;
+
+      return {
+        term,
+        rawTerm: data.rawTerm,
+        score,
+        regionsCount: data.regions.size,
+        sampleSentence: data.sampleSentence,
+      };
+    })
     .sort((a, b) => b.score - a.score);
 
-  // Seleccionar tema central y líneas A, B, C
+  // Seleccionar tema central y líneas A, B, C (hasta 3)
   const lineasSeleccionadas: string[] = [];
   const evidenciasSeleccionadas: string[] = [evidenciaCentral];
 
   for (const cand of candidatosOrdenados) {
     if (lineasSeleccionadas.length >= 3) break;
-    // Capitalizar adecuadamente
-    const terminoFormateado = cand.term
-      .split(" ")
-      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-      .join(" ");
+    // Usar la forma original del término o capitalizar adecuadamente
+    const terminoFormateado = cand.rawTerm.includes(" ")
+      ? cand.rawTerm.split(" ").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")
+      : cand.rawTerm.charAt(0).toUpperCase() + cand.rawTerm.slice(1);
 
     if (!lineasSeleccionadas.some((l) => l.toLowerCase().includes(cand.term.toLowerCase()))) {
       lineasSeleccionadas.push(terminoFormateado);

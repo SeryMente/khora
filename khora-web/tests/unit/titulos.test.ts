@@ -210,4 +210,117 @@ test("Titulos Suite - PROMPT TIT-1A Engine Tests & Golden Cases", async (t) => {
     assert.ok(resTexto.confidence >= 0);
     assert.strictEqual(resTexto.prompt_version, "tit-1a-v1");
   });
+
+  await t.test("A. IDEA-CENTRAL-AL-FINAL: texto con >=14 chunks donde la afirmación central aparece SOLO en el último chunk", async () => {
+    delete process.env.GROQ_API_KEY;
+    const chunksTexto: string[] = [];
+    for (let i = 1; i <= 13; i++) {
+      chunksTexto.push(`Chunk ${i} con discusión sobre aspectos operativos secundarios del proyecto sin tomar decisiones definitivas. `.repeat(15));
+    }
+    const chunkFinal = "En el chunk catorce se aprobó la resolución crucial: implementar la arquitectura QuantumDąbrowski en la nube.";
+    chunksTexto.push(chunkFinal);
+    const textoCompleto = chunksTexto.join("\n\n");
+
+    const res = await generarTituloConGarantia(textoCompleto);
+    const titleNorm = res.title.toLowerCase();
+    assert.ok(
+      titleNorm.includes("quantum") || titleNorm.includes("dabrowski") || titleNorm.includes("catorce"),
+      `El título debe capturar la idea central del último chunk 14 (título obtenido: "${res.title}")`
+    );
+  });
+
+  await t.test("B. IDEA-EN-CHUNK-12: término distintivo inyectado únicamente en el chunk 12", async () => {
+    delete process.env.GROQ_API_KEY;
+    const chunksTexto: string[] = [];
+    for (let i = 1; i <= 14; i++) {
+      if (i === 12) {
+        chunksTexto.push("En esta doceava sección se introduce la especificación MóduloXylophone para el motor de cómputo. ".repeat(10));
+      } else {
+        chunksTexto.push(`Sección ${i} con notas operativas de rutina sin mayor trascendencia. `.repeat(15));
+      }
+    }
+    const textoCompleto = chunksTexto.join("\n\n");
+
+    const res = await generarTituloConGarantia(textoCompleto);
+    const fullTextResult = (res.title + " " + res.ideas.map((i) => i.label).join(" ")).toLowerCase();
+    assert.ok(
+      fullTextResult.includes("xylophone") || fullTextResult.includes("modulo"),
+      `El título o las ideas deben reflejar el término del chunk 12 (obtenido: "${res.title}")`
+    );
+  });
+
+  await t.test("C. TRES-HILOS: texto multihilo con 3 líneas ideacionales claras debe exponer las 3", () => {
+    delete process.env.GROQ_API_KEY;
+    const texto = `
+      Primera línea: Se concretó la migración completa a PostgreSQL.
+      Segunda línea: Se desplegó la integración de modelos con Groq.
+      Tercera línea: Se configuró la seguridad OAuth2 con PKCE.
+    `;
+    const res = generarTituloFallback(texto);
+    assert.ok(res.ideas.length >= 3, `Debe exponer al menos 3 ideas (obtenido: ${res.ideas.length})`);
+    assert.ok(res.ideas.length <= 3, `Máximo 3 ideas (obtenido: ${res.ideas.length})`);
+  });
+
+  await t.test("D. ORACIÓN-CLAVE-TARDÍA: oración decisiva es la 4ª dentro de un bloque", () => {
+    delete process.env.GROQ_API_KEY;
+    const chunkInicial = "Sección inicial introductoria con discusiones generales. ".repeat(20);
+    const chunkDecisivo = "Discusión preliminar. Contexto secundario. Notas de soporte. Oración cuatro decisiva: se aprobó la ratificación del acuerdo estratégico QuantumDąbrowski para la compañía.";
+    const texto = `${chunkInicial}\n\n${chunkDecisivo}`;
+    const res = generarTituloFallback(texto);
+    const combo = (res.title + " " + JSON.stringify(res.ideas) + " " + res.evidence.map((e) => e.text).join(" ")).toLowerCase();
+    assert.ok(
+      combo.includes("quantum") || combo.includes("dabrowski") || combo.includes("acuerdo") || combo.includes("ratificación"),
+      `La 4ª oración decisiva debe ser capturada (obtenido título: "${res.title}")`
+    );
+  });
+
+  await t.test("E. OVERLAP-FRONTERA: bigrama en el límite de chunk aparece íntegro con overlapChars > 0", () => {
+    const pad1 = "Palabra ".repeat(120); // ~960 chars
+    const bigrama = "FronteraAlfa FronteraBeta";
+    const pad2 = " Continuación ".repeat(120);
+    const texto = `${pad1}${bigrama}${pad2}`;
+
+    const maxChars = 1000;
+    const overlapChars = 200;
+    const chunks = segmentarTextoEnChunks(texto, maxChars, overlapChars);
+
+    const contieneBigramaIntegro = chunks.some((c) => c.includes("FronteraAlfa FronteraBeta"));
+    assert.ok(contieneBigramaIntegro, "El bigrama en la frontera debe aparecer íntegro en algún chunk gracias al overlap real");
+  });
+
+  await t.test("F. FALLBACK-DISTRIBUIDO: sin API key sobre texto con inicio genérico y señal al centro/final", () => {
+    delete process.env.GROQ_API_KEY;
+    const inicioGenerico = "Buenas tardes a todos los presentes en la reunión cotidiana de seguimiento. ".repeat(10);
+    const senalCentroFinal = "Se aprobó el presupuesto para el Lanzamiento Satelital Khora. ".repeat(5);
+    const texto = `${inicioGenerico}\n\n${senalCentroFinal}`;
+
+    const res = generarTituloFallback(texto);
+    const titleNorm = res.title.toLowerCase();
+
+    assert.ok(!titleNorm.startsWith("buenas tardes"), `El título NO debe salir de las primeras palabras genéricas (obtenido: "${res.title}")`);
+    assert.ok(
+      titleNorm.includes("lanzamiento") || titleNorm.includes("satelital") || titleNorm.includes("khora") || titleNorm.includes("presupuesto"),
+      `El título debe reflejar la señal del centro/final (obtenido: "${res.title}")`
+    );
+  });
+
+  await t.test("NO-REGRESIÓN: comprobación explícita de no truncamiento sobre chunks 11/12", async () => {
+    delete process.env.GROQ_API_KEY;
+    const chunksTexto: string[] = [];
+    for (let i = 1; i <= 12; i++) {
+      if (i === 11) {
+        chunksTexto.push("En el bloque once se aprobó la resolución MarcadorUnicoChunk11 para la plataforma. ".repeat(15));
+      } else {
+        chunksTexto.push(`Texto repetitivo genérico del bloque ${i} con notas de rutina sin mayor trascendencia. `.repeat(15));
+      }
+    }
+    const texto = chunksTexto.join("\n\n");
+    const res = await generarTituloConGarantia(texto);
+    const combo = (res.title + " " + JSON.stringify(res.ideas) + " " + res.evidence.map((e) => e.text).join(" ")).toLowerCase();
+
+    assert.ok(
+      combo.includes("marcadorunicochunk11"),
+      `El pipeline debe procesar los chunks pasados del 10º (obtenido título: "${res.title}")`
+    );
+  });
 });
