@@ -7,7 +7,7 @@ export interface SustitucionTildeSegura {
   regla: string;
 }
 
-const FORMAS_OBLIGATORIAS_INEQUIVOCAS: Record<string, string> = {
+export const FORMAS_OBLIGATORIAS_INEQUIVOCAS: Record<string, string> = {
   tambien: "también",
   segun: "según",
   seccion: "sección",
@@ -32,7 +32,7 @@ const FORMAS_OBLIGATORIAS_INEQUIVOCAS: Record<string, string> = {
 };
 
 // Formas ambiguas que NUNCA deben autoaplicarse sin intervención del operador
-const FORMAS_AMBIGUAS_RESERVADAS = new Set([
+export const FORMAS_AMBIGUAS_RESERVADAS = new Set([
   "mas", "mas", "esta", "esta", "si", "el", "tu", "de", "se", "aun",
   "termino", "termino", "solo", "solo"
 ]);
