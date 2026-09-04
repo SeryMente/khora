@@ -5,12 +5,11 @@ Verifica driver espía de cero escrituras en proponer, ratificación, transacci�
 rollback, idempotencia y rechazo de propuestas no ratificadas.
 """
 
+import uuid
 from dataclasses import asdict
 from datetime import datetime, timezone
-import uuid
-import pytest
 
-from khora_kernel.contracts.proposal import item_to_canonical_dict
+import pytest
 
 from khora_kernel.api import (
     ObjetoDeInformacion,
@@ -22,6 +21,7 @@ from khora_kernel.api import (
 )
 from khora_kernel.contracts.proposal import (
     ProposalEnvelope,
+    item_to_canonical_dict,
     validate_proposal_envelope,
 )
 from khora_kernel.poblacion import (
@@ -210,9 +210,6 @@ def test_asentar_exitoso_tras_ratificacion_y_transaccion_unica():
     assert acta.triples_escritos > 0
     assert len(memoria.entidades) > 0
     assert len(memoria.asentamientos) == 1
-
-
-test_rollback_en_transaccion_unica_si_falla_constraint = None
 
 
 def test_rollback_en_transaccion_unica_si_falla_constraint():

@@ -5,13 +5,12 @@ Define los esquemas y validadores para la zona derivada y la zona de juicio.
 Cumple estrictamente con ADR-010 y check_stdlib_only.py (solo stdlib).
 """
 
-from dataclasses import dataclass, field, asdict
-from datetime import datetime
 import hashlib
 import json
 import re
-from typing import Any, Dict, List, Optional, Tuple, Union
 import uuid
+from dataclasses import asdict, dataclass, field
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 CURRENT_SCHEMA_VERSION = "1.0.0"
 KHORA_PROPOSAL_NAMESPACE = uuid.UUID("6ba7b810-9dad-11d1-80b4-00c04fd430c8")

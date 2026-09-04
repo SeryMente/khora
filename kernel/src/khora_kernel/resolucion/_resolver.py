@@ -5,7 +5,7 @@ import os
 import re
 import unicodedata
 from collections import defaultdict
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any, List, Optional
 
 from khora_kernel.api import PuertoEmbeddings, PuertoLLM, Triple
@@ -129,11 +129,12 @@ def resolver(
                     best_cand_key = cand_key
 
             cand_review = not (cand_key == canonical)
+            cand_key_str = str(cand_key or canonical)
             candidates_list.append(
                 ResolutionCandidate(
-                    canonical_key=cand_key,
+                    canonical_key=cand_key_str,
                     score=float(score),
-                    label=str(cand_label),
+                    label=str(cand_label or cand_key_str),
                     needs_review=cand_review,
                 )
             )
@@ -155,10 +156,12 @@ def resolver(
             needs_review = False
             chosen_canonical = canonical
 
+        chosen_canonical_str = str(chosen_canonical or canonical)
+
         if not candidates_list:
             candidates_list.append(
                 ResolutionCandidate(
-                    canonical_key=chosen_canonical,
+                    canonical_key=chosen_canonical_str,
                     score=1.0,
                     label=crudo_id,
                     needs_review=needs_review,
@@ -167,14 +170,14 @@ def resolver(
 
         entidades_resolucion[crudo_id] = EntidadResolucion(
             raw_label=crudo_id,
-            canonical_key=chosen_canonical,
+            canonical_key=chosen_canonical_str,
             decision=decision,
             needs_review=needs_review,
             candidates=candidates_list,
             embedding=vec_nuevo,
             provenance_context=str(descripcion_lista),
         )
-        mapeo_claves[crudo_id] = chosen_canonical
+        mapeo_claves[crudo_id] = chosen_canonical_str
 
     triples_resueltos: list[Triple] = []
     for t in triples:

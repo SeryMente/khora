@@ -1,6 +1,6 @@
 from khora_kernel.contracts.proposal import (
-    Anchor,
     CURRENT_SCHEMA_VERSION,
+    Anchor,
     Judgment,
     ProposalEnvelope,
     ProposalItem,
