@@ -368,6 +368,8 @@ if (
 if (sql.includes("volcado_version")) {
   return { rows: [{ n: 1, version: 1 }] };
 }
+// La condición anterior para "volcado_version" ya cubre este caso.
+
         return { rows: [] };
       },
       connect: async () => ({
