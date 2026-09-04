@@ -55,7 +55,7 @@ let dbQueriesLogged: { sql: string; params?: any[] }[] = [];
 
   // 3. UPDATE/INSERT queries
   return { rows: [] };
-}) as any;
+};
 
 import { POST } from "../../app/api/ingesta/route";
 import { sha256de } from "../../lib/server/correcciones";

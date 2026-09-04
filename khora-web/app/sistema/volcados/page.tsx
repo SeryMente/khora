@@ -149,7 +149,14 @@ export default function VolcadosPage() {
   const [currentTimeMs, setCurrentTimeMs] = useState<number>(0);
   const [palabrasTiming, setPalabrasTiming] = useState<PalabraTiming[]>([]);
   const [activePalabraIdx, setActivePalabraIdx] = useState<number | null>(null);
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [audioError, setAudioError] = useState<string | null>(null);
+
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const pendingSeekOffsetRef = useRef<number | null>(null);
+  const pendingPlayRef = useRef<boolean>(false);
+
+  const duracionTotalMs = manifiestoPartes.reduce((acc, p) => acc + (p.duracion_ms || 0), 0);
 
   // Findings Navigation states
   const [hallazgos, setHallazgos] = useState<Hallazgo[]>([]);
@@ -284,11 +291,181 @@ export default function VolcadosPage() {
     }
   };
 
+  // Helper to format ms to MM:SS
+  const formatMs = (ms: number): string => {
+    if (!ms || isNaN(ms) || ms < 0) return "00:00";
+    const totalSeconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+  };
+
+  // Resolve global time to target part and local offset
+  const resolveGlobalTime = (targetMs: number) => {
+    if (manifiestoPartes.length === 0) {
+      return { targetPartIndex: 1, targetParte: null, localOffsetSec: 0 };
+    }
+    let targetParte = manifiestoPartes.find((p) => targetMs >= p.start_ms && targetMs <= p.end_ms);
+    if (!targetParte) {
+      if (targetMs < manifiestoPartes[0].start_ms) {
+        targetParte = manifiestoPartes[0];
+      } else {
+        targetParte = manifiestoPartes[manifiestoPartes.length - 1];
+      }
+    }
+    const rawOffsetSec = (targetMs - targetParte.start_ms) / 1000;
+    const maxOffsetSec = (targetParte.end_ms - targetParte.start_ms) / 1000;
+    const localOffsetSec = Math.max(0, Math.min(rawOffsetSec, maxOffsetSec));
+    return { targetPartIndex: targetParte.part_index, targetParte, localOffsetSec };
+  };
+
+  // Global seek handler
+  const handleGlobalSeek = (targetGlobalMs: number) => {
+    if (manifiestoPartes.length === 0) return;
+    const clampedTargetMs = Math.max(0, Math.min(targetGlobalMs, duracionTotalMs));
+    const { targetPartIndex, targetParte, localOffsetSec } = resolveGlobalTime(clampedTargetMs);
+
+    setAudioError(null);
+    setCurrentTimeMs(clampedTargetMs);
+
+    if (targetPartIndex !== currentPartIndex && targetParte) {
+      setCurrentPartIndex(targetPartIndex);
+      setAudioSourceUrl(targetParte.download_path);
+      pendingSeekOffsetRef.current = localOffsetSec;
+      pendingPlayRef.current = isPlaying || true;
+    } else if (audioRef.current) {
+      audioRef.current.currentTime = localOffsetSec;
+      if (isPlaying) {
+        audioRef.current.play().catch((err) => {
+          setAudioError("Error al reproducir audio: " + err.message);
+        });
+      }
+    }
+  };
+
+  const handleTimeUpdate = () => {
+    if (!audioRef.current) return;
+    const localSec = audioRef.current.currentTime || 0;
+    const currentPart = manifiestoPartes.find((p) => p.part_index === currentPartIndex);
+    const startMs = currentPart ? currentPart.start_ms : 0;
+    const globalTime = startMs + Math.floor(localSec * 1000);
+
+    setCurrentTimeMs(globalTime);
+
+    if (palabrasTiming.length > 0) {
+      const idx = palabrasTiming.findIndex((w) => globalTime >= w.start_ms && globalTime <= w.end_ms);
+      setActivePalabraIdx(idx !== -1 ? idx : null);
+    }
+  };
+
+  const handlePartEnded = () => {
+    if (manifiestoPartes.length === 0) {
+      setIsPlaying(false);
+      return;
+    }
+    const currentPart = manifiestoPartes.find((p) => p.part_index === currentPartIndex);
+    const nextPart = manifiestoPartes.find((p) => p.part_index === currentPartIndex + 1);
+
+    if (!nextPart) {
+      setIsPlaying(false);
+      setCurrentTimeMs(duracionTotalMs);
+      return;
+    }
+
+    if (currentPart) {
+      const gapMs = nextPart.start_ms - currentPart.end_ms;
+      if (gapMs > 1000) {
+        setAudioError(
+          `Hueco detectado entre Parte ${currentPart.part_index} y Parte ${nextPart.part_index} (${Math.round(gapMs)} ms). Reproducción detenida.`
+        );
+        setIsPlaying(false);
+        return;
+      }
+    }
+
+    if (nextPart.bytes <= 0) {
+      setAudioError(`Parte ${nextPart.part_index} no contiene datos de audio (0 bytes). Reproducción detenida.`);
+      setIsPlaying(false);
+      return;
+    }
+
+    setCurrentPartIndex(nextPart.part_index);
+    setAudioSourceUrl(nextPart.download_path);
+    pendingSeekOffsetRef.current = 0;
+    pendingPlayRef.current = isPlaying;
+  };
+
+  const handleCanPlay = () => {
+    if (!audioRef.current) return;
+    if (pendingSeekOffsetRef.current !== null) {
+      audioRef.current.currentTime = pendingSeekOffsetRef.current;
+      pendingSeekOffsetRef.current = null;
+    }
+    if (pendingPlayRef.current) {
+      pendingPlayRef.current = false;
+      audioRef.current
+        .play()
+        .then(() => setIsPlaying(true))
+        .catch((err) => {
+          setAudioError("Error al iniciar reproducción: " + err.message);
+          setIsPlaying(false);
+        });
+    }
+  };
+
+  const handleAudioError = () => {
+    setIsPlaying(false);
+    setAudioError(`Error al cargar la parte ${currentPartIndex} de audio (404, 423, 416 o error de red).`);
+  };
+
+  const togglePlayPause = () => {
+    if (!audioRef.current) return;
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      setAudioError(null);
+      audioRef.current
+        .play()
+        .then(() => setIsPlaying(true))
+        .catch((err) => {
+          setAudioError("Error al iniciar reproducción: " + err.message);
+          setIsPlaying(false);
+        });
+    }
+  };
+
+  const handleManualPartChange = (targetIndex: number) => {
+    const targetPart = manifiestoPartes.find((p) => p.part_index === targetIndex);
+    if (!targetPart) return;
+    setAudioError(null);
+    setCurrentPartIndex(targetIndex);
+    setAudioSourceUrl(targetPart.download_path);
+    setCurrentTimeMs(targetPart.start_ms);
+    pendingSeekOffsetRef.current = 0;
+    pendingPlayRef.current = isPlaying;
+  };
+
   // Handle volcado selection
   const selectVolcadoItem = async (id: string, skipMobileToggle?: boolean) => {
     setSelectedId(id);
     setIngestaResult(null);
     setDrawerSubTab("cockpit");
+
+    // Clean audio state reset
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+    setIsPlaying(false);
+    setCurrentPartIndex(1);
+    setCurrentTimeMs(0);
+    setAudioError(null);
+    setPalabrasTiming([]);
+    setActivePalabraIdx(null);
+    pendingSeekOffsetRef.current = null;
+    pendingPlayRef.current = false;
+
     if (!skipMobileToggle) {
       setMobileShowDetail(true);
     }
@@ -624,6 +801,38 @@ export default function VolcadosPage() {
 
   // Render highlighted prose text securely without dangerouslySetInnerHTML
   const renderProseConResalte = (textoFuente: string, hallazgoActual?: Hallazgo) => {
+    if (palabrasTiming.length > 0) {
+      return (
+        <div className="font-serif leading-relaxed text-base flex flex-wrap gap-x-1.5 gap-y-1">
+          {palabrasTiming.map((item, idx) => {
+            const isActive = activePalabraIdx === idx || (currentTimeMs >= item.start_ms && currentTimeMs <= item.end_ms);
+            const isHallazgo =
+              hallazgoActual &&
+              hallazgoActual.posicion.inicio !== undefined &&
+              item.char_inicio >= hallazgoActual.posicion.inicio &&
+              item.char_fin <= hallazgoActual.posicion.fin;
+
+            return (
+              <span
+                key={idx}
+                onClick={() => handleGlobalSeek(item.start_ms)}
+                title={`${formatMs(item.start_ms)} - ${formatMs(item.end_ms)} (clic para ir a marca)`}
+                className={`cursor-pointer transition-colors px-0.5 rounded ${
+                  isActive
+                    ? "bg-amber-400 text-zinc-950 font-bold ring-1 ring-amber-300"
+                    : isHallazgo
+                    ? "bg-amber-400/30 text-amber-200 underline decoration-amber-400"
+                    : "hover:bg-zinc-800 hover:text-amber-300"
+                }`}
+              >
+                {item.palabra}
+              </span>
+            );
+          })}
+        </div>
+      );
+    }
+
     if (!hallazgoActual || hallazgoActual.posicion.inicio === undefined) {
       return <span>{textoFuente}</span>;
     }
@@ -1063,53 +1272,87 @@ export default function VolcadosPage() {
                       <div className="p-3 border bg-zinc-900 border-zinc-800 space-y-2">
                         <div className="flex justify-between items-center text-xs font-mono">
                           <span className="font-bold flex items-center gap-1">
-                            <Icons.Volume2 size={14} /> Reproductor de Audio (Parte {currentPartIndex} / {manifiestoPartes.length || 1})
+                            <Icons.Volume2 size={14} /> Reproductor Continuo (Parte {currentPartIndex} / {manifiestoPartes.length || 1})
                           </span>
                           {renderAudioStatusBadge(selectedItem.audio_status)}
                         </div>
 
+                        {audioError && (
+                          <div className="p-2 border border-red-500/50 bg-red-950/30 text-xs font-mono text-red-300 flex justify-between items-center">
+                            <span>⚠️ {audioError}</span>
+                            <button onClick={() => setAudioError(null)} className="text-[10px] underline hover:text-red-200">
+                              Descartar
+                            </button>
+                          </div>
+                        )}
+
                         {selectedItem.audio_status !== "no_recuperable" && selectedItem.audio_status !== "no_aplica" ? (
-                          <div className="space-y-2">
+                          <div className="space-y-3">
+                            {/* Main Global Progress & Audio Controls */}
+                            <div className="flex items-center gap-3">
+                              <button
+                                onClick={togglePlayPause}
+                                className="p-2 border border-amber-500/50 bg-amber-950/30 hover:bg-amber-900/50 text-amber-400 font-bold text-xs flex items-center gap-1 cursor-pointer shrink-0"
+                              >
+                                {isPlaying ? <Icons.Pause size={14} /> : <Icons.Play size={14} />}
+                                {isPlaying ? "Pausar" : "Reproducir"}
+                              </button>
+
+                              {/* Global Time Display */}
+                              <span className="text-xs font-mono text-zinc-300 shrink-0">
+                                {formatMs(currentTimeMs)} / {formatMs(duracionTotalMs)}
+                              </span>
+
+                              {/* Global Seek Slider */}
+                              <input
+                                type="range"
+                                min={0}
+                                max={duracionTotalMs || 100}
+                                value={currentTimeMs}
+                                onChange={(e) => handleGlobalSeek(Number(e.target.value))}
+                                className="w-full accent-amber-400 cursor-pointer h-1.5 bg-zinc-700 rounded-none"
+                              />
+                            </div>
+
+                            {/* Native audio element */}
                             <audio
                               ref={audioRef}
                               src={audioSourceUrl}
-                              controls
+                              onPlay={() => setIsPlaying(true)}
+                              onPause={() => setIsPlaying(false)}
+                              onTimeUpdate={handleTimeUpdate}
+                              onEnded={handlePartEnded}
+                              onError={handleAudioError}
+                              onCanPlay={handleCanPlay}
                               preload="metadata"
                               className="w-full h-8"
                             />
-                            {manifiestoPartes.length > 1 && (
-                              <div className="flex justify-between items-center text-xs font-mono">
-                                <button
-                                  disabled={currentPartIndex <= 1}
-                                  onClick={() => {
-                                    const nextIdx = currentPartIndex - 1;
-                                    setCurrentPartIndex(nextIdx);
-                                    if (manifiestoPartes[nextIdx - 1]) {
-                                      setAudioSourceUrl(manifiestoPartes[nextIdx - 1].download_path);
-                                    }
-                                  }}
-                                  className="px-2 py-1 border border-zinc-700 hover:bg-zinc-800 disabled:opacity-40"
-                                >
-                                  Parte anterior
-                                </button>
-                                <span>Parte {currentPartIndex} de {manifiestoPartes.length}</span>
-                                <button
-                                  disabled={currentPartIndex >= manifiestoPartes.length}
-                                  onClick={() => {
-                                    const nextIdx = currentPartIndex + 1;
-                                    setCurrentPartIndex(nextIdx);
-                                    if (manifiestoPartes[nextIdx - 1]) {
-                                      setAudioSourceUrl(manifiestoPartes[nextIdx - 1].download_path);
-                                    }
-                                  }}
-                                  className="px-2 py-1 border border-zinc-700 hover:bg-zinc-800 disabled:opacity-40"
-                                >
-                                  Parte siguiente
-                                </button>
-                              </div>
-                            )}
+
+                            {/* Manual Part Switching Controls */}
+                            <div className="flex justify-between items-center text-xs font-mono pt-1 border-t border-zinc-800">
+                              <button
+                                disabled={currentPartIndex <= 1}
+                                onClick={() => handleManualPartChange(currentPartIndex - 1)}
+                                className="px-2 py-1 border border-zinc-700 hover:bg-zinc-800 disabled:opacity-40 cursor-pointer"
+                              >
+                                Parte anterior
+                              </button>
+                              <span className="opacity-80">
+                                Parte {currentPartIndex} de {manifiestoPartes.length || 1}
+                              </span>
+                              <button
+                                disabled={currentPartIndex >= manifiestoPartes.length}
+                                onClick={() => handleManualPartChange(currentPartIndex + 1)}
+                                className="px-2 py-1 border border-zinc-700 hover:bg-zinc-800 disabled:opacity-40 cursor-pointer"
+                              >
+                                Parte siguiente
+                              </button>
+                            </div>
+
                             <div className="text-[11px] font-mono text-zinc-400">
-                              {palabrasTiming.length > 0 ? `Sincronizado (${palabrasTiming.length} marcas)` : "sin marcas temporales"}
+                              {palabrasTiming.length > 0
+                                ? `Sincronizado (${palabrasTiming.length} marcas de tiempo · Clic en palabras para ir a marca)`
+                                : "Sin marcas de tiempo (desplazamiento continuo por audio)"}
                             </div>
                           </div>
                         ) : (
