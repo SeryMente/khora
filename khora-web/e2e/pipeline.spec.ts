@@ -196,7 +196,7 @@ test.describe("Pipeline Control Tower E2E Tests", () => {
       const url = route.request().url();
       const method = route.request().method();
 
-      if (url.includes("/delta") || url.includes("/sugerencias")) {
+      if (url.includes("/delta") || url.includes("/sugerencias") || url.includes("/propuestas")) {
         return route.fallback();
       }
 
