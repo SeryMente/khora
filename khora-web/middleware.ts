@@ -1,4 +1,4 @@
-// @l0 L0-002 §4 · @req AUTH-F1-01/REQ-1 · @acr ACR-1.2
+// @l0 L0-002 §4 · @req AUTH-F1-01/REQ-1 · @acr ACR-1.2 · @req UI-REVIEW/SECURITY
 import { auth } from "@/auth";
 import { NextResponse } from "next/server";
 
@@ -9,23 +9,32 @@ export const config = {
 };
 
 export default auth((req) => {
-  if (req.nextUrl.pathname === "/sistema/entorno-persistente") {
+  const pathname = req.nextUrl.pathname;
+
+  // Fail-closed security for /ui-review
+  if (pathname.startsWith("/ui-review")) {
+    if (process.env.KHORA_UI_REVIEW_MODE !== "1") {
+      return NextResponse.json({ error: "Not Found" }, { status: 404 });
+    }
+    return NextResponse.next();
+  }
+
+  if (pathname === "/sistema/entorno-persistente") {
     return NextResponse.redirect(new URL("/sistema/seguridad#entorno-persistente", req.nextUrl.origin), 308);
   }
 
-  // Skip auth checks when running Playwright E2E tests
+  // Skip auth checks when running Playwright E2E tests internally
   if (process.env.PLAYWRIGHT_TEST_RUN === '1' || process.env.PLAYWRIGHT_TEST_BYPASS === 'true') {
     return NextResponse.next();
   }
 
   // auth() makes the token available on req.auth
   if (!req.auth) {
-    if (req.nextUrl.pathname.startsWith('/api/')) {
+    if (pathname.startsWith('/api/')) {
       return NextResponse.json({ error: "Auth required" }, { status: 401 });
     }
 
     // For UI routes, redirect to Next-Auth's default sign-in flow (which will trigger OIDC).
-    // The signIn flow redirects to /api/auth/signin which is excluded in the matcher.
     const url = new URL("/api/auth/signin", req.nextUrl.origin);
     url.searchParams.set("callbackUrl", req.nextUrl.pathname + req.nextUrl.search);
     return NextResponse.redirect(url);
