@@ -1,0 +1,309 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://khora.io/schemas/capture.schema.json",
+  "title": "CaptureContract",
+  "description": "Contrato de captura sin pérdida y autoobservación para Khora (CAP-0). Congela la máquina de estados, el diario de captura y el envelope de telemetría.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "states",
+    "transitions",
+    "transient_timeouts"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^1\\.[0-9]+\\.[0-9]+$",
+      "description": "Versión del esquema de contrato (1.x.x)."
+    },
+    "states": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "idle",
+          "starting",
+          "recording",
+          "pausing",
+          "paused",
+          "resuming",
+          "stopping",
+          "finalizing",
+          "complete",
+          "degraded",
+          "failed"
+        ]
+      },
+      "uniqueItems": true,
+      "description": "Lista exhaustiva de 11 estados permitidos en la máquina de estados de captura."
+    },
+    "transitions": {
+      "type": "object",
+      "description": "Matriz de transiciones permitidas por cada estado.",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "transient_timeouts": {
+      "type": "object",
+      "description": "Timeouts máximos en milisegundos y destinos de fallback para estados transitorios.",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["timeout_ms", "fallback_state"],
+        "properties": {
+          "timeout_ms": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "fallback_state": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "CaptureState": {
+      "type": "string",
+      "enum": [
+        "idle",
+        "starting",
+        "recording",
+        "pausing",
+        "paused",
+        "resuming",
+        "stopping",
+        "finalizing",
+        "complete",
+        "degraded",
+        "failed"
+      ]
+    },
+    "SourceTriplet": {
+      "type": "object",
+      "required": ["volcado_id", "version", "sha256"],
+      "properties": {
+        "volcado_id": {
+          "type": "string",
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-fA-F]{64}$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "CaptureJournalEntry": {
+      "type": "object",
+      "description": "Entrada individual del Diario de Captura sin pérdida.",
+      "required": [
+        "session_id",
+        "capture_epoch",
+        "recognition_epoch",
+        "sequence",
+        "result_index",
+        "tipo",
+        "texto",
+        "client_time",
+        "audio_part_index",
+        "recorder_epoch",
+        "start_ms",
+        "end_ms",
+        "bytes",
+        "sha256",
+        "upload_state",
+        "retry_count"
+      ],
+      "properties": {
+        "session_id": {
+          "type": "string",
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+        },
+        "capture_epoch": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "recognition_epoch": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "result_index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "tipo": {
+          "type": "string",
+          "enum": ["interim_snapshot", "final"]
+        },
+        "texto": {
+          "type": "string"
+        },
+        "client_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "audio_part_index": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "recorder_epoch": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "start_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "end_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^([0-9a-fA-F]{64})?$"
+        },
+        "upload_state": {
+          "type": "string",
+          "enum": ["pending", "uploaded", "ack_received", "failed"]
+        },
+        "ack_time": {
+          "oneOf": [
+            { "type": "null" },
+            { "type": "string", "format": "date-time" }
+          ]
+        },
+        "retry_count": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "ObservationEnvelope": {
+      "type": "object",
+      "description": "Envelope de Autoobservación y Telemetría. PROHÍBE texto/audio crudo.",
+      "required": [
+        "schema_version",
+        "event_uuid",
+        "event_name",
+        "phase",
+        "severity",
+        "outcome",
+        "component",
+        "correlation_id",
+        "causation_id",
+        "attempt_id",
+        "sequence",
+        "session_id",
+        "client_time",
+        "server_time",
+        "duration_ms",
+        "metrics",
+        "reason_code",
+        "privacy_class"
+      ],
+      "properties": {
+        "schema_version": {
+          "type": "string",
+          "pattern": "^1\\.[0-9]+\\.[0-9]+$"
+        },
+        "event_uuid": {
+          "type": "string",
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+        },
+        "event_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "phase": {
+          "type": "string",
+          "minLength": 1
+        },
+        "severity": {
+          "type": "string",
+          "enum": ["info", "warning", "error", "critical"]
+        },
+        "outcome": {
+          "type": "string",
+          "enum": ["success", "failure", "degraded"]
+        },
+        "component": {
+          "type": "string",
+          "minLength": 1
+        },
+        "correlation_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "causation_id": {
+          "oneOf": [
+            { "type": "null" },
+            { "type": "string", "minLength": 1 }
+          ]
+        },
+        "attempt_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "session_id": {
+          "type": "string",
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+        },
+        "terna": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/SourceTriplet" }
+          ]
+        },
+        "client_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "server_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "duration_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "metrics": {
+          "type": "object",
+          "additionalProperties": {
+            "type": ["number", "boolean", "string"]
+          }
+        },
+        "reason_code": {
+          "type": "string"
+        },
+        "privacy_class": {
+          "type": "string",
+          "enum": ["public", "internal", "confidential", "telemetry_only"]
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
