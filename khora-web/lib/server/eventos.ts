@@ -79,6 +79,23 @@ export interface EventoSistema {
   privacy_class?: string | null;
 }
 
+export type StorageDiagnosticCode =
+  | "READY"
+  | "DB_UNREACHABLE"
+  | "EVENT_SCHEMA_MISSING"
+  | "EVENT_SCHEMA_OUTDATED"
+  | "EVENT_STORE_FORBIDDEN"
+  | "UNKNOWN";
+
+export interface StorageDiagnosticResult {
+  ready: boolean;
+  reason_code: StorageDiagnosticCode;
+  retryable: boolean;
+  schema_version_expected: string;
+  schema_version_detected: string | null;
+  correlation_id: string;
+}
+
 const FASES_VALIDAS = new Set<FaseEvento>([
   "dictado",
   "transcripcion",
@@ -124,6 +141,132 @@ export function validarEventId(fase: FaseEvento, eventId: string): boolean {
   const prefijoEsperado = PREFIJOS_FASE[fase];
   const regex = new RegExp(`^${prefijoEsperado}-[0-9]{3}$`);
   return regex.test(eventId);
+}
+
+/**
+ * Comprobación acotada READ-ONLY del almacén de eventos.
+ * Verifica conexión, existencia de tabla, columnas obligatorias y permisos sin mutar la BD.
+ */
+export async function diagnosticarEstadoAlmacen(correlacionId?: string): Promise<StorageDiagnosticResult> {
+  const correlation_id = correlacionId || randomUUID();
+  const schema_version_expected = "1.1";
+
+  let db;
+  try {
+    db = getDb();
+  } catch {
+    return {
+      ready: false,
+      reason_code: "DB_UNREACHABLE",
+      retryable: true,
+      schema_version_expected,
+      schema_version_detected: null,
+      correlation_id,
+    };
+  }
+
+  try {
+    await db.query("SELECT 1");
+  } catch (err: any) {
+    if (err?.code === "42501") {
+      return {
+        ready: false,
+        reason_code: "EVENT_STORE_FORBIDDEN",
+        retryable: false,
+        schema_version_expected,
+        schema_version_detected: null,
+        correlation_id,
+      };
+    }
+    return {
+      ready: false,
+      reason_code: "DB_UNREACHABLE",
+      retryable: true,
+      schema_version_expected,
+      schema_version_detected: null,
+      correlation_id,
+    };
+  }
+
+  try {
+    const tableRes = await db.query(
+      `SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'eventos_sistema'`
+    );
+    if (!tableRes.rows || tableRes.rows.length === 0) {
+      return {
+        ready: false,
+        reason_code: "EVENT_SCHEMA_MISSING",
+        retryable: false,
+        schema_version_expected,
+        schema_version_detected: "none",
+        correlation_id,
+      };
+    }
+
+    const colsRes = await db.query(
+      `SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'eventos_sistema'`
+    );
+    const cols = new Set((colsRes.rows || []).map((r: any) => String(r.column_name).toLowerCase()));
+
+    const requiredObs1Cols = [
+      "event_uuid",
+      "idempotency_key",
+      "schema_version",
+      "outcome",
+      "component",
+      "causation_id",
+      "attempt_id",
+      "sequence",
+      "session_id",
+      "release_sha",
+      "duration_ms",
+      "metrics",
+      "reason_code",
+      "privacy_class",
+    ];
+
+    const missingCols = requiredObs1Cols.filter((col) => !cols.has(col));
+    if (missingCols.length > 0) {
+      return {
+        ready: false,
+        reason_code: "EVENT_SCHEMA_OUTDATED",
+        retryable: false,
+        schema_version_expected,
+        schema_version_detected: "1.0",
+        correlation_id,
+      };
+    }
+
+    await db.query(`SELECT id FROM eventos_sistema LIMIT 1`);
+
+    return {
+      ready: true,
+      reason_code: "READY",
+      retryable: false,
+      schema_version_expected,
+      schema_version_detected: "1.1",
+      correlation_id,
+    };
+  } catch (err: any) {
+    if (err?.code === "42501") {
+      return {
+        ready: false,
+        reason_code: "EVENT_STORE_FORBIDDEN",
+        retryable: false,
+        schema_version_expected,
+        schema_version_detected: null,
+        correlation_id,
+      };
+    }
+    return {
+      ready: false,
+      reason_code: "UNKNOWN",
+      retryable: true,
+      schema_version_expected,
+      schema_version_detected: null,
+      correlation_id,
+    };
+  }
 }
 
 const DDL_EVENTOS_SISTEMA = [
@@ -181,6 +324,9 @@ const DDL_EVENTOS_SISTEMA = [
 
 let tablaEventosLista = false;
 
+/**
+ * DEPRECATED: DDL helper para entorno de pruebas. NUNCA invocar durante peticiones HTTP.
+ */
 export async function asegurarTablaEventosSistema(): Promise<void> {
   if (tablaEventosLista) return;
   const db = getDb();
@@ -229,7 +375,6 @@ export async function registrarEventosBatch(
   items: (RegistrarEventoParams | ObservationEnvelope)[],
   batchIdempotencyKey?: string | null
 ): Promise<IngestBatchResult> {
-  await asegurarTablaEventosSistema();
   const db = getDb();
 
   const response: IngestBatchResult = {
@@ -242,7 +387,6 @@ export async function registrarEventosBatch(
   for (let idx = 0; idx < items.length; idx++) {
     const raw = items[idx];
 
-    // Map ObservationEnvelope or RegistrarEventoParams to unified format
     let params: RegistrarEventoParams;
     if ("event_uuid" in raw && "event_name" in raw) {
       const obs = raw as ObservationEnvelope;
@@ -257,13 +401,11 @@ export async function registrarEventosBatch(
         continue;
       }
 
-      // Convert phase to valid FaseEvento
       let faseMapped: FaseEvento = "captura";
       if (FASES_VALIDAS.has(obs.phase as FaseEvento)) {
         faseMapped = obs.phase as FaseEvento;
       }
 
-      // Format eventId as e.g. CAP-001 or DIC-001
       const prefijo = PREFIJOS_FASE[faseMapped] || "CAP";
       const eventIdFormatted = `${prefijo}-${String((obs.sequence || idx + 1) % 1000).padStart(3, "0")}`;
 
@@ -315,13 +457,11 @@ export async function registrarEventosBatch(
     try {
       await client.query("BEGIN");
 
-      // Advisory lock based on correlation_id to prevent hash chain concurrency races
       const lockKey = Math.abs(
         correlacionId.split("-").reduce((acc, part) => acc ^ parseInt(part.slice(0, 8), 16), 0)
       );
       await client.query("SELECT pg_advisory_xact_lock($1)", [lockKey]);
 
-      // Check for deduplication by event_uuid or idempotency_key
       const dupCheck = await client.query(
         `SELECT id FROM eventos_sistema WHERE event_uuid = $1 OR (idempotency_key IS NOT NULL AND idempotency_key = $2) LIMIT 1`,
         [eventUuid, idempotencyKey]
@@ -338,7 +478,6 @@ export async function registrarEventosBatch(
         continue;
       }
 
-      // Chain Hash per correlation_id
       const lastRes = await client.query(
         `SELECT event_hash FROM eventos_sistema
          WHERE correlacion_id = $1
@@ -428,7 +567,6 @@ export async function registrarEventosBatch(
       await client.query("ROLLBACK");
       console.error("[registrarEventosBatch] Error registrando evento, mandando a Outbox:", err);
 
-      // Save to outbox for retry/durability
       try {
         await db.query(
           `INSERT INTO eventos_outbox (event_uuid, correlacion_id, idempotency_key, payload, estado, error_ultimo)
@@ -456,9 +594,6 @@ export async function registrarEventosBatch(
   return response;
 }
 
-/**
- * Función pública para registrar un evento individual del sistema de forma NO-BLOQUEANTE.
- */
 export async function registrarEvento(params: RegistrarEventoParams): Promise<boolean> {
   const res = await executeWithTimeout(registrarEventosBatch([params]), 3000, {
     accepted: 0,
@@ -469,11 +604,7 @@ export async function registrarEvento(params: RegistrarEventoParams): Promise<bo
   return res.accepted > 0 || res.duplicates > 0;
 }
 
-/**
- * Procesa eventos pendientes acumulados en el Outbox.
- */
 export async function procesarOutbox(): Promise<{ procesados: number; fallidos: number }> {
-  await asegurarTablaEventosSistema();
   const db = getDb();
 
   const pending = await db.query(
