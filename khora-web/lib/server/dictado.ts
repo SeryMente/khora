@@ -65,8 +65,17 @@ let columnasListas = false;
 
 export async function asegurarColumnasDictado(): Promise<void> {
   if (columnasListas) return;
-  await asegurarTabla();
   const db = getDb();
+  try {
+    await db.query("SELECT audio_url, audio_bytes, duracion_seg, fuente, pulido_aplicado, audio_partes, session_id, estado_transcripcion FROM volcado LIMIT 0");
+    await db.query("SELECT session_id, volcado_id, estado, total_partes, duracion_seg FROM dictado_session LIMIT 0");
+    await db.query("SELECT session_id, volcado_id, part_index, blob_url, blob_path, bytes, sha256, start_ms, end_ms, duracion_ms, estado_verificacion FROM dictado_audio_parte LIMIT 0");
+    columnasListas = true;
+    return;
+  } catch {
+    // Instalaciones antiguas: ejecutar la compatibilidad DDL una sola vez.
+  }
+  await asegurarTabla();
   for (const sql of ALTERS) {
     await db.query(sql);
   }

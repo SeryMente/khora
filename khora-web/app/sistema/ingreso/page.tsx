@@ -6,6 +6,7 @@ import { ensamblarParrafos, Fragmento } from "../../../lib/transcripcion/ensambl
 import { reconciliarSegmentos, type SegmentoReconciliado } from "../../../lib/transcripcion/reconciliar";
 import { IngresoView } from "../../components/shared/IngresoView";
 import { transcribeStoredSession } from "../../../lib/client/authoritative-transcription";
+import { importAndTranscribeAudio } from "../../../lib/client/import-audio-file";
 
 type Estado = "inactivo" | "dictando";
 
@@ -77,6 +78,7 @@ function IngresoContenido() {
   const duracionRef = useRef(0);
   const abortosRef = useRef(0);
   const audioPermitidoRef = useRef(true);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const sesionIdRef = useRef<string>("");
   const parteConsecutivaRef = useRef<number>(1);
@@ -470,6 +472,44 @@ function IngresoContenido() {
     }
   }, [texto, titulo, pulidosOk]);
 
+  const handleAdjuntarAudio = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setAdjuntandoAudio(true);
+    setError("");
+    setAviso("");
+    if (!sesionIdRef.current) sesionIdRef.current = generarSesionId();
+
+    try {
+      const result = await importAndTranscribeAudio({
+        file,
+        sessionId: sesionIdRef.current,
+        previewText: texto,
+      });
+      const data = result.data;
+      if (data.audioUrl) {
+        partesSubidasRef.current = [{ parte: 1, url: data.audioUrl, bytes: data.audioBytes || file.size }];
+        setPartesContador(1);
+        setBytesAcumulados(data.audioBytes || file.size);
+        setConAudio(true);
+      }
+      if (result.ok && typeof data.textoFinal === "string") {
+        const reconciled = reconciliarSegmentos(segmentosRef.current, data.textoFinal);
+        segmentosRef.current = reconciled.segmentos;
+        setSegmentos(reconciled.segmentos);
+        setTexto(data.textoFinal);
+        setReconciliacionMensaje(data.motivoReconciliacion || "Audio adjuntado y transcrito exitosamente.");
+      } else {
+        setAviso(data.detail || "Audio almacenado; la transcripción puede reintentarse.");
+      }
+    } catch (cause) {
+      setError(`Error al adjuntar archivo de audio: ${String(cause)}`);
+    } finally {
+      setAdjuntandoAudio(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
   const limpiar = useCallback(() => {
     segmentosRef.current = [];
     setSegmentos([]);
@@ -555,7 +595,15 @@ function IngresoContenido() {
   };
 
   return (
-    <IngresoView
+    <>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".mp3,.m4a,.mp4,.wav,.webm,.ogg,.flac,audio/*"
+        onChange={handleAdjuntarAudio}
+        className="hidden"
+      />
+      <IngresoView
       state={{
         titulo,
         texto,
@@ -585,9 +633,11 @@ function IngresoContenido() {
         onIniciar: iniciar,
         onDetener: detener,
         onGuardar: guardar,
+        onAdjuntarClick: () => fileInputRef.current?.click(),
         onLimpiar: limpiar,
         onConfirmarEdicion: confirmarEdicion,
       }}
-    />
+      />
+    </>
   );
 }

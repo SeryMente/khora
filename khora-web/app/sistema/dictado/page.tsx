@@ -6,6 +6,7 @@ import * as Icons from "lucide-react";
 import { ensamblarParrafos, Fragmento } from "../../../lib/transcripcion/ensamblar";
 import { reconciliarSegmentos, type SegmentoReconciliado } from "../../../lib/transcripcion/reconciliar";
 import { transcribeStoredSession } from "../../../lib/client/authoritative-transcription";
+import { importAndTranscribeAudio } from "../../../lib/client/import-audio-file";
 
 type Estado = "inactivo" | "dictando" | "finalizando";
 type EstadoReconciliacion = "preview_live" | "procesando_whisper" | "reconciliado_whisper" | "fallback_preview" | "editado_manual";
@@ -590,18 +591,18 @@ export default function DictadoPage() {
     setError("");
     setAviso("");
 
-    const forma = new FormData();
-    forma.append("audio", file);
     const textoPreview = segmentosRef.current.map((s) => s.texto).join("\n\n") || pendienteRef.current;
-    forma.append("previewText", textoPreview);
     if (!sesionIdRef.current) {
       sesionIdRef.current = generarSesionId();
     }
-    forma.append("sessionId", sesionIdRef.current);
 
     try {
-      const res = await fetch("/api/transcribir/archivo", { method: "POST", body: forma });
-      const data = await res.json();
+      const result = await importAndTranscribeAudio({
+        file,
+        sessionId: sesionIdRef.current,
+        previewText: textoPreview,
+      });
+      const data = result.data;
 
       if (data?.sessionId) {
         sesionIdRef.current = data.sessionId;
@@ -625,7 +626,7 @@ export default function DictadoPage() {
         setEstadoTranscripcionUI(data.estadoTranscripcion);
       }
 
-      if (res.ok && data?.exito && typeof data?.textoFinal === "string") {
+      if (result.ok && typeof data?.textoFinal === "string") {
         const resultadoReconciliacion = reconciliarSegmentos(segmentosRef.current, data.textoFinal);
         segmentosRef.current = resultadoReconciliacion.segmentos;
         setSegmentos(resultadoReconciliacion.segmentos);

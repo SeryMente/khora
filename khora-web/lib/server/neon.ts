@@ -11,6 +11,9 @@ export function getDb(): Pool {
     const isTest = process.env.DATABASE_URL.includes("localhost");
     pool = new Pool({
       connectionString: process.env.DATABASE_URL,
+      connectionTimeoutMillis: 8000,
+      query_timeout: 20000,
+      statement_timeout: 20000,
       // Usar SSL para la BD real de Neon, pero no para local.
       ssl: isTest ? false : {
         rejectUnauthorized: false
