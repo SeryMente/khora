@@ -5,6 +5,7 @@ import { getDb } from "@/lib/server/neon";
 import { descifrarBytes } from "@/lib/server/cripto";
 import { COOKIE_BOVEDA, desbloqueoVigente } from "@/lib/server/boveda";
 import { reportarIncidente } from "@/lib/server/incidentes";
+import { detectAudioFormat } from "@/lib/server/importedAudio";
 
 export const runtime = "nodejs";
 
@@ -192,13 +193,14 @@ export async function GET(
     }
 
     const totalBytes = claro.length;
+    const contentType = detectAudioFormat(claro)?.mimeType || "application/octet-stream";
     const rangeHeader = req.headers.get("range");
 
     if (!rangeHeader) {
       return new NextResponse(new Uint8Array(claro), {
         status: 200,
         headers: {
-          "content-type": "audio/webm",
+          "content-type": contentType,
           "accept-ranges": "bytes",
           "content-length": String(totalBytes),
           "cache-control": "no-store",
@@ -235,7 +237,7 @@ export async function GET(
     return new NextResponse(new Uint8Array(chunk), {
       status: 206,
       headers: {
-        "content-type": "audio/webm",
+        "content-type": contentType,
         "accept-ranges": "bytes",
         "content-range": `bytes ${start}-${end}/${totalBytes}`,
         "content-length": String(contentLength),

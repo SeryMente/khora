@@ -57,6 +57,14 @@ let listo = false;
 export async function asegurarTabla(): Promise<void> {
   if (listo) return;
   const db = getDb();
+  try {
+    await db.query("SELECT folio, version_aprobada, sha256_aprobado, aprobado_en, aprobador, texto_estructurado, estructura_ratificada_en FROM volcado LIMIT 0");
+    await db.query("SELECT volcado_id, accion, estado_anterior, estado_nuevo, version, sha256, usuario FROM volcado_revision_auditoria LIMIT 0");
+    listo = true;
+    return;
+  } catch {
+    // Instalaciones antiguas: ejecutar la compatibilidad DDL una sola vez.
+  }
   for (const sentencia of DDL) {
     await db.query(sentencia);
   }

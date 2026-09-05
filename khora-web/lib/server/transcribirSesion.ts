@@ -29,6 +29,7 @@ export interface ResultadoTranscribirSesion {
 interface ParteAudioDB {
   part_index: number;
   blob_url: string;
+  blob_path?: string | null;
   start_ms?: number | null;
   end_ms?: number | null;
 }
@@ -50,7 +51,7 @@ export async function transcribirSesion(
 
   if (sessionId) {
     const res = await db.query(
-      `SELECT part_index, blob_url, start_ms, end_ms
+      `SELECT part_index, blob_url, blob_path, start_ms, end_ms
        FROM dictado_audio_parte
        WHERE session_id = $1
        ORDER BY part_index ASC`,
@@ -59,6 +60,7 @@ export async function transcribirSesion(
     partes = res.rows.map((r) => ({
       part_index: Number(r.part_index),
       blob_url: String(r.blob_url),
+      blob_path: r.blob_path ? String(r.blob_path) : null,
       start_ms: r.start_ms !== null ? Number(r.start_ms) : null,
       end_ms: r.end_ms !== null ? Number(r.end_ms) : null,
     }));
@@ -121,9 +123,10 @@ export async function transcribirSesion(
         continue;
       }
 
+      const extension = parte.blob_path?.match(/\.([a-z0-9]+)\.khc$/i)?.[1] || "webm";
       const resGroq = await transcribirAudioConGroq(
         bufferDescifrado,
-        `dictado-parte-${parte.part_index}.webm`,
+        `dictado-parte-${parte.part_index}.${extension}`,
         { verboseJson: true }
       );
 
