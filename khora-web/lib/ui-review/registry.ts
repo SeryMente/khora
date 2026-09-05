@@ -20,7 +20,8 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
       "ingreso.btn-adjuntar",
       "ingreso.btn-limpiar",
       "ingreso.textarea",
-      "ingreso.stats"
+      "ingreso.stats",
+      "ingreso.msg-resultado"
     ]
   },
   "ingreso:recording": {
@@ -167,7 +168,7 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
     recommended_viewport: "desktop",
     ui_ids: [
       "pipeline.container",
-      "pipeline.error-state"
+      "pipeline.empty-state"
     ]
   },
 
@@ -180,7 +181,7 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
     status: "active",
     recommended_viewport: "desktop",
     ui_ids: [
-      "revision.container",
+      "pipeline.container",
       "revision.cockpit-header",
       "revision.reading-prose",
       "revision.audio-player"
@@ -194,7 +195,7 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
     status: "active",
     recommended_viewport: "desktop",
     ui_ids: [
-      "revision.container",
+      "pipeline.container",
       "revision.textarea-editor",
       "revision.btn-guardar-version"
     ]
@@ -207,7 +208,7 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
     status: "active",
     recommended_viewport: "desktop",
     ui_ids: [
-      "revision.container",
+      "pipeline.container",
       "revision.hallazgos-nav",
       "revision.btn-aceptar-hallazgo",
       "revision.btn-rechazar-hallazgo"
@@ -221,7 +222,7 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
     status: "active",
     recommended_viewport: "desktop",
     ui_ids: [
-      "revision.container",
+      "pipeline.container",
       "revision.audio-player",
       "revision.btn-play-pause",
       "revision.audio-seek-slider"
@@ -235,7 +236,7 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
     status: "active",
     recommended_viewport: "desktop",
     ui_ids: [
-      "revision.container",
+      "pipeline.container",
       "revision.banner-incidente",
       "revision.btn-resolver-incidente"
     ]
@@ -248,7 +249,7 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
     status: "active",
     recommended_viewport: "desktop",
     ui_ids: [
-      "revision.container",
+      "pipeline.container",
       "approval.gate",
       "approval.blockers-list"
     ]
@@ -261,7 +262,7 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
     status: "active",
     recommended_viewport: "desktop",
     ui_ids: [
-      "revision.container",
+      "pipeline.container",
       "approval.gate",
       "approval.hold-button",
       "approval.keyboard-btn"
@@ -304,7 +305,7 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
     ui_ids: [
       "approval.gate",
       "approval.badge-approved",
-      "approval.btn-ingest"
+      "ingesta.btn-ingerir"
     ]
   },
 
@@ -371,7 +372,8 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
       "registro.header",
       "registro.filter-bar",
       "registro.events-list",
-      "registro.event-item"
+      "registro.event-item",
+      "registro.btn-copiar"
     ]
   },
   "registro:empty": {
@@ -407,7 +409,8 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
     recommended_viewport: "desktop",
     ui_ids: [
       "registro.container",
-      "registro.error-state"
+      "registro.error-state",
+      "registro.btn-reintentar"
     ]
   },
 
