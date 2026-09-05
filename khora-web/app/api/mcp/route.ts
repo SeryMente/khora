@@ -14,6 +14,7 @@ import {
   toolKhoraBuscarVolcados,
   toolKhoraVersionesVolcado,
 } from "@/lib/server/mcp-tools";
+import { toolKhoraUiReview } from "@/lib/server/mcp-ui-review";
 
 export const runtime = "nodejs";
 
@@ -161,6 +162,27 @@ async function handleMcpRequest(req: NextRequest) {
     },
     async (args: any) => {
       const res = await toolKhoraVersionesVolcado(args);
+      return { content: [{ type: "text", text: JSON.stringify(res, null, 2) }] };
+    }
+  );
+
+  // Herramienta 6: khora_ui_review
+  mcpServer.tool(
+    "khora_ui_review",
+    "Devuelve la interfaz de Khora renderizada en HTML con el corpus real del operador. " +
+      "Permite ver la UI que producen los volcados: densidad de la bandeja, títulos largos, " +
+      "lectura de dictados extensos, incidentes. Solo lectura; los controles no responden. " +
+      "Sin argumentos devuelve el inventario de pantallas y la forma del corpus.",
+    {
+      pantalla: z
+        .enum(["ingreso", "archivo", "revision", "aprobacion", "ingesta", "registro", "grafo"])
+        .optional()
+        .describe("Pantalla a renderizar. Omitir para recibir el inventario."),
+      volcado: z.string().optional().describe("Folio o UUID del volcado que se muestra abierto"),
+      solo_metadatos: z.boolean().optional().describe("Devolver solo el inventario, sin HTML"),
+    },
+    async (args: any) => {
+      const res = await toolKhoraUiReview(args);
       return { content: [{ type: "text", text: JSON.stringify(res, null, 2) }] };
     }
   );
