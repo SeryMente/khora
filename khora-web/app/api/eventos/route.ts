@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { getDb } from "@/lib/server/neon";
 import {
-  asegurarTablaEventosSistema,
+  diagnosticarEstadoAlmacen,
   registrarEventosBatch,
   FaseEvento,
 } from "@/lib/server/eventos";
@@ -13,7 +13,6 @@ export const runtime = "nodejs";
 export async function GET(req: NextRequest) {
   const session = await auth();
 
-  // If PLAYWRIGHT_TEST_RUN is active, bypass session requirement to align with middleware
   const isTest =
     process.env.PLAYWRIGHT_TEST_RUN === "1" ||
     process.env.PLAYWRIGHT_TEST_BYPASS === "true";
@@ -21,13 +20,29 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
 
+  const searchParams = req.nextUrl.searchParams;
+  const correlacionId = searchParams.get("correlacion_id");
+
+  const diag = await diagnosticarEstadoAlmacen(correlacionId || undefined);
+  if (!diag.ready) {
+    return NextResponse.json(
+      {
+        error: "Almacén de eventos no disponible",
+        ready: diag.ready,
+        reason_code: diag.reason_code,
+        retryable: diag.retryable,
+        schema_version_expected: diag.schema_version_expected,
+        schema_version_detected: diag.schema_version_detected,
+        correlation_id: diag.correlation_id,
+      },
+      { status: 503, headers: { "Cache-Control": "no-store" } }
+    );
+  }
+
   try {
-    await asegurarTablaEventosSistema();
     const db = getDb();
 
-    const searchParams = req.nextUrl.searchParams;
     const fase = searchParams.get("fase") as FaseEvento | null;
-    const correlacionId = searchParams.get("correlacion_id");
     const volcadoId = searchParams.get("volcado_id");
     const desde = searchParams.get("desde");
     const hasta = searchParams.get("hasta");
@@ -90,10 +105,18 @@ export async function GET(req: NextRequest) {
       { headers: { "Cache-Control": "no-store" } }
     );
   } catch (error) {
-    console.error("Error en GET /api/eventos:", error);
+    console.error("Error imprevisto en GET /api/eventos:", error);
     return NextResponse.json(
-      { error: "Error interno consultando eventos", detail: String(error) },
-      { status: 500 }
+      {
+        error: "Error interno procesando eventos",
+        ready: false,
+        reason_code: "UNKNOWN",
+        retryable: true,
+        schema_version_expected: diag.schema_version_expected,
+        schema_version_detected: diag.schema_version_detected,
+        correlation_id: diag.correlation_id,
+      },
+      { status: 500, headers: { "Cache-Control": "no-store" } }
     );
   }
 }
@@ -106,6 +129,22 @@ export async function POST(req: NextRequest) {
     process.env.PLAYWRIGHT_TEST_BYPASS === "true";
   if (!session && !isTest) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
+
+  const diag = await diagnosticarEstadoAlmacen();
+  if (!diag.ready) {
+    return NextResponse.json(
+      {
+        error: "Almacén de eventos no disponible",
+        ready: diag.ready,
+        reason_code: diag.reason_code,
+        retryable: diag.retryable,
+        schema_version_expected: diag.schema_version_expected,
+        schema_version_detected: diag.schema_version_detected,
+        correlation_id: diag.correlation_id,
+      },
+      { status: 503, headers: { "Cache-Control": "no-store" } }
+    );
   }
 
   try {
@@ -160,10 +199,18 @@ export async function POST(req: NextRequest) {
       }
     );
   } catch (error) {
-    console.error("Error en POST /api/eventos:", error);
+    console.error("Error imprevisto en POST /api/eventos:", error);
     return NextResponse.json(
-      { error: "Error interno procesando eventos durables", detail: String(error) },
-      { status: 500 }
+      {
+        error: "Error interno procesando eventos",
+        ready: false,
+        reason_code: "UNKNOWN",
+        retryable: true,
+        schema_version_expected: diag.schema_version_expected,
+        schema_version_detected: diag.schema_version_detected,
+        correlation_id: diag.correlation_id,
+      },
+      { status: 500, headers: { "Cache-Control": "no-store" } }
     );
   }
 }

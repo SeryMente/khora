@@ -1,7 +1,7 @@
 // @l0 L0-002 · @req SISTEMA-MENU/E5 · Componente Presentacional Compartido de Visor de Eventos
 "use client";
 
-import { ScrollText, Clipboard, RefreshCw, Filter, Layers, ChevronDown, ChevronRight } from "lucide-react";
+import { ScrollText, Clipboard, RefreshCw, Filter, Layers, ChevronDown, ChevronRight, AlertTriangle, Database, ShieldAlert } from "lucide-react";
 
 export type EventoSistema = {
   id: number;
@@ -24,7 +24,10 @@ export type RegistroViewState = {
   eventos: EventoSistema[];
   ndjsonRaw: string;
   loading: boolean;
+  reintentando?: boolean;
   error: string | null;
+  reasonCode?: string | null;
+  correlationId?: string | null;
   faseFiltro: string;
   agruparPorCorrelacion: boolean;
   mensajeCopiar: string;
@@ -55,6 +58,7 @@ const FASE_COLORS: Record<string, string> = {
   autorizacion: "#f59e0b",
   ingesta: "#06b6d4",
   grafo: "#6366f1",
+  captura: "#14b8a6",
 };
 
 export function RegistroView({
@@ -69,7 +73,10 @@ export function RegistroView({
   const {
     eventos,
     loading,
+    reintentando,
     error,
+    reasonCode,
+    correlationId,
     faseFiltro,
     agruparPorCorrelacion,
     mensajeCopiar,
@@ -82,6 +89,74 @@ export function RegistroView({
     acc[key].push(evt);
     return acc;
   }, {});
+
+  const renderDiagnosticError = () => {
+    let title = "Error de Sistema";
+    let explanation = "Se produjo una anomalía al consultar el registro de eventos.";
+    let icon = <AlertTriangle size={28} className="text-amber-500" />;
+
+    if (reasonCode === "DB_UNREACHABLE") {
+      title = "Base de Datos No Disponible";
+      explanation = "No se pudo establecer conexión con el almacén de datos persistente. Por favor, intente de nuevo.";
+      icon = <Database size={28} className="text-red-400" />;
+    } else if (reasonCode === "EVENT_SCHEMA_MISSING") {
+      title = "Esquema No Preparado (Tabla Ausente)";
+      explanation = "El esquema de eventos no se encuentra instalado en la base de datos. Se requiere ejecutar la migración correspondiente.";
+      icon = <AlertTriangle size={28} className="text-amber-400" />;
+    } else if (reasonCode === "EVENT_SCHEMA_OUTDATED") {
+      title = "Esquema Obsoleto";
+      explanation = "La estructura de la tabla de eventos requiere actualización de columnas. Aplique las migraciones pendientes.";
+      icon = <AlertTriangle size={28} className="text-amber-400" />;
+    } else if (reasonCode === "EVENT_STORE_FORBIDDEN" || error?.includes("401") || error?.includes("403")) {
+      title = "Acceso No Autorizado";
+      explanation = "No tiene permisos suficientes para consultar el registro de eventos.";
+      icon = <ShieldAlert size={28} className="text-red-500" />;
+    }
+
+    return (
+      <div
+        data-ui-id="registro.error-state"
+        role="status"
+        aria-live="polite"
+        className="p-6 border rounded space-y-4 text-xs font-mono"
+        style={{ borderColor: "var(--khora-border)", background: "var(--khora-surface)" }}
+      >
+        <div className="flex items-start gap-3">
+          {icon}
+          <div className="space-y-1 flex-1">
+            <h2 className="text-sm font-bold uppercase tracking-wide text-red-400">{title}</h2>
+            <p className="opacity-80 leading-relaxed">{explanation}</p>
+            {reasonCode && (
+              <div className="flex items-center gap-2 mt-2">
+                <span className="font-bold opacity-60">Código de diagnóstico:</span>
+                <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-stone-800 text-amber-300 border border-stone-700">
+                  {reasonCode}
+                </span>
+              </div>
+            )}
+            {correlationId && (
+              <p className="opacity-60 text-[10px]">
+                Correlación: <code className="text-emerald-400">{correlationId}</code>
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div className="flex justify-end pt-2 border-t" style={{ borderColor: "var(--khora-border)" }}>
+          <button
+            data-ui-id="registro.btn-reintentar"
+            onClick={() => actions.onReload?.()}
+            disabled={reintentando}
+            className="flex items-center gap-2 px-4 py-2 font-bold uppercase border rounded hover:opacity-80 transition-colors disabled:opacity-50"
+            style={{ borderColor: "var(--khora-border)", background: "var(--khora-bg)" }}
+          >
+            <RefreshCw size={14} className={reintentando ? "animate-spin" : ""} />
+            {reintentando ? "Reintentando..." : "Reintentar"}
+          </button>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <main
@@ -113,17 +188,24 @@ export function RegistroView({
             </button>
             <button
               onClick={() => actions.onReload?.()}
-              className="p-2 border rounded hover:opacity-80 transition-colors"
+              disabled={loading || reintentando}
+              className="p-2 border rounded hover:opacity-80 transition-colors disabled:opacity-50"
               style={{ borderColor: "var(--khora-border)", background: "var(--khora-surface)" }}
               title="Actualizar registro"
+              aria-label="Actualizar registro"
             >
-              <RefreshCw size={16} />
+              <RefreshCw size={16} className={loading || reintentando ? "animate-spin" : ""} />
             </button>
           </div>
         </header>
 
         {mensajeCopiar && (
-          <div className="p-2 text-xs border rounded flex items-center gap-2" style={{ borderColor: "var(--khora-border)", background: "var(--khora-surface)" }}>
+          <div
+            role="status"
+            aria-live="polite"
+            className="p-2 text-xs border rounded flex items-center gap-2"
+            style={{ borderColor: "var(--khora-border)", background: "var(--khora-surface)" }}
+          >
             <span>{mensajeCopiar}</span>
           </div>
         )}
@@ -132,11 +214,12 @@ export function RegistroView({
         <div data-ui-id="registro.filter-bar" className="flex flex-wrap items-center justify-between gap-4 p-3 border rounded" style={{ borderColor: "var(--khora-border)", background: "var(--khora-surface)" }}>
           <div className="flex items-center gap-3 text-xs">
             <Filter size={16} style={{ color: "var(--khora-accent)" }} />
-            <span className="font-bold uppercase">Fase:</span>
+            <label htmlFor="fase-filtro-select" className="font-bold uppercase">Fase:</label>
             <select
+              id="fase-filtro-select"
               value={faseFiltro}
               onChange={(e) => actions.onFaseFiltroChange?.(e.target.value)}
-              className="p-1 border rounded bg-transparent font-mono focus:outline-none"
+              className="p-1 border rounded bg-transparent font-mono focus:outline-none focus:ring-1 focus:ring-emerald-500"
               style={{ borderColor: "var(--khora-border)", color: "var(--khora-ink)" }}
             >
               <option value="todas">Todas las fases</option>
@@ -147,6 +230,7 @@ export function RegistroView({
               <option value="autorizacion">Autorización</option>
               <option value="ingesta">Ingesta</option>
               <option value="grafo">Grafo</option>
+              <option value="captura">Captura</option>
             </select>
           </div>
 
@@ -157,7 +241,7 @@ export function RegistroView({
                 type="checkbox"
                 checked={agruparPorCorrelacion}
                 onChange={(e) => actions.onAgruparChange?.(e.target.checked)}
-                className="rounded"
+                className="rounded focus:ring-emerald-500"
               />
               Agrupar por correlacion_id
             </label>
@@ -166,11 +250,17 @@ export function RegistroView({
 
         {/* Content list */}
         {loading ? (
-          <div data-ui-id="registro.loading-state" className="p-8 text-center text-xs opacity-60">Cargando registro de eventos...</div>
-        ) : error ? (
-          <div data-ui-id="registro.error-state" className="p-8 text-center text-xs text-red-400 border rounded border-red-800">
-            Error: {error}
+          <div
+            data-ui-id="registro.loading-state"
+            role="status"
+            aria-live="polite"
+            className="p-8 text-center text-xs opacity-60 border rounded"
+            style={{ borderColor: "var(--khora-border)", background: "var(--khora-surface)" }}
+          >
+            {reintentando ? "Reintentando consulta del registro..." : "Cargando registro de eventos..."}
           </div>
+        ) : error ? (
+          renderDiagnosticError()
         ) : eventos.length === 0 ? (
           <div data-ui-id="registro.empty-state" className="p-8 text-center text-xs opacity-60 border rounded" style={{ borderColor: "var(--khora-border)" }}>
             No se encontraron eventos en el registro.
@@ -212,10 +302,15 @@ function ItemEvento({ evt, expanded, onToggle }: { evt: EventoSistema; expanded:
   return (
     <div
       data-ui-id="registro.event-item"
-      className="border rounded text-xs transition-colors"
+      className="border rounded text-xs transition-colors focus-within:ring-1 focus-within:ring-emerald-500"
       style={{ borderColor: "var(--khora-border)", background: "var(--khora-surface)" }}
     >
-      <div className="p-3 flex items-start justify-between gap-3 cursor-pointer" onClick={onToggle}>
+      <button
+        type="button"
+        className="w-full text-left p-3 flex items-start justify-between gap-3 focus:outline-none"
+        onClick={onToggle}
+        aria-expanded={expanded}
+      >
         <div className="flex items-start gap-2.5 flex-1">
           <span className="text-base select-none">{cfg.icon}</span>
           <div className="space-y-1 flex-1">
@@ -240,10 +335,10 @@ function ItemEvento({ evt, expanded, onToggle }: { evt: EventoSistema; expanded:
           </div>
         </div>
 
-        <button className="p-1 opacity-60 hover:opacity-100">
+        <div className="p-1 opacity-60 hover:opacity-100">
           {expanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
-        </button>
-      </div>
+        </div>
+      </button>
 
       {expanded && (
         <div className="p-3 border-t space-y-2 font-mono text-[11px]" style={{ borderColor: "var(--khora-border)", background: "var(--khora-bg)" }}>

@@ -24,6 +24,21 @@ test.beforeEach(() => {
 
   const mockClient = {
     query: async (sql: string, params: any[] = []) => {
+      if (sql.includes("SELECT 1")) return { rows: [{ "?column?": 1 }] };
+      if (sql.includes("information_schema.tables")) return { rows: [{ table_name: "eventos_sistema" }] };
+      if (sql.includes("information_schema.columns")) {
+        return {
+          rows: [
+            "id", "fase", "event_id", "estado", "mensaje", "detalle",
+            "volcado_id", "version", "sha256", "correlacion_id", "servidor_en",
+            "cliente_en", "hash_anterior", "event_hash", "event_uuid",
+            "idempotency_key", "schema_version", "outcome", "component",
+            "causation_id", "attempt_id", "sequence", "session_id",
+            "release_sha", "duration_ms", "metrics", "reason_code", "privacy_class"
+          ].map((c) => ({ column_name: c })),
+        };
+      }
+
       // DDL operations
       if (sql.includes("CREATE TABLE") || sql.includes("CREATE INDEX") || sql.includes("ALTER TABLE")) {
         return { rows: [], rowCount: 0 };
