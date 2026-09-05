@@ -53,3 +53,24 @@ export function resolveGlobalSeek(
   );
   return { position: position + 1, localSeconds: localMs / 1000 };
 }
+
+export async function explainAudioHttpFailure(
+  response: Response,
+): Promise<string | null> {
+  if (response.ok) return null;
+
+  let detail = "";
+  try {
+    const body = await response.clone().json();
+    detail = typeof body?.detail === "string" ? body.detail : "";
+  } catch {
+    detail = "";
+  }
+
+  if (response.status === 423) {
+    return (
+      detail || "Bóveda cerrada: desbloquéala antes de reproducir el audio."
+    );
+  }
+  return detail || `La fuente de audio respondió con HTTP ${response.status}.`;
+}
