@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState, Suspense } from "react";
 import { ensamblarParrafos, Fragmento } from "../../../lib/transcripcion/ensamblar";
 import { reconciliarSegmentos, type SegmentoReconciliado } from "../../../lib/transcripcion/reconciliar";
 import { IngresoView } from "../../components/shared/IngresoView";
+import { transcribeStoredSession } from "../../../lib/client/authoritative-transcription";
 
 type Estado = "inactivo" | "dictando";
 
@@ -83,6 +84,8 @@ function IngresoContenido() {
   const parteTrozosRef = useRef<Blob[]>([]);
   const parteInicioRef = useRef<number>(0);
   const subidaEnCursoRef = useRef<Promise<void> | null>(null);
+  const finalizacionAudioRef = useRef<Promise<void> | null>(null);
+  const resolverFinalizacionAudioRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     const w = window as any;
@@ -132,32 +135,23 @@ function IngresoContenido() {
   }, []);
 
   const ejecutarTranscripcionAutoritativa = useCallback(async () => {
-    if (trozosRef.current.length === 0 && partesSubidasRef.current.length === 0) return;
+    if (!sesionIdRef.current || partesSubidasRef.current.length === 0) {
+      if (trozosRef.current.length > 0) {
+        setReconciliacionMensaje(
+          "No se enviará el audio completo al servidor: ninguna parte quedó almacenada y vinculada a la sesión.",
+        );
+      }
+      return;
+    }
     const textoPreview = texto || segmentosRef.current.map((s) => s.texto).join("\n\n");
 
-    const forma = new FormData();
-    forma.append("previewText", textoPreview);
-
-    if (partesSubidasRef.current.length > 0) {
-      const chunkMeta = partesSubidasRef.current.map((p) => ({
-        part_index: p.parte,
-        start_ms: (p.parte - 1) * 45000,
-        end_ms: p.parte * 45000,
-        session_id: sesionIdRef.current,
-      }));
-      forma.append("chunkMeta", JSON.stringify(chunkMeta));
-    }
-
-    if (trozosRef.current.length > 0) {
-      const blobCompleto = new Blob(trozosRef.current, { type: "audio/webm" });
-      forma.append("audio", blobCompleto, "dictado-completo.webm");
-    }
-
     try {
-      const r = await fetch("/api/transcribir", { method: "POST", body: forma });
-      const data = await r.json();
+      const { ok, data } = await transcribeStoredSession(
+        sesionIdRef.current,
+        textoPreview,
+      );
 
-      if (r.ok && data?.exito && typeof data?.textoFinal === "string") {
+      if (ok && data?.exito && typeof data?.textoFinal === "string") {
         const resultadoReconciliacion = reconciliarSegmentos(segmentosRef.current, data.textoFinal);
         segmentosRef.current = resultadoReconciliacion.segmentos;
         setSegmentos(resultadoReconciliacion.segmentos);
@@ -259,9 +253,19 @@ function IngresoContenido() {
       };
 
       grabadora.onstop = async () => {
-        await subirParteActual();
+        try {
+          const finalizacion = subirParteActual();
+          subidaEnCursoRef.current = finalizacion;
+          await finalizacion;
+        } finally {
+          resolverFinalizacionAudioRef.current?.();
+          resolverFinalizacionAudioRef.current = null;
+        }
       };
 
+      finalizacionAudioRef.current = new Promise<void>((resolve) => {
+        resolverFinalizacionAudioRef.current = resolve;
+      });
       grabadora.start(1000);
       grabRef.current = grabadora;
     } catch (e) {
@@ -366,6 +370,8 @@ function IngresoContenido() {
     parteTrozosRef.current = [];
     parteInicioRef.current = Date.now();
     subidaEnCursoRef.current = null;
+    finalizacionAudioRef.current = null;
+    resolverFinalizacionAudioRef.current = null;
     setPartesContador(0);
     setBytesAcumulados(0);
 
@@ -390,8 +396,15 @@ function IngresoContenido() {
     setParcial("");
     setEscuchando(false);
     estabilizarEmision();
-    await ejecutarTranscripcionAutoritativa();
-    setEstado("inactivo");
+    try {
+      if (finalizacionAudioRef.current) await finalizacionAudioRef.current;
+      if (subidaEnCursoRef.current) await subidaEnCursoRef.current;
+      await ejecutarTranscripcionAutoritativa();
+    } finally {
+      finalizacionAudioRef.current = null;
+      subidaEnCursoRef.current = null;
+      setEstado("inactivo");
+    }
   }, [estabilizarEmision, detenerGrabacion, ejecutarTranscripcionAutoritativa]);
 
   const guardar = useCallback(async () => {

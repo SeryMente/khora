@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import * as Icons from "lucide-react";
 import { ensamblarParrafos, Fragmento } from "../../../lib/transcripcion/ensamblar";
 import { reconciliarSegmentos, type SegmentoReconciliado } from "../../../lib/transcripcion/reconciliar";
+import { transcribeStoredSession } from "../../../lib/client/authoritative-transcription";
 
 type Estado = "inactivo" | "dictando" | "finalizando";
 type EstadoReconciliacion = "preview_live" | "procesando_whisper" | "reconciliado_whisper" | "fallback_preview" | "editado_manual";
@@ -172,37 +173,29 @@ export default function DictadoPage() {
   }, []);
 
   const ejecutarTranscripcionAutoritativa = useCallback(async () => {
-    if (partesRawRef.current.length === 0 && trozosRef.current.length === 0 && partesSubidasRef.current.length === 0) return;
+    if (!sesionIdRef.current || partesSubidasRef.current.length === 0) {
+      if (partesRawRef.current.length > 0 || trozosRef.current.length > 0) {
+        setEstadoReconciliacion("fallback_preview");
+        setEstadoTranscripcionUI("fallido");
+        estadoTranscripcionRef.current = "fallido";
+        setAviso("Audio no vinculado; se conservó la transcripción del navegador");
+        setReconciliacionMensaje(
+          "No se enviará el audio completo al servidor: ninguna parte quedó almacenada y vinculada a la sesión.",
+        );
+      }
+      return;
+    }
     setEstadoReconciliacion("procesando_whisper");
 
     const textoPreview = segmentosRef.current.map((s) => s.texto).join("\n\n") || pendienteRef.current;
 
-    const forma = new FormData();
-    forma.append("previewText", textoPreview);
-
-    if (partesRawRef.current.length > 0) {
-      // D12: candado por partes - enviar cada parte como archivo independiente + chunkMeta
-      const chunkMeta = partesRawRef.current.map((p) => ({
-        part_index: p.parte,
-        start_ms: (p.parte - 1) * 45000,
-        end_ms: p.parte * 45000,
-        session_id: sesionIdRef.current,
-      }));
-      forma.append("chunkMeta", JSON.stringify(chunkMeta));
-
-      for (const p of partesRawRef.current) {
-        forma.append("audio", p.blob, `dictado-parte-${p.parte}.webm`);
-      }
-    } else if (trozosRef.current.length > 0) {
-      const blobCompleto = new Blob(trozosRef.current, { type: "audio/webm" });
-      forma.append("audio", blobCompleto, "dictado-completo.webm");
-    }
-
     try {
-      const r = await fetch("/api/transcribir", { method: "POST", body: forma });
-      const data = await r.json();
+      const { ok, data } = await transcribeStoredSession(
+        sesionIdRef.current,
+        textoPreview,
+      );
 
-      if (r.ok && data?.exito && typeof data?.textoFinal === "string") {
+      if (ok && data?.exito && typeof data?.textoFinal === "string") {
         const resultadoReconciliacion = reconciliarSegmentos(segmentosRef.current, data.textoFinal);
         segmentosRef.current = resultadoReconciliacion.segmentos;
         setSegmentos(resultadoReconciliacion.segmentos);
