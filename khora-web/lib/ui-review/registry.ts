@@ -20,8 +20,7 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
       "ingreso.btn-adjuntar",
       "ingreso.btn-limpiar",
       "ingreso.textarea",
-      "ingreso.stats",
-      "ingreso.msg-resultado"
+      "ingreso.stats"
     ]
   },
   "ingreso:recording": {
@@ -372,8 +371,7 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
       "registro.header",
       "registro.filter-bar",
       "registro.events-list",
-      "registro.event-item",
-      "registro.btn-copiar"
+      "registro.event-item"
     ]
   },
   "registro:empty": {
@@ -478,6 +476,135 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
       "grafo.container",
       "grafo.error-state"
     ]
+  },
+
+  // ── ESCENARIOS DE FALLO ──────────────────────────────────────────────
+  // Casos derivados de incidentes reales observados en produccion.
+  "ingreso:boveda_bloqueada": {
+    screen: "ingreso",
+    scenario: "boveda_bloqueada",
+    title: "Ingreso · Boveda Bloqueada",
+    description: "La boveda esta cerrada (HTTP 423). El audio no puede cifrarse ni custodiarse; el sistema debe declarar la causa real, no un error de codec.",
+    status: "active",
+    recommended_viewport: "desktop",
+    ui_ids: ["ingreso.container", "ingreso.msg-error", "ingreso.btn-archivar", "ingreso.textarea"]
+  },
+  "ingreso:audio_grande": {
+    screen: "ingreso",
+    scenario: "audio_grande",
+    title: "Ingreso · Adjunto de 13.97 MB",
+    description: "Archivo MP3 de 19 minutos que excede el limite de 4.5 MB de una funcion serverless. Debe subirse por carga directa cifrada, nunca por la funcion.",
+    status: "active",
+    recommended_viewport: "desktop",
+    ui_ids: ["ingreso.container", "ingreso.btn-adjuntar", "ingreso.stats", "ingreso.msg-resultado"]
+  },
+  "ingreso:timeout_archivado": {
+    screen: "ingreso",
+    scenario: "timeout_archivado",
+    title: "Ingreso · Timeout al Archivar",
+    description: "FUNCTION_INVOCATION_TIMEOUT: la ruta critica excedio su limite. El texto no debe perderse y el volcado debe quedar recuperable.",
+    status: "active",
+    recommended_viewport: "desktop",
+    ui_ids: ["ingreso.container", "ingreso.msg-error", "ingreso.btn-archivar", "ingreso.textarea"]
+  },
+  "ingreso:red_perdida": {
+    screen: "ingreso",
+    scenario: "red_perdida",
+    title: "Ingreso · Red Perdida Durante el Dictado",
+    description: "Reconexiones acumuladas y partes de audio pendientes de subir. El dictado continua; nada de lo capturado se descarta.",
+    status: "active",
+    recommended_viewport: "desktop",
+    ui_ids: ["ingreso.container", "ingreso.status-listening", "ingreso.aviso-degradado", "ingreso.stats", "ingreso.textarea"]
+  },
+  "ingreso:texto_contaminado": {
+    screen: "ingreso",
+    scenario: "texto_contaminado",
+    title: "Ingreso · Texto Contaminado por el ASR",
+    description: "La transcripcion contiene fuga del prompt del motor y una alucinacion de cierre. Viola F2 Ninguna Palabra Ajena y debe senalarse antes de archivar.",
+    status: "active",
+    recommended_viewport: "desktop",
+    ui_ids: ["ingreso.container", "ingreso.textarea", "ingreso.msg-reconciliacion", "ingreso.btn-retranscribir"]
+  },
+  "ingreso:truncamiento_utf8": {
+    screen: "ingreso",
+    scenario: "truncamiento_utf8",
+    title: "Ingreso · Palabras Truncadas en la Tilde",
+    description: "Ocho palabras cortadas exactamente en la primera tilde por truncamiento UTF-8 multibyte, con perdida de puntuacion. Viola F3 Integridad de Caracteres.",
+    status: "active",
+    recommended_viewport: "desktop",
+    ui_ids: ["ingreso.container", "ingreso.textarea", "ingreso.msg-error", "ingreso.btn-retranscribir"]
+  },
+  "ingreso:sin_titulo": {
+    screen: "ingreso",
+    scenario: "sin_titulo",
+    title: "Ingreso · Titulacion Fallida",
+    description: "El generador de titulos no respondio. Legibilidad es degradable: el volcado avanza pero el fallo queda visible y reintentable.",
+    status: "active",
+    recommended_viewport: "desktop",
+    ui_ids: ["ingreso.container", "ingreso.titulo-input", "ingreso.btn-titulo-ia", "ingreso.msg-reconciliacion"]
+  },
+  "archivo:sin_titulo": {
+    screen: "archivo",
+    scenario: "sin_titulo",
+    title: "Archivo · Volcados sin Titulo",
+    description: "Volcados que superaron Custodia y Fidelidad pero no Legibilidad. Aparecen sin nombre y requieren titulacion manual o reintento.",
+    status: "active",
+    recommended_viewport: "desktop",
+    ui_ids: ["pipeline.container", "pipeline.list", "pipeline.item-card", "pipeline.summary"]
+  },
+  "archivo:carga_completa": {
+    screen: "archivo",
+    scenario: "carga_completa",
+    title: "Archivo · Bandeja Densa",
+    description: "Bandeja con muchos volcados, titulos largos y descripciones de un parrafo. Verifica densidad, desbordamiento y jerarquia visual.",
+    status: "active",
+    recommended_viewport: "desktop",
+    ui_ids: ["pipeline.container", "pipeline.list", "pipeline.item-card", "pipeline.filters", "pipeline.summary"]
+  },
+  "archivo:preparacion_fallida": {
+    screen: "archivo",
+    scenario: "preparacion_fallida",
+    title: "Archivo · Preparacion Fallida",
+    description: "Volcados detenidos por fallo de protocolo, con la causa exacta visible. Nunca deben aparentar normalidad ni mostrar error desconocido.",
+    status: "active",
+    recommended_viewport: "desktop",
+    ui_ids: ["pipeline.container", "pipeline.list", "pipeline.item-card", "pipeline.summary"]
+  },
+  "revision:texto_largo": {
+    screen: "revision",
+    scenario: "texto_largo",
+    title: "Revision · Dictado Extenso",
+    description: "Transcripcion de 19 minutos en lectura continua. Verifica ancho de columna, ritmo tipografico y comodidad de lectura prolongada.",
+    status: "active",
+    recommended_viewport: "desktop",
+    ui_ids: ["pipeline.container", "pipeline.drawer", "revision.reading-prose", "revision.cockpit-header", "revision.audio-player"]
+  },
+  "revision:audio_ausente": {
+    screen: "revision",
+    scenario: "audio_ausente",
+    title: "Revision · Audio No Vinculado",
+    description: "Incidente audio_no_vinculado: el volcado carece de audio custodiado. Viola C2 y no puede contrastarse contra la fuente.",
+    status: "active",
+    recommended_viewport: "desktop",
+    ui_ids: ["pipeline.container", "pipeline.drawer", "revision.banner-incidente", "revision.btn-resolver-incidente", "revision.reading-prose"]
+  },
+  "revision:integridad_violada": {
+    screen: "revision",
+    scenario: "integridad_violada",
+    title: "Revision · Barrera de Integridad Violada",
+    description: "El SHA-256 del verbatim no coincide con el sellado. Fallo bloqueante de C3: el volcado no puede avanzar bajo ninguna circunstancia.",
+    status: "active",
+    recommended_viewport: "desktop",
+    ui_ids: ["pipeline.container", "pipeline.drawer", "revision.banner-incidente", "revision.cockpit-header", "revision.reading-prose"]
+  },
+  "registro:errores": {
+    screen: "registro",
+    scenario: "errores",
+    title: "Registro · Eventos Fallidos",
+    description: "Log con eventos FAIL de titulacion, transcripcion y archivado. Cada fallo debe declarar causa aprovechable, nunca un catch vacio.",
+    status: "active",
+    recommended_viewport: "desktop",
+    ui_ids: ["registro.container", "registro.events-list", "registro.event-item", "registro.filter-bar", "registro.btn-copiar"]
   }
 };
 
