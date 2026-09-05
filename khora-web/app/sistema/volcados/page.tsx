@@ -1,8 +1,15 @@
 // @l0 L0-002-R · @req PIPELINE/REQ-3,UI-02/RESKIN,UI-PIPELINE-FIX/REQ-1,UI-TRANSICION-REVISION/REQ-1,REVISION-COCKPIT/REQ-1 · @acr ACR-1.2 · @req TRACE-SESSION/010 · @req TITULOS-LLM/REQ-2
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { PipelineView, PipelineViewState } from "../../components/shared/PipelineView";
+import { useEffect, useState, useCallback, useRef } from "react";
+import {
+  PipelineView,
+  PipelineViewState,
+} from "../../components/shared/PipelineView";
+import {
+  globalTimeForPart,
+  resolveGlobalSeek,
+} from "../../../lib/audio-playback";
 
 export default function VolcadosPage() {
   const [pipelineItems, setPipelineItems] = useState<any[]>([]);
@@ -13,7 +20,9 @@ export default function VolcadosPage() {
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<any | null>(null);
-  const [drawerSubTab, setDrawerSubTab] = useState<"cockpit" | "trace">("cockpit");
+  const [drawerSubTab, setDrawerSubTab] = useState<"cockpit" | "trace">(
+    "cockpit",
+  );
 
   const [viewMode, setViewMode] = useState<"lectura" | "edicion">("lectura");
   const [editableTexto, setEditableTexto] = useState("");
@@ -26,8 +35,74 @@ export default function VolcadosPage() {
   const [currentTimeMs, setCurrentTimeMs] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [audioError, setAudioError] = useState<string | null>(null);
+  const [fallbackDurationMs, setFallbackDurationMs] = useState<number>(0);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const pendingSeekSecondsRef = useRef<number | null>(null);
+  const resumeAfterLoadRef = useRef(false);
 
-  const duracionTotalMs = manifiestoPartes.reduce((acc, p) => acc + (p.duracion_ms || 0), 0);
+  const manifestDurationMs = manifiestoPartes.reduce(
+    (acc, p) => acc + (p.duracion_ms || 0),
+    0,
+  );
+  const duracionTotalMs = manifestDurationMs || fallbackDurationMs;
+
+  const loadAudioPosition = useCallback(
+    (position: number, localSeconds = 0, autoplay = false) => {
+      if (manifiestoPartes.length === 0) return;
+      const safePosition = Math.min(
+        Math.max(position, 1),
+        manifiestoPartes.length,
+      );
+      const part = manifiestoPartes[safePosition - 1];
+      pendingSeekSecondsRef.current = Math.max(0, localSeconds);
+      resumeAfterLoadRef.current = autoplay;
+      setCurrentPartIndex(safePosition);
+      setAudioSourceUrl(part.download_path);
+      setAudioError(null);
+    },
+    [manifiestoPartes],
+  );
+
+  const toggleAudioPlayback = useCallback(async () => {
+    const audio = audioRef.current;
+    if (!audio || !audioSourceUrl) {
+      setAudioError(
+        "El audio figura disponible, pero no existe una fuente reproducible.",
+      );
+      setIsPlaying(false);
+      return;
+    }
+
+    if (!audio.paused) {
+      audio.pause();
+      return;
+    }
+
+    try {
+      await audio.play();
+    } catch (err: any) {
+      setIsPlaying(false);
+      setAudioError(
+        `No se pudo iniciar la reproducción: ${err?.message || "fuente de audio inválida"}`,
+      );
+    }
+  }, [audioSourceUrl]);
+
+  const seekAudioGlobally = useCallback(
+    (targetMs: number) => {
+      if (manifiestoPartes.length === 0) return;
+      const seek = resolveGlobalSeek(manifiestoPartes, targetMs);
+      const audio = audioRef.current;
+      const samePart = seek.position === currentPartIndex;
+      if (samePart && audio) {
+        audio.currentTime = seek.localSeconds;
+        setCurrentTimeMs(targetMs);
+        return;
+      }
+      loadAudioPosition(seek.position, seek.localSeconds, isPlaying);
+    },
+    [currentPartIndex, isPlaying, loadAudioPosition, manifiestoPartes],
+  );
 
   const [hallazgos, setHallazgos] = useState<any[]>([]);
   const [activeHallazgoIndex, setActiveHallazgoIndex] = useState<number>(0);
@@ -38,11 +113,15 @@ export default function VolcadosPage() {
 
   const [holdProgress, setHoldProgress] = useState<number>(0);
   const [isHolding, setIsHolding] = useState<boolean>(false);
-  const [showAccessibleModal, setShowAccessibleModal] = useState<boolean>(false);
-  const [accessibleConfirmText, setAccessibleConfirmText] = useState<string>("");
+  const [showAccessibleModal, setShowAccessibleModal] =
+    useState<boolean>(false);
+  const [accessibleConfirmText, setAccessibleConfirmText] =
+    useState<string>("");
   const [approvingVersion, setApprovingVersion] = useState<boolean>(false);
-  const [showAudioResolveModal, setShowAudioResolveModal] = useState<boolean>(false);
-  const [selectedAudioResolveCode, setSelectedAudioResolveCode] = useState<string>("aceptado_sin_audio");
+  const [showAudioResolveModal, setShowAudioResolveModal] =
+    useState<boolean>(false);
+  const [selectedAudioResolveCode, setSelectedAudioResolveCode] =
+    useState<string>("aceptado_sin_audio");
 
   const [ingesting, setIngesting] = useState(false);
   const [ingestaResult, setIngestaResult] = useState<any>(null);
@@ -76,6 +155,13 @@ export default function VolcadosPage() {
 
   const loadCockpitData = async (id: string, versionNum: number) => {
     setLoadingGate(true);
+    audioRef.current?.pause();
+    setIsPlaying(false);
+    setCurrentTimeMs(0);
+    setFallbackDurationMs(0);
+    setAudioError(null);
+    setManifiestoPartes([]);
+    setAudioSourceUrl("");
     try {
       const resManif = await fetch(`/api/audio/${id}/manifiesto`);
       if (resManif.ok) {
@@ -84,10 +170,17 @@ export default function VolcadosPage() {
         if (dataManif.partes && dataManif.partes.length > 0) {
           setCurrentPartIndex(1);
           setAudioSourceUrl(dataManif.partes[0].download_path);
+        } else {
+          setAudioError(
+            "El manifiesto no contiene partes de audio reproducibles.",
+          );
         }
       } else {
         setManifiestoPartes([]);
         setAudioSourceUrl(`/api/audio/${id}`);
+        setAudioError(
+          "No se pudo cargar el manifiesto; se intentará la fuente de audio consolidada.",
+        );
       }
 
       const resGate = await fetch(`/api/revision/${id}/compuerta`);
@@ -104,10 +197,14 @@ export default function VolcadosPage() {
         setIncidentes([]);
       }
 
-      const resHal = await fetch(`/api/revision/${id}/hallazgos?version=${versionNum}`);
+      const resHal = await fetch(
+        `/api/revision/${id}/hallazgos?version=${versionNum}`,
+      );
       if (resHal.ok) {
         const dataHal = await resHal.json();
-        const pending = (dataHal.hallazgos || []).filter((h: any) => h.estado === "pendiente");
+        const pending = (dataHal.hallazgos || []).filter(
+          (h: any) => h.estado === "pendiente",
+        );
         setHallazgos(pending);
         setActiveHallazgoIndex(0);
       } else {
@@ -134,8 +231,13 @@ export default function VolcadosPage() {
       const res = await fetch("/api/versiones?id=" + id);
       const data = await res.json();
       if (res.ok && Array.isArray(data.versiones)) {
-        const latestVersionNum = data.versiones.reduce((max: number, v: any) => Math.max(max, Number(v.version)), 1);
-        const activeVer = data.versiones.find((v: any) => Number(v.version) === latestVersionNum);
+        const latestVersionNum = data.versiones.reduce(
+          (max: number, v: any) => Math.max(max, Number(v.version)),
+          1,
+        );
+        const activeVer = data.versiones.find(
+          (v: any) => Number(v.version) === latestVersionNum,
+        );
         if (activeVer) {
           setEditableTexto(activeVer.texto || "");
         }
@@ -166,7 +268,10 @@ export default function VolcadosPage() {
       const res = await fetch("/api/dictado-archivo/titulo", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: selectedId, texto: editableTexto || undefined }),
+        body: JSON.stringify({
+          id: selectedId,
+          texto: editableTexto || undefined,
+        }),
       });
       const data = await res.json();
       if (res.ok && data.title) {
@@ -175,7 +280,9 @@ export default function VolcadosPage() {
         }
         await fetchPipeline();
       } else {
-        setTitleError(data.detail || data.error || "No se pudo generar el título");
+        setTitleError(
+          data.detail || data.error || "No se pudo generar el título",
+        );
       }
     } catch (err: any) {
       setTitleError("Error de red: " + (err?.message ?? String(err)));
@@ -202,7 +309,12 @@ export default function VolcadosPage() {
   };
 
   const handleIngestApproved = async () => {
-    if (!selectedItem || !selectedItem.version_aprobada || !selectedItem.sha256_aprobado) return;
+    if (
+      !selectedItem ||
+      !selectedItem.version_aprobada ||
+      !selectedItem.sha256_aprobado
+    )
+      return;
     setIngesting(true);
     setIngestaResult(null);
     try {
@@ -282,26 +394,89 @@ export default function VolcadosPage() {
   };
 
   return (
-    <PipelineView
-      state={state}
-      actions={{
-        onFilterChange: setFilter,
-        onSearchChange: setSearchQuery,
-        onSelectVolcado: selectVolcadoItem,
-        onSetDrawerSubTab: setDrawerSubTab,
-        onSetViewMode: setViewMode,
-        onEditableTextoChange: setEditableTexto,
-        onRegenerarTitulo: handleRegenerarTitulo,
-        onSaveEdits: handleSaveEdits,
-        onIngestApproved: handleIngestApproved,
-        onGlobalSeek: setCurrentTimeMs,
-        onTogglePlayPause: () => setIsPlaying(!isPlaying),
-        onManualPartChange: setCurrentPartIndex,
-        onSetShowAccessibleModal: setShowAccessibleModal,
-        onSetAccessibleConfirmText: setAccessibleConfirmText,
-        onSetShowAudioResolveModal: setShowAudioResolveModal,
-        onSetSelectedAudioResolveCode: setSelectedAudioResolveCode,
-      }}
-    />
+    <>
+      <audio
+        ref={audioRef}
+        src={audioSourceUrl || undefined}
+        preload="metadata"
+        className="sr-only"
+        onLoadedMetadata={(event) => {
+          const audio = event.currentTarget;
+          if (
+            manifiestoPartes.length === 0 &&
+            Number.isFinite(audio.duration)
+          ) {
+            setFallbackDurationMs(Math.max(0, audio.duration * 1000));
+          }
+          const pending = pendingSeekSecondsRef.current;
+          if (pending !== null && Number.isFinite(audio.duration)) {
+            audio.currentTime = Math.min(
+              pending,
+              Math.max(0, audio.duration - 0.01),
+            );
+          }
+          pendingSeekSecondsRef.current = null;
+          if (resumeAfterLoadRef.current) {
+            resumeAfterLoadRef.current = false;
+            void audio.play().catch((err: any) => {
+              setIsPlaying(false);
+              setAudioError(
+                `No se pudo continuar la reproducción: ${err?.message || "fuente de audio inválida"}`,
+              );
+            });
+          }
+        }}
+        onTimeUpdate={(event) => {
+          setCurrentTimeMs(
+            globalTimeForPart(
+              manifiestoPartes,
+              currentPartIndex,
+              event.currentTarget.currentTime,
+            ),
+          );
+        }}
+        onPlay={() => {
+          setIsPlaying(true);
+          setAudioError(null);
+        }}
+        onPause={() => setIsPlaying(false)}
+        onEnded={() => {
+          if (currentPartIndex < manifiestoPartes.length) {
+            loadAudioPosition(currentPartIndex + 1, 0, true);
+          } else {
+            setIsPlaying(false);
+            setCurrentTimeMs(duracionTotalMs);
+          }
+        }}
+        onError={() => {
+          setIsPlaying(false);
+          setAudioError(
+            "La fuente de audio no pudo cargarse o no es reproducible.",
+          );
+        }}
+      />
+      <PipelineView
+        state={state}
+        actions={{
+          onFilterChange: setFilter,
+          onSearchChange: setSearchQuery,
+          onSelectVolcado: selectVolcadoItem,
+          onSetDrawerSubTab: setDrawerSubTab,
+          onSetViewMode: setViewMode,
+          onEditableTextoChange: setEditableTexto,
+          onRegenerarTitulo: handleRegenerarTitulo,
+          onSaveEdits: handleSaveEdits,
+          onIngestApproved: handleIngestApproved,
+          onGlobalSeek: seekAudioGlobally,
+          onTogglePlayPause: toggleAudioPlayback,
+          onManualPartChange: (position) =>
+            loadAudioPosition(position, 0, isPlaying),
+          onSetShowAccessibleModal: setShowAccessibleModal,
+          onSetAccessibleConfirmText: setAccessibleConfirmText,
+          onSetShowAudioResolveModal: setShowAudioResolveModal,
+          onSetSelectedAudioResolveCode: setSelectedAudioResolveCode,
+        }}
+      />
+    </>
   );
 }
