@@ -15,13 +15,24 @@ export async function GET(request: Request) {
   const protocol = request.headers.get("x-forwarded-proto") || "http";
   const baseUrl = `${protocol}://${host}`;
 
-  const releaseSha = process.env.VERCEL_GIT_COMMIT_SHA || process.env.RELEASE_SHA || "dev-local-sha";
+  // El sha debe reflejar el commit realmente desplegado. VERCEL_GIT_COMMIT_SHA
+  // solo se puebla en despliegues disparados por Git; los despliegues por CLI
+  // lo dejan vacío. Cuando no hay procedencia verificable se declara explícito
+  // en lugar de mostrar un valor viejo que induzca a error.
+  const releaseSha =
+    process.env.VERCEL_GIT_COMMIT_SHA ||
+    process.env.RELEASE_SHA ||
+    process.env.NEXT_PUBLIC_RELEASE_SHA ||
+    "sha-no-verificable";
   const fingerprintSource = JSON.stringify(UI_REVIEW_SCENARIOS);
   const sourceFingerprint = createHash("sha256").update(fingerprintSource).digest("hex").slice(0, 16);
 
   const manifestUrls = Object.values(UI_REVIEW_SCENARIOS).map(
     (s) => `${baseUrl}/ui-review/${s.screen}?scenario=${s.scenario}`
   );
+
+  // Rutas prerenderizadas: legibles por modelos que no ejecutan JavaScript.
+  const staticUrls = SCREENS.map((s) => `${baseUrl}/ui-review/${s}/estatico`);
 
   const body: ManifestSchema = {
     schema_version: "1.0.0",
@@ -31,6 +42,8 @@ export async function GET(request: Request) {
     screens: SCREENS,
     scenarios: UI_REVIEW_SCENARIOS,
     manifest_urls: manifestUrls,
+    static_urls: staticUrls,
+    static_index: `${baseUrl}/ui-review/estatico`,
   };
 
   return NextResponse.json(body, {

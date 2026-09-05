@@ -6,6 +6,12 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { SCREENS, UI_REVIEW_SCENARIOS, getAllScenariosForScreen } from "@/lib/ui-review/registry";
 import { ScreenId, ViewportMode, VIEWPORTS, ReviewContextInfo } from "@/lib/ui-review/types";
 import { ReviewFixtureAdapter } from "@/lib/ui-review/adapters";
+import {
+  buildIngresoState,
+  buildPipelineState,
+  buildRegistroState,
+  buildGrafoState,
+} from "@/lib/ui-review/states";
 import { IngresoView } from "@/app/components/shared/IngresoView";
 import { PipelineView } from "@/app/components/shared/PipelineView";
 import { RegistroView } from "@/app/components/shared/RegistroView";
@@ -302,33 +308,7 @@ function RenderCurrentScreen({
   switch (screen) {
     case "ingreso":
       return (
-        <IngresoView
-          isReviewMode={true}
-          state={{
-            titulo: scenario === "recording" ? "Dictado de prueba en curso" : "Título sintético para revisión",
-            texto: scenario === "error"
-              ? ""
-              : "El sistema Khora procesa las transcripciones manteniendo la veracidad semántica de los volcados orales.",
-            estado: scenario === "recording" ? "dictando" : "inactivo",
-            editando: scenario === "paused_editing",
-            soportado: true,
-            escuchando: scenario === "recording",
-            guardando: false,
-            generandoTitulo: false,
-            retranscribiendo: scenario === "finalizing",
-            adjuntandoAudio: false,
-            conAudio: true,
-            partesContador: 1,
-            bytesAcumulados: 524288,
-            reconexiones: 0,
-            pulidosOk: 2,
-            pulidosNo: 0,
-            reconciliacionMensaje: scenario === "degraded" ? "Posible omisión detectada · se conservó lo capturado" : "",
-            aviso: scenario === "degraded" ? "Fallo de conexión autoritativa" : "",
-            error: scenario === "error" ? "Permiso de micrófono denegado para el reconocimiento de voz" : fetchError || "",
-            resultado: "",
-          }}
-        />
+        <IngresoView isReviewMode state={buildIngresoState(scenario, fetchError)} />
       );
 
     case "archivo":
@@ -336,95 +316,17 @@ function RenderCurrentScreen({
     case "aprobacion":
     case "ingesta":
       return (
-        <PipelineView
-          isReviewMode={true}
-          state={{
-            pipelineItems: scenario === "empty" ? [] : volcados,
-            resumen: {
-              total: scenario === "empty" ? 0 : volcados.length,
-              en_revision: 1,
-              pendiente_revision: 0,
-              listo_ingesta: 1,
-              ingerido: 0,
-              anomalies: scenario === "incident" ? 1 : 0,
-              sin_audio: scenario === "incident" ? 1 : 0,
-            },
-            loadingPipeline: scenario === "loading",
-            filter: "todos",
-            searchQuery: "",
-            selectedId: scenario === "empty" ? null : volcado?.id ?? "v-sintetico-001-uuid-demostración",
-            selectedItem: scenario === "empty" ? null : volcado ?? volcados[0],
-            drawerSubTab: "cockpit",
-            viewMode: scenario === "editing" ? "edicion" : "lectura",
-            editableTexto: volcado?.texto || "El sistema Khora procesa las transcripciones manteniendo la veracidad semántica de los volcados orales.",
-            generatingTitle: false,
-            titleError: null,
-            manifiestoPartes: [
-              { part_index: 1, start_ms: 0, end_ms: 60000, duracion_ms: 60000, bytes: 524288, download_path: "" }
-            ],
-            currentPartIndex: 1,
-            audioSourceUrl: "",
-            currentTimeMs: 15000,
-            duracionTotalMs: 60000,
-            isPlaying: scenario === "audio_multipart",
-            audioError: scenario === "incident" ? "Audio no disponible" : null,
-            hallazgos: scenario === "suggestions" ? hallazgos : [],
-            activeHallazgoIndex: 0,
-            incidentes: scenario === "incident" ? incidentes : [],
-            gateDecision: scenario === "approved"
-              ? { canApprove: true, version: 1, sha256: "sha-aprobado", gate_hash: "hash-ready", blockers: [], warnings: [], counts: { errores_tipograficos_pendientes: 0, correcciones_lingüisticas_pendientes: 0, observaciones_sintacticas_pendientes: 0, incidentes_operativos_abiertos: 0 } }
-              : scenario === "blocked" || scenario === "gate_blocked" || scenario === "incident"
-              ? { canApprove: false, version: 1, sha256: "sha-bloqueado", gate_hash: "hash-blocked", blockers: [{ code: "INCIDENTE_ABIERTO", message: "Incidente de audio pendiente" }], warnings: [], counts: { errores_tipograficos_pendientes: 0, correcciones_lingüisticas_pendientes: 1, observaciones_sintacticas_pendientes: 0, incidentes_operativos_abiertos: 1 } }
-              : gateDecision,
-            loadingGate: false,
-            holdProgress: 0,
-            isHolding: false,
-            showAccessibleModal: false,
-            accessibleConfirmText: "",
-            approvingVersion: false,
-            showAudioResolveModal: scenario === "incident",
-            selectedAudioResolveCode: "aceptado_sin_audio",
-            ingesting: scenario === "running",
-            ingestaResult: scenario === "success"
-              ? { success: true, io_id: "io-sintetico-999" }
-              : scenario === "failure"
-              ? { success: false, error: "Error de conexión con el kernel" }
-              : null,
-          }}
-        />
+        <PipelineView isReviewMode state={buildPipelineState(scenario, fetchError)} />
       );
 
     case "registro":
       return (
-        <RegistroView
-          isReviewMode={true}
-          state={{
-            eventos: scenario === "empty" ? [] : eventos,
-            ndjsonRaw: "",
-            loading: scenario === "loading",
-            error: scenario === "error" ? "Error al consultar la API de eventos" : fetchError,
-            faseFiltro: "todas",
-            agruparPorCorrelacion: false,
-            mensajeCopiar: "",
-            expandedDetails: {},
-          }}
-        />
+        <RegistroView isReviewMode state={buildRegistroState(scenario, fetchError)} />
       );
 
     case "grafo":
       return (
-        <GrafoView
-          isReviewMode={true}
-          state={{
-            nodes: scenario === "empty" ? [] : grafoData.nodes,
-            edges: scenario === "empty" ? [] : grafoData.edges,
-            loading: scenario === "loading",
-            error: scenario === "error" ? "Error al recuperar proyecciones del grafo" : fetchError,
-            viewMode: scenario === "dense" ? "graph" : "list",
-            layer2Active: scenario === "dense",
-            selectedElement: null,
-          }}
-        />
+        <GrafoView isReviewMode state={buildGrafoState(scenario, fetchError)} />
       );
 
     default:

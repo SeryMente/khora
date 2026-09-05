@@ -51,6 +51,10 @@ export type ManifestSchema = {
   screens: ScreenId[];
   scenarios: Record<string, ScenarioDefinition>;
   manifest_urls: string[];
+  /** Rutas prerenderizadas legibles sin JavaScript. */
+  static_urls: string[];
+  /** Índice de las rutas prerenderizadas. */
+  static_index: string;
 };
 
 export type ExportSummary = {
