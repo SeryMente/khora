@@ -2,6 +2,7 @@ import assert from "assert";
 import test from "node:test";
 import {
   clampPlaybackPosition,
+  explainAudioHttpFailure,
   globalTimeForPart,
   resolveGlobalSeek,
   type AudioManifestPart,
@@ -48,4 +49,26 @@ test("audio playback controller clamps seeks outside the manifest", () => {
     position: 2,
     localSeconds: 10,
   });
+});
+
+test("audio playback reports a locked vault instead of a codec error", async () => {
+  const response = new Response(
+    JSON.stringify({ detail: "Bóveda cerrada: introduce el PIN" }),
+    { status: 423, headers: { "content-type": "application/json" } },
+  );
+  assert.equal(
+    await explainAudioHttpFailure(response),
+    "Bóveda cerrada: introduce el PIN",
+  );
+});
+
+test("audio playback preserves specific server failures", async () => {
+  const response = new Response(
+    JSON.stringify({ detail: "No se pudo descifrar el blob de audio." }),
+    { status: 500, headers: { "content-type": "application/json" } },
+  );
+  assert.equal(
+    await explainAudioHttpFailure(response),
+    "No se pudo descifrar el blob de audio.",
+  );
 });

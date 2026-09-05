@@ -7,6 +7,7 @@ import {
   PipelineViewState,
 } from "../../components/shared/PipelineView";
 import {
+  explainAudioHttpFailure,
   globalTimeForPart,
   resolveGlobalSeek,
 } from "../../../lib/audio-playback";
@@ -39,6 +40,7 @@ export default function VolcadosPage() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const pendingSeekSecondsRef = useRef<number | null>(null);
   const resumeAfterLoadRef = useRef(false);
+  const validatedAudioSourceRef = useRef<string | null>(null);
 
   const manifestDurationMs = manifiestoPartes.reduce(
     (acc, p) => acc + (p.duracion_ms || 0),
@@ -56,6 +58,7 @@ export default function VolcadosPage() {
       const part = manifiestoPartes[safePosition - 1];
       pendingSeekSecondsRef.current = Math.max(0, localSeconds);
       resumeAfterLoadRef.current = autoplay;
+      validatedAudioSourceRef.current = null;
       setCurrentPartIndex(safePosition);
       setAudioSourceUrl(part.download_path);
       setAudioError(null);
@@ -79,6 +82,19 @@ export default function VolcadosPage() {
     }
 
     try {
+      if (validatedAudioSourceRef.current !== audioSourceUrl) {
+        const response = await fetch(audioSourceUrl, {
+          headers: { Range: "bytes=0-1" },
+          cache: "no-store",
+        });
+        const failure = await explainAudioHttpFailure(response);
+        if (failure) {
+          setIsPlaying(false);
+          setAudioError(failure);
+          return;
+        }
+        validatedAudioSourceRef.current = audioSourceUrl;
+      }
       await audio.play();
     } catch (err: any) {
       setIsPlaying(false);
@@ -160,12 +176,15 @@ export default function VolcadosPage() {
     setCurrentTimeMs(0);
     setFallbackDurationMs(0);
     setAudioError(null);
+    validatedAudioSourceRef.current = null;
     setManifiestoPartes([]);
     setAudioSourceUrl("");
     try {
-      const resManif = await fetch(`/api/audio/${id}/manifiesto`);
+      const resManif = await fetch(`/api/audio/${id}/manifiesto`, {
+        cache: "no-store",
+      });
+      const dataManif = await resManif.json().catch(() => ({}));
       if (resManif.ok) {
-        const dataManif = await resManif.json();
         setManifiestoPartes(dataManif.partes || []);
         if (dataManif.partes && dataManif.partes.length > 0) {
           setCurrentPartIndex(1);
@@ -177,9 +196,13 @@ export default function VolcadosPage() {
         }
       } else {
         setManifiestoPartes([]);
-        setAudioSourceUrl(`/api/audio/${id}`);
+        setAudioSourceUrl("");
         setAudioError(
-          "No se pudo cargar el manifiesto; se intentará la fuente de audio consolidada.",
+          (typeof dataManif?.detail === "string" && dataManif.detail) ||
+            (resManif.status === 423
+              ? "Bóveda cerrada: desbloquéala antes de reproducir el audio."
+              : null) ||
+            "No se pudo cargar el manifiesto de audio.",
         );
       }
 
@@ -451,7 +474,9 @@ export default function VolcadosPage() {
         onError={() => {
           setIsPlaying(false);
           setAudioError(
-            "La fuente de audio no pudo cargarse o no es reproducible.",
+            (current) =>
+              current ||
+              "La fuente de audio no pudo cargarse o no es reproducible.",
           );
         }}
       />
