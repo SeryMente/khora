@@ -17,20 +17,32 @@ export async function POST(req: NextRequest) {
   try {
     const forma = await req.formData();
     const archivo = forma.get("audio");
-    const previewText = typeof forma.get("previewText") === "string" ? String(forma.get("previewText")) : "";
-    let sessionId = typeof forma.get("sessionId") === "string" ? String(forma.get("sessionId")).trim() : "";
+    const previewText =
+      typeof forma.get("previewText") === "string"
+        ? String(forma.get("previewText"))
+        : "";
+    let sessionId =
+      typeof forma.get("sessionId") === "string"
+        ? String(forma.get("sessionId")).trim()
+        : "";
 
     if (!sessionId) {
       sessionId = randomUUID();
     }
 
     if (!(archivo instanceof Blob)) {
-      return NextResponse.json({ detail: "Falta el archivo de audio" }, { status: 400 });
+      return NextResponse.json(
+        { detail: "Falta el archivo de audio" },
+        { status: 400 },
+      );
     }
 
     const crudo = Buffer.from(await archivo.arrayBuffer());
     if (crudo.length === 0) {
-      return NextResponse.json({ detail: "El archivo de audio llegó vacío" }, { status: 400 });
+      return NextResponse.json(
+        { detail: "El archivo de audio llegó vacío" },
+        { status: 400 },
+      );
     }
 
     // 1. Persistir el archivo CIFRADO como parte 1 de la sesión (igual patrón que /api/audio)
@@ -53,8 +65,18 @@ export async function POST(req: NextRequest) {
         bytes: crudo.length,
         sha256,
       });
-    } catch (dbErr) {
-      console.error("Error al registrar parte de audio adjunto en la base de datos:", dbErr);
+    } catch {
+      return NextResponse.json(
+        {
+          error: "audio_almacenado_no_vinculado",
+          detail:
+            "El audio adjunto quedó almacenado, pero no pudo vincularse a la sesión. No se continuará a transcripción.",
+          sessionId,
+          audioBytes: crudo.length,
+          sha256,
+        },
+        { status: 503 },
+      );
     }
 
     // 2. Si bytes > ~24MB: guardar y responder exito:false, estadoTranscripcion:"fallido"
@@ -66,13 +88,16 @@ export async function POST(req: NextRequest) {
         sessionId,
         audioUrl: subido.url,
         audioBytes: crudo.length,
-        detail: "El archivo excede ~24MB. Se guardó el audio. Usa 'Re-transcribir audio' para procesarlo.",
+        detail:
+          "El archivo excede ~24MB. Se guardó el audio. Usa 'Re-transcribir audio' para procesarlo.",
       });
     }
 
     // 3. Transcribir con Groq Whisper y reconciliar con el guardián D12
     const nombreArchivo = (archivo as any).name || "audio-adjunto.webm";
-    const resGroq = await transcribirAudioConGroq(crudo, nombreArchivo, { verboseJson: true });
+    const resGroq = await transcribirAudioConGroq(crudo, nombreArchivo, {
+      verboseJson: true,
+    });
 
     if (!resGroq.exito) {
       return NextResponse.json({
@@ -104,8 +129,11 @@ export async function POST(req: NextRequest) {
     });
   } catch (e: any) {
     return NextResponse.json(
-      { detail: "Fallo al procesar el archivo de audio adjunto", causa: String(e?.message ?? e) },
-      { status: 500 }
+      {
+        detail: "Fallo al procesar el archivo de audio adjunto",
+        causa: String(e?.message ?? e),
+      },
+      { status: 500 },
     );
   }
 }

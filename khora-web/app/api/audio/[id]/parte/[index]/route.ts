@@ -8,16 +8,25 @@ import { reportarIncidente } from "@/lib/server/incidentes";
 
 export const runtime = "nodejs";
 
-export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string; index: string }> }) {
+export async function GET(
+  req: NextRequest,
+  ctx: { params: Promise<{ id: string; index: string }> },
+) {
   try {
     if (!desbloqueoVigente(req.cookies.get(COOKIE_BOVEDA)?.value)) {
-      return NextResponse.json({ error: "boveda_cerrada", detail: "Bóveda cerrada: introduce el PIN" }, { status: 423 });
+      return NextResponse.json(
+        { error: "boveda_cerrada", detail: "Bóveda cerrada: introduce el PIN" },
+        { status: 423 },
+      );
     }
 
     const { id, index } = await ctx.params;
     const partIndex = parseInt(index, 10);
-    if (isNaN(partIndex) || partIndex < 1) {
-      return NextResponse.json({ error: "parametro_invalido", detail: "Índice de parte inválido" }, { status: 400 });
+    if (isNaN(partIndex) || partIndex < 0) {
+      return NextResponse.json(
+        { error: "parametro_invalido", detail: "Índice de parte inválido" },
+        { status: 400 },
+      );
     }
 
     const isNumeric = /^\d+$/.test(id.trim());
@@ -26,16 +35,24 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string;
       isNumeric
         ? "SELECT id, audio_url, audio_partes, session_id FROM volcado WHERE folio = $1"
         : "SELECT id, audio_url, audio_partes, session_id FROM volcado WHERE id::text = $1",
-      [isNumeric ? parseInt(id.trim(), 10) : id.trim()]
+      [isNumeric ? parseInt(id.trim(), 10) : id.trim()],
     );
 
     if (volcadoRes.rows.length === 0) {
-      return NextResponse.json({ error: "volcado_inexistente", detail: "El volcado especificado no existe." }, { status: 404 });
+      return NextResponse.json(
+        {
+          error: "volcado_inexistente",
+          detail: "El volcado especificado no existe.",
+        },
+        { status: 404 },
+      );
     }
 
     const volcado = volcadoRes.rows[0];
     const volcadoId = volcado.id;
-    const sessionId = volcado.session_id ? String(volcado.session_id).trim() : null;
+    const sessionId = volcado.session_id
+      ? String(volcado.session_id).trim()
+      : null;
 
     let blobUrl = "";
     let sha256Esperado: string | null = null;
@@ -45,7 +62,7 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string;
       const parteRes = await db.query(
         `SELECT blob_url, sha256 FROM dictado_audio_parte
          WHERE (session_id = $1 OR volcado_id = $2) AND part_index = $3`,
-        [sessionId, volcadoId, partIndex]
+        [sessionId, volcadoId, partIndex],
       );
       if (parteRes.rows.length > 0) {
         blobUrl = parteRes.rows[0].blob_url;
@@ -56,7 +73,10 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string;
     // 2. Resolver por audio_partes JSON
     if (!blobUrl && volcado.audio_partes) {
       try {
-        const jsonPartes = typeof volcado.audio_partes === "string" ? JSON.parse(volcado.audio_partes) : volcado.audio_partes;
+        const jsonPartes =
+          typeof volcado.audio_partes === "string"
+            ? JSON.parse(volcado.audio_partes)
+            : volcado.audio_partes;
         if (Array.isArray(jsonPartes)) {
           const p = jsonPartes.find((item) => (item.parte ?? 1) === partIndex);
           if (p && p.url) {
@@ -82,7 +102,13 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string;
         origen: "reproducir_parte",
         evidencia: { parte_solicitada: partIndex },
       });
-      return NextResponse.json({ error: "parte_inexistente", detail: `Parte ${partIndex} de audio no encontrada.` }, { status: 404 });
+      return NextResponse.json(
+        {
+          error: "parte_inexistente",
+          detail: `Parte ${partIndex} de audio no encontrada.`,
+        },
+        { status: 404 },
+      );
     }
 
     // Descargar blob
@@ -97,7 +123,10 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string;
         origen: "reproducir_parte",
         evidencia: { url: blobUrl, error: String(err) },
       });
-      return NextResponse.json({ error: "blob_inaccesible", detail: `Blob inaccesible: ${blobUrl}` }, { status: 502 });
+      return NextResponse.json(
+        { error: "blob_inaccesible", detail: `Blob inaccesible: ${blobUrl}` },
+        { status: 502 },
+      );
     }
 
     if (!remoto.ok) {
@@ -108,7 +137,13 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string;
         origen: "reproducir_parte",
         evidencia: { url: blobUrl, status: remoto.status },
       });
-      return NextResponse.json({ error: "blob_inaccesible", detail: `Blob respondió con status ${remoto.status}` }, { status: 502 });
+      return NextResponse.json(
+        {
+          error: "blob_inaccesible",
+          detail: `Blob respondió con status ${remoto.status}`,
+        },
+        { status: 502 },
+      );
     }
 
     const cifrado = Buffer.from(await remoto.arrayBuffer());
@@ -123,7 +158,13 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string;
         origen: "reproducir_parte",
         evidencia: { motivo: "Error al descifrar el blob." },
       });
-      return NextResponse.json({ error: "blob_corrupto", detail: "No se pudo descifrar el blob de audio." }, { status: 500 });
+      return NextResponse.json(
+        {
+          error: "blob_corrupto",
+          detail: "No se pudo descifrar el blob de audio.",
+        },
+        { status: 500 },
+      );
     }
 
     if (sha256Esperado) {
@@ -134,9 +175,19 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string;
           tipo: "checksum_audio_invalido",
           severidad: "alta",
           origen: "reproducir_parte",
-          evidencia: { parte: partIndex, calculado: hashCalculado, esperado: sha256Esperado },
+          evidencia: {
+            parte: partIndex,
+            calculado: hashCalculado,
+            esperado: sha256Esperado,
+          },
         });
-        return NextResponse.json({ error: "checksum_audio_invalido", detail: `Fallo de verificación SHA256 en parte ${partIndex}` }, { status: 500 });
+        return NextResponse.json(
+          {
+            error: "checksum_audio_invalido",
+            detail: `Fallo de verificación SHA256 en parte ${partIndex}`,
+          },
+          { status: 500 },
+        );
       }
     }
 
@@ -192,6 +243,9 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string;
       },
     });
   } catch (err: any) {
-    return NextResponse.json({ error: "error_interno", detail: String(err) }, { status: 500 });
+    return NextResponse.json(
+      { error: "error_interno", detail: String(err) },
+      { status: 500 },
+    );
   }
 }
