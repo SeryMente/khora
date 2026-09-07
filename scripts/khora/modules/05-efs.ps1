@@ -36,5 +36,5 @@ function Remove-KhoraContainer {
     return (-not(Test-Path $ROOT_DIR))
 }
 function Test-KhoraEncrypted { param($Path) return (Test-KhoraEncryptedWorkspace) }
-function Protect-KhoraPath { if(-not(Test-KhoraEncryptedWorkspace)){throw'Workspace sin BitLocker.'};return $true }
+function Protect-KhoraPath { if(-not(Test-KhoraEncryptedWorkspace)){throw 'Workspace sin BitLocker.'};return $true }
 function Invoke-SecureDeleteFile { param($File) Remove-Item -LiteralPath $File -Force -ErrorAction SilentlyContinue }

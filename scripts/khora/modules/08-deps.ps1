@@ -27,21 +27,21 @@ function Start-KhoraPrefetch {
     if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
         $release=Invoke-RestMethod -Uri 'https://api.github.com/repos/git-for-windows/git/releases/latest' -Headers @{'User-Agent'='khora-ep'}
         $asset=$release.assets|Where-Object{$_.name -match '^PortableGit-.*-64-bit\.7z\.exe$'}|Select-Object -First 1
-        if(-not$asset){throw'No se encontró PortableGit.'}
+        if(-not$asset){throw 'No se encontró PortableGit.'}
         Start-KhoraDownloadJob -Name git -Uri $asset.browser_download_url -Path (Join-Path $directory $asset.name)
     }
     if (-not (Get-Command gh -ErrorAction SilentlyContinue)) {
         $release=Invoke-RestMethod -Uri 'https://api.github.com/repos/cli/cli/releases/latest' -Headers @{'User-Agent'='khora-ep'}
         $asset=$release.assets|Where-Object{$_.name -match '^gh_.*_windows_amd64\.zip$'}|Select-Object -First 1
         $sums=$release.assets|Where-Object{$_.name -match 'checksums\.txt$'}|Select-Object -First 1
-        if(-not$asset-or-not$sums){throw'No se encontró GitHub CLI.'}
+        if(-not$asset-or-not$sums){throw 'No se encontró GitHub CLI.'}
         Start-KhoraDownloadJob -Name gh -Uri $asset.browser_download_url -Path (Join-Path $directory $asset.name)
         Start-KhoraDownloadJob -Name ghSums -Uri $sums.browser_download_url -Path (Join-Path $directory $sums.name)
     }
     if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
         $index=Invoke-RestMethod -Uri 'https://nodejs.org/dist/index.json'
         $release=$index|Where-Object{$_.lts -and ($_.files -contains 'win-x64-zip')}|Select-Object -First 1
-        if(-not$release){throw'No se encontró Node.js LTS.'}
+        if(-not$release){throw 'No se encontró Node.js LTS.'}
         $name='node-'+$release.version+'-win-x64.zip';$base='https://nodejs.org/dist/'+$release.version
         Start-KhoraDownloadJob -Name node -Uri ($base+'/'+$name) -Path (Join-Path $directory $name)
         Start-KhoraDownloadJob -Name nodeSums -Uri ($base+'/SHASUMS256.txt') -Path (Join-Path $directory 'node-SHASUMS256.txt')
@@ -72,11 +72,11 @@ function Wait-KhoraPrefetch {
 function Ensure-Git {
     if(Get-Command git -ErrorAction SilentlyContinue){return $true}
     $installer=Wait-KhoraPrefetch -Name git
-    if(-not$installer){throw'PortableGit ausente.'}
-    if((Get-AuthenticodeSignature $installer).Status -ne 'Valid'){throw'Firma PortableGit inválida.'}
+    if(-not$installer){throw 'PortableGit ausente.'}
+    if((Get-AuthenticodeSignature $installer).Status -ne 'Valid'){throw 'Firma PortableGit inválida.'}
     $target=Join-Path $WORK_DIR 'tools\git';New-Item -ItemType Directory -Path $target -Force|Out-Null
     $process=Start-Process $installer -ArgumentList @("-o`"$target`"",'-y') -Wait -PassThru
-    if($process.ExitCode -ne 0){throw'Extracción Git falló.'}
+    if($process.ExitCode -ne 0){throw 'Extracción Git falló.'}
     Add-KhoraPath -Path (Join-Path $target 'cmd')
     return [bool](Get-Command git -ErrorAction SilentlyContinue)
 }
@@ -84,48 +84,48 @@ function Ensure-Git {
 function Ensure-GhCli {
     $existing=Get-Command gh -ErrorAction SilentlyContinue;if($existing){return $existing.Source}
     $zip=Wait-KhoraPrefetch -Name gh;$sumFile=Wait-KhoraPrefetch -Name ghSums
-    if(-not$zip-or-not$sumFile){throw'GitHub CLI ausente.'}
+    if(-not$zip-or-not$sumFile){throw 'GitHub CLI ausente.'}
     $line=Get-Content $sumFile|Where-Object{$_ -match [regex]::Escape((Split-Path $zip -Leaf))}|Select-Object -First 1
-    if(-not$line){throw'Checksum GitHub CLI ausente.'}
-    if((Get-FileHash $zip -Algorithm SHA256).Hash -ine (($line -split '\s+')[0])){throw'Checksum GitHub CLI inválido.'}
+    if(-not$line){throw 'Checksum GitHub CLI ausente.'}
+    if((Get-FileHash $zip -Algorithm SHA256).Hash -ine (($line -split '\s+')[0])){throw 'Checksum GitHub CLI inválido.'}
     $target=Join-Path $WORK_DIR 'tools\gh';Expand-Archive -LiteralPath $zip -DestinationPath $target -Force
-    $gh=Get-ChildItem $target -Filter gh.exe -Recurse|Select-Object -First 1;if(-not$gh){throw'gh.exe ausente.'}
+    $gh=Get-ChildItem $target -Filter gh.exe -Recurse|Select-Object -First 1;if(-not$gh){throw 'gh.exe ausente.'}
     Add-KhoraPath -Path $gh.DirectoryName;return $gh.FullName
 }
 
 function Confirm-GhCliAuth {
- $gh=Join-Path $TOOLS_DIR 'gh\bin\gh.exe';if(-not(Test-Path -LiteralPath $gh)){throw'GitHub CLI no disponible.'};$ok=Invoke-WithToken -Action {param($token)$previous=$env:GH_TOKEN;try{$env:GH_TOKEN=$token;$identity=(& $gh api user --jq .login 2>&1|Out-String).Trim();return ($LASTEXITCODE-eq0-and$identity)}finally{if($null-ne$previous){$env:GH_TOKEN=$previous}else{Remove-Item Env:GH_TOKEN -ErrorAction SilentlyContinue}}};return [bool]$ok
+ $gh=Join-Path $TOOLS_DIR 'gh\bin\gh.exe';if(-not(Test-Path -LiteralPath $gh)){throw 'GitHub CLI no disponible.'};$ok=Invoke-WithToken -Action {param($token)$previous=$env:GH_TOKEN;try{$env:GH_TOKEN=$token;$identity=(& $gh api user --jq .login 2>&1|Out-String).Trim();return ($LASTEXITCODE-eq0-and$identity)}finally{if($null-ne$previous){$env:GH_TOKEN=$previous}else{Remove-Item Env:GH_TOKEN -ErrorAction SilentlyContinue}}};return [bool]$ok
 }
 function Ensure-Node {
     $existing=Get-Command node -ErrorAction SilentlyContinue;if($existing){return $existing.Source}
     $zip=Wait-KhoraPrefetch -Name node;$sumFile=Wait-KhoraPrefetch -Name nodeSums
-    if(-not$zip-or-not$sumFile){throw'Node.js ausente.'}
+    if(-not$zip-or-not$sumFile){throw 'Node.js ausente.'}
     $line=Get-Content $sumFile|Where-Object{$_ -match [regex]::Escape((Split-Path $zip -Leaf))}|Select-Object -First 1
-    if(-not$line-or(Get-FileHash $zip -Algorithm SHA256).Hash -ine (($line.Trim() -split '\s+')[0])){throw'Checksum Node.js inválido.'}
+    if(-not$line-or(Get-FileHash $zip -Algorithm SHA256).Hash -ine (($line.Trim() -split '\s+')[0])){throw 'Checksum Node.js inválido.'}
     $target=Join-Path $WORK_DIR 'tools\node';Expand-Archive -LiteralPath $zip -DestinationPath $target -Force
-    $node=Get-ChildItem $target -Filter node.exe -Recurse|Select-Object -First 1;if(-not$node){throw'node.exe ausente.'}
+    $node=Get-ChildItem $target -Filter node.exe -Recurse|Select-Object -First 1;if(-not$node){throw 'node.exe ausente.'}
     Add-KhoraPath -Path $node.DirectoryName;return $node.FullName
 }
 
 function Ensure-Python311 {
     $existing=Get-Command python -ErrorAction SilentlyContinue
     if($existing -and $existing.Source -notmatch '\\WindowsApps\\'){if((& $existing.Source --version 2>&1) -match '^Python 3\.(1[1-9]|[2-9]\d)'){return $existing.Source}}
-    $installer=Wait-KhoraPrefetch -Name python;if(-not$installer){throw'Python ausente.'}
-    if((Get-AuthenticodeSignature $installer).Status -ne 'Valid'){throw'Firma Python inválida.'}
+    $installer=Wait-KhoraPrefetch -Name python;if(-not$installer){throw 'Python ausente.'}
+    if((Get-AuthenticodeSignature $installer).Status -ne 'Valid'){throw 'Firma Python inválida.'}
     $target=Join-Path $WORK_DIR 'tools\python311';New-Item -ItemType Directory -Path $target -Force|Out-Null
     $arguments='/quiet InstallAllUsers=0 PrependPath=0 Include_pip=1 Include_test=0 TargetDir="'+$target+'"'
     $process=Start-Process $installer -ArgumentList $arguments -Wait -PassThru -WindowStyle Hidden
-    $python=Join-Path $target 'python.exe';if($process.ExitCode -ne 0 -or -not(Test-Path $python)){throw'Instalación Python falló.'}
+    $python=Join-Path $target 'python.exe';if($process.ExitCode -ne 0 -or -not(Test-Path $python)){throw 'Instalación Python falló.'}
     Add-KhoraPath -Path $target;return $python
 }
 
 function Ensure-VSCode {
     $target=Join-Path $WORK_DIR 'tools\vscode';$code=Join-Path $target 'Code.exe'
     if(-not(Test-Path $code)){
-        $zip=Wait-KhoraPrefetch -Name vscode;if(-not$zip){throw'Visual Studio Code ausente.'}
-        $expected=[string]$script:PrefetchPlan['vscodeHash'];if($expected -and (Get-FileHash $zip -Algorithm SHA256).Hash -ine $expected){throw'Checksum Visual Studio Code inválido.'}
+        $zip=Wait-KhoraPrefetch -Name vscode;if(-not$zip){throw 'Visual Studio Code ausente.'}
+        $expected=[string]$script:PrefetchPlan['vscodeHash'];if($expected -and (Get-FileHash $zip -Algorithm SHA256).Hash -ine $expected){throw 'Checksum Visual Studio Code inválido.'}
         Expand-Archive -LiteralPath $zip -DestinationPath $target -Force
-        if(-not(Test-Path $code)-or(Get-AuthenticodeSignature $code).Status -ne 'Valid'){throw'Firma Visual Studio Code inválida.'}
+        if(-not(Test-Path $code)-or(Get-AuthenticodeSignature $code).Status -ne 'Valid'){throw 'Firma Visual Studio Code inválida.'}
     }
     foreach($path in @((Join-Path $target 'data\user-data'),(Join-Path $target 'data\extensions'),(Join-Path $target 'data\tmp'))){New-Item -ItemType Directory -Path $path -Force|Out-Null}
     return $code
@@ -135,7 +135,7 @@ function Get-CodeCli {$code=Ensure-VSCode;return (Join-Path (Split-Path -Parent 
 function Ensure-VercelCLI {
     $node=Ensure-Node;$npm=Join-Path (Split-Path -Parent $node) 'npm.cmd';if(-not(Test-Path $npm)){$npm=(Get-Command npm.cmd -ErrorAction Stop).Source}
     $target=Join-Path $WORK_DIR 'tools\vercel';$vercel=Join-Path $target 'node_modules\.bin\vercel.cmd'
-    if(-not(Test-Path $vercel)){& $npm install --prefix $target --no-save --no-audit --no-fund vercel@59.3.0 2>&1|ForEach-Object{Info ('npm vercel: '+[string]$_)};if($LASTEXITCODE -ne 0){throw'Instalación Vercel CLI falló.'}}
+    if(-not(Test-Path $vercel)){& $npm install --prefix $target --no-save --no-audit --no-fund vercel@59.3.0 2>&1|ForEach-Object{Info ('npm vercel: '+[string]$_)};if($LASTEXITCODE -ne 0){throw 'Instalación Vercel CLI falló.'}}
     return $vercel
 }
 
@@ -175,11 +175,11 @@ function Start-KhoraVSCode {
 
 function Start-KhoraDependencyHydration {
     $python=Ensure-Python311;$node=Ensure-Node;$venv=Join-Path $WORK_DIR 'venv';$web=Join-Path $REPO_DIR 'khora-web';$npm=Join-Path (Split-Path -Parent $node) 'npm.cmd'
-    if(Test-Path(Join-Path $REPO_DIR 'pyproject.toml')){$script:DependencyJobs['python']=Start-Job -ArgumentList @($python,$venv,$REPO_DIR) -ScriptBlock {param($py,$ve,$repo)& $py -m venv $ve;if($LASTEXITCODE-ne0){throw'venv falló'};& (Join-Path $ve 'Scripts\python.exe') -m pip install -e $repo --disable-pip-version-check;if($LASTEXITCODE-ne0){throw'pip falló'}}}
-    if(Test-Path(Join-Path $web 'package-lock.json')){$script:DependencyJobs['node']=Start-Job -ArgumentList @($npm,$web) -ScriptBlock {param($npmPath,$directory)& $npmPath --prefix $directory ci --no-audit --no-fund;if($LASTEXITCODE-ne0){throw'npm ci falló'}}}
+    if(Test-Path(Join-Path $REPO_DIR 'pyproject.toml')){$script:DependencyJobs['python']=Start-Job -ArgumentList @($python,$venv,$REPO_DIR) -ScriptBlock {param($py,$ve,$repo)& $py -m venv $ve;if($LASTEXITCODE-ne0){throw 'venv falló'};& (Join-Path $ve 'Scripts\python.exe') -m pip install -e $repo --disable-pip-version-check;if($LASTEXITCODE-ne0){throw 'pip falló'}}}
+    if(Test-Path(Join-Path $web 'package-lock.json')){$script:DependencyJobs['node']=Start-Job -ArgumentList @($npm,$web) -ScriptBlock {param($npmPath,$directory)& $npmPath --prefix $directory ci --no-audit --no-fund;if($LASTEXITCODE-ne0){throw 'npm ci falló'}}}
 }
 function Wait-KhoraDependencyHydration {
-    foreach($name in @($script:DependencyJobs.Keys)){$job=$script:DependencyJobs[$name];Wait-Job $job|Out-Null;$output=@(Receive-Job $job -ErrorAction SilentlyContinue);$output|ForEach-Object{Info ("dependency ${name}: "+[string]$_)};if($job.State-ne'Completed'){throw"Dependencias $name fallaron."};Remove-Job $job -Force}
+    foreach($name in @($script:DependencyJobs.Keys)){$job=$script:DependencyJobs[$name];Wait-Job $job|Out-Null;$output=@(Receive-Job $job -ErrorAction SilentlyContinue);$output|ForEach-Object{Info ("dependency ${name}: "+[string]$_)};if($job.State-ne'Completed'){throw "Dependencias $name fallaron."};Remove-Job $job -Force}
     $script:DependencyJobs=@{}
 }
 function Start-DepsPreload{Start-KhoraPrefetch}

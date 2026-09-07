@@ -15,19 +15,19 @@ function Invoke-GitTokenCommand {
     return [pscustomobject]@{Code=$script:GitExit;Output=@($script:GitOutput)}
 }
 function Initialize-KhoraRepository {
-    if(-not(Get-Command git -ErrorAction SilentlyContinue)){throw'Git no disponible.'}
+    if(-not(Get-Command git -ErrorAction SilentlyContinue)){throw 'Git no disponible.'}
     if(-not(Test-Path(Join-Path $REPO_DIR '.git'))){& git -C $REPO_DIR init|Out-Null;& git -C $REPO_DIR remote add origin 'https://github.com/SeryMente/khora.git'|Out-Null}
     & git -C $REPO_DIR config user.name $CFG.gitName;& git -C $REPO_DIR config user.email $CFG.gitEmail;& git -C $REPO_DIR config core.autocrlf false
     $sha=[string]$script:SESSION.commitSha;$fetch=Invoke-GitTokenCommand -Arguments @('fetch','--prune','origin',$sha)
     if($fetch.Code-ne0){throw('git fetch falló: '+(($fetch.Output-join' ')|Mask-Token))}
     & git -C $REPO_DIR reset --hard $sha|Out-Null
-    if((& git -C $REPO_DIR rev-parse HEAD).Trim()-ne$sha){throw'El SHA local no coincide con el remoto.'}
+    if((& git -C $REPO_DIR rev-parse HEAD).Trim()-ne$sha){throw 'El SHA local no coincide con el remoto.'}
 }
 function Init-Wip {
     $list=Invoke-GitTokenCommand -Arguments @('for-each-ref','--sort=-committerdate','--format=%(refname:short)','refs/remotes/origin/ep-wip/*');$branch=$null
     if($list.Code-eq0-and$list.Output.Count-gt0){$remote=([string]$list.Output[0]).Trim();if($remote-match'^origin/(.+)$'){$branch=$Matches[1];& git -C $REPO_DIR checkout -B $branch $remote|Out-Null}}
     if(-not$branch){$branch='ep-wip/'+(Get-Date -Format 'yyyyMMdd-HHmmss');& git -C $REPO_DIR checkout -b $branch|Out-Null}
-    if($LASTEXITCODE-ne0){throw'No se pudo preparar la rama WIP.'};$script:WIP_BRANCH=$branch
+    if($LASTEXITCODE-ne0){throw 'No se pudo preparar la rama WIP.'};$script:WIP_BRANCH=$branch
 }
 function Get-KhoraStageablePaths {
     $paths=New-Object 'System.Collections.Generic.List[string]'
@@ -44,8 +44,8 @@ function Push-Verified {
     if($remote.Code-ne0-or$remote.Output.Count-eq0){return $false};return ($local-eq((([string]$remote.Output[0])-split'\s+')[0]))
 }
 function Do-AutoWip {
-    foreach($path in Get-KhoraStageablePaths){& git -C $REPO_DIR add -- $path|Out-Null;if($LASTEXITCODE-ne0){throw"No se pudo stagear $path"}}
-    if(@(& git -C $REPO_DIR diff --cached --name-only).Count-gt0){& git -C $REPO_DIR commit -m ('ep: continuidad '+(Get-Date -Format 'yyyy-MM-dd HH:mm:ss'))|Out-Null;if($LASTEXITCODE-ne0){throw'Commit WIP falló.'}}
+    foreach($path in Get-KhoraStageablePaths){& git -C $REPO_DIR add -- $path|Out-Null;if($LASTEXITCODE-ne0){throw "No se pudo stagear $path"}}
+    if(@(& git -C $REPO_DIR diff --cached --name-only).Count-gt0){& git -C $REPO_DIR commit -m ('ep: continuidad '+(Get-Date -Format 'yyyy-MM-dd HH:mm:ss'))|Out-Null;if($LASTEXITCODE-ne0){throw 'Commit WIP falló.'}}
     return (Push-Verified)
 }
 function Test-UnpushedWork{return [bool]((Get-KhoraStageablePaths).Count-gt0)}

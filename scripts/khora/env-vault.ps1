@@ -47,7 +47,7 @@ function KhoraVault-Decrypt {
     param($Entry,[byte[]]$Key)
     $iv=[Convert]::FromBase64String($Entry.nonce);$cipher=[Convert]::FromBase64String($Entry.cipher);$tag=[Convert]::FromBase64String($Entry.tag)
     $hmac=New-Object Security.Cryptography.HMACSHA256(,[byte[]]$Key[32..63]);$expected=$hmac.ComputeHash($iv+$cipher);$hmac.Dispose()
-    if(-not(Test-KhoraBytesEqual -A $tag -B $expected)){throw'Bóveda: HMAC inválido o llave incorrecta.'}
+    if(-not(Test-KhoraBytesEqual -A $tag -B $expected)){throw 'Bóveda: HMAC inválido o llave incorrecta.'}
     $aes=[Security.Cryptography.Aes]::Create();$aes.Key=[byte[]]$Key[0..31];$aes.IV=$iv
     $plain=$aes.CreateDecryptor().TransformFinalBlock($cipher,0,$cipher.Length);$aes.Dispose()
     return [Text.Encoding]::UTF8.GetString($plain)
@@ -72,7 +72,7 @@ function Set-KhoraEnvVaultVariable {
     param([string]$Name,[switch]$Rotate,[switch]$UseClipboard)
     $vault=KhoraVault-Load;$names=@($vault.entries.PSObject.Properties.Name);if(($names-contains$Name)-and-not$Rotate){return }
     if($UseClipboard){$value=([string](Get-Clipboard -Raw)).Trim();Set-Clipboard -Value' '}else{$value=KhoraVault-SecureToPlain -Secure (Read-Host ('Valor para '+$Name) -AsSecureString)}
-    if([string]::IsNullOrWhiteSpace($value)-or-not(KhoraVault-ValidateValue -Name $Name -Value $value)){throw'Valor de bóveda inválido.'}
+    if([string]::IsNullOrWhiteSpace($value)-or-not(KhoraVault-ValidateValue -Name $Name -Value $value)){throw 'Valor de bóveda inválido.'}
     $key=KhoraVault-DeriveKey -MasterSecure (KhoraVault-GetMasterKey) -Salt ([Convert]::FromBase64String($vault.salt));$entry=KhoraVault-Encrypt -PlainText $value -Key $key
     if($names-contains$Name){$vault.entries.$Name=$entry}else{$vault.entries|Add-Member -MemberType NoteProperty -Name $Name -Value $entry}
     KhoraVault-Save -VaultObj $vault;$value=$null
@@ -89,10 +89,10 @@ function Protect-KhoraFile {
 }
 function Unprotect-KhoraFile {
     param([string]$InputFile,[string]$OutputFile)
-    $all=[IO.File]::ReadAllBytes($InputFile);if($all.Length-lt73-or[Text.Encoding]::ASCII.GetString($all,0,8)-ne'KHORAEP1'){throw'Perfil cifrado inválido.'}
+    $all=[IO.File]::ReadAllBytes($InputFile);if($all.Length-lt73-or[Text.Encoding]::ASCII.GetString($all,0,8)-ne'KHORAEP1'){throw 'Perfil cifrado inválido.'}
     $salt=[byte[]]$all[8..23];$iv=[byte[]]$all[24..39];$tag=[byte[]]$all[40..71];$cipher=[byte[]]$all[72..($all.Length-1)]
     $key=KhoraVault-DeriveKey -MasterSecure (KhoraVault-GetMasterKey) -Salt $salt;$hmac=New-Object Security.Cryptography.HMACSHA256(,[byte[]]$key[32..63]);$expected=$hmac.ComputeHash([Text.Encoding]::ASCII.GetBytes('KHORAEP1')+$salt+$iv+$cipher)
-    if(-not(Test-KhoraBytesEqual -A $tag -B $expected)){throw'Perfil cifrado: HMAC inválido.'}
+    if(-not(Test-KhoraBytesEqual -A $tag -B $expected)){throw 'Perfil cifrado: HMAC inválido.'}
     $aes=[Security.Cryptography.Aes]::Create();$aes.Key=[byte[]]$key[0..31];$aes.IV=$iv;$plain=$aes.CreateDecryptor().TransformFinalBlock($cipher,0,$cipher.Length)
     [IO.File]::WriteAllBytes($OutputFile,$plain);$hmac.Dispose();$aes.Dispose();[Array]::Clear($plain,0,$plain.Length)
 }

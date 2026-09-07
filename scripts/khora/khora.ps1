@@ -37,7 +37,7 @@ function Get-KhoraBootstrapHeaders {
 }
 function Send-KhoraBootstrapEvent {
     param([string]$Id,[string]$State,[string]$Message,[Nullable[long]]$DurationMs=$null)
-    if([string]::IsNullOrWhiteSpace($KhoraToken)-or[string]::IsNullOrWhiteSpace($KhoraApiBase)){throw'Token o API Khora ausente; la bitácora persistente es obligatoria.'}
+    if([string]::IsNullOrWhiteSpace($KhoraToken)-or[string]::IsNullOrWhiteSpace($KhoraApiBase)){throw 'Token o API Khora ausente; la bitácora persistente es obligatoria.'}
     $event=[ordered]@{id=$Id;state=$State;message=$Message;timestamp=[DateTime]::UtcNow.ToString('o')}
     if($null-ne$DurationMs){$event.durationMs=[long]$DurationMs}
     $body=@{events=@($event)}|ConvertTo-Json -Depth 6 -Compress
@@ -69,9 +69,9 @@ function Test-KhoraAdministrator {
 }
 function Assert-KhoraBootstrapInputs {
  param([string]$Token,[string]$ApiBase)
- if([string]::IsNullOrWhiteSpace($Token)-or$Token.Length-gt16384-or$Token-notmatch'^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$'){throw'Token Khora ausente o con formato JWT inválido.'}
- try{$uri=[uri]$ApiBase}catch{throw'URL canónica Khora inválida.'}
- if(-not$uri.IsAbsoluteUri-or$uri.Scheme-ne'https'-or$uri.UserInfo-or$uri.Query-or$uri.Fragment-or$uri.AbsolutePath.TrimEnd('/')-ne'/api/ep'){throw'La API Khora debe ser HTTPS y terminar exactamente en /api/ep.'}
+ if([string]::IsNullOrWhiteSpace($Token)-or$Token.Length-gt16384-or$Token-notmatch'^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$'){throw 'Token Khora ausente o con formato JWT inválido.'}
+ try{$uri=[uri]$ApiBase}catch{throw 'URL canónica Khora inválida.'}
+ if(-not$uri.IsAbsoluteUri-or$uri.Scheme-ne'https'-or$uri.UserInfo-or$uri.Query-or$uri.Fragment-or$uri.AbsolutePath.TrimEnd('/')-ne'/api/ep'){throw 'La API Khora debe ser HTTPS y terminar exactamente en /api/ep.'}
 }
 function Remove-KhoraTemporaryGate {
  try{$full=[IO.Path]::GetFullPath($script:GATE_PATH);$temp=[IO.Path]::GetFullPath([IO.Path]::GetTempPath());if($full.StartsWith($temp,[StringComparison]::OrdinalIgnoreCase)-and[IO.Path]::GetFileName($full)-like'khora-bootstrap-*.ps1'){Remove-Item -LiteralPath $full -Force -ErrorAction Stop;return $true}}catch{};return $false
@@ -82,16 +82,16 @@ function Set-KhoraBootstrapConsoleVisible {
 }
 function Invoke-KhoraElevation {
  if(Test-KhoraAdministrator){return $false}
- if([string]::IsNullOrWhiteSpace($script:SELF_SOURCE)){throw'No se pudo materializar el gate para elevación.'}
+ if([string]::IsNullOrWhiteSpace($script:SELF_SOURCE)){throw 'No se pudo materializar el gate para elevación.'}
  $temporaryScript=Join-Path $env:TEMP ('khora-bootstrap-'+[guid]::NewGuid().ToString('N')+'.ps1');$temporaryToken=Join-Path $env:TEMP ('khora-token-'+[guid]::NewGuid().ToString('N')+'.dpapi')
- try{[IO.File]::WriteAllText($temporaryScript,$script:SELF_SOURCE,(New-Object Text.UTF8Encoding($true)));Protect-KhoraSecureStringBlob -Secure (ConvertTo-SecureString $script:KhoraToken -AsPlainText -Force) -Path $temporaryToken;$args=@('-NoProfile','-ExecutionPolicy','Bypass','-File',('"'+$temporaryScript+'"'),'-Bootstrap','-KhoraTokenFile',('"'+$temporaryToken+'"'),'-KhoraApiBase',('"'+$KhoraApiBase+'"'));$child=Start-Process powershell.exe -Verb RunAs -ArgumentList $args -PassThru -ErrorAction Stop;$until=[DateTime]::UtcNow.AddSeconds(45);while((Test-Path -LiteralPath $temporaryToken)-and-not$child.HasExited-and[DateTime]::UtcNow-lt$until){Start-Sleep -Milliseconds 200};if($child.HasExited-and(Test-Path -LiteralPath $temporaryToken)){throw'El proceso elevado no consumió la credencial protegida.'};return $true}catch{Remove-Item -LiteralPath $temporaryScript,$temporaryToken -Force -ErrorAction SilentlyContinue;throw}
+ try{[IO.File]::WriteAllText($temporaryScript,$script:SELF_SOURCE,(New-Object Text.UTF8Encoding($true)));Protect-KhoraSecureStringBlob -Secure (ConvertTo-SecureString $script:KhoraToken -AsPlainText -Force) -Path $temporaryToken;$args=@('-NoProfile','-ExecutionPolicy','Bypass','-File',('"'+$temporaryScript+'"'),'-Bootstrap','-KhoraTokenFile',('"'+$temporaryToken+'"'),'-KhoraApiBase',('"'+$KhoraApiBase+'"'));$child=Start-Process powershell.exe -Verb RunAs -ArgumentList $args -PassThru -ErrorAction Stop;$until=[DateTime]::UtcNow.AddSeconds(45);while((Test-Path -LiteralPath $temporaryToken)-and-not$child.HasExited-and[DateTime]::UtcNow-lt$until){Start-Sleep -Milliseconds 200};if($child.HasExited-and(Test-Path -LiteralPath $temporaryToken)){throw 'El proceso elevado no consumió la credencial protegida.'};return $true}catch{Remove-Item -LiteralPath $temporaryScript,$temporaryToken -Force -ErrorAction SilentlyContinue;throw}
 }
 function Get-KhoraDesktop {
- $desktop=[Environment]::GetFolderPath([Environment+SpecialFolder]::Desktop);if([string]::IsNullOrWhiteSpace($desktop)-or-not(Test-Path -LiteralPath $desktop -PathType Container)){throw'No se pudo descubrir un Escritorio local utilizable.'};$root=[IO.Path]::GetPathRoot($desktop);if($root.StartsWith('\\')){throw'VHDX requiere un Escritorio en volumen local.'};$probe=Join-Path $desktop ('.khora-probe-'+[guid]::NewGuid().ToString('N'));try{[IO.File]::WriteAllText($probe,'ok');Remove-Item -LiteralPath $probe -Force}catch{throw'El Escritorio no es escribible.'};$drive=Get-PSDrive -Name $root.TrimEnd('\').TrimEnd(':') -ErrorAction SilentlyContinue;if($drive-and$drive.Free-lt6GB){throw'Se requieren al menos 6 GiB libres.'};return [IO.Path]::GetFullPath($desktop)
+ $desktop=[Environment]::GetFolderPath([Environment+SpecialFolder]::Desktop);if([string]::IsNullOrWhiteSpace($desktop)-or-not(Test-Path -LiteralPath $desktop -PathType Container)){throw 'No se pudo descubrir un Escritorio local utilizable.'};$root=[IO.Path]::GetPathRoot($desktop);if($root.StartsWith('\\')){throw 'VHDX requiere un Escritorio en volumen local.'};$probe=Join-Path $desktop ('.khora-probe-'+[guid]::NewGuid().ToString('N'));try{[IO.File]::WriteAllText($probe,'ok');Remove-Item -LiteralPath $probe -Force}catch{throw 'El Escritorio no es escribible.'};$drive=Get-PSDrive -Name $root.TrimEnd('\').TrimEnd(':') -ErrorAction SilentlyContinue;if($drive-and$drive.Free-lt6GB){throw 'Se requieren al menos 6 GiB libres.'};return [IO.Path]::GetFullPath($desktop)
 }
 function Get-KhoraFreeDrive {
     foreach($letterCode in 90..82){$letter=[char]$letterCode;if(-not(Test-Path ("$letter`:\"))){return [string]$letter}}
-    throw'No hay letra de unidad libre entre R y Z.'
+    throw 'No hay letra de unidad libre entre R y Z.'
 }
 function Invoke-KhoraDiskpart {
     param([string[]]$Lines)
@@ -110,7 +110,7 @@ function New-KhoraEncryptedWorkspace {
     Enable-BitLocker -MountPoint $mount -PasswordProtector -Password $password -EncryptionMethod XtsAes256 -UsedSpaceOnly -SkipHardwareTest|Out-Null
     $deadline=(Get-Date).AddMinutes(5)
     do{$volume=Get-BitLockerVolume -MountPoint $mount;if([int]$volume.EncryptionPercentage-eq100-and[string]$volume.ProtectionStatus-eq'On'){break};Start-Sleep -Milliseconds 400}while((Get-Date)-lt$deadline)
-    if([int]$volume.EncryptionPercentage-ne100-or[string]$volume.ProtectionStatus-ne'On'){throw'BitLocker no alcanzó 100% y ProtectionStatus=On.'}
+    if([int]$volume.EncryptionPercentage-ne100-or[string]$volume.ProtectionStatus-ne'On'){throw 'BitLocker no alcanzó 100% y ProtectionStatus=On.'}
     return $mount
 }
 function Register-KhoraRebootCleanup {
@@ -132,7 +132,7 @@ function Get-KhoraGitHubToken {
         }
         Start-Sleep -Milliseconds 400
     }while((Get-Date)-lt$deadline)
-    throw'No se recibió un Personal Access Token válido en diez minutos.'
+    throw 'No se recibió un Personal Access Token válido en diez minutos.'
 }
 function Invoke-WithBootstrapToken {
     param([Security.SecureString]$Secure,[ScriptBlock]$Action)
@@ -141,7 +141,7 @@ function Invoke-WithBootstrapToken {
 }
 function Materialize-KhoraRepository {
  param([Security.SecureString]$Pat,[string]$Destination)
- return Invoke-WithBootstrapToken -Secure $Pat -Action {param($token)$id=[guid]::NewGuid().ToString('N');$zip=Join-Path $env:TEMP ('khora-seed-'+$id+'.zip');$extract=Join-Path $env:TEMP ('khora-seed-'+$id);try{$headers=@{Authorization=('Bearer '+$token);'User-Agent'='khora-ep-medio-v1';Accept='application/vnd.github+json'};$commit=Invoke-RestMethod -Uri ('https'+'://api.github.com/repos/SeryMente/khora/commits/main') -Headers $headers -TimeoutSec 30 -ErrorAction Stop;$sha=[string]$commit.sha;if($sha-notmatch'^[0-9a-f]{40}$'){throw'SHA remoto inválido.'};$uri=(('https'+'://api.github.com/repos/SeryMente/khora/zipball/{0}')-f$sha);Invoke-WebRequest -Uri $uri -Headers $headers -OutFile $zip -UseBasicParsing -TimeoutSec 900 -ErrorAction Stop;$sig=[IO.File]::ReadAllBytes($zip);if($sig.Length-lt4-or$sig[0]-ne0x50-or$sig[1]-ne0x4B){throw'GitHub no devolvió ZIP.'};New-Item -ItemType Directory -Path $extract -Force|Out-Null;Expand-Archive -LiteralPath $zip -DestinationPath $extract -Force -ErrorAction Stop;$roots=@(Get-ChildItem -LiteralPath $extract -Directory -Force);if($roots.Count-ne1){throw'ZIP sin raíz única.'};New-Item -ItemType Directory -Path $Destination -Force|Out-Null;Get-ChildItem -LiteralPath $roots[0].FullName -Force|ForEach-Object{Copy-Item -LiteralPath $_.FullName -Destination $Destination -Recurse -Force};return $sha}finally{Remove-Item -LiteralPath $zip -Force -ErrorAction SilentlyContinue;Remove-Item -LiteralPath $extract -Recurse -Force -ErrorAction SilentlyContinue;$token=$null}}
+ return Invoke-WithBootstrapToken -Secure $Pat -Action {param($token)$id=[guid]::NewGuid().ToString('N');$zip=Join-Path $env:TEMP ('khora-seed-'+$id+'.zip');$extract=Join-Path $env:TEMP ('khora-seed-'+$id);try{$headers=@{Authorization=('Bearer '+$token);'User-Agent'='khora-ep-medio-v1';Accept='application/vnd.github+json'};$commit=Invoke-RestMethod -Uri ('https'+'://api.github.com/repos/SeryMente/khora/commits/main') -Headers $headers -TimeoutSec 30 -ErrorAction Stop;$sha=[string]$commit.sha;if($sha-notmatch'^[0-9a-f]{40}$'){throw 'SHA remoto inválido.'};$uri=(('https'+'://api.github.com/repos/SeryMente/khora/zipball/{0}')-f$sha);Invoke-WebRequest -Uri $uri -Headers $headers -OutFile $zip -UseBasicParsing -TimeoutSec 900 -ErrorAction Stop;$sig=[IO.File]::ReadAllBytes($zip);if($sig.Length-lt4-or$sig[0]-ne0x50-or$sig[1]-ne0x4B){throw 'GitHub no devolvió ZIP.'};New-Item -ItemType Directory -Path $extract -Force|Out-Null;Expand-Archive -LiteralPath $zip -DestinationPath $extract -Force -ErrorAction Stop;$roots=@(Get-ChildItem -LiteralPath $extract -Directory -Force);if($roots.Count-ne1){throw 'ZIP sin raíz única.'};New-Item -ItemType Directory -Path $Destination -Force|Out-Null;Get-ChildItem -LiteralPath $roots[0].FullName -Force|ForEach-Object{Copy-Item -LiteralPath $_.FullName -Destination $Destination -Recurse -Force};return $sha}finally{Remove-Item -LiteralPath $zip -Force -ErrorAction SilentlyContinue;Remove-Item -LiteralPath $extract -Recurse -Force -ErrorAction SilentlyContinue;$token=$null}}
 }
 function Start-KhoraLogWindow {
     param([string]$Log)
@@ -166,9 +166,9 @@ function Start-KhoraBootstrap {
     Write-Host 'Cada etapa expone un identificador estable EP-*.' -ForegroundColor DarkGray
     $outer=$null;$vhd=$null;$mount=$null;$vault=$null;$pat=$null
     try{
-        $desktop=Invoke-KhoraBootstrapStage -Id 'EP-IN-010' -Label 'Comprobar Windows, elevación y Escritorio' -Action {if($env:OS-ne'Windows_NT'){throw'Solo Windows.'};foreach($command in @('diskpart.exe','Enable-BitLocker','Get-BitLockerVolume','Register-ScheduledTask')){if(-not(Get-Command $command -ErrorAction SilentlyContinue)){throw"Falta $command"}};return (Get-KhoraDesktop)}
+        $desktop=Invoke-KhoraBootstrapStage -Id 'EP-IN-010' -Label 'Comprobar Windows, elevación y Escritorio' -Action {if($env:OS-ne'Windows_NT'){throw 'Solo Windows.'};foreach($command in @('diskpart.exe','Enable-BitLocker','Get-BitLockerVolume','Register-ScheduledTask')){if(-not(Get-Command $command -ErrorAction SilentlyContinue)){throw "Falta $command"}};return (Get-KhoraDesktop)}
         $sessionId=[guid]::NewGuid().ToString();$outer=Join-Path $desktop ('KHORA-EP-'+$sessionId);$vhd=Join-Path $outer 'khora-ep-medio.vhdx';$drive=Get-KhoraFreeDrive
-        $vault=Invoke-KhoraBootstrapStage -Id 'EP-IN-020' -Label 'Recibir la llave de la bóveda' -Action {$key=Read-Host 'Llave de la bóveda' -AsSecureString;if($key.Length-lt8){throw'Llave demasiado corta.'};return $key}
+        $vault=Invoke-KhoraBootstrapStage -Id 'EP-IN-020' -Label 'Recibir la llave de la bóveda' -Action {$key=Read-Host 'Llave de la bóveda' -AsSecureString;if($key.Length-lt8){throw 'Llave demasiado corta.'};return $key}
         $mount=Invoke-KhoraBootstrapStage -Id 'EP-IN-030' -Label 'Crear y verificar el volumen cifrado' -Action {New-KhoraEncryptedWorkspace -Outer $outer -Vhd $vhd -Drive $drive -VaultKey $vault -SessionId $sessionId}
         $work=Join-Path ($mount+'\') 'khora-ep';$state=Join-Path $work 'session-state';$repository=Join-Path $work 'repo';$logs=Join-Path $work 'logs'
         New-Item -ItemType Directory -Path @($state,$repository,$logs) -Force|Out-Null
@@ -188,7 +188,7 @@ function Start-KhoraBootstrap {
         $manifest=[ordered]@{schema='khora-ep-session/v1';epVersion=$script:EP_VERSION;scriptVersion=$script:SCRIPT_VERSION;sessionId=$sessionId;startedUtc=[DateTime]::UtcNow.ToString('o');outerDir=$outer;vhdPath=$vhd;mountPoint=$mount;workDir=$work;stateDir=$state;repoDir=$repository;logFile=$log;jsonLog=$jsonLog;commitSha=$sha;cleanupTask=$task;launcherPid=$PID;khoraApiBase=$KhoraApiBase;logPid=0}
         $manifestPath=Join-Path $state 'session-manifest.json';$manifest|ConvertTo-Json -Depth 8|Set-Content -LiteralPath $manifestPath -Encoding UTF8
         $logProcess=Start-KhoraLogWindow -Log $log;$manifest.logPid=$logProcess.Id;$manifest|ConvertTo-Json -Depth 8|Set-Content -LiteralPath $manifestPath -Encoding UTF8
-        $gate=Join-Path $repository 'scripts\khora\khora.ps1';if(-not(Test-Path $gate)){throw'El commit no contiene el punto de entrada contractual.'}
+        $gate=Join-Path $repository 'scripts\khora\khora.ps1';if(-not(Test-Path $gate)){throw 'El commit no contiene el punto de entrada contractual.'}
         $arguments=@('-NoProfile','-ExecutionPolicy','Bypass','-File',('"'+$gate+'"'),'-BootstrapStage2','-SessionManifest',('"'+$manifestPath+'"'),'-WatchPid',$PID)
         $consoleHidden=Set-KhoraBootstrapConsoleVisible -Visible $false
         try{$interface=Start-Process powershell.exe -ArgumentList $arguments -PassThru -ErrorAction Stop;Wait-Process -Id $interface.Id}finally{if($consoleHidden){Set-KhoraBootstrapConsoleVisible -Visible $true|Out-Null}}
@@ -197,9 +197,9 @@ function Start-KhoraBootstrap {
 }
 
 if($Bootstrap){Start-KhoraBootstrap;return }
-if(-not$script:GATE_DIR){throw'Este modo requiere el punto de entrada clonado.'}
+if(-not$script:GATE_DIR){throw 'Este modo requiere el punto de entrada clonado.'}
 . (Join-Path $script:GATE_DIR 'khora.barrel.ps1')
 if($BootstrapStage2){Start-KhoraMain;return }
 if($CleanupOnly){Invoke-Cleanup -Reason $Reason -Emergency;return }
 if($GuardianOnly){Start-GuardianLoop -WatchPid $WatchPid;return }
-throw'Usa el instanciador autenticado de Khora o -Bootstrap.'
+throw 'Usa el instanciador autenticado de Khora o -Bootstrap.'

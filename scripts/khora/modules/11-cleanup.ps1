@@ -11,7 +11,7 @@ function Invoke-Cleanup {
         Invoke-KhoraCleanupStageSafe -Id 'EP-OUT-010' -Label ('Aceptar cierre: '+$Reason) -Action {$script:SES_ACTIVE=$false;return $true}|Out-Null
         Invoke-KhoraCleanupStageSafe -Id 'EP-OUT-020' -Label 'Detener Visual Studio Code y procesos de trabajo' -Action {Stop-KhoraWorkspaceProcesses -KeepLog;return $true}|Out-Null
         $profileOk=Invoke-KhoraCleanupStageSafe -Id 'EP-OUT-030' -Label 'Cifrar el perfil de Visual Studio Code' -Action {Export-VSCodeConfig;return $true}
-        $pushOk=Invoke-KhoraCleanupStageSafe -Id 'EP-OUT-040' -Label 'Persistir y verificar continuidad remota' -Action {if(-not(Do-AutoWip)){throw'Push no verificable por SHA.'};return $true}
+        $pushOk=Invoke-KhoraCleanupStageSafe -Id 'EP-OUT-040' -Label 'Persistir y verificar continuidad remota' -Action {if(-not(Do-AutoWip)){throw 'Push no verificable por SHA.'};return $true}
         if(-not$profileOk-or-not$pushOk){try{Write-KhoraEvent -Id 'EP-OUT-040' -State INFO -Message 'Posible pérdida de continuidad; se prioriza confidencialidad.' -RemoteOptional}catch{}}
         Invoke-KhoraCleanupStageSafe -Id 'EP-OUT-050' -Label 'Purgar variables y secretos de trabajo' -Action {Clear-KhoraSensitiveMemory -KeepKhora;Remove-Item -LiteralPath (Join-Path $STATE_DIR 'github-token.guardian.dpapi'),(Join-Path $STATE_DIR 'vault-key.guardian.dpapi') -Force -ErrorAction SilentlyContinue;return $true}|Out-Null
         Stop-Process -Id ([int]$script:SESSION.logPid) -Force -ErrorAction SilentlyContinue
