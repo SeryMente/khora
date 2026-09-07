@@ -7,7 +7,6 @@ import { reconciliarSegmentos, type SegmentoReconciliado } from "../../../lib/tr
 import { IngresoView } from "../../components/shared/IngresoView";
 import { transcribeStoredSession } from "../../../lib/client/authoritative-transcription";
 import { importAndTranscribeAudio } from "../../../lib/client/import-audio-file";
-import { cerrarEdicionInSitu } from "../../../lib/client/edicion-in-situ";
 
 type Estado = "inactivo" | "dictando";
 
@@ -80,9 +79,6 @@ function IngresoContenido() {
   const abortosRef = useRef(0);
   const audioPermitidoRef = useRef(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const textoAntesEdicionRef = useRef("");
-  const estabaDictandoRef = useRef(false);
-  const cerrandoEdicionRef = useRef(false);
 
   const sesionIdRef = useRef<string>("");
   const parteConsecutivaRef = useRef<number>(1);
@@ -413,37 +409,6 @@ function IngresoContenido() {
     }
   }, [estabilizarEmision, detenerGrabacion, ejecutarTranscripcionAutoritativa]);
 
-  const pausarParaEdicionInSitu = useCallback(() => {
-    activoRef.current = false;
-    if (rearmeRef.current) clearTimeout(rearmeRef.current);
-    try { recRef.current?.stop(); } catch {}
-    recRef.current = null;
-    detenerGrabacion();
-    if (relojRef.current) clearTimeout(relojRef.current);
-    setParcial("");
-    setEscuchando(false);
-    estabilizarEmision();
-    setEstado("inactivo");
-  }, [detenerGrabacion, estabilizarEmision]);
-
-  const reanudarTrasEdicionInSitu = useCallback(async () => {
-    if (finalizacionAudioRef.current) await finalizacionAudioRef.current;
-    if (subidaEnCursoRef.current) await subidaEnCursoRef.current;
-    finalizacionAudioRef.current = null;
-    subidaEnCursoRef.current = null;
-
-    activoRef.current = true;
-    const arrancado = arrancarReconocedor();
-    if (!arrancado) {
-      activoRef.current = false;
-      setEstado("inactivo");
-      return;
-    }
-
-    setEstado("dictando");
-    setTimeout(() => { void arrancarGrabacion(); }, 900);
-  }, [arrancarGrabacion, arrancarReconocedor]);
-
   const guardar = useCallback(async () => {
     setError("");
     setResultado("");
@@ -565,9 +530,6 @@ function IngresoContenido() {
     setTexto("");
     setEditando(false);
     setEstabaDictando(false);
-    textoAntesEdicionRef.current = "";
-    estabaDictandoRef.current = false;
-    cerrandoEdicionRef.current = false;
     setReconciliacionMensaje("");
 
     sesionIdRef.current = "";
@@ -579,22 +541,19 @@ function IngresoContenido() {
     setBytesAcumulados(0);
   }, []);
 
-  const iniciarEdicionInSitu = useCallback(() => {
-    if (editando || cerrandoEdicionRef.current) return;
-    textoAntesEdicionRef.current = texto;
-    const dictadoActivo = estado === "dictando" || activoRef.current;
-    estabaDictandoRef.current = dictadoActivo;
-    setEstabaDictando(dictadoActivo);
-    setEditando(true);
-    if (dictadoActivo) pausarParaEdicionInSitu();
-  }, [editando, estado, pausarParaEdicionInSitu, texto]);
-
-  const handleTextoChange = useCallback((val: string) => {
-    if (!editando) iniciarEdicionInSitu();
+  const handleTextoChange = (val: string) => {
+    if (!editando) {
+      setEditando(true);
+      if (estado === "dictando") {
+        setEstabaDictando(true);
+        detener();
+      }
+    }
     setTexto(val);
-  }, [editando, iniciarEdicionInSitu]);
+  };
 
-  const aplicarEdicionInSitu = useCallback(() => {
+  const confirmarEdicion = () => {
+    setEditando(false);
     const parrafos = texto.split("\n\n").filter((p) => p.trim().length > 0);
     const existentes = [...segmentosRef.current];
 
@@ -610,44 +569,7 @@ function IngresoContenido() {
 
     segmentosRef.current = nuevosSegmentos;
     setSegmentos(nuevosSegmentos);
-  }, [texto]);
-
-  const finalizarEdicionInSitu = useCallback(async (forzarConfirmacion: boolean) => {
-    if (cerrandoEdicionRef.current) return;
-    cerrandoEdicionRef.current = true;
-    const debeReanudar = estabaDictandoRef.current;
-    try {
-      await cerrarEdicionInSitu({
-        textoAntes: textoAntesEdicionRef.current,
-        textoActual: texto,
-        forzarConfirmacion,
-        estabaDictando: debeReanudar,
-        confirmar: aplicarEdicionInSitu,
-        desactivar: () => undefined,
-        reanudar: reanudarTrasEdicionInSitu,
-      });
-    } finally {
-      setEditando(false);
-      estabaDictandoRef.current = false;
-      setEstabaDictando(false);
-      cerrandoEdicionRef.current = false;
-    }
-  }, [aplicarEdicionInSitu, reanudarTrasEdicionInSitu, texto]);
-
-  const confirmarEdicion = useCallback(() => {
-    void finalizarEdicionInSitu(true);
-  }, [finalizarEdicionInSitu]);
-
-  useEffect(() => {
-    if (!editando) return;
-    const manejarTecla = (event: KeyboardEvent) => {
-      if (event.key !== "Escape" || event.repeat) return;
-      event.preventDefault();
-      void finalizarEdicionInSitu(false);
-    };
-    window.addEventListener("keydown", manejarTecla);
-    return () => window.removeEventListener("keydown", manejarTecla);
-  }, [editando, finalizarEdicionInSitu]);
+  };
 
   const generarTituloConIA = async () => {
     if (!texto.trim()) return;
@@ -706,7 +628,6 @@ function IngresoContenido() {
       }}
       actions={{
         onTituloChange: setTitulo,
-        onIniciarEdicion: iniciarEdicionInSitu,
         onTextoChange: handleTextoChange,
         onGenerarTitulo: generarTituloConIA,
         onIniciar: iniciar,

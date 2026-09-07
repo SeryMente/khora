@@ -94,18 +94,8 @@ function Ensure-GhCli {
 }
 
 function Confirm-GhCliAuth {
-    if(-not(Ensure-Git)){return $false};$gh=Ensure-GhCli
-    Invoke-WithToken -Action {
-        param($token)
-        $env:GH_TOKEN=$token
-        try{$token|& $gh auth login --hostname github.com --git-protocol https --with-token --insecure-storage 2>&1|ForEach-Object{Info ('gh: '+(Mask-Token([string]$_)))}}
-        finally{Remove-Item Env:GH_TOKEN -ErrorAction SilentlyContinue}
-    }|Out-Null
-    if($LASTEXITCODE -ne 0){return $false}
-    & $gh auth setup-git --hostname github.com|Out-Null
-    return ($LASTEXITCODE -eq 0 -and (Test-KhoraGitHubToken))
+ $gh=Join-Path $TOOLS_DIR 'gh\bin\gh.exe';if(-not(Test-Path -LiteralPath $gh)){throw'GitHub CLI no disponible.'};$ok=Invoke-WithToken -Action {param($token)$previous=$env:GH_TOKEN;try{$env:GH_TOKEN=$token;$identity=(& $gh api user --jq .login 2>&1|Out-String).Trim();return ($LASTEXITCODE-eq0-and$identity)}finally{if($null-ne$previous){$env:GH_TOKEN=$previous}else{Remove-Item Env:GH_TOKEN -ErrorAction SilentlyContinue}}};return [bool]$ok
 }
-
 function Ensure-Node {
     $existing=Get-Command node -ErrorAction SilentlyContinue;if($existing){return $existing.Source}
     $zip=Wait-KhoraPrefetch -Name node;$sumFile=Wait-KhoraPrefetch -Name nodeSums
@@ -145,7 +135,7 @@ function Get-CodeCli {$code=Ensure-VSCode;return (Join-Path (Split-Path -Parent 
 function Ensure-VercelCLI {
     $node=Ensure-Node;$npm=Join-Path (Split-Path -Parent $node) 'npm.cmd';if(-not(Test-Path $npm)){$npm=(Get-Command npm.cmd -ErrorAction Stop).Source}
     $target=Join-Path $WORK_DIR 'tools\vercel';$vercel=Join-Path $target 'node_modules\.bin\vercel.cmd'
-    if(-not(Test-Path $vercel)){& $npm install --prefix $target --no-save --no-audit --no-fund vercel@latest 2>&1|ForEach-Object{Info ('npm vercel: '+[string]$_)};if($LASTEXITCODE -ne 0){throw'Instalación Vercel CLI falló.'}}
+    if(-not(Test-Path $vercel)){& $npm install --prefix $target --no-save --no-audit --no-fund vercel@59.3.0 2>&1|ForEach-Object{Info ('npm vercel: '+[string]$_)};if($LASTEXITCODE -ne 0){throw'Instalación Vercel CLI falló.'}}
     return $vercel
 }
 

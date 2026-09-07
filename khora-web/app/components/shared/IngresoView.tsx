@@ -29,7 +29,6 @@ export type IngresoViewState = {
 
 export type IngresoViewActions = {
   onTituloChange?: (val: string) => void;
-  onIniciarEdicion?: () => void;
   onTextoChange?: (val: string) => void;
   onGenerarTitulo?: () => void;
   onIniciar?: () => void;
@@ -239,7 +238,7 @@ export function IngresoView({
           <div className="flex items-center gap-2">
             <Icons.PenTool size={32} strokeWidth={1.75} style={{ color: "var(--khora-accent)" }} />
             <span>
-              <strong>Edición in situ activa:</strong> Pulsa Esc para confirmar los cambios o salir; si el dictado estaba activo, la escucha se reanudará automáticamente.
+              <strong>Edición in-situ activa:</strong> El dictado está pausado. Confirma los cambios para reanudar.
             </span>
           </div>
           <button
@@ -257,8 +256,6 @@ export function IngresoView({
         <textarea
           data-ui-id="ingreso.textarea"
           value={texto}
-          onFocus={() => actions.onIniciarEdicion?.()}
-          onClick={() => actions.onIniciarEdicion?.()}
           onChange={(e) => actions.onTextoChange?.(e.target.value)}
           placeholder="Escribe, pega o inicia el dictado para transcribir..."
           className="w-full p-4 min-h-[260px] whitespace-pre-wrap leading-relaxed border rounded-none text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)] focus-visible:border-[var(--khora-accent)]"

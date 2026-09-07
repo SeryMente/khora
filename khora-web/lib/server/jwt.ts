@@ -13,81 +13,74 @@ export interface JwtPayload {
   [key: string]: any;
 }
 
-function base64UrlEncode(str: string | Buffer): string {
-  const buf = typeof str === "string" ? Buffer.from(str) : str;
-  return buf.toString("base64")
-    .replace(/=/g, "")
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_");
+export type JwtVerificationError = "invalid_format" | "invalid_header" | "invalid_signature" | "invalid_payload" | "expired";
+export type JwtVerificationResult = { ok: true; payload: JwtPayload } | { ok: false; error: JwtVerificationError };
+
+function base64UrlEncode(value: string | Buffer): string {
+  const buffer = typeof value === "string" ? Buffer.from(value, "utf8") : value;
+  return buffer.toString("base64").replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
 }
 
-function base64UrlDecode(str: string): string {
-  let base64 = str.replace(/-/g, "+").replace(/_/g, "/");
-  while (base64.length % 4) {
-    base64 += "=";
-  }
-  return Buffer.from(base64, "base64").toString("utf-8");
+function base64UrlDecodeBuffer(value: string): Buffer | null {
+  if (!/^[A-Za-z0-9_-]+$/.test(value)) return null;
+  try {
+    let normalized = value.replace(/-/g, "+").replace(/_/g, "/");
+    while (normalized.length % 4) normalized += "=";
+    const decoded = Buffer.from(normalized, "base64");
+    return base64UrlEncode(decoded) === value ? decoded : null;
+  } catch { return null; }
 }
 
 export function signJwt(payload: JwtPayload, secret: string): string {
-  const header = { alg: "HS256", typ: "JWT" };
-  const encodedHeader = base64UrlEncode(JSON.stringify(header));
+  const encodedHeader = base64UrlEncode(JSON.stringify({ alg: "HS256", typ: "JWT" }));
   const encodedPayload = base64UrlEncode(JSON.stringify(payload));
   const signatureInput = `${encodedHeader}.${encodedPayload}`;
+  const signature = createHmac("sha256", secret).update(signatureInput).digest();
+  return `${signatureInput}.${base64UrlEncode(signature)}`;
+}
 
-  const signature = createHmac("sha256", secret)
-    .update(signatureInput)
-    .digest();
-  const encodedSignature = base64UrlEncode(signature);
+export function verifyJwtDetailed(token: string, secret: string): JwtVerificationResult {
+  if (typeof token !== "string" || token.length < 16 || token.length > 16_384) return { ok: false, error: "invalid_format" };
+  const parts = token.split(".");
+  if (parts.length !== 3) return { ok: false, error: "invalid_format" };
+  const [encodedHeader, encodedPayload, encodedSignature] = parts;
+  const headerBytes = base64UrlDecodeBuffer(encodedHeader);
+  const payloadBytes = base64UrlDecodeBuffer(encodedPayload);
+  const signatureBytes = base64UrlDecodeBuffer(encodedSignature);
+  if (!headerBytes || !payloadBytes || !signatureBytes) return { ok: false, error: "invalid_format" };
 
-  return `${signatureInput}.${encodedSignature}`;
+  let header: unknown;
+  try { header = JSON.parse(headerBytes.toString("utf8")); } catch { return { ok: false, error: "invalid_header" }; }
+  if (!header || typeof header !== "object" || (header as { alg?: unknown }).alg !== "HS256" || (header as { typ?: unknown }).typ !== "JWT") {
+    return { ok: false, error: "invalid_header" };
+  }
+
+  const expected = createHmac("sha256", secret).update(`${encodedHeader}.${encodedPayload}`).digest();
+  if (signatureBytes.length !== expected.length || !timingSafeEqual(signatureBytes, expected)) return { ok: false, error: "invalid_signature" };
+
+  let payload: unknown;
+  try { payload = JSON.parse(payloadBytes.toString("utf8")); } catch { return { ok: false, error: "invalid_payload" }; }
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) return { ok: false, error: "invalid_payload" };
+  const candidate = payload as Partial<JwtPayload>;
+  if (!Number.isSafeInteger(candidate.exp) || !Number.isSafeInteger(candidate.iat) || typeof candidate.iss !== "string" || typeof candidate.sub !== "string" || typeof candidate.aud !== "string" || typeof candidate.scope !== "string" || typeof candidate.jti !== "string") {
+    return { ok: false, error: "invalid_payload" };
+  }
+  const nowSeconds = Math.floor(Date.now() / 1000);
+  if ((candidate.exp as number) <= nowSeconds) return { ok: false, error: "expired" };
+  return { ok: true, payload: candidate as JwtPayload };
 }
 
 export function verifyJwt(token: string, secret: string): JwtPayload | null {
-  try {
-    const parts = token.split(".");
-    if (parts.length !== 3) return null;
-
-    const [encodedHeader, encodedPayload, encodedSignature] = parts;
-    const signatureInput = `${encodedHeader}.${encodedPayload}`;
-
-    const expectedSignature = base64UrlEncode(
-      createHmac("sha256", secret).update(signatureInput).digest()
-    );
-
-    if (encodedSignature !== expectedSignature) {
-      return null;
-    }
-
-    const payload = JSON.parse(base64UrlDecode(encodedPayload)) as JwtPayload;
-
-    // Verify expiration
-    const nowSec = Math.floor(Date.now() / 1000);
-    if (payload.exp && payload.exp < nowSec) {
-      return null;
-    }
-
-    return payload;
-  } catch (e) {
-    return null;
-  }
+  const result = verifyJwtDetailed(token, secret);
+  return result.ok ? result.payload : null;
 }
 
 export function verifyPkceS256(verifier: string, challenge: string): boolean {
   try {
     if (!verifier || !challenge) return false;
-    const computedHash = createHash("sha256").update(verifier).digest();
-    const computedChallenge = base64UrlEncode(computedHash);
-
-    const bufA = Buffer.from(computedChallenge);
-    const bufB = Buffer.from(challenge);
-
-    if (bufA.length !== bufB.length) {
-      return false;
-    }
-
-    return timingSafeEqual(bufA, bufB);
-  } catch {
-    return false;
-  }
+    const computed = base64UrlEncode(createHash("sha256").update(verifier).digest());
+    const actualBuffer = Buffer.from(computed);
+    const expectedBuffer = Buffer.from(challenge);
+    return actualBuffer.length === expectedBuffer.length && timingSafeEqual(actualBuffer, expectedBuffer);
+  } catch { return false; }
 }
