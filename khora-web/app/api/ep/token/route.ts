@@ -3,7 +3,7 @@ import { createEpSessionToken, getEpSessionSummary, isEpUserAllowed } from "@/li
 import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = "nodejs";
-const NO_STORE_HEADERS = { "Cache-Control": "no-store, max-age=0", Pragma: "no-cache", "Referrer-Policy": "no-referrer", "X-Content-Type-Options": "nosniff" } as const;
+const NO_STORE_HEADERS = { "Cache-Control": "no-store", Pragma: "no-cache", "Referrer-Policy": "no-referrer", "X-Content-Type-Options": "nosniff" } as const;
 
 function psSingleQuoted(value: string): string { return `'${value.replace(/'/g, "''")}'`; }
 
