@@ -1,8 +1,9 @@
 import "./setup.js";
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { setDbForTesting, resetDbForTesting } from "../../lib/server/neon.js";
-import { createEpSessionToken, getEpConfig } from "../../lib/server/ep.js";
+import { createEpSessionToken, getEpAuthFailure, getEpConfig } from "../../lib/server/ep.js";
 import { POST as postEpTokenRoute } from "../../app/api/ep/token/route.js";
 import middleware from "../../middleware";
 import { NextRequest } from "next/server";
@@ -178,7 +179,7 @@ test("EP Security: POST /api/ep/token platform parameter handling and command se
     assert.equal(bodyMac.error, "unsupported_platform");
 
     // 3. Supported platform "windows" -> 200 OK with launcher contract
-    const reqWin = new NextRequest("https://khora.example.com/api/ep/token", {
+    const reqWin = new NextRequest("https://khora-preview.vercel.app/api/ep/token", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ platform: "windows" }),
@@ -195,12 +196,22 @@ test("EP Security: POST /api/ep/token platform parameter handling and command se
     assert.ok(bodyWin.command);
     assert.ok(bodyWin.launcher);
     assert.equal(bodyWin.launcher.id, "windows-powershell");
+    assert.equal(bodyWin.launcher.version, "2");
     assert.equal(bodyWin.launcher.platform, "windows");
     assert.equal(bodyWin.launcher.status, "supported");
-
-    // Command secrecy invariant: Command MUST NOT contain the token
+    assert.equal(bodyWin.launcher.execution, "temporary-ps1-current-process");
+    assert.equal(bodyWin.apiBase, "https://khora.example.com/api/ep");
     assert.equal(bodyWin.command.includes(bodyWin.token), false);
     assert.equal(bodyWin.launcher.command.includes(bodyWin.token), false);
+    assert.doesNotMatch(bodyWin.command, /ScriptBlock/);
+    assert.doesNotMatch(bodyWin.command, /-KhoraToken\s+\$k/);
+    assert.match(bodyWin.command, /khora-bootstrap-/);
+    assert.match(bodyWin.command, /\.ps1/);
+    assert.match(bodyWin.command, /WriteAllText/);
+    assert.match(bodyWin.command, /KhoraTokenFile/);
+    assert.match(bodyWin.command, /ConvertFrom-SecureString/);
+    assert.match(bodyWin.command, /finally/);
+    assert.match(bodyWin.command, /Set-Clipboard -Value ' '/);
 
     // 4. Empty/missing platform defaults to "windows"
     const reqEmpty = new NextRequest("https://khora.example.com/api/ep/token", {
@@ -216,6 +227,22 @@ test("EP Security: POST /api/ep/token platform parameter handling and command se
   } finally {
     resetDbForTesting();
   }
+});
+
+test("EP Security: public authentication codes never expose internal errors", () => {
+  assert.deepEqual(getEpAuthFailure(new Error("invalid_signature")), { code: "invalid_signature", status: 401 });
+  assert.deepEqual(getEpAuthFailure(new Error("password=secret database host")), { code: "authentication_unavailable", status: 503 });
+});
+
+test("EP Security UI copies command and token independently without persistent browser storage", () => {
+  const source = readFileSync(new URL("../../app/sistema/seguridad/page.tsx", import.meta.url), "utf8");
+  assert.match(source, /copyTarget\("command"\)/);
+  assert.match(source, /copyTarget\("token"\)/);
+  assert.match(source, /writeClipboardExact\(value\)/);
+  assert.match(source, /candidate\.command\.includes\(candidate\.token\)/);
+  assert.match(source, /No se muestra en pantalla/i);
+  assert.doesNotMatch(source, /localStorage|sessionStorage/);
+  assert.doesNotMatch(source, /console\.(log|debug|info)\s*\(/);
 });
 
 test("EP Security: Middleware 308 redirect from /sistema/entorno-persistente to /sistema/seguridad#entorno-persistente", async () => {

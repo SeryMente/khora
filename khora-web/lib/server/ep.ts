@@ -1,6 +1,6 @@
 import { createHash, randomBytes, randomUUID } from "node:crypto";
 import { getDb } from "@/lib/server/neon";
-import { JwtPayload, signJwt, verifyJwt } from "@/lib/server/jwt";
+import { JwtPayload, signJwt, verifyJwtDetailed } from "@/lib/server/jwt";
 
 export type EpState = "START" | "OK" | "FAIL" | "INFO" | "SKIP";
 export interface EpTokenPayload extends JwtPayload { sid: string; typ: "ep-session"; }
@@ -14,6 +14,7 @@ const TOKEN_PATTERNS = [
   /github_pat_[A-Za-z0-9_]{12,}/g,
   /vcp_[A-Za-z0-9]{8,}/g,
   /Bearer\s+[A-Za-z0-9._~-]{16,}/gi,
+  /\beyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{16,}\b/g,
 ];
 function sha256(value: string): string { return createHash("sha256").update(value).digest("hex"); }
 function clean(value: unknown, limit = 4000): string {
@@ -22,10 +23,16 @@ function clean(value: unknown, limit = 4000): string {
   return text;
 }
 function canonicalOrigin(origin?: string): string {
-  const explicit = process.env.EP_CANONICAL_URL?.replace(/\/$/, "");
-  if (explicit) return explicit;
-  if (process.env.NODE_ENV === "production") throw new Error("EP_CANONICAL_URL es obligatorio en produccion");
-  return (origin || "http://localhost:3000") + "/api/ep";
+  const explicit = process.env.EP_CANONICAL_URL?.trim();
+  if (!explicit && process.env.NODE_ENV === "production") throw new Error("EP_CANONICAL_URL es obligatorio en produccion");
+  const candidate = explicit || new URL("/api/ep", origin || "http://localhost:3000").toString();
+  let parsed: URL;
+  try { parsed = new URL(candidate); } catch { throw new Error("EP_CANONICAL_URL invalido"); }
+  if (parsed.username || parsed.password || parsed.search || parsed.hash) throw new Error("EP_CANONICAL_URL no admite credenciales, query ni fragmento");
+  if (process.env.NODE_ENV === "production" && parsed.protocol !== "https:") throw new Error("EP_CANONICAL_URL debe usar HTTPS en produccion");
+  const pathname = parsed.pathname.replace(/\/+$/, "") || "/";
+  if (pathname !== "/api/ep") throw new Error("EP_CANONICAL_URL debe terminar exactamente en /api/ep");
+  return parsed.origin + pathname;
 }
 export function getEpConfig(origin?: string) {
   const test = process.env.NODE_ENV === "test" || process.env.PLAYWRIGHT_TEST_RUN === "1";
@@ -58,6 +65,7 @@ export async function createEpSessionToken(email: string, origin: string) {
   const client = await db.connect();
   try {
     await client.query("BEGIN");
+    await client.query("SELECT pg_advisory_xact_lock(hashtext($1))", [payload.sub]);
     const rateCheck = await client.query(
       `SELECT COUNT(*)::int AS cnt FROM ep_bootstrap_tokens
        WHERE usuario=$1 AND emitido_en > (NOW() - INTERVAL '15 minutes')`,
@@ -86,22 +94,38 @@ export async function createEpSessionToken(email: string, origin: string) {
 }
 export async function authenticateEpBearer(req: Request, scopes: string[]): Promise<EpTokenPayload> {
   const header = req.headers.get("authorization") || "";
-  if (!header.startsWith("Bearer ")) throw new Error("missing_bearer");
-  const raw = header.slice(7).trim();
+  if (!header.trim()) throw new Error("missing_bearer");
+  const match = header.match(/^Bearer[ \t]+([A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)$/i);
+  if (!match || match[1].length > 16_384) throw new Error("invalid_token_format");
   const origin = new URL(req.url).origin;
   const config = getEpConfig(origin);
-  const payload = verifyJwt(raw, config.secret) as EpTokenPayload | null;
-  if (!payload || payload.typ !== "ep-session" || payload.iss !== config.issuer || payload.aud !== config.audience || !payload.sid) throw new Error("invalid_token");
-  const granted = new Set((payload.scope || "").split(/\s+/).filter(Boolean));
-  if (scopes.some(scope => !granted.has(scope))) throw new Error("insufficient_scope");
+  const verification = verifyJwtDetailed(match[1], config.secret);
+  if (!verification.ok) {
+    if (verification.error === "expired") throw new Error("revoked_or_expired");
+    if (verification.error === "invalid_signature") throw new Error("invalid_signature");
+    throw new Error("invalid_token");
+  }
+  const payload = verification.payload as EpTokenPayload;
+  if (payload.typ !== "ep-session" || payload.iss !== config.issuer || typeof payload.sid !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(payload.sid) || typeof payload.sub !== "string" || !payload.sub || typeof payload.jti !== "string" || payload.jti.length < 16 || payload.jti.length > 256) throw new Error("invalid_token");
+  if (payload.aud !== config.audience) throw new Error("invalid_audience");
+  const granted = new Set(payload.scope.split(/\s+/).filter(Boolean));
+  if (scopes.some((scope) => !granted.has(scope))) throw new Error("insufficient_scope");
   const result = await getDb().query(
     `SELECT 1 FROM ep_bootstrap_tokens
      WHERE jti_hash=$1 AND session_id=$2 AND usuario=$3
        AND revocado_en IS NULL AND expira_en>NOW()`,
-    [sha256(payload.jti),payload.sid,payload.sub]
+    [sha256(payload.jti), payload.sid, payload.sub]
   );
   if (!result.rowCount) throw new Error("revoked_or_expired");
   return payload;
+}
+
+export type EpAuthFailureCode = "missing_bearer" | "invalid_token_format" | "invalid_token" | "invalid_signature" | "invalid_audience" | "insufficient_scope" | "revoked_or_expired" | "authentication_unavailable";
+const EP_AUTH_FAILURES = new Set<EpAuthFailureCode>(["missing_bearer", "invalid_token_format", "invalid_token", "invalid_signature", "invalid_audience", "insufficient_scope", "revoked_or_expired"]);
+export function getEpAuthFailure(error: unknown): { code: EpAuthFailureCode; status: 401 | 503 } {
+  const message = error instanceof Error ? error.message : "";
+  if (EP_AUTH_FAILURES.has(message as EpAuthFailureCode)) return { code: message as EpAuthFailureCode, status: 401 };
+  return { code: "authentication_unavailable", status: 503 };
 }
 export async function markBootstrapFetched(payload: EpTokenPayload) {
   await getDb().query(

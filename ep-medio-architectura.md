@@ -1,7 +1,7 @@
 # Entorno Persistente Medio · Arquitectura canónica v1.0.0
 
 **Estado:** normativa · restauración inaugural 1.0.0
-**Host KHORA:** 7.3.0
+**Host KHORA:** 7.4.0
 **Repositorio:** `SeryMente/khora`, tratado como privado
 **Punto de entrada único:** `scripts/khora/khora.ps1`
 **Firma de instrucción:** NX-326m
@@ -37,13 +37,17 @@ Una sesión válida cumple simultáneamente:
 - publica en `EP-IN-080` el SHA exacto de `main` como producción y verifica el alias canónico antes de continuar;
 - nunca continúa sin cifrado, sin registro remoto crítico o sin limpieza al reinicio.
 
+### 2.1 Compatibilidad verificable
+
+“Cualquier computadora” significa un host **Windows compatible**: Windows PowerShell 5.1 o superior, sesión interactiva con elevación administrativa, BitLocker disponible, Escritorio en almacenamiento local escribible, al menos 6 GiB libres y red HTTPS hacia Khora, GitHub, Vercel y proveedores oficiales de herramientas. No se ocultan limitaciones del host: una carencia falla cerrada en `EP-IN-010` o `EP-IN-030` con identificador estable, sin degradación de cifrado.
+
 ## 3. Modelo de acceso privado
 
 ### 3.1 Credenciales distintas
 
 | Credencial | Emisor | Alcance | Vida | Persistencia permitida |
 |---|---|---|---|---|
-| Token Khora de sesión | Khora, después de Google OpenID Connect | descargar el gate y leer/escribir bitácoras de la sesión actual o anterior | una sola sesión; 12 horas por defecto, máximo 24 | hash de `jti` en servidor; texto plano solo en memoria y blobs de protección de datos dentro del volumen |
+| Token Khora de sesión | Khora, después de Google OpenID Connect | descargar el gate y leer/escribir bitácoras de la sesión actual o anterior | una sola sesión; 12 horas por defecto, máximo 24 | hash de `jti` en servidor; texto plano solo en memoria; blob DPAPI temporal entre lanzador y gate y blobs DPAPI dentro del volumen, todos con eliminación explícita |
 | Llave de bóveda | usuario | raíz criptográfica de la bóveda, BitLocker y perfil de Visual Studio Code | sesión | `SecureString` y Protección de Datos de Windows dentro del volumen |
 | Personal Access Token de GitHub | GitHub | leer/escribir `SeryMente/khora` privado | definido por GitHub | memoria y Protección de Datos de Windows dentro del volumen |
 | `VERCEL_TOKEN` | bóveda | `vercel whoami` y `vercel link` | sesión | variable de proceso dentro del volumen; nunca argumentos de proceso |
@@ -57,7 +61,7 @@ El token Khora no sustituye el Personal Access Token de GitHub ni la llave de la
 3. El proveedor valida firma, emisor y reclamación de audiencia (`aud`) de Google.
 4. Khora compara el correo con `EP_ALLOWED_EMAIL` y falla cerrado si no coincide.
 5. `POST /api/ep/token` acepta el parámetro opcional de plataforma (`{ "platform": "windows" }`, por defecto `"windows"` si se omite). Plataformas no soportadas como `"linux"` o `"macos"` devuelven HTTP 400 con `unsupported_platform`.
-6. Se aplica un límite de tasa en base de datos (`ep_bootstrap_tokens`): máximo 5 emisiones por usuario cada 15 minutos (HTTP 429 `rate_limit_exceeded`).
+6. Se aplica un límite de tasa en base de datos (`ep_bootstrap_tokens`): máximo 5 emisiones por usuario cada 15 minutos (HTTP 429 `rate_limit_exceeded`). Un bloqueo transaccional asesor por usuario serializa emisiones concurrentes antes del conteo, revocación e inserción.
 7. `POST /api/ep/token` crea un identificador de sesión y emite un JSON Web Token HMAC-SHA256 con:
    - `iss = khora-ep`;
    - `aud = EP_CANONICAL_URL`;
@@ -65,9 +69,9 @@ El token Khora no sustituye el Personal Access Token de GitHub ni la llave de la
    - `sid = identificador de sesión`;
    - `scope = ep:bootstrap ep:logs:write ep:logs:read`;
    - `jti`, `iat`, `exp` y `typ = ep-session`.
-8. Devuelve además el descriptor del lanzador (`launcher`: id, platform, shell, minimumVersion, storageBackend, status, command) e incluye los encabezados `Cache-Control: no-store` y `Pragma: no-cache`.
+8. Devuelve además el descriptor del lanzador (`launcher`: id, version, platform, shell, minimumVersion, storageBackend, execution, status, command), la `apiBase` tomada exactamente de la audiencia firmada y los encabezados `Cache-Control: no-store` y `Pragma: no-cache`.
 9. Emitir un token nuevo revoca cualquier token de Entorno Persistente todavía activo del mismo usuario. Por eso se requiere una generación nueva por sesión.
-10. El servidor guarda únicamente SHA-256 de `jti`; el token completo se muestra una sola vez.
+10. El servidor guarda únicamente SHA-256 de `jti`. La interfaz mantiene el token completo solo en memoria, no lo renderiza, valida localmente sus tres segmentos y permite copiarlo exactamente mediante una acción explícita.
 
 Variables de producción obligatorias:
 
@@ -102,7 +106,7 @@ La página entrega primero un comando fijo y después el token. El usuario:
 2. copia el token Khora;
 3. vuelve a PowerShell y presiona Enter.
 
-El comando lee el token desde el portapapeles, borra el portapapeles, descarga `GET /api/ep/bootstrap` con `Authorization: Bearer`, ejecuta el gate en memoria y elimina sus variables. El token no aparece como texto en el historial de la terminal.
+El comando lee y valida el token desde el portapapeles, borra inmediatamente el portapapeles y descarga `GET /api/ep/bootstrap` con `Authorization: Bearer` contra la `apiBase` idéntica a la audiencia firmada. Materializa el cuerpo como un `.ps1` aleatorio con UTF-8 BOM, protege el token en un blob DPAPI temporal, elimina la variable en texto plano y ejecuta el gate como archivo en el mismo proceso con `-KhoraTokenFile`. Un `finally` limpia portapapeles, gate, blob y variables tanto en éxito como en fallo. El token no aparece en historial, salida ni argumentos de un proceso nuevo. `ScriptBlock.Create` está prohibido porque no conserva la semántica de archivo requerida por `#requires`, `CmdletBinding` y `param` en Windows PowerShell 5.1.
 
 ### 3.4 Acceso de modelos
 
@@ -135,7 +139,7 @@ Cada fila almacena `hash_anterior` y `event_hash`; `(session_id, secuencia)` es 
 
 ### 4.3 Sanitización
 
-Cliente y servidor redactan Personal Access Tokens, tokens Khora, tokens Vercel y encabezados Bearer. No se transmiten valores de variables, contenido de la bóveda, portapapeles, archivos de usuario ni argumentos que contengan secretos. Los mensajes se limitan a 4 000 caracteres y el detalle estructurado a 16 000.
+Cliente y servidor redactan Personal Access Tokens, JWT desnudos o en encabezados Bearer y tokens Vercel con prefijo conocido. No se transmiten valores de variables, contenido de la bóveda, portapapeles, archivos de usuario ni argumentos que contengan secretos. Los mensajes se limitan a 4 000 caracteres y el detalle estructurado a 16 000.
 
 ## 5. Identificadores estables de secuencia
 
@@ -155,9 +159,9 @@ Formato técnico:
 
 | ID | Elemento | Criterio de salida |
 |---|---|---|
-| `EP-IN-010` | Windows, elevación y Escritorio | Windows, administrador, funciones requeridas y Escritorio resuelto |
+| `EP-IN-010` | Windows, elevación y Escritorio | Windows, administrador, funciones requeridas, Escritorio local escribible y al menos 6 GiB libres |
 | `EP-IN-020` | llave de bóveda | `SecureString` no vacío aceptado |
-| `EP-IN-030` | volumen cifrado | BitLocker `ProtectionStatus=On` y `EncryptionPercentage=100` |
+| `EP-IN-030` | volumen cifrado | BitLocker `EncryptionMethod=XtsAes256`, `ProtectionStatus=On` y `EncryptionPercentage=100` |
 | `EP-IN-040` | limpieza al reinicio | tarea `AtStartup`, `SYSTEM`, privilegio máximo registrada |
 | `EP-IN-050` | GitHub | Personal Access Token identifica usuario y permite escritura al repositorio privado |
 | `EP-IN-060` | commit exacto | archivo `zipball/{sha}` autenticado, extraído dentro del volumen |
@@ -189,14 +193,14 @@ Formato técnico:
 | `EP-OUT-060` | bloquear BitLocker |
 | `EP-OUT-070` | desmontar Disco Duro Virtual versión 2 |
 | `EP-OUT-080` | eliminar contenedor y carpeta del Escritorio |
-| `EP-OUT-090` | desregistrar tarea de reinicio |
+| `EP-OUT-090` | desregistrar tarea solo tras confirmar eliminación; conservarla si quedan residuos |
 | `EP-OUT-100` | confirmar cierre remoto y purgar token Khora |
 
 ## 6. Superficies visibles
 
 La terminal usada para lanzar no cuenta como ventana adicional. Se permiten exactamente dos superficies adicionales del subsistema:
 
-1. **Interfaz:** durante el arranque es la consola amigable de etapas. Cuando Visual Studio Code está listo, la consola se oculta y Visual Studio Code la reemplaza como interfaz principal, mostrando `KHORA-STATUS.md` y la sesión restaurada.
+1. **Interfaz:** durante el arranque es la consola amigable de etapas. Antes de transferir control al gate clonado, el host bootstrap se oculta; la consola de etapa 2 ocupa su lugar y el host se restaura únicamente al terminar. Cuando Visual Studio Code está listo, la consola de etapa 2 se oculta y Visual Studio Code la reemplaza como interfaz principal, mostrando `KHORA-STATUS.md` y la sesión restaurada.
 2. **Registro:** una consola dedicada exclusivamente a seguir `events.log`; no acepta comandos operativos.
 
 La interfaz usa lenguaje breve, indicadores y duraciones. La ventana Registro conserva diagnóstico detallado. Ambas muestran el mismo identificador. El texto de error siempre explica qué identificador reportar.
@@ -211,9 +215,9 @@ La interfaz usa lenguaje breve, indicadores y duraciones. La ventana Registro co
 - etiqueta: `KHORA_EP_V1`;
 - sistema de archivos: NTFS;
 - BitLocker: XTS-AES-256, `UsedSpaceOnly`, protector de contraseña;
-- secreto BitLocker: SHA-256 de `llave_de_bóveda || KHORA-EP-V1 || session-id`.
+- secreto BitLocker: SHA-256 de `llave_de_bóveda || KHORA-EP-V1 || session-id`, transformado en una contraseña de 57 caracteres con mayúscula, minúscula, número y símbolo.
 
-La derivación hace que la llave de la bóveda sea la raíz de acceso y genera una contraseña compatible con políticas de BitLocker. El texto de la llave no se escribe en disco.
+La derivación hace que la llave de la bóveda sea la raíz de acceso y evita fallos de políticas empresariales que exigen mezcla de clases en protectores de contraseña BitLocker. El texto de la llave y la contraseña derivada no se escriben en disco y sus búferes se limpian al terminar la etapa.
 
 No existe alternativa con Encrypting File System. Si falta BitLocker, elevación, tarea al reinicio o verificación al 100 %, no se descarga el repositorio.
 
@@ -222,7 +226,7 @@ No existe alternativa con Encrypting File System. Si falta BitLocker, elevación
 `<unidad>\khora-ep` contiene:
 
 - `repo\` — commit privado exacto y rama de continuidad;
-- `tools\` — Git, GitHub CLI, Node.js, Python, Vercel CLI y Visual Studio Code portátiles cuando faltan versiones aceptables del host;
+- `tools\` — Git, GitHub CLI, Node.js, Python, Vercel CLI 59.3.0 fijada y Visual Studio Code portátiles cuando faltan versiones aceptables del host;
 - `session-state\` — manifiesto y blobs de Protección de Datos de Windows;
 - `logs\` — registro local;
 - `cache\`, `tmp\`, `venv\` y perfil portátil.
@@ -267,7 +271,7 @@ Guardian vigila:
 
 Los blobs Guardian están cifrados mediante Protección de Datos de Windows y residen dentro de BitLocker. Permiten concluir registro y continuidad si el supervisor muere. Ante conflicto, la confidencialidad gana: aun si falla `EP-OUT-030` o `EP-OUT-040`, se ejecutan bloqueo, desmontaje y eliminación. La bitácora remota conserva el fallo y la posible pérdida de continuidad.
 
-La tarea de arranque como `SYSTEM` elimina la carpeta exterior tras un reinicio inesperado. No deja cuarentena local.
+La tarea de arranque como `SYSTEM` elimina la carpeta exterior tras un reinicio inesperado. Solo se desregistra cuando confirma que la carpeta ya no existe; si el bloqueo, desmontaje o borrado falla, permanece armada para el siguiente reinicio. No deja cuarentena local.
 
 ## 11. API de Khora
 
@@ -279,7 +283,7 @@ La tarea de arranque como `SYSTEM` elimina la carpeta exterior tras un reinicio 
 | `POST /api/ep/events` | Bearer `ep:logs:write` | uno a cien eventos transaccionales |
 | `GET /api/ep/logs` | Bearer `ep:logs:read` | sesión actual o anterior, JSON o NDJSON |
 
-Los endpoints Bearer están excluidos del middleware de cookies, pero validan firma, emisor, audiencia, scopes, expiración, revocación, sesión y usuario en su propia ruta. `/api/ep/token` continúa protegido por Auth.js.
+Los endpoints Bearer están excluidos del middleware de cookies, pero validan formato y tamaño, encabezado JWT (`alg=HS256`, `typ=JWT`), firma con comparación constante, emisor, audiencia, scopes, expiración inclusiva, revocación, sesión y usuario en su propia ruta. Responden solo códigos públicos estables (`missing_bearer`, `invalid_token_format`, `invalid_token`, `invalid_signature`, `invalid_audience`, `insufficient_scope`, `revoked_or_expired` o `authentication_unavailable`) y nunca mensajes internos. `/api/ep/token` continúa protegido por Auth.js.
 
 ## 12. Manifiesto y contrato de archivos
 
@@ -290,7 +294,7 @@ Los endpoints Bearer están excluidos del middleware de cookies, pero validan fi
 - `scripts/khora/llave/ARRANCAR.cmd` — entrada local de mantenimiento;
 - `khora-web/lib/server/ep.ts` — tokens, autorización, bitácora y consulta;
 - `khora-web/app/api/ep/*` — API;
-- `khora-web/app/sistema/entorno-persistente/page.tsx` — emisión autenticada;
+- `khora-web/app/sistema/seguridad/page.tsx` — emisión autenticada, copia independiente y bitácora;
 - `khora-web/db/migrations/016_ep_persistent_sessions.sql` — persistencia;
 - `scripts/khora/tests/Test-Arranque.ps1` y `tests/validate_ep.py` — validación.
 
@@ -301,13 +305,15 @@ La restauración no se considera ejecutada en Windows hasta pasar, en una máqui
 1. análisis sintáctico de todos los PowerShell;
 2. migración de base de datos;
 3. compilación Next.js;
-4. emisión Google OpenID Connect y revocación de token anterior;
-5. arranque frío con repositorio privado;
-6. confirmación visual de identificadores y dos superficies adicionales;
-7. corte forzado durante cada etapa y lectura posterior del `START` remoto;
-8. extracción del Disco Duro Virtual versión 2 cerrado y prueba negativa sin llave;
-9. salida manual, cierre de Visual Studio Code, muerte de terminal, inactividad y reinicio;
-10. ausencia de contenedor, tarea, procesos, configuración GitHub/Vercel y secretos.
+4. emisión Google OpenID Connect, copia exacta independiente de comando y token y revocación de token anterior;
+5. diagnóstico seguro de `401` para formato, firma, audiencia, scope, revocación y expiración;
+6. materialización y eliminación del `.ps1` y blob DPAPI temporales en éxito y fallo, sin token en historial, salida ni argumentos de proceso;
+7. arranque frío con repositorio privado hasta `EP-IN-010` y después ciclo completo;
+8. confirmación visual de identificadores y dos superficies adicionales;
+9. corte forzado durante cada etapa y lectura posterior del `START` remoto;
+10. extracción del Disco Duro Virtual versión 2 cerrado y prueba negativa sin llave;
+11. salida manual, cierre de Visual Studio Code, muerte de terminal, inactividad y reinicio;
+12. ausencia de contenedor, tarea, procesos, configuración GitHub/Vercel y secretos.
 
 Las verificaciones Linux o estáticas no sustituyen esta matriz. Cualquier resultado no ejecutado debe declararse **NO VERIFICADO**.
 

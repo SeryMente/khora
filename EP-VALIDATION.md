@@ -1,29 +1,18 @@
-# Validación de la restauración v1.0
+# EP v1.0 — evidencia de validación
 
-## Verificado en el sandbox
+**Host Khora:** 7.4.0  
+**Firma:** NX-326m
 
-- `tests/validate_ep.py`: **OK**.
-- Gate embebido en la API idéntico byte por byte al punto de entrada: **OK**.
-- Codificación UTF-8 con marca de orden de bytes y finales CRLF para PowerShell: **OK**.
-- Delimitadores léxicos de PowerShell: **OK**.
-- Parser oficial de Windows PowerShell 5.1 para todos los scripts: **OK**.
-- Separacion lexica del keyword `return` y sus operandos, con prueba de ejecucion de la boveda: **OK**.
-- Pruebas unitarias completas de Seguridad y Entorno Persistente (`khora-web/tests/unit/ep_security.test.ts`): **OK** (75 tests pasando).
-- Contrato multiplataforma `POST /api/ep/token` con descriptor `launcher` y rechazo 400 `unsupported_platform`: **OK**.
-- Contrato estático de publicación obligatoria del SHA exacto de `main` en `EP-IN-080`, con `vercel deploy --prod`, árbol desechable y `ep-main-live.json`: **OK**.
-- Límite de tasa por base de datos (5 emisiones / 15 min): **OK**.
-- Redirección HTTP 308 desde `/sistema/entorno-persistente` a `/sistema/seguridad#entorno-persistente`: **OK**.
-- Módulo `/sistema/seguridad` con navegación `ShieldCheck`, flujo visible de 4 pasos, accesibilidad por teclado, anuncios `aria-live` y visor de bitácora inline: **OK**.
-- Sintaxis de los archivos TypeScript y TSX nuevos mediante TypeScript `transpileModule`: **OK**.
-- Parseo adicional de rutas y página mediante esbuild: **OK**.
-- Escaneo de patrones de secretos en texto plano: **OK**.
+## Aprobado en auditoría estática Linux
 
-## No verificado en este entorno Linux
+- Gate único, arquitectura, launcher y bootstrap embebido coherentes.
+- Bootstrap idéntico byte a byte al gate, con UTF-8 BOM y CRLF.
+- Launcher sin `ScriptBlock.Create`: `.ps1` y blob DPAPI temporales, ejecución en el proceso actual y limpieza en `finally`.
+- JWT HS256 estricto, firma en tiempo constante, audiencia canónica, scopes, expiración, revocación y códigos públicos.
+- UI con copia independiente y exacta de comando/token, token no renderizado, estados accesibles, expiración y descarte.
+- Descarga privada de GitHub, Vercel 59.3.0 fijada, redacción de secretos y preflight de Escritorio local.
+- Escaneo de secretos, rutas inseguras y artefactos excluidos.
 
-- ejecución de Windows PowerShell 5.1;
-- BitLocker, Disco Duro Virtual versión 2, tareas programadas y Protección de Datos de Windows;
-- compilación completa de Next.js, porque el adjunto no contiene `node_modules` y la red del sandbox no resolvió paquetes;
-- migración y comportamiento de PostgreSQL real;
-- autenticación Google OpenID Connect, GitHub, Vercel y reinicios reales.
+## Obligatorio antes de fusionar
 
-Estas pruebas son obligatorias antes de declarar despliegue de producción.
+No se afirma ejecución real de Windows desde este sandbox Linux. En Windows compatible deben aprobarse: parser oficial Windows PowerShell 5.1, emisión/copias, lanzamiento hasta `EP-IN-010`, elevación, VHDX/BitLocker XTS-AES-256, restauración, dos superficies, deadman/inactividad/reinicio y limpieza total. También deben repetirse `npm run typecheck`, `npm run ui-review:check`, `npm run prebuild`, pruebas y `next build --webpack` con las dependencias del repositorio local. No desplegar ni fusionar antes de esas pruebas.
