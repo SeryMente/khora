@@ -33,9 +33,10 @@ class _MockTriple:
 
 
 class MockMemoria:
-    def __init__(self):
+    def __init__(self, reject_transaction: bool = False):
         self.entidades = {}  # canonical_key -> _MockEntity
         self.triples = []
+        self.reject_transaction = reject_transaction
 
         # Simulamos el nodo User raíz
         self.entidades["User"] = _MockEntity(canonical_key="User", provenance=["root"], is_user=True)
@@ -138,6 +139,48 @@ class MockMemoria:
                     timestamp=provenance.timestamp
                 ))
                 escritos += 1
+        return escritos
+
+    def asentar_transaccional(
+        self,
+        entidades: List[dict],
+        relaciones: List[dict],
+        source_triplet: dict,
+        io_id: str,
+        timestamp: str,
+    ) -> int:
+        if self.reject_transaction:
+            return 0
+
+        for entidad in entidades:
+            self.merge_entidad(
+                canonical_key=entidad["canonical_key"],
+                label_original=entidad["label_original"],
+                provenance_raw=entidad["provenance_raw"],
+                embedding=entidad.get("embedding") or [],
+                needs_review=bool(entidad.get("needs_review", False)),
+            )
+
+        escritos = 0
+        for relacion in relaciones:
+            if any(
+                triple.origen == relacion["origen_id"]
+                and triple.destino == relacion["destino_id"]
+                and triple.relacion == relacion["relacion"]
+                and triple.io_id == io_id
+                for triple in self.triples
+            ):
+                continue
+            self.triples.append(
+                _MockTriple(
+                    origen=relacion["origen_id"],
+                    relacion=relacion["relacion"],
+                    destino=relacion["destino_id"],
+                    io_id=io_id,
+                    timestamp=timestamp,
+                )
+            )
+            escritos += 1
         return escritos
 
     def frecuencia(self, canonical_key: str) -> int:
@@ -292,7 +335,7 @@ def test_provenance():
         assert "provenance" in str(e).lower()
 
 def test_rollback_huerfano():
-    memoria = MockMemoria()
+    memoria = MockMemoria(reject_transaction=True)
     llm = MockPuertoLLM({})
     emb = MockPuertoEmbeddings()
 

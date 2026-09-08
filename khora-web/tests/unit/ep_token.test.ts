@@ -21,7 +21,9 @@ test("EP token conserva audience, session y scopes", () => {
 test("JWT rechaza firma alterada en tiempo constante", () => {
   const now = Math.floor(Date.now() / 1000);
   const token = signJwt({ iss: "i", sub: "s", aud: "a", scope: "x", gen: 1, iat: now, exp: now + 60, jti: "j" }, secret);
-  const altered = token.slice(0, -1) + (token.endsWith("A") ? "B" : "A");
+  const [header, payload, signature] = token.split(".");
+  const alteredSignature = (signature.startsWith("A") ? "B" : "A") + signature.slice(1);
+  const altered = `${header}.${payload}.${alteredSignature}`;
   assert.deepEqual(verifyJwtDetailed(altered, secret), { ok: false, error: "invalid_signature" }); assert.equal(verifyJwt(altered, secret), null);
 });
 
