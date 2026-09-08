@@ -79,6 +79,7 @@ test("EP Security: Token creation, audience, scopes and command secrecy", async 
     assert.equal(decoded.sub, email);
     assert.equal(decoded.scope, "ep:bootstrap ep:logs:write ep:logs:read");
     assert.equal(decoded.typ, "ep-session");
+    assert.equal(decoded.launchMode, "normal");
 
     // Revocation check: Issue second token, verify prior token revoked
     const result2 = await createEpSessionToken(email, origin);
@@ -196,10 +197,13 @@ test("EP Security: POST /api/ep/token platform parameter handling and command se
     assert.ok(bodyWin.command);
     assert.ok(bodyWin.launcher);
     assert.equal(bodyWin.launcher.id, "windows-powershell");
-    assert.equal(bodyWin.launcher.version, "2");
+    assert.equal(bodyWin.launcher.version, "3");
+    assert.equal(bodyWin.mode, "normal");
+    assert.equal(bodyWin.launcher.mode, "normal");
+    assert.equal(bodyWin.launcher.hostToolPolicy, "allow-verified-host");
     assert.equal(bodyWin.launcher.platform, "windows");
     assert.equal(bodyWin.launcher.status, "supported");
-    assert.equal(bodyWin.launcher.execution, "temporary-ps1-current-process");
+    assert.equal(bodyWin.launcher.execution, "windows-powershell-5.1-child-process-dpapi");
     assert.equal(bodyWin.apiBase, "https://khora.example.com/api/ep");
     assert.equal(bodyWin.command.includes(bodyWin.token), false);
     assert.equal(bodyWin.launcher.command.includes(bodyWin.token), false);
@@ -212,8 +216,44 @@ test("EP Security: POST /api/ep/token platform parameter handling and command se
     assert.match(bodyWin.command, /ConvertFrom-SecureString/);
     assert.match(bodyWin.command, /finally/);
     assert.match(bodyWin.command, /Set-Clipboard -Value ' '/);
+    assert.match(bodyWin.command, /WindowsPowerShell\\v1\.0\\powershell\.exe/);
+    assert.match(bodyWin.command, /-LaunchMode \$m/);
+    assert.match(bodyWin.command, /X-Khora-Launch-Mode/);
+    assert.match(bodyWin.command, /KHORA_LAUNCH_MODE_MISMATCH/);
+    assert.match(bodyWin.command, /\$m='normal'/);
 
-    // 4. Empty/missing platform defaults to "windows"
+    // 4. Clean-host mode is explicit, token-bound and never embeds the token.
+    const reqClean = new NextRequest("https://khora.example.com/api/ep/token", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ platform: "windows", mode: "clean-host" }),
+    });
+
+    const resClean = await postEpTokenRoute(reqClean);
+    assert.equal(resClean.status, 200);
+    const bodyClean = await resClean.json();
+    assert.equal(bodyClean.mode, "clean-host");
+    assert.equal(bodyClean.launcher.id, "windows-powershell-clean-host");
+    assert.equal(bodyClean.launcher.version, "3");
+    assert.equal(bodyClean.launcher.mode, "clean-host");
+    assert.equal(bodyClean.launcher.isolation, "fresh-bitlocker-vhdx-per-session");
+    assert.equal(bodyClean.launcher.hostToolPolicy, "force-portable");
+    assert.equal(bodyClean.command.includes(bodyClean.token), false);
+    assert.match(bodyClean.command, /\$m='clean-host'/);
+    const decodedClean = verifyJwt(bodyClean.token, getEpConfig("https://khora.example.com").secret) as any;
+    assert.equal(decodedClean.launchMode, "clean-host");
+
+    // 5. Unknown launch mode is rejected before token creation.
+    const reqUnknownMode = new NextRequest("https://khora.example.com/api/ep/token", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ platform: "windows", mode: "container-ish" }),
+    });
+    const resUnknownMode = await postEpTokenRoute(reqUnknownMode);
+    assert.equal(resUnknownMode.status, 400);
+    assert.equal((await resUnknownMode.json()).error, "unsupported_launch_mode");
+
+    // 6. Empty/missing platform and mode default to normal Windows.
     const reqEmpty = new NextRequest("https://khora.example.com/api/ep/token", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -224,6 +264,7 @@ test("EP Security: POST /api/ep/token platform parameter handling and command se
     assert.equal(resEmpty.status, 200);
     const bodyEmpty = await resEmpty.json();
     assert.equal(bodyEmpty.launcher.platform, "windows");
+    assert.equal(bodyEmpty.mode, "normal");
   } finally {
     resetDbForTesting();
   }
@@ -234,22 +275,28 @@ test("EP Security: public authentication codes never expose internal errors", ()
   assert.deepEqual(getEpAuthFailure(new Error("password=secret database host")), { code: "authentication_unavailable", status: 503 });
 });
 
-test("EP Security UI copies command and token independently without persistent browser storage", () => {
-  const source = readFileSync(new URL("../../app/sistema/seguridad/page.tsx", import.meta.url), "utf8");
+test("EP Security UI isolates Entorno Persistente as a submodule and keeps credentials ephemeral", () => {
+  const page = readFileSync(new URL("../../app/sistema/seguridad/page.tsx", import.meta.url), "utf8");
+  const source = readFileSync(new URL("../../app/components/os/EntornoPersistentePanel.tsx", import.meta.url), "utf8");
+  assert.match(page, /"entorno-persistente"/);
+  assert.match(page, /<EntornoPersistentePanel \/>/);
   assert.match(source, /copyTarget\("command"\)/);
   assert.match(source, /copyTarget\("token"\)/);
   assert.match(source, /writeClipboardExact\(value\)/);
   assert.match(source, /candidate\.command\.includes\(candidate\.token\)/);
+  assert.match(source, /mode: launchMode/);
+  assert.match(source, /Prueba de máquina limpia/);
+  assert.match(source, /ignora herramientas del host/);
   assert.match(source, /No se muestra en pantalla/i);
   assert.doesNotMatch(source, /localStorage|sessionStorage/);
   assert.doesNotMatch(source, /console\.(log|debug|info)\s*\(/);
 });
 
-test("EP Security: Middleware 308 redirect from /sistema/entorno-persistente to /sistema/seguridad#entorno-persistente", async () => {
+test("EP Security: Middleware 308 redirect opens the Entorno Persistente submodule", async () => {
   const req = new NextRequest("https://khora.example.com/sistema/entorno-persistente");
   const res = (await (middleware as any)(req, {} as any)) as any;
 
   assert.ok(res);
   assert.equal(res.status, 308);
-  assert.equal(res.headers.get("location"), "https://khora.example.com/sistema/seguridad#entorno-persistente");
+  assert.equal(res.headers.get("location"), "https://khora.example.com/sistema/seguridad?tab=entorno-persistente");
 });

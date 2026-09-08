@@ -15,5 +15,5 @@ export async function GET(req: NextRequest) {
   try { await markBootstrapFetched(payload); }
   catch { return NextResponse.json({ error: "bootstrap_state_unavailable", code: "bootstrap_state_unavailable", detail: "bootstrap_state_unavailable" }, { status: 503, headers: NO_STORE_HEADERS }); }
   const script = Buffer.from(BOOTSTRAP_PS1_BASE64, "base64").toString("utf8");
-  return new NextResponse(script, { status: 200, headers: { ...NO_STORE_HEADERS, "Content-Type": "text/plain; charset=utf-8", "Content-Security-Policy": "default-src 'none'" } });
+  return new NextResponse(script, { status: 200, headers: { ...NO_STORE_HEADERS, "Content-Type": "text/plain; charset=utf-8", "Content-Security-Policy": "default-src 'none'", "X-Khora-Launch-Mode": payload.launchMode } });
 }

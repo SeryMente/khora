@@ -1,5 +1,5 @@
 ﻿# KHORA EP Medio v1.0 - configuración de sesión
-$script:SCRIPT_VERSION = '7.4.0'
+$script:SCRIPT_VERSION = '7.5.0'
 $script:EP_VERSION = '1.0.0'
 $script:SES_ACTIVE = $false
 $script:TokSecure = $null
@@ -12,6 +12,10 @@ $script:SESSION_MANIFEST_PATH = if ($script:SESSION_MANIFEST_ARG) { $script:SESS
 if (-not $script:SESSION_MANIFEST_PATH -or -not (Test-Path $script:SESSION_MANIFEST_PATH)) { throw 'Falta session-manifest.json.' }
 $script:SESSION = Get-Content -LiteralPath $script:SESSION_MANIFEST_PATH -Raw | ConvertFrom-Json
 if ($script:SESSION.schema -ne 'khora-ep-session/v1') { throw 'Manifiesto incompatible.' }
+$script:LAUNCH_MODE = if ($script:SESSION.launchMode) { [string]$script:SESSION.launchMode } else { 'normal' }
+if ($script:LAUNCH_MODE -notin @('normal','clean-host')) { throw 'Modo de lanzamiento incompatible.' }
+$script:FORCE_PORTABLE_TOOLS = $script:LAUNCH_MODE -eq 'clean-host'
+$script:HOST_TOOL_POLICY = if ($script:FORCE_PORTABLE_TOOLS) { 'force-portable' } else { 'allow-verified-host' }
 $ROOT_DIR = [string]$script:SESSION.outerDir
 $WORK_DIR = [string]$script:SESSION.workDir
 $REPO_DIR = [string]$script:SESSION.repoDir
@@ -23,6 +27,8 @@ $MOUNT_POINT = [string]$script:SESSION.mountPoint
 $SESSION_ID = [string]$script:SESSION.sessionId
 $TASK_NAME = [string]$script:SESSION.cleanupTask
 $KHORA_API_BASE = [string]$script:SESSION.khoraApiBase
+$TOOLS_DIR = Join-Path $WORK_DIR 'tools'
+$env:KHORA_EP_LAUNCH_MODE = $script:LAUNCH_MODE
 $env:TEMP = Join-Path $WORK_DIR 'tmp'
 $env:TMP = $env:TEMP
 $env:GH_CONFIG_DIR = Join-Path $STATE_DIR 'gh'
@@ -31,5 +37,18 @@ $env:NPM_CONFIG_CACHE = Join-Path $WORK_DIR 'cache\npm'
 $env:PIP_CACHE_DIR = Join-Path $WORK_DIR 'cache\pip'
 $env:XDG_CONFIG_HOME = Join-Path $STATE_DIR 'xdg-config'
 $env:XDG_DATA_HOME = Join-Path $STATE_DIR 'xdg-data'
-foreach ($path in @($env:TEMP,$env:GH_CONFIG_DIR,(Split-Path -Parent $env:GIT_CONFIG_GLOBAL),$env:NPM_CONFIG_CACHE,$env:PIP_CACHE_DIR,$env:XDG_CONFIG_HOME,$env:XDG_DATA_HOME)) { New-Item -ItemType Directory -Path $path -Force | Out-Null }
+$isolatedPaths = @()
+if ($script:FORCE_PORTABLE_TOOLS) {
+    $env:HOME = Join-Path $STATE_DIR 'home'
+    $env:APPDATA = Join-Path $STATE_DIR 'appdata\roaming'
+    $env:LOCALAPPDATA = Join-Path $STATE_DIR 'appdata\local'
+    $env:Path = @(
+        (Join-Path $env:SystemRoot 'System32'),
+        $env:SystemRoot,
+        (Join-Path $env:SystemRoot 'System32\Wbem'),
+        (Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0')
+    ) -join ';'
+    $isolatedPaths = @($env:HOME,$env:APPDATA,$env:LOCALAPPDATA)
+}
+foreach ($path in @($TOOLS_DIR,$env:TEMP,$env:GH_CONFIG_DIR,(Split-Path -Parent $env:GIT_CONFIG_GLOBAL),$env:NPM_CONFIG_CACHE,$env:PIP_CACHE_DIR,$env:XDG_CONFIG_HOME,$env:XDG_DATA_HOME)+$isolatedPaths) { New-Item -ItemType Directory -Path $path -Force | Out-Null }
 $CFG = [ordered]@{repoOrg='SeryMente';repoName='khora';branch='main';gitName='Victor Hugo Torres';gitEmail='280919.29061988@proton.me';inactivityMinutes=15;autoWipMinutes=5;vercelScope='victorhugotorresmendez-8991s-projects';vercelProject='khora-web';vercelCanonicalUrl='https://khora-web.vercel.app'}

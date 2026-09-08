@@ -13,7 +13,7 @@ function customToken(header: unknown, payload: unknown): string {
 
 test("EP token conserva audience, session y scopes", () => {
   const now = Math.floor(Date.now() / 1000);
-  const token = signJwt({ iss: "khora-ep", sub: "test@example.com", aud: "https://khora.example/api/ep", scope: "ep:bootstrap ep:logs:write ep:logs:read", gen: 1, iat: now, exp: now + 60, jti: "jti-1", sid: "00000000-0000-0000-0000-000000000001", typ: "ep-session" }, secret);
+  const token = signJwt({ iss: "khora-ep", sub: "test@example.com", aud: "https://khora.example/api/ep", scope: "ep:bootstrap ep:logs:write ep:logs:read", gen: 1, iat: now, exp: now + 60, jti: "jti-1", sid: "00000000-0000-0000-0000-000000000001", typ: "ep-session", launchMode: "normal" }, secret);
   const payload = verifyJwt(token, secret);
   assert.equal(payload?.aud, "https://khora.example/api/ep"); assert.equal(payload?.sid, "00000000-0000-0000-0000-000000000001"); assert.match(payload?.scope || "", /ep:logs:read/);
 });

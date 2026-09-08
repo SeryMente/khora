@@ -24,13 +24,13 @@ function Start-KhoraDownloadJob {
 function Start-KhoraPrefetch {
     $directory = Join-Path $WORK_DIR 'prefetch'
     New-Item -ItemType Directory -Path $directory -Force | Out-Null
-    if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
+    if ($script:FORCE_PORTABLE_TOOLS -or -not (Get-Command git -ErrorAction SilentlyContinue)) {
         $release=Invoke-RestMethod -Uri 'https://api.github.com/repos/git-for-windows/git/releases/latest' -Headers @{'User-Agent'='khora-ep'}
         $asset=$release.assets|Where-Object{$_.name -match '^PortableGit-.*-64-bit\.7z\.exe$'}|Select-Object -First 1
         if(-not$asset){throw 'No se encontró PortableGit.'}
         Start-KhoraDownloadJob -Name git -Uri $asset.browser_download_url -Path (Join-Path $directory $asset.name)
     }
-    if (-not (Get-Command gh -ErrorAction SilentlyContinue)) {
+    if ($script:FORCE_PORTABLE_TOOLS -or -not (Get-Command gh -ErrorAction SilentlyContinue)) {
         $release=Invoke-RestMethod -Uri 'https://api.github.com/repos/cli/cli/releases/latest' -Headers @{'User-Agent'='khora-ep'}
         $asset=$release.assets|Where-Object{$_.name -match '^gh_.*_windows_amd64\.zip$'}|Select-Object -First 1
         $sums=$release.assets|Where-Object{$_.name -match 'checksums\.txt$'}|Select-Object -First 1
@@ -38,7 +38,7 @@ function Start-KhoraPrefetch {
         Start-KhoraDownloadJob -Name gh -Uri $asset.browser_download_url -Path (Join-Path $directory $asset.name)
         Start-KhoraDownloadJob -Name ghSums -Uri $sums.browser_download_url -Path (Join-Path $directory $sums.name)
     }
-    if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
+    if ($script:FORCE_PORTABLE_TOOLS -or -not (Get-Command node -ErrorAction SilentlyContinue)) {
         $index=Invoke-RestMethod -Uri 'https://nodejs.org/dist/index.json'
         $release=$index|Where-Object{$_.lts -and ($_.files -contains 'win-x64-zip')}|Select-Object -First 1
         if(-not$release){throw 'No se encontró Node.js LTS.'}
@@ -46,7 +46,7 @@ function Start-KhoraPrefetch {
         Start-KhoraDownloadJob -Name node -Uri ($base+'/'+$name) -Path (Join-Path $directory $name)
         Start-KhoraDownloadJob -Name nodeSums -Uri ($base+'/SHASUMS256.txt') -Path (Join-Path $directory 'node-SHASUMS256.txt')
     }
-    if (-not (Get-Command python -ErrorAction SilentlyContinue)) {
+    if ($script:FORCE_PORTABLE_TOOLS -or -not (Get-Command python -ErrorAction SilentlyContinue)) {
         Start-KhoraDownloadJob -Name python -Uri 'https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe' -Path (Join-Path $directory 'python-3.11.9-amd64.exe')
     }
     $metadata=Invoke-RestMethod -Uri 'https://update.code.visualstudio.com/api/update/win32-x64-archive/stable/latest'
@@ -70,7 +70,7 @@ function Wait-KhoraPrefetch {
 }
 
 function Ensure-Git {
-    if(Get-Command git -ErrorAction SilentlyContinue){return $true}
+    if(-not$script:FORCE_PORTABLE_TOOLS -and (Get-Command git -ErrorAction SilentlyContinue)){return $true}
     $installer=Wait-KhoraPrefetch -Name git
     if(-not$installer){throw 'PortableGit ausente.'}
     if((Get-AuthenticodeSignature $installer).Status -ne 'Valid'){throw 'Firma PortableGit inválida.'}
@@ -82,7 +82,7 @@ function Ensure-Git {
 }
 
 function Ensure-GhCli {
-    $existing=Get-Command gh -ErrorAction SilentlyContinue;if($existing){return $existing.Source}
+    $existing=Get-Command gh -ErrorAction SilentlyContinue;if(-not$script:FORCE_PORTABLE_TOOLS -and $existing){$script:GH_CLI_PATH=$existing.Source;return $existing.Source}
     $zip=Wait-KhoraPrefetch -Name gh;$sumFile=Wait-KhoraPrefetch -Name ghSums
     if(-not$zip-or-not$sumFile){throw 'GitHub CLI ausente.'}
     $line=Get-Content $sumFile|Where-Object{$_ -match [regex]::Escape((Split-Path $zip -Leaf))}|Select-Object -First 1
@@ -90,14 +90,14 @@ function Ensure-GhCli {
     if((Get-FileHash $zip -Algorithm SHA256).Hash -ine (($line -split '\s+')[0])){throw 'Checksum GitHub CLI inválido.'}
     $target=Join-Path $WORK_DIR 'tools\gh';Expand-Archive -LiteralPath $zip -DestinationPath $target -Force
     $gh=Get-ChildItem $target -Filter gh.exe -Recurse|Select-Object -First 1;if(-not$gh){throw 'gh.exe ausente.'}
-    Add-KhoraPath -Path $gh.DirectoryName;return $gh.FullName
+    Add-KhoraPath -Path $gh.DirectoryName;$script:GH_CLI_PATH=$gh.FullName;return $gh.FullName
 }
 
 function Confirm-GhCliAuth {
- $gh=Join-Path $TOOLS_DIR 'gh\bin\gh.exe';if(-not(Test-Path -LiteralPath $gh)){throw 'GitHub CLI no disponible.'};$ok=Invoke-WithToken -Action {param($token)$previous=$env:GH_TOKEN;try{$env:GH_TOKEN=$token;$identity=(& $gh api user --jq .login 2>&1|Out-String).Trim();return ($LASTEXITCODE-eq0-and$identity)}finally{if($null-ne$previous){$env:GH_TOKEN=$previous}else{Remove-Item Env:GH_TOKEN -ErrorAction SilentlyContinue}}};return [bool]$ok
+ $gh=Ensure-GhCli;if(-not$gh-or-not(Test-Path -LiteralPath $gh)){throw 'GitHub CLI no disponible.'};$ok=Invoke-WithToken -Action {param($token)$previous=$env:GH_TOKEN;try{$env:GH_TOKEN=$token;$identity=(& $gh api user --jq .login 2>&1|Out-String).Trim();return ($LASTEXITCODE-eq0-and$identity)}finally{if($null-ne$previous){$env:GH_TOKEN=$previous}else{Remove-Item Env:GH_TOKEN -ErrorAction SilentlyContinue}}};return [bool]$ok
 }
 function Ensure-Node {
-    $existing=Get-Command node -ErrorAction SilentlyContinue;if($existing){return $existing.Source}
+    $existing=Get-Command node -ErrorAction SilentlyContinue;if(-not$script:FORCE_PORTABLE_TOOLS -and $existing){return $existing.Source}
     $zip=Wait-KhoraPrefetch -Name node;$sumFile=Wait-KhoraPrefetch -Name nodeSums
     if(-not$zip-or-not$sumFile){throw 'Node.js ausente.'}
     $line=Get-Content $sumFile|Where-Object{$_ -match [regex]::Escape((Split-Path $zip -Leaf))}|Select-Object -First 1
@@ -109,7 +109,7 @@ function Ensure-Node {
 
 function Ensure-Python311 {
     $existing=Get-Command python -ErrorAction SilentlyContinue
-    if($existing -and $existing.Source -notmatch '\\WindowsApps\\'){if((& $existing.Source --version 2>&1) -match '^Python 3\.(1[1-9]|[2-9]\d)'){return $existing.Source}}
+    if(-not$script:FORCE_PORTABLE_TOOLS -and $existing -and $existing.Source -notmatch '\\WindowsApps\\'){if((& $existing.Source --version 2>&1) -match '^Python 3\.(1[1-9]|[2-9]\d)'){return $existing.Source}}
     $installer=Wait-KhoraPrefetch -Name python;if(-not$installer){throw 'Python ausente.'}
     if((Get-AuthenticodeSignature $installer).Status -ne 'Valid'){throw 'Firma Python inválida.'}
     $target=Join-Path $WORK_DIR 'tools\python311';New-Item -ItemType Directory -Path $target -Force|Out-Null
