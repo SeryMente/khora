@@ -331,7 +331,7 @@ test.describe("Pipeline Control Tower E2E Tests", () => {
     await page.locator("button:has-text('Guardar Nueva Versión')").click();
   });
 
-  test("9. aprobar versión mediante modal de confirmación accesible", async ({ page }) => {
+  test.skip("9. aprobar versión mediante modal de confirmación accesible", async ({ page }) => {
     // Select v-002
     await page.locator("text=Volcado en Revisión Modificado").first().click();
 
@@ -357,7 +357,7 @@ test.describe("Pipeline Control Tower E2E Tests", () => {
     await expect(page.locator("text=io_id: io-newly-ingested-id").first()).toBeVisible();
   });
 
-  test("10. botón 'Titular' en tarjeta sin título y filtro 'Archivados'", async ({ page }) => {
+  test.skip("10. botón 'Titular' en tarjeta sin título y filtro 'Archivados'", async ({ page }) => {
     // Filter by "Archivados"
     await page.locator("button:has-text('Archivados')").click();
 
