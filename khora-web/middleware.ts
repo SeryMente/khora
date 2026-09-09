@@ -20,7 +20,7 @@ export default auth((req) => {
   }
 
   if (pathname === "/sistema/entorno-persistente") {
-    return NextResponse.redirect(new URL("/sistema/seguridad#entorno-persistente", req.nextUrl.origin), 308);
+    return NextResponse.redirect(new URL("/sistema/seguridad?tab=entorno-persistente", req.nextUrl.origin), 308);
   }
 
   // Skip auth checks when running Playwright E2E tests internally

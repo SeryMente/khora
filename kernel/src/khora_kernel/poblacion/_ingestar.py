@@ -72,7 +72,7 @@ def proponer(
 ) -> ProposalEnvelope:
     """
     Transduce y resuelve en MODO LECTURA PURA (READ-ONLY) emitiendo un ProposalEnvelope
-    cumpliendo estrictamente el contrato 5-0. Cero escrituras en memoria o Neo4j.
+    cumpliendo estrictamente el contrato 5-0. Cero escrituras en memoria o en el grafo.
     """
     p_prelim = transducir(objeto, memoria, puerto_llm)
     resueltos = resolver(p_prelim.relations, memoria, puerto_llm, puerto_embeddings)
@@ -234,7 +234,7 @@ def asentar(
     on_upsert: Optional[Any] = None,
 ) -> ActaDeIngesta:
     """
-    Asienta una propuesta ratificada en UNA sola transacción atómica Neo4j/memoria.
+    Asienta una propuesta ratificada en UNA sola transacción atómica grafo/memoria.
     Exige la presencia de juicios explícitos (judgments). Sin juicios NO se asienta.
     Fallo de constraints o error causa rollback completo.
     """

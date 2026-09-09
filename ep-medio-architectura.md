@@ -1,7 +1,7 @@
 # Entorno Persistente Medio · Arquitectura canónica v1.0.0
 
 **Estado:** normativa · restauración inaugural 1.0.0
-**Host KHORA:** 7.4.0
+**Host KHORA:** 7.5.0
 **Repositorio:** `SeryMente/khora`, tratado como privado
 **Punto de entrada único:** `scripts/khora/khora.ps1`
 **Firma de instrucción:** NX-326m
@@ -56,11 +56,11 @@ El token Khora no sustituye el Personal Access Token de GitHub ni la llave de la
 
 ### 3.2 Emisión por Google OpenID Connect y Sección Seguridad
 
-1. El usuario navega a la sección principal **Seguridad** (`/sistema/seguridad`) o mediante la redirección HTTP 308 desde `/sistema/entorno-persistente` hacia `/sistema/seguridad#entorno-persistente`.
+1. El usuario navega a la sección principal **Seguridad** (`/sistema/seguridad`) o mediante la redirección HTTP 308 desde `/sistema/entorno-persistente` hacia `/sistema/seguridad?tab=entorno-persistente`.
 2. Auth.js valida la sesión mediante el proveedor configurado por `OIDC_ISSUER_URL`, `OIDC_CLIENT_ID` y `OIDC_CLIENT_SECRET`.
 3. El proveedor valida firma, emisor y reclamación de audiencia (`aud`) de Google.
 4. Khora compara el correo con `EP_ALLOWED_EMAIL` y falla cerrado si no coincide.
-5. `POST /api/ep/token` acepta el parámetro opcional de plataforma (`{ "platform": "windows" }`, por defecto `"windows"` si se omite). Plataformas no soportadas como `"linux"` o `"macos"` devuelven HTTP 400 con `unsupported_platform`.
+5. `POST /api/ep/token` acepta plataforma y modo (`{ "platform": "windows", "mode": "normal" | "clean-host" }`). Ambos tienen valores seguros por defecto; plataformas o modos desconocidos fallan con HTTP 400.
 6. Se aplica un límite de tasa en base de datos (`ep_bootstrap_tokens`): máximo 5 emisiones por usuario cada 15 minutos (HTTP 429 `rate_limit_exceeded`). Un bloqueo transaccional asesor por usuario serializa emisiones concurrentes antes del conteo, revocación e inserción.
 7. `POST /api/ep/token` crea un identificador de sesión y emite un JSON Web Token HMAC-SHA256 con:
    - `iss = khora-ep`;
@@ -68,7 +68,7 @@ El token Khora no sustituye el Personal Access Token de GitHub ni la llave de la
    - `sub = correo autenticado`;
    - `sid = identificador de sesión`;
    - `scope = ep:bootstrap ep:logs:write ep:logs:read`;
-   - `jti`, `iat`, `exp` y `typ = ep-session`.
+   - `jti`, `iat`, `exp`, `typ = ep-session` y `launchMode` ligado criptográficamente al token.
 8. Devuelve además el descriptor del lanzador (`launcher`: id, version, platform, shell, minimumVersion, storageBackend, execution, status, command), la `apiBase` tomada exactamente de la audiencia firmada y los encabezados `Cache-Control: no-store` y `Pragma: no-cache`.
 9. Emitir un token nuevo revoca cualquier token de Entorno Persistente todavía activo del mismo usuario. Por eso se requiere una generación nueva por sesión.
 10. El servidor guarda únicamente SHA-256 de `jti`. La interfaz mantiene el token completo solo en memoria, no lo renderiza, valida localmente sus tres segmentos y permite copiarlo exactamente mediante una acción explícita.
@@ -106,7 +106,7 @@ La página entrega primero un comando fijo y después el token. El usuario:
 2. copia el token Khora;
 3. vuelve a PowerShell y presiona Enter.
 
-El comando lee y valida el token desde el portapapeles, borra inmediatamente el portapapeles y descarga `GET /api/ep/bootstrap` con `Authorization: Bearer` contra la `apiBase` idéntica a la audiencia firmada. Materializa el cuerpo como un `.ps1` aleatorio con UTF-8 BOM, protege el token en un blob DPAPI temporal, elimina la variable en texto plano y ejecuta el gate como archivo en el mismo proceso con `-KhoraTokenFile`. Un `finally` limpia portapapeles, gate, blob y variables tanto en éxito como en fallo. El token no aparece en historial, salida ni argumentos de un proceso nuevo. `ScriptBlock.Create` está prohibido porque no conserva la semántica de archivo requerida por `#requires`, `CmdletBinding` y `param` en Windows PowerShell 5.1.
+El comando lee y valida el token desde el portapapeles, borra inmediatamente el portapapeles y descarga `GET /api/ep/bootstrap` con `Authorization: Bearer` contra la `apiBase` idéntica a la audiencia firmada. Materializa el cuerpo como un `.ps1` aleatorio con UTF-8 BOM, protege el token en un blob DPAPI temporal, elimina la variable en texto plano e invoca explícitamente `%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe` con `-KhoraTokenFile` y el modo no secreto. Un `finally` limpia portapapeles, gate, blob y variables tanto en éxito como en fallo. El token no aparece en historial, salida ni argumentos de proceso. `ScriptBlock.Create` está prohibido porque no conserva la semántica de archivo requerida por `#requires`, `CmdletBinding` y `param` en Windows PowerShell 5.1.
 
 ### 3.4 Acceso de modelos
 
@@ -119,6 +119,19 @@ Un modelo autorizado puede:
   - añadir `format=ndjson` para JSON delimitado por saltos de línea.
 
 Ningún endpoint acepta acceso anónimo. El token solo puede leer sesiones cuyo `usuario` coincide con su `sub`.
+
+## 3.5 Modo `clean-host`: prueba reproducible de máquina limpia
+
+El submódulo **Seguridad → Entorno Persistente** ofrece dos contratos. `normal` permite reutilizar una herramienta del host solo si supera la verificación existente. `clean-host` es una ruta de aprovisionamiento real y obligatoria:
+
+1. `LaunchMode=clean-host` viaja desde la UI al token, al launcher, a la elevación y a `session-manifest.json`.
+2. El VHDX nuevo con BitLocker sigue siendo el contenedor de trabajo; Windows Sandbox no es requisito y no se simula un contenedor exitoso.
+3. `PATH` se reduce a componentes de Windows y `HOME`, `APPDATA`, `LOCALAPPDATA`, temporales y cachés se redirigen al VHDX.
+4. Git, GitHub CLI, Node.js, Python y Visual Studio Code se descargan otra vez desde sus proveedores oficiales, se verifican mediante firma o SHA-256 según el contrato existente y se ejecutan desde `work/tools`.
+5. Las instalaciones del host se ignoran aunque existan. Las etapas `EP-IN-*` no cambian: cualquier fallo real queda localizado y la sesión solo es utilizable al alcanzar `EP-IN-130`.
+6. El modo `normal` conserva compatibilidad; `clean-host` no reduce BitLocker, autenticación, publicación exacta de `main`, bitácora ni limpieza.
+
+Límite explícito: el núcleo de Windows, PowerShell 5.1, BitLocker, red y elevación siguen siendo capacidades del host. El modo prueba el aprovisionamiento de la cadena de desarrollo, no virtualiza Windows.
 
 ## 4. Bitácora persistente resistente a fallos
 
