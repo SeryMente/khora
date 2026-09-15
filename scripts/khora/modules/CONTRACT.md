@@ -1,4 +1,4 @@
-# Contrato modular · Entorno Persistente Medio v1.0.0
+# Contrato modular · Entorno Persistente Medio v1.0.1
 
 El único punto de entrada del repositorio es `scripts/khora/khora.ps1`. El instanciador remoto autenticado devuelve exactamente ese gate. El barril carga, en orden, los módulos `00` a `15` y `90`.
 
