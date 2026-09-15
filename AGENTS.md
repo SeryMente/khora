@@ -41,7 +41,7 @@ No crear una arquitectura paralela para resolver una necesidad que ya tenga un m
 Antes de crear código nuevo para una capacidad del EP, el agente DEBE localizar y reutilizar el mecanismo existente que ya desempeñe esa responsabilidad.
 
 
-## Entorno Persistente Medio v1.0
+## Entorno Persistente Medio v1.0.1
 
 - La especificación única es `ep-medio-architectura.md`.
 - Mantén el punto de entrada único `scripts/khora/khora.ps1`.

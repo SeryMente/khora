@@ -3,7 +3,7 @@ import { getDb } from "@/lib/server/neon";
 import { JwtPayload, signJwt, verifyJwtDetailed } from "@/lib/server/jwt";
 
 export type EpState = "START" | "OK" | "FAIL" | "INFO" | "SKIP";
-export type EpLaunchMode = "normal" | "clean-host";
+export type EpLaunchMode = "normal";
 export interface EpTokenPayload extends JwtPayload { sid: string; typ: "ep-session"; launchMode: EpLaunchMode; }
 export interface IncomingEpEvent {
   id: string; state: EpState; message?: string; durationMs?: number | null;
@@ -50,7 +50,7 @@ export function isEpUserAllowed(email: string, origin?: string): boolean {
   return !!email && (!allowed || email.toLowerCase() === allowed);
 }
 export async function createEpSessionToken(email: string, origin: string, launchMode: EpLaunchMode = "normal") {
-  if (launchMode !== "normal" && launchMode !== "clean-host") throw new Error("unsupported_launch_mode");
+  if (launchMode !== "normal") throw new Error("unsupported_launch_mode");
   const config = getEpConfig(origin);
   if (!isEpUserAllowed(email, origin)) throw new Error("Usuario no autorizado para Entorno Persistente");
   const now = Math.floor(Date.now() / 1000);
@@ -108,7 +108,7 @@ export async function authenticateEpBearer(req: Request, scopes: string[]): Prom
     throw new Error("invalid_token");
   }
   const payload = verification.payload as EpTokenPayload;
-  if (payload.typ !== "ep-session" || payload.iss !== config.issuer || (payload.launchMode !== "normal" && payload.launchMode !== "clean-host") || typeof payload.sid !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(payload.sid) || typeof payload.sub !== "string" || !payload.sub || typeof payload.jti !== "string" || payload.jti.length < 16 || payload.jti.length > 256) throw new Error("invalid_token");
+  if (payload.typ !== "ep-session" || payload.iss !== config.issuer || payload.launchMode !== "normal" || typeof payload.sid !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(payload.sid) || typeof payload.sub !== "string" || !payload.sub || typeof payload.jti !== "string" || payload.jti.length < 16 || payload.jti.length > 256) throw new Error("invalid_token");
   if (payload.aud !== config.audience) throw new Error("invalid_audience");
   const granted = new Set(payload.scope.split(/\s+/).filter(Boolean));
   if (scopes.some((scope) => !granted.has(scope))) throw new Error("insufficient_scope");

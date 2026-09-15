@@ -1,6 +1,6 @@
-# EP v1.0 — evidencia de validación
+# EP v1.0.1 — evidencia de validación
 
-**Host Khora:** 7.5.0
+**Host Khora:** 7.5.1
 **Firma:** NX-326m
 
 ## Aprobado en auditoría estática Linux
@@ -9,8 +9,8 @@
 - Bootstrap idéntico byte a byte al gate, con UTF-8 BOM y CRLF.
 - Launcher sin `ScriptBlock.Create`: `.ps1` y blob DPAPI temporales, invocación explícita de Windows PowerShell 5.1 y limpieza en `finally`.
 - JWT HS256 estricto, firma en tiempo constante, audiencia canónica, scopes, expiración, revocación y códigos públicos.
-- UI reorganizada como Seguridad → Entorno Persistente, selector normal/clean-host, copia independiente y exacta de comando/token, token no renderizado, estados accesibles, expiración y descarte.
-- `clean-host` ligado al JWT y al manifiesto; PATH, HOME, APPDATA, temporales y cachés aislados; Git, GitHub CLI, Node.js, Python y Visual Studio Code portátiles obligatorios.
+- UI reorganizada como Seguridad → Entorno Persistente (normal-only + lanzamiento simplificado): comando estático visible antes/después, emisión y copia automática de token al portapapeles sin renderizado, reintento exclusivo ante bloqueo del navegador.
+- Modo `clean-host` rechazado explícitamente con HTTP 400 (`unsupported_launch_mode`), sin mutación de estado.
 - Descarga privada de GitHub, Vercel 59.3.0 fijada, redacción de secretos y preflight de Escritorio local.
 - Escaneo de secretos, rutas inseguras y artefactos excluidos.
 

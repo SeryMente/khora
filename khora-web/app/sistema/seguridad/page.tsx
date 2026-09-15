@@ -32,7 +32,7 @@ function SeguridadOverview({ onOpen }: { onOpen: (tab: Exclude<SecurityTab, "seg
         <span className="flex h-11 w-11 items-center justify-center rounded-lg border" style={border}><Container size={23} /></span>
         <p className="mt-5 text-[10px] font-bold uppercase tracking-[0.2em] opacity-50">Submódulo</p>
         <h2 className="mt-1 text-lg font-bold">Entorno Persistente</h2>
-        <p className="mt-2 text-sm leading-relaxed opacity-70">Sesiones cifradas, comando de arranque, prueba de máquina limpia y bitácora remota.</p>
+        <p className="mt-2 text-sm leading-relaxed opacity-70">Sesiones cifradas, comando de arranque y bitácora remota.</p>
       </button>
       <button type="button" onClick={() => onOpen("boveda")} className="min-h-52 rounded-xl border p-6 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--khora-accent)]" style={{ ...border, background: "var(--khora-surface)" }}>
         <span className="flex h-11 w-11 items-center justify-center rounded-lg border" style={border}><LockKeyhole size={23} /></span>
