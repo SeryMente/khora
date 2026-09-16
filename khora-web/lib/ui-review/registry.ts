@@ -478,6 +478,69 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
     ]
   },
 
+  // 8. Consulta
+  "consulta:idle": {
+    screen: "consulta",
+    scenario: "idle",
+    title: "Consulta · Sesión de Chat Lista",
+    description: "Consola de consulta multi-turno lista para interactuar con selector de perfil y modelo override.",
+    status: "active",
+    recommended_viewport: "desktop",
+    ui_ids: [
+      "consulta.container",
+      "consulta.header",
+      "consulta.selector-perfil",
+      "consulta.input-modelo-override",
+      "consulta.toggle-modo-grafo",
+      "consulta.messages-list",
+      "consulta.message-item",
+      "consulta.message-origin",
+      "consulta.form-input",
+      "consulta.input-text",
+      "consulta.btn-enviar"
+    ]
+  },
+  "consulta:generating": {
+    screen: "consulta",
+    scenario: "generating",
+    title: "Consulta · Transmisión Streaming en Curso",
+    description: "Generación en streaming SSE activa con indicador animado e input deshabilitado.",
+    status: "active",
+    recommended_viewport: "desktop",
+    ui_ids: [
+      "consulta.container",
+      "consulta.status-generating",
+      "consulta.form-input",
+      "consulta.btn-enviar"
+    ]
+  },
+  "consulta:grafo": {
+    screen: "consulta",
+    scenario: "grafo",
+    title: "Consulta · Modo Grafo (RAG)",
+    description: "Consulta ejecutada sobre el motor de conocimiento en Neo4j con panel de fuentes y evidencia.",
+    status: "active",
+    recommended_viewport: "desktop",
+    ui_ids: [
+      "consulta.container",
+      "consulta.toggle-modo-grafo",
+      "consulta.message-origin",
+      "consulta.sources-panel"
+    ]
+  },
+  "consulta:error": {
+    screen: "consulta",
+    scenario: "error",
+    title: "Consulta · Error de Transmisión o Proveedor",
+    description: "Aviso de error legible presentado ante fallo del proveedor LLM o interrupción de red.",
+    status: "active",
+    recommended_viewport: "desktop",
+    ui_ids: [
+      "consulta.container",
+      "consulta.error-banner"
+    ]
+  },
+
   // ── ESCENARIOS DE FALLO ──────────────────────────────────────────────
   // Casos derivados de incidentes reales observados en produccion.
   "ingreso:boveda_bloqueada": {
@@ -615,7 +678,8 @@ export const SCREENS: ScreenId[] = [
   "aprobacion",
   "ingesta",
   "registro",
-  "grafo"
+  "grafo",
+  "consulta"
 ];
 
 export function getScenario(screen: ScreenId, scenarioName: string): ScenarioDefinition | null {

@@ -19,7 +19,8 @@ export type ScreenId =
   | "aprobacion"
   | "ingesta"
   | "registro"
-  | "grafo";
+  | "grafo"
+  | "consulta";
 
 export type ScenarioStatus = "active" | "absent";
 

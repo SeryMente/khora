@@ -1,5 +1,4 @@
 # @l0 L0-002 · @req KA-00/REQ-CHAT · @acr ACR-2.1
-import os
 import pytest
 
 from khora_kernel.proveedores import (
