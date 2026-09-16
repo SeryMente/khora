@@ -1,11 +1,12 @@
-# @l0 L0-002-R · @req API-00/REQ-1,REQ-2,REQ-3,DEPLOY-01/REQ-1,DEPLOY-01/REQ-2,DEPLOY-01/REQ-3,ING-03/REQ-1,GRAFO-01/REQ-1 · @acr ACR-1.1,ACR-1.2,ACR-2.1,ACR-3.1 · @ua UA-03,UA-04,UA-05,UA-06
+# @l0 L0-002-R · @req API-00/REQ-1,REQ-2,REQ-3,REQ-CHAT,DEPLOY-01/REQ-1,DEPLOY-01/REQ-2,DEPLOY-01/REQ-3,ING-03/REQ-1,GRAFO-01/REQ-1 · @acr ACR-1.1,ACR-1.2,ACR-2.1,ACR-3.1 · @ua UA-03,UA-04,UA-05,UA-06
 import os
 import uuid
 import datetime
 import traceback
-from typing import Optional
+from typing import List, Optional
 from fastapi import FastAPI, Depends, HTTPException, Header, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, model_validator
 import logging
 from contextlib import asynccontextmanager
@@ -280,6 +281,87 @@ async def endpoint_consulta(req: ConsultaRequest):
     except Exception as e:
         logging.error(f"Consulta error: {traceback.format_exc()}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+class MensajeChat(BaseModel):
+    rol: str
+    contenido: str
+
+
+class ChatRequest(BaseModel):
+    mensajes: List[MensajeChat]
+    perfil: str
+    modelo_override: Optional[str] = None
+
+
+@app.post("/api/v1/chat", dependencies=[Depends(verify_key)])
+async def endpoint_chat(req: ChatRequest):
+    import json
+    import urllib.error
+    from khora_kernel.proveedores import (
+        PerfilLLMNoConfiguradoError,
+        crear_proveedor_por_perfil,
+        extraer_segundos_reintento,
+    )
+
+    try:
+        proveedor = crear_proveedor_por_perfil(req.perfil, modelo_override=req.modelo_override)
+        mensajes_dict = [{"role": m.rol, "content": m.contenido} for m in req.mensajes]
+        stream_iter = proveedor.generar_stream(mensajes_dict)
+    except PerfilLLMNoConfiguradoError as e:
+        raise HTTPException(
+            status_code=503,
+            detail={"error": "PERFIL_NO_CONFIGURADO", "perfil": e.perfil, "detalle": e.mensaje}
+        )
+    except urllib.error.HTTPError as e:
+        error_body = ""
+        try:
+            error_body = e.read().decode("utf-8")
+        except Exception:
+            pass
+        if e.code == 429:
+            segundos = extraer_segundos_reintento(error_body, headers=e.headers)
+            raise HTTPException(
+                status_code=429,
+                detail={"error": "RATE_LIMIT", "perfil": req.perfil, "reintentar_en_segundos": segundos}
+            )
+        raise HTTPException(
+            status_code=502,
+            detail={"error": "PROVEEDOR_ERROR", "perfil": req.perfil, "codigo": e.code, "mensaje": str(e)}
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail={"error": "ERROR_INTERNO", "perfil": req.perfil, "mensaje": str(e)}
+        )
+
+    async def sse_event_generator():
+        origen = f"llm:{req.perfil}:{proveedor.llm_model}"
+        try:
+            for chunk in stream_iter:
+                payload = {"tipo": "chunk", "texto": chunk, "origen": origen}
+                yield f"data: {json.dumps(payload, ensure_ascii=False)}\n\n"
+
+            payload_fin = {"tipo": "fin"}
+            yield f"data: {json.dumps(payload_fin, ensure_ascii=False)}\n\n"
+        except urllib.error.HTTPError as e:
+            error_body = ""
+            try:
+                error_body = e.read().decode("utf-8")
+            except Exception:
+                pass
+            if e.code == 429:
+                segundos = extraer_segundos_reintento(error_body, headers=e.headers)
+                payload_err = {"tipo": "error", "error": "RATE_LIMIT", "perfil": req.perfil, "reintentar_en_segundos": segundos}
+            else:
+                payload_err = {"tipo": "error", "error": "PROVEEDOR_ERROR", "perfil": req.perfil, "codigo": e.code}
+            yield f"data: {json.dumps(payload_err, ensure_ascii=False)}\n\n"
+        except Exception as e:
+            payload_err = {"tipo": "error", "error": "ERROR_INTERNO", "perfil": req.perfil, "mensaje": str(e)}
+            yield f"data: {json.dumps(payload_err, ensure_ascii=False)}\n\n"
+
+    return StreamingResponse(sse_event_generator(), media_type="text/event-stream")
+
 
 @app.get("/health")
 @app.get("/api/v1/salud")
