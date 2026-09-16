@@ -253,7 +253,7 @@ db60f4bb5a898b2e5ac57f91195454e693769c8e63a1064db300663f331cecd4  ./khora-web/ap
 498684b2838bdb273886d0f9236f41cfb4bb0281e40ee562fef5b6573a8d02a4  ./khora-web/app/components/ThemeToggle.tsx
 93992ccca6db5d8fda607e78aaf925e1c78e327cb4d9f18c30f2f23e5e56c48e  ./khora-web/app/components/UpdatePrompt.tsx
 bc5a4691e376000eaaecaaad8e76f6ea55f08431e57a3b796a8963f75772fb7a  ./khora-web/app/components/os/AppIcon.tsx
-6684aa094741327e64c26d0dfed15b5b5b1c5bf00d80e2daa8eaff97654b09f0  ./khora-web/app/components/os/EntornoPersistentePanel.tsx
+969cca43454fdd08a07938dd5984fbf62832e6abef6455d6cdba45b5f8ffe422  ./khora-web/app/components/os/EntornoPersistentePanel.tsx
 e623512b60f3f656af1268553ce93e618375375352bf84b90c480b9358e79411  ./khora-web/app/components/os/KhoraShell.tsx
 6dd2c462593cbaee7789886c973870825deb48c1c0db804188af101a1622c215  ./khora-web/app/components/os/KhoraSplash.tsx
 6b38855b6ca8ec0b26d545593136087edfe62f3a8eabc565e55e1ab1083be1f0  ./khora-web/app/components/os/PaginaBoveda.tsx
@@ -446,8 +446,8 @@ dac4f7655cc8f3b18c50ccd9cee11d780f8841ac24368d318f3d9daa8dd0577a  ./khora-web/ma
 979b29917a479b98c2e093289bb5b42da27e5dca596be33f0068db22d7a9a22e  ./khora-web/metadata.json
 84e6812104cbce1bb1e573afc17765acaf79b1ddee6f05562d62bf879131baea  ./khora-web/middleware.ts
 0a3e191a99ace83480b259685a68f951068c9cff2a4de2cfa0f53c169f9df114  ./khora-web/next.config.ts
-bf72693ae9faec8a67f2ca4db792564b8e1502835536796630df69de2bb9602b  ./khora-web/package-lock.json
-980440f2eeefa835c47c3b48f10ab543cb2e6247cbc59880d6e6f2e2b60be694  ./khora-web/package.json
+a39986e6309a4fdbdd3a9b85cf8ee70d125e97cd9f5fa0b219413b5be978f504  ./khora-web/package-lock.json
+3b0df159e798eae5dc8bf0e0d8a8a2341154b3cb0b4f4c9ce89960d7986b43a2  ./khora-web/package.json
 5a9ffe983477f3858670e151c19534377d6c523cc8ceadc838cc69fafed5411e  ./khora-web/pages/404.tsx
 7b2dfe403ee98aacec3e6c3e6126ab4223c5e5d8b2cea31a1ce96452af253502  ./khora-web/pages/_app.tsx
 3e76fbd3eba01f49986c63dcb38be111b44844906f56a275dd0629ad2e693000  ./khora-web/playwright.config.ts
