@@ -267,7 +267,7 @@ test("EP Security: public authentication codes never expose internal errors", ()
 
 test("EP Security UI isolates Entorno Persistente as a submodule and keeps credentials ephemeral", () => {
   const page = readFileSync(new URL("../../app/sistema/seguridad/page.tsx", import.meta.url), "utf8");
-  const source = readFileSync(new URL("../../app/components/os/EntornoPersistentePanel.tsx", import.meta.url), "utf8");
+  const source = readFileSync(new URL("../../app/components/ep/EntornoPersistentePanel.tsx", import.meta.url), "utf8");
   assert.match(page, /"entorno-persistente"/);
   assert.match(page, /<EntornoPersistentePanel \/>/);
   assert.match(source, /copyCommand/);
