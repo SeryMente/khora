@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..",
 
 from fastapi.testclient import TestClient
 
-from api.main import app, neo4j_driver
+from api.main import app
 
 # We need to set a dummy key for testing
 os.environ["KHORA_API_KEY"] = "test-key-123"
