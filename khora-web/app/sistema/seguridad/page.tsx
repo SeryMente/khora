@@ -4,7 +4,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Container, LockKeyhole, ShieldCheck } from "lucide-react";
-import EntornoPersistentePanel from "@/app/components/os/EntornoPersistentePanel";
+import EntornoPersistentePanel from "@/app/components/ep/EntornoPersistentePanel";
 import PaginaBoveda from "@/app/components/os/PaginaBoveda";
 
 type SecurityTab = "seguridad" | "entorno-persistente" | "boveda";
