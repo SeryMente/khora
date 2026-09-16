@@ -2,7 +2,7 @@
 $Global:KhoraVaultPath=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..\secrets\env-vault.enc.json'))
 if(-not(Get-Variable KhoraVaultMasterKey -Scope Global -ErrorAction SilentlyContinue)){$Global:KhoraVaultMasterKey=$null}
 if(-not(Get-Variable KhoraVaultLoadedNames -Scope Global -ErrorAction SilentlyContinue)){$Global:KhoraVaultLoadedNames=@()}
-$Global:KhoraVaultValidators=@{'NEO4J_URI'='^(neo4j(\+s)?|bolt(\+s)?|https)://\S+$';'NEO4J_USER'='^[A-Za-z0-9\-]{1,64}$';'NEO4J_PASSWORD'='^\S{8,}$'}
+$Global:KhoraVaultValidators=@{'NEO4J_URI'='^(neo4j(\+s)?|bolt(\+s)?|https)://\S+$';'NEO4J_USER'='^[A-Za-z0-9\-]{1,64}$';'NEO4J_PASSWORD'='^\S{8,}$';'KHORA_PERFIL_OPEN_SOURCE_BASE_URL'='^https?://\S+$';'KHORA_PERFIL_GEMINI_BASE_URL'='^https?://\S+$';'KHORA_PERFIL_GROQ_BASE_URL'='^https?://\S+$'}
 
 function KhoraVault-SecureToPlain {
     param([Security.SecureString]$Secure)
