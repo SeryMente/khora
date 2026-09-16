@@ -11,11 +11,13 @@ import {
   buildPipelineState,
   buildRegistroState,
   buildGrafoState,
+  buildConsultaState,
 } from "@/lib/ui-review/states";
 import { IngresoView } from "@/app/components/shared/IngresoView";
 import { PipelineView } from "@/app/components/shared/PipelineView";
 import { RegistroView } from "@/app/components/shared/RegistroView";
 import { GrafoView } from "@/app/components/shared/GrafoView";
+import { ConsultaView } from "@/app/components/shared/ConsultaView";
 import * as Icons from "lucide-react";
 
 const adapter = new ReviewFixtureAdapter();
@@ -327,6 +329,11 @@ function RenderCurrentScreen({
     case "grafo":
       return (
         <GrafoView isReviewMode state={buildGrafoState(scenario, fetchError)} />
+      );
+
+    case "consulta":
+      return (
+        <ConsultaView isReviewMode state={buildConsultaState(scenario, fetchError)} />
       );
 
     default:

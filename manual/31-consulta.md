@@ -16,6 +16,13 @@ Retorna un `ResultadoDeConsulta` que contiene la lista de fragmentos y un indica
 En contexto `TRANSPARENTE`, nunca retorna entidades marcadas como `PRIVADAS`.
 Si faltan datos para recuperar resúmenes de comunidad o nodos knn, el campo `degradacion_declarada` indicará las carencias del modo global.
 
+## Interfaz de Usuario (`/sistema/consulta`)
+La pantalla `/sistema/consulta` implementa una consola de conversación multi-turno con transmisión en vivo (streaming SSE):
+1. **Chat Multi-turno Streaming:** Consume `POST /api/chat` (proxy autenticado hacia `POST /api/v1/chat` en el kernel Python). Transmite eventos SSE (`chunk`, `error`, `fin`) sin bufferear.
+2. **Selector de Perfil de Proveedor:** Permite elegir entre `open_source`, `gemini` y `groq`, con un campo opcional de `modelo_override` para especificar un modelo LLM concreto.
+3. **Modo Grafo (RAG) Opcional:** Al activar el toggle "Modo Grafo", las consultas se redirigen al servicio GraphRAG de Neo4j (`POST /api/consulta` -> `POST /api/v1/consulta`), incrustando en el historial la respuesta junto con su subgrafo, fuentes y evidencia de origen.
+4. **Atribución de Origen:** Cada mensaje del asistente declara su origen (`llm:{perfil}:{modelo}` o `grafo`).
+
 ## Cómo se reemplaza
 El componente está desacoplado del Kernel a nivel puerto, si se requiere utilizar un verdadero GraphRAG con un motor indexado se deberá montar un driver que implemente `MotorDeConsulta` pero con integraciones de terceros.
 

@@ -24,6 +24,7 @@ import {
   buildPipelineState,
   buildRegistroState,
   buildGrafoState,
+  buildConsultaState,
   PANTALLAS_PIPELINE,
 } from "../../lib/ui-review/states";
 
@@ -34,6 +35,7 @@ const COMPONENTES_OBLIGATORIOS = [
   "PipelineView.tsx",
   "RegistroView.tsx",
   "GrafoView.tsx",
+  "ConsultaView.tsx",
 ];
 
 function uiIdsDeComponentes(): Set<string> {
@@ -134,6 +136,9 @@ test("todo escenario registrado produce un estado tipado valido", () => {
       const s = buildGrafoState(def.scenario);
       assert.ok(Array.isArray(s.nodes));
       assert.ok(Array.isArray(s.edges));
+    } else if (def.screen === "consulta") {
+      const s = buildConsultaState(def.scenario);
+      assert.ok(Array.isArray(s.mensajes));
     }
   }
 });
@@ -143,6 +148,7 @@ test("los escenarios vacios y de error son deterministas", () => {
   assert.strictEqual(buildPipelineState("empty").selectedId, null);
   assert.deepStrictEqual(buildRegistroState("empty").eventos, []);
   assert.deepStrictEqual(buildGrafoState("empty").nodes, []);
+  assert.deepStrictEqual(buildConsultaState("empty").mensajes, []);
   assert.ok(buildIngresoState("error").error.length > 0);
   assert.ok((buildRegistroState("error").error || "").length > 0);
 });
