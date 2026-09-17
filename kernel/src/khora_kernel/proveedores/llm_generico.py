@@ -125,8 +125,8 @@ class ProveedorLLMGenerico:
         self,
         mensajes: List[Dict[str, Any]],
         temperature: float = 0.0
-    ) -> Generator[str, None, None]:
-        """Envía una petición con stream=True y produce fragmentos de texto conforme se reciben."""
+    ) -> Generator[Any, None, None]:
+        """Envía una petición con stream=True y produce fragmentos de texto o diccionarios de métricas conforme se reciben."""
         url = f"{self.base_url}/chat/completions"
         headers = {
             "Content-Type": "application/json",
@@ -138,6 +138,7 @@ class ProveedorLLMGenerico:
             "messages": mensajes,
             "temperature": temperature,
             "stream": True,
+            "stream_options": {"include_usage": True},
         }
 
         req = urllib.request.Request(
@@ -172,6 +173,8 @@ class ProveedorLLMGenerico:
                                 content = delta.get("content", "")
                                 if content:
                                     yield content
+                            if "usage" in payload and payload["usage"]:
+                                yield {"usage": payload["usage"]}
                         except json.JSONDecodeError:
                             continue
             finally:

@@ -10,8 +10,8 @@ import path from "path";
 test("UI Review Harness Test Suite", async (t) => {
 
   await t.test("1. Registro de pantallas y escenarios completo y no vacío", () => {
-    assert.strictEqual(SCREENS.length, 8);
-    assert.deepStrictEqual(SCREENS, ["ingreso", "archivo", "revision", "aprobacion", "ingesta", "registro", "grafo", "consulta"]);
+    assert.strictEqual(SCREENS.length, 9);
+    assert.deepStrictEqual(SCREENS, ["ingreso", "archivo", "revision", "aprobacion", "ingesta", "registro", "grafo", "consulta", "kpi"]);
 
     for (const screen of SCREENS) {
       const scenarios = getAllScenariosForScreen(screen);
@@ -81,7 +81,7 @@ test("UI Review Harness Test Suite", async (t) => {
     const sharedDir = path.join(process.cwd(), "app", "components", "shared");
     assert.ok(fs.existsSync(sharedDir), "El directorio app/components/shared debe existir");
 
-    const requiredComponents = ["IngresoView.tsx", "PipelineView.tsx", "RegistroView.tsx", "GrafoView.tsx", "ConsultaView.tsx"];
+    const requiredComponents = ["IngresoView.tsx", "PipelineView.tsx", "RegistroView.tsx", "GrafoView.tsx", "ConsultaView.tsx", "KpiPanelView.tsx"];
     for (const comp of requiredComponents) {
       const filePath = path.join(sharedDir, comp);
       assert.ok(fs.existsSync(filePath), `Falta el componente compartido ${comp}`);
@@ -105,6 +105,9 @@ test("UI Review Harness Test Suite", async (t) => {
 
     const consultaPageContent = fs.readFileSync(path.join(process.cwd(), "app", "sistema", "consulta", "page.tsx"), "utf8");
     assert.ok(consultaPageContent.includes("ConsultaView"), "consulta/page.tsx debe consumir ConsultaView");
+
+    const kpisPageContent = fs.readFileSync(path.join(process.cwd(), "app", "sistema", "kpis", "page.tsx"), "utf8");
+    assert.ok(kpisPageContent.includes("KpiPanelView"), "kpis/page.tsx debe consumir KpiPanelView");
   });
 
 });

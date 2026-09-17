@@ -339,8 +339,12 @@ async def endpoint_chat(req: ChatRequest):
         origen = f"llm:{req.perfil}:{proveedor.llm_model}"
         try:
             for chunk in stream_iter:
-                payload = {"tipo": "chunk", "texto": chunk, "origen": origen}
-                yield f"data: {json.dumps(payload, ensure_ascii=False)}\n\n"
+                if isinstance(chunk, dict) and "usage" in chunk:
+                    payload_usage = {"tipo": "usage", "usage": chunk["usage"]}
+                    yield f"data: {json.dumps(payload_usage, ensure_ascii=False)}\n\n"
+                elif isinstance(chunk, str):
+                    payload = {"tipo": "chunk", "texto": chunk, "origen": origen}
+                    yield f"data: {json.dumps(payload, ensure_ascii=False)}\n\n"
 
             payload_fin = {"tipo": "fin"}
             yield f"data: {json.dumps(payload_fin, ensure_ascii=False)}\n\n"
