@@ -56,6 +56,17 @@ export default function SystemBar() {
       </Link>
 
       <Link
+        href="/sistema/kpis"
+        className="flex flex-col items-center justify-center p-2"
+        style={{
+          color: pathname === "/sistema/kpis" ? "var(--khora-ink)" : "var(--khora-accent)"
+        }}
+      >
+        <Icons.Activity size={32} strokeWidth={1.75} absoluteStrokeWidth={true} />
+        <span className="text-xs mt-1 font-medium">KPIs</span>
+      </Link>
+
+      <Link
         href="/sistema/registro"
         className="flex flex-col items-center justify-center p-2"
         style={{

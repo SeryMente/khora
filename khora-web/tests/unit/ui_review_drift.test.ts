@@ -25,6 +25,7 @@ import {
   buildRegistroState,
   buildGrafoState,
   buildConsultaState,
+  buildKpiState,
   PANTALLAS_PIPELINE,
 } from "../../lib/ui-review/states";
 
@@ -36,6 +37,7 @@ const COMPONENTES_OBLIGATORIOS = [
   "RegistroView.tsx",
   "GrafoView.tsx",
   "ConsultaView.tsx",
+  "KpiPanelView.tsx",
 ];
 
 function uiIdsDeComponentes(): Set<string> {
@@ -139,6 +141,10 @@ test("todo escenario registrado produce un estado tipado valido", () => {
     } else if (def.screen === "consulta") {
       const s = buildConsultaState(def.scenario);
       assert.ok(Array.isArray(s.mensajes));
+    } else if (def.screen === "kpi") {
+      const s = buildKpiState(def.scenario);
+      assert.ok(Array.isArray(s.selectedProfiles));
+      assert.ok(typeof s.sinPerfilesConfigurados === "boolean");
     }
   }
 });
