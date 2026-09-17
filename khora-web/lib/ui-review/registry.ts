@@ -541,6 +541,77 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
     ]
   },
 
+  // 9. KPIs
+  "kpi:idle": {
+    screen: "kpi",
+    scenario: "idle",
+    title: "KPIs · Panel de Rendimiento Listo",
+    description: "Panel de métricas y benchmarks listo para ejecución fan-out.",
+    status: "active",
+    recommended_viewport: "desktop",
+    ui_ids: [
+      "kpi.container",
+      "kpi.header",
+      "kpi.form-input",
+      "kpi.input-prompt",
+      "kpi.btn-comparar",
+      "kpi.profile-checkboxes",
+      "kpi.results-grid",
+      "kpi.card-result",
+      "kpi.metric-ttft",
+      "kpi.metric-tps",
+      "kpi.metric-duration",
+      "kpi.benchmarks-table",
+      "kpi.catalog-section"
+    ]
+  },
+  "kpi:comparando": {
+    screen: "kpi",
+    scenario: "comparando",
+    title: "KPIs · Medición Fan-Out en Curso",
+    description: "Prueba comparativa en vivo midiendo TTFT y TPS en paralelo.",
+    status: "active",
+    recommended_viewport: "desktop",
+    ui_ids: [
+      "kpi.container",
+      "kpi.form-input",
+      "kpi.btn-comparar",
+      "kpi.results-grid",
+      "kpi.card-result",
+      "kpi.metric-ttft",
+      "kpi.metric-tps",
+      "kpi.metric-duration"
+    ]
+  },
+  "kpi:fallo-parcial": {
+    screen: "kpi",
+    scenario: "fallo-parcial",
+    title: "KPIs · Fallo Parcial de Proveedor",
+    description: "Uno o más perfiles fallan mientras el resto de las tarjetas operan con normalidad.",
+    status: "active",
+    recommended_viewport: "desktop",
+    ui_ids: [
+      "kpi.container",
+      "kpi.error-banner",
+      "kpi.results-grid",
+      "kpi.card-result"
+    ]
+  },
+  "kpi:degradado-total": {
+    screen: "kpi",
+    scenario: "degradado-total",
+    title: "KPIs · Degradación Total (Sin Credenciales)",
+    description: "Aviso claro de degradación cuando ningún perfil de proveedor posee credenciales.",
+    status: "active",
+    recommended_viewport: "desktop",
+    ui_ids: [
+      "kpi.container",
+      "kpi.degraded-banner",
+      "kpi.benchmarks-table",
+      "kpi.catalog-section"
+    ]
+  },
+
   // ── ESCENARIOS DE FALLO ──────────────────────────────────────────────
   // Casos derivados de incidentes reales observados en produccion.
   "ingreso:boveda_bloqueada": {
@@ -679,7 +750,8 @@ export const SCREENS: ScreenId[] = [
   "ingesta",
   "registro",
   "grafo",
-  "consulta"
+  "consulta",
+  "kpi"
 ];
 
 export function getScenario(screen: ScreenId, scenarioName: string): ScenarioDefinition | null {

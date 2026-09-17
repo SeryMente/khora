@@ -20,7 +20,8 @@ export type ScreenId =
   | "ingesta"
   | "registro"
   | "grafo"
-  | "consulta";
+  | "consulta"
+  | "kpi";
 
 export type ScenarioStatus = "active" | "absent";
 

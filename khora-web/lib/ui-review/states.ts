@@ -15,6 +15,7 @@ import type { PipelineViewState } from "@/app/components/shared/PipelineView";
 import type { RegistroViewState } from "@/app/components/shared/RegistroView";
 import type { GrafoViewState } from "@/app/components/shared/GrafoView";
 import type { ConsultaViewState } from "@/app/components/shared/ConsultaView";
+import type { KpiPanelViewState } from "@/app/components/shared/KpiPanelView";
 import {
   FIXTURE_VOLCADOS,
   FIXTURE_HALLAZGOS,
@@ -280,6 +281,61 @@ export function buildConsultaState(
       scenario === "error"
         ? "Error sintético de conexión con el proveedor LLM"
         : fetchError || null,
+  };
+}
+
+export function buildKpiState(
+  scenario: string,
+  fetchError: string | null = null
+): KpiPanelViewState {
+  const isComparando = scenario === "comparando";
+  const isFalloParcial = scenario === "fallo-parcial";
+  const isDegradadoTotal = scenario === "degradado-total";
+
+  return {
+    promptInput: isComparando || isFalloParcial ? "Explicación sintética de rendimiento Khora" : "",
+    selectedProfiles: ["groq", "gemini", "open_source"],
+    generandoGlobal: isComparando,
+    sinPerfilesConfigurados: isDegradadoTotal,
+    resultados: {
+      groq: {
+        perfil: "groq",
+        estado: isComparando ? "generando" : "exito",
+        contenido: "Groq LPU sintético: latencia mínima y alto rendimiento.",
+        ttftMs: 180,
+        durationMs: 1200,
+        realTokens: 42,
+        charCount: 168,
+        tps: 35.0,
+        isExactTokens: true,
+        origenModel: "llm:groq:llama-3.3-70b-versatile",
+      },
+      gemini: {
+        perfil: "gemini",
+        estado: isComparando ? "generando" : "exito",
+        contenido: "Gemini sintético: respuesta analítica completada.",
+        ttftMs: 320,
+        durationMs: 2100,
+        realTokens: null,
+        charCount: 200,
+        tps: 23.8,
+        isExactTokens: false,
+        origenModel: "llm:gemini:gemini-1.5-flash",
+      },
+      open_source: {
+        perfil: "open_source",
+        estado: isFalloParcial ? "error" : isComparando ? "generando" : "exito",
+        contenido: isFalloParcial ? "" : "Respuesta de modelo Open Source local.",
+        errorMsg: isFalloParcial ? "PERFIL_NO_CONFIGURADO: Faltan variables en el perfil 'open_source'" : fetchError || undefined,
+        ttftMs: isFalloParcial ? null : 450,
+        durationMs: isFalloParcial ? null : 3500,
+        realTokens: null,
+        charCount: isFalloParcial ? 0 : 150,
+        tps: isFalloParcial ? null : 10.7,
+        isExactTokens: false,
+        origenModel: "llm:open_source:llama-3.1-8b",
+      },
+    },
   };
 }
 
