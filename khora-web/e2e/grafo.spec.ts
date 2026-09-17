@@ -9,10 +9,10 @@ test.describe("Grafo 4 Capas - VIZ-01", () => {
   });
 
   test("ACR-1.1 & ACR-2.1: vista default muestra lista accesible (o estado vacio)", async ({ page }) => {
-    // Wait for either the nodes to load or the empty state message
+    // Wait for either the nodes to load, the empty state message, or error state
     const emptyState = page.locator("text=El grafo está vacío.");
     const listHeader = page.locator("text=Lista Accesible de Nodos");
-    const errorState = page.locator("text=Error fetching");
+    const errorState = page.locator("[data-ui-id='grafo.error-state']");
 
     await Promise.race([
       emptyState.waitFor({ state: "visible" }).catch(() => {}),
@@ -25,7 +25,7 @@ test.describe("Grafo 4 Capas - VIZ-01", () => {
 
   test("Verificación de Reskin canónico y escala de grises", async ({ page }) => {
     // Wait for page to stop loading / show either error or content
-    const errorState = page.locator("text=Error:");
+    const errorState = page.locator("[data-ui-id='grafo.error-state']");
     const listHeader = page.locator("text=Lista Accesible de Nodos");
     const emptyState = page.locator("text=El grafo está vacío.");
 
@@ -57,9 +57,9 @@ test.describe("Grafo 4 Capas - VIZ-01", () => {
   });
 
   test("ACR-1.2, ACR-1.4, ACR-1.5: Capas y proyección en modo grafo", async ({ page }) => {
-    // Wait for the graph to load or be empty
+    // Wait for the graph to load, be empty, or show error
     const emptyState = page.locator("text=El grafo está vacío.");
-    const errorState = page.locator("text=Error fetching");
+    const errorState = page.locator("[data-ui-id='grafo.error-state']");
     const listHeader = page.locator("text=Lista Accesible de Nodos");
 
     // Race to see which state occurs first
