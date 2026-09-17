@@ -95,6 +95,7 @@ export default function KpisPage() {
     const promesas = perfiles.map(async (perfil) => {
       const t0 = performance.now();
       let firstTokenTime: number | null = null;
+      let lastChunkTime: number | null = null;
       let realUsageTokens: number | null = null;
       let localContenido = "";
       let localCharCount = 0;
@@ -155,9 +156,11 @@ export default function KpisPage() {
               const evento = JSON.parse(jsonRaw);
 
               if (evento.tipo === "chunk") {
+                const now = performance.now();
                 if (firstTokenTime === null) {
-                  firstTokenTime = performance.now();
+                  firstTokenTime = now;
                 }
+                lastChunkTime = now;
 
                 const textoChunk = evento.texto || "";
                 localContenido += textoChunk;
@@ -206,15 +209,18 @@ export default function KpisPage() {
         const totalDurationMs = Math.round(tf - t0);
         const ttftMsFinal = firstTokenTime ? Math.round(firstTokenTime - t0) : totalDurationMs;
 
-        // Conteo de tokens: exacto si el proveedor devolvió usage, o char_count/4 como estimación por defecto
-        const isExactTokens = realUsageTokens !== null;
+        // Fin de la ventana de generación: usar el timestamp del ÚLTIMO CHUNK de contenido
+        // recibido para evitar inflar artificialmente el tiempo transcurrido por latencia posterior.
+        const endGenTime = lastChunkTime ?? tf;
+        const duracionGeneracionSec = (endGenTime - (firstTokenTime ?? t0)) / 1000;
+        const duracionEfectivaSec = duracionGeneracionSec > 0 ? duracionGeneracionSec : totalDurationMs / 1000;
+
+        // Conteo de tokens: únicamente completion_tokens como tokens exactos, o char_count/4 como estimado
+        const isExactTokens = typeof realUsageTokens === "number";
         const tokensFinales = isExactTokens
           ? (realUsageTokens as number)
           : Math.ceil(localCharCount / 4);
 
-        // TPS: tokens / tiempo_generacion (en segundos)
-        const duracionGeneracionSec = (totalDurationMs - (ttftMsFinal || 0)) / 1000;
-        const duracionEfectivaSec = duracionGeneracionSec > 0 ? duracionGeneracionSec : totalDurationMs / 1000;
         const tpsFinal = duracionEfectivaSec > 0 ? tokensFinales / duracionEfectivaSec : 0;
 
         setResultados((prev) => ({
@@ -225,7 +231,7 @@ export default function KpisPage() {
             contenido: localContenido,
             ttftMs: ttftMsFinal,
             durationMs: totalDurationMs,
-            realTokens: realUsageTokens,
+            realTokens: isExactTokens ? realUsageTokens : null,
             charCount: localCharCount,
             tps: tpsFinal,
             isExactTokens,

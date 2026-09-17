@@ -345,7 +345,10 @@ export function KpiPanelView({
                     <p className="font-bold text-sm text-emerald-400">
                       {res.tps !== null ? (
                         <>
-                          {res.tps.toFixed(1)} <span className="text-[9px] font-normal opacity-70">tok/s</span>
+                          {res.tps.toFixed(1)}{" "}
+                          <span className="text-[9px] font-normal opacity-70">
+                            tok/s ({res.isExactTokens ? "real" : "estimado"})
+                          </span>
                         </>
                       ) : (
                         "—"
@@ -366,7 +369,7 @@ export function KpiPanelView({
                     <span className="text-[10px] uppercase opacity-60">Tokens</span>
                     <p className="font-mono text-xs opacity-90">
                       {res.realTokens !== null ? (
-                        <span title="Tokens exactos del proveedor">{res.realTokens} (exacto)</span>
+                        <span title="Tokens reales del proveedor">{res.realTokens} (real)</span>
                       ) : res.charCount > 0 ? (
                         <span title="Estimación basada en char_count/4">
                           {Math.ceil(res.charCount / 4)} (estimado)

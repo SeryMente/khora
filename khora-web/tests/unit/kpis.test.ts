@@ -8,17 +8,17 @@ import { buildKpiState } from "../../lib/ui-review/states";
 
 test("KPIs Suite - Métricas LLM, Fan-Out y Benchmarks de Frontera", async (t) => {
 
-  await t.test("1. Cálculo correcto de TTFT y TPS con tokens exactos y estimados", () => {
-    // Escenario 1: Tokens exactos reportados por la API
+  await t.test("1. Cálculo correcto de TTFT y TPS con tokens reales y estimados", () => {
+    // Escenario 1: Tokens reales reportados vía completion_tokens en la API
     const t0 = 1000;
     const tFirstToken = 1250; // TTFT = 250ms
-    const tFinal = 3250;     // Duración total = 2250ms
+    const tLastChunk = 3250;  // Fin de generación por último chunk = 2000ms de ventana
     const exactTokens = 100;
 
     const ttftCalculado = tFirstToken - t0;
     assert.strictEqual(ttftCalculado, 250);
 
-    const duracionGeneracionSec = (tFinal - tFirstToken) / 1000; // 2.0s
+    const duracionGeneracionSec = (tLastChunk - tFirstToken) / 1000; // 2.0s
     const tpsExacto = exactTokens / duracionGeneracionSec;
     assert.strictEqual(tpsExacto, 50);
 
@@ -29,6 +29,50 @@ test("KPIs Suite - Métricas LLM, Fan-Out y Benchmarks de Frontera", async (t) =
 
     const tpsEstimado = estimatedTokens / duracionGeneracionSec;
     assert.strictEqual(tpsEstimado, 25);
+  });
+
+  await t.test("1b. Manejo de evento usage con completion_tokens vs fallback a estimado por caracteres", () => {
+    // Caso A: usage incluye completion_tokens -> isExactTokens = true, realTokens = completion_tokens
+    const usageConCompletion = { completion_tokens: 80, prompt_tokens: 20, total_tokens: 100 };
+    const tieneCompletionA = typeof usageConCompletion.completion_tokens === "number";
+    assert.strictEqual(tieneCompletionA, true);
+    const tokensFinalesA = tieneCompletionA ? usageConCompletion.completion_tokens : Math.ceil(300 / 4);
+    assert.strictEqual(tokensFinalesA, 80);
+
+    // Caso B: usage NO incluye completion_tokens (ej. solo total_tokens) -> Cae al estimado por caracteres
+    const usageSinCompletion: Record<string, any> = { total_tokens: 100 };
+    const tieneCompletionB = typeof usageSinCompletion.completion_tokens === "number";
+    assert.strictEqual(tieneCompletionB, false);
+    const charCountB = 240;
+    const tokensFinalesB = tieneCompletionB ? usageSinCompletion.completion_tokens : Math.ceil(charCountB / 4);
+    assert.strictEqual(tokensFinalesB, 60);
+
+    // Caso C: Stream NUNCA envía usage -> Cae al estimado por caracteres
+    const usageNulo = null;
+    const tieneCompletionC = usageNulo && typeof (usageNulo as any).completion_tokens === "number";
+    assert.strictEqual(Boolean(tieneCompletionC), false);
+    const charCountC = 160;
+    const tokensFinalesC = Math.ceil(charCountC / 4);
+    assert.strictEqual(tokensFinalesC, 40);
+  });
+
+  await t.test("1c. Ventana de generación usa lastChunkTime y previene distorsión por latencia de usage/fin", () => {
+    const t0 = 1000;
+    const firstTokenTime = 1200;
+    const lastChunkTime = 3200; // Ventana real = 2000ms
+    const usageEventTime = 3800; // Evento usage llegó 600ms después
+
+    // Si se usara usageEventTime, la duración sería 2600ms y el TPS bajaría artificialmente
+    const duracionConUsageTimeSec = (usageEventTime - firstTokenTime) / 1000;
+    const tpsDistorsionado = 100 / duracionConUsageTimeSec; // ~38.46 tok/s
+
+    // Usando correctamente lastChunkTime
+    const duracionCorrectaSec = (lastChunkTime - firstTokenTime) / 1000;
+    const tpsCorrecto = 100 / duracionCorrectaSec; // 50 tok/s
+
+    assert.strictEqual(duracionCorrectaSec, 2.0);
+    assert.strictEqual(tpsCorrecto, 50);
+    assert.ok(tpsCorrecto > tpsDistorsionado);
   });
 
   await t.test("2. El fan-out a N perfiles tolera el fallo parcial de uno sin afectar a los demás", () => {
