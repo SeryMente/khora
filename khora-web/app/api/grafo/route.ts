@@ -1,39 +1,54 @@
 // @l0 L0-003 · @req GRAFO/TABLAS
 import { NextResponse } from "next/server";
-import { obtenerNodos, obtenerAristas } from "@/lib/server/grafo";
+import {
+  obtenerGrafoNeo4j,
+  Neo4jNoConfiguradoError,
+  Neo4jInalcanzableError,
+} from "@/lib/server/grafo";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
   try {
-    const rawNodes = await obtenerNodos();
-    const rawEdges = await obtenerAristas();
+    const { searchParams } = new URL(request.url);
+    const ioId = searchParams.get("io_id") || searchParams.get("ioId");
+    const volcadoId = searchParams.get("volcado_id") || searchParams.get("volcadoId");
+    const limitRaw = searchParams.get("limit");
+    const limit = limitRaw ? parseInt(limitRaw, 10) : 500;
 
-    const nodes = rawNodes.map((n) => ({
-      id: n.id,
-      summary: n.summary || "Sin resumen",
-      community: typeof n.community === "number" ? n.community : 0,
-      level: typeof n.level === "number" ? n.level : 0,
-      centrality: typeof n.centrality === "number" ? n.centrality : 1.0,
-      origen: n.origen || "Desconocido",
-      timestamp: n.timestamp || new Date().toISOString(),
-      verificacion: n.verificacion || "Pendiente",
-    }));
-
-    const edges = rawEdges.map((e) => ({
-      id: e.id,
-      source: e.source,
-      target: e.target,
-      type: e.type,
-      weight: typeof e.weight === "number" ? e.weight : 1.0,
-      origen: e.origen || "Desconocido",
-      timestamp: e.timestamp || new Date().toISOString(),
-      verificacion: e.verificacion || "Pendiente",
-    }));
+    const { nodes, edges } = await obtenerGrafoNeo4j({
+      ioId,
+      volcadoId,
+      limit: isNaN(limit) ? 500 : limit,
+    });
 
     return NextResponse.json({ nodes, edges });
-  } catch (error) {
-    console.error("Postgres-backed graph query error:", error);
-    return NextResponse.json({ error: "Failed to fetch graph data from Postgres" }, { status: 500 });
+  } catch (error: any) {
+    console.error("Neo4j-backed graph query error:", error);
+
+    if (error instanceof Neo4jNoConfiguradoError || error?.code === "NEO4J_UNCONFIGURED") {
+      return NextResponse.json(
+        {
+          error: error.message || "Credenciales de Neo4j no configuradas",
+          code: "NEO4J_UNCONFIGURED",
+        },
+        { status: 503 }
+      );
+    }
+
+    if (error instanceof Neo4jInalcanzableError || error?.code === "NEO4J_UNREACHABLE") {
+      return NextResponse.json(
+        {
+          error: error.message || "No se pudo conectar a Neo4j Aura",
+          code: "NEO4J_UNREACHABLE",
+        },
+        { status: 503 }
+      );
+    }
+
+    return NextResponse.json(
+      { error: "Error inesperado al consultar el grafo en Neo4j", detail: String(error) },
+      { status: 500 }
+    );
   }
 }
