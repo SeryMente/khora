@@ -177,7 +177,7 @@ class ProveedorLLMGenerico:
             finally:
                 response.close()
 
-        return _read_chunks()
+        yield from _read_chunks()
 
     def incrustar(self, textos: list[str]) -> list[list[float]]:
         base_url = (

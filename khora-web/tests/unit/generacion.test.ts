@@ -1,140 +1,63 @@
 import test from "node:test";
 import assert from "node:assert";
-import { resolverGeneracion, type Generacion } from "../../lib/server/generacion.js";
+import { resolverGeneracion } from "../../lib/server/generacion.js";
 
-test("resolverGeneracion: Regla (1) si shellEnv !== 'os', devuelve 'vigente'", () => {
-  const rutasOs = new Set(["/sistema/volcados", "/sistema/ingreso"]);
-
-  const casosSinOsEnv: Array<{ pathname: string; shellEnv: string | undefined }> = [
-    { pathname: "/sistema/volcados", shellEnv: undefined },
-    { pathname: "/sistema/volcados", shellEnv: "dev" },
-    { pathname: "/sistema/volcados", shellEnv: "production" },
-    { pathname: "/sistema/volcados", shellEnv: "OS" },
-    { pathname: "/sistema/volcados", shellEnv: "" },
-  ];
-
-  for (const caso of casosSinOsEnv) {
-    const resultado = resolverGeneracion(caso.pathname, caso.shellEnv, rutasOs);
-    assert.strictEqual(
-      resultado,
-      "vigente",
-      `Para shellEnv="${caso.shellEnv}" y pathname="${caso.pathname}", debe retornar "vigente"`
-    );
-  }
+test("Caso 1: sin KHORA_SHELL (undefined), todo es vigente sin importar rutasOs", () => {
+  const resultado = resolverGeneracion("/", undefined, new Set(["/"]));
+  assert.strictEqual(resultado, "vigente");
 });
 
-test("resolverGeneracion: Regla (2) si pathname ya empieza con '/os', devuelve 'vigente'", () => {
-  const rutasOs = new Set(["/sistema/volcados", "/os/sistema/volcados"]);
-
-  const casosRutaOs: Array<{ pathname: string; shellEnv: string }> = [
-    { pathname: "/os/sistema/volcados", shellEnv: "os" },
-    { pathname: "/os", shellEnv: "os" },
-    { pathname: "/os/cualquier/ruta", shellEnv: "os" },
-  ];
-
-  for (const caso of casosRutaOs) {
-    const resultado = resolverGeneracion(caso.pathname, caso.shellEnv, rutasOs);
-    assert.strictEqual(
-      resultado,
-      "vigente",
-      `Para pathname "${caso.pathname}" que empieza con "/os", debe retornar "vigente"`
-    );
-  }
+test("Caso 2: cadena vacía en shellEnv no es 'os'", () => {
+  const resultado = resolverGeneracion("/", "", new Set(["/"]));
+  assert.strictEqual(resultado, "vigente");
 });
 
-test("resolverGeneracion: Regla (3) si rutasOs no contiene pathname, devuelve 'vigente'", () => {
-  const rutasOs = new Set(["/sistema/volcados", "/sistema/ingreso"]);
-
-  const casosRutaNoEnSet: Array<{ pathname: string; shellEnv: string }> = [
-    { pathname: "/sistema/desconocido", shellEnv: "os" },
-    { pathname: "/api/v1/health", shellEnv: "os" },
-    { pathname: "/", shellEnv: "os" },
-  ];
-
-  for (const caso of casosRutaNoEnSet) {
-    const resultado = resolverGeneracion(caso.pathname, caso.shellEnv, rutasOs);
-    assert.strictEqual(
-      resultado,
-      "vigente",
-      `Para pathname="${caso.pathname}" no presente en rutasOs, debe retornar "vigente"`
-    );
-  }
+test("Caso 3: mayúsculas en shellEnv ('OS') no activan — falla seguro, no falla abierto", () => {
+  const resultado = resolverGeneracion("/", "OS", new Set(["/"]));
+  assert.strictEqual(resultado, "vigente");
 });
 
-test("resolverGeneracion: Regla (4) en cualquier otro caso, devuelve 'os'", () => {
-  const rutasOs = new Set(["/sistema/volcados", "/sistema/ingreso", "/sistema/seguridad"]);
-
-  const casosExitoOs: Array<{ pathname: string; shellEnv: string }> = [
-    { pathname: "/sistema/volcados", shellEnv: "os" },
-    { pathname: "/sistema/ingreso", shellEnv: "os" },
-    { pathname: "/sistema/seguridad", shellEnv: "os" },
-  ];
-
-  for (const caso of casosExitoOs) {
-    const resultado = resolverGeneracion(caso.pathname, caso.shellEnv, rutasOs);
-    assert.strictEqual(
-      resultado,
-      "os",
-      `Para pathname="${caso.pathname}" en rutasOs con shellEnv="os", debe retornar "os"`
-    );
-  }
+test("Caso 4: espacio en la variable de entorno (' os') no activa — falla seguro", () => {
+  const resultado = resolverGeneracion("/", " os", new Set(["/"]));
+  assert.strictEqual(resultado, "vigente");
 });
 
-test("resolverGeneracion: Tabla explicita de entrada/salida para las 4 ramas", () => {
-  const rutasOs = new Set(["/sistema/volcados"]);
+test("Caso 5: caso base, shellEnv='os' y la ruta está declarada en rutasOs", () => {
+  const resultado = resolverGeneracion("/", "os", new Set(["/"]));
+  assert.strictEqual(resultado, "os");
+});
 
-  interface CasoTabla {
-    desc: string;
-    pathname: string;
-    shellEnv: string | undefined;
-    rutasOs: ReadonlySet<string>;
-    esperado: Generacion;
-  }
+test("Caso 6: pathname='/os' ya está en el árbol de destino, no se reescribe dos veces", () => {
+  const resultado = resolverGeneracion("/os", "os", new Set(["/os"]));
+  assert.strictEqual(resultado, "vigente");
+});
 
-  const tabla: CasoTabla[] = [
-    {
-      desc: "Rama 1: shellEnv es undefined",
-      pathname: "/sistema/volcados",
-      shellEnv: undefined,
-      rutasOs,
-      esperado: "vigente",
-    },
-    {
-      desc: "Rama 1: shellEnv es 'prod'",
-      pathname: "/sistema/volcados",
-      shellEnv: "prod",
-      rutasOs,
-      esperado: "vigente",
-    },
-    {
-      desc: "Rama 2: pathname empieza con /os",
-      pathname: "/os/sistema/volcados",
-      shellEnv: "os",
-      rutasOs,
-      esperado: "vigente",
-    },
-    {
-      desc: "Rama 3: pathname no está en rutasOs",
-      pathname: "/sistema/otra",
-      shellEnv: "os",
-      rutasOs,
-      esperado: "vigente",
-    },
-    {
-      desc: "Rama 4: shellEnv es 'os', pathname no empieza con /os y está en rutasOs",
-      pathname: "/sistema/volcados",
-      shellEnv: "os",
-      rutasOs,
-      esperado: "os",
-    },
-  ];
+test("Caso 7: pathname='/os/' startsWith('/os') también atrapa el slash final", () => {
+  const resultado = resolverGeneracion("/os/", "os", new Set(["/os"]));
+  assert.strictEqual(resultado, "vigente");
+});
 
-  for (const fila of tabla) {
-    const obtenido = resolverGeneracion(fila.pathname, fila.shellEnv, fila.rutasOs);
-    assert.strictEqual(
-      obtenido,
-      fila.esperado,
-      `Falló [${fila.desc}]: esperado=${fila.esperado}, obtenido=${obtenido}`
-    );
-  }
+test("Caso 8: ruta '/nucleo' no declarada en rutasOs ({'/'}), aunque el shell esté activo", () => {
+  const resultado = resolverGeneracion("/nucleo", "os", new Set(["/"]));
+  assert.strictEqual(resultado, "vigente");
+});
+
+test("Caso 9: sin slash final en rutasOs ({'/nucleo'}) para '/nucleo/' -> no hay match; cero normalización", () => {
+  const resultado = resolverGeneracion("/nucleo/", "os", new Set(["/nucleo"]));
+  assert.strictEqual(resultado, "vigente");
+});
+
+test("Caso 10: rutasOs con múltiples entradas ({'/', '/nucleo'}), ambas activas de forma independiente", () => {
+  const resultado = resolverGeneracion("/nucleo", "os", new Set(["/", "/nucleo"]));
+  assert.strictEqual(resultado, "os");
+});
+
+test("Caso 11: pathname '' vacío es un caso defensivo, resuelve a vigente y no revienta", () => {
+  const resultado = resolverGeneracion("", "os", new Set([""]));
+  assert.strictEqual(resultado, "vigente");
+});
+
+test("Caso 12: rutasOs vacío nunca activa nada, ni con el shell prendido", () => {
+  const resultado = resolverGeneracion("/", "os", new Set());
+  assert.strictEqual(resultado, "vigente");
 });
