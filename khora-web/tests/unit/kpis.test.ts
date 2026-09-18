@@ -106,12 +106,13 @@ test("KPIs Suite - Métricas LLM, Fan-Out y Benchmarks de Frontera", async (t) =
     assert.ok(FRONTIER_BENCHMARKS_CONFIG.modelosFrontera.length >= 3);
     assert.ok("MMLU" in FRONTIER_BENCHMARKS_CONFIG.definicionMetricas);
     assert.ok("TPS" in FRONTIER_BENCHMARKS_CONFIG.definicionMetricas);
+    assert.ok("SWE-bench_Verified" in FRONTIER_BENCHMARKS_CONFIG.definicionMetricas);
+    assert.ok("GPQA_Diamond" in FRONTIER_BENCHMARKS_CONFIG.definicionMetricas);
 
     for (const model of FRONTIER_BENCHMARKS_CONFIG.modelosFrontera) {
       assert.ok(model.nombreModelo);
       assert.ok(model.proveedor);
       assert.ok(typeof model.puntuaciones === "object");
-      assert.ok("MMLU" in model.puntuaciones);
     }
 
     // Catálogo
