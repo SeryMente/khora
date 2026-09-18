@@ -10,7 +10,7 @@ export interface FrontierModelMetrics {
   nombreModelo: string;
   proveedor: string;
   esFrontera: boolean;
-  puntuaciones: Record<string, number>;
+  puntuaciones: Record<string, number | null>;
 }
 
 export interface FrontierBenchmarkConfig {
@@ -36,6 +36,18 @@ export const FRONTIER_BENCHMARKS_CONFIG: FrontierBenchmarkConfig = {
       unidad: "%",
       maxScore: 100,
     },
+    "SWE-bench_Verified": {
+      nombre: "SWE-bench Verified",
+      descripcion: "Resolución de issues reales de GitHub",
+      unidad: "%",
+      maxScore: 100,
+    },
+    GPQA_Diamond: {
+      nombre: "GPQA Diamond",
+      descripcion: "Preguntas de ciencia nivel doctorado",
+      unidad: "%",
+      maxScore: 100,
+    },
     TTFT_ms: {
       nombre: "TTFT",
       descripcion: "Time To First Token objetivo en milisegundos",
@@ -49,37 +61,62 @@ export const FRONTIER_BENCHMARKS_CONFIG: FrontierBenchmarkConfig = {
   },
   modelosFrontera: [
     {
-      nombreModelo: "GPT-4o",
+      nombreModelo: "GPT-5.5",
       proveedor: "OpenAI",
       esFrontera: true,
       puntuaciones: {
-        MMLU: 88.7,
-        HumanEval: 90.2,
+        MMLU: 92.4,
+        "SWE-bench_Verified": 88.6,
+        GPQA_Diamond: 94.0,
         TTFT_ms: 300,
         TPS: 110,
       },
     },
     {
-      nombreModelo: "Claude 3.5 Sonnet",
+      nombreModelo: "Claude Opus 4.8",
       proveedor: "Anthropic",
       esFrontera: true,
       puntuaciones: {
-        MMLU: 88.3,
-        HumanEval: 92.0,
+        MMLU: null,
+        "SWE-bench_Verified": 88.6,
+        GPQA_Diamond: 93.6,
         TTFT_ms: 350,
         TPS: 95,
       },
     },
     {
-      nombreModelo: "Gemini 1.5 Pro",
+      nombreModelo: "Gemini 3.1 Pro",
       proveedor: "Google",
       esFrontera: true,
       puntuaciones: {
-        MMLU: 85.9,
-        HumanEval: 84.1,
+        MMLU: null,
+        "SWE-bench_Verified": 80.6,
+        GPQA_Diamond: 94.3,
         TTFT_ms: 400,
         TPS: 85,
       },
+    },
+    {
+      nombreModelo: "GPT-OSS-120B",
+      proveedor: "OpenAI (vía Groq)",
+      esFrontera: false,
+      puntuaciones: {
+        MMLU: 90.0,
+        "SWE-bench_Verified": 62.4,
+        GPQA_Diamond: 80.9,
+      },
+    },
+    {
+      nombreModelo: "DeepSeek V4 Flash",
+      proveedor: "DeepSeek (perfil open_source)",
+      esFrontera: false,
+      puntuaciones: {},
+    },
+    {
+      nombreModelo: "Gemini 3.8 Flash",
+      proveedor: "Google (perfil gemini)",
+      esFrontera: false,
+      puntuaciones: {},
     },
   ],
 };

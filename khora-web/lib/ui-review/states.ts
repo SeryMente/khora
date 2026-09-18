@@ -244,7 +244,7 @@ export function buildConsultaState(
     rol: "assistant" as const,
     contenido:
       "La veracidad semántica se garantiza mediante auditorías léxicas y verbatims inmutables.",
-    origen: "llm:groq:llama-3.3-70b-versatile",
+    origen: "llm:groq:openai/gpt-oss-120b",
   };
 
   const msgAssistantGrafo = {
@@ -274,7 +274,7 @@ export function buildConsultaState(
         : [msgUser, msgAssistantStream],
     inputPregunta: scenario === "recording" ? "Pregunta sintética..." : "",
     perfil: "groq",
-    modeloOverride: scenario === "override" ? "llama-3.3-70b-versatile" : "",
+    modeloOverride: scenario === "override" ? "openai/gpt-oss-120b" : "",
     modoGrafo: scenario === "grafo",
     generando: scenario === "generating",
     error:
@@ -308,7 +308,7 @@ export function buildKpiState(
         charCount: 168,
         tps: 35.0,
         isExactTokens: true,
-        origenModel: "llm:groq:llama-3.3-70b-versatile",
+        origenModel: "llm:groq:openai/gpt-oss-120b",
       },
       gemini: {
         perfil: "gemini",
@@ -320,7 +320,7 @@ export function buildKpiState(
         charCount: 200,
         tps: 23.8,
         isExactTokens: false,
-        origenModel: "llm:gemini:gemini-1.5-flash",
+        origenModel: "llm:gemini:gemini-3.8-flash",
       },
       open_source: {
         perfil: "open_source",
@@ -333,7 +333,7 @@ export function buildKpiState(
         charCount: isFalloParcial ? 0 : 150,
         tps: isFalloParcial ? null : 10.7,
         isExactTokens: false,
-        origenModel: "llm:open_source:llama-3.1-8b",
+        origenModel: "llm:open_source:deepseek-v4-flash",
       },
     },
   };

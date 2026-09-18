@@ -21,7 +21,7 @@ export const MODEL_CATALOG_CONFIG: ModelCatalogConfig = {
     {
       perfilId: "groq",
       nombreProveedor: "Groq Fast Inference",
-      modeloDefecto: "llama-3.3-70b-versatile",
+      modeloDefecto: "openai/gpt-oss-120b",
       ventanaContextoTokens: 128000,
       capacidades: {
         streaming: true,
@@ -34,7 +34,7 @@ export const MODEL_CATALOG_CONFIG: ModelCatalogConfig = {
     {
       perfilId: "gemini",
       nombreProveedor: "Google Gemini",
-      modeloDefecto: "gemini-1.5-flash",
+      modeloDefecto: "gemini-3.8-flash",
       ventanaContextoTokens: 1000000,
       capacidades: {
         streaming: true,
@@ -47,15 +47,15 @@ export const MODEL_CATALOG_CONFIG: ModelCatalogConfig = {
     {
       perfilId: "open_source",
       nombreProveedor: "Open Source / Local",
-      modeloDefecto: "llama-3.1-8b",
-      ventanaContextoTokens: 8192,
+      modeloDefecto: "deepseek-v4-flash",
+      ventanaContextoTokens: 1000000,
       capacidades: {
         streaming: true,
         usageMetrics: false,
         multiTurn: true,
         localExecution: true,
       },
-      notas: "Instancia local o servidor privado vLLM/Ollama.",
+      notas: "Acceso gratis vía OpenRouter (deepseek/deepseek-v4-flash:free) o API directa de DeepSeek con reasoning effort configurable.",
     },
   ],
 };
