@@ -11,14 +11,107 @@ export interface LocalModelCatalogEntry {
 export interface CatalogModelEntry {
   perfilId: "open_source" | "gemini" | "groq" | "local";
   nombreProveedor: string;
-  modeloDefecto: string;
-  ventanaContextoTokens: number;
+  modeloDefecto?: string;
+  ventanaContextoTokens?: number;
   capacidades: Record<string, boolean | string | number>;
   motor?: "ollama";
   requiereGPU?: boolean;
   sinCredencial?: boolean;
   modelosLocales?: LocalModelCatalogEntry[];
   notas?: string;
+}
+
+export type FuenteResolucionLocal = "override" | "detectado" | "recomendado_no_instalado";
+
+export interface ModeloLocalResueltoResult {
+  modeloResuelto: string;
+  ventanaContextoTokens: number | null;
+  fuenteResolucion: FuenteResolucionLocal;
+  descripcionFuente: string;
+  tagCatalogo?: LocalModelCatalogEntry;
+}
+
+/**
+ * Parsea el string de contexto de la tabla de modelos locales a tokens binarios reales
+ * (ej. "128K" -> 131072, "256K" -> 262144, "—" -> null).
+ */
+export function parsearContextoTokensBinario(contextoStr?: string | null): number | null {
+  if (!contextoStr || contextoStr.trim() === "—") {
+    return null;
+  }
+  const match = contextoStr.trim().match(/^(\d+(?:\.\d+)?)\s*([KMGT])?$/i);
+  if (!match) return null;
+
+  const num = parseFloat(match[1]);
+  const unit = (match[2] || "").toUpperCase();
+
+  switch (unit) {
+    case "K":
+      return Math.round(num * 1024);
+    case "M":
+      return Math.round(num * 1024 * 1024);
+    case "G":
+      return Math.round(num * 1024 * 1024 * 1024);
+    default:
+      return Math.round(num);
+  }
+}
+
+/**
+ * Resuelve dinámicamente el modelo activo y la ventana de contexto para el perfil local
+ * siguiendo el orden estricto de resolución:
+ * 1. modeloOverride (si existe y no está vacío) -> fuente: "override"
+ * 2. Cruce entre modelosInstalados y los tags de modelosLocales en el ORDEN del catálogo -> fuente: "detectado"
+ * 3. Fallback explícito a qwen3.8:27b -> fuente: "recomendado_no_instalado"
+ */
+export function resolverModeloYVentanaLocal(
+  modeloOverride?: string | null,
+  modelosInstalados: string[] = [],
+  modelosLocales: LocalModelCatalogEntry[] = MODEL_CATALOG_CONFIG.perfiles.find((p) => p.perfilId === "local")?.modelosLocales || []
+): ModeloLocalResueltoResult {
+  if (modeloOverride && modeloOverride.trim() !== "") {
+    const overrideLimpio = modeloOverride.trim();
+    const coincideCatalogo = modelosLocales.find(
+      (m) => m.tag.toLowerCase() === overrideLimpio.toLowerCase() || overrideLimpio.toLowerCase().startsWith(m.tag.toLowerCase())
+    );
+    const ventana = coincideCatalogo ? parsearContextoTokensBinario(coincideCatalogo.contexto) : null;
+
+    return {
+      modeloResuelto: overrideLimpio,
+      ventanaContextoTokens: ventana,
+      fuenteResolucion: "override",
+      descripcionFuente: "Modelo fijado por override manual",
+      tagCatalogo: coincideCatalogo,
+    };
+  }
+
+  for (const itemCatalogo of modelosLocales) {
+    const instaladoCoincidente = modelosInstalados.find((inst) =>
+      inst.toLowerCase().startsWith(itemCatalogo.tag.toLowerCase()) ||
+      itemCatalogo.tag.toLowerCase().startsWith(inst.toLowerCase())
+    );
+    if (instaladoCoincidente) {
+      return {
+        modeloResuelto: instaladoCoincidente,
+        ventanaContextoTokens: parsearContextoTokensBinario(itemCatalogo.contexto),
+        fuenteResolucion: "detectado",
+        descripcionFuente: `Modelo detectado en sistema ('${instaladoCoincidente}')`,
+        tagCatalogo: itemCatalogo,
+      };
+    }
+  }
+
+  const recomendado = modelosLocales.find((m) => m.tag === "qwen3.8:27b") || modelosLocales[0];
+  const tagRecomendado = recomendado ? recomendado.tag : "qwen3.8:27b";
+  const contextoRecomendado = recomendado ? parsearContextoTokensBinario(recomendado.contexto) : 262144;
+
+  return {
+    modeloResuelto: tagRecomendado,
+    ventanaContextoTokens: contextoRecomendado,
+    fuenteResolucion: "recomendado_no_instalado",
+    descripcionFuente: `Modelo recomendado (no instalado) ('${tagRecomendado}')`,
+    tagCatalogo: recomendado,
+  };
 }
 
 export interface ModelCatalogConfig {
@@ -73,8 +166,6 @@ export const MODEL_CATALOG_CONFIG: ModelCatalogConfig = {
     {
       perfilId: "local",
       nombreProveedor: "Local (Ollama)",
-      modeloDefecto: "qwen3.8:27b",
-      ventanaContextoTokens: 262144,
       motor: "ollama",
       requiereGPU: true,
       sinCredencial: true,

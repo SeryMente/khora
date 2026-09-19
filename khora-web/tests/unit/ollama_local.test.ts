@@ -10,7 +10,11 @@ import {
   ejecutarInferenciaOllamaLocal,
   OllamaStreamChunk,
 } from "../../lib/client/ollamaLocal";
-import { MODEL_CATALOG_CONFIG } from "../../lib/config/model_catalog";
+import {
+  MODEL_CATALOG_CONFIG,
+  resolverModeloYVentanaLocal,
+  parsearContextoTokensBinario,
+} from "../../lib/config/model_catalog";
 
 test("Perfil Local Suite - Inferencia Ollama, Script PowerShell y TPS", async (t) => {
 
@@ -166,6 +170,42 @@ test("Perfil Local Suite - Inferencia Ollama, Script PowerShell y TPS", async (t
     assert.strictEqual(localEntry.requiereGPU, true);
     assert.strictEqual(localEntry.sinCredencial, true);
     assert.strictEqual(localEntry.modelosLocales?.length, 5);
+
+    // Verificación (a): La entrada "local" NO posee modeloDefecto ni ventanaContextoTokens estáticos
+    assert.strictEqual(localEntry.modeloDefecto, undefined);
+    assert.strictEqual(localEntry.ventanaContextoTokens, undefined);
+  });
+
+  await t.test("6. Parseo binario de ventana de contexto en tokens reales (parsearContextoTokensBinario)", () => {
+    assert.strictEqual(parsearContextoTokensBinario("128K"), 131072); // 128 * 1024
+    assert.strictEqual(parsearContextoTokensBinario("256K"), 262144); // 256 * 1024
+    assert.strictEqual(parsearContextoTokensBinario("—"), null);
+    assert.strictEqual(parsearContextoTokensBinario(null), null);
+    assert.strictEqual(parsearContextoTokensBinario(""), null);
+  });
+
+  await t.test("7. Resolución dinámica de modelo local (resolverModeloYVentanaLocal) en los 3 casos", () => {
+    const localEntry = MODEL_CATALOG_CONFIG.perfiles.find((p) => p.perfilId === "local");
+    const modelosLocales = localEntry?.modelosLocales || [];
+
+    // Caso 1: Override manual por el usuario -> fuente "override"
+    const resOverride = resolverModeloYVentanaLocal("gpt-oss:20b", ["qwen3-coder:30b"], modelosLocales);
+    assert.strictEqual(resOverride.modeloResuelto, "gpt-oss:20b");
+    assert.strictEqual(resOverride.ventanaContextoTokens, 131072);
+    assert.strictEqual(resOverride.fuenteResolucion, "override");
+
+    // Caso 2: Detectado por cruce entre modelosInstalados y tabla de catálogo -> fuente "detectado"
+    // 'qwen3-coder:30b' aparece antes que 'qwen3.8:27b' en el catálogo si ambos están instalados
+    const resDetectado = resolverModeloYVentanaLocal("", ["qwen3.8:27b", "qwen3-coder:30b"], modelosLocales);
+    assert.strictEqual(resDetectado.modeloResuelto, "qwen3-coder:30b");
+    assert.strictEqual(resDetectado.ventanaContextoTokens, 262144);
+    assert.strictEqual(resDetectado.fuenteResolucion, "detectado");
+
+    // Caso 3: Ningún modelo instalado coincide con el catálogo -> fuente "recomendado_no_instalado" (fallback explicit)
+    const resRecomendado = resolverModeloYVentanaLocal("", ["modelo-desconocido:latest"], modelosLocales);
+    assert.strictEqual(resRecomendado.modeloResuelto, "qwen3.8:27b");
+    assert.strictEqual(resRecomendado.ventanaContextoTokens, 262144);
+    assert.strictEqual(resRecomendado.fuenteResolucion, "recomendado_no_instalado");
   });
 
 });
