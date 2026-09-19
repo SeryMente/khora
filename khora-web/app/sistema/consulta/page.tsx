@@ -9,6 +9,7 @@ import {
   MensajeChatSession,
   Evidencia,
 } from "@/app/components/shared/ConsultaView";
+import { ejecutarInferenciaOllamaLocal } from "@/lib/client/ollamaLocal";
 
 export default function ConsultaPage() {
   const [mensajes, setMensajes] = useState<MensajeChatSession[]>([]);
@@ -43,7 +44,54 @@ export default function ConsultaPage() {
     setMensajes(nuevosMensajes);
     setGenerando(true);
 
-    if (modoGrafo) {
+    if (perfil === "local" && !modoGrafo) {
+      // Inferencia Local directa Navegador -> http://localhost:11434 (API nativa de Ollama)
+      const assistantMsgId = crypto.randomUUID();
+      const modeloUsado = modeloOverride.trim() || "qwen3.8:27b";
+      const initialAssistantMsg: MensajeChatSession = {
+        id: assistantMsgId,
+        rol: "assistant",
+        contenido: "",
+        origen: `ollama:${modeloUsado}`,
+      };
+
+      setMensajes([...nuevosMensajes, initialAssistantMsg]);
+
+      try {
+        const payloadMensajes = nuevosMensajes.map((m) => ({
+          role: m.rol === "user" ? ("user" as const) : ("assistant" as const),
+          content: m.contenido,
+        }));
+
+        await ejecutarInferenciaOllamaLocal({
+          model: modeloUsado,
+          messages: payloadMensajes,
+          onChunk: (chunkText, fullText) => {
+            setMensajes((prev) =>
+              prev.map((m) =>
+                m.id === assistantMsgId
+                  ? { ...m, contenido: fullText }
+                  : m
+              )
+            );
+          },
+        });
+      } catch (err: any) {
+        const errorText =
+          err.message ||
+          "Error de conexión con Ollama en http://localhost:11434. Asegúrate de que Ollama esté corriendo.";
+        setError(errorText);
+        setMensajes((prev) =>
+          prev.map((m) =>
+            m.id === assistantMsgId && !m.contenido
+              ? { ...m, contenido: "Error al generar respuesta local.", error: errorText }
+              : m
+          )
+        );
+      } finally {
+        setGenerando(false);
+      }
+    } else if (modoGrafo) {
       // Modo Grafo: Invocar /api/consulta (RAG existente)
       try {
         const response = await fetch("/api/consulta", {

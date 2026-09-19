@@ -335,6 +335,17 @@ export function buildKpiState(
         isExactTokens: false,
         origenModel: "llm:open_source:deepseek-v4-flash",
       },
+      local: {
+        perfil: "local",
+        estado: "idle",
+        contenido: "",
+        ttftMs: null,
+        durationMs: null,
+        realTokens: null,
+        charCount: 0,
+        tps: null,
+        isExactTokens: false,
+      },
     },
   };
 }

@@ -6,6 +6,8 @@ El puerto LLM (`PuertoLLM` y `PuertoEmbeddings`) es el contrato oficial de *khor
 
 Khora incluye un `ProveedorLLMGenerico` (aliado como `ProveedorOpenAICompatible`) en `khora_kernel.proveedores` capaz de conectarse con cualquier API HTTP (local o remota) compatible con la interfaz de OpenAI (ej. OpenAI, vLLM, Groq, Google Gemini via proxy OpenAI, Ollama).
 
+Para el perfil local de inferencia en la propia máquina del usuario, Khora soporta el perfil `"local"` (Ollama directo). Siguiendo [ADR-016](decisiones/adr-016-perfil-local-ollama-directo.md), este perfil realiza llamadas en streaming desde el navegador directamente hacia `http://localhost:11434/api/chat` usando la API nativa de Ollama sin pasar por el proxy `/api/chat` del servidor. Ver detalles en [manual/91-modelos-locales.md](91-modelos-locales.md).
+
 ### Perfil Predeterminado (Backward Compatibility)
 Para el comportamiento predeterminado (utilizado por `/api/v1/ingesta` y `/api/v1/consulta`), se configuran las siguientes variables de entorno de proceso:
 
