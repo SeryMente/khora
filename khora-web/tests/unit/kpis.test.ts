@@ -124,8 +124,13 @@ test("KPIs Suite - Métricas LLM, Fan-Out y Benchmarks de Frontera", async (t) =
 
     for (const cat of MODEL_CATALOG_CONFIG.perfiles) {
       assert.ok(cat.nombreProveedor);
-      assert.ok(cat.modeloDefecto);
-      assert.ok(cat.ventanaContextoTokens > 0);
+      if (cat.perfilId !== "local") {
+        assert.ok(cat.modeloDefecto);
+        assert.ok((cat.ventanaContextoTokens ?? 0) > 0);
+      } else {
+        assert.strictEqual(cat.modeloDefecto, undefined);
+        assert.strictEqual(cat.ventanaContextoTokens, undefined);
+      }
       assert.ok(typeof cat.capacidades === "object");
     }
   });

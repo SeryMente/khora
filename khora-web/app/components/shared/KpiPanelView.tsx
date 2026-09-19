@@ -20,9 +20,12 @@ import {
   Copy,
   Check,
 } from "lucide-react";
+import { Info } from "lucide-react";
 import {
   generarPowerShellInstalacionOllama,
   copiarAlPortapapeles,
+  diagnosticarConexionOllama,
+  DiagnosticoOllamaResult,
 } from "@/lib/client/ollamaLocal";
 import { PerfilProveedor } from "./ConsultaView";
 import {
@@ -32,6 +35,7 @@ import {
 import {
   MODEL_CATALOG_CONFIG,
   ModelCatalogConfig,
+  resolverModeloYVentanaLocal,
 } from "@/lib/config/model_catalog";
 import { logTelemetryEvent } from "@/lib/telemetry";
 
@@ -85,17 +89,41 @@ export function KpiPanelView({
   } = state;
 
   const [copiadoLocal, setCopiadoLocal] = useState(false);
+  const [diagnosticoLocal, setDiagnosticoLocal] = useState<DiagnosticoOllamaResult | null>(null);
+  const [comprobandoLocal, setComprobandoLocal] = useState(false);
+  const [mostrarInfoLocal, setMostrarInfoLocal] = useState(false);
+
   const localConfig = catalogConfig.perfiles.find((p) => p.perfilId === "local");
+  const modelosLocalesList = localConfig?.modelosLocales || [];
+
+  const resueltoLocal = resolverModeloYVentanaLocal(
+    resultados.local?.modeloOverride || "",
+    diagnosticoLocal?.modelosInstalados || [],
+    modelosLocalesList
+  );
 
   const handleCopiarComandoKpi = async () => {
     const origen = typeof window !== "undefined" ? window.location.origin : "http://localhost:3000";
-    const cmd = generarPowerShellInstalacionOllama(localConfig?.modeloDefecto || "qwen3.8:27b", origen);
+    const cmd = generarPowerShellInstalacionOllama(resueltoLocal.modeloResuelto, origen);
     const exito = await copiarAlPortapapeles(cmd);
     if (exito) {
       setCopiadoLocal(true);
       setTimeout(() => setCopiadoLocal(false), 3000);
     }
   };
+
+  const handleVerificarEstadoLocal = async () => {
+    setComprobandoLocal(true);
+    const diag = await diagnosticarConexionOllama(resueltoLocal.modeloResuelto);
+    setDiagnosticoLocal(diag);
+    setComprobandoLocal(false);
+  };
+
+  React.useEffect(() => {
+    if (selectedProfiles.includes("local")) {
+      handleVerificarEstadoLocal();
+    }
+  }, [selectedProfiles.includes("local"), resueltoLocal.modeloResuelto]);
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -161,6 +189,130 @@ export function KpiPanelView({
                 Ningún perfil de proveedor LLM posee credenciales válidas en las variables de entorno del servidor (`KHORA_PERFIL_*`). Ingrese sus credenciales para habilitar la inferencia en vivo.
               </p>
             </div>
+          </div>
+        )}
+
+        {/* Banner Informativo Proactivo de Diagnóstico en 4 Estados para Perfil Local */}
+        {selectedProfiles.includes("local") && (
+          <div
+            className="p-4 border rounded space-y-3 text-xs font-mono"
+            style={{
+              borderColor:
+                diagnosticoLocal?.estado === "listo"
+                  ? "rgba(16, 185, 129, 0.4)"
+                  : diagnosticoLocal?.estado === "sin_modelo"
+                  ? "rgba(234, 179, 8, 0.4)"
+                  : "rgba(239, 68, 68, 0.4)",
+              background:
+                diagnosticoLocal?.estado === "listo"
+                  ? "rgba(16, 185, 129, 0.08)"
+                  : diagnosticoLocal?.estado === "sin_modelo"
+                  ? "rgba(234, 179, 8, 0.08)"
+                  : "rgba(239, 68, 68, 0.08)",
+            }}
+          >
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div className="flex items-center gap-2">
+                <Terminal size={18} className="text-blue-400 shrink-0" />
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold uppercase text-blue-400 block">
+                      Perfil Local Activo (Ollama Directo Browser → http://localhost:11434)
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setMostrarInfoLocal(!mostrarInfoLocal)}
+                      className="text-blue-300 hover:text-blue-100 transition-colors"
+                      title="¿Por qué es distinto el perfil local?"
+                    >
+                      <HelpCircle size={15} />
+                    </button>
+                  </div>
+                  <span className="opacity-90 font-semibold block">
+                    Estado:{" "}
+                    {diagnosticoLocal?.estado === "listo" && (
+                      <span className="text-emerald-400 font-bold">🟢 LISTO — Ollama activo con modelo disponible</span>
+                    )}
+                    {diagnosticoLocal?.estado === "sin_modelo" && (
+                      <span className="text-amber-400 font-bold">⚠️ MODELO NO DESCARGADO — Ollama corriendo pero falta el modelo</span>
+                    )}
+                    {diagnosticoLocal?.estado === "no_instalado" && (
+                      <span className="text-red-400 font-bold">🔴 NO CONECTADO — Ollama no instalado o no iniciado</span>
+                    )}
+                    {diagnosticoLocal?.estado === "error" && (
+                      <span className="text-red-400 font-bold">❌ ERROR TÉCNICO — Falla en respuesta de Ollama</span>
+                    )}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleVerificarEstadoLocal}
+                  disabled={comprobandoLocal}
+                  className="px-2.5 py-1.5 font-bold uppercase rounded border text-[11px] bg-stone-800 border-stone-600 text-stone-200 hover:bg-stone-700"
+                >
+                  {comprobandoLocal ? "Comprobando..." : "Recomprobar"}
+                </button>
+
+                <div className="flex flex-col items-end">
+                  <span className="text-[10px] opacity-80 text-blue-200 font-mono mb-1">
+                    Pega este comando en PowerShell, espera a que termine, y vuelve aquí para recargar el estado.
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleCopiarComandoKpi}
+                    className="px-3 py-1.5 font-bold uppercase rounded border text-xs flex items-center gap-1.5 transition-colors bg-blue-900/40 border-blue-600 text-blue-200 hover:bg-blue-800/50"
+                  >
+                    {copiadoLocal ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
+                    {copiadoLocal ? "¡Comando Copiado!" : "Copiar comando PowerShell"}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Panel Didáctico Explicativo del Perfil Local */}
+            {mostrarInfoLocal && (
+              <div className="p-3 border rounded bg-stone-900/90 border-blue-500/30 space-y-2 text-[11px]">
+                <div className="font-bold text-blue-300 uppercase flex items-center gap-1.5">
+                  <Info size={14} /> ¿Por qué el perfil 'local' es distinto?
+                </div>
+                <ul className="list-disc list-inside space-y-1 opacity-90 leading-relaxed">
+                  <li>
+                    <strong>Llamada directa desde el navegador:</strong> Las peticiones de inferencia salen directamente desde tu navegador hacia <code className="bg-black/40 px-1 rounded">http://localhost:11434</code> sin pasar por el servidor ni intermediarios de API.
+                  </li>
+                  <li>
+                    <strong>Sin credenciales requeridas:</strong> No se transmiten API keys ni secretos al servidor de Khora para las consultas locales.
+                  </li>
+                  <li>
+                    <strong>Rendimiento dependiente de tu hardware:</strong> Las métricas de velocidad (TTFT y TPS) dependen enteramente de la potencia de tu tarjeta gráfica (GPU/VRAM) y memoria RAM.
+                  </li>
+                </ul>
+              </div>
+            )}
+
+            {diagnosticoLocal && (
+              <div className="p-2.5 rounded bg-black/20 border border-white/5 space-y-1 text-[11px]">
+                <p className="opacity-90">
+                  <strong>Detalle:</strong> {diagnosticoLocal.mensaje}
+                </p>
+                <p className="opacity-80">
+                  <strong>Acción sugerida:</strong> {diagnosticoLocal.accionSugerida}
+                </p>
+                {diagnosticoLocal.modelosInstalados.length > 0 && (
+                  <p className="opacity-70 text-[10px]">
+                    <strong>Modelos detectados en tu máquina:</strong> {diagnosticoLocal.modelosInstalados.join(", ")}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {resueltoLocal.modeloResuelto.startsWith("gpt-oss") && (
+              <p className="text-[11px] text-amber-300 opacity-90 border-t border-blue-500/20 pt-2">
+                ⚠️ <strong>Advertencia hardware:</strong> gpt-oss en cuantización MXFP4 cae a ejecución por CPU si la GPU no posee soporte completo para aceleración MXFP4.
+              </p>
+            )}
           </div>
         )}
 
@@ -579,16 +731,38 @@ export function KpiPanelView({
                   {item.nombreProveedor}
                 </div>
 
-                <div className="space-y-1 text-[11px]">
-                  <div>
-                    <span className="opacity-60">Modelo por Defecto:</span>{" "}
-                    <strong className="font-mono">{item.modeloDefecto}</strong>
+                {item.perfilId === "local" ? (
+                  <div className="space-y-1 text-[11px]">
+                    <div>
+                      <span className="opacity-60">Modelo Activo:</span>{" "}
+                      <strong className="font-mono text-emerald-400">{resueltoLocal.modeloResuelto}</strong>
+                      <span className="text-[10px] block opacity-75 font-mono">({resueltoLocal.descripcionFuente})</span>
+                    </div>
+                    <div>
+                      <span className="opacity-60">Ventana Contexto:</span>{" "}
+                      <strong className="font-mono">
+                        {resueltoLocal.ventanaContextoTokens !== null
+                          ? `${resueltoLocal.ventanaContextoTokens.toLocaleString()} tokens`
+                          : "No especificado"}
+                      </strong>
+                    </div>
                   </div>
-                  <div>
-                    <span className="opacity-60">Ventana Contexto:</span>{" "}
-                    <strong className="font-mono">{item.ventanaContextoTokens.toLocaleString()} tokens</strong>
+                ) : (
+                  <div className="space-y-1 text-[11px]">
+                    <div>
+                      <span className="opacity-60">Modelo por Defecto:</span>{" "}
+                      <strong className="font-mono">{item.modeloDefecto}</strong>
+                    </div>
+                    <div>
+                      <span className="opacity-60">Ventana Contexto:</span>{" "}
+                      <strong className="font-mono">
+                        {item.ventanaContextoTokens !== undefined
+                          ? `${item.ventanaContextoTokens.toLocaleString()} tokens`
+                          : "—"}
+                      </strong>
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* Badges de Capacidades */}
                 <div className="space-y-1">

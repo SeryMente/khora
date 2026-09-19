@@ -18,13 +18,17 @@ import {
   Terminal,
   Cpu,
 } from "lucide-react";
+import { Info, HelpCircle } from "lucide-react";
 import {
   generarPowerShellInstalacionOllama,
   copiarAlPortapapeles,
   diagnosticarConexionOllama,
   DiagnosticoOllamaResult,
 } from "@/lib/client/ollamaLocal";
-import { MODEL_CATALOG_CONFIG } from "@/lib/config/model_catalog";
+import {
+  MODEL_CATALOG_CONFIG,
+  resolverModeloYVentanaLocal,
+} from "@/lib/config/model_catalog";
 
 export interface Evidencia {
   tripleta: string;
@@ -88,12 +92,19 @@ export function ConsultaView({
   const [copiado, setCopiado] = useState(false);
   const [diagnostico, setDiagnostico] = useState<DiagnosticoOllamaResult | null>(null);
   const [comprobando, setComprobando] = useState(false);
+  const [mostrarInfoLocal, setMostrarInfoLocal] = useState(false);
+
   const localConfig = MODEL_CATALOG_CONFIG.perfiles.find((p) => p.perfilId === "local");
   const modelosLocalesList = localConfig?.modelosLocales || [];
 
+  const resueltoLocal = resolverModeloYVentanaLocal(
+    modeloOverride,
+    diagnostico?.modelosInstalados || [],
+    modelosLocalesList
+  );
+
   const handleCopiarComando = async () => {
-    const modeloElegido = modeloOverride.trim() || localConfig?.modeloDefecto || "qwen3.8:27b";
-    const cmd = generarPowerShellInstalacionOllama(modeloElegido);
+    const cmd = generarPowerShellInstalacionOllama(resueltoLocal.modeloResuelto);
     const exito = await copiarAlPortapapeles(cmd);
     if (exito) {
       setCopiado(true);
@@ -103,8 +114,7 @@ export function ConsultaView({
 
   const handleVerificarEstado = async () => {
     setComprobando(true);
-    const modeloElegido = modeloOverride.trim() || localConfig?.modeloDefecto || "qwen3.8:27b";
-    const diag = await diagnosticarConexionOllama(modeloElegido);
+    const diag = await diagnosticarConexionOllama(resueltoLocal.modeloResuelto);
     setDiagnostico(diag);
     setComprobando(false);
   };
@@ -113,7 +123,7 @@ export function ConsultaView({
     if (perfil === "local") {
       handleVerificarEstado();
     }
-  }, [perfil, modeloOverride]);
+  }, [perfil, resueltoLocal.modeloResuelto]);
 
   const toggleEvidencia = (msgId: string) => {
     setEvidenciaAbierta((prev) => ({ ...prev, [msgId]: !prev[msgId] }));
@@ -206,23 +216,31 @@ export function ConsultaView({
                 Modelo:
               </span>
               {perfil === "local" ? (
-                <select
-                  data-ui-id="consulta.input-modelo-override"
-                  value={modeloOverride || localConfig?.modeloDefecto || "qwen3.8:27b"}
-                  onChange={(e) => actions.onModeloOverrideChange?.(e.target.value)}
-                  disabled={generando || modoGrafo}
-                  className="flex-1 p-1.5 border rounded bg-transparent text-xs font-mono focus:outline-none focus:ring-1 focus:ring-emerald-500 disabled:opacity-50"
-                  style={{
-                    borderColor: "var(--khora-border)",
-                    color: "var(--khora-ink)",
-                  }}
-                >
-                  {modelosLocalesList.map((m) => (
-                    <option key={m.tag} value={m.tag}>
-                      {m.tag} ({m.vramAprox}) — {m.usoRecomendado}
-                    </option>
-                  ))}
-                </select>
+                <div className="flex-1 flex flex-col space-y-1">
+                  <select
+                    data-ui-id="consulta.input-modelo-override"
+                    value={resueltoLocal.modeloResuelto}
+                    onChange={(e) => actions.onModeloOverrideChange?.(e.target.value)}
+                    disabled={generando || modoGrafo}
+                    className="w-full p-1.5 border rounded bg-transparent text-xs font-mono focus:outline-none focus:ring-1 focus:ring-emerald-500 disabled:opacity-50"
+                    style={{
+                      borderColor: "var(--khora-border)",
+                      color: "var(--khora-ink)",
+                    }}
+                  >
+                    {modelosLocalesList.map((m) => (
+                      <option key={m.tag} value={m.tag}>
+                        {m.tag} ({m.vramAprox}) — {m.usoRecomendado}
+                      </option>
+                    ))}
+                  </select>
+                  <span className="text-[10px] opacity-75 font-mono text-emerald-400">
+                    Origen: {resueltoLocal.descripcionFuente}
+                    {resueltoLocal.ventanaContextoTokens !== null && (
+                      <> · Ventana: {resueltoLocal.ventanaContextoTokens.toLocaleString()} tokens</>
+                    )}
+                  </span>
+                </div>
               ) : (
                 <input
                   data-ui-id="consulta.input-modelo-override"
@@ -281,9 +299,19 @@ export function ConsultaView({
               <div className="flex items-center gap-2">
                 <Terminal size={18} className="text-blue-400 shrink-0" />
                 <div>
-                  <span className="font-bold uppercase text-blue-400 block">
-                    Perfil Local (Ollama Directo Browser → http://localhost:11434)
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold uppercase text-blue-400 block">
+                      Perfil Local (Ollama Directo Browser → http://localhost:11434)
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setMostrarInfoLocal(!mostrarInfoLocal)}
+                      className="text-blue-300 hover:text-blue-100 transition-colors"
+                      title="¿Por qué es distinto el perfil local?"
+                    >
+                      <HelpCircle size={15} />
+                    </button>
+                  </div>
                   <span className="opacity-90 font-semibold block">
                     Estado:{" "}
                     {diagnostico?.estado === "listo" && (
@@ -312,16 +340,41 @@ export function ConsultaView({
                   {comprobando ? "Comprobando..." : "Recomprobar"}
                 </button>
 
-                <button
-                  type="button"
-                  onClick={handleCopiarComando}
-                  className="px-3 py-1.5 font-bold uppercase rounded border text-xs flex items-center gap-1.5 transition-colors bg-blue-900/40 border-blue-600 text-blue-200 hover:bg-blue-800/50"
-                >
-                  {copiado ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
-                  {copiado ? "¡Comando Copiado!" : "Copiar comando PowerShell"}
-                </button>
+                <div className="flex flex-col items-end">
+                  <span className="text-[10px] opacity-80 text-blue-200 font-mono mb-1">
+                    Pega este comando en PowerShell, espera a que termine, y vuelve aquí para recargar el estado.
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleCopiarComando}
+                    className="px-3 py-1.5 font-bold uppercase rounded border text-xs flex items-center gap-1.5 transition-colors bg-blue-900/40 border-blue-600 text-blue-200 hover:bg-blue-800/50"
+                  >
+                    {copiado ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
+                    {copiado ? "¡Comando Copiado!" : "Copiar comando PowerShell"}
+                  </button>
+                </div>
               </div>
             </div>
+
+            {/* Panel Didáctico Explicativo del Perfil Local */}
+            {mostrarInfoLocal && (
+              <div className="p-3 border rounded bg-stone-900/90 border-blue-500/30 space-y-2 text-[11px]">
+                <div className="font-bold text-blue-300 uppercase flex items-center gap-1.5">
+                  <Info size={14} /> ¿Por qué el perfil 'local' es distinto?
+                </div>
+                <ul className="list-disc list-inside space-y-1 opacity-90 leading-relaxed">
+                  <li>
+                    <strong>Llamada directa desde el navegador:</strong> Las peticiones de inferencia salen directamente desde tu navegador hacia <code className="bg-black/40 px-1 rounded">http://localhost:11434</code> sin pasar por el servidor ni intermediarios de API.
+                  </li>
+                  <li>
+                    <strong>Sin credenciales requeridas:</strong> No se transmiten API keys ni secretos al servidor de Khora para las consultas locales.
+                  </li>
+                  <li>
+                    <strong>Rendimiento dependiente de tu hardware:</strong> Las métricas de velocidad (TTFT y TPS) dependen enteramente de la potencia de tu tarjeta gráfica (GPU/VRAM) y memoria RAM.
+                  </li>
+                </ul>
+              </div>
+            )}
 
             {diagnostico && (
               <div className="p-2.5 rounded bg-black/20 border border-white/5 space-y-1 text-[11px]">
@@ -339,7 +392,7 @@ export function ConsultaView({
               </div>
             )}
 
-            {(modeloOverride.startsWith("gpt-oss") || localConfig?.modeloDefecto?.startsWith("gpt-oss")) && (
+            {resueltoLocal.modeloResuelto.startsWith("gpt-oss") && (
               <p className="text-[11px] text-amber-300 opacity-90 border-t border-blue-500/20 pt-2">
                 ⚠️ <strong>Advertencia hardware:</strong> gpt-oss en cuantización MXFP4 cae a ejecución por CPU si la GPU no posee soporte completo para aceleración MXFP4.
               </p>
