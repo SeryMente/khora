@@ -13,7 +13,18 @@ import {
   Network,
   AlertTriangle,
   Trash2,
+  Copy,
+  Check,
+  Terminal,
+  Cpu,
 } from "lucide-react";
+import {
+  generarPowerShellInstalacionOllama,
+  copiarAlPortapapeles,
+  diagnosticarConexionOllama,
+  DiagnosticoOllamaResult,
+} from "@/lib/client/ollamaLocal";
+import { MODEL_CATALOG_CONFIG } from "@/lib/config/model_catalog";
 
 export interface Evidencia {
   tripleta: string;
@@ -33,7 +44,7 @@ export interface MensajeChatSession {
   error?: string | null;
 }
 
-export type PerfilProveedor = "open_source" | "gemini" | "groq";
+export type PerfilProveedor = "open_source" | "gemini" | "groq" | "local";
 
 export interface ConsultaViewState {
   mensajes: MensajeChatSession[];
@@ -74,6 +85,35 @@ export function ConsultaView({
   } = state;
 
   const [evidenciaAbierta, setEvidenciaAbierta] = useState<Record<string, boolean>>({});
+  const [copiado, setCopiado] = useState(false);
+  const [diagnostico, setDiagnostico] = useState<DiagnosticoOllamaResult | null>(null);
+  const [comprobando, setComprobando] = useState(false);
+  const localConfig = MODEL_CATALOG_CONFIG.perfiles.find((p) => p.perfilId === "local");
+  const modelosLocalesList = localConfig?.modelosLocales || [];
+
+  const handleCopiarComando = async () => {
+    const modeloElegido = modeloOverride.trim() || localConfig?.modeloDefecto || "qwen3.8:27b";
+    const cmd = generarPowerShellInstalacionOllama(modeloElegido);
+    const exito = await copiarAlPortapapeles(cmd);
+    if (exito) {
+      setCopiado(true);
+      setTimeout(() => setCopiado(false), 3000);
+    }
+  };
+
+  const handleVerificarEstado = async () => {
+    setComprobando(true);
+    const modeloElegido = modeloOverride.trim() || localConfig?.modeloDefecto || "qwen3.8:27b";
+    const diag = await diagnosticarConexionOllama(modeloElegido);
+    setDiagnostico(diag);
+    setComprobando(false);
+  };
+
+  React.useEffect(() => {
+    if (perfil === "local") {
+      handleVerificarEstado();
+    }
+  }, [perfil, modeloOverride]);
 
   const toggleEvidencia = (msgId: string) => {
     setEvidenciaAbierta((prev) => ({ ...prev, [msgId]: !prev[msgId] }));
@@ -153,30 +193,51 @@ export function ConsultaView({
                   color: "var(--khora-ink)",
                 }}
               >
-                <option value="open_source">open_source (Llama/Local)</option>
-                <option value="gemini">gemini (Google Vertex/AI)</option>
+                <option value="open_source">open_source (Cloud Free)</option>
+                <option value="gemini">gemini (Google AI)</option>
                 <option value="groq">groq (Fast Inference)</option>
+                <option value="local">local (Ollama Directo)</option>
               </select>
             </div>
 
-            {/* Input Modelo Override (Opcional) */}
-            <div className="flex items-center gap-2 text-xs flex-1 min-w-[200px]">
+            {/* Input / Selector de Modelo */}
+            <div className="flex items-center gap-2 text-xs flex-1 min-w-[220px]">
               <span className="font-bold uppercase opacity-80 whitespace-nowrap">
                 Modelo:
               </span>
-              <input
-                data-ui-id="consulta.input-modelo-override"
-                type="text"
-                value={modeloOverride}
-                onChange={(e) => actions.onModeloOverrideChange?.(e.target.value)}
-                placeholder="Override opcional (ej. llama-3.3-70b-versatile)"
-                disabled={generando || modoGrafo}
-                className="flex-1 p-1.5 border rounded bg-transparent text-xs font-mono focus:outline-none focus:ring-1 focus:ring-emerald-500 disabled:opacity-50"
-                style={{
-                  borderColor: "var(--khora-border)",
-                  color: "var(--khora-ink)",
-                }}
-              />
+              {perfil === "local" ? (
+                <select
+                  data-ui-id="consulta.input-modelo-override"
+                  value={modeloOverride || localConfig?.modeloDefecto || "qwen3.8:27b"}
+                  onChange={(e) => actions.onModeloOverrideChange?.(e.target.value)}
+                  disabled={generando || modoGrafo}
+                  className="flex-1 p-1.5 border rounded bg-transparent text-xs font-mono focus:outline-none focus:ring-1 focus:ring-emerald-500 disabled:opacity-50"
+                  style={{
+                    borderColor: "var(--khora-border)",
+                    color: "var(--khora-ink)",
+                  }}
+                >
+                  {modelosLocalesList.map((m) => (
+                    <option key={m.tag} value={m.tag}>
+                      {m.tag} ({m.vramAprox}) — {m.usoRecomendado}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  data-ui-id="consulta.input-modelo-override"
+                  type="text"
+                  value={modeloOverride}
+                  onChange={(e) => actions.onModeloOverrideChange?.(e.target.value)}
+                  placeholder="Override opcional (ej. llama-3.3-70b-versatile)"
+                  disabled={generando || modoGrafo}
+                  className="flex-1 p-1.5 border rounded bg-transparent text-xs font-mono focus:outline-none focus:ring-1 focus:ring-emerald-500 disabled:opacity-50"
+                  style={{
+                    borderColor: "var(--khora-border)",
+                    color: "var(--khora-ink)",
+                  }}
+                />
+              )}
             </div>
 
             {/* Toggle Modo Grafo */}
@@ -197,24 +258,126 @@ export function ConsultaView({
           </div>
         </section>
 
+        {/* Banner Informativo de Diagnóstico en 4 Estados para Perfil Local */}
+        {perfil === "local" && (
+          <div
+            className="p-4 border rounded space-y-3 text-xs"
+            style={{
+              borderColor:
+                diagnostico?.estado === "listo"
+                  ? "rgba(16, 185, 129, 0.4)"
+                  : diagnostico?.estado === "sin_modelo"
+                  ? "rgba(234, 179, 8, 0.4)"
+                  : "rgba(239, 68, 68, 0.4)",
+              background:
+                diagnostico?.estado === "listo"
+                  ? "rgba(16, 185, 129, 0.08)"
+                  : diagnostico?.estado === "sin_modelo"
+                  ? "rgba(234, 179, 8, 0.08)"
+                  : "rgba(239, 68, 68, 0.08)",
+            }}
+          >
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div className="flex items-center gap-2">
+                <Terminal size={18} className="text-blue-400 shrink-0" />
+                <div>
+                  <span className="font-bold uppercase text-blue-400 block">
+                    Perfil Local (Ollama Directo Browser → http://localhost:11434)
+                  </span>
+                  <span className="opacity-90 font-semibold block">
+                    Estado:{" "}
+                    {diagnostico?.estado === "listo" && (
+                      <span className="text-emerald-400 font-bold">🟢 LISTO — Ollama activo con modelo disponible</span>
+                    )}
+                    {diagnostico?.estado === "sin_modelo" && (
+                      <span className="text-amber-400 font-bold">⚠️ MODELO NO DESCARGADO — Ollama corriendo pero falta el modelo</span>
+                    )}
+                    {diagnostico?.estado === "no_instalado" && (
+                      <span className="text-red-400 font-bold">🔴 NO CONECTADO — Ollama no instalado o no iniciado</span>
+                    )}
+                    {diagnostico?.estado === "error" && (
+                      <span className="text-red-400 font-bold">❌ ERROR TÉCNICO — Falla en respuesta de Ollama</span>
+                    )}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleVerificarEstado}
+                  disabled={comprobando}
+                  className="px-2.5 py-1.5 font-bold uppercase rounded border text-[11px] bg-stone-800 border-stone-600 text-stone-200 hover:bg-stone-700"
+                >
+                  {comprobando ? "Comprobando..." : "Recomprobar"}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleCopiarComando}
+                  className="px-3 py-1.5 font-bold uppercase rounded border text-xs flex items-center gap-1.5 transition-colors bg-blue-900/40 border-blue-600 text-blue-200 hover:bg-blue-800/50"
+                >
+                  {copiado ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
+                  {copiado ? "¡Comando Copiado!" : "Copiar comando PowerShell"}
+                </button>
+              </div>
+            </div>
+
+            {diagnostico && (
+              <div className="p-2.5 rounded bg-black/20 border border-white/5 space-y-1 text-[11px]">
+                <p className="opacity-90">
+                  <strong>Detalle:</strong> {diagnostico.mensaje}
+                </p>
+                <p className="opacity-80">
+                  <strong>Acción sugerida:</strong> {diagnostico.accionSugerida}
+                </p>
+                {diagnostico.modelosInstalados.length > 0 && (
+                  <p className="opacity-70 text-[10px]">
+                    <strong>Modelos detectados en tu máquina:</strong> {diagnostico.modelosInstalados.join(", ")}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {(modeloOverride.startsWith("gpt-oss") || localConfig?.modeloDefecto?.startsWith("gpt-oss")) && (
+              <p className="text-[11px] text-amber-300 opacity-90 border-t border-blue-500/20 pt-2">
+                ⚠️ <strong>Advertencia hardware:</strong> gpt-oss en cuantización MXFP4 cae a ejecución por CPU si la GPU no posee soporte completo para aceleración MXFP4.
+              </p>
+            )}
+          </div>
+        )}
+
         {/* Error Banner General */}
         {error && (
           <div
             data-ui-id="consulta.error-banner"
             role="alert"
-            className="p-4 border rounded flex items-start gap-3 text-xs"
+            className="p-4 border rounded flex items-start justify-between gap-3 text-xs flex-wrap"
             style={{
               borderColor: "rgba(239, 68, 68, 0.4)",
               background: "rgba(239, 68, 68, 0.08)",
             }}
           >
-            <AlertTriangle size={18} className="text-red-400 shrink-0 mt-0.5" />
-            <div className="space-y-1">
-              <span className="font-bold uppercase text-red-400">
-                Error en la consulta
-              </span>
-              <p className="opacity-90">{error}</p>
+            <div className="flex items-start gap-3 flex-1">
+              <AlertTriangle size={18} className="text-red-400 shrink-0 mt-0.5" />
+              <div className="space-y-1">
+                <span className="font-bold uppercase text-red-400">
+                  Error en la consulta
+                </span>
+                <p className="opacity-90">{error}</p>
+              </div>
             </div>
+
+            {(error.includes("localhost:11434") || error.includes("Ollama")) && (
+              <button
+                type="button"
+                onClick={handleCopiarComando}
+                className="px-3 py-1.5 font-bold uppercase rounded border text-xs flex items-center gap-1.5 transition-colors bg-red-950 border-red-700 text-red-200 hover:bg-red-900"
+              >
+                {copiado ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
+                {copiado ? "¡Comando Copiado!" : "Copiar comando de instalación PowerShell"}
+              </button>
+            )}
           </div>
         )}
 
