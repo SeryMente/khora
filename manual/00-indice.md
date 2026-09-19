@@ -8,7 +8,7 @@
 - [60. Motor Neo4j (Sustrato C1/C2)](60-motor.md)
 - [70. Constructor J7 (ΦM, η/τ, fKGC)](70-constructor.md)
 - [80. Puerto LLM Oficial del Kernel](80-puerto-llm.md)
-- [91. Catálogo e Instalación de Modelos Locales (Ollama)](91-modelos-locales.md)
+- [92. Catálogo e Instalación de Modelos Locales por GPU](92-sprint-modelos-locales-gpu.md)
 
 - [📝 BORRADOR: Resolución de Entidades](90-resolucion.md)
 

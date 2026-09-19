@@ -3,7 +3,7 @@
 - **Estado:** Aprobado
 - **Fecha:** 2026-08-20
 - **Autores:** Jules & Equipo Khora
-- **Relacionado:** [ADR-015: Perfiles de Proveedor LLM en Servidor](adr-015-perfiles-proveedor-llm.md), [Documento 91: Catálogo e Instalación Local](../91-modelos-locales.md)
+- **Relacionado:** [ADR-015: Perfiles de Proveedor LLM en Servidor](adr-015-perfiles-proveedor-llm.md), [Documento 92: Catálogo e Instalación Local por GPU](../92-sprint-modelos-locales-gpu.md)
 
 ## Contexto y Problema
 
