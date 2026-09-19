@@ -9,6 +9,7 @@ import {
 } from "@/app/components/shared/KpiPanelView";
 import { PerfilProveedor } from "@/app/components/shared/ConsultaView";
 import { logTelemetryEvent } from "@/lib/telemetry";
+import { ejecutarInferenciaOllamaLocal } from "@/lib/client/ollamaLocal";
 
 export default function KpisPage() {
   const [promptInput, setPromptInput] = useState("");
@@ -45,6 +46,17 @@ export default function KpisPage() {
     },
     open_source: {
       perfil: "open_source",
+      estado: "idle",
+      contenido: "",
+      ttftMs: null,
+      durationMs: null,
+      realTokens: null,
+      charCount: 0,
+      tps: null,
+      isExactTokens: false,
+    },
+    local: {
+      perfil: "local",
       estado: "idle",
       contenido: "",
       ttftMs: null,
@@ -93,6 +105,69 @@ export default function KpisPage() {
 
     // Disparar peticiones HTTP en paralelo para cada perfil (fan-out)
     const promesas = perfiles.map(async (perfil) => {
+      if (perfil === "local") {
+        // Inferencia Local directa Navegador -> http://localhost:11434 (API nativa)
+        try {
+          const resLocal = await ejecutarInferenciaOllamaLocal({
+            model: "qwen3.8:27b",
+            messages: [{ role: "user", content: prompt }],
+            onChunk: (chunkText, fullText) => {
+              setResultados((prev) => ({
+                ...prev,
+                local: {
+                  ...prev.local,
+                  contenido: fullText,
+                  charCount: fullText.length,
+                },
+              }));
+            },
+          });
+
+          setResultados((prev) => ({
+            ...prev,
+            local: {
+              ...prev.local,
+              estado: "exito",
+              contenido: resLocal.contenido,
+              ttftMs: resLocal.ttftMs,
+              durationMs: resLocal.durationMs,
+              realTokens: resLocal.evalCount,
+              charCount: resLocal.contenido.length,
+              tps: resLocal.tps,
+              isExactTokens: resLocal.exactTokens,
+              origenModel: resLocal.origenModel,
+            },
+          }));
+
+          await logTelemetryEvent({
+            moduleId: "khora-web",
+            action: "LLM_KPI",
+            severity: "INFO",
+            payload: {
+              perfil: "local",
+              modelo: resLocal.origenModel,
+              ttft_ms: resLocal.ttftMs,
+              total_duration_ms: resLocal.durationMs,
+              tps: resLocal.tps,
+              is_exact_tokens: resLocal.exactTokens,
+              total_tokens: resLocal.evalCount ?? Math.ceil(resLocal.contenido.length / 4),
+            },
+          });
+        } catch (err: any) {
+          setResultados((prev) => ({
+            ...prev,
+            local: {
+              ...prev.local,
+              estado: "error",
+              errorMsg:
+                err.message ||
+                "No se pudo conectar con Ollama en http://localhost:11434.",
+            },
+          }));
+        }
+        return;
+      }
+
       const t0 = performance.now();
       let firstTokenTime: number | null = null;
       let lastChunkTime: number | null = null;

@@ -117,10 +117,10 @@ test("KPIs Suite - Métricas LLM, Fan-Out y Benchmarks de Frontera", async (t) =
 
     // Catálogo
     assert.strictEqual(MODEL_CATALOG_CONFIG.version, "1.0.0");
-    assert.strictEqual(MODEL_CATALOG_CONFIG.perfiles.length, 3);
+    assert.strictEqual(MODEL_CATALOG_CONFIG.perfiles.length, 4);
 
     const perfilesIds = MODEL_CATALOG_CONFIG.perfiles.map((p) => p.perfilId);
-    assert.deepStrictEqual(perfilesIds, ["groq", "gemini", "open_source"]);
+    assert.deepStrictEqual(perfilesIds, ["groq", "gemini", "open_source", "local"]);
 
     for (const cat of MODEL_CATALOG_CONFIG.perfiles) {
       assert.ok(cat.nombreProveedor);

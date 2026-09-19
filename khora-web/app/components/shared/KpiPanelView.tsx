@@ -16,7 +16,14 @@ import {
   Cpu,
   Layers,
   HelpCircle,
+  Terminal,
+  Copy,
+  Check,
 } from "lucide-react";
+import {
+  generarPowerShellInstalacionOllama,
+  copiarAlPortapapeles,
+} from "@/lib/client/ollamaLocal";
 import { PerfilProveedor } from "./ConsultaView";
 import {
   FRONTIER_BENCHMARKS_CONFIG,
@@ -77,6 +84,19 @@ export function KpiPanelView({
     catalogConfig = MODEL_CATALOG_CONFIG,
   } = state;
 
+  const [copiadoLocal, setCopiadoLocal] = useState(false);
+  const localConfig = catalogConfig.perfiles.find((p) => p.perfilId === "local");
+
+  const handleCopiarComandoKpi = async () => {
+    const origen = typeof window !== "undefined" ? window.location.origin : "http://localhost:3000";
+    const cmd = generarPowerShellInstalacionOllama(localConfig?.modeloDefecto || "qwen3.8:27b", origen);
+    const exito = await copiarAlPortapapeles(cmd);
+    if (exito) {
+      setCopiadoLocal(true);
+      setTimeout(() => setCopiadoLocal(false), 3000);
+    }
+  };
+
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (actions.onSubmitComparacion) {
@@ -86,7 +106,7 @@ export function KpiPanelView({
     }
   };
 
-  const perfilesList: PerfilProveedor[] = ["groq", "gemini", "open_source"];
+  const perfilesList: PerfilProveedor[] = ["groq", "gemini", "open_source", "local"];
 
   const hayErrorParcial = Object.values(resultados).some(
     (r) => selectedProfiles.includes(r.perfil) && r.estado === "error"
@@ -232,17 +252,30 @@ export function KpiPanelView({
           </form>
         </section>
 
-        {/* Banner de Fallo Parcial (Si algunos perfiles fallaron pero otros tuvieron éxito) */}
+        {/* Banner de Fallo Parcial */}
         {hayErrorParcial && hayExitoParcial && (
           <div
             data-ui-id="kpi.error-banner"
             role="alert"
-            className="p-3 border rounded flex items-center gap-2 text-xs text-amber-300 border-amber-800/50 bg-amber-950/20"
+            className="p-3 border rounded flex items-center justify-between gap-2 text-xs text-amber-300 border-amber-800/50 bg-amber-950/20 flex-wrap"
           >
-            <AlertTriangle size={16} className="shrink-0" />
-            <span>
-              Fallo parcial detectado: Uno o más perfiles respondieron con error, pero el panel continúa operativo visualizando los demás resultados.
-            </span>
+            <div className="flex items-center gap-2">
+              <AlertTriangle size={16} className="shrink-0" />
+              <span>
+                Fallo parcial detectado: Uno o más perfiles respondieron con error, pero el panel continúa operativo visualizando los demás resultados.
+              </span>
+            </div>
+
+            {resultados.local?.estado === "error" && (
+              <button
+                type="button"
+                onClick={handleCopiarComandoKpi}
+                className="px-3 py-1 font-bold uppercase rounded border text-[11px] flex items-center gap-1 bg-amber-950 border-amber-700 text-amber-200 hover:bg-amber-900"
+              >
+                {copiadoLocal ? <Check size={12} className="text-emerald-400" /> : <Copy size={12} />}
+                {copiadoLocal ? "¡Comando Copiado!" : "Copiar comando de instalación PowerShell"}
+              </button>
+            )}
           </div>
         )}
 
@@ -382,11 +415,21 @@ export function KpiPanelView({
                 </div>
 
                 {/* Área de Texto o Error */}
-                <div className="flex-1 min-h-[140px] max-h-[250px] overflow-y-auto p-2 border rounded font-sans text-xs whitespace-pre-wrap leading-relaxed" style={{ borderColor: "var(--khora-border)", background: "var(--khora-bg)" }}>
+                <div className="flex-1 min-h-[140px] max-h-[250px] overflow-y-auto p-2 border rounded font-sans text-xs whitespace-pre-wrap leading-relaxed space-y-2" style={{ borderColor: "var(--khora-border)", background: "var(--khora-bg)" }}>
                   {res.estado === "error" ? (
-                    <div className="text-red-400 font-mono text-[11px] space-y-1">
+                    <div className="text-red-400 font-mono text-[11px] space-y-2">
                       <strong>Detalle de Error:</strong>
                       <p>{res.errorMsg || "Error al conectar con el perfil."}</p>
+                      {p === "local" && (
+                        <button
+                          type="button"
+                          onClick={handleCopiarComandoKpi}
+                          className="mt-1 px-2.5 py-1 text-[10px] font-bold uppercase rounded border flex items-center gap-1 bg-red-950 border-red-700 text-red-200 hover:bg-red-900"
+                        >
+                          {copiadoLocal ? <Check size={12} className="text-emerald-400" /> : <Copy size={12} />}
+                          {copiadoLocal ? "¡Comando Copiado!" : "Copiar comando PowerShell"}
+                        </button>
+                      )}
                     </div>
                   ) : res.contenido ? (
                     res.contenido
