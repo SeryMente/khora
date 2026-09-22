@@ -1,7 +1,8 @@
 // @l0 L0-002 · @req HARNESS-01/REQ-1 · Script de "Primer Vínculo Harness"
 import fs from "fs";
 import path from "path";
-import { createHash, randomUUID } from "crypto";
+import { randomUUID } from "crypto";
+import { v5 as uuidv5 } from "uuid";
 
 import { getDb } from "../lib/server/neon";
 import { descifrarTexto } from "../lib/server/cripto";
@@ -11,20 +12,8 @@ import { verificarCircuitoCompletoNeo4j } from "../lib/server/grafo";
 
 const UUID_NAMESPACE_URL = "6ba7b811-9dad-11d1-80b4-00c04fd430c8";
 
-function uuidToBytes(uuid: string): Buffer {
-  return Buffer.from(uuid.replace(/-/g, ""), "hex");
-}
-
 export function calcularIoId(volcadoId: string, version: number): string {
-  const claveVersion = `khora:volcado:${volcadoId}:v${version}`;
-  const hash = createHash("sha1")
-    .update(Buffer.concat([uuidToBytes(UUID_NAMESPACE_URL), Buffer.from(claveVersion, "utf8")]))
-    .digest();
-  const bytes = Buffer.from(hash.subarray(0, 16));
-  bytes[6] = (bytes[6] & 0x0f) | 0x50;
-  bytes[8] = (bytes[8] & 0x3f) | 0x80;
-  const hex = bytes.toString("hex");
-  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+  return uuidv5(`khora:volcado:${volcadoId}:v${version}`, UUID_NAMESPACE_URL);
 }
 
 function extraerMensajeError(data: Record<string, any>, status: number): string {
