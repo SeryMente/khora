@@ -74,6 +74,8 @@ def test_ingesta_valida():
     assert "io_id" in data
     assert "counters" in data
     assert "ts" in data
+    assert "needs_review" in data
+    assert isinstance(data["needs_review"], int)
     assert "create" in data["counters"]
     assert "update" in data["counters"]
     assert "ignore" in data["counters"]

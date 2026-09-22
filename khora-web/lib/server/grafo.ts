@@ -375,6 +375,7 @@ export interface VerificacionCircuitoResult {
   exists: boolean;
   node_count: number;
   relation_count: number;
+  needs_review_count: number;
   details: {
     io_id: string;
     volcado_id: string | null;
@@ -422,6 +423,7 @@ export async function verificarCircuitoCompletoNeo4j(ioId: string): Promise<Veri
           exists: false,
           node_count: 0,
           relation_count: 0,
+          needs_review_count: 0,
           details: null
         };
       }
@@ -436,10 +438,12 @@ export async function verificarCircuitoCompletoNeo4j(ioId: string): Promise<Veri
 
       const nodesRes = await session.run(
         `MATCH (:InformationObject {io_id: $ioId})-[m:MENTIONS {io_id: $ioId}]->(e:Entity)
-         RETURN count(e) AS node_count`,
+         RETURN count(e) AS node_count,
+                count(CASE WHEN e.needs_review = true THEN 1 END) AS needs_review_count`,
         { ioId }
       );
       const node_count = Number(nodesRes.records[0].get("node_count") || 0);
+      const needs_review_count = Number(nodesRes.records[0].get("needs_review_count") || 0);
 
       const relsRes = await session.run(
         `MATCH ()-[r:RELATION {io_id: $ioId}]->()
@@ -453,7 +457,7 @@ export async function verificarCircuitoCompletoNeo4j(ioId: string): Promise<Veri
         eventId: "GRA-002",
         estado: "OK",
         mensaje: `Verificación en Neo4j exitosa para io_id ${ioId}: ${node_count} nodos, ${relation_count} relaciones`,
-        detalle: { ioId, node_count, relation_count, volcado_id, version, sha256 },
+        detalle: { ioId, node_count, relation_count, needs_review_count, volcado_id, version, sha256 },
         volcadoId: volcado_id,
         version,
         sha256,
@@ -464,6 +468,7 @@ export async function verificarCircuitoCompletoNeo4j(ioId: string): Promise<Veri
         exists: true,
         node_count,
         relation_count,
+        needs_review_count,
         details: {
           io_id: ioId,
           volcado_id,

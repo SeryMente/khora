@@ -208,6 +208,7 @@ async def endpoint_ingesta(req: IngestaRequest):
                 "ignore": acta.ideas_repetidas
             },
             "triples_escritos": acta.triples_escritos,
+            "needs_review": acta.needs_review,
             "ts": acta.timestamp
         }
     except HTTPException:

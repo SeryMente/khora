@@ -17,6 +17,7 @@ let fetchMockResponse: () => Promise<any> = async () => ({
   json: async () => ({
     io_id: "io-test-uuid-1234",
     idempotent: false,
+    needs_review: 2,
     counters: { create: 3, update: 1, ignore: 0 },
     ts: "2026-09-17T12:00:00Z",
   }),
@@ -49,7 +50,7 @@ Pool.prototype.query = (async function (sql: string, params?: any[]) {
   return { rows: [] };
 }) as any;
 
-import { ejecutarPrimerVinculo } from "../../scripts/primer_vinculo";
+import { calcularIoId, ejecutarPrimerVinculo } from "../../scripts/primer_vinculo";
 import { sha256de } from "../../lib/server/correcciones";
 import { cifrarTexto } from "../../lib/server/cripto";
 
@@ -78,7 +79,7 @@ test("Primer Vínculo Harness Suite", async (t) => {
         }
         if (query.includes("count(e) AS node_count")) {
           return {
-            records: [{ get: () => 4 }],
+            records: [{ get: (key: string) => key === "needs_review_count" ? 2 : 4 }],
           };
         }
         if (query.includes("count(r) AS relation_count")) {
@@ -129,8 +130,9 @@ test("Primer Vínculo Harness Suite", async (t) => {
         status: 200,
         ok: true,
         json: async () => ({
-          io_id: `io-${volcadoId}`,
+          io_id: calcularIoId(volcadoId, 1),
           idempotent: false,
+          needs_review: 2,
           counters: { create: 4, update: 0, ignore: 0 },
           ts: new Date().toISOString(),
         }),
@@ -142,7 +144,7 @@ test("Primer Vínculo Harness Suite", async (t) => {
       assert.strictEqual(reporte.volcado_id, volcadoId);
       assert.strictEqual(reporte.version, 1);
       assert.strictEqual(reporte.sha256, sha);
-      assert.strictEqual(reporte.io_id, `io-${volcadoId}`);
+      assert.strictEqual(reporte.io_id, calcularIoId(volcadoId, 1));
       assert.strictEqual(reporte.metodo_ingesta, "kernel_directo (/api/v1/ingesta)");
       assert.strictEqual(reporte.estado_volcado, "ingerido");
       assert.strictEqual(reporte.idempotent, false);
@@ -152,7 +154,7 @@ test("Primer Vínculo Harness Suite", async (t) => {
         node_count: 4,
         relation_count: 2,
       });
-      assert.strictEqual(reporte.needs_review_count, 0);
+      assert.strictEqual(reporte.needs_review_count, 2);
       assert.strictEqual(
         reporte.ratificacion,
         "ratificación automática (bypass temporal, ver 5C-FIX)"
@@ -160,7 +162,7 @@ test("Primer Vínculo Harness Suite", async (t) => {
 
       const updateQuery = dbQueriesLogged.find((q) => q.sql.includes("UPDATE volcado"));
       assert.ok(updateQuery);
-      assert.strictEqual(updateQuery.params?.[0], `io-${volcadoId}`);
+      assert.strictEqual(updateQuery.params?.[0], calcularIoId(volcadoId, 1));
 
       const auditQuery = dbQueriesLogged.find((q) => q.sql.includes("INSERT INTO volcado_revision_auditoria"));
       assert.ok(auditQuery);
@@ -170,7 +172,7 @@ test("Primer Vínculo Harness Suite", async (t) => {
 
     await t.test("2. Idempotencia: Volcado ya ingerido reporta idempotent=true y ratificacion=null sin duplicar", async () => {
       mockDbVolcados[0].estado = "ingerido";
-      mockDbVolcados[0].io_id = `io-${volcadoId}`;
+      mockDbVolcados[0].io_id = calcularIoId(volcadoId, 1);
 
       const reporte = await ejecutarPrimerVinculo({ volcadoId, dryRun: false });
 
@@ -194,7 +196,7 @@ test("Primer Vínculo Harness Suite", async (t) => {
 
       assert.strictEqual(reporte.ok, false);
       assert.strictEqual(reporte.estado_volcado, "en_revision");
-      assert.ok(reporte.error?.includes("La ingesta exige que el volcado esté en estado listo_ingesta"));
+      assert.ok(reporte.error?.includes("La ingesta exige que el volcado esté en estado listo_ingesta o fallido recuperable"));
     });
 
     await t.test("4. Dry-run: Valida origen y hace healthcheck del kernel sin modificar BD ni Neo4j", async () => {
@@ -215,6 +217,7 @@ test("Primer Vínculo Harness Suite", async (t) => {
       assert.strictEqual(reporte.estado_volcado, "listo_ingesta");
       assert.strictEqual(reporte.io_id, null);
       assert.deepStrictEqual(reporte.kernel_salud, { ok: true, neo4j: true });
+      assert.strictEqual(reporte.needs_review_count, undefined);
       assert.strictEqual(
         reporte.ratificacion,
         "ratificación automática (bypass temporal, ver 5C-FIX)"
@@ -246,6 +249,56 @@ test("Primer Vínculo Harness Suite", async (t) => {
       assert.ok(auditQuery);
       assert.strictEqual(auditQuery.params?.[2], "ingesta_fallida");
       assert.strictEqual(auditQuery.params?.[7], "cli:primer_vinculo");
+    });
+
+    await t.test("6. Dry-run falla cerrado cuando Neo4j no está saludable", async () => {
+      mockDbVolcados[0].estado = "listo_ingesta";
+      mockDbVolcados[0].io_id = null;
+      fetchMockResponse = async () => ({
+        status: 200,
+        ok: true,
+        json: async () => ({ ok: true, neo4j: false }),
+      });
+
+      const reporte = await ejecutarPrimerVinculo({ volcadoId, dryRun: true });
+      assert.strictEqual(reporte.ok, false);
+      assert.strictEqual(reporte.error, "Dry-run bloqueado: kernel o Neo4j no están saludables");
+    });
+
+    await t.test("7. Un volcado fallido puede reintentarse sin intervención manual", async () => {
+      mockDbVolcados[0].estado = "fallido";
+      mockDbVolcados[0].io_id = null;
+      fetchMockResponse = async () => ({
+        status: 200,
+        ok: true,
+        json: async () => ({
+          io_id: calcularIoId(volcadoId, 1),
+          idempotent: false,
+          needs_review: 2,
+          counters: { create: 4, update: 0, ignore: 0 },
+        }),
+      });
+
+      const reporte = await ejecutarPrimerVinculo({ volcadoId, dryRun: false });
+      assert.strictEqual(reporte.ok, true);
+      assert.strictEqual(reporte.estado_volcado, "ingerido");
+      assert.strictEqual(reporte.needs_review_count, 2);
+    });
+
+    await t.test("8. Rechaza un io_id distinto del UUIDv5 canónico antes de mutar PostgreSQL", async () => {
+      mockDbVolcados[0].estado = "listo_ingesta";
+      mockDbVolcados[0].io_id = null;
+      dbQueriesLogged = [];
+      fetchMockResponse = async () => ({
+        status: 200,
+        ok: true,
+        json: async () => ({ io_id: randomUUID(), idempotent: false }),
+      });
+
+      const reporte = await ejecutarPrimerVinculo({ volcadoId, dryRun: false });
+      assert.strictEqual(reporte.ok, false);
+      assert.ok(reporte.error?.startsWith("Conflicto de identidad:"));
+      assert.strictEqual(dbQueriesLogged.some((q) => q.sql.includes("UPDATE volcado")), false);
     });
   } finally {
     (neo4j as any).driver = originalDriver;
