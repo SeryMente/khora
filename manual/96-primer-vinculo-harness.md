@@ -19,7 +19,7 @@ Este comando permite al operador ejecutar la ingesta reproducible de un `volcado
 Ejecutar desde el directorio `khora-web/`:
 
 ### 1. Verificación previa en seco (Dry-Run)
-Valida la procedencia del volcado en PostgreSQL y realiza un healthcheck contra el kernel y Neo4j sin modificar nada:
+Valida la procedencia del volcado en PostgreSQL y realiza un healthcheck contra el kernel y Neo4j sin modificar nada. Solo devuelve `ok: true` si ambos están saludables:
 
 ```bash
 cd khora-web
@@ -46,7 +46,7 @@ La salida JSON en stdout incluye la información de verificación sin exponer te
   "volcado_id": "11111111-1111-1111-1111-111111111111",
   "version": 1,
   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-  "io_id": "io-11111111-1111-1111-1111-111111111111",
+  "io_id": "<UUIDv5 derivado de khora:volcado:<volcado_id>:v<version>>",
   "metodo_ingesta": "kernel_directo (/api/v1/ingesta)",
   "estado_volcado": "ingerido",
   "idempotent": false,
@@ -56,7 +56,7 @@ La salida JSON en stdout incluye la información de verificación sin exponer te
     "node_count": 5,
     "relation_count": 3
   },
-  "needs_review_count": 0,
+  "needs_review_count": 2,
   "ratificacion": "ratificación automática (bypass temporal, ver 5C-FIX)",
   "timestamp": "2026-09-17T16:20:00.000Z"
 }
@@ -70,3 +70,11 @@ Si se ejecuta el comando sobre un volcado que ya fue ingerido previamente:
 - El script **no duplica la ingesta**.
 - Realiza la verificación directa en Neo4j Aura.
 - Retorna `"idempotent": true` y `"ratificacion": null` en el reporte.
+
+
+## Recuperación y compuertas
+
+- Un volcado en `fallido` puede reintentarse: cada fallo incrementa `intentos`, conserva `ultimo_error` y deja trazabilidad de auditoría.
+- El `io_id` se calcula como UUIDv5 canónico, igual que en el bridge Python. Un identificador remoto distinto bloquea la actualización de PostgreSQL.
+- `needs_review_count` se obtiene del grafo verificado; nunca se fija a cero por defecto.
+- Errores HTTP estructurados conservan la causa devuelta por el kernel.

@@ -1,13 +1,44 @@
 // @l0 L0-002 · @req HARNESS-01/REQ-1 · Script de "Primer Vínculo Harness"
 import fs from "fs";
 import path from "path";
-import { randomUUID } from "crypto";
+import { createHash, randomUUID } from "crypto";
 
 import { getDb } from "../lib/server/neon";
 import { descifrarTexto } from "../lib/server/cripto";
 import { sha256de, listarVersiones } from "../lib/server/correcciones";
 import { registrarEvento } from "../lib/server/eventos";
 import { verificarCircuitoCompletoNeo4j } from "../lib/server/grafo";
+
+const UUID_NAMESPACE_URL = "6ba7b811-9dad-11d1-80b4-00c04fd430c8";
+
+function uuidToBytes(uuid: string): Buffer {
+  return Buffer.from(uuid.replace(/-/g, ""), "hex");
+}
+
+export function calcularIoId(volcadoId: string, version: number): string {
+  const claveVersion = `khora:volcado:${volcadoId}:v${version}`;
+  const hash = createHash("sha1")
+    .update(Buffer.concat([uuidToBytes(UUID_NAMESPACE_URL), Buffer.from(claveVersion, "utf8")]))
+    .digest();
+  const bytes = Buffer.from(hash.subarray(0, 16));
+  bytes[6] = (bytes[6] & 0x0f) | 0x50;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+  const hex = bytes.toString("hex");
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
+
+function extraerMensajeError(data: Record<string, any>, status: number): string {
+  if (typeof data.error === "string") return data.error;
+  if (typeof data.detail === "string") return data.detail;
+  if (data.detail && typeof data.detail === "object") {
+    if (typeof data.detail.error === "string" && typeof data.detail.causa === "string") {
+      return `${data.detail.error}: ${data.detail.causa}`;
+    }
+    if (typeof data.detail.error === "string") return data.detail.error;
+    if (typeof data.detail.causa === "string") return data.detail.causa;
+  }
+  return `El Kernel retornó HTTP ${status}`;
+}
 
 function cargarEntorno() {
   const cargarArchivo = (ruta: string) => {
@@ -69,11 +100,11 @@ export async function ejecutarPrimerVinculo(opciones: OpcionesPrimerVinculo): Pr
   const { volcadoId, dryRun = false } = opciones;
   const ts = new Date().toISOString();
 
-  if (!volcadoId || typeof volcadoId !== "string" || !/^[0-9a-fA-F-]{36}$/.test(volcadoId.trim())) {
+  if (!volcadoId || typeof volcadoId !== "string" || !/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/.test(volcadoId.trim())) {
     return {
       ok: false,
       timestamp: ts,
-      error: "Se requiere un --volcado-id válido (UUID de 36 caracteres).",
+      error: "Se requiere un --volcado-id válido (UUID canónico).",
     };
   }
 
@@ -107,7 +138,16 @@ export async function ejecutarPrimerVinculo(opciones: OpcionesPrimerVinculo): Pr
 
   // Caso 1: Idempotencia - el volcado ya está ingerido o ya tiene io_id
   if (volcado.estado === "ingerido" || volcado.io_id) {
-    const ioId = String(volcado.io_id || `io-${uuidNormalizado}`);
+    if (volcado.version_aprobada === null || volcado.version_aprobada === undefined) {
+      return {
+        ok: false,
+        volcado_id: uuidNormalizado,
+        estado_volcado: volcado.estado,
+        timestamp: ts,
+        error: "El volcado ingerido carece de version_aprobada; no se puede reconstruir su io_id idempotente",
+      };
+    }
+    const ioId = String(volcado.io_id || calcularIoId(uuidNormalizado, Number(volcado.version_aprobada)));
     let verif;
     try {
       verif = await verificarCircuitoCompletoNeo4j(ioId);
@@ -130,20 +170,20 @@ export async function ejecutarPrimerVinculo(opciones: OpcionesPrimerVinculo): Pr
         node_count: verif.node_count,
         relation_count: verif.relation_count,
       },
-      needs_review_count: 0,
+      needs_review_count: verif.needs_review_count,
       ratificacion: null,
       timestamp: ts,
     };
   }
 
   // Caso 2: El volcado no está en estado listo_ingesta
-  if (volcado.estado !== "listo_ingesta") {
+  if (volcado.estado !== "listo_ingesta" && volcado.estado !== "fallido") {
     return {
       ok: false,
       volcado_id: uuidNormalizado,
       estado_volcado: volcado.estado,
       timestamp: ts,
-      error: `La ingesta exige que el volcado esté en estado listo_ingesta. Estado actual: ${volcado.estado}`,
+      error: `La ingesta exige que el volcado esté en estado listo_ingesta o fallido recuperable. Estado actual: ${volcado.estado}`,
     };
   }
 
@@ -159,6 +199,7 @@ export async function ejecutarPrimerVinculo(opciones: OpcionesPrimerVinculo): Pr
   }
 
   const versionAprobada = Number(volcado.version_aprobada);
+  const ioIdEsperado = calcularIoId(uuidNormalizado, versionAprobada);
   const versiones = await listarVersiones(uuidNormalizado);
   const filaVersion = (versiones as Array<{ version: number | string; texto: string | null; sha256: string | null }>).find(
     (v) => Number(v.version) === versionAprobada
@@ -226,20 +267,21 @@ export async function ejecutarPrimerVinculo(opciones: OpcionesPrimerVinculo): Pr
       salud = { ok: false, neo4j: false, error: String(err?.message ?? err) };
     }
 
+    const saludOk = salud.ok === true && salud.neo4j === true;
     return {
-      ok: true,
+      ok: saludOk,
       volcado_id: uuidNormalizado,
       version: versionAprobada,
       sha256: shaServidor,
       io_id: null,
       metodo_ingesta: "kernel_directo (/api/v1/ingesta)",
-      estado_volcado: "listo_ingesta",
+      estado_volcado: volcado.estado,
       idempotent: false,
       dry_run: true,
       kernel_salud: salud,
       verificacion_neo4j: null,
-      needs_review_count: 0,
       ratificacion: "ratificación automática (bypass temporal, ver 5C-FIX)",
+      error: saludOk ? undefined : "Dry-run bloqueado: kernel o Neo4j no están saludables",
       timestamp: ts,
     };
   }
@@ -283,7 +325,16 @@ export async function ejecutarPrimerVinculo(opciones: OpcionesPrimerVinculo): Pr
     }
 
     if (apiResponse.ok) {
-      const ioId = typeof data.io_id === "string" ? data.io_id : `io-${uuidNormalizado}`;
+      const ioId = typeof data.io_id === "string" ? data.io_id : ioIdEsperado;
+      if (ioId !== ioIdEsperado) {
+        return {
+          ok: false,
+          volcado_id: uuidNormalizado,
+          estado_volcado: volcado.estado,
+          timestamp: ts,
+          error: `Conflicto de identidad: el kernel devolvió io_id ${ioId}, esperado ${ioIdEsperado}`,
+        };
+      }
       const esIdempotente = Boolean(data.idempotent);
 
       await db.query(
@@ -365,19 +416,14 @@ export async function ejecutarPrimerVinculo(opciones: OpcionesPrimerVinculo): Pr
           node_count: verif.node_count,
           relation_count: verif.relation_count,
         },
-        needs_review_count: 0,
+        needs_review_count: verif.needs_review_count,
         ratificacion: esIdempotente ? null : "ratificación automática (bypass temporal, ver 5C-FIX)",
         timestamp: ts,
       };
     }
 
     // Manejo de respuesta HTTP no exitosa
-    const errorMsg =
-      typeof data.error === "string"
-        ? data.error
-        : typeof data.detail === "string"
-          ? data.detail
-          : `El Kernel retornó HTTP ${apiResponse.status}`;
+    const errorMsg = extraerMensajeError(data, apiResponse.status);
 
     await db.query(
       `
