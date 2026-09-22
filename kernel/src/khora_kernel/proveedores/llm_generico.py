@@ -155,7 +155,7 @@ class ProveedorLLMGenerico:
         except urllib.error.URLError as e:
             raise RuntimeError(f"Error de conexión con LLM: {e}")
 
-        def _read_chunks() -> Generator[str, None, None]:
+        def _read_chunks() -> Generator[Any, None, None]:
             try:
                 for line in response:
                     line_str = line.decode("utf-8").strip()
