@@ -57,9 +57,12 @@ function cargarEntorno() {
 
 cargarEntorno();
 
+export type VerificadorNeo4j = typeof verificarCircuitoCompletoNeo4j;
+
 export interface OpcionesPrimerVinculo {
   volcadoId: string;
   dryRun?: boolean;
+  verificarNeo4j?: VerificadorNeo4j;
 }
 
 export interface ReportePrimerVinculo {
@@ -86,7 +89,7 @@ export interface ReportePrimerVinculo {
 }
 
 export async function ejecutarPrimerVinculo(opciones: OpcionesPrimerVinculo): Promise<ReportePrimerVinculo> {
-  const { volcadoId, dryRun = false } = opciones;
+  const { volcadoId, dryRun = false, verificarNeo4j = verificarCircuitoCompletoNeo4j } = opciones;
   const ts = new Date().toISOString();
 
   if (!volcadoId || typeof volcadoId !== "string" || !/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/.test(volcadoId.trim())) {
@@ -139,17 +142,22 @@ export async function ejecutarPrimerVinculo(opciones: OpcionesPrimerVinculo): Pr
     const ioId = String(volcado.io_id || calcularIoId(uuidNormalizado, Number(volcado.version_aprobada)));
     let verif;
     try {
-      verif = await verificarCircuitoCompletoNeo4j(ioId);
+      verif = await verificarNeo4j(ioId, {
+        volcadoId: uuidNormalizado,
+        version: Number(volcado.version_aprobada),
+        sha256: volcado.sha256_aprobado ? String(volcado.sha256_aprobado) : null,
+      });
     } catch (err: any) {
       verif = { exists: false, node_count: 0, relation_count: 0, details: null };
     }
+    const ioIdCanonico = typeof verif.details?.io_id === "string" ? verif.details.io_id : ioId;
 
     return {
       ok: verif.exists,
       volcado_id: uuidNormalizado,
       version: volcado.version_aprobada ? Number(volcado.version_aprobada) : undefined,
       sha256: volcado.sha256_aprobado || undefined,
-      io_id: ioId,
+      io_id: ioIdCanonico,
       metodo_ingesta: "kernel_directo (/api/v1/ingesta)",
       estado_volcado: "ingerido",
       idempotent: true,
@@ -188,7 +196,8 @@ export async function ejecutarPrimerVinculo(opciones: OpcionesPrimerVinculo): Pr
   }
 
   const versionAprobada = Number(volcado.version_aprobada);
-  const ioIdEsperado = calcularIoId(uuidNormalizado, versionAprobada);
+  const ioIdPostgres = calcularIoId(uuidNormalizado, versionAprobada);
+
   const versiones = await listarVersiones(uuidNormalizado);
   const filaVersion = (versiones as Array<{ version: number | string; texto: string | null; sha256: string | null }>).find(
     (v) => Number(v.version) === versionAprobada
@@ -291,7 +300,11 @@ export async function ejecutarPrimerVinculo(opciones: OpcionesPrimerVinculo): Pr
   };
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 60000);
+  const timeoutMs = Number.parseInt(process.env.KHORA_INGEST_TIMEOUT_MS ?? "300000", 10);
+  if (!Number.isFinite(timeoutMs) || timeoutMs < 1000) {
+    throw new Error("KHORA_INGEST_TIMEOUT_MS inválido");
+  }
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
     const apiResponse = await fetch(`${kernelUrl}/api/v1/ingesta`, {
@@ -314,16 +327,9 @@ export async function ejecutarPrimerVinculo(opciones: OpcionesPrimerVinculo): Pr
     }
 
     if (apiResponse.ok) {
-      const ioId = typeof data.io_id === "string" ? data.io_id : ioIdEsperado;
-      if (ioId !== ioIdEsperado) {
-        return {
-          ok: false,
-          volcado_id: uuidNormalizado,
-          estado_volcado: volcado.estado,
-          timestamp: ts,
-          error: `Conflicto de identidad: el kernel devolvió io_id ${ioId}, esperado ${ioIdEsperado}`,
-        };
-      }
+      const ioId = typeof data.io_id === "string" && data.io_id.trim().length > 0
+        ? data.io_id.trim()
+        : null;
       const esIdempotente = Boolean(data.idempotent);
 
       await db.query(
@@ -337,7 +343,7 @@ export async function ejecutarPrimerVinculo(opciones: OpcionesPrimerVinculo): Pr
             ultimo_error = NULL
           WHERE id = $2
         `,
-        [ioId, uuidNormalizado]
+        [ioIdPostgres, uuidNormalizado]
       );
 
       await db.query(
@@ -385,17 +391,22 @@ export async function ejecutarPrimerVinculo(opciones: OpcionesPrimerVinculo): Pr
       // Verificación independiente en Neo4j Aura
       let verif;
       try {
-        verif = await verificarCircuitoCompletoNeo4j(ioId);
+        verif = await verificarNeo4j(ioId, {
+          volcadoId: uuidNormalizado,
+          version: versionAprobada,
+          sha256: shaServidor,
+        });
       } catch (err: any) {
         verif = { exists: false, node_count: 0, relation_count: 0, details: null };
       }
+      const ioIdCanonico = typeof verif.details?.io_id === "string" ? verif.details.io_id : ioId;
 
       return {
         ok: verif.exists,
         volcado_id: uuidNormalizado,
         version: versionAprobada,
         sha256: shaServidor,
-        io_id: ioId,
+        io_id: ioIdCanonico,
         metodo_ingesta: "kernel_directo (/api/v1/ingesta)",
         estado_volcado: "ingerido",
         idempotent: esIdempotente,

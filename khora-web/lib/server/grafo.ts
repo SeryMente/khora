@@ -384,7 +384,10 @@ export interface VerificacionCircuitoResult {
   } | null;
 }
 
-export async function verificarCircuitoCompletoNeo4j(ioId: string): Promise<VerificacionCircuitoResult> {
+export async function verificarCircuitoCompletoNeo4j(
+  ioId: string | null,
+  identidad?: { volcadoId?: string | null; version?: number | null; sha256?: string | null }
+): Promise<VerificacionCircuitoResult> {
   const uri = process.env.NEO4J_URI;
   const user = process.env.NEO4J_USER;
   const password = process.env.NEO4J_PASSWORD;
@@ -404,11 +407,24 @@ export async function verificarCircuitoCompletoNeo4j(ioId: string): Promise<Veri
   try {
     const session = driverInstance.session();
     try {
+      const usaIdentidadPersistida = Boolean(
+        identidad?.volcadoId && identidad.version !== null && identidad.version !== undefined && identidad.sha256
+      );
       const ioRes = await session.run(
-        `MATCH (io:InformationObject {io_id: $ioId})
-         RETURN io.volcado_id AS volcado_id, io.version AS version, io.sha256 AS sha256
-         LIMIT 1`,
-        { ioId }
+        usaIdentidadPersistida
+          ? `MATCH (io:InformationObject {volcado_id: $volcadoId, version: $version, sha256: $sha256})
+             RETURN io.io_id AS io_id, io.volcado_id AS volcado_id, io.version AS version, io.sha256 AS sha256
+             LIMIT 1`
+          : `MATCH (io:InformationObject {io_id: $ioId})
+             RETURN io.io_id AS io_id, io.volcado_id AS volcado_id, io.version AS version, io.sha256 AS sha256
+             LIMIT 1`,
+        usaIdentidadPersistida
+          ? {
+              volcadoId: identidad?.volcadoId ?? null,
+              version: identidad?.version ?? null,
+              sha256: identidad?.sha256 ?? null,
+            }
+          : { ioId }
       );
 
       if (ioRes.records.length === 0) {
@@ -429,6 +445,7 @@ export async function verificarCircuitoCompletoNeo4j(ioId: string): Promise<Veri
       }
 
       const rec = ioRes.records[0];
+      const ioIdCanonico = String(rec.get("io_id") || ioId || "");
       const volcado_id = rec.get("volcado_id") || null;
       const versionRaw = rec.get("version");
       const version = versionRaw !== null && versionRaw !== undefined
@@ -440,7 +457,7 @@ export async function verificarCircuitoCompletoNeo4j(ioId: string): Promise<Veri
         `MATCH (:InformationObject {io_id: $ioId})-[m:MENTIONS {io_id: $ioId}]->(e:Entity)
          RETURN count(e) AS node_count,
                 count(CASE WHEN e.needs_review = true THEN 1 END) AS needs_review_count`,
-        { ioId }
+        { ioId: ioIdCanonico }
       );
       const node_count = Number(nodesRes.records[0].get("node_count") || 0);
       const needs_review_count = Number(nodesRes.records[0].get("needs_review_count") || 0);
@@ -448,7 +465,7 @@ export async function verificarCircuitoCompletoNeo4j(ioId: string): Promise<Veri
       const relsRes = await session.run(
         `MATCH ()-[r:RELATION {io_id: $ioId}]->()
          RETURN count(r) AS relation_count`,
-        { ioId }
+        { ioId: ioIdCanonico }
       );
       const relation_count = Number(relsRes.records[0].get("relation_count") || 0);
 
@@ -456,8 +473,8 @@ export async function verificarCircuitoCompletoNeo4j(ioId: string): Promise<Veri
         fase: "grafo",
         eventId: "GRA-002",
         estado: "OK",
-        mensaje: `Verificación en Neo4j exitosa para io_id ${ioId}: ${node_count} nodos, ${relation_count} relaciones`,
-        detalle: { ioId, node_count, relation_count, needs_review_count, volcado_id, version, sha256 },
+        mensaje: `Verificación en Neo4j exitosa para io_id ${ioIdCanonico}: ${node_count} nodos, ${relation_count} relaciones`,
+        detalle: { ioId: ioIdCanonico, node_count, relation_count, needs_review_count, volcado_id, version, sha256 },
         volcadoId: volcado_id,
         version,
         sha256,
@@ -470,7 +487,7 @@ export async function verificarCircuitoCompletoNeo4j(ioId: string): Promise<Veri
         relation_count,
         needs_review_count,
         details: {
-          io_id: ioId,
+          io_id: ioIdCanonico,
           volcado_id,
           version,
           sha256

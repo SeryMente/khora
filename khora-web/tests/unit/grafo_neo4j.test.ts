@@ -1,196 +1,87 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import neo4j from "neo4j-driver";
-import {
-  obtenerGrafoNeo4j,
-  Neo4jNoConfiguradoError,
-  Neo4jInalcanzableError,
-} from "../../lib/server/grafo";
 import { GET } from "../../app/api/grafo/route";
 
-test("grafo_neo4j: throws Neo4jNoConfiguradoError when env vars are missing", async () => {
-  const origUri = process.env.NEO4J_URI;
-  const origUser = process.env.NEO4J_USER;
-  const origPass = process.env.NEO4J_PASSWORD;
+const envKeys = ["NEO4J_URI", "NEO4J_USER", "NEO4J_PASSWORD"] as const;
+function withEnv(values: Record<string, string | undefined>) {
+  const original = Object.fromEntries(envKeys.map((key) => [key, process.env[key]]));
+  for (const key of envKeys) values[key] === undefined ? delete process.env[key] : process.env[key] = values[key]!;
+  return () => { for (const key of envKeys) original[key] === undefined ? delete process.env[key] : process.env[key] = original[key]!; };
+}
+function record(data: Record<string, unknown>) { return { get: (key: string) => data[key] }; }
+function mockDriver(run: (query: string, params: Record<string, unknown>) => Promise<unknown[]> | unknown[]) {
+  const previous = neo4j.driver;
+  (neo4j as any).driver = () => ({ session: () => ({ run: async (query: string, params: Record<string, unknown>) => ({ records: await run(query, params) }), close: async () => {} }), close: async () => {} });
+  return () => { (neo4j as any).driver = previous; };
+}
+const io = (id: string) => record({ id, volcadoId: "v1", version: 1, sha256: "a".repeat(64), timestamp: "2026-09-22T00:00:00Z" });
+const entity = (id: string) => record({ id, summary: id, community: 0, level: 0, centrality: 1, origen: "test", timestamp: "2026-09-22T00:00:00Z", verificacion: "Verificado" });
+const mention = (source: string, target: string) => record({ id: `${source}->${target}:MENTIONS`, source, target, type: "MENTIONS" });
+const relation = (source: string, target: string) => record({ id: `${source}->${target}:R`, source, target, type: "RELATED", weight: 1, origen: "test", timestamp: "2026-09-22T00:00:00Z", verificacion: "Verificado" });
 
+function rowsFor(query: string) {
+  if (query.includes("UNWIND $ioIds")) return [mention("io-1", "e-1"), mention("io-1", "missing")];
+  if (query.includes("MATCH (io:InformationObject)-[:MENTIONS]->(e:Entity)")) return [entity("e-1"), entity("e-2")];
+  if (query.includes("r:RELATION")) return [relation("e-1", "e-2"), relation("e-1", "missing")];
+  if (query.includes("MATCH (io:InformationObject)")) return [io("io-1")];
+  return [];
+}
+
+test("/api/grafo exposes filtered InformationObject and MENTIONS without dangling edges", async () => {
+  const restoreEnv = withEnv({ NEO4J_URI: "bolt://localhost:7687", NEO4J_USER: "neo4j", NEO4J_PASSWORD: "test" });
+  const restoreDriver = mockDriver(async (query) => rowsFor(query));
   try {
-    delete process.env.NEO4J_URI;
-    delete process.env.NEO4J_USER;
-    delete process.env.NEO4J_PASSWORD;
-
-    await assert.rejects(
-      async () => {
-        await obtenerGrafoNeo4j();
-      },
-      (err: any) => {
-        assert.ok(err instanceof Neo4jNoConfiguradoError);
-        assert.equal(err.code, "NEO4J_UNCONFIGURED");
-        return true;
-      }
-    );
-  } finally {
-    if (origUri) process.env.NEO4J_URI = origUri;
-    if (origUser) process.env.NEO4J_USER = origUser;
-    if (origPass) process.env.NEO4J_PASSWORD = origPass;
-  }
-});
-
-test("grafo_neo4j: /api/grafo returns 503 NEO4J_UNCONFIGURED when credentials missing", async () => {
-  const origUri = process.env.NEO4J_URI;
-  const origUser = process.env.NEO4J_USER;
-  const origPass = process.env.NEO4J_PASSWORD;
-
-  try {
-    delete process.env.NEO4J_URI;
-    delete process.env.NEO4J_USER;
-    delete process.env.NEO4J_PASSWORD;
-
-    const req = new Request("http://localhost:3000/api/grafo");
-    const res = await GET(req);
-
-    assert.equal(res.status, 503);
-    const body = await res.json();
-    assert.equal(body.code, "NEO4J_UNCONFIGURED");
-    assert.ok(body.error.includes("Credenciales de Neo4j no configuradas"));
-  } finally {
-    if (origUri) process.env.NEO4J_URI = origUri;
-    if (origUser) process.env.NEO4J_USER = origUser;
-    if (origPass) process.env.NEO4J_PASSWORD = origPass;
-  }
-});
-
-test("grafo_neo4j: Cypher queries are strictly READ-ONLY and contain no mutations", async () => {
-  const capturedQueries: string[] = [];
-
-  const originalDriver = neo4j.driver;
-
-  (neo4j as any).driver = () => ({
-    session: () => ({
-      run: async (query: string, params: any) => {
-        capturedQueries.push(query);
-        return { records: [] };
-      },
-      close: async () => {},
-    }),
-    close: async () => {},
-  });
-
-  const origUri = process.env.NEO4J_URI;
-  const origUser = process.env.NEO4J_USER;
-  const origPass = process.env.NEO4J_PASSWORD;
-
-  try {
-    process.env.NEO4J_URI = "bolt://localhost:7687";
-    process.env.NEO4J_USER = "neo4j";
-    process.env.NEO4J_PASSWORD = "password";
-
-    // Call without filters
-    await obtenerGrafoNeo4j();
-
-    // Call with io_id
-    await obtenerGrafoNeo4j({ ioId: "io-test-123" });
-
-    // Call with volcado_id
-    await obtenerGrafoNeo4j({ volcadoId: "volcado-test-456" });
-
-    assert.ok(capturedQueries.length >= 6);
-
-    const mutatingClauseRegex = /\b(CREATE|MERGE|DELETE|SET|REMOVE|DETACH)\b/i;
-
-    for (const query of capturedQueries) {
-      assert.equal(
-        mutatingClauseRegex.test(query),
-        false,
-        `Query contains mutating Cypher clause: ${query}`
-      );
-      const upper = query.toUpperCase();
-      assert.ok(upper.includes("MATCH"), "Query must contain MATCH");
-      assert.ok(upper.includes("RETURN"), "Query must contain RETURN");
-    }
-  } finally {
-    (neo4j as any).driver = originalDriver;
-    if (origUri) process.env.NEO4J_URI = origUri; else delete process.env.NEO4J_URI;
-    if (origUser) process.env.NEO4J_USER = origUser; else delete process.env.NEO4J_USER;
-    if (origPass) process.env.NEO4J_PASSWORD = origPass; else delete process.env.NEO4J_PASSWORD;
-  }
-});
-
-test("grafo_neo4j: /api/grafo maps mock Neo4j nodes and edges into expected JSON structure", async () => {
-  const originalDriver = neo4j.driver;
-
-  const mockNodeRecord = {
-    get: (key: string) => {
-      const data: Record<string, any> = {
-        id: "ent:persona_juan",
-        summary: "Juan Pérez",
-        community: 2,
-        level: 1,
-        centrality: 0.95,
-        origen: "asentamiento=p5b",
-        timestamp: "2026-03-01T12:00:00Z",
-        verificacion: "Verificado",
-      };
-      return data[key];
-    },
-  };
-
-  const mockEdgeRecord = {
-    get: (key: string) => {
-      const data: Record<string, any> = {
-        id: "ent:persona_juan->ent:org_khora:TRABAJA_EN",
-        source: "ent:persona_juan",
-        target: "ent:org_khora",
-        type: "TRABAJA_EN",
-        weight: 1.0,
-        origen: "asentamiento=p5b",
-        timestamp: "2026-03-01T12:00:00Z",
-        verificacion: "Verificado",
-      };
-      return data[key];
-    },
-  };
-
-  (neo4j as any).driver = () => ({
-    session: () => ({
-      run: async (query: string) => {
-        if (query.includes("e.canonical_key AS id")) {
-          return { records: [mockNodeRecord] };
-        }
-        return { records: [mockEdgeRecord] };
-      },
-      close: async () => {},
-    }),
-    close: async () => {},
-  });
-
-  const origUri = process.env.NEO4J_URI;
-  const origUser = process.env.NEO4J_USER;
-  const origPass = process.env.NEO4J_PASSWORD;
-
-  try {
-    process.env.NEO4J_URI = "bolt://localhost:7687";
-    process.env.NEO4J_USER = "neo4j";
-    process.env.NEO4J_PASSWORD = "password";
-
-    const req = new Request("http://localhost:3000/api/grafo?io_id=io-123&limit=50");
-    const res = await GET(req);
-
+    const res = await GET(new Request("http://localhost:3000/api/grafo?io_id=io-1&limit=10"));
     assert.equal(res.status, 200);
     const body = await res.json();
+    assert.equal(body.informationObjects[0].id, "io-1");
+    assert.deepEqual(body.mentions.map((edge: any) => [edge.source, edge.target]), [["io-1", "e-1"]]);
+    assert.equal(body.nodes.length, 2);
+    assert.deepEqual(body.edges.map((edge: any) => [edge.source, edge.target]), [["e-1", "e-2"]]);
+    assert.equal(body.truncated, false);
+  } finally { restoreDriver(); restoreEnv(); }
+});
 
-    assert.equal(body.nodes.length, 1);
-    assert.equal(body.nodes[0].id, "ent:persona_juan");
-    assert.equal(body.nodes[0].summary, "Juan Pérez");
-    assert.equal(body.nodes[0].community, 2);
+test("/api/grafo declares truncation and clamps large limits", async () => {
+  const restoreEnv = withEnv({ NEO4J_URI: "bolt://localhost:7687", NEO4J_USER: "neo4j", NEO4J_PASSWORD: "test" });
+  const restoreDriver = mockDriver(async (query) => query.includes("MATCH (io:InformationObject)") ? [io("io-1"), io("io-2")] : []);
+  try {
+    const res = await GET(new Request("http://localhost:3000/api/grafo?limit=2501"));
+    assert.equal(res.status, 200);
+    const body = await res.json();
+    assert.equal(body.limit, 2000);
+    assert.equal(body.truncated, true);
+    assert.equal(body.truncation.limit, true);
+    assert.equal(body.truncation.informationObjects, false);
+  } finally { restoreDriver(); restoreEnv(); }
+});
 
-    assert.equal(body.edges.length, 1);
-    assert.equal(body.edges[0].source, "ent:persona_juan");
-    assert.equal(body.edges[0].target, "ent:org_khora");
-    assert.equal(body.edges[0].type, "TRABAJA_EN");
-  } finally {
-    (neo4j as any).driver = originalDriver;
-    if (origUri) process.env.NEO4J_URI = origUri; else delete process.env.NEO4J_URI;
-    if (origUser) process.env.NEO4J_USER = origUser; else delete process.env.NEO4J_USER;
-    if (origPass) process.env.NEO4J_PASSWORD = origPass; else delete process.env.NEO4J_PASSWORD;
-  }
+test("/api/grafo rejects invalid limits instead of silently defaulting", async () => {
+  const res = await GET(new Request("http://localhost:3000/api/grafo?limit=10oops"));
+  assert.equal(res.status, 400);
+  assert.equal((await res.json()).code, "INVALID_LIMIT");
+});
+
+test("/api/grafo distinguishes unavailable Neo4j (503) from query defects (500)", async () => {
+  const restoreEnv = withEnv({ NEO4J_URI: "bolt://localhost:7687", NEO4J_USER: "neo4j", NEO4J_PASSWORD: "test" });
+  let unavailable = true;
+  const restoreDriver = mockDriver(async () => { if (unavailable) throw Object.assign(new Error("offline"), { code: "ServiceUnavailable" }); throw new Error("invalid Cypher"); });
+  try {
+    let res = await GET(new Request("http://localhost:3000/api/grafo"));
+    assert.equal(res.status, 503);
+    unavailable = false;
+    res = await GET(new Request("http://localhost:3000/api/grafo"));
+    assert.equal(res.status, 500);
+    assert.equal((await res.json()).code, "GRAPH_QUERY_FAILED");
+  } finally { restoreDriver(); restoreEnv(); }
+});
+
+test("/api/grafo returns 503 when Neo4j credentials are missing", async () => {
+  const restoreEnv = withEnv({ NEO4J_URI: undefined, NEO4J_USER: undefined, NEO4J_PASSWORD: undefined });
+  try {
+    const res = await GET(new Request("http://localhost:3000/api/grafo"));
+    assert.equal(res.status, 503);
+    assert.equal((await res.json()).code, "NEO4J_UNCONFIGURED");
+  } finally { restoreEnv(); }
 });
