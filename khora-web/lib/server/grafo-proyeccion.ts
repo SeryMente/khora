@@ -136,7 +136,7 @@ export async function obtenerProyeccionGrafo(filtros: Filtros = {}): Promise<Pro
       const ioIdSet = new Set(ioIds);
       const nodeIdSet = new Set(nodeIds);
       const mentions: MencionGrafo[] = mentionResult.rows.map((row) => ({
-        id: str(row.get("id")), source: str(row.get("source")), target: str(row.get("target")), type: "MENTIONS",
+        id: str(row.get("id")), source: str(row.get("source")), target: str(row.get("target")), type: "MENTIONS" as const,
       })).filter((edge) => ioIdSet.has(edge.source) && nodeIdSet.has(edge.target));
 
       const edgeQuery = ioId || volcadoId
