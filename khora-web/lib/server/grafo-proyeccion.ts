@@ -1,5 +1,6 @@
 import neo4j from "neo4j-driver";
 import { Neo4jInalcanzableError, Neo4jNoConfiguradoError } from "./grafo";
+import { ejecutarConFallbackNeo4j } from "./neo4j-conexion";
 
 const MAX_LIMIT = 2000;
 const DEFAULT_LIMIT = 500;
@@ -69,10 +70,9 @@ export async function obtenerProyeccionGrafo(filtros: Filtros = {}): Promise<Pro
   const limit = Math.min(solicitados, MAX_LIMIT);
   const ioId = filtros.ioId?.trim() || null;
   const volcadoId = filtros.volcadoId?.trim() || null;
-  const driver = neo4j.driver(uri, neo4j.auth.basic(user, password));
-
   try {
-    const session = driver.session();
+    return await ejecutarConFallbackNeo4j(uri, user, password, async (driver) => {
+      const session = driver.session();
     try {
       const ioQuery = `
         MATCH (io:InformationObject)
@@ -177,14 +177,13 @@ export async function obtenerProyeccionGrafo(filtros: Filtros = {}): Promise<Pro
         nodes, edges, informationObjects, mentions, limit, truncation,
         truncated: Object.values(truncation).some(Boolean),
       };
-    } finally {
-      await session.close();
-    }
+      } finally {
+        await session.close();
+      }
+    });
   } catch (error) {
     if (error instanceof Neo4jNoConfiguradoError || error instanceof Neo4jInalcanzableError) throw error;
     if (esIndisponibilidad(error)) throw new Neo4jInalcanzableError(`Neo4j no está disponible: ${String((error as any)?.message ?? error)}`);
     throw error;
-  } finally {
-    await driver.close();
   }
 }
