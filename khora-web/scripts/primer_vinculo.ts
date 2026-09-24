@@ -57,9 +57,12 @@ function cargarEntorno() {
 
 cargarEntorno();
 
+export type VerificadorNeo4j = typeof verificarCircuitoCompletoNeo4j;
+
 export interface OpcionesPrimerVinculo {
   volcadoId: string;
   dryRun?: boolean;
+  verificarNeo4j?: VerificadorNeo4j;
 }
 
 export interface ReportePrimerVinculo {
@@ -86,7 +89,7 @@ export interface ReportePrimerVinculo {
 }
 
 export async function ejecutarPrimerVinculo(opciones: OpcionesPrimerVinculo): Promise<ReportePrimerVinculo> {
-  const { volcadoId, dryRun = false } = opciones;
+  const { volcadoId, dryRun = false, verificarNeo4j = verificarCircuitoCompletoNeo4j } = opciones;
   const ts = new Date().toISOString();
 
   if (!volcadoId || typeof volcadoId !== "string" || !/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/.test(volcadoId.trim())) {
@@ -139,7 +142,7 @@ export async function ejecutarPrimerVinculo(opciones: OpcionesPrimerVinculo): Pr
     const ioId = String(volcado.io_id || calcularIoId(uuidNormalizado, Number(volcado.version_aprobada)));
     let verif;
     try {
-      verif = await verificarCircuitoCompletoNeo4j(ioId, {
+      verif = await verificarNeo4j(ioId, {
         volcadoId: uuidNormalizado,
         version: Number(volcado.version_aprobada),
         sha256: volcado.sha256_aprobado ? String(volcado.sha256_aprobado) : null,
@@ -388,7 +391,7 @@ export async function ejecutarPrimerVinculo(opciones: OpcionesPrimerVinculo): Pr
       // Verificación independiente en Neo4j Aura
       let verif;
       try {
-        verif = await verificarCircuitoCompletoNeo4j(ioId, {
+        verif = await verificarNeo4j(ioId, {
           volcadoId: uuidNormalizado,
           version: versionAprobada,
           sha256: shaServidor,

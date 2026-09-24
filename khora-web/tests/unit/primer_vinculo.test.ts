@@ -2,7 +2,6 @@
 import "./setup";
 import assert from "assert";
 import test from "node:test";
-import neo4j from "neo4j-driver";
 import { Pool } from "pg";
 import { randomUUID } from "crypto";
 
@@ -59,40 +58,20 @@ test("Primer Vínculo Harness Suite", async (t) => {
   const textoPrueba = "Contenido de prueba para el primer vínculo real.";
   const sha = sha256de(textoPrueba);
 
-  const originalDriver = neo4j.driver;
-  (neo4j as any).driver = () => ({
-    session: () => ({
-      run: async (query: string, params: any) => {
-        if (query.includes("RETURN io.io_id AS io_id")) {
-          return {
-            records: [
-              {
-                get: (key: string) => {
-                  if (key === "io_id") return "io-" + volcadoId;
-                  if (key === "volcado_id") return volcadoId;
-                  if (key === "version") return 1;
-                  if (key === "sha256") return sha;
-                  return null;
-                },
-              },
-            ],
-          };
-        }
-        if (query.includes("count(e) AS node_count")) {
-          return {
-            records: [{ get: (key: string) => key === "needs_review_count" ? 2 : 4 }],
-          };
-        }
-        if (query.includes("count(r) AS relation_count")) {
-          return {
-            records: [{ get: () => 2 }],
-          };
-        }
-        return { records: [] };
-      },
-      close: async () => {},
-    }),
-    close: async () => {},
+  const verificarNeo4j = async (
+    _ioId: string | null,
+    identidad?: { volcadoId?: string | null; version?: number | null; sha256?: string | null }
+  ) => ({
+    exists: true,
+    node_count: 4,
+    relation_count: 2,
+    needs_review_count: 2,
+    details: {
+      io_id: "io-" + volcadoId,
+      volcado_id: identidad?.volcadoId ?? volcadoId,
+      version: identidad?.version ?? 1,
+      sha256: identidad?.sha256 ?? sha,
+    },
   });
 
   const origUri = process.env.NEO4J_URI;
@@ -139,7 +118,7 @@ test("Primer Vínculo Harness Suite", async (t) => {
         }),
       });
 
-      const reporte = await ejecutarPrimerVinculo({ volcadoId, dryRun: false });
+      const reporte = await ejecutarPrimerVinculo({ volcadoId, dryRun: false, verificarNeo4j });
 
       assert.strictEqual(reporte.ok, true);
       assert.strictEqual(reporte.volcado_id, volcadoId);
@@ -175,7 +154,7 @@ test("Primer Vínculo Harness Suite", async (t) => {
       mockDbVolcados[0].estado = "ingerido";
       mockDbVolcados[0].io_id = calcularIoId(volcadoId, 1);
 
-      const reporte = await ejecutarPrimerVinculo({ volcadoId, dryRun: false });
+      const reporte = await ejecutarPrimerVinculo({ volcadoId, dryRun: false, verificarNeo4j });
 
       assert.strictEqual(reporte.ok, true);
       assert.strictEqual(reporte.volcado_id, volcadoId);
@@ -194,7 +173,7 @@ test("Primer Vínculo Harness Suite", async (t) => {
       mockDbVolcados[0].estado = "en_revision";
       mockDbVolcados[0].io_id = null;
 
-      const reporte = await ejecutarPrimerVinculo({ volcadoId, dryRun: false });
+      const reporte = await ejecutarPrimerVinculo({ volcadoId, dryRun: false, verificarNeo4j });
 
       assert.strictEqual(reporte.ok, false);
       assert.strictEqual(reporte.estado_volcado, "en_revision");
@@ -211,7 +190,7 @@ test("Primer Vínculo Harness Suite", async (t) => {
         json: async () => ({ ok: true, neo4j: true }),
       });
 
-      const reporte = await ejecutarPrimerVinculo({ volcadoId, dryRun: true });
+      const reporte = await ejecutarPrimerVinculo({ volcadoId, dryRun: true, verificarNeo4j });
 
       assert.strictEqual(reporte.ok, true);
       assert.strictEqual(reporte.volcado_id, volcadoId);
@@ -237,7 +216,7 @@ test("Primer Vínculo Harness Suite", async (t) => {
         json: async () => ({ error: "Internal Error in Kernel Python" }),
       });
 
-      const reporte = await ejecutarPrimerVinculo({ volcadoId, dryRun: false });
+      const reporte = await ejecutarPrimerVinculo({ volcadoId, dryRun: false, verificarNeo4j });
 
       assert.strictEqual(reporte.ok, false);
       assert.strictEqual(reporte.estado_volcado, "fallido");
@@ -262,7 +241,7 @@ test("Primer Vínculo Harness Suite", async (t) => {
         json: async () => ({ ok: true, neo4j: false }),
       });
 
-      const reporte = await ejecutarPrimerVinculo({ volcadoId, dryRun: true });
+      const reporte = await ejecutarPrimerVinculo({ volcadoId, dryRun: true, verificarNeo4j });
       assert.strictEqual(reporte.ok, false);
       assert.strictEqual(reporte.error, "Dry-run bloqueado: kernel o Neo4j no están saludables");
     });
@@ -281,7 +260,7 @@ test("Primer Vínculo Harness Suite", async (t) => {
         }),
       });
 
-      const reporte = await ejecutarPrimerVinculo({ volcadoId, dryRun: false });
+      const reporte = await ejecutarPrimerVinculo({ volcadoId, dryRun: false, verificarNeo4j });
       assert.strictEqual(reporte.ok, true);
       assert.strictEqual(reporte.estado_volcado, "ingerido");
       assert.strictEqual(reporte.needs_review_count, 2);
@@ -297,7 +276,7 @@ test("Primer Vínculo Harness Suite", async (t) => {
         json: async () => ({ idempotent: false }),
       });
 
-      const reporte = await ejecutarPrimerVinculo({ volcadoId, dryRun: false });
+      const reporte = await ejecutarPrimerVinculo({ volcadoId, dryRun: false, verificarNeo4j });
       assert.strictEqual(reporte.ok, true);
       assert.strictEqual(reporte.io_id, "io-" + volcadoId);
       const updateQuery = dbQueriesLogged.find((q) => q.sql.includes("UPDATE volcado"));
@@ -305,7 +284,6 @@ test("Primer Vínculo Harness Suite", async (t) => {
       assert.strictEqual(updateQuery.params?.[0], calcularIoId(volcadoId, 1));
     });
   } finally {
-    (neo4j as any).driver = originalDriver;
     if (origUri) process.env.NEO4J_URI = origUri; else delete process.env.NEO4J_URI;
     if (origUser) process.env.NEO4J_USER = origUser; else delete process.env.NEO4J_USER;
     if (origPass) process.env.NEO4J_PASSWORD = origPass; else delete process.env.NEO4J_PASSWORD;
