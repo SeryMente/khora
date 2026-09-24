@@ -21,10 +21,10 @@ const mention = (source: string, target: string) => record({ id: `${source}->${t
 const relation = (source: string, target: string) => record({ id: `${source}->${target}:R`, source, target, type: "RELATED", weight: 1, origen: "test", timestamp: "2026-09-22T00:00:00Z", verificacion: "Verificado" });
 
 function rowsFor(query: string) {
-  if (query.includes("MATCH (io:InformationObject)")) return [io("io-1")];
-  if (query.includes("MATCH (io:InformationObject)-[:MENTIONS]->(e:Entity)")) return [entity("e-1"), entity("e-2")];
   if (query.includes("UNWIND $ioIds")) return [mention("io-1", "e-1"), mention("io-1", "missing")];
+  if (query.includes("MATCH (io:InformationObject)-[:MENTIONS]->(e:Entity)")) return [entity("e-1"), entity("e-2")];
   if (query.includes("r:RELATION")) return [relation("e-1", "e-2"), relation("e-1", "missing")];
+  if (query.includes("MATCH (io:InformationObject)")) return [io("io-1")];
   return [];
 }
 
