@@ -85,3 +85,38 @@ test("/api/grafo returns 503 when Neo4j credentials are missing", async () => {
     assert.equal((await res.json()).code, "NEO4J_UNCONFIGURED");
   } finally { restoreEnv(); }
 });
+
+test("/api/grafo retries routing discovery once through the equivalent direct Bolt URI", async () => {
+  const restoreEnv = withEnv({ NEO4J_URI: "neo4j+s://example.databases.neo4j.io", NEO4J_USER: "neo4j", NEO4J_PASSWORD: "test" });
+  const previous = neo4j.driver;
+  const attemptedUris: string[] = [];
+  (neo4j as any).driver = (uri: string) => {
+    attemptedUris.push(uri);
+    return {
+      session: () => ({
+        run: async (query: string, params: Record<string, unknown>) => {
+          if (uri.startsWith("neo4j+s://")) {
+            throw Object.assign(new Error("Could not perform discovery. No routing servers available."), { code: "ServiceUnavailable" });
+          }
+          return { records: await rowsFor(query) };
+        },
+        close: async () => {},
+      }),
+      close: async () => {},
+    };
+  };
+  try {
+    const res = await GET(new Request("http://localhost:3000/api/grafo?io_id=io-1&limit=10"));
+    assert.equal(res.status, 200);
+    assert.deepEqual(attemptedUris, [
+      "neo4j+s://example.databases.neo4j.io",
+      "bolt+s://example.databases.neo4j.io",
+    ]);
+    const body = await res.json();
+    assert.equal(body.informationObjects[0].id, "io-1");
+    assert.deepEqual(body.mentions.map((edge: any) => [edge.source, edge.target]), [["io-1", "e-1"]]);
+  } finally {
+    (neo4j as any).driver = previous;
+    restoreEnv();
+  }
+});
