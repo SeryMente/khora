@@ -193,6 +193,7 @@ export async function ejecutarPrimerVinculo(opciones: OpcionesPrimerVinculo): Pr
   }
 
   const versionAprobada = Number(volcado.version_aprobada);
+  const ioIdPostgres = calcularIoId(uuidNormalizado, versionAprobada);
 
   const versiones = await listarVersiones(uuidNormalizado);
   const filaVersion = (versiones as Array<{ version: number | string; texto: string | null; sha256: string | null }>).find(
@@ -339,7 +340,7 @@ export async function ejecutarPrimerVinculo(opciones: OpcionesPrimerVinculo): Pr
             ultimo_error = NULL
           WHERE id = $2
         `,
-        [ioId, uuidNormalizado]
+        [ioIdPostgres, uuidNormalizado]
       );
 
       await db.query(
