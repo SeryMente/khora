@@ -8,6 +8,7 @@
   var reconnectTimer = null;
   var reconnectDelay = 500;
   var offscreenReady = false;
+  var captureStopResolver = null;
 
   var DEFAULT_STATE = {
     bridgeStatus: "disconnected",
@@ -222,8 +223,23 @@
 
   async function stopCapture(reason) {
     var before = await readState();
+
     if (before.captureStatus === "recording") {
+      var waitForStop = new Promise(function (resolve) {
+        var settled = false;
+        captureStopResolver = function () {
+          if (settled) return;
+          settled = true;
+          captureStopResolver = null;
+          resolve();
+        };
+        setTimeout(function () {
+          if (captureStopResolver) captureStopResolver();
+        }, 10000);
+      });
+
       try { await sendOffscreen({ command: "stop", reason: reason || "manual" }); } catch (_) {}
+      await waitForStop;
     }
 
     var sessionId = before.armedSessionId;
@@ -315,6 +331,9 @@
             timestamp: message.timestamp || iso()
           });
         } else if (message.type === "KHORA_LIVE_AUDIO_STATUS") {
+          if ((message.status === "stopped" || message.status === "error") && captureStopResolver) {
+            captureStopResolver();
+          }
           writeState({
             captureStatus: message.status || "idle",
             captureError: message.error || null
