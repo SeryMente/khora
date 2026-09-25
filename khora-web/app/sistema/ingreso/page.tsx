@@ -249,13 +249,14 @@ function IngresoContenido() {
     await nuevaSubida;
   }, []);
 
-  const enviarChromeCommand = useCallback((command: "arm" | "stop" | "status") => {
+  const enviarChromeCommand = useCallback((command: "arm" | "stop" | "status", partStartIndex?: number) => {
     if (typeof window === "undefined") return;
     window.postMessage({
       channel: "khora-live-caption-v1",
       direction: "page-to-extension",
       command,
       sessionId: sesionIdRef.current || null,
+      partStartIndex: Math.max(1, Number(partStartIndex || 1)),
     }, "*");
   }, []);
 
@@ -513,13 +514,17 @@ function IngresoContenido() {
     setEditando(false);
     setEstabaDictando(false);
 
-    parteConsecutivaRef.current = partesSubidasRef.current.length + 1;
+    const siguienteParte = partesSubidasRef.current.reduce(
+      (max, item) => Math.max(max, Number(item.parte) || 0),
+      0,
+    ) + 1;
+    parteConsecutivaRef.current = siguienteParte;
     parteTrozosRef.current = [];
     subidaEnCursoRef.current = null;
     inicioRef.current = 0;
     parteInicioRef.current = 0;
 
-    enviarChromeCommand("arm");
+    enviarChromeCommand("arm", siguienteParte);
     setAviso("Sesión preparada. Cambia a la pestaña de Chrome que reproduce el audio y pulsa el icono de Aisthesis para iniciar su captura.");
   }, [enviarChromeCommand]);
 
@@ -753,7 +758,7 @@ function IngresoContenido() {
     setError("");
     setAviso("");
     setReconexiones(0);
-    fuenteEntradaSesionRef.current = "microfono";
+    fuenteEntradaSesionRef.current = null;
     modoEntradaRef.current = "ninguno";
     setModoEntrada("ninguno");
     setChromeCaptionActivo(false);
