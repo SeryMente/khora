@@ -38,10 +38,21 @@ $remote = ([string](Invoke-Gh @('api',('repos/{0}/git/ref/heads/main' -f $Repo),
 if ($remote -ne $mainSha) { throw 'GitHub devolvio SHA inconsistente para main.' }
 
 Write-Host ('KHORA-OK · main ' + $mainSha.Substring(0,12)) -ForegroundColor Cyan
-Write-Host 'Iniciando deploy de main en Vercel...' -ForegroundColor DarkGray
-Invoke-Gh @('workflow','run',$Workflow,'--repo',$Repo,'--ref','main') | Out-Null
-
+Write-Host 'Preparando deploy de main en Vercel...' -ForegroundColor DarkGray
 $beforeRows = @(Invoke-GhJson @('run','list','--repo',$Repo,'--workflow',$Workflow,'--branch','main','--limit','20','--json','databaseId,headSha,status,conclusion,createdAt,url'))
+$run = $beforeRows |
+    Where-Object {
+        $_.headSha -eq $mainSha -and
+        @('queued','in_progress') -contains [string]$_.status
+    } |
+    Sort-Object { [int64]$_.databaseId } -Descending |
+    Select-Object -First 1
+
+if ($null -eq $run) {
+    Write-Host 'No hay deploy activo para este SHA; iniciando workflow_dispatch...' -ForegroundColor DarkGray
+    Invoke-Gh @('workflow','run',$Workflow,'--repo',$Repo,'--ref','main') | Out-Null
+}
+
 $beforeMaxId = ($beforeRows | Where-Object { $_.headSha -eq $mainSha } | ForEach-Object { [int64]$_.databaseId } | Measure-Object -Maximum).Maximum
 if ($null -eq $beforeMaxId) { $beforeMaxId = 0 }
 
