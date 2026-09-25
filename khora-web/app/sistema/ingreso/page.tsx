@@ -90,6 +90,7 @@ function IngresoContenido() {
 
   const sesionIdRef = useRef<string>("");
   const modoEntradaRef = useRef<"ninguno" | "microfono" | "chrome_live_caption">("ninguno");
+  const fuenteEntradaSesionRef = useRef<"microfono" | "chrome_live_caption" | null>(null);
   const parteConsecutivaRef = useRef<number>(1);
   const partesSubidasRef = useRef<{ parte: number; url: string; bytes: number; fuenteAudio?: "microphone" | "chrome_tab"; start_ms?: number; end_ms?: number; duracion_ms?: number }[]>([]);
   const parteTrozosRef = useRef<Blob[]>([]);
@@ -333,17 +334,29 @@ function IngresoContenido() {
         return;
       }
 
-      if (data.event === "audio.chunk" && data.sessionId === sesionIdRef.current && data.buffer instanceof ArrayBuffer) {
-        const blob = new Blob([data.buffer], { type: data.mimeType || "audio/webm" });
-        parteTrozosRef.current.push(blob);
-        trozosRef.current.push(blob);
-        setConAudio(true);
+      if (data.event === "audio.part" && data.sessionId === sesionIdRef.current) {
+        const part = Number(data.part);
+        const bytes = Number(data.bytes || 0);
+        if (!Number.isInteger(part) || part < 1 || !data.url) return;
 
-        const totalSize = parteTrozosRef.current.reduce((sum, chunk) => sum + chunk.size, 0);
-        const elapsed = parteInicioRef.current > 0 ? Date.now() - parteInicioRef.current : 0;
-        if (totalSize >= 2 * 1024 * 1024 || elapsed >= 120 * 1000) {
-          void subirParteActual();
+        if (!partesSubidasRef.current.some((item) =>
+          item.parte === part && item.fuenteAudio === "chrome_tab"
+        )) {
+          partesSubidasRef.current.push({
+            parte,
+            url: String(data.url),
+            bytes,
+            fuenteAudio: "chrome_tab",
+            start_ms: Number(data.startMs || 0),
+            end_ms: Number(data.endMs || 0),
+            duracion_ms: Number(data.duracionMs || 0),
+          });
+          partesSubidasRef.current.sort((a, b) => a.parte - b.parte);
+          setPartesContador(partesSubidasRef.current.length);
+          setBytesAcumulados((total) => total + bytes);
+          setConAudio(true);
         }
+        return;
       }
     };
 
@@ -493,6 +506,7 @@ function IngresoContenido() {
     if (!sesionIdRef.current) sesionIdRef.current = generarSesionId();
 
     modoEntradaRef.current = "chrome_live_caption";
+    fuenteEntradaSesionRef.current = "chrome_live_caption";
     setModoEntrada("chrome_live_caption");
     activoRef.current = true;
     setEstado("dictando");
@@ -520,6 +534,7 @@ function IngresoContenido() {
 
     sesionIdRef.current = generarSesionId();
     modoEntradaRef.current = "microfono";
+    fuenteEntradaSesionRef.current = "microfono";
     setModoEntrada("microfono");
     parteConsecutivaRef.current = 1;
     partesSubidasRef.current = [];
@@ -648,7 +663,7 @@ function IngresoContenido() {
         duracionSeg: duracionRef.current,
         pulidoAplicado: pulidosOk > 0,
         audioPartes: partes.length > 0 ? partes : null,
-        fuenteEntrada: modoEntradaRef.current === "chrome_live_caption" ? "chrome_live_caption" : "microfono",
+        fuenteEntrada: fuenteEntradaSesionRef.current || "microfono",
       };
 
       let rv: Response;
@@ -738,6 +753,7 @@ function IngresoContenido() {
     setError("");
     setAviso("");
     setReconexiones(0);
+    fuenteEntradaSesionRef.current = "microfono";
     modoEntradaRef.current = "ninguno";
     setModoEntrada("ninguno");
     setChromeCaptionActivo(false);
