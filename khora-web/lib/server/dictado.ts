@@ -109,6 +109,7 @@ export type EntradaDictado = {
   usuario?: string | null;
   audioPartes?: AudioParte[] | null;
   estadoTranscripcion?: string | null;
+  fuenteEntrada?: "microfono" | "chrome_live_caption" | null;
 };
 
 export async function registrarParteAudio(params: {
@@ -212,7 +213,7 @@ export async function guardarDictado(entrada: EntradaDictado) {
         entrada.texto.length,
         entrada.titulo ?? null,
         "web",
-        "dictado",
+        entrada.fuenteEntrada === "chrome_live_caption" ? "chrome_live_caption" : "dictado",
         entrada.usuario ?? null,
         "archivado",
         "dictado",
