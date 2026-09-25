@@ -334,12 +334,6 @@
     return false;
   });
 
-  chrome.action.onClicked.addListener(function (tab) {
-    if (self.KHORA_LIVE_CAPTION_ACTION) {
-      Promise.resolve(self.KHORA_LIVE_CAPTION_ACTION(tab)).catch(function () {});
-    }
-  });
-
   self.KHORA_LIVE_CAPTION_ACTION = handleActionClick;
 
   chrome.tabs.onRemoved.addListener(function (tabId) {
