@@ -14,7 +14,7 @@ const ALTERS = [
   "ALTER TABLE volcado ADD COLUMN IF NOT EXISTS audio_partes JSONB",
   "ALTER TABLE volcado ADD COLUMN IF NOT EXISTS session_id TEXT",
   "ALTER TABLE volcado ADD COLUMN IF NOT EXISTS estado_transcripcion TEXT",
-  "ALTER TABLE dictado_audio_parte ADD COLUMN IF NOT EXISTS fuente_audio TEXT DEFAULT $microphone$",
+  "ALTER TABLE dictado_audio_parte ADD COLUMN IF NOT EXISTS fuente_audio TEXT DEFAULT 'microphone'",
 ];
 
 const SESSION_TABLES_SQL = `
