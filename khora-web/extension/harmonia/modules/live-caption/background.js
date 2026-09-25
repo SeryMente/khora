@@ -18,6 +18,7 @@
     armedSessionId: null,
     armedKhoraTabId: null,
     khoraAudioEndpoint: null,
+    nextPartIndex: 1,
     captureStatus: "idle",
     captureTabId: null,
     captureStartedAt: null,
@@ -198,7 +199,7 @@
     broadcast(event);
   }
 
-  async function registerSession(sessionId, khoraTabId) {
+  async function registerSession(sessionId, khoraTabId, nextPartIndex) {
     if (!sessionId) return writeState({ armedSessionId: null, armedKhoraTabId: null, captureStatus: "idle" });
     var khoraAudioEndpoint = null;
     if (khoraTabId) {
@@ -214,6 +215,7 @@
       armedSessionId: sessionId,
       armedKhoraTabId: khoraTabId || null,
       khoraAudioEndpoint: khoraAudioEndpoint,
+      nextPartIndex: Math.max(1, Number(nextPartIndex) || 1),
       captureStatus: "armed",
       captureError: null
     });
@@ -251,7 +253,8 @@
       captureError: null,
       armedSessionId: null,
       armedKhoraTabId: null,
-      khoraAudioEndpoint: null
+      khoraAudioEndpoint: null,
+      nextPartIndex: 1
     });
     broadcast({ type: "capture.status", status: "stopped", reason: reason || "manual", timestamp: iso(), sessionId: sessionId });
     return { sessionId: sessionId, khoraTabId: tabId };
@@ -287,7 +290,8 @@
         streamId: streamId,
         sessionId: state.armedSessionId,
         sourceTabId: tab.id,
-        audioEndpoint: state.khoraAudioEndpoint
+        audioEndpoint: state.khoraAudioEndpoint,
+        startPartIndex: state.nextPartIndex
       });
 
       await writeState({
@@ -357,7 +361,11 @@
       (async function () {
         try {
           if (message.command === "arm") {
-            await registerSession(message.sessionId, sender && sender.tab ? sender.tab.id : null);
+            await registerSession(
+              message.sessionId,
+              sender && sender.tab ? sender.tab.id : null,
+              Number(message.partStartIndex || 1)
+            );
           } else if (message.command === "stop") {
             await stopCapture("session-stopped");
           } else if (message.command === "status") {
