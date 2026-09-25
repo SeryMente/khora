@@ -30,6 +30,8 @@ export async function POST(req: Request) {
 
     const sesionId = forma.get("sesionId");
     const parteStr = forma.get("parte");
+    const fuenteAudioRaw = forma.get("fuenteAudio");
+    const fuenteAudio = fuenteAudioRaw === "chrome_tab" ? "chrome_tab" : "microphone";
 
     let destino: string;
     const isSession =
@@ -66,6 +68,7 @@ export async function POST(req: Request) {
           blobPath: destino,
           bytes: crudo.length,
           sha256,
+          fuenteAudio,
         });
       } catch {
         return NextResponse.json(
@@ -77,6 +80,7 @@ export async function POST(req: Request) {
             partIndex,
             bytes: crudo.length,
             sha256,
+            fuenteAudio,
           },
           { status: 503 },
         );
@@ -88,6 +92,7 @@ export async function POST(req: Request) {
       bytes: crudo.length,
       cifrado: true,
       sha256,
+      fuenteAudio,
     });
   } catch (e) {
     return NextResponse.json(
