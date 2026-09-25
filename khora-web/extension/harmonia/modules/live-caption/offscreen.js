@@ -25,22 +25,47 @@
     return "";
   }
 
-  function cleanup() {
-    try { recorder && recorder.state !== "inactive" && recorder.stop(); } catch (_) {}
-    recorder = null;
+  function resetMediaState() {
     try { stream && stream.getTracks().forEach(function (track) { track.stop(); }); } catch (_) {}
     stream = null;
     try { audioSource && audioSource.disconnect(); } catch (_) {}
     audioSource = null;
     try { audioContext && audioContext.close(); } catch (_) {}
     audioContext = null;
+    recorder = null;
     startedAtMs = 0;
     currentSessionId = null;
     sequence = 0;
   }
 
+  function stopRecording() {
+    return new Promise(function (resolve) {
+      if (!recorder || recorder.state === "inactive") {
+        resetMediaState();
+        resolve();
+        return;
+      }
+
+      var activeRecorder = recorder;
+      var finished = false;
+      var finish = function () {
+        if (finished) return;
+        finished = true;
+        resetMediaState();
+        resolve();
+      };
+
+      activeRecorder.addEventListener("stop", finish, { once: true });
+      try {
+        activeRecorder.stop();
+      } catch (_) {
+        finish();
+      }
+    });
+  }
+
   async function startRecording(message) {
-    cleanup();
+    await stopRecording();
 
     currentSessionId = message.sessionId;
     var constraints = {
@@ -131,7 +156,7 @@
         }).catch(function () {});
       });
     } else if (message.command === "stop") {
-      cleanup();
+      stopRecording().catch(function () {});
     }
   });
 })();
