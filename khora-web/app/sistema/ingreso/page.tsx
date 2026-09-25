@@ -344,7 +344,7 @@ function IngresoContenido() {
           item.parte === part && item.fuenteAudio === "chrome_tab"
         )) {
           partesSubidasRef.current.push({
-            parte,
+            parte: part,
             url: String(data.url),
             bytes,
             fuenteAudio: "chrome_tab",
