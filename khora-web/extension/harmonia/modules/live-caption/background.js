@@ -93,26 +93,27 @@
   }
 
   async function ensureOffscreen() {
-    if (offscreenReady && chrome.runtime.getContexts) {
+    if (chrome.runtime.getContexts) {
       var contexts = await chrome.runtime.getContexts({
         contextTypes: ["OFFSCREEN_DOCUMENT"],
         documentUrls: [chrome.runtime.getURL("modules/live-caption/offscreen.html")]
       });
-      if (contexts && contexts.length) return;
+      if (contexts && contexts.length) {
+        offscreenReady = true;
+        return;
+      }
     }
 
-    if (!offscreenReady || !chrome.runtime.getContexts) {
-      try {
-        await chrome.offscreen.createDocument({
-          url: "modules/live-caption/offscreen.html",
-          reasons: ["USER_MEDIA"],
-          justification: "Capturar y registrar el audio de una pestaña de Chrome durante una sesión de Ingreso de Khora."
-        });
-      } catch (error) {
-        if (!String(error).toLowerCase().includes("already exists")) throw error;
-      }
-      offscreenReady = true;
+    try {
+      await chrome.offscreen.createDocument({
+        url: "modules/live-caption/offscreen.html",
+        reasons: ["USER_MEDIA"],
+        justification: "Capturar y registrar el audio de una pestaña de Chrome durante una sesión de Ingreso de Khora."
+      });
+    } catch (error) {
+      if (!String(error).toLowerCase().includes("already exists")) throw error;
     }
+    offscreenReady = true;
   }
 
   async function sendOffscreen(message) {
