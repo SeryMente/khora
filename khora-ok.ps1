@@ -25,7 +25,7 @@ function Invoke-GhJson {
         throw ('gh fallo: ' + (($output | ForEach-Object { [string]$_ }) -join ' '))
     }
     $json = ($output | ForEach-Object { [string]$_ }) -join [Environment]::NewLine
-    return ($json | ConvertFrom-Json -Depth 20)
+    return ($json | ConvertFrom-Json)
 }
 
 $repoRoot = ([string](Invoke-Gh @('repo','view',$Repo,'--json','nameWithOwner','-q','.nameWithOwner'))).Trim()
