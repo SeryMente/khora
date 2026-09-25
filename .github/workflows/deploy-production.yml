@@ -64,7 +64,7 @@ jobs:
       - name: Deploy to Vercel
         id: vercel_deploy
         run: |
-          DEPLOY_URL=$(npx vercel deploy --prebuilt --prod --token=${VERCEL_TOKEN})
+          DEPLOY_URL=$(npx vercel deploy --prebuilt --prod --archive=tgz --token=${VERCEL_TOKEN})
           echo "DEPLOY_URL=$DEPLOY_URL" >> $GITHUB_ENV
           echo "Vercel Deployment URL: $DEPLOY_URL"
 
