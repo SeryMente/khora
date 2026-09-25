@@ -39,6 +39,7 @@ export async function POST(req: Request) {
       pulidoAplicado: c?.pulidoAplicado === true,
       audioPartes: Array.isArray(c?.audioPartes) ? c.audioPartes : null,
       estadoTranscripcion: c?.estadoTranscripcion ?? null,
+      fuenteEntrada: c?.fuenteEntrada === "chrome_live_caption" ? "chrome_live_caption" : "microfono",
       usuario: session.user.email,
     });
 
