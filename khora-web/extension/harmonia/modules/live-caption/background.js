@@ -15,6 +15,7 @@
     captionActive: false,
     lastCaptionAt: null,
     armedSessionId: null,
+    armedKhoraTabId: null,
     captureStatus: "idle",
     captureTabId: null,
     captureStartedAt: null,
@@ -55,25 +56,29 @@
     });
   }
 
-  function broadcastAudio(buffer, meta) {
-    chrome.tabs.query({}, function (tabs) {
-      (tabs || []).forEach(function (tab) {
-        if (!tab || !tab.id || !KHORA_HOST_RE.test(tab.url || "")) return;
-        var copy = buffer.slice(0);
-        chrome.tabs.sendMessage(tab.id, {
-          type: "KHORA_LIVE_CAPTION_EVENT",
-          event: "audio.chunk",
-          timestamp: meta.timestamp,
-          sequence: meta.sequence,
-          sessionId: meta.sessionId,
-          source: "chrome_tab",
-          startMs: meta.startMs,
-          endMs: meta.endMs,
-          mimeType: meta.mimeType,
-          buffer: copy
-        }).catch(function () {});
-      });
-    });
+  async function broadcastAudio(buffer, meta) {
+    var state = await readState();
+    var targetTabId = state.armedKhoraTabId;
+    if (!targetTabId || state.armedSessionId !== meta.sessionId) return;
+
+    try {
+      var tab = await chrome.tabs.get(targetTabId);
+      if (!tab || !KHORA_HOST_RE.test(tab.url || "")) return;
+
+      var copy = buffer.slice(0);
+      chrome.tabs.sendMessage(targetTabId, {
+        type: "KHORA_LIVE_CAPTION_EVENT",
+        event: "audio.chunk",
+        timestamp: meta.timestamp,
+        sequence: meta.sequence,
+        sessionId: meta.sessionId,
+        source: "chrome_tab",
+        startMs: meta.startMs,
+        endMs: meta.endMs,
+        mimeType: meta.mimeType,
+        buffer: copy
+      }).catch(function () {});
+    } catch (_) {}
   }
 
   function notify(title, message) {
@@ -190,10 +195,11 @@
     broadcast(event);
   }
 
-  async function registerSession(sessionId) {
-    if (!sessionId) return writeState({ armedSessionId: null, captureStatus: "idle" });
+  async function registerSession(sessionId, khoraTabId) {
+    if (!sessionId) return writeState({ armedSessionId: null, armedKhoraTabId: null, captureStatus: "idle" });
     await writeState({
       armedSessionId: sessionId,
+      armedKhoraTabId: khoraTabId || null,
       captureStatus: "armed",
       captureError: null
     });
@@ -202,18 +208,23 @@
   }
 
   async function stopCapture(reason) {
-    try {
-      await sendOffscreen({ command: "stop", reason: reason || "manual" });
-    } catch (_) {}
-    var state = await writeState({
+    var before = await readState();
+    if (before.captureStatus === "recording") {
+      try { await sendOffscreen({ command: "stop", reason: reason || "manual" }); } catch (_) {}
+    }
+
+    var sessionId = before.armedSessionId;
+    var tabId = before.armedKhoraTabId;
+    await writeState({
       captureStatus: "idle",
       captureTabId: null,
       captureStartedAt: null,
       captureError: null,
-      armedSessionId: null
+      armedSessionId: null,
+      armedKhoraTabId: null
     });
-    broadcast({ type: "capture.status", status: "stopped", reason: reason || "manual", timestamp: iso(), sessionId: state.armedSessionId });
-    return state;
+    broadcast({ type: "capture.status", status: "stopped", reason: reason || "manual", timestamp: iso(), sessionId: sessionId });
+    return { sessionId: sessionId, khoraTabId: tabId };
   }
 
   async function handleActionClick(tab) {
@@ -309,7 +320,7 @@
       (async function () {
         try {
           if (message.command === "arm") {
-            await registerSession(message.sessionId);
+            await registerSession(message.sessionId, sender && sender.tab ? sender.tab.id : null);
           } else if (message.command === "stop") {
             await stopCapture("session-stopped");
           } else if (message.command === "status") {
@@ -339,6 +350,7 @@
   chrome.tabs.onRemoved.addListener(function (tabId) {
     readState().then(function (state) {
       if (state.captureTabId === tabId) stopCapture("source-tab-closed").catch(function () {});
+      if (state.armedKhoraTabId === tabId) stopCapture("khora-tab-closed").catch(function () {});
     });
   });
 
