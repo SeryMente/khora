@@ -16,6 +16,7 @@
     lastCaptionAt: null,
     armedSessionId: null,
     armedKhoraTabId: null,
+    khoraAudioEndpoint: null,
     captureStatus: "idle",
     captureTabId: null,
     captureStartedAt: null,
@@ -198,9 +199,20 @@
 
   async function registerSession(sessionId, khoraTabId) {
     if (!sessionId) return writeState({ armedSessionId: null, armedKhoraTabId: null, captureStatus: "idle" });
+    var khoraAudioEndpoint = null;
+    if (khoraTabId) {
+      try {
+        var khoraTab = await chrome.tabs.get(khoraTabId);
+        if (khoraTab && khoraTab.url) {
+          khoraAudioEndpoint = new URL("/api/audio", khoraTab.url).href;
+        }
+      } catch (_) {}
+    }
+
     await writeState({
       armedSessionId: sessionId,
       armedKhoraTabId: khoraTabId || null,
+      khoraAudioEndpoint: khoraAudioEndpoint,
       captureStatus: "armed",
       captureError: null
     });
@@ -222,7 +234,8 @@
       captureStartedAt: null,
       captureError: null,
       armedSessionId: null,
-      armedKhoraTabId: null
+      armedKhoraTabId: null,
+      khoraAudioEndpoint: null
     });
     broadcast({ type: "capture.status", status: "stopped", reason: reason || "manual", timestamp: iso(), sessionId: sessionId });
     return { sessionId: sessionId, khoraTabId: tabId };
@@ -257,7 +270,8 @@
         command: "start",
         streamId: streamId,
         sessionId: state.armedSessionId,
-        sourceTabId: tab.id
+        sourceTabId: tab.id,
+        audioEndpoint: state.khoraAudioEndpoint
       });
 
       await writeState({
@@ -285,18 +299,21 @@
   chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     if (!message || message.target === "khora-live-caption-offscreen") {
       if (message && message.target === "khora-live-caption-offscreen") {
-        if (message.type === "KHORA_LIVE_AUDIO_CHUNK") {
-          var buffer = message.buffer;
-          if (buffer && buffer instanceof ArrayBuffer) {
-            broadcastAudio(buffer, {
-              sessionId: message.sessionId,
-              sequence: message.sequence,
-              timestamp: message.timestamp || iso(),
-              startMs: message.startMs,
-              endMs: message.endMs,
-              mimeType: message.mimeType
-            });
-          }
+        if (message.type === "KHORA_LIVE_AUDIO_PART_STORED") {
+          broadcast({
+            type: "audio.part",
+            status: "stored",
+            sessionId: message.sessionId || null,
+            part: message.part,
+            url: message.url,
+            bytes: message.bytes,
+            sha256: message.sha256 || null,
+            source: "chrome_tab",
+            startMs: message.startMs,
+            endMs: message.endMs,
+            duracionMs: message.duracionMs,
+            timestamp: message.timestamp || iso()
+          });
         } else if (message.type === "KHORA_LIVE_AUDIO_STATUS") {
           writeState({
             captureStatus: message.status || "idle",
