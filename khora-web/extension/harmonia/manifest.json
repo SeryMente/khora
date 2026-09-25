@@ -86,6 +86,9 @@
     "48": "icon48.png",
     "128": "icon128.png"
   },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src ws://127.0.0.1:8788 http://127.0.0.1:8788 https://khora-web.vercel.app http://localhost:3000 http://127.0.0.1:3000"
+  },
   "action": {
     "default_title": "Aisthesis - sombrilla CoMind",
     "default_icon": {
