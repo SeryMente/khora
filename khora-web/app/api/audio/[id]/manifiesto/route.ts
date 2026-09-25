@@ -60,6 +60,7 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
       duracion_ms: number;
       bytes: number;
       sha256: string | null;
+      fuente_audio: "microphone" | "chrome_tab";
       verificado: boolean;
       download_path: string;
     }> = [];
@@ -80,6 +81,7 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
           duracion_ms: durMs,
           bytes,
           sha256: p.sha256 ?? null,
+          fuente_audio: p.fuente_audio === "chrome_tab" ? "chrome_tab" : "microphone",
           verificado: p.estado_verificacion === "verificado",
           download_path: `/api/audio/${volcadoId}/parte/${p.part_index ?? (idx + 1)}`,
         };
@@ -108,6 +110,7 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
             duracion_ms: durMs,
             bytes,
             sha256: p.sha256 ?? null,
+            fuente_audio: p.fuenteAudio === "chrome_tab" ? "chrome_tab" : "microphone",
             verificado: true,
             download_path: `/api/audio/${volcadoId}/parte/${p.parte ?? (idx + 1)}`,
           };
@@ -123,6 +126,7 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
           duracion_ms: durMs,
           bytes: Number(volcado.audio_bytes || 0),
           sha256: null,
+          fuente_audio: "microphone",
           verificado: true,
           download_path: `/api/audio/${volcadoId}/parte/1`,
         },
