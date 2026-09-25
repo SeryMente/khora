@@ -1,7 +1,11 @@
 # EP v1.0.1 — evidencia de validación
 
-**Host Khora:** 7.5.1
+**Host Khora:** 7.5.2
 **Firma:** NX-326m
+
+## Hallazgos post-auditoría — corregidos
+
+- **Corrección de borrado sobre rutas cortas 8.3 en `%TEMP%` (`EP-IN-030`):** En ejecuciones en vivo donde `%TEMP%`/`%TMP%` resuelven a la forma corta 8.3 (ej. `C:\Users\PC13~1\...`), `EP-IN-030` fallaba con `PSArgumentException` (`InvalidArgument`) en `Remove-Item -LiteralPath`. La causa aislada demostró que el proveedor de sistema de archivos de PowerShell tropieza con rutas cortas 8.3, mientras que I/O directo vía .NET (`[IO.File]`, `[IO.Directory]`) y procesos Win32 nativos no presentan inconveniente. Se corrigieron los 3 puntos de limpieza sobre `$env:TEMP` en `scripts/khora/khora.ps1` (`Invoke-KhoraElevation`, `Invoke-KhoraDiskpart` y `Materialize-KhoraRepository`) sustituyendo `Remove-Item` por invocaciones directas a `[IO.File]::Delete` y `[IO.Directory]::Delete` envueltas en bloques `try/catch` silenciosos.
 
 ## Aprobado en auditoría estática Linux
 
