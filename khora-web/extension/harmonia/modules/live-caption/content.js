@@ -16,7 +16,8 @@
     chrome.runtime.sendMessage({
       type: "KHORA_LIVE_CAPTION_COMMAND",
       command: message.command,
-      sessionId: message.sessionId || null
+      sessionId: message.sessionId || null,
+      partStartIndex: Number(message.partStartIndex || 1)
     }).catch(function () {});
   });
 
