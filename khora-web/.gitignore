@@ -51,3 +51,6 @@ playwright/.cache/
 node_modules/
 
 .env*
+
+.vercel
+.env*
