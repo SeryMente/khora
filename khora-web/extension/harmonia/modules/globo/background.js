@@ -1083,7 +1083,7 @@ chrome.runtime.onInstalled.addListener((details)=>{ setupAlarm(); updateBadge(nu
 chrome.runtime.onStartup.addListener(()=>{ setupAlarm(); logEvent("info","Navegador iniciado, alarma activa (telemetria de desarrollo v"+VERSION+")",null,"system").then(()=>flushTelemetry("arranque")); checkAhkDependency("arranque-navegador", true).then(st=>{ if(st && st.ok) runOperationalStartup("arranque-navegador"); else openAhkUi(); }); });
 chrome.alarms.onAlarm.addListener(a=>{ if(a.name === "poll"){ requireAhkReady("alarma-poll").then(ok=>{ if(ok){ runDupCleanupIfPending("alarma"); syncAllTabs("alarma"); } }); } else if(a.name === "tx"){ maybeHeartbeat("latido").then(()=>flushTelemetry("alarma")); } else if(a.name === "ahk"){ checkAhkDependency("alarma", true).then(st=>{ if(st && st.ok) runOperationalStartup("alarma-ahk-ok"); }); } });
 chrome.notifications.onClicked && chrome.notifications.onClicked.addListener((id)=>{ if(id===AHK_NOTIFY_ID) { void openAhkUi(); } else { try{ chrome.runtime.openOptionsPage(); }catch(e){} } });
-chrome.action.onClicked.addListener(()=>{ checkAhkDependency("click-extension", true); openUiTab(); });
+chrome.action.onClicked.addListener((tab)=>{ if(self.KHORA_LIVE_CAPTION_ACTION){ Promise.resolve(self.KHORA_LIVE_CAPTION_ACTION(tab)).then(function(handled){ if(handled)return; checkAhkDependency("click-extension", true); openUiTab(); }).catch(function(){ checkAhkDependency("click-extension", true); openUiTab(); }); } else { checkAhkDependency("click-extension", true); openUiTab(); } });
 
 // v3.10 - puerto keep-alive durante llamadas: mantiene vivo el service worker para que el
 // cronometro y el watchdog sigan procesandose mientras dura la llamada.
