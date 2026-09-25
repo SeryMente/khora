@@ -96,6 +96,8 @@ Después de autenticar GitHub y antes de abrir Visual Studio Code, `EP-IN-080` d
 6. fallar cerrado si `main` cambia durante la secuencia o si el alias no acredita el SHA;
 7. eliminar el archivo local de variables descargado por Vercel y solo entonces restaurar la rama `ep-wip/*`.
 
+La ruta estática `ep-main-live.json` es una prueba técnica de procedencia del despliegue, no contenido de usuario; por ello queda excluida específicamente del matcher de autenticación para que `EP-IN-080` pueda verificarla públicamente, sin abrir acceso anónimo al resto de la aplicación.
+
 Esta publicación es parte constitutiva de la instanciación, no una acción opcional ni un despliegue del trabajo WIP.
 
 ### 3.3 Flujo streamlined y comando sin secreto en el historial
