@@ -44,7 +44,7 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
     let partesDb: any[] = [];
     if (sessionId || volcadoId) {
       const dbPartesRes = await db.query(
-        `SELECT id, part_index, blob_url, blob_path, bytes, sha256, start_ms, end_ms, duracion_ms, estado_verificacion
+        `SELECT id, part_index, blob_url, blob_path, bytes, sha256, fuente_audio, start_ms, end_ms, duracion_ms, estado_verificacion
          FROM dictado_audio_parte
          WHERE session_id = $1 OR volcado_id = $2
          ORDER BY part_index ASC`,
