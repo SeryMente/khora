@@ -40,6 +40,10 @@ export function buildIngresoState(
         ? ""
         : "El sistema Khora procesa las transcripciones manteniendo la veracidad semántica de los volcados orales.",
     estado: scenario === "recording" ? "dictando" : "inactivo",
+    modoEntrada: "ninguno",
+    chromeBridgeEstado: "desconectado",
+    chromeCaptionActivo: false,
+    chromeCapturaEstado: "inactiva",
     editando: scenario === "paused_editing",
     soportado: true,
     escuchando: scenario === "recording",
