@@ -54,6 +54,10 @@ function IngresoContenido() {
   const [conAudio, setConAudio] = useState(false);
   const [escuchando, setEscuchando] = useState(false);
   const [reconexiones, setReconexiones] = useState(0);
+  const [modoEntrada, setModoEntrada] = useState<"ninguno" | "microfono" | "chrome_live_caption">("ninguno");
+  const [chromeBridgeEstado, setChromeBridgeEstado] = useState("desconectado");
+  const [chromeCaptionActivo, setChromeCaptionActivo] = useState(false);
+  const [chromeCapturaEstado, setChromeCapturaEstado] = useState("inactiva");
 
   const [reconciliacionMensaje, setReconciliacionMensaje] = useState("");
 
@@ -85,8 +89,9 @@ function IngresoContenido() {
   const cerrandoEdicionRef = useRef(false);
 
   const sesionIdRef = useRef<string>("");
+  const modoEntradaRef = useRef<"ninguno" | "microfono" | "chrome_live_caption">("ninguno");
   const parteConsecutivaRef = useRef<number>(1);
-  const partesSubidasRef = useRef<{ parte: number; url: string; bytes: number }[]>([]);
+  const partesSubidasRef = useRef<{ parte: number; url: string; bytes: number; fuenteAudio?: "microphone" | "chrome_tab"; start_ms?: number; end_ms?: number; duracion_ms?: number }[]>([]);
   const parteTrozosRef = useRef<Blob[]>([]);
   const parteInicioRef = useRef<number>(0);
   const subidaEnCursoRef = useRef<Promise<void> | null>(null);
@@ -183,15 +188,25 @@ function IngresoContenido() {
 
     const parteActual = parteConsecutivaRef.current;
     parteConsecutivaRef.current += 1;
-    parteInicioRef.current = Date.now();
 
+    const ahoraMs = Date.now();
+    const referenciaInicio = inicioRef.current || ahoraMs;
+    const startMs = Math.max(0, parteInicioRef.current - referenciaInicio);
+    const endMs = Math.max(startMs, ahoraMs - referenciaInicio);
+    parteInicioRef.current = ahoraMs;
+
+    const fuenteAudio = modoEntradaRef.current === "chrome_live_caption" ? "chrome_tab" : "microphone";
     const blob = new Blob(trozosParaSubir, { type: "audio/webm" });
     const sesionId = sesionIdRef.current;
 
     const forma = new FormData();
-    forma.append("audio", blob, `dictado-parte-${parteActual}.webm`);
+    forma.append("audio", blob, fuenteAudio + "-parte-" + parteActual + ".webm");
     forma.append("sesionId", sesionId);
     forma.append("parte", String(parteActual));
+    forma.append("fuenteAudio", fuenteAudio);
+    forma.append("startMs", String(startMs));
+    forma.append("endMs", String(endMs));
+    forma.append("duracionMs", String(Math.max(0, endMs - startMs)));
 
     const ejecutarSubida = async () => {
       try {
@@ -210,15 +225,19 @@ function IngresoContenido() {
             parte: parteActual,
             url: da.url,
             bytes: bytesSubidos,
+            fuenteAudio: fuenteAudio as "microphone" | "chrome_tab",
+            start_ms: startMs,
+            end_ms: endMs,
+            duracion_ms: Math.max(0, endMs - startMs),
           });
           setPartesContador(partesSubidasRef.current.length);
           setBytesAcumulados((total) => total + bytesSubidos);
           setConAudio(true);
         } else {
-          setAviso(`audio parte ${parteActual} no guardada: ${String(da?.detail || "")}`);
+          setAviso("audio parte " + parteActual + " no guardada: " + String(da?.detail || ""));
         }
       } catch (e) {
-        setAviso(`audio parte ${parteActual} no guardada por error: ${String(e)}`);
+        setAviso("audio parte " + parteActual + " no guardada por error: " + String(e));
       }
     };
 
