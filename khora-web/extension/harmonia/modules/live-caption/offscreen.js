@@ -215,7 +215,7 @@
 
     startedAtMs = now();
     partStartedAtMs = startedAtMs;
-    partIndex = 1;
+    partIndex = Math.max(1, Number(message.startPartIndex) || 1);
     partChunks = [];
     partBytes = 0;
     uploadQueue = Promise.resolve();
