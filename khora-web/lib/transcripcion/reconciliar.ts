@@ -10,6 +10,7 @@ export type SegmentoReconciliado = {
   id: string;
   texto: string;
   estado: EstadoSegmento;
+  origen?: "microfono" | "chrome_live_caption";
   modificadoManualmente?: boolean;
   start_ms_global?: number;
   end_ms_global?: number;
