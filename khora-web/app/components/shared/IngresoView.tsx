@@ -8,6 +8,7 @@ export type IngresoViewState = {
   titulo: string;
   texto: string;
   estado: "inactivo" | "dictando";
+  modoEntrada: "ninguno" | "microfono" | "chrome_live_caption";
   editando: boolean;
   soportado: boolean;
   escuchando: boolean;
@@ -33,6 +34,7 @@ export type IngresoViewActions = {
   onTextoChange?: (val: string) => void;
   onGenerarTitulo?: () => void;
   onIniciar?: () => void;
+  onPrepararChrome?: () => void;
   onDetener?: () => void;
   onGuardar?: () => void;
   onRetranscribir?: () => void;
@@ -54,6 +56,7 @@ export function IngresoView({
     titulo,
     texto,
     estado,
+    modoEntrada,
     editando,
     soportado,
     escuchando,
@@ -134,20 +137,36 @@ export function IngresoView({
 
         <div className="flex flex-wrap items-center gap-3">
           {estado === "inactivo" ? (
-            <button
-              data-ui-id="ingreso.btn-iniciar"
-              onClick={() => actions.onIniciar?.()}
-              disabled={!soportado || editando || adjuntandoAudio || retranscribiendo}
-              className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
-              style={{
-                backgroundColor: "var(--khora-accent)",
-                color: "var(--khora-bg)",
-                borderColor: "var(--khora-accent)",
-              }}
-            >
-              <Icons.Mic size={32} strokeWidth={1.75} />
-              Iniciar dictado
-            </button>
+            <>
+              <button
+                data-ui-id="ingreso.btn-iniciar"
+                onClick={() => actions.onIniciar?.()}
+                disabled={!soportado || editando || adjuntandoAudio || retranscribiendo}
+                className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
+                style={{
+                  backgroundColor: "var(--khora-accent)",
+                  color: "var(--khora-bg)",
+                  borderColor: "var(--khora-accent)",
+                }}
+              >
+                <Icons.Mic size={32} strokeWidth={1.75} />
+                Iniciar dictado
+              </button>
+              <button
+                data-ui-id="ingreso.btn-chrome"
+                onClick={() => actions.onPrepararChrome?.()}
+                disabled={editando || adjuntandoAudio || retranscribiendo}
+                className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
+                style={{
+                  backgroundColor: "var(--khora-surface)",
+                  color: "var(--khora-ink)",
+                  borderColor: "var(--khora-border)",
+                }}
+              >
+                <Icons.Chromium size={24} strokeWidth={1.75} />
+                Capturar Chrome
+              </button>
+            </>
           ) : (
             <button
               data-ui-id="ingreso.btn-detener"
@@ -160,7 +179,7 @@ export function IngresoView({
               }}
             >
               <Icons.Pause size={32} strokeWidth={1.75} />
-              Detener
+              {modoEntrada === "chrome_live_caption" ? "Detener captura Chrome" : "Detener dictado"}
             </button>
           )}
 
@@ -227,11 +246,23 @@ export function IngresoView({
           {estado === "dictando" && (
             <span data-ui-id="ingreso.status-listening" className="flex items-center gap-2 text-xs font-semibold" style={{ color: "var(--khora-accent)" }}>
               <Icons.Activity size={32} strokeWidth={1.75} />
-              {escuchando ? "escuchando" : "reconectando..."}
+              {modoEntrada === "chrome_live_caption"
+                ? "Chrome: captura activa / Live Caption en espera de señal"
+                : escuchando ? "escuchando" : "reconectando..."}
             </span>
           )}
         </div>
       </div>
+
+      {modoEntrada === "chrome_live_caption" && (
+        <div data-ui-id="ingreso.banner-chrome" className="p-3 border rounded-none text-sm flex items-start gap-3" style={{ borderColor: "var(--khora-border)", backgroundColor: "var(--khora-surface)", color: "var(--khora-ink)" }}>
+          <Icons.Headphones size={24} strokeWidth={1.75} style={{ color: "var(--khora-accent)" }} className="shrink-0 mt-0.5" />
+          <div>
+            <strong>Entrada Chrome Live Caption.</strong>{" "}
+            El bridge local debe estar ejecutándose. Para guardar el audio de la pestaña, cambia a la pestaña que reproduce el audio y pulsa el icono de Aisthesis; luego vuelve a Khora. La reproducción del audio se conserva.
+          </div>
+        </div>
+      )}
 
       {/* Banner de Edición Activa */}
       {editando && (
@@ -273,7 +304,7 @@ export function IngresoView({
 
       {/* Estadísticas */}
       <p data-ui-id="ingreso.stats" className="text-xs font-medium" style={{ color: "var(--khora-accent)" }}>
-        estado: {estado} / editando: {editando ? "sí" : "no"} / caracteres: {texto.length} / bloques pulidos: {pulidosOk} / bloques sin pulir: {pulidosNo} / audio: {conAudio ? "sí" : "no"} / partes subidas: {partesContador} ({(bytesAcumulados / (1024 * 1024)).toFixed(2)} MB) / reconexiones: {reconexiones}
+        estado: {estado} / modo: {modoEntrada} / editando: {editando ? "sí" : "no"} / caracteres: {texto.length} / bloques pulidos: {pulidosOk} / bloques sin pulir: {pulidosNo} / audio: {conAudio ? "sí" : "no"} / partes subidas: {partesContador} ({(bytesAcumulados / (1024 * 1024)).toFixed(2)} MB) / reconexiones: {reconexiones}
       </p>
 
       {/* Alertas y Mensajes de Retorno */}
