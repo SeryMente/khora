@@ -3,6 +3,9 @@ export type AudioManifestPart = {
   start_ms?: number | null;
   end_ms?: number | null;
   duracion_ms?: number | null;
+  bytes?: number | null;
+  sha256?: string | null;
+  fuente_audio?: "microphone" | "chrome_tab" | null;
   download_path: string;
 };
 
