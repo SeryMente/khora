@@ -169,7 +169,7 @@ export function IngresoView({
                   borderColor: "var(--khora-border)",
                 }}
               >
-                <Icons.Chrome size={24} strokeWidth={1.75} />
+                <Icons.Monitor size={24} strokeWidth={1.75} />
                 Capturar Chrome
               </button>
             </>
