@@ -234,18 +234,6 @@
       sendStatus("error", String(event && event.error || "MediaRecorder error"));
     };
 
-    recorder.onstop = function () {
-      void (async function () {
-        try {
-          await flushPart(true);
-          await uploadQueue;
-          sendStatus("stopped");
-        } catch (error) {
-          sendStatus("error", String(error));
-        }
-      })();
-    };
-
     recorder.start(1000);
   }
 
