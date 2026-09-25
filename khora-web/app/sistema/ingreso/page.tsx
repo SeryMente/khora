@@ -247,6 +247,110 @@ function IngresoContenido() {
     await nuevaSubida;
   }, []);
 
+  const enviarChromeCommand = useCallback((command: "arm" | "stop" | "status") => {
+    if (typeof window === "undefined") return;
+    window.postMessage({
+      channel: "khora-live-caption-v1",
+      direction: "page-to-extension",
+      command,
+      sessionId: sesionIdRef.current || null,
+    }, "*");
+  }, []);
+
+  useEffect(() => {
+    const recibirEventoChrome = (event: MessageEvent) => {
+      if (event.source !== window) return;
+      const data = event.data;
+      if (!data || data.channel !== "khora-live-caption-v1" || data.direction !== "extension-to-page") return;
+
+      if (data.event === "bridge.status") {
+        setChromeBridgeEstado(data.status === "connected" ? "conectado" : String(data.status || "desconectado"));
+        return;
+      }
+
+      if (data.event === "state") {
+        setChromeBridgeEstado(String(data.status || "desconectado"));
+        setChromeCaptionActivo(Boolean(data.captionActive));
+        setChromeCapturaEstado(String(data.captureStatus || "inactiva"));
+        return;
+      }
+
+      if (data.event === "capture.status") {
+        setChromeCapturaEstado(String(data.status || "inactiva"));
+        if (data.status === "recording") {
+          inicioRef.current = Date.now();
+          parteInicioRef.current = inicioRef.current;
+          setConAudio(false);
+          setAviso("Captura de audio de Chrome activa. Puedes volver a Khora; Live Caption seguirá entrando.");
+        }
+        if (data.status === "stopped" || data.status === "error") {
+          void (async () => {
+            if (parteTrozosRef.current.length > 0) await subirParteActual();
+            chromeStopResolverRef.current?.();
+            chromeStopResolverRef.current = null;
+          })();
+        }
+        return;
+      }
+
+      if (data.event === "caption.status") {
+        setChromeCaptionActivo(data.status === "found");
+        return;
+      }
+
+      if (data.event === "caption.segment" && typeof data.text === "string") {
+        const text = data.text.trim();
+        if (!text || modoEntradaRef.current !== "chrome_live_caption") return;
+
+        const current = segmentosRef.current;
+        const previous = current[current.length - 1];
+        let next: SegmentoReconciliado[];
+        if (
+          previous &&
+          previous.estado === "provisional_asr" &&
+          previous.origen === "chrome_live_caption" &&
+          !previous.modificadoManualmente
+        ) {
+          next = [
+            ...current.slice(0, -1),
+            { ...previous, texto: (previous.texto + " " + text).trim() },
+          ];
+        } else {
+          next = [
+            ...current,
+            {
+              id: "chrome-" + String(data.sequence || Date.now()) + "-" + Date.now(),
+              texto: text,
+              estado: "provisional_asr",
+              origen: "chrome_live_caption",
+            },
+          ];
+        }
+        segmentosRef.current = next;
+        setSegmentos(next);
+        setReconciliacionMensaje("Entrada Chrome Live Caption recibida mediante el bridge local.");
+        return;
+      }
+
+      if (data.event === "audio.chunk" && data.sessionId === sesionIdRef.current && data.buffer instanceof ArrayBuffer) {
+        const blob = new Blob([data.buffer], { type: data.mimeType || "audio/webm" });
+        parteTrozosRef.current.push(blob);
+        trozosRef.current.push(blob);
+        setConAudio(true);
+
+        const totalSize = parteTrozosRef.current.reduce((sum, chunk) => sum + chunk.size, 0);
+        const elapsed = parteInicioRef.current > 0 ? Date.now() - parteInicioRef.current : 0;
+        if (totalSize >= 2 * 1024 * 1024 || elapsed >= 120 * 1000) {
+          void subirParteActual();
+        }
+      }
+    };
+
+    window.addEventListener("message", recibirEventoChrome);
+    enviarChromeCommand("status");
+    return () => window.removeEventListener("message", recibirEventoChrome);
+  }, [enviarChromeCommand, subirParteActual]);
+
   const detenerGrabacion = useCallback(() => {
     try { grabRef.current?.stop(); } catch {}
     grabRef.current = null;
@@ -380,6 +484,30 @@ function IngresoContenido() {
     return true;
   }, [estabilizarEmision, detenerGrabacion]);
 
+  const prepararChrome = useCallback(() => {
+    setError("");
+    setAviso("");
+    setResultado("");
+    setReconexiones(0);
+    if (!sesionIdRef.current) sesionIdRef.current = generarSesionId();
+
+    modoEntradaRef.current = "chrome_live_caption";
+    setModoEntrada("chrome_live_caption");
+    activoRef.current = true;
+    setEstado("dictando");
+    setEditando(false);
+    setEstabaDictando(false);
+
+    parteConsecutivaRef.current = partesSubidasRef.current.length + 1;
+    parteTrozosRef.current = [];
+    subidaEnCursoRef.current = null;
+    inicioRef.current = 0;
+    parteInicioRef.current = 0;
+
+    enviarChromeCommand("arm");
+    setAviso("Sesión preparada. Cambia a la pestaña de Chrome que reproduce el audio y pulsa el icono de Aisthesis para iniciar su captura.");
+  }, [enviarChromeCommand]);
+
   const iniciar = useCallback(async () => {
     setError("");
     setAviso("");
@@ -390,6 +518,8 @@ function IngresoContenido() {
     trozosRef.current = [];
 
     sesionIdRef.current = generarSesionId();
+    modoEntradaRef.current = "microfono";
+    setModoEntrada("microfono");
     parteConsecutivaRef.current = 1;
     partesSubidasRef.current = [];
     parteTrozosRef.current = [];
@@ -400,6 +530,8 @@ function IngresoContenido() {
     setPartesContador(0);
     setBytesAcumulados(0);
 
+    modoEntradaRef.current = "microfono";
+    setModoEntrada("microfono");
     activoRef.current = true;
     const arrancado = arrancarReconocedor();
     if (!arrancado) { activoRef.current = false; return; }
@@ -411,6 +543,24 @@ function IngresoContenido() {
   }, [arrancarReconocedor, arrancarGrabacion]);
 
   const detener = useCallback(async () => {
+    if (modoEntradaRef.current === "chrome_live_caption") {
+      activoRef.current = false;
+      setEstado("inactivo");
+      enviarChromeCommand("stop");
+      await new Promise<void>((resolve) => {
+        chromeStopResolverRef.current = resolve;
+        window.setTimeout(() => {
+          chromeStopResolverRef.current = null;
+          resolve();
+        }, 5000);
+      });
+      if (parteTrozosRef.current.length > 0) await subirParteActual();
+      modoEntradaRef.current = "ninguno";
+      setModoEntrada("ninguno");
+      setChromeCapturaEstado("inactiva");
+      return;
+    }
+
     activoRef.current = false;
     if (rearmeRef.current) clearTimeout(rearmeRef.current);
     try { recRef.current?.stop(); } catch {}
@@ -430,7 +580,7 @@ function IngresoContenido() {
       subidaEnCursoRef.current = null;
       setEstado("inactivo");
     }
-  }, [estabilizarEmision, detenerGrabacion, ejecutarTranscripcionAutoritativa]);
+  }, [estabilizarEmision, detenerGrabacion, ejecutarTranscripcionAutoritativa, enviarChromeCommand, subirParteActual]);
 
   const pausarParaEdicionInSitu = useCallback(() => {
     activoRef.current = false;
@@ -565,6 +715,7 @@ function IngresoContenido() {
   };
 
   const limpiar = useCallback(() => {
+    enviarChromeCommand("stop");
     segmentosRef.current = [];
     setSegmentos([]);
     fragmentosRef.current = [];
@@ -581,6 +732,10 @@ function IngresoContenido() {
     setError("");
     setAviso("");
     setReconexiones(0);
+    modoEntradaRef.current = "ninguno";
+    setModoEntrada("ninguno");
+    setChromeCaptionActivo(false);
+    setChromeCapturaEstado("inactiva");
     setTexto("");
     setEditando(false);
     setEstabaDictando(false);
