@@ -18,6 +18,16 @@ function Invoke-Gh {
     return $output
 }
 
+function Invoke-GhJson {
+    param([Parameter(Mandatory=$true)][string[]]$Arguments)
+    $output = @(& gh @Arguments 2>&1)
+    if ($LASTEXITCODE -ne 0) {
+        throw ('gh fallo: ' + (($output | ForEach-Object { [string]$_ }) -join ' '))
+    }
+    $json = ($output | ForEach-Object { [string]$_ }) -join [Environment]::NewLine
+    return ($json | ConvertFrom-Json -Depth 20)
+}
+
 $repoRoot = ([string](Invoke-Gh @('repo','view',$Repo,'--json','nameWithOwner','-q','.nameWithOwner'))).Trim()
 if ($repoRoot -ne $Repo) { throw 'El repositorio GitHub no coincide con SeryMente/khora.' }
 
@@ -35,13 +45,13 @@ Invoke-Gh @('workflow','run',$Workflow,'--repo',$Repo,'--ref','main') | Out-Null
 $run = $null
 for ($attempt = 1; $attempt -le 45; $attempt++) {
     Start-Sleep -Seconds 2
-    $rows = @((Invoke-Gh @('run','list','--repo',$Repo,'--workflow',$Workflow,'--branch','main','--event','workflow_dispatch','--limit','20','--json','databaseId,headSha,status,conclusion,createdAt,url')) | ConvertFrom-Json)
+    $rows = @(Invoke-GhJson @('run','list','--repo',$Repo,'--workflow',$Workflow,'--branch','main','--event','workflow_dispatch','--limit','20','--json','databaseId,headSha,status,conclusion,createdAt,url'))
     $run = $rows |
         Where-Object {
             $_.headSha -eq $mainSha -and
-            ([DateTime]$_.createdAt).ToUniversalTime() -ge $dispatchAt.AddSeconds(-10)
+            ([DateTimeOffset]::Parse([string]$_.createdAt)).UtcDateTime -ge $dispatchAt.AddSeconds(-10)
         } |
-        Sort-Object { [DateTime]$_.createdAt } -Descending |
+        Sort-Object { ([DateTimeOffset]::Parse([string]$_.createdAt)).UtcDateTime } -Descending |
         Select-Object -First 1
     if ($null -ne $run) { break }
 }
