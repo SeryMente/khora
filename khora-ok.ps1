@@ -31,7 +31,6 @@ function Invoke-GhJson {
 $repoRoot = ([string](Invoke-Gh @('repo','view',$Repo,'--json','nameWithOwner','-q','.nameWithOwner'))).Trim()
 if ($repoRoot -ne $Repo) { throw 'El repositorio GitHub no coincide con SeryMente/khora.' }
 
-$dispatchAt = [DateTime]::UtcNow
 $mainSha = ([string](Invoke-Gh @('api',('repos/{0}/commits/main' -f $Repo),'--jq','.sha'))).Trim()
 if ($mainSha -notmatch '^[0-9a-f]{40}$') { throw 'No se pudo fijar un SHA valido de main.' }
 
@@ -42,16 +41,20 @@ Write-Host ('KHORA-OK · main ' + $mainSha.Substring(0,12)) -ForegroundColor Cya
 Write-Host 'Iniciando deploy de main en Vercel...' -ForegroundColor DarkGray
 Invoke-Gh @('workflow','run',$Workflow,'--repo',$Repo,'--ref','main') | Out-Null
 
+$beforeRows = @(Invoke-GhJson @('run','list','--repo',$Repo,'--workflow',$Workflow,'--branch','main','--limit','20','--json','databaseId,headSha,status,conclusion,createdAt,url'))
+$beforeMaxId = ($beforeRows | Where-Object { $_.headSha -eq $mainSha } | ForEach-Object { [int64]$_.databaseId } | Measure-Object -Maximum).Maximum
+if ($null -eq $beforeMaxId) { $beforeMaxId = 0 }
+
 $run = $null
 for ($attempt = 1; $attempt -le 45; $attempt++) {
     Start-Sleep -Seconds 2
-    $rows = @(Invoke-GhJson @('run','list','--repo',$Repo,'--workflow',$Workflow,'--branch','main','--event','workflow_dispatch','--limit','20','--json','databaseId,headSha,status,conclusion,createdAt,url'))
+    $rows = @(Invoke-GhJson @('run','list','--repo',$Repo,'--workflow',$Workflow,'--branch','main','--limit','20','--json','databaseId,headSha,status,conclusion,createdAt,url'))
     $run = $rows |
         Where-Object {
             $_.headSha -eq $mainSha -and
-            ([DateTimeOffset]::Parse([string]$_.createdAt)).UtcDateTime -ge $dispatchAt.AddSeconds(-10)
+            ([int64]$_.databaseId) -gt [int64]$beforeMaxId
         } |
-        Sort-Object { ([DateTimeOffset]::Parse([string]$_.createdAt)).UtcDateTime } -Descending |
+        Sort-Object { [int64]$_.databaseId } -Descending |
         Select-Object -First 1
     if ($null -ne $run) { break }
 }
