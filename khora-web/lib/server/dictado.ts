@@ -14,6 +14,7 @@ const ALTERS = [
   "ALTER TABLE volcado ADD COLUMN IF NOT EXISTS audio_partes JSONB",
   "ALTER TABLE volcado ADD COLUMN IF NOT EXISTS session_id TEXT",
   "ALTER TABLE volcado ADD COLUMN IF NOT EXISTS estado_transcripcion TEXT",
+  "ALTER TABLE dictado_audio_parte ADD COLUMN IF NOT EXISTS fuente_audio TEXT DEFAULT 'microphone'",
 ];
 
 const SESSION_TABLES_SQL = `
@@ -41,6 +42,7 @@ CREATE TABLE IF NOT EXISTS dictado_audio_parte (
     blob_path TEXT,
     bytes INTEGER NOT NULL,
     sha256 TEXT,
+    fuente_audio TEXT NOT NULL DEFAULT 'microphone',
     estado TEXT NOT NULL DEFAULT 'uploaded',
     uploaded_at TIMESTAMPTZ DEFAULT NOW(),
     start_ms INTEGER,
@@ -69,7 +71,7 @@ export async function asegurarColumnasDictado(): Promise<void> {
   try {
     await db.query("SELECT audio_url, audio_bytes, duracion_seg, fuente, pulido_aplicado, audio_partes, session_id, estado_transcripcion FROM volcado LIMIT 0");
     await db.query("SELECT session_id, volcado_id, estado, total_partes, duracion_seg FROM dictado_session LIMIT 0");
-    await db.query("SELECT session_id, volcado_id, part_index, blob_url, blob_path, bytes, sha256, start_ms, end_ms, duracion_ms, estado_verificacion FROM dictado_audio_parte LIMIT 0");
+    await db.query("SELECT session_id, volcado_id, part_index, blob_url, blob_path, bytes, sha256, fuente_audio, start_ms, end_ms, duracion_ms, estado_verificacion FROM dictado_audio_parte LIMIT 0");
     columnasListas = true;
     return;
   } catch {
@@ -90,6 +92,7 @@ export type AudioParte = {
   bytes: number;
   path?: string;
   sha256?: string;
+  fuenteAudio?: "microphone" | "chrome_tab";
   start_ms?: number;
   end_ms?: number;
   duracion_ms?: number;
@@ -106,6 +109,7 @@ export type EntradaDictado = {
   usuario?: string | null;
   audioPartes?: AudioParte[] | null;
   estadoTranscripcion?: string | null;
+  fuenteEntrada?: "microfono" | "chrome_live_caption" | null;
 };
 
 export async function registrarParteAudio(params: {
@@ -115,6 +119,7 @@ export async function registrarParteAudio(params: {
   blobPath?: string;
   bytes: number;
   sha256?: string;
+  fuenteAudio?: "microphone" | "chrome_tab";
   startMs?: number;
   endMs?: number;
   duracionMs?: number;
@@ -133,13 +138,14 @@ export async function registrarParteAudio(params: {
 
     // Registrar/Actualizar parte
     await db.query(
-      `INSERT INTO dictado_audio_parte (session_id, part_index, blob_url, blob_path, bytes, sha256, start_ms, end_ms, duracion_ms)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      `INSERT INTO dictado_audio_parte (session_id, part_index, blob_url, blob_path, bytes, sha256, fuente_audio, start_ms, end_ms, duracion_ms)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
        ON CONFLICT (session_id, part_index) DO UPDATE
        SET blob_url = EXCLUDED.blob_url,
            blob_path = EXCLUDED.blob_path,
            bytes = EXCLUDED.bytes,
            sha256 = EXCLUDED.sha256,
+           fuente_audio = EXCLUDED.fuente_audio,
            start_ms = COALESCE(EXCLUDED.start_ms, dictado_audio_parte.start_ms),
            end_ms = COALESCE(EXCLUDED.end_ms, dictado_audio_parte.end_ms),
            duracion_ms = COALESCE(EXCLUDED.duracion_ms, dictado_audio_parte.duracion_ms),
@@ -151,6 +157,7 @@ export async function registrarParteAudio(params: {
         params.blobPath ?? null,
         params.bytes,
         params.sha256 ?? null,
+        params.fuenteAudio ?? "microphone",
         params.startMs ?? null,
         params.endMs ?? null,
         params.duracionMs ?? null,
@@ -206,7 +213,7 @@ export async function guardarDictado(entrada: EntradaDictado) {
         entrada.texto.length,
         entrada.titulo ?? null,
         "web",
-        "dictado",
+        entrada.fuenteEntrada === "chrome_live_caption" ? "chrome_live_caption" : "dictado",
         entrada.usuario ?? null,
         "archivado",
         "dictado",

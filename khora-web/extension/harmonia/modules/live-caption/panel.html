@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Khora Live Caption</title>
+  <style>
+    body{font:13px system-ui,sans-serif;background:#090d16;color:#f8fafc;padding:18px;max-width:620px}
+    h1{font-size:18px;margin:0 0 8px}
+    p{color:#c7ccd1;line-height:1.5}
+    .box{border:1px solid #2f3745;padding:12px;margin-top:12px}
+    code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+  </style>
+</head>
+<body>
+  <h1>Khora · Live Caption</h1>
+  <p>Este módulo conecta Khora con el bridge local que lee Chrome Live Caption mediante Windows UI Automation y, cuando el usuario lo activa, conserva el audio de la pestaña capturada.</p>
+  <div class="box">
+    <strong>Flujo</strong>
+    <p>Chrome Live Caption → UI Automation → bridge local → extensión → Khora /sistema/ingreso.</p>
+    <p>Audio: <code>chrome.tabCapture</code> → grabación por partes → Khora.</p>
+  </div>
+</body>
+</html>

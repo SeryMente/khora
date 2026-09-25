@@ -44,7 +44,7 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
     let partesDb: any[] = [];
     if (sessionId || volcadoId) {
       const dbPartesRes = await db.query(
-        `SELECT id, part_index, blob_url, blob_path, bytes, sha256, start_ms, end_ms, duracion_ms, estado_verificacion
+        `SELECT id, part_index, blob_url, blob_path, bytes, sha256, fuente_audio, start_ms, end_ms, duracion_ms, estado_verificacion
          FROM dictado_audio_parte
          WHERE session_id = $1 OR volcado_id = $2
          ORDER BY part_index ASC`,
@@ -60,6 +60,7 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
       duracion_ms: number;
       bytes: number;
       sha256: string | null;
+      fuente_audio: "microphone" | "chrome_tab";
       verificado: boolean;
       download_path: string;
     }> = [];
@@ -80,6 +81,7 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
           duracion_ms: durMs,
           bytes,
           sha256: p.sha256 ?? null,
+          fuente_audio: p.fuente_audio === "chrome_tab" ? "chrome_tab" : "microphone",
           verificado: p.estado_verificacion === "verificado",
           download_path: `/api/audio/${volcadoId}/parte/${p.part_index ?? (idx + 1)}`,
         };
@@ -108,6 +110,7 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
             duracion_ms: durMs,
             bytes,
             sha256: p.sha256 ?? null,
+            fuente_audio: p.fuenteAudio === "chrome_tab" ? "chrome_tab" : "microphone",
             verificado: true,
             download_path: `/api/audio/${volcadoId}/parte/${p.parte ?? (idx + 1)}`,
           };
@@ -123,6 +126,7 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
           duracion_ms: durMs,
           bytes: Number(volcado.audio_bytes || 0),
           sha256: null,
+          fuente_audio: "microphone",
           verificado: true,
           download_path: `/api/audio/${volcadoId}/parte/1`,
         },

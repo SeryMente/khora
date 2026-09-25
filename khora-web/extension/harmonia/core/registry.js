@@ -27,4 +27,13 @@ self.AISTHESIS_REGISTRY = [
     background: "modules/todoist/background.js",
     settings: ["TODOIST_NOTION_DB_ID"]
   }
+  ,{
+    id: "live-caption",
+    name: "Khora Live Caption",
+    version: "0.1.0",
+    enabled: true,
+    background: "modules/live-caption/background.js",
+    settings: [],
+    panel: "modules/live-caption/panel.html"
+  }
 ];

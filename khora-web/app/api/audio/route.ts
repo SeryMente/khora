@@ -30,6 +30,14 @@ export async function POST(req: Request) {
 
     const sesionId = forma.get("sesionId");
     const parteStr = forma.get("parte");
+    const fuenteAudioRaw = forma.get("fuenteAudio");
+    const fuenteAudio = fuenteAudioRaw === "chrome_tab" ? "chrome_tab" : "microphone";
+    const startMsRaw = forma.get("startMs");
+    const endMsRaw = forma.get("endMs");
+    const duracionMsRaw = forma.get("duracionMs");
+    const startMs = typeof startMsRaw === "string" && Number.isFinite(Number(startMsRaw)) ? Number(startMsRaw) : undefined;
+    const endMs = typeof endMsRaw === "string" && Number.isFinite(Number(endMsRaw)) ? Number(endMsRaw) : undefined;
+    const duracionMs = typeof duracionMsRaw === "string" && Number.isFinite(Number(duracionMsRaw)) ? Number(duracionMsRaw) : undefined;
 
     let destino: string;
     const isSession =
@@ -66,6 +74,10 @@ export async function POST(req: Request) {
           blobPath: destino,
           bytes: crudo.length,
           sha256,
+          fuenteAudio,
+          startMs,
+          endMs,
+          duracionMs,
         });
       } catch {
         return NextResponse.json(
@@ -77,6 +89,7 @@ export async function POST(req: Request) {
             partIndex,
             bytes: crudo.length,
             sha256,
+            fuenteAudio,
           },
           { status: 503 },
         );
@@ -88,6 +101,7 @@ export async function POST(req: Request) {
       bytes: crudo.length,
       cifrado: true,
       sha256,
+      fuenteAudio,
     });
   } catch (e) {
     return NextResponse.json(

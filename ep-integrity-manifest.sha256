@@ -7,7 +7,7 @@ d896857375fb4de94a7d8bca4ffd06b7ef71163d92d266f935bf3cfa31562ab6  ./.github/work
 3d97ed288bfdaea505f302337d67ff2237b42e0dee8a54a4366b101acb728ecb  ./.github/workflows/auto-revert-on-smoke-fail.yml
 887df5a17f7872919d10f712cb2db9285792e5e25c41738d703691a9231b6b0c  ./.github/workflows/board-orchestrator.yml
 e4a62232e8104f0ff30c7de3b44c3ca08bd7bea59730468eb6e1b71cba801394  ./.github/workflows/ci.yml
-acf7289019e15e8d436f9b3b070f15180ffb2daf7ba6458f8011531619790389  ./.github/workflows/deploy-production.yml
+a4d51a47d84b0f9327d6bea17e728ee147a967f4575e52b037f03399e4b1d7e4  ./.github/workflows/deploy-production.yml
 c4b4525728150cb3b9c640f6383cdd1da4e78402baad0cbd1c26e316e7fef7f7  ./.github/workflows/g4-fronteras.yml
 1397b1454845cbeede376325a7efddf89144a6bcf1420126e468c3cc2a7abf1d  ./.github/workflows/healthcheck-khora-api.yml
 09c4101beceaf9ddc37f9054e0b2f983d22f0d9016e8fadc898b68a269c5d899  ./.github/workflows/ichnos-cobertura.yml
@@ -577,3 +577,5 @@ da48f883dbbb32f23889a472abc82e58dbad79e76640ce3ef0f3fd3e7681f4a8  ./test_puentes
 82aeef6a665be8b9ebee4511d2a0aeb47a1a6497bd80b94bb3dcc3c0335fbefa  ./tools/vscode/extensions.txt
 ec2f00596f643c3181e6f3c6bfb64bb07cf8994f019df013681c886bee0d8b6a  ./tools/vscode/settings.user.json
 0781138d74646a88e45ed0314d18cecb6bcd76d22cbb555740c72013dd8a4e4a  ./update_tests.sh
+8bdccb0b1465a6b996109b4f0ec0157b0e53f0f2d6e16ac033bb15b263ac8a40  ./khora-ok.ps1
+b59633baa23897211cdbf8f690ec6e54cb606d677804aa9e1c0995304f386e3f  ./khora-ok.cmd

@@ -54,6 +54,10 @@ function IngresoContenido() {
   const [conAudio, setConAudio] = useState(false);
   const [escuchando, setEscuchando] = useState(false);
   const [reconexiones, setReconexiones] = useState(0);
+  const [modoEntrada, setModoEntrada] = useState<"ninguno" | "microfono" | "chrome_live_caption">("ninguno");
+  const [chromeBridgeEstado, setChromeBridgeEstado] = useState("desconectado");
+  const [chromeCaptionActivo, setChromeCaptionActivo] = useState(false);
+  const [chromeCapturaEstado, setChromeCapturaEstado] = useState("inactiva");
 
   const [reconciliacionMensaje, setReconciliacionMensaje] = useState("");
 
@@ -85,13 +89,16 @@ function IngresoContenido() {
   const cerrandoEdicionRef = useRef(false);
 
   const sesionIdRef = useRef<string>("");
+  const modoEntradaRef = useRef<"ninguno" | "microfono" | "chrome_live_caption">("ninguno");
+  const fuenteEntradaSesionRef = useRef<"microfono" | "chrome_live_caption" | null>(null);
   const parteConsecutivaRef = useRef<number>(1);
-  const partesSubidasRef = useRef<{ parte: number; url: string; bytes: number }[]>([]);
+  const partesSubidasRef = useRef<{ parte: number; url: string; bytes: number; fuenteAudio?: "microphone" | "chrome_tab"; start_ms?: number; end_ms?: number; duracion_ms?: number }[]>([]);
   const parteTrozosRef = useRef<Blob[]>([]);
   const parteInicioRef = useRef<number>(0);
   const subidaEnCursoRef = useRef<Promise<void> | null>(null);
   const finalizacionAudioRef = useRef<Promise<void> | null>(null);
   const resolverFinalizacionAudioRef = useRef<(() => void) | null>(null);
+  const chromeStopResolverRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     const w = window as any;
@@ -183,15 +190,25 @@ function IngresoContenido() {
 
     const parteActual = parteConsecutivaRef.current;
     parteConsecutivaRef.current += 1;
-    parteInicioRef.current = Date.now();
 
+    const ahoraMs = Date.now();
+    const referenciaInicio = inicioRef.current || ahoraMs;
+    const startMs = Math.max(0, parteInicioRef.current - referenciaInicio);
+    const endMs = Math.max(startMs, ahoraMs - referenciaInicio);
+    parteInicioRef.current = ahoraMs;
+
+    const fuenteAudio = modoEntradaRef.current === "chrome_live_caption" ? "chrome_tab" : "microphone";
     const blob = new Blob(trozosParaSubir, { type: "audio/webm" });
     const sesionId = sesionIdRef.current;
 
     const forma = new FormData();
-    forma.append("audio", blob, `dictado-parte-${parteActual}.webm`);
+    forma.append("audio", blob, fuenteAudio + "-parte-" + parteActual + ".webm");
     forma.append("sesionId", sesionId);
     forma.append("parte", String(parteActual));
+    forma.append("fuenteAudio", fuenteAudio);
+    forma.append("startMs", String(startMs));
+    forma.append("endMs", String(endMs));
+    forma.append("duracionMs", String(Math.max(0, endMs - startMs)));
 
     const ejecutarSubida = async () => {
       try {
@@ -210,15 +227,19 @@ function IngresoContenido() {
             parte: parteActual,
             url: da.url,
             bytes: bytesSubidos,
+            fuenteAudio: fuenteAudio as "microphone" | "chrome_tab",
+            start_ms: startMs,
+            end_ms: endMs,
+            duracion_ms: Math.max(0, endMs - startMs),
           });
           setPartesContador(partesSubidasRef.current.length);
           setBytesAcumulados((total) => total + bytesSubidos);
           setConAudio(true);
         } else {
-          setAviso(`audio parte ${parteActual} no guardada: ${String(da?.detail || "")}`);
+          setAviso("audio parte " + parteActual + " no guardada: " + String(da?.detail || ""));
         }
       } catch (e) {
-        setAviso(`audio parte ${parteActual} no guardada por error: ${String(e)}`);
+        setAviso("audio parte " + parteActual + " no guardada por error: " + String(e));
       }
     };
 
@@ -227,6 +248,123 @@ function IngresoContenido() {
     subidaEnCursoRef.current = nuevaSubida;
     await nuevaSubida;
   }, []);
+
+  const enviarChromeCommand = useCallback((command: "arm" | "stop" | "status", partStartIndex?: number) => {
+    if (typeof window === "undefined") return;
+    window.postMessage({
+      channel: "khora-live-caption-v1",
+      direction: "page-to-extension",
+      command,
+      sessionId: sesionIdRef.current || null,
+      partStartIndex: Math.max(1, Number(partStartIndex || 1)),
+    }, "*");
+  }, []);
+
+  useEffect(() => {
+    const recibirEventoChrome = (event: MessageEvent) => {
+      if (event.source !== window) return;
+      const data = event.data;
+      if (!data || data.channel !== "khora-live-caption-v1" || data.direction !== "extension-to-page") return;
+
+      if (data.event === "bridge.status") {
+        setChromeBridgeEstado(data.status === "connected" ? "conectado" : String(data.status || "desconectado"));
+        return;
+      }
+
+      if (data.event === "state") {
+        setChromeBridgeEstado(String(data.status || "desconectado"));
+        setChromeCaptionActivo(Boolean(data.captionActive));
+        setChromeCapturaEstado(String(data.captureStatus || "inactiva"));
+        return;
+      }
+
+      if (data.event === "capture.status") {
+        setChromeCapturaEstado(String(data.status || "inactiva"));
+        if (data.status === "recording") {
+          inicioRef.current = Date.now();
+          parteInicioRef.current = inicioRef.current;
+          setConAudio(false);
+          setAviso("Captura de audio de Chrome activa. Puedes volver a Khora; Live Caption seguirá entrando.");
+        }
+        if (data.status === "stopped" || data.status === "error") {
+          void (async () => {
+            if (parteTrozosRef.current.length > 0) await subirParteActual();
+            chromeStopResolverRef.current?.();
+            chromeStopResolverRef.current = null;
+          })();
+        }
+        return;
+      }
+
+      if (data.event === "caption.status") {
+        setChromeCaptionActivo(data.status === "found");
+        return;
+      }
+
+      if (data.event === "caption.segment" && typeof data.text === "string") {
+        const text = data.text.trim();
+        if (!text || modoEntradaRef.current !== "chrome_live_caption") return;
+
+        const current = segmentosRef.current;
+        const previous = current[current.length - 1];
+        let next: SegmentoReconciliado[];
+        if (
+          previous &&
+          previous.estado === "provisional_asr" &&
+          previous.origen === "chrome_live_caption" &&
+          !previous.modificadoManualmente
+        ) {
+          next = [
+            ...current.slice(0, -1),
+            { ...previous, texto: (previous.texto + " " + text).trim() },
+          ];
+        } else {
+          next = [
+            ...current,
+            {
+              id: "chrome-" + String(data.sequence || Date.now()) + "-" + Date.now(),
+              texto: text,
+              estado: "provisional_asr",
+              origen: "chrome_live_caption",
+            },
+          ];
+        }
+        segmentosRef.current = next;
+        setSegmentos(next);
+        setReconciliacionMensaje("Entrada Chrome Live Caption recibida mediante el bridge local.");
+        return;
+      }
+
+      if (data.event === "audio.part" && data.sessionId === sesionIdRef.current) {
+        const part = Number(data.part);
+        const bytes = Number(data.bytes || 0);
+        if (!Number.isInteger(part) || part < 1 || !data.url) return;
+
+        if (!partesSubidasRef.current.some((item) =>
+          item.parte === part && item.fuenteAudio === "chrome_tab"
+        )) {
+          partesSubidasRef.current.push({
+            parte: part,
+            url: String(data.url),
+            bytes,
+            fuenteAudio: "chrome_tab",
+            start_ms: Number(data.startMs || 0),
+            end_ms: Number(data.endMs || 0),
+            duracion_ms: Number(data.duracionMs || 0),
+          });
+          partesSubidasRef.current.sort((a, b) => a.parte - b.parte);
+          setPartesContador(partesSubidasRef.current.length);
+          setBytesAcumulados((total) => total + bytes);
+          setConAudio(true);
+        }
+        return;
+      }
+    };
+
+    window.addEventListener("message", recibirEventoChrome);
+    enviarChromeCommand("status");
+    return () => window.removeEventListener("message", recibirEventoChrome);
+  }, [enviarChromeCommand, subirParteActual]);
 
   const detenerGrabacion = useCallback(() => {
     try { grabRef.current?.stop(); } catch {}
@@ -361,6 +499,35 @@ function IngresoContenido() {
     return true;
   }, [estabilizarEmision, detenerGrabacion]);
 
+  const prepararChrome = useCallback(() => {
+    setError("");
+    setAviso("");
+    setResultado("");
+    setReconexiones(0);
+    if (!sesionIdRef.current) sesionIdRef.current = generarSesionId();
+
+    modoEntradaRef.current = "chrome_live_caption";
+    fuenteEntradaSesionRef.current = "chrome_live_caption";
+    setModoEntrada("chrome_live_caption");
+    activoRef.current = true;
+    setEstado("dictando");
+    setEditando(false);
+    setEstabaDictando(false);
+
+    const siguienteParte = partesSubidasRef.current.reduce(
+      (max, item) => Math.max(max, Number(item.parte) || 0),
+      0,
+    ) + 1;
+    parteConsecutivaRef.current = siguienteParte;
+    parteTrozosRef.current = [];
+    subidaEnCursoRef.current = null;
+    inicioRef.current = 0;
+    parteInicioRef.current = 0;
+
+    enviarChromeCommand("arm", siguienteParte);
+    setAviso("Sesión preparada. Cambia a la pestaña de Chrome que reproduce el audio y pulsa el icono de Aisthesis para iniciar su captura.");
+  }, [enviarChromeCommand]);
+
   const iniciar = useCallback(async () => {
     setError("");
     setAviso("");
@@ -371,6 +538,9 @@ function IngresoContenido() {
     trozosRef.current = [];
 
     sesionIdRef.current = generarSesionId();
+    modoEntradaRef.current = "microfono";
+    fuenteEntradaSesionRef.current = "microfono";
+    setModoEntrada("microfono");
     parteConsecutivaRef.current = 1;
     partesSubidasRef.current = [];
     parteTrozosRef.current = [];
@@ -392,6 +562,30 @@ function IngresoContenido() {
   }, [arrancarReconocedor, arrancarGrabacion]);
 
   const detener = useCallback(async () => {
+    if (modoEntradaRef.current === "chrome_live_caption") {
+      activoRef.current = false;
+      setEstado("inactivo");
+      const esperaParo = new Promise<void>((resolve) => {
+        chromeStopResolverRef.current = resolve;
+        window.setTimeout(() => {
+          chromeStopResolverRef.current = null;
+          resolve();
+        }, 5000);
+      });
+      enviarChromeCommand("stop");
+      await esperaParo;
+      if (inicioRef.current > 0) {
+        duracionRef.current = Math.round((Date.now() - inicioRef.current) / 1000);
+      }
+      if (parteTrozosRef.current.length > 0) await subirParteActual();
+      modoEntradaRef.current = "ninguno";
+      setModoEntrada("ninguno");
+      setChromeCapturaEstado("inactiva");
+      return;
+    }
+
+    modoEntradaRef.current = "microfono";
+    setModoEntrada("microfono");
     activoRef.current = false;
     if (rearmeRef.current) clearTimeout(rearmeRef.current);
     try { recRef.current?.stop(); } catch {}
@@ -411,7 +605,7 @@ function IngresoContenido() {
       subidaEnCursoRef.current = null;
       setEstado("inactivo");
     }
-  }, [estabilizarEmision, detenerGrabacion, ejecutarTranscripcionAutoritativa]);
+  }, [estabilizarEmision, detenerGrabacion, ejecutarTranscripcionAutoritativa, enviarChromeCommand, subirParteActual]);
 
   const pausarParaEdicionInSitu = useCallback(() => {
     activoRef.current = false;
@@ -474,6 +668,7 @@ function IngresoContenido() {
         duracionSeg: duracionRef.current,
         pulidoAplicado: pulidosOk > 0,
         audioPartes: partes.length > 0 ? partes : null,
+        fuenteEntrada: fuenteEntradaSesionRef.current || "microfono",
       };
 
       let rv: Response;
@@ -546,6 +741,7 @@ function IngresoContenido() {
   };
 
   const limpiar = useCallback(() => {
+    enviarChromeCommand("stop");
     segmentosRef.current = [];
     setSegmentos([]);
     fragmentosRef.current = [];
@@ -562,6 +758,11 @@ function IngresoContenido() {
     setError("");
     setAviso("");
     setReconexiones(0);
+    fuenteEntradaSesionRef.current = null;
+    modoEntradaRef.current = "ninguno";
+    setModoEntrada("ninguno");
+    setChromeCaptionActivo(false);
+    setChromeCapturaEstado("inactiva");
     setTexto("");
     setEditando(false);
     setEstabaDictando(false);
@@ -581,6 +782,10 @@ function IngresoContenido() {
 
   const iniciarEdicionInSitu = useCallback(() => {
     if (editando || cerrandoEdicionRef.current) return;
+    if (modoEntradaRef.current === "chrome_live_caption" && estado === "dictando") {
+      setAviso("Detén la captura Chrome antes de editar el texto.");
+      return;
+    }
     textoAntesEdicionRef.current = texto;
     const dictadoActivo = estado === "dictando" || activoRef.current;
     estabaDictandoRef.current = dictadoActivo;
@@ -686,6 +891,10 @@ function IngresoContenido() {
         titulo,
         texto,
         estado,
+        modoEntrada,
+        chromeBridgeEstado,
+        chromeCaptionActivo,
+        chromeCapturaEstado,
         editando,
         soportado,
         escuchando,
@@ -710,6 +919,7 @@ function IngresoContenido() {
         onTextoChange: handleTextoChange,
         onGenerarTitulo: generarTituloConIA,
         onIniciar: iniciar,
+        onPrepararChrome: prepararChrome,
         onDetener: detener,
         onGuardar: guardar,
         onAdjuntarClick: () => fileInputRef.current?.click(),

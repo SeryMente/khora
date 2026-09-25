@@ -38,6 +38,14 @@ jobs:
             });
             return response.data.id;
 
+      - name: Stamp exact main provenance
+        shell: bash
+        run: |
+          mkdir -p khora-web/public
+          cat > khora-web/public/ep-main-live.json <<EOF
+          {"schema":"khora-live-main/v1","branch":"main","commitSha":"${GITHUB_SHA}","publishedUtc":"$(date -u +%Y-%m-%dT%H:%M:%SZ)"}
+          EOF
+
       - name: Install Node and Vercel CLI
         uses: actions/setup-node@v4
         with:
@@ -60,8 +68,20 @@ jobs:
           echo "DEPLOY_URL=$DEPLOY_URL" >> $GITHUB_ENV
           echo "Vercel Deployment URL: $DEPLOY_URL"
 
+      - name: Verify exact main provenance
+        shell: bash
+        run: |
+          for attempt in {1..30}; do
+            if curl -fsS "https://khora-web.vercel.app/ep-main-live.json?sha=${GITHUB_SHA}" | jq -e --arg sha "${GITHUB_SHA}" '.branch=="main" and .commitSha==$sha' >/dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Vercel no acredita el SHA exacto de main: ${GITHUB_SHA}"
+          exit 1
+
       - name: Post-deploy smoke check
-        run: curl -f https://khora-web.vercel.app || echo 'smoke warning'
+        run: curl -f https://khora-web.vercel.app
 
       - name: Set Deployment Status (Success)
         if: success()
