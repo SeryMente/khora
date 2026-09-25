@@ -97,6 +97,7 @@ function IngresoContenido() {
   const subidaEnCursoRef = useRef<Promise<void> | null>(null);
   const finalizacionAudioRef = useRef<Promise<void> | null>(null);
   const resolverFinalizacionAudioRef = useRef<(() => void) | null>(null);
+  const chromeStopResolverRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     const w = window as any;
@@ -530,8 +531,6 @@ function IngresoContenido() {
     setPartesContador(0);
     setBytesAcumulados(0);
 
-    modoEntradaRef.current = "microfono";
-    setModoEntrada("microfono");
     activoRef.current = true;
     const arrancado = arrancarReconocedor();
     if (!arrancado) { activoRef.current = false; return; }
@@ -546,14 +545,18 @@ function IngresoContenido() {
     if (modoEntradaRef.current === "chrome_live_caption") {
       activoRef.current = false;
       setEstado("inactivo");
-      enviarChromeCommand("stop");
-      await new Promise<void>((resolve) => {
+      const esperaParo = new Promise<void>((resolve) => {
         chromeStopResolverRef.current = resolve;
         window.setTimeout(() => {
           chromeStopResolverRef.current = null;
           resolve();
         }, 5000);
       });
+      enviarChromeCommand("stop");
+      await esperaParo;
+      if (inicioRef.current > 0) {
+        duracionRef.current = Math.round((Date.now() - inicioRef.current) / 1000);
+      }
       if (parteTrozosRef.current.length > 0) await subirParteActual();
       modoEntradaRef.current = "ninguno";
       setModoEntrada("ninguno");
@@ -561,6 +564,8 @@ function IngresoContenido() {
       return;
     }
 
+    modoEntradaRef.current = "microfono";
+    setModoEntrada("microfono");
     activoRef.current = false;
     if (rearmeRef.current) clearTimeout(rearmeRef.current);
     try { recRef.current?.stop(); } catch {}
@@ -643,6 +648,7 @@ function IngresoContenido() {
         duracionSeg: duracionRef.current,
         pulidoAplicado: pulidosOk > 0,
         audioPartes: partes.length > 0 ? partes : null,
+        fuenteEntrada: modoEntradaRef.current === "chrome_live_caption" ? "chrome_live_caption" : "microfono",
       };
 
       let rv: Response;
@@ -755,6 +761,10 @@ function IngresoContenido() {
 
   const iniciarEdicionInSitu = useCallback(() => {
     if (editando || cerrandoEdicionRef.current) return;
+    if (modoEntradaRef.current === "chrome_live_caption" && estado === "dictando") {
+      setAviso("Detén la captura Chrome antes de editar el texto.");
+      return;
+    }
     textoAntesEdicionRef.current = texto;
     const dictadoActivo = estado === "dictando" || activoRef.current;
     estabaDictandoRef.current = dictadoActivo;
@@ -860,6 +870,7 @@ function IngresoContenido() {
         titulo,
         texto,
         estado,
+        modoEntrada,
         editando,
         soportado,
         escuchando,
@@ -884,6 +895,7 @@ function IngresoContenido() {
         onTextoChange: handleTextoChange,
         onGenerarTitulo: generarTituloConIA,
         onIniciar: iniciar,
+        onPrepararChrome: prepararChrome,
         onDetener: detener,
         onGuardar: guardar,
         onAdjuntarClick: () => fileInputRef.current?.click(),
