@@ -9,6 +9,9 @@ export type IngresoViewState = {
   texto: string;
   estado: "inactivo" | "dictando";
   modoEntrada: "ninguno" | "microfono" | "chrome_live_caption";
+  chromeBridgeEstado: string;
+  chromeCaptionActivo: boolean;
+  chromeCapturaEstado: string;
   editando: boolean;
   soportado: boolean;
   escuchando: boolean;
@@ -57,6 +60,9 @@ export function IngresoView({
     texto,
     estado,
     modoEntrada,
+    chromeBridgeEstado,
+    chromeCaptionActivo,
+    chromeCapturaEstado,
     editando,
     soportado,
     escuchando,
@@ -259,7 +265,10 @@ export function IngresoView({
           <Icons.Headphones size={24} strokeWidth={1.75} style={{ color: "var(--khora-accent)" }} className="shrink-0 mt-0.5" />
           <div>
             <strong>Entrada Chrome Live Caption.</strong>{" "}
-            El bridge local debe estar ejecutándose. Para guardar el audio de la pestaña, cambia a la pestaña que reproduce el audio y pulsa el icono de Aisthesis; luego vuelve a Khora. La reproducción del audio se conserva.
+            Bridge: {chromeBridgeEstado} · Live Caption: {chromeCaptionActivo ? "detectado" : "esperando"} · Audio: {chromeCapturaEstado}.
+            <div style={{ marginTop: 4, opacity: 0.8 }}>
+              Para guardar el audio de la pestaña, cambia a la pestaña que reproduce el audio y pulsa el icono de Aisthesis; luego vuelve a Khora. La reproducción del audio se conserva.
+            </div>
           </div>
         </div>
       )}
