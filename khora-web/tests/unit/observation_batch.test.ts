@@ -1,9 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { ObservationBatchSchema, OBSERVATION_BATCH_SCHEMA_VERSION, buildNdjson } from "../../lib/contracts/observation-batch";
+import { ObservationBatchSchema, OBSERVATION_BATCH_SCHEMA_VERSION, buildNdjson, type ObservationEvent } from "../../lib/contracts/observation-batch";
 
 const uuid="11111111-1111-4111-8111-111111111111";
-const baseEvent={
+const baseEvent: ObservationEvent = {
   schema_version:"2.0",event_uuid:uuid,event_name:"CAPTURE_START",
   scope:"capture",category:"lifecycle",severity:"INFO",outcome:"SUCCESS",
   component:"tab-capture",correlation_id:uuid,sequence:1,session_id:"sess-1",
