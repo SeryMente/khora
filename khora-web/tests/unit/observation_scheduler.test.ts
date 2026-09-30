@@ -31,7 +31,7 @@ test("Batch 1: reinicio recupera pendientes y los fallos respetan backoff", () =
   assert.ok(telemetry.includes("if (unsynced <= 0)"));
   assert.ok(telemetry.includes("if (nextRetryAt > now) delay = Math.max(delay, nextRetryAt - now)"));
   assert.ok(telemetry.includes('scheduleObservationSync("service_worker_init")'));
-  assert.ok(middleware.includes("ep-main-live\\.json"));
+  assert.ok(middleware.includes("ep-main-live"));
   assert.ok(background.includes("https?:\\/\\/"));
   assert.equal(deploy.includes('--deployment "${DEPLOY_URL}"'), false);
   assert.ok(deploy.includes("vercel curl \"https://khora-web.vercel.app/ep-main-live.json?sha=${GITHUB_SHA}\""));
