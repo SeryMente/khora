@@ -14,6 +14,7 @@ export async function GET() {
     token_endpoint: `${config.issuer}/api/oauth/token`,
     code_challenge_methods_supported: ["S256"],
     authorization_response_iss_parameter_supported: true,
+    client_id_metadata_document_supported: true,
     scopes_supported: ["runtime:read", "volcados:read", "offline_access"],
     grant_types_supported: ["authorization_code", "refresh_token"],
     response_types_supported: ["code"],
