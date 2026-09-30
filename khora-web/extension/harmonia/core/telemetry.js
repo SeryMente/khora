@@ -17,6 +17,7 @@ const OBS_SYNC_MAX_WAIT_MS = 30000;
 const OBS_SYNC_BATCH_THRESHOLD = 25;
 const OBS_SYNC_BATCH_MAX_EVENTS = 50;
 const OBSERVATION_BATCH_SCHEMA_VERSION = "2.0";
+let telemetryWriteChain = Promise.resolve();
 
 function generateSessionId() {
   if (self.crypto && self.crypto.randomUUID) return self.crypto.randomUUID();
@@ -204,19 +205,28 @@ self.AISTHESIS_TELEMETRY.logEvent = function (event) {
       sessionId: event.sessionId || currentSessionId
     });
 
-    chrome.storage.local.get(TELEMETRY_STORAGE_KEY, function(result) {
-      var buffer = Array.isArray(result[TELEMETRY_STORAGE_KEY]) ? result[TELEMETRY_STORAGE_KEY] : [];
-      buffer.push(fullEvent);
-      if (buffer.length > MAX_TELEMETRY_EVENTS) buffer = buffer.slice(-MAX_TELEMETRY_EVENTS);
+    telemetryWriteChain = telemetryWriteChain
+      .then(function () {
+        return new Promise(function (resolve) {
+          chrome.storage.local.get(TELEMETRY_STORAGE_KEY, function(result) {
+            var buffer = Array.isArray(result[TELEMETRY_STORAGE_KEY]) ? result[TELEMETRY_STORAGE_KEY] : [];
+            buffer.push(fullEvent);
+            if (buffer.length > MAX_TELEMETRY_EVENTS) buffer = buffer.slice(-MAX_TELEMETRY_EVENTS);
 
-      chrome.storage.local.set({ [TELEMETRY_STORAGE_KEY]: buffer }, function() {
-        if (chrome.runtime.lastError) {
-          console.error("[Telemetry] Failed to save:", chrome.runtime.lastError);
-          return;
-        }
-        if (!fullEvent.suppressObservationSync) scheduleObservationSync("event");
+            chrome.storage.local.set({ [TELEMETRY_STORAGE_KEY]: buffer }, function() {
+              if (chrome.runtime.lastError) {
+                console.error("[Telemetry] Failed to save:", chrome.runtime.lastError);
+              } else if (!fullEvent.suppressObservationSync) {
+                scheduleObservationSync("event");
+              }
+              resolve();
+            });
+          });
+        });
+      })
+      .catch(function (error) {
+        try { console.error("[Telemetry] Error en cola de persistencia:", error); } catch (_) {}
       });
-    });
   } catch (err) {
     console.error("[Telemetry] Error in logEvent:", err);
   }
