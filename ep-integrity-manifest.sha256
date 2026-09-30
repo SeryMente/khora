@@ -4,7 +4,7 @@ d6ad6c75611acbc35b8e25e984b9d0f7501b2dc021c5d10c3351269f01108376  ./.gitattribut
 3d97ed288bfdaea505f302337d67ff2237b42e0dee8a54a4366b101acb728ecb  ./.github/workflows/auto-revert-on-smoke-fail.yml
 887df5a17f7872919d10f712cb2db9285792e5e25c41738d703691a9231b6b0c  ./.github/workflows/board-orchestrator.yml
 e4a62232e8104f0ff30c7de3b44c3ca08bd7bea59730468eb6e1b71cba801394  ./.github/workflows/ci.yml
-5b4b96cb5e3ce06618eb2464bc7a6262acca75d25f7d060bcec52b786ec8cc14  ./.github/workflows/deploy-production.yml
+c05dd3bf638680b58c854b34505ee8660f6bd5769902de30920a1dc77568c5e5  ./.github/workflows/deploy-production.yml
 c4b4525728150cb3b9c640f6383cdd1da4e78402baad0cbd1c26e316e7fef7f7  ./.github/workflows/g4-fronteras.yml
 1397b1454845cbeede376325a7efddf89144a6bcf1420126e468c3cc2a7abf1d  ./.github/workflows/healthcheck-khora-api.yml
 09c4101beceaf9ddc37f9054e0b2f983d22f0d9016e8fadc898b68a269c5d899  ./.github/workflows/ichnos-cobertura.yml
@@ -175,7 +175,7 @@ bde5790ef6c559294b0390d56ebf6a4e96c147a8a2f248a92e8eb6a9d6201ebb  ./kernel/tests
 a61fc475e1708b4db8e2069347bf733441fc68c95bce42c503559f178e7cbd81  ./kernel/tools/RECICLAJE.md
 f635dbebd9ea9d7338063349322f86be346d824adbb15dd3ae35ecf3e35461fc  ./kernel/tools/tests/test_audit.py
 b59633baa23897211cdbf8f690ec6e54cb606d677804aa9e1c0995304f386e3f  ./khora-ok.cmd
-0426c7586f8ac2e4cbfd886b9e72398dbbb77e260c869d6b6828a8f904280831  ./khora-ok.ps1
+a558e2e4395d9312664ed3cd951e5f82dbd7eeeefd213354d62c4ff3683feaf3  ./khora-ok.ps1
 a0d3d06e828751c100188eba6f137527b85fed30f3f4b9c68942c8b66a93bad5  ./khora-web/.env.example
 67343aaa1fbef0b9440e4adfee519385b5fe4abf051b9e2ed3027d664d1e654a  ./khora-web/.gitignore
 593723350f243036fcad9c381a3eef71482daf03925fb8129c891bbec0d8ad0d  ./khora-web/app/.well-known/oauth-authorization-server/route.ts
@@ -309,8 +309,8 @@ f9d7069e71cdf22a3d848b788add603228e45e493d442887ce0b73c0a30f3594  ./khora-web/e2
 428aa6b9c59098665e554cd0ea0280dc08e0ae3d1effd280131f1d39f900f9fe  ./khora-web/extension/harmonia/core/aisthesis.html
 94d737765457b9f521c1cd549ba901b897d2c54bd2cd6fda7ad5a963de35e7a9  ./khora-web/extension/harmonia/core/aisthesis.js
 ca4bd42187dc54b53fda411058acc43c90305ea0b33261a76586869a3cbcc20b  ./khora-web/extension/harmonia/core/registry.js
-b74d6a7968b1aa1d4eed6962ae58fa54742e8b115840d617e4c210e843e47828  ./khora-web/extension/harmonia/core/shell.sw.js
-adcd534dee003d0a897d477bff933f1f08fe18a732c5ffd1268177208f5bf230  ./khora-web/extension/harmonia/core/telemetry.js
+10da5a1cbe9c4eb59b8cc2b8e660265b4b2336bd0cb4de20b2b9ae40e9cc7bfd  ./khora-web/extension/harmonia/core/shell.sw.js
+0681829a1c04815ffcdc0dd135d8f8defdf9f7c8a7a77dba63e53ae502f2ec1d  ./khora-web/extension/harmonia/core/telemetry.js
 f3849f02abfbccf4010b7e9f46bbc2aea18c35a790977fa169f9e6f3c1f522a2  ./khora-web/extension/harmonia/icon128.png
 f321a52b575aace685aa044cffbe61c4a3b20ea3800868e0c3a7ac6e48e4bc93  ./khora-web/extension/harmonia/icon16.png
 95896e8e65add129fea0f9bceebcb44a3e7cdd983caa6e67b6572516d073edec  ./khora-web/extension/harmonia/icon48.png
@@ -352,7 +352,7 @@ d665d7a3e1fc5bdc859650db1b51fcfc402742693eadb707b6dd696d15208bd4  ./khora-web/ex
 a1628f87f9459393c4db1bb4d04735ac213a66d7eaf19fa51060d6b33d345116  ./khora-web/extension/harmonia/modules/globo/module.json
 0246c00ddd3db34d8775f2223e7c632e812b009e7fe7e216c4e544695aa0933c  ./khora-web/extension/harmonia/modules/globo/options.html
 b55c9494c6c9d7169d45d8012405e23fa51e317c6044ef39cb5c2ac64a7f37ac  ./khora-web/extension/harmonia/modules/globo/options.js
-77737bb809cc2281ebc81c32c7dce196a60b82825d0cdc2cbd7762dd2cfd4c3c  ./khora-web/extension/harmonia/modules/live-caption/background.js
+005d106bc4d239315c10f15d9d8453256d6ee31f3fc47833f0bdecb11a082173  ./khora-web/extension/harmonia/modules/live-caption/background.js
 05bba292b7affdf7a39a93ec7195d96b434b54400c804eda696c3b88323cdca0  ./khora-web/extension/harmonia/modules/live-caption/content.js
 43205c71956a84eb9c6254be5f5255106357a236081a32ae9843fae5648f526f  ./khora-web/extension/harmonia/modules/shared/notion-adapter.js
 497fdfa4a80c7105742089086ed53b33bb1b5b7f018ec867e0b8fc41122dba0d  ./khora-web/extension/harmonia/modules/todoist/background.js
@@ -367,7 +367,7 @@ b31d06b4799600b8228c1204c9137cd600879358efb3ca3623a4bf22ee481aab  ./khora-web/ex
 a03808414d520afc6beb5fd39f1119210598a0b879f95852b76c9b702246c7a1  ./khora-web/lib/chain-health.ts
 730178d40a20924fb2d35cf057ffa956b60200d50d798512be66bb06c18e0369  ./khora-web/lib/classifier.ts
 f3f8c4abd61a2272b4c15a7f664b2747121b5b16b5ec67ca74e7cd5003d64dc3  ./khora-web/lib/contracts/InformationObject.ts
-0195467e56f28894e95424b410c740e5cc89cc5d593648c02b233beb1efd1dc0  ./khora-web/lib/contracts/observation-batch.ts
+c9597e78a15084ac788422f2d082b4e7da0635ee113c3629ad841c891318ab74  ./khora-web/lib/contracts/observation-batch.ts
 99f4903cbc1aaf07e58e50253824fb8dbcfedf9a73279747be301836bd55f206  ./khora-web/lib/crypto-local.ts
 9768bae6bf3fc9fd23af4237167c5aaea12637b432fe76472804cfdc897316b7  ./khora-web/lib/crypto.ts
 7d2053e01907f2e17fd91badbf21bd5f4109f831594779a8e8aee925abd9835e  ./khora-web/lib/db.ts
@@ -480,8 +480,8 @@ a470a9a5e3eb0e0830c54e260ee89d0ff06e297d87d849c27f44875b95504360  ./khora-web/te
 5066bc4c64d518f0ae006cbf9a5065bd1ac14a5ad2eddd12857d6b7cfa16328b  ./khora-web/tests/unit/ingesta.test.ts
 5b7eb0c6bf8c40b63ba7cf58602046237cbe8f1004ff015e4c8ee65e7da06a1b  ./khora-web/tests/unit/mcp_oauth.test.ts
 f6b775825039cb25b791e26e6c5e8f1dea99875b7d7177a6e6cea188926b00d2  ./khora-web/tests/unit/oauth.test.ts
-89570094d8190a3a44a1ece7fa028972e56d9ee00cba2e75ddd0e6b846383b73  ./khora-web/tests/unit/observation_batch.test.ts
-ddb32a9b94815a5871fc466b9268d8f454b72e01503fecf5b7b8e040a0b80ba1  ./khora-web/tests/unit/observation_scheduler.test.ts
+6772d14673adead0cda43c1e846808b212921290ad7e4b767f4e75ef612e5109  ./khora-web/tests/unit/observation_batch.test.ts
+65fa66f72f2d2bd66315c0be2660504e90d8fe0922b50dcf436acf2fc759a2ef  ./khora-web/tests/unit/observation_scheduler.test.ts
 c230791252e607f762387754bf4ce1b22b54235d05b129c0f9126bf2c6b32f12  ./khora-web/tests/unit/pipeline.test.ts
 352e94e2b71753804079e992ef045eb54bdf2daa57e4efbb6b366923ce0fe704  ./khora-web/tests/unit/reconciliacion_manual.test.ts
 5e772536efe9a56735e1ee6cf1283606cd19fe771824e6972bc1da6608ff81b0  ./khora-web/tests/unit/review_entrance.test.ts
