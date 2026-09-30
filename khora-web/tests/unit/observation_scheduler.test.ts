@@ -41,7 +41,7 @@ test("Batch 1: reinicio recupera pendientes y los fallos respetan backoff", () =
   assert.ok(manifest.includes('"modules/live-caption/content.js"'));
   assert.ok(manifest.includes('"alarms"'));
   assert.ok(manifest.includes('"https://khora-web.vercel.app/*"'));
-  assert.ok(builder.includes('path.join(webRoot, "extension", "harmonia")'));
+  assert.ok(builder.includes("path.join(webRoot, 'extension', 'harmonia')"));
 });
 
 test("Batch 1: existe un único camino de envío y permite manual + automático", () => {
