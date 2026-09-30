@@ -80,7 +80,16 @@ if ($afterSha -ne $mainSha) {
     throw ('main cambio durante el deploy (' + $mainSha.Substring(0,12) + ' -> ' + $afterSha.Substring(0,12) + '). No se considera valido; ejecuta khora-ok de nuevo.')
 }
 
-$proof = Invoke-RestMethod -Uri ($ProductionUrl + $ProofPath + '?sha=' + $mainSha) -Headers @{ 'Cache-Control'='no-cache'; Pragma='no-cache' } -TimeoutSec 30
+$proofRaw = @(& npx vercel curl ($ProductionUrl + $ProofPath + '?sha=' + $mainSha) 2>&1)
+if ($LASTEXITCODE -ne 0) {
+    throw ('No se pudo consultar la prueba de Vercel: ' + (($proofRaw | ForEach-Object { [string]$_ }) -join ' '))
+}
+$proofText = ($proofRaw | ForEach-Object { [string]$_ }) -join [Environment]::NewLine
+try {
+    $proof = $proofText | ConvertFrom-Json
+} catch {
+    throw ('Vercel devolvio una respuesta que no es JSON: ' + $proofText.Substring(0, [Math]::Min(500, $proofText.Length)))
+}
 if ([string]$proof.branch -ne 'main' -or [string]$proof.commitSha -ne $mainSha) {
     throw 'Vercel no acredita el SHA exacto de main.'
 }
