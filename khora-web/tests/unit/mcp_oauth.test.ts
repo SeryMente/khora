@@ -115,7 +115,7 @@ test("2. MCP_CANONICAL_URL semantics and metadata endpoints consistency", async 
   assert.equal(protectedMeta.resource, "https://khora.example.com/api/mcp");
   assert.ok(!protectedMeta.resource.includes("/api/mcp/api/mcp"));
   assert.deepEqual(protectedMeta.authorization_servers, ["https://khora.example.com"]);
-  assert.deepEqual(protectedMeta.scopes_supported, ["volcados:read"]);
+  assert.deepEqual(protectedMeta.scopes_supported, ["runtime:read", "volcados:read"]);
 
   const authRes = await getAuthServerMetadata();
   const authMeta = await authRes.json();
