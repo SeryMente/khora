@@ -15,6 +15,7 @@ import {
   toolKhoraVersionesVolcado,
 } from "@/lib/server/mcp-tools";
 import { toolKhoraUiReview } from "@/lib/server/mcp-ui-review";
+import { toolKhoraEstadoVivo, toolKhoraEventosRecientes } from "@/lib/server/mcp-observability";
 
 export const runtime = "nodejs";
 
@@ -87,8 +88,8 @@ async function handleMcpRequest(req: NextRequest) {
 
   // Instanciar servidor MCP en modo sin estado
   const mcpServer = new McpServer({
-    name: "khora-mcp-volcados",
-    version: "1.0.0",
+    name: "khora-mcp",
+    version: "1.1.0",
   });
 
   // Herramienta 1: khora_resumen
@@ -183,6 +184,38 @@ async function handleMcpRequest(req: NextRequest) {
     },
     async (args: any) => {
       const res = await toolKhoraUiReview(args);
+      return { content: [{ type: "text", text: JSON.stringify(res, null, 2) }] };
+    }
+  );
+
+  // Herramienta 7: estado vivo de runtime
+  mcpServer.tool(
+    "khora_estado_vivo",
+    "Estado operativo actual de Khora a partir del registro persistente de runtime. Devuelve actividad reciente, sesiones observadas, última observación y fallos recientes. Solo lectura.",
+    {},
+    async () => {
+      const res = await toolKhoraEstadoVivo();
+      return { content: [{ type: "text", text: JSON.stringify(res, null, 2) }] };
+    }
+  );
+
+  // Herramienta 8: eventos recientes de runtime
+  mcpServer.tool(
+    "khora_eventos_recientes",
+    "Lee el flujo reciente de eventos de Khora con filtros por sesión, componente, severidad, resultado, fase, scope y categoría. Solo lectura.",
+    {
+      segundos: z.number().optional().describe("Ventana retrospectiva en segundos (1-86400, default 300)"),
+      limite: z.number().optional().describe("Máximo de eventos (1-200, default 50)"),
+      session_id: z.string().optional().describe("Filtrar por sesión"),
+      component: z.string().optional().describe("Filtrar por componente"),
+      severity: z.enum(["INFO","WARN","ERROR","CRITICAL"]).optional(),
+      outcome: z.enum(["SUCCESS","FAILURE","PARTIAL","SKIPPED","PENDING"]).optional(),
+      fase: z.string().optional().describe("Filtrar por fase persistida"),
+      scope: z.string().optional().describe("Scope de ObservationBatch"),
+      category: z.string().optional().describe("Categoría de ObservationBatch"),
+    },
+    async (args: any) => {
+      const res = await toolKhoraEventosRecientes(args);
       return { content: [{ type: "text", text: JSON.stringify(res, null, 2) }] };
     }
   );

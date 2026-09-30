@@ -12,12 +12,13 @@ const TELEMETRY_SYNC_STATE_KEY = "AISTHESIS_TELEMETRY_SYNC_STATE";
 const MAX_TELEMETRY_EVENTS = 1000;
 
 const OBS_SYNC_ALARM = "khora-observation-sync";
-const OBS_SYNC_DEBOUNCE_MS = 5000;
-const OBS_SYNC_MAX_WAIT_MS = 30000;
-const OBS_SYNC_BATCH_THRESHOLD = 25;
+const OBS_SYNC_DEBOUNCE_MS = 1000;
+const OBS_SYNC_MAX_WAIT_MS = 5000;
+const OBS_SYNC_BATCH_THRESHOLD = 10;
 const OBS_SYNC_BATCH_MAX_EVENTS = 50;
 const OBSERVATION_BATCH_SCHEMA_VERSION = "2.0";
 let telemetryWriteChain = Promise.resolve();
+let observationSyncTimer = null;
 
 function generateSessionId() {
   if (self.crypto && self.crypto.randomUUID) return self.crypto.randomUUID();
@@ -150,6 +151,21 @@ async function countUnsynced(buffer, lastReportedUuid) {
   return idx >= 0 ? buffer.length - idx - 1 : buffer.length;
 }
 
+function armObservationTimer(delayMs) {
+  try {
+    if (observationSyncTimer !== null) clearTimeout(observationSyncTimer);
+  } catch (_) {}
+  var delay = Math.max(250, Number(delayMs) || OBS_SYNC_DEBOUNCE_MS);
+  observationSyncTimer = setTimeout(function () {
+    observationSyncTimer = null;
+    try {
+      if (self.AISTHESIS_REPORT_LATEST) {
+        self.AISTHESIS_REPORT_LATEST({ manual: false }).catch(function () {});
+      }
+    } catch (_) {}
+  }, delay);
+}
+
 async function armObservationAlarm(delayMs) {
   if (!chrome.alarms || !chrome.alarms.create) return false;
   var when = Date.now() + Math.max(250, Number(delayMs) || OBS_SYNC_DEBOUNCE_MS);
@@ -197,6 +213,7 @@ async function scheduleObservationSync(reason) {
       })
     });
     await armObservationAlarm(delay);
+    armObservationTimer(delay);
   } catch (error) {
     try { console.error("[Telemetry] No se pudo programar sincronización:", error); } catch (_) {}
   }
@@ -389,7 +406,10 @@ self.AISTHESIS_TELEMETRY.markReported = async function (batch) {
     }),
     AISTHESIS_TELEMETRY_LAST_BATCH_ID: batch.batch_id
   });
-  if (unsynced > 0) await armObservationAlarm(250);
+  if (unsynced > 0) {
+    await armObservationAlarm(250);
+    armObservationTimer(250);
+  }
 };
 
 self.AISTHESIS_TELEMETRY.noteSyncFailure = async function () {
@@ -405,6 +425,20 @@ self.AISTHESIS_TELEMETRY.noteSyncFailure = async function () {
     })
   });
   await armObservationAlarm(backoff);
+};
+
+self.AISTHESIS_TELEMETRY.logHeartbeat = function () {
+  self.AISTHESIS_TELEMETRY.logEvent({
+    moduleId: "harmonia-runtime",
+    component: "runtime-heartbeat",
+    action: "HEARTBEAT",
+    severity: "INFO",
+    payload: {
+      expected: "runtime_alive",
+      actual: "runtime_alive",
+      satisfied: true
+    }
+  });
 };
 
 try { scheduleObservationSync("service_worker_init"); } catch (_) {}

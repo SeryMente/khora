@@ -164,7 +164,7 @@ export default async function AuthorizePage(props: {
 
         <div className="space-y-4 text-sm text-gray-300 mb-8">
           <p>
-            La aplicación en <strong className="text-white">{redirectHost}</strong> solicita acceso para consultar los volcados de Khora en nombre de:
+            La aplicación en <strong className="text-white">{redirectHost}</strong> solicita acceso de solo lectura a los datos de Khora en nombre de:
           </p>
 
           <div className="p-3 rounded-lg bg-black/40 border border-gray-800 flex items-center justify-between">
@@ -177,7 +177,7 @@ export default async function AuthorizePage(props: {
             <ul className="text-xs space-y-1 text-gray-300">
               <li className="flex items-center space-x-2">
                 <span className="text-emerald-400">✓</span>
-                <span>Lectura de volcados y revisiones (<code>volcados:read</code>)</span>
+                <span>Lectura de volcados, revisiones y observabilidad de runtime (<code>volcados:read</code>)</span>
               </li>
               <li className="flex items-center space-x-2">
                 <span className="text-emerald-400">✓</span>
