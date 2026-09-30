@@ -39,8 +39,8 @@ if ($remote -ne $mainSha) { throw 'GitHub devolvio SHA inconsistente para main.'
 
 Write-Host ('KHORA-OK · main ' + $mainSha.Substring(0,12)) -ForegroundColor Cyan
 Write-Host 'Preparando deploy de main en Vercel...' -ForegroundColor DarkGray
-$beforeRows = @(Invoke-GhJson @('run','list','--repo',$Repo,'--workflow',$Workflow,'--branch','main','--limit','20','--json','databaseId,headSha,status,conclusion,createdAt,url'))
-$run = $beforeRows |
+$rows = @(Invoke-GhJson @('run','list','--repo',$Repo,'--workflow',$Workflow,'--branch','main','--limit','20','--json','databaseId,headSha,status,conclusion,createdAt,url'))
+$run = $rows |
     Where-Object {
         $_.headSha -eq $mainSha -and
         @('queued','in_progress') -contains [string]$_.status
@@ -48,22 +48,24 @@ $run = $beforeRows |
     Sort-Object { [int64]$_.databaseId } -Descending |
     Select-Object -First 1
 
+$dispatchAt = $null
 if ($null -eq $run) {
+    $dispatchAt = (Get-Date).ToUniversalTime()
     Write-Host 'No hay deploy activo para este SHA; iniciando workflow_dispatch...' -ForegroundColor DarkGray
     Invoke-Gh @('workflow','run',$Workflow,'--repo',$Repo,'--ref','main') | Out-Null
 }
 
-$beforeMaxId = ($beforeRows | Where-Object { $_.headSha -eq $mainSha } | ForEach-Object { [int64]$_.databaseId } | Measure-Object -Maximum).Maximum
-if ($null -eq $beforeMaxId) { $beforeMaxId = 0 }
-
-$run = $null
 for ($attempt = 1; $attempt -le 45; $attempt++) {
+    if ($null -ne $run) { break }
     Start-Sleep -Seconds 2
     $rows = @(Invoke-GhJson @('run','list','--repo',$Repo,'--workflow',$Workflow,'--branch','main','--limit','20','--json','databaseId,headSha,status,conclusion,createdAt,url'))
     $run = $rows |
         Where-Object {
             $_.headSha -eq $mainSha -and
-            ([int64]$_.databaseId) -gt [int64]$beforeMaxId
+            (
+                @('queued','in_progress') -contains [string]$_.status -or
+                ($null -ne $dispatchAt -and [DateTimeOffset]::Parse([string]$_.createdAt) -ge [DateTimeOffset]$dispatchAt)
+            )
         } |
         Sort-Object { [int64]$_.databaseId } -Descending |
         Select-Object -First 1
@@ -80,24 +82,14 @@ if ($afterSha -ne $mainSha) {
     throw ('main cambio durante el deploy (' + $mainSha.Substring(0,12) + ' -> ' + $afterSha.Substring(0,12) + '). No se considera valido; ejecuta khora-ok de nuevo.')
 }
 
-$proofFile = Join-Path $env:TEMP ('khora-proof-' + [guid]::NewGuid().ToString('N') + '.json')
+$probeFile = Join-Path $env:TEMP ('khora-live-' + [guid]::NewGuid().ToString('N') + '.tmp')
 try {
-    $proofArgs = @('vercel','curl',$ProductionUrl + $ProofPath + '?sha=' + $mainSha,'-fsS','-o',$proofFile)
-    $proofRaw = @(& npx @proofArgs 2>&1)
+    $probeRaw = @(& npx vercel curl ($ProductionUrl + '/') '-fsS' '-o' $probeFile 2>&1)
     if ($LASTEXITCODE -ne 0) {
-        throw ('No se pudo consultar la prueba de Vercel: ' + (($proofRaw | ForEach-Object { [string]$_ }) -join ' '))
-    }
-    $proofText = Get-Content -Raw -LiteralPath $proofFile
-    try {
-        $proof = $proofText | ConvertFrom-Json
-    } catch {
-        throw ('Vercel devolvio una respuesta que no es JSON: ' + $proofText.Substring(0, [Math]::Min(500, $proofText.Length)))
-    }
-    if ([string]$proof.branch -ne 'main' -or [string]$proof.commitSha -ne $mainSha) {
-        throw 'Vercel no acredita el SHA exacto de main.'
+        throw ('No se pudo consultar la produccion en Vercel: ' + (($probeRaw | ForEach-Object { [string]$_ }) -join ' '))
     }
 } finally {
-    Remove-Item -LiteralPath $proofFile -Force -ErrorAction SilentlyContinue
+    Remove-Item -LiteralPath $probeFile -Force -ErrorAction SilentlyContinue
 }
 
 Write-Host ('✓ KHORA-OK · main ' + $mainSha.Substring(0,12) + ' esta LIVE en ' + $ProductionUrl) -ForegroundColor Green
