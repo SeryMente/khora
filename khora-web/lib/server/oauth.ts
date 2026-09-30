@@ -27,6 +27,7 @@ export async function crearCodigoAutorizacion(params: {
   redirectUri: string;
   resource: string;
   usuario: string;
+  scope: string;
 }): Promise<string> {
   const rawCode = generateRandomToken(32);
   const codeHash = hashString(rawCode);
@@ -136,7 +137,7 @@ export async function rotarRefreshToken(
        WHERE token_hash = $2
          AND rotado_a IS NULL
          AND expira_en > NOW()
-       RETURNING id, token_hash, usuario, resource, emitido_en, expira_en, rotado_a`,
+       RETURNING id, token_hash, usuario, resource, scope, emitido_en, expira_en, rotado_a`,
       [newTokenHash, tokenHash]
     );
 
