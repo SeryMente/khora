@@ -23,8 +23,7 @@ test("Batch 1: scheduler es por evento, agrupado y acotado", () => {
 
 test("Batch 1: reinicio recupera pendientes y los fallos respetan backoff", () => {
   const telemetry = read("extension/harmonia/core/telemetry.js");
-  const shell = read("extension/harmonia/core/shell.sw.js");
-  const middleware = read("../../middleware.ts");
+  const middleware = read("../middleware.ts");
   const background = read("extension/harmonia/modules/live-caption/background.js");
   const deploy = fs.readFileSync(path.join(root, "../../.github/workflows/deploy-production.yml"), "utf8");
 
