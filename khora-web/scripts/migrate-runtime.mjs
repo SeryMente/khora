@@ -8,10 +8,8 @@ if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL es obligatorio para aplicar la migración de runtime.");
 }
 
-const sql = await fs.readFile(
-  path.join(process.cwd(), "db/migrations/023_runtime_state.sql"),
-  "utf8",
-);
+const migrationFiles = ["023_runtime_state.sql", "024_oauth_scopes.sql"];
+const sql = (await Promise.all(migrationFiles.map((file) => fs.readFile(path.join(process.cwd(), "db/migrations", file), "utf8")))).join("\n");
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -24,7 +22,7 @@ try {
   await pool.query("BEGIN");
   await pool.query(sql);
   await pool.query("COMMIT");
-  console.log("Migración 023 de runtime aplicada.");
+  console.log("Migraciones 023 runtime + 024 OAuth scopes aplicadas.");
 } catch (error) {
   try {
     await pool.query("ROLLBACK");
