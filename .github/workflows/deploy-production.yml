@@ -75,17 +75,18 @@ jobs:
       - name: Verify exact main provenance
         shell: bash
         run: |
+          PROOF_URL="${DEPLOY_URL%/}/ep-main-live.json?sha=${GITHUB_SHA}"
           for attempt in {1..30}; do
             PROOF_FILE=$(mktemp)
-            if npx vercel curl "https://khora-web.vercel.app/ep-main-live.json?sha=${GITHUB_SHA}" -fsS -o "${PROOF_FILE}" >/dev/null 2>&1 &&
-               jq -e --arg sha "${GITHUB_SHA}" '.branch=="main" and .commitSha==$sha' "${PROOF_FILE}" >/dev/null 2>&1; then
-              rm -f "${PROOF_FILE}"
+            if npx vercel curl "$PROOF_URL" -fsS -o "$PROOF_FILE" >/dev/null 2>&1 &&
+               jq -e --arg sha "${GITHUB_SHA}" '.branch=="main" and .commitSha==$sha' "$PROOF_FILE" >/dev/null 2>&1; then
+              rm -f "$PROOF_FILE"
               exit 0
             fi
-            rm -f "${PROOF_FILE}"
+            rm -f "$PROOF_FILE"
             sleep 2
           done
-          echo "Vercel no acredita el SHA exacto de main: ${GITHUB_SHA}"
+          echo "Vercel no acredita el SHA exacto del deployment: ${DEPLOY_URL} (main ${GITHUB_SHA})"
           exit 1
 
       - name: Post-deploy smoke check
