@@ -406,3 +406,5 @@ self.AISTHESIS_TELEMETRY.noteSyncFailure = async function () {
   });
   await armObservationAlarm(backoff);
 };
+
+try { scheduleObservationSync("service_worker_init"); } catch (_) {}
