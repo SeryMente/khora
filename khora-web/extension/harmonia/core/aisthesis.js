@@ -78,7 +78,11 @@
   }); }catch(e){}
   leerAhk(); setInterval(leerAhk, 5000);
 
-  var reportBtn = document.getElementById("reportObservations");\n  var reportStatus = document.getElementById("reportObservationsStatus");\n  if(reportBtn){ reportBtn.addEventListener("click", function(){ reportBtn.disabled=true; if(reportStatus) reportStatus.textContent="enviando…"; chrome.runtime.sendMessage({type:"KHORA_REPORT_OBSERVATIONS"}, function(response){ reportBtn.disabled=false; if(!reportStatus) return; if(chrome.runtime.lastError) reportStatus.textContent="error de extensión"; else if(response && response.ok) reportStatus.textContent=response.skipped?"sin novedades":"batch reportado"; else reportStatus.textContent=(response&&response.error)?String(response.error).slice(0,80):"no reportado"; setTimeout(function(){reportStatus.textContent="";},5000); }); }); }\n\n  // Lente inicial: la ultima usada, o Chronos por defecto.
+  var reportBtn = document.getElementById("reportObservations");
+  var reportStatus = document.getElementById("reportObservationsStatus");
+  if(reportBtn){ reportBtn.addEventListener("click", function(){ reportBtn.disabled=true; if(reportStatus) reportStatus.textContent="enviando…"; chrome.runtime.sendMessage({type:"KHORA_REPORT_OBSERVATIONS"}, function(response){ reportBtn.disabled=false; if(!reportStatus) return; if(chrome.runtime.lastError) reportStatus.textContent="error de extensión"; else if(response && response.ok) reportStatus.textContent=response.skipped?"sin novedades":"batch reportado"; else reportStatus.textContent=(response&&response.error)?String(response.error).slice(0,80):"no reportado"; setTimeout(function(){reportStatus.textContent="";},5000); }); }); }
+
+  // Lente inicial: la ultima usada, o Chronos por defecto.
   var inicial = "chronos";
   try{ var g = localStorage.getItem("aisthesis.lente"); if(g === "agora" || g === "chronos") inicial = g; }catch(e){}
   if((location.hash||"").indexOf("agora") >= 0) inicial = "agora";
