@@ -49,6 +49,11 @@ test("ObservationBatch v2 rechaza inconsistencias del resumen",()=>{
   assert.equal(ObservationBatchSchema.safeParse(badFirst).success,false);
 });
 
+test("ObservationBatch v2 limita valores JSON diagnósticos",()=>{
+  const bad={...baseEvent,diagnostic:{expected:"x".repeat(201)}};
+  assert.equal(ObservationBatchSchema.safeParse(batchFor(bad)).success,false);
+});
+
 test("ObservationBatch v2 rechaza strings diagnósticas excesivamente largas",()=>{
   const bad={...baseEvent,metrics:{diagnostic:"x".repeat(201)}};
   assert.equal(ObservationBatchSchema.safeParse(batchFor(bad)).success,false);
