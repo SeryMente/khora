@@ -6,6 +6,7 @@ import { obtenerGeneracionRevocacion } from "@/lib/server/oauth";
 import { isProductionEnv } from "@/lib/server/mcp-db";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
+import { ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 import {
   toolKhoraResumen,
@@ -437,7 +438,7 @@ async function handleMcpRequest(req: NextRequest) {
     },
   ] as any;
 
-  mcpServer.server.setRequestHandler("tools/list" as any, async () => ({
+  mcpServer.server.setRequestHandler(ListToolsRequestSchema, async () => ({
     tools: toolsList,
   }));
 
