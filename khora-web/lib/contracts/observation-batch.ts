@@ -105,6 +105,17 @@ export const ObservationBatchSchema = z.object({
   summary:ObservationBatchSummarySchema,
   events:z.array(ObservationEventSchema).min(1).max(50),
 }).strict().superRefine((batch, ctx) => {
+  if (batch.summary.event_count !== batch.events.length) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["summary", "event_count"], message: "summary.event_count no coincide con events.length" });
+  }
+  const firstEventTime = batch.events[0]?.client_time ?? null;
+  const lastEventTime = batch.events[batch.events.length - 1]?.client_time ?? null;
+  if (batch.first_event_at !== firstEventTime) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["first_event_at"], message: "first_event_at no coincide con el primer evento" });
+  }
+  if (batch.last_event_at !== lastEventTime) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["last_event_at"], message: "last_event_at no coincide con el último evento" });
+  }
   for (const event of batch.events) {
     const error = inspectMetrics(event.metrics);
     if (error) {
