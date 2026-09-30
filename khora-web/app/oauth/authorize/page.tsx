@@ -50,7 +50,7 @@ export default async function AuthorizePage(props: {
     try {
       const url = new URL(client_id);
       return url.protocol === "https:" && url.hostname === "chatgpt.com" &&
-        /^\\/oauth\\/(?:client\\.json|[^/]+\\/client\\.json)$/.test(url.pathname);
+        /^\/oauth\/(?:client\.json|[^/]+\/client\.json)$/.test(url.pathname);
     } catch {
       return false;
     }
@@ -60,7 +60,7 @@ export default async function AuthorizePage(props: {
     config.redirectUris.includes(redirect_uri || "");
 
   const supportedScopes = new Set(["volcados:read", "runtime:read", "offline_access"]);
-  const requestedScopes = requestedScope.split(/\\s+/).filter(Boolean);
+  const requestedScopes = requestedScope.split(/\s+/).filter(Boolean);
 
   // 1. Validar client_id
   if (!client_id || (!isChatGptClient && client_id !== config.clientId)) {
@@ -87,7 +87,7 @@ export default async function AuthorizePage(props: {
   }
 
   if (requestedScopes.length === 0 || requestedScopes.some((item) => !supportedScopes.has(item))) {
-    return redirect(`${redirect_uri}?error=invalid_scope&error_description=Unsupported%20scope&state=${encodeURIComponent(state)}`);
+    const invalidScopeUrl = new URL(redirect_uri); invalidScopeUrl.searchParams.set("error", "invalid_scope"); invalidScopeUrl.searchParams.set("error_description", "Unsupported scope"); invalidScopeUrl.searchParams.set("state", state); invalidScopeUrl.searchParams.set("iss", config.issuer); return redirect(invalidScopeUrl.toString());
   }
 
   // A partir de aquí, client_id y redirect_uri son válidos. Errores posteriores pueden redirigir a redirect_uri.
@@ -118,6 +118,7 @@ export default async function AuthorizePage(props: {
         error: "invalid_request",
         error_description: "code_challenge with method S256 is required",
         state,
+        iss: config.issuer,
       })
     );
   }
@@ -146,6 +147,7 @@ export default async function AuthorizePage(props: {
         error: "access_denied",
         error_description: `Acceso denegado: La cuenta de Google (${userEmail}) no esta autorizada para MCP. Se requiere ${config.allowedEmail}.`,
         state,
+        iss: config.issuer,
       })
     );
   }
