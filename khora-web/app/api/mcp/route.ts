@@ -29,10 +29,25 @@ function makeUnauthorizedResponse(config: ReturnType<typeof getMcpConfig>) {
       status: 401,
       headers: {
         "Content-Type": "application/json",
-        "WWW-Authenticate": `Bearer resource_metadata="${metadataUrl}", scope="volcados:read"`,
+        "WWW-Authenticate": `Bearer resource_metadata="${metadataUrl}", scope="runtime:read"`,
       },
     }
   );
+}
+
+function scopeFailure(config: ReturnType<typeof getMcpConfig>, requiredScope: string) {
+  const metadataUrl = config
+    ? `${config.issuer}/.well-known/oauth-protected-resource`
+    : "";
+  return {
+    isError: true,
+    content: [{ type: "text", text: `Permiso insuficiente. Se requiere ${requiredScope}.` }],
+    _meta: {
+      "mcp/www_authenticate": [
+        `Bearer resource_metadata="${metadataUrl}", error="insufficient_scope", error_description="Se requiere ${requiredScope}"`,
+      ],
+    },
+  };
 }
 
 async function handleMcpRequest(req: NextRequest) {
@@ -76,9 +91,14 @@ async function handleMcpRequest(req: NextRequest) {
 
   // Verificar scope ("volcados:read")
   const scopes = (payload.scope || "").split(/\s+/).filter(Boolean);
-  if (!scopes.includes("volcados:read")) {
+  if (!scopes.includes("volcados:read") && !scopes.includes("runtime:read")) {
     return makeUnauthorizedResponse(config);
   }
+
+  const requireScope = (scope: "volcados:read" | "runtime:read") =>
+    scopes.includes(scope)
+      ? null
+      : scopeFailure(config, scope);
 
   // Verificar revocación de generación
   const currentGen = await obtenerGeneracionRevocacion(payload.sub);
