@@ -2,8 +2,9 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-const root = process.cwd();
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 
 function read(relativePath: string): string {
   return fs.readFileSync(path.join(root, relativePath), "utf8");
@@ -23,7 +24,7 @@ test("Batch 1: scheduler es por evento, agrupado y acotado", () => {
 
 test("Batch 1: reinicio recupera pendientes y los fallos respetan backoff", () => {
   const telemetry = read("extension/harmonia/core/telemetry.js");
-  const middleware = read("../middleware.ts");
+  const middleware = read("middleware.ts");
   const background = read("extension/harmonia/modules/live-caption/background.js");
   const deploy = fs.readFileSync(path.join(root, "../../.github/workflows/deploy-production.yml"), "utf8");
 
