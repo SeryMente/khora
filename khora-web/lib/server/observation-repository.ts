@@ -91,7 +91,6 @@ export async function publishObservationBatch(batch:ObservationBatch) {
   const parent = await gh(token,"/repos/"+REPO+"/git/commits/"+branch.sha);
   const json = JSON.stringify(batch);
   const ndjson = buildNdjson(batch.events);
-  const historyPath = OBSERVATION_BATCH_HISTORY_DIR + "/" + batch.batch_id + ".json";
 
   const [latestBlob,ndjsonBlob,historyBlob] = await Promise.all([
     createBlob(token,json),createBlob(token,ndjson),createBlob(token,json)
