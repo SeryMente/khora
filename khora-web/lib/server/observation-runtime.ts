@@ -1,11 +1,11 @@
 import type {
   ObservationBatch,
   ObservationEvent,
-  ObservationScope,
-  ObservationCategory,
 } from "@/lib/contracts/observation-batch";
 import type { RegistrarEventoParams, FaseEvento, EstadoEvento } from "./eventos";
 import { cleanSecretos, registrarEventosBatch } from "./eventos";
+
+type ObservationScope = ObservationEvent["scope"];
 
 const SCOPE_TO_PHASE: Record<ObservationScope, FaseEvento> = {
   capture: "captura",
@@ -62,7 +62,7 @@ function mapEvent(batch: ObservationBatch, event: ObservationEvent): RegistrarEv
     extension_version: batch.extension_version,
     partial: batch.partial,
     scope: event.scope,
-    category: event.category as ObservationCategory,
+    category: event.category,
     severity: event.severity,
     diagnostic: event.diagnostic ?? null,
     environment: batch.environment,
