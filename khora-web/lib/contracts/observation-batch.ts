@@ -49,7 +49,7 @@ export const ObservationEventSchema = z.object({
   privacy_class:z.literal("ANONYMIZED_TELEMETRY"),
 }).strict();
 
-const FORBIDDEN_METRIC_KEY = /(^|_)(raw_audio|audio_data|transcript|transcription|dictation|verbatim|text_content|speech_text|base64|token|secret|password|cookie|authorization|credential)($|_)/i;
+const FORBIDDEN_METRIC_KEY = /(^|_)(raw_audio|audio_data|audio|transcript|transcription|dictation|verbatim|text_content|speech_text|base64|token|secret|password|cookie|authorization|credential|message|stack|description|content|caption|text|title|url|href|path|body)($|_)/i;
 
 function inspectMetrics(value: unknown, path = "metrics"): string | null {
   if (Array.isArray(value)) {
