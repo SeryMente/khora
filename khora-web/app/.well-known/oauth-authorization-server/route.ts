@@ -13,10 +13,11 @@ export async function GET() {
     authorization_endpoint: `${config.issuer}/oauth/authorize`,
     token_endpoint: `${config.issuer}/api/oauth/token`,
     code_challenge_methods_supported: ["S256"],
-    scopes_supported: ["volcados:read", "offline_access"],
+    authorization_response_iss_parameter_supported: true,
+    scopes_supported: ["runtime:read", "volcados:read", "offline_access"],
     grant_types_supported: ["authorization_code", "refresh_token"],
     response_types_supported: ["code"],
-    token_endpoint_auth_methods_supported: ["client_secret_post"],
+    token_endpoint_auth_methods_supported: ["none", "client_secret_post"],
   };
 
   return NextResponse.json(metadata, {
