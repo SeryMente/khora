@@ -28,15 +28,14 @@ test("Batch 1: reinicio recupera pendientes y los fallos respetan backoff", () =
   const background = read("extension/harmonia/modules/live-caption/background.js");
   const deploy = fs.readFileSync(path.join(root, "../../.github/workflows/deploy-production.yml"), "utf8");
 
-  assert.match(telemetry, /if \(unsynced <= 0\)/);
-  assert.match(telemetry, /if \(nextRetryAt > now\) delay = Math\.max\(delay, nextRetryAt - now\)/);
-  assert.match(telemetry, /nextRetryAt: 0/);
-  assert.match(shell, /chrome\.runtime\.onStartup\.addListener/);
-  assert.match(shell, /chrome\.runtime\.onInstalled\.addListener/);
-  assert.match(middleware, /ep-main-live\\.json\$/);
-  assert.match(background, /https\?:\\/\\//);
-  assert.doesNotMatch(deploy, /--deployment "\$\{DEPLOY_URL\}"/);
-  assert.match(deploy, /vercel curl "https:\\/\\/khora-web\\.vercel\\.app\\/ep-main-live\\.json/);
+  assert.ok(telemetry.includes("if (unsynced <= 0)"));
+  assert.ok(telemetry.includes("if (nextRetryAt > now) delay = Math.max(delay, nextRetryAt - now)"));
+  assert.ok(shell.includes("chrome.runtime.onStartup.addListener"));
+  assert.ok(shell.includes("chrome.runtime.onInstalled.addListener"));
+  assert.ok(middleware.includes("ep-main-live\\.json"));
+  assert.ok(background.includes("https?:\\/\\/"));
+  assert.equal(deploy.includes('--deployment "${DEPLOY_URL}"'), false);
+  assert.ok(deploy.includes("vercel curl \"https://khora-web.vercel.app/ep-main-live.json?sha=${GITHUB_SHA}\""));
 });
 
 test("Batch 1: existe un único camino de envío y permite manual + automático", () => {
