@@ -52,6 +52,18 @@ test("ChatGPT CIMD client can exchange a runtime-only authorization code", async
     },
   };
 
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (input, init) => {
+    if (String(input) === "https://chatgpt.com/oauth/client.json") {
+      return new Response(JSON.stringify({
+        client_id: "https://chatgpt.com/oauth/client.json",
+        redirect_uris: ["https://chatgpt.com/connector_platform_oauth_redirect"],
+        token_endpoint_auth_methods_supported: ["none"],
+      }), { status: 200, headers: { "Content-Type": "application/json" } });
+    }
+    return originalFetch(input, init);
+  };
+
   setDbForTesting(mockDbPool);
   try {
     const form = new FormData();
@@ -83,6 +95,7 @@ test("ChatGPT CIMD client can exchange a runtime-only authorization code", async
     assert.equal(payload.iss, "https://khora.example.com");
   } finally {
     resetDbForTesting();
+    globalThis.fetch = originalFetch;
   }
 });
 
