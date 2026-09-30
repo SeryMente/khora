@@ -1,6 +1,6 @@
 // @l0 L0-002 §4 · @req MCP-OAUTH-01/REQ-6
 import { NextRequest, NextResponse } from "next/server";
-import { getMcpConfig } from "@/lib/server/mcp-config";
+import { getMcpConfig, validateCimdClient } from "@/lib/server/mcp-config";
 import {
   obtenerCodigoAutorizacionValido,
   marcarCodigoComoUsado,
@@ -77,6 +77,16 @@ export async function POST(req: NextRequest) {
       { error: "invalid_client", error_description: "Invalid client credentials" },
       { status: 401 },
     );
+  }
+
+  if (publicChatGptClient) {
+    const redirectUriForCimd = formData.get("redirect_uri")?.toString() || "";
+    if (!redirectUriForCimd || !(await validateCimdClient(clientId, redirectUriForCimd))) {
+      return NextResponse.json(
+        { error: "invalid_client", error_description: "ChatGPT client metadata could not be verified" },
+        { status: 401 },
+      );
+    }
   }
 
   if (grantType === "authorization_code") {
