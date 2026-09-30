@@ -1,6 +1,6 @@
 // @l0 L0-002 §4 · @req MCP-OAUTH-01/REQ-5
 import { auth } from "@/auth";
-import { getMcpConfig } from "@/lib/server/mcp-config";
+import { getMcpConfig, validateCimdClient } from "@/lib/server/mcp-config";
 import { crearCodigoAutorizacion } from "@/lib/server/oauth";
 import { redirect } from "next/navigation";
 
@@ -76,6 +76,15 @@ export default async function AuthorizePage(props: {
 
   // 2. Validar redirect_uri por coincidencia exacta
   if (!redirect_uri || !allowedRedirect) {
+  if (isChatGptClient && !(await validateCimdClient(client_id!, redirect_uri!))) {
+    const invalidClientUrl = new URL(redirect_uri!);
+    invalidClientUrl.searchParams.set("error", "invalid_client");
+    invalidClientUrl.searchParams.set("error_description", "Client metadata could not be verified");
+    invalidClientUrl.searchParams.set("state", state);
+    invalidClientUrl.searchParams.set("iss", config.issuer);
+    return redirect(invalidClientUrl.toString());
+  }
+
   if (resource && resource !== config.canonicalUrl) {
     const invalidResourceUrl = new URL(redirect_uri!);
     invalidResourceUrl.searchParams.set("error", "invalid_target");
