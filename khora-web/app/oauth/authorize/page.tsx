@@ -76,6 +76,15 @@ export default async function AuthorizePage(props: {
 
   // 2. Validar redirect_uri por coincidencia exacta
   if (!redirect_uri || !allowedRedirect) {
+  if (resource && resource !== config.canonicalUrl) {
+    const invalidResourceUrl = new URL(redirect_uri!);
+    invalidResourceUrl.searchParams.set("error", "invalid_target");
+    invalidResourceUrl.searchParams.set("error_description", "Invalid resource");
+    invalidResourceUrl.searchParams.set("state", state);
+    invalidResourceUrl.searchParams.set("iss", config.issuer);
+    return redirect(invalidResourceUrl.toString());
+  }
+
     return (
       <main className="min-h-screen bg-[var(--khora-absolute,#050505)] text-[var(--khora-ink,#f0f0f0)] flex items-center justify-center p-6">
         <div className="max-w-md w-full bg-[var(--khora-surface,#121212)] border border-red-800/50 p-6 rounded-lg text-center">
