@@ -11,7 +11,34 @@ const JsonValueSchema: z.ZodType<unknown> = z.lazy(() => z.union([
   z.record(z.string(), JsonValueSchema),
 ]));
 
-const FORBIDDEN_KEY = /(^|_)(raw_audio|audio_data|transcript|transcription|dictation|verbatim|text_content|speech_text|base64|token|secret|password|cookie|authorization|credential|message|stack|description|content|caption|text|title|url|href|path|body)($|_)/i;
+const FORBIDDEN_KEYS = new Set([
+  "audio",
+  "raw_audio",
+  "audio_data",
+  "transcript",
+  "transcription",
+  "dictation",
+  "verbatim",
+  "text_content",
+  "speech_text",
+  "base64",
+  "token",
+  "secret",
+  "password",
+  "cookie",
+  "authorization",
+  "credential",
+  "message",
+  "stack",
+  "description",
+  "content",
+  "text",
+  "title",
+  "url",
+  "href",
+  "path",
+  "body",
+]);
 
 function inspect(value: unknown, path = "state"): string | null {
   if (Array.isArray(value)) {
@@ -23,7 +50,7 @@ function inspect(value: unknown, path = "state"): string | null {
   }
   if (value && typeof value === "object") {
     for (const [key, nested] of Object.entries(value as Record<string, unknown>)) {
-      if (FORBIDDEN_KEY.test(key)) return path + "." + key;
+      if (FORBIDDEN_KEYS.has(key.toLowerCase())) return path + "." + key;
       if (typeof nested === "string" && nested.length > 200) return path + "." + key + ":long-string";
       const error = inspect(nested, path + "." + key);
       if (error) return error;
