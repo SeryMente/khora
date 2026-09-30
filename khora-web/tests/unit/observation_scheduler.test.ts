@@ -24,12 +24,13 @@ test("Batch 1: scheduler es por evento, agrupado y acotado", () => {
 test("Batch 1: existe un único camino de envío y permite manual + automático", () => {
   const shell = read("extension/harmonia/core/shell.sw.js");
   const ui = read("extension/harmonia/core/aisthesis.js");
+  const html = read("extension/harmonia/core/aisthesis.html");
 
   assert.match(shell, /var reportPromise = null/);
   assert.match(shell, /chrome\.alarms\.onAlarm\.addListener/);
   assert.match(shell, /message\.type\s*!==\s*["\']KHORA_REPORT_OBSERVATIONS["\']/);
   assert.match(shell, /type: "KHORA_OBSERVATION_REPORT_REQUEST"/);
-  assert.match(ui, /id="reportObservations"/);
+  assert.match(html, /id="reportObservations"/);
   assert.match(ui, /type:"KHORA_REPORT_OBSERVATIONS"/);
 });
 
