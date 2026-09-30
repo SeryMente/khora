@@ -1,5 +1,9 @@
 name: Deploy to Production (Vercel)
 
+concurrency:
+  group: khora-production
+  cancel-in-progress: true
+
 on:
   push:
     branches:
@@ -72,7 +76,7 @@ jobs:
         shell: bash
         run: |
           for attempt in {1..30}; do
-            if curl -fsS "https://khora-web.vercel.app/ep-main-live.json?sha=${GITHUB_SHA}" | jq -e --arg sha "${GITHUB_SHA}" '.branch=="main" and .commitSha==$sha' >/dev/null; then
+            if npx vercel curl --token="${VERCEL_TOKEN}" "https://khora-web.vercel.app/ep-main-live.json?sha=${GITHUB_SHA}" 2>/dev/null | jq -e --arg sha "${GITHUB_SHA}" '.branch=="main" and .commitSha==$sha' >/dev/null; then
               exit 0
             fi
             sleep 2
@@ -81,7 +85,7 @@ jobs:
           exit 1
 
       - name: Post-deploy smoke check
-        run: curl -f https://khora-web.vercel.app
+        run: npx vercel curl --token="${VERCEL_TOKEN}" https://khora-web.vercel.app >/dev/null
 
       - name: Set Deployment Status (Success)
         if: success()
