@@ -27,7 +27,7 @@ test("Batch 1: existe un único camino de envío y permite manual + automático"
 
   assert.match(shell, /var reportPromise = null/);
   assert.match(shell, /chrome\.alarms\.onAlarm\.addListener/);
-  assert.match(shell, /type: "KHORA_REPORT_OBSERVATIONS"/);
+  assert.match(shell, /type:\s*["\']KHORA_REPORT_OBSERVATIONS["\']/);
   assert.match(shell, /type: "KHORA_OBSERVATION_REPORT_REQUEST"/);
   assert.match(ui, /id="reportObservations"/);
   assert.match(ui, /type:"KHORA_REPORT_OBSERVATIONS"/);
