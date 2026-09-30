@@ -21,7 +21,7 @@ export async function toolKhoraObservacionInstantanea(args?: { session_id?: stri
   const sessionFilter = args?.session_id ? "WHERE session_id = $1" : "";
   const sessionParams = args?.session_id ? [args.session_id] : [];
 
-  const [stateRes, latestRes, activityRes, failureRes, cursorRes] = await Promise.all([
+  const [stateRes, latestRes, activityRes, failureRes, cursorRes, sessionsRes] = await Promise.all([
     db.query(
       `SELECT runtime_id, session_id, observed_at, updated_at, route, screen,
               active, visible, focused, release_sha, source, privacy_class, state
@@ -69,6 +69,14 @@ export async function toolKhoraObservacionInstantanea(args?: { session_id?: stri
     db.query(
       `SELECT COALESCE(MAX(id), 0)::bigint AS cursor FROM eventos_sistema`,
     ),
+    db.query(
+      `SELECT runtime_id, session_id, observed_at, updated_at, route, screen,
+              active, visible, focused, release_sha, source, state
+       FROM khora_runtime_state
+       WHERE updated_at >= NOW() - INTERVAL '15 minutes'
+       ORDER BY updated_at DESC
+       LIMIT 20`,
+    ),
   ]);
 
   const runtime = stateRes.rows[0] || null;
@@ -106,8 +114,18 @@ export async function toolKhoraObservacionInstantanea(args?: { session_id?: stri
       antiguedad_ultimo_evento_ms: eventLagMs,
     },
     ultima_observacion: latest,
+    sesiones_activas_observadas: sessionsRes.rows,
     fallos_ultimos_60_minutos: failureRes.rows,
     event_cursor: Number(cursorRes.rows[0]?.cursor || 0),
+    almacenamiento: {
+      disponible: true,
+      fuente: "khora_runtime_state + eventos_sistema",
+      modo: "solo_lectura",
+    },
+    interpretacion_operativa:
+      runtimeStale
+        ? "El estado semántico del navegador no es fresco; no debe asumirse que la instancia siga abierta o activa."
+        : "El estado semántico del navegador está actualizado dentro del umbral operativo.",
     lectura: runtimeStale
       ? "El estado semántico del navegador no es fresco; no debe asumirse que la instancia siga abierta o activa."
       : "El estado semántico del navegador está actualizado dentro del umbral operativo.",
