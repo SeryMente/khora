@@ -9,7 +9,6 @@ if (!process.env.DATABASE_URL) {
 }
 
 const migrationFiles = ["023_runtime_state.sql", "024_oauth_scopes.sql"];
-const sql = (await Promise.all(migrationFiles.map((file) => fs.readFile(path.join(process.cwd(), "db/migrations", file), "utf8")))).join("\n");
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -19,15 +18,13 @@ const pool = new Pool({
 });
 
 try {
-  await pool.query("BEGIN");
-  await pool.query(sql);
-  await pool.query("COMMIT");
+  for (const file of migrationFiles) {
+    const sql = await fs.readFile(path.join(process.cwd(), "db/migrations", file), "utf8");
+    await pool.query(sql);
+  }
   console.log("Migraciones 023 runtime + 024 OAuth scopes aplicadas.");
 } catch (error) {
-  try {
-    await pool.query("ROLLBACK");
-  } catch {}
-  console.error("Error aplicando migración 023 de runtime:", error);
+  console.error("Error aplicando migraciones de runtime:", error);
   process.exitCode = 1;
 } finally {
   await pool.end();
