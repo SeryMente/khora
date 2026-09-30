@@ -4,7 +4,7 @@ d6ad6c75611acbc35b8e25e984b9d0f7501b2dc021c5d10c3351269f01108376  ./.gitattribut
 3d97ed288bfdaea505f302337d67ff2237b42e0dee8a54a4366b101acb728ecb  ./.github/workflows/auto-revert-on-smoke-fail.yml
 887df5a17f7872919d10f712cb2db9285792e5e25c41738d703691a9231b6b0c  ./.github/workflows/board-orchestrator.yml
 e4a62232e8104f0ff30c7de3b44c3ca08bd7bea59730468eb6e1b71cba801394  ./.github/workflows/ci.yml
-bdfc74b17df21e2f3ade226d15b963de28e4012cdc90329671f8404b990b0bf5  ./.github/workflows/deploy-production.yml
+5b4b96cb5e3ce06618eb2464bc7a6262acca75d25f7d060bcec52b786ec8cc14  ./.github/workflows/deploy-production.yml
 c4b4525728150cb3b9c640f6383cdd1da4e78402baad0cbd1c26e316e7fef7f7  ./.github/workflows/g4-fronteras.yml
 1397b1454845cbeede376325a7efddf89144a6bcf1420126e468c3cc2a7abf1d  ./.github/workflows/healthcheck-khora-api.yml
 09c4101beceaf9ddc37f9054e0b2f983d22f0d9016e8fadc898b68a269c5d899  ./.github/workflows/ichnos-cobertura.yml
@@ -175,7 +175,7 @@ bde5790ef6c559294b0390d56ebf6a4e96c147a8a2f248a92e8eb6a9d6201ebb  ./kernel/tests
 a61fc475e1708b4db8e2069347bf733441fc68c95bce42c503559f178e7cbd81  ./kernel/tools/RECICLAJE.md
 f635dbebd9ea9d7338063349322f86be346d824adbb15dd3ae35ecf3e35461fc  ./kernel/tools/tests/test_audit.py
 b59633baa23897211cdbf8f690ec6e54cb606d677804aa9e1c0995304f386e3f  ./khora-ok.cmd
-c8f881c2be5ffd3eda612398f77b7bf8b9e66313fcd11bb191ad8e76c4200b48  ./khora-ok.ps1
+0426c7586f8ac2e4cbfd886b9e72398dbbb77e260c869d6b6828a8f904280831  ./khora-ok.ps1
 a0d3d06e828751c100188eba6f137527b85fed30f3f4b9c68942c8b66a93bad5  ./khora-web/.env.example
 67343aaa1fbef0b9440e4adfee519385b5fe4abf051b9e2ed3027d664d1e654a  ./khora-web/.gitignore
 593723350f243036fcad9c381a3eef71482daf03925fb8129c891bbec0d8ad0d  ./khora-web/app/.well-known/oauth-authorization-server/route.ts
