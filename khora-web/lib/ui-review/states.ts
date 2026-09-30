@@ -39,11 +39,11 @@ export function buildIngresoState(
       scenario === "error"
         ? ""
         : "El sistema Khora procesa las transcripciones manteniendo la veracidad semántica de los volcados orales.",
-    estado: scenario === "recording" ? "dictando" : "inactivo",
-    modoEntrada: "ninguno",
-    chromeBridgeEstado: "desconectado",
-    chromeCaptionActivo: false,
-    chromeCapturaEstado: "inactiva",
+    estado: scenario === "recording" || scenario === "chrome_live_caption" ? "dictando" : "inactivo",
+    modoEntrada: scenario === "chrome_live_caption" ? "chrome_live_caption" : "ninguno",
+    chromeBridgeEstado: scenario === "chrome_live_caption" ? "conectado" : "desconectado",
+    chromeCaptionActivo: scenario === "chrome_live_caption",
+    chromeCapturaEstado: scenario === "chrome_live_caption" ? "capturando" : "inactiva",
     editando: scenario === "paused_editing",
     soportado: true,
     escuchando: scenario === "recording",
