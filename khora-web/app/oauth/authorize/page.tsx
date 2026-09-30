@@ -12,6 +12,7 @@ interface SearchParams {
   code_challenge_method?: string;
   state?: string;
   resource?: string;
+  scope?: string;
   approved?: string;
 }
 
@@ -40,11 +41,29 @@ export default async function AuthorizePage(props: {
     code_challenge_method,
     state = "",
     resource,
+    scope: requestedScope = "volcados:read",
     approved,
   } = searchParams;
 
+  const isChatGptClient = (() => {
+    if (!client_id) return false;
+    try {
+      const url = new URL(client_id);
+      return url.protocol === "https:" && url.hostname === "chatgpt.com" &&
+        /^\\/oauth\\/(?:client\\.json|[^/]+\\/client\\.json)$/.test(url.pathname);
+    } catch {
+      return false;
+    }
+  })();
+
+  const allowedRedirect = redirect_uri === "https://chatgpt.com/connector_platform_oauth_redirect" ||
+    config.redirectUris.includes(redirect_uri || "");
+
+  const supportedScopes = new Set(["volcados:read", "runtime:read", "offline_access"]);
+  const requestedScopes = requestedScope.split(/\\s+/).filter(Boolean);
+
   // 1. Validar client_id
-  if (!client_id || client_id !== config.clientId) {
+  if (!client_id || (!isChatGptClient && client_id !== config.clientId)) {
     return (
       <main className="min-h-screen bg-[var(--khora-absolute,#050505)] text-[var(--khora-ink,#f0f0f0)] flex items-center justify-center p-6">
         <div className="max-w-md w-full bg-[var(--khora-surface,#121212)] border border-red-800/50 p-6 rounded-lg text-center">
@@ -56,7 +75,7 @@ export default async function AuthorizePage(props: {
   }
 
   // 2. Validar redirect_uri por coincidencia exacta
-  if (!redirect_uri || !config.redirectUris.includes(redirect_uri)) {
+  if (!redirect_uri || !allowedRedirect) {
     return (
       <main className="min-h-screen bg-[var(--khora-absolute,#050505)] text-[var(--khora-ink,#f0f0f0)] flex items-center justify-center p-6">
         <div className="max-w-md w-full bg-[var(--khora-surface,#121212)] border border-red-800/50 p-6 rounded-lg text-center">
@@ -65,6 +84,10 @@ export default async function AuthorizePage(props: {
         </div>
       </main>
     );
+  }
+
+  if (requestedScopes.length === 0 || requestedScopes.some((item) => !supportedScopes.has(item))) {
+    return redirect(`${redirect_uri}?error=invalid_scope&error_description=Unsupported%20scope&state=${encodeURIComponent(state)}`);
   }
 
   // A partir de aquí, client_id y redirect_uri son válidos. Errores posteriores pueden redirigir a redirect_uri.
@@ -83,6 +106,7 @@ export default async function AuthorizePage(props: {
         error: "unsupported_response_type",
         error_description: "Response type must be 'code'",
         state,
+        iss: config.issuer,
       })
     );
   }
@@ -133,12 +157,14 @@ export default async function AuthorizePage(props: {
       redirectUri: redirect_uri,
       resource: resource || config.canonicalUrl,
       usuario: userEmail,
+      scope: requestedScopes.join(" "),
     });
 
     redirect(
       buildRedirectUrl({
         code,
         state,
+        iss: config.issuer,
       })
     );
   }
@@ -177,7 +203,7 @@ export default async function AuthorizePage(props: {
             <ul className="text-xs space-y-1 text-gray-300">
               <li className="flex items-center space-x-2">
                 <span className="text-emerald-400">✓</span>
-                <span>Lectura de volcados, revisiones y observabilidad de runtime (<code>volcados:read</code>)</span>
+                <span>Lectura del runtime (<code>runtime:read</code>) y, cuando se solicita, de volcados/revisiones (<code>volcados:read</code>)</span>
               </li>
               <li className="flex items-center space-x-2">
                 <span className="text-emerald-400">✓</span>
@@ -198,6 +224,7 @@ export default async function AuthorizePage(props: {
           <input type="hidden" name="code_challenge" value={code_challenge} />
           <input type="hidden" name="code_challenge_method" value={code_challenge_method} />
           <input type="hidden" name="state" value={state} />
+          <input type="hidden" name="scope" value={requestedScopes.join(" ")} />
           {resource && <input type="hidden" name="resource" value={resource} />}
           <input type="hidden" name="approved" value="true" />
 
