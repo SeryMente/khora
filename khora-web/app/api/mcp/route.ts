@@ -15,7 +15,7 @@ import {
   toolKhoraVersionesVolcado,
 } from "@/lib/server/mcp-tools";
 import { toolKhoraUiReview } from "@/lib/server/mcp-ui-review";
-import { toolKhoraEstadoVivo, toolKhoraEventosRecientes } from "@/lib/server/mcp-observability";
+import { toolKhoraEstadoVivo, toolKhoraEventosRecientes, toolKhoraObservacionInstantanea, toolKhoraEventosDesde } from "@/lib/server/mcp-observability";
 
 export const runtime = "nodejs";
 
@@ -89,7 +89,7 @@ async function handleMcpRequest(req: NextRequest) {
   // Instanciar servidor MCP en modo sin estado
   const mcpServer = new McpServer({
     name: "khora-mcp",
-    version: "1.1.0",
+    version: "1.2.0",
   });
 
   // Herramienta 1: khora_resumen
@@ -184,6 +184,34 @@ async function handleMcpRequest(req: NextRequest) {
     },
     async (args: any) => {
       const res = await toolKhoraUiReview(args);
+      return { content: [{ type: "text", text: JSON.stringify(res, null, 2) }] };
+    }
+  );
+
+  // Herramienta 9: observación instantánea unificada
+  mcpServer.tool(
+    "khora_observacion_instantanea",
+    "Vista unificada del estado semántico actual del navegador, actividad persistida, último evento, fallos recientes y cursor de eventos. Solo lectura.",
+    {
+      session_id: z.string().optional().describe("Limitar la observación a una sesión concreta"),
+    },
+    async (args: any) => {
+      const res = await toolKhoraObservacionInstantanea(args);
+      return { content: [{ type: "text", text: JSON.stringify(res, null, 2) }] };
+    }
+  );
+
+  // Herramienta 10: eventos desde cursor
+  mcpServer.tool(
+    "khora_eventos_desde",
+    "Devuelve únicamente los eventos posteriores a un cursor monotónico global. Permite mantener una visión incremental del runtime sin releer el historial.",
+    {
+      cursor: z.number().int().nonnegative().optional().describe("ID de evento ya observado; usar 0 para comenzar"),
+      limite: z.number().int().min(1).max(200).optional().describe("Máximo de eventos a devolver"),
+      session_id: z.string().optional().describe("Filtrar por sesión"),
+    },
+    async (args: any) => {
+      const res = await toolKhoraEventosDesde(args);
       return { content: [{ type: "text", text: JSON.stringify(res, null, 2) }] };
     }
   );
