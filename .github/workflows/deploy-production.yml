@@ -62,6 +62,10 @@ jobs:
       - name: Pull Vercel Project Settings
         run: npx vercel pull --yes --environment=production --token=${VERCEL_TOKEN}
 
+      - name: Apply runtime database migration
+        working-directory: khora-web
+        run: node --env-file=../.vercel/.env.production.local scripts/migrate-runtime.mjs
+
       - name: Build Vercel Project
         run: npx vercel build --prod --token=${VERCEL_TOKEN}
 
