@@ -122,6 +122,8 @@ async function handleMcpRequest(req: NextRequest) {
       estado: z.string().optional().describe("Estado del volcado"),
     },
     async (args: any) => {
+      const denied = requireScope("volcados:read");
+      if (denied) return denied;
       const res = await toolKhoraResumen(args);
       return { content: [{ type: "text", text: JSON.stringify(res, null, 2) }] };
     }
@@ -140,6 +142,8 @@ async function handleMcpRequest(req: NextRequest) {
       offset: z.number().optional().describe("Paginación"),
     },
     async (args: any) => {
+      const denied = requireScope("volcados:read");
+      if (denied) return denied;
       const res = await toolKhoraListarVolcados(args);
       return { content: [{ type: "text", text: JSON.stringify(res, null, 2) }] };
     }
@@ -154,6 +158,8 @@ async function handleMcpRequest(req: NextRequest) {
       version: z.number().optional().describe("Versión histórica concreta a consultar"),
     },
     async (args: any) => {
+      const denied = requireScope("volcados:read");
+      if (denied) return denied;
       const res = await toolKhoraLeerVolcado(args);
       return { content: [{ type: "text", text: JSON.stringify(res, null, 2) }] };
     }
@@ -169,6 +175,8 @@ async function handleMcpRequest(req: NextRequest) {
       offset: z.number().optional().describe("Paginación"),
     },
     async (args: any) => {
+      const denied = requireScope("volcados:read");
+      if (denied) return denied;
       const res = await toolKhoraBuscarVolcados(args);
       return { content: [{ type: "text", text: JSON.stringify(res, null, 2) }] };
     }
@@ -182,6 +190,8 @@ async function handleMcpRequest(req: NextRequest) {
       volcado_id: z.string().describe("Folio numérico o UUID del volcado"),
     },
     async (args: any) => {
+      const denied = requireScope("volcados:read");
+      if (denied) return denied;
       const res = await toolKhoraVersionesVolcado(args);
       return { content: [{ type: "text", text: JSON.stringify(res, null, 2) }] };
     }
@@ -203,6 +213,8 @@ async function handleMcpRequest(req: NextRequest) {
       solo_metadatos: z.boolean().optional().describe("Devolver solo el inventario, sin HTML"),
     },
     async (args: any) => {
+      const denied = requireScope("volcados:read");
+      if (denied) return denied;
       const res = await toolKhoraUiReview(args);
       return { content: [{ type: "text", text: JSON.stringify(res, null, 2) }] };
     }
@@ -216,6 +228,8 @@ async function handleMcpRequest(req: NextRequest) {
       session_id: z.string().optional().describe("Limitar la observación a una sesión concreta"),
     },
     async (args: any) => {
+      const denied = requireScope("runtime:read");
+      if (denied) return denied;
       const res = await toolKhoraObservacionInstantanea(args);
       return { content: [{ type: "text", text: JSON.stringify(res, null, 2) }] };
     }
@@ -231,6 +245,8 @@ async function handleMcpRequest(req: NextRequest) {
       session_id: z.string().optional().describe("Filtrar por sesión"),
     },
     async (args: any) => {
+      const denied = requireScope("runtime:read");
+      if (denied) return denied;
       const res = await toolKhoraEventosDesde(args);
       return { content: [{ type: "text", text: JSON.stringify(res, null, 2) }] };
     }
@@ -242,6 +258,8 @@ async function handleMcpRequest(req: NextRequest) {
     "Estado operativo actual de Khora a partir del registro persistente de runtime. Devuelve actividad reciente, sesiones observadas, última observación y fallos recientes. Solo lectura.",
     {},
     async () => {
+      const denied = requireScope("runtime:read");
+      if (denied) return denied;
       const res = await toolKhoraEstadoVivo();
       return { content: [{ type: "text", text: JSON.stringify(res, null, 2) }] };
     }
@@ -263,6 +281,8 @@ async function handleMcpRequest(req: NextRequest) {
       category: z.string().optional().describe("Categoría de ObservationBatch"),
     },
     async (args: any) => {
+      const denied = requireScope("runtime:read");
+      if (denied) return denied;
       const res = await toolKhoraEventosRecientes(args);
       return { content: [{ type: "text", text: JSON.stringify(res, null, 2) }] };
     }
