@@ -14,7 +14,7 @@ export const ObservationCategorySchema = z.enum([
 ]);
 
 const JsonValueSchema: z.ZodType<unknown> = z.lazy(() => z.union([
-  z.string(),z.number().finite(),z.boolean(),z.null(),z.array(JsonValueSchema),z.record(z.string(), JsonValueSchema)
+  z.string().max(200),z.number().finite(),z.boolean(),z.null(),z.array(JsonValueSchema),z.record(z.string(), JsonValueSchema)
 ]));
 
 export const ObservationDiagnosticSchema = z.object({
@@ -107,6 +107,40 @@ export const ObservationBatchSchema = z.object({
 }).strict().superRefine((batch, ctx) => {
   if (batch.summary.event_count !== batch.events.length) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["summary", "event_count"], message: "summary.event_count no coincide con events.length" });
+  }
+  const countBy = (key: "severity" | "outcome" | "scope" | "category" | "component") =>
+    batch.events.reduce<Record<string, number>>((acc, event) => {
+      const value = String(event[key]);
+      acc[value] = (acc[value] || 0) + 1;
+      return acc;
+    }, {});
+  for (const [field, expected] of [
+    ["severity_counts", countBy("severity")],
+    ["outcome_counts", countBy("outcome")],
+    ["scope_counts", countBy("scope")],
+    ["category_counts", countBy("category")],
+    ["component_counts", countBy("component")],
+  ] as const) {
+    if (JSON.stringify(batch.summary[field]) !== JSON.stringify(expected)) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["summary", field], message: field + " no coincide con events" });
+    }
+  }
+  const expectedFailureCount = batch.events.filter((event) => event.outcome === "FAILURE" || event.severity === "CRITICAL").length;
+  const expectedWarningCount = batch.events.filter((event) => event.severity === "WARN").length;
+  const expectedGapCount = batch.events.filter((event) => event.diagnostic?.satisfied === false).length;
+  if (batch.summary.failure_count !== expectedFailureCount) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["summary", "failure_count"], message: "failure_count no coincide con events" });
+  }
+  if (batch.summary.warning_count !== expectedWarningCount) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["summary", "warning_count"], message: "warning_count no coincide con events" });
+  }
+  if (batch.summary.expectation_gap_count !== expectedGapCount) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["summary", "expectation_gap_count"], message: "expectation_gap_count no coincide con events" });
+  }
+  const expectedSequences = batch.events.map((_, index) => index + 1);
+  const actualSequences = batch.events.map((event) => event.sequence);
+  if (actualSequences.some((sequence, index) => sequence !== expectedSequences[index])) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["events"], message: "event.sequence debe ser continuo y empezar en 1" });
   }
   const firstEventTime = batch.events[0]?.client_time ?? null;
   const lastEventTime = batch.events[batch.events.length - 1]?.client_time ?? null;
