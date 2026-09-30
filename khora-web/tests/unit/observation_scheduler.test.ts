@@ -24,14 +24,13 @@ test("Batch 1: scheduler es por evento, agrupado y acotado", () => {
 test("Batch 1: reinicio recupera pendientes y los fallos respetan backoff", () => {
   const telemetry = read("extension/harmonia/core/telemetry.js");
   const shell = read("extension/harmonia/core/shell.sw.js");
-  const middleware = read("../middleware.ts");
+  const middleware = read("../../middleware.ts");
   const background = read("extension/harmonia/modules/live-caption/background.js");
   const deploy = fs.readFileSync(path.join(root, "../../.github/workflows/deploy-production.yml"), "utf8");
 
   assert.ok(telemetry.includes("if (unsynced <= 0)"));
   assert.ok(telemetry.includes("if (nextRetryAt > now) delay = Math.max(delay, nextRetryAt - now)"));
-  assert.ok(shell.includes("chrome.runtime.onStartup.addListener"));
-  assert.ok(shell.includes("chrome.runtime.onInstalled.addListener"));
+  assert.ok(telemetry.includes('scheduleObservationSync("service_worker_init")'));
   assert.ok(middleware.includes("ep-main-live\\.json"));
   assert.ok(background.includes("https?:\\/\\/"));
   assert.equal(deploy.includes('--deployment "${DEPLOY_URL}"'), false);
