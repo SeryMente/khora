@@ -50,10 +50,17 @@ function redactString(value, max) {
 
 function sanitizeScalar(key, value) {
   var k = String(key || "").toLowerCase();
-  if (/token|secret|password|cookie|authorization|credential|base64|transcript|transcription|dictation|verbatim|raw_audio|audio_data|speech_text|text_content|content_text|message|stack|description|content|caption|text|title|url|href|path|body/.test(k)) {
+  if (/token|secret|password|cookie|authorization|credential|base64|transcript|transcription|dictation|verbatim|raw_audio|speech_text|text_content|content_text/.test(k)) {
     return undefined;
   }
-  if (k === "url" || k === "href") return undefined;
+  if (k === "url" || k === "href") {
+    try {
+      var u = new URL(String(value));
+      return u.origin + u.pathname;
+    } catch (_) {
+      return "[REDACTED_URL]";
+    }
+  }
   if (typeof value === "string") return redactString(value, 256);
   if (typeof value === "number" || typeof value === "boolean" || value === null) return value;
   return value;
@@ -169,23 +176,9 @@ async function scheduleObservationSync(reason) {
     var now = Date.now();
     var dirtySince = Number(state.sync.dirtySince || 0) || now;
     var unsynced = await countUnsynced(state.buffer, state.lastReportedUuid);
-    if (unsynced <= 0) {
-      await chrome.storage.local.set({
-        [TELEMETRY_SYNC_STATE_KEY]: Object.assign({}, state.sync, {
-          dirtySince: 0,
-          pendingCount: 0,
-          nextRetryAt: 0,
-          scheduleReason: reason || "event",
-          schedulerVersion: OBSERVATION_BATCH_SCHEMA_VERSION
-        })
-      });
-      return false;
-    }
     var delay = OBS_SYNC_DEBOUNCE_MS;
     if (unsynced >= OBS_SYNC_BATCH_THRESHOLD) delay = 250;
     else delay = Math.max(250, Math.min(OBS_SYNC_DEBOUNCE_MS, dirtySince + OBS_SYNC_MAX_WAIT_MS - now));
-    var nextRetryAt = Number(state.sync.nextRetryAt || 0) || 0;
-    if (nextRetryAt > now) delay = Math.max(delay, nextRetryAt - now);
 
     await chrome.storage.local.set({
       [TELEMETRY_SYNC_STATE_KEY]: Object.assign({}, state.sync, {
@@ -384,8 +377,7 @@ self.AISTHESIS_TELEMETRY.markReported = async function (batch) {
       dirtySince: unsynced > 0 ? (state.sync.dirtySince || Date.now()) : 0,
       pendingCount: unsynced,
       lastSuccessAt: Date.now(),
-      failureCount: 0,
-      nextRetryAt: 0
+      failureCount: 0
     }),
     AISTHESIS_TELEMETRY_LAST_BATCH_ID: batch.batch_id
   });

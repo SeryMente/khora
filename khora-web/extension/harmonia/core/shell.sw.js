@@ -178,17 +178,6 @@ function installReporterMessageHandler() {
 }
 installReporterMessageHandler();
 
-function reconcileObservationScheduler(reason) {
-  try {
-    if (self.AISTHESIS_TELEMETRY && self.AISTHESIS_TELEMETRY.scheduleObservationSync) {
-      self.AISTHESIS_TELEMETRY.scheduleObservationSync(reason || "shell_ready").catch(function () {});
-    }
-  } catch (_) {}
-}
-chrome.runtime.onStartup.addListener(function () { reconcileObservationScheduler("startup"); });
-chrome.runtime.onInstalled.addListener(function () { reconcileObservationScheduler("installed"); });
-reconcileObservationScheduler("shell_ready");
-
 self.AISTHESIS_REPORT_LATEST = reportLatestObservations;
 
 self.AISTHESIS_CFG = self.AISTHESIS_CFG || {};

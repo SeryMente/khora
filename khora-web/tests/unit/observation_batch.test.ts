@@ -11,7 +11,7 @@ const baseEvent: ObservationEvent = {
   diagnostic:{expected:"recording",actual:"recording",satisfied:true},
   metrics:{bytes:123},release_sha:null,privacy_class:"ANONYMIZED_TELEMETRY"
 };
-function batchFor(event:any){
+function batchFor(event: ObservationEvent){
   return {
     schema_version:OBSERVATION_BATCH_SCHEMA_VERSION,batch_id:uuid,source:"harmonia-extension",
     extension_version:"0.3.4",session_id:"sess-1",generated_at:"2026-09-30T16:00:02.000Z",
@@ -32,6 +32,21 @@ test("ObservationBatch v2 valida cobertura diagnóstica y NDJSON",()=>{
 test("ObservationBatch v2 rechaza métricas que intenten transportar texto o audio",()=>{
   const bad={...baseEvent,metrics:{raw_audio:"data:audio/wav;base64,AAAA"}};
   assert.equal(ObservationBatchSchema.safeParse(batchFor(bad)).success,false);
+});
+
+test("ObservationBatch v2 rechaza claves de contexto que podrían filtrar navegación o texto",()=>{
+  for (const key of ["title","url","message","text","caption","content"]) {
+    const bad={...baseEvent,metrics:{[key]:"x"}};
+    assert.equal(ObservationBatchSchema.safeParse(batchFor(bad)).success,false,key);
+  }
+});
+
+test("ObservationBatch v2 rechaza inconsistencias del resumen",()=>{
+  const original=batchFor(baseEvent);
+  const badCount={...original,summary:{...original.summary,event_count:2}};
+  assert.equal(ObservationBatchSchema.safeParse(badCount).success,false);
+  const badFirst={...original,first_event_at:"2026-09-30T16:00:01.000Z"};
+  assert.equal(ObservationBatchSchema.safeParse(badFirst).success,false);
 });
 
 test("ObservationBatch v2 rechaza strings diagnósticas excesivamente largas",()=>{

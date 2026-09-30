@@ -21,6 +21,24 @@ test("Batch 1: scheduler es por evento, agrupado y acotado", () => {
   assert.match(telemetry, /let telemetryWriteChain = Promise\.resolve\(\)/);
 });
 
+test("Batch 1: reinicio recupera pendientes y los fallos respetan backoff", () => {
+  const telemetry = read("extension/harmonia/core/telemetry.js");
+  const shell = read("extension/harmonia/core/shell.sw.js");
+  const middleware = read("../middleware.ts");
+  const background = read("extension/harmonia/modules/live-caption/background.js");
+  const deploy = fs.readFileSync(path.join(root, "../../.github/workflows/deploy-production.yml"), "utf8");
+
+  assert.match(telemetry, /if \(unsynced <= 0\)/);
+  assert.match(telemetry, /if \(nextRetryAt > now\) delay = Math\.max\(delay, nextRetryAt - now\)/);
+  assert.match(telemetry, /nextRetryAt: 0/);
+  assert.match(shell, /chrome\.runtime\.onStartup\.addListener/);
+  assert.match(shell, /chrome\.runtime\.onInstalled\.addListener/);
+  assert.match(middleware, /ep-main-live\\.json\$/);
+  assert.match(background, /https\?:\\/\\//);
+  assert.doesNotMatch(deploy, /--deployment "\$\{DEPLOY_URL\}"/);
+  assert.match(deploy, /vercel curl "https:\\/\\/khora-web\\.vercel\\.app\\/ep-main-live\\.json/);
+});
+
 test("Batch 1: existe un único camino de envío y permite manual + automático", () => {
   const shell = read("extension/harmonia/core/shell.sw.js");
   const ui = read("extension/harmonia/core/aisthesis.js");

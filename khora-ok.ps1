@@ -82,7 +82,8 @@ if ($afterSha -ne $mainSha) {
 
 $proofFile = Join-Path $env:TEMP ('khora-proof-' + [guid]::NewGuid().ToString('N') + '.json')
 try {
-    $proofRaw = @(& npx vercel curl ($ProductionUrl + $ProofPath + '?sha=' + $mainSha) -fsS -o $proofFile 2>&1)
+    $proofArgs = @('vercel','curl',$ProofPath + '?sha=' + $mainSha,'--deployment',$ProductionUrl,'-fsS','-o',$proofFile)
+    $proofRaw = @(& npx @proofArgs 2>&1)
     if ($LASTEXITCODE -ne 0) {
         throw ('No se pudo consultar la prueba de Vercel: ' + (($proofRaw | ForEach-Object { [string]$_ }) -join ' '))
     }

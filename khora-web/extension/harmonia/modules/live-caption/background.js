@@ -2,7 +2,7 @@
   "use strict";
 
   var BRIDGE_URL = "ws://127.0.0.1:8788/";
-  var KHORA_HOST_RE = /^https?:\/\/(khora-web\.vercel\.app|localhost:3000|127\.0\.0\.1:3000)(?:\/|$)/i;
+  var KHORA_HOST_RE = /^https:\/\/(khora-web\.vercel\.app|localhost:3000|127\.0\.0\.1:3000)(?:\/|$)/i;
   var STATE_KEY = "khoraLiveCaptionState";
   var socket = null;
   var reconnectTimer = null;
