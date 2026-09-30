@@ -26,7 +26,7 @@ test("Batch 1: reinicio recupera pendientes y los fallos respetan backoff", () =
   const telemetry = read("extension/harmonia/core/telemetry.js");
   const middleware = read("middleware.ts");
   const background = read("extension/harmonia/modules/live-caption/background.js");
-  const deploy = fs.readFileSync(path.join(root, "../../.github/workflows/deploy-production.yml"), "utf8");
+  const deploy = fs.readFileSync(path.join(root, "../.github/workflows/deploy-production.yml"), "utf8");
 
   assert.ok(telemetry.includes("if (unsynced <= 0)"));
   assert.ok(telemetry.includes("if (nextRetryAt > now) delay = Math.max(delay, nextRetryAt - now)"));
@@ -35,6 +35,12 @@ test("Batch 1: reinicio recupera pendientes y los fallos respetan backoff", () =
   assert.ok(background.includes("https?:\\/\\/"));
   assert.equal(deploy.includes('--deployment "${DEPLOY_URL}"'), false);
   assert.ok(deploy.includes("vercel curl \"https://khora-web.vercel.app/ep-main-live.json?sha=${GITHUB_SHA}\""));
+  const manifest = read("extension/harmonia/manifest.json");
+  const builder = read("scripts/build-extension.mjs");
+  assert.ok(manifest.includes('"modules/live-caption/content.js"'));
+  assert.ok(manifest.includes('"alarms"'));
+  assert.ok(manifest.includes('"https://khora-web.vercel.app/*"'));
+  assert.ok(builder.includes('path.join(webRoot, "extension", "harmonia")'));
 });
 
 test("Batch 1: existe un único camino de envío y permite manual + automático", () => {
