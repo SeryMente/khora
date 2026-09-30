@@ -74,34 +74,45 @@ export default async function AuthorizePage(props: {
     );
   }
 
-  // 2. Validar redirect_uri por coincidencia exacta
-  if (!redirect_uri || !allowedRedirect) {
-  if (isChatGptClient && !(await validateCimdClient(client_id!, redirect_uri!))) {
-    const invalidClientUrl = new URL(redirect_uri!);
-    invalidClientUrl.searchParams.set("error", "invalid_client");
-    invalidClientUrl.searchParams.set("error_description", "Client metadata could not be verified");
-    invalidClientUrl.searchParams.set("state", state);
-    invalidClientUrl.searchParams.set("iss", config.issuer);
-    return redirect(invalidClientUrl.toString());
+  // 2. Validar redirect_uri por coincidencia exacta y CIMD para clientes ChatGPT
+  if (!redirect_uri) {
+    return (
+      <main className="min-h-screen bg-[var(--khora-absolute,#050505)] text-[var(--khora-ink,#f0f0f0)] flex items-center justify-center p-6">
+        <div className="max-w-md w-full bg-[var(--khora-surface,#121212)] border border-red-800/50 p-6 rounded-lg text-center">
+          <h1 className="text-xl font-bold text-red-400 mb-2">URI de Redirección No Permitida</h1>
+          <p className="text-sm text-gray-300">La URI de redirección es obligatoria.</p>
+        </div>
+      </main>
+    );
+  }
+
+  if (isChatGptClient) {
+    if (!(await validateCimdClient(client_id, redirect_uri))) {
+      const invalidClientUrl = new URL(redirect_uri);
+      invalidClientUrl.searchParams.set("error", "invalid_client");
+      invalidClientUrl.searchParams.set("error_description", "Client metadata could not be verified");
+      invalidClientUrl.searchParams.set("state", state);
+      invalidClientUrl.searchParams.set("iss", config.issuer);
+      return redirect(invalidClientUrl.toString());
+    }
+  } else if (!allowedRedirect) {
+    return (
+      <main className="min-h-screen bg-[var(--khora-absolute,#050505)] text-[var(--khora-ink,#f0f0f0)] flex items-center justify-center p-6">
+        <div className="max-w-md w-full bg-[var(--khora-surface,#121212)] border border-red-800/50 p-6 rounded-lg text-center">
+          <h1 className="text-xl font-bold text-red-400 mb-2">URI de Redirección No Permitida</h1>
+          <p className="text-sm text-gray-300">La URI de redirección ({redirect_uri}) no está registrada en la lista blanca.</p>
+        </div>
+      </main>
+    );
   }
 
   if (resource && resource !== config.canonicalUrl) {
-    const invalidResourceUrl = new URL(redirect_uri!);
+    const invalidResourceUrl = new URL(redirect_uri);
     invalidResourceUrl.searchParams.set("error", "invalid_target");
     invalidResourceUrl.searchParams.set("error_description", "Invalid resource");
     invalidResourceUrl.searchParams.set("state", state);
     invalidResourceUrl.searchParams.set("iss", config.issuer);
     return redirect(invalidResourceUrl.toString());
-  }
-
-    return (
-      <main className="min-h-screen bg-[var(--khora-absolute,#050505)] text-[var(--khora-ink,#f0f0f0)] flex items-center justify-center p-6">
-        <div className="max-w-md w-full bg-[var(--khora-surface,#121212)] border border-red-800/50 p-6 rounded-lg text-center">
-          <h1 className="text-xl font-bold text-red-400 mb-2">URI de Redirección No Permitida</h1>
-          <p className="text-sm text-gray-300">La URI de redirección ({redirect_uri || "no especificada"}) no está registrada en la lista blanca.</p>
-        </div>
-      </main>
-    );
   }
 
   if (requestedScopes.length === 0 || requestedScopes.some((item) => !supportedScopes.has(item))) {
