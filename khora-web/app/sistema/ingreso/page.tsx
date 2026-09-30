@@ -99,10 +99,128 @@ function IngresoContenido() {
   const finalizacionAudioRef = useRef<Promise<void> | null>(null);
   const resolverFinalizacionAudioRef = useRef<(() => void) | null>(null);
   const chromeStopResolverRef = useRef<(() => void) | null>(null);
+  const runtimeIdRef = useRef<string>("");
+  const runtimeSnapshotRef = useRef<Record<string, unknown>>({});
 
   useEffect(() => {
     const w = window as any;
     if (!w.SpeechRecognition && !w.webkitSpeechRecognition) setSoportado(false);
+  }, []);
+
+  useEffect(() => {
+    try {
+      const stored = window.sessionStorage.getItem("khora-runtime-id");
+      if (stored) {
+        runtimeIdRef.current = stored;
+        return;
+      }
+    } catch {}
+    runtimeIdRef.current = generarSesionId();
+    try {
+      window.sessionStorage.setItem("khora-runtime-id", runtimeIdRef.current);
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    runtimeSnapshotRef.current = {
+      operation_state: estado,
+      input_mode: modoEntrada,
+      listening: escuchando,
+      speech_recognition_supported: soportado,
+      chrome_bridge: chromeBridgeEstado,
+      caption_active: chromeCaptionActivo,
+      capture_status: chromeCapturaEstado,
+      editing: editando,
+      audio_present: conAudio,
+      audio_parts: partesContador,
+      audio_bytes: bytesAcumulados,
+      reconnects: reconexiones,
+      segment_count: segmentos.length,
+      interim_present: parcial.trim().length > 0,
+      error_present: error.trim().length > 0,
+      notice_present: aviso.trim().length > 0,
+      saving: guardando,
+      title_generation: generandoTitulo,
+      authoritative_transcription: retranscribiendo,
+      audio_attachment: adjuntandoAudio,
+    };
+  }, [
+    estado,
+    modoEntrada,
+    escuchando,
+    soportado,
+    chromeBridgeEstado,
+    chromeCaptionActivo,
+    chromeCapturaEstado,
+    editando,
+    conAudio,
+    partesContador,
+    bytesAcumulados,
+    reconexiones,
+    segmentos.length,
+    parcial,
+    error,
+    aviso,
+    guardando,
+    generandoTitulo,
+    retranscribiendo,
+    adjuntandoAudio,
+  ]);
+
+  useEffect(() => {
+    const publicar = (activeOverride?: boolean) => {
+      if (!runtimeIdRef.current) runtimeIdRef.current = generarSesionId();
+      const visible = document.visibilityState === "visible";
+      const focused = document.hasFocus();
+      const payload = {
+        schema_version: "1.0",
+        runtime_id: runtimeIdRef.current,
+        session_id: sesionIdRef.current || null,
+        observed_at: new Date().toISOString(),
+        route: "/sistema/ingreso",
+        screen: "ingreso",
+        active: activeOverride ?? true,
+        visible,
+        focused,
+        source: "khora-ui",
+        privacy_class: "ANONYMIZED_RUNTIME_STATE",
+        state: {
+          ...runtimeSnapshotRef.current,
+          lifecycle: activeOverride === false ? "pagehide" : "present",
+        },
+      };
+
+      fetch("/api/observaciones/runtime-state", {
+        method: "POST",
+        credentials: "include",
+        keepalive: activeOverride === false,
+        headers: {
+          "Content-Type": "application/json",
+          "X-Khora-Runtime-Source": "khora-ui",
+        },
+        body: JSON.stringify(payload),
+      }).catch(() => {});
+    };
+
+    const timer = window.setInterval(() => publicar(), 3000);
+    const onVisibilityChange = () => publicar();
+    const onFocus = () => publicar();
+    const onBlur = () => publicar();
+    const onPageHide = () => publicar(false);
+
+    publicar();
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    window.addEventListener("focus", onFocus);
+    window.addEventListener("blur", onBlur);
+    window.addEventListener("pagehide", onPageHide);
+
+    return () => {
+      window.clearInterval(timer);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      window.removeEventListener("focus", onFocus);
+      window.removeEventListener("blur", onBlur);
+      window.removeEventListener("pagehide", onPageHide);
+    };
   }, []);
 
   useEffect(() => {
