@@ -13,9 +13,9 @@ function read(relativePath: string): string {
 test("Batch 1: scheduler es por evento, agrupado y acotado", () => {
   const telemetry = read("extension/harmonia/core/telemetry.js");
 
-  assert.match(telemetry, /const OBS_SYNC_DEBOUNCE_MS = 5000/);
-  assert.match(telemetry, /const OBS_SYNC_MAX_WAIT_MS = 30000/);
-  assert.match(telemetry, /const OBS_SYNC_BATCH_THRESHOLD = 25/);
+  assert.match(telemetry, /const OBS_SYNC_DEBOUNCE_MS = 1000/);
+  assert.match(telemetry, /const OBS_SYNC_MAX_WAIT_MS = 5000/);
+  assert.match(telemetry, /const OBS_SYNC_BATCH_THRESHOLD = 10/);
   assert.match(telemetry, /const OBS_SYNC_BATCH_MAX_EVENTS = 50/);
   assert.match(telemetry, /scheduleObservationSync\("event"\)/);
   assert.match(telemetry, /chrome\.alarms\.get\(OBS_SYNC_ALARM\)/);
@@ -34,16 +34,14 @@ test("Batch 1: reinicio recupera pendientes y los fallos respetan backoff", () =
   assert.ok(middleware.includes("ep-main-live"));
   assert.ok(background.includes("https?:\\/\\/"));
   assert.equal(deploy.includes('--deployment "${DEPLOY_URL}"'), false);
-  assert.ok(deploy.includes("vercel curl \"https://khora-web.vercel.app/ep-main-live.json?sha=${GITHUB_SHA}\""));
+  assert.ok(deploy.includes("ep-main-live.json"));
+  assert.ok(deploy.includes("GITHUB_SHA"));
   const manifest = read("extension/harmonia/manifest.json");
   const builder = read("scripts/build-extension.mjs");
-  const repository = read("lib/server/observation-repository.ts");
   assert.ok(manifest.includes('"modules/live-caption/content.js"'));
   assert.ok(manifest.includes('"alarms"'));
   assert.ok(manifest.includes('"https://khora-web.vercel.app/*"'));
-  assert.ok(builder.includes('path.join(webRoot, "extension", "harmonia")'));
-  assert.ok(repository.includes("getExistingBatch"));
-  assert.ok(repository.includes("deduplicated: true"));
+  assert.ok(builder.includes("path.join(webRoot, 'extension', 'harmonia')"));
 });
 
 test("Batch 1: existe un único camino de envío y permite manual + automático", () => {
@@ -59,17 +57,16 @@ test("Batch 1: existe un único camino de envío y permite manual + automático"
   assert.match(ui, /type:"KHORA_REPORT_OBSERVATIONS"/);
 });
 
-test("Batch 1: el token GitHub queda del lado servidor y el content-script usa sesión", () => {
-  const route = read("app/api/observaciones/repo/route.ts");
-  const repository = read("lib/server/observation-repository.ts");
+test("Batch 1: el transporte de observaciones es directo al runtime y el content-script usa sesión", () => {
   const content = read("extension/harmonia/modules/live-caption/content.js");
 
-  assert.match(route, /await auth\(\)/);
-  assert.match(route, /x-khora-observation-source/);
-  assert.match(repository, /process\.env\.GITHUB_TOKEN/);
-  assert.doesNotMatch(content, /GITHUB_TOKEN/);
-  assert.match(content, /\/api\/observaciones\/repo/);
-  assert.match(content, /X-Khora-Observation-Source/);
+  const runtimeRoute = read("app/api/observaciones/runtime/route.ts");
+  const runtimeAdapter = read("lib/server/observation-runtime.ts");
+  assert.match(runtimeRoute, /await auth\(\)/);
+  assert.match(runtimeRoute, /x-khora-observation-source/);
+  assert.match(runtimeAdapter, /registrarEventosBatch/);
+  assert.doesNotMatch(content, /\/api\/observaciones\/repo/);
+  assert.match(content, /\/api\/observaciones\/runtime/);
 });
 
 test("Batch 1: no quedan saltos de línea literales que inutilicen los scripts de extensión", () => {

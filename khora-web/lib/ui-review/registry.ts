@@ -23,6 +23,22 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
       "ingreso.stats"
     ]
   },
+  "ingreso:chrome_live_caption": {
+    screen: "ingreso",
+    scenario: "chrome_live_caption",
+    title: "Ingreso · Chrome Live Caption",
+    description: "Captura del audio reproducido en una pestaña de Chrome mediante Live Caption, con estado del puente y captura persistente.",
+    status: "active",
+    recommended_viewport: "desktop",
+    ui_ids: [
+      "ingreso.container",
+      "ingreso.btn-chrome",
+      "ingreso.banner-chrome",
+      "ingreso.btn-detener",
+      "ingreso.textarea",
+      "ingreso.stats"
+    ]
+  },
   "ingreso:recording": {
     screen: "ingreso",
     scenario: "recording",

@@ -6,6 +6,7 @@ import { obtenerGeneracionRevocacion } from "@/lib/server/oauth";
 import { isProductionEnv } from "@/lib/server/mcp-db";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
+import { ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 import {
   toolKhoraResumen,
@@ -15,6 +16,7 @@ import {
   toolKhoraVersionesVolcado,
 } from "@/lib/server/mcp-tools";
 import { toolKhoraUiReview } from "@/lib/server/mcp-ui-review";
+import { toolKhoraEstadoVivo, toolKhoraEventosRecientes, toolKhoraObservacionInstantanea, toolKhoraEventosDesde } from "@/lib/server/mcp-observability";
 
 export const runtime = "nodejs";
 
@@ -28,10 +30,25 @@ function makeUnauthorizedResponse(config: ReturnType<typeof getMcpConfig>) {
       status: 401,
       headers: {
         "Content-Type": "application/json",
-        "WWW-Authenticate": `Bearer resource_metadata="${metadataUrl}", scope="volcados:read"`,
+        "WWW-Authenticate": `Bearer resource_metadata="${metadataUrl}", scope="runtime:read"`,
       },
     }
   );
+}
+
+function scopeFailure(config: ReturnType<typeof getMcpConfig>, requiredScope: string) {
+  const metadataUrl = config
+    ? `${config.issuer}/.well-known/oauth-protected-resource`
+    : "";
+  return {
+    isError: true as const,
+    content: [{ type: "text" as const, text: `Permiso insuficiente. Se requiere ${requiredScope}.` }],
+    _meta: {
+      "mcp/www_authenticate": [
+        `Bearer resource_metadata="${metadataUrl}", error="insufficient_scope", error_description="Se requiere ${requiredScope}"`,
+      ],
+    },
+  };
 }
 
 async function handleMcpRequest(req: NextRequest) {
@@ -75,9 +92,14 @@ async function handleMcpRequest(req: NextRequest) {
 
   // Verificar scope ("volcados:read")
   const scopes = (payload.scope || "").split(/\s+/).filter(Boolean);
-  if (!scopes.includes("volcados:read")) {
+  if (!scopes.includes("volcados:read") && !scopes.includes("runtime:read")) {
     return makeUnauthorizedResponse(config);
   }
+
+  const requireScope = (scope: "volcados:read" | "runtime:read") =>
+    scopes.includes(scope)
+      ? null
+      : scopeFailure(config, scope);
 
   // Verificar revocación de generación
   const currentGen = await obtenerGeneracionRevocacion(payload.sub);
@@ -87,8 +109,8 @@ async function handleMcpRequest(req: NextRequest) {
 
   // Instanciar servidor MCP en modo sin estado
   const mcpServer = new McpServer({
-    name: "khora-mcp-volcados",
-    version: "1.0.0",
+    name: "khora-mcp",
+    version: "1.2.0",
   });
 
   // Herramienta 1: khora_resumen
@@ -101,6 +123,8 @@ async function handleMcpRequest(req: NextRequest) {
       estado: z.string().optional().describe("Estado del volcado"),
     },
     async (args: any) => {
+      const denied = requireScope("volcados:read");
+      if (denied) return denied;
       const res = await toolKhoraResumen(args);
       return { content: [{ type: "text", text: JSON.stringify(res, null, 2) }] };
     }
@@ -119,6 +143,8 @@ async function handleMcpRequest(req: NextRequest) {
       offset: z.number().optional().describe("Paginación"),
     },
     async (args: any) => {
+      const denied = requireScope("volcados:read");
+      if (denied) return denied;
       const res = await toolKhoraListarVolcados(args);
       return { content: [{ type: "text", text: JSON.stringify(res, null, 2) }] };
     }
@@ -133,6 +159,8 @@ async function handleMcpRequest(req: NextRequest) {
       version: z.number().optional().describe("Versión histórica concreta a consultar"),
     },
     async (args: any) => {
+      const denied = requireScope("volcados:read");
+      if (denied) return denied;
       const res = await toolKhoraLeerVolcado(args);
       return { content: [{ type: "text", text: JSON.stringify(res, null, 2) }] };
     }
@@ -148,6 +176,8 @@ async function handleMcpRequest(req: NextRequest) {
       offset: z.number().optional().describe("Paginación"),
     },
     async (args: any) => {
+      const denied = requireScope("volcados:read");
+      if (denied) return denied;
       const res = await toolKhoraBuscarVolcados(args);
       return { content: [{ type: "text", text: JSON.stringify(res, null, 2) }] };
     }
@@ -161,6 +191,8 @@ async function handleMcpRequest(req: NextRequest) {
       volcado_id: z.string().describe("Folio numérico o UUID del volcado"),
     },
     async (args: any) => {
+      const denied = requireScope("volcados:read");
+      if (denied) return denied;
       const res = await toolKhoraVersionesVolcado(args);
       return { content: [{ type: "text", text: JSON.stringify(res, null, 2) }] };
     }
@@ -182,10 +214,233 @@ async function handleMcpRequest(req: NextRequest) {
       solo_metadatos: z.boolean().optional().describe("Devolver solo el inventario, sin HTML"),
     },
     async (args: any) => {
+      const denied = requireScope("volcados:read");
+      if (denied) return denied;
       const res = await toolKhoraUiReview(args);
       return { content: [{ type: "text", text: JSON.stringify(res, null, 2) }] };
     }
   );
+
+  // Herramienta 9: observación instantánea unificada
+  mcpServer.tool(
+    "khora_observacion_instantanea",
+    "Vista unificada del estado semántico actual del navegador, actividad persistida, último evento, fallos recientes y cursor de eventos. Solo lectura.",
+    {
+      session_id: z.string().optional().describe("Limitar la observación a una sesión concreta"),
+    },
+    async (args: any) => {
+      const denied = requireScope("runtime:read");
+      if (denied) return denied;
+      const res = await toolKhoraObservacionInstantanea(args);
+      return { content: [{ type: "text", text: JSON.stringify(res, null, 2) }] };
+    }
+  );
+
+  // Herramienta 10: eventos desde cursor
+  mcpServer.tool(
+    "khora_eventos_desde",
+    "Devuelve únicamente los eventos posteriores a un cursor monotónico global. Permite mantener una visión incremental del runtime sin releer el historial.",
+    {
+      cursor: z.number().int().nonnegative().optional().describe("ID de evento ya observado; usar 0 para comenzar"),
+      limite: z.number().int().min(1).max(200).optional().describe("Máximo de eventos a devolver"),
+      session_id: z.string().optional().describe("Filtrar por sesión"),
+    },
+    async (args: any) => {
+      const denied = requireScope("runtime:read");
+      if (denied) return denied;
+      const res = await toolKhoraEventosDesde(args);
+      return { content: [{ type: "text", text: JSON.stringify(res, null, 2) }] };
+    }
+  );
+
+  // Herramienta 7: estado vivo de runtime
+  mcpServer.tool(
+    "khora_estado_vivo",
+    "Estado operativo actual de Khora a partir del registro persistente de runtime. Devuelve actividad reciente, sesiones observadas, última observación y fallos recientes. Solo lectura.",
+    {},
+    async () => {
+      const denied = requireScope("runtime:read");
+      if (denied) return denied;
+      const res = await toolKhoraEstadoVivo();
+      return { content: [{ type: "text", text: JSON.stringify(res, null, 2) }] };
+    }
+  );
+
+  // Herramienta 8: eventos recientes de runtime
+  mcpServer.tool(
+    "khora_eventos_recientes",
+    "Lee el flujo reciente de eventos de Khora con filtros por sesión, componente, severidad, resultado, fase, scope y categoría. Solo lectura.",
+    {
+      segundos: z.number().optional().describe("Ventana retrospectiva en segundos (1-86400, default 300)"),
+      limite: z.number().optional().describe("Máximo de eventos (1-200, default 50)"),
+      session_id: z.string().optional().describe("Filtrar por sesión"),
+      component: z.string().optional().describe("Filtrar por componente"),
+      severity: z.enum(["INFO","WARN","ERROR","CRITICAL"]).optional(),
+      outcome: z.enum(["SUCCESS","FAILURE","PARTIAL","SKIPPED","PENDING"]).optional(),
+      fase: z.string().optional().describe("Filtrar por fase persistida"),
+      scope: z.string().optional().describe("Scope de ObservationBatch"),
+      category: z.string().optional().describe("Categoría de ObservationBatch"),
+    },
+    async (args: any) => {
+      const denied = requireScope("runtime:read");
+      if (denied) return denied;
+      const res = await toolKhoraEventosRecientes(args);
+      return { content: [{ type: "text", text: JSON.stringify(res, null, 2) }] };
+    }
+  );
+
+  // SDK 1.x no publica securitySchemes en el nivel raíz de tools/list.
+  // Publicamos una lista tipada explícita para que ChatGPT pueda detectar OAuth
+  // por herramienta, manteniendo las mismas herramientas y esquemas de entrada.
+  const toolsList = [
+    {
+      name: "khora_resumen",
+      description: "Conteo por estado, caracteres y rango de fechas.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          fecha_inicio: { type: "string", description: "Fecha inicio filtro ISO (YYYY-MM-DD)" },
+          fecha_fin: { type: "string", description: "Fecha fin filtro ISO (YYYY-MM-DD)" },
+          estado: { type: "string", description: "Estado del volcado" },
+        },
+        additionalProperties: false,
+      },
+      securitySchemes: [{ type: "oauth2", scopes: ["volcados:read"] }],
+    },
+    {
+      name: "khora_listar_volcados",
+      description: "Índice con metadatos y extracto. Filtros por estado, fechas u orden.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          estado: { type: "string", description: "Filtrar por estado" },
+          fecha_inicio: { type: "string", description: "Filtrar por fecha inicio" },
+          fecha_fin: { type: "string", description: "Filtrar por fecha fin" },
+          orden: { type: "string", enum: ["ASC", "DESC"], description: "Orden cronológico (ASC o DESC)" },
+          limite: { type: "number", description: "Límite de resultados (max 100)" },
+          offset: { type: "number", description: "Paginación" },
+        },
+        additionalProperties: false,
+      },
+      securitySchemes: [{ type: "oauth2", scopes: ["volcados:read"] }],
+    },
+    {
+      name: "khora_leer_volcado",
+      description: "Verbatim íntegro por id (folio o UUID), o versión histórica concreta.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          id: { type: "string", description: "Folio numérico o UUID único del volcado" },
+          version: { type: "number", description: "Versión histórica concreta a consultar" },
+        },
+        required: ["id"],
+        additionalProperties: false,
+      },
+      securitySchemes: [{ type: "oauth2", scopes: ["volcados:read"] }],
+    },
+    {
+      name: "khora_buscar_volcados",
+      description: "Búsqueda de frase con fragmentos de contexto y plegado de acentos.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          busqueda: { type: "string", description: "Frase o texto a buscar" },
+          limite: { type: "number", description: "Límite de resultados" },
+          offset: { type: "number", description: "Paginación" },
+        },
+        required: ["busqueda"],
+        additionalProperties: false,
+      },
+      securitySchemes: [{ type: "oauth2", scopes: ["volcados:read"] }],
+    },
+    {
+      name: "khora_versiones_volcado",
+      description: "Historial de correcciones, sha256 y versión aprobada.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          volcado_id: { type: "string", description: "Folio numérico o UUID del volcado" },
+        },
+        required: ["volcado_id"],
+        additionalProperties: false,
+      },
+      securitySchemes: [{ type: "oauth2", scopes: ["volcados:read"] }],
+    },
+    {
+      name: "khora_ui_review",
+      description: "Devuelve la interfaz de Khora renderizada en HTML con el corpus real del operador. Solo lectura.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          pantalla: { type: "string", enum: ["ingreso", "archivo", "revision", "aprobacion", "ingesta", "registro", "grafo"] },
+          volcado: { type: "string" },
+          solo_metadatos: { type: "boolean" },
+        },
+        additionalProperties: false,
+      },
+      securitySchemes: [{ type: "oauth2", scopes: ["volcados:read"] }],
+    },
+    {
+      name: "khora_observacion_instantanea",
+      description: "Vista unificada del estado semántico actual del navegador, actividad persistida, último evento, fallos recientes y cursor de eventos. Solo lectura.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          session_id: { type: "string", description: "Limitar la observación a una sesión concreta" },
+        },
+        additionalProperties: false,
+      },
+      securitySchemes: [{ type: "oauth2", scopes: ["runtime:read"] }],
+    },
+    {
+      name: "khora_eventos_desde",
+      description: "Devuelve únicamente los eventos posteriores a un cursor monotónico global. Permite mantener una visión incremental del runtime sin releer el historial.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          cursor: { type: "integer", minimum: 0, description: "ID de evento ya observado; usar 0 para comenzar" },
+          limite: { type: "integer", minimum: 1, maximum: 200, description: "Máximo de eventos" },
+          session_id: { type: "string", description: "Filtrar por sesión" },
+        },
+        additionalProperties: false,
+      },
+      securitySchemes: [{ type: "oauth2", scopes: ["runtime:read"] }],
+    },
+    {
+      name: "khora_estado_vivo",
+      description: "Estado operativo actual de Khora a partir del registro persistente de runtime. Devuelve actividad reciente, sesiones observadas, última observación y fallos recientes. Solo lectura.",
+      inputSchema: {
+        type: "object",
+        properties: {},
+        additionalProperties: false,
+      },
+      securitySchemes: [{ type: "oauth2", scopes: ["runtime:read"] }],
+    },
+    {
+      name: "khora_eventos_recientes",
+      description: "Lee el flujo reciente de eventos de Khora con filtros por sesión, componente, severidad, resultado, fase, scope y categoría. Solo lectura.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          segundos: { type: "number", minimum: 1, maximum: 86400, description: "Ventana retrospectiva en segundos" },
+          limite: { type: "number", minimum: 1, maximum: 200, description: "Máximo de eventos" },
+          session_id: { type: "string" },
+          component: { type: "string" },
+          severity: { type: "string", enum: ["INFO", "WARN", "ERROR", "CRITICAL"] },
+          outcome: { type: "string", enum: ["SUCCESS", "FAILURE", "PARTIAL", "SKIPPED", "PENDING"] },
+          fase: { type: "string" },
+          scope: { type: "string" },
+          category: { type: "string" },
+        },
+        additionalProperties: false,
+      },
+      securitySchemes: [{ type: "oauth2", scopes: ["runtime:read"] }],
+    },
+  ] as any;
+
+  mcpServer.server.setRequestHandler(ListToolsRequestSchema, async () => ({
+    tools: toolsList,
+  }));
 
   const transport = new WebStandardStreamableHTTPServerTransport({
     sessionIdGenerator: undefined,

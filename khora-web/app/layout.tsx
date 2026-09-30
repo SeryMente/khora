@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { UpdatePrompt } from "./components/UpdatePrompt";
 import { TelemetryProvider } from "./components/TelemetryProvider";
+import { RuntimeObserver } from "./components/RuntimeObserver";
 import KhoraSplash from "./components/os/KhoraSplash";
 import KhoraShell from "./components/os/KhoraShell";
 import "./globals.css";
@@ -64,6 +65,7 @@ export default function RootLayout({
             </head>
             <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
                 <TelemetryProvider>
+                    <RuntimeObserver />
                     <UpdatePrompt />
                     <KhoraSplash />
                     <KhoraShell>{children}</KhoraShell>

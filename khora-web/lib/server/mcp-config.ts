@@ -69,6 +69,50 @@ export function getProtectedResourceMetadata(config = getMcpConfig()) {
   return {
     resource: config.canonicalUrl,
     authorization_servers: [config.issuer],
-    scopes_supported: ["volcados:read"],
+    scopes_supported: ["runtime:read", "volcados:read"],
   };
+}
+
+
+export async function validateCimdClient(
+  clientId: string,
+  redirectUri: string,
+): Promise<boolean> {
+  try {
+    const parsed = new URL(clientId);
+    if (parsed.protocol !== "https:" || parsed.hostname !== "chatgpt.com") return false;
+    if (!/^\/oauth\/(?:client\.json|[^/]+\/client\.json)$/.test(parsed.pathname)) return false;
+
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 3000);
+    try {
+      const response = await fetch(clientId, {
+        method: "GET",
+        headers: { Accept: "application/json" },
+        cache: "no-store",
+        signal: controller.signal,
+      });
+      if (!response.ok) return false;
+      const document = (await response.json()) as {
+        client_id?: unknown;
+        redirect_uris?: unknown;
+        token_endpoint_auth_methods_supported?: unknown;
+        token_endpoint_auth_method?: unknown;
+      };
+      if (document.client_id !== clientId) return false;
+      if (!Array.isArray(document.redirect_uris) || !document.redirect_uris.includes(redirectUri)) return false;
+
+      const methods = Array.isArray(document.token_endpoint_auth_methods_supported)
+        ? document.token_endpoint_auth_methods_supported.map(String)
+        : document.token_endpoint_auth_method
+          ? [String(document.token_endpoint_auth_method)]
+          : [];
+
+      return methods.includes("none");
+    } finally {
+      clearTimeout(timer);
+    }
+  } catch {
+    return false;
+  }
 }

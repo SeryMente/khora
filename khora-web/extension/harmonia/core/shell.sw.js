@@ -5,6 +5,7 @@ importScripts("telemetry.js");
 const AISTHESIS_MODULES = self.AISTHESIS_REGISTRY || [];
 const KHORA_HOST_RE = /^https?:\/\/(khora-web\.vercel\.app|localhost:3000|127\.0\.0\.1:3000)(?:\/|$)/i;
 const REPORT_ALARM = "khora-observation-sync";
+const HEARTBEAT_ALARM = "khora-observation-heartbeat";
 
 function shellLog(msg, extra) { try { console.log("[aisthesis] " + msg, extra || ""); } catch (e) {} }
 function telem(event) {
@@ -14,6 +15,10 @@ function telem(event) {
     }
   } catch (_) {}
 }
+
+try {
+  chrome.alarms.create(HEARTBEAT_ALARM, { periodInMinutes: 0.5 });
+} catch (_) {}
 
 async function findKhoraTab() {
   var tabs = await chrome.tabs.query({
@@ -89,13 +94,13 @@ async function reportLatestObservations(options) {
               action: "REPORT_OK",
               severity: "INFO",
               payload: {
-                expected: "repository_commit",
-                actual: "repository_commit",
+                expected: "runtime_event_store",
+                actual: "runtime_event_store",
                 satisfied: true,
                 batchId: batch.batch_id,
                 eventCount: batch.events.length,
-                branch: response.result && response.result.branch,
-                commitSha: response.result && response.result.commit_sha,
+                acceptedCount: response.result && response.result.accepted,
+                duplicateCount: response.result && response.result.duplicates,
                 automatic: !options.manual
               }
             });
@@ -109,8 +114,8 @@ async function reportLatestObservations(options) {
               action: "REPORT_FAIL",
               severity: "ERROR",
               payload: {
-                expected: "repository_commit",
-                actual: "publish_failed",
+                expected: "runtime_event_store",
+                actual: "persist_failed",
                 satisfied: false,
                 batchId: batch.batch_id,
                 automatic: !options.manual,
@@ -153,7 +158,12 @@ if (chrome.tabs && chrome.tabs.onUpdated) {
 }
 
 chrome.alarms.onAlarm.addListener(function (alarm) {
-  if (!alarm || alarm.name !== REPORT_ALARM) return;
+  if (!alarm) return;
+  if (alarm.name === HEARTBEAT_ALARM) {
+    try { self.AISTHESIS_TELEMETRY.logHeartbeat(); } catch (_) {}
+    return;
+  }
+  if (alarm.name !== REPORT_ALARM) return;
   reportLatestObservations({ manual: false }).catch(function (error) {
     telem({
       suppressObservationSync: true,

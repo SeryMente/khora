@@ -1,6 +1,6 @@
 // @l0 L0-002 §4 · @req MCP-OAUTH-01/REQ-5
 import { auth } from "@/auth";
-import { getMcpConfig } from "@/lib/server/mcp-config";
+import { getMcpConfig, validateCimdClient } from "@/lib/server/mcp-config";
 import { crearCodigoAutorizacion } from "@/lib/server/oauth";
 import { redirect } from "next/navigation";
 
@@ -12,6 +12,7 @@ interface SearchParams {
   code_challenge_method?: string;
   state?: string;
   resource?: string;
+  scope?: string;
   approved?: string;
 }
 
@@ -40,11 +41,29 @@ export default async function AuthorizePage(props: {
     code_challenge_method,
     state = "",
     resource,
+    scope: requestedScope = "volcados:read",
     approved,
   } = searchParams;
 
+  const isChatGptClient = (() => {
+    if (!client_id) return false;
+    try {
+      const url = new URL(client_id);
+      return url.protocol === "https:" && url.hostname === "chatgpt.com" &&
+        /^\/oauth\/(?:client\.json|[^/]+\/client\.json)$/.test(url.pathname);
+    } catch {
+      return false;
+    }
+  })();
+
+  const allowedRedirect = redirect_uri === "https://chatgpt.com/connector_platform_oauth_redirect" ||
+    config.redirectUris.includes(redirect_uri || "");
+
+  const supportedScopes = new Set(["volcados:read", "runtime:read", "offline_access"]);
+  const requestedScopes = requestedScope.split(/\s+/).filter(Boolean);
+
   // 1. Validar client_id
-  if (!client_id || client_id !== config.clientId) {
+  if (!client_id || (!isChatGptClient && client_id !== config.clientId)) {
     return (
       <main className="min-h-screen bg-[var(--khora-absolute,#050505)] text-[var(--khora-ink,#f0f0f0)] flex items-center justify-center p-6">
         <div className="max-w-md w-full bg-[var(--khora-surface,#121212)] border border-red-800/50 p-6 rounded-lg text-center">
@@ -55,16 +74,49 @@ export default async function AuthorizePage(props: {
     );
   }
 
-  // 2. Validar redirect_uri por coincidencia exacta
-  if (!redirect_uri || !config.redirectUris.includes(redirect_uri)) {
+  // 2. Validar redirect_uri por coincidencia exacta y CIMD para clientes ChatGPT
+  if (!redirect_uri) {
     return (
       <main className="min-h-screen bg-[var(--khora-absolute,#050505)] text-[var(--khora-ink,#f0f0f0)] flex items-center justify-center p-6">
         <div className="max-w-md w-full bg-[var(--khora-surface,#121212)] border border-red-800/50 p-6 rounded-lg text-center">
           <h1 className="text-xl font-bold text-red-400 mb-2">URI de Redirección No Permitida</h1>
-          <p className="text-sm text-gray-300">La URI de redirección ({redirect_uri || "no especificada"}) no está registrada en la lista blanca.</p>
+          <p className="text-sm text-gray-300">La URI de redirección es obligatoria.</p>
         </div>
       </main>
     );
+  }
+
+  if (isChatGptClient) {
+    if (!(await validateCimdClient(client_id, redirect_uri))) {
+      const invalidClientUrl = new URL(redirect_uri);
+      invalidClientUrl.searchParams.set("error", "invalid_client");
+      invalidClientUrl.searchParams.set("error_description", "Client metadata could not be verified");
+      invalidClientUrl.searchParams.set("state", state);
+      invalidClientUrl.searchParams.set("iss", config.issuer);
+      return redirect(invalidClientUrl.toString());
+    }
+  } else if (!allowedRedirect) {
+    return (
+      <main className="min-h-screen bg-[var(--khora-absolute,#050505)] text-[var(--khora-ink,#f0f0f0)] flex items-center justify-center p-6">
+        <div className="max-w-md w-full bg-[var(--khora-surface,#121212)] border border-red-800/50 p-6 rounded-lg text-center">
+          <h1 className="text-xl font-bold text-red-400 mb-2">URI de Redirección No Permitida</h1>
+          <p className="text-sm text-gray-300">La URI de redirección ({redirect_uri}) no está registrada en la lista blanca.</p>
+        </div>
+      </main>
+    );
+  }
+
+  if (resource && resource !== config.canonicalUrl) {
+    const invalidResourceUrl = new URL(redirect_uri);
+    invalidResourceUrl.searchParams.set("error", "invalid_target");
+    invalidResourceUrl.searchParams.set("error_description", "Invalid resource");
+    invalidResourceUrl.searchParams.set("state", state);
+    invalidResourceUrl.searchParams.set("iss", config.issuer);
+    return redirect(invalidResourceUrl.toString());
+  }
+
+  if (requestedScopes.length === 0 || requestedScopes.some((item) => !supportedScopes.has(item))) {
+    const invalidScopeUrl = new URL(redirect_uri); invalidScopeUrl.searchParams.set("error", "invalid_scope"); invalidScopeUrl.searchParams.set("error_description", "Unsupported scope"); invalidScopeUrl.searchParams.set("state", state); invalidScopeUrl.searchParams.set("iss", config.issuer); return redirect(invalidScopeUrl.toString());
   }
 
   // A partir de aquí, client_id y redirect_uri son válidos. Errores posteriores pueden redirigir a redirect_uri.
@@ -83,6 +135,7 @@ export default async function AuthorizePage(props: {
         error: "unsupported_response_type",
         error_description: "Response type must be 'code'",
         state,
+        iss: config.issuer,
       })
     );
   }
@@ -94,6 +147,7 @@ export default async function AuthorizePage(props: {
         error: "invalid_request",
         error_description: "code_challenge with method S256 is required",
         state,
+        iss: config.issuer,
       })
     );
   }
@@ -122,6 +176,7 @@ export default async function AuthorizePage(props: {
         error: "access_denied",
         error_description: `Acceso denegado: La cuenta de Google (${userEmail}) no esta autorizada para MCP. Se requiere ${config.allowedEmail}.`,
         state,
+        iss: config.issuer,
       })
     );
   }
@@ -133,12 +188,14 @@ export default async function AuthorizePage(props: {
       redirectUri: redirect_uri,
       resource: resource || config.canonicalUrl,
       usuario: userEmail,
+      scope: requestedScopes.join(" "),
     });
 
     redirect(
       buildRedirectUrl({
         code,
         state,
+        iss: config.issuer,
       })
     );
   }
@@ -164,7 +221,7 @@ export default async function AuthorizePage(props: {
 
         <div className="space-y-4 text-sm text-gray-300 mb-8">
           <p>
-            La aplicación en <strong className="text-white">{redirectHost}</strong> solicita acceso para consultar los volcados de Khora en nombre de:
+            La aplicación en <strong className="text-white">{redirectHost}</strong> solicita acceso de solo lectura a los datos de Khora en nombre de:
           </p>
 
           <div className="p-3 rounded-lg bg-black/40 border border-gray-800 flex items-center justify-between">
@@ -177,7 +234,7 @@ export default async function AuthorizePage(props: {
             <ul className="text-xs space-y-1 text-gray-300">
               <li className="flex items-center space-x-2">
                 <span className="text-emerald-400">✓</span>
-                <span>Lectura de volcados y revisiones (<code>volcados:read</code>)</span>
+                <span>Lectura del runtime (<code>runtime:read</code>) y, cuando se solicita, de volcados/revisiones (<code>volcados:read</code>)</span>
               </li>
               <li className="flex items-center space-x-2">
                 <span className="text-emerald-400">✓</span>
@@ -198,6 +255,7 @@ export default async function AuthorizePage(props: {
           <input type="hidden" name="code_challenge" value={code_challenge} />
           <input type="hidden" name="code_challenge_method" value={code_challenge_method} />
           <input type="hidden" name="state" value={state} />
+          <input type="hidden" name="scope" value={requestedScopes.join(" ")} />
           {resource && <input type="hidden" name="resource" value={resource} />}
           <input type="hidden" name="approved" value="true" />
 

@@ -14,6 +14,7 @@ test.describe("MCP OAuth Authorization Server & Protected Resource", () => {
     expect(body.authorization_endpoint).toContain("/oauth/authorize");
     expect(body.token_endpoint).toContain("/api/oauth/token");
     expect(body.code_challenge_methods_supported).toEqual(["S256"]);
+    expect(body.scopes_supported).toContain("runtime:read");
     expect(body.scopes_supported).toContain("volcados:read");
     expect(body.grant_types_supported).toEqual(["authorization_code", "refresh_token"]);
   });
@@ -32,6 +33,7 @@ test.describe("MCP OAuth Authorization Server & Protected Resource", () => {
     expect(body1.resource).toContain("/api/mcp");
     expect(body1.authorization_servers).toBeDefined();
     expect(body1.authorization_servers[0]).not.toContain("/api/mcp");
+    expect(body1.scopes_supported).toContain("runtime:read");
     expect(body1.scopes_supported).toContain("volcados:read");
   });
 
@@ -41,7 +43,7 @@ test.describe("MCP OAuth Authorization Server & Protected Resource", () => {
     const header = res.headers()["www-authenticate"];
     expect(header).toBeDefined();
     expect(header).toContain("Bearer resource_metadata=");
-    expect(header).toContain("scope=\"volcados:read\"");
+    expect(header).toContain("scope=\"runtime:read\"");
   });
 
   test("Form-urlencoded /api/oauth/token with invalid client credentials returns invalid_client", async ({ request }) => {

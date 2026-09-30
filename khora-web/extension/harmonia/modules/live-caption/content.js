@@ -27,9 +27,9 @@
     if (message.type === "KHORA_OBSERVATION_REPORT_REQUEST") {
       (async function () {
         try {
-          var response = await fetch("/api/observaciones/repo", { method:"POST", credentials:"include", headers:{"Content-Type":"application/json","X-Khora-Observation-Source":"harmonia-extension"}, body:JSON.stringify(message.batch) });
+          var response = await fetch("/api/observaciones/runtime", { method:"POST", credentials:"include", headers:{"Content-Type":"application/json","X-Khora-Observation-Source":"harmonia-extension"}, body:JSON.stringify(message.batch) });
           var raw = await response.text(); var data = null; try { data = JSON.parse(raw); } catch (_) {}
-          sendResponse(response.ok ? {ok:true,result:data&&data.repository?data.repository:null} : {ok:false,status:response.status,error:data&&data.error?data.error:raw.slice(0,300)});
+          sendResponse(response.ok ? {ok:true,result:data&&data.runtime?data.runtime:null} : {ok:false,status:response.status,error:data&&data.error?data.error:raw.slice(0,300)});
         } catch (error) { sendResponse({ok:false,error:String(error)}); }
       })();
       return true;

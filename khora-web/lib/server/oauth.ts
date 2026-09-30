@@ -16,6 +16,7 @@ export interface AuthCodeRecord {
   code_challenge: string;
   redirect_uri: string;
   resource: string;
+  scope: string;
   usuario: string;
   expira_en: Date;
   usado_en: Date | null;
@@ -26,6 +27,7 @@ export async function crearCodigoAutorizacion(params: {
   redirectUri: string;
   resource: string;
   usuario: string;
+  scope: string;
 }): Promise<string> {
   const rawCode = generateRandomToken(32);
   const codeHash = hashString(rawCode);
@@ -33,9 +35,9 @@ export async function crearCodigoAutorizacion(params: {
 
   const db = getDb();
   await db.query(
-    `INSERT INTO oauth_codes (code_hash, code_challenge, redirect_uri, resource, usuario, expira_en)
-     VALUES ($1, $2, $3, $4, $5, $6)`,
-    [codeHash, params.codeChallenge, params.redirectUri, params.resource, params.usuario, expiresAt]
+    `INSERT INTO oauth_codes (code_hash, code_challenge, redirect_uri, resource, scope, usuario, expira_en)
+     VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+    [codeHash, params.codeChallenge, params.redirectUri, params.resource, params.scope, params.usuario, expiresAt]
   );
 
   return rawCode;
@@ -48,7 +50,7 @@ export async function obtenerCodigoAutorizacionValido(
   const db = getDb();
 
   const result = await db.query<AuthCodeRecord>(
-    `SELECT id, code_hash, code_challenge, redirect_uri, resource, usuario, expira_en, usado_en
+    `SELECT id, code_hash, code_challenge, redirect_uri, resource, scope, usuario, expira_en, usado_en
      FROM oauth_codes
      WHERE code_hash = $1
        AND usado_en IS NULL
@@ -89,6 +91,7 @@ export interface RefreshTokenRecord {
   token_hash: string;
   usuario: string;
   resource: string;
+  scope: string;
   emitido_en: Date;
   expira_en: Date;
   rotado_a: string | null;
@@ -97,6 +100,7 @@ export interface RefreshTokenRecord {
 export async function crearRefreshToken(params: {
   usuario: string;
   resource: string;
+  scope: string;
 }): Promise<string> {
   const rawToken = generateRandomToken(32);
   const tokenHash = hashString(rawToken);
@@ -104,9 +108,9 @@ export async function crearRefreshToken(params: {
 
   const db = getDb();
   await db.query(
-    `INSERT INTO oauth_refresh_tokens (token_hash, usuario, resource, expira_en)
-     VALUES ($1, $2, $3, $4)`,
-    [tokenHash, params.usuario, params.resource, expiresAt]
+    `INSERT INTO oauth_refresh_tokens (token_hash, usuario, resource, scope, expira_en)
+     VALUES ($1, $2, $3, $4, $5)`,
+    [tokenHash, params.usuario, params.resource, params.scope, expiresAt]
   );
 
   return rawToken;
@@ -133,7 +137,7 @@ export async function rotarRefreshToken(
        WHERE token_hash = $2
          AND rotado_a IS NULL
          AND expira_en > NOW()
-       RETURNING id, token_hash, usuario, resource, emitido_en, expira_en, rotado_a`,
+       RETURNING id, token_hash, usuario, resource, scope, emitido_en, expira_en, rotado_a`,
       [newTokenHash, tokenHash]
     );
 
@@ -145,9 +149,9 @@ export async function rotarRefreshToken(
     const record = updateRes.rows[0];
 
     await client.query(
-      `INSERT INTO oauth_refresh_tokens (token_hash, usuario, resource, expira_en)
-       VALUES ($1, $2, $3, $4)`,
-      [newTokenHash, record.usuario, record.resource, newExpiresAt]
+      `INSERT INTO oauth_refresh_tokens (token_hash, usuario, resource, scope, expira_en)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [newTokenHash, record.usuario, record.resource, record.scope, newExpiresAt]
     );
 
     await client.query("COMMIT");
