@@ -114,6 +114,12 @@ export const ObservationBatchSchema = z.object({
       acc[value] = (acc[value] || 0) + 1;
       return acc;
     }, {});
+  const sameCounts = (actual: Record<string, number>, expected: Record<string, number>) => {
+    const actualKeys = Object.keys(actual).sort();
+    const expectedKeys = Object.keys(expected).sort();
+    return actualKeys.length === expectedKeys.length &&
+      actualKeys.every((key, index) => key === expectedKeys[index] && actual[key] === expected[key]);
+  };
   for (const [field, expected] of [
     ["severity_counts", countBy("severity")],
     ["outcome_counts", countBy("outcome")],
@@ -121,7 +127,7 @@ export const ObservationBatchSchema = z.object({
     ["category_counts", countBy("category")],
     ["component_counts", countBy("component")],
   ] as const) {
-    if (JSON.stringify(batch.summary[field]) !== JSON.stringify(expected)) {
+    if (!sameCounts(batch.summary[field], expected)) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["summary", field], message: field + " no coincide con events" });
     }
   }
