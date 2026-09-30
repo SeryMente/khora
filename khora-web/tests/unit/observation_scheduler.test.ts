@@ -42,8 +42,6 @@ test("Batch 1: reinicio recupera pendientes y los fallos respetan backoff", () =
   assert.ok(manifest.includes('"alarms"'));
   assert.ok(manifest.includes('"https://khora-web.vercel.app/*"'));
   assert.ok(builder.includes('path.join(webRoot, "extension", "harmonia")'));
-  assert.ok(repository.includes("getExistingBatch"));
-  assert.ok(repository.includes("deduplicated: true"));
 });
 
 test("Batch 1: existe un único camino de envío y permite manual + automático", () => {
@@ -59,9 +57,7 @@ test("Batch 1: existe un único camino de envío y permite manual + automático"
   assert.match(ui, /type:"KHORA_REPORT_OBSERVATIONS"/);
 });
 
-test("Batch 1: el token GitHub queda del lado servidor y el content-script usa sesión", () => {
-  const route = read("app/api/observaciones/repo/route.ts");
-  const repository = read("lib/server/observation-repository.ts");
+test("Batch 1: el transporte de observaciones es directo al runtime y el content-script usa sesión", () => {
   const content = read("extension/harmonia/modules/live-caption/content.js");
 
   const runtimeRoute = read("app/api/observaciones/runtime/route.ts");
