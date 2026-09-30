@@ -26,7 +26,8 @@
     sequence: 0
   };
 
-  function iso() { return new Date().toISOString(); }\n  function telem(event) { try { if (self.AISTHESIS_TELEMETRY && self.AISTHESIS_TELEMETRY.logEvent) self.AISTHESIS_TELEMETRY.logEvent(event); } catch (_) {} }
+  function iso() { return new Date().toISOString(); }
+  function telem(event) { try { if (self.AISTHESIS_TELEMETRY && self.AISTHESIS_TELEMETRY.logEvent) self.AISTHESIS_TELEMETRY.logEvent(event); } catch (_) {} }
 
   async function readState() {
     var value = await chrome.storage.local.get(STATE_KEY);
@@ -155,7 +156,8 @@
     });
 
     socket.addEventListener("error", function () {
-      writeState({ bridgeStatus: "error", bridgeStatusDetail: "No se pudo conectar con el bridge local." });\n      telem({moduleId:"live-caption",component:"caption-bridge",action:"BRIDGE_ERROR",severity:"ERROR",payload:{expected:"bridge_available",actual:"websocket_error",satisfied:false}});
+      writeState({ bridgeStatus: "error", bridgeStatusDetail: "No se pudo conectar con el bridge local." });
+      telem({moduleId:"live-caption",component:"caption-bridge",action:"BRIDGE_ERROR",severity:"ERROR",payload:{expected:"bridge_available",actual:"websocket_error",satisfied:false}});
     });
 
     socket.addEventListener("close", function () {
@@ -306,9 +308,11 @@
         timestamp: iso(),
         sessionId: state.armedSessionId
       });
-      telem({moduleId:"live-caption",component:"tab-capture",action:"CAPTURE_START",severity:"INFO",sessionId:state.armedSessionId,payload:{expected:"recording",actual:"recording",satisfied:true,source:"chrome_tab"}});\n      notify("Khora · Audio Chrome", "Captura iniciada para la sesión de Ingreso.");
+      telem({moduleId:"live-caption",component:"tab-capture",action:"CAPTURE_START",severity:"INFO",sessionId:state.armedSessionId,payload:{expected:"recording",actual:"recording",satisfied:true,source:"chrome_tab"}});
+      notify("Khora · Audio Chrome", "Captura iniciada para la sesión de Ingreso.");
     } catch (error) {
-      await writeState({ captureStatus: "error", captureError: String(error) });\n      telem({moduleId:"live-caption",component:"tab-capture",action:"CAPTURE_ERROR",severity:"ERROR",payload:{expected:"recording",actual:"error",satisfied:false},errorDetails:{name:"CaptureError",message:String(error)}});
+      await writeState({ captureStatus: "error", captureError: String(error) });
+      telem({moduleId:"live-caption",component:"tab-capture",action:"CAPTURE_ERROR",severity:"ERROR",payload:{expected:"recording",actual:"error",satisfied:false},errorDetails:{name:"CaptureError",message:String(error)}});
       broadcast({ type: "capture.status", status: "error", reason: String(error), timestamp: iso() });
       notify("Khora · Audio Chrome", "No se pudo iniciar la captura: " + String(error));
     }
