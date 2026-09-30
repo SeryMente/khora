@@ -9,7 +9,7 @@ const RUTAS_OS = new Set<string>(["/"]);
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|api/auth|api/version|api/mcp|api/ep/(?:bootstrap|events|logs)|\\.well-known|api/oauth/token).*)",
+    "/((?!_next/static|_next/image|favicon.ico|ep-main-live\\.json$|api/auth|api/version|api/mcp|api/ep/(?:bootstrap|events|logs)|\\.well-known|api/oauth/token).*)",
   ],
 };
 
