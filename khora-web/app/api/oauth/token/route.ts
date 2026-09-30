@@ -80,8 +80,10 @@ export async function POST(req: NextRequest) {
   }
 
   if (publicChatGptClient) {
-    const redirectUriForCimd = formData.get("redirect_uri")?.toString() || "";
-    if (!redirectUriForCimd || !(await validateCimdClient(clientId, redirectUriForCimd))) {
+    const redirectUriForCimd =
+      formData.get("redirect_uri")?.toString() ||
+      "https://chatgpt.com/connector_platform_oauth_redirect";
+    if (!(await validateCimdClient(clientId, redirectUriForCimd))) {
       return NextResponse.json(
         { error: "invalid_client", error_description: "ChatGPT client metadata could not be verified" },
         { status: 401 },
