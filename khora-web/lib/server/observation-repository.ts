@@ -1,4 +1,3 @@
-import crypto from "crypto";
 import {
   OBSERVATION_BATCH_BRANCH,
   OBSERVATION_BATCH_HISTORY_DIR,
@@ -55,11 +54,40 @@ async function createBlob(token:string,content:string) {
   return String(data.sha);
 }
 
+async function getExistingBatch(token:string, branch:string, batchId:string) {
+  const historyPath = OBSERVATION_BATCH_HISTORY_DIR + "/" + batchId + ".json";
+  try {
+    await gh(token,"/repos/"+REPO+"/contents/"+historyPath.split("/").map(encodeURIComponent).join("/")+"?ref="+encodeURIComponent(branch));
+    const ref = await getRef(token,branch);
+    return { exists: true, historyPath, commitSha: String(ref.object.sha) };
+  } catch (error:any) {
+    if (String(error?.message || "").startsWith("GitHub HTTP 404")) {
+      return { exists: false, historyPath, commitSha: null };
+    }
+    throw error;
+  }
+}
+
 export async function publishObservationBatch(batch:ObservationBatch) {
   const token = process.env.GITHUB_TOKEN;
   if (!token) throw new Error("GITHUB_TOKEN no está configurado en el entorno de producción");
 
   const branch = await ensureBranch(token);
+  const historyPath = OBSERVATION_BATCH_HISTORY_DIR + "/" + batch.batch_id + ".json";
+  const existing = await getExistingBatch(token, OBSERVATION_BATCH_BRANCH, batch.batch_id);
+  if (existing.exists) {
+    return {
+      branch: OBSERVATION_BATCH_BRANCH,
+      batch_id: batch.batch_id,
+      commit_sha: existing.commitSha,
+      commit_url: null,
+      latest_path: OBSERVATION_BATCH_LATEST_PATH,
+      history_path: historyPath,
+      event_count: batch.events.length,
+      deduplicated: true
+    };
+  }
+
   const parent = await gh(token,"/repos/"+REPO+"/git/commits/"+branch.sha);
   const json = JSON.stringify(batch);
   const ndjson = buildNdjson(batch.events);
