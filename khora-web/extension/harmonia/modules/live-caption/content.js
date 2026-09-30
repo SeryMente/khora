@@ -21,8 +21,8 @@
     }).catch(function () {});
   });
 
-  chrome.runtime.onMessage.addListener(function (message) {
-    if (!message || message.type !== "KHORA_LIVE_CAPTION_EVENT") return;
+  chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+    if (!message) return false;\n\n    if (message.type === "KHORA_OBSERVATION_REPORT_REQUEST") {\n      (async function () {\n        try {\n          var response = await fetch("/api/observaciones/repo", { method:"POST", credentials:"include", headers:{"Content-Type":"application/json","X-Khora-Observation-Source":"harmonia-extension"}, body:JSON.stringify(message.batch) });\n          var raw = await response.text(); var data = null; try { data = JSON.parse(raw); } catch (_) {}\n          sendResponse(response.ok ? {ok:true,result:data&&data.repository?data.repository:null} : {ok:false,status:response.status,error:data&&data.error?data.error:raw.slice(0,300)});\n        } catch (error) { sendResponse({ok:false,error:String(error)}); }\n      })();\n      return true;\n    }\n\n    if (message.type !== "KHORA_LIVE_CAPTION_EVENT") return false;
     var payload = Object.assign({}, message);
     delete payload.type;
     payload.channel = CHANNEL;

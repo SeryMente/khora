@@ -46,7 +46,7 @@
   .ahk.ok .luz{ background:var(--ok); box-shadow:0 0 10px rgba(127,174,107,.7); }
   .ahk.bloq .luz{ background:var(--err); box-shadow:0 0 10px rgba(193,85,75,.7); animation:lat 1.4s infinite; }
   @keyframes lat{ 0%,100%{opacity:1} 50%{opacity:.25} }
-  /* Lentes (modos) */
+  .report{ display:flex;align-items:center;gap:8px;margin-left:8px;padding:7px 11px;border:1px solid var(--oro-tenue);border-radius:4px;background:rgba(201,162,75,.05);color:var(--oro-claro);font:11px var(--serif);letter-spacing:.12em;text-transform:uppercase;cursor:pointer; } .report:hover{background:rgba(201,162,75,.13)} .report:disabled{opacity:.45;cursor:wait}.report-status{min-width:80px;color:var(--ceniza);font-size:10px;letter-spacing:.08em;text-transform:uppercase}\n  /* Lentes (modos) */
   nav.lentes{ display:flex; gap:2px; padding:0 22px; background:var(--obsidiana2);
     border-bottom:1px solid var(--linea); }
   .lente{ position:relative; background:transparent; border:none; cursor:pointer;
@@ -82,7 +82,7 @@
     </div>
     <div class="lema">Hierofante <span>·</span> Silencio <span>·</span> Secretos</div>
     <div class="estado">
-      <div class="ahk" id="ahk"><span class="luz"></span><span id="ahkTxt">AHK · verificando</span></div>
+      <div class="ahk" id="ahk"><span class="luz"></span><span id="ahkTxt">AHK · verificando</span></div><button class="report" id="reportObservations" title="Publicar el último batch de observaciones en el repositorio de Khora">OBS · REPORTAR</button><span class="report-status" id="reportObservationsStatus"></span>
     </div>
   </header>
 
