@@ -40,8 +40,8 @@ function scopeFailure(config: ReturnType<typeof getMcpConfig>, requiredScope: st
     ? `${config.issuer}/.well-known/oauth-protected-resource`
     : "";
   return {
-    isError: true,
-    content: [{ type: "text", text: `Permiso insuficiente. Se requiere ${requiredScope}.` }],
+    isError: true as const,
+    content: [{ type: "text" as const, text: `Permiso insuficiente. Se requiere ${requiredScope}.` }],
     _meta: {
       "mcp/www_authenticate": [
         `Bearer resource_metadata="${metadataUrl}", error="insufficient_scope", error_description="Se requiere ${requiredScope}"`,
