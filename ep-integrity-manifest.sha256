@@ -481,7 +481,7 @@ a470a9a5e3eb0e0830c54e260ee89d0ff06e297d87d849c27f44875b95504360  ./khora-web/te
 5b7eb0c6bf8c40b63ba7cf58602046237cbe8f1004ff015e4c8ee65e7da06a1b  ./khora-web/tests/unit/mcp_oauth.test.ts
 f6b775825039cb25b791e26e6c5e8f1dea99875b7d7177a6e6cea188926b00d2  ./khora-web/tests/unit/oauth.test.ts
 89570094d8190a3a44a1ece7fa028972e56d9ee00cba2e75ddd0e6b846383b73  ./khora-web/tests/unit/observation_batch.test.ts
-f2d5afd8dd79c1f1098f2fe013fe2b7f907db2d8d7a764d1af9c3bee7ddc6603  ./khora-web/tests/unit/observation_scheduler.test.ts
+afd1738e65f0112af9eb3ad643e50c0a2be103e01bb98e5a1976e12309236847  ./khora-web/tests/unit/observation_scheduler.test.ts
 c230791252e607f762387754bf4ce1b22b54235d05b129c0f9126bf2c6b32f12  ./khora-web/tests/unit/pipeline.test.ts
 352e94e2b71753804079e992ef045eb54bdf2daa57e4efbb6b366923ce0fe704  ./khora-web/tests/unit/reconciliacion_manual.test.ts
 5e772536efe9a56735e1ee6cf1283606cd19fe771824e6972bc1da6608ff81b0  ./khora-web/tests/unit/review_entrance.test.ts
