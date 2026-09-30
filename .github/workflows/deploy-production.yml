@@ -76,16 +76,20 @@ jobs:
         shell: bash
         run: |
           for attempt in {1..30}; do
-            if npx vercel curl --token="${VERCEL_TOKEN}" "https://khora-web.vercel.app/ep-main-live.json?sha=${GITHUB_SHA}" 2>/dev/null | jq -e --arg sha "${GITHUB_SHA}" '.branch=="main" and .commitSha==$sha' >/dev/null; then
+            PROOF_FILE=$(mktemp)
+            if npx vercel curl "/ep-main-live.json?sha=${GITHUB_SHA}" --deployment "${DEPLOY_URL}" -fsS -o "${PROOF_FILE}" >/dev/null 2>&1 &&
+               jq -e --arg sha "${GITHUB_SHA}" '.branch=="main" and .commitSha==$sha' "${PROOF_FILE}" >/dev/null 2>&1; then
+              rm -f "${PROOF_FILE}"
               exit 0
             fi
+            rm -f "${PROOF_FILE}"
             sleep 2
           done
           echo "Vercel no acredita el SHA exacto de main: ${GITHUB_SHA}"
           exit 1
 
       - name: Post-deploy smoke check
-        run: npx vercel curl --token="${VERCEL_TOKEN}" https://khora-web.vercel.app >/dev/null
+        run: npx vercel curl / --deployment "${DEPLOY_URL}" -fsS -o /dev/null
 
       - name: Set Deployment Status (Success)
         if: success()
