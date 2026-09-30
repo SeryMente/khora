@@ -37,10 +37,13 @@ test("Batch 1: reinicio recupera pendientes y los fallos respetan backoff", () =
   assert.ok(deploy.includes("vercel curl \"https://khora-web.vercel.app/ep-main-live.json?sha=${GITHUB_SHA}\""));
   const manifest = read("extension/harmonia/manifest.json");
   const builder = read("scripts/build-extension.mjs");
+  const repository = read("lib/server/observation-repository.ts");
   assert.ok(manifest.includes('"modules/live-caption/content.js"'));
   assert.ok(manifest.includes('"alarms"'));
   assert.ok(manifest.includes('"https://khora-web.vercel.app/*"'));
   assert.ok(builder.includes('path.join(webRoot, "extension", "harmonia")'));
+  assert.ok(repository.includes("getExistingBatch"));
+  assert.ok(repository.includes("deduplicated: true"));
 });
 
 test("Batch 1: existe un único camino de envío y permite manual + automático", () => {
