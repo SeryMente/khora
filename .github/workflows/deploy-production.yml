@@ -77,7 +77,7 @@ jobs:
         run: |
           for attempt in {1..30}; do
             PROOF_FILE=$(mktemp)
-            if npx vercel curl "/ep-main-live.json?sha=${GITHUB_SHA}" --deployment "${DEPLOY_URL}" -fsS -o "${PROOF_FILE}" >/dev/null 2>&1 &&
+            if npx vercel curl "https://khora-web.vercel.app/ep-main-live.json?sha=${GITHUB_SHA}" -fsS -o "${PROOF_FILE}" >/dev/null 2>&1 &&
                jq -e --arg sha "${GITHUB_SHA}" '.branch=="main" and .commitSha==$sha' "${PROOF_FILE}" >/dev/null 2>&1; then
               rm -f "${PROOF_FILE}"
               exit 0
@@ -89,7 +89,7 @@ jobs:
           exit 1
 
       - name: Post-deploy smoke check
-        run: npx vercel curl / --deployment "${DEPLOY_URL}" -fsS -o /dev/null
+        run: npx vercel curl https://khora-web.vercel.app/ -fsS -o /dev/null
 
       - name: Set Deployment Status (Success)
         if: success()
