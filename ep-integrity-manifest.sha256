@@ -231,7 +231,7 @@ d8a668c2a1a5879029f972afca8fb5b146391b529442ba4074141456ffbf7db7  ./khora-web/ap
 db60f4bb5a898b2e5ac57f91195454e693769c8e63a1064db300663f331cecd4  ./khora-web/app/components/CapturarModal.tsx
 31a4ccb3ec336349d6718c4b73f2e687aa02715e89f780a564f6ab0224d5be66  ./khora-web/app/components/CopyBlock.tsx
 969cca43454fdd08a07938dd5984fbf62832e6abef6455d6cdba45b5f8ffe422  ./khora-web/app/components/ep/EntornoPersistentePanel.tsx
-5559c740b90c8c130e51855e79b4abd81a5baa69c867aacd6f28c9ea2e68ec7d  ./khora-web/app/components/GlobalFooter.tsx
+54aaea486b61dc0a5b6f436c17bb54e6c14454b151ce73c139698594938274ea  ./khora-web/app/components/GlobalFooter.tsx
 bc5a4691e376000eaaecaaad8e76f6ea55f08431e57a3b796a8963f75772fb7a  ./khora-web/app/components/os/AppIcon.tsx
 e623512b60f3f656af1268553ce93e618375375352bf84b90c480b9358e79411  ./khora-web/app/components/os/KhoraShell.tsx
 6dd2c462593cbaee7789886c973870825deb48c1c0db804188af101a1622c215  ./khora-web/app/components/os/KhoraSplash.tsx
