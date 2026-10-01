@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import path from 'path';
 
 test.describe('Web <-> Kernel Parity', () => {
@@ -31,7 +31,8 @@ print(json.dumps(schema))
     fs.writeFileSync(scriptPath, pyScript);
 
     try {
-      const result = execSync(`python ${scriptPath}`);
+      const pythonCommand = process.platform === "win32" ? "py" : "python";
+      const result = execFileSync(pythonCommand, [scriptPath], { encoding: "utf8" });
       const kernelSchema = JSON.parse(result.toString());
 
       // In TypeScript we don't have runtime reflection for interfaces, but we can verify the python

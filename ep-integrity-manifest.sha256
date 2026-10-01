@@ -305,7 +305,7 @@ beb307e40c5cc1e3a2d3fbe7041ee9ca3580f706ddbb41c415e6e29f8049965e  ./khora-web/e2
 8ebaed8d25f88e51fc0806de6321fa57fb731d0189cafd0efb1350052b6f9000  ./khora-web/e2e/integracion-extension.spec.ts
 5f4b1f0c47755f1f079f2cd4c2ef3440a90d291ae28538c2bd8e482beb583b78  ./khora-web/e2e/mapa.spec.ts
 d76b0f332b919ce26f69fa42d5b104a2c91e6e583402deaf29207094f504cd64  ./khora-web/e2e/mcp_oauth.spec.ts
-fdb3b841cf0f15d1410818f70650ee38656305df62905e615718243b0b8bdc61  ./khora-web/e2e/parity.spec.ts
+2b9bbcc2a410ec4592f1d8e101417405fa7fa26337cb42582cdc8c97ae9ffd35  ./khora-web/e2e/parity.spec.ts
 47ee065c8426ff699bbba410d05103482e9a90e7a2f5f39bc038e18970f0db2f  ./khora-web/e2e/pipeline.spec.ts
 bc499301e9c2e8851e5f66ee602ec56e58859e8bd991922e96c4e9c29dbe5fb7  ./khora-web/e2e/revision-cockpit.spec.ts
 9a96c73e5c916b6afb25859e9c05de20432dc2bd3b72ae3b869c3eb0e46fe4af  ./khora-web/e2e/shell-v2.spec.ts
@@ -440,7 +440,7 @@ dac4f7655cc8f3b18c50ccd9cee11d780f8841ac24368d318f3d9daa8dd0577a  ./khora-web/ma
 78fe7d2aa90eed3807faf54fd302958b7fb52ef3401e5f6ca50650917b603623  ./khora-web/middleware.ts
 0a3e191a99ace83480b259685a68f951068c9cff2a4de2cfa0f53c169f9df114  ./khora-web/next.config.ts
 28f6b2e076565918fe9c777075211043836ecb8f1e18d7b579d6b0db95f80b9e  ./khora-web/package-lock.json
-7bd0bbab29fd4ce7a10d949914e75dfcfb82c3b7a9b78ad42f9af49e4e299215  ./khora-web/package.json
+2f560fa1ac0de6cf1ef8eb9147c63550052c2c559651437ba8fb20a791d4dd44  ./khora-web/package.json
 7b2dfe403ee98aacec3e6c3e6126ab4223c5e5d8b2cea31a1ce96452af253502  ./khora-web/pages/_app.tsx
 5a9ffe983477f3858670e151c19534377d6c523cc8ceadc838cc69fafed5411e  ./khora-web/pages/404.tsx
 3e76fbd3eba01f49986c63dcb38be111b44844906f56a275dd0629ad2e693000  ./khora-web/playwright.config.ts
@@ -501,7 +501,7 @@ fb2a0a418ba19f8c797236ed704d83323f57562b85d1206c99ff889cb2ebc1c9  ./khora-web/te
 0dbd04022523510a0cd41e94040b839597e4cef97ca288bb553492deef4af47d  ./khora-web/tests/unit/runtime_state.test.ts
 a80ca177c16d3690e544709c4da6096974f5c545d8fb67e3bca1cd90f9237480  ./khora-web/tests/unit/runtime_transport.test.ts
 681a8cc2b79cf3726d7acaaebea872a66251750510a01dfd6d471f0297aed83c  ./khora-web/tests/unit/segmentacion.test.ts
-a1f3f82fd376d4c0e35ef7f342c26e25d348c8c715516ae693081faf9140bbc1  ./khora-web/tests/unit/setup.ts
+22cdbbe8cd037f7cfeb5ab28775353bd5e4896cb4bd55cba2ff5692b62c1bf91  ./khora-web/tests/unit/setup.ts
 28b8d209b58f439040820c82b3fc6fe4d6cce160895b1d869217aed06f15915b  ./khora-web/tests/unit/tildes_y_groq.test.ts
 3c6efaab3685f0447e14359d7a166da7119573de9a2c86b09652b4c3146c60d9  ./khora-web/tests/unit/titulos.test.ts
 2868085c4fa36279f994e9db5552b6abbab7682b8fb46266391e3f2500f385a3  ./khora-web/tests/unit/transcribir_overlap.test.ts
