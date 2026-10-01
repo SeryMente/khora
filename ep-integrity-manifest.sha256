@@ -231,7 +231,7 @@ d8a668c2a1a5879029f972afca8fb5b146391b529442ba4074141456ffbf7db7  ./khora-web/ap
 db60f4bb5a898b2e5ac57f91195454e693769c8e63a1064db300663f331cecd4  ./khora-web/app/components/CapturarModal.tsx
 31a4ccb3ec336349d6718c4b73f2e687aa02715e89f780a564f6ab0224d5be66  ./khora-web/app/components/CopyBlock.tsx
 969cca43454fdd08a07938dd5984fbf62832e6abef6455d6cdba45b5f8ffe422  ./khora-web/app/components/ep/EntornoPersistentePanel.tsx
-4220506de84528350c6dae8db0d9d95e0e85f5fca36c6e939cad617ee316709c  ./khora-web/app/components/GlobalFooter.tsx
+5559c740b90c8c130e51855e79b4abd81a5baa69c867aacd6f28c9ea2e68ec7d  ./khora-web/app/components/GlobalFooter.tsx
 bc5a4691e376000eaaecaaad8e76f6ea55f08431e57a3b796a8963f75772fb7a  ./khora-web/app/components/os/AppIcon.tsx
 e623512b60f3f656af1268553ce93e618375375352bf84b90c480b9358e79411  ./khora-web/app/components/os/KhoraShell.tsx
 6dd2c462593cbaee7789886c973870825deb48c1c0db804188af101a1622c215  ./khora-web/app/components/os/KhoraSplash.tsx
@@ -249,7 +249,7 @@ e33be9249217a71034bc3fe5ace256876ec76dfde571f0dbfebccaf4626e48b0  ./khora-web/ap
 821e9d5808ed33b11743dd5f7eea41790c8918380ca94ce9793dea995b5f2f38  ./khora-web/app/herramientas/bitacora/page.tsx
 189d15238e0ecdf58cbc9c501c3d66884eae3d701e32391d2000748ef595049b  ./khora-web/app/herramientas/opi-vri/page.tsx
 7cce01486806d99bb3b1b3447b99ed794bc01d04bb88a0d6fedcd9d6df9a3f30  ./khora-web/app/herramientas/page.tsx
-675abffcc861684eeaffc46a44058117d4c3797ee27c52a79c29435ad09ec8e8  ./khora-web/app/layout.tsx
+eb95e66e0337f5d6852b49381f02ccbf9f8509524e54a1cd268d6a2b76bf6a3f5  ./khora-web/app/layout.tsx
 a35ad45b0cc67d30c3902c934574590c84763ee6d5a5868e8c18723e434ad282  ./khora-web/app/mapa/CustomNode.tsx
 ca87d091bccb3009f0c6d074567163461c575e07d5727f087966d62c01454125  ./khora-web/app/mapa/page.tsx
 793e39fd8bc1def9f8c454da02d6608462290a9a60cd873f51e433077c9ed43b  ./khora-web/app/not-found.tsx

@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { UpdatePrompt } from "./components/UpdatePrompt";
 import { TelemetryProvider } from "./components/TelemetryProvider";
 import { RuntimeObserver } from "./components/RuntimeObserver";
+import { GlobalFooter } from "./components/GlobalFooter";
 import KhoraSplash from "./components/os/KhoraSplash";
 import KhoraShell from "./components/os/KhoraShell";
 import "./globals.css";
@@ -69,6 +70,7 @@ export default function RootLayout({
                     <UpdatePrompt />
                     <KhoraSplash />
                     <KhoraShell>{children}</KhoraShell>
+                    <GlobalFooter />
                 </TelemetryProvider>
             </body>
         </html>

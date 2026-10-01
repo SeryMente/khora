@@ -1,25 +1,23 @@
-import fs from 'fs';
-import path from 'path';
+import fs from "fs";
+import path from "path";
 
 export function GlobalFooter() {
-  let sprint = "??";
-  let fraccion = "??";
+  let version = "desconocida";
   try {
-    const filePath = path.join(process.cwd(), '../version.json');
-    if (fs.existsSync(filePath)) {
-      const data = fs.readFileSync(filePath, 'utf-8');
-      const parsed = JSON.parse(data);
-      sprint = parsed.sprint || sprint;
-      fraccion = parsed.fraccion || fraccion;
+    const filePath = path.join(process.cwd(), "package.json");
+    const data = fs.readFileSync(filePath, "utf-8");
+    const parsed = JSON.parse(data);
+    if (typeof parsed.version === "string" && parsed.version.trim()) {
+      version = parsed.version.trim();
     }
-  } catch (e) {
-    console.error("Error reading version.json:", e);
+  } catch {
+    // El indicador es informativo y no debe afectar el renderizado de Khora.
   }
 
   return (
-    <footer className="fixed bottom-4 md:bottom-8 left-0 w-full flex justify-center z-10 opacity-40 pointer-events-none pb-safe">
-      <span className="text-[9px] text-cora-text font-mono uppercase tracking-[0.3em] text-center px-4">
-        Sistema Operativo Khora · {sprint} · {fraccion}
+    <footer className="fixed bottom-2 left-0 z-50 w-full pointer-events-none flex justify-center pb-safe">
+      <span className="text-[8px] leading-none text-cora-text/45 font-mono tracking-[0.14em]">
+        v{version}
       </span>
     </footer>
   );
