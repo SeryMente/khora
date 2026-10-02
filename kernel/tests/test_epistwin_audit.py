@@ -1,4 +1,6 @@
 # @l0 L0-002-R · @req KA-00/REQ-2 · @acr ACR-2.1
+import json
+
 import networkx as nx
 import pytest
 
@@ -13,6 +15,7 @@ from khora_kernel.epistwin_audit import (
     modularity_q,
     null_modularity_report,
     partition_membership,
+    persist_registry_signal,
     registry_signal,
     resolution_sweep,
 )
@@ -31,6 +34,32 @@ def test_gwet_ac1_en_distribucion_sesgada():
     score = gwet_ac1(labels_a, labels_b)
     assert 0.0 <= score < 1.0
     assert score == pytest.approx(0.9474720945502297)
+
+
+def test_persist_registry_signal(tmp_path):
+    signal = registry_signal(
+        "community_signal",
+        "delta_q",
+        0.2,
+        "12m",
+        "no change under null",
+        "degree-preserving-edge-permutation",
+    )
+    path = tmp_path / "signals.jsonl"
+    record_hash = persist_registry_signal(
+        signal,
+        str(path),
+        source_sha256="a" * 64,
+        git_sha="b" * 40,
+    )
+    row = json.loads(path.read_text(encoding="utf-8").strip())
+    assert row["status"] == "prospective"
+    assert row["record_sha256"] == record_hash
+    assert row["source_sha256"] == "a" * 64
+    assert row["git_sha"] == "b" * 40
+    assert row["metric"] == "delta_q"
+    assert row["null_model"] == "degree-preserving-edge-permutation"
+    assert row["recorded_at"]
 
 
 def test_partition_integrity_and_stability():

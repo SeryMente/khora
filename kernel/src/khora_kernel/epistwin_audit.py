@@ -5,7 +5,9 @@ from __future__ import annotations
 import hashlib
 import json
 import math
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
+from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any, Iterable
 
 import networkx as nx
@@ -227,6 +229,34 @@ def registry_signal(
     if not name or not metric or not null_model or not falsification:
         raise ValueError('Un registro prospectivo requiere señal, métrica, modelo nulo y falsación')
     return ProspectiveSignal(name, metric, threshold, horizon, falsification, null_model)
+
+
+def persist_registry_signal(
+    signal: ProspectiveSignal,
+    path: str = "data/epistwin/prospective-signals.jsonl",
+    *,
+    source_sha256: str | None = None,
+    git_sha: str | None = None,
+) -> str:
+    """Persiste una señal prospectiva como registro append-only verificable."""
+    if not isinstance(signal, ProspectiveSignal):
+        raise TypeError("signal debe ser ProspectiveSignal")
+    record = asdict(signal)
+    record.update(
+        {
+            "recorded_at": datetime.now(timezone.utc).isoformat(),
+            "source_sha256": source_sha256,
+            "git_sha": git_sha,
+            "status": "prospective",
+        }
+    )
+    canonical = json.dumps(record, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    record["record_sha256"] = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+    destination = Path(path)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    with destination.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(record, sort_keys=True, ensure_ascii=False) + "\n")
+    return record["record_sha256"]
 
 
 def run_multi_judge(cases: Iterable[dict[str, str]], judges: dict[str, Any]) -> dict[str, Any]:
