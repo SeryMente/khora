@@ -426,7 +426,14 @@ class Neo4jMemoriaOrganizada:
         ORDER BY a, rel, b, io
         """
         with self._driver.session() as session:
-            nodes = [r["id"] for r in session.run(query_nodes)]
+            nodes = [
+                {
+                    "id": r["id"],
+                    "labels": sorted(r["labels"] or []),
+                    "value": r["value"],
+                }
+                for r in session.run(query_nodes)
+            ]
             edges = [dict(r) for r in session.run(query_edges)]
         payload = {"nodes": nodes, "edges": edges}
         return hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
