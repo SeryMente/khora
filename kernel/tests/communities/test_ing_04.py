@@ -161,8 +161,15 @@ def test_graph_revision_cambia_con_valor_de_nodo(neo4j_config):
             session.run(
                 "MATCH (e:Literal {canonical_key:'rev-value'}) SET e.value = '43'"
             )
-        after = memoria.get_graph_revision()
-        assert after != before
+        after_value = memoria.get_graph_revision()
+        assert after_value != before
+
+        with memoria._driver.session() as session:
+            session.run(
+                "MATCH (e:Literal {canonical_key:'rev-value'}) SET e.datatype = 'float'"
+            )
+        after_datatype = memoria.get_graph_revision()
+        assert after_datatype != after_value
     finally:
         with memoria._driver.session() as session:
             session.run(
