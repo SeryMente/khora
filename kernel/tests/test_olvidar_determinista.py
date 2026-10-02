@@ -147,3 +147,95 @@ def test_olvidar_runtime_elimina_residuos_de_indice(neo4j_config, monkeypatch, t
                 session.run("MATCH (n) DETACH DELETE n")
         finally:
             memoria.cerrar()
+
+
+def test_olvidar_runtime_regenera_comunidades_y_resumenes(neo4j_config, monkeypatch, tmp_path):
+    import json
+    import khora_kernel.embeddings as embeddings
+
+    monkeypatch.setenv("KHORA_FSUM_AUTO", "1")
+    index_file = tmp_path / "pkg.idx"
+    map_file = tmp_path / "pkg_map.json"
+    meta_file = tmp_path / "pkg_map_meta.json"
+    text_file = tmp_path / "pkg_map_texts.json"
+    monkeypatch.setattr(embeddings, "INDEX_FILE", index_file)
+    monkeypatch.setattr(embeddings, "MAP_FILE", map_file)
+    monkeypatch.setattr(embeddings, "META_FILE", meta_file)
+    monkeypatch.setattr(embeddings, "TEXT_FILE", text_file)
+
+    summary_calls = []
+    def fake_summarize_all(memoria, provider, graph_revision):
+        summary_calls.append(graph_revision)
+        return None
+    monkeypatch.setattr("khora_kernel.summaries.summarize_all", fake_summarize_all)
+
+    memoria = Neo4jMemoriaOrganizada(
+        neo4j_config["uri"], neo4j_config["user"], neo4j_config["password"]
+    )
+    try:
+        with memoria._driver.session() as session:
+            session.run("MATCH (n) DETACH DELETE n")
+
+        def ingest_entity(io_id, entity_id):
+            ts = "2026-10-02T20:00:00Z"
+            memoria.asentar_transaccional(
+                entidades=[{
+                    "canonical_key": entity_id, "label_original": entity_id,
+                    "embedding": None, "provenance_raw": "test",
+                    "event_time": ts, "capture_time": ts, "custody": "test",
+                    "needs_review": False,
+                }],
+                relaciones=[],
+                source_triplet={
+                    "origen": "test", "driver": "pytest", "timestamp": ts,
+                    "event_time": ts, "capture_time": ts, "custody": "test",
+                    "metadata": {},
+                },
+                io_id=io_id,
+                timestamp=ts,
+            )
+
+        ingest_entity("io-keep", "KEEP")
+        ingest_entity("io-delete", "DELETE")
+
+        before_revision = memoria.get_graph_revision()
+        embeddings.rebuild_index(memoria, before_revision)
+        assert {"KEEP", "DELETE"}.issubset(
+            json.loads(map_file.read_text(encoding="utf-8"))
+        )
+
+        acta = memoria.olvidar("io-delete")
+        assert len(acta) == 64
+
+        after_revision = memoria.get_graph_revision()
+        assert after_revision != before_revision
+
+        with memoria._driver.session() as session:
+            assert session.run(
+                "MATCH (e:Entity {canonical_key:'DELETE'}) RETURN count(e) AS n"
+            ).single()["n"] == 0
+            assert session.run(
+                "MATCH (e:Entity {canonical_key:'KEEP'}) RETURN count(e) AS n"
+            ).single()["n"] == 1
+            assert session.run(
+                "MATCH (c:Community) WHERE c.invalid_at IS NULL AND c.published = true RETURN count(c) AS n"
+            ).single()["n"] >= 1
+            assert session.run(
+                """
+                MATCH (e:Entity {canonical_key:'KEEP'})-[:IN_COMMUNITY]->(c:Community)
+                WHERE c.invalid_at IS NULL AND c.published = true
+                RETURN count(c) AS n
+                """
+            ).single()["n"] == 1
+
+        ids_after = json.loads(map_file.read_text(encoding="utf-8"))
+        assert "DELETE" not in ids_after
+        assert "KEEP" in ids_after
+        meta_after = json.loads(meta_file.read_text(encoding="utf-8"))
+        assert meta_after["invalidated"] is False
+        assert meta_after["graph_revision"] == after_revision
+        assert summary_calls == [after_revision]
+    finally:
+        with memoria._driver.session() as session:
+            session.run("MATCH (n) DETACH DELETE n")
+        memoria.cerrar()
