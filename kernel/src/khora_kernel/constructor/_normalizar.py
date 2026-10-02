@@ -45,11 +45,10 @@ def normalizar(objeto: ObjetoDeInformacion, puerto_llm: PuertoLLM | None = None)
         resp = puerto_llm.generar(solicitud)
         return resp.texto
 
-    mllm_model = os.environ.get("KHORA_MLLM_MODEL")
-    if not mllm_model or mllm_model == "mock":
-        # Mock permitido SOLO en CI (documentado D2)
+    if os.environ.get("KHORA_TEST_MODE", "").lower() in {"1", "true", "yes"}:
         return "[MOCK CAPTION] Imagen descriptiva detectada"
 
-    # Aquí iría el proveedor LLM existente en el repo, pero como no hay otro más
-    # que el simulado/fallback, usamos fallback documentado.
-    return f"[CAPTION {mllm_model}] Descripción extraída de la imagen."
+    raise RuntimeError(
+        "η visual requiere un PuertoLLM/Mvis real; "
+        "no se permite caption sintético fuera de KHORA_TEST_MODE"
+    )

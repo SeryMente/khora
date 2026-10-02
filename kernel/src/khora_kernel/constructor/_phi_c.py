@@ -32,17 +32,31 @@ def phi_c(
     if tipo_formato in ["mp3", "m4a", "wav"]:
         if transcriptor_audio_func:
             texto_base = transcriptor_audio_func(contenido_bytes, f"audio.{tipo_formato}")
+        elif os.environ.get("KHORA_TEST_MODE", "").lower() in {"1", "true", "yes"}:
+            texto_base = "[TEST MOCK TRANSCRIPTION] Audio sin transcriptor"
         else:
-            # Fallback si no hay transcriptor inyectado (aunque en el flow normal el adaptador lo pasará)
-            texto_base = "[SKIP] Transcripción de audio no configurada."
+            raise RuntimeError(
+                "ΦC audio requiere un transcriptor real; "
+                "no se permite transcripción sintética fuera de KHORA_TEST_MODE"
+            )
     elif tipo_formato in ["png", "jpg", "webp"]:
         # Para imágenes, la URL o data URI irá en el texto
         b64 = base64.b64encode(contenido_bytes).decode("utf-8")
         texto_base = f"data:image/{tipo_formato};base64,{b64}"
-    elif tipo_formato == "pdf" or tipo_formato == "docx":
-        # Simulación de extracción de texto de pdf/docx para cumplir con la interfaz
-        # En una implementación completa esto requeriría dependencias
-        texto_base = f"[{tipo_formato.upper()}] Contenido textual extraído (simulado por ausencia de deps de parsing)."
+    elif tipo_formato == "pdf":
+        from io import BytesIO
+
+        from pypdf import PdfReader
+
+        pages = PdfReader(BytesIO(contenido_bytes)).pages
+        texto_base = "\n".join((page.extract_text() or "") for page in pages).strip()
+    elif tipo_formato == "docx":
+        from io import BytesIO
+
+        from docx import Document
+
+        document = Document(BytesIO(contenido_bytes))
+        texto_base = "\n".join(p.text for p in document.paragraphs).strip()
     elif tipo_formato == "texto":
         texto_base = contenido_bytes.decode('utf-8')
 

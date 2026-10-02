@@ -5,6 +5,8 @@ import pytest
 from neo4j import GraphDatabase
 from testcontainers.community.neo4j import Neo4jContainer
 
+os.environ.setdefault("KHORA_TEST_MODE", "1")
+
 
 @pytest.fixture(scope="session")
 def neo4j_container():

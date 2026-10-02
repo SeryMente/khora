@@ -94,8 +94,12 @@ def _gleaning_loop(chunk: str, pre_entidades: list, puerto_llm: PuertoLLM | None
             )
             resp = puerto_llm.generar(solicitud)
             faltaron = resp.texto
+        elif os.environ.get("KHORA_TEST_MODE", "").lower() in {"1", "true", "yes"}:
+            faltaron = "NO"
         else:
-            faltaron = "NO"  # Mock behavior
+            raise RuntimeError(
+                "fKGC gleaning requiere un PuertoLLM real fuera de KHORA_TEST_MODE"
+            )
 
         if faltaron == "NO":
             break
@@ -121,8 +125,13 @@ def extraer(texto: str, lector_grafo, puerto_llm: PuertoLLM | None = None) -> li
     for chunk in chunks:
         if puerto_llm:
             pre_entidades = _llm_ner(chunk, puerto_llm)
-        else:
+        elif os.environ.get("KHORA_TEST_MODE", "").lower() in {"1", "true", "yes"}:
             pre_entidades = _mock_ner(chunk)
+        else:
+            raise RuntimeError(
+                "fKGC requiere un PuertoLLM real; "
+                "no se permite NER sintético fuera de KHORA_TEST_MODE"
+            )
 
         final_entidades = _gleaning_loop(chunk, pre_entidades, puerto_llm)
 

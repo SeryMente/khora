@@ -119,3 +119,27 @@ def test_acr_2_3_csv_texto_puro(lector):
     triples = phi_c(csv_bytes, origen="test_csv", lector_grafo=lector)
 
     assert len(triples) > 0
+
+
+def test_no_simulacion_texto_fuera_de_test_mode(lector, monkeypatch):
+    monkeypatch.delenv("KHORA_TEST_MODE", raising=False)
+    with pytest.raises(RuntimeError, match="fKGC requiere un PuertoLLM real"):
+        phi_c(b"Juan conoce Maria", origen="test_text", lector_grafo=lector)
+
+
+def test_no_simulacion_audio_fuera_de_test_mode(lector, monkeypatch):
+    monkeypatch.delenv("KHORA_TEST_MODE", raising=False)
+    mp3_bytes = b"ID3" + b"\x00" * 20
+    with pytest.raises(RuntimeError, match="transcriptor real"):
+        phi_c(mp3_bytes, origen="test_mp3", lector_grafo=lector)
+
+
+def test_no_simulacion_imagen_fuera_de_test_mode(lector, monkeypatch):
+    monkeypatch.delenv("KHORA_TEST_MODE", raising=False)
+    monkeypatch.delenv("KHORA_MLLM_MODEL", raising=False)
+    png_bytes = bytes.fromhex(
+        "89504E470D0A1A0A0000000D49484452000000010000000108060000001F15C489"
+        "0000000A49444154789C63000100000500010D0A2DB40000000049454E44AE426082"
+    )
+    with pytest.raises(RuntimeError, match="PuertoLLM/Mvis real"):
+        phi_c(png_bytes, origen="test_png", lector_grafo=lector)
