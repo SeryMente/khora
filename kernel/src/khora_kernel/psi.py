@@ -29,16 +29,33 @@ def on_node_upserted(node_id: str, memoria: Any, ts: str | None = None, puerto_l
     )
     manifest = recalcular_leiden(node_id, memoria, ts)
     summary_status = {"communities_summarized": 0, "summary_error": None}
-    try:
-        from khora_kernel.summaries import summarize_all
-        if os.getenv("KHORA_FSUM_AUTO", "1").lower() not in {"0", "false", "no"}:
-            summarize_all(memoria, _summary_provider(puerto_llm), manifest["graph_revision"])
-            if hasattr(memoria, "publicar_comunidades"):
-                memoria.publicar_comunidades(manifest["graph_revision"], ts)
-            summary_status["communities_summarized"] = len(manifest.get("communities", []))
-    except Exception as exc:
-        summary_status["summary_error"] = str(exc)
-        logging.error("[PIPELINE] fSUM falló después de aceptar update %s: %s", node_id, exc)
+    if os.getenv("KHORA_FSUM_AUTO", "1").lower() not in {"0", "false", "no"}:
+        try:
+            from khora_kernel.summaries import summarize_all
+
+            summarize_all(
+                memoria,
+                _summary_provider(puerto_llm),
+                manifest["graph_revision"],
+            )
+            summary_status["communities_summarized"] = len(
+                manifest.get("communities", [])
+            )
+        except Exception as exc:
+            # fSUM es neuronal y puede degradar si no hay proveedor disponible;
+            # eso no debe impedir la publicación de la partición simbólica.
+            summary_status["summary_error"] = str(exc)
+            logging.error(
+                "[PIPELINE] fSUM falló después de aceptar update %s: %s",
+                node_id,
+                exc,
+            )
+
+    if hasattr(memoria, "publicar_comunidades"):
+        # La sustitución de la partición es el paso estructural del ciclo.
+        # Se publica incluso si fSUM tuvo una degradación; los placeholders
+        # permanecen auditables y el retriever conserva el grounding topológico.
+        memoria.publicar_comunidades(manifest["graph_revision"], ts)
 
     index_status = rebuild_index(memoria, manifest["graph_revision"])
     return {

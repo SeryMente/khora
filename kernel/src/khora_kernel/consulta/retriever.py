@@ -53,16 +53,26 @@ class RetrieverGraphRAG(MotorDeConsulta):
             return self._consultar_mock(semillas_ids, contexto, degradacion)
 
         try:
+            graph_revision = (
+                self.memoria.get_graph_revision()
+                if hasattr(self.memoria, "get_graph_revision")
+                else "unknown"
+            )
             with self.memoria._driver.session() as session:
                 community_rows = list(session.run(
                     """
                     UNWIND $seeds AS sid
-                    MATCH (e:Entity {canonical_key:sid})-[:IN_COMMUNITY]->(c:Community)
-                    WHERE e.invalid_at IS NULL AND c.invalid_at IS NULL AND c.published = true
+                    MATCH (e:Entity {canonical_key:sid})-[:IN_COMMUNITY]->(
+                        c:Community {graph_revision:$revision}
+                    )
+                    WHERE e.invalid_at IS NULL
+                      AND c.invalid_at IS NULL
+                      AND c.published = true
                     RETURN DISTINCT sid, c.community_id AS community_id
                     ORDER BY community_id
                     """,
                     seeds=semillas_ids,
+                    revision=graph_revision,
                 ))
                 community_ids = sorted({r["community_id"] for r in community_rows if r["community_id"]})
 
@@ -71,12 +81,20 @@ class RetrieverGraphRAG(MotorDeConsulta):
                     member_rows = session.run(
                         """
                         UNWIND $cids AS cid
-                        MATCH (e:Entity)-[:IN_COMMUNITY]->(c:Community {community_id:cid})
-                        WHERE e.invalid_at IS NULL AND c.invalid_at IS NULL AND c.published = true
+                        MATCH (e:Entity)-[:IN_COMMUNITY]->(
+                            c:Community {
+                                community_id:cid,
+                                graph_revision:$revision
+                            }
+                        )
+                        WHERE e.invalid_at IS NULL
+                          AND c.invalid_at IS NULL
+                          AND c.published = true
                         RETURN DISTINCT e.canonical_key AS id
                         LIMIT $lim
                         """,
                         cids=community_ids,
+                        revision=graph_revision,
                         lim=self.max_community_nodes,
                     )
                     member_ids = {r["id"] for r in member_rows if r["id"]}
@@ -171,13 +189,17 @@ class RetrieverGraphRAG(MotorDeConsulta):
                     for row in session.run(
                         """
                         UNWIND $cids AS cid
-                        MATCH (c:Community {community_id:cid})
+                        MATCH (c:Community {
+                            community_id:cid,
+                            graph_revision:$revision
+                        })
                         WHERE c.invalid_at IS NULL AND c.published = true
                         RETURN c.community_id AS id, c.summary AS summary,
                                c.graph_revision AS graph_revision
                         ORDER BY id
                         """,
                         cids=community_ids,
+                        revision=graph_revision,
                     ):
                         if row["summary"]:
                             summaries.append(row["id"])
@@ -194,11 +216,7 @@ class RetrieverGraphRAG(MotorDeConsulta):
 
                 if not summaries:
                     degradacion.append("Sin resumen de comunidad")
-                revision = (
-                    self.memoria.get_graph_revision()
-                    if hasattr(self.memoria, "get_graph_revision")
-                    else "unknown"
-                )
+                revision = graph_revision
                 degradacion.append(
                     f"GraphRAG revision={revision} seeds={len(semillas_ids)} "
                     f"communities={len(community_ids)} nodes={len(node_map)}"
