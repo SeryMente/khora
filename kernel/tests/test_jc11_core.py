@@ -122,6 +122,12 @@ def test_ht_persistido(tmp_path, monkeypatch):
     assert "ANSWER" in states
     assert ht.trace
     assert any(event.get("action") == "RETRIEVE" for event in ht.trace)
+    assert len(ht.evidence) >= 2
+    evidence_by_id = {item.node_id: item for item in ht.evidence}
+    assert {"node1", "node2"} <= set(evidence_by_id)
+    assert all("origen=mock" in evidence_by_id[node_id].triple for node_id in ("node1", "node2"))
+    assert all("texto=" in evidence_by_id[node_id].triple for node_id in ("node1", "node2"))
+    assert all(evidence_by_id[node_id].source_step > 0 for node_id in ("node1", "node2"))
 
 
 def test_no_escritura_pkg(tmp_path, monkeypatch):

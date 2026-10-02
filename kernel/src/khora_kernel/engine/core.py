@@ -176,6 +176,23 @@ def _retrieve(ht: Ht, question: str, memoria: Any, contexto: Any = None) -> Ht:
         "sufficient": resultado.suficiencia.value == "suficiente",
     }
     ht = _set_last_step_observation(ht, payload, "GraphRAG ejecutado.")
+    evidence = []
+    source_step = ht.steps[-1].n
+    for fragmento in resultado.fragmentos:
+        provenance = fragmento.provenance
+        provenance_text = (
+            f"origen={provenance.origen};"
+            f"driver={provenance.driver or ''};"
+            f"timestamp={provenance.timestamp}"
+        )
+        evidence.append(
+            HtEvidence(
+                node_id=fragmento.id,
+                triple=f"{provenance_text};texto={fragmento.texto}",
+                source_step=source_step,
+            )
+        )
+    ht = _add_evidence(ht, evidence)
     return _add_trace(ht, {"action": "RETRIEVE", **payload, "degradation": resultado.degradacion_declarada})
 
 
