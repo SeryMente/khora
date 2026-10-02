@@ -80,7 +80,7 @@ def get_community_edges(
         coalesce(e2.id, e2.canonical_key) AS target,
         e2.label_original AS target_desc,
         labels(e2) AS target_labels,
-        type(r) AS relation,
+        coalesce(r.type,type(r)) AS relation,
         properties(r) AS edge_props,
         degree1 + degree2 AS combined_degree
     ORDER BY combined_degree DESC
