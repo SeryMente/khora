@@ -1,0 +1,105 @@
+name: EpisTwin PersonalQA - multi-juez real
+
+on:
+  workflow_dispatch:
+    inputs:
+      judges:
+        description: "Perfiles separados por coma: judge_a,judge_b[,judge_c,judge_d]"
+        required: true
+        default: "judge_a,judge_b"
+      limit:
+        description: "Casos; vacio = 100"
+        required: false
+        default: ""
+      output_name:
+        description: "Nombre del JSON"
+        required: true
+        default: "personalqa-evaluation.json"
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/kernel/src
+      KHORA_EMB_OFFLINE: "1"
+      KHORA_PERFIL_JUDGE_A_BASE_URL: ${{ secrets.KHORA_EPIS_JUDGE_A_BASE_URL }}
+      KHORA_PERFIL_JUDGE_A_API_KEY: ${{ secrets.KHORA_EPIS_JUDGE_A_API_KEY }}
+      KHORA_PERFIL_JUDGE_A_MODEL: ${{ secrets.KHORA_EPIS_JUDGE_A_MODEL }}
+      KHORA_PERFIL_JUDGE_B_BASE_URL: ${{ secrets.KHORA_EPIS_JUDGE_B_BASE_URL }}
+      KHORA_PERFIL_JUDGE_B_API_KEY: ${{ secrets.KHORA_EPIS_JUDGE_B_API_KEY }}
+      KHORA_PERFIL_JUDGE_B_MODEL: ${{ secrets.KHORA_EPIS_JUDGE_B_MODEL }}
+      KHORA_PERFIL_JUDGE_C_BASE_URL: ${{ secrets.KHORA_EPIS_JUDGE_C_BASE_URL }}
+      KHORA_PERFIL_JUDGE_C_API_KEY: ${{ secrets.KHORA_EPIS_JUDGE_C_API_KEY }}
+      KHORA_PERFIL_JUDGE_C_MODEL: ${{ secrets.KHORA_EPIS_JUDGE_C_MODEL }}
+      KHORA_PERFIL_JUDGE_D_BASE_URL: ${{ secrets.KHORA_EPIS_JUDGE_D_BASE_URL }}
+      KHORA_PERFIL_JUDGE_D_API_KEY: ${{ secrets.KHORA_EPIS_JUDGE_D_API_KEY }}
+      KHORA_PERFIL_JUDGE_D_MODEL: ${{ secrets.KHORA_EPIS_JUDGE_D_MODEL }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install
+        run: pip install --no-cache-dir -e "kernel/[ci]"
+
+      - name: Validate judges
+        shell: bash
+        run: |
+          set -euo pipefail
+          raw="${{ inputs.judges }}"
+          IFS=',' read -ra JUDGES <<< "$raw"
+          count=0
+          for judge in $(printf '%s\n' "$raw" | tr ',' '\n'); do
+            count=$((count+1))
+            case "$judge" in
+              judge_a)
+                test -n "$KHORA_PERFIL_JUDGE_A_BASE_URL"
+                test -n "$KHORA_PERFIL_JUDGE_A_API_KEY"
+                test -n "$KHORA_PERFIL_JUDGE_A_MODEL"
+                ;;
+              judge_b)
+                test -n "$KHORA_PERFIL_JUDGE_B_BASE_URL"
+                test -n "$KHORA_PERFIL_JUDGE_B_API_KEY"
+                test -n "$KHORA_PERFIL_JUDGE_B_MODEL"
+                ;;
+              judge_c)
+                test -n "$KHORA_PERFIL_JUDGE_C_BASE_URL"
+                test -n "$KHORA_PERFIL_JUDGE_C_API_KEY"
+                test -n "$KHORA_PERFIL_JUDGE_C_MODEL"
+                ;;
+              judge_d)
+                test -n "$KHORA_PERFIL_JUDGE_D_BASE_URL"
+                test -n "$KHORA_PERFIL_JUDGE_D_API_KEY"
+                test -n "$KHORA_PERFIL_JUDGE_D_MODEL"
+                ;;
+              *)
+                echo "Perfil no permitido: $judge"
+                exit 1
+                ;;
+            esac
+          done
+          if [ "$count" -lt 2 ] || [ "$count" -gt 4 ]; then
+            echo "Se requieren entre 2 y 4 jueces reales."
+            exit 1
+          fi
+
+      - name: Run PersonalQA
+        shell: bash
+        run: |
+          python scripts/run_personalqa_judges.py \
+            --judges "${{ inputs.judges }}" \
+            ${{ inputs.limit != '' && format('--limit {0}', inputs.limit) || '' }} \
+            --output "data/epistwin/${{ inputs.output_name }}"
+
+      - name: Upload evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: epistwin-personalqa-${{ github.run_id }}
+          path: data/epistwin/${{ inputs.output_name }}
+          if-no-files-found: error
+          retention-days: 30
