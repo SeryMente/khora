@@ -159,6 +159,8 @@ def test_priorizacion_hoja():
     neo4j._driver.edges.append({"type": "IN_COMMUNITY", "entity_id": "N4", "community_id": "C1"})
     neo4j._driver.edges.append({"type": "IN_COMMUNITY", "entity_id": "N5", "community_id": "C1"})
     neo4j._driver.edges.append({"type": "RELATED", "source": "N4", "target": "N5", "relation": "R3"})
+    neo4j._driver.nodes.append({"labels": ["Entity"], "id": "N6", "community_id": "C2"})
+    neo4j._driver.edges.append({"type": "RELATED", "source": "N2", "target": "N6", "relation": "R_EXTERNAL"})
 
     llm = MockPuertoLLM()
     summarize_community(neo4j, "C1", llm)
@@ -170,6 +172,7 @@ def test_priorizacion_hoja():
 
     # R1 and R2 should be before R3 due to combined degree
     assert min(idx_r1, idx_r2) < idx_r3
+    assert "R_EXTERNAL" not in prompt
 
 
 def test_sustitucion_superior():
