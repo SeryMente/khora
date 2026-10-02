@@ -1,5 +1,6 @@
 # @l0 L0-002-R · @req JULES-3/REQ-2
 # @l0 L0-002 · @req ING-03/REQ-1 · @acr ACR-1.1,ACR-1.2 · @ua UA-05
+import inspect
 import uuid
 from datetime import datetime, timezone
 from typing import Any, List, Optional, Union
@@ -299,6 +300,34 @@ def ratificar_propuesta(
         return from_dict(proposal_copy)
 
 
+def _dispatch_upsert_hook(
+    on_upsert: Any,
+    io_id: str,
+    memoria: Any,
+    timestamp: str,
+    puerto_llm: PuertoLLM,
+) -> Any:
+    """Invoca el hook causal con el proveedor LLM cuando la firma lo admite."""
+    try:
+        parameters = inspect.signature(on_upsert).parameters.values()
+        positional = [
+            p
+            for p in parameters
+            if p.kind
+            in (inspect.Parameter.POSITIONAL_ONLY, inspect.Parameter.POSITIONAL_OR_KEYWORD)
+        ]
+        accepts_varargs = any(
+            p.kind == inspect.Parameter.VAR_POSITIONAL for p in parameters
+        )
+    except (TypeError, ValueError):
+        positional = []
+        accepts_varargs = False
+
+    if accepts_varargs or len(positional) >= 4:
+        return on_upsert(io_id, memoria, timestamp, puerto_llm)
+    return on_upsert(io_id, memoria, timestamp)
+
+
 def asentar(
     proposal: ProposalEnvelope,
     memoria: Any,
@@ -326,7 +355,13 @@ def asentar(
     # preservar el contrato ingestión -> pipeline posterior.
     if not proposal.items:
         if on_upsert:
-            on_upsert(io_id, memoria, proposal.created_at)
+            _dispatch_upsert_hook(
+                on_upsert,
+                io_id,
+                memoria,
+                proposal.created_at,
+                puerto_llm,
+            )
         return ActaDeIngesta(
             origen="p5b-kernel",
             timestamp=proposal.created_at,
@@ -459,7 +494,13 @@ def asentar(
                 )
 
     if on_upsert:
-        on_upsert(io_id, memoria, proposal.created_at)
+        _dispatch_upsert_hook(
+            on_upsert,
+            io_id,
+            memoria,
+            proposal.created_at,
+            puerto_llm,
+        )
 
     return ActaDeIngesta(
         origen="p5b-kernel",

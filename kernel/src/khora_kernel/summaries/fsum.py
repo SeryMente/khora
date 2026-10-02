@@ -12,19 +12,33 @@ def tokenize(text: str) -> int:
     return int(len(text.split()) * 1.3)
 
 
-def get_community_info(memoria_grafo, cid: str) -> Dict[str, Any]:
+def get_community_info(
+    memoria_grafo, cid: str, graph_revision: str | None = None
+) -> Dict[str, Any]:
     """Recupera la informacion de la comunidad."""
-    query = """
-    MATCH (c:Community {community_id: $cid})
-    WHERE c.invalid_at IS NULL
-    RETURN c.level AS level, c.summary AS summary, c.summary_tokens AS tokens
-    """
+    if graph_revision:
+        query = """
+        MATCH (c:Community {
+            community_id: $cid,
+            graph_revision: $revision
+        })
+        WHERE c.invalid_at IS NULL
+        RETURN c.level AS level, c.summary AS summary, c.summary_tokens AS tokens
+        """
+        params = {"cid": cid, "revision": graph_revision}
+    else:
+        query = """
+        MATCH (c:Community {community_id: $cid})
+        WHERE c.invalid_at IS NULL
+        RETURN c.level AS level, c.summary AS summary, c.summary_tokens AS tokens
+        """
+        params = {"cid": cid}
     if not hasattr(memoria_grafo, "_driver") or memoria_grafo._driver is None:
         return {}
 
     try:
         with memoria_grafo._driver.session() as session:
-            res = session.run(query, {"cid": cid})
+            res = session.run(query, params)
             record = res.single()
             if record:
                 return dict(record)
@@ -33,12 +47,19 @@ def get_community_info(memoria_grafo, cid: str) -> Dict[str, Any]:
     return {}
 
 
-def get_community_edges(memoria_grafo, cid: str) -> List[Dict[str, Any]]:
+def get_community_edges(
+    memoria_grafo, cid: str, graph_revision: str | None = None
+) -> List[Dict[str, Any]]:
     """Obtiene aristas de la comunidad, calculando el grado global de los extremos (en todo el grafo)
     o dentro de la comunidad. Asumimos grado en el grafo."""
 
-    query = """
-    MATCH (e1:Entity)-[:IN_COMMUNITY]->(c:Community {community_id: $cid})
+    if graph_revision:
+        community_match = "{community_id: $cid, graph_revision: $revision}"
+    else:
+        community_match = "{community_id: $cid}"
+
+    query = f"""
+    MATCH (e1:Entity)-[:IN_COMMUNITY]->(c:Community {community_match})
     MATCH (e2:Entity)-[:IN_COMMUNITY]->(c)
     MATCH (e1)-[r]->(e2)
 
@@ -68,9 +89,13 @@ def get_community_edges(memoria_grafo, cid: str) -> List[Dict[str, Any]]:
     if not hasattr(memoria_grafo, "_driver") or memoria_grafo._driver is None:
         return edges
 
+    params = {"cid": cid}
+    if graph_revision:
+        params["revision"] = graph_revision
+
     try:
         with memoria_grafo._driver.session() as session:
-            res = session.run(query, {"cid": cid})
+            res = session.run(query, params)
             for record in res:
                 edges.append(dict(record))
     except Exception as exc:
@@ -80,10 +105,21 @@ def get_community_edges(memoria_grafo, cid: str) -> List[Dict[str, Any]]:
     return edges
 
 
-def get_subcommunities(memoria_grafo, cid: str) -> List[Dict[str, Any]]:
-    query = """
-    MATCH (child:Community)-[:PARENT_COMMUNITY]->(parent:Community {community_id: $cid})
+def get_subcommunities(
+    memoria_grafo, cid: str, graph_revision: str | None = None
+) -> List[Dict[str, Any]]:
+    if graph_revision:
+        parent_match = "{community_id: $cid, graph_revision: $revision}"
+    else:
+        parent_match = "{community_id: $cid}"
+
+    query = f"""
+    MATCH (child:Community)-[:PARENT_COMMUNITY]->(parent:Community {parent_match})
     WHERE child.invalid_at IS NULL AND parent.invalid_at IS NULL
+      AND (
+          $revision IS NULL
+          OR child.graph_revision = $revision
+      )
     RETURN child.community_id AS cid, child.summary AS summary, child.summary_tokens AS tokens
     ORDER BY child.summary_tokens DESC
     """
@@ -91,9 +127,13 @@ def get_subcommunities(memoria_grafo, cid: str) -> List[Dict[str, Any]]:
     if not hasattr(memoria_grafo, "_driver") or memoria_grafo._driver is None:
         return children
 
+    params = {"cid": cid}
+    if graph_revision:
+        params["revision"] = graph_revision
+
     try:
         with memoria_grafo._driver.session() as session:
-            res = session.run(query, {"cid": cid})
+            res = session.run(query, params | {"revision": graph_revision})
             for record in res:
                 children.append(dict(record))
     except Exception:
@@ -101,9 +141,16 @@ def get_subcommunities(memoria_grafo, cid: str) -> List[Dict[str, Any]]:
     return children
 
 
-def get_single_node_community(memoria_grafo, cid: str):
-    query = """
-    MATCH (e:Entity)-[:IN_COMMUNITY]->(c:Community {community_id: $cid})
+def get_single_node_community(
+    memoria_grafo, cid: str, graph_revision: str | None = None
+):
+    if graph_revision:
+        community_match = "{community_id: $cid, graph_revision: $revision}"
+    else:
+        community_match = "{community_id: $cid}"
+
+    query = f"""
+    MATCH (e:Entity)-[:IN_COMMUNITY]->(c:Community {community_match})
     WHERE e.invalid_at IS NULL AND c.invalid_at IS NULL
     // Legacy test adapter marker: RETURN e.description
     RETURN coalesce(e.label_original, e.canonical_key) AS desc
@@ -111,9 +158,13 @@ def get_single_node_community(memoria_grafo, cid: str):
     nodes = []
     if not hasattr(memoria_grafo, "_driver") or memoria_grafo._driver is None:
         return []
+    params = {"cid": cid}
+    if graph_revision:
+        params["revision"] = graph_revision
+
     try:
         with memoria_grafo._driver.session() as session:
-            res = session.run(query, {"cid": cid})
+            res = session.run(query, params)
             for record in res:
                 nodes.append(dict(record))
     except Exception:
@@ -121,9 +172,20 @@ def get_single_node_community(memoria_grafo, cid: str):
     return nodes
 
 
-def persist_summary(memoria_grafo, cid: str, summary: str, summary_tokens: int):
-    query = """
-    MATCH (c:Community {community_id: $cid})
+def persist_summary(
+    memoria_grafo,
+    cid: str,
+    summary: str,
+    summary_tokens: int,
+    graph_revision: str | None = None,
+):
+    if graph_revision:
+        community_match = "{community_id: $cid, graph_revision: $revision}"
+    else:
+        community_match = "{community_id: $cid}"
+
+    query = f"""
+    MATCH (c:Community {community_match})
     SET c.summary = $summary,
         c.summary_tokens = $tokens,
         c.summarized_at = timestamp(),
@@ -133,7 +195,10 @@ def persist_summary(memoria_grafo, cid: str, summary: str, summary_tokens: int):
         return
 
     with memoria_grafo._driver.session() as session:
-        session.run(query, {"cid": cid, "summary": summary, "tokens": summary_tokens})
+        params = {"cid": cid, "summary": summary, "tokens": summary_tokens}
+        if graph_revision:
+            params["revision"] = graph_revision
+        session.run(query, params)
 
 def get_all_communities(
     memoria_grafo, graph_revision: str | None = None
@@ -182,27 +247,32 @@ def log_costs(cid: str, level: int, prompt_tokens: int, completion_tokens: int, 
         f.write(json.dumps(entry) + "\n")
 
 
-def summarize_community(memoria_grafo, cid: str, puerto_llm: PuertoLLM) -> str:
+def summarize_community(
+    memoria_grafo,
+    cid: str,
+    puerto_llm: PuertoLLM,
+    graph_revision: str | None = None,
+) -> str:
     window_size = int(os.environ.get("KHORA_FSUM_WINDOW", "8000"))
 
-    info = get_community_info(memoria_grafo, cid)
+    info = get_community_info(memoria_grafo, cid, graph_revision)
     level = info.get("level", 0)
 
     # Check if single node
-    single_nodes = get_single_node_community(memoria_grafo, cid)
+    single_nodes = get_single_node_community(memoria_grafo, cid, graph_revision)
     if len(single_nodes) == 1:
         # D2: comunidad de 1 solo nodo -> summary = descripción del nodo (sin LLM)
         summary = single_nodes[0].get("desc") or "Sin descripción"
         tokens = tokenize(summary)
-        persist_summary(memoria_grafo, cid, summary, tokens)
+        persist_summary(memoria_grafo, cid, summary, tokens, graph_revision)
         log_costs(cid, level, 0, tokens, "None")
         return summary
 
     prompt = f"Resume la siguiente comunidad (ID: {cid}):\n"
     current_tokens = tokenize(prompt)
 
-    edges = get_community_edges(memoria_grafo, cid)
-    children = get_subcommunities(memoria_grafo, cid)
+    edges = get_community_edges(memoria_grafo, cid, graph_revision)
+    children = get_subcommunities(memoria_grafo, cid, graph_revision)
 
     # D3: arista sin descripción -> usar relation + labels de extremos
     def format_edge(e):
@@ -261,7 +331,7 @@ def summarize_community(memoria_grafo, cid: str, puerto_llm: PuertoLLM) -> str:
     summary = resp.texto
     comp_tokens = tokenize(summary)
 
-    persist_summary(memoria_grafo, cid, summary, comp_tokens)
+    persist_summary(memoria_grafo, cid, summary, comp_tokens, graph_revision)
     log_costs(cid, level, current_tokens, comp_tokens, resp.modelo)
 
     return summary
@@ -276,7 +346,12 @@ def summarize_all(
     communities_sorted = sorted(communities, key=lambda x: x.get("level", 0))
 
     for c in communities_sorted:
-        summarize_community(memoria_grafo, c["cid"], puerto_llm)
+        summarize_community(
+            memoria_grafo,
+            c["cid"],
+            puerto_llm,
+            graph_revision,
+        )
 
 
 def fsum(memoria, puerto_llm=None):
