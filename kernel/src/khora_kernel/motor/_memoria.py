@@ -1,5 +1,6 @@
 # @l0 L0-002-R · @req ING-03/REQ-1,GRAFO-01/REQ-1 · @acr ACR-1.1,ACR-1.2 · @ua UA-03,UA-04,UA-05,UA-06
 import json
+import logging
 from typing import Any, Dict, List, Optional
 
 from neo4j import GraphDatabase
@@ -1044,7 +1045,6 @@ def _asentar_transaccional_canonico(
 
                 global_record = tx.run(check_huerfanos_global).single()
                 if global_record and int(global_record["orphans"]) > 0:
-                    import logging
                     logging.warning(
                         "GRAFO-01: %s nodo(s) huérfano(s) heredados en el grafo "
                         "(NO bloquean esta ingesta).",
@@ -1109,7 +1109,10 @@ def _reificar_comunidades_staged(
     query_member = """
     UNWIND $members AS m
     MATCH (e:Entity {canonical_key: m.entity_id})
-    MATCH (c:Community {community_id: m.community_id})
+    MATCH (c:Community {
+        community_id: m.community_id,
+        graph_revision: $graph_revision
+    })
     WHERE c.invalid_at IS NULL AND e.invalid_at IS NULL
     CREATE (e)-[r:IN_COMMUNITY {io_id: $io_id, published:false}]->(c)
     SET r.created_at = datetime($ts),
@@ -1119,8 +1122,14 @@ def _reificar_comunidades_staged(
 
     query_parent = """
     UNWIND $parents AS p
-    MATCH (child:Community {community_id: p.child_id})
-    MATCH (parent:Community {community_id: p.parent_id})
+    MATCH (child:Community {
+        community_id: p.child_id,
+        graph_revision: $graph_revision
+    })
+    MATCH (parent:Community {
+        community_id: p.parent_id,
+        graph_revision: $graph_revision
+    })
     WHERE child.invalid_at IS NULL AND parent.invalid_at IS NULL
     CREATE (child)-[r:PARENT_COMMUNITY {io_id: $io_id, published:false}]->(parent)
     SET r.created_at = datetime($ts),
@@ -1168,6 +1177,7 @@ def _reificar_comunidades_staged(
                         members=members_list,
                         io_id=io_id,
                         ts=ts,
+                        graph_revision=graph_revision or "unknown",
                     )
                 if parents_list:
                     tx.run(
@@ -1175,6 +1185,7 @@ def _reificar_comunidades_staged(
                         parents=parents_list,
                         io_id=io_id,
                         ts=ts,
+                        graph_revision=graph_revision or "unknown",
                     )
                 tx.commit()
     except Exception as exc:
