@@ -560,6 +560,7 @@ class Neo4jMemoriaOrganizada:
         """Eliminación determinista con barrera contra influencia residual de derivados."""
         import hashlib
         import json
+        from datetime import datetime, timezone
         from pathlib import Path
 
         from khora_kernel.embeddings import (
@@ -637,8 +638,31 @@ class Neo4jMemoriaOrganizada:
                     except OSError:
                         pass
 
+            # UA-52: un delete/corrección debe regenerar la partición y sus derivados
+            # sobre exactamente el grafo restante, antes de volver a habilitar el índice.
+            rebuild_ts = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+            from khora_kernel.communities import recalcular_leiden
+            manifest = recalcular_leiden(f"delete:{io_id}", self, rebuild_ts)
+
+            if os.getenv("KHORA_FSUM_AUTO", "1").lower() not in {"0", "false", "no"}:
+                try:
+                    from khora_kernel.summaries import summarize_all
+                    from khora_kernel.proveedores.llm_generico import ProveedorLLMGenerico
+                    summarize_all(
+                        self,
+                        ProveedorLLMGenerico(),
+                        manifest["graph_revision"],
+                    )
+                except Exception as exc:
+                    # El resumen es neuronal y degradable; la partición simbólica
+                    # ya fue reconstruida y será publicada igualmente.
+                    import logging
+                    logging.error("[DELETE] fSUM falló después de borrar %s: %s", io_id, exc)
+
+            self.publicar_comunidades(manifest["graph_revision"], rebuild_ts)
+
             try:
-                rebuild_index(self, self.get_graph_revision())
+                rebuild_index(self, manifest["graph_revision"])
             except Exception:
                 # Nunca dejar un índice viejo utilizable si la reconstrucción falla.
                 for path in (INDEX_FILE, MAP_FILE, META_FILE, TEXT_FILE):
