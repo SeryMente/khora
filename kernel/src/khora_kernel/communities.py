@@ -220,52 +220,6 @@ def _write_manifest(manifest: dict) -> None:
     )
 
 
-def recalcular_leiden(io_id: str, memoria_grafo, ts: str) -> dict:
-    G, manifest = _semantic_projection(memoria_grafo)
-    reificadas = jerarquia_leiden(G)
-    integrity = _validate_partition(G, reificadas)
-    manifest.update({
-        "accepted_update_id": io_id,
-        "run_timestamp": ts,
-        "algorithm": {
-            "implementation": "leidenalg",
-            "version": getattr(leidenalg, "__version__", "unknown"),
-            "objective": "modularity_Q",
-            "resolution": None,
-            "gamma_recorded": KHORA_LEIDEN_GAMMA,
-            "theta_effective": False,
-            "seed": KHORA_LEIDEN_SEED,
-            "weights": "weight",
-            "directed": False,
-            "isolated_node_policy": "retain_as_singleton",
-        },
-        "integrity": integrity,
-        "communities": [
-            {
-                "community_id": cid,
-                "level": info["level"],
-                "parent": info["parent"],
-                "member_fingerprint": info["member_fingerprint"],
-                "members": info["miembros"],
-            }
-            for cid, info in sorted(reificadas.estructura.items())
-        ],
-    })
-    if not integrity["coverage_ok"] or integrity["duplicate_members"] or not integrity["connected_communities"]:
-        raise RuntimeError(f"Partición Leiden inválida: {integrity}")
-    if hasattr(memoria_grafo, "reificar_comunidades"):
-        memoria_grafo.reificar_comunidades(
-            reificadas, io_id, ts, graph_revision=manifest["graph_revision"]
-        )
-    _write_manifest(manifest)
-    logging.info(
-        "[LEIDEN] revision=%s update=%s communities=%s nodes=%s edges=%s",
-        manifest["graph_revision"], io_id, integrity["community_count"],
-        manifest["vertex_count"], manifest["edge_count"],
-    )
-    return manifest
-
-
 # Unify the causal revision used by memory and the Leiden manifest.
 def _recalcular_leiden_canonico(io_id: str, memoria_grafo, ts: str) -> dict:
     G, manifest = _semantic_projection(memoria_grafo)

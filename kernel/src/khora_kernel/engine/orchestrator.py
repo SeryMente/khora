@@ -5,14 +5,16 @@ from khora_kernel.api import PuertoVision
 from khora_kernel.engine import core as core_module
 from khora_kernel.engine.core import ValidatedResponse
 from khora_kernel.engine.fallback import run_fallback
+from khora_kernel.engine.fval import fval
+from khora_kernel.engine.history import load_ht
+from khora_kernel.proveedores.openai import ProveedorOpenAICompatible
+
 
 def _ask_core(*args, **kwargs):
     return core_module.ask(*args, **kwargs)
 
+
 ask = _ask_core
-from khora_kernel.engine.fval import fval
-from khora_kernel.engine.history import load_ht
-from khora_kernel.proveedores.openai import ProveedorOpenAICompatible
 
 
 def ask_with_fallback(

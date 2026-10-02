@@ -1,4 +1,5 @@
 # @l0 L0-002-R · @req ING-03/REQ-1,GRAFO-01/REQ-1 · @acr ACR-1.1,ACR-1.2 · @ua UA-03,UA-04,UA-05,UA-06
+import json
 from typing import Any, Dict, List, Optional
 
 from neo4j import GraphDatabase
@@ -390,7 +391,8 @@ class Neo4jMemoriaOrganizada:
             return dict(record) if record else None
 
     def get_graph_revision(self) -> str:
-        import hashlib, json
+        import hashlib
+        import json
         self._asegurar_conexion()
         query_nodes = """
         MATCH (n)
@@ -538,7 +540,8 @@ class Neo4jMemoriaOrganizada:
     def olvidar(self, io_id: str) -> str:
         """Eliminación determinista: borra IO, relaciones del IO, comunidades antiguas
         y entidades que ya no tienen ninguna procedencia activa. Devuelve una huella de acta."""
-        import hashlib, json
+        import hashlib
+        import json
         self._asegurar_conexion()
         with self._driver.session() as session:
             with session.begin_transaction() as tx:
@@ -664,17 +667,6 @@ class Neo4jMemoriaOrganizada:
 
     def reificar_comunidades(self, comunidades, io_id: str, ts: str, graph_revision: str | None = None) -> None:
         self._asegurar_conexion()
-
-        # We need to invalidate previous communities and their relations
-        query_invalidate = """
-        MATCH (c:Community)
-        WHERE c.invalid_at IS NULL
-        SET c.invalid_at = datetime($ts)
-        WITH c
-        OPTIONAL MATCH (c)-[r]-()
-        WHERE r.invalid_at IS NULL AND (type(r) = 'IN_COMMUNITY' OR type(r) = 'PARENT_COMMUNITY')
-        SET r.invalid_at = datetime($ts)
-        """
 
         query_community = """
         UNWIND $communities AS comm
@@ -1066,10 +1058,6 @@ def _asentar_transaccional_canonico(
 
 Neo4jMemoriaOrganizada.asentar_transaccional = _asentar_transaccional_canonico
 
-# Runtime dependency used by the canonical transaction implementation.
-import json
-
-
 # Staged reification: old published partition remains visible until publish.
 def _reificar_comunidades_staged(
     self, comunidades, io_id: str, ts: str, graph_revision: str | None = None
@@ -1176,10 +1164,20 @@ def _olvidar_canonico(self, io_id: str) -> str:
 
     from khora_kernel.embeddings import (
         INDEX_FILE as _INDEX_FILE,
+    )
+    from khora_kernel.embeddings import (
         MAP_FILE as _MAP_FILE,
+    )
+    from khora_kernel.embeddings import (
         META_FILE as _META_FILE,
+    )
+    from khora_kernel.embeddings import (
         TEXT_FILE as _TEXT_FILE,
+    )
+    from khora_kernel.embeddings import (
         invalidate_index as _invalidate_index,
+    )
+    from khora_kernel.embeddings import (
         rebuild_index as _rebuild_index,
     )
 

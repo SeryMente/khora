@@ -160,34 +160,6 @@ def _tokens(text: str) -> set[str]:
     return set(re.findall(r"[a-z0-9áéíóúüñ]+", normalized))
 
 
-def knn(query: str, k: int) -> List[Tuple[str, float]]:
-    ids = _read_ids()
-    if not ids:
-        return []
-    matrix = _load_vectors()
-    if matrix.ndim != 2 or matrix.shape[0] != len(ids):
-        return []
-    q = np.asarray(embed_text(query), dtype=np.float32)
-    if q.shape[0] != matrix.shape[1]:
-        return []
-    scores = matrix @ q
-    lexical = []
-    query_tokens = _tokens(query)
-    try:
-        text_map = json.loads(TEXT_FILE.read_text(encoding="utf-8")) if TEXT_FILE.exists() else {}
-    except Exception:
-        text_map = {}
-    for node_id in ids:
-        node_tokens = _tokens(str(text_map.get(node_id, "")))
-        union = query_tokens | node_tokens
-        lexical.append((len(query_tokens & node_tokens) / len(union)) if union else 0.0)
-    # El componente léxico no sustituye la semántica: rompe empates y garantiza
-    # que identificadores/canon de dominio explícitos sean recuperables.
-    combined = np.asarray(scores, dtype=np.float32) + 3.0 * np.asarray(lexical, dtype=np.float32)
-    order = np.argsort(-combined)[:min(k, len(ids))]
-    return [(ids[int(i)], float(scores[int(i)])) for i in order]
-
-
 def on_node_upserted(node_id: str, memoria: Any) -> dict:
     revision = memoria.get_graph_revision() if hasattr(memoria, "get_graph_revision") else None
     return rebuild_index(memoria, revision)

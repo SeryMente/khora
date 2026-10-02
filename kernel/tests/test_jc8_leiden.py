@@ -88,8 +88,9 @@ def test_sin_llm():
 
 
 def test_reificacion_es_staged_y_no_invalida_publicado():
-    from unittest.mock import MagicMock
     from types import SimpleNamespace
+    from unittest.mock import MagicMock
+
     from khora_kernel.motor._memoria import Neo4jMemoriaOrganizada
 
     memoria = Neo4jMemoriaOrganizada.__new__(Neo4jMemoriaOrganizada)
@@ -122,6 +123,7 @@ def test_reificacion_es_staged_y_no_invalida_publicado():
 
 def test_publicacion_comunidades_es_atomica():
     from unittest.mock import MagicMock
+
     from khora_kernel.motor._memoria import Neo4jMemoriaOrganizada
 
     memoria = Neo4jMemoriaOrganizada.__new__(Neo4jMemoriaOrganizada)

@@ -2,11 +2,12 @@
 import networkx as nx
 import pytest
 
+from khora_kernel.communities import jerarquia_leiden
 from khora_kernel.epistwin_audit import (
+    align_longitudinal,
     compare_community_ab,
     degree_preserving_null,
     gwet_ac1,
-    align_longitudinal,
     likert_to_ordinal,
     membership_stability,
     modularity_q,
@@ -15,7 +16,6 @@ from khora_kernel.epistwin_audit import (
     registry_signal,
     resolution_sweep,
 )
-from khora_kernel.communities import jerarquia_leiden
 
 
 def test_likert_and_ac1():

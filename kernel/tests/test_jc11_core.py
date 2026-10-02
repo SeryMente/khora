@@ -1,14 +1,10 @@
 # @l0 L0-002-R · @req RAZ-02/REQ-2 · @acr ACR-2.1
-import os
 
 from khora_kernel.api import (
-    ContextoDeVisibilidad,
-    NodoSubgrafo,
     AristaSubgrafo,
+    NodoSubgrafo,
     Provenance,
-    ResultadoDeConsulta,
     RespuestaLLM,
-    NivelSuficiencia,
 )
 from khora_kernel.engine.core import ask
 from khora_kernel.engine.history import load_ht

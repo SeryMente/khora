@@ -9,10 +9,20 @@ from typing import Any, Dict, List, Optional
 
 from khora_kernel.api import PuertoLLM, SolicitudLLM
 from khora_kernel.consulta.retriever import RetrieverGraphRAG
-from khora_kernel.embeddings import knn
+from khora_kernel.embeddings import knn as _knn
 from khora_kernel.engine.fval import FvalResult, fval
-from khora_kernel.engine.history import Ht, HtEvidence, HtStep, Response, load_ht, save_ht
+from khora_kernel.engine.history import (
+    Ht,
+    HtEvidence,
+    HtStep,
+    Response,
+    load_ht,
+    save_ht,
+)
 from khora_kernel.proveedores.llm_generico import ProveedorLLMGenerico
+
+# Compatibility seam for legacy tests/consumers; production retrieval lives in RetrieverGraphRAG.
+knn = _knn
 
 
 @dataclass(frozen=True)
