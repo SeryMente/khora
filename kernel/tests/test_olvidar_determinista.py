@@ -150,8 +150,6 @@ def test_olvidar_runtime_elimina_residuos_de_indice(neo4j_config, monkeypatch, t
 
 
 def test_olvidar_runtime_regenera_comunidades_y_resumenes(neo4j_config, monkeypatch, tmp_path):
-    import json
-
     monkeypatch.setenv("KHORA_FSUM_AUTO", "1")
     index_file = tmp_path / "pkg.idx"
     map_file = tmp_path / "pkg_map.json"
