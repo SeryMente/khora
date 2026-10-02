@@ -18,6 +18,7 @@ from khora_kernel.epistwin_audit import (
     persist_registry_signal,
     registry_signal,
     resolution_sweep,
+    longitudinal_lineage_ids,
 )
 
 
@@ -145,3 +146,54 @@ def test_multi_judge_requires_reasoning_and_reports_ac1():
     assert result["judge_count"] == 2
     assert result["ac1_pairwise"]["judge_a:judge_b"] == pytest.approx(1.0)
     assert result["cases"][0]["judges"]["judge_a"]["ordinal"] == "high"
+
+
+def test_longitudinal_lineage_tracks_stable_persistence_alignment_split_merge_birth_and_extinction():
+    persistent = longitudinal_lineage_ids(
+        {"c1": ["a", "b"]},
+        {"c1": ["a", "b"]},
+        threshold=0.5,
+    )
+    assert persistent["c1"]["event"] == "persistence"
+    assert persistent["c1"]["stable_id"] == "c1"
+
+    aligned = longitudinal_lineage_ids(
+        {"old": ["a", "b", "c"]},
+        {"new": ["a", "b", "c", "d"]},
+        threshold=0.5,
+    )
+    assert aligned["new"]["event"] == "alignment"
+    assert aligned["new"]["parents"] == ["old"]
+    assert aligned["new"]["stable_id"] != "new"
+
+    split = longitudinal_lineage_ids(
+        {"old": ["a", "b", "c"]},
+        {"left": ["a", "b"], "right": ["c"]},
+        threshold=0.3,
+    )
+    assert split["left"]["event"] == "split"
+    assert split["right"]["event"] == "split"
+    assert split["left"]["parents"] == ["old"]
+    assert split["right"]["parents"] == ["old"]
+
+    merge = longitudinal_lineage_ids(
+        {"old-left": ["a", "b"], "old-right": ["c", "d"]},
+        {"new": ["a", "b", "c", "d"]},
+        threshold=0.4,
+    )
+    assert merge["new"]["event"] == "merge"
+    assert set(merge["new"]["parents"]) == {"old-left", "old-right"}
+
+    birth = longitudinal_lineage_ids(
+        {},
+        {"new": ["a", "b"]},
+    )
+    assert birth["new"]["event"] == "birth"
+    assert birth["new"]["parents"] == []
+
+    extinct = align_longitudinal(
+        {"old": ["a", "b"]},
+        {},
+        threshold=0.5,
+    )
+    assert any(event["type"] == "extinction" for event in extinct)
