@@ -1,8 +1,10 @@
 # @l0 L0-002-R · @req KA-00/REQ-2 · @acr ACR-2.1
+import json
 import os
 
 import networkx as nx
 
+import khora_kernel.communities as communities_module
 from khora_kernel.communities import jerarquia_leiden
 
 
@@ -140,3 +142,35 @@ def test_publicacion_comunidades_es_atomica():
     assert any("published = true" in q for q in queries)
     assert any("SET c.invalid_at" in q for q in queries)
     tx.commit.assert_called_once()
+
+
+def test_manifest_reproducible_y_verificable(tmp_path, monkeypatch):
+    G = nx.path_graph(["a", "b", "c"])
+    manifest = communities_module._manifest(G)
+    manifest["algorithm"] = {
+        "implementation": "leidenalg",
+        "version": "test",
+        "seed": 42,
+    }
+    manifest["integrity"] = {
+        "coverage_ok": True,
+        "duplicate_members": False,
+        "connected_communities": True,
+    }
+    monkeypatch.setattr(communities_module, "MANIFEST_DIR", tmp_path)
+    communities_module._write_manifest(manifest)
+
+    versioned = tmp_path / f"leiden-{manifest['graph_revision']}.json"
+    latest = tmp_path / "leiden-latest.json"
+    assert versioned.exists()
+    assert latest.exists()
+
+    loaded = json.loads(versioned.read_text(encoding="utf-8"))
+    latest_loaded = json.loads(latest.read_text(encoding="utf-8"))
+    assert loaded == latest_loaded
+    assert loaded["graph_revision"] == manifest["graph_revision"]
+    assert loaded["projection"]["node_ids"] == ["a", "b", "c"]
+    assert loaded["integrity"]["coverage_ok"] is True
+
+    repeat = communities_module._manifest(G)
+    assert repeat["graph_revision"] == manifest["graph_revision"]
