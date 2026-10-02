@@ -235,7 +235,7 @@ class Neo4jMemoriaOrganizada:
                         + [r["destino_id"] for r in relaciones_entity]
                     ))
                     if claves_list:
-                        tx.run(
+                        res_anchor = tx.run(
                             anclaje_query, ts=ts, io_id=io_id, io_key=io_key,
                             prov_str=prov_str_io, claves=claves_list, volcado_id=volcado,
                             version=version, sha256=sha256,
@@ -245,6 +245,8 @@ class Neo4jMemoriaOrganizada:
                             capture_time=source_triplet.get("capture_time"),
                             custody=source_triplet.get("custody"),
                         )
+                        anchor_record = res_anchor.single()
+                        escritos += anchor_record["anclados"] if anchor_record else 0
 
                     # Verificar Unión Disjunta
                     res_viol = tx.run(restriccion_query)
