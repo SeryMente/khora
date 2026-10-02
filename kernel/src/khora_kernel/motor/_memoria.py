@@ -35,6 +35,11 @@ class Neo4jMemoriaOrganizada:
         except Exception as e:
             raise Exception(f"No se pudo conectar a Neo4j: {str(e)}")
 
+    def cerrar(self) -> None:
+        if self._driver is not None:
+            self._driver.close()
+            self._driver = None
+
     def _asegurar_conexion(self):
         if self._driver is None:
             self._conectar()

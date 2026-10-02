@@ -6,7 +6,6 @@ import pytest
 
 import khora_kernel.embeddings as embeddings_mod
 from khora_kernel.embeddings import (
-    embed_text,
     get_model_call_count,
     index_all,
     knn,
@@ -32,6 +31,11 @@ def clean_index(tmp_path, monkeypatch):
     monkeypatch.setattr(embeddings_mod, "MAP_FILE", tmp_path / "faiss_pkg_map.json")
     monkeypatch.setattr(embeddings_mod, "META_FILE", tmp_path / "faiss_pkg_map_meta.json")
     monkeypatch.setattr(embeddings_mod, "TEXT_FILE", tmp_path / "faiss_pkg_map_texts.json")
+    monkeypatch.setattr(
+        embeddings_mod,
+        "get_model",
+        lambda: (_ for _ in ()).throw(RuntimeError("modelo neuronal deshabilitado en tests herméticos")),
+    )
     reset_model_call_count()
     yield
 
@@ -54,7 +58,7 @@ def load_golden():
 
 def test_dim_1024():
     """embedding de longitud exacta 1024."""
-    emb = embed_text("test")
+    emb = embeddings_mod._fallback_embedding("test")
     assert len(emb) == 1024
 
 def test_knn_top3():

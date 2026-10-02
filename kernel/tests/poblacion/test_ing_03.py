@@ -53,7 +53,13 @@ def test_ing_03_acr_1_1_acr_1_2(neo4j_driver, neo4j_config):
         id="o1",
         texto="Contenido de prueba",
         provenance=prov1,
-        metadata={"autor": "Autor1", "fecha": "2026-07-23"}
+        metadata={
+            "autor": "Autor1",
+            "fecha": "2026-07-23",
+            "volcado_id": "8f8f2e1a-6f01-4bc7-9d77-5c44aa8736e1",
+            "version": 1,
+            "sha256": "0" * 64,
+        }
     )
 
     # Ingesta 1
