@@ -305,3 +305,77 @@ def test_integracion_neo4j(neo4j_config, monkeypatch):
             )
         driver.close()
         memoria_real.cerrar()
+
+
+def test_integracion_neo4j_con_literal_en_gstar(neo4j_config, monkeypatch):
+    """Un hecho Entity->Literal debe sobrevivir la construcci�n de G* real."""
+    from neo4j import GraphDatabase
+
+    from khora_kernel.motor._memoria import Neo4jMemoriaOrganizada
+
+    memoria = Neo4jMemoriaOrganizada(
+        neo4j_config["uri"], neo4j_config["user"], neo4j_config["password"]
+    )
+    driver = GraphDatabase.driver(
+        neo4j_config["uri"], auth=(neo4j_config["user"], neo4j_config["password"])
+    )
+    entity_id = "e2e_literal_entity"
+    literal_id = "literal:42"
+
+    try:
+        with driver.session() as session:
+            session.run(
+                "MATCH (n) WHERE n.canonical_key IN $ids DETACH DELETE n",
+                ids=[entity_id, literal_id],
+            )
+            session.run(
+                """
+                CREATE (e:Entity {
+                    id:$entity, canonical_key:$entity,
+                    label_original:'Alice',
+                    provenance:['origen=e2e, driver=ci, timestamp=2026-10-02T19:00:00Z'],
+                    visibilidad:'privado', invalid_at:null,
+                    created_at:datetime(), valid_at:datetime()
+                })
+                CREATE (l:Literal {
+                    id:$literal, canonical_key:$literal,
+                    value:'42', datatype:'integer',
+                    invalid_at:null, created_at:datetime(), valid_at:datetime()
+                })
+                CREATE (e)-[:RELATION {
+                    type:'HAS_AGE', io_id:'io-literal-e2e',
+                    provenance:['origen=e2e, driver=ci, timestamp=2026-10-02T19:00:00Z'],
+                    invalid_at:null, created_at:datetime(), valid_at:datetime()
+                }]->(l)
+                """,
+                entity=entity_id,
+                literal=literal_id,
+            )
+
+        monkeypatch.setattr(
+            khora_kernel.embeddings,
+            "knn",
+            lambda query, k: [(entity_id, 1.0)],
+        )
+        retriever = RetrieverGraphRAG(memoria_neo4j=memoria)
+        result = retriever.consultar("edad de Alice", ContextoDeVisibilidad.PRIVADO)
+
+        node_map = {node.id: node.etiqueta for node in result.subgrafo.nodos}
+        edge_tuples = {
+            (edge.origen, edge.destino, edge.relacion)
+            for edge in result.subgrafo.aristas
+        }
+        fragment_map = {fragment.id: fragment.texto for fragment in result.fragmentos}
+
+        assert literal_id in node_map
+        assert node_map[literal_id] == "Literal"
+        assert (entity_id, literal_id, "RELATION") in edge_tuples
+        assert fragment_map[literal_id] == "42"
+    finally:
+        with driver.session() as session:
+            session.run(
+                "MATCH (n) WHERE n.canonical_key IN $ids DETACH DELETE n",
+                ids=[entity_id, literal_id],
+            )
+        driver.close()
+        memoria.cerrar()
