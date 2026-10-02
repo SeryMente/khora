@@ -20,7 +20,7 @@ Si faltan datos para recuperar resúmenes de comunidad o nodos knn, el campo `de
 La pantalla `/sistema/consulta` implementa una consola de conversación multi-turno con transmisión en vivo (streaming SSE):
 1. **Chat Multi-turno Streaming:** Consume `POST /api/chat` (proxy autenticado hacia `POST /api/v1/chat` en el kernel Python). Transmite eventos SSE (`chunk`, `error`, `fin`) sin bufferear.
 2. **Selector de Perfil de Proveedor:** Permite elegir entre `open_source`, `gemini` y `groq`, con un campo opcional de `modelo_override` para especificar un modelo LLM concreto.
-3. **Modo Grafo (RAG) Opcional:** Al activar el toggle "Modo Grafo", las consultas se redirigen al servicio GraphRAG de Neo4j (`POST /api/consulta` -> `POST /api/v1/consulta`), incrustando en el historial la respuesta junto con su subgrafo, fuentes y evidencia de origen.
+3. **Modo Grafo (GraphRAG):** El modo de consulta sobre el PKG usa el Retriever GraphRAG estructural: semilla k-NN, expansión topológica multi-hop y resúmenes fSUM de comunidades Leiden. La interfaz puede activar o desactivar esta superficie de consulta, pero la implementación del retriever ya es un componente real del Kernel.
 4. **Atribución de Origen:** Cada mensaje del asistente declara su origen (`llm:{perfil}:{modelo}` o `grafo`).
 
 ## Panel de KPIs & Benchmarks LLM (`/sistema/kpis`)
@@ -43,7 +43,7 @@ El panel de KPIs en la ruta dedicada `/sistema/kpis` mide empíricamente el rend
    - No realiza scraping en vivo de benchmarks de terceros ni consumo de APIs externas para la tabla de frontera.
 
 ## Cómo se reemplaza
-El componente está desacoplado del Kernel a nivel puerto, si se requiere utilizar un verdadero GraphRAG con un motor indexado se deberá montar un driver que implemente `MotorDeConsulta` pero con integraciones de terceros.
+El componente está implementado dentro del Kernel mediante el contrato `MotorDeConsulta` y consultas estructurales sobre Neo4j. Las dependencias externas (Neo4j y embeddings) se mantienen fuera del núcleo arquitectónico mediante sus fronteras/puertos correspondientes.
 
 ## Costo de reemplazo
 El costo de reemplazar la implementación actual de GraphRAG es **Alto**, dado que implementa un pipeline complejo (Embedding -> Multi-Hop -> Leiden/fSUM). Reemplazar este componente exigiría configurar un indexador GraphRAG externo y su respectivo modelo de embeddings para mapear todo el corpus y responder con consultas complejas.

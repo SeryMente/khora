@@ -52,6 +52,11 @@ def main():
             print(f"Warning: Directorio {directory} no existe. Ignorando.")
             continue
 
+        if directory.is_file():
+            violations = check_file(directory, args.internal_pkg)
+            all_violations.extend(violations)
+            continue
+
         for py_file in directory.rglob("*.py"):
             violations = check_file(py_file, args.internal_pkg)
             all_violations.extend(violations)

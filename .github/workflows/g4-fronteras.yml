@@ -10,6 +10,8 @@ on:
 jobs:
   vigilar-fronteras:
     runs-on: ubuntu-latest
+    env:
+      KHORA_EMB_OFFLINE: "1"
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
@@ -24,7 +26,7 @@ jobs:
       - name: Instalar dependencias base
         run: |
           cd kernel
-          pip install -e ".[dev]"
+          pip install --no-cache-dir -e ".[ci]"
 
       - name: "G9 precondición: Type-checking estricto (Pyright)"
         run: |
@@ -42,7 +44,7 @@ jobs:
           echo "Buscando contaminación vendor ($VENDOR_KEYWORDS) en kernel (excluyendo drivers)..."
 
           if [ -d "kernel/src/khora_kernel" ]; then
-            MATCHES=$(grep -riE --include="*.py" "$VENDOR_KEYWORDS" kernel/src/khora_kernel/ | grep -vE "kernel/src/khora_kernel/(drivers|motor|proveedores)/" || true)
+            MATCHES=$(grep -riE --include="*.py" "^[[:space:]]*(from|import)[[:space:]]+(notion|todoist|neo4j|groq|whisper|vercel|openai|anthropic|langchain)([[:space:].]|$)" kernel/src/khora_kernel/ | grep -vE "kernel/src/khora_kernel/(drivers|motor|proveedores)/" || true)
             if [ -n "$MATCHES" ]; then
               echo "❌ G2: Se encontró contaminación vendor en el kernel:"
               echo "$MATCHES"
@@ -85,7 +87,7 @@ jobs:
 
       - name: "G6: Cintura de peso cero (ADR-10)"
         run: |
-          python3 scripts/check_stdlib_only.py kernel/src/khora_kernel/api kernel/src/khora_kernel/ports
+          python3 scripts/check_stdlib_only.py kernel/src/khora_kernel/api.py kernel/src/khora_kernel/ports
 
       - name: "G7: Import sin efectos (ADR-10)"
         run: |

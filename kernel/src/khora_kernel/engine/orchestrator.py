@@ -7,7 +7,6 @@ from khora_kernel.engine.core import ValidatedResponse
 from khora_kernel.engine.fallback import run_fallback
 from khora_kernel.engine.fval import fval
 from khora_kernel.engine.history import load_ht
-from khora_kernel.proveedores.openai import ProveedorOpenAICompatible
 
 
 def _ask_core(*args, **kwargs):
@@ -64,7 +63,7 @@ def ask_with_fallback(
         pregunta=question,
         referencia_modalidad=referencia_modalidad,
         puerto_vision=puerto_vision,
-        puerto_llm=ProveedorOpenAICompatible(),
+        puerto_llm=core_module._get_provider(),
         db_path=db_path,
     )
     second = ask(
