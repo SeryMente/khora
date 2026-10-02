@@ -257,3 +257,51 @@ def test_log_costos():
         assert data["community_id"] == "C1"
         assert "prompt_tokens" in data
         assert "completion_tokens" in data
+
+
+def test_fsum_preserva_predicado_semantico_real(neo4j_config):
+    from neo4j import GraphDatabase
+
+    from khora_kernel.motor._memoria import Neo4jMemoriaOrganizada
+    from khora_kernel.summaries.fsum import get_community_edges
+
+    memoria = Neo4jMemoriaOrganizada(
+        neo4j_config["uri"], neo4j_config["user"], neo4j_config["password"]
+    )
+    driver = GraphDatabase.driver(
+        neo4j_config["uri"],
+        auth=(neo4j_config["user"], neo4j_config["password"]),
+    )
+    ids = ["fsum-A", "fsum-B"]
+    cid = "fsum-semantic-community"
+    try:
+        with driver.session() as session:
+            session.run(
+                "MATCH (n) WHERE n.canonical_key IN $ids OR n.community_id=$cid DETACH DELETE n",
+                ids=ids,
+                cid=cid,
+            )
+            session.run(
+                """
+                CREATE (a:Entity {canonical_key:'fsum-A', id:'fsum-A', label_original:'A', invalid_at:null})
+                CREATE (b:Entity {canonical_key:'fsum-B', id:'fsum-B', label_original:'B', invalid_at:null})
+                CREATE (c:Community {community_id:$cid, invalid_at:null})
+                CREATE (a)-[:IN_COMMUNITY {invalid_at:null}]->(c)
+                CREATE (b)-[:IN_COMMUNITY {invalid_at:null}]->(c)
+                CREATE (a)-[:RELATION {type:'WORKS_WITH', io_id:'fsum-test', invalid_at:null}]->(b)
+                """,
+                cid=cid,
+            )
+
+        edges = get_community_edges(memoria, cid)
+        assert len(edges) == 1
+        assert edges[0]["relation"] == "WORKS_WITH"
+    finally:
+        with driver.session() as session:
+            session.run(
+                "MATCH (n) WHERE n.canonical_key IN $ids OR n.community_id=$cid DETACH DELETE n",
+                ids=ids,
+                cid=cid,
+            )
+        driver.close()
+        memoria.cerrar()
