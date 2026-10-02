@@ -25,6 +25,14 @@ def test_likert_and_ac1():
     assert gwet_ac1(["a","b","a"], ["a","b","a"]) == pytest.approx(1.0)
 
 
+def test_gwet_ac1_en_distribucion_sesgada():
+    labels_a = ["high"] * 19 + ["medium"]
+    labels_b = ["high"] * 19 + ["low"]
+    score = gwet_ac1(labels_a, labels_b)
+    assert 0.0 <= score < 1.0
+    assert score == pytest.approx(0.9474720945502297)
+
+
 def test_partition_integrity_and_stability():
     p = {"c1":["a","b"], "c2":["c"]}
     assert partition_membership(p)["a"] == "c1"
