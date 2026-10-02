@@ -231,6 +231,15 @@ def test_olvidar_runtime_regenera_comunidades_y_resumenes(neo4j_config, monkeypa
             ).single()
             assert keep_state is not None
             assert "Entity" in keep_state["labels"]
+            assert "User" not in keep_state["labels"], (
+                f"KEEP unexpectedly carries User label: labels={keep_state['labels']}"
+            )
+            assert "InformationObject" not in keep_state["labels"], (
+                f"KEEP unexpectedly carries InformationObject label: labels={keep_state['labels']}"
+            )
+            assert "Community" not in keep_state["labels"], (
+                f"KEEP unexpectedly carries Community label: labels={keep_state['labels']}"
+            )
             assert keep_state["invalid_at"] is None, f"KEEP invalid_at={keep_state['invalid_at']}"
             assert keep_state["created_at"] is not None
             assert keep_state["valid_at"] is not None
