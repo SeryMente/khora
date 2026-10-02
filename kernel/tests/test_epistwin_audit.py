@@ -11,6 +11,8 @@ from khora_kernel.epistwin_audit import (
     degree_preserving_null,
     gwet_ac1,
     likert_to_ordinal,
+    likert_to_polarity,
+    longitudinal_lineage_ids,
     membership_stability,
     modularity_q,
     null_modularity_report,
@@ -18,7 +20,6 @@ from khora_kernel.epistwin_audit import (
     persist_registry_signal,
     registry_signal,
     resolution_sweep,
-    longitudinal_lineage_ids,
 )
 
 
@@ -26,7 +27,10 @@ def test_likert_and_ac1():
     assert likert_to_ordinal(1) == "low"
     assert likert_to_ordinal(3) == "medium"
     assert likert_to_ordinal(5) == "high"
-    assert gwet_ac1(["a","b","a"], ["a","b","a"]) == pytest.approx(1.0)
+    assert likert_to_polarity(1) == "Negative"
+    assert likert_to_polarity(3) == "Neutral"
+    assert likert_to_polarity(5) == "Positive"
+    assert gwet_ac1(["Positive","Neutral","Positive"], ["Positive","Neutral","Positive"]) == pytest.approx(1.0)
 
 
 def test_gwet_ac1_en_distribucion_sesgada():
@@ -146,6 +150,7 @@ def test_multi_judge_requires_reasoning_and_reports_ac1():
     assert result["judge_count"] == 2
     assert result["ac1_pairwise"]["judge_a:judge_b"] == pytest.approx(1.0)
     assert result["cases"][0]["judges"]["judge_a"]["ordinal"] == "high"
+    assert result["cases"][0]["judges"]["judge_a"]["normalized"] == "Positive"
 
 
 def test_longitudinal_lineage_tracks_stable_persistence_alignment_split_merge_birth_and_extinction():

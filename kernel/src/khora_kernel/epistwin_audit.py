@@ -19,6 +19,13 @@ def likert_to_ordinal(score: int) -> str:
     return 'low' if score <= 2 else 'medium' if score == 3 else 'high'
 
 
+def likert_to_polarity(score: int) -> str:
+    """Normalización EpisTwin: 1-2 Negative, 3 Neutral, 4-5 Positive."""
+    if score not in range(1, 6):
+        raise ValueError('Likert debe estar entre 1 y 5')
+    return 'Negative' if score <= 2 else 'Neutral' if score == 3 else 'Positive'
+
+
 def gwet_ac1(labels_a: Iterable[str], labels_b: Iterable[str]) -> float:
     a, b = list(labels_a), list(labels_b)
     if len(a) != len(b) or not a:
@@ -277,8 +284,14 @@ def run_multi_judge(cases: Iterable[dict[str, str]], judges: dict[str, Any]) -> 
                 raise ValueError(f"Juez {name} debe devolver reasoning antes del score")
             score = int(result.get("likert", 0))
             ordinal = likert_to_ordinal(score)
-            labels[name].append(ordinal)
-            row["judges"][name] = {"reasoning": result["reasoning"], "likert": score, "ordinal": ordinal}
+            polarity = likert_to_polarity(score)
+            labels[name].append(polarity)
+            row["judges"][name] = {
+                "reasoning": result["reasoning"],
+                "likert": score,
+                "ordinal": ordinal,
+                "normalized": polarity,
+            }
         rows.append(row)
 
     agreement: dict[str, float] = {}
