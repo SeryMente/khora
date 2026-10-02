@@ -46,6 +46,20 @@ def _mock_ner(chunk: str) -> list[tuple[str, str, str]]:
     return triples
 
 
+def _fkgc_temperature() -> float:
+    """θ de fKGC: muestreo real, estrictamente positivo."""
+    raw = os.environ.get("KHORA_FKGC_TEMPERATURE", "0.01")
+    try:
+        temperature = float(raw)
+    except ValueError as exc:
+        raise ValueError("KHORA_FKGC_TEMPERATURE debe ser numérico") from exc
+    if temperature <= 0:
+        raise ValueError("KHORA_FKGC_TEMPERATURE debe ser > 0 para conservar el muestreo de fKGC")
+    if temperature > 0.1:
+        raise ValueError("KHORA_FKGC_TEMPERATURE debe estar <= 0.1 según el rango recomendado del canon")
+    return temperature
+
+
 def _llm_ner(chunk: str, puerto_llm: PuertoLLM) -> list[tuple]:
     # NER real con LLM
     sistema_prompt = (
@@ -59,7 +73,7 @@ def _llm_ner(chunk: str, puerto_llm: PuertoLLM) -> list[tuple]:
         prompt=f"Extrae entidades y relaciones de este texto:\n\n{chunk}",
         sistema=sistema_prompt,
         formato_estricto=None,
-        metadata={"temperature": 0.0, "role": "fKGC"},
+        metadata={"temperature": _fkgc_temperature(), "role": "fKGC"},
     )
     resp = puerto_llm.generar(solicitud)
     triples = []
