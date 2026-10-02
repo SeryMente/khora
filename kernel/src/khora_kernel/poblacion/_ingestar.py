@@ -350,18 +350,9 @@ def asentar(
         volcado = str(proposal.source_triplet.volcado_id or "")
         io_id = volcado[3:] if volcado.startswith("io:") else volcado
 
-    # Una propuesta ratificada sin items es un no-op válido: el extractor no
-    # produjo conocimiento asentable. El hook causal sigue ejecutándose para
-    # preservar el contrato ingestión -> pipeline posterior.
+    # Una propuesta ratificada sin items es un no-op válido: no debe
+    # disparar derivados ni fabricar una nueva revisión.
     if not proposal.items:
-        if on_upsert:
-            _dispatch_upsert_hook(
-                on_upsert,
-                io_id,
-                memoria,
-                proposal.created_at,
-                puerto_llm,
-            )
         return ActaDeIngesta(
             origen="p5b-kernel",
             timestamp=proposal.created_at,
@@ -493,7 +484,7 @@ def asentar(
                     needs_review=ent["needs_review"],
                 )
 
-    if on_upsert:
+    if on_upsert and triples_escritos > 0:
         _dispatch_upsert_hook(
             on_upsert,
             io_id,
