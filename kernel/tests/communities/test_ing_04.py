@@ -62,7 +62,7 @@ def test_ing_04_acr_1_1(memoria_limpia, caplog):
     from khora_kernel.psi import on_node_upserted
     ingestar(objeto, memoria_limpia, DummyPuertoLLM(), DummyPuertoEmbeddings(), on_upsert=on_node_upserted)
 
-    assert any("[PIPELINE] Leiden disparado por ingesta=obj-1" in record.message for record in caplog.records)
+    assert any("[PIPELINE] recalculo disparado por ingesta=obj-1" in record.message for record in caplog.records)
     assert any("ts=2024-05-01T12:00:00Z" in record.message for record in caplog.records)
 
 def test_ing_04_acr_2_1(memoria_limpia):

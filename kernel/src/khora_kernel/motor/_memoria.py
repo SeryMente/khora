@@ -1052,6 +1052,28 @@ def _asentar_transaccional_canonico(
                     )
 
                 tx.commit()
+
+                # Post-commit audit: the causal hook must observe the same committed graph.
+                with self._driver.session() as verify_session:
+                    counts = verify_session.run(
+                        """
+                        MATCH (e:Entity)
+                        WHERE NOT e:User AND NOT e:InformationObject
+                        RETURN count(e) AS entities
+                        """
+                    ).single()
+                    relation_counts = verify_session.run(
+                        """
+                        MATCH ()-[r:RELATION]->()
+                        RETURN count(r) AS relations
+                        """
+                    ).single()
+                    logging.info(
+                        "[INGESTA] postcommit io=%s entities=%s relations=%s",
+                        io_id,
+                        int(counts["entities"] if counts else 0),
+                        int(relation_counts["relations"] if relation_counts else 0),
+                    )
                 return escritos
     except (ValueError, IngestaFallidaError):
         raise
