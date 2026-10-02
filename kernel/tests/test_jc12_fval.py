@@ -3,7 +3,7 @@ import os
 
 import pytest
 
-from khora_kernel.engine.fval import fval, get_verdict, split_claims
+from khora_kernel.engine.fval import _global_fval, fval, get_verdict, split_claims
 from khora_kernel.engine.history import Ht, HtEvidence, Response, save_ht
 
 
@@ -160,3 +160,40 @@ def test_no_escritura_pkg(monkeypatch, tmp_path):
     db_path = str(tmp_path / "test_no_escritura.db")
     fval(resp, ht, db_path)
     assert db.writes == 0
+
+
+def test_global_fval_uses_ht_and_returns_binary_global_verdict():
+    captured = {}
+
+    class GlobalJudge:
+        def generar(self, solicitud):
+            captured["request"] = solicitud
+            return type(
+                "Response",
+                (),
+                {
+                    "texto": (
+                        '{"vt":"Sufficient","deficit_type":null,'
+                        '"reason":"H_t respalda globalmente la respuesta."}'
+                    )
+                },
+            )()
+
+    ht = Ht(
+        session_id="global_fval",
+        created_at="2026-10-02T00:00:00Z",
+        steps=[],
+        evidence=[HtEvidence(node_id="n1", triple="A rel B", source_step=1)],
+        verdicts=[],
+        trace=[{"action": "RETRIEVE", "gstar_nodes": ["n1"]}],
+    )
+
+    result = _global_fval("A está relacionado con B.", ht, GlobalJudge())
+
+    assert result.vt == "Sufficient"
+    assert result.deficit_type is None
+    assert result.scope == "global_Ht"
+    assert captured["request"].metadata["role"] == "fVAL"
+    assert "No hagas verificación claim-by-claim" in captured["request"].prompt
+    assert "A rel B" in captured["request"].prompt
+    assert "RETRIEVE" in captured["request"].prompt

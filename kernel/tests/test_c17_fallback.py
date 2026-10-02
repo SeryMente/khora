@@ -99,6 +99,104 @@ def mock_llm_provider(monkeypatch):
     return provider_mock
 
 
+def test_textual_insufficiency_does_not_activate_visual_fallback(monkeypatch):
+    from khora_kernel.engine.core import ValidatedResponse
+
+    class Vision:
+        calls = 0
+
+        def extraer_evidencia(self, referencia):
+            self.calls += 1
+            return "NO DEBE LLAMARSE"
+
+    vision = Vision()
+    first = ValidatedResponse(
+        answer="No tengo suficiente evidencia textual.",
+        citations=[],
+        ht_ref="session-textual",
+        verdict="INSUFFICIENT",
+        deficit_type="TEXTUAL",
+        reason="Falta evidencia textual.",
+        delta_fb=False,
+        trace=[],
+    )
+    monkeypatch.setattr(
+        "khora_kernel.engine.orchestrator.ask",
+        lambda *args, **kwargs: first,
+    )
+    monkeypatch.setattr(
+        "khora_kernel.engine.orchestrator.run_fallback",
+        lambda *args, **kwargs: (_ for _ in ()).throw(
+            AssertionError("ΔFB no debe ejecutarse para déficit TEXTUAL")
+        ),
+    )
+
+    result = ask_with_fallback(
+        question="Pregunta textual",
+        referencia_modalidad="unused.jpg",
+        puerto_vision=vision,
+        session_id="session-textual",
+        db_path="unused.db",
+        memoria_grafo=object(),
+    )
+
+    assert result is first
+    assert vision.calls == 0
+
+
+def test_visual_insufficiency_activates_fallback_once(monkeypatch):
+    from khora_kernel.engine.core import ValidatedResponse
+
+    first = ValidatedResponse(
+        answer="No puedo confirmar lo visual.",
+        citations=["node1"],
+        ht_ref="session-visual",
+        verdict="INSUFFICIENT",
+        deficit_type="VISUAL",
+        reason="Hace falta evidencia visual.",
+        delta_fb=True,
+        trace=[],
+    )
+    second = ValidatedResponse(
+        answer="La imagen muestra el perro marrón.",
+        citations=["node1", "fallback_vqa"],
+        ht_ref="session-visual",
+        verdict="SUFFICIENT",
+        deficit_type=None,
+        reason="La evidencia visual completa la respuesta.",
+        delta_fb=False,
+        trace=[{"action": "FALLBACK"}],
+    )
+    calls = {"ask": 0, "fallback": 0}
+
+    def fake_ask(*args, **kwargs):
+        calls["ask"] += 1
+        return first if calls["ask"] == 1 else second
+
+    def fake_fallback(*args, **kwargs):
+        calls["fallback"] += 1
+        return {"session_id": "session-visual"}
+
+    monkeypatch.setattr("khora_kernel.engine.orchestrator.ask", fake_ask)
+    monkeypatch.setattr("khora_kernel.engine.orchestrator.run_fallback", fake_fallback)
+    monkeypatch.setattr(
+        "khora_kernel.engine.core._get_provider",
+        lambda: object(),
+    )
+
+    result = ask_with_fallback(
+        question="¿De qué color es?",
+        referencia_modalidad="dog.jpg",
+        puerto_vision=object(),
+        session_id="session-visual",
+        db_path="unused.db",
+        memoria_grafo=object(),
+    )
+
+    assert result is second
+    assert calls == {"ask": 2, "fallback": 1}
+
+
 def test_fallback_activation(tmp_db, mock_llm_provider, monkeypatch):
     # Asegurar que el entorno indica fVAL
     monkeypatch.setenv("KHORA_FVAL_MODE", "mark")
