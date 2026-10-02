@@ -136,7 +136,7 @@ class RetrieverGraphRAG(MotorDeConsulta):
                       AND a.canonical_key IN $ids AND b.canonical_key IN $ids
                     RETURN coalesce(a.id,a.canonical_key) AS source,
                            coalesce(b.id,b.canonical_key) AS target,
-                           type(r) AS relation,
+                           coalesce(r.type,type(r)) AS relation,
                            CASE WHEN a:Literal THEN toString(a.value)
                                 ELSE coalesce(a.label_original,a.canonical_key) END AS source_text,
                            CASE WHEN b:Literal THEN toString(b.value)
