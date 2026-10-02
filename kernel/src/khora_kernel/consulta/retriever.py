@@ -265,8 +265,10 @@ class RetrieverGraphRAG(MotorDeConsulta):
         rows = session.run(
             """
             UNWIND $ids AS id
-            MATCH (e:Entity {canonical_key:id})
-            WHERE e.invalid_at IS NULL
+            MATCH (e)
+            WHERE e.canonical_key = id
+              AND e.invalid_at IS NULL
+              AND any(label IN labels(e) WHERE label IN ['Entity','Literal','Blank'])
             RETURN e.canonical_key AS id, coalesce(e.visibilidad,'privado') AS vis
             """,
             ids=list(ids),
