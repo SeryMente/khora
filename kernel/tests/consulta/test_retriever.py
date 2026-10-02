@@ -224,24 +224,35 @@ def test_integracion_neo4j(neo4j_config, monkeypatch):
                     provenance:['origen=e2e, driver=ci, timestamp=2026-10-02T18:00:00Z'],
                     visibilidad:'transparente', invalid_at:null
                 })
-                CREATE (c:Community {
-                    community_id:$cid, graph_revision:'e2e-rev',
-                    published:true, published_at:datetime(),
-                    invalid_at:null, summary:'Resumen E2E'
-                })
-                CREATE (a)-[:IN_COMMUNITY {
-                    published:true, invalid_at:null,
-                    created_at:datetime(), valid_at:datetime()
-                }]->(c)
-                CREATE (b)-[:IN_COMMUNITY {
-                    published:true, invalid_at:null,
-                    created_at:datetime(), valid_at:datetime()
-                }]->(c)
                 """,
                 seed=seed_id,
                 member=member_id,
-                cid=community_id,
             )
+            graph_revision = memoria_real.get_graph_revision()
+            with driver.session() as session:
+                session.run(
+                    """
+                    MATCH (a:Entity {canonical_key:$seed})
+                    MATCH (b:Entity {canonical_key:$member})
+                    CREATE (c:Community {
+                        community_id:$cid, graph_revision:$revision,
+                        published:true, published_at:datetime(),
+                        invalid_at:null, summary:'Resumen E2E'
+                    })
+                    CREATE (a)-[:IN_COMMUNITY {
+                        published:true, invalid_at:null,
+                        created_at:datetime(), valid_at:datetime()
+                    }]->(c)
+                    CREATE (b)-[:IN_COMMUNITY {
+                        published:true, invalid_at:null,
+                        created_at:datetime(), valid_at:datetime()
+                    }]->(c)
+                    """,
+                    seed=seed_id,
+                    member=member_id,
+                    cid=community_id,
+                    revision=graph_revision,
+                )
 
         monkeypatch.setattr(
             khora_kernel.embeddings,
