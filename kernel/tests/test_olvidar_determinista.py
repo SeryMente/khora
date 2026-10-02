@@ -219,6 +219,22 @@ def test_olvidar_runtime_regenera_comunidades_y_resumenes(neo4j_config, monkeypa
             assert session.run(
                 "MATCH (e:Entity {canonical_key:'DELETE'}) RETURN count(e) AS n"
             ).single()["n"] == 0
+
+            keep_state = session.run(
+                """
+                MATCH (e:Entity {canonical_key:'KEEP'})
+                RETURN labels(e) AS labels,
+                       e.invalid_at AS invalid_at,
+                       e.created_at AS created_at,
+                       e.valid_at AS valid_at
+                """
+            ).single()
+            assert keep_state is not None
+            assert "Entity" in keep_state["labels"]
+            assert keep_state["invalid_at"] is None, f"KEEP invalid_at={keep_state['invalid_at']}"
+            assert keep_state["created_at"] is not None
+            assert keep_state["valid_at"] is not None
+
             assert session.run(
                 "MATCH (e:Entity {canonical_key:'KEEP'}) RETURN count(e) AS n"
             ).single()["n"] == 1
