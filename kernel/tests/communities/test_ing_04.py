@@ -100,6 +100,75 @@ def test_ing_04_acr_2_1(memoria_limpia):
             assert record["i"] is None
         assert count > 0
 
+def test_psi_pipeline_propaga_revision_y_orden(monkeypatch):
+    from khora_kernel import psi
+
+    calls = []
+
+    manifest = {
+        "graph_revision": "rev-canonica",
+        "communities": [{"community_id": "c1"}],
+    }
+
+    def fake_leiden(node_id, memoria, ts):
+        calls.append(("leiden", node_id, ts))
+        return manifest
+
+    def fake_summary(memoria, provider, graph_revision):
+        calls.append(("fsum", graph_revision))
+
+    class FakeMemoria:
+        def publicar_comunidades(self, graph_revision, ts):
+            calls.append(("publish", graph_revision, ts))
+
+    def fake_rebuild(memoria, graph_revision):
+        calls.append(("index", graph_revision))
+        return {"graph_revision": graph_revision, "nodes_indexed": 2}
+
+    monkeypatch.setattr(psi, "recalcular_leiden", fake_leiden)
+    monkeypatch.setattr("khora_kernel.summaries.summarize_all", fake_summary)
+    monkeypatch.setattr(psi, "rebuild_index", fake_rebuild)
+
+    result = psi.on_node_upserted(
+        "io-psi",
+        FakeMemoria(),
+        ts="2026-10-02T20:00:00Z",
+        puerto_llm=object(),
+    )
+
+    assert result["graph_revision"] == "rev-canonica"
+    assert [item[0] for item in calls] == ["leiden", "fsum", "publish", "index"]
+    assert calls[1][1] == "rev-canonica"
+    assert calls[2][1] == "rev-canonica"
+    assert calls[3][1] == "rev-canonica"
+
+
+def test_salud_grafo_runtime_invariantes(neo4j_config):
+    from khora_kernel.motor import Neo4jMemoriaOrganizada
+
+    memoria = Neo4jMemoriaOrganizada(
+        neo4j_config["uri"],
+        neo4j_config["user"],
+        neo4j_config["password"],
+    )
+    try:
+        checks = memoria.salud_grafo()
+        expected = {
+            "typed_overlap",
+            "missing_temporal_nodes",
+            "missing_temporal_edges",
+            "unreachable_entities",
+            "active_membership_to_invalid_community",
+            "eligible_without_active_community",
+            "active_communities_without_members",
+        }
+        assert expected.issubset(checks)
+        assert all(checks[key] == 0 for key in expected)
+        assert isinstance(checks["graph_revision"], str)
+    finally:
+        memoria.cerrar()
+
+
 def test_ing_04_acr_invalidacion(memoria_limpia):
     ts1 = "2024-05-01T12:00:00Z"
     objeto1 = ObjetoDeInformacion(
