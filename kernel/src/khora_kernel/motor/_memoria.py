@@ -409,7 +409,8 @@ class Neo4jMemoriaOrganizada:
         RETURN DISTINCT
             coalesce(n.id, n.canonical_key) AS id,
             labels(n) AS labels,
-            coalesce(n.value, n.label_original, '') AS value
+            coalesce(n.value, n.label_original, '') AS value,
+            coalesce(n.datatype, '') AS datatype
         ORDER BY id
         """
         query_edges = """
@@ -432,6 +433,7 @@ class Neo4jMemoriaOrganizada:
                     "id": r["id"],
                     "labels": sorted(r["labels"] or []),
                     "value": r["value"],
+                    "datatype": r["datatype"],
                 }
                 for r in session.run(query_nodes)
             ]
