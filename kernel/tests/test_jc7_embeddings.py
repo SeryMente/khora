@@ -1,5 +1,6 @@
 # @l0 L0-002-R · @req KA-00/REQ-2 · @acr ACR-2.1
 import json
+from pathlib import Path
 
 import pytest
 
@@ -34,12 +35,21 @@ def clean_index(tmp_path, monkeypatch):
     reset_model_call_count()
     yield
 
+REPO_ROOT = Path(__file__).resolve().parents[2]
+DATA_ROOT = REPO_ROOT / "data"
+
+
 def load_corpus():
-    with open("data/dev/jc7_corpus_v0.jsonl", "r", encoding="utf-8") as f:
+    with (DATA_ROOT / "dev" / "jc7_corpus_v0.jsonl").open(
+        "r", encoding="utf-8"
+    ) as f:
         return [json.loads(line) for line in f]
 
+
 def load_golden():
-    with open("data/golden/jc7_queries.jsonl", "r", encoding="utf-8") as f:
+    with (DATA_ROOT / "golden" / "jc7_queries.jsonl").open(
+        "r", encoding="utf-8"
+    ) as f:
         return [json.loads(line) for line in f]
 
 def test_dim_1024():

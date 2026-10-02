@@ -1284,3 +1284,12 @@ def _olvidar_canonico(self, io_id: str) -> str:
 
 
 Neo4jMemoriaOrganizada.olvidar = _olvidar_canonico
+
+
+def _cerrar(self) -> None:
+    if self._driver is not None:
+        self._driver.close()
+        self._driver = None
+
+
+Neo4jMemoriaOrganizada.cerrar = _cerrar

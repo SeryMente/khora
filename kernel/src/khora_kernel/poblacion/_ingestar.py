@@ -79,7 +79,7 @@ def proponer(
     resueltos = resolver(p_prelim.relations, memoria, puerto_llm, puerto_embeddings)
 
     meta = objeto.metadata or {}
-    volcado_id = meta.get("volcado_id", str(uuid.uuid4()))
+    volcado_id = meta.get("volcado_id") or f"io:{objeto.id}"
     version = meta.get("version")
     if version is None:
         version = 1
@@ -89,7 +89,25 @@ def proponer(
         except (ValueError, TypeError):
             version = 1
 
-    sha256 = meta.get("sha256", "0" * 64)
+    sha256 = meta.get("sha256")
+    if not sha256:
+        import hashlib
+        import json
+
+        payload_for_hash = {
+            "id": objeto.id,
+            "texto": objeto.texto,
+            "metadata": objeto.metadata,
+            "source_schema": objeto.source_schema,
+        }
+        sha256 = hashlib.sha256(
+            json.dumps(
+                payload_for_hash,
+                ensure_ascii=False,
+                sort_keys=True,
+                default=str,
+            ).encode("utf-8")
+        ).hexdigest()
 
     triplet = SourceTriplet(
         volcado_id=volcado_id,
@@ -293,8 +311,32 @@ def asentar(
     Exige la presencia de juicios explícitos (judgments). Sin juicios NO se asienta.
     Fallo de constraints o error causa rollback completo.
     """
-    if not proposal.judgments:
-        raise ValueError("Propuesta no ratificada: se requieren juicios (judgments) explícitos para asentar.")
+    if not proposal.judgments and proposal.items:
+        raise ValueError(
+            "Propuesta no ratificada: se requieren juicios (judgments) explícitos para asentar."
+        )
+
+    io_id = (
+        (proposal.source_provenance or {}).get("io_id")
+        or ("io-" + proposal.source_triplet.volcado_id)
+    )
+
+    # Una propuesta ratificada sin items es un no-op válido: el extractor no
+    # produjo conocimiento asentable. El hook causal sigue ejecutándose para
+    # preservar el contrato ingestión -> pipeline posterior.
+    if not proposal.items:
+        if on_upsert:
+            on_upsert(io_id, memoria, proposal.created_at)
+        return ActaDeIngesta(
+            origen="p5b-kernel",
+            timestamp=proposal.created_at,
+            ideas_novedosas=0,
+            ideas_repetidas=0,
+            matices=0,
+            needs_review=0,
+            triples_escritos=0,
+            linea_temporal_indexada=True,
+        )
 
     judgment_by_item = {j.item_id: j.decision for j in proposal.judgments}
 
@@ -376,14 +418,12 @@ def asentar(
             })
 
     # UA-03: el usuario raíz nunca aparece como tail de una relación semántica.
-    if any(
-        r["origen_id"] == "root" or r["destino_id"] == "root"
-        for r in relaciones_a_escribir
-    ):
-        raise ValueError("Violación UA-03: u/root no puede aparecer como cola de una relación.")
+    if any(r["destino_id"] == "root" for r in relaciones_a_escribir):
+        raise ValueError(
+            "Violación UA-03: u/root no puede aparecer como cola de una relación."
+        )
     # La identidad canónica del Information Object es el id del objeto fuente.
     # La terna (volcado_id, version, sha256) queda como procedencia/idempotencia.
-    io_id = (proposal.source_provenance or {}).get("io_id") or ("io-" + proposal.source_triplet.volcado_id)
     terna = {
         "volcado_id": proposal.source_triplet.volcado_id,
         "version": proposal.source_triplet.version,

@@ -1,11 +1,14 @@
 # @l0 L0-002 · @req ING-05/REQ-1 · @acr ACR-1.1,ACR-1.2 · @ua —
 
+import importlib
+
 import pytest
 
-import khora_kernel.summaries.fsum as fsum_module
 from khora_kernel.api import Provenance, PuertoLLM, RespuestaLLM, SolicitudLLM
 from khora_kernel.motor._memoria import Neo4jMemoriaOrganizada
 from khora_kernel.summaries.fsum import fsum
+
+fsum_module = importlib.import_module("khora_kernel.summaries.fsum")
 
 
 class MockPuertoLLM(PuertoLLM):
@@ -41,8 +44,14 @@ def setup_db(driver):
         # Insertar datos de prueba: 2 comunidades (una hoja, una raíz)
         # Nodos y aristas con invalid_at nulo
         query = """
-        CREATE (c1:Community {community_id: 'C1', level: 0})
-        CREATE (c2:Community {community_id: 'C2', level: 1})
+        CREATE (c1:Community {
+            community_id: 'C1', level: 0, published: true,
+            invalid_at: null, created_at: datetime(), valid_at: datetime()
+        })
+        CREATE (c2:Community {
+            community_id: 'C2', level: 1, published: true,
+            invalid_at: null, created_at: datetime(), valid_at: datetime()
+        })
 
         CREATE (e1:Entity {id: 'E1', canonical_key: 'Ent1'})
         CREATE (e2:Entity {id: 'E2', canonical_key: 'Ent2'})
@@ -73,7 +82,9 @@ def test_ing_05_acr_1_1_and_1_2(neo4j_driver, neo4j_config, monkeypatch):
         def generar(self, solicitud):
             return mock_llm.generar(solicitud)
 
-    monkeypatch.setattr(fsum_module, "ProveedorOpenAICompatible", FakeProveedor)
+    from khora_kernel.proveedores import llm_generico
+
+    monkeypatch.setattr(llm_generico, "ProveedorLLMGenerico", FakeProveedor)
 
     # Ejecutamos
     fsum(memoria)

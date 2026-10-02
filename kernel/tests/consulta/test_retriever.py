@@ -1,7 +1,5 @@
 # @l0 L0-002-R · @req KA-00/REQ-2 · @acr ACR-2.1
 
-import os
-
 import pytest
 
 import khora_kernel.embeddings
@@ -179,23 +177,120 @@ def test_insuficiente(retriever: RetrieverGraphRAG):
 
 
 
-@pytest.mark.skipif(not os.environ.get('KHORA_NEO4J_TEST_URI'), reason="Requiere base de datos Neo4j real (patrón M-1)")
-def test_integracion_neo4j(retriever: RetrieverGraphRAG):
-    """Prueba real contra base de datos Neo4j."""
-    # Instanciamos el retriever con el driver real y probamos
-    # la expansión de subgrafo en un DB.
-    # Dado que es un test skip-if-no-docker, validaremos instanciando Neo4jMemoriaOrganizada
+def test_integracion_neo4j(neo4j_config, monkeypatch):
+    """Valida GraphRAG contra Neo4j real y la influencia causal de comunidades.
+
+    La semilla KNN se fija sólo para aislar el retriever; la selección
+    topológica, las comunidades y la construcción de G* se ejecutan sobre
+    la instancia Neo4j real proporcionada por el fixture.
+    """
+    from neo4j import GraphDatabase
 
     from khora_kernel.motor._memoria import Neo4jMemoriaOrganizada
 
-    uri = os.environ.get("KHORA_NEO4J_TEST_URI", "bolt://localhost:7687")
-    user = os.environ.get("KHORA_NEO4J_TEST_USER", "neo4j")
-    password = os.environ.get("KHORA_NEO4J_TEST_PASS", "password")
+    memoria_real = Neo4jMemoriaOrganizada(
+        neo4j_config["uri"],
+        neo4j_config["user"],
+        neo4j_config["password"],
+    )
+    driver = GraphDatabase.driver(
+        neo4j_config["uri"],
+        auth=(neo4j_config["user"], neo4j_config["password"]),
+    )
+    seed_id = "e2e_seed"
+    member_id = "e2e_community_member"
+    community_id = "e2e-community"
 
-    memoria_real = Neo4jMemoriaOrganizada(uri, user, password)
-    retriever_real = RetrieverGraphRAG(memoria_neo4j=memoria_real, puerto_embeddings=MockPuertoEmbeddings())
+    try:
+        with driver.session() as session:
+            session.run(
+                """
+                MATCH (n)
+                WHERE n.canonical_key IN $ids OR n.community_id = $cid
+                DETACH DELETE n
+                """,
+                ids=[seed_id, member_id],
+                cid=community_id,
+            )
+            session.run(
+                """
+                CREATE (a:Entity {
+                    id:$seed, canonical_key:$seed, label_original:'Semilla E2E',
+                    provenance:['origen=e2e, driver=ci, timestamp=2026-10-02T18:00:00Z'],
+                    visibilidad:'transparente', invalid_at:null
+                })
+                CREATE (b:Entity {
+                    id:$member, canonical_key:$member, label_original:'Miembro comunitario E2E',
+                    provenance:['origen=e2e, driver=ci, timestamp=2026-10-02T18:00:00Z'],
+                    visibilidad:'transparente', invalid_at:null
+                })
+                CREATE (c:Community {
+                    community_id:$cid, graph_revision:'e2e-rev',
+                    published:true, published_at:datetime(),
+                    invalid_at:null, summary:'Resumen E2E'
+                })
+                CREATE (a)-[:IN_COMMUNITY {
+                    published:true, invalid_at:null,
+                    created_at:datetime(), valid_at:datetime()
+                }]->(c)
+                CREATE (b)-[:IN_COMMUNITY {
+                    published:true, invalid_at:null,
+                    created_at:datetime(), valid_at:datetime()
+                }]->(c)
+                """,
+                seed=seed_id,
+                member=member_id,
+                cid=community_id,
+            )
 
-    retriever_real.consultar("prueba", ContextoDeVisibilidad.TRANSPARENTE)
+        monkeypatch.setattr(
+            khora_kernel.embeddings,
+            "knn",
+            lambda query, k: [(seed_id, 1.0)],
+        )
+        retriever_real = RetrieverGraphRAG(memoria_neo4j=memoria_real)
 
-    # Asserting suficiencia depends on db content, but we test the structure
-    pass  # type already checked
+        active = retriever_real.consultar(
+            "Semilla E2E",
+            ContextoDeVisibilidad.TRANSPARENTE,
+        )
+        active_ids = {node.id for node in active.subgrafo.nodos}
+
+        assert active.suficiencia == NivelSuficiencia.SUFICIENTE
+        assert seed_id in active_ids
+        assert member_id in active_ids
+        assert "communities=1" in active.degradacion_declarada
+
+        with driver.session() as session:
+            session.run(
+                """
+                MATCH (c:Community {community_id:$cid})
+                SET c.invalid_at = datetime()
+                WITH c
+                MATCH (e:Entity)-[r:IN_COMMUNITY]->(c)
+                SET r.invalid_at = datetime(), r.published = false
+                """,
+                cid=community_id,
+            )
+
+        disabled = retriever_real.consultar(
+            "Semilla E2E",
+            ContextoDeVisibilidad.TRANSPARENTE,
+        )
+        disabled_ids = {node.id for node in disabled.subgrafo.nodos}
+
+        assert seed_id in disabled_ids
+        assert member_id not in disabled_ids
+        assert active_ids != disabled_ids
+    finally:
+        with driver.session() as session:
+            session.run(
+                "MATCH (n) WHERE n.canonical_key IN $ids DETACH DELETE n",
+                ids=[seed_id, member_id],
+            )
+            session.run(
+                "MATCH (c:Community {community_id:$cid}) DETACH DELETE c",
+                cid=community_id,
+            )
+        driver.close()
+        memoria_real.cerrar()
