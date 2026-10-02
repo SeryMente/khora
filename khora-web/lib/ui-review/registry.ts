@@ -454,7 +454,8 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
     ui_ids: [
       "grafo.container",
       "grafo.header",
-      "grafo.flow-view"
+      "grafo.flow-view",
+      "grafo.flow-node"
     ]
   },
   "grafo:empty": {

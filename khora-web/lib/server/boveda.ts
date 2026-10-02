@@ -1,8 +1,9 @@
-import { createHmac, randomBytes, scryptSync, timingSafeEqual } from "crypto"
+import { createHmac, randomBytes, randomInt, scryptSync, timingSafeEqual } from "crypto"
 import { getDb } from "./neon"
 
 export const COOKIE_BOVEDA = "khora_boveda"
 export const MINUTOS_BOVEDA = 30
+export const LONGITUD_PIN_GENERADO = 10
 
 const DDL = [
   "create table if not exists boveda_pin (id int primary key, hash text not null, salt text not null, creado_en timestamptz not null default now(), actualizado_en timestamptz not null default now())",
@@ -21,6 +22,16 @@ export async function pinConfigurado(): Promise<boolean> {
   await asegurarBoveda()
   const res = await getDb().query("select 1 from boveda_pin where id = 1")
   return res.rows.length > 0
+}
+
+export function generarPinSeguro(longitud = LONGITUD_PIN_GENERADO): string {
+  if (!Number.isInteger(longitud) || longitud < 6 || longitud > 12) {
+    throw new Error("la longitud del pin debe estar entre 6 y 12 digitos")
+  }
+
+  const minimo = 10 ** (longitud - 1)
+  const maximo = 10 ** longitud
+  return String(randomInt(minimo, maximo))
 }
 
 export async function definirPin(pin: string): Promise<void> {

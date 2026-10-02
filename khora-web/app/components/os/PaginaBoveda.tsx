@@ -2,13 +2,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { LockKeyhole, Clock3, TriangleAlert, Check } from "lucide-react";
+import { LockKeyhole, Clock3, TriangleAlert, Check, Copy, WandSparkles } from "lucide-react";
 
 type Estado = { configurado?: boolean; abierta?: boolean; minutos?: number; error?: string };
 
 export default function PaginaBoveda() {
   const [estado, setEstado] = useState<Estado | null>(null);
   const [pin, setPin] = useState("");
+  const [generado, setGenerado] = useState("");
+  const [copiado, setCopiado] = useState(false);
   const [aviso, setAviso] = useState("");
 
   async function consultar() {
@@ -26,6 +28,7 @@ export default function PaginaBoveda() {
 
   async function enviar() {
     setAviso("procesando...");
+    setCopiado(false);
     try {
       const r = await fetch("/api/boveda", {
         method: "POST",
@@ -42,6 +45,41 @@ export default function PaginaBoveda() {
       consultar();
     } catch (e) {
       setAviso("error: " + String(e));
+    }
+  }
+
+  async function generar() {
+    setAviso("generando PIN seguro...");
+    setGenerado("");
+    setCopiado(false);
+    try {
+      const r = await fetch("/api/boveda", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ generar: true }),
+      });
+      const d = await r.json();
+      if (!r.ok) {
+        setAviso("error: " + String(d?.detail ?? d?.error ?? r.status));
+        return;
+      }
+      setGenerado(String(d.pin ?? ""));
+      setAviso("PIN generado y bóveda abierta. Guárdalo; no se volverá a mostrar al recargar.");
+      consultar();
+    } catch (e) {
+      setAviso("error: " + String(e));
+    }
+  }
+
+  async function copiarGenerado() {
+    if (!generado) return;
+    try {
+      await navigator.clipboard.writeText(generado);
+      setCopiado(true);
+      setAviso("PIN copiado al portapapeles.");
+      window.setTimeout(() => setCopiado(false), 1800);
+    } catch {
+      setAviso("No se pudo copiar automáticamente. Selecciónalo y cópialo manualmente.");
     }
   }
 
@@ -144,6 +182,85 @@ export default function PaginaBoveda() {
             className="p-3 text-xs opacity-80 leading-relaxed text-center"
           >
             El primer pin que escribas queda registrado como el pin de la bóveda. De 4 a 12 dígitos.
+          </div>
+        )}
+
+        {!configurado && (
+          <div
+            style={{
+              borderColor: "var(--khora-border)",
+              backgroundColor: "var(--khora-bg)",
+            }}
+            className="border p-4 space-y-3"
+          >
+            <div className="flex items-center gap-3">
+              <WandSparkles
+                size={22}
+                strokeWidth={1.75}
+                style={{ color: "var(--khora-accent)" }}
+              />
+              <div>
+                <div className="text-xs uppercase tracking-wider font-bold">
+                  Generación del sistema
+                </div>
+                <div className="text-[11px] opacity-70 leading-relaxed">
+                  Khora puede crear un PIN seguro de 10 dígitos. No necesitas inventarlo ni usar PowerShell.
+                </div>
+              </div>
+            </div>
+
+            <button
+              onClick={generar}
+              type="button"
+              style={{
+                backgroundColor: "var(--khora-accent)",
+                color: "var(--khora-bg)",
+                borderColor: "var(--khora-accent)",
+                borderWidth: "1px",
+                borderStyle: "solid",
+              }}
+              className="w-full p-3 font-bold uppercase text-sm tracking-widest transition-all cursor-pointer hover:opacity-90"
+            >
+              Generar PIN seguro
+            </button>
+          </div>
+        )}
+
+        {generado && (
+          <div
+            style={{
+              borderColor: "var(--khora-accent)",
+              backgroundColor: "var(--khora-bg)",
+            }}
+            className="border p-4 space-y-3"
+          >
+            <div className="text-[11px] uppercase tracking-wider opacity-70">
+              PIN generado por Khora
+            </div>
+            <div className="flex items-center gap-2">
+              <code
+                className="flex-1 text-center text-2xl font-bold tracking-[0.28em] select-all"
+                aria-label="PIN generado"
+              >
+                {generado}
+              </code>
+              <button
+                onClick={copiarGenerado}
+                type="button"
+                title="Copiar PIN"
+                aria-label="Copiar PIN"
+                className="p-3 border cursor-pointer hover:opacity-80"
+                style={{
+                  borderColor: "var(--khora-border)",
+                  color: "var(--khora-ink)",
+                }}
+              >
+                {copiado ? <Check size={18} /> : <Copy size={18} />}
+              </button>
+            </div>
+            <div className="text-[11px] opacity-70 leading-relaxed">
+              Este PIN sólo se muestra en esta sesión. Guárdalo antes de salir o recargar la página.
+            </div>
           </div>
         )}
 
