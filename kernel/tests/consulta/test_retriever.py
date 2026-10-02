@@ -369,7 +369,7 @@ def test_integracion_neo4j_con_literal_en_gstar(neo4j_config, monkeypatch):
 
         assert literal_id in node_map
         assert node_map[literal_id] == "Literal"
-        assert (entity_id, literal_id, "RELATION") in edge_tuples
+        assert (entity_id, literal_id, "HAS_AGE") in edge_tuples
         assert fragment_map[literal_id] == "42"
     finally:
         with driver.session() as session:
