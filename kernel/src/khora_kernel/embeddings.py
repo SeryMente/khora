@@ -65,6 +65,8 @@ def embed_text(text: str) -> List[float]:
     global _MODEL_CALL_COUNT
     _MODEL_CALL_COUNT += 1
     try:
+        if os.getenv("KHORA_EMB_OFFLINE", "").lower() in {"1", "true", "yes"}:
+            return _fallback_embedding(text)
         if os.getenv("KHORA_LLM_BASE_URL"):
             from khora_kernel.proveedores import ProveedorLLMGenerico
             emb = ProveedorLLMGenerico().incrustar([text])[0]

@@ -11,6 +11,7 @@ jobs:
       KHORA_NEO4J_TEST_USER: neo4j
       KHORA_NEO4J_TEST_PASS: neo4jpassword
       PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/kernel/src
+      KHORA_EMB_OFFLINE: "1"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
