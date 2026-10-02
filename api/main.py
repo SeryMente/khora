@@ -80,7 +80,7 @@ app.add_middleware(
 @app.middleware("http")
 async def security_middleware(request: Request, call_next):
     # Exclude OPTIONS (CORS preflight) and healthcheck endpoints
-    if request.method == "OPTIONS" or request.url.path in ["/health", "/api/v1/salud"]:
+    if request.method == "OPTIONS" or request.url.path in ["/health", "/api/v1/salud", "/api/v1/salud/grafo"]:
         return await call_next(request)
 
     x_khora_key = request.headers.get("X-Khora-Key")
@@ -136,6 +136,15 @@ class IngestaRequest(BaseModel):
             sha_real = hashlib.sha256(self.texto.encode("utf-8")).hexdigest()
             if sha_real != sha_declarado:
                 raise ValueError("sha256 no coincide con el texto recibido")
+        elif self.archivo_base64:
+            import base64
+            try:
+                payload = base64.b64decode(self.archivo_base64, validate=True)
+            except Exception as exc:
+                raise ValueError(f"archivo_base64 inválido: {exc}")
+            sha_real = hashlib.sha256(payload).hexdigest()
+            if sha_real != sha_declarado:
+                raise ValueError("sha256 no coincide con el archivo recibido")
         return self
 
 
@@ -157,7 +166,10 @@ async def endpoint_ingesta(req: IngestaRequest):
         prov = Provenance(
             origen=prov_dict.get("origen", "api"),
             driver=prov_dict.get("driver", "fastapi"),
-            timestamp=prov_dict.get("timestamp", datetime.datetime.utcnow().isoformat() + "Z")
+            timestamp=prov_dict.get("timestamp", datetime.datetime.utcnow().isoformat() + "Z"),
+            event_time=prov_dict.get("event_time"),
+            capture_time=prov_dict.get("capture_time"),
+            custody=prov_dict.get("custody"),
         )
 
         prov_terna = req.provenance or {}
@@ -186,18 +198,32 @@ async def endpoint_ingesta(req: IngestaRequest):
         if req.archivo_base64:
             metadata["payload_uri"] = f"data:{req.mime};base64,{req.archivo_base64[:20]}..."
 
+        raw_payload = None
+        if req.archivo_base64:
+            import base64
+            raw_payload = base64.b64decode(req.archivo_base64)
         objeto = ObjetoDeInformacion(
             id=objeto_id,
             texto=texto_final,
             provenance=prov,
-            metadata=metadata
+            metadata=metadata,
+            raw_payload=raw_payload,
+            source_schema=req.mime,
         )
+
+        from khora_kernel.psi import on_node_upserted
+        pipeline_result = {}
+        def _post_commit(io_id, mem, ts):
+            nonlocal pipeline_result
+            pipeline_result = on_node_upserted(io_id, mem, ts, puerto_llm)
+            return pipeline_result
 
         acta = ingestar(
             objeto=objeto,
             memoria=memoria,
             puerto_llm=puerto_llm,
-            puerto_embeddings=puerto_embeddings
+            puerto_embeddings=puerto_embeddings,
+            on_upsert=_post_commit,
         )
 
         return {
@@ -209,7 +235,9 @@ async def endpoint_ingesta(req: IngestaRequest):
             },
             "triples_escritos": acta.triples_escritos,
             "needs_review": acta.needs_review,
-            "ts": acta.timestamp
+            "ts": acta.timestamp,
+            "graph_revision": pipeline_result.get("graph_revision") or memoria.get_graph_revision(),
+            "pipeline": pipeline_result
         }
     except HTTPException:
         raise
@@ -248,7 +276,7 @@ async def endpoint_consulta(req: ConsultaRequest):
         memoria = Neo4jMemoriaOrganizada(neo4j_config["uri"], neo4j_config["user"], neo4j_config["password"])
         puerto_embeddings = ProveedorOpenAICompatible()
 
-        retriever = RetrieverGraphRAG(memoria_neo4j=memoria, puerto_embeddings=puerto_embeddings)
+        retriever = RetrieverGraphRAG(memoria_grafo=memoria, puerto_embeddings=puerto_embeddings)
 
         contexto_str = req.contexto if req.contexto else "privado"
         try:
@@ -385,3 +413,39 @@ async def endpoint_salud():
                 return {"ok": False, "neo4j": False}
     except Exception as e:
         return {"ok": False, "neo4j": False, "detail": str(e)}
+
+
+class OlvidoRequest(BaseModel):
+    io_id: str
+
+
+@app.get("/api/v1/salud/grafo", dependencies=[Depends(verify_key)])
+async def endpoint_salud_grafo():
+    if not neo4j_driver:
+        raise HTTPException(status_code=503, detail="Database not available")
+    try:
+        from khora_kernel.motor import Neo4jMemoriaOrganizada
+        memoria = Neo4jMemoriaOrganizada(neo4j_config["uri"], neo4j_config["user"], neo4j_config["password"])
+        return {"ok": True, **memoria.salud_grafo()}
+    except Exception as exc:
+        logging.error("Graph health error: %s", traceback.format_exc())
+        raise HTTPException(status_code=500, detail=str(exc))
+
+
+@app.post("/api/v1/olvidar", dependencies=[Depends(verify_key)])
+async def endpoint_olvidar(req: OlvidoRequest):
+    if not neo4j_driver:
+        raise HTTPException(status_code=503, detail="Database not available")
+    try:
+        from khora_kernel.motor import Neo4jMemoriaOrganizada
+        from khora_kernel.proveedores import ProveedorOpenAICompatible
+        from khora_kernel.psi import on_node_upserted
+        memoria = Neo4jMemoriaOrganizada(neo4j_config["uri"], neo4j_config["user"], neo4j_config["password"])
+        acta = memoria.olvidar(req.io_id)
+        ts = datetime.datetime.now(datetime.timezone.utc).isoformat()
+        provider = ProveedorOpenAICompatible()
+        pipeline = on_node_upserted("forget:" + req.io_id, memoria, ts, provider)
+        return {"ok": True, "io_id": req.io_id, "forget_fingerprint": acta, "pipeline": pipeline}
+    except Exception as exc:
+        logging.error("Forget error: %s", traceback.format_exc())
+        raise HTTPException(status_code=500, detail=str(exc))

@@ -59,7 +59,7 @@ def _llm_ner(chunk: str, puerto_llm: PuertoLLM) -> list[tuple]:
         prompt=f"Extrae entidades y relaciones de este texto:\n\n{chunk}",
         sistema=sistema_prompt,
         formato_estricto=None,
-        metadata={"temperature": 0.0},
+        metadata={"temperature": 0.0, "role": "fKGC"},
     )
     resp = puerto_llm.generar(solicitud)
     triples = []
@@ -90,7 +90,7 @@ def _gleaning_loop(chunk: str, pre_entidades: list, puerto_llm: PuertoLLM | None
                 prompt=f"¿Faltaron entidades por extraer en este texto basándonos en lo ya extraído?\n\nTexto: {chunk}\nExtraído: {pre_entidades}",
                 sistema=None,
                 formato_estricto=("SI", "NO"),
-                metadata={"temperature": 0.0},
+                metadata={"temperature": 0.0, "role": "fKGC"},
             )
             resp = puerto_llm.generar(solicitud)
             faltaron = resp.texto

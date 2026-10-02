@@ -4,9 +4,8 @@ import os
 
 import pytest
 
+import khora_kernel.embeddings as embeddings_mod
 from khora_kernel.embeddings import (
-    INDEX_FILE,
-    MAP_FILE,
     embed_text,
     get_model_call_count,
     index_all,
@@ -26,11 +25,13 @@ class MemoriaMock:
         return self.nodes.get(node_id)
 
 @pytest.fixture(autouse=True)
-def clean_index():
-    if os.path.exists(INDEX_FILE):
-        os.remove(INDEX_FILE)
-    if os.path.exists(MAP_FILE):
-        os.remove(MAP_FILE)
+def clean_index(tmp_path, monkeypatch):
+    # Aísla el índice por proceso de prueba para impedir contaminación por
+    # la aplicación Khora u otros workers concurrentes que compartan data/.
+    monkeypatch.setattr(embeddings_mod, "INDEX_FILE", tmp_path / "faiss_pkg.idx")
+    monkeypatch.setattr(embeddings_mod, "MAP_FILE", tmp_path / "faiss_pkg_map.json")
+    monkeypatch.setattr(embeddings_mod, "META_FILE", tmp_path / "faiss_pkg_map_meta.json")
+    monkeypatch.setattr(embeddings_mod, "TEXT_FILE", tmp_path / "faiss_pkg_map_texts.json")
     reset_model_call_count()
     yield
 
@@ -132,10 +133,10 @@ def test_todos_indexados():
     memoria = MemoriaMock(corpus)
     index_all(memoria)
 
-    assert os.path.exists(INDEX_FILE)
-    assert os.path.exists(MAP_FILE)
+    assert embeddings_mod.INDEX_FILE.exists()
+    assert embeddings_mod.MAP_FILE.exists()
 
-    with open(MAP_FILE, "r", encoding="utf-8") as f:
+    with open(embeddings_mod.MAP_FILE, "r", encoding="utf-8") as f:
         id_map = json.load(f)
 
     assert len(id_map) == len(corpus)

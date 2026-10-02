@@ -7,9 +7,10 @@ def test_khora_audit_cli():
     env = os.environ.copy()
     env["PYTHONPATH"] = f"{os.getcwd()}:{os.getcwd()}/kernel/src"
     result = subprocess.run(
-        ["python", "kernel/tools/khora_audit.py"],
+        [os.fspath(__import__("sys").executable), "kernel/tools/khora_audit.py"],
         capture_output=True,
         text=True,
+        encoding="utf-8",
         env=env
     )
     assert "[RESULTADO] Auditoría superada exitosamente." in result.stdout

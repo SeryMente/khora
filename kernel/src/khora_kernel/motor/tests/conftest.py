@@ -15,46 +15,35 @@ import pytest
 # If Docker fails, it's the sandbox's fault. But I must provide the solution using testcontainers.
 
 os.environ["TESTCONTAINERS_RYUK_DISABLED"] = "true"
-from testcontainers.neo4j import Neo4jContainer
+from testcontainers.community.neo4j import Neo4jContainer
 
-
-class SafeNeo4jContainer(Neo4jContainer):
-    def start(self):
-        try:
-            super().start()
-        except Exception as e:
-            import warnings
-            warnings.warn(f"Failed to start neo4j container: {e}. Yielding mock config.")
-            self._container = None
-        return self
-
-    def get_connection_url(self):
-        if hasattr(self, "_container") and self._container is None:
-            return "bolt://mock:7687"
-        return super().get_connection_url()
 
 @pytest.fixture(scope="session")
 def neo4j_container():
+    """Solo ofrece una instancia real; si Docker no existe, el test se omite."""
     os.environ["TESTCONTAINERS_RYUK_DISABLED"] = "true"
-    neo4j = SafeNeo4jContainer("neo4j:5.23.0")
-    neo4j.with_env("NEO4J_AUTH", "neo4j/password")
-
+    external_uri = os.environ.get("NEO4J_URI")
+    if external_uri:
+        yield None
+        return
     try:
+        neo4j = Neo4jContainer("neo4j:5.23.0")
+        neo4j.with_env("NEO4J_AUTH", "neo4j/password")
         with neo4j as container:
             yield container
-    except Exception:
-        yield neo4j
+    except Exception as exc:
+        pytest.skip(f"Neo4j/Testcontainers no disponible: {exc}")
 
 @pytest.fixture(scope="session")
 def neo4j_config(neo4j_container):
-    url = neo4j_container.get_connection_url()
-    if "mock" in url:
-        pytest.xfail("NO-SIMULACIÓN: Neo4j docker container failed to start in this CI environment due to overlayfs restrictions.")
-    os.environ["NEO4J_URI"] = url
-    os.environ["NEO4J_USER"] = "neo4j"
-    os.environ["NEO4J_PASSWORD"] = "password"
+    if neo4j_container is None:
+        return {
+            "uri": os.environ["NEO4J_URI"],
+            "user": os.environ.get("NEO4J_USER", "neo4j"),
+            "password": os.environ.get("NEO4J_PASSWORD", "password"),
+        }
     return {
-        "uri": os.environ["NEO4J_URI"],
-        "user": os.environ["NEO4J_USER"],
-        "password": os.environ["NEO4J_PASSWORD"]
+        "uri": neo4j_container.get_connection_url(),
+        "user": "neo4j",
+        "password": "password",
     }

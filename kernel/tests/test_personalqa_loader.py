@@ -23,3 +23,22 @@ def test_loader_validation_errors(tmp_path):
     loader = PersonalQALoader(dataset_path=str(invalid_data_path))
     with pytest.raises(PersonalQAValidationError, match="t_global must be exactly '2025-09-01 13:00'"):
         loader.load_and_validate()
+
+
+def test_loader_rejects_object_after_t_global(tmp_path):
+    import json
+
+    objects = [
+        {"id": f"obj_{i}", "source": "Events", "timestamp": "2025-08-01T00:00:00", "content": "x", "metadata": {}}
+        for i in range(71)
+    ]
+    objects[-1]["timestamp"] = "2025-09-02T00:00:00"
+    payload = {
+        "t_global": "2025-09-01 13:00",
+        "information_objects": objects,
+        "qa_pairs": [{}] * 100,
+    }
+    path = tmp_path / "future.json"
+    path.write_text(json.dumps(payload), encoding="utf-8")
+    with pytest.raises(PersonalQAValidationError, match="occurs after t_global"):
+        PersonalQALoader(str(path)).load_and_validate()

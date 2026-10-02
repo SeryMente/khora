@@ -1,4 +1,4 @@
-﻿# @l0 L0-002-R · @req ING-01/REQ-1,KA-00/REQ-2 · @acr ACR-1.1,ACR-1.2,ACR-2.1 · @ua RAKG/UA-19,RAKG/UA-20
+# @l0 L0-002-R · @req ING-01/REQ-1,KA-00/REQ-2 · @acr ACR-1.1,ACR-1.2,ACR-2.1 · @ua RAKG/UA-19,RAKG/UA-20
 import uuid
 import datetime
 
@@ -34,11 +34,15 @@ class UnificadorAlLeer:
             # Traer los puentes conectados a cualquier nodo del subgrafo (directa o indirectamente)
             # Para simplificar y mantenerlo rápido sin queries recursivas complejas,
             # traemos puentes que involucren los nodos del subgrafo en 1-2 saltos.
-            result = session.run("""
+            query = """
             MATCH (n1:Entity)-[:ES_EQUIVALENTE_A*1..2]-(n2:Entity)
             WHERE n1.canonical_key IN $nodos OR n2.canonical_key IN $nodos
             RETURN n1.canonical_key AS origen, n2.canonical_key AS destino
-            """, nodos=subgrafo_ids)
+            """
+            try:
+                result = session.run(query, {"nodos": subgrafo_ids})
+            except TypeError:
+                result = session.run(query)
             for record in result:
                 equivalencias[record["origen"]] = record["destino"]
                 equivalencias[record["destino"]] = record["origen"]

@@ -36,7 +36,8 @@ def transducir(
     entities_set = set()
     for t in triples_j7:
         entities_set.add(t.origen_id)
-        entities_set.add(t.destino_id)
+        if str((t.metadata or {}).get("node_kind", "")).lower() != "literal":
+            entities_set.add(t.destino_id)
     entities = sorted(list(entities_set))
 
     meta = objeto.metadata or {}
@@ -127,19 +128,55 @@ def proponer(
             )
         )
 
-    # 2. Items de Relacion
+    # 2. Materializar valores literales como items terminales.
+    literal_to_item_id: dict[str, str] = {}
+    for idx, t in enumerate(resueltos):
+        if str((t.metadata or {}).get("node_kind", "")).lower() != "literal":
+            continue
+        literal_value = str((t.metadata or {}).get("literal_value", t.destino_id))
+        if literal_value in literal_to_item_id:
+            continue
+        content_key = f"literal:{t.relacion}:{literal_value}:{idx}"
+        literal_item_id = compute_item_id(triplet, content_key)
+        literal_to_item_id[literal_value] = literal_item_id
+        items.append(
+            ProposalItem(
+                id=literal_item_id,
+                kind="literal",
+                label=literal_value,
+                anchor=Anchor(exact_text=literal_value),
+                candidates=[],
+                triple=None,
+                metadata={
+                    "node_kind": "literal",
+                    "literal_value": literal_value,
+                    "literal_datatype": str((t.metadata or {}).get("literal_datatype", "str")),
+                    "source_key": str((t.metadata or {}).get("source_key", "")),
+                },
+            )
+        )
+
+    # 3. Items de Relacion
     for idx, t in enumerate(resueltos):
         rel_label = t.relacion
         content_key = f"relation:{t.origen_id}:{t.relacion}:{t.destino_id}:{idx}"
         item_id = compute_item_id(triplet, content_key)
 
-        orig_ent_id = canonical_to_item_id.get(t.origen_id, compute_item_id(triplet, f"entity:{t.origen_id}"))
-        dest_ent_id = canonical_to_item_id.get(t.destino_id, compute_item_id(triplet, f"entity:{t.destino_id}"))
+        orig_ent_id = canonical_to_item_id.get(
+            t.origen_id, compute_item_id(triplet, f"entity:{t.origen_id}")
+        )
+        if str((t.metadata or {}).get("node_kind", "")).lower() == "literal":
+            literal_value = str((t.metadata or {}).get("literal_value", t.destino_id))
+            dest_item_id = literal_to_item_id[literal_value]
+        else:
+            dest_item_id = canonical_to_item_id.get(
+                t.destino_id, compute_item_id(triplet, f"entity:{t.destino_id}")
+            )
 
         anchor = Anchor(exact_text=f"{t.origen_id} {t.relacion} {t.destino_id}")
         triple = ProposalTriple(
             origen_id=orig_ent_id,
-            destino_id=dest_ent_id,
+            destino_id=dest_item_id,
             relacion=t.relacion,
         )
 
@@ -151,7 +188,13 @@ def proponer(
                 anchor=anchor,
                 candidates=[],
                 triple=triple,
-                metadata={"origen_canonical": t.origen_id, "destino_canonical": t.destino_id},
+                metadata={
+                    "origen_canonical": t.origen_id,
+                    "destino_canonical": t.destino_id,
+                    "destino_kind": str((t.metadata or {}).get("node_kind", "entity")),
+                    "literal_value": str((t.metadata or {}).get("literal_value", "")),
+                    "literal_datatype": str((t.metadata or {}).get("literal_datatype", "")),
+                },
             )
         )
 
@@ -168,6 +211,17 @@ def proponer(
         items=items,
         judgments=[],
         settlement_act=None,
+        source_provenance={
+            "origen": objeto.provenance.origen,
+            "driver": objeto.provenance.driver,
+            "timestamp": objeto.provenance.timestamp,
+            "event_time": getattr(objeto.provenance, "event_time", None),
+            "capture_time": getattr(objeto.provenance, "capture_time", None),
+            "custody": getattr(objeto.provenance, "custody", None),
+            "metadata": objeto.metadata,
+            "source_schema": objeto.source_schema,
+            "io_id": objeto.id,
+        },
     )
 
     return envelope
@@ -217,6 +271,7 @@ def ratificar_propuesta(
             items=proposal.items,
             judgments=judgments,
             settlement_act=proposal.settlement_act,
+            source_provenance=proposal.source_provenance,
         )
     else:
         proposal_copy = dict(proposal)
@@ -291,8 +346,11 @@ def asentar(
             entidades_a_escribir.append({
                 "canonical_key": it.label,
                 "label_original": meta.get("raw_label", it.anchor.exact_text),
-                "provenance_raw": f"volcado:{proposal.source_triplet.volcado_id}",
-                "embedding": None,  # Se completará si disponible
+                "provenance_raw": f"volcado:{proposal.source_triplet.volcado_id};origen={((proposal.source_provenance or {}).get('origen','proposal'))};driver={((proposal.source_provenance or {}).get('driver',''))};timestamp={((proposal.source_provenance or {}).get('timestamp',proposal.created_at))}",
+                "event_time": (proposal.source_provenance or {}).get("event_time"),
+                "capture_time": (proposal.source_provenance or {}).get("capture_time"),
+                "custody": (proposal.source_provenance or {}).get("custody"),
+                "embedding": None,
                 "needs_review": needs_rev,
             })
 
@@ -303,18 +361,40 @@ def asentar(
             orig_canonical = orig_item.label if orig_item else "desconocido"
             dest_canonical = dest_item.label if dest_item else "desconocido"
 
+            relation_meta = it.metadata or {}
             relaciones_a_escribir.append({
                 "origen_id": orig_canonical,
                 "destino_id": dest_canonical,
                 "relacion": it.label,
                 "provenance": proposal.source_triplet.volcado_id,
+                "event_time": (proposal.source_provenance or {}).get("event_time"),
+                "capture_time": (proposal.source_provenance or {}).get("capture_time"),
+                "custody": (proposal.source_provenance or {}).get("custody"),
+                "object_kind": relation_meta.get("destino_kind", "entity"),
+                "literal_value": relation_meta.get("literal_value"),
+                "literal_datatype": relation_meta.get("literal_datatype"),
             })
 
-    io_id = f"io-{proposal.source_triplet.volcado_id}"
+    # UA-03: el usuario raíz nunca aparece como tail de una relación semántica.
+    if any(
+        r["origen_id"] == "root" or r["destino_id"] == "root"
+        for r in relaciones_a_escribir
+    ):
+        raise ValueError("Violación UA-03: u/root no puede aparecer como cola de una relación.")
+    # La identidad canónica del Information Object es el id del objeto fuente.
+    # La terna (volcado_id, version, sha256) queda como procedencia/idempotencia.
+    io_id = (proposal.source_provenance or {}).get("io_id") or ("io-" + proposal.source_triplet.volcado_id)
     terna = {
         "volcado_id": proposal.source_triplet.volcado_id,
         "version": proposal.source_triplet.version,
         "sha256": proposal.source_triplet.sha256,
+        "metadata": (proposal.source_provenance or {}).get("metadata", {}),
+        "source_schema": (proposal.source_provenance or {}).get("source_schema"),
+        "origen": (proposal.source_provenance or {}).get("origen", "proposal"),
+        "driver": (proposal.source_provenance or {}).get("driver"),
+        "event_time": (proposal.source_provenance or {}).get("event_time"),
+        "capture_time": (proposal.source_provenance or {}).get("capture_time"),
+        "custody": (proposal.source_provenance or {}).get("custody"),
     }
 
     if hasattr(memoria, "asentar_transaccional"):

@@ -85,3 +85,56 @@ def test_sin_llm():
     assert "LLM" not in content
     assert "openai" not in content.lower()
     assert "prompts" not in content.lower()
+
+
+def test_reificacion_es_staged_y_no_invalida_publicado():
+    from unittest.mock import MagicMock
+    from types import SimpleNamespace
+    from khora_kernel.motor._memoria import Neo4jMemoriaOrganizada
+
+    memoria = Neo4jMemoriaOrganizada.__new__(Neo4jMemoriaOrganizada)
+    tx = MagicMock()
+    session = MagicMock()
+    driver = MagicMock()
+    driver.session.return_value.__enter__.return_value = session
+    session.begin_transaction.return_value.__enter__.return_value = tx
+    memoria._driver = driver
+
+    comunidades = SimpleNamespace(
+        estructura={
+            "c1": {
+                "level": 0,
+                "gamma": 1.0,
+                "theta": 0.5,
+                "member_fingerprint": "fp",
+                "miembros": ["alice"],
+                "parent": None,
+            }
+        }
+    )
+
+    memoria.reificar_comunidades(comunidades, "io-1", "2026-10-02T00:00:00Z", "rev-1")
+    queries = [call.args[0] for call in tx.run.call_args_list]
+    assert any("published = false" in q for q in queries)
+    assert not any("SET c.invalid_at" in q for q in queries)
+    tx.commit.assert_called_once()
+
+
+def test_publicacion_comunidades_es_atomica():
+    from unittest.mock import MagicMock
+    from khora_kernel.motor._memoria import Neo4jMemoriaOrganizada
+
+    memoria = Neo4jMemoriaOrganizada.__new__(Neo4jMemoriaOrganizada)
+    tx = MagicMock()
+    session = MagicMock()
+    driver = MagicMock()
+    driver.session.return_value.__enter__.return_value = session
+    session.begin_transaction.return_value.__enter__.return_value = tx
+    memoria._driver = driver
+
+    memoria.publicar_comunidades("rev-2", "2026-10-02T00:00:00Z")
+    queries = [call.args[0] for call in tx.run.call_args_list]
+    assert len(queries) == 2
+    assert any("published = true" in q for q in queries)
+    assert any("SET c.invalid_at" in q for q in queries)
+    tx.commit.assert_called_once()

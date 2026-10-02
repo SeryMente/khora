@@ -119,10 +119,9 @@ def mock_knn(query: str, k: int):
         return []
     return [("engine", 0.9)]
 
-khora_kernel.embeddings.knn = mock_knn
-
 @pytest.fixture
-def retriever() -> RetrieverGraphRAG:
+def retriever(monkeypatch) -> RetrieverGraphRAG:
+    monkeypatch.setattr(khora_kernel.embeddings, "knn", mock_knn)
     mem = MockMemoriaMultiHop()
     emb = MockPuertoEmbeddings()
     ret = RetrieverGraphRAG(memoria_neo4j=mem, puerto_embeddings=emb)

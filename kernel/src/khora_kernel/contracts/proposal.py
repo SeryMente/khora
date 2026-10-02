@@ -1,4 +1,4 @@
-# @l0 L0-002-R · @req ING-03/REQ-CONTRACT
+# @l0 L0-002-R · @req ING-03/REQ-CONTRACT · @acr ACR-1.1
 """
 Contrato de Propuestas (ProposalEnvelope) - Kernel Python.
 Define los esquemas y validadores para la zona derivada y la zona de juicio.
@@ -52,7 +52,7 @@ class ProposalTriple:
 @dataclass(frozen=True)
 class ProposalItem:
     id: str
-    kind: str  # "entity" | "relation"
+    kind: str  # "entity" | "literal" | "relation"
     label: str
     anchor: Anchor
     candidates: List[ResolutionCandidate]
@@ -90,6 +90,7 @@ class ProposalEnvelope:
     items: List[ProposalItem]
     judgments: List[Judgment] = field(default_factory=list)
     settlement_act: Optional[SettlementAct] = None
+    source_provenance: Optional[Dict[str, Any]] = None
 
 
 def compute_item_id(triplet: SourceTriplet, content_key: str) -> str:
@@ -201,7 +202,7 @@ def validate_proposal_envelope(raw: Any) -> Tuple[bool, List[str]]:
 
             if not isinstance(item_id, str) or not UUID_REGEX.match(item_id):
                 errors.append(f"items[{idx}].id debe ser un UUID válido.")
-            if kind not in ("entity", "relation"):
+            if kind not in ("entity", "literal", "relation"):
                 errors.append(f"items[{idx}].kind debe ser 'entity' o 'relation'.")
             if not isinstance(label, str) or len(label.strip()) == 0:
                 errors.append(f"items[{idx}].label es obligatorio.")
@@ -344,4 +345,5 @@ def from_dict(data: dict) -> ProposalEnvelope:
         items=items,
         judgments=judgments,
         settlement_act=settlement_act,
+        source_provenance=data.get("source_provenance"),
     )

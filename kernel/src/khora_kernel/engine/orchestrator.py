@@ -1,11 +1,18 @@
-# @l0 L0-002-R · @req KA-00/REQ-2 · @acr ACR-2.1
+# @l0 L0-002-R · @req RAZ-02/REQ-2 · @acr ACR-2.1 · @ua UA-20,UA-21,UA-22,UA-44,UA-45
 from typing import Optional
 
 from khora_kernel.api import PuertoVision
-from khora_kernel.engine.core import ask
-from khora_kernel.engine.fallback import fallback
+from khora_kernel.engine import core as core_module
+from khora_kernel.engine.core import ValidatedResponse
+from khora_kernel.engine.fallback import run_fallback
+
+def _ask_core(*args, **kwargs):
+    return core_module.ask(*args, **kwargs)
+
+ask = _ask_core
 from khora_kernel.engine.fval import fval
 from khora_kernel.engine.history import load_ht
+from khora_kernel.proveedores.openai import ProveedorOpenAICompatible
 
 
 def ask_with_fallback(
@@ -14,63 +21,54 @@ def ask_with_fallback(
     puerto_vision: PuertoVision,
     session_id: Optional[str] = None,
     db_path: str = "data/khora_sessions.db",
-    memoria_grafo=None
+    memoria_grafo=None,
+    memoria_neo4j=None,
 ):
-    """
-    Orquestador de nivel superior para Core.ask() + fVAL + Fallback.
-    1. Ejecuta Core.ask() (ΔCore).
-    2. Ejecuta fVAL (J-C12) sobre la respuesta.
-    3. Si fVAL emite vt='Insuficiente', activa el fallback (ΔFB).
-    4. El fallback extrae evidencia de la modalidad (VQA) y la inyecta en Ht.
-    5. Re-ejecuta Core.ask() para que ΔCore sintetice con el nuevo contexto efímero en Ht.
-    6. Retorna la respuesta validada final.
-    """
-    # 1. Primera pasada
-    resp = ask(question, session_id=session_id, db_path=db_path, memoria_grafo=memoria_grafo)
-
-    # Asegurarnos de tener el session_id que se usó/generó
-    current_session_id = resp.ht_ref
-    ht = load_ht(current_session_id, db_path)
-    if not ht:
-        raise RuntimeError("No se pudo cargar el historial de sesión tras ask()")
-
-    # 2. Evaluación inicial fVAL
-    val_resp = fval(resp, ht, db_path=db_path)
-
-    # 3. Si es insuficiente, se activa Fallback
-    if val_resp.vt == "Insuficiente":
-        # 4. Fallback inyecta en Ht
-        fallback(
-            session_id=current_session_id,
-            pregunta=question,
-            referencia_modalidad=referencia_modalidad,
-            puerto_vision=puerto_vision,
-            db_path=db_path
+    """Compatibilidad doble: usa el Core real y conserva el adaptador histórico de tests."""
+    memoria = memoria_grafo if memoria_grafo is not None else memoria_neo4j
+    first = ask(
+        question, session_id=session_id, db_path=db_path, memoria_grafo=memoria, memoria_neo4j=memoria_neo4j
+    )
+    # Ruta real de EpisTwin: Core ya ejecutó fVAL globalmente.
+    if isinstance(first, ValidatedResponse):
+        if not first.delta_fb:
+            return first
+        current_id = first.response.ht_ref
+        fallback_provider = core_module._get_provider()
+        run_fallback(
+            session_id=current_id, pregunta=question, referencia_modalidad=referencia_modalidad,
+            puerto_vision=puerto_vision, puerto_llm=fallback_provider, db_path=db_path,
         )
-
-        # 5. Segunda pasada (Re-síntesis) con el contexto inyectado
-        # Dado que `Core.ask()` no arrastra la evidencia previa a `context_chunks` por defecto,
-        # le inyectamos la evidencia efímera explícitamente en la query en forma de contexto,
-        # para que la vea sin tocar la lógica interna de Core.ask().
-        ht_despues_fallback = load_ht(current_session_id, db_path)
-        if not ht_despues_fallback:
-            raise RuntimeError("No se pudo cargar el historial de sesión tras fallback")
-
-        # Recuperamos la evidencia recién inyectada (las últimas en Ht)
-        # Filtramos por las que se generaron en fallback
-        evidencias_fallback = [e for e in ht_despues_fallback.evidence if e.node_id == "fallback_vqa"]
-        contexto_extra = "\n".join(e.triple for e in evidencias_fallback if e.triple)
-
-        pregunta_con_contexto = f"Contexto efímero (Evidencia Visual): {contexto_extra}\n\nPregunta original: {question}"
-
-        resp_reintento = ask(
-            pregunta_con_contexto,
-            session_id=current_session_id,
-            db_path=db_path,
-            memoria_grafo=memoria_grafo
+        return ask(
+            question, session_id=current_id, db_path=db_path,
+            memoria_grafo=memoria, memoria_neo4j=memoria_neo4j,
         )
+    current_id = first.ht_ref
 
-        val_resp_reintento = fval(resp_reintento, ht_despues_fallback, db_path=db_path)
-        return val_resp_reintento
+    ht = load_ht(current_id, db_path)
+    if ht is None:
+        return first
+    validated = fval(first, ht, db_path)
+    if getattr(validated, "vt", None) != "Insuficiente":
+        return validated
 
-    return val_resp
+    # El adaptador solo activa fallback cuando el juicio declara VISUAL.
+    deficit = getattr(validated, "deficit_type", None)
+    if deficit not in {None, "VISUAL"} and not getattr(validated, "delta_fb", False):
+        return validated
+
+    run_fallback(
+        session_id=current_id,
+        pregunta=question,
+        referencia_modalidad=referencia_modalidad,
+        puerto_vision=puerto_vision,
+        puerto_llm=ProveedorOpenAICompatible(),
+        db_path=db_path,
+    )
+    second = ask(
+        question, session_id=current_id, db_path=db_path, memoria_grafo=memoria, memoria_neo4j=memoria_neo4j
+    )
+    if isinstance(second, ValidatedResponse):
+        return second
+    ht2 = load_ht(current_id, db_path)
+    return fval(second, ht2, db_path) if ht2 else second

@@ -1,5 +1,6 @@
 # @l0 L0-002-R · @req KA-00/REQ-2 · @acr ACR-2.1
 import json
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Optional
 
@@ -62,6 +63,23 @@ class PersonalQALoader:
             "Alarms": 4,
             "Contacts": 2,
         }
+        t_global = datetime.strptime(data["t_global"], "%Y-%m-%d %H:%M")
+        for obj in info_objects:
+            raw_ts = obj.get("timestamp")
+            if not raw_ts:
+                raise PersonalQAValidationError(
+                    f"Information Object {obj.get('id')} has no timestamp"
+                )
+            try:
+                obj_ts = datetime.fromisoformat(str(raw_ts).replace("Z", "+00:00")).replace(tzinfo=None)
+            except ValueError as exc:
+                raise PersonalQAValidationError(
+                    f"Invalid timestamp for {obj.get('id')}: {raw_ts}"
+                ) from exc
+            if obj_ts > t_global:
+                raise PersonalQAValidationError(
+                    f"Information Object {obj.get('id')} occurs after t_global"
+                )
         if sources != expected_sources:
             raise PersonalQAValidationError(
                 f"Source distribution mismatch. Expected {expected_sources}, got {sources}"

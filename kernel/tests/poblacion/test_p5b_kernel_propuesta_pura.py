@@ -1,4 +1,4 @@
-# @l0 L0-002-R · @req ING-03/REQ-CONTRACT
+# @l0 L0-002-R · @req ING-03/REQ-CONTRACT · @acr ACR-1.1
 """
 Pruebas E2E y de unidad para la Tarea Prompt 5B (Kernel proponente sin escrituras).
 Verifica driver espía de cero escrituras en proponer, ratificación, transacción única,
@@ -180,6 +180,26 @@ def test_driver_espia_falla_ante_cualquier_escritura_durante_proponer():
     valido, errores = validate_proposal_envelope(env_dict)
     assert valido, f"Envelope inválido: {errores}"
     assert len(envelope.judgments) == 0  # Sin juicios inicialmente
+
+
+def test_propuesta_materializa_literal_sin_resolverlo():
+    memoria = SpyMemoriaEscrituraProhibida()
+    llm = MockPuertoLLM()
+    emb = MockPuertoEmbeddings()
+    obj = ObjetoDeInformacion(
+        id="io-literal",
+        texto="Texto",
+        provenance=Provenance(
+            origen="test", driver="test", timestamp=datetime.now(timezone.utc).isoformat()
+        ),
+        metadata={"autor": "Ada"},
+    )
+    envelope = proponer(obj, memoria, llm, emb)
+    literal_items = [i for i in envelope.items if i.kind == "literal"]
+    assert literal_items
+    assert all(not i.candidates for i in literal_items)
+    relations = [i for i in envelope.items if i.kind == "relation"]
+    assert any((r.metadata or {}).get("destino_kind") == "literal" for r in relations)
 
 
 def test_propuesta_no_ratificada_rechazada_al_asentar():

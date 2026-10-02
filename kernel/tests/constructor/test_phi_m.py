@@ -44,6 +44,20 @@ def test_acr_1_2_cero_llamadas_llm(caplog):
     assert "puerto" not in log_text
     assert "prompt" not in log_text
 
+def test_phi_m_treats_metadata_values_as_literals():
+    prov = Provenance(origen="test", driver="test", timestamp="2026-07-19T00:00:00Z")
+    obj = ObjetoDeInformacion(
+        id="fixture_literal_01",
+        texto="Texto",
+        provenance=prov,
+        metadata={"autor": "Ada", "fecha": "1843-08-01"},
+    )
+    triples = phi_m(obj)
+    assert triples
+    assert all((t.metadata or {}).get("node_kind") == "literal" for t in triples)
+    assert all((t.metadata or {}).get("literal_value") for t in triples)
+
+
 def test_acr_1_3_head_y_bitemporal():
     """
     ACR-1.3: toda tripleta tiene head nι y porta valid_at / invalid_at / created_at

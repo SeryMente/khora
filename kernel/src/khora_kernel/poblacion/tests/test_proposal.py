@@ -1,4 +1,4 @@
-# @l0 L0-002-R · @req JULES-3/REQ-3
+# @l0 L0-002-R · @req JULES-3/REQ-3 · @acr ACR-1.1
 import uuid
 
 from khora_kernel.api import (

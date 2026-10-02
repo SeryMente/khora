@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 # Headers tracking
-header_regex = re.compile(r"^#\s*@l0\s+(L0-\d{3}(?:-R)?)\s+·\s+@req\s+([A-Z0-9-]+/REQ-\d+)\s+·\s+@acr\s+(ACR-\d+\.\d+)")
+header_regex = re.compile(r"^#\s*@l0\s+(L0-\d{3}(?:-R)?)\s+·\s+@req\s+([A-Z0-9-]+/REQ-[A-Z0-9-]+(?:,(?:[A-Z0-9-]+/)?REQ-[A-Z0-9-]+)*)\s+·\s+@acr\s+(ACR-[A-Z0-9-]+(?:\.\d+)?(?:,ACR-[A-Z0-9-]+(?:\.\d+)?)*)", re.MULTILINE)
 
 # Known modules that require verdict in RECICLAJE.md
 KNOWN_MODULES = [
@@ -26,6 +26,9 @@ KNOWN_MODULES = [
     "kernel/tests/*"
 ]
 
+AUDIT_EXCLUDED_PARTS = {"scripts", "__pycache__", ".pytest_cache"}
+
+
 def check_headers_and_orphans(kernel_dir):
     """
     (REQ-1 a, b) & (REQ-2 e)
@@ -38,7 +41,7 @@ def check_headers_and_orphans(kernel_dir):
     missing_acr = []
 
     for filepath in python_files:
-        if ".pytest_cache" in filepath.parts or "__pycache__" in filepath.parts:
+        if any(part in AUDIT_EXCLUDED_PARTS for part in filepath.parts):
             continue
 
         with open(filepath, "r", encoding="utf-8") as f:
@@ -81,7 +84,7 @@ def check_simulated_tests(kernel_dir):
 
     return len(failing_tests) == 0, failing_tests
 
-def check_heterogeneity():
+def check_heterogeneity(kernel_dir):
     """
     (REQ-1 d)
     Verifies that turning off a dimension doesn't crash the system.
@@ -91,14 +94,17 @@ def check_heterogeneity():
     # when KHORA_DISABLE_DIM=D-MEM is set.
     env = os.environ.copy()
     env["KHORA_DISABLE_DIM"] = "D-MEM"
-    env["PYTHONPATH"] = f"{os.getcwd()}:{os.getcwd()}/kernel/src"
+    repo_root = Path(kernel_dir).resolve().parent
+    env["PYTHONPATH"] = os.pathsep.join([
+        str(repo_root),
+        str(repo_root / "kernel" / "src"),
+        env.get("PYTHONPATH", ""),
+    ]).strip(os.pathsep)
 
-    # Check if pytest is available, otherwise just use python -c "import khora_kernel"
+    # Usa exactamente el mismo intérprete que ejecuta la auditoría; no depende de PATH.
     try:
-        # We run python -c "import khora_kernel" as it verifies zero side-effects import
-        # and doesn't collapse
         result = subprocess.run(
-            ["python", "-c", "import khora_kernel"],
+            [sys.executable, "-c", "import khora_kernel"],
             env=env,
             capture_output=True,
             text=True
@@ -141,7 +147,7 @@ def generate_matrix(kernel_dir):
     matrix = {}
 
     for filepath in python_files:
-        if ".pytest_cache" in filepath.parts or "__pycache__" in filepath.parts:
+        if any(part in AUDIT_EXCLUDED_PARTS for part in filepath.parts):
             continue
 
         with open(filepath, "r", encoding="utf-8") as f:
@@ -170,6 +176,8 @@ def generate_matrix(kernel_dir):
 
 
 def main():
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     parser = argparse.ArgumentParser(description="khora-audit: Instrumento determinista de auditoria post-merge")
     parser.add_argument("--dir", default="kernel", help="Kernel directory to scan")
 
@@ -209,7 +217,7 @@ def main():
         all_passed = False
 
     # (d)
-    pass_d, error_msg = check_heterogeneity()
+    pass_d, error_msg = check_heterogeneity(kernel_dir)
     if pass_d:
         print("[PASS] REQ-1 (d): Heterogeneidad: apagar dimensión sin colapso.")
     else:

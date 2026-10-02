@@ -83,9 +83,12 @@ def resolver(
 
     for t in triples:
         contextos_por_id[t.origen_id].append(f"Actúa como origen en: {t.relacion} hacia {t.destino_id}")
-        contextos_por_id[t.destino_id].append(f"Actúa como destino en: {t.origen_id} con relación {t.relacion}")
+        if str((t.metadata or {}).get("node_kind", "")).lower() != "literal":
+            contextos_por_id[t.destino_id].append(
+                f"Actúa como destino en: {t.origen_id} con relación {t.relacion}"
+            )
+            etiquetas_por_id[t.destino_id] = t.destino_id
         etiquetas_por_id[t.origen_id] = t.origen_id
-        etiquetas_por_id[t.destino_id] = t.destino_id
 
     mapeo_claves: dict[str, str] = {}
     entidades_resolucion: dict[str, EntidadResolucion] = {}

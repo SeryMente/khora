@@ -102,7 +102,7 @@ def mock_llm_provider(monkeypatch):
 
 def test_fallback_activation(tmp_db, mock_llm_provider, monkeypatch):
     # Asegurar que el entorno indica fVAL
-    os.environ["KHORA_FVAL_MODE"] = "mark"
+    monkeypatch.setenv("KHORA_FVAL_MODE", "mark")
 
     vision_port = MockVisionPort()
     neo4j_mem = MockNeo4jMemoria()

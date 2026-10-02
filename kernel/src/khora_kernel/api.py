@@ -17,9 +17,12 @@ class NivelSuficiencia(Enum):
 
 @dataclass(frozen=True)
 class Provenance:
-    origen: str  # "chat" | "dictado" | "archivo" | etc.
-    driver: str | None  # None si es ingesta directa
-    timestamp: str  # ISO-8601
+    origen: str
+    driver: str | None
+    timestamp: str
+    event_time: str | None = None
+    capture_time: str | None = None
+    custody: str | None = None
 
 
 @dataclass(frozen=True)
@@ -35,7 +38,9 @@ class ObjetoDeInformacion:
     id: str
     texto: str
     provenance: Provenance
-    metadata: dict[str, str]
+    metadata: dict[str, object]
+    raw_payload: bytes | str | None = None
+    source_schema: str | None = None
 
 
 @dataclass(frozen=True)

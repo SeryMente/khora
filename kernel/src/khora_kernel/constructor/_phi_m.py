@@ -30,13 +30,21 @@ def phi_m(objeto: ObjetoDeInformacion) -> list[Triple]:
         import hashlib
         id_hash = hashlib.sha256(f"{objeto.id}-{relacion}-{v}".encode()).hexdigest()[:16]
 
+        # ΦM trata los valores de metadata como terminales literales.
+        # La entidad semántica (p.ej. CRE-ATED_BY) queda reservada a ΦC/fKGC.
+        metadata = {
+            "node_kind": "literal",
+            "literal_value": str(v),
+            "literal_datatype": type(v).__name__,
+            "source_key": k,
+        }
         triple = Triple(
             id=f"t-{id_hash}",
             origen_id=objeto.id,
             destino_id=str(v),
             relacion=relacion,
             provenance=objeto.provenance,
-            metadata={},
+            metadata=metadata,
             valid_at=objeto.provenance.timestamp,
             invalid_at=None,
             created_at=objeto.provenance.timestamp

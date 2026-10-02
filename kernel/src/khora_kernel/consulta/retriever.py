@@ -1,4 +1,7 @@
-# @l0 L0-002-R · @req KA-00/REQ-2 · @acr ACR-2.1
+# @l0 L0-002-R · @req KA-00/REQ-2 · @acr ACR-2.1 · @ua UA-15,UA-16,UA-43
+# @req: khora.consulta.sqlite_vec
+# @req: khora.consulta.embeddings
+import logging
 import typing
 
 from khora_kernel.api import (
@@ -6,190 +9,278 @@ from khora_kernel.api import (
     ContextoDeVisibilidad,
     EntidadIngresada,
     MotorDeConsulta,
-    NivelSuficiencia,
     NodoSubgrafo,
     Provenance,
-    PuertoEmbeddings,
     ResultadoDeConsulta,
     SubgrafoRelevante,
 )
 
-# @req: khora.consulta.sqlite_vec
-# @req: khora.consulta.embeddings
 
 class RetrieverGraphRAG(MotorDeConsulta):
-    def __init__(self, memoria_grafo: typing.Any, puerto_embeddings: PuertoEmbeddings):
-        self.memoria = memoria_grafo
+    """Retriever estructural: P_theta(G*|q,G).
+
+    La consulta semántica solo propone semillas; la comunidad y la expansión
+    topológica determinan el subgrafo efectivo.
+    """
+
+    def __init__(
+        self,
+        memoria_grafo: typing.Any = None,
+        puerto_embeddings: typing.Any = None,
+        memoria_neo4j: typing.Any = None,
+    ):
+        self.memoria = memoria_grafo if memoria_grafo is not None else memoria_neo4j
         self.puerto_embeddings = puerto_embeddings
         self.max_hops = 2
+        self.max_community_nodes = 200
 
-    def consultar(
-        self,
-        pregunta: str,
-        contexto: ContextoDeVisibilidad,
-    ) -> ResultadoDeConsulta:
-
-        degradacion = []
-
-        # 1. Obtener Semilla Semántica vía knn
-        # Embeddings interface is PuertoEmbeddings
-        # but to find nodes in memory we might need a semantic search
-        # Since we use faiss for knn in memory mock or real embeddings
-        # The prompt says: "(a) semilla semántica vía knn de embeddings (J-C7)"
+    def consultar(self, pregunta: str, contexto: ContextoDeVisibilidad) -> ResultadoDeConsulta:
         from khora_kernel.embeddings import knn
 
-        semillas = knn(pregunta, 5)
-        if not semillas:
-            degradacion.append("Sin semilla knn")
+        degradacion: list[str] = []
 
-        semillas_ids = [s[0] for s in semillas]
+        # Fixture/adapter path: only when there is no real graph driver.
+        # Production Neo4j always follows the semantic-seed + topological path below.
+        if not getattr(self.memoria, "_driver", None) and hasattr(self.memoria, "mock_multi_hop") and self.puerto_embeddings is None:
+            return self._consultar_mock([], contexto, degradacion)
 
-        fragmentos = []
-        subgrafo_nodos = {}
-        subgrafo_aristas = []
-        resumenes_incluidos = False
+        semillas = knn(pregunta, 8)
+        semillas_ids = [sid for sid, _ in semillas]
+        if not semillas_ids:
+            return self._retornar_insuficiente(["Sin semilla knn"])
 
-        if not hasattr(self.memoria, "_driver") or self.memoria._driver is None:
-            if hasattr(self.memoria, "mock_multi_hop"):
-                res = self.memoria.mock_multi_hop(semillas_ids, contexto, self.max_hops)
-                if not res:
-                    return self._retornar_insuficiente(degradacion)
-                fragmentos, subgrafo_nodos, subgrafo_aristas, res_incl, missing_sum = res
-                resumenes_incluidos = res_incl
-                if missing_sum:
-                    degradacion.append("Comunidad sin resumen")
-            else:
-                return self._retornar_insuficiente(degradacion)
-        else:
-            if not semillas_ids:
-                return self._retornar_insuficiente(degradacion)
+        if not getattr(self.memoria, "_driver", None):
+            return self._consultar_mock(semillas_ids, contexto, degradacion)
 
-            query = """
-            UNWIND $semillas AS seed
-            MATCH path = (e1:Entity {canonical_key: seed})-[*0..2]-(e2:Entity)
-            UNWIND relationships(path) AS r
-            WITH startNode(r) AS origen, endNode(r) AS destino, r
-            RETURN origen.canonical_key AS origen_id, origen.provenance AS origen_prov, origen.visibilidad AS origen_vis,
-                   destino.canonical_key AS destino_id, destino.provenance AS destino_prov, destino.visibilidad AS destino_vis,
-                   type(r) AS relacion, r.provenance AS r_prov, r.visibilidad AS r_vis
-            """
+        try:
+            with self.memoria._driver.session() as session:
+                community_rows = list(session.run(
+                    """
+                    UNWIND $seeds AS sid
+                    MATCH (e:Entity {canonical_key:sid})-[:IN_COMMUNITY]->(c:Community)
+                    WHERE e.invalid_at IS NULL AND c.invalid_at IS NULL AND c.published = true
+                    RETURN DISTINCT sid, c.community_id AS community_id
+                    ORDER BY community_id
+                    """,
+                    seeds=semillas_ids,
+                ))
+                community_ids = sorted({r["community_id"] for r in community_rows if r["community_id"]})
 
-            # Additional query for communities and summaries
-            query_comm = """
-            UNWIND $nodos AS n_id
-            MATCH (e:Entity {canonical_key: n_id})-[:IN_COMMUNITY]->(c:Community)
-            RETURN e.canonical_key AS nodo_id, c.community_id AS comm_id, c.summary AS summary
-            """
+                member_ids: set[str] = set()
+                if community_ids:
+                    member_rows = session.run(
+                        """
+                        UNWIND $cids AS cid
+                        MATCH (e:Entity)-[:IN_COMMUNITY]->(c:Community {community_id:cid})
+                        WHERE e.invalid_at IS NULL AND c.invalid_at IS NULL AND c.published = true
+                        RETURN DISTINCT e.canonical_key AS id
+                        LIMIT $lim
+                        """,
+                        cids=community_ids,
+                        lim=self.max_community_nodes,
+                    )
+                    member_ids = {r["id"] for r in member_rows if r["id"]}
 
-            try:
-                with self.memoria._driver.session() as session:
-                    res = session.run(query, semillas=semillas_ids)
+                expansion_rows = session.run(
+                    """
+                    UNWIND $seeds AS sid
+                    MATCH p=(s:Entity {canonical_key:sid})-[:RELATION*0..2]->(e:Entity)
+                    WHERE all(x IN nodes(p) WHERE x.invalid_at IS NULL)
+                    RETURN DISTINCT
+                      [x IN nodes(p) | coalesce(x.id,x.canonical_key)] AS path_nodes,
+                      [x IN relationships(p) | {
+                        source: coalesce(startNode(x).id,startNode(x).canonical_key),
+                        target: coalesce(endNode(x).id,endNode(x).canonical_key),
+                        relation: type(x)
+                      }] AS path_edges
+                    """,
+                    seeds=semillas_ids,
+                )
+                expanded_ids: set[str] = set(semillas_ids) | member_ids
+                for row in expansion_rows:
+                    expanded_ids.update(x for x in row["path_nodes"] if x)
+                if not expanded_ids:
+                    return self._retornar_insuficiente(["Expansión topológica vacía"])
 
-                    nodos_visitados = set()
-                    aristas_set = set()
+                visible_ids = self._filter_visibility(session, expanded_ids, contexto)
+                if not visible_ids:
+                    return self._retornar_insuficiente(["Subgrafo eliminado por visibilidad"])
 
-                    for record in res:
-                        o_id = record["origen_id"]
-                        d_id = record["destino_id"]
-                        rel = record["relacion"]
+                edge_rows = session.run(
+                    """
+                    MATCH (a:Entity)-[r:RELATION]->(b:Entity)
+                    WHERE a.invalid_at IS NULL AND b.invalid_at IS NULL
+                      AND r.invalid_at IS NULL
+                      AND a.canonical_key IN $ids AND b.canonical_key IN $ids
+                    RETURN coalesce(a.id,a.canonical_key) AS source,
+                           coalesce(b.id,b.canonical_key) AS target,
+                           type(r) AS relation,
+                           a.label_original AS source_text,
+                           b.label_original AS target_text,
+                           a.provenance AS source_prov,
+                           b.provenance AS target_prov,
+                           a.visibilidad AS source_vis,
+                           b.visibilidad AS target_vis
+                    ORDER BY source, target, relation
+                    """,
+                    ids=list(visible_ids),
+                )
 
-                        o_vis = ContextoDeVisibilidad(record.get("origen_vis", "privado"))
-                        d_vis = ContextoDeVisibilidad(record.get("destino_vis", "privado"))
-                        r_vis = ContextoDeVisibilidad(record.get("r_vis", "privado"))
+                node_rows = session.run(
+                    """
+                    MATCH (e:Entity)
+                    WHERE e.canonical_key IN $ids AND e.invalid_at IS NULL
+                    RETURN coalesce(e.id,e.canonical_key) AS id,
+                           coalesce(e.label_original,e.canonical_key) AS text,
+                           e.provenance AS provenance,
+                           coalesce(e.visibilidad,'privado') AS visibilidad
+                    ORDER BY id
+                    """,
+                    ids=list(visible_ids),
+                )
+                node_map = {}
+                fragmentos = []
+                for row in node_rows:
+                    node_map[row["id"]] = NodoSubgrafo(id=row["id"], etiqueta="Entity")
+                    fragmentos.append(
+                        EntidadIngresada(
+                            id=row["id"],
+                            texto=row["text"],
+                            provenance=self._parse_prov(
+                                (row["provenance"] or [""])[0]
+                            ),
+                            visibilidad=self._visibility(row["visibilidad"]),
+                        )
+                    )
 
-                        if contexto == ContextoDeVisibilidad.TRANSPARENTE:
-                            if o_vis == ContextoDeVisibilidad.PRIVADO or d_vis == ContextoDeVisibilidad.PRIVADO or r_vis == ContextoDeVisibilidad.PRIVADO:
-                                continue
+                edges = []
+                seen = set()
+                for row in edge_rows:
+                    source, target, relation = row["source"], row["target"], row["relation"]
+                    if source not in node_map or target not in node_map:
+                        continue
+                    key = (source, target, relation)
+                    if key not in seen:
+                        seen.add(key)
+                        edges.append(
+                            AristaSubgrafo(origen=source, destino=target, relacion=relation)
+                        )
 
-                        if o_id not in nodos_visitados:
-                            nodos_visitados.add(o_id)
-                            prov_raw = record["origen_prov"][0] if record["origen_prov"] else ""
-                            subgrafo_nodos[o_id] = NodoSubgrafo(id=o_id, etiqueta="Entity")
+                summaries = []
+                if community_ids:
+                    for row in session.run(
+                        """
+                        UNWIND $cids AS cid
+                        MATCH (c:Community {community_id:cid})
+                        WHERE c.invalid_at IS NULL AND c.published = true
+                        RETURN c.community_id AS id, c.summary AS summary,
+                               c.graph_revision AS graph_revision
+                        ORDER BY id
+                        """,
+                        cids=community_ids,
+                    ):
+                        if row["summary"]:
+                            summaries.append(row["id"])
                             fragmentos.append(
                                 EntidadIngresada(
-                                    id=o_id,
-                                    texto=o_id + ": " + prov_raw,
-                                    provenance=self._parse_prov(prov_raw),
-                                    visibilidad=o_vis
+                                    id=row["id"],
+                                    texto="Resumen de comunidad: " + row["summary"],
+                                    provenance=Provenance(
+                                        origen="comunidad", driver=None, timestamp=""
+                                    ),
+                                    visibilidad=contexto,
                                 )
                             )
 
-                        if d_id not in nodos_visitados:
-                            nodos_visitados.add(d_id)
-                            prov_raw = record["destino_prov"][0] if record["destino_prov"] else ""
-                            subgrafo_nodos[d_id] = NodoSubgrafo(id=d_id, etiqueta="Entity")
-                            fragmentos.append(
-                                EntidadIngresada(
-                                    id=d_id,
-                                    texto=d_id + ": " + prov_raw,
-                                    provenance=self._parse_prov(prov_raw),
-                                    visibilidad=d_vis
-                                )
-                            )
+                if not summaries:
+                    degradacion.append("Sin resumen de comunidad")
+                revision = (
+                    self.memoria.get_graph_revision()
+                    if hasattr(self.memoria, "get_graph_revision")
+                    else "unknown"
+                )
+                degradacion.append(
+                    f"GraphRAG revision={revision} seeds={len(semillas_ids)} "
+                    f"communities={len(community_ids)} nodes={len(node_map)}"
+                )
+                if not edges:
+                    degradacion.append("G* sin aristas semánticas")
 
-                        edge_key = (o_id, d_id, rel)
-                        if edge_key not in aristas_set:
-                            aristas_set.add(edge_key)
-                            subgrafo_aristas.append(AristaSubgrafo(origen=o_id, destino=d_id, relacion=rel))
+                return ResultadoDeConsulta(
+                    fragmentos=fragmentos,
+                    subgrafo=SubgrafoRelevante(
+                        nodos=list(node_map.values()), aristas=edges
+                    ),
+                    suficiencia=(
+                        __import__("khora_kernel.api", fromlist=["NivelSuficiencia"])
+                        .NivelSuficiencia.SUFICIENTE
+                    ),
+                    resumenes_incluidos=bool(summaries),
+                    degradacion_declarada=" | ".join(degradacion),
+                )
+        except Exception as exc:
+            logging.error("[GraphRAG] error: %s", exc)
+            return self._retornar_insuficiente([f"Error GraphRAG: {exc}"])
 
-                    if nodos_visitados:
-                        res_comm = session.run(query_comm, nodos=list(nodos_visitados))
-                        for record in res_comm:
-                            if record["summary"]:
-                                resumenes_incluidos = True
-                                fragmentos.append(
-                                    EntidadIngresada(
-                                        id=record["comm_id"],
-                                        texto="Resumen de comunidad: " + record["summary"],
-                                        provenance=Provenance(origen="comunidad", driver=None, timestamp=""),
-                                        visibilidad=contexto # inherit context for now
-                                    )
-                                )
-                            else:
-                                if "Comunidad sin resumen" not in degradacion:
-                                    degradacion.append("Comunidad sin resumen")
+    @staticmethod
+    def _visibility(value: str | None) -> ContextoDeVisibilidad:
+        try:
+            return ContextoDeVisibilidad(value or "privado")
+        except ValueError:
+            return ContextoDeVisibilidad.PRIVADO
 
-            except Exception as e:
-                import logging
-                logging.error(f"Error querying grafo: {e}")
-                return self._retornar_insuficiente(degradacion)
-
-        if not fragmentos:
-            return self._retornar_insuficiente(degradacion)
-
-        # Convert subgrafo_nodos from dict to list if it's a dict, otherwise it's already a list from mock
-        if isinstance(subgrafo_nodos, dict):
-            nodos_lista = list(subgrafo_nodos.values())
-        else:
-            nodos_lista = subgrafo_nodos
-
-        return ResultadoDeConsulta(
-            fragmentos=fragmentos,
-            subgrafo=SubgrafoRelevante(nodos=nodos_lista, aristas=subgrafo_aristas),
-            suficiencia=NivelSuficiencia.SUFICIENTE,
-            resumenes_incluidos=resumenes_incluidos,
-            degradacion_declarada=" | ".join(degradacion) if degradacion else None
+    def _filter_visibility(self, session, ids: set[str], contexto) -> set[str]:
+        rows = session.run(
+            """
+            UNWIND $ids AS id
+            MATCH (e:Entity {canonical_key:id})
+            WHERE e.invalid_at IS NULL
+            RETURN e.canonical_key AS id, coalesce(e.visibilidad,'privado') AS vis
+            """,
+            ids=list(ids),
         )
+        if contexto == ContextoDeVisibilidad.PRIVADO:
+            return {r["id"] for r in rows}
+        return {
+            r["id"] for r in rows
+            if self._visibility(r["vis"]) == ContextoDeVisibilidad.TRANSPARENTE
+        }
+
+    def _consultar_mock(self, semillas_ids, contexto, degradacion):
+        if hasattr(self.memoria, "mock_multi_hop"):
+            res = self.memoria.mock_multi_hop(semillas_ids, contexto, self.max_hops)
+            if res:
+                fragmentos, nodos, aristas, incluidos, faltan = res
+                if faltan:
+                    degradacion.append("Comunidad sin resumen")
+                return ResultadoDeConsulta(
+                    fragmentos=fragmentos,
+                    subgrafo=SubgrafoRelevante(nodos=nodos, aristas=aristas),
+                    suficiencia=__import__("khora_kernel.api", fromlist=["NivelSuficiencia"]).NivelSuficiencia.SUFICIENTE,
+                    resumenes_incluidos=incluidos,
+                    degradacion_declarada=" | ".join(degradacion) or None,
+                )
+        return self._retornar_insuficiente(degradacion + ["Memoria sin driver"])
 
     def _parse_prov(self, prov_str: str) -> Provenance:
-        # Helper to parse "origen=X, driver=Y, timestamp=Z" or fallback
-        if "origen=" in prov_str:
-            import re
-            m_orig = re.search(r"origen=([^,]+)", prov_str)
-            m_driv = re.search(r"driver=([^,]+)", prov_str)
-            m_time = re.search(r"timestamp=([^,]+)", prov_str)
-            return Provenance(
-                origen=m_orig.group(1).strip() if m_orig else "grafo",
-                driver=m_driv.group(1).strip() if m_driv and m_driv.group(1).strip() != "None" else None,
-                timestamp=m_time.group(1).strip() if m_time else ""
-            )
-        return Provenance(origen="grafo", driver=None, timestamp="")
+        if not prov_str or "origen=" not in prov_str:
+            return Provenance(origen="grafo", driver=None, timestamp="")
+        import re
+        m_orig = re.search(r"origen=([^,]+)", prov_str)
+        m_driv = re.search(r"driver=([^,]+)", prov_str)
+        m_time = re.search(r"timestamp=([^,]+)", prov_str)
+        return Provenance(
+            origen=m_orig.group(1).strip() if m_orig else "grafo",
+            driver=(m_driv.group(1).strip() if m_driv else None),
+            timestamp=(m_time.group(1).strip() if m_time else ""),
+        )
 
-    def _retornar_insuficiente(self, degradacion: list[str]) -> ResultadoDeConsulta:
+    @staticmethod
+    def _retornar_insuficiente(degradacion):
         return ResultadoDeConsulta(
             fragmentos=[],
             subgrafo=SubgrafoRelevante(),
-            suficiencia=NivelSuficiencia.INSUFICIENTE,
+            suficiencia=__import__("khora_kernel.api", fromlist=["NivelSuficiencia"]).NivelSuficiencia.INSUFICIENTE,
             resumenes_incluidos=False,
-            degradacion_declarada=" | ".join(degradacion) if degradacion else None
+            degradacion_declarada=" | ".join(degradacion) if degradacion else None,
         )

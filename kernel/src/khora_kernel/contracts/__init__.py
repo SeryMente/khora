@@ -1,3 +1,4 @@
+# @l0 L0-002-R · @req ING-03/REQ-CONTRACT · @acr ACR-1.1
 from khora_kernel.contracts.proposal import (
     CURRENT_SCHEMA_VERSION,
     Anchor,

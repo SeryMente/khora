@@ -1,6 +1,7 @@
 # @l0 L0-002-R · @req KA-00/REQ-2 · @acr ACR-2.1
 # @l0 L0-002 · @req ING-02/REQ-1,REQ-2 · @acr ACR-1.1,ACR-1.2,ACR-2.1,ACR-2.2,ACR-2.3 · @ua UA-07,UA-08,UA-09,UA-41
 import base64
+import hashlib
 import logging
 import os
 from datetime import datetime, timezone
@@ -54,10 +55,12 @@ def phi_c(
         metadata["tipo"] = "imagen"
 
     obj = ObjetoDeInformacion(
-        id=f"obj-{hash(texto_base)}",
+        id="obj-" + hashlib.sha256(contenido_bytes).hexdigest(),
         texto=texto_base,
         provenance=prov,
-        metadata=metadata
+        metadata={**metadata, "sha256": hashlib.sha256(contenido_bytes).hexdigest(), "mime": tipo_formato},
+        raw_payload=contenido_bytes,
+        source_schema=tipo_formato,
     )
 
     # Etapa η (Captioning/Normalización)

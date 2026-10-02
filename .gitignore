@@ -64,3 +64,6 @@ scripts/khora/versions/
 
 .vercel
 .env*
+
+.vercel
+.env*

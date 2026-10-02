@@ -1,6 +1,4 @@
-# @l0 L0-002-R · @req KA-00/REQ-2 · @acr ACR-2.1
-# @l0 L0-002 · @req VIS-01/REQ-1,REQ-2 · @acr ACR-1.1,ACR-1.2,ACR-2.1 · @ua UA-22,UA-23,UA-24,UA-25
-
+# @l0 L0-002-R · @req RAZ-02/REQ-2 · @acr ACR-2.1 · @ua UA-23,UA-24,UA-25,UA-41
 import base64
 import logging
 from dataclasses import dataclass
@@ -13,52 +11,47 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class ResultadoVisual:
-    """Retorno efímero de tVIS. El llamador (RAZ-02) lo convierte
-    a HtEvidence antes de escribir a Ht."""
     hallazgo_vqa: str
     entidades_consultadas: list[str]
     bytes_procesados: int
 
 
+def _payload_to_base64(payload: bytes | str) -> tuple[str, int]:
+    if isinstance(payload, bytes):
+        return base64.b64encode(payload).decode("utf-8"), len(payload)
+    text = str(payload).strip()
+    if text.startswith("data:image/") and "," in text:
+        return text.split(",", 1)[1], len(text)
+    if text.startswith("http://") or text.startswith("https://"):
+        return text, len(text)
+    return text, len(text)
+
+
 async def refinar_visual(
-    bytes_imagen: bytes,
+    bytes_imagen: bytes | str,
     entidades_relevantes: List[str],
     puerto_llm: PuertoLLM,
+    pregunta: str = "",
 ) -> ResultadoVisual:
-    """
-    Co-rutina efímera para refinamiento visual (tVIS).
-    Toma bytes de imagen crudos, los pasa a Base64, e invoca al PuertoLLM para VQA
-    basado en las entidades topológicamente relevantes.
-    NO persiste nada a grafo (estrictamente efímera).
-    """
-    # ACR-1.2: Trazabilidad del subconjunto consultado (topológicamente relevante)
-    logger.info(f"[tVIS] Iniciando refinamiento visual. Entidades relevantes: {entidades_relevantes}")
-
-    # Convertir bytes crudos a Base64
-    imagen_base64 = base64.b64encode(bytes_imagen).decode("utf-8")
-
-    # Construir prompt
-    entidades_str = ", ".join(entidades_relevantes)
-    prompt = f"Analiza la imagen considerando las siguientes entidades clave: {entidades_str}. Extrae evidencia relevante."
-
+    """tVIS: fetch raw payload + neural VQA; the result never enters the PKG."""
+    logger.info("[tVIS] entidades topológicas=%s", entidades_relevantes)
+    imagen_base64, processed = _payload_to_base64(bytes_imagen)
+    entidades_str = ", ".join(entidades_relevantes) or "(ninguna; usar solo evidencia visual)"
+    prompt = (
+        "Evidencia Visual VQA. Analiza el payload visual crudo observado y responde únicamente "
+        "esta pregunta: " + pregunta + ". Usa solo lo visible. "
+        "El subconjunto topológico relevante es: " + entidades_str
+    )
     solicitud = SolicitudLLM(
         prompt=prompt,
-        sistema="Eres un asistente experto analizando imágenes en el contexto de entidades específicas.",
+        sistema="Eres Mvis de EpisTwin; salida efímera, no la persistas en el PKG.",
         formato_estricto=None,
-        metadata={"temperature": 0.0},
-        imagenes_base64=[imagen_base64]
+        metadata={"temperature": 0.0, "role": "Mvis"},
+        imagenes_base64=[imagen_base64],
     )
-
-    try:
-        respuesta = puerto_llm.generar(solicitud)
-        texto_evidencia = respuesta.texto
-    except Exception as e:
-        logger.error(f"[tVIS] Error en VQA: {e}")
-        texto_evidencia = f"Error en VQA: {e}"
-
-    # Retornar evidencia efímera (será agregada al historial por quien llama, tVIS muere aquí)
+    respuesta = puerto_llm.generar(solicitud)
     return ResultadoVisual(
-        hallazgo_vqa=texto_evidencia,
-        entidades_consultadas=entidades_relevantes,
-        bytes_procesados=len(bytes_imagen)
+        hallazgo_vqa=respuesta.texto,
+        entidades_consultadas=list(entidades_relevantes),
+        bytes_procesados=processed,
     )

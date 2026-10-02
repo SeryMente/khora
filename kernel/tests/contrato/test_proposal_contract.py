@@ -1,3 +1,4 @@
+# @l0 L0-002-R · @req ING-03/REQ-CONTRACT · @acr ACR-1.1
 from datetime import datetime, timezone
 
 from khora_kernel.contracts import (
@@ -166,6 +167,28 @@ def test_judgment_zone_does_not_alter_payload_hash():
     valid, errors = validate_proposal_envelope(raw)
     assert valid, f"Validación falló: {errors}"
     assert raw["payload_hash"] == initial_hash
+
+
+def test_literal_item_kind_is_valid():
+    raw = create_valid_envelope_dict()
+    literal_id = compute_item_id(SAMPLE_TRIPLET, "literal:autor:Ada")
+    raw["items"][0] = {
+        "id": literal_id,
+        "kind": "literal",
+        "label": "Ada",
+        "anchor": {"exact_text": "Ada"},
+        "candidates": [],
+        "metadata": {
+            "node_kind": "literal",
+            "literal_value": "Ada",
+            "literal_datatype": "str",
+        },
+    }
+    raw["payload_hash"] = compute_payload_hash(raw["items"])
+    valid, errors = validate_proposal_envelope(raw)
+    assert valid, errors
+    envelope = from_dict(raw)
+    assert envelope.items[0].kind == "literal"
 
 
 def test_compute_item_id_deterministic():

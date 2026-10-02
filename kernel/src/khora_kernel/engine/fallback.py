@@ -1,62 +1,63 @@
-# @l0 L0-002-R · @req KA-00/REQ-2 · @acr ACR-2.1
+# @l0 L0-002-R · @req RAZ-02/REQ-2 · @acr ACR-2.1 · @ua UA-21,UA-22,UA-23,UA-24,UA-25,UA-41
+import asyncio
+from typing import Any
 
-from khora_kernel.api import PuertoVision
+from khora_kernel.api import PuertoLLM, PuertoVision
 from khora_kernel.engine.history import HtEvidence, load_ht, save_ht
+from khora_kernel.tvis.corutina import refinar_visual
 
 
-def fallback(
+async def fallback(
     session_id: str,
     pregunta: str,
     referencia_modalidad: str,
     puerto_vision: PuertoVision,
-    db_path: str = "data/khora_sessions.db"
-) -> None:
-    """
-    Agente de respaldo (ΔFB).
-    Se activa cuando fVAL emite vt=Insuficiente.
-    Accede a la modalidad cruda (ej. imagen) a través de PuertoVision,
-    extrae evidencia y la inyecta al historial Ht como contexto efímero de la sesión.
-    JAMÁS escribe al PKG (grafo).
-    """
+    puerto_llm: PuertoLLM,
+    db_path: str = "data/khora_sessions.db",
+) -> dict[str, Any]:
+    """ΔFB como co-rutina neural: recupera payload crudo y ejecuta tVIS.
+    El resultado visual es efímero respecto al PKG; solo H_t de la sesión lo conserva."""
     ht = load_ht(session_id, db_path)
     if not ht:
-        return
-
-    # 1. Contextual Fetching
-    # Extraer payload crudo (ej. imagen base64/URL) a través del puerto
-    imagen_cruda = puerto_vision.extraer_evidencia(referencia_modalidad)
-
-    # 2. Neural VQA Injection
-    from khora_kernel.api import SolicitudLLM
-    from khora_kernel.proveedores.llm_generico import ProveedorLLMGenerico
-
-    proveedor = ProveedorLLMGenerico()
-    solicitud = SolicitudLLM(
-        prompt=f"Por favor, responde a la siguiente pregunta observando la imagen provista: {pregunta}",
-        sistema="Eres un asistente experto analizando imágenes. Debes extraer la evidencia solicitada con precisión.",
-        formato_estricto=None,
-        metadata={"temperature": 0.0},
-        imagenes_base64=[imagen_cruda] if imagen_cruda else None
-    )
-
-    try:
-        respuesta_mllm = proveedor.generar(solicitud)
-        evidencia_cruda_texto = respuesta_mllm.texto
-    except Exception as e:
-        evidencia_cruda_texto = f"Error en VQA: {e}"
-
-    # Crear evidencia para el historial
-    from khora_kernel.engine.core import _add_evidence, _add_step
-
-    # Añadimos un paso de transición en el historial
-    ht_con_paso = _add_step(ht, "FALLBACK", f"Activando ΔFB. Obteniendo evidencia de {referencia_modalidad}")
-
-    evidencia_efimera = HtEvidence(
+        raise RuntimeError("No existe H_t para activar fallback")
+    raw = puerto_vision.extraer_evidencia(referencia_modalidad)
+    if not raw:
+        raise RuntimeError("PuertoVision no devolvió payload crudo")
+    relevant: list[str] = []
+    for event in getattr(ht, "trace", []):
+        if isinstance(event, dict):
+            relevant.extend(event.get("gstar_nodes", []))
+    relevant = list(dict.fromkeys(relevant))[:50]
+    result = await refinar_visual(raw, relevant, puerto_llm, pregunta=pregunta)
+    step_no = len(ht.steps) + 1
+    evidence_text = result.hallazgo_vqa
+    if not evidence_text.lower().startswith("evidencia visual"):
+        evidence_text = "Evidencia Visual VQA: " + evidence_text
+    evidence = HtEvidence(
         node_id="fallback_vqa",
-        triple=evidencia_cruda_texto,
-        source_step=len(ht_con_paso.steps)
+        triple=evidence_text,
+        source_step=step_no,
     )
+    from khora_kernel.engine.core import _add_evidence, _add_step, _add_trace
+    updated = _add_step(ht, "FALLBACK", "ΔFB activado por insuficiencia VISUAL.",
+                        {"entities": result.entidades_consultadas, "bytes": result.bytes_procesados})
+    updated = _add_evidence(updated, [evidence])
+    updated = _add_trace(updated, {
+        "action": "FALLBACK", "visual_ephemeral": True,
+        "raw_payload_persisted_to_pkg": False,
+        "entities_selected_topologically": relevant,
+    })
+    save_ht(updated, db_path)
+    return {"hallazgo": result.hallazgo_vqa, "session_id": session_id, "entities": relevant}
 
-    ht_actualizado = _add_evidence(ht_con_paso, [evidencia_efimera])
 
-    save_ht(ht_actualizado, db_path)
+def run_fallback(*args, **kwargs):
+    """Adaptador síncrono para consumidores no async; el núcleo sigue siendo co-rutina."""
+    try:
+        return asyncio.run(fallback(*args, **kwargs))
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        try:
+            return loop.run_until_complete(fallback(*args, **kwargs))
+        finally:
+            loop.close()

@@ -7,7 +7,7 @@ name = "khora"
 version = "0.0.0"
 description = "Khora"
 requires-python = ">=3.11"
-dependencies = ["pydantic>=2", "fastapi", "uvicorn[standard]", "cryptography", "httpx", "neo4j"]
+dependencies = ["pydantic>=2", "fastapi", "uvicorn[standard]", "cryptography", "httpx", "neo4j", "numpy>=1.26", "networkx>=3.2", "igraph>=0.11", "leidenalg>=0.10", "groq>=0.9.0"]
 
 [tool.setuptools]
 py-modules = []
@@ -20,5 +20,7 @@ include = ["api", "kernel", "shell", "puentes", "drivers", "tools"]
 
 [dependency-groups]
 dev = [
-    "pytest (>=9.1.1,<10.0.0)"
+    "pytest (>=9.1.1,<10.0.0)",
+    "pytest-asyncio>=1.2",
+    "testcontainers>=4.13"
 ]

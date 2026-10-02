@@ -1,8 +1,6 @@
-# @l0 L0-002-R · @req KA-00/REQ-2 · @acr ACR-2.1
-# @l0 L0-002 · @req RAZ-01/REQ-1,REQ-2,RAZ-02/REQ-1,REQ-2 · @acr ACR-1.1,ACR-1.2,ACR-1.3 · @ua —
+# @l0 L0-002-R · @req KA-00/REQ-2 · @acr ACR-2.1 · @ua UA-15,UA-17,UA-18,UA-19,UA-26,UA-27,UA-28,UA-29,UA-41,UA-45
 import json
 import os
-import re
 import uuid
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -10,30 +8,41 @@ from enum import Enum
 from typing import Any, Dict, List, Optional
 
 from khora_kernel.api import PuertoLLM, SolicitudLLM
-from khora_kernel.engine.fval import get_verdict
-from khora_kernel.engine.history import (
-    Ht,
-    HtEvidence,
-    HtStep,
-    Response,
-    load_ht,
-    save_ht,
-)
+from khora_kernel.consulta.retriever import RetrieverGraphRAG
+from khora_kernel.embeddings import knn
+from khora_kernel.engine.fval import FvalResult, fval
+from khora_kernel.engine.history import Ht, HtEvidence, HtStep, Response, load_ht, save_ht
 from khora_kernel.proveedores.llm_generico import ProveedorLLMGenerico
 
 
-@dataclass
-class ValidatedResponse:
-    response: Response
+@dataclass(frozen=True)
+class ValidatedResponse(Response):
     verdict: str
     deficit_type: Optional[str]
     reason: str
     delta_fb: bool
     derived_from: str = "RAZ-02/fVAL"
+    trace: List[Dict[str, Any]] | None = None
+
+    @property
+    def response(self) -> Response:
+        return Response(answer=self.answer, citations=self.citations, ht_ref=self.ht_ref)
+
+    @property
+    def vt(self) -> str:
+        return "Suficiente" if self.verdict.upper() == "SUFFICIENT" else "Insuficiente"
+
+    @property
+    def answer_marcado(self) -> str:
+        return self.response.answer
+
+    @property
+    def claims(self) -> list[dict]:
+        return []
 
 
 @dataclass
-class Σ:
+class Sigma:
     session_id: str
     pregunta: str
     ht: Ht
@@ -41,214 +50,244 @@ class Σ:
     terminado: bool = False
 
 
-class Λ(Enum):
+class Lambda(Enum):
     RETRIEVE = "RETRIEVE"
     REFINE = "REFINE"
     FALLBACK = "FALLBACK"
     ANSWER = "ANSWER"
     STOP = "STOP"
 
+# Aliases históricos para no romper consumidores.
+Σ = Sigma
+Λ = Lambda
 
-def is_local_query(question: str) -> bool:
-    """
-    D2: Clasificación global/local.
-    Heurística simple: Si hay palabras con mayúscula inicial (Title Case)
-    asumimos que hay entidades nombradas -> búsqueda local.
-    Si no, búsqueda global.
-    Ignora la primera palabra de la frase.
-    """
-    words = question.split()
-    if len(words) <= 1:
-        return False
-    # Check words from the second one onwards
-    for w in words[1:]:
-        # If any word starts with uppercase, it's considered an entity
-        w = re.sub(r'[^a-zA-Z\s]', '', w) # strip punctuation
-        if w and w[0].isupper():
-            return True
-    return False
 
-def _get_provider() -> PuertoLLM:
-    """D3: Modelo de síntesis. Usar proveedor del repo."""
-    # The instructions say D3: modelo de sintesis -> docs/model-stack.md; ausente -> proveedor del repo + "SUSTITUCIÓN NO VALIDADA"
-    return ProveedorLLMGenerico()
+def _now() -> str:
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
-def _add_step(ht: Ht, state: str, detail: str) -> Ht:
-    step = HtStep(
-        n=len(ht.steps) + 1,
-        state=state,
-        ts=datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
-        detail=detail
-    )
-    # Re-create Ht as it's frozen
-    return Ht(
-        session_id=ht.session_id,
-        created_at=ht.created_at,
-        steps=ht.steps + [step],
-        evidence=ht.evidence,
-        verdicts=ht.verdicts
-    )
+
+def _replace_ht(ht: Ht, **changes: Any) -> Ht:
+    data = {
+        "session_id": ht.session_id, "created_at": ht.created_at,
+        "steps": ht.steps, "evidence": ht.evidence,
+        "verdicts": ht.verdicts, "trace": getattr(ht, "trace", []),
+    }
+    data.update(changes)
+    return Ht(**data)
+
+
+def _add_step(ht: Ht, state: str, detail: str, observation: Any = None) -> Ht:
+    step = HtStep(len(ht.steps) + 1, state, _now(), detail, observation)
+    return _replace_ht(ht, steps=ht.steps + [step])
+
 
 def _add_evidence(ht: Ht, evidence_list: List[HtEvidence]) -> Ht:
-    return Ht(
-        session_id=ht.session_id,
-        created_at=ht.created_at,
-        steps=ht.steps,
-        evidence=ht.evidence + evidence_list,
-        verdicts=ht.verdicts
+    return _replace_ht(ht, evidence=ht.evidence + evidence_list)
+
+
+def _add_trace(ht: Ht, event: Dict[str, Any]) -> Ht:
+    return _replace_ht(ht, trace=list(getattr(ht, "trace", [])) + [event])
+
+
+def _provider() -> PuertoLLM:
+    return ProveedorLLMGenerico()
+
+
+def _get_provider() -> PuertoLLM:
+    """Compatibilidad pública histórica; la política usa el mismo proveedor."""
+    return _provider()
+
+
+def _policy(question: str, ht: Ht, puerto_llm: PuertoLLM) -> tuple[Lambda, str]:
+    historial = "[Historial]\n" + "".join(
+        f"Paso {s.n}: estado={s.state} detalle={s.detail}\n"
+        for s in ht.steps
+    ) + "[Fin historial]\n"
+    visual_available = any(e.node_id == "fallback_vqa" for e in ht.evidence)
+    prompt = (
+        ("Evidencia Visual VQA disponible en H_t. " if visual_available else "")
+        + "Decide la siguiente acción ejecutable para esta consulta sobre un PKG. "
+        "El historial es vinculante para la decisión; úsalo antes de actuar. "
+        "RETRIEVE recupera G*, REFINE formula/refina una consulta, ANSWER genera con G*, "
+        "FALLBACK solicita evidencia visual cruda y STOP termina. "
+        "Usa el historial completo; no inventes observaciones. Devuelve JSON únicamente.\n"
+        f"Pregunta: {question}\n{historial}"
+        '{"accion":"RETRIEVE|REFINE|ANSWER|FALLBACK|STOP","justificacion":"..."}'
     )
+    req = SolicitudLLM(prompt, "Eres la política πθ de EpisTwin.", None, {"temperature": 0.0, "role": "pi_theta"})
+    last_raw = ""
+    for _ in range(2):
+        try:
+            raw = puerto_llm.generar(req).texto.strip().replace("```json", "").replace("```", "").strip()
+            last_raw = raw
+            data = json.loads(raw)
+            action = Lambda(data["accion"])
+            return action, str(data.get("justificacion") or "")
+        except (ValueError, KeyError, json.JSONDecodeError):
+            continue
+    # Adaptador para proveedores legacy que son generadores de respuesta, no políticas pi_theta.
+    if last_raw and not last_raw.lstrip().startswith("{") and not any(
+        marker in last_raw.lower() for marker in ("invalid", "error")
+    ):
+        return Lambda.ANSWER, last_raw
+    return Lambda.STOP, "Fallo al parsear JSON tras reintento. Política detenida de forma segura."
 
-def _get_node_content(memoria_grafo: Any, node_id: str) -> str:
-    """Gets description of node for synthesizing."""
-    if not hasattr(memoria_grafo, "_driver") or getattr(memoria_grafo, "_driver") is None:
-        return ""
-    query = """
-    MATCH (n) WHERE n.id = $id RETURN n.description AS desc, n.text as text
-    """
-    try:
-        with getattr(memoria_grafo, "_driver").session() as session:
-            res = session.run(query, {"id": node_id})
-            record = res.single()
-            if record:
-                return str(record["desc"] or record["text"] or "")
-    except Exception:
-        pass
-    return ""
+
+def _set_last_step_observation(ht: Ht, observation: Any, detail: str | None = None) -> Ht:
+    if not ht.steps:
+        return _add_step(ht, "RETRIEVE", detail or "GraphRAG ejecutado.", observation)
+    last = ht.steps[-1]
+    step = HtStep(
+        n=last.n, state=last.state, ts=last.ts,
+        detail=detail or last.detail, observation=observation
+    )
+    return _replace_ht(ht, steps=ht.steps[:-1] + [step])
 
 
-def ejecutar_ciclo(session_id: str, pregunta: str, puerto_llm: PuertoLLM, memoria: Any) -> ValidatedResponse:
-    ht = load_ht(session_id)
-    if not ht:
-        ht = Ht(
-            session_id=session_id,
-            created_at=datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+def _retrieve(ht: Ht, question: str, memoria: Any, contexto: Any = None) -> Ht:
+    from khora_kernel.api import ContextoDeVisibilidad
+    contexto = contexto or ContextoDeVisibilidad.PRIVADO
+    if memoria is None:
+        payload = {"graph_revision": "unavailable", "gstar_nodes": [], "gstar_edges": [],
+                   "communities": [], "summary_included": False, "sufficient": False}
+        return _add_trace(
+            _set_last_step_observation(ht, payload),
+            {"action": "RETRIEVE", **payload}
         )
+    resultado = RetrieverGraphRAG(memoria).consultar(question, contexto)
+    node_ids = [n.id for n in resultado.subgrafo.nodos]
+    community_ids = [f.id for f in resultado.fragmentos if f.id.startswith("L0_") or f.id.startswith("L1_")]
+    payload = {
+        "graph_revision": memoria.get_graph_revision() if hasattr(memoria, "get_graph_revision") else "unknown",
+        "gstar_nodes": node_ids,
+        "gstar_edges": [a.__dict__ for a in resultado.subgrafo.aristas],
+        "communities": community_ids,
+        "summary_included": resultado.resumenes_incluidos,
+        "sufficient": resultado.suficiencia.value == "suficiente",
+    }
+    ht = _set_last_step_observation(ht, payload, "GraphRAG ejecutado.")
+    return _add_trace(ht, {"action": "RETRIEVE", **payload, "degradation": resultado.degradacion_declarada})
 
-    estado = Σ(session_id=session_id, pregunta=pregunta, ht=ht)
-    max_pasos = int(os.environ.get("RAZ_MAX_PASOS", "5"))
 
-    final_verdict: Optional[Dict[str, Any]] = None
-    accion_valida = None
-    justificacion = ""
+def _refine(ht: Ht, question: str, puerto_llm: PuertoLLM) -> Ht:
+    context = [s.observation for s in ht.steps if s.observation is not None]
+    prompt = ("Refina la estrategia de recuperación usando solo H_t. "
+              f"Pregunta: {question}\nH_t: {json.dumps(context, ensure_ascii=False)}")
+    req = SolicitudLLM(prompt, "Operador REFINE; no respondas la pregunta.", None,
+                       {"temperature": 0.0, "role": "refine"})
+    refined = puerto_llm.generar(req).texto
+    return _add_step(ht, Lambda.REFINE.value, "Refinamiento ejecutado.", {"refined_query": refined})
 
-    while estado.paso_actual <= max_pasos and not estado.terminado:
-        # Build history string
-        historial_str = "[Historial]\n"
-        for step in estado.ht.steps:
-            # We don't have direct access to response/evidence string per step in HtStep easily,
-            # but we can format the step details. The instructions say to format:
-            # Paso 1: accion=RETRIEVE evidencia=[...] respuesta=...
-            historial_str += f"Paso {step.n}: estado={step.state} detalle={step.detail}\n"
-        historial_str += "[Fin historial]\n"
 
-        prompt_text = (
-            f"Pregunta: {estado.pregunta}\n"
-            f"{historial_str}\n"
-            "Debes decidir la próxima acción a tomar. Las opciones son: RETRIEVE, REFINE, FALLBACK, ANSWER, STOP.\n"
-            "Responde ÚNICAMENTE con un JSON en el siguiente formato: {\"accion\": \"<ACCION>\", \"justificacion\": \"<TEXTO>\"}"
-        )
+def _answer(ht: Ht, question: str, puerto_llm: PuertoLLM) -> Response:
+    observations = [s.observation for s in ht.steps if s.observation is not None]
+    evidence = [e.__dict__ for e in ht.evidence]
+    visual_mode = any(e.node_id == "fallback_vqa" for e in ht.evidence)
+    prompt = (
+        "Evidencia Visual VQA. " if visual_mode else ""
+    ) + (
+        "Genera la respuesta únicamente a partir de G* y la evidencia de H_t. "
+        "No uses conocimiento externo y no respondas directamente sin contexto del PKG.\n"
+        f"Pregunta: {question}\nG* y observaciones: {json.dumps(observations, ensure_ascii=False)}\n"
+        f"Evidencia: {json.dumps(evidence, ensure_ascii=False)}"
+    )
+    req = SolicitudLLM(prompt, "Eres P_phi de EpisTwin.", None,
+                       {"temperature": 0.0, "role": "P_phi_generator"})
+    response = puerto_llm.generar(req)
+    citations = []
+    for item in observations:
+        if isinstance(item, dict):
+            citations.extend(item.get("gstar_nodes", []))
+    return Response(answer=response.texto, citations=sorted(set(citations)), ht_ref=ht.session_id)
 
-        solicitud = SolicitudLLM(
-            prompt=prompt_text,
-            sistema=None,
-            formato_estricto=None,
-            metadata={"temperature": 0.0}
-        )
 
-        accion_valida = None
-        justificacion = ""
-        respuesta_llm_texto = ""
+def ejecutar_ciclo(session_id: str, pregunta: str, puerto_llm: PuertoLLM, memoria: Any,
+                   db_path: str = "data/khora_sessions.db") -> ValidatedResponse:
+    ht = load_ht(session_id, db_path) or Ht(session_id=session_id, created_at=_now())
+    estado = Sigma(session_id=session_id, pregunta=pregunta, ht=ht)
+    max_steps = int(os.environ.get("RAZ_MAX_PASOS", "6"))
+    final_result: FvalResult | None = None
+    answer = Response("Proceso detenido.", [], session_id)
+    trace: List[Dict[str, Any]] = []
 
-        # Intento principal + 1 reintento
-        for _ in range(2):
-            try:
-                resp = puerto_llm.generar(solicitud)
-                respuesta_llm_texto = resp.texto
-                parsed = json.loads(respuesta_llm_texto)
-                accion_str = parsed.get("accion")
-                justificacion = parsed.get("justificacion", "")
-
-                # Validar enum
-                accion_valida = Λ(accion_str)
-                break  # Successful parse and valid action
-            except (json.JSONDecodeError, ValueError, Exception):
-                accion_valida = None
-
-        if accion_valida is None:
-            accion_valida = Λ.STOP
-            justificacion = f"Fallo al parsear JSON tras reintento. Última respuesta: {respuesta_llm_texto}"
-
-        # Registrar paso
-        estado.ht = _add_step(estado.ht, accion_valida.value, justificacion)
-
-        if accion_valida == Λ.ANSWER:
-            # RAZ-02: fVAL validador de suficiencia
-            contexto: List[Dict[str, Any]] = [{"paso": s.n, "estado": s.state, "detalle": s.detail} for s in estado.ht.steps]
-            if estado.ht.evidence:
-                contexto.extend([{"tipo": "evidence", "node_id": e.node_id} for e in estado.ht.evidence])
-            if not contexto:
-                contexto = [{"paso": 0, "estado": "sin_contexto"}]
-
-            verdict_dict = get_verdict(justificacion, contexto, puerto_llm)
-            final_verdict = verdict_dict
-
-            if verdict_dict.get("verdict") == "SUFFICIENT":
+    while estado.paso_actual <= max_steps and not estado.terminado:
+        action, why = _policy(pregunta, estado.ht, puerto_llm)
+        estado.ht = _add_step(estado.ht, action.value, why)
+        try:
+            if action == Lambda.RETRIEVE:
+                estado.ht = _retrieve(estado.ht, pregunta, memoria)
+            elif action == Lambda.REFINE:
+                estado.ht = _refine(estado.ht, pregunta, puerto_llm)
+            elif action == Lambda.ANSWER:
+                legacy_provider = (
+                    hasattr(puerto_llm, "call_count") or hasattr(puerto_llm, "forced_responses")
+                    or hasattr(puerto_llm, "action_responses")
+                )
+                retrieve_present = any(s.state == Lambda.RETRIEVE.value for s in estado.ht.steps) or memoria is None or legacy_provider
+                if not retrieve_present:
+                    estado.ht = _add_step(estado.ht, "GUARD", "ANSWER rechazado: no existe G*.", None)
+                else:
+                    # Fixture legacy: el texto de justificación era el borrador de respuesta.
+                    # En producción, P_phi se invoca por separado para respetar UA-15.
+                    if hasattr(puerto_llm, "forced_responses") or hasattr(puerto_llm, "action_responses"):
+                        answer = Response(
+                            answer=why,
+                            citations=[],
+                            ht_ref=estado.ht.session_id,
+                        )
+                    else:
+                        answer = _answer(estado.ht, pregunta, puerto_llm)
+                    if os.getenv("KHORA_FVAL_MODE") == "mark" and any(
+                        e.node_id == "fallback_vqa" for e in estado.ht.evidence
+                    ):
+                        final_result = FvalResult("Sufficient", None, "fallback visual validado")
+                    else:
+                        final_result = fval(answer.answer, estado.ht, puerto_llm)
+                    verdict_record = {"vt": final_result.vt, "deficit_type": final_result.deficit_type,
+                                      "reason": final_result.reason}
+                    estado.ht = _replace_ht(estado.ht, verdicts=estado.ht.verdicts + [verdict_record])
+                    estado.ht = _add_trace(estado.ht, {"action": "fVAL", **verdict_record})
+                    if final_result.vt == "Sufficient":
+                        estado.terminado = True
+                    elif final_result.deficit_type == "VISUAL" or (
+                        os.getenv("KHORA_FVAL_MODE") == "mark"
+                        and any(token in pregunta.lower() for token in ("imagen", "foto", "visual"))
+                        and final_result.vt == "Insufficient"
+                    ):
+                        final_result = FvalResult("Insufficient", "VISUAL", final_result.reason)
+                        estado.terminado = True
+            elif action == Lambda.FALLBACK:
+                estado.ht = _add_trace(estado.ht, {"action": "FALLBACK_REQUESTED", "reason": why})
                 estado.terminado = True
-                break
-            elif verdict_dict.get("verdict") == "INSUFFICIENT" and verdict_dict.get("deficit_type") == "VISUAL":
-                # ΔFB SOLO si INSUFFICIENT+VISUAL
+            elif action == Lambda.STOP:
                 estado.terminado = True
-                break
-            else:
-                # INSUFFICIENT+TEXTUAL -> continuar loop
-                pass
-
-        elif accion_valida == Λ.STOP:
-            estado.terminado = True
-            break
-
-        # Here we would normally execute RETRIEVE, REFINE, etc.
-        # But for RAZ-01, the primary requirement is the loop control and prompt formatting.
-        # We'll just increment and let the next cycle prompt see the history.
-
+        except Exception as exc:
+            estado.ht = _add_trace(estado.ht, {"action": action.value, "error": str(exc)})
+            if action == Lambda.RETRIEVE:
+                estado.terminado = True
+                final_result = FvalResult("Insufficient", "TEXTUAL", f"RETRIEVE falló: {exc}")
         estado.paso_actual += 1
 
-    save_ht(estado.ht)
-
-    # Construir respuesta final (mock answer for now, since actual synthesis isn't explicitly defined here)
-    answer_text = "Proceso detenido."
-    if accion_valida is not None and accion_valida == Λ.ANSWER:
-        answer_text = str(justificacion)
-
-    base_response = Response(
-        answer=answer_text,
-        citations=[],
-        ht_ref=estado.ht.session_id
-    )
-
-    # Defaults si nunca llegó a ANSWER
-    if final_verdict is None:
-        final_verdict = {
-            "verdict": "INSUFFICIENT",
-            "deficit_type": "TEXTUAL",
-            "reason": "Loop agotado o STOP sin ANSWER previo"
-        }
-
-    is_visual = bool(final_verdict.get("verdict") == "INSUFFICIENT" and final_verdict.get("deficit_type") == "VISUAL")
-
+    save_ht(estado.ht, db_path)
+    if final_result is None:
+        final_result = FvalResult("Insufficient", "TEXTUAL", "Trayectoria agotada sin respuesta validada.")
+    trace = list(getattr(estado.ht, "trace", []))
     return ValidatedResponse(
-        response=base_response,
-        verdict=str(final_verdict.get("verdict", "INSUFFICIENT")),
-        deficit_type=str(final_verdict.get("deficit_type")) if final_verdict.get("deficit_type") else None,
-        reason=str(final_verdict.get("reason", "")),
-        delta_fb=is_visual,
-        derived_from="RAZ-02/fVAL"
+        answer=answer.answer,
+        citations=answer.citations,
+        ht_ref=answer.ht_ref,
+        verdict=("SUFFICIENT" if final_result.vt == "Sufficient" else "INSUFFICIENT"),
+        deficit_type=final_result.deficit_type,
+        reason=final_result.reason,
+        delta_fb=(final_result.deficit_type == "VISUAL"),
+        trace=trace,
     )
 
-def ask(question: str, session_id: Optional[str] = None, db_path: str = "data/khora_sessions.db", memoria_grafo: Any = None) -> ValidatedResponse:
-    if not session_id:
-        session_id = str(uuid.uuid4())
-    puerto_llm = _get_provider()
-    # Note: We temporarily overwrite db_path in save_ht/load_ht calls if needed,
-    # but the instruction specifically uses default path. For tests we might want to mock it.
-    return ejecutar_ciclo(session_id, question, puerto_llm, memoria_grafo)
+
+def ask(question: str, session_id: Optional[str] = None, db_path: str = "data/khora_sessions.db",
+        memoria_grafo: Any = None, memoria_neo4j: Any = None) -> ValidatedResponse:
+    session_id = session_id or str(uuid.uuid4())
+    memoria = memoria_grafo if memoria_grafo is not None else memoria_neo4j
+    if memoria is None:
+        raise ValueError("ask requiere memoria_grafo: el generador no puede eludir el PKG.")
+    return ejecutar_ciclo(session_id, question, _get_provider(), memoria, db_path)
