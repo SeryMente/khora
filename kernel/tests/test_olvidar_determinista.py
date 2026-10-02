@@ -214,9 +214,27 @@ def test_olvidar_runtime_regenera_comunidades_y_resumenes(neo4j_config, monkeypa
             assert session.run(
                 "MATCH (e:Entity {canonical_key:'KEEP'}) RETURN count(e) AS n"
             ).single()["n"] == 1
-            assert session.run(
-                "MATCH (c:Community) WHERE c.invalid_at IS NULL AND c.published = true RETURN count(c) AS n"
-            ).single()["n"] >= 1
+            publication_rows = session.run(
+                """
+                MATCH (c:Community)
+                RETURN c.community_id AS id,
+                       c.graph_revision AS revision,
+                       c.published AS published,
+                       c.invalid_at AS invalid_at
+                ORDER BY id
+                """
+            )
+            publications = [dict(row) for row in publication_rows]
+            assert publications, f"No communities after delete: {publications}"
+
+            active_publications = [
+                row for row in publications
+                if row["invalid_at"] is None and row["published"] is True
+            ]
+            assert active_publications, (
+                f"Communities regenerated but not published: "
+                f"expected_revision={after_revision}; rows={publications}"
+            )
             assert session.run(
                 """
                 MATCH (e:Entity {canonical_key:'KEEP'})-[:IN_COMMUNITY]->(c:Community)
