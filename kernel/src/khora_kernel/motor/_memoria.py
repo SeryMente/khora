@@ -466,6 +466,12 @@ class Neo4jMemoriaOrganizada:
                   }
                 RETURN count(e) AS value
             """,
+            "active_membership_to_invalid_community": """
+                MATCH (:Entity)-[r:IN_COMMUNITY]->(c:Community)
+                WHERE r.invalid_at IS NULL
+                  AND c.invalid_at IS NOT NULL
+                RETURN count(r) AS value
+            """,
             "active_communities_without_members": """
                 MATCH (c:Community)
                 WHERE c.invalid_at IS NULL
