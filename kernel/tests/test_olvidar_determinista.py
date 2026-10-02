@@ -14,11 +14,11 @@ def _memoria_mock():
     driver.session.return_value.__enter__.return_value = session
     session.begin_transaction.return_value.__enter__.return_value = tx
     memoria._driver = driver
-    return memoria, tx
+    return memoria, tx, session
 
 
 def test_olvidar_cubre_io_relaciones_entidades_literales_y_comunidades(monkeypatch):
-    memoria, tx = _memoria_mock()
+    memoria, tx, session = _memoria_mock()
 
     import khora_kernel.embeddings as embeddings
     invalidated = {"value": False}
@@ -49,6 +49,7 @@ def test_olvidar_cubre_io_relaciones_entidades_literales_y_comunidades(monkeypat
         return result
 
     tx.run.side_effect = run
+    session.run.return_value = io_result
 
     acta = memoria.olvidar("io-1")
     assert len(acta) == 64
@@ -65,10 +66,10 @@ def test_olvidar_cubre_io_relaciones_entidades_literales_y_comunidades(monkeypat
 
 
 def test_olvidar_ausente_tiene_huella_determinista():
-    memoria, tx = _memoria_mock()
+    memoria, tx, session = _memoria_mock()
     result = MagicMock()
     result.single.return_value = None
-    tx.run.return_value = result
+    session.run.return_value = result
 
     a = memoria.olvidar("io-ausente")
     b = memoria.olvidar("io-ausente")
