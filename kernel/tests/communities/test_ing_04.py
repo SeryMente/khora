@@ -12,10 +12,18 @@ from khora_kernel.poblacion import ingestar
 class DummyPuertoLLM:
     def generar(self, solicitud):
         from khora_kernel.api import Provenance, RespuestaLLM
+
+        prompt = solicitud.prompt or ""
+        if "¿Faltaron entidades" in prompt:
+            texto = "NO"
+        elif "Extrae entidades y relaciones" in prompt:
+            texto = "A, interactua_con, B, Concepto\nB, relacionado_con, C, Concepto"
+        else:
+            texto = "Resumen de prueba"
         return RespuestaLLM(
-            texto="Dummy response",
+            texto=texto,
             modelo="dummy",
-            provenance=Provenance("sys", None, "2024-01-01T00:00:00Z")
+            provenance=Provenance("sys", None, "2024-01-01T00:00:00Z"),
         )
 
 class DummyPuertoEmbeddings:
@@ -54,7 +62,7 @@ def test_ing_04_acr_1_1(memoria_limpia, caplog):
     from khora_kernel.psi import on_node_upserted
     ingestar(objeto, memoria_limpia, DummyPuertoLLM(), DummyPuertoEmbeddings(), on_upsert=on_node_upserted)
 
-    assert any("recalculo disparado por ingesta=obj-1" in record.message for record in caplog.records)
+    assert any("[PIPELINE] Leiden disparado por ingesta=obj-1" in record.message for record in caplog.records)
     assert any("ts=2024-05-01T12:00:00Z" in record.message for record in caplog.records)
 
 def test_ing_04_acr_2_1(memoria_limpia):

@@ -22,6 +22,11 @@ def on_node_upserted(node_id: str, memoria: Any, ts: str | None = None, puerto_l
     """
     from datetime import datetime, timezone
     ts = ts or datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+    logging.info(
+        "[PIPELINE] recalculo disparado por ingesta=%s ts=%s",
+        node_id,
+        ts,
+    )
     manifest = recalcular_leiden(node_id, memoria, ts)
     summary_status = {"communities_summarized": 0, "summary_error": None}
     try:
