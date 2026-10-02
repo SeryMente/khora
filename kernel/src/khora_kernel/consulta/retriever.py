@@ -102,8 +102,10 @@ class RetrieverGraphRAG(MotorDeConsulta):
                 expansion_rows = session.run(
                     """
                     UNWIND $seeds AS sid
-                    MATCH p=(s:Entity {canonical_key:sid})-[:RELATION*0..2]->(e:Entity)
-                    WHERE all(x IN nodes(p) WHERE x.invalid_at IS NULL)
+                    MATCH p=(s:Entity {canonical_key:sid})-[:RELATION*0..2]->(e)
+                    WHERE all(x IN nodes(p) WHERE x.invalid_at IS NULL
+                      AND any(label IN labels(x) WHERE label IN ['Entity','Literal','Blank']))
+                      AND any(label IN labels(e) WHERE label IN ['Entity','Literal','Blank'])
                     RETURN DISTINCT
                       [x IN nodes(p) | coalesce(x.id,x.canonical_key)] AS path_nodes,
                       [x IN relationships(p) | {
@@ -126,19 +128,23 @@ class RetrieverGraphRAG(MotorDeConsulta):
 
                 edge_rows = session.run(
                     """
-                    MATCH (a:Entity)-[r:RELATION]->(b:Entity)
+                    MATCH (a)-[r:RELATION]->(b)
                     WHERE a.invalid_at IS NULL AND b.invalid_at IS NULL
                       AND r.invalid_at IS NULL
+                      AND any(label IN labels(a) WHERE label IN ['Entity','Literal','Blank'])
+                      AND any(label IN labels(b) WHERE label IN ['Entity','Literal','Blank'])
                       AND a.canonical_key IN $ids AND b.canonical_key IN $ids
                     RETURN coalesce(a.id,a.canonical_key) AS source,
                            coalesce(b.id,b.canonical_key) AS target,
                            type(r) AS relation,
-                           a.label_original AS source_text,
-                           b.label_original AS target_text,
-                           a.provenance AS source_prov,
-                           b.provenance AS target_prov,
-                           a.visibilidad AS source_vis,
-                           b.visibilidad AS target_vis
+                           CASE WHEN a:Literal THEN toString(a.value)
+                                ELSE coalesce(a.label_original,a.canonical_key) END AS source_text,
+                           CASE WHEN b:Literal THEN toString(b.value)
+                                ELSE coalesce(b.label_original,b.canonical_key) END AS target_text,
+                           properties(a)['provenance'] AS source_prov,
+                           properties(b)['provenance'] AS target_prov,
+                           properties(a)['visibilidad'] AS source_vis,
+                           properties(b)['visibilidad'] AS target_vis
                     ORDER BY source, target, relation
                     """,
                     ids=list(visible_ids),
@@ -146,12 +152,15 @@ class RetrieverGraphRAG(MotorDeConsulta):
 
                 node_rows = session.run(
                     """
-                    MATCH (e:Entity)
+                    MATCH (e)
                     WHERE e.canonical_key IN $ids AND e.invalid_at IS NULL
+                      AND any(label IN labels(e) WHERE label IN ['Entity','Literal','Blank'])
                     RETURN coalesce(e.id,e.canonical_key) AS id,
-                           coalesce(e.label_original,e.canonical_key) AS text,
-                           e.provenance AS provenance,
-                           coalesce(e.visibilidad,'privado') AS visibilidad
+                           labels(e) AS node_labels,
+                           CASE WHEN e:Literal THEN toString(e.value)
+                                ELSE coalesce(e.label_original,e.canonical_key) END AS text,
+                           properties(e)['provenance'] AS provenance,
+                           coalesce(properties(e)['visibilidad'],'privado') AS visibilidad
                     ORDER BY id
                     """,
                     ids=list(visible_ids),
@@ -159,7 +168,12 @@ class RetrieverGraphRAG(MotorDeConsulta):
                 node_map = {}
                 fragmentos = []
                 for row in node_rows:
-                    node_map[row["id"]] = NodoSubgrafo(id=row["id"], etiqueta="Entity")
+                    node_labels = row.get("node_labels") or ["Entity"]
+                    etiqueta = next(
+                        (label for label in ("Entity", "Literal", "Blank") if label in node_labels),
+                        "Entity",
+                    )
+                    node_map[row["id"]] = NodoSubgrafo(id=row["id"], etiqueta=etiqueta)
                     fragmentos.append(
                         EntidadIngresada(
                             id=row["id"],
