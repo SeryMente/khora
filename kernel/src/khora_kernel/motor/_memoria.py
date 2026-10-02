@@ -550,48 +550,117 @@ class Neo4jMemoriaOrganizada:
                 tx.commit()
 
     def olvidar(self, io_id: str) -> str:
-        """Eliminación determinista: borra IO, relaciones del IO, comunidades antiguas
-        y entidades que ya no tienen ninguna procedencia activa. Devuelve una huella de acta."""
+        """Eliminación determinista con barrera contra influencia residual de derivados."""
         import hashlib
         import json
+        from pathlib import Path
+
+        from khora_kernel.embeddings import (
+            INDEX_FILE,
+            MAP_FILE,
+            META_FILE,
+            TEXT_FILE,
+            invalidate_index,
+            rebuild_index,
+        )
+
         self._asegurar_conexion()
-        with self._driver.session() as session:
-            with session.begin_transaction() as tx:
-                io = tx.run(
+
+        # UA-30: el índice queda no consultable antes de tocar el grafo.
+        invalidate_index()
+
+        try:
+            assert self._driver is not None
+            with self._driver.session() as session:
+                io = session.run(
                     "MATCH (io:InformationObject {io_id:$id}) "
                     "RETURN io.io_id AS id, io.sha256 AS sha, "
-                    "[ (io)-[:MENTIONS]->(e:Entity) | coalesce(e.id,e.canonical_key) ] AS entities",
+                    "[ (io)-[:MENTIONS]->(e:Entity) | "
+                    "coalesce(e.id,e.canonical_key) ] AS entities",
                     id=io_id,
                 ).single()
+
                 if not io:
+                    try:
+                        rebuild_index(self, self.get_graph_revision())
+                    except Exception:
+                        pass
                     return hashlib.sha256(f"absent:{io_id}".encode()).hexdigest()
 
-                entities = [e for e in (io["entities"] or []) if e]
-                literal_rows = tx.run(
-                    "MATCH (a)-[r:RELATION {io_id:$id}]->(l:Literal) "
-                    "RETURN DISTINCT coalesce(l.id,l.canonical_key) AS id",
-                    id=io_id,
-                )
-                literals = [row["id"] for row in literal_rows if row["id"]]
+                with session.begin_transaction() as tx:
+                    entities = [e for e in (io["entities"] or []) if e]
+                    literal_rows = tx.run(
+                        "MATCH (a)-[r:RELATION {io_id:$id}]->(l:Literal) "
+                        "RETURN DISTINCT coalesce(l.id,l.canonical_key) AS id",
+                        id=io_id,
+                    )
+                    literals = [row["id"] for row in literal_rows if row["id"]]
 
-                tx.run("MATCH ()-[r:RELATION {io_id:$id}]-() DELETE r", id=io_id)
-                tx.run("MATCH (io:InformationObject {io_id:$id}) DETACH DELETE io", id=io_id)
-                tx.run(
-                    "UNWIND $ids AS id MATCH (e:Entity {canonical_key:id}) "
-                    "WHERE NOT (e)<-[:MENTIONS]-(:InformationObject) DETACH DELETE e",
-                    ids=entities,
-                )
-                tx.run(
-                    "UNWIND $ids AS id MATCH (l:Literal {canonical_key:id}) "
-                    "WHERE NOT (l)<-[:RELATION]-() DETACH DELETE l",
-                    ids=literals,
-                )
-                tx.run("MATCH (c:Community) DETACH DELETE c")
-                tx.commit()
-        return hashlib.sha256(
-            json.dumps({"io_id": io_id, "sha256": io["sha"], "entities": sorted(entities)},
-                       sort_keys=True, separators=(",", ":")).encode()
-        ).hexdigest()
+                    tx.run(
+                        "MATCH ()-[r:RELATION {io_id:$id}]-() DELETE r",
+                        id=io_id,
+                    )
+                    tx.run(
+                        "MATCH (io:InformationObject {io_id:$id}) "
+                        "DETACH DELETE io",
+                        id=io_id,
+                    )
+                    tx.run(
+                        "UNWIND $ids AS id "
+                        "MATCH (e:Entity {canonical_key:id}) "
+                        "WHERE NOT (e)<-[:MENTIONS]-(:InformationObject) "
+                        "DETACH DELETE e",
+                        ids=entities,
+                    )
+                    tx.run(
+                        "UNWIND $ids AS id "
+                        "MATCH (l:Literal {canonical_key:id}) "
+                        "WHERE NOT (l)<-[:RELATION]-() "
+                        "DETACH DELETE l",
+                        ids=literals,
+                    )
+                    tx.run("MATCH (c:Community) DETACH DELETE c")
+                    tx.commit()
+
+            manifest_dir = Path("data/epistwin")
+            if manifest_dir.exists():
+                for path in manifest_dir.glob("*.json"):
+                    try:
+                        path.unlink()
+                    except OSError:
+                        pass
+
+            try:
+                rebuild_index(self, self.get_graph_revision())
+            except Exception:
+                # Nunca dejar un índice viejo utilizable si la reconstrucción falla.
+                for path in (INDEX_FILE, MAP_FILE, META_FILE, TEXT_FILE):
+                    try:
+                        path.unlink()
+                    except OSError:
+                        pass
+
+            return hashlib.sha256(
+                json.dumps(
+                    {
+                        "io_id": io_id,
+                        "sha256": io["sha"],
+                        "entities": sorted(entities),
+                        "literals": sorted(literals),
+                    },
+                    sort_keys=True,
+                    separators=(",", ":"),
+                ).encode()
+            ).hexdigest()
+
+        except Exception:
+            # Ante rollback/fallo, el índice permanece invalidado; intentamos
+            # reconstruir únicamente contra el grafo íntegro resultante.
+            try:
+                rebuild_index(self, self.get_graph_revision())
+            except Exception:
+                pass
+            raise
 
     def get_comunidades_vigentes(self) -> List[Dict[str, Any]]:
         self._asegurar_conexion()
