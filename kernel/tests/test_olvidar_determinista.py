@@ -1,6 +1,8 @@
 # @l0 L0-002-R · @req KA-00/REQ-2 · @acr ACR-2.1
+import json
 from unittest.mock import MagicMock
 
+import khora_kernel.embeddings as embeddings
 from khora_kernel.motor._memoria import Neo4jMemoriaOrganizada
 
 
@@ -74,9 +76,6 @@ def test_olvidar_ausente_tiene_huella_determinista():
 
 
 def test_olvidar_runtime_elimina_residuos_de_indice(neo4j_config, monkeypatch, tmp_path):
-    import json
-    import khora_kernel.embeddings as embeddings
-
     index_file = tmp_path / "pkg.idx"
     map_file = tmp_path / "pkg_map.json"
     meta_file = tmp_path / "pkg_map_meta.json"
