@@ -129,14 +129,6 @@ def test_olvidar_runtime_elimina_residuos_de_indice(neo4j_config, monkeypatch, t
         after_revision = memoria.get_graph_revision()
         assert after_revision != before_revision
 
-        from khora_kernel.communities import _semantic_projection
-        semantic_graph, semantic_manifest = _semantic_projection(memoria)
-        assert "KEEP" in semantic_graph.nodes(), (
-            f"KEEP existe en Neo4j pero no entra a la proyección: "
-            f"nodes={sorted(semantic_graph.nodes())}; manifest={semantic_manifest}"
-        )
-        assert semantic_manifest["vertex_count"] >= 1
-
         with memoria._driver.session() as session:
             assert session.run("MATCH (io:InformationObject {io_id:$id}) RETURN count(io) AS n", id="io-delete-runtime").single()["n"] == 0
             assert session.run("MATCH (e:Entity {canonical_key:'A'}) RETURN count(e) AS n").single()["n"] == 0
@@ -214,6 +206,14 @@ def test_olvidar_runtime_regenera_comunidades_y_resumenes(neo4j_config, monkeypa
 
         after_revision = memoria.get_graph_revision()
         assert after_revision != before_revision
+
+        from khora_kernel.communities import _semantic_projection
+        semantic_graph, semantic_manifest = _semantic_projection(memoria)
+        assert "KEEP" in semantic_graph.nodes(), (
+            f"KEEP existe en Neo4j pero no entra a la proyección: "
+            f"nodes={sorted(semantic_graph.nodes())}; manifest={semantic_manifest}"
+        )
+        assert semantic_manifest["vertex_count"] >= 1
 
         with memoria._driver.session() as session:
             assert session.run(
