@@ -419,7 +419,7 @@ class Neo4jMemoriaOrganizada:
         RETURN
             coalesce(a.id,a.canonical_key) AS a,
             labels(a) AS a_labels,
-            type(r) AS rel,
+            coalesce(r.type,type(r)) AS rel,
             coalesce(b.id,b.canonical_key) AS b,
             labels(b) AS b_labels,
             coalesce(r.io_id,'') AS io
