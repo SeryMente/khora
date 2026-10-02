@@ -179,6 +179,64 @@ def test_graph_revision_cambia_con_valor_de_nodo(neo4j_config):
         memoria.cerrar()
 
 
+def test_ingesta_idempotente_no_dispara_derivados(neo4j_config):
+    from khora_kernel.motor import Neo4jMemoriaOrganizada
+
+    memoria = Neo4jMemoriaOrganizada(
+        neo4j_config["uri"], neo4j_config["user"], neo4j_config["password"]
+    )
+    try:
+        with memoria._driver.session() as session:
+            session.run("MATCH (n) DETACH DELETE n")
+
+        objeto = ObjetoDeInformacion(
+            id="io-idempotent",
+            texto="Alice trabaja en Acme.",
+            provenance=Provenance(
+                origen="test",
+                driver="dummy",
+                timestamp="2026-10-02T20:00:00Z",
+            ),
+            metadata={
+                "volcado_id": "dump-idempotent",
+                "version": 1,
+                "sha256": "a" * 64,
+            },
+        )
+
+        calls = []
+
+        def hook(*args):
+            calls.append(args)
+
+        first = ingestar(
+            objeto,
+            memoria,
+            DummyPuertoLLM(),
+            DummyPuertoEmbeddings(),
+            on_upsert=hook,
+        )
+        revision_after_first = memoria.get_graph_revision()
+
+        second = ingestar(
+            objeto,
+            memoria,
+            DummyPuertoLLM(),
+            DummyPuertoEmbeddings(),
+            on_upsert=hook,
+        )
+        revision_after_second = memoria.get_graph_revision()
+
+        assert first.triples_escritos > 0
+        assert second.triples_escritos == 0
+        assert len(calls) == 1
+        assert revision_after_second == revision_after_first
+    finally:
+        with memoria._driver.session() as session:
+            session.run("MATCH (n) DETACH DELETE n")
+        memoria.cerrar()
+
+
 def test_psi_pipeline_propaga_revision_y_orden(monkeypatch):
     from khora_kernel import psi
 
