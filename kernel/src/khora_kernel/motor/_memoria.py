@@ -300,7 +300,7 @@ class Neo4jMemoriaOrganizada:
         relaciones: list[dict[str, Any]] = []
         for t in triples:
             object_kind = str((t.metadata or {}).get('node_kind', 'entity')).lower()
-            if t.origen_id == 'root' or t.destino_id == 'root':
+            if t.destino_id == 'root':
                 raise ValueError('Violación UA-03: u/root no puede aparecer como cola de una relación.')
             for node_id in [t.origen_id] + ([] if object_kind == 'literal' else [t.destino_id]):
                 entidades.setdefault(node_id, {
