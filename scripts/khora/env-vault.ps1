@@ -78,6 +78,107 @@ function Set-KhoraEnvVaultVariable {
     KhoraVault-Save -VaultObj $vault;$value=$null
 }
 
+function New-KhoraTemporaryVaultAccess {
+    param(
+        [int]$Minutes = 15,
+        [string]$Path = (Join-Path $env:LOCALAPPDATA 'Khora\state\vault-key-temporary.dpapi.json')
+    )
+    if($Minutes -lt 1 -or $Minutes -gt 60){throw 'La ventana temporal debe ser de 1 a 60 minutos.'}
+    $secure=Read-Host 'Llave temporal de la bóveda (no se mostrará)' -AsSecureString
+    if($secure.Length -lt 8){throw 'Llave temporal demasiado corta.'}
+    $directory=Split-Path -Parent $Path
+    New-Item -ItemType Directory -Path $directory -Force|Out-Null
+    $payload=[ordered]@{
+        expiresAtUtc=[DateTime]::UtcNow.AddMinutes($Minutes).ToString('o')
+        secureValue=($secure|ConvertFrom-SecureString)
+    }
+    $temp=$Path+'.tmp'
+    $payload|ConvertTo-Json -Depth 4|Set-Content -LiteralPath $temp -Encoding UTF8
+    Move-Item -LiteralPath $temp -Destination $Path -Force
+    Write-Host ('TEMP_VAULT_ACCESS_READY expires='+$payload.expiresAtUtc)
+    $secure=$null
+}
+
+function Import-KhoraTemporaryVaultAccess {
+    param([string]$Path = (Join-Path $env:LOCALAPPDATA 'Khora\state\vault-key-temporary.dpapi.json'))
+    if(-not(Test-Path -LiteralPath $Path)){throw 'No existe acceso temporal de bóveda.'}
+    $payload=Get-Content -LiteralPath $Path -Raw|ConvertFrom-Json
+    $expires=[DateTime]::Parse($payload.expiresAtUtc,[Globalization.CultureInfo]::InvariantCulture,[Globalization.DateTimeStyles]::RoundtripKind)
+    if([DateTime]::UtcNow -ge $expires){
+        Remove-Item -LiteralPath $Path -Force -ErrorAction SilentlyContinue
+        throw 'El acceso temporal de bóveda ha expirado.'
+    }
+    $Global:KhoraVaultMasterKey=($payload.secureValue.Trim()|ConvertTo-SecureString)
+    Write-Host ('TEMP_VAULT_ACCESS_IMPORTED expires='+$expires.ToString('o'))
+    return $expires
+}
+
+function Remove-KhoraTemporaryVaultAccess {
+    param([string]$Path = (Join-Path $env:LOCALAPPDATA 'Khora\state\vault-key-temporary.dpapi.json'))
+    Remove-Item -LiteralPath $Path -Force -ErrorAction SilentlyContinue
+    $Global:KhoraVaultMasterKey=$null
+    Clear-KhoraEnvVaultSession
+    Write-Host 'TEMP_VAULT_ACCESS_REMOVED'
+}
+
+function Rotate-KhoraVaultMasterKey {
+    param(
+        [string]$BackupPath = ''
+    )
+    $vault=KhoraVault-Load
+    $oldSecure=KhoraVault-GetMasterKey
+    $oldKey=KhoraVault-DeriveKey -MasterSecure $oldSecure -Salt ([Convert]::FromBase64String($vault.salt))
+    $plaintext=@{}
+    try{
+        foreach($entry in $vault.entries.PSObject.Properties){
+            $plaintext[$entry.Name]=KhoraVault-Decrypt -Entry $entry.Value -Key $oldKey
+        }
+
+        $newSecure=Read-Host 'Nueva llave maestra de la bóveda' -AsSecureString
+        $confirmSecure=Read-Host 'Repite la nueva llave maestra' -AsSecureString
+        $newPlain=KhoraVault-SecureToPlain -Secure $newSecure
+        $confirmPlain=KhoraVault-SecureToPlain -Secure $confirmSecure
+        try{
+            if($newPlain.Length -lt 8){throw 'Nueva llave maestra demasiado corta.'}
+            if($newPlain -ne $confirmPlain){throw 'Las llaves maestras nuevas no coinciden.'}
+        }finally{
+            $confirmPlain=$null
+        }
+
+        $salt=New-Object byte[] 16
+        [Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($salt)
+        $newKey=KhoraVault-DeriveKey -MasterSecure $newSecure -Salt $salt
+        $entries=[ordered]@{}
+        foreach($entry in $plaintext.GetEnumerator()){
+            $entries[$entry.Key]=KhoraVault-Encrypt -PlainText $entry.Value -Key $newKey
+        }
+
+        if([string]::IsNullOrWhiteSpace($BackupPath)){
+            $stamp=[DateTime]::UtcNow.ToString('yyyyMMdd-HHmmss')
+            $BackupPath=$Global:KhoraVaultPath+'.bak-'+$stamp
+        }
+        Copy-Item -LiteralPath $Global:KhoraVaultPath -Destination $BackupPath -Force
+
+        $rotated=[ordered]@{
+            salt=[Convert]::ToBase64String($salt)
+            entries=[pscustomobject]$entries
+        }
+        $tmp=$Global:KhoraVaultPath+'.rotate.tmp'
+        [IO.File]::WriteAllText($tmp,($rotated|ConvertTo-Json -Depth 10),(New-Object Text.UTF8Encoding($false)))
+        Move-Item -LiteralPath $tmp -Destination $Global:KhoraVaultPath -Force
+
+        $Global:KhoraVaultMasterKey=$newSecure
+        Write-Host ('VAULT_MASTER_KEY_ROTATED entries='+$entries.Count+' backup='+$BackupPath)
+    }catch{
+        Remove-Item -LiteralPath ($Global:KhoraVaultPath+'.rotate.tmp') -Force -ErrorAction SilentlyContinue
+        throw
+    }finally{
+        $plaintext.Clear()
+        $newPlain=$null
+        $oldKey=$null
+    }
+}
+
 function Protect-KhoraFile {
     param([string]$InputFile,[string]$OutputFile)
     $plain=[IO.File]::ReadAllBytes($InputFile);$salt=New-Object byte[] 16;[Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($salt)
