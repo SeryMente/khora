@@ -82,6 +82,7 @@ def test_leiden_null_and_resolution():
     assert report["null_samples"] == 2
     sweep = resolution_sweep(g, [0.5, 1.0], seed=7)
     assert len(sweep) == 2
+    assert all(row["resolution_effective"] is False for row in sweep)
 
 
 def test_ab_and_longitudinal_registry():

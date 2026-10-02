@@ -75,7 +75,7 @@ def modularity_q(G: nx.Graph, partition: dict[str, Iterable[str]]) -> float:
 def resolution_sweep(
     G: nx.Graph, resolutions: Iterable[float], seed: int = 42
 ) -> list[dict[str, Any]]:
-    """Explora sensibilidad. Para modularity Q la resolución se reporta como parámetro externo."""
+    """Explora parámetros sin atribuir efecto a una resolución que no sea efectiva."""
     from khora_kernel.communities import jerarquia_leiden
     rows = []
     for resolution in resolutions:
@@ -83,6 +83,7 @@ def resolution_sweep(
         partition = {cid: info["miembros"] for cid, info in result.estructura.items()}
         rows.append({
             "resolution": float(resolution),
+            "resolution_effective": False,
             "community_count": len(partition),
             "partition": partition,
             "modularity_q": modularity_q(G, partition),
