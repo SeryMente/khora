@@ -135,6 +135,43 @@ def test_graph_revision_cambia_con_predicado_semantico(neo4j_config):
         memoria.cerrar()
 
 
+def test_graph_revision_cambia_con_valor_de_nodo(neo4j_config):
+    memoria = Neo4jMemoriaOrganizada(
+        neo4j_config["uri"],
+        neo4j_config["user"],
+        neo4j_config["password"],
+    )
+    try:
+        with memoria._driver.session() as session:
+            session.run(
+                "MATCH (n) WHERE n.canonical_key IN $ids DETACH DELETE n",
+                ids=["rev-value"],
+            )
+            session.run(
+                """
+                CREATE (e:Literal {
+                    canonical_key:'rev-value', id:'rev-value',
+                    value:'42', datatype:'integer',
+                    invalid_at:null, created_at:datetime(), valid_at:datetime()
+                })
+                """
+            )
+        before = memoria.get_graph_revision()
+        with memoria._driver.session() as session:
+            session.run(
+                "MATCH (e:Literal {canonical_key:'rev-value'}) SET e.value = '43'"
+            )
+        after = memoria.get_graph_revision()
+        assert after != before
+    finally:
+        with memoria._driver.session() as session:
+            session.run(
+                "MATCH (n) WHERE n.canonical_key IN $ids DETACH DELETE n",
+                ids=["rev-value"],
+            )
+        memoria.cerrar()
+
+
 def test_psi_pipeline_propaga_revision_y_orden(monkeypatch):
     from khora_kernel import psi
 
