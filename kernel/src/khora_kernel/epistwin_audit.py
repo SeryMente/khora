@@ -5,7 +5,6 @@ from __future__ import annotations
 import hashlib
 import json
 import math
-import random
 from dataclasses import dataclass
 from typing import Any, Iterable
 
@@ -61,9 +60,8 @@ def degree_preserving_null(G: nx.Graph, seed: int = 42, swaps: int | None = None
     H = G.copy()
     if H.number_of_edges() < 2:
         return H
-    rng = random.Random(seed)
     target = swaps if swaps is not None else max(1, 10 * H.number_of_edges())
-    nx.double_edge_swap(H, target, max_tries=max(target * 20, 100), seed=rng)
+    nx.double_edge_swap(H, target, max_tries=max(target * 20, 100), seed=seed)
     return H
 
 
