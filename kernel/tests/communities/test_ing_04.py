@@ -100,6 +100,41 @@ def test_ing_04_acr_2_1(memoria_limpia):
             assert record["i"] is None
         assert count > 0
 
+def test_graph_revision_cambia_con_predicado_semantico(neo4j_config):
+    memoria = Neo4jMemoriaOrganizada(
+        neo4j_config["uri"],
+        neo4j_config["user"],
+        neo4j_config["password"],
+    )
+    try:
+        with memoria._driver.session() as session:
+            session.run("MATCH (n) WHERE n.canonical_key IN $ids DETACH DELETE n", ids=["rev-A", "rev-B"])
+            session.run(
+                """
+                CREATE (a:Entity {canonical_key:'rev-A', id:'rev-A', label_original:'A',
+                    invalid_at:null, created_at:datetime(), valid_at:datetime()})
+                CREATE (b:Entity {canonical_key:'rev-B', id:'rev-B', label_original:'B',
+                    invalid_at:null, created_at:datetime(), valid_at:datetime()})
+                CREATE (a)-[:RELATION {type:'HAS_NAME', io_id:'rev-test',
+                    invalid_at:null, created_at:datetime(), valid_at:datetime()}]->(b)
+                """
+            )
+        before = memoria.get_graph_revision()
+        with memoria._driver.session() as session:
+            session.run(
+                """
+                MATCH (a:Entity {canonical_key:'rev-A'})-[r:RELATION {io_id:'rev-test'}]->(b:Entity {canonical_key:'rev-B'})
+                SET r.type = 'HAS_ALIAS'
+                """
+            )
+        after = memoria.get_graph_revision()
+        assert after != before
+    finally:
+        with memoria._driver.session() as session:
+            session.run("MATCH (n) WHERE n.canonical_key IN $ids DETACH DELETE n", ids=["rev-A", "rev-B"])
+        memoria.cerrar()
+
+
 def test_psi_pipeline_propaga_revision_y_orden(monkeypatch):
     from khora_kernel import psi
 
