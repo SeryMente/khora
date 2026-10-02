@@ -18,8 +18,8 @@ CONSTRAINTS = (
     "FOR (io:InformationObject) REQUIRE io.io_id IS UNIQUE",
     "CREATE CONSTRAINT information_object_canonical_key IF NOT EXISTS "
     "FOR (io:InformationObject) REQUIRE io.canonical_key IS UNIQUE",
-    "CREATE CONSTRAINT community_id IF NOT EXISTS "
-    "FOR (c:Community) REQUIRE c.community_id IS UNIQUE",
+    "CREATE CONSTRAINT community_identity IF NOT EXISTS "
+    "FOR (c:Community) REQUIRE (c.community_id, c.graph_revision) IS UNIQUE",
     "CREATE CONSTRAINT user_id IF NOT EXISTS "
     "FOR (u:User) REQUIRE u.id IS UNIQUE",
 )

@@ -316,10 +316,10 @@ def asentar(
             "Propuesta no ratificada: se requieren juicios (judgments) explícitos para asentar."
         )
 
-    io_id = (
-        (proposal.source_provenance or {}).get("io_id")
-        or ("io-" + proposal.source_triplet.volcado_id)
-    )
+    io_id = (proposal.source_provenance or {}).get("io_id")
+    if not io_id:
+        volcado = str(proposal.source_triplet.volcado_id or "")
+        io_id = volcado[3:] if volcado.startswith("io:") else volcado
 
     # Una propuesta ratificada sin items es un no-op válido: el extractor no
     # produjo conocimiento asentable. El hook causal sigue ejecutándose para
