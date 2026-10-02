@@ -1,7 +1,7 @@
 # @l0 L0-002-R · @req KA-00/REQ-2 · @acr ACR-2.1
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List
 
 from khora_kernel.api import PuertoLLM, SolicitudLLM
@@ -234,7 +234,7 @@ def get_all_communities(
 def log_costs(cid: str, level: int, prompt_tokens: int, completion_tokens: int, model: str):
     log_file = "logs/fsum_costs.jsonl"
     os.makedirs(os.path.dirname(log_file), exist_ok=True)
-    ts = datetime.utcnow().isoformat() + "Z"
+    ts = datetime.now(timezone.utc).isoformat()
     entry = {
         "community_id": cid,
         "level": level,

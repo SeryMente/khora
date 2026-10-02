@@ -1,7 +1,7 @@
 # @l0 L0-002-R · @req KA-00/REQ-2 · @acr ACR-2.1
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 
 import pytest
 
@@ -15,7 +15,7 @@ class MockPuertoLLM:
 
     def generar(self, solicitud: SolicitudLLM) -> RespuestaLLM:
         self.calls.append(solicitud)
-        prov = Provenance("llm:mock", "mock_driver", datetime.utcnow().isoformat() + "Z")
+        prov = Provenance("llm:mock", "mock_driver", datetime.now(timezone.utc).isoformat())
         # Generar un resumen que evidencie el prompt
         return RespuestaLLM("Resumen generado basado en prompt.", "mock-model", prov)
 
