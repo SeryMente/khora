@@ -649,8 +649,10 @@ class Neo4jMemoriaOrganizada:
 
             if os.getenv("KHORA_FSUM_AUTO", "1").lower() not in {"0", "false", "no"}:
                 try:
+                    from khora_kernel.proveedores.llm_generico import (
+                        ProveedorLLMGenerico,
+                    )
                     from khora_kernel.summaries import summarize_all
-                    from khora_kernel.proveedores.llm_generico import ProveedorLLMGenerico
                     summarize_all(
                         self,
                         ProveedorLLMGenerico(),
