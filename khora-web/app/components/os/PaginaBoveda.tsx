@@ -46,6 +46,32 @@ export default function PaginaBoveda() {
     }
   }
 
+  async function restablecerPin() {
+    if (!/^[0-9]{4,12}$/.test(pin)) {
+      setAviso("error: el nuevo pin debe tener entre 4 y 12 digitos");
+      return;
+    }
+    if (!window.confirm("Esto reemplazara el PIN actual de la Boveda. Continuar?")) return;
+    setAviso("restableciendo PIN...");
+    try {
+      const r = await fetch("/api/boveda", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ pin, reset: true }),
+      });
+      const d = await r.json();
+      if (!r.ok) {
+        setAviso("error: " + String(d?.error ?? r.status));
+        return;
+      }
+      setAviso("PIN restablecido y boveda abierta");
+      setPin("");
+      consultar();
+    } catch (e) {
+      setAviso("error: " + String(e));
+    }
+  }
+
   const configurado = estado?.configurado === true;
   const abierta = estado?.abierta === true;
 
@@ -181,6 +207,24 @@ export default function PaginaBoveda() {
           >
             {configurado ? "Abrir bóveda" : "Definir pin"}
           </button>
+
+          {configurado && (
+            <button
+              type="button"
+              onClick={restablecerPin}
+              disabled={pin.length < 4}
+              style={{
+                backgroundColor: "transparent",
+                color: "var(--khora-ink)",
+                borderColor: "var(--khora-border)",
+                borderWidth: "1px",
+                borderStyle: "solid",
+              }}
+              className="w-full p-2.5 text-xs font-bold uppercase tracking-widest transition-all cursor-pointer hover:opacity-80 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Restablecer PIN olvidado
+            </button>
+          )}
         </div>
 
         <VaultAgentAccessPanel />
