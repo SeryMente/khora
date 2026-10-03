@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { LockKeyhole, Clock3, TriangleAlert, Check } from "lucide-react";
+import VaultAgentAccessPanel from "./VaultAgentAccessPanel";
 
 type Estado = { configurado?: boolean; abierta?: boolean; minutos?: number; error?: string };
 
@@ -181,6 +182,8 @@ export default function PaginaBoveda() {
             {configurado ? "Abrir bóveda" : "Definir pin"}
           </button>
         </div>
+
+        <VaultAgentAccessPanel />
 
         {/* Response Notice */}
         {aviso && (
