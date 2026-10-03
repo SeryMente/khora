@@ -3,7 +3,6 @@
 import json
 
 import pytest
-
 from scripts.run_personalqa_judges import _case_rows, _validate_judge_diversity
 
 
