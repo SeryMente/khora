@@ -265,7 +265,7 @@ def clear() -> None:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Agente local de acceso temporal a la bóveda canónica de Cora.")
+    parser = argparse.ArgumentParser(description="Agente local de acceso temporal a la bóveda canónica de Khora.")
     sub = parser.add_subparsers(dest="action", required=True)
 
     p_enroll = sub.add_parser("enroll")
