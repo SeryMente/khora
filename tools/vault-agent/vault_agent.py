@@ -3,7 +3,7 @@
 
 No contiene la llave maestra en el repositorio. La llave se inscribe una sola vez
 y queda protegida con Windows DPAPI para el usuario actual. Cada ejecución posterior
-requiere un token efímero emitido por Cora Web y validado en su endpoint canónico.
+requiere un token efímero emitido por Khora Web y validado en su endpoint canónico.
 """
 
 from __future__ import annotations
@@ -34,7 +34,7 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
 TOKEN_RE = re.compile(r"^[A-Za-z0-9_-]{43}$")
-CORA_CANONICAL_URL = "https://khora-web.vercel.app"
+KHORA_CANONICAL_URL = "https://khora-web.vercel.app"
 STATE_PATH = Path(os.environ.get("LOCALAPPDATA", str(Path.home()))) / "Khora" / "state" / "vault-agent-master.dpapi.json"
 DEFAULT_VAULT_PATH = Path(__file__).resolve().parents[2] / "secrets" / "env-vault.enc.json"
 PBKDF2_ITERATIONS = 200_000
@@ -132,29 +132,44 @@ def load_master() -> str:
 def canonical_origin(value: str) -> str:
     value = value.rstrip("/")
     if not value.startswith("https://"):
-        raise VaultAgentError("Cora Web debe usar HTTPS.")
+        raise VaultAgentError("Khora Web debe usar HTTPS.")
     return value
 
 
+def token_from_clipboard() -> str:
+    try:
+        result = subprocess.run(
+            ["powershell", "-NoProfile", "-NonInteractive", "-Command", "Get-Clipboard -Raw"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+            check=True,
+        )
+    except (OSError, subprocess.SubprocessError) as exc:
+        raise VaultAgentError("No se pudo leer el portapapeles de Windows.") from exc
+    return result.stdout.strip()
+
 def parse_token_from_args(args: argparse.Namespace) -> str:
-    if getattr(args, "token_stdin", False):
+    if getattr(args, "token_clipboard", False):
+        token = token_from_clipboard()
+    elif getattr(args, "token_stdin", False):
         token = sys.stdin.readline().strip()
     else:
         token = getattr(args, "token", "") or ""
     if not TOKEN_RE.fullmatch(token):
-        raise VaultAgentError("Token de Cora inválido.")
+        raise VaultAgentError("Token de Khora inválido.")
     return token
 
 
-def introspect(token: str, cora_url: str = CORA_CANONICAL_URL) -> dict[str, Any]:
-    url = canonical_origin(cora_url) + "/api/security/vault-agent/introspect"
+def introspect(token: str, khora_url: str = KHORA_CANONICAL_URL) -> dict[str, Any]:
+    url = canonical_origin(khora_url) + "/api/security/vault-agent/introspect"
     request = urllib.request.Request(
         url,
         headers={
             "Authorization": f"Bearer {token}",
             "Accept": "application/json",
             "Cache-Control": "no-store",
-            "User-Agent": "cora-vault-agent/1",
+            "User-Agent": "khora-vault-agent/1",
         },
         method="GET",
     )
@@ -170,16 +185,16 @@ def introspect(token: str, cora_url: str = CORA_CANONICAL_URL) -> dict[str, Any]
                 code = candidate
         except Exception:
             pass
-        raise VaultAgentError(f"Cora Web rechazó la capacidad: {code}.") from exc
+        raise VaultAgentError(f"Khora Web rechazó la capacidad: {code}.") from exc
     except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as exc:
-        raise VaultAgentError("No se pudo contactar a Cora Web para validar la capacidad.") from exc
+        raise VaultAgentError("No se pudo contactar a Khora Web para validar la capacidad.") from exc
 
     if not isinstance(payload, dict) or payload.get("ok") is not True:
-        raise VaultAgentError("Cora Web devolvió una respuesta de capacidad inválida.")
+        raise VaultAgentError("Khora Web devolvió una respuesta de capacidad inválida.")
     if payload.get("scope") != TOKEN_SCOPE:
         raise VaultAgentError("La capacidad no contiene el ámbito de la bóveda canónica.")
-    if payload.get("audience") != canonical_origin(cora_url):
-        raise VaultAgentError("La capacidad no pertenece al origen canónico de Cora Web.")
+    if payload.get("audience") != canonical_origin(khora_url):
+        raise VaultAgentError("La capacidad no pertenece al origen canónico de Khora Web.")
     expires = parse_utc(str(payload["expiresAt"]))
     if expires <= utc_now():
         raise VaultAgentError("La capacidad de bóveda ha expirado.")
@@ -215,31 +230,31 @@ def enroll(vault_path: Path) -> None:
     first_name = next(iter(entries))
     decrypt_entry(entries[first_name], key)
     protect_master(master)
-    print("CORA_VAULT_AGENT_ENROLLED")
+    print("KHORA_VAULT_AGENT_ENROLLED")
     print("DPAPI_SCOPE=Windows-current-user")
     print("MASTER_PLAINTEXT_PERSISTED=no")
 
 
-def run_command(token: str, command: list[str], names: list[str] | None, vault_path: Path, cora_url: str) -> int:
+def run_command(token: str, command: list[str], names: list[str] | None, vault_path: Path, khora_url: str) -> int:
     if not command:
         raise VaultAgentError("Falta el comando hijo después de --.")
-    introspect(token, cora_url)
+    introspect(token, khora_url)
     env = os.environ.copy()
     env.update(unlock_environment(names, vault_path))
     process = subprocess.run(command, env=env)
     return int(process.returncode)
 
 
-def run_shell(token: str, names: list[str] | None, vault_path: Path, cora_url: str) -> int:
-    introspect(token, cora_url)
+def run_shell(token: str, names: list[str] | None, vault_path: Path, khora_url: str) -> int:
+    introspect(token, khora_url)
     env = os.environ.copy()
     env.update(unlock_environment(names, vault_path))
     return int(subprocess.call(["cmd.exe"], env=env))
 
 
-def revoke(token: str, cora_url: str) -> None:
-    introspect(token, cora_url)
-    url = canonical_origin(cora_url) + "/api/security/vault-agent/token"
+def revoke(token: str, khora_url: str) -> None:
+    introspect(token, khora_url)
+    url = canonical_origin(khora_url) + "/api/security/vault-agent/token"
     request = urllib.request.Request(
         url,
         headers={
@@ -249,10 +264,10 @@ def revoke(token: str, cora_url: str) -> None:
         },
         method="DELETE",
     )
-    # DELETE requires the Cora browser session, so the bearer capability alone is
+    # DELETE requires the Khora browser session, so the bearer capability alone is
     # intentionally not accepted by the server. This command therefore remains a
     # harmless compatibility hook and reports the canonical web control as source.
-    raise VaultAgentError("La revocación se realiza desde Cora Web; no se ejecutó ningún cambio local.")
+    raise VaultAgentError("La revocación se realiza desde Khora Web; no se ejecutó ningún cambio local.")
 
 
 def clear() -> None:
@@ -260,7 +275,7 @@ def clear() -> None:
         STATE_PATH.unlink()
     except FileNotFoundError:
         pass
-    print("CORA_VAULT_AGENT_LOCAL_CLEAR")
+    print("KHORA_VAULT_AGENT_LOCAL_CLEAR")
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -275,7 +290,8 @@ def build_parser() -> argparse.ArgumentParser:
         token_group = parser_action.add_mutually_exclusive_group(required=True)
         token_group.add_argument("--token")
         token_group.add_argument("--token-stdin", action="store_true")
-        parser_action.add_argument("--cora-url", default=CORA_CANONICAL_URL)
+        token_group.add_argument("--token-clipboard", action="store_true")
+        parser_action.add_argument("--khora-url", default=KHORA_CANONICAL_URL)
         parser_action.add_argument("--vault", default=str(DEFAULT_VAULT_PATH))
         parser_action.add_argument("--names", nargs="*", default=None)
         if action == "run":
@@ -285,7 +301,8 @@ def build_parser() -> argparse.ArgumentParser:
     token_group = p_revoke.add_mutually_exclusive_group(required=True)
     token_group.add_argument("--token")
     token_group.add_argument("--token-stdin", action="store_true")
-    p_revoke.add_argument("--cora-url", default=CORA_CANONICAL_URL)
+    token_group.add_argument("--token-clipboard", action="store_true")
+    p_revoke.add_argument("--khora-url", default=KHORA_CANONICAL_URL)
 
     sub.add_parser("clear")
     return parser
@@ -302,7 +319,7 @@ def main() -> int:
 
     token = parse_token_from_args(args)
     if args.action == "status":
-        payload = introspect(token, args.cora_url)
+        payload = introspect(token, args.khora_url)
         print(json.dumps({
             "valid": True,
             "expiresAt": payload["expiresAt"],
@@ -314,11 +331,11 @@ def main() -> int:
         command = list(args.command)
         if command and command[0] == "--":
             command = command[1:]
-        return run_command(token, command, args.names, Path(args.vault), args.cora_url)
+        return run_command(token, command, args.names, Path(args.vault), args.khora_url)
     if args.action == "shell":
-        return run_shell(token, args.names, Path(args.vault), args.cora_url)
+        return run_shell(token, args.names, Path(args.vault), args.khora_url)
     if args.action == "revoke":
-        revoke(token, args.cora_url)
+        revoke(token, args.khora_url)
         return 0
     raise VaultAgentError("Acción no soportada.")
 
@@ -327,5 +344,5 @@ if __name__ == "__main__":
     try:
         raise SystemExit(main())
     except VaultAgentError as exc:
-        print(f"CORA_VAULT_AGENT_ERROR: {exc}", file=sys.stderr)
+        print(f"KHORA_VAULT_AGENT_ERROR: {exc}", file=sys.stderr)
         raise SystemExit(2)
