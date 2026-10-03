@@ -18,5 +18,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     if (!s) throw new Error("AUTH_SECRET env var is required — no fallback allowed");
     return s;
   })(),
+  pages: { signIn: "/auth/signin" },
   trustHost: true, // We trust the host where Next-Auth is running (especially in playwright and standard vercel deploys)
 });

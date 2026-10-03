@@ -40,6 +40,7 @@ export const metadata: Metadata = {
         telephone: false,
     },
     icons: {
+        icon: "/khora-mark.svg",
         apple: "/apple-touch-icon.png",
     },
 };
@@ -61,6 +62,7 @@ export default function RootLayout({
             <head>
                 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
                 <meta name="theme-color" content="#0a0a0b" />
+                <link rel="icon" href="/khora-mark.svg" type="image/svg+xml" />
                 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
                 <script dangerouslySetInnerHTML={{ __html: GUION_TEMA }} />
             </head>
