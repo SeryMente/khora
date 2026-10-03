@@ -1,7 +1,7 @@
 "use client";
 
 import { Check, Clipboard, Clock3, Eye, EyeOff, LockKeyhole, RefreshCw, ShieldCheck, Trash2, TriangleAlert } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type Status = {
   active?: boolean;
@@ -14,60 +14,111 @@ type Status = {
 
 type Issued = {
   token: string;
+  issuedAt: string;
   expiresAt: string;
   audience: string;
   scope: string;
   minutes: number;
 };
 
+type HistoryEntry = {
+  issuedAt: string;
+  expiresAt: string;
+  revokedAt: string | null;
+  status: "active" | "expired" | "revoked";
+  scope: string;
+  audience: string;
+};
+
+type History = {
+  total: number;
+  active: number;
+  expired: number;
+  revoked: number;
+  entries: HistoryEntry[];
+  error?: string;
+};
+
+function formatRemaining(ms: number): string {
+  if (!Number.isFinite(ms) || ms <= 0) return "00:00:00";
+  const total = Math.floor(ms / 1000);
+  const hours = Math.floor(total / 3600);
+  const minutes = Math.floor((total % 3600) / 60);
+  const seconds = total % 60;
+  return [hours, minutes, seconds].map((value) => String(value).padStart(2, "0")).join(":");
+}
+
+function formatDate(value: string | null): string {
+  if (!value) return "—";
+  const parsed = new Date(value);
+  return Number.isFinite(parsed.getTime())
+    ? parsed.toLocaleString("es-MX", { dateStyle: "short", timeStyle: "medium" })
+    : "—";
+}
+
+function statusLabel(status: HistoryEntry["status"]): string {
+  if (status === "active") return "ACTIVA";
+  if (status === "expired") return "EXPIRADA";
+  return "REVOCADA";
+}
+
 export default function VaultAgentAccessPanel() {
   const [status, setStatus] = useState<Status | null>(null);
+  const [history, setHistory] = useState<History | null>(null);
   const [issued, setIssued] = useState<Issued | null>(null);
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState(false);
   const [visible, setVisible] = useState(false);
   const [notice, setNotice] = useState("");
+  const [now, setNow] = useState(() => Date.now());
 
   async function refresh() {
     try {
-      const response = await fetch("/api/security/vault-agent/token", { cache: "no-store" });
-      const data = await response.json();
-      setStatus(data && typeof data === "object" ? data : null);
+      const [statusResponse, historyResponse] = await Promise.all([
+        fetch("/api/security/vault-agent/token", { cache: "no-store" }),
+        fetch("/api/security/vault-agent/history?limit=12", { cache: "no-store" }),
+      ]);
+      const [statusData, historyData] = await Promise.all([statusResponse.json(), historyResponse.json()]);
+      setStatus(statusData && typeof statusData === "object" ? statusData : null);
+      setHistory(historyData && typeof historyData === "object" ? historyData : null);
     } catch {
       setStatus({ error: "No se pudo consultar el estado del acceso temporal." });
+      setHistory({ total: 0, active: 0, expired: 0, revoked: 0, entries: [], error: "No se pudo consultar el historial." });
     }
   }
 
   useEffect(() => {
     void refresh();
+    const tick = window.setInterval(() => setNow(Date.now()), 1000);
+    const poll = window.setInterval(() => void refresh(), 15000);
     const clear = () => {
       setIssued(null);
       setVisible(false);
       setCopied(false);
     };
     window.addEventListener("pagehide", clear);
-    return () => window.removeEventListener("pagehide", clear);
+    return () => {
+      window.clearInterval(tick);
+      window.clearInterval(poll);
+      window.removeEventListener("pagehide", clear);
+    };
   }, []);
 
+  const active = issued || (status?.active ? status : null);
+  const expiresAtMs = active?.expiresAt ? Date.parse(active.expiresAt) : 0;
+  const remainingMs = expiresAtMs - now;
+  const live = Boolean(active && Number.isFinite(expiresAtMs) && remainingMs > 0);
+
   useEffect(() => {
-    if (!issued) return;
-    const remaining = Date.parse(issued.expiresAt) - Date.now();
-    if (!Number.isFinite(remaining) || remaining <= 0) {
-      setIssued(null);
-      setVisible(false);
-      setCopied(false);
-      setNotice("La capacidad expiró y fue eliminada de esta página.");
-      void refresh();
-      return;
-    }
-    const timer = window.setTimeout(() => {
-      setIssued(null);
-      setVisible(false);
-      setCopied(false);
-      setNotice("La capacidad expiró y fue eliminada de esta página.");
-    }, remaining);
-    return () => window.clearTimeout(timer);
-  }, [issued]);
+    if (!issued || !Number.isFinite(expiresAtMs) || remainingMs > 0) return;
+    setIssued(null);
+    setVisible(false);
+    setCopied(false);
+    setNotice("La capacidad expiró y fue eliminada de esta página.");
+    void refresh();
+  }, [expiresAtMs, issued, remainingMs]);
+
+  const historico = useMemo(() => history ?? { total: 0, active: 0, expired: 0, revoked: 0, entries: [] }, [history]);
 
   async function issue() {
     if (issued && !window.confirm("Emitir una nueva capacidad revocará la actual. ¿Continuar?")) return;
@@ -85,13 +136,15 @@ export default function VaultAgentAccessPanel() {
         cache: "no-store",
       });
       const data = await response.json();
-      if (!response.ok) throw new Error(
-        data?.error === "rate_limit_exceeded"
-          ? "Se alcanzó el límite temporal de emisiones."
-          : data?.error === "not_authorized"
-            ? "Tu sesión no está autorizada para emitir esta capacidad."
-            : "Khora Web no pudo emitir la capacidad."
-      );
+      if (!response.ok) {
+        throw new Error(
+          data?.error === "rate_limit_exceeded"
+            ? "Se alcanzó el límite temporal de emisiones."
+            : data?.error === "not_authorized"
+              ? "Tu sesión no está autorizada para emitir esta capacidad."
+              : "Khora Web no pudo emitir la capacidad."
+        );
+      }
       if (
         typeof data?.token !== "string" ||
         typeof data?.expiresAt !== "string" ||
@@ -105,7 +158,7 @@ export default function VaultAgentAccessPanel() {
       setIssued(next);
       await navigator.clipboard.writeText(next.token);
       setCopied(true);
-      setNotice("Capacidad emitida y copiada al portapapeles. Pégala directamente en ChatGPT cuando vayas a trabajar en el entorno local.");
+      setNotice("Capacidad emitida y copiada al portapapeles. Pégala directamente en ChatGPT para trabajar en el entorno local.");
       window.setTimeout(() => setCopied(false), 2500);
       await refresh();
     } catch (error) {
@@ -146,10 +199,6 @@ export default function VaultAgentAccessPanel() {
     }
   }
 
-  const active = issued || (status?.active ? status : null);
-  const expiresAt = active?.expiresAt ? Date.parse(active.expiresAt) : 0;
-  const live = Boolean(active && Number.isFinite(expiresAt) && expiresAt > Date.now());
-
   return (
     <section
       data-ui-id="seguridad.boveda.agente"
@@ -163,7 +212,7 @@ export default function VaultAgentAccessPanel() {
           <p className="text-[10px] font-bold uppercase tracking-[0.18em] opacity-55">Khora Web · Acceso delegado</p>
           <h2 id="vault-agent-title" className="mt-1 text-lg font-bold">Capacidad para agente local</h2>
           <p className="mt-1 text-xs leading-relaxed opacity-70">
-            Khora Web emite una credencial efímera de 60 minutos. No contiene secretos y solo autoriza al agente local a abrir la bóveda canónica.
+            Credencial efímera de 60 minutos. No contiene secretos y solo autoriza al agente local a abrir la bóveda canónica.
           </p>
         </div>
       </div>
@@ -190,15 +239,31 @@ export default function VaultAgentAccessPanel() {
         {busy ? "Procesando..." : live ? "Emitir nueva capacidad · revoca la actual" : "Emitir capacidad · 60 minutos"}
       </button>
 
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        {[
+          ["Emisiones", historico.total],
+          ["Activa", historico.active],
+          ["Expiradas", historico.expired],
+          ["Revocadas", historico.revoked],
+        ].map(([label, value]) => (
+          <div key={label} className="rounded-lg border p-3" style={{ borderColor: "var(--khora-border)", background: "var(--khora-bg)" }}>
+            <span className="block text-[9px] uppercase tracking-[0.12em] opacity-55">{label}</span>
+            <strong className="mt-1 block text-lg tabular-nums">{value}</strong>
+          </div>
+        ))}
+      </div>
+
       {live && active?.expiresAt && (
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="rounded-lg border p-3" style={{ borderColor: "var(--khora-border)" }}>
-            <span className="flex items-center gap-2 text-[10px] uppercase opacity-55"><Clock3 size={14} /> Vencimiento</span>
-            <strong className="mt-1 block text-xs">{new Date(active.expiresAt).toLocaleString("es-MX")}</strong>
+            <span className="flex items-center gap-2 text-[10px] uppercase opacity-55"><Clock3 size={14} /> Contador en vivo</span>
+            <strong className="mt-1 block font-mono text-xl tabular-nums">{formatRemaining(remainingMs)}</strong>
+            <span className="mt-1 block text-[10px] opacity-55">vence {formatDate(active.expiresAt)}</span>
           </div>
           <div className="rounded-lg border p-3" style={{ borderColor: "var(--khora-border)" }}>
             <span className="text-[10px] uppercase opacity-55">Estado</span>
-            <strong className="mt-1 flex items-center gap-2 text-xs text-emerald-400"><Check size={14} /> Capacidad activa</strong>
+            <strong className="mt-2 flex items-center gap-2 text-xs"><Check size={14} style={{ color: "var(--khora-accent)" }} /> Capacidad activa</strong>
+            <span className="mt-1 block text-[10px] opacity-55">emitida {formatDate(active.issuedAt ?? "")}</span>
           </div>
         </div>
       )}
@@ -234,10 +299,46 @@ export default function VaultAgentAccessPanel() {
         </div>
       )}
 
-      {notice && (
+      <div className="space-y-3">
+        <div className="flex items-end justify-between gap-3">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.14em] opacity-55">Auditoría de capacidades</p>
+            <h3 className="mt-1 text-sm font-bold">Historial de emisiones</h3>
+          </div>
+          <span className="text-[10px] opacity-50">actualiza cada 15 s</span>
+        </div>
+
+        <div className="overflow-hidden rounded-lg border" style={{ borderColor: "var(--khora-border)" }}>
+          {historico.entries.length === 0 ? (
+            <div className="p-4 text-xs opacity-60">Todavía no hay emisiones registradas.</div>
+          ) : (
+            <div className="divide-y" style={{ borderColor: "var(--khora-border)" }}>
+              {historico.entries.map((entry) => (
+                <div key={entry.issuedAt + entry.expiresAt} className="grid gap-2 p-3 text-xs sm:grid-cols-[1.35fr_1fr_0.8fr] sm:items-center">
+                  <div>
+                    <span className="block text-[9px] uppercase opacity-45">Generada</span>
+                    <strong className="font-mono text-[11px]">{formatDate(entry.issuedAt)}</strong>
+                  </div>
+                  <div>
+                    <span className="block text-[9px] uppercase opacity-45">{entry.status === "revoked" ? "Revocada" : "Expiración"}</span>
+                    <span className="font-mono text-[11px]">{formatDate(entry.revokedAt ?? entry.expiresAt)}</span>
+                  </div>
+                  <div className="sm:text-right">
+                    <span className="inline-flex rounded border px-2 py-1 text-[9px] font-bold tracking-[0.12em]" style={{ borderColor: "var(--khora-border)" }}>
+                      {statusLabel(entry.status)}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {(notice || status?.error || history?.error) && (
         <div className="flex items-start gap-3 rounded-lg border p-3 text-xs leading-relaxed" style={{ borderColor: "var(--khora-border)", background: "var(--khora-bg)" }} role="status">
-          {notice.includes("no pudo") || notice.includes("No se") || notice.includes("error") ? <TriangleAlert size={16} className="mt-0.5 shrink-0" /> : <Check size={16} className="mt-0.5 shrink-0" />}
-          <span>{notice}</span>
+          {notice.includes("no pudo") || notice.includes("No se") || status?.error || history?.error ? <TriangleAlert size={16} className="mt-0.5 shrink-0" /> : <Check size={16} className="mt-0.5 shrink-0" />}
+          <span>{notice || status?.error || history?.error}</span>
         </div>
       )}
     </section>

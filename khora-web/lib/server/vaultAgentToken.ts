@@ -17,6 +17,14 @@ type VaultAgentRow = {
   audience: string;
 };
 
+type VaultAgentHistoryRow = {
+  emitido_en: string;
+  expira_en: string;
+  revocado_en: string | null;
+  scope: string;
+  audience: string;
+};
+
 function sha256(value: string): string {
   return createHash("sha256").update(value, "utf8").digest("hex");
 }
@@ -93,7 +101,8 @@ export async function issueVaultAgentToken(email: string, origin?: string) {
 
     const token = randomBytes(TOKEN_BYTES).toString("base64url");
     const tokenHash = sha256(token);
-    const expiresAt = new Date(Date.now() + VAULT_AGENT_MINUTES * 60_000);
+    const issuedAt = new Date();
+    const expiresAt = new Date(issuedAt.getTime() + VAULT_AGENT_MINUTES * 60_000);
     await client.query(
       `INSERT INTO vault_agent_tokens(token_hash,usuario,expira_en,scope,audience)
        VALUES($1,$2,$3,$4,$5)`,
@@ -103,6 +112,7 @@ export async function issueVaultAgentToken(email: string, origin?: string) {
 
     return {
       token,
+      issuedAt: issuedAt.toISOString(),
       expiresAt: expiresAt.toISOString(),
       audience,
       scope: VAULT_AGENT_SCOPE,
@@ -171,6 +181,55 @@ export async function getVaultAgentStatus(email: string, origin?: string) {
     expiresAt: new Date(String(result.rows[0].expira_en)).toISOString(),
     scope: String(result.rows[0].scope),
     audience: String(result.rows[0].audience),
+  };
+}
+
+export async function getVaultAgentHistory(email: string, origin?: string, limit = 20) {
+  await ensureVaultAgentTokens();
+  const normalizedEmail = email.toLowerCase();
+  assertAllowed(normalizedEmail, origin);
+  const safeLimit = Math.min(Math.max(Math.trunc(limit) || 20, 1), 50);
+
+  const summary = await getDb().query(
+    `SELECT
+       COUNT(*)::int AS total,
+       COUNT(*) FILTER (WHERE revocado_en IS NULL AND expira_en > NOW())::int AS activas,
+       COUNT(*) FILTER (WHERE revocado_en IS NULL AND expira_en <= NOW())::int AS expiradas,
+       COUNT(*) FILTER (WHERE revocado_en IS NOT NULL)::int AS revocadas
+     FROM vault_agent_tokens
+     WHERE usuario=$1`,
+    [normalizedEmail]
+  );
+
+  const result = await getDb().query(
+    `SELECT emitido_en, expira_en, revocado_en, scope, audience
+     FROM vault_agent_tokens
+     WHERE usuario=$1
+     ORDER BY emitido_en DESC
+     LIMIT $2`,
+    [normalizedEmail, safeLimit]
+  );
+
+  const rows = result.rows as VaultAgentHistoryRow[];
+  return {
+    total: Number(summary.rows[0]?.total ?? 0),
+    active: Number(summary.rows[0]?.activas ?? 0),
+    expired: Number(summary.rows[0]?.expiradas ?? 0),
+    revoked: Number(summary.rows[0]?.revocadas ?? 0),
+    entries: rows.map((row) => {
+      const emittedAt = new Date(String(row.emitido_en));
+      const expiresAt = new Date(String(row.expira_en));
+      const revokedAt = row.revocado_en ? new Date(String(row.revocado_en)) : null;
+      const status = revokedAt ? "revoked" : expiresAt.getTime() > Date.now() ? "active" : "expired";
+      return {
+        issuedAt: emittedAt.toISOString(),
+        expiresAt: expiresAt.toISOString(),
+        revokedAt: revokedAt?.toISOString() ?? null,
+        status,
+        scope: String(row.scope),
+        audience: String(row.audience),
+      };
+    }),
   };
 }
 
