@@ -75,6 +75,33 @@ def _judge_from_provider(provider: Any):
     return judge
 
 
+def _validate_judge_diversity(providers: dict[str, Any]) -> dict[str, str]:
+    models = {
+        name: str(getattr(provider, "llm_model", "")).strip()
+        for name, provider in providers.items()
+    }
+    missing = [name for name, model in models.items() if not model]
+    if missing:
+        raise SystemExit(
+            "PersonalQA no puede certificar un panel real si falta el modelo en: "
+            + ", ".join(missing)
+        )
+    seen: dict[str, str] = {}
+    duplicates = []
+    for name, model in models.items():
+        key = model.casefold()
+        if key in seen:
+            duplicates.append(f"{name}={model} (igual a {seen[key]})")
+        else:
+            seen[key] = name
+    if duplicates:
+        raise SystemExit(
+            "UA-36: los jueces deben usar modelos distintos; duplicados: "
+            + "; ".join(duplicates)
+        )
+    return models
+
+
 def _case_rows(data: dict[str, Any], limit: int | None) -> list[dict[str, str]]:
     return [
         {
@@ -129,6 +156,7 @@ def main() -> int:
         name: crear_proveedor_por_perfil(name)
         for name in judge_names
     }
+    judge_models = _validate_judge_diversity(providers)
     judges = {
         name: _judge_from_provider(provider)
         for name, provider in providers.items()
@@ -147,6 +175,7 @@ def main() -> int:
         "source_sha256": source_sha,
         "git_sha": git_sha,
         "judges": judge_names,
+        "judge_models": judge_models,
         "evaluation": evaluation,
         "generated_at": datetime.now(UTC).isoformat(),
         "status": "complete",

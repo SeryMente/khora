@@ -1,6 +1,31 @@
+# @l0 L0-002-R · @req KA-00/REQ-2 · @acr ACR-2.1
+# @l0 L0-002 · @req QA-EPISTWIN/REQ-1 · @acr ACR-EPISTWIN-1 · @ua UA-36,UA-37
 import json
 
-from scripts.run_personalqa_judges import _case_rows
+import pytest
+
+from scripts.run_personalqa_judges import _case_rows, _validate_judge_diversity
+
+
+def test_judge_diversity_rejects_duplicate_models():
+    class Provider:
+        llm_model = "same-model"
+
+    with pytest.raises(SystemExit, match="UA-36.*modelos distintos"):
+        _validate_judge_diversity({"judge_a": Provider(), "judge_b": Provider()})
+
+
+def test_judge_diversity_returns_models_for_distinct_panel():
+    class ProviderA:
+        llm_model = "model-a"
+
+    class ProviderB:
+        llm_model = "model-b"
+
+    assert _validate_judge_diversity({"judge_a": ProviderA(), "judge_b": ProviderB()}) == {
+        "judge_a": "model-a",
+        "judge_b": "model-b",
+    }
 
 
 def test_case_rows_adapts_canonical_personalqa_keys():

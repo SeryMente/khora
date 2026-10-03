@@ -1,3 +1,5 @@
+# @l0 L0-002-R · @req KA-00/REQ-2 · @acr ACR-2.1
+# @l0 L0-002 · @req ING-02/REQ-1 · @acr ACR-1.2 · @ua UA-08
 import pytest
 
 from khora_kernel.api import Provenance, RespuestaLLM
