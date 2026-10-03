@@ -23,6 +23,22 @@ except ImportError:
 neo4j_driver = None
 neo4j_config = {}
 
+GRAPH_HEALTH_DEFECT_KEYS = (
+    "typed_overlap",
+    "missing_temporal_nodes",
+    "missing_temporal_edges",
+    "unreachable_entities",
+    "active_membership_to_invalid_community",
+    "eligible_without_active_community",
+    "active_communities_without_members",
+)
+
+
+def _graph_health_payload(checks: dict) -> dict:
+    defects = {key: checks.get(key) for key in GRAPH_HEALTH_DEFECT_KEYS}
+    ok = all(isinstance(value, int) and value == 0 for value in defects.values())
+    return {"ok": ok, "defects": defects, **checks}
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global neo4j_driver
@@ -426,7 +442,12 @@ async def endpoint_salud_grafo():
     try:
         from khora_kernel.motor import Neo4jMemoriaOrganizada
         memoria = Neo4jMemoriaOrganizada(neo4j_config["uri"], neo4j_config["user"], neo4j_config["password"])
-        return {"ok": True, **memoria.salud_grafo()}
+        payload = _graph_health_payload(memoria.salud_grafo())
+        if not payload["ok"]:
+            raise HTTPException(status_code=409, detail=payload)
+        return payload
+    except HTTPException:
+        raise
     except Exception as exc:
         logging.error("Graph health error: %s", traceback.format_exc())
         raise HTTPException(status_code=500, detail=str(exc))

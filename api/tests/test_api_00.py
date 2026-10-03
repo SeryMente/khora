@@ -8,6 +8,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..",
 
 from fastapi.testclient import TestClient
 
+import api.main as api_main
+
 from api.main import app, neo4j_driver
 
 # We need to set a dummy key for testing
@@ -24,6 +26,82 @@ def test_salud():
     data = response.json()
     assert "ok" in data
     assert "neo4j" in data
+
+def test_salud_grafo_sano_devuelve_200(monkeypatch):
+    class FakeMemoria:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def salud_grafo(self):
+            return {
+                key: 0
+                for key in api_main.GRAPH_HEALTH_DEFECT_KEYS
+            } | {
+                "graph_revision": "rev-test",
+                "theta_effective": False,
+            }
+
+    monkeypatch.setattr(api_main, "neo4j_driver", object())
+    monkeypatch.setattr(
+        api_main,
+        "neo4j_config",
+        {"uri": "bolt://test", "user": "neo4j", "password": "password"},
+    )
+    monkeypatch.setattr("khora_kernel.motor.Neo4jMemoriaOrganizada", FakeMemoria)
+
+    response = client.get("/api/v1/salud/grafo")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["ok"] is True
+    assert data["defects"] == {
+        key: 0 for key in api_main.GRAPH_HEALTH_DEFECT_KEYS
+    }
+
+
+@pytest.mark.parametrize(
+    ("checks", "expected_key", "expected_status"),
+    [
+        (
+            {"active_membership_to_invalid_community": 1},
+            "active_membership_to_invalid_community",
+            409,
+        ),
+        (
+            {},
+            "missing_temporal_edges",
+            409,
+        ),
+    ],
+)
+def test_salud_grafo_no_oculta_defectos(monkeypatch, checks, expected_key, expected_status):
+    class FakeMemoria:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def salud_grafo(self):
+            if not checks:
+                return {"graph_revision": "rev-test"}
+            values = {key: 0 for key in api_main.GRAPH_HEALTH_DEFECT_KEYS}
+            values.update(checks)
+            return values | {"graph_revision": "rev-test"}
+
+    monkeypatch.setattr(api_main, "neo4j_driver", object())
+    monkeypatch.setattr(
+        api_main,
+        "neo4j_config",
+        {"uri": "bolt://test", "user": "neo4j", "password": "password"},
+    )
+    monkeypatch.setattr("khora_kernel.motor.Neo4jMemoriaOrganizada", FakeMemoria)
+
+    response = client.get("/api/v1/salud/grafo")
+    assert response.status_code == expected_status
+    detail = response.json()["detail"]
+    assert detail["ok"] is False
+    if expected_key in checks:
+        assert detail["defects"][expected_key] == checks[expected_key]
+    else:
+        assert detail["defects"][expected_key] is None
+
 
 def test_ingesta_sin_key():
     response = client.post("/api/v1/ingesta", json={"texto": "prueba"})
