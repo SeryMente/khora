@@ -62,6 +62,10 @@ scripts/khora/config.json
 scripts/khora/logs/
 scripts/khora/versions/
 
+# Backups locales de la bóveda canónica (nunca versionar)
+secrets/env-vault.enc.json.bak-*
+secrets/env-vault.enc.json.pre-restore-*
+
 .vercel
 .env*
 

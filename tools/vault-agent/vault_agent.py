@@ -91,15 +91,14 @@ def load_vault(path: Path) -> dict[str, Any]:
 def protect_master(master: str) -> None:
     if len(master) < 8:
         raise VaultAgentError("La llave maestra debe tener al menos 8 caracteres.")
-    description, blob = win32crypt.CryptProtectData(
+    blob = win32crypt.CryptProtectData(
         master.encode("utf-8"),
-        "Cora canonical vault agent",
+        "Khora canonical vault agent",
         None,
         None,
         None,
         0,
     )
-    _ = description
     STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
     payload = {
         "version": 1,
