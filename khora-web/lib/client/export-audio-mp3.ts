@@ -43,7 +43,7 @@ export async function exportAudioAsMp3({
   const audioContext = new AudioContextCtor();
   try {
     const decoded = await audioContext.decodeAudioData(bytes.slice(0));
-    const { default: lamejs } = await import("@breezystack/lamejs");
+    const lamejs = await import("@breezystack/lamejs");
     const channels = Math.min(decoded.numberOfChannels, 2);
     const encoder = new lamejs.Mp3Encoder(
       channels,
