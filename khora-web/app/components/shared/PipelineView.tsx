@@ -60,7 +60,7 @@ export type PipelineViewState = {
   currentTimeMs: number;
   duracionTotalMs: number;
   isPlaying: boolean;
-  audioError: string | null;
+  audioError: string | null;\n  exportingMp3: boolean;
   hallazgos: any[];
   activeHallazgoIndex: number;
   incidentes: any[];
@@ -95,7 +95,7 @@ export type PipelineViewActions = {
   onResolveAudioIncident?: () => void;
   onIngestApproved?: () => void;
   onGlobalSeek?: (targetMs: number) => void;
-  onTogglePlayPause?: () => void;
+  onTogglePlayPause?: () => void;\n  onExportMp3?: () => void;
   onManualPartChange?: (index: number) => void;
   onSetShowAccessibleModal?: (show: boolean) => void;
   onSetAccessibleConfirmText?: (val: string) => void;
@@ -735,6 +735,16 @@ export function PipelineView({
                               {formatMs(currentTimeMs)} /{" "}
                               {formatMs(duracionTotalMs)}
                             </span>
+                            <button
+                              data-ui-id="revision.btn-download-mp3"
+                              onClick={() => actions.onExportMp3?.()}
+                              disabled={!audioSourceUrl || exportingMp3}
+                              className="px-2 py-1 border border-emerald-500/50 bg-emerald-950/30 hover:bg-emerald-900/50 text-emerald-300 font-bold text-[10px] flex items-center gap-1 cursor-pointer shrink-0 disabled:opacity-40 disabled:cursor-not-allowed"
+                              title="Descargar el volcado completo como MP3"
+                            >
+                              <Icons.Download size={13} />
+                              {exportingMp3 ? "Generando MP3..." : "Descargar MP3 completo"}
+                            </button>
 
                             <input
                               data-ui-id="revision.audio-seek-slider"
