@@ -492,7 +492,8 @@ export default function DictadoPage() {
     };
   }, []);
 
-  useEffect(() => registerKhoraLockCheckpoint(async () => {
+  useEffect(() => {
+    const unregister = registerKhoraLockCheckpoint(async () => {
     if (!sesionIdRef.current) return;
     const estabaActivo = activoRef.current || estado === "dictando";
     if (estabaActivo) {
@@ -509,7 +510,9 @@ export default function DictadoPage() {
     await guardarCheckpoint(true);
     setAviso("Dictado protegido por autobloqueo.");
     if (estabaActivo) setEstado("inactivo");
-  }), [estado, guardarCheckpoint]);
+    });
+    return () => { unregister(); };
+  }, [estado, guardarCheckpoint]);
 
   const guardar = useCallback(async () => {
     setError("");
