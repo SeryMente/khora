@@ -35,7 +35,7 @@ export default function VolcadosPage() {
   const [audioSourceUrl, setAudioSourceUrl] = useState<string>("");
   const [currentTimeMs, setCurrentTimeMs] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [audioError, setAudioError] = useState<string | null>(null);
+  const [audioError, setAudioError] = useState<string | null>(null);\n  const [exportingMp3, setExportingMp3] = useState(false);
   const [fallbackDurationMs, setFallbackDurationMs] = useState<number>(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const pendingSeekSecondsRef = useRef<number | null>(null);
@@ -283,6 +283,26 @@ export default function VolcadosPage() {
     void init();
   }, [fetchPipeline]);
 
+  const handleExportMp3 = useCallback(async () => {
+    if (!selectedId || !manifiestoPartes.length || exportingMp3) return;
+    setExportingMp3(true);
+    setAudioError(null);
+    try {
+      const folio = selectedItem?.folio ? String(selectedItem.folio) : selectedId;
+      await exportAudioAsMp3({
+        sourceUrl: `/api/audio/${selectedId}`,
+        filename: `khora-volcado-${folio}.mp3`,
+        bitrateKbps: 128,
+      });
+    } catch (err: any) {
+      setAudioError(
+        err?.message || "No se pudo generar el MP3 completo del volcado.",
+      );
+    } finally {
+      setExportingMp3(false);
+    }
+  }, [exportingMp3, manifiestoPartes.length, selectedId, selectedItem?.folio]);
+
   const handleRegenerarTitulo = async () => {
     if (!selectedId) return;
     setGeneratingTitle(true);
@@ -493,7 +513,7 @@ export default function VolcadosPage() {
           onSaveEdits: handleSaveEdits,
           onIngestApproved: handleIngestApproved,
           onGlobalSeek: seekAudioGlobally,
-          onTogglePlayPause: toggleAudioPlayback,
+          onTogglePlayPause: toggleAudioPlayback,\n          onExportMp3: handleExportMp3,
           onManualPartChange: (position) =>
             loadAudioPosition(position, 0, isPlaying),
           onSetShowAccessibleModal: setShowAccessibleModal,
