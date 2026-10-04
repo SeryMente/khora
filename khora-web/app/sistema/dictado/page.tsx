@@ -7,6 +7,7 @@ import { ensamblarParrafos, Fragmento } from "../../../lib/transcripcion/ensambl
 import { reconciliarSegmentos, type SegmentoReconciliado } from "../../../lib/transcripcion/reconciliar";
 import { transcribeStoredSession } from "../../../lib/client/authoritative-transcription";
 import { importAndTranscribeAudio } from "../../../lib/client/import-audio-file";
+import { registerKhoraLockCheckpoint, reportKhoraActivity } from "../../components/AutoLockProvider";
 
 type Estado = "inactivo" | "dictando" | "finalizando";
 type EstadoReconciliacion = "preview_live" | "procesando_whisper" | "reconciliado_whisper" | "fallback_preview" | "editado_manual";
@@ -80,10 +81,32 @@ export default function DictadoPage() {
   const subidaEnCursoRef = useRef<Promise<void> | null>(null);
   const finalizacionAudioRef = useRef<Promise<void> | null>(null);
   const resolverFinalizacionAudioRef = useRef<(() => void) | null>(null);
+  const checkpointEnCursoRef = useRef<Promise<void> | null>(null);
+  const ultimoCheckpointTextoRef = useRef("");
 
   useEffect(() => {
     const w = window as any;
     if (!w.SpeechRecognition && !w.webkitSpeechRecognition) setSoportado(false);
+  }, []);
+
+  useEffect(() => {
+    let activo = true;
+    void fetch("/api/dictado/checkpoint", { cache: "no-store" })
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => {
+        const recovery = data?.recovery;
+        if (!activo || !recovery?.sessionId || typeof recovery?.texto !== "string" || !recovery.texto.trim()) return;
+        sesionIdRef.current = String(recovery.sessionId);
+        ultimoCheckpointTextoRef.current = recovery.texto;
+        const segmento: SegmentoReconciliado = { id: "recovery-" + recovery.sessionId, texto: recovery.texto, estado: "pendiente_error" };
+        segmentosRef.current = [segmento];
+        setSegmentos([segmento]);
+        pendienteRef.current = recovery.texto;
+        setPendiente("");
+        setAviso("Se recupero automaticamente un dictado pendiente protegido antes del cierre anterior.");
+      })
+      .catch(() => undefined);
+    return () => { activo = false; };
   }, []);
 
   /**
@@ -171,6 +194,29 @@ export default function DictadoPage() {
     const nuevaSubida = anteriorSubida.then(ejecutarSubidas);
     subidaEnCursoRef.current = nuevaSubida;
     await nuevaSubida;
+  }, []);
+
+  const guardarCheckpoint = useCallback(async (forzar = false) => {
+    const sessionId = sesionIdRef.current;
+    const texto = segmentosRef.current.map((s) => s.texto).join("\n\n") || pendienteRef.current;
+    if (!sessionId || !texto.trim()) return;
+    if (!forzar && texto === ultimoCheckpointTextoRef.current) return;
+    const anterior = checkpointEnCursoRef.current || Promise.resolve();
+    const tarea = anterior.then(async () => {
+      try {
+        const response = await fetch("/api/dictado/checkpoint", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sessionId, texto }),
+          keepalive: true,
+        });
+        if (response.ok) ultimoCheckpointTextoRef.current = texto;
+      } catch (e) {
+        setAviso("checkpoint de seguridad pendiente: " + String(e));
+      }
+    });
+    checkpointEnCursoRef.current = tarea;
+    await tarea;
   }, []);
 
   const ejecutarTranscripcionAutoritativa = useCallback(async () => {
@@ -264,12 +310,13 @@ export default function DictadoPage() {
         if (ev.data && ev.data.size > 0) {
           trozosRef.current.push(ev.data);
           parteTrozosRef.current.push(ev.data);
+          reportKhoraActivity();
           setConAudio(true);
 
           const totalSize = parteTrozosRef.current.reduce((sum, chunk) => sum + chunk.size, 0);
           const elapsed = Date.now() - parteInicioRef.current;
 
-          if (totalSize >= 1.5 * 1024 * 1024 || elapsed >= 45 * 1000) {
+          if (totalSize >= 512 * 1024 || elapsed >= 10 * 1000) {
             void subirParteActual();
           }
         }
@@ -315,6 +362,8 @@ export default function DictadoPage() {
 
           fragmentosRef.current.push({ texto: txt, pausaMsAntes });
           estabilizarEmision();
+          reportKhoraActivity();
+          void guardarCheckpoint();
 
           if (relojRef.current) clearTimeout(relojRef.current);
           relojRef.current = setTimeout(estabilizarEmision, 4000);
@@ -374,7 +423,7 @@ export default function DictadoPage() {
     recRef.current = rec;
     try { rec.start(); } catch (e) { setError("no se pudo iniciar el reconocimiento: " + String(e)); return false; }
     return true;
-  }, [estabilizarEmision, detenerGrabacion]);
+  }, [estabilizarEmision, detenerGrabacion, guardarCheckpoint]);
 
   const iniciar = useCallback(async () => {
     setError("");
@@ -386,6 +435,8 @@ export default function DictadoPage() {
     trozosRef.current = [];
 
     sesionIdRef.current = generarSesionId();
+    ultimoCheckpointTextoRef.current = "";
+    checkpointEnCursoRef.current = null;
     parteConsecutivaRef.current = 1;
     partesSubidasRef.current = [];
     partesRawRef.current = [];
@@ -440,6 +491,25 @@ export default function DictadoPage() {
       try { flujoRef.current?.getTracks?.().forEach((pista: any) => pista.stop()); } catch {}
     };
   }, []);
+
+  useEffect(() => registerKhoraLockCheckpoint(async () => {
+    if (!sesionIdRef.current) return;
+    const estabaActivo = activoRef.current || estado === "dictando";
+    if (estabaActivo) {
+      activoRef.current = false;
+      setEstado("finalizando");
+      if (rearmeRef.current) clearTimeout(rearmeRef.current);
+      try { recRef.current?.stop(); } catch {}
+      recRef.current = null;
+      try { grabRef.current?.stop(); } catch {}
+      try { flujoRef.current?.getTracks?.().forEach((pista: any) => pista.stop()); } catch {}
+      if (finalizacionAudioRef.current) await finalizacionAudioRef.current;
+      if (subidaEnCursoRef.current) await subidaEnCursoRef.current;
+    }
+    await guardarCheckpoint(true);
+    setAviso("Dictado protegido por autobloqueo.");
+    if (estabaActivo) setEstado("inactivo");
+  }), [estado, guardarCheckpoint]);
 
   const guardar = useCallback(async () => {
     setError("");
