@@ -1,6 +1,6 @@
 // @l0 L0-002 §4 · @req MCP-OAUTH-01/REQ-6
 import { NextRequest, NextResponse } from "next/server";
-import { getMcpConfig, validateCimdClient } from "@/lib/server/mcp-config";
+import { getMcpConfig, validateCimdClient, validateDynamicClient } from "@/lib/server/mcp-config";
 import {
   obtenerCodigoAutorizacionValido,
   marcarCodigoComoUsado,
@@ -71,8 +71,10 @@ export async function POST(req: NextRequest) {
   const clientId = formData.get("client_id")?.toString() || "";
   const clientSecret = formData.get("client_secret")?.toString() || "";
   const publicChatGptClient = isChatGptClient(clientId);
+  const redirectUriForClient = formData.get("redirect_uri")?.toString();
+  const dynamicClient = validateDynamicClient(clientId, config.jwtSecret, redirectUriForClient);
 
-  if (!clientId || (!publicChatGptClient && (clientId !== config.clientId || clientSecret !== config.clientSecret))) {
+  if (!clientId || (!publicChatGptClient && !dynamicClient && (clientId !== config.clientId || clientSecret !== config.clientSecret))) {
     return NextResponse.json(
       { error: "invalid_client", error_description: "Invalid client credentials" },
       { status: 401 },

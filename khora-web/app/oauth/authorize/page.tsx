@@ -1,6 +1,6 @@
 // @l0 L0-002 §4 · @req MCP-OAUTH-01/REQ-5
 import { auth } from "@/auth";
-import { getMcpConfig, validateCimdClient } from "@/lib/server/mcp-config";
+import { getMcpConfig, validateCimdClient, validateDynamicClient } from "@/lib/server/mcp-config";
 import { crearCodigoAutorizacion } from "@/lib/server/oauth";
 import { redirect } from "next/navigation";
 
@@ -56,14 +56,15 @@ export default async function AuthorizePage(props: {
     }
   })();
 
+  const isDynamicClient = !!client_id && validateDynamicClient(client_id, config.jwtSecret, redirect_uri);
   const allowedRedirect = redirect_uri === "https://chatgpt.com/connector_platform_oauth_redirect" ||
-    config.redirectUris.includes(redirect_uri || "");
+    config.redirectUris.includes(redirect_uri || "") || isDynamicClient;
 
   const supportedScopes = new Set(["volcados:read", "runtime:read", "offline_access"]);
   const requestedScopes = requestedScope.split(/\s+/).filter(Boolean);
 
   // 1. Validar client_id
-  if (!client_id || (!isChatGptClient && client_id !== config.clientId)) {
+  if (!client_id || (!isChatGptClient && !isDynamicClient && client_id !== config.clientId)) {
     return (
       <main className="min-h-screen bg-[var(--khora-absolute,#050505)] text-[var(--khora-ink,#f0f0f0)] flex items-center justify-center p-6">
         <div className="max-w-md w-full bg-[var(--khora-surface,#121212)] border border-red-800/50 p-6 rounded-lg text-center">
