@@ -20,6 +20,7 @@
     "migrate:runtime": "node scripts/migrate-runtime.mjs"
   },
   "dependencies": {
+    "@breezystack/lamejs": "^1.2.7",
     "@google/genai": "^2.10.0",
     "@modelcontextprotocol/sdk": "^1.30.0",
     "@notionhq/client": "^5.23.0",
