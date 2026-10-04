@@ -6,6 +6,7 @@ import { RuntimeObserver } from "./components/RuntimeObserver";
 import { GlobalFooter } from "./components/GlobalFooter";
 import KhoraSplash from "./components/os/KhoraSplash";
 import KhoraShell from "./components/os/KhoraShell";
+import AutoLockProvider from "./components/AutoLockProvider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -71,7 +72,9 @@ export default function RootLayout({
                     <RuntimeObserver />
                     <UpdatePrompt />
                     <KhoraSplash />
-                    <KhoraShell>{children}</KhoraShell>
+                    <AutoLockProvider>
+                        <KhoraShell>{children}</KhoraShell>
+                    </AutoLockProvider>
                     <GlobalFooter />
                 </TelemetryProvider>
             </body>
