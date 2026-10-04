@@ -91,3 +91,5 @@ export default function AutoLockProvider({ children }: { children: React.ReactNo
   </>;
 }
 // Production deployment marker: Cora autolock checkpoint flow.
+
+// Git integration production trigger after verification.
