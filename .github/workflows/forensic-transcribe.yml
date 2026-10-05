@@ -28,7 +28,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
       - name: Install Faster-Whisper
-        run: python -m pip install --upgrade pip && python -m pip install --no-cache-dir faster-whisper
+        run: python -m pip install --upgrade pip && python -m pip install --no-cache-dir "faster-whisper" "av<19"
 
       - name: Transcribe audio from repository
         env:
