@@ -1,5 +1,4 @@
-name: Forensic transcription
-
+name: Forensic transcription — maximum quality
 on:
   push:
     branches: [main]
@@ -8,12 +7,31 @@ on:
       - ".github/workflows/forensic-transcribe.yml"
   workflow_dispatch:
 
+permissions:
+  contents: read
+
+env:
+  AUDIO_PATH: data/volcados/2026-10-05-Vocaroo-184Eqk8BMLcF.mp3
+  EXPECTED_SHA256: c64f949012a4f141f6eded1b2aa69ad69d3961c02b4b3ca220c541ec456834e3
+
 jobs:
   transcribe:
+    name: large-v3 / ${ matrix.preset }
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-    permissions:
-      contents: read
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - preset: ctx-beam5
+            beam_size: 5
+            condition_on_previous_text: true
+          - preset: ctx-beam10
+            beam_size: 10
+            condition_on_previous_text: true
+          - preset: noctx-beam5
+            beam_size: 5
+            condition_on_previous_text: false
 
     steps:
       - name: Checkout repository
@@ -28,19 +46,27 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
       - name: Install Faster-Whisper
-        run: python -m pip install --upgrade pip && python -m pip install --no-cache-dir "faster-whisper" "av<19"
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --no-cache-dir "faster-whisper" "av<19"
 
-      - name: Transcribe audio from repository
+      - name: Verify immutable audio
+        run: |
+          actual="$(sha256sum "$AUDIO_PATH" | awk '{print $1}')"
+          echo "AUDIO_SHA256=$actual"
+          test "$actual" = "$EXPECTED_SHA256"
+
+      - name: Transcribe with large-v3
         env:
-          AUDIO_PATH: data/volcados/2026-10-05-Vocaroo-184Eqk8BMLcF.mp3
-          OUTPUT_DIR: forensic-output
+          OUTPUT_DIR: forensic-output/${ matrix.preset }
+          BEAM_SIZE: ${ matrix.beam_size }
+          CONDITION_ON_PREVIOUS_TEXT: ${ matrix.condition_on_previous_text }
         run: |
           python - <<'PY'
           import hashlib
           import json
           import os
           from pathlib import Path
-
           from faster_whisper import WhisperModel
 
           audio = Path(os.environ["AUDIO_PATH"])
@@ -48,20 +74,21 @@ jobs:
           outdir.mkdir(parents=True, exist_ok=True)
 
           sha256 = hashlib.sha256(audio.read_bytes()).hexdigest()
+          if sha256 != os.environ["EXPECTED_SHA256"]:
+              raise SystemExit(f"Audio SHA mismatch: {sha256}")
 
-          model = WhisperModel(
-              "large-v3-turbo",
-              device="cpu",
-              compute_type="int8",
-          )
+          beam_size = int(os.environ["BEAM_SIZE"])
+          condition = os.environ["CONDITION_ON_PREVIOUS_TEXT"].lower() == "true"
+
+          model = WhisperModel("large-v3", device="cpu", compute_type="int8")
 
           segments, info = model.transcribe(
               str(audio),
               language="es",
               task="transcribe",
               temperature=0.0,
-              beam_size=5,
-              condition_on_previous_text=True,
+              beam_size=beam_size,
+              condition_on_previous_text=condition,
               vad_filter=False,
               word_timestamps=True,
           )
@@ -95,34 +122,98 @@ jobs:
           result = {
               "audio_file": str(audio).replace("\\", "/"),
               "audio_sha256": sha256,
-              "model": "faster-whisper / large-v3-turbo",
+              "model": "faster-whisper / large-v3",
+              "decode": {
+                  "beam_size": beam_size,
+                  "condition_on_previous_text": condition,
+                  "temperature": 0.0,
+                  "vad_filter": False,
+                  "word_timestamps": True,
+              },
               "language": info.language,
-              "language_probability": info.language_probability,
-              "duration_seconds": info.duration,
+              "language_probability": float(info.language_probability),
+              "duration_seconds": float(info.duration),
               "text": "".join(text_parts).strip(),
               "segments": segment_list,
               "word_count": len(words),
           }
 
-          (outdir / "whisper-large-v3-turbo.json").write_text(
+          (outdir / "result.json").write_text(
               json.dumps(result, ensure_ascii=False, indent=2),
               encoding="utf-8",
           )
-          (outdir / "whisper-large-v3-turbo.txt").write_text(
+          (outdir / "result.txt").write_text(
               result["text"] + "\n",
               encoding="utf-8",
           )
 
-          print("AUDIO_SHA256=" + sha256)
-          print("DURATION_SECONDS=" + str(info.duration))
-          print("WORD_COUNT=" + str(len(words)))
-          print(result["text"])
+          print(f"AUDIO_SHA256={sha256}")
+          print(f"DURATION_SECONDS={info.duration}")
+          print(f"WORD_COUNT={len(words)}")
           PY
 
-      - name: Upload transcription artifact
+      - name: Upload transcription
         uses: actions/upload-artifact@v4
         with:
-          name: forensic-transcription-2026-10-05
-          path: forensic-output/
+          name: forensic-large-v3-${ matrix.preset }
+          path: forensic-output/${ matrix.preset }/
           if-no-files-found: error
-          retention-days: 7
+          retention-days: 14
+
+  aggregate:
+    name: Aggregate forensic runs
+    needs: transcribe
+    if: ${ always() && needs.transcribe.result != 'cancelled' }
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Download all model outputs
+        uses: actions/download-artifact@v4
+        with:
+          pattern: forensic-large-v3-*
+          path: forensic-runs
+          merge-multiple: false
+
+      - name: Build immutable manifest
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path("forensic-runs")
+          results = sorted(root.glob("*/result.json"))
+          if not results:
+              raise SystemExit("No transcription result artifacts found")
+
+          expected = "${ env.EXPECTED_SHA256 }"
+          manifest = {"expected_audio_sha256": expected, "runs": []}
+
+          for path in results:
+              data = json.loads(path.read_text(encoding="utf-8"))
+              actual = data["audio_sha256"].lower()
+              if actual != expected:
+                  raise SystemExit(f"Audio SHA mismatch in {path}: {actual}")
+              manifest["runs"].append({
+                  "artifact": path.parent.name,
+                  "model": data["model"],
+                  "decode": data["decode"],
+                  "duration_seconds": data["duration_seconds"],
+                  "language": data["language"],
+                  "language_probability": data["language_probability"],
+                  "word_count": data["word_count"],
+              })
+
+          Path("forensic-manifest.json").write_text(
+              json.dumps(manifest, ensure_ascii=False, indent=2),
+              encoding="utf-8",
+          )
+          print(json.dumps(manifest, ensure_ascii=False, indent=2))
+          PY
+
+      - name: Upload aggregated manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: forensic-large-v3-manifest
+          path: forensic-manifest.json
+          retention-days: 14
