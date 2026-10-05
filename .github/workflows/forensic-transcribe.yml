@@ -16,22 +16,9 @@ env:
 
 jobs:
   transcribe:
-    name: large-v3 / ${ matrix.preset }
+    name: large-v3 forensic battery
     runs-on: ubuntu-latest
-    timeout-minutes: 120
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - preset: ctx-beam5
-            beam_size: 5
-            condition_on_previous_text: true
-          - preset: ctx-beam10
-            beam_size: 10
-            condition_on_previous_text: true
-          - preset: noctx-beam5
-            beam_size: 5
-            condition_on_previous_text: false
+    timeout-minutes: 240
 
     steps:
       - name: Checkout repository
@@ -56,164 +43,146 @@ jobs:
           echo "AUDIO_SHA256=$actual"
           test "$actual" = "$EXPECTED_SHA256"
 
-      - name: Transcribe with large-v3
-        env:
-          OUTPUT_DIR: forensic-output/${ matrix.preset }
-          BEAM_SIZE: ${ matrix.beam_size }
-          CONDITION_ON_PREVIOUS_TEXT: ${ matrix.condition_on_previous_text }
+      - name: Run large-v3 forensic battery
         run: |
           python - <<'PY'
           import hashlib
           import json
           import os
           from pathlib import Path
+
           from faster_whisper import WhisperModel
 
           audio = Path(os.environ["AUDIO_PATH"])
-          outdir = Path(os.environ["OUTPUT_DIR"])
+          outdir = Path("forensic-output")
           outdir.mkdir(parents=True, exist_ok=True)
 
           sha256 = hashlib.sha256(audio.read_bytes()).hexdigest()
           if sha256 != os.environ["EXPECTED_SHA256"]:
               raise SystemExit(f"Audio SHA mismatch: {sha256}")
 
-          beam_size = int(os.environ["BEAM_SIZE"])
-          condition = os.environ["CONDITION_ON_PREVIOUS_TEXT"].lower() == "true"
-
-          model = WhisperModel("large-v3", device="cpu", compute_type="int8")
-
-          segments, info = model.transcribe(
-              str(audio),
-              language="es",
-              task="transcribe",
-              temperature=0.0,
-              beam_size=beam_size,
-              condition_on_previous_text=condition,
-              vad_filter=False,
-              word_timestamps=True,
+          model = WhisperModel(
+              "large-v3",
+              device="cpu",
+              compute_type="int8",
           )
 
-          segment_list = []
-          words = []
-          text_parts = []
+          presets = [
+              {
+                  "name": "ctx-beam5",
+                  "beam_size": 5,
+                  "condition_on_previous_text": True,
+              },
+              {
+                  "name": "ctx-beam10",
+                  "beam_size": 10,
+                  "condition_on_previous_text": True,
+              },
+              {
+                  "name": "noctx-beam5",
+                  "beam_size": 5,
+                  "condition_on_previous_text": False,
+              },
+          ]
 
-          for seg in segments:
-              segment_words = []
-              if seg.words:
-                  for w in seg.words:
-                      item = {
-                          "start": float(w.start),
-                          "end": float(w.end),
-                          "word": w.word,
-                          "probability": float(w.probability),
-                      }
-                      segment_words.append(item)
-                      words.append(item)
+          for preset in presets:
+              print(
+                  f"START preset={preset['name']} "
+                  f"beam={preset['beam_size']} "
+                  f"context={preset['condition_on_previous_text']}",
+                  flush=True,
+              )
 
-              segment_list.append({
-                  "id": int(seg.id),
-                  "start": float(seg.start),
-                  "end": float(seg.end),
-                  "text": seg.text,
-                  "words": segment_words,
-              })
-              text_parts.append(seg.text)
+              segments, info = model.transcribe(
+                  str(audio),
+                  language="es",
+                  task="transcribe",
+                  temperature=0.0,
+                  beam_size=preset["beam_size"],
+                  condition_on_previous_text=preset["condition_on_previous_text"],
+                  vad_filter=False,
+                  word_timestamps=True,
+              )
 
-          result = {
-              "audio_file": str(audio).replace("\\", "/"),
+              segment_list = []
+              words = []
+              text_parts = []
+
+              for seg in segments:
+                  segment_words = []
+                  if seg.words:
+                      for w in seg.words:
+                          item = {
+                              "start": float(w.start),
+                              "end": float(w.end),
+                              "word": w.word,
+                              "probability": float(w.probability),
+                          }
+                          segment_words.append(item)
+                          words.append(item)
+
+                  segment_list.append({
+                      "id": int(seg.id),
+                      "start": float(seg.start),
+                      "end": float(seg.end),
+                      "text": seg.text,
+                      "words": segment_words,
+                  })
+                  text_parts.append(seg.text)
+
+              result = {
+                  "audio_file": str(audio).replace("\\", "/"),
+                  "audio_sha256": sha256,
+                  "model": "faster-whisper / large-v3",
+                  "decode": {
+                      "beam_size": preset["beam_size"],
+                      "condition_on_previous_text": preset["condition_on_previous_text"],
+                      "temperature": 0.0,
+                      "vad_filter": False,
+                      "word_timestamps": True,
+                  },
+                  "language": info.language,
+                  "language_probability": float(info.language_probability),
+                  "duration_seconds": float(info.duration),
+                  "text": "".join(text_parts).strip(),
+                  "segments": segment_list,
+                  "word_count": len(words),
+              }
+
+              target = outdir / preset["name"]
+              target.mkdir(parents=True, exist_ok=True)
+              (target / "result.json").write_text(
+                  json.dumps(result, ensure_ascii=False, indent=2),
+                  encoding="utf-8",
+              )
+              (target / "result.txt").write_text(
+                  result["text"] + "\n",
+                  encoding="utf-8",
+              )
+
+              print(
+                  f"DONE preset={preset['name']} "
+                  f"duration={info.duration} "
+                  f"words={len(words)}",
+                  flush=True,
+              )
+
+          manifest = {
               "audio_sha256": sha256,
               "model": "faster-whisper / large-v3",
-              "decode": {
-                  "beam_size": beam_size,
-                  "condition_on_previous_text": condition,
-                  "temperature": 0.0,
-                  "vad_filter": False,
-                  "word_timestamps": True,
-              },
-              "language": info.language,
-              "language_probability": float(info.language_probability),
-              "duration_seconds": float(info.duration),
-              "text": "".join(text_parts).strip(),
-              "segments": segment_list,
-              "word_count": len(words),
+              "presets": [p["name"] for p in presets],
           }
-
-          (outdir / "result.json").write_text(
-              json.dumps(result, ensure_ascii=False, indent=2),
-              encoding="utf-8",
-          )
-          (outdir / "result.txt").write_text(
-              result["text"] + "\n",
-              encoding="utf-8",
-          )
-
-          print(f"AUDIO_SHA256={sha256}")
-          print(f"DURATION_SECONDS={info.duration}")
-          print(f"WORD_COUNT={len(words)}")
-          PY
-
-      - name: Upload transcription
-        uses: actions/upload-artifact@v4
-        with:
-          name: forensic-large-v3-${ matrix.preset }
-          path: forensic-output/${ matrix.preset }/
-          if-no-files-found: error
-          retention-days: 14
-
-  aggregate:
-    name: Aggregate forensic runs
-    needs: transcribe
-    if: ${ always() && needs.transcribe.result != 'cancelled' }
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-
-    steps:
-      - name: Download all model outputs
-        uses: actions/download-artifact@v4
-        with:
-          pattern: forensic-large-v3-*
-          path: forensic-runs
-          merge-multiple: false
-
-      - name: Build immutable manifest
-        run: |
-          python - <<'PY'
-          import json
-          from pathlib import Path
-
-          root = Path("forensic-runs")
-          results = sorted(root.glob("*/result.json"))
-          if not results:
-              raise SystemExit("No transcription result artifacts found")
-
-          expected = "${ env.EXPECTED_SHA256 }"
-          manifest = {"expected_audio_sha256": expected, "runs": []}
-
-          for path in results:
-              data = json.loads(path.read_text(encoding="utf-8"))
-              actual = data["audio_sha256"].lower()
-              if actual != expected:
-                  raise SystemExit(f"Audio SHA mismatch in {path}: {actual}")
-              manifest["runs"].append({
-                  "artifact": path.parent.name,
-                  "model": data["model"],
-                  "decode": data["decode"],
-                  "duration_seconds": data["duration_seconds"],
-                  "language": data["language"],
-                  "language_probability": data["language_probability"],
-                  "word_count": data["word_count"],
-              })
-
-          Path("forensic-manifest.json").write_text(
+          (outdir / "manifest.json").write_text(
               json.dumps(manifest, ensure_ascii=False, indent=2),
               encoding="utf-8",
           )
           print(json.dumps(manifest, ensure_ascii=False, indent=2))
           PY
 
-      - name: Upload aggregated manifest
+      - name: Upload forensic outputs
         uses: actions/upload-artifact@v4
         with:
-          name: forensic-large-v3-manifest
-          path: forensic-manifest.json
+          name: forensic-large-v3-maximum-quality
+          path: forensic-output/
+          if-no-files-found: error
           retention-days: 14
