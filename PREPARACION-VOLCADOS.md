@@ -74,7 +74,11 @@ El texto debe corresponder a lo dicho. Ni menos, ni más, ni deformado.
 
 **F1 · Cobertura Íntegra.** Ninguna palabra dicha se pierde. Se detecta
 cobertura insuficiente comparando la transcripción contra las partes de audio
-almacenadas. **No negociable.**
+almacenadas. **No negociable.** El protocolo de máxima exigencia, la batería
+large-v3, la alineación palabra-por-palabra, la resolución de discrepancias y
+los criterios de PASS/FAIL están definidos en
+[`docs/FORENSIC-TRANSCRIPTION-2026-10-05.md`](./docs/FORENSIC-TRANSCRIPTION-2026-10-05.md),
+FTS-001 v1.0.0.
 
 **F2 · Ninguna Palabra Ajena.** El texto no contiene nada que el operador no
 haya dicho. Cubre dos fuentes conocidas de contaminación:
