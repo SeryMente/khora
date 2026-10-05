@@ -1,0 +1,128 @@
+name: Forensic transcription
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "data/volcados/2026-10-05-Vocaroo-184Eqk8BMLcF.mp3"
+      - ".github/workflows/forensic-transcribe.yml"
+  workflow_dispatch:
+
+jobs:
+  transcribe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Install Faster-Whisper
+        run: python -m pip install --upgrade pip && python -m pip install --no-cache-dir faster-whisper
+
+      - name: Transcribe audio from repository
+        env:
+          AUDIO_PATH: data/volcados/2026-10-05-Vocaroo-184Eqk8BMLcF.mp3
+          OUTPUT_DIR: forensic-output
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          from faster_whisper import WhisperModel
+
+          audio = Path(os.environ["AUDIO_PATH"])
+          outdir = Path(os.environ["OUTPUT_DIR"])
+          outdir.mkdir(parents=True, exist_ok=True)
+
+          sha256 = hashlib.sha256(audio.read_bytes()).hexdigest()
+
+          model = WhisperModel(
+              "large-v3-turbo",
+              device="cpu",
+              compute_type="int8",
+          )
+
+          segments, info = model.transcribe(
+              str(audio),
+              language="es",
+              task="transcribe",
+              temperature=0.0,
+              beam_size=5,
+              condition_on_previous_text=True,
+              vad_filter=False,
+              word_timestamps=True,
+          )
+
+          segment_list = []
+          words = []
+          text_parts = []
+
+          for seg in segments:
+              segment_words = []
+              if seg.words:
+                  for w in seg.words:
+                      item = {
+                          "start": float(w.start),
+                          "end": float(w.end),
+                          "word": w.word,
+                          "probability": float(w.probability),
+                      }
+                      segment_words.append(item)
+                      words.append(item)
+
+              segment_list.append({
+                  "id": int(seg.id),
+                  "start": float(seg.start),
+                  "end": float(seg.end),
+                  "text": seg.text,
+                  "words": segment_words,
+              })
+              text_parts.append(seg.text)
+
+          result = {
+              "audio_file": str(audio).replace("\\", "/"),
+              "audio_sha256": sha256,
+              "model": "faster-whisper / large-v3-turbo",
+              "language": info.language,
+              "language_probability": info.language_probability,
+              "duration_seconds": info.duration,
+              "text": "".join(text_parts).strip(),
+              "segments": segment_list,
+              "word_count": len(words),
+          }
+
+          (outdir / "whisper-large-v3-turbo.json").write_text(
+              json.dumps(result, ensure_ascii=False, indent=2),
+              encoding="utf-8",
+          )
+          (outdir / "whisper-large-v3-turbo.txt").write_text(
+              result["text"] + "\n",
+              encoding="utf-8",
+          )
+
+          print("AUDIO_SHA256=" + sha256)
+          print("DURATION_SECONDS=" + str(info.duration))
+          print("WORD_COUNT=" + str(len(words)))
+          print(result["text"])
+          PY
+
+      - name: Upload transcription artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: forensic-transcription-2026-10-05
+          path: forensic-output/
+          if-no-files-found: error
+          retention-days: 7
