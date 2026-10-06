@@ -36,7 +36,8 @@ export default function VolcadosPage() {
   const [audioSourceUrl, setAudioSourceUrl] = useState<string>("");
   const [currentTimeMs, setCurrentTimeMs] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [audioError, setAudioError] = useState<string | null>(null);\n  const [exportingMp3, setExportingMp3] = useState(false);
+  const [audioError, setAudioError] = useState<string | null>(null);
+  const [exportingMp3, setExportingMp3] = useState(false);
   const [fallbackDurationMs, setFallbackDurationMs] = useState<number>(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const pendingSeekSecondsRef = useRef<number | null>(null);
@@ -515,7 +516,8 @@ export default function VolcadosPage() {
           onSaveEdits: handleSaveEdits,
           onIngestApproved: handleIngestApproved,
           onGlobalSeek: seekAudioGlobally,
-          onTogglePlayPause: toggleAudioPlayback,\n          onExportMp3: handleExportMp3,
+          onTogglePlayPause: toggleAudioPlayback,
+          onExportMp3: handleExportMp3,
           onManualPartChange: (position) =>
             loadAudioPosition(position, 0, isPlaying),
           onSetShowAccessibleModal: setShowAccessibleModal,
