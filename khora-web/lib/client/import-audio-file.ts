@@ -104,6 +104,8 @@ export async function importAndTranscribeAudio(args: {
       audioUrl: stored.audioUrl,
       audioBytes: stored.audioBytes,
       mimeType: stored.mimeType,
+      sha256: stored.sha256,
+      verificado: stored.verificado === true,
       estadoTranscripcion: transcription.data?.estadoTranscripcion || "fallido",
     },
   };
