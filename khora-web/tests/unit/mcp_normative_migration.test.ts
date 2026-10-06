@@ -27,3 +27,10 @@ test("027_manual_mcp_tokens define un Bearer manual revocable, scoped and expira
   assert.match(content, /expira_en TIMESTAMPTZ NOT NULL/);
   assert.match(content, /revocado_en TIMESTAMPTZ/);
 });
+
+
+test("migrate-runtime incluye 027_manual_mcp_tokens", () => {
+  const scriptPath = path.resolve(process.cwd(), "scripts/migrate-runtime.mjs");
+  const content = fs.readFileSync(scriptPath, "utf8");
+  assert.match(content, /"027_manual_mcp_tokens\.sql"/);
+});
