@@ -104,7 +104,7 @@ export default async function middleware(req: NextRequest, event: NextFetchEvent
 
   let response: Response;
   try {
-    const authResult = await authMiddleware(req, event);
+    const authResult = await (authMiddleware as (request: NextRequest) => Response | void | Promise<Response | void>)(req);
     response = authResult instanceof Response ? authResult : NextResponse.next();
   } catch (error) {
     const failureResponse = NextResponse.json({ error: "internal" }, { status: 500 });
