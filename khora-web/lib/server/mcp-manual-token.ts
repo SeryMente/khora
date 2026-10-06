@@ -23,9 +23,14 @@ export interface ManualMcpTokenRecord {
 }
 
 function normalizeScopes(scopes: unknown): string[] {
-  if (!Array.isArray(scopes)) return [];
-  const requested = new Set(scopes.map((scope) => String(scope).trim()).filter(Boolean));
-  return MANUAL_MCP_SCOPES.filter((scope) => requested.has(scope));
+  if (!Array.isArray(scopes) || scopes.length === 0) return [];
+  const requested = scopes.map((scope) => String(scope).trim()).filter(Boolean);
+  const unique = new Set(requested);
+  if (unique.size !== requested.length) throw new Error("MANUAL_TOKEN_SCOPE_INVALID");
+  if (requested.some((scope) => !MANUAL_MCP_SCOPES.includes(scope as ManualScope))) {
+    throw new Error("MANUAL_TOKEN_SCOPE_INVALID");
+  }
+  return MANUAL_MCP_SCOPES.filter((scope) => unique.has(scope));
 }
 
 function normalizeLabel(value: unknown): string {
