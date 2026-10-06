@@ -211,7 +211,7 @@ da7133e7329b0d018003ceb1c26c2bc756a3e0b1852a159f93ca0e512b3699e1  ./khora-web/ap
 6284f74c305de710328df645f4f280fcbe41da60adcac9db859e880a2f87a69f  ./khora-web/app/api/kpi/minutes/route.ts
 296f7aafc0def8deb93de61c48603606377e33cba9c5db93709e4e3ca385107d  ./khora-web/app/api/mcp/manual-token/route.ts
 dbcb1a564d60532dd93219d50621f627b80e0a840bbc7ecb458108313e8a5aa5  ./khora-web/app/api/mcp/revocacion/route.ts
-f9d3fe9e3c71e8880bb5aaaf6d463567babc63446fec80fa9463960650f922b6  ./khora-web/app/api/mcp/route.ts
+7945e9ef04fa45ab4a116a42320ba2d016347ed06df4cda4bda5121107e9c0da  ./khora-web/app/api/mcp/route.ts
 ee83417f71679b7173a0dd38291b7ab13fc0f1e576fb2cc5b7f655c4187de08e  ./khora-web/app/api/oauth/token/route.ts
 4d72f9e53f5951586ed44ed19745373d429d9455bd962f9657801df114d56ee5  ./khora-web/app/api/observaciones/runtime/route.ts
 a71e5d2db9874c598dafe738da89f5c3d4b630e6bcf40c059d5481374cfd6389  ./khora-web/app/api/observaciones/runtime-state/route.ts
