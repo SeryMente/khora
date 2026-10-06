@@ -62,3 +62,64 @@ const authMiddleware = auth((req) => {
   }
   return NextResponse.next();
 });
+
+async function emitBoundaryEvent(req: NextRequest, correlationId: string, response: Response, durationMs: number) {
+  const key = process.env.KHORA_API_KEY;
+  if (!key || req.nextUrl.pathname === "/api/eventos") return;
+
+  const statusCode = response.status;
+  const now = new Date().toISOString();
+  const payload = [{
+    event_uuid: crypto.randomUUID(),
+    schema_version: "2.0",
+    event_name: "SERVICE_HTTP",
+    phase: statusCode === 401 || statusCode === 403 ? "autorizacion" : "manejo",
+    severity: statusCode >= 500 ? "ERROR" : statusCode >= 400 ? "WARN" : "INFO",
+    outcome: statusCode >= 400 ? "FAILURE" : "SUCCESS",
+    component: "khora-web-middleware",
+    correlation_id: correlationId,
+    causation_id: null,
+    attempt_id: null,
+    sequence: null,
+    session_id: null,
+    release_sha: process.env.VERCEL_GIT_COMMIT_SHA || null,
+    client_time: now,
+    server_time: now,
+    duration_ms: durationMs,
+    metrics: { status_code: statusCode, method: req.method, route: req.nextUrl.pathname },
+    reason_code: statusCode >= 400 ? "HTTP_" + statusCode : null,
+    privacy_class: "SYSTEM_AUDIT",
+  }];
+
+  await fetch(new URL("/api/eventos", req.nextUrl.origin), {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-Khora-Key": key },
+    body: JSON.stringify(payload),
+  });
+}
+
+export default async function middleware(req: NextRequest, event: NextFetchEvent) {
+  const correlationId = req.headers.get("x-khora-correlation-id") || crypto.randomUUID();
+  const startedAt = Date.now();
+
+  let response: Response;
+  try {
+    response = await authMiddleware(req, event);
+  } catch (error) {
+    const failureResponse = NextResponse.json({ error: "internal" }, { status: 500 });
+    event.waitUntil(emitBoundaryEvent(req, correlationId, failureResponse, Date.now() - startedAt).catch(() => {}));
+    throw error;
+  }
+
+  try {
+    response.headers.set("X-Khora-Correlation-Id", correlationId);
+  } catch {
+    // Do not let immutable response headers break the service.
+  }
+
+  event.waitUntil(
+    emitBoundaryEvent(req, correlationId, response, Date.now() - startedAt).catch(() => {})
+  );
+
+  return response;
+}
