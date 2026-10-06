@@ -455,7 +455,6 @@ export default function DictadoPage() {
     parteConsecutivaRef.current = 1;
     partesSubidasRef.current = [];
     partesRawRef.current = [];
-    partesRawRef.current = [];
     parteTrozosRef.current = [];
     parteInicioRef.current = Date.now();
     subidaEnCursoRef.current = null;
@@ -576,6 +575,7 @@ export default function DictadoPage() {
         pulidoAplicado: pulidosOk > 0,
         audioPartes: partes.length > 0 ? partes : null,
         estadoTranscripcion: estadoTranscripcionRef.current || null,
+        fuenteEntrada: fuenteEntradaSesionRef.current || "microfono",
       };
 
       let rv: Response;
