@@ -129,13 +129,15 @@ function isHex(value: unknown, length: number): value is string {
 
 function extractPrincipleSection(source: string): string {
   const normalized = normalizeText(source);
-  const titledStart = normalized.search(/^##\\s+4\\.\\s+Principios fundamentales\\s*$/im);
+  const titledStart = normalized.search(/^##\s+4\.\s+Principios fundamentales\s*$/im);
 
   if (titledStart >= 0) {
     const afterStart = normalized.slice(titledStart);
-    const nextMajor = afterStart.slice(afterStart.indexOf("\\n") + 1).search(/^##\\s+/m);
+    const firstLineBreak = afterStart.indexOf("\n");
+    const body = firstLineBreak >= 0 ? afterStart.slice(firstLineBreak + 1) : "";
+    const nextMajor = body.search(/^##\s+/m);
     if (nextMajor >= 0) {
-      return afterStart.slice(0, afterStart.indexOf("\\n") + 1 + nextMajor);
+      return afterStart.slice(0, firstLineBreak + 1 + nextMajor);
     }
     return afterStart;
   }
@@ -143,20 +145,22 @@ function extractPrincipleSection(source: string): string {
   // Evolución tolerante: si el SI cambia la numeración/nombre de la sección,
   // localizar directamente el primer bloque de principios y cerrar en el
   // siguiente heading de nivel 2. Nunca se infiere normativa desde narrativa.
-  const firstPrinciple = normalized.search(/^###\\s+P\\d{3}\\s+·\\s+.+$/m);
+  const firstPrinciple = normalized.search(/^###\s+P\d{3}\s+·\s+.+$/m);
   if (firstPrinciple < 0) throw new Error("SI_SECTION_MISSING");
 
   const afterFirst = normalized.slice(firstPrinciple);
-  const nextMajor = afterFirst.slice(afterFirst.indexOf("\\n") + 1).search(/^##\\s+/m);
+  const firstLineBreak = afterFirst.indexOf("\n");
+  const body = firstLineBreak >= 0 ? afterFirst.slice(firstLineBreak + 1) : "";
+  const nextMajor = body.search(/^##\s+/m);
   if (nextMajor >= 0) {
-    return afterFirst.slice(0, afterFirst.indexOf("\\n") + 1 + nextMajor);
+    return afterFirst.slice(0, firstLineBreak + 1 + nextMajor);
   }
   return afterFirst;
 }
 
 export function parsePrinciples(source: string): ManifestPrinciple[] {
   const section = extractPrincipleSection(source);
-  const matches = Array.from(section.matchAll(/^###\\s+(P\\d{3})\\s+·\\s+(.+?)\\s*$/gm));
+  const matches = Array.from(section.matchAll(/^###\s+(P\d{3})\s+·\s+(.+?)\s*$/gm));
   const principles: ManifestPrinciple[] = [];
   const seenFolios = new Set<string>();
 
@@ -169,8 +173,8 @@ export function parsePrinciples(source: string): ManifestPrinciple[] {
     const start = match.index || 0;
     const end = i + 1 < matches.length ? (matches[i + 1].index || section.length) : section.length;
     const block = normalizeText(section.slice(start, end)).trim();
-    const stateMatch = block.match(/\\*\\*Estado:\\*\\*\\s*([^\\n]+)/i);
-    const preponderanceMatch = block.match(/\\*\\*Índice de preponderancia:\\*\\*\\s*([0-9]+(?:\\.[0-9]+)?)/i);
+    const stateMatch = block.match(/\*\*Estado:\*\*\s*([^\n]+)/i);
+    const preponderanceMatch = block.match(/\*\*Índice de preponderancia:\*\*\s*([0-9]+(?:\.[0-9]+)?)/i);
     const state = stateMatch ? stateMatch[1].trim() : "";
     const preponderance = preponderanceMatch ? Number(preponderanceMatch[1]) : Number.NaN;
 
