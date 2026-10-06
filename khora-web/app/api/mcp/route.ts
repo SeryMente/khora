@@ -19,6 +19,7 @@ import { toolKhoraUiReview } from "@/lib/server/mcp-ui-review";
 import { toolKhoraEstadoVivo, toolKhoraEventosRecientes, toolKhoraObservacionInstantanea, toolKhoraEventosDesde } from "@/lib/server/mcp-observability";
 import { assertNormativeTurnOpen, openNormativeTurn, verifyNormativeTurn } from "@/lib/server/mcp-normative";
 import { authenticateManualMcpToken, MANUAL_MCP_TOKEN_PREFIX } from "@/lib/server/mcp-manual-token";
+import { registrarEventoServicio } from "@/lib/server/service-observability";
 
 export const runtime = "nodejs";
 
@@ -197,18 +198,65 @@ async function handleMcpRequest(req: NextRequest) {
     inputSchema: Record<string, unknown>,
     handler: (args: any) => Promise<any>,
   ) => {
+    const observedHandler = async (args: any, requireTurn: boolean) => {
+      const startedAt = Date.now();
+      try {
+        if (requireTurn) {
+          const normativeDenied = await requireNormativeTurn(actor, args._norm_turn_token);
+          if (normativeDenied) {
+            await registrarEventoServicio({
+              service: "mcp",
+              operation: "tool." + name,
+              route: "/api/mcp",
+              method: "MCP",
+              outcome: "FAILURE",
+              severity: "WARN",
+              reasonCode: "NORMATIVE_TURN_REQUIRED",
+              durationMs: Date.now() - startedAt,
+              metadata: { tool: name },
+            });
+            return normativeDenied;
+          }
+        }
+
+        const result = await handler(requireTurn ? withoutNormTurn(args) : args);
+        const failed = result?.isError === true;
+        await registrarEventoServicio({
+          service: "mcp",
+          operation: "tool." + name,
+          route: "/api/mcp",
+          method: "MCP",
+          outcome: failed ? "FAILURE" : "SUCCESS",
+          severity: failed ? "WARN" : "INFO",
+          durationMs: Date.now() - startedAt,
+          metadata: { tool: name },
+        });
+        return result;
+      } catch (error) {
+        await registrarEventoServicio({
+          service: "mcp",
+          operation: "tool." + name,
+          route: "/api/mcp",
+          method: "MCP",
+          outcome: "FAILURE",
+          severity: "ERROR",
+          durationMs: Date.now() - startedAt,
+          reasonCode: error instanceof Error ? error.name.slice(0, 64) : "TOOL_ERROR",
+          metadata: { tool: name, error_type: error instanceof Error ? error.name : "unknown" },
+        });
+        throw error;
+      }
+    };
+
     if (name === "khora_norm_open_turn" || name === "khora_norm_verify_turn") {
-      return mcpServer.tool(name, description, inputSchema, handler);
+      return mcpServer.tool(name, description, inputSchema, async (args: any) => observedHandler(args, false));
     }
+
     return mcpServer.tool(
       name,
       description,
       withNormTurn(inputSchema as z.ZodRawShape),
-      async (args: any) => {
-        const normativeDenied = await requireNormativeTurn(actor, args._norm_turn_token);
-        if (normativeDenied) return normativeDenied;
-        return handler(withoutNormTurn(args));
-      },
+      async (args: any) => observedHandler(args, true),
     );
   };
 
