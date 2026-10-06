@@ -9,6 +9,7 @@
 - [70. Constructor J7 (ΦM, η/τ, fKGC)](70-constructor.md)
 - [80. Puerto LLM Oficial del Kernel](80-puerto-llm.md)
 - [92. Catálogo e Instalación de Modelos Locales por GPU](92-sprint-modelos-locales-gpu.md)
+- [93. Sprint de Endurecimiento Forense de la Transcripción](93-sprint-endurecimiento-transcripcion.md)
 
 - [📝 BORRADOR: Resolución de Entidades](90-resolucion.md)
 
