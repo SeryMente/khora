@@ -178,7 +178,7 @@ b59633baa23897211cdbf8f690ec6e54cb606d677804aa9e1c0995304f386e3f  ./khora-ok.cmd
 4f2f133dd3d75a473bc7b88a0f1882fa0c1238eb892e0019b8ceef93e9606642  ./khora-ok.ps1
 8c61fa4a406b37cd72fd08bbaa60a32a023551f3b07f832d738def850564ee66  ./khora-web/.env.example
 67343aaa1fbef0b9440e4adfee519385b5fe4abf051b9e2ed3027d664d1e654a  ./khora-web/.gitignore
-73cbd53e59f0fa3ae4264041bc64a8cfeab95c0ff6eb6e6f35bd3beca499b754  ./khora-web/app/.well-known/oauth-authorization-server/route.ts
+433775683891488d01090bd7e903cb119f31d5f01707665182753b8f6ee42358  ./khora-web/app/.well-known/oauth-authorization-server/route.ts
 38cc7c932ae4a6d045109cc5985da635895f9f4c3a78535abfb148a5420bec92  ./khora-web/app/.well-known/oauth-protected-resource/api/mcp/route.ts
 38cc7c932ae4a6d045109cc5985da635895f9f4c3a78535abfb148a5420bec92  ./khora-web/app/.well-known/oauth-protected-resource/route.ts
 9d1ea1747c1c7489b5bfde43a8e7facc8a872e7f93066e1259d34702e66ee4c2  ./khora-web/app/adherence/page.tsx
