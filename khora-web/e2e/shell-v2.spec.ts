@@ -8,6 +8,7 @@ test.describe('Shell Navegación v2', () => {
       { path: '/sistema/volcados', expectedTitle: 'Mesa de Revisión Sincrónica' },
       { path: '/sistema/ingesta', expectedTitle: 'Ingesta' },
       { path: '/sistema/consulta', expectedTitle: 'Consola de Consulta' },
+      { path: '/sistema/otros', expectedTitle: 'Evidencia normativa' },
       { path: '/grafo', expectedTitle: 'Grafo PKG - Proyección Leiden' },
       { path: '/mapa', expectedTitle: 'Mapa Visual de Ramificaciones' }
     ];
@@ -19,11 +20,11 @@ test.describe('Shell Navegación v2', () => {
       try {
         await expect(page.locator(`h1:has-text("${route.expectedTitle}"), h2:has-text("${route.expectedTitle}")`).first()).toBeVisible({ timeout: 5000 });
       } catch (e) {
-          if (route.path === '/grafo') {
-              await expect(page.locator('text="Error: Error fetching graph data"')).toBeVisible();
-          } else {
-              throw e;
-          }
+        if (route.path === '/grafo') {
+          await expect(page.locator('text="Error: Error fetching graph data"')).toBeVisible();
+        } else {
+          throw e;
+        }
       }
     }
   });
