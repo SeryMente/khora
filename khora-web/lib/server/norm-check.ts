@@ -157,6 +157,35 @@ export async function fetchSiBlob(blobSha: string): Promise<string> {
   }
 }
 
+export async function getCurrentSiSnapshot(): Promise<ParsedSi & { gitBlobSha: string }> {
+  const response = await fetch(
+    "https://api.github.com/repos/" + CANONICAL_SI_REPOSITORY + "/contents/" + CANONICAL_SI_PATH + "?ref=main",
+    {
+      headers: {
+        Accept: "application/vnd.github+json",
+        "User-Agent": "Khora-NormCheck/0.1.0",
+      },
+      cache: "no-store",
+    },
+  );
+  if (!response.ok) throw new Error("SI_CURRENT_FETCH_" + response.status);
+  const payload = (await response.json()) as { sha?: string; encoding?: string; content?: string };
+  if (!isHex(payload.sha, 40) || payload.encoding !== "base64" || typeof payload.content !== "string") {
+    throw new Error("SI_CURRENT_PAYLOAD_INVALID");
+  }
+  const source = normalizeText(Buffer.from(payload.content.replace(/\n/g, ""), "base64").toString("utf8"));
+  const versionMatch = source.match(/^\*\*Versión:\*\*\s*(v\d+\.\d+\.\d+)/mi);
+  if (!versionMatch) throw new Error("SI_VERSION_MISSING");
+  const manifest = parsePrinciples(source);
+  return {
+    version: versionMatch[1],
+    sha256: sha256(source),
+    manifest,
+    manifestSha256: buildManifestHash(manifest),
+    gitBlobSha: payload.sha,
+  };
+}
+
 export async function loadSiSnapshot(blobSha: string): Promise<ParsedSi> {
   const source = normalizeText(await fetchSiBlob(blobSha));
   const versionMatch = source.match(/^\*\*Versión:\*\*\s*(v\d+\.\d+\.\d+)/mi);
