@@ -88,6 +88,24 @@ export async function POST(request: Request) {
       contentType: "application/octet-stream",
     });
 
+    // La importación solo se considera custodiada después de releer, descifrar y verificar hash + tamaño.
+    try {
+      const verifyResponse = await fetch(stored.url, { cache: "no-store" });
+      if (!verifyResponse.ok) {
+        await del(stored.url).catch(() => undefined);
+        return NextResponse.json({ detail: `No se pudo verificar la carga almacenada (HTTP ${verifyResponse.status})` }, { status: 502 });
+      }
+      const storedClear = decryptStagedAudio(Buffer.from(await verifyResponse.arrayBuffer()), keyBase64, ivBase64);
+      const verifySha = createHash("sha256").update(storedClear).digest("hex");
+      if (storedClear.length !== clear.length || verifySha !== sha256) {
+        await del(stored.url).catch(() => undefined);
+        return NextResponse.json({ detail: "La verificación de almacenamiento no coincide con el archivo original." }, { status: 502 });
+      }
+    } catch (verifyError) {
+      await del(stored.url).catch(() => undefined);
+      return NextResponse.json({ detail: `Falló la verificación del audio almacenado: ${String(verifyError)}` }, { status: 502 });
+    }
+
     try {
       await registrarParteAudio({
         sessionId,
@@ -96,6 +114,7 @@ export async function POST(request: Request) {
         blobPath: destination,
         bytes: clear.length,
         sha256,
+        estadoVerificacion: "verificado",
       });
     } catch (error) {
       await del(stored.url).catch(() => undefined);
@@ -110,6 +129,7 @@ export async function POST(request: Request) {
       mimeType: format.mimeType,
       originalName,
       estado: "audio_almacenado",
+      verificado: true,
     });
   } catch (error) {
     return NextResponse.json(
