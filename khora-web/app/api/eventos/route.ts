@@ -1,4 +1,5 @@
 // @l0 L0-002-R · @req SISTEMA-MENU/E3,E5
+import { timingSafeEqual } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { getDb } from "@/lib/server/neon";
@@ -10,13 +11,20 @@ import {
 
 export const runtime = "nodejs";
 
+function validServerKey(req: NextRequest): boolean {
+  const supplied = req.headers.get("x-khora-key") || "";
+  const expected = process.env.KHORA_API_KEY || "";
+  if (!supplied || !expected || supplied.length !== expected.length) return false;
+  return timingSafeEqual(Buffer.from(supplied), Buffer.from(expected));
+}
+
 export async function GET(req: NextRequest) {
   const session = await auth();
 
   const isTest =
     process.env.PLAYWRIGHT_TEST_RUN === "1" ||
     process.env.PLAYWRIGHT_TEST_BYPASS === "true";
-  if (!session && !isTest) {
+  if (!session && !isTest && !validServerKey(req)) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
 
