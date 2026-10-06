@@ -80,7 +80,7 @@ export async function exportAudioAsMp3({
       decoded.sampleRate,
       bitrateKbps,
     );
-    const mp3Chunks: Int8Array[] = [];
+    const mp3Chunks: Uint8Array<ArrayBuffer>[] = [];
     const blockSize = 1152;
     const left = decoded.getChannelData(0);
     const right = channels === 2 ? decoded.getChannelData(1) : null;
@@ -91,11 +91,11 @@ export async function exportAudioAsMp3({
       const mp3Buffer = right
         ? encoder.encodeBuffer(leftChunk, floatToInt16(right.subarray(offset, end)))
         : encoder.encodeBuffer(leftChunk);
-      if (mp3Buffer.length > 0) mp3Chunks.push(new Int8Array(mp3Buffer));
+      if (mp3Buffer.length > 0) { const safeChunk = new Uint8Array(new ArrayBuffer(mp3Buffer.length)); safeChunk.set(new Uint8Array(mp3Buffer)); mp3Chunks.push(safeChunk); }
     }
 
     const tail = encoder.flush();
-    if (tail.length > 0) mp3Chunks.push(new Int8Array(tail));
+    if (tail.length > 0) { const safeTail = new Uint8Array(new ArrayBuffer(tail.length)); safeTail.set(new Uint8Array(tail)); mp3Chunks.push(safeTail); }
 
     const blob = new Blob(mp3Chunks, { type: "audio/mpeg" });
     const url = URL.createObjectURL(blob);
