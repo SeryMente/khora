@@ -2,7 +2,7 @@
 import { del, put } from "@vercel/blob";
 import { NextResponse } from "next/server";
 import { createHash } from "crypto";
-import { cifrarBytes } from "../../../lib/server/cripto";
+import { cifrarBytes, descifrarBytes } from "../../../lib/server/cripto";
 import { registrarParteAudio } from "../../../lib/server/dictado";
 import { auth } from "@/auth";
 
@@ -45,7 +45,6 @@ export async function POST(req: Request) {
     const endMs = typeof endMsRaw === "string" && Number.isFinite(Number(endMsRaw)) ? Number(endMsRaw) : undefined;
     const duracionMs = typeof duracionMsRaw === "string" && Number.isFinite(Number(duracionMsRaw)) ? Number(duracionMsRaw) : undefined;
 
-    let destino: string;
     const isSession =
       typeof sesionId === "string" && sesionId.trim().length > 0;
     const isParte = typeof parteStr === "string" && parteStr.trim().length > 0;
@@ -65,9 +64,7 @@ export async function POST(req: Request) {
       );
     }
 
-    if (isSession && isParte) {
-      destino = "dictado/" + sesionId + "/" + partIndex + ".webm.khc";
-    }
+    const destino = "dictado/" + String(sesionId).trim() + "/" + partIndex + ".webm.khc";
 
     const subido = await put(destino, cifrado, {
       access: "public",
