@@ -11,6 +11,7 @@ import {
   globalTimeForPart,
   resolveGlobalSeek,
 } from "../../../lib/audio-playback";
+import { exportAudioAsMp3 } from "../../../lib/client/export-audio-mp3";
 
 export default function VolcadosPage() {
   const [pipelineItems, setPipelineItems] = useState<any[]>([]);
@@ -291,8 +292,9 @@ export default function VolcadosPage() {
       const folio = selectedItem?.folio ? String(selectedItem.folio) : selectedId;
       await exportAudioAsMp3({
         sourceUrl: `/api/audio/${selectedId}`,
+        manifestUrl: `/api/audio/${selectedId}/manifiesto`,
         filename: `khora-volcado-${folio}.mp3`,
-        bitrateKbps: 128,
+        bitrateKbps: 192,
       });
     } catch (err: any) {
       setAudioError(
