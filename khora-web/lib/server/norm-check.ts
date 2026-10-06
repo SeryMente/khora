@@ -63,6 +63,47 @@ export type VerificationResult = {
   integrity: "PASS" | "FAIL";
 };
 
+export type CycleVerificationRecord = {
+  schema: "cycle-verification/v1";
+  cycle_id: string;
+  attempt: number;
+  status: "VERIFIED" | "INVALID" | "INCOMPLETE";
+  evidence_sha256: string;
+  si_version: string;
+  si_sha256: string;
+  manifest_sha256: string;
+  verifier_version: string;
+  recorded_at: string;
+  receipt_id: string | null;
+};
+
+export function buildCycleVerificationRecord(input: {
+  cycle_id: string;
+  attempt: number;
+  status: "VERIFIED" | "INVALID" | "INCOMPLETE";
+  evidence_sha256: string;
+  si_version: string;
+  si_sha256: string;
+  manifest_sha256: string;
+  verifier_version: string;
+  recorded_at: string;
+  receipt_id?: string | null;
+}): CycleVerificationRecord {
+  return {
+    schema: "cycle-verification/v1",
+    cycle_id: input.cycle_id,
+    attempt: input.attempt,
+    status: input.status,
+    evidence_sha256: input.evidence_sha256,
+    si_version: input.si_version,
+    si_sha256: input.si_sha256,
+    manifest_sha256: input.manifest_sha256,
+    verifier_version: input.verifier_version,
+    recorded_at: input.recorded_at,
+    receipt_id: input.receipt_id ?? null,
+  };
+}
+
 type ParsedSi = {
   version: string;
   sha256: string;
