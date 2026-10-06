@@ -262,13 +262,10 @@ test.describe('Dictado por partes contract test', () => {
     await page.locator('button:has-text("Archivar volcado")').click();
     await page.waitForTimeout(1000);
 
-    // Text should save successfully even though audio failed with 502 (non-JSON)
-    expect(dictadoPayload).not.toBeNull();
-    expect(dictadoPayload.texto.toLowerCase()).toContain('saving even with failed audio upload');
-    expect(dictadoPayload.audioPartes).toBeNull(); // No parts successfully uploaded
+    // AUD-05: una sesión de voz sin audio verificado NO puede archivarse.
+    expect(dictadoPayload).toBeNull();
 
-    // Success message should show up
-    const successMsg = page.locator('main div:has(svg)').filter({ hasText: /archivado/ });
-    await expect(successMsg).toBeVisible();
+    const errorAlert = page.locator('main div').filter({ hasText: /No se puede archivar el volcado.*custodia íntegra/i }).last();
+    await expect(errorAlert).toBeVisible();
   });
 });
