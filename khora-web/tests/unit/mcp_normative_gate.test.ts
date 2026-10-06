@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { signJwt } from "@/lib/server/jwt";
 import { assertNormativeTurnOpen } from "@/lib/server/mcp-normative";
+import { buildCycleVerificationRecord } from "@/lib/server/norm-check";
 import { resetDbForTesting, setDbForTesting } from "@/lib/server/neon";
 
 process.env.NODE_ENV = "test";
@@ -142,4 +143,26 @@ test("normative gate rejects a token after global revocation", async () => {
   } finally {
     resetDbForTesting();
   }
+});
+
+test("cycle verification output record preserves cycle, attempt, verdict and evidence", () => {
+  const record = buildCycleVerificationRecord({
+    cycle_id: cycleId,
+    attempt: 2,
+    status: "VERIFIED",
+    evidence_sha256: "a".repeat(64),
+    si_version: "v1.1.0",
+    si_sha256: "b".repeat(64),
+    manifest_sha256: "c".repeat(64),
+    verifier_version: "norm-check/0.2.0",
+    recorded_at: "2026-10-06T20:00:00.000Z",
+    receipt_id: "receipt-1",
+  });
+
+  assert.equal(record.schema, "cycle-verification/v1");
+  assert.equal(record.cycle_id, cycleId);
+  assert.equal(record.attempt, 2);
+  assert.equal(record.status, "VERIFIED");
+  assert.equal(record.evidence_sha256, "a".repeat(64));
+  assert.equal(record.receipt_id, "receipt-1");
 });
