@@ -36,7 +36,9 @@ test.describe('Dictado por partes contract test', () => {
         body: JSON.stringify({
           url: 'https://blob.vercel-storage.com/dictado/mock-part-url.webm.khc',
           bytes: postData ? postData.length : 1234,
-          cifrado: true
+          cifrado: true,
+          sha256: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          verificado: true
         }),
       });
     });
