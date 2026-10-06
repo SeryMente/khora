@@ -122,6 +122,7 @@ test("2. MCP_CANONICAL_URL semantics and metadata endpoints consistency", async 
   assert.equal(authMeta.issuer, "https://khora.example.com");
   assert.equal(authMeta.authorization_endpoint, "https://khora.example.com/oauth/authorize");
   assert.equal(authMeta.token_endpoint, "https://khora.example.com/api/oauth/token");
+  assert.deepEqual(authMeta.scopes_supported, ["runtime:read", "volcados:read", "norm:turn", "offline_access"]);
 });
 
 test("2b. PKCE S256 verification behavior", () => {
