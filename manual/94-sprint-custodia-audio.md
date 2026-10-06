@@ -289,7 +289,7 @@ Una vez cerrado AUD-05:
 2. el audio de Khora se convierte en la fuente acústica primaria del laboratorio;
 3. el expediente FTS puede utilizar esos audios directamente;
 4. la estrategia forense de transcripción retoma su ejecución;
-5. la comparación Cora/Khora contra terceros pasa a ser una herramienta de contraste, no una necesidad de custodia.
+5. la comparación Khora/Khora contra terceros pasa a ser una herramienta de contraste, no una necesidad de custodia.
 
 ---
 
