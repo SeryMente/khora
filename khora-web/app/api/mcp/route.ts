@@ -80,7 +80,9 @@ async function handleMcpRequest(req: NextRequest) {
   let actor: string;
   let scopes: string[];
   let tokenGeneration: number;
-  const manualToken = token.startsWith(MANUAL_MCP_TOKEN_PREFIX)\n    ? await authenticateManualMcpToken(token)\n    : null;
+  const manualToken = token.startsWith(MANUAL_MCP_TOKEN_PREFIX)
+    ? await authenticateManualMcpToken(token)
+    : null;
 
   if (manualToken) {
     if (manualToken.resource !== config.canonicalUrl) {
