@@ -240,7 +240,8 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
       "pipeline.container",
       "revision.audio-player",
       "revision.btn-play-pause",
-      "revision.audio-seek-slider"
+      "revision.audio-seek-slider",
+      "revision.btn-download-mp3"
     ]
   },
   "revision:incident": {
