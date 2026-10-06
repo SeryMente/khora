@@ -174,6 +174,7 @@ export function buildPipelineState(
     duracionTotalMs: 60000,
     isPlaying: scenario === "audio_multipart",
     audioError: scenario === "incident" ? "Audio no disponible" : null,
+    exportingMp3: false,
     hallazgos: scenario === "suggestions" ? FIXTURE_HALLAZGOS : [],
     activeHallazgoIndex: 0,
     incidentes: scenario === "incident" ? FIXTURE_INCIDENTES : [],
