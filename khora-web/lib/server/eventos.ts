@@ -1,5 +1,6 @@
 // @l0 L0-002-R · @req SISTEMA-MENU/E3,E4,H
 import { createHash, randomUUID } from "crypto";
+import { getServiceCorrelationId } from "./service-context";
 import { getDb } from "./neon";
 import {
   ObservationEnvelope,
@@ -449,7 +450,7 @@ export async function registrarEventosBatch(
       continue;
     }
 
-    const correlacionId = params.correlacionId || randomUUID();
+    const correlacionId = params.correlacionId || getServiceCorrelationId() || randomUUID();
     const eventUuid = params.eventUuid || randomUUID();
     const idempotencyKey = params.idempotencyKey || null;
 
