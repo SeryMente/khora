@@ -72,6 +72,8 @@ export default function DictadoPage() {
 
   // New refs for session, parts & raw blobs
   const sesionIdRef = useRef<string>("");
+  const modoEntradaRef = useRef<"microfono" | "chrome_live_caption" | "ninguno">("microfono");
+  const fuenteEntradaSesionRef = useRef<"microfono" | "chrome_live_caption" | null>("microfono");
   const parteConsecutivaRef = useRef<number>(1);
   const partesSubidasRef = useRef<{ parte: number; url: string; bytes: number; sha256: string; verificado: boolean }[]>([]);
   const partesRawRef = useRef<{ parte: number; blob: Blob }[]>([]);
