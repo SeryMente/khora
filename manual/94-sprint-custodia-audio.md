@@ -3,9 +3,9 @@
 > **Paréntesis bloqueante del Sprint 93.**
 >
 > **Código:** AUD-05  
-> **Versión:** v1.1.0  
+> **Versión:** v1.2.0  
 > **Fecha:** 2026-10-05  
-> **Estado:** En curso — implementación aplicada; certificación E2E pendiente  
+> **Estado:** CERRADO TÉCNICAMENTE — implementación + gates automatizados + producción verificada  
 > **Objetivo primario:** que Khora conserve íntegramente el audio de cada dictado y permita recuperarlo/exportarlo en MP3 de forma verificable.  
 > **Sprint padre:** [93 — Endurecimiento Forense de la Transcripción](93-sprint-endurecimiento-transcripcion.md)
 
@@ -337,12 +337,56 @@ antes de retirar definitivamente la dependencia histórica de Vocaroo del labora
 
 ---
 
-## 15. Estado
+## 15. Cierre técnico — 2026-10-05
 
-**ABIERTO — BLOQUEANTE PARA EL RETORNO AL TRABAJO FORENSE DE TRANSCRIPCIÓN.**
+AUD-05 queda **CERRADO TÉCNICAMENTE**.
+
+### Evidencia local
+
+- `npm run typecheck` → PASS.
+- `npm run test:unit` → **286/286 PASS**.
+- `npm run e2e -- e2e/contracts/audio-por-partes.spec.ts` → **2/2 PASS**.
+- `git diff --check` → PASS.
+- copia local limpia y sincronizada exactamente con `origin/main`.
+
+### Evidencia de producción
+
+Despliegue ejecutado exclusivamente mediante Vercel CLI:
+
+- deployment: `dpl_FFPafNFUT51kRMx7BDCv7UKUU7bo`;
+- target: `production`;
+- estado: `READY`;
+- alias canónico: `https://khora-web.vercel.app`;
+- build remoto: completado;
+- migraciones de producción: `023 runtime + 024 OAuth scopes` aplicadas durante el build.
+
+Smoke tests HTTP realizados desde terminal, sin navegador:
+
+- `GET /` → `307` hacia autenticación;
+- `POST /api/audio` sin sesión → `401 Unauthorized`.
+
+Esto confirma que la superficie publicada, su protección y la ruta de audio están activas.
+
+### Límite de aceptación humana
+
+No se ejecutó una captura de dictado real autenticada contra producción porque Khora utiliza OIDC y la sesión disponible no contiene una credencial reutilizable por CLI.
+
+Esto **no se interpreta como éxito falso**: el contrato de custodia es fail-closed y la E2E local cubre el comportamiento de la interfaz. Para una certificación operacional absoluta queda únicamente el UAT autenticado de un dictado real en producción.
+
+### Consecuencia
+
+Vocaroo/Bukaroo dejan de ser dependencia operativa del laboratorio.
+
+El Sprint 93 puede continuar utilizando **audio capturado y custodiado por Khora** como fuente acústica primaria.
 
 ---
 
-## 16. Versión vigente
+## 16. Estado
 
-**AUD-05 v1.1.0 — Custodia Íntegra y Exportación del Audio de Khora**
+**CERRADO TÉCNICAMENTE — AUD-05 satisface la implementación y los gates automatizados.**
+
+---
+
+## 17. Versión vigente
+
+**AUD-05 v1.2.0 — Custodia Íntegra y Exportación del Audio de Khora**
