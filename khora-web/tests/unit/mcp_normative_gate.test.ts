@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { signJwt } from "@/lib/server/jwt";
-import { assertNormativeTurnOpen } from "@/lib/server/mcp-normative";
+import { assertNormativeTurnOpen, verifyNormativeTurn } from "@/lib/server/mcp-normative";
 import { buildCycleVerificationRecord } from "@/lib/server/norm-check";
 import { resetDbForTesting, setDbForTesting } from "@/lib/server/neon";
 
@@ -165,4 +165,20 @@ test("cycle verification output record preserves cycle, attempt, verdict and evi
   assert.equal(record.status, "VERIFIED");
   assert.equal(record.evidence_sha256, "a".repeat(64));
   assert.equal(record.receipt_id, "receipt-1");
+});
+
+
+test("normative verification rejects replay of a token after the turn is closed", async () => {
+  setMockTurn({ status: "CLOSED" });
+  try {
+    await assert.rejects(
+      verifyNormativeTurn(actor, {
+        turn_token: makeToken(),
+        receipt: {} as any,
+      }),
+      /TURN_TOKEN_REPLAY_AFTER_CLOSE/,
+    );
+  } finally {
+    resetDbForTesting();
+  }
 });
