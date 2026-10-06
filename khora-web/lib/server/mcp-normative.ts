@@ -6,6 +6,7 @@ import {
   getCurrentSiSnapshot,
   verifyNormativeReceipt,
   type NormativeReceipt,
+  buildCycleVerificationRecord,
 } from "./norm-check";
 
 const TURN_TOKEN_KIND = "norm-turn";
@@ -332,6 +333,18 @@ export async function verifyNormativeTurn(
         idempotent: true,
         closed: true,
         result: existingReceipt.rows[0],
+        verification_record: buildCycleVerificationRecord({
+          cycle_id: turn.cycle_id,
+          attempt: token.turn_attempt,
+          status: existingReceipt.rows[0].status,
+          evidence_sha256: existingReceipt.rows[0].evidence_sha256,
+          si_version: existingReceipt.rows[0].si_version,
+          si_sha256: existingReceipt.rows[0].si_sha256,
+          manifest_sha256: existingReceipt.rows[0].manifest_sha256,
+          verifier_version: existingReceipt.rows[0].verifier_version,
+          recorded_at: existingReceipt.rows[0].created_at,
+          receipt_id: existingReceipt.rows[0].id,
+        }),
       };
     }
     throw new Error("TURN_ALREADY_CLOSED");
@@ -427,6 +440,18 @@ export async function verifyNormativeTurn(
       closed: result.status === "VERIFIED",
       next_attempt: result.status === "VERIFIED" ? null : receipt.cycle.attempt + 1,
       result,
+      verification_record: buildCycleVerificationRecord({
+        cycle_id: receipt.cycle.id,
+        attempt: receipt.cycle.attempt,
+        status: result.status,
+        evidence_sha256: receipt.evidence_sha256,
+        si_version: receipt.si.version,
+        si_sha256: receipt.si.sha256,
+        manifest_sha256: receipt.si.manifest_sha256,
+        verifier_version: "norm-check/0.2.0",
+        recorded_at: insert.rows[0].created_at,
+        receipt_id: insert.rows[0].id,
+      }),
     };
   } catch (error) {
     await client.query("ROLLBACK");
@@ -445,6 +470,18 @@ export async function verifyNormativeTurn(
           idempotent: true,
           closed: existing.rows[0].status === "VERIFIED",
           result: existing.rows[0],
+          verification_record: buildCycleVerificationRecord({
+            cycle_id: receipt.cycle.id,
+            attempt: receipt.cycle.attempt,
+            status: existing.rows[0].status,
+            evidence_sha256: existing.rows[0].evidence_sha256,
+            si_version: existing.rows[0].si_version,
+            si_sha256: existing.rows[0].si_sha256,
+            manifest_sha256: existing.rows[0].manifest_sha256,
+            verifier_version: existing.rows[0].verifier_version,
+            recorded_at: existing.rows[0].created_at,
+            receipt_id: existing.rows[0].id,
+          }),
         };
       }
     }
