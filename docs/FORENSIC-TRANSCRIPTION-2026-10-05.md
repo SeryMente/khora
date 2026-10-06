@@ -2,13 +2,13 @@
 # Especificación Forense de Transcripción · Khora
 
 **Especificación:** FTS-001  
-**Versión:** 1.1.0  
+**Versión:** 1.2.0  
 **Fecha:** 2026-10-05  
 **Estado:** normativa para el ciclo forense de ingreso de volcados  
 **Repositorio:** SeryMente/khora  
 **Referencia arquitectónica:** Entorno Persistente Medio v1.0.1  
 **Objetivo:** máxima fidelidad verbal demostrable contra el audio original.  
-**Sprint canónico:** [`manual/93-sprint-endurecimiento-transcripcion.md`](../blob/main/manual/93-sprint-endurecimiento-transcripcion.md), TRS-001 v1.1.0.
+**Sprint canónico:** [`manual/93-sprint-endurecimiento-transcripcion.md`](../blob/main/manual/93-sprint-endurecimiento-transcripcion.md), TRS-001 v1.2.0.
 
 ---
 
@@ -155,6 +155,11 @@ Duración observada por control ASR:
 La transcripción Cora usada en este ciclo es una fuente candidata de comparación,
 no una fuente de verdad.
 
+El cierre debe evitar el sobreajuste al único caso actual. El corpus mínimo del
+sprint será una muestra larga de oro, al menos cuatro muestras dirigidas y una
+muestra holdout ciega. La holdout no participa en el ajuste y se utiliza para
+validar generalización antes de declarar capacidad robusta.
+
 Para el objetivo del sprint, esta muestra debe conservar tres capas separadas:
 
 1. audio original;
@@ -201,6 +206,17 @@ modelos menores sólo como controles
 ~~~
 
 No se permite bajar de modelo sólo para obtener más velocidad.
+
+### 5.3 Prioridad de la prueba de Cora
+
+El expediente no se considera completo por disponer de una salida excelente de
+Whisper. La pregunta experimental es si **Cora**, en su flujo real de ingreso,
+reduce sus errores frente a la referencia acústica sin crear nuevas
+discrepancias.
+
+Cada iteración debe conservar el antes/después de Cora y registrar qué cambio
+se introdujo.
+
 
 ### 5.1 Hardware de referencia del ciclo
 
@@ -291,6 +307,20 @@ medium/small ─→ control de consistencia
 
 Un modelo menor no puede invalidar automáticamente la convergencia fuerte de
 large-v3, pero sí puede elevar un pasaje a revisión amarilla.
+
+---
+
+## 8. Regla de aceptación de Cora
+
+Para cada muestra evaluada:
+
+`PASS = 0 omisiones + 0 inserciones + 0 sustituciones + 0 YELLOW sin resolver`
+
+WER/CER se conservarán como métricas de progreso y regresión, pero nunca
+sustituyen este criterio binario.
+
+Una salida de Cora que sea inteligible pero contenga una sola discrepancia de
+palabra permanece en FAIL.
 
 ---
 
