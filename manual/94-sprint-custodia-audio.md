@@ -3,9 +3,9 @@
 > **Paréntesis bloqueante del Sprint 93.**
 >
 > **Código:** AUD-05  
-> **Versión:** v1.0.0  
+> **Versión:** v1.1.0  
 > **Fecha:** 2026-10-05  
-> **Estado:** En curso  
+> **Estado:** En curso — implementación aplicada; certificación E2E pendiente  
 > **Objetivo primario:** que Khora conserve íntegramente el audio de cada dictado y permita recuperarlo/exportarlo en MP3 de forma verificable.  
 > **Sprint padre:** [93 — Endurecimiento Forense de la Transcripción](93-sprint-endurecimiento-transcripcion.md)
 
@@ -293,12 +293,56 @@ Una vez cerrado AUD-05:
 
 ---
 
-## 14. Estado
+## 14. Estado de implementación — 2026-10-05
+
+La primera implementación del contrato AUD-05 ya fue aplicada en `main`.
+
+### Controles incorporados
+
+- contrato de custodia por parte con índice, bytes, SHA-256 y estado de verificación;
+- verificación post-escritura mediante recuperación + descifrado + comparación de bytes + SHA-256;
+- archivado de sesiones de voz bloqueado si falta audio verificado;
+- reintento de subida por parte;
+- manifiesto con estado de custodia;
+- recuperación del audio bloqueada cuando la sesión está incompleta o no verificada;
+- validación del tamaño recuperado por parte y del total del volcado;
+- exportación MP3 bloqueada hasta que el manifiesto confirme custodia íntegra;
+- bitrate MP3 predeterminado elevado a 192 kbps;
+- pruebas unitarias iniciales para el contrato de custodia.
+
+### Evidencia de integración
+
+Commits principales de implementación:
+
+- `6098403e` — contrato de custodia;
+- `c446d45f` — pruebas unitarias;
+- `a69c5161` / `8836345c` — verificación post-escritura de captura;
+- `7792cab0` — archivado condicionado a custodia;
+- `81fb162b` / `4b0869c5` — manifiesto de custodia;
+- `ea775357` / `5fa1b5c` — recuperación íntegra;
+- `f623a164` / `d96591e5` — exportación MP3 verificada;
+- `d593f965` — integración del botón de exportación en el cockpit.
+
+### Verificación pendiente
+
+La última corrida de CI para el código aplicado está todavía en curso. Por tanto:
+
+**AUD-05 NO está cerrado todavía.**
+
+Debe completarse además una prueba E2E real de:
+
+`captura → subida → verificación → archivado → recuperación → reproducción → exportación MP3`
+
+antes de retirar definitivamente la dependencia histórica de Vocaroo del laboratorio operativo.
+
+---
+
+## 15. Estado
 
 **ABIERTO — BLOQUEANTE PARA EL RETORNO AL TRABAJO FORENSE DE TRANSCRIPCIÓN.**
 
 ---
 
-## 15. Versión vigente
+## 16. Versión vigente
 
-**AUD-05 v1.0.0 — Custodia Íntegra y Exportación del Audio de Khora**
+**AUD-05 v1.1.0 — Custodia Íntegra y Exportación del Audio de Khora**
