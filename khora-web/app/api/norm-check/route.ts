@@ -5,6 +5,7 @@ import { getDb } from "@/lib/server/neon";
 import {
   getCurrentVerifierInfo,
   NORM_CHECK_VERIFIER_VERSION,
+  getCurrentSiSnapshot,
   verifyNormativeReceipt,
   type NormativeReceipt,
 } from "@/lib/server/norm-check";
@@ -78,10 +79,6 @@ async function authorize(request: NextRequest, allowApiKey: boolean) {
 const noStore = { "Cache-Control": "no-store" };
 
 export async function GET(request: NextRequest) {
-  if (!(await authorize(request, false))) {
-    return NextResponse.json({ error: "No autorizado" }, { status: 401, headers: noStore });
-  }
-
   const mode = request.nextUrl.searchParams.get("mode");
   const actor = await authorize(request, mode === "snapshot");
   if (!actor) {
@@ -90,7 +87,6 @@ export async function GET(request: NextRequest) {
 
   try {
     if (mode === "snapshot") {
-      const { getCurrentSiSnapshot } = await import("@/lib/server/norm-check");
       const snapshot = await getCurrentSiSnapshot();
       return NextResponse.json(
         {
