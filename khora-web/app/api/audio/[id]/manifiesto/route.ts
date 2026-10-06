@@ -41,6 +41,18 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
       session_id: sessionId,
     });
 
+    let totalPartesEsperado: number | null = null;
+    if (sessionId) {
+      const sessionRes = await db.query(
+        "SELECT total_partes FROM dictado_session WHERE session_id = $1",
+        [sessionId],
+      );
+      if (sessionRes.rows.length > 0) {
+        const n = Number(sessionRes.rows[0].total_partes);
+        totalPartesEsperado = Number.isInteger(n) && n > 0 ? n : null;
+      }
+    }
+
     // Buscar partes registradas en dictado_audio_parte
     let partesDb: any[] = [];
     if (sessionId || volcadoId) {
@@ -172,7 +184,7 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
         sha256: p.sha256,
         estado_verificacion: p.verificado ? "verificado" : "pendiente",
       })),
-      partesManifiesto.length,
+      totalPartesEsperado ?? partesManifiesto.length,
     );
 
     const computedStatus = custodia.ok ? "disponible" : "incompleto";
