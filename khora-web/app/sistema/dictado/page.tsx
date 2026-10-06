@@ -73,7 +73,7 @@ export default function DictadoPage() {
   // New refs for session, parts & raw blobs
   const sesionIdRef = useRef<string>("");
   const parteConsecutivaRef = useRef<number>(1);
-  const partesSubidasRef = useRef<{ parte: number; url: string; bytes: number }[]>([]);
+  const partesSubidasRef = useRef<{ parte: number; url: string; bytes: number; sha256: string; verificado: boolean }[]>([]);
   const partesRawRef = useRef<{ parte: number; blob: Blob }[]>([]);
   const parteTrozosRef = useRef<Blob[]>([]);
   const parteInicioRef = useRef<number>(0);
@@ -157,37 +157,52 @@ export default function DictadoPage() {
     const sesionId = sesionIdRef.current;
 
     const ejecutarSubidas = async () => {
-      const forma = new FormData();
-      forma.append("audio", blob, `dictado-parte-${parteActual}.webm`);
-      forma.append("sesionId", sesionId);
-      forma.append("parte", String(parteActual));
+      const maxIntentos = 3;
+      let ultimoError = "fallo desconocido";
 
-      try {
-        const ra = await fetch("/api/audio", { method: "POST", body: forma });
-        const textoRespuesta = await ra.text();
-        let da: any = {};
+      for (let intento = 1; intento <= maxIntentos; intento += 1) {
+        const forma = new FormData();
+        forma.append("audio", blob, `dictado-parte-${parteActual}.webm`);
+        forma.append("sesionId", sesionId);
+        forma.append("parte", String(parteActual));
+        forma.append("fuenteAudio", modoEntradaRef.current === "chrome_live_caption" ? "chrome_tab" : "microphone");
+
         try {
-          da = JSON.parse(textoRespuesta);
-        } catch {
-          da = { detail: "Respuesta no-JSON de la API de audio: " + textoRespuesta.slice(0, 100) };
+          const ra = await fetch("/api/audio", { method: "POST", body: forma });
+          const textoRespuesta = await ra.text();
+          let da: any = {};
+          try {
+            da = JSON.parse(textoRespuesta);
+          } catch {
+            da = { detail: "Respuesta no-JSON de la API de audio: " + textoRespuesta.slice(0, 100) };
+          }
+
+          if (ra.ok && typeof da?.url === "string" && da?.verificado === true && typeof da?.sha256 === "string") {
+            const bytesSubidos = typeof da?.bytes === "number" ? da.bytes : blob.size;
+            partesSubidasRef.current.push({
+              parte: parteActual,
+              url: da.url,
+              bytes: bytesSubidos,
+              sha256: da.sha256,
+              verificado: true,
+            });
+            setPartesContador(partesSubidasRef.current.length);
+            setBytesAcumulados((total) => total + bytesSubidos);
+            setConAudio(true);
+            return;
+          }
+
+          ultimoError = String(da?.detail || "La API no confirmó custodia verificable.");
+        } catch (e) {
+          ultimoError = String(e);
         }
 
-        if (ra.ok && typeof da?.url === "string") {
-          const bytesSubidos = typeof da?.bytes === "number" ? da.bytes : blob.size;
-          partesSubidasRef.current.push({
-            parte: parteActual,
-            url: da.url,
-            bytes: bytesSubidos,
-          });
-          setPartesContador(partesSubidasRef.current.length);
-          setBytesAcumulados((total) => total + bytesSubidos);
-          setConAudio(true);
-        } else {
-          setAviso(`audio parte ${parteActual} no guardada: ${String(da?.detail || "")}`);
+        if (intento < maxIntentos) {
+          await new Promise((resolve) => setTimeout(resolve, 500 * intento));
         }
-      } catch (e) {
-        setAviso(`audio parte ${parteActual} no guardada por error: ${String(e)}`);
       }
+
+      setAviso(`audio parte ${parteActual} no guardada tras ${maxIntentos} intentos: ${ultimoError}`);
     };
 
     const anteriorSubida = subidaEnCursoRef.current || Promise.resolve();
@@ -440,6 +455,7 @@ export default function DictadoPage() {
     parteConsecutivaRef.current = 1;
     partesSubidasRef.current = [];
     partesRawRef.current = [];
+    partesRawRef.current = [];
     parteTrozosRef.current = [];
     parteInicioRef.current = Date.now();
     subidaEnCursoRef.current = null;
@@ -528,6 +544,20 @@ export default function DictadoPage() {
       let audioUrl: string | null = null;
       let audioBytes: number | null = null;
       const partes = partesSubidasRef.current;
+
+      const audioEsperado = fuenteEntradaSesionRef.current === "microfono" || fuenteEntradaSesionRef.current === "chrome_live_caption";
+      const partesGeneradas = partesRawRef.current.length;
+      const indicesSubidos = new Set(partes.map((p) => p.parte));
+      const audioIntegro = audioEsperado && partesGeneradas > 0
+        ? partes.length === partesGeneradas &&
+          [...Array(partesGeneradas)].every((_, i) => indicesSubidos.has(i + 1)) &&
+          partes.every((p) => p.verificado === true && /^[0-9a-f]{64}$/i.test(p.sha256))
+        : !audioEsperado;
+
+      if (audioEsperado && !audioIntegro) {
+        setError("No se puede archivar el volcado: Khora no ha verificado la custodia íntegra de todas las partes de audio.");
+        return;
+      }
 
       if (partes.length > 0) {
         const ordenadas = [...partes].sort((a, b) => a.parte - b.parte);
