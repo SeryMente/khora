@@ -161,3 +161,15 @@ Cuatro perfiles listos en el repositorio. La prueba en vivo con credenciales rea
 
 - **Intérprete**: Probar `/sistema/consulta` y `/sistema/kpis` con la infraestructura local en marcha.
 - **Intérprete**: Confirmar alcance del Radar + Benchmarking Didáctico (doc 91 §13).
+
+
+## 14. Sprint hermano — endurecimiento forense de transcripción
+
+La capacidad local de inferencia es un habilitador de infraestructura para el endurecimiento de STT, pero no constituye por sí misma una prueba de fidelidad acústica.
+
+El contrato específico de calidad y aceptación vive en:
+
+- [93 — Sprint: Endurecimiento Forense de la Transcripción de Khora](93-sprint-endurecimiento-transcripcion.md)
+- `docs/FORENSIC-TRANSCRIPTION-2026-10-05.md`
+
+Regla de integración: disponer de GPU/modelos locales mejora la capacidad de experimentación y reduce la latencia del laboratorio, pero **no autoriza a declarar una transcripción correcta sin la validación forense contra el audio soberano**.
