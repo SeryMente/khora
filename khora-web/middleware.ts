@@ -1,6 +1,6 @@
 // @l0 L0-002 §4 · @req AUTH-F1-01/REQ-1 · @acr ACR-1.2 · @req UI-REVIEW/SECURITY
 import { auth } from "@/auth";
-import { NextResponse } from "next/server";
+import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
 import { resolverGeneracion } from "./lib/server/generacion";
 
 const RUTAS_OS = new Set<string>(["/"]);
@@ -9,11 +9,11 @@ const RUTAS_OS = new Set<string>(["/"]);
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|ep-main-live\\.json$|auth/signin|api/auth|api/version|api/mcp|api/ep/(?:bootstrap|events|logs)|\\.well-known|api/oauth/token).*)",
+    "/((?!_next/static|_next/image|favicon.ico|ep-main-live\\.json$|auth/signin|api/auth|api/version|api/eventos|\\.well-known).*)",
   ],
 };
 
-export default auth((req) => {
+const authMiddleware = auth((req) => {
   const pathname = req.nextUrl.pathname;
 
   // Fail-closed security for /ui-review
