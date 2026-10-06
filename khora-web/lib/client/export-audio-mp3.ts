@@ -24,6 +24,7 @@ export async function exportAudioAsMp3({
     throw new Error("Bitrate MP3 no permitido.");
   }
 
+  let expectedBytes: number | null = null;
   if (manifestUrl) {
     const manifestResponse = await fetch(manifestUrl, { cache: "no-store" });
     let manifest: any = {};
@@ -34,6 +35,7 @@ export async function exportAudioAsMp3({
     if (manifest?.audio_status !== "disponible" || manifest?.custodia?.ok !== true) {
       throw new Error(manifest?.custodia?.motivo || "El audio no está verificado para exportación.");
     }
+    expectedBytes = Number.isFinite(Number(manifest?.bytes_totales)) ? Number(manifest.bytes_totales) : null;
   }
 
   const response = await fetch(sourceUrl, { cache: "no-store" });
@@ -51,6 +53,9 @@ export async function exportAudioAsMp3({
   const bytes = await response.arrayBuffer();
   if (bytes.byteLength === 0) {
     throw new Error("Khora devolvió un audio vacío; se bloqueó la exportación.");
+  }
+  if (expectedBytes !== null && bytes.byteLength !== expectedBytes) {
+    throw new Error(`El audio recuperado no coincide con el manifiesto (${bytes.byteLength} vs ${expectedBytes} bytes).`);
   }
   const contentType = response.headers.get("content-type") || "";
   if (!contentType.toLowerCase().startsWith("audio/")) {
