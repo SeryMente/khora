@@ -235,6 +235,47 @@ export async function openNormativeTurn(
   };
 }
 
+export async function assertNormativeTurnOpen(actor: string, turnToken: string) {
+  if (!validActor(actor)) throw new Error("TURN_ACTOR_INVALID");
+  if (typeof turnToken !== "string" || turnToken.length < 16) throw new Error("TURN_TOKEN_INVALID");
+
+  const config = getMcpConfig();
+  if (!config) throw new Error("MCP_CONFIG_MISSING");
+  const tokenResult = verifyJwtDetailed(turnToken, config.jwtSecret);
+  if (!tokenResult.ok) throw tokenFailure("TURN_TOKEN_" + tokenResult.error.toUpperCase());
+
+  const token = tokenResult.payload;
+  const tokenScopes = token.scope.split(/\s+/).filter(Boolean);
+  if (
+    token.token_kind !== TURN_TOKEN_KIND ||
+    !tokenScopes.includes("norm:turn") ||
+    token.iss !== config.issuer ||
+    token.aud !== config.canonicalUrl ||
+    token.sub !== actor ||
+    typeof token.turn_cycle_id !== "string" ||
+    typeof token.turn_nonce !== "string" ||
+    !Number.isSafeInteger(token.turn_attempt) ||
+    typeof token.turn_si_sha256 !== "string" ||
+    typeof token.turn_manifest_sha256 !== "string"
+  ) throw new Error("TURN_TOKEN_CLAIMS_INVALID");
+
+  const gen = await obtenerGeneracionRevocacion(actor);
+  if (token.gen !== gen) throw new Error("TURN_TOKEN_REVOKED");
+
+  const turn = await readTurn(token.turn_cycle_id);
+  if (!turn) throw new Error("TURN_NOT_FOUND");
+  if (turn.actor !== actor) throw new Error("TURN_ACTOR_MISMATCH");
+  if (turn.status !== "OPEN") throw new Error("TURN_NOT_OPEN");
+  if (
+    token.turn_nonce !== turn.nonce ||
+    token.turn_attempt !== turn.current_attempt ||
+    token.turn_si_sha256 !== turn.si_sha256 ||
+    token.turn_manifest_sha256 !== turn.manifest_sha256
+  ) throw new Error("TURN_TOKEN_STATE_MISMATCH");
+
+  return turn;
+}
+
 export async function verifyNormativeTurn(
   actor: string,
   input: { turn_token: string; receipt: NormativeReceipt }

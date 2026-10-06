@@ -53,7 +53,15 @@ Existe además una migración SQL 025 y un bootstrap perezoso de la tabla para e
 - abrir el detalle de un comprobante;
 - pegar un receipt JSON y solicitar la verificación server-side.
 
-## Flujo normativo por MCP\n\n1. `khora_norm_open_turn` fija el snapshot del SI y emite un token de turno.\n2. El modelo ejecuta la tarea con ese snapshot.\n3. `khora_norm_verify_turn` valida el receipt y persiste el intento.\n4. Solo `VERIFIED` marca el turno como cerrado en KHORA.\n5. `INVALID` e `INCOMPLETE` dejan el turno abierto y avanzan `attempt`.\n\nEl mismo endpoint MCP sirve para el resto de capacidades de Cora/KHORA; no se crea una segunda entrada normativa. El transporte Bearer puede proceder de OAuth o de un token manual gestionado por KHORA.\n\n## Límite
+## Flujo normativo por MCP\n\n1. `khora_norm_open_turn` fija el snapshot del SI y emite un token de turno.\n2. El modelo ejecuta la tarea con ese snapshot.\n3. `khora_norm_verify_turn` valida el receipt y persiste el intento.\n4. Solo `VERIFIED` marca el turno como cerrado en KHORA.\n5. `INVALID` e `INCOMPLETE` dejan el turno abierto y avanzan `attempt`.\n\nEl mismo endpoint MCP sirve para el resto de capacidades de Cora/KHORA; no se crea una segunda entrada normativa. El transporte Bearer puede proceder de OAuth o de un token manual gestionado por KHORA.\n\n## Enforcement del ciclo por MCP
+
+Las herramientas MCP sustantivas de KHORA están protegidas por un gate de ciclo. Cada llamada requiere `_norm_turn_token` emitido por `khora_norm_open_turn`; KHORA valida que el token corresponda al actor, ciclo, intento, nonce y snapshot exactos antes de ejecutar la herramienta.
+
+Después de `VERIFIED`, el ciclo queda `CLOSED` y el token deja de ser reutilizable. Tras `INVALID` o `INCOMPLETE`, el intento cambia y el token anterior deja de ser válido; el cliente debe abrir/usar el nuevo attempt.
+
+El servidor MCP también publica instrucciones operativas para que el cliente ejecute `OPEN → tarea → VERIFY`, pero esas instrucciones son una guía del protocolo. Un servidor MCP remoto no puede impedir técnicamente que una interfaz de chat nativa produzca texto sin llamar primero a una herramienta. La garantía fuerte de “ningún turno sin verificación” requiere un runtime/adaptador que controle ese loop y bloquee el cierre hasta `VERIFIED`.
+
+## Límite
 
 La comprobación estructural es determinista. La auditoría semántica profunda no forma parte del fast path y podrá añadirse después.
 

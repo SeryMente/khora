@@ -17,7 +17,7 @@ import {
 } from "@/lib/server/mcp-tools";
 import { toolKhoraUiReview } from "@/lib/server/mcp-ui-review";
 import { toolKhoraEstadoVivo, toolKhoraEventosRecientes, toolKhoraObservacionInstantanea, toolKhoraEventosDesde } from "@/lib/server/mcp-observability";
-import { openNormativeTurn, verifyNormativeTurn } from "@/lib/server/mcp-normative";
+import { assertNormativeTurnOpen, openNormativeTurn, verifyNormativeTurn } from "@/lib/server/mcp-normative";
 import { authenticateManualMcpToken, MANUAL_MCP_TOKEN_PREFIX } from "@/lib/server/mcp-manual-token";
 
 export const runtime = "nodejs";
@@ -51,6 +51,48 @@ function scopeFailure(config: ReturnType<typeof getMcpConfig>, requiredScope: st
       ],
     },
   };
+}
+
+const NORM_TURN_TOKEN = z.string().min(16).describe(
+  "Token del ciclo normativo emitido por khora_norm_open_turn. Obligatorio para toda herramienta MCP sustantiva."
+);
+
+function withNormTurn<T extends z.ZodRawShape>(fields: T): T & { _norm_turn_token: typeof NORM_TURN_TOKEN } {
+  return {
+    ...fields,
+    _norm_turn_token: NORM_TURN_TOKEN,
+  };
+}
+
+function withoutNormTurn(args: Record<string, unknown>) {
+  const { _norm_turn_token: _ignored, ...rest } = args;
+  return rest;
+}
+
+async function requireNormativeTurn(actor: string, turnToken: unknown) {
+  if (typeof turnToken !== "string") {
+    return {
+      isError: true as const,
+      content: [{
+        type: "text" as const,
+        text: "NORMATIVE_TURN_REQUIRED: primero llama a khora_norm_open_turn y usa el turn_token devuelto.",
+      }],
+    };
+  }
+  try {
+    await assertNormativeTurnOpen(actor, turnToken);
+    return null;
+  } catch (error) {
+    return {
+      isError: true as const,
+      content: [{
+        type: "text" as const,
+        text: error instanceof Error
+          ? `NORMATIVE_TURN_REQUIRED: ${error.message}. Debes abrir/reabrir el ciclo con khora_norm_open_turn antes de continuar.`
+          : "NORMATIVE_TURN_REQUIRED",
+      }],
+    };
+  }
 }
 
 async function handleMcpRequest(req: NextRequest) {
@@ -133,13 +175,45 @@ async function handleMcpRequest(req: NextRequest) {
   }
 
   // Instanciar servidor MCP en modo sin estado
-  const mcpServer = new McpServer({
-    name: "khora-mcp",
-    version: "1.2.0",
-  });
+  const mcpServer = new McpServer(
+    {
+      name: "khora-mcp",
+      version: "1.3.0",
+    },
+    {
+      instructions:
+        "NORM-CHECK ENFORCEMENT: toda ejecucion que use esta aplicacion debe tratarse como un ciclo normativo. " +
+        "Primero llama a khora_norm_open_turn para fijar el snapshot, nonce y turn_token. " +
+        "Usa ese turn_token en toda herramienta MCP sustantiva de KHORA. " +
+        "Antes de emitir el resultado final llama a khora_norm_verify_turn con el receipt completo. " +
+        "Solo VERIFIED cierra el ciclo; INVALID e INCOMPLETE requieren un nuevo attempt. " +
+        "Nunca presentes la verificacion como realizada si KHORA no devolvio VERIFIED.",
+    },
+  );
+
+  const gatedTool = (
+    name: string,
+    description: string,
+    inputSchema: Record<string, unknown>,
+    handler: (args: any) => Promise<any>,
+  ) => {
+    if (name === "khora_norm_open_turn" || name === "khora_norm_verify_turn") {
+      return mcpServer.tool(name, description, inputSchema, handler);
+    }
+    return mcpServer.tool(
+      name,
+      description,
+      withNormTurn(inputSchema as z.ZodRawShape),
+      async (args: any) => {
+        const normativeDenied = await requireNormativeTurn(actor, args._norm_turn_token);
+        if (normativeDenied) return normativeDenied;
+        return handler(withoutNormTurn(args));
+      },
+    );
+  };
 
   // Herramienta 1: khora_resumen
-  mcpServer.tool(
+  gatedTool(
     "khora_resumen",
     "Conteo por estado, caracteres y rango de fechas.",
     {
@@ -156,7 +230,7 @@ async function handleMcpRequest(req: NextRequest) {
   );
 
   // Herramienta 2: khora_listar_volcados
-  mcpServer.tool(
+  gatedTool(
     "khora_listar_volcados",
     "Índice con metadatos y extracto. Filtros por estado, fechas u orden.",
     {
@@ -176,7 +250,7 @@ async function handleMcpRequest(req: NextRequest) {
   );
 
   // Herramienta 3: khora_leer_volcado
-  mcpServer.tool(
+  gatedTool(
     "khora_leer_volcado",
     "Verbatim íntegro por id (folio o UUID), o versión histórica concreta.",
     {
@@ -192,7 +266,7 @@ async function handleMcpRequest(req: NextRequest) {
   );
 
   // Herramienta 4: khora_buscar_volcados
-  mcpServer.tool(
+  gatedTool(
     "khora_buscar_volcados",
     "Búsqueda de frase con fragmentos de contexto y plegado de acentos.",
     {
@@ -209,7 +283,7 @@ async function handleMcpRequest(req: NextRequest) {
   );
 
   // Herramienta 5: khora_versiones_volcado
-  mcpServer.tool(
+  gatedTool(
     "khora_versiones_volcado",
     "Historial de correcciones, sha256 y versión aprobada.",
     {
@@ -224,7 +298,7 @@ async function handleMcpRequest(req: NextRequest) {
   );
 
   // Herramienta 6: khora_ui_review
-  mcpServer.tool(
+  gatedTool(
     "khora_ui_review",
     "Devuelve la interfaz de Khora renderizada en HTML con el corpus real del operador. " +
       "Permite ver la UI que producen los volcados: densidad de la bandeja, títulos largos, " +
@@ -247,7 +321,7 @@ async function handleMcpRequest(req: NextRequest) {
   );
 
   // Herramienta 9: observación instantánea unificada
-  mcpServer.tool(
+  gatedTool(
     "khora_observacion_instantanea",
     "Vista unificada del estado semántico actual del navegador, actividad persistida, último evento, fallos recientes y cursor de eventos. Solo lectura.",
     {
@@ -262,7 +336,7 @@ async function handleMcpRequest(req: NextRequest) {
   );
 
   // Herramienta 10: eventos desde cursor
-  mcpServer.tool(
+  gatedTool(
     "khora_eventos_desde",
     "Devuelve únicamente los eventos posteriores a un cursor monotónico global. Permite mantener una visión incremental del runtime sin releer el historial.",
     {
@@ -279,7 +353,7 @@ async function handleMcpRequest(req: NextRequest) {
   );
 
   // Herramienta 7: estado vivo de runtime
-  mcpServer.tool(
+  gatedTool(
     "khora_estado_vivo",
     "Estado operativo actual de Khora a partir del registro persistente de runtime. Devuelve actividad reciente, sesiones observadas, última observación y fallos recientes. Solo lectura.",
     {},
@@ -292,7 +366,7 @@ async function handleMcpRequest(req: NextRequest) {
   );
 
   // Herramienta 8: eventos recientes de runtime
-  mcpServer.tool(
+  gatedTool(
     "khora_eventos_recientes",
     "Lee el flujo reciente de eventos de Khora con filtros por sesión, componente, severidad, resultado, fase, scope y categoría. Solo lectura.",
     {
@@ -316,7 +390,7 @@ async function handleMcpRequest(req: NextRequest) {
 
 
   // Gobernanza normativa: misma puerta MCP, capacidad separada por scope.
-  mcpServer.tool(
+  gatedTool(
     "khora_norm_open_turn",
     "Abre el ciclo normativo del turno y fija el snapshot exacto del SI. Usa norm:turn.",
     {
@@ -338,7 +412,7 @@ async function handleMcpRequest(req: NextRequest) {
     }
   );
 
-  mcpServer.tool(
+  gatedTool(
     "khora_norm_verify_turn",
     "Verifica y registra el receipt del turno. Solo cierra el ciclo cuando KHORA devuelve VERIFIED. Usa norm:turn.",
     {
@@ -539,6 +613,23 @@ async function handleMcpRequest(req: NextRequest) {
       securitySchemes: [{ type: "oauth2", scopes: ["norm:turn"] }],
     },
   ] as any;
+
+  for (const tool of toolsList) {
+    if (tool.name === "khora_norm_open_turn" || tool.name === "khora_norm_verify_turn") continue;
+    tool.inputSchema = tool.inputSchema || { type: "object", properties: {} };
+    tool.inputSchema.properties = {
+      ...(tool.inputSchema.properties || {}),
+      _norm_turn_token: {
+        type: "string",
+        minLength: 16,
+        description: "REQUERIDO: token del ciclo emitido por khora_norm_open_turn.",
+      },
+    };
+    tool.inputSchema.required = Array.from(new Set([
+      ...(Array.isArray(tool.inputSchema.required) ? tool.inputSchema.required : []),
+      "_norm_turn_token",
+    ]));
+  }
 
   mcpServer.server.setRequestHandler(ListToolsRequestSchema, async () => ({
     tools: toolsList,

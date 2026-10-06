@@ -54,7 +54,7 @@ test("manual Bearer token is high-entropy, scoped, expiring and stored by hash",
     assert.equal(result.bearer, "Bearer " + result.token);
     assert.equal(result.record.scope, "volcados:read norm:turn");
     assert.equal(result.record.generacion, 7);
-    assert.equal(inserted.token_prefix, result.token.slice(0, 22));
+    assert.equal(inserted.token_prefix, result.token.slice(0, 21));
     assert.notEqual(inserted.token_hash, result.token);
 
     await assert.rejects(
@@ -141,7 +141,7 @@ test("canonical MCP accepts a valid manual Bearer token and still enforces globa
             usuario: "operador@khora.app",
             resource: "https://khora.example.com/api/mcp",
             scope: "volcados:read runtime:read norm:turn",
-            generacion: generation,
+            generacion: 8,
             etiqueta: "ChatGPT",
             emitido_en: new Date(),
             expira_en: new Date(Date.now() + 86400000),
@@ -151,7 +151,7 @@ test("canonical MCP accepts a valid manual Bearer token and still enforces globa
         };
       }
       if (sql.includes("UPDATE mcp_manual_tokens")) return { rowCount: 1, rows: [] };
-      if (sql.includes("FROM mcp_revocacion")) return { rowCount: 1, rows: [{ generacion }] };
+      if (sql.includes("FROM mcp_revocacion")) return { rowCount: 1, rows: [{ generacion: generation }] };
       return { rowCount: 0, rows: [] };
     },
   };
