@@ -115,6 +115,14 @@ function tokenFailure(message: string): Error {
   return new Error(message);
 }
 
+
+function sameRecordedAttempt(
+  stored: { nonce?: unknown; evidence_sha256?: unknown },
+  receipt: Pick<NormativeReceipt, "nonce" | "evidence_sha256">,
+): boolean {
+  return stored.nonce === receipt.nonce && stored.evidence_sha256 === receipt.evidence_sha256;
+}
+
 async function readTurn(cycleId: string): Promise<TurnRow | null> {
   const db = getDb();
   const result = await db.query<TurnRow>(
@@ -432,11 +440,14 @@ export async function verifyNormativeTurn(
       const existing = await db.query(
         "SELECT id, status, integrity, coverage_expected, coverage_evaluated, coverage_missing, " +
           "coverage_duplicates, coverage_unknown, reasons, si_version, si_sha256, manifest_sha256, " +
-          "evidence_sha256, verifier_version, created_at " +
+          "evidence_sha256, nonce, verifier_version, created_at " +
           "FROM normative_receipts WHERE cycle_id = $1 AND attempt = $2 LIMIT 1",
         [receipt.cycle.id, receipt.cycle.attempt]
       );
       if (existing.rows[0]) {
+        if (!sameRecordedAttempt(existing.rows[0], receipt)) {
+          throw new Error("TURN_ATTEMPT_REPLAY");
+        }
         return {
           ok: existing.rows[0].status === "VERIFIED",
           stored: true,
