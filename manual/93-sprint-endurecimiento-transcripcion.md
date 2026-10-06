@@ -3,10 +3,10 @@
 > **Documento canónico del sprint de endurecimiento de la capacidad de transcripción.**
 >
 > **Código:** TRS-001  
-> **Versión:** v1.2.0  
+> **Versión:** v1.3.0  
 > **Fecha de instauración:** 2026-10-05  
-> **Estado:** En curso — laboratorio forense activo  
-**Objetivo primario:** que Cora produzca una transcripción fiel a lo pronunciado, palabra por palabra, sin omisiones ni inserciones, y que Khora bloquee cualquier resultado no demostrado.  
+> **Estado:** Pausado tácticamente — bloqueado por AUD-05 hasta cerrar la custodia de audio  
+**Objetivo primario:** que Khora produzca una transcripción fiel a lo pronunciado, palabra por palabra, sin omisiones ni inserciones, y que Khora bloquee cualquier resultado no demostrado.  
 > **Dominio:** ingreso de volcados / dictado / STT / reconciliación / fidelidad verbal  
 > **Documento forense hermano:** `docs/FORENSIC-TRANSCRIPTION-2026-10-05.md`  
 > **Protocolo de volcados:** `PREPARACION-VOLCADOS.md`  
@@ -20,13 +20,13 @@
 
 ### Objetivo primario
 
-**Hacer que Cora transcriba el habla real del operador con fidelidad palabra por palabra.**
+**Hacer que Khora transcriba el habla real del operador con fidelidad palabra por palabra.**
 
-Todo el sprint queda subordinado a este objetivo. No se optimiza «Whisper», «el pipeline», «la UI» ni «la legibilidad» como fines independientes. Se optimiza la capacidad de Cora para producir un registro textual que corresponda a lo pronunciado.
+Todo el sprint queda subordinado a este objetivo. No se optimiza «Whisper», «el pipeline», «la UI» ni «la legibilidad» como fines independientes. Se optimiza la capacidad de Khora para producir un registro textual que corresponda a lo pronunciado.
 
 La pregunta de cierre es única:
 
-> **¿La transcripción entregada por Cora coincide con lo que realmente se escucha en el audio?**
+> **¿La transcripción entregada por Khora coincide con lo que realmente se escucha en el audio?**
 
 La respuesta debe poder demostrarse.
 
@@ -90,7 +90,7 @@ La prioridad es evitar que una mejora de legibilidad termine alterando el regist
 
 ---
 
-## 2. Principio epistemológico: el audio es soberano
+## 2. Principio epistemológico: el audio custodio de Khora es soberano
 
 Para este sprint:
 
@@ -98,7 +98,7 @@ Para este sprint:
 
 No son fuente primaria:
 
-- la salida de Cora;
+- la salida de Khora;
 - la salida de Whisper;
 - la confianza del modelo;
 - la plausibilidad semántica;
@@ -197,13 +197,13 @@ La documentación forense detallada que materializa estos principios es:
 
 **Duración observada:** ~1276.6 s
 
-Este audio constituye el **caso de regresión principal** del sprint y la primera muestra de validación de Cora. No debe sustituirse por otra grabación simplemente para obtener un resultado más favorable.
+Este audio es una **muestra histórica de laboratorio** capturada fuera de Khora. Se conserva como evidencia del ciclo iniciado el 2026-10-05, pero no será requisito de las futuras pruebas. El nuevo corpus deberá utilizar audio capturado y custodiado por Khora tras cerrar AUD-05. No debe sustituirse por otra grabación simplemente para obtener un resultado más favorable.
 
 La muestra debe conservarse incluso después del cierre del sprint.
 
 ---
 
-## 6. Estrategia principal: endurecer Cora, no solo el modelo
+## 6. Estrategia principal: endurecer Khora, no solo el modelo
 
 La estrategia se ejecuta como un circuito cerrado de **medición → diagnóstico → modificación → regrabación/retranscripción → comparación acústica → regresión**.
 
@@ -212,7 +212,7 @@ La estrategia se ejecuta como un circuito cerrado de **medición → diagnóstic
 | Fuente | Rol | Autoridad |
 |---|---|---|
 | Audio Vocaroo/Bukaroo | Registro acústico del habla | **Soberano** |
-| Cora | Sistema bajo prueba / candidato de producción | No autoritativo |
+| Khora | Sistema bajo prueba / candidato de producción | No autoritativo |
 | `large-v3` local | Instrumento de máxima calidad para contraste | No autoritativo |
 | `large-v3` remoto | Opinión independiente de laboratorio | No autoritativo |
 | Revisión humana contra audio | Adjudicación acústica | **Oráculo de validación** |
@@ -221,21 +221,21 @@ Bukaroo/Vocaroo sirve como control de captura independiente; no se convierte en 
 
 ### 6.2 Ciclo operativo canónico
 
-**Fase A — Captura pareada.** Dictar el mismo contenido simultáneamente en Cora y en Bukaroo/Vocaroo. Conservar el audio completo y su hash.
+**Fase A — Captura pareada.** Dictar el mismo contenido simultáneamente en Khora y en Bukaroo/Vocaroo. Conservar el audio completo y su hash.
 
-**Fase B — Línea base de Cora.** Guardar la transcripción producida por Cora sin corregirla, junto con versión, configuración, timestamps y estado de la sesión.
+**Fase B — Línea base de Khora.** Guardar la transcripción producida por Khora sin corregirla, junto con versión, configuración, timestamps y estado de la sesión.
 
-**Fase C — Texto de referencia acústica.** Escuchar el audio y construir/adjudicar el texto de referencia palabra por palabra. La referencia no se deriva de Cora ni de otro ASR.
+**Fase C — Texto de referencia acústica.** Escuchar el audio y construir/adjudicar el texto de referencia palabra por palabra. La referencia no se deriva de Khora ni de otro ASR.
 
-**Fase D — Alineación.** Alinear referencia y Cora por intervalos temporales y palabras. Cada diferencia se clasifica como GREEN, RED o YELLOW.
+**Fase D — Alineación.** Alinear referencia y Khora por intervalos temporales y palabras. Cada diferencia se clasifica como GREEN, RED o YELLOW.
 
 **Fase E — Diagnóstico de causa.** Para cada RED/YELLOW determinar si la causa dominante es captura, segmentación/chunking, contexto, decodificación, modelo, prompt, glosario, postproceso o reconciliación.
 
 **Fase F — Contraste independiente.** Ejecutar `large-v3` local/GPU sobre todo el audio y, en las zonas críticas, con presets alternativos. Usar el resultado para localizar evidencia, no para sustituir la referencia acústica.
 
-**Fase G — Corrección de Cora.** Modificar únicamente la etapa responsable y conservar un antes/después reproducible. No aplicar «correcciones» lingüísticas que no estén justificadas por el audio.
+**Fase G — Corrección de Khora.** Modificar únicamente la etapa responsable y conservar un antes/después reproducible. No aplicar «correcciones» lingüísticas que no estén justificadas por el audio.
 
-**Fase H — Reprueba.** Volver a ejecutar Cora sobre la misma muestra de oro y comprobar que se redujeron los errores sin introducir nuevos.
+**Fase H — Reprueba.** Volver a ejecutar Khora sobre la misma muestra de oro y comprobar que se redujeron los errores sin introducir nuevos.
 
 **Fase I — Regresión.** Repetir la batería sobre todas las muestras de oro existentes. Una mejora en un caso que degrade otro no se acepta.
 
@@ -260,17 +260,17 @@ Cada iteración debe modificar **una sola causa dominante o una sola variable ex
 
 Quedan prohibidas las modificaciones simultáneas que impidan saber qué produjo el cambio, salvo una corrección integral obligada por una causa técnica única.
 
-### 6.5 La transcripción candidata de Cora debe permanecer intacta
+### 6.5 La transcripción candidata de Khora debe permanecer intacta
 
 Para medir mejora real:
 
-- conservar la salida cruda de Cora antes de cualquier corrección;
+- conservar la salida cruda de Khora antes de cualquier corrección;
 - no editarla manualmente antes de calcular las métricas;
-- no pasarle a Cora una transcripción esperada como prompt;
+- no pasarle a Khora una transcripción esperada como prompt;
 - no usar la referencia acústica para «enseñar» el caso durante la misma prueba;
 - no aplicar glosarios o reglas de postproceso para ocultar errores durante la medición.
 
-La primera medición debe representar lo que Cora realmente hace.
+La primera medición debe representar lo que Khora realmente hace.
 
 ### 6.6 Prohibición de sobreajuste a la muestra de oro
 
@@ -316,22 +316,22 @@ Un downshift solo es legítimo con:
 
 ---
 
-## 7. Batería forense mínima y prueba de Cora
+## 7. Batería forense mínima y prueba de Khora
 
-La batería tiene que medir a **Cora contra una referencia acústica**, no únicamente comparar modelos.
+La batería tiene que medir a **Khora contra una referencia acústica**, no únicamente comparar modelos.
 
 Para cada muestra de oro se ejecuta como mínimo:
 
-1. Cora en su configuración candidata de producción.
+1. Khora en su configuración candidata de producción.
 2. `large-v3` beam 5 + contexto.
 3. `large-v3` beam 10 + contexto.
 4. `large-v3` beam 5 sin contexto.
 
-La salida de Cora se registra siempre con identidad de versión/configuración. Las tres corridas de Whisper sirven para localizar fragilidad y proponer hipótesis.
+La salida de Khora se registra siempre con identidad de versión/configuración. Las tres corridas de Whisper sirven para localizar fragilidad y proponer hipótesis.
 
 ### 7.1 Métricas obligatorias
 
-La métrica primaria de esta iniciativa es el **error de palabra de Cora contra la referencia acústica**.
+La métrica primaria de esta iniciativa es el **error de palabra de Khora contra la referencia acústica**.
 
 Por muestra:
 
@@ -704,7 +704,7 @@ Todas las muestras de regresión pasan el mismo criterio. No se acepta una mejor
 
 ### Puerta G3 — Holdout / producción
 
-Una muestra nueva, ciega al proceso de ajuste, pasa el mismo criterio mediante el flujo real de Cora.
+Una muestra nueva, ciega al proceso de ajuste, pasa el mismo criterio mediante el flujo real de Khora.
 
 Solo después de G1 + G2 + G3 se puede afirmar que la capacidad está endurecida con evidencia de generalización.
 
@@ -808,11 +808,11 @@ La cobertura funcional existente no se considera suficiente para declarar perfec
 
 ### Estado metodológico
 
-La metodología ya quedó reorientada a Cora como sistema bajo prueba:
+La metodología ya quedó reorientada a Khora como sistema bajo prueba:
 
 - audio soberano;
 - referencia acústica adjudicada;
-- Cora como candidato real;
+- Khora como candidato real;
 - Whisper como instrumento de contraste;
 - corrección basada en causa;
 - repetición sobre el mismo caso;
@@ -931,11 +931,11 @@ Cuando no pueda demostrarse la corrección, **el estado correcto es bloqueado**,
 
 ## 26. Estado de cierre
 
-**Estado actual: ABIERTO.**
+**Estado actual: PAUSADO TÁCTICAMENTE.**
 
 Motivo:
 
-La ingeniería de captura, reconciliación y protección contra pérdida está instrumentada, pero el endurecimiento forense de la calidad acústica todavía requiere completar la batería de máxima calidad y resolver todas las discrepancias contra el audio de la muestra de oro.
+La metodología forense está definida, pero la ejecución se pausa mientras AUD-05 garantiza que el audio de Khora sea la fuente acústica primaria, íntegra, recuperable y exportable.
 
 **La existencia de una transcripción técnicamente exitosa no constituye cierre del sprint.**
 
@@ -943,6 +943,6 @@ La ingeniería de captura, reconciliación y protección contra pérdida está i
 
 ## 27. Versión vigente
 
-**TRS-001 v1.2.0 — Endurecimiento Forense de la Transcripción de Khora orientado a Cora**
+**TRS-001 v1.3.0 — Endurecimiento Forense de la Transcripción de Khora**
 
 Esta versión establece el contrato base del sprint. Cualquier revisión futura deberá incrementar el número de versión.
