@@ -209,8 +209,9 @@ da7133e7329b0d018003ceb1c26c2bc756a3e0b1852a159f93ca0e512b3699e1  ./khora-web/ap
 16284f8ba72e63931b17c0f83817a1f46faac619fc203b4e645ba8295abc03d0  ./khora-web/app/api/jules/sources/route.ts
 45cf2e58cdcc1f9f47492b34b91808733ebb668559dc0d4f20e63e6f253fe226  ./khora-web/app/api/jules/trigger/route.ts
 6284f74c305de710328df645f4f280fcbe41da60adcac9db859e880a2f87a69f  ./khora-web/app/api/kpi/minutes/route.ts
+296f7aafc0def8deb93de61c48603606377e33cba9c5db93709e4e3ca385107d  ./khora-web/app/api/mcp/manual-token/route.ts
 dbcb1a564d60532dd93219d50621f627b80e0a840bbc7ecb458108313e8a5aa5  ./khora-web/app/api/mcp/revocacion/route.ts
-81af67cbbb8705a535b701d10e52480e25b54d6aa9637feae70d43b68130373b  ./khora-web/app/api/mcp/route.ts
+f9d3fe9e3c71e8880bb5aaaf6d463567babc63446fec80fa9463960650f922b6  ./khora-web/app/api/mcp/route.ts
 ee83417f71679b7173a0dd38291b7ab13fc0f1e576fb2cc5b7f655c4187de08e  ./khora-web/app/api/oauth/token/route.ts
 4d72f9e53f5951586ed44ed19745373d429d9455bd962f9657801df114d56ee5  ./khora-web/app/api/observaciones/runtime/route.ts
 a71e5d2db9874c598dafe738da89f5c3d4b630e6bcf40c059d5481374cfd6389  ./khora-web/app/api/observaciones/runtime-state/route.ts
@@ -265,7 +266,7 @@ a39a9de5e86829310dfdcd1569534dcd159700105f41d29e3ee640b0f3ab45cc  ./khora-web/ap
 d45c9a0bb862f50ab97218fb8f97f05549ea62a3f8dde593bfade32e01044a66  ./khora-web/app/sistema/ingesta/layout.tsx
 fbf49b077ef1b61bb1ac6ac0dae9db69a3b3188af5cfbfe44b4eab90947c8573  ./khora-web/app/sistema/ingesta/page.tsx
 f9f4bd365fbb02670133b12299e13b574f03fba5b1829f98fc57f0f00c74e50b  ./khora-web/app/sistema/ingreso/page.tsx
-04ad222fe0ff3ccc859c26bea5cb4547fc191b2fda57cf73878ede4fc422ac4b  ./khora-web/app/sistema/mcp/page.tsx
+c691aa67b84479b10959d1f8d2c0e4ea83bd3b6b6e44089c3415d128c788acad  ./khora-web/app/sistema/mcp/page.tsx
 3906189ec05066ad618e3c4b586150e2673403cc6a8a1e2527c9f79755f68a16  ./khora-web/app/sistema/registro/page.tsx
 04bbb838ba952b42ebb5a82ce6b9cc40c474cc5afd22aa7017ee545ebd10c8f9  ./khora-web/app/sistema/seguridad/page.tsx
 880a72913308e06e32f5d9029d1778c6e59ef0feecb2a5171ed2762c4a9de0df  ./khora-web/app/sistema/volcados/page.tsx
@@ -289,7 +290,8 @@ bc4de9bac9484745f888ca0b20534db1defe139c7595dea5ca0c603c194340e3  ./khora-web/db
 5d92f02ee0bbe3c7af0d8351c74a2b1529322da4697eac67922177213ae38799  ./khora-web/db/migrations/023_runtime_state.sql
 666b72eaacb74bcf34dcfa869c9c4301b214d3b2c01d970a397ff959ca913f99  ./khora-web/db/migrations/024_oauth_scopes.sql
 1d18d817cb4b9528e286301dad5e8335a564299a586af204fa4a83dac895b01b  ./khora-web/db/migrations/026_normative_turns.sql
-ab65c630af3c2a48c007d1f8a81ee15eafbd143b2475101778f36fb910f2c941  ./khora-web/docs/normative-check.md
+cb8b5c4b0a9f93c5d97e3539420ced44bf5b08a0a75de3ac7a69d22b2cb4438b  ./khora-web/db/migrations/027_manual_mcp_tokens.sql
+3a3c0d523cfd36f574ec62e38bcc8c306872ae8469c9c4288d1a6667886ccf4e  ./khora-web/docs/normative-check.md
 2cd7e74080c1634a94e2c0a7528a3ce9d2d17bb1187f3c1cf0ee6058aec09a41  ./khora-web/e2e/bitacora-dictado.spec.ts
 04d039a2f4bafb6e1aa427b640d6c6ab2072bbd784f781345c408a608cbeed94  ./khora-web/e2e/ciclo-ingesta.spec.ts
 6a27875a6706c461dfbb2be305a0732829be6cb3a182cf15c81ec5a526f7ac32  ./khora-web/e2e/contracts/app-icon.spec.ts
@@ -407,6 +409,7 @@ b791af688c438b566a45f28bc78c72d38888326e92b4290d7974f9d1f7c86035  ./khora-web/li
 3abb50e3f954d6dddbdcdb1c8ed98d1bf960b02f75b3134ec9c4413a2b4cae84  ./khora-web/lib/server/jwt.ts
 d4245e2bd197f1434fb358d0a7cbca9c9de9fd3e501198106ff3e65f71c0662f  ./khora-web/lib/server/mcp-config.ts
 97119beaaf16ac3f8c4f7c3a1dc6c53bdefb62d2ca887a77ef1e3dd5b84e0a98  ./khora-web/lib/server/mcp-db.ts
+28ff5b7b19283e53f2cd1676a819790665953969a461afb03da98d6c59669952  ./khora-web/lib/server/mcp-manual-token.ts
 66083675944b498b63b27e0aed9e3e8cd7dc24dc7eaefa1cf3ce514fe8730674  ./khora-web/lib/server/mcp-normative.ts
 dcd241a2bc665b7e01bf0b5f63ade83c42d4151e9a0ff5af8170b7434f1de70b  ./khora-web/lib/server/mcp-observability.ts
 b268042d268fe81a53a6805bb302ec98b9df0204b8c16c2635224c8f59b7a656  ./khora-web/lib/server/mcp-tools.ts
@@ -467,7 +470,7 @@ a7c05144e3af9568ca5e6b70867c1ab5c89e5a25b92d7f55de2a270683b990fd  ./khora-web/sc
 cadd05af313e10cf980d188d6b4f15b2350b6dccb0e244f74d3106d3e778232b  ./khora-web/scripts/migrar_archivados.ts
 c59868c0e05a1771e41b06c3d713a3267377972192f6cd8ebca230c330ec998b  ./khora-web/scripts/migrate.js
 a41b9c5bc82066f2d111ec2b16e205e3d84e30775435f50262708ed0f18a68e9  ./khora-web/scripts/migrate-ep.mjs
-bcb6eb9529d18d3ccc9092420297576633e578b81c9454998d956be78fc7289e  ./khora-web/scripts/migrate-runtime.mjs
+e4498922ed08b1acb1e35c4ed301b2e01c0b64b93ebffa605402a2087347d915  ./khora-web/scripts/migrate-runtime.mjs
 56ae642483607f33593abf0b081a69646b9b9b4e0b2ae62ffc5f6f5615c6a4f5  ./khora-web/scripts/reconcile_forensics.ts
 7918776be6330f777ca36feeb979a2a9915ac67de381996f512c57523a87cec8  ./khora-web/scripts/repair_volcados.ts
 1d60c6e4778b4a8b32376bd63681e70c9b78820fdce06194f64e826ee89f230d  ./khora-web/scripts/reparar_volcados_historicos.ts
@@ -491,7 +494,8 @@ a470a9a5e3eb0e0830c54e260ee89d0ff06e297d87d849c27f44875b95504360  ./khora-web/te
 915632ca4597a5dfa767d9f4623f34678c06ab8ff5b6fc200d3399da8ccfc7eb  ./khora-web/tests/unit/eventos_sistema.test.ts
 0d94d97b9941db994dfc6e5a0e67cc07692ab9c793c2c34c33017cf1060b76fd  ./khora-web/tests/unit/folio.test.ts
 5066bc4c64d518f0ae006cbf9a5065bd1ac14a5ad2eddd12857d6b7cfa16328b  ./khora-web/tests/unit/ingesta.test.ts
-12625375ff8ddc7b79f00f282caea74855e0512f78cb39c0e214605e9c814730  ./khora-web/tests/unit/mcp_normative_migration.test.ts
+6560e8523640638008863ec98560abb7168336310f01cd5b9d9b0f7bbb04e706  ./khora-web/tests/unit/mcp_manual_token.test.ts
+83743d0c8b53f65852919c1c40c65e461892f6c3affab92900f29603cddfa08a  ./khora-web/tests/unit/mcp_normative_migration.test.ts
 5beeb511fbd26331ffe46384fc838bb2386fec388499b3e371e8cfcd507be823  ./khora-web/tests/unit/mcp_oauth.test.ts
 7c06fe2100292c60379dd9227d4994c615738ae6123ab794ddccb40192ef32e9  ./khora-web/tests/unit/mcp_tool_auth_metadata.test.ts
 f6b775825039cb25b791e26e6c5e8f1dea99875b7d7177a6e6cea188926b00d2  ./khora-web/tests/unit/oauth.test.ts
