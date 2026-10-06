@@ -65,6 +65,15 @@ test("manual Bearer token is high-entropy, scoped, expiring and stored by hash",
       }),
       /MANUAL_TOKEN_SCOPE_REQUIRED/,
     );
+
+    await assert.rejects(
+      createManualMcpToken({
+        usuario: "operador@khora.app",
+        scopes: ["norm:turn", "admin:write"],
+        expiresInDays: 90,
+      }),
+      /MANUAL_TOKEN_SCOPE_INVALID/,
+    );
   } finally {
     resetDbForTesting();
   }
