@@ -78,7 +78,7 @@ almacenadas. **No negociable.** El protocolo de máxima exigencia, la batería
 large-v3, la alineación palabra-por-palabra, la resolución de discrepancias y
 los criterios de PASS/FAIL están definidos en
 [`docs/FORENSIC-TRANSCRIPTION-2026-10-05.md`](./docs/FORENSIC-TRANSCRIPTION-2026-10-05.md),
-FTS-001 v1.0.0.
+FTS-001 v1.0.0, bajo el contrato operativo de [`TRS-001 v1.0.0`](./manual/93-sprint-endurecimiento-transcripcion.md).
 
 **F2 · Ninguna Palabra Ajena.** El texto no contiene nada que el operador no
 haya dicho. Cubre dos fuentes conocidas de contaminación:
