@@ -19,7 +19,7 @@ Por tanto, este sprint se convierte en **prerrequisito operativo del Sprint 93**
 
 Mientras AUD-05 no esté cerrado:
 
-- no se elimina la dependencia experimental de fuentes externas por razones de conveniencia;
+- Vocaroo/Bukaroo no se utilizan como parte del nuevo procedimiento; el objetivo es que Khora sea autosuficiente para capturar y custodiar su propio audio;
 - no se declara que Khora posee una cadena acústica confiable;
 - no se utiliza un audio recuperado sin verificación como evidencia forense;
 - la investigación de transcripción permanece en pausa, salvo controles aislados.
