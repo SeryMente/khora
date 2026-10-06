@@ -719,6 +719,8 @@ export default function DictadoPage() {
             parte: 1,
             url: data.audioUrl,
             bytes: data.audioBytes || file.size,
+            sha256: data.sha256 || "",
+            verificado: data.verificado === true,
           },
         ];
         setPartesContador(1);
