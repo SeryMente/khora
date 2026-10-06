@@ -423,6 +423,7 @@ export default function VolcadosPage() {
     duracionTotalMs,
     isPlaying,
     audioError,
+    exportingMp3,
     hallazgos,
     activeHallazgoIndex,
     incidentes,
