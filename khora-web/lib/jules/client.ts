@@ -1,5 +1,7 @@
 // Jules API v1alpha adapter
 
+import { emitirEventoServicio } from "@/lib/server/service-observability";
+
 const JULES_API_BASE_URL = "https://jules.googleapis.com/v1alpha";
 
 export type AutomationMode = "AUTOMATION_MODE_UNSPECIFIED" | "AUTO_CREATE_PR";
@@ -91,6 +93,15 @@ async function fetchWithBackoff(
   options: RequestInit = {}
 ): Promise<Response> {
   let attempt = 0;
+  const startedAt = Date.now();
+  let pathname = "unknown";
+  try {
+    pathname = new URL(url).pathname
+      .replace(/\/(sessions|sources)\/[^/]+/g, "/$1/:id")
+      .slice(0, 240);
+  } catch {
+    // Safe placeholder.
+  }
 
   while (true) {
     let response: Response;
@@ -99,6 +110,18 @@ async function fetchWithBackoff(
       response = await fetch(url, options);
     } catch (error) {
       if (attempt >= MAX_RETRIES) {
+        emitirEventoServicio({
+          service: "jules",
+          operation: "http.dependency",
+          method: options.method || "GET",
+          provider: "google-jules",
+          dependency: "jules.googleapis.com",
+          route: pathname,
+          outcome: "FAILURE",
+          severity: "ERROR",
+          durationMs: Date.now() - startedAt,
+          reasonCode: error instanceof Error ? error.name.slice(0, 64) : "NETWORK_ERROR",
+        });
         throw error;
       }
       attempt++;
@@ -108,6 +131,17 @@ async function fetchWithBackoff(
     }
 
     if (response.ok) {
+      emitirEventoServicio({
+        service: "jules",
+        operation: "http.dependency",
+        method: options.method || "GET",
+        provider: "google-jules",
+        dependency: "jules.googleapis.com",
+        route: pathname,
+        statusCode: response.status,
+        outcome: "SUCCESS",
+        durationMs: Date.now() - startedAt,
+      });
       return response;
     }
 
@@ -124,6 +158,20 @@ async function fetchWithBackoff(
       await delay(sleepTime);
       continue;
     }
+
+    emitirEventoServicio({
+      service: "jules",
+      operation: "http.dependency",
+      method: options.method || "GET",
+      provider: "google-jules",
+      dependency: "jules.googleapis.com",
+      route: pathname,
+      statusCode: response.status,
+      outcome: "FAILURE",
+      severity: response.status >= 500 ? "ERROR" : "WARN",
+      durationMs: Date.now() - startedAt,
+      reasonCode: "HTTP_" + response.status,
+    });
 
     // Unrecoverable error or max retries reached
     let errorData = null;
