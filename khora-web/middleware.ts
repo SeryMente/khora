@@ -28,6 +28,16 @@ const authMiddleware = auth((req) => {
     return NextResponse.redirect(new URL("/sistema/seguridad?tab=entorno-persistente", req.nextUrl.origin), 308);
   }
 
+  const servicioConAutenticacionPropia =
+    pathname.startsWith("/api/mcp") ||
+    pathname.startsWith("/api/ep/") ||
+    pathname.startsWith("/api/oauth/") ||
+    pathname.startsWith("/.well-known");
+
+  if (servicioConAutenticacionPropia) {
+    return NextResponse.next();
+  }
+
   const esBypassDePruebas =
     process.env.PLAYWRIGHT_TEST_RUN === '1' || process.env.PLAYWRIGHT_TEST_BYPASS === 'true';
   // El bypass salta la autenticación real (OIDC), nunca la resolución
