@@ -60,7 +60,8 @@ export type PipelineViewState = {
   currentTimeMs: number;
   duracionTotalMs: number;
   isPlaying: boolean;
-  audioError: string | null;\n  exportingMp3: boolean;
+  audioError: string | null;
+  exportingMp3: boolean;
   hallazgos: any[];
   activeHallazgoIndex: number;
   incidentes: any[];
@@ -95,7 +96,8 @@ export type PipelineViewActions = {
   onResolveAudioIncident?: () => void;
   onIngestApproved?: () => void;
   onGlobalSeek?: (targetMs: number) => void;
-  onTogglePlayPause?: () => void;\n  onExportMp3?: () => void;
+  onTogglePlayPause?: () => void;
+  onExportMp3?: () => void;
   onManualPartChange?: (index: number) => void;
   onSetShowAccessibleModal?: (show: boolean) => void;
   onSetAccessibleConfirmText?: (val: string) => void;
