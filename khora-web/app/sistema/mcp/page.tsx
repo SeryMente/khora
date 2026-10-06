@@ -34,7 +34,7 @@ export default function PaginaMcpRevocacion() {
   }, []);
 
   async function revocarAcceso() {
-    if (!confirm("¿Está seguro de que desea revocar el acceso MCP? Todos los tokens de Claude activos dejarán de funcionar de inmediato.")) {
+    if (!confirm("¿Está seguro de que desea revocar el acceso MCP? Todos los tokens MCP activos del cliente autorizado dejarán de funcionar de inmediato.")) {
       return;
     }
 
@@ -80,7 +80,7 @@ export default function PaginaMcpRevocacion() {
             Control MCP & Revocación
           </h1>
           <p className="text-xs opacity-70">
-            Administra el acceso de Claude a la API de volcados de Khora.
+            Administra el acceso de clientes MCP a las capacidades de Cora/KHORA.
           </p>
         </div>
 
