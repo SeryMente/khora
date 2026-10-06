@@ -106,6 +106,8 @@ export function buildCycleVerificationRecord(input: {
 
 type ParsedSi = {
   version: string;
+  versionName: string;
+  lastUpdatedAt: string;
   sha256: string;
   manifest: ManifestPrinciple[];
   manifestSha256: string;
@@ -222,9 +224,13 @@ export async function getCurrentSiSnapshot(): Promise<ParsedSi & { gitBlobSha: s
   const source = normalizeText(Buffer.from(payload.content.replace(/\n/g, ""), "base64").toString("utf8"));
   const versionMatch = source.match(/^\*\*Versión:\*\*\s*(v\d+\.\d+\.\d+)/mi);
   if (!versionMatch) throw new Error("SI_VERSION_MISSING");
+  const versionNameMatch = source.match(/^\*\*Nombre de versión:\*\*\s*(.+)$/mi);
+  const lastUpdatedMatch = source.match(/^\*\*Última actualización canónica:\*\*\s*(.+)$/mi);
   const manifest = parsePrinciples(source);
   return {
     version: versionMatch[1],
+    versionName: versionNameMatch ? versionNameMatch[1].trim() : "",
+    lastUpdatedAt: lastUpdatedMatch ? lastUpdatedMatch[1].trim() : "",
     sha256: sha256(source),
     manifest,
     manifestSha256: buildManifestHash(manifest),
@@ -236,10 +242,14 @@ export async function loadSiSnapshot(blobSha: string): Promise<ParsedSi> {
   const source = normalizeText(await fetchSiBlob(blobSha));
   const versionMatch = source.match(/^\*\*Versión:\*\*\s*(v\d+\.\d+\.\d+)/mi);
   if (!versionMatch) throw new Error("SI_VERSION_MISSING");
+  const versionNameMatch = source.match(/^\*\*Nombre de versión:\*\*\s*(.+)$/mi);
+  const lastUpdatedMatch = source.match(/^\*\*Última actualización canónica:\*\*\s*(.+)$/mi);
 
   const manifest = parsePrinciples(source);
   return {
     version: versionMatch[1],
+    versionName: versionNameMatch ? versionNameMatch[1].trim() : "",
+    lastUpdatedAt: lastUpdatedMatch ? lastUpdatedMatch[1].trim() : "",
     sha256: sha256(source),
     manifest,
     manifestSha256: buildManifestHash(manifest),
@@ -392,5 +402,7 @@ export function getCurrentVerifierInfo() {
     verifier_version: NORM_CHECK_VERIFIER_VERSION,
     si_repository: CANONICAL_SI_REPOSITORY,
     si_path: CANONICAL_SI_PATH,
+    si_version_name: "Identidad Versionada y Vigencia Canónica",
+    si_last_updated_at: "2026-10-06T16:42:13-06:00",
   };
 }
