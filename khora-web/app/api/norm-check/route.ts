@@ -82,7 +82,31 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401, headers: noStore });
   }
 
+  const mode = request.nextUrl.searchParams.get("mode");
+  const actor = await authorize(request, mode === "snapshot");
+  if (!actor) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401, headers: noStore });
+  }
+
   try {
+    if (mode === "snapshot") {
+      const { getCurrentSiSnapshot } = await import("@/lib/server/norm-check");
+      const snapshot = await getCurrentSiSnapshot();
+      return NextResponse.json(
+        {
+          snapshot: {
+            version: snapshot.version,
+            git_blob_sha: snapshot.gitBlobSha,
+            sha256: snapshot.sha256,
+            manifest_sha256: snapshot.manifestSha256,
+            principles: snapshot.manifest,
+          },
+          verifier: getCurrentVerifierInfo(),
+        },
+        { headers: noStore },
+      );
+    }
+
     await ensureSchema();
     const db = getDb();
     const id = request.nextUrl.searchParams.get("id");
