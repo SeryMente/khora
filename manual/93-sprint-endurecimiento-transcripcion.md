@@ -3,9 +3,10 @@
 > **Documento canónico del sprint de endurecimiento de la capacidad de transcripción.**
 >
 > **Código:** TRS-001  
-> **Versión:** v1.0.0  
+> **Versión:** v1.1.0  
 > **Fecha de instauración:** 2026-10-05  
 > **Estado:** En curso — laboratorio forense activo  
+**Objetivo primario:** que Cora produzca una transcripción fiel a lo pronunciado, palabra por palabra, sin omisiones ni inserciones, y que Khora bloquee cualquier resultado no demostrado.  
 > **Dominio:** ingreso de volcados / dictado / STT / reconciliación / fidelidad verbal  
 > **Documento forense hermano:** `docs/FORENSIC-TRANSCRIPTION-2026-10-05.md`  
 > **Protocolo de volcados:** `PREPARACION-VOLCADOS.md`  
@@ -15,9 +16,30 @@
 
 ---
 
-## 0. Regla de cierre del sprint
+## 0. Objetivo primario y regla de cierre
 
-**Khora no declarará endurecida su capacidad de transcripción mientras exista una discrepancia verbal sin resolver contra el audio de referencia.**
+### Objetivo primario
+
+**Hacer que Cora transcriba el habla real del operador con fidelidad palabra por palabra.**
+
+Todo el sprint queda subordinado a este objetivo. No se optimiza «Whisper», «el pipeline», «la UI» ni «la legibilidad» como fines independientes. Se optimiza la capacidad de Cora para producir un registro textual que corresponda a lo pronunciado.
+
+La pregunta de cierre es única:
+
+> **¿La transcripción entregada por Cora coincide con lo que realmente se escucha en el audio?**
+
+La respuesta debe poder demostrarse.
+
+### Regla de cierre
+
+**Khora no declarará endurecida su capacidad de transcripción mientras exista una discrepancia verbal sin resolver contra el audio de referencia, aunque el modelo haya obtenido una WER baja, una alta confianza o una salida semánticamente plausible.**
+
+La calidad se mide en dos niveles:
+
+1. **Métrica de progreso:** WER/CER y catálogo de errores para localizar regresiones y mejoras.
+2. **Criterio de aceptación:** cero errores de palabra no resueltos frente al audio.
+
+WER/CER sirven para comparar versiones; **no pueden autorizar el cierre**.
 
 La unidad de calidad no es:
 
@@ -175,15 +197,64 @@ La documentación forense detallada que materializa estos principios es:
 
 **Duración observada:** ~1276.6 s
 
-Este audio constituye el **caso de regresión principal** del sprint. No debe sustituirse por otra grabación simplemente para obtener un resultado más favorable.
+Este audio constituye el **caso de regresión principal** del sprint y la primera muestra de validación de Cora. No debe sustituirse por otra grabación simplemente para obtener un resultado más favorable.
 
 La muestra debe conservarse incluso después del cierre del sprint.
 
 ---
 
-## 6. Estrategia de endurecimiento del motor STT
+## 6. Estrategia principal: endurecer Cora, no solo el modelo
 
-### 6.1 Orden de preferencia
+La estrategia se ejecuta como un circuito cerrado de **medición → diagnóstico → modificación → regrabación/retranscripción → comparación acústica → regresión**.
+
+### 6.1 Roles de las fuentes
+
+| Fuente | Rol | Autoridad |
+|---|---|---|
+| Audio Vocaroo/Bukaroo | Registro acústico del habla | **Soberano** |
+| Cora | Sistema bajo prueba / candidato de producción | No autoritativo |
+| `large-v3` local | Instrumento de máxima calidad para contraste | No autoritativo |
+| `large-v3` remoto | Opinión independiente de laboratorio | No autoritativo |
+| Revisión humana contra audio | Adjudicación acústica | **Oráculo de validación** |
+
+Bukaroo/Vocaroo sirve como control de captura independiente; no se convierte en «verdad» solo porque produzca un texto.
+
+### 6.2 Ciclo operativo canónico
+
+**Fase A — Captura pareada.** Dictar el mismo contenido simultáneamente en Cora y en Bukaroo/Vocaroo. Conservar el audio completo y su hash.
+
+**Fase B — Línea base de Cora.** Guardar la transcripción producida por Cora sin corregirla, junto con versión, configuración, timestamps y estado de la sesión.
+
+**Fase C — Texto de referencia acústica.** Escuchar el audio y construir/adjudicar el texto de referencia palabra por palabra. La referencia no se deriva de Cora ni de otro ASR.
+
+**Fase D — Alineación.** Alinear referencia y Cora por intervalos temporales y palabras. Cada diferencia se clasifica como GREEN, RED o YELLOW.
+
+**Fase E — Diagnóstico de causa.** Para cada RED/YELLOW determinar si la causa dominante es captura, segmentación/chunking, contexto, decodificación, modelo, prompt, glosario, postproceso o reconciliación.
+
+**Fase F — Contraste independiente.** Ejecutar `large-v3` local/GPU sobre todo el audio y, en las zonas críticas, con presets alternativos. Usar el resultado para localizar evidencia, no para sustituir la referencia acústica.
+
+**Fase G — Corrección de Cora.** Modificar únicamente la etapa responsable y conservar un antes/después reproducible. No aplicar «correcciones» lingüísticas que no estén justificadas por el audio.
+
+**Fase H — Reprueba.** Volver a ejecutar Cora sobre la misma muestra de oro y comprobar que se redujeron los errores sin introducir nuevos.
+
+**Fase I — Regresión.** Repetir la batería sobre todas las muestras de oro existentes. Una mejora en un caso que degrade otro no se acepta.
+
+### 6.3 Orden de optimización
+
+La investigación debe atacar la causa de mayor impacto en este orden:
+
+1. integridad del audio y continuidad de captura;
+2. pérdida por chunks, overlap o truncamiento;
+3. configuración de segmentación y timestamps;
+4. modelo y decodificación;
+5. contaminación por contexto/prompt;
+6. glosario y normalización;
+7. reconciliación y ensamblaje;
+8. presentación y pulido.
+
+**Nunca empezar por L1/pulido para resolver un error F1/F2/F3.**
+
+### 6.4 Modelo de máxima calidad
 
 La calidad máxima verificable tiene prioridad sobre la comodidad operativa.
 
@@ -192,10 +263,10 @@ Orden canónico:
 1. `large-v3` local + GPU;
 2. `large-v3` local con precisión compatible si fuese técnicamente necesaria;
 3. `large-v3` remoto como laboratorio independiente;
-4. `large-v3-turbo` como alternativa de ingeniería cuando esté disponible y sea necesario;
+4. `large-v3-turbo` como control/alternativa de ingeniería;
 5. modelos inferiores **solo como controles**, nunca como fundamento para declarar fidelidad máxima.
 
-### 6.2 Prohibición de downshift silencioso
+### 6.5 Prohibición de downshift silencioso
 
 No se permite pasar de `large-v3` a un modelo inferior únicamente porque:
 
@@ -215,9 +286,46 @@ Un downshift solo es legítimo con:
 
 ---
 
-## 7. Batería forense mínima
+## 7. Batería forense mínima y prueba de Cora
 
-Para una muestra de oro, el laboratorio debe ejecutar al menos:
+La batería tiene que medir a **Cora contra una referencia acústica**, no únicamente comparar modelos.
+
+Para cada muestra de oro se ejecuta como mínimo:
+
+1. Cora en su configuración candidata de producción.
+2. `large-v3` beam 5 + contexto.
+3. `large-v3` beam 10 + contexto.
+4. `large-v3` beam 5 sin contexto.
+
+La salida de Cora se registra siempre con identidad de versión/configuración. Las tres corridas de Whisper sirven para localizar fragilidad y proponer hipótesis.
+
+### 7.1 Métricas obligatorias
+
+Por muestra:
+
+- WER;
+- CER;
+- palabras omitidas;
+- palabras insertadas;
+- sustituciones;
+- errores en nombres;
+- errores en términos técnicos;
+- errores en negaciones;
+- errores de repetición;
+- tramos truncados;
+- intervalos YELLOW.
+
+### 7.2 Métrica de decisión
+
+La métrica de progreso puede mejorar de una iteración a otra aunque siga existiendo un error.
+
+La métrica de aceptación no:
+
+> **PASS = 0 omisiones + 0 inserciones + 0 sustituciones + 0 YELLOW sin resolver.**
+
+Un único error de palabra mantiene la muestra en FAIL.
+
+
 
 | Preset | Modelo | Beam | Contexto previo |
 |---|---|---:|---|
@@ -409,7 +517,35 @@ Un resultado de Whisper que termina «con éxito» pero omite una cláusula comp
 
 ---
 
-## 12. Preservación contra pérdida silenciosa
+## 12. Puerta de fidelidad antes de persistir
+
+La transcripción no debe pasar directamente de «generada» a «asentada».
+
+Estados conceptuales obligatorios:
+
+`capturada → transcripción_candidata → validación → aceptada | bloqueada`
+
+La reconciliación existente es una defensa contra la pérdida, pero **no es por sí sola un verificador de fidelidad acústica**.
+
+Por tanto:
+
+- una transcripción con déficit detectado se bloquea;
+- una transcripción con sustituciones se bloquea;
+- una transcripción con inserciones se bloquea;
+- una transcripción con ambigüedad se bloquea;
+- una transcripción no comparada contra el audio de prueba no puede marcarse como forensemente validada.
+
+### 12.1 Gap técnico explícito
+
+El sprint debe cerrar una diferencia crítica entre el control actual y el objetivo:
+
+> una reconciliación por cobertura/LCS puede detectar déficit sin demostrar que cada palabra nueva sea la palabra correcta.
+
+En consecuencia, el siguiente endurecimiento de código debe introducir una **validación simétrica de equivalencia** que compruebe omisión, inserción y sustitución, no únicamente déficit.
+
+Mientras esa garantía no exista, la reconciliación debe considerarse una capa de preservación, no la prueba final de fidelidad.
+
+## 13. Preservación contra pérdida silenciosa
 
 Los mecanismos actuales de reconciliación ya contemplan la detección de déficits, la prevención de sobreescritura y la conservación de texto previo ante resultados incompletos.
 
@@ -428,7 +564,7 @@ No deben presentarse como estados equivalentes.
 
 ---
 
-## 13. Separación entre laboratorio y producción
+## 14. Separación entre laboratorio y producción
 
 ### Laboratorio forense
 
@@ -456,7 +592,7 @@ Debe utilizar únicamente una configuración que:
 
 ---
 
-## 14. Reproducibilidad obligatoria
+## 15. Reproducibilidad obligatoria
 
 Cada ejecución forense deberá conservar como mínimo:
 
@@ -481,7 +617,7 @@ Cuando una prueba dependa de GPU, registrar también el dispositivo lógico util
 
 ---
 
-## 15. Integridad de los artefactos
+## 16. Integridad de los artefactos
 
 Los nombres de artefacto deben permitir distinguir:
 
@@ -503,7 +639,7 @@ Los artefactos no deben sobrescribirse entre presets.
 
 ---
 
-## 16. Regla de independencia entre modelos
+## 17. Regla de independencia entre modelos
 
 Una segunda salida de ASR es **evidencia independiente**, no autoridad.
 
@@ -517,7 +653,7 @@ La independencia tiene valor para localizar zonas donde la inferencia automátic
 
 ---
 
-## 17. Criterios de aceptación del sprint
+## 18. Criterios de aceptación del sprint
 
 El sprint queda en estado **ACEPTADO** solamente cuando se cumplen simultáneamente las siguientes condiciones.
 
@@ -560,7 +696,7 @@ El sprint queda en estado **ACEPTADO** solamente cuando se cumplen simultáneame
 
 ---
 
-## 18. Criterios explícitos de NO aceptación
+## 19. Criterios explícitos de NO aceptación
 
 El sprint debe permanecer abierto si ocurre cualquiera de estos casos:
 
@@ -580,7 +716,7 @@ Estas justificaciones no satisfacen el contrato de fidelidad.
 
 ---
 
-## 19. Controles de regresión
+## 20. Controles de regresión
 
 Cada cambio posterior en:
 
@@ -615,7 +751,7 @@ La cobertura funcional existente no se considera suficiente para declarar perfec
 
 ---
 
-## 20. Estado actual del laboratorio — 2026-10-05
+## 21. Estado actual del laboratorio — 2026-10-05
 
 ### Evidencia local
 
@@ -653,7 +789,7 @@ Su propósito es proporcionar evidencia adicional y no consumir la GPU local del
 
 ---
 
-## 21. Política de recursos
+## 22. Política de recursos
 
 La investigación de calidad no debe dejar el equipo local bloqueado innecesariamente.
 
@@ -670,7 +806,7 @@ La preservación de recursos nunca debe convertirse en excusa para rebajar el ni
 
 ---
 
-## 22. Política de cambios del sprint
+## 23. Política de cambios del sprint
 
 Todo cambio sustantivo al contrato de fidelidad debe:
 
@@ -685,7 +821,7 @@ No deben crearse reglas paralelas en conversaciones o notas privadas que contrad
 
 ---
 
-## 23. Documentos normativos relacionados
+## 24. Documentos normativos relacionados
 
 - **Protocolo de volcados:** `PREPARACION-VOLCADOS.md`
 - **Expediente forense:** `docs/FORENSIC-TRANSCRIPTION-2026-10-05.md`
@@ -698,7 +834,7 @@ No deben crearse reglas paralelas en conversaciones o notas privadas que contrad
 
 ---
 
-## 24. Regla de evolución
+## 25. Regla de evolución
 
 Este sprint se considera una capacidad de infraestructura crítica, no una mejora cosmética.
 
@@ -727,7 +863,7 @@ Cuando no pueda demostrarse la corrección, **el estado correcto es bloqueado**,
 
 ---
 
-## 25. Estado de cierre
+## 26. Estado de cierre
 
 **Estado actual: ABIERTO.**
 
@@ -739,8 +875,8 @@ La ingeniería de captura, reconciliación y protección contra pérdida está i
 
 ---
 
-## 26. Versión vigente
+## 27. Versión vigente
 
-**TRS-001 v1.0.0 — Endurecimiento Forense de la Transcripción de Khora**
+**TRS-001 v1.1.0 — Endurecimiento Forense de la Transcripción de Khora orientado a Cora**
 
 Esta versión establece el contrato base del sprint. Cualquier revisión futura deberá incrementar el número de versión.
