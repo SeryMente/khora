@@ -69,7 +69,7 @@ Formato estable:
   "attempt": 1,
   "status": "VERIFIED",
   "evidence_sha256": "...",
-  "si_version": "v1.1.0",
+  "si_version": "v1.2.0",
   "si_sha256": "...",
   "manifest_sha256": "...",
   "verifier_version": "norm-check/0.2.0",
@@ -95,3 +95,12 @@ La comprobación estructural es determinista. La auditoría semántica profunda 
 ## Vínculo canónico
 
 Especificación metodológica: SeryMente/metodologia/ESPECIFICACION-EVIDENCIA-NORMATIVA-POR-CICLO.md
+
+
+## Observabilidad de fronteras de servicio
+
+Cora registra la frontera de cada request HTTP mediante el middleware transversal y registra además cada tool call de MCP. El evento de frontera contiene servicio, operación, ruta, método, correlación, resultado, código de estado, duración y razón de fallo, sin payloads ni secretos.
+
+El bridge FastAPI conserva el `correlation_id`, registra la finalización de respuestas streaming y entrega el evento al mismo almacén durable. Jules, Notion y Ollama local registran sus dependencias/servicios críticos.
+
+Los eventos de dominio existentes continúan siendo la fuente detallada para captura, dictado, transcripción, ingesta, revisión, grafo y demás operaciones internas. No se crea un segundo almacén.
