@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { del, put } from "@vercel/blob";
 import { createHash } from "crypto";
 import { auth } from "@/auth";
-import { cifrarBytes } from "@/lib/server/cripto";
+import { cifrarBytes, descifrarBytes } from "@/lib/server/cripto";
 import { registrarParteAudio } from "@/lib/server/dictado";
 import {
   MAX_IMPORTED_AUDIO_BYTES,
@@ -95,7 +95,7 @@ export async function POST(request: Request) {
         await del(stored.url).catch(() => undefined);
         return NextResponse.json({ detail: `No se pudo verificar la carga almacenada (HTTP ${verifyResponse.status})` }, { status: 502 });
       }
-      const storedClear = decryptStagedAudio(Buffer.from(await verifyResponse.arrayBuffer()), keyBase64, ivBase64);
+      const storedClear = descifrarBytes(Buffer.from(await verifyResponse.arrayBuffer()));
       const verifySha = createHash("sha256").update(storedClear).digest("hex");
       if (storedClear.length !== clear.length || verifySha !== sha256) {
         await del(stored.url).catch(() => undefined);
