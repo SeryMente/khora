@@ -7,7 +7,8 @@
 **Estado:** normativa para el ciclo forense de ingreso de volcados  
 **Repositorio:** SeryMente/khora  
 **Referencia arquitectónica:** Entorno Persistente Medio v1.0.1  
-**Objetivo:** máxima fidelidad verbal demostrable contra el audio original.
+**Objetivo:** máxima fidelidad verbal demostrable contra el audio original.  
+**Sprint canónico:** [`manual/93-sprint-endurecimiento-transcripcion.md`](../blob/main/manual/93-sprint-endurecimiento-transcripcion.md), TRS-001 v1.0.0.
 
 ---
 
