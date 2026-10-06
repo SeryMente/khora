@@ -201,11 +201,17 @@ export async function guardarDictado(entrada: EntradaDictado) {
   await asegurarColumnasDictado();
   const db = getDb();
 
-  const audioEsperado = entrada.fuenteEntrada !== "chrome_live_caption"
-    ? Boolean(entrada.audioPartes?.length || entrada.audioUrl)
-    : Boolean(entrada.audioPartes?.length || entrada.audioUrl);
+  const sessionId = entrada.sessionId?.trim() || null;
+  const correlacionId = sessionId || randomUUID();
+  const requiereAudioVerificado =
+    Boolean(sessionId) &&
+    (entrada.fuenteEntrada === "microfono" || entrada.fuenteEntrada === "chrome_live_caption");
 
-  if (audioEsperado && Array.isArray(entrada.audioPartes) && entrada.audioPartes.length > 0) {
+  if (requiereAudioVerificado) {
+    if (!Array.isArray(entrada.audioPartes) || entrada.audioPartes.length === 0) {
+      throw new Error("No se puede archivar el dictado: la sesión tiene captura de voz pero no tiene partes de audio.");
+    }
+
     const custodia = evaluarCustodiaAudio(
       entrada.audioPartes.map((p) => ({
         part_index: Number(p.parte),
@@ -215,15 +221,14 @@ export async function guardarDictado(entrada: EntradaDictado) {
       })),
       entrada.audioPartes.length,
     );
+
     if (!custodia.ok) {
       throw new Error(custodia.motivo);
     }
   }
+
   const id = randomUUID();
   const sha = createHash("sha256").update(entrada.texto, "utf8").digest("hex");
-
-  const sessionId = entrada.sessionId?.trim() || null;
-  const correlacionId = sessionId || id;
 
   try {
     await db.query(
