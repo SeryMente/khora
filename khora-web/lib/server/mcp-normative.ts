@@ -321,7 +321,8 @@ export async function verifyNormativeTurn(
     const db = getDb();
     const existingReceipt = await db.query(
       "SELECT id, status, integrity, coverage_expected, coverage_evaluated, coverage_missing, " +
-        "coverage_duplicates, coverage_unknown, reasons, verifier_version, created_at " +
+        "coverage_duplicates, coverage_unknown, reasons, si_version, si_sha256, manifest_sha256, " +
+        "evidence_sha256, verifier_version, created_at " +
         "FROM normative_receipts WHERE cycle_id = $1 AND attempt = $2 LIMIT 1",
       [turn.cycle_id, token.turn_attempt]
     );
@@ -458,7 +459,8 @@ export async function verifyNormativeTurn(
     if ((error as { code?: string })?.code === "23505") {
       const existing = await db.query(
         "SELECT id, status, integrity, coverage_expected, coverage_evaluated, coverage_missing, " +
-          "coverage_duplicates, coverage_unknown, reasons, verifier_version, created_at " +
+          "coverage_duplicates, coverage_unknown, reasons, si_version, si_sha256, manifest_sha256, " +
+          "evidence_sha256, verifier_version, created_at " +
           "FROM normative_receipts WHERE cycle_id = $1 AND attempt = $2 LIMIT 1",
         [receipt.cycle.id, receipt.cycle.attempt]
       );
