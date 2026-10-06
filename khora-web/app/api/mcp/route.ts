@@ -18,7 +18,7 @@ import {
 import { toolKhoraUiReview } from "@/lib/server/mcp-ui-review";
 import { toolKhoraEstadoVivo, toolKhoraEventosRecientes, toolKhoraObservacionInstantanea, toolKhoraEventosDesde } from "@/lib/server/mcp-observability";
 import { openNormativeTurn, verifyNormativeTurn } from "@/lib/server/mcp-normative";
-import { authenticateManualMcpToken } from "@/lib/server/mcp-manual-token";
+import { authenticateManualMcpToken, MANUAL_MCP_TOKEN_PREFIX } from "@/lib/server/mcp-manual-token";
 
 export const runtime = "nodejs";
 
@@ -80,7 +80,7 @@ async function handleMcpRequest(req: NextRequest) {
   let actor: string;
   let scopes: string[];
   let tokenGeneration: number;
-  const manualToken = await authenticateManualMcpToken(token);
+  const manualToken = token.startsWith(MANUAL_MCP_TOKEN_PREFIX)\n    ? await authenticateManualMcpToken(token)\n    : null;
 
   if (manualToken) {
     if (manualToken.resource !== config.canonicalUrl) {
