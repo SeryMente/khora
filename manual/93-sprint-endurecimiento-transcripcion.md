@@ -3,7 +3,7 @@
 > **Documento canónico del sprint de endurecimiento de la capacidad de transcripción.**
 >
 > **Código:** TRS-001  
-> **Versión:** v1.1.0  
+> **Versión:** v1.2.0  
 > **Fecha de instauración:** 2026-10-05  
 > **Estado:** En curso — laboratorio forense activo  
 **Objetivo primario:** que Cora produzca una transcripción fiel a lo pronunciado, palabra por palabra, sin omisiones ni inserciones, y que Khora bloquee cualquier resultado no demostrado.  
@@ -254,6 +254,36 @@ La investigación debe atacar la causa de mayor impacto en este orden:
 
 **Nunca empezar por L1/pulido para resolver un error F1/F2/F3.**
 
+### 6.4 Regla de intervención mínima
+
+Cada iteración debe modificar **una sola causa dominante o una sola variable experimental** siempre que sea posible. Esto permite atribuir la mejora o regresión.
+
+Quedan prohibidas las modificaciones simultáneas que impidan saber qué produjo el cambio, salvo una corrección integral obligada por una causa técnica única.
+
+### 6.5 La transcripción candidata de Cora debe permanecer intacta
+
+Para medir mejora real:
+
+- conservar la salida cruda de Cora antes de cualquier corrección;
+- no editarla manualmente antes de calcular las métricas;
+- no pasarle a Cora una transcripción esperada como prompt;
+- no usar la referencia acústica para «enseñar» el caso durante la misma prueba;
+- no aplicar glosarios o reglas de postproceso para ocultar errores durante la medición.
+
+La primera medición debe representar lo que Cora realmente hace.
+
+### 6.6 Prohibición de sobreajuste a la muestra de oro
+
+La muestra `GOLDEN-FORENSIC-2026-10-05-001` es obligatoria, pero **no es suficiente para demostrar robustez**.
+
+El corpus objetivo de este sprint debe evolucionar a:
+
+- **1 muestra larga de oro**: el caso actual;
+- **≥4 muestras dirigidas cortas** que cubran específicamente nombres propios, términos técnicos, negaciones, repeticiones/autocorrecciones y posibles alucinaciones;
+- **1 muestra holdout ciega** que no se utilice para ajustar la estrategia.
+
+La muestra holdout solo se evalúa después de congelar una candidata de producción. Una mejora que funciona en la muestra de oro pero falla en la holdout no puede declararse robusta.
+
 ### 6.4 Modelo de máxima calidad
 
 La calidad máxima verificable tiene prioridad sobre la comodidad operativa.
@@ -300,6 +330,8 @@ Para cada muestra de oro se ejecuta como mínimo:
 La salida de Cora se registra siempre con identidad de versión/configuración. Las tres corridas de Whisper sirven para localizar fragilidad y proponer hipótesis.
 
 ### 7.1 Métricas obligatorias
+
+La métrica primaria de esta iniciativa es el **error de palabra de Cora contra la referencia acústica**.
 
 Por muestra:
 
@@ -655,7 +687,28 @@ La independencia tiene valor para localizar zonas donde la inferencia automátic
 
 ## 18. Criterios de aceptación del sprint
 
-El sprint queda en estado **ACEPTADO** solamente cuando se cumplen simultáneamente las siguientes condiciones.
+El sprint queda en estado **ACEPTADO** solamente cuando se superan tres puertas consecutivas: muestra, corpus y holdout/producción.
+
+### Puerta G1 — Muestra
+
+La muestra de oro pasa con:
+
+- 0 omisiones;
+- 0 inserciones;
+- 0 sustituciones;
+- 0 YELLOW sin resolver.
+
+### Puerta G2 — Corpus
+
+Todas las muestras de regresión pasan el mismo criterio. No se acepta una mejora que introduzca una regresión en cualquier otra muestra.
+
+### Puerta G3 — Holdout / producción
+
+Una muestra nueva, ciega al proceso de ajuste, pasa el mismo criterio mediante el flujo real de Cora.
+
+Solo después de G1 + G2 + G3 se puede afirmar que la capacidad está endurecida con evidencia de generalización.
+
+
 
 ### A. Calidad verbal
 
@@ -752,6 +805,19 @@ La cobertura funcional existente no se considera suficiente para declarar perfec
 ---
 
 ## 21. Estado actual del laboratorio — 2026-10-05
+
+### Estado metodológico
+
+La metodología ya quedó reorientada a Cora como sistema bajo prueba:
+
+- audio soberano;
+- referencia acústica adjudicada;
+- Cora como candidato real;
+- Whisper como instrumento de contraste;
+- corrección basada en causa;
+- repetición sobre el mismo caso;
+- regresión sobre corpus;
+- validación final ciega.
 
 ### Evidencia local
 
@@ -877,6 +943,6 @@ La ingeniería de captura, reconciliación y protección contra pérdida está i
 
 ## 27. Versión vigente
 
-**TRS-001 v1.1.0 — Endurecimiento Forense de la Transcripción de Khora orientado a Cora**
+**TRS-001 v1.2.0 — Endurecimiento Forense de la Transcripción de Khora orientado a Cora**
 
 Esta versión establece el contrato base del sprint. Cualquier revisión futura deberá incrementar el número de versión.
