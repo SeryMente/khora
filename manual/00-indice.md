@@ -10,6 +10,7 @@
 - [80. Puerto LLM Oficial del Kernel](80-puerto-llm.md)
 - [92. Catálogo e Instalación de Modelos Locales por GPU](92-sprint-modelos-locales-gpu.md)
 - [93. Sprint de Endurecimiento Forense de la Transcripción](93-sprint-endurecimiento-transcripcion.md)
+- [94. Sprint de Custodia Íntegra y Exportación del Audio](94-sprint-custodia-audio.md)
 
 - [📝 BORRADOR: Resolución de Entidades](90-resolucion.md)
 
