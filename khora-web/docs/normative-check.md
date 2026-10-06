@@ -7,12 +7,19 @@
 ## Superficie
 
 - UI: /sistema/otros
+- API snapshot máquina: GET /api/norm-check?mode=snapshot
 - API máquina: POST /api/norm-check
 - API de lectura: GET /api/norm-check
 - Persistencia: normative_receipts
 - Verificador: khora-web/lib/server/norm-check.ts
 
 La entrada de máquina utiliza el encabezado X-KHORA-KEY. La clave reutiliza la credencial de servicio existente de KHORA y nunca se entrega a la UI.
+
+## Flujo de máquina
+
+1. El cliente obtiene el snapshot vigente con `GET /api/norm-check?mode=snapshot` usando `X-KHORA-KEY`.
+2. El snapshot devuelve versión, blob SHA, SHA-256, manifest SHA-256 y la totalidad dinámica de principios.
+3. Al cerrar el ciclo, el cliente envía el Cycle Receipt a `POST /api/norm-check`.
 
 ## Verificación
 
