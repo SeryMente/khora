@@ -90,7 +90,7 @@ Jerarquía obligatoria:
 1. AUDIO ORIGINAL INMUTABLE                  = fuente soberana
 2. REFERENCIA ACÚSTICA ADJUDICADA            = oráculo de validación
 3. ASR INDEPENDIENTE CON TIMESTAMPS          = evidencia de contraste
-4. CORA                                      = sistema bajo prueba
+4. KHORA                                      = sistema bajo prueba
 5. INFERENCIAS SEMÁNTICAS HUMANAS            = contexto auxiliar, nunca autoridad
 ~~~
 
@@ -371,7 +371,7 @@ No puede normalizarse:
 Representar como:
 
 ~~~
-CORA              EVIDENCIA
+KHORA              EVIDENCIA
 
 palabra_i    ↔    palabra_j
 palabra_i+1  ↔    —
