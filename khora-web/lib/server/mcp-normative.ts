@@ -318,37 +318,9 @@ export async function verifyNormativeTurn(
   if (turn.actor !== actor) throw new Error("TURN_ACTOR_MISMATCH");
 
   if (turn.status === "CLOSED") {
-    const db = getDb();
-    const existingReceipt = await db.query(
-      "SELECT id, status, integrity, coverage_expected, coverage_evaluated, coverage_missing, " +
-        "coverage_duplicates, coverage_unknown, reasons, si_version, si_sha256, manifest_sha256, " +
-        "evidence_sha256, verifier_version, created_at " +
-        "FROM normative_receipts WHERE cycle_id = $1 AND attempt = $2 LIMIT 1",
-      [turn.cycle_id, token.turn_attempt]
-    );
-    if (existingReceipt.rows[0]) {
-      return {
-        ok: existingReceipt.rows[0].status === "VERIFIED",
-        id: existingReceipt.rows[0].id,
-        stored: true,
-        idempotent: true,
-        closed: true,
-        result: existingReceipt.rows[0],
-        verification_record: buildCycleVerificationRecord({
-          cycle_id: turn.cycle_id,
-          attempt: token.turn_attempt,
-          status: existingReceipt.rows[0].status,
-          evidence_sha256: existingReceipt.rows[0].evidence_sha256,
-          si_version: existingReceipt.rows[0].si_version,
-          si_sha256: existingReceipt.rows[0].si_sha256,
-          manifest_sha256: existingReceipt.rows[0].manifest_sha256,
-          verifier_version: existingReceipt.rows[0].verifier_version,
-          recorded_at: existingReceipt.rows[0].created_at,
-          receipt_id: existingReceipt.rows[0].id,
-        }),
-      };
-    }
-    throw new Error("TURN_ALREADY_CLOSED");
+    // A closed turn is terminal. The turn token is intentionally not a
+    // reusable read handle: reusing it is a protocol replay and must fail.
+    throw new Error("TURN_TOKEN_REPLAY_AFTER_CLOSE");
   }
 
   if (
