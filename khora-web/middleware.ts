@@ -104,7 +104,7 @@ export default async function middleware(req: NextRequest, event: NextFetchEvent
 
   let response: Response;
   try {
-    response = await authMiddleware(req, event);
+    response = await authMiddleware(req);
   } catch (error) {
     const failureResponse = NextResponse.json({ error: "internal" }, { status: 500 });
     event.waitUntil(emitBoundaryEvent(req, correlationId, failureResponse, Date.now() - startedAt).catch(() => {}));
