@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { signJwt } from "@/lib/server/jwt";
-import { assertNormativeTurnOpen, verifyNormativeTurn } from "@/lib/server/mcp-normative";
+import { assertNormativeTurnOpen, verifyNormativeTurn, sameRecordedAttempt } from "@/lib/server/mcp-normative";
 import { buildCycleVerificationRecord } from "@/lib/server/norm-check";
 import { resetDbForTesting, setDbForTesting } from "@/lib/server/neon";
 
@@ -181,4 +181,29 @@ test("normative verification rejects replay of a token after the turn is closed"
   } finally {
     resetDbForTesting();
   }
+});
+
+
+test("normative attempt idempotency only accepts the exact recorded nonce and evidence", () => {
+  assert.equal(
+    sameRecordedAttempt(
+      { nonce, evidence_sha256: "a".repeat(64) },
+      { nonce, evidence_sha256: "a".repeat(64) },
+    ),
+    true,
+  );
+  assert.equal(
+    sameRecordedAttempt(
+      { nonce, evidence_sha256: "a".repeat(64) },
+      { nonce: nonce + "-different", evidence_sha256: "a".repeat(64) },
+    ),
+    false,
+  );
+  assert.equal(
+    sameRecordedAttempt(
+      { nonce, evidence_sha256: "a".repeat(64) },
+      { nonce, evidence_sha256: "b".repeat(64) },
+    ),
+    false,
+  );
 });
