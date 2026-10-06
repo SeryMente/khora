@@ -2,24 +2,24 @@
 # Especificación Forense de Transcripción · Khora
 
 **Especificación:** FTS-001  
-**Versión:** 1.2.0  
+**Versión:** 1.3.0  
 **Fecha:** 2026-10-05  
 **Estado:** normativa para el ciclo forense de ingreso de volcados  
 **Repositorio:** SeryMente/khora  
 **Referencia arquitectónica:** Entorno Persistente Medio v1.0.1  
 **Objetivo:** máxima fidelidad verbal demostrable contra el audio original.  
-**Sprint canónico:** [`manual/93-sprint-endurecimiento-transcripcion.md`](../blob/main/manual/93-sprint-endurecimiento-transcripcion.md), TRS-001 v1.2.0.
+**Sprint canónico:** [`manual/93-sprint-endurecimiento-transcripcion.md`](../blob/main/manual/93-sprint-endurecimiento-transcripcion.md), TRS-001 v1.3.0.
 
 ---
 
 ## 1. Propósito
 
-Esta especificación existe para un objetivo concreto: **hacer que Cora produzca
+Esta especificación existe para un objetivo concreto: **hacer que Khora produzca
 una transcripción fiel a lo pronunciado por el operador, palabra por palabra**.
 
 El objetivo no es maximizar una métrica de un modelo aislado ni obtener un texto
 plausible, limpio o semánticamente razonable. El objeto de evaluación es la
-salida efectiva de Cora en el flujo de ingreso de volcados.
+salida efectiva de Khora en el flujo de ingreso de volcados.
 
 El circuito de validación es:
 
@@ -28,7 +28,7 @@ audio soberano
      ↓
 referencia acústica adjudicada
      ↓
-Cora (sistema bajo prueba)
+Khora (sistema bajo prueba)
      ↓
 alineación temporal y léxica
      ↓
@@ -41,8 +41,7 @@ repetición sobre la misma muestra
 regresión sobre el corpus
 ~~~
 
-Bukaroo/Vocaroo y Whisper se utilizan como instrumentos independientes para
-captura y contraste. Ninguno sustituye al audio como fuente soberana.
+Vocaroo/Bukaroo quedan fuera del procedimiento futuro. Whisper se conserva como instrumento de contraste; el audio capturado y custodiado por Khora será la fuente soberana.
 
 La aceptación final exige equivalencia palabra por palabra en la medida en que
 el audio permita adjudicarla, sin RED ni YELLOW pendientes.
@@ -77,7 +76,7 @@ Aplica a:
 3. muestras golden de fidelidad;
 4. auditorías de modificaciones al motor de ASR;
 5. comparación entre proveedores y modelos;
-6. análisis de una transcripción candidata producida por Cora u otro frontend.
+6. análisis de una transcripción candidata producida por Khora u otro frontend.
 
 No sustituye la ruta productiva. Es una capa independiente de verificación.
 
@@ -96,7 +95,7 @@ Jerarquía obligatoria:
 ~~~
 
 La **referencia acústica adjudicada** se construye escuchando el audio y
-estableciendo qué palabras son efectivamente pronunciadas. Cora, Bukaroo,
+estableciendo qué palabras son efectivamente pronunciadas. Khora, Bukaroo,
 Vocaroo o Whisper no pueden generar por sí solos esa referencia.
 
 El nivel 5 nunca puede utilizarse para convertir una discrepancia en una
@@ -152,7 +151,7 @@ Duración observada por control ASR:
 ~1,276.6 s
 ~~~
 
-La transcripción Cora usada en este ciclo es una fuente candidata de comparación,
+La transcripción Khora usada en este ciclo es una fuente candidata de comparación,
 no una fuente de verdad.
 
 El cierre debe evitar el sobreajuste al único caso actual. El corpus mínimo del
@@ -163,8 +162,8 @@ validar generalización antes de declarar capacidad robusta.
 Para el objetivo del sprint, esta muestra debe conservar tres capas separadas:
 
 1. audio original;
-2. transcripción Cora sin corregir;
-3. referencia acústica adjudicada contra la que Cora es evaluada.
+2. transcripción Khora sin corregir;
+3. referencia acústica adjudicada contra la que Khora es evaluada.
 
 No se debe sustituir la referencia adjudicada por una salida de otro modelo
 solo porque produzca menos errores aparentes.
@@ -207,14 +206,14 @@ modelos menores sólo como controles
 
 No se permite bajar de modelo sólo para obtener más velocidad.
 
-### 5.3 Prioridad de la prueba de Cora
+### 5.3 Prioridad de la prueba de Khora
 
 El expediente no se considera completo por disponer de una salida excelente de
-Whisper. La pregunta experimental es si **Cora**, en su flujo real de ingreso,
+Whisper. La pregunta experimental es si **Khora**, en su flujo real de ingreso,
 reduce sus errores frente a la referencia acústica sin crear nuevas
 discrepancias.
 
-Cada iteración debe conservar el antes/después de Cora y registrar qué cambio
+Cada iteración debe conservar el antes/después de Khora y registrar qué cambio
 se introdujo.
 
 
@@ -254,9 +253,9 @@ No son causas válidas:
 
 Una única ejecución de Whisper no constituye evidencia concluyente.
 
-Tampoco una única ejecución de Cora demuestra capacidad robusta. La prueba
+Tampoco una única ejecución de Khora demuestra capacidad robusta. La prueba
 debe buscar **estabilidad frente a cambios controlados** y, sobre todo, reducir
-el error de Cora contra la referencia acústica.
+el error de Khora contra la referencia acústica.
 
 
 La batería de referencia es:
@@ -310,7 +309,7 @@ large-v3, pero sí puede elevar un pasaje a revisión amarilla.
 
 ---
 
-## 8. Regla de aceptación de Cora
+## 8. Regla de aceptación de Khora
 
 Para cada muestra evaluada:
 
@@ -319,7 +318,7 @@ Para cada muestra evaluada:
 WER/CER se conservarán como métricas de progreso y regresión, pero nunca
 sustituyen este criterio binario.
 
-Una salida de Cora que sea inteligible pero contenga una sola discrepancia de
+Una salida de Khora que sea inteligible pero contenga una sola discrepancia de
 palabra permanece en FAIL.
 
 ---
@@ -389,12 +388,12 @@ Cada diferencia debe recibir clasificación y evidencia.
 
 ### VERDE · Confirmada
 
-Cora coincide con la evidencia acústica suficiente y no existe señal contraria
+Khora coincide con la evidencia acústica suficiente y no existe señal contraria
 material.
 
 ### ROJO · Discrepancia demostrada
 
-La evidencia demuestra que Cora:
+La evidencia demuestra que Khora:
 
 - omitió;
 - añadió;
@@ -428,7 +427,7 @@ Cada amarillo debe pasar por un análisis focalizado:
 2. extraer una ventana acústica alrededor del evento;
 3. volver a procesar con large-v3;
 4. probar al menos dos configuraciones;
-5. comparar contra las hipótesis candidatas de Cora;
+5. comparar contra las hipótesis candidatas de Khora;
 6. verificar continuidad temporal;
 7. contrastar la salida independiente;
 8. emitir VERDE, ROJO o AMARILLO persistente.
@@ -870,7 +869,7 @@ Está prohibido:
 
 - declarar PASS por intuición;
 - declarar PASS por porcentaje;
-- corregir Cora para forzar coincidencia;
+- corregir Khora para forzar coincidencia;
 - usar una transcripción previa como fuente de verdad;
 - ocultar discrepancias;
 - borrar evidencia de ejecuciones fallidas;
@@ -940,3 +939,20 @@ El protocolo es intencionalmente conservador:
 > Es preferible declarar una palabra indeterminada que aceptar como fiel una palabra que el audio no demuestra.
 
 **Khora · FTS-001 v1.0.0 · Máxima fidelidad verificable.**
+
+
+---
+
+## 18. Dependencia AUD-05 — fuente acústica primaria de Khora
+
+El expediente FTS-001 queda subordinado, para nuevas muestras, al Sprint AUD-05.
+
+A partir del cierre de AUD-05:
+
+- no se requiere Vocaroo/Bukaroo para generar la muestra;
+- Khora captura y custodia el audio original;
+- la recuperación verifica integridad antes del arbitraje;
+- el MP3 es una derivación exportable, nunca la fuente primaria;
+- Whisper y otros ASR sirven para contraste y localización de discrepancias.
+
+El audio histórico Vocaroo del ciclo `GOLDEN-FORENSIC-2026-10-05-001` permanece como evidencia de laboratorio, no como dependencia operativa futura.
