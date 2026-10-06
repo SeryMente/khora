@@ -1,5 +1,6 @@
 // @l0 L0-002-R · @req FIX-DICTADO/ESPEJO-NOTION · @acr ACR-1.2 · @req FIX-DICTADO/D15 · @req SISTEMA-MENU/E4
 import { registrarEvento } from "./eventos";
+import { emitirEventoServicio } from "./service-observability";
 
 function formatFechaLocal(date: Date): string {
   const y = date.getFullYear();
@@ -59,6 +60,7 @@ export async function espejarVolcado(datos: DatosEspejo): Promise<void> {
   const dbId = process.env.NOTION_DB_VOLCADOS;
 
   if (!token || !dbId) {
+    emitirEventoServicio({ service: "notion", operation: "config.check", provider: "notion", dependency: "api.notion.com", outcome: "SKIPPED", severity: "WARN", reasonCode: "NOTION_NOT_CONFIGURED" });
     await registrarEvento({
       fase: "dictado",
       eventId: "DIC-004",
@@ -198,9 +200,12 @@ export async function espejarVolcado(datos: DatosEspejo): Promise<void> {
     });
 
     if (!response.ok) {
+      emitirEventoServicio({ service: "notion", operation: "pages.create", provider: "notion", dependency: "api.notion.com", statusCode: response.status, outcome: "FAILURE", severity: response.status >= 500 ? "ERROR" : "WARN", reasonCode: "HTTP_" + response.status });
       const errorText = await response.text();
       throw new Error(`Notion API error: ${response.status} - ${errorText}`);
     }
+
+    emitirEventoServicio({ service: "notion", operation: "pages.create", provider: "notion", dependency: "api.notion.com", statusCode: response.status, outcome: "SUCCESS" });
 
     await registrarEvento({
       fase: "dictado",
@@ -214,6 +219,7 @@ export async function espejarVolcado(datos: DatosEspejo): Promise<void> {
       correlacionId: datos.volcado_id,
     });
   } catch (err) {
+    emitirEventoServicio({ service: "notion", operation: "pages.create", provider: "notion", dependency: "api.notion.com", outcome: "FAILURE", severity: "ERROR", reasonCode: err instanceof Error ? err.name.slice(0, 64) : "NOTION_ERROR" });
     await registrarEvento({
       fase: "dictado",
       eventId: "DIC-004",
