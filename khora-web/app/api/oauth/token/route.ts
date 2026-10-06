@@ -11,7 +11,7 @@ import {
 } from "@/lib/server/oauth";
 import { signJwt, verifyPkceS256 } from "@/lib/server/jwt";
 
-const SUPPORTED_SCOPES = new Set(["volcados:read", "runtime:read", "offline_access"]);
+const SUPPORTED_SCOPES = new Set(["volcados:read", "runtime:read", "norm:turn", "offline_access"]);
 const DEFAULT_SCOPE = "volcados:read";
 
 function isChatGptClient(clientId: string) {

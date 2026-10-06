@@ -17,6 +17,7 @@ import {
 } from "@/lib/server/mcp-tools";
 import { toolKhoraUiReview } from "@/lib/server/mcp-ui-review";
 import { toolKhoraEstadoVivo, toolKhoraEventosRecientes, toolKhoraObservacionInstantanea, toolKhoraEventosDesde } from "@/lib/server/mcp-observability";
+import { openNormativeTurn, verifyNormativeTurn } from "@/lib/server/mcp-normative";
 
 export const runtime = "nodejs";
 
@@ -92,11 +93,11 @@ async function handleMcpRequest(req: NextRequest) {
 
   // Verificar scope ("volcados:read")
   const scopes = (payload.scope || "").split(/\s+/).filter(Boolean);
-  if (!scopes.includes("volcados:read") && !scopes.includes("runtime:read")) {
+  if (!scopes.includes("volcados:read") && !scopes.includes("runtime:read") && !scopes.includes("norm:turn")) {
     return makeUnauthorizedResponse(config);
   }
 
-  const requireScope = (scope: "volcados:read" | "runtime:read") =>
+  const requireScope = (scope: "volcados:read" | "runtime:read" | "norm:turn") =>
     scopes.includes(scope)
       ? null
       : scopeFailure(config, scope);
@@ -289,6 +290,55 @@ async function handleMcpRequest(req: NextRequest) {
     }
   );
 
+
+  // Gobernanza normativa: misma puerta MCP, capacidad separada por scope.
+  mcpServer.tool(
+    "khora_norm_open_turn",
+    "Abre el ciclo normativo del turno y fija el snapshot exacto del SI. Usa norm:turn.",
+    {
+      conversation_id: z.string().optional().describe("Identificador externo de conversación, si la plataforma lo proporciona"),
+      turn_number: z.number().int().positive().optional().describe("Número de turno, si la plataforma lo proporciona"),
+    },
+    async (args: any) => {
+      const denied = requireScope("norm:turn");
+      if (denied) return denied;
+      try {
+        const res = await openNormativeTurn(payload.sub, args);
+        return { content: [{ type: "text", text: JSON.stringify(res) }] };
+      } catch (error) {
+        return {
+          isError: true,
+          content: [{ type: "text", text: error instanceof Error ? error.message : "TURN_OPEN_FAILED" }],
+        };
+      }
+    }
+  );
+
+  mcpServer.tool(
+    "khora_norm_verify_turn",
+    "Verifica y registra el receipt del turno. Solo cierra el ciclo cuando KHORA devuelve VERIFIED. Usa norm:turn.",
+    {
+      turn_token: z.string().min(16).describe("Token opaco emitido por khora_norm_open_turn"),
+      receipt: z.object({}).passthrough().describe("Cycle Receipt NORM-CHECK v0.2.0"),
+    },
+    async (args: any) => {
+      const denied = requireScope("norm:turn");
+      if (denied) return denied;
+      try {
+        const res = await verifyNormativeTurn(payload.sub, {
+          turn_token: args.turn_token,
+          receipt: args.receipt,
+        });
+        return { content: [{ type: "text", text: JSON.stringify(res) }] };
+      } catch (error) {
+        return {
+          isError: true,
+          content: [{ type: "text", text: error instanceof Error ? error.message : "TURN_VERIFY_FAILED" }],
+        };
+      }
+    }
+  );
+
   // SDK 1.x no publica securitySchemes en el nivel raíz de tools/list.
   // Publicamos una lista tipada explícita para que ChatGPT pueda detectar OAuth
   // por herramienta, manteniendo las mismas herramientas y esquemas de entrada.
@@ -435,6 +485,34 @@ async function handleMcpRequest(req: NextRequest) {
         additionalProperties: false,
       },
       securitySchemes: [{ type: "oauth2", scopes: ["runtime:read"] }],
+    },
+
+    {
+      name: "khora_norm_open_turn",
+      description: "Abre el ciclo normativo del turno y fija el snapshot exacto del SI.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          conversation_id: { type: "string" },
+          turn_number: { type: "integer", minimum: 1 },
+        },
+        additionalProperties: false,
+      },
+      securitySchemes: [{ type: "oauth2", scopes: ["norm:turn"] }],
+    },
+    {
+      name: "khora_norm_verify_turn",
+      description: "Verifica y registra el receipt del turno; solo VERIFIED cierra el ciclo.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          turn_token: { type: "string", minLength: 16 },
+          receipt: { type: "object" },
+        },
+        required: ["turn_token", "receipt"],
+        additionalProperties: false,
+      },
+      securitySchemes: [{ type: "oauth2", scopes: ["norm:turn"] }],
     },
   ] as any;
 

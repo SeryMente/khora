@@ -69,7 +69,7 @@ export function getProtectedResourceMetadata(config = getMcpConfig()) {
   return {
     resource: config.canonicalUrl,
     authorization_servers: [config.issuer],
-    scopes_supported: ["runtime:read", "volcados:read"],
+    scopes_supported: ["runtime:read", "volcados:read", "norm:turn"],
   };
 }
 

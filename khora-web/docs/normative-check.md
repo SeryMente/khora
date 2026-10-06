@@ -1,21 +1,21 @@
 # NORM-CHECK en KHORA
 
 **Estado:** IMPLEMENTACIÓN INICIAL  
-**Versión:** v0.1.0  
+**Versión:** v0.2.0 — MCP multiuso + ciclo normativo  
 **Fecha:** 2026-10-06
 
 ## Superficie
 
 - UI: /sistema/otros
-- API snapshot máquina: GET /api/norm-check?mode=snapshot
-- API máquina: POST /api/norm-check
-- API de lectura: GET /api/norm-check
+- MCP canónico multiuso: `/api/mcp`
+- Herramientas MCP normativas: `khora_norm_open_turn`, `khora_norm_verify_turn`
+- REST legado/manual: GET/POST `/api/norm-check`
 - Persistencia: normative_receipts
 - Verificador: khora-web/lib/server/norm-check.ts
 
-La entrada de máquina utiliza el encabezado X-KHORA-KEY. La clave reutiliza la credencial de servicio existente de KHORA y nunca se entrega a la UI.
+El acceso de plataformas se concentra en un único recurso MCP: `/api/mcp`. OAuth identifica al cliente y los scopes limitan capacidades; no existe un servidor MCP separado para gobernanza. `KHORA_API_KEY` queda reservado para compatibilidad servidor-a-servidor y nunca se entrega al modelo ni a la UI.
 
-## Flujo de máquina
+## MCP multiuso\n\nLa misma entrada MCP expone las capacidades existentes de Cora/KHORA —volcados, runtime, revisión— y las capacidades normativas. El recurso no se duplica por función.\n\nScopes vigentes:\n\n- `volcados:read` — lectura de volcados y revisión.\n- `runtime:read` — observabilidad del runtime.\n- `norm:turn` — apertura y verificación del ciclo normativo.\n\nUna plataforma puede solicitar uno o varios scopes sobre el mismo `/api/mcp`.\n\n## Flujo de máquina
 
 1. El cliente obtiene el snapshot vigente con `GET /api/norm-check?mode=snapshot` usando `X-KHORA-KEY`.
 2. El snapshot devuelve versión, blob SHA, SHA-256, manifest SHA-256 y la totalidad dinámica de principios.
@@ -53,7 +53,7 @@ Existe además una migración SQL 025 y un bootstrap perezoso de la tabla para e
 - abrir el detalle de un comprobante;
 - pegar un receipt JSON y solicitar la verificación server-side.
 
-## Límite
+## Flujo normativo por MCP\n\n1. `khora_norm_open_turn` fija el snapshot del SI y emite un token de turno.\n2. El modelo ejecuta la tarea con ese snapshot.\n3. `khora_norm_verify_turn` valida el receipt y persiste el intento.\n4. Solo `VERIFIED` marca el turno como cerrado en KHORA.\n5. `INVALID` e `INCOMPLETE` dejan el turno abierto y avanzan `attempt`.\n\nEl mismo endpoint MCP sirve para el resto de capacidades de Cora/KHORA; no se crea una segunda entrada normativa.\n\n## Límite
 
 La comprobación estructural es determinista. La auditoría semántica profunda no forma parte del fast path y podrá añadirse después.
 

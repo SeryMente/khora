@@ -59,7 +59,7 @@ export default async function AuthorizePage(props: {
   const allowedRedirect = redirect_uri === "https://chatgpt.com/connector_platform_oauth_redirect" ||
     config.redirectUris.includes(redirect_uri || "");
 
-  const supportedScopes = new Set(["volcados:read", "runtime:read", "offline_access"]);
+  const supportedScopes = new Set(["volcados:read", "runtime:read", "norm:turn", "offline_access"]);
   const requestedScopes = requestedScope.split(/\s+/).filter(Boolean);
 
   // 1. Validar client_id
@@ -234,7 +234,7 @@ export default async function AuthorizePage(props: {
             <ul className="text-xs space-y-1 text-gray-300">
               <li className="flex items-center space-x-2">
                 <span className="text-emerald-400">✓</span>
-                <span>Lectura del runtime (<code>runtime:read</code>) y, cuando se solicita, de volcados/revisiones (<code>volcados:read</code>)</span>
+                <span>Permisos solicitados: <code>{requestedScopes.join(" ")}</code></span>
               </li>
               <li className="flex items-center space-x-2">
                 <span className="text-emerald-400">✓</span>
