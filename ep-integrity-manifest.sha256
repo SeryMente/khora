@@ -265,7 +265,7 @@ a39a9de5e86829310dfdcd1569534dcd159700105f41d29e3ee640b0f3ab45cc  ./khora-web/ap
 d45c9a0bb862f50ab97218fb8f97f05549ea62a3f8dde593bfade32e01044a66  ./khora-web/app/sistema/ingesta/layout.tsx
 fbf49b077ef1b61bb1ac6ac0dae9db69a3b3188af5cfbfe44b4eab90947c8573  ./khora-web/app/sistema/ingesta/page.tsx
 f9f4bd365fbb02670133b12299e13b574f03fba5b1829f98fc57f0f00c74e50b  ./khora-web/app/sistema/ingreso/page.tsx
-9be0fd1372d88ca4b996652114bc9243e2ab7a468ebd71576cfd1e2d8d4a2bf6  ./khora-web/app/sistema/mcp/page.tsx
+04ad222fe0ff3ccc859c26bea5cb4547fc191b2fda57cf73878ede4fc422ac4b  ./khora-web/app/sistema/mcp/page.tsx
 3906189ec05066ad618e3c4b586150e2673403cc6a8a1e2527c9f79755f68a16  ./khora-web/app/sistema/registro/page.tsx
 04bbb838ba952b42ebb5a82ce6b9cc40c474cc5afd22aa7017ee545ebd10c8f9  ./khora-web/app/sistema/seguridad/page.tsx
 880a72913308e06e32f5d9029d1778c6e59ef0feecb2a5171ed2762c4a9de0df  ./khora-web/app/sistema/volcados/page.tsx
