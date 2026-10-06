@@ -116,7 +116,7 @@ function tokenFailure(message: string): Error {
 }
 
 
-function sameRecordedAttempt(
+export function sameRecordedAttempt(
   stored: { nonce?: unknown; evidence_sha256?: unknown },
   receipt: Pick<NormativeReceipt, "nonce" | "evidence_sha256">,
 ): boolean {
