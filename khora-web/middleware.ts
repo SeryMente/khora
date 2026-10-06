@@ -102,16 +102,16 @@ export default async function middleware(req: NextRequest, event: NextFetchEvent
   const correlationId = req.headers.get("x-khora-correlation-id") || crypto.randomUUID();
   const startedAt = Date.now();
 
-  let response: Response | undefined;
+  let response: Response;
   try {
-    response = await authMiddleware(req);
+    const authResult = await authMiddleware(req);
+    response = authResult instanceof Response ? authResult : NextResponse.next();
   } catch (error) {
     const failureResponse = NextResponse.json({ error: "internal" }, { status: 500 });
     event.waitUntil(emitBoundaryEvent(req, correlationId, failureResponse, Date.now() - startedAt).catch(() => {}));
     throw error;
   }
 
-  response = response || NextResponse.next();
 
   try {
     response.headers.set("X-Khora-Correlation-Id", correlationId);
