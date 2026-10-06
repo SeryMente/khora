@@ -1,5 +1,6 @@
 export type Mp3ExportOptions = {
   sourceUrl: string;
+  manifestUrl?: string;
   filename?: string;
   bitrateKbps?: number;
 };
@@ -15,9 +16,26 @@ function floatToInt16(input: Float32Array): Int16Array {
 
 export async function exportAudioAsMp3({
   sourceUrl,
+  manifestUrl,
   filename = "khora-audio.mp3",
-  bitrateKbps = 128,
+  bitrateKbps = 192,
 }: Mp3ExportOptions): Promise<void> {
+  if (![96, 128, 160, 192, 256, 320].includes(bitrateKbps)) {
+    throw new Error("Bitrate MP3 no permitido.");
+  }
+
+  if (manifestUrl) {
+    const manifestResponse = await fetch(manifestUrl, { cache: "no-store" });
+    let manifest: any = {};
+    try { manifest = await manifestResponse.json(); } catch { manifest = {}; }
+    if (!manifestResponse.ok) {
+      throw new Error(manifest?.detail || "No se pudo validar el manifiesto del audio.");
+    }
+    if (manifest?.audio_status !== "disponible" || manifest?.custodia?.ok !== true) {
+      throw new Error(manifest?.custodia?.motivo || "El audio no está verificado para exportación.");
+    }
+  }
+
   const response = await fetch(sourceUrl, { cache: "no-store" });
   if (!response.ok) {
     let detail = "";
@@ -31,6 +49,13 @@ export async function exportAudioAsMp3({
   }
 
   const bytes = await response.arrayBuffer();
+  if (bytes.byteLength === 0) {
+    throw new Error("Khora devolvió un audio vacío; se bloqueó la exportación.");
+  }
+  const contentType = response.headers.get("content-type") || "";
+  if (!contentType.toLowerCase().startsWith("audio/")) {
+    throw new Error(`La fuente recuperada no es audio reproducible (${contentType || "content-type ausente"}).`);
+  }
   const AudioContextCtor =
     window.AudioContext ||
     (window as typeof window & { webkitAudioContext?: typeof AudioContext })
