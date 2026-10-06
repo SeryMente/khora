@@ -2,38 +2,50 @@
 # Especificación Forense de Transcripción · Khora
 
 **Especificación:** FTS-001  
-**Versión:** 1.0.0  
+**Versión:** 1.1.0  
 **Fecha:** 2026-10-05  
 **Estado:** normativa para el ciclo forense de ingreso de volcados  
 **Repositorio:** SeryMente/khora  
 **Referencia arquitectónica:** Entorno Persistente Medio v1.0.1  
 **Objetivo:** máxima fidelidad verbal demostrable contra el audio original.  
-**Sprint canónico:** [`manual/93-sprint-endurecimiento-transcripcion.md`](../blob/main/manual/93-sprint-endurecimiento-transcripcion.md), TRS-001 v1.0.0.
+**Sprint canónico:** [`manual/93-sprint-endurecimiento-transcripcion.md`](../blob/main/manual/93-sprint-endurecimiento-transcripcion.md), TRS-001 v1.1.0.
 
 ---
 
 ## 1. Propósito
 
-Esta especificación define el protocolo de máxima exigencia para determinar si
-una transcripción de un volcado corresponde exactamente a lo pronunciado en su
-audio.
+Esta especificación existe para un objetivo concreto: **hacer que Cora produzca
+una transcripción fiel a lo pronunciado por el operador, palabra por palabra**.
 
-El objetivo no es producir un texto plausible, limpio, gramatical o
-semánticamente razonable. El objetivo es demostrar, hasta donde la evidencia
-acústica permita hacerlo, una correspondencia palabra-por-palabra entre:
+El objetivo no es maximizar una métrica de un modelo aislado ni obtener un texto
+plausible, limpio o semánticamente razonable. El objeto de evaluación es la
+salida efectiva de Cora en el flujo de ingreso de volcados.
+
+El circuito de validación es:
 
 ~~~
-audio original
+audio soberano
      ↓
-evidencia acústica independiente
+referencia acústica adjudicada
      ↓
-alineación temporal
+Cora (sistema bajo prueba)
      ↓
-comparación palabra-por-palabra
+alineación temporal y léxica
      ↓
-veredicto
+clasificación de cada discrepancia
+     ↓
+corrección de la causa
+     ↓
+repetición sobre la misma muestra
+     ↓
+regresión sobre el corpus
 ~~~
 
+Bukaroo/Vocaroo y Whisper se utilizan como instrumentos independientes para
+captura y contraste. Ninguno sustituye al audio como fuente soberana.
+
+La aceptación final exige equivalencia palabra por palabra en la medida en que
+el audio permita adjudicarla, sin RED ni YELLOW pendientes.
 El protocolo debe detectar:
 
 - omisiones;
@@ -71,20 +83,25 @@ No sustituye la ruta productiva. Es una capa independiente de verificación.
 
 ---
 
-## 3. Fuentes de verdad
+## 3. Fuentes de verdad y roles
 
 Jerarquía obligatoria:
 
 ~~~
-1. AUDIO ORIGINAL INMUTABLE
-2. EVIDENCIA ASR INDEPENDIENTE CON TIMESTAMPS
-3. TRANSCRIPCIÓN CANDIDATA
-4. INFERENCIAS SEMÁNTICAS HUMANAS
+1. AUDIO ORIGINAL INMUTABLE                  = fuente soberana
+2. REFERENCIA ACÚSTICA ADJUDICADA            = oráculo de validación
+3. ASR INDEPENDIENTE CON TIMESTAMPS          = evidencia de contraste
+4. CORA                                      = sistema bajo prueba
+5. INFERENCIAS SEMÁNTICAS HUMANAS            = contexto auxiliar, nunca autoridad
 ~~~
 
-El nivel 4 nunca puede utilizarse para convertir una discrepancia en una
-coincidencia.
+La **referencia acústica adjudicada** se construye escuchando el audio y
+estableciendo qué palabras son efectivamente pronunciadas. Cora, Bukaroo,
+Vocaroo o Whisper no pueden generar por sí solos esa referencia.
 
+El nivel 5 nunca puede utilizarse para convertir una discrepancia en una
+coincidencia. Cuando el audio no permite decidir, el estado correcto es
+YELLOW/bloqueado.
 ### Regla de no interpretación
 
 Durante el arbitraje está prohibido:
@@ -137,6 +154,15 @@ Duración observada por control ASR:
 
 La transcripción Cora usada en este ciclo es una fuente candidata de comparación,
 no una fuente de verdad.
+
+Para el objetivo del sprint, esta muestra debe conservar tres capas separadas:
+
+1. audio original;
+2. transcripción Cora sin corregir;
+3. referencia acústica adjudicada contra la que Cora es evaluada.
+
+No se debe sustituir la referencia adjudicada por una salida de otro modelo
+solo porque produzca menos errores aparentes.
 
 ### 4.2 Inmutabilidad
 
@@ -211,6 +237,11 @@ No son causas válidas:
 ## 6. Batería primaria de decodificación
 
 Una única ejecución de Whisper no constituye evidencia concluyente.
+
+Tampoco una única ejecución de Cora demuestra capacidad robusta. La prueba
+debe buscar **estabilidad frente a cambios controlados** y, sobre todo, reducir
+el error de Cora contra la referencia acústica.
+
 
 La batería de referencia es:
 
