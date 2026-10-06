@@ -470,7 +470,7 @@ a7c05144e3af9568ca5e6b70867c1ab5c89e5a25b92d7f55de2a270683b990fd  ./khora-web/sc
 cadd05af313e10cf980d188d6b4f15b2350b6dccb0e244f74d3106d3e778232b  ./khora-web/scripts/migrar_archivados.ts
 c59868c0e05a1771e41b06c3d713a3267377972192f6cd8ebca230c330ec998b  ./khora-web/scripts/migrate.js
 a41b9c5bc82066f2d111ec2b16e205e3d84e30775435f50262708ed0f18a68e9  ./khora-web/scripts/migrate-ep.mjs
-e4498922ed08b1acb1e35c4ed301b2e01c0b64b93ebffa605402a2087347d915  ./khora-web/scripts/migrate-runtime.mjs
+fa4fd754f9af96a3467e449857a50560d1d58427e3436048abfa6872f6b8cac3  ./khora-web/scripts/migrate-runtime.mjs
 56ae642483607f33593abf0b081a69646b9b9b4e0b2ae62ffc5f6f5615c6a4f5  ./khora-web/scripts/reconcile_forensics.ts
 7918776be6330f777ca36feeb979a2a9915ac67de381996f512c57523a87cec8  ./khora-web/scripts/repair_volcados.ts
 1d60c6e4778b4a8b32376bd63681e70c9b78820fdce06194f64e826ee89f230d  ./khora-web/scripts/reparar_volcados_historicos.ts
@@ -495,7 +495,7 @@ a470a9a5e3eb0e0830c54e260ee89d0ff06e297d87d849c27f44875b95504360  ./khora-web/te
 0d94d97b9941db994dfc6e5a0e67cc07692ab9c793c2c34c33017cf1060b76fd  ./khora-web/tests/unit/folio.test.ts
 5066bc4c64d518f0ae006cbf9a5065bd1ac14a5ad2eddd12857d6b7cfa16328b  ./khora-web/tests/unit/ingesta.test.ts
 6560e8523640638008863ec98560abb7168336310f01cd5b9d9b0f7bbb04e706  ./khora-web/tests/unit/mcp_manual_token.test.ts
-83743d0c8b53f65852919c1c40c65e461892f6c3affab92900f29603cddfa08a  ./khora-web/tests/unit/mcp_normative_migration.test.ts
+bbcbc99a366aac74a6c581c6152688db6982b4b21e22fc27ee9ec0693d90d73b  ./khora-web/tests/unit/mcp_normative_migration.test.ts
 5beeb511fbd26331ffe46384fc838bb2386fec388499b3e371e8cfcd507be823  ./khora-web/tests/unit/mcp_oauth.test.ts
 7c06fe2100292c60379dd9227d4994c615738ae6123ab794ddccb40192ef32e9  ./khora-web/tests/unit/mcp_tool_auth_metadata.test.ts
 f6b775825039cb25b791e26e6c5e8f1dea99875b7d7177a6e6cea188926b00d2  ./khora-web/tests/unit/oauth.test.ts
