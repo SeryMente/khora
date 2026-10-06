@@ -1,4 +1,4 @@
-import { hashString, generateRandomToken, obtenerGeneracionRevocacion } from "./oauth";
+import { generateRandomToken, obtenerGeneracionRevocacion } from "./oauth";
 import { getDb } from "./neon";
 import { getMcpConfig } from "./mcp-config";
 import { signJwt, verifyJwtDetailed } from "./jwt";
@@ -413,24 +413,3 @@ export async function verifyNormativeTurn(
   }
 }
 
-export async function getNormativeTurnStatus(actor: string, cycleId: string) {
-  if (!validActor(actor) || typeof cycleId !== "string" || !cycleId.trim()) {
-    throw new Error("TURN_STATUS_INVALID");
-  }
-  await ensureSchema();
-  const turn = await readTurn(cycleId.trim());
-  if (!turn) throw new Error("TURN_NOT_FOUND");
-  if (turn.actor !== actor) throw new Error("TURN_ACTOR_MISMATCH");
-
-  return {
-    cycle_id: turn.cycle_id,
-    attempt: turn.current_attempt,
-    status: turn.status,
-    si_version: turn.si_version,
-    si_sha256: turn.si_sha256,
-    manifest_sha256: turn.manifest_sha256,
-    opened_at: turn.opened_at,
-    closed_at: turn.closed_at,
-    verified_attempt: turn.verified_attempt,
-  };
-}

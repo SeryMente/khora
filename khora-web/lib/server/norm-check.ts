@@ -1,8 +1,13 @@
 import { createHash } from "crypto";
 
 export const NORM_CHECK_PROTOCOL = "NORM-CHECK";
-export const NORM_CHECK_PROTOCOL_VERSION = "v0.1.0";
-export const NORM_CHECK_VERIFIER_VERSION = "norm-check/0.1.0";
+export const NORM_CHECK_PROTOCOL_VERSION = "v0.2.0";
+export const LEGACY_NORM_CHECK_PROTOCOL_VERSION = "v0.1.0";
+export const NORM_CHECK_VERIFIER_VERSION = "norm-check/0.2.0";
+const ACCEPTED_PROTOCOL_VERSIONS = new Set([
+  LEGACY_NORM_CHECK_PROTOCOL_VERSION,
+  NORM_CHECK_PROTOCOL_VERSION,
+]);
 export const CANONICAL_SI_REPOSITORY = "SeryMente/metodologia";
 export const CANONICAL_SI_PATH = "SI-METACOGNITIVO.md";
 
@@ -132,7 +137,7 @@ export async function fetchSiBlob(blobSha: string): Promise<string> {
       {
         headers: {
           Accept: "application/vnd.github+json",
-          "User-Agent": "Khora-NormCheck/0.1.0",
+          "User-Agent": "Khora-NormCheck/0.2.0",
         },
         cache: "force-cache",
       },
@@ -163,7 +168,7 @@ export async function getCurrentSiSnapshot(): Promise<ParsedSi & { gitBlobSha: s
     {
       headers: {
         Accept: "application/vnd.github+json",
-        "User-Agent": "Khora-NormCheck/0.1.0",
+        "User-Agent": "Khora-NormCheck/0.2.0",
       },
       cache: "no-store",
     },
@@ -206,7 +211,7 @@ function validateBasicReceipt(receipt: unknown): receipt is NormativeReceipt {
   const cycle = value.cycle as Record<string, unknown> | undefined;
   const si = value.si as Record<string, unknown> | undefined;
 
-  if (value.protocol !== NORM_CHECK_PROTOCOL || value.protocol_version !== NORM_CHECK_PROTOCOL_VERSION) return false;
+  if (value.protocol !== NORM_CHECK_PROTOCOL || typeof value.protocol_version !== "string" || !ACCEPTED_PROTOCOL_VERSIONS.has(value.protocol_version)) return false;
   if (!cycle || typeof cycle.id !== "string" || cycle.id.trim().length === 0) return false;
   if (!Number.isInteger(cycle.attempt) || Number(cycle.attempt) < 1) return false;
   if (!si || typeof si.version !== "string" || !isHex(si.git_blob_sha, 40) || !isHex(si.sha256, 64) || !isHex(si.manifest_sha256, 64)) return false;
