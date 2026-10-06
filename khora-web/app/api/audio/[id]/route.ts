@@ -44,12 +44,16 @@ export async function GET(pedido: NextRequest, contexto: { params: Promise<{ id:
       partesDb = dbPartesRes.rows;
     }
 
+    let totalPartesEsperado = partesDb.length;
     if (sessionId) {
       const sessionRes = await db.query("SELECT estado, total_partes FROM dictado_session WHERE session_id = $1", [sessionId]);
       if (sessionRes.rows.length > 0) {
-        const totalPartes = sessionRes.rows[0].total_partes;
-        if (typeof totalPartes === "number" && partesDb.length !== totalPartes) {
-          return NextResponse.json({ error: "audio_parcial", detail: `Custodia incompleta: ${partesDb.length}/${totalPartes} partes registradas.` }, { status: 422 });
+        const totalPartes = Number(sessionRes.rows[0].total_partes);
+        if (Number.isInteger(totalPartes) && totalPartes > 0) {
+          totalPartesEsperado = totalPartes;
+          if (partesDb.length !== totalPartes) {
+            return NextResponse.json({ error: "audio_parcial", detail: `Custodia incompleta: ${partesDb.length}/${totalPartes} partes registradas.` }, { status: 422 });
+          }
         }
       }
     }
@@ -62,7 +66,7 @@ export async function GET(pedido: NextRequest, contexto: { params: Promise<{ id:
           sha256: p.sha256,
           estado_verificacion: p.estado_verificacion,
         })),
-        sessionId ? Number.NaN : partesDb.length,
+        totalPartesEsperado,
       );
       if (!custodia.ok) {
         return NextResponse.json({
