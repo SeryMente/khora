@@ -3,6 +3,9 @@ import os
 import uuid
 import datetime
 import traceback
+import asyncio
+import json
+import urllib.request
 from typing import List, Optional
 from fastapi import FastAPI, Depends, HTTPException, Header, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -107,6 +110,85 @@ async def security_middleware(request: Request, call_next):
         return JSONResponse(status_code=401, content={"detail": "unauthorized"})
 
     return await call_next(request)
+
+
+
+def _emit_service_event(correlation_id: str, method: str, route: str, status_code: int, duration_ms: int) -> None:
+    key = os.getenv("KHORA_API_KEY")
+    if not key:
+        return
+    target_base = os.getenv("KHORA_WEB_ORIGIN", "https://khora-web.vercel.app").rstrip("/")
+    now = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    payload = [{
+        "event_uuid": str(uuid.uuid4()),
+        "schema_version": "2.0",
+        "event_name": "SERVICE_HTTP",
+        "phase": "autorizacion" if status_code in (401, 403) else "manejo",
+        "severity": "ERROR" if status_code >= 500 else ("WARN" if status_code >= 400 else "INFO"),
+        "outcome": "FAILURE" if status_code >= 400 else "SUCCESS",
+        "component": "fastapi-bridge",
+        "correlation_id": correlation_id,
+        "causation_id": None,
+        "attempt_id": None,
+        "sequence": None,
+        "session_id": None,
+        "release_sha": os.getenv("VERCEL_GIT_COMMIT_SHA") or os.getenv("GIT_SHA"),
+        "client_time": now,
+        "server_time": now,
+        "duration_ms": duration_ms,
+        "metrics": {"status_code": status_code, "method": method, "route": route},
+        "reason_code": ("HTTP_" + str(status_code)) if status_code >= 400 else None,
+        "privacy_class": "SYSTEM_AUDIT",
+    }]
+    try:
+        request = urllib.request.Request(
+            target_base + "/api/eventos",
+            data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+            method="POST",
+            headers={"Content-Type": "application/json", "X-Khora-Key": key},
+        )
+        with urllib.request.urlopen(request, timeout=2) as response:
+            response.read(32)
+    except Exception as exc:
+        logging.warning("FastAPI observability delivery failed: %s", type(exc).__name__)
+
+
+@app.middleware("http")
+async def observability_middleware(request: Request, call_next):
+    if request.method == "OPTIONS":
+        return await call_next(request)
+    correlation_id = request.headers.get("X-Khora-Correlation-Id") or str(uuid.uuid4())
+    started = datetime.datetime.now(datetime.timezone.utc)
+    try:
+        response = await call_next(request)
+    except Exception:
+        duration_ms = int((datetime.datetime.now(datetime.timezone.utc) - started).total_seconds() * 1000)
+        asyncio.create_task(asyncio.to_thread(_emit_service_event, correlation_id, request.method, request.url.path, 500, duration_ms))
+        raise
+
+    response.headers["X-Khora-Correlation-Id"] = correlation_id
+
+    if hasattr(response, "body_iterator") and response.body_iterator is not None:
+        original_iterator = response.body_iterator
+
+        async def observed_stream():
+            try:
+                async for chunk in original_iterator:
+                    yield chunk
+            except Exception:
+                duration_ms = int((datetime.datetime.now(datetime.timezone.utc) - started).total_seconds() * 1000)
+                await asyncio.to_thread(_emit_service_event, correlation_id, request.method, request.url.path, 500, duration_ms)
+                raise
+            else:
+                duration_ms = int((datetime.datetime.now(datetime.timezone.utc) - started).total_seconds() * 1000)
+                await asyncio.to_thread(_emit_service_event, correlation_id, request.method, request.url.path, response.status_code, duration_ms)
+
+        response.body_iterator = observed_stream()
+        return response
+
+    duration_ms = int((datetime.datetime.now(datetime.timezone.utc) - started).total_seconds() * 1000)
+    asyncio.create_task(asyncio.to_thread(_emit_service_event, correlation_id, request.method, request.url.path, response.status_code, duration_ms))
+    return response
 
 # Keep verify_key around just in case endpoints depend on it explicitly via Depends,
 # though the middleware handles it globally now.
