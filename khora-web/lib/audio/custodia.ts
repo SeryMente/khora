@@ -20,10 +20,12 @@ export function evaluarCustodiaAudio(
   const ordenadas = [...(partes || [])].sort((a, b) => Number(a.part_index) - Number(b.part_index));
   const total = totalEsperado ?? ordenadas.length;
   const indicesFaltantes: number[] = [];
+  const indicesPresentes = new Set(
+    ordenadas.map((parte) => Number(parte.part_index)),
+  );
 
   for (let i = 1; i <= total; i += 1) {
-    const parte = ordenadas[i - 1];
-    if (!parte || Number(parte.part_index) !== i) indicesFaltantes.push(i);
+    if (!indicesPresentes.has(i)) indicesFaltantes.push(i);
   }
 
   if (indicesFaltantes.length > 0) {
