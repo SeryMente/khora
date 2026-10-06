@@ -59,6 +59,46 @@ export interface DiagnosticoOllamaResult {
 }
 
 const DEFAULT_OLLAMA_BASE_URL = "http://localhost:11434";
+async function registrarOllamaEvento(
+  outcome: "SUCCESS" | "FAILURE",
+  statusCode: number | null,
+  durationMs: number,
+  reasonCode?: string,
+  model?: string,
+) {
+  try {
+    await fetch("/api/eventos", {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify([{
+        event_uuid: crypto.randomUUID(),
+        schema_version: "2.0",
+        event_name: "SERVICE_LLM_LOCAL",
+        phase: "manejo",
+        severity: outcome === "FAILURE" ? "ERROR" : "INFO",
+        outcome,
+        component: "ollama-local-client",
+        correlation_id: crypto.randomUUID(),
+        causation_id: null,
+        attempt_id: null,
+        sequence: null,
+        session_id: null,
+        release_sha: null,
+        client_time: new Date().toISOString(),
+        server_time: new Date().toISOString(),
+        duration_ms: durationMs,
+        metrics: { status_code: statusCode, model: model || "unknown" },
+        reason_code: reasonCode || null,
+        privacy_class: "SYSTEM_AUDIT",
+      }]),
+      keepalive: true,
+    });
+  } catch {
+    // Observability must not break local inference.
+  }
+}
+
 
 /**
  * Genera el script ejecutable de PowerShell para instalar/configurar y arrancar Ollama
@@ -236,6 +276,7 @@ export async function ejecutarInferenciaOllamaLocal(
       signal: opts.signal,
     });
   } catch (err: any) {
+    await registrarOllamaEvento("FAILURE", null, Math.round(performance.now() - t0), "NETWORK_ERROR", opts.model);
     throw new Error(
       `No se pudo conectar con Ollama en ${baseUrl}. Error de red: ${err.message || "desconocido"}. Asegúrese de que Ollama está corriendo y el origen CORS ${typeof window !== "undefined" ? window.location.origin : ""} esté permitido en OLLAMA_ORIGINS.`
     );
@@ -243,6 +284,7 @@ export async function ejecutarInferenciaOllamaLocal(
 
   if (!response.ok) {
     const errorText = await response.text().catch(() => "");
+    await registrarOllamaEvento("FAILURE", response.status, Math.round(performance.now() - t0), "HTTP_" + response.status, opts.model);
     throw new Error(
       `Ollama retornó HTTP ${response.status}: ${errorText || response.statusText}`
     );
@@ -326,6 +368,8 @@ export async function ejecutarInferenciaOllamaLocal(
 
   const tpsFinal = calcularTpsOllama(evalCountFinal, evalDurationNsFinal);
   const exactTokens = evalCountFinal !== null && evalDurationNsFinal !== null;
+
+  await registrarOllamaEvento("SUCCESS", response.status, totalDurationMs, undefined, opts.model);
 
   return {
     contenido: fullContent,
