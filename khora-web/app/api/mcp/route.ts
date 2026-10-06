@@ -18,6 +18,7 @@ import {
 import { toolKhoraUiReview } from "@/lib/server/mcp-ui-review";
 import { toolKhoraEstadoVivo, toolKhoraEventosRecientes, toolKhoraObservacionInstantanea, toolKhoraEventosDesde } from "@/lib/server/mcp-observability";
 import { openNormativeTurn, verifyNormativeTurn } from "@/lib/server/mcp-normative";
+import { authenticateManualMcpToken } from "@/lib/server/mcp-manual-token";
 
 export const runtime = "nodejs";
 
@@ -76,24 +77,45 @@ async function handleMcpRequest(req: NextRequest) {
   }
 
   const token = authHeader.substring(7).trim();
-  const payload = verifyJwt(token, config.jwtSecret);
-  if (!payload) {
-    return makeUnauthorizedResponse(config);
+  let actor: string;
+  let scopes: string[];
+  let tokenGeneration: number;
+  const manualToken = await authenticateManualMcpToken(token);
+
+  if (manualToken) {
+    if (manualToken.resource !== config.canonicalUrl) {
+      return makeUnauthorizedResponse(config);
+    }
+    actor = manualToken.usuario;
+    scopes = manualToken.scope.split(/\s+/).filter(Boolean);
+    tokenGeneration = manualToken.generacion;
+  } else {
+    const payload = verifyJwt(token, config.jwtSecret);
+    if (!payload) {
+      return makeUnauthorizedResponse(config);
+    }
+
+    // Verificar issuer (iss)
+    if (payload.iss !== config.issuer) {
+      return makeUnauthorizedResponse(config);
+    }
+
+    // Verificar audiencia (aud)
+    if (payload.aud !== config.canonicalUrl) {
+      return makeUnauthorizedResponse(config);
+    }
+
+    scopes = (payload.scope || "").split(/\s+/).filter(Boolean);
+    actor = payload.sub;
+    tokenGeneration = payload.gen;
   }
 
-  // Verificar issuer (iss)
-  if (payload.iss !== config.issuer) {
-    return makeUnauthorizedResponse(config);
-  }
-
-  // Verificar audiencia (aud)
-  if (payload.aud !== config.canonicalUrl) {
-    return makeUnauthorizedResponse(config);
-  }
-
-  // Verificar scope ("volcados:read")
-  const scopes = (payload.scope || "").split(/\s+/).filter(Boolean);
-  if (!scopes.includes("volcados:read") && !scopes.includes("runtime:read") && !scopes.includes("norm:turn")) {
+  // El Bearer puede ser OAuth (JWT) o un token manual opaco gestionado por KHORA.
+  if (
+    !actor ||
+    !Number.isSafeInteger(tokenGeneration) ||
+    (!scopes.includes("volcados:read") && !scopes.includes("runtime:read") && !scopes.includes("norm:turn"))
+  ) {
     return makeUnauthorizedResponse(config);
   }
 
@@ -102,9 +124,9 @@ async function handleMcpRequest(req: NextRequest) {
       ? null
       : scopeFailure(config, scope);
 
-  // Verificar revocación de generación
-  const currentGen = await obtenerGeneracionRevocacion(payload.sub);
-  if (typeof payload.gen !== "number" || payload.gen !== currentGen) {
+  // Verificar revocación de generación para ambos tipos de Bearer.
+  const currentGen = await obtenerGeneracionRevocacion(actor);
+  if (tokenGeneration !== currentGen) {
     return makeUnauthorizedResponse(config);
   }
 
@@ -303,7 +325,7 @@ async function handleMcpRequest(req: NextRequest) {
       const denied = requireScope("norm:turn");
       if (denied) return denied;
       try {
-        const res = await openNormativeTurn(payload.sub, args);
+        const res = await openNormativeTurn(actor, args);
         return { content: [{ type: "text", text: JSON.stringify(res) }] };
       } catch (error) {
         return {
@@ -325,7 +347,7 @@ async function handleMcpRequest(req: NextRequest) {
       const denied = requireScope("norm:turn");
       if (denied) return denied;
       try {
-        const res = await verifyNormativeTurn(payload.sub, {
+        const res = await verifyNormativeTurn(actor, {
           turn_token: args.turn_token,
           receipt: args.receipt,
         });
