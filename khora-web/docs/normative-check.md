@@ -1,7 +1,7 @@
 # NORM-CHECK en KHORA
 
 **Estado:** IMPLEMENTACIÓN INICIAL  
-**Versión:** v0.2.0 — MCP multiuso + ciclo normativo  
+**Versión:** v0.3.0 — MCP multiuso + registro verificable por ciclo  
 **Fecha:** 2026-10-06
 
 ## Superficie
@@ -53,7 +53,34 @@ Existe además una migración SQL 025 y un bootstrap perezoso de la tabla para e
 - abrir el detalle de un comprobante;
 - pegar un receipt JSON y solicitar la verificación server-side.
 
-## Flujo normativo por MCP\n\n1. `khora_norm_open_turn` fija el snapshot del SI y emite un token de turno.\n2. El modelo ejecuta la tarea con ese snapshot.\n3. `khora_norm_verify_turn` valida el receipt y persiste el intento.\n4. Solo `VERIFIED` marca el turno como cerrado en KHORA.\n5. `INVALID` e `INCOMPLETE` dejan el turno abierto y avanzan `attempt`.\n\nEl mismo endpoint MCP sirve para el resto de capacidades de Cora/KHORA; no se crea una segunda entrada normativa. El transporte Bearer puede proceder de OAuth o de un token manual gestionado por KHORA.\n\n## Enforcement del ciclo por MCP
+## Flujo normativo por MCP\n\n1. `khora_norm_open_turn` fija el snapshot del SI y emite un token de turno.\n2. El modelo ejecuta la tarea con ese snapshot.\n3. `khora_norm_verify_turn` valida el receipt y persiste el intento.\n4. Solo `VERIFIED` marca el turno como cerrado en KHORA.\n5. `INVALID` e `INCOMPLETE` dejan el turno abierto y avanzan `attempt`.\n\nEl mismo endpoint MCP sirve para el resto de capacidades de Cora/KHORA; no se crea una segunda entrada normativa. El transporte Bearer puede proceder de OAuth o de un token manual gestionado por KHORA.\n\n
+## Registro canónico de verificación por ciclo
+
+P028 del SI exige que cada ciclo quede registrado con una correspondencia verificable entre su identidad, el resultado y la evidencia que lo sustenta.
+
+La fuente única de persistencia continúa siendo `normative_receipts`; el registro de salida es una proyección, no una segunda copia persistida.
+
+Formato estable:
+
+```json
+{
+  "schema": "cycle-verification/v1",
+  "cycle_id": "...",
+  "attempt": 1,
+  "status": "VERIFIED",
+  "evidence_sha256": "...",
+  "si_version": "v1.1.0",
+  "si_sha256": "...",
+  "manifest_sha256": "...",
+  "verifier_version": "norm-check/0.2.0",
+  "recorded_at": "...",
+  "receipt_id": "..."
+}
+```
+
+La herramienta MCP `khora_norm_verify_turn` devuelve este registro en `verification_record` tanto para el primer almacenamiento como para respuestas idempotentes. Los intentos `INVALID` e `INCOMPLETE` conservan su propio registro y no se sobrescriben.
+
+## Enforcement del ciclo por MCP
 
 Las herramientas MCP sustantivas de KHORA están protegidas por un gate de ciclo. Cada llamada requiere `_norm_turn_token` emitido por `khora_norm_open_turn`; KHORA valida que el token corresponda al actor, ciclo, intento, nonce y snapshot exactos antes de ejecutar la herramienta.
 
