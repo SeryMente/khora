@@ -492,7 +492,7 @@ a470a9a5e3eb0e0830c54e260ee89d0ff06e297d87d849c27f44875b95504360  ./khora-web/te
 0d94d97b9941db994dfc6e5a0e67cc07692ab9c793c2c34c33017cf1060b76fd  ./khora-web/tests/unit/folio.test.ts
 5066bc4c64d518f0ae006cbf9a5065bd1ac14a5ad2eddd12857d6b7cfa16328b  ./khora-web/tests/unit/ingesta.test.ts
 12625375ff8ddc7b79f00f282caea74855e0512f78cb39c0e214605e9c814730  ./khora-web/tests/unit/mcp_normative_migration.test.ts
-bfd38f57a1a743f7e2cba5f4b0761757aa2efaa8ffd23ea296e531d45c872d5c  ./khora-web/tests/unit/mcp_oauth.test.ts
+5beeb511fbd26331ffe46384fc838bb2386fec388499b3e371e8cfcd507be823  ./khora-web/tests/unit/mcp_oauth.test.ts
 7c06fe2100292c60379dd9227d4994c615738ae6123ab794ddccb40192ef32e9  ./khora-web/tests/unit/mcp_tool_auth_metadata.test.ts
 f6b775825039cb25b791e26e6c5e8f1dea99875b7d7177a6e6cea188926b00d2  ./khora-web/tests/unit/oauth.test.ts
 a780f6ceffd724e146fce131ac5ebcd7ec4bb9ca8261db775ecf1b3bbb40c4e4  ./khora-web/tests/unit/oauth_scopes_migration.test.ts
