@@ -4,6 +4,7 @@ import { getDb } from "./neon";
 import { asegurarTabla, prepararVolcadoParaRevision } from "./volcados";
 import { cifrarTexto } from "./cripto";
 import { registrarEvento } from "./eventos";
+import { evaluarCustodiaAudio } from "../audio/custodia";
 
 const ALTERS = [
   "ALTER TABLE volcado ADD COLUMN IF NOT EXISTS audio_url TEXT",
@@ -96,6 +97,7 @@ export type AudioParte = {
   start_ms?: number;
   end_ms?: number;
   duracion_ms?: number;
+  estadoVerificacion?: "pendiente" | "verificado";
 };
 
 export type EntradaDictado = {
@@ -123,6 +125,7 @@ export async function registrarParteAudio(params: {
   startMs?: number;
   endMs?: number;
   duracionMs?: number;
+  estadoVerificacion?: "pendiente" | "verificado";
 }) {
   await asegurarColumnasDictado();
   const db = getDb();
@@ -138,14 +141,15 @@ export async function registrarParteAudio(params: {
 
     // Registrar/Actualizar parte
     await db.query(
-      `INSERT INTO dictado_audio_parte (session_id, part_index, blob_url, blob_path, bytes, sha256, fuente_audio, start_ms, end_ms, duracion_ms)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      `INSERT INTO dictado_audio_parte (session_id, part_index, blob_url, blob_path, bytes, sha256, fuente_audio, estado_verificacion, start_ms, end_ms, duracion_ms)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
        ON CONFLICT (session_id, part_index) DO UPDATE
        SET blob_url = EXCLUDED.blob_url,
            blob_path = EXCLUDED.blob_path,
            bytes = EXCLUDED.bytes,
            sha256 = EXCLUDED.sha256,
            fuente_audio = EXCLUDED.fuente_audio,
+           estado_verificacion = EXCLUDED.estado_verificacion,
            start_ms = COALESCE(EXCLUDED.start_ms, dictado_audio_parte.start_ms),
            end_ms = COALESCE(EXCLUDED.end_ms, dictado_audio_parte.end_ms),
            duracion_ms = COALESCE(EXCLUDED.duracion_ms, dictado_audio_parte.duracion_ms),
@@ -158,6 +162,7 @@ export async function registrarParteAudio(params: {
         params.bytes,
         params.sha256 ?? null,
         params.fuenteAudio ?? "microphone",
+        params.estadoVerificacion ?? "pendiente",
         params.startMs ?? null,
         params.endMs ?? null,
         params.duracionMs ?? null,
@@ -195,6 +200,25 @@ export async function registrarParteAudio(params: {
 export async function guardarDictado(entrada: EntradaDictado) {
   await asegurarColumnasDictado();
   const db = getDb();
+
+  const audioEsperado = entrada.fuenteEntrada !== "chrome_live_caption"
+    ? Boolean(entrada.audioPartes?.length || entrada.audioUrl)
+    : Boolean(entrada.audioPartes?.length || entrada.audioUrl);
+
+  if (audioEsperado && Array.isArray(entrada.audioPartes) && entrada.audioPartes.length > 0) {
+    const custodia = evaluarCustodiaAudio(
+      entrada.audioPartes.map((p) => ({
+        part_index: Number(p.parte),
+        bytes: Number(p.bytes),
+        sha256: p.sha256 ?? null,
+        estado_verificacion: p.estadoVerificacion ?? null,
+      })),
+      entrada.audioPartes.length,
+    );
+    if (!custodia.ok) {
+      throw new Error(custodia.motivo);
+    }
+  }
   const id = randomUUID();
   const sha = createHash("sha256").update(entrada.texto, "utf8").digest("hex");
 
