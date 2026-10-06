@@ -4,6 +4,7 @@ import { createHash } from "crypto";
 import { getDb } from "../../../../lib/server/neon";
 import { descifrarBytes } from "../../../../lib/server/cripto";
 import { COOKIE_BOVEDA, desbloqueoVigente } from "../../../../lib/server/boveda";
+import { evaluarCustodiaAudio } from "../../../../lib/audio/custodia";
 
 export const runtime = "nodejs";
 
@@ -19,8 +20,8 @@ export async function GET(pedido: NextRequest, contexto: { params: Promise<{ id:
     const db = getDb();
     const volcadoRes = await db.query(
       isNumeric
-        ? "SELECT id, audio_url, audio_partes, session_id FROM volcado WHERE folio = $1"
-        : "SELECT id, audio_url, audio_partes, session_id FROM volcado WHERE id::text = $1",
+        ? "SELECT id, audio_url, audio_partes, session_id, audio_bytes FROM volcado WHERE folio = $1"
+        : "SELECT id, audio_url, audio_partes, session_id, audio_bytes FROM volcado WHERE id::text = $1",
       [isNumeric ? parseInt(id.trim(), 10) : id.trim()]
     );
 
@@ -31,12 +32,13 @@ export async function GET(pedido: NextRequest, contexto: { params: Promise<{ id:
     const volcado = volcadoRes.rows[0];
     const volcadoId = volcado.id;
     const sessionId = volcado.session_id ? String(volcado.session_id).trim() : null;
+    const audioBytesEsperados = Number(volcado.audio_bytes || 0);
 
     // 1. Intentar resolver por dictado_audio_parte
     let partesDb: any[] = [];
     if (sessionId || volcadoId) {
       const dbPartesRes = await db.query(
-        "SELECT part_index, blob_url, bytes, sha256 FROM dictado_audio_parte WHERE session_id = $1 OR volcado_id = $2 ORDER BY part_index ASC",
+        "SELECT part_index, blob_url, bytes, sha256, estado_verificacion FROM dictado_audio_parte WHERE session_id = $1 OR volcado_id = $2 ORDER BY part_index ASC",
         [sessionId, volcadoId]
       );
       partesDb = dbPartesRes.rows;
@@ -46,13 +48,29 @@ export async function GET(pedido: NextRequest, contexto: { params: Promise<{ id:
       const sessionRes = await db.query("SELECT estado, total_partes FROM dictado_session WHERE session_id = $1", [sessionId]);
       if (sessionRes.rows.length > 0) {
         const totalPartes = sessionRes.rows[0].total_partes;
-        if (typeof totalPartes === "number" && partesDb.length < totalPartes) {
-          return NextResponse.json({ error: "audio_parcial", detail: `Faltan partes de audio: ${partesDb.length}/${totalPartes}` }, { status: 422 });
+        if (typeof totalPartes === "number" && partesDb.length !== totalPartes) {
+          return NextResponse.json({ error: "audio_parcial", detail: `Custodia incompleta: ${partesDb.length}/${totalPartes} partes registradas.` }, { status: 422 });
         }
       }
     }
 
     if (partesDb.length > 0) {
+      const custodia = evaluarCustodiaAudio(
+        partesDb.map((p) => ({
+          part_index: Number(p.part_index),
+          bytes: Number(p.bytes),
+          sha256: p.sha256,
+          estado_verificacion: p.estado_verificacion,
+        })),
+        sessionId ? Number.NaN : partesDb.length,
+      );
+      if (!custodia.ok) {
+        return NextResponse.json({
+          error: "audio_no_verificado",
+          detail: custodia.motivo,
+          indices_faltantes: custodia.indicesFaltantes,
+        }, { status: 422 });
+      }
       const bufferArrayList: Buffer[] = [];
       for (const p of partesDb) {
         const url = p.blob_url;
@@ -74,6 +92,10 @@ export async function GET(pedido: NextRequest, contexto: { params: Promise<{ id:
           return NextResponse.json({ error: "blob_corrupto", detail: "No se pudo descifrar el blob de audio." }, { status: 500 });
         }
 
+        if (claro.length !== Number(p.bytes)) {
+          return NextResponse.json({ error: "blob_corrupto", detail: `El tamaño recuperado no coincide en parte ${p.part_index}` }, { status: 500 });
+        }
+
         if (p.sha256) {
           const hashCalculado = createHash("sha256").update(claro).digest("hex");
           if (hashCalculado !== p.sha256) {
@@ -85,6 +107,9 @@ export async function GET(pedido: NextRequest, contexto: { params: Promise<{ id:
       }
 
       const audioTotal = Buffer.concat(bufferArrayList);
+      if (audioBytesEsperados > 0 && audioTotal.length !== audioBytesEsperados) {
+        return NextResponse.json({ error: "audio_corrupto", detail: "El tamaño total del audio recuperado no coincide con el manifiesto.", bytesEsperados: audioBytesEsperados, bytesRecuperados: audioTotal.length }, { status: 500 });
+      }
       return new NextResponse(new Uint8Array(audioTotal), {
         status: 200,
         headers: {
