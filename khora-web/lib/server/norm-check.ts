@@ -139,19 +139,49 @@ function isHex(value: unknown, length: number): value is string {
   return typeof value === "string" && new RegExp("^" + "[a-f0-9]{" + length + "}$").test(value);
 }
 
-function parsePrinciples(source: string): ManifestPrinciple[] {
-  const sectionStart = source.indexOf("## 4. Principios fundamentales");
-  if (sectionStart < 0) throw new Error("SI_SECTION_MISSING");
+function extractPrincipleSection(source: string): string {
+  const normalized = normalizeText(source);
+  const titledStart = normalized.search(/^##\s+4\.\s+Principios fundamentales\s*$/im);
 
-  const afterStart = source.slice(sectionStart);
-  const nextMajor = afterStart.search(/\n##\s+5\./);
-  const section = nextMajor >= 0 ? afterStart.slice(0, nextMajor) : afterStart;
+  if (titledStart >= 0) {
+    const afterStart = normalized.slice(titledStart);
+    const firstLineBreak = afterStart.indexOf("\n");
+    const body = firstLineBreak >= 0 ? afterStart.slice(firstLineBreak + 1) : "";
+    const nextMajor = body.search(/^##\s+/m);
+    if (nextMajor >= 0) {
+      return afterStart.slice(0, firstLineBreak + 1 + nextMajor);
+    }
+    return afterStart;
+  }
 
+  // Evolución tolerante: si el SI cambia la numeración/nombre de la sección,
+  // localizar directamente el primer bloque de principios y cerrar en el
+  // siguiente heading de nivel 2. Nunca se infiere normativa desde narrativa.
+  const firstPrinciple = normalized.search(/^###\s+P\d{3}\s+·\s+.+$/m);
+  if (firstPrinciple < 0) throw new Error("SI_SECTION_MISSING");
+
+  const afterFirst = normalized.slice(firstPrinciple);
+  const firstLineBreak = afterFirst.indexOf("\n");
+  const body = firstLineBreak >= 0 ? afterFirst.slice(firstLineBreak + 1) : "";
+  const nextMajor = body.search(/^##\s+/m);
+  if (nextMajor >= 0) {
+    return afterFirst.slice(0, firstLineBreak + 1 + nextMajor);
+  }
+  return afterFirst;
+}
+
+export function parsePrinciples(source: string): ManifestPrinciple[] {
+  const section = extractPrincipleSection(source);
   const matches = Array.from(section.matchAll(/^###\s+(P\d{3})\s+·\s+(.+?)\s*$/gm));
   const principles: ManifestPrinciple[] = [];
+  const seenFolios = new Set<string>();
 
   for (let i = 0; i < matches.length; i += 1) {
     const match = matches[i];
+    const folio = match[1];
+    if (seenFolios.has(folio)) throw new Error("SI_PRINCIPLES_DUPLICATED:" + folio);
+    seenFolios.add(folio);
+
     const start = match.index || 0;
     const end = i + 1 < matches.length ? (matches[i + 1].index || section.length) : section.length;
     const block = normalizeText(section.slice(start, end)).trim();
@@ -160,15 +190,20 @@ function parsePrinciples(source: string): ManifestPrinciple[] {
     const state = stateMatch ? stateMatch[1].trim() : "";
     const preponderance = preponderanceMatch ? Number(preponderanceMatch[1]) : Number.NaN;
 
-    if (state === "CANÓNICO" && Number.isFinite(preponderance)) {
-      principles.push({
-        folio: match[1],
-        name: match[2].trim(),
-        preponderance,
-        state,
-        sha256: sha256(block),
-      });
+    if (state !== "CANÓNICO") {
+      throw new Error("SI_PRINCIPLE_STATE_INVALID:" + folio);
     }
+    if (!Number.isFinite(preponderance) || preponderance < 0 || preponderance > 1) {
+      throw new Error("SI_PREPONDERANCE_INVALID:" + folio);
+    }
+
+    principles.push({
+      folio,
+      name: match[2].trim(),
+      preponderance,
+      state,
+      sha256: sha256(block),
+    });
   }
 
   if (principles.length === 0) throw new Error("SI_NO_CANONICAL_PRINCIPLES");
@@ -449,6 +484,7 @@ export async function verifyNormativeReceipt(
   const seen = new Set<string>();
   let duplicates = 0;
   let unknown = 0;
+  let evaluated = 0;
 
   for (const evidence of receipt.principles) {
     if (seen.has(evidence.folio)) {
@@ -456,12 +492,15 @@ export async function verifyNormativeReceipt(
       continue;
     }
     seen.add(evidence.folio);
-    if (!expectedFolios.has(evidence.folio)) unknown += 1;
+    if (expectedFolios.has(evidence.folio)) {
+      evaluated += 1;
+    } else {
+      unknown += 1;
+    }
   }
 
-  const missing = snapshot.manifest.filter((p) => !seen.has(p.folio)).length;
-  const evaluated = seen.size;
   const expected = snapshot.manifest.length;
+  const missing = expected - evaluated;
   const percent = expected === 0 ? 0 : Math.round((evaluated / expected) * 10000) / 100;
   const expectedOrder = snapshot.manifest.map((principle) => principle.folio);
   const actualOrder = receipt.principles.map((principle) => principle.folio);

@@ -147,6 +147,13 @@ function tokenFailure(message: string): Error {
   return new Error(message);
 }
 
+export function sameRecordedAttempt(
+  stored: { nonce?: unknown; evidence_sha256?: unknown },
+  receipt: Pick<NormativeReceipt, "nonce" | "evidence_sha256">,
+): boolean {
+  return stored.nonce === receipt.nonce && stored.evidence_sha256 === receipt.evidence_sha256;
+}
+
 function issueReleaseToken(actor: string, turn: TurnRow, outputSha256: string, evidenceSha256: string, config: NonNullable<ReturnType<typeof getMcpConfig>>, gen: number): string {
   const nowSec = Math.floor(Date.now() / 1000);
   return signJwt(
@@ -594,40 +601,8 @@ export async function verifyNormativeTurn(
   if (turn.actor !== actor) throw new Error("TURN_ACTOR_MISMATCH");
 
   if (turn.status === "CLOSED") {
-    const db = getDb();
-    const existingReceipt = await db.query(
-      "SELECT id, status, integrity, coverage_expected, coverage_evaluated, coverage_missing, " +
-        "coverage_duplicates, coverage_unknown, order_verified, application_log_sha256, reasons, si_version, si_git_commit_sha, si_sha256, manifest_sha256, " +
-        "evidence_sha256, verifier_version, created_at " +
-        "FROM normative_receipts WHERE cycle_id = $1 AND attempt = $2 LIMIT 1",
-      [turn.cycle_id, token.turn_attempt]
-    );
-    if (existingReceipt.rows[0]) {
-      return {
-        ok: existingReceipt.rows[0].status === "VERIFIED",
-        id: existingReceipt.rows[0].id,
-        stored: true,
-        idempotent: true,
-        closed: true,
-        result: existingReceipt.rows[0],
-        verification_record: buildCycleVerificationRecord({
-          cycle_id: turn.cycle_id,
-          attempt: token.turn_attempt,
-          status: existingReceipt.rows[0].status,
-          evidence_sha256: existingReceipt.rows[0].evidence_sha256,
-          si_version: existingReceipt.rows[0].si_version,
-          si_git_commit_sha: existingReceipt.rows[0].si_git_commit_sha,
-          si_sha256: existingReceipt.rows[0].si_sha256,
-          manifest_sha256: existingReceipt.rows[0].manifest_sha256,
-          order_verified: existingReceipt.rows[0].order_verified,
-          application_log_sha256: existingReceipt.rows[0].application_log_sha256,
-          verifier_version: existingReceipt.rows[0].verifier_version,
-          recorded_at: existingReceipt.rows[0].created_at,
-          receipt_id: existingReceipt.rows[0].id,
-        }),
-      };
-    }
-    throw new Error("TURN_ALREADY_CLOSED");
+    // A closed turn is terminal. Reusing its turn token is a protocol replay.
+    throw new Error("TURN_TOKEN_REPLAY_AFTER_CLOSE");
   }
 
   if (
@@ -767,11 +742,14 @@ export async function verifyNormativeTurn(
       const existing = await db.query(
         "SELECT id, status, integrity, coverage_expected, coverage_evaluated, coverage_missing, " +
           "coverage_duplicates, coverage_unknown, order_verified, application_log_sha256, reasons, si_version, si_git_commit_sha, si_sha256, manifest_sha256, " +
-          "evidence_sha256, verifier_version, created_at " +
+          "evidence_sha256, nonce, verifier_version, created_at " +
           "FROM normative_receipts WHERE cycle_id = $1 AND attempt = $2 LIMIT 1",
         [receipt.cycle.id, receipt.cycle.attempt]
       );
       if (existing.rows[0]) {
+        if (!sameRecordedAttempt(existing.rows[0], receipt)) {
+          throw new Error("TURN_ATTEMPT_REPLAY");
+        }
         return {
           ok: existing.rows[0].status === "VERIFIED",
           stored: true,

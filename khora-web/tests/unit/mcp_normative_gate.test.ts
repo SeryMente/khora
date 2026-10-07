@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { signJwt } from "@/lib/server/jwt";
-import { applyNormativePrinciple, assertNormativeTurnOpen } from "@/lib/server/mcp-normative";
+import { applyNormativePrinciple, assertNormativeTurnOpen, verifyNormativeTurn, sameRecordedAttempt } from "@/lib/server/mcp-normative";
 import { REQUIRED_OUTPUT_FORMAT_VERSION, REQUIRED_PLATFORM, type NormativeRuntimeContext } from "@/lib/server/normative-runtime";
 import { buildCycleVerificationRecord } from "@/lib/server/norm-check";
 import { resetDbForTesting, setDbForTesting } from "@/lib/server/neon";
@@ -299,4 +299,41 @@ test("server-side principle application enforces canonical order and builds the 
   } finally {
     resetDbForTesting();
   }
+});
+
+
+test("normative verification rejects replay of a token after the turn is closed", async () => {
+  setMockTurn({ status: "CLOSED" });
+  try {
+    await assert.rejects(
+      verifyNormativeTurn(actor, { turn_token: makeToken(), receipt: {} as any }),
+      /TURN_TOKEN_REPLAY_AFTER_CLOSE/,
+    );
+  } finally {
+    resetDbForTesting();
+  }
+});
+
+test("normative attempt idempotency only accepts the exact recorded nonce and evidence", () => {
+  assert.equal(
+    sameRecordedAttempt(
+      { nonce, evidence_sha256: "a".repeat(64) },
+      { nonce, evidence_sha256: "a".repeat(64) },
+    ),
+    true,
+  );
+  assert.equal(
+    sameRecordedAttempt(
+      { nonce, evidence_sha256: "a".repeat(64) },
+      { nonce: nonce + "-different", evidence_sha256: "a".repeat(64) },
+    ),
+    false,
+  );
+  assert.equal(
+    sameRecordedAttempt(
+      { nonce, evidence_sha256: "a".repeat(64) },
+      { nonce, evidence_sha256: "b".repeat(64) },
+    ),
+    false,
+  );
 });
