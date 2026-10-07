@@ -263,7 +263,7 @@ export async function openNormativeTurn(
         cycle_id: existing.cycle_id,
         attempt: existing.current_attempt,
         nonce: existing.nonce,
-        turn_token: issueTurnToken(actor, existing, config, gen),
+        turn_token: issueTurnToken(actor, existing, config, gen, input.runtime),
         status: existing.status,
         opened_at: existing.opened_at,
       },
@@ -320,7 +320,7 @@ export async function openNormativeTurn(
       cycle_id: row.cycle_id,
       attempt: row.current_attempt,
       nonce: row.nonce,
-      turn_token: issueTurnToken(actor, row, config, gen),
+      turn_token: issueTurnToken(actor, row, config, gen, input.runtime),
       status: row.status,
       opened_at: row.opened_at,
     },
@@ -333,8 +333,8 @@ export async function openNormativeTurn(
     },
     verifier: {
       protocol: "NORM-CHECK",
-      protocol_version: "v0.2.0",
-      verifier_version: "norm-check/0.2.0",
+      protocol_version: "v0.4.0",
+      verifier_version: "norm-check/0.4.0",
     },
   };
 }
