@@ -1,15 +1,6 @@
 // @l0 L0-002-R · @req UI-01/REQ-1
 import AppIcon from "./components/os/AppIcon";
-
-const SUPERFICIES = [
-    { href: "/sistema/volcados", etiqueta: "Volcados", icono: "Files" },
-    { href: "/sistema/ingreso", etiqueta: "Ingreso", icono: "Keyboard" },
-    { href: "/sistema/consulta", etiqueta: "Consulta", icono: "MessageSquareShare" },
-    { href: "/sistema/kpis", etiqueta: "KPIs", icono: "Activity" },
-    { href: "/grafo", etiqueta: "Grafo", icono: "Network" },
-    { href: "/sistema/boveda", etiqueta: "Boveda", icono: "LockKeyhole" },
-    { href: "/sistema/seguridad", etiqueta: "Seguridad", icono: "ShieldCheck" },
-];
+import { NAVIGATION_REGISTRY } from "./navigation/registry";
 
 export default function Home() {
     return (
@@ -61,8 +52,13 @@ export default function Home() {
                     maxWidth: "24rem",
                 }}
             >
-                {SUPERFICIES.map((s) => (
-                    <AppIcon key={s.href} href={s.href} etiqueta={s.etiqueta} icono={s.icono} />
+                {NAVIGATION_REGISTRY.map((entry) => (
+                    <AppIcon
+                        key={entry.id}
+                        href={entry.href}
+                        etiqueta={entry.label}
+                        icono={entry.icon}
+                    />
                 ))}
             </div>
         </div>
