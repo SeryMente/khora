@@ -60,7 +60,7 @@ async function main() {
       if (!registeredUiIds.has(match[1])) fail("data-ui-id sin registro: " + match[1] + " en " + fileName);
     }
 
-    if (/<(div|span)\\b[^>]*\\bonClick\\s*=/.test(content)) {
+    if (/<(div|span)\b[^>]*\bonClick\s*=/.test(content)) {
       fail("Interacción onClick sobre elemento no semántico en " + fileName + "; use <button>, <a> o el control nativo apropiado.");
     }
   }
