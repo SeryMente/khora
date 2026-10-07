@@ -1,5 +1,5 @@
 import { generateRandomToken, obtenerGeneracionRevocacion } from "./oauth";
-import { assertNormativeRuntimeContext, REQUIRED_OUTPUT_FORMAT_VERSION, REQUIRED_PLATFORM, REQUIRED_REASONING_MODE, type NormativeRuntimeContext } from "./normative-runtime";
+import { assertNormativeRuntimeContext, REQUIRED_OUTPUT_FORMAT_VERSION, REQUIRED_PLATFORM, type NormativeRuntimeContext } from "./normative-runtime";
 import { getDb } from "./neon";
 import { getMcpConfig } from "./mcp-config";
 import { signJwt, verifyJwtDetailed } from "./jwt";
@@ -66,7 +66,7 @@ async function ensureSchema() {
       );
       await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS platform TEXT NOT NULL DEFAULT 'ChatGPT'");
       await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS reasoning_mode TEXT NOT NULL DEFAULT 'THINKING'");
-      await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS output_format_version TEXT NOT NULL DEFAULT 'v1.7.1'");
+      await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS output_format_version TEXT NOT NULL DEFAULT 'v1.7.2'");
       await db.query("CREATE INDEX IF NOT EXISTS normative_turns_opened_at_idx ON normative_turns (opened_at DESC)");
       await db.query("CREATE INDEX IF NOT EXISTS normative_turns_status_idx ON normative_turns (status, opened_at DESC)");
     })().catch((error) => {
@@ -382,12 +382,11 @@ export async function assertNormativeTurnOpen(
     typeof token.turn_si_sha256 !== "string" ||
     typeof token.turn_manifest_sha256 !== "string" ||
     token.turn_platform !== REQUIRED_PLATFORM ||
-    token.turn_reasoning_mode !== REQUIRED_REASONING_MODE ||
     token.turn_output_format_version !== REQUIRED_OUTPUT_FORMAT_VERSION ||
     token.turn_platform !== runtime.platform ||
     token.turn_reasoning_mode !== runtime.reasoning_mode ||
     token.turn_output_format_version !== runtime.output_format_version
-  ) throw new Error("THINKING_MODE_REQUIRED");
+  ) throw new Error("NORMATIVE_RUNTIME_MISMATCH");
 
   const gen = await obtenerGeneracionRevocacion(actor);
   if (token.gen !== gen) throw new Error("TURN_TOKEN_REVOKED");

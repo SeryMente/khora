@@ -21,7 +21,7 @@ import { assertNormativeTurnOpen, openNormativeTurn, verifyNormativeTurn, releas
 import { authenticateManualMcpToken, MANUAL_MCP_TOKEN_PREFIX } from "@/lib/server/mcp-manual-token";
 import { registrarEventoServicio } from "@/lib/server/service-observability";
 import { getCurrentSiSnapshot, getCurrentVerifierInfo } from "@/lib/server/norm-check";
-import { assertNormativeRuntimeContext, REQUIRED_OUTPUT_FORMAT_VERSION, REQUIRED_PLATFORM, REQUIRED_REASONING_MODE } from "@/lib/server/normative-runtime";
+import { assertNormativeRuntimeContext, REASONING_MODES, REQUIRED_OUTPUT_FORMAT_VERSION, REQUIRED_PLATFORM, type ReasoningMode } from "@/lib/server/normative-runtime";
 
 export const runtime = "nodejs";
 
@@ -59,8 +59,8 @@ function scopeFailure(config: ReturnType<typeof getMcpConfig>, requiredScope: st
 const NORM_TURN_TOKEN = z.string().min(16).describe(
   "Token del ciclo normativo emitido por khora_norm_open_turn. Obligatorio para toda herramienta MCP sustantiva."
 );
-const NORM_THINKING_MODE = z.literal(REQUIRED_REASONING_MODE).describe(
-  "Obligatorio: ChatGPT debe estar ejecutando en modo Thinking. Si no puede verificarse, no se ejecuta."
+const NORM_THINKING_MODE = z.enum(REASONING_MODES).describe(
+  "Modo de razonamiento observado para el turno. Usa THINKING cuando la plataforma lo exponga; usa UNKNOWN/UNAVAILABLE cuando no exista una señal operativa. Es metadato, no bloquea la salida."
 );
 const NORM_OUTPUT_FORMAT_VERSION = z.literal(REQUIRED_OUTPUT_FORMAT_VERSION).describe(
   "Contrato obligatorio de salida visible por ciclo."
@@ -108,7 +108,7 @@ async function requireNormativeTurn(
     });
     await assertNormativeTurnOpen(actor, turnToken, {
       platform: REQUIRED_PLATFORM,
-      reasoning_mode: REQUIRED_REASONING_MODE,
+      reasoning_mode: thinkingMode as ReasoningMode,
       output_format_version: REQUIRED_OUTPUT_FORMAT_VERSION,
     });
     return null;
@@ -212,12 +212,11 @@ async function handleMcpRequest(req: NextRequest) {
     },
     {
       instructions:
-        "MANDATORY NORMATIVE GATE: para trabajo sujeto a la metodologia, ChatGPT debe estar en modo Thinking; si el modo no es verificable, detente y no ejecutes. " +
-        "Durante el razonamiento: HEALTH MCP -> OPEN TURN -> aplicar todos los principios del snapshot -> VERIFY -> RELEASE -> respuesta. " +
-        "La salida visible de cada turno debe cumplir el contrato v1.7.1. " +
-        "Si Thinking, HEALTH, VERIFY o RELEASE falla, el turno permanece BLOQUEADO y no esta resuelto. " +
-        "Usa el turn_token y los campos de Thinking/formato en toda herramienta sustantiva. " +
-        "Nunca presentes verificacion ni completitud si KHORA no devolvio VERIFIED_RELEASE.",
+        "ADAPTIVE NORMATIVE GATE: durante Thinking, cuando este disponible, intenta HEALTH MCP -> OPEN TURN -> aplicar todos los principios del snapshot -> VERIFY -> RELEASE antes de emitir la salida. " +
+        "La salida visible de cada turno debe cumplir el contrato v1.7.2 cualquiera que sea el escenario. " +
+        "Si KHORA no esta disponible o no puede verificarse, continua la respuesta sin inventar verificacion y declara K: OFF. " +
+        "Si KHORA devuelve VERIFIED_RELEASE, declara K: ✓. Si devuelve un fallo normativo, declara K: ! o K: ? segun corresponda. " +
+        "El modo de razonamiento es metadato operativo y no debe presentarse como prueba del pensamiento interno.",
     },
   );
 
@@ -611,8 +610,8 @@ async function handleMcpRequest(req: NextRequest) {
       inputSchema: {
         type: "object",
         properties: {
-          thinking_mode: { type: "string", enum: ["THINKING"] },
-          output_format_version: { type: "string", enum: ["v1.7.1"] },
+          thinking_mode: { type: "string", enum: [...REASONING_MODES] },
+          output_format_version: { type: "string", enum: ["v1.7.2"] },
         },
         required: ["thinking_mode", "output_format_version"],
         additionalProperties: false,
@@ -771,8 +770,8 @@ async function handleMcpRequest(req: NextRequest) {
         properties: {
           conversation_id: { type: "string" },
           turn_number: { type: "integer", minimum: 1 },
-          thinking_mode: { type: "string", enum: ["THINKING"] },
-          output_format_version: { type: "string", enum: ["v1.7.1"] },
+          thinking_mode: { type: "string", enum: ["THINKING", "INSTANT", "UNKNOWN", "UNAVAILABLE"] },
+          output_format_version: { type: "string", enum: ["v1.7.2"] },
         },
         required: ["thinking_mode", "output_format_version"],
         additionalProperties: false,
@@ -825,12 +824,12 @@ async function handleMcpRequest(req: NextRequest) {
       },
       _thinking_mode: {
         type: "string",
-        enum: ["THINKING"],
+        enum: ["THINKING", "INSTANT", "UNKNOWN", "UNAVAILABLE"],
         description: "REQUERIDO: ChatGPT debe estar en modo Thinking.",
       },
       _output_format_version: {
         type: "string",
-        enum: ["v1.7.1"],
+        enum: ["v1.7.2"],
         description: "REQUERIDO: contrato de salida visible por ciclo.",
       },
     };

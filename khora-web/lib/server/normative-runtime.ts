@@ -1,10 +1,11 @@
 export const REQUIRED_PLATFORM = "ChatGPT" as const;
-export const REQUIRED_REASONING_MODE = "THINKING" as const;
-export const REQUIRED_OUTPUT_FORMAT_VERSION = "v1.7.1" as const;
+export const REASONING_MODES = ["THINKING", "INSTANT", "UNKNOWN", "UNAVAILABLE"] as const;
+export type ReasoningMode = (typeof REASONING_MODES)[number];
+export const REQUIRED_OUTPUT_FORMAT_VERSION = "v1.7.2" as const;
 
 export type NormativeRuntimeContext = {
   platform: typeof REQUIRED_PLATFORM;
-  reasoning_mode: typeof REQUIRED_REASONING_MODE;
+  reasoning_mode: ReasoningMode;
   output_format_version: typeof REQUIRED_OUTPUT_FORMAT_VERSION;
 };
 
@@ -13,13 +14,14 @@ export function isNormativeRuntimeContext(value: unknown): value is NormativeRun
   const candidate = value as Record<string, unknown>;
   return (
     candidate.platform === REQUIRED_PLATFORM &&
-    candidate.reasoning_mode === REQUIRED_REASONING_MODE &&
+    typeof candidate.reasoning_mode === "string" &&
+    (REASONING_MODES as readonly string[]).includes(candidate.reasoning_mode) &&
     candidate.output_format_version === REQUIRED_OUTPUT_FORMAT_VERSION
   );
 }
 
 export function assertNormativeRuntimeContext(value: unknown): asserts value is NormativeRuntimeContext {
   if (!isNormativeRuntimeContext(value)) {
-    throw new Error("THINKING_MODE_REQUIRED");
+    throw new Error("NORMATIVE_RUNTIME_INVALID");
   }
 }

@@ -1,5 +1,5 @@
 import { createHash } from "crypto";
-import { assertNormativeRuntimeContext, REQUIRED_OUTPUT_FORMAT_VERSION, REQUIRED_PLATFORM, REQUIRED_REASONING_MODE, type NormativeRuntimeContext } from "./normative-runtime";
+import { assertNormativeRuntimeContext, type NormativeRuntimeContext } from "./normative-runtime";
 
 export const NORM_CHECK_PROTOCOL = "NORM-CHECK";
 export const NORM_CHECK_PROTOCOL_VERSION = "v0.4.0";
