@@ -157,6 +157,7 @@ export const NAVIGATION_EXEMPT_ROUTES = new Set([
   "/offline",
   "/ui-review",
   "/ui-review/estatico",
+  "/ui-review/manifest.json",
   "/capturar/compartir",
 ]);
 
