@@ -38,6 +38,7 @@ export type NormativeReceipt = {
   nonce: string;
   principles: NormativePrincipleEvidence[];
   output_sha256: string;
+  output_header: string;
   evidence_sha256: string;
   created_at: string;
   runtime: NormativeRuntimeContext;
@@ -119,6 +120,7 @@ type ParsedSi = {
   version: string;
   versionName: string;
   lastUpdatedAt: string;
+  canonicalUpdatedAt: string;
   gitCommitSha: string;
   sha256: string;
   manifest: ManifestPrinciple[];
@@ -133,6 +135,83 @@ function sha256(value: string): string {
 
 function normalizeText(value: string): string {
   return value.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+}
+
+
+type CanonicalSiHistory = {
+  sha: string;
+  updatedAt: string;
+};
+
+async function fetchCanonicalSiHistory(refSha: string): Promise<CanonicalSiHistory> {
+  if (!isHex(refSha, 40)) throw new Error("SI_COMMIT_SHA_INVALID");
+
+  const response = await fetch(
+    "https://api.github.com/repos/" + CANONICAL_SI_REPOSITORY + "/commits?path=" +
+      encodeURIComponent(CANONICAL_SI_PATH) + "&sha=" + refSha + "&per_page=1",
+    {
+      headers: {
+        Accept: "application/vnd.github+json",
+        "User-Agent": "Khora-NormCheck/0.5.0",
+      },
+      cache: "force-cache",
+    },
+  );
+  if (!response.ok) throw new Error("SI_HISTORY_FETCH_" + response.status);
+
+  const payload = (await response.json()) as Array<{
+    sha?: string;
+    commit?: {
+      committer?: { date?: string | null } | null;
+      author?: { date?: string | null } | null;
+    };
+  }>;
+
+  const latest = payload[0];
+  const updatedAt = latest?.commit?.committer?.date || latest?.commit?.author?.date || "";
+  if (!latest || !isHex(latest.sha, 40) || !updatedAt || Number.isNaN(Date.parse(updatedAt))) {
+    throw new Error("SI_HISTORY_PAYLOAD_INVALID");
+  }
+
+  return { sha: latest.sha, updatedAt };
+}
+
+function canonicalSiAge(updatedAt: string, at: string): string {
+  const updatedMs = Date.parse(updatedAt);
+  const atMs = Date.parse(at);
+  if (Number.isNaN(updatedMs) || Number.isNaN(atMs)) throw new Error("SI_OUTPUT_DATE_INVALID");
+
+  const elapsedMs = atMs - updatedMs;
+  if (elapsedMs < 0) throw new Error("SI_UPDATED_AT_IN_FUTURE");
+
+  const minutes = Math.floor(elapsedMs / 60000);
+  if (minutes < 60) return minutes === 1 ? "hace 1 minuto" : "hace " + minutes + " minutos";
+
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return hours === 1 ? "hace 1 hora" : "hace " + hours + " horas";
+
+  const days = Math.floor(hours / 24);
+  if (days < 30) return days === 1 ? "hace 1 día" : "hace " + days + " días";
+
+  return updatedAt.slice(0, 10);
+}
+
+export function buildCanonicalSiOutputHeader(
+  snapshot: Pick<ParsedSi, "version" | "versionName" | "canonicalUpdatedAt">,
+  at: string | Date,
+): string {
+  const atIso = at instanceof Date ? at.toISOString() : at;
+  if (!snapshot.version || !snapshot.versionName || !snapshot.canonicalUpdatedAt) {
+    throw new Error("SI_OUTPUT_IDENTITY_INCOMPLETE");
+  }
+
+  return (
+    "SI CARGADO · " + snapshot.version +
+    " — " + snapshot.versionName +
+    " · COMPLETO · ACTIVO · ÚLTIMO CAMBIO: " +
+    canonicalSiAge(snapshot.canonicalUpdatedAt, atIso) +
+    " | " + snapshot.canonicalUpdatedAt.slice(0, 10)
+  );
 }
 
 function isHex(value: unknown, length: number): value is string {
@@ -331,12 +410,17 @@ export async function getCurrentSiSnapshot(): Promise<ParsedSi & { gitBlobSha: s
     const versionMatch = source.match(/^\*\*Versión:\*\*\s*(v\d+\.\d+\.\d+)/mi);
     if (!versionMatch) throw new Error("SI_VERSION_MISSING");
     const versionNameMatch = source.match(/^\*\*Nombre de versión:\*\*\s*(.+)$/mi);
+    if (!versionNameMatch) throw new Error("SI_VERSION_NAME_MISSING");
     const lastUpdatedMatch = source.match(/^\*\*Última actualización canónica:\*\*\s*(.+)$/mi);
+    if (!lastUpdatedMatch) throw new Error("SI_LAST_UPDATED_MISSING");
+    const history = await fetchCanonicalSiHistory(mainSha);
+
     const manifest = parsePrinciples(source);
     return {
       version: versionMatch[1],
-      versionName: versionNameMatch ? versionNameMatch[1].trim() : "",
-      lastUpdatedAt: lastUpdatedMatch ? lastUpdatedMatch[1].trim() : "",
+      versionName: versionNameMatch[1].trim(),
+      lastUpdatedAt: lastUpdatedMatch[1].trim(),
+      canonicalUpdatedAt: history.updatedAt,
       gitCommitSha: mainSha,
       sha256: sha256(source),
       manifest,
@@ -348,19 +432,23 @@ export async function getCurrentSiSnapshot(): Promise<ParsedSi & { gitBlobSha: s
   throw new Error("SI_SNAPSHOT_FAILED");
 }
 
-export async function loadSiSnapshot(blobSha: string): Promise<ParsedSi> {
+export async function loadSiSnapshot(blobSha: string, gitCommitSha: string): Promise<ParsedSi> {
   const source = normalizeText(await fetchSiBlob(blobSha));
   const versionMatch = source.match(/^\*\*Versión:\*\*\s*(v\d+\.\d+\.\d+)/mi);
   if (!versionMatch) throw new Error("SI_VERSION_MISSING");
   const versionNameMatch = source.match(/^\*\*Nombre de versión:\*\*\s*(.+)$/mi);
+  if (!versionNameMatch) throw new Error("SI_VERSION_NAME_MISSING");
   const lastUpdatedMatch = source.match(/^\*\*Última actualización canónica:\*\*\s*(.+)$/mi);
+  if (!lastUpdatedMatch) throw new Error("SI_LAST_UPDATED_MISSING");
+  const history = await fetchCanonicalSiHistory(gitCommitSha);
 
   const manifest = parsePrinciples(source);
   return {
     version: versionMatch[1],
-    versionName: versionNameMatch ? versionNameMatch[1].trim() : "",
-    lastUpdatedAt: lastUpdatedMatch ? lastUpdatedMatch[1].trim() : "",
-    gitCommitSha: "",
+    versionName: versionNameMatch[1].trim(),
+    lastUpdatedAt: lastUpdatedMatch[1].trim(),
+    canonicalUpdatedAt: history.updatedAt,
+    gitCommitSha,
     sha256: sha256(source),
     manifest,
     manifestSha256: buildManifestHash(manifest),
@@ -381,7 +469,8 @@ function validateBasicReceipt(receipt: unknown): receipt is NormativeReceipt {
   if (typeof value.nonce !== "string" || value.nonce.length < 16 || value.nonce.length > 128) return false;
   if (!isHex(value.evidence_sha256, 64)) return false;
   if (!Array.isArray(value.principles) || value.principles.length === 0) return false;
-  if (typeof value.created_at !== "string" || value.created_at.length < 10) return false;
+  if (typeof value.created_at !== "string" || value.created_at.length < 10 || Number.isNaN(Date.parse(value.created_at))) return false;
+  if (typeof value.output_header !== "string" || value.output_header.trim().length < 32) return false;
   try {
     assertNormativeRuntimeContext(value.runtime);
   } catch {
@@ -423,6 +512,7 @@ function computeEvidenceHash(receipt: NormativeReceipt): string {
       reason_code: item.reason_code || null,
     })),
     output_sha256: receipt.output_sha256,
+    output_header: receipt.output_header,
     created_at: receipt.created_at,
     runtime: {
       platform: receipt.runtime.platform,
@@ -457,7 +547,7 @@ export async function verifyNormativeReceipt(
   const receipt = input as NormativeReceipt;
   let snapshot: ParsedSi;
   try {
-    snapshot = await loadSiSnapshot(receipt.si.git_blob_sha);
+    snapshot = await loadSiSnapshot(receipt.si.git_blob_sha, receipt.si.git_commit_sha);
   } catch (error) {
     return {
       status: "INVALID",
@@ -476,6 +566,8 @@ export async function verifyNormativeReceipt(
   }
 
   const reasons: string[] = [];
+  const expectedOutputHeader = buildCanonicalSiOutputHeader(snapshot, receipt.created_at);
+  if (receipt.output_header !== expectedOutputHeader) reasons.push("OUTPUT_HEADER_MISMATCH");
   if (receipt.si.version !== snapshot.version) reasons.push("SI_VERSION_MISMATCH");
   if (receipt.si.sha256 !== snapshot.sha256) reasons.push("SI_SHA256_MISMATCH");
   if (receipt.si.manifest_sha256 !== snapshot.manifestSha256) reasons.push("MANIFEST_SHA256_MISMATCH");
