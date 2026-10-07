@@ -1,8 +1,9 @@
 import { createHash } from "crypto";
+import { assertNormativeRuntimeContext, REQUIRED_OUTPUT_FORMAT_VERSION, REQUIRED_PLATFORM, REQUIRED_REASONING_MODE, type NormativeRuntimeContext } from "./normative-runtime";
 
 export const NORM_CHECK_PROTOCOL = "NORM-CHECK";
-export const NORM_CHECK_PROTOCOL_VERSION = "v0.3.0";
-export const NORM_CHECK_VERIFIER_VERSION = "norm-check/0.3.0";
+export const NORM_CHECK_PROTOCOL_VERSION = "v0.4.0";
+export const NORM_CHECK_VERIFIER_VERSION = "norm-check/0.4.0";
 const ACCEPTED_PROTOCOL_VERSIONS = new Set([NORM_CHECK_PROTOCOL_VERSION]);
 export const CANONICAL_SI_REPOSITORY = "SeryMente/metodologia";
 export const CANONICAL_SI_PATH = "SI-METACOGNITIVO.md";
@@ -38,6 +39,7 @@ export type NormativeReceipt = {
   output_sha256: string;
   evidence_sha256: string;
   created_at: string;
+  runtime: NormativeRuntimeContext;
 };
 
 export type VerificationResult = {
@@ -193,7 +195,7 @@ export async function fetchSiBlob(blobSha: string): Promise<string> {
       {
         headers: {
           Accept: "application/vnd.github+json",
-          "User-Agent": "Khora-NormCheck/0.2.0",
+          "User-Agent": "Khora-NormCheck/0.4.0",
         },
         cache: "force-cache",
       },
@@ -284,6 +286,11 @@ function validateBasicReceipt(receipt: unknown): receipt is NormativeReceipt {
   if (!isHex(value.evidence_sha256, 64)) return false;
   if (!Array.isArray(value.principles) || value.principles.length === 0) return false;
   if (typeof value.created_at !== "string" || value.created_at.length < 10) return false;
+  try {
+    assertNormativeRuntimeContext(value.runtime);
+  } catch {
+    return false;
+  }
 
   for (const raw of value.principles) {
     if (!raw || typeof raw !== "object") return false;
@@ -322,6 +329,11 @@ function computeEvidenceHash(receipt: NormativeReceipt): string {
       .sort((a, b) => a.folio.localeCompare(b.folio)),
     output_sha256: receipt.output_sha256,
     created_at: receipt.created_at,
+    runtime: {
+      platform: receipt.runtime.platform,
+      reasoning_mode: receipt.runtime.reasoning_mode,
+      output_format_version: receipt.runtime.output_format_version,
+    },
   };
   return sha256(canonicalJsonString(canonical));
 }
