@@ -592,6 +592,13 @@ async function handleMcpRequest(req: NextRequest) {
       turn_token: z.string().min(16).describe("Token opaco emitido por khora_norm_open_turn"),
       receipt: z.object({
         output_header: z.string().min(32).describe("Encabezado SI canónico exacto del ciclo."),
+        methodology_output_header: z.string().min(32).describe("Encabezado de Metodología canónico exacto del ciclo."),
+        methodology: z.object({
+          version: z.string().min(1),
+          git_commit_sha: z.string().length(40),
+          git_blob_sha: z.string().length(40),
+          sha256: z.string().length(64),
+        }).describe("Snapshot canónico de METODOLOGIA.md del ciclo."),
       }).passthrough().describe("Cycle Receipt NORM-CHECK v0.5.0"),
     },
     async (args: any) => {
@@ -644,7 +651,7 @@ async function handleMcpRequest(req: NextRequest) {
         type: "object",
         properties: {
           thinking_mode: { type: "string", enum: [...REASONING_MODES] },
-          output_format_version: { type: "string", enum: ["v1.7.2"] },
+          output_format_version: { type: "string", enum: ["v1.7.3"] },
         },
         required: ["thinking_mode", "output_format_version"],
         additionalProperties: false,
@@ -804,7 +811,7 @@ async function handleMcpRequest(req: NextRequest) {
           conversation_id: { type: "string" },
           turn_number: { type: "integer", minimum: 1 },
           thinking_mode: { type: "string", enum: ["THINKING", "INSTANT", "UNKNOWN", "UNAVAILABLE"] },
-          output_format_version: { type: "string", enum: ["v1.7.2"] },
+          output_format_version: { type: "string", enum: ["v1.7.3"] },
         },
         required: ["thinking_mode", "output_format_version"],
         additionalProperties: false,
@@ -843,8 +850,24 @@ async function handleMcpRequest(req: NextRequest) {
                 minLength: 32,
                 description: "REQUERIDO: encabezado SI canónico exacto del ciclo.",
               },
+              methodology_output_header: {
+                type: "string",
+                minLength: 32,
+                description: "REQUERIDO: encabezado de Metodología canónico exacto del ciclo.",
+              },
+              methodology: {
+                type: "object",
+                properties: {
+                  version: { type: "string", minLength: 1 },
+                  git_commit_sha: { type: "string", minLength: 40, maxLength: 40 },
+                  git_blob_sha: { type: "string", minLength: 40, maxLength: 40 },
+                  sha256: { type: "string", minLength: 64, maxLength: 64 },
+                },
+                required: ["version", "git_commit_sha", "git_blob_sha", "sha256"],
+                additionalProperties: false,
+              },
             },
-            required: ["output_header"],
+            required: ["output_header", "methodology_output_header", "methodology"],
             additionalProperties: true,
           },
         },
@@ -891,7 +914,7 @@ async function handleMcpRequest(req: NextRequest) {
       },
       _output_format_version: {
         type: "string",
-        enum: ["v1.7.2"],
+        enum: ["v1.7.3"],
         description: "REQUERIDO: contrato de salida visible por ciclo.",
       },
     };
