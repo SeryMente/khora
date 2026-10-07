@@ -6,7 +6,7 @@ import {
   REQUIRED_PLATFORM,
   REQUIRED_REASONING_MODE,
   isNormativeRuntimeContext,
-} from "../lib/server/normative-runtime";
+} from "../../lib/server/normative-runtime";
 
 test("accepts the canonical Thinking runtime contract", () => {
   assert.equal(
