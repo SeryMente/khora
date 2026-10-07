@@ -289,7 +289,7 @@ export async function openNormativeTurn(
       verifier: {
         protocol: "NORM-CHECK",
         protocol_version: "v0.4.0",
-        verifier_version: "norm-check/0.3.0",
+        verifier_version: "norm-check/0.4.0",
       },
     };
   }
