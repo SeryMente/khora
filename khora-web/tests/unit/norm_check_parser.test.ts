@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { parsePrinciples } from "@/lib/server/norm-check";
+import { buildCanonicalSiOutputHeader, parsePrinciples } from "@/lib/server/norm-check";
 
 function principle(folio: string, preponderance: string, state = "CANÓNICO") {
   return `### ${folio} · Principio ${folio}
@@ -55,4 +55,35 @@ test("parser rechaza preponderancia fuera del dominio 0..1", () => {
   ].join("\n");
 
   assert.throws(() => parsePrinciples(source), /SI_PREPONDERANCE_INVALID:P019/);
+});
+
+
+test("formato canónico del SI conserva identidad y antigüedad relativa", () => {
+  const snapshot = {
+    version: "v1.6.7",
+    versionName: "Gobernanza Transaccional del Estado RDC",
+    canonicalUpdatedAt: "2026-10-07T20:31:02.000Z",
+  };
+
+  assert.equal(
+    buildCanonicalSiOutputHeader(snapshot, "2026-10-07T21:02:02.000Z"),
+    "SI CARGADO · v1.6.7 — Gobernanza Transaccional del Estado RDC · COMPLETO · ACTIVO · ÚLTIMO CAMBIO: hace 31 minutos | 2026-10-07",
+  );
+});
+
+test("formato canónico cambia a horas y luego a fecha absoluta sin alterar la identidad", () => {
+  const snapshot = {
+    version: "v1.6.7",
+    versionName: "Gobernanza Transaccional del Estado RDC",
+    canonicalUpdatedAt: "2026-09-01T12:00:00.000Z",
+  };
+
+  assert.match(
+    buildCanonicalSiOutputHeader(snapshot, "2026-09-01T14:00:00.000Z"),
+    /ÚLTIMO CAMBIO: hace 2 horas \| 2026-09-01$/,
+  );
+  assert.equal(
+    buildCanonicalSiOutputHeader(snapshot, "2026-10-07T12:00:00.000Z"),
+    "SI CARGADO · v1.6.7 — Gobernanza Transaccional del Estado RDC · COMPLETO · ACTIVO · ÚLTIMO CAMBIO: 2026-09-01 | 2026-09-01",
+  );
 });
