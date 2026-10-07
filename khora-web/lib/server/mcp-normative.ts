@@ -94,7 +94,10 @@ async function ensureSchema() {
       await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS application_index INTEGER NOT NULL DEFAULT 0");
       await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS application_vector JSONB NOT NULL DEFAULT '[]'::jsonb");
       await db.query("ALTER TABLE normative_receipts ADD COLUMN IF NOT EXISTS si_git_commit_sha TEXT NOT NULL DEFAULT 'UNKNOWN'");
+      await db.query("ALTER TABLE normative_receipts ADD COLUMN IF NOT EXISTS methodology_version TEXT NOT NULL DEFAULT 'UNKNOWN'");
       await db.query("ALTER TABLE normative_receipts ADD COLUMN IF NOT EXISTS methodology_git_commit_sha TEXT NOT NULL DEFAULT 'UNKNOWN'");
+      await db.query("ALTER TABLE normative_receipts ADD COLUMN IF NOT EXISTS methodology_git_blob_sha TEXT NOT NULL DEFAULT 'UNKNOWN'");
+      await db.query("ALTER TABLE normative_receipts ADD COLUMN IF NOT EXISTS methodology_sha256 TEXT NOT NULL DEFAULT 'UNKNOWN'");
       await db.query("ALTER TABLE normative_receipts ADD COLUMN IF NOT EXISTS order_verified BOOLEAN NOT NULL DEFAULT FALSE");
       await db.query("ALTER TABLE normative_receipts ADD COLUMN IF NOT EXISTS application_log_sha256 TEXT NOT NULL DEFAULT ''");
       await db.query("CREATE INDEX IF NOT EXISTS normative_turns_opened_at_idx ON normative_turns (opened_at DESC)");
