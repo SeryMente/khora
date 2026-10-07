@@ -98,3 +98,31 @@ La estrategia de navegación está implementada y certificada de forma independi
 ### Próximo cierre legítimo
 
 El cierre definitivo requiere que los bloqueos globales sean resueltos en su propio ciclo y que el PR #279 obtenga sus checks obligatorios en verde; después podrá promoverse el SHA exacto a `main` y comprobarse producción.
+
+## Auditoría final del ciclo — 2026-10-07
+
+**SHA de implementación certificado:** `8b6d3105f65e7c5b130241562ac2bdde045ff2ae`  
+**SHA de trazabilidad anterior:** `db9d0997a3dc8be04ab228ce3f171af01d881bf9`  
+**PR:** #279 — OPEN / NOT MERGED.
+
+### Estado de invariantes
+
+PASS — registro único.  
+PASS — Seguridad fuera de Sistema en nivel 1.  
+PASS — Capturar fuera de Sistema en nivel 1.  
+PASS — KPIs fuera de nivel 1.  
+PASS — Sistema no contiene Seguridad ni Capturar.  
+PASS — Home sin inventario paralelo.  
+PASS — rutas técnicas/legacy clasificadas.  
+PASS — assets estáticos excluidos del guard.  
+PASS — cobertura y referencias verificadas en ambos sentidos.  
+PASS — batería específica: 5/5 pruebas de navegación.  
+BLOCKED — CI global: incidencias preexistentes documentadas.  
+NOT APPLIED — promoción a producción: PR no fusionado.  
+NOT CONCLUSIVE — E2E visual: runner remoto sin Chromium.
+
+### Decisión
+
+**PROVISIONAL / EN ESPERA DE CIERRE CI.**
+
+No se autoriza merge forzado ni despliegue de producción como mecanismo para ocultar los bloqueos externos.
