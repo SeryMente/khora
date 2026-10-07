@@ -1,129 +1,122 @@
 # UI_REVIEW · Cómo ver la interfaz de Khora
 
-> Documento canónico. Si eres un modelo de lenguaje al que Victor Hugo dirigió
-> aquí, lee esta página completa antes de opinar sobre el diseño de Khora.
+> Documento canónico. Lee esta página completa antes de evaluar o modificar la
+> interfaz de Khora.
 
 ## 1. Qué es esto
 
-Khora expone un **gemelo fiel de su interfaz** en rutas públicas de solo
-lectura. No es una maqueta ni una reconstrucción: renderiza **exactamente los
-mismos componentes de React** que usa el sistema en producción, alimentados con
-datos sintéticos.
+Khora expone un sistema de revisión de interfaz de solo lectura. No es una
+maqueta separada: utiliza los mismos componentes presentacionales compartidos
+que consume producción y los alimenta exclusivamente con datos sintéticos.
 
-Sirve para que cualquier persona o modelo pueda ver, citar y proponer cambios
-sobre la interfaz vigente sin acceder a datos reales.
+Hay dos superficies de inspección:
 
-## 2. Enlaces
+- **Harness interactivo:** selector de pantalla, escenario y viewport.
+- **Prerender semántico:** HTML de cada escenario para personas o agentes que no
+  ejecutan JavaScript.
 
-Base: `https://khora-web.vercel.app`
+## 2. Rutas
 
-| Ruta | Para qué | Requiere JavaScript |
+Base prevista: `https://khora-web.vercel.app`
+
+| Ruta | Propósito | JavaScript |
 |---|---|---|
-| `/ui-review/estatico` | **Empieza aquí.** Índice de pantallas | No |
-| `/ui-review/<pantalla>/estatico` | Todos los escenarios de una pantalla, ya renderizados | No |
+| `/ui-review/estatico` | Índice de las pantallas | No |
+| `/ui-review/<pantalla>/estatico` | Todos los escenarios de una pantalla | No |
 | `/ui-review/manifest.json` | Inventario legible por máquina | No |
-| `/ui-review` | Harness interactivo con selector de escenario y viewport | Sí |
-| `/ui-review/<pantalla>?scenario=<escenario>` | Un escenario concreto | Sí |
+| `/ui-review` | Harness interactivo | Sí |
+| `/ui-review/<pantalla>?scenario=<escenario>` | Escenario concreto | Sí |
 
-**Si no ejecutas JavaScript** (la mayoría de los recuperadores web, incluidos
-agentes de ChatGPT, Notion y Claude vía fetch): usa siempre las rutas que
-terminan en `/estatico`. Las demás te devolverán un cascarón vacío con el texto
-`Cargando escenario sintético...`, que **no** es la interfaz.
+Las rutas de UI Review permanecen **fail-closed** y requieren
+`KHORA_UI_REVIEW_MODE=1`.
 
-**Si controlas un navegador real** (Claude in Chrome, Playwright, una persona):
-`/ui-review` te da además pestañas de pantalla, selector de escenario,
-conmutador Desktop/Mobile y resaltado de identificadores.
+## 3. Las nueve pantallas registradas
 
-## 3. Las siete pantallas
-
-| Pantalla | Qué muestra | Componente compartido |
+| Pantalla | Función | Componente compartido |
 |---|---|---|
-| `ingreso` | Dictado en vivo, escritura y adjuntar audio | `IngresoView` |
-| `archivo` | Lista de volcados capturados | `PipelineView` |
-| `revision` | Mesa de revisión, audio y hallazgos | `PipelineView` |
-| `aprobacion` | Compuerta de aprobación de versión | `PipelineView` |
-| `ingesta` | Envío al kernel y grafo | `PipelineView` |
-| `registro` | Log de eventos del sistema | `RegistroView` |
-| `grafo` | Proyección cognitiva de nodos y aristas | `GrafoView` |
+| `ingreso` | Dictado, escritura y adjuntar audio | `IngresoView` |
+| `archivo` | Lista de volcados | `PipelineView` |
+| `revision` | Revisión, audio y hallazgos | `PipelineView` |
+| `aprobacion` | Compuerta de aprobación | `PipelineView` |
+| `ingesta` | Envío al kernel | `PipelineView` |
+| `registro` | Registro de eventos | `RegistroView` |
+| `grafo` | Nodos y relaciones | `GrafoView` |
+| `consulta` | Consulta multi-turno y RAG | `ConsultaView` |
+| `kpi` | Métricas y benchmarks | `KpiPanelView` |
 
-Cada pantalla tiene entre 3 y 9 escenarios: estados inactivo, cargando, vacío,
-error, y los estados propios de su flujo. El manifiesto los enumera todos.
+Cada pantalla tiene escenarios explícitos de operación, carga, vacío, error y
+casos derivados de incidentes cuando aplican.
 
-## 4. Identificadores estables (`ui_id`)
+## 4. Identificadores estables
 
-Cada elemento relevante lleva un atributo `data-ui-id`, por ejemplo
+Los elementos relevantes llevan `data-ui-id`, por ejemplo
 `ingreso.btn-adjuntar` o `revision.btn-resolver-incidente`.
 
-**Úsalos para referirte a la interfaz con precisión.** En lugar de «el botón de
-la derecha», escribe `ingreso.btn-adjuntar`. Son estables entre versiones y
-están garantizados por pruebas automáticas.
+El registro de escenarios y los componentes se verifican contra esos IDs. Un
+ID nuevo no documentado o un ID registrado que ya no exista hace fallar el
+gate.
 
-## 5. Garantía de fidelidad
+## 5. Cero deriva
 
-Tres mecanismos impiden que lo que ves aquí se aleje de la interfaz real:
+La revisión utiliza tres defensas combinadas:
 
-1. **Fuente única de componentes.** Las rutas de producción y UI Review importan
-   los mismos archivos de `khora-web/app/components/shared/`. No existen dos
-   versiones de la interfaz.
-2. **Acoplamiento por tipos.** Los estados sintéticos de
-   `khora-web/lib/ui-review/states.ts` están declarados con los tipos reales que
-   exigen esos componentes. Si las props cambian, el proyecto deja de compilar.
-3. **Prueba antideriva en CI.** `tests/unit/ui_review_drift.test.ts` compara los
-   `data-ui-id` presentes en los componentes contra el registro de escenarios.
-   Si alguien añade, renombra o borra uno sin registrarlo, la prueba falla y la
-   fusión se bloquea.
+1. Producción y UI Review comparten `app/components/shared/`.
+2. Los estados sintéticos se tipan contra los estados reales de esos componentes.
+3. `ui_review_drift.test.ts` compara los `data-ui-id` de producción con el
+   registro canónico.
 
-Consecuencia: **si UI Review muestra algo, la interfaz real lo tiene.** No hace
-falta mantenerlo a mano.
+La regla adicional de navegación comprueba que no existan enlaces internos
+muertos ni páginas de producto huérfanas.
 
-## 6. Qué no encontrarás aquí
+## 6. Certificación E2E
 
-- Datos reales. Todos los volcados, eventos y nodos son sintéticos.
-- Efectos externos. Los botones no escriben en base de datos ni llaman APIs.
-- Secretos ni credenciales.
-- Autenticación. Estas rutas son de lectura pública, por diseño.
+El workflow **UI Quality** ejecuta:
 
-En el prerender estático los controles se muestran pero no responden: es un
-retrato de la interfaz, no una aplicación funcionante.
+`typecheck → ui-review:check → ui:contract → test:unit`
 
-## 7. Cómo pedir ayuda de diseño
+y, en un job separado:
 
-Formulación recomendada al dirigir a un modelo:
+`Playwright Chromium → shell-v2 → ui-quality`
 
-> Revisa `https://khora-web.vercel.app/ui-review/ingreso/estatico`. Es la
-> interfaz real de mi sistema, con datos sintéticos. Propón mejoras al escenario
-> `idle` refiriéndote a los elementos por su `ui_id`.
+La certificación E2E comprueba en escritorio y móvil:
 
-## 8. Activación
+- renderización de todas las superficies de producto;
+- ausencia de respuestas HTTP 4xx/5xx en las rutas probadas;
+- nombre accesible de controles;
+- ausencia de `div[role=button]` como control simulado;
+- `alt` en imágenes;
+- presencia de `h1`;
+- ausencia de overflow horizontal relevante;
+- ausencia de errores JavaScript no controlados;
+- navegación completa del menú Sistema;
+- acceso Seguridad → Control MCP;
+- persistencia del cambio de tema;
+- prerender de las nueve pantallas de UI Review.
 
-Las rutas dependen de la variable de entorno `KHORA_UI_REVIEW_MODE=1` en el
-proyecto de Vercel, con tipo **config** (no *secret*: en Edge Runtime una
-variable marcada como secreto no llega al middleware y las rutas responden 404).
+## 7. Qué es deliberadamente técnico
 
-Si `/ui-review/estatico` devuelve `{"error":"Not Found"}`, esa variable falta o
-está mal tipada.
+No son módulos de producto y no se incluyen en el inventario operativo:
 
-## 9. Archivos del sistema
+- autenticación y OAuth;
+- `/offline`;
+- `/ui-review` y sus subrutas de inspección;
+- `/capturar/compartir`, que es un trigger externo de Share Target.
 
-| Archivo | Función |
-|---|---|
-| `khora-web/lib/ui-review/registry.ts` | Registro canónico de escenarios y `ui_id` |
-| `khora-web/lib/ui-review/states.ts` | Estados sintéticos tipados. Fuente única |
-| `khora-web/lib/ui-review/fixtures.ts` | Datos sintéticos |
-| `khora-web/app/ui-review/[screen]/estatico/page.tsx` | Prerender sin JavaScript |
-| `khora-web/app/ui-review/ReviewHarnessShell.tsx` | Harness interactivo |
-| `khora-web/tests/unit/ui_review_drift.test.ts` | Guardián antideriva |
-| `khora-web/scripts/check_ui_review.ts` | Verificación de integridad |
+Los aliases históricos `/sistema/boveda`, `/sistema/entorno-persistente` y
+`/herramientas/bitacora` deben resolver hacia superficies canónicas existentes.
 
-## 10. Añadir una pantalla o un escenario
+## 8. Regla de aceptación
 
-1. Añade el `data-ui-id` en el componente compartido correspondiente.
-2. Regístralo en el escenario adecuado de `registry.ts`.
-3. Si es una pantalla nueva, añade su `ScreenId` en `types.ts`, su constructor
-   de estado en `states.ts` y su caso en el prerender.
-4. Ejecuta `npm run test:unit` y `npm run ui-review:check`.
+Una nueva superficie no queda aceptada únicamente porque compile. Debe tener:
 
-La prueba antideriva te dirá exactamente qué falta. No hay pasos ocultos.
+1. ruta funcional;
+2. entrada de navegación o trigger externo explícito;
+3. cobertura del contrato de navegación;
+4. escenarios UI cuando use un componente compartido;
+5. typecheck;
+6. UI Review;
+7. pruebas unitarias;
+8. E2E.
 
 ---
 
