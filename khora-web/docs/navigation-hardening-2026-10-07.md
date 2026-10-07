@@ -126,3 +126,42 @@ NOT CONCLUSIVE — E2E visual: runner remoto sin Chromium.
 **PROVISIONAL / EN ESPERA DE CIERRE CI.**
 
 No se autoriza merge forzado ni despliegue de producción como mecanismo para ocultar los bloqueos externos.
+
+## Rectificación y cierre operacional — 2026-10-07
+
+Esta sección **sustituye cualquier estado operativo anterior** del presente documento.
+
+**Integración**
+- PR #279 — MERGED. Merge SHA: `7a0545d9d1b7010f16561b0843b23ca0622e8829`.
+- PR #281 — MERGED por squash. Merge SHA: `7b6d707174d949054837057795386040d28b7b22`.
+- `main` del cierre técnico antes de esta anotación: `7b6d707174d949054837057795386040d28b7b22`.
+
+**Bloqueo de build encontrado y resuelto**
+- Vercel identificó en `app/api/mcp/route.ts:104` el error `Cannot find name 'assertNormativeRuntimeContext'`.
+- El símbolo ya estaba exportado por `lib/server/normative-runtime.ts`; el hotfix restauró el archivo íntegro y añadió exclusivamente el import faltante.
+- El hotfix preproducción `dpl_2qmKqU5Rfvz72bFZbcdP51VMa3xm` quedó `READY`.
+
+**Producción verificada antes de esta anotación**
+- Proyecto canónico: `khora-web` / scope `victorhugotorresmendez-8991s-projects`.
+- Deployment de producción: `dpl_AEVqgJ3tAf6jKwXgbuG6etcpCWLt`.
+- SHA desplegado: `7b6d707174d949054837057795386040d28b7b22`.
+- Estado Vercel: `READY`.
+- Alias canónico: `khora-web.vercel.app`.
+- Smoke HTTP post-deploy: `/`, `/sistema/seguridad`, `/sistema/mcp`, `/ingreso` y `/grafo` respondieron HTTP 200.
+- El HTML servido en producción expone exactamente 7 entradas primarias: `volcados`, `ingreso`, `grafo`, `consulta`, `capturar`, `seguridad`, `sistema`.
+- Se verificó negativamente que el menú Sistema no contiene Seguridad ni Capturar en el HTML servido.
+- No hubo errores `error/fatal` en runtime durante la ventana de verificación final de producción.
+
+**Limitaciones que permanecen explicitadas**
+- Los workflows globales de GitHub Actions continúan en rojo por incidencias de suite/infraestructura independientes del cambio de navegación y por restricciones de integración GitHub→Vercel en el plan Hobby; no se presentan como verdes.
+- El E2E visual con navegador no pudo ejecutarse en el runner utilizado por falta del ejecutable Chromium; el smoke HTTP/HTML aporta evidencia de serving y estructura, pero no sustituye una inspección visual humana.
+- No se modificaron variables ni configuración del proyecto Vercel para ocultar dichos bloqueos.
+
+**Estado de cierre**
+- **PUBLICADO EN PRODUCCIÓN: SÍ.**
+- **SHA EXACTO PUBLICADO: VERIFICADO.**
+- **ESTRATEGIA DE NAVEGACIÓN: IMPLEMENTADA Y CERTIFICADA POR GUARD + 5/5 TESTS ESPECÍFICOS + BUILD VERCEL.**
+- **CI GLOBAL: NO VERDE; LIMITACIÓN REGISTRADA.**
+- **E2E VISUAL: NO CONCLUYENTE POR INFRAESTRUCTURA.**
+
+La conclusión operativa es que el cambio solicitado está integrado en `main` y publicado en producción, con evidencia post-deploy verificable; los bloqueos de CI/E2E quedan diferenciados de la funcionalidad desplegada y no se ocultan.
