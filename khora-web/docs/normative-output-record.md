@@ -19,10 +19,11 @@ La obligación normativa se encuentra en:
 
 `CICLO: <cycle_id> | ATTEMPT: <n> | VERIFICACIÓN: VERIFIED|INVALID|INCOMPLETE | EVIDENCIA: <evidence_sha256>`
 
-El encabezado contextual del ciclo debe incluir:
+El encabezado contextual del ciclo debe incluir exactamente:
 
-`SI: <si_version> — <nombre_de_versión> | ÚLTIMO CAMBIO: hace <n> minutos|horas|días | <YYYY-MM-DD>`
+`SI CARGADO · <si_version> — <nombre_de_versión> · COMPLETO · ACTIVO · ÚLTIMO CAMBIO: hace <n> minutos|horas|días | <YYYY-MM-DD>`
 
+El instante de referencia se obtiene del último commit que modificó `SI-METACOGNITIVO.md` dentro del snapshot exacto del ciclo. El valor relativo se calcula al momento registrado en `created_at`.
 ## Contrato máquina
 
 ```json
@@ -32,6 +33,7 @@ El encabezado contextual del ciclo debe incluir:
   "attempt": 1,
   "status": "VERIFIED",
   "evidence_sha256": "<sha256>",
+  "output_header": "SI CARGADO · <si_version> — <nombre_de_versión> · COMPLETO · ACTIVO · ÚLTIMO CAMBIO: hace <n> minutos|horas|días | <YYYY-MM-DD>",
   "si_version": "v1.2.0",
   "si_sha256": "<sha256>",
   "manifest_sha256": "<sha256>",
@@ -52,4 +54,4 @@ La proyección `verification_record` se devuelve desde `khora_norm_verify_turn`.
 
 `GET /api/norm-check/record?cycle_id=<id>&attempt=<n>`
 
-La interfaz devuelve el objeto estructurado y su representación de salida.
+La interfaz devuelve el objeto estructurado y su representación de salida. Un receipt sin `output_header` o con un encabezado distinto del calculado por KHORA no puede alcanzar `VERIFIED` ni `VERIFIED_RELEASE`.
