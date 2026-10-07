@@ -165,3 +165,14 @@ Esta sección **sustituye cualquier estado operativo anterior** del presente doc
 - **E2E VISUAL: NO CONCLUYENTE POR INFRAESTRUCTURA.**
 
 La conclusión operativa es que el cambio solicitado está integrado en `main` y publicado en producción, con evidencia post-deploy verificable; los bloqueos de CI/E2E quedan diferenciados de la funcionalidad desplegada y no se ocultan.
+
+## Corrección UX/UI responsive — 2026-10-07
+
+Delta verificado: `overflow-x-auto` en la barra recortaba los submenús; el icono se sustituía por una flecha y el estado abierto quedaba mal indicado; Ingreso y Capturar estaban duplicados como primer nivel.
+
+Corrección aplicada: seis dominios primarios; Capturar dentro de Ingreso; contenedor raíz sin overflow de scroll; paneles con CSS responsive dedicado; icono de dominio persistente; ChevronDown cerrado / ChevronUp abierto; `aria-controls`; pruebas de bounds para 1440×900, 1024×768, 768×900 y 390×844.
+
+Build independiente Vercel: `dpl_6kXnDmYGhXLcyerwcNNsBAKu1CaG` → READY.
+
+Captura autenticada de la sesión del operador: no disponible en este entorno porque RDC no tiene cuenta vinculada y el navegador headless está bloqueado por política de organización. No se presenta una recreación como captura real.
+
