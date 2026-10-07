@@ -191,3 +191,22 @@ Correcciones finales verificadas en código:
 - E2E preparado para 1440/1024/768/390 px y bounds completos del panel.
 
 La inspección visual autenticada de la sesión del operador no pudo ejecutarse en este entorno: RDC no tiene cuenta vinculada y el navegador headless está bloqueado por política de organización. El generador de imágenes de ChatGPT tampoco estuvo disponible durante este ciclo.
+
+## Verificación final post-publicación — 2026-10-07
+
+Deployment producción: `dpl_2nHR1EmgvL3XwgpKFX6ZvrCCHYhP` → READY.  
+SHA servido: `ebac7e7e8867dce9b4042789e178695d03e6fb45`.  
+Alias canónico: `khora-web.vercel.app`.
+
+Smoke:
+- `/` → 200
+- `/sistema/seguridad` → 200
+- `/ingreso` → 200
+- `/capturar` → 200
+- 6 entradas primarias exactas: Volcados, Ingreso, Grafo, Consulta, Seguridad, Sistema.
+- No existe `overflow-x-auto` en el HTML servido.
+- Sistema no contiene Capturar.
+- Capturar queda alcanzable desde Ingreso.
+
+Runtime: se observó una entrada etiquetada `error/function` para `/api/observaciones/runtime-state`, cuyo contenido fue exclusivamente una advertencia de compatibilidad futura de PostgreSQL sobre `sslmode`; no se observó excepción de aplicación ni fallo de navegación asociado.
+
