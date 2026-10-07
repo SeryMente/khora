@@ -21,6 +21,7 @@ import { assertNormativeTurnOpen, openNormativeTurn, verifyNormativeTurn, releas
 import { authenticateManualMcpToken, MANUAL_MCP_TOKEN_PREFIX } from "@/lib/server/mcp-manual-token";
 import { registrarEventoServicio } from "@/lib/server/service-observability";
 import { getCurrentSiSnapshot, getCurrentVerifierInfo } from "@/lib/server/norm-check";
+import { REQUIRED_OUTPUT_FORMAT_VERSION, REQUIRED_PLATFORM, REQUIRED_REASONING_MODE } from "@/lib/server/normative-runtime";
 
 export const runtime = "nodejs";
 
