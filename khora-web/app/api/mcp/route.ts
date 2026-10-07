@@ -536,7 +536,15 @@ async function handleMcpRequest(req: NextRequest) {
       const denied = requireScope("norm:turn");
       if (denied) return denied;
       try {
-        const res = await openNormativeTurn(actor, args);
+        const res = await openNormativeTurn(actor, {
+          conversation_id: args.conversation_id,
+          turn_number: args.turn_number,
+          runtime: {
+            platform: REQUIRED_PLATFORM,
+            reasoning_mode: args.thinking_mode,
+            output_format_version: args.output_format_version,
+          },
+        });
         return { content: [{ type: "text", text: JSON.stringify(res) }] };
       } catch (error) {
         return {
