@@ -90,7 +90,8 @@ function MenuPanel({
   return (
     <nav
       aria-label={"Menú " + entry.label}
-      id={"navigation-menu-" + entry.id}\n      aria-describedby={"navigation-menu-description-" + entry.id}
+      id={"navigation-menu-" + entry.id}
+      aria-describedby={"navigation-menu-description-" + entry.id}
       data-navigation-menu={entry.id}
       className="absolute bottom-full left-1/2 z-[60] mb-2 w-[min(22rem,calc(100vw-1rem))] -translate-x-1/2 overflow-hidden rounded-xl border shadow-2xl max-[639px]:fixed max-[639px]:bottom-[calc(4.75rem+env(safe-area-inset-bottom))] max-[639px]:left-2 max-[639px]:right-2 max-[639px]:w-auto max-[639px]:translate-x-0"
       style={{
