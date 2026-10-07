@@ -226,7 +226,7 @@ export async function getCurrentSiSnapshot(): Promise<ParsedSi & { gitBlobSha: s
     {
       headers: {
         Accept: "application/vnd.github+json",
-        "User-Agent": "Khora-NormCheck/0.2.0",
+        "User-Agent": "Khora-NormCheck/0.4.0",
       },
       cache: "no-store",
     },
