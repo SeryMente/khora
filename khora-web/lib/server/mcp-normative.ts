@@ -94,6 +94,7 @@ async function ensureSchema() {
       await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS application_index INTEGER NOT NULL DEFAULT 0");
       await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS application_vector JSONB NOT NULL DEFAULT '[]'::jsonb");
       await db.query("ALTER TABLE normative_receipts ADD COLUMN IF NOT EXISTS si_git_commit_sha TEXT NOT NULL DEFAULT 'UNKNOWN'");
+      await db.query("ALTER TABLE normative_receipts ADD COLUMN IF NOT EXISTS methodology_git_commit_sha TEXT NOT NULL DEFAULT 'UNKNOWN'");
       await db.query("ALTER TABLE normative_receipts ADD COLUMN IF NOT EXISTS order_verified BOOLEAN NOT NULL DEFAULT FALSE");
       await db.query("ALTER TABLE normative_receipts ADD COLUMN IF NOT EXISTS application_log_sha256 TEXT NOT NULL DEFAULT ''");
       await db.query("CREATE INDEX IF NOT EXISTS normative_turns_opened_at_idx ON normative_turns (opened_at DESC)");
@@ -657,7 +658,7 @@ export async function verifyNormativeTurn(
   }
 
   const receipt = input.receipt;
-  if (!receipt || typeof receipt !== "object" || !receipt.cycle || !receipt.si || !receipt.runtime) {
+  if (!receipt || typeof receipt !== "object" || !receipt.cycle || !receipt.si || !receipt.methodology || !receipt.runtime) {
     throw new Error("TURN_RECEIPT_SCHEMA_INVALID");
   }
   if (receipt.cycle?.id !== turn.cycle_id) throw new Error("TURN_RECEIPT_CYCLE_MISMATCH");
@@ -673,7 +674,11 @@ export async function verifyNormativeTurn(
     receipt.si?.git_commit_sha !== turn.si_git_commit_sha ||
     receipt.si?.git_blob_sha !== turn.si_git_blob_sha ||
     receipt.si?.sha256 !== turn.si_sha256 ||
-    receipt.si?.manifest_sha256 !== turn.manifest_sha256
+    receipt.si?.manifest_sha256 !== turn.manifest_sha256 ||
+    receipt.methodology?.version !== turn.methodology_version ||
+    receipt.methodology?.git_commit_sha !== turn.methodology_git_commit_sha ||
+    receipt.methodology?.git_blob_sha !== turn.methodology_git_blob_sha ||
+    receipt.methodology?.sha256 !== turn.methodology_sha256
   ) {
     throw new Error("TURN_RECEIPT_SNAPSHOT_MISMATCH");
   }
@@ -706,10 +711,10 @@ export async function verifyNormativeTurn(
     const insert = await client.query(
       "INSERT INTO normative_receipts (" +
         "cycle_id, attempt, protocol, protocol_version, si_version, si_git_blob_sha, si_sha256, " +
-        "manifest_sha256, input_sha256, nonce, output_sha256, evidence_sha256, status, integrity, " +
+        "manifest_sha256, methodology_version, methodology_git_commit_sha, methodology_git_blob_sha, methodology_sha256, input_sha256, nonce, output_sha256, evidence_sha256, status, integrity, " +
         "coverage_expected, coverage_evaluated, coverage_missing, coverage_duplicates, coverage_unknown, " +
         "order_verified, application_log_sha256, reasons, receipt, verifier_version, si_git_commit_sha" +
-      ") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25) " +
+      ") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29) " +
       "RETURNING id, created_at",
       [
         receipt.cycle.id,
@@ -720,6 +725,10 @@ export async function verifyNormativeTurn(
         receipt.si.git_blob_sha,
         receipt.si.sha256,
         receipt.si.manifest_sha256,
+        receipt.methodology.version,
+        receipt.methodology.git_commit_sha,
+        receipt.methodology.git_blob_sha,
+        receipt.methodology.sha256,
         receipt.input_sha256,
         receipt.nonce,
         receipt.output_sha256,
