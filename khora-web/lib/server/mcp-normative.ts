@@ -225,7 +225,7 @@ export async function releaseNormativeTurn(actor: string, input: { turn_token: s
 async function readTurn(cycleId: string): Promise<TurnRow | null> {
   const db = getDb();
   const result = await db.query<TurnRow>(
-    "SELECT cycle_id, conversation_id, turn_number, actor, current_attempt, status, nonce, " +
+    "SELECT cycle_id, conversation_id, turn_number, actor, platform, reasoning_mode, output_format_version, current_attempt, status, nonce, " +
       "si_version, si_git_blob_sha, si_sha256, manifest_sha256, manifest, opened_at, closed_at, verified_attempt " +
       "FROM normative_turns WHERE cycle_id = $1 LIMIT 1",
     [cycleId]
@@ -288,7 +288,7 @@ export async function openNormativeTurn(
       },
       verifier: {
         protocol: "NORM-CHECK",
-        protocol_version: "v0.3.0",
+        protocol_version: "v0.4.0",
         verifier_version: "norm-check/0.3.0",
       },
     };
@@ -302,9 +302,9 @@ export async function openNormativeTurn(
     "INSERT INTO normative_turns (" +
       "cycle_id, conversation_id, turn_number, actor, platform, reasoning_mode, output_format_version, current_attempt, status, nonce, " +
       "si_version, si_git_blob_sha, si_sha256, manifest_sha256, manifest" +
-      ") VALUES ($1,$2,$3,$4,1,'OPEN',$5,$6,$7,$8,$9,$10) " +
+      ") VALUES ($1,$2,$3,$4,$5,$6,$7,1,'OPEN',$8,$9,$10,$11,$12,$13) " +
       "ON CONFLICT (cycle_id) DO NOTHING " +
-      "RETURNING cycle_id, conversation_id, turn_number, actor, current_attempt, status, nonce, " +
+      "RETURNING cycle_id, conversation_id, turn_number, actor, platform, reasoning_mode, output_format_version, current_attempt, status, nonce, " +
       "si_version, si_git_blob_sha, si_sha256, manifest_sha256, manifest, opened_at, closed_at, verified_attempt",
     [
       cycleId,
