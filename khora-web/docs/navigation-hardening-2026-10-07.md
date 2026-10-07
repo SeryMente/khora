@@ -176,3 +176,18 @@ Build independiente Vercel: `dpl_6kXnDmYGhXLcyerwcNNsBAKu1CaG` → READY.
 
 Captura autenticada de la sesión del operador: no disponible en este entorno porque RDC no tiene cuenta vinculada y el navegador headless está bloqueado por política de organización. No se presenta una recreación como captura real.
 
+## Cierre de corrección responsive — 2026-10-07
+
+PR #282 fue integrado por squash en `main`: `2517e8351560b9c75a746d88670c19399071cf45`.
+
+La certificación Vercel del branch corregido `dpl_3m1ZQqrAcLtCd6HZCek61DBJtXsy` quedó READY.
+
+Correcciones finales verificadas en código:
+- 6 dominios primarios; Capturar dentro de Ingreso.
+- La barra no usa overflow de scroll.
+- El panel no queda recortado.
+- En móvil el panel usa ancho útil con márgenes.
+- El icono del dominio permanece y el chevron solo indica estado.
+- E2E preparado para 1440/1024/768/390 px y bounds completos del panel.
+
+La inspección visual autenticada de la sesión del operador no pudo ejecutarse en este entorno: RDC no tiene cuenta vinculada y el navegador headless está bloqueado por política de organización. El generador de imágenes de ChatGPT tampoco estuvo disponible durante este ciclo.
