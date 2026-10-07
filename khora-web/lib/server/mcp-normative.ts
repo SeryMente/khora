@@ -11,6 +11,8 @@ import {
 
 const TURN_TOKEN_KIND = "norm-turn";
 const TURN_TTL_SECONDS = 12 * 60 * 60;
+const RELEASE_TOKEN_KIND = "norm-release";
+const RELEASE_TTL_SECONDS = 5 * 60;
 
 type TurnRow = {
   cycle_id: string;
@@ -115,6 +117,94 @@ function tokenFailure(message: string): Error {
   return new Error(message);
 }
 
+function issueReleaseToken(actor: string, turn: TurnRow, outputSha256: string, evidenceSha256: string, config: NonNullable<ReturnType<typeof getMcpConfig>>, gen: number): string {
+  const nowSec = Math.floor(Date.now() / 1000);
+  return signJwt(
+    {
+      iss: config.issuer,
+      sub: actor,
+      aud: config.canonicalUrl,
+      scope: "norm:turn",
+      gen,
+      exp: nowSec + RELEASE_TTL_SECONDS,
+      iat: nowSec,
+      jti: generateRandomToken(16),
+      token_kind: RELEASE_TOKEN_KIND,
+      turn_cycle_id: turn.cycle_id,
+      turn_attempt: turn.current_attempt,
+      turn_nonce: turn.nonce,
+      turn_output_sha256: outputSha256,
+      turn_evidence_sha256: evidenceSha256,
+    },
+    config.jwtSecret
+  );
+}
+
+export async function releaseNormativeTurn(actor: string, input: { turn_token: string }) {
+  if (!validActor(actor)) throw new Error("TURN_ACTOR_INVALID");
+  if (!input || typeof input.turn_token !== "string" || input.turn_token.length < 16) {
+    throw new Error("TURN_TOKEN_INVALID");
+  }
+
+  await ensureSchema();
+  const config = getMcpConfig();
+  if (!config) throw new Error("MCP_CONFIG_MISSING");
+
+  const tokenResult = verifyJwtDetailed(input.turn_token, config.jwtSecret);
+  if (!tokenResult.ok) throw tokenFailure("TURN_TOKEN_" + tokenResult.error.toUpperCase());
+  const token = tokenResult.payload;
+  const tokenScopes = token.scope.split(/\s+/).filter(Boolean);
+
+  if (
+    token.token_kind !== TURN_TOKEN_KIND ||
+    !tokenScopes.includes("norm:turn") ||
+    token.iss !== config.issuer ||
+    token.aud !== config.canonicalUrl ||
+    token.sub !== actor ||
+    typeof token.turn_cycle_id !== "string" ||
+    typeof token.turn_nonce !== "string" ||
+    !Number.isSafeInteger(token.turn_attempt)
+  ) {
+    throw new Error("TURN_TOKEN_CLAIMS_INVALID");
+  }
+
+  const gen = await obtenerGeneracionRevocacion(actor);
+  if (token.gen !== gen) throw new Error("TURN_TOKEN_REVOKED");
+
+  const turn = await readTurn(token.turn_cycle_id);
+  if (!turn) throw new Error("TURN_NOT_FOUND");
+  if (turn.actor !== actor) throw new Error("TURN_ACTOR_MISMATCH");
+  if (turn.status !== "CLOSED") throw new Error("TURN_NOT_VERIFIED");
+  if (turn.verified_attempt !== turn.current_attempt) throw new Error("TURN_VERIFIED_ATTEMPT_MISMATCH");
+  if (token.turn_nonce !== turn.nonce || token.turn_attempt !== turn.current_attempt) {
+    throw new Error("TURN_TOKEN_STATE_MISMATCH");
+  }
+
+  const db = getDb();
+  const receipt = await db.query<{
+    status: string;
+    output_sha256: string;
+    evidence_sha256: string;
+  }>(
+    "SELECT status, output_sha256, evidence_sha256 FROM normative_receipts WHERE cycle_id = $1 AND attempt = $2 LIMIT 1",
+    [turn.cycle_id, turn.verified_attempt]
+  );
+  const row = receipt.rows[0];
+  if (!row || row.status !== "VERIFIED") throw new Error("TURN_VERIFICATION_RECORD_MISSING");
+
+  const releaseToken = issueReleaseToken(actor, turn, row.output_sha256, row.evidence_sha256, config, gen);
+  return {
+    ok: true,
+    status: "VERIFIED_RELEASE",
+    cycle_id: turn.cycle_id,
+    attempt: turn.current_attempt,
+    output_sha256: row.output_sha256,
+    evidence_sha256: row.evidence_sha256,
+    release_token: releaseToken,
+    expires_in_seconds: RELEASE_TTL_SECONDS,
+  };
+}
+
 async function readTurn(cycleId: string): Promise<TurnRow | null> {
   const db = getDb();
   const result = await db.query<TurnRow>(
@@ -173,8 +263,8 @@ export async function openNormativeTurn(
       },
       verifier: {
         protocol: "NORM-CHECK",
-        protocol_version: "v0.2.0",
-        verifier_version: "norm-check/0.2.0",
+        protocol_version: "v0.3.0",
+        verifier_version: "norm-check/0.3.0",
       },
     };
   }
