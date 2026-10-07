@@ -109,7 +109,7 @@ for (const viewport of [
       await expect(toggle).toBeVisible();
       await toggle.click();
 
-      const menu = page.getByRole("menu", { name: "Menú Sistema" });
+      const menu = page.getByRole("navigation", { name: "Menú Sistema" });
       await expect(menu).toBeVisible();
 
       const required = [
@@ -129,10 +129,10 @@ for (const viewport of [
       ];
 
       for (const name of required) {
-        await expect(menu.getByRole("menuitem", { name, exact: true })).toBeVisible();
+        await expect(menu.getByRole("link", { name, exact: true })).toBeVisible();
       }
 
-      await menu.getByRole("menuitem", { name: "Seguridad", exact: true }).click();
+      await menu.getByRole("link", { name: "Seguridad", exact: true }).click();
       await expect(page).toHaveURL(/\/sistema\/seguridad$/);
       await expect(page.getByRole("tab", { name: "Control MCP", exact: true })).toBeVisible();
 
