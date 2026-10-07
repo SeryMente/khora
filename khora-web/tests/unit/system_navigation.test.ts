@@ -8,6 +8,8 @@ const systemBar = readFileSync(join(root, "app/components/os/SystemBar.tsx"), "u
 const securityPage = readFileSync(join(root, "app/sistema/seguridad/page.tsx"), "utf8");
 const toolsPage = readFileSync(join(root, "app/herramientas/page.tsx"), "utf8");
 const bitacoraRedirect = readFileSync(join(root, "app/herramientas/bitacora/page.tsx"), "utf8");
+const bovedaRedirect = readFileSync(join(root, "app/sistema/boveda/page.tsx"), "utf8");
+const entornoPersistenteRedirect = readFileSync(join(root, "app/sistema/entorno-persistente/page.tsx"), "utf8");
 
 test("Sistema no pierde rutas de producto en su menú", () => {
   const requiredMenuRoutes = [
@@ -55,4 +57,22 @@ test("Herramientas conserva UI funcional para sus submódulos", () => {
     bitacoraRedirect.includes('redirect("/sistema/volcados")'),
     "El acceso histórico de Bitácora debe resolver a la superficie canónica de Volcados.",
   );
+});
+
+test("Los aliases históricos de seguridad no apuntan a rutas retiradas", () => {
+  assert.ok(
+    bovedaRedirect.includes('redirect("/sistema/seguridad?tab=boveda")'),
+    "Bóveda debe resolver al submódulo canónico de Seguridad.",
+  );
+  assert.ok(
+    entornoPersistenteRedirect.includes('redirect("/sistema/seguridad?tab=entorno-persistente")'),
+    "Entorno Persistente debe resolver al submódulo canónico de Seguridad.",
+  );
+});
+
+test("Las pestañas de Seguridad conservan semántica ARIA completa", () => {
+  assert.ok(securityPage.includes('role="tablist"'));
+  assert.ok(securityPage.includes('aria-controls={tabPanelId}'));
+  assert.ok(securityPage.includes('role="tabpanel"'));
+  assert.ok(securityPage.includes('aria-labelledby={"security-tab-" + activeTab}'));
 });
