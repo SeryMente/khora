@@ -189,3 +189,26 @@ test("UI Review · las 9 pantallas tienen prerender semántico", async ({ page }
     expect(scenarios, "Cada pantalla debe exponer escenarios sintéticos").toBeGreaterThan(0);
   }
 });
+
+test("UI Review · el prerender de las 9 pantallas funciona sin JavaScript", async ({ browser }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  const page = await context.newPage();
+
+  try {
+    const indexResponse = await page.goto("/ui-review/estatico", { waitUntil: "domcontentloaded" });
+    expect(indexResponse?.status() ?? 0, "El índice estático no debe fallar").toBeLessThan(400);
+    const indexLinks = await page.locator('a[href^="/ui-review/"][href$="/estatico"]').count();
+    expect(indexLinks, "El índice debe enlazar todas las pantallas registradas").toBe(9);
+
+    for (const screen of UI_REVIEW_SCREENS) {
+      const response = await page.goto("/ui-review/" + screen + "/estatico", { waitUntil: "domcontentloaded" });
+      expect(response?.status() ?? 0, "El prerender " + screen + " no debe fallar").toBeLessThan(400);
+      await expect(page.locator('[data-ui-review-static-screen="' + screen + '"]')).toBeVisible();
+      const scenarios = await page.locator("[data-ui-review-scenario]").count();
+      expect(scenarios, "Cada pantalla debe exponer escenarios sintéticos").toBeGreaterThan(0);
+      expect(await page.locator("[data-ui-review-scenario] h2").count()).toBe(scenarios);
+    }
+  } finally {
+    await context.close();
+  }
+});
