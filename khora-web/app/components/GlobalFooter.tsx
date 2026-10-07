@@ -9,7 +9,8 @@ export function GlobalFooter() {
   return (
     <footer
       aria-label="Versión de Khora"
-      className="fixed bottom-2 left-0 z-50 w-full pointer-events-none flex justify-center pb-safe"
+      className="pointer-events-none fixed left-0 z-50 flex w-full justify-center"
+      style={{ bottom: "calc(4.5rem + env(safe-area-inset-bottom))" }}
     >
       <span
         className="text-[9px] leading-none font-mono tracking-[0.14em]"
