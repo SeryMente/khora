@@ -608,7 +608,15 @@ async function handleMcpRequest(req: NextRequest) {
     {
       name: "khora_mcp_health",
       description: "Comprobación discreta de acceso completo al MCP de KHORA. No ejecuta trabajo sustantivo.",
-      inputSchema: { type: "object", properties: {}, additionalProperties: false },
+      inputSchema: {
+        type: "object",
+        properties: {
+          thinking_mode: { type: "string", enum: ["THINKING"] },
+          output_format_version: { type: "string", enum: ["v1.7.0"] },
+        },
+        required: ["thinking_mode", "output_format_version"],
+        additionalProperties: false,
+      },
       securitySchemes: [{ type: "oauth2", scopes: ["volcados:read", "runtime:read", "norm:turn"] }],
     },
     {
@@ -763,7 +771,10 @@ async function handleMcpRequest(req: NextRequest) {
         properties: {
           conversation_id: { type: "string" },
           turn_number: { type: "integer", minimum: 1 },
+          thinking_mode: { type: "string", enum: ["THINKING"] },
+          output_format_version: { type: "string", enum: ["v1.7.0"] },
         },
+        required: ["thinking_mode", "output_format_version"],
         additionalProperties: false,
       },
       securitySchemes: [{ type: "oauth2", scopes: ["norm:turn"] }],
@@ -812,10 +823,22 @@ async function handleMcpRequest(req: NextRequest) {
         minLength: 16,
         description: "REQUERIDO: token del ciclo emitido por khora_norm_open_turn.",
       },
+      _thinking_mode: {
+        type: "string",
+        enum: ["THINKING"],
+        description: "REQUERIDO: ChatGPT debe estar en modo Thinking.",
+      },
+      _output_format_version: {
+        type: "string",
+        enum: ["v1.7.0"],
+        description: "REQUERIDO: contrato de salida visible por ciclo.",
+      },
     };
     tool.inputSchema.required = Array.from(new Set([
       ...(Array.isArray(tool.inputSchema.required) ? tool.inputSchema.required : []),
       "_norm_turn_token",
+      "_thinking_mode",
+      "_output_format_version",
     ]));
   }
 
