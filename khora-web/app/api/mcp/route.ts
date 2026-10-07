@@ -231,7 +231,7 @@ async function handleMcpRequest(req: NextRequest) {
       const startedAt = Date.now();
       try {
         if (requireTurn) {
-          const normativeDenied = await requireNormativeTurn(actor, args._norm_turn_token);
+          const normativeDenied = await requireNormativeTurn(actor, args._norm_turn_token, args._thinking_mode, args._output_format_version);
           if (normativeDenied) {
             await registrarEventoServicio({
               service: "mcp",
