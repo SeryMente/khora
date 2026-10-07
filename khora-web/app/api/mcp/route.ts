@@ -470,8 +470,16 @@ async function handleMcpRequest(req: NextRequest) {
   gatedTool(
     "khora_mcp_health",
     "Comprobación discreta de acceso completo al MCP de KHORA. No ejecuta trabajo sustantivo.",
-    {},
-    async () => {
+    {
+      thinking_mode: NORM_THINKING_MODE,
+      output_format_version: NORM_OUTPUT_FORMAT_VERSION,
+    },
+    async (args: any) => {
+      assertNormativeRuntimeContext({
+        platform: REQUIRED_PLATFORM,
+        reasoning_mode: args.thinking_mode,
+        output_format_version: args.output_format_version,
+      });
       const requiredScopes = ["volcados:read", "runtime:read", "norm:turn"];
       const missingScopes = requiredScopes.filter((scope) => !scopes.includes(scope));
       try {
