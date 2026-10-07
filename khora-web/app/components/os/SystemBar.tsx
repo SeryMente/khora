@@ -42,7 +42,8 @@ export default function SystemBar() {
     pathname?.startsWith("/sistema/dictado") ||
     pathname?.startsWith("/sistema/editar") ||
     pathname?.startsWith("/sistema/ingesta") ||
-    pathname?.startsWith("/sistema/kpis");
+    pathname?.startsWith("/sistema/kpis") ||
+    pathname?.startsWith("/mapa");
 
   return (
     <nav
@@ -165,6 +166,11 @@ export default function SystemBar() {
             <Link href="/sistema/kpis" role="menuitem" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
               <Icons.Activity size={16} />
               <span>KPIs</span>
+            </Link>
+
+            <Link href="/mapa" role="menuitem" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
+              <Icons.Map size={16} />
+              <span>Mapa</span>
             </Link>
 
             <div className="border-y px-3 py-2 text-left" style={{ borderColor: "var(--khora-border)" }}>

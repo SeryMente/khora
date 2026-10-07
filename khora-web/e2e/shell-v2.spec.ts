@@ -39,6 +39,7 @@ test.describe('Shell Navegación v2', () => {
     await expect(menu.getByRole('menuitem', { name: 'Edición', exact: true })).toBeVisible();
     await expect(menu.getByRole('menuitem', { name: 'Ingesta', exact: true })).toBeVisible();
     await expect(menu.getByRole('menuitem', { name: 'KPIs', exact: true })).toBeVisible();
+    await expect(menu.getByRole('menuitem', { name: 'Mapa', exact: true })).toBeVisible();
     await expect(menu.getByRole('menuitem', { name: 'Seguridad', exact: true })).toBeVisible();
     await expect(menu.getByRole('menuitem', { name: 'Control MCP', exact: true })).toBeVisible();
     await expect(menu.getByRole('menuitem', { name: 'Evidencia normativa', exact: true })).toBeVisible();
