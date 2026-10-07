@@ -23,7 +23,7 @@ El encabezado contextual del ciclo debe incluir exactamente:
 
 `SI CARGADO · <si_version> — <nombre_de_versión> · COMPLETO · ACTIVO · ÚLTIMO CAMBIO: hace <n> minutos|horas|días | <YYYY-MM-DD>`
 
-El instante de referencia se obtiene del último commit que modificó `SI-METACOGNITIVO.md` dentro del snapshot exacto del ciclo. El valor relativo se calcula al momento registrado en `created_at`.
+El instante de referencia se obtiene del último commit que modificó `SI-METACOGNITIVO.md` dentro del snapshot exacto del ciclo. El valor relativo se calcula al instante de apertura del ciclo (`opened_at`), de modo que el encabezado queda estable durante todo el procesamiento del turno.
 ## Contrato máquina
 
 ```json
