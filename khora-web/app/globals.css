@@ -59,3 +59,40 @@ body {
 @media (prefers-reduced-motion: reduce) {
     [data-testid="khora-splash"] { animation: none !important; }
 }
+
+.khora-navigation-root {
+    pointer-events: none;
+}
+
+.khora-navigation-row {
+    pointer-events: auto;
+}
+
+.khora-navigation-menu {
+    position: absolute;
+    left: 50%;
+    bottom: 100%;
+    transform: translateX(-50%);
+    width: min(22rem, calc(100vw - 1rem));
+    margin-bottom: 0.5rem;
+    z-index: 60;
+    overflow: hidden;
+}
+
+@media (max-width: 639px) {
+    .khora-navigation-menu {
+        position: fixed;
+        left: 0.5rem;
+        right: 0.5rem;
+        bottom: calc(4.75rem + env(safe-area-inset-bottom));
+        width: auto;
+        transform: none;
+        margin-bottom: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .khora-navigation-row {
+        gap: 0.125rem;
+    }
+}

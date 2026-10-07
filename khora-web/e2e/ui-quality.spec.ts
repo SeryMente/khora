@@ -102,28 +102,22 @@ for (const viewport of [
       expect(pageErrors, "No se permiten errores JavaScript no controlados").toEqual([]);
     });
 
-    test("la navegación respeta dominios primarios y submenús semánticos", async ({ page }) => {
+    test("la navegación agrupa captura dentro de ingreso y no recorta submenús", async ({ page }) => {
       await page.goto("/sistema/volcados", { waitUntil: "domcontentloaded" });
       await expect(page.locator('[data-testid="khora-splash"]')).toHaveCount(0, { timeout: 3000 });
 
-      const primaryEntries = page.locator("[data-navigation-entry]");
-      await expect(primaryEntries).toHaveCount(7);
+      await expect(page.locator("[data-navigation-entry]")).toHaveCount(6);
+      await expect(page.getByRole("link", { name: "Capturar", exact: true })).toHaveCount(0);
 
-      for (const name of ["Seguridad", "Capturar", "Ingreso", "Grafo"]) {
-        await expect(page.getByRole("button", { name, exact: true })).toBeVisible();
+      await page.getByRole("button", { name: "Ingreso", exact: true }).click();
+      const ingresoMenu = page.getByRole("navigation", { name: "Menú Ingreso" });
+      await expect(ingresoMenu).toBeVisible();
+      for (const name of ["Ingreso", "Capturar", "Dictado", "Edición", "Ingesta"]) {
+        await expect(ingresoMenu.getByRole("link", { name, exact: true })).toBeVisible();
       }
 
-      await page.getByRole("button", { name: "Sistema", exact: true }).click();
-      const systemMenu = page.getByRole("navigation", { name: "Menú Sistema" });
-      await expect(systemMenu).toBeVisible();
-
-      for (const name of ["Herramientas", "OPI / VRI", "KPIs", "Roadmap", "Adherencia", "Evidencia normativa", "Registro"]) {
-        await expect(systemMenu.getByRole("link", { name, exact: true })).toBeVisible();
-      }
-
-      await expect(systemMenu.getByRole("link", { name: "Seguridad", exact: true })).toHaveCount(0);
-      await expect(systemMenu.getByRole("link", { name: "Capturar", exact: true })).toHaveCount(0);
-      await expect(systemMenu.getByRole("link", { name: "Dictado", exact: true })).toHaveCount(0);
+      await page.getByRole("button", { name: "Ingreso", exact: true }).click();
+      await expect(ingresoMenu).toHaveCount(0);
 
       await page.getByRole("button", { name: "Seguridad", exact: true }).click();
       const securityMenu = page.getByRole("navigation", { name: "Menú Seguridad" });
@@ -132,9 +126,21 @@ for (const viewport of [
         await expect(securityMenu.getByRole("link", { name, exact: true })).toBeVisible();
       }
 
-      await securityMenu.getByRole("link", { name: "Seguridad", exact: true }).click();
-      await expect(page).toHaveURL(/\/sistema\/seguridad$/);
-      await expect(page.getByRole("tab", { name: "Control MCP", exact: true })).toBeVisible();
+      await page.getByRole("button", { name: "Seguridad", exact: true }).click();
+      await expect(securityMenu).toHaveCount(0);
+
+      await page.getByRole("button", { name: "Sistema", exact: true }).click();
+      const systemMenu = page.getByRole("navigation", { name: "Menú Sistema" });
+      await expect(systemMenu).toBeVisible();
+      for (const name of ["Herramientas", "OPI / VRI", "KPIs", "Roadmap", "Adherencia", "Evidencia normativa", "Registro"]) {
+        await expect(systemMenu.getByRole("link", { name, exact: true })).toBeVisible();
+      }
+      await expect(systemMenu.getByRole("link", { name: "Seguridad", exact: true })).toHaveCount(0);
+      await expect(systemMenu.getByRole("link", { name: "Capturar", exact: true })).toHaveCount(0);
+      await expect(systemMenu.getByRole("link", { name: "Dictado", exact: true })).toHaveCount(0);
+
+      await page.getByRole("button", { name: "Sistema", exact: true }).click();
+      await expect(systemMenu).toHaveCount(0);
     });
 
     test("los aliases históricos resuelven a superficies canónicas", async ({ page }) => {

@@ -1,82 +1,105 @@
 # Navegación canónica del sistema
 
-**Estado:** IMPLEMENTADO  
-**Fecha de cierre:** 2026-10-06
+**Estado:** IMPLEMENTADO Y ENDURECIDO  
+**Última revisión:** 2026-10-07
 
 ## Invariante
 
-Toda capacidad de producto que tenga una ruta operativa debe tener una entrada de interfaz alcanzable desde la navegación principal. No se consideran superficies de producto los harnesses de prueba, rutas de diagnóstico protegidas o páginas explícitamente marcadas como construcción interna.
+Toda capacidad de producto que tenga una ruta operativa debe tener una entrada alcanzable desde la navegación principal o desde el submenú semántico de su dominio. La jerarquía debe reflejar la función, no simplemente la existencia de una URL.
 
 ## Navegación principal
 
-La barra inferior mantiene las entradas operativas de uso frecuente:
+La barra inferior contiene seis dominios primarios de uso frecuente más el control de tema:
 
 - Volcados → `/sistema/volcados`
-- Ingreso → `/sistema/ingreso`
-- Grafo → `/grafo`
+- Ingreso → abre el dominio de entrada y captura
+- Grafo → abre Grafo / Mapa
 - Consulta → `/sistema/consulta`
-- KPIs → `/sistema/kpis`
-- Sistema → abre el inventario completo de módulos especializados y de seguridad.
+- Seguridad → abre Seguridad / Entorno Persistente / Bóveda / Control MCP
+- Sistema → abre Herramientas / OPI-VRI / KPIs / Roadmap / Adherencia / Evidencia normativa / Registro
 
-El menú **Sistema** expone:
+**Decisión semántica:** Capturar no es un dominio primario independiente. Es una acción de entrada rápida y, por tanto, pertenece al dominio **Ingreso**.
 
-### Operación
+## Menú Ingreso
 
+- Ingreso → `/sistema/ingreso`
+- Capturar → `/capturar`
 - Dictado → `/sistema/dictado`
 - Edición → `/sistema/editar`
 - Ingesta → `/sistema/ingesta`
-- KPIs → `/sistema/kpis`
+
+Esto evita presentar como dominios hermanos dos capacidades que pertenecen al mismo ciclo de entrada de memoria.
+
+## Menú Grafo
+
+- Grafo → `/grafo`
 - Mapa → `/mapa`
-- Capturar → `/capturar`
-- Herramientas → `/herramientas`
-- Roadmap → `/roadmap`
-- Adherencia → `/adherence`
-
-### Seguridad y control
-
-- Seguridad → `/sistema/seguridad`
-- Control MCP → `/sistema/mcp`
-- Evidencia normativa → `/sistema/otros`
-- Registro → `/sistema/registro`
-
-La barra y el menú son complementarios: una función no debe depender de que el usuario conozca una URL interna.
-
-## Menú Herramientas
-
-`/herramientas` conserva sus propios submódulos visibles:
-
-- Bitácora 24/365 → `/herramientas/bitacora` → redirige a la superficie canónica actual de Volcados `/sistema/volcados`.
-- OPI/VRI → `/herramientas/opi-vri`.
-
-El acceso histórico a Bitácora no apunta a una URL retirada; funciona como alias de compatibilidad hacia Volcados.
 
 ## Menú Seguridad
 
-`/sistema/seguridad` es la superficie canónica de seguridad. Sus submódulos son:
+- Seguridad → `/sistema/seguridad`
+- Entorno Persistente → `/sistema/seguridad?tab=entorno-persistente`
+- Bóveda → `/sistema/seguridad?tab=boveda`
+- Control MCP → `/sistema/seguridad?tab=mcp`
 
-- Seguridad
-- Entorno Persistente
-- Bóveda
-- Control MCP
+Las rutas estables `/sistema/boveda` y `/sistema/entorno-persistente` permanecen como aliases históricos.
 
-**Control MCP** reutiliza la consola existente `/sistema/mcp`; allí se administran OAuth, Bearer Tokens manuales, scopes y revocación.
+## Menú Sistema
 
-Las rutas estables `/sistema/boveda` y `/sistema/entorno-persistente` redirigen a sus submódulos dentro de Seguridad.
+Sistema queda reservado a capacidades secundarias de administración, observabilidad, herramientas y gobierno:
 
-## Superficies técnicas no navegables
+### Herramientas
+- Herramientas → `/herramientas`
+- OPI / VRI → `/herramientas/opi-vri`
 
-`/ui-review` permanece protegido como harness de revisión y no se expone en el menú operativo. Las rutas de autenticación/OAuth y `/offline` son superficies de infraestructura/protocolo y conservan sus propios disparadores; no son módulos de producto que el usuario deba localizar desde el menú Sistema.
+### Extensiones
+- KPIs → `/sistema/kpis`
 
-La ruta `/capturar/compartir` es una superficie de recepción externa de Share Target: dispone de UI propia y se activa por el mecanismo de compartición del sistema, no por navegación interna. No se clasifica como módulo de menú.
+### Gobierno y observabilidad
+- Roadmap → `/roadmap`
+- Adherencia → `/adherence`
+- Evidencia normativa → `/sistema/otros`
+- Registro → `/sistema/registro`
 
-Las demás páginas de producto enumeradas en el árbol `app/**/page.tsx` —incluidas Capturar, Herramientas, Roadmap y Adherencia— tienen una entrada de navegación.
+## Comportamiento responsive obligatorio
+
+La barra no utiliza `overflow-x-auto` en su contenedor raíz, porque un submenu que debe emerger por encima queda recortado por un contexto de overflow.
+
+La fila primaria se mantiene centrada y compacta:
+
+- escritorio: botones de mayor tamaño, ancho máximo de la barra y separación uniforme;
+- móvil: botones compactos, sin scroll horizontal obligatorio;
+- submenús de escritorio: flotan sobre el botón origen;
+- submenús móviles: se fijan con márgenes laterales seguros y ancho útil de viewport;
+- todos los submenús deben quedar completamente dentro del viewport.
+
+El indicador de apertura es una pequeña flecha junto al texto. El icono del dominio se conserva siempre; nunca se sustituye por la flecha.
+
+## Interacción
+
+- Click en un dominio con submenú: abre/cierra su menú.
+- Click en otro dominio: cambia al menú correspondiente.
+- Click en una opción: navega y cierra el menú.
+- Click fuera de la barra: cierra el menú.
+- `Escape`: cierra el menú.
+- Cambio de ruta: cierra el menú.
+- El estado abierto se refleja con `aria-expanded` y el panel se relaciona mediante `aria-controls`.
+
+## Aliases y superficies técnicas
+
+- `/herramientas/bitacora` → `/sistema/volcados`
+- `/sistema/boveda` → `/sistema/seguridad?tab=boveda`
+- `/sistema/entorno-persistente` → `/sistema/seguridad?tab=entorno-persistente`
+- `/capturar/compartir` permanece como Share Target externo y no aparece como módulo de menú.
+- `/ui-review`, autenticación/OAuth y `/offline` permanecen como superficies técnicas.
 
 ## Guardia contra regresiones
 
-La navegación se protege en tres niveles:
+La navegación se protege con:
 
-- `tests/unit/system_navigation.test.ts`: rutas del menú, submódulos de Seguridad, aliases históricos y semántica ARIA de pestañas.
-- `scripts/check_navigation_contract.ts`: descubre rutas estáticas, detecta enlaces internos muertos y rechaza páginas de producto huérfanas.
-- `e2e/shell-v2.spec.ts` + `e2e/ui-quality.spec.ts`: renderización real, menú completo, aliases, accesibilidad básica, tema, overflow y prerender sin JavaScript en escritorio y móvil.
+- `app/navigation/registry.ts`: fuente declarativa única.
+- `scripts/check_navigation_contract.ts`: cobertura bidireccional y clasificación de rutas.
+- `tests/unit/system_navigation_hardened.test.ts`: límites, agrupación semántica, ausencia de overflow y affordance de flechas.
+- `e2e/shell-v2.spec.ts`: apertura real de los cuatro submenús, bounds del viewport en 1440/1024/768/390 y cierre.
+- `e2e/ui-quality.spec.ts`: navegación y accesibilidad por escritorio y móvil.
 
-El workflow `UI Quality` ejecuta estos controles en cada cambio de `main` y pull request.

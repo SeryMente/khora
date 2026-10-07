@@ -40,9 +40,9 @@ export type NavigationEntry = {
 /**
  * Canonical product-navigation contract.
  *
- * Level 1 is deliberately small. A route may be a real product surface without
- * being a level-1 domain: reachability is hierarchical, not equivalent to
- * primary placement.
+ * Level 1 is deliberately small. Input/capture is one coherent domain:
+ * "Ingreso" is the entry point and Capturar is a child action, not a competing
+ * primary domain. Reachability is hierarchical, not equivalent to primary placement.
  */
 export const NAVIGATION_REGISTRY: readonly NavigationEntry[] = [
   {
@@ -63,12 +63,14 @@ export const NAVIGATION_REGISTRY: readonly NavigationEntry[] = [
     level: 1,
     coverage: [
       "/sistema/ingreso",
+      "/capturar",
       "/sistema/dictado",
       "/sistema/editar",
       "/sistema/ingesta",
     ],
     children: [
       { id: "ingreso-main", label: "Ingreso", href: "/sistema/ingreso", icon: "Keyboard", group: "Entrada" },
+      { id: "capturar", label: "Capturar", href: "/capturar", icon: "Mic", group: "Entrada" },
       { id: "dictado", label: "Dictado", href: "/sistema/dictado", icon: "Mic", group: "Entrada" },
       { id: "edicion", label: "Edición", href: "/sistema/editar", icon: "PenLine", group: "Revisión de entrada" },
       { id: "ingesta", label: "Ingesta", href: "/sistema/ingesta", icon: "UploadCloud", group: "Entrada" },
@@ -95,15 +97,6 @@ export const NAVIGATION_REGISTRY: readonly NavigationEntry[] = [
     kind: "direct",
     level: 1,
     coverage: ["/sistema/consulta"],
-  },
-  {
-    id: "capturar",
-    label: "Capturar",
-    href: "/capturar",
-    icon: "Mic",
-    kind: "direct",
-    level: 1,
-    coverage: ["/capturar"],
   },
   {
     id: "seguridad",
