@@ -101,6 +101,7 @@ for (const viewport of [
 
     test("el menú Sistema es completamente navegable", async ({ page }) => {
       await page.goto("/sistema/volcados", { waitUntil: "domcontentloaded" });
+      await expect(page.locator('[data-testid="khora-splash"]')).toHaveCount(0, { timeout: 3000 });
       const toggle = page.getByRole("button", { name: "Sistema", exact: true });
       await expect(toggle).toBeVisible();
       await toggle.click();
@@ -138,6 +139,7 @@ for (const viewport of [
 
     test("el tema cambia mediante control nativo y conserva accesibilidad", async ({ page }) => {
       await page.goto("/", { waitUntil: "domcontentloaded" });
+      await expect(page.locator('[data-testid="khora-splash"]')).toHaveCount(0, { timeout: 3000 });
       const toggle = page.getByRole("button", { name: /Cambiar a tema/ });
       await expect(toggle).toBeVisible();
       await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
