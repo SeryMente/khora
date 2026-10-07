@@ -26,6 +26,7 @@ export default function KhoraSplash() {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                pointerEvents: "none",
                 backgroundColor: "var(--khora-absolute)",
                 animation: "splash-animation " + DURACION_MS + "ms ease-in-out forwards",
             }}
