@@ -58,7 +58,7 @@ test("shell renders the registry and keeps menu panels un-clipped", () => {
   assert.match(bar, /data-navigation-entry=\{entry\.id\}/);
   assert.match(bar, /data-navigation-menu=\{entry\.id\}/);
   assert.doesNotMatch(bar, /overflow-x-auto/);
-  assert.match(bar, /max-\[639px\]:fixed/);
+  assert.match(bar, /khora-navigation-menu/);
   assert.match(bar, /ChevronUp/);
   assert.match(bar, /ChevronDown/);
 });
