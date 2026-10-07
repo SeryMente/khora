@@ -25,25 +25,25 @@ function SeguridadOverview({ onOpen }: { onOpen: (tab: Exclude<SecurityTab, "seg
   const border = { borderColor: "var(--khora-border)" };
   return <div className="space-y-7">
     <header className="space-y-3 border-b pb-6 text-center" style={border}>
-      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl border" style={{ ...border, background: "var(--khora-surface)" }}><ShieldCheck size={30} style={{ color: "var(--khora-accent)" }} /></div>
+      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl border" style={{ ...border, background: "var(--khora-surface)" }}><ShieldCheck size={30} aria-hidden="true" style={{ color: "var(--khora-accent)" }} /></div>
       <h1 className="text-2xl font-bold uppercase tracking-[0.18em]">Seguridad</h1>
       <p className="mx-auto max-w-2xl text-sm leading-relaxed opacity-70">Controles de acceso, custodia y entornos aislados. Cada responsabilidad vive en un submódulo explícito.</p>
     </header>
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       <button type="button" onClick={() => onOpen("entorno-persistente")} className="min-h-52 rounded-xl border p-6 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--khora-accent)]" style={{ ...border, background: "var(--khora-surface)" }}>
-        <span className="flex h-11 w-11 items-center justify-center rounded-lg border" style={border}><Container size={23} /></span>
+        <span aria-hidden="true" className="flex h-11 w-11 items-center justify-center rounded-lg border" style={border}><Container size={23} /></span>
         <p className="mt-5 text-[10px] font-bold uppercase tracking-[0.2em] opacity-50">Submódulo</p>
         <h2 className="mt-1 text-lg font-bold">Entorno Persistente</h2>
         <p className="mt-2 text-sm leading-relaxed opacity-70">Sesiones cifradas, comando de arranque y bitácora remota.</p>
       </button>
       <button type="button" onClick={() => onOpen("boveda")} className="min-h-52 rounded-xl border p-6 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--khora-accent)]" style={{ ...border, background: "var(--khora-surface)" }}>
-        <span className="flex h-11 w-11 items-center justify-center rounded-lg border" style={border}><LockKeyhole size={23} /></span>
+        <span aria-hidden="true" className="flex h-11 w-11 items-center justify-center rounded-lg border" style={border}><LockKeyhole size={23} /></span>
         <p className="mt-5 text-[10px] font-bold uppercase tracking-[0.2em] opacity-50">Submódulo</p>
         <h2 className="mt-1 text-lg font-bold">Bóveda</h2>
         <p className="mt-2 text-sm leading-relaxed opacity-70">Apertura temporal y custodia de grabaciones, volcados y secretos operativos.</p>
       </button>
       <button type="button" onClick={() => onOpen("mcp")} className="min-h-52 rounded-xl border p-6 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--khora-accent)]" style={{ ...border, background: "var(--khora-surface)" }}>
-        <span className="flex h-11 w-11 items-center justify-center rounded-lg border" style={border}><KeyRound size={23} /></span>
+        <span aria-hidden="true" className="flex h-11 w-11 items-center justify-center rounded-lg border" style={border}><KeyRound size={23} /></span>
         <p className="mt-5 text-[10px] font-bold uppercase tracking-[0.2em] opacity-50">Control de acceso</p>
         <h2 className="mt-1 text-lg font-bold">Control MCP</h2>
         <p className="mt-2 text-sm leading-relaxed opacity-70">OAuth, Bearer Tokens manuales, scopes y revocación de clientes MCP.</p>
@@ -68,13 +68,37 @@ function SeguridadContent() {
     <div className="flex max-w-full overflow-x-auto border-b" style={{ borderColor: "var(--khora-border)" }} role="tablist" aria-label="Módulos de seguridad">
       {TABS.map((tab) => {
         const Icon = tab.icon;
-        return <button key={tab.id} type="button" role="tab" aria-selected={activeTab === tab.id} onClick={() => openTab(tab.id)} className="flex min-h-12 shrink-0 items-center gap-2 px-4 py-3 text-sm font-bold uppercase tracking-wider focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--khora-accent)]" style={{ borderBottom: activeTab === tab.id ? "2px solid var(--khora-accent)" : "2px solid transparent", opacity: activeTab === tab.id ? 1 : .55 }}><Icon size={18} />{tab.label}</button>;
+        const tabPanelId = "security-panel-" + tab.id;
+        return <button
+          key={tab.id}
+          id={"security-tab-" + tab.id}
+          type="button"
+          role="tab"
+          aria-selected={activeTab === tab.id}
+          aria-controls={tabPanelId}
+          tabIndex={activeTab === tab.id ? 0 : -1}
+          onClick={() => openTab(tab.id)}
+          className="flex min-h-12 shrink-0 items-center gap-2 px-4 py-3 text-sm font-bold uppercase tracking-wider focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--khora-accent)]"
+          style={{
+            borderBottom: activeTab === tab.id ? "2px solid var(--khora-accent)" : "2px solid transparent",
+            opacity: activeTab === tab.id ? 1 : .55,
+          }}
+        >
+          <Icon size={18} aria-hidden="true" />{tab.label}
+        </button>;
       })}
     </div>
-    {activeTab === "seguridad" && <SeguridadOverview onOpen={openTab} />}
-    {activeTab === "entorno-persistente" && <EntornoPersistentePanel />}
-    {activeTab === "boveda" && <PaginaBoveda />}
-    {activeTab === "mcp" && <PaginaMcpRevocacion />}
+    <div
+      id={"security-panel-" + activeTab}
+      role="tabpanel"
+      aria-labelledby={"security-tab-" + activeTab}
+      tabIndex={0}
+    >
+      {activeTab === "seguridad" && <SeguridadOverview onOpen={openTab} />}
+      {activeTab === "entorno-persistente" && <EntornoPersistentePanel />}
+      {activeTab === "boveda" && <PaginaBoveda />}
+      {activeTab === "mcp" && <PaginaMcpRevocacion />}
+    </div>
   </div>;
 }
 
