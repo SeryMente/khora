@@ -4,22 +4,133 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import * as Icons from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
+import {
+  NAVIGATION_REGISTRY,
+  navigationGroupNames,
+  type NavigationEntry,
+  type NavigationChild,
+  type NavigationIcon,
+} from "../../navigation/registry";
+
+const ICONS: Record<NavigationIcon, LucideIcon> = {
+  Files: Icons.Files,
+  Keyboard: Icons.Keyboard,
+  Network: Icons.Network,
+  MessageSquareShare: Icons.MessageSquareShare,
+  Mic: Icons.Mic,
+  ShieldCheck: Icons.ShieldCheck,
+  ScrollText: Icons.ScrollText,
+  PenLine: Icons.PenLine,
+  UploadCloud: Icons.UploadCloud,
+  Wrench: Icons.Wrench,
+  Activity: Icons.Activity,
+  MapPinned: Icons.MapPinned,
+  FileCheck2: Icons.FileCheck2,
+  Container: Icons.Container,
+  LockKeyhole: Icons.LockKeyhole,
+  KeyRound: Icons.KeyRound,
+};
+
+function normalizePath(href: string): string {
+  return href.split("?")[0].split("#")[0].replace(/\/+$/, "") || "/";
+}
+
+function isEntryActive(pathname: string | null, entry: NavigationEntry): boolean {
+  if (!pathname) return false;
+  return entry.coverage.some((route) =>
+    pathname === route || pathname.startsWith(route + "/"),
+  );
+}
+
+function isChildActive(pathname: string | null, child: NavigationChild): boolean {
+  return normalizePath(child.href) === normalizePath(pathname || "");
+}
+
+function NavIcon({ name, size = 22 }: { name: NavigationIcon; size?: number }) {
+  const Icon = ICONS[name];
+  return <Icon size={size} strokeWidth={1.75} absoluteStrokeWidth aria-hidden="true" />;
+}
+
+function MenuLink({ child, pathname, onNavigate }: { child: NavigationChild; pathname: string | null; onNavigate: () => void }) {
+  return (
+    <Link
+      href={child.href}
+      data-navigation-child={child.id}
+      className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-xs font-bold hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--khora-accent)]"
+      aria-current={isChildActive(pathname, child) ? "page" : undefined}
+      onClick={onNavigate}
+    >
+      <NavIcon name={child.icon} size={16} />
+      <span>{child.label}</span>
+    </Link>
+  );
+}
+
+function MenuPanel({ entry, pathname, onNavigate }: { entry: NavigationEntry; pathname: string | null; onNavigate: () => void }) {
+  const groups = navigationGroupNames(entry);
+
+  return (
+    <nav
+      aria-label={"Menú " + entry.label}
+      aria-describedby={"navigation-menu-description-" + entry.id}
+      data-navigation-menu={entry.id}
+      className="absolute bottom-full left-1/2 mb-2 w-[min(22rem,calc(100vw-1rem))] -translate-x-1/2 overflow-hidden rounded-xl border shadow-2xl"
+      style={{
+        borderColor: "var(--khora-border)",
+        background: "var(--khora-surface)",
+      }}
+    >
+      <div
+        className="border-b px-3 py-2.5 text-left"
+        style={{ borderColor: "var(--khora-border)" }}
+      >
+        <p className="text-[10px] font-bold uppercase tracking-[0.18em] opacity-50">{entry.label}</p>
+        <p id={"navigation-menu-description-" + entry.id} className="text-[11px] opacity-60">
+          Accesos del dominio
+        </p>
+      </div>
+
+      <div className="max-h-[62vh] overflow-y-auto p-2">
+        {groups.map((group) => (
+          <section key={group} className="mb-2 last:mb-0" data-navigation-group={group}>
+            <p className="px-3 pb-1 pt-2 text-[9px] font-bold uppercase tracking-[0.18em] opacity-45">
+              {group}
+            </p>
+            <div className="space-y-0.5">
+              {(entry.children ?? [])
+                .filter((child) => child.group === group)
+                .map((child) => (
+                  <MenuLink
+                    key={child.id}
+                    child={child}
+                    pathname={pathname}
+                    onNavigate={onNavigate}
+                  />
+                ))}
+            </div>
+          </section>
+        ))}
+      </div>
+    </nav>
+  );
+}
 
 export default function SystemBar() {
   const pathname = usePathname();
-  const [systemMenuOpen, setSystemMenuOpen] = useState(false);
-  const systemMenuRef = useRef<HTMLDivElement | null>(null);
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const navigationRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     function handlePointerDown(event: MouseEvent) {
-      if (!systemMenuRef.current?.contains(event.target as Node)) {
-        setSystemMenuOpen(false);
+      if (!navigationRef.current?.contains(event.target as Node)) {
+        setOpenMenuId(null);
       }
     }
 
     function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") setSystemMenuOpen(false);
+      if (event.key === "Escape") setOpenMenuId(null);
     }
 
     document.addEventListener("mousedown", handlePointerDown);
@@ -31,222 +142,66 @@ export default function SystemBar() {
   }, []);
 
   useEffect(() => {
-    setSystemMenuOpen(false);
+    setOpenMenuId(null);
   }, [pathname]);
-
-  const systemActive =
-    pathname?.startsWith("/sistema/registro") ||
-    pathname?.startsWith("/sistema/otros") ||
-    pathname?.startsWith("/sistema/seguridad") ||
-    pathname?.startsWith("/sistema/mcp") ||
-    pathname?.startsWith("/sistema/dictado") ||
-    pathname?.startsWith("/sistema/editar") ||
-    pathname?.startsWith("/sistema/ingesta") ||
-    pathname?.startsWith("/sistema/kpis") ||
-    pathname?.startsWith("/mapa") ||
-    pathname?.startsWith("/capturar") ||
-    pathname?.startsWith("/herramientas") ||
-    pathname?.startsWith("/roadmap") ||
-    pathname?.startsWith("/adherence");
 
   return (
     <nav
-      className="fixed bottom-0 w-full flex justify-around items-center p-2 z-50"
+      ref={navigationRef}
+      className="fixed bottom-0 inset-x-0 z-50 flex items-end justify-center gap-1 overflow-x-auto p-2"
       aria-label="Barra de sistema"
+      data-navigation-primary-count={NAVIGATION_REGISTRY.length}
     >
-      <Link
-        href="/sistema/volcados"
-        className="flex flex-col items-center justify-center p-2"
-        style={{
-          color:
-            pathname === "/sistema/volcados"
-              ? "var(--khora-ink)"
-              : "var(--khora-accent)",
-        }}
-      >
-        <Icons.Files size={32} strokeWidth={1.75} absoluteStrokeWidth={true} />
-        <span className="text-xs mt-1 font-medium">Volcados</span>
-      </Link>
+      {NAVIGATION_REGISTRY.map((entry) => {
+        const active = isEntryActive(pathname, entry);
 
-      <Link
-        href="/sistema/ingreso"
-        className="flex flex-col items-center justify-center p-2"
-        style={{
-          color:
-            pathname === "/sistema/ingreso"
-              ? "var(--khora-ink)"
-              : "var(--khora-accent)",
-        }}
-      >
-        <Icons.Keyboard size={32} strokeWidth={1.75} absoluteStrokeWidth={true} />
-        <span className="text-xs mt-1 font-medium">Ingreso</span>
-      </Link>
+        return (
+          <div key={entry.id} className="relative shrink-0" data-navigation-entry={entry.id}>
+            {entry.kind === "menu" && openMenuId === entry.id && (
+              <MenuPanel
+                entry={entry}
+                pathname={pathname}
+                onNavigate={() => setOpenMenuId(null)}
+              />
+            )}
 
-      <Link
-        href="/grafo"
-        className="flex flex-col items-center justify-center p-2"
-        style={{
-          color: pathname === "/grafo" ? "var(--khora-ink)" : "var(--khora-accent)",
-        }}
-      >
-        <Icons.Network size={32} strokeWidth={1.75} absoluteStrokeWidth={true} />
-        <span className="text-xs mt-1 font-medium">Grafo</span>
-      </Link>
+            {entry.kind === "direct" ? (
+              <Link
+                href={entry.href}
+                className="flex min-w-16 flex-col items-center justify-center rounded-lg p-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--khora-accent)]"
+                style={{ color: active ? "var(--khora-ink)" : "var(--khora-accent)" }}
+                aria-current={active ? "page" : undefined}
+              >
+                <NavIcon name={entry.icon} size={32} />
+                <span className="mt-1 text-xs font-medium">{entry.label}</span>
+              </Link>
+            ) : (
+              <button
+                type="button"
+                aria-haspopup="true"
+                aria-expanded={openMenuId === entry.id}
+                aria-label={entry.label}
+                onClick={() =>
+                  setOpenMenuId((current) => (current === entry.id ? null : entry.id))
+                }
+                className="flex min-w-16 flex-col items-center justify-center rounded-lg p-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--khora-accent)]"
+                style={{ color: active ? "var(--khora-ink)" : "var(--khora-accent)" }}
+              >
+                {openMenuId === entry.id ? (
+                  <Icons.ChevronDown size={32} strokeWidth={1.75} absoluteStrokeWidth aria-hidden="true" />
+                ) : (
+                  <NavIcon name={entry.icon} size={32} />
+                )}
+                <span className="mt-1 text-xs font-medium">{entry.label}</span>
+              </button>
+            )}
+          </div>
+        );
+      })}
 
-      <Link
-        href="/sistema/consulta"
-        className="flex flex-col items-center justify-center p-2"
-        style={{
-          color:
-            pathname === "/sistema/consulta"
-              ? "var(--khora-ink)"
-              : "var(--khora-accent)",
-        }}
-      >
-        <Icons.MessageSquareShare
-          size={32}
-          strokeWidth={1.75}
-          absoluteStrokeWidth={true}
-        />
-        <span className="text-xs mt-1 font-medium">Consulta</span>
-      </Link>
-
-      <Link
-        href="/sistema/kpis"
-        className="flex flex-col items-center justify-center p-2"
-        style={{
-          color:
-            pathname === "/sistema/kpis"
-              ? "var(--khora-ink)"
-              : "var(--khora-accent)",
-        }}
-      >
-        <Icons.Activity size={32} strokeWidth={1.75} absoluteStrokeWidth={true} />
-        <span className="text-xs mt-1 font-medium">KPIs</span>
-      </Link>
-
-      <div ref={systemMenuRef} className="relative">
-        {systemMenuOpen && (
-          <nav
-            aria-label="Menú Sistema"
-            aria-describedby="system-menu-description"
-            className="absolute bottom-full right-0 mb-2 max-h-[70vh] min-w-56 overflow-y-auto rounded-xl border shadow-2xl"
-            style={{
-              borderColor: "var(--khora-border)",
-              background: "var(--khora-surface)",
-            }}
-          >
-            <div
-              className="border-b px-3 py-2 text-left"
-              style={{ borderColor: "var(--khora-border)" }}
-            >
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em] opacity-50">
-                Sistema
-              </p>
-              <p id="system-menu-description" className="text-xs opacity-60">Módulos navegables del entorno</p>
-            </div>
-
-            <div
-              className="border-b px-3 py-2 text-left"
-              style={{ borderColor: "var(--khora-border)" }}
-            >
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em] opacity-50">
-                Operación
-              </p>
-            </div>
-
-            <Link href="/sistema/dictado" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
-              <Icons.Mic size={16} />
-              <span>Dictado</span>
-            </Link>
-            <Link href="/sistema/editar" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
-              <Icons.PenLine size={16} />
-              <span>Edición</span>
-            </Link>
-            <Link href="/sistema/ingesta" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
-              <Icons.UploadCloud size={16} />
-              <span>Ingesta</span>
-            </Link>
-            <Link href="/sistema/kpis" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
-              <Icons.Activity size={16} />
-              <span>KPIs</span>
-            </Link>
-
-            <Link href="/mapa" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
-              <Icons.Map size={16} />
-              <span>Mapa</span>
-            </Link>
-
-            <Link href="/capturar" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
-              <Icons.Mic size={16} />
-              <span>Capturar</span>
-            </Link>
-            <Link href="/herramientas" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
-              <Icons.Wrench size={16} />
-              <span>Herramientas</span>
-            </Link>
-            <Link href="/roadmap" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
-              <Icons.MapPinned size={16} />
-              <span>Roadmap</span>
-            </Link>
-            <Link href="/adherence" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
-              <Icons.ChartNoAxesCombined size={16} />
-              <span>Adherencia</span>
-            </Link>
-
-            <div className="border-y px-3 py-2 text-left" style={{ borderColor: "var(--khora-border)" }}>
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em] opacity-50">
-                Seguridad y control
-              </p>
-            </div>
-
-            <Link href="/sistema/seguridad" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
-              <Icons.ShieldCheck size={16} />
-              <span>Seguridad</span>
-            </Link>
-            <Link href="/sistema/mcp" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
-              <Icons.KeyRound size={16} />
-              <span>Control MCP</span>
-            </Link>
-            <Link href="/sistema/otros" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
-              <Icons.FileCheck2 size={16} />
-              <span>Evidencia normativa</span>
-            </Link>
-            <Link href="/sistema/registro" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
-              <Icons.ScrollText size={16} />
-              <span>Registro</span>
-            </Link>
-          </nav>
-        )}
-
-        <button
-          type="button"
-          aria-haspopup="true"
-          aria-expanded={systemMenuOpen}
-          onClick={() => setSystemMenuOpen((open) => !open)}
-          className="flex flex-col items-center justify-center p-2"
-          style={{
-            color: systemActive ? "var(--khora-ink)" : "var(--khora-accent)",
-          }}
-        >
-          {systemMenuOpen ? (
-            <Icons.ChevronDown
-              size={32}
-              strokeWidth={1.75}
-              absoluteStrokeWidth={true}
-            />
-          ) : (
-            <Icons.ScrollText
-              size={32}
-              strokeWidth={1.75}
-              absoluteStrokeWidth={true}
-            />
-          )}
-          <span className="text-xs mt-1 font-medium">Sistema</span>
-        </button>
+      <div className="shrink-0">
+        <ThemeToggle />
       </div>
-
-      <ThemeToggle />
     </nav>
   );
 }
