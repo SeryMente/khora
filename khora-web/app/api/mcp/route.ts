@@ -109,7 +109,7 @@ async function requireNormativeTurn(
     await assertNormativeTurnOpen(actor, turnToken, {
       platform: REQUIRED_PLATFORM,
       reasoning_mode: thinkingMode as ReasoningMode,
-      output_format_version: outputFormatVersion,
+      output_format_version: REQUIRED_OUTPUT_FORMAT_VERSION,
     });
     return null;
   } catch (error) {
