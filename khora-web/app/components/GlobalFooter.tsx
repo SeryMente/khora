@@ -7,8 +7,14 @@ const version =
 
 export function GlobalFooter() {
   return (
-    <footer className="fixed bottom-2 left-0 z-50 w-full pointer-events-none flex justify-center pb-safe">
-      <span className="text-[8px] leading-none text-cora-text/45 font-mono tracking-[0.14em]">
+    <footer
+      aria-label="Versión de Khora"
+      className="fixed bottom-2 left-0 z-50 w-full pointer-events-none flex justify-center pb-safe"
+    >
+      <span
+        className="text-[9px] leading-none font-mono tracking-[0.14em]"
+        style={{ color: "var(--khora-accent)", opacity: 0.5 }}
+      >
         v{version}
       </span>
     </footer>
