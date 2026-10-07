@@ -213,7 +213,7 @@ async function handleMcpRequest(req: NextRequest) {
     {
       instructions:
         "ADAPTIVE NORMATIVE GATE: durante Thinking, cuando este disponible, intenta HEALTH MCP -> OPEN TURN -> aplicar todos los principios del snapshot -> VERIFY -> RELEASE antes de emitir la salida. " +
-        "La salida visible de cada turno debe cumplir el contrato v1.7.1 cualquiera que sea el escenario. " +
+        "La salida visible de cada turno debe cumplir el contrato v1.7.2 cualquiera que sea el escenario. " +
         "Si KHORA no esta disponible o no puede verificarse, continua la respuesta sin inventar verificacion y declara K: OFF. " +
         "Si KHORA devuelve VERIFIED_RELEASE, declara K: ✓. Si devuelve un fallo normativo, declara K: ! o K: ? segun corresponda. " +
         "El modo de razonamiento es metadato operativo y no debe presentarse como prueba del pensamiento interno.",
@@ -611,7 +611,7 @@ async function handleMcpRequest(req: NextRequest) {
         type: "object",
         properties: {
           thinking_mode: { type: "string", enum: [...REASONING_MODES] },
-          output_format_version: { type: "string", enum: ["v1.7.1"] },
+          output_format_version: { type: "string", enum: ["v1.7.2"] },
         },
         required: ["thinking_mode", "output_format_version"],
         additionalProperties: false,
@@ -771,7 +771,7 @@ async function handleMcpRequest(req: NextRequest) {
           conversation_id: { type: "string" },
           turn_number: { type: "integer", minimum: 1 },
           thinking_mode: { type: "string", enum: ["THINKING", "INSTANT", "UNKNOWN", "UNAVAILABLE"] },
-          output_format_version: { type: "string", enum: ["v1.7.1"] },
+          output_format_version: { type: "string", enum: ["v1.7.2"] },
         },
         required: ["thinking_mode", "output_format_version"],
         additionalProperties: false,
@@ -829,7 +829,7 @@ async function handleMcpRequest(req: NextRequest) {
       },
       _output_format_version: {
         type: "string",
-        enum: ["v1.7.1"],
+        enum: ["v1.7.2"],
         description: "REQUERIDO: contrato de salida visible por ciclo.",
       },
     };
