@@ -526,6 +526,7 @@ function computeEvidenceHash(receipt: NormativeReceipt): string {
 export async function verifyNormativeReceipt(
   input: unknown,
   serverApplicationVector?: NormativePrincipleEvidence[],
+  outputHeaderAt?: string,
 ): Promise<VerificationResult> {
   if (!validateBasicReceipt(input)) {
     return {
@@ -566,7 +567,7 @@ export async function verifyNormativeReceipt(
   }
 
   const reasons: string[] = [];
-  const expectedOutputHeader = buildCanonicalSiOutputHeader(snapshot, receipt.created_at);
+  const expectedOutputHeader = buildCanonicalSiOutputHeader(snapshot, outputHeaderAt || receipt.created_at);
   if (receipt.output_header !== expectedOutputHeader) reasons.push("OUTPUT_HEADER_MISMATCH");
   if (receipt.si.version !== snapshot.version) reasons.push("SI_VERSION_MISMATCH");
   if (receipt.si.sha256 !== snapshot.sha256) reasons.push("SI_SHA256_MISMATCH");
