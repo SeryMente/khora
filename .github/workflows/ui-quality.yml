@@ -1,0 +1,47 @@
+name: UI Quality
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ui-quality-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ui-contract:
+    name: UI Contract
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: khora-web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: khora-web/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run ui-review:check
+      - run: npm run ui:contract
+      - run: npm run test:unit
+
+  ui-e2e:
+    name: UI E2E
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: khora-web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: khora-web/package-lock.json
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run e2e -- e2e/shell-v2.spec.ts e2e/ui-quality.spec.ts
