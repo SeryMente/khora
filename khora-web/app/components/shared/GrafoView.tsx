@@ -84,9 +84,11 @@ function GraphNode({ data }: NodeProps<FlowNode>) {
   const scale = Math.max(0.88, Math.min(1.3, 0.9 + Number(node.centrality || 1) * 0.08));
 
   return (
-    <div
+    <button
+      type="button"
       data-ui-id="grafo.flow-node"
-      className="relative rounded-xl border px-4 py-3 shadow-lg"
+      aria-label={"Inspeccionar nodo: " + node.summary}
+      className="relative block rounded-xl border px-4 py-3 text-left shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--khora-accent)]"
       style={{
         width: 230 * scale,
         minHeight: 92,
@@ -113,7 +115,7 @@ function GraphNode({ data }: NodeProps<FlowNode>) {
         {node.verificacion} · {node.origen}
       </div>
       <Handle type="source" position={Position.Right} className="!h-2 !w-2 !border-0" style={{ background: color }} />
-    </div>
+    </button>
   );
 }
 
@@ -289,10 +291,12 @@ export function GrafoView({
           <div data-ui-id="grafo.node-list" className="max-w-5xl mx-auto space-y-4 overflow-auto p-4">
             <h2 className="mb-4 text-lg font-semibold">Lista Accesible de Nodos</h2>
             {nodes.map((node) => (
-              <div
+              <button
+                type="button"
                 key={node.id}
                 onClick={() => actions.onSelectElement?.({ type: "node", data: node })}
-                className="flex cursor-pointer flex-col gap-2 rounded border p-4 shadow-sm"
+                aria-label={"Inspeccionar nodo: " + node.summary}
+                className="flex w-full cursor-pointer flex-col gap-2 rounded border p-4 text-left shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--khora-accent)]"
                 style={{ backgroundColor: "var(--khora-surface)", borderColor: "var(--khora-border)" }}
               >
                 <p className="font-medium">{node.summary}</p>
@@ -303,7 +307,7 @@ export function GrafoView({
                   <span>Origen: {node.origen}</span>
                   <span>{node.verificacion}</span>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         ) : (
