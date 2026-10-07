@@ -339,8 +339,13 @@ export async function openNormativeTurn(
   };
 }
 
-export async function assertNormativeTurnOpen(actor: string, turnToken: string) {
+export async function assertNormativeTurnOpen(
+  actor: string,
+  turnToken: string,
+  runtime: NormativeRuntimeContext,
+) {
   if (!validActor(actor)) throw new Error("TURN_ACTOR_INVALID");
+  assertNormativeRuntimeContext(runtime);
   if (typeof turnToken !== "string" || turnToken.length < 16) throw new Error("TURN_TOKEN_INVALID");
 
   const config = getMcpConfig();
@@ -360,8 +365,14 @@ export async function assertNormativeTurnOpen(actor: string, turnToken: string) 
     typeof token.turn_nonce !== "string" ||
     !Number.isSafeInteger(token.turn_attempt) ||
     typeof token.turn_si_sha256 !== "string" ||
-    typeof token.turn_manifest_sha256 !== "string"
-  ) throw new Error("TURN_TOKEN_CLAIMS_INVALID");
+    typeof token.turn_manifest_sha256 !== "string" ||
+    token.turn_platform !== REQUIRED_PLATFORM ||
+    token.turn_reasoning_mode !== REQUIRED_REASONING_MODE ||
+    token.turn_output_format_version !== REQUIRED_OUTPUT_FORMAT_VERSION ||
+    token.turn_platform !== runtime.platform ||
+    token.turn_reasoning_mode !== runtime.reasoning_mode ||
+    token.turn_output_format_version !== runtime.output_format_version
+  ) throw new Error("THINKING_MODE_REQUIRED");
 
   const gen = await obtenerGeneracionRevocacion(actor);
   if (token.gen !== gen) throw new Error("TURN_TOKEN_REVOKED");
