@@ -99,10 +99,10 @@ test.describe('Shell Navegación v3', () => {
 
         const menuBox = await menu.boundingBox();
         expect(menuBox).not.toBeNull();
-        expect(menuBox!.left).toBeGreaterThanOrEqual(0);
-        expect(menuBox!.top).toBeGreaterThanOrEqual(0);
-        expect(menuBox!.right).toBeLessThanOrEqual(viewport.width);
-        expect(menuBox!.bottom).toBeLessThanOrEqual(viewport.height);
+        expect(menuBox!.x).toBeGreaterThanOrEqual(0);
+        expect(menuBox!.y).toBeGreaterThanOrEqual(0);
+        expect(menuBox!.x + menuBox!.width).toBeLessThanOrEqual(viewport.width);
+        expect(menuBox!.y + menuBox!.height).toBeLessThanOrEqual(viewport.height);
 
         const svgCount = await button.locator('svg').count();
         expect(svgCount).toBeGreaterThanOrEqual(2);

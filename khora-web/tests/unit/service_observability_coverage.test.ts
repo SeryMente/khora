@@ -15,7 +15,7 @@ test("service observability contract covers the service boundaries", () => {
 
   assert.match(middleware, /authMiddleware/);
   assert.match(middleware, /emitBoundaryEvent/);
-  assert.match(middleware, /api/eventos/);
+  assert.match(middleware, new RegExp("api/eventos"));
   assert.match(middleware, /X-Khora-Correlation-Id/);
   assert.match(serviceObs, /withServiceObservation/);
   assert.match(serviceContext, /AsyncLocalStorage/);

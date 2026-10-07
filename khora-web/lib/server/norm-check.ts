@@ -2,8 +2,8 @@ import { createHash } from "crypto";
 import { assertNormativeRuntimeContext, type NormativeRuntimeContext } from "./normative-runtime";
 
 export const NORM_CHECK_PROTOCOL = "NORM-CHECK";
-export const NORM_CHECK_PROTOCOL_VERSION = "v0.4.0";
-export const NORM_CHECK_VERIFIER_VERSION = "norm-check/0.4.0";
+export const NORM_CHECK_PROTOCOL_VERSION = "v0.5.0";
+export const NORM_CHECK_VERIFIER_VERSION = "norm-check/0.5.0";
 const ACCEPTED_PROTOCOL_VERSIONS = new Set([NORM_CHECK_PROTOCOL_VERSION]);
 export const CANONICAL_SI_REPOSITORY = "SeryMente/metodologia";
 export const CANONICAL_SI_PATH = "SI-METACOGNITIVO.md";
@@ -29,6 +29,7 @@ export type NormativeReceipt = {
   cycle: { id: string; attempt: number };
   si: {
     version: string;
+    git_commit_sha: string;
     git_blob_sha: string;
     sha256: string;
     manifest_sha256: string;
@@ -48,6 +49,7 @@ export type VerificationResult = {
   cycle_id: string;
   attempt: number;
   si_version: string;
+  si_git_commit_sha: string;
   si_git_blob_sha: string;
   manifest_sha256: string;
   coverage: {
@@ -58,6 +60,8 @@ export type VerificationResult = {
     unknown: number;
     percent: number;
   };
+  order_verified: boolean;
+  application_log_sha256: string;
   integrity: "PASS" | "FAIL";
 };
 
@@ -68,8 +72,11 @@ export type CycleVerificationRecord = {
   status: "VERIFIED" | "INVALID" | "INCOMPLETE";
   evidence_sha256: string;
   si_version: string;
+  si_git_commit_sha: string;
   si_sha256: string;
   manifest_sha256: string;
+  order_verified: boolean;
+  application_log_sha256: string;
   verifier_version: string;
   recorded_at: string;
   receipt_id: string | null;
@@ -81,8 +88,11 @@ export function buildCycleVerificationRecord(input: {
   status: "VERIFIED" | "INVALID" | "INCOMPLETE";
   evidence_sha256: string;
   si_version: string;
+  si_git_commit_sha: string;
   si_sha256: string;
   manifest_sha256: string;
+  order_verified: boolean;
+  application_log_sha256: string;
   verifier_version: string;
   recorded_at: string;
   receipt_id?: string | null;
@@ -94,8 +104,11 @@ export function buildCycleVerificationRecord(input: {
     status: input.status,
     evidence_sha256: input.evidence_sha256,
     si_version: input.si_version,
+    si_git_commit_sha: input.si_git_commit_sha,
     si_sha256: input.si_sha256,
     manifest_sha256: input.manifest_sha256,
+    order_verified: input.order_verified,
+    application_log_sha256: input.application_log_sha256,
     verifier_version: input.verifier_version,
     recorded_at: input.recorded_at,
     receipt_id: input.receipt_id ?? null,
@@ -106,6 +119,7 @@ type ParsedSi = {
   version: string;
   versionName: string;
   lastUpdatedAt: string;
+  gitCommitSha: string;
   sha256: string;
   manifest: ManifestPrinciple[];
   manifestSha256: string;
@@ -158,7 +172,13 @@ function parsePrinciples(source: string): ManifestPrinciple[] {
   }
 
   if (principles.length === 0) throw new Error("SI_NO_CANONICAL_PRINCIPLES");
-  principles.sort((a, b) => a.folio.localeCompare(b.folio));
+
+  const folios = new Set(principles.map((principle) => principle.folio));
+  if (folios.size !== principles.length) throw new Error("SI_PRINCIPLES_DUPLICATED");
+
+  principles.sort(
+    (a, b) => b.preponderance - a.preponderance || a.folio.localeCompare(b.folio),
+  );
   return principles;
 }
 
@@ -195,7 +215,7 @@ export async function fetchSiBlob(blobSha: string): Promise<string> {
       {
         headers: {
           Accept: "application/vnd.github+json",
-          "User-Agent": "Khora-NormCheck/0.4.0",
+          "User-Agent": "Khora-NormCheck/0.5.0",
         },
         cache: "force-cache",
       },
@@ -221,36 +241,76 @@ export async function fetchSiBlob(blobSha: string): Promise<string> {
 }
 
 export async function getCurrentSiSnapshot(): Promise<ParsedSi & { gitBlobSha: string }> {
-  const response = await fetch(
-    "https://api.github.com/repos/" + CANONICAL_SI_REPOSITORY + "/contents/" + CANONICAL_SI_PATH + "?ref=main",
-    {
-      headers: {
-        Accept: "application/vnd.github+json",
-        "User-Agent": "Khora-NormCheck/0.4.0",
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    const commitResponse = await fetch(
+      "https://api.github.com/repos/" + CANONICAL_SI_REPOSITORY + "/commits/main",
+      {
+        headers: {
+          Accept: "application/vnd.github+json",
+          "User-Agent": "Khora-NormCheck/0.5.0",
+        },
+        cache: "no-store",
       },
-      cache: "no-store",
-    },
-  );
-  if (!response.ok) throw new Error("SI_CURRENT_FETCH_" + response.status);
-  const payload = (await response.json()) as { sha?: string; encoding?: string; content?: string };
-  if (!isHex(payload.sha, 40) || payload.encoding !== "base64" || typeof payload.content !== "string") {
-    throw new Error("SI_CURRENT_PAYLOAD_INVALID");
+    );
+    if (!commitResponse.ok) throw new Error("SI_MAIN_FETCH_" + commitResponse.status);
+    const commitPayload = (await commitResponse.json()) as { sha?: string };
+    if (!isHex(commitPayload.sha, 40)) throw new Error("SI_MAIN_SHA_INVALID");
+    const mainSha = commitPayload.sha;
+
+    const response = await fetch(
+      "https://api.github.com/repos/" + CANONICAL_SI_REPOSITORY + "/contents/" + CANONICAL_SI_PATH + "?ref=" + mainSha,
+      {
+        headers: {
+          Accept: "application/vnd.github+json",
+          "User-Agent": "Khora-NormCheck/0.5.0",
+        },
+        cache: "no-store",
+      },
+    );
+    if (!response.ok) throw new Error("SI_CURRENT_FETCH_" + response.status);
+    const payload = (await response.json()) as { sha?: string; encoding?: string; content?: string };
+    if (!isHex(payload.sha, 40) || payload.encoding !== "base64" || typeof payload.content !== "string") {
+      throw new Error("SI_CURRENT_PAYLOAD_INVALID");
+    }
+
+    const confirmResponse = await fetch(
+      "https://api.github.com/repos/" + CANONICAL_SI_REPOSITORY + "/commits/main",
+      {
+        headers: {
+          Accept: "application/vnd.github+json",
+          "User-Agent": "Khora-NormCheck/0.5.0",
+        },
+        cache: "no-store",
+      },
+    );
+    if (!confirmResponse.ok) throw new Error("SI_MAIN_CONFIRM_FETCH_" + confirmResponse.status);
+    const confirmPayload = (await confirmResponse.json()) as { sha?: string };
+    if (!isHex(confirmPayload.sha, 40)) throw new Error("SI_MAIN_CONFIRM_SHA_INVALID");
+
+    if (confirmPayload.sha !== mainSha) {
+      if (attempt === 3) throw new Error("SI_MAIN_CHANGED_DURING_SNAPSHOT");
+      continue;
+    }
+
+    const source = normalizeText(Buffer.from(payload.content.replace(/\n/g, ""), "base64").toString("utf8"));
+    const versionMatch = source.match(/^\*\*Versión:\*\*\s*(v\d+\.\d+\.\d+)/mi);
+    if (!versionMatch) throw new Error("SI_VERSION_MISSING");
+    const versionNameMatch = source.match(/^\*\*Nombre de versión:\*\*\s*(.+)$/mi);
+    const lastUpdatedMatch = source.match(/^\*\*Última actualización canónica:\*\*\s*(.+)$/mi);
+    const manifest = parsePrinciples(source);
+    return {
+      version: versionMatch[1],
+      versionName: versionNameMatch ? versionNameMatch[1].trim() : "",
+      lastUpdatedAt: lastUpdatedMatch ? lastUpdatedMatch[1].trim() : "",
+      gitCommitSha: mainSha,
+      sha256: sha256(source),
+      manifest,
+      manifestSha256: buildManifestHash(manifest),
+      gitBlobSha: payload.sha,
+    };
   }
-  const source = normalizeText(Buffer.from(payload.content.replace(/\n/g, ""), "base64").toString("utf8"));
-  const versionMatch = source.match(/^\*\*Versión:\*\*\s*(v\d+\.\d+\.\d+)/mi);
-  if (!versionMatch) throw new Error("SI_VERSION_MISSING");
-  const versionNameMatch = source.match(/^\*\*Nombre de versión:\*\*\s*(.+)$/mi);
-  const lastUpdatedMatch = source.match(/^\*\*Última actualización canónica:\*\*\s*(.+)$/mi);
-  const manifest = parsePrinciples(source);
-  return {
-    version: versionMatch[1],
-    versionName: versionNameMatch ? versionNameMatch[1].trim() : "",
-    lastUpdatedAt: lastUpdatedMatch ? lastUpdatedMatch[1].trim() : "",
-    sha256: sha256(source),
-    manifest,
-    manifestSha256: buildManifestHash(manifest),
-    gitBlobSha: payload.sha,
-  };
+
+  throw new Error("SI_SNAPSHOT_FAILED");
 }
 
 export async function loadSiSnapshot(blobSha: string): Promise<ParsedSi> {
@@ -265,6 +325,7 @@ export async function loadSiSnapshot(blobSha: string): Promise<ParsedSi> {
     version: versionMatch[1],
     versionName: versionNameMatch ? versionNameMatch[1].trim() : "",
     lastUpdatedAt: lastUpdatedMatch ? lastUpdatedMatch[1].trim() : "",
+    gitCommitSha: "",
     sha256: sha256(source),
     manifest,
     manifestSha256: buildManifestHash(manifest),
@@ -280,7 +341,7 @@ function validateBasicReceipt(receipt: unknown): receipt is NormativeReceipt {
   if (value.protocol !== NORM_CHECK_PROTOCOL || typeof value.protocol_version !== "string" || !ACCEPTED_PROTOCOL_VERSIONS.has(value.protocol_version)) return false;
   if (!cycle || typeof cycle.id !== "string" || cycle.id.trim().length === 0) return false;
   if (!Number.isInteger(cycle.attempt) || Number(cycle.attempt) < 1) return false;
-  if (!si || typeof si.version !== "string" || !isHex(si.git_blob_sha, 40) || !isHex(si.sha256, 64) || !isHex(si.manifest_sha256, 64)) return false;
+  if (!si || typeof si.version !== "string" || !isHex(si.git_commit_sha, 40) || !isHex(si.git_blob_sha, 40) || !isHex(si.sha256, 64) || !isHex(si.manifest_sha256, 64)) return false;
   if (!isHex(value.input_sha256, 64) || !isHex(value.output_sha256, 64)) return false;
   if (typeof value.nonce !== "string" || value.nonce.length < 16 || value.nonce.length > 128) return false;
   if (!isHex(value.evidence_sha256, 64)) return false;
@@ -313,20 +374,19 @@ function computeEvidenceHash(receipt: NormativeReceipt): string {
     cycle: { id: receipt.cycle.id, attempt: receipt.cycle.attempt },
     si: {
       version: receipt.si.version,
+      git_commit_sha: receipt.si.git_commit_sha,
       git_blob_sha: receipt.si.git_blob_sha,
       sha256: receipt.si.sha256,
       manifest_sha256: receipt.si.manifest_sha256,
     },
     input_sha256: receipt.input_sha256,
     nonce: receipt.nonce,
-    principles: [...receipt.principles]
-      .map((item) => ({
-        folio: item.folio,
-        status: item.status,
-        anchor: item.anchor || null,
-        reason_code: item.reason_code || null,
-      }))
-      .sort((a, b) => a.folio.localeCompare(b.folio)),
+    principles: receipt.principles.map((item) => ({
+      folio: item.folio,
+      status: item.status,
+      anchor: item.anchor || null,
+      reason_code: item.reason_code || null,
+    })),
     output_sha256: receipt.output_sha256,
     created_at: receipt.created_at,
     runtime: {
@@ -338,7 +398,10 @@ function computeEvidenceHash(receipt: NormativeReceipt): string {
   return sha256(canonicalJsonString(canonical));
 }
 
-export async function verifyNormativeReceipt(input: unknown): Promise<VerificationResult> {
+export async function verifyNormativeReceipt(
+  input: unknown,
+  serverApplicationVector?: NormativePrincipleEvidence[],
+): Promise<VerificationResult> {
   if (!validateBasicReceipt(input)) {
     return {
       status: "INVALID",
@@ -346,9 +409,12 @@ export async function verifyNormativeReceipt(input: unknown): Promise<Verificati
       cycle_id: "UNKNOWN",
       attempt: 0,
       si_version: "",
+      si_git_commit_sha: "",
       si_git_blob_sha: "",
       manifest_sha256: "",
       coverage: { expected: 0, evaluated: 0, missing: 0, duplicates: 0, unknown: 0, percent: 0 },
+      order_verified: false,
+      application_log_sha256: "",
       integrity: "FAIL",
     };
   }
@@ -364,9 +430,12 @@ export async function verifyNormativeReceipt(input: unknown): Promise<Verificati
       cycle_id: receipt.cycle.id,
       attempt: receipt.cycle.attempt,
       si_version: receipt.si.version,
+      si_git_commit_sha: receipt.si.git_commit_sha,
       si_git_blob_sha: receipt.si.git_blob_sha,
       manifest_sha256: receipt.si.manifest_sha256,
       coverage: { expected: 0, evaluated: 0, missing: 0, duplicates: 0, unknown: 0, percent: 0 },
+      order_verified: false,
+      application_log_sha256: "",
       integrity: "FAIL",
     };
   }
@@ -394,10 +463,41 @@ export async function verifyNormativeReceipt(input: unknown): Promise<Verificati
   const evaluated = seen.size;
   const expected = snapshot.manifest.length;
   const percent = expected === 0 ? 0 : Math.round((evaluated / expected) * 10000) / 100;
+  const expectedOrder = snapshot.manifest.map((principle) => principle.folio);
+  const actualOrder = receipt.principles.map((principle) => principle.folio);
+  const receiptOrderVerified =
+    actualOrder.length === expectedOrder.length &&
+    actualOrder.every((folio, index) => folio === expectedOrder[index]);
+
+  const serverOrderVerified = serverApplicationVector
+    ? serverApplicationVector.length === expectedOrder.length &&
+      serverApplicationVector.every((item, index) => item.folio === expectedOrder[index])
+    : false;
+
+  const serverMatchesReceipt = serverApplicationVector
+    ? serverApplicationVector.length === receipt.principles.length &&
+      serverApplicationVector.every((item, index) => {
+        const received = receipt.principles[index];
+        return item.folio === received.folio &&
+          item.status === received.status &&
+          (item.anchor || null) === (received.anchor || null) &&
+          (item.reason_code || null) === (received.reason_code || null);
+      })
+    : false;
+
+  const orderVerified = receiptOrderVerified && (!serverApplicationVector || (serverOrderVerified && serverMatchesReceipt));
 
   if (missing > 0) reasons.push("PRINCIPLES_MISSING");
   if (duplicates > 0) reasons.push("PRINCIPLES_DUPLICATED");
   if (unknown > 0) reasons.push("PRINCIPLES_UNKNOWN");
+  if (!orderVerified) reasons.push("PRINCIPLES_ORDER_MISMATCH");
+
+  const applicationLogSha256 = serverApplicationVector
+    ? sha256(canonicalJsonString(serverApplicationVector))
+    : "";
+
+  if (serverApplicationVector && serverApplicationVector.length < expected) reasons.push("APPLICATION_LOG_INCOMPLETE");
+  if (serverApplicationVector && !serverMatchesReceipt) reasons.push("APPLICATION_LOG_MISMATCH");
 
   if (computeEvidenceHash(receipt) !== receipt.evidence_sha256) reasons.push("EVIDENCE_SHA256_MISMATCH");
 
@@ -413,9 +513,12 @@ export async function verifyNormativeReceipt(input: unknown): Promise<Verificati
     cycle_id: receipt.cycle.id,
     attempt: receipt.cycle.attempt,
     si_version: receipt.si.version,
+    si_git_commit_sha: receipt.si.git_commit_sha,
     si_git_blob_sha: receipt.si.git_blob_sha,
     manifest_sha256: receipt.si.manifest_sha256,
     coverage: { expected, evaluated, missing, duplicates, unknown, percent },
+    order_verified: orderVerified,
+    application_log_sha256: applicationLogSha256,
     integrity,
   };
 }

@@ -1,6 +1,7 @@
 // @l0 L0-002-R · @req CORA-02/REQ-1
 import { builtinModules } from "module";
 
+process.env.PLAYWRIGHT_TEST_RUN ??= "1";
 process.env.AUTH_SECRET ??= "test-secret-12345678901234567890123456789012";
 process.env.X_KHORA_KEY ??= "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef";
 

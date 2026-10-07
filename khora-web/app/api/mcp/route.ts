@@ -17,7 +17,7 @@ import {
 } from "@/lib/server/mcp-tools";
 import { toolKhoraUiReview } from "@/lib/server/mcp-ui-review";
 import { toolKhoraEstadoVivo, toolKhoraEventosRecientes, toolKhoraObservacionInstantanea, toolKhoraEventosDesde } from "@/lib/server/mcp-observability";
-import { assertNormativeTurnOpen, openNormativeTurn, verifyNormativeTurn, releaseNormativeTurn } from "@/lib/server/mcp-normative";
+import { assertNormativeTurnOpen, openNormativeTurn, applyNormativePrinciple, verifyNormativeTurn, releaseNormativeTurn } from "@/lib/server/mcp-normative";
 import { authenticateManualMcpToken, MANUAL_MCP_TOKEN_PREFIX } from "@/lib/server/mcp-manual-token";
 import { registrarEventoServicio } from "@/lib/server/service-observability";
 import { getCurrentSiSnapshot, getCurrentVerifierInfo } from "@/lib/server/norm-check";
@@ -212,7 +212,7 @@ async function handleMcpRequest(req: NextRequest) {
     },
     {
       instructions:
-        "ADAPTIVE NORMATIVE GATE: durante Thinking, cuando este disponible, intenta HEALTH MCP -> OPEN TURN -> aplicar todos los principios del snapshot -> VERIFY -> RELEASE antes de emitir la salida. " +
+        "ADAPTIVE NORMATIVE GATE: cuando KHORA esta disponible, ejecuta HEALTH MCP -> OPEN TURN -> aplica cada principio mediante khora_norm_apply_principle en el orden devuelto -> VERIFY -> RELEASE antes de emitir la salida. " +
         "La salida visible de cada turno debe cumplir el contrato v1.7.2 cualquiera que sea el escenario. " +
         "Si KHORA no esta disponible o no puede verificarse, continua la respuesta sin inventar verificacion y declara K: OFF. " +
         "Si KHORA devuelve VERIFIED_RELEASE, declara K: ✓. Si devuelve un fallo normativo, declara K: ! o K: ? segun corresponda. " +
@@ -276,7 +276,7 @@ async function handleMcpRequest(req: NextRequest) {
       }
     };
 
-    if (name === "khora_mcp_health" || name === "khora_norm_open_turn" || name === "khora_norm_verify_turn" || name === "khora_norm_release_turn") {
+    if (name === "khora_mcp_health" || name === "khora_norm_open_turn" || name === "khora_norm_apply_principle" || name === "khora_norm_verify_turn" || name === "khora_norm_release_turn") {
       return mcpServer.tool(name, description, inputSchema, async (args: any) => observedHandler(args, false));
     }
 
@@ -489,7 +489,7 @@ async function handleMcpRequest(req: NextRequest) {
           content: [{
             type: "text",
             text: JSON.stringify({
-              ok: fullAccess && Boolean(snapshot.version && snapshot.gitBlobSha),
+              ok: fullAccess && Boolean(snapshot.version && snapshot.gitCommitSha && snapshot.gitBlobSha),
               status: fullAccess ? "OK" : "DEGRADED",
               full_access: fullAccess,
               missing_scopes: missingScopes,
@@ -555,11 +555,42 @@ async function handleMcpRequest(req: NextRequest) {
   );
 
   gatedTool(
+    "khora_norm_apply_principle",
+    "Registra server-side la aplicación del siguiente principio del snapshot. KHORA impone el orden canónico y no permite saltos o reordenamientos.",
+    {
+      turn_token: z.string().min(16).describe("Token opaco emitido por khora_norm_open_turn"),
+      folio: z.string().regex(/^P\d{3}$/).describe("Folio del siguiente principio esperado por KHORA"),
+      status: z.enum(["A", "N", "C"]).describe("A=APLICADO, N=NO_APLICABLE, C=CONFLICTO_RESUELTO"),
+      anchor: z.string().min(1).max(64).optional().describe("Obligatorio para A/C"),
+      reason_code: z.string().min(1).max(32).optional().describe("Obligatorio para N"),
+    },
+    async (args: any) => {
+      const denied = requireScope("norm:turn");
+      if (denied) return denied;
+      try {
+        const res = await applyNormativePrinciple(actor, {
+          turn_token: args.turn_token,
+          folio: args.folio,
+          status: args.status,
+          anchor: args.anchor,
+          reason_code: args.reason_code,
+        });
+        return { content: [{ type: "text", text: JSON.stringify(res) }] };
+      } catch (error) {
+        return {
+          isError: true,
+          content: [{ type: "text", text: error instanceof Error ? error.message : "PRINCIPLE_APPLICATION_FAILED" }],
+        };
+      }
+    }
+  );
+
+  gatedTool(
     "khora_norm_verify_turn",
     "Verifica y registra el receipt del turno. Solo cierra el ciclo cuando KHORA devuelve VERIFIED. Usa norm:turn.",
     {
       turn_token: z.string().min(16).describe("Token opaco emitido por khora_norm_open_turn"),
-      receipt: z.object({}).passthrough().describe("Cycle Receipt NORM-CHECK v0.3.0"),
+      receipt: z.object({}).passthrough().describe("Cycle Receipt NORM-CHECK v0.5.0"),
     },
     async (args: any) => {
       const denied = requireScope("norm:turn");
@@ -779,6 +810,23 @@ async function handleMcpRequest(req: NextRequest) {
       securitySchemes: [{ type: "oauth2", scopes: ["norm:turn"] }],
     },
     {
+      name: "khora_norm_apply_principle",
+      description: "Registra server-side la aplicación secuencial del siguiente principio del snapshot.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          turn_token: { type: "string", minLength: 16 },
+          folio: { type: "string", pattern: "^P\\d{3}$" },
+          status: { type: "string", enum: ["A","N","C"] },
+          anchor: { type: "string" },
+          reason_code: { type: "string" },
+        },
+        required: ["turn_token","folio","status"],
+        additionalProperties: false,
+      },
+      securitySchemes: [{ type: "oauth2", scopes: ["norm:turn"] }],
+    },
+    {
       name: "khora_norm_verify_turn",
       description: "Verifica y registra el receipt del turno; solo VERIFIED cierra el ciclo.",
       inputSchema: {
@@ -811,6 +859,7 @@ async function handleMcpRequest(req: NextRequest) {
     if (
       tool.name === "khora_mcp_health" ||
       tool.name === "khora_norm_open_turn" ||
+      tool.name === "khora_norm_apply_principle" ||
       tool.name === "khora_norm_verify_turn" ||
       tool.name === "khora_norm_release_turn"
     ) continue;

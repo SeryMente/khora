@@ -1,14 +1,14 @@
 # NORM-CHECK en KHORA
 
 **Estado:** IMPLEMENTADO  
-**Versión:** v0.4.0 — Gobernanza versionada y observabilidad de servicios  
-**Fecha:** 2026-10-06
+**Versión:** v0.5.0 — Evidencia ordenada y ledger server-side por ciclo
+**Fecha:** 2026-10-07
 
 ## Superficie
 
 - UI: /sistema/otros
 - MCP canónico multiuso: `/api/mcp`
-- Herramientas MCP normativas: `khora_norm_open_turn`, `khora_norm_verify_turn`
+- Herramientas MCP normativas: `khora_norm_open_turn`, `khora_norm_apply_principle`, `khora_norm_verify_turn`, `khora_norm_release_turn`
 - REST legado/manual: GET/POST `/api/norm-check`
 - Persistencia: normative_receipts
 - Verificador: khora-web/lib/server/norm-check.ts
@@ -17,9 +17,11 @@ El acceso de plataformas se concentra en un único recurso MCP: `/api/mcp`. OAut
 
 ## MCP multiuso\n\nLa misma entrada MCP expone las capacidades existentes de Cora/KHORA —volcados, runtime, revisión— y las capacidades normativas. El recurso no se duplica por función.\n\nScopes vigentes:\n\n- `volcados:read` — lectura de volcados y revisión.\n- `runtime:read` — observabilidad del runtime.\n- `norm:turn` — apertura y verificación del ciclo normativo.\n\nUna plataforma puede solicitar uno o varios scopes sobre el mismo `/api/mcp`. Para plataformas con soporte OAuth se usa OAuth 2.0 + PKCE; como alternativa, el operador puede generar desde `/sistema/mcp` un Bearer Token manual con scopes y caducidad, copiarlo y colocarlo en el campo de credencial de la plataforma. KHORA almacena solo su hash y la revocación global por generación lo invalida junto con los tokens OAuth.\n\n## Flujo de máquina
 
-1. El cliente obtiene el snapshot vigente con `GET /api/norm-check?mode=snapshot` usando `X-KHORA-KEY`.
-2. El snapshot devuelve versión, blob SHA, SHA-256, manifest SHA-256 y la totalidad dinámica de principios.
-3. Al cerrar el ciclo, el cliente envía el Cycle Receipt a `POST /api/norm-check`.
+1. `khora_norm_open_turn` adquiere el `main` actual dos veces (H1 → SI@H1 → H2) y solo acepta el snapshot si H1=H2; fija versión, commit SHA, blob SHA, SHA-256, manifest SHA-256 y la totalidad dinámica de principios.
+2. `khora_norm_apply_principle` registra cada principio en el ledger server-side y KHORA solo acepta el siguiente folio del orden canónico.
+3. `khora_norm_verify_turn` bloquea el turno, exige ledger completo y ordenado, compara ese ledger con el receipt y persiste el hash `application_log_sha256` junto con el receipt.
+4. Solo un resultado `VERIFIED` permite cerrar el turno y `khora_norm_release_turn` emite `VERIFIED_RELEASE` únicamente cuando el receipt conserva orden, hash del ledger y commit del snapshot.
+5. La salida conversacional no se bloquea si KHORA no está disponible; en ese caso no se declara verificación positiva.
 
 ## Verificación
 
@@ -63,7 +65,7 @@ La superficie normativa y su control de acceso deben ser alcanzables sin conocer
 - abrir el detalle de un comprobante;
 - pegar un receipt JSON y solicitar la verificación server-side.
 
-## Flujo normativo por MCP\n\n1. `khora_norm_open_turn` fija el snapshot del SI y emite un token de turno.\n2. El modelo ejecuta la tarea con ese snapshot.\n3. `khora_norm_verify_turn` valida el receipt y persiste el intento.\n4. Solo `VERIFIED` marca el turno como cerrado en KHORA.\n5. `INVALID` e `INCOMPLETE` dejan el turno abierto y avanzan `attempt`.\n\nEl mismo endpoint MCP sirve para el resto de capacidades de Cora/KHORA; no se crea una segunda entrada normativa. El transporte Bearer puede proceder de OAuth o de un token manual gestionado por KHORA.\n\n
+## Flujo normativo por MCP\n\n1. `khora_norm_open_turn` fija el snapshot del SI y emite un token de turno.\n2. `khora_norm_apply_principle` registra cada principio una sola vez, en el orden canónico impuesto por KHORA.\n3. `khora_norm_verify_turn` valida el receipt contra el ledger server-side y persiste el intento.\n4. Solo `VERIFIED` marca el turno como cerrado en KHORA.\n5. `khora_norm_release_turn` emite `VERIFIED_RELEASE` solo con orden, ledger/hash y snapshot consistentes.\n6. `INVALID` e `INCOMPLETE` conservan el intento histórico y abren el siguiente `attempt`.\n\nEl mismo endpoint MCP sirve para el resto de capacidades de Cora/KHORA; no se crea una segunda entrada normativa. El transporte Bearer puede proceder de OAuth o de un token manual gestionado por KHORA.\n\n
 ## Registro canónico de verificación por ciclo
 
 P028 del SI exige que cada ciclo quede registrado con una correspondencia verificable entre su identidad, el resultado y la evidencia que lo sustenta.
@@ -79,10 +81,13 @@ Formato estable:
   "attempt": 1,
   "status": "VERIFIED",
   "evidence_sha256": "...",
-  "si_version": "v1.2.0",
+  "si_version": "v1.6.7",
+  "si_git_commit_sha": "...",
   "si_sha256": "...",
   "manifest_sha256": "...",
-  "verifier_version": "norm-check/0.2.0",
+  "order_verified": true,
+  "application_log_sha256": "...",
+  "verifier_version": "norm-check/0.5.0",
   "recorded_at": "...",
   "receipt_id": "..."
 }

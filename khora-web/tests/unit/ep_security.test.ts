@@ -282,7 +282,11 @@ test("EP Security UI isolates Entorno Persistente as a submodule and keeps crede
 
 test("EP Security: Middleware 308 redirect opens the Entorno Persistente submodule", async () => {
   const req = new NextRequest("https://khora.example.com/sistema/entorno-persistente");
-  const res = (await (middleware as any)(req, {} as any)) as any;
+  const waitUntilTasks: Promise<unknown>[] = [];
+  const res = (await (middleware as any)(req, {
+    waitUntil: (task: Promise<unknown>) => waitUntilTasks.push(Promise.resolve(task)),
+  })) as any;
+  await Promise.all(waitUntilTasks);
 
   assert.ok(res);
   assert.equal(res.status, 308);

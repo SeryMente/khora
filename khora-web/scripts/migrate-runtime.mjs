@@ -1,4 +1,5 @@
 import fs from "node:fs/promises";
+import fs from "node:fs";
 import path from "node:path";
 import pg from "pg";
 
@@ -8,7 +9,7 @@ if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL es obligatorio para aplicar la migración de runtime.");
 }
 
-const migrationFiles = ["023_runtime_state.sql", "024_oauth_scopes.sql", "025_normative_receipts.sql", "026_normative_turns.sql", "027_manual_mcp_tokens.sql"];
+const migrationFiles = ["023_runtime_state.sql", "024_oauth_scopes.sql", "025_normative_receipts.sql", "026_normative_turns.sql", "027_manual_mcp_tokens.sql", "028_normative_order_ledger.sql"];
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -22,7 +23,7 @@ try {
     const sql = await fs.readFile(path.join(process.cwd(), "db/migrations", file), "utf8");
     await pool.query(sql);
   }
-  console.log("Migraciones 023-027 de runtime, OAuth, evidencia normativa y Bearer manual aplicadas.");
+  console.log("Migraciones 023-028 de runtime, OAuth, evidencia normativa, Bearer manual y ledger de orden aplicadas.");
 } catch (error) {
   console.error("Error aplicando migraciones de runtime:", error);
   process.exitCode = 1;

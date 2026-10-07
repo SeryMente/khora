@@ -27,10 +27,13 @@ type TurnRow = {
   status: "OPEN" | "CLOSED";
   nonce: string;
   si_version: string;
+  si_git_commit_sha: string;
   si_git_blob_sha: string;
   si_sha256: string;
   manifest_sha256: string;
   manifest: unknown[];
+  application_index: number;
+  application_vector: Array<{ folio: string; status: "A" | "N" | "C"; anchor?: string | null; reason_code?: string | null }>;
   opened_at: string;
   closed_at: string | null;
   verified_attempt: number | null;
@@ -55,10 +58,13 @@ async function ensureSchema() {
           "status TEXT NOT NULL CHECK (status IN ('OPEN','CLOSED'))," +
           "nonce TEXT NOT NULL UNIQUE," +
           "si_version TEXT NOT NULL," +
+          "si_git_commit_sha TEXT NOT NULL," +
           "si_git_blob_sha TEXT NOT NULL," +
           "si_sha256 TEXT NOT NULL," +
           "manifest_sha256 TEXT NOT NULL," +
           "manifest JSONB NOT NULL," +
+          "application_index INTEGER NOT NULL DEFAULT 0 CHECK (application_index >= 0)," +
+          "application_vector JSONB NOT NULL DEFAULT '[]'::jsonb," +
           "opened_at TIMESTAMPTZ NOT NULL DEFAULT NOW()," +
           "closed_at TIMESTAMPTZ," +
           "verified_attempt INTEGER" +
@@ -67,6 +73,12 @@ async function ensureSchema() {
       await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS platform TEXT NOT NULL DEFAULT 'ChatGPT'");
       await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS reasoning_mode TEXT NOT NULL DEFAULT 'THINKING'");
       await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS output_format_version TEXT NOT NULL DEFAULT 'v1.7.2'");
+      await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS si_git_commit_sha TEXT NOT NULL DEFAULT 'UNKNOWN'");
+      await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS application_index INTEGER NOT NULL DEFAULT 0");
+      await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS application_vector JSONB NOT NULL DEFAULT '[]'::jsonb");
+      await db.query("ALTER TABLE normative_receipts ADD COLUMN IF NOT EXISTS si_git_commit_sha TEXT NOT NULL DEFAULT 'UNKNOWN'");
+      await db.query("ALTER TABLE normative_receipts ADD COLUMN IF NOT EXISTS order_verified BOOLEAN NOT NULL DEFAULT FALSE");
+      await db.query("ALTER TABLE normative_receipts ADD COLUMN IF NOT EXISTS application_log_sha256 TEXT NOT NULL DEFAULT ''");
       await db.query("CREATE INDEX IF NOT EXISTS normative_turns_opened_at_idx ON normative_turns (opened_at DESC)");
       await db.query("CREATE INDEX IF NOT EXISTS normative_turns_status_idx ON normative_turns (status, opened_at DESC)");
     })().catch((error) => {
@@ -100,7 +112,7 @@ function cycleIdFor(conversationId: string | null, turnNumber: number | null): s
 
 function issueTurnToken(
   actor: string,
-  row: Pick<TurnRow, "cycle_id" | "current_attempt" | "nonce" | "si_sha256" | "manifest_sha256">,
+  row: Pick<TurnRow, "cycle_id" | "current_attempt" | "nonce" | "si_git_commit_sha" | "si_sha256" | "manifest_sha256">,
   config: NonNullable<ReturnType<typeof getMcpConfig>>,
   gen: number,
   runtime: NormativeRuntimeContext,
@@ -120,6 +132,7 @@ function issueTurnToken(
       turn_cycle_id: row.cycle_id,
       turn_attempt: row.current_attempt,
       turn_nonce: row.nonce,
+      turn_si_git_commit_sha: row.si_git_commit_sha,
       turn_si_sha256: row.si_sha256,
       turn_manifest_sha256: row.manifest_sha256,
       turn_platform: runtime.platform,
@@ -180,6 +193,7 @@ export async function releaseNormativeTurn(actor: string, input: { turn_token: s
     token.sub !== actor ||
     typeof token.turn_cycle_id !== "string" ||
     typeof token.turn_nonce !== "string" ||
+    typeof token.turn_si_git_commit_sha !== "string" ||
     !Number.isSafeInteger(token.turn_attempt)
   ) {
     throw new Error("TURN_TOKEN_CLAIMS_INVALID");
@@ -193,7 +207,11 @@ export async function releaseNormativeTurn(actor: string, input: { turn_token: s
   if (turn.actor !== actor) throw new Error("TURN_ACTOR_MISMATCH");
   if (turn.status !== "CLOSED") throw new Error("TURN_NOT_VERIFIED");
   if (turn.verified_attempt !== turn.current_attempt) throw new Error("TURN_VERIFIED_ATTEMPT_MISMATCH");
-  if (token.turn_nonce !== turn.nonce || token.turn_attempt !== turn.current_attempt) {
+  if (
+    token.turn_nonce !== turn.nonce ||
+    token.turn_attempt !== turn.current_attempt ||
+    token.turn_si_git_commit_sha !== turn.si_git_commit_sha
+  ) {
     throw new Error("TURN_TOKEN_STATE_MISMATCH");
   }
 
@@ -202,12 +220,19 @@ export async function releaseNormativeTurn(actor: string, input: { turn_token: s
     status: string;
     output_sha256: string;
     evidence_sha256: string;
+    order_verified: boolean;
+    application_log_sha256: string;
+    si_git_commit_sha: string;
   }>(
-    "SELECT status, output_sha256, evidence_sha256 FROM normative_receipts WHERE cycle_id = $1 AND attempt = $2 LIMIT 1",
+    "SELECT status, output_sha256, evidence_sha256, order_verified, application_log_sha256, si_git_commit_sha FROM normative_receipts WHERE cycle_id = $1 AND attempt = $2 LIMIT 1",
     [turn.cycle_id, turn.verified_attempt]
   );
   const row = receipt.rows[0];
   if (!row || row.status !== "VERIFIED") throw new Error("TURN_VERIFICATION_RECORD_MISSING");
+  if (row.order_verified !== true || !/^[a-f0-9]{64}$/.test(row.application_log_sha256)) {
+    throw new Error("TURN_VERIFICATION_EVIDENCE_INCOMPLETE");
+  }
+  if (row.si_git_commit_sha !== turn.si_git_commit_sha) throw new Error("TURN_RELEASE_SNAPSHOT_MISMATCH");
 
   const releaseToken = issueReleaseToken(actor, turn, row.output_sha256, row.evidence_sha256, config, gen);
   return {
@@ -217,6 +242,9 @@ export async function releaseNormativeTurn(actor: string, input: { turn_token: s
     attempt: turn.current_attempt,
     output_sha256: row.output_sha256,
     evidence_sha256: row.evidence_sha256,
+    application_log_sha256: row.application_log_sha256,
+    order_verified: row.order_verified,
+    si_git_commit_sha: row.si_git_commit_sha,
     release_token: releaseToken,
     expires_in_seconds: RELEASE_TTL_SECONDS,
   };
@@ -226,7 +254,7 @@ async function readTurn(cycleId: string): Promise<TurnRow | null> {
   const db = getDb();
   const result = await db.query<TurnRow>(
     "SELECT cycle_id, conversation_id, turn_number, actor, platform, reasoning_mode, output_format_version, current_attempt, status, nonce, " +
-      "si_version, si_git_blob_sha, si_sha256, manifest_sha256, manifest, opened_at, closed_at, verified_attempt " +
+      "si_version, si_git_commit_sha, si_git_blob_sha, si_sha256, manifest_sha256, manifest, application_index, application_vector, opened_at, closed_at, verified_attempt " +
       "FROM normative_turns WHERE cycle_id = $1 LIMIT 1",
     [cycleId]
   );
@@ -281,6 +309,7 @@ export async function openNormativeTurn(
       },
       snapshot: {
         version: existing.si_version,
+        git_commit_sha: existing.si_git_commit_sha,
         git_blob_sha: existing.si_git_blob_sha,
         sha256: existing.si_sha256,
         manifest_sha256: existing.manifest_sha256,
@@ -288,8 +317,8 @@ export async function openNormativeTurn(
       },
       verifier: {
         protocol: "NORM-CHECK",
-        protocol_version: "v0.4.0",
-        verifier_version: "norm-check/0.4.0",
+        protocol_version: "v0.5.0",
+        verifier_version: "norm-check/0.5.0",
       },
     };
   }
@@ -301,11 +330,11 @@ export async function openNormativeTurn(
   const inserted = await db.query<TurnRow>(
     "INSERT INTO normative_turns (" +
       "cycle_id, conversation_id, turn_number, actor, platform, reasoning_mode, output_format_version, current_attempt, status, nonce, " +
-      "si_version, si_git_blob_sha, si_sha256, manifest_sha256, manifest" +
-      ") VALUES ($1,$2,$3,$4,$5,$6,$7,1,'OPEN',$8,$9,$10,$11,$12,$13) " +
+      "si_version, si_git_commit_sha, si_git_blob_sha, si_sha256, manifest_sha256, manifest, application_index, application_vector" +
+      ") VALUES ($1,$2,$3,$4,$5,$6,$7,1,'OPEN',$8,$9,$10,$11,$12,$13,$14,0,$15) " +
       "ON CONFLICT (cycle_id) DO NOTHING " +
       "RETURNING cycle_id, conversation_id, turn_number, actor, platform, reasoning_mode, output_format_version, current_attempt, status, nonce, " +
-      "si_version, si_git_blob_sha, si_sha256, manifest_sha256, manifest, opened_at, closed_at, verified_attempt",
+      "si_version, si_git_commit_sha, si_git_blob_sha, si_sha256, manifest_sha256, manifest, application_index, application_vector, opened_at, closed_at, verified_attempt",
     [
       cycleId,
       conversationId || cycleId,
@@ -316,10 +345,12 @@ export async function openNormativeTurn(
       input.runtime.output_format_version,
       nonce,
       snapshot.version,
+      snapshot.gitCommitSha,
       snapshot.gitBlobSha,
       snapshot.sha256,
       snapshot.manifestSha256,
       JSON.stringify(snapshot.manifest),
+      JSON.stringify([]),
     ]
   );
 
@@ -341,6 +372,7 @@ export async function openNormativeTurn(
     },
     snapshot: {
       version: row.si_version,
+      git_commit_sha: row.si_git_commit_sha,
       git_blob_sha: row.si_git_blob_sha,
       sha256: row.si_sha256,
       manifest_sha256: row.manifest_sha256,
@@ -348,10 +380,120 @@ export async function openNormativeTurn(
     },
     verifier: {
       protocol: "NORM-CHECK",
-      protocol_version: "v0.4.0",
-      verifier_version: "norm-check/0.4.0",
+      protocol_version: "v0.5.0",
+      verifier_version: "norm-check/0.5.0",
     },
   };
+}
+
+export async function applyNormativePrinciple(
+  actor: string,
+  input: {
+    turn_token: string;
+    folio: string;
+    status: "A" | "N" | "C";
+    anchor?: string | null;
+    reason_code?: string | null;
+  },
+) {
+  if (!validActor(actor)) throw new Error("TURN_ACTOR_INVALID");
+  if (!input || typeof input.turn_token !== "string" || input.turn_token.length < 16) {
+    throw new Error("TURN_TOKEN_INVALID");
+  }
+  if (!/^P\d{3}$/.test(input.folio)) throw new Error("PRINCIPLE_FOLIO_INVALID");
+  if (input.status === "A" || input.status === "C") {
+    if (typeof input.anchor !== "string" || !/^[A-Za-z][A-Za-z0-9._:-]{0,63}$/.test(input.anchor)) {
+      throw new Error("PRINCIPLE_ANCHOR_REQUIRED");
+    }
+  }
+  if (input.status === "N") {
+    if (typeof input.reason_code !== "string" || !/^[A-Z0-9_:-]{1,32}$/.test(input.reason_code)) {
+      throw new Error("PRINCIPLE_REASON_CODE_REQUIRED");
+    }
+  }
+
+  await ensureSchema();
+  const config = getMcpConfig();
+  if (!config) throw new Error("MCP_CONFIG_MISSING");
+  const tokenResult = verifyJwtDetailed(input.turn_token, config.jwtSecret);
+  if (!tokenResult.ok) throw tokenFailure("TURN_TOKEN_" + tokenResult.error.toUpperCase());
+
+  const token = tokenResult.payload;
+  const gen = await obtenerGeneracionRevocacion(actor);
+  const tokenScopes = typeof token.scope === "string" ? token.scope.split(/\s+/).filter(Boolean) : [];
+  if (
+    token.token_kind !== TURN_TOKEN_KIND ||
+    !tokenScopes.includes("norm:turn") ||
+    token.iss !== config.issuer ||
+    token.aud !== config.canonicalUrl ||
+    token.sub !== actor ||
+    token.gen !== gen ||
+    typeof token.turn_cycle_id !== "string" ||
+    !Number.isSafeInteger(token.turn_attempt) ||
+    typeof token.turn_nonce !== "string" ||
+    typeof token.turn_si_git_commit_sha !== "string" ||
+    typeof token.turn_si_sha256 !== "string" ||
+    typeof token.turn_manifest_sha256 !== "string" ||
+    token.turn_platform !== REQUIRED_PLATFORM ||
+    typeof token.turn_reasoning_mode !== "string" ||
+    token.turn_output_format_version !== REQUIRED_OUTPUT_FORMAT_VERSION
+  ) throw new Error("TURN_TOKEN_CLAIMS_INVALID");
+
+  const db = getDb();
+  const client = await db.connect();
+  try {
+    await client.query("BEGIN");
+    const result = await client.query<TurnRow>(
+      "SELECT cycle_id, conversation_id, turn_number, actor, platform, reasoning_mode, output_format_version, current_attempt, status, nonce, " +
+        "si_version, si_git_commit_sha, si_git_blob_sha, si_sha256, manifest_sha256, manifest, application_index, application_vector, opened_at, closed_at, verified_attempt " +
+        "FROM normative_turns WHERE cycle_id = $1 FOR UPDATE",
+      [token.turn_cycle_id],
+    );
+    const turn = result.rows[0];
+    if (!turn) throw new Error("TURN_NOT_FOUND");
+    if (turn.actor !== actor) throw new Error("TURN_ACTOR_MISMATCH");
+    if (turn.status !== "OPEN") throw new Error("TURN_NOT_OPEN");
+    if (token.turn_attempt !== turn.current_attempt || token.turn_nonce !== turn.nonce || token.turn_si_sha256 !== turn.si_sha256 || token.turn_manifest_sha256 !== turn.manifest_sha256 || token.turn_si_git_commit_sha !== turn.si_git_commit_sha) {
+      throw new Error("TURN_TOKEN_STATE_MISMATCH");
+    }
+    if (token.turn_platform !== turn.platform || token.turn_reasoning_mode !== turn.reasoning_mode || token.turn_output_format_version !== turn.output_format_version) {
+      throw new Error("TURN_RUNTIME_PERSISTENCE_MISMATCH");
+    }
+
+    if (turn.application_index >= turn.manifest.length) throw new Error("PRINCIPLES_ALREADY_COMPLETE");
+    const expected = turn.manifest[turn.application_index] as { folio?: string };
+    if (!expected?.folio || expected.folio !== input.folio) throw new Error("PRINCIPLE_ORDER_MISMATCH");
+
+    const entry = {
+      folio: input.folio,
+      status: input.status,
+      anchor: input.status === "N" ? null : input.anchor || null,
+      reason_code: input.status === "N" ? input.reason_code || null : null,
+    };
+    await client.query(
+      "UPDATE normative_turns SET application_index = application_index + 1, application_vector = application_vector || $2::jsonb WHERE cycle_id = $1",
+      [turn.cycle_id, JSON.stringify([entry])],
+    );
+
+    await client.query("COMMIT");
+    const nextIndex = turn.application_index + 1;
+    const next = nextIndex < turn.manifest.length ? turn.manifest[nextIndex] : null;
+    return {
+      ok: true,
+      cycle_id: turn.cycle_id,
+      attempt: turn.current_attempt,
+      applied: entry,
+      sequence: nextIndex,
+      total: turn.manifest.length,
+      complete: next === null,
+      next_principle: next,
+    };
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
 }
 
 export async function assertNormativeTurnOpen(
@@ -378,6 +520,7 @@ export async function assertNormativeTurnOpen(
     token.sub !== actor ||
     typeof token.turn_cycle_id !== "string" ||
     typeof token.turn_nonce !== "string" ||
+    typeof token.turn_si_git_commit_sha !== "string" ||
     !Number.isSafeInteger(token.turn_attempt) ||
     typeof token.turn_si_sha256 !== "string" ||
     typeof token.turn_manifest_sha256 !== "string" ||
@@ -398,6 +541,7 @@ export async function assertNormativeTurnOpen(
   if (
     token.turn_nonce !== turn.nonce ||
     token.turn_attempt !== turn.current_attempt ||
+    token.turn_si_git_commit_sha !== turn.si_git_commit_sha ||
     token.turn_si_sha256 !== turn.si_sha256 ||
     token.turn_manifest_sha256 !== turn.manifest_sha256
   ) throw new Error("TURN_TOKEN_STATE_MISMATCH");
@@ -431,9 +575,13 @@ export async function verifyNormativeTurn(
     token.sub !== actor ||
     typeof token.turn_cycle_id !== "string" ||
     typeof token.turn_nonce !== "string" ||
+    typeof token.turn_si_git_commit_sha !== "string" ||
     !Number.isSafeInteger(token.turn_attempt) ||
     typeof token.turn_si_sha256 !== "string" ||
-    typeof token.turn_manifest_sha256 !== "string"
+    typeof token.turn_manifest_sha256 !== "string" ||
+    token.turn_platform !== REQUIRED_PLATFORM ||
+    typeof token.turn_reasoning_mode !== "string" ||
+    token.turn_output_format_version !== REQUIRED_OUTPUT_FORMAT_VERSION
   ) {
     throw new Error("TURN_TOKEN_CLAIMS_INVALID");
   }
@@ -449,7 +597,7 @@ export async function verifyNormativeTurn(
     const db = getDb();
     const existingReceipt = await db.query(
       "SELECT id, status, integrity, coverage_expected, coverage_evaluated, coverage_missing, " +
-        "coverage_duplicates, coverage_unknown, reasons, si_version, si_sha256, manifest_sha256, " +
+        "coverage_duplicates, coverage_unknown, order_verified, application_log_sha256, reasons, si_version, si_git_commit_sha, si_sha256, manifest_sha256, " +
         "evidence_sha256, verifier_version, created_at " +
         "FROM normative_receipts WHERE cycle_id = $1 AND attempt = $2 LIMIT 1",
       [turn.cycle_id, token.turn_attempt]
@@ -468,8 +616,11 @@ export async function verifyNormativeTurn(
           status: existingReceipt.rows[0].status,
           evidence_sha256: existingReceipt.rows[0].evidence_sha256,
           si_version: existingReceipt.rows[0].si_version,
+          si_git_commit_sha: existingReceipt.rows[0].si_git_commit_sha,
           si_sha256: existingReceipt.rows[0].si_sha256,
           manifest_sha256: existingReceipt.rows[0].manifest_sha256,
+          order_verified: existingReceipt.rows[0].order_verified,
+          application_log_sha256: existingReceipt.rows[0].application_log_sha256,
           verifier_version: existingReceipt.rows[0].verifier_version,
           recorded_at: existingReceipt.rows[0].created_at,
           receipt_id: existingReceipt.rows[0].id,
@@ -482,6 +633,7 @@ export async function verifyNormativeTurn(
   if (
     token.turn_nonce !== turn.nonce ||
     token.turn_attempt !== turn.current_attempt ||
+    token.turn_si_git_commit_sha !== turn.si_git_commit_sha ||
     token.turn_si_sha256 !== turn.si_sha256 ||
     token.turn_manifest_sha256 !== turn.manifest_sha256
   ) {
@@ -489,7 +641,10 @@ export async function verifyNormativeTurn(
   }
 
   const receipt = input.receipt;
-  if (!receipt || receipt.cycle?.id !== turn.cycle_id) throw new Error("TURN_RECEIPT_CYCLE_MISMATCH");
+  if (!receipt || typeof receipt !== "object" || !receipt.cycle || !receipt.si || !receipt.runtime) {
+    throw new Error("TURN_RECEIPT_SCHEMA_INVALID");
+  }
+  if (receipt.cycle?.id !== turn.cycle_id) throw new Error("TURN_RECEIPT_CYCLE_MISMATCH");
   if (receipt.cycle.attempt !== turn.current_attempt) throw new Error("TURN_RECEIPT_ATTEMPT_MISMATCH");
   if (receipt.nonce !== turn.nonce) throw new Error("TURN_RECEIPT_NONCE_MISMATCH");
   if (receipt.runtime.platform !== token.turn_platform || receipt.runtime.reasoning_mode !== token.turn_reasoning_mode || receipt.runtime.output_format_version !== token.turn_output_format_version) {
@@ -498,11 +653,14 @@ export async function verifyNormativeTurn(
   if (receipt.runtime.platform !== turn.platform || receipt.runtime.reasoning_mode !== turn.reasoning_mode || receipt.runtime.output_format_version !== turn.output_format_version) {
     throw new Error("TURN_RUNTIME_PERSISTENCE_MISMATCH");
   }
-  if (receipt.si?.sha256 !== turn.si_sha256 || receipt.si?.manifest_sha256 !== turn.manifest_sha256) {
+  if (
+    receipt.si?.git_commit_sha !== turn.si_git_commit_sha ||
+    receipt.si?.git_blob_sha !== turn.si_git_blob_sha ||
+    receipt.si?.sha256 !== turn.si_sha256 ||
+    receipt.si?.manifest_sha256 !== turn.manifest_sha256
+  ) {
     throw new Error("TURN_RECEIPT_SNAPSHOT_MISMATCH");
   }
-
-  const result = await verifyNormativeReceipt(receipt);
 
   const db = getDb();
   const client = await db.connect();
@@ -511,7 +669,7 @@ export async function verifyNormativeTurn(
 
     const locked = await client.query<TurnRow>(
       "SELECT cycle_id, conversation_id, turn_number, actor, platform, reasoning_mode, output_format_version, current_attempt, status, nonce, " +
-        "si_version, si_git_blob_sha, si_sha256, manifest_sha256, manifest, opened_at, closed_at, verified_attempt " +
+        "si_version, si_git_commit_sha, si_git_blob_sha, si_sha256, manifest_sha256, manifest, application_index, application_vector, opened_at, closed_at, verified_attempt " +
         "FROM normative_turns WHERE cycle_id = $1 FOR UPDATE",
       [turn.cycle_id]
     );
@@ -519,14 +677,23 @@ export async function verifyNormativeTurn(
     if (!current) throw new Error("TURN_NOT_FOUND");
     if (current.status === "CLOSED") throw new Error("TURN_ALREADY_CLOSED");
     if (current.current_attempt !== receipt.cycle.attempt) throw new Error("TURN_ATTEMPT_CHANGED");
+    if (current.application_index !== current.manifest.length || current.application_vector.length !== current.manifest.length) {
+      throw new Error("TURN_PRINCIPLES_INCOMPLETE");
+    }
+    const ledgerOrderValid = current.application_vector.every((entry, index) => {
+      const expected = current.manifest[index] as { folio?: string } | undefined;
+      return expected?.folio === entry.folio;
+    });
+    if (!ledgerOrderValid) throw new Error("TURN_APPLICATION_LEDGER_INVALID");
 
+    const result = await verifyNormativeReceipt(receipt, current.application_vector);
     const insert = await client.query(
       "INSERT INTO normative_receipts (" +
         "cycle_id, attempt, protocol, protocol_version, si_version, si_git_blob_sha, si_sha256, " +
         "manifest_sha256, input_sha256, nonce, output_sha256, evidence_sha256, status, integrity, " +
         "coverage_expected, coverage_evaluated, coverage_missing, coverage_duplicates, coverage_unknown, " +
-        "reasons, receipt, verifier_version" +
-      ") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22) " +
+        "order_verified, application_log_sha256, reasons, receipt, verifier_version, si_git_commit_sha" +
+      ") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25) " +
       "RETURNING id, created_at",
       [
         receipt.cycle.id,
@@ -548,9 +715,12 @@ export async function verifyNormativeTurn(
         result.coverage.missing,
         result.coverage.duplicates,
         result.coverage.unknown,
+        result.order_verified,
+        result.application_log_sha256,
         JSON.stringify(result.reasons),
         JSON.stringify(receipt),
-        "norm-check/0.4.0",
+        "norm-check/0.5.0",
+        receipt.si.git_commit_sha,
       ]
     );
 
@@ -561,7 +731,7 @@ export async function verifyNormativeTurn(
       );
     } else {
       await client.query(
-        "UPDATE normative_turns SET current_attempt = current_attempt + 1 WHERE cycle_id = $1",
+        "UPDATE normative_turns SET current_attempt = current_attempt + 1, application_index = 0, application_vector = '[]'::jsonb WHERE cycle_id = $1",
         [current.cycle_id]
       );
     }
@@ -583,7 +753,10 @@ export async function verifyNormativeTurn(
         si_version: receipt.si.version,
         si_sha256: receipt.si.sha256,
         manifest_sha256: receipt.si.manifest_sha256,
-        verifier_version: "norm-check/0.4.0",
+        order_verified: result.order_verified,
+        application_log_sha256: result.application_log_sha256,
+        si_git_commit_sha: receipt.si.git_commit_sha,
+        verifier_version: "norm-check/0.5.0",
         recorded_at: insert.rows[0].created_at,
         receipt_id: insert.rows[0].id,
       }),
@@ -593,7 +766,7 @@ export async function verifyNormativeTurn(
     if ((error as { code?: string })?.code === "23505") {
       const existing = await db.query(
         "SELECT id, status, integrity, coverage_expected, coverage_evaluated, coverage_missing, " +
-          "coverage_duplicates, coverage_unknown, reasons, si_version, si_sha256, manifest_sha256, " +
+          "coverage_duplicates, coverage_unknown, order_verified, application_log_sha256, reasons, si_version, si_git_commit_sha, si_sha256, manifest_sha256, " +
           "evidence_sha256, verifier_version, created_at " +
           "FROM normative_receipts WHERE cycle_id = $1 AND attempt = $2 LIMIT 1",
         [receipt.cycle.id, receipt.cycle.attempt]
@@ -612,8 +785,11 @@ export async function verifyNormativeTurn(
             status: existing.rows[0].status,
             evidence_sha256: existing.rows[0].evidence_sha256,
             si_version: existing.rows[0].si_version,
+            si_git_commit_sha: existing.rows[0].si_git_commit_sha,
             si_sha256: existing.rows[0].si_sha256,
             manifest_sha256: existing.rows[0].manifest_sha256,
+            order_verified: existing.rows[0].order_verified,
+            application_log_sha256: existing.rows[0].application_log_sha256,
             verifier_version: existing.rows[0].verifier_version,
             recorded_at: existing.rows[0].created_at,
             receipt_id: existing.rows[0].id,

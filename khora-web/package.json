@@ -9,7 +9,7 @@
     "start": "next start",
     "e2e": "playwright test",
     "e2e:report": "playwright show-report",
-    "test:unit": "tsx --import ./tests/unit/setup.ts --test tests/unit/*.test.ts",
+    "test:unit": "node scripts/run_unit_tests.mjs",
     "typecheck": "tsc --noEmit",
     "ui-review:check": "tsx scripts/check_ui_review.ts",
     "ui-review:export": "tsx scripts/export_ui_review.ts",
