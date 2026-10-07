@@ -1,0 +1,76 @@
+name: Integrity Manifest Refresh
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Refresh declared integrity scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          manifest="ep-integrity-manifest.sha256"
+          paths=(
+            "UI_REVIEW.md"
+            ".github/workflows/ci.yml"
+            ".github/workflows/ui-quality.yml"
+            "khora-web/app/components/AutoLockProvider.tsx"
+            "khora-web/app/components/GlobalFooter.tsx"
+            "khora-web/app/components/os/ThemeToggle.tsx"
+            "khora-web/app/herramientas/bitacora/page.tsx"
+            "khora-web/app/herramientas/page.tsx"
+            "khora-web/app/ui-review/[screen]/estatico/page.tsx"
+            "khora-web/e2e/contracts/theme-toggle.spec.ts"
+            "khora-web/e2e/ui-quality.spec.ts"
+            "khora-web/package.json"
+            "khora-web/playwright.config.ts"
+            "khora-web/scripts/check_navigation_contract.ts"
+            "khora-web/scripts/check_ui_review.ts"
+            "khora-web/tests/unit/system_navigation.test.ts"
+            "khora-web/tests/unit/ui_review.test.ts"
+            "khora-web/tests/unit/ui_review_drift.test.ts"
+            "khora-web/docs/system-navigation.md"
+          )
+
+          for path in "${paths[@]}"; do
+            test -f "$path" || { echo "Missing integrity target: $path" >&2; exit 1; }
+            if ! grep -qF "  $path" "$manifest"; then
+              sha256sum "$path" >> "${manifest}.tmp"
+              awk -v p="$path" '{print $0}' "${manifest}.tmp" >/dev/null
+            fi
+          done
+
+          if test -f "${manifest}.tmp"; then
+            cat "${manifest}.tmp" >> "$manifest"
+            rm -f "${manifest}.tmp"
+          fi
+
+          sort -u "$manifest" > "${manifest}.sorted"
+          mv "${manifest}.sorted" "$manifest"
+
+          bash scripts/generar_manifiesto_integridad.sh
+
+      - name: Commit manifest when changed
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- ep-integrity-manifest.sha256; then
+            echo "Integrity manifest already current."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ep-integrity-manifest.sha256
+          git commit -m "chore: refresh integrity manifest"
+          git push
