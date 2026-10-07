@@ -1,74 +1,81 @@
-// @l0 L0-002 · @req UI-REVIEW/CHECK · Guardia de integridad de escenarios y componentes compartidos
+// @l0 L0-002 · @req UI-REVIEW/CHECK · Guardia de integridad de escenarios, componentes y prerender
+
 import { SCREENS, UI_REVIEW_SCENARIOS } from "../lib/ui-review/registry";
-import { ScreenId } from "../lib/ui-review/types";
+import { VIEWPORTS } from "../lib/ui-review/types";
 import fs from "fs";
 import path from "path";
 
 async function main() {
-  console.log("🔍 Verificando integridad del Harness UI Review...");
+  console.log("🔍 Verificando contrato UI Review completo...");
 
   let errors = 0;
-
-  // 1. Verificación de pantallas
-  if (!SCREENS || SCREENS.length === 0) {
-    console.error("❌ Error: No se encontraron pantallas definidas en SCREENS.");
+  const fail = (message: string) => {
+    console.error("❌ " + message);
     errors++;
-  } else {
-    console.log(`✓ Registradas ${SCREENS.length} pantallas: ${SCREENS.join(", ")}`);
-  }
+  };
 
-  // 2. Cobertura de escenarios por pantalla
+  if (!SCREENS.length) fail("SCREENS está vacío.");
+  if (!Object.keys(UI_REVIEW_SCENARIOS).length) fail("No existen escenarios registrados.");
+
+  const seenScenarioKeys = new Set<string>();
   for (const screen of SCREENS) {
-    const scenariosForScreen = Object.values(UI_REVIEW_SCENARIOS).filter((s) => s.screen === screen);
-    if (scenariosForScreen.length === 0) {
-      console.error(`❌ Error: La pantalla '${screen}' no tiene escenarios registrados.`);
-      errors++;
-    } else {
-      console.log(`  - Pantalla '${screen}': ${scenariosForScreen.length} escenarios.`);
-    }
+    const scenarios = Object.values(UI_REVIEW_SCENARIOS).filter((scenario) => scenario.screen === screen);
+    if (!scenarios.length) fail("La pantalla '" + screen + "' no tiene escenarios.");
   }
 
-  // 3. Verificación de ui_ids y metadatos en cada escenario
-  for (const [key, sc] of Object.entries(UI_REVIEW_SCENARIOS)) {
-    if (!sc.screen || !sc.scenario || !sc.title || !sc.description) {
-      console.error(`❌ Error en escenario '${key}': Faltan campos obligatorios.`);
-      errors++;
-    }
-    if (!Array.isArray(sc.ui_ids) || sc.ui_ids.length === 0) {
-      console.error(`❌ Error en escenario '${key}': Lista 'ui_ids' vacía o inválida.`);
-      errors++;
-    }
+  for (const [key, scenario] of Object.entries(UI_REVIEW_SCENARIOS)) {
+    if (seenScenarioKeys.has(key)) fail("Escenario duplicado: " + key);
+    seenScenarioKeys.add(key);
+
+    if (!scenario.screen || !SCREENS.includes(scenario.screen)) fail("Escenario con pantalla inválida: " + key);
+    if (!scenario.scenario || !scenario.title || !scenario.description) fail("Escenario incompleto: " + key);
+    if (!Array.isArray(scenario.ui_ids) || scenario.ui_ids.length === 0) fail("Escenario sin ui_ids: " + key);
+    if (!VIEWPORTS[scenario.recommended_viewport]) fail("Viewport inválido en: " + key);
   }
 
-  // 4. Verificación de regla anti-duplicación (Componentes Compartidos)
   const sharedDir = path.join(process.cwd(), "app", "components", "shared");
-  const expectedSharedComponents = [
+  const requiredSharedComponents = [
     "IngresoView.tsx",
     "PipelineView.tsx",
     "RegistroView.tsx",
     "GrafoView.tsx",
+    "ConsultaView.tsx",
+    "KpiPanelView.tsx",
   ];
 
-  for (const comp of expectedSharedComponents) {
-    const fullPath = path.join(sharedDir, comp);
-    if (!fs.existsSync(fullPath)) {
-      console.error(`❌ Error Anti-Duplicación: Falta componente compartido obligatorio '${comp}' en app/components/shared.`);
-      errors++;
-    } else {
-      console.log(`✓ Componente compartido verificado: ${comp}`);
+  for (const component of requiredSharedComponents) {
+    if (!fs.existsSync(path.join(sharedDir, component))) fail("Falta componente compartido: " + component);
+  }
+
+  const registeredUiIds = new Set<string>();
+  for (const scenario of Object.values(UI_REVIEW_SCENARIOS)) {
+    for (const id of scenario.ui_ids) registeredUiIds.add(id);
+  }
+
+  const uiIdPattern = /data-ui-id=["'`]([^"'`{}]+)["'`]/g;
+  for (const fileName of requiredSharedComponents) {
+    const content = fs.readFileSync(path.join(sharedDir, fileName), "utf8");
+    let match: RegExpExecArray | null;
+    while ((match = uiIdPattern.exec(content)) !== null) {
+      if (!registeredUiIds.has(match[1])) fail("data-ui-id sin registro: " + match[1] + " en " + fileName);
     }
   }
 
+  const staticScreenPage = path.join(process.cwd(), "app", "ui-review", "[screen]", "estatico", "page.tsx");
+  if (!fs.existsSync(staticScreenPage)) fail("Falta el prerender /ui-review/[screen]/estatico.");
+
+  const manifestRoute = path.join(process.cwd(), "app", "ui-review", "manifest.json", "route.ts");
+  if (!fs.existsSync(manifestRoute)) fail("Falta la ruta de manifest de UI Review.");
+
   if (errors > 0) {
-    console.error(`\n❌ Falló la verificación con ${errors} error(es).`);
+    console.error("\n❌ UI Review rechazado: " + errors + " error(es).");
     process.exit(1);
   }
 
-  console.log("\n✅ UI Review integrity check exitoso: 0 errores.");
-  process.exit(0);
+  console.log("\n✅ UI Review íntegro: escenarios, ui_ids, componentes compartidos y prerender presentes.");
 }
 
-main().catch((err) => {
-  console.error("Fallo inesperado en check:", err);
+main().catch((error) => {
+  console.error("Fallo inesperado en UI Review:", error);
   process.exit(1);
 });
