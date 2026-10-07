@@ -5,6 +5,8 @@ import { getMcpConfig } from "./mcp-config";
 import { signJwt, verifyJwtDetailed } from "./jwt";
 import {
   getCurrentSiSnapshot,
+  loadSiSnapshot,
+  buildCanonicalSiOutputHeader,
   verifyNormativeReceipt,
   type NormativeReceipt,
   buildCycleVerificationRecord,
@@ -300,6 +302,8 @@ export async function openNormativeTurn(
     if (existing.status === "CLOSED") throw new Error("TURN_ALREADY_CLOSED");
     if (existing.platform !== input.runtime.platform || existing.reasoning_mode !== input.runtime.reasoning_mode || existing.output_format_version !== input.runtime.output_format_version) {
       throw new Error("TURN_RUNTIME_MISMATCH");
+
+     const existingSnapshot = await loadSiSnapshot(existing.si_git_blob_sha, existing.si_git_commit_sha);
     }
 
     const gen = await obtenerGeneracionRevocacion(actor);
@@ -316,6 +320,9 @@ export async function openNormativeTurn(
       },
       snapshot: {
         version: existing.si_version,
+         version_name: existingSnapshot.versionName,
+         last_updated_at: existingSnapshot.canonicalUpdatedAt,
+         output_header: buildCanonicalSiOutputHeader(existingSnapshot, existing.opened_at),
         git_commit_sha: existing.si_git_commit_sha,
         git_blob_sha: existing.si_git_blob_sha,
         sha256: existing.si_sha256,
@@ -379,6 +386,9 @@ export async function openNormativeTurn(
     },
     snapshot: {
       version: row.si_version,
+       version_name: snapshot.versionName,
+       last_updated_at: snapshot.canonicalUpdatedAt,
+       output_header: buildCanonicalSiOutputHeader(snapshot, row.opened_at),
       git_commit_sha: row.si_git_commit_sha,
       git_blob_sha: row.si_git_blob_sha,
       sha256: row.si_sha256,
