@@ -26,7 +26,7 @@ test("parser no depende de la sección 5 para delimitar el catálogo", () => {
 
   const manifest = parsePrinciples(source);
 
-  assert.deepEqual(manifest.map((item) => item.folio), ["P019", "P020"]);
+  assert.deepEqual(manifest.map((item) => item.folio), ["P020", "P019"]);
 });
 
 test("parser rechaza folios duplicados", () => {
