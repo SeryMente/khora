@@ -17,9 +17,10 @@ import {
 } from "@/lib/server/mcp-tools";
 import { toolKhoraUiReview } from "@/lib/server/mcp-ui-review";
 import { toolKhoraEstadoVivo, toolKhoraEventosRecientes, toolKhoraObservacionInstantanea, toolKhoraEventosDesde } from "@/lib/server/mcp-observability";
-import { assertNormativeTurnOpen, openNormativeTurn, verifyNormativeTurn } from "@/lib/server/mcp-normative";
+import { assertNormativeTurnOpen, openNormativeTurn, verifyNormativeTurn, releaseNormativeTurn } from "@/lib/server/mcp-normative";
 import { authenticateManualMcpToken, MANUAL_MCP_TOKEN_PREFIX } from "@/lib/server/mcp-manual-token";
 import { registrarEventoServicio } from "@/lib/server/service-observability";
+import { getCurrentSiSnapshot, getCurrentVerifierInfo } from "@/lib/server/norm-check";
 
 export const runtime = "nodejs";
 
@@ -248,7 +249,7 @@ async function handleMcpRequest(req: NextRequest) {
       }
     };
 
-    if (name === "khora_norm_open_turn" || name === "khora_norm_verify_turn") {
+    if (name === "khora_mcp_health" || name === "khora_norm_open_turn" || name === "khora_norm_verify_turn" || name === "khora_norm_release_turn") {
       return mcpServer.tool(name, description, inputSchema, async (args: any) => observedHandler(args, false));
     }
 
@@ -437,6 +438,54 @@ async function handleMcpRequest(req: NextRequest) {
   );
 
 
+  // Health-check discreto del MCP: confirma autenticación, scopes y lectura del SI canónico.
+  gatedTool(
+    "khora_mcp_health",
+    "Comprobación discreta de acceso completo al MCP de KHORA. No ejecuta trabajo sustantivo.",
+    {},
+    async () => {
+      const requiredScopes = ["volcados:read", "runtime:read", "norm:turn"];
+      const missingScopes = requiredScopes.filter((scope) => !scopes.includes(scope));
+      try {
+        const snapshot = await getCurrentSiSnapshot();
+        const verifier = getCurrentVerifierInfo();
+        const fullAccess = missingScopes.length === 0;
+        return {
+          content: [{
+            type: "text",
+            text: JSON.stringify({
+              ok: fullAccess && Boolean(snapshot.version && snapshot.gitBlobSha),
+              status: fullAccess ? "OK" : "DEGRADED",
+              full_access: fullAccess,
+              missing_scopes: missingScopes,
+              protocol: verifier.protocol,
+              protocol_version: verifier.protocol_version,
+              verifier_version: verifier.verifier_version,
+              si_version: snapshot.version,
+              si_sha256: snapshot.sha256,
+              manifest_sha256: snapshot.manifestSha256,
+              tools_contract: "SINGLE_MCP",
+            }),
+          }],
+        };
+      } catch (error) {
+        return {
+          isError: true,
+          content: [{
+            type: "text",
+            text: JSON.stringify({
+              ok: false,
+              status: "UNAVAILABLE",
+              full_access: false,
+              missing_scopes: missingScopes,
+              reason: error instanceof Error ? error.message : "MCP_HEALTH_FAILED",
+            }),
+          }],
+        };
+      }
+    }
+  );
+
   // Gobernanza normativa: misma puerta MCP, capacidad separada por scope.
   gatedTool(
     "khora_norm_open_turn",
@@ -485,10 +534,37 @@ async function handleMcpRequest(req: NextRequest) {
     }
   );
 
+  gatedTool(
+    "khora_norm_release_turn",
+    "Emite una autorización breve de liberación solo para un turno ya VERIFIED. No verifica por segunda vez.",
+    {
+      turn_token: z.string().min(16).describe("Token opaco del ciclo emitido por khora_norm_open_turn"),
+    },
+    async (args: any) => {
+      const denied = requireScope("norm:turn");
+      if (denied) return denied;
+      try {
+        const res = await releaseNormativeTurn(actor, { turn_token: args.turn_token });
+        return { content: [{ type: "text", text: JSON.stringify(res) }] };
+      } catch (error) {
+        return {
+          isError: true,
+          content: [{ type: "text", text: error instanceof Error ? error.message : "TURN_RELEASE_FAILED" }],
+        };
+      }
+    }
+  );
+
   // SDK 1.x no publica securitySchemes en el nivel raíz de tools/list.
   // Publicamos una lista tipada explícita para que ChatGPT pueda detectar OAuth
   // por herramienta, manteniendo las mismas herramientas y esquemas de entrada.
   const toolsList = [
+    {
+      name: "khora_mcp_health",
+      description: "Comprobación discreta de acceso completo al MCP de KHORA. No ejecuta trabajo sustantivo.",
+      inputSchema: { type: "object", properties: {}, additionalProperties: false },
+      securitySchemes: [{ type: "oauth2", scopes: ["volcados:read", "runtime:read", "norm:turn"] }],
+    },
     {
       name: "khora_resumen",
       description: "Conteo por estado, caracteres y rango de fechas.",
@@ -660,10 +736,28 @@ async function handleMcpRequest(req: NextRequest) {
       },
       securitySchemes: [{ type: "oauth2", scopes: ["norm:turn"] }],
     },
+    {
+      name: "khora_norm_release_turn",
+      description: "Emite una autorización de liberación solo para un turno ya VERIFIED.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          turn_token: { type: "string", minLength: 16, description: "Token del ciclo emitido por khora_norm_open_turn" },
+        },
+        required: ["turn_token"],
+        additionalProperties: false,
+      },
+      securitySchemes: [{ type: "oauth2", scopes: ["norm:turn"] }],
+    },
   ] as any;
 
   for (const tool of toolsList) {
-    if (tool.name === "khora_norm_open_turn" || tool.name === "khora_norm_verify_turn") continue;
+    if (
+      tool.name === "khora_mcp_health" ||
+      tool.name === "khora_norm_open_turn" ||
+      tool.name === "khora_norm_verify_turn" ||
+      tool.name === "khora_norm_release_turn"
+    ) continue;
     tool.inputSchema = tool.inputSchema || { type: "object", properties: {} };
     tool.inputSchema.properties = {
       ...(tool.inputSchema.properties || {}),
