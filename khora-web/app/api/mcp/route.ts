@@ -66,10 +66,12 @@ const NORM_OUTPUT_FORMAT_VERSION = z.literal(REQUIRED_OUTPUT_FORMAT_VERSION).des
   "Contrato obligatorio de salida visible por ciclo."
 );
 
-function withNormTurn<T extends z.ZodRawShape>(fields: T): T & { _norm_turn_token: typeof NORM_TURN_TOKEN } {
+function withNormTurn<T extends z.ZodRawShape>(fields: T): T & { _norm_turn_token: typeof NORM_TURN_TOKEN; _thinking_mode: typeof NORM_THINKING_MODE; _output_format_version: typeof NORM_OUTPUT_FORMAT_VERSION } {
   return {
     ...fields,
     _norm_turn_token: NORM_TURN_TOKEN,
+    _thinking_mode: NORM_THINKING_MODE,
+    _output_format_version: NORM_OUTPUT_FORMAT_VERSION,
   };
 }
 
