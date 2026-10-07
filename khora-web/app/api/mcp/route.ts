@@ -772,7 +772,7 @@ async function handleMcpRequest(req: NextRequest) {
           conversation_id: { type: "string" },
           turn_number: { type: "integer", minimum: 1 },
           thinking_mode: { type: "string", enum: ["THINKING"] },
-          output_format_version: { type: "string", enum: ["v1.7.0"] },
+          output_format_version: { type: "string", enum: ["v1.7.1"] },
         },
         required: ["thinking_mode", "output_format_version"],
         additionalProperties: false,
@@ -830,7 +830,7 @@ async function handleMcpRequest(req: NextRequest) {
       },
       _output_format_version: {
         type: "string",
-        enum: ["v1.7.0"],
+        enum: ["v1.7.1"],
         description: "REQUERIDO: contrato de salida visible por ciclo.",
       },
     };
