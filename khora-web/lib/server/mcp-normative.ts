@@ -6,7 +6,10 @@ import { signJwt, verifyJwtDetailed } from "./jwt";
 import {
   getCurrentSiSnapshot,
   loadSiSnapshot,
+  getCurrentMethodologySnapshot,
+  loadMethodologySnapshot,
   buildCanonicalSiOutputHeader,
+  buildCanonicalMethodologyOutputHeader,
   verifyNormativeReceipt,
   type NormativeReceipt,
   buildCycleVerificationRecord,
@@ -82,7 +85,7 @@ async function ensureSchema() {
       );
       await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS platform TEXT NOT NULL DEFAULT 'ChatGPT'");
       await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS reasoning_mode TEXT NOT NULL DEFAULT 'THINKING'");
-      await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS output_format_version TEXT NOT NULL DEFAULT 'v1.7.2'");
+      await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS output_format_version TEXT NOT NULL DEFAULT 'v1.7.3'");
       await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS si_git_commit_sha TEXT NOT NULL DEFAULT 'UNKNOWN'");
       await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS methodology_version TEXT NOT NULL DEFAULT 'UNKNOWN'");
       await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS methodology_git_commit_sha TEXT NOT NULL DEFAULT 'UNKNOWN'");
@@ -244,8 +247,9 @@ export async function releaseNormativeTurn(actor: string, input: { turn_token: s
     order_verified: boolean;
     application_log_sha256: string;
     si_git_commit_sha: string;
+    methodology_git_commit_sha: string;
   }>(
-    "SELECT status, output_sha256, evidence_sha256, order_verified, application_log_sha256, si_git_commit_sha FROM normative_receipts WHERE cycle_id = $1 AND attempt = $2 LIMIT 1",
+    "SELECT status, output_sha256, evidence_sha256, order_verified, application_log_sha256, si_git_commit_sha, methodology_git_commit_sha FROM normative_receipts WHERE cycle_id = $1 AND attempt = $2 LIMIT 1",
     [turn.cycle_id, turn.verified_attempt]
   );
   const row = receipt.rows[0];
@@ -253,7 +257,9 @@ export async function releaseNormativeTurn(actor: string, input: { turn_token: s
   if (row.order_verified !== true || !/^[a-f0-9]{64}$/.test(row.application_log_sha256)) {
     throw new Error("TURN_VERIFICATION_EVIDENCE_INCOMPLETE");
   }
-  if (row.si_git_commit_sha !== turn.si_git_commit_sha) throw new Error("TURN_RELEASE_SNAPSHOT_MISMATCH");
+  if (row.si_git_commit_sha !== turn.si_git_commit_sha || row.methodology_git_commit_sha !== turn.methodology_git_commit_sha) {
+    throw new Error("TURN_RELEASE_SNAPSHOT_MISMATCH");
+  }
 
   const releaseToken = issueReleaseToken(actor, turn, row.output_sha256, row.evidence_sha256, config, gen);
   return {
@@ -354,6 +360,7 @@ export async function openNormativeTurn(
   }
 
   const snapshot = await getCurrentSiSnapshot();
+  const methodologySnapshot = await getCurrentMethodologySnapshot();
   const nonce = generateRandomToken(32);
   const gen = await obtenerGeneracionRevocacion(actor);
 
@@ -361,7 +368,7 @@ export async function openNormativeTurn(
     "INSERT INTO normative_turns (" +
       "cycle_id, conversation_id, turn_number, actor, platform, reasoning_mode, output_format_version, current_attempt, status, nonce, " +
       "si_version, si_git_commit_sha, si_git_blob_sha, si_sha256, manifest_sha256, methodology_version, methodology_git_commit_sha, methodology_git_blob_sha, methodology_sha256, manifest, application_index, application_vector" +
-      ") VALUES ($1,$2,$3,$4,$5,$6,$7,1,'OPEN',$8,$9,$10,$11,$12,$13,$14,0,$15) " +
+      ") VALUES ($1,$2,$3,$4,$5,$6,$7,1,'OPEN',$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,0,$19) " +
       "ON CONFLICT (cycle_id) DO NOTHING " +
       "RETURNING cycle_id, conversation_id, turn_number, actor, platform, reasoning_mode, output_format_version, current_attempt, status, nonce, " +
       "si_version, si_git_commit_sha, si_git_blob_sha, si_sha256, manifest_sha256, methodology_version, methodology_git_commit_sha, methodology_git_blob_sha, methodology_sha256, manifest, application_index, application_vector, opened_at, closed_at, verified_attempt",
@@ -406,9 +413,13 @@ export async function openNormativeTurn(
     },
     snapshot: {
       version: row.si_version,
-       version_name: snapshot.versionName,
-       last_updated_at: snapshot.canonicalUpdatedAt,
-       output_header: buildCanonicalSiOutputHeader(snapshot, row.opened_at),
+      version_name: snapshot.versionName,
+      last_updated_at: snapshot.canonicalUpdatedAt,
+      output_header: buildCanonicalSiOutputHeader(snapshot, row.opened_at),
+      methodology_version: row.methodology_version,
+      methodology_version_name: methodologySnapshot.versionName,
+      methodology_last_updated_at: methodologySnapshot.canonicalUpdatedAt,
+      methodology_output_header: buildCanonicalMethodologyOutputHeader(methodologySnapshot, row.opened_at),
       git_commit_sha: row.si_git_commit_sha,
       git_blob_sha: row.si_git_blob_sha,
       sha256: row.si_sha256,
