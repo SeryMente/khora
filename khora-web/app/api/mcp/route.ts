@@ -59,6 +59,12 @@ function scopeFailure(config: ReturnType<typeof getMcpConfig>, requiredScope: st
 const NORM_TURN_TOKEN = z.string().min(16).describe(
   "Token del ciclo normativo emitido por khora_norm_open_turn. Obligatorio para toda herramienta MCP sustantiva."
 );
+const NORM_THINKING_MODE = z.literal(REQUIRED_REASONING_MODE).describe(
+  "Obligatorio: ChatGPT debe estar ejecutando en modo Thinking. Si no puede verificarse, no se ejecuta."
+);
+const NORM_OUTPUT_FORMAT_VERSION = z.literal(REQUIRED_OUTPUT_FORMAT_VERSION).describe(
+  "Contrato obligatorio de salida visible por ciclo."
+);
 
 function withNormTurn<T extends z.ZodRawShape>(fields: T): T & { _norm_turn_token: typeof NORM_TURN_TOKEN } {
   return {
