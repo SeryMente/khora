@@ -1,4 +1,5 @@
 // @l0 L0-002 §4 · @req MCP-CFG-01/REQ-1
+import { createHmac, timingSafeEqual } from "node:crypto";
 
 export interface McpConfig {
   clientId: string;
@@ -115,4 +116,66 @@ export async function validateCimdClient(
   } catch {
     return false;
   }
+}
+
+
+export interface DynamicClientMetadata {
+  redirect_uris: string[];
+  client_name?: string;
+  token_endpoint_auth_method: "none";
+  iat: number;
+}
+
+function base64url(input: string | Buffer): string {
+  return Buffer.from(input).toString("base64url");
+}
+
+export function isAllowedDynamicRedirect(uri: string): boolean {
+  try {
+    const url = new URL(uri);
+    const host = url.hostname.toLowerCase();
+    return url.protocol === "https:" &&
+      (host === "notion.com" || host.endsWith(".notion.com") || host === "notion.so" || host.endsWith(".notion.so"));
+  } catch {
+    return false;
+  }
+}
+
+export function createDynamicClientId(
+  metadata: Omit<DynamicClientMetadata, "iat">,
+  secret: string,
+): string {
+  const payload = base64url(JSON.stringify({ ...metadata, iat: Math.floor(Date.now() / 1000) }));
+  const signature = createHmac("sha256", secret).update(payload).digest("base64url");
+  return `khora-dcr.${payload}.${signature}`;
+}
+
+export function getDynamicClientMetadata(
+  clientId: string,
+  secret: string,
+): DynamicClientMetadata | null {
+  const parts = clientId.split(".");
+  if (parts.length !== 3 || parts[0] !== "khora-dcr") return null;
+  const expected = createHmac("sha256", secret).update(parts[1]).digest();
+  let supplied: Buffer;
+  try { supplied = Buffer.from(parts[2], "base64url"); } catch { return null; }
+  if (supplied.length !== expected.length || !timingSafeEqual(supplied, expected)) return null;
+  try {
+    const value = JSON.parse(Buffer.from(parts[1], "base64url").toString("utf8")) as DynamicClientMetadata;
+    if (!Array.isArray(value.redirect_uris) || value.redirect_uris.length === 0) return null;
+    if (!value.redirect_uris.every(isAllowedDynamicRedirect)) return null;
+    if (value.token_endpoint_auth_method !== "none" || !Number.isInteger(value.iat)) return null;
+    return value;
+  } catch {
+    return null;
+  }
+}
+
+export function validateDynamicClient(
+  clientId: string,
+  secret: string,
+  redirectUri?: string,
+): boolean {
+  const metadata = getDynamicClientMetadata(clientId, secret);
+  return !!metadata && (!redirectUri || metadata.redirect_uris.includes(redirectUri));
 }

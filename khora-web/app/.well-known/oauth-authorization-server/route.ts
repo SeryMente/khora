@@ -12,6 +12,7 @@ export async function GET() {
     issuer: config.issuer,
     authorization_endpoint: `${config.issuer}/oauth/authorize`,
     token_endpoint: `${config.issuer}/api/oauth/token`,
+    registration_endpoint: `${config.issuer}/api/oauth/register`,
     code_challenge_methods_supported: ["S256"],
     authorization_response_iss_parameter_supported: true,
     client_id_metadata_document_supported: true,
