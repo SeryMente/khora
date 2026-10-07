@@ -73,4 +73,10 @@ Las demás páginas de producto enumeradas en el árbol `app/**/page.tsx` —inc
 
 ## Guardia contra regresiones
 
-`tests/unit/system_navigation.test.ts` comprueba que las rutas esenciales permanezcan declaradas en `SystemBar.tsx`, que Herramientas conserve sus submódulos y que Bitácora mantenga un destino canónico existente. El E2E de shell comprueba además que los elementos sean visibles y navegables como UI.
+La navegación se protege en tres niveles:
+
+- `tests/unit/system_navigation.test.ts`: rutas del menú, submódulos de Seguridad, aliases históricos y semántica ARIA de pestañas.
+- `scripts/check_navigation_contract.ts`: descubre rutas estáticas, detecta enlaces internos muertos y rechaza páginas de producto huérfanas.
+- `e2e/shell-v2.spec.ts` + `e2e/ui-quality.spec.ts`: renderización real, menú completo, aliases, accesibilidad básica, tema, overflow y prerender sin JavaScript en escritorio y móvil.
+
+El workflow `UI Quality` ejecuta estos controles en cada cambio de `main` y pull request.
