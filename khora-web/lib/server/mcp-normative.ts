@@ -671,7 +671,7 @@ export async function verifyNormativeTurn(
     });
     if (!ledgerOrderValid) throw new Error("TURN_APPLICATION_LEDGER_INVALID");
 
-    const result = await verifyNormativeReceipt(receipt, current.application_vector);
+    const result = await verifyNormativeReceipt(receipt, current.application_vector, current.opened_at);
     const insert = await client.query(
       "INSERT INTO normative_receipts (" +
         "cycle_id, attempt, protocol, protocol_version, si_version, si_git_blob_sha, si_sha256, " +
