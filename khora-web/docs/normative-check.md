@@ -48,15 +48,15 @@ Existe además una migración SQL 025 y un bootstrap perezoso de la tabla para e
 
 La superficie normativa y su control de acceso deben ser alcanzables sin conocer URLs internas:
 
-- **Menú Sistema → Seguridad** abre `/sistema/seguridad`.
+- **Navegación principal → Seguridad** abre `/sistema/seguridad`.
 - Dentro de **Seguridad** están los submódulos **Entorno Persistente**, **Bóveda** y **Control MCP**.
 - **Control MCP** abre la consola existente de `/sistema/mcp`: OAuth, Bearer manuales, scopes y revocación.
-- **Menú Sistema → Evidencia normativa** abre `/sistema/otros`: consulta, detalle y verificación de receipts.
-- **Menú Sistema → Registro** abre `/sistema/registro`: observabilidad y eventos persistidos.
+- **Navegación principal → Sistema → Evidencia normativa** abre `/sistema/otros`: consulta, detalle y verificación de receipts.
+- **Navegación principal → Sistema → Registro** abre `/sistema/registro`: observabilidad y eventos persistidos.
 
 ## Interfaz
 
-«Evidencia normativa» se abre desde el botón Sistema de la barra inferior. La pantalla permite:
+«Evidencia normativa» se abre desde el submenú Sistema de la barra inferior. La pantalla permite:
 
 - consultar los últimos 50 comprobantes;
 - ver totales VERIFIED/INVALID/INCOMPLETE;
