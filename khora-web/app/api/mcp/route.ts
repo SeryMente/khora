@@ -590,7 +590,9 @@ async function handleMcpRequest(req: NextRequest) {
     "Verifica y registra el receipt del turno. Solo cierra el ciclo cuando KHORA devuelve VERIFIED. Usa norm:turn.",
     {
       turn_token: z.string().min(16).describe("Token opaco emitido por khora_norm_open_turn"),
-      receipt: z.object({}).passthrough().describe("Cycle Receipt NORM-CHECK v0.5.0"),
+      receipt: z.object({
+        output_header: z.string().min(32).describe("Encabezado SI canónico exacto del ciclo."),
+      }).passthrough().describe("Cycle Receipt NORM-CHECK v0.5.0"),
     },
     async (args: any) => {
       const denied = requireScope("norm:turn");
@@ -833,7 +835,18 @@ async function handleMcpRequest(req: NextRequest) {
         type: "object",
         properties: {
           turn_token: { type: "string", minLength: 16 },
-          receipt: { type: "object" },
+          receipt: {
+            type: "object",
+            properties: {
+              output_header: {
+                type: "string",
+                minLength: 32,
+                description: "REQUERIDO: encabezado SI canónico exacto del ciclo.",
+              },
+            },
+            required: ["output_header"],
+            additionalProperties: true,
+          },
         },
         required: ["turn_token", "receipt"],
         additionalProperties: false,
