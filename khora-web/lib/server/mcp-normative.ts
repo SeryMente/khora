@@ -1,5 +1,5 @@
 import { generateRandomToken, obtenerGeneracionRevocacion } from "./oauth";
-import { assertNormativeRuntimeContext, REQUIRED_OUTPUT_FORMAT_VERSION, REQUIRED_PLATFORM, REQUIRED_REASONING_MODE, type NormativeRuntimeContext } from "./normative-runtime";
+import { assertNormativeRuntimeContext, REQUIRED_OUTPUT_FORMAT_VERSION, REQUIRED_PLATFORM, type NormativeRuntimeContext } from "./normative-runtime";
 import { getDb } from "./neon";
 import { getMcpConfig } from "./mcp-config";
 import { signJwt, verifyJwtDetailed } from "./jwt";
@@ -382,12 +382,11 @@ export async function assertNormativeTurnOpen(
     typeof token.turn_si_sha256 !== "string" ||
     typeof token.turn_manifest_sha256 !== "string" ||
     token.turn_platform !== REQUIRED_PLATFORM ||
-    token.turn_reasoning_mode !== REQUIRED_REASONING_MODE ||
     token.turn_output_format_version !== REQUIRED_OUTPUT_FORMAT_VERSION ||
     token.turn_platform !== runtime.platform ||
     token.turn_reasoning_mode !== runtime.reasoning_mode ||
     token.turn_output_format_version !== runtime.output_format_version
-  ) throw new Error("THINKING_MODE_REQUIRED");
+  ) throw new Error("NORMATIVE_RUNTIME_MISMATCH");
 
   const gen = await obtenerGeneracionRevocacion(actor);
   if (token.gen !== gen) throw new Error("TURN_TOKEN_REVOKED");
