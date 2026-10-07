@@ -76,7 +76,12 @@ function withNormTurn<T extends z.ZodRawShape>(fields: T): T & { _norm_turn_toke
 }
 
 function withoutNormTurn(args: Record<string, unknown>) {
-  const { _norm_turn_token: _ignored, ...rest } = args;
+  const {
+    _norm_turn_token: _ignoredToken,
+    _thinking_mode: _ignoredThinking,
+    _output_format_version: _ignoredFormat,
+    ...rest
+  } = args;
   return rest;
 }
 
