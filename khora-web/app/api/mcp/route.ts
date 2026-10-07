@@ -85,7 +85,12 @@ function withoutNormTurn(args: Record<string, unknown>) {
   return rest;
 }
 
-async function requireNormativeTurn(actor: string, turnToken: unknown) {
+async function requireNormativeTurn(
+  actor: string,
+  turnToken: unknown,
+  thinkingMode: unknown,
+  outputFormatVersion: unknown,
+) {
   if (typeof turnToken !== "string") {
     return {
       isError: true as const,
@@ -96,7 +101,16 @@ async function requireNormativeTurn(actor: string, turnToken: unknown) {
     };
   }
   try {
-    await assertNormativeTurnOpen(actor, turnToken);
+    assertNormativeRuntimeContext({
+      platform: REQUIRED_PLATFORM,
+      reasoning_mode: thinkingMode,
+      output_format_version: outputFormatVersion,
+    });
+    await assertNormativeTurnOpen(actor, turnToken, {
+      platform: REQUIRED_PLATFORM,
+      reasoning_mode: REQUIRED_REASONING_MODE,
+      output_format_version: REQUIRED_OUTPUT_FORMAT_VERSION,
+    });
     return null;
   } catch (error) {
     return {
