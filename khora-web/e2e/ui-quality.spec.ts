@@ -21,6 +21,8 @@ const PRODUCT_ROUTES = [
   "/sistema/mcp",
   "/sistema/otros",
   "/sistema/registro",
+  "/sistema/boveda",
+  "/sistema/entorno-persistente",
 ];
 
 const UI_REVIEW_SCREENS = [
@@ -92,6 +94,7 @@ for (const viewport of [
       for (const route of PRODUCT_ROUTES) {
         const response = await page.goto(route, { waitUntil: "domcontentloaded" });
         expect(response?.status() ?? 0, "La ruta " + route + " no debe responder 4xx/5xx").toBeLessThan(400);
+        await expect(page.locator('[data-testid="khora-splash"]')).toHaveCount(0, { timeout: 3000 });
         await expect(page.locator("body")).toBeVisible();
         await assertBasicAccessibility(page);
       }
@@ -135,6 +138,33 @@ for (const viewport of [
 
       await page.getByRole("tab", { name: "Control MCP", exact: true }).click();
       await expect(page.getByRole("heading", { name: "Control MCP & Revocación", exact: true })).toBeVisible();
+    });
+
+    test("los aliases históricos resuelven a superficies canónicas", async ({ page }) => {
+      const aliases: Array<[string, RegExp]> = [
+        ["/sistema/boveda", /\/sistema\/seguridad\?tab=boveda$/],
+        ["/sistema/entorno-persistente", /\/sistema\/seguridad\?tab=entorno-persistente$/],
+        ["/herramientas/bitacora", /\/sistema\/volcados$/],
+      ];
+
+      for (const [alias, canonical] of aliases) {
+        await page.goto(alias, { waitUntil: "domcontentloaded" });
+        await expect(page).toHaveURL(canonical);
+        await expect(page.locator("h1").first()).toBeVisible();
+      }
+    });
+
+    test("las pestañas de Seguridad exponen semántica ARIA coherente", async ({ page }) => {
+      await page.goto("/sistema/seguridad", { waitUntil: "domcontentloaded" });
+      await expect(page.locator('[data-testid="khora-splash"]')).toHaveCount(0, { timeout: 3000 });
+      const tabs = page.getByRole("tab");
+      await expect(tabs).toHaveCount(4);
+      expect(await tabs.evaluateAll((nodes) => nodes.filter((node) => node.getAttribute("tabindex") === "0").length)).toBe(1);
+      for (const tab of await tabs.all()) {
+        const controls = await tab.getAttribute("aria-controls");
+        expect(controls).toBeTruthy();
+        await expect(page.locator("#" + controls)).toHaveAttribute("aria-labelledby", await tab.getAttribute("id") || "");
+      }
     });
 
     test("el tema cambia mediante control nativo y conserva accesibilidad", async ({ page }) => {
