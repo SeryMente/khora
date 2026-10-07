@@ -1,13 +1,9 @@
 import { createHash } from "crypto";
 
 export const NORM_CHECK_PROTOCOL = "NORM-CHECK";
-export const NORM_CHECK_PROTOCOL_VERSION = "v0.2.0";
-export const LEGACY_NORM_CHECK_PROTOCOL_VERSION = "v0.1.0";
-export const NORM_CHECK_VERIFIER_VERSION = "norm-check/0.2.0";
-const ACCEPTED_PROTOCOL_VERSIONS = new Set([
-  LEGACY_NORM_CHECK_PROTOCOL_VERSION,
-  NORM_CHECK_PROTOCOL_VERSION,
-]);
+export const NORM_CHECK_PROTOCOL_VERSION = "v0.3.0";
+export const NORM_CHECK_VERIFIER_VERSION = "norm-check/0.3.0";
+const ACCEPTED_PROTOCOL_VERSIONS = new Set([NORM_CHECK_PROTOCOL_VERSION]);
 export const CANONICAL_SI_REPOSITORY = "SeryMente/metodologia";
 export const CANONICAL_SI_PATH = "SI-METACOGNITIVO.md";
 
@@ -164,8 +160,25 @@ function parsePrinciples(source: string): ManifestPrinciple[] {
   return principles;
 }
 
+function canonicalizeJson(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(canonicalizeJson);
+  if (value && typeof value === "object") {
+    const record = value as Record<string, unknown>;
+    return Object.fromEntries(
+      Object.keys(record)
+        .sort()
+        .map((key) => [key, canonicalizeJson(record[key])])
+    );
+  }
+  return value;
+}
+
+function canonicalJsonString(value: unknown): string {
+  return JSON.stringify(canonicalizeJson(value));
+}
+
 function buildManifestHash(manifest: ManifestPrinciple[]): string {
-  return sha256(JSON.stringify(manifest));
+  return sha256(canonicalJsonString(manifest));
 }
 
 export async function fetchSiBlob(blobSha: string): Promise<string> {
@@ -310,7 +323,7 @@ function computeEvidenceHash(receipt: NormativeReceipt): string {
     output_sha256: receipt.output_sha256,
     created_at: receipt.created_at,
   };
-  return sha256(JSON.stringify(canonical));
+  return sha256(canonicalJsonString(canonical));
 }
 
 export async function verifyNormativeReceipt(input: unknown): Promise<VerificationResult> {
@@ -402,7 +415,5 @@ export function getCurrentVerifierInfo() {
     verifier_version: NORM_CHECK_VERIFIER_VERSION,
     si_repository: CANONICAL_SI_REPOSITORY,
     si_path: CANONICAL_SI_PATH,
-    si_version_name: "Identidad Versionada y Vigencia Canónica",
-    si_last_updated_at: "2026-10-06T16:42:13-06:00",
   };
 }
