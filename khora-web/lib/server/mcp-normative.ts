@@ -530,7 +530,7 @@ export async function verifyNormativeTurn(
         result.coverage.unknown,
         JSON.stringify(result.reasons),
         JSON.stringify(receipt),
-        "norm-check/0.2.0",
+        "norm-check/0.4.0",
       ]
     );
 
@@ -563,7 +563,7 @@ export async function verifyNormativeTurn(
         si_version: receipt.si.version,
         si_sha256: receipt.si.sha256,
         manifest_sha256: receipt.si.manifest_sha256,
-        verifier_version: "norm-check/0.2.0",
+        verifier_version: "norm-check/0.4.0",
         recorded_at: insert.rows[0].created_at,
         receipt_id: insert.rows[0].id,
       }),
