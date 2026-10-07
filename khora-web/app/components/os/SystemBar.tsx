@@ -34,7 +34,7 @@ const ICONS: Record<NavigationIcon, LucideIcon> = {
 };
 
 function normalizePath(href: string): string {
-  return href.split("?")[0].split("#")[0].replace(/\/+$/, "") || "/";
+  return href.split("?")[0].split("#")[0].replace(//+$/, "") || "/";
 }
 
 function isEntryActive(pathname: string | null, entry: NavigationEntry): boolean {
@@ -53,7 +53,15 @@ function NavIcon({ name, size = 22 }: { name: NavigationIcon; size?: number }) {
   return <Icon size={size} strokeWidth={1.75} absoluteStrokeWidth aria-hidden="true" />;
 }
 
-function MenuLink({ child, pathname, onNavigate }: { child: NavigationChild; pathname: string | null; onNavigate: () => void }) {
+function MenuLink({
+  child,
+  pathname,
+  onNavigate,
+}: {
+  child: NavigationChild;
+  pathname: string | null;
+  onNavigate: () => void;
+}) {
   return (
     <Link
       href={child.href}
@@ -68,15 +76,23 @@ function MenuLink({ child, pathname, onNavigate }: { child: NavigationChild; pat
   );
 }
 
-function MenuPanel({ entry, pathname, onNavigate }: { entry: NavigationEntry; pathname: string | null; onNavigate: () => void }) {
+function MenuPanel({
+  entry,
+  pathname,
+  onNavigate,
+}: {
+  entry: NavigationEntry;
+  pathname: string | null;
+  onNavigate: () => void;
+}) {
   const groups = navigationGroupNames(entry);
 
   return (
     <nav
       aria-label={"Menú " + entry.label}
-      aria-describedby={"navigation-menu-description-" + entry.id}
+      id={"navigation-menu-" + entry.id}\n      aria-describedby={"navigation-menu-description-" + entry.id}
       data-navigation-menu={entry.id}
-      className="absolute bottom-full left-1/2 mb-2 w-[min(22rem,calc(100vw-1rem))] -translate-x-1/2 overflow-hidden rounded-xl border shadow-2xl"
+      className="absolute bottom-full left-1/2 z-[60] mb-2 w-[min(22rem,calc(100vw-1rem))] -translate-x-1/2 overflow-hidden rounded-xl border shadow-2xl max-[639px]:fixed max-[639px]:bottom-[calc(4.75rem+env(safe-area-inset-bottom))] max-[639px]:left-2 max-[639px]:right-2 max-[639px]:w-auto max-[639px]:translate-x-0"
       style={{
         borderColor: "var(--khora-border)",
         background: "var(--khora-surface)",
@@ -148,59 +164,66 @@ export default function SystemBar() {
   return (
     <nav
       ref={navigationRef}
-      className="fixed bottom-0 inset-x-0 z-50 flex items-end justify-center gap-1 overflow-x-auto p-2"
+      className="fixed bottom-0 inset-x-0 z-50 flex items-end justify-center px-2 pb-2"
       aria-label="Barra de sistema"
       data-navigation-primary-count={NAVIGATION_REGISTRY.length}
     >
-      {NAVIGATION_REGISTRY.map((entry) => {
-        const active = isEntryActive(pathname, entry);
+      <div className="flex w-full max-w-5xl items-end justify-center gap-1 overflow-visible">
+        {NAVIGATION_REGISTRY.map((entry) => {
+          const active = isEntryActive(pathname, entry);
+          const menuOpen = openMenuId === entry.id;
 
-        return (
-          <div key={entry.id} className="relative shrink-0" data-navigation-entry={entry.id}>
-            {entry.kind === "menu" && openMenuId === entry.id && (
-              <MenuPanel
-                entry={entry}
-                pathname={pathname}
-                onNavigate={() => setOpenMenuId(null)}
-              />
-            )}
+          return (
+            <div key={entry.id} className="relative shrink-0" data-navigation-entry={entry.id}>
+              {entry.kind === "menu" && menuOpen && (
+                <MenuPanel
+                  entry={entry}
+                  pathname={pathname}
+                  onNavigate={() => setOpenMenuId(null)}
+                />
+              )}
 
-            {entry.kind === "direct" ? (
-              <Link
-                href={entry.href}
-                className="flex min-w-16 flex-col items-center justify-center rounded-lg p-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--khora-accent)]"
-                style={{ color: active ? "var(--khora-ink)" : "var(--khora-accent)" }}
-                aria-current={active ? "page" : undefined}
-              >
-                <NavIcon name={entry.icon} size={32} />
-                <span className="mt-1 text-xs font-medium">{entry.label}</span>
-              </Link>
-            ) : (
-              <button
-                type="button"
-                aria-haspopup="true"
-                aria-expanded={openMenuId === entry.id}
-                aria-label={entry.label}
-                onClick={() =>
-                  setOpenMenuId((current) => (current === entry.id ? null : entry.id))
-                }
-                className="flex min-w-16 flex-col items-center justify-center rounded-lg p-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--khora-accent)]"
-                style={{ color: active ? "var(--khora-ink)" : "var(--khora-accent)" }}
-              >
-                {openMenuId === entry.id ? (
-                  <Icons.ChevronDown size={32} strokeWidth={1.75} absoluteStrokeWidth aria-hidden="true" />
-                ) : (
-                  <NavIcon name={entry.icon} size={32} />
-                )}
-                <span className="mt-1 text-xs font-medium">{entry.label}</span>
-              </button>
-            )}
-          </div>
-        );
-      })}
+              {entry.kind === "direct" ? (
+                <Link
+                  href={entry.href}
+                  className="flex min-w-12 flex-col items-center justify-center rounded-lg p-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--khora-accent)] sm:min-w-16 sm:p-2"
+                  style={{ color: active ? "var(--khora-ink)" : "var(--khora-accent)" }}
+                  aria-current={active ? "page" : undefined}
+                >
+                  <NavIcon name={entry.icon} size={24} />
+                  <span className="mt-1 whitespace-nowrap text-[10px] font-medium sm:text-xs">{entry.label}</span>
+                </Link>
+              ) : (
+                <button
+                  type="button"
+                  aria-haspopup="true"
+                  aria-expanded={menuOpen}
+                  aria-controls={menuOpen ? "navigation-menu-" + entry.id : undefined}
+                  aria-label={entry.label}
+                  onClick={() =>
+                    setOpenMenuId((current) => (current === entry.id ? null : entry.id))
+                  }
+                  className="flex min-w-12 flex-col items-center justify-center rounded-lg p-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--khora-accent)] sm:min-w-16 sm:p-2"
+                  style={{ color: active ? "var(--khora-ink)" : "var(--khora-accent)" }}
+                >
+                  <NavIcon name={entry.icon} size={24} />
+                  <span className="mt-1 flex items-center gap-0.5 whitespace-nowrap text-[10px] font-medium sm:text-xs">
+                    {entry.label}
+                    {menuOpen ? (
+                      <Icons.ChevronUp size={11} strokeWidth={2} aria-hidden="true" />
+                    ) : (
+                      <Icons.ChevronDown size={11} strokeWidth={2} aria-hidden="true" />
+                    )}
+                  </span>
+                </button>
+              )}
+            </div>
+          );
+        })}
 
-      <div className="shrink-0">
-        <ThemeToggle />
+        <div className="shrink-0">
+          <ThemeToggle />
+        </div>
       </div>
     </nav>
   );
