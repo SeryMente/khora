@@ -89,9 +89,13 @@ function cycleIdFor(conversationId: string | null, turnNumber: number | null): s
   return "TURN/" + generateRandomToken(16);
 }
 
-function issueTurnToken(actor: string, row: Pick<TurnRow,
-  "cycle_id" | "current_attempt" | "nonce" | "si_sha256" | "manifest_sha256"
->, config: NonNullable<ReturnType<typeof getMcpConfig>>, gen: number): string {
+function issueTurnToken(
+  actor: string,
+  row: Pick<TurnRow, "cycle_id" | "current_attempt" | "nonce" | "si_sha256" | "manifest_sha256">,
+  config: NonNullable<ReturnType<typeof getMcpConfig>>,
+  gen: number,
+  runtime: NormativeRuntimeContext,
+): string {
   const nowSec = Math.floor(Date.now() / 1000);
   return signJwt(
     {
