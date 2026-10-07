@@ -87,6 +87,8 @@ export type CycleVerificationRecord = {
   si_git_commit_sha: string;
   si_sha256: string;
   manifest_sha256: string;
+  methodology_version: string;
+  methodology_git_commit_sha: string;
   order_verified: boolean;
   application_log_sha256: string;
   verifier_version: string;
@@ -103,6 +105,8 @@ export function buildCycleVerificationRecord(input: {
   si_git_commit_sha: string;
   si_sha256: string;
   manifest_sha256: string;
+  methodology_version: string;
+  methodology_git_commit_sha: string;
   order_verified: boolean;
   application_log_sha256: string;
   verifier_version: string;
@@ -119,6 +123,8 @@ export function buildCycleVerificationRecord(input: {
     si_git_commit_sha: input.si_git_commit_sha,
     si_sha256: input.si_sha256,
     manifest_sha256: input.manifest_sha256,
+    methodology_version: input.methodology_version,
+    methodology_git_commit_sha: input.methodology_git_commit_sha,
     order_verified: input.order_verified,
     application_log_sha256: input.application_log_sha256,
     verifier_version: input.verifier_version,
