@@ -7,6 +7,8 @@ export const NORM_CHECK_VERIFIER_VERSION = "norm-check/0.5.0";
 const ACCEPTED_PROTOCOL_VERSIONS = new Set([NORM_CHECK_PROTOCOL_VERSION]);
 export const CANONICAL_SI_REPOSITORY = "SeryMente/metodologia";
 export const CANONICAL_SI_PATH = "SI-METACOGNITIVO.md";
+export const CANONICAL_METHODOLOGY_REPOSITORY = "SeryMente/metodologia";
+export const CANONICAL_METHODOLOGY_PATH = "METODOLOGIA.md";
 
 type ManifestPrinciple = {
   folio: string;
@@ -34,11 +36,18 @@ export type NormativeReceipt = {
     sha256: string;
     manifest_sha256: string;
   };
+  methodology: {
+    version: string;
+    git_commit_sha: string;
+    git_blob_sha: string;
+    sha256: string;
+  };
   input_sha256: string;
   nonce: string;
   principles: NormativePrincipleEvidence[];
   output_sha256: string;
   output_header: string;
+  methodology_output_header: string;
   evidence_sha256: string;
   created_at: string;
   runtime: NormativeRuntimeContext;
@@ -53,6 +62,8 @@ export type VerificationResult = {
   si_git_commit_sha: string;
   si_git_blob_sha: string;
   manifest_sha256: string;
+  methodology_version: string;
+  methodology_git_commit_sha: string;
   coverage: {
     expected: number;
     evaluated: number;
@@ -127,7 +138,18 @@ type ParsedSi = {
   manifestSha256: string;
 };
 
+type ParsedMethodology = {
+  version: string;
+  versionName: string;
+  lastUpdatedAt: string;
+  canonicalUpdatedAt: string;
+  gitCommitSha: string;
+  gitBlobSha: string;
+  sha256: string;
+};
+
 const blobCache = new Map<string, Promise<string>>();
+const methodologyBlobCache = new Map<string, Promise<string>>();
 
 function sha256(value: string): string {
   return createHash("sha256").update(value, "utf8").digest("hex");
@@ -176,6 +198,39 @@ async function fetchCanonicalSiHistory(refSha: string): Promise<CanonicalSiHisto
   return { sha: latest.sha, updatedAt };
 }
 
+async function fetchCanonicalMethodologyHistory(refSha: string): Promise<CanonicalSiHistory> {
+  if (!isHex(refSha, 40)) throw new Error("METHODOLOGY_COMMIT_SHA_INVALID");
+
+  const response = await fetch(
+    "https://api.github.com/repos/" + CANONICAL_METHODOLOGY_REPOSITORY + "/commits?path=" +
+      encodeURIComponent(CANONICAL_METHODOLOGY_PATH) + "&sha=" + refSha + "&per_page=1",
+    {
+      headers: {
+        Accept: "application/vnd.github+json",
+        "User-Agent": "Khora-NormCheck/0.5.0",
+      },
+      cache: "force-cache",
+    },
+  );
+  if (!response.ok) throw new Error("METHODOLOGY_HISTORY_FETCH_" + response.status);
+
+  const payload = (await response.json()) as Array<{
+    sha?: string;
+    commit?: {
+      committer?: { date?: string | null } | null;
+      author?: { date?: string | null } | null;
+    };
+  }>;
+
+  const latest = payload[0];
+  const updatedAt = latest?.commit?.committer?.date || latest?.commit?.author?.date || "";
+  if (!latest || !isHex(latest.sha, 40) || !updatedAt || Number.isNaN(Date.parse(updatedAt))) {
+    throw new Error("METHODOLOGY_HISTORY_PAYLOAD_INVALID");
+  }
+
+  return { sha: latest.sha, updatedAt };
+}
+
 function canonicalSiAge(updatedAt: string, at: string): string {
   const updatedMs = Date.parse(updatedAt);
   const atMs = Date.parse(at);
@@ -209,6 +264,25 @@ export function buildCanonicalSiOutputHeader(
     "SI CARGADO · " + snapshot.version +
     " — " + snapshot.versionName +
     " · COMPLETO · ACTIVO · ÚLTIMO CAMBIO: " +
+    canonicalSiAge(snapshot.canonicalUpdatedAt, atIso) +
+    " | " + snapshot.canonicalUpdatedAt.slice(0, 10)
+  );
+}
+
+
+export function buildCanonicalMethodologyOutputHeader(
+  snapshot: Pick<ParsedMethodology, "version" | "versionName" | "canonicalUpdatedAt">,
+  at: string | Date,
+): string {
+  const atIso = at instanceof Date ? at.toISOString() : at;
+  if (!snapshot.version || !snapshot.versionName || !snapshot.canonicalUpdatedAt) {
+    throw new Error("METHODOLOGY_OUTPUT_IDENTITY_INCOMPLETE");
+  }
+
+  return (
+    "METODOLOGÍA CARGADA · " + snapshot.version +
+    " — " + snapshot.versionName +
+    " · COMPLETA · ACTIVA · ÚLTIMO CAMBIO: " +
     canonicalSiAge(snapshot.canonicalUpdatedAt, atIso) +
     " | " + snapshot.canonicalUpdatedAt.slice(0, 10)
   );
@@ -354,6 +428,44 @@ export async function fetchSiBlob(blobSha: string): Promise<string> {
   }
 }
 
+
+async function fetchMethodologyBlob(blobSha: string): Promise<string> {
+  if (!isHex(blobSha, 40)) throw new Error("METHODOLOGY_BLOB_SHA_INVALID");
+
+  const cached = methodologyBlobCache.get(blobSha);
+  if (cached) return cached;
+
+  const promise = (async () => {
+    const response = await fetch(
+      "https://api.github.com/repos/" + CANONICAL_METHODOLOGY_REPOSITORY + "/git/blobs/" + blobSha,
+      {
+        headers: {
+          Accept: "application/vnd.github+json",
+          "User-Agent": "Khora-NormCheck/0.5.0",
+        },
+        cache: "force-cache",
+      },
+    );
+
+    if (!response.ok) throw new Error("METHODOLOGY_BLOB_FETCH_" + response.status);
+
+    const payload = (await response.json()) as { encoding?: string; content?: string };
+    if (payload.encoding !== "base64" || typeof payload.content !== "string") {
+      throw new Error("METHODOLOGY_BLOB_ENCODING_INVALID");
+    }
+
+    return Buffer.from(payload.content.replace(/\n/g, ""), "base64").toString("utf8");
+  })();
+
+  methodologyBlobCache.set(blobSha, promise);
+  try {
+    return await promise;
+  } catch (error) {
+    methodologyBlobCache.delete(blobSha);
+    throw error;
+  }
+}
+
 export async function getCurrentSiSnapshot(): Promise<ParsedSi & { gitBlobSha: string }> {
   for (let attempt = 1; attempt <= 3; attempt += 1) {
     const commitResponse = await fetch(
@@ -432,6 +544,103 @@ export async function getCurrentSiSnapshot(): Promise<ParsedSi & { gitBlobSha: s
   throw new Error("SI_SNAPSHOT_FAILED");
 }
 
+
+export async function getCurrentMethodologySnapshot(): Promise<ParsedMethodology> {
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    const commitResponse = await fetch(
+      "https://api.github.com/repos/" + CANONICAL_METHODOLOGY_REPOSITORY + "/commits/main",
+      {
+        headers: {
+          Accept: "application/vnd.github+json",
+          "User-Agent": "Khora-NormCheck/0.5.0",
+        },
+        cache: "no-store",
+      },
+    );
+    if (!commitResponse.ok) throw new Error("METHODOLOGY_MAIN_FETCH_" + commitResponse.status);
+    const commitPayload = (await commitResponse.json()) as { sha?: string };
+    if (!isHex(commitPayload.sha, 40)) throw new Error("METHODOLOGY_MAIN_SHA_INVALID");
+    const mainSha = commitPayload.sha;
+
+    const response = await fetch(
+      "https://api.github.com/repos/" + CANONICAL_METHODOLOGY_REPOSITORY + "/contents/" + CANONICAL_METHODOLOGY_PATH + "?ref=" + mainSha,
+      {
+        headers: {
+          Accept: "application/vnd.github+json",
+          "User-Agent": "Khora-NormCheck/0.5.0",
+        },
+        cache: "no-store",
+      },
+    );
+    if (!response.ok) throw new Error("METHODOLOGY_CURRENT_FETCH_" + response.status);
+    const payload = (await response.json()) as { sha?: string; encoding?: string; content?: string };
+    if (!isHex(payload.sha, 40) || payload.encoding !== "base64" || typeof payload.content !== "string") {
+      throw new Error("METHODOLOGY_CURRENT_PAYLOAD_INVALID");
+    }
+
+    const confirmResponse = await fetch(
+      "https://api.github.com/repos/" + CANONICAL_METHODOLOGY_REPOSITORY + "/commits/main",
+      {
+        headers: {
+          Accept: "application/vnd.github+json",
+          "User-Agent": "Khora-NormCheck/0.5.0",
+        },
+        cache: "no-store",
+      },
+    );
+    if (!confirmResponse.ok) throw new Error("METHODOLOGY_MAIN_CONFIRM_FETCH_" + confirmResponse.status);
+    const confirmPayload = (await confirmResponse.json()) as { sha?: string };
+    if (!isHex(confirmPayload.sha, 40)) throw new Error("METHODOLOGY_MAIN_CONFIRM_SHA_INVALID");
+
+    if (confirmPayload.sha !== mainSha) {
+      if (attempt === 3) throw new Error("METHODOLOGY_MAIN_CHANGED_DURING_SNAPSHOT");
+      continue;
+    }
+
+    const source = normalizeText(Buffer.from(payload.content.replace(/\n/g, ""), "base64").toString("utf8"));
+    const versionMatch = source.match(/^- \\*\\*Versión:\\*\\*\\s*(v\\d+\\.\\d+\\.\\d+)/mi);
+    if (!versionMatch) throw new Error("METHODOLOGY_VERSION_MISSING");
+    const versionNameMatch = source.match(/^- \\*\\*Nombre de versión:\\*\\*\\s*(.+)$/mi);
+    if (!versionNameMatch) throw new Error("METHODOLOGY_VERSION_NAME_MISSING");
+    const lastUpdatedMatch = source.match(/^- \\*\\*Última actualización canónica:\\*\\*\\s*(.+)$/mi);
+    if (!lastUpdatedMatch) throw new Error("METHODOLOGY_LAST_UPDATED_MISSING");
+    const history = await fetchCanonicalMethodologyHistory(mainSha);
+
+    return {
+      version: versionMatch[1],
+      versionName: versionNameMatch[1].trim(),
+      lastUpdatedAt: lastUpdatedMatch[1].trim(),
+      canonicalUpdatedAt: history.updatedAt,
+      gitCommitSha: mainSha,
+      gitBlobSha: payload.sha,
+      sha256: sha256(source),
+    };
+  }
+
+  throw new Error("METHODOLOGY_SNAPSHOT_FAILED");
+}
+
+export async function loadMethodologySnapshot(blobSha: string, gitCommitSha: string): Promise<ParsedMethodology> {
+  const source = normalizeText(await fetchMethodologyBlob(blobSha));
+  const versionMatch = source.match(/^- \\*\\*Versión:\\*\\*\\s*(v\\d+\\.\\d+\\.\\d+)/mi);
+  if (!versionMatch) throw new Error("METHODOLOGY_VERSION_MISSING");
+  const versionNameMatch = source.match(/^- \\*\\*Nombre de versión:\\*\\*\\s*(.+)$/mi);
+  if (!versionNameMatch) throw new Error("METHODOLOGY_VERSION_NAME_MISSING");
+  const lastUpdatedMatch = source.match(/^- \\*\\*Última actualización canónica:\\*\\*\\s*(.+)$/mi);
+  if (!lastUpdatedMatch) throw new Error("METHODOLOGY_LAST_UPDATED_MISSING");
+  const history = await fetchCanonicalMethodologyHistory(gitCommitSha);
+
+  return {
+    version: versionMatch[1],
+    versionName: versionNameMatch[1].trim(),
+    lastUpdatedAt: lastUpdatedMatch[1].trim(),
+    canonicalUpdatedAt: history.updatedAt,
+    gitCommitSha,
+    gitBlobSha: blobSha,
+    sha256: sha256(source),
+  };
+}
+
 export async function loadSiSnapshot(blobSha: string, gitCommitSha: string): Promise<ParsedSi> {
   const source = normalizeText(await fetchSiBlob(blobSha));
   const versionMatch = source.match(/^\*\*Versión:\*\*\s*(v\d+\.\d+\.\d+)/mi);
@@ -465,12 +674,15 @@ function validateBasicReceipt(receipt: unknown): receipt is NormativeReceipt {
   if (!cycle || typeof cycle.id !== "string" || cycle.id.trim().length === 0) return false;
   if (!Number.isInteger(cycle.attempt) || Number(cycle.attempt) < 1) return false;
   if (!si || typeof si.version !== "string" || !isHex(si.git_commit_sha, 40) || !isHex(si.git_blob_sha, 40) || !isHex(si.sha256, 64) || !isHex(si.manifest_sha256, 64)) return false;
+  const methodology = value.methodology as Record<string, unknown> | undefined;
+  if (!methodology || typeof methodology.version !== "string" || !isHex(methodology.git_commit_sha, 40) || !isHex(methodology.git_blob_sha, 40) || !isHex(methodology.sha256, 64)) return false;
   if (!isHex(value.input_sha256, 64) || !isHex(value.output_sha256, 64)) return false;
   if (typeof value.nonce !== "string" || value.nonce.length < 16 || value.nonce.length > 128) return false;
   if (!isHex(value.evidence_sha256, 64)) return false;
   if (!Array.isArray(value.principles) || value.principles.length === 0) return false;
   if (typeof value.created_at !== "string" || value.created_at.length < 10 || Number.isNaN(Date.parse(value.created_at))) return false;
   if (typeof value.output_header !== "string" || value.output_header.trim().length < 32) return false;
+  if (typeof value.methodology_output_header !== "string" || value.methodology_output_header.trim().length < 32) return false;
   try {
     assertNormativeRuntimeContext(value.runtime);
   } catch {
@@ -504,6 +716,12 @@ function computeEvidenceHash(receipt: NormativeReceipt): string {
       manifest_sha256: receipt.si.manifest_sha256,
     },
     input_sha256: receipt.input_sha256,
+    methodology: {
+      version: receipt.methodology.version,
+      git_commit_sha: receipt.methodology.git_commit_sha,
+      git_blob_sha: receipt.methodology.git_blob_sha,
+      sha256: receipt.methodology.sha256,
+    },
     nonce: receipt.nonce,
     principles: receipt.principles.map((item) => ({
       folio: item.folio,
@@ -513,6 +731,7 @@ function computeEvidenceHash(receipt: NormativeReceipt): string {
     })),
     output_sha256: receipt.output_sha256,
     output_header: receipt.output_header,
+    methodology_output_header: receipt.methodology_output_header,
     created_at: receipt.created_at,
     runtime: {
       platform: receipt.runtime.platform,
@@ -547,8 +766,10 @@ export async function verifyNormativeReceipt(
 
   const receipt = input as NormativeReceipt;
   let snapshot: ParsedSi;
+  let methodologySnapshot: ParsedMethodology;
   try {
     snapshot = await loadSiSnapshot(receipt.si.git_blob_sha, receipt.si.git_commit_sha);
+    methodologySnapshot = await loadMethodologySnapshot(receipt.methodology.git_blob_sha, receipt.methodology.git_commit_sha);
   } catch (error) {
     return {
       status: "INVALID",
@@ -567,11 +788,16 @@ export async function verifyNormativeReceipt(
   }
 
   const reasons: string[] = [];
-  const expectedOutputHeader = buildCanonicalSiOutputHeader(snapshot, outputHeaderAt || receipt.created_at);
+  const headerAt = outputHeaderAt || receipt.created_at;
+  const expectedOutputHeader = buildCanonicalSiOutputHeader(snapshot, headerAt);
+  const expectedMethodologyOutputHeader = buildCanonicalMethodologyOutputHeader(methodologySnapshot, headerAt);
   if (receipt.output_header !== expectedOutputHeader) reasons.push("OUTPUT_HEADER_MISMATCH");
+  if (receipt.methodology_output_header !== expectedMethodologyOutputHeader) reasons.push("METHODOLOGY_OUTPUT_HEADER_MISMATCH");
   if (receipt.si.version !== snapshot.version) reasons.push("SI_VERSION_MISMATCH");
   if (receipt.si.sha256 !== snapshot.sha256) reasons.push("SI_SHA256_MISMATCH");
   if (receipt.si.manifest_sha256 !== snapshot.manifestSha256) reasons.push("MANIFEST_SHA256_MISMATCH");
+  if (receipt.methodology.version !== methodologySnapshot.version) reasons.push("METHODOLOGY_VERSION_MISMATCH");
+  if (receipt.methodology.sha256 !== methodologySnapshot.sha256) reasons.push("METHODOLOGY_SHA256_MISMATCH");
 
   const expectedFolios = new Set(snapshot.manifest.map((p) => p.folio));
   const seen = new Set<string>();
@@ -646,8 +872,10 @@ export async function verifyNormativeReceipt(
     attempt: receipt.cycle.attempt,
     si_version: receipt.si.version,
     si_git_commit_sha: receipt.si.git_commit_sha,
-    si_git_blob_sha: receipt.si.git_blob_sha,
+    si_git_blob_sha: receipt.si.git_commit_sha,
     manifest_sha256: receipt.si.manifest_sha256,
+    methodology_version: receipt.methodology.version,
+    methodology_git_commit_sha: receipt.methodology.git_commit_sha,
     coverage: { expected, evaluated, missing, duplicates, unknown, percent },
     order_verified: orderVerified,
     application_log_sha256: applicationLogSha256,
