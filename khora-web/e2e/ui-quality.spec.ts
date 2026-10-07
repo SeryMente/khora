@@ -165,6 +165,52 @@ for (const viewport of [
         expect(controls).toBeTruthy();
         await expect(page.locator("#" + controls)).toHaveAttribute("aria-labelledby", await tab.getAttribute("id") || "");
       }
+
+      const firstTab = tabs.filter({ hasText: "Seguridad" }).first();
+      await firstTab.focus();
+      await page.keyboard.press("End");
+      await expect(page.getByRole("tab", { name: "Control MCP", exact: true })).toHaveAttribute("aria-selected", "true");
+      await page.keyboard.press("Home");
+      await expect(page.getByRole("tab", { name: "Seguridad", exact: true })).toHaveAttribute("aria-selected", "true");
+      await page.keyboard.press("ArrowRight");
+      await expect(page.getByRole("tab", { name: "Entorno Persistente", exact: true })).toHaveAttribute("aria-selected", "true");
+    });
+
+    test("el grafo mantiene interacción accesible por teclado", async ({ page }) => {
+      await page.route("**/api/grafo**", async (route) => {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            nodes: [
+              {
+                id: "node-ui-001",
+                summary: "Nodo sintético accesible",
+                community: 1,
+                level: 2,
+                centrality: 3,
+                origen: "fixture-ui",
+                timestamp: "2026-10-06T00:00:00Z",
+                verificacion: "VERIFIED",
+              },
+            ],
+            edges: [],
+          }),
+        });
+      });
+
+      await page.goto("/grafo", { waitUntil: "domcontentloaded" });
+      await expect(page.locator('[data-testid="khora-splash"]')).toHaveCount(0, { timeout: 3000 });
+
+      const node = page.getByRole("button", { name: "Inspeccionar nodo: Nodo sintético accesible" });
+      await expect(node).toBeVisible();
+      await node.focus();
+      await page.keyboard.press("Enter");
+
+      await expect(page.getByRole("heading", { name: "Inspección de Comunidad", exact: true })).toBeVisible();
+
+      await page.getByRole("button", { name: "Cerrar inspección" }).click();
+      await expect(page.getByRole("heading", { name: "Inspección de Comunidad", exact: true })).toHaveCount(0);
     });
 
     test("el tema cambia mediante control nativo y conserva accesibilidad", async ({ page }) => {
