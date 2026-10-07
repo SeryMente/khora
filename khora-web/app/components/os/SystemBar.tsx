@@ -34,7 +34,7 @@ const ICONS: Record<NavigationIcon, LucideIcon> = {
 };
 
 function normalizePath(href: string): string {
-  return href.split("?")[0].split("#")[0].replace(//+$/, "") || "/";
+  return href.split("?")[0].split("#")[0].replace(/\/+$/, "") || "/";
 }
 
 function isEntryActive(pathname: string | null, entry: NavigationEntry): boolean {
@@ -93,7 +93,7 @@ function MenuPanel({
       id={"navigation-menu-" + entry.id}
       aria-describedby={"navigation-menu-description-" + entry.id}
       data-navigation-menu={entry.id}
-      className="absolute bottom-full left-1/2 z-[60] mb-2 w-[min(22rem,calc(100vw-1rem))] -translate-x-1/2 overflow-hidden rounded-xl border shadow-2xl max-[639px]:fixed max-[639px]:bottom-[calc(4.75rem+env(safe-area-inset-bottom))] max-[639px]:left-2 max-[639px]:right-2 max-[639px]:w-auto max-[639px]:translate-x-0"
+      className="khora-navigation-menu rounded-xl border shadow-2xl"
       style={{
         borderColor: "var(--khora-border)",
         background: "var(--khora-surface)",
@@ -165,11 +165,11 @@ export default function SystemBar() {
   return (
     <nav
       ref={navigationRef}
-      className="fixed bottom-0 inset-x-0 z-50 flex items-end justify-center px-2 pb-2"
+      className="khora-navigation-root fixed bottom-0 inset-x-0 z-50 flex items-end justify-center px-2 pb-2"
       aria-label="Barra de sistema"
       data-navigation-primary-count={NAVIGATION_REGISTRY.length}
     >
-      <div className="flex w-full max-w-5xl items-end justify-center gap-1 overflow-visible">
+      <div className="khora-navigation-row flex w-full max-w-5xl items-end justify-center gap-1 overflow-visible">
         {NAVIGATION_REGISTRY.map((entry) => {
           const active = isEntryActive(pathname, entry);
           const menuOpen = openMenuId === entry.id;
