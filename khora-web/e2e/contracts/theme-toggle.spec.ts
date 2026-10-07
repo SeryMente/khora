@@ -23,9 +23,8 @@ test.describe("ThemeToggle Component Contract & E2E", () => {
     const htmlElement = page.locator("html");
     await expect(htmlElement).toHaveAttribute("data-theme", "dark");
 
-    // 3. Find the Theme Toggle button in the SystemBar
-    // It has title "Cambiar a claro" or text "Tema" and is a div role="button" now
-    const toggleButton = page.locator('div[role="button"]:has-text("Tema")');
+    // 3. Find the native Theme Toggle button in the SystemBar
+    const toggleButton = page.getByRole("button", { name: /Cambiar a tema/ });
     await expect(toggleButton).toBeVisible();
 
     // The icon inside when dark should be Sun
