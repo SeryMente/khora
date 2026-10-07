@@ -892,5 +892,7 @@ export function getCurrentVerifierInfo() {
     verifier_version: NORM_CHECK_VERIFIER_VERSION,
     si_repository: CANONICAL_SI_REPOSITORY,
     si_path: CANONICAL_SI_PATH,
+    methodology_repository: CANONICAL_METHODOLOGY_REPOSITORY,
+    methodology_path: CANONICAL_METHODOLOGY_PATH,
   };
 }
