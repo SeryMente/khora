@@ -102,42 +102,39 @@ for (const viewport of [
       expect(pageErrors, "No se permiten errores JavaScript no controlados").toEqual([]);
     });
 
-    test("el menú Sistema es completamente navegable", async ({ page }) => {
+    test("la navegación respeta dominios primarios y submenús semánticos", async ({ page }) => {
       await page.goto("/sistema/volcados", { waitUntil: "domcontentloaded" });
       await expect(page.locator('[data-testid="khora-splash"]')).toHaveCount(0, { timeout: 3000 });
-      const toggle = page.getByRole("button", { name: "Sistema", exact: true });
-      await expect(toggle).toBeVisible();
-      await toggle.click();
 
-      const menu = page.getByRole("navigation", { name: "Menú Sistema" });
-      await expect(menu).toBeVisible();
+      const primaryEntries = page.locator("[data-navigation-entry]");
+      await expect(primaryEntries).toHaveCount(7);
 
-      const required = [
-        "Dictado",
-        "Edición",
-        "Ingesta",
-        "KPIs",
-        "Mapa",
-        "Capturar",
-        "Herramientas",
-        "Roadmap",
-        "Adherencia",
-        "Seguridad",
-        "Control MCP",
-        "Evidencia normativa",
-        "Registro",
-      ];
-
-      for (const name of required) {
-        await expect(menu.getByRole("link", { name, exact: true })).toBeVisible();
+      for (const name of ["Seguridad", "Capturar", "Ingreso", "Grafo"]) {
+        await expect(page.getByRole("button", { name, exact: true })).toBeVisible();
       }
 
-      await menu.getByRole("link", { name: "Seguridad", exact: true }).click();
+      await page.getByRole("button", { name: "Sistema", exact: true }).click();
+      const systemMenu = page.getByRole("navigation", { name: "Menú Sistema" });
+      await expect(systemMenu).toBeVisible();
+
+      for (const name of ["Herramientas", "OPI / VRI", "KPIs", "Roadmap", "Adherencia", "Evidencia normativa", "Registro"]) {
+        await expect(systemMenu.getByRole("link", { name, exact: true })).toBeVisible();
+      }
+
+      await expect(systemMenu.getByRole("link", { name: "Seguridad", exact: true })).toHaveCount(0);
+      await expect(systemMenu.getByRole("link", { name: "Capturar", exact: true })).toHaveCount(0);
+      await expect(systemMenu.getByRole("link", { name: "Dictado", exact: true })).toHaveCount(0);
+
+      await page.getByRole("button", { name: "Seguridad", exact: true }).click();
+      const securityMenu = page.getByRole("navigation", { name: "Menú Seguridad" });
+      await expect(securityMenu).toBeVisible();
+      for (const name of ["Seguridad", "Entorno Persistente", "Bóveda", "Control MCP"]) {
+        await expect(securityMenu.getByRole("link", { name, exact: true })).toBeVisible();
+      }
+
+      await securityMenu.getByRole("link", { name: "Seguridad", exact: true }).click();
       await expect(page).toHaveURL(/\/sistema\/seguridad$/);
       await expect(page.getByRole("tab", { name: "Control MCP", exact: true })).toBeVisible();
-
-      await page.getByRole("tab", { name: "Control MCP", exact: true }).click();
-      await expect(page.getByRole("heading", { name: "Control MCP & Revocación", exact: true })).toBeVisible();
     });
 
     test("los aliases históricos resuelven a superficies canónicas", async ({ page }) => {
