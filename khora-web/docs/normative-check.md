@@ -56,7 +56,7 @@ La superficie normativa y su control de acceso deben ser alcanzables sin conocer
 
 ## Interfaz
 
-«Otros» se abre desde el botón Sistema de la barra inferior. La pantalla permite:
+«Evidencia normativa» se abre desde el botón Sistema de la barra inferior. La pantalla permite:
 
 - consultar los últimos 50 comprobantes;
 - ver totales VERIFIED/INVALID/INCOMPLETE;
