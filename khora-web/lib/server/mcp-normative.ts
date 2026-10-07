@@ -781,6 +781,8 @@ export async function verifyNormativeTurn(
         si_version: receipt.si.version,
         si_sha256: receipt.si.sha256,
         manifest_sha256: receipt.si.manifest_sha256,
+        methodology_version: receipt.methodology.version,
+        methodology_git_commit_sha: receipt.methodology.git_commit_sha,
         order_verified: result.order_verified,
         application_log_sha256: result.application_log_sha256,
         si_git_commit_sha: receipt.si.git_commit_sha,
