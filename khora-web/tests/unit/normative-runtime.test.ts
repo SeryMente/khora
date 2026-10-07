@@ -25,7 +25,7 @@ test("rejects unknown output format", () => {
   assert.equal(
     isNormativeRuntimeContext({
       platform: REQUIRED_PLATFORM,
-      reasoning_mode: REQUIRED_REASONING_MODE,
+      reasoning_mode: "UNKNOWN",
       output_format_version: "v1.6.0",
     }),
     false,
