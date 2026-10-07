@@ -226,9 +226,14 @@ async function readTurn(cycleId: string): Promise<TurnRow | null> {
 
 export async function openNormativeTurn(
   actor: string,
-  input: { conversation_id?: string; turn_number?: number }
+  input: {
+    conversation_id?: string;
+    turn_number?: number;
+    runtime: NormativeRuntimeContext;
+  }
 ) {
   if (!validActor(actor)) throw new Error("TURN_ACTOR_INVALID");
+  assertNormativeRuntimeContext(input.runtime);
 
   const conversationId = normalizeConversationId(input.conversation_id);
   const turnNumber = normalizeTurnNumber(input.turn_number);
