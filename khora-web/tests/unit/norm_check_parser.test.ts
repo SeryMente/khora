@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { buildCanonicalSiOutputHeader, parsePrinciples } from "@/lib/server/norm-check";
+import { buildCanonicalMethodologyOutputHeader, buildCanonicalSiOutputHeader, parsePrinciples } from "@/lib/server/norm-check";
 
 function principle(folio: string, preponderance: string, state = "CANÓNICO") {
   return `### ${folio} · Principio ${folio}
@@ -85,5 +85,19 @@ test("formato canónico cambia a horas y luego a fecha absoluta sin alterar la i
   assert.equal(
     buildCanonicalSiOutputHeader(snapshot, "2026-10-07T12:00:00.000Z"),
     "SI CARGADO · v1.6.7 — Gobernanza Transaccional del Estado RDC · COMPLETO · ACTIVO · ÚLTIMO CAMBIO: 2026-09-01 | 2026-09-01",
+  );
+});
+
+
+test("formato canónico de Metodología conserva identidad y antigüedad relativa", () => {
+  const snapshot = {
+    version: "v0.11.8",
+    versionName: "Versionado Canónico del Método General",
+    canonicalUpdatedAt: "2026-10-07T21:10:00.000Z",
+  };
+
+  assert.equal(
+    buildCanonicalMethodologyOutputHeader(snapshot, "2026-10-07T21:41:00.000Z"),
+    "METODOLOGÍA CARGADA · v0.11.8 — Versionado Canónico del Método General · COMPLETA · ACTIVA · ÚLTIMO CAMBIO: hace 31 minutos | 2026-10-07",
   );
 });
