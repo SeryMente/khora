@@ -10,14 +10,9 @@ export default function ThemeToggle() {
 
   useEffect(() => {
     setMounted(true);
-    const stored = localStorage.getItem("khora-theme");
-    if (stored === "light") {
-      setTheme("light");
-      document.documentElement.dataset.theme = "light";
-    } else {
-      setTheme("dark");
-      document.documentElement.dataset.theme = "dark";
-    }
+    const nextTheme = localStorage.getItem("khora-theme") === "light" ? "light" : "dark";
+    setTheme(nextTheme);
+    document.documentElement.dataset.theme = nextTheme;
   }, []);
 
   const toggleTheme = () => {
@@ -27,18 +22,11 @@ export default function ThemeToggle() {
     document.documentElement.dataset.theme = nextTheme;
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      toggleTheme();
-    }
-  };
-
   if (!mounted) {
-    // Return a matching layout structure before mount to prevent layout shifts
     return (
       <div
-        className="flex flex-col items-center justify-center p-2 opacity-0 cursor-pointer"
+        aria-hidden="true"
+        className="flex flex-col items-center justify-center p-2 opacity-0"
         style={{ color: "var(--khora-accent)" }}
       >
         <div className="w-8 h-8 flex items-center justify-center">
@@ -49,27 +37,21 @@ export default function ThemeToggle() {
     );
   }
 
+  const label = theme === "dark" ? "Cambiar a tema claro" : "Cambiar a tema oscuro";
+
   return (
-    <div
-      role="button"
-      tabIndex={0}
+    <button
+      type="button"
+      aria-label={label}
+      title={label}
       onClick={toggleTheme}
-      onKeyDown={handleKeyDown}
       className="flex flex-col items-center justify-center p-2 cursor-pointer border-0 bg-transparent focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 rounded-lg"
-      style={{
-        color: "var(--khora-accent)",
-        outlineColor: "var(--khora-accent)",
-      }}
-      title={theme === "dark" ? "Cambiar a claro" : "Cambiar a oscuro"}
+      style={{ color: "var(--khora-accent)", outlineColor: "var(--khora-accent)" }}
     >
-      <div className="w-8 h-8 flex items-center justify-center">
-        {theme === "dark" ? (
-          <Sun size={20} strokeWidth={1.75} />
-        ) : (
-          <Moon size={20} strokeWidth={1.75} />
-        )}
-      </div>
+      <span className="w-8 h-8 flex items-center justify-center" aria-hidden="true">
+        {theme === "dark" ? <Sun size={20} strokeWidth={1.75} /> : <Moon size={20} strokeWidth={1.75} />}
+      </span>
       <span className="text-xs mt-1 font-medium">Tema</span>
-    </div>
+    </button>
   );
 }
