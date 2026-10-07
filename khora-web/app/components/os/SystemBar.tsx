@@ -127,7 +127,7 @@ export default function SystemBar() {
 
       <div ref={systemMenuRef} className="relative">
         {systemMenuOpen && (
-          <div
+          <nav
             aria-label="Menú Sistema"
             aria-describedby="system-menu-description"
             className="absolute bottom-full right-0 mb-2 max-h-[70vh] min-w-56 overflow-y-auto rounded-xl border shadow-2xl"
@@ -216,7 +216,7 @@ export default function SystemBar() {
               <Icons.ScrollText size={16} />
               <span>Registro</span>
             </Link>
-          </div>
+          </nav>
         )}
 
         <button
