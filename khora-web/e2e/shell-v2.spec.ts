@@ -36,22 +36,22 @@ test.describe('Shell Navegación v2', () => {
     await expect(page.locator('[data-testid="khora-splash"]')).toHaveCount(0, { timeout: 3000 });
     await page.getByRole('button', { name: 'Sistema', exact: true }).click();
 
-    const menu = page.getByRole('menu', { name: 'Menú Sistema' });
-    await expect(menu.getByRole('menuitem', { name: 'Dictado', exact: true })).toBeVisible();
-    await expect(menu.getByRole('menuitem', { name: 'Edición', exact: true })).toBeVisible();
-    await expect(menu.getByRole('menuitem', { name: 'Ingesta', exact: true })).toBeVisible();
-    await expect(menu.getByRole('menuitem', { name: 'KPIs', exact: true })).toBeVisible();
-    await expect(menu.getByRole('menuitem', { name: 'Mapa', exact: true })).toBeVisible();
-    await expect(menu.getByRole('menuitem', { name: 'Capturar', exact: true })).toBeVisible();
-    await expect(menu.getByRole('menuitem', { name: 'Herramientas', exact: true })).toBeVisible();
-    await expect(menu.getByRole('menuitem', { name: 'Roadmap', exact: true })).toBeVisible();
-    await expect(menu.getByRole('menuitem', { name: 'Adherencia', exact: true })).toBeVisible();
-    await expect(menu.getByRole('menuitem', { name: 'Seguridad', exact: true })).toBeVisible();
-    await expect(menu.getByRole('menuitem', { name: 'Control MCP', exact: true })).toBeVisible();
-    await expect(menu.getByRole('menuitem', { name: 'Evidencia normativa', exact: true })).toBeVisible();
-    await expect(menu.getByRole('menuitem', { name: 'Registro', exact: true })).toBeVisible();
+    const menu = page.getByRole('navigation', { name: 'Menú Sistema' });
+    await expect(menu.getByRole('link', { name: 'Dictado', exact: true })).toBeVisible();
+    await expect(menu.getByRole('link', { name: 'Edición', exact: true })).toBeVisible();
+    await expect(menu.getByRole('link', { name: 'Ingesta', exact: true })).toBeVisible();
+    await expect(menu.getByRole('link', { name: 'KPIs', exact: true })).toBeVisible();
+    await expect(menu.getByRole('link', { name: 'Mapa', exact: true })).toBeVisible();
+    await expect(menu.getByRole('link', { name: 'Capturar', exact: true })).toBeVisible();
+    await expect(menu.getByRole('link', { name: 'Herramientas', exact: true })).toBeVisible();
+    await expect(menu.getByRole('link', { name: 'Roadmap', exact: true })).toBeVisible();
+    await expect(menu.getByRole('link', { name: 'Adherencia', exact: true })).toBeVisible();
+    await expect(menu.getByRole('link', { name: 'Seguridad', exact: true })).toBeVisible();
+    await expect(menu.getByRole('link', { name: 'Control MCP', exact: true })).toBeVisible();
+    await expect(menu.getByRole('link', { name: 'Evidencia normativa', exact: true })).toBeVisible();
+    await expect(menu.getByRole('link', { name: 'Registro', exact: true })).toBeVisible();
 
-    await menu.getByRole('menuitem', { name: 'Seguridad', exact: true }).click();
+    await menu.getByRole('link', { name: 'Seguridad', exact: true }).click();
     await expect(page).toHaveURL(new RegExp('/sistema/seguridad$'));
     await expect(page.getByRole('heading', { name: 'Seguridad', exact: true })).toBeVisible();
     await expect(page.getByRole('tab', { name: 'Control MCP', exact: true })).toBeVisible();
