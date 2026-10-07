@@ -770,7 +770,7 @@ async function handleMcpRequest(req: NextRequest) {
         properties: {
           conversation_id: { type: "string" },
           turn_number: { type: "integer", minimum: 1 },
-          thinking_mode: { type: "string", enum: ["THINKING"] },
+          thinking_mode: { type: "string", enum: ["THINKING", "INSTANT", "UNKNOWN", "UNAVAILABLE"] },
           output_format_version: { type: "string", enum: ["v1.7.1"] },
         },
         required: ["thinking_mode", "output_format_version"],
@@ -824,7 +824,7 @@ async function handleMcpRequest(req: NextRequest) {
       },
       _thinking_mode: {
         type: "string",
-        enum: ["THINKING"],
+        enum: ["THINKING", "INSTANT", "UNKNOWN", "UNAVAILABLE"],
         description: "REQUERIDO: ChatGPT debe estar en modo Thinking.",
       },
       _output_format_version: {
