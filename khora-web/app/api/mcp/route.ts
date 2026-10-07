@@ -529,6 +529,8 @@ async function handleMcpRequest(req: NextRequest) {
     {
       conversation_id: z.string().optional().describe("Identificador externo de conversación, si la plataforma lo proporciona"),
       turn_number: z.number().int().positive().optional().describe("Número de turno, si la plataforma lo proporciona"),
+      thinking_mode: NORM_THINKING_MODE,
+      output_format_version: NORM_OUTPUT_FORMAT_VERSION,
     },
     async (args: any) => {
       const denied = requireScope("norm:turn");
