@@ -20,7 +20,7 @@ import { toolKhoraEstadoVivo, toolKhoraEventosRecientes, toolKhoraObservacionIns
 import { assertNormativeTurnOpen, openNormativeTurn, applyNormativePrinciple, verifyNormativeTurn, releaseNormativeTurn } from "@/lib/server/mcp-normative";
 import { authenticateManualMcpToken, MANUAL_MCP_TOKEN_PREFIX } from "@/lib/server/mcp-manual-token";
 import { registrarEventoServicio } from "@/lib/server/service-observability";
-import { getCurrentSiSnapshot, getCurrentVerifierInfo } from "@/lib/server/norm-check";
+import { getCurrentSiSnapshot, getCurrentMethodologySnapshot, getCurrentVerifierInfo } from "@/lib/server/norm-check";
 import { assertNormativeRuntimeContext, REASONING_MODES, REQUIRED_OUTPUT_FORMAT_VERSION, REQUIRED_PLATFORM, type ReasoningMode } from "@/lib/server/normative-runtime";
 
 export const runtime = "nodejs";
@@ -483,6 +483,7 @@ async function handleMcpRequest(req: NextRequest) {
       const missingScopes = requiredScopes.filter((scope) => !scopes.includes(scope));
       try {
         const snapshot = await getCurrentSiSnapshot();
+        const methodologySnapshot = await getCurrentMethodologySnapshot();
         const verifier = getCurrentVerifierInfo();
         const fullAccess = missingScopes.length === 0;
         return {
@@ -497,8 +498,13 @@ async function handleMcpRequest(req: NextRequest) {
               protocol_version: verifier.protocol_version,
               verifier_version: verifier.verifier_version,
               si_version: snapshot.version,
+              si_version_name: snapshot.versionName,
+              si_last_updated_at: snapshot.canonicalUpdatedAt,
               si_sha256: snapshot.sha256,
               manifest_sha256: snapshot.manifestSha256,
+              methodology_version: methodologySnapshot.version,
+              methodology_version_name: methodologySnapshot.versionName,
+              methodology_last_updated_at: methodologySnapshot.canonicalUpdatedAt,
               tools_contract: "SINGLE_MCP"
             })
           }]
