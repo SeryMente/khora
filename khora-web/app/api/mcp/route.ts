@@ -214,7 +214,7 @@ async function handleMcpRequest(req: NextRequest) {
       instructions:
         "MANDATORY NORMATIVE GATE: para trabajo sujeto a la metodologia, ChatGPT debe estar en modo Thinking; si el modo no es verificable, detente y no ejecutes. " +
         "Durante el razonamiento: HEALTH MCP -> OPEN TURN -> aplicar todos los principios del snapshot -> VERIFY -> RELEASE -> respuesta. " +
-        "La salida visible de cada turno debe cumplir el contrato v1.7.0. " +
+        "La salida visible de cada turno debe cumplir el contrato v1.7.1. " +
         "Si Thinking, HEALTH, VERIFY o RELEASE falla, el turno permanece BLOQUEADO y no esta resuelto. " +
         "Usa el turn_token y los campos de Thinking/formato en toda herramienta sustantiva. " +
         "Nunca presentes verificacion ni completitud si KHORA no devolvio VERIFIED_RELEASE.",
@@ -612,7 +612,7 @@ async function handleMcpRequest(req: NextRequest) {
         type: "object",
         properties: {
           thinking_mode: { type: "string", enum: ["THINKING"] },
-          output_format_version: { type: "string", enum: ["v1.7.0"] },
+          output_format_version: { type: "string", enum: ["v1.7.1"] },
         },
         required: ["thinking_mode", "output_format_version"],
         additionalProperties: false,
