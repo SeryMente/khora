@@ -59,6 +59,10 @@ async function main() {
     while ((match = uiIdPattern.exec(content)) !== null) {
       if (!registeredUiIds.has(match[1])) fail("data-ui-id sin registro: " + match[1] + " en " + fileName);
     }
+
+    if (/<(div|span)\\b[^>]*\\bonClick\\s*=/.test(content)) {
+      fail("Interacción onClick sobre elemento no semántico en " + fileName + "; use <button>, <a> o el control nativo apropiado.");
+    }
   }
 
   const staticScreenPage = path.join(process.cwd(), "app", "ui-review", "[screen]", "estatico", "page.tsx");
