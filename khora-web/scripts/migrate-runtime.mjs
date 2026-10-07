@@ -1,5 +1,4 @@
 import fs from "node:fs/promises";
-import fs from "node:fs";
 import path from "node:path";
 import pg from "pg";
 
