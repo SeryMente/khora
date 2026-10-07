@@ -36,7 +36,13 @@ export default function SystemBar() {
 
   const systemActive =
     pathname?.startsWith("/sistema/registro") ||
-    pathname?.startsWith("/sistema/otros");
+    pathname?.startsWith("/sistema/otros") ||
+    pathname?.startsWith("/sistema/seguridad") ||
+    pathname?.startsWith("/sistema/mcp") ||
+    pathname?.startsWith("/sistema/dictado") ||
+    pathname?.startsWith("/sistema/editar") ||
+    pathname?.startsWith("/sistema/ingesta") ||
+    pathname?.startsWith("/sistema/kpis");
 
   return (
     <nav
@@ -119,7 +125,7 @@ export default function SystemBar() {
           <div
             role="menu"
             aria-label="Menú Sistema"
-            className="absolute bottom-full right-0 mb-2 min-w-48 overflow-hidden rounded-xl border shadow-2xl"
+            className="absolute bottom-full right-0 mb-2 max-h-[70vh] min-w-56 overflow-y-auto rounded-xl border shadow-2xl"
             style={{
               borderColor: "var(--khora-border)",
               background: "var(--khora-surface)",
@@ -135,23 +141,53 @@ export default function SystemBar() {
               <p className="text-xs opacity-60">Módulos del entorno</p>
             </div>
 
-            <Link
-              href="/sistema/registro"
-              role="menuitem"
-              className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80"
-            >
-              <Icons.ScrollText size={16} />
-              <span>Registro</span>
-            </Link>
-
-            <Link
-              href="/sistema/otros"
-              role="menuitem"
-              className="flex w-full items-center gap-3 border-t px-4 py-3 text-left text-xs font-bold hover:opacity-80"
+            <div
+              className="border-b px-3 py-2 text-left"
               style={{ borderColor: "var(--khora-border)" }}
             >
-              <Icons.PackageSearch size={16} />
-              <span>Otros</span>
+              <p className="text-[10px] font-bold uppercase tracking-[0.18em] opacity-50">
+                Operación
+              </p>
+            </div>
+
+            <Link href="/sistema/dictado" role="menuitem" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
+              <Icons.Mic size={16} />
+              <span>Dictado</span>
+            </Link>
+            <Link href="/sistema/editar" role="menuitem" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
+              <Icons.PenLine size={16} />
+              <span>Edición</span>
+            </Link>
+            <Link href="/sistema/ingesta" role="menuitem" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
+              <Icons.UploadCloud size={16} />
+              <span>Ingesta</span>
+            </Link>
+            <Link href="/sistema/kpis" role="menuitem" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
+              <Icons.Activity size={16} />
+              <span>KPIs</span>
+            </Link>
+
+            <div className="border-y px-3 py-2 text-left" style={{ borderColor: "var(--khora-border)" }}>
+              <p className="text-[10px] font-bold uppercase tracking-[0.18em] opacity-50">
+                Seguridad y control
+              </p>
+            </div>
+
+            <Link href="/sistema/seguridad" role="menuitem" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
+              <Icons.ShieldCheck size={16} />
+              <span>Seguridad</span>
+            </Link>
+            <Link href="/sistema/mcp" role="menuitem" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
+              <Icons.KeyRound size={16} />
+              <span>Control MCP</span>
+            </Link>
+            <Link href="/sistema/otros" role="menuitem" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
+              <Icons.FileCheck2 size={16} />
+              <span>Evidencia normativa</span>
+            </Link>
+            <Link href="/sistema/registro" role="menuitem" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
+              <Icons.ScrollText size={16} />
+              <span>Registro</span>
             </Link>
           </div>
         )}

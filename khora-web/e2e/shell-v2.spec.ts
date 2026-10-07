@@ -8,6 +8,8 @@ test.describe('Shell Navegación v2', () => {
       { path: '/sistema/volcados', expectedTitle: 'Mesa de Revisión Sincrónica' },
       { path: '/sistema/ingesta', expectedTitle: 'Ingesta' },
       { path: '/sistema/consulta', expectedTitle: 'Consola de Consulta' },
+      { path: '/sistema/seguridad', expectedTitle: 'Seguridad' },
+      { path: '/sistema/mcp', expectedTitle: 'Control MCP & Revocación' },
       { path: '/sistema/otros', expectedTitle: 'Evidencia normativa' },
       { path: '/grafo', expectedTitle: 'Grafo PKG - Proyección Leiden' },
       { path: '/mapa', expectedTitle: 'Mapa Visual de Ramificaciones' }
@@ -27,5 +29,27 @@ test.describe('Shell Navegación v2', () => {
         }
       }
     }
+  });
+  test('El menú Sistema expone las superficies recuperadas y el acceso de seguridad', async ({ page }) => {
+    await page.goto('http://localhost:3000/sistema/volcados');
+    await page.getByRole('button', { name: 'Sistema', exact: true }).click();
+
+    const menu = page.getByRole('menu', { name: 'Menú Sistema' });
+    await expect(menu.getByRole('menuitem', { name: 'Dictado', exact: true })).toBeVisible();
+    await expect(menu.getByRole('menuitem', { name: 'Edición', exact: true })).toBeVisible();
+    await expect(menu.getByRole('menuitem', { name: 'Ingesta', exact: true })).toBeVisible();
+    await expect(menu.getByRole('menuitem', { name: 'KPIs', exact: true })).toBeVisible();
+    await expect(menu.getByRole('menuitem', { name: 'Seguridad', exact: true })).toBeVisible();
+    await expect(menu.getByRole('menuitem', { name: 'Control MCP', exact: true })).toBeVisible();
+    await expect(menu.getByRole('menuitem', { name: 'Evidencia normativa', exact: true })).toBeVisible();
+    await expect(menu.getByRole('menuitem', { name: 'Registro', exact: true })).toBeVisible();
+
+    await menu.getByRole('menuitem', { name: 'Seguridad', exact: true }).click();
+    await expect(page).toHaveURL(new RegExp('/sistema/seguridad$'));
+    await expect(page.getByRole('heading', { name: 'Seguridad', exact: true })).toBeVisible();
+    await expect(page.getByRole('tab', { name: 'Control MCP', exact: true })).toBeVisible();
+
+    await page.getByRole('tab', { name: 'Control MCP', exact: true }).click();
+    await expect(page.getByRole('heading', { name: 'Control MCP & Revocación', exact: true })).toBeVisible();
   });
 });

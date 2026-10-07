@@ -1,7 +1,7 @@
 # NORM-CHECK en KHORA
 
-**Estado:** IMPLEMENTACIÓN INICIAL  
-**Versión:** v0.3.0 — MCP multiuso + registro verificable por ciclo  
+**Estado:** IMPLEMENTADO  
+**Versión:** v0.4.0 — Gobernanza versionada y observabilidad de servicios  
 **Fecha:** 2026-10-06
 
 ## Superficie
@@ -43,6 +43,16 @@ Los blobs del SI se cachean por SHA para reducir latencia cuando se reutiliza un
 La combinación cycle_id + attempt es única. Un rechazo no se sobrescribe: el cliente debe crear un nuevo attempt.
 
 Existe además una migración SQL 025 y un bootstrap perezoso de la tabla para evitar que un despliegue quede inutilizable si la migración todavía no se ha aplicado.
+
+## Navegación UI
+
+La superficie normativa y su control de acceso deben ser alcanzables sin conocer URLs internas:
+
+- **Menú Sistema → Seguridad** abre `/sistema/seguridad`.
+- Dentro de **Seguridad** están los submódulos **Entorno Persistente**, **Bóveda** y **Control MCP**.
+- **Control MCP** abre la consola existente de `/sistema/mcp`: OAuth, Bearer manuales, scopes y revocación.
+- **Menú Sistema → Evidencia normativa** abre `/sistema/otros`: consulta, detalle y verificación de receipts.
+- **Menú Sistema → Registro** abre `/sistema/registro`: observabilidad y eventos persistidos.
 
 ## Interfaz
 
