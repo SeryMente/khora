@@ -20,6 +20,9 @@ type TurnRow = {
   conversation_id: string;
   turn_number: number | null;
   actor: string;
+  platform: string;
+  reasoning_mode: string;
+  output_format_version: string;
   current_attempt: number;
   status: "OPEN" | "CLOSED";
   nonce: string;
@@ -45,6 +48,9 @@ async function ensureSchema() {
           "conversation_id TEXT NOT NULL," +
           "turn_number INTEGER," +
           "actor TEXT NOT NULL," +
+          "platform TEXT NOT NULL," +
+          "reasoning_mode TEXT NOT NULL," +
+          "output_format_version TEXT NOT NULL," +
           "current_attempt INTEGER NOT NULL CHECK (current_attempt > 0)," +
           "status TEXT NOT NULL CHECK (status IN ('OPEN','CLOSED'))," +
           "nonce TEXT NOT NULL UNIQUE," +
@@ -58,6 +64,9 @@ async function ensureSchema() {
           "verified_attempt INTEGER" +
         ");"
       );
+      await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS platform TEXT NOT NULL DEFAULT 'ChatGPT'");
+      await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS reasoning_mode TEXT NOT NULL DEFAULT 'THINKING'");
+      await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS output_format_version TEXT NOT NULL DEFAULT 'v1.7.0'");
       await db.query("CREATE INDEX IF NOT EXISTS normative_turns_opened_at_idx ON normative_turns (opened_at DESC)");
       await db.query("CREATE INDEX IF NOT EXISTS normative_turns_status_idx ON normative_turns (status, opened_at DESC)");
     })().catch((error) => {
@@ -254,6 +263,9 @@ export async function openNormativeTurn(
   if (existing) {
     if (existing.actor !== actor) throw new Error("TURN_ACTOR_MISMATCH");
     if (existing.status === "CLOSED") throw new Error("TURN_ALREADY_CLOSED");
+    if (existing.platform !== input.runtime.platform || existing.reasoning_mode !== input.runtime.reasoning_mode || existing.output_format_version !== input.runtime.output_format_version) {
+      throw new Error("TURN_RUNTIME_MISMATCH");
+    }
 
     const gen = await obtenerGeneracionRevocacion(actor);
     return {
@@ -288,7 +300,7 @@ export async function openNormativeTurn(
 
   const inserted = await db.query<TurnRow>(
     "INSERT INTO normative_turns (" +
-      "cycle_id, conversation_id, turn_number, actor, current_attempt, status, nonce, " +
+      "cycle_id, conversation_id, turn_number, actor, platform, reasoning_mode, output_format_version, current_attempt, status, nonce, " +
       "si_version, si_git_blob_sha, si_sha256, manifest_sha256, manifest" +
       ") VALUES ($1,$2,$3,$4,1,'OPEN',$5,$6,$7,$8,$9,$10) " +
       "ON CONFLICT (cycle_id) DO NOTHING " +
@@ -299,6 +311,9 @@ export async function openNormativeTurn(
       conversationId || cycleId,
       turnNumber,
       actor,
+      REQUIRED_PLATFORM,
+      input.runtime.reasoning_mode,
+      input.runtime.output_format_version,
       nonce,
       snapshot.version,
       snapshot.gitBlobSha,
@@ -478,6 +493,12 @@ export async function verifyNormativeTurn(
   if (!receipt || receipt.cycle?.id !== turn.cycle_id) throw new Error("TURN_RECEIPT_CYCLE_MISMATCH");
   if (receipt.cycle.attempt !== turn.current_attempt) throw new Error("TURN_RECEIPT_ATTEMPT_MISMATCH");
   if (receipt.nonce !== turn.nonce) throw new Error("TURN_RECEIPT_NONCE_MISMATCH");
+  if (receipt.runtime.platform !== token.turn_platform || receipt.runtime.reasoning_mode !== token.turn_reasoning_mode || receipt.runtime.output_format_version !== token.turn_output_format_version) {
+    throw new Error("TURN_RECEIPT_RUNTIME_MISMATCH");
+  }
+  if (receipt.runtime.platform !== turn.platform || receipt.runtime.reasoning_mode !== turn.reasoning_mode || receipt.runtime.output_format_version !== turn.output_format_version) {
+    throw new Error("TURN_RUNTIME_PERSISTENCE_MISMATCH");
+  }
   if (receipt.si?.sha256 !== turn.si_sha256 || receipt.si?.manifest_sha256 !== turn.manifest_sha256) {
     throw new Error("TURN_RECEIPT_SNAPSHOT_MISMATCH");
   }
@@ -490,7 +511,7 @@ export async function verifyNormativeTurn(
     await client.query("BEGIN");
 
     const locked = await client.query<TurnRow>(
-      "SELECT cycle_id, conversation_id, turn_number, actor, current_attempt, status, nonce, " +
+      "SELECT cycle_id, conversation_id, turn_number, actor, platform, reasoning_mode, output_format_version, current_attempt, status, nonce, " +
         "si_version, si_git_blob_sha, si_sha256, manifest_sha256, manifest, opened_at, closed_at, verified_attempt " +
         "FROM normative_turns WHERE cycle_id = $1 FOR UPDATE",
       [turn.cycle_id]
