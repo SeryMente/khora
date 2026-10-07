@@ -757,6 +757,8 @@ export async function verifyNormativeReceipt(
       si_git_commit_sha: "",
       si_git_blob_sha: "",
       manifest_sha256: "",
+      methodology_version: "",
+      methodology_git_commit_sha: "",
       coverage: { expected: 0, evaluated: 0, missing: 0, duplicates: 0, unknown: 0, percent: 0 },
       order_verified: false,
       application_log_sha256: "",
