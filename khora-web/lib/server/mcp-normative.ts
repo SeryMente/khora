@@ -33,6 +33,10 @@ type TurnRow = {
   si_git_blob_sha: string;
   si_sha256: string;
   manifest_sha256: string;
+  methodology_version: string;
+  methodology_git_commit_sha: string;
+  methodology_git_blob_sha: string;
+  methodology_sha256: string;
   manifest: unknown[];
   application_index: number;
   application_vector: Array<{ folio: string; status: "A" | "N" | "C"; anchor?: string | null; reason_code?: string | null }>;
@@ -64,6 +68,10 @@ async function ensureSchema() {
           "si_git_blob_sha TEXT NOT NULL," +
           "si_sha256 TEXT NOT NULL," +
           "manifest_sha256 TEXT NOT NULL," +
+          "methodology_version TEXT NOT NULL," +
+          "methodology_git_commit_sha TEXT NOT NULL," +
+          "methodology_git_blob_sha TEXT NOT NULL," +
+          "methodology_sha256 TEXT NOT NULL," +
           "manifest JSONB NOT NULL," +
           "application_index INTEGER NOT NULL DEFAULT 0 CHECK (application_index >= 0)," +
           "application_vector JSONB NOT NULL DEFAULT '[]'::jsonb," +
@@ -76,6 +84,10 @@ async function ensureSchema() {
       await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS reasoning_mode TEXT NOT NULL DEFAULT 'THINKING'");
       await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS output_format_version TEXT NOT NULL DEFAULT 'v1.7.2'");
       await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS si_git_commit_sha TEXT NOT NULL DEFAULT 'UNKNOWN'");
+      await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS methodology_version TEXT NOT NULL DEFAULT 'UNKNOWN'");
+      await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS methodology_git_commit_sha TEXT NOT NULL DEFAULT 'UNKNOWN'");
+      await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS methodology_git_blob_sha TEXT NOT NULL DEFAULT 'UNKNOWN'");
+      await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS methodology_sha256 TEXT NOT NULL DEFAULT 'UNKNOWN'");
       await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS application_index INTEGER NOT NULL DEFAULT 0");
       await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS application_vector JSONB NOT NULL DEFAULT '[]'::jsonb");
       await db.query("ALTER TABLE normative_receipts ADD COLUMN IF NOT EXISTS si_git_commit_sha TEXT NOT NULL DEFAULT 'UNKNOWN'");
@@ -263,7 +275,7 @@ async function readTurn(cycleId: string): Promise<TurnRow | null> {
   const db = getDb();
   const result = await db.query<TurnRow>(
     "SELECT cycle_id, conversation_id, turn_number, actor, platform, reasoning_mode, output_format_version, current_attempt, status, nonce, " +
-      "si_version, si_git_commit_sha, si_git_blob_sha, si_sha256, manifest_sha256, manifest, application_index, application_vector, opened_at, closed_at, verified_attempt " +
+      "si_version, si_git_commit_sha, si_git_blob_sha, si_sha256, manifest_sha256, methodology_version, methodology_git_commit_sha, methodology_git_blob_sha, methodology_sha256, manifest, application_index, application_vector, opened_at, closed_at, verified_attempt " +
       "FROM normative_turns WHERE cycle_id = $1 LIMIT 1",
     [cycleId]
   );
@@ -305,6 +317,7 @@ export async function openNormativeTurn(
     }
 
     const existingSnapshot = await loadSiSnapshot(existing.si_git_blob_sha, existing.si_git_commit_sha);
+    const existingMethodologySnapshot = await loadMethodologySnapshot(existing.methodology_git_blob_sha, existing.methodology_git_commit_sha);
     const gen = await obtenerGeneracionRevocacion(actor);
     return {
       ok: true,
@@ -319,9 +332,13 @@ export async function openNormativeTurn(
       },
       snapshot: {
         version: existing.si_version,
-         version_name: existingSnapshot.versionName,
-         last_updated_at: existingSnapshot.canonicalUpdatedAt,
-         output_header: buildCanonicalSiOutputHeader(existingSnapshot, existing.opened_at),
+        version_name: existingSnapshot.versionName,
+        last_updated_at: existingSnapshot.canonicalUpdatedAt,
+        output_header: buildCanonicalSiOutputHeader(existingSnapshot, existing.opened_at),
+        methodology_version: existing.methodology_version,
+        methodology_version_name: existingMethodologySnapshot.versionName,
+        methodology_last_updated_at: existingMethodologySnapshot.canonicalUpdatedAt,
+        methodology_output_header: buildCanonicalMethodologyOutputHeader(existingMethodologySnapshot, existing.opened_at),
         git_commit_sha: existing.si_git_commit_sha,
         git_blob_sha: existing.si_git_blob_sha,
         sha256: existing.si_sha256,
@@ -343,11 +360,11 @@ export async function openNormativeTurn(
   const inserted = await db.query<TurnRow>(
     "INSERT INTO normative_turns (" +
       "cycle_id, conversation_id, turn_number, actor, platform, reasoning_mode, output_format_version, current_attempt, status, nonce, " +
-      "si_version, si_git_commit_sha, si_git_blob_sha, si_sha256, manifest_sha256, manifest, application_index, application_vector" +
+      "si_version, si_git_commit_sha, si_git_blob_sha, si_sha256, manifest_sha256, methodology_version, methodology_git_commit_sha, methodology_git_blob_sha, methodology_sha256, manifest, application_index, application_vector" +
       ") VALUES ($1,$2,$3,$4,$5,$6,$7,1,'OPEN',$8,$9,$10,$11,$12,$13,$14,0,$15) " +
       "ON CONFLICT (cycle_id) DO NOTHING " +
       "RETURNING cycle_id, conversation_id, turn_number, actor, platform, reasoning_mode, output_format_version, current_attempt, status, nonce, " +
-      "si_version, si_git_commit_sha, si_git_blob_sha, si_sha256, manifest_sha256, manifest, application_index, application_vector, opened_at, closed_at, verified_attempt",
+      "si_version, si_git_commit_sha, si_git_blob_sha, si_sha256, manifest_sha256, methodology_version, methodology_git_commit_sha, methodology_git_blob_sha, methodology_sha256, manifest, application_index, application_vector, opened_at, closed_at, verified_attempt",
     [
       cycleId,
       conversationId || cycleId,
@@ -362,6 +379,10 @@ export async function openNormativeTurn(
       snapshot.gitBlobSha,
       snapshot.sha256,
       snapshot.manifestSha256,
+      methodologySnapshot.version,
+      methodologySnapshot.gitCommitSha,
+      methodologySnapshot.gitBlobSha,
+      methodologySnapshot.sha256,
       JSON.stringify(snapshot.manifest),
       JSON.stringify([]),
     ]
@@ -461,7 +482,7 @@ export async function applyNormativePrinciple(
     await client.query("BEGIN");
     const result = await client.query<TurnRow>(
       "SELECT cycle_id, conversation_id, turn_number, actor, platform, reasoning_mode, output_format_version, current_attempt, status, nonce, " +
-        "si_version, si_git_commit_sha, si_git_blob_sha, si_sha256, manifest_sha256, manifest, application_index, application_vector, opened_at, closed_at, verified_attempt " +
+        "si_version, si_git_commit_sha, si_git_blob_sha, si_sha256, manifest_sha256, methodology_version, methodology_git_commit_sha, methodology_git_blob_sha, methodology_sha256, manifest, application_index, application_vector, opened_at, closed_at, verified_attempt " +
         "FROM normative_turns WHERE cycle_id = $1 FOR UPDATE",
       [token.turn_cycle_id],
     );
@@ -653,7 +674,7 @@ export async function verifyNormativeTurn(
 
     const locked = await client.query<TurnRow>(
       "SELECT cycle_id, conversation_id, turn_number, actor, platform, reasoning_mode, output_format_version, current_attempt, status, nonce, " +
-        "si_version, si_git_commit_sha, si_git_blob_sha, si_sha256, manifest_sha256, manifest, application_index, application_vector, opened_at, closed_at, verified_attempt " +
+        "si_version, si_git_commit_sha, si_git_blob_sha, si_sha256, manifest_sha256, methodology_version, methodology_git_commit_sha, methodology_git_blob_sha, methodology_sha256, manifest, application_index, application_vector, opened_at, closed_at, verified_attempt " +
         "FROM normative_turns WHERE cycle_id = $1 FOR UPDATE",
       [turn.cycle_id]
     );
