@@ -18,6 +18,7 @@ test.describe('Shell Navegación v2', () => {
     for (const route of routes) {
       await page.goto(`http://localhost:3000${route.path}`);
       await page.waitForLoadState('domcontentloaded');
+      await expect(page.locator('[data-testid="khora-splash"]')).toHaveCount(0, { timeout: 3000 });
 
       try {
         await expect(page.locator(`h1:has-text("${route.expectedTitle}"), h2:has-text("${route.expectedTitle}")`).first()).toBeVisible({ timeout: 5000 });
@@ -32,6 +33,7 @@ test.describe('Shell Navegación v2', () => {
   });
   test('El menú Sistema expone las superficies recuperadas y el acceso de seguridad', async ({ page }) => {
     await page.goto('http://localhost:3000/sistema/volcados');
+    await expect(page.locator('[data-testid="khora-splash"]')).toHaveCount(0, { timeout: 3000 });
     await page.getByRole('button', { name: 'Sistema', exact: true }).click();
 
     const menu = page.getByRole('menu', { name: 'Menú Sistema' });
