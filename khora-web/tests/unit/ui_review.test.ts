@@ -8,7 +8,6 @@ import fs from "fs";
 import path from "path";
 
 test("UI Review Harness Test Suite", async (t) => {
-
   await t.test("1. Registro de pantallas y escenarios completo y no vacío", () => {
     assert.strictEqual(SCREENS.length, 9);
     assert.deepStrictEqual(SCREENS, ["ingreso", "archivo", "revision", "aprobacion", "ingesta", "registro", "grafo", "consulta", "kpi"]);
@@ -27,7 +26,6 @@ test("UI Review Harness Test Suite", async (t) => {
 
   await t.test("2. ReviewFixtureAdapter opera exclusivamente con datos sintéticos y cero llamadas mutantes", async () => {
     const adapter = new ReviewFixtureAdapter();
-
     const volcados = await adapter.getVolcados();
     assert.ok(Array.isArray(volcados));
     assert.ok(volcados.length > 0);
@@ -50,14 +48,12 @@ test("UI Review Harness Test Suite", async (t) => {
     const originalEnv = process.env.KHORA_UI_REVIEW_MODE;
 
     try {
-      // 3a. Variable apagada / ausente
       delete process.env.KHORA_UI_REVIEW_MODE;
       const { GET: getManifestDisabled } = await import("../../app/ui-review/manifest.json/route");
       const reqDisabled = new Request("http://localhost/ui-review/manifest.json");
       const resDisabled = await getManifestDisabled(reqDisabled);
       assert.strictEqual(resDisabled.status, 404);
 
-      // 3b. Variable encendida = 1
       process.env.KHORA_UI_REVIEW_MODE = "1";
       const resEnabled = await getManifestDisabled(reqDisabled);
       assert.strictEqual(resEnabled.status, 200);
@@ -68,8 +64,8 @@ test("UI Review Harness Test Suite", async (t) => {
       assert.ok(body.source_fingerprint);
       assert.ok(Array.isArray(body.screens));
       assert.strictEqual(body.manifest_urls.length, Object.keys(UI_REVIEW_SCENARIOS).length);
+      assert.strictEqual(body.static_urls.length, SCREENS.length);
 
-      // Headers
       assert.strictEqual(resEnabled.headers.get("Cache-Control"), "no-store, max-age=0, must-revalidate");
       assert.strictEqual(resEnabled.headers.get("X-Robots-Tag"), "noindex, nofollow");
     } finally {
@@ -77,37 +73,36 @@ test("UI Review Harness Test Suite", async (t) => {
     }
   });
 
-  await t.test("4. Regla Anti-Duplicación: Las páginas productivas y el harness utilizan los mismos componentes presentacionales compartidos", () => {
+  await t.test("4. Fuente única de componentes presentacionales", () => {
     const sharedDir = path.join(process.cwd(), "app", "components", "shared");
-    assert.ok(fs.existsSync(sharedDir), "El directorio app/components/shared debe existir");
+    assert.ok(fs.existsSync(sharedDir), "Debe existir app/components/shared");
 
     const requiredComponents = ["IngresoView.tsx", "PipelineView.tsx", "RegistroView.tsx", "GrafoView.tsx", "ConsultaView.tsx", "KpiPanelView.tsx"];
     for (const comp of requiredComponents) {
       const filePath = path.join(sharedDir, comp);
-      assert.ok(fs.existsSync(filePath), `Falta el componente compartido ${comp}`);
-
-      const content = fs.readFileSync(filePath, "utf8");
-      assert.ok(content.includes("data-ui-id="), `El componente ${comp} debe incluir atributos data-ui-id`);
+      assert.ok(fs.existsSync(filePath), "Falta " + comp);
+      assert.ok(fs.readFileSync(filePath, "utf8").includes("data-ui-id="), comp + " debe exponer data-ui-id");
     }
 
-    // Verificar que las páginas productivas importan desde app/components/shared
-    const ingresoPageContent = fs.readFileSync(path.join(process.cwd(), "app", "sistema", "ingreso", "page.tsx"), "utf8");
-    assert.ok(ingresoPageContent.includes("IngresoView"), "ingreso/page.tsx debe consumir IngresoView");
-
-    const volcadosPageContent = fs.readFileSync(path.join(process.cwd(), "app", "sistema", "volcados", "page.tsx"), "utf8");
-    assert.ok(volcadosPageContent.includes("PipelineView"), "volcados/page.tsx debe consumir PipelineView");
-
-    const registroPageContent = fs.readFileSync(path.join(process.cwd(), "app", "sistema", "registro", "page.tsx"), "utf8");
-    assert.ok(registroPageContent.includes("RegistroView"), "registro/page.tsx debe consumir RegistroView");
-
-    const grafoPageContent = fs.readFileSync(path.join(process.cwd(), "app", "grafo", "page.tsx"), "utf8");
-    assert.ok(grafoPageContent.includes("GrafoView"), "grafo/page.tsx debe consumir GrafoView");
-
-    const consultaPageContent = fs.readFileSync(path.join(process.cwd(), "app", "sistema", "consulta", "page.tsx"), "utf8");
-    assert.ok(consultaPageContent.includes("ConsultaView"), "consulta/page.tsx debe consumir ConsultaView");
-
-    const kpisPageContent = fs.readFileSync(path.join(process.cwd(), "app", "sistema", "kpis", "page.tsx"), "utf8");
-    assert.ok(kpisPageContent.includes("KpiPanelView"), "kpis/page.tsx debe consumir KpiPanelView");
+    for (const [label, file, symbol] of [
+      ["Ingreso", "app/sistema/ingreso/page.tsx", "IngresoView"],
+      ["Volcados", "app/sistema/volcados/page.tsx", "PipelineView"],
+      ["Registro", "app/sistema/registro/page.tsx", "RegistroView"],
+      ["Grafo", "app/grafo/page.tsx", "GrafoView"],
+      ["Consulta", "app/sistema/consulta/page.tsx", "ConsultaView"],
+      ["KPIs", "app/sistema/kpis/page.tsx", "KpiPanelView"],
+    ] as const) {
+      const content = fs.readFileSync(path.join(process.cwd(), file), "utf8");
+      assert.ok(content.includes(symbol), label + " debe consumir " + symbol);
+    }
   });
 
+  await t.test("5. Prerender semántico existe para las nueve pantallas", () => {
+    const staticPage = path.join(process.cwd(), "app", "ui-review", "[screen]", "estatico", "page.tsx");
+    assert.ok(fs.existsSync(staticPage), "Falta app/ui-review/[screen]/estatico/page.tsx");
+    const content = fs.readFileSync(staticPage, "utf8");
+    assert.ok(content.includes("generateStaticParams"));
+    assert.ok(content.includes("force-static"));
+    assert.ok(content.includes("SCREENS"));
+  });
 });
