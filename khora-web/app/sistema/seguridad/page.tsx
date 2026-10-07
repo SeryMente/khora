@@ -64,8 +64,25 @@ function SeguridadContent() {
     router.replace(tab === "seguridad" ? "/sistema/seguridad" : `/sistema/seguridad?tab=${tab}`, { scroll: false });
   }
 
+  function handleTabKeyDown(event: React.KeyboardEvent<HTMLButtonElement>, current: SecurityTab) {
+    const index = TABS.findIndex((tab) => tab.id === current);
+    if (index < 0) return;
+
+    let nextIndex = index;
+    if (event.key === "ArrowRight" || event.key === "ArrowDown") nextIndex = (index + 1) % TABS.length;
+    else if (event.key === "ArrowLeft" || event.key === "ArrowUp") nextIndex = (index - 1 + TABS.length) % TABS.length;
+    else if (event.key === "Home") nextIndex = 0;
+    else if (event.key === "End") nextIndex = TABS.length - 1;
+    else return;
+
+    event.preventDefault();
+    const next = TABS[nextIndex];
+    openTab(next.id);
+    window.requestAnimationFrame(() => document.getElementById("security-tab-" + next.id)?.focus());
+  }
+
   return <div className="w-full max-w-5xl space-y-8">
-    <div className="flex max-w-full overflow-x-auto border-b" style={{ borderColor: "var(--khora-border)" }} role="tablist" aria-label="Módulos de seguridad">
+    <div className="flex max-w-full overflow-x-auto border-b" style={{ borderColor: "var(--khora-border)" }} role="tablist" aria-label="Módulos de seguridad" aria-orientation="horizontal">
       {TABS.map((tab) => {
         const Icon = tab.icon;
         const tabPanelId = "security-panel-" + tab.id;
@@ -78,6 +95,7 @@ function SeguridadContent() {
           aria-controls={tabPanelId}
           tabIndex={activeTab === tab.id ? 0 : -1}
           onClick={() => openTab(tab.id)}
+          onKeyDown={(event) => handleTabKeyDown(event, tab.id)}
           className="flex min-h-12 shrink-0 items-center gap-2 px-4 py-3 text-sm font-bold uppercase tracking-wider focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--khora-accent)]"
           style={{
             borderBottom: activeTab === tab.id ? "2px solid var(--khora-accent)" : "2px solid transparent",
