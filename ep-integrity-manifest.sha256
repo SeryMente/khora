@@ -247,9 +247,9 @@ ee563838a9c1de72e6ea251c14276010fe2580708b094fad116bb9855f06885d  ./khora-web/ap
 c642925ebd3994a835268d069aca1ecace5316a028acc3117a22e5a8c50c516d  ./khora-web/app/error.tsx
 1104a5b5f0edab20b3f65eceaa7428d9e65bc357c549c74ea59fe681702d0956  ./khora-web/app/globals.css
 e33be9249217a71034bc3fe5ace256876ec76dfde571f0dbfebccaf4626e48b0  ./khora-web/app/grafo/page.tsx
-821e9d5808ed33b11743dd5f7eea41790c8918380ca94ce9793dea995b5f2f38  ./khora-web/app/herramientas/bitacora/page.tsx
+6ca4784dc299829948b88d6609d2e230160f49822223885c6701690e54fa3d26  ./khora-web/app/herramientas/bitacora/page.tsx
 189d15238e0ecdf58cbc9c501c3d66884eae3d701e32391d2000748ef595049b  ./khora-web/app/herramientas/opi-vri/page.tsx
-7cce01486806d99bb3b1b3447b99ed794bc01d04bb88a0d6fedcd9d6df9a3f30  ./khora-web/app/herramientas/page.tsx
+fdf621136a61c8c5690ffee014f7647ca478165288a4750216c9de550f6bf769  ./khora-web/app/herramientas/page.tsx
 93a796faaef1c6be49ceae370ed5191a6f36b626f88bc56c55b2e5564c8e1dcc  ./khora-web/app/layout.tsx
 a35ad45b0cc67d30c3902c934574590c84763ee6d5a5868e8c18723e434ad282  ./khora-web/app/mapa/CustomNode.tsx
 ca87d091bccb3009f0c6d074567163461c575e07d5727f087966d62c01454125  ./khora-web/app/mapa/page.tsx
