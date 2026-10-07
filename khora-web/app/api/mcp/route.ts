@@ -212,12 +212,12 @@ async function handleMcpRequest(req: NextRequest) {
     },
     {
       instructions:
-        "NORM-CHECK ENFORCEMENT: toda ejecucion que use esta aplicacion debe tratarse como un ciclo normativo. " +
-        "Primero llama a khora_norm_open_turn para fijar el snapshot, nonce y turn_token. " +
-        "Usa ese turn_token en toda herramienta MCP sustantiva de KHORA. " +
-        "Antes de emitir el resultado final llama a khora_norm_verify_turn con el receipt completo. " +
-        "Solo VERIFIED cierra el ciclo; INVALID e INCOMPLETE requieren un nuevo attempt. " +
-        "Nunca presentes la verificacion como realizada si KHORA no devolvio VERIFIED.",
+        "MANDATORY NORMATIVE GATE: para trabajo sujeto a la metodologia, ChatGPT debe estar en modo Thinking; si el modo no es verificable, detente y no ejecutes. " +
+        "Durante el razonamiento: HEALTH MCP -> OPEN TURN -> aplicar todos los principios del snapshot -> VERIFY -> RELEASE -> respuesta. " +
+        "La salida visible de cada turno debe cumplir el contrato v1.7.0. " +
+        "Si Thinking, HEALTH, VERIFY o RELEASE falla, el turno permanece BLOQUEADO y no esta resuelto. " +
+        "Usa el turn_token y los campos de Thinking/formato en toda herramienta sustantiva. " +
+        "Nunca presentes verificacion ni completitud si KHORA no devolvio VERIFIED_RELEASE.",
     },
   );
 
