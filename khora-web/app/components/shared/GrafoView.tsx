@@ -84,11 +84,9 @@ function GraphNode({ data }: NodeProps<FlowNode>) {
   const scale = Math.max(0.88, Math.min(1.3, 0.9 + Number(node.centrality || 1) * 0.08));
 
   return (
-    <button
-      type="button"
+    <div
       data-ui-id="grafo.flow-node"
-      aria-label={"Inspeccionar nodo: " + node.summary}
-      className="relative block rounded-xl border px-4 py-3 text-left shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--khora-accent)]"
+      className="relative rounded-xl border px-2 py-2 shadow-lg"
       style={{
         width: 230 * scale,
         minHeight: 92,
@@ -97,25 +95,31 @@ function GraphNode({ data }: NodeProps<FlowNode>) {
         borderColor: color,
         boxShadow: `0 0 0 1px ${color}33, 0 8px 24px rgba(0,0,0,.22)`,
       }}
-      onClick={(event) => {
-        event.stopPropagation();
-        data.onSelect?.(node);
-      }}
     >
       <Handle type="target" position={Position.Left} className="!h-2 !w-2 !border-0" style={{ background: color }} />
-      <div className="mb-2 truncate text-xs font-bold" title={node.summary}>
-        {node.summary}
-      </div>
-      <div className="flex flex-wrap gap-x-3 gap-y-1 text-[10px] opacity-75">
-        <span>Comunidad {node.community}</span>
-        <span>Nivel {node.level}</span>
-        <span>Centralidad {node.centrality}</span>
-      </div>
-      <div className="mt-2 truncate text-[9px] opacity-60" title={node.origen}>
-        {node.verificacion} · {node.origen}
-      </div>
+      <button
+        type="button"
+        aria-label={"Inspeccionar nodo: " + node.summary}
+        className="block w-full rounded-lg px-2 py-1 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--khora-accent)]"
+        onClick={(event) => {
+          event.stopPropagation();
+          data.onSelect?.(node);
+        }}
+      >
+        <span className="mb-2 block truncate text-xs font-bold" title={node.summary}>
+          {node.summary}
+        </span>
+        <span className="flex flex-wrap gap-x-3 gap-y-1 text-[10px] opacity-75">
+          <span>Comunidad {node.community}</span>
+          <span>Nivel {node.level}</span>
+          <span>Centralidad {node.centrality}</span>
+        </span>
+        <span className="mt-2 block truncate text-[9px] opacity-60" title={node.origen}>
+          {node.verificacion} · {node.origen}
+        </span>
+      </button>
       <Handle type="source" position={Position.Right} className="!h-2 !w-2 !border-0" style={{ background: color }} />
-    </button>
+    </div>
   );
 }
 
