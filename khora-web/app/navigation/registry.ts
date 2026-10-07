@@ -167,7 +167,7 @@ export const CANONICAL_PRODUCT_ROUTES = new Set(
 export function normalizeNavigationPath(raw: string): string {
   const clean = raw.split("#")[0].split("?")[0].trim();
   if (!clean || clean === "/") return "/";
-  return clean.replace(//+$/, "");
+  return clean.replace(/\/+$/, "");
 }
 
 export function navigationGroupNames(entry: NavigationEntry): string[] {
