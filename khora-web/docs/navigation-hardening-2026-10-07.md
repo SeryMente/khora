@@ -57,20 +57,44 @@
 | Momento | Evidencia | Resultado |
 |---|---|---|
 | Baseline | `main@9cd28610395ee9cf0876294480204dfcb45a7c1e` | Regresión de mega-menú identificada |
-| Rama | `fix/canonical-navigation-20261007` | En ejecución |
-| Implementación | Registro + barra + home + guard + tests + docs | Pendiente de cerrar |
-| CI | `khora-ok / gate`, `CI`, `UI Quality` | Pendiente de ejecución |
-| Producción | SHA exacto en `ep-main-live.json` | Pendiente de evidencia |
+| Rama | `fix/canonical-navigation-20261007` | Implementación completa; cierre global condicionado |
+| Implementación | Registro + barra + home + guard + tests + docs | COMPLETADA en `8b6d3105f65e7c5b130241562ac2bdde045ff2ae` |
+| CI | `khora-ok / gate`, `CI`, `UI Quality` | BLOQUEADA por fallos preexistentes/infraestructura; no se falsea el gate |
+| Producción | SHA exacto en `ep-main-live.json` | NO APLICADO: PR abierto; no se desplegó producción |
 
 ## Resultado posterior
 
-Actualizar esta sección **solo con evidencia observada**, nunca por inferencia:
+### Evidencia observada
 
-- Commit final:
-- Checks verdes:
-- Resultado de E2E:
-- URL de producción:
-- SHA acreditado en producción:
-- Smoke post-deploy:
-- Incidencias o regresiones restantes:
-- Decisión final RAP: **CERRADO / PROVISIONAL / REVERTIDO**
+- **Commit final de la rama:** `8b6d3105f65e7c5b130241562ac2bdde045ff2ae`.
+- **Pull Request:** #279, abierto; no se ejecutó merge forzado.
+- **Contrato de navegación:** PASS. El guard produjo `✅ Contrato de navegación íntegro: jerarquía, cobertura, enlaces, aliases y rutas verificadas.`
+- **Batería específica de navegación:** PASS, **5 tests / 5 pass / 0 fail**.
+- **Build independiente del SHA actual:** PASS; Vercel `dpl_72PTmekhSaAoRLbAxTeMt5AjU21A` quedó `READY`. Durante el build se observó `✓ Compiled successfully` y `Finished TypeScript in 11.0s`.
+- **Build independiente previo:** `dpl_2HYrZ8YFv15rr5b5Bs5iCiyfzx6g` también quedó `READY` y confirmó compilación de las rutas del producto.
+- **E2E Playwright independiente:** NO CONCLUYENTE POR INFRAESTRUCTURA. El runner no tenía el ejecutable Chromium requerido; ambos tests fallaron antes de ejecutar la aplicación.
+- **Suite unitaria global:** NO CONCLUYENTE PARA ESTE CAMBIO. Se detuvo por fallos ajenos en EP Security/Neo4j.
+- **Typecheck global:** NO CONCLUYENTE PARA ESTE CAMBIO. Existe un error sintáctico preexistente en `tests/unit/service_observability_coverage.test.ts(18,41): TS1109`.
+- **Preview HTTP:** NO CONCLUYENTE. El entorno protegido devolvió error de configuración de NextAuth y correspondió a `/api/auth/[...nextauth]`.
+- **Integración GitHub→Vercel/Netlify:** BLOQUEADA POR PLAN. Los bots reportaron que el repositorio privado de la organización no puede desplegarse desde Hobby; esto impide usar esos checks como evidencia de producción.
+- **Producción:** NO MODIFICADA. El cambio no se publicó a `main` ni se promovió a producción.
+
+### Falsaciones ejecutadas
+
+1. Se comprobó que la barra ya no contiene una lista manual de menús: consume `NAVIGATION_REGISTRY`.
+2. Se comprobó negativamente que Sistema no contiene Seguridad, Capturar ni Dictado.
+3. Se comprobó que Seguridad vuelve a ser dominio de nivel 1.
+4. Se comprobó que KPIs no es dominio de nivel 1.
+5. Se comprobó unicidad de cobertura canónica.
+6. Se comprobó que las referencias a assets estáticos no generan falsos `ENLACE_SIN_RUTA`.
+7. Se ejecutó el build real del SHA actual después de contrato y pruebas de navegación.
+
+### Decisión RAP
+
+**PROVISIONAL / EN ESPERA DE CIERRE CI.**
+
+La estrategia de navegación está implementada y certificada de forma independiente, pero el cierre canónico queda deliberadamente abierto porque los gates globales del repositorio siguen bloqueados por incidencias no pertenecientes a esta corrección y por restricciones de infraestructura. No se hace bypass del merge ni se declara producción modificada.
+
+### Próximo cierre legítimo
+
+El cierre definitivo requiere que los bloqueos globales sean resueltos en su propio ciclo y que el PR #279 obtenga sus checks obligatorios en verde; después podrá promoverse el SHA exacto a `main` y comprobarse producción.
