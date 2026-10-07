@@ -17,7 +17,8 @@
     "backfill:titulos": "tsx scripts/backfill_titulos.ts",
     "repair:volcados": "tsx scripts/repair_volcados.ts",
     "migrate:ep": "node scripts/migrate-ep.mjs",
-    "migrate:runtime": "node scripts/migrate-runtime.mjs"
+    "migrate:runtime": "node scripts/migrate-runtime.mjs",
+    "ui:contract": "tsx scripts/check_navigation_contract.ts"
   },
   "dependencies": {
     "@breezystack/lamejs": "^1.2.7",
