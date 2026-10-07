@@ -1,6 +1,6 @@
 export const REQUIRED_PLATFORM = "ChatGPT" as const;
 export const REQUIRED_REASONING_MODE = "THINKING" as const;
-export const REQUIRED_OUTPUT_FORMAT_VERSION = "v1.7.0" as const;
+export const REQUIRED_OUTPUT_FORMAT_VERSION = "v1.7.1" as const;
 
 export type NormativeRuntimeContext = {
   platform: typeof REQUIRED_PLATFORM;
