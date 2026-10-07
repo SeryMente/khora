@@ -128,8 +128,8 @@ export default function SystemBar() {
       <div ref={systemMenuRef} className="relative">
         {systemMenuOpen && (
           <div
-            role="menu"
             aria-label="Menú Sistema"
+            aria-describedby="system-menu-description"
             className="absolute bottom-full right-0 mb-2 max-h-[70vh] min-w-56 overflow-y-auto rounded-xl border shadow-2xl"
             style={{
               borderColor: "var(--khora-border)",
@@ -143,7 +143,7 @@ export default function SystemBar() {
               <p className="text-[10px] font-bold uppercase tracking-[0.18em] opacity-50">
                 Sistema
               </p>
-              <p className="text-xs opacity-60">Módulos del entorno</p>
+              <p id="system-menu-description" className="text-xs opacity-60">Módulos navegables del entorno</p>
             </div>
 
             <div
@@ -155,41 +155,41 @@ export default function SystemBar() {
               </p>
             </div>
 
-            <Link href="/sistema/dictado" role="menuitem" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
+            <Link href="/sistema/dictado" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
               <Icons.Mic size={16} />
               <span>Dictado</span>
             </Link>
-            <Link href="/sistema/editar" role="menuitem" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
+            <Link href="/sistema/editar" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
               <Icons.PenLine size={16} />
               <span>Edición</span>
             </Link>
-            <Link href="/sistema/ingesta" role="menuitem" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
+            <Link href="/sistema/ingesta" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
               <Icons.UploadCloud size={16} />
               <span>Ingesta</span>
             </Link>
-            <Link href="/sistema/kpis" role="menuitem" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
+            <Link href="/sistema/kpis" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
               <Icons.Activity size={16} />
               <span>KPIs</span>
             </Link>
 
-            <Link href="/mapa" role="menuitem" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
+            <Link href="/mapa" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
               <Icons.Map size={16} />
               <span>Mapa</span>
             </Link>
 
-            <Link href="/capturar" role="menuitem" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
+            <Link href="/capturar" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
               <Icons.Mic size={16} />
               <span>Capturar</span>
             </Link>
-            <Link href="/herramientas" role="menuitem" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
+            <Link href="/herramientas" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
               <Icons.Wrench size={16} />
               <span>Herramientas</span>
             </Link>
-            <Link href="/roadmap" role="menuitem" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
+            <Link href="/roadmap" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
               <Icons.MapPinned size={16} />
               <span>Roadmap</span>
             </Link>
-            <Link href="/adherence" role="menuitem" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
+            <Link href="/adherence" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
               <Icons.ChartNoAxesCombined size={16} />
               <span>Adherencia</span>
             </Link>
@@ -200,19 +200,19 @@ export default function SystemBar() {
               </p>
             </div>
 
-            <Link href="/sistema/seguridad" role="menuitem" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
+            <Link href="/sistema/seguridad" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
               <Icons.ShieldCheck size={16} />
               <span>Seguridad</span>
             </Link>
-            <Link href="/sistema/mcp" role="menuitem" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
+            <Link href="/sistema/mcp" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
               <Icons.KeyRound size={16} />
               <span>Control MCP</span>
             </Link>
-            <Link href="/sistema/otros" role="menuitem" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
+            <Link href="/sistema/otros" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
               <Icons.FileCheck2 size={16} />
               <span>Evidencia normativa</span>
             </Link>
-            <Link href="/sistema/registro" role="menuitem" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
+            <Link href="/sistema/registro" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
               <Icons.ScrollText size={16} />
               <span>Registro</span>
             </Link>
@@ -221,7 +221,7 @@ export default function SystemBar() {
 
         <button
           type="button"
-          aria-haspopup="menu"
+          aria-haspopup="true"
           aria-expanded={systemMenuOpen}
           onClick={() => setSystemMenuOpen((open) => !open)}
           className="flex flex-col items-center justify-center p-2"
