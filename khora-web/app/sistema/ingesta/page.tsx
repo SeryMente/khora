@@ -143,7 +143,7 @@ export default function IngestaPage() {
               onClick={() => { setFile(null); if(fileInputRef.current) fileInputRef.current.value = ""; }}
               disabled={loading}
             >
-              Remove File
+              Quitar archivo
             </button>
           )}
         </div>
