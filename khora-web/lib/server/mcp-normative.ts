@@ -1,4 +1,5 @@
 import { generateRandomToken, obtenerGeneracionRevocacion } from "./oauth";
+import { assertNormativeRuntimeContext, REQUIRED_OUTPUT_FORMAT_VERSION, REQUIRED_PLATFORM, REQUIRED_REASONING_MODE, type NormativeRuntimeContext } from "./normative-runtime";
 import { getDb } from "./neon";
 import { getMcpConfig } from "./mcp-config";
 import { signJwt, verifyJwtDetailed } from "./jwt";
