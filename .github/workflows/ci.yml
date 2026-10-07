@@ -53,4 +53,5 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm run ui-review:check
+      - run: npm run ui:contract
       - run: npm run test:unit
