@@ -1,12 +1,12 @@
 # Registro de salida de verificación normativa por ciclo
 
 **Estado:** CONTRATO DERIVADO CANÓNICO  
-**Versión:** v1.1.0 — Identidad y Vigencia del Registro de Ciclo  
+**Versión:** v1.1.1 — Identidad Dual SI/Metodología del Registro de Ciclo  
 **Fecha:** 2026-10-06
 
 ## Norma
 
-La obligación material que fundamenta este contrato es la trazabilidad verificable entre ciclo, resultado de verificación y evidencia. La identificación del SI añade versión, nombre específico y última modificación canónica.
+La obligación material que fundamenta este contrato es la trazabilidad verificable entre ciclo, resultado de verificación y evidencia. La identificación normativa añade por separado la versión, nombre específico y última modificación canónica del SI y de la Metodología.
 
 La obligación normativa se encuentra en:
 
@@ -23,7 +23,7 @@ El encabezado contextual del ciclo debe incluir exactamente:
 
 `SI CARGADO · <si_version> — <nombre_de_versión> · COMPLETO · ACTIVO · ÚLTIMO CAMBIO: hace <n> minutos|horas|días | <YYYY-MM-DD>`
 
-El instante de referencia se obtiene del último commit que modificó `SI-METACOGNITIVO.md` dentro del snapshot exacto del ciclo. El valor relativo se calcula al instante de apertura del ciclo (`opened_at`), de modo que el encabezado queda estable durante todo el procesamiento del turno.
+El instante del SI se obtiene del último commit que modificó `SI-METACOGNITIVO.md` dentro del snapshot exacto del ciclo. El instante de Metodología se obtiene del último commit que modificó `METODOLOGIA.md` dentro de su snapshot exacto. Ambos valores relativos se calculan al instante de apertura del ciclo (`opened_at`), de modo que los encabezados quedan estables durante todo el procesamiento del turno.
 ## Contrato máquina
 
 ```json
@@ -34,7 +34,9 @@ El instante de referencia se obtiene del último commit que modificó `SI-METACO
   "status": "VERIFIED",
   "evidence_sha256": "<sha256>",
   "output_header": "SI CARGADO · <si_version> — <nombre_de_versión> · COMPLETO · ACTIVO · ÚLTIMO CAMBIO: hace <n> minutos|horas|días | <YYYY-MM-DD>",
+  "methodology_output_header": "METODOLOGÍA CARGADA · <metodology_version> — <nombre_de_versión> · COMPLETA · ACTIVA · ÚLTIMO CAMBIO: hace <n> minutos|horas|días | <YYYY-MM-DD>",
   "si_version": "v1.2.0",
+  "methodology_version": "v0.11.8",
   "si_sha256": "<sha256>",
   "manifest_sha256": "<sha256>",
   "verifier_version": "norm-check/0.2.0",
@@ -54,4 +56,4 @@ La proyección `verification_record` se devuelve desde `khora_norm_verify_turn`.
 
 `GET /api/norm-check/record?cycle_id=<id>&attempt=<n>`
 
-La interfaz devuelve el objeto estructurado y su representación de salida. Un receipt sin `output_header` o con un encabezado distinto del calculado por KHORA no puede alcanzar `VERIFIED` ni `VERIFIED_RELEASE`.
+La interfaz devuelve el objeto estructurado y su representación de salida. Un receipt sin `output_header`, sin `methodology_output_header`, con identidad metodológica incompleta o con cualquiera de los encabezados distinto del calculado por KHORA no puede alcanzar `VERIFIED` ni `VERIFIED_RELEASE`.
