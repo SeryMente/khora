@@ -113,6 +113,9 @@ function issueTurnToken(
       turn_nonce: row.nonce,
       turn_si_sha256: row.si_sha256,
       turn_manifest_sha256: row.manifest_sha256,
+      turn_platform: runtime.platform,
+      turn_reasoning_mode: runtime.reasoning_mode,
+      turn_output_format_version: runtime.output_format_version,
     },
     config.jwtSecret
   );
