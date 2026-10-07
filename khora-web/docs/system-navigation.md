@@ -27,6 +27,10 @@ El menú **Sistema** expone:
 - Ingesta → `/sistema/ingesta`
 - KPIs → `/sistema/kpis`
 - Mapa → `/mapa`
+- Capturar → `/capturar`
+- Herramientas → `/herramientas`
+- Roadmap → `/roadmap`
+- Adherencia → `/adherence`
 
 ### Seguridad y control
 
@@ -50,9 +54,11 @@ La barra y el menú son complementarios: una función no debe depender de que el
 
 Las rutas estables `/sistema/boveda` y `/sistema/entorno-persistente` redirigen a sus submódulos dentro de Seguridad.
 
-## Superficies auxiliares
+## Superficies técnicas no navegables
 
-`/ui-review` permanece protegido como harness de revisión. `/herramientas`, `/roadmap` y `/adherence` son superficies auxiliares separadas del menú operativo principal y conservan su propia interfaz cuando están habilitadas.
+`/ui-review` permanece protegido como harness de revisión y no se expone en el menú operativo. Las rutas de autenticación/OAuth y `/offline` son superficies de infraestructura/protocolo y conservan sus propios disparadores; no son módulos de producto que el usuario deba localizar desde el menú Sistema.
+
+Las demás páginas de producto enumeradas en el árbol `app/**/page.tsx` —incluidas Capturar, Herramientas, Roadmap y Adherencia— tienen una entrada de navegación.
 
 ## Guardia contra regresiones
 

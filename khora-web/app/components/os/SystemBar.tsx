@@ -43,7 +43,11 @@ export default function SystemBar() {
     pathname?.startsWith("/sistema/editar") ||
     pathname?.startsWith("/sistema/ingesta") ||
     pathname?.startsWith("/sistema/kpis") ||
-    pathname?.startsWith("/mapa");
+    pathname?.startsWith("/mapa") ||
+    pathname?.startsWith("/capturar") ||
+    pathname?.startsWith("/herramientas") ||
+    pathname?.startsWith("/roadmap") ||
+    pathname?.startsWith("/adherence");
 
   return (
     <nav
@@ -171,6 +175,23 @@ export default function SystemBar() {
             <Link href="/mapa" role="menuitem" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
               <Icons.Map size={16} />
               <span>Mapa</span>
+            </Link>
+
+            <Link href="/capturar" role="menuitem" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
+              <Icons.Mic size={16} />
+              <span>Capturar</span>
+            </Link>
+            <Link href="/herramientas" role="menuitem" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
+              <Icons.Wrench size={16} />
+              <span>Herramientas</span>
+            </Link>
+            <Link href="/roadmap" role="menuitem" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
+              <Icons.MapPinned size={16} />
+              <span>Roadmap</span>
+            </Link>
+            <Link href="/adherence" role="menuitem" className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs font-bold hover:opacity-80">
+              <Icons.ChartNoAxesCombined size={16} />
+              <span>Adherencia</span>
             </Link>
 
             <div className="border-y px-3 py-2 text-left" style={{ borderColor: "var(--khora-border)" }}>

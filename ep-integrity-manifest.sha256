@@ -237,7 +237,7 @@ bc5a4691e376000eaaecaaad8e76f6ea55f08431e57a3b796a8963f75772fb7a  ./khora-web/ap
 e623512b60f3f656af1268553ce93e618375375352bf84b90c480b9358e79411  ./khora-web/app/components/os/KhoraShell.tsx
 6dd2c462593cbaee7789886c973870825deb48c1c0db804188af101a1622c215  ./khora-web/app/components/os/KhoraSplash.tsx
 11c30567d7bcc74b87b60d9906e673851a669ea7bdac2b8282425fc369a92cc0  ./khora-web/app/components/os/PaginaBoveda.tsx
-baba20841165dcbfacee6cea336b00ca1ef479f8ed1225ae80c6ba852e32f594  ./khora-web/app/components/os/SystemBar.tsx
+35b78f5f4afdefb17aa1e6ba38d157ef231bb7b689b6ba372bb4209160ec9e6d  ./khora-web/app/components/os/SystemBar.tsx
 ee563838a9c1de72e6ea251c14276010fe2580708b094fad116bb9855f06885d  ./khora-web/app/components/os/ThemeToggle.tsx
 49726a267445779556c4e387ec78f5f24597ce7a8ab3161797774005d6af1da5  ./khora-web/app/components/RuntimeObserver.tsx
 16fb763aa4f522b9a22edd3325527ff8f4bb34f907d1641dc6fc01d8f762020c  ./khora-web/app/components/TelemetryProvider.tsx
