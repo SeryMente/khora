@@ -41,6 +41,15 @@ El menú **Sistema** expone:
 
 La barra y el menú son complementarios: una función no debe depender de que el usuario conozca una URL interna.
 
+## Menú Herramientas
+
+`/herramientas` conserva sus propios submódulos visibles:
+
+- Bitácora 24/365 → `/herramientas/bitacora` → redirige a la superficie canónica actual de Volcados `/sistema/volcados`.
+- OPI/VRI → `/herramientas/opi-vri`.
+
+El acceso histórico a Bitácora no apunta a una URL retirada; funciona como alias de compatibilidad hacia Volcados.
+
 ## Menú Seguridad
 
 `/sistema/seguridad` es la superficie canónica de seguridad. Sus submódulos son:
@@ -58,8 +67,10 @@ Las rutas estables `/sistema/boveda` y `/sistema/entorno-persistente` redirigen 
 
 `/ui-review` permanece protegido como harness de revisión y no se expone en el menú operativo. Las rutas de autenticación/OAuth y `/offline` son superficies de infraestructura/protocolo y conservan sus propios disparadores; no son módulos de producto que el usuario deba localizar desde el menú Sistema.
 
+La ruta `/capturar/compartir` es una superficie de recepción externa de Share Target: dispone de UI propia y se activa por el mecanismo de compartición del sistema, no por navegación interna. No se clasifica como módulo de menú.
+
 Las demás páginas de producto enumeradas en el árbol `app/**/page.tsx` —incluidas Capturar, Herramientas, Roadmap y Adherencia— tienen una entrada de navegación.
 
 ## Guardia contra regresiones
 
-`tests/unit/system_navigation.test.ts` comprueba que las rutas esenciales permanezcan declaradas en `SystemBar.tsx` y que Seguridad conserve sus submódulos. El E2E de shell comprueba además que los elementos sean visibles y navegables como UI.
+`tests/unit/system_navigation.test.ts` comprueba que las rutas esenciales permanezcan declaradas en `SystemBar.tsx`, que Herramientas conserve sus submódulos y que Bitácora mantenga un destino canónico existente. El E2E de shell comprueba además que los elementos sean visibles y navegables como UI.
