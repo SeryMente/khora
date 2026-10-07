@@ -302,10 +302,9 @@ export async function openNormativeTurn(
     if (existing.status === "CLOSED") throw new Error("TURN_ALREADY_CLOSED");
     if (existing.platform !== input.runtime.platform || existing.reasoning_mode !== input.runtime.reasoning_mode || existing.output_format_version !== input.runtime.output_format_version) {
       throw new Error("TURN_RUNTIME_MISMATCH");
-
-     const existingSnapshot = await loadSiSnapshot(existing.si_git_blob_sha, existing.si_git_commit_sha);
     }
 
+    const existingSnapshot = await loadSiSnapshot(existing.si_git_blob_sha, existing.si_git_commit_sha);
     const gen = await obtenerGeneracionRevocacion(actor);
     return {
       ok: true,
