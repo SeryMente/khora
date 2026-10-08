@@ -158,8 +158,13 @@ export default function SystemBar() {
     };
   }, []);
 
+  const previousPathnameRef = useRef(pathname);
+
   useEffect(() => {
-    setOpenMenuId(null);
+    if (previousPathnameRef.current !== pathname) {
+      previousPathnameRef.current = pathname;
+      setOpenMenuId(null);
+    }
   }, [pathname]);
 
   return (
