@@ -14,7 +14,7 @@ arch=read('ep-medio-architectura.md')
 gate=read('scripts/khora/khora.ps1','utf-8-sig')
 code='\n'.join(p.read_text(encoding='utf-8-sig') for p in (ROOT/'scripts/khora').rglob('*.ps1') if 'tests' not in p.parts)
 require("EP_VERSION = '1.0.1'" in gate,'Versión EP incorrecta')
-require("SCRIPT_VERSION = '7.5.1'" in gate,'Versión host incorrecta')
+require("SCRIPT_VERSION = '7.5.2'" in gate,'Versión host incorrecta')
 require('Enable-BitLocker' in gate,'Falta BitLocker')
 require('WindowsPowerShell\\\\v1.0\\\\powershell.exe' in read('khora-web/app/api/ep/token/route.ts'),'Launcher no fija Windows PowerShell 5.1')
 require('Encrypting File System' not in code,'Fallback Encrypting File System prohibido')
@@ -25,6 +25,9 @@ require(re.search(r'vercel\s+deploy\s+--prod',code,re.I) is not None,'Falta publ
 require('ep-main-live.json' in code and 'Test-KhoraRemoteMainExact' in code,'Prueba live main incompleta')
 require('{{https://' not in code,'URL con llaves dobles')
 require('raw.githubusercontent.com' not in gate,'Bootstrap anónimo prohibido')
+require('Find-KhoraHostToolPath' in gate or 'Resolve-KhoraHostToolPath' in gate,'Falta descubrimiento robusto de herramientas del host')
+require('Find-KhoraHostExecutable' in code,'Falta resolvedor robusto de herramientas en dependencias')
+require('npm.cmd' in code,'El bootstrap debe usar npm.cmd para evitar bloqueo de npm.ps1')
 # Sequence registry
 ids=[f'EP-IN-{n:03d}' for n in range(10,131,10)]+[f'EP-RUN-{n:03d}' for n in (10,20,30)]+[f'EP-OUT-{n:03d}' for n in range(10,101,10)]
 for event_id in ids:
