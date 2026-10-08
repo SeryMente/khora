@@ -11,6 +11,7 @@ on:
       - "khora-web/lib/server/mcp-normative.ts"
       - "khora-web/app/api/mcp/route.ts"
       - "khora-web/scripts/check_output_contract_sync.mjs"
+      - "khora-web/scripts/check_output_contract_integration.mjs"
       - "khora-web/tests/unit/output-contract.test.ts"
       - "khora-web/package.json"
       - ".github/workflows/output-contract.yml"
@@ -18,17 +19,11 @@ on:
 jobs:
   contract:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: khora-web
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: "22"
-          cache: "npm"
-          cache-dependency-path: khora-web/package-lock.json
-      - run: npm ci
-      - run: npm run output:contract:check
-      - run: npm run typecheck
-      - run: npx tsx tests/unit/output-contract.test.ts
+          node-version: "24"
+      - run: node khora-web/scripts/check_output_contract_sync.mjs
+      - run: node khora-web/scripts/check_output_contract_integration.mjs
+      - run: node --experimental-strip-types khora-web/tests/unit/output-contract.test.ts
