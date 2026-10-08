@@ -797,7 +797,7 @@ export async function verifyNormativeTurn(
       const existing = await db.query(
         "SELECT id, status, integrity, coverage_expected, coverage_evaluated, coverage_missing, " +
           "coverage_duplicates, coverage_unknown, order_verified, application_log_sha256, reasons, si_version, si_git_commit_sha, si_sha256, manifest_sha256, " +
-          "methodology_version, methodology_git_commit_sha, evidence_sha256, nonce, verifier_version, created_at " +
+          "methodology_version, methodology_git_commit_sha, evidence_sha256, nonce, verifier_version, methodology_version, methodology_git_commit_sha, created_at " +
           "FROM normative_receipts WHERE cycle_id = $1 AND attempt = $2 LIMIT 1",
         [receipt.cycle.id, receipt.cycle.attempt]
       );
