@@ -12,7 +12,7 @@ export default function HerramientasPage() {
       </div>
 
       <header className="w-full flex items-center justify-between z-10 mb-12 mt-4 max-w-4xl mx-auto">
-        <Link href="/" className="text-gray-400 hover:text-white transition-colors flex items-center gap-2 text-sm uppercase tracking-widest font-mono">
+        <Link href="/" aria-label="Inicio" className="text-gray-400 hover:text-white transition-colors flex items-center gap-2 text-sm uppercase tracking-widest font-mono">
           <ChevronLeft className="w-4 h-4" />
           Core
         </Link>
