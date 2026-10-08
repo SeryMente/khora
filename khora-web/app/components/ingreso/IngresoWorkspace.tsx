@@ -397,8 +397,7 @@ function IngresoContenido() {
 
     const ejecutarSubida = async () => {
       try {
-        const ra = await fetch("/api/audio", { method: "POST", body: forma });
-        const textoRespuesta = await ra.text();
+        const ra = await fetch("/api/audio", { method: "POST", body: forma });        const textoRespuesta = await ra.text();
         let da: any = {};
         try {
           da = JSON.parse(textoRespuesta);
@@ -797,8 +796,7 @@ function IngresoContenido() {
       await ejecutarTranscripcionAutoritativa();
     } finally {
       finalizacionAudioRef.current = null;
-      subidaEnCursoRef.current = null;
-      setEstado("inactivo");
+      subidaEnCursoRef.current = null;      setEstado("inactivo");
     }
   }, [estabilizarEmision, detenerGrabacion, ejecutarTranscripcionAutoritativa, enviarChromeCommand, subirParteActual]);
 
@@ -1116,7 +1114,7 @@ function IngresoContenido() {
 
   if (modoWorkspace === "revision") {
     return (
-      <main style={{ maxWidth: 1240, margin: "0 auto", padding: 24 }}>
+      <main style={{ width: "100%", maxWidth: 1240, minWidth: 0, margin: "0 auto", padding: 24, boxSizing: "border-box" }}>
         <IngresoModeNav activeMode="revision" />
         <IngresoRevisionPanel />
       </main>
@@ -1125,7 +1123,7 @@ function IngresoContenido() {
 
   if (modoWorkspace === "ingesta") {
     return (
-      <main style={{ maxWidth: 1240, margin: "0 auto", padding: 24 }}>
+      <main style={{ width: "100%", maxWidth: 1240, minWidth: 0, margin: "0 auto", padding: 24, boxSizing: "border-box" }}>
         <IngresoModeNav activeMode="ingesta" />
         <IngresoIngestaPanel volcadoId={volcadoId} version={version} />
       </main>
@@ -1134,7 +1132,7 @@ function IngresoContenido() {
 
   return (
     <>
-      <div style={{ maxWidth: 1240, margin: "0 auto", padding: "16px 24px 0" }}>
+      <div style={{ width: "100%", maxWidth: 1240, minWidth: 0, margin: "0 auto", padding: "16px 24px 0", boxSizing: "border-box" }}>
         <IngresoModeNav activeMode={modoWorkspace} />
       </div>
       <input
