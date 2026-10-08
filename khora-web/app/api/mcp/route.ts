@@ -599,6 +599,7 @@ async function handleMcpRequest(req: NextRequest) {
       receipt: z.object({
         output_header: z.string().min(32).describe("Encabezado SI canónico exacto del ciclo."),
         methodology_output_header: z.string().min(32).describe("Encabezado de Metodología canónico exacto del ciclo."),
+        output_text: z.string().min(32).describe("Texto completo candidato a salida. KHORA valida su estructura exacta antes de cerrar el ciclo."),
         methodology: z.object({
           version: z.string().min(1),
           git_commit_sha: z.string().length(40),
@@ -657,7 +658,7 @@ async function handleMcpRequest(req: NextRequest) {
         type: "object",
         properties: {
           thinking_mode: { type: "string", enum: [...REASONING_MODES] },
-          output_format_version: { type: "string", enum: ["v1.7.3"] },
+          output_format_version: { type: "string", enum: ["v1.7.5"] },
         },
         required: ["thinking_mode", "output_format_version"],
         additionalProperties: false,
@@ -817,7 +818,7 @@ async function handleMcpRequest(req: NextRequest) {
           conversation_id: { type: "string" },
           turn_number: { type: "integer", minimum: 1 },
           thinking_mode: { type: "string", enum: ["THINKING", "INSTANT", "UNKNOWN", "UNAVAILABLE"] },
-          output_format_version: { type: "string", enum: ["v1.7.3"] },
+          output_format_version: { type: "string", enum: ["v1.7.5"] },
         },
         required: ["thinking_mode", "output_format_version"],
         additionalProperties: false,
@@ -856,6 +857,11 @@ async function handleMcpRequest(req: NextRequest) {
                 minLength: 32,
                 description: "REQUERIDO: encabezado SI canónico exacto del ciclo.",
               },
+              output_text: {
+                type: "string",
+                minLength: 32,
+                description: "REQUERIDO: texto completo candidato a salida; KHORA valida su estructura exacta antes de cerrar el ciclo.",
+              },
               methodology_output_header: {
                 type: "string",
                 minLength: 32,
@@ -873,7 +879,7 @@ async function handleMcpRequest(req: NextRequest) {
                 additionalProperties: false,
               },
             },
-            required: ["output_header", "methodology_output_header", "methodology"],
+            required: ["output_header", "methodology_output_header", "output_text", "methodology"],
             additionalProperties: true,
           },
         },
@@ -920,7 +926,7 @@ async function handleMcpRequest(req: NextRequest) {
       },
       _output_format_version: {
         type: "string",
-        enum: ["v1.7.3"],
+        enum: ["v1.7.5"],
         description: "REQUERIDO: contrato de salida visible por ciclo.",
       },
     };
