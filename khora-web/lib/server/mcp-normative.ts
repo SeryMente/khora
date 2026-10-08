@@ -252,8 +252,9 @@ export async function releaseNormativeTurn(actor: string, input: { turn_token: s
     application_log_sha256: string;
     si_git_commit_sha: string;
     methodology_git_commit_sha: string;
+    receipt: string;
   }>(
-    "SELECT status, output_sha256, evidence_sha256, order_verified, application_log_sha256, si_git_commit_sha, methodology_git_commit_sha FROM normative_receipts WHERE cycle_id = $1 AND attempt = $2 LIMIT 1",
+    "SELECT status, output_sha256, evidence_sha256, order_verified, application_log_sha256, si_git_commit_sha, methodology_git_commit_sha, receipt::text AS receipt FROM normative_receipts WHERE cycle_id = $1 AND attempt = $2 LIMIT 1",
     [turn.cycle_id, turn.verified_attempt]
   );
   const row = receipt.rows[0];
@@ -265,6 +266,21 @@ export async function releaseNormativeTurn(actor: string, input: { turn_token: s
     throw new Error("TURN_RELEASE_SNAPSHOT_MISMATCH");
   }
 
+  let releasedOutput: string;
+  try {
+    const storedReceipt = JSON.parse(row.receipt) as { output_text?: unknown };
+    if (typeof storedReceipt.output_text !== "string" || storedReceipt.output_text.length === 0) {
+      throw new Error("TURN_RELEASE_OUTPUT_MISSING");
+    }
+    releasedOutput = storedReceipt.output_text;
+  } catch (error) {
+    if (error instanceof Error && error.message === "TURN_RELEASE_OUTPUT_MISSING") throw error;
+    throw new Error("TURN_RELEASE_RECEIPT_INVALID");
+  }
+  if (sha256Output(releasedOutput) !== row.output_sha256) {
+    throw new Error("TURN_RELEASE_OUTPUT_HASH_MISMATCH");
+  }
+
   const releaseToken = issueReleaseToken(actor, turn, row.output_sha256, row.evidence_sha256, config, gen);
   return {
     ok: true,
@@ -272,6 +288,7 @@ export async function releaseNormativeTurn(actor: string, input: { turn_token: s
     cycle_id: turn.cycle_id,
     attempt: turn.current_attempt,
     output_sha256: row.output_sha256,
+    released_output: releasedOutput,
     evidence_sha256: row.evidence_sha256,
     application_log_sha256: row.application_log_sha256,
     order_verified: row.order_verified,
