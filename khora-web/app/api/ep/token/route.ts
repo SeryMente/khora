@@ -86,6 +86,7 @@ export async function POST(req: NextRequest) {
   let platform = "windows";
   let modeExplicit = false;
   let modeVal = "normal";
+  let workspaceRepos: unknown = undefined;
 
   const contentType = req.headers.get("content-type") || "";
   if (contentType.includes("application/json")) {
@@ -93,6 +94,7 @@ export async function POST(req: NextRequest) {
       const body = await req.json();
       if (body && typeof body === "object") {
         if (typeof body.platform === "string" && body.platform.trim()) platform = body.platform.trim().toLowerCase();
+        if ("repositories" in body) workspaceRepos = body.repositories;
         if ("mode" in body && body.mode !== undefined && body.mode !== null) {
           modeExplicit = true;
           if (typeof body.mode === "string") modeVal = body.mode.trim().toLowerCase();
@@ -111,12 +113,15 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const issued = await createEpSessionToken(email, origin, "normal");
+    const issued = await createEpSessionToken(email, origin, "normal", workspaceRepos);
     const apiBase = issued.payload.aud;
     const launcher = getNormalLauncherDescriptor(apiBase);
     return NextResponse.json({ token: issued.token, sessionId: issued.payload.sid, expiresAt: issued.expiresAt, command: launcher.command, apiBase, mode: "normal", launcher }, { headers: NO_STORE_HEADERS });
   } catch (error) {
     const message = error instanceof Error ? error.message : "";
+    if (message === "invalid_workspace_repositories") return NextResponse.json({ error: "invalid_workspace_repositories" }, { status: 400, headers: NO_STORE_HEADERS });
+    if (message === "workspace_repository_not_found") return NextResponse.json({ error: "workspace_repository_not_found" }, { status: 400, headers: NO_STORE_HEADERS });
+    if (message === "github_catalog_unavailable") return NextResponse.json({ error: "workspace_catalog_unavailable" }, { status: 503, headers: NO_STORE_HEADERS });
     if (message === "rate_limit_exceeded") return NextResponse.json({ error: "rate_limit_exceeded", message: "Máximo de cinco emisiones cada quince minutos." }, { status: 429, headers: NO_STORE_HEADERS });
     return NextResponse.json({ error: "token_issue_unavailable", message: "No se pudo emitir el token Khora de forma segura." }, { status: 503, headers: NO_STORE_HEADERS });
   }
