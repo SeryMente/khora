@@ -1,7 +1,7 @@
 // @l0 L0-002-R · @req UI-04/INGRESO-INTEGRADO
 "use client";
 
-import { useCallback, useEffect, useRef, useState, Suspense } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ensamblarParrafos, Fragmento } from "../../../lib/transcripcion/ensamblar";
 import { reconciliarSegmentos, type SegmentoReconciliado } from "../../../lib/transcripcion/reconciliar";
 import { IngresoView } from "../shared/IngresoView";
@@ -29,11 +29,7 @@ function generarSesionId() {
 }
 
 export function IngresoWorkspace() {
-  return (
-    <Suspense fallback={<p style={{ padding: "2rem", color: "var(--khora-accent)" }}>Cargando…</p>}>
-      <IngresoContenido />
-    </Suspense>
-  );
+  return <IngresoContenido />;
 }
 
 function IngresoContenido() {
