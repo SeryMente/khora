@@ -1,5 +1,6 @@
 import { createHash } from "crypto";
 import { assertNormativeRuntimeContext, type NormativeRuntimeContext } from "./normative-runtime";
+import { parseCanonicalCycleOutput, renderCanonicalCycleOutput, sha256Output } from "./output-contract";
 
 export const NORM_CHECK_PROTOCOL = "NORM-CHECK";
 export const NORM_CHECK_PROTOCOL_VERSION = "v0.5.0";
@@ -46,6 +47,7 @@ export type NormativeReceipt = {
   nonce: string;
   principles: NormativePrincipleEvidence[];
   output_sha256: string;
+  output_text: string;
   output_header: string;
   methodology_output_header: string;
   evidence_sha256: string;
@@ -683,6 +685,7 @@ function validateBasicReceipt(receipt: unknown): receipt is NormativeReceipt {
   const methodology = value.methodology as Record<string, unknown> | undefined;
   if (!methodology || typeof methodology.version !== "string" || !isHex(methodology.git_commit_sha, 40) || !isHex(methodology.git_blob_sha, 40) || !isHex(methodology.sha256, 64)) return false;
   if (!isHex(value.input_sha256, 64) || !isHex(value.output_sha256, 64)) return false;
+  if (typeof value.output_text !== "string" || value.output_text.length === 0) return false;
   if (typeof value.nonce !== "string" || value.nonce.length < 16 || value.nonce.length > 128) return false;
   if (!isHex(value.evidence_sha256, 64)) return false;
   if (!Array.isArray(value.principles) || value.principles.length === 0) return false;
@@ -736,6 +739,7 @@ function computeEvidenceHash(receipt: NormativeReceipt): string {
       reason_code: item.reason_code || null,
     })),
     output_sha256: receipt.output_sha256,
+    output_text: receipt.output_text,
     output_header: receipt.output_header,
     methodology_output_header: receipt.methodology_output_header,
     created_at: receipt.created_at,
@@ -808,6 +812,28 @@ export async function verifyNormativeReceipt(
   if (receipt.si.manifest_sha256 !== snapshot.manifestSha256) reasons.push("MANIFEST_SHA256_MISMATCH");
   if (receipt.methodology.version !== methodologySnapshot.version) reasons.push("METHODOLOGY_VERSION_MISMATCH");
   if (receipt.methodology.sha256 !== methodologySnapshot.sha256) reasons.push("METHODOLOGY_SHA256_MISMATCH");
+
+  let parsedOutput: ReturnType<typeof parseCanonicalCycleOutput> | null = null;
+  try {
+    parsedOutput = parseCanonicalCycleOutput(
+      receipt.output_text,
+      expectedOutputHeader,
+      expectedMethodologyOutputHeader,
+    );
+    if (renderCanonicalCycleOutput(parsedOutput) !== receipt.output_text) {
+      reasons.push("OUTPUT_CANONICAL_RENDER_MISMATCH");
+    }
+    if (parsedOutput.ci !== "✓") {
+      reasons.push("CI_STATUS_NOT_POSITIVE");
+    }
+  } catch (error) {
+    reasons.push(error instanceof Error ? error.message : "OUTPUT_FORMAT_INVALID");
+  }
+
+  const computedOutputSha256 = sha256Output(receipt.output_text);
+  if (receipt.output_sha256 !== computedOutputSha256) reasons.push("OUTPUT_SHA256_MISMATCH");
+  if (parsedOutput && receipt.output_header !== parsedOutput.siHeader) reasons.push("OUTPUT_HEADER_RECEIPT_MISMATCH");
+  if (parsedOutput && receipt.methodology_output_header !== parsedOutput.methodologyHeader) reasons.push("METHODOLOGY_OUTPUT_HEADER_RECEIPT_MISMATCH");
 
   const expectedFolios = new Set(snapshot.manifest.map((p) => p.folio));
   const seen = new Set<string>();
