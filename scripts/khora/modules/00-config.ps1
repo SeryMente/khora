@@ -25,6 +25,12 @@ $MOUNT_POINT = [string]$script:SESSION.mountPoint
 $SESSION_ID = [string]$script:SESSION.sessionId
 $TASK_NAME = [string]$script:SESSION.cleanupTask
 $KHORA_API_BASE = [string]$script:SESSION.khoraApiBase
+$script:HOST_PROFILE_PATH = if ($script:SESSION.hostProfilePath) { [string]$script:SESSION.hostProfilePath } else { Join-Path $STATE_DIR 'host-profile.v1.json' }
+$script:HOST_PROFILE = $null
+if (Test-Path -LiteralPath $script:HOST_PROFILE_PATH -PathType Leaf) {
+    $script:HOST_PROFILE = Get-Content -LiteralPath $script:HOST_PROFILE_PATH -Raw | ConvertFrom-Json
+    if ($script:HOST_PROFILE.schema -ne 'oep-host-profile/v1') { throw 'Perfil de host incompatible.' }
+}
 $TOOLS_DIR = Join-Path $WORK_DIR 'tools'
 $env:KHORA_EP_LAUNCH_MODE = $script:LAUNCH_MODE
 $env:TEMP = Join-Path $WORK_DIR 'tmp'
