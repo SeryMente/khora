@@ -43,6 +43,7 @@ type Issued = {
   launcher: Launcher;
 };
 type Summary = { id: string; estado: string; creado_en: string; ultimo_evento_en: string | null; cerrado_en: string | null };
+type WorkspaceRepo = { name: string; private: boolean; defaultBranch: string; extensionRoot: string | null };
 type Notice = { kind: "idle" | "working" | "success" | "error"; text: string };
 type JwtClaims = { iss?: unknown; sid?: unknown; typ?: unknown; exp?: unknown; launchMode?: unknown };
 
@@ -146,6 +147,8 @@ async function copyTokenStrict(token: string): Promise<void> {
 export default function EntornoPersistentePanel() {
   const [issued, setIssued] = useState<Issued | null>(null);
   const [sessions, setSessions] = useState<Summary[]>([]);
+  const [repoCatalog, setRepoCatalog] = useState<WorkspaceRepo[]>([]);
+  const [selectedRepos, setSelectedRepos] = useState<string[]>(["CENSUS", "signal-interpreter"]);
   const [staticCommand, setStaticCommand] = useState<string>("");
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<Notice>({ kind: "idle", text: "" });
@@ -173,7 +176,22 @@ export default function EntornoPersistentePanel() {
     } catch { /* La consulta secundaria no invalida la credencial activa. */ }
   }
 
-  useEffect(() => { void refresh(); }, []);
+  async function loadRepoCatalog() {
+    try {
+      const response = await fetch("/api/ep/repos", { cache: "no-store", credentials: "same-origin" });
+      const data = await response.json().catch(() => null);
+      if (!response.ok || !data || !Array.isArray(data.repositories)) {
+        throw new Error(messageFromResponse(data, "No se pudo cargar el catálogo de repositorios."));
+      }
+      const catalog = data.repositories as WorkspaceRepo[];
+      setRepoCatalog(catalog);
+      setSelectedRepos((current) => current.filter((name) => catalog.some((repo) => repo.name === name)));
+    } catch (error) {
+      setNotice({ kind: "error", text: error instanceof Error ? error.message : "No se pudo cargar el catálogo de repositorios." });
+    }
+  }
+
+  useEffect(() => { void refresh(); void loadRepoCatalog(); }, []);
 
   useEffect(() => {
     if (!issued) return;
@@ -218,7 +236,7 @@ export default function EntornoPersistentePanel() {
       const response = await fetch("/api/ep/token", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ platform: "windows" }),
+        body: JSON.stringify({ platform: "windows", repositories: selectedRepos }),
         cache: "no-store",
         credentials: "same-origin",
         signal: controller.signal,
@@ -357,7 +375,34 @@ export default function EntornoPersistentePanel() {
         </div>
         <div className="flex items-start gap-3 rounded-lg border p-4 text-sm" style={{ ...border, background: "var(--khora-bg)" }}><AlertTriangle className="mt-0.5 shrink-0 text-amber-400" size={18} /><div><strong className="block">Una emisión nueva revoca la anterior</strong><p className="mt-1 opacity-70">El token vive exclusivamente en memoria hasta que vence, lo descartas o cierras la pestaña. Nunca se imprime en pantalla ni se guarda en el navegador.</p></div></div>
 
-        <button type="button" data-ui-id="seguridad.ep.generar" disabled={busy} onClick={issue} className="flex min-h-12 w-full items-center justify-center gap-2 rounded-lg border p-3 text-sm font-bold uppercase tracking-[0.14em] hover:opacity-90 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--khora-accent)]" style={{ background: "var(--khora-accent)", color: "var(--khora-bg)", borderColor: "var(--khora-accent)" }}><RefreshCw size={17} className={busy ? "animate-spin" : ""} />{busy ? "Preparando de forma segura..." : issued ? "Preparar nuevo Entorno Persistente (revoca actual)" : "Preparar Entorno Persistente"}</button>
+                <section className="space-y-4 rounded-lg border p-4" style={{ ...border, background: "var(--khora-bg)" }} data-ui-id="seguridad.ep.repositorios">
+          <div className="flex items-start gap-3">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-xs font-bold" style={border}>0</span>
+            <div>
+              <h3 className="font-bold">Repositorios de trabajo</h3>
+              <p className="text-xs opacity-65">Elige qué proyectos se materializarán dentro de <code>Desktop/EP</code>. KHORA queda reservado como runtime del bootstrap.</p>
+            </div>
+          </div>
+          {repoCatalog.length === 0 ? (
+            <p className="text-xs opacity-55">Cargando catálogo de SeryMente...</p>
+          ) : (
+            <div className="grid gap-2 sm:grid-cols-2">
+              {repoCatalog.filter((repo) => repo.name.toLowerCase() !== "khora").map((repo) => {
+                const checked = selectedRepos.includes(repo.name);
+                return <label key={repo.name} className="flex cursor-pointer items-start gap-3 rounded-lg border p-3 text-xs hover:bg-white/5" style={border}>
+                  <input type="checkbox" checked={checked} onChange={() => setSelectedRepos((current) => checked ? current.filter((name) => name !== repo.name) : [...current, repo.name])} className="mt-0.5" />
+                  <span className="min-w-0">
+                    <strong className="block truncate">{repo.name}</strong>
+                    <span className="opacity-55">{repo.private ? "privado" : "público"} · {repo.extensionRoot ? "extensión Chrome" : "workspace"}</span>
+                  </span>
+                </label>;
+              })}
+            </div>
+          )}
+          <div className="text-[11px] opacity-55">{selectedRepos.length} repositorio{selectedRepos.length === 1 ? "" : "s"} seleccionado{selectedRepos.length === 1 ? "" : "s"}.</div>
+        </section>
+
+<button type="button" data-ui-id="seguridad.ep.generar" disabled={busy} onClick={issue} className="flex min-h-12 w-full items-center justify-center gap-2 rounded-lg border p-3 text-sm font-bold uppercase tracking-[0.14em] hover:opacity-90 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--khora-accent)]" style={{ background: "var(--khora-accent)", color: "var(--khora-bg)", borderColor: "var(--khora-accent)" }}><RefreshCw size={17} className={busy ? "animate-spin" : ""} />{busy ? "Preparando de forma segura..." : issued ? "Preparar nuevo Entorno Persistente (revoca actual)" : "Preparar Entorno Persistente"}</button>
         {notice.text && <div role={notice.kind === "error" ? "alert" : "status"} className="flex items-start gap-3 rounded-lg border p-3 text-sm" style={{ ...border, background: "var(--khora-bg)" }}>{noticeIcon}<span>{notice.text}</span></div>}
       </div>
 
