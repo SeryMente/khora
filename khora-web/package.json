@@ -18,7 +18,8 @@
     "repair:volcados": "tsx scripts/repair_volcados.ts",
     "migrate:ep": "node scripts/migrate-ep.mjs",
     "migrate:runtime": "node scripts/migrate-runtime.mjs",
-    "ui:contract": "tsx scripts/check_navigation_contract.ts"
+    "ui:contract": "tsx scripts/check_navigation_contract.ts",
+    "output:contract:check": "node scripts/check_output_contract_sync.mjs"
   },
   "dependencies": {
     "@breezystack/lamejs": "^1.2.7",
