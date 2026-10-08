@@ -1,12 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 const routes = [
-  { path: '/sistema/ingreso', expectedTitle: 'Ingreso Integrado' },
-  { path: '/sistema/ingreso?modo=dictado', expectedTitle: 'Ingreso Integrado' },
-  { path: '/sistema/ingreso?modo=captura', expectedTitle: 'Ingreso Integrado' },
-  { path: '/sistema/ingreso?modo=archivo', expectedTitle: 'Ingreso Integrado' },
-  { path: '/sistema/ingreso?modo=revision', expectedTitle: 'Editar transcripciones' },
-  { path: '/sistema/ingreso?modo=ingesta', expectedTitle: 'Ingreso a memoria' },
+  { path: '/sistema/ingreso', expectedTitle: 'Ingreso' },
   { path: '/sistema/volcados', expectedTitle: 'Mesa de Revisión Sincrónica' },
   { path: '/sistema/consulta', expectedTitle: 'Consola de Consulta' },
   { path: '/sistema/seguridad', expectedTitle: 'Seguridad' },
@@ -14,10 +9,10 @@ const routes = [
   { path: '/sistema/otros', expectedTitle: 'Evidencia normativa' },
   { path: '/grafo', expectedTitle: 'Grafo PKG - Proyección Leiden' },
   { path: '/mapa', expectedTitle: 'Mapa Visual de Ramificaciones' },
-  { path: '/capturar', expectedTitle: 'Ingreso Integrado' },
-  { path: '/sistema/dictado', expectedTitle: 'Ingreso Integrado' },
-  { path: '/sistema/editar', expectedTitle: 'Editar transcripciones' },
-  { path: '/sistema/ingesta', expectedTitle: 'Ingreso a memoria' },
+  { path: '/capturar', expectedTitle: 'Ingreso' },
+  { path: '/sistema/dictado', expectedTitle: 'Ingreso' },
+  { path: '/sistema/editar', expectedTitle: 'Mesa de Revisión Sincrónica' },
+  { path: '/sistema/ingesta', expectedTitle: 'Mesa de Revisión Sincrónica' },
 ];
 
 test.describe('Shell Navegación v3', () => {
@@ -46,7 +41,9 @@ test.describe('Shell Navegación v3', () => {
     await expect(page.locator('[data-testid="khora-splash"]')).toHaveCount(0, { timeout: 3000 });
 
     await expect(page.locator('[data-navigation-entry]')).toHaveCount(6);
+    await expect(page.locator('[data-navigation-entry]').evaluateAll((nodes) => nodes.map((node) => node.getAttribute('data-navigation-entry')))).resolves.toEqual(['ingreso', 'volcados', 'grafo', 'consulta', 'seguridad', 'sistema']);
     await expect(page.getByRole('link', { name: 'Ingreso', exact: true })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Volcados', exact: true })).toBeVisible();
     for (const name of ['Grafo', 'Seguridad', 'Sistema']) {
       await expect(page.getByRole('button', { name, exact: true })).toBeVisible();
     }
@@ -56,11 +53,7 @@ test.describe('Shell Navegación v3', () => {
     await expect(page.getByRole('link', { name: 'Ingesta', exact: true })).toHaveCount(0);
 
     await page.goto('http://localhost:3000/sistema/ingreso');
-    const ingresoModes = page.getByRole('navigation', { name: 'Modos de Ingreso' });
-    await expect(ingresoModes).toBeVisible();
-    for (const name of ['Entrada', 'Dictado', 'Captura', 'Archivo', 'Revisión', 'Ingesta']) {
-      await expect(ingresoModes.getByRole('link', { name, exact: true })).toBeVisible();
-    }
+    await expect(page.getByRole('navigation', { name: 'Modos de Ingreso' })).toHaveCount(0);
 
     await page.getByRole('button', { name: 'Grafo', exact: true }).click();
     const grafoMenu = page.getByRole('navigation', { name: 'Menú Grafo' });
