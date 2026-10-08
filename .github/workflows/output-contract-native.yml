@@ -1,0 +1,58 @@
+name: Output Contract Native
+
+on:
+  push:
+    branches:
+      - feat/strict-cycle-output-contract
+
+jobs:
+  native:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Validate contract implementation
+        run: |
+          node --experimental-strip-types --input-type=module <<'EOF'
+          import fs from "node:fs";
+          import assert from "node:assert/strict";
+          const schema = JSON.parse(fs.readFileSync("khora-web/contracts/FORMATO-REGISTRO-VERIFICACION-CICLO.schema.json", "utf8"));
+          assert.equal(schema.version, "v1.7.6");
+          assert.equal(schema.strict.normal_line_count, 6);
+          assert.equal(schema.strict.blocked_preamble_line_count, 8);
+          const runtime = fs.readFileSync("khora-web/lib/server/normative-runtime.ts", "utf8");
+          assert.match(runtime, /REQUIRED_OUTPUT_FORMAT_VERSION\s*=\s*"v1\.7\.6"/);
+          const contract = await import("./khora-web/lib/server/output-contract.ts");
+          assert.equal(contract.OUTPUT_FORMAT_VERSION, "v1.7.6");
+          const siHeader = "SI CARGADO · v1.6.9 — Verificación del Régimen Personalizado · COMPLETO · ACTIVO · ÚLTIMO CAMBIO: hace 1 minuto | 2026-10-08";
+          const methodologyHeader = "METODOLOGÍA CARGADA · v0.12.3 — Contrato de Salida Ejecutable · COMPLETA · ACTIVA · ÚLTIMO CAMBIO: hace 1 minuto | 2026-10-08";
+          const input = {
+            cycle: "PROYECTO / CONV-01 / C001",
+            siHeader,
+            methodologyHeader,
+            ci: "✓",
+            ubic: "CECEQ",
+            rdc: "NO",
+            cuenta: "NO DISPONIBLE",
+            usoUsado: "0",
+            usoRestante: "100",
+            sesion: "NO VERIFICADA",
+            frescura: "✓",
+            khora: "OFF",
+            thinking: "?",
+            rdcCnx: "NO REQUERIDA",
+            usr: "fila4",
+            resultado: "Resultado suficiente.",
+            estado: "COMPLETADO"
+          };
+          const output = contract.renderCanonicalCycleOutput(input);
+          assert.equal(output.split("\n").length, 6);
+          assert.equal(contract.parseCanonicalCycleOutput(output, siHeader, methodologyHeader).ci, "✓");
+          assert.throws(() => contract.parseCanonicalCycleOutput(output + "\nEXTRA", siHeader, methodologyHeader), /OUTPUT_LINE_COUNT_INVALID/);
+          assert.throws(() => contract.parseCanonicalCycleOutput(output.replace("CI: ✓", "CI: MAYBE"), siHeader, methodologyHeader), /OUTPUT_HUD_FORMAT_INVALID/);
+          const blocked = contract.renderCanonicalCycleOutput({...input, rdc:"SI", estado:"BLOQUEADO", bloqueado:{motivo:"RDC requerido.",rdc:"REQUERIDA"}});
+          assert.equal(contract.parseCanonicalCycleOutput(blocked, siHeader, methodologyHeader).estado, "BLOQUEADO");
+          console.log("OUTPUT_CONTRACT_NATIVE_OK");
+          EOF
