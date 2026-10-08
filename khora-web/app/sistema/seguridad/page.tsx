@@ -1,7 +1,7 @@
 // @l0 L0-002-R · @req SISTEMA-MENU/E1 · @req EP-LAUNCHER/UI-3
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Container, KeyRound, LockKeyhole, ShieldCheck } from "lucide-react";
 import EntornoPersistentePanel from "@/app/components/ep/EntornoPersistentePanel";
@@ -56,10 +56,19 @@ function SeguridadContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<SecurityTab>("seguridad");
+  const pendingTabRef = useRef<SecurityTab | null>(null);
 
-  useEffect(() => { setActiveTab(parseTab(searchParams?.get("tab") || null)); }, [searchParams]);
+  useEffect(() => {
+    const tab = parseTab(searchParams?.get("tab") || null);
+    if (pendingTabRef.current) {
+      if (pendingTabRef.current === tab) pendingTabRef.current = null;
+      return;
+    }
+    setActiveTab(tab);
+  }, [searchParams]);
 
   function openTab(tab: SecurityTab) {
+    pendingTabRef.current = tab;
     setActiveTab(tab);
     router.replace(tab === "seguridad" ? "/sistema/seguridad" : `/sistema/seguridad?tab=${tab}`, { scroll: false });
   }
