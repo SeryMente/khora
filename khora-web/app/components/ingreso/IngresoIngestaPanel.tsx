@@ -156,7 +156,7 @@ export function IngresoIngestaPanel({ volcadoId: initialVolcadoId = null, versio
         <div style={{ marginBottom: 10 }}><strong>Ingreso directo compatible</strong><div style={{ fontSize: 12, opacity: 0.75, marginTop: 4 }}>Preserva la capacidad histórica de incorporar texto o un archivo, de forma mutuamente excluyente.</div></div>
         <textarea aria-label="Contenido directo" value={texto} onChange={(event) => { setTexto(event.target.value); if (event.target.value) setFile(null); setError(""); }} placeholder="Pega aquí contenido para ingreso directo…" disabled={Boolean(file)} style={{ width: "100%", minHeight: 120, boxSizing: "border-box", padding: 12, resize: "vertical", border: "1px solid var(--khora-border)", background: "transparent", color: "inherit" }} />
         <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center", marginTop: 12 }}>
-          <input aria-label="Seleccionar archivo para ingreso directo" type="file" accept={ALLOWED_MIME_TYPES.join(",")} disabled={Boolean(texto)} onChange={(event) => seleccionarArchivo(event.target.files?.[0] ?? null)} />
+          <input aria-label="Seleccionar archivo para ingreso directo" type="file" disabled={Boolean(texto)} onChange={(event) => seleccionarArchivo(event.target.files?.[0] ?? null)} />
           <button type="submit" disabled={loading || (!texto.trim() && !file)} style={{ padding: "10px 18px", fontWeight: 700, cursor: loading ? "wait" : "pointer" }}>{loading ? "Procesando…" : "Ingresar directo"}</button>
           {file && <span style={{ fontSize: 12, opacity: 0.8 }}>Archivo: {file.name}</span>}
         </div>
