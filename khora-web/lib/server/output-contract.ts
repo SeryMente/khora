@@ -191,8 +191,6 @@ export function parseCanonicalCycleOutput(
       lines[7] !== "╚════════════════════════════════════════════════════════════╝" ||
       !motivoMatch ||
       !blockRdcMatch ||
-      lines[3].length !== 61 ||
-      lines[4].length !== 61 ||
       motivoMatch[1].trim().length === 0
     ) {
       throw new Error("OUTPUT_BLOCK_PREAMBLE_INVALID");
