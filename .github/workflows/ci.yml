@@ -51,6 +51,7 @@ jobs:
         with:
           node-version: "22"
       - run: npm ci
+      - run: npm run output:contract:check
       - run: npm run typecheck
       - run: npm run ui-review:check
       - run: npm run ui:contract
