@@ -45,6 +45,13 @@ function cleanSingleLine(value: string, field: string): string {
   return value;
 }
 
+function cleanHeader(value: string, field: string): string {
+  if (typeof value !== "string" || value.length === 0 || /[\r\n]/u.test(value)) {
+    throw new Error("OUTPUT_" + field.toUpperCase() + "_INVALID");
+  }
+  return value;
+}
+
 export function renderCanonicalCycleOutput(input: CanonicalCycleOutput): string {
   assertAllowed(input.ci, CI_STATES, "ci");
   assertAllowed(input.rdc, RDC_STATES, "rdc");
@@ -55,8 +62,8 @@ export function renderCanonicalCycleOutput(input: CanonicalCycleOutput): string 
   assertAllowed(input.estado, CYCLE_STATES, "estado");
 
   const cycle = cleanSingleLine(input.cycle, "cycle");
-  const siHeader = cleanSingleLine(input.siHeader.replace(/\r?\n/gu, ""), "si_header");
-  const methodologyHeader = cleanSingleLine(input.methodologyHeader.replace(/\r?\n/gu, ""), "methodology_header");
+  const siHeader = cleanHeader(input.siHeader, "si_header");
+  const methodologyHeader = cleanHeader(input.methodologyHeader, "methodology_header");
   const ubic = cleanSingleLine(input.ubic, "ubic");
   const cuenta = cleanSingleLine(input.cuenta, "cuenta");
   const usoUsado = cleanSingleLine(input.usoUsado, "uso_usado").replace(/%$/u, "");
