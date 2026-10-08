@@ -55,8 +55,8 @@ export function renderCanonicalCycleOutput(input: CanonicalCycleOutput): string 
   assertAllowed(input.estado, CYCLE_STATES, "estado");
 
   const cycle = cleanSingleLine(input.cycle, "cycle");
-  const siHeader = cleanSingleLine(input.siHeader, "si_header");
-  const methodologyHeader = cleanSingleLine(input.methodologyHeader, "methodology_header");
+  const siHeader = cleanSingleLine(input.siHeader.replace(/\r?\n/gu, ""), "si_header");
+  const methodologyHeader = cleanSingleLine(input.methodologyHeader.replace(/\r?\n/gu, ""), "methodology_header");
   const ubic = cleanSingleLine(input.ubic, "ubic");
   const cuenta = cleanSingleLine(input.cuenta, "cuenta");
   const usoUsado = cleanSingleLine(input.usoUsado, "uso_usado").replace(/%$/u, "");
