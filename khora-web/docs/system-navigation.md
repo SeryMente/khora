@@ -12,23 +12,30 @@ Toda capacidad de producto que tenga una ruta operativa debe tener una entrada a
 La barra inferior contiene seis dominios primarios de uso frecuente más el control de tema:
 
 - Volcados → `/sistema/volcados`
-- Ingreso → abre el dominio de entrada y captura
+- Ingreso → `/sistema/ingreso`
 - Grafo → abre Grafo / Mapa
 - Consulta → `/sistema/consulta`
 - Seguridad → abre Seguridad / Entorno Persistente / Bóveda / Control MCP
 - Sistema → abre Herramientas / OPI-VRI / KPIs / Roadmap / Adherencia / Evidencia normativa / Registro
 
-**Decisión semántica:** Capturar no es un dominio primario independiente. Es una acción de entrada rápida y, por tanto, pertenece al dominio **Ingreso**.
+**Decisión semántica:** Capturar, Dictado, Edición e Ingesta no son dominios primarios independientes. Son fases/capacidades del mismo ciclo de entrada de memoria y se alojan dentro del workspace canónico **Ingreso**.
 
-## Menú Ingreso
+## Workspace Ingreso
 
-- Ingreso → `/sistema/ingreso`
-- Capturar → `/capturar`
-- Dictado → `/sistema/dictado`
-- Edición → `/sistema/editar`
-- Ingesta → `/sistema/ingesta`
+La única superficie de producto para el ciclo de entrada es:
 
-Esto evita presentar como dominios hermanos dos capacidades que pertenecen al mismo ciclo de entrada de memoria.
+`/sistema/ingreso`
+
+El workspace expone modos internos, no dominios hermanos:
+
+- Entrada → `/sistema/ingreso`
+- Dictado → `/sistema/ingreso?modo=dictado`
+- Captura → `/sistema/ingreso?modo=captura`
+- Archivo → `/sistema/ingreso?modo=archivo`
+- Revisión → `/sistema/ingreso?modo=revision`
+- Ingesta → `/sistema/ingreso?modo=ingesta`
+
+El flujo canónico es **captura → transcripción/procesamiento → revisión → aprobación → ingesta**. La navegación primaria no debe volver a exponer estas fases como entradas independientes.
 
 ## Menú Grafo
 
@@ -87,6 +94,12 @@ El indicador de apertura es una pequeña flecha junto al texto. El icono del dom
 
 ## Aliases y superficies técnicas
 
+Las rutas históricas de Ingreso permanecen operativas como compatibilidad y redirigen al workspace canónico:
+
+- `/capturar` → `/sistema/ingreso?modo=captura`
+- `/sistema/dictado` → `/sistema/ingreso?modo=dictado`
+- `/sistema/editar` → `/sistema/ingreso?modo=revision`
+- `/sistema/ingesta` → `/sistema/ingreso?modo=ingesta`
 - `/herramientas/bitacora` → `/sistema/volcados`
 - `/sistema/boveda` → `/sistema/seguridad?tab=boveda`
 - `/sistema/entorno-persistente` → `/sistema/seguridad?tab=entorno-persistente`
@@ -100,6 +113,6 @@ La navegación se protege con:
 - `app/navigation/registry.ts`: fuente declarativa única.
 - `scripts/check_navigation_contract.ts`: cobertura bidireccional y clasificación de rutas.
 - `tests/unit/system_navigation_hardened.test.ts`: límites, agrupación semántica, ausencia de overflow y affordance de flechas.
-- `e2e/shell-v2.spec.ts`: apertura real de los cuatro submenús, bounds del viewport en 1440/1024/768/390 y cierre.
+- `e2e/shell-v2.spec.ts`: apertura real de los tres submenús restantes, bounds del viewport en 1440/1024/768/390 y cierre; Ingreso se valida como enlace directo y workspace de modos.
 - `e2e/ui-quality.spec.ts`: navegación y accesibilidad por escritorio y móvil.
 

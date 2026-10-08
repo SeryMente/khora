@@ -104,7 +104,7 @@ function CompartirContent() {
         <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-[#112A4F]/20 rounded-full blur-[120px]" />
       </div>
       <header className="w-full max-w-2xl flex items-center justify-between z-10 mb-8 pt-4">
-        <Link href="/" className="text-cora-silver hover:text-white flex items-center gap-2 transition-colors">
+        <Link href="/" aria-label="Inicio" className="text-cora-silver hover:text-white flex items-center gap-2 transition-colors">
           <ArrowLeft className="w-5 h-5" />
           <span>Volver</span>
         </Link>

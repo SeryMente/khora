@@ -1,17 +1,23 @@
 import { test, expect } from '@playwright/test';
 
 const routes = [
-  { path: '/sistema/dictado', expectedTitle: 'Dictado' },
-  { path: '/sistema/editar', expectedTitle: 'Editar transcripciones' },
+  { path: '/sistema/ingreso', expectedTitle: 'Ingreso Integrado' },
+  { path: '/sistema/ingreso?modo=dictado', expectedTitle: 'Ingreso Integrado' },
+  { path: '/sistema/ingreso?modo=captura', expectedTitle: 'Ingreso Integrado' },
+  { path: '/sistema/ingreso?modo=archivo', expectedTitle: 'Ingreso Integrado' },
+  { path: '/sistema/ingreso?modo=revision', expectedTitle: 'Editar transcripciones' },
+  { path: '/sistema/ingreso?modo=ingesta', expectedTitle: 'Ingreso a memoria' },
   { path: '/sistema/volcados', expectedTitle: 'Mesa de Revisión Sincrónica' },
-  { path: '/sistema/ingesta', expectedTitle: 'Ingesta' },
   { path: '/sistema/consulta', expectedTitle: 'Consola de Consulta' },
   { path: '/sistema/seguridad', expectedTitle: 'Seguridad' },
   { path: '/sistema/mcp', expectedTitle: 'Control MCP & Revocación' },
   { path: '/sistema/otros', expectedTitle: 'Evidencia normativa' },
   { path: '/grafo', expectedTitle: 'Grafo PKG - Proyección Leiden' },
   { path: '/mapa', expectedTitle: 'Mapa Visual de Ramificaciones' },
-  { path: '/capturar', expectedTitle: 'Captura' },
+  { path: '/capturar', expectedTitle: 'Ingreso Integrado' },
+  { path: '/sistema/dictado', expectedTitle: 'Ingreso Integrado' },
+  { path: '/sistema/editar', expectedTitle: 'Editar transcripciones' },
+  { path: '/sistema/ingesta', expectedTitle: 'Ingreso a memoria' },
 ];
 
 test.describe('Shell Navegación v3', () => {
@@ -40,16 +46,20 @@ test.describe('Shell Navegación v3', () => {
     await expect(page.locator('[data-testid="khora-splash"]')).toHaveCount(0, { timeout: 3000 });
 
     await expect(page.locator('[data-navigation-entry]')).toHaveCount(6);
-    for (const name of ['Ingreso', 'Grafo', 'Seguridad', 'Sistema']) {
+    await expect(page.getByRole('link', { name: 'Ingreso', exact: true })).toBeVisible();
+    for (const name of ['Grafo', 'Seguridad', 'Sistema']) {
       await expect(page.getByRole('button', { name, exact: true })).toBeVisible();
     }
     await expect(page.getByRole('link', { name: 'Capturar', exact: true })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: 'Dictado', exact: true })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: 'Edición', exact: true })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: 'Ingesta', exact: true })).toHaveCount(0);
 
-    await page.getByRole('button', { name: 'Ingreso', exact: true }).click();
-    const ingresoMenu = page.getByRole('navigation', { name: 'Menú Ingreso' });
-    await expect(ingresoMenu).toBeVisible();
-    for (const name of ['Ingreso', 'Capturar', 'Dictado', 'Edición', 'Ingesta']) {
-      await expect(ingresoMenu.getByRole('link', { name, exact: true })).toBeVisible();
+    await page.goto('http://localhost:3000/sistema/ingreso');
+    const ingresoModes = page.getByRole('navigation', { name: 'Modos de Ingreso' });
+    await expect(ingresoModes).toBeVisible();
+    for (const name of ['Entrada', 'Dictado', 'Captura', 'Archivo', 'Revisión', 'Ingesta']) {
+      await expect(ingresoModes.getByRole('link', { name, exact: true })).toBeVisible();
     }
 
     await page.getByRole('button', { name: 'Grafo', exact: true }).click();
@@ -89,7 +99,7 @@ test.describe('Shell Navegación v3', () => {
       await expect(page.locator('[data-testid="khora-splash"]')).toHaveCount(0, { timeout: 3000 });
       await expect(page.locator('[data-navigation-primary-count]')).toHaveAttribute('data-navigation-primary-count', '6');
 
-      for (const name of ['Ingreso', 'Grafo', 'Seguridad', 'Sistema']) {
+      for (const name of ['Grafo', 'Seguridad', 'Sistema']) {
         const button = page.getByRole('button', { name, exact: true });
         await button.click();
         await expect(button).toHaveAttribute('aria-expanded', 'true');

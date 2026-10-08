@@ -169,13 +169,8 @@ export function GrafoView({
       }));
   }, [edges, nodes]);
 
-  const inspectionPanel = selectedElement ? (
-    <Panel
-      position="top-right"
-      className="!m-4 !w-80 !rounded-lg !border !border-zinc-700 !p-4 !shadow-xl"
-      style={{ backgroundColor: "var(--khora-surface)", color: "var(--khora-ink)" }}
-      data-ui-id="grafo.panel-inspection"
-    >
+  const inspectionContent = selectedElement ? (
+    <>
       <div className="mb-4 flex items-center justify-between border-b border-zinc-700 pb-2 text-xs">
         <h3 className="font-bold uppercase">
           {selectedElement.type === "node" ? "Inspección de Comunidad" : "Inspección de Relación"}
@@ -217,7 +212,29 @@ export function GrafoView({
           <div><span className="opacity-70">Verificación:</span> {selectedElement.data.verificacion}</div>
         </div>
       )}
+    </>
+  ) : null;
+
+  const inspectionPanel = selectedElement ? (
+    <Panel
+      position="top-right"
+      className="!m-4 !w-80 !rounded-lg !border !border-zinc-700 !p-4 !shadow-xl"
+      style={{ backgroundColor: "var(--khora-surface)", color: "var(--khora-ink)" }}
+      data-ui-id="grafo.panel-inspection"
+    >
+      {inspectionContent}
     </Panel>
+  ) : null;
+
+  const listInspectionPanel = selectedElement && viewMode === "list" ? (
+    <aside
+      data-ui-id="grafo.panel-inspection"
+      className="mx-auto mt-4 w-full max-w-5xl rounded-lg border p-4 shadow-xl"
+      style={{ backgroundColor: "var(--khora-surface)", color: "var(--khora-ink)", borderColor: "var(--khora-border)" }}
+      aria-label="Inspección de elemento seleccionado"
+    >
+      {inspectionContent}
+    </aside>
   ) : null;
 
   return (
@@ -292,28 +309,31 @@ export function GrafoView({
             El grafo está vacío.
           </div>
         ) : viewMode === "list" ? (
-          <div data-ui-id="grafo.node-list" className="max-w-5xl mx-auto space-y-4 overflow-auto p-4">
-            <h2 className="mb-4 text-lg font-semibold">Lista Accesible de Nodos</h2>
-            {nodes.map((node) => (
-              <button
-                type="button"
-                key={node.id}
-                onClick={() => actions.onSelectElement?.({ type: "node", data: node })}
-                aria-label={"Inspeccionar nodo: " + node.summary}
-                className="flex w-full cursor-pointer flex-col gap-2 rounded border p-4 text-left shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--khora-accent)]"
-                style={{ backgroundColor: "var(--khora-surface)", borderColor: "var(--khora-border)" }}
-              >
-                <p className="font-medium">{node.summary}</p>
-                <div className="flex flex-wrap gap-4 text-xs opacity-80">
-                  <span>Comunidad: {node.community}</span>
-                  <span>Nivel: {node.level}</span>
-                  <span>Centralidad: {node.centrality}</span>
-                  <span>Origen: {node.origen}</span>
-                  <span>{node.verificacion}</span>
-                </div>
-              </button>
-            ))}
-          </div>
+          <>
+            <div data-ui-id="grafo.node-list" className="max-w-5xl mx-auto space-y-4 overflow-auto p-4">
+              <h2 className="mb-4 text-lg font-semibold">Lista Accesible de Nodos</h2>
+              {nodes.map((node) => (
+                <button
+                  type="button"
+                  key={node.id}
+                  onClick={() => actions.onSelectElement?.({ type: "node", data: node })}
+                  aria-label={"Inspeccionar nodo: " + node.summary}
+                  className="flex w-full cursor-pointer flex-col gap-2 rounded border p-4 text-left shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--khora-accent)]"
+                  style={{ backgroundColor: "var(--khora-surface)", borderColor: "var(--khora-border)" }}
+                >
+                  <p className="font-medium">{node.summary}</p>
+                  <div className="flex flex-wrap gap-4 text-xs opacity-80">
+                    <span>Comunidad: {node.community}</span>
+                    <span>Nivel: {node.level}</span>
+                    <span>Centralidad: {node.centrality}</span>
+                    <span>Origen: {node.origen}</span>
+                    <span>{node.verificacion}</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+            {listInspectionPanel}
+          </>
         ) : (
           <div
             data-ui-id="grafo.flow-view"

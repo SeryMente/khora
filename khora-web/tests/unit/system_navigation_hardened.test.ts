@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { MAX_PRIMARY_NAVIGATION_ITEMS, NAVIGATION_REGISTRY, normalizeNavigationPath } from "../../app/navigation/registry";
+import { MAX_PRIMARY_NAVIGATION_ITEMS, NAVIGATION_LEGACY_ALIASES, NAVIGATION_REGISTRY, normalizeNavigationPath } from "../../app/navigation/registry";
 
 const root = process.cwd();
 const bar = readFileSync(join(root, "app/components/os/SystemBar.tsx"), "utf8");
@@ -23,22 +23,38 @@ test("system menu only exposes secondary surfaces", () => {
   assert.equal(entry.coverage.includes("/capturar"), false);
 });
 
-test("input and capture form one coherent ingreso domain", () => {
+test("input, dictation, review and ingestion form one coherent ingreso domain", () => {
   const entry = NAVIGATION_REGISTRY.find((item) => item.id === "ingreso");
   assert.ok(entry);
-  assert.equal(entry.coverage.includes("/capturar"), true);
-  assert.deepEqual((entry.children ?? []).map((child) => child.id), [
-    "ingreso-main", "capturar", "dictado", "edicion", "ingesta",
-  ]);
+  assert.equal(entry.kind, "direct");
+  assert.equal(entry.href, "/sistema/ingreso");
+  assert.deepEqual(entry.coverage, ["/sistema/ingreso"]);
+  assert.equal((entry.children ?? []).length, 0);
   assert.equal(NAVIGATION_REGISTRY.some((item) => item.id === "capturar"), false);
+  assert.equal(NAVIGATION_REGISTRY.some((item) => item.id === "dictado"), false);
+  assert.equal(NAVIGATION_REGISTRY.some((item) => item.id === "edicion"), false);
+  assert.equal(NAVIGATION_REGISTRY.some((item) => item.id === "ingesta"), false);
 });
 
-test("domain menus are hierarchical rather than flattened into one list", () => {
+test("legacy ingreso routes are aliases, not primary coverage", () => {
+  const aliases: Array<[string, string]> = [
+    ["/capturar", "/sistema/ingreso?modo=captura"],
+    ["/sistema/dictado", "/sistema/ingreso?modo=dictado"],
+    ["/sistema/editar", "/sistema/ingreso?modo=revision"],
+    ["/sistema/ingesta", "/sistema/ingreso?modo=ingesta"],
+  ];
+  for (const [alias, canonical] of aliases) {
+    assert.equal(NAVIGATION_LEGACY_ALIASES.get(alias), canonical);
+    assert.equal(NAVIGATION_REGISTRY.some((entry) => entry.coverage.includes(alias)), false);
+  }
+});
+
+test("domain menus are hierarchical while ingreso modes stay inside the workspace", () => {
   const ingreso = NAVIGATION_REGISTRY.find((item) => item.id === "ingreso");
   const grafo = NAVIGATION_REGISTRY.find((item) => item.id === "grafo");
   assert.ok(ingreso);
   assert.ok(grafo);
-  assert.deepEqual((ingreso.children ?? []).map((child) => child.id), ["ingreso-main", "capturar", "dictado", "edicion", "ingesta"]);
+  assert.deepEqual((ingreso.children ?? []).map((child) => child.id), []);
   assert.deepEqual((grafo.children ?? []).map((child) => child.id), ["grafo-main", "mapa"]);
 });
 

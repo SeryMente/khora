@@ -110,7 +110,7 @@ test.describe('Dictado sin perdida anti-regresion guard', () => {
       (window as any).webkitSpeechRecognition = MockSpeechRecognition;
     });
 
-    await page.goto('/sistema/dictado');
+    await page.goto('/sistema/ingreso?modo=dictado');
 
     // Verify page has loaded
     const mainHeader = page.locator('h1');
@@ -128,7 +128,7 @@ test.describe('Dictado sin perdida anti-regresion guard', () => {
     await stopBtn.click();
 
     // Read the transcription panel text
-    const transcriptionArea = page.locator('main div.p-4.min-h-\\[240px\\]').first();
+    const transcriptionArea = page.locator('textarea[data-ui-id="ingreso.textarea"]').first();
     await expect(transcriptionArea).toBeVisible();
 
     const textContent = await transcriptionArea.textContent() || '';
@@ -208,7 +208,7 @@ test.describe('Dictado sin perdida anti-regresion guard', () => {
       });
     });
 
-    await page.goto('/sistema/dictado');
+    await page.goto('/sistema/ingreso?modo=dictado');
     await expect(page.locator('h1')).toBeVisible();
 
     const startBtn = page.locator('button:has-text("Iniciar dictado")');
@@ -218,7 +218,7 @@ test.describe('Dictado sin perdida anti-regresion guard', () => {
     const stopBtn = page.locator('button:has-text("Detener")');
     await stopBtn.click();
 
-    const transcriptionArea = page.locator('main div.p-4.min-h-\\[240px\\]').first();
+    const transcriptionArea = page.locator('textarea[data-ui-id="ingreso.textarea"]').first();
     await expect(transcriptionArea).toBeVisible();
 
     const textContent = await transcriptionArea.textContent() || '';

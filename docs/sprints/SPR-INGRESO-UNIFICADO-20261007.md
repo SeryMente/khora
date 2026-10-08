@@ -2,10 +2,10 @@
 id: KHORA-SPRINT-INGRESO-UNIFICADO-20261007
 tipo: sprint
 version: v0.1.0
-estado: PLANIFICADO
+estado: EN_PROGRESO
 fecha: 2026-10-07
 repositorio_canonico: https://github.com/SeryMente/khora
-base_sha: d70b208d42dc0283ccf1d8b5cad6618135148f30
+base_sha: b8ae985da85a0f5eb79fcd6aab5cdb30e8e639d5
 ruta_canonica: docs/sprints/SPR-INGRESO-UNIFICADO-20261007.md
 owner: KHORA
 ---
@@ -344,13 +344,23 @@ La integración a `main` solo después de los jueces obligatorios del repositori
 
 ## 13. Estado operativo
 
-**Estado:** PLANIFICADO
+**Estado:** EN_PROGRESO
 **Código productivo modificado por este sprint:** NO
 **Documento canónico creado:** SÍ
-**Baseline:** `d70b208d42dc0283ccf1d8b5cad6618135148f30`
+**Baseline:** `b8ae985da85a0f5eb79fcd6aab5cdb30e8e639d5`
 **Producción modificada por este sprint:** NO
-**Pruebas de este sprint ejecutadas:** NO
-**Siguiente ciclo autorizado:** C0
+**Pruebas de este sprint ejecutadas:** C0 baseline ejecutado; typecheck y unitarias terminan con código 1 sin diagnóstico visible en la envolvente npm; UI contract pendiente de rerun directo.
+**Siguiente ciclo autorizado:** C0 → C1
+
+### Evidencia C0 · 2026-10-07
+
+- Rama de trabajo: `sprint/ingreso-unificado-20261007` creada desde `b8ae985da85a0f5eb79fcd6aab5cdb30e8e639d5`.
+- Árbol inicial limpio.
+- `git show --stat HEAD` confirma que `b8ae985` solo contiene el objeto canónico del sprint.
+- `npm run typecheck`: exit code 1, sin mensajes de diagnóstico visibles.
+- `npm run test:unit`: exit code 1, sin mensajes de diagnóstico visibles.
+- Se confirmó que `package.json` usa Node/tsx instalados localmente y que existen pruebas unitarias; la causa de los dos códigos 1 queda clasificada como **incidencia preexistente de runner/entorno hasta reproducir diagnóstico** y no se atribuye al sprint.
+- Se preserva el criterio: ningún fallo silencioso se declara resuelto por el sprint sin causa y evidencia.
 
 ## 14. Recuperación en nueva conversación
 

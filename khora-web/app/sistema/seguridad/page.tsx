@@ -106,17 +106,25 @@ function SeguridadContent() {
         </button>;
       })}
     </div>
-    <div
-      id={"security-panel-" + activeTab}
-      role="tabpanel"
-      aria-labelledby={"security-tab-" + activeTab}
-      tabIndex={0}
-    >
-      {activeTab === "seguridad" && <SeguridadOverview onOpen={openTab} />}
-      {activeTab === "entorno-persistente" && <EntornoPersistentePanel />}
-      {activeTab === "boveda" && <PaginaBoveda />}
-      {activeTab === "mcp" && <PaginaMcpRevocacion />}
-    </div>
+    {TABS.map((tab) => (
+      <div
+        key={tab.id}
+        id={"security-panel-" + tab.id}
+        role="tabpanel"
+        aria-labelledby={"security-tab-" + tab.id}
+        tabIndex={0}
+        hidden={activeTab !== tab.id}
+      >
+        {activeTab === tab.id && (
+          <>
+            {tab.id === "seguridad" && <SeguridadOverview onOpen={openTab} />}
+            {tab.id === "entorno-persistente" && <EntornoPersistentePanel />}
+            {tab.id === "boveda" && <PaginaBoveda />}
+            {tab.id === "mcp" && <PaginaMcpRevocacion />}
+          </>
+        )}
+      </div>
+    ))}
   </div>;
 }
 

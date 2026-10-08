@@ -59,22 +59,9 @@ export const NAVIGATION_REGISTRY: readonly NavigationEntry[] = [
     label: "Ingreso",
     href: "/sistema/ingreso",
     icon: "Keyboard",
-    kind: "menu",
+    kind: "direct",
     level: 1,
-    coverage: [
-      "/sistema/ingreso",
-      "/capturar",
-      "/sistema/dictado",
-      "/sistema/editar",
-      "/sistema/ingesta",
-    ],
-    children: [
-      { id: "ingreso-main", label: "Ingreso", href: "/sistema/ingreso", icon: "Keyboard", group: "Entrada" },
-      { id: "capturar", label: "Capturar", href: "/capturar", icon: "Mic", group: "Entrada" },
-      { id: "dictado", label: "Dictado", href: "/sistema/dictado", icon: "Mic", group: "Entrada" },
-      { id: "edicion", label: "Edición", href: "/sistema/editar", icon: "PenLine", group: "Revisión de entrada" },
-      { id: "ingesta", label: "Ingesta", href: "/sistema/ingesta", icon: "UploadCloud", group: "Entrada" },
-    ],
+    coverage: ["/sistema/ingreso"],
   },
   {
     id: "grafo",
@@ -158,6 +145,10 @@ export const NAVIGATION_LEGACY_ALIASES = new Map<string, string>([
   ["/sistema/boveda", "/sistema/seguridad?tab=boveda"],
   ["/sistema/entorno-persistente", "/sistema/seguridad?tab=entorno-persistente"],
   ["/herramientas/bitacora", "/sistema/volcados"],
+  ["/capturar", "/sistema/ingreso?modo=captura"],
+  ["/sistema/dictado", "/sistema/ingreso?modo=dictado"],
+  ["/sistema/editar", "/sistema/ingreso?modo=revision"],
+  ["/sistema/ingesta", "/sistema/ingreso?modo=ingesta"],
 ]);
 
 export const CANONICAL_PRODUCT_ROUTES = new Set(

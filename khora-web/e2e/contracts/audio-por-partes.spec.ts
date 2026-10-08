@@ -108,7 +108,7 @@ test.describe('Dictado por partes contract test', () => {
       (window as any).webkitSpeechRecognition = MockSpeechRecognition;
     });
 
-    await page.goto('/sistema/dictado');
+    await page.goto('/sistema/ingreso?modo=dictado');
 
     // Click "Iniciar dictado"
     const startBtn = page.locator('button:has-text("Iniciar dictado")');
@@ -250,7 +250,7 @@ test.describe('Dictado por partes contract test', () => {
       (window as any).webkitSpeechRecognition = MockSpeechRecognition;
     });
 
-    await page.goto('/sistema/dictado');
+    await page.goto('/sistema/ingreso?modo=dictado');
 
     // Start & stop dictation
     await page.locator('button:has-text("Iniciar dictado")').click();

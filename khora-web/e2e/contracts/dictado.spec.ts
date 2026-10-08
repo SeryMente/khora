@@ -8,12 +8,12 @@ test.describe('Dictado UI Reskin Contract and Layout', () => {
       localStorage.setItem('khora_auth_session', JSON.stringify({ authenticated: true, timestamp: Date.now() }));
     });
 
-    await page.goto('/sistema/dictado');
+    await page.goto('/sistema/ingreso?modo=dictado');
 
     // Verify Title element
     const mainHeader = page.locator('h1');
     await expect(mainHeader).toBeVisible();
-    await expect(mainHeader).toContainText('Dictado');
+    await expect(mainHeader).toContainText('Ingreso Integrado');
 
     // Verify main container styles (paddingBottom of 6rem, maxWidth)
     const mainContainer = page.locator('main').first();
@@ -28,14 +28,14 @@ test.describe('Dictado UI Reskin Contract and Layout', () => {
     await expect(micIcon).toHaveAttribute('stroke-width', '1.75');
 
     // Check input style properties
-    const inputField = page.locator('input[placeholder="titulo opcional"]').first();
+    const inputField = page.locator('input[data-ui-id="ingreso.titulo-input"]').first();
     await expect(inputField).toBeVisible();
     await expect(inputField).toHaveCSS('background-color', 'rgb(23, 24, 26)'); // --khora-surface
     await expect(inputField).toHaveCSS('color', 'rgb(199, 204, 209)'); // --khora-ink
     await expect(inputField).toHaveCSS('border-color', 'rgb(35, 37, 42)'); // --khora-border
 
     // Check textarea transcription container
-    const transcriptionArea = page.locator('main div.p-4.min-h-\\[240px\\]').first();
+    const transcriptionArea = page.locator('textarea[data-ui-id="ingreso.textarea"]').first();
     await expect(transcriptionArea).toBeVisible();
     await expect(transcriptionArea).toHaveCSS('background-color', 'rgb(23, 24, 26)'); // --khora-surface
     await expect(transcriptionArea).toHaveCSS('color', 'rgb(199, 204, 209)'); // --khora-ink
