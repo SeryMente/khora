@@ -1,6 +1,6 @@
 import { createHash } from "crypto";
 
-export const OUTPUT_FORMAT_VERSION = "v1.7.5" as const;
+export const OUTPUT_FORMAT_VERSION = "v1.7.6 as const;
 
 export const CI_STATES = ["✓", "?", "!"] as const;
 export const RDC_STATES = ["SI", "NO", "PENDIENTE"] as const;
