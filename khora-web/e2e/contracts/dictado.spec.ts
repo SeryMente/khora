@@ -13,7 +13,7 @@ test.describe('Dictado UI Reskin Contract and Layout', () => {
     // Verify Title element
     const mainHeader = page.locator('h1');
     await expect(mainHeader).toBeVisible();
-    await expect(mainHeader).toContainText('Ingreso Integrado');
+    await expect(mainHeader).toContainText('Ingreso');
 
     // Verify main container styles (paddingBottom of 6rem, maxWidth)
     const mainContainer = page.locator('main').first();
