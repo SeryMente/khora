@@ -6,8 +6,7 @@ const localPath = new URL("../contracts/FORMATO-REGISTRO-VERIFICACION-CICLO.sche
 const runtimePath = new URL("../lib/server/normative-runtime.ts", import.meta.url);
 const contractPath = new URL("../lib/server/output-contract.ts", import.meta.url);
 
-const canonicalSchemaUrl = "https://raw.githubusercontent.com/SeryMente/metodologia/main/FORMATO-REGISTRO-VERIFICACION-CICLO.schema.json";
-const canonicalFormatUrl = "https://raw.githubusercontent.com/SeryMente/metodologia/main/FORMATO-REGISTRO-VERIFICACION-CICLO.md";
+const canonicalApi = "https://api.github.com/repos/SeryMente/metodologia/contents/";
 
 function sha256(value) {
   return crypto.createHash("sha256").update(value, "utf8").digest("hex");
@@ -19,15 +18,29 @@ function extractVersion(source, pattern, label) {
   return match[1];
 }
 
-const [canonicalSchema, canonicalFormat, localSchema, runtimeSource, contractSource] = await Promise.all([
-  fetch(canonicalSchemaUrl, { cache: "no-store" }).then((r) => {
-    if (!r.ok) throw new Error("CANONICAL_SCHEMA_FETCH_" + r.status);
-    return r.text();
-  }),
-  fetch(canonicalFormatUrl, { cache: "no-store" }).then((r) => {
-    if (!r.ok) throw new Error("CANONICAL_FORMAT_FETCH_" + r.status);
-    return r.text();
-  }),
+async function fetchGithubFile(path) {
+  const response = await fetch(canonicalApi + path + "?ref=main", {
+    headers: { Accept: "application/vnd.github+json", "User-Agent": "Khora-Output-Contract-Sync/1.0" },
+    cache: "no-store",
+  });
+  if (!response.ok) throw new Error("CANONICAL_FETCH_" + path + "_" + response.status);
+  const payload = await response.json();
+  if (payload.encoding !== "base64" || typeof payload.content !== "string" || typeof payload.sha !== "string") {
+    throw new Error("CANONICAL_PAYLOAD_INVALID_" + path);
+  }
+  return { content: Buffer.from(payload.content.replace(/\n/g, ""), "base64").toString("utf8"), blobSha: payload.sha };
+}
+
+const [canonicalSchemaRecord, canonicalFormatRecord, localSchema, runtimeSource, contractSource] = await Promise.all([
+  fetchGithubFile("FORMATO-REGISTRO-VERIFICACION-CICLO.schema.json"),
+  fetchGithubFile("FORMATO-REGISTRO-VERIFICACION-CICLO.md"),
+  fs.readFile(localPath, "utf8"),
+  fs.readFile(runtimePath, "utf8"),
+  fs.readFile(contractPath, "utf8"),
+]);
+
+const canonicalSchema = canonicalSchemaRecord.content;
+const canonicalFormat = canonicalFormatRecord.content;
   fs.readFile(localPath, "utf8"),
   fs.readFile(runtimePath, "utf8"),
   fs.readFile(contractPath, "utf8"),
