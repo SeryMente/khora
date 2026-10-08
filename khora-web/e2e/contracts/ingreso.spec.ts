@@ -1,7 +1,7 @@
 // @l0 L0-002-R · @req UI-04/INGRESO-INTEGRADO
 import { test, expect } from '@playwright/test';
 
-test.describe('Ingreso Integrado Screen and Layout', () => {
+test.describe('Ingreso Screen and Layout', () => {
   test('renders correctly with editable textarea, standard tokens, and correct spacing', async ({ page }) => {
     // Navigate to the new integrated screen with test auth bypass
     await page.goto('/sistema/ingreso');
@@ -9,7 +9,7 @@ test.describe('Ingreso Integrado Screen and Layout', () => {
     // Verify Title element
     const mainHeader = page.locator('h1');
     await expect(mainHeader).toBeVisible();
-    await expect(mainHeader).toContainText('Ingreso Integrado');
+    await expect(mainHeader).toContainText('Ingreso');
 
     // Verify main container has paddingBottom of 6rem (96px) to avoid SystemBar overlap
     const mainContainer = page.locator('main').first();
