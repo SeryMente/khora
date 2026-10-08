@@ -179,7 +179,7 @@ test("cycle verification output record preserves cycle, attempt, verdict and evi
     si_git_commit_sha: siCommitSha,
     si_sha256: "b".repeat(64),
     manifest_sha256: "c".repeat(64),
-    methodology_version: "v0.12.3",
+    methodology_version: "v0.12.5",
     methodology_git_commit_sha: "e".repeat(40),
     order_verified: true,
     application_log_sha256: "d".repeat(64),
@@ -194,7 +194,7 @@ test("cycle verification output record preserves cycle, attempt, verdict and evi
   assert.equal(record.status, "VERIFIED");
   assert.equal(record.evidence_sha256, "a".repeat(64));
   assert.equal(record.receipt_id, "receipt-1");
-  assert.equal(record.methodology_version, "v0.12.3");
+  assert.equal(record.methodology_version, "v0.12.5");
   assert.equal(record.methodology_git_commit_sha, "e".repeat(40));
   assert.equal(record.si_git_commit_sha, siCommitSha);
   assert.equal(record.order_verified, true);
