@@ -103,7 +103,7 @@ export default function RoadmapPage() {
   
   return (
     <main className="bg-cora-bg min-h-screen flex flex-col selection:bg-cora-accent/20 relative">
-      <header className="sticky top-0 w-full p-4 md:p-6 flex items-center justify-between z-10 bg-cora-bg/80 backdrop-blur-md border-b border-cora-silver/20">
+      <header className="sticky top-0 z-10 flex w-full flex-wrap items-center justify-between gap-4 border-b border-cora-silver/20 bg-cora-bg/80 p-4 backdrop-blur-md md:p-6">
         <div className="flex items-center gap-4">
           <Link href="/" aria-label="Inicio" className="p-2 rounded-full hover:bg-cora-surface transition-colors">
             <ArrowLeft className="w-5 h-5 text-cora-text" />
