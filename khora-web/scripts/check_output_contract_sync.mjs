@@ -1,7 +1,6 @@
 import fs from "node:fs/promises";
 import crypto from "node:crypto";
 
-const ROOT = new URL("..", import.meta.url).pathname;
 const localPath = new URL("../contracts/FORMATO-REGISTRO-VERIFICACION-CICLO.schema.json", import.meta.url);
 const runtimePath = new URL("../lib/server/normative-runtime.ts", import.meta.url);
 const contractPath = new URL("../lib/server/output-contract.ts", import.meta.url);
@@ -41,10 +40,6 @@ const [canonicalSchemaRecord, canonicalFormatRecord, localSchema, runtimeSource,
 
 const canonicalSchema = canonicalSchemaRecord.content;
 const canonicalFormat = canonicalFormatRecord.content;
-  fs.readFile(localPath, "utf8"),
-  fs.readFile(runtimePath, "utf8"),
-  fs.readFile(contractPath, "utf8"),
-]);
 
 if (canonicalSchema !== localSchema) {
   throw new Error("OUTPUT_CONTRACT_SCHEMA_DRIFT:" + sha256(canonicalSchema) + "!=" + sha256(localSchema));
