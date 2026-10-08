@@ -110,7 +110,7 @@ test.describe('Dictado sin perdida anti-regresion guard', () => {
       (window as any).webkitSpeechRecognition = MockSpeechRecognition;
     });
 
-    await page.goto('/sistema/ingreso?modo=dictado');
+    await page.goto('/sistema/ingreso');
 
     // Verify page has loaded
     const mainHeader = page.locator('h1');
@@ -208,7 +208,7 @@ test.describe('Dictado sin perdida anti-regresion guard', () => {
       });
     });
 
-    await page.goto('/sistema/ingreso?modo=dictado');
+    await page.goto('/sistema/ingreso');
     await expect(page.locator('h1')).toBeVisible();
 
     const startBtn = page.locator('button:has-text("Iniciar dictado")');
