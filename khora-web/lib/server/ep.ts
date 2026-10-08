@@ -4,7 +4,7 @@ import { JwtPayload, signJwt, verifyJwtDetailed } from "@/lib/server/jwt";
 
 export type EpState = "START" | "OK" | "FAIL" | "INFO" | "SKIP";
 export type EpLaunchMode = "normal";
-export interface EpTokenPayload extends JwtPayload { sid: string; typ: "ep-session"; launchMode: EpLaunchMode; }
+export interface EpTokenPayload extends JwtPayload { sid: string; typ: "ep-session"; launchMode: EpLaunchMode; workspaceRepos?: string[]; }
 export interface IncomingEpEvent {
   id: string; state: EpState; message?: string; durationMs?: number | null;
   timestamp?: string; detail?: Record<string, unknown> | null;
@@ -49,10 +49,11 @@ export function isEpUserAllowed(email: string, origin?: string): boolean {
   const allowed = getEpConfig(origin).allowedEmail;
   return !!email && (!allowed || email.toLowerCase() === allowed);
 }
-export async function createEpSessionToken(email: string, origin: string, launchMode: EpLaunchMode = "normal") {
+export async function createEpSessionToken(email: string, origin: string, launchMode: EpLaunchMode = "normal", workspaceRepos?: unknown) {
   if (launchMode !== "normal") throw new Error("unsupported_launch_mode");
   const config = getEpConfig(origin);
   if (!isEpUserAllowed(email, origin)) throw new Error("Usuario no autorizado para Entorno Persistente");
+  const resolvedWorkspaceRepos = await resolveEpWorkspaceRepos(workspaceRepos);
   const now = Math.floor(Date.now() / 1000);
   const exp = now + config.ttlSeconds;
   const sid = randomUUID();
@@ -60,6 +61,7 @@ export async function createEpSessionToken(email: string, origin: string, launch
   const payload: EpTokenPayload = {
     iss: config.issuer, sub: email.toLowerCase(), aud: config.audience,
     scope: "ep:bootstrap ep:logs:write ep:logs:read", gen: 1,
+    workspaceRepos: resolvedWorkspaceRepos,
     exp, iat: now, jti, sid, typ: "ep-session", launchMode,
   };
   const token = signJwt(payload, config.secret);
@@ -108,7 +110,7 @@ export async function authenticateEpBearer(req: Request, scopes: string[]): Prom
     throw new Error("invalid_token");
   }
   const payload = verification.payload as EpTokenPayload;
-  if (payload.typ !== "ep-session" || payload.iss !== config.issuer || payload.launchMode !== "normal" || typeof payload.sid !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(payload.sid) || typeof payload.sub !== "string" || !payload.sub || typeof payload.jti !== "string" || payload.jti.length < 16 || payload.jti.length > 256) throw new Error("invalid_token");
+  if (payload.typ !== "ep-session" || payload.iss !== config.issuer || payload.launchMode !== "normal" || (payload.workspaceRepos !== undefined && (!Array.isArray(payload.workspaceRepos) || payload.workspaceRepos.some((name) => typeof name !== "string" || !/^[A-Za-z0-9_.-]{1,100}$/.test(name)))) || typeof payload.sid !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(payload.sid) || typeof payload.sub !== "string" || !payload.sub || typeof payload.jti !== "string" || payload.jti.length < 16 || payload.jti.length > 256) throw new Error("invalid_token");
   if (payload.aud !== config.audience) throw new Error("invalid_audience");
   const granted = new Set(payload.scope.split(/\s+/).filter(Boolean));
   if (scopes.some((scope) => !granted.has(scope))) throw new Error("insufficient_scope");
@@ -124,6 +126,62 @@ export async function authenticateEpBearer(req: Request, scopes: string[]): Prom
 
 export type EpAuthFailureCode = "missing_bearer" | "invalid_token_format" | "invalid_token" | "invalid_signature" | "invalid_audience" | "insufficient_scope" | "revoked_or_expired" | "authentication_unavailable";
 const EP_AUTH_FAILURES = new Set<EpAuthFailureCode>(["missing_bearer", "invalid_token_format", "invalid_token", "invalid_signature", "invalid_audience", "insufficient_scope", "revoked_or_expired"]);
+
+export type EpWorkspaceRepo = {
+  name: string;
+  private: boolean;
+  defaultBranch: string;
+  extensionRoot: string | null;
+};
+const DEFAULT_OEP_WORKSPACE_REPOS = ["CENSUS", "signal-interpreter"] as const;
+let repoCatalogCache: { expiresAt: number; value: EpWorkspaceRepo[] } | null = null;
+async function githubApi(path: string): Promise<any> {
+  const token = process.env.GITHUB_TOKEN?.trim();
+  if (!token) throw new Error("github_catalog_unavailable");
+  const response = await fetch("https://api.github.com" + path, {
+    headers: { Authorization: "Bearer " + token, Accept: "application/vnd.github+json", "User-Agent": "khora-ep-catalog/1" },
+    cache: "no-store",
+  });
+  if (!response.ok) throw new Error("github_catalog_unavailable");
+  return response.json();
+}
+export async function getEpRepoCatalog(): Promise<EpWorkspaceRepo[]> {
+  if (repoCatalogCache && repoCatalogCache.expiresAt > Date.now()) return repoCatalogCache.value;
+  const raw = await githubApi("/orgs/SeryMente/repos?per_page=100&sort=full_name&direction=asc&type=all");
+  if (!Array.isArray(raw)) throw new Error("github_catalog_unavailable");
+  const catalog: EpWorkspaceRepo[] = [];
+  for (const repo of raw) {
+    if (!repo || typeof repo.name !== "string" || repo.archived) continue;
+    let extensionRoot: string | null = null;
+    try {
+      const tree = await githubApi("/repos/SeryMente/" + encodeURIComponent(repo.name) + "/git/trees/" + encodeURIComponent(String(repo.default_branch || "main")) + "?recursive=1");
+      const treeItems = Array.isArray(tree?.tree) ? tree.tree : [];
+      const manifest = treeItems.find((item: any) => item && item.type === "blob" && String(item.path).toLowerCase().endsWith("/manifest.json"));
+      const rootManifest = treeItems.find((item: any) => item && item.type === "blob" && String(item.path).toLowerCase() === "manifest.json");
+      if (rootManifest) extensionRoot = ".";
+      else if (manifest) extensionRoot = String(manifest.path).slice(0, -"/manifest.json".length);
+    } catch { extensionRoot = null; }
+    catalog.push({ name: repo.name, private: Boolean(repo.private), defaultBranch: String(repo.default_branch || "main"), extensionRoot });
+  }
+  catalog.sort((a,b)=>a.name.localeCompare(b.name));
+  repoCatalogCache = { expiresAt: Date.now() + 30_000, value: catalog };
+  return catalog;
+}
+export async function resolveEpWorkspaceRepos(requested?: unknown): Promise<string[]> {
+  const catalog = await getEpRepoCatalog();
+  const byLower = new Map(catalog.map(repo => [repo.name.toLowerCase(), repo.name]));
+  const input = requested == null ? Array.from(DEFAULT_OEP_WORKSPACE_REPOS) : requested;
+  if (!Array.isArray(input) || input.length > 25) throw new Error("invalid_workspace_repositories");
+  const resolved: string[] = [];
+  for (const value of input) {
+    if (typeof value !== "string" || !/^[A-Za-z0-9_.-]{1,100}$/.test(value)) throw new Error("invalid_workspace_repositories");
+    const canonical = byLower.get(value.toLowerCase());
+    if (!canonical) throw new Error("workspace_repository_not_found");
+    if (canonical.toLowerCase() === "khora") continue;
+    if (!resolved.includes(canonical)) resolved.push(canonical);
+  }
+  return resolved;
+}
 export function getEpAuthFailure(error: unknown): { code: EpAuthFailureCode; status: 401 | 503 } {
   const message = error instanceof Error ? error.message : "";
   if (EP_AUTH_FAILURES.has(message as EpAuthFailureCode)) return { code: message as EpAuthFailureCode, status: 401 };
