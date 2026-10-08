@@ -62,6 +62,6 @@ test("normative turn inserts keep SQL placeholder cardinality aligned", () => {
   const openInsert = source.match(/INSERT INTO normative_turns[\s\S]*?VALUES \(([^)]*)\)/)?.[1] ?? "";
   const receiptInsert = source.match(/INSERT INTO normative_receipts[\s\S]*?VALUES \(([^)]*)\)/)?.[1] ?? "";
 
-  assert.equal((openInsert.match(/\$\d+/g) ?? []).length, 15);
-  assert.equal((receiptInsert.match(/\$\d+/g) ?? []).length, 25);
+  assert.equal((openInsert.match(/\$\d+/g) ?? []).length, 19);
+  assert.equal((receiptInsert.match(/\$\d+/g) ?? []).length, 29);
 });

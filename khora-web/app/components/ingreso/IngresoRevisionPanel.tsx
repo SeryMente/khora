@@ -267,9 +267,9 @@ export function IngresoRevisionPanel() {
         </p>
       </header>
 
-      <div style={{ display: "flex", gap: 20, alignItems: "flex-start" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 20, alignItems: "flex-start" }}>
         {/* Lista de volcados a la izquierda */}
-        <div style={{ flex: "0 0 280px", maxHeight: 600, overflowY: "auto", border: "1px solid #334155", borderRadius: 8, padding: 10, background: "#0f172a" }}>
+        <div style={{ flex: "1 1 280px", width: "100%", maxWidth: "100%", minWidth: 0, boxSizing: "border-box", maxHeight: 600, overflowY: "auto", border: "1px solid #334155", borderRadius: 8, padding: 10, background: "#0f172a" }}>
           <h3 style={{ fontSize: 14, marginTop: 0, marginBottom: 10, opacity: 0.9 }}>Volcados registradas</h3>
           {filas.length === 0 && <p style={{ fontSize: 13, opacity: 0.6 }}>Sin volcados</p>}
           {filas.map(f => (
@@ -308,7 +308,7 @@ export function IngresoRevisionPanel() {
         </div>
 
         {/* Zona Central / Editor y Asistente */}
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 16 }}>
+        <div style={{ flex: "1 1 420px", width: "100%", minWidth: 0, boxSizing: "border-box", display: "flex", flexDirection: "column", gap: 16 }}>
           {!sel ? (
             <div style={{ padding: 40, textAlign: "center", border: "1px dashed #334155", borderRadius: 8, opacity: 0.7 }}>
               Selecciona un volcado de la lista para iniciar el control de calidad.
@@ -346,7 +346,7 @@ export function IngresoRevisionPanel() {
               )}
 
               {/* Layout Editor + Panel Sugerencias */}
-              <div style={{ display: "flex", gap: 16, alignItems: "stretch" }}>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 16, alignItems: "stretch", minWidth: 0 }}>
                 {/* Editor de Texto Activo */}
                 <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 8 }}>
                   <label style={{ fontSize: 13, fontWeight: 600 }}>Borrador en Edición:</label>
@@ -378,7 +378,7 @@ export function IngresoRevisionPanel() {
                 </div>
 
                 {/* Panel Asistente KHORA */}
-                <div style={{ flex: "0 0 340px", border: "1px solid #334155", borderRadius: 6, padding: 12, background: "#0f172a", display: "flex", flexDirection: "column", gap: 10, maxHeight: 420, overflowY: "auto" }}>
+                <div style={{ flex: "1 1 300px", width: "100%", maxWidth: "100%", minWidth: 0, boxSizing: "border-box", border: "1px solid #334155", borderRadius: 6, padding: 12, background: "#0f172a", display: "flex", flexDirection: "column", gap: 10, maxHeight: 420, overflowY: "auto" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <h3 style={{ fontSize: 13, margin: 0, fontWeight: 700 }}>Asistente KHORA</h3>
                     <div style={{ fontSize: 11, display: "flex", gap: 6 }}>
@@ -478,7 +478,7 @@ export function IngresoRevisionPanel() {
               </div>
 
               {/* Botones de Acción Explícita */}
-              <div style={{ display: "flex", gap: 12, marginTop: 8, alignItems: "center", padding: 12, background: "#0f172a", borderRadius: 8, border: "1px solid #334155" }}>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 8, alignItems: "center", minWidth: 0, padding: 12, background: "#0f172a", borderRadius: 8, border: "1px solid #334155" }}>
                 <button
                   onClick={guardarNuevaVersion}
                   disabled={cargando}
