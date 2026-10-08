@@ -96,10 +96,10 @@ export function IngresoView({
       <div className="border-b pb-4" style={{ borderColor: "var(--khora-border)" }}>
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <Icons.Keyboard size={32} strokeWidth={1.75} style={{ color: "var(--khora-accent)" }} />
-          Ingreso Integrado
+          Ingreso
         </h1>
         <p className="text-sm mt-1" style={{ color: "var(--khora-accent)" }}>
-          Método universal combinado: Dicta en vivo, escribe o pega directamente. La transcripción es editable in-situ con protección segmentaria.
+          Captura por voz o texto sin elegir un modo. Lo capturado queda a salvo; la revisión y la incorporación continúan en Volcados.
         </p>
       </div>
 
