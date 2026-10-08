@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Contrato de salida canónica por ciclo",
   "contract_id": "FORMATO-REGISTRO-VERIFICACION-CICLO",
-  "version": "v1.7.6",
+  "version": "v1.7.7",
   "status": "CANÓNICO",
   "kind": "chatgpt-cycle-output",
   "strict": {
@@ -40,6 +40,15 @@
           "states": [
             "✓",
             "?",
+            "!"
+          ]
+        },
+        {
+          "name": "RA",
+          "states": [
+            "INICIAL",
+            "✓",
+            "CORRECTIVO",
             "!"
           ]
         },
@@ -139,6 +148,12 @@
       "?",
       "!"
     ],
+    "RA": [
+      "INICIAL",
+      "✓",
+      "CORRECTIVO",
+      "!"
+    ],
     "RDC": [
       "SI",
       "NO",
@@ -201,7 +216,7 @@
       "const": "FORMATO-REGISTRO-VERIFICACION-CICLO"
     },
     "version": {
-      "const": "v1.7.6"
+      "const": "v1.7.7"
     },
     "status": {
       "const": "CANÓNICO"
