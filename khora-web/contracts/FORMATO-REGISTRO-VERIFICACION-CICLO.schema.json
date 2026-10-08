@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Contrato de salida canónica por ciclo",
   "contract_id": "FORMATO-REGISTRO-VERIFICACION-CICLO",
-  "version": "v1.7.5",
+  "version": "v1.7.6",
   "status": "CANÓNICO",
   "kind": "chatgpt-cycle-output",
   "strict": {
@@ -12,7 +12,7 @@
     "trailing_newline": false,
     "line_terminator": "\\n",
     "normal_line_count": 6,
-    "blocked_preamble_line_count": 7
+    "blocked_preamble_line_count": 8
   },
   "lines": [
     {
