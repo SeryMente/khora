@@ -1,0 +1,44 @@
+name: Output Contract Diagnostic 2
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "khora-web/**"
+      - ".github/workflows/output-contract-diagnostic-2.yml"
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  diagnostic:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Run and report
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set +e
+          : > /tmp/report.md
+          run() {
+            local name="$1"
+            shift
+            echo "### $name" >> /tmp/report.md
+            "$@" >> /tmp/report.md 2>&1
+            local code=$?
+            echo "exit=$code" >> /tmp/report.md
+            echo >> /tmp/report.md
+            return $code
+          }
+          run sync node khora-web/scripts/check_output_contract_sync.mjs; c1=$?
+          run integration node khora-web/scripts/check_output_contract_integration.mjs; c2=$?
+          run tests node --experimental-strip-types khora-web/tests/unit/output-contract.test.ts; c3=$?
+          gh pr comment "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --body-file /tmp/report.md
+          if [ "$c1" -ne 0 ] || [ "$c2" -ne 0 ] || [ "$c3" -ne 0 ]; then exit 1; fi
