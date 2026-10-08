@@ -320,6 +320,9 @@ La ubicación modifica parámetros de ejecución, no el objetivo del sistema. CS
 - `OEP-DEC-020`: debe contemplarse revisión de sesiones RDC.
 - `OEP-DEC-021`: se prevé un Hub gráfico para OEP.
 - `OEP-DEC-022`: el perfil de host/ubicación es estado de primera clase del arranque y queda persistido dentro del volumen cifrado.
+- `OEP-DEC-023`: `Desktop/EP` es una junction verificada hacia el workspace cifrado; no es una segunda copia.
+- `OEP-DEC-024`: la selección de repositorios es parte firmada de la sesión OEP y cada repositorio seleccionado obtiene continuidad WIP independiente.
+- `OEP-DEC-022`: el perfil de host/ubicación es estado de primera clase del arranque y queda persistido dentro del volumen cifrado.
 - `OEP-DEC-023`: `Desktop/EP` es una junction verificada hacia el workspace cifrado; no es una segunda copia del workspace.
 
 ## 52. Pendientes actuales
@@ -373,7 +376,7 @@ Toda modificación material debe aumentar versión, conservar historial, indicar
 **Estado:** ACTIVO  
 **Nivel:** arquitectura transversal en construcción  
 **Implementación completa:** NO VERIFICADA  
-**Fuente técnica principal:** `SeryMente/khora/ep-medio-architectura.md v1.0.2`  
+**Fuente técnica principal:** `SeryMente/khora/ep-medio-architectura.md v1.0.3`  
 **Fuente metodológica:** `SeryMente/metodologia/SI-METACOGNITIVO.md v1.6.7`
 
 La ausencia de contexto conversacional no autoriza a reconstruir decisiones fuera de este objeto o de sus fuentes canónicas.

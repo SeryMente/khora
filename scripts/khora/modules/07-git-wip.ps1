@@ -1,6 +1,6 @@
 ﻿# Git privado y continuidad WIP.
 function Invoke-GitTokenCommand {
-    param([string[]]$Arguments)
+    param([string[]]$Arguments,[string]$RepositoryPath=$REPO_DIR)
     $script:GitOutput=@();$script:GitExit=1
     Invoke-WithToken -Action {
         param($token)
@@ -9,7 +9,7 @@ function Invoke-GitTokenCommand {
         [IO.File]::WriteAllText($askPass,$body,(New-Object Text.ASCIIEncoding))
         try {
             $env:KHORA_GIT_TOKEN=$token;$env:GIT_ASKPASS=$askPass;$env:GIT_TERMINAL_PROMPT='0'
-            $script:GitOutput=@(& git -C $REPO_DIR @Arguments 2>&1);$script:GitExit=$LASTEXITCODE
+            $script:GitOutput=@(& git -C $RepositoryPath @Arguments 2>&1);$script:GitExit=$LASTEXITCODE
         } finally { Remove-Item Env:KHORA_GIT_TOKEN,Env:GIT_ASKPASS -ErrorAction SilentlyContinue;Remove-Item -LiteralPath $askPass -Force -ErrorAction SilentlyContinue }
     }|Out-Null
     return [pscustomobject]@{Code=$script:GitExit;Output=@($script:GitOutput)}
@@ -46,7 +46,14 @@ function Push-Verified {
 function Do-AutoWip {
     foreach($path in Get-KhoraStageablePaths){& git -C $REPO_DIR add -- $path|Out-Null;if($LASTEXITCODE-ne0){throw "No se pudo stagear $path"}}
     if(@(& git -C $REPO_DIR diff --cached --name-only).Count-gt0){& git -C $REPO_DIR commit -m ('ep: continuidad '+(Get-Date -Format 'yyyy-MM-dd HH:mm:ss'))|Out-Null;if($LASTEXITCODE-ne0){throw 'Commit WIP falló.'}}
-    return (Push-Verified)
+    $runtimeOk=Push-Verified
+    $workspaceOk=$true
+    if(Get-Command Sync-OepWorkspaceWip -ErrorAction SilentlyContinue){$workspaceOk=Sync-OepWorkspaceWip}
+    return ($runtimeOk-and$workspaceOk)
 }
-function Test-UnpushedWork{return [bool]((Get-KhoraStageablePaths).Count-gt0)}
+function Test-UnpushedWork {
+    if((Get-KhoraStageablePaths).Count-gt0){return $true}
+    if(Get-Command Get-OepStageablePaths -ErrorAction SilentlyContinue){foreach($entry in @($script:SESSION.workspaceRepositories)){if((Get-OepStageablePaths -RepositoryPath ([string]$entry.path)).Count-gt0){return $true}}}
+    return $false
+}
 function Ensure-GitignoreHygiene{}

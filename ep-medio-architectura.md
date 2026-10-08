@@ -1,6 +1,6 @@
-# Entorno Persistente Medio · Arquitectura canónica v1.0.2
+# Entorno Persistente Medio · Arquitectura canónica v1.0.3
 
-**Estado:** normativa · actualización 1.0.2
+**Estado:** normativa · actualización 1.0.3
 **Host KHORA:** 7.5.1
 **Repositorio:** `SeryMente/khora`, tratado como privado
 **Punto de entrada único:** `scripts/khora/khora.ps1`
@@ -180,6 +180,7 @@ Formato técnico:
 | `EP-IN-050` | GitHub | Personal Access Token identifica usuario y permite escritura al repositorio privado |
 | `EP-IN-060` | commit exacto | archivo `zipball/{sha}` autenticado, extraído dentro del volumen |
 | `EP-IN-070` | GitHub y main exacto | Git, GitHub CLI, `fetch`, autenticación y SHA de `main` verificados |
+| `EP-IN-075` | repositorios OEP seleccionados | cada repositorio autorizado tiene carpeta propia bajo `EP`, SHA de rama principal registrado y rama `ep-wip/*` remota verificada |
 | `EP-IN-080` | Vercel y main live | `VERCEL_TOKEN`, `whoami`, `link`, build y despliegue del SHA exacto; el alias canónico devuelve `ep-main-live.json` con ese SHA; después se restaura `ep-wip/*` |
 | `EP-IN-090` | Visual Studio Code | distribución portátil verificada, perfil restaurado y proceso iniciado |
 | `EP-IN-100` | bóveda completa | variables de la bóveda importadas solo al proceso supervisor |
@@ -319,7 +320,13 @@ Los endpoints Bearer están excluidos del middleware de cookies, pero validan fo
 
 `Desktop/EP` no es almacenamiento adicional. Es una junction NTFS al directorio `EP` dentro del VHDX cifrado. El arranque falla cerrado si `Desktop/EP` ya existe y no es una junction cuyo `Target` coincide exactamente con el directorio de workspace de la sesión. La salida elimina primero la junction y después bloquea/desmonta el VHDX. La eliminación utiliza I/O .NET para evitar el fallo conocido de `Remove-Item` con rutas 8.3 en PowerShell 5.1.
 
-## 14. Validación de versión
+## 14. Selección y continuidad multi-repositorio
+
+La sesión recibe de KHORA una selección firmada de repositorios. `EP-IN-075` consulta la selección mediante el token de sesión, crea o valida `EP/<repo>`, fija la rama principal exacta por SHA y prepara o recupera `ep-wip/*`. Un repositorio existente con cambios locales no se sobrescribe: la etapa falla cerrado. `EP-RUN-010` persiste y verifica cambios WIP de KHORA y de cada repositorio seleccionado.
+
+KHORA permanece separado como runtime en `repo\\`; no se duplica por esta etapa.
+
+## 15. Validación de versión
 
 La restauración no se considera ejecutada en Windows hasta pasar, en una máquina de prueba:
 
@@ -338,6 +345,6 @@ La restauración no se considera ejecutada en Windows hasta pasar, en una máqui
 
 Las verificaciones Linux o estáticas no sustituyen esta matriz. Cualquier resultado no ejecutado debe declararse **NO VERIFICADO**.
 
-## 15. Huellas de implementación
+## 16. Huellas de implementación
 
 El paquete final incluye `ep-integrity-manifest.sha256`, calculado después de todas las modificaciones. El manifiesto no se incluye a sí mismo y cubre la arquitectura, gate, módulos, API, migración y pruebas. Un modelo debe verificarlo antes de atribuir comportamiento a v1.0.
