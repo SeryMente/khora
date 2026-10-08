@@ -103,6 +103,7 @@ export function renderCanonicalCycleOutput(input: CanonicalCycleOutput): string 
   if (!input.bloqueado) throw new Error("OUTPUT_BLOCK_METADATA_MISSING");
   assertAllowed(input.bloqueado.rdc, BLOCK_RDC_STATES, "bloqueo_rdc");
   const motivo = cleanSingleLine(input.bloqueado.motivo, "bloqueo_motivo");
+  if ([...motivo].length > 51) throw new Error("OUTPUT_BLOCK_REASON_TOO_LONG");
 
   const preamble = [
     "╔════════════════════════════════════════════════════════════╗",
