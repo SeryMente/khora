@@ -1,5 +1,5 @@
 ﻿# KHORA EP Medio v1.0 - configuración de sesión
-$script:SCRIPT_VERSION = '7.5.2'
+$script:SCRIPT_VERSION = '7.5.3'
 $script:EP_VERSION = '1.0.1'
 $script:SES_ACTIVE = $false
 $script:TokSecure = $null

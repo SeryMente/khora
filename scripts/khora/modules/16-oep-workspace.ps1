@@ -1,4 +1,4 @@
-# OEP workspace materialization and per-repository continuity
+﻿# OEP workspace materialization and per-repository continuity
 
 function Invoke-OepWithKhoraToken {
     param([Parameter(Mandatory=$true)][ScriptBlock]$Action)

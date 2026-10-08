@@ -1,7 +1,7 @@
-# Entorno Persistente Medio · Arquitectura canónica v1.0.3
+# Entorno Persistente Medio · Arquitectura canónica v1.0.4
 
-**Estado:** normativa · actualización 1.0.3
-**Host KHORA:** 7.5.2
+**Estado:** normativa · actualización 1.0.4
+**Host KHORA:** 7.5.3
 **Repositorio:** `SeryMente/khora`, tratado como privado
 **Punto de entrada único:** `scripts/khora/khora.ps1`
 **Firma de instrucción:** NX-326m
@@ -56,7 +56,7 @@ El bootstrap debe reutilizar primero herramientas instaladas y verificables en r
 | Personal Access Token de GitHub | GitHub | leer/escribir `SeryMente/khora` privado | definido por GitHub | memoria y Protección de Datos de Windows dentro del volumen |
 | `VERCEL_TOKEN` | bóveda | `vercel whoami` y `vercel link` | sesión | variable de proceso dentro del volumen; nunca argumentos de proceso |
 
-El token Khora no sustituye el Personal Access Token de GitHub ni la llave de la bóveda. Su paso ocurre **antes de la instanciación** y, por ello, no altera el orden interno no negociable.
+El token Khora no sustituye el Personal Access Token de GitHub ni la llave de la bóveda. Cuando GitHub CLI está previamente autenticado en el host, el bootstrap reutiliza esa credencial para obtener el PAT en memoria y evita pedir una segunda autorización; el portapapeles queda como mecanismo de contingencia. Su paso ocurre **antes de la instanciación** y, por ello, no altera el orden interno no negociable.
 
 ### 3.2 Emisión por Google OpenID Connect y Sección Seguridad
 
@@ -234,9 +234,9 @@ La interfaz usa lenguaje breve, indicadores y duraciones. La ventana Registro co
 - etiqueta: `KHORA_EP_V1`;
 - sistema de archivos: NTFS;
 - BitLocker: XTS-AES-256, `UsedSpaceOnly`, protector de contraseña;
-- secreto BitLocker: SHA-256 de `llave_de_bóveda || KHORA-EP-V1 || session-id`, transformado en una contraseña de 57 caracteres con mayúscula, minúscula, número y símbolo.
+- secreto BitLocker: PBKDF2-HMAC-SHA256 con 200 000 iteraciones, usando como sal `KHORA-EP-V1 || session-id`, sobre la llave de la bóveda, y codificación Base64 del resultado de 32 bytes para formar la contraseña del protector.
 
-La derivación hace que la llave de la bóveda sea la raíz de acceso y evita fallos de políticas empresariales que exigen mezcla de clases en protectores de contraseña BitLocker. El texto de la llave y la contraseña derivada no se escriben en disco y sus búferes se limpian al terminar la etapa.
+La derivación con PBKDF2 añade endurecimiento contra ataques offline y mantiene la llave de la bóveda como raíz de acceso. El texto de la llave, la sal derivada y la contraseña resultante no se escriben en disco y sus búferes se limpian al terminar la etapa.
 
 No existe alternativa con Encrypting File System. Si falta BitLocker, elevación, tarea al reinicio o verificación al 100 %, no se descarga el repositorio.
 

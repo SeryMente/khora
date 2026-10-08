@@ -1,4 +1,4 @@
-function Find-KhoraHostExecutable {
+﻿function Find-KhoraHostExecutable {
     param([Parameter(Mandatory=$true)][string]$Name)
     $programFiles=[Environment]::GetEnvironmentVariable('ProgramFiles')
     $programFilesX86=[Environment]::GetEnvironmentVariable('ProgramFiles(x86)')
@@ -75,7 +75,7 @@ function Start-KhoraPrefetch {
         Start-KhoraDownloadJob -Name node -Uri ($base+'/'+$name) -Path (Join-Path $directory $name)
         Start-KhoraDownloadJob -Name nodeSums -Uri ($base+'/SHASUMS256.txt') -Path (Join-Path $directory 'node-SHASUMS256.txt')
     }
-    if (-not (Get-Command python -ErrorAction SilentlyContinue)) {
+    if (-not (Find-KhoraHostExecutable -Name 'python')) {
         Start-KhoraDownloadJob -Name python -Uri 'https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe' -Path (Join-Path $directory 'python-3.11.9-amd64.exe')
     }
     $metadata=Invoke-RestMethod -Uri 'https://update.code.visualstudio.com/api/update/win32-x64-archive/stable/latest'
