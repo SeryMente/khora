@@ -344,13 +344,16 @@ La integración a `main` solo después de los jueces obligatorios del repositori
 
 ## 13. Estado operativo
 
-**Estado:** EN_PROGRESO
-**Código productivo modificado por este sprint:** NO
+**Estado:** PUBLICACION_EN_PROGRESO
+**Código productivo modificado por este sprint:** SÍ
 **Documento canónico creado:** SÍ
 **Baseline:** `b8ae985da85a0f5eb79fcd6aab5cdb30e8e639d5`
-**Producción modificada por este sprint:** NO
-**Pruebas de este sprint ejecutadas:** C0 baseline ejecutado; typecheck y unitarias terminan con código 1 sin diagnóstico visible en la envolvente npm; UI contract pendiente de rerun directo.
-**Siguiente ciclo autorizado:** C0 → C1
+**Main actualmente validado:** `5dc82b536525c546542509db9694293f6da1885c`
+**Producción modificada por este sprint:** EN PUBLICACIÓN
+**Vercel canónico:** proyecto `khora-web` · scope `victorhugotorresmendez-8991s-projects`
+**Evidencia local:** typecheck 0; 323/323 unitarias; build Next.js 0; build de extensión 0; E2E enfocado 27/29 antes de la corrección final del wrapper global y posteriores correcciones de UI.
+**Criterio de cierre:** la publicación solo se considera terminada cuando Vercel acredita el SHA exacto de main y el smoke de producción finaliza correctamente.
+**Siguiente ciclo autorizado:** verificación de deployment y smoke de producción
 
 ### Evidencia C0 · 2026-10-07
 
@@ -390,3 +393,12 @@ Esta decisión gobierna el sprint salvo evidencia material en contrario. Toda de
 - Edición: `khora-web/app/sistema/editar/page.tsx`
 - Ingesta: `khora-web/app/sistema/ingesta/page.tsx`
 - Captura histórica: `khora-web/app/capturar/page.tsx`
+
+
+### Evidencia de publicación · 2026-10-08
+
+- Main contiene la superficie canónica única de Ingreso y sus modos internos.
+- Rutas históricas de Capturar, Dictado, Edición e Ingesta permanecen como compatibilidad temporal.
+- KhoraShell ya no anida un `<main>` de página dentro de otro `<main>`, eliminando la causa común del hydration mismatch observado.
+- Revisión e Ingesta tienen contención responsive; Ingesta valida MIME en aplicación sin filtro nativo que impida la prueba de tipos inválidos.
+- La certificación E2E fue ejecutada hasta 27/29 antes de la corrección final del wrapper; no se declara verde hasta completar el siguiente ciclo.
