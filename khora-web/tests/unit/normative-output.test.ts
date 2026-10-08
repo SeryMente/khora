@@ -32,7 +32,7 @@ function sampleData() {
 }
 
 test("uses the local canonical contract version", () => {
-  assert.equal(CANONICAL_OUTPUT_FORMAT_VERSION, "v1.7.6");
+  assert.equal(CANONICAL_OUTPUT_FORMAT_VERSION, "v1.7.7");
 });
 
 test("renders and validates the exact six-line canonical output", () => {
