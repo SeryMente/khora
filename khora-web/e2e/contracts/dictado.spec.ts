@@ -8,7 +8,7 @@ test.describe('Dictado UI Reskin Contract and Layout', () => {
       localStorage.setItem('khora_auth_session', JSON.stringify({ authenticated: true, timestamp: Date.now() }));
     });
 
-    await page.goto('/sistema/ingreso?modo=dictado');
+    await page.goto('/sistema/ingreso');
 
     // Verify Title element
     const mainHeader = page.locator('h1');
