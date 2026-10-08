@@ -16,7 +16,7 @@ function Invoke-Cleanup {
         Invoke-KhoraCleanupStageSafe -Id 'EP-OUT-050' -Label 'Purgar variables y secretos de trabajo' -Action {Clear-KhoraSensitiveMemory -KeepKhora;Remove-Item -LiteralPath (Join-Path $STATE_DIR 'github-token.guardian.dpapi'),(Join-Path $STATE_DIR 'vault-key.guardian.dpapi') -Force -ErrorAction SilentlyContinue;return $true}|Out-Null
         Stop-Process -Id ([int]$script:SESSION.logPid) -Force -ErrorAction SilentlyContinue
         Invoke-KhoraCleanupStageSafe -Id 'EP-OUT-060' -Label 'Bloquear BitLocker' -Action {Lock-KhoraEncryptedVolume}|Out-Null
-        Invoke-KhoraCleanupStageSafe -Id 'EP-OUT-070' -Label 'Desmontar el Disco Duro Virtual versión 2' -Action {Dismount-KhoraVhd}|Out-Null
+        Invoke-KhoraCleanupStageSafe -Id 'EP-OUT-070' -Label 'Eliminar enlace Desktop/EP y desmontar el Disco Duro Virtual versión 2' -Action {Remove-KhoraDesktopEpWorkspace -Link ([string]$script:SESSION.desktopWorkspaceLink) -Target ([string]$script:SESSION.workspaceDir)|Out-Null;Dismount-KhoraVhd}|Out-Null
         Invoke-KhoraCleanupStageSafe -Id 'EP-OUT-080' -Label 'Eliminar contenedor y carpeta efímera' -Action {Remove-KhoraContainer}|Out-Null
         Invoke-KhoraCleanupStageSafe -Id 'EP-OUT-090' -Label 'Desarmar limpieza al reinicio' -Action {Unregister-ScheduledTask -TaskName $TASK_NAME -Confirm:$false -ErrorAction SilentlyContinue;return $true}|Out-Null
         try{Write-KhoraEvent -Id 'EP-OUT-100' -State START -Message 'Finalizar la sesión';Write-KhoraUiStage -Id 'EP-OUT-100' -State START -Label 'Finalizar la sesión';Write-KhoraEvent -Id 'EP-OUT-100' -State OK -Message 'Sesión eliminada';Write-KhoraUiStage -Id 'EP-OUT-100' -State OK -Label 'Sesión eliminada'}catch{}
