@@ -18,6 +18,10 @@
 - Descarga privada de GitHub, Vercel 59.3.0 fijada, redacción de secretos y preflight de Escritorio local.
 - Escaneo de secretos, rutas inseguras y artefactos excluidos.
 
+## Evidencia Windows PC-7 · ciclo OEP de toolchain
+
+La verificación real mediante RDC confirmó `C:\\Program Files\\Git\\cmd\\git.exe`, `C:\\Program Files\\GitHub CLI\\gh.exe`, `C:\\Users\\PC 7\\AppData\\Local\\Programs\\Python\\Python311\\python.exe`, `C:\\Program Files\\Notepad++\\notepad++.exe`, `C:\\Program Files\\obs-studio\\bin\\64bit\\obs64.exe` y AutoHotkey 2.0 bajo `C:\\Program Files (x86)\\AutoHotkey\\v2\\`. `node.exe` y `npm.cmd` provienen de `C:\\Program Files\\nodejs\\`. El host no expone la webcam virtual de OBS todavía en la enumeración de dispositivos.
+
 ## Obligatorio antes de fusionar
 
 No se afirma ejecución real de Windows desde este sandbox Linux. En Windows compatible deben aprobarse: parser oficial Windows PowerShell 5.1, emisión/copias, lanzamiento hasta `EP-IN-010`, elevación, VHDX/BitLocker XTS-AES-256, restauración, dos superficies, deadman/inactividad/reinicio y limpieza total. También deben repetirse `npm run typecheck`, `npm run ui-review:check`, `npm run prebuild`, pruebas y `next build --webpack` con las dependencias del repositorio local. No desplegar ni fusionar antes de esas pruebas.
