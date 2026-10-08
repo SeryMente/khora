@@ -1,7 +1,7 @@
 # Navegación canónica del sistema
 
 **Estado:** IMPLEMENTADO Y ENDURECIDO  
-**Última revisión:** 2026-10-07
+**Última revisión:** 2026-10-08
 
 ## Invariante
 
