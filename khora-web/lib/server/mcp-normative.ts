@@ -86,7 +86,7 @@ async function ensureSchema() {
       );
       await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS platform TEXT NOT NULL DEFAULT 'ChatGPT'");
       await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS reasoning_mode TEXT NOT NULL DEFAULT 'THINKING'");
-      await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS output_format_version TEXT NOT NULL DEFAULT 'v1.7.3'");
+      await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS output_format_version TEXT NOT NULL DEFAULT 'v1.7.6'");
       await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS si_git_commit_sha TEXT NOT NULL DEFAULT 'UNKNOWN'");
       await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS methodology_version TEXT NOT NULL DEFAULT 'UNKNOWN'");
       await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS methodology_git_commit_sha TEXT NOT NULL DEFAULT 'UNKNOWN'");
