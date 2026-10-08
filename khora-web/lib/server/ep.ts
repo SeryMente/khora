@@ -168,9 +168,10 @@ export async function getEpRepoCatalog(): Promise<EpWorkspaceRepo[]> {
   return catalog;
 }
 export async function resolveEpWorkspaceRepos(requested?: unknown): Promise<string[]> {
+  if (requested == null) return Array.from(DEFAULT_OEP_WORKSPACE_REPOS);
   const catalog = await getEpRepoCatalog();
   const byLower = new Map(catalog.map(repo => [repo.name.toLowerCase(), repo.name]));
-  const input = requested == null ? Array.from(DEFAULT_OEP_WORKSPACE_REPOS) : requested;
+  const input = requested;
   if (!Array.isArray(input) || input.length > 25) throw new Error("invalid_workspace_repositories");
   const resolved: string[] = [];
   for (const value of input) {
