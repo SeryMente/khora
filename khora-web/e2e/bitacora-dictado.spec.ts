@@ -6,7 +6,7 @@ test.describe('Bitacora - Regresion Dictado', () => {
       localStorage.setItem('khora_auth_session', JSON.stringify({ authenticated: true, timestamp: Date.now() }));
     });
 
-    await page.goto('/sistema/ingreso?modo=dictado');
+    await page.goto('/sistema/ingreso');
 
     const textarea = page.locator('[data-ui-id="ingreso.textarea"]').first();
     await expect(textarea).toBeVisible();
