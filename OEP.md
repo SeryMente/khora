@@ -2,7 +2,7 @@
 
 **Identificador:** OEP  
 **Nombre completo:** Persistencia de Entorno Operativo  
-**Versión:** v0.1.3  
+**Versión:** v0.1.4
 **Estado:** ACTIVO · CANÓNICO PARA ESTE ÁMBITO · EN EVOLUCIÓN CONTROLADA  
 **Sistema emisor:** KHORA  
 **Plataforma objetivo actual:** Windows
@@ -17,13 +17,13 @@ Cuando OEP sea recuperado sin el contexto conversacional original, leer en este 
 
 ## 1. Fuentes canónicas
 
-**Fuente técnica primaria existente:** `SeryMente/khora/ep-medio-architectura.md`, versión observada `v1.0.3`. Es la especificación normativa existente de Entorno Persistente Medio.
+**Fuente técnica primaria existente:** `SeryMente/khora/ep-medio-architectura.md`, versión observada `v1.0.4`. Es la especificación normativa existente de Entorno Persistente Medio.
 
 **Fuente metodológica superior:** `SeryMente/metodologia/SI-METACOGNITIVO.md`, versión observada `v1.6.8`, nombre de versión **Continuidad Canónica entre Conversaciones**.
 
-**Snapshot de KHORA observado al canonizar OEP:** `main` = `d393097cec48db1daa9b8398b579b3adc2d3e095`. SHA verificado en este ciclo después de integrar las correcciones de toolchain y bootstrap.
+**Snapshot de KHORA observado al canonizar OEP:** `main` = `5dc82b536525c546542509db9694293f6da1885c`. SHA verificado en este ciclo después de integrar las correcciones de toolchain y bootstrap.
 
-**Blob actual de arquitectura EP:** `4df10eafb273cf3bc77ab5efa2ea12e835cbfc16`.
+**Blob actual de arquitectura EP:** `382e4a929a984a96926fd6f9080f80bedd109a0b`.
 
 ## 2. Propósito
 
@@ -306,11 +306,39 @@ OEP conserva su identidad aunque se acceda mediante navegador, KHORA, PowerShell
 - OBS Studio `32.2.2`.
 - AutoHotkey 2.0.29.
 - No se verificó todavía cámara virtual de OBS.
-- GitHub CLI quedó instalado pero sin autenticación persistente; `gh auth login --web` está actualmente detenido esperando autorización interactiva mediante código de dispositivo.
+- En el cierre del ciclo 003, GitHub CLI quedó instalado pero sin autenticación persistente; esa condición histórica se resolvió durante el ciclo 004 mediante autorización web y verificación de la sesión.
 
 **Resultado:** `PARCIALMENTE_RESUELTO`. La reutilización y detección robusta fueron integradas en código y el toolchain quedó materializado en el host real. La ejecución end-to-end de KHORA/OEP permanece `NO-VERIFICADA` hasta completar autenticación GitHub y ejecutar el bootstrap real.
 
 **Causa conocida incorporada:** stderr de CLIs nativas puede convertirse en `NativeCommandError` bajo PowerShell 5.1 con `$ErrorActionPreference='Stop'`; probes futuros deben capturar salida y `$LASTEXITCODE` o usar entrypoints nativos compatibles. `npm.ps1` no debe ser tratado como entrypoint válido cuando está bloqueado por ExecutionPolicy.
+
+## 47.2 Ciclo operativo 004 — Hardening criptográfico, reducción de superficie y validación E2E
+
+**Desafío:** validar extremo a extremo el perímetro cifrado y cerrar diferencias entre host, bootstrap, autenticación de GitHub y aplicación web antes de producción.
+
+**Cambios integrados en KHORA:**
+- `scripts/khora/khora.ps1` queda en `7.5.3`, reutiliza herramientas del host por rutas estándar y deriva la contraseña del protector BitLocker EP con PBKDF2-HMAC-SHA256, 200 000 iteraciones, sal `KHORA-EP-V1|session-id` y 32 bytes codificados en Base64.
+- `Get-KhoraGitHubToken` intenta primero `gh auth token`, valida la credencial contra GitHub y la conserva solo en memoria; el portapapeles queda como fallback.
+- `scripts/khora/modules/08-deps.ps1` evita descargar Python cuando existe una instalación estándar válida.
+- Se regeneró el bootstrap embebido para conservar equivalencia byte-a-byte con el gate.
+- Se eliminaron `khora-web/app/api/security/setup-recovery/route.ts` y `khora-web/lib/firebase.ts` por estar sin consumidores; también se eliminaron `nodemailer` y `firebase` de producción.
+- `tests/validate_ep.py` exige PBKDF2-HMAC-SHA256/200 000 para el secreto BitLocker y rechaza derivación directa mediante `ComputeHash($bytes)`.
+
+**Evidencia real en PC-7 mediante RDC:**
+- Autenticación GitHub CLI verificada contra `api.github.com`; la cuenta autenticada dispone de permiso de escritura sobre `SeryMente/khora` sin exponer el token.
+- `EP v1.0.1 static validation: OK`.
+- Parser PowerShell 5.1: `OK`.
+- Prueba viva `KHORA-PBKDF2-CRYPT-TEST`: VHDX cifrado con `XtsAes256`, 100 %, protección activa, bloqueo/desbloqueo y lectura del sentinel; sin residuos después de limpieza.
+- `npm audit --omit=dev`: `0` vulnerabilidades después de retirar las dependencias muertas.
+- `test:unit`: 323/323, 0 fallos.
+- `next build --webpack`: 77/77 páginas estáticas generadas, TypeScript y optimización completados con código de salida 0.
+
+**Host BitLocker:** `C:` continúa `FullyEncrypted`, `ProtectionStatus=Off`, `XtsAes128`, 100 %, sin protectores; TPM está listo. La corrección se intentó y Windows devolvió `0x80070522` por falta del privilegio requerido en la sesión RDC no elevada. No se cambió el cifrado existente de `C:`.
+
+**Vercel:** proyecto `khora-web` vinculado a `SeryMente/khora`, dominio `khora-web.vercel.app` verificado y `AUTH_SECRET` presente en producción. La creación explícita del despliegue para `5dc82b536525c546542509db9694293f6da1885c` fue rechazada por Vercel con HTTP 402, `api-deployments-free-per-day`: más de 100 despliegues diarios en el plan gratuito. La ruta CLI alternativa no estaba instalada en el host.
+
+**Resultado:** `PARCIALMENTE_RESUELTO`. El código, cifrado EP, autenticación y build quedan validados; la protección de `C:` y el despliegue de producción requieren intervención externa al código: UAC/privilegio de BitLocker y resolución de la cuota/plan de Vercel, respectivamente.
+
 ## 48. Resiliencia de contexto
 
 Las propiedades esenciales no deben depender de memoria conversacional. Si una propiedad solo existe en la conversación y no en este objeto o una fuente canónica referenciada, existe una deficiencia de resiliencia y debe corregirse en un ciclo.
@@ -353,8 +381,7 @@ La ubicación modifica parámetros de ejecución, no el objetivo del sistema. CS
 - `OEP-DEC-022`: el perfil de host/ubicación es estado de primera clase del arranque y queda persistido dentro del volumen cifrado.
 - `OEP-DEC-023`: `Desktop/EP` es una junction verificada hacia el workspace cifrado; no es una segunda copia.
 - `OEP-DEC-024`: la selección de repositorios es parte firmada de la sesión OEP y cada repositorio seleccionado obtiene continuidad WIP independiente.
-- `OEP-DEC-022`: el perfil de host/ubicación es estado de primera clase del arranque y queda persistido dentro del volumen cifrado.
-- `OEP-DEC-023`: `Desktop/EP` es una junction verificada hacia el workspace cifrado; no es una segunda copia del workspace.
+
 
 ## 52. Pendientes actuales
 
@@ -363,14 +390,17 @@ La ubicación modifica parámetros de ejecución, no el objetivo del sistema. CS
 - `OEP-PENDING-003`: esquema formal de Location Profile.
 - `OEP-PENDING-004`: estructura formal del manifiesto de sesión.
 - `OEP-PENDING-005`: **RESUELTO EN CICLO 002**. `Desktop/EP` es una junction verificada hacia `EP/` dentro del VHDX cifrado; la verificación end-to-end completa permanece pendiente.
-- `OEP-PENDING-006`: **PARCIALMENTE RESUELTO EN CICLO 003**. OBS Studio 32.2.2 está instalado y localizado; cámara virtual de OBS sigue sin verificación.
+- `OEP-PENDING-006`: **PARCIALMENTE RESUELTO**. OBS Studio 32.2.2 está instalado y localizado; cámara virtual de OBS sigue sin verificación.
+- `OEP-PENDING-012`: **PARCIALMENTE RESUELTO EN CICLO 004**. GitHub CLI ya está autenticado y el bootstrap puede reutilizar su credencial en memoria; el bootstrap E2E completo de KHORA/OEP no se ejecutó porque la llave/clave maestra de la bóveda no fue aportada y no debe reconstruirse ni regenerarse a ciegas.
+- `OEP-PENDING-013`: **PARCIALMENTE RESUELTO EN CICLO 004**. El proyecto `khora-web` está vinculado a `SeryMente/khora`, tiene `AUTH_SECRET` de producción y dominio `khora-web.vercel.app`; la publicación de la revisión `5dc82b5` fue bloqueada por el límite gratuito diario de Vercel. OBS Virtual Camera y VS Code siguen sin verificación.
+- `OEP-PENDING-014`: **BLOQUEADO**. `C:` está 100 % cifrado pero `ProtectionStatus=Off`, `XtsAes128` y sin protectores; TPM está disponible, pero `Add-BitLockerKeyProtector` desde la sesión RDC no elevada devuelve `0x80070522` por privilegio requerido. Requiere una ejecución administrativa interactiva/UAC para añadir el protector TPM y reanudar protección sin cambiar el método actual del volumen.
+- `OEP-PENDING-015`: **PENDIENTE**. Tras resolver la cuota de Vercel, crear/verificar el despliegue de producción correspondiente al SHA canónico de `main` y ejecutar smoke tests públicos.
 - `OEP-PENDING-007`: **RESUELTO EN CICLO 003**. Notepad++ 8.9.8.1 instalado y localizado.
 - `OEP-PENDING-008`: **RESUELTO EN CICLO 003**. AutoHotkey 2.0.29 instalado y localizado.
 - `OEP-PENDING-009`: modelo de revisión de sesiones RDC.
 - `OEP-PENDING-010`: contrato de evolución/versionado del bootstrap.
 - `OEP-PENDING-011`: persistencia/reconstrucción del estado no-Git de cada repositorio.
-- `OEP-PENDING-012`: ejecutar validación end-to-end real del bootstrap en PC-7 tras completar autenticación GitHub.
-- `OEP-PENDING-013`: verificar cámara virtual de OBS y provisionar/validar VS Code + Vercel en flujo real.
+
 
 ## 53. Asuntos explícitamente no decididos
 
@@ -398,6 +428,9 @@ Se incorpora el primer corte funcional de OEP: perfil de host `oep-host-profile/
 ### v0.1.3
 Se integra el ciclo 003 de reutilización verificable del toolchain del host, detección fuera de `PATH`, uso de `npm.cmd`, alineación de versión `7.5.2`, refresh del bootstrap embebido y evidencia real de provisión en PC-7.
 
+### v0.1.4
+Se integra el ciclo 004 de hardening criptográfico y de superficie de ataque: PBKDF2-HMAC-SHA256 con 200 000 iteraciones para la contraseña del protector BitLocker EP; reutilización de la sesión autenticada de GitHub CLI en memoria; alineación de Host KHORA `7.5.3`; eliminación de un endpoint de recuperación muerto y de `firebase` sin consumidores; auditoría de runtime con `0` vulnerabilidades; validación real de VHDX + BitLocker XTS-AES-256 y build web completo en PC-7. El despliegue final a Vercel quedó bloqueado por el límite gratuito diario de despliegues.
+
 ## 57. Regla de modificación
 
 Toda modificación material debe aumentar versión, conservar historial, indicar qué cambió, conservar decisiones no sustituidas, marcar sustituciones explícitamente y conservar trazabilidad. No borrar contexto histórico relevante.
@@ -408,11 +441,12 @@ Toda modificación material debe aumentar versión, conservar historial, indicar
 
 ## 59. Estado al cierre
 
-**OEP:** `v0.1.3`  
+**OEP:** `v0.1.4`
 **Estado:** ACTIVO  
 **Nivel:** arquitectura transversal en construcción  
+**Último ciclo integrado:** 004 · hardening criptográfico, reducción de superficie de ataque y validación E2E
 **Implementación completa:** NO VERIFICADA  
-**Fuente técnica principal:** `SeryMente/khora/ep-medio-architectura.md v1.0.3`  
-**Fuente metodológica:** `SeryMente/metodologia/SI-METACOGNITIVO.md v1.6.7`
+**Fuente técnica principal:** `SeryMente/khora/ep-medio-architectura.md v1.0.4`
+**Fuente metodológica:** `SeryMente/metodologia/SI-METACOGNITIVO.md v1.6.8`
 
 La ausencia de contexto conversacional no autoriza a reconstruir decisiones fuera de este objeto o de sus fuentes canónicas.
