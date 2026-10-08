@@ -7,8 +7,8 @@ import {
   validateCanonicalCycleOutput,
 } from "../../lib/server/normative-output";
 
-const expectedSiHeader = "SI CARGADO · v1.6.16 — Reanclaje Recursivo del Régimen Personalizado · COMPLETO · ACTIVO · ÚLTIMO CAMBIO: hace 1 minuto | 2026-10-08";
-const expectedMethodologyHeader = "METODOLOGÍA CARGADA · v0.14.3 — Reanclaje Recursivo del Régimen Personalizado · COMPLETA · ACTIVA · ÚLTIMO CAMBIO: hace 1 minuto | 2026-10-08";
+const expectedSiHeader = "SI CARGADO · v1.6.19 — Bootstrap Fail-Closed y Reanclaje Visible · COMPLETO · ACTIVO · ÚLTIMO CAMBIO: 2026-10-08";
+const expectedMethodologyHeader = "METODOLOGÍA CARGADA · v0.14.6 — Contrato Visible de Reanclaje · COMPLETA · ACTIVA · ÚLTIMO CAMBIO: 2026-10-08";
 
 function sampleData() {
   return {
