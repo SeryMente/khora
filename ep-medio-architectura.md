@@ -1,7 +1,7 @@
 # Entorno Persistente Medio · Arquitectura canónica v1.0.3
 
 **Estado:** normativa · actualización 1.0.3
-**Host KHORA:** 7.5.1
+**Host KHORA:** 7.5.2
 **Repositorio:** `SeryMente/khora`, tratado como privado
 **Punto de entrada único:** `scripts/khora/khora.ps1`
 **Firma de instrucción:** NX-326m
@@ -38,6 +38,10 @@ Una sesión válida cumple simultáneamente:
 - nunca continúa sin cifrado, sin registro remoto crítico o sin limpieza al reinicio.
 
 ### 2.1 Compatibilidad verificable
+#### 2.1.1 Descubrimiento de herramientas del host
+
+El bootstrap debe reutilizar primero herramientas instaladas y verificables en rutas estándar del host aunque no estén presentes en `PATH`. `npm` se resuelve mediante `npm.cmd` cuando `npm.ps1` esté bloqueado por `ExecutionPolicy`. Los alias de `WindowsApps` para Python no cuentan como instalación compatible. Solo cuando no exista una instalación verificable se activa la provisión controlada correspondiente.
+
 
 “Cualquier computadora” significa un host **Windows compatible**: Windows PowerShell 5.1 o superior, sesión interactiva con elevación administrativa, BitLocker disponible, Escritorio en almacenamiento local escribible, al menos 6 GiB libres y red HTTPS hacia Khora, GitHub, Vercel y proveedores oficiales de herramientas. No se ocultan limitaciones del host: una carencia falla cerrada en `EP-IN-010` o `EP-IN-030` con identificador estable, sin degradación de cifrado.
 
