@@ -2,8 +2,30 @@
 "use client";
 
 import React, { useEffect, useState, useCallback, Suspense } from "react";
+import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
-import { GrafoView, GrafoViewState, GrafoNode, GrafoEdge } from "../components/shared/GrafoView";
+import type { GrafoViewState, GrafoNode, GrafoEdge } from "../components/shared/GrafoView";
+
+const GrafoViewClient = dynamic(
+  () => import("../components/shared/GrafoView").then((mod) => mod.GrafoView),
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        className="flex min-h-screen w-full flex-col font-mono"
+        style={{ backgroundColor: "var(--khora-bg)", color: "var(--khora-ink)" }}
+      >
+        <header
+          className="border-b p-4"
+          style={{ backgroundColor: "var(--khora-surface)", borderColor: "var(--khora-border)" }}
+        >
+          <h1 className="text-xl font-bold tracking-wider">Grafo PKG - Proyección Leiden</h1>
+          <p className="text-sm opacity-70">Cargando proyecciones del grafo...</p>
+        </header>
+      </div>
+    ),
+  }
+);
 
 export default function GrafoPage() {
   return (
@@ -19,7 +41,6 @@ function GrafoContent() {
   const [edges, setEdges] = useState<GrafoEdge[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
   const [viewMode, setViewMode] = useState<"list" | "graph">("list");
   const [layer2Active, setLayer2Active] = useState(true);
   const [selectedElement, setSelectedElement] = useState<{ type: "node" | "edge"; data: any } | null>(null);
@@ -69,7 +90,7 @@ function GrafoContent() {
   };
 
   return (
-    <GrafoView
+    <GrafoViewClient
       state={state}
       actions={{
         onSetViewMode: setViewMode,
