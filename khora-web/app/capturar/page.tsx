@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
 export default function CapturarPage() {
-  redirect("/sistema/ingreso?modo=captura");
+  redirect("/sistema/ingreso");
 }
