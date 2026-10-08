@@ -7,8 +7,8 @@ import {
   validateCanonicalCycleOutput,
 } from "../../lib/server/normative-output";
 
-const expectedSiHeader = "SI CARGADO · v1.6.12 — Continuidad de Publicación Vercel por Cuenta Secundaria · COMPLETO · ACTIVO · ÚLTIMO CAMBIO: hace 1 minuto | 2026-10-08";
-const expectedMethodologyHeader = "METODOLOGÍA CARGADA · v0.13.0 — Continuidad de Publicación Vercel por Cuenta Secundaria · COMPLETA · ACTIVA · ÚLTIMO CAMBIO: hace 1 minuto | 2026-10-08";
+const expectedSiHeader = "SI CARGADO · v1.6.16 — Reanclaje Recursivo del Régimen Personalizado · COMPLETO · ACTIVO · ÚLTIMO CAMBIO: hace 1 minuto | 2026-10-08";
+const expectedMethodologyHeader = "METODOLOGÍA CARGADA · v0.14.3 — Reanclaje Recursivo del Régimen Personalizado · COMPLETA · ACTIVA · ÚLTIMO CAMBIO: hace 1 minuto | 2026-10-08";
 
 function sampleData() {
   return {
