@@ -213,7 +213,7 @@ async function handleMcpRequest(req: NextRequest) {
     {
       instructions:
         "ADAPTIVE NORMATIVE GATE: cuando KHORA esta disponible, ejecuta HEALTH MCP -> OPEN TURN -> aplica cada principio mediante khora_norm_apply_principle en el orden devuelto -> VERIFY -> RELEASE antes de emitir la salida. " +
-        "La salida visible de cada turno debe cumplir el contrato v1.7.2 cualquiera que sea el escenario. " +
+        "La salida visible de cada turno debe cumplir el contrato v1.7.6 cualquiera que sea el escenario. " +
         "Si KHORA no esta disponible o no puede verificarse, continua la respuesta sin inventar verificacion y declara K: OFF. " +
         "Si KHORA devuelve VERIFIED_RELEASE, declara K: ✓. Si devuelve un fallo normativo, declara K: ! o K: ? segun corresponda. " +
         "El modo de razonamiento es metadato operativo y no debe presentarse como prueba del pensamiento interno.",
@@ -637,7 +637,7 @@ async function handleMcpRequest(req: NextRequest) {
       if (denied) return denied;
       try {
         const res = await releaseNormativeTurn(actor, { turn_token: args.turn_token });
-        return { content: [{ type: "text", text: JSON.stringify(res) }] };
+        return { content: [{ type: "text", text: res.released_output }], structuredContent: res };
       } catch (error) {
         return {
           isError: true,
