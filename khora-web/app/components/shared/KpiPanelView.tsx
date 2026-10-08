@@ -742,7 +742,7 @@ export function KpiPanelView({
                       <span className="opacity-60">Ventana Contexto:</span>{" "}
                       <strong className="font-mono">
                         {resueltoLocal.ventanaContextoTokens !== null
-                          ? `${resueltoLocal.ventanaContextoTokens.toLocaleString()} tokens`
+                          ? `${resueltoLocal.ventanaContextoTokens.toLocaleString("es-MX")} tokens`
                           : "No especificado"}
                       </strong>
                     </div>
@@ -757,7 +757,7 @@ export function KpiPanelView({
                       <span className="opacity-60">Ventana Contexto:</span>{" "}
                       <strong className="font-mono">
                         {item.ventanaContextoTokens !== undefined
-                          ? `${item.ventanaContextoTokens.toLocaleString()} tokens`
+                          ? `${item.ventanaContextoTokens.toLocaleString("es-MX")} tokens`
                           : "—"}
                       </strong>
                     </div>
