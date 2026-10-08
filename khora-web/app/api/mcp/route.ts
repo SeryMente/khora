@@ -62,7 +62,8 @@ const NORM_TURN_TOKEN = z.string().min(16).describe(
 const NORM_THINKING_MODE = z.enum(REASONING_MODES).describe(
   "Modo de razonamiento observado para el turno. Usa THINKING cuando la plataforma lo exponga; usa UNKNOWN/UNAVAILABLE cuando no exista una señal operativa. Es metadato, no bloquea la salida."
 );
-const NORM_OUTPUT_FORMAT_VERSION = z.literal(REQUIRED_OUTPUT_FORMAT_VERSION).describe(
+const NORM_OUTPUT_FORMAT_VERSION = z.string().refine(
+  (value) => value === REQUIRED_OUTPUT_FORMAT_VERSION,
   "Contrato obligatorio de salida visible por ciclo."
 );
 
@@ -597,6 +598,7 @@ async function handleMcpRequest(req: NextRequest) {
     {
       turn_token: z.string().min(16).describe("Token opaco emitido por khora_norm_open_turn"),
       receipt: z.object({
+        output: z.string().min(1).describe("Texto completo candidato de salida canónica del ciclo. KHORA valida estructura, identidad y hash antes de VERIFIED."),
         output_header: z.string().min(32).describe("Encabezado SI canónico exacto del ciclo."),
         methodology_output_header: z.string().min(32).describe("Encabezado de Metodología canónico exacto del ciclo."),
         methodology: z.object({
@@ -657,7 +659,7 @@ async function handleMcpRequest(req: NextRequest) {
         type: "object",
         properties: {
           thinking_mode: { type: "string", enum: [...REASONING_MODES] },
-          output_format_version: { type: "string", enum: ["v1.7.3"] },
+          output_format_version: { type: "string", enum: [REQUIRED_OUTPUT_FORMAT_VERSION] },
         },
         required: ["thinking_mode", "output_format_version"],
         additionalProperties: false,
@@ -817,7 +819,7 @@ async function handleMcpRequest(req: NextRequest) {
           conversation_id: { type: "string" },
           turn_number: { type: "integer", minimum: 1 },
           thinking_mode: { type: "string", enum: ["THINKING", "INSTANT", "UNKNOWN", "UNAVAILABLE"] },
-          output_format_version: { type: "string", enum: ["v1.7.3"] },
+          output_format_version: { type: "string", enum: [REQUIRED_OUTPUT_FORMAT_VERSION] },
         },
         required: ["thinking_mode", "output_format_version"],
         additionalProperties: false,
@@ -920,7 +922,7 @@ async function handleMcpRequest(req: NextRequest) {
       },
       _output_format_version: {
         type: "string",
-        enum: ["v1.7.3"],
+        enum: [REQUIRED_OUTPUT_FORMAT_VERSION],
         description: "REQUERIDO: contrato de salida visible por ciclo.",
       },
     };

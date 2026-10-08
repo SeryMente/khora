@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Contrato de salida canónica por ciclo",
   "contract_id": "FORMATO-REGISTRO-VERIFICACION-CICLO",
-  "version": "v1.7.5",
+  "version": "v1.7.6",
   "status": "CANÓNICO",
   "kind": "chatgpt-cycle-output",
   "strict": {
@@ -12,7 +12,7 @@
     "trailing_newline": false,
     "line_terminator": "\\n",
     "normal_line_count": 6,
-    "blocked_preamble_line_count": 7
+    "blocked_preamble_line_count": 8
   },
   "lines": [
     {
@@ -176,5 +176,60 @@
     "release_requires_validated_output": true,
     "renderer_is_canonical": true,
     "validator_rejects_unknown_fields": true
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "contract_id",
+    "status",
+    "kind",
+    "strict",
+    "lines",
+    "blocked_preamble",
+    "states",
+    "policy"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "contract_id": {
+      "const": "FORMATO-REGISTRO-VERIFICACION-CICLO"
+    },
+    "version": {
+      "const": "v1.7.6"
+    },
+    "status": {
+      "const": "CANÓNICO"
+    },
+    "kind": {
+      "const": "chatgpt-cycle-output"
+    },
+    "strict": {
+      "type": "object"
+    },
+    "lines": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6
+    },
+    "blocked_preamble": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 8,
+      "items": {
+        "type": "string"
+      }
+    },
+    "states": {
+      "type": "object"
+    },
+    "policy": {
+      "type": "object"
+    }
   }
 }

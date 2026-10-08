@@ -1,5 +1,6 @@
 import { createHash } from "crypto";
 import { assertNormativeRuntimeContext, type NormativeRuntimeContext } from "./normative-runtime";
+import { hashCanonicalCycleOutput, validateCanonicalCycleOutput } from "./normative-output";
 
 export const NORM_CHECK_PROTOCOL = "NORM-CHECK";
 export const NORM_CHECK_PROTOCOL_VERSION = "v0.5.0";
@@ -45,6 +46,7 @@ export type NormativeReceipt = {
   input_sha256: string;
   nonce: string;
   principles: NormativePrincipleEvidence[];
+  output: string;
   output_sha256: string;
   output_header: string;
   methodology_output_header: string;
@@ -682,6 +684,7 @@ function validateBasicReceipt(receipt: unknown): receipt is NormativeReceipt {
   if (!si || typeof si.version !== "string" || !isHex(si.git_commit_sha, 40) || !isHex(si.git_blob_sha, 40) || !isHex(si.sha256, 64) || !isHex(si.manifest_sha256, 64)) return false;
   const methodology = value.methodology as Record<string, unknown> | undefined;
   if (!methodology || typeof methodology.version !== "string" || !isHex(methodology.git_commit_sha, 40) || !isHex(methodology.git_blob_sha, 40) || !isHex(methodology.sha256, 64)) return false;
+  if (typeof value.output !== "string" || value.output.length === 0) return false;
   if (!isHex(value.input_sha256, 64) || !isHex(value.output_sha256, 64)) return false;
   if (typeof value.nonce !== "string" || value.nonce.length < 16 || value.nonce.length > 128) return false;
   if (!isHex(value.evidence_sha256, 64)) return false;
@@ -735,6 +738,7 @@ function computeEvidenceHash(receipt: NormativeReceipt): string {
       anchor: item.anchor || null,
       reason_code: item.reason_code || null,
     })),
+    output: receipt.output,
     output_sha256: receipt.output_sha256,
     output_header: receipt.output_header,
     methodology_output_header: receipt.methodology_output_header,
@@ -803,6 +807,12 @@ export async function verifyNormativeReceipt(
   const expectedMethodologyOutputHeader = buildCanonicalMethodologyOutputHeader(methodologySnapshot, headerAt);
   if (receipt.output_header !== expectedOutputHeader) reasons.push("OUTPUT_HEADER_MISMATCH");
   if (receipt.methodology_output_header !== expectedMethodologyOutputHeader) reasons.push("METHODOLOGY_OUTPUT_HEADER_MISMATCH");
+  const outputValidation = validateCanonicalCycleOutput(receipt.output, {
+    expectedSiHeader: expectedOutputHeader,
+    expectedMethodologyHeader: expectedMethodologyOutputHeader,
+  });
+  if (!outputValidation.ok) reasons.push(...outputValidation.reasons.map((reason) => "OUTPUT_FORMAT_" + reason));
+  if (hashCanonicalCycleOutput(receipt.output) !== receipt.output_sha256) reasons.push("OUTPUT_SHA256_MISMATCH");
   if (receipt.si.version !== snapshot.version) reasons.push("SI_VERSION_MISMATCH");
   if (receipt.si.sha256 !== snapshot.sha256) reasons.push("SI_SHA256_MISMATCH");
   if (receipt.si.manifest_sha256 !== snapshot.manifestSha256) reasons.push("MANIFEST_SHA256_MISMATCH");

@@ -1,7 +1,9 @@
+import { CANONICAL_OUTPUT_FORMAT_VERSION } from "./normative-output";
+
 export const REQUIRED_PLATFORM = "ChatGPT" as const;
 export const REASONING_MODES = ["THINKING", "INSTANT", "UNKNOWN", "UNAVAILABLE"] as const;
 export type ReasoningMode = (typeof REASONING_MODES)[number];
-export const REQUIRED_OUTPUT_FORMAT_VERSION = "v1.7.4" as const;
+export const REQUIRED_OUTPUT_FORMAT_VERSION = CANONICAL_OUTPUT_FORMAT_VERSION;
 
 export type NormativeRuntimeContext = {
   platform: typeof REQUIRED_PLATFORM;

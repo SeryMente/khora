@@ -1,8 +1,8 @@
 # Registro de salida de verificación normativa por ciclo
 
 **Estado:** CONTRATO DERIVADO CANÓNICO  
-**Versión:** v1.1.1 — Identidad Dual SI/Metodología del Registro de Ciclo  
-**Fecha:** 2026-10-06
+**Versión:** v1.2.0 — Contrato Ejecutable y Salida Determinista  
+**Fecha:** 2026-10-08
 
 ## Norma
 
@@ -57,3 +57,16 @@ La proyección `verification_record` se devuelve desde `khora_norm_verify_turn`.
 `GET /api/norm-check/record?cycle_id=<id>&attempt=<n>`
 
 La interfaz devuelve el objeto estructurado y su representación de salida. Un receipt sin `output_header`, sin `methodology_output_header`, con identidad metodológica incompleta o con cualquiera de los encabezados distinto del calculado por KHORA no puede alcanzar `VERIFIED` ni `VERIFIED_RELEASE`.
+
+
+## Contrato ejecutable de salida
+
+El contrato visible vigente pertenece a `SeryMente/metodologia/FORMATO-REGISTRO-VERIFICACION-CICLO.schema.json` versión `v1.7.6`. KHORA mantiene una copia exacta para ejecución y una prueba de sincronización contra `main` de Metodología.
+
+El candidato completo de salida se valida antes de `VERIFIED` mediante un parser cerrado y se reconstruye mediante un renderer determinista. La liberación devuelve exactamente el texto validado asociado al receipt; no genera una variante posterior.
+
+La ruta crítica es:
+
+`OPEN → CASCADA NORMATIVA → OUTPUT CANDIDATE → VALIDATE → VERIFY → RELEASE → OUTPUT LIBERADO`
+
+El hash `output_sha256` debe corresponder al texto completo validado. La ausencia, modificación o divergencia estructural del output impide `VERIFIED_RELEASE`.

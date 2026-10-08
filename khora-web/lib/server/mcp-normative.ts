@@ -14,6 +14,7 @@ import {
   type NormativeReceipt,
   buildCycleVerificationRecord,
 } from "./norm-check";
+import { hashCanonicalCycleOutput } from "./normative-output";
 
 const TURN_TOKEN_KIND = "norm-turn";
 const TURN_TTL_SECONDS = 12 * 60 * 60;
@@ -85,7 +86,7 @@ async function ensureSchema() {
       );
       await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS platform TEXT NOT NULL DEFAULT 'ChatGPT'");
       await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS reasoning_mode TEXT NOT NULL DEFAULT 'THINKING'");
-      await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS output_format_version TEXT NOT NULL DEFAULT 'v1.7.3'");
+      await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS output_format_version TEXT NOT NULL DEFAULT '" + REQUIRED_OUTPUT_FORMAT_VERSION + "'");
       await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS si_git_commit_sha TEXT NOT NULL DEFAULT 'UNKNOWN'");
       await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS methodology_version TEXT NOT NULL DEFAULT 'UNKNOWN'");
       await db.query("ALTER TABLE normative_turns ADD COLUMN IF NOT EXISTS methodology_git_commit_sha TEXT NOT NULL DEFAULT 'UNKNOWN'");
@@ -251,9 +252,10 @@ export async function releaseNormativeTurn(actor: string, input: { turn_token: s
     order_verified: boolean;
     application_log_sha256: string;
     si_git_commit_sha: string;
+    receipt: unknown;
     methodology_git_commit_sha: string;
   }>(
-    "SELECT status, output_sha256, evidence_sha256, order_verified, application_log_sha256, si_git_commit_sha, methodology_git_commit_sha FROM normative_receipts WHERE cycle_id = $1 AND attempt = $2 LIMIT 1",
+    "SELECT status, output_sha256, evidence_sha256, order_verified, application_log_sha256, si_git_commit_sha, methodology_git_commit_sha, receipt FROM normative_receipts WHERE cycle_id = $1 AND attempt = $2 LIMIT 1",
     [turn.cycle_id, turn.verified_attempt]
   );
   const row = receipt.rows[0];
@@ -264,6 +266,10 @@ export async function releaseNormativeTurn(actor: string, input: { turn_token: s
   if (row.si_git_commit_sha !== turn.si_git_commit_sha || row.methodology_git_commit_sha !== turn.methodology_git_commit_sha) {
     throw new Error("TURN_RELEASE_SNAPSHOT_MISMATCH");
   }
+  const storedReceipt = row.receipt as { output?: unknown } | null;
+  if (!storedReceipt || typeof storedReceipt.output !== "string" || hashCanonicalCycleOutput(storedReceipt.output) !== row.output_sha256) {
+    throw new Error("TURN_RELEASE_OUTPUT_INVALID");
+  }
 
   const releaseToken = issueReleaseToken(actor, turn, row.output_sha256, row.evidence_sha256, config, gen);
   return {
@@ -271,6 +277,7 @@ export async function releaseNormativeTurn(actor: string, input: { turn_token: s
     status: "VERIFIED_RELEASE",
     cycle_id: turn.cycle_id,
     attempt: turn.current_attempt,
+    output: storedReceipt.output,
     output_sha256: row.output_sha256,
     evidence_sha256: row.evidence_sha256,
     application_log_sha256: row.application_log_sha256,
