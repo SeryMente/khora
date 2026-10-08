@@ -55,7 +55,7 @@ function SeguridadOverview({ onOpen }: { onOpen: (tab: Exclude<SecurityTab, "seg
 function SeguridadContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [activeTab, setActiveTab] = useState<SecurityTab>(() => parseTab(searchParams?.get("tab") || null));
+  const [activeTab, setActiveTab] = useState<SecurityTab>("seguridad");
 
   useEffect(() => { setActiveTab(parseTab(searchParams?.get("tab") || null)); }, [searchParams]);
 
