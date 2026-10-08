@@ -2,7 +2,7 @@
 
 **Identificador:** OEP  
 **Nombre completo:** Persistencia de Entorno Operativo  
-**Versión:** v0.1.2  
+**Versión:** v0.1.3  
 **Estado:** ACTIVO · CANÓNICO PARA ESTE ÁMBITO · EN EVOLUCIÓN CONTROLADA  
 **Sistema emisor:** KHORA  
 **Plataforma objetivo actual:** Windows
@@ -17,13 +17,13 @@ Cuando OEP sea recuperado sin el contexto conversacional original, leer en este 
 
 ## 1. Fuentes canónicas
 
-**Fuente técnica primaria existente:** `SeryMente/khora/ep-medio-architectura.md`, versión observada `v1.0.1`. Es la especificación normativa existente de Entorno Persistente Medio.
+**Fuente técnica primaria existente:** `SeryMente/khora/ep-medio-architectura.md`, versión observada `v1.0.3`. Es la especificación normativa existente de Entorno Persistente Medio.
 
-**Fuente metodológica superior:** `SeryMente/metodologia/SI-METACOGNITIVO.md`, versión observada `v1.6.7`, nombre de versión **Gobernanza Transaccional del Estado RDC**.
+**Fuente metodológica superior:** `SeryMente/metodologia/SI-METACOGNITIVO.md`, versión observada `v1.6.8`, nombre de versión **Continuidad Canónica entre Conversaciones**.
 
-**Snapshot de KHORA observado al canonizar OEP:** `main` = `55ee0f535929cf55841807ea92f8d410e9b8f455`. Es histórico y debe verificarse de nuevo antes de afirmar vigencia.
+**Snapshot de KHORA observado al canonizar OEP:** `main` = `d393097cec48db1daa9b8398b579b3adc2d3e095`. SHA verificado en este ciclo después de integrar las correcciones de toolchain y bootstrap.
 
-**Blob observado de EP:** `0b5e5048d4316bcbc2450a8f03261b543ad61109`.
+**Blob actual de arquitectura EP:** `4df10eafb273cf3bc77ab5efa2ea12e835cbfc16`.
 
 ## 2. Propósito
 
@@ -280,6 +280,37 @@ OEP conserva su identidad aunque se acceda mediante navegador, KHORA, PowerShell
 
 **Resultado:** `RESUELTO` para captura/persistencia del perfil; `NO-VERIFICADO` para bootstrap OEP completo en este host.
 
+## 47.1 Ciclo operativo 003 — Reutilización verificable del toolchain del host
+
+**Desafío:** hacer que OEP/KHORA reutilicen instalaciones válidas del host aunque no estén en `PATH`, y que el bootstrap no dependa de `npm.ps1` cuando la política de ejecución lo bloquee.
+
+**Cambios integrados en KHORA:**
+- `scripts/khora/khora.ps1` añade resolución determinista de herramientas en rutas estándar del host y evita tratar el alias de Python en `WindowsApps` como instalación válida.
+- `scripts/khora/modules/08-deps.ps1` reutiliza Git, GitHub CLI, Node.js y Python encontrados en rutas estándar y resuelve npm mediante `npm.cmd`.
+- `scripts/khora/modules/00-config.ps1` queda alineado con `SCRIPT_VERSION = 7.5.2`.
+- `tests/validate_ep.py` exige la presencia del resolvedor de herramientas y de `npm.cmd`.
+- `ep-medio-architectura.md` documenta el contrato de reutilización de herramientas del host.
+- `khora-web/lib/server/ep-bootstrap-content.ts` fue regenerado para mantener el bootstrap embebido byte-equivalente al gate.
+
+**Evidencia real en PC-7 mediante RDC:**
+- PowerShell 5.1.26100.9168.
+- Usuario interactivo `PC 7`; administrador `true`.
+- Escritorio `C:\Users\PC 7\Desktop`.
+- Espacio libre medido: ~1008.32 GiB.
+- BitLocker disponible en el sistema.
+- Node.js `v24.20.0`; npm `11.19.0` mediante `npm.cmd`.
+- Git `2.55.0.windows.5`.
+- GitHub CLI `2.102.0`.
+- Python `3.11.9`.
+- Notepad++ `8.9.8.1`.
+- OBS Studio `32.2.2`.
+- AutoHotkey 2.0.29.
+- No se verificó todavía cámara virtual de OBS.
+- GitHub CLI quedó instalado pero sin autenticación persistente; `gh auth login --web` está actualmente detenido esperando autorización interactiva mediante código de dispositivo.
+
+**Resultado:** `PARCIALMENTE_RESUELTO`. La reutilización y detección robusta fueron integradas en código y el toolchain quedó materializado en el host real. La ejecución end-to-end de KHORA/OEP permanece `NO-VERIFICADA` hasta completar autenticación GitHub y ejecutar el bootstrap real.
+
+**Causa conocida incorporada:** stderr de CLIs nativas puede convertirse en `NativeCommandError` bajo PowerShell 5.1 con `$ErrorActionPreference='Stop'`; probes futuros deben capturar salida y `$LASTEXITCODE` o usar entrypoints nativos compatibles. `npm.ps1` no debe ser tratado como entrypoint válido cuando está bloqueado por ExecutionPolicy.
 ## 48. Resiliencia de contexto
 
 Las propiedades esenciales no deben depender de memoria conversacional. Si una propiedad solo existe en la conversación y no en este objeto o una fuente canónica referenciada, existe una deficiencia de resiliencia y debe corregirse en un ciclo.
@@ -332,12 +363,14 @@ La ubicación modifica parámetros de ejecución, no el objetivo del sistema. CS
 - `OEP-PENDING-003`: esquema formal de Location Profile.
 - `OEP-PENDING-004`: estructura formal del manifiesto de sesión.
 - `OEP-PENDING-005`: **RESUELTO EN CICLO 002**. `Desktop/EP` es una junction verificada hacia `EP/` dentro del VHDX cifrado; la verificación end-to-end completa permanece pendiente.
-- `OEP-PENDING-006`: instalación/verificación de OBS y cámara virtual.
-- `OEP-PENDING-007`: instalación/verificación de Notepad++.
-- `OEP-PENDING-008`: instalación/verificación de AutoHotkey 2.0.
+- `OEP-PENDING-006`: **PARCIALMENTE RESUELTO EN CICLO 003**. OBS Studio 32.2.2 está instalado y localizado; cámara virtual de OBS sigue sin verificación.
+- `OEP-PENDING-007`: **RESUELTO EN CICLO 003**. Notepad++ 8.9.8.1 instalado y localizado.
+- `OEP-PENDING-008`: **RESUELTO EN CICLO 003**. AutoHotkey 2.0.29 instalado y localizado.
 - `OEP-PENDING-009`: modelo de revisión de sesiones RDC.
 - `OEP-PENDING-010`: contrato de evolución/versionado del bootstrap.
 - `OEP-PENDING-011`: persistencia/reconstrucción del estado no-Git de cada repositorio.
+- `OEP-PENDING-012`: ejecutar validación end-to-end real del bootstrap en PC-7 tras completar autenticación GitHub.
+- `OEP-PENDING-013`: verificar cámara virtual de OBS y provisionar/validar VS Code + Vercel en flujo real.
 
 ## 53. Asuntos explícitamente no decididos
 
@@ -362,6 +395,9 @@ Endurecimiento para autosuficiencia y resiliencia de contexto; se añadieron aut
 ### v0.1.2
 Se incorpora el primer corte funcional de OEP: perfil de host `oep-host-profile/v1`, persistencia del perfil dentro del volumen cifrado, exposición al runtime mediante `session-manifest.json` y evidencia del primer host real observado por RDC.
 
+### v0.1.3
+Se integra el ciclo 003 de reutilización verificable del toolchain del host, detección fuera de `PATH`, uso de `npm.cmd`, alineación de versión `7.5.2`, refresh del bootstrap embebido y evidencia real de provisión en PC-7.
+
 ## 57. Regla de modificación
 
 Toda modificación material debe aumentar versión, conservar historial, indicar qué cambió, conservar decisiones no sustituidas, marcar sustituciones explícitamente y conservar trazabilidad. No borrar contexto histórico relevante.
@@ -372,7 +408,7 @@ Toda modificación material debe aumentar versión, conservar historial, indicar
 
 ## 59. Estado al cierre
 
-**OEP:** `v0.1.2`  
+**OEP:** `v0.1.3`  
 **Estado:** ACTIVO  
 **Nivel:** arquitectura transversal en construcción  
 **Implementación completa:** NO VERIFICADA  
