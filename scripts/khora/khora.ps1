@@ -115,6 +115,37 @@ function Invoke-KhoraElevation {
 function Get-KhoraDesktop {
  $desktop=[Environment]::GetFolderPath([Environment+SpecialFolder]::Desktop);if([string]::IsNullOrWhiteSpace($desktop)-or-not(Test-Path -LiteralPath $desktop -PathType Container)){throw 'No se pudo descubrir un Escritorio local utilizable.'};$root=[IO.Path]::GetPathRoot($desktop);if($root.StartsWith('\\')){throw 'VHDX requiere un Escritorio en volumen local.'};$probe=Join-Path $desktop ('.khora-probe-'+[guid]::NewGuid().ToString('N'));try{[IO.File]::WriteAllText($probe,'ok');Remove-Item -LiteralPath $probe -Force}catch{throw 'El Escritorio no es escribible.'};$drive=Get-PSDrive -Name $root.TrimEnd('\').TrimEnd(':') -ErrorAction SilentlyContinue;if($drive-and$drive.Free-lt6GB){throw 'Se requieren al menos 6 GiB libres.'};return [IO.Path]::GetFullPath($desktop)
 }
+function Ensure-KhoraDesktopEpWorkspace {
+    param([Parameter(Mandatory=$true)][string]$Desktop,[Parameter(Mandatory=$true)][string]$Target)
+    if(-not(Test-Path -LiteralPath $Target -PathType Container)){New-Item -ItemType Directory -Path $Target -Force|Out-Null}
+    $link=Join-Path $Desktop 'EP'
+    if(Test-Path -LiteralPath $link){
+        $item=Get-Item -LiteralPath $link -Force
+        $isReparse=(($item.Attributes -band [IO.FileAttributes]::ReparsePoint)-ne0)
+        $isJunction=([string]$item.LinkType -eq 'Junction')
+        $knownTarget=$false
+        if($isReparse -and $isJunction){try{$knownTarget=([IO.Path]::GetFullPath([string]$item.Target)-eq[IO.Path]::GetFullPath($Target))}catch{}}
+        if(-not $knownTarget){throw 'La carpeta Desktop/EP ya existe y no es el workspace OEP de esta sesión.'}
+    }else{
+        & cmd.exe /d /c ('mklink /J "{0}" "{1}"' -f $link,$Target)|Out-Null
+        if($LASTEXITCODE-ne0){throw 'No se pudo crear la junction Desktop/EP.'}
+    }
+    $check=Get-Item -LiteralPath $link -Force
+    if((([string]$check.LinkType) -ne 'Junction')-or(([IO.Path]::GetFullPath([string]$check.Target)) -ne [IO.Path]::GetFullPath($Target))){throw 'La junction Desktop/EP no coincide con el workspace OEP.'}
+    return $link
+}
+function Remove-KhoraDesktopEpWorkspace {
+    param([Parameter(Mandatory=$true)][string]$Link,[Parameter(Mandatory=$true)][string]$Target)
+    if(-not(Test-Path -LiteralPath $Link)){return $true}
+    $item=Get-Item -LiteralPath $Link -Force
+    $isReparse=(($item.Attributes -band [IO.FileAttributes]::ReparsePoint)-ne0)
+    $isJunction=([string]$item.LinkType -eq 'Junction')
+    $knownTarget=$false
+    if($isReparse -and $isJunction){try{$knownTarget=([IO.Path]::GetFullPath([string]$item.Target)-eq[IO.Path]::GetFullPath($Target))}catch{}}
+    if(-not $knownTarget){throw 'Desktop/EP no coincide con el workspace OEP; no se elimina.'}
+    [IO.Directory]::Delete($Link,$false)
+    return (-not(Test-Path -LiteralPath $Link))
+}
 function Get-KhoraFreeDrive {
     foreach($letterCode in 90..82){$letter=[char]$letterCode;if(-not(Test-Path ("$letter`:\"))){return [string]$letter}}
     throw 'No hay letra de unidad libre entre R y Z.'
@@ -198,6 +229,7 @@ function Start-KhoraBootstrap {
         $vault=Invoke-KhoraBootstrapStage -Id 'EP-IN-020' -Label 'Recibir la llave de la bóveda' -Action {$key=Read-Host 'Llave de la bóveda' -AsSecureString;if($key.Length-lt8){throw 'Llave demasiado corta.'};return $key}
         $mount=Invoke-KhoraBootstrapStage -Id 'EP-IN-030' -Label 'Crear y verificar el volumen cifrado' -Action {New-KhoraEncryptedWorkspace -Outer $outer -Vhd $vhd -Drive $drive -VaultKey $vault -SessionId $sessionId}
         $work=Join-Path ($mount+'\') 'khora-ep';$state=Join-Path $work 'session-state';$repository=Join-Path $work 'repo';$logs=Join-Path $work 'logs'
+        $workspaceDir=Join-Path $work 'EP';$desktopWorkspaceLink=Invoke-KhoraBootstrapStage -Id 'EP-IN-015' -Label 'Presentar el workspace cifrado en Escritorio/EP' -Action {Ensure-KhoraDesktopEpWorkspace -Desktop $desktop -Target $workspaceDir}
         $hostProfilePath=Join-Path $state 'host-profile.v1.json';Save-KhoraHostProfile -Profile $hostProfile -Path $hostProfilePath
         New-Item -ItemType Directory -Path @($state,$repository,$logs) -Force|Out-Null
         $log=Join-Path $logs 'events.log';$jsonLog=Join-Path $logs 'events.jsonl';New-Item -ItemType File -Path @($log,$jsonLog) -Force|Out-Null
@@ -213,7 +245,7 @@ function Start-KhoraBootstrap {
         Protect-KhoraSecureStringBlob -Secure $pat -Path (Join-Path $state 'github-token.guardian.dpapi')
         Protect-KhoraSecureStringBlob -Secure $khoraSecure -Path (Join-Path $state 'khora-token.guardian.dpapi')
         $script:KhoraToken=$null;$KhoraToken=$null;$khoraSecure=$null
-        $manifest=[ordered]@{schema='khora-ep-session/v1';epVersion=$script:EP_VERSION;scriptVersion=$script:SCRIPT_VERSION;launchMode='normal';hostToolPolicy='allow-verified-host';sessionId=$sessionId;startedUtc=[DateTime]::UtcNow.ToString('o');outerDir=$outer;vhdPath=$vhd;mountPoint=$mount;workDir=$work;stateDir=$state;repoDir=$repository;logFile=$log;jsonLog=$jsonLog;commitSha=$sha;cleanupTask=$task;launcherPid=$PID;khoraApiBase=$KhoraApiBase;logPid=0;hostProfileSchema='oep-host-profile/v1';hostProfilePath=$hostProfilePath;hostClassification=[string]$hostProfile.hostClassification}
+        $manifest=[ordered]@{schema='khora-ep-session/v1';epVersion=$script:EP_VERSION;scriptVersion=$script:SCRIPT_VERSION;launchMode='normal';hostToolPolicy='allow-verified-host';sessionId=$sessionId;startedUtc=[DateTime]::UtcNow.ToString('o');outerDir=$outer;vhdPath=$vhd;mountPoint=$mount;workDir=$work;stateDir=$state;repoDir=$repository;logFile=$log;jsonLog=$jsonLog;commitSha=$sha;cleanupTask=$task;launcherPid=$PID;khoraApiBase=$KhoraApiBase;logPid=0;hostProfileSchema='oep-host-profile/v1';hostProfilePath=$hostProfilePath;hostClassification=[string]$hostProfile.hostClassification;workspaceDir=$workspaceDir;desktopWorkspaceLink=$desktopWorkspaceLink}
         $manifestPath=Join-Path $state 'session-manifest.json';$manifest|ConvertTo-Json -Depth 8|Set-Content -LiteralPath $manifestPath -Encoding UTF8
         $logProcess=Start-KhoraLogWindow -Log $log;$manifest.logPid=$logProcess.Id;$manifest|ConvertTo-Json -Depth 8|Set-Content -LiteralPath $manifestPath -Encoding UTF8
         $gate=Join-Path $repository 'scripts\khora\khora.ps1';if(-not(Test-Path $gate)){throw 'El commit no contiene el punto de entrada contractual.'}
