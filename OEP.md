@@ -1,0 +1,360 @@
+# OEP — Objeto Canónico de Persistencia de Entorno
+
+**Identificador:** OEP  
+**Nombre completo:** Persistencia de Entorno Operativo  
+**Versión:** v0.1.1  
+**Estado:** ACTIVO · CANÓNICO PARA ESTE ÁMBITO · EN EVOLUCIÓN CONTROLADA  
+**Sistema emisor:** KHORA  
+**Plataforma objetivo actual:** Windows
+
+> Este documento es el objeto canónico transversal de OEP. Su función es conservar contexto suficiente para reconstruir el propósito, las invariantes, decisiones, límites, pendientes, fuentes y estado del ámbito de Persistencia de Entorno aunque se pierda el contexto conversacional original.
+
+---
+
+## 0. Recuperación de contexto
+
+Cuando OEP sea recuperado sin el contexto conversacional original, leer en este orden: identidad y versión; fuentes canónicas; invariantes; decisiones; estado; pendientes; desafío activo. No reconstruir por memoria una decisión que esté escrita aquí o en una fuente de mayor autoridad. Ante conflicto, prevalece la fuente de mayor autoridad; si ninguna lo resuelve, el asunto queda BLOQUEADO y se solicita únicamente lo necesario.
+
+## 1. Fuentes canónicas
+
+**Fuente técnica primaria existente:** `SeryMente/khora/ep-medio-architectura.md`, versión observada `v1.0.1`. Es la especificación normativa existente de Entorno Persistente Medio.
+
+**Fuente metodológica superior:** `SeryMente/metodologia/SI-METACOGNITIVO.md`, versión observada `v1.6.7`, nombre de versión **Gobernanza Transaccional del Estado RDC**.
+
+**Snapshot de KHORA observado al canonizar OEP:** `main` = `55ee0f535929cf55841807ea92f8d410e9b8f455`. Es histórico y debe verificarse de nuevo antes de afirmar vigencia.
+
+**Blob observado de EP:** `0b5e5048d4316bcbc2450a8f03261b543ad61109`.
+
+## 2. Propósito
+
+OEP proporciona una continuidad de trabajo persistente en su identidad y estado remoto, pero efímera en su materialización local. La computadora donde se trabaja es un medio temporal, no el ancla principal de continuidad.
+
+**Principio rector:** persistencia remota + materialización local efímera + adaptación al host + recuperación verificable.
+
+## 3. Modelo de continuidad
+
+Una misma continuidad lógica atraviesa múltiples instancias locales. Cambiar de computadora o ubicación no equivale a comenzar un trabajo nuevo. La continuidad debe quedar respaldada por repositorios remotos y demás estados autorizados.
+
+## 4. Ubicaciones objetivo actuales
+
+Perfiles iniciales: `LOC-CSEC`, `LOC-OFFICE-DEPOT`, `LOC-LUIS-PASTEUR`.
+
+Las ubicaciones son perfiles de adaptación de un único motor OEP. No deben convertirse en implementaciones independientes.
+
+## 5. Perfil de ubicación / host
+
+Cada materialización debe poder asociarse a un perfil de host que describa como mínimo: Windows y versión; PowerShell; privilegios; BitLocker; espacio libre; Escritorio real del usuario interactivo; escritura local; HTTPS; Git; GitHub CLI; Node.js/npm; Python; Vercel CLI; Visual Studio Code; Notepad++; Chrome; OBS; cámara virtual de OBS; AutoHotkey 2.0; políticas del host; herramientas reutilizables; faltantes e incompatibles.
+
+Estados recomendados: `AVAILABLE`, `AVAILABLE_COMPATIBLE`, `MISSING`, `INCOMPATIBLE`, `BLOCKED`, `NOT_VERIFIED`.
+
+La existencia de una herramienta no implica que pueda reutilizarse.
+
+## 6. Experiencia de arranque objetivo
+
+Llegar a una computadora → abrir KHORA → autenticarse → obtener credencial OEP → recibir de KHORA el comando PowerShell → ejecutar launcher → detectar host → seleccionar/adoptar perfil → materializar únicamente lo necesario → quedar operativo → trabajar → cerrar o perder sesión → volatilizar instancia local.
+
+La intervención manual y el tiempo de arranque deben minimizarse y medirse.
+
+## 7. Regla de desarrollo ciclo a ciclo
+
+Se resuelve un desafío concreto por ciclo. Cada ciclo registra desafío, contexto utilizado, análisis, solución, cambios incorporados, evidencia y nuevos pendientes.
+
+Si el desafío no puede resolverse cabalmente con la información disponible, se detiene la ejecución sustantiva y se solicita únicamente lo necesario.
+
+Estados: `RESUELTO`, `PARCIALMENTE_RESUELTO`, `BLOQUEADO`, `NO-VERIFICADO`, `PENDIENTE`.
+
+## 8. Taxonomía del conocimiento
+
+`FACTO-CANONICO` = existe en fuente normativa o implementación verificable.  
+`DECISION-OEP` = decisión adoptada explícitamente.  
+`REQUISITO-OEP` = necesidad declarada aún sujeta a diseño.  
+`PROPUESTA` = alternativa no adoptada.  
+`PENDIENTE` = asunto no resuelto.  
+`NO-VERIFICADO` = no probado suficientemente.
+
+Lo no escrito no debe inventarse.
+
+## 9. KHORA como autoridad de emisión
+
+KHORA es el sistema emisor del launcher de OEP. Flujo: KHORA → autenticación → credencial de sesión OEP → launcher PowerShell → bootstrap OEP.
+
+**GitHub Gist queda descartado** como mecanismo de distribución del launcher o recuperación de secretos.
+
+## 10. Launcher PowerShell
+
+Debe ser emitido por KHORA, estar libre de secretos incrustados, soportar Windows PowerShell 5.1 como mínimo actual, recuperar el bootstrap autorizado, adaptarse al host, no exponer el token en historial/salida/argumentos de proceso, limpiar temporales y credenciales y producir errores identificables.
+
+La implementación existente de EP debe ser la base antes de crear un mecanismo paralelo.
+
+## 11. Autenticación
+
+### 11.1 OIDC
+Google OIDC permanece como identidad primaria de KHORA. OEP no reemplaza la autenticación global de KHORA.
+
+### 11.2 Acceso rápido específico de OEP
+Se adopta como dirección de diseño una credencial rápida específica, provisionalmente denominada `OEP Master Password`, para reducir la fricción de arranque sin convertirla automáticamente en credencial primaria global.
+
+Modelo: OIDC → identidad primaria de KHORA. OEP Master Password → acceso rápido y limitado a la emisión/inicio de OEP.
+
+### 11.3 Mínimo privilegio
+Debe limitarse al ámbito OEP y no adquirir automáticamente administración general de KHORA, acceso general a secretos o acceso irrestricto a repositorios.
+
+### 11.4 Seguridad
+El diseño debe resolver verificador seguro, derivación resistente a fuerza bruta, salt, rate limiting, bloqueo, revocación, rotación, recuperación, invalidación, protección contra enumeración y reuso. Nunca almacenar la contraseña en claro ni incrustarla en el launcher.
+
+## 12. Token de sesión OEP
+
+El token emitido por KHORA debe ser efímero, asociado a sesión, revocable, limitado por scopes, identificable y protegido contra exposición. La arquitectura EP vigente ya contempla `sid`, `jti`, expiración, scopes, audiencia, emisor, revocación y asociación a usuario.
+
+## 13. Token vs raíz criptográfica
+
+**Pendiente crítico.** La intención aportada contempla utilizar el token de KHORA como llave o componente de la llave de arranque/cifrado. EP Medio v1.0.1 actualmente separa token Khora para bootstrap/logs/autorización y llave de bóveda para raíz criptográfica/BitLocker/perfil. Hasta una decisión explícita: **token de sesión OEP ≠ automáticamente raíz criptográfica**.
+
+## 14. Invariante de cifrado
+
+Los repositorios no deben quedar materializados innecesariamente en claro fuera del perímetro protegido. Modelo: crear perímetro protegido → materializar dentro → trabajar dentro → destruir. No descargar/descomprimir en claro y cifrar después si ello deja una copia externa. La implementación EP vigente utiliza VHDX + BitLocker como perímetro actual.
+
+## 15. Workspace
+
+La raíz lógica deseada es `<Escritorio>/EP/`.
+
+Estructura conceptual: `EP/Gestor-de-Procesos/`, `EP/Signal-Interpreter/`, `EP/Armonía/`, `EP/KHORA/` y otros repositorios seleccionados.
+
+Cada repositorio seleccionado bajo `SeryMente` corresponde a una carpeta de trabajo determinista dentro de `EP`. Armonía es futura y no obliga a materialización en todas las sesiones.
+
+## 16. Extensiones Chrome
+
+Extensiones actuales: Gestor de Procesos y Signal Interpreter. Extensión prevista: Armonía.
+
+Para una extensión Chrome, la carpeta de trabajo del repositorio es directamente la raíz cargable de Chrome. El `manifest.json` vive en esa raíz cuando el proyecto así lo requiera. No crear una copia adicional solo para instalar.
+
+## 17. Selección de repositorios
+
+OEP debe soportar materialización total y subconjuntos. La selección debe formar parte de una configuración de sesión reproducible.
+
+## 18. Manifiesto de sesión
+
+El diseño futuro debe permitir un descriptor reproducible con sesión, perfil de ubicación, repositorios, herramientas, capacidades, preferencias del workspace y políticas de seguridad.
+
+## 19. Herramientas obligatorias
+
+**Visual Studio Code:** IDE principal; conservar la estrategia portátil/persistible de EP cuando sea compatible.
+
+**Notepad++:** obligatorio para edición rápida y bloc de notas híbrido; detectar → verificar → reutilizar si válido → instalar si falta.
+
+**OBS:** objetivo inmediato disponer de cámara virtual; detectar → verificar compatibilidad → verificar cámara virtual → reutilizar o instalar.
+
+**AutoHotkey 2.0:** obligatorio; verificar existencia, versión, ejecución y compatibilidad.
+
+**Google Chrome:** necesario para KHORA, autenticación, extensiones y operación web.
+
+**Git / GitHub CLI / Node.js / npm / Python / Vercel:** dependencias de infraestructura según necesidades de repositorios y despliegues.
+
+## 20. Política de host verificado
+
+Una herramienta del host solo puede reutilizarse si cumple versión, seguridad/firma cuando corresponda, aislamiento de configuración/cachés y contrato OEP. Esto corresponde al principio existente `allow-verified-host`.
+
+## 21. Descubrimiento del Escritorio
+
+El Escritorio se descubre dinámicamente. No asumir una ruta fija. El workspace se crea a partir del Escritorio real del usuario interactivo.
+
+## 22. Bootstrap adaptativo
+
+El bootstrap debe seguir: detección → perfil → evaluación → reutilizar / instalar / reparar / bloquear.
+
+No asumir Git, npm, Python, OBS, Notepad++, AutoHotkey, BitLocker, privilegios, PATH completo, rutas estándar ni políticas permisivas.
+
+## 23. Persistencia remota
+
+La continuidad debe quedar respaldada por repositorios, ramas de continuidad, estados remotos autorizados, perfiles persistibles, bitácoras remotas y otros artefactos explícitamente persistentes.
+
+La instancia local nunca debe ser el único portador de continuidad.
+
+## 24. Git y continuidad
+
+EP vigente utiliza ramas `ep-wip/*` para trabajo en progreso. Cuando una etapa requiere persistencia confirmada, el éxito debe verificarse por SHA local = SHA remoto cuando el contrato lo exige.
+
+## 25. Bitácora
+
+EP vigente utiliza un registro local técnico dentro del perímetro y un libro mayor remoto persistente. La bitácora remota debe sobrevivir cierre abrupto, muerte de procesos, eliminación local y reinicio. La estructura existente usa `ep_sessions`, `ep_bootstrap_tokens` y `ep_events`.
+
+## 26. Integridad de bitácora
+
+La arquitectura existente encadena eventos mediante `SHA-256(hash_anterior || representación_canónica_del_evento)` para detectar supresión, reordenamiento y modificación posterior. El reloj de servidor es autoritativo.
+
+## 27. Identificadores estables
+
+EP vigente utiliza `EP-IN-xxx`, `EP-RUN-xxx` y `EP-OUT-xxx`. No renumerar ni reutilizar identificadores existentes.
+
+## 28. Dead-man trigger
+
+El mecanismo de hombre muerto ya existe en EP y OEP debe reutilizarlo. Si la sesión operativa deja de estar bajo control autorizado, la instancia local debe tender a la volatilización segura. Se contemplan cierre normal, cierre de VS Code, muerte de terminal/supervisor, inactividad, reinicio y vigilancia.
+
+Ante conflicto entre continuidad y confidencialidad, prevalece la confidencialidad.
+
+## 29. Limpieza
+
+Secuencia conceptual: aceptar motivo → detener procesos → persistir lo necesario → verificar continuidad remota → purgar secretos → bloquear → desmontar → eliminar contenedor → eliminar carpeta exterior → retirar tarea solo tras confirmar ausencia de residuos → cerrar sesión OEP remotamente.
+
+Un fallo de continuidad no debe impedir la limpieza crítica.
+
+## 30. Reinicio inesperado
+
+La tarea de arranque de limpieza debe detectar residuos, intentar limpiarlos, confirmar eliminación y permanecer armada si quedan residuos. No crear cuarentena local permanente para residuos sensibles.
+
+## 31. Gestión de secretos
+
+No deben aparecer secretos en historial, logs, salida, argumentos de proceso, repositorios, archivos temporales innecesarios ni portapapeles después de su uso. Debe limpiarse token, variables sensibles, blobs temporales, portapapeles y artefactos de bootstrap.
+
+## 32. Cachés y configuración
+
+Cuando formen parte de la sesión, TEMP, TMP, GH_CONFIG_DIR, GIT_CONFIG_GLOBAL, NPM_CONFIG_CACHE, PIP_CACHE_DIR, XDG_CONFIG_HOME y XDG_DATA_HOME deben redirigirse al perímetro OEP.
+
+## 33. Perfil de VS Code
+
+Persistir configuración útil y extensiones/listas necesarias; reconstruir binarios cuando sea necesario; mantener el estado persistido cifrado; evitar secretos en el perfil.
+
+## 34. Clasificación del estado local
+
+Cada componente local debe clasificarse como `PERSISTENTE`, `RECONSTRUIBLE` o `EFÍMERO`. Un componente necesario para continuidad que no esté respaldado remotamente es una deficiencia arquitectónica que debe registrarse.
+
+## 35. Rendimiento
+
+Objetivo: minimizar el tiempo entre autenticación y entorno utilizable. Cada etapa crítica registra START, estado terminal, duración e identificador estable. Optimizar con mediciones reales.
+
+## 36. Evolución del bootstrap
+
+La mejora basada en uso real sigue: fallo observado → causa → solución → prueba → versión → evidencia → integración. No se considera aprendizaje válido un cambio improvisado sin evidencia. Las causas conocidas no deben repetirse deliberadamente.
+
+## 37. Estados de sesión
+
+Estados conceptuales: `NEW`, `AUTHENTICATED`, `BOOTSTRAPPING`, `PROFILED`, `PROVISIONING`, `MATERIALIZING`, `READY`, `WORKING`, `FINALIZING`, `CLEANING`, `CLOSED`, `FAILED`, `BLOCKED`, `RECOVERY_REQUIRED`.
+
+## 38. Continuidad remota
+
+Estados conceptuales: `REMOTE_CONTINUITY_OK`, `REMOTE_CONTINUITY_PENDING`, `REMOTE_CONTINUITY_FAILED`. Una sesión local `READY` no implica automáticamente continuidad remota confirmada.
+
+## 39. Condición de operativo
+
+Solo declarar una sesión operativa cuando el host es compatible, el perímetro está protegido, las herramientas requeridas están listas, los repositorios requeridos están materializados, la continuidad remota es válida, la vigilancia está activa y las superficies previstas son correctas.
+
+## 40. Reconciliación
+
+Si estado local y remoto discrepan: **NO ELEGIR SILENCIOSAMENTE**. Determinar versión, SHA, sesión, autoría, conflicto y posibilidad de preservación. Ante incertidumbre material: `BLOCKED`.
+
+## 41. SHA como identidad técnica
+
+Cuando una afirmación dependa de contenido, versión o despliegue concreto, preferir el SHA exacto. `main`, `latest` o `production` no sustituyen una identidad exacta cuando se requiere precisión.
+
+## 42. Publicación de main
+
+EP vigente contiene `EP-IN-080`, que exige publicación y verificación del SHA exacto de `main` y restauración posterior de `ep-wip/*`. OEP conserva esta propiedad mientras siga vigente en EP.
+
+## 43. Límites del modelo de amenaza
+
+OEP protege principalmente datos en reposo, copias físicas, residuos locales y materialización efímera. No afirma aislar el volumen contra malware con privilegios equivalentes ni contra un host ya comprometido mientras el entorno está montado.
+
+## 44. RDC
+
+RDC forma parte del contexto operativo cuando el ciclo requiera acceso al host, diagnóstico, ejecución, revisión de sesiones o reinstanciación. El estado RDC debe observarse de forma real y no inferirse. Se prevé capacidad para revisar sesiones RDC desde OEP.
+
+## 45. OEP Hub
+
+Se prevé un Hub gráfico como capa superior para iniciar, seleccionar repositorios, seleccionar perfil, editar configuración, obtener launcher, ver estado, revisar RDC y finalizar. El Hub no debe contener como única copia la lógica crítica del núcleo.
+
+## 46. Independencia del mecanismo de acceso
+
+OEP conserva su identidad aunque se acceda mediante navegador, KHORA, PowerShell, RDC, Hub futuro u otro mecanismo autorizado. La interfaz no define el sistema.
+
+## 47. Resiliencia de contexto
+
+Las propiedades esenciales no deben depender de memoria conversacional. Si una propiedad solo existe en la conversación y no en este objeto o una fuente canónica referenciada, existe una deficiencia de resiliencia y debe corregirse en un ciclo.
+
+## 48. Resiliencia ante contradicción
+
+Una propuesta incompatible con una propiedad existente se registra como CONFLICTO DETECTADO. No reemplaza silenciosamente una decisión previa. Toda sustitución debe declarar elemento sustituido, motivo, impacto y nueva propiedad.
+
+## 49. Resiliencia ante cambio de implementación
+
+Separar propiedad de implementación. Ejemplo: la propiedad es materialización local cifrada; la implementación actual es VHDX + BitLocker. Una implementación futura puede sustituir VHDX si conserva las propiedades exigidas.
+
+## 50. Resiliencia ante cambio de host
+
+La ubicación modifica parámetros de ejecución, no el objetivo del sistema. CSEC, Office Depot y Luis Pasteur deben ser perfiles, no motores independientes.
+
+## 51. Registro de decisiones
+
+- `OEP-DEC-001`: el nombre transversal es OEP — Persistencia de Entorno Operativo.
+- `OEP-DEC-002`: KHORA es el emisor del launcher PowerShell.
+- `OEP-DEC-003`: GitHub Gist queda descartado.
+- `OEP-DEC-004`: OIDC permanece como identidad primaria de KHORA.
+- `OEP-DEC-005`: se explora una contraseña rápida específica de OEP.
+- `OEP-DEC-006`: la contraseña rápida no sustituye automáticamente la identidad global de KHORA.
+- `OEP-DEC-007`: las ubicaciones iniciales son CSEC, Office Depot y Luis Pasteur.
+- `OEP-DEC-008`: se utilizarán perfiles de ubicación/host.
+- `OEP-DEC-009`: la raíz lógica de trabajo es `<Escritorio>/EP/`.
+- `OEP-DEC-010`: cada repositorio seleccionado tendrá su carpeta dentro de `EP`.
+- `OEP-DEC-011`: las extensiones usan su carpeta de trabajo como raíz cargable de Chrome.
+- `OEP-DEC-012`: Gestor de Procesos y Signal Interpreter son extensiones actuales.
+- `OEP-DEC-013`: Armonía es una extensión futura prevista.
+- `OEP-DEC-014`: Notepad++ es obligatorio.
+- `OEP-DEC-015`: OBS debe verificarse y, si falta y el host lo permite, instalarse para cámara virtual.
+- `OEP-DEC-016`: AutoHotkey 2.0 es obligatorio.
+- `OEP-DEC-017`: el sistema debe minimizar el tiempo de arranque.
+- `OEP-DEC-018`: el bootstrap debe adaptarse al host.
+- `OEP-DEC-019`: la selección de repositorios debe poder ser parcial.
+- `OEP-DEC-020`: debe contemplarse revisión de sesiones RDC.
+- `OEP-DEC-021`: se prevé un Hub gráfico para OEP.
+
+## 52. Pendientes actuales
+
+- `OEP-PENDING-001`: diseño seguro y completo de autenticación rápida por contraseña maestra.
+- `OEP-PENDING-002`: relación exacta entre token KHORA y raíz criptográfica.
+- `OEP-PENDING-003`: esquema formal de Location Profile.
+- `OEP-PENDING-004`: estructura formal del manifiesto de sesión.
+- `OEP-PENDING-005`: relación técnica entre `<Escritorio>/EP/` y el perímetro cifrado.
+- `OEP-PENDING-006`: instalación/verificación de OBS y cámara virtual.
+- `OEP-PENDING-007`: instalación/verificación de Notepad++.
+- `OEP-PENDING-008`: instalación/verificación de AutoHotkey 2.0.
+- `OEP-PENDING-009`: modelo de revisión de sesiones RDC.
+- `OEP-PENDING-010`: contrato de evolución/versionado del bootstrap.
+- `OEP-PENDING-011`: persistencia/reconstrucción del estado no-Git de cada repositorio.
+
+## 53. Asuntos explícitamente no decididos
+
+No está decidido que la contraseña OEP sustituya OIDC globalmente; que el token de sesión sea directamente la llave criptográfica; que Gist participe; que todos los repositorios se clonen siempre; que OBS deba ejecutarse siempre; que todas las herramientas del host deban reemplazarse; que el Hub exista antes del bootstrap funcional; ni que cada ubicación tenga código independiente.
+
+## 54. Regla de evidencia
+
+Toda afirmación de implementación debe poder vincularse a una fuente, archivo, prueba, ejecución o evidencia equivalente. Distinguir siempre entre existencia, implementación, funcionamiento y funcionamiento reproducido.
+
+## 55. Regla de cierre de ciclo
+
+Un ciclo queda integrado cuando el problema está definido, la solución está formulada, su relación con fuentes existentes está determinada, OEP está actualizado, la implementación fue modificada cuando correspondía, la evidencia quedó registrada y los nuevos pendientes fueron identificados. Si implementación o evidencia requerida aún no existe: `NO-VERIFICADO`.
+
+## 56. Historial
+
+### v0.1.0
+Primer objeto canónico transversal de contexto de OEP.
+
+### v0.1.1
+Endurecimiento para autosuficiencia y resiliencia de contexto; se añadieron autoridad y snapshots, taxonomía del conocimiento, invariantes, estados, reconciliación, reglas de no-inferencia, recuperación de contexto, resiliencia ante contradicción y cambios de implementación/host, decisiones y pendientes formales, evidencia y cierre de ciclo.
+
+## 57. Regla de modificación
+
+Toda modificación material debe aumentar versión, conservar historial, indicar qué cambió, conservar decisiones no sustituidas, marcar sustituciones explícitamente y conservar trazabilidad. No borrar contexto histórico relevante.
+
+## 58. Definición canónica consolidada
+
+> OEP es el ámbito del sistema KHORA dedicado a proporcionar persistencia de entorno operativo mediante una continuidad de trabajo respaldada remotamente y materializaciones locales temporales, cifradas, verificables y adaptativas al host. La ubicación física del trabajo es una variable de ejecución y no una variante del sistema. Cada sesión local debe poder reconstruirse desde el estado autorizado, utilizar únicamente las herramientas y repositorios necesarios, mantener la continuidad remota y volatilizar su materialización local mediante cierre normal o mecanismos de hombre muerto. KHORA constituye el punto de emisión del launcher y de las credenciales de sesión de OEP. OIDC continúa siendo la identidad primaria global de KHORA, mientras que una futura credencial rápida específica de OEP puede reducir la fricción de arranque sin convertirse automáticamente en sustituto de la identidad primaria.
+
+## 59. Estado al cierre
+
+**OEP:** `v0.1.1`  
+**Estado:** ACTIVO  
+**Nivel:** arquitectura transversal en construcción  
+**Implementación completa:** NO VERIFICADA  
+**Fuente técnica principal:** `SeryMente/khora/ep-medio-architectura.md v1.0.1`  
+**Fuente metodológica:** `SeryMente/metodologia/SI-METACOGNITIVO.md v1.6.7`
+
+La ausencia de contexto conversacional no autoriza a reconstruir decisiones fuera de este objeto o de sus fuentes canónicas.
