@@ -68,6 +68,7 @@
       url: meta.url,
       bytes: meta.bytes,
       sha256: meta.sha256 || null,
+      verificado: meta.verificado === true,
       startMs: meta.startMs,
       endMs: meta.endMs,
       duracionMs: meta.duracionMs,
@@ -120,6 +121,7 @@
         url: data.url,
         bytes: Number(data.bytes || blob.size),
         sha256: data.sha256 || null,
+        verificado: data.verificado === true,
         startMs: startMs,
         endMs: endMs,
         duracionMs: durationMs

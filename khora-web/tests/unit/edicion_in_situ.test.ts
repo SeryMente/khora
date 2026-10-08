@@ -73,7 +73,7 @@ test("edición in situ: comparación cruda detecta cualquier cambio", () => {
 
 test("edición in situ: la página registra y libera Escape", () => {
   const pagina = fs.readFileSync(
-    path.resolve(__dirname, "../../app/sistema/ingreso/page.tsx"),
+    path.resolve(__dirname, "../../app/components/ingreso/IngresoWorkspace.tsx"),
     "utf8",
   );
   const vista = fs.readFileSync(

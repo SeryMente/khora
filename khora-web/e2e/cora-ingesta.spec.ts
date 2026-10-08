@@ -8,7 +8,7 @@ test.describe("Ingesta UI", () => {
     // Provide a mocked session directly in the browser via cookie or bypass
     // the UI requirement by intercepting the page loading and setting our own.
 
-    // However, since middleware protects /sistema/ingesta directly in next.js,
+    // However, since middleware protects the Ingreso workspace directly in next.js,
     // we bypass it using Playwright's auth state or just mocking the session.
     await page.route("**/api/auth/session", async (route) => {
       await route.fulfill({
@@ -22,7 +22,7 @@ test.describe("Ingesta UI", () => {
     });
 
     // Navigate to the test page directly
-    await page.goto("/sistema/ingesta");
+    await page.goto("/sistema/ingreso?modo=ingesta");
   });
 
   test("should have mutually exclusive inputs", async ({ page }) => {

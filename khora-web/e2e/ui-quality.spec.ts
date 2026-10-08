@@ -8,15 +8,16 @@ const PRODUCT_ROUTES = [
   "/sistema/kpis",
   "/grafo",
   "/mapa",
-  "/capturar",
+  "/sistema/ingreso?modo=dictado",
+  "/sistema/ingreso?modo=captura",
+  "/sistema/ingreso?modo=archivo",
+  "/sistema/ingreso?modo=revision",
+  "/sistema/ingreso?modo=ingesta",
   "/herramientas",
   "/herramientas/opi-vri",
   "/herramientas/bitacora",
   "/roadmap",
   "/adherence",
-  "/sistema/dictado",
-  "/sistema/editar",
-  "/sistema/ingesta",
   "/sistema/seguridad",
   "/sistema/mcp",
   "/sistema/otros",
@@ -102,22 +103,26 @@ for (const viewport of [
       expect(pageErrors, "No se permiten errores JavaScript no controlados").toEqual([]);
     });
 
-    test("la navegación agrupa captura dentro de ingreso y no recorta submenús", async ({ page }) => {
+    test("la navegación mantiene ingreso como una sola superficie y conserva submenús externos", async ({ page }) => {
       await page.goto("/sistema/volcados", { waitUntil: "domcontentloaded" });
       await expect(page.locator('[data-testid="khora-splash"]')).toHaveCount(0, { timeout: 3000 });
 
       await expect(page.locator("[data-navigation-entry]")).toHaveCount(6);
+      await expect(page.getByRole("link", { name: "Ingreso", exact: true })).toBeVisible();
       await expect(page.getByRole("link", { name: "Capturar", exact: true })).toHaveCount(0);
+      await expect(page.getByRole("link", { name: "Dictado", exact: true })).toHaveCount(0);
+      await expect(page.getByRole("link", { name: "Edición", exact: true })).toHaveCount(0);
+      await expect(page.getByRole("link", { name: "Ingesta", exact: true })).toHaveCount(0);
 
-      await page.getByRole("button", { name: "Ingreso", exact: true }).click();
-      const ingresoMenu = page.getByRole("navigation", { name: "Menú Ingreso" });
-      await expect(ingresoMenu).toBeVisible();
-      for (const name of ["Ingreso", "Capturar", "Dictado", "Edición", "Ingesta"]) {
-        await expect(ingresoMenu.getByRole("link", { name, exact: true })).toBeVisible();
+      await page.goto("/sistema/ingreso", { waitUntil: "domcontentloaded" });
+      const ingresoModes = page.getByRole("navigation", { name: "Modos de Ingreso" });
+      await expect(ingresoModes).toBeVisible();
+      for (const name of ["Entrada", "Dictado", "Captura", "Archivo", "Revisión", "Ingesta"]) {
+        await expect(ingresoModes.getByRole("link", { name, exact: true })).toBeVisible();
       }
 
-      await page.getByRole("button", { name: "Ingreso", exact: true }).click();
-      await expect(ingresoMenu).toHaveCount(0);
+      await page.getByRole("link", { name: "Ingreso", exact: true }).click();
+      await expect(page).toHaveURL(/\/sistema\/ingreso$/);
 
       await page.getByRole("button", { name: "Seguridad", exact: true }).click();
       const securityMenu = page.getByRole("navigation", { name: "Menú Seguridad" });
@@ -148,6 +153,10 @@ for (const viewport of [
         ["/sistema/boveda", /\/sistema\/seguridad\?tab=boveda$/],
         ["/sistema/entorno-persistente", /\/sistema\/seguridad\?tab=entorno-persistente$/],
         ["/herramientas/bitacora", /\/sistema\/volcados$/],
+        ["/capturar", /\/sistema\/ingreso\?modo=captura$/],
+        ["/sistema/dictado", /\/sistema\/ingreso\?modo=dictado$/],
+        ["/sistema/editar", /\/sistema\/ingreso\?modo=revision$/],
+        ["/sistema/ingesta", /\/sistema\/ingreso\?modo=ingesta$/],
       ];
 
       for (const [alias, canonical] of aliases) {

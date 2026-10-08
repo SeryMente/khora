@@ -332,6 +332,7 @@
             url: message.url,
             bytes: message.bytes,
             sha256: message.sha256 || null,
+            verificado: message.verificado === true,
             source: "chrome_tab",
             startMs: message.startMs,
             endMs: message.endMs,
