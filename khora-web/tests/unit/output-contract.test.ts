@@ -8,7 +8,7 @@ import {
   sha256Output,
 } from "../../lib/server/output-contract";
 
-const siHeader = "SI CARGADO · v1.6.9 — Verificación del Régimen Personalizado · COMPLETO · ACTIVO · ÚLTIMO CAMBIO: hace 1 minuto | 2026-10-08";
+const siHeader = "SI CARGADO · v1.6.11 — Enforcement Determinista de Salida · COMPLETO · ACTIVO · ÚLTIMO CAMBIO: hace 1 minuto | 2026-10-08";
 const methodologyHeader = "METODOLOGÍA CARGADA · v0.12.3 — Verificación del Régimen Personalizado · COMPLETA · ACTIVA · ÚLTIMO CAMBIO: hace 1 minuto | 2026-10-08";
 
 function base(overrides: Partial<Parameters<typeof renderCanonicalCycleOutput>[0]> = {}) {
