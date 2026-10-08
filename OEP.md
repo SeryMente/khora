@@ -2,7 +2,7 @@
 
 **Identificador:** OEP  
 **Nombre completo:** Persistencia de Entorno Operativo  
-**Versión:** v0.1.4
+**Versión:** v0.1.5
 **Estado:** ACTIVO · CANÓNICO PARA ESTE ÁMBITO · EN EVOLUCIÓN CONTROLADA  
 **Sistema emisor:** KHORA  
 **Plataforma objetivo actual:** Windows
@@ -21,7 +21,7 @@ Cuando OEP sea recuperado sin el contexto conversacional original, leer en este 
 
 **Fuente metodológica superior:** `SeryMente/metodologia/SI-METACOGNITIVO.md`, versión observada `v1.6.8`, nombre de versión **Continuidad Canónica entre Conversaciones**.
 
-**Snapshot de KHORA observado al canonizar OEP:** `main` = `5dc82b536525c546542509db9694293f6da1885c`. SHA verificado en este ciclo después de integrar las correcciones de toolchain y bootstrap.
+**Snapshot de KHORA observado al canonizar OEP:** `main` = `019d7ab396534148db111b7860697ec7c8029d81`. SHA verificado en este ciclo después de integrar las correcciones de toolchain y bootstrap.
 
 **Blob actual de arquitectura EP:** `382e4a929a984a96926fd6f9080f80bedd109a0b`.
 
@@ -393,7 +393,7 @@ La ubicación modifica parámetros de ejecución, no el objetivo del sistema. CS
 - `OEP-PENDING-006`: **PARCIALMENTE RESUELTO**. OBS Studio 32.2.2 está instalado y localizado; cámara virtual de OBS sigue sin verificación.
 - `OEP-PENDING-012`: **PARCIALMENTE RESUELTO EN CICLO 004**. GitHub CLI ya está autenticado y el bootstrap puede reutilizar su credencial en memoria; el bootstrap E2E completo de KHORA/OEP no se ejecutó porque la llave/clave maestra de la bóveda no fue aportada y no debe reconstruirse ni regenerarse a ciegas.
 - `OEP-PENDING-013`: **PARCIALMENTE RESUELTO EN CICLO 004**. El proyecto `khora-web` está vinculado a `SeryMente/khora`, tiene `AUTH_SECRET` de producción y dominio `khora-web.vercel.app`; la publicación de la revisión `5dc82b5` fue bloqueada por el límite gratuito diario de Vercel. OBS Virtual Camera y VS Code siguen sin verificación.
-- `OEP-PENDING-014`: **BLOQUEADO**. `C:` está 100 % cifrado pero `ProtectionStatus=Off`, `XtsAes128` y sin protectores; TPM está disponible, pero `Add-BitLockerKeyProtector` desde la sesión RDC no elevada devuelve `0x80070522` por privilegio requerido. Requiere una ejecución administrativa interactiva/UAC para añadir el protector TPM y reanudar protección sin cambiar el método actual del volumen.
+- `OEP-PENDING-014`: **BLOQUEADO**. `C:` está 100 % cifrado pero `ProtectionStatus=Off`, `XtsAes128` y sin protectores; TPM está disponible, pero `la provisión TPM se intentó desde una tarea `SYSTEM`; `Add-BitLockerKeyProtector` no persistió el protector y `manage-bde -protectors -add C: -tpm` devolvió `0x80070002`. El TPM reporta `RestartPending=True`, por lo que el estado requiere reinicio/provisión UEFI/TPM posterior y verificación final. Requiere una ejecución administrativa interactiva/UAC para añadir el protector TPM y reanudar protección sin cambiar el método actual del volumen.
 - `OEP-PENDING-015`: **PENDIENTE**. Tras resolver la cuota de Vercel, crear/verificar el despliegue de producción correspondiente al SHA canónico de `main` y ejecutar smoke tests públicos.
 - `OEP-PENDING-007`: **RESUELTO EN CICLO 003**. Notepad++ 8.9.8.1 instalado y localizado.
 - `OEP-PENDING-008`: **RESUELTO EN CICLO 003**. AutoHotkey 2.0.29 instalado y localizado.
@@ -429,7 +429,10 @@ Se incorpora el primer corte funcional de OEP: perfil de host `oep-host-profile/
 Se integra el ciclo 003 de reutilización verificable del toolchain del host, detección fuera de `PATH`, uso de `npm.cmd`, alineación de versión `7.5.2`, refresh del bootstrap embebido y evidencia real de provisión en PC-7.
 
 ### v0.1.4
-Se integra el ciclo 004 de hardening criptográfico y de superficie de ataque: PBKDF2-HMAC-SHA256 con 200 000 iteraciones para la contraseña del protector BitLocker EP; reutilización de la sesión autenticada de GitHub CLI en memoria; alineación de Host KHORA `7.5.3`; eliminación de un endpoint de recuperación muerto y de `firebase` sin consumidores; auditoría de runtime con `0` vulnerabilidades; validación real de VHDX + BitLocker XTS-AES-256 y build web completo en PC-7. El despliegue final a Vercel quedó bloqueado por el límite gratuito diario de despliegues.
+Se integra el ciclo 004 de hardening criptográfico y de superficie de ataque: PBKDF2-HMAC-SHA256 con 200 000 iteraciones para la contraseña del protector BitLocker EP; reutilización de la sesión autenticada de GitHub CLI en memoria; alineación de Host KHORA `7.5.3`; eliminación de un endpoint de recuperación muerto y de `firebase` sin consumidores; auditoría de runtime con `0` vulnerabilidades; validación real de VHDX + BitLocker XTS-AES-256 y build web completo en PC-7. El despliegue de `019d7ab` a Vercel quedó bloqueado por el límite gratuito diario de despliegues; `khora-web.vercel.app` continúa vivo sobre un deployment anterior.
+
+### v0.1.5
+Se actualiza el snapshot canónico al commit `019d7ab396534148db111b7860697ec7c8029d81`, se registra que `khora-web.vercel.app` sigue operativo sobre un deployment previo por agotamiento de cuota de despliegues, y se corrige el diagnóstico del host BitLocker: `SYSTEM` puede ejecutar la operación pero el protector TPM no persiste mientras el TPM está en `RestartPending=True`; la reparación final queda pendiente de reinicio/provisión y verificación posteriores.
 
 ## 57. Regla de modificación
 
@@ -441,7 +444,7 @@ Toda modificación material debe aumentar versión, conservar historial, indicar
 
 ## 59. Estado al cierre
 
-**OEP:** `v0.1.4`
+**OEP:** `v0.1.5`
 **Estado:** ACTIVO  
 **Nivel:** arquitectura transversal en construcción  
 **Último ciclo integrado:** 004 · hardening criptográfico, reducción de superficie de ataque y validación E2E
