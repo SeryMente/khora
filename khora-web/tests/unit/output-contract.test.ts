@@ -9,7 +9,7 @@ import {
 } from "../../lib/server/output-contract";
 
 const siHeader = "SI CARGADO · v1.6.8 — Continuidad Canónica entre Conversaciones · COMPLETO · ACTIVO · ÚLTIMO CAMBIO: hace 1 minuto | 2026-10-08";
-const methodologyHeader = "METODOLOGÍA CARGADA · v0.12.2 — Verificación del Régimen Personalizado · COMPLETA · ACTIVA · ÚLTIMO CAMBIO: hace 1 minuto | 2026-10-08";
+const methodologyHeader = "METODOLOGÍA CARGADA · v0.12.3 — Verificación del Régimen Personalizado · COMPLETA · ACTIVA · ÚLTIMO CAMBIO: hace 1 minuto | 2026-10-08";
 
 function base(overrides: Partial<Parameters<typeof renderCanonicalCycleOutput>[0]> = {}) {
   return {
@@ -35,7 +35,7 @@ function base(overrides: Partial<Parameters<typeof renderCanonicalCycleOutput>[0
 }
 
 test("contract version is locked", () => {
-  assert.equal(OUTPUT_FORMAT_VERSION, "v1.7.5");
+  assert.equal(OUTPUT_FORMAT_VERSION, "v1.7.6");
 });
 
 test("renderer emits exactly the canonical six-line format", () => {
