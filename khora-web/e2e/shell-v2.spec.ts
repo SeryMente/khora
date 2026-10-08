@@ -41,7 +41,7 @@ test.describe('Shell Navegación v3', () => {
     await expect(page.locator('[data-testid="khora-splash"]')).toHaveCount(0, { timeout: 3000 });
 
     await expect(page.locator('[data-navigation-entry]')).toHaveCount(6);
-    await expect(page.locator('[data-navigation-entry]').evaluateAll((nodes) => nodes.map((node) => node.getAttribute('data-navigation-entry')))).resolves.toEqual(['ingreso', 'volcados', 'grafo', 'consulta', 'seguridad', 'sistema']);
+    const primaryIds = await page.locator('[data-navigation-entry]').evaluateAll((nodes) => nodes.map((node) => node.getAttribute('data-navigation-entry')));\n    expect(primaryIds).toEqual(['ingreso', 'volcados', 'grafo', 'consulta', 'seguridad', 'sistema']);
     await expect(page.getByRole('link', { name: 'Ingreso', exact: true })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Volcados', exact: true })).toBeVisible();
     for (const name of ['Grafo', 'Seguridad', 'Sistema']) {
