@@ -264,7 +264,7 @@ test("UI Review · el prerender de las 9 pantallas funciona sin JavaScript", asy
       await expect(page.locator('[data-ui-review-static-screen="' + screen + '"]')).toBeVisible();
       const scenarios = await page.locator("[data-ui-review-scenario]").count();
       expect(scenarios, "Cada pantalla debe exponer escenarios sintéticos").toBeGreaterThan(0);
-      expect(await page.locator("[data-ui-review-scenario] h2").count()).toBe(scenarios);
+      expect(await page.locator("[data-ui-review-scenario] > header h2").count()).toBe(scenarios);
     }
   } finally {
     await context.close();
