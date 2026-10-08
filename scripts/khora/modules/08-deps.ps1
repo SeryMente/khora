@@ -1,3 +1,32 @@
+function Find-KhoraHostExecutable {
+    param([Parameter(Mandatory=$true)][string]$Name)
+    $programFiles=[Environment]::GetEnvironmentVariable('ProgramFiles')
+    $programFilesX86=[Environment]::GetEnvironmentVariable('ProgramFiles(x86)')
+    $localAppData=[Environment]::GetEnvironmentVariable('LOCALAPPDATA')
+    $candidates=@()
+    switch($Name){
+        'git' {$candidates=@((Join-Path $programFiles 'Git\cmd\git.exe'),(Join-Path $programFiles 'Git\bin\git.exe'),(Join-Path $localAppData 'Programs\Git\cmd\git.exe'))}
+        'gh' {$candidates=@((Join-Path $programFiles 'GitHub CLI\gh.exe'),(Join-Path $localAppData 'Programs\GitHub CLI\gh.exe'))}
+        'node' {$candidates=@((Join-Path $programFiles 'nodejs\node.exe'),(Join-Path $localAppData 'Programs\nodejs\node.exe'))}
+        'npm' {$candidates=@((Join-Path $programFiles 'nodejs\npm.cmd'),(Join-Path $localAppData 'Programs\nodejs\npm.cmd'))}
+        'python' {$candidates=@((Join-Path $localAppData 'Programs\Python\Python311\python.exe'),(Join-Path $localAppData 'Programs\Python\Python312\python.exe'),(Join-Path $programFiles 'Python311\python.exe'),(Join-Path $programFiles 'Python312\python.exe'))}
+    }
+    foreach($candidate in $candidates){
+        if($candidate -and (Test-Path -LiteralPath $candidate -PathType Leaf)){return [IO.Path]::GetFullPath($candidate)}
+    }
+    $commandNames=if($Name -eq 'npm'){@('npm.cmd','npm')}else{@($Name)}
+    foreach($commandName in $commandNames){
+        $cmd=Get-Command $commandName -ErrorAction SilentlyContinue
+        if($cmd){
+            $path=[string]$cmd.Source
+            if($Name -eq 'python' -and $path -match '\\WindowsApps\\'){continue}
+            if($Name -eq 'npm' -and $path -match '\\npm\.ps1$'){$cmd=Get-Command npm.cmd -ErrorAction SilentlyContinue;if(-not $cmd){continue};$path=[string]$cmd.Source}
+            if($path -and (Test-Path -LiteralPath $path -PathType Leaf)){return [IO.Path]::GetFullPath($path)}
+        }
+    }
+    return $null
+}
+
 ﻿# Toolchain efímero y precarga paralela.
 $script:PrefetchJobs = @{}
 $script:PrefetchPlan = @{}
@@ -24,13 +53,13 @@ function Start-KhoraDownloadJob {
 function Start-KhoraPrefetch {
     $directory = Join-Path $WORK_DIR 'prefetch'
     New-Item -ItemType Directory -Path $directory -Force | Out-Null
-    if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
+    if (-not (Find-KhoraHostExecutable -Name 'git')) {
         $release=Invoke-RestMethod -Uri 'https://api.github.com/repos/git-for-windows/git/releases/latest' -Headers @{'User-Agent'='khora-ep'}
         $asset=$release.assets|Where-Object{$_.name -match '^PortableGit-.*-64-bit\.7z\.exe$'}|Select-Object -First 1
         if(-not$asset){throw 'No se encontró PortableGit.'}
         Start-KhoraDownloadJob -Name git -Uri $asset.browser_download_url -Path (Join-Path $directory $asset.name)
     }
-    if (-not (Get-Command gh -ErrorAction SilentlyContinue)) {
+    if (-not (Find-KhoraHostExecutable -Name 'gh')) {
         $release=Invoke-RestMethod -Uri 'https://api.github.com/repos/cli/cli/releases/latest' -Headers @{'User-Agent'='khora-ep'}
         $asset=$release.assets|Where-Object{$_.name -match '^gh_.*_windows_amd64\.zip$'}|Select-Object -First 1
         $sums=$release.assets|Where-Object{$_.name -match 'checksums\.txt$'}|Select-Object -First 1
@@ -38,7 +67,7 @@ function Start-KhoraPrefetch {
         Start-KhoraDownloadJob -Name gh -Uri $asset.browser_download_url -Path (Join-Path $directory $asset.name)
         Start-KhoraDownloadJob -Name ghSums -Uri $sums.browser_download_url -Path (Join-Path $directory $sums.name)
     }
-    if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
+    if (-not (Find-KhoraHostExecutable -Name 'node')) {
         $index=Invoke-RestMethod -Uri 'https://nodejs.org/dist/index.json'
         $release=$index|Where-Object{$_.lts -and ($_.files -contains 'win-x64-zip')}|Select-Object -First 1
         if(-not$release){throw 'No se encontró Node.js LTS.'}
@@ -70,7 +99,8 @@ function Wait-KhoraPrefetch {
 }
 
 function Ensure-Git {
-    if(Get-Command git -ErrorAction SilentlyContinue){return $true}
+    $existing=Find-KhoraHostExecutable -Name 'git'
+    if($existing){Add-KhoraPath -Path (Split-Path -Parent $existing);return $existing}
     $installer=Wait-KhoraPrefetch -Name git
     if(-not$installer){throw 'PortableGit ausente.'}
     if((Get-AuthenticodeSignature $installer).Status -ne 'Valid'){throw 'Firma PortableGit inválida.'}
@@ -82,7 +112,8 @@ function Ensure-Git {
 }
 
 function Ensure-GhCli {
-    $existing=Get-Command gh -ErrorAction SilentlyContinue;if($existing){$script:GH_CLI_PATH=$existing.Source;return $existing.Source}
+    $existing=Find-KhoraHostExecutable -Name 'gh'
+    if($existing){Add-KhoraPath -Path (Split-Path -Parent $existing);$script:GH_CLI_PATH=$existing;return $existing}
     $zip=Wait-KhoraPrefetch -Name gh;$sumFile=Wait-KhoraPrefetch -Name ghSums
     if(-not$zip-or-not$sumFile){throw 'GitHub CLI ausente.'}
     $line=Get-Content $sumFile|Where-Object{$_ -match [regex]::Escape((Split-Path $zip -Leaf))}|Select-Object -First 1
@@ -97,7 +128,8 @@ function Confirm-GhCliAuth {
  $gh=Ensure-GhCli;if(-not$gh-or-not(Test-Path -LiteralPath $gh)){throw 'GitHub CLI no disponible.'};$ok=Invoke-WithToken -Action {param($token)$previous=$env:GH_TOKEN;try{$env:GH_TOKEN=$token;$identity=(& $gh api user --jq .login 2>&1|Out-String).Trim();return ($LASTEXITCODE-eq0-and$identity)}finally{if($null-ne$previous){$env:GH_TOKEN=$previous}else{Remove-Item Env:GH_TOKEN -ErrorAction SilentlyContinue}}};return [bool]$ok
 }
 function Ensure-Node {
-    $existing=Get-Command node -ErrorAction SilentlyContinue;if($existing){return $existing.Source}
+    $existing=Find-KhoraHostExecutable -Name 'node'
+    if($existing){Add-KhoraPath -Path (Split-Path -Parent $existing);return $existing}
     $zip=Wait-KhoraPrefetch -Name node;$sumFile=Wait-KhoraPrefetch -Name nodeSums
     if(-not$zip-or-not$sumFile){throw 'Node.js ausente.'}
     $line=Get-Content $sumFile|Where-Object{$_ -match [regex]::Escape((Split-Path $zip -Leaf))}|Select-Object -First 1
@@ -133,7 +165,9 @@ function Ensure-VSCode {
 
 function Get-CodeCli {$code=Ensure-VSCode;return (Join-Path (Split-Path -Parent $code) 'bin\code.cmd')}
 function Ensure-VercelCLI {
-    $node=Ensure-Node;$npm=Join-Path (Split-Path -Parent $node) 'npm.cmd';if(-not(Test-Path $npm)){$npm=(Get-Command npm.cmd -ErrorAction Stop).Source}
+    $node=Ensure-Node;$npm=Find-KhoraHostExecutable -Name 'npm'
+    if(-not $npm){$npm=Join-Path (Split-Path -Parent $node) 'npm.cmd'}
+    if(-not(Test-Path -LiteralPath $npm -PathType Leaf)){throw 'npm.cmd ausente.'}
     $target=Join-Path $WORK_DIR 'tools\vercel';$vercel=Join-Path $target 'node_modules\.bin\vercel.cmd'
     if(-not(Test-Path $vercel)){& $npm install --prefix $target --no-save --no-audit --no-fund vercel@59.3.0 2>&1|ForEach-Object{Info ('npm vercel: '+[string]$_)};if($LASTEXITCODE -ne 0){throw 'Instalación Vercel CLI falló.'}}
     return $vercel
@@ -174,7 +208,9 @@ function Start-KhoraVSCode {
 }
 
 function Start-KhoraDependencyHydration {
-    $python=Ensure-Python311;$node=Ensure-Node;$venv=Join-Path $WORK_DIR 'venv';$web=Join-Path $REPO_DIR 'khora-web';$npm=Join-Path (Split-Path -Parent $node) 'npm.cmd'
+    $python=Ensure-Python311;$node=Ensure-Node;$venv=Join-Path $WORK_DIR 'venv';$web=Join-Path $REPO_DIR 'khora-web';$npm=Find-KhoraHostExecutable -Name 'npm'
+    if(-not $npm){$npm=Join-Path (Split-Path -Parent $node) 'npm.cmd'}
+    if(-not(Test-Path -LiteralPath $npm -PathType Leaf)){throw 'npm.cmd ausente.'}
     if(Test-Path(Join-Path $REPO_DIR 'pyproject.toml')){$script:DependencyJobs['python']=Start-Job -ArgumentList @($python,$venv,$REPO_DIR) -ScriptBlock {param($py,$ve,$repo)& $py -m venv $ve;if($LASTEXITCODE-ne0){throw 'venv falló'};& (Join-Path $ve 'Scripts\python.exe') -m pip install -e $repo --disable-pip-version-check;if($LASTEXITCODE-ne0){throw 'pip falló'}}}
     if(Test-Path(Join-Path $web 'package-lock.json')){$script:DependencyJobs['node']=Start-Job -ArgumentList @($npm,$web) -ScriptBlock {param($npmPath,$directory)& $npmPath --prefix $directory ci --no-audit --no-fund;if($LASTEXITCODE-ne0){throw 'npm ci falló'}}}
 }
