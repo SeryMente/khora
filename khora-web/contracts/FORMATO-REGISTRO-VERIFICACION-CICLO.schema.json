@@ -1,0 +1,180 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Contrato de salida canónica por ciclo",
+  "contract_id": "FORMATO-REGISTRO-VERIFICACION-CICLO",
+  "version": "v1.7.5",
+  "status": "CANÓNICO",
+  "kind": "chatgpt-cycle-output",
+  "strict": {
+    "extra_text": false,
+    "leading_whitespace": false,
+    "trailing_whitespace": false,
+    "trailing_newline": false,
+    "line_terminator": "\\n",
+    "normal_line_count": 6,
+    "blocked_preamble_line_count": 7
+  },
+  "lines": [
+    {
+      "position": 1,
+      "field": "cycle",
+      "pattern": "^.+ / CONV-[0-9]+ / C[0-9]+$"
+    },
+    {
+      "position": 2,
+      "field": "si_header",
+      "source": "SI canonical header"
+    },
+    {
+      "position": 3,
+      "field": "methodology_header",
+      "source": "Metodología canonical header"
+    },
+    {
+      "position": 4,
+      "field": "hud",
+      "prefix": "ChatGPT · ",
+      "fields": [
+        {
+          "name": "CI",
+          "states": [
+            "✓",
+            "?",
+            "!"
+          ]
+        },
+        {
+          "name": "UBIC",
+          "type": "text"
+        },
+        {
+          "name": "RDC",
+          "states": [
+            "SI",
+            "NO",
+            "PENDIENTE"
+          ]
+        },
+        {
+          "name": "C",
+          "type": "text"
+        },
+        {
+          "name": "RDC-USO",
+          "pattern": "^[0-9]+(?:\\.[0-9]+)?% usado / [0-9]+(?:\\.[0-9]+)?% restante$"
+        },
+        {
+          "name": "S",
+          "states": [
+            "ACTIVA",
+            "INACTIVA",
+            "NO VERIFICADA"
+          ]
+        },
+        {
+          "name": "F",
+          "states": [
+            "✓",
+            "?",
+            "!"
+          ]
+        },
+        {
+          "name": "K",
+          "states": [
+            "✓",
+            "OFF",
+            "?",
+            "!"
+          ]
+        },
+        {
+          "name": "T",
+          "states": [
+            "✓",
+            "?",
+            "!"
+          ]
+        },
+        {
+          "name": "RDC-CNX",
+          "type": "text"
+        },
+        {
+          "name": "USR",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "position": 5,
+      "field": "result",
+      "prefix": "RESULTADO: ",
+      "type": "nonempty-single-line-text"
+    },
+    {
+      "position": 6,
+      "field": "state",
+      "states": [
+        "COMPLETADO",
+        "BLOQUEADO",
+        "PENDIENTE"
+      ],
+      "prefix": "ESTADO: "
+    }
+  ],
+  "blocked_preamble": [
+    "╔════════════════════════════════════════════════════════════╗",
+    "║ ⛔⛔⛔  BLOQUEADO · EJECUCIÓN DETENIDA  ⛔⛔⛔              ║",
+    "╠════════════════════════════════════════════════════════════╣",
+    "║ MOTIVO: <nonempty>                                        ║",
+    "║ RDC: <REQUERIDA|NO VERIFICADA|NO DISPONIBLE>               ║",
+    "║ ESTADO DEL CICLO: BLOQUEADO                                ║",
+    "║ CONVERSACIÓN: ABIERTA PARA RESOLUCIÓN                      ║",
+    "╚════════════════════════════════════════════════════════════╝"
+  ],
+  "states": {
+    "CI": [
+      "✓",
+      "?",
+      "!"
+    ],
+    "RDC": [
+      "SI",
+      "NO",
+      "PENDIENTE"
+    ],
+    "S": [
+      "ACTIVA",
+      "INACTIVA",
+      "NO VERIFICADA"
+    ],
+    "F": [
+      "✓",
+      "?",
+      "!"
+    ],
+    "K": [
+      "✓",
+      "OFF",
+      "?",
+      "!"
+    ],
+    "T": [
+      "✓",
+      "?",
+      "!"
+    ],
+    "ESTADO": [
+      "COMPLETADO",
+      "BLOQUEADO",
+      "PENDIENTE"
+    ]
+  },
+  "policy": {
+    "verified_cycle_requires_exact_output": true,
+    "release_requires_validated_output": true,
+    "renderer_is_canonical": true,
+    "validator_rejects_unknown_fields": true
+  }
+}
