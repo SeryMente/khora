@@ -2,7 +2,7 @@
 
 **Identificador:** OEP  
 **Nombre completo:** Persistencia de Entorno Operativo  
-**Versión:** v0.1.1  
+**Versión:** v0.1.2  
 **Estado:** ACTIVO · CANÓNICO PARA ESTE ÁMBITO · EN EVOLUCIÓN CONTROLADA  
 **Sistema emisor:** KHORA  
 **Plataforma objetivo actual:** Windows
@@ -266,7 +266,21 @@ Se prevé un Hub gráfico como capa superior para iniciar, seleccionar repositor
 
 OEP conserva su identidad aunque se acceda mediante navegador, KHORA, PowerShell, RDC, Hub futuro u otro mecanismo autorizado. La interfaz no define el sistema.
 
-## 47. Resiliencia de contexto
+## 47. Ciclo operativo 001 — Perfil de host
+
+**Desafío:** hacer que OEP conozca las capacidades y señales del host antes de declarar el entorno operativo.
+
+**Implementado:** `scripts/khora/khora.ps1` amplía `EP-IN-010` para capturar un perfil `oep-host-profile/v1` y lo persiste dentro del volumen cifrado como `session-state/host-profile.v1.json`; `session-manifest.json` registra esquema, ruta y clasificación. `modules/00-config.ps1` carga el perfil para etapas posteriores.
+
+**Evidencia RDC en PC-7:** Windows 11 Pro build 26200; usuario `PC 7`; administrador `true`; Escritorio `C:\Users\PC 7\Desktop`; ~1002.28 GiB libres en C:; Git y GitHub CLI portátiles presentes en `Desktop\_BootstrapTools`; Node.js y npm presentes; Python resuelve a WindowsApps; VS Code, Notepad++, OBS y AutoHotkey no encontrados por `Get-Command`.
+
+**Señales de administración:** `cyberclient`, `cyberclientproxy`, `vigia`, `DFLocker64` y otras; clasificación `managed-or-public-suspected`, sin inferir ubicación.
+
+**BitLocker del sistema observado:** `FullyEncrypted`, `Protection=Off`, `XtsAes128`, `100%`. Describe C: y **no equivale a EP-IN-030**, que verifica el VHDX de trabajo con XTS-AES-256 y protección activa.
+
+**Resultado:** `RESUELTO` para captura/persistencia del perfil; `NO-VERIFICADO` para bootstrap OEP completo en este host.
+
+## 48. Resiliencia de contexto
 
 Las propiedades esenciales no deben depender de memoria conversacional. Si una propiedad solo existe en la conversación y no en este objeto o una fuente canónica referenciada, existe una deficiencia de resiliencia y debe corregirse en un ciclo.
 
@@ -305,6 +319,7 @@ La ubicación modifica parámetros de ejecución, no el objetivo del sistema. CS
 - `OEP-DEC-019`: la selección de repositorios debe poder ser parcial.
 - `OEP-DEC-020`: debe contemplarse revisión de sesiones RDC.
 - `OEP-DEC-021`: se prevé un Hub gráfico para OEP.
+- `OEP-DEC-022`: el perfil de host/ubicación es estado de primera clase del arranque y queda persistido dentro del volumen cifrado.
 
 ## 52. Pendientes actuales
 
@@ -340,6 +355,9 @@ Primer objeto canónico transversal de contexto de OEP.
 ### v0.1.1
 Endurecimiento para autosuficiencia y resiliencia de contexto; se añadieron autoridad y snapshots, taxonomía del conocimiento, invariantes, estados, reconciliación, reglas de no-inferencia, recuperación de contexto, resiliencia ante contradicción y cambios de implementación/host, decisiones y pendientes formales, evidencia y cierre de ciclo.
 
+### v0.1.2
+Se incorpora el primer corte funcional de OEP: perfil de host `oep-host-profile/v1`, persistencia del perfil dentro del volumen cifrado, exposición al runtime mediante `session-manifest.json` y evidencia del primer host real observado por RDC.
+
 ## 57. Regla de modificación
 
 Toda modificación material debe aumentar versión, conservar historial, indicar qué cambió, conservar decisiones no sustituidas, marcar sustituciones explícitamente y conservar trazabilidad. No borrar contexto histórico relevante.
@@ -350,7 +368,7 @@ Toda modificación material debe aumentar versión, conservar historial, indicar
 
 ## 59. Estado al cierre
 
-**OEP:** `v0.1.1`  
+**OEP:** `v0.1.2`  
 **Estado:** ACTIVO  
 **Nivel:** arquitectura transversal en construcción  
 **Implementación completa:** NO VERIFICADA  
