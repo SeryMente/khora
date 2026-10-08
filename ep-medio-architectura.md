@@ -1,6 +1,6 @@
-# Entorno Persistente Medio · Arquitectura canónica v1.0.1
+# Entorno Persistente Medio · Arquitectura canónica v1.0.2
 
-**Estado:** normativa · actualización 1.0.1
+**Estado:** normativa · actualización 1.0.2
 **Host KHORA:** 7.5.1
 **Repositorio:** `SeryMente/khora`, tratado como privado
 **Punto de entrada único:** `scripts/khora/khora.ps1`
@@ -173,6 +173,7 @@ Formato técnico:
 | ID | Elemento | Criterio de salida |
 |---|---|---|
 | `EP-IN-010` | Windows, elevación y Escritorio | Windows, administrador, funciones requeridas, Escritorio local escribible y al menos 6 GiB libres |
+| `EP-IN-015` | workspace OEP visible | `Desktop/EP` es una junction NTFS verificada cuyo `Target` coincide exactamente con el workspace dentro del VHDX cifrado |
 | `EP-IN-020` | llave de bóveda | `SecureString` no vacío aceptado |
 | `EP-IN-030` | volumen cifrado | BitLocker `EncryptionMethod=XtsAes256`, `ProtectionStatus=On` y `EncryptionPercentage=100` |
 | `EP-IN-040` | limpieza al reinicio | tarea `AtStartup`, `SYSTEM`, privilegio máximo registrada |
@@ -238,7 +239,8 @@ No existe alternativa con Encrypting File System. Si falta BitLocker, elevación
 
 `<unidad>\khora-ep` contiene:
 
-- `repo\` — commit privado exacto y rama de continuidad;
+- `EP\` — raíz del workspace visible mediante la junction `Desktop/EP`; las carpetas de proyectos seleccionados viven aquí;
+- `repo\` — commit privado exacto y runtime de continuidad de KHORA;
 - `tools\` — Git, GitHub CLI, Node.js, Python, Vercel CLI 59.3.0 fijada y Visual Studio Code portátiles cuando faltan versiones aceptables del host;
 - `session-state\` — manifiesto y blobs de Protección de Datos de Windows;
 - `logs\` — registro local;
@@ -308,10 +310,16 @@ Los endpoints Bearer están excluidos del middleware de cookies, pero validan fo
 - `khora-web/lib/server/ep.ts` — tokens, autorización, bitácora y consulta;
 - `khora-web/app/api/ep/*` — API;
 - `khora-web/app/sistema/seguridad/page.tsx` — emisión autenticada, copia independiente y bitácora;
+- `scripts/khora/khora.ps1` — `EP-IN-015` crea/verifica `Desktop/EP` como junction al workspace cifrado;
+- `scripts/khora/modules/00-config.ps1` — expone `workspaceDir` y `desktopWorkspaceLink` al runtime;
 - `khora-web/db/migrations/016_ep_persistent_sessions.sql` — persistencia;
 - `scripts/khora/tests/Test-Arranque.ps1` y `tests/validate_ep.py` — validación.
 
-## 13. Validación de versión
+## 13. Contrato del workspace visible
+
+`Desktop/EP` no es almacenamiento adicional. Es una junction NTFS al directorio `EP` dentro del VHDX cifrado. El arranque falla cerrado si `Desktop/EP` ya existe y no es una junction cuyo `Target` coincide exactamente con el directorio de workspace de la sesión. La salida elimina primero la junction y después bloquea/desmonta el VHDX. La eliminación utiliza I/O .NET para evitar el fallo conocido de `Remove-Item` con rutas 8.3 en PowerShell 5.1.
+
+## 14. Validación de versión
 
 La restauración no se considera ejecutada en Windows hasta pasar, en una máquina de prueba:
 
@@ -330,6 +338,6 @@ La restauración no se considera ejecutada en Windows hasta pasar, en una máqui
 
 Las verificaciones Linux o estáticas no sustituyen esta matriz. Cualquier resultado no ejecutado debe declararse **NO VERIFICADO**.
 
-## 14. Huellas de implementación
+## 15. Huellas de implementación
 
 El paquete final incluye `ep-integrity-manifest.sha256`, calculado después de todas las modificaciones. El manifiesto no se incluye a sí mismo y cubre la arquitectura, gate, módulos, API, migración y pruebas. Un modelo debe verificarlo antes de atribuir comportamiento a v1.0.
