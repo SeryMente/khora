@@ -41,29 +41,30 @@ export async function GET(
 
     await asegurarColumnasDictado();
     const db = getDb();
-    const sourceResult = await db.query(
-      "SELECT driver FROM volcado WHERE session_id = $1 ORDER BY recibido_en DESC LIMIT 1",
-      [sessionId],
-    );
-    if (sourceResult.rows.length === 0 || sourceResult.rows[0].driver !== "audio_archivo") {
-      return NextResponse.json({
-        error: "audio_no_es_importacion_original",
-        detail: "Esta sesión no está registrada como importación de un archivo original. No se concatenarán partes de una grabación como si fueran un archivo fuente.",
-      }, { status: 409 });
-    }
+    const db = getDb();
     const result = await db.query(
-      `SELECT part_index, blob_url, blob_path, bytes, sha256, estado_verificacion
-       FROM dictado_audio_parte
-       WHERE session_id = $1
-       ORDER BY part_index ASC`,
+      `SELECT p.part_index, p.blob_url, p.blob_path, p.bytes, p.sha256,
+              p.estado_verificacion, p.fuente_audio, v.driver
+       FROM dictado_audio_parte p
+       LEFT JOIN dictado_session s ON s.session_id = p.session_id
+       LEFT JOIN volcado v ON v.id = s.volcado_id
+       WHERE p.session_id = $1
+       ORDER BY p.part_index ASC`,
       [sessionId],
     );
     const parts = result.rows as Array<{
       part_index: number; blob_url: string; blob_path: string | null;
       bytes: number; sha256: string | null; estado_verificacion: string | null;
+      fuente_audio: string | null; driver: string | null;
     }>;
     if (!parts.length) {
       return NextResponse.json({ error: "audio_no_vinculado", detail: "La sesión no tiene audio original persistido." }, { status: 404 });
+    }
+    if (parts[0].fuente_audio !== "audio_archivo" && parts[0].driver !== "audio_archivo") {
+      return NextResponse.json({
+        error: "audio_no_es_importacion_original",
+        detail: "Esta sesión no está registrada como importación de un archivo original. No se concatenarán partes de una grabación como si fueran un archivo fuente.",
+      }, { status: 409 });
     }
     if (parts.length !== 1 || Number(parts[0].part_index) !== 1) {
       return NextResponse.json({
