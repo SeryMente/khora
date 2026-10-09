@@ -77,7 +77,7 @@ test("EP Security: Token creation, audience, scopes and command secrecy", async 
     assert.equal(decoded.iss, "khora-ep");
     assert.equal(decoded.aud, "https://khora.example.com/api/ep");
     assert.equal(decoded.sub, email);
-    assert.equal(decoded.scope, "ep:bootstrap ep:logs:write ep:logs:read");
+    assert.equal(decoded.scope, "ep:bootstrap ep:github:token ep:logs:write ep:logs:read");
     assert.equal(decoded.typ, "ep-session");
     assert.equal(decoded.launchMode, "normal");
 
@@ -280,6 +280,42 @@ test("EP Security UI isolates Entorno Persistente as a submodule and keeps crede
   assert.doesNotMatch(source, /console\.(log|debug|info)\s*\(/);
 });
 
+test("EP Security: GitHub PAT is encrypted at rest and only served to an EP bearer session", () => {
+  const vault = readFileSync(new URL("../../lib/server/ep-github-credential.ts", import.meta.url), "utf8");
+  const manageRoute = readFileSync(new URL("../../app/api/ep/github-credential/route.ts", import.meta.url), "utf8");
+  const tokenRoute = readFileSync(new URL("../../app/api/ep/github-token/route.ts", import.meta.url), "utf8");
+  const bootstrap = readFileSync(new URL("../../../scripts/khora/khora.ps1", import.meta.url), "utf8");
+
+  assert.match(vault, /createCipheriv\("aes-256-gcm"/);
+  assert.match(vault, /createDecipheriv\("aes-256-gcm"/);
+  assert.match(vault, /ON CONFLICT\(singleton_id\) DO UPDATE SET ciphertext=EXCLUDED\.ciphertext/);
+  assert.match(manageRoute, /getEpGitHubCredentialStatus/);
+  assert.doesNotMatch(manageRoute, /NextResponse\.json\(\{\s*token\s*,/);
+  assert.match(tokenRoute, /authenticateEpBearer\(req, \["ep:github:token"\]\)/);
+  assert.match(tokenRoute, /getStoredEpGitHubToken\(\)/);
+  assert.match(bootstrap, /\/github-token/);
+  assert.doesNotMatch(bootstrap, /Copia un Personal Access Token de GitHub con escritura/);
+});
+
+test("EP Security: OEP master password is independent from general KHORA OIDC", () => {
+  const masterPage = readFileSync(new URL("../../app/auth/ep/page.tsx", import.meta.url), "utf8");
+  const masterAuth = readFileSync(new URL("../../app/api/ep/master-auth/route.ts", import.meta.url), "utf8");
+  const masterVerifier = readFileSync(new URL("../../lib/server/ep-master-password.ts", import.meta.url), "utf8");
+  const session = readFileSync(new URL("../../lib/ep-master-session.ts", import.meta.url), "utf8");
+  const middlewareSource = readFileSync(new URL("../../middleware.ts", import.meta.url), "utf8");
+
+  assert.match(masterPage, /Contraseña maestra de OEP/);
+  assert.match(masterAuth, /authenticateEpMasterPassword/);
+  assert.match(masterAuth, /epMasterCookieOptions/);
+  assert.match(masterVerifier, /scryptSync/);
+  assert.match(masterVerifier, /timingSafeEqual/);
+  assert.match(masterVerifier, /MAX_ATTEMPTS = 8/);
+  assert.match(session, /httpOnly: true/);
+  assert.match(session, /sameSite: "strict"/);
+  assert.match(middlewareSource, /readEpMasterEmail/);
+  assert.match(middlewareSource, /auth\/ep/);
+});
+ 
 test("EP Security: Middleware 308 redirect opens the Entorno Persistente submodule", async () => {
   const req = new NextRequest("https://khora.example.com/sistema/entorno-persistente");
   const waitUntilTasks: Promise<unknown>[] = [];
