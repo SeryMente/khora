@@ -301,6 +301,8 @@ test("EP Security: GitHub PAT is encrypted at rest and only served to an EP bear
   assert.match(panel, /const catalogLoaded = await loadRepoCatalog\(true\)/);
   assert.match(bootstrap, /\/github-token/);
   assert.doesNotMatch(bootstrap, /Copia un Personal Access Token de GitHub con escritura/);
+  assert.match(vault, /gho_\[A-Za-z0-9\]\{20,\}/);
+  assert.match(bootstrap, /gho_\[A-Za-z0-9\]\{20,\}/);
 });
 
 test("EP Security: OEP master password is independent from general KHORA OIDC", () => {
