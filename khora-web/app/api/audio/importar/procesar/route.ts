@@ -117,8 +117,21 @@ export async function POST(request: Request) {
         estadoVerificacion: "verificado",
       });
     } catch (error) {
-      await del(stored.url).catch(() => undefined);
-      throw error;
+      // La copia cifrada ya se verificó contra el original. Si falla el vínculo,
+      // mantenerla y devolver su localizador para recuperación; no destruir evidencia.
+      return NextResponse.json(
+        {
+          error: "audio_almacenado_no_vinculado",
+          detail: "El audio importado se almacenó y verificó, pero no pudo vincularse a la sesión. El objeto cifrado se conserva para recuperación; no se considera archivado.",
+          sessionId,
+          audioUrl: stored.url,
+          blobPath: destination,
+          audioBytes: clear.length,
+          sha256,
+          causa: error instanceof Error ? error.message : String(error),
+        },
+        { status: 503 },
+      );
     }
 
     return NextResponse.json({
