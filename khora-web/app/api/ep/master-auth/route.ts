@@ -33,7 +33,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "master_auth_rejected" }, { status: 401, headers: NO_STORE });
   }
 
-  const result = await authenticateEpMasterPassword(password, req);
+  let result: Awaited<ReturnType<typeof authenticateEpMasterPassword>>;
+  try { result = await authenticateEpMasterPassword(password, req); }
+  catch { result = "unavailable"; }
   if (result === "rate_limited") {
     return NextResponse.json({ error: "master_auth_rate_limited" }, { status: 429, headers: NO_STORE });
   }
