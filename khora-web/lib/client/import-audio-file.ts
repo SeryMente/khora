@@ -105,10 +105,29 @@ export async function importAndTranscribeAudio(args: {
     };
   }
 
-  const transcription = await transcribeStoredSession(
-    args.sessionId,
-    args.previewText,
-  );
+  let transcription: { ok: boolean; data: Record<string, any> };
+  try {
+    transcription = await transcribeStoredSession(
+      args.sessionId,
+      args.previewText,
+    );
+  } catch (cause) {
+    // La custodia ya quedó verificada en el servidor. Un fallo de red de STT
+    // no debe ocultar el localizador ni hacer que Ingreso olvide el original.
+    return {
+      ok: false,
+      data: {
+        sessionId: args.sessionId,
+        audioUrl: stored.audioUrl,
+        audioBytes: stored.audioBytes,
+        mimeType: stored.mimeType,
+        sha256: stored.sha256,
+        verificado: stored.verificado === true,
+        estadoTranscripcion: "fallido",
+        detail: `El audio original quedó almacenado y verificado, pero falló la solicitud de transcripción: ${cause instanceof Error ? cause.message : String(cause)}. Puedes custodiarlo y exportarlo sin transcripción.`,
+      },
+    };
+  }
 
   return {
     ok: transcription.ok && transcription.data?.exito === true,
