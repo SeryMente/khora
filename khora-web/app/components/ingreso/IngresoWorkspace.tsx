@@ -1,8 +1,7 @@
 // @l0 L0-002-R · @req UI-04/INGRESO-INTEGRADO
 "use client";
 
-import { useCallback, useEffect, useRef, useState, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ensamblarParrafos, Fragmento } from "../../../lib/transcripcion/ensamblar";
 import { reconciliarSegmentos, type SegmentoReconciliado } from "../../../lib/transcripcion/reconciliar";
 import { IngresoView } from "../shared/IngresoView";
@@ -10,9 +9,7 @@ import { transcribeStoredSession } from "../../../lib/client/authoritative-trans
 import { importAndTranscribeAudio } from "../../../lib/client/import-audio-file";
 import { cerrarEdicionInSitu } from "../../../lib/client/edicion-in-situ";
 import { registerKhoraLockCheckpoint, reportKhoraActivity } from "../AutoLockProvider";
-import { IngresoModeNav, type IngresoWorkspaceMode } from "./IngresoModeNav";
-import { IngresoRevisionPanel } from "./IngresoRevisionPanel";
-import { IngresoIngestaPanel } from "./IngresoIngestaPanel";
+
 
 type Estado = "inactivo" | "dictando";
 
@@ -33,20 +30,10 @@ function generarSesionId() {
 }
 
 export function IngresoWorkspace() {
-  return (
-    <Suspense fallback={<p style={{ padding: "2rem", color: "var(--khora-accent)" }}>Cargando…</p>}>
-      <IngresoContenido />
-    </Suspense>
-  );
+  return <IngresoContenido />;
 }
 
 function IngresoContenido() {
-  const searchParams = useSearchParams();
-  const modoParam = searchParams?.get("modo");
-  const modoWorkspace: IngresoWorkspaceMode = modoParam === "dictado" || modoParam === "captura" || modoParam === "archivo" || modoParam === "revision" || modoParam === "ingesta" ? modoParam : "nuevo";
-  const volcadoId = searchParams?.get("volcado_id") ?? null;
-  const versionParam = Number(searchParams?.get("version"));
-  const version = Number.isInteger(versionParam) && versionParam >= 1 ? versionParam : null;
 
   const [segmentos, setSegmentos] = useState<SegmentoReconciliado[]>([]);
   const [pendiente, setPendiente] = useState("");
@@ -61,6 +48,7 @@ function IngresoContenido() {
   const [generandoTitulo, setGenerandoTitulo] = useState(false);
   const [retranscribiendo, setRetranscribiendo] = useState(false);
   const [adjuntandoAudio, setAdjuntandoAudio] = useState(false);
+  const [exportandoAudio, setExportandoAudio] = useState(false);
   const [resultado, setResultado] = useState("");
   const [soportado, setSoportado] = useState(true);
   const [conAudio, setConAudio] = useState(false);
@@ -102,9 +90,9 @@ function IngresoContenido() {
 
   const sesionIdRef = useRef<string>("");
   const modoEntradaRef = useRef<"ninguno" | "microfono" | "chrome_live_caption">("ninguno");
-  const fuenteEntradaSesionRef = useRef<"microfono" | "chrome_live_caption" | null>(null);
+  const fuenteEntradaSesionRef = useRef<"texto" | "microfono" | "chrome_live_caption" | "audio_archivo" | null>(null);
   const parteConsecutivaRef = useRef<number>(1);
-  const partesSubidasRef = useRef<{ parte: number; url: string; bytes: number; fuenteAudio?: "microphone" | "chrome_tab"; start_ms?: number; end_ms?: number; duracion_ms?: number; sha256?: string; verificado?: boolean }[]>([]);
+  const partesSubidasRef = useRef<{ parte: number; url: string; bytes: number; fuenteAudio?: "microphone" | "chrome_tab" | "audio_archivo"; nombreOriginal?: string | null; mimeType?: string | null; start_ms?: number; end_ms?: number; duracion_ms?: number; sha256?: string; verificado?: boolean }[]>([]);
   const parteTrozosRef = useRef<Blob[]>([]);
   const parteInicioRef = useRef<number>(0);
   const subidaEnCursoRef = useRef<Promise<void> | null>(null);
@@ -858,7 +846,21 @@ function IngresoContenido() {
   const guardar = useCallback(async () => {
     setError("");
     setResultado("");
-    if (texto.trim().length === 0) { setError("no hay nada que archivar"); return; }
+    if (archivado) {
+      setError("Esta captura ya está archivada y sellada. Pulsa Limpiar para iniciar una captura nueva.");
+      return;
+    }
+    const archivoOriginalVerificado =
+      fuenteEntradaSesionRef.current === "audio_archivo" &&
+      partesSubidasRef.current.length === 1 &&
+      partesSubidasRef.current[0].verificado === true &&
+      Number(partesSubidasRef.current[0].bytes) > 0 &&
+      /^[0-9a-f]{64}$/i.test(String(partesSubidasRef.current[0].sha256 ?? ""));
+    if (texto.trim().length === 0 && !archivoOriginalVerificado) {
+      setError("No hay transcripción para archivar. Puedes custodiar el audio original si su almacenamiento y SHA-256 ya están verificados.");
+      return;
+    }
+    if (!sesionIdRef.current) sesionIdRef.current = generarSesionId();
     setGuardando(true);
     try {
       if (subidaEnCursoRef.current) {
@@ -868,14 +870,27 @@ function IngresoContenido() {
       let audioUrl: string | null = null;
       let audioBytes: number | null = null;
       const partes = partesSubidasRef.current;
-      const audioEsperado = fuenteEntradaSesionRef.current === "microfono" || fuenteEntradaSesionRef.current === "chrome_live_caption";
+      const fuenteEntrada = fuenteEntradaSesionRef.current;
+      const audioEsperado = fuenteEntrada === "microfono" || fuenteEntrada === "chrome_live_caption" || fuenteEntrada === "audio_archivo";
+      const audioImportado = fuenteEntrada === "audio_archivo";
       const partesGeneradas = partesRawRef.current.length;
       const indicesSubidos = new Set(partes.map((p) => p.parte));
-      const audioIntegro = audioEsperado && partesGeneradas > 0
-        ? partes.length === partesGeneradas &&
-          [...Array(partesGeneradas)].every((_, i) => indicesSubidos.has(i + 1)) &&
-          partes.every((p) => p.verificado === true && /^[0-9a-f]{64}$/i.test(String(p.sha256 ?? "")))
-        : !audioEsperado;
+      const todasLasPartesVerificadas = partes.length > 0 &&
+        partes.every((p) => p.verificado === true &&
+          Number(p.bytes) > 0 &&
+          /^[0-9a-f]{64}$/i.test(String(p.sha256 ?? "")));
+      const indicesContiguos = [...partes]
+        .sort((a, b) => a.parte - b.parte)
+        .every((p, i) => p.parte === i + 1);
+      const audioIntegro = audioImportado
+        ? partes.length === 1 && partes[0].parte === 1 && todasLasPartesVerificadas
+        : fuenteEntrada === "microfono" && partesGeneradas > 0
+          ? partes.length === partesGeneradas &&
+            [...Array(partesGeneradas)].every((_, i) => indicesSubidos.has(i + 1)) &&
+            todasLasPartesVerificadas
+          : fuenteEntrada === "chrome_live_caption"
+            ? todasLasPartesVerificadas && indicesContiguos
+            : !audioEsperado;
 
       if (audioEsperado && !audioIntegro) {
         setError("No se puede archivar el volcado: Khora no ha verificado la custodia íntegra de todas las partes de audio.");
@@ -899,7 +914,7 @@ function IngresoContenido() {
         pulidoAplicado: pulidosOk > 0,
         audioPartes: partes.length > 0 ? partes : null,
         estadoTranscripcion: estadoTranscripcionRef.current || null,
-        fuenteEntrada: fuenteEntradaSesionRef.current || "microfono",
+        fuenteEntrada: fuenteEntradaSesionRef.current || "texto",
       };
 
       let rv: Response;
@@ -921,7 +936,9 @@ function IngresoContenido() {
         if (!rv.ok) {
           setError(String(dv?.detail || "Error desconocido") + " " + String(dv?.causa ?? ""));
         } else {
-          setResultado("archivado " + String(dv?.chars) + " caracteres, sha " + String(dv?.sha256).slice(0, 8) + (audioUrl ? `, con audio (${partes.length} partes)` : ", sin audio"));
+          setArchivado(true);
+          setResultado((dv?.idempotent ? "volcado ya archivado " : "archivado ") + String(dv?.chars) + " caracteres, sha " + String(dv?.sha256).slice(0, 8) + (audioUrl ? `, con audio (${partes.length} partes)` : ", sin audio"));
+          setAviso("Captura sellada. La revisión y las correcciones se hacen en Volcados; pulsa Limpiar para empezar una captura nueva.");
         }
       } catch (err) {
         setError("Error de red al guardar: " + String(err));
@@ -931,9 +948,63 @@ function IngresoContenido() {
     } finally {
       setGuardando(false);
     }
-  }, [texto, titulo, pulidosOk]);
+  }, [archivado, texto, titulo, pulidosOk]);
+
+
+  const exportarAudioOriginal = useCallback(async () => {
+    const sessionId = sesionIdRef.current;
+    const partes = partesSubidasRef.current;
+    if (!sessionId || fuenteEntradaSesionRef.current !== "audio_archivo" ||
+        partes.length !== 1 || partes[0].verificado !== true ||
+        !/^[0-9a-f]{64}$/i.test(String(partes[0].sha256 ?? ""))) {
+      setError("El audio original aún no dispone de una custodia verificada para exportarlo.");
+      return;
+    }
+    setExportandoAudio(true);
+    setError("");
+    try {
+      const response = await fetch(`/api/audio/sesion/${encodeURIComponent(sessionId)}/exportar`, { cache: "no-store" });
+      if (!response.ok) {
+        let detail = `No se pudo exportar el audio original (HTTP ${response.status}).`;
+        try {
+          const data = await response.json();
+          if (typeof data?.detail === "string") detail = data.detail;
+        } catch {}
+        throw new Error(detail);
+      }
+      const original = await response.blob();
+      const url = URL.createObjectURL(original);
+      const link = document.createElement("a");
+      link.href = url;
+      const disposition = response.headers.get("content-disposition") || "";
+      const nameMatch = disposition.match(/filename="?([^";]+)"?/i);
+      const utf8NameMatch = disposition.match(/filename\*=UTF-8''([^;]+)/i);
+      let downloadName = nameMatch?.[1] || "audio-original";
+      if (utf8NameMatch?.[1]) {
+        try {
+          downloadName = decodeURIComponent(utf8NameMatch[1]);
+        } catch {
+          // El nombre ASCII seguro sigue disponible como fallback.
+        }
+      }
+      link.download = downloadName;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (cause) {
+      setError(String(cause instanceof Error ? cause.message : cause));
+    } finally {
+      setExportandoAudio(false);
+    }
+  }, []);
 
   const handleAdjuntarAudio = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (archivado) {
+      setError("Esta captura ya está archivada. Pulsa Limpiar antes de adjuntar audio a una captura nueva.");
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
     const file = e.target.files?.[0];
     if (!file) return;
     setAdjuntandoAudio(true);
@@ -948,12 +1019,29 @@ function IngresoContenido() {
         previewText: texto,
       });
       const data = result.data;
-      if (data.audioUrl) {
-        partesSubidasRef.current = [{ parte: 1, url: data.audioUrl, bytes: data.audioBytes || file.size, sha256: data.sha256 || "", verificado: data.verificado === true }];
+      const localizadorRecuperacion =
+        typeof data.audioUrl === "string" ? data.audioUrl :
+        typeof data.stagingUrl === "string" && data.recuperable === true ? data.stagingUrl : null;
+      if (localizadorRecuperacion) {
+        fuenteEntradaSesionRef.current = "audio_archivo";
+        partesSubidasRef.current = [{
+          parte: 1,
+          url: localizadorRecuperacion,
+          bytes: data.audioBytes || file.size,
+          sha256: data.sha256 || "",
+          fuenteAudio: "audio_archivo",
+          nombreOriginal: typeof data.originalName === "string" && data.originalName.trim() ? data.originalName : file.name,
+          mimeType: typeof data.mimeType === "string" && data.mimeType.trim() ? data.mimeType : file.type,
+          verificado: data.verificado === true,
+        }];
         setPartesContador(1);
         setBytesAcumulados(data.audioBytes || file.size);
         setConAudio(true);
       }
+      estadoTranscripcionRef.current =
+        typeof data.estadoTranscripcion === "string"
+          ? data.estadoTranscripcion
+          : result.ok ? "completo" : "fallido";
       if (result.ok && typeof data.textoFinal === "string") {
         const reconciled = reconciliarSegmentos(segmentosRef.current, data.textoFinal);
         segmentosRef.current = reconciled.segmentos;
@@ -961,7 +1049,8 @@ function IngresoContenido() {
         setTexto(data.textoFinal);
         setReconciliacionMensaje(data.motivoReconciliacion || "Audio adjuntado y transcrito exitosamente.");
       } else {
-        setAviso(data.detail || "Audio almacenado; la transcripción puede reintentarse.");
+        const localizador = localizadorRecuperacion ? " Localizador recuperable: " + localizadorRecuperacion + "." : "";
+        setAviso((data.detail || "Audio original almacenado; la transcripción puede reintentarse.") + localizador + (data.verificado === true ? " El audio original está verificado y puede archivarse aunque falle la transcripción." : " La custodia aún no está verificada; no archives esta captura."));
       }
     } catch (cause) {
       setError(`Error al adjuntar archivo de audio: ${String(cause)}`);
@@ -1112,28 +1201,10 @@ function IngresoContenido() {
     }
   };
 
-  if (modoWorkspace === "revision") {
-    return (
-      <main style={{ width: "100%", maxWidth: 1240, minWidth: 0, margin: "0 auto", padding: 24, boxSizing: "border-box" }}>
-        <IngresoModeNav activeMode="revision" />
-        <IngresoRevisionPanel />
-      </main>
-    );
-  }
-
-  if (modoWorkspace === "ingesta") {
-    return (
-      <main style={{ width: "100%", maxWidth: 1240, minWidth: 0, margin: "0 auto", padding: 24, boxSizing: "border-box" }}>
-        <IngresoModeNav activeMode="ingesta" />
-        <IngresoIngestaPanel volcadoId={volcadoId} version={version} />
-      </main>
-    );
-  }
-
   return (
     <>
       <div style={{ width: "100%", maxWidth: 1240, minWidth: 0, margin: "0 auto", padding: "16px 24px 0", boxSizing: "border-box" }}>
-        <IngresoModeNav activeMode={modoWorkspace} />
+        
       </div>
       <input
         ref={fileInputRef}
@@ -1159,6 +1230,8 @@ function IngresoContenido() {
         generandoTitulo,
         retranscribiendo,
         adjuntandoAudio,
+        exportandoAudio,
+        audioExportable: fuenteEntradaSesionRef.current === "audio_archivo" && partesSubidasRef.current.length === 1 && partesSubidasRef.current[0].verificado === true && /^[0-9a-f]{64}$/i.test(String(partesSubidasRef.current[0].sha256 ?? "")),
         conAudio,
         partesContador,
         bytesAcumulados,
@@ -1180,6 +1253,7 @@ function IngresoContenido() {
         onDetener: detener,
         onGuardar: guardar,
         onAdjuntarClick: () => fileInputRef.current?.click(),
+        onExportarAudio: exportarAudioOriginal,
         onLimpiar: limpiar,
         onConfirmarEdicion: confirmarEdicion,
       }}

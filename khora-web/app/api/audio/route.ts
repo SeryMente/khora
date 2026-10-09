@@ -1,5 +1,5 @@
 // @l0 L0-002-R · @req FIX-DICTADO/D2-D8 · @req TRACE-SESSION/010
-import { del, put } from "@vercel/blob";
+import { put } from "@vercel/blob";
 import { NextResponse } from "next/server";
 import { createHash } from "crypto";
 import { cifrarBytes, descifrarBytes } from "../../../lib/server/cripto";
@@ -72,14 +72,25 @@ export async function POST(req: Request) {
       contentType: "application/octet-stream",
     });
 
-    // Verificación post-escritura: recuperar el objeto recién almacenado,
-    // descifrarlo y comparar bytes + SHA-256 antes de marcar la parte como verificada.
+    // Tras escribir el blob, una falla de verificación lo deja en cuarentena:
+    // se conserva el localizador, pero nunca se declara ni registra como verificado.
     try {
       const verificacion = await fetch(subido.url, { cache: "no-store" });
       if (!verificacion.ok) {
-        await del(subido.url).catch(() => undefined);
         return NextResponse.json(
-          { error: "audio_no_verificable", detail: `No se pudo releer el audio almacenado (HTTP ${verificacion.status}).` },
+          {
+            error: "audio_no_verificable",
+            detail: `No se pudo releer el audio almacenado (HTTP ${verificacion.status}). El objeto se conserva para recuperación y no puede archivarse.`,
+            sessionId: String(sesionId).trim(),
+            partIndex,
+            url: subido.url,
+            blobPath: destino,
+            bytes: crudo.length,
+            sha256,
+            fuenteAudio,
+            verificado: false,
+            recuperable: true,
+          },
           { status: 502 },
         );
       }
@@ -89,23 +100,41 @@ export async function POST(req: Request) {
       const shaVerificado = createHash("sha256").update(almacenado).digest("hex");
 
       if (almacenado.length !== crudo.length || shaVerificado !== sha256) {
-        await del(subido.url).catch(() => undefined);
         return NextResponse.json(
           {
             error: "audio_corrupto",
-            detail: "La verificación post-escritura no coincide con el audio recibido.",
+            detail: "La verificación post-escritura no coincide. El objeto se conserva para reconciliación, pero queda no verificado y no puede archivarse.",
+            sessionId: String(sesionId).trim(),
+            partIndex,
+            url: subido.url,
+            blobPath: destino,
             bytesEsperados: crudo.length,
             bytesRecuperados: almacenado.length,
             sha256Esperado: sha256,
             sha256Recuperado: shaVerificado,
+            sha256,
+            fuenteAudio,
+            verificado: false,
+            recuperable: true,
           },
           { status: 502 },
         );
       }
     } catch (verificationError) {
-      await del(subido.url).catch(() => undefined);
       return NextResponse.json(
-        { error: "audio_no_verificable", detail: `Falló la verificación post-escritura: ${String(verificationError)}` },
+        {
+          error: "audio_no_verificable",
+          detail: `Falló la verificación post-escritura: ${String(verificationError)}. El blob se conserva en cuarentena recuperable y no puede archivarse.`,
+          sessionId: String(sesionId).trim(),
+          partIndex,
+          url: subido.url,
+          blobPath: destino,
+          bytes: crudo.length,
+          sha256,
+          fuenteAudio,
+          verificado: false,
+          recuperable: true,
+        },
         { status: 502 },
       );
     }
@@ -124,18 +153,24 @@ export async function POST(req: Request) {
           endMs,
           duracionMs,
         });
-      } catch {
-        await del(subido.url).catch(() => undefined);
+      } catch (linkError) {
+        // El objeto ya fue releído, descifrado y comparado. No borrarlo porque
+        // una falla de vínculo no debe destruir el único original verificado.
         return NextResponse.json(
           {
             error: "audio_almacenado_no_vinculado",
             detail:
-              "El audio quedó almacenado, pero no pudo vincularse a la sesión. No se declarará guardado hasta reparar el vínculo.",
+              "El audio cifrado se almacenó y verificó, pero falló el vínculo a la sesión. El objeto se conserva para recuperación; reintenta con el mismo sessionId/partIndex y no lo archives aún.",
             sessionId: String(sesionId).trim(),
             partIndex,
+            url: subido.url,
+            blobPath: destino,
             bytes: crudo.length,
             sha256,
             fuenteAudio,
+            causa: linkError instanceof Error ? linkError.message : String(linkError),
+            verificado: false,
+            recuperable: true,
           },
           { status: 503 },
         );

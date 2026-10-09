@@ -88,13 +88,47 @@ export async function importAndTranscribeAudio(args: {
   });
   const stored = await readJson(storedResponse);
   if (!storedResponse.ok) {
-    throw new Error(stored.detail || "No se pudo custodiar el audio importado");
+    // Propagar el objeto recuperable al espacio de Ingreso sin afirmar custodia.
+    // El archivo local original sigue disponible para una nueva verificación.
+    return {
+      ok: false,
+      data: {
+        ...stored,
+        sessionId: args.sessionId,
+        stagingUrl: typeof stored.stagingUrl === "string" ? stored.stagingUrl : stagingBlob.url,
+        audioBytes: typeof stored.audioBytes === "number" ? stored.audioBytes : args.file.size,
+        sha256: typeof stored.sha256 === "string" ? stored.sha256 : undefined,
+        verificado: false,
+        recuperable: stored.recuperable === true || typeof stored.audioUrl === "string" || typeof stored.stagingUrl === "string",
+        detail: stored.detail || "No se pudo verificar el audio importado. El archivo local original se conserva; no archives esta captura hasta completar la verificación.",
+      },
+    };
   }
 
-  const transcription = await transcribeStoredSession(
-    args.sessionId,
-    args.previewText,
-  );
+  let transcription: { ok: boolean; data: Record<string, any> };
+  try {
+    transcription = await transcribeStoredSession(
+      args.sessionId,
+      args.previewText,
+    );
+  } catch (cause) {
+    // La custodia ya quedó verificada en el servidor. Un fallo de red de STT
+    // no debe ocultar el localizador ni hacer que Ingreso olvide el original.
+    return {
+      ok: false,
+      data: {
+        sessionId: args.sessionId,
+        audioUrl: stored.audioUrl,
+        audioBytes: stored.audioBytes,
+        mimeType: stored.mimeType,
+        originalName: stored.originalName,
+        sha256: stored.sha256,
+        verificado: stored.verificado === true,
+        estadoTranscripcion: "fallido",
+        detail: `El audio original quedó almacenado y verificado, pero falló la solicitud de transcripción: ${cause instanceof Error ? cause.message : String(cause)}. Puedes custodiarlo y exportarlo sin transcripción.`,
+      },
+    };
+  }
 
   return {
     ok: transcription.ok && transcription.data?.exito === true,
@@ -104,6 +138,7 @@ export async function importAndTranscribeAudio(args: {
       audioUrl: stored.audioUrl,
       audioBytes: stored.audioBytes,
       mimeType: stored.mimeType,
+        originalName: stored.originalName,
       sha256: stored.sha256,
       verificado: stored.verificado === true,
       estadoTranscripcion: transcription.data?.estadoTranscripcion || "fallido",

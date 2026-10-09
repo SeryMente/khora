@@ -3,7 +3,7 @@ import { after, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { guardarDictado } from "../../../lib/server/dictado";
 import { espejarVolcado } from "../../../lib/server/espejoNotion";
-import { generarTituloFallback } from "../../../lib/server/titulos";
+import { generarTituloFallback, generarTituloDeUltimoRecurso } from "../../../lib/server/titulos";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -17,15 +17,32 @@ export async function POST(req: Request) {
     }
     const c = await req.json();
     const texto = typeof c?.texto === "string" ? c.texto : "";
-    if (texto.trim().length === 0) {
-      return NextResponse.json({ detail: "texto vacio" }, { status: 400 });
+    const fuenteEntrada =
+      c?.fuenteEntrada === "chrome_live_caption" ? "chrome_live_caption" :
+      c?.fuenteEntrada === "audio_archivo" ? "audio_archivo" :
+      c?.fuenteEntrada === "texto" ? "texto" : "microfono";
+    const audioPartes = Array.isArray(c?.audioPartes) ? c.audioPartes : null;
+    // El audio original puede custodiarse aunque la transcripción haya fallado.
+    // guardarDictado contrasta después las partes con el manifiesto verificado en servidor.
+    const audioOriginalPendiente =
+      fuenteEntrada === "audio_archivo" &&
+      Array.isArray(audioPartes) &&
+      audioPartes.length > 0 &&
+      audioPartes.every((p: any) =>
+        Number.isInteger(Number(p?.parte)) &&
+        Number(p?.bytes) > 0 &&
+        /^[0-9a-f]{64}$/i.test(String(p?.sha256 ?? "")) &&
+        p?.verificado === true
+      );
+    if (texto.trim().length === 0 && !audioOriginalPendiente) {
+      return NextResponse.json({ detail: "texto vacio: no hay texto ni audio original verificado para custodiar" }, { status: 400 });
     }
 
     // 1. Resolver un título determinista sin bloquear el archivado con una llamada LLM.
     let tituloResolver: string | null = c?.titulo?.trim() || null;
 
     if (!tituloResolver) {
-      tituloResolver = generarTituloFallback(texto).title;
+      tituloResolver = generarTituloFallback(texto).title || generarTituloDeUltimoRecurso(texto);
     }
 
     // 2. Persistir dictado en la BD (fuente de verdad)
@@ -37,9 +54,9 @@ export async function POST(req: Request) {
       audioBytes: c?.audioBytes ?? null,
       duracionSeg: c?.duracionSeg ?? null,
       pulidoAplicado: c?.pulidoAplicado === true,
-      audioPartes: Array.isArray(c?.audioPartes) ? c.audioPartes : null,
+      audioPartes,
       estadoTranscripcion: c?.estadoTranscripcion ?? null,
-      fuenteEntrada: c?.fuenteEntrada === "chrome_live_caption" ? "chrome_live_caption" : "microfono",
+      fuenteEntrada,
       usuario: session.user.email,
     });
 

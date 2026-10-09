@@ -8,11 +8,6 @@ const PRODUCT_ROUTES = [
   "/sistema/kpis",
   "/grafo",
   "/mapa",
-  "/sistema/ingreso?modo=dictado",
-  "/sistema/ingreso?modo=captura",
-  "/sistema/ingreso?modo=archivo",
-  "/sistema/ingreso?modo=revision",
-  "/sistema/ingreso?modo=ingesta",
   "/herramientas",
   "/herramientas/opi-vri",
   "/herramientas/bitacora",
@@ -108,21 +103,17 @@ for (const viewport of [
       await expect(page.locator('[data-testid="khora-splash"]')).toHaveCount(0, { timeout: 3000 });
 
       await expect(page.locator("[data-navigation-entry]")).toHaveCount(6);
+      const primaryIds = await page.locator("[data-navigation-entry]").evaluateAll((nodes) => nodes.map((node) => node.getAttribute("data-navigation-entry")));
+      expect(primaryIds).toEqual(["ingreso", "volcados", "grafo", "consulta", "seguridad", "sistema"]);
       await expect(page.getByRole("link", { name: "Ingreso", exact: true })).toBeVisible();
+      await expect(page.getByRole("link", { name: "Volcados", exact: true })).toBeVisible();
       await expect(page.getByRole("link", { name: "Capturar", exact: true })).toHaveCount(0);
       await expect(page.getByRole("link", { name: "Dictado", exact: true })).toHaveCount(0);
       await expect(page.getByRole("link", { name: "Edición", exact: true })).toHaveCount(0);
       await expect(page.getByRole("link", { name: "Ingesta", exact: true })).toHaveCount(0);
 
       await page.goto("/sistema/ingreso", { waitUntil: "domcontentloaded" });
-      const ingresoModes = page.getByRole("navigation", { name: "Modos de Ingreso" });
-      await expect(ingresoModes).toBeVisible();
-      for (const name of ["Entrada", "Dictado", "Captura", "Archivo", "Revisión", "Ingesta"]) {
-        await expect(ingresoModes.getByRole("link", { name, exact: true })).toBeVisible();
-      }
-
-      await page.getByRole("link", { name: "Ingreso", exact: true }).click();
-      await expect(page).toHaveURL(/\/sistema\/ingreso$/);
+      await expect(page.getByRole("navigation", { name: "Modos de Ingreso" })).toHaveCount(0);
 
       await page.getByRole("button", { name: "Seguridad", exact: true }).click();
       const securityMenu = page.getByRole("navigation", { name: "Menú Seguridad" });
@@ -153,18 +144,86 @@ for (const viewport of [
         ["/sistema/boveda", /\/sistema\/seguridad\?tab=boveda$/],
         ["/sistema/entorno-persistente", /\/sistema\/seguridad\?tab=entorno-persistente$/],
         ["/herramientas/bitacora", /\/sistema\/volcados$/],
-        ["/capturar", /\/sistema\/ingreso\?modo=captura$/],
-        ["/sistema/dictado", /\/sistema\/ingreso\?modo=dictado$/],
-        ["/sistema/editar", /\/sistema\/ingreso\?modo=revision$/],
-        ["/sistema/ingesta", /\/sistema\/ingreso\?modo=ingesta$/],
+        ["/capturar", /\/sistema\/ingreso$/],
+        ["/sistema/dictado", /\/sistema\/ingreso$/],
+        ["/sistema/editar", /\/sistema\/editar$/],
+        ["/sistema/ingesta", /\/sistema\/volcados$/],
       ];
 
       for (const [alias, canonical] of aliases) {
         await page.goto(alias, { waitUntil: "domcontentloaded" });
         await expect(page).toHaveURL(canonical);
         await expect(page.locator("h1").first()).toBeVisible();
+        if (alias === "/sistema/editar") {
+          await expect(page.getByRole("heading", { name: /mesa de revisión sincrónica/i }).first()).toBeVisible();
+        }
       }
     });
+
+    test("ING-DIRECT-01 contract: editor alias retains direct route and only the opened approved tuple is sent", async ({ page }) => {
+  const digest = "a".repeat(64);
+  const sentTuples: { volcado_id: string; version: string; sha256: string }[] = [];
+  await page.route("**/api/auth/session", async (route) => {
+    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ user: { email: "operator@example.invalid" }, expires: new Date(Date.now()+3600000).toISOString() }) });
+  });
+  await page.route("**/api/volcados/pipeline", async (route) => {
+    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({
+      total: 1,
+      counts: { archivado: 0, pendiente_revision: 0, en_revision: 0, listo_ingesta: 1, ingerido: 0, fallido: 0 },
+      integrity: { sync: 1, text_without_audio: 0 },
+      volcados: [{ id: "tuple-volcado-01", folio: 1, titulo: "Tuple test", estado: "listo_ingesta", version_aprobada: 2, sha256_aprobada: digest, version_actual: 2, session_id: "tuple-session", partes_count: 0 }]
+    }) });
+  });
+  await page.route("**/api/versiones?id=tuple-volcado-01", async (route) => {
+    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ versiones: [
+      { version: 1, texto: "older version", sha256: "b".repeat(64) },
+      { version: 2, texto: "approved version", sha256: digest }
+    ]}) });
+  });
+  await page.route("**/api/audio/tuple-volcado-01/manifiesto", async (route) => {
+    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ partes: [] }) });
+  });
+  await page.route("**/api/revision/tuple-volcado-01/compuerta", async (route) => {
+    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ canApprove: false, version: 2, sha256: digest, blockers: [], warnings: [], counts: {} }) });
+  });
+  await page.route("**/api/revision/tuple-volcado-01/incidentes", async (route) => {
+    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ incidentes: [] }) });
+  });
+  await page.route("**/api/revision/tuple-volcado-01/hallazgos?version=2", async (route) => {
+    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ hallazgos: [] }) });
+  });
+  await page.route("**/api/ingesta", async (route) => {
+    const body = route.request().postData() || "";
+    const pick = (name: string) => body.match(new RegExp(`name="${name}"\\r\\n\\r\\n([^\\r\\n]+)`))?.[1] || "";
+    sentTuples.push({ volcado_id: pick("volcado_id"), version: pick("version"), sha256: pick("sha256") });
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ io_id: "io-tuple-test", idempotent: sentTuples.length > 1 }),
+    });
+  });
+
+  await page.goto("/sistema/editar?volcado_id=tuple-volcado-01&version=2");
+  await expect(page).toHaveURL(/\/sistema\/editar\?volcado_id=tuple-volcado-01&version=2$/);
+  await expect(page.getByRole("button", { name: "Ingerir esta version", exact: true })).toBeVisible();
+  const exactTuple = { volcado_id: "tuple-volcado-01", version: "2", sha256: digest };
+  await page.getByRole("button", { name: "Ingerir esta version", exact: true }).click();
+  await expect.poll(() => sentTuples.length).toBe(1);
+  expect(sentTuples[0]).toEqual(exactTuple);
+
+  await page.goto("/sistema/editar?volcado_id=tuple-volcado-01&version=1");
+  await expect(page).toHaveURL(/\/sistema\/editar\?volcado_id=tuple-volcado-01&version=1$/);
+  await expect(page.getByRole("button", { name: "Ingerir esta version", exact: true })).toHaveCount(0);
+  expect(sentTuples).toHaveLength(1);
+
+  // Repetir la misma ratificada debe volver a enviar exactamente la misma terna.
+  await page.goto("/sistema/editar?volcado_id=tuple-volcado-01&version=2");
+  await expect(page).toHaveURL(/\/sistema\/editar\?volcado_id=tuple-volcado-01&version=2$/);
+  await expect(page.getByRole("button", { name: "Ingerir esta version", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Ingerir esta version", exact: true }).click();
+  await expect.poll(() => sentTuples.length).toBe(2);
+  expect(sentTuples).toEqual([exactTuple, exactTuple]);
+});
 
     test("las pestañas de Seguridad exponen semántica ARIA coherente", async ({ page }) => {
       await page.goto("/sistema/seguridad", { waitUntil: "domcontentloaded" });

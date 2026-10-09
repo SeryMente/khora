@@ -1,9 +1,11 @@
 // @l0 L0-002-R · @req FIX-DICTADO/D14
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@/auth";
 import { put } from "@vercel/blob";
 import { createHash, randomUUID } from "crypto";
-import { cifrarBytes } from "../../../../lib/server/cripto";
+import { cifrarBytes, descifrarBytes } from "../../../../lib/server/cripto";
 import { registrarParteAudio } from "../../../../lib/server/dictado";
+import { detectAudioFormat } from "../../../../lib/server/importedAudio";
 import { transcribirAudioConGroq } from "../../../../lib/server/transcribir";
 import { evaluarCoberturaYReconciliar } from "../../../../lib/transcripcion/reconciliar";
 
@@ -15,6 +17,10 @@ const MAX_BYTES_GROQ = 24 * 1024 * 1024; // ~24MB
 
 export async function POST(req: NextRequest) {
   try {
+    const session = await auth();
+    if (!session?.user?.email) {
+      return NextResponse.json({ detail: "no autenticado" }, { status: 401 });
+    }
     const forma = await req.formData();
     const archivo = forma.get("audio");
     const previewText =
@@ -46,15 +52,82 @@ export async function POST(req: NextRequest) {
     }
 
     // 1. Persistir el archivo CIFRADO como parte 1 de la sesión (igual patrón que /api/audio)
+    const format = detectAudioFormat(crudo);
+    if (!format) {
+      return NextResponse.json(
+        { detail: "El archivo no contiene un formato de audio admitido" },
+        { status: 415 },
+      );
+    }
+    const nombreArchivo =
+      typeof (archivo as File).name === "string" && (archivo as File).name.trim()
+        ? (archivo as File).name.trim()
+        : "audio-adjunto." + format.extension;
     const sha256 = createHash("sha256").update(crudo).digest("hex");
     const cifrado = cifrarBytes(crudo);
-    const destino = `dictado/${sessionId}/1.webm.khc`;
+    const destino = `dictado/${sessionId}/1.${format.extension}.khc`;
 
     const subido = await put(destino, cifrado, {
       access: "public",
       addRandomSuffix: true,
       contentType: "application/octet-stream",
     });
+
+    // La parte adjunta no se marca custodiada hasta releer, descifrar y verificarla.
+    try {
+      const verificacion = await fetch(subido.url, { cache: "no-store" });
+      if (!verificacion.ok) {
+        return NextResponse.json(
+          {
+            error: "audio_no_verificable",
+            detail: `No se pudo releer la carga almacenada (HTTP ${verificacion.status}). El blob se conserva para recuperación, pero no está verificado.`,
+            sessionId,
+            audioUrl: subido.url,
+            blobPath: destino,
+            audioBytes: crudo.length,
+            sha256,
+            verificado: false,
+            recuperable: true,
+          },
+          { status: 502 },
+        );
+      }
+      const bytesAlmacenados = descifrarBytes(Buffer.from(await verificacion.arrayBuffer()));
+      const shaAlmacenado = createHash("sha256").update(bytesAlmacenados).digest("hex");
+      if (bytesAlmacenados.length !== crudo.length || shaAlmacenado !== sha256) {
+        return NextResponse.json(
+          {
+            error: "audio_corrupto",
+            detail: "La copia almacenada no coincide con el archivo original. Se conserva para reconciliación; no está verificada ni puede archivarse.",
+            sessionId,
+            audioUrl: subido.url,
+            blobPath: destino,
+            audioBytes: crudo.length,
+            bytesRecuperados: bytesAlmacenados.length,
+            sha256,
+            sha256Recuperado: shaAlmacenado,
+            verificado: false,
+            recuperable: true,
+          },
+          { status: 502 },
+        );
+      }
+    } catch (verificationError) {
+      return NextResponse.json(
+        {
+          error: "audio_no_verificable",
+          detail: `Falló la verificación de almacenamiento: ${String(verificationError)}. El blob se conserva para recuperación y no se considera custodiado.`,
+          sessionId,
+          audioUrl: subido.url,
+          blobPath: destino,
+          audioBytes: crudo.length,
+          sha256,
+          verificado: false,
+          recuperable: true,
+        },
+        { status: 502 },
+      );
+    }
 
     try {
       await registrarParteAudio({
@@ -64,6 +137,10 @@ export async function POST(req: NextRequest) {
         blobPath: destino,
         bytes: crudo.length,
         sha256,
+        fuenteAudio: "audio_archivo",
+        nombreOriginal: nombreArchivo,
+        mimeType: format.mimeType,
+        estadoVerificacion: "verificado",
       });
     } catch {
       return NextResponse.json(
@@ -72,8 +149,11 @@ export async function POST(req: NextRequest) {
           detail:
             "El audio adjunto quedó almacenado, pero no pudo vincularse a la sesión. No se continuará a transcripción.",
           sessionId,
+          audioUrl: subido.url,
+          blobPath: destino,
           audioBytes: crudo.length,
           sha256,
+          recuperable: true,
         },
         { status: 503 },
       );
@@ -94,7 +174,6 @@ export async function POST(req: NextRequest) {
     }
 
     // 3. Transcribir con Groq Whisper y reconciliar con el guardián D12
-    const nombreArchivo = (archivo as any).name || "audio-adjunto.webm";
     const resGroq = await transcribirAudioConGroq(crudo, nombreArchivo, {
       verboseJson: true,
     });
@@ -107,6 +186,8 @@ export async function POST(req: NextRequest) {
         sessionId,
         audioUrl: subido.url,
         audioBytes: crudo.length,
+        originalName: nombreArchivo,
+        mimeType: format.mimeType,
         detail: resGroq.motivo || "Fallo la transcripción con Groq Whisper",
       });
     }
@@ -125,6 +206,8 @@ export async function POST(req: NextRequest) {
       sessionId,
       audioUrl: subido.url,
       audioBytes: crudo.length,
+      originalName: nombreArchivo,
+      mimeType: format.mimeType,
       modelo: resGroq.modelo,
     });
   } catch (e: any) {

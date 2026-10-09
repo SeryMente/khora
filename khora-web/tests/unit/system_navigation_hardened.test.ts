@@ -11,7 +11,7 @@ test("primary navigation stays bounded and registry-driven", () => {
   assert.equal(NAVIGATION_REGISTRY.length, 6);
   assert.ok(NAVIGATION_REGISTRY.length <= MAX_PRIMARY_NAVIGATION_ITEMS);
   assert.deepEqual(NAVIGATION_REGISTRY.map((entry) => entry.id), [
-    "volcados", "ingreso", "grafo", "consulta", "seguridad", "sistema",
+    "ingreso", "volcados", "grafo", "consulta", "seguridad", "sistema",
   ]);
 });
 
@@ -23,7 +23,7 @@ test("system menu only exposes secondary surfaces", () => {
   assert.equal(entry.coverage.includes("/capturar"), false);
 });
 
-test("input, dictation, review and ingestion form one coherent ingreso domain", () => {
+test("ingreso is the capture surface and volcados is the downstream archive/review domain", () => {
   const entry = NAVIGATION_REGISTRY.find((item) => item.id === "ingreso");
   assert.ok(entry);
   assert.equal(entry.kind, "direct");
@@ -36,20 +36,24 @@ test("input, dictation, review and ingestion form one coherent ingreso domain", 
   assert.equal(NAVIGATION_REGISTRY.some((item) => item.id === "ingesta"), false);
 });
 
-test("legacy ingreso routes are aliases, not primary coverage", () => {
+test("legacy ingreso routes resolve to canonical semantic domains without dead modes", () => {
   const aliases: Array<[string, string]> = [
-    ["/capturar", "/sistema/ingreso?modo=captura"],
-    ["/sistema/dictado", "/sistema/ingreso?modo=dictado"],
-    ["/sistema/editar", "/sistema/ingreso?modo=revision"],
-    ["/sistema/ingesta", "/sistema/ingreso?modo=ingesta"],
+    ["/capturar", "/sistema/ingreso"],
+    ["/sistema/dictado", "/sistema/ingreso"],
+    ["/sistema/editar", "/sistema/volcados"],
+    ["/sistema/ingesta", "/sistema/volcados"],
   ];
   for (const [alias, canonical] of aliases) {
     assert.equal(NAVIGATION_LEGACY_ALIASES.get(alias), canonical);
     assert.equal(NAVIGATION_REGISTRY.some((entry) => entry.coverage.includes(alias)), false);
   }
+  assert.ok(readFileSync(join(root, "app/capturar/page.tsx"), "utf8").includes('redirect("/sistema/ingreso")'));
+  assert.ok(readFileSync(join(root, "app/sistema/dictado/page.tsx"), "utf8").includes('redirect("/sistema/ingreso")'));
+  assert.ok(readFileSync(join(root, "app/sistema/editar/page.tsx"), "utf8").includes("VolcadosPage legacyEditorEntry"));
+  assert.ok(readFileSync(join(root, "app/sistema/ingesta/page.tsx"), "utf8").includes('redirect("/sistema/volcados")'));
 });
 
-test("domain menus are hierarchical while ingreso modes stay inside the workspace", () => {
+test("domain menus remain hierarchical while ingreso and volcados stay primary", () => {
   const ingreso = NAVIGATION_REGISTRY.find((item) => item.id === "ingreso");
   const grafo = NAVIGATION_REGISTRY.find((item) => item.id === "grafo");
   assert.ok(ingreso);

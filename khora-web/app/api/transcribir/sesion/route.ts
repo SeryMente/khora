@@ -1,5 +1,6 @@
 // @l0 L0-002-R · @req FIX-DICTADO/D13
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@/auth";
 import { transcribirSesion } from "../../../../lib/server/transcribirSesion";
 
 export const runtime = "nodejs";
@@ -8,6 +9,10 @@ export const maxDuration = 300;
 
 export async function POST(req: NextRequest) {
   try {
+    const session = await auth();
+    if (!session?.user?.email) {
+      return NextResponse.json({ detail: "no autenticado" }, { status: 401 });
+    }
     const body = await req.json();
     const sessionId = typeof body?.sessionId === "string" ? body.sessionId : undefined;
     const volcadoId = typeof body?.volcadoId === "string" ? body.volcadoId : undefined;
