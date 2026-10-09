@@ -124,18 +124,22 @@ export async function POST(req: Request) {
           endMs,
           duracionMs,
         });
-      } catch {
-        await del(subido.url).catch(() => undefined);
+      } catch (linkError) {
+        // El objeto ya fue releído, descifrado y comparado. No borrarlo porque
+        // una falla de vínculo no debe destruir el único original verificado.
         return NextResponse.json(
           {
             error: "audio_almacenado_no_vinculado",
             detail:
-              "El audio quedó almacenado, pero no pudo vincularse a la sesión. No se declarará guardado hasta reparar el vínculo.",
+              "El audio cifrado se almacenó y verificó, pero falló el vínculo a la sesión. El objeto se conserva para recuperación; reintenta con el mismo sessionId/partIndex y no lo archives aún.",
             sessionId: String(sesionId).trim(),
             partIndex,
+            url: subido.url,
+            blobPath: destino,
             bytes: crudo.length,
             sha256,
             fuenteAudio,
+            causa: linkError instanceof Error ? linkError.message : String(linkError),
           },
           { status: 503 },
         );
