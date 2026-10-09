@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import { createEpSessionToken, getEpConfig, getEpSessionSummary, isEpUserAllowed } from "@/lib/server/ep";
+import { createEpSessionToken, getEpConfig, getEpSessionSummary, resolveEpUserEmail } from "@/lib/server/ep";
 import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = "nodejs";
@@ -66,9 +66,9 @@ function getNormalLauncherDescriptor(apiBase: string) {
 
 export async function GET(req: NextRequest) {
   const session = await auth();
-  const email = session?.user?.email || "";
+  const email = await resolveEpUserEmail(req, session?.user?.email || "");
   const origin = req.nextUrl.origin;
-  if (!email || !isEpUserAllowed(email, origin)) return NextResponse.json({ error: "not_authorized" }, { status: 401, headers: NO_STORE_HEADERS });
+  if (!email) return NextResponse.json({ error: "not_authorized" }, { status: 401, headers: NO_STORE_HEADERS });
   try {
     const apiBase = getEpConfig(origin).audience;
     const launcher = getNormalLauncherDescriptor(apiBase);
@@ -79,9 +79,9 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const session = await auth();
-  const email = session?.user?.email || "";
+  const email = await resolveEpUserEmail(req, session?.user?.email || "");
   const origin = req.nextUrl.origin;
-  if (!email || !isEpUserAllowed(email, origin)) return NextResponse.json({ error: "not_authorized" }, { status: 401, headers: NO_STORE_HEADERS });
+  if (!email) return NextResponse.json({ error: "not_authorized" }, { status: 401, headers: NO_STORE_HEADERS });
 
   let platform = "windows";
   let modeExplicit = false;
