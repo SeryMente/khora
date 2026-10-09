@@ -88,7 +88,21 @@ export async function importAndTranscribeAudio(args: {
   });
   const stored = await readJson(storedResponse);
   if (!storedResponse.ok) {
-    throw new Error(stored.detail || "No se pudo custodiar el audio importado");
+    // Propagar el objeto recuperable al espacio de Ingreso sin afirmar custodia.
+    // El archivo local original sigue disponible para una nueva verificación.
+    return {
+      ok: false,
+      data: {
+        ...stored,
+        sessionId: args.sessionId,
+        stagingUrl: typeof stored.stagingUrl === "string" ? stored.stagingUrl : stagingBlob.url,
+        audioBytes: typeof stored.audioBytes === "number" ? stored.audioBytes : args.file.size,
+        sha256: typeof stored.sha256 === "string" ? stored.sha256 : undefined,
+        verificado: false,
+        recuperable: stored.recuperable === true || typeof stored.audioUrl === "string" || typeof stored.stagingUrl === "string",
+        detail: stored.detail || "No se pudo verificar el audio importado. El archivo local original se conserva; no archives esta captura hasta completar la verificación.",
+      },
+    };
   }
 
   const transcription = await transcribeStoredSession(
