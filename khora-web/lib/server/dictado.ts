@@ -112,7 +112,7 @@ export type EntradaDictado = {
   usuario?: string | null;
   audioPartes?: AudioParte[] | null;
   estadoTranscripcion?: string | null;
-  fuenteEntrada?: "microfono" | "chrome_live_caption" | null;
+  fuenteEntrada?: "texto" | "microfono" | "chrome_live_caption" | "audio_archivo" | null;
 };
 
 export async function registrarParteAudio(params: {
@@ -309,7 +309,7 @@ async function guardarDictadoConSesion(
         `Custodia rota: la sesión registra ${partesPersistidas.length} partes pero el archivado recibió ${partesRecibidas.length}.`,
       );
     }
-    if (partesPersistidas.length > 0) {
+    if (partesPersistidas.length > 0 || partesRecibidas.length > 0) {
       const custodiaPersistida = evaluarCustodiaAudio(
         partesPersistidas.map((p: any) => ({
           part_index: Number(p.part_index),
@@ -487,7 +487,7 @@ export async function guardarDictado(entrada: EntradaDictado) {
   const correlacionId = sessionId || randomUUID();
   const requiereAudioVerificado =
     Boolean(sessionId) &&
-    (entrada.fuenteEntrada === "microfono" || entrada.fuenteEntrada === "chrome_live_caption");
+    (entrada.fuenteEntrada === "microfono" || entrada.fuenteEntrada === "chrome_live_caption" || entrada.fuenteEntrada === "audio_archivo");
 
   if (requiereAudioVerificado) {
     if (!Array.isArray(entrada.audioPartes) || entrada.audioPartes.length === 0) {
