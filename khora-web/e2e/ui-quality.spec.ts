@@ -171,7 +171,7 @@ for (const viewport of [
       total: 1,
       counts: { archivado: 0, pendiente_revision: 0, en_revision: 0, listo_ingesta: 1, ingerido: 0, fallido: 0 },
       integrity: { sync: 1, text_without_audio: 0 },
-      volcados: [{ id: "tuple-volcado-01", folio: 1, titulo: "Tuple test", estado: "listo_ingesta", version_aprobada: 2, sha256_aprobado: digest, version_actual: 2, session_id: "tuple-session", partes_count: 0 }]
+      volcados: [{ id: "tuple-volcado-01", folio: 1, titulo: "Tuple test", estado: "listo_ingesta", version_aprobada: 2, sha256_aprobada: digest, version_actual: 2, session_id: "tuple-session", partes_count: 0 }]
     }) });
   });
   await page.route("**/api/versiones?id=tuple-volcado-01", async (route) => {
