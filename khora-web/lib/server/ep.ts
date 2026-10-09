@@ -1,6 +1,7 @@
 import { createHash, randomBytes, randomUUID } from "node:crypto";
 import { getDb } from "@/lib/server/neon";
 import { JwtPayload, signJwt, verifyJwtDetailed } from "@/lib/server/jwt";
+import { createEpGitHubInstallationToken, EP_GITHUB_REPOSITORIES } from "@/lib/server/github-app";
 
 export type EpState = "START" | "OK" | "FAIL" | "INFO" | "SKIP";
 export type EpLaunchMode = "normal";
@@ -60,7 +61,7 @@ export async function createEpSessionToken(email: string, origin: string, launch
   const jti = randomBytes(24).toString("base64url");
   const payload: EpTokenPayload = {
     iss: config.issuer, sub: email.toLowerCase(), aud: config.audience,
-    scope: "ep:bootstrap ep:logs:write ep:logs:read", gen: 1,
+    scope: "ep:bootstrap ep:github:session ep:logs:write ep:logs:read", gen: 1,
     workspaceRepos: resolvedWorkspaceRepos,
     exp, iat: now, jti, sid, typ: "ep-session", launchMode,
   };
@@ -135,26 +136,51 @@ export type EpWorkspaceRepo = {
 };
 const DEFAULT_OEP_WORKSPACE_REPOS = ["CENSUS", "signal-interpreter"] as const;
 let repoCatalogCache: { expiresAt: number; value: EpWorkspaceRepo[] } | null = null;
-async function githubApi(path: string): Promise<any> {
-  const token = process.env.GITHUB_TOKEN?.trim();
-  if (!token) throw new Error("github_catalog_unavailable");
+
+async function githubApi(path: string, token: string): Promise<any> {
   const response = await fetch("https://api.github.com" + path, {
-    headers: { Authorization: "Bearer " + token, Accept: "application/vnd.github+json", "User-Agent": "khora-ep-catalog/1" },
+    headers: {
+      Authorization: "Bearer " + token,
+      Accept: "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2022-11-28",
+      "User-Agent": "khora-ep-catalog/2",
+    },
     cache: "no-store",
+    signal: AbortSignal.timeout(20_000),
   });
   if (!response.ok) throw new Error("github_catalog_unavailable");
   return response.json();
 }
+
 export async function getEpRepoCatalog(): Promise<EpWorkspaceRepo[]> {
   if (repoCatalogCache && repoCatalogCache.expiresAt > Date.now()) return repoCatalogCache.value;
-  const raw = await githubApi("/orgs/SeryMente/repos?per_page=100&sort=full_name&direction=asc&type=all");
+
+  let token: string;
+  let raw: any;
+  if (process.env.GITHUB_APP_ID && process.env.GITHUB_APP_PRIVATE_KEY && process.env.GITHUB_APP_INSTALLATION_ID) {
+    const appToken = await createEpGitHubInstallationToken();
+    token = appToken.token;
+    raw = await githubApi("/installation/repositories?per_page=100", token);
+    raw = raw?.repositories;
+  } else {
+    // Compatibility path for the existing OIDC flow until the scoped GitHub App is provisioned.
+    token = process.env.GITHUB_TOKEN?.trim() || "";
+    if (!token) throw new Error("github_catalog_unavailable");
+    raw = await githubApi("/orgs/SeryMente/repos?per_page=100&sort=full_name&direction=asc&type=all", token);
+  }
+
   if (!Array.isArray(raw)) throw new Error("github_catalog_unavailable");
+  const allowedNames = new Set(EP_GITHUB_REPOSITORIES.map((name) => name.toLowerCase()));
   const catalog: EpWorkspaceRepo[] = [];
   for (const repo of raw) {
     if (!repo || typeof repo.name !== "string" || repo.archived) continue;
+    if (process.env.GITHUB_APP_ID && !allowedNames.has(repo.name.toLowerCase())) continue;
     let extensionRoot: string | null = null;
     try {
-      const tree = await githubApi("/repos/SeryMente/" + encodeURIComponent(repo.name) + "/git/trees/" + encodeURIComponent(String(repo.default_branch || "main")) + "?recursive=1");
+      const tree = await githubApi(
+        "/repos/SeryMente/" + encodeURIComponent(repo.name) + "/git/trees/" + encodeURIComponent(String(repo.default_branch || "main")) + "?recursive=1",
+        token,
+      );
       const treeItems = Array.isArray(tree?.tree) ? tree.tree : [];
       const manifest = treeItems.find((item: any) => item && item.type === "blob" && String(item.path).toLowerCase().endsWith("/manifest.json"));
       const rootManifest = treeItems.find((item: any) => item && item.type === "blob" && String(item.path).toLowerCase() === "manifest.json");
@@ -167,6 +193,31 @@ export async function getEpRepoCatalog(): Promise<EpWorkspaceRepo[]> {
   repoCatalogCache = { expiresAt: Date.now() + 30_000, value: catalog };
   return catalog;
 }
+
+export async function reserveEpGitHubTokenIssue(sessionId: string): Promise<boolean> {
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(sessionId)) return false;
+  const client = await getDb().connect();
+  try {
+    await client.query("BEGIN");
+    await client.query("SELECT pg_advisory_xact_lock(hashtext($1))", ["ep-github-install-token:" + sessionId]);
+    await client.query("DELETE FROM ep_github_install_token_requests WHERE issued_at < NOW() - INTERVAL '24 hours'");
+    const count = await client.query(
+      "SELECT COUNT(*)::int AS issued FROM ep_github_install_token_requests WHERE session_id=$1 AND issued_at > NOW() - INTERVAL '1 hour'",
+      [sessionId],
+    );
+    if (Number(count.rows[0]?.issued || 0) >= 30) {
+      await client.query("ROLLBACK");
+      return false;
+    }
+    await client.query("INSERT INTO ep_github_install_token_requests(session_id) VALUES($1)", [sessionId]);
+    await client.query("COMMIT");
+    return true;
+  } catch (error) {
+    try { await client.query("ROLLBACK"); } catch {}
+    throw error;
+  } finally { client.release(); }
+}
+
 export async function resolveEpWorkspaceRepos(requested?: unknown): Promise<string[]> {
   if (requested == null) return Array.from(DEFAULT_OEP_WORKSPACE_REPOS);
   const catalog = await getEpRepoCatalog();
