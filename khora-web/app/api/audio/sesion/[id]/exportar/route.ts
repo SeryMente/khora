@@ -41,6 +41,16 @@ export async function GET(
 
     await asegurarColumnasDictado();
     const db = getDb();
+    const sourceResult = await db.query(
+      "SELECT driver FROM volcado WHERE session_id = $1 ORDER BY recibido_en DESC LIMIT 1",
+      [sessionId],
+    );
+    if (sourceResult.rows.length === 0 || sourceResult.rows[0].driver !== "audio_archivo") {
+      return NextResponse.json({
+        error: "audio_no_es_importacion_original",
+        detail: "Esta sesión no está registrada como importación de un archivo original. No se concatenarán partes de una grabación como si fueran un archivo fuente.",
+      }, { status: 409 });
+    }
     const result = await db.query(
       `SELECT part_index, blob_url, blob_path, bytes, sha256, estado_verificacion
        FROM dictado_audio_parte
@@ -54,6 +64,12 @@ export async function GET(
     }>;
     if (!parts.length) {
       return NextResponse.json({ error: "audio_no_vinculado", detail: "La sesión no tiene audio original persistido." }, { status: 404 });
+    }
+    if (parts.length !== 1 || Number(parts[0].part_index) !== 1) {
+      return NextResponse.json({
+        error: "audio_original_ambiguo",
+        detail: "La exportación del original exige un único archivo importado verificado; no se concatenarán partes de grabación.",
+      }, { status: 409 });
     }
 
     const custody = evaluarCustodiaAudio(
@@ -87,10 +103,8 @@ export async function GET(
       buffers.push(clear);
     }
 
-    const audio = Buffer.concat(buffers);
-    const extension = parts.length === 1
-      ? String(parts[0].blob_path || "").match(/\.([a-z0-9]+)\.khc$/i)?.[1]?.toLowerCase() || "bin"
-      : "webm";
+    const audio = buffers[0];
+    const extension = String(parts[0].blob_path || "").match(/\.([a-z0-9]+)\.khc$/i)?.[1]?.toLowerCase() || "bin";
     const mime = AUDIO_MIME[extension] || "application/octet-stream";
     return new NextResponse(new Uint8Array(audio), {
       status: 200,
