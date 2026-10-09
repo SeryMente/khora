@@ -1,8 +1,7 @@
 // @l0 L0-002-R · @req UI-04/INGRESO-INTEGRADO
 "use client";
 
-import { useCallback, useEffect, useRef, useState, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ensamblarParrafos, Fragmento } from "../../../lib/transcripcion/ensamblar";
 import { reconciliarSegmentos, type SegmentoReconciliado } from "../../../lib/transcripcion/reconciliar";
 import { IngresoView } from "../shared/IngresoView";
@@ -11,8 +10,6 @@ import { importAndTranscribeAudio } from "../../../lib/client/import-audio-file"
 import { cerrarEdicionInSitu } from "../../../lib/client/edicion-in-situ";
 import { registerKhoraLockCheckpoint, reportKhoraActivity } from "../AutoLockProvider";
 
-import { IngresoRevisionPanel } from "./IngresoRevisionPanel";
-import { IngresoIngestaPanel } from "./IngresoIngestaPanel";
 
 type Estado = "inactivo" | "dictando";
 
@@ -33,20 +30,10 @@ function generarSesionId() {
 }
 
 export function IngresoWorkspace() {
-  return (
-    <Suspense fallback={<p style={{ padding: "2rem", color: "var(--khora-accent)" }}>Cargando…</p>}>
-      <IngresoContenido />
-    </Suspense>
-  );
+  return <IngresoContenido />;
 }
 
 function IngresoContenido() {
-  const searchParams = useSearchParams();
-  const modoParam = searchParams?.get("modo");
-  const modoWorkspace = modoParam === "revision" ? "revision" : modoParam === "ingesta" ? "ingesta" : "nuevo";
-  const volcadoId = searchParams?.get("volcado_id") ?? null;
-  const versionParam = Number(searchParams?.get("version"));
-  const version = Number.isInteger(versionParam) && versionParam >= 1 ? versionParam : null;
 
   const [segmentos, setSegmentos] = useState<SegmentoReconciliado[]>([]);
   const [pendiente, setPendiente] = useState("");
@@ -1189,24 +1176,6 @@ function IngresoContenido() {
       setGenerandoTitulo(false);
     }
   };
-
-  if (modoWorkspace === "revision") {
-    return (
-      <main style={{ width: "100%", maxWidth: 1240, minWidth: 0, margin: "0 auto", padding: 24, boxSizing: "border-box" }}>
-        
-        <IngresoRevisionPanel />
-      </main>
-    );
-  }
-
-  if (modoWorkspace === "ingesta") {
-    return (
-      <main style={{ width: "100%", maxWidth: 1240, minWidth: 0, margin: "0 auto", padding: 24, boxSizing: "border-box" }}>
-        
-        <IngresoIngestaPanel volcadoId={volcadoId} version={version} />
-      </main>
-    );
-  }
 
   return (
     <>
