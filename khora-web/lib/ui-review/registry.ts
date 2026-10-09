@@ -268,7 +268,7 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
     ui_ids: [
       "pipeline.container",
       "approval.gate",
-      "approval.blockers-list"
+      "approval.blockers-list",
       "volcados.version-selection-error",
     ]
   },
