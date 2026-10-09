@@ -316,13 +316,57 @@ async def endpoint_ingesta(req: IngestaRequest):
             pipeline_result = on_node_upserted(io_id, mem, ts, puerto_llm)
             return pipeline_result
 
-        acta = ingestar(
-            objeto=objeto,
-            memoria=memoria,
-            puerto_llm=puerto_llm,
-            puerto_embeddings=puerto_embeddings,
-            on_upsert=_post_commit,
-        )
+        try:
+            acta = ingestar(
+                objeto=objeto,
+                memoria=memoria,
+                puerto_llm=puerto_llm,
+                puerto_embeddings=puerto_embeddings,
+                on_upsert=_post_commit,
+            )
+        except Exception as write_error:
+            # Dos solicitudes de la misma terna pueden superar el precheck a la vez.
+            # Solo se considera idempotente el perdedor si una lectura posterior
+            # demuestra que existe el mismo io_id con la misma terna inmutable.
+            detail = str(write_error).lower()
+            identity_constraint_conflict = (
+                ("constraint" in detail or "already exists" in detail or "unique" in detail)
+                and any(key in detail for key in ("io_id", "canonical_key", "informationobject"))
+            )
+            if not identity_constraint_conflict:
+                raise
+
+            with neo4j_driver.session() as session:
+                existente_concurrente = session.run(
+                    "MATCH (io:InformationObject {io_id:$io}) "
+                    "RETURN io.volcado_id AS v, io.version AS ver, io.sha256 AS s",
+                    io=objeto_id,
+                ).single()
+
+            if not existente_concurrente:
+                raise
+
+            misma_terna = (
+                existente_concurrente["v"] == str(prov_terna["volcado_id"])
+                and int(existente_concurrente["ver"]) == version_terna
+                and str(existente_concurrente["s"]).lower() == sha_terna
+            )
+            if not misma_terna:
+                raise HTTPException(
+                    status_code=409,
+                    detail={
+                        "error": "conflicto de procedencia en carrera de ingesta",
+                        "volcado_id": str(prov_terna["volcado_id"]),
+                        "version": version_terna,
+                    },
+                )
+
+            return {
+                "io_id": objeto_id,
+                "counters": {"create": 0, "update": 0, "ignore": 0},
+                "ts": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                "idempotent": True,
+            }
 
         return {
             "io_id": objeto.id,
