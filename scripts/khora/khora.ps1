@@ -224,7 +224,7 @@ function Get-KhoraGitHubToken {
         $headers=@{Authorization=('Bearer '+$script:KhoraToken);Accept='application/json';'Cache-Control'='no-store';'User-Agent'='khora-ep-launcher/5'}
         $response=Invoke-RestMethod -Method Get -Uri ($KhoraApiBase.TrimEnd('/')+'/github-token') -Headers $headers -TimeoutSec 45 -ErrorAction Stop
         $candidate=[string]$response.token
-        if($candidate-notmatch'^(ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,})$'-or[string]$response.purpose-ne'ep-bootstrap'){throw 'GITHUB_CREDENTIAL_RESPONSE_INVALID'}
+        if($candidate-notmatch'^(ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|gho_[A-Za-z0-9]{20,})$'-or[string]$response.purpose-ne'ep-bootstrap'){throw 'GITHUB_CREDENTIAL_RESPONSE_INVALID'}
         return (ConvertTo-SecureString $candidate -AsPlainText -Force)
     }catch{
         $code='github_credential_unavailable'
