@@ -1008,6 +1008,7 @@ function IngresoContenido() {
           url: localizadorRecuperacion,
           bytes: data.audioBytes || file.size,
           sha256: data.sha256 || "",
+          fuenteAudio: "audio_archivo",
           verificado: data.verificado === true,
         }];
         setPartesContador(1);
