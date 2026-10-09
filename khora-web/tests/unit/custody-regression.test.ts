@@ -380,6 +380,7 @@ test("CUSTODY-08: verified imported audio can be archived even when transcriptio
         url: audioUrl,
         bytes: audioBytes.length,
         sha256: audioSha,
+        fuenteAudio: "audio_archivo",
         estadoVerificacion: "verificado",
         verificado: true,
       }],
