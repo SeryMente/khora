@@ -1,5 +1,5 @@
 // @l0 L0-002-R · @req FIX-DICTADO/D2-D8 · @req TRACE-SESSION/010
-import { del, put } from "@vercel/blob";
+import { put } from "@vercel/blob";
 import { NextResponse } from "next/server";
 import { createHash } from "crypto";
 import { cifrarBytes, descifrarBytes } from "../../../lib/server/cripto";
