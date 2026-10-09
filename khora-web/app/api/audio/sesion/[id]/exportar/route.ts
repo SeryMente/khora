@@ -117,7 +117,7 @@ export async function GET(
       headers: {
         "Content-Type": mime,
         "Content-Length": String(audio.length),
-        "Content-Disposition": 'attachment; filename="' + asciiName + '"; filename*=UTF-8'' + encodeURIComponent(downloadName),
+        "Content-Disposition": `attachment; filename="${asciiName}"; filename*=UTF-8''${encodeURIComponent(downloadName)}`,
         "Cache-Control": "no-store",
         "X-Content-Type-Options": "nosniff",
       },
