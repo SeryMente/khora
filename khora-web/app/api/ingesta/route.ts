@@ -129,12 +129,20 @@ async function persistirFalloIngesta(
     await client.query("BEGIN");
     enTransaccion = true;
     const actualRes = await client.query(
-      "SELECT estado FROM volcado WHERE id = $1 FOR UPDATE",
+      "SELECT estado, version_aprobada, sha256_aprobado, io_id FROM volcado WHERE id = $1 FOR UPDATE",
       [args.volcadoId],
     );
     if (!actualRes.rows?.length) throw new Error("No se encontró el volcado al registrar el fallo de ingesta.");
 
-    const estadoAnterior = String(actualRes.rows[0].estado ?? "");
+    const actual = actualRes.rows[0] as VolcadoRow;
+    const estadoAnterior = String(actual.estado ?? "");
+    const versionActual = Number(actual.version_aprobada ?? 0);
+    const shaActual = String(actual.sha256_aprobado ?? "").trim().toLowerCase();
+    if (versionActual !== args.version || shaActual !== args.sha256.toLowerCase()) {
+      throw new IngestaConcurrencyError(
+        "La versión aprobada cambió antes de registrar el fallo. Se conserva el estado de la versión actual; el error pertenece a un intento obsoleto.",
+      );
+    }
     const estadoEsperado = estadoAnterior === "ingerido" ? "ingerido" : "fallido";
     const updateRes = await client.query(
       `UPDATE volcado
@@ -143,9 +151,14 @@ async function persistirFalloIngesta(
            intentos = COALESCE(intentos, 0) + 1,
            ultimo_error = $2
        WHERE id = $1
+         AND version_aprobada = $3
+         AND lower(sha256_aprobado) = $4
        RETURNING estado`,
-      [args.volcadoId, args.error],
+      [args.volcadoId, args.error, args.version, args.sha256.toLowerCase()],
     );
+    if (typeof updateRes.rowCount === "number" && updateRes.rowCount !== 1) {
+      throw new IngestaConcurrencyError("La aprobación cambió antes de persistir el fallo de ingesta.");
+    }
     const estadoPersistido = String(updateRes.rows?.[0]?.estado ?? estadoEsperado);
 
     await client.query(
