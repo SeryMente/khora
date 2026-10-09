@@ -98,6 +98,7 @@ export type AudioParte = {
   end_ms?: number;
   duracion_ms?: number;
   estadoVerificacion?: "pendiente" | "verificado";
+  verificado?: boolean;
 };
 
 export type EntradaDictado = {
@@ -197,6 +198,246 @@ export async function registrarParteAudio(params: {
   }
 }
 
+function normalizarFirmaPartesAudio(partes: any): string {
+  let lista: any[] = [];
+  if (Array.isArray(partes)) {
+    lista = partes;
+  } else if (typeof partes === "string" && partes.trim()) {
+    try {
+      const parsed = JSON.parse(partes);
+      if (Array.isArray(parsed)) lista = parsed;
+    } catch {
+      throw new Error("Custodia rota: el manifiesto de partes archivado no es JSON válido.");
+    }
+  }
+
+  return JSON.stringify(
+    lista
+      .map((p) => ({
+        parte: Number(p.parte ?? p.part_index),
+        bytes: Number(p.bytes),
+        sha256: String(p.sha256 ?? "").trim().toLowerCase(),
+        fuenteAudio: p.fuenteAudio === "chrome_tab" || p.fuente_audio === "chrome_tab" ? "chrome_tab" : "microphone",
+        start_ms: p.start_ms ?? p.startMs ?? null,
+        end_ms: p.end_ms ?? p.endMs ?? null,
+        duracion_ms: p.duracion_ms ?? p.duracionMs ?? null,
+      }))
+      .sort((a, b) => a.parte - b.parte),
+  );
+}
+
+async function guardarDictadoConSesion(
+  entrada: EntradaDictado,
+  sessionId: string,
+  sha: string,
+  correlacionId: string,
+) {
+  const db = getDb();
+  const idNuevo = randomUUID();
+  const client = await db.connect();
+  let enTransaccion = false;
+  let volcadoIdParaEvento = idNuevo;
+  let retorno: { id: string; sha256: string; chars: number; sessionId: string; idempotent: boolean; estado?: string } | null = null;
+  let preparar = false;
+
+  try {
+    await client.query("BEGIN");
+    enTransaccion = true;
+
+    // Materializar la fila de sesión y bloquearla. Dos POST concurrentes con el
+    // mismo sessionId quedan serializados antes de decidir si crean un volcado.
+    await client.query(
+      `INSERT INTO dictado_session (session_id, estado, actualizado_en)
+       VALUES ($1, 'uploading', NOW())
+       ON CONFLICT (session_id) DO NOTHING`,
+      [sessionId],
+    );
+    const sesionRes = await client.query(
+      "SELECT session_id, volcado_id, estado FROM dictado_session WHERE session_id = $1 FOR UPDATE",
+      [sessionId],
+    );
+    if (sesionRes.rows.length === 0) {
+      throw new Error("Custodia rota: no se pudo bloquear la sesión de captura.");
+    }
+
+    const partesRes = await client.query(
+      `SELECT part_index, bytes, sha256, fuente_audio, estado_verificacion, start_ms, end_ms, duracion_ms
+       FROM dictado_audio_parte WHERE session_id = $1 ORDER BY part_index ASC`,
+      [sessionId],
+    );
+    const partesPersistidas = partesRes.rows ?? [];
+    const partesRecibidas = entrada.audioPartes ?? [];
+
+    // Nunca aceptar audio declarado por el navegador si no existe y está verificado
+    // en el almacén canónico vinculado a esa sesión.
+    if (partesPersistidas.length !== partesRecibidas.length) {
+      throw new Error(
+        `Custodia rota: la sesión registra ${partesPersistidas.length} partes pero el archivado recibió ${partesRecibidas.length}.`,
+      );
+    }
+    if (partesPersistidas.length > 0) {
+      const custodiaPersistida = evaluarCustodiaAudio(
+        partesPersistidas.map((p: any) => ({
+          part_index: Number(p.part_index),
+          bytes: Number(p.bytes),
+          sha256: p.sha256 ?? null,
+          estado_verificacion: p.estado_verificacion ?? null,
+        })),
+        partesPersistidas.length,
+      );
+      if (!custodiaPersistida.ok) throw new Error(custodiaPersistida.motivo);
+    }
+    if (
+      normalizarFirmaPartesAudio(partesPersistidas) !==
+      normalizarFirmaPartesAudio(partesRecibidas)
+    ) {
+      throw new Error("Custodia rota: las partes presentadas no coinciden con el manifiesto verificado de la sesión.");
+    }
+
+    const volcadoVinculado = sesionRes.rows[0].volcado_id as string | null;
+    if (volcadoVinculado) {
+      const existenteRes = await client.query(
+        `SELECT id, sha256, chars, audio_partes, estado, session_id
+         FROM volcado WHERE id = $1 FOR UPDATE`,
+        [volcadoVinculado],
+      );
+      if (existenteRes.rows.length === 0) {
+        throw new Error("Custodia rota: la sesión apunta a un volcado que no existe; no se creará otro automáticamente.");
+      }
+      const existente = existenteRes.rows[0] as any;
+      volcadoIdParaEvento = String(existente.id);
+      if (
+        String(existente.session_id ?? "") !== sessionId ||
+        String(existente.sha256 ?? "").trim().toLowerCase() !== sha ||
+        Number(existente.chars) !== entrada.texto.length ||
+        normalizarFirmaPartesAudio(existente.audio_partes) !== normalizarFirmaPartesAudio(partesRecibidas)
+      ) {
+        throw new Error(
+          "Conflicto de idempotencia: sessionId ya está archivado con otro texto o manifiesto de audio. El original se conserva; edita desde Volcados o inicia una captura nueva.",
+        );
+      }
+
+      const versionRes = await client.query(
+        "SELECT version FROM volcado_version WHERE volcado_id = $1 AND version = 1",
+        [volcadoVinculado],
+      );
+      preparar =
+        (existente.estado === "archivado" || existente.estado === "pendiente_revision") &&
+        (versionRes.rows?.length ?? 0) === 0;
+      retorno = {
+        id: String(existente.id),
+        sha256: String(existente.sha256),
+        chars: Number(existente.chars),
+        sessionId,
+        idempotent: true,
+        estado: String(existente.estado),
+      };
+    } else {
+      await client.query(
+        `INSERT INTO volcado
+         (id, texto, sha256, chars, titulo, origen, driver, usuario, estado, fuente, audio_url, audio_bytes, duracion_seg, pulido_aplicado, audio_partes, session_id, estado_transcripcion)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)`,
+        [
+          idNuevo,
+          cifrarTexto(entrada.texto),
+          sha,
+          entrada.texto.length,
+          entrada.titulo ?? null,
+          "web",
+          entrada.fuenteEntrada === "chrome_live_caption" ? "chrome_live_caption" : "dictado",
+          entrada.usuario ?? null,
+          "archivado",
+          "dictado",
+          entrada.audioUrl ?? null,
+          entrada.audioBytes ?? null,
+          entrada.duracionSeg ?? null,
+          entrada.pulidoAplicado === true,
+          entrada.audioPartes ? JSON.stringify(entrada.audioPartes) : null,
+          sessionId,
+          entrada.estadoTranscripcion ?? null,
+        ],
+      );
+
+      const totalPartes = partesRecibidas.length > 0 ? partesRecibidas.length : null;
+      const vinculoRes = await client.query(
+        `UPDATE dictado_session
+         SET volcado_id = $1, estado = 'complete',
+             total_partes = COALESCE($3, total_partes),
+             duracion_seg = COALESCE($4, duracion_seg),
+             cerrado_en = NOW(), actualizado_en = NOW()
+         WHERE session_id = $2 AND volcado_id IS NULL`,
+        [idNuevo, sessionId, totalPartes, entrada.duracionSeg ?? null],
+      );
+      if (typeof vinculoRes.rowCount === "number" && vinculoRes.rowCount !== 1) {
+        throw new Error("Custodia rota: no se pudo vincular la sesión con un único volcado.");
+      }
+      await client.query(
+        "UPDATE dictado_audio_parte SET volcado_id = $1 WHERE session_id = $2",
+        [idNuevo, sessionId],
+      );
+      retorno = {
+        id: idNuevo,
+        sha256: sha,
+        chars: entrada.texto.length,
+        sessionId,
+        idempotent: false,
+        estado: "archivado",
+      };
+      preparar = true;
+    }
+
+    await client.query("COMMIT");
+    enTransaccion = false;
+  } catch (err) {
+    if (enTransaccion) await client.query("ROLLBACK").catch(() => undefined);
+    await registrarEvento({
+      fase: "dictado",
+      eventId: "DIC-001",
+      estado: "FAIL",
+      mensaje: `Fallo al custodiar el dictado: ${String(err)}`,
+      detalle: { error: String(err), sessionId },
+      volcadoId: volcadoIdParaEvento,
+      sha256: sha,
+      correlacionId,
+    });
+    throw err;
+  } finally {
+    client.release();
+  }
+
+  if (!retorno) throw new Error("Custodia rota: no se produjo un resultado de archivado.");
+  if (preparar) {
+    await prepararVolcadoParaRevision(retorno.id, entrada.usuario, { onFailure: "keep_captura" });
+  }
+  await registrarEvento({
+    fase: "dictado",
+    eventId: "DIC-001",
+    estado: "OK",
+    mensaje: retorno.idempotent
+      ? "Reintento de archivado resuelto contra el volcado original; no se creó una copia."
+      : "Dictado archivado e inicializado exitosamente para revisión",
+    detalle: {
+      volcadoId: retorno.id,
+      sessionId,
+      chars: retorno.chars,
+      idempotent: retorno.idempotent,
+      pulidoAplicado: entrada.pulidoAplicado,
+    },
+    volcadoId: retorno.id,
+    version: 1,
+    sha256: retorno.sha256,
+    correlacionId,
+  });
+
+  return {
+    id: retorno.id,
+    sha256: retorno.sha256,
+    chars: retorno.chars,
+    sessionId,
+    idempotent: retorno.idempotent,
+  };
+}
+
 export async function guardarDictado(entrada: EntradaDictado) {
   await asegurarColumnasDictado();
   const db = getDb();
@@ -217,7 +458,7 @@ export async function guardarDictado(entrada: EntradaDictado) {
         part_index: Number(p.parte),
         bytes: Number(p.bytes),
         sha256: p.sha256 ?? null,
-        estado_verificacion: p.estadoVerificacion ?? null,
+        estado_verificacion: p.estadoVerificacion ?? (p.verificado === true ? "verificado" : null),
       })),
       entrada.audioPartes.length,
     );
@@ -227,8 +468,12 @@ export async function guardarDictado(entrada: EntradaDictado) {
     }
   }
 
-  const id = randomUUID();
   const sha = createHash("sha256").update(entrada.texto, "utf8").digest("hex");
+  if (sessionId) {
+    return guardarDictadoConSesion(entrada, sessionId, sha, correlacionId);
+  }
+
+  const id = randomUUID();
 
   try {
     await db.query(
