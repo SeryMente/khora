@@ -322,8 +322,7 @@ async function guardarDictadoConSesion(
         [volcadoVinculado],
       );
       preparar =
-        (existente.estado === "archivado" || existente.estado === "pendiente_revision") &&
-        (versionRes.rows?.length ?? 0) === 0;
+        existente.estado === "archivado" || existente.estado === "pendiente_revision";
       retorno = {
         id: String(existente.id),
         sha256: String(existente.sha256),
@@ -399,7 +398,7 @@ async function guardarDictadoConSesion(
       volcadoId: volcadoIdParaEvento,
       sha256: sha,
       correlacionId,
-    });
+    }).catch(() => undefined);
     throw err;
   } finally {
     client.release();
