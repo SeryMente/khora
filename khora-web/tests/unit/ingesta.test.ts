@@ -59,6 +59,11 @@ Pool.prototype.query = (async function (sql: string, params?: any[]) {
   return { rows: [] };
 }) as any;
 
+Pool.prototype.connect = (async function (this: any) {
+  const pool = this;
+  return { query: (sql: string, params?: any[]) => pool.query(sql, params), release: () => undefined };
+}) as any;
+
 import { POST } from "../../app/api/ingesta/route";
 import { sha256de } from "../../lib/server/correcciones";
 import { cifrarTexto } from "../../lib/server/cripto";
@@ -242,8 +247,7 @@ test("Ingesta Route Suite", async (t) => {
     // Assert state is set to 'fallido' in DB
     const updateQuery = dbQueriesLogged.find(q => q.sql.includes("UPDATE volcado"));
     assert.ok(updateQuery);
-    assert.ok(updateQuery.sql.includes("estado = $3"));
-    assert.strictEqual(updateQuery.params?.[2], "fallido");
+    assert.ok(updateQuery.sql.toLowerCase().includes("case when estado = 'ingerido' then 'ingerido' else 'fallido' end"));
     assert.strictEqual(updateQuery.params?.[1], "Kernel internal error details");
 
     // Verify audit log
@@ -277,7 +281,7 @@ test("Ingesta Route Suite", async (t) => {
     // State is 'fallido' in DB
     const updateQuery = dbQueriesLogged.find(q => q.sql.includes("UPDATE volcado"));
     assert.ok(updateQuery);
-    assert.strictEqual(updateQuery.params?.[2], "fallido");
+    assert.ok(updateQuery.sql.toLowerCase().includes("case when estado = 'ingerido' then 'ingerido' else 'fallido' end"));
     assert.strictEqual(updateQuery.params?.[1], "Request to kernel timed out");
   });
 
@@ -344,8 +348,11 @@ test("Ingesta Route Suite", async (t) => {
     assert.strictEqual(response.status, 502);
     updateQuery = dbQueriesLogged.find(q => q.sql.toLowerCase().includes("update volcado"));
     assert.ok(updateQuery);
-    assert.strictEqual(updateQuery.params?.[2], "ingerido");
+    assert.ok(updateQuery.sql.toLowerCase().includes("case when estado = 'ingerido' then 'ingerido' else 'fallido' end"));
     assert.strictEqual(updateQuery.params?.[1], "Kernel offline");
+    const failureAudit = dbQueriesLogged.find(q => q.sql.toLowerCase().includes("insert into volcado_revision_auditoria"));
+    assert.ok(failureAudit);
+    assert.strictEqual(failureAudit.params?.[4], "ingerido");
   });
 
   await t.test("9. Rejects missing client SHA before calling the kernel", async () => {
