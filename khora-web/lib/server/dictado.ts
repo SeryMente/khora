@@ -270,7 +270,7 @@ async function guardarDictadoConSesion(
   const idNuevo = randomUUID();
   const client = await db.connect();
   let enTransaccion = false;
-  let volcadoIdParaEvento = idNuevo;
+  let volcadoIdParaEvento: string = idNuevo;
   let retorno: { id: string; sha256: string; chars: number; sessionId: string; idempotent: boolean; estado?: string } | null = null;
   let preparar = false;
 
