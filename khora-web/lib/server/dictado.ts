@@ -583,7 +583,7 @@ export async function guardarDictado(entrada: EntradaDictado) {
       correlacionId,
     });
 
-    return { id, sha256: sha, chars: entrada.texto.length, sessionId };
+    return { id, sha256: sha, chars: entrada.texto.length, sessionId, idempotent: false };
   } catch (err) {
     await registrarEvento({
       fase: "dictado",
