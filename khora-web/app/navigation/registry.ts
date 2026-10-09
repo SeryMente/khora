@@ -46,15 +46,6 @@ export type NavigationEntry = {
  */
 export const NAVIGATION_REGISTRY: readonly NavigationEntry[] = [
   {
-    id: "volcados",
-    label: "Volcados",
-    href: "/sistema/volcados",
-    icon: "Files",
-    kind: "direct",
-    level: 1,
-    coverage: ["/sistema/volcados"],
-  },
-  {
     id: "ingreso",
     label: "Ingreso",
     href: "/sistema/ingreso",
@@ -62,6 +53,15 @@ export const NAVIGATION_REGISTRY: readonly NavigationEntry[] = [
     kind: "direct",
     level: 1,
     coverage: ["/sistema/ingreso"],
+  },
+  {
+    id: "volcados",
+    label: "Volcados",
+    href: "/sistema/volcados",
+    icon: "Files",
+    kind: "direct",
+    level: 1,
+    coverage: ["/sistema/volcados"],
   },
   {
     id: "grafo",
