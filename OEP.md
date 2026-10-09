@@ -2,7 +2,8 @@
 
 **Identificador:** OEP  
 **Nombre completo:** Persistencia de Entorno Operativo  
-**Versión:** v0.1.5
+**Versión:** v0.1.6
+**Nombre de versión:** Bóveda GitHub Cifrada y Acceso Maestro Limitado a OEP
 **Estado:** ACTIVO · CANÓNICO PARA ESTE ÁMBITO · EN EVOLUCIÓN CONTROLADA  
 **Sistema emisor:** KHORA  
 **Plataforma objetivo actual:** Windows
@@ -17,9 +18,9 @@ Cuando OEP sea recuperado sin el contexto conversacional original, leer en este 
 
 ## 1. Fuentes canónicas
 
-**Fuente técnica primaria existente:** `SeryMente/khora/ep-medio-architectura.md`, versión observada `v1.0.4`. Es la especificación normativa existente de Entorno Persistente Medio.
+**Fuente técnica en `main`:** `SeryMente/khora/ep-medio-architectura.md` v1.0.4. **Propuesta de revisión:** v1.0.5 en la rama `feat/ep-github-token-vault-ui`, PR #292; no se considera producción hasta integrar, aplicar migraciones y superar validación.
 
-**Fuente metodológica superior:** `SeryMente/metodologia/SI-METACOGNITIVO.md`, versión observada `v1.6.8`, nombre de versión **Continuidad Canónica entre Conversaciones**.
+**Fuente metodológica superior:** `SeryMente/metodologia/SI-METACOGNITIVO.md`, versión observada `v1.6.21`, nombre **Ordenamiento por Preponderancia y Categorías**.
 
 **Snapshot de KHORA observado al canonizar OEP:** `main` = `019d7ab396534148db111b7860697ec7c8029d81`. SHA verificado en este ciclo después de integrar las correcciones de toolchain y bootstrap.
 
@@ -92,15 +93,17 @@ La implementación existente de EP debe ser la base antes de crear un mecanismo 
 Google OIDC permanece como identidad primaria de KHORA. OEP no reemplaza la autenticación global de KHORA.
 
 ### 11.2 Acceso rápido específico de OEP
-Se adopta como dirección de diseño una credencial rápida específica, provisionalmente denominada `OEP Master Password`, para reducir la fricción de arranque sin convertirla automáticamente en credencial primaria global.
+La contraseña maestra OEP está implementada en la rama `feat/ep-github-token-vault-ui` (PR #292), todavía no integrada ni verificada en producción. La configuración inicial/rotación requiere una sesión OIDC autorizada; una vez configurada, el acceso diario a EP se hace desde `/auth/ep` sin iniciar Google OIDC en cada terminal.
 
-Modelo: OIDC → identidad primaria de KHORA. OEP Master Password → acceso rápido y limitado a la emisión/inicio de OEP.
+Modelo: OIDC → identidad primaria global de KHORA y alta/recuperación de la contraseña OEP. OEP Master Password → acceso corto y limitado a emisión/inicio de OEP, sin abrir rutas generales de KHORA.
+
+La cookie de acceso OEP tiene duración de 15 minutos, firma HMAC por ámbito, `HttpOnly`, `SameSite=Strict`, `Secure` en producción y `Path=/`. La sesión se valida solo en el submódulo EP y los endpoints de gestión EP.
 
 ### 11.3 Mínimo privilegio
-Debe limitarse al ámbito OEP y no adquirir automáticamente administración general de KHORA, acceso general a secretos o acceso irrestricto a repositorios.
+La cookie maestra no se convierte en una sesión Auth.js y no adquiere administración general de KHORA. La emisión del PAT para PowerShell exige un JWT EP activo con scope `ep:github:token`.
 
 ### 11.4 Seguridad
-El diseño debe resolver verificador seguro, derivación resistente a fuerza bruta, salt, rate limiting, bloqueo, revocación, rotación, recuperación, invalidación, protección contra enumeración y reuso. Nunca almacenar la contraseña en claro ni incrustarla en el launcher.
+El verificador de la contraseña usa scrypt con salt aleatorio, pepper derivado por ámbito de `EP_BOOTSTRAP_JWT_SECRET`, comparación de tiempo constante y límite de ocho fallos por origen hasheado cada 15 minutos. La contraseña no se almacena en claro ni se incrusta en el launcher. La implementación aún necesita pasar CI y la matriz E2E de PowerShell 5.1; no se marca RESUELTA hasta contar con esa evidencia.
 
 ## 12. Token de sesión OEP
 
@@ -385,7 +388,7 @@ La ubicación modifica parámetros de ejecución, no el objetivo del sistema. CS
 
 ## 52. Pendientes actuales
 
-- `OEP-PENDING-001`: diseño seguro y completo de autenticación rápida por contraseña maestra.
+- `OEP-PENDING-001`: **IMPLEMENTADO EN RAMA / NO VERIFICADO**. Puerta OEP con verificador scrypt, salt, pepper, limitación de intentos y sesión firmada de alcance EP; pendiente CI, alta inicial, recuperación y recorrido E2E en producción.
 - `OEP-PENDING-002`: relación exacta entre token KHORA y raíz criptográfica.
 - `OEP-PENDING-003`: esquema formal de Location Profile.
 - `OEP-PENDING-004`: estructura formal del manifiesto de sesión.
@@ -444,12 +447,23 @@ Toda modificación material debe aumentar versión, conservar historial, indicar
 
 ## 59. Estado al cierre
 
-**OEP:** `v0.1.5`
-**Estado:** ACTIVO  
-**Nivel:** arquitectura transversal en construcción  
-**Último ciclo integrado:** 004 · hardening criptográfico, reducción de superficie de ataque y validación E2E
-**Implementación completa:** NO VERIFICADA  
-**Fuente técnica principal:** `SeryMente/khora/ep-medio-architectura.md v1.0.4`
-**Fuente metodológica:** `SeryMente/metodologia/SI-METACOGNITIVO.md v1.6.8`
+**OEP:** `v0.1.6` · **Bóveda GitHub Cifrada y Acceso Maestro Limitado a OEP**
+**Estado:** ACTIVO · CAMBIO PROPUESTO EN PR
+**Nivel:** arquitectura transversal en construcción
+**Último ciclo:** 005 · puerta maestra EP y bóveda GitHub cifrada
+**Implementación completa:** NO VERIFICADA
+**Fuente técnica en main:** `SeryMente/khora/ep-medio-architectura.md v1.0.4`
+**Revisión técnica propuesta:** `SeryMente/khora/ep-medio-architectura.md v1.0.5`, PR #292
+**Fuente metodológica:** `SeryMente/metodologia/SI-METACOGNITIVO.md v1.6.21`
 
 La ausencia de contexto conversacional no autoriza a reconstruir decisiones fuera de este objeto o de sus fuentes canónicas.
+
+## 60. Ciclo operativo 005 — Bóveda GitHub cifrada y acceso maestro OEP
+
+**Antes →** el bootstrap pedía un PAT en el portapapeles y el módulo EP exigía OIDC para emitir una sesión. No existía un flujo de UI para guardar el PAT cifrado y recuperarlo bajo autorización EP.
+
+**Cambio →** la rama `feat/ep-github-token-vault-ui` agrega una UI para cargar/rotar/borrar la credencial, validación del acceso al conjunto de repositorios requerido, almacenamiento AES-256-GCM en la BD, endpoint Bearer para entregar el PAT al launcher, puerta de contraseña maestra limitada a EP, migración 017, tests de contrato y actualización del PowerShell embebido.
+
+**Motivo →** eliminar el reingreso interactivo del PAT, evitar exponerlo en interfaz/clipboard/historial/logs y permitir iniciar OEP desde Cybernet sin iniciar OIDC en cada uso, manteniendo OIDC para KHORA global.
+
+**Resultado →** implementación propuesta en PR #292, commit de cabecera al momento del registro: `7c323af13076bb9efe004af713d0e575e1c741bd`. El PR incluye cambios posteriores en docs y requiere reconsultar su SHA actual. No se invocó Vercel, RDC ni implementación local. CI, aplicación de migración, configuración inicial de contraseña desde OIDC, carga inicial del PAT y arranque real en Windows PowerShell 5.1 permanecen NO VERIFICADOS. El PAT granular debe poseer Contents: Read and write y Metadata: Read en todos los repositorios que vayan a materializarse; las respuestas de metadatos por sí solas no prueban los scopes efectivos de escritura.
