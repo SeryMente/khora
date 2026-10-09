@@ -66,8 +66,6 @@ ALTER TABLE dictado_audio_parte ADD COLUMN IF NOT EXISTS start_ms INTEGER;
 ALTER TABLE dictado_audio_parte ADD COLUMN IF NOT EXISTS end_ms INTEGER;
 ALTER TABLE dictado_audio_parte ADD COLUMN IF NOT EXISTS duracion_ms INTEGER;
 ALTER TABLE dictado_audio_parte ADD COLUMN IF NOT EXISTS estado_verificacion TEXT DEFAULT 'pendiente';
-ALTER TABLE dictado_audio_parte ADD COLUMN IF NOT EXISTS original_name TEXT;
-ALTER TABLE dictado_audio_parte ADD COLUMN IF NOT EXISTS mime_type TEXT;
 `;
 
 let columnasListas = false;
