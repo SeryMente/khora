@@ -182,3 +182,110 @@ def test_consulta_valida():
     assert "suficiencia" in data
     assert "nodos" in data["subgrafo"]
     assert "aristas" in data["subgrafo"]
+
+
+@pytest.mark.parametrize(
+    ("sha_existente", "expected_status", "expected_idempotent"),
+    [
+        ("match", 200, True),
+        ("mismatch", 409, False),
+    ],
+)
+def test_ingesta_concurrente_confirma_identidad_antes_de_declarar_idempotencia(
+    monkeypatch, sha_existente, expected_status, expected_idempotent
+):
+    import hashlib
+    import uuid
+
+    texto = "El mismo volcado, la misma versión y la misma huella."
+    sha = hashlib.sha256(texto.encode("utf-8")).hexdigest()
+    volcado_id = str(uuid.uuid4())
+    sha_en_grafo = sha if sha_existente == "match" else "f" * 64
+
+    class FakeResult:
+        def __init__(self, record):
+            self.record = record
+
+        def single(self):
+            return self.record
+
+    class FakeSession:
+        def __init__(self, driver):
+            self.driver = driver
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc, tb):
+            return False
+
+        def run(self, query, **kwargs):
+            self.driver.reads += 1
+            # El precheck inicial no ve el objeto; la lectura tras el conflicto
+            # simula el objeto que la solicitud concurrente acaba de confirmar.
+            if self.driver.reads == 1:
+                return FakeResult(None)
+            return FakeResult({
+                "v": volcado_id,
+                "ver": 1,
+                "s": sha_en_grafo,
+            })
+
+    class FakeDriver:
+        def __init__(self):
+            self.reads = 0
+
+        def session(self):
+            return FakeSession(self)
+
+    class FakeMemoria:
+        def __init__(self, *args, **kwargs):
+            pass
+
+    class FakeProvider:
+        def __init__(self, *args, **kwargs):
+            pass
+
+    import khora_kernel.motor as motor_module
+    import khora_kernel.proveedores as provider_module
+
+    driver = FakeDriver()
+    monkeypatch.setattr(api_main, "neo4j_driver", driver)
+    monkeypatch.setattr(
+        api_main,
+        "neo4j_config",
+        {"uri": "bolt://test", "user": "neo4j", "password": "test"},
+    )
+    monkeypatch.setattr(motor_module, "Neo4jMemoriaOrganizada", FakeMemoria)
+    monkeypatch.setattr(provider_module, "ProveedorOpenAICompatible", FakeProvider)
+
+    def duplicate_write(*args, **kwargs):
+        raise Exception(
+            "Error en asentamiento transaccional único: "
+            "ConstraintValidationFailed; already exists with label InformationObject "
+            "and property io_id"
+        )
+
+    monkeypatch.setattr(api_main, "ingestar", duplicate_write)
+
+    response = client.post(
+        "/api/v1/ingesta",
+        json={
+            "texto": texto,
+            "provenance": {
+                "volcado_id": volcado_id,
+                "version": 1,
+                "sha256": sha,
+            },
+        },
+        headers={"X-KHORA-KEY": "test-key-123"},
+    )
+
+    assert response.status_code == expected_status
+    data = response.json()
+    if expected_idempotent:
+        assert data["io_id"] == str(uuid.uuid5(uuid.NAMESPACE_URL, f"khora:volcado:{volcado_id}:v1"))
+        assert data["idempotent"] is True
+        assert data["counters"] == {"create": 0, "update": 0, "ignore": 0}
+    else:
+        assert data["detail"]["error"] == "conflicto de procedencia en carrera de ingesta"
