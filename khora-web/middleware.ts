@@ -2,6 +2,7 @@
 import { auth } from "@/auth";
 import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
 import { resolverGeneracion } from "./lib/server/generacion";
+import { readEpMasterEmail } from "./lib/ep-master-session";
 
 const RUTAS_OS = new Set<string>(["/"]);
 // Una ruta entra aquí solo cuando su espejo en app/os/ está terminado
@@ -9,11 +10,11 @@ const RUTAS_OS = new Set<string>(["/"]);
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|ep-main-live\\.json$|auth/signin|api/auth|api/version|api/eventos|\\.well-known).*)",
+    "/((?!_next/static|_next/image|favicon.ico|ep-main-live\\.json$|auth/signin|auth/ep|api/auth|api/version|api/eventos|\\.well-known).*)",
   ],
 };
 
-const authMiddleware = auth((req) => {
+const authMiddleware = auth(async (req) => {
   const pathname = req.nextUrl.pathname;
 
   // Fail-closed security for /ui-review
@@ -26,6 +27,17 @@ const authMiddleware = auth((req) => {
 
   if (pathname === "/sistema/entorno-persistente") {
     return NextResponse.redirect(new URL("/sistema/seguridad?tab=entorno-persistente", req.nextUrl.origin), 308);
+  }
+
+  // The master password creates an EP-only signed cookie; it is never treated
+  // as a general KHORA/Auth.js session.
+  const isEpPanel = pathname === "/sistema/seguridad" && req.nextUrl.searchParams.get("tab") === "entorno-persistente";
+  if (isEpPanel && !req.auth) {
+    const masterEmail = await readEpMasterEmail(req, req.nextUrl.origin);
+    if (masterEmail) return NextResponse.next();
+    const gate = new URL("/auth/ep", req.nextUrl.origin);
+    gate.searchParams.set("callbackUrl", "/sistema/seguridad?tab=entorno-persistente");
+    return NextResponse.redirect(gate);
   }
 
   const servicioConAutenticacionPropia =
