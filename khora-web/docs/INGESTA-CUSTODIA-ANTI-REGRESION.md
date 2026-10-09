@@ -76,3 +76,16 @@ El PR #290 permanece abierto y no mergeado. No se debe eliminar ni degradar una 
 La guardia de código está incorporada y documentada; la certificación del último SHA queda **PENDIENTE** hasta ejecutar sobre el código actual typecheck, UI contract, unitarias y build, y obtener evidencia del resultado de los workflows. Después siguen pendientes las pruebas E2E con PostgreSQL, Blob y grafo reales y la compuerta `ING-DIRECT-01` en producción.
 
 No fusionar ni declarar el sistema protegido integralmente por la presencia de las barreras solamente.
+
+
+## Revisión posterior del límite de concurrencia · 2026-10-09
+
+**Código revisado:** `fa4e1b787921646a3197eeaba82047f501212602` (manejo de conflicto de identidad concurrente en `api/main.py` y prueba en `api/tests/test_api_00.py`).
+
+- Si dos solicitudes superan el precheck y una pierde por una restricción única, el endpoint vuelve a leer `InformationObject` por `io_id`.
+- Solo responde idempotencia si la lectura confirma exactamente `volcado_id + version + sha256`; si la terna difiere, devuelve `409`; si no hay objeto confirmado, conserva el error original.
+- Se añadió una prueba de fallo controlado para la misma terna (idempotente) y para SHA distinto (conflicto). **Esta prueba simula la respuesta de Neo4j; no sustituye una carrera concurrente real contra el grafo.**
+- En el corte del código anterior, GitHub Actions volvió a reportar fallo en `CI` y `UI Quality`; el conector no pudo recuperar sus logs (`BlobNotFound`). No se declara que esta modificación pase TypeScript/Python o los gates hasta disponer de una ejecución reproducible.
+- La conexión RDC no tiene dispositivos conectados. La prueba local posterior a estos cambios sigue pendiente.
+
+**Siguiente compuerta no negociable:** comprobar en Neo4j real dos solicitudes concurrentes con la misma terna, una repetición posterior, una terna conflictiva, estado/identidad de PostgreSQL y que el pipeline derivado no se ejecute dos veces. No marcar ING-02/ING-04 como certificados hasta conservar la evidencia de esa prueba.
