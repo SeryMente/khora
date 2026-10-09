@@ -350,7 +350,7 @@ test("CUSTODY-08: verified imported audio can be archived even when transcriptio
   const audioSha = createHash("sha256").update(audioBytes).digest("hex");
   const audioUrl = "https://blob.invalid/imported-audio.mp3.khc";
   const state: FakeState = {
-    session: null,
+    session: { session_id: sessionId, volcado_id: null, estado: "uploading" },
     parts: [],
     volume: null,
     versions: [],
@@ -412,6 +412,25 @@ test("CUSTODY-09: Ingreso exposes export only for verified imported audio and se
   assert.ok(exportRoute.includes("desbloqueoVigente"));
 });
 
+
+
+test("CUSTODY-11: transcript network failure must return the verified original locator", () => {
+  const importer = readFileSync(resolve(process.cwd(), "lib/client/import-audio-file.ts"), "utf8");
+  const catchStart = importer.indexOf("catch (cause)", importer.indexOf("transcribeStoredSession"));
+  const catchEnd = importer.indexOf("\n  return {", catchStart);
+  assert.ok(catchStart >= 0 && catchEnd > catchStart);
+  const handler = importer.slice(catchStart, catchEnd);
+  assert.ok(handler.includes("audioUrl: stored.audioUrl"));
+  assert.ok(handler.includes("verificado: stored.verificado === true"));
+  assert.ok(handler.includes('estadoTranscripcion: "fallido"'));
+});
+
+test("CUSTODY-12: original audio export only accepts a single import-file source", () => {
+  const exportRoute = readFileSync(resolve(process.cwd(), "app/api/audio/sesion/[id]/exportar/route.ts"), "utf8");
+  assert.ok(exportRoute.includes('sourceResult.rows[0].driver !== "audio_archivo"'));
+  assert.ok(exportRoute.includes("parts.length !== 1"));
+  assert.ok(exportRoute.includes("const audio = buffers[0]"));
+});
 
 test("CUSTODY-10: stale ingestion failures cannot overwrite a newer approved version", () => {
   const route = readFileSync(resolve(process.cwd(), "app/api/ingesta/route.ts"), "utf8");
