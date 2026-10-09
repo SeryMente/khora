@@ -146,7 +146,7 @@ for (const viewport of [
         ["/herramientas/bitacora", /\/sistema\/volcados$/],
         ["/capturar", /\/sistema\/ingreso$/],
         ["/sistema/dictado", /\/sistema\/ingreso$/],
-        ["/sistema/editar", /\\/sistema\\/editar$/],
+        ["/sistema/editar", /\/sistema\/editar$/],
         ["/sistema/ingesta", /\/sistema\/volcados$/],
       ];
 
