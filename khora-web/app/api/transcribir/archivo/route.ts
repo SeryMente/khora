@@ -125,6 +125,7 @@ export async function POST(req: NextRequest) {
         blobPath: destino,
         bytes: crudo.length,
         sha256,
+        fuenteAudio: "audio_archivo",
         estadoVerificacion: "verificado",
       });
     } catch {
