@@ -36,7 +36,7 @@ test("ingreso is the capture surface and volcados is the downstream archive/revi
   assert.equal(NAVIGATION_REGISTRY.some((item) => item.id === "ingesta"), false);
 });
 
-test("legacy ingreso routes resolve to canonical semantic domains", () => {
+test("legacy ingreso routes resolve to canonical semantic domains without dead modes", () => {
   const aliases: Array<[string, string]> = [
     ["/capturar", "/sistema/ingreso"],
     ["/sistema/dictado", "/sistema/ingreso"],
@@ -47,6 +47,10 @@ test("legacy ingreso routes resolve to canonical semantic domains", () => {
     assert.equal(NAVIGATION_LEGACY_ALIASES.get(alias), canonical);
     assert.equal(NAVIGATION_REGISTRY.some((entry) => entry.coverage.includes(alias)), false);
   }
+  assert.ok(readFileSync(join(root, "app/capturar/page.tsx"), "utf8").includes('redirect("/sistema/ingreso")'));
+  assert.ok(readFileSync(join(root, "app/sistema/dictado/page.tsx"), "utf8").includes('redirect("/sistema/ingreso")'));
+  assert.ok(readFileSync(join(root, "app/sistema/editar/page.tsx"), "utf8").includes("VolcadosPage legacyEditorEntry"));
+  assert.ok(readFileSync(join(root, "app/sistema/ingesta/page.tsx"), "utf8").includes('redirect("/sistema/volcados")'));
 });
 
 test("domain menus remain hierarchical while ingreso and volcados stay primary", () => {
