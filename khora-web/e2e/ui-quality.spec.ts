@@ -155,10 +155,62 @@ for (const viewport of [
         await expect(page).toHaveURL(canonical);
         await expect(page.locator("h1").first()).toBeVisible();
         if (alias === "/sistema/editar") {
-          await expect(page.getByRole("heading", { name: /editar transcripciones/i }).first()).toBeVisible();
+          await expect(page.getByRole("heading", { name: /mesa de revisión sincrónica/i }).first()).toBeVisible();
         }
       }
     });
+
+    test("ING-DIRECT-01 contract: editor alias retains direct route and only the opened approved tuple is sent", async ({ page }) => {
+  const digest = "a".repeat(64);
+  let lastTuple: { volcado_id: string; version: string; sha256: string } | null = null;
+  await page.route("**/api/auth/session", async (route) => {
+    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ user: { email: "operator@example.invalid" }, expires: new Date(Date.now()+3600000).toISOString() }) });
+  });
+  await page.route("**/api/volcados/pipeline", async (route) => {
+    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({
+      total: 1,
+      counts: { archivado: 0, pendiente_revision: 0, en_revision: 0, listo_ingesta: 1, ingerido: 0, fallido: 0 },
+      integrity: { sync: 1, text_without_audio: 0 },
+      volcados: [{ id: "tuple-volcado-01", folio: 1, titulo: "Tuple test", estado: "listo_ingesta", version_aprobada: 2, sha256_aprobado: digest, version_actual: 2, session_id: "tuple-session", partes_count: 0 }]
+    }) });
+  });
+  await page.route("**/api/versiones?id=tuple-volcado-01", async (route) => {
+    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ versiones: [
+      { version: 1, texto: "older version", sha256: "b".repeat(64) },
+      { version: 2, texto: "approved version", sha256: digest }
+    ]}) });
+  });
+  await page.route("**/api/audio/tuple-volcado-01/manifiesto", async (route) => {
+    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ partes: [] }) });
+  });
+  await page.route("**/api/revision/tuple-volcado-01/compuerta", async (route) => {
+    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ canApprove: false, version: 2, sha256: digest, blockers: [], warnings: [], counts: {} }) });
+  });
+  await page.route("**/api/revision/tuple-volcado-01/incidentes", async (route) => {
+    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ incidentes: [] }) });
+  });
+  await page.route("**/api/revision/tuple-volcado-01/hallazgos?version=2", async (route) => {
+    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ hallazgos: [] }) });
+  });
+  await page.route("**/api/ingesta", async (route) => {
+    const body = route.request().postData() || "";
+    const pick = (name: string) => body.match(new RegExp(`name="${name}"\\r\\n\\r\\n([^\\r\\n]+)`))?.[1] || "";
+    lastTuple = { volcado_id: pick("volcado_id"), version: pick("version"), sha256: pick("sha256") };
+    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ io_id: "io-tuple-test" }) });
+  });
+
+  await page.goto("/sistema/editar?volcado_id=tuple-volcado-01&version=2");
+  await expect(page).toHaveURL(/\/sistema\/editar\?volcado_id=tuple-volcado-01&version=2$/);
+  await expect(page.getByRole("button", { name: "Ingerir esta version", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Ingerir esta version", exact: true }).click();
+  await expect.poll(() => lastTuple).toEqual({ volcado_id: "tuple-volcado-01", version: "2", sha256: digest });
+
+  lastTuple = null;
+  await page.goto("/sistema/editar?volcado_id=tuple-volcado-01&version=1");
+  await expect(page).toHaveURL(/\/sistema\/editar\?volcado_id=tuple-volcado-01&version=1$/);
+  await expect(page.getByRole("button", { name: "Ingerir esta version", exact: true })).toHaveCount(0);
+  expect(lastTuple).toBeNull();
+});
 
     test("las pestañas de Seguridad exponen semántica ARIA coherente", async ({ page }) => {
       await page.goto("/sistema/seguridad", { waitUntil: "domcontentloaded" });
