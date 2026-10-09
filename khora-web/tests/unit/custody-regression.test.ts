@@ -36,6 +36,21 @@ function makeDb(state: FakeState) {
       return { rows: state.session ? [{ ...state.session }] : [], rowCount: state.session ? 1 : 0 };
     }
 
+    if (normalized.includes("select * from volcado where id = $1 for update")) {
+      const row = state.volume ? {
+        ...state.volume, folio: 1, titulo: "Custody regression", origen: "web",
+        driver: "dictado", usuario: "custody-test", recibido_en: new Date(),
+        io_id: null, intentos: 0, ultimo_error: null, ultimo_intento: null,
+        version_aprobada: null,
+      } : null;
+      return { rows: row ? [row] : [], rowCount: row ? 1 : 0 };
+    }
+
+    if (normalized.includes("select coalesce(max(version), 0)::int as ultima")) {
+      const versions = state.versions.filter((v) => v.volcado_id === params[0]);
+      return { rows: [{ ultima: versions.reduce((max, v) => Math.max(max, Number(v.version)), 0) }], rowCount: 1 };
+    }
+
     if (normalized.includes("select part_index, bytes, sha256, fuente_audio, estado_verificacion")) {
       return { rows: state.parts.map((p) => ({ ...p })), rowCount: state.parts.length };
     }
@@ -48,6 +63,14 @@ function makeDb(state: FakeState) {
       return { rows: state.versions.map((v) => ({ ...v })), rowCount: state.versions.length };
     }
 
+    if (normalized.startsWith("insert into volcado_version ")) {
+      state.versions.push({
+        id: params[0], volcado_id: params[1], version: params[2],
+        texto: params[3], sha256: params[4], chars: params[5], motivo: params[6],
+      });
+      return { rows: [], rowCount: 1 };
+    }
+
     if (normalized.startsWith("insert into volcado ")) {
       state.volumeInsertCount += 1;
       const row = {
@@ -55,12 +78,37 @@ function makeDb(state: FakeState) {
         texto: params[1],
         sha256: params[2],
         chars: params[3],
+        titulo: params[4],
+        origen: params[5],
+        driver: params[6],
+        usuario: params[7],
+        estado: "archivado",
+        io_id: null,
         audio_partes: params[14],
         session_id: params[15],
-        estado: "archivado",
+        folio: 1,
+        recibido_en: new Date(),
+        version_aprobada: null,
       };
       state.volume = row;
       return { rows: [row], rowCount: 1 };
+    }
+
+    if (normalized.startsWith("update volcado set estado = 'pendiente_revision'")) {
+      if (state.volume) state.volume.estado = "pendiente_revision";
+      return { rows: [], rowCount: 1 };
+    }
+
+    if (normalized.startsWith("update volcado set estado = 'en_revision'")) {
+      if (!state.volume) return { rows: [], rowCount: 0 };
+      state.volume.estado = "en_revision";
+      return { rows: [{
+        id: state.volume.id, folio: 1, texto: state.volume.texto, sha256: state.volume.sha256,
+        chars: state.volume.chars, titulo: state.volume.titulo, origen: state.volume.origen,
+        driver: state.volume.driver, usuario: state.volume.usuario, recibido_en: new Date(),
+        estado: "en_revision", io_id: null, intentos: 0, ultimo_error: null,
+        ultimo_intento: null, version_aprobada: null,
+      }], rowCount: 1 };
     }
 
     if (normalized.includes("insert into dictado_audio_parte")) {
@@ -255,6 +303,39 @@ test("CUSTODY-05: retrying an audio part with different bytes/hash is rejected w
     assert.equal(state.parts[0].blob_url, original.blobUrl);
     assert.equal(state.parts[0].bytes, original.bytes);
     assert.equal(state.parts[0].sha256, original.sha256);
+  } finally {
+    resetDbForTesting();
+  }
+});
+
+test("CUSTODY-06: text-only capture with a stable session ID archives without inventing an audio requirement", async () => {
+  const sessionId = "session-text-only-001";
+  const texto = "Texto manual que debe poder archivarse sin audio.";
+  const state: FakeState = {
+    session: null,
+    parts: [],
+    volume: null,
+    versions: [],
+    log: [],
+    volumeInsertCount: 0,
+  };
+  setDbForTesting(makeDb(state) as any);
+  try {
+    const result = await guardarDictado({
+      texto,
+      sessionId,
+      fuenteEntrada: "texto",
+      usuario: "custody-test@example.invalid",
+    });
+    assert.equal(result.sessionId, sessionId);
+    assert.equal(result.idempotent, false);
+    assert.equal(state.volumeInsertCount, 1);
+    assert.equal(state.session?.volcado_id, result.id);
+    assert.equal(state.session?.estado, "complete");
+    assert.equal(state.volume?.estado, "en_revision");
+    assert.equal(state.volume?.sha256, hash(texto));
+    assert.equal(state.parts.length, 0);
+    assert.equal(state.versions.length, 1);
   } finally {
     resetDbForTesting();
   }
