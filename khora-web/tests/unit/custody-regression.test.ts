@@ -134,12 +134,14 @@ function makeDb(state: FakeState) {
     }
 
     if (normalized.includes("insert into dictado_audio_parte")) {
-      const [sessionId, partIndex, blobUrl, blobPath, bytes, sha256, source, verified, startMs, endMs, durationMs] = params;
+      const [sessionId, partIndex, blobUrl, blobPath, bytes, sha256, source, verified, startMs, endMs, durationMs, originalName, mimeType] = params;
       const existing = state.parts.find((p) => p.session_id === sessionId && p.part_index === partIndex);
       if (existing && (
         Number(existing.bytes) !== Number(bytes) ||
         String(existing.sha256).toLowerCase() !== String(sha256).toLowerCase() ||
-        existing.fuente_audio !== source
+        existing.fuente_audio !== source ||
+        (existing.original_name ?? originalName ?? null) !== (originalName ?? existing.original_name ?? null) ||
+        (existing.mime_type ?? mimeType ?? null) !== (mimeType ?? existing.mime_type ?? null)
       )) {
         return { rows: [], rowCount: 0 };
       }
@@ -147,12 +149,14 @@ function makeDb(state: FakeState) {
         existing.blob_url = blobUrl;
         existing.blob_path = blobPath;
         existing.estado_verificacion = verified;
+        existing.original_name = existing.original_name ?? originalName ?? null;
+        existing.mime_type = existing.mime_type ?? mimeType ?? null;
       } else {
         state.parts.push({
           session_id: sessionId, part_index: partIndex, blob_url: blobUrl,
           blob_path: blobPath, bytes, sha256, fuente_audio: source,
           estado_verificacion: verified, start_ms: startMs, end_ms: endMs,
-          duracion_ms: durationMs,
+          duracion_ms: durationMs, original_name: originalName ?? null, mime_type: mimeType ?? null,
         });
       }
       return { rows: [{ part_index: partIndex }], rowCount: 1 };
@@ -401,6 +405,8 @@ test("CUSTODY-08: verified imported audio can be archived even when transcriptio
         bytes: audioBytes.length,
         sha256: audioSha,
         fuenteAudio: "audio_archivo",
+        nombreOriginal: "entrada-prueba.mp3",
+        mimeType: "audio/mpeg",
         estadoVerificacion: "verificado",
         verificado: true,
       }],
@@ -415,6 +421,8 @@ test("CUSTODY-08: verified imported audio can be archived even when transcriptio
     assert.equal(state.parts.length, 1);
     assert.equal(state.parts[0].sha256, audioSha);
     assert.equal(state.parts[0].estado_verificacion, "verificado");
+    assert.equal(state.parts[0].original_name, "entrada-prueba.mp3");
+    assert.equal(state.parts[0].mime_type, "audio/mpeg");
     assert.equal(state.versions.length, 0, "an empty transcript must not fabricate a version");
   } finally {
     resetDbForTesting();
@@ -450,6 +458,8 @@ test("CUSTODY-11: transcript network failure must return the verified original l
 test("CUSTODY-12: original export works from verified import custody before or after archive", () => {
   const exportRoute = readFileSync(resolve(process.cwd(), "app/api/audio/sesion/[id]/exportar/route.ts"), "utf8");
   assert.ok(exportRoute.includes("p.fuente_audio"));
+  assert.ok(exportRoute.includes("p.original_name"));
+  assert.ok(exportRoute.includes("p.mime_type"));
   assert.ok(exportRoute.includes("LEFT JOIN dictado_session"));
   assert.ok(exportRoute.includes('parts[0].fuente_audio !== "audio_archivo"'));
   assert.ok(exportRoute.includes("parts.length !== 1"));
