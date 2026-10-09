@@ -145,10 +145,10 @@ export const NAVIGATION_LEGACY_ALIASES = new Map<string, string>([
   ["/sistema/boveda", "/sistema/seguridad?tab=boveda"],
   ["/sistema/entorno-persistente", "/sistema/seguridad?tab=entorno-persistente"],
   ["/herramientas/bitacora", "/sistema/volcados"],
-  ["/capturar", "/sistema/ingreso?modo=captura"],
-  ["/sistema/dictado", "/sistema/ingreso?modo=dictado"],
-  ["/sistema/editar", "/sistema/ingreso?modo=revision"],
-  ["/sistema/ingesta", "/sistema/ingreso?modo=ingesta"],
+  ["/capturar", "/sistema/ingreso"],
+  ["/sistema/dictado", "/sistema/ingreso"],
+  ["/sistema/editar", "/sistema/volcados"],
+  ["/sistema/ingesta", "/sistema/volcados"],
 ]);
 
 export const CANONICAL_PRODUCT_ROUTES = new Set(
