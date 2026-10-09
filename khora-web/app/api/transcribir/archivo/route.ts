@@ -5,6 +5,7 @@ import { put } from "@vercel/blob";
 import { createHash, randomUUID } from "crypto";
 import { cifrarBytes, descifrarBytes } from "../../../../lib/server/cripto";
 import { registrarParteAudio } from "../../../../lib/server/dictado";
+import { detectAudioFormat } from "../../../../lib/server/importedAudio";
 import { transcribirAudioConGroq } from "../../../../lib/server/transcribir";
 import { evaluarCoberturaYReconciliar } from "../../../../lib/transcripcion/reconciliar";
 
@@ -51,9 +52,20 @@ export async function POST(req: NextRequest) {
     }
 
     // 1. Persistir el archivo CIFRADO como parte 1 de la sesión (igual patrón que /api/audio)
+    const format = detectAudioFormat(crudo);
+    if (!format) {
+      return NextResponse.json(
+        { detail: "El archivo no contiene un formato de audio admitido" },
+        { status: 415 },
+      );
+    }
+    const nombreArchivo =
+      typeof (archivo as File).name === "string" && (archivo as File).name.trim()
+        ? (archivo as File).name.trim()
+        : "audio-adjunto." + format.extension;
     const sha256 = createHash("sha256").update(crudo).digest("hex");
     const cifrado = cifrarBytes(crudo);
-    const destino = `dictado/${sessionId}/1.webm.khc`;
+    const destino = `dictado/${sessionId}/1.${format.extension}.khc`;
 
     const subido = await put(destino, cifrado, {
       access: "public",
@@ -126,6 +138,8 @@ export async function POST(req: NextRequest) {
         bytes: crudo.length,
         sha256,
         fuenteAudio: "audio_archivo",
+        nombreOriginal: nombreArchivo,
+        mimeType: format.mimeType,
         estadoVerificacion: "verificado",
       });
     } catch {
@@ -160,7 +174,6 @@ export async function POST(req: NextRequest) {
     }
 
     // 3. Transcribir con Groq Whisper y reconciliar con el guardián D12
-    const nombreArchivo = (archivo as any).name || "audio-adjunto.webm";
     const resGroq = await transcribirAudioConGroq(crudo, nombreArchivo, {
       verboseJson: true,
     });
@@ -173,6 +186,8 @@ export async function POST(req: NextRequest) {
         sessionId,
         audioUrl: subido.url,
         audioBytes: crudo.length,
+        originalName: nombreArchivo,
+        mimeType: format.mimeType,
         detail: resGroq.motivo || "Fallo la transcripción con Groq Whisper",
       });
     }
@@ -191,6 +206,8 @@ export async function POST(req: NextRequest) {
       sessionId,
       audioUrl: subido.url,
       audioBytes: crudo.length,
+      originalName: nombreArchivo,
+      mimeType: format.mimeType,
       modelo: resGroq.modelo,
     });
   } catch (e: any) {
