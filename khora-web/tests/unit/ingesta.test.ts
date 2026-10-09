@@ -398,6 +398,34 @@ test("Ingesta Route Suite", async (t) => {
     assert.strictEqual(response.status, 502);
     const updateQuery = dbQueriesLogged.find(q => q.sql.toLowerCase().includes("update volcado"));
     assert.ok(updateQuery);
-    assert.strictEqual(updateQuery.params?.[2], "fallido");
+    assert.ok(updateQuery.sql.toLowerCase().includes("case when estado = 'ingerido' then 'ingerido' else 'fallido' end"));
+  });
+
+  await t.test("12. Approval invalidated during kernel call is rejected without changing volcado state", async () => {
+    mockDbVolcados[0].estado = "listo_ingesta";
+    mockDbVolcados[0].version_aprobada = 1;
+    mockDbVolcados[0].sha256_aprobado = sha;
+    mockDbVolcados[0].io_id = null;
+    dbQueriesLogged = [];
+    fetchMockResponse = async () => {
+      mockDbVolcados[0].estado = "en_revision";
+      mockDbVolcados[0].version_aprobada = null;
+      mockDbVolcados[0].sha256_aprobado = null;
+      return { status: 200, ok: true, json: async () => ({ io_id: "stale-approval-io-id" }) };
+    };
+    const formData = new FormData();
+    formData.append("volcado_id", volcadoId);
+    formData.append("version", "1");
+    formData.append("sha256", sha);
+    const response = await POST(new Request("http://localhost/api/ingesta", { method: "POST", body: formData }));
+    assert.strictEqual(response.status, 409);
+    const body = await response.json();
+    assert.strictEqual(body.error, "aprobacion_o_identidad_cambio_durante_ingesta");
+    const stateMutations = dbQueriesLogged.filter(q =>
+      q.sql.toLowerCase().includes("update volcado") &&
+      (q.sql.toLowerCase().includes("estado = 'ingerido'") ||
+       q.sql.toLowerCase().includes("else 'fallido' end"))
+    );
+    assert.deepStrictEqual(stateMutations, []);
   });
 });
