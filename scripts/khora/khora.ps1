@@ -216,32 +216,22 @@ function Register-KhoraRebootCleanup {
     Register-ScheduledTask -TaskName $Task -Action $action -Trigger $trigger -Principal $principal -Force|Out-Null
 }
 function Get-KhoraGitHubToken {
-    $gh=Resolve-KhoraHostToolPath -Name 'gh'
-    if($gh-and(Test-Path -LiteralPath $gh -PathType Leaf)){
-        try{
-            $tokenOutput=@(& $gh auth token 2>&1);$exit=$LASTEXITCODE
-            if($exit-eq0){
-                $candidate=([string]($tokenOutput -join '')).Trim()
-                if($candidate-match'^(ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|gho_[A-Za-z0-9]{20,})$'){
-                    $headers=@{Authorization=('Bearer '+$candidate);'User-Agent'='khora-ep-medio-v1';Accept='application/vnd.github+json'}
-                    $user=Invoke-RestMethod -Uri 'https://api.github.com/user' -Headers $headers -TimeoutSec 20
-                    $repo=Invoke-RestMethod -Uri 'https://api.github.com/repos/SeryMente/khora' -Headers $headers -TimeoutSec 20
-                    if($user.login-and($repo.permissions.push-or$repo.permissions.maintain-or$repo.permissions.admin)){return (ConvertTo-SecureString $candidate -AsPlainText -Force)}
-                }
-                $candidate=$null
-            }
-        }catch{}finally{$candidate=$null}
-    }
-    Write-Host '  Copia un Personal Access Token de GitHub con escritura sobre SeryMente/khora.' -ForegroundColor Yellow
-    $deadline=(Get-Date).AddMinutes(10)
-    do{
-        $candidate=([string](Get-Clipboard -Raw -ErrorAction SilentlyContinue)).Trim()
-        if($candidate-match'^(ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|gho_[A-Za-z0-9]{20,})$'){
-            try{$headers=@{Authorization=('Bearer '+$candidate);'User-Agent'='khora-ep-medio-v1';Accept='application/vnd.github+json'};$user=Invoke-RestMethod -Uri 'https://api.github.com/user' -Headers $headers -TimeoutSec 20;$repo=Invoke-RestMethod -Uri 'https://api.github.com/repos/SeryMente/khora' -Headers $headers -TimeoutSec 20;if($user.login-and($repo.permissions.push-or$repo.permissions.maintain-or$repo.permissions.admin)){Set-Clipboard -Value' ';return (ConvertTo-SecureString $candidate -AsPlainText -Force)}}catch{}finally{$candidate=$null}
-        }
-        Start-Sleep -Milliseconds 400
-    }while((Get-Date)-lt$deadline)
-    throw 'No se recibió un Personal Access Token válido en diez minutos.'
+    if([string]::IsNullOrWhiteSpace($script:KhoraToken)-or[string]::IsNullOrWhiteSpace($KhoraApiBase)){throw 'KHORA_SESSION_REQUIRED_FOR_GITHUB_APP_TOKEN'}
+    $base=[uri]$KhoraApiBase
+    if($base.Scheme-ne'https'-or$base.Query-or$base.Fragment-or$base.AbsolutePath.TrimEnd('/')-ne'/api/ep'){throw 'KHORA_API_BASE_INVALID'}
+    $headers=@{Authorization=('Bearer '+$script:KhoraToken);Accept='application/json';'Content-Type'='application/json';'Cache-Control'='no-store';'User-Agent'='khora-ep-launcher/5'}
+    $issued=$null;$token=$null
+    try{
+        $issued=Invoke-RestMethod -Method Post -Uri ($KhoraApiBase.TrimEnd('/')+'/github-token') -Headers $headers -Body '{}' -TimeoutSec 45 -ErrorAction Stop
+        $token=[string]$issued.token
+        $expires=[DateTimeOffset]::MinValue
+        if($token-notmatch'^ghs_[A-Za-z0-9_]{20,}$'-or-not[DateTimeOffset]::TryParse([string]$issued.expiresAt,[ref]$expires)-or$expires.UtcDateTime-le[DateTime]::UtcNow.AddMinutes(2)){throw 'GITHUB_APP_TOKEN_CONTRACT_INVALID'}
+        $expected=@('SeryMente/metodologia','SeryMente/otrogranprograma','SeryMente/GDP','SeryMente/CENSUS','SeryMente/signal-interpreter','SeryMente/khora')
+        $actual=@($issued.repositories|ForEach-Object{([string]$_).ToLowerInvariant()})
+        foreach($repositoryName in $expected){if($actual-notcontains$repositoryName.ToLowerInvariant()){throw ('GITHUB_APP_REPOSITORY_SCOPE_MISSING='+$repositoryName)}}
+        $script:GitHubAppTokenExpiresAt=$expires.UtcDateTime
+        return (ConvertTo-SecureString $token -AsPlainText -Force)
+    }finally{$token=$null;$issued=$null;$headers=$null}
 }
 function Invoke-WithBootstrapToken {
     param([Security.SecureString]$Secure,[ScriptBlock]$Action)
