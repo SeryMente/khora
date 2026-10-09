@@ -345,19 +345,19 @@ test("CUSTODY-06: text-only capture with a stable session ID archives without in
 
 test("CUSTODY-07: verification failures never delete stored audio and staging is deleted only after verified linkage", () => {
   const audioRoute = readFileSync(resolve(process.cwd(), "app/api/audio/route.ts"), "utf8");
-  assert.doesNotMatch(audioRoute, /del\\s*\\(\\s*subido\\.url/);
-  assert.match(audioRoute, /recuperable:\\s*true/);
-  assert.match(audioRoute, /verificado:\\s*false/);
+  assert.doesNotMatch(audioRoute, /del\s*\(\s*subido\.url/);
+  assert.match(audioRoute, /recuperable:\s*true/);
+  assert.match(audioRoute, /verificado:\s*false/);
 
   const importRoute = readFileSync(resolve(process.cwd(), "app/api/audio/importar/procesar/route.ts"), "utf8");
-  assert.doesNotMatch(importRoute, /del\\s*\\(\\s*stored\\.url/);
-  assert.match(importRoute, /stagingCanBeDeleted\\s*=\\s*true/);
-  assert.match(importRoute, /if \\(stagingUrl && stagingCanBeDeleted\\)/);
-  assert.match(importRoute, /audioUrl:\\s*stored\\.url/);
-  assert.match(importRoute, /recuperable:\\s*true/);
+  assert.doesNotMatch(importRoute, /del\s*\(\s*stored\.url/);
+  assert.match(importRoute, /stagingCanBeDeleted\s*=\s*true/);
+  assert.match(importRoute, /if \(stagingUrl && stagingCanBeDeleted\)/);
+  assert.match(importRoute, /audioUrl:\s*stored\.url/);
+  assert.match(importRoute, /recuperable:\s*true/);
 
   const importedTranscription = readFileSync(resolve(process.cwd(), "app/api/transcribir/archivo/route.ts"), "utf8");
-  assert.match(importedTranscription, /descifrarBytes\\(Buffer\\.from\\(await verificacion\\.arrayBuffer\\(\\)\\)\\)/);
-  assert.match(importedTranscription, /estadoVerificacion:\\s*"verificado"/);
-  assert.match(importedTranscription, /audioUrl:\\s*subido\\.url/);
+  assert.match(importedTranscription, /descifrarBytes\(Buffer\.from\(await verificacion\.arrayBuffer\(\)\)\)/);
+  assert.match(importedTranscription, /estadoVerificacion:\s*"verificado"/);
+  assert.match(importedTranscription, /audioUrl:\s*subido\.url/);
 });
