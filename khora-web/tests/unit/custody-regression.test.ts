@@ -96,6 +96,26 @@ function makeDb(state: FakeState) {
       return { rows: [row], rowCount: 1 };
     }
 
+    if (normalized.startsWith("update volcado set estado = 'archivado'")) {
+      if (state.volume) {
+        state.volume.estado = "archivado";
+        state.volume.ultimo_error = params[1] ?? null;
+      }
+      return { rows: [], rowCount: state.volume ? 1 : 0 };
+    }
+
+    if (normalized.startsWith("select id, folio, texto, sha256, chars, titulo, origen, driver, usuario, recibido_en, estado, io_id, intentos, ultimo_error, ultimo_intento, version_aprobada from volcado where id = $1")) {
+      return { rows: state.volume ? [{
+        ...state.volume,
+        folio: 1,
+        io_id: null,
+        intentos: 0,
+        ultimo_error: state.volume.ultimo_error ?? null,
+        ultimo_intento: null,
+        version_aprobada: null,
+      }] : [], rowCount: state.volume ? 1 : 0 };
+    }
+
     if (normalized.startsWith("update volcado set estado = 'pendiente_revision'")) {
       if (state.volume) state.volume.estado = "pendiente_revision";
       return { rows: [], rowCount: 1 };
@@ -391,6 +411,7 @@ test("CUSTODY-08: verified imported audio can be archived even when transcriptio
     assert.equal(state.session?.volcado_id, result.id);
     assert.equal(state.session?.estado, "complete");
     assert.equal(state.volume?.sha256, hash(""));
+    assert.equal(state.volume?.driver, "audio_archivo");
     assert.equal(state.parts.length, 1);
     assert.equal(state.parts[0].sha256, audioSha);
     assert.equal(state.parts[0].estado_verificacion, "verificado");
