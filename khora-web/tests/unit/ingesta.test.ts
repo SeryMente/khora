@@ -24,8 +24,10 @@ let fetchMockResponse: () => Promise<any> = async () => ({
   })
 });
 
-// Override globalThis.fetch
+// Override globalThis.fetch and record kernel requests for provenance regression assertions.
+const kernelRequests: { url: unknown; options: any }[] = [];
 globalThis.fetch = (async (url: any, options: any) => {
+  kernelRequests.push({ url, options });
   return fetchMockResponse();
 }) as any;
 
@@ -101,6 +103,7 @@ test("Ingesta Route Suite", async (t) => {
     const formData = new FormData();
     formData.append("volcado_id", volcadoId);
     formData.append("version", "1");
+    formData.append("sha256", sha);
 
     const request = new Request("http://localhost/api/ingesta", {
       method: "POST",
@@ -134,7 +137,8 @@ test("Ingesta Route Suite", async (t) => {
 
     const formData = new FormData();
     formData.append("volcado_id", volcadoId);
-    formData.append("version", "1"); // requested 1, but approved is 2
+    formData.append("version", "1");
+    formData.append("sha256", sha); // requested 1, but approved is 2
 
     const request = new Request("http://localhost/api/ingesta", {
       method: "POST",
@@ -152,11 +156,13 @@ test("Ingesta Route Suite", async (t) => {
 
   await t.test("3. Rechazo de SHA incorrecto", async () => {
     // Modify mock DB sha256_aprobado to mismatch version
-    mockDbVolcados[0].sha256_aprobado = "mismatch-sha-value";
+    const shaAprobadoAlternativo = "f".repeat(64);
+    mockDbVolcados[0].sha256_aprobado = shaAprobadoAlternativo;
 
     const formData = new FormData();
     formData.append("volcado_id", volcadoId);
     formData.append("version", "1");
+    formData.append("sha256", shaAprobadoAlternativo);
 
     const request = new Request("http://localhost/api/ingesta", {
       method: "POST",
@@ -177,6 +183,7 @@ test("Ingesta Route Suite", async (t) => {
     const formData = new FormData();
     formData.append("volcado_id", fakeId);
     formData.append("version", "1");
+    formData.append("sha256", sha);
 
     const request = new Request("http://localhost/api/ingesta", {
       method: "POST",
@@ -196,6 +203,7 @@ test("Ingesta Route Suite", async (t) => {
     const formData = new FormData();
     formData.append("volcado_id", volcadoId);
     formData.append("version", "99");
+    formData.append("sha256", sha);
 
     const request = new Request("http://localhost/api/ingesta", {
       method: "POST",
@@ -221,6 +229,7 @@ test("Ingesta Route Suite", async (t) => {
     const formData = new FormData();
     formData.append("volcado_id", volcadoId);
     formData.append("version", "1");
+    formData.append("sha256", sha);
 
     const request = new Request("http://localhost/api/ingesta", {
       method: "POST",
@@ -255,6 +264,7 @@ test("Ingesta Route Suite", async (t) => {
     const formData = new FormData();
     formData.append("volcado_id", volcadoId);
     formData.append("version", "1");
+    formData.append("sha256", sha);
 
     const request = new Request("http://localhost/api/ingesta", {
       method: "POST",
@@ -271,16 +281,20 @@ test("Ingesta Route Suite", async (t) => {
     assert.strictEqual(updateQuery.params?.[1], "Request to kernel timed out");
   });
 
-  await t.test("8. Retry & Idempotency - Allows retry from fallido and ingerido", async () => {
-    // 8a. Retry from 'fallido'
-    mockDbVolcados[0].estado = "listo_ingesta";
+  await t.test("8. Idempotent retry from failed/ingested preserves the exact tuple and never regresses an ingested dump", async () => {
+    // The kernel may have committed a graph write even when the web request timed out.
+    mockDbVolcados[0].estado = "fallido";
+    mockDbVolcados[0].version_aprobada = 1;
+    mockDbVolcados[0].sha256_aprobado = sha;
+    mockDbVolcados[0].io_id = null;
     dbQueriesLogged = [];
     fetchMockResponse = async () => ({
       status: 200,
       ok: true,
       json: async () => ({
         io_id: "idempotent-io-id",
-        counters: { create: 0, update: 0, ignore: 15 },
+        idempotent: true,
+        counters: { create: 0, update: 0, ignore: 0 },
         ts: new Date().toISOString()
       })
     });
@@ -288,53 +302,95 @@ test("Ingesta Route Suite", async (t) => {
     const formData = new FormData();
     formData.append("volcado_id", volcadoId);
     formData.append("version", "1");
+    formData.append("sha256", sha);
 
-    let request = new Request("http://localhost/api/ingesta", {
-      method: "POST",
-      body: formData,
-    });
-
+    let request = new Request("http://localhost/api/ingesta", { method: "POST", body: formData });
     let response = await POST(request);
     assert.strictEqual(response.status, 200);
-
+    let body = await response.json();
+    assert.strictEqual(body.io_id, "idempotent-io-id");
+    assert.strictEqual(body.idempotent, true);
     let updateQuery = dbQueriesLogged.find(q => q.sql.toLowerCase().includes("update volcado"));
     assert.ok(updateQuery);
     assert.strictEqual(updateQuery.params?.[0], "idempotent-io-id");
     assert.ok(updateQuery.sql.toLowerCase().includes("estado = 'ingerido'"));
 
-    // 8b. Retry/Re-attempt from 'listo_ingesta'
-    mockDbVolcados[0].estado = "listo_ingesta";
+    const sentPayload = JSON.parse(kernelRequests[kernelRequests.length - 1].options.body);
+    assert.deepStrictEqual({
+      volcado_id: sentPayload.provenance.volcado_id,
+      version: sentPayload.provenance.version,
+      sha256: sentPayload.provenance.sha256,
+    }, { volcado_id: volcadoId, version: 1, sha256: sha });
+
+    // Repeat from the already-ingested state: the same IO identity is mandatory.
+    mockDbVolcados[0].estado = "ingerido";
+    mockDbVolcados[0].io_id = "idempotent-io-id";
     dbQueriesLogged = [];
-
-    request = new Request("http://localhost/api/ingesta", {
-      method: "POST",
-      body: formData,
-    });
-
+    request = new Request("http://localhost/api/ingesta", { method: "POST", body: formData });
     response = await POST(request);
     assert.strictEqual(response.status, 200);
+    body = await response.json();
+    assert.strictEqual(body.io_id, "idempotent-io-id");
+    assert.strictEqual(body.idempotent, true);
     updateQuery = dbQueriesLogged.find(q => q.sql.toLowerCase().includes("update volcado"));
     assert.ok(updateQuery);
-    assert.strictEqual(updateQuery.params?.[0], "idempotent-io-id");
     assert.ok(updateQuery.sql.toLowerCase().includes("estado = 'ingerido'"));
 
-    // 8c. Ensure retry from 'listo_ingesta' DOES NOT downgrade if fetch fails
+    // A verification retry must never downgrade a dump that had already been ingested.
     dbQueriesLogged = [];
-    fetchMockResponse = async () => {
-      throw new Error("Kernel offline");
-    };
-
-    request = new Request("http://localhost/api/ingesta", {
-      method: "POST",
-      body: formData,
-    });
-
+    fetchMockResponse = async () => { throw new Error("Kernel offline"); };
+    request = new Request("http://localhost/api/ingesta", { method: "POST", body: formData });
     response = await POST(request);
     assert.strictEqual(response.status, 502);
-
     updateQuery = dbQueriesLogged.find(q => q.sql.toLowerCase().includes("update volcado"));
     assert.ok(updateQuery);
-    assert.strictEqual(updateQuery.params?.[2], "fallido");
+    assert.strictEqual(updateQuery.params?.[2], "ingerido");
     assert.strictEqual(updateQuery.params?.[1], "Kernel offline");
+  });
+
+  await t.test("9. Rejects missing client SHA before calling the kernel", async () => {
+    const before = kernelRequests.length;
+    const formData = new FormData();
+    formData.append("volcado_id", volcadoId);
+    formData.append("version", "1");
+    const response = await POST(new Request("http://localhost/api/ingesta", { method: "POST", body: formData }));
+    assert.strictEqual(response.status, 400);
+    assert.strictEqual(kernelRequests.length, before);
+  });
+
+  await t.test("10. Rejects a client SHA that is not the approved SHA", async () => {
+    mockDbVolcados[0].estado = "listo_ingesta";
+    mockDbVolcados[0].version_aprobada = 1;
+    mockDbVolcados[0].sha256_aprobado = sha;
+    const before = kernelRequests.length;
+    const formData = new FormData();
+    formData.append("volcado_id", volcadoId);
+    formData.append("version", "1");
+    formData.append("sha256", "a".repeat(64));
+    const response = await POST(new Request("http://localhost/api/ingesta", { method: "POST", body: formData }));
+    assert.strictEqual(response.status, 409);
+    assert.strictEqual(kernelRequests.length, before);
+  });
+
+  await t.test("11. Does not mark ingestion successful when the kernel omits io_id", async () => {
+    mockDbVolcados[0].estado = "listo_ingesta";
+    mockDbVolcados[0].version_aprobada = 1;
+    mockDbVolcados[0].sha256_aprobado = sha;
+    mockDbVolcados[0].io_id = null;
+    dbQueriesLogged = [];
+    fetchMockResponse = async () => ({
+      status: 200,
+      ok: true,
+      json: async () => ({ counters: { create: 1, update: 0, ignore: 0 } })
+    });
+    const formData = new FormData();
+    formData.append("volcado_id", volcadoId);
+    formData.append("version", "1");
+    formData.append("sha256", sha);
+    const response = await POST(new Request("http://localhost/api/ingesta", { method: "POST", body: formData }));
+    assert.strictEqual(response.status, 502);
+    const updateQuery = dbQueriesLogged.find(q => q.sql.toLowerCase().includes("update volcado"));
+    assert.ok(updateQuery);
+    assert.strictEqual(updateQuery.params?.[2], "fallido");
   });
 });
