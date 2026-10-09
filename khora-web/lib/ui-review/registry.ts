@@ -23,6 +23,28 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
       "ingreso.stats"
     ]
   },
+  "ingreso:archived": {
+    screen: "ingreso",
+    scenario: "archived",
+    title: "Ingreso · Captura Sellada",
+    description: "Un volcado ya archivado muestra el sello de custodia y deshabilita controles que podrían sustituir el original.",
+    status: "active",
+    recommended_viewport: "desktop",
+    ui_ids: [
+      "ingreso.container",
+      "ingreso.archivado",
+      "ingreso.titulo-input",
+      "ingreso.btn-titulo-ia",
+      "ingreso.btn-iniciar",
+      "ingreso.btn-chrome",
+      "ingreso.btn-archivar",
+      "ingreso.btn-retranscribir",
+      "ingreso.btn-adjuntar",
+      "ingreso.btn-limpiar",
+      "ingreso.textarea",
+      "ingreso.stats"
+    ]
+  },
   "ingreso:chrome_live_caption": {
     screen: "ingreso",
     scenario: "chrome_live_caption",
