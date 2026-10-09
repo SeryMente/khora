@@ -169,6 +169,8 @@ export async function POST(req: Request) {
             sha256,
             fuenteAudio,
             causa: linkError instanceof Error ? linkError.message : String(linkError),
+            verificado: false,
+            recuperable: true,
           },
           { status: 503 },
         );
