@@ -846,6 +846,10 @@ function IngresoContenido() {
   const guardar = useCallback(async () => {
     setError("");
     setResultado("");
+    if (archivado) {
+      setError("Esta captura ya está archivada y sellada. Pulsa Limpiar para iniciar una captura nueva.");
+      return;
+    }
     const archivoOriginalVerificado =
       fuenteEntradaSesionRef.current === "audio_archivo" &&
       partesSubidasRef.current.length === 1 &&
@@ -856,6 +860,7 @@ function IngresoContenido() {
       setError("No hay transcripción para archivar. Puedes custodiar el audio original si su almacenamiento y SHA-256 ya están verificados.");
       return;
     }
+    if (!sesionIdRef.current) sesionIdRef.current = generarSesionId();
     setGuardando(true);
     try {
       if (subidaEnCursoRef.current) {
@@ -931,7 +936,9 @@ function IngresoContenido() {
         if (!rv.ok) {
           setError(String(dv?.detail || "Error desconocido") + " " + String(dv?.causa ?? ""));
         } else {
-          setResultado("archivado " + String(dv?.chars) + " caracteres, sha " + String(dv?.sha256).slice(0, 8) + (audioUrl ? `, con audio (${partes.length} partes)` : ", sin audio"));
+          setArchivado(true);
+          setResultado((dv?.idempotent ? "volcado ya archivado " : "archivado ") + String(dv?.chars) + " caracteres, sha " + String(dv?.sha256).slice(0, 8) + (audioUrl ? `, con audio (${partes.length} partes)` : ", sin audio"));
+          setAviso("Captura sellada. La revisión y las correcciones se hacen en Volcados; pulsa Limpiar para empezar una captura nueva.");
         }
       } catch (err) {
         setError("Error de red al guardar: " + String(err));
@@ -941,7 +948,7 @@ function IngresoContenido() {
     } finally {
       setGuardando(false);
     }
-  }, [texto, titulo, pulidosOk]);
+  }, [archivado, texto, titulo, pulidosOk]);
 
 
   const exportarAudioOriginal = useCallback(async () => {
@@ -984,6 +991,11 @@ function IngresoContenido() {
   }, []);
 
   const handleAdjuntarAudio = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (archivado) {
+      setError("Esta captura ya está archivada. Pulsa Limpiar antes de adjuntar audio a una captura nueva.");
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
     const file = e.target.files?.[0];
     if (!file) return;
     setAdjuntandoAudio(true);
