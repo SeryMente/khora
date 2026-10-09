@@ -239,7 +239,7 @@ export default function EntornoPersistentePanel() {
         const messages: Record<string, string> = {
           invalid_token_format: "El formato del token no es compatible. Usa un PAT de GitHub clásico (ghp_) o de granularidad fina (github_pat_).",
           github_token_rejected: "GitHub rechazó el token o no pudo identificar la cuenta.",
-          github_repo_access_missing: "El token no tiene acceso de lectura y escritura a todos los repositorios requeridos: CENSUS, GDP, metodologia, otrogranprograma, signal-interpreter y khora.",
+          github_repo_access_missing: "La cuenta asociada al token no tiene permisos suficientes en uno de los seis repositorios requeridos, o GitHub no permitió comprobar el acceso. Para escribir ramas y commits, confirma Contents: Read and write y Metadata: Read en cada repositorio.",
           credential_vault_unavailable: "La bóveda cifrada no está disponible. La credencial no se guardó.",
           not_authorized: "La sesión OEP no está autorizada para gestionar secretos.",
         };
