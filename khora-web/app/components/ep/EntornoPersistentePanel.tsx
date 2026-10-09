@@ -237,7 +237,7 @@ export default function EntornoPersistentePanel() {
       const data = await response.json().catch(() => null);
       if (!response.ok) {
         const messages: Record<string, string> = {
-          invalid_token_format: "El formato del token no es compatible. Usa un PAT de GitHub clásico (ghp_) o de granularidad fina (github_pat_).",
+          invalid_token_format: "El formato del token no es compatible. Usa un token de GitHub reconocido (PAT clásico ghp_, PAT granular github_pat_ u OAuth gho_) con acceso de escritura a los repositorios requeridos.",
           github_token_rejected: "GitHub rechazó el token o no pudo identificar la cuenta.",
           github_repo_access_missing: "La cuenta asociada al token no tiene permisos suficientes en uno de los seis repositorios requeridos, o GitHub no permitió comprobar el acceso. Para escribir ramas y commits, confirma Contents: Read and write y Metadata: Read en cada repositorio.",
           credential_vault_unavailable: "La bóveda cifrada no está disponible. La credencial no se guardó.",
@@ -521,7 +521,7 @@ export default function EntornoPersistentePanel() {
               onChange={(event) => setGithubTokenInput(event.target.value)}
               maxLength={8192}
               disabled={githubCredentialBusy}
-              placeholder={githubCredential?.configured ? "Token guardado; escribe uno nuevo para rotarlo" : "ghp_… o github_pat_…"}
+              placeholder={githubCredential?.configured ? "Token guardado; escribe uno nuevo para rotarlo" : "ghp_… · github_pat_… · gho_…"}
               className="min-h-12 w-full rounded-lg border bg-transparent px-4 py-3 text-sm outline-none focus-visible:ring-2 disabled:opacity-50"
               style={border}
               aria-label="Token de GitHub"
