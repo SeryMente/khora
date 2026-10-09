@@ -1,4 +1,4 @@
-# Entorno Persistente Medio · Arquitectura canónica v1.0.4
+# Entorno Persistente Medio · Arquitectura canónica v1.0.5
 
 **Estado:** normativa · actualización 1.0.4
 **Host KHORA:** 7.5.3
@@ -53,25 +53,25 @@ El bootstrap debe reutilizar primero herramientas instaladas y verificables en r
 |---|---|---|---|---|
 | Token Khora de sesión | Khora, después de Google OpenID Connect | descargar el gate y leer/escribir bitácoras de la sesión actual o anterior | una sola sesión; 12 horas por defecto, máximo 24 | hash de `jti` en servidor; texto plano solo en memoria; blob DPAPI temporal entre lanzador y gate y blobs DPAPI dentro del volumen, todos con eliminación explícita |
 | Llave de bóveda | usuario | raíz criptográfica de la bóveda, BitLocker y perfil de Visual Studio Code | sesión | `SecureString` y Protección de Datos de Windows dentro del volumen |
-| Personal Access Token de GitHub | GitHub | leer/escribir `SeryMente/khora` privado | definido por GitHub | memoria y Protección de Datos de Windows dentro del volumen |
+| Personal Access Token de GitHub | GitHub | leer/escribir los repositorios de trabajo requeridos | definido por GitHub | cifrado AES-256-GCM en la bóveda server-side; entrega TLS solo a una sesión EP validada; DPAPI dentro del volumen para uso local |
 | `VERCEL_TOKEN` | bóveda | `vercel whoami` y `vercel link` | sesión | variable de proceso dentro del volumen; nunca argumentos de proceso |
 
-El token Khora no sustituye el Personal Access Token de GitHub ni la llave de la bóveda. Cuando GitHub CLI está previamente autenticado en el host, el bootstrap reutiliza esa credencial para obtener el PAT en memoria y evita pedir una segunda autorización; el portapapeles queda como mecanismo de contingencia. Su paso ocurre **antes de la instanciación** y, por ello, no altera el orden interno no negociable.
+El token Khora no sustituye el Personal Access Token de GitHub ni la llave de la bóveda. El PAT se carga una vez en la UI de EP, se valida contra los repositorios requeridos, se cifra en el servidor y nunca se devuelve a la interfaz después del guardado. Durante el bootstrap, GET /api/ep/github-token lo entrega por TLS únicamente a una sesión Khora válida con scope ep:github:token; PowerShell lo mantiene en memoria y lo protege con DPAPI dentro del volumen cifrado. El token no se lee del portapapeles ni se vuelve a solicitar interactivamente.
 
-### 3.2 Emisión por Google OpenID Connect y Sección Seguridad
+### 3.2 Emisión de sesión EP y acceso rápido limitado
 
-1. El usuario navega a la sección principal **Seguridad** (`/sistema/seguridad`) o mediante la redirección HTTP 308 desde `/sistema/entorno-persistente` hacia `/sistema/seguridad?tab=entorno-persistente`.
-2. Auth.js valida la sesión mediante el proveedor configurado por `OIDC_ISSUER_URL`, `OIDC_CLIENT_ID` y `OIDC_CLIENT_SECRET`.
-3. El proveedor valida firma, emisor y reclamación de audiencia (`aud`) de Google.
-4. Khora compara el correo con `EP_ALLOWED_EMAIL` y falla cerrado si no coincide.
-5. `POST /api/ep/token` acepta plataforma (`{ "platform": "windows" }`). Sin parámetro `mode` o con `mode: "normal"`, emite una sesión normal. Solicitudes explícitas con `mode: "clean-host"` u otros valores no soportados son rechazadas con HTTP 400 (`unsupported_launch_mode`).
+1. OIDC sigue siendo la identidad global de Khôra. Para reducir fricción exclusivamente en EP, el acceso directo a /sistema/seguridad?tab=entorno-persistente puede usar /auth/ep y una contraseña maestra OEP previamente configurada desde una sesión OIDC autorizada.
+2. La contraseña maestra se verifica con scrypt, salt aleatorio de 32 bytes y pepper derivado por ámbito de EP_BOOTSTRAP_JWT_SECRET; se guarda únicamente el verificador. Se limitan los intentos fallidos a ocho por origen hasheado cada 15 minutos.
+3. Una validación correcta emite una cookie firmada de 15 minutos con HttpOnly, SameSite=Strict, Secure en producción y Path=/. La cookie únicamente satisface el submódulo EP y sus endpoints de administración; no se convierte en sesión Auth.js ni abre otras rutas generales de Khôra.
+4. /api/ep/master-password permite configurar o rotar la contraseña solo con una sesión OIDC autorizada. El acceso maestro puede consultar su estado, pero no rotarla ni recuperar su valor.
+5. POST /api/ep/token acepta plataforma ({ "platform": "windows" }). Sin parámetro mode o con mode: "normal", emite una sesión normal. Solicitudes explícitas con mode: "clean-host" u otros valores no soportados son rechazadas con HTTP 400 (unsupported_launch_mode).
 6. Se aplica un límite de tasa en base de datos (`ep_bootstrap_tokens`): máximo 5 emisiones por usuario cada 15 minutos (HTTP 429 `rate_limit_exceeded`). Un bloqueo transaccional asesor por usuario serializa emisiones concurrentes antes del conteo, revocación e inserción.
 7. `POST /api/ep/token` crea un identificador de sesión y emite un JSON Web Token HMAC-SHA256 con:
    - `iss = khora-ep`;
    - `aud = EP_CANONICAL_URL`;
    - `sub = correo autenticado`;
    - `sid = identificador de sesión`;
-   - `scope = ep:bootstrap ep:logs:write ep:logs:read`;
+   - `scope = ep:bootstrap ep:github:token ep:logs:write ep:logs:read`;
    - `jti`, `iat`, `exp`, `typ = ep-session` y `launchMode = "normal"` ligado criptográficamente al token.
 8. Devuelve además el descriptor del lanzador (`launcher`: id, version, platform, shell, minimumVersion, storageBackend, execution, status, command), la `apiBase` tomada exactamente de la audiencia firmada y los encabezados `Cache-Control: no-store` y `Pragma: no-cache`.
 9. Emitir un token nuevo revoca cualquier token de Entorno Persistente todavía activo del mismo usuario. Por eso se requiere una generación nueva por sesión.
@@ -86,7 +86,7 @@ Variables de producción obligatorias:
 - `AUTH_SECRET`;
 - `OIDC_ISSUER_URL`, `OIDC_CLIENT_ID` y `OIDC_CLIENT_SECRET`.
 
-La migración requerida es `khora-web/db/migrations/016_ep_persistent_sessions.sql` y se aplica con `npm run migrate:ep`.
+Las migraciones `khora-web/db/migrations/016_ep_persistent_sessions.sql` y `017_ep_github_credential_vault.sql` se aplican con `npm run migrate:ep` o en la secuencia de runtime.
 
 ### 3.3 Publicación obligatoria de `main` al instanciar
 
@@ -115,7 +115,7 @@ La interfaz entrega el comando de PowerShell libre de secretos. El flujo operati
 5. El usuario regresa a PowerShell y presiona Enter.
 6. Si el navegador rechaza la escritura automática al portapapeles, la interfaz falla de forma segura ofreciendo únicamente la acción explícita "Reintentar copiar token".
 
-El comando en PowerShell lee y valida el token exacto desde el portapapeles, lo limpia inmediatamente y descarga `GET /api/ep/bootstrap` con `Authorization: Bearer` contra la `apiBase` idéntica a la audiencia firmada. Materializa el cuerpo como un `.ps1` aleatorio con UTF-8 BOM, protege el token en un blob DPAPI temporal, elimina la variable en texto plano e invoca explícitamente `%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe` con `-KhoraTokenFile`. Un `finally` limpia portapapeles, gate, blob y variables tanto en éxito como en fallo. El token nunca aparece en historial, salida ni argumentos de proceso. `ScriptBlock.Create` está prohibido porque no conserva la semántica de archivo requerida por `#requires`, `CmdletBinding` y `param` en Windows PowerShell 5.1.
+El comando en PowerShell lee y valida el token Khora exacto desde el portapapeles, lo limpia inmediatamente y descarga `GET /api/ep/bootstrap` con `Authorization: Bearer` contra la `apiBase` idéntica a la audiencia firmada. En EP-IN-050, recupera el PAT cifrado mediante `GET /api/ep/github-token` con el mismo token de sesión, lo protege como SecureString/DPAPI y falla cerrado si la bóveda no contiene una credencial válida. Materializa el cuerpo como un `.ps1` aleatorio con UTF-8 BOM, protege el token en un blob DPAPI temporal, elimina la variable en texto plano e invoca explícitamente `%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe` con `-KhoraTokenFile`. Un `finally` limpia portapapeles, gate, blob y variables tanto en éxito como en fallo. El token nunca aparece en historial, salida ni argumentos de proceso. `ScriptBlock.Create` está prohibido porque no conserva la semántica de archivo requerida por `#requires`, `CmdletBinding` y `param` en Windows PowerShell 5.1.
 
 ### 3.4 Acceso de modelos
 
@@ -297,13 +297,17 @@ La tarea de arranque como `SYSTEM` elimina la carpeta exterior tras un reinicio 
 
 | Método y ruta | Autenticación | Resultado |
 |---|---|---|
-| `POST /api/ep/token` | sesión Google OpenID Connect | token, identificador, vencimiento y comando |
-| `GET /api/ep/token` | sesión Google OpenID Connect | dos sesiones más recientes |
+| `POST /api/ep/token` | sesión OIDC autorizada o cookie maestra limitada a EP | token, identificador, vencimiento y comando |
+| `GET /api/ep/token` | sesión OIDC autorizada o cookie maestra limitada a EP | dos sesiones más recientes |
+| `POST /api/ep/master-auth` | contraseña maestra OEP | cookie EP firmada de 15 minutos; límite de intentos |
+| `GET/POST/DELETE /api/ep/github-credential` | sesión OIDC autorizada o cookie maestra limitada a EP | estado, carga cifrada/rotación o borrado de PAT; nunca entrega el valor guardado |
+| `GET /api/ep/github-token` | Bearer `ep:github:token` | PAT descifrado en JSON no-cache para el bootstrap; scope y sesión deben validarse |
+| `PUT /api/ep/master-password` | sesión OIDC autorizada | establecer o rotar el verificador OEP |
 | `GET /api/ep/bootstrap` | Bearer `ep:bootstrap` | gate PowerShell exacto, sin caché |
 | `POST /api/ep/events` | Bearer `ep:logs:write` | uno a cien eventos transaccionales |
 | `GET /api/ep/logs` | Bearer `ep:logs:read` | sesión actual o anterior, JSON o NDJSON |
 
-Los endpoints Bearer están excluidos del middleware de cookies, pero validan formato y tamaño, encabezado JWT (`alg=HS256`, `typ=JWT`), firma con comparación constante, emisor, audiencia, scopes, expiración inclusiva, revocación, sesión y usuario en su propia ruta. Responden solo códigos públicos estables (`missing_bearer`, `invalid_token_format`, `invalid_token`, `invalid_signature`, `invalid_audience`, `insufficient_scope`, `revoked_or_expired` o `authentication_unavailable`) y nunca mensajes internos. `/api/ep/token` continúa protegido por Auth.js.
+Los endpoints Bearer están excluidos del middleware de cookies, pero validan formato y tamaño, encabezado JWT (`alg=HS256`, `typ=JWT`), firma con comparación constante, emisor, audiencia, scopes, expiración inclusiva, revocación, sesión y usuario en su propia ruta. Responden solo códigos públicos estables (`missing_bearer`, `invalid_token_format`, `invalid_token`, `invalid_signature`, `invalid_audience`, `insufficient_scope`, `revoked_or_expired` o `authentication_unavailable`) y nunca mensajes internos. Los endpoints de credencial OEP exigen identidad OIDC o cookie maestra limitada, mientras que `/api/ep/github-token` solo acepta el Bearer de una sesión EP vigente. El PAT se cifra con AES-256-GCM; la clave se deriva con separación de dominio de `EP_BOOTSTRAP_JWT_SECRET`, por lo que rotar esa raíz exige volver a cargar el PAT.
 
 ## 12. Manifiesto y contrato de archivos
 
@@ -352,3 +356,13 @@ Las verificaciones Linux o estáticas no sustituyen esta matriz. Cualquier resul
 ## 16. Huellas de implementación
 
 El paquete final incluye `ep-integrity-manifest.sha256`, calculado después de todas las modificaciones. El manifiesto no se incluye a sí mismo y cubre la arquitectura, gate, módulos, API, migración y pruebas. Un modelo debe verificarlo antes de atribuir comportamiento a v1.0.
+
+## 17. Bóveda de GitHub y contraseña maestra OEP · v1.0.5
+
+**Antes:** el comando de PowerShell requería un PAT disponible previamente en GitHub CLI o en el portapapeles. La API EP exigía OIDC para emitir sesión y no ofrecía una UI server-side para guardar el PAT ni una entrada rápida separada para OEP.
+
+**Cambio:** el submódulo EP añade una puerta /auth/ep que verifica la contraseña maestra registrada desde una sesión OIDC; un verificador scrypt con salt aleatorio, pepper por ámbito, límites de intentos y cookie firmada corta HttpOnly/SameSite=Strict; un formulario UI para cargar, validar, rotar y eliminar el PAT; una bóveda de base de datos que persiste solo el envoltorio AES-256-GCM (IV, etiqueta de autenticación y ciphertext), usuario GitHub, sufijo de cuatro caracteres y estado de acceso a repositorios; un endpoint GET /api/ep/github-token limitado a Bearer EP que descifra el secreto solo al solicitarlo el bootstrap; un launcher PowerShell que sustituye la solicitud PAT por recuperación HTTPS bajo la apiBase existente y lo almacena con DPAPI dentro del volumen cifrado; migración 017_ep_github_credential_vault.sql y pruebas de contrato.
+
+**Motivo:** evitar volver a pegar un secreto de larga duración en una terminal compartida sin exponer el PAT en HTML, JavaScript, URL, clipboard, historial de comandos, argumentos del proceso o registros. La contraseña OEP reduce fricción solo para EP y no reemplaza la identidad global de Khôra.
+
+**Resultado:** la rama incorpora la implementación y la UI; la seguridad de despliegue, los scopes reales del PAT granular y el funcionamiento extremo a extremo de PowerShell 5.1 permanecen sujetos al CI y a la validación operativa posterior. Nunca se debe declarar operativa una ruta hasta aplicar la migración y probarla en producción.
