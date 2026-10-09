@@ -468,6 +468,19 @@ test("CUSTODY-12: original export works from verified import custody before or a
   assert.ok(exportRoute.includes("createHash(\"sha256\")"));
 });
 
+
+test("CUSTODY-13: fresh installations create custody tables before applying compatibility ALTERs", () => {
+  const source = readFileSync(resolve(process.cwd(), "lib/server/dictado.ts"), "utf8");
+  const ensureStart = source.indexOf("export async function asegurarColumnasDictado");
+  const createTables = source.indexOf("await db.query(SESSION_TABLES_SQL);", ensureStart);
+  const applyAlters = source.indexOf("for (const sql of ALTERS)", ensureStart);
+  assert.ok(ensureStart >= 0);
+  assert.ok(createTables > ensureStart);
+  assert.ok(applyAlters > createTables);
+  assert.ok(source.includes("ALTER TABLE dictado_audio_parte ADD COLUMN IF NOT EXISTS original_name TEXT"));
+  assert.ok(source.includes("ALTER TABLE dictado_audio_parte ADD COLUMN IF NOT EXISTS mime_type TEXT"));
+});
+
 test("CUSTODY-10: stale ingestion failures cannot overwrite a newer approved version", () => {
   const route = readFileSync(resolve(process.cwd(), "app/api/ingesta/route.ts"), "utf8");
   const failureHandler = route.slice(route.indexOf("async function persistirFalloIngesta"), route.indexOf("export async function POST"));
