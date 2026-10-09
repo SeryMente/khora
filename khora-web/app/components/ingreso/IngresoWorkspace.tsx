@@ -408,6 +408,26 @@ function IngresoContenido() {
           setPartesContador(partesSubidasRef.current.length);
           setBytesAcumulados((total) => total + bytesSubidos);
           setConAudio(true);
+        } else if (da?.recuperable === true && typeof da?.url === "string") {
+          const bytesSubidos = typeof da?.bytes === "number" ? da.bytes : blob.size;
+          const parteRecuperable = {
+            parte: parteActual,
+            url: da.url,
+            bytes: bytesSubidos,
+            sha256: typeof da?.sha256 === "string" ? da.sha256 : "",
+            verificado: false,
+            fuenteAudio: fuenteAudio as "microphone" | "chrome_tab",
+            start_ms: startMs,
+            end_ms: endMs,
+            duracion_ms: Math.max(0, endMs - startMs),
+          };
+          const existente = partesSubidasRef.current.findIndex((item) => item.parte === parteActual && item.fuenteAudio === parteRecuperable.fuenteAudio);
+          if (existente >= 0) partesSubidasRef.current[existente] = parteRecuperable;
+          else partesSubidasRef.current.push(parteRecuperable);
+          setPartesContador(partesSubidasRef.current.length);
+          setBytesAcumulados((total) => total + bytesSubidos);
+          setConAudio(true);
+          setAviso("La parte " + parteActual + " se conserva como blob recuperable, pero NO verificado. No archives esta captura. Localizador: " + da.url + ". Causa: " + String(da?.detail || ""));
         } else {
           setAviso("audio parte " + parteActual + " no guardada: " + String(da?.detail || ""));
         }
@@ -957,9 +977,18 @@ function IngresoContenido() {
         previewText: texto,
       });
       const data = result.data;
-      if (data.audioUrl) {
+      const localizadorRecuperacion =
+        typeof data.audioUrl === "string" ? data.audioUrl :
+        typeof data.stagingUrl === "string" && data.recuperable === true ? data.stagingUrl : null;
+      if (localizadorRecuperacion) {
         fuenteEntradaSesionRef.current = "audio_archivo";
-        partesSubidasRef.current = [{ parte: 1, url: data.audioUrl, bytes: data.audioBytes || file.size, sha256: data.sha256 || "", verificado: data.verificado === true }];
+        partesSubidasRef.current = [{
+          parte: 1,
+          url: localizadorRecuperacion,
+          bytes: data.audioBytes || file.size,
+          sha256: data.sha256 || "",
+          verificado: data.verificado === true && result.ok === true,
+        }];
         setPartesContador(1);
         setBytesAcumulados(data.audioBytes || file.size);
         setConAudio(true);
@@ -971,7 +1000,8 @@ function IngresoContenido() {
         setTexto(data.textoFinal);
         setReconciliacionMensaje(data.motivoReconciliacion || "Audio adjuntado y transcrito exitosamente.");
       } else {
-        setAviso(data.detail || "Audio almacenado; la transcripción puede reintentarse.");
+        const localizador = localizadorRecuperacion ? " Localizador recuperable: " + localizadorRecuperacion + "." : "";
+        setAviso((data.detail || "Audio almacenado; la transcripción puede reintentarse.") + localizador + (data.recuperable ? " La custodia aún no está verificada; no archives esta captura." : ""));
       }
     } catch (cause) {
       setError(`Error al adjuntar archivo de audio: ${String(cause)}`);
