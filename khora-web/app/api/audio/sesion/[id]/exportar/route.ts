@@ -41,7 +41,6 @@ export async function GET(
 
     await asegurarColumnasDictado();
     const db = getDb();
-    const db = getDb();
     const result = await db.query(
       `SELECT p.part_index, p.blob_url, p.blob_path, p.bytes, p.sha256,
               p.estado_verificacion, p.fuente_audio, v.driver
