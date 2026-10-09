@@ -293,6 +293,7 @@ test("EP Security: GitHub PAT is encrypted at rest and only served to an EP bear
   assert.match(vault, /ON CONFLICT\(singleton_id\) DO UPDATE SET ciphertext=EXCLUDED\.ciphertext/);
   assert.match(manageRoute, /getEpGitHubCredentialStatus/);
   assert.doesNotMatch(manageRoute, /NextResponse\.json\(\{\s*token\s*,/);
+  assert.match(manageRoute, /req\.headers\.get\("origin"\) !== req\.nextUrl\.origin/);
   assert.match(tokenRoute, /authenticateEpBearer\(req, \["ep:github:token"\]\)/);
   assert.match(tokenRoute, /getStoredEpGitHubToken\(\)/);
   assert.match(epServer, /getStoredEpGitHubToken\(\)/);
@@ -311,6 +312,7 @@ test("EP Security: OEP master password is independent from general KHORA OIDC", 
 
   assert.match(masterPage, /Contraseña maestra de OEP/);
   assert.match(masterAuth, /authenticateEpMasterPassword/);
+  assert.match(masterAuth, /catch \{ result = "unavailable"; \}/);
   assert.match(masterAuth, /epMasterCookieOptions/);
   assert.match(masterVerifier, /scryptSync/);
   assert.match(masterVerifier, /timingSafeEqual/);
