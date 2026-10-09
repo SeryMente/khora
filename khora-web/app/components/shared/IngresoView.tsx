@@ -19,6 +19,8 @@ export type IngresoViewState = {
   generandoTitulo: boolean;
   retranscribiendo: boolean;
   adjuntandoAudio: boolean;
+  exportandoAudio: boolean;
+  audioExportable: boolean;
   conAudio: boolean;
   partesContador: number;
   bytesAcumulados: number;
@@ -42,6 +44,7 @@ export type IngresoViewActions = {
   onGuardar?: () => void;
   onRetranscribir?: () => void;
   onAdjuntarClick?: () => void;
+  onExportarAudio?: () => void;
   onLimpiar?: () => void;
   onConfirmarEdicion?: () => void;
 };
@@ -70,6 +73,8 @@ export function IngresoView({
     generandoTitulo,
     retranscribiendo,
     adjuntandoAudio,
+    exportandoAudio,
+    audioExportable,
     conAudio,
     partesContador,
     bytesAcumulados,
@@ -233,6 +238,19 @@ export function IngresoView({
             <Icons.Paperclip size={20} strokeWidth={1.75} />
             {adjuntandoAudio ? "Adjuntando..." : "Adjuntar audio"}
           </button>
+          {audioExportable && (
+            <button
+              data-ui-id="ingreso.btn-exportar-audio"
+              onClick={() => actions.onExportarAudio?.()}
+              disabled={exportandoAudio || adjuntandoAudio || guardando}
+              className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
+              style={{ backgroundColor: "var(--khora-surface)", color: "var(--khora-ink)", borderColor: "var(--khora-border)" }}
+            >
+              <Icons.Download size={20} strokeWidth={1.75} />
+              {exportandoAudio ? "Exportando audio..." : "Exportar audio original"}
+            </button>
+          )}
+
 
           <button
             data-ui-id="ingreso.btn-limpiar"
