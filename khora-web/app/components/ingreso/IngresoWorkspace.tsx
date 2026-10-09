@@ -92,7 +92,7 @@ function IngresoContenido() {
   const modoEntradaRef = useRef<"ninguno" | "microfono" | "chrome_live_caption">("ninguno");
   const fuenteEntradaSesionRef = useRef<"texto" | "microfono" | "chrome_live_caption" | "audio_archivo" | null>(null);
   const parteConsecutivaRef = useRef<number>(1);
-  const partesSubidasRef = useRef<{ parte: number; url: string; bytes: number; fuenteAudio?: "microphone" | "chrome_tab" | "audio_archivo"; start_ms?: number; end_ms?: number; duracion_ms?: number; sha256?: string; verificado?: boolean }[]>([]);
+  const partesSubidasRef = useRef<{ parte: number; url: string; bytes: number; fuenteAudio?: "microphone" | "chrome_tab" | "audio_archivo"; nombreOriginal?: string | null; mimeType?: string | null; start_ms?: number; end_ms?: number; duracion_ms?: number; sha256?: string; verificado?: boolean }[]>([]);
   const parteTrozosRef = useRef<Blob[]>([]);
   const parteInicioRef = useRef<number>(0);
   const subidaEnCursoRef = useRef<Promise<void> | null>(null);
@@ -1009,6 +1009,8 @@ function IngresoContenido() {
           bytes: data.audioBytes || file.size,
           sha256: data.sha256 || "",
           fuenteAudio: "audio_archivo",
+          nombreOriginal: typeof data.originalName === "string" && data.originalName.trim() ? data.originalName : file.name,
+          mimeType: typeof data.mimeType === "string" && data.mimeType.trim() ? data.mimeType : file.type,
           verificado: data.verificado === true,
         }];
         setPartesContador(1);
