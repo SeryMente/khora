@@ -5,6 +5,7 @@ export const EP_GITHUB_REPOSITORIES = [
   "metodologia",
   "otrogranprograma",
   "GDP",
+  "CENSUS",
   "signal-interpreter",
   "khora",
 ] as const;
