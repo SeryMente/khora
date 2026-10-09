@@ -185,7 +185,7 @@ export default function EntornoPersistentePanel() {
     } catch { /* La consulta secundaria no invalida la credencial activa. */ }
   }
 
-  async function loadRepoCatalog() {
+  async function loadRepoCatalog(silent = false): Promise<boolean> {
     try {
       const response = await fetch("/api/ep/repos", { cache: "no-store", credentials: "same-origin" });
       const data = await response.json().catch(() => null);
@@ -195,8 +195,10 @@ export default function EntornoPersistentePanel() {
       const catalog = data.repositories as WorkspaceRepo[];
       setRepoCatalog(catalog);
       setSelectedRepos((current) => current.filter((name) => catalog.some((repo) => repo.name === name)));
+      return true;
     } catch (error) {
-      setNotice({ kind: "error", text: error instanceof Error ? error.message : "No se pudo cargar el catálogo de repositorios." });
+      if (!silent) setNotice({ kind: "error", text: error instanceof Error ? error.message : "No se pudo cargar el catálogo de repositorios." });
+      return false;
     }
   }
 
@@ -244,7 +246,13 @@ export default function EntornoPersistentePanel() {
         throw new Error(messages[String(data?.error || "")] || "No se pudo guardar la credencial de GitHub.");
       }
       setGithubCredential(data as GitHubCredentialStatus);
-      setNotice({ kind: "success", text: "Token validado y guardado cifrado en la bóveda del servidor. No se devolvió ni se mostró el secreto." });
+      const catalogLoaded = await loadRepoCatalog(true);
+      setNotice({
+        kind: "success",
+        text: catalogLoaded
+          ? "Token validado y guardado cifrado; el selector de repositorios se actualizó. El secreto no se mostró ni se devolvió a la UI."
+          : "Token validado y guardado cifrado; no se pudo recargar el catálogo. El secreto no se mostró ni se devolvió a la UI. Reintenta actualizar el catálogo antes de iniciar.",
+      });
     } catch (error) {
       setNotice({ kind: "error", text: error instanceof Error ? error.message : "No se pudo guardar la credencial." });
     } finally {
@@ -262,6 +270,7 @@ export default function EntornoPersistentePanel() {
       const data = await response.json().catch(() => null);
       if (!response.ok) throw new Error("No se pudo eliminar la credencial de GitHub.");
       setGithubCredential({ configured: false, githubLogin: null, tokenSuffix: null, repositories: [], updatedAt: null });
+      await loadRepoCatalog(true);
       setNotice({ kind: "success", text: "Credencial eliminada de la bóveda. Ningún token fue enviado al navegador." });
     } catch (error) {
       setNotice({ kind: "error", text: error instanceof Error ? error.message : "No se pudo eliminar la credencial." });
