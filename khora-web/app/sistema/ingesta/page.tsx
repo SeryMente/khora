@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import { IngresoIngestaPanel } from "../../components/ingreso/IngresoIngestaPanel";
 
 export default function IngestaPage() {
-  redirect("/sistema/ingreso?modo=ingesta");
+  return <IngresoIngestaPanel />;
 }
