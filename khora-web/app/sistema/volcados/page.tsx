@@ -13,7 +13,7 @@ import {
 } from "../../../lib/audio-playback";
 import { exportAudioAsMp3 } from "../../../lib/client/export-audio-mp3";
 
-export default function VolcadosPage() {
+export default function VolcadosPage({ legacyEditorEntry = false }: { legacyEditorEntry?: boolean } = {}) {
   const [pipelineItems, setPipelineItems] = useState<any[]>([]);
   const [resumen, setResumen] = useState<any>(null);
   const [loadingPipeline, setLoadingPipeline] = useState(true);
@@ -22,6 +22,9 @@ export default function VolcadosPage() {
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<any | null>(null);
+  const [selectedVersionNumber, setSelectedVersionNumber] = useState<number | null>(null);
+  const [selectedVersionSha256, setSelectedVersionSha256] = useState<string | null>(null);
+  const [versionSelectionError, setVersionSelectionError] = useState<string | null>(null);
   const [drawerSubTab, setDrawerSubTab] = useState<"cockpit" | "trace">(
     "cockpit",
   );
@@ -242,45 +245,96 @@ export default function VolcadosPage() {
     }
   };
 
-  const selectVolcadoItem = async (id: string) => {
+  const selectVolcadoItem = async (
+    id: string,
+    requestedVersion: number | null = null,
+  ) => {
     setSelectedId(id);
     setIngestaResult(null);
+    setVersionSelectionError(null);
+    setSelectedVersionNumber(null);
+    setSelectedVersionSha256(null);
     setDrawerSubTab("cockpit");
 
     const item = pipelineItems.find((i) => i.id === id);
-    if (item) {
-      setSelectedItem(item);
-    }
+    setSelectedItem(item ?? null);
 
     try {
-      const res = await fetch("/api/versiones?id=" + id);
+      const res = await fetch("/api/versiones?id=" + encodeURIComponent(id), { cache: "no-store" });
       const data = await res.json();
-      if (res.ok && Array.isArray(data.versiones)) {
-        const latestVersionNum = data.versiones.reduce(
-          (max: number, v: any) => Math.max(max, Number(v.version)),
-          1,
-        );
-        const activeVer = data.versiones.find(
-          (v: any) => Number(v.version) === latestVersionNum,
-        );
-        if (activeVer) {
-          setEditableTexto(activeVer.texto || "");
-        }
-        await loadCockpitData(id, latestVersionNum);
-      } else {
+      if (!res.ok || !Array.isArray(data.versiones) || data.versiones.length === 0) {
         setEditableTexto("");
+        setVersionSelectionError(
+          "No existe un historial de versiones verificable para este volcado. No se elegirá otra versión por omisión.",
+        );
+        return;
       }
+
+      const versions = data.versiones as Array<{ version: number | string; texto?: string | null; sha256?: string | null }>;
+      const availableNumbers = versions.map((v) => Number(v.version)).filter((v) => Number.isInteger(v) && v > 0);
+      const resolvedVersion = requestedVersion === null
+        ? Math.max(...availableNumbers)
+        : requestedVersion;
+      const activeVer = versions.find((v) => Number(v.version) === resolvedVersion);
+      if (!Number.isInteger(resolvedVersion) || resolvedVersion < 1 || !activeVer) {
+        setEditableTexto("");
+        setVersionSelectionError(
+          `La versión solicitada v${requestedVersion} no existe para este volcado. No se sustituirá por la última versión.`,
+        );
+        return;
+      }
+
+      const sha = String(activeVer.sha256 ?? "").trim().toLowerCase();
+      setSelectedVersionNumber(resolvedVersion);
+      setSelectedVersionSha256(sha || null);
+      setEditableTexto(activeVer.texto || "");
+      if (!/^[0-9a-f]{64}$/.test(sha)) {
+        setVersionSelectionError(
+          `La versión abierta v${resolvedVersion} no tiene un SHA-256 válido; la ingesta queda bloqueada.`,
+        );
+      }
+      await loadCockpitData(id, resolvedVersion);
     } catch (err) {
+      setEditableTexto("");
+      setVersionSelectionError(
+        `No se pudo cargar la versión abierta; no se seleccionará otra automáticamente. ${err instanceof Error ? err.message : String(err)}`,
+      );
       console.error("Error loading versions:", err);
     }
   };
 
   useEffect(() => {
     async function init() {
-      const items = await fetchPipeline();
-      if (items && items.length > 0 && !selectedId) {
-        await selectVolcadoItem(items[0].id);
+      const params = new URLSearchParams(window.location.search);
+      const requestedId = params.get("volcado_id") || params.get("id");
+      const versionValue = params.get("version");
+      const requestedVersion = versionValue === null ? null : Number(versionValue);
+
+      if (
+        versionValue !== null &&
+        (!requestedId || !Number.isInteger(requestedVersion) || Number(requestedVersion) < 1)
+      ) {
+        setVersionSelectionError(
+          "La URL debe identificar el volcado y una versión entera positiva. No se inferirá la versión.",
+        );
+        return;
       }
+
+      const items = await fetchPipeline();
+      if (!items || items.length === 0) return;
+
+      if (requestedId) {
+        if (!items.some((item) => item.id === requestedId)) {
+          setVersionSelectionError(
+            "El volcado solicitado no está presente en el inventario. No se abrirá otro volcado por omisión.",
+          );
+          return;
+        }
+        await selectVolcadoItem(requestedId, requestedVersion);
+        return;
+      }
+
+      if (!selectedId) await selectVolcadoItem(items[0].id);
     }
     void init();
   }, [fetchPipeline]);
@@ -355,48 +409,61 @@ export default function VolcadosPage() {
   };
 
   const handleIngestApproved = async () => {
-    if (
-      !selectedItem ||
-      !selectedItem.version_aprobada ||
-      !selectedItem.sha256_aprobado
-    )
+    const openedVersion = selectedVersionNumber;
+    const openedSha = String(selectedVersionSha256 ?? "").trim().toLowerCase();
+    const approvedVersion = Number(selectedItem?.version_aprobada ?? 0);
+    const approvedSha = String(selectedItem?.sha256_aprobado ?? "").trim().toLowerCase();
+
+    if (!selectedItem || openedVersion === null || !/^[0-9a-f]{64}$/.test(openedSha)) {
+      setIngestaResult({
+        success: false,
+        error: "No existe una versión abierta con SHA-256 verificable. No se enviará la versión aprobada por sustitución.",
+      });
       return;
+    }
+    if (approvedVersion !== openedVersion || approvedSha !== openedSha) {
+      setIngestaResult({
+        success: false,
+        error: `La versión abierta v${openedVersion} no coincide exactamente con la versión ratificada. No se enviará otra versión.`,
+      });
+      return;
+    }
+    if (!["listo_ingesta", "fallido", "ingerido"].includes(String(selectedItem.estado))) {
+      setIngestaResult({
+        success: false,
+        error: `La versión abierta no puede ingerirse desde el estado actual: ${String(selectedItem.estado)}.`,
+      });
+      return;
+    }
+
     setIngesting(true);
     setIngestaResult(null);
     try {
       const formData = new FormData();
       formData.append("volcado_id", selectedItem.id);
-      formData.append("version", String(selectedItem.version_aprobada));
-      formData.append("sha256", selectedItem.sha256_aprobado);
+      formData.append("version", String(openedVersion));
+      formData.append("sha256", openedSha);
 
-      const res = await fetch("/api/ingesta", {
-        method: "POST",
-        body: formData,
-      });
+      const res = await fetch("/api/ingesta", { method: "POST", body: formData });
       const data = await res.json();
+      const ioId = typeof data?.io_id === "string" ? data.io_id.trim() : "";
 
-      if (res.ok || res.status === 201 || res.status === 200) {
-        setIngestaResult({
-          success: true,
-          io_id: data.io_id || "Generado",
-          details: data,
-        });
-        setSelectedItem({
-          ...selectedItem,
-          estado: "ingerido",
-          io_id: data.io_id || "Generado",
-        });
+      if (res.ok && ioId.length > 0) {
+        setIngestaResult({ success: true, io_id: ioId, details: data });
+        setSelectedItem({ ...selectedItem, estado: "ingerido", io_id: ioId });
         await fetchPipeline();
       } else {
         setIngestaResult({
           success: false,
-          error: data.error || data.detail || "Error en la ingesta del kernel",
+          error: data.error || data.detail || (!res.ok
+            ? "Error en la ingesta del kernel"
+            : "La ingesta devolvió éxito HTTP sin un io_id persistido; el resultado no se declarará exitoso."),
         });
       }
     } catch (err: any) {
       setIngestaResult({
         success: false,
-        error: "Error de red: " + err.message,
+        error: "Error de red: " + (err?.message ?? String(err)),
       });
     } finally {
       setIngesting(false);
@@ -404,6 +471,10 @@ export default function VolcadosPage() {
   };
 
   const state: PipelineViewState = {
+    legacyEditorEntry,
+    selectedVersionNumber,
+    selectedVersionSha256,
+    versionSelectionError,
     pipelineItems,
     resumen,
     loadingPipeline,
