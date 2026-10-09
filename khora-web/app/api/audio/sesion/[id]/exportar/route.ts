@@ -1,5 +1,6 @@
 // @l0 L0-002-R · @req L0-003/CUSTODIA · @req ING-EXPORT-ORIGINAL
 import { createHash } from "crypto";
+import { basename } from "path";
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { COOKIE_BOVEDA, desbloqueoVigente } from "@/lib/server/boveda";
@@ -43,7 +44,7 @@ export async function GET(
     const db = getDb();
     const result = await db.query(
       `SELECT p.part_index, p.blob_url, p.blob_path, p.bytes, p.sha256,
-              p.estado_verificacion, p.fuente_audio, v.driver
+              p.estado_verificacion, p.fuente_audio, p.original_name, p.mime_type, v.driver
        FROM dictado_audio_parte p
        LEFT JOIN dictado_session s ON s.session_id = p.session_id
        LEFT JOIN volcado v ON v.id = s.volcado_id
@@ -54,7 +55,7 @@ export async function GET(
     const parts = result.rows as Array<{
       part_index: number; blob_url: string; blob_path: string | null;
       bytes: number; sha256: string | null; estado_verificacion: string | null;
-      fuente_audio: string | null; driver: string | null;
+      fuente_audio: string | null; original_name: string | null; mime_type: string | null; driver: string | null;
     }>;
     if (!parts.length) {
       return NextResponse.json({ error: "audio_no_vinculado", detail: "La sesión no tiene audio original persistido." }, { status: 404 });
@@ -105,13 +106,18 @@ export async function GET(
 
     const audio = buffers[0];
     const extension = String(parts[0].blob_path || "").match(/\.([a-z0-9]+)\.khc$/i)?.[1]?.toLowerCase() || "bin";
-    const mime = AUDIO_MIME[extension] || "application/octet-stream";
+    const fallbackMime = AUDIO_MIME[extension] || "application/octet-stream";
+    const storedMime = String(parts[0].mime_type || "").trim().toLowerCase();
+    const mime = Object.values(AUDIO_MIME).includes(storedMime) ? storedMime : fallbackMime;
+    const originalName = basename(String(parts[0].original_name || "").replaceAll(String.fromCharCode(92), "/")).replace(/[\r\n"]/g, "").trim();
+    const downloadName = originalName || ("audio-original." + extension);
+    const asciiName = downloadName.replace(/[^\x20-\x7E]/g, "_").replace(/[";]/g, "_") || ("audio-original." + extension);
     return new NextResponse(new Uint8Array(audio), {
       status: 200,
       headers: {
         "Content-Type": mime,
         "Content-Length": String(audio.length),
-        "Content-Disposition": `attachment; filename="audio-original.${extension}"`,
+        "Content-Disposition": 'attachment; filename="' + asciiName + '"; filename*=UTF-8'' + encodeURIComponent(downloadName),
         "Cache-Control": "no-store",
         "X-Content-Type-Options": "nosniff",
       },
