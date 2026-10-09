@@ -390,6 +390,9 @@ test("CUSTODY-08: verified imported audio can be archived even when transcriptio
       blobPath: `dictado/${sessionId}/1.mp3.khc`,
       bytes: audioBytes.length,
       sha256: audioSha,
+      fuenteAudio: "audio_archivo",
+      nombreOriginal: "entrada-prueba.mp3",
+      mimeType: "audio/mpeg",
       estadoVerificacion: "verificado",
     });
     const result = await guardarDictado({
