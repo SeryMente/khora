@@ -76,7 +76,7 @@ async function githubRequest<T>(path: string, token: string): Promise<T> {
 }
 
 async function validateToken(token: string) {
-  if (!/^(?:ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,})$/.test(token)) {
+  if (!/^(?:ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|gho_[A-Za-z0-9]{20,})$/.test(token)) {
     throw new EpGitHubCredentialError("invalid_token_format");
   }
   let user: { login?: unknown };
