@@ -89,7 +89,7 @@ function IngresoContenido() {
 
   const sesionIdRef = useRef<string>("");
   const modoEntradaRef = useRef<"ninguno" | "microfono" | "chrome_live_caption">("ninguno");
-  const fuenteEntradaSesionRef = useRef<"microfono" | "chrome_live_caption" | null>(null);
+  const fuenteEntradaSesionRef = useRef<"texto" | "microfono" | "chrome_live_caption" | "audio_archivo" | null>(null);
   const parteConsecutivaRef = useRef<number>(1);
   const partesSubidasRef = useRef<{ parte: number; url: string; bytes: number; fuenteAudio?: "microphone" | "chrome_tab"; start_ms?: number; end_ms?: number; duracion_ms?: number; sha256?: string; verificado?: boolean }[]>([]);
   const parteTrozosRef = useRef<Blob[]>([]);
