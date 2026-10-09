@@ -18,6 +18,7 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
       "ingreso.btn-archivar",
       "ingreso.btn-retranscribir",
       "ingreso.btn-adjuntar",
+      "ingreso.btn-exportar-audio",
       "ingreso.btn-limpiar",
       "ingreso.textarea",
       "ingreso.stats"
@@ -268,6 +269,7 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
       "pipeline.container",
       "approval.gate",
       "approval.blockers-list"
+      "volcados.version-selection-error",
     ]
   },
   "revision:gate_ready": {
