@@ -412,7 +412,7 @@ export default function VolcadosPage({ legacyEditorEntry = false }: { legacyEdit
     const openedVersion = selectedVersionNumber;
     const openedSha = String(selectedVersionSha256 ?? "").trim().toLowerCase();
     const approvedVersion = Number(selectedItem?.version_aprobada ?? 0);
-    const approvedSha = String(selectedItem?.sha256_aprobado ?? "").trim().toLowerCase();
+    const approvedSha = String(selectedItem?.sha256_aprobada ?? "").trim().toLowerCase();
 
     if (!selectedItem || openedVersion === null || !/^[0-9a-f]{64}$/.test(openedSha)) {
       setIngestaResult({
