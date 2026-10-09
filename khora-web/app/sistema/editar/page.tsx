@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import { IngresoRevisionPanel } from "../../components/ingreso/IngresoRevisionPanel";
 
 export default function EditarPage() {
-  redirect("/sistema/ingreso?modo=revision");
+  return <IngresoRevisionPanel />;
 }
