@@ -2,7 +2,7 @@
 import { randomUUID, createHash } from "crypto";
 import { getDb } from "./neon";
 import { asegurarTabla, prepararVolcadoParaRevision } from "./volcados";
-import { cifrarTexto } from "./cripto";
+import { cifrarTexto, descifrarTexto } from "./cripto";
 import { registrarEvento } from "./eventos";
 import { evaluarCustodiaAudio } from "../audio/custodia";
 
@@ -331,7 +331,7 @@ async function guardarDictadoConSesion(
     const volcadoVinculado = sesionRes.rows[0].volcado_id as string | null;
     if (volcadoVinculado) {
       const existenteRes = await client.query(
-        `SELECT id, sha256, chars, audio_partes, estado, session_id
+        `SELECT id, texto, sha256, chars, audio_partes, estado, session_id
          FROM volcado WHERE id = $1 FOR UPDATE`,
         [volcadoVinculado],
       );
@@ -340,6 +340,11 @@ async function guardarDictadoConSesion(
       }
       const existente = existenteRes.rows[0] as any;
       volcadoIdParaEvento = String(existente.id);
+      const textoExistente = descifrarTexto(String(existente.texto ?? ""));
+      const shaTextoExistente = createHash("sha256").update(textoExistente, "utf8").digest("hex");
+      if (shaTextoExistente !== String(existente.sha256 ?? "").trim().toLowerCase()) {
+        throw new Error("Custodia rota: el texto archivado ya no coincide con su SHA-256 sellado.");
+      }
       if (
         String(existente.session_id ?? "") !== sessionId ||
         String(existente.sha256 ?? "").trim().toLowerCase() !== sha ||
@@ -366,6 +371,9 @@ async function guardarDictadoConSesion(
         estado: String(existente.estado),
       };
     } else {
+      if (String(sesionRes.rows[0].estado ?? "") === "complete") {
+        throw new Error("Custodia rota: sesión marcada completa sin volcado vinculado; se requiere reconciliación, no un archivado nuevo.");
+      }
       await client.query(
         `INSERT INTO volcado
          (id, texto, sha256, chars, titulo, origen, driver, usuario, estado, fuente, audio_url, audio_bytes, duracion_seg, pulido_aplicado, audio_partes, session_id, estado_transcripcion)
