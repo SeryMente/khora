@@ -131,37 +131,66 @@ export async function registrarParteAudio(params: {
   await asegurarColumnasDictado();
   const db = getDb();
 
+  if (!params.sessionId.trim()) throw new Error("Custodia inválida: falta sessionId.");
+  if (!Number.isInteger(params.partIndex) || params.partIndex < 1) {
+    throw new Error("Custodia inválida: partIndex debe iniciar en 1 y ser entero.");
+  }
+  if (!Number.isSafeInteger(params.bytes) || params.bytes <= 0) {
+    throw new Error("Custodia inválida: la parte no contiene bytes verificables.");
+  }
+  if (!/^[0-9a-f]{64}$/i.test(String(params.sha256 ?? ""))) {
+    throw new Error("Custodia inválida: cada parte debe tener SHA-256 verificado.");
+  }
+
   try {
-    // Asegurar sesión
-    await db.query(
+    // Una sesión archivada queda sellada: no admite nuevas partes.
+    const sesion = await db.query(
       `INSERT INTO dictado_session (session_id, estado, actualizado_en)
        VALUES ($1, 'uploading', NOW())
-       ON CONFLICT (session_id) DO UPDATE SET actualizado_en = NOW()`,
+       ON CONFLICT (session_id) DO UPDATE SET actualizado_en = NOW()
+       WHERE dictado_session.volcado_id IS NULL
+         AND dictado_session.estado <> 'complete'
+       RETURNING session_id`,
       [params.sessionId]
     );
+    if (typeof sesion.rowCount === "number" && sesion.rowCount === 0) {
+      throw new Error("Custodia sellada: la sesión ya se vinculó a un volcado; no se puede añadir ni sustituir audio.");
+    }
 
-    // Registrar/Actualizar parte
-    await db.query(
-      `INSERT INTO dictado_audio_parte (session_id, part_index, blob_url, blob_path, bytes, sha256, fuente_audio, estado_verificacion, start_ms, end_ms, duracion_ms)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+    // Reintentar un upload solo puede reemplazar la ubicación del mismo contenido.
+    // Otra huella/bytes en el mismo índice es un conflicto; jamás sobrescribir el original.
+    const parte = await db.query(
+      `INSERT INTO dictado_audio_parte
+         (session_id, part_index, blob_url, blob_path, bytes, sha256, fuente_audio, estado_verificacion, start_ms, end_ms, duracion_ms)
+       SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11
+       WHERE EXISTS (
+         SELECT 1 FROM dictado_session s
+         WHERE s.session_id = $1 AND s.volcado_id IS NULL AND s.estado <> 'complete'
+       )
        ON CONFLICT (session_id, part_index) DO UPDATE
        SET blob_url = EXCLUDED.blob_url,
            blob_path = EXCLUDED.blob_path,
-           bytes = EXCLUDED.bytes,
-           sha256 = EXCLUDED.sha256,
-           fuente_audio = EXCLUDED.fuente_audio,
            estado_verificacion = EXCLUDED.estado_verificacion,
            start_ms = COALESCE(EXCLUDED.start_ms, dictado_audio_parte.start_ms),
            end_ms = COALESCE(EXCLUDED.end_ms, dictado_audio_parte.end_ms),
            duracion_ms = COALESCE(EXCLUDED.duracion_ms, dictado_audio_parte.duracion_ms),
-           uploaded_at = NOW()`,
+           uploaded_at = NOW()
+       WHERE dictado_audio_parte.bytes = EXCLUDED.bytes
+         AND lower(dictado_audio_parte.sha256) = lower(EXCLUDED.sha256)
+         AND dictado_audio_parte.fuente_audio = EXCLUDED.fuente_audio
+         AND EXISTS (
+           SELECT 1 FROM dictado_session s
+           WHERE s.session_id = EXCLUDED.session_id
+             AND s.volcado_id IS NULL AND s.estado <> 'complete'
+         )
+       RETURNING part_index`,
       [
         params.sessionId,
         params.partIndex,
         params.blobUrl,
         params.blobPath ?? null,
         params.bytes,
-        params.sha256 ?? null,
+        params.sha256!.toLowerCase(),
         params.fuenteAudio ?? "microphone",
         params.estadoVerificacion ?? "pendiente",
         params.startMs ?? null,
@@ -169,6 +198,11 @@ export async function registrarParteAudio(params: {
         params.duracionMs ?? null,
       ]
     );
+    if (typeof parte.rowCount === "number" && parte.rowCount === 0) {
+      throw new Error(
+        `Conflicto de custodia en la parte ${params.partIndex}: ya existe contenido con otra huella/bytes, o la sesión quedó sellada. El original no se sobrescribió.`,
+      );
+    }
 
     await registrarEvento({
       fase: "dictado",
