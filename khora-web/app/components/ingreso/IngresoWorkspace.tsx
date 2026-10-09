@@ -870,7 +870,7 @@ function IngresoContenido() {
       let audioUrl: string | null = null;
       let audioBytes: number | null = null;
       const partes = partesSubidasRef.current;
-      const audioEsperado = fuenteEntradaSesionRef.current === "microfono" || fuenteEntradaSesionRef.current === "chrome_live_caption";
+      const audioEsperado = fuenteEntradaSesionRef.current !== null;
       const partesGeneradas = partesRawRef.current.length;
       const indicesSubidos = new Set(partes.map((p) => p.parte));
       const audioIntegro = audioEsperado && partesGeneradas > 0
@@ -901,7 +901,7 @@ function IngresoContenido() {
         pulidoAplicado: pulidosOk > 0,
         audioPartes: partes.length > 0 ? partes : null,
         estadoTranscripcion: estadoTranscripcionRef.current || null,
-        fuenteEntrada: fuenteEntradaSesionRef.current || "microfono",
+        fuenteEntrada: fuenteEntradaSesionRef.current || "texto",
       };
 
       let rv: Response;
@@ -958,6 +958,7 @@ function IngresoContenido() {
       });
       const data = result.data;
       if (data.audioUrl) {
+        fuenteEntradaSesionRef.current = "audio_archivo";
         partesSubidasRef.current = [{ parte: 1, url: data.audioUrl, bytes: data.audioBytes || file.size, sha256: data.sha256 || "", verificado: data.verificado === true }];
         setPartesContador(1);
         setBytesAcumulados(data.audioBytes || file.size);
