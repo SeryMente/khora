@@ -237,7 +237,7 @@ b4e90855d059c16634f15ec8f0e613b3206cd17bb7bec190ba58f181777fbcd4  ./khora-web/ap
 43cf297fba0355889f6172d2e0c369c2f63392c8f5b178e673cce374af6e5e97  ./khora-web/app/capturar/page.tsx
 db60f4bb5a898b2e5ac57f91195454e693769c8e63a1064db300663f331cecd4  ./khora-web/app/components/CapturarModal.tsx
 31a4ccb3ec336349d6718c4b73f2e687aa02715e89f780a564f6ab0224d5be66  ./khora-web/app/components/CopyBlock.tsx
-f355f4a43a06d3c26a3eda8502334c581961064de82e14875722e15fa14240a2  ./khora-web/app/components/ep/EntornoPersistentePanel.tsx
+9c3011da7a73978694acd2b31af169aa4930d292b86c62965049dcb6ce11ead8  ./khora-web/app/components/ep/EntornoPersistentePanel.tsx
 54aaea486b61dc0a5b6f436c17bb54e6c14454b151ce73c139698594938274ea  ./khora-web/app/components/GlobalFooter.tsx
 bc5a4691e376000eaaecaaad8e76f6ea55f08431e57a3b796a8963f75772fb7a  ./khora-web/app/components/os/AppIcon.tsx
 e623512b60f3f656af1268553ce93e618375375352bf84b90c480b9358e79411  ./khora-web/app/components/os/KhoraShell.tsx
@@ -410,7 +410,7 @@ cdf6901d41c5f3139be7fa44dd415f2fb047aee9ddc6c3a6b5143bb4f9b0ba45  ./khora-web/li
 6269d6b69187002ad3136a066632302c5eff558b54a6cf85887b4eac87d1be3d  ./khora-web/lib/server/ep-bootstrap-content.ts
 3f7a3679e4e0c9989c928b55738d34391c289775e9e2151518e7a9ad17ae5fed  ./khora-web/lib/server/ep-github-credential.ts
 5883d7e87d78f027f287e006df9e9e3e9506243d66a451e2cd2275c8230a228c  ./khora-web/lib/server/ep-master-password.ts
-c41e14094bac668dac3188dd8b7b329c1037d07bd05616a839b46f92d769dcf5  ./khora-web/lib/server/ep.ts
+fbe1f028706fc85e6516ce5e5222d26b9c9be44b0ba8775ca073876f86a94540  ./khora-web/lib/server/ep.ts
 a07bd679df43f4d298db4356424bdbb877d89570cec897cef889769221f3f5ae  ./khora-web/lib/server/espejoNotion.test.ts
 c8c8f4437796eac17ba9567129076516e3e80715222899bdde1d76afb50469f3  ./khora-web/lib/server/espejoNotion.ts
 40f0a28e40a43d8e8f8fe4e56fd41f64e1ef02ce37e92032329f5eb3a33e9cb5  ./khora-web/lib/server/eventos.ts
@@ -499,7 +499,7 @@ de7d735c46127a7f1b7d424c7c3a9c3e53e7eda53dd3b7fb41474b5f25757f4c  ./khora-web/te
 8279173df75e480671083b4906e2dd0c1867639b35b322e5117184a403814161  ./khora-web/tests/unit/chatgpt_oauth.test.ts
 46cc546f8a1da5a7c15de924da7e51ea8ce41588614d8b76423b9c354e8c64ef  ./khora-web/tests/unit/compuerta.test.ts
 1695b3740daa396553420afb4fc4c4ec400479ae630bcb774c725e10c426b69d  ./khora-web/tests/unit/dictado_clean_verbatim.test.ts
-cb49f0d533c0e5aaf4307422ce0f601fe8279b4fe01a63f80f15862be8b8e371  ./khora-web/tests/unit/ep_security.test.ts
+234298b639342c156334529b904a2cdadc567f40a19163daab7db70912825114  ./khora-web/tests/unit/ep_security.test.ts
 7110a1d2e9986afe57155068f4d3da49ce9bec51f36c387aadf66b6e30e77451  ./khora-web/tests/unit/ep_token.test.ts
 915632ca4597a5dfa767d9f4623f34678c06ab8ff5b6fc200d3399da8ccfc7eb  ./khora-web/tests/unit/eventos_sistema.test.ts
 0d94d97b9941db994dfc6e5a0e67cc07692ab9c793c2c34c33017cf1060b76fd  ./khora-web/tests/unit/folio.test.ts
