@@ -978,7 +978,16 @@ function IngresoContenido() {
       link.href = url;
       const disposition = response.headers.get("content-disposition") || "";
       const nameMatch = disposition.match(/filename="?([^";]+)"?/i);
-      link.download = nameMatch?.[1] || "audio-original";
+      const utf8NameMatch = disposition.match(/filename\*=UTF-8''([^;]+)/i);
+      let downloadName = nameMatch?.[1] || "audio-original";
+      if (utf8NameMatch?.[1]) {
+        try {
+          downloadName = decodeURIComponent(utf8NameMatch[1]);
+        } catch {
+          // El nombre ASCII seguro sigue disponible como fallback.
+        }
+      }
+      link.download = downloadName;
       document.body.appendChild(link);
       link.click();
       link.remove();
