@@ -8,7 +8,7 @@ if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL es obligatorio para aplicar la migración de runtime.");
 }
 
-const migrationFiles = ["023_runtime_state.sql", "024_oauth_scopes.sql", "025_normative_receipts.sql", "026_normative_turns.sql", "027_manual_mcp_tokens.sql", "028_normative_order_ledger.sql"];
+const migrationFiles = ["016_ep_persistent_sessions.sql", "017_ep_github_credential_vault.sql", "023_runtime_state.sql", "024_oauth_scopes.sql", "025_normative_receipts.sql", "026_normative_turns.sql", "027_manual_mcp_tokens.sql", "028_normative_order_ledger.sql"];
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -22,7 +22,7 @@ try {
     const sql = await fs.readFile(path.join(process.cwd(), "db/migrations", file), "utf8");
     await pool.query(sql);
   }
-  console.log("Migraciones 023-028 de runtime, OAuth, evidencia normativa, Bearer manual y ledger de orden aplicadas.");
+  console.log("Migraciones EP 016-017 y runtime 023-028 aplicadas.");
 } catch (error) {
   console.error("Error aplicando migraciones de runtime:", error);
   process.exitCode = 1;
