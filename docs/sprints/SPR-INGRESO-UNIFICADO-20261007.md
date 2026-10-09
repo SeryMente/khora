@@ -318,4 +318,16 @@ La distinción de UX queda cerrada así: **Ingreso y Volcados son superficies de
 - **Despliegue:** las comprobaciones de preview de Vercel/Netlify reportaron restricciones del servicio de despliegue; no son evidencia de que el código se haya compilado en el runner.
 - **Gobernanza:** el bloque de VERBATIM de la sección 1 permanece sin cambios. Esta versión no afirma un censo exhaustivo de Notion ni modifica silenciosamente sus páginas.
 
+
+### 11.4 Cierre de PRs y preparación de referencias obsoletas
+
+- **PR #291:** fusionado por squash en `main`, commit `caf5ba5c638a628013aaf55007e4bee33048931b`. GitHub ya retiró la referencia de la rama de integración.
+- **PR #290:** cerrado como sustituido por #291. Su rama `refactor/ingreso-volcados-consolidacion-20261008` no se debe fusionar. Su historial sigue disponible en el PR cerrado; la referencia queda candidata a borrado tras conservar esa trazabilidad.
+- **PR #288:** cerrado sin merge por estar divergido y mezclar cambios de paneles heredados con cambios normativos transversales fuera del alcance funcional. Su rama `fix/normative-record-type-20261007` conserva cambios independientes de Metodología/MCP; no se clasifica como borrable en bloque.
+- **Candidatas a poda por no tener commits únicos respecto de `main` en la comparación realizada:** `release/ingreso-live-20261008` y `feat/procedencia-terna`. Antes de eliminarlas, comprobar que el head no haya cambiado desde la auditoría.
+- **Ramas que no se borran automáticamente:** `feat/interfaz-volcados`, `feat/volcados-reskin-master-detail-6920560992591667827`, `fix/traceability-session-dictado-volcado-11813748551019416541` y `fix/pipeline-ingesta-defects-2747149774445849604` contienen commits únicos de ramas muy divergidas y mezcla de áreas del sistema; requieren revisión de cada cambio útil antes de descartar sus referencias.
+- **PR abierto ajeno a este sprint:** #287, contrato de salida de ciclos. No se mezcla en este cambio porque no pertenece a Ingreso, Volcados ni Ingesta.
+
+La referencia borrada o podada no equivale a borrar el historial del PR fusionado/cerrado. En esta integración no hay operación de borrado de refs de rama disponible; por tanto, las referencias candidatas quedan preparadas y enumeradas, pero no se declara su eliminación efectiva.
+
 **Dictamen v0.5.0:** implementación funcional selectiva integrada en `main`; la certificación final sigue bloqueada. El gate solo puede cerrarse después de una ejecución válida de las pruebas automatizadas y del PASS de `ING-DIRECT-01` en producción. No se confunden merge, CI ejecutada ni despliegue.
