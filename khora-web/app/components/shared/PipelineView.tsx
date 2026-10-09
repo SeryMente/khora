@@ -163,7 +163,7 @@ export function PipelineView({
     selectedVersionNumber !== null &&
     /^[0-9a-f]{64}$/.test(String(selectedVersionSha256 ?? "").trim().toLowerCase()) &&
     Number(selectedItem.version_aprobada) === selectedVersionNumber &&
-    String(selectedItem.sha256_aprobado ?? "").trim().toLowerCase() ===
+    String(selectedItem.sha256_aprobada ?? "").trim().toLowerCase() ===
       String(selectedVersionSha256 ?? "").trim().toLowerCase() &&
     ["listo_ingesta", "fallido", "ingerido"].includes(String(selectedItem.estado)),
   );
@@ -980,7 +980,7 @@ export function PipelineView({
                           ? `v${selectedItem.version_aprobada}`
                           : "Ninguna"}
                       </div>
-                      <div>SHA-256 ratificado: {selectedItem.sha256_aprobado || "N/A"}</div>
+                      <div>SHA-256 ratificado: {selectedItem.sha256_aprobada || "N/A"}</div>
                     </div>
                   </div>
                 )}
