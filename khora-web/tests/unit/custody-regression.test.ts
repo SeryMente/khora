@@ -426,11 +426,15 @@ test("CUSTODY-11: transcript network failure must return the verified original l
   assert.ok(handler.includes('estadoTranscripcion: "fallido"'));
 });
 
-test("CUSTODY-12: original audio export only accepts a single import-file source", () => {
+test("CUSTODY-12: original export works from verified import custody before or after archive", () => {
   const exportRoute = readFileSync(resolve(process.cwd(), "app/api/audio/sesion/[id]/exportar/route.ts"), "utf8");
-  assert.ok(exportRoute.includes('sourceResult.rows[0].driver !== "audio_archivo"'));
+  assert.ok(exportRoute.includes("p.fuente_audio"));
+  assert.ok(exportRoute.includes("LEFT JOIN dictado_session"));
+  assert.ok(exportRoute.includes('parts[0].fuente_audio !== "audio_archivo"'));
   assert.ok(exportRoute.includes("parts.length !== 1"));
   assert.ok(exportRoute.includes("const audio = buffers[0]"));
+  assert.ok(exportRoute.includes("evaluarCustodiaAudio"));
+  assert.ok(exportRoute.includes("createHash(\"sha256\")"));
 });
 
 test("CUSTODY-10: stale ingestion failures cannot overwrite a newer approved version", () => {
