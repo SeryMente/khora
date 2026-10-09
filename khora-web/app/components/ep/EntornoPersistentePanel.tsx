@@ -45,7 +45,7 @@ type Issued = {
 type Summary = { id: string; estado: string; creado_en: string; ultimo_evento_en: string | null; cerrado_en: string | null };
 type WorkspaceRepo = { name: string; private: boolean; defaultBranch: string; extensionRoot: string | null };
 type GitHubCredentialStatus = { configured: boolean; githubLogin: string | null; tokenSuffix: string | null; repositories: Array<{ name: string; read: boolean; write: boolean }>; updatedAt: string | null };
-type MasterPasswordStatus = { configured: boolean; updatedAt: string | null };
+type MasterPasswordStatus = { configured: boolean; updatedAt: string | null; canManage?: boolean };
 type Notice = { kind: "idle" | "working" | "success" | "error"; text: string };
 type JwtClaims = { iss?: unknown; sid?: unknown; typ?: unknown; exp?: unknown; launchMode?: unknown };
 
@@ -539,21 +539,30 @@ export default function EntornoPersistentePanel() {
           )}
         </section>
 
-        <section className="space-y-4 rounded-lg border p-4" style={{ ...border, background: "var(--khora-bg)" }} data-ui-id="seguridad.ep.master-password">
-          <div className="flex items-start gap-3">
-            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-xs font-bold" style={border}>B</span>
-            <div>
-              <h3 className="font-bold">Contraseña maestra de OEP</h3>
-              <p className="mt-1 text-xs leading-relaxed opacity-65">Se configura o rota una sola vez desde una sesión OIDC autorizada. Después puedes abrir el submódulo EP sin iniciar Google OIDC en cada terminal. Se almacena un verificador scrypt con salt aleatorio; nunca la contraseña en claro.</p>
+        {masterPasswordStatus?.canManage ? (
+          <section className="space-y-4 rounded-lg border p-4" style={{ ...border, background: "var(--khora-bg)" }} data-ui-id="seguridad.ep.master-password">
+            <div className="flex items-start gap-3">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-xs font-bold" style={border}>B</span>
+              <div>
+                <h3 className="font-bold">Contraseña maestra de OEP</h3>
+                <p className="mt-1 text-xs leading-relaxed opacity-65">Se configura o rota una sola vez desde una sesión OIDC autorizada. Después puedes abrir el submódulo EP sin iniciar Google OIDC en cada terminal. Se almacena un verificador scrypt con salt aleatorio; nunca la contraseña en claro.</p>
+              </div>
             </div>
-          </div>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <label className="block space-y-2 text-xs"><span className="font-bold uppercase tracking-wider">Nueva contraseña (mínimo 16 caracteres)</span><input type="password" autoComplete="new-password" value={masterPasswordInput} onChange={(event) => setMasterPasswordInput(event.target.value)} maxLength={1024} disabled={masterPasswordBusy} className="min-h-11 w-full rounded-lg border bg-transparent px-3 py-2 text-sm outline-none focus-visible:ring-2" style={border} /></label>
-            <label className="block space-y-2 text-xs"><span className="font-bold uppercase tracking-wider">Confirmar contraseña</span><input type="password" autoComplete="new-password" value={masterPasswordConfirmation} onChange={(event) => setMasterPasswordConfirmation(event.target.value)} maxLength={1024} disabled={masterPasswordBusy} className="min-h-11 w-full rounded-lg border bg-transparent px-3 py-2 text-sm outline-none focus-visible:ring-2" style={border} /></label>
-          </div>
-          <button type="button" onClick={saveMasterPassword} disabled={masterPasswordBusy || masterPasswordInput.length < 16 || !masterPasswordConfirmation} className="flex min-h-11 items-center justify-center gap-2 rounded-lg border px-4 py-2 text-xs font-bold uppercase disabled:opacity-50" style={border}><KeyRound size={15} />{masterPasswordBusy ? "Guardando..." : masterPasswordStatus?.configured ? "Rotar contraseña maestra" : "Configurar contraseña maestra"}</button>
-          <p className="text-xs opacity-55">{masterPasswordStatus?.configured ? "Contraseña maestra configurada" + (masterPasswordStatus.updatedAt ? " · actualizada " + new Date(masterPasswordStatus.updatedAt).toLocaleString("es-MX") : "") : "La primera configuración y la recuperación requieren iniciar sesión OIDC. En el acceso diario de Cybernet solo se usará la contraseña maestra de OEP."}</p>
-        </section>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="block space-y-2 text-xs"><span className="font-bold uppercase tracking-wider">Nueva contraseña (mínimo 16 caracteres)</span><input type="password" autoComplete="new-password" value={masterPasswordInput} onChange={(event) => setMasterPasswordInput(event.target.value)} maxLength={1024} disabled={masterPasswordBusy} className="min-h-11 w-full rounded-lg border bg-transparent px-3 py-2 text-sm outline-none focus-visible:ring-2" style={border} /></label>
+              <label className="block space-y-2 text-xs"><span className="font-bold uppercase tracking-wider">Confirmar contraseña</span><input type="password" autoComplete="new-password" value={masterPasswordConfirmation} onChange={(event) => setMasterPasswordConfirmation(event.target.value)} maxLength={1024} disabled={masterPasswordBusy} className="min-h-11 w-full rounded-lg border bg-transparent px-3 py-2 text-sm outline-none focus-visible:ring-2" style={border} /></label>
+            </div>
+            <button type="button" onClick={saveMasterPassword} disabled={masterPasswordBusy || masterPasswordInput.length < 16 || !masterPasswordConfirmation} className="flex min-h-11 items-center justify-center gap-2 rounded-lg border px-4 py-2 text-xs font-bold uppercase disabled:opacity-50" style={border}><KeyRound size={15} />{masterPasswordBusy ? "Guardando..." : masterPasswordStatus.configured ? "Rotar contraseña maestra" : "Configurar contraseña maestra"}</button>
+            <p className="text-xs opacity-55">{masterPasswordStatus.configured ? "Contraseña maestra configurada" + (masterPasswordStatus.updatedAt ? " · actualizada " + new Date(masterPasswordStatus.updatedAt).toLocaleString("es-MX") : "") : "La primera configuración y la recuperación requieren iniciar sesión OIDC."}</p>
+          </section>
+        ) : (
+          <section className="space-y-2 rounded-lg border p-4 text-xs" style={{ ...border, background: "var(--khora-bg)" }} data-ui-id="seguridad.ep.master-password.status">
+            <h3 className="font-bold">Contraseña maestra de OEP</h3>
+            {masterPasswordStatus?.configured
+              ? <p className="opacity-65">Configurada · {masterPasswordStatus.updatedAt ? new Date(masterPasswordStatus.updatedAt).toLocaleString("es-MX") : "fecha no disponible"}. Esta sesión EP no puede rotarla; la recuperación requiere OIDC autorizado.</p>
+              : <p className="opacity-65">Estado no confirmado. La configuración inicial o recuperación requiere una sesión OIDC autorizada.</p>}
+          </section>
+        )}
 
         <section className="space-y-4 rounded-lg border p-4" style={{ ...border, background: "var(--khora-bg)" }} data-ui-id="seguridad.ep.repositorios">
           <div className="flex items-start gap-3">
