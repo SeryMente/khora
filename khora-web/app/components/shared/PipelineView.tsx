@@ -49,6 +49,10 @@ export type PipelineViewState = {
   searchQuery: string;
   selectedId: string | null;
   selectedItem: any | null;
+  selectedVersionNumber: number | null;
+  selectedVersionSha256: string | null;
+  versionSelectionError: string | null;
+  legacyEditorEntry: boolean;
   drawerSubTab: "cockpit" | "trace";
   viewMode: "lectura" | "edicion";
   editableTexto: string;
@@ -122,6 +126,10 @@ export function PipelineView({
     searchQuery,
     selectedId,
     selectedItem,
+    selectedVersionNumber,
+    selectedVersionSha256,
+    versionSelectionError,
+    legacyEditorEntry,
     drawerSubTab,
     viewMode,
     editableTexto,
@@ -150,6 +158,15 @@ export function PipelineView({
   } = state;
 
   const activeHallazgo = hallazgos[activeHallazgoIndex];
+  const selectedVersionIsApproved = Boolean(
+    selectedItem &&
+    selectedVersionNumber !== null &&
+    /^[0-9a-f]{64}$/.test(String(selectedVersionSha256 ?? "").trim().toLowerCase()) &&
+    Number(selectedItem.version_aprobada) === selectedVersionNumber &&
+    String(selectedItem.sha256_aprobado ?? "").trim().toLowerCase() ===
+      String(selectedVersionSha256 ?? "").trim().toLowerCase() &&
+    ["listo_ingesta", "fallido", "ingerido"].includes(String(selectedItem.estado)),
+  );
 
   const formatMs = (ms: number): string => {
     if (!ms || isNaN(ms) || ms < 0) return "00:00";
@@ -204,6 +221,11 @@ export function PipelineView({
           </p>
         </div>
       </div>
+      {versionSelectionError && (
+        <div role="alert" data-ui-id="volcados.version-selection-error" className="border p-3 text-sm" style={{ borderColor: "var(--khora-border)", color: "var(--khora-ink)" }}>
+          {versionSelectionError}
+        </div>
+      )}
 
       <div className="space-y-6">
         {/* Summary Cards */}
@@ -888,8 +910,7 @@ export function PipelineView({
                         data-ui-id="ingesta.container"
                         className="pt-2 border-t border-zinc-800 space-y-2"
                       >
-                        {(selectedItem.estado === "listo_ingesta" ||
-                          selectedItem.version_aprobada) && (
+                        {selectedVersionIsApproved && (
                           <button
                             data-ui-id="ingesta.btn-ingerir"
                             onClick={() => actions.onIngestApproved?.()}
@@ -898,9 +919,18 @@ export function PipelineView({
                           >
                             {ingesting
                               ? "Ingiriendo en Grafo..."
-                              : "Ingerir versión aprobada"}
+                              : legacyEditorEntry
+                                ? "Ingerir esta version"
+                                : "Ingerir versión aprobada"}
                           </button>
                         )}
+                        {selectedItem.version_aprobada &&
+                          selectedVersionNumber !== null &&
+                          !selectedVersionIsApproved && (
+                            <div role="status" className="border p-3 text-xs" style={{ borderColor: "var(--khora-border)", color: "var(--khora-ink)" }}>
+                              La versión abierta v{selectedVersionNumber} no coincide exactamente con la versión ratificada v{selectedItem.version_aprobada}. No se enviará otra versión.
+                            </div>
+                          )}
 
                         {ingesting && (
                           <div
@@ -941,12 +971,16 @@ export function PipelineView({
                       <div>UUID: {selectedItem.id}</div>
                       <div>Folio: #{selectedItem.folio || "N/A"}</div>
                       <div>
-                        Versión Aprobada:{" "}
+                        Versión abierta: {selectedVersionNumber === null ? "Ninguna" : `v${selectedVersionNumber}`}
+                      </div>
+                      <div>SHA-256 abierto: {selectedVersionSha256 || "N/A"}</div>
+                      <div>
+                        Versión ratificada:{" "}
                         {selectedItem.version_aprobada
                           ? `v${selectedItem.version_aprobada}`
                           : "Ninguna"}
                       </div>
-                      <div>SHA256: {selectedItem.sha256_aprobado || "N/A"}</div>
+                      <div>SHA-256 ratificado: {selectedItem.sha256_aprobado || "N/A"}</div>
                     </div>
                   </div>
                 )}
