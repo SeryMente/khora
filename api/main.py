@@ -26,6 +26,32 @@ except ImportError:
 neo4j_driver = None
 neo4j_config = {}
 
+def _is_identity_constraint_conflict(error: Exception) -> bool:
+    detail = str(error).lower()
+    return (
+        ("constraint" in detail or "already exists" in detail or "unique" in detail)
+        and any(key in detail for key in ("io_id", "canonical_key", "informationobject"))
+    )
+
+
+def _same_ingesta_provenance_tuple(
+    existing,
+    volcado_id: str,
+    version: int,
+    sha256: str,
+) -> bool:
+    if not existing:
+        return False
+    try:
+        return (
+            existing["v"] == str(volcado_id)
+            and int(existing["ver"]) == int(version)
+            and str(existing["s"]).lower() == str(sha256).lower()
+        )
+    except (KeyError, TypeError, ValueError):
+        return False
+
+
 GRAPH_HEALTH_DEFECT_KEYS = (
     "typed_overlap",
     "missing_temporal_nodes",
@@ -328,12 +354,7 @@ async def endpoint_ingesta(req: IngestaRequest):
             # Dos solicitudes de la misma terna pueden superar el precheck a la vez.
             # Solo se considera idempotente el perdedor si una lectura posterior
             # demuestra que existe el mismo io_id con la misma terna inmutable.
-            detail = str(write_error).lower()
-            identity_constraint_conflict = (
-                ("constraint" in detail or "already exists" in detail or "unique" in detail)
-                and any(key in detail for key in ("io_id", "canonical_key", "informationobject"))
-            )
-            if not identity_constraint_conflict:
+            if not _is_identity_constraint_conflict(write_error):
                 raise
 
             with neo4j_driver.session() as session:
@@ -346,10 +367,11 @@ async def endpoint_ingesta(req: IngestaRequest):
             if not existente_concurrente:
                 raise
 
-            misma_terna = (
-                existente_concurrente["v"] == str(prov_terna["volcado_id"])
-                and int(existente_concurrente["ver"]) == version_terna
-                and str(existente_concurrente["s"]).lower() == sha_terna
+            misma_terna = _same_ingesta_provenance_tuple(
+                existente_concurrente,
+                str(prov_terna["volcado_id"]),
+                version_terna,
+                sha_terna,
             )
             if not misma_terna:
                 raise HTTPException(
