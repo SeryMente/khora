@@ -408,7 +408,7 @@ c93f62364fca15a8956a32e49a326f09e87e74c272424d58f65fe3b1909e501b  ./khora-web/li
 8ea8db7015fad0bcc63d321ca95cfdc85e77b270e9893619ca0c7c5b252b85bc  ./khora-web/lib/server/dictado.ts
 cdf6901d41c5f3139be7fa44dd415f2fb047aee9ddc6c3a6b5143bb4f9b0ba45  ./khora-web/lib/server/domainAudio.ts
 6269d6b69187002ad3136a066632302c5eff558b54a6cf85887b4eac87d1be3d  ./khora-web/lib/server/ep-bootstrap-content.ts
-3f7a3679e4e0c9989c928b55738d34391c289775e9e2151518e7a9ad17ae5fed  ./khora-web/lib/server/ep-github-credential.ts
+d5499c80727061725da19cf855ffe42ca570f232f67aba35ca158ba9f6d8a4bc  ./khora-web/lib/server/ep-github-credential.ts
 5883d7e87d78f027f287e006df9e9e3e9506243d66a451e2cd2275c8230a228c  ./khora-web/lib/server/ep-master-password.ts
 fbe1f028706fc85e6516ce5e5222d26b9c9be44b0ba8775ca073876f86a94540  ./khora-web/lib/server/ep.ts
 a07bd679df43f4d298db4356424bdbb877d89570cec897cef889769221f3f5ae  ./khora-web/lib/server/espejoNotion.test.ts
