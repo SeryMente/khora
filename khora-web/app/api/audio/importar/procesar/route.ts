@@ -149,6 +149,8 @@ export async function POST(request: Request) {
         bytes: clear.length,
         sha256,
         fuenteAudio: "audio_archivo",
+        nombreOriginal: originalName.trim() || "audio",
+        mimeType: format.mimeType,
         estadoVerificacion: "verificado",
       });
     } catch (error) {
