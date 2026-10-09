@@ -44,6 +44,7 @@ function IngresoContenido() {
   const [pulidosOk, setPulidosOk] = useState(0);
   const [pulidosNo, setPulidosNo] = useState(0);
   const [guardando, setGuardando] = useState(false);
+  const [archivado, setArchivado] = useState(false);
   const [generandoTitulo, setGenerandoTitulo] = useState(false);
   const [retranscribiendo, setRetranscribiendo] = useState(false);
   const [adjuntandoAudio, setAdjuntandoAudio] = useState(false);
@@ -676,6 +677,10 @@ function IngresoContenido() {
   }, [estabilizarEmision, detenerGrabacion]);
 
   const prepararChrome = useCallback(() => {
+    if (archivado) {
+      setError("Esta captura ya está archivada. Pulsa Limpiar antes de iniciar otra captura.");
+      return;
+    }
     setError("");
     setAviso("");
     setResultado("");
@@ -702,9 +707,13 @@ function IngresoContenido() {
 
     enviarChromeCommand("arm", siguienteParte);
     setAviso("Sesión preparada. Cambia a la pestaña de Chrome que reproduce el audio y pulsa el icono de Aisthesis para iniciar su captura.");
-  }, [enviarChromeCommand]);
+  }, [archivado, enviarChromeCommand]);
 
   const iniciar = useCallback(async () => {
+    if (archivado) {
+      setError("Esta captura ya está archivada. Pulsa Limpiar antes de iniciar otro dictado.");
+      return;
+    }
     setError("");
     setAviso("");
     setResultado("");
@@ -739,7 +748,7 @@ function IngresoContenido() {
     setEditando(false);
     setEstabaDictando(false);
     setTimeout(() => { void arrancarGrabacion(); }, 900);
-  }, [arrancarReconocedor, arrancarGrabacion]);
+  }, [archivado, arrancarReconocedor, arrancarGrabacion]);
 
   const detener = useCallback(async () => {
     if (modoEntradaRef.current === "chrome_live_caption") {
@@ -844,7 +853,14 @@ function IngresoContenido() {
   const guardar = useCallback(async () => {
     setError("");
     setResultado("");
+    if (archivado) {
+      setError("Este volcado ya está archivado y sellado. Para editarlo, abre Volcados; pulsa Limpiar para iniciar una captura nueva.");
+      return;
+    }
     if (texto.trim().length === 0) { setError("no hay nada que archivar"); return; }
+    // Clave estable por captura: un retry después de perder la respuesta debe
+    // devolver el mismo volcado, no crear otra fila con un UUID nuevo.
+    if (!sesionIdRef.current) sesionIdRef.current = generarSesionId();
     setGuardando(true);
     try {
       if (subidaEnCursoRef.current) {
@@ -907,7 +923,9 @@ function IngresoContenido() {
         if (!rv.ok) {
           setError(String(dv?.detail || "Error desconocido") + " " + String(dv?.causa ?? ""));
         } else {
-          setResultado("archivado " + String(dv?.chars) + " caracteres, sha " + String(dv?.sha256).slice(0, 8) + (audioUrl ? `, con audio (${partes.length} partes)` : ", sin audio"));
+          setArchivado(true);
+          setResultado((dv?.idempotent ? "volcado ya archivado " : "archivado ") + String(dv?.chars) + " caracteres, sha " + String(dv?.sha256).slice(0, 8) + (audioUrl ? `, con audio (${partes.length} partes)` : ", sin audio"));
+          setAviso("Captura sellada. La revisión y las correcciones deben hacerse en Volcados; pulsa Limpiar para iniciar una captura nueva.");
         }
       } catch (err) {
         setError("Error de red al guardar: " + String(err));
@@ -917,9 +935,14 @@ function IngresoContenido() {
     } finally {
       setGuardando(false);
     }
-  }, [texto, titulo, pulidosOk]);
+  }, [archivado, texto, titulo, pulidosOk]);
 
   const handleAdjuntarAudio = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (archivado) {
+      setError("Esta captura ya está archivada. Pulsa Limpiar antes de adjuntar audio a una captura nueva.");
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
     const file = e.target.files?.[0];
     if (!file) return;
     setAdjuntandoAudio(true);
@@ -959,6 +982,7 @@ function IngresoContenido() {
 
   const limpiar = useCallback(() => {
     enviarChromeCommand("stop");
+    setArchivado(false);
     segmentosRef.current = [];
     setSegmentos([]);
     fragmentosRef.current = [];
@@ -1016,9 +1040,13 @@ function IngresoContenido() {
   }, [editando, estado, pausarParaEdicionInSitu, texto]);
 
   const handleTextoChange = useCallback((val: string) => {
+    if (archivado) {
+      setError("El volcado ya está archivado y sellado. Las ediciones se realizan en Volcados.");
+      return;
+    }
     if (!editando) iniciarEdicionInSitu();
     setTexto(val);
-  }, [editando, iniciarEdicionInSitu]);
+  }, [archivado, editando, iniciarEdicionInSitu]);
 
   const aplicarEdicionInSitu = useCallback(() => {
     const parrafos = texto.split("\n\n").filter((p) => p.trim().length > 0);
@@ -1112,6 +1140,7 @@ function IngresoContenido() {
       state={{
         titulo,
         texto,
+        archivado,
         estado,
         modoEntrada,
         chromeBridgeEstado,
