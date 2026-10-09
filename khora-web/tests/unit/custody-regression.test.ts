@@ -469,6 +469,24 @@ test("CUSTODY-12: original export works from verified import custody before or a
 });
 
 
+
+test("CUSTODY-14: archived captures stay sealed and text-only saves receive stable session IDs", () => {
+  const workspace = readFileSync(resolve(process.cwd(), "app/components/ingreso/IngresoWorkspace.tsx"), "utf8");
+  const saveStart = workspace.indexOf("const guardar = useCallback");
+  const exportStart = workspace.indexOf("const exportarAudioOriginal", saveStart);
+  const saveHandler = workspace.slice(saveStart, exportStart);
+  assert.ok(saveHandler.includes("if (archivado)"));
+  assert.ok(saveHandler.includes("if (!sesionIdRef.current) sesionIdRef.current = generarSesionId()"));
+  assert.ok(saveHandler.includes("setArchivado(true)"));
+  assert.ok(saveHandler.includes("setAviso("));
+  assert.ok(saveHandler.includes("[archivado, texto, titulo, pulidosOk]"));
+
+  const attachStart = workspace.indexOf("const handleAdjuntarAudio");
+  const cleanStart = workspace.indexOf("const limpiar", attachStart);
+  const attachHandler = workspace.slice(attachStart, cleanStart);
+  assert.ok(attachHandler.includes("if (archivado)"));
+  assert.ok(attachHandler.includes("Pulsa Limpiar antes de adjuntar audio"));
+});
 test("CUSTODY-13: fresh installations create custody tables before applying compatibility ALTERs", () => {
   const source = readFileSync(resolve(process.cwd(), "lib/server/dictado.ts"), "utf8");
   const ensureStart = source.indexOf("export async function asegurarColumnasDictado");
