@@ -7,6 +7,7 @@ import * as Icons from "lucide-react";
 export type IngresoViewState = {
   titulo: string;
   texto: string;
+  archivado: boolean;
   estado: "inactivo" | "dictando";
   modoEntrada: "ninguno" | "microfono" | "chrome_live_caption";
   chromeBridgeEstado: string;
@@ -58,6 +59,7 @@ export function IngresoView({
   const {
     titulo,
     texto,
+    archivado,
     estado,
     modoEntrada,
     chromeBridgeEstado,
@@ -103,6 +105,13 @@ export function IngresoView({
         </p>
       </div>
 
+      {archivado && (
+        <div data-ui-id="ingreso.archivado" className="p-3 border rounded-none text-sm flex items-center gap-2" style={{ borderColor: "var(--khora-border)", backgroundColor: "var(--khora-surface)", color: "var(--khora-accent)" }}>
+          <Icons.ShieldCheck size={24} strokeWidth={1.75} className="shrink-0" />
+          <span>Captura archivada y sellada. La revisión y las correcciones se hacen en Volcados. Pulsa Limpiar para empezar otra captura.</span>
+        </div>
+      )}
+
       {!soportado && (
         <div className="p-3 border rounded-none text-sm flex items-center gap-2" style={{ borderColor: "var(--khora-border)", backgroundColor: "var(--khora-surface)", color: "var(--khora-accent)" }}>
           <Icons.TriangleAlert size={32} strokeWidth={1.75} className="shrink-0" />
@@ -116,6 +125,7 @@ export function IngresoView({
           <input
             data-ui-id="ingreso.titulo-input"
             value={titulo}
+            disabled={archivado}
             onChange={(e) => actions.onTituloChange?.(e.target.value)}
             placeholder="Título opcional (escribe o genera con IA)"
             className="flex-1 p-2.5 border rounded-none text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)] focus-visible:border-[var(--khora-accent)]"
@@ -128,7 +138,7 @@ export function IngresoView({
           <button
             data-ui-id="ingreso.btn-titulo-ia"
             onClick={() => actions.onGenerarTitulo?.()}
-            disabled={generandoTitulo || !texto.trim()}
+            disabled={archivado || generandoTitulo || !texto.trim()}
             className="px-3 py-2.5 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)] text-xs"
             style={{
               backgroundColor: "var(--khora-surface)",
@@ -147,7 +157,7 @@ export function IngresoView({
               <button
                 data-ui-id="ingreso.btn-iniciar"
                 onClick={() => actions.onIniciar?.()}
-                disabled={!soportado || editando || adjuntandoAudio || retranscribiendo}
+                disabled={archivado || !soportado || editando || adjuntandoAudio || retranscribiendo}
                 className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
                 style={{
                   backgroundColor: "var(--khora-accent)",
@@ -161,7 +171,7 @@ export function IngresoView({
               <button
                 data-ui-id="ingreso.btn-chrome"
                 onClick={() => actions.onPrepararChrome?.()}
-                disabled={editando || adjuntandoAudio || retranscribiendo}
+                disabled={archivado || editando || adjuntandoAudio || retranscribiendo}
                 className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
                 style={{
                   backgroundColor: "var(--khora-surface)",
@@ -192,7 +202,7 @@ export function IngresoView({
           <button
             data-ui-id="ingreso.btn-archivar"
             onClick={() => actions.onGuardar?.()}
-            disabled={guardando || estado === "dictando" || editando || adjuntandoAudio || retranscribiendo}
+            disabled={archivado || guardando || estado === "dictando" || editando || adjuntandoAudio || retranscribiendo}
             className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
             style={{
               backgroundColor: "var(--khora-surface)",
@@ -207,7 +217,7 @@ export function IngresoView({
           <button
             data-ui-id="ingreso.btn-retranscribir"
             onClick={() => actions.onRetranscribir?.()}
-            disabled={retranscribiendo || adjuntandoAudio || estado !== "inactivo"}
+            disabled={archivado || retranscribiendo || adjuntandoAudio || estado !== "inactivo"}
             className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
             style={{
               backgroundColor: "var(--khora-surface)",
@@ -222,7 +232,7 @@ export function IngresoView({
           <button
             data-ui-id="ingreso.btn-adjuntar"
             onClick={() => actions.onAdjuntarClick?.()}
-            disabled={adjuntandoAudio || retranscribiendo || estado !== "inactivo"}
+            disabled={archivado || adjuntandoAudio || retranscribiendo || estado !== "inactivo"}
             className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
             style={{
               backgroundColor: "var(--khora-surface)",
@@ -297,6 +307,7 @@ export function IngresoView({
         <textarea
           data-ui-id="ingreso.textarea"
           value={texto}
+          disabled={archivado}
           onFocus={() => actions.onIniciarEdicion?.()}
           onClick={() => actions.onIniciarEdicion?.()}
           onChange={(e) => actions.onTextoChange?.(e.target.value)}
