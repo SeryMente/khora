@@ -72,8 +72,11 @@ export async function POST(req: NextRequest) {
           detail:
             "El audio adjunto quedó almacenado, pero no pudo vincularse a la sesión. No se continuará a transcripción.",
           sessionId,
+          audioUrl: subido.url,
+          blobPath: destino,
           audioBytes: crudo.length,
           sha256,
+          recuperable: true,
         },
         { status: 503 },
       );
