@@ -285,6 +285,8 @@ test("EP Security: GitHub PAT is encrypted at rest and only served to an EP bear
   const manageRoute = readFileSync(new URL("../../app/api/ep/github-credential/route.ts", import.meta.url), "utf8");
   const tokenRoute = readFileSync(new URL("../../app/api/ep/github-token/route.ts", import.meta.url), "utf8");
   const bootstrap = readFileSync(new URL("../../../scripts/khora/khora.ps1", import.meta.url), "utf8");
+  const epServer = readFileSync(new URL("../../lib/server/ep.ts", import.meta.url), "utf8");
+  const panel = readFileSync(new URL("../../app/components/ep/EntornoPersistentePanel.tsx", import.meta.url), "utf8");
 
   assert.match(vault, /createCipheriv\("aes-256-gcm"/);
   assert.match(vault, /createDecipheriv\("aes-256-gcm"/);
@@ -293,6 +295,9 @@ test("EP Security: GitHub PAT is encrypted at rest and only served to an EP bear
   assert.doesNotMatch(manageRoute, /NextResponse\.json\(\{\s*token\s*,/);
   assert.match(tokenRoute, /authenticateEpBearer\(req, \["ep:github:token"\]\)/);
   assert.match(tokenRoute, /getStoredEpGitHubToken\(\)/);
+  assert.match(epServer, /getStoredEpGitHubToken\(\)/);
+  assert.match(epServer, /EP_REQUIRED_GITHUB_REPOSITORIES/);
+  assert.match(panel, /const catalogLoaded = await loadRepoCatalog\(true\)/);
   assert.match(bootstrap, /\/github-token/);
   assert.doesNotMatch(bootstrap, /Copia un Personal Access Token de GitHub con escritura/);
 });
