@@ -59,3 +59,20 @@ Las pruebas nuevas viven en:
 La suite unitaria controla contratos y fallos simulados; no certifica por sí sola PostgreSQL, Blob o Neo4j reales. El ciclo E2E completo de ingesta está marcado `skip` y la compuerta `ING-DIRECT-01` en producción continúa bloqueante. Antes de certificar hay que demostrar con almacenamiento/grafo reales: primera ingesta, respuesta perdida, repetición idéntica, identidad `io_id` estable, ausencia de duplicados, conflicto de SHA, cambio concurrente de aprobación y fallo de vínculo del audio con recuperación del blob.
 
 El PR #290 permanece abierto y no mergeado. No se debe eliminar ni degradar una guardia heredada, ni marcar el protocolo como certificado, hasta completar esas pruebas de integración y conservar los enlaces a sus resultados.
+
+
+## Estado de validación del corte remoto actual · 2026-10-09
+
+**SHA examinado:** `8682e3a26ea25113e893c523ccc16fb3c1d47512` · PR #290 abierto, sin merge.
+
+- Los workflows de GitHub Actions asociados a ese SHA (`CI`, `UI Quality` y `khora-ok / gate`) están en fallo. Se reintentaron los jobs fallidos; los reintentos también terminaron en fallo.
+- Los logs no pudieron recuperarse por la interfaz de GitHub disponible para esta sesión: la descarga devuelve `BlobNotFound`. **No se atribuye una causa específica a esos fallos sin logs o una ejecución reproducible.**
+- La conexión RDC informa que no hay dispositivos conectados. Por ello no se pudo ejecutar otra ronda local en PC-7 después de los últimos cambios transaccionales.
+- Hay resultados locales satisfactorios registrados en commits anteriores, pero los documentos históricos difieren entre 338/338 y 339/339 pruebas por cortes distintos. Ninguno de esos conteos se promociona a PASS del SHA actual.
+- Los checks de preview de Vercel/Netlify aparecen en fallo por restricciones del plan del repositorio privado; deben separarse de los checks funcionales del código.
+
+### Bloqueo vigente
+
+La guardia de código está incorporada y documentada; la certificación del último SHA queda **PENDIENTE** hasta ejecutar sobre el código actual typecheck, UI contract, unitarias y build, y obtener evidencia del resultado de los workflows. Después siguen pendientes las pruebas E2E con PostgreSQL, Blob y grafo reales y la compuerta `ING-DIRECT-01` en producción.
+
+No fusionar ni declarar el sistema protegido integralmente por la presencia de las barreras solamente.
