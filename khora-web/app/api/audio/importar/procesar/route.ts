@@ -148,6 +148,7 @@ export async function POST(request: Request) {
         blobPath: destination,
         bytes: clear.length,
         sha256,
+        fuenteAudio: "audio_archivo",
         estadoVerificacion: "verificado",
       });
     } catch (error) {
