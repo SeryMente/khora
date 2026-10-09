@@ -534,3 +534,13 @@ test("CUSTODY-07: verification failures never delete stored audio and staging is
   assert.match(importedTranscription, /estadoVerificacion:\s*"verificado"/);
   assert.match(importedTranscription, /audioUrl:\s*subido\.url/);
 });
+
+
+test("CUSTODY-16: session transcription endpoint requires an authenticated user", () => {
+  const route = readFileSync(resolve(process.cwd(), "app/api/transcribir/sesion/route.ts"), "utf8");
+  assert.ok(route.includes('import { auth } from "@/auth"'));
+  assert.ok(route.includes("const session = await auth()"));
+  assert.ok(route.includes("if (!session?.user?.email)"));
+  assert.ok(route.includes("status: 401"));
+  assert.ok(route.indexOf("const session = await auth()") < route.indexOf("transcribirSesion({"));
+});
