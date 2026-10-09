@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import { isEpUserAllowed } from "@/lib/server/ep";
+import { isEpUserAllowed, resolveEpUserEmail } from "@/lib/server/ep";
 import { getEpMasterPasswordStatus, setEpMasterPassword } from "@/lib/server/ep-master-password";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -14,9 +14,12 @@ async function oidcUser(req: NextRequest): Promise<string> {
 
 export async function GET(req: NextRequest) {
   const email = await oidcUser(req);
-  if (!email) return NextResponse.json({ error: "oidc_reauthentication_required" }, { status: 401, headers: NO_STORE });
+  if (!email) {
+    const masterEmail = await resolveEpUserEmail(req);
+    if (!masterEmail) return NextResponse.json({ error: "not_authorized" }, { status: 401, headers: NO_STORE });
+  }
   try {
-    return NextResponse.json(await getEpMasterPasswordStatus(), { headers: NO_STORE });
+    return NextResponse.json({ ...(await getEpMasterPasswordStatus()), canManage: Boolean(email) }, { headers: NO_STORE });
   } catch {
     return NextResponse.json({ error: "master_password_status_unavailable" }, { status: 503, headers: NO_STORE });
   }
