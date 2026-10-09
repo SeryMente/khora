@@ -93,7 +93,7 @@ export type AudioParte = {
   bytes: number;
   path?: string;
   sha256?: string;
-  fuenteAudio?: "microphone" | "chrome_tab";
+  fuenteAudio?: "microphone" | "chrome_tab" | "audio_archivo";
   start_ms?: number;
   end_ms?: number;
   duracion_ms?: number;
@@ -122,7 +122,7 @@ export async function registrarParteAudio(params: {
   blobPath?: string;
   bytes: number;
   sha256?: string;
-  fuenteAudio?: "microphone" | "chrome_tab";
+  fuenteAudio?: "microphone" | "chrome_tab" | "audio_archivo";
   startMs?: number;
   endMs?: number;
   duracionMs?: number;
@@ -251,7 +251,7 @@ function normalizarFirmaPartesAudio(partes: any): string {
         parte: Number(p.parte ?? p.part_index),
         bytes: Number(p.bytes),
         sha256: String(p.sha256 ?? "").trim().toLowerCase(),
-        fuenteAudio: p.fuenteAudio === "chrome_tab" || p.fuente_audio === "chrome_tab" ? "chrome_tab" : "microphone",
+        fuenteAudio: p.fuenteAudio === "audio_archivo" || p.fuente_audio === "audio_archivo" ? "audio_archivo" : p.fuenteAudio === "chrome_tab" || p.fuente_audio === "chrome_tab" ? "chrome_tab" : "microphone",
         start_ms: p.start_ms ?? p.startMs ?? null,
         end_ms: p.end_ms ?? p.endMs ?? null,
         duracion_ms: p.duracion_ms ?? p.duracionMs ?? null,
