@@ -18,6 +18,7 @@ export const maxDuration = 60;
 
 export async function POST(request: Request) {
   let stagingUrl = "";
+  let stagingCanBeDeleted = false;
   try {
     const session = await auth();
     if (!session?.user?.email) {
@@ -88,22 +89,55 @@ export async function POST(request: Request) {
       contentType: "application/octet-stream",
     });
 
-    // La importación solo se considera custodiada después de releer, descifrar y verificar hash + tamaño.
+    // Si la lectura de control falla, conservar el objeto cifrado y la carga temporal.
+    // La recuperación nunca se confunde con custodia verificada.
     try {
       const verifyResponse = await fetch(stored.url, { cache: "no-store" });
       if (!verifyResponse.ok) {
-        await del(stored.url).catch(() => undefined);
-        return NextResponse.json({ detail: `No se pudo verificar la carga almacenada (HTTP ${verifyResponse.status})` }, { status: 502 });
+        return NextResponse.json({
+          error: "audio_no_verificable",
+          detail: `No se pudo verificar la carga almacenada (HTTP ${verifyResponse.status}). Los objetos quedan conservados para recuperación; el audio no está verificado ni archivado.`,
+          sessionId,
+          audioUrl: stored.url,
+          blobPath: destination,
+          stagingUrl,
+          audioBytes: clear.length,
+          sha256,
+          verificado: false,
+          recuperable: true,
+        }, { status: 502 });
       }
       const storedClear = descifrarBytes(Buffer.from(await verifyResponse.arrayBuffer()));
       const verifySha = createHash("sha256").update(storedClear).digest("hex");
       if (storedClear.length !== clear.length || verifySha !== sha256) {
-        await del(stored.url).catch(() => undefined);
-        return NextResponse.json({ detail: "La verificación de almacenamiento no coincide con el archivo original." }, { status: 502 });
+        return NextResponse.json({
+          error: "audio_corrupto",
+          detail: "La verificación de almacenamiento no coincide con el archivo original. El objeto cifrado y la carga temporal se conservan para reconciliación; no se consideran verificados.",
+          sessionId,
+          audioUrl: stored.url,
+          blobPath: destination,
+          stagingUrl,
+          audioBytes: clear.length,
+          bytesRecuperados: storedClear.length,
+          sha256,
+          sha256Recuperado: verifySha,
+          verificado: false,
+          recuperable: true,
+        }, { status: 502 });
       }
     } catch (verifyError) {
-      await del(stored.url).catch(() => undefined);
-      return NextResponse.json({ detail: `Falló la verificación del audio almacenado: ${String(verifyError)}` }, { status: 502 });
+      return NextResponse.json({
+        error: "audio_no_verificable",
+        detail: `Falló la verificación del audio almacenado: ${String(verifyError)}. El objeto cifrado y la carga temporal se conservan para recuperación.`,
+        sessionId,
+        audioUrl: stored.url,
+        blobPath: destination,
+        stagingUrl,
+        audioBytes: clear.length,
+        sha256,
+        verificado: false,
+        recuperable: true,
+      }, { status: 502 });
     }
 
     try {
@@ -118,7 +152,7 @@ export async function POST(request: Request) {
       });
     } catch (error) {
       // La copia cifrada ya se verificó contra el original. Si falla el vínculo,
-      // mantenerla y devolver su localizador para recuperación; no destruir evidencia.
+      // mantener tanto el destino final como la carga temporal para recuperación.
       return NextResponse.json(
         {
           error: "audio_almacenado_no_vinculado",
@@ -134,6 +168,7 @@ export async function POST(request: Request) {
       );
     }
 
+    stagingCanBeDeleted = true;
     return NextResponse.json({
       sessionId,
       audioUrl: stored.url,
@@ -153,6 +188,6 @@ export async function POST(request: Request) {
       { status: 500 },
     );
   } finally {
-    if (stagingUrl) await del(stagingUrl).catch(() => undefined);
+    if (stagingUrl && stagingCanBeDeleted) await del(stagingUrl).catch(() => undefined);
   }
 }
