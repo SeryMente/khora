@@ -2,11 +2,11 @@
 id: KHORA-SPRINT-INGRESO-UNIFICADO-20261007
 tipo: sprint
 version: v0.5.0
-estado: IMPLEMENTACION_SELECTIVA_EN_RAMA__PR_291_ABIERTO__CI_REMOTO_SIN_EJECUCION_UTIL__ING_DIRECT_01_PRODUCCION_PENDIENTE
+estado: IMPLEMENTACION_FUNCIONAL_SELECTIVA_MERGEADA_EN_MAIN__CI_NO_EJECUTADA_POR_RUNNER__ING_DIRECT_01_PRODUCCION_PENDIENTE
 fecha: 2026-10-09
 repositorio_canonico: https://github.com/SeryMente/khora
 ruta_canonica: docs/sprints/SPR-INGRESO-UNIFICADO-20261007.md
-rama: fix/ingreso-volcados-ingesta-functional-20261009
+rama: main
 pull_request: https://github.com/SeryMente/khora/pull/291
 base_sha: b94e05f7a3f8e8bb3d48bf635054fd3b44702c4c
 owner: KHORA
@@ -14,7 +14,7 @@ owner: KHORA
 
 # Sprint KHORA · Ingreso → Volcados · Especificación canónica
 
-**Estado del objeto:** CANÓNICO PARA ESTE SPRINT · v0.5.0 IMPLEMENTACIÓN FUNCIONAL SELECTIVA PUBLICADA EN RAMA · FUSIÓN PENDIENTE · CERTIFICACIÓN DE PRODUCCIÓN BLOQUEADA.  
+**Estado del objeto:** CANÓNICO PARA ESTE SPRINT · v0.5.0 IMPLEMENTACIÓN FUNCIONAL SELECTIVA FUSIONADA EN `main` · CI SIN EJECUCIÓN ÚTIL · CERTIFICACIÓN DE PRODUCCIÓN BLOQUEADA.  
 **Regla de autoridad:** la sección 1 conserva literalmente la especificación aportada por el usuario y es la fuente normativa de intención del sprint. Las decisiones, los criterios de aceptación y el registro técnico de las secciones posteriores son traducciones operativas subordinadas; no pueden alterar ni sustituir el bloque verbatim.  
 **Historial:** v0.5.0 aplica la especificación VERBATIM al código de Ingreso, Volcados e Ingesta, suma correcciones de custodia, metadatos, sesión sellada y terna idempotente, y distingue la implementación publicada de la certificación de producción todavía pendiente. v0.4.0 incorpora una segunda pasada independiente por hubs y fuentes normativas de Notion, precisa la pregunta funcional y diferencia intención resuelta de cierre documental/funcional pendiente. v0.3.0 registró la primera auditoría; v0.2.0 sustituyó la interpretación de v0.1.0 que trataba Revisión e Ingesta como modos internos de Ingreso. Se conserva el identificador del objeto para mantener una única ruta canónica y continuidad de trazabilidad.
 
@@ -22,10 +22,10 @@ owner: KHORA
 
 - **Objetivo:** consolidar Ingreso como superficie de captura y colocar Volcados inmediatamente a su derecha como siguiente dominio del flujo de datos.
 - **Secuencia funcional:** `Ingreso → Volcados → revisión/ratificación → ingesta → Núcleo`.
-- **Rama de implementación histórica:** `refactor/ingreso-volcados-consolidacion-20261008` (PR #290, sustituida por la rama selectiva).
-- **Rama de integración actual:** `fix/ingreso-volcados-ingesta-functional-20261009`.
-- **PR actual:** [#291 · fix(audio): close custody and ingestion gaps end to end](https://github.com/SeryMente/khora/pull/291).
-- **Estado real vigente:** cambios de código publicados y PR pendiente de merge; no hay certificación integral de CI ni de `ING-DIRECT-01` en producción. No afirmar que se ejecutaron tests locales en esta instancia.
+- **Rama de integración:** `main`.
+- **PR integrado:** [#291 · fix(audio): close custody and ingestion gaps end to end](https://github.com/SeryMente/khora/pull/291).
+- **Commit squash-merge:** [`caf5ba5c638a628013aaf55007e4bee33048931b`](https://github.com/SeryMente/khora/commit/caf5ba5c638a628013aaf55007e4bee33048931b).
+- **Estado real vigente:** la implementación selectiva está integrada en `main`, con `khora-web 0.3.7`. No hay certificación integral de CI ni PASS de `ING-DIRECT-01` en producción. Los workflows posteriores al merge finalizan con `runner_id=0` y cero pasos, de modo que no hay evidencia de que `typecheck`, unit tests, Python API tests o E2E se hayan ejecutado.
 - **No confundir:** que el build local y las pruebas dirigidas pasen no demuestra que el sprint ya esté integrado en `main`, publicado en producción o certificado por la suite E2E completa.
 
 ## 1. Especificación canónica del usuario — VERBATIM
@@ -300,7 +300,7 @@ La distinción de UX queda cerrada así: **Ingreso y Volcados son superficies de
 
 **Motivo →** Cumplir el VERBATIM del usuario y el protocolo L0-003: cada archivo conserva su original, el historial no se sobrescribe y solo una versión ratificada exacta puede incorporarse al núcleo. El éxito aparente no sustituye la evidencia de custodia o identidad.
 
-**Resultado →** Los cambios y las pruebas de regresión se publicaron en [PR #291](https://github.com/SeryMente/khora/pull/291), con versión de paquete `khora-web 0.3.7`. Esta es una implementación versionada en rama, no una afirmación de que ya esté desplegada o certificada en producción.
+**Resultado →** Los cambios se fusionaron por squash en `main` mediante [PR #291](https://github.com/SeryMente/khora/pull/291), commit [`caf5ba5c638a628013aaf55007e4bee33048931b`](https://github.com/SeryMente/khora/commit/caf5ba5c638a628013aaf55007e4bee33048931b), con versión de paquete `khora-web 0.3.7`. La integración a `main` está verificada; el despliegue/certificación productiva no se declara exitoso.
 
 ### 11.2 Alcance funcional implementado
 
@@ -312,10 +312,10 @@ La distinción de UX queda cerrada así: **Ingreso y Volcados son superficies de
 
 ### 11.3 Evidencia, límites y gate de cierre
 
-- **Publicación:** los cambios están en la rama indicada y agrupados en el PR #291; el objetivo es un squash-merge a `main`, no fusionar íntegramente las ramas divergidas #290/#288.
+- **Publicación:** la implementación está en `main` por squash-merge `caf5ba5c638a628013aaf55007e4bee33048931b`. Los PR #290 y #288 quedaron cerrados como sustituidos; sus commits e historiales se conservaron para trazabilidad y no se fusionaron completos.
 - **CI remoto:** los workflows recientes reportaron fallo antes de mostrar pasos de runner; las consultas de logs devolvieron `BlobNotFound`. No hay evidencia de salida de `typecheck`, tests unitarios o E2E para este head. Por tanto, el estado no se rotula como “tests aprobados”; una ejecución de runner funcional sigue siendo un criterio de aceptación.
 - **Producción:** `ING-DIRECT-01` sigue pendiente: debe probarse contra producción con una tupla nueva y una repetida, validarse un `io_id` no vacío y verificarse que la repetición no modifique el grafo. El E2E simulado de contrato no equivale a ese PASS.
 - **Despliegue:** las comprobaciones de preview de Vercel/Netlify reportaron restricciones del servicio de despliegue; no son evidencia de que el código se haya compilado en el runner.
 - **Gobernanza:** el bloque de VERBATIM de la sección 1 permanece sin cambios. Esta versión no afirma un censo exhaustivo de Notion ni modifica silenciosamente sus páginas.
 
-**Dictamen v0.5.0:** implementación funcional selectiva publicada; integración en `main` y certificación real todavía pendientes. El gate final solo puede cerrarse después de verificar el merge, ejecutar pruebas con resultados legibles y completar `ING-DIRECT-01` en producción.
+**Dictamen v0.5.0:** implementación funcional selectiva integrada en `main`; la certificación final sigue bloqueada. El gate solo puede cerrarse después de una ejecución válida de las pruebas automatizadas y del PASS de `ING-DIRECT-01` en producción. No se confunden merge, CI ejecutada ni despliegue.
