@@ -412,6 +412,16 @@ test("CUSTODY-09: Ingreso exposes export only for verified imported audio and se
   assert.ok(exportRoute.includes("desbloqueoVigente"));
 });
 
+
+test("CUSTODY-10: stale ingestion failures cannot overwrite a newer approved version", () => {
+  const route = readFileSync(resolve(process.cwd(), "app/api/ingesta/route.ts"), "utf8");
+  const failureHandler = route.slice(route.indexOf("async function persistirFalloIngesta"), route.indexOf("export async function POST"));
+  assert.ok(failureHandler.includes("versionActual !== args.version"));
+  assert.ok(failureHandler.includes("shaActual !== args.sha256.toLowerCase()"));
+  assert.ok(failureHandler.includes("AND version_aprobada = $3"));
+  assert.ok(failureHandler.includes("AND lower(sha256_aprobado) = $4"));
+});
+
 test("CUSTODY-07: verification failures never delete stored audio and staging is deleted only after verified linkage", () => {
   const audioRoute = readFileSync(resolve(process.cwd(), "app/api/audio/route.ts"), "utf8");
   assert.doesNotMatch(audioRoute, /del\s*\(\s*subido\.url/);
