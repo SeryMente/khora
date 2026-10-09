@@ -487,6 +487,14 @@ test("CUSTODY-14: archived captures stay sealed and text-only saves receive stab
   assert.ok(attachHandler.includes("if (archivado)"));
   assert.ok(attachHandler.includes("Pulsa Limpiar antes de adjuntar audio"));
 });
+
+test("CUSTODY-15: browser download honors the preserved UTF-8 filename from the server", () => {
+  const workspace = readFileSync(resolve(process.cwd(), "app/components/ingreso/IngresoWorkspace.tsx"), "utf8");
+  assert.ok(workspace.includes("filename\\*=UTF-8"));
+  assert.ok(workspace.includes("decodeURIComponent(utf8NameMatch[1])"));
+  assert.ok(workspace.includes("link.download = downloadName"));
+});
+
 test("CUSTODY-13: fresh installations create custody tables before applying compatibility ALTERs", () => {
   const source = readFileSync(resolve(process.cwd(), "lib/server/dictado.ts"), "utf8");
   const ensureStart = source.indexOf("export async function asegurarColumnasDictado");
