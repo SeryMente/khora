@@ -44,6 +44,8 @@ type Issued = {
 };
 type Summary = { id: string; estado: string; creado_en: string; ultimo_evento_en: string | null; cerrado_en: string | null };
 type WorkspaceRepo = { name: string; private: boolean; defaultBranch: string; extensionRoot: string | null };
+type GitHubCredentialStatus = { configured: boolean; githubLogin: string | null; tokenSuffix: string | null; repositories: Array<{ name: string; read: boolean; write: boolean }>; updatedAt: string | null };
+type MasterPasswordStatus = { configured: boolean; updatedAt: string | null };
 type Notice = { kind: "idle" | "working" | "success" | "error"; text: string };
 type JwtClaims = { iss?: unknown; sid?: unknown; typ?: unknown; exp?: unknown; launchMode?: unknown };
 
@@ -158,6 +160,13 @@ export default function EntornoPersistentePanel() {
   const [logOpen, setLogOpen] = useState(false);
   const [logBusy, setLogBusy] = useState(false);
   const [logContent, setLogContent] = useState("");
+  const [githubTokenInput, setGithubTokenInput] = useState("");
+  const [githubCredential, setGithubCredential] = useState<GitHubCredentialStatus | null>(null);
+  const [githubCredentialBusy, setGithubCredentialBusy] = useState(false);
+  const [masterPasswordInput, setMasterPasswordInput] = useState("");
+  const [masterPasswordConfirmation, setMasterPasswordConfirmation] = useState("");
+  const [masterPasswordStatus, setMasterPasswordStatus] = useState<MasterPasswordStatus | null>(null);
+  const [masterPasswordBusy, setMasterPasswordBusy] = useState(false);
 
   const expiresAt = issued ? Date.parse(issued.expiresAt) : 0;
   const expired = Boolean(issued && (!Number.isFinite(expiresAt) || expiresAt <= Date.now()));
@@ -191,7 +200,117 @@ export default function EntornoPersistentePanel() {
     }
   }
 
-  useEffect(() => { void refresh(); void loadRepoCatalog(); }, []);
+  async function loadGitHubCredentialStatus() {
+    try {
+      const response = await fetch("/api/ep/github-credential", { cache: "no-store", credentials: "same-origin" });
+      const data = await response.json().catch(() => null);
+      if (response.ok && data && typeof data.configured === "boolean") setGithubCredential(data as GitHubCredentialStatus);
+      else setGithubCredential(null);
+    } catch { setGithubCredential(null); }
+  }
+
+  async function loadMasterPasswordStatus() {
+    try {
+      const response = await fetch("/api/ep/master-password", { cache: "no-store", credentials: "same-origin" });
+      const data = await response.json().catch(() => null);
+      if (response.ok && data && typeof data.configured === "boolean") setMasterPasswordStatus(data as MasterPasswordStatus);
+      else setMasterPasswordStatus(null);
+    } catch { setMasterPasswordStatus(null); }
+  }
+
+  async function saveGitHubCredential() {
+    const token = githubTokenInput;
+    if (!token || githubCredentialBusy) return;
+    setGithubTokenInput("");
+    setGithubCredentialBusy(true);
+    setNotice({ kind: "working", text: "Validando acceso a los repositorios requeridos y guardando la credencial cifrada..." });
+    try {
+      const response = await fetch("/api/ep/github-credential", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token }),
+        cache: "no-store",
+        credentials: "same-origin",
+      });
+      const data = await response.json().catch(() => null);
+      if (!response.ok) {
+        const messages: Record<string, string> = {
+          invalid_token_format: "El formato del token no es compatible. Usa un PAT de GitHub clásico (ghp_) o de granularidad fina (github_pat_).",
+          github_token_rejected: "GitHub rechazó el token o no pudo identificar la cuenta.",
+          github_repo_access_missing: "El token no tiene acceso de lectura y escritura a todos los repositorios requeridos: CENSUS, GDP, metodologia, otrogranprograma, signal-interpreter y khora.",
+          credential_vault_unavailable: "La bóveda cifrada no está disponible. La credencial no se guardó.",
+          not_authorized: "La sesión OEP no está autorizada para gestionar secretos.",
+        };
+        throw new Error(messages[String(data?.error || "")] || "No se pudo guardar la credencial de GitHub.");
+      }
+      setGithubCredential(data as GitHubCredentialStatus);
+      setNotice({ kind: "success", text: "Token validado y guardado cifrado en la bóveda del servidor. No se devolvió ni se mostró el secreto." });
+    } catch (error) {
+      setNotice({ kind: "error", text: error instanceof Error ? error.message : "No se pudo guardar la credencial." });
+    } finally {
+      setGithubTokenInput("");
+      setGithubCredentialBusy(false);
+    }
+  }
+
+  async function removeGitHubCredential() {
+    if (githubCredentialBusy) return;
+    if (!window.confirm("Se eliminará la credencial cifrada. Los nuevos arranques no podrán materializar repositorios hasta cargar otro token. ¿Continuar?")) return;
+    setGithubCredentialBusy(true);
+    try {
+      const response = await fetch("/api/ep/github-credential", { method: "DELETE", cache: "no-store", credentials: "same-origin" });
+      const data = await response.json().catch(() => null);
+      if (!response.ok) throw new Error("No se pudo eliminar la credencial de GitHub.");
+      setGithubCredential({ configured: false, githubLogin: null, tokenSuffix: null, repositories: [], updatedAt: null });
+      setNotice({ kind: "success", text: "Credencial eliminada de la bóveda. Ningún token fue enviado al navegador." });
+    } catch (error) {
+      setNotice({ kind: "error", text: error instanceof Error ? error.message : "No se pudo eliminar la credencial." });
+    } finally { setGithubCredentialBusy(false); }
+  }
+
+  async function saveMasterPassword() {
+    if (masterPasswordBusy) return;
+    if (masterPasswordInput.length < 16) {
+      setNotice({ kind: "error", text: "La contraseña maestra debe tener al menos 16 caracteres." });
+      return;
+    }
+    if (masterPasswordInput !== masterPasswordConfirmation) {
+      setNotice({ kind: "error", text: "Las contraseñas maestras no coinciden." });
+      return;
+    }
+    const password = masterPasswordInput;
+    setMasterPasswordInput("");
+    setMasterPasswordConfirmation("");
+    setMasterPasswordBusy(true);
+    try {
+      const response = await fetch("/api/ep/master-password", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+        cache: "no-store",
+        credentials: "same-origin",
+      });
+      const data = await response.json().catch(() => null);
+      if (!response.ok || data?.ok !== true) {
+        const message = data?.error === "oidc_reauthentication_required"
+          ? "La configuración inicial o rotación de la contraseña maestra requiere una sesión OIDC autorizada."
+          : data?.error === "master_password_policy"
+            ? "Usa una contraseña de 16 a 1024 caracteres."
+            : "No se pudo guardar la contraseña maestra.";
+        throw new Error(message);
+      }
+      setMasterPasswordStatus({ configured: true, updatedAt: new Date().toISOString() });
+      setNotice({ kind: "success", text: "Contraseña maestra de OEP configurada. El acceso posterior a EP tendrá caducidad y no abrirá el resto de Khôra." });
+    } catch (error) {
+      setNotice({ kind: "error", text: error instanceof Error ? error.message : "No se pudo configurar la contraseña maestra." });
+    } finally {
+      setMasterPasswordInput("");
+      setMasterPasswordConfirmation("");
+      setMasterPasswordBusy(false);
+    }
+  }
+
+  useEffect(() => { void refresh(); void loadRepoCatalog(); void loadGitHubCredentialStatus(); void loadMasterPasswordStatus(); }, []);
 
   useEffect(() => {
     if (!issued) return;
@@ -375,7 +494,68 @@ export default function EntornoPersistentePanel() {
         </div>
         <div className="flex items-start gap-3 rounded-lg border p-4 text-sm" style={{ ...border, background: "var(--khora-bg)" }}><AlertTriangle className="mt-0.5 shrink-0 text-amber-400" size={18} /><div><strong className="block">Una emisión nueva revoca la anterior</strong><p className="mt-1 opacity-70">El token vive exclusivamente en memoria hasta que vence, lo descartas o cierras la pestaña. Nunca se imprime en pantalla ni se guarda en el navegador.</p></div></div>
 
-                <section className="space-y-4 rounded-lg border p-4" style={{ ...border, background: "var(--khora-bg)" }} data-ui-id="seguridad.ep.repositorios">
+                <section className="space-y-4 rounded-lg border p-4" style={{ ...border, background: "var(--khora-bg)" }} data-ui-id="seguridad.ep.github-credential">
+          <div className="flex items-start gap-3">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-xs font-bold" style={border}>A</span>
+            <div className="min-w-0">
+              <h3 className="font-bold">Credencial de GitHub (secreto persistente)</h3>
+              <p className="mt-1 text-xs leading-relaxed opacity-65">Carga aquí el PAT que ya tienes configurado para operar los repositorios. Khôra valida la cuenta y el acceso a los seis repositorios requeridos, cifra el secreto en el servidor con AES-256-GCM y solo lo revela al bootstrap PowerShell con una sesión EP válida. El navegador nunca puede volver a leer el token guardado.</p>
+            </div>
+          </div>
+          <label className="block space-y-2 text-xs">
+            <span className="font-bold uppercase tracking-wider">Personal Access Token de GitHub</span>
+            <input
+              type="password"
+              autoComplete="new-password"
+              spellCheck={false}
+              value={githubTokenInput}
+              onChange={(event) => setGithubTokenInput(event.target.value)}
+              maxLength={8192}
+              disabled={githubCredentialBusy}
+              placeholder={githubCredential?.configured ? "Token guardado; escribe uno nuevo para rotarlo" : "ghp_… o github_pat_…"}
+              className="min-h-12 w-full rounded-lg border bg-transparent px-4 py-3 text-sm outline-none focus-visible:ring-2 disabled:opacity-50"
+              style={border}
+              aria-label="Token de GitHub"
+            />
+            <span className="block opacity-55">No pegues el token en un issue, comentario, chat, URL o terminal compartida. Al guardar, el campo se vacía y no se permite recuperar el secreto desde la UI.</span>
+          </label>
+          <div className="flex flex-wrap gap-2">
+            <button type="button" onClick={saveGitHubCredential} disabled={!githubTokenInput || githubCredentialBusy} className="flex min-h-11 items-center justify-center gap-2 rounded-lg border px-4 py-2 text-xs font-bold uppercase disabled:opacity-50" style={{ ...border, background: "var(--khora-accent)", color: "var(--khora-bg)" }}>
+              <ShieldCheck size={16} />{githubCredentialBusy ? "Validando..." : githubCredential?.configured ? "Validar y rotar token" : "Validar y guardar token"}
+            </button>
+            {githubCredential?.configured && <button type="button" onClick={removeGitHubCredential} disabled={githubCredentialBusy} className="flex min-h-11 items-center justify-center gap-2 rounded-lg border px-4 py-2 text-xs font-bold uppercase disabled:opacity-50" style={border}><Trash2 size={15} />Eliminar token guardado</button>}
+          </div>
+          {githubCredential?.configured ? (
+            <div className="space-y-2 rounded-lg border p-3 text-xs" style={border}>
+              <p className="flex flex-wrap items-center gap-2"><ShieldCheck size={16} className="text-emerald-400" /> <strong>Secreto configurado</strong> · GitHub: <code>{githubCredential.githubLogin}</code> · finaliza en <code>{githubCredential.tokenSuffix}</code></p>
+              <p className="opacity-60">Actualizado: {githubCredential.updatedAt ? new Date(githubCredential.updatedAt).toLocaleString("es-MX") : "fecha no disponible"}</p>
+              <div className="grid gap-1 sm:grid-cols-2">
+                {githubCredential.repositories.map((repo) => <span key={repo.name} className="flex items-center gap-2"><Check size={13} className={repo.read && repo.write ? "text-emerald-400" : "text-amber-400"} />{repo.name} · {repo.read ? "lectura" : "sin lectura"} / {repo.write ? "escritura de cuenta" : "sin escritura de cuenta"}</span>)}
+              </div>
+              <p className="opacity-55">La lectura de permisos de repositorio no inspecciona todos los scopes del PAT. Para crear y actualizar ramas, el PAT de granularidad fina debe tener Contents: Read and write y Metadata: Read en los repositorios que uses.</p>
+            </div>
+          ) : (
+            <p className="text-xs opacity-55">{githubCredential === null ? "No se pudo confirmar el estado de la bóveda; prueba a actualizar la página." : "Todavía no se guardó un token. Sin este secreto, el comando de PowerShell fallará de forma segura antes de materializar repositorios."}</p>
+          )}
+        </section>
+
+        <section className="space-y-4 rounded-lg border p-4" style={{ ...border, background: "var(--khora-bg)" }} data-ui-id="seguridad.ep.master-password">
+          <div className="flex items-start gap-3">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-xs font-bold" style={border}>B</span>
+            <div>
+              <h3 className="font-bold">Contraseña maestra de OEP</h3>
+              <p className="mt-1 text-xs leading-relaxed opacity-65">Se configura o rota una sola vez desde una sesión OIDC autorizada. Después puedes abrir el submódulo EP sin iniciar Google OIDC en cada terminal. Se almacena un verificador scrypt con salt aleatorio; nunca la contraseña en claro.</p>
+            </div>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <label className="block space-y-2 text-xs"><span className="font-bold uppercase tracking-wider">Nueva contraseña (mínimo 16 caracteres)</span><input type="password" autoComplete="new-password" value={masterPasswordInput} onChange={(event) => setMasterPasswordInput(event.target.value)} maxLength={1024} disabled={masterPasswordBusy} className="min-h-11 w-full rounded-lg border bg-transparent px-3 py-2 text-sm outline-none focus-visible:ring-2" style={border} /></label>
+            <label className="block space-y-2 text-xs"><span className="font-bold uppercase tracking-wider">Confirmar contraseña</span><input type="password" autoComplete="new-password" value={masterPasswordConfirmation} onChange={(event) => setMasterPasswordConfirmation(event.target.value)} maxLength={1024} disabled={masterPasswordBusy} className="min-h-11 w-full rounded-lg border bg-transparent px-3 py-2 text-sm outline-none focus-visible:ring-2" style={border} /></label>
+          </div>
+          <button type="button" onClick={saveMasterPassword} disabled={masterPasswordBusy || masterPasswordInput.length < 16 || !masterPasswordConfirmation} className="flex min-h-11 items-center justify-center gap-2 rounded-lg border px-4 py-2 text-xs font-bold uppercase disabled:opacity-50" style={border}><KeyRound size={15} />{masterPasswordBusy ? "Guardando..." : masterPasswordStatus?.configured ? "Rotar contraseña maestra" : "Configurar contraseña maestra"}</button>
+          <p className="text-xs opacity-55">{masterPasswordStatus?.configured ? "Contraseña maestra configurada" + (masterPasswordStatus.updatedAt ? " · actualizada " + new Date(masterPasswordStatus.updatedAt).toLocaleString("es-MX") : "") : "La primera configuración y la recuperación requieren iniciar sesión OIDC. En el acceso diario de Cybernet solo se usará la contraseña maestra de OEP."}</p>
+        </section>
+
+        <section className="space-y-4 rounded-lg border p-4" style={{ ...border, background: "var(--khora-bg)" }} data-ui-id="seguridad.ep.repositorios">
           <div className="flex items-start gap-3">
             <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-xs font-bold" style={border}>0</span>
             <div>
