@@ -85,10 +85,12 @@ export async function asegurarColumnasDictado(): Promise<void> {
     // Instalaciones antiguas: ejecutar la compatibilidad DDL una sola vez.
   }
   await asegurarTabla();
+  // Las tablas de sesión/partes deben existir antes de aplicar ALTER TABLE:
+  // una instalación nueva también entra por este camino de compatibilidad.
+  await db.query(SESSION_TABLES_SQL);
   for (const sql of ALTERS) {
     await db.query(sql);
   }
-  await db.query(SESSION_TABLES_SQL);
   await db.query(EXTENDED_COLUMNS_SQL);
   columnasListas = true;
 }
