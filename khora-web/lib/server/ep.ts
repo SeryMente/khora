@@ -14,6 +14,7 @@ export interface IncomingEpEvent {
 const EVENT_ID = /^EP-(IN|RUN|OUT)-[0-9]{3}$/;
 const TOKEN_PATTERNS = [
   /ghp_[A-Za-z0-9_]{12,}/g,
+  /gho_[A-Za-z0-9]{12,}/g,
   /github_pat_[A-Za-z0-9_]{12,}/g,
   /vcp_[A-Za-z0-9]{8,}/g,
   /Bearer\s+[A-Za-z0-9._~-]{16,}/gi,
