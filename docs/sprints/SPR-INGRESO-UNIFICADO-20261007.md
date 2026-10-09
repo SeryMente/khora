@@ -1,9 +1,9 @@
 ---
 id: KHORA-SPRINT-INGRESO-UNIFICADO-20261007
 tipo: sprint
-version: v0.3.0
+version: v0.4.0
 estado: AUDITORIA_NOTION_REGISTRADA__IMPLEMENTACION_EN_RAMA__PR_ABIERTO__BLOQUEOS_FUNCIONALES_Y_CERTIFICACION
-fecha: 2026-10-08
+fecha: 2026-10-09
 repositorio_canonico: https://github.com/SeryMente/khora
 ruta_canonica: docs/sprints/SPR-INGRESO-UNIFICADO-20261007.md
 rama: refactor/ingreso-volcados-consolidacion-20261008
@@ -14,9 +14,9 @@ owner: KHORA
 
 # Sprint KHORA · Ingreso → Volcados · Especificación canónica
 
-**Estado del objeto:** CANÓNICO PARA ESTE SPRINT · AUDITORÍA DOCUMENTAL v0.3.0 INCORPORADA.  
+**Estado del objeto:** CANÓNICO PARA ESTE SPRINT · SEGUNDA PASADA DOCUMENTAL v0.4.0 ASENTADA · DICTAMEN FUNCIONAL PARCIAL · CIERRE BLOQUEADO.  
 **Regla de autoridad:** la sección 1 conserva literalmente la especificación aportada por el usuario y es la fuente normativa de intención del sprint. Las decisiones, los criterios de aceptación y el registro técnico de las secciones posteriores son traducciones operativas subordinadas; no pueden alterar ni sustituir el bloque verbatim.  
-**Historial:** esta versión (v0.3.0) incorpora la auditoría de Notion y corrige los criterios de cierre; v0.2.0 sustituyó la interpretación de v0.1.0 que trataba Revisión e Ingesta como modos internos de Ingreso. Se conserva el identificador del objeto para mantener una única ruta canónica y continuidad de trazabilidad.
+**Historial:** v0.4.0 incorpora una segunda pasada independiente por hubs y fuentes normativas de Notion, precisa la pregunta funcional y diferencia intención resuelta de cierre documental/funcional pendiente. v0.3.0 registró la primera auditoría; v0.2.0 sustituyó la interpretación de v0.1.0 que trataba Revisión e Ingesta como modos internos de Ingreso. Se conserva el identificador del objeto para mantener una única ruta canónica y continuidad de trazabilidad.
 
 ## 0. Cápsula de recuperación
 
@@ -221,4 +221,71 @@ La integración de Notion entrega las páginas consultadas con corte de recupera
 ### 9.5. Veredicto de auditoría documental
 
 **Resultado: IMPLEMENTACIÓN PARCIAL; CIERRE BLOQUEADO.** El orden primario y la eliminación de pestañas redundantes están implementados y las pruebas locales dirigidas registradas pasaron. No queda demostrado que se haya preservado/certificado el contrato completo de capacidades de audio ni que haya pasado la compuerta de retiro de `/sistema/editar`; el PR sigue abierto, los checks remotos fallan y Notion no está actualizado a esta especificación. No declarar este sprint “terminado” hasta cerrar los bloqueos listados.
+
+## 10. Segunda pasada independiente de Notion — corte 2026-10-09
+
+### 10.1 Alcance y límite de honestidad
+
+Esta pasada no reutiliza como premisa la lista de fuentes de §9. Se repitió la búsqueda por conceptos, nombres de tareas y contratos históricos; se recorrieron los hubs enlazados de Diseño/UI y Desarrollo, Plan Maestro, Mapa, Roadmap y Sistema; y se recuperaron fuentes normativas, de ejecución y de incidentes para contrastarlas con la intención verbatim de §1 y con el diff del PR #290.
+
+**No se declara auditado exhaustivamente todo el workspace.** La conexión permite buscar y recuperar páginas pertinentes, pero no enumerar ni leer de forma demostrable cada página de todos los espacios. Además, las fuentes estructurales principales que devolvió Notion informan `verification: unverified` y `page_last_edited_at` en torno al 2026-09-24; los cortes operativos escritos dentro de ellas abarcan fechas distintas. La búsqueda de discusiones no devolvió comentarios recuperables y `suggested_edits_status` fue `not_enabled`. Por tanto, no se puede afirmar que no existan decisiones más recientes en páginas no encontradas, comentarios o cambios no incluidos en estos snapshots.
+
+### 10.2 Fuentes adicionales identificadas y su peso
+
+| Fuente | Qué establece para este sprint | Peso y límite |
+|---|---|---|
+| [Plan Maestro · Khora](https://app.notion.com/p/ab55d4a3b25082d78925013d58c8e272) y hubs [Diseño & UI](https://app.notion.com/p/9545d4a3b25082c489f101177b434b8d), [Desarrollo](https://app.notion.com/p/8de5d4a3b25083c9ae2d012db5059d50) y [Roadmap](https://app.notion.com/p/d835d4a3b25083419c27012a1e6dffe4) | Sitúan el flujo en la arquitectura mayor y declaran una jerarquía documental. | El Plan Maestro se autodefine como fuente global de verdad, pero su snapshot y varios estados del Roadmap son históricos. No se usa un estado fechado en julio como prueba del estado real de octubre. |
+| [Arquitectura de Interfaz v0.9→v0.9.1](https://app.notion.com/p/4575d4a3b25082a3aff801167a1d60f1), en particular §§51–55 | El canon ejecutable remite al Paquete Jules v0.8; UI-03/Archivo tiene un gate de integración y protecciones invariantes explícitas. | Fuente operativa crítica para las restricciones de ruta y certificación; su snapshot no está verificado como vigente hoy. |
+| [Paquete Jules v0.8](https://app.notion.com/p/ec85d4a3b25082a1a5c001ca37140a9b), tarea J-12, y [PROMPT MASIVO v0.6](https://app.notion.com/p/5ca5d4a3b25083b992b301039ccc5c0f) | Ambos prohíben expresamente tocar, retirar, redirigir o degradar `/sistema/editar` antes de la prueba requerida; J-12 asigna Archivo y la ingesta directa a Volcados. | Restricción explícita y repetida. No está supersedida por §1: la instrucción del usuario elimina pestañas internas redundantes y coloca la revisión en Volcados, pero no ordena retirar anticipadamente la ruta viva. |
+| [Diseño UX · Khora](https://app.notion.com/p/d035d4a3b250830394ac81be550b264a) y [Principios de UI](https://app.notion.com/p/29b5d4a3b25083379bfb811ad64265d2) | Distinguen los tres modos macro del sistema —Captura, Consulta y Acción— y priorizan captura de baja fricción. | Precisa el alcance: eliminar subpestañas redundantes dentro de Ingreso no equivale a borrar los modos macro ni sus capacidades. |
+| [L0-003 · Protocolo de Ingesta ratificado](https://app.notion.com/p/b385d4a3b25082fbb838011f2fc71bf9) | Divide el dato en zona irreversible (original, audio cuando corresponda, versiones, deltas, tiempos y procedencia), zona derivada reconstruible y zona de juicio humano permanente. La escritura al grafo exige ratificación y procedencia exacta. | Contrato ratificado; impide tratar una refactorización visual como autorización para simplificar custodia o autoaprobar. |
+| [IAR · Planeación provisional consolidada, corte 2026-09-04](https://app.notion.com/p/f375d4a3b25083aa818c0173bcf85e78) | Mantiene CAP-1R (importar, grabar, registrar y exportar audio desde Ingreso, independiente del STT) antes de CAP-2R (E2E real y fault injection de no pérdida silenciosa). Declara problemas de pausa/reanudación, callbacks obsoletos y divergencia entre captura y Dictado. | Fuente de planificación más reciente encontrada para este conjunto; el propio documento se declara provisional y su snapshot no está verificado como actualizado después de su corte. |
+| [SEA · IAR · RES](https://app.notion.com/p/f485d4a3b250822e9fd0013ea04b7305) | Define el propósito global de la prótesis cognitiva: SEA, Ideación Asíncrona Recuperable y Redacción Enraizada en Sentido. | Responde al propósito global, no demuestra que esos resultados ya estén construidos. |
+| [VCU](https://app.notion.com/p/6955d4a3b2508373ab8c01dccce1f601), [DOC-09](https://app.notion.com/p/0895d4a3b25082d58b268116b2a74006) y [Hitos, Secuencia e Integridad](https://app.notion.com/p/96d5d4a3b25082d9b08401d6cb6c2d51) | Refuerzan que se debe comprobar repositorio y producción actuales, evitar pérdida de originales y no avanzar aguas abajo como si estuvieran cerradas etapas previas. | Contexto histórico/procedimental de utilidad; estados de ejecución y fechas antiguas no son prueba del corte actual. |
+| [G-2 · Exportar/importar](https://app.notion.com/p/5af5d4a3b2508359952801aa40ce23b9) | Especifica exportación JSONL + `.tar.gz` + manifiesto SHA-256 y una prueba exportar→importar→consultar. | La tarjeta dice fusionada, pero la prueba real seguía sin marcarse. La etiqueta “Fusionado” no demuestra integridad del ciclo. |
+| [Incidente de custodia del 6 de agosto](https://app.notion.com/p/1555d4a3b2508311bb858105fa2f0a0d), [fallo del 7 de agosto](https://app.notion.com/p/2c95d4a3b25082c98be101f4c24094ea) y [rescate de volcados abortados](https://app.notion.com/p/e165d4a3b25083ca915281ed2cc46f8e) | Documentan pérdidas reales o no verificadas de audio cuando falló el guardado; texto rescatado fuera del sistema. | Evidencia histórica concreta de por qué una falla parcial debe preservar el original, exponer localizador recuperable y nunca declarar éxito implícito. |
+| [Auditoría de no-regresión](https://app.notion.com/p/3f45d4a3b25081438403cf7250a378f5) | Registra invariantes técnicos y bloqueos del PR. | Es un borrador técnico no ratificado: evidencia de análisis, no una enmienda por sí misma al canon de producto. |
+
+### 10.3 Respuesta precisa a la pregunta fundamental
+
+**Dictamen: la pregunta de diseño del flujo de este sprint queda resuelta en su núcleo conceptual, pero no queda resuelta la reconciliación global de todo Notion ni queda demostrada la implementación completa.** No deben confundirse esos tres niveles.
+
+La función que este sprint debe preservar y ordenar es:
+
+1. **Ingreso — capturar con mínima fricción.** Aceptar texto/escritura y voz/dictado sin exigir clasificación previa. Cuando la sesión procede de audio, preservar el audio original y su procedencia; la transcripción es una representación derivada y el fallo de STT no debe destruir ni bloquear la custodia/exportación. La importación de audio y la exportación directa desde Ingreso siguen dentro de CAP-1R; no se consideran satisfechas por existir un botón en otra pantalla. El ingreso manual de texto no debe fingir que existe un audio.
+2. **Volcados — custodiar y revisar sin sobrescritura.** Ser la siguiente superficie primaria a la derecha de Ingreso y concentrar el archivo de volcados, escucha/reproducción cuando haya audio, edición como nueva versión, deltas y procedencia, historial y decisión humana de aprobar/rechazar. El original y las versiones anteriores son inmutables; un cambio posterior invalida la aprobación anterior. Una corrección de transcripción debe distinguirse de una enmienda de contenido.
+3. **Ingesta — procedimiento posterior, no pestaña redundante de Ingreso.** Incorporar al Núcleo/Grafo solo la versión exacta ratificada mediante `volcado_id + version + sha256`; verificar esa terna en servidor, persistir `io_id`, mantener idempotencia y auditar tanto éxito como fallo. Una respuesta 2xx, una interfaz renderizada o un test con grafo simulado no constituyen por sí solos prueba de escritura real.
+4. **Propósito aguas abajo.** Estas etapas son la base forense para SEA/IAR/RES; no equivalen a declarar construidas la recuperación ideacional ni la síntesis cognitiva. La intervención UI debe habilitar captura, procedencia, escucha, edición/ratificación y evidencia, no introducir renovación estética o semántica por sí misma.
+
+La distinción de UX queda cerrada así: **Ingreso y Volcados son superficies de navegación diferentes; Captura/Consulta/Acción siguen siendo modos macro del sistema.** Lo que el usuario observó como redundante eran pestañas internas de Ingreso que no cambiaban la interfaz. Quitar esas pestañas no autoriza retirar sus capacidades subyacentes.
+
+### 10.4 Riesgos concretos al comparar la intención con PR #290
+
+- **Ruta heredada:** PR #290 redirige `/sistema/editar` a `/sistema/volcados`, aunque Arquitectura §§51–55 y J-12 prohíben retirarla/redirectarla hasta que `ING-DIRECT-01` pase en producción. La instrucción verbatim no da permiso para saltar esa compuerta.
+- **Exportación de audio en Ingreso:** la vista `IngresoView` de la rama no expone acción de exportación. Volcados tiene exportación MP3, pero eso no satisface el requerimiento CAP-1R de exportar directamente desde Ingreso.
+- **Importación aún no probada:** el manejador de adjuntar audio existe, pero debe probarse que el audio importado y ya verificado puede archivarse. En el código revisado, la guardia de archivado contrasta `partesRawRef` y partes subidas; el flujo de adjunto no añade un chunk a `partesRawRef`. Esto es una discrepancia de código que exige prueba/reconciliación, no un fallo de producción declarado sin ejecución.
+- **Cobertura eliminada:** PR #290 elimina `e2e/cora-ingesta.spec.ts` (133 líneas), que cubría exclusividad texto/archivo, límites de tamaño, MIME y envíos exitosos. La consolidación de pantallas puede requerir reescribir esos casos, no simplemente perderlos.
+- **Contratos UI:** la arquitectura anterior mantenía UI-08 Revisión y UI-09 Ratificación ocultos mientras `CTR-PROP-01`/`CTR-DELTA-01` necesitaran backend. Antes de declarar equivalencia en Volcados hay que mostrar que los contratos reales ahora existen y que aprobación/edición quedan invalidadas correctamente en cada nueva versión.
+- **Prueba final:** `ING-DIRECT-01`, CAP-2R, el ciclo exportar→importar→consultar y los checks del SHA final continúan sin evidencia suficiente. Los workflows remotos actuales figuran en fallo; sus logs no pudieron recuperarse y no se atribuye una causa sin ellos.
+
+### 10.5 Estado de certeza
+
+- **Resuelto como intención del sprint:** eliminar subpestañas redundantes dentro de Ingreso; poner Ingreso a la izquierda de Volcados; mover revisión/edición a Volcados; tratar Ingesta como operación sobre una versión aprobada, con el contrato de procedencia intacto.
+- **Corroborado por canon ratificado:** preservación append-only, separación dato derivado/juicio humano, procedencia obligatoria y no pérdida silenciosa de audio.
+- **No resuelto como capacidad actual:** exportación directa desde Ingreso, aceptación real del audio importado, prueba de ingesta directa en producción, retiro seguro de la ruta heredada y restauración de cobertura E2E eliminada.
+- **No resuelto documentalmente a escala de workspace:** reconciliación/ratificación del Plan Maestro y Arquitectura UI con la especificación actual del sprint, verificación de cambios después de los snapshots, y censo exhaustivo de todas las páginas/posibles discusiones del espacio. Esta pasada no autoriza afirmar “todo Notion revisado”.
+
+### 10.6 Cierre documental requerido
+
+- [ ] Reconciliar este dictamen con el Plan Maestro y el canon de interfaz de Notion mediante el procedimiento de gobernanza aplicable; no alterar las páginas de Notion de forma implícita.
+- [ ] Conservar `/sistema/editar` hasta un PASS real de `ING-DIRECT-01` en producción con versión nueva y repetida.
+- [ ] Probar importación/archivado de WebM, WAV, M4A y MP3; fallo de STT, fallo de DB/vínculo y reintentos idempotentes, sin pérdida del original.
+- [ ] Resolver o diferir explícitamente, mediante decisión del operador, la exportación directa desde Ingreso. No marcarla como satisfecha por la exportación disponible en Volcados.
+- [ ] Reponer o reemplazar la cobertura funcional de `cora-ingesta.spec.ts`; añadir E2E de captura real/simulada de navegador, no solo comprobaciones de layout.
+- [ ] Verificar los contratos de edición/ratificación en Volcados; ejecutar CAP-2R, `ING-DIRECT-01`, exportación→importación→consulta, y la batería completa sobre un único SHA final.
+- [ ] Repetir typecheck, contrato de navegación, tests unitarios configurados, build y E2E global; clasificar cualquier fallo remoto con logs accesibles antes de integrar.
+
+### 10.7 Veredicto de esta segunda pasada
+
+**RESULTADO: INTENCIÓN DEL FLUJO RESUELTA; AUDITORÍA TOTAL DE NOTION NO DEMOSTRADA; IMPLEMENTACIÓN Y CIERRE BLOQUEADOS.** La respuesta funcional no debe volver a quedar en la frase genérica “Ingreso → Volcados → Ingesta”: incluye custodia inmutable, juicio humano, exportación/importación independientes del STT y la compuerta de ruta heredada. No mergear PR #290 ni retirar capacidades en nombre de la consolidación hasta cerrar los bloqueos verificables.
 
