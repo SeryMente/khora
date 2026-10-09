@@ -31,6 +31,149 @@ type KernelResponse = {
   [key: string]: unknown;
 };
 
+class IngestaConcurrencyError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "IngestaConcurrencyError";
+  }
+}
+
+async function persistirIngestaExitosa(
+  db: ReturnType<typeof getDb>,
+  args: { volcadoId: string; ioId: string; version: number; sha256: string; usuario: string },
+): Promise<void> {
+  const client = await db.connect();
+  let enTransaccion = false;
+  try {
+    await client.query("BEGIN");
+    enTransaccion = true;
+    const actualRes = await client.query(
+      "SELECT estado, version_aprobada, sha256_aprobado, io_id FROM volcado WHERE id = $1 FOR UPDATE",
+      [args.volcadoId],
+    );
+    if (!actualRes.rows?.length) {
+      throw new IngestaConcurrencyError("El volcado desapareció mientras la ingesta estaba en curso.");
+    }
+
+    const actual = actualRes.rows[0] as VolcadoRow;
+    const estadoAnterior = String(actual.estado ?? "");
+    const versionActual = Number(actual.version_aprobada ?? 0);
+    const shaActual = String(actual.sha256_aprobado ?? "").trim().toLowerCase();
+    const ioActual = String(actual.io_id ?? "");
+
+    if (versionActual !== args.version || shaActual !== args.sha256.toLowerCase()) {
+      throw new IngestaConcurrencyError(
+        "La versión aprobada cambió durante la ingesta. El resultado del núcleo no se atribuirá a la nueva versión; se requiere reconciliación.",
+      );
+    }
+    if (!["listo_ingesta", "fallido", "ingerido"].includes(estadoAnterior)) {
+      throw new IngestaConcurrencyError(
+        `El estado cambió a '${estadoAnterior}' mientras la ingesta estaba en curso; se conserva la transición actual.`,
+      );
+    }
+    if (estadoAnterior === "ingerido" && ioActual !== args.ioId) {
+      throw new IngestaConcurrencyError(
+        "Conflicto de idempotencia: la versión ya está vinculada a otro io_id; no se sustituirá.",
+      );
+    }
+
+    const updateRes = await client.query(
+      `UPDATE volcado
+       SET estado = 'ingerido',
+           io_id = $1,
+           ultimo_intento = now(),
+           intentos = COALESCE(intentos, 0) + 1,
+           ultimo_error = NULL
+       WHERE id = $2
+         AND version_aprobada = $3
+         AND lower(sha256_aprobado) = $4
+       RETURNING estado`,
+      [args.ioId, args.volcadoId, args.version, args.sha256.toLowerCase()],
+    );
+    if (typeof updateRes.rowCount === "number" && updateRes.rowCount !== 1) {
+      throw new IngestaConcurrencyError("La aprobación de la versión cambió antes de confirmar la ingesta.");
+    }
+
+    await client.query(
+      `INSERT INTO volcado_revision_auditoria
+       (id, volcado_id, accion, estado_anterior, estado_nuevo, version, sha256, usuario)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+      [
+        randomUUID(),
+        args.volcadoId,
+        estadoAnterior === "ingerido" ? "ingesta_idempotente" : "ingestado",
+        estadoAnterior,
+        "ingerido",
+        args.version,
+        args.sha256,
+        args.usuario,
+      ],
+    );
+    await client.query("COMMIT");
+    enTransaccion = false;
+  } catch (err) {
+    if (enTransaccion) await client.query("ROLLBACK").catch(() => undefined);
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+async function persistirFalloIngesta(
+  db: ReturnType<typeof getDb>,
+  args: { volcadoId: string; error: string; version: number; sha256: string; usuario: string },
+): Promise<string> {
+  const client = await db.connect();
+  let enTransaccion = false;
+  try {
+    await client.query("BEGIN");
+    enTransaccion = true;
+    const actualRes = await client.query(
+      "SELECT estado FROM volcado WHERE id = $1 FOR UPDATE",
+      [args.volcadoId],
+    );
+    if (!actualRes.rows?.length) throw new Error("No se encontró el volcado al registrar el fallo de ingesta.");
+
+    const estadoAnterior = String(actualRes.rows[0].estado ?? "");
+    const estadoEsperado = estadoAnterior === "ingerido" ? "ingerido" : "fallido";
+    const updateRes = await client.query(
+      `UPDATE volcado
+       SET estado = CASE WHEN estado = 'ingerido' THEN 'ingerido' ELSE 'fallido' END,
+           ultimo_intento = now(),
+           intentos = COALESCE(intentos, 0) + 1,
+           ultimo_error = $2
+       WHERE id = $1
+       RETURNING estado`,
+      [args.volcadoId, args.error],
+    );
+    const estadoPersistido = String(updateRes.rows?.[0]?.estado ?? estadoEsperado);
+
+    await client.query(
+      `INSERT INTO volcado_revision_auditoria
+       (id, volcado_id, accion, estado_anterior, estado_nuevo, version, sha256, usuario)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+      [
+        randomUUID(),
+        args.volcadoId,
+        "ingesta_fallida",
+        estadoAnterior,
+        estadoPersistido,
+        args.version,
+        args.sha256,
+        args.usuario,
+      ],
+    );
+    await client.query("COMMIT");
+    enTransaccion = false;
+    return estadoPersistido;
+  } catch (err) {
+    if (enTransaccion) await client.query("ROLLBACK").catch(() => undefined);
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
 export async function POST(req: Request) {
   const session = await auth();
 
@@ -433,59 +576,13 @@ export async function POST(req: Request) {
           throw new Error("Conflicto de idempotencia: el io_id devuelto no coincide con el ya archivado");
         }
 
-        await db.query(
-          `
-            UPDATE volcado
-            SET
-              estado = 'ingerido',
-              io_id = $1,
-              ultimo_intento = now(),
-              intentos = COALESCE(intentos, 0) + 1,
-              ultimo_error = NULL
-            WHERE id = $2
-          `,
-          [
-            ioId,
-            volcadoId,
-          ]
-        );
-
-        await db.query(
-          `
-            INSERT INTO volcado_revision_auditoria
-            (
-              id,
-              volcado_id,
-              accion,
-              estado_anterior,
-              estado_nuevo,
-              version,
-              sha256,
-              usuario
-            )
-            VALUES
-            (
-              $1,
-              $2,
-              $3,
-              $4,
-              $5,
-              $6,
-              $7,
-              $8
-            )
-          `,
-          [
-            randomUUID(),
-            volcadoId,
-            "ingestado",
-            volcado.estado,
-            "ingerido",
-            versionPedida,
-            shaServidor,
-            session.user.email,
-          ]
-        );
+        await persistirIngestaExitosa(db, {
+          volcadoId,
+          ioId,
+          version: versionPedida,
+          sha256: shaServidor,
+          usuario: session.user.email,
+        });
 
         await registrarEvento({
           fase: "ingesta",
@@ -514,62 +611,14 @@ export async function POST(req: Request) {
             ? data.detail
             : `Kernel returned HTTP ${apiResponse.status}`;
 
-      const nuevoEstado = volcado.estado === "ingerido" ? "ingerido" : "fallido";
-
       try {
-        await db.query(
-          `
-            UPDATE volcado
-            SET
-              estado = $3,
-              ultimo_intento = now(),
-              intentos = COALESCE(intentos, 0) + 1,
-              ultimo_error = $2
-            WHERE id = $1
-          `,
-          [
-            volcadoId,
-            errorMsg,
-            nuevoEstado,
-          ]
-        );
-
-        await db.query(
-          `
-            INSERT INTO volcado_revision_auditoria
-            (
-              id,
-              volcado_id,
-              accion,
-              estado_anterior,
-              estado_nuevo,
-              version,
-              sha256,
-              usuario
-            )
-            VALUES
-            (
-              $1,
-              $2,
-              $3,
-              $4,
-              $5,
-              $6,
-              $7,
-              $8
-            )
-          `,
-          [
-            randomUUID(),
-            volcadoId,
-            "ingesta_fallida",
-            volcado.estado,
-            nuevoEstado,
-            versionPedida,
-            shaServidor,
-            session.user.email,
-          ]
-        );
+        await persistirFalloIngesta(db, {
+          volcadoId,
+          error: errorMsg,
+          version: versionPedida,
+          sha256: shaServidor,
+          usuario: session.user.email,
+        });
       } catch (dbError) {
         console.error(
           "Error registrando fallo de ingesta en PostgreSQL:",
@@ -598,6 +647,24 @@ export async function POST(req: Request) {
     } catch (fetchError: unknown) {
       clearTimeout(timeout);
 
+      if (fetchError instanceof IngestaConcurrencyError) {
+        await registrarEvento({
+          fase: "ingesta",
+          eventId: "ING-002",
+          estado: "FAIL",
+          mensaje: "Ingesta no vinculada: la aprobación o la identidad del io_id cambió durante la operación",
+          detalle: { volcadoId, version: versionPedida, sha256: shaServidor, causa: fetchError.message },
+          volcadoId,
+          version: versionPedida,
+          sha256: shaServidor,
+          correlacionId: volcadoId,
+        });
+        return NextResponse.json(
+          { error: "aprobacion_o_identidad_cambio_durante_ingesta", detail: fetchError.message },
+          { status: 409 },
+        );
+      }
+
       const isAbortError =
         fetchError instanceof Error &&
         fetchError.name === "AbortError";
@@ -608,62 +675,14 @@ export async function POST(req: Request) {
           ? fetchError.message
           : "Kernel request failed";
 
-      const nuevoEstado = volcado.estado === "ingerido" ? "ingerido" : "fallido";
-
       try {
-        await db.query(
-          `
-            UPDATE volcado
-            SET
-              estado = $3,
-              ultimo_intento = now(),
-              intentos = COALESCE(intentos, 0) + 1,
-              ultimo_error = $2
-            WHERE id = $1
-          `,
-          [
-            volcadoId,
-            errMsg,
-            nuevoEstado,
-          ]
-        );
-
-        await db.query(
-          `
-            INSERT INTO volcado_revision_auditoria
-            (
-              id,
-              volcado_id,
-              accion,
-              estado_anterior,
-              estado_nuevo,
-              version,
-              sha256,
-              usuario
-            )
-            VALUES
-            (
-              $1,
-              $2,
-              $3,
-              $4,
-              $5,
-              $6,
-              $7,
-              $8
-            )
-          `,
-          [
-            randomUUID(),
-            volcadoId,
-            "ingesta_fallida",
-            volcado.estado,
-            nuevoEstado,
-            versionPedida,
-            shaServidor,
-            session.user.email,
-          ]
-        );
+        await persistirFalloIngesta(db, {
+          volcadoId,
+          error: errMsg,
+          version: versionPedida,
+          sha256: shaServidor,
+          usuario: session.user.email,
+        });
       } catch (dbError) {
         console.error(
           "Error registrando fallo de ingesta en PostgreSQL:",
