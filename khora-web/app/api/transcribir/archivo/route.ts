@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { put } from "@vercel/blob";
 import { createHash, randomUUID } from "crypto";
-import { cifrarBytes } from "../../../../lib/server/cripto";
+import { cifrarBytes, descifrarBytes } from "../../../../lib/server/cripto";
 import { registrarParteAudio } from "../../../../lib/server/dictado";
 import { transcribirAudioConGroq } from "../../../../lib/server/transcribir";
 import { evaluarCoberturaYReconciliar } from "../../../../lib/transcripcion/reconciliar";
@@ -56,6 +56,62 @@ export async function POST(req: NextRequest) {
       contentType: "application/octet-stream",
     });
 
+    // La parte adjunta no se marca custodiada hasta releer, descifrar y verificarla.
+    try {
+      const verificacion = await fetch(subido.url, { cache: "no-store" });
+      if (!verificacion.ok) {
+        return NextResponse.json(
+          {
+            error: "audio_no_verificable",
+            detail: `No se pudo releer la carga almacenada (HTTP ${verificacion.status}). El blob se conserva para recuperación, pero no está verificado.`,
+            sessionId,
+            audioUrl: subido.url,
+            blobPath: destino,
+            audioBytes: crudo.length,
+            sha256,
+            verificado: false,
+            recuperable: true,
+          },
+          { status: 502 },
+        );
+      }
+      const bytesAlmacenados = descifrarBytes(Buffer.from(await verificacion.arrayBuffer()));
+      const shaAlmacenado = createHash("sha256").update(bytesAlmacenados).digest("hex");
+      if (bytesAlmacenados.length !== crudo.length || shaAlmacenado !== sha256) {
+        return NextResponse.json(
+          {
+            error: "audio_corrupto",
+            detail: "La copia almacenada no coincide con el archivo original. Se conserva para reconciliación; no está verificada ni puede archivarse.",
+            sessionId,
+            audioUrl: subido.url,
+            blobPath: destino,
+            audioBytes: crudo.length,
+            bytesRecuperados: bytesAlmacenados.length,
+            sha256,
+            sha256Recuperado: shaAlmacenado,
+            verificado: false,
+            recuperable: true,
+          },
+          { status: 502 },
+        );
+      }
+    } catch (verificationError) {
+      return NextResponse.json(
+        {
+          error: "audio_no_verificable",
+          detail: `Falló la verificación de almacenamiento: ${String(verificationError)}. El blob se conserva para recuperación y no se considera custodiado.`,
+          sessionId,
+          audioUrl: subido.url,
+          blobPath: destino,
+          audioBytes: crudo.length,
+          sha256,
+          verificado: false,
+          recuperable: true,
+        },
+        { status: 502 },
+      );
+    }
+
     try {
       await registrarParteAudio({
         sessionId,
@@ -64,6 +120,7 @@ export async function POST(req: NextRequest) {
         blobPath: destino,
         bytes: crudo.length,
         sha256,
+        estadoVerificacion: "verificado",
       });
     } catch {
       return NextResponse.json(
