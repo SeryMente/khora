@@ -154,6 +154,12 @@ for (const viewport of [
         await page.goto(alias, { waitUntil: "domcontentloaded" });
         await expect(page).toHaveURL(canonical);
         await expect(page.locator("h1").first()).toBeVisible();
+        if (alias === "/sistema/editar") {
+          await expect(page.getByRole("heading", { name: /revisi[oó]n/i }).first()).toBeVisible();
+        }
+        if (alias === "/sistema/ingesta") {
+          await expect(page.getByRole("heading", { name: /ingesta/i }).first()).toBeVisible();
+        }
       }
     });
 
