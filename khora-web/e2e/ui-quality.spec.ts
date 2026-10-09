@@ -162,7 +162,7 @@ for (const viewport of [
 
     test("ING-DIRECT-01 contract: editor alias retains direct route and only the opened approved tuple is sent", async ({ page }) => {
   const digest = "a".repeat(64);
-  let lastTuple: { volcado_id: string; version: string; sha256: string } | null = null;
+  const sentTuples: { volcado_id: string; version: string; sha256: string }[] = [];
   await page.route("**/api/auth/session", async (route) => {
     await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ user: { email: "operator@example.invalid" }, expires: new Date(Date.now()+3600000).toISOString() }) });
   });
@@ -195,21 +195,34 @@ for (const viewport of [
   await page.route("**/api/ingesta", async (route) => {
     const body = route.request().postData() || "";
     const pick = (name: string) => body.match(new RegExp(`name="${name}"\\r\\n\\r\\n([^\\r\\n]+)`))?.[1] || "";
-    lastTuple = { volcado_id: pick("volcado_id"), version: pick("version"), sha256: pick("sha256") };
-    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ io_id: "io-tuple-test" }) });
+    sentTuples.push({ volcado_id: pick("volcado_id"), version: pick("version"), sha256: pick("sha256") });
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ io_id: "io-tuple-test", idempotent: sentTuples.length > 1 }),
+    });
   });
 
   await page.goto("/sistema/editar?volcado_id=tuple-volcado-01&version=2");
   await expect(page).toHaveURL(/\/sistema\/editar\?volcado_id=tuple-volcado-01&version=2$/);
   await expect(page.getByRole("button", { name: "Ingerir esta version", exact: true })).toBeVisible();
+  const exactTuple = { volcado_id: "tuple-volcado-01", version: "2", sha256: digest };
   await page.getByRole("button", { name: "Ingerir esta version", exact: true }).click();
-  await expect.poll(() => lastTuple).toEqual({ volcado_id: "tuple-volcado-01", version: "2", sha256: digest });
+  await expect.poll(() => sentTuples.length).toBe(1);
+  expect(sentTuples[0]).toEqual(exactTuple);
 
-  lastTuple = null;
   await page.goto("/sistema/editar?volcado_id=tuple-volcado-01&version=1");
   await expect(page).toHaveURL(/\/sistema\/editar\?volcado_id=tuple-volcado-01&version=1$/);
   await expect(page.getByRole("button", { name: "Ingerir esta version", exact: true })).toHaveCount(0);
-  expect(lastTuple).toBeNull();
+  expect(sentTuples).toHaveLength(1);
+
+  // Repetir la misma ratificada debe volver a enviar exactamente la misma terna.
+  await page.goto("/sistema/editar?volcado_id=tuple-volcado-01&version=2");
+  await expect(page).toHaveURL(/\/sistema\/editar\?volcado_id=tuple-volcado-01&version=2$/);
+  await expect(page.getByRole("button", { name: "Ingerir esta version", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Ingerir esta version", exact: true }).click();
+  await expect.poll(() => sentTuples.length).toBe(2);
+  expect(sentTuples).toEqual([exactTuple, exactTuple]);
 });
 
     test("las pestañas de Seguridad exponen semántica ARIA coherente", async ({ page }) => {
