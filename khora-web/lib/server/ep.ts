@@ -2,6 +2,7 @@ import { createHash, randomBytes, randomUUID } from "node:crypto";
 import { getDb } from "@/lib/server/neon";
 import { JwtPayload, signJwt, verifyJwtDetailed } from "@/lib/server/jwt";
 import { readEpMasterEmail } from "@/lib/ep-master-session";
+import { EP_REQUIRED_GITHUB_REPOSITORIES, getEpGitHubCredentialStatus, getStoredEpGitHubToken } from "@/lib/server/ep-github-credential";
 
 export type EpState = "START" | "OK" | "FAIL" | "INFO" | "SKIP";
 export type EpLaunchMode = "normal";
@@ -149,26 +150,59 @@ export type EpWorkspaceRepo = {
 };
 const DEFAULT_OEP_WORKSPACE_REPOS = ["CENSUS", "signal-interpreter"] as const;
 let repoCatalogCache: { expiresAt: number; value: EpWorkspaceRepo[] } | null = null;
-async function githubApi(path: string): Promise<any> {
-  const token = process.env.GITHUB_TOKEN?.trim();
-  if (!token) throw new Error("github_catalog_unavailable");
+
+async function getEpCatalogToken(): Promise<string> {
+  try {
+    const status = await getEpGitHubCredentialStatus();
+    if (status.configured) return await getStoredEpGitHubToken();
+  } catch {
+    const legacy = process.env.GITHUB_TOKEN?.trim();
+    if (legacy) return legacy;
+    throw new Error("github_catalog_unavailable");
+  }
+  const legacy = process.env.GITHUB_TOKEN?.trim();
+  if (legacy) return legacy;
+  throw new Error("github_catalog_unavailable");
+}
+
+async function githubApi(path: string, token: string): Promise<any> {
   const response = await fetch("https://api.github.com" + path, {
-    headers: { Authorization: "Bearer " + token, Accept: "application/vnd.github+json", "User-Agent": "khora-ep-catalog/1" },
+    headers: {
+      Authorization: "Bearer " + token,
+      Accept: "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2022-11-28",
+      "User-Agent": "khora-ep-catalog/2",
+    },
     cache: "no-store",
+    signal: AbortSignal.timeout(20_000),
   });
   if (!response.ok) throw new Error("github_catalog_unavailable");
   return response.json();
 }
+
 export async function getEpRepoCatalog(): Promise<EpWorkspaceRepo[]> {
   if (repoCatalogCache && repoCatalogCache.expiresAt > Date.now()) return repoCatalogCache.value;
-  const raw = await githubApi("/orgs/SeryMente/repos?per_page=100&sort=full_name&direction=asc&type=all");
-  if (!Array.isArray(raw)) throw new Error("github_catalog_unavailable");
+  const token = await getEpCatalogToken();
+  const allowedNames = new Set(EP_REQUIRED_GITHUB_REPOSITORIES.map((name) => name.toLowerCase()));
+  const raw = await Promise.all(
+    EP_REQUIRED_GITHUB_REPOSITORIES
+      .filter((name) => name.toLowerCase() !== "khora")
+      .map(async (name) => {
+        const repo = await githubApi("/repos/SeryMente/" + encodeURIComponent(name), token);
+        if (!repo || typeof repo.name !== "string" || repo.archived || !allowedNames.has(repo.name.toLowerCase())) {
+          throw new Error("github_catalog_unavailable");
+        }
+        return repo;
+      }),
+  );
   const catalog: EpWorkspaceRepo[] = [];
   for (const repo of raw) {
-    if (!repo || typeof repo.name !== "string" || repo.archived) continue;
     let extensionRoot: string | null = null;
     try {
-      const tree = await githubApi("/repos/SeryMente/" + encodeURIComponent(repo.name) + "/git/trees/" + encodeURIComponent(String(repo.default_branch || "main")) + "?recursive=1");
+      const tree = await githubApi(
+        "/repos/SeryMente/" + encodeURIComponent(repo.name) + "/git/trees/" + encodeURIComponent(String(repo.default_branch || "main")) + "?recursive=1",
+        token,
+      );
       const treeItems = Array.isArray(tree?.tree) ? tree.tree : [];
       const manifest = treeItems.find((item: any) => item && item.type === "blob" && String(item.path).toLowerCase().endsWith("/manifest.json"));
       const rootManifest = treeItems.find((item: any) => item && item.type === "blob" && String(item.path).toLowerCase() === "manifest.json");
