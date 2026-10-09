@@ -15,6 +15,7 @@ type VolcadoRow = {
   estado: string;
   version_aprobada: number | string | null;
   sha256_aprobado: string | null;
+  io_id: string | null;
 };
 
 type VersionRow = {
@@ -66,6 +67,7 @@ export async function POST(req: Request) {
 
     const volcadoIdValue = formData.get("volcado_id");
     const versionValue = formData.get("version");
+    const shaValue = formData.get("sha256");
 
     const volcadoId =
       typeof volcadoIdValue === "string"
@@ -76,23 +78,34 @@ export async function POST(req: Request) {
       typeof versionValue === "string"
         ? versionValue.trim()
         : null;
+    const shaCliente =
+      typeof shaValue === "string"
+        ? shaValue.trim().toLowerCase()
+        : null;
 
-    if (!volcadoId || !versionCruda) {
+    if (!volcadoId || !versionCruda || !shaCliente) {
       await registrarEvento({
         fase: "ingesta",
         eventId: "ING-002",
         estado: "FAIL",
         mensaje: "Rechazo de ingesta por procedencia incompleta (Etapa 6 L0-003)",
-        detalle: { volcadoId, versionCruda },
+        detalle: { volcadoId, versionCruda, shaCliente },
       });
       return NextResponse.json(
         {
           error:
-            "procedencia ausente: se exigen volcado_id y version",
+            "procedencia ausente: se exigen volcado_id, version y sha256",
         },
         {
           status: 400,
         }
+      );
+    }
+
+    if (!/^[0-9a-f]{64}$/.test(shaCliente)) {
+      return NextResponse.json(
+        { error: "sha256 solicitado debe ser un digest hexadecimal de 64 caracteres" },
+        { status: 400 }
       );
     }
 
@@ -145,7 +158,8 @@ export async function POST(req: Request) {
         SELECT
           estado,
           version_aprobada,
-          sha256_aprobado
+          sha256_aprobado,
+          io_id
         FROM volcado
         WHERE id = $1
       `,
@@ -166,16 +180,22 @@ export async function POST(req: Request) {
     const volcado =
       vRes.rows[0] as VolcadoRow;
 
-    if (volcado.estado !== "listo_ingesta") {
+    const estadosReintentables = new Set(["listo_ingesta", "fallido", "ingerido"]);
+    if (!estadosReintentables.has(volcado.estado)) {
       return NextResponse.json(
         {
           error:
-            `La ingesta exige que el volcado este en estado listo_ingesta. ` +
-            `Estado actual: ${volcado.estado}`,
+            `La ingesta exige una versión aprobada en listo_ingesta; solo se permite reintentar una tupla idéntica desde fallido o verificar idempotencia desde ingerido. Estado actual: ${volcado.estado}`,
         },
         {
           status: 428,
         }
+      );
+    }
+    if (volcado.estado === "ingerido" && !volcado.io_id) {
+      return NextResponse.json(
+        { error: "integridad rota: el volcado está ingerido pero no tiene io_id persistido" },
+        { status: 409 }
       );
     }
 
@@ -208,6 +228,25 @@ export async function POST(req: Request) {
 
     const versionAprobada =
       Number(volcado.version_aprobada);
+    const shaAprobadoDeclarado = String(volcado.sha256_aprobado).trim().toLowerCase();
+
+    if (shaCliente !== shaAprobadoDeclarado) {
+      await registrarEvento({
+        fase: "ingesta",
+        eventId: "ING-002",
+        estado: "FAIL",
+        mensaje: "Rechazo de ingesta: el SHA enviado por el cliente no coincide con el SHA aprobado",
+        detalle: { volcadoId, versionPedida, shaCliente, shaAprobadoDeclarado },
+        volcadoId,
+        version: versionPedida,
+        sha256: shaCliente,
+        correlacionId: volcadoId,
+      });
+      return NextResponse.json(
+        { error: "sha256 solicitado no coincide con la versión aprobada" },
+        { status: 409 }
+      );
+    }
 
     if (
       !Number.isInteger(versionAprobada) ||
@@ -383,9 +422,16 @@ export async function POST(req: Request) {
 
       if (apiResponse.ok) {
         const ioId =
-          typeof data.io_id === "string"
-            ? data.io_id
+          typeof data.io_id === "string" && data.io_id.trim().length > 0
+            ? data.io_id.trim()
             : null;
+
+        if (!ioId) {
+          throw new Error("Kernel devolvió éxito sin io_id; no se marcará el volcado como ingerido");
+        }
+        if (volcado.estado === "ingerido" && ioId !== volcado.io_id) {
+          throw new Error("Conflicto de idempotencia: el io_id devuelto no coincide con el ya archivado");
+        }
 
         await db.query(
           `
@@ -468,7 +514,7 @@ export async function POST(req: Request) {
             ? data.detail
             : `Kernel returned HTTP ${apiResponse.status}`;
 
-      const nuevoEstado = "fallido";
+      const nuevoEstado = volcado.estado === "ingerido" ? "ingerido" : "fallido";
 
       try {
         await db.query(
@@ -562,7 +608,7 @@ export async function POST(req: Request) {
           ? fetchError.message
           : "Kernel request failed";
 
-      const nuevoEstado = "fallido";
+      const nuevoEstado = volcado.estado === "ingerido" ? "ingerido" : "fallido";
 
       try {
         await db.query(
