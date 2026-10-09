@@ -16,6 +16,8 @@ const ALTERS = [
   "ALTER TABLE volcado ADD COLUMN IF NOT EXISTS session_id TEXT",
   "ALTER TABLE volcado ADD COLUMN IF NOT EXISTS estado_transcripcion TEXT",
   "ALTER TABLE dictado_audio_parte ADD COLUMN IF NOT EXISTS fuente_audio TEXT DEFAULT 'microphone'",
+  "ALTER TABLE dictado_audio_parte ADD COLUMN IF NOT EXISTS original_name TEXT",
+  "ALTER TABLE dictado_audio_parte ADD COLUMN IF NOT EXISTS mime_type TEXT",
 ];
 
 const SESSION_TABLES_SQL = `
@@ -44,6 +46,8 @@ CREATE TABLE IF NOT EXISTS dictado_audio_parte (
     bytes INTEGER NOT NULL,
     sha256 TEXT,
     fuente_audio TEXT NOT NULL DEFAULT 'microphone',
+    original_name TEXT,
+    mime_type TEXT,
     estado TEXT NOT NULL DEFAULT 'uploaded',
     uploaded_at TIMESTAMPTZ DEFAULT NOW(),
     start_ms INTEGER,
@@ -62,6 +66,8 @@ ALTER TABLE dictado_audio_parte ADD COLUMN IF NOT EXISTS start_ms INTEGER;
 ALTER TABLE dictado_audio_parte ADD COLUMN IF NOT EXISTS end_ms INTEGER;
 ALTER TABLE dictado_audio_parte ADD COLUMN IF NOT EXISTS duracion_ms INTEGER;
 ALTER TABLE dictado_audio_parte ADD COLUMN IF NOT EXISTS estado_verificacion TEXT DEFAULT 'pendiente';
+ALTER TABLE dictado_audio_parte ADD COLUMN IF NOT EXISTS original_name TEXT;
+ALTER TABLE dictado_audio_parte ADD COLUMN IF NOT EXISTS mime_type TEXT;
 `;
 
 let columnasListas = false;
@@ -72,7 +78,7 @@ export async function asegurarColumnasDictado(): Promise<void> {
   try {
     await db.query("SELECT audio_url, audio_bytes, duracion_seg, fuente, pulido_aplicado, audio_partes, session_id, estado_transcripcion FROM volcado LIMIT 0");
     await db.query("SELECT session_id, volcado_id, estado, total_partes, duracion_seg FROM dictado_session LIMIT 0");
-    await db.query("SELECT session_id, volcado_id, part_index, blob_url, blob_path, bytes, sha256, fuente_audio, start_ms, end_ms, duracion_ms, estado_verificacion FROM dictado_audio_parte LIMIT 0");
+    await db.query("SELECT session_id, volcado_id, part_index, blob_url, blob_path, bytes, sha256, fuente_audio, start_ms, end_ms, duracion_ms, estado_verificacion, original_name, mime_type FROM dictado_audio_parte LIMIT 0");
     columnasListas = true;
     return;
   } catch {
@@ -94,6 +100,8 @@ export type AudioParte = {
   path?: string;
   sha256?: string;
   fuenteAudio?: "microphone" | "chrome_tab" | "audio_archivo";
+  nombreOriginal?: string | null;
+  mimeType?: string | null;
   start_ms?: number;
   end_ms?: number;
   duracion_ms?: number;
@@ -123,6 +131,8 @@ export async function registrarParteAudio(params: {
   bytes: number;
   sha256?: string;
   fuenteAudio?: "microphone" | "chrome_tab" | "audio_archivo";
+  nombreOriginal?: string | null;
+  mimeType?: string | null;
   startMs?: number;
   endMs?: number;
   duracionMs?: number;
@@ -161,8 +171,8 @@ export async function registrarParteAudio(params: {
     // Otra huella/bytes en el mismo índice es un conflicto; jamás sobrescribir el original.
     const parte = await db.query(
       `INSERT INTO dictado_audio_parte
-         (session_id, part_index, blob_url, blob_path, bytes, sha256, fuente_audio, estado_verificacion, start_ms, end_ms, duracion_ms)
-       SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11
+         (session_id, part_index, blob_url, blob_path, bytes, sha256, fuente_audio, estado_verificacion, start_ms, end_ms, duracion_ms, original_name, mime_type)
+       SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13
        WHERE EXISTS (
          SELECT 1 FROM dictado_session s
          WHERE s.session_id = $1 AND s.volcado_id IS NULL AND s.estado <> 'complete'
@@ -174,10 +184,14 @@ export async function registrarParteAudio(params: {
            start_ms = COALESCE(EXCLUDED.start_ms, dictado_audio_parte.start_ms),
            end_ms = COALESCE(EXCLUDED.end_ms, dictado_audio_parte.end_ms),
            duracion_ms = COALESCE(EXCLUDED.duracion_ms, dictado_audio_parte.duracion_ms),
+           original_name = COALESCE(dictado_audio_parte.original_name, EXCLUDED.original_name),
+           mime_type = COALESCE(dictado_audio_parte.mime_type, EXCLUDED.mime_type),
            uploaded_at = NOW()
        WHERE dictado_audio_parte.bytes = EXCLUDED.bytes
          AND lower(dictado_audio_parte.sha256) = lower(EXCLUDED.sha256)
          AND dictado_audio_parte.fuente_audio = EXCLUDED.fuente_audio
+         AND COALESCE(dictado_audio_parte.original_name, EXCLUDED.original_name) = COALESCE(EXCLUDED.original_name, dictado_audio_parte.original_name)
+         AND COALESCE(dictado_audio_parte.mime_type, EXCLUDED.mime_type) = COALESCE(EXCLUDED.mime_type, dictado_audio_parte.mime_type)
          AND EXISTS (
            SELECT 1 FROM dictado_session s
            WHERE s.session_id = EXCLUDED.session_id
@@ -196,6 +210,8 @@ export async function registrarParteAudio(params: {
         params.startMs ?? null,
         params.endMs ?? null,
         params.duracionMs ?? null,
+        params.nombreOriginal?.trim() || null,
+        params.mimeType?.trim().toLowerCase() || null,
       ]
     );
     if (typeof parte.rowCount === "number" && parte.rowCount === 0) {
@@ -252,6 +268,8 @@ function normalizarFirmaPartesAudio(partes: any): string {
         bytes: Number(p.bytes),
         sha256: String(p.sha256 ?? "").trim().toLowerCase(),
         fuenteAudio: p.fuenteAudio === "audio_archivo" || p.fuente_audio === "audio_archivo" ? "audio_archivo" : p.fuenteAudio === "chrome_tab" || p.fuente_audio === "chrome_tab" ? "chrome_tab" : "microphone",
+        nombreOriginal: String(p.nombreOriginal ?? p.original_name ?? "").trim() || null,
+        mimeType: String(p.mimeType ?? p.mime_type ?? "").trim().toLowerCase() || null,
         start_ms: p.start_ms ?? p.startMs ?? null,
         end_ms: p.end_ms ?? p.endMs ?? null,
         duracion_ms: p.duracion_ms ?? p.duracionMs ?? null,
@@ -295,7 +313,7 @@ async function guardarDictadoConSesion(
     }
 
     const partesRes = await client.query(
-      `SELECT part_index, bytes, sha256, fuente_audio, estado_verificacion, start_ms, end_ms, duracion_ms
+      `SELECT part_index, bytes, sha256, fuente_audio, estado_verificacion, start_ms, end_ms, duracion_ms, original_name, mime_type
        FROM dictado_audio_parte WHERE session_id = $1 ORDER BY part_index ASC`,
       [sessionId],
     );
