@@ -2,6 +2,7 @@ import { createHash, randomBytes, randomUUID } from "node:crypto";
 import { getDb } from "@/lib/server/neon";
 import { JwtPayload, signJwt, verifyJwtDetailed } from "@/lib/server/jwt";
 import { createEpGitHubInstallationToken, EP_GITHUB_REPOSITORIES } from "@/lib/server/github-app";
+import { readEpMasterEmail } from "@/lib/ep-master-session";
 
 export type EpState = "START" | "OK" | "FAIL" | "INFO" | "SKIP";
 export type EpLaunchMode = "normal";
@@ -49,6 +50,19 @@ export function getEpConfig(origin?: string) {
 export function isEpUserAllowed(email: string, origin?: string): boolean {
   const allowed = getEpConfig(origin).allowedEmail;
   return !!email && (!allowed || email.toLowerCase() === allowed);
+}
+
+export async function resolveEpUserEmail(request: Request, authenticatedEmail?: string | null): Promise<string> {
+  const origin = new URL(request.url).origin;
+  const candidate = (authenticatedEmail || "").trim().toLowerCase();
+  try {
+    if (candidate && isEpUserAllowed(candidate, origin)) return candidate;
+  } catch {}
+  try {
+    const masterEmail = await readEpMasterEmail(request, origin);
+    if (masterEmail && isEpUserAllowed(masterEmail, origin)) return masterEmail;
+  } catch {}
+  return "";
 }
 export async function createEpSessionToken(email: string, origin: string, launchMode: EpLaunchMode = "normal", workspaceRepos?: unknown) {
   if (launchMode !== "normal") throw new Error("unsupported_launch_mode");
