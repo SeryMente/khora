@@ -1,404 +1,166 @@
 ---
 id: KHORA-SPRINT-INGRESO-UNIFICADO-20261007
 tipo: sprint
-version: v0.1.0
-estado: EN_PROGRESO
-fecha: 2026-10-07
+version: v0.2.0
+estado: IMPLEMENTACION_EN_RAMA__PR_ABIERTO__CERTIFICACION_GLOBAL_PENDIENTE
+fecha: 2026-10-08
 repositorio_canonico: https://github.com/SeryMente/khora
-base_sha: b8ae985da85a0f5eb79fcd6aab5cdb30e8e639d5
 ruta_canonica: docs/sprints/SPR-INGRESO-UNIFICADO-20261007.md
+rama: refactor/ingreso-volcados-consolidacion-20261008
+pull_request: https://github.com/SeryMente/khora/pull/290
+base_sha: b94e05f7a3f8e8bb3d48bf635054fd3b44702c4c
 owner: KHORA
 ---
 
-# Sprint KHORA · Unificación del dominio Ingreso
+# Sprint KHORA · Ingreso → Volcados · Especificación canónica
 
-**Propósito:** convertir Capturar, Dictado, Edición e Ingesta en capacidades de una sola interfaz de trabajo de Ingreso, eliminando duplicación de superficie sin eliminar capacidades funcionales.
-
-**Regla de este documento:** este archivo es el objeto canónico de planificación y recuperación del sprint. Describe la decisión y el camino de implementación; no declara capacidades como implementadas hasta que exista evidencia posterior.
+**Estado del objeto:** CANÓNICO PARA ESTE SPRINT.  
+**Regla de autoridad:** la sección 1 conserva literalmente la especificación aportada por el usuario y es la fuente normativa de intención del sprint. Las decisiones, los criterios de aceptación y el registro técnico de las secciones posteriores son traducciones operativas subordinadas; no pueden alterar ni sustituir el bloque verbatim.  
+**Historial:** esta versión (v0.2.0) sustituye la interpretación de (v0.1.0) que trataba Revisión e Ingesta como modos internos de Ingreso. Se conserva el identificador del objeto para mantener una única ruta canónica y continuidad de trazabilidad.
 
 ## 0. Cápsula de recuperación
 
-**Situación:** la navegación de KHORA fue endurecida y agrupó bajo Ingreso cinco destinos que todavía son aplicaciones separadas.
+- **Objetivo:** consolidar Ingreso como superficie de captura y colocar Volcados inmediatamente a su derecha como siguiente dominio del flujo de datos.
+- **Secuencia funcional:** `Ingreso → Volcados → revisión/ratificación → ingesta → Núcleo`.
+- **Rama de implementación:** `refactor/ingreso-volcados-consolidacion-20261008`.
+- **PR:** [#290 · refactor(ui): consolidar ingreso y volcados en el flujo canónico](https://github.com/SeryMente/khora/pull/290).
+- **Estado real:** la implementación está en la rama del PR y dispone de validaciones locales satisfactorias para los gates indicados abajo. El PR sigue abierto y sin merge; la certificación global de E2E permanece pendiente.
+- **No confundir:** que el build local y las pruebas dirigidas pasen no demuestra que el sprint ya esté integrado en `main`, publicado en producción o certificado por la suite E2E completa.
 
-**Hallazgo principal:** `/sistema/ingreso` y `/sistema/dictado` contienen dos implementaciones grandes del mismo dominio de captura, transcripción y edición. `/capturar` es una implementación simple y antigua; `/sistema/ingesta` es una superficie técnica de entrada a un endpoint; `/sistema/editar` es una estación de revisión que opera sobre los mismos volcados.
+## 1. Especificación canónica del usuario — VERBATIM
 
-**Decisión:** una sola interfaz canónica: `/sistema/ingreso`.
+El contenido del siguiente bloque es una transcripción literal de la especificación original. No corregir ortografía, puntuación, mayúsculas, repeticiones ni errores de transcripción dentro de este bloque.
 
-**Límite:** Volcados permanece como superficie independiente de inventario y revisión sincrónica.
+```text
+Bueno, entonces, qué bueno, al parecer la limitación era tentativa. Así déjalo, está bien. Ahora estoy viendo la actualización del interfaz de usuario en ingreso, sigo viendo en la parte de arriba entrada, dictado, captura, archivo, revisión, ingesta. Este, entrada y dictado pueden fundirse, captura también. De hecho si le hago clic a las tres no cambia nada en la interfaz, parece ser como que es la misma. Archivo también no funciona. Luego revisión manda a una funcionalidad que me permite editar las transcripciones, pero si me voy a volcado, tengo el modo edición, que serviría para lo mismo. Entonces, y además revisión no forma parte de ingreso, eso forma parte de volcado. Por cierto, en los menús principales ingreso debe ir a la izquierda y volcado debe ir a la derecha de ingreso porque es posterior en la secuencia que siguen los datos. y luego ingesta, que es un menú que tengo todavía en ingreso. Yo creo que hace relación al procedimiento de ingesta.   
+   
+Por cierto ya quedo listro esto?
+```
 
-**No se modifica inicialmente:** el contrato de backend de `/api/audio`, `/api/dictado`, `/api/ingesta`, `/api/edicion`, `/api/revision/*`, `/api/volcado` y `/api/versiones`, salvo adaptaciones estrictamente necesarias.
+## 2. Decisión canónica derivada
 
-**Ruta de reanudación:** leer este documento completo, verificar `main`, comprobar Git y continuar desde la primera fase no cerrada.
+Estas reglas son criterios operativos derivados del texto anterior, no una reescritura del mismo:
 
-## 1. Línea base
+1. **Ingreso** es la superficie primaria de captura. Entrada, Dictado y Captura no deben aparecer como modos o pestañas de navegación independientes cuando sus controles no producen una diferencia observable en el workspace.
+2. **Archivo** tampoco debe permanecer como pestaña/modo de navegación independiente. La capacidad concreta de importar o adjuntar archivos solo puede darse por operativa cuando exista evidencia específica de que funciona; la especificación original declara que el control visible de Archivo no funciona.
+3. **Volcados** es la siguiente superficie primaria, inmediatamente a la derecha de Ingreso. La secuencia de los datos determina el orden de la navegación.
+4. **Revisión y edición** pertenecen a Volcados. No deben duplicarse en un modo de Ingreso si Volcados ya ofrece la funcionalidad equivalente para las transcripciones.
+5. **Ingesta** es una operación downstream del procedimiento de incorporación. No es un modo de navegación dentro de Ingreso ni un dominio primario independiente. Su ejecución debe permanecer ligada al volcado y a la versión aprobada según el contrato existente.
+6. Los aliases históricos pueden seguir resolviendo por compatibilidad, pero no deben hacer reaparecer las superficies eliminadas ni conservar los antiguos modos como destinos canónicos.
+7. La eliminación de una pestaña redundante no autoriza a eliminar capacidades útiles de captura, custodia de audio, transcripción, revisión, aprobación o ingesta que sigan teniendo un lugar válido en el flujo.
 
-- Repositorio: `SeryMente/khora`
-- Rama: `main`
-- SHA local/remoto observado: `d70b208d42dc0283ccf1d8b5cad6618135148f30`
-- Aplicación: `khora-web/`
-- Registro de navegación: `khora-web/app/navigation/registry.ts`
-- Documento de navegación: `khora-web/docs/system-navigation.md`
+## 3. Navegación y flujo canónicos
 
-Archivos auditados:
+### 3.1 Navegación primaria — orden obligatorio
 
-| Superficie | Archivo | Líneas observadas |
-|---|---|---:|
-| Ingreso | `app/sistema/ingreso/page.tsx` | 1050 |
-| Dictado | `app/sistema/dictado/page.tsx` | 1077 |
-| Capturar | `app/capturar/page.tsx` | 157 |
-| Ingesta | `app/sistema/ingesta/page.tsx` | 174 |
-| Edición | `app/sistema/editar/page.tsx` | 642 |
-| Vista compartida | `app/components/shared/IngresoView.tsx` | 346 |
-| Navegación | `app/navigation/registry.ts` | 175 |
+`Ingreso → Volcados → Grafo → Consulta → Seguridad → Sistema`
 
-`Ingreso` y `Dictado` comparten ensamblado de párrafos, reconciliación, transcripción autoritativa, importación de audio y custodia por partes. La conclusión es funcional y arquitectónica, no una afirmación de identidad textual completa.
-## 2. Modelo funcional objetivo
+- **Ingreso:** `/sistema/ingreso`
+- **Volcados:** `/sistema/volcados`
 
-El objeto de producto no es Dictado, Edición o Ingesta por separado. Es una **Entrada** que atraviesa estados:
+Ingreso debe ser el primer dominio primario. Volcados debe ser el segundo y aparecer inmediatamente a su derecha.
 
-`captura → transcripción/procesamiento → revisión → aprobación → ingesta`
+### 3.2 Responsabilidades por dominio
 
-### 2.1 Una superficie, varios modos internos
+| Dominio/fase | Responsabilidad canónica |
+|---|---|
+| Ingreso | Captura por los mecanismos de entrada disponibles, sin forzar una elección entre modos equivalentes. |
+| Volcados | Archivo de entradas capturadas, selección de un volcado, revisión y edición de transcripciones, historial/versiones y aprobación. |
+| Ingesta | Operación posterior aplicada a una versión aprobada de un volcado; no es una superficie primaria independiente. |
+| Núcleo | Destino posterior de la secuencia de incorporación. |
 
-Ruta canónica: `/sistema/ingreso`
+### 3.3 Compatibilidad de rutas
 
-Modos internos previstos:
+- `/capturar` → `/sistema/ingreso`
+- `/sistema/dictado` → `/sistema/ingreso`
+- `/sistema/editar` → `/sistema/volcados`
+- `/sistema/ingesta` → `/sistema/volcados`
 
-- `nuevo`: crear una entrada.
-- `dictado`: iniciar o reanudar voz.
-- `captura`: compatibilidad con enlaces heredados.
-- `archivo`: importar audio o archivo.
-- `revision`: seleccionar y revisar un volcado.
-- `ingesta`: mostrar y ejecutar la acción final de incorporación.
+La redirección de un alias es compatibilidad técnica, no autorización para preservar una pestaña o modo redundante.
 
-Los modos no crean dominios de nivel 1 ni páginas de producto distintas.
+## 4. Límites y contratos preservados
 
-### 2.2 Workspace objetivo
+- Mantener los mecanismos útiles de captura existentes en Ingreso.
+- Mantener el flujo de revisión, edición, versionado y aprobación en Volcados.
+- Preservar el contrato downstream de `/api/ingesta`: el flujo canónico utiliza `volcado_id`, `version` aprobada y la trazabilidad/hash exigidos por el backend.
+- No restaurar una vía lateral de ingesta directa a partir de texto o archivo que eluda el volcado aprobado.
+- No cambiar el contrato persistente de las APIs salvo necesidad demostrada y tratada como cambio independiente.
+- No declarar que la importación de archivos está resuelta solamente porque se haya eliminado su pestaña; requiere verificación específica del mecanismo funcional que permanezca disponible.
 
-1. **Entrada:** texto/pega, micrófono, Chrome Live Caption y archivo.
-2. **Contenido:** título, transcripción y edición in-situ.
-3. **Revisión:** sugerencias, original, diferencias, versiones y aprobación.
-4. **Finalización:** guardar, aprobar e ingresar a memoria, según el estado del objeto.
+## 5. Criterios de aceptación
 
-La interfaz debe mostrar solo acciones aplicables al estado actual.
+- [x] El registro de navegación coloca `ingreso` primero y `volcados` segundo.
+- [x] Ingreso ya no presenta la navegación interna «Modos de Ingreso».
+- [x] Revisión e ingesta dejan de ser modos de navegación dentro de Ingreso.
+- [x] Los aliases históricos redirigen a sus superficies canónicas.
+- [x] El contrato de ingesta posterior a aprobación se conserva.
+- [x] Typecheck, contrato de navegación, pruebas unitarias y build local pasan en el estado registrado en la sección 6.
+- [ ] Reejecutar y cerrar la suite E2E global; no declarar certificación total mientras exista cualquier fallo sin clasificar.
+- [ ] Verificar de forma específica la capacidad funcional de archivo/importación, porque la especificación original informa que el control Archivo no funcionaba.
+- [ ] Integrar el PR en `main` conforme al proceso normal del repositorio.
+- [ ] Verificar publicación/entorno compartido tras integración cuando la vía de despliegue legítima esté disponible.
 
-## 3. Decisiones de deprecación y fusión
+Una casilla marcada solo acredita la evidencia citada en la sección 6. No implica que los criterios pendientes estén satisfechos.
 
-| Actual | Tratamiento | Resultado |
+## 6. Registro de implementación y pruebas
+
+### 6.1 Implementación registrada
+
+- `khora-web/app/navigation/registry.ts`: orden canónico y aliases.
+- `khora-web/app/components/ingreso/IngresoWorkspace.tsx`: una sola superficie de captura, sin ramas de modo Revisión/Ingesta.
+- `khora-web/app/components/shared/IngresoView.tsx`: etiqueta y descripción canónicas de Ingreso.
+- Rutas históricas `/capturar`, `/sistema/dictado`, `/sistema/editar` y `/sistema/ingesta`: convertidas en redirects.
+- Componentes redundantes `IngresoModeNav`, `IngresoRevisionPanel` e `IngresoIngestaPanel`: eliminados del árbol activo.
+- `khora-web/docs/system-navigation.md`: flujo y semántica de navegación actualizados.
+- `PipelineView` y el contrato backend de `/api/ingesta`: conservados.
+
+### 6.2 Gates locales registrados como satisfactorios
+
+| Gate | Resultado registrado | Alcance |
 |---|---|---|
-| `/sistema/ingreso` | conservar y ampliar | **interfaz canónica** |
-| `/sistema/dictado` | absorber capacidades | alias técnico |
-| `/capturar` | retirar de la navegación | alias técnico |
-| `/sistema/editar` | absorber estación de revisión | alias técnico |
-| `/sistema/ingesta` | absorber acción final | alias técnico |
-| `/sistema/volcados` | conservar | superficie independiente |
-| APIs de entrada | conservar inicialmente | contrato técnico interno |
-
-### 3.1 Aliases de compatibilidad
-
-- `/capturar` → `/sistema/ingreso?modo=captura`
-- `/sistema/dictado` → `/sistema/ingreso?modo=dictado`
-- `/sistema/editar` → `/sistema/ingreso?modo=revision`
-- `/sistema/ingesta` → `/sistema/ingreso?modo=ingesta`
-
-La compatibilidad de ruta no implica que la ruta siga siendo una superficie independiente.
-
-### 3.2 Regla de eliminación
-
-No borrar una implementación hasta demostrar absorción funcional, pruebas equivalentes, aliases, ausencia de referencias de navegación, build/tests verdes y rollback suficiente.
-## 4. Arquitectura técnica prevista
-
-No se deben pegar los 1077 renglones de Dictado dentro de los 1050 de Ingreso. El objetivo es reemplazar cinco superficies por una composición modular, no crear un nuevo monolito.
-
-Composición prevista:
-
-`page.tsx → IngresoWorkspace → captura / transcripción / audio / revisión / persistencia / finalización`
-
-### Componentes previstos
-
-**Shell:** `app/sistema/ingreso/page.tsx`
-
-Resolver modo, cargar estado inicial y componer el workspace.
-
-**Workspace:** `app/components/ingreso/IngresoWorkspace.tsx`
-
-Composición visual del flujo completo.
-
-**Entrada:** componente para texto, micrófono, Chrome Live Caption y archivo.
-
-**Contenido y revisión:** editor unificado, edición in-situ y panel de sugerencias.
-
-**Finalización:** guardar, aprobar e ingresar a memoria.
-
-**Lógica:** extraer funciones de las páginas actuales hacia hooks o módulos de cliente, evitando duplicar estado y refs.
-
-Los nombres exactos de archivos pueden cambiar durante C1; la separación de responsabilidades es lo canónico.
-
-## 5. Pipeline funcional objetivo
-
-### A. Texto / pegar
-
-`texto → entrada → revisión → guardar → aprobar → ingesta`
-
-### B. Micrófono
-
-`micrófono → ASR provisional → audio por partes → checkpoint → Whisper autoritativo → reconciliación → revisión → guardar`
-
-### C. Chrome Live Caption
-
-`Chrome → bridge → señal/transcripción → audio asociado cuando exista → reconciliación → revisión → guardar`
-
-### D. Archivo
-
-`archivo → custodia/transcripción → texto → revisión → guardar`
-
-### E. Revisión de un volcado existente
-
-`lista → seleccionar → cargar versión → editar → sugerencias → nueva versión → aprobar → ingesta`
-
-### F. Recuperación
-
-Toda sesión con checkpoint debe poder reanudarse dentro de Ingreso, sin saltar a `/sistema/dictado`.
-
-**Invariante:** todos los caminos producen el mismo objeto de trabajo y convergen en revisión/finalización.
-## 6. Plan de implementación por ciclos
-
-### C0 · Preflight y congelación de contrato
-
-- Fijar baseline SHA.
-- Revisar dependencias y referencias de las cinco rutas.
-- Inventariar pruebas actuales.
-- Confirmar ausencia de trabajo local ajeno.
-- Resultado: contrato de migración cerrado.
-
-### C1 · Extracción del motor de Ingreso
-
-- Identificar duplicación entre Ingreso y Dictado.
-- Elegir una única implementación autoritativa del pipeline de voz.
-- Extraer lógica reutilizable.
-- Mantener comportamiento mediante pruebas.
-
-### C2 · Workspace unificado
-
-- Construir `IngresoWorkspace`.
-- Integrar texto, micrófono, Chrome y archivo.
-- Integrar edición in-situ.
-- Jerarquizar estados de audio, transcripción y reconciliación.
-- Mostrar solo acciones válidas para el estado actual.
-
-### C3 · Revisión dentro de Ingreso
-
-- Llevar selector de volcados a modo `revision`.
-- Integrar sugerencias de `/api/revision/sugerencias`.
-- Integrar aceptación/rechazo.
-- Integrar historial, delta y aprobación.
-
-### C4 · Ingesta como fase final
-
-- Integrar `/api/ingesta` como acción del objeto.
-- Sustituir abrir Ingesta por `Ingresar a memoria`.
-- Mostrar resultado en la misma sesión.
-- Mantener idempotencia y trazabilidad.
-
-### C5 · Deprecación de superficies
-
-- Retirar entradas secundarias del submenú.
-- Convertir rutas secundarias en aliases.
-- Actualizar manifest/shortcuts y enlaces históricos.
-- Preparar eliminación física solo después de certificación.
-
-### C6 · Certificación
-
-- Typecheck.
-- Unitarias.
-- Contrato de navegación.
-- E2E de flujo completo.
-- E2E de aliases.
-- Responsive 1440/1024/768/390.
-- Build y smoke de producción.
-- Comparar SHA servido con commit publicado.
-## 7. Contratos que deben permanecer intactos
-
-Salvo evidencia de necesidad, el sprint no rediseña:
-
-- `/api/audio` y `/api/audio/[id]`
-- `/api/dictado` y `/api/dictado/checkpoint`
-- `/api/transcribir/sesion` y `/api/transcribir/archivo`
-- `/api/dictado-archivo/titulo`
-- `/api/volcado` y `/api/volcado/[id]`
-- `/api/versiones`
-- `/api/edicion`
-- `/api/revision/sugerencias` y `/api/revision/[id]/aprobar`
-- `/api/ingesta`
-
-La regla es **unificar interfaz y orquestación antes que cambiar contratos persistentes**.
-
-Si dos endpoints demuestran realizar la misma obligación sustancial, su fusión será un subciclo separado con migración propia.
-
-## 8. Pruebas y jueces de aceptación
-
-### Navegación
-
-- Ingreso es la única interfaz visible del dominio.
-- Capturar, Dictado, Edición e Ingesta no aparecen como módulos.
-- Las rutas históricas resuelven el modo equivalente.
-- Volcados continúa independiente.
-
-### Funcionalidad mínima
-
-1. escribir/pegar y guardar;
-2. dictar por micrófono;
-3. captura Chrome;
-4. adjuntar audio;
-5. transcripción autoritativa;
-6. edición manual protegida;
-7. sugerencias de revisión;
-8. guardar nueva versión;
-9. aprobar versión;
-10. ejecutar ingesta;
-11. recuperar checkpoint;
-12. limpiar/reiniciar sin fuga de estado.
-
-### Integridad
-
-- El original permanece recuperable.
-- La edición manual no es sobreescrita por reconciliación.
-- Audio y sesión permanecen vinculados.
-- Las versiones siguen siendo auditables.
-- Aprobación e ingesta conservan su secuencia.
-
-### Responsive
-
-1440×900, 1024×768, 768×900 y 390×844; sin overflow horizontal relevante ni paneles recortados.
-## 9. Criterios de cierre
-
-- [ ] `/sistema/ingreso` es la única interfaz visible del dominio.
-- [ ] Capacidades de las cuatro superficies están absorbidas.
-- [ ] No existen dos motores paralelos de dictado/transcripción.
-- [ ] No se crea un monolito sustituto de la duplicación.
-- [ ] Endpoints persistentes siguen funcionando.
-- [ ] Aliases históricos funcionan.
-- [ ] Navegación canónica actualizada.
-- [ ] Tests unitarios relevantes pasan.
-- [ ] Typecheck pasa.
-- [ ] E2E completo pasa.
-- [ ] E2E responsive pasa.
-- [ ] Build de producción pasa.
-- [ ] Producción sirve exactamente el SHA publicado.
-- [ ] Documentación refleja la arquitectura implementada.
-- [ ] Este objeto queda actualizado con evidencia final.
-
-### No son criterios de cierre
-
-- ocultar las rutas antiguas solo con CSS;
-- conservar código duplicado detrás de aliases;
-- usar un build verde como sustituto de pruebas funcionales;
-- declarar `READY` como prueba de comportamiento no probado.
-
-## 10. Riesgos y controles
-
-**Pantalla monstruo:** separación Shell / Workspace / lógica.
-
-**Pérdida de capacidades de Dictado:** C1 certificado antes de C2.
-
-**Enlaces rotos:** aliases explícitos y pruebas.
-
-**Aprobación o ingesta ambiguas:** máquina de estados visible y acciones condicionadas.
-
-**Edición durante ASR:** conservar protección segmentaria y suspensión/reanudación.
-
-**Duplicación backend:** no fusionar APIs por comodidad.
-
-**Pérdida de contexto:** este archivo es el objeto canónico de recuperación.
-
-**Cierre prematuro:** ningún checkbox se marca por intención; solo por evidencia ejecutada.
-## 11. Rollback
-
-Cada ciclo debe producir commits pequeños y reversibles.
-
-Rollback de UI:
-
-`restore previous workspace → restore navigation → restore aliases`
-
-Rollback de lógica:
-
-`restore previous client modules → retain backend contracts`
-
-No se permite borrar datos, versiones, audio ni registros persistentes como mecanismo de rollback.
-
-## 12. Estrategia de Git
-
-Rama recomendada: `sprint/ingreso-unificado-20261007`
-
-Commits por ciclo:
-
-- C0 · documentación/preflight
-- C1 · consolidación del motor
-- C2 · workspace
-- C3 · revisión
-- C4 · ingesta
-- C5 · deprecación/navegación
-- C6 · certificación/documentación
-
-La integración a `main` solo después de los jueces obligatorios del repositorio.
-
-## 13. Estado operativo
-
-**Estado:** PUBLICACION_EN_PROGRESO
-**Código productivo modificado por este sprint:** SÍ
-**Documento canónico creado:** SÍ
-**Baseline:** `b8ae985da85a0f5eb79fcd6aab5cdb30e8e639d5`
-**Main actualmente validado:** `5dc82b536525c546542509db9694293f6da1885c`
-**Producción modificada por este sprint:** EN PUBLICACIÓN
-**Vercel canónico:** proyecto `khora-web` · scope `victorhugotorresmendez-8991s-projects`
-**Evidencia local:** typecheck 0; 323/323 unitarias; build Next.js 0; build de extensión 0; E2E enfocado 27/29 antes de la corrección final del wrapper global y posteriores correcciones de UI.
-**Criterio de cierre:** la publicación solo se considera terminada cuando Vercel acredita el SHA exacto de main y el smoke de producción finaliza correctamente.
-**Siguiente ciclo autorizado:** verificación de deployment y smoke de producción
-
-### Evidencia C0 · 2026-10-07
-
-- Rama de trabajo: `sprint/ingreso-unificado-20261007` creada desde `b8ae985da85a0f5eb79fcd6aab5cdb30e8e639d5`.
-- Árbol inicial limpio.
-- `git show --stat HEAD` confirma que `b8ae985` solo contiene el objeto canónico del sprint.
-- `npm run typecheck`: exit code 1, sin mensajes de diagnóstico visibles.
-- `npm run test:unit`: exit code 1, sin mensajes de diagnóstico visibles.
-- Se confirmó que `package.json` usa Node/tsx instalados localmente y que existen pruebas unitarias; la causa de los dos códigos 1 queda clasificada como **incidencia preexistente de runner/entorno hasta reproducir diagnóstico** y no se atribuye al sprint.
-- Se preserva el criterio: ningún fallo silencioso se declara resuelto por el sprint sin causa y evidencia.
-
-## 14. Recuperación en nueva conversación
-
-1. Recuperar este archivo desde `docs/sprints/`.
-2. Verificar https://github.com/SeryMente/khora.
-3. Verificar `main` y comparar SHA local/remoto.
-4. Leer §0, §6, §9 y §13 antes de actuar.
-5. Revisar Git antes de modificar.
-6. Determinar la primera fase C0–C6 no cerrada.
-7. Ejecutar esa fase y actualizar este mismo objeto con evidencia.
-8. No reconstruir el objetivo desde memoria si este documento está disponible.
-
-## 15. Decisión arquitectónica resumida
-
-> **Una sola interfaz de Ingreso; múltiples modos internos; un solo objeto de trabajo; un solo pipeline autoritativo; APIs existentes como contratos técnicos; rutas antiguas como compatibilidad temporal; Volcados permanece independiente.**
-
-Esta decisión gobierna el sprint salvo evidencia material en contrario. Toda desviación debe registrarse explícitamente.
-
-## 16. Referencias canónicas
-
-- Repositorio: https://github.com/SeryMente/khora
-- Registro: `khora-web/app/navigation/registry.ts`
-- Navegación: `khora-web/docs/system-navigation.md`
-- Endurecimiento: `khora-web/docs/navigation-hardening-2026-10-07.md`
-- Ingreso: `khora-web/app/sistema/ingreso/page.tsx`
-- Dictado: `khora-web/app/sistema/dictado/page.tsx`
-- Edición: `khora-web/app/sistema/editar/page.tsx`
-- Ingesta: `khora-web/app/sistema/ingesta/page.tsx`
-- Captura histórica: `khora-web/app/capturar/page.tsx`
-
-
-### Evidencia de publicación · 2026-10-08
-
-- Main contiene la superficie canónica única de Ingreso y sus modos internos.
-- Rutas históricas de Capturar, Dictado, Edición e Ingesta permanecen como compatibilidad temporal.
-- KhoraShell ya no anida un `<main>` de página dentro de otro `<main>`, eliminando la causa común del hydration mismatch observado.
-- Revisión e Ingesta tienen contención responsive; Ingesta valida MIME en aplicación sin filtro nativo que impida la prueba de tipos inválidos.
-- La certificación E2E fue ejecutada hasta 27/29 antes de la corrección final del wrapper; no se declara verde hasta completar el siguiente ciclo.
+| `npm.cmd run typecheck` | PASS | TypeScript |
+| `npm.cmd run ui:contract` | PASS | Jerarquía, cobertura, enlaces, aliases y rutas |
+| `npm.cmd run test:unit` | PASS | 328 pruebas unitarias |
+| `npm.cmd run build` con `AUTH_SECRET` local de sesión | PASS | Build de producción local |
+| `e2e/shell-v2.spec.ts` en modo producción local | PASS · 3/3 | Navegación primaria y menús |
+| `e2e/ui-quality.spec.ts` filtrado a orden y aliases | PASS · 4/4 | Escritorio/móvil, jerarquía y compatibilidad |
+| `e2e/contracts/ingreso.spec.ts` y `dictado.spec.ts` | PASS · 2/2 | Contrato UI de Ingreso/Dictado |
+
+### 6.3 Pruebas globales pendientes y límites de evidencia
+
+- La suite completa de `e2e/ui-quality.spec.ts` no se ha vuelto a ejecutar después de la corrección de hidratación y apertura de menús.
+- Una ejecución global anterior registró **7 fallos y 10 aprobaciones** antes de la corrección; entre las causas identificadas estaba `/ui-review/estatico` devolviendo 404. No debe presentarse ese resultado como una suite completa satisfactoria.
+- Las validaciones dirigidas posteriores sí pasaron, pero no reemplazan la ejecución global.
+- Los endpoints de API que requieren sesión devolvieron 401 en una comprobación local sin sesión; la página Volcados renderizó y manejó la lista no disponible. No se modificó la autenticación para ocultar este límite.
+- Los proveedores de preview del PR informaron una restricción de plan para repositorio privado de organización. Esto limita el preview externo; no invalida por sí mismo el build local.
+
+## 7. Fases y referencias canónicas del repositorio
+
+### Fase A · Canonización de la especificación
+- Objeto de sprint: https://github.com/SeryMente/khora/blob/refactor/ingreso-volcados-consolidacion-20261008/docs/sprints/SPR-INGRESO-UNIFICADO-20261007.md
+- PR de implementación: https://github.com/SeryMente/khora/pull/290
+
+### Fase B · Navegación primaria y aliases
+- Registro: https://github.com/SeryMente/khora/blob/refactor/ingreso-volcados-consolidacion-20261008/khora-web/app/navigation/registry.ts
+- Contrato automatizado: https://github.com/SeryMente/khora/blob/refactor/ingreso-volcados-consolidacion-20261008/khora-web/scripts/check_navigation_contract.ts
+- Pruebas unitarias: https://github.com/SeryMente/khora/blob/refactor/ingreso-volcados-consolidacion-20261008/khora-web/tests/unit/system_navigation_hardened.test.ts
+
+### Fase C · Workspace de captura
+- Workspace: https://github.com/SeryMente/khora/blob/refactor/ingreso-volcados-consolidacion-20261008/khora-web/app/components/ingreso/IngresoWorkspace.tsx
+- Vista compartida: https://github.com/SeryMente/khora/blob/refactor/ingreso-volcados-consolidacion-20261008/khora-web/app/components/shared/IngresoView.tsx
+
+### Fase D · Contrato de Volcados e Ingesta
+- Superficie de Volcados: https://github.com/SeryMente/khora/blob/refactor/ingreso-volcados-consolidacion-20261008/khora-web/app/components/volcados/PipelineView.tsx
+- Endpoint de ingesta: https://github.com/SeryMente/khora/blob/refactor/ingreso-volcados-consolidacion-20261008/khora-web/app/api/ingesta/route.ts
+
+### Fase E · Navegación documentada y certificación
+- Documento de navegación: https://github.com/SeryMente/khora/blob/refactor/ingreso-volcados-consolidacion-20261008/khora-web/docs/system-navigation.md
+- E2E de navegación: https://github.com/SeryMente/khora/blob/refactor/ingreso-volcados-consolidacion-20261008/khora-web/e2e/shell-v2.spec.ts
+- Calidad UI: https://github.com/SeryMente/khora/blob/refactor/ingreso-volcados-consolidacion-20261008/khora-web/e2e/ui-quality.spec.ts
+
+## 8. Historial de decisiones del objeto
+
+- **v0.1.0 · Interpretación inicial (supersedida):** planteaba una sola interfaz de Ingreso con modos internos para Revisión e Ingesta.
+- **v0.2.0 · Especificación canónica verbatim:** Ingreso queda como captura; Volcados recibe revisión/edición y la secuencia posterior; Ingesta se trata como procedimiento downstream, manteniendo el orden primario Ingreso → Volcados.
+
+No se debe reactivar una decisión de v0.1.0 sin una nueva instrucción explícita del usuario y una versión posterior del objeto canónico.
