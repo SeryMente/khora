@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   const email = await authorizedUser(req);
   if (!email) return NextResponse.json({ error: "not_authorized" }, { status: 401, headers: NO_STORE });
-  if (req.headers.get("origin") && req.headers.get("origin") !== req.nextUrl.origin) {
+  if (req.headers.get("origin") !== req.nextUrl.origin) {
     return NextResponse.json({ error: "invalid_request" }, { status: 403, headers: NO_STORE });
   }
   try {
