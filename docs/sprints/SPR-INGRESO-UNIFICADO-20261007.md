@@ -150,7 +150,7 @@ Una casilla marcada solo acredita la evidencia citada en la sección 6. No impli
 - Vista compartida: https://github.com/SeryMente/khora/blob/refactor/ingreso-volcados-consolidacion-20261008/khora-web/app/components/shared/IngresoView.tsx
 
 ### Fase D · Contrato de Volcados e Ingesta
-- Superficie de Volcados: https://github.com/SeryMente/khora/blob/refactor/ingreso-volcados-consolidacion-20261008/khora-web/app/components/volcados/PipelineView.tsx
+- Superficie de Volcados: https://github.com/SeryMente/khora/blob/refactor/ingreso-volcados-consolidacion-20261008/khora-web/app/components/shared/PipelineView.tsx
 - Endpoint de ingesta: https://github.com/SeryMente/khora/blob/refactor/ingreso-volcados-consolidacion-20261008/khora-web/app/api/ingesta/route.ts
 
 ### Fase E · Navegación documentada y certificación
