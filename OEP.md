@@ -2,8 +2,8 @@
 
 **Identificador:** OEP  
 **Nombre completo:** Persistencia de Entorno Operativo  
-**Versión:** v0.1.6
-**Nombre de versión:** Bóveda GitHub Cifrada y Acceso Maestro Limitado a OEP
+**Versión:** v0.1.7
+**Nombre de versión:** Compatibilidad de Credenciales GitHub y Verificación de CI Pendiente
 **Estado:** ACTIVO · CANÓNICO PARA ESTE ÁMBITO · EN EVOLUCIÓN CONTROLADA  
 **Sistema emisor:** KHORA  
 **Plataforma objetivo actual:** Windows
@@ -458,12 +458,23 @@ Toda modificación material debe aumentar versión, conservar historial, indicar
 
 La ausencia de contexto conversacional no autoriza a reconstruir decisiones fuera de este objeto o de sus fuentes canónicas.
 
-## 60. Ciclo operativo 005 — Bóveda GitHub cifrada y acceso maestro OEP
+## 60. Ciclo operativo 005 — UI de Cora, bóveda GitHub cifrada y acceso maestro OEP
 
-**Antes →** el bootstrap pedía un PAT en el portapapeles y el módulo EP exigía OIDC para emitir una sesión. No existía un flujo de UI para guardar el PAT cifrado y recuperarlo bajo autorización EP.
+**Antes →** el bootstrap pedía un token de GitHub por portapapeles si no había GitHub CLI autenticado y el módulo EP exigía OIDC para emitir una sesión. No existía un flujo de UI para guardar la credencial cifrada y recuperarla bajo autorización EP.
 
-**Cambio →** la rama `feat/ep-github-token-vault-ui` agrega una UI para cargar/rotar/borrar la credencial, validación del acceso al conjunto de repositorios requerido, almacenamiento AES-256-GCM en la BD, endpoint Bearer para entregar el PAT al launcher, puerta de contraseña maestra limitada a EP, migración 017, tests de contrato y actualización del PowerShell embebido.
+**Cambio →** la rama `feat/ep-github-token-vault-ui` agrega una UI para cargar/rotar/borrar la credencial, validar usuario y seis repositorios, cifrar con AES-256-GCM en base de datos, entregar el secreto por HTTPS a un Bearer EP con scope `ep:github:token`, puerta de contraseña maestra limitada a EP, migración 017, tests estáticos y actualización sincronizada del PowerShell embebido. Conserva los tres prefijos que admitía el bootstrap anterior: PAT clásico `ghp_`, PAT granular `github_pat_` y token OAuth `gho_`; no crea una ruta canónica alternativa ni una GitHub App.
 
-**Motivo →** eliminar el reingreso interactivo del PAT, evitar exponerlo en interfaz/clipboard/historial/logs y permitir iniciar OEP desde Cybernet sin iniciar OIDC en cada uso, manteniendo OIDC para KHORA global.
+**Motivo →** cumplir la precisión del usuario: el path existente ya está configurado; faltaba una interfaz de Cora para introducir el token como secreto, cifrarlo y hacerlo disponible al comando PowerShell servido por Cora, sin reingresarlo en Cybernet.
 
-**Resultado →** implementación propuesta en PR #292, commit de cabecera al momento del registro: `7c323af13076bb9efe004af713d0e575e1c741bd`. El PR incluye cambios posteriores en docs y requiere reconsultar su SHA actual. No se invocó Vercel, RDC ni implementación local. CI, aplicación de migración, configuración inicial de contraseña desde OIDC, carga inicial del PAT y arranque real en Windows PowerShell 5.1 permanecen NO VERIFICADOS. El PAT granular debe poseer Contents: Read and write y Metadata: Read en todos los repositorios que vayan a materializarse; las respuestas de metadatos por sí solas no prueban los scopes efectivos de escritura.
+**Resultado →** propuesta en PR #292, rama `feat/ep-github-token-vault-ui`, cabecera observada `009fc2d5952285193e45732b52de92f95d545e55`; PR abierto y draft, no integrado ni desplegado. Los workflows `CI`, `Khora Single Script Guard`, `khora-ok / gate` y `UI Quality` fallaron en esa cabecera y también después de reintentar los jobs fallidos desde GitHub; no fue posible recuperar los logs por respuesta 404 `BlobNotFound`. No se ha ejecutado PowerShell 5.1 en un host real, no se aplicó la migración en producción, no se configuró una contraseña maestra real ni se cargó la credencial real. El PAT granular debe tener `Contents: Read and write` y `Metadata: Read` en los repositorios requeridos; el metadata API no prueba por sí solo los scopes de escritura.
+
+## 61. Ciclo operativo 006 — Compatibilidad de prefijos y reintento de workflows
+
+**Antes →** el código nuevo solo admitía PAT clásicos y granulares, aunque el bootstrap previo también aceptaba tokens OAuth `gho_`; el estado de CI de la rama no estaba diagnosticado porque el conector no podía recuperar los logs.
+
+**Cambio →** se restableció el prefijo `gho_` en la validación del servidor, el PowerShell, la UI y la redacción de secretos en logs. El PowerShell embebido se regeneró del fuente y se verificó equivalencia tras normalizar los finales de línea. Se refrescaron los hashes de los archivos afectados y las pruebas de contrato ahora comprueban la compatibilidad del prefijo.
+
+**Motivo →** conservar la compatibilidad del mecanismo que ya funcionaba y evitar que cargar el token en la bóveda introduzca una regresión de prefijos o haga divergir el script servido del fuente.
+
+**Resultado →** commit de cabecera observado `009fc2d5952285193e45732b52de92f95d545e55`; manifiesto con 606 entradas y hashes del ciclo refrescados. Los cuatro workflows se reintentaron mediante GitHub y terminaron de nuevo en fallo; los logs de los siete jobs dieron `BlobNotFound`. No se puede afirmar que los tests pasen ni que la implementación esté certificada. `OEP-PENDING-001` continúa abierto hasta que se diagnostique CI con logs utilizables, se aplique la migración en el entorno autorizado y se valide el recorrido completo con Windows PowerShell 5.1 y una escritura efectiva de GitHub.
+
