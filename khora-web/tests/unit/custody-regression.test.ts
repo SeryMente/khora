@@ -402,14 +402,14 @@ test("CUSTODY-08: verified imported audio can be archived even when transcriptio
 test("CUSTODY-09: Ingreso exposes export only for verified imported audio and server re-verifies the original", () => {
   const workspace = readFileSync(resolve(process.cwd(), "app/components/ingreso/IngresoWorkspace.tsx"), "utf8");
   assert.match(workspace, /fuenteEntradaSesionRef\.current === "audio_archivo"/);
-  assert.match(workspace, /onExportarAudio: exportarAudioOriginal/);
-  assert.match(workspace, /audioExportable:/);
+  assert.ok(workspace.includes("onExportarAudio: exportarAudioOriginal"));
+  assert.ok(workspace.includes("audioExportable:"));
 
   const exportRoute = readFileSync(resolve(process.cwd(), "app/api/audio/sesion/[id]/exportar/route.ts"), "utf8");
-  assert.match(exportRoute, /evaluarCustodiaAudio/);
-  assert.match(exportRoute, /descifrarBytes/);
+  assert.ok(exportRoute.includes("evaluarCustodiaAudio"));
+  assert.ok(exportRoute.includes("descifrarBytes"));
   assert.match(exportRoute, /sha !== String\(part\.sha256/);
-  assert.match(exportRoute, /desbloqueoVigente/);
+  assert.ok(exportRoute.includes("desbloqueoVigente"));
 });
 
 test("CUSTODY-07: verification failures never delete stored audio and staging is deleted only after verified linkage", () => {
