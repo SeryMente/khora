@@ -182,3 +182,38 @@ def test_consulta_valida():
     assert "suficiencia" in data
     assert "nodos" in data["subgrafo"]
     assert "aristas" in data["subgrafo"]
+
+def test_ingesta_concurrent_identity_conflict_requires_identity_constraint():
+    assert api_main._is_identity_constraint_conflict(
+        RuntimeError("constraint violation: unique InformationObject io_id")
+    )
+    assert api_main._is_identity_constraint_conflict(
+        RuntimeError("already exists canonical_key")
+    )
+    assert not api_main._is_identity_constraint_conflict(
+        RuntimeError("timeout talking to the model provider")
+    )
+    assert not api_main._is_identity_constraint_conflict(
+        RuntimeError("constraint violation on unrelated relationship")
+    )
+
+
+def test_ingesta_concurrent_retry_requires_exact_provenance_tuple():
+    record = {"v": "00000000-0000-0000-0000-000000000001", "ver": 3, "s": "a" * 64}
+    assert api_main._same_ingesta_provenance_tuple(
+        record, "00000000-0000-0000-0000-000000000001", 3, "A" * 64
+    )
+    assert not api_main._same_ingesta_provenance_tuple(
+        record, "00000000-0000-0000-0000-000000000002", 3, "a" * 64
+    )
+    assert not api_main._same_ingesta_provenance_tuple(
+        record, "00000000-0000-0000-0000-000000000001", 4, "a" * 64
+    )
+    assert not api_main._same_ingesta_provenance_tuple(
+        record, "00000000-0000-0000-0000-000000000001", 3, "b" * 64
+    )
+    assert not api_main._same_ingesta_provenance_tuple(
+        {"v": None, "ver": "invalid", "s": None},
+        "00000000-0000-0000-0000-000000000001", 3, "a" * 64
+    )
+
