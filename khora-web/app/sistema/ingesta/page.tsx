@@ -1,5 +1,5 @@
-import { IngresoIngestaPanel } from "../../components/ingreso/IngresoIngestaPanel";
+import { redirect } from "next/navigation";
 
 export default function IngestaPage() {
-  return <IngresoIngestaPanel />;
+  redirect("/sistema/volcados");
 }
