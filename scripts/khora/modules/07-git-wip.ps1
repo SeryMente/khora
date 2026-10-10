@@ -7,10 +7,16 @@ function Invoke-GitTokenCommand {
         $askPass=Join-Path $env:TEMP ('khora-askpass-'+[guid]::NewGuid().ToString('N')+'.cmd')
         $body="@echo off`r`nif /I `%~1==`"Username for 'https://github.com':`" (echo x-access-token) else (echo `%KHORA_GIT_TOKEN`%)`r`n"
         [IO.File]::WriteAllText($askPass,$body,(New-Object Text.ASCIIEncoding))
+        $oldGcmInteractive=$env:GCM_INTERACTIVE;$oldGitPrompt=$env:GIT_TERMINAL_PROMPT
         try {
-            $env:KHORA_GIT_TOKEN=$token;$env:GIT_ASKPASS=$askPass;$env:GIT_TERMINAL_PROMPT='0'
-            $script:GitOutput=@(& git -C $RepositoryPath @Arguments 2>&1);$script:GitExit=$LASTEXITCODE
-        } finally { Remove-Item Env:KHORA_GIT_TOKEN,Env:GIT_ASKPASS -ErrorAction SilentlyContinue;Remove-Item -LiteralPath $askPass -Force -ErrorAction SilentlyContinue }
+            $env:KHORA_GIT_TOKEN=$token;$env:GIT_ASKPASS=$askPass;$env:GIT_TERMINAL_PROMPT='0';$env:GCM_INTERACTIVE='Never'
+            $script:GitOutput=@(& git -c credential.helper= -C $RepositoryPath @Arguments 2>&1);$script:GitExit=$LASTEXITCODE
+        } finally {
+            Remove-Item Env:KHORA_GIT_TOKEN,Env:GIT_ASKPASS -ErrorAction SilentlyContinue
+            if($null -eq $oldGcmInteractive){Remove-Item Env:GCM_INTERACTIVE -ErrorAction SilentlyContinue}else{$env:GCM_INTERACTIVE=$oldGcmInteractive}
+            if($null -eq $oldGitPrompt){Remove-Item Env:GIT_TERMINAL_PROMPT -ErrorAction SilentlyContinue}else{$env:GIT_TERMINAL_PROMPT=$oldGitPrompt}
+            Remove-Item -LiteralPath $askPass -Force -ErrorAction SilentlyContinue
+        }
     }|Out-Null
     return [pscustomobject]@{Code=$script:GitExit;Output=@($script:GitOutput)}
 }
