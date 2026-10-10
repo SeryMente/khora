@@ -168,7 +168,7 @@ function Remove-KhoraPythonMachineRegistration {
             $location=[string]$props.InstallLocation
             if([string]::IsNullOrWhiteSpace($location)){continue}
             try{$location=[IO.Path]::GetFullPath($location).TrimEnd('\')}catch{continue}
-            if([string]::Compare($location,$target,[StringComparison]::OrdinalIgnoreCase)-eq0-and[string]$props.DisplayName-match'(?i)^Python 3\.11'){
+            if ([string]::Compare($location,$target,[StringComparison]::OrdinalIgnoreCase) -eq 0 -and ([string]$props.DisplayName) -match '(?i)^Python 3\.11') {
                 Remove-Item -LiteralPath $entry.PSPath -Recurse -Force -ErrorAction Stop
                 Info ('Removed temporary machine Python uninstall registration at '+$target)
             }
