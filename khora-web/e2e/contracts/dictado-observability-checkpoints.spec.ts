@@ -102,12 +102,20 @@ test("dictation checkpoints persist start, immediate inline-edit pause, resume, 
     { timeout: 7000 },
   ).toBeTruthy();
 
+  await page.locator('[data-ui-id="ingreso.btn-detener"]').click();
+  await expect.poll(
+    () => recordedEvents.some((event) => event.event_name === "DICTADO_DETENIDO"),
+    { timeout: 7000 },
+  ).toBeTruthy();
+
   const requiredCheckpoints = [
     "DICTADO_INICIO_SOLICITADO",
     "DICTADO_INICIO_ACEPTADO",
     "EDICION_IN_SITU_INICIADA",
     "DICTADO_PAUSA_POR_EDICION",
     "DICTADO_PAUSADO_POR_EDICION",
+    "DICTADO_DETENCION_SOLICITADA",
+    "DICTADO_DETENIDO",
     "EDICION_IN_SITU_CIERRE_INICIADO",
     "EDICION_IN_SITU_CONFIRMADA",
     "REANUDACION_POR_EDICION_SOLICITADA",

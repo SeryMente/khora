@@ -548,3 +548,11 @@ La lectura de vuelta tras el commit C004 confirma que la corrección de tipo de 
 
 El fallo de infraestructura de ejecución sigue siendo un impedimento objetivo para cerrar verificación automatizada. No se cambia código de workflows ni permisos del repositorio como parte de esta tarea de observabilidad. La implementación está publicada y leída de vuelta; las pruebas están definidas pero no ejecutadas por CI, y el acceso MCP/persistencia real permanecen pendientes.
 
+
+
+### Addendum de cierre de cobertura E2E — base 63c08bff331456bc8834994f62e8ac899f073061
+
+Se amplió la prueba E2E para cubrir también la parada normal después del ciclo edición/reanudación. Ahora la prueba espera DICTADO_DETENCION_SOLICITADA y DICTADO_DETENIDO con el selector estable ingreso.btn-detener, además de verificar inicio, pausa por edición, confirmación, reanudación, callback de la instancia antigua y ausencia del texto en la telemetría. El test sigue aislado mediante interceptación de POST /api/eventos y /api/dictado/checkpoint; no representa una prueba de persistencia contra la base real y aún no ha sido ejecutado por un runner.
+
+Blob de la E2E ampliada: 143af621028ce1e775ecd5b35d8c17654e603ecf.
+
