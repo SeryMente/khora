@@ -29,7 +29,7 @@ function buildWindowsLauncherCommand(apiBase: string): string {
     "$secure|ConvertFrom-SecureString|Set-Content -LiteralPath $tf -Encoding ASCII",
     "$k=$null",
     "Remove-Variable k,secure -ErrorAction SilentlyContinue",
-    "& $winps -NoProfile -ExecutionPolicy Bypass -File $p -Bootstrap -KhoraTokenFile $tf -KhoraApiBase $b",
+    "& $winps -NoProfile -ExecutionPolicy Bypass -File $p -Bootstrap -KhoraTokenFile $tf -KhoraApiBase $b -KhoraExpectedExecutionIdentity $execIdentity",
     "if($LASTEXITCODE-ne0){throw ('KHORA_BOOTSTRAP_EXIT_'+$LASTEXITCODE)}",
   ].join(";");
   const cleanup = [
