@@ -372,7 +372,7 @@ El paquete final incluye `ep-integrity-manifest.sha256`, calculado después de t
 
 **Antes:** el primer borrador de la UI permitía que cualquier sesión con la cookie maestra OEP intentara cargar, rotar o eliminar la credencial GitHub. Aunque el servicio validaba la sesión EP, esa capacidad ampliaba indebidamente la autoridad de la contraseña maestra sobre un secreto de larga duración.
 
-**Cambio:** la API `GET /api/ep/github-credential` permite a una sesión maestra válida consultar solo el estado redactado (cuenta, sufijo, repositorios y fecha). Las operaciones `POST` y `DELETE` requieren una sesión OIDC autorizada y un `Origin` coincidente. La UI usa el campo `canManage` para ocultar los controles de administración en sesiones maestras. Tras guardar o borrar, la UI conserva el permiso de administración durante la sesión OIDC actual.
+**Cambio:** la API `GET /api/ep/github-credential` permite a una sesión maestra válida consultar solo el estado redactado (cuenta, sufijo, repositorios y fecha). Las operaciones `POST` y `DELETE` requieren una sesión OIDC autorizada y un `Origin` coincidente. La emisión de sesión en `POST /api/ep/token`, cuando depende de la cookie maestra en vez de OIDC, también exige `Origin` idéntico al origen de la petición. La UI usa el campo `canManage` para ocultar los controles de administración en sesiones maestras. Tras guardar o borrar, la UI conserva el permiso de administración durante la sesión OIDC actual.
 
 **Motivo:** mantener OIDC como autoridad de administración y reservar la contraseña maestra para el acceso diario limitado a OEP. La cookie maestra permite arrancar EP y consumir la credencial a través del JWT EP con scope `ep:github:token`, pero no gestionar directamente el token persistente.
 
