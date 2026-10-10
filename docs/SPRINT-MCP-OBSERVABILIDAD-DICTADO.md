@@ -564,3 +564,11 @@ La inspección de .github/workflows/ui-quality.yml mostró que el job UI E2E inv
 
 La revisión de workflows después del cambio continúa bloqueada por el problema preexistente de asignación: runs concluyen como failure en dos segundos, runner_id=0 y cero pasos. La E2E ya está conectada al workflow, pero no se afirma que haya sido ejecutada.
 
+
+
+### Ajuste final de selector E2E — base e5ef3ba910642a0e5851f53fc99b1bd2ba5c6d93
+
+Se reemplazó la aserción inicial genérica sobre h1 por la disponibilidad del control estable ingreso.btn-iniciar, evitando dependencia del número de encabezados de la página. La E2E sigue incluyendo la parada normal después de validar la secuencia de pausa/reanudación.
+
+Blob actualizado de la E2E: 745441c25acc95c0c9c88ca68c4af0b80ab62c50.
+

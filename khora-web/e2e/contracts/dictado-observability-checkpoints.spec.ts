@@ -76,7 +76,7 @@ test("dictation checkpoints persist start, immediate inline-edit pause, resume, 
   });
 
   await page.goto("/sistema/ingreso?modo=dictado");
-  await expect(page.locator("h1")).toBeVisible();
+  await expect(page.locator('[data-ui-id="ingreso.btn-iniciar"]')).toBeVisible();
   await page.locator('[data-ui-id="ingreso.btn-iniciar"]').click();
   await expect.poll(
     () => recordedEvents.some((event) => event.event_name === "RECONOCEDOR_INICIADO"),
