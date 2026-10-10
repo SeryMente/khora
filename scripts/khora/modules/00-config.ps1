@@ -39,7 +39,7 @@ $ROOT_DIR = [string]$script:SESSION.outerDir
 $WORK_DIR = [string]$script:SESSION.workDir
 $REPO_DIR = [string]$script:SESSION.repoDir
 $WORKSPACE_DIR = if ($script:SESSION.workspaceDir) { [string]$script:SESSION.workspaceDir } else { Join-Path $WORK_DIR 'EP' }
-$DESKTOP_EP_LINK = if ($script:SESSION.desktopWorkspaceLink) { [string]$script:SESSION.desktopWorkspaceLink } else { Join-Path ([string][Environment]::GetFolderPath([Environment+SpecialFolder]::Desktop)) 'EP' }
+$DESKTOP_EP_LINK = if ($script:SESSION.desktopWorkspaceLink) { [string]$script:SESSION.desktopWorkspaceLink } elseif ($script:DATA_PROFILE_MODE -eq 'fila4-profile-tree') { Join-Path (Join-Path $script:DATA_PROFILE_ROOT 'Desktop') 'EP' } else { Join-Path ([string][Environment]::GetFolderPath([Environment+SpecialFolder]::Desktop)) 'EP' }
 $STATE_DIR = [string]$script:SESSION.stateDir
 $LOG_FILE = [string]$script:SESSION.logFile
 $JSON_LOG = [string]$script:SESSION.jsonLog
@@ -56,6 +56,7 @@ if (Test-Path -LiteralPath $script:HOST_PROFILE_PATH -PathType Leaf) {
 }
 $TOOLS_DIR = Join-Path $WORK_DIR 'tools'
 $env:KHORA_EP_LAUNCH_MODE = $script:LAUNCH_MODE
+$env:KHORA_EP_DATA_PROFILE_MODE = $script:DATA_PROFILE_MODE
 $env:TEMP = Join-Path $WORK_DIR 'tmp'
 $env:TMP = $env:TEMP
 $env:GH_CONFIG_DIR = Join-Path $STATE_DIR 'gh'
