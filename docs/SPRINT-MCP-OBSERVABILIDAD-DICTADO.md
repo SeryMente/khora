@@ -457,7 +457,7 @@ Cada ciclo puede incluir varias entradas de evidencia, pero no debe omitir ningu
 **Estado general:** ABIERTO · IMPLEMENTACIÓN DE OBSERVABILIDAD DEL DICTADO EN VALIDACIÓN.  
 **S0:** VERIFICADO. Objeto canónico en KHORA y entrada en README comprobados por read-back.  
 **S1:** acceso MCP autenticado y consulta de registros reales siguen pendientes.  
-**S2:** instrumentación del dictado, contrato USER_DATA, cola de envío con reintento y pruebas unitarias/E2E están publicadas y leídas de vuelta en C003/C004. Las suites aún no se ejecutan: GitHub Actions termina con runner_id=0 y cero pasos; CI, persistencia real y producción quedan PENDIENTES DE VERIFICACIÓN.  
+**S2:** instrumentación del dictado, contrato USER_DATA, cola de envío con reintento y pruebas unitarias/E2E están publicadas y leídas de vuelta. Los reintentos más recientes de CI/UI Quality siguen fallando antes de iniciar pasos (runner_id=0); CI, persistencia real y producción permanecen PENDIENTES DE VERIFICACIÓN.  
 **El bug de dictado no está diagnosticado ni corregido en este sprint.**  
 **No se ha probado una conexión MCP autenticada ni runtime de producción en este ciclo.**  
 **No se afirma despliegue ni verificación de producción.**
@@ -522,4 +522,29 @@ El objeto se conserva como texto canónico portable. Para cualquier afirmación 
 - khora-web/e2e/contracts/dictado-observability-checkpoints.spec.ts: blob a84b6e5c977bf595765a0bfa38a070966d7f4abc; 4949 caracteres, 134 líneas.
 
 **Estado del ciclo:** implementación y pruebas escritas publicadas; revisión estática y read-back completados; CI, persistencia real y producción pendientes de verificación. El próximo paso técnico es recuperar la ejecución de GitHub Actions para que CI/UI Quality asignen runners, ejecuten las suites y expongan logs. Después se debe comprobar la ingestión durable en un entorno autorizado y consultar esos eventos a través del MCP real antes de abordar la corrección funcional del dictado.
+
+
+
+## Addendum de verificación final de C004 · 2026-10-10
+
+La lectura de vuelta tras el commit C004 confirma que la corrección de tipo de timer también quedó publicada. En este punto el HEAD de main fue 3b1b27cf0ac4e6c308475f500cee75b6028bffe8 (docs(observability): record readback and CI execution limits); el único código respecto del HEAD previo cambia el tipo de retorno de los timers del colector a ReturnType<typeof window.setTimeout>. La auditoría de métricas continuó sin claves utilizadas fuera de ALLOWED_METRICS: 68 puntos literales, 61 nombres de evento distintos y cero nombres de evento que coincidan con los patrones de fuga probados.
+
+**Read-back exacto de main al HEAD 3b1b27cf0ac4e6c308475f500cee75b6028bffe8:**
+- khora-web/lib/client/dictado-observability.ts — blob 96ad3e77cd03ffd8ecfb490358d4ab1b6289939d; 10,694 caracteres / 263 líneas.
+- khora-web/tests/unit/dictado_observability.test.ts — blob 5501f55e07c8a9fa550fa31e0016458084539d12; 7,914 caracteres / 188 líneas.
+- khora-web/app/components/ingreso/IngresoWorkspace.tsx — blob 9eb3d878504322f07db8607b5cfe7f8f548b8cc6; 68,862 caracteres / 1,449 líneas.
+- khora-web/lib/contracts/observation.ts — blob 7f6b0d606af00acc80f3845eaf73fa1b773382cb; 3,781 caracteres / 103 líneas.
+- khora-web/lib/server/eventos.ts — blob 48f81945bebf4728fbdcfcdddebbccc93293029c; 20,217 caracteres / 660 líneas.
+- khora-web/tests/unit/eventos_durables.test.ts — blob fd73a1d0194f53ff51a73ee3f7e83d38bbb48342; 13,781 caracteres / 403 líneas.
+- khora-web/e2e/contracts/dictado-observability-checkpoints.spec.ts — blob a84b6e5c977bf595765a0bfa38a070966d7f4abc; 4,949 caracteres / 134 líneas.
+- docs/SPRINT-MCP-OBSERVABILIDAD-DICTADO.md (antes de este addendum) — blob 132acbed4cc956a6a81ed92cc38a5b9682ea54c6; 58,109 caracteres / 526 líneas.
+- Versión de paquete observada en khora-web/package.json: 0.3.8; no se incrementó el release del producto porque el build, las pruebas y el despliegue no pudieron verificarse.
+
+**Nueva evidencia de workflows para el HEAD 3b1b27cf0ac4e6c308475f500cee75b6028bffe8:**
+- CI: run 38076870773, intento 2, failure. Los jobs 114285689046 (khora-web-gate), 114285689218 (calidad) y 114285689298 (api-tests) terminaron entre 18:43:09Z y 18:43:11Z, cada uno con runner_id=0 y cero pasos.
+- UI Quality: run 38076870781, intento 2, failure. Los jobs 114285699743 (UI E2E) y 114285699909 (UI Contract) terminaron entre 18:43:12Z y 18:43:14Z, también con runner_id=0 y cero pasos.
+- Se volvió a solicitar el reintento de ambos workflows; ambos quedaron en el mismo resultado. La descarga de logs del job 114285689046 volvió a devolver HTTP 404 BlobNotFound, por lo que no hay mensaje remoto que identifique la causa del rechazo al asignar runner.
+- Deploy to Production (Vercel), run 38076870776, falló igualmente sin runner/pasos. No se afirma despliegue en producción.
+
+El fallo de infraestructura de ejecución sigue siendo un impedimento objetivo para cerrar verificación automatizada. No se cambia código de workflows ni permisos del repositorio como parte de esta tarea de observabilidad. La implementación está publicada y leída de vuelta; las pruebas están definidas pero no ejecutadas por CI, y el acceso MCP/persistencia real permanecen pendientes.
 
