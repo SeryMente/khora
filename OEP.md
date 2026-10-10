@@ -482,7 +482,7 @@ La ausencia de contexto conversacional no autoriza a reconstruir decisiones fuer
 
 **Antes →** la primera implementación de la bóveda autorizaba cargar y eliminar el token con la cookie maestra OEP, extendiendo su autoridad sobre un secreto persistente más allá del uso necesario para arrancar EP.
 
-**Cambio →** GET /api/ep/github-credential devuelve canManage: OIDC puede administrar; una sesión maestra solo consulta el estado no sensible. POST y DELETE exigen OIDC y validación de origen. La UI oculta controles de administración cuando canManage es falso, manteniendo el uso del token existente para el bootstrap. Se añadieron aserciones de contrato y se documentó la arquitectura v1.0.6.
+**Cambio →** GET /api/ep/github-credential devuelve canManage: OIDC puede administrar; una sesión maestra solo consulta el estado no sensible. POST y DELETE exigen OIDC y validación de origen. La emisión mediante POST /api/ep/token, cuando usa la cookie maestra como principal en vez de OIDC, también exige Origin coincidente. La UI oculta controles de administración cuando canManage es falso, manteniendo el uso del token existente para el bootstrap. Se añadieron aserciones de contrato y se documentó la arquitectura v1.0.6.
 
 **Motivo →** impedir que la contraseña maestra se convierta en un mecanismo de administración de secretos de larga duración, manteniendo la separación entre OIDC global y el acceso operativo OEP.
 
