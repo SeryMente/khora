@@ -1,4 +1,4 @@
-# Entorno Persistente Medio · Arquitectura canónica v1.0.5
+# Entorno Persistente Medio · Arquitectura canónica v1.0.6
 
 **Estado:** normativa · actualización 1.0.4
 **Host KHORA:** 7.5.3
@@ -366,3 +366,14 @@ El paquete final incluye `ep-integrity-manifest.sha256`, calculado después de t
 **Motivo:** evitar volver a pegar un secreto de larga duración en una terminal compartida sin exponer el PAT en HTML, JavaScript, URL, clipboard, historial de comandos, argumentos del proceso o registros. La contraseña OEP reduce fricción solo para EP y no reemplaza la identidad global de Khôra.
 
 **Resultado:** la rama incorpora la implementación y la UI; la seguridad de despliegue, los scopes reales del PAT granular y el funcionamiento extremo a extremo de PowerShell 5.1 permanecen sujetos al CI y a la validación operativa posterior. Nunca se debe declarar operativa una ruta hasta aplicar la migración y probarla en producción.
+
+
+## 18. Límite de administración de secretos OEP · v1.0.6
+
+**Antes:** el primer borrador de la UI permitía que cualquier sesión con la cookie maestra OEP intentara cargar, rotar o eliminar la credencial GitHub. Aunque el servicio validaba la sesión EP, esa capacidad ampliaba indebidamente la autoridad de la contraseña maestra sobre un secreto de larga duración.
+
+**Cambio:** la API `GET /api/ep/github-credential` permite a una sesión maestra válida consultar solo el estado redactado (cuenta, sufijo, repositorios y fecha). Las operaciones `POST` y `DELETE` requieren una sesión OIDC autorizada y un `Origin` coincidente. La UI usa el campo `canManage` para ocultar los controles de administración en sesiones maestras. Tras guardar o borrar, la UI conserva el permiso de administración durante la sesión OIDC actual.
+
+**Motivo:** mantener OIDC como autoridad de administración y reservar la contraseña maestra para el acceso diario limitado a OEP. La cookie maestra permite arrancar EP y consumir la credencial a través del JWT EP con scope `ep:github:token`, pero no gestionar directamente el token persistente.
+
+**Resultado:** corrección implementada en la rama `feat/ep-github-token-vault-ui`; añadidas aserciones de contrato en `tests/unit/ep_security.test.ts`. Falta que GitHub Actions proporcione una ejecución aprobada y que se valide el recorrido en Windows PowerShell 5.1. La propuesta sigue sin integrar ni desplegar.
