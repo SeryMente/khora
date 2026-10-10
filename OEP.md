@@ -2,8 +2,8 @@
 
 **Identificador:** OEP  
 **Nombre completo:** Persistencia de Entorno Operativo  
-**Versión:** v0.1.7
-**Nombre de versión:** Compatibilidad de Credenciales GitHub y Verificación de CI Pendiente
+**Versión:** v0.1.8
+**Nombre de versión:** Administración OIDC del Secreto y Acceso Maestro EP de Solo Uso
 **Estado:** ACTIVO · CANÓNICO PARA ESTE ÁMBITO · EN EVOLUCIÓN CONTROLADA  
 **Sistema emisor:** KHORA  
 **Plataforma objetivo actual:** Windows
@@ -97,10 +97,10 @@ La contraseña maestra OEP está implementada en la rama `feat/ep-github-token-v
 
 Modelo: OIDC → identidad primaria global de KHORA y alta/recuperación de la contraseña OEP. OEP Master Password → acceso corto y limitado a emisión/inicio de OEP, sin abrir rutas generales de KHORA.
 
-La cookie de acceso OEP tiene duración de 15 minutos, firma HMAC por ámbito, `HttpOnly`, `SameSite=Strict`, `Secure` en producción y `Path=/`. La sesión se valida solo en el submódulo EP y los endpoints de gestión EP.
+La cookie de acceso OEP tiene duración de 15 minutos, firma HMAC por ámbito, `HttpOnly`, `SameSite=Strict`, `Secure` en producción y `Path=/`. La sesión se valida solo en el submódulo EP. La contraseña maestra puede consultar el estado redactado del token persistente y utilizarlo al arrancar mediante el JWT EP, pero no cargarlo, rotarlo ni borrarlo. La administración de ese secreto exige sesión OIDC autorizada.
 
 ### 11.3 Mínimo privilegio
-La cookie maestra no se convierte en una sesión Auth.js y no adquiere administración general de KHORA. La emisión del PAT para PowerShell exige un JWT EP activo con scope `ep:github:token`.
+La cookie maestra no se convierte en una sesión Auth.js y no adquiere administración general de KHORA ni de secretos persistentes. La emisión de sesión EP habilita el arranque y la recuperación del token de GitHub con un JWT EP activo de scope `ep:github:token`; los endpoints de carga, rotación y borrado del token exigen OIDC.
 
 ### 11.4 Seguridad
 El verificador de la contraseña usa scrypt con salt aleatorio, pepper derivado por ámbito de `EP_BOOTSTRAP_JWT_SECRET`, comparación de tiempo constante y límite de ocho fallos por origen hasheado cada 15 minutos. La contraseña no se almacena en claro ni se incrusta en el launcher. La implementación aún necesita pasar CI y la matriz E2E de PowerShell 5.1; no se marca RESUELTA hasta contar con esa evidencia.
@@ -478,3 +478,12 @@ La ausencia de contexto conversacional no autoriza a reconstruir decisiones fuer
 
 **Resultado →** commit de cabecera observado `009fc2d5952285193e45732b52de92f95d545e55`; manifiesto con 606 entradas y hashes del ciclo refrescados. Los cuatro workflows se reintentaron mediante GitHub y terminaron de nuevo en fallo; los logs de los siete jobs dieron `BlobNotFound`. No se puede afirmar que los tests pasen ni que la implementación esté certificada. `OEP-PENDING-001` continúa abierto hasta que se diagnostique CI con logs utilizables, se aplique la migración en el entorno autorizado y se valide el recorrido completo con Windows PowerShell 5.1 y una escritura efectiva de GitHub.
 
+## 62. Ciclo operativo 007 — Administración OIDC del token GitHub
+
+**Antes →** la primera implementación de la bóveda autorizaba cargar y eliminar el token con la cookie maestra OEP, extendiendo su autoridad sobre un secreto persistente más allá del uso necesario para arrancar EP.
+
+**Cambio →** GET /api/ep/github-credential devuelve canManage: OIDC puede administrar; una sesión maestra solo consulta el estado no sensible. POST y DELETE exigen OIDC y validación de origen. La UI oculta controles de administración cuando canManage es falso, manteniendo el uso del token existente para el bootstrap. Se añadieron aserciones de contrato y se documentó la arquitectura v1.0.6.
+
+**Motivo →** impedir que la contraseña maestra se convierta en un mecanismo de administración de secretos de larga duración, manteniendo la separación entre OIDC global y el acceso operativo OEP.
+
+**Resultado →** corrección en la rama feat/ep-github-token-vault-ui; la validación automatizada aún no está certificada y el PR continúa sin integrar ni desplegar. OEP-PENDING-001 permanece abierto hasta el CI aprobado, migración, configuración real y prueba E2E PowerShell 5.1.
