@@ -1,6 +1,6 @@
 ﻿# KHORA EP Medio v1.0 - configuración de sesión
-$script:SCRIPT_VERSION = '7.5.3'
-$script:EP_VERSION = '1.0.1'
+$script:SCRIPT_VERSION = '7.5.4'
+$script:EP_VERSION = '1.0.2'
 $script:SES_ACTIVE = $false
 $script:TokSecure = $null
 $script:KhoraTokenSecure = $null
@@ -12,6 +12,27 @@ $script:SESSION_MANIFEST_PATH = if ($script:SESSION_MANIFEST_ARG) { $script:SESS
 if (-not $script:SESSION_MANIFEST_PATH -or -not (Test-Path $script:SESSION_MANIFEST_PATH)) { throw 'Falta session-manifest.json.' }
 $script:SESSION = Get-Content -LiteralPath $script:SESSION_MANIFEST_PATH -Raw | ConvertFrom-Json
 if ($script:SESSION.schema -ne 'khora-ep-session/v1') { throw 'Manifiesto incompatible.' }
+$script:EXECUTION_IDENTITY = [Security.Principal.WindowsIdentity]::GetCurrent().Name
+$script:DATA_PROFILE_MODE = if ($script:SESSION.dataProfileMode) { [string]$script:SESSION.dataProfileMode } else { 'execution-profile' }
+$script:DATA_PROFILE_NAME = if ($script:SESSION.dataProfileName) { [string]$script:SESSION.dataProfileName } else { [Environment]::UserName }
+$script:DATA_PROFILE_ROOT = if ($script:SESSION.dataProfileRoot) { [IO.Path]::GetFullPath([string]$script:SESSION.dataProfileRoot).TrimEnd('\') } else { [IO.Path]::GetFullPath([string]$env:USERPROFILE).TrimEnd('\') }
+$script:KHORA_HOST_TEMP = if ($script:SESSION.hostTemp) { [IO.Path]::GetFullPath([string]$script:SESSION.hostTemp) } else { [IO.Path]::GetFullPath([IO.Path]::GetTempPath()) }
+if ($script:SESSION.executionIdentity -and [string]::Compare([string]$script:SESSION.executionIdentity,$script:EXECUTION_IDENTITY,[StringComparison]::OrdinalIgnoreCase) -ne 0) { throw 'KHORA_EXECUTION_IDENTITY_MISMATCH' }
+if ($script:DATA_PROFILE_MODE -eq 'fila4-profile-tree') {
+    if ($script:EXECUTION_IDENTITY -notmatch '(?i)(^|\\)mantenimientorci$') { throw 'KHORA_CECEQ_REQUIRES_MANTENIMIENTORCI_EXECUTION_TOKEN' }
+    $profilePrefix = $script:DATA_PROFILE_ROOT.TrimEnd('\') + '\'
+    $expectedHostTemp = [IO.Path]::GetFullPath((Join-Path $script:DATA_PROFILE_ROOT 'AppData\Local\Temp'))
+    if ([string]::Compare($script:KHORA_HOST_TEMP,$expectedHostTemp,[StringComparison]::OrdinalIgnoreCase) -ne 0) { throw 'KHORA_HOST_TEMP_OUTSIDE_FILA4_PROFILE' }
+    foreach ($path in @($script:DATA_PROFILE_ROOT,$script:KHORA_HOST_TEMP)) {
+        if ($path -ne $script:DATA_PROFILE_ROOT -and -not $path.StartsWith($profilePrefix,[StringComparison]::OrdinalIgnoreCase)) { throw 'KHORA_PATH_OUTSIDE_FILA4_PROFILE' }
+        if (Test-Path -LiteralPath $path) {
+            $item = Get-Item -LiteralPath $path -Force -ErrorAction Stop
+            if (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { throw 'KHORA_FILA4_REPARSE_POINT_REFUSED' }
+        } elseif ($path -eq $script:KHORA_HOST_TEMP) {
+            New-Item -ItemType Directory -Path $path -Force -ErrorAction Stop | Out-Null
+        }
+    }
+}
 $script:LAUNCH_MODE = 'normal'
 $script:HOST_TOOL_POLICY = 'allow-verified-host'
 $ROOT_DIR = [string]$script:SESSION.outerDir
