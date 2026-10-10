@@ -295,6 +295,8 @@ test("EP Security: GitHub PAT is encrypted at rest and only served to an EP bear
   assert.doesNotMatch(manageRoute, /NextResponse\.json\(\{\s*token\s*,/);
   assert.match(manageRoute, /req\.headers\.get\("origin"\) !== req\.nextUrl\.origin/);
   assert.match(manageRoute, /oidcAdministrator\(req\)/);
+  const tokenRoute = readFileSync(new URL("../../app/api/ep/token/route.ts", import.meta.url), "utf8");
+  assert.match(tokenRoute, /oidcEmail !== email && req\.headers\.get\("origin"\) !== origin/);
   assert.match(manageRoute, /authorizedUser\(req\)/);
   assert.match(tokenRoute, /authenticateEpBearer\(req, \["ep:github:token"\]\)/);
   assert.match(tokenRoute, /getStoredEpGitHubToken\(\)/);
