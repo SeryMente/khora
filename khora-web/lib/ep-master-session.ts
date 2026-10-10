@@ -73,7 +73,9 @@ export async function readEpMasterEmail(request: Request, expectedOrigin?: strin
   const key = await sessionKey();
   if (!payloadBytes || !signature || !key) return null;
   let verified = false;
-  try { verified = await crypto.subtle.verify("HMAC", key, signature, new TextEncoder().encode(parts[0])); } catch { return null; }
+  const signatureBuffer = new Uint8Array(signature.byteLength);
+  signatureBuffer.set(signature);
+  try { verified = await crypto.subtle.verify("HMAC", key, signatureBuffer.buffer as ArrayBuffer, new TextEncoder().encode(parts[0])); } catch { return null; }
   if (!verified) return null;
   let payload: EpMasterSessionPayload;
   try { payload = JSON.parse(new TextDecoder().decode(payloadBytes)) as EpMasterSessionPayload; } catch { return null; }

@@ -61,7 +61,7 @@ La interfaz devuelve el objeto estructurado y su representación de salida. Un r
 
 ## Contrato ejecutable de salida
 
-El contrato visible vigente pertenece a `SeryMente/metodologia/FORMATO-REGISTRO-VERIFICACION-CICLO.schema.json` versión `v1.7.6`. KHORA mantiene una copia exacta para ejecución y una prueba de sincronización contra `main` de Metodología.
+El contrato visible vigente pertenece a `SeryMente/metodologia/FORMATO-REGISTRO-VERIFICACION-CICLO.schema.json` versión `v1.7.7`. KHORA mantiene una copia exacta para ejecución y una prueba de sincronización contra `main` de Metodología.
 
 El candidato completo de salida se valida antes de `VERIFIED` mediante un parser cerrado y se reconstruye mediante un renderer determinista. La liberación devuelve exactamente el texto validado asociado al receipt; no genera una variante posterior.
 

@@ -16,6 +16,7 @@ function sampleData() {
     si_header: expectedSiHeader,
     methodology_header: expectedMethodologyHeader,
     ci: "✓" as const,
+    ra: "INICIAL" as const,
     ubic: "CECEQ",
     rdc: "SI" as const,
     account: "blacksheepsup@gmail.com",
@@ -32,7 +33,7 @@ function sampleData() {
 }
 
 test("uses the local canonical contract version", () => {
-  assert.equal(CANONICAL_OUTPUT_FORMAT_VERSION, "v1.7.6");
+  assert.equal(CANONICAL_OUTPUT_FORMAT_VERSION, "v1.7.7");
 });
 
 test("renders and validates the exact six-line canonical output", () => {
@@ -49,6 +50,7 @@ test("rejects extra text, line count drift, bad states and non-canonical renderi
   assert.equal(validateCanonicalCycleOutput("prefix\n" + output, { expectedSiHeader, expectedMethodologyHeader }).ok, false);
   assert.equal(validateCanonicalCycleOutput(output + "\nsuffix", { expectedSiHeader, expectedMethodologyHeader }).ok, false);
   assert.equal(validateCanonicalCycleOutput(output.replace("CI: ✓", "CI: X"), { expectedSiHeader, expectedMethodologyHeader }).ok, false);
+  assert.equal(validateCanonicalCycleOutput(output.replace("RA: INICIAL", "RA: UNKNOWN"), { expectedSiHeader, expectedMethodologyHeader }).ok, false);
   assert.equal(validateCanonicalCycleOutput(output.replace("ESTADO: COMPLETADO", "ESTADO: UNKNOWN"), { expectedSiHeader, expectedMethodologyHeader }).ok, false);
   assert.equal(validateCanonicalCycleOutput(output.replace(" · K: ✓ · T: ✓", " · EXTRA: 1 · K: ✓ · T: ✓"), { expectedSiHeader, expectedMethodologyHeader }).ok, false);
 });

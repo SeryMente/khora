@@ -375,11 +375,13 @@ export function PipelineView({
               filteredItems.map((item) => {
                 const isSelected = selectedId === item.id;
                 return (
-                  <div
+                  <button
+                    type="button"
                     key={item.id}
                     data-ui-id="pipeline.item-card"
+                    aria-pressed={isSelected}
                     onClick={() => actions.onSelectVolcado?.(item.id)}
-                    className={`p-3 border cursor-pointer flex flex-col space-y-1.5 rounded-none transition-all ${
+                    className={`p-3 border cursor-pointer flex flex-col space-y-1.5 rounded-none transition-all text-left w-full ${
                       isSelected
                         ? "bg-zinc-800/40 ring-1 ring-[var(--khora-accent)]"
                         : "bg-[var(--khora-surface)]"
@@ -390,28 +392,28 @@ export function PipelineView({
                         : "var(--khora-border)",
                     }}
                   >
-                    <div className="flex justify-between items-start gap-2">
-                      <div className="flex items-center gap-1.5 min-w-0">
+                    <span className="flex justify-between items-start gap-2">
+                      <span className="flex items-center gap-1.5 min-w-0">
                         {item.folio && (
                           <span className="font-mono text-[10px] px-1 py-0.5 bg-zinc-800 text-amber-400 font-bold shrink-0">
                             #{item.folio}
                           </span>
                         )}
-                        <h3 className="font-bold text-xs truncate">
+                        <span className="font-bold text-xs truncate">
                           {item.titulo || "Sin título"}
-                        </h3>
-                      </div>
+                        </span>
+                      </span>
                       <span className="text-[9px] font-mono border px-1 uppercase opacity-80">
                         {item.estado}
                       </span>
-                    </div>
-                    <div className="flex justify-between items-center text-[10px] font-mono">
+                    </span>
+                    <span className="flex justify-between items-center text-[10px] font-mono">
                       {renderAudioStatusBadge(item.audio_status)}
                       <span className="opacity-60">
                         {new Date(item.recibido_en).toLocaleDateString()}
                       </span>
-                    </div>
-                  </div>
+                    </span>
+                  </button>
                 );
               })
             )}

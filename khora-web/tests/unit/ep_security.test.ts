@@ -283,7 +283,7 @@ test("EP Security UI isolates Entorno Persistente as a submodule and keeps crede
 test("EP Security: GitHub PAT is encrypted at rest and only served to an EP bearer session", () => {
   const vault = readFileSync(new URL("../../lib/server/ep-github-credential.ts", import.meta.url), "utf8");
   const manageRoute = readFileSync(new URL("../../app/api/ep/github-credential/route.ts", import.meta.url), "utf8");
-  const tokenRoute = readFileSync(new URL("../../app/api/ep/github-token/route.ts", import.meta.url), "utf8");
+  const githubTokenRoute = readFileSync(new URL("../../app/api/ep/github-token/route.ts", import.meta.url), "utf8");
   const bootstrap = readFileSync(new URL("../../../scripts/khora/khora.ps1", import.meta.url), "utf8");
   const epServer = readFileSync(new URL("../../lib/server/ep.ts", import.meta.url), "utf8");
   const panel = readFileSync(new URL("../../app/components/ep/EntornoPersistentePanel.tsx", import.meta.url), "utf8");
@@ -295,11 +295,11 @@ test("EP Security: GitHub PAT is encrypted at rest and only served to an EP bear
   assert.doesNotMatch(manageRoute, /NextResponse\.json\(\{\s*token\s*,/);
   assert.match(manageRoute, /req\.headers\.get\("origin"\) !== req\.nextUrl\.origin/);
   assert.match(manageRoute, /oidcAdministrator\(req\)/);
-  const tokenRoute = readFileSync(new URL("../../app/api/ep/token/route.ts", import.meta.url), "utf8");
-  assert.match(tokenRoute, /oidcEmail !== email && req\.headers\.get\("origin"\) !== origin/);
+  const epSessionTokenRoute = readFileSync(new URL("../../app/api/ep/token/route.ts", import.meta.url), "utf8");
+  assert.match(epSessionTokenRoute, /oidcEmail !== email && req\.headers\.get\("origin"\) !== origin/);
   assert.match(manageRoute, /authorizedUser\(req\)/);
-  assert.match(tokenRoute, /authenticateEpBearer\(req, \["ep:github:token"\]\)/);
-  assert.match(tokenRoute, /getStoredEpGitHubToken\(\)/);
+  assert.match(githubTokenRoute, /authenticateEpBearer\(req, \["ep:github:token"\]\)/);
+  assert.match(githubTokenRoute, /getStoredEpGitHubToken\(\)/);
   assert.match(epServer, /getStoredEpGitHubToken\(\)/);
   assert.match(epServer, /EP_REQUIRED_GITHUB_REPOSITORIES/);
   assert.match(panel, /const catalogLoaded = await loadRepoCatalog\(true\)/);
