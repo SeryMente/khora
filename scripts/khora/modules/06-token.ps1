@@ -1,5 +1,5 @@
 ﻿# Secretos efímeros protegidos por Protección de Datos de Windows.
-function Import-KhoraDpapi { param([string]$Path) if(-not(Test-Path $Path)){throw "Falta $Path"};return ((Get-Content -LiteralPath $Path -Raw).Trim()|ConvertTo-SecureString) }
+function Import-KhoraDpapi { param([string]$Path) if(-not(Test-Path -LiteralPath $Path)){throw "Falta $Path"};$plain=Unprotect-KhoraTextBlob -Path $Path;try{return (ConvertTo-SecureString -String $plain -AsPlainText -Force)}finally{$plain=$null} }
 function Import-KhoraBootstrapSecrets {
     $Global:KhoraVaultMasterKey=Import-KhoraDpapi (Join-Path $STATE_DIR 'vault-key.dpapi')
     $script:TokSecure=Import-KhoraDpapi (Join-Path $STATE_DIR 'github-token.dpapi')
