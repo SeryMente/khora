@@ -215,6 +215,76 @@ test("OBS-1: Ingestión batch con deduplicación por event_uuid e idempotencia i
   assert.equal(res2.results[0].status, "duplicate");
 });
 
+test("OBS-1: Eventos de dictado User Data preservan clase, fallo y secuencia fuera del rango 999", async () => {
+  process.env.PLAYWRIGHT_TEST_RUN = "1";
+  const sessionId = randomUUID();
+  const eventUuid = randomUUID();
+  const envelope: ObservationEnvelope = {
+    schema_version: "1.1",
+    event_uuid: eventUuid,
+    event_name: "DICTADO_INICIO_FALLIDO",
+    phase: "dictado",
+    severity: "ERROR",
+    outcome: "FAILURE",
+    component: "ingreso_workspace",
+    correlation_id: sessionId,
+    sequence: 1000,
+    session_id: sessionId,
+    privacy_class: "USER_DATA",
+    reason_code: "synchronous_start_rejected",
+    metrics: { result_chars: 0, input_mode: "microfono" },
+  };
+
+  const persisted = await registrarEventosBatch([envelope]);
+  assert.equal(persisted.accepted, 1);
+  assert.equal(persisted.rejected, 0);
+
+  const request = new NextRequest("http://localhost:3000/api/eventos?correlacion_id=" + sessionId);
+  const response = await GET(request);
+  assert.equal(response.status, 200);
+  const body = await response.json();
+  const event = body.eventos.find((candidate: any) => candidate.event_uuid === eventUuid);
+  assert.ok(event);
+  assert.equal(event.privacy_class, "USER_DATA");
+  assert.equal(event.fase, "dictado");
+  assert.equal(event.event_id, "DIC-001");
+  assert.equal(event.estado, "FAIL");
+  assert.equal(event.outcome, "FAILURE");
+});
+
+test("OBS-1: El estado de evento refleja los outcomes PENDING y SKIPPED de dictado", async () => {
+  process.env.PLAYWRIGHT_TEST_RUN = "1";
+  const sessionId = randomUUID();
+  const pendingId = randomUUID();
+  const skippedId = randomUUID();
+  const makeEnvelope = (eventUuid: string, sequence: number, outcome: "PENDING" | "SKIPPED"): ObservationEnvelope => ({
+    schema_version: "1.1",
+    event_uuid: eventUuid,
+    event_name: outcome === "PENDING" ? "DICTADO_INICIO_SOLICITADO" : "TRANSCRIPCION_AUTORITATIVA_OMITIDA",
+    phase: "dictado",
+    severity: "INFO",
+    outcome,
+    component: "ingreso_workspace",
+    correlation_id: sessionId,
+    sequence,
+    session_id: sessionId,
+    privacy_class: "USER_DATA",
+    reason_code: outcome === "SKIPPED" ? "no_verified_parts" : null,
+    metrics: { part_count: 0 },
+  });
+
+  const persisted = await registrarEventosBatch([
+    makeEnvelope(pendingId, 1, "PENDING"),
+    makeEnvelope(skippedId, 2, "SKIPPED"),
+  ]);
+  assert.equal(persisted.accepted, 2);
+  const response = await GET(new NextRequest("http://localhost:3000/api/eventos?correlacion_id=" + sessionId));
+  assert.equal(response.status, 200);
+  const body = await response.json();
+  assert.equal(body.eventos.find((event: any) => event.event_uuid === pendingId)?.estado, "START");
+  assert.equal(body.eventos.find((event: any) => event.event_uuid === skippedId)?.estado, "SKIP");
+});
+
 test("OBS-1: Cadena de hashes por correlación preserva integridad determinista", async () => {
   const correlationId = randomUUID();
 

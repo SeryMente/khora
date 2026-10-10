@@ -3,7 +3,7 @@ import { createHash } from "crypto";
 
 export type ObservationSeverity = "INFO" | "WARN" | "ERROR" | "CRITICAL";
 export type ObservationOutcome = "SUCCESS" | "FAILURE" | "PARTIAL" | "SKIPPED" | "PENDING";
-export type ObservationPrivacyClass = "PUBLIC_METRIC" | "ANONYMIZED_TELEMETRY" | "SYSTEM_AUDIT";
+export type ObservationPrivacyClass = "PUBLIC_METRIC" | "ANONYMIZED_TELEMETRY" | "SYSTEM_AUDIT" | "USER_DATA";
 
 export interface ObservationEnvelope {
   schema_version: string;

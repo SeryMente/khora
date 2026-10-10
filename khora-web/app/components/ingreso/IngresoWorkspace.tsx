@@ -8,6 +8,7 @@ import { IngresoView } from "../shared/IngresoView";
 import { transcribeStoredSession } from "../../../lib/client/authoritative-transcription";
 import { importAndTranscribeAudio } from "../../../lib/client/import-audio-file";
 import { cerrarEdicionInSitu } from "../../../lib/client/edicion-in-situ";
+import { enviarEventosObservabilidadDictado, registrarEventoObservabilidadDictado, type DictadoObservationOptions } from "../../../lib/client/dictado-observability";
 import { registerKhoraLockCheckpoint, reportKhoraActivity } from "../AutoLockProvider";
 
 
@@ -105,6 +106,14 @@ function IngresoContenido() {
   const ultimoCheckpointTextoRef = useRef("");
   const partesRawRef = useRef<{ parte: number; blob: Blob }[]>([]);
   const estadoTranscripcionRef = useRef<string | null>(null);
+  const intentoReconocimientoRef = useRef(0);
+  const reconexionesRef = useRef(0);
+  const ultimoEventoParcialRef = useRef(0);
+  const observarDictado = useCallback((eventName: string, options: DictadoObservationOptions = {}) => {
+    const sessionId = sesionIdRef.current;
+    if (!sessionId) return null;
+    return registrarEventoObservabilidadDictado({ sessionId, eventName, ...options });
+  }, []);
 
   useEffect(() => {
     const w = window as any;
@@ -114,10 +123,25 @@ function IngresoContenido() {
   useEffect(() => {
     let activo = true;
     void fetch("/api/dictado/checkpoint", { cache: "no-store" })
-      .then((r) => r.ok ? r.json() : null)
+      .then((r) => {
+        if (!r.ok) throw new Error("checkpoint_recovery_http_" + r.status);
+        return r.json();
+      })
       .then((data) => {
         const recovery = data?.recovery;
-        if (!activo || !recovery?.sessionId || typeof recovery?.texto !== "string" || !recovery.texto.trim()) return;
+        if (!activo) return;
+        if (!recovery?.sessionId || typeof recovery?.texto !== "string" || !recovery.texto.trim()) {
+          if (!sesionIdRef.current) sesionIdRef.current = generarSesionId();
+          const w = window as any;
+          observarDictado("WORKSPACE_READY", { outcome: "SUCCESS", metrics: { recognition_supported: Boolean(w.SpeechRecognition || w.webkitSpeechRecognition), state: "idle", source_mode: "microfono" } });
+          void enviarEventosObservabilidadDictado();
+          return;
+        }
+        if (activoRef.current) {
+          observarDictado("RECUPERACION_OMITIDA_POR_SESION_ACTIVA", { severity: "WARN", outcome: "PARTIAL", reasonCode: "active_session_won_race", metrics: { recovery_found: true, active: true } });
+          void enviarEventosObservabilidadDictado();
+          return;
+        }
         sesionIdRef.current = String(recovery.sessionId);
         ultimoCheckpointTextoRef.current = recovery.texto;
         const segmento: SegmentoReconciliado = { id: "recovery-" + recovery.sessionId, texto: recovery.texto, estado: "pendiente_error" };
@@ -128,10 +152,17 @@ function IngresoContenido() {
         setTexto(recovery.texto);
         setAviso("Se recuperó automáticamente un dictado pendiente protegido antes del cierre anterior.");
         setReconciliacionMensaje("Checkpoint recuperado e incorporado al mismo espacio de Ingreso.");
+        observarDictado("CHECKPOINT_RECUPERADO", { outcome: "SUCCESS", metrics: { recovery_found: true, checkpoint_chars: recovery.texto.length, segment_count: 1 } });
+        void enviarEventosObservabilidadDictado();
       })
-      .catch(() => undefined);
+      .catch(() => {
+        if (!activo) return;
+        if (!sesionIdRef.current) sesionIdRef.current = generarSesionId();
+        observarDictado("ERROR_RECUPERACION_CHECKPOINT", { severity: "WARN", outcome: "PARTIAL", reasonCode: "checkpoint_recovery_unavailable" });
+        void enviarEventosObservabilidadDictado();
+      });
     return () => { activo = false; };
-  }, []);
+  }, [observarDictado]);
 
   useEffect(() => {
     try {
@@ -298,6 +329,9 @@ function IngresoContenido() {
     if (!forzar && textoCheckpoint === ultimoCheckpointTextoRef.current) return;
     const anterior = checkpointEnCursoRef.current || Promise.resolve();
     const tarea = anterior.then(async () => {
+      const startedAt = Date.now();
+      observarDictado("CHECKPOINT_INICIADO", { outcome: "PENDING", metrics: { forced: forzar, checkpoint_chars: textoCheckpoint.length, segment_count: segmentosRef.current.length } });
+      await enviarEventosObservabilidadDictado();
       try {
         const response = await fetch("/api/dictado/checkpoint", {
           method: "POST",
@@ -305,18 +339,31 @@ function IngresoContenido() {
           body: JSON.stringify({ sessionId, texto: textoCheckpoint }),
           keepalive: true,
         });
-        if (response.ok) ultimoCheckpointTextoRef.current = textoCheckpoint;
+        if (response.ok) {
+          ultimoCheckpointTextoRef.current = textoCheckpoint;
+          observarDictado("CHECKPOINT_PERSISTIDO", { outcome: "SUCCESS", durationMs: Date.now() - startedAt, metrics: { forced: forzar, checkpoint_chars: textoCheckpoint.length, checkpoint_ok: true } });
+        } else {
+          observarDictado("CHECKPOINT_FALLIDO", { severity: "ERROR", outcome: "FAILURE", reasonCode: "http_" + response.status, durationMs: Date.now() - startedAt, metrics: { forced: forzar, checkpoint_chars: textoCheckpoint.length, http_status: response.status, checkpoint_ok: false } });
+        }
       } catch (cause) {
+        observarDictado("CHECKPOINT_FALLIDO", { severity: "ERROR", outcome: "FAILURE", reasonCode: "network_error", durationMs: Date.now() - startedAt, metrics: { forced: forzar, checkpoint_chars: textoCheckpoint.length, checkpoint_ok: false } });
         setAviso("checkpoint de seguridad pendiente: " + String(cause));
+      } finally {
+        await enviarEventosObservabilidadDictado();
       }
     });
     checkpointEnCursoRef.current = tarea;
     await tarea;
-  }, []);
+  }, [observarDictado]);
 
   const ejecutarTranscripcionAutoritativa = useCallback(async () => {
+    const transcriptionStartedAt = Date.now();
+    observarDictado("TRANSCRIPCION_AUTORITATIVA_INICIADA", { outcome: "PENDING", metrics: { part_count: partesSubidasRef.current.length, segment_count: segmentosRef.current.length } });
+    void enviarEventosObservabilidadDictado();
     if (!sesionIdRef.current || partesSubidasRef.current.length === 0) {
       estadoTranscripcionRef.current = partesRawRef.current.length > 0 ? "fallido" : null;
+      observarDictado("TRANSCRIPCION_AUTORITATIVA_OMITIDA", { outcome: "SKIPPED", reasonCode: !sesionIdRef.current ? "no_session" : "no_verified_parts", metrics: { part_count: partesSubidasRef.current.length, segment_count: segmentosRef.current.length } });
+      void enviarEventosObservabilidadDictado();
       if (trozosRef.current.length > 0) {
         setReconciliacionMensaje(
           "No se enviará el audio completo al servidor: ninguna parte quedó almacenada y vinculada a la sesión.",
@@ -343,15 +390,21 @@ function IngresoContenido() {
         setReconciliacionMensaje(
           data.motivoReconciliacion || resultadoReconciliacion.motivo || "Transcripción autoritativa Groq Whisper procesada con éxito."
         );
+        observarDictado("TRANSCRIPCION_AUTORITATIVA_COMPLETADA", { outcome: "SUCCESS", durationMs: Date.now() - transcriptionStartedAt, metrics: { part_count: partesSubidasRef.current.length, segment_count: resultadoReconciliacion.segmentos.length, response_ok: true } });
+        void enviarEventosObservabilidadDictado();
       } else {
         estadoTranscripcionRef.current = "fallido";
+        observarDictado("TRANSCRIPCION_AUTORITATIVA_FALLIDA", { severity: "WARN", outcome: "PARTIAL", reasonCode: "provider_declined", durationMs: Date.now() - transcriptionStartedAt, metrics: { part_count: partesSubidasRef.current.length, segment_count: segmentosRef.current.length, response_ok: false } });
         setReconciliacionMensaje(`Groq Whisper no disponible: ${data?.detail || "Conservando previsualización ASR en vivo."}`);
       }
     } catch (e) {
       estadoTranscripcionRef.current = "fallido";
+      observarDictado("TRANSCRIPCION_AUTORITATIVA_FALLIDA", { severity: "ERROR", outcome: "FAILURE", reasonCode: "request_failed", durationMs: Date.now() - transcriptionStartedAt, metrics: { part_count: partesSubidasRef.current.length, segment_count: segmentosRef.current.length, response_ok: false } });
       setReconciliacionMensaje(`Fallo al solicitar transcripción autoritativa: ${String(e)}.`);
+    } finally {
+      await enviarEventosObservabilidadDictado();
     }
-  }, [texto]);
+  }, [texto, observarDictado]);
 
   const subirParteActual = useCallback(async () => {
     if (parteTrozosRef.current.length === 0) return;
@@ -373,6 +426,8 @@ function IngresoContenido() {
 
     const fuenteAudio = modoEntradaRef.current === "chrome_live_caption" ? "chrome_tab" : "microphone";
     const sesionId = sesionIdRef.current;
+    const uploadStartedAt = Date.now();
+    observarDictado("PARTE_AUDIO_SUBIDA_INICIADA", { outcome: "PENDING", attemptId: "parte-" + parteActual, metrics: { part_index: parteActual, media_part_count: trozosParaSubir.length, media_part_bytes: blob.size, source_mode: modoEntradaRef.current } });
 
     const forma = new FormData();
     forma.append("audio", blob, fuenteAudio + "-parte-" + parteActual + ".webm");
@@ -409,11 +464,16 @@ function IngresoContenido() {
           setPartesContador(partesSubidasRef.current.length);
           setBytesAcumulados((total) => total + bytesSubidos);
           setConAudio(true);
+          observarDictado("PARTE_AUDIO_PERSISTIDA", { outcome: "SUCCESS", attemptId: "parte-" + parteActual, durationMs: Date.now() - uploadStartedAt, metrics: { part_index: parteActual, media_part_bytes: bytesSubidos, upload_verified: true, part_count: partesSubidasRef.current.length } });
         } else {
-          setAviso("audio parte " + parteActual + " no guardada: " + String(da?.detail || ""));
+          observarDictado("PARTE_AUDIO_FALLIDA", { severity: "ERROR", outcome: "FAILURE", reasonCode: "upload_or_integrity_failed", attemptId: "parte-" + parteActual, durationMs: Date.now() - uploadStartedAt, metrics: { part_index: parteActual, media_part_bytes: blob.size, http_status: ra.status, upload_verified: false } });
+          setAviso("audio parte " + parteActual + " no guardada: fallo de almacenamiento o verificación");
         }
       } catch (e) {
+        observarDictado("PARTE_AUDIO_FALLIDA", { severity: "ERROR", outcome: "FAILURE", reasonCode: "network_error", attemptId: "parte-" + parteActual, durationMs: Date.now() - uploadStartedAt, metrics: { part_index: parteActual, media_part_bytes: blob.size, upload_verified: false } });
         setAviso("audio parte " + parteActual + " no guardada por error: " + String(e));
+      } finally {
+        await enviarEventosObservabilidadDictado();
       }
     };
 
@@ -421,10 +481,11 @@ function IngresoContenido() {
     const nuevaSubida = anteriorSubida.then(ejecutarSubida);
     subidaEnCursoRef.current = nuevaSubida;
     await nuevaSubida;
-  }, []);
+  }, [observarDictado]);
 
   const enviarChromeCommand = useCallback((command: "arm" | "stop" | "status", partStartIndex?: number) => {
     if (typeof window === "undefined") return;
+    observarDictado("COMANDO_CHROME_ENVIADO", { outcome: "PENDING", metrics: { source_mode: "chrome_live_caption", capture_state: command } });
     window.postMessage({
       channel: "khora-live-caption-v1",
       direction: "page-to-extension",
@@ -432,7 +493,7 @@ function IngresoContenido() {
       sessionId: sesionIdRef.current || null,
       partStartIndex: Math.max(1, Number(partStartIndex || 1)),
     }, "*");
-  }, []);
+  }, [observarDictado]);
 
   useEffect(() => {
     const recibirEventoChrome = (event: MessageEvent) => {
@@ -463,6 +524,7 @@ function IngresoContenido() {
         if (data.status === "stopped" || data.status === "error") {
           void (async () => {
             if (parteTrozosRef.current.length > 0) await subirParteActual();
+            observarDictado(data.status === "error" ? "CAPTURA_CHROME_PARO_FALLIDO" : "CAPTURA_CHROME_DETENIDA", { severity: data.status === "error" ? "ERROR" : "INFO", outcome: data.status === "error" ? "FAILURE" : "SUCCESS", reasonCode: data.status === "error" ? "capture_stop_error" : null, metrics: { source_mode: "chrome_live_caption", capture_state: String(data.status).slice(0, 40), shutdown_acknowledged: true } });
             chromeStopResolverRef.current?.();
             chromeStopResolverRef.current = null;
           })();
@@ -540,22 +602,41 @@ function IngresoContenido() {
     window.addEventListener("message", recibirEventoChrome);
     enviarChromeCommand("status");
     return () => window.removeEventListener("message", recibirEventoChrome);
-  }, [enviarChromeCommand, subirParteActual]);
+  }, [enviarChromeCommand, subirParteActual, observarDictado]);
 
-  const detenerGrabacion = useCallback(() => {
-    try { grabRef.current?.stop(); } catch {}
+  const detenerGrabacion = useCallback((reasonCode = "stop_requested") => {
+    const recorder = grabRef.current;
+    observarDictado("GRABACION_PARO_SOLICITADO", {
+      outcome: recorder ? "PENDING" : "SKIPPED",
+      reasonCode,
+      metrics: { was_recording: Boolean(recorder), pending_chunks: parteTrozosRef.current.length },
+    });
+    try { recorder?.stop(); } catch {
+      observarDictado("GRABACION_PARO_FALLIDO", { severity: "WARN", outcome: "PARTIAL", reasonCode: "recorder_stop_failed" });
+    }
     grabRef.current = null;
     try { flujoRef.current?.getTracks?.().forEach((pista: any) => pista.stop()); } catch {}
     flujoRef.current = null;
-  }, []);
+  }, [observarDictado]);
 
   const arrancarGrabacion = useCallback(async () => {
-    if (!audioPermitidoRef.current || !activoRef.current || grabRef.current) return;
+    if (!audioPermitidoRef.current || !activoRef.current || grabRef.current) {
+      observarDictado("INICIO_GRABACION_OMITIDO", { outcome: "SKIPPED", reasonCode: !audioPermitidoRef.current ? "recording_disabled" : !activoRef.current ? "dictation_inactive" : "recorder_already_exists", metrics: { active: activoRef.current, recorder_ready: Boolean(grabRef.current) } });
+      return;
+    }
+    const recorderStartedAt = Date.now();
+    observarDictado("SOLICITUD_MICROFONO", { outcome: "PENDING", metrics: { source_mode: modoEntradaRef.current } });
     try {
       const flujo = await navigator.mediaDevices.getUserMedia({ audio: true });
+      observarDictado("MICROFONO_PERMITIDO", { outcome: "SUCCESS", durationMs: Date.now() - recorderStartedAt, metrics: { permission_granted: true, source_mode: modoEntradaRef.current } });
       if (!activoRef.current || !audioPermitidoRef.current) { try { flujo.getTracks().forEach((pista: any) => pista.stop()); } catch {} return; }
       flujoRef.current = flujo;
       const grabadora = new MediaRecorder(flujo);
+      grabadora.onstart = () => observarDictado("GRABACION_INICIADA", { outcome: "SUCCESS", durationMs: Date.now() - recorderStartedAt, metrics: { recorder_state: String(grabadora.state), source_mode: modoEntradaRef.current } });
+      grabadora.onerror = () => {
+        observarDictado("ERROR_GRABADORA", { severity: "ERROR", outcome: "FAILURE", reasonCode: "media_recorder_error", metrics: { recorder_state: String(grabadora.state), source_mode: modoEntradaRef.current } });
+        void enviarEventosObservabilidadDictado();
+      };
 
       grabadora.ondataavailable = (ev: any) => {
         if (ev.data && ev.data.size > 0) {
@@ -565,6 +646,7 @@ function IngresoContenido() {
 
           const totalSize = parteTrozosRef.current.reduce((sum, chunk) => sum + chunk.size, 0);
           const elapsed = Date.now() - parteInicioRef.current;
+          if (parteTrozosRef.current.length % 10 === 0) observarDictado("FRAGMENTOS_RECIBIDOS", { outcome: "SUCCESS", metrics: { chunk_count: parteTrozosRef.current.length, media_chunk_bytes: ev.data.size, recorded_bytes: totalSize, elapsed_ms: elapsed } });
 
           if (totalSize >= 2 * 1024 * 1024 || elapsed >= 120 * 1000) {
             void subirParteActual();
@@ -573,13 +655,18 @@ function IngresoContenido() {
       };
 
       grabadora.onstop = async () => {
+        observarDictado("GRABACION_DETENIDA", { outcome: "SUCCESS", metrics: { pending_chunks: parteTrozosRef.current.length, recorder_state: String(grabadora.state) } });
         try {
           const finalizacion = subirParteActual();
           subidaEnCursoRef.current = finalizacion;
           await finalizacion;
+        } catch (cause) {
+          observarDictado("FINALIZACION_GRABACION_FALLIDA", { severity: "ERROR", outcome: "FAILURE", reasonCode: "part_upload_failed" });
+          throw cause;
         } finally {
           resolverFinalizacionAudioRef.current?.();
           resolverFinalizacionAudioRef.current = null;
+          await enviarEventosObservabilidadDictado();
         }
       };
 
@@ -589,19 +676,33 @@ function IngresoContenido() {
       grabadora.start(1000);
       grabRef.current = grabadora;
     } catch (e) {
+      observarDictado("ERROR_INICIO_GRABACION", { severity: "ERROR", outcome: "FAILURE", reasonCode: "microphone_or_recorder_error", durationMs: Date.now() - recorderStartedAt, metrics: { source_mode: modoEntradaRef.current } });
       setAviso("dictado sin grabacion de voz: " + String(e));
+      void enviarEventosObservabilidadDictado();
     }
-  }, [subirParteActual]);
+  }, [subirParteActual, observarDictado]);
 
   const arrancarReconocedor = useCallback(() => {
     const w = window as any;
     const SR = w.SpeechRecognition || w.webkitSpeechRecognition;
-    if (!SR) { setError("Este navegador no soporta dictado en vivo. Usa Chrome o Edge."); return false; }
+    if (!SR) {
+      observarDictado("CAPACIDAD_RECONOCIMIENTO_AUSENTE", { severity: "ERROR", outcome: "FAILURE", reasonCode: "speech_recognition_unsupported", metrics: { recognition_supported: false, source_mode: modoEntradaRef.current } });
+      setError("Este navegador no soporta dictado en vivo. Usa Chrome o Edge.");
+      void enviarEventosObservabilidadDictado();
+      return false;
+    }
+    const intento = ++intentoReconocimientoRef.current;
+    const recognizerStartedAt = Date.now();
     const rec = new SR();
     rec.lang = "es-MX";
     rec.continuous = true;
     rec.interimResults = true;
-    rec.onstart = () => { setEscuchando(true); abortosRef.current = 0; };
+    observarDictado("RECONOCEDOR_CONSTRUIDO", { outcome: "SUCCESS", attemptId: "recognizer-" + intento, metrics: { recognizer_attempt: intento, continuous: true, interim_results: true, recognition_supported: true, source_mode: modoEntradaRef.current } });
+    rec.onstart = () => {
+      setEscuchando(true);
+      abortosRef.current = 0;
+      observarDictado("RECONOCEDOR_INICIADO", { outcome: "SUCCESS", attemptId: "recognizer-" + intento, durationMs: Date.now() - recognizerStartedAt, metrics: { recognizer_attempt: intento, recognizer_state: "started", recognizer_active: true, source_mode: modoEntradaRef.current } });
+    };
     rec.onresult = (ev: any) => {
       let interino = "";
       const ahora = Date.now();
@@ -613,6 +714,7 @@ function IngresoContenido() {
           ultimaMarcaTiempoRef.current = ahora;
 
           fragmentosRef.current.push({ texto: txt, pausaMsAntes });
+          observarDictado("RESULTADO_FINAL_RECIBIDO", { outcome: "SUCCESS", attemptId: "recognizer-" + intento, metrics: { result_chars: txt.length, duration_since_result_ms: pausaMsAntes, result_index: i, segment_count: fragmentosRef.current.length } });
           estabilizarEmision();
           reportKhoraActivity();
           void guardarCheckpoint();
@@ -624,9 +726,15 @@ function IngresoContenido() {
         }
       }
       setParcial(interino.trim());
+      if (interino.trim() && ahora - ultimoEventoParcialRef.current >= 5000) {
+        ultimoEventoParcialRef.current = ahora;
+        observarDictado("RESULTADO_PARCIAL_RECIBIDO", { outcome: "PARTIAL", attemptId: "recognizer-" + intento, metrics: { partial_chars: interino.trim().length, recognizer_attempt: intento } });
+      }
     };
     rec.onerror = (ev: any) => {
-      const clase = String(ev?.error ?? "");
+      const clase = String(ev?.error ?? "unknown");
+      observarDictado("ERROR_RECONOCEDOR", { severity: clase === "no-speech" ? "INFO" : clase === "aborted" ? "WARN" : "ERROR", outcome: clase === "no-speech" ? "PARTIAL" : "FAILURE", reasonCode: clase, attemptId: "recognizer-" + intento, metrics: { recognizer_attempt: intento, abort_count: abortosRef.current, was_recording: Boolean(grabRef.current), source_mode: modoEntradaRef.current } });
+      void enviarEventosObservabilidadDictado();
       if (clase === "not-allowed" || clase === "service-not-allowed") {
         activoRef.current = false;
         setEscuchando(false);
@@ -648,34 +756,56 @@ function IngresoContenido() {
           setEscuchando(false);
           setEstado("inactivo");
           setError("reconocimiento: " + clase + " persistente tras " + abortosRef.current + " intentos");
+          observarDictado("RECONOCIMIENTO_DETENIDO_POR_ERRORES", { severity: "ERROR", outcome: "FAILURE", reasonCode: clase, attemptId: "recognizer-" + intento, metrics: { abort_count: abortosRef.current, recognizer_attempt: intento } });
+          void enviarEventosObservabilidadDictado();
         }
         return;
       }
       if (clase.length > 0 && clase !== "no-speech") setAviso("reconocimiento: " + clase);
     };
     rec.onend = () => {
+      const recognizerIsCurrent = recRef.current === rec;
+      observarDictado("EVENTO_FIN_RECONOCEDOR", { severity: recognizerIsCurrent ? "INFO" : "WARN", outcome: activoRef.current ? "PENDING" : "SUCCESS", reasonCode: recognizerIsCurrent ? null : "callback_from_previous_recognizer", attemptId: "recognizer-" + intento, metrics: { recognizer_attempt: intento, recognizer_is_current: recognizerIsCurrent, recognizer_active: activoRef.current, reconnect_count: reconexionesRef.current } });
+      if (activoRef.current && !recognizerIsCurrent) observarDictado("REARME_INSTANCIA_ANTERIOR", { severity: "WARN", outcome: "PARTIAL", reasonCode: "previous_recognizer_onend_while_active", attemptId: "recognizer-" + intento, metrics: { recognizer_attempt: intento, recognizer_is_current: false, recognizer_active: true } });
       setEscuchando(false);
       setParcial("");
-      if (!activoRef.current) return;
+      if (!activoRef.current) { void enviarEventosObservabilidadDictado(); return; }
       if (rearmeRef.current) clearTimeout(rearmeRef.current);
+      observarDictado("RECONEXION_PROGRAMADA", { outcome: "PENDING", attemptId: "recognizer-" + intento, metrics: { recognizer_attempt: intento, reconnect_count: reconexionesRef.current } });
+      void enviarEventosObservabilidadDictado();
       rearmeRef.current = setTimeout(() => {
         if (!activoRef.current) return;
-        setReconexiones((n) => n + 1);
+        reconexionesRef.current += 1;
+        setReconexiones(reconexionesRef.current);
+        observarDictado("RECONEXION_INICIADA", { outcome: "PENDING", attemptId: "recognizer-" + intento, metrics: { recognizer_attempt: intento, reconnect_count: reconexionesRef.current } });
         try {
           rec.start();
         } catch {
+          observarDictado("RECONEXION_FALLIDA", { severity: "WARN", outcome: "PARTIAL", reasonCode: "restart_rejected", attemptId: "recognizer-" + intento, metrics: { reconnect_count: reconexionesRef.current } });
           try { rec.abort(); } catch {}
           rearmeRef.current = setTimeout(() => {
             if (!activoRef.current) return;
-            try { rec.start(); } catch (e3) { activoRef.current = false; setEstado("inactivo"); setError("reconocimiento no reanudable: " + String(e3)); }
+            try {
+              rec.start();
+              observarDictado("RECONEXION_REINTENTADA", { outcome: "PENDING", attemptId: "recognizer-" + intento, metrics: { reconnect_count: reconexionesRef.current, retry_count: 1 } });
+            } catch (e3) {
+              activoRef.current = false; setEstado("inactivo"); setError("reconocimiento no reanudable: " + String(e3));
+              observarDictado("RECONOCIMIENTO_NO_REANUDABLE", { severity: "ERROR", outcome: "FAILURE", reasonCode: "restart_retry_rejected", attemptId: "recognizer-" + intento, metrics: { reconnect_count: reconexionesRef.current, retry_count: 1 } });
+              void enviarEventosObservabilidadDictado();
+            }
           }, 700);
         }
       }, 350);
     };
     recRef.current = rec;
-    try { rec.start(); } catch (e) { setError("no se pudo iniciar el reconocimiento: " + String(e)); return false; }
+    try { rec.start(); } catch (e) {
+      observarDictado("RECONOCEDOR_START_FALLIDO", { severity: "ERROR", outcome: "FAILURE", reasonCode: "synchronous_start_rejected", attemptId: "recognizer-" + intento, metrics: { recognizer_attempt: intento, recognition_supported: true } });
+      setError("no se pudo iniciar el reconocimiento: " + String(e));
+      void enviarEventosObservabilidadDictado();
+      return false;
+    }
     return true;
-  }, [estabilizarEmision, detenerGrabacion]);
+  }, [estabilizarEmision, detenerGrabacion, observarDictado]);
 
   const prepararChrome = useCallback(() => {
     setError("");
@@ -702,20 +832,24 @@ function IngresoContenido() {
     inicioRef.current = 0;
     parteInicioRef.current = 0;
 
+    observarDictado("CAPTURA_CHROME_PREPARADA", { outcome: "PENDING", metrics: { source_mode: "chrome_live_caption", part_index: siguienteParte, bridge_state: chromeBridgeEstado, capture_state: chromeCapturaEstado } });
     enviarChromeCommand("arm", siguienteParte);
     setAviso("Sesión preparada. Cambia a la pestaña de Chrome que reproduce el audio y pulsa el icono de Aisthesis para iniciar su captura.");
-  }, [enviarChromeCommand]);
+  }, [enviarChromeCommand, observarDictado, chromeBridgeEstado, chromeCapturaEstado]);
 
   const iniciar = useCallback(async () => {
     setError("");
     setAviso("");
     setResultado("");
     setReconexiones(0);
+    reconexionesRef.current = 0;
+    intentoReconocimientoRef.current = 0;
     abortosRef.current = 0;
     audioPermitidoRef.current = true;
     trozosRef.current = [];
 
     sesionIdRef.current = generarSesionId();
+    observarDictado("DICTADO_INICIO_SOLICITADO", { outcome: "PENDING", metrics: { source_mode: "microfono", recognition_supported: soportado } });
     modoEntradaRef.current = "microfono";
     fuenteEntradaSesionRef.current = "microfono";
     setModoEntrada("microfono");
@@ -735,20 +869,30 @@ function IngresoContenido() {
 
     activoRef.current = true;
     const arrancado = arrancarReconocedor();
-    if (!arrancado) { activoRef.current = false; return; }
+    if (!arrancado) {
+      activoRef.current = false;
+      observarDictado("DICTADO_INICIO_FALLIDO", { severity: "ERROR", outcome: "FAILURE", reasonCode: "recognizer_start_failed", metrics: { source_mode: "microfono" } });
+      void enviarEventosObservabilidadDictado();
+      return;
+    }
+    observarDictado("DICTADO_INICIO_ACEPTADO", { outcome: "SUCCESS", metrics: { source_mode: "microfono", recognition_supported: true } });
+    void enviarEventosObservabilidadDictado();
     inicioRef.current = Date.now();
     setEstado("dictando");
     setEditando(false);
     setEstabaDictando(false);
     setTimeout(() => { void arrancarGrabacion(); }, 900);
-  }, [arrancarReconocedor, arrancarGrabacion]);
+  }, [arrancarReconocedor, arrancarGrabacion, observarDictado, soportado]);
 
   const detener = useCallback(async () => {
+    observarDictado("DICTADO_DETENCION_SOLICITADA", { outcome: "PENDING", metrics: { source_mode: modoEntradaRef.current, active: activoRef.current, was_listening: escuchando } });
+    void enviarEventosObservabilidadDictado();
     if (modoEntradaRef.current === "chrome_live_caption") {
       activoRef.current = false;
       setEstado("inactivo");
+      let shutdownAcknowledged = false;
       const esperaParo = new Promise<void>((resolve) => {
-        chromeStopResolverRef.current = resolve;
+        chromeStopResolverRef.current = () => { shutdownAcknowledged = true; resolve(); };
         window.setTimeout(() => {
           chromeStopResolverRef.current = null;
           resolve();
@@ -756,6 +900,7 @@ function IngresoContenido() {
       });
       enviarChromeCommand("stop");
       await esperaParo;
+      if (!shutdownAcknowledged) observarDictado("PARADA_CHROME_ACK_TIMEOUT", { severity: "WARN", outcome: "PARTIAL", reasonCode: "stop_ack_timeout", metrics: { source_mode: "chrome_live_caption", shutdown_acknowledged: false } });
       if (inicioRef.current > 0) {
         duracionRef.current = Math.round((Date.now() - inicioRef.current) / 1000);
       }
@@ -763,6 +908,8 @@ function IngresoContenido() {
       modoEntradaRef.current = "ninguno";
       setModoEntrada("ninguno");
       setChromeCapturaEstado("inactiva");
+      observarDictado("DICTADO_DETENIDO", { outcome: "SUCCESS", durationMs: duracionRef.current * 1000, metrics: { source_mode: "chrome_live_caption", part_count: partesSubidasRef.current.length } });
+      await enviarEventosObservabilidadDictado();
       return;
     }
 
@@ -784,24 +931,34 @@ function IngresoContenido() {
       await ejecutarTranscripcionAutoritativa();
     } finally {
       finalizacionAudioRef.current = null;
-      subidaEnCursoRef.current = null;      setEstado("inactivo");
+      subidaEnCursoRef.current = null;
+      setEstado("inactivo");
+      observarDictado("DICTADO_DETENIDO", { outcome: "SUCCESS", durationMs: duracionRef.current * 1000, metrics: { source_mode: "microfono", part_count: partesSubidasRef.current.length, segment_count: segmentosRef.current.length } });
+      await enviarEventosObservabilidadDictado();
     }
-  }, [estabilizarEmision, detenerGrabacion, ejecutarTranscripcionAutoritativa, enviarChromeCommand, subirParteActual]);
+  }, [estabilizarEmision, detenerGrabacion, ejecutarTranscripcionAutoritativa, enviarChromeCommand, subirParteActual, observarDictado, escuchando]);
 
   const pausarParaEdicionInSitu = useCallback(() => {
+    const pauseStartedAt = Date.now();
+    observarDictado("DICTADO_PAUSA_POR_EDICION", { outcome: "PENDING", metrics: { was_dictating: activoRef.current || estado === "dictando", was_listening: escuchando, chars_before: textoAntesEdicionRef.current.length } });
     activoRef.current = false;
     if (rearmeRef.current) clearTimeout(rearmeRef.current);
     try { recRef.current?.stop(); } catch {}
     recRef.current = null;
-    detenerGrabacion();
+    detenerGrabacion("edit_in_situ");
     if (relojRef.current) clearTimeout(relojRef.current);
     setParcial("");
     setEscuchando(false);
     estabilizarEmision();
     setEstado("inactivo");
-  }, [detenerGrabacion, estabilizarEmision]);
+    observarDictado("DICTADO_PAUSADO_POR_EDICION", { outcome: "SUCCESS", durationMs: Date.now() - pauseStartedAt, metrics: { was_dictating: true, was_listening: escuchando, chars_before: textoAntesEdicionRef.current.length } });
+    void enviarEventosObservabilidadDictado();
+  }, [detenerGrabacion, estabilizarEmision, observarDictado, estado, escuchando]);
 
   const reanudarTrasEdicionInSitu = useCallback(async () => {
+    const resumeStartedAt = Date.now();
+    observarDictado("REANUDACION_POR_EDICION_SOLICITADA", { outcome: "PENDING", metrics: { source_mode: modoEntradaRef.current } });
+    try {
     if (finalizacionAudioRef.current) await finalizacionAudioRef.current;
     if (subidaEnCursoRef.current) await subidaEnCursoRef.current;
     finalizacionAudioRef.current = null;
@@ -812,12 +969,22 @@ function IngresoContenido() {
     if (!arrancado) {
       activoRef.current = false;
       setEstado("inactivo");
+      observarDictado("REANUDACION_POR_EDICION_FALLIDA", { severity: "ERROR", outcome: "FAILURE", reasonCode: "recognizer_start_failed" });
+      await enviarEventosObservabilidadDictado();
       return;
     }
 
     setEstado("dictando");
+    observarDictado("REANUDACION_POR_EDICION_COMPLETADA", { outcome: "SUCCESS", durationMs: Date.now() - resumeStartedAt, metrics: { source_mode: modoEntradaRef.current } });
+    void enviarEventosObservabilidadDictado();
     setTimeout(() => { void arrancarGrabacion(); }, 900);
-  }, [arrancarGrabacion, arrancarReconocedor]);
+    } catch {
+      activoRef.current = false;
+      setEstado("inactivo");
+      observarDictado("REANUDACION_POR_EDICION_FALLIDA", { severity: "ERROR", outcome: "FAILURE", reasonCode: "pending_audio_finalization_failed", durationMs: Date.now() - resumeStartedAt });
+      await enviarEventosObservabilidadDictado();
+    }
+  }, [arrancarGrabacion, arrancarReconocedor, observarDictado]);
 
   useEffect(() => {
     const unregister = registerKhoraLockCheckpoint(async () => {
@@ -862,6 +1029,9 @@ function IngresoContenido() {
     }
     if (!sesionIdRef.current) sesionIdRef.current = generarSesionId();
     setGuardando(true);
+    const saveStartedAt = Date.now();
+    observarDictado("GUARDADO_DICTADO_INICIADO", { outcome: "PENDING", metrics: { chars_current: texto.length, part_count: partesSubidasRef.current.length } });
+    void enviarEventosObservabilidadDictado();
     try {
       if (subidaEnCursoRef.current) {
         await subidaEnCursoRef.current;
@@ -934,21 +1104,26 @@ function IngresoContenido() {
         }
 
         if (!rv.ok) {
+          observarDictado("GUARDADO_DICTADO_FALLIDO", { severity: "ERROR", outcome: "FAILURE", reasonCode: "http_" + rv.status, durationMs: Date.now() - saveStartedAt, metrics: { http_status: rv.status, chars_current: texto.length, part_count: partesSubidasRef.current.length } });
           setError(String(dv?.detail || "Error desconocido") + " " + String(dv?.causa ?? ""));
         } else {
+          observarDictado("GUARDADO_DICTADO_COMPLETADO", { outcome: "SUCCESS", durationMs: Date.now() - saveStartedAt, metrics: { response_ok: true, chars_current: texto.length, part_count: partesSubidasRef.current.length } });
           setArchivado(true);
           setResultado((dv?.idempotent ? "volcado ya archivado " : "archivado ") + String(dv?.chars) + " caracteres, sha " + String(dv?.sha256).slice(0, 8) + (audioUrl ? `, con audio (${partes.length} partes)` : ", sin audio"));
           setAviso("Captura sellada. La revisión y las correcciones se hacen en Volcados; pulsa Limpiar para empezar una captura nueva.");
         }
       } catch (err) {
+        observarDictado("GUARDADO_DICTADO_FALLIDO", { severity: "ERROR", outcome: "FAILURE", reasonCode: "network_error", durationMs: Date.now() - saveStartedAt, metrics: { chars_current: texto.length, part_count: partesSubidasRef.current.length } });
         setError("Error de red al guardar: " + String(err));
       }
     } catch (e) {
+      observarDictado("GUARDADO_DICTADO_FALLIDO", { severity: "ERROR", outcome: "FAILURE", reasonCode: "save_preparation_failed", durationMs: Date.now() - saveStartedAt });
       setError(String(e));
     } finally {
       setGuardando(false);
+      await enviarEventosObservabilidadDictado();
     }
-  }, [archivado, texto, titulo, pulidosOk]);
+  }, [archivado, texto, titulo, pulidosOk, observarDictado]);
 
 
   const exportarAudioOriginal = useCallback(async () => {
@@ -1061,6 +1236,8 @@ function IngresoContenido() {
   };
 
   const limpiar = useCallback(() => {
+    observarDictado("CAPTURA_LIMPIADA", { outcome: "SUCCESS", metrics: { source_mode: modoEntradaRef.current, chars_before: texto.length, part_count: partesSubidasRef.current.length } });
+    void enviarEventosObservabilidadDictado();
     enviarChromeCommand("stop");
     segmentosRef.current = [];
     setSegmentos([]);
@@ -1102,21 +1279,23 @@ function IngresoContenido() {
     estadoTranscripcionRef.current = null;
     setPartesContador(0);
     setBytesAcumulados(0);
-  }, []);
+  }, [enviarChromeCommand, observarDictado, texto]);
 
   const iniciarEdicionInSitu = useCallback(() => {
     if (editando || cerrandoEdicionRef.current) return;
     if (modoEntradaRef.current === "chrome_live_caption" && estado === "dictando") {
+      observarDictado("EDICION_IN_SITU_BLOQUEADA", { severity: "WARN", outcome: "SKIPPED", reasonCode: "chrome_capture_must_stop_first", metrics: { source_mode: "chrome_live_caption", active: true } });
       setAviso("Detén la captura Chrome antes de editar el texto.");
       return;
     }
     textoAntesEdicionRef.current = texto;
     const dictadoActivo = estado === "dictando" || activoRef.current;
+    observarDictado("EDICION_IN_SITU_INICIADA", { outcome: "PENDING", metrics: { was_dictating: dictadoActivo, chars_before: texto.length, segment_count: segmentosRef.current.length, source_mode: modoEntradaRef.current } });
     estabaDictandoRef.current = dictadoActivo;
     setEstabaDictando(dictadoActivo);
     setEditando(true);
     if (dictadoActivo) pausarParaEdicionInSitu();
-  }, [editando, estado, pausarParaEdicionInSitu, texto]);
+  }, [editando, estado, pausarParaEdicionInSitu, texto, observarDictado]);
 
   const handleTextoChange = useCallback((val: string) => {
     if (!editando) iniciarEdicionInSitu();
@@ -1145,6 +1324,8 @@ function IngresoContenido() {
     if (cerrandoEdicionRef.current) return;
     cerrandoEdicionRef.current = true;
     const debeReanudar = estabaDictandoRef.current;
+    const editStartedAt = Date.now();
+    observarDictado("EDICION_IN_SITU_CIERRE_INICIADO", { outcome: "PENDING", metrics: { confirmed: forzarConfirmacion, was_dictating: debeReanudar, chars_before: textoAntesEdicionRef.current.length, chars_after: texto.length } });
     try {
       await cerrarEdicionInSitu({
         textoAntes: textoAntesEdicionRef.current,
@@ -1155,13 +1336,18 @@ function IngresoContenido() {
         desactivar: () => undefined,
         reanudar: reanudarTrasEdicionInSitu,
       });
+      observarDictado(forzarConfirmacion ? "EDICION_IN_SITU_CONFIRMADA" : "EDICION_IN_SITU_CANCELADA", { outcome: "SUCCESS", durationMs: Date.now() - editStartedAt, metrics: { confirmed: forzarConfirmacion, was_dictating: debeReanudar, chars_before: textoAntesEdicionRef.current.length, chars_after: texto.length } });
+    } catch (cause) {
+      observarDictado("EDICION_IN_SITU_CIERRE_FALLIDO", { severity: "ERROR", outcome: "FAILURE", reasonCode: "edit_finalize_failed", durationMs: Date.now() - editStartedAt, metrics: { confirmed: forzarConfirmacion, was_dictating: debeReanudar } });
+      throw cause;
     } finally {
       setEditando(false);
       estabaDictandoRef.current = false;
       setEstabaDictando(false);
       cerrandoEdicionRef.current = false;
+      await enviarEventosObservabilidadDictado();
     }
-  }, [aplicarEdicionInSitu, reanudarTrasEdicionInSitu, texto]);
+  }, [aplicarEdicionInSitu, reanudarTrasEdicionInSitu, texto, observarDictado]);
 
   const confirmarEdicion = useCallback(() => {
     void finalizarEdicionInSitu(true);

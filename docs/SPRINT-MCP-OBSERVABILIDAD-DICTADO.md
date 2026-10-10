@@ -399,16 +399,70 @@ Cada ciclo puede incluir varias entradas de evidencia, pero no debe omitir ningu
 
 **Corrección de ubicación completada y verificada por read-back:** la primera publicación en `SeryMente/metodologia` fue una ubicación incorrecta. El objeto canónico operativo reside exclusivamente en `SeryMente/khora/docs/SPRINT-MCP-OBSERVABILIDAD-DICTADO.md`, enlazado desde el README de KHORA. Se retiró el duplicado de Metodología en commit `e32c499e698204a9ebf25af08cd30c54c5c8a1f2`; los cambios compensatorios fueron `d185f5cb19b5b6f984e41dbec419cae571cbe8fb` (METODOLOGIA.md), `50f643aa023bbcd6f74b2455e95a64f752adeaf6` (BOOTSTRAP-CONTEXTO-GLOBAL.md) y `0d2066f22e02821aa585cd5fdae38f1877d5f559` (README.md). El read-back confirmó que los tres archivos de Metodología volvieron exactamente a sus blobs originales de apertura: `e0dc6157d2bc95bca8dff5fde354d601b163a814`, `785e4034bb6eecc01521e573e3c3c16259944057` y `7ba4ddba0bd6728c36c4e9245895c9f73867a55e`. No se reescribió el historial remoto.
 
+### MCP-OBS-DICTADO/C003 · 2026-10-10 · Instrumentación persistente de checkpoints de dictado
+
+**Propósito:** instrumentar exclusivamente el dictado por GitHub, con checkpoints en las transiciones diagnósticas, persistencia central e integridad de los eventos.
+
+**Instrucción verbatim:**
+
+> Trabaja exclusivamente en la observavilidad de khora
+> 
+> 1. El sistema debe de guardar en persistencia,  quiza vercel blob,  no estoy sguro,   todo el registro de eventos..  Se consideran datos de usuario.
+> 2. Lo debe de persistir,  con la frecuencia neesaria.&#x20;
+> 3. Ademas de otros metodos,  ya que no se restringe a esto, checkpoints por proceso se establecen,  en  este momento necesito que veriques de extremo a extremo el proceso dedl dictado, y encuentres checkpoints adecuados,  cuando se inicia el dictado,  cuando se detiene pr edicion ipso facto,  es decir mapea todos lo0s puntoss en los que es posible que ocurra algo que pueda servir observar tanto para el desarrollo y mejroa contina, como para diagnostico de bugs.&#x20;
+> 4. Asegurte que los checkpoints desencadenan un envio actualizado del registo de eventos debidamente estriucturado y hecho para que se tenga claridad sobre lo ocurrido.&#x20;
+> 5. Por ahjora enfocate nada mas en el proceso de dictado para los checkpoitns.&#x20;
+> 6. Trabaja de manera que todo lo que te digo en  est entrdada se cumpla cabalmente.
+> 7. No te detengas hjasta terminar. Por nada del mundo.
+> 8. Imponte  unmaximo grado  de rigurosa implacable calidad en la atencion al detalle y la calidad
+> 9. Trabaja con  github nada mas,  sinrdc.
+> 10. Si no has resuelto todo esto en  un solo cilo habras fallado en la ejecucion.&#x20;
+> 11. Vuelvo en unas hjoras.&#x20;
+> 
+> COMIENZA YA
+
+**Interpretación operativa:** instrumentar Micrófono/Web Speech y Chrome Live Caption; marcar eventos como datos de usuario; mantener los registros completos en el sistema de eventos persistentes; enviar los eventos en cada checkpoint; no incluir texto, audio, URL privada ni secretos en la telemetría; no corregir todavía la causa del bug de dictado.
+
+**Línea base:** HEAD main `35d00868758ff5d481983ed2415a8cff71011cc1`. Component `IngresoWorkspace.tsx` blob `eed47f0c7705f2c472d8b87c8c286e060d2a132e`; server `lib/server/eventos.ts` blob `48e59087a125c7155374bfacc64ff860ba2b1bd8`; contract `lib/contracts/observation.ts` blob `e468ef66b1e90914a9e6b5c656ca4ae0a9b7451d`; ingest route `app/api/eventos/route.ts` blob `45329eafb9238c4fb85d294b83426bf0f1790f4f`.
+
+**Persistencia elegida:** se reutiliza POST /api/eventos → registrarEventosBatch → eventos_sistema, con deduplicación por UUID/idempotencia, cadena hash y outbox. No se añade una copia paralela a Vercel Blob: los eventos requieren consulta estructurada y ya hay un almacén canónico. El texto del checkpoint sigue cifrado y separado; la telemetría nunca guarda el texto literal.
+
+**Checkpoints instrumentados:**
+
+| Etapa | Eventos / propósito |
+| --- | --- |
+| Montaje y recuperación | WORKSPACE_READY, CHECKPOINT_RECUPERADO, ERROR_RECUPERACION_CHECKPOINT y RECUPERACION_OMITIDA_POR_SESION_ACTIVA; estado de recuperación/capacidad sin contenido verbal. |
+| Inicio ASR | DICTADO_INICIO_SOLICITADO/ACEPTADO/FALLIDO, CAPACIDAD_RECONOCIMIENTO_AUSENTE, RECONOCEDOR_CONSTRUIDO/INICIADO/START_FALLIDO. Separa solicitud, construcción y start. |
+| Micrófono / MediaRecorder | SOLICITUD_MICROFONO, MICROFONO_PERMITIDO, ERROR_INICIO_GRABACION, GRABACION_INICIADA/DETENIDA, ERROR_GRABADORA, FRAGMENTOS_RECIBIDOS, GRABACION_PARO_SOLICITADO/FALLIDO. Mide tiempos, bytes y fragmentos. |
+| Resultados de voz | RESULTADO_FINAL_RECIBIDO y RESULTADO_PARCIAL_RECIBIDO; registra longitud/segmentos, no frases. Los parciales se limitan por frecuencia. |
+| Errores y rearme | ERROR_RECONOCEDOR, EVENTO_FIN_RECONOCEDOR, RECONEXION_PROGRAMADA/INICIADA/FALLIDA/REINTENTADA y RECONOCIMIENTO_NO_REANUDABLE. |
+| Hipótesis de instancia antigua | REARME_INSTANCIA_ANTERIOR compara la instancia del callback con recRef.current. Es señal diagnóstica; no confirma ni corrige la hipótesis I-006. |
+| Checkpoint | CHECKPOINT_INICIADO/PERSISTIDO/FALLIDO con carácter-count, duración, modo forzado y resultado HTTP; el texto original no viaja en telemetría. |
+| Edición in situ | EDICION_IN_SITU_INICIADA, DICTADO_PAUSA_POR_EDICION, DICTADO_PAUSADO_POR_EDICION, fallo de parada y contadores de longitud. Registra el paro inmediato en el primer cambio del editor. |
+| Confirmación/cancelación y reanudación | EDICION_IN_SITU_CIERRE_INICIADO/CONFIRMADA/CANCELADA/CIERRE_FALLIDO y REANUDACION_POR_EDICION_SOLICITADA/COMPLETADA/FALLIDA. Captura espera de finalización/subida y vuelta al recognizer. |
+| Chrome Live Caption | CAPTURA_CHROME_PREPARADA, COMANDO_CHROME_ENVIADO, BRIDGE_CHROME_ESTADO, CAPTURA_CHROME_ESTADO/FALLIDA, SEGMENTO_CHROME_RECIBIDO, PARTE_CHROME_INVALIDA/VERIFICADA, CAPTURA_CHROME_DETENIDA/PARO_FALLIDO y PARADA_CHROME_ACK_TIMEOUT. |
+| Upload/transcripción | PARTE_AUDIO_SUBIDA_INICIADA/PERSISTIDA/FALLIDA y TRANSCRIPCION_AUTORITATIVA_INICIADA/OMITIDA/COMPLETADA/FALLIDA. Sin URL ni bytes de audio en payload. |
+| Cierre/guardado/limpieza | DICTADO_DETENCION_SOLICITADA/DETENIDO, GUARDADO_DICTADO_INICIADO/COMPLETADO/FALLIDO, AUTOBLOQUEO_CHECKPOINT_INICIADO/COMPLETADO y CAPTURA_LIMPIADA. |
+
+**Contrato de evento:** OBS-1 con UUID, fase dictado, componente ingreso_workspace, correlación por sesión, causation_id, intento, secuencia, tiempo de cliente, duración, severity/outcome, reason_code, métricas escalares autorizadas y privacy_class USER_DATA. Las cadenas y claves no autorizadas se descartan en el cliente. El servidor traduce PENDING a START, SKIPPED a SKIP, PARTIAL a INFO y los fallos a FAIL; sequence=1000 produce DIC-001, nunca DIC-000.
+
+**Envío y confirmación:** se encola en sessionStorage con respaldo en memoria y se programa POST en 100 ms; hitos críticos también fuerzan envío y se reintenta en online, pagehide, cambio de visibilidad y checkpoints siguientes. Un lote se retira solamente con acuse donde accepted + duplicates igual al número enviado y rejected=0. La deduplicación reutiliza UUID y clave idempotente. La persistencia central se considera acreditada solo tras acuse del endpoint.
+
+**Límites y no-resultados:** no se añade Blob paralelo; no se modificó intencionalmente la lógica funcional de reconexión para no anticipar el diagnóstico. La hipótesis I-006 permanece NO CONFIRMADA. El HEAD inicial presentaba workflows fallidos; los logs disponibles devolvieron 404 y no se adjudica su causa. No se ejecutó MCP autenticado, ni pruebas de runtime ni validación de producción en este punto.
+
+**Siguiente actualización obligatoria:** C004 deberá añadir el SHA del commit publicado, read-back de cada fichero y resultados reales de GitHub Actions. Hasta que los checks se ejecuten, S2 permanece IMPLEMENTADO/PENDIENTE DE VERIFICACIÓN.
+
 ## 17. Estado operativo vigente y siguiente acción
 
-**Estado general:** ABIERTO · NO CERRAR.  
+**Estado general:** ABIERTO · IMPLEMENTACIÓN DE OBSERVABILIDAD DEL DICTADO EN VALIDACIÓN.  
 **S0:** VERIFICADO. Objeto canónico en KHORA y entrada en README comprobados por read-back.  
-**S1:** comprobar acceso MCP real y recuperar eventos reales de observabilidad con credenciales autorizadas.  
+**S1:** acceso MCP autenticado y consulta de registros reales siguen pendientes.  
+**S2:** instrumentación del dictado, contrato USER_DATA, cola de envío y pruebas se publican en C003; la verificación dependerá del read-back y de CI.  
 **El bug de dictado no está diagnosticado ni corregido en este sprint.**  
-**No se ha probado una conexión MCP autenticada desde esta conversación.**  
-**No existe autorización en este objeto para afirmar que producción quedó verificada.**
+**No se ha probado una conexión MCP autenticada ni runtime de producción en este ciclo.**  
+**No se afirma despliegue ni verificación de producción.**
 
-La siguiente acción es resolver S1 sin modificar todavía la conducta del reconocedor: comprobar acceso MCP real desde un cliente autorizado y recuperar eventos reales de observabilidad. La limpieza compensatoria de Metodología pertenece al cierre administrativo de este ciclo y no convierte S1 en completado. Si la plataforma utilizada no dispone de un conector MCP real, registrar con precisión esa limitación y preparar la vía de conexión soportada, sin simular llamadas ni exigir al usuario que repita toda la historia.
+La siguiente acción es leer de vuelta los cambios publicados, comprobar el resultado de GitHub Actions y corregir cualquier fallo de pruebas o tipado. Después se debe verificar el acceso MCP real y consultar los eventos persistidos. La instrumentación registra la hipótesis del callback tardío, pero no declara la causa ni altera la conducta del reconocedor para adelantarse al diagnóstico.
 
 ## 18. Referencias canónicas
 
@@ -422,3 +476,13 @@ La siguiente acción es resolver S1 sin modificar todavía la conducta del recon
 - [Observability services contract](https://github.com/SeryMente/khora/blob/main/khora-web/docs/observability-services.md)
 
 El objeto se conserva como texto canónico portable. Para cualquier afirmación dinámica —acceso real, estado de producción, contenido actual de eventos, resultado de un test o versión desplegada— se debe obtener evidencia nueva del recurso correspondiente y registrar el resultado en esta crónica.
+
+
+## 19. Invariantes del colector
+
+- Todos los eventos del flujo se clasifican USER_DATA; el sobre observacional admite únicamente valores escalares permitidos y no transporta texto dictado, audio, URL privada ni tokens.
+- El identificador causal apunta al evento más reciente de la misma sesión. La secuencia es ascendente por sesión.
+- Una respuesta HTTP 200 que contenga rechazos no confirma persistencia de todo el lote. Cualquier rechazo, resumen incompleto o error conserva la cola.
+- Los parciales de reconocimiento se muestrean como máximo cada cinco segundos y las señales de fragmentos se emiten cada diez chunks; los hitos, errores, uploads, checkpoints y transiciones de edición se registran individualmente.
+- Vercel Blob no se añade como copia paralela sin una necesidad específica: eventos_sistema/outbox es la fuente estructurada existente, y el texto se conserva en su ruta cifrada separada.
+- Los callbacks tardíos se observan sin alterar su comportamiento funcional hasta que una reproducción determine la causa.

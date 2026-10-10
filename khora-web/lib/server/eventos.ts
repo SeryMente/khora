@@ -408,12 +408,19 @@ export async function registrarEventosBatch(
       }
 
       const prefijo = PREFIJOS_FASE[faseMapped] || "CAP";
-      const eventIdFormatted = `${prefijo}-${String((obs.sequence || idx + 1) % 1000).padStart(3, "0")}`;
+      const normalizedSequence = Math.max(1, Math.floor(Number(obs.sequence) || idx + 1));
+      const eventNumber = ((normalizedSequence - 1) % 999) + 1;
+      const eventIdFormatted = `${prefijo}-${String(eventNumber).padStart(3, "0")}`;
+      const outcomeState: EstadoEvento =
+        obs.severity === "ERROR" || obs.severity === "CRITICAL" || obs.outcome === "FAILURE" ? "FAIL" :
+        obs.outcome === "PENDING" ? "START" :
+        obs.outcome === "SKIPPED" ? "SKIP" :
+        obs.outcome === "PARTIAL" ? "INFO" : "OK";
 
       params = {
         fase: faseMapped,
         eventId: eventIdFormatted,
-        estado: obs.severity === "ERROR" || obs.severity === "CRITICAL" ? "FAIL" : "OK",
+        estado: outcomeState,
         mensaje: cleanSecretos(obs.event_name, 1000),
         detalle: obs.metrics ? { metrics: obs.metrics, component: obs.component } : { component: obs.component },
         volcadoId: obs.volcado_id,
@@ -430,7 +437,7 @@ export async function registrarEventosBatch(
         attemptId: obs.attempt_id,
         sequence: obs.sequence,
         sessionId: obs.session_id,
-        releaseSha: obs.release_sha,
+        releaseSha: obs.release_sha || process.env.VERCEL_GIT_COMMIT_SHA || null,
         durationMs: obs.duration_ms,
         metrics: obs.metrics,
         reasonCode: obs.reason_code,
