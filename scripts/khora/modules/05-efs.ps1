@@ -25,8 +25,19 @@ function Lock-KhoraEncryptedVolume {
     return $true
 }
 function Dismount-KhoraVhd {
-    $file=Join-Path $env:SystemRoot ('Temp\khora-detach-'+[guid]::NewGuid().ToString('N')+'.txt')
-    [IO.File]::WriteAllLines($file,@("select vdisk file=`"$VHD_PATH`"",'detach vdisk noerr'),(New-Object Text.ASCIIEncoding))
+    $tempRoot=[string]$script:KHORA_HOST_TEMP
+    if([string]::IsNullOrWhiteSpace($tempRoot)){throw 'KHORA_HOST_TEMP_MISSING'}
+    $tempRoot=[IO.Path]::GetFullPath($tempRoot)
+    if($script:DATA_PROFILE_MODE -eq 'fila4-profile-tree'){
+        $rootPrefix=([string]$script:DATA_PROFILE_ROOT).TrimEnd('\')+'\'
+        if(-not $tempRoot.StartsWith($rootPrefix,[StringComparison]::OrdinalIgnoreCase)){throw 'KHORA_DISMOUNT_TEMP_OUTSIDE_FILA4_PROFILE'}
+    }
+    if(-not(Test-Path -LiteralPath $tempRoot -PathType Container)){throw 'KHORA_HOST_TEMP_NOT_FOUND'}
+    $tempItem=Get-Item -LiteralPath $tempRoot -Force -ErrorAction Stop
+    if(($tempItem.Attributes -band [IO.FileAttributes]::ReparsePoint)-ne0){throw 'KHORA_HOST_TEMP_REPARSE_POINT_REFUSED'}
+    $file=Join-Path $tempRoot ('khora-detach-'+[guid]::NewGuid().ToString('N')+'.txt')
+    $diskpartSelect='select vdisk file="'+$VHD_PATH+'"'
+    [IO.File]::WriteAllLines($file,@($diskpartSelect,'detach vdisk noerr'),(New-Object Text.ASCIIEncoding))
     try{& diskpart.exe /s $file|Out-Null}finally{Remove-Item -LiteralPath $file -Force -ErrorAction SilentlyContinue}
     return (-not(Test-Path($MOUNT_POINT+'\')))
 }
