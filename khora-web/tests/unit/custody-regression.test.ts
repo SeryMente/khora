@@ -464,7 +464,7 @@ test("CUSTODY-12: original export works from verified import custody before or a
   assert.ok(exportRoute.includes("p.original_name"));
   assert.ok(exportRoute.includes("p.mime_type"));
   assert.ok(exportRoute.includes("LEFT JOIN dictado_session"));
-  assert.ok(exportRoute.includes('parts[0].fuente_audio !== "audio_archivo"'));
+  assert.ok(exportRoute.includes('parts[0].fuente_audio !== "audio_archivo" && parts[0].driver !== "audio_archivo"'));
   assert.ok(exportRoute.includes("parts.length !== 1"));
   assert.ok(exportRoute.includes("const audio = buffers[0]"));
   assert.ok(exportRoute.includes("evaluarCustodiaAudio"));
@@ -482,7 +482,7 @@ test("CUSTODY-14: archived captures stay sealed and text-only saves receive stab
   assert.ok(saveHandler.includes("if (!sesionIdRef.current) sesionIdRef.current = generarSesionId()"));
   assert.ok(saveHandler.includes("setArchivado(true)"));
   assert.ok(saveHandler.includes("setAviso("));
-  assert.ok(saveHandler.includes("[archivado, texto, titulo, pulidosOk]"));
+  assert.ok(saveHandler.includes("[archivado, texto, titulo, pulidosOk, observarDictado]"));
 
   const attachStart = workspace.indexOf("const handleAdjuntarAudio");
   const cleanStart = workspace.indexOf("const limpiar", attachStart);
