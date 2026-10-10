@@ -2,8 +2,8 @@
 
 **Identificador:** OEP  
 **Nombre completo:** Persistencia de Entorno Operativo  
-**Versión:** v0.1.8
-**Nombre de versión:** Administración OIDC del Secreto y Acceso Maestro EP de Solo Uso
+**Versión:** v0.1.9
+**Nombre de versión:** Fallo Cerrado de la Bóveda y Contrato de Acceso OEP
 **Estado:** ACTIVO · CANÓNICO PARA ESTE ÁMBITO · EN EVOLUCIÓN CONTROLADA  
 **Sistema emisor:** KHORA  
 **Plataforma objetivo actual:** Windows
@@ -487,3 +487,13 @@ La ausencia de contexto conversacional no autoriza a reconstruir decisiones fuer
 **Motivo →** impedir que la contraseña maestra se convierta en un mecanismo de administración de secretos de larga duración, manteniendo la separación entre OIDC global y el acceso operativo OEP.
 
 **Resultado →** corrección en la rama feat/ep-github-token-vault-ui; la validación automatizada aún no está certificada y el PR continúa sin integrar ni desplegar. OEP-PENDING-001 permanece abierto hasta el CI aprobado, migración, configuración real y prueba E2E PowerShell 5.1.
+
+## 63. Ciclo operativo 008 — Fail-closed de bóveda y contrato de acceso OEP
+
+**Antes →** si no se podía consultar la bóveda o descifrar un token ya configurado, el catálogo podía recurrir a `GITHUB_TOKEN` del entorno y cambiar de credencial sin confirmación. La nueva ruta `/auth/ep` tampoco estaba declarada como excepción en el registro de navegación.
+
+**Cambio →** el catálogo usa la variable legado solo cuando consulta correctamente la bóveda y obtiene `configured: false`; los errores de almacenamiento/descifrado ahora detienen la operación. Se registró `/auth/ep` en `NAVIGATION_EXEMPT_ROUTES` y se agregó una aserción de contrato para evitar que el validador de navegación trate la pantalla de login OEP como una ruta de producto huérfana.
+
+**Motivo →** impedir fallback silencioso ante un secreto cifrado ilegible y preservar el contrato de navegación existente.
+
+**Resultado →** cambios en la rama `feat/ep-github-token-vault-ui`; todavía no hay evidencia de CI aprobada y no se ha probado en Windows PowerShell 5.1. `OEP-PENDING-001` permanece abierto hasta que los checks pasen, la migración se aplique y el recorrido real se verifique.
