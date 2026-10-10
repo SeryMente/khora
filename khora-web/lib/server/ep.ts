@@ -153,14 +153,17 @@ const DEFAULT_OEP_WORKSPACE_REPOS = ["CENSUS", "signal-interpreter"] as const;
 let repoCatalogCache: { expiresAt: number; value: EpWorkspaceRepo[] } | null = null;
 
 async function getEpCatalogToken(): Promise<string> {
+  // Only use the legacy environment token when the vault is confirmed empty.
+  // If the vault is unavailable or its ciphertext cannot be decrypted, fail closed
+  // rather than silently switching identities/permissions.
+  let status: Awaited<ReturnType<typeof getEpGitHubCredentialStatus>>;
   try {
-    const status = await getEpGitHubCredentialStatus();
-    if (status.configured) return await getStoredEpGitHubToken();
+    status = await getEpGitHubCredentialStatus();
   } catch {
-    const legacy = process.env.GITHUB_TOKEN?.trim();
-    if (legacy) return legacy;
     throw new Error("github_catalog_unavailable");
   }
+  if (status.configured) return getStoredEpGitHubToken();
+
   const legacy = process.env.GITHUB_TOKEN?.trim();
   if (legacy) return legacy;
   throw new Error("github_catalog_unavailable");
