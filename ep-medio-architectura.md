@@ -1,4 +1,4 @@
-# Entorno Persistente Medio · Arquitectura canónica v1.0.6
+# Entorno Persistente Medio · Arquitectura canónica v1.0.7
 
 **Estado:** normativa · actualización 1.0.4
 **Host KHORA:** 7.5.3
@@ -377,3 +377,13 @@ El paquete final incluye `ep-integrity-manifest.sha256`, calculado después de t
 **Motivo:** mantener OIDC como autoridad de administración y reservar la contraseña maestra para el acceso diario limitado a OEP. La cookie maestra permite arrancar EP y consumir la credencial a través del JWT EP con scope `ep:github:token`, pero no gestionar directamente el token persistente.
 
 **Resultado:** corrección implementada en la rama `feat/ep-github-token-vault-ui`; añadidas aserciones de contrato en `tests/unit/ep_security.test.ts`. Falta que GitHub Actions proporcione una ejecución aprobada y que se valide el recorrido en Windows PowerShell 5.1. La propuesta sigue sin integrar ni desplegar.
+
+## 19. Fail-closed del catálogo y alcance de la ruta de acceso OEP · v1.0.7
+
+**Antes:** si el catálogo no podía leer el estado de la bóveda o descifrar una credencial existente, podía caer en `GITHUB_TOKEN` del entorno, cambiando de identidad/permiso sin que el operador lo detectara. La nueva ruta `/auth/ep` tampoco se había añadido a las rutas que el contrato de navegación excluye deliberadamente.
+
+**Cambio:** `getEpCatalogToken()` solo usa `GITHUB_TOKEN` como compatibilidad cuando la consulta de la bóveda termina correctamente y confirma que no hay una credencial guardada. Si la BD no responde o la credencial configurada no se puede descifrar, la operación falla cerrada con `github_catalog_unavailable`. La ruta `/auth/ep` se incorpora a `NAVIGATION_EXEMPT_ROUTES` y queda protegida por una prueba de contrato.
+
+**Motivo:** no ocultar un fallo de descifrado ni seleccionar silenciosamente otro token; y mantener coherente el contrato de navegación al añadir una pantalla de autenticación específica de OEP.
+
+**Resultado:** cambios presentes en `feat/ep-github-token-vault-ui`; aún sujetos a CI y pruebas runtime. El PR permanece sin integrar ni desplegar.
