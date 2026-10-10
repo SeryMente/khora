@@ -82,6 +82,12 @@ export async function POST(req: NextRequest) {
   const email = await resolveEpUserEmail(req, session?.user?.email || "");
   const origin = req.nextUrl.origin;
   if (!email) return NextResponse.json({ error: "not_authorized" }, { status: 401, headers: NO_STORE_HEADERS });
+  const oidcEmail = (session?.user?.email || "").trim().toLowerCase();
+  // A master-cookie-only request is browser-authorized and must be same-origin.
+  // Preserve legacy OIDC callers while rejecting cross-origin issuance via the EP cookie.
+  if (oidcEmail !== email && req.headers.get("origin") !== origin) {
+    return NextResponse.json({ error: "invalid_origin" }, { status: 403, headers: NO_STORE_HEADERS });
+  }
 
   let platform = "windows";
   let modeExplicit = false;
