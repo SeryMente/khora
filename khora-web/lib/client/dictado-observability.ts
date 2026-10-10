@@ -38,6 +38,8 @@ export interface DictadoObservationInput extends DictadoObservationOptions {
 let memoryQueue: ObservationEnvelope[] = [];
 let flushInFlight: Promise<void> | null = null;
 let flushTimer: ReturnType<typeof setTimeout> | null = null;
+let retryTimer: ReturnType<typeof setTimeout> | null = null;
+let retryAttempt = 0;
 let listenersInstalled = false;
 const sequenceFallback = new Map<string, number>();
 const causationFallback = new Map<string, string>();
@@ -137,6 +139,22 @@ function safeReasonCode(value?: string | null): string | null {
   return value.toLowerCase().replace(/[^a-z0-9_-]/g, "_").slice(0, 80) || null;
 }
 
+function scheduleRetry(): void {
+  if (typeof window === "undefined" || retryTimer !== null) return;
+  const delayMs = Math.min(30_000, 1_000 * (2 ** Math.min(retryAttempt, 5)));
+  retryAttempt = Math.min(retryAttempt + 1, 6);
+  retryTimer = window.setTimeout(() => {
+    retryTimer = null;
+    void enviarEventosObservabilidadDictado();
+  }, delayMs);
+}
+
+function cancelRetry(resetAttempts = false): void {
+  if (retryTimer !== null && typeof window !== "undefined") window.clearTimeout(retryTimer);
+  retryTimer = null;
+  if (resetAttempts) retryAttempt = 0;
+}
+
 function installRetryListeners(): void {
   if (listenersInstalled || typeof window === "undefined") return;
   listenersInstalled = true;
@@ -199,7 +217,7 @@ export function registrarEventoObservabilidadDictado(input: DictadoObservationIn
 async function flushPendingEvents(): Promise<void> {
   for (let round = 0; round < MAX_FLUSH_ROUNDS; round++) {
     const queue = readQueue();
-    if (queue.length === 0) return;
+    if (queue.length === 0) { cancelRetry(true); return; }
     const sessionId = queue[0].session_id;
     const batch = queue.filter((event) => event.session_id === sessionId).slice(0, MAX_BATCH);
     if (!batch.length) return;
@@ -220,19 +238,25 @@ async function flushPendingEvents(): Promise<void> {
       const summary = result?.summary;
       if (!response.ok || !summary ||
           Number(summary.accepted || 0) + Number(summary.duplicates || 0) !== batch.length ||
-          Number(summary.rejected || 0) !== 0) return;
+          Number(summary.rejected || 0) !== 0) {
+        scheduleRetry();
+        return;
+      }
       const sentIds = new Set(batch.map((event) => event.event_uuid));
       writeQueue(readQueue().filter((event) => !sentIds.has(event.event_uuid)));
     } catch {
-      // Se conserva la cola para reintentar en el próximo checkpoint o al volver la conexión.
+      // Se conserva la cola y se aplica backoff, aun si no llega otro checkpoint.
+      scheduleRetry();
       return;
     }
   }
+  if (readQueue().length > 0) scheduleRetry();
 }
 
 export function enviarEventosObservabilidadDictado(): Promise<void> {
   if (typeof window === "undefined") return Promise.resolve();
   if (flushInFlight) return flushInFlight;
+  cancelRetry(false);
   flushInFlight = flushPendingEvents().finally(() => { flushInFlight = null; });
   return flushInFlight;
 }

@@ -136,3 +136,46 @@ test("dictation telemetry keeps the queue when the server explicitly rejects eve
     assert.equal(requests.length, 1);
   });
 });
+
+
+test("dictation telemetry schedules automatic backoff retry after a server rejection", async () => {
+  await withBrowser(async ({ requests, storage, replies }) => {
+    const root = globalThis as any;
+    const scheduled: Array<() => void> = [];
+    const originalSetTimeout = root.window.setTimeout;
+    root.window.setTimeout = (fn: () => void) => { scheduled.push(fn); return scheduled.length; };
+    try {
+      replies.push(() => ({
+        ok: true,
+        status: 200,
+        json: async () => ({ ok: true, summary: { accepted: 0, duplicates: 0, rejected: 1, total: 1 }, results: [] }),
+      }) as Response);
+      replies.push(() => okResponse(1));
+      const eventId = registrarEventoObservabilidadDictado({
+        sessionId: "44444444-4444-4444-8444-444444444444",
+        eventName: "CHECKPOINT_FALLIDO",
+        severity: "ERROR",
+        outcome: "FAILURE",
+        reasonCode: "schema_rejected",
+      });
+      assert.ok(eventId);
+      // Discard the short event debounce, then perform the first transport attempt.
+      scheduled.shift();
+      await enviarEventosObservabilidadDictado();
+      assert.equal(requests.length, 1);
+      assert.equal(JSON.parse(storage.values.get("khora:dictado:observability:v1:pending") || "[]").length, 1);
+      assert.equal(scheduled.length, 1);
+      // Retry must keep the same UUID and clear the queue only after acknowledgement.
+      scheduled.shift()!();
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      assert.equal(requests.length, 2);
+      const first = JSON.parse(String(requests[0].init.body)).events[0];
+      const second = JSON.parse(String(requests[1].init.body)).events[0];
+      assert.equal(first.event_uuid, eventId);
+      assert.equal(second.event_uuid, eventId);
+      assert.equal(JSON.parse(storage.values.get("khora:dictado:observability:v1:pending") || "[]").length, 0);
+    } finally {
+      root.window.setTimeout = originalSetTimeout;
+    }
+  });
+});

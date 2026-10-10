@@ -246,6 +246,9 @@ test("OBS-1: Eventos de dictado User Data preservan clase, fallo y secuencia fue
   const event = body.eventos.find((candidate: any) => candidate.event_uuid === eventUuid);
   assert.ok(event);
   assert.equal(event.privacy_class, "USER_DATA");
+  assert.equal(event.detalle.severity, "ERROR");
+  assert.equal(event.detalle.phase, "dictado");
+  assert.equal(event.detalle.outcome, "FAILURE");
   assert.equal(event.fase, "dictado");
   assert.equal(event.event_id, "DIC-001");
   assert.equal(event.estado, "FAIL");
