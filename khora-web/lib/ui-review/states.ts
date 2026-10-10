@@ -51,6 +51,8 @@ export function buildIngresoState(
     generandoTitulo: false,
     retranscribiendo: scenario === "finalizing",
     adjuntandoAudio: false,
+    exportandoAudio: false,
+    audioExportable: false,
     conAudio: true,
     partesContador: 1,
     bytesAcumulados: 524288,
@@ -152,6 +154,10 @@ export function buildPipelineState(
         ? null
         : volcado?.id ?? "v-sintetico-001-uuid-demostración",
     selectedItem: scenario === "empty" ? null : volcado,
+    selectedVersionNumber: null,
+    selectedVersionSha256: null,
+    versionSelectionError: null,
+    legacyEditorEntry: false,
     drawerSubTab: "cockpit",
     viewMode: scenario === "editing" ? "edicion" : "lectura",
     editableTexto:

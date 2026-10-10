@@ -51,6 +51,7 @@ function IngresoContenido() {
   const [adjuntandoAudio, setAdjuntandoAudio] = useState(false);
   const [exportandoAudio, setExportandoAudio] = useState(false);
   const [resultado, setResultado] = useState("");
+  const [archivado, setArchivado] = useState(false);
   const [soportado, setSoportado] = useState(true);
   const [conAudio, setConAudio] = useState(false);
   const [escuchando, setEscuchando] = useState(false);
@@ -1261,6 +1262,7 @@ function IngresoContenido() {
     setChromeCaptionActivo(false);
     setChromeCapturaEstado("inactiva");
     setTexto("");
+    setArchivado(false);
     setEditando(false);
     setEstabaDictando(false);
     textoAntesEdicionRef.current = "";

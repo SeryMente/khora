@@ -77,6 +77,7 @@ export function mapObs1ToCap0(obs: OBS1Envelope): CAP0Envelope {
     PUBLIC_METRIC: "public",
     ANONYMIZED_TELEMETRY: "telemetry_only",
     SYSTEM_AUDIT: "internal",
+    USER_DATA: "confidential",
   };
 
   return {

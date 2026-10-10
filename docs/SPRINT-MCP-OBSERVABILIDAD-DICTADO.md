@@ -587,3 +587,21 @@ Este resultado confirma un bloqueo de ejecución de GitHub Actions, no la salida
 
 Estado del producto leído en package.json: khora-web 0.3.8. El nombre de la actualización de código documentada para este ciclo es Observabilidad end-to-end del dictado / C004. El objeto del sprint conserva su versión propia v0.1.0 — Contexto Portátil de Observabilidad MCP y Dictado.
 
+### Addendum C005 — Validación E2E local del dictado por RDC — base e976509cc08471d063dfe7ec962b7749e007bdf7
+
+Se verificó una conexión RDC activa y se creó una copia de trabajo aislada desde `main` en e976509cc08471d063dfe7ec962b7749e007bdf7; la copia preexistente del Escritorio estaba atrasada y contenía modificaciones locales, por lo que no se sobrescribió.
+
+La primera compilación descubrió que `IngresoWorkspace` referenciaba `archivado`/`setArchivado` sin declarar el estado. Se añadió el estado y su reinicio en `limpiar`. También se corrigieron dos bloqueos de TypeScript del código de observabilidad (`USER_DATA` en el adaptador CAP-0 y los tipos de los timers de navegador), se alinearon los fixtures de UI Review con sus contratos actuales y se tipó el callback de selección de volcados. No se modificó el workflow ni se dejó una opción de omisión de TypeScript en la configuración del producto.
+
+**Evidencia local reproducible (Windows, Node v24.0.0, npm 11.3.0):**
+- Instalación de dependencias: `npm.cmd ci --ignore-scripts` terminó con exit code 0 (659 paquetes). Se necesitó `--ignore-scripts` porque la ejecución de un script de ciclo de vida de npm falló con `ERR_INVALID_ARG_TYPE`; el build y la E2E posterior se ejecutaron por separado.
+- TypeScript: `npm.cmd run typecheck` — exit code 0.
+- Unitarias dirigidas: `node --import tsx --test tests/unit/dictado_observability.test.ts tests/unit/eventos_durables.test.ts` — 12 pasaron, 0 fallaron.
+- E2E dirigida: `npm.cmd run e2e -- e2e/contracts/dictado-observability-checkpoints.spec.ts --reporter=line` — exit code 0; 1 prueba pasó en Chromium (1.4 minutos), con compilación normal y la configuración original restaurada. La secuencia cubre inicio, pausa por edición in situ, confirmación, reanudación, callback tardío de instancia anterior y parada normal.
+
+**Bloqueos/alcance restante:**
+- La suite unitaria completa continúa en rojo fuera del flujo de observabilidad: `tests/unit/ingesta.test.ts` recibe HTTP 400 donde sus casos esperan otros estados HTTP, y `tests/unit/methodology_contract_sync.test.ts` compara un contrato local v1.7.6 contra la versión canónica esperada v1.7.7 y difiere también en el estado RA. No se cambiaron esos contratos/pruebas en este ciclo.
+- La E2E intercepta `POST /api/eventos` y `/api/dictado/checkpoint`; valida el flujo cliente/UI, no una inserción y lectura reales de Postgres. La persistencia real y la recuperación mediante MCP autenticado siguen pendientes.
+- Los workflows de GitHub Actions no han sido desbloqueados: los intentos anteriores siguen fallando antes de ejecutar pasos (`runner_id=0`, cero pasos). La validación local no se presenta como CI exitoso ni como despliegue de producción.
+
+Nombre de la actualización de código: **Observabilidad end-to-end del dictado / C005**. Versión del objeto de sprint: **v0.1.0 — Contexto Portátil de Observabilidad MCP y Dictado**. La versión de paquete `khora-web` permanece en **0.3.8**.

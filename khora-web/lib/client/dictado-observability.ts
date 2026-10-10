@@ -37,8 +37,8 @@ export interface DictadoObservationInput extends DictadoObservationOptions {
 
 let memoryQueue: ObservationEnvelope[] = [];
 let flushInFlight: Promise<void> | null = null;
-let flushTimer: ReturnType<typeof window.setTimeout> | null = null;
-let retryTimer: ReturnType<typeof window.setTimeout> | null = null;
+let flushTimer: number | null = null;
+let retryTimer: number | null = null;
 let retryAttempt = 0;
 let listenersInstalled = false;
 const sequenceFallback = new Map<string, number>();
