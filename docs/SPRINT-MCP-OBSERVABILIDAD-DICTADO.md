@@ -572,3 +572,18 @@ Se reemplazó la aserción inicial genérica sobre h1 por la disponibilidad del 
 
 Blob actualizado de la E2E: 745441c25acc95c0c9c88ca68c4af0b80ab62c50.
 
+
+
+### Punto de control final de publicación — base 9788a0dd9211917a40ff617ed3caad0b92d7ddeb
+
+La publicación final de código revisada desde main es 9788a0dd9211917a40ff617ed3caad0b92d7ddeb, mensaje “test(observability): stabilize dictation E2E entry selector”. La E2E de checkpoints es el blob 745441c25acc95c0c9c88ca68c4af0b80ab62c50; el workflow UI Quality que ahora la invoca es el blob 8a8d1cb0746d311894369d2a9c17778b8b1d3ffd. La suite unitaria se descubrió por inspección de run_unit_tests.mjs: recoge todos los archivos .test.ts del directorio tests/unit.
+
+Los nuevos workflows lanzados para ese commit no llegaron a ejecutar pasos:
+- CI run 38077145933: failure; 114286388455 (khora-web-gate), 114286388634 (calidad) y 114286388647 (api-tests), todos runner_id=0 y cero pasos.
+- UI Quality run 38077145921: failure; 114286388702 (UI E2E) y 114286388900 (UI Contract), runner_id=0 y cero pasos.
+- Deploy to Production run 38077145918: failure; 114286388671 (deploy-and-notify), runner_id=0 y cero pasos.
+
+Este resultado confirma un bloqueo de ejecución de GitHub Actions, no la salida de una compilación, pruebas o despliegue. No hay evidencia suficiente para afirmar que la aplicación se haya desplegado o que la persistencia se haya probado contra Postgres en ejecución.
+
+Estado del producto leído en package.json: khora-web 0.3.8. El nombre de la actualización de código documentada para este ciclo es Observabilidad end-to-end del dictado / C004. El objeto del sprint conserva su versión propia v0.1.0 — Contexto Portátil de Observabilidad MCP y Dictado.
+
