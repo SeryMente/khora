@@ -103,7 +103,7 @@ test("runtime-only grant refuses escalation to volcados:read at token exchange",
   let used = false;
   const mockRecord = {
     id: 92,
-    code_hash: codeHash + "2",
+    code_hash: codeHash,
     code_challenge: challenge,
     redirect_uri: "https://chatgpt.com/connector_platform_oauth_redirect",
     resource: "https://khora.example.com/api/mcp",
