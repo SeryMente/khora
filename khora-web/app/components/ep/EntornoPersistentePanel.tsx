@@ -44,7 +44,7 @@ type Issued = {
 };
 type Summary = { id: string; estado: string; creado_en: string; ultimo_evento_en: string | null; cerrado_en: string | null };
 type WorkspaceRepo = { name: string; private: boolean; defaultBranch: string; extensionRoot: string | null };
-type GitHubCredentialStatus = { configured: boolean; githubLogin: string | null; tokenSuffix: string | null; repositories: Array<{ name: string; read: boolean; write: boolean }>; updatedAt: string | null };
+type GitHubCredentialStatus = { configured: boolean; githubLogin: string | null; tokenSuffix: string | null; repositories: Array<{ name: string; read: boolean; write: boolean }>; updatedAt: string | null; canManage?: boolean };
 type MasterPasswordStatus = { configured: boolean; updatedAt: string | null; canManage?: boolean };
 type Notice = { kind: "idle" | "working" | "success" | "error"; text: string };
 type JwtClaims = { iss?: unknown; sid?: unknown; typ?: unknown; exp?: unknown; launchMode?: unknown };
@@ -508,32 +508,42 @@ export default function EntornoPersistentePanel() {
             <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-xs font-bold" style={border}>A</span>
             <div className="min-w-0">
               <h3 className="font-bold">Credencial de GitHub (secreto persistente)</h3>
-              <p className="mt-1 text-xs leading-relaxed opacity-65">Carga aquí el PAT que ya tienes configurado para operar los repositorios. Khôra valida la cuenta y el acceso a los seis repositorios requeridos, cifra el secreto en el servidor con AES-256-GCM y solo lo revela al bootstrap PowerShell con una sesión EP válida. El navegador nunca puede volver a leer el token guardado.</p>
+              <p className="mt-1 text-xs leading-relaxed opacity-65">La credencial se cifra en el servidor con AES-256-GCM y solo se entrega al bootstrap PowerShell con una sesión EP válida. El navegador nunca puede volver a leer el secreto guardado.</p>
             </div>
           </div>
-          <label className="block space-y-2 text-xs">
-            <span className="font-bold uppercase tracking-wider">Personal Access Token de GitHub</span>
-            <input
-              type="password"
-              autoComplete="new-password"
-              spellCheck={false}
-              value={githubTokenInput}
-              onChange={(event) => setGithubTokenInput(event.target.value)}
-              maxLength={8192}
-              disabled={githubCredentialBusy}
-              placeholder={githubCredential?.configured ? "Token guardado; escribe uno nuevo para rotarlo" : "ghp_… · github_pat_… · gho_…"}
-              className="min-h-12 w-full rounded-lg border bg-transparent px-4 py-3 text-sm outline-none focus-visible:ring-2 disabled:opacity-50"
-              style={border}
-              aria-label="Token de GitHub"
-            />
-            <span className="block opacity-55">No pegues el token en un issue, comentario, chat, URL o terminal compartida. Al guardar, el campo se vacía y no se permite recuperar el secreto desde la UI.</span>
-          </label>
-          <div className="flex flex-wrap gap-2">
-            <button type="button" onClick={saveGitHubCredential} disabled={!githubTokenInput || githubCredentialBusy} className="flex min-h-11 items-center justify-center gap-2 rounded-lg border px-4 py-2 text-xs font-bold uppercase disabled:opacity-50" style={{ ...border, background: "var(--khora-accent)", color: "var(--khora-bg)" }}>
-              <ShieldCheck size={16} />{githubCredentialBusy ? "Validando..." : githubCredential?.configured ? "Validar y rotar token" : "Validar y guardar token"}
-            </button>
-            {githubCredential?.configured && <button type="button" onClick={removeGitHubCredential} disabled={githubCredentialBusy} className="flex min-h-11 items-center justify-center gap-2 rounded-lg border px-4 py-2 text-xs font-bold uppercase disabled:opacity-50" style={border}><Trash2 size={15} />Eliminar token guardado</button>}
-          </div>
+
+          {githubCredential?.canManage ? (
+            <>
+              <label className="block space-y-2 text-xs">
+                <span className="font-bold uppercase tracking-wider">Token de GitHub</span>
+                <input
+                  type="password"
+                  autoComplete="new-password"
+                  spellCheck={false}
+                  value={githubTokenInput}
+                  onChange={(event) => setGithubTokenInput(event.target.value)}
+                  maxLength={8192}
+                  disabled={githubCredentialBusy}
+                  placeholder={githubCredential.configured ? "Token guardado; escribe uno nuevo para rotarlo" : "ghp_… · github_pat_… · gho_…"}
+                  className="min-h-12 w-full rounded-lg border bg-transparent px-4 py-3 text-sm outline-none focus-visible:ring-2 disabled:opacity-50"
+                  style={border}
+                  aria-label="Token de GitHub"
+                />
+                <span className="block opacity-55">La carga, rotación y eliminación requieren una sesión OIDC autorizada. No pegues el token en un issue, comentario, chat, URL o terminal compartida. Al guardar, el campo se vacía.</span>
+              </label>
+              <div className="flex flex-wrap gap-2">
+                <button type="button" onClick={saveGitHubCredential} disabled={!githubTokenInput || githubCredentialBusy} className="flex min-h-11 items-center justify-center gap-2 rounded-lg border px-4 py-2 text-xs font-bold uppercase disabled:opacity-50" style={{ ...border, background: "var(--khora-accent)", color: "var(--khora-bg)" }}>
+                  <ShieldCheck size={16} />{githubCredentialBusy ? "Validando..." : githubCredential.configured ? "Validar y rotar token" : "Validar y guardar token"}
+                </button>
+                {githubCredential.configured && <button type="button" onClick={removeGitHubCredential} disabled={githubCredentialBusy} className="flex min-h-11 items-center justify-center gap-2 rounded-lg border px-4 py-2 text-xs font-bold uppercase disabled:opacity-50" style={border}><Trash2 size={15} />Eliminar token guardado</button>}
+              </div>
+            </>
+          ) : (
+            <p className="rounded-lg border p-3 text-xs leading-relaxed opacity-70" style={border}>
+              Esta sesión EP puede utilizar la credencial guardada para iniciar el entorno, pero no puede administrarla. Para cargar, rotar o eliminar el token, inicia una sesión OIDC autorizada.
+            </p>
+          )}
+
           {githubCredential?.configured ? (
             <div className="space-y-2 rounded-lg border p-3 text-xs" style={border}>
               <p className="flex flex-wrap items-center gap-2"><ShieldCheck size={16} className="text-emerald-400" /> <strong>Secreto configurado</strong> · GitHub: <code>{githubCredential.githubLogin}</code> · finaliza en <code>{githubCredential.tokenSuffix}</code></p>
@@ -541,10 +551,10 @@ export default function EntornoPersistentePanel() {
               <div className="grid gap-1 sm:grid-cols-2">
                 {githubCredential.repositories.map((repo) => <span key={repo.name} className="flex items-center gap-2"><Check size={13} className={repo.read && repo.write ? "text-emerald-400" : "text-amber-400"} />{repo.name} · {repo.read ? "lectura" : "sin lectura"} / {repo.write ? "escritura de cuenta" : "sin escritura de cuenta"}</span>)}
               </div>
-              <p className="opacity-55">La lectura de permisos de repositorio no inspecciona todos los scopes del PAT. Para crear y actualizar ramas, el PAT de granularidad fina debe tener Contents: Read and write y Metadata: Read en los repositorios que uses.</p>
+              <p className="opacity-55">La lectura de permisos de repositorio no demuestra los scopes efectivos del token. Para crear y actualizar ramas, un PAT granular debe tener Contents: Read and write y Metadata: Read en los repositorios que uses.</p>
             </div>
           ) : (
-            <p className="text-xs opacity-55">{githubCredential === null ? "No se pudo confirmar el estado de la bóveda; prueba a actualizar la página." : "Todavía no se guardó un token. Sin este secreto, el comando de PowerShell fallará de forma segura antes de materializar repositorios."}</p>
+            <p className="text-xs opacity-55">{githubCredential === null ? "No se pudo confirmar el estado de la bóveda; actualiza la página e inténtalo de nuevo." : "Todavía no hay una credencial guardada. La configuración inicial requiere una sesión OIDC autorizada."}</p>
           )}
         </section>
 
