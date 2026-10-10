@@ -331,6 +331,8 @@ test("EP Security: OEP master password is independent from general KHORA OIDC", 
   assert.match(session, /sameSite: "strict"/);
   assert.match(middlewareSource, /readEpMasterEmail/);
   assert.match(middlewareSource, /auth\/ep/);
+  const navigation = readFileSync(new URL("../../app/navigation/registry.ts", import.meta.url), "utf8");
+  assert.match(navigation, /"\/auth\/ep"/);
 });
  
 test("EP Security: Middleware 308 redirect opens the Entorno Persistente submodule", async () => {
