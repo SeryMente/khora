@@ -605,3 +605,14 @@ La primera compilación descubrió que `IngresoWorkspace` referenciaba `archivad
 - Los workflows de GitHub Actions no han sido desbloqueados: los intentos anteriores siguen fallando antes de ejecutar pasos (`runner_id=0`, cero pasos). La validación local no se presenta como CI exitoso ni como despliegue de producción.
 
 Nombre de la actualización de código: **Observabilidad end-to-end del dictado / C005**. Versión del objeto de sprint: **v0.1.0 — Contexto Portátil de Observabilidad MCP y Dictado**. La versión de paquete `khora-web` permanece en **0.3.8**.
+
+### Addendum C006 — Readback posterior a la publicación y estado actual de Actions — base e93987ee1caaee4d437bfbd594fbdc2fe091569b
+
+La publicación C005 quedó confirmada en `main` con el commit `e93987ee1caaee4d437bfbd594fbdc2fe091569b`. Se consultaron de nuevo los workflows disparados por ese SHA; el bloqueo de asignación de runner persiste también después de publicar las correcciones y la evidencia local:
+
+- CI run 38079276808: jobs `calidad`, `khora-web-gate` y `api-tests`; todos failure, `runner_id=0`, nombre de runner vacío y cero pasos.
+- UI Quality run 38079276806: jobs `UI Contract` y `UI E2E`; ambos failure, `runner_id=0`, cero pasos.
+- Deploy to Production (Vercel) run 38079276845: job `deploy-and-notify`, failure, `runner_id=0`, cero pasos.
+- Integrity Manifest Refresh run 38079276874 y sync-repos run 38079276869: ambos failure antes de ejecutar pasos, `runner_id=0`.
+
+En consecuencia, el E2E local de dictado y el typecheck están verificados en la copia de trabajo, pero GitHub Actions no ejecutó los mismos tests y no hay despliegue exitoso confirmado. La E2E simula el reconocedor e intercepta los endpoints de checkpoint/eventos; la escritura y lectura de Postgres y el readback MCP autenticado siguen siendo los últimos pasos de validación funcional real.
