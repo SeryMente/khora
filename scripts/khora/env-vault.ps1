@@ -9,6 +9,31 @@ function KhoraVault-SecureToPlain {
     $pointer=[Runtime.InteropServices.Marshal]::SecureStringToBSTR($Secure)
     try{return [Runtime.InteropServices.Marshal]::PtrToStringBSTR($pointer)}finally{[Runtime.InteropServices.Marshal]::ZeroFreeBSTR($pointer)}
 }
+function KhoraVault-ProtectTemporaryAccessValue {
+    param([Parameter(Mandatory=$true)][Security.SecureString]$Secure)
+    if($env:KHORA_EP_DATA_PROFILE_MODE -ne 'fila4-profile-tree'){return ($Secure|ConvertFrom-SecureString)}
+    if(-not('System.Security.Cryptography.ProtectedData' -as [type])){Add-Type -AssemblyName System.Security -ErrorAction Stop}
+    $plain=KhoraVault-SecureToPlain -Secure $Secure
+    $bytes=[Text.Encoding]::UTF8.GetBytes($plain)
+    $entropy=[Text.Encoding]::UTF8.GetBytes('KHORA-EP-MACHINE-DPAPI-v1|SeryMente')
+    $cipher=$null
+    try{$cipher=[Security.Cryptography.ProtectedData]::Protect($bytes,$entropy,[Security.Cryptography.DataProtectionScope]::LocalMachine);return [Convert]::ToBase64String($cipher)}
+    finally{$plain=$null;if($bytes){[Array]::Clear($bytes,0,$bytes.Length)};if($entropy){[Array]::Clear($entropy,0,$entropy.Length)};if($cipher){[Array]::Clear($cipher,0,$cipher.Length)}}
+}
+function KhoraVault-UnprotectTemporaryAccessValue {
+    param([Parameter(Mandatory=$true)][string]$Value,[string]$ProtectionScope)
+    if($env:KHORA_EP_DATA_PROFILE_MODE -ne 'fila4-profile-tree'){
+        if($ProtectionScope -eq 'LocalMachine-v1'){throw 'El blob de acceso de máquina solo se importa dentro de Entorno Persistente.'}
+        return ($Value.Trim()|ConvertTo-SecureString)
+    }
+    if($ProtectionScope -ne 'LocalMachine-v1'){throw 'TEMP_VAULT_PROTECTION_SCOPE_MISMATCH: no se usará DPAPI de usuario en CECEQ.'}
+    if(-not('System.Security.Cryptography.ProtectedData' -as [type])){Add-Type -AssemblyName System.Security -ErrorAction Stop}
+    $cipher=[Convert]::FromBase64String($Value.Trim())
+    $entropy=[Text.Encoding]::UTF8.GetBytes('KHORA-EP-MACHINE-DPAPI-v1|SeryMente')
+    $bytes=$null
+    try{$bytes=[Security.Cryptography.ProtectedData]::Unprotect($cipher,$entropy,[Security.Cryptography.DataProtectionScope]::LocalMachine);$plain=[Text.Encoding]::UTF8.GetString($bytes);try{return (ConvertTo-SecureString -String $plain -AsPlainText -Force)}finally{$plain=$null}}
+    finally{if($cipher){[Array]::Clear($cipher,0,$cipher.Length)};if($entropy){[Array]::Clear($entropy,0,$entropy.Length)};if($bytes){[Array]::Clear($bytes,0,$bytes.Length)}}
+}
 function KhoraVault-GetMasterKey {
     if($Global:KhoraVaultMasterKey){return $Global:KhoraVaultMasterKey}
     $Global:KhoraVaultMasterKey=Read-Host 'Llave de la bóveda' -AsSecureString
@@ -90,7 +115,7 @@ function New-KhoraTemporaryVaultAccess {
     New-Item -ItemType Directory -Path $directory -Force|Out-Null
     $payload=[ordered]@{
         expiresAtUtc=[DateTime]::UtcNow.AddMinutes($Minutes).ToString('o')
-        secureValue=($secure|ConvertFrom-SecureString)
+        protectionScope=$(if($env:KHORA_EP_DATA_PROFILE_MODE -eq 'fila4-profile-tree'){'LocalMachine-v1'}else{'CurrentUser'});secureValue=(KhoraVault-ProtectTemporaryAccessValue -Secure $secure)
     }
     $temp=$Path+'.tmp'
     $payload|ConvertTo-Json -Depth 4|Set-Content -LiteralPath $temp -Encoding UTF8
@@ -108,7 +133,7 @@ function Import-KhoraTemporaryVaultAccess {
         Remove-Item -LiteralPath $Path -Force -ErrorAction SilentlyContinue
         throw 'El acceso temporal de bóveda ha expirado.'
     }
-    $Global:KhoraVaultMasterKey=($payload.secureValue.Trim()|ConvertTo-SecureString)
+    $Global:KhoraVaultMasterKey=KhoraVault-UnprotectTemporaryAccessValue -Value ([string]$payload.secureValue) -ProtectionScope ([string]$payload.protectionScope)
     Write-Host ('TEMP_VAULT_ACCESS_IMPORTED expires='+$expires.ToString('o'))
     return $expires
 }
