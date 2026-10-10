@@ -1,0 +1,153 @@
+name: EP Vault Diagnostics (temporary)
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "khora-web/**"
+      - "scripts/khora/**"
+      - ".github/workflows/ep-vault-diagnostics.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ep-vault-diagnostics-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  diagnose:
+    name: Capture EP vault validation logs
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: khora-web/package-lock.json
+
+      - name: Prepare diagnostic directory
+        run: mkdir -p .ep-vault-diagnostics
+
+      - name: Install Node dependencies
+        run: |
+          set +e
+          npm ci > ../.ep-vault-diagnostics/npm-ci.log 2>&1
+          code=$?
+          echo "$code" > ../.ep-vault-diagnostics/npm-ci.exit
+          exit 0
+        working-directory: khora-web
+
+      - name: TypeScript typecheck
+        if: always()
+        run: |
+          set +e
+          npm run typecheck > ../.ep-vault-diagnostics/typecheck.log 2>&1
+          code=$?
+          echo "$code" > ../.ep-vault-diagnostics/typecheck.exit
+          exit 0
+        working-directory: khora-web
+
+      - name: UI review contract
+        if: always()
+        run: |
+          set +e
+          npm run ui-review:check > ../.ep-vault-diagnostics/ui-review.log 2>&1
+          code=$?
+          echo "$code" > ../.ep-vault-diagnostics/ui-review.exit
+          exit 0
+        working-directory: khora-web
+
+      - name: Navigation contract
+        if: always()
+        run: |
+          set +e
+          npm run ui:contract > ../.ep-vault-diagnostics/ui-contract.log 2>&1
+          code=$?
+          echo "$code" > ../.ep-vault-diagnostics/ui-contract.exit
+          exit 0
+        working-directory: khora-web
+
+      - name: Unit tests
+        if: always()
+        run: |
+          set +e
+          npm run test:unit > ../.ep-vault-diagnostics/unit-tests.log 2>&1
+          code=$?
+          echo "$code" > ../.ep-vault-diagnostics/unit-tests.exit
+          exit 0
+        working-directory: khora-web
+
+      - name: Install Chromium
+        if: always()
+        run: |
+          set +e
+          npx playwright install --with-deps chromium > ../.ep-vault-diagnostics/playwright-install.log 2>&1
+          code=$?
+          echo "$code" > ../.ep-vault-diagnostics/playwright-install.exit
+          exit 0
+        working-directory: khora-web
+
+      - name: UI E2E smoke
+        if: always()
+        run: |
+          set +e
+          npm run e2e -- e2e/shell-v2.spec.ts e2e/ui-quality.spec.ts > ../.ep-vault-diagnostics/ui-e2e.log 2>&1
+          code=$?
+          echo "$code" > ../.ep-vault-diagnostics/ui-e2e.exit
+          exit 0
+        working-directory: khora-web
+
+      - name: PowerShell parser and denylist
+        if: always()
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Continue"
+          $fail = $false
+          $deny = @("CipherMode]::GCM", "AesGcm", "RandomNumberGenerator]::Fill", "-AsHashtable")
+          Get-ChildItem -Path scripts/khora -Recurse -Filter *.ps1 -File | ForEach-Object {
+            $errors = $null
+            $tokens = $null
+            [System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$tokens, [ref]$errors) | Out-Null
+            if ($errors -and $errors.Count -gt 0) {
+              "PARSE-ERR $($_.FullName)" | Add-Content .ep-vault-diagnostics/powershell-parser.log
+              $errors | ForEach-Object { $_.Message | Add-Content .ep-vault-diagnostics/powershell-parser.log }
+              $fail = $true
+            } else {
+              "OK-PARSE $($_.FullName)" | Add-Content .ep-vault-diagnostics/powershell-parser.log
+            }
+            $content = Get-Content -Raw $_.FullName
+            foreach ($pattern in $deny) {
+              if ($content -match [regex]::Escape($pattern)) {
+                "DENY $pattern in $($_.FullName)" | Add-Content .ep-vault-diagnostics/powershell-parser.log
+                $fail = $true
+              }
+            }
+          }
+          if ($fail) { "exit=1" | Set-Content .ep-vault-diagnostics/powershell-parser.exit }
+          else { "exit=0" | Set-Content .ep-vault-diagnostics/powershell-parser.exit }
+          exit 0
+
+      - name: Upload diagnostic logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ep-vault-diagnostics-${{ github.run_id }}
+          path: .ep-vault-diagnostics/
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Fail if any captured check failed
+        if: always()
+        run: |
+          failed=0
+          for result in .ep-vault-diagnostics/*.exit; do
+            [ -f "$result" ] || continue
+            code=$(cat "$result")
+            echo "$(basename "$result"): $code"
+            [ "$code" = "0" ] || failed=1
+          done
+          exit "$failed"
