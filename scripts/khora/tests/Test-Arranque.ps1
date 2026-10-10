@@ -13,6 +13,8 @@ $config=Get-Content (Join-Path $root 'scripts\khora\modules\00-config.ps1') -Raw
 $efs=Get-Content (Join-Path $root 'scripts\khora\modules\05-efs.ps1') -Raw
 $deps=Get-Content (Join-Path $root 'scripts\khora\modules\08-deps.ps1') -Raw
 $cleanup=Get-Content (Join-Path $root 'scripts\khora\modules\11-cleanup.ps1') -Raw
+$vault=Get-Content (Join-Path $root 'scripts\khora\env-vault.ps1') -Raw
+$gitAuth=Get-Content (Join-Path $root 'scripts\khora\modules\07-git-wip.ps1') -Raw
 Assert-Khora($gate-match'Initialize-KhoraDataProfileContext')'Falta resolver de destino de datos CECEQ.'
 Assert-Khora($gate-match'KHORA_EXECUTION_IDENTITY_MISMATCH')'No se verifica la identidad efectiva.'
 Assert-Khora($gate-match'dataProfileMode=\[string\]\$script:KHORA_DATA_PROFILE_MODE')'El manifiesto no separa identidad efectiva y perfil de datos.'
@@ -28,6 +30,13 @@ Assert-Khora($efs-match'KHORA_DISMOUNT_TEMP_OUTSIDE_FILA4_PROFILE')'El temporal 
 Assert-Khora($deps-match'InstallAllUsers=1')'Python debe instalarse sin registro por usuario.'
 Assert-Khora($deps-notmatch'InstallAllUsers=0')'Python no debe instalarse en el perfil MantenimientoRCI.'
 Assert-Khora($cleanup-match'Remove-KhoraPythonMachineRegistration')'Falta limpiar el registro temporal de Python.'
+
+Assert-Khora($gate-match'DataProtectionScope\]::LocalMachine')'El gate debe usar DPAPI de ámbito de equipo.'
+Assert-Khora($launcher-match'DataProtectionScope\]::LocalMachine')'El token inicial debe protegerse con DPAPI de ámbito de equipo.'
+Assert-Khora($vault-match'TEMP_VAULT_PROTECTION_SCOPE_MISMATCH')'La bóveda no debe aceptar DPAPI de usuario en modo fila4.'
+Assert-Khora($vault-match'protectionScope=\$\(if\(\$env:KHORA_EP_DATA_PROFILE_MODE')'El blob temporal de bóveda debe etiquetar el ámbito de protección.'
+Assert-Khora($gitAuth-match'git -c credential\.helper= -C \$RepositoryPath')'Git debe omitir helpers de credenciales persistentes.'
+Assert-Khora($gitAuth-match"GCM_INTERACTIVE='Never'")'Git Credential Manager interactivo debe deshabilitarse en EP.'
 Assert-Khora($all-notmatch'git\s+add\s+-A')'git add -A prohibido.'
 $forbiddenReturnToken='return'+'@';Assert-Khora -Condition ($all -notmatch [regex]::Escape($forbiddenReturnToken)) -Message 'Token return seguido de @ invalido.'
 $returnKeyword='return';Assert-Khora -Condition ($all -notmatch ('(?i)\b'+$returnKeyword+'(?=\S)')) -Message 'return debe separarse de su operando.'
