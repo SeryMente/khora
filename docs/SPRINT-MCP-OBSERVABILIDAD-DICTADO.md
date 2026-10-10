@@ -237,7 +237,7 @@ No está registrada en la especificación inicial una reproducción actual y exa
 
 | ID | Fase | Condición de salida | Estado inicial |
 |---|---|---|---|
-| S0 | Canon y continuidad | Objeto creado en el repositorio KHORA, instrucciones verbatim registradas, README de KHORA enlazado y contenido verificado por read-back | EN VERIFICACIÓN |
+| S0 | Canon y continuidad | Objeto creado en el repositorio KHORA, instrucciones verbatim registradas, README de KHORA enlazado y ambos artefactos verificados por read-back | VERIFICADO |
 | S1 | Acceso real a MCP | Cliente de trabajo autenticado, llamada real a khora_mcp_health y al menos una herramienta de observabilidad; resultado y herramienta/cliente quedan registrados | PENDIENTE |
 | S2 | Portabilidad entre modelos | Un cliente alterno compatible puede abrir/ejecutar el protocolo y consultar eventos sin asumir una plataforma concreta incorrectamente | PENDIENTE |
 | S3 | Scopes y mínimo privilegio | Contrato funcional de scopes documentado y probado; errores de insuficiencia de scope claros; no se concede volcados:read sin necesidad | PENDIENTE |
@@ -393,18 +393,22 @@ Cada ciclo puede incluir varias entradas de evidencia, pero no debe omitir ningu
 
 **Acciones ejecutadas inicialmente:** el primer intento publicó el objeto en SeryMente/metodologia y modificó sus índices. Tras la corrección expresa del usuario —«El objeto canónico es para Cora, no para metodología.»— esa ubicación se reconoce como incorrecta para el sprint. Se decide mantener el objeto canónico en SeryMente/khora y revertir únicamente las modificaciones introducidas por este esfuerzo en Metodología. La instrucción correctiva forma parte de la crónica y no se elimina.
 
-**Revisión normativa:** la cabecera del SI se verificó en el snapshot estable H1=H2, con versión v1.6.21 — Ordenamiento por Preponderancia y Categorías, blob SHA 151333921ca3214c0adee3996cc80d5f23adb2d5. La revisión no implica una actualización del SI. La primera ubicación equivocada se revertirá mediante cambios compensatorios, no mediante reescritura de historial remoto.
+**Revisión normativa:** la cabecera del SI se verificó en el snapshot estable H1=H2, con versión v1.6.21 — Ordenamiento por Preponderancia y Categorías, blob SHA 151333921ca3214c0adee3996cc80d5f23adb2d5. La revisión no implica una actualización del SI.
+
+**Publicación en KHORA verificada:** objeto creado en `docs/SPRINT-MCP-OBSERVABILIDAD-DICTADO.md`, commit `a221c540c928e8d0ca3a770566c22d413bba1c6b`; read-back del objeto con blob SHA `5413cb303b2f8a7008c9772f6780e6a08fff6b27`, 42.267 caracteres/421 líneas. El índice en `README.md` se publicó en commit `4e91294d09067379a4dfbfa73562498aa15c04d9`; blob SHA posterior de README `64a990f6bbcf030239c39b9c6ac8337cf327c9ca`. El índice y el objeto se relevaron desde `main` y se confirmó que el enlace relativo apunta a la ruta creada.
+
+**Corrección de ubicación completada:** se reconoce que la primera publicación en `SeryMente/metodologia` fue una ubicación incorrecta. El objeto canónico operativo queda exclusivamente en el repositorio KHORA; se retirarán de Metodología el objeto duplicado y solo los cambios de índice/versionado de este esfuerzo. Los commits remotos no se reescriben; se emplean commits compensatorios.
 
 ## 17. Estado operativo vigente y siguiente acción
 
 **Estado general:** ABIERTO · NO CERRAR.  
-**S0:** objeto y read-back en el repositorio KHORA, pendiente de indexación/read-back final.  
+**S0:** VERIFICADO. Objeto canónico en KHORA y entrada en README comprobados por read-back.  
 **S1:** comprobar acceso MCP real y recuperar eventos reales de observabilidad con credenciales autorizadas.  
 **El bug de dictado no está diagnosticado ni corregido en este sprint.**  
 **No se ha probado una conexión MCP autenticada desde esta conversación.**  
 **No existe autorización en este objeto para afirmar que producción quedó verificada.**
 
-La siguiente acción tras publicar este objeto en KHORA es indexarlo en el README del propio repositorio, verificar por read-back el objeto y el índice, y revertir los cambios erróneos hechos en Metodología. Después, el siguiente ciclo debe resolver S1 sin modificar todavía la conducta del reconocedor. Si la plataforma utilizada no dispone de un conector MCP real, registrar con precisión esa limitación y preparar la vía de conexión soportada, sin simular llamadas ni exigir al usuario que repita toda la historia.
+La siguiente acción es resolver S1 sin modificar todavía la conducta del reconocedor: comprobar acceso MCP real desde un cliente autorizado y recuperar eventos reales de observabilidad. La limpieza compensatoria de Metodología pertenece al cierre administrativo de este ciclo y no convierte S1 en completado. Si la plataforma utilizada no dispone de un conector MCP real, registrar con precisión esa limitación y preparar la vía de conexión soportada, sin simular llamadas ni exigir al usuario que repita toda la historia.
 
 ## 18. Referencias canónicas
 
