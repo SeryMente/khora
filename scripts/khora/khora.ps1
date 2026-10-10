@@ -10,12 +10,13 @@ param(
     [int]$WatchPid=0,
     [string]$KhoraToken,
     [string]$KhoraTokenFile,
-    [string]$KhoraApiBase
+    [string]$KhoraApiBase,
+    [string]$KhoraExpectedExecutionIdentity
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
-$script:EP_VERSION = '1.0.2'
-$script:SCRIPT_VERSION = '7.5.4'
+$script:EP_VERSION = '1.0.3'
+$script:SCRIPT_VERSION = '7.5.5'
 $script:GATE_PATH=$PSCommandPath
 $script:GATE_DIR=if($PSCommandPath){Split-Path -Parent $PSCommandPath}else{$null}
 $script:SESSION_MANIFEST_ARG=$SessionManifest
@@ -27,9 +28,28 @@ function ConvertFrom-KhoraSecureString {
     $pointer=[Runtime.InteropServices.Marshal]::SecureStringToBSTR($Value)
     try{return [Runtime.InteropServices.Marshal]::PtrToStringBSTR($pointer)}finally{[Runtime.InteropServices.Marshal]::ZeroFreeBSTR($pointer)}
 }
+function Protect-KhoraTextBlob {
+    param([Parameter(Mandatory=$true)][string]$Text,[Parameter(Mandatory=$true)][string]$Path)
+    if(-not('System.Security.Cryptography.ProtectedData' -as [type])){Add-Type -AssemblyName System.Security -ErrorAction Stop}
+    $data=[Text.Encoding]::UTF8.GetBytes($Text)
+    $entropy=[Text.Encoding]::UTF8.GetBytes('KHORA-EP-MACHINE-DPAPI-v1|SeryMente')
+    $cipher=$null
+    try{$cipher=[Security.Cryptography.ProtectedData]::Protect($data,$entropy,[Security.Cryptography.DataProtectionScope]::LocalMachine);[IO.File]::WriteAllText($Path,[Convert]::ToBase64String($cipher),[Text.Encoding]::ASCII)}
+    finally{if($data){[Array]::Clear($data,0,$data.Length)};if($entropy){[Array]::Clear($entropy,0,$entropy.Length)};if($cipher){[Array]::Clear($cipher,0,$cipher.Length)}}
+}
+function Unprotect-KhoraTextBlob {
+    param([Parameter(Mandatory=$true)][string]$Path)
+    if(-not('System.Security.Cryptography.ProtectedData' -as [type])){Add-Type -AssemblyName System.Security -ErrorAction Stop}
+    $cipher=[Convert]::FromBase64String(([IO.File]::ReadAllText($Path,[Text.Encoding]::ASCII)).Trim())
+    $entropy=[Text.Encoding]::UTF8.GetBytes('KHORA-EP-MACHINE-DPAPI-v1|SeryMente')
+    $data=$null
+    try{$data=[Security.Cryptography.ProtectedData]::Unprotect($cipher,$entropy,[Security.Cryptography.DataProtectionScope]::LocalMachine);return [Text.Encoding]::UTF8.GetString($data)}
+    finally{if($cipher){[Array]::Clear($cipher,0,$cipher.Length)};if($entropy){[Array]::Clear($entropy,0,$entropy.Length)};if($data){[Array]::Clear($data,0,$data.Length)}}
+}
 function Protect-KhoraSecureStringBlob {
     param([Security.SecureString]$Secure,[string]$Path)
-    $Secure|ConvertFrom-SecureString|Set-Content -LiteralPath $Path -Encoding ASCII
+    $plain=ConvertFrom-KhoraSecureString $Secure
+    try{Protect-KhoraTextBlob -Text $plain -Path $Path}finally{$plain=$null}
 }
 function Get-KhoraBootstrapHeaders {
     param([string]$Token)
@@ -179,7 +199,7 @@ function Get-KhoraHostProfile {
     $toolNames=@('git','gh','node','npm','python','code','notepad++','obs64','AutoHotkey')
     $tools=[ordered]@{};foreach($name in $toolNames){$tools[$name]=Get-KhoraToolProfile -Name $name}
     $signalNames=@('cyberclient','cyberclientproxy','vigia','DFLocker64','DFServ');$signals=@();foreach($name in $signalNames){if(Get-Process -Name $name -ErrorAction SilentlyContinue){$signals+=$name}}
-    return [ordered]@{schema='oep-host-profile/v1';capturedUtc=[DateTime]::UtcNow.ToString('o');machineName=[Environment]::MachineName;userName=[Environment]::UserName;executionIdentity=[Security.Principal.WindowsIdentity]::GetCurrent().Name;dataProfileName=[string]$script:KHORA_DATA_PROFILE_NAME;dataProfileRoot=[string]$script:KHORA_DATA_PROFILE_ROOT;is64BitOS=[Environment]::Is64BitOperatingSystem;os=[ordered]@{caption=[string]$os.Caption;version=[string]$os.Version;build=[string]$os.BuildNumber};administrator=(Test-KhoraAdministrator);desktop=[IO.Path]::GetFullPath($Desktop);desktopStorageRoot=[IO.Path]::GetPathRoot($Desktop);desktopWritable=$true;freeGiB=[math]::Round($drive.Free/1GB,2);systemBitLocker=$systemBitLocker;managementSignals=@($signals);hostClassification=if($signals.Count -gt 0){'managed-or-public-suspected'}else{'unclassified'};tools=$tools;hostToolPolicy='allow-verified-host'}
+    return [ordered]@{schema='oep-host-profile/v1';capturedUtc=[DateTime]::UtcNow.ToString('o');machineName=[Environment]::MachineName;userName=[Environment]::UserName;executionIdentity=[Security.Principal.WindowsIdentity]::GetCurrent().Name;dataProfileMode=[string]$script:KHORA_DATA_PROFILE_MODE;dataProfileName=[string]$script:KHORA_DATA_PROFILE_NAME;dataProfileRoot=[string]$script:KHORA_DATA_PROFILE_ROOT;is64BitOS=[Environment]::Is64BitOperatingSystem;os=[ordered]@{caption=[string]$os.Caption;version=[string]$os.Version;build=[string]$os.BuildNumber};administrator=(Test-KhoraAdministrator);desktop=[IO.Path]::GetFullPath($Desktop);desktopStorageRoot=[IO.Path]::GetPathRoot($Desktop);desktopWritable=$true;freeGiB=[math]::Round($drive.Free/1GB,2);systemBitLocker=$systemBitLocker;managementSignals=@($signals);hostClassification=if($signals.Count -gt 0){'managed-or-public-suspected'}else{'unclassified'};tools=$tools;hostToolPolicy='allow-verified-host'}
 }
 function Save-KhoraHostProfile {
     param([Parameter(Mandatory=$true)][object]$Profile,[Parameter(Mandatory=$true)][string]$Path)
@@ -189,7 +209,7 @@ function Invoke-KhoraElevation {
  if(Test-KhoraAdministrator){return $false}
  if([string]::IsNullOrWhiteSpace($script:SELF_SOURCE)){throw 'No se pudo materializar el gate para elevación.'}
  $temporaryScript=Join-Path $script:KHORA_TARGET_TEMP ('khora-bootstrap-'+[guid]::NewGuid().ToString('N')+'.ps1');$temporaryToken=Join-Path $script:KHORA_TARGET_TEMP ('khora-token-'+[guid]::NewGuid().ToString('N')+'.dpapi')
- try{[IO.File]::WriteAllText($temporaryScript,$script:SELF_SOURCE,(New-Object Text.UTF8Encoding($true)));Protect-KhoraSecureStringBlob -Secure (ConvertTo-SecureString $script:KhoraToken -AsPlainText -Force) -Path $temporaryToken;$args=@('-NoProfile','-ExecutionPolicy','Bypass','-File',('"'+$temporaryScript+'"'),'-Bootstrap','-KhoraTokenFile',('"'+$temporaryToken+'"'),'-KhoraApiBase',('"'+$KhoraApiBase+'"'));$child=Start-Process powershell.exe -Verb RunAs -ArgumentList $args -PassThru -ErrorAction Stop;$until=[DateTime]::UtcNow.AddSeconds(45);while((Test-Path -LiteralPath $temporaryToken)-and-not$child.HasExited-and[DateTime]::UtcNow-lt$until){Start-Sleep -Milliseconds 200};if($child.HasExited-and(Test-Path -LiteralPath $temporaryToken)){throw 'El proceso elevado no consumió la credencial protegida.'};return $true}catch{try{[IO.File]::Delete($temporaryScript)}catch{};try{[IO.File]::Delete($temporaryToken)}catch{};throw}
+ try{[IO.File]::WriteAllText($temporaryScript,$script:SELF_SOURCE,(New-Object Text.UTF8Encoding($true)));Protect-KhoraSecureStringBlob -Secure (ConvertTo-SecureString $script:KhoraToken -AsPlainText -Force) -Path $temporaryToken;$args=@('-NoProfile','-ExecutionPolicy','Bypass','-File',('"'+$temporaryScript+'"'),'-Bootstrap','-KhoraTokenFile',('"'+$temporaryToken+'"'),'-KhoraApiBase',('"'+$KhoraApiBase+'"'),'-KhoraExpectedExecutionIdentity',('"'+$script:KHORA_EXPECTED_EXECUTION_IDENTITY+'"'));$child=Start-Process powershell.exe -Verb RunAs -ArgumentList $args -PassThru -ErrorAction Stop;$until=[DateTime]::UtcNow.AddSeconds(45);while((Test-Path -LiteralPath $temporaryToken)-and-not$child.HasExited-and[DateTime]::UtcNow-lt$until){Start-Sleep -Milliseconds 200};if($child.HasExited-and(Test-Path -LiteralPath $temporaryToken)){throw 'El proceso elevado no consumió la credencial protegida.'};return $true}catch{try{[IO.File]::Delete($temporaryScript)}catch{};try{[IO.File]::Delete($temporaryToken)}catch{};throw}
 }
 function Get-KhoraDesktop {
  $desktop=if($script:KHORA_TARGET_DESKTOP){[string]$script:KHORA_TARGET_DESKTOP}else{[Environment]::GetFolderPath([Environment+SpecialFolder]::Desktop)}
@@ -319,9 +339,13 @@ function Invoke-KhoraEmergencyDetach {
     if($Outer){Remove-Item -LiteralPath $Outer -Recurse -Force -ErrorAction SilentlyContinue}
 }
 function Start-KhoraBootstrap {
+    $actualExecutionIdentity=[Security.Principal.WindowsIdentity]::GetCurrent().Name
+    if([string]::IsNullOrWhiteSpace($KhoraExpectedExecutionIdentity)){$KhoraExpectedExecutionIdentity=$actualExecutionIdentity}
+    if([string]::Compare($KhoraExpectedExecutionIdentity,$actualExecutionIdentity,[StringComparison]::OrdinalIgnoreCase)-ne0){throw 'KHORA_EXECUTION_IDENTITY_MISMATCH'}
+    $script:KHORA_EXPECTED_EXECUTION_IDENTITY=$KhoraExpectedExecutionIdentity
     Initialize-KhoraDataProfileContext
     if($script:KHORA_DATA_PROFILE_MODE -eq 'fila4-profile-tree' -and $KhoraTokenFile){$tokenPath=[IO.Path]::GetFullPath($KhoraTokenFile);$profilePrefix=([string]$script:KHORA_DATA_PROFILE_ROOT).TrimEnd('\')+'\';if(-not $tokenPath.StartsWith($profilePrefix,[StringComparison]::OrdinalIgnoreCase)){throw 'KHORA_TOKEN_FILE_OUTSIDE_FILA4_PROFILE'}}
-    if($KhoraTokenFile){try{$secure=(Get-Content -LiteralPath $KhoraTokenFile -Raw -ErrorAction Stop).Trim()|ConvertTo-SecureString;$script:KhoraToken=ConvertFrom-KhoraSecureString $secure}finally{Remove-Item -LiteralPath $KhoraTokenFile -Force -ErrorAction SilentlyContinue;$secure=$null}}else{$script:KhoraToken=$KhoraToken}
+    if($KhoraTokenFile){try{$script:KhoraToken=Unprotect-KhoraTextBlob -Path $KhoraTokenFile}finally{Remove-Item -LiteralPath $KhoraTokenFile -Force -ErrorAction SilentlyContinue}}else{$script:KhoraToken=$KhoraToken}
     Assert-KhoraBootstrapInputs -Token $script:KhoraToken -ApiBase $KhoraApiBase
     if(-not(Test-KhoraAdministrator)){if(Invoke-KhoraElevation){return }}
     Remove-KhoraTemporaryGate|Out-Null
@@ -352,7 +376,7 @@ function Start-KhoraBootstrap {
         Protect-KhoraSecureStringBlob -Secure $pat -Path (Join-Path $state 'github-token.guardian.dpapi')
         Protect-KhoraSecureStringBlob -Secure $khoraSecure -Path (Join-Path $state 'khora-token.guardian.dpapi')
         $script:KhoraToken=$null;$KhoraToken=$null;$khoraSecure=$null
-        $manifest=[ordered]@{schema='khora-ep-session/v1';epVersion=$script:EP_VERSION;scriptVersion=$script:SCRIPT_VERSION;launchMode='normal';hostToolPolicy='allow-verified-host';sessionId=$sessionId;startedUtc=[DateTime]::UtcNow.ToString('o');outerDir=$outer;vhdPath=$vhd;mountPoint=$mount;workDir=$work;stateDir=$state;repoDir=$repository;logFile=$log;jsonLog=$jsonLog;commitSha=$sha;cleanupTask=$task;launcherPid=$PID;khoraApiBase=$KhoraApiBase;logPid=0;hostProfileSchema='oep-host-profile/v1';hostProfilePath=$hostProfilePath;hostClassification=[string]$hostProfile.hostClassification;executionIdentity=[string]$script:KHORA_EXECUTION_IDENTITY;dataProfileName=[string]$script:KHORA_DATA_PROFILE_NAME;dataProfileRoot=[string]$script:KHORA_DATA_PROFILE_ROOT;hostTemp=[string]$script:KHORA_TARGET_TEMP;workspaceDir=$workspaceDir;desktopWorkspaceLink=$desktopWorkspaceLink}
+        $manifest=[ordered]@{schema='khora-ep-session/v1';epVersion=$script:EP_VERSION;scriptVersion=$script:SCRIPT_VERSION;launchMode='normal';hostToolPolicy='allow-verified-host';sessionId=$sessionId;startedUtc=[DateTime]::UtcNow.ToString('o');outerDir=$outer;vhdPath=$vhd;mountPoint=$mount;workDir=$work;stateDir=$state;repoDir=$repository;logFile=$log;jsonLog=$jsonLog;commitSha=$sha;cleanupTask=$task;launcherPid=$PID;khoraApiBase=$KhoraApiBase;logPid=0;hostProfileSchema='oep-host-profile/v1';hostProfilePath=$hostProfilePath;hostClassification=[string]$hostProfile.hostClassification;executionIdentity=[string]$script:KHORA_EXECUTION_IDENTITY;dataProfileMode=[string]$script:KHORA_DATA_PROFILE_MODE;dataProfileName=[string]$script:KHORA_DATA_PROFILE_NAME;dataProfileRoot=[string]$script:KHORA_DATA_PROFILE_ROOT;hostTemp=[string]$script:KHORA_TARGET_TEMP;workspaceDir=$workspaceDir;desktopWorkspaceLink=$desktopWorkspaceLink}
         $manifestPath=Join-Path $state 'session-manifest.json';$manifest|ConvertTo-Json -Depth 8|Set-Content -LiteralPath $manifestPath -Encoding UTF8
         $logProcess=Start-KhoraLogWindow -Log $log;$manifest.logPid=$logProcess.Id;$manifest|ConvertTo-Json -Depth 8|Set-Content -LiteralPath $manifestPath -Encoding UTF8
         $gate=Join-Path $repository 'scripts\khora\khora.ps1';if(-not(Test-Path $gate)){throw 'El commit no contiene el punto de entrada contractual.'}
