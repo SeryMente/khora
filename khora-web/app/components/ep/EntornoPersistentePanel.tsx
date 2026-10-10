@@ -269,7 +269,7 @@ export default function EntornoPersistentePanel() {
       const response = await fetch("/api/ep/github-credential", { method: "DELETE", cache: "no-store", credentials: "same-origin" });
       const data = await response.json().catch(() => null);
       if (!response.ok) throw new Error("No se pudo eliminar la credencial de GitHub.");
-      setGithubCredential({ configured: false, githubLogin: null, tokenSuffix: null, repositories: [], updatedAt: null });
+      setGithubCredential({ configured: false, githubLogin: null, tokenSuffix: null, repositories: [], updatedAt: null, canManage: true });
       await loadRepoCatalog(true);
       setNotice({ kind: "success", text: "Credencial eliminada de la bóveda. Ningún token fue enviado al navegador." });
     } catch (error) {
@@ -308,7 +308,7 @@ export default function EntornoPersistentePanel() {
             : "No se pudo guardar la contraseña maestra.";
         throw new Error(message);
       }
-      setMasterPasswordStatus({ configured: true, updatedAt: new Date().toISOString() });
+      setMasterPasswordStatus({ configured: true, updatedAt: new Date().toISOString(), canManage: true });
       setNotice({ kind: "success", text: "Contraseña maestra de OEP configurada. El acceso posterior a EP tendrá caducidad y no abrirá el resto de Khôra." });
     } catch (error) {
       setNotice({ kind: "error", text: error instanceof Error ? error.message : "No se pudo configurar la contraseña maestra." });
