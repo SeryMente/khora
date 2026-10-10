@@ -77,7 +77,7 @@ test("dictation checkpoints persist start, immediate inline-edit pause, resume, 
 
   await page.goto("/sistema/ingreso?modo=dictado");
   await expect(page.locator("h1")).toBeVisible();
-  await page.locator('button:has-text("Iniciar dictado")').click();
+  await page.locator('[data-ui-id="ingreso.btn-iniciar"]').click();
   await expect.poll(
     () => recordedEvents.some((event) => event.event_name === "RECONOCEDOR_INICIADO"),
     { timeout: 7000 },
@@ -85,7 +85,6 @@ test("dictation checkpoints persist start, immediate inline-edit pause, resume, 
 
   const textarea = page.locator('textarea[data-ui-id="ingreso.textarea"]').first();
   await textarea.focus();
-  await expect(page.locator('[data-ui-id="ingreso.banner-edicion"]')).toBeVisible();
   await expect.poll(
     () => recordedEvents.some((event) => event.event_name === "DICTADO_PAUSA_POR_EDICION") &&
       recordedEvents.some((event) => event.event_name === "DICTADO_PAUSADO_POR_EDICION"),

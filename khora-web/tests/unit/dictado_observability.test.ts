@@ -113,13 +113,14 @@ test("dictation event queue survives a failed HTTP response and retries with the
 });
 
 
-test("dictation telemetry keeps the queue when the server explicitly rejects events", async () => {
+test("dictation telemetry preserves a rejected event until the next acknowledged delivery", async () => {
   await withBrowser(async ({ requests, storage, replies }) => {
     replies.push(() => ({
       ok: true,
       status: 200,
-      json: async () => ({ ok: false, summary: { accepted: 0, duplicates: 0, rejected: 1, total: 1 }, results: [] }),
+      json: async () => ({ ok: true, summary: { accepted: 0, duplicates: 0, rejected: 1, total: 1 }, results: [] }),
     }) as Response);
+    replies.push(() => okResponse(1));
     const eventId = registrarEventoObservabilidadDictado({
       sessionId: "33333333-3333-4333-8333-333333333333",
       eventName: "CHECKPOINT_FALLIDO",
@@ -130,10 +131,15 @@ test("dictation telemetry keeps the queue when the server explicitly rejects eve
     assert.ok(eventId);
     await enviarEventosObservabilidadDictado();
 
-    const queued = JSON.parse(storage.values.get("khora:dictado:observability:v1:pending") || "[]");
+    let queued = JSON.parse(storage.values.get("khora:dictado:observability:v1:pending") || "[]");
     assert.equal(queued.length, 1);
     assert.equal(queued[0].event_uuid, eventId);
     assert.equal(requests.length, 1);
+
+    await enviarEventosObservabilidadDictado();
+    queued = JSON.parse(storage.values.get("khora:dictado:observability:v1:pending") || "[]");
+    assert.equal(queued.length, 0);
+    assert.equal(requests.length, 2);
   });
 });
 
