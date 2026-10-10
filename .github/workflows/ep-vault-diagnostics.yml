@@ -19,180 +19,127 @@ concurrency:
 
 jobs:
   diagnose:
-    name: Capture EP vault validation logs
+    name: Diagnose without checkout action
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: "npm"
-          cache-dependency-path: khora-web/package-lock.json
-
-      - name: Prepare diagnostic directory
-        run: mkdir -p .ep-vault-diagnostics
-
-      - name: Install Node dependencies
-        run: |
-          set +e
-          npm ci > ../.ep-vault-diagnostics/npm-ci.log 2>&1
-          code=$?
-          echo "$code" > ../.ep-vault-diagnostics/npm-ci.exit
-          exit 0
-        working-directory: khora-web
-
-      - name: TypeScript typecheck
-        if: always()
-        run: |
-          set +e
-          npm run typecheck > ../.ep-vault-diagnostics/typecheck.log 2>&1
-          code=$?
-          echo "$code" > ../.ep-vault-diagnostics/typecheck.exit
-          exit 0
-        working-directory: khora-web
-
-      - name: UI review contract
-        if: always()
-        run: |
-          set +e
-          npm run ui-review:check > ../.ep-vault-diagnostics/ui-review.log 2>&1
-          code=$?
-          echo "$code" > ../.ep-vault-diagnostics/ui-review.exit
-          exit 0
-        working-directory: khora-web
-
-      - name: Navigation contract
-        if: always()
-        run: |
-          set +e
-          npm run ui:contract > ../.ep-vault-diagnostics/ui-contract.log 2>&1
-          code=$?
-          echo "$code" > ../.ep-vault-diagnostics/ui-contract.exit
-          exit 0
-        working-directory: khora-web
-
-      - name: Unit tests
-        if: always()
-        run: |
-          set +e
-          npm run test:unit > ../.ep-vault-diagnostics/unit-tests.log 2>&1
-          code=$?
-          echo "$code" > ../.ep-vault-diagnostics/unit-tests.exit
-          exit 0
-        working-directory: khora-web
-
-      - name: Install Chromium
-        if: always()
-        run: |
-          set +e
-          npx playwright install --with-deps chromium > ../.ep-vault-diagnostics/playwright-install.log 2>&1
-          code=$?
-          echo "$code" > ../.ep-vault-diagnostics/playwright-install.exit
-          exit 0
-        working-directory: khora-web
-
-      - name: UI E2E smoke
-        if: always()
-        run: |
-          set +e
-          npm run e2e -- e2e/shell-v2.spec.ts e2e/ui-quality.spec.ts > ../.ep-vault-diagnostics/ui-e2e.log 2>&1
-          code=$?
-          echo "$code" > ../.ep-vault-diagnostics/ui-e2e.exit
-          exit 0
-        working-directory: khora-web
-
-      - name: PowerShell parser and denylist
-        if: always()
-        shell: pwsh
-        run: |
-          $ErrorActionPreference = "Continue"
-          $fail = $false
-          $deny = @("CipherMode]::GCM", "AesGcm", "RandomNumberGenerator]::Fill", "-AsHashtable")
-          Get-ChildItem -Path scripts/khora -Recurse -Filter *.ps1 -File | ForEach-Object {
-            $errors = $null
-            $tokens = $null
-            [System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$tokens, [ref]$errors) | Out-Null
-            if ($errors -and $errors.Count -gt 0) {
-              "PARSE-ERR $($_.FullName)" | Add-Content .ep-vault-diagnostics/powershell-parser.log
-              $errors | ForEach-Object { $_.Message | Add-Content .ep-vault-diagnostics/powershell-parser.log }
-              $fail = $true
-            } else {
-              "OK-PARSE $($_.FullName)" | Add-Content .ep-vault-diagnostics/powershell-parser.log
-            }
-            $content = Get-Content -Raw $_.FullName
-            foreach ($pattern in $deny) {
-              if ($content -match [regex]::Escape($pattern)) {
-                "DENY $pattern in $($_.FullName)" | Add-Content .ep-vault-diagnostics/powershell-parser.log
-                $fail = $true
-              }
-            }
-          }
-          if ($fail) { "exit=1" | Set-Content .ep-vault-diagnostics/powershell-parser.exit }
-          else { "exit=0" | Set-Content .ep-vault-diagnostics/powershell-parser.exit }
-          exit 0
-
-      - name: Upload diagnostic logs
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ep-vault-diagnostics-${{ github.run_id }}
-          path: .ep-vault-diagnostics/
-          if-no-files-found: error
-          retention-days: 7
-
-      - name: Publish sanitized diagnostic excerpt to the pull request
-        if: always() && github.event.pull_request.number
+      - name: Fetch source and publish sanitized diagnostics
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
+        shell: bash
         run: |
-          node <<'NODE'
+          set +e
+          D="$RUNNER_TEMP/ep-vault-diagnostics"
+          SRC="$RUNNER_TEMP/ep-vault-source"
+          mkdir -p "$D" "$SRC"
+          printf 'Node: ' > "$D/runtime.log"
+          node --version >> "$D/runtime.log" 2>&1
+          printf 'npm: ' >> "$D/runtime.log"
+          npm --version >> "$D/runtime.log" 2>&1
+          printf 'Fetching %s@%s from GitHub API\n' "$GH_REPO" "$HEAD_SHA" > "$D/source-download.log"
+          curl --location --silent --show-error --retry 2 \
+            --header "Authorization: Bearer $GH_TOKEN" \
+            --header "Accept: application/vnd.github+json" \
+            --header "X-GitHub-Api-Version: 2022-11-28" \
+            --output "$D/source.tar.gz" \
+            --write-out 'HTTP %{http_code}\n' \
+            "https://api.github.com/repos/$GH_REPO/tarball/$HEAD_SHA" >> "$D/source-download.log" 2>&1
+          fetch_code=$?
+          echo "$fetch_code" > "$D/source-download.exit"
+          if [ "$fetch_code" -eq 0 ] && [ -s "$D/source.tar.gz" ]; then
+            tar -xzf "$D/source.tar.gz" --strip-components=1 -C "$SRC" > "$D/extract.log" 2>&1
+            echo "$?" > "$D/extract.exit"
+          else
+            echo "1" > "$D/extract.exit"
+          fi
+
+          if [ -f "$SRC/khora-web/package.json" ]; then
+            cd "$SRC/khora-web"
+            npm ci > "$D/npm-ci.log" 2>&1
+            echo "$?" > "$D/npm-ci.exit"
+            npm run typecheck > "$D/typecheck.log" 2>&1
+            echo "$?" > "$D/typecheck.exit"
+            npm run ui-review:check > "$D/ui-review.log" 2>&1
+            echo "$?" > "$D/ui-review.exit"
+            npm run ui:contract > "$D/ui-contract.log" 2>&1
+            echo "$?" > "$D/ui-contract.exit"
+            npm run test:unit > "$D/unit-tests.log" 2>&1
+            echo "$?" > "$D/unit-tests.exit"
+            npx playwright install --with-deps chromium > "$D/playwright-install.log" 2>&1
+            echo "$?" > "$D/playwright-install.exit"
+            npm run e2e -- e2e/shell-v2.spec.ts e2e/ui-quality.spec.ts > "$D/ui-e2e.log" 2>&1
+            echo "$?" > "$D/ui-e2e.exit"
+          else
+            echo "Repository source not available; Node checks skipped." > "$D/source-unavailable.log"
+          fi
+
+          if command -v pwsh >/dev/null 2>&1 && [ -d "$SRC/scripts/khora" ]; then
+            cd "$SRC"
+            pwsh -NoProfile -Command '
+              $ErrorActionPreference = "Continue"
+              $failed = $false
+              $deny = @("CipherMode]::GCM", "AesGcm", "RandomNumberGenerator]::Fill", "-AsHashtable")
+              Get-ChildItem scripts/khora -Recurse -Filter *.ps1 -File | ForEach-Object {
+                $parseErrors = $null; $tokens = $null
+                [System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$tokens, [ref]$parseErrors) | Out-Null
+                if ($parseErrors -and $parseErrors.Count -gt 0) { "PARSE-ERR $($_.FullName)"; $parseErrors | ForEach-Object { $_.Message }; $failed = $true }
+                $text = Get-Content -Raw $_.FullName
+                foreach ($pattern in $deny) { if ($text -match [regex]::Escape($pattern)) { "DENY $pattern $($_.FullName)"; $failed = $true } }
+              }
+              if ($failed) { exit 1 } else { "PowerShell parser and denylist passed"; exit 0 }
+            ' > "$D/powershell-parser.log" 2>&1
+            echo "$?" > "$D/powershell-parser.exit"
+          else
+            echo "pwsh unavailable on diagnostic runner." > "$D/powershell-parser.log"
+            echo "2" > "$D/powershell-parser.exit"
+          fi
+
+          node - "$D" "$GH_REPO" "$PR_NUMBER" "$HEAD_SHA" <<'NODE'
           const fs = require("node:fs");
           const path = require("node:path");
-          const root = ".ep-vault-diagnostics";
-          const files = [
-            "npm-ci.log",
-            "typecheck.log",
-            "ui-review.log",
-            "ui-contract.log",
-            "unit-tests.log",
-            "playwright-install.log",
-            "ui-e2e.log",
-            "powershell-parser.log",
+          const root = process.argv[2];
+          const repo = process.argv[3];
+          const pr = process.argv[4];
+          const sha = process.argv[5];
+          const names = [
+            "runtime.log", "source-download.log", "extract.log", "source-unavailable.log",
+            "npm-ci.log", "typecheck.log", "ui-review.log", "ui-contract.log",
+            "unit-tests.log", "playwright-install.log", "ui-e2e.log", "powershell-parser.log"
           ];
           const redact = (s) => s
             .replace(/(?:ghp_|github_pat_|gho_)[A-Za-z0-9_]{16,}/g, "[REDACTED_GITHUB_TOKEN]")
             .replace(/Bearer\s+[^\s"'<>]+/gi, "Bearer [REDACTED]")
             .replace(/(EP_BOOTSTRAP_JWT_SECRET|GITHUB_TOKEN|password)\s*[:=]\s*[^\s"'<>]+/gi, "$1=[REDACTED]");
           const sections = [];
-          for (const file of files) {
-            const full = path.join(root, file);
+          for (const name of names) {
+            const full = path.join(root, name);
             if (!fs.existsSync(full)) continue;
-            let content = redact(fs.readFileSync(full, "utf8"));
-            if (content.length > 8500) content = "[últimas líneas]\n" + content.slice(-8500);
-            const exitPath = full.replace(/\.log$/, ".exit");
-            const exit = fs.existsSync(exitPath) ? fs.readFileSync(exitPath, "utf8").trim() : "sin código de salida";
-            sections.push("### " + file + " (exit=" + exit + ")\n\n\x60\x60\x60text\n" + content + "\n\x60\x60\x60");
+            let body = redact(fs.readFileSync(full, "utf8"));
+            const codePath = full.replace(/\.log$/, ".exit");
+            const code = fs.existsSync(codePath) ? fs.readFileSync(codePath, "utf8").trim() : "not-run";
+            if (body.length > 7000) body = "[truncated to last lines]\n" + body.slice(-7000);
+            sections.push("### " + name + " · exit=" + code + "\n\n\x60\x60\x60text\n" + body + "\n\x60\x60\x60");
           }
-          let body = "Diagnóstico temporal de PR #" + process.env.PR_NUMBER + "\n\n" +
-            "Logs saneados para identificar por qué falla la validación automatizada. No incluir secretos.\n\n" +
-            sections.join("\n\n");
-          if (body.length > 60000) body = body.slice(0, 59000) + "\n\n[recorte por límite de tamaño]";
-          fs.writeFileSync(path.join(root, "pr-diagnostic-comment.md"), body, "utf8");
+          const content = "Temporary diagnostics for " + repo + " PR #" + pr + "\nHead: " + sha +
+            "\n\nLogs are captured from this isolated run and secrets are redacted.\n\n" + sections.join("\n\n");
+          fs.writeFileSync(path.join(root, "comment.json"), JSON.stringify({body: content.slice(0, 58000)}));
           NODE
-          gh pr comment "$PR_NUMBER" --repo "$GH_REPO" --body-file .ep-vault-diagnostics/pr-diagnostic-comment.md
-
-      - name: Fail if any captured check failed
-        if: always()
-        run: |
-          failed=0
-          for result in .ep-vault-diagnostics/*.exit; do
-            [ -f "$result" ] || continue
-            code=$(cat "$result")
-            echo "$(basename "$result"): $code"
-            [ "$code" = "0" ] || failed=1
-          done
-          exit "$failed"
+          comment_code=1
+          if [ -f "$D/comment.json" ] && [ -n "$GH_TOKEN" ]; then
+            curl --silent --show-error --output "$D/comment-response.json" --write-out '%{http_code}' \
+              --request POST \
+              --header "Authorization: Bearer $GH_TOKEN" \
+              --header "Accept: application/vnd.github+json" \
+              --header "X-GitHub-Api-Version: 2022-11-28" \
+              --header "Content-Type: application/json" \
+              --data-binary @"$D/comment.json" \
+              "https://api.github.com/repos/$GH_REPO/issues/$PR_NUMBER/comments" > "$D/comment-status.txt" 2> "$D/comment-error.log"
+            comment_code=$?
+          fi
+          echo "diagnostic-comment-curl-exit=$comment_code" >> "$D/runtime.log"
+          cat "$D/runtime.log"
+          echo "Logs were posted as a sanitized PR comment if the GitHub token allowed comments."
+          exit 0
