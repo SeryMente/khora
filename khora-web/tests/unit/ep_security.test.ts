@@ -301,6 +301,9 @@ test("EP Security: GitHub PAT is encrypted at rest and only served to an EP bear
   assert.match(epServer, /getStoredEpGitHubToken\(\)/);
   assert.match(epServer, /EP_REQUIRED_GITHUB_REPOSITORIES/);
   assert.match(panel, /const catalogLoaded = await loadRepoCatalog\(true\)/);
+  assert.match(panel, /githubCredential\?\.canManage \?/);
+  assert.match(panel, /no puede administrarla/);
+  assert.match(manageRoute, /const email = await oidcAdministrator\(req\)/);
   assert.match(bootstrap, /\/github-token/);
   assert.doesNotMatch(bootstrap, /Copia un Personal Access Token de GitHub con escritura/);
   assert.match(vault, /gho_\[A-Za-z0-9\]\{20,\}/);
@@ -318,6 +321,7 @@ test("EP Security: OEP master password is independent from general KHORA OIDC", 
   assert.match(masterAuth, /authenticateEpMasterPassword/);
   assert.match(masterAuth, /catch \{ result = "unavailable"; \}/);
   assert.match(masterAuth, /epMasterCookieOptions/);
+  assert.match(masterAuth, /expiresInSeconds: session\.maxAge/);
   assert.match(masterVerifier, /scryptSync/);
   assert.match(masterVerifier, /timingSafeEqual/);
   assert.match(masterVerifier, /MAX_ATTEMPTS = 8/);
