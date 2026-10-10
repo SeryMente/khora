@@ -42,6 +42,8 @@ config=read('scripts/khora/modules/00-config.ps1','utf-8-sig')
 efs=read('scripts/khora/modules/05-efs.ps1','utf-8-sig')
 deps=read('scripts/khora/modules/08-deps.ps1','utf-8-sig')
 cleanup=read('scripts/khora/modules/11-cleanup.ps1','utf-8-sig')
+vault=read('scripts/khora/env-vault.ps1','utf-8-sig')
+git_auth=read('scripts/khora/modules/07-git-wip.ps1','utf-8-sig')
 require('Initialize-KhoraDataProfileContext' in gate,'Falta resolver del árbol de datos para CECEQ')
 require('KHORA_FILA4_PROFILE_NOT_UNIQUE' in gate and 'KHORA_FILA4_REPARSE_POINT_REFUSED' in gate,'La resolución de Fila4 debe fallar cerrada ante perfil ambiguo o ruta insegura')
 require('KhoraExpectedExecutionIdentity' in gate and 'KHORA_EXECUTION_IDENTITY_MISMATCH' in gate,'No se conserva/verifica la identidad efectiva del proceso')
@@ -72,6 +74,10 @@ require('KHORA_FILA4_PROFILE_NOT_UNIQUE' in gate and 'KHORA_FILA4_REPARSE_POINT_
 require('KHORA_CECEQ_REQUIRES_MANTENIMIENTORCI_EXECUTION_TOKEN' in config,'El modo de datos fila4 debe conservar la identidad MantenimientoRCI')
 require('InstallAllUsers=1' in deps and 'InstallAllUsers=0' not in deps,'Python no debe instalarse en HKCU bajo MantenimientoRCI')
 require('Remove-KhoraPythonMachineRegistration' in deps and 'Remove-KhoraPythonMachineRegistration' in cleanup,'Los registros temporales de Python deben retirarse')
+require("KHORA_EP_DATA_PROFILE_MODE = $script:DATA_PROFILE_MODE" in config,'El runtime no publica el modo de perfil de datos al proceso')
+require("protectionScope=$(if($env:KHORA_EP_DATA_PROFILE_MODE -eq 'fila4-profile-tree'){'LocalMachine-v1'}else{'CurrentUser'})" in vault,'El acceso temporal de bóveda no registra explícitamente su ámbito de protección')
+require('TEMP_VAULT_PROTECTION_SCOPE_MISMATCH' in vault and 'DataProtectionScope]::LocalMachine' in vault,'La bóveda debe rechazar DPAPI de usuario en modo fila4')
+require('git -c credential.helper= -C $RepositoryPath' in git_auth and "`$env:GCM_INTERACTIVE='Never'" in git_auth,'Git no debe consultar el Administrador persistente de credenciales en EP')
 # Remote persistence and private bootstrap
 for rel in ['khora-web/app/api/ep/token/route.ts','khora-web/app/api/ep/bootstrap/route.ts','khora-web/app/api/ep/events/route.ts','khora-web/app/api/ep/logs/route.ts','khora-web/lib/server/ep.ts','khora-web/db/migrations/016_ep_persistent_sessions.sql']:
     require((ROOT/rel).is_file(),f'Falta {rel}')
@@ -130,4 +136,4 @@ for p in (ROOT/'scripts/khora').rglob('*.ps1'):
     if problem:errors.append(problem)
 if errors:
     print('\n'.join('ERROR: '+e for e in errors));sys.exit(1)
-print('EP v1.0.1 static validation: OK')
+print('EP v1.0.3 static validation: OK')
