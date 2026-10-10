@@ -15,8 +15,8 @@ param(
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
-$script:EP_VERSION = '1.0.2'
-$script:SCRIPT_VERSION = '7.5.4'
+$script:EP_VERSION = '1.0.3'
+$script:SCRIPT_VERSION = '7.5.5'
 $script:GATE_PATH=$PSCommandPath
 $script:GATE_DIR=if($PSCommandPath){Split-Path -Parent $PSCommandPath}else{$null}
 $script:SESSION_MANIFEST_ARG=$SessionManifest
@@ -28,9 +28,28 @@ function ConvertFrom-KhoraSecureString {
     $pointer=[Runtime.InteropServices.Marshal]::SecureStringToBSTR($Value)
     try{return [Runtime.InteropServices.Marshal]::PtrToStringBSTR($pointer)}finally{[Runtime.InteropServices.Marshal]::ZeroFreeBSTR($pointer)}
 }
+function Protect-KhoraTextBlob {
+    param([Parameter(Mandatory=$true)][string]$Text,[Parameter(Mandatory=$true)][string]$Path)
+    if(-not('System.Security.Cryptography.ProtectedData' -as [type])){Add-Type -AssemblyName System.Security -ErrorAction Stop}
+    $data=[Text.Encoding]::UTF8.GetBytes($Text)
+    $entropy=[Text.Encoding]::UTF8.GetBytes('KHORA-EP-MACHINE-DPAPI-v1|SeryMente')
+    $cipher=$null
+    try{$cipher=[Security.Cryptography.ProtectedData]::Protect($data,$entropy,[Security.Cryptography.DataProtectionScope]::LocalMachine);[IO.File]::WriteAllText($Path,[Convert]::ToBase64String($cipher),[Text.Encoding]::ASCII)}
+    finally{if($data){[Array]::Clear($data,0,$data.Length)};if($entropy){[Array]::Clear($entropy,0,$entropy.Length)};if($cipher){[Array]::Clear($cipher,0,$cipher.Length)}}
+}
+function Unprotect-KhoraTextBlob {
+    param([Parameter(Mandatory=$true)][string]$Path)
+    if(-not('System.Security.Cryptography.ProtectedData' -as [type])){Add-Type -AssemblyName System.Security -ErrorAction Stop}
+    $cipher=[Convert]::FromBase64String(([IO.File]::ReadAllText($Path,[Text.Encoding]::ASCII)).Trim())
+    $entropy=[Text.Encoding]::UTF8.GetBytes('KHORA-EP-MACHINE-DPAPI-v1|SeryMente')
+    $data=$null
+    try{$data=[Security.Cryptography.ProtectedData]::Unprotect($cipher,$entropy,[Security.Cryptography.DataProtectionScope]::LocalMachine);return [Text.Encoding]::UTF8.GetString($data)}
+    finally{if($cipher){[Array]::Clear($cipher,0,$cipher.Length)};if($entropy){[Array]::Clear($entropy,0,$entropy.Length)};if($data){[Array]::Clear($data,0,$data.Length)}}
+}
 function Protect-KhoraSecureStringBlob {
     param([Security.SecureString]$Secure,[string]$Path)
-    $Secure|ConvertFrom-SecureString|Set-Content -LiteralPath $Path -Encoding ASCII
+    $plain=ConvertFrom-KhoraSecureString $Secure
+    try{Protect-KhoraTextBlob -Text $plain -Path $Path}finally{$plain=$null}
 }
 function Get-KhoraBootstrapHeaders {
     param([string]$Token)
@@ -326,7 +345,7 @@ function Start-KhoraBootstrap {
     $script:KHORA_EXPECTED_EXECUTION_IDENTITY=$KhoraExpectedExecutionIdentity
     Initialize-KhoraDataProfileContext
     if($script:KHORA_DATA_PROFILE_MODE -eq 'fila4-profile-tree' -and $KhoraTokenFile){$tokenPath=[IO.Path]::GetFullPath($KhoraTokenFile);$profilePrefix=([string]$script:KHORA_DATA_PROFILE_ROOT).TrimEnd('\')+'\';if(-not $tokenPath.StartsWith($profilePrefix,[StringComparison]::OrdinalIgnoreCase)){throw 'KHORA_TOKEN_FILE_OUTSIDE_FILA4_PROFILE'}}
-    if($KhoraTokenFile){try{$secure=(Get-Content -LiteralPath $KhoraTokenFile -Raw -ErrorAction Stop).Trim()|ConvertTo-SecureString;$script:KhoraToken=ConvertFrom-KhoraSecureString $secure}finally{Remove-Item -LiteralPath $KhoraTokenFile -Force -ErrorAction SilentlyContinue;$secure=$null}}else{$script:KhoraToken=$KhoraToken}
+    if($KhoraTokenFile){try{$script:KhoraToken=Unprotect-KhoraTextBlob -Path $KhoraTokenFile}finally{Remove-Item -LiteralPath $KhoraTokenFile -Force -ErrorAction SilentlyContinue}}else{$script:KhoraToken=$KhoraToken}
     Assert-KhoraBootstrapInputs -Token $script:KhoraToken -ApiBase $KhoraApiBase
     if(-not(Test-KhoraAdministrator)){if(Invoke-KhoraElevation){return }}
     Remove-KhoraTemporaryGate|Out-Null
