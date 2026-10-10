@@ -457,12 +457,12 @@ Cada ciclo puede incluir varias entradas de evidencia, pero no debe omitir ningu
 **Estado general:** ABIERTO · IMPLEMENTACIÓN DE OBSERVABILIDAD DEL DICTADO EN VALIDACIÓN.  
 **S0:** VERIFICADO. Objeto canónico en KHORA y entrada en README comprobados por read-back.  
 **S1:** acceso MCP autenticado y consulta de registros reales siguen pendientes.  
-**S2:** instrumentación del dictado, contrato USER_DATA, cola de envío y pruebas se publican en C003; la verificación dependerá del read-back y de CI.  
+**S2:** instrumentación del dictado, contrato USER_DATA, cola de envío con reintento y pruebas unitarias/E2E están publicadas y leídas de vuelta en C003/C004. Las suites aún no se ejecutan: GitHub Actions termina con runner_id=0 y cero pasos; CI, persistencia real y producción quedan PENDIENTES DE VERIFICACIÓN.  
 **El bug de dictado no está diagnosticado ni corregido en este sprint.**  
 **No se ha probado una conexión MCP autenticada ni runtime de producción en este ciclo.**  
 **No se afirma despliegue ni verificación de producción.**
 
-La siguiente acción es leer de vuelta los cambios publicados, comprobar el resultado de GitHub Actions y corregir cualquier fallo de pruebas o tipado. Después se debe verificar el acceso MCP real y consultar los eventos persistidos. La instrumentación registra la hipótesis del callback tardío, pero no declara la causa ni altera la conducta del reconocedor para adelantarse al diagnóstico.
+La siguiente acción es recuperar GitHub Actions y ejecutar CI/UI Quality; sus jobs actuales no asignan runner y no permiten conocer el resultado de las pruebas. Después se debe verificar la ingestión en un entorno autorizado, recuperar eventos por MCP y solo entonces diagnosticar/corregir el bug. La instrumentación registra callbacks tardíos sin dar por probada la causa.
 
 ## 18. Referencias canónicas
 
@@ -486,3 +486,40 @@ El objeto se conserva como texto canónico portable. Para cualquier afirmación 
 - Los parciales de reconocimiento se muestrean como máximo cada cinco segundos y las señales de fragmentos se emiten cada diez chunks; los hitos, errores, uploads, checkpoints y transiciones de edición se registran individualmente.
 - Vercel Blob no se añade como copia paralela sin una necesidad específica: eventos_sistema/outbox es la fuente estructurada existente, y el texto se conserva en su ruta cifrada separada.
 - Los callbacks tardíos se observan sin alterar su comportamiento funcional hasta que una reproducción determine la causa.
+
+
+### MCP-OBS-DICTADO/C004 · 2026-10-10 · Read-back, endurecimiento de entrega y límites de CI
+
+**Instrucción nueva recibida verbatim:** “Continua”.
+
+**Línea base de continuidad:** KHORA main en el commit bb406c61e4456ea8e7d40fbeaab343ab1f39c8a2, cuyo mensaje es “test(observability): cover inline dictation checkpoint lifecycle”. Se mantuvo el ámbito exclusivamente en la observabilidad del dictado y se trabajó únicamente con GitHub; no se utilizó RDC, no se consultó Vercel como evidencia de publicación y no se alteró deliberadamente la conducta funcional del reconocedor obsoleto.
+
+**Auditoría estática de la instrumentación leída desde main:** el componente Ingreso contiene 68 puntos literales de registro y 61 nombres de evento distintos. Se compararon las claves de métricas presentes en sus objetos de evento con la lista ALLOWED_METRICS del colector: no quedó ninguna clave utilizada fuera de la lista. Ningún nombre de evento literal inspeccionado coincide con los patrones de fuga prohibidos por el colector. Los eventos transmiten longitudes, estados, contadores, tiempos, bytes y reason codes normalizados, no fragmentos de texto ni audio.
+
+**Contrato de persistencia trazado desde el código:** el cliente envía lotes a POST /api/eventos con cookies same-origin. La ruta exige sesión autenticada salvo la excepción interna de pruebas, comprueba el estado del almacén y llama a registrarEventosBatch. El servidor valida el envelope con validateObservationPrivacy, traduce la fase y el estado, conserva fase/severidad/outcome/metrics en el detalle, asigna UUID e idempotencia y escribe en eventos_sistema con la tabla outbox existente. La migración 021 establece privacy_class como TEXT con default SYSTEM_AUDIT, sin un enum que bloquee USER_DATA. El colector considera el lote entregado solo si accepted + duplicates es igual al tamaño del lote y rejected es cero.
+
+**Corrección de robustez adicional:** se añadió reintento automático con backoff exponencial acotado cuando ocurre error HTTP/red, el servidor informa rechazos o quedan eventos tras las rondas máximas de drenaje. El evento conserva UUID y clave idempotente durante el reintento; la cola queda pendiente hasta el acuse completo. La tipificación del timer se ajustó a ReturnType<typeof window.setTimeout> para alinear el tipo del temporizador con la API del navegador y evitar diferencias de ReturnType entre DOM y Node.
+
+**Pruebas escritas para el ciclo:**
+- Pruebas unitarias de clase USER_DATA, saneamiento de transcript/unapproved metric, confirmación de lotes, recuperación tras error HTTP, conservación ante rechazo explícito y reintento con UUID estable.
+- Pruebas duraderas de ingesta USER_DATA, conservación de severity/phase/outcome, mapeo de FAILURE a FAIL, PENDING a START y SKIPPED a SKIP, además de la secuencia que excede 999.
+- Prueba E2E de navegador con un reconocedor simulado: inicio, foco/edición inmediata, pausa, confirmación, reanudación y evento de callback onend tardío de una instancia anterior; también comprueba que el texto simulado y el editado no se filtren a la telemetría. Sus endpoints de eventos/checkpoint están interceptados, por lo que la prueba verifica el flujo cliente, no una escritura real en Postgres.
+- Las pruebas se han añadido y se han leído de vuelta desde GitHub, pero no se afirma que hayan sido ejecutadas correctamente.
+
+**GitHub Actions — evidencia y limitación:** el commit de instrumentación y la prueba E2E es bb406c61e4456ea8e7d40fbeaab343ab1f39c8a2. El run CI 38071515684, intento 2, quedó en failure; sus jobs 114269824344 (khora-web-gate), 114269824577 (api-tests) y 114269824693 (calidad) terminaron con runner_id=0 y cero pasos. UI Quality run 38071515845, intento 2, quedó en failure; jobs 114269830277 (UI E2E) y 114269830488 (UI Contract) también terminaron con runner_id=0 y cero pasos. El deploy run 38071515779 y el job 114269705877 concluyeron de igual modo, antes de ejecutar pasos. Los intentos previos de obtener logs devolvieron HTTP 404 de los blobs de logs. Estos resultados acreditan que los workflows no ejecutaron sus pasos; no acreditan un fallo de compilación o de pruebas introducido por este cambio, ni permiten atribuir la causa subyacente.
+
+**Contrato diferente revisado:** ObservationBatchSchema usa otro formato de ingesta para el origen harmonia-extension y exige ANONYMIZED_TELEMETRY. El flujo instrumentado aquí se envía directamente al endpoint POST /api/eventos en formato ObservationEnvelope OBS-1, que sí declara USER_DATA. No se modificó ObservationBatchSchema para no mezclar ambos contratos ni desviar esta tarea de la persistencia duradera del dictado.
+
+**Resultados no verificados y pendientes:** no hay conexión MCP autenticada demostrada en este ciclo, ni consulta de eventos reales de producción, ni reproducción con micrófono real, ni test ejecutado por runner, ni prueba de una inserción real a Postgres. El bug funcional del dictado continúa NO CONFIRMADO y NO CORREGIDO; REARME_INSTANCIA_ANTERIOR es una señal diagnóstica instrumentada y la prueba E2E simula ese evento. No se declara despliegue ni disponibilidad en producción.
+
+**Read-back de la base de código desde main en el commit bb406c61e4456ea8e7d40fbeaab343ab1f39c8a2:**
+
+- khora-web/app/components/ingreso/IngresoWorkspace.tsx: blob 9eb3d878504322f07db8607b5cfe7f8f548b8cc6; 68862 caracteres, 1449 líneas.
+- khora-web/lib/contracts/observation.ts: blob 7f6b0d606af00acc80f3845eaf73fa1b773382cb; 3781 caracteres, 103 líneas.
+- khora-web/lib/server/eventos.ts: blob 48f81945bebf4728fbdcfcdddebbccc93293029c; 20217 caracteres, 660 líneas.
+- khora-web/tests/unit/dictado_observability.test.ts: blob 5501f55e07c8a9fa550fa31e0016458084539d12; 7914 caracteres, 188 líneas.
+- khora-web/tests/unit/eventos_durables.test.ts: blob fd73a1d0194f53ff51a73ee3f7e83d38bbb48342; 13781 caracteres, 403 líneas.
+- khora-web/e2e/contracts/dictado-observability-checkpoints.spec.ts: blob a84b6e5c977bf595765a0bfa38a070966d7f4abc; 4949 caracteres, 134 líneas.
+
+**Estado del ciclo:** implementación y pruebas escritas publicadas; revisión estática y read-back completados; CI, persistencia real y producción pendientes de verificación. El próximo paso técnico es recuperar la ejecución de GitHub Actions para que CI/UI Quality asignen runners, ejecuten las suites y expongan logs. Después se debe comprobar la ingestión durable en un entorno autorizado y consultar esos eventos a través del MCP real antes de abordar la corrección funcional del dictado.
+
