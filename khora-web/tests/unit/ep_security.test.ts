@@ -275,6 +275,9 @@ test("EP Security UI isolates Entorno Persistente as a submodule and keeps crede
   assert.match(page, /"entorno-persistente"/);
   assert.match(page, /<EntornoPersistentePanel \/>/);
   assert.match(source, /copyCommand/);
+  assert.match(source, /SaveNothing/);
+  assert.match(source, /NoProfile/);
+  assert.match(source, /seguridad\.ep\.consola-segura/);
   assert.match(source, /copyTokenStrict/);
   assert.match(source, /Reintentar copiar token/);
   assert.match(source, /Token preparado\. Regresa a PowerShell y presiona Enter/);
