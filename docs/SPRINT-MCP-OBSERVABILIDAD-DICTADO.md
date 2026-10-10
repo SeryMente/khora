@@ -556,3 +556,11 @@ Se amplió la prueba E2E para cubrir también la parada normal después del cicl
 
 Blob de la E2E ampliada: 143af621028ce1e775ecd5b35d8c17654e603ecf.
 
+
+
+### Addendum CI — integración explícita de la E2E de dictado — base 4103f31be53a47233cb60c0b7f4024a3691974b8
+
+La inspección de .github/workflows/ui-quality.yml mostró que el job UI E2E invocaba Playwright con una lista explícita de solo dos specs, de modo que la nueva prueba e2e/contracts/dictado-observability-checkpoints.spec.ts no se ejecutaría en CI aun estando dentro de testDir/testMatch. Se actualizó el comando de ese job para incluir el spec de observabilidad del dictado. El runner unitario scripts/run_unit_tests.mjs sí descubre automáticamente todos los archivos tests/unit/*.test.ts, por lo que las cuatro pruebas nuevas del colector entran en el conjunto unitario.
+
+La revisión de workflows después del cambio continúa bloqueada por el problema preexistente de asignación: runs concluyen como failure en dos segundos, runner_id=0 y cero pasos. La E2E ya está conectada al workflow, pero no se afirma que haya sido ejecutada.
+

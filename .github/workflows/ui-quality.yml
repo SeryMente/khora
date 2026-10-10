@@ -44,4 +44,4 @@ jobs:
           cache-dependency-path: khora-web/package-lock.json
       - run: npm ci
       - run: npx playwright install --with-deps chromium
-      - run: npm run e2e -- e2e/shell-v2.spec.ts e2e/ui-quality.spec.ts
+      - run: npm run e2e -- e2e/shell-v2.spec.ts e2e/ui-quality.spec.ts e2e/contracts/dictado-observability-checkpoints.spec.ts
