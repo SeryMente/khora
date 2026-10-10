@@ -133,6 +133,7 @@ export const MAX_PRIMARY_NAVIGATION_ITEMS = 7;
 
 export const NAVIGATION_EXEMPT_ROUTES = new Set([
   "/auth/signin",
+  "/auth/ep",
   "/oauth/authorize",
   "/offline",
   "/ui-review",
