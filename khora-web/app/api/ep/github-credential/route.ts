@@ -34,9 +34,13 @@ function statusFor(error: unknown): { error: string; status: number } {
 }
 
 export async function GET(req: NextRequest) {
-  if (!(await authorizedUser(req))) return NextResponse.json({ error: "not_authorized" }, { status: 401, headers: NO_STORE });
+  const session = await auth();
+  const email = await resolveEpUserEmail(req, session?.user?.email || "");
+  if (!email) return NextResponse.json({ error: "not_authorized" }, { status: 401, headers: NO_STORE });
   try {
-    return NextResponse.json(await getEpGitHubCredentialStatus(), { headers: NO_STORE });
+    const status = await getEpGitHubCredentialStatus();
+    const sessionEmail = (session?.user?.email || "").trim().toLowerCase();
+    return NextResponse.json({ ...status, canManage: Boolean(sessionEmail && sessionEmail === email) }, { headers: NO_STORE });
   } catch {
     return NextResponse.json({ error: "credential_vault_unavailable" }, { status: 503, headers: NO_STORE });
   }
@@ -62,7 +66,7 @@ export async function POST(req: NextRequest) {
   }
   try {
     const status = await saveEpGitHubCredential(token, email);
-    return NextResponse.json(status, { headers: NO_STORE });
+    return NextResponse.json({ ...status, canManage: true }, { headers: NO_STORE });
   } catch (error) {
     const result = statusFor(error);
     return NextResponse.json({ error: result.error }, { status: result.status, headers: NO_STORE });
@@ -77,7 +81,7 @@ export async function DELETE(req: NextRequest) {
   }
   try {
     await deleteEpGitHubCredential();
-    return NextResponse.json({ configured: false }, { headers: NO_STORE });
+    return NextResponse.json({ configured: false, canManage: true }, { headers: NO_STORE });
   } catch {
     return NextResponse.json({ error: "credential_vault_unavailable" }, { status: 503, headers: NO_STORE });
   }
