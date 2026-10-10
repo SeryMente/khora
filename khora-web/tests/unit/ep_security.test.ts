@@ -197,13 +197,13 @@ test("EP Security: POST /api/ep/token platform parameter handling and command se
     assert.ok(bodyWin.command);
     assert.ok(bodyWin.launcher);
     assert.equal(bodyWin.launcher.id, "windows-powershell");
-    assert.equal(bodyWin.launcher.version, "4");
+    assert.equal(bodyWin.launcher.version, "6");
     assert.equal(bodyWin.mode, "normal");
     assert.equal(bodyWin.launcher.mode, "normal");
     assert.equal(bodyWin.launcher.hostToolPolicy, "allow-verified-host");
     assert.equal(bodyWin.launcher.platform, "windows");
     assert.equal(bodyWin.launcher.status, "supported");
-    assert.equal(bodyWin.launcher.execution, "windows-powershell-5.1-child-process-dpapi");
+    assert.equal(bodyWin.launcher.execution, "windows-powershell-5.1-dpapi-machine-token-native-identity-fila4-data-root");
     assert.equal(bodyWin.apiBase, "https://khora.example.com/api/ep");
     assert.equal(bodyWin.command.includes(bodyWin.token), false);
     assert.equal(bodyWin.launcher.command.includes(bodyWin.token), false);
@@ -214,7 +214,11 @@ test("EP Security: POST /api/ep/token platform parameter handling and command se
     assert.match(bodyWin.command, /\.ps1/);
     assert.match(bodyWin.command, /WriteAllText/);
     assert.match(bodyWin.command, /KhoraTokenFile/);
-    assert.match(bodyWin.command, /ConvertFrom-SecureString/);
+    assert.match(bodyWin.command, /DataProtectionScope\]::LocalMachine/);
+    assert.match(bodyWin.command, /KHORA-EP-MACHINE-DPAPI-v1/);
+    assert.match(bodyWin.command, /KHORA_FILA4_PROFILE_NOT_UNIQUE/);
+    assert.match(bodyWin.command, /\$p=Join-Path \$targetTemp/);
+    assert.match(bodyWin.command, /-KhoraExpectedExecutionIdentity \$execIdentity/);
     assert.match(bodyWin.command, /finally/);
     assert.match(bodyWin.command, /Set-Clipboard -Value ' '/);
     assert.match(bodyWin.command, /WindowsPowerShell\\v1\.0\\powershell\.exe/);
