@@ -6,8 +6,8 @@ function Assert-Khora{param([bool]$Condition,[string]$Message)if(-not$Condition)
 $gate=Get-Content(Join-Path $root 'scripts\khora\khora.ps1')-Raw
 $barrel=Get-Content(Join-Path $root 'scripts\khora\khora.barrel.ps1')-Raw
 $all=(Get-ChildItem -LiteralPath (Join-Path $root 'scripts\khora') -Filter '*.ps1' -Recurse|Where-Object{$_.FullName -notmatch '\\tests\\'}|ForEach-Object{Get-Content -LiteralPath $_.FullName -Raw})-join"`n"
-Assert-Khora($gate-match"EP_VERSION\s*=\s*'1\.0\.2'")'Version EP incorrecta.'
-Assert-Khora($gate-match"SCRIPT_VERSION\s*=\s*'7\.5\.4'")'Version host incorrecta.'
+Assert-Khora($gate-match"EP_VERSION\s*=\s*'1\.0\.3'")'Version EP incorrecta.'
+Assert-Khora($gate-match"SCRIPT_VERSION\s*=\s*'7\.5\.5'")'Version host incorrecta.'
 $launcher=Get-Content (Join-Path $root 'khora-web\app\api\ep\token\route.ts') -Raw
 $config=Get-Content (Join-Path $root 'scripts\khora\modules\00-config.ps1') -Raw
 $efs=Get-Content (Join-Path $root 'scripts\khora\modules\05-efs.ps1') -Raw
@@ -37,4 +37,4 @@ Assert-Khora($all-notmatch'cipher\.exe|Encrypting File System')'Fallback EFS pro
 Assert-Khora($all-match'Enable-BitLocker')'Falta BitLocker.'
 $p70=$all.IndexOf('EP-IN-070');$p80=$all.IndexOf('EP-IN-080');$p90=$all.IndexOf('EP-IN-090');Assert-Khora -Condition ($p70 -ge 0 -and $p70 -lt $p80 -and $p80 -lt $p90) -Message 'Orden GitHub/Vercel/Visual Studio Code ausente.'
 Assert-Khora -Condition (Test-Path -LiteralPath (Join-Path $root 'ep-medio-architectura.md')) -Message 'Falta arquitectura canonica.'
-if($errors.Count){$errors|ForEach-Object{Write-Error $_};exit 1};Write-Host 'Validacion estatica EP v1.0.1: OK' -ForegroundColor Green
+if($errors.Count){$errors|ForEach-Object{Write-Error $_};exit 1};Write-Host 'Validacion estatica EP v1.0.3: OK' -ForegroundColor Green
