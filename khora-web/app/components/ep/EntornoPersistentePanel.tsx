@@ -409,7 +409,12 @@ export default function EntornoPersistentePanel() {
       <div className="space-y-6 p-5 sm:p-7" data-ui-id="seguridad.ep.pasos">
         {activeCommand && (
           <div className="space-y-3">
-            <div className="flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-full border text-xs font-bold" style={border}>1</span><div><h3 className="font-bold">Copia y pega el comando de PowerShell</h3><p className="text-xs opacity-65">Pégalo en Windows PowerShell 5.1, pero NO presiones Enter todavía.</p></div></div>
+            <div className="rounded-lg border p-3 space-y-2" style={{ ...border, background: "var(--khora-bg)" }} data-ui-id="seguridad.ep.consola-segura">
+              <p className="text-xs font-bold">CECEQ · prepara una consola sin historial persistente</p>
+              <p className="text-xs opacity-70">No uses una consola interactiva de MantenimientoRCI que ya esté abierta. Desde Ejecutar (Win+R), pega esta instrucción y pulsa Ctrl+Shift+Enter para abrir Windows PowerShell como administrador. La opción de historial solo cambia esa sesión; no guarda preferencias en el perfil.</p>
+              <code className="block overflow-x-auto whitespace-pre-wrap break-all rounded border p-2 text-[11px]">{'powershell.exe -NoProfile -NoExit -Command "Import-Module PSReadLine -ErrorAction SilentlyContinue; if (Get-Module PSReadLine) { Set-PSReadLineOption -HistorySaveStyle SaveNothing }"'}</code>
+            </div>
+            <div className="flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-full border text-xs font-bold" style={border}>1</span><div><h3 className="font-bold">Copia y pega el comando de PowerShell</h3><p className="text-xs opacity-65">Pégalo en esa nueva consola Windows PowerShell 5.1, pero NO presiones Enter todavía.</p></div></div>
             <pre className="max-h-36 overflow-auto whitespace-pre-wrap break-all rounded-lg border p-4 text-xs leading-relaxed" style={{ ...border, background: "var(--khora-bg)" }} data-ui-id="seguridad.ep.comando">{activeCommand}</pre>
             <button type="button" onClick={copyCommand} className="flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border p-3 text-sm font-bold hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--khora-accent)]" style={border} data-ui-id="seguridad.ep.copiar-comando">{commandCopied ? <Check size={17} className="text-emerald-400" /> : <TerminalSquare size={17} />}{commandCopied ? "Comando copiado exactamente" : "Copiar comando PowerShell"}</button>
           </div>
