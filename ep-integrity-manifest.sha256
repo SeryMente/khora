@@ -49,7 +49,7 @@ d0721a998cd2289dead8f26f404cd3e24cc1d25d76e471fc0a49d93dee058d35  ./drivers/tran
 a4bd237d302027cba333ac05c1686ba103b8821e374fdef0776737b48221ae6a  ./EP-ARCHITECTURE.md
 e7dc6da7ec69f527b9c9b092b7ed9ab022adededce7c2ef5bda18743de129d2c  ./EP-BUILD-REPORT.json
 24e4857233368f5f9ba98c07fc5c389edfbfb8408766ffbf1052106b351c76ad  ./EP-LIVE-LOG.md
-d5d5ffbc64242bec166e074fd5376d2c2de475caeeccc8957a3f9919bb00cb5d  ./ep-medio-architectura.md
+382e3bdd2a8d73aaa1a74ad811721f7045473bc2cbdc10baa05ef623f946bb67  ./ep-medio-architectura.md
 c495ac1bf2066560b3d30e70c8adbcda4839aa5f02cc6c0f1b61452974e7b2eb  ./EP-VALIDATION.md
 678b13f6346d1bdc2702539219929bfceab3cf6acf2fa7fe56f519698da56be6  ./fix_motor.patch
 8a577423cf16b27e939ad227d7fefd19504c00f997705b440de708a62761788b  ./fix_test_api.patch
@@ -194,7 +194,7 @@ b49061ae54b908c65f4825050934fe504861bf898e011b059a9c84c7081db16a  ./khora-web/ap
 72eedfc957708cda528113e0127994c199a659a2cfdd11febb12260b8df8d986  ./khora-web/app/api/edicion/route.ts
 ad84ca3ae173f86ea212c24fee6fa084a314926ab51be4167b98173cb078d569  ./khora-web/app/api/ep/bootstrap/route.ts
 1d9eb7a6ea865d451ec968030f72f5e41b4ac4ae45ae0ac383078495280af69e  ./khora-web/app/api/ep/events/route.ts
-0665f5127c9316190ff2942110ad5884a067184792ee6b60720511dfb1583c59  ./khora-web/app/api/ep/github-credential/route.ts
+1a25d216eca39eb3a4615ef39d9095ecd9ffa755396cc3ebf50752f12ef6fa99  ./khora-web/app/api/ep/github-credential/route.ts
 32e23d07fc9cefccc83589fb74df1c3f548ce1a35bd87066e41b00a3e477076b  ./khora-web/app/api/ep/github-token/route.ts
 3fd53a184bffb29ee5ecafa03f710fdd7cac6c9dc15d3be506f80088faccf072  ./khora-web/app/api/ep/logs/route.ts
 6b559eea14f8fbc92e38747e0e56b48cad4ec02c21a629613448d16c0b8cb34b  ./khora-web/app/api/ep/master-auth/route.ts
@@ -237,7 +237,7 @@ b4e90855d059c16634f15ec8f0e613b3206cd17bb7bec190ba58f181777fbcd4  ./khora-web/ap
 43cf297fba0355889f6172d2e0c369c2f63392c8f5b178e673cce374af6e5e97  ./khora-web/app/capturar/page.tsx
 db60f4bb5a898b2e5ac57f91195454e693769c8e63a1064db300663f331cecd4  ./khora-web/app/components/CapturarModal.tsx
 31a4ccb3ec336349d6718c4b73f2e687aa02715e89f780a564f6ab0224d5be66  ./khora-web/app/components/CopyBlock.tsx
-92828dd1805cf641d18bfbd23e0a459c28743f33638d94d84ed1b30e8263fcc4  ./khora-web/app/components/ep/EntornoPersistentePanel.tsx
+379b63d8023497981869529199ba4a3572494af92e452006ab079d4d1defb6a0  ./khora-web/app/components/ep/EntornoPersistentePanel.tsx
 54aaea486b61dc0a5b6f436c17bb54e6c14454b151ce73c139698594938274ea  ./khora-web/app/components/GlobalFooter.tsx
 bc5a4691e376000eaaecaaad8e76f6ea55f08431e57a3b796a8963f75772fb7a  ./khora-web/app/components/os/AppIcon.tsx
 e623512b60f3f656af1268553ce93e618375375352bf84b90c480b9358e79411  ./khora-web/app/components/os/KhoraShell.tsx
@@ -499,7 +499,7 @@ de7d735c46127a7f1b7d424c7c3a9c3e53e7eda53dd3b7fb41474b5f25757f4c  ./khora-web/te
 8279173df75e480671083b4906e2dd0c1867639b35b322e5117184a403814161  ./khora-web/tests/unit/chatgpt_oauth.test.ts
 46cc546f8a1da5a7c15de924da7e51ea8ce41588614d8b76423b9c354e8c64ef  ./khora-web/tests/unit/compuerta.test.ts
 1695b3740daa396553420afb4fc4c4ec400479ae630bcb774c725e10c426b69d  ./khora-web/tests/unit/dictado_clean_verbatim.test.ts
-bdaaf3ccc424a66fc6b2b7fe9f03d89d162cb2a9d01402f190af67fc754ad0e1  ./khora-web/tests/unit/ep_security.test.ts
+dc17e824776303e47842085f5a8c78afe7e75a92e4b8c0365944b55afa35e919  ./khora-web/tests/unit/ep_security.test.ts
 7110a1d2e9986afe57155068f4d3da49ce9bec51f36c387aadf66b6e30e77451  ./khora-web/tests/unit/ep_token.test.ts
 915632ca4597a5dfa767d9f4623f34678c06ab8ff5b6fc200d3399da8ccfc7eb  ./khora-web/tests/unit/eventos_sistema.test.ts
 0d94d97b9941db994dfc6e5a0e67cc07692ab9c793c2c34c33017cf1060b76fd  ./khora-web/tests/unit/folio.test.ts
@@ -551,7 +551,7 @@ b1c0edb603057ae7226fc5586364cc55fe57c4fd0532e37cf40662e43c7d7406  ./manual/decis
 a02ed63cbc71fb5a5fe0f67aaeeb2294301ff611c12ed6e7af5907cdb6a60023  ./manual/decisiones/adr-009.md
 c3d5659be275fdb42edb0ea31abbd1fa3fbc20258d5670745f1d3aca85803b95  ./manual/decisiones/adr-010.md
 e586e1275614b69a82aac8ae6c31b2101ebedf51783b52f8a01a81faf4948795  ./manual/decisiones/adr-011.md
-643eb212e07d8cb4a20308ba46c3f7f8eabeb7df5bf8b66326e493e3de9f1224  ./OEP.md
+3a719348b06c018e92e9b6f3e10eb4c273da8bbf2d348bf6e7e58ba6d9f02913  ./OEP.md
 b41ace6a7a82d856c374c18c4be36a0090e6ebc61cc51b228f86d1d984c1c5ba  ./output.sh
 681e2ab2abf6dc824b57e1a18d83ab29527b612d65ea45d071a45e35e00a9d88  ./output.txt
 7c9147b24f80596bc08596aa364665f897a10dfdc505fd2cae351b0229c74659  ./poetry.lock
