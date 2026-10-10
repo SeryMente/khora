@@ -139,15 +139,53 @@ function Ensure-Node {
     Add-KhoraPath -Path $node.DirectoryName;return $node.FullName
 }
 
+function Remove-KhoraPythonMachineRegistration {
+    param([Parameter(Mandatory=$true)][string]$InstallRoot)
+    $target=[IO.Path]::GetFullPath($InstallRoot).TrimEnd('\')
+    $pythonRoots=@('Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Python\PythonCore','Registry::HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Python\PythonCore')
+    foreach($registryRoot in $pythonRoots){
+        if(-not(Test-Path -LiteralPath $registryRoot)){continue}
+        foreach($versionKey in @(Get-ChildItem -LiteralPath $registryRoot -ErrorAction SilentlyContinue)){
+            $installKey=Join-Path $versionKey.PSPath 'InstallPath'
+            if(-not(Test-Path -LiteralPath $installKey)){continue}
+            $registered=''
+            try{$registered=[string](Get-Item -LiteralPath $installKey -ErrorAction Stop).GetValue('')}catch{}
+            if([string]::IsNullOrWhiteSpace($registered)){continue}
+            try{$registered=[IO.Path]::GetFullPath($registered).TrimEnd('\')}catch{continue}
+            if([string]::Compare($registered,$target,[StringComparison]::OrdinalIgnoreCase)-eq0){
+                Remove-Item -LiteralPath $versionKey.PSPath -Recurse -Force -ErrorAction Stop
+                Info ('Removed temporary machine Python registration at '+$target)
+            }
+        }
+    }
+    $uninstallRoots=@('Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall','Registry::HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall')
+    foreach($registryRoot in $uninstallRoots){
+        if(-not(Test-Path -LiteralPath $registryRoot)){continue}
+        foreach($entry in @(Get-ChildItem -LiteralPath $registryRoot -ErrorAction SilentlyContinue)){
+            $props=$null
+            try{$props=Get-ItemProperty -LiteralPath $entry.PSPath -ErrorAction Stop}catch{}
+            if($null-eq$props){continue}
+            $location=[string]$props.InstallLocation
+            if([string]::IsNullOrWhiteSpace($location)){continue}
+            try{$location=[IO.Path]::GetFullPath($location).TrimEnd('\')}catch{continue}
+            if([string]::Compare($location,$target,[StringComparison]::OrdinalIgnoreCase)-eq0-and[string]$props.DisplayName-match'(?i)^Python 3\.11'){
+                Remove-Item -LiteralPath $entry.PSPath -Recurse -Force -ErrorAction Stop
+                Info ('Removed temporary machine Python uninstall registration at '+$target)
+            }
+        }
+    }
+}
+
 function Ensure-Python311 {
     $existing=Get-Command python -ErrorAction SilentlyContinue
     if($existing -and $existing.Source -notmatch '\\WindowsApps\\'){if((& $existing.Source --version 2>&1) -match '^Python 3\.(1[1-9]|[2-9]\d)'){return $existing.Source}}
     $installer=Wait-KhoraPrefetch -Name python;if(-not$installer){throw 'Python ausente.'}
     if((Get-AuthenticodeSignature $installer).Status -ne 'Valid'){throw 'Firma Python inválida.'}
     $target=Join-Path $WORK_DIR 'tools\python311';New-Item -ItemType Directory -Path $target -Force|Out-Null
-    $arguments='/quiet InstallAllUsers=0 PrependPath=0 Include_pip=1 Include_test=0 TargetDir="'+$target+'"'
+    $arguments='/quiet InstallAllUsers=1 PrependPath=0 Include_pip=1 Include_test=0 Include_doc=0 Include_tcltk=0 Include_dev=0 Shortcuts=0 AssociateFiles=0 Include_launcher=0 TargetDir="'+$target+'"'
     $process=Start-Process $installer -ArgumentList $arguments -Wait -PassThru -WindowStyle Hidden
-    $python=Join-Path $target 'python.exe';if($process.ExitCode -ne 0 -or -not(Test-Path $python)){throw 'Instalación Python falló.'}
+    $python=Join-Path $target 'python.exe';if($process.ExitCode -ne 0 -or -not(Test-Path $python)){Remove-KhoraPythonMachineRegistration -InstallRoot $target;throw 'Instalación Python falló.'}
+    Remove-KhoraPythonMachineRegistration -InstallRoot $target
     Add-KhoraPath -Path $target;return $python
 }
 
