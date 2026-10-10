@@ -12,8 +12,16 @@ export const runtime = "nodejs";
 const NO_STORE = { "Cache-Control": "no-store, max-age=0", Pragma: "no-cache", "Referrer-Policy": "no-referrer", "X-Content-Type-Options": "nosniff" } as const;
 
 async function authorizedUser(req: NextRequest): Promise<string> {
+  // Reading the redacted status is allowed from the EP master session.
   const session = await auth();
   return resolveEpUserEmail(req, session?.user?.email || "");
+}
+
+async function oidcAdministrator(req: NextRequest): Promise<string> {
+  // A master-password session can start EP but cannot administer long-lived secrets.
+  const session = await auth();
+  const email = (session?.user?.email || "").trim().toLowerCase();
+  return email ? resolveEpUserEmail(req, email).then((resolved) => resolved === email ? email : "") : "";
 }
 
 function statusFor(error: unknown): { error: string; status: number } {
@@ -35,7 +43,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const email = await authorizedUser(req);
+  const email = await oidcAdministrator(req);
   if (!email) return NextResponse.json({ error: "not_authorized" }, { status: 401, headers: NO_STORE });
   if (req.headers.get("origin") !== req.nextUrl.origin || !(req.headers.get("content-type") || "").toLowerCase().startsWith("application/json")) {
     return NextResponse.json({ error: "invalid_request" }, { status: 403, headers: NO_STORE });
@@ -62,7 +70,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const email = await authorizedUser(req);
+  const email = await oidcAdministrator(req);
   if (!email) return NextResponse.json({ error: "not_authorized" }, { status: 401, headers: NO_STORE });
   if (req.headers.get("origin") !== req.nextUrl.origin) {
     return NextResponse.json({ error: "invalid_request" }, { status: 403, headers: NO_STORE });
