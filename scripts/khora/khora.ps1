@@ -10,7 +10,8 @@ param(
     [int]$WatchPid=0,
     [string]$KhoraToken,
     [string]$KhoraTokenFile,
-    [string]$KhoraApiBase
+    [string]$KhoraApiBase,
+    [string]$KhoraExpectedExecutionIdentity
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
@@ -189,7 +190,7 @@ function Invoke-KhoraElevation {
  if(Test-KhoraAdministrator){return $false}
  if([string]::IsNullOrWhiteSpace($script:SELF_SOURCE)){throw 'No se pudo materializar el gate para elevación.'}
  $temporaryScript=Join-Path $script:KHORA_TARGET_TEMP ('khora-bootstrap-'+[guid]::NewGuid().ToString('N')+'.ps1');$temporaryToken=Join-Path $script:KHORA_TARGET_TEMP ('khora-token-'+[guid]::NewGuid().ToString('N')+'.dpapi')
- try{[IO.File]::WriteAllText($temporaryScript,$script:SELF_SOURCE,(New-Object Text.UTF8Encoding($true)));Protect-KhoraSecureStringBlob -Secure (ConvertTo-SecureString $script:KhoraToken -AsPlainText -Force) -Path $temporaryToken;$args=@('-NoProfile','-ExecutionPolicy','Bypass','-File',('"'+$temporaryScript+'"'),'-Bootstrap','-KhoraTokenFile',('"'+$temporaryToken+'"'),'-KhoraApiBase',('"'+$KhoraApiBase+'"'));$child=Start-Process powershell.exe -Verb RunAs -ArgumentList $args -PassThru -ErrorAction Stop;$until=[DateTime]::UtcNow.AddSeconds(45);while((Test-Path -LiteralPath $temporaryToken)-and-not$child.HasExited-and[DateTime]::UtcNow-lt$until){Start-Sleep -Milliseconds 200};if($child.HasExited-and(Test-Path -LiteralPath $temporaryToken)){throw 'El proceso elevado no consumió la credencial protegida.'};return $true}catch{try{[IO.File]::Delete($temporaryScript)}catch{};try{[IO.File]::Delete($temporaryToken)}catch{};throw}
+ try{[IO.File]::WriteAllText($temporaryScript,$script:SELF_SOURCE,(New-Object Text.UTF8Encoding($true)));Protect-KhoraSecureStringBlob -Secure (ConvertTo-SecureString $script:KhoraToken -AsPlainText -Force) -Path $temporaryToken;$args=@('-NoProfile','-ExecutionPolicy','Bypass','-File',('"'+$temporaryScript+'"'),'-Bootstrap','-KhoraTokenFile',('"'+$temporaryToken+'"'),'-KhoraApiBase',('"'+$KhoraApiBase+'"'),'-KhoraExpectedExecutionIdentity',('"'+$script:KHORA_EXPECTED_EXECUTION_IDENTITY+'"'));$child=Start-Process powershell.exe -Verb RunAs -ArgumentList $args -PassThru -ErrorAction Stop;$until=[DateTime]::UtcNow.AddSeconds(45);while((Test-Path -LiteralPath $temporaryToken)-and-not$child.HasExited-and[DateTime]::UtcNow-lt$until){Start-Sleep -Milliseconds 200};if($child.HasExited-and(Test-Path -LiteralPath $temporaryToken)){throw 'El proceso elevado no consumió la credencial protegida.'};return $true}catch{try{[IO.File]::Delete($temporaryScript)}catch{};try{[IO.File]::Delete($temporaryToken)}catch{};throw}
 }
 function Get-KhoraDesktop {
  $desktop=if($script:KHORA_TARGET_DESKTOP){[string]$script:KHORA_TARGET_DESKTOP}else{[Environment]::GetFolderPath([Environment+SpecialFolder]::Desktop)}
@@ -319,6 +320,10 @@ function Invoke-KhoraEmergencyDetach {
     if($Outer){Remove-Item -LiteralPath $Outer -Recurse -Force -ErrorAction SilentlyContinue}
 }
 function Start-KhoraBootstrap {
+    $actualExecutionIdentity=[Security.Principal.WindowsIdentity]::GetCurrent().Name
+    if([string]::IsNullOrWhiteSpace($KhoraExpectedExecutionIdentity)){$KhoraExpectedExecutionIdentity=$actualExecutionIdentity}
+    if([string]::Compare($KhoraExpectedExecutionIdentity,$actualExecutionIdentity,[StringComparison]::OrdinalIgnoreCase)-ne0){throw 'KHORA_EXECUTION_IDENTITY_MISMATCH'}
+    $script:KHORA_EXPECTED_EXECUTION_IDENTITY=$KhoraExpectedExecutionIdentity
     Initialize-KhoraDataProfileContext
     if($script:KHORA_DATA_PROFILE_MODE -eq 'fila4-profile-tree' -and $KhoraTokenFile){$tokenPath=[IO.Path]::GetFullPath($KhoraTokenFile);$profilePrefix=([string]$script:KHORA_DATA_PROFILE_ROOT).TrimEnd('\')+'\';if(-not $tokenPath.StartsWith($profilePrefix,[StringComparison]::OrdinalIgnoreCase)){throw 'KHORA_TOKEN_FILE_OUTSIDE_FILA4_PROFILE'}}
     if($KhoraTokenFile){try{$secure=(Get-Content -LiteralPath $KhoraTokenFile -Raw -ErrorAction Stop).Trim()|ConvertTo-SecureString;$script:KhoraToken=ConvertFrom-KhoraSecureString $secure}finally{Remove-Item -LiteralPath $KhoraTokenFile -Force -ErrorAction SilentlyContinue;$secure=$null}}else{$script:KhoraToken=$KhoraToken}
