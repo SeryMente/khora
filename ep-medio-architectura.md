@@ -63,7 +63,7 @@ Los temporales de arranque, credenciales transferidas entre procesos, logs exter
 | Personal Access Token de GitHub | GitHub | leer/escribir `SeryMente/khora` privado | definido por GitHub | memoria y Protección de Datos de Windows dentro del volumen |
 | `VERCEL_TOKEN` | bóveda | `vercel whoami` y `vercel link` | sesión | variable de proceso dentro del volumen; nunca argumentos de proceso |
 
-El token Khora no sustituye el Personal Access Token de GitHub ni la llave de la bóveda. Cuando GitHub CLI está previamente autenticado en el host, el bootstrap reutiliza esa credencial para obtener el PAT en memoria y evita pedir una segunda autorización; el portapapeles queda como mecanismo de contingencia. Su paso ocurre **antes de la instanciación** y, por ello, no altera el orden interno no negociable.
+El token Khora no sustituye el Personal Access Token de GitHub ni la llave de la bóveda. Fuera de CECEQ, cuando la configuración de GitHub CLI ya existe y puede reutilizarse sin salir del ámbito permitido, el bootstrap puede obtener el PAT en memoria. En CECEQ, `GH_CONFIG_DIR` se redirige antes de la autenticación a un destino bajo fila4; Khora no lee ni modifica la configuración o los tokens de GitHub CLI del perfil MantenimientoRCI. Si el CLI aislado no está autenticado, se utiliza el mecanismo de contingencia por portapapeles. La configuración Git global del perfil de trabajo y el `credential.helper` persistente quedan excluidos de los comandos de continuidad WIP.
 
 ### 3.2 Emisión por Google OpenID Connect y Sección Seguridad
 
