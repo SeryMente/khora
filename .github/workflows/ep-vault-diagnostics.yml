@@ -10,6 +10,8 @@ on:
 
 permissions:
   contents: read
+  issues: write
+  pull-requests: write
 
 concurrency:
   group: ep-vault-diagnostics-${{ github.event.pull_request.number || github.ref }}
@@ -139,6 +141,49 @@ jobs:
           path: .ep-vault-diagnostics/
           if-no-files-found: error
           retention-days: 7
+
+      - name: Publish sanitized diagnostic excerpt to the pull request
+        if: always() && github.event.pull_request.number
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          node <<'NODE'
+          const fs = require("node:fs");
+          const path = require("node:path");
+          const root = ".ep-vault-diagnostics";
+          const files = [
+            "npm-ci.log",
+            "typecheck.log",
+            "ui-review.log",
+            "ui-contract.log",
+            "unit-tests.log",
+            "playwright-install.log",
+            "ui-e2e.log",
+            "powershell-parser.log",
+          ];
+          const redact = (s) => s
+            .replace(/(?:ghp_|github_pat_|gho_)[A-Za-z0-9_]{16,}/g, "[REDACTED_GITHUB_TOKEN]")
+            .replace(/Bearer\s+[^\s"'<>]+/gi, "Bearer [REDACTED]")
+            .replace(/(EP_BOOTSTRAP_JWT_SECRET|GITHUB_TOKEN|password)\s*[:=]\s*[^\s"'<>]+/gi, "$1=[REDACTED]");
+          const sections = [];
+          for (const file of files) {
+            const full = path.join(root, file);
+            if (!fs.existsSync(full)) continue;
+            let content = redact(fs.readFileSync(full, "utf8"));
+            if (content.length > 8500) content = "[últimas líneas]\n" + content.slice(-8500);
+            const exitPath = full.replace(/\.log$/, ".exit");
+            const exit = fs.existsSync(exitPath) ? fs.readFileSync(exitPath, "utf8").trim() : "sin código de salida";
+            sections.push("### " + file + " (exit=" + exit + ")\n\n\x60\x60\x60text\n" + content + "\n\x60\x60\x60");
+          }
+          let body = "Diagnóstico temporal de PR #" + process.env.PR_NUMBER + "\n\n" +
+            "Logs saneados para identificar por qué falla la validación automatizada. No incluir secretos.\n\n" +
+            sections.join("\n\n");
+          if (body.length > 60000) body = body.slice(0, 59000) + "\n\n[recorte por límite de tamaño]";
+          fs.writeFileSync(path.join(root, "pr-diagnostic-comment.md"), body, "utf8");
+          NODE
+          gh pr comment "$PR_NUMBER" --repo "$GH_REPO" --body-file .ep-vault-diagnostics/pr-diagnostic-comment.md
 
       - name: Fail if any captured check failed
         if: always()
