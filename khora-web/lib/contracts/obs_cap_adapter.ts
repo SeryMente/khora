@@ -25,7 +25,7 @@ export function mapCap0ToObs1(cap: CAP0Envelope): OBS1Envelope {
   const privacyMap: Record<TelemetryPrivacyClass, ObservationPrivacyClass> = {
     public: "PUBLIC_METRIC",
     internal: "SYSTEM_AUDIT",
-    confidential: "SYSTEM_AUDIT",
+    confidential: "USER_DATA",
     telemetry_only: "ANONYMIZED_TELEMETRY",
   };
 
@@ -77,6 +77,7 @@ export function mapObs1ToCap0(obs: OBS1Envelope): CAP0Envelope {
     PUBLIC_METRIC: "public",
     ANONYMIZED_TELEMETRY: "telemetry_only",
     SYSTEM_AUDIT: "internal",
+    USER_DATA: "confidential",
   };
 
   return {
