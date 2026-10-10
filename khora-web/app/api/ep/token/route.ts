@@ -35,13 +35,14 @@ function buildWindowsLauncherCommand(apiBase: string): string {
   const cleanup = [
     "try{Set-Clipboard -Value ' '}catch{}",
     "foreach($artifact in @($p,$tf)){if($artifact){Remove-Item -LiteralPath $artifact -Force -ErrorAction SilentlyContinue}}",
-    "Remove-Variable b,k,p,tf,response,s,headers,payload,reader,stream,code,secure,artifact,winps,signedMode -ErrorAction SilentlyContinue",
+    "foreach($name in $oldProfileEnvironment.Keys){[Environment]::SetEnvironmentVariable([string]$name,$oldProfileEnvironment[$name],'Process')};Remove-Variable b,k,p,tf,response,s,headers,payload,reader,stream,code,secure,artifact,winps,signedMode,oldProfileEnvironment,name,wi,execIdentity,targetTemp,fila4Root,allProfiles,profiles,profile,account,desktop,appData,localAppData,tempRoot,rootPrefix,guardPaths,targetPath,full,item,directory,driveRoot,machinePath,machineModules -ErrorAction SilentlyContinue",
   ].join(";");
   return [
     "$ErrorActionPreference='Stop'",
     "$ProgressPreference='SilentlyContinue'",
     `$b=${psSingleQuoted(apiBase)}`,
     "$k=$null;$p=$null;$tf=$null;$response=$null;$s=$null;$payload=$null;$reader=$null;$stream=$null;$winps=$null",
+    "$oldProfileEnvironment=[ordered]@{USERPROFILE=$env:USERPROFILE;HOME=$env:HOME;HOMEDRIVE=$env:HOMEDRIVE;HOMEPATH=$env:HOMEPATH;APPDATA=$env:APPDATA;LOCALAPPDATA=$env:LOCALAPPDATA;TEMP=$env:TEMP;TMP=$env:TMP;GH_CONFIG_DIR=$env:GH_CONFIG_DIR;GIT_CONFIG_GLOBAL=$env:GIT_CONFIG_GLOBAL;NPM_CONFIG_CACHE=$env:NPM_CONFIG_CACHE;XDG_CONFIG_HOME=$env:XDG_CONFIG_HOME;XDG_DATA_HOME=$env:XDG_DATA_HOME;Path=$env:Path;PSModulePath=$env:PSModulePath}",
     `try{${body}}finally{${cleanup}}`,
   ].join(";");
 }
