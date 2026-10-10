@@ -324,7 +324,7 @@ export default function VolcadosPage({ legacyEditorEntry = false }: { legacyEdit
       if (!items || items.length === 0) return;
 
       if (requestedId) {
-        if (!items.some((item) => item.id === requestedId)) {
+        if (!items.some((item: { id: string }) => item.id === requestedId)) {
           setVersionSelectionError(
             "El volcado solicitado no está presente en el inventario. No se abrirá otro volcado por omisión.",
           );
