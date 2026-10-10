@@ -1,7 +1,7 @@
-# Entorno Persistente Medio · Arquitectura canónica v1.0.4
+# Entorno Persistente Medio · Arquitectura canónica v1.0.5
 
-**Estado:** normativa · actualización 1.0.4
-**Host KHORA:** 7.5.3
+**Estado:** normativa · actualización 1.0.5
+**Host KHORA:** 7.5.5
 **Repositorio:** `SeryMente/khora`, tratado como privado
 **Punto de entrada único:** `scripts/khora/khora.ps1`
 **Firma de instrucción:** NX-326m
@@ -42,6 +42,13 @@ Una sesión válida cumple simultáneamente:
 
 El bootstrap debe reutilizar primero herramientas instaladas y verificables en rutas estándar del host aunque no estén presentes en `PATH`. `npm` se resuelve mediante `npm.cmd` cuando `npm.ps1` esté bloqueado por `ExecutionPolicy`. Los alias de `WindowsApps` para Python no cuentan como instalación compatible. Solo cuando no exista una instalación verificable se activa la provisión controlada correspondiente.
 
+### 2.1.2 Identidad de ejecución y árbol de datos en CECEQ
+
+Cuando Khora arranca Entorno Persistente en CECEQ, la identidad Windows efectiva de todos los procesos es `central\MantenimientoRCI`. El lanzador, el gate y cada proceso hijo deben comprobar que el token efectivo sigue perteneciendo a esa identidad. No se inicia sesión como `fila4`, no se suplanta esa identidad ni se informa que el proceso actúa como `fila4`.
+
+`fila4` define exclusivamente el árbol de datos. Antes de leer el token o escribir el primer archivo, el lanzador resuelve de forma única el perfil real de fila4 y valida `Desktop`, `AppData\Roaming`, `AppData\Local` y `AppData\Local\Temp`, rechazando puntos de reanálisis y destinos externos. Las variables `USERPROFILE`, `HOME`, `APPDATA`, `LOCALAPPDATA`, `TEMP`, `TMP`, `PATH`, `PSModulePath`, `GH_CONFIG_DIR`, `GIT_CONFIG_GLOBAL`, `NPM_CONFIG_CACHE` y `XDG_*` se redirigen únicamente en el entorno del proceso; el shell llamador recupera sus valores anteriores al concluir.
+
+Los temporales de arranque, credenciales transferidas entre procesos, logs externos al volumen, configuración de herramientas y la carpeta exterior que contiene el VHDX se guardan en el árbol de fila4. Clones, perfiles y dependencias de la sesión viven dentro del VHDX cifrado alojado allí. El flujo no modifica variables de usuario persistentes, `HKCU` ni configuraciones, cachés, historiales o credenciales del perfil de MantenimientoRCI. Los blobs temporales de credenciales utilizan DPAPI de ámbito de equipo con entropía de aplicación explícita, no DPAPI de usuario. Las instalaciones faltantes se materializan de forma portátil en el VHDX; toda inscripción de instalador que sea necesaria para desplegar en un directorio objetivo se elimina al terminar la instalación y vuelve a comprobarse durante la limpieza.
 
 “Cualquier computadora” significa un host **Windows compatible**: Windows PowerShell 5.1 o superior, sesión interactiva con elevación administrativa, BitLocker disponible, Escritorio en almacenamiento local escribible, al menos 6 GiB libres y red HTTPS hacia Khora, GitHub, Vercel y proveedores oficiales de herramientas. No se ocultan limitaciones del host: una carencia falla cerrada en `EP-IN-010` o `EP-IN-030` con identificador estable, sin degradación de cifrado.
 
@@ -51,7 +58,7 @@ El bootstrap debe reutilizar primero herramientas instaladas y verificables en r
 
 | Credencial | Emisor | Alcance | Vida | Persistencia permitida |
 |---|---|---|---|---|
-| Token Khora de sesión | Khora, después de Google OpenID Connect | descargar el gate y leer/escribir bitácoras de la sesión actual o anterior | una sola sesión; 12 horas por defecto, máximo 24 | hash de `jti` en servidor; texto plano solo en memoria; blob DPAPI temporal entre lanzador y gate y blobs DPAPI dentro del volumen, todos con eliminación explícita |
+| Token Khora de sesión | Khora, después de Google OpenID Connect | descargar el gate y leer/escribir bitácoras de la sesión actual o anterior | una sola sesión; 12 horas por defecto, máximo 24 | hash de `jti` en servidor; texto plano solo en memoria; blobs DPAPI de ámbito de equipo solo durante el traspaso entre procesos y dentro del volumen, con destino bajo fila4 y eliminación explícita |
 | Llave de bóveda | usuario | raíz criptográfica de la bóveda, BitLocker y perfil de Visual Studio Code | sesión | `SecureString` y Protección de Datos de Windows dentro del volumen |
 | Personal Access Token de GitHub | GitHub | leer/escribir `SeryMente/khora` privado | definido por GitHub | memoria y Protección de Datos de Windows dentro del volumen |
 | `VERCEL_TOKEN` | bóveda | `vercel whoami` y `vercel link` | sesión | variable de proceso dentro del volumen; nunca argumentos de proceso |
@@ -115,7 +122,7 @@ La interfaz entrega el comando de PowerShell libre de secretos. El flujo operati
 5. El usuario regresa a PowerShell y presiona Enter.
 6. Si el navegador rechaza la escritura automática al portapapeles, la interfaz falla de forma segura ofreciendo únicamente la acción explícita "Reintentar copiar token".
 
-El comando en PowerShell lee y valida el token exacto desde el portapapeles, lo limpia inmediatamente y descarga `GET /api/ep/bootstrap` con `Authorization: Bearer` contra la `apiBase` idéntica a la audiencia firmada. Materializa el cuerpo como un `.ps1` aleatorio con UTF-8 BOM, protege el token en un blob DPAPI temporal, elimina la variable en texto plano e invoca explícitamente `%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe` con `-KhoraTokenFile`. Un `finally` limpia portapapeles, gate, blob y variables tanto en éxito como en fallo. El token nunca aparece en historial, salida ni argumentos de proceso. `ScriptBlock.Create` está prohibido porque no conserva la semántica de archivo requerida por `#requires`, `CmdletBinding` y `param` en Windows PowerShell 5.1.
+En CECEQ, antes de leer el token del portapapeles, el comando resuelve el perfil fila4, valida los destinos permitidos y redirige las rutas del proceso sin cambiar la identidad efectiva `central\MantenimientoRCI`. Solo después limpia el portapapeles, descarga `GET /api/ep/bootstrap` con `Authorization: Bearer` contra la `apiBase` idéntica a la audiencia firmada y materializa el gate en el TEMP de fila4. El token se protege como un blob DPAPI de ámbito de equipo, nunca como DPAPI ligado a MantenimientoRCI; el gate comprueba la identidad efectiva esperada, vuelve a resolver el perfil y elimina el blob al consumirlo. Invoca explícitamente `%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe` con `-KhoraTokenFile`. Un `finally` limpia portapapeles, gate, blob, buffers sensibles y restaura las variables de entorno del proceso llamador tanto en éxito como en fallo. Los destinos externos al árbol de fila4, perfiles ambiguos o puntos de reanálisis generan un fallo cerrado. `ScriptBlock.Create` está prohibido porque no conserva la semántica de archivo requerida por `#requires`, `CmdletBinding` y `param` en Windows PowerShell 5.1.
 
 ### 3.4 Acceso de modelos
 
@@ -176,7 +183,7 @@ Formato técnico:
 
 | ID | Elemento | Criterio de salida |
 |---|---|---|
-| `EP-IN-010` | Windows, elevación y Escritorio | Windows, administrador, funciones requeridas, Escritorio local escribible y al menos 6 GiB libres |
+| `EP-IN-010` | Windows, identidad efectiva, perfil de datos y Escritorio | Windows y funciones requeridas; en CECEQ identidad real `central\MantenimientoRCI`; perfil de fila4 único, rutas destino seguras, Escritorio local escribible y al menos 6 GiB libres |
 | `EP-IN-015` | workspace OEP visible | `Desktop/EP` es una junction NTFS verificada cuyo `Target` coincide exactamente con el workspace dentro del VHDX cifrado |
 | `EP-IN-020` | llave de bóveda | `SecureString` no vacío aceptado |
 | `EP-IN-030` | volumen cifrado | BitLocker `EncryptionMethod=XtsAes256`, `ProtectionStatus=On` y `EncryptionPercentage=100` |
@@ -340,6 +347,8 @@ La restauración no se considera ejecutada en Windows hasta pasar, en una máqui
 4. emisión Google OpenID Connect, copia exacta independiente de comando y token y revocación de token anterior;
 5. diagnóstico seguro de `401` para formato, firma, audiencia, scope, revocación y expiración;
 6. materialización y eliminación del `.ps1` y blob DPAPI temporales en éxito y fallo, sin token en historial, salida ni argumentos de proceso;
+7. en CECEQ, identidad Windows efectiva MantenimientoRCI verificada en cada proceso, destinos resueltos bajo fila4, ausencia de escrituras en el perfil MantenimientoRCI, restauración del entorno del shell y DPAPI de ámbito de equipo;
+8. fallo cerrado ante perfil fila4 ambiguo, punto de reanálisis o ruta de escritura fuera del destino autorizado;
 7. arranque frío con repositorio privado hasta `EP-IN-010` y después ciclo completo;
 8. confirmación visual de identificadores y dos superficies adicionales;
 9. corte forzado durante cada etapa y lectura posterior del `START` remoto;
