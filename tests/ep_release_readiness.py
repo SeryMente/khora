@@ -61,7 +61,8 @@ def valid_timestamp(value: object, now: datetime) -> bool:
 
 
 def check_receipt(root: Path, reference: object, sha: str, check_id: str,
-                  profile: str, now: datetime, admitted_at: str) -> str | None:
+                  profile: str, now: datetime, admitted_at: str,
+                  release_id: str, invocation_id: str) -> str | None:
     if not isinstance(reference, dict):
         return "missing_evidence"
     name, digest = reference.get("path"), reference.get("sha256")
@@ -93,7 +94,8 @@ def check_receipt(root: Path, reference: object, sha: str, check_id: str,
     if not isinstance(receipt, dict):
         return "invalid_receipt"
     expected = {"schema": "ep-test-receipt/v1", "check_id": check_id,
-                "candidate_sha": sha, "profile": profile, "status": "PASS"}
+                "candidate_sha": sha, "profile": profile, "status": "PASS",
+                "release_id": release_id, "invocation_id": invocation_id}
     if any(receipt.get(k) != v for k, v in expected.items()):
         return "receipt_identity_or_status_mismatch"
     if receipt.get("synthetic") is not False:
@@ -174,7 +176,8 @@ def validate_preparation(manifest: object, evidence_root: Path,
                 continue
             if root is not None and valid_timestamp(admitted, now):
                 error = check_receipt(root, row.get("evidence"), expected_sha,
-                                      check_id, expected_profile, now, admitted)
+                                      check_id, expected_profile, now, admitted,
+                                      manifest.get("release_id"), manifest.get("invocation_id"))
                 if error:
                     errors.append(check_id + ":" + error)
     ready = not errors

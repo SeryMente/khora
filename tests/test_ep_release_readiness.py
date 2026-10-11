@@ -35,6 +35,7 @@ class PreparationGateTests(unittest.TestCase):
             receipt = {
                 "schema": "ep-test-receipt/v1", "check_id": check_id,
                 "candidate_sha": self.sha, "profile": self.profile,
+                "release_id": "test-release", "invocation_id": "test-invocation",
                 "status": "PASS", "synthetic": False,
                 "executed_at": "2026-10-11T02:00:00Z", "exit_code": 0,
                 "producer": "test-fixture", "environment": "staging",
@@ -139,6 +140,8 @@ class PreparationGateTests(unittest.TestCase):
             ("R15", {"approval_verified": False}),
             ("R01", {"synthetic": True}),
             ("R01", {"candidate_sha": "b" * 40}),
+            ("R01", {"invocation_id": "another-invocation"}),
+            ("R01", {"release_id": "another-release"}),
             ("R01", {"executed_at": "2026-10-12T00:00:00Z"}),
             ("R01", {"executed_at": "2026-10-10T00:00:00Z"}),
             ("R01", {"exit_code": 1}), ("R01", {"exit_code": False}),
