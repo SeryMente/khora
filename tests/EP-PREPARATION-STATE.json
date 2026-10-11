@@ -1,0 +1,58 @@
+{
+  "schema": "ep-execution-observation/v1",
+  "executor": "Samantha",
+  "delivery_mode": "prepare-only",
+  "profile": "EP-INTEGRAL",
+  "state": "BLOCKED",
+  "execution_admitted": false,
+  "ready_for_vercel": false,
+  "published_verified": false,
+  "global_certified": false,
+  "single_cycle_preparation_completed": false,
+  "single_cycle_completed": false,
+  "canon_commit": "48be13a17eb7266315e8bdfe656b40135f151e95",
+  "observed_main_sha": "dbc73afada1ad29abf46f4599d22cc3158a9a986",
+  "observed_product_pr": {
+    "number": 292,
+    "head_sha": "6738c1f1aeffe5835a725531e0774d4420af13c5",
+    "draft": true,
+    "mergeable_state": "dirty",
+    "reviews": []
+  },
+  "blockers": [
+    {
+      "code": "BLOCKED_HOST_IDENTITY",
+      "evidence": "Desktop Commander Remote list_devices returned both devices Offline; Windows PowerShell 5.1/BitLocker/physical E2E not available."
+    },
+    {
+      "code": "BLOCKED_CI_EVIDENCE",
+      "evidence": "check-runs read returned 403 Resource not accessible by personal access token; no live checks/log evidence obtained."
+    },
+    {
+      "code": "BLOCKED_AUTHORIZATION",
+      "evidence": "Required UX/UI/security/architecture presence and approvals were not established; PR reviews returned empty."
+    },
+    {
+      "code": "BLOCKED_INTEGRATION",
+      "evidence": "PR292 remains draft and mergeable_state dirty. Conflict resolution/integration not certified."
+    }
+  ],
+  "not_verified": [
+    "production migration and secret configuration",
+    "private storage policies/read-back/restore",
+    "WordPress licensed asset and restore",
+    "GPU eligibility/location/workflows and visual approval",
+    "full product build and Windows E2E"
+  ],
+  "performed": [
+    "canon v1.2.0 published and read back literally",
+    "existing static validator extended with optional evidence gate",
+    "10 local unittest methods passed"
+  ],
+  "not_performed": [
+    "product runtime/security/UI changes",
+    "merging PR292 or main",
+    "Vercel deployment or dispatch"
+  ],
+  "only_vercel_remaining": false
+}

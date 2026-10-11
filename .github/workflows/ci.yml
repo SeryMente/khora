@@ -50,6 +50,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+      - name: EP preparation evidence gate regression tests
+        run: python -m unittest discover -s ../tests -p test_ep_release_readiness.py -v
       - run: npm ci
       - run: npm run typecheck
       - run: npm run ui-review:check
