@@ -10,7 +10,7 @@
   "global_certified": false,
   "single_cycle_preparation_completed": false,
   "single_cycle_completed": false,
-  "canon_commit": "48be13a17eb7266315e8bdfe656b40135f151e95",
+  "canon_commit": "6e0a416025594916016a34ae32e2b7e8af591320",
   "observed_main_sha": "dbc73afada1ad29abf46f4599d22cc3158a9a986",
   "observed_product_pr": {
     "number": 292,
@@ -22,27 +22,24 @@
   "blockers": [
     {
       "code": "BLOCKED_HOST_IDENTITY",
-      "evidence": "Desktop Commander Remote list_devices returned both devices Offline; Windows PowerShell 5.1/BitLocker/physical E2E not available."
-    },
-    {
-      "code": "BLOCKED_CI_EVIDENCE",
-      "evidence": "check-runs read returned 403 Resource not accessible by personal access token; no live checks/log evidence obtained."
+      "evidence": "Fresh list_devices: both connected Windows devices Offline. Cannot run Windows PowerShell 5.1/BitLocker/physical restore or GPU acceptance."
     },
     {
       "code": "BLOCKED_AUTHORIZATION",
-      "evidence": "Required UX/UI/security/architecture presence and approvals were not established; PR reviews returned empty."
+      "evidence": "Fresh PR292 reviews empty. Approval of documented storage/continuity/visual policy is not an exact UX/UI/security implementation review."
     },
     {
       "code": "BLOCKED_INTEGRATION",
-      "evidence": "PR292 remains draft and mergeable_state dirty. Conflict resolution/integration not certified."
+      "evidence": "Fresh PR292 get: draft=true, merged=false, mergeable_state=dirty; head 6738c1f1aeffe5835a725531e0774d4420af13c5."
     }
   ],
   "not_verified": [
+    "private Blob store ID/access/capacity and zero-new-expense viability",
+    "actual checkpoint interval, RPO and restore-time compliance",
     "production migration and secret configuration",
-    "private storage policies/read-back/restore",
     "WordPress licensed asset and restore",
-    "GPU eligibility/location/workflows and visual approval",
-    "full product build and Windows E2E"
+    "GPU eligibility/location/workflows and human visual approval",
+    "full product build, CI evidence and Windows E2E"
   ],
   "performed": [
     "canon v1.2.0 published and read back literally",
@@ -50,9 +47,31 @@
     "10 local unittest methods passed"
   ],
   "not_performed": [
-    "product runtime/security/UI changes",
+    "product runtime/security/UI changes this cycle",
     "merging PR292 or main",
-    "Vercel deployment or dispatch"
+    "Vercel deployment or dispatch",
+    "creating Blob store or applying production migrations"
   ],
-  "only_vercel_remaining": false
+  "only_vercel_remaining": false,
+  "observed_at": "2026-10-11T02:50:34.073175Z",
+  "canon_version": "1.4.0",
+  "document_decisions": {
+    "D01": "approved: private Vercel Blob, encrypted before upload, no new expense without approval",
+    "D02": "approved: checkpoint/RPO 5 minutes, restore <=60 minutes, last 3 valid and 7 daily with dependencies",
+    "D03": "approved: all 10 critical, each >=3/5, average >=4.2/5"
+  },
+  "approval_scope": "Policy package approved; general implementation requested; exact product UX/UI/security review and physical acceptance not established.",
+  "ci_evidence": {
+    "status": "NOT_VERIFIED",
+    "historical_endpoint_error": "check-runs: 403 Resource not accessible by personal access token",
+    "not_retried_without_new_evidence": true,
+    "diagnosis": "Does not establish lack of Actions read/write permission. Current connection exposes no Actions jobs/log tools; no authorized live shell available."
+  },
+  "performed_this_cycle": [
+    "canon v1.4.0 saved and literal full read-back verified",
+    "document decisions D01/D02/D03 approved and incorporated",
+    "Khora main and product PR/reviews freshly read",
+    "available local preparation gate regression: 10 unittest methods PASS (synthetic fixtures; not operational evidence)"
+  ],
+  "runtime_implementation_started_this_cycle": false
 }
