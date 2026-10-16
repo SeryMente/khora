@@ -44,3 +44,37 @@ test("panel distingue medición ausente y no captura texto por defecto", async (
   await expect(page.getByText("Sin comprobaciones suficientes", { exact: false })).toBeVisible();
   await expect(page.getByText("No es tiempo desde que hablaste.", { exact: false })).toBeVisible();
 });
+
+test("encuesta muestreada: solo después de detener, sin foco forzado ni texto en métricas", async ({ page }) => {
+  await page.addInitScript((key) => {
+    localStorage.setItem("khora:experience:v1:" + key, JSON.stringify({ enabled: true, sampling: { day: "", count: 0, last: 0 } }));
+    const w = window as any;
+    class Recognition {
+      onstart?: () => void; onend?: () => void;
+      start() { setTimeout(() => this.onstart?.(), 0); }
+      stop() { setTimeout(() => this.onend?.(), 0); }
+    }
+    w.SpeechRecognition = w.webkitSpeechRecognition = Recognition;
+    Object.defineProperty(navigator, "mediaDevices", { configurable: true, value: { getUserMedia: async () => { throw new DOMException("Synthetic no microphone", "NotAllowedError"); } } });
+    const original = crypto.getRandomValues.bind(crypto);
+    crypto.getRandomValues = ((a: any) => { if (a instanceof Uint32Array && a.length === 1) { a[0] = 0; return a; } return original(a); }) as typeof crypto.getRandomValues;
+  }, profile);
+  await page.clock.install();
+  const payloads: any[] = [];
+  page.on("request", r => { if (r.url().endsWith("/api/dictado-experience") && r.method() === "POST") payloads.push(r.postDataJSON()); });
+  await page.reload();
+  await page.getByRole("button", { name: "Calidad del dictado", exact: true }).click();
+  await expect(page.getByLabel("Activar mediciones y encuestas breves del dictado")).toBeChecked();
+  await page.locator('[data-ui-id="ingreso.btn-iniciar"]').click();
+  await page.clock.runFor(100);
+  await expect(page.getByRole("button", { name: "Dar opinión", exact: true })).toBeDisabled();
+  await page.clock.runFor(61_000);
+  await expect(page.getByRole("textbox", { name: "Comentario adicional" })).toHaveCount(0);
+  await page.locator('[data-ui-id="ingreso.btn-detener"]').click();
+  await page.clock.runFor(1000);
+  await expect(page.getByRole("textbox", { name: "Comentario adicional" })).toBeVisible();
+  await expect(page.getByRole("textbox", { name: "Comentario adicional" })).not.toBeFocused();
+  await expect.poll(() => payloads.some(p => p.data.kind === "session")).toBe(true);
+  expect(payloads.filter(p => p.data.kind === "session").every(p => p.data.metrics.duration_ms >= 60_000)).toBe(true);
+  expect(payloads.every(p => p.data.kind !== "feedback")).toBe(true);
+});
