@@ -1,3 +1,5 @@
+import { registrarEventoServicio } from "@/lib/server/service-observability";
+import { withHttpDiagnostics } from "@/lib/server/mcp-diagnostic-boundary";
 // @l0 L0-002 §4 · @req MCP-OAUTH-01/REQ-6
 import { NextRequest, NextResponse } from "next/server";
 import { getMcpConfig, validateCimdClient, validateDynamicClient } from "@/lib/server/mcp-config";
@@ -48,7 +50,7 @@ function tokenResponse(accessToken: string, refreshToken: string, scope: string)
   );
 }
 
-export async function POST(req: NextRequest) {
+async function handlePOST(req: NextRequest) {
   const config = getMcpConfig();
   if (!config) {
     return NextResponse.json(
@@ -110,28 +112,28 @@ export async function POST(req: NextRequest) {
     const record = await obtenerCodigoAutorizacionValido(code);
     if (!record) {
       return NextResponse.json(
-        { error: "invalid_grant", error_description: "Invalid grant" },
+        { error: "invalid_grant", error_description: "Invalid grant", _diagnostic_code: "OAUTH_CODE_INACTIVE" },
         { status: 400 },
       );
     }
 
     if (record.redirect_uri !== redirectUri) {
       return NextResponse.json(
-        { error: "invalid_grant", error_description: "Invalid grant" },
+        { error: "invalid_grant", error_description: "Invalid grant", _diagnostic_code: "OAUTH_REDIRECT_MISMATCH" },
         { status: 400 },
       );
     }
 
     if (!verifyPkceS256(codeVerifier, record.code_challenge)) {
       return NextResponse.json(
-        { error: "invalid_grant", error_description: "Invalid grant" },
+        { error: "invalid_grant", error_description: "Invalid grant", _diagnostic_code: "OAUTH_PKCE_MISMATCH" },
         { status: 400 },
       );
     }
 
     if (record.resource !== config.canonicalUrl || (resourceParam && resourceParam !== record.resource)) {
       return NextResponse.json(
-        { error: "invalid_grant", error_description: "Invalid grant" },
+        { error: "invalid_grant", error_description: "Invalid grant", _diagnostic_code: "OAUTH_RESOURCE_MISMATCH" },
         { status: 400 },
       );
     }
@@ -162,7 +164,7 @@ export async function POST(req: NextRequest) {
     const marcado = await marcarCodigoComoUsado(record.id);
     if (!marcado) {
       return NextResponse.json(
-        { error: "invalid_grant", error_description: "Invalid grant" },
+        { error: "invalid_grant", error_description: "Invalid grant", _diagnostic_code: "OAUTH_CODE_CONSUMED" },
         { status: 400 },
       );
     }
@@ -206,7 +208,7 @@ export async function POST(req: NextRequest) {
     const rotated = await rotarRefreshToken(rawRefreshToken);
     if (!rotated) {
       return NextResponse.json(
-        { error: "invalid_grant", error_description: "Invalid grant" },
+        { error: "invalid_grant", error_description: "Invalid grant", _diagnostic_code: "OAUTH_REFRESH_INACTIVE" },
         { status: 400 },
       );
     }
@@ -214,14 +216,14 @@ export async function POST(req: NextRequest) {
     const { record, newToken } = rotated;
     if (record.resource !== config.canonicalUrl) {
       return NextResponse.json(
-        { error: "invalid_grant", error_description: "Invalid grant" },
+        { error: "invalid_grant", error_description: "Invalid grant", _diagnostic_code: "OAUTH_RESOURCE_MISMATCH" },
         { status: 400 },
       );
     }
 
     if (resourceParam && resourceParam !== record.resource) {
       return NextResponse.json(
-        { error: "invalid_grant", error_description: "Invalid grant" },
+        { error: "invalid_grant", error_description: "Invalid grant", _diagnostic_code: "OAUTH_RESOURCE_MISMATCH" },
         { status: 400 },
       );
     }
@@ -258,3 +260,5 @@ export async function POST(req: NextRequest) {
     { status: 400 },
   );
 }
+
+export const POST = withHttpDiagnostics("oauth.token.POST", handlePOST, registrarEventoServicio);

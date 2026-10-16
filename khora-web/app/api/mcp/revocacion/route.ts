@@ -1,9 +1,11 @@
+import { registrarEventoServicio } from "@/lib/server/service-observability";
+import { withHttpDiagnostics } from "@/lib/server/mcp-diagnostic-boundary";
 // @l0 L0-002 §4 · @req MCP-REV-01/REQ-1
 import { auth } from "@/auth";
 import { obtenerInfoRevocacionUsuario, revocarAccesoUsuario } from "@/lib/server/oauth";
 import { NextResponse } from "next/server";
 
-export async function GET() {
+async function handleGET() {
   const session = await auth();
   const userEmail = session?.user?.email;
 
@@ -15,7 +17,7 @@ export async function GET() {
   return NextResponse.json(info);
 }
 
-export async function POST() {
+async function handlePOST() {
   const session = await auth();
   const userEmail = session?.user?.email;
 
@@ -30,3 +32,7 @@ export async function POST() {
     mensaje: "Acceso revocado exitosamente. Todos los access tokens y refresh tokens fueron invalidados.",
   });
 }
+
+export const GET = withHttpDiagnostics("mcp.revocacion.GET", handleGET, registrarEventoServicio);
+
+export const POST = withHttpDiagnostics("mcp.revocacion.POST", handlePOST, registrarEventoServicio);

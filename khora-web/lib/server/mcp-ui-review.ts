@@ -1,3 +1,4 @@
+import { McpDiagnosticError } from "./mcp-diagnostics";
 // @l0 L0-002 · @req UI-REVIEW/MCP · Herramienta khora_ui_review
 //
 // Devuelve la interfaz de Khora renderizada en HTML, alimentada con el corpus
@@ -30,7 +31,7 @@ export function claveProyeccionReal(): string {
     process.env.AUTH_SECRET ||
     "";
   if (secreto.length < 16) {
-    throw new Error("No hay secreto suficiente para derivar la clave de proyeccion");
+    throw new McpDiagnosticError("MCP_CONFIG_MISSING");
   }
   const ventana = Math.floor(Date.now() / 300000); // rota cada 5 minutos
   return createHmac("sha256", secreto).update(`ui-review-real:${ventana}`).digest("hex").slice(0, 40);
@@ -90,7 +91,7 @@ export async function toolKhoraUiReview(args: {
 
   const pantalla = args.pantalla.trim().toLowerCase();
   if (!esPantallaValida(pantalla)) {
-    return { error: "pantalla_invalida", recibido: args.pantalla, pantallas_disponibles: SCREENS };
+    throw new McpDiagnosticError("MCP_INPUT_INVALID");
   }
 
   const url = new URL(`${origenCanonico()}/ui-review/${pantalla}/estatico`);
@@ -102,11 +103,12 @@ export async function toolKhoraUiReview(args: {
   try {
     const res = await fetch(url.toString(), { cache: "no-store" });
     if (!res.ok) {
-      return { error: "fallo_de_render", pantalla, http: res.status };
+      throw new McpDiagnosticError("MCP_UI_RENDER_FAILED", { upstream_status: res.status });
     }
     html = await res.text();
   } catch (e: any) {
-    return { error: "fallo_de_render", pantalla, detalle: String(e?.message || e).slice(0, 300) };
+    if (e instanceof McpDiagnosticError) throw e;
+    throw new McpDiagnosticError("MCP_UI_RENDER_FAILED");
   }
 
   const escenarios = getAllScenariosForScreen(pantalla);

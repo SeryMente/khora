@@ -1,3 +1,5 @@
+import { registrarEventoServicio } from "@/lib/server/service-observability";
+import { withHttpDiagnostics } from "@/lib/server/mcp-diagnostic-boundary";
 // @l0 L0-002 §4 · @req MCP-OAUTH-DCR-01/REQ-1
 import { NextRequest, NextResponse } from "next/server";
 import {
@@ -6,7 +8,7 @@ import {
   isAllowedDynamicRedirect,
 } from "@/lib/server/mcp-config";
 
-export async function POST(req: NextRequest) {
+async function handlePOST(req: NextRequest) {
   const config = getMcpConfig();
   if (!config) {
     return NextResponse.json({ error: "server_error", error_description: "MCP configuration missing" }, { status: 503 });
@@ -17,6 +19,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "invalid_client_metadata", error_description: "Expected JSON body" }, { status: 400 });
   }
 
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    return NextResponse.json({ error: "invalid_client_metadata", error_description: "Expected JSON object" }, { status: 400 });
+  }
   const redirectUris = Array.isArray(body.redirect_uris)
     ? body.redirect_uris.filter((value): value is string => typeof value === "string")
     : [];
@@ -48,3 +53,5 @@ export async function POST(req: NextRequest) {
     response_types: ["code"],
   }, { status: 201, headers: { "Cache-Control": "no-store" } });
 }
+
+export const POST = withHttpDiagnostics("oauth.register.POST", handlePOST, registrarEventoServicio);
