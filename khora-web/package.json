@@ -13,7 +13,7 @@
     "typecheck": "tsc --noEmit",
     "ui-review:check": "tsx scripts/check_ui_review.ts",
     "ui-review:export": "tsx scripts/export_ui_review.ts",
-    "prebuild": "node scripts/build-extension.mjs",
+    "prebuild": "node --import tsx scripts/preflight-experience.ts && node scripts/build-extension.mjs",
     "backfill:titulos": "tsx scripts/backfill_titulos.ts",
     "repair:volcados": "tsx scripts/repair_volcados.ts",
     "migrate:ep": "node scripts/migrate-ep.mjs",
