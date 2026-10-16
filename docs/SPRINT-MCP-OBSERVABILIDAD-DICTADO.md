@@ -703,3 +703,11 @@ Registro ejecutable existente y documento único actualizados, sin otro manual. 
 **Incidentes:** PowerShell anidado consumió variables y falló antes del payload; corregido usando shell directo. Preflight abortó por ruta histórica ausente; se preparó checkout aislado con remoto verificado. npm stderr/warning se convirtió en NativeCommandError por ErrorActionPreference Stop; repetición mediante cmd y evaluación de exit code aprobó npm ci, Node 24/tsx comprobados. Clonado presenta modificación de finales de línea en scripts/khora/khora.ps1; no se stagea ni modifica el contenido del Entorno Persistente. El espejo khora-vercel es antiguo (julio) y se descarta; 404 de candidatos no implica falta de acceso a la fuente. Registro canónico de errores actualizado y leído para confirmar.
 
 **Estado de este punto:** IMPLEMENTADO EN PROPUESTA, NO VERIFICADO. Artefacto de benchmark comienza not_run. Pruebas, revisión de seguridad/interfaz, persistencia real, fusión y despliegue aún pendientes. No se amplía aprobación histórica de #297 a fallos de módulos ajenos ni se afirma que Actions o el proveedor real funcionan. Tras ejecutar se añadirá evidencia nueva sin reescribir estos resultados.
+
+
+### C009 · Verificación y compuerta de publicación · 2026-10-16
+- Instrucción adicional: «Que la encuesta admita entrada manual adicional. Continua». Implementada entrada libre opcional de hasta 1000 caracteres; se admite comentario sin valoración.
+- Rama `feat/dictado-benchmark-feedback-20261016`, código probado `185f09b`: benchmark dirigido 20/20; navegador 14/14; suite unitaria completa 402/402; tipos, contratos/revisión de interfaz y build correctos. Reconocimiento y SQL externos controlados: NO equivalen a validación de voz o base productiva.
+- Artefacto publicado por código: `khora-web/lib/generated/dictado-benchmark.json`; especificación completa: `khora-web/docs/dictado-experience.md`.
+- Descarga local Vercel no valida DATABASE_URL ni clave; causa abierta. No se modifican secretos. Se añade compuerta de almacenamiento opt-in para candidata sin promoción de dominio: escritura, cifrado, lectura y borrado de propietario sintético.
+- Hasta verificar esa candidata: NO desplegado en dominio público, NO persistencia productiva certificada.

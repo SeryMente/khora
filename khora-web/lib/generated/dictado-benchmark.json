@@ -1,1 +1,22 @@
-{"schema":"khora-dictado-benchmark/v1","status":"not_run","testedAt":null,"sourceSha":null,"checks":[],"limits":["No hay una ejecución nueva acreditada todavía.","Las pruebas controladas no sustituyen la voz física ni la persistencia real."]}
+{
+  "schema": "khora-dictado-benchmark/v1",
+  "status": "passed",
+  "testedAt": "2026-10-16T21:04:45.206Z",
+  "sourceSha": "185f09bbe6230731b1cf6ad1bf07bfbb812a0c6d",
+  "inputFingerprint": "99d427d85e05a9b1dff5db8f61ef97dd6640d9f0ab00ef9fe1c931bdef2480c6",
+  "checks": [
+    {
+      "name": "Contratos, muestreo, privacidad y persistencia controlada",
+      "status": "passed"
+    },
+    {
+      "name": "Continuidad del dictado y encuesta en navegador",
+      "status": "passed"
+    }
+  ],
+  "limits": [
+    "Reconocimiento y endpoints externos controlados en las pruebas de navegador; no voz física ni SQL productivo.",
+    "Cifrado real y consultas de almacenamiento contra doble de base de datos en pruebas unitarias; no certificación de despliegue.",
+    "No mide fidelidad de voz ni comodidad automáticamente. Es un benchmark de contrato/regresión, no una puntuación universal."
+  ]
+}
