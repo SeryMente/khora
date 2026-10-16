@@ -8,11 +8,11 @@ import { describeMcpTool, MCP_TOOL_SCOPES, type McpToolName } from "../../lib/se
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const runtimeTools = ["khora_observacion_instantanea", "khora_eventos_desde", "khora_estado_vivo", "khora_eventos_recientes"] as const;
-const dataTools = ["khora_resumen", "khora_listar_volcados", "khora_leer_volcado", "khora_buscar_volcados", "khora_versiones_volcado", "khora_ui_review"] as const;
+const dataTools = ["khora_resumen", "khora_listar_volcados", "khora_leer_volcado", "khora_buscar_volcados", "khora_versiones_volcado", "khora_ui_review", "khora_listar_audios", "khora_leer_audio"] as const;
 const normTools = ["khora_norm_open_turn", "khora_norm_apply_principle", "khora_norm_verify_turn", "khora_norm_release_turn"] as const;
 
-test("MCP preserves root securitySchemes for all fifteen tools", () => {
-  assert.equal(Object.keys(MCP_TOOL_SCOPES).length, 15);
+test("MCP preserves root securitySchemes for all seventeen tools", () => {
+  assert.equal(Object.keys(MCP_TOOL_SCOPES).length, 17);
   for (const [names, scopes] of [[runtimeTools, ["runtime:read"]], [dataTools, ["volcados:read"]], [normTools, ["norm:turn"]]] as const) {
     for (const name of names) {
       assert.deepEqual(describeMcpTool(name as McpToolName, "test", {}).securitySchemes, [{ type: "oauth2", scopes: [...scopes] }]);
@@ -39,7 +39,7 @@ test("one canonical document covers the exact tool catalog and current output ve
   const document = fs.readFileSync(path.join(root, "docs/normative-check.md"), "utf8");
   const readme = fs.readFileSync(path.join(root, "../README.md"), "utf8");
   const documented = [...document.matchAll(/^\| `(khora_[a-z_]+)`/gm)].map(match => match[1]);
-  assert.equal(documented.length, 15);
+  assert.equal(documented.length, 17);
   assert.deepEqual(documented.sort(), Object.keys(MCP_TOOL_SCOPES).sort());
   for (const heading of ["Conexión", "Catálogo", "Contratos", "Ciclo normativo", "Autorización y configuración", "Datos y efectos", "Diagnóstico", "Compatibilidad", "Pruebas y mantenimiento"]) {
     assert.equal(document.split("\n## " + heading + "\n").length, 2, heading);

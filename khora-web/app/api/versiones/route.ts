@@ -10,7 +10,7 @@ export async function GET(req: Request) {
     const url = new URL(req.url);
     const id = url.searchParams.get("id") ?? "";
     if (id.length === 0) return NextResponse.json({ detail: "falta el id" }, { status: 400 });
-    await asegurarVersionInicial(id);
+    // Reads never fabricate a version. Creation belongs to archive/edit transactions.
     const versiones = await listarVersiones(id);
     return NextResponse.json({ versiones });
   } catch (e) {

@@ -11,3 +11,7 @@ El subsistema Entorno Persistente Medio v1.0 se especifica en [`ep-medio-archite
 | [`UI_REVIEW.md`](./UI_REVIEW.md) | Cómo ver la interfaz vigente de Khora, incluidos los modelos que no ejecutan JavaScript |
 | [`ep-medio-architectura.md`](./ep-medio-architectura.md) | Entorno Persistente Medio v1.0 |
 | [`docs/SPRINT-MCP-OBSERVABILIDAD-DICTADO.md`](./docs/SPRINT-MCP-OBSERVABILIDAD-DICTADO.md) | Objeto canónico de continuidad del sprint: interoperabilidad MCP, registros de observabilidad y corrección del bug de dictado; bitácora exhaustiva por ciclo |
+
+### Custodia continua de dictados
+
+Contrato, mapa de código, garantías, recuperación, audio original/MP3, herramientas y pruebas: [Custodia continua de dictados](./khora-web/docs/CUSTODIA-DICTADOS.md). Lectura obligatoria para cambios futuros; el documento distingue implementación de certificación productiva y enumera las brechas aún abiertas.

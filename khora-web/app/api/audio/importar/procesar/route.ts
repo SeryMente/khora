@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { del, put } from "@vercel/blob";
 import { createHash } from "crypto";
+import { reclamarSesion } from "@/lib/server/custodia-schema";
 import { auth } from "@/auth";
 import { cifrarBytes, descifrarBytes } from "@/lib/server/cripto";
 import { registrarParteAudio } from "@/lib/server/dictado";
@@ -44,6 +45,7 @@ export async function POST(request: Request) {
       );
     }
 
+    await reclamarSesion(sessionId, session.user.email);
     const response = await fetch(stagingUrl, { cache: "no-store" });
     if (!response.ok) {
       return NextResponse.json(

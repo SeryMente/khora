@@ -62,6 +62,7 @@ export function routeFixture(options: { scopes?: string[]; revoked?: boolean; de
     "@/lib/server/mcp-db": { isProductionEnv: () => options.production === true },
     "@/lib/server/mcp-manual-token": { MANUAL_MCP_TOKEN_PREFIX: "fixture-manual-", authenticateManualMcpToken: async () => null },
     "@/lib/server/service-observability": { registrarEventoServicio: async () => { if (options.auditFail) throw Error("synthetic audit failure"); } },
+    "@/lib/server/mcp-audios": { toolKhoraListarAudios: (_actor:string,args:unknown)=>business("ListarAudios")(args), toolKhoraLeerAudio: (_actor:string,args:unknown)=>business("LeerAudio")(args) },
     "@/lib/server/mcp-tools": Object.fromEntries(["Resumen", "ListarVolcados", "LeerVolcado", "BuscarVolcados", "VersionesVolcado"].map(n => ["toolKhora" + n, business(n)])),
     "@/lib/server/mcp-ui-review": { toolKhoraUiReview: business("UiReview") },
     "@/lib/server/mcp-observability": Object.fromEntries(["EstadoVivo", "EventosRecientes", "ObservacionInstantanea", "EventosDesde"].map(n => ["toolKhora" + n, business(n)])),

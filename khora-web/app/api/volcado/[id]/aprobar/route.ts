@@ -1,6 +1,7 @@
 // @l0 L0-002-R · @req ING-03/REQ-1,API-00/REQ-1 · @acr ACR-1.2
 import { NextResponse } from "next/server";
 import { auth } from "../../../../../auth";
+import { evaluarCompuertaAprobacion } from "@/lib/server/compuerta";
 import { aprobarVersion } from "../../../../../lib/server/correcciones";
 
 export const runtime = "nodejs";
@@ -26,6 +27,8 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       return NextResponse.json({ error: "version invalida o ausente" }, { status: 400 });
     }
 
+    const gate=await evaluarCompuertaAprobacion(id,session.user.email);
+    if(!gate.canApprove||gate.version!==version||gate.sha256!==String(body?.sha256||""))return NextResponse.json({error:"compuerta_o_huella_no_coincide",blockers:gate.blockers},{status:409});
     const result = await aprobarVersion(id, version, session.user.email);
     return NextResponse.json({ version: result.version, sha256: result.sha256 });
   } catch (e) {

@@ -139,7 +139,7 @@ export async function registrarParteAudio(params: {
   estadoVerificacion?: "pendiente" | "verificado";
 }) {
   await asegurarColumnasDictado();
-  const db = getDb();
+  const pool = getDb();
 
   if (!params.sessionId.trim()) throw new Error("Custodia inválida: falta sessionId.");
   if (!Number.isInteger(params.partIndex) || params.partIndex < 1) {
@@ -152,7 +152,9 @@ export async function registrarParteAudio(params: {
     throw new Error("Custodia inválida: cada parte debe tener SHA-256 verificado.");
   }
 
+  const db = await pool.connect();
   try {
+    await db.query("BEGIN");
     // Una sesión archivada queda sellada: no admite nuevas partes.
     const sesion = await db.query(
       `INSERT INTO dictado_session (session_id, estado, actualizado_en)
@@ -167,6 +169,7 @@ export async function registrarParteAudio(params: {
       throw new Error("Custodia sellada: la sesión ya se vinculó a un volcado; no se puede añadir ni sustituir audio.");
     }
 
+    await db.query("SELECT session_id FROM dictado_session WHERE session_id=$1 FOR UPDATE", [params.sessionId]);
     // Reintentar un upload solo puede reemplazar la ubicación del mismo contenido.
     // Otra huella/bytes en el mismo índice es un conflicto; jamás sobrescribir el original.
     const parte = await db.query(
@@ -220,6 +223,7 @@ export async function registrarParteAudio(params: {
       );
     }
 
+    await db.query("COMMIT");
     await registrarEvento({
       fase: "dictado",
       eventId: "DIC-002",
@@ -236,6 +240,7 @@ export async function registrarParteAudio(params: {
       correlacionId: params.sessionId,
     });
   } catch (err) {
+    await db.query("ROLLBACK").catch(()=>undefined);
     await registrarEvento({
       fase: "dictado",
       eventId: "DIC-002",
@@ -245,7 +250,7 @@ export async function registrarParteAudio(params: {
       correlacionId: params.sessionId,
     });
     throw err;
-  }
+  } finally { db.release(); }
 }
 
 function normalizarFirmaPartesAudio(partes: any): string {
@@ -349,7 +354,7 @@ async function guardarDictadoConSesion(
     const volcadoVinculado = sesionRes.rows[0].volcado_id as string | null;
     if (volcadoVinculado) {
       const existenteRes = await client.query(
-        `SELECT id, texto, sha256, chars, audio_partes, estado, session_id
+        `SELECT id, texto, texto_original, sha256, chars, audio_partes, estado, session_id
          FROM volcado WHERE id = $1 FOR UPDATE`,
         [volcadoVinculado],
       );
@@ -365,8 +370,7 @@ async function guardarDictadoConSesion(
       }
       if (
         String(existente.session_id ?? "") !== sessionId ||
-        String(existente.sha256 ?? "").trim().toLowerCase() !== sha ||
-        Number(existente.chars) !== entrada.texto.length ||
+        createHash("sha256").update(descifrarTexto(String(existente.texto_original ?? existente.texto ?? "")), "utf8").digest("hex") !== sha ||
         normalizarFirmaPartesAudio(existente.audio_partes) !== normalizarFirmaPartesAudio(partesRecibidas)
       ) {
         throw new Error(
@@ -382,8 +386,8 @@ async function guardarDictadoConSesion(
         existente.estado === "archivado" || existente.estado === "pendiente_revision";
       retorno = {
         id: String(existente.id),
-        sha256: String(existente.sha256),
-        chars: Number(existente.chars),
+        sha256: sha,
+        chars: entrada.texto.length,
         sessionId,
         idempotent: true,
         estado: String(existente.estado),
@@ -403,10 +407,10 @@ async function guardarDictadoConSesion(
           entrada.texto.length,
           entrada.titulo ?? null,
           "web",
-          entrada.fuenteEntrada === "chrome_live_caption" ? "chrome_live_caption" : entrada.fuenteEntrada === "audio_archivo" ? "audio_archivo" : "dictado",
+          entrada.fuenteEntrada === "chrome_live_caption" ? "chrome_live_caption" : entrada.fuenteEntrada === "audio_archivo" ? "audio_archivo" : entrada.fuenteEntrada === "texto" ? "texto" : "dictado",
           entrada.usuario ?? null,
           "archivado",
-          "dictado",
+          entrada.fuenteEntrada === "texto" ? "texto" : "dictado",
           entrada.audioUrl ?? null,
           entrada.audioBytes ?? null,
           entrada.duracionSeg ?? null,
@@ -466,7 +470,8 @@ async function guardarDictadoConSesion(
 
   if (!retorno) throw new Error("Custodia rota: no se produjo un resultado de archivado.");
   if (preparar) {
-    await prepararVolcadoParaRevision(retorno.id, entrada.usuario, { onFailure: "keep_captura" });
+    const prepared = await prepararVolcadoParaRevision(retorno.id, entrada.usuario, { onFailure: "keep_captura" });
+    retorno.estado = prepared.estado;
   }
   await registrarEvento({
     fase: "dictado",
@@ -501,7 +506,8 @@ export async function guardarDictado(entrada: EntradaDictado) {
   await asegurarColumnasDictado();
   const db = getDb();
 
-  const sessionId = entrada.sessionId?.trim() || null;
+  const sessionId = typeof entrada.sessionId === "string" ? entrada.sessionId.trim() || null : null;
+  if (!sessionId) throw new Error("Custodia inválida: toda captura requiere sessionId.");
   const correlacionId = sessionId || randomUUID();
   const requiereAudioVerificado =
     Boolean(sessionId) &&
@@ -546,10 +552,10 @@ export async function guardarDictado(entrada: EntradaDictado) {
         entrada.texto.length,
         entrada.titulo ?? null,
         "web",
-        entrada.fuenteEntrada === "chrome_live_caption" ? "chrome_live_caption" : entrada.fuenteEntrada === "audio_archivo" ? "audio_archivo" : "dictado",
+        entrada.fuenteEntrada === "chrome_live_caption" ? "chrome_live_caption" : entrada.fuenteEntrada === "audio_archivo" ? "audio_archivo" : entrada.fuenteEntrada === "texto" ? "texto" : "dictado",
         entrada.usuario ?? null,
         "archivado",
-        "dictado",
+        entrada.fuenteEntrada === "texto" ? "texto" : "dictado",
         entrada.audioUrl ?? null,
         entrada.audioBytes ?? null,
         entrada.duracionSeg ?? null,

@@ -3,11 +3,14 @@ import { after, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { guardarDictado } from "../../../lib/server/dictado";
 import { espejarVolcado } from "../../../lib/server/espejoNotion";
-import { generarTituloFallback, generarTituloDeUltimoRecurso } from "../../../lib/server/titulos";
+import { generarMp3Sesion } from "@/lib/server/audio-mp3";
+import { reclamarSesion } from "@/lib/server/custodia-schema";
+import { getDb } from "@/lib/server/neon";
+import { generarTituloConGarantia, generarTituloFallback, generarTituloDeUltimoRecurso } from "../../../lib/server/titulos";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 120;
+export const maxDuration = 300;
 
 export async function POST(req: Request) {
   try {
@@ -25,7 +28,7 @@ export async function POST(req: Request) {
     // El audio original puede custodiarse aunque la transcripción haya fallado.
     // guardarDictado contrasta después las partes con el manifiesto verificado en servidor.
     const audioOriginalPendiente =
-      fuenteEntrada === "audio_archivo" &&
+      fuenteEntrada !== "texto" &&
       Array.isArray(audioPartes) &&
       audioPartes.length > 0 &&
       audioPartes.every((p: any) =>
@@ -45,10 +48,12 @@ export async function POST(req: Request) {
       tituloResolver = generarTituloFallback(texto).title || generarTituloDeUltimoRecurso(texto);
     }
 
+    const sessionId = String(c?.sessionId ?? c?.sesionId ?? "");
+    await reclamarSesion(sessionId, session.user.email);
     // 2. Persistir dictado en la BD (fuente de verdad)
     const r = await guardarDictado({
       texto,
-      sessionId: c?.sessionId ?? c?.sesionId ?? null,
+      sessionId,
       titulo: tituloResolver,
       audioUrl: c?.audioUrl ?? null,
       audioBytes: c?.audioBytes ?? null,
@@ -60,8 +65,18 @@ export async function POST(req: Request) {
       usuario: session.user.email,
     });
 
+    // Persist job before responding. Conversion is secondary and must not undo capture.
+    let mp3Estado="no_aplica";
+    if(audioPartes?.length){try{await getDb().query("INSERT INTO dictado_mp3(session_id) VALUES($1) ON CONFLICT DO NOTHING",[sessionId]);mp3Estado="pendiente";}catch{mp3Estado="cola_no_confirmada";}}
     // 3. Espejar a Notion (secundario, acotado a 8s y try/catch que no frena la respuesta)
     after(async () => {
+      if(audioPartes?.length)await generarMp3Sesion(sessionId).catch(()=>undefined);
+      if(!c?.titulo?.trim() && texto.trim()) {
+        try {
+          const title=await generarTituloConGarantia(texto);
+          await getDb().query("UPDATE volcado SET titulo=$2 WHERE id=$1 AND titulo=$3",[r.id,title.title,tituloResolver]);
+        }catch{/* Capture remains valid. Explicit title regeneration is retryable. */}
+      }
       try {
       const volcado_id = r.id;
       const version = 1;
@@ -91,7 +106,7 @@ export async function POST(req: Request) {
       }
     });
 
-    return NextResponse.json({ ...r, titulo: tituloResolver }, { status: 201 });
+    return NextResponse.json({ ...r, titulo: tituloResolver, mp3Estado }, { status: 201 });
   } catch (e) {
     return NextResponse.json(
       { detail: "no se pudo archivar el dictado", causa: String(e) },

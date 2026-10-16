@@ -48,3 +48,7 @@ Antes de crear código nuevo para una capacidad del EP, el agente DEBE localizar
 - Conserva identificadores `EP-*`; no renumeres identificadores publicados.
 - Todo cambio de flujo, seguridad, token, bitácora, persistencia o limpieza exige actualizar la arquitectura y `ep-integrity-manifest.sha256`.
 - Nunca añadas acceso anónimo, fallback sin BitLocker, secretos en logs o `git add -A`. Conserva el despliegue obligatorio y verificable del SHA exacto de `main` en `EP-IN-080`; nunca despliegues `ep-wip/*`.
+
+## Custodia continua de dictados — lectura obligatoria
+
+Antes de modificar captura manual o transcrita, audio, checkpoints, Archivar, recuperación, títulos, versiones, MP3 o herramientas MCP de audio, leer [Custodia continua de dictados](khora-web/docs/CUSTODIA-DICTADOS.md). Es la entrada única de mantenimiento de ese circuito. Actualizar código, pruebas, contratos y ese documento en el mismo cambio. No convertir texto a voz; conservar originales además del MP3; no declarar producción certificada a partir de mocks o compilación. Mantener visibles las brechas pendientes y sus pruebas terminales.

@@ -39,8 +39,8 @@ function normalizar(p: string): string {
 }
 
 function tokenizar(t: string): { raw: string[]; norm: string[] } {
-  const raw = t.split(/\s+/).filter((s) => s.length > 0);
-  return { raw, norm: raw.map(normalizar) };
+  const raw = t.match(/\s+|[^\s]+/g) || [];
+  return { raw, norm: raw };
 }
 
 export function calcularDelta(original: string, editado: string): Par[] {
@@ -49,7 +49,7 @@ export function calcularDelta(original: string, editado: string): Par[] {
   const n = A.norm.length;
   const m = B.norm.length;
   if (n === 0 && m === 0) return [];
-  if (n * m > 4000000) return [{ antes: "(texto demasiado largo para el delta fino)", despues: "" }];
+  if (n * m > 4000000) return original === editado ? [] : [{ antes: original, despues: editado }];
   const dp: number[][] = [];
   for (let i = 0; i <= n; i++) { dp.push(new Array(m + 1).fill(0)); }
   for (let i = n - 1; i >= 0; i--) {
@@ -61,8 +61,8 @@ export function calcularDelta(original: string, editado: string): Par[] {
   let bufA: string[] = [];
   let bufB: string[] = [];
   const volcar = () => {
-    const a = bufA.join(" ").trim();
-    const b = bufB.join(" ").trim();
+    const a = bufA.join("");
+    const b = bufB.join("");
     if (a.length > 0 || b.length > 0) pares.push({ antes: a, despues: b });
     bufA = [];
     bufB = [];
@@ -80,26 +80,32 @@ export function calcularDelta(original: string, editado: string): Par[] {
   return pares;
 }
 
-export async function crearVersion(volcadoId: string, texto: string, motivo: string) {
-  await asegurarEsquema();
-  const db = getDb();
-  const r = await db.query("SELECT COALESCE(MAX(version), 0)::int AS ultima FROM volcado_version WHERE volcado_id = $1", [volcadoId]);
-  const version = Number((r.rows[0] as any).ultima) + 1;
-  const sha = sha256de(texto);
-  await db.query("INSERT INTO volcado_version (id, volcado_id, version, texto, sha256, chars, motivo) VALUES ($1,$2,$3,$4,$5,$6,$7)", [randomUUID(), volcadoId, version, cifrarTexto(texto), sha, texto.length, motivo]);
-  return { version, sha256: sha, chars: texto.length };
+type QueryClient = { query: (sql: string, params?: any[]) => Promise<any> };
+export async function crearVersion(volcadoId: string, texto: string, motivo: string, transaction?: QueryClient) {
+  if (!transaction) await asegurarEsquema();
+  const owned = transaction ? null : await getDb().connect();
+  const c = transaction || owned!;
+  try {
+    if (owned) { await c.query("BEGIN"); await c.query("SELECT id FROM volcado WHERE id=$1 FOR UPDATE", [volcadoId]); }
+    const r = await c.query("SELECT COALESCE(MAX(version), 0)::int AS ultima FROM volcado_version WHERE volcado_id = $1", [volcadoId]);
+    const version = Number(r.rows[0].ultima) + 1; const sha = sha256de(texto);
+    await c.query("INSERT INTO volcado_version (id, volcado_id, version, texto, sha256, chars, motivo) VALUES ($1,$2,$3,$4,$5,$6,$7)", [randomUUID(),volcadoId,version,cifrarTexto(texto),sha,texto.length,motivo]);
+    if (owned) await c.query("COMMIT");
+    return { version, sha256: sha, chars: texto.length };
+  } catch(e) { if(owned) await c.query("ROLLBACK").catch(()=>undefined); throw e; }
+  finally { owned?.release(); }
 }
-
 export async function asegurarVersionInicial(volcadoId: string) {
-  await asegurarEsquema();
-  const db = getDb();
-  const c = await db.query("SELECT COUNT(*)::int AS n FROM volcado_version WHERE volcado_id = $1", [volcadoId]);
-  if (Number((c.rows[0] as any).n) > 0) return;
-  const v = await db.query("SELECT texto, texto_original FROM volcado WHERE id = $1", [volcadoId]);
-  if (v.rows.length === 0) throw new Error("volcado no encontrado");
-  const fila: any = v.rows[0];
-  const base: string = descifrarTexto(String(fila.texto_original ?? fila.texto ?? ""));
-  await crearVersion(volcadoId, base, "transcripcion original del dictado");
+  await asegurarEsquema(); const c=await getDb().connect();
+  try {
+    await c.query("BEGIN");
+    const v=await c.query("SELECT texto,texto_original FROM volcado WHERE id=$1 FOR UPDATE",[volcadoId]);
+    if(!v.rows.length)throw new Error("volcado no encontrado");
+    const count=await c.query("SELECT COUNT(*)::int AS n FROM volcado_version WHERE volcado_id=$1",[volcadoId]);
+    const base=descifrarTexto(String(v.rows[0].texto_original??v.rows[0].texto??""));
+    if(!Number(count.rows[0].n)&&base.length)await crearVersion(volcadoId,base,"transcripcion original del dictado",c);
+    await c.query("COMMIT");
+  }catch(e){await c.query("ROLLBACK").catch(()=>undefined);throw e;}finally{c.release();}
 }
 
 export async function listarVersiones(volcadoId: string) {
@@ -109,54 +115,39 @@ export async function listarVersiones(volcadoId: string) {
   return r.rows;
 }
 
-export async function guardarEdicion(volcadoId: string, textoEditado: string, usuario?: string | null) {
-  await asegurarEsquema();
-  await asegurarVersionInicial(volcadoId);
-  const db = getDb();
-
-  // Consultar estado anterior real antes del update
-  const stateRes = await db.query("SELECT estado FROM volcado WHERE id = $1", [volcadoId]);
-  const estadoAnteriorReal = stateRes.rows.length > 0 ? String(stateRes.rows[0].estado ?? "archivado") : "archivado";
-
-  const u = await db.query("SELECT version, texto FROM volcado_version WHERE volcado_id = $1 ORDER BY version DESC LIMIT 1", [volcadoId]);
-  const ultima: any = u.rows[0];
-  const base: string = descifrarTexto(String(ultima.texto ?? ""));
-  const versionDesde = Number(ultima.version);
-
-  if (base === textoEditado) {
-    return { pares: [] as Par[], guardadas: 0, version: versionDesde, sinCambios: true, sha256: sha256de(textoEditado), chars: textoEditado.length };
-  }
-
-  const pares = calcularDelta(base, textoEditado);
-  const nueva = await crearVersion(volcadoId, textoEditado, "edicion manual del operador");
-
-  // Al crear una nueva versión, se retorna al estado 'en_revision' e invalidan aprobaciones anteriores
-  await db.query(
-    "UPDATE volcado SET texto_original = COALESCE(texto_original, texto), texto = $2, sha256 = $3, chars = $4, estado = $5, version_aprobada = NULL, sha256_aprobado = NULL, aprobado_en = NULL, aprobador = NULL, editado_en = now(), ediciones = COALESCE(ediciones, 0) + 1 WHERE id = $1",
-    [volcadoId, cifrarTexto(textoEditado), nueva.sha256, textoEditado.length, "en_revision"]
-  );
-
-  // Registro en auditoría con el estado anterior real de la BD
-  await db.query(
-    "INSERT INTO volcado_revision_auditoria (id, volcado_id, accion, estado_anterior, estado_nuevo, version, sha256, usuario) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)",
-    [randomUUID(), volcadoId, "version_guardada", estadoAnteriorReal, "en_revision", nueva.version, nueva.sha256, usuario ?? null]
-  );
-
-  let guardadas = 0;
-  for (const p of pares) {
-    if (p.antes.length === 0 || p.despues.length === 0) continue;
-    if (p.antes.length > 80 || p.despues.length > 80) continue;
-    await db.query("INSERT INTO correccion (id, volcado_id, antes, despues, version_desde, version_hasta) VALUES ($1,$2,$3,$4,$5,$6)", [randomUUID(), volcadoId, p.antes, p.despues, versionDesde, nueva.version]);
-    guardadas++;
-  }
-  return { pares, guardadas, version: nueva.version, versionDesde, sinCambios: false, sha256: nueva.sha256, chars: nueva.chars };
+export async function guardarEdicion(volcadoId: string, textoEditado: string, usuario?: string | null, expected?: { version?: number; sha256?: string; motivo?: string }) {
+  await asegurarEsquema(); await asegurarVersionInicial(volcadoId); const c=await getDb().connect();
+  try {
+    await c.query("BEGIN");
+    const state=await c.query("SELECT estado,texto,sha256 FROM volcado WHERE id=$1 FOR UPDATE",[volcadoId]);
+    if(!state.rows.length)throw new Error("volcado no encontrado");
+    const u=await c.query("SELECT version,texto,sha256 FROM volcado_version WHERE volcado_id=$1 ORDER BY version DESC LIMIT 1",[volcadoId]);
+    const last=u.rows[0]; const base=descifrarTexto(String(last?.texto??state.rows[0].texto??""));const from=Number(last?.version??0);
+    if(expected?.version!==undefined&&expected.version!==from)throw new Error("conflicto_version_base");
+    if(expected?.sha256&&expected.sha256!==sha256de(base))throw new Error("conflicto_huella_base");
+    if(base===textoEditado){await c.query("COMMIT");return {pares:[] as Par[],guardadas:0,version:from,sinCambios:true,sha256:sha256de(base),chars:base.length};}
+    const pares=calcularDelta(base,textoEditado);const reason=expected?.motivo||"enmienda_contenido";
+    const nueva=await crearVersion(volcadoId,textoEditado,reason,c);
+    await c.query("UPDATE volcado SET texto_original=COALESCE(texto_original,texto),texto=$2,sha256=$3,chars=$4,estado='en_revision',version_aprobada=NULL,sha256_aprobado=NULL,aprobado_en=NULL,aprobador=NULL,editado_en=now(),ediciones=COALESCE(ediciones,0)+1 WHERE id=$1",[volcadoId,cifrarTexto(textoEditado),nueva.sha256,textoEditado.length]);
+    await c.query("INSERT INTO volcado_revision_auditoria(id,volcado_id,accion,estado_anterior,estado_nuevo,version,sha256,usuario) VALUES($1,$2,$3,$4,$5,$6,$7,$8)",[randomUUID(),volcadoId,"version_guardada:"+reason,state.rows[0].estado,"en_revision",nueva.version,nueva.sha256,usuario??null]);
+    for(const p of pares)await c.query("INSERT INTO correccion(id,volcado_id,antes,despues,version_desde,version_hasta) VALUES($1,$2,$3,$4,$5,$6)",[randomUUID(),volcadoId,cifrarTexto(p.antes),cifrarTexto(p.despues),from,nueva.version]);
+    await c.query("COMMIT");return {pares,guardadas:pares.length,version:nueva.version,versionDesde:from,sinCambios:false,sha256:nueva.sha256,chars:nueva.chars};
+  }catch(e){await c.query("ROLLBACK").catch(()=>undefined);throw e;}finally{c.release();}
 }
 
 export async function listarLexico(limite = 200) {
   await asegurarEsquema();
   const db = getDb();
-  const r = await db.query("SELECT antes, despues, COUNT(*)::int AS veces FROM correccion GROUP BY antes, despues ORDER BY veces DESC, antes ASC LIMIT $1", [limite]);
-  return r.rows;
+  // Randomized encryption cannot be grouped by ciphertext. Aggregate decoded pairs.
+  const maximo = Math.max(1, Math.min(1000, Math.floor(limite) || 200));
+  const r = await db.query("SELECT antes, despues, COUNT(*)::int AS veces FROM correccion GROUP BY antes, despues");
+  const grupos = new Map<string, { antes: string; despues: string; veces: number }>();
+  for (const row of r.rows) {
+    const antes = descifrarTexto(row.antes), despues = descifrarTexto(row.despues);
+    const key = JSON.stringify([antes, despues]), previo = grupos.get(key);
+    grupos.set(key, { antes, despues, veces: (previo?.veces || 0) + Number(row.veces) });
+  }
+  return [...grupos.values()].sort((a,b) => b.veces-a.veces || a.antes.localeCompare(b.antes)).slice(0,maximo);
 }
 
 export { marcarPendienteRevision, iniciarRevision, aprobarVersion, reabrirRevision } from "./volcados";

@@ -19,6 +19,9 @@ export function evaluarCustodiaAudio(
 ): ResultadoCustodiaAudio {
   const ordenadas = [...(partes || [])].sort((a, b) => Number(a.part_index) - Number(b.part_index));
   const total = totalEsperado ?? ordenadas.length;
+  if (!Number.isSafeInteger(total) || total <= 0 || new Set(ordenadas.map(p => Number(p.part_index))).size !== ordenadas.length || ordenadas.some(p => !Number.isSafeInteger(Number(p.part_index)) || Number(p.part_index) < 1 || Number(p.part_index) > total)) {
+    return { ok:false, motivo:"Manifiesto vacío, duplicado o con cantidad/índices inválidos.", indicesFaltantes:[] };
+  }
   const indicesFaltantes: number[] = [];
   const indicesPresentes = new Set(
     ordenadas.map((parte) => Number(parte.part_index)),
