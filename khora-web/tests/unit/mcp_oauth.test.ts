@@ -415,7 +415,10 @@ test("4. Missing KHORA_READONLY_DATABASE_URL in production returns 503", async (
     assert.equal(res.status, 503);
     const data = await res.json();
     assert.equal(data.error, "server_error");
-    assert.ok(data.error_description.includes("KHORA_READONLY_DATABASE_URL mandatory"));
+    assert.equal(data.diagnostic.code, "MCP_CONFIG_MISSING");
+    assert.equal(data.error_description, data.diagnostic.message);
+    assert.ok(data.diagnostic.message.length > 20);
+    assert.ok(res.headers.get("x-khora-correlation-id"));
   } finally {
     process.env.VERCEL_ENV = originalVercelEnv;
     if (originalReadonlyUrl) {
