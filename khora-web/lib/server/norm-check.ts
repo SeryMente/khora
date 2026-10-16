@@ -1,3 +1,4 @@
+import { fetchNormativeGithub } from "./normative-github";
 import { isNormativeReceipt, NORM_CHECK_PROTOCOL, NORM_CHECK_PROTOCOL_VERSION, type NormativeReceipt, type NormativePrincipleEvidence } from "./normative-receipt-schema";
 export type { NormativeReceipt, NormativePrincipleEvidence } from "./normative-receipt-schema";
 import { createHash } from "crypto";
@@ -141,18 +142,8 @@ type CanonicalSiHistory = {
 async function fetchCanonicalSiHistory(refSha: string): Promise<CanonicalSiHistory> {
   if (!isHex(refSha, 40)) throw new Error("SI_COMMIT_SHA_INVALID");
 
-  const response = await fetch(
-    "https://api.github.com/repos/" + CANONICAL_SI_REPOSITORY + "/commits?path=" +
-      encodeURIComponent(CANONICAL_SI_PATH) + "&sha=" + refSha + "&per_page=1",
-    {
-      headers: {
-        Accept: "application/vnd.github+json",
-        "User-Agent": "Khora-NormCheck/0.5.0",
-      },
-      cache: "force-cache",
-    },
-  );
-  if (!response.ok) throw new Error("SI_HISTORY_FETCH_" + response.status);
+  const response = await fetchNormativeGithub("https://api.github.com/repos/" + CANONICAL_SI_REPOSITORY + "/commits?path=" +
+      encodeURIComponent(CANONICAL_SI_PATH) + "&sha=" + refSha + "&per_page=1", "SI_HISTORY_FETCH");
 
   const payload = (await response.json()) as Array<{
     sha?: string;
@@ -174,18 +165,8 @@ async function fetchCanonicalSiHistory(refSha: string): Promise<CanonicalSiHisto
 async function fetchCanonicalMethodologyHistory(refSha: string): Promise<CanonicalSiHistory> {
   if (!isHex(refSha, 40)) throw new Error("METHODOLOGY_COMMIT_SHA_INVALID");
 
-  const response = await fetch(
-    "https://api.github.com/repos/" + CANONICAL_METHODOLOGY_REPOSITORY + "/commits?path=" +
-      encodeURIComponent(CANONICAL_METHODOLOGY_PATH) + "&sha=" + refSha + "&per_page=1",
-    {
-      headers: {
-        Accept: "application/vnd.github+json",
-        "User-Agent": "Khora-NormCheck/0.5.0",
-      },
-      cache: "force-cache",
-    },
-  );
-  if (!response.ok) throw new Error("METHODOLOGY_HISTORY_FETCH_" + response.status);
+  const response = await fetchNormativeGithub("https://api.github.com/repos/" + CANONICAL_METHODOLOGY_REPOSITORY + "/commits?path=" +
+      encodeURIComponent(CANONICAL_METHODOLOGY_PATH) + "&sha=" + refSha + "&per_page=1", "METHODOLOGY_HISTORY_FETCH");
 
   const payload = (await response.json()) as Array<{
     sha?: string;
@@ -371,18 +352,7 @@ export async function fetchSiBlob(blobSha: string): Promise<string> {
   if (cached) return cached;
 
   const promise = (async () => {
-    const response = await fetch(
-      "https://api.github.com/repos/" + CANONICAL_SI_REPOSITORY + "/git/blobs/" + blobSha,
-      {
-        headers: {
-          Accept: "application/vnd.github+json",
-          "User-Agent": "Khora-NormCheck/0.5.0",
-        },
-        cache: "force-cache",
-      },
-    );
-
-    if (!response.ok) throw new Error("SI_BLOB_FETCH_" + response.status);
+    const response = await fetchNormativeGithub("https://api.github.com/repos/" + CANONICAL_SI_REPOSITORY + "/git/blobs/" + blobSha, "SI_BLOB_FETCH");
 
     const payload = (await response.json()) as { encoding?: string; content?: string };
     if (payload.encoding !== "base64" || typeof payload.content !== "string") {
@@ -409,18 +379,7 @@ async function fetchMethodologyBlob(blobSha: string): Promise<string> {
   if (cached) return cached;
 
   const promise = (async () => {
-    const response = await fetch(
-      "https://api.github.com/repos/" + CANONICAL_METHODOLOGY_REPOSITORY + "/git/blobs/" + blobSha,
-      {
-        headers: {
-          Accept: "application/vnd.github+json",
-          "User-Agent": "Khora-NormCheck/0.5.0",
-        },
-        cache: "force-cache",
-      },
-    );
-
-    if (!response.ok) throw new Error("METHODOLOGY_BLOB_FETCH_" + response.status);
+    const response = await fetchNormativeGithub("https://api.github.com/repos/" + CANONICAL_METHODOLOGY_REPOSITORY + "/git/blobs/" + blobSha, "METHODOLOGY_BLOB_FETCH");
 
     const payload = (await response.json()) as { encoding?: string; content?: string };
     if (payload.encoding !== "base64" || typeof payload.content !== "string") {
@@ -441,48 +400,18 @@ async function fetchMethodologyBlob(blobSha: string): Promise<string> {
 
 export async function getCurrentSiSnapshot(): Promise<ParsedSi & { gitBlobSha: string }> {
   for (let attempt = 1; attempt <= 3; attempt += 1) {
-    const commitResponse = await fetch(
-      "https://api.github.com/repos/" + CANONICAL_SI_REPOSITORY + "/commits/main",
-      {
-        headers: {
-          Accept: "application/vnd.github+json",
-          "User-Agent": "Khora-NormCheck/0.5.0",
-        },
-        cache: "no-store",
-      },
-    );
-    if (!commitResponse.ok) throw new Error("SI_MAIN_FETCH_" + commitResponse.status);
+    const commitResponse = await fetchNormativeGithub("https://api.github.com/repos/" + CANONICAL_SI_REPOSITORY + "/commits/main", "SI_MAIN_FETCH");
     const commitPayload = (await commitResponse.json()) as { sha?: string };
     if (!isHex(commitPayload.sha, 40)) throw new Error("SI_MAIN_SHA_INVALID");
     const mainSha = commitPayload.sha;
 
-    const response = await fetch(
-      "https://api.github.com/repos/" + CANONICAL_SI_REPOSITORY + "/contents/" + CANONICAL_SI_PATH + "?ref=" + mainSha,
-      {
-        headers: {
-          Accept: "application/vnd.github+json",
-          "User-Agent": "Khora-NormCheck/0.5.0",
-        },
-        cache: "no-store",
-      },
-    );
-    if (!response.ok) throw new Error("SI_CURRENT_FETCH_" + response.status);
+    const response = await fetchNormativeGithub("https://api.github.com/repos/" + CANONICAL_SI_REPOSITORY + "/contents/" + CANONICAL_SI_PATH + "?ref=" + mainSha, "SI_CURRENT_FETCH");
     const payload = (await response.json()) as { sha?: string; encoding?: string; content?: string };
     if (!isHex(payload.sha, 40) || payload.encoding !== "base64" || typeof payload.content !== "string") {
       throw new Error("SI_CURRENT_PAYLOAD_INVALID");
     }
 
-    const confirmResponse = await fetch(
-      "https://api.github.com/repos/" + CANONICAL_SI_REPOSITORY + "/commits/main",
-      {
-        headers: {
-          Accept: "application/vnd.github+json",
-          "User-Agent": "Khora-NormCheck/0.5.0",
-        },
-        cache: "no-store",
-      },
-    );
-    if (!confirmResponse.ok) throw new Error("SI_MAIN_CONFIRM_FETCH_" + confirmResponse.status);
+    const confirmResponse = await fetchNormativeGithub("https://api.github.com/repos/" + CANONICAL_SI_REPOSITORY + "/commits/main", "SI_MAIN_CONFIRM_FETCH");
     const confirmPayload = (await confirmResponse.json()) as { sha?: string };
     if (!isHex(confirmPayload.sha, 40)) throw new Error("SI_MAIN_CONFIRM_SHA_INVALID");
 
@@ -520,48 +449,18 @@ export async function getCurrentSiSnapshot(): Promise<ParsedSi & { gitBlobSha: s
 
 export async function getCurrentMethodologySnapshot(): Promise<ParsedMethodology> {
   for (let attempt = 1; attempt <= 3; attempt += 1) {
-    const commitResponse = await fetch(
-      "https://api.github.com/repos/" + CANONICAL_METHODOLOGY_REPOSITORY + "/commits/main",
-      {
-        headers: {
-          Accept: "application/vnd.github+json",
-          "User-Agent": "Khora-NormCheck/0.5.0",
-        },
-        cache: "no-store",
-      },
-    );
-    if (!commitResponse.ok) throw new Error("METHODOLOGY_MAIN_FETCH_" + commitResponse.status);
+    const commitResponse = await fetchNormativeGithub("https://api.github.com/repos/" + CANONICAL_METHODOLOGY_REPOSITORY + "/commits/main", "METHODOLOGY_MAIN_FETCH");
     const commitPayload = (await commitResponse.json()) as { sha?: string };
     if (!isHex(commitPayload.sha, 40)) throw new Error("METHODOLOGY_MAIN_SHA_INVALID");
     const mainSha = commitPayload.sha;
 
-    const response = await fetch(
-      "https://api.github.com/repos/" + CANONICAL_METHODOLOGY_REPOSITORY + "/contents/" + CANONICAL_METHODOLOGY_PATH + "?ref=" + mainSha,
-      {
-        headers: {
-          Accept: "application/vnd.github+json",
-          "User-Agent": "Khora-NormCheck/0.5.0",
-        },
-        cache: "no-store",
-      },
-    );
-    if (!response.ok) throw new Error("METHODOLOGY_CURRENT_FETCH_" + response.status);
+    const response = await fetchNormativeGithub("https://api.github.com/repos/" + CANONICAL_METHODOLOGY_REPOSITORY + "/contents/" + CANONICAL_METHODOLOGY_PATH + "?ref=" + mainSha, "METHODOLOGY_CURRENT_FETCH");
     const payload = (await response.json()) as { sha?: string; encoding?: string; content?: string };
     if (!isHex(payload.sha, 40) || payload.encoding !== "base64" || typeof payload.content !== "string") {
       throw new Error("METHODOLOGY_CURRENT_PAYLOAD_INVALID");
     }
 
-    const confirmResponse = await fetch(
-      "https://api.github.com/repos/" + CANONICAL_METHODOLOGY_REPOSITORY + "/commits/main",
-      {
-        headers: {
-          Accept: "application/vnd.github+json",
-          "User-Agent": "Khora-NormCheck/0.5.0",
-        },
-        cache: "no-store",
-      },
-    );
-    if (!confirmResponse.ok) throw new Error("METHODOLOGY_MAIN_CONFIRM_FETCH_" + confirmResponse.status);
+    const confirmResponse = await fetchNormativeGithub("https://api.github.com/repos/" + CANONICAL_METHODOLOGY_REPOSITORY + "/commits/main", "METHODOLOGY_MAIN_CONFIRM_FETCH");
     const confirmPayload = (await confirmResponse.json()) as { sha?: string };
     if (!isHex(confirmPayload.sha, 40)) throw new Error("METHODOLOGY_MAIN_CONFIRM_SHA_INVALID");
 

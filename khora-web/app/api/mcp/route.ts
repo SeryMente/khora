@@ -1,7 +1,11 @@
+import { registrarEventoServicio } from "@/lib/server/service-observability";
+import { randomUUID } from "node:crypto";
+import { diagnosticFailure, diagnose } from "@/lib/server/mcp-diagnostics";
+import { installMcpDiagnostics, withHttpDiagnostics } from "@/lib/server/mcp-diagnostic-boundary";
 // @l0 L0-002 §4 · @req MCP-ROUTE-01/REQ-1
 import { NextRequest, NextResponse } from "next/server";
 import { getMcpConfig } from "@/lib/server/mcp-config";
-import { verifyJwt } from "@/lib/server/jwt";
+import { verifyJwtDetailed } from "@/lib/server/jwt";
 import { obtenerGeneracionRevocacion } from "@/lib/server/oauth";
 import { isProductionEnv } from "@/lib/server/mcp-db";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -21,18 +25,17 @@ import { toolKhoraUiReview } from "@/lib/server/mcp-ui-review";
 import { toolKhoraEstadoVivo, toolKhoraEventosRecientes, toolKhoraObservacionInstantanea, toolKhoraEventosDesde } from "@/lib/server/mcp-observability";
 import { assertNormativeTurnOpen, openNormativeTurn, applyNormativePrinciple, verifyNormativeTurn, releaseNormativeTurn } from "@/lib/server/mcp-normative";
 import { authenticateManualMcpToken, MANUAL_MCP_TOKEN_PREFIX } from "@/lib/server/mcp-manual-token";
-import { registrarEventoServicio } from "@/lib/server/service-observability";
 import { getCurrentSiSnapshot, getCurrentMethodologySnapshot, getCurrentVerifierInfo } from "@/lib/server/norm-check";
 import { assertNormativeRuntimeContext, REASONING_MODES, REQUIRED_OUTPUT_FORMAT_VERSION, REQUIRED_PLATFORM, type ReasoningMode } from "@/lib/server/normative-runtime";
 
 export const runtime = "nodejs";
 
-function makeUnauthorizedResponse(config: ReturnType<typeof getMcpConfig>) {
+function makeUnauthorizedResponse(config: ReturnType<typeof getMcpConfig>, reason = "MCP_AUTH_CLAIMS_INVALID") {
   const metadataUrl = config
     ? `${config.issuer}/.well-known/oauth-protected-resource`
     : "";
   return new NextResponse(
-    JSON.stringify({ error: "unauthorized", error_description: "Valid Bearer token required" }),
+    JSON.stringify({ error: "unauthorized", error_description: "Valid Bearer token required", _diagnostic_code: reason }),
     {
       status: 401,
       headers: {
@@ -43,14 +46,14 @@ function makeUnauthorizedResponse(config: ReturnType<typeof getMcpConfig>) {
   );
 }
 
-function scopeFailure(config: ReturnType<typeof getMcpConfig>, requiredScope: string) {
+function scopeFailure(config: ReturnType<typeof getMcpConfig>, requiredScope: string, correlation_id: string) {
   const metadataUrl = config
     ? `${config.issuer}/.well-known/oauth-protected-resource`
     : "";
   return {
-    isError: true as const,
-    content: [{ type: "text" as const, text: `Permiso insuficiente. Se requiere ${requiredScope}.` }],
+    ...diagnosticFailure("MCP_SCOPE_REQUIRED", { operation: "authorization", correlation_id }),
     _meta: {
+      ...diagnosticFailure("MCP_SCOPE_REQUIRED", { operation: "authorization", correlation_id })._meta,
       "mcp/www_authenticate": [
         `Bearer resource_metadata="${metadataUrl}", error="insufficient_scope", error_description="Se requiere ${requiredScope}"`,
       ],
@@ -90,16 +93,9 @@ async function requireNormativeTurn(
   turnToken: unknown,
   thinkingMode: unknown,
   outputFormatVersion: unknown,
+  context: { operation: string; correlation_id: string },
 ) {
-  if (typeof turnToken !== "string") {
-    return {
-      isError: true as const,
-      content: [{
-        type: "text" as const,
-        text: "NORMATIVE_TURN_REQUIRED: primero llama a khora_norm_open_turn y usa el turn_token devuelto.",
-      }],
-    };
-  }
+  if (typeof turnToken !== "string") return diagnosticFailure("TURN_TOKEN_INVALID", context);
   try {
     assertNormativeRuntimeContext({
       platform: REQUIRED_PLATFORM,
@@ -113,19 +109,13 @@ async function requireNormativeTurn(
     });
     return null;
   } catch (error) {
-    return {
-      isError: true as const,
-      content: [{
-        type: "text" as const,
-        text: error instanceof Error
-          ? `NORMATIVE_TURN_REQUIRED: ${error.message}. Debes abrir/reabrir el ciclo con khora_norm_open_turn antes de continuar.`
-          : "NORMATIVE_TURN_REQUIRED",
-      }],
-    };
+    const result = diagnosticFailure(error, context);
+    return { ...result, _meta: { ...result._meta, category: "NORMATIVE_TURN_REQUIRED" } };
   }
 }
 
 async function handleMcpRequest(req: NextRequest) {
+  const correlation_id = randomUUID();
   const config = getMcpConfig();
   if (!config) {
     return NextResponse.json(
@@ -145,7 +135,7 @@ async function handleMcpRequest(req: NextRequest) {
   // §B.2 & §B.3: Validar Token Bearer
   const authHeader = req.headers.get("authorization") || "";
   if (!authHeader.startsWith("Bearer ")) {
-    return makeUnauthorizedResponse(config);
+    return makeUnauthorizedResponse(config, "MCP_AUTH_MISSING");
   }
 
   const token = authHeader.substring(7).trim();
@@ -158,25 +148,25 @@ async function handleMcpRequest(req: NextRequest) {
 
   if (manualToken) {
     if (manualToken.resource !== config.canonicalUrl) {
-      return makeUnauthorizedResponse(config);
+      return makeUnauthorizedResponse(config, "MCP_AUTH_RESOURCE_MISMATCH");
     }
     actor = manualToken.usuario;
     scopes = manualToken.scope.split(/\s+/).filter(Boolean);
     tokenGeneration = manualToken.generacion;
   } else {
-    const payload = verifyJwt(token, config.jwtSecret);
-    if (!payload) {
-      return makeUnauthorizedResponse(config);
-    }
+    if (token.startsWith(MANUAL_MCP_TOKEN_PREFIX)) return makeUnauthorizedResponse(config, "MCP_MANUAL_TOKEN_INACTIVE");
+    const verified = verifyJwtDetailed(token, config.jwtSecret);
+    if (!verified.ok) return makeUnauthorizedResponse(config, "MCP_AUTH_" + verified.error.toUpperCase());
+    const payload = verified.payload;
 
     // Verificar issuer (iss)
     if (payload.iss !== config.issuer) {
-      return makeUnauthorizedResponse(config);
+      return makeUnauthorizedResponse(config, "MCP_AUTH_ISSUER_MISMATCH");
     }
 
     // Verificar audiencia (aud)
     if (payload.aud !== config.canonicalUrl) {
-      return makeUnauthorizedResponse(config);
+      return makeUnauthorizedResponse(config, "MCP_AUTH_RESOURCE_MISMATCH");
     }
 
     scopes = (payload.scope || "").split(/\s+/).filter(Boolean);
@@ -196,12 +186,12 @@ async function handleMcpRequest(req: NextRequest) {
   const requireScope = (scope: "volcados:read" | "runtime:read" | "norm:turn") =>
     scopes.includes(scope)
       ? null
-      : scopeFailure(config, scope);
+      : scopeFailure(config, scope, correlation_id);
 
   // Verificar revocación de generación para ambos tipos de Bearer.
   const currentGen = await obtenerGeneracionRevocacion(actor);
   if (tokenGeneration !== currentGen) {
-    return makeUnauthorizedResponse(config);
+    return makeUnauthorizedResponse(config, "MCP_AUTH_REVOKED");
   }
 
   // Instanciar servidor MCP en modo sin estado
@@ -220,6 +210,7 @@ async function handleMcpRequest(req: NextRequest) {
     },
   );
 
+  installMcpDiagnostics(mcpServer.server, correlation_id, registrarEventoServicio);
   const toolsList: ReturnType<typeof describeMcpTool>[] = [];
 
   const gatedTool = (
@@ -229,53 +220,14 @@ async function handleMcpRequest(req: NextRequest) {
     handler: (args: any) => Promise<any>,
   ) => {
     const observedHandler = async (args: any, requireTurn: boolean) => {
-      const startedAt = Date.now();
+      const context = { operation: name, correlation_id };
       try {
         if (requireTurn) {
-          const normativeDenied = await requireNormativeTurn(actor, args._norm_turn_token, args._thinking_mode, args._output_format_version);
-          if (normativeDenied) {
-            await registrarEventoServicio({
-              service: "mcp",
-              operation: "tool." + name,
-              route: "/api/mcp",
-              method: "MCP",
-              outcome: "FAILURE",
-              severity: "WARN",
-              reasonCode: "NORMATIVE_TURN_REQUIRED",
-              durationMs: Date.now() - startedAt,
-              metadata: { tool: name },
-            });
-            return normativeDenied;
-          }
+          const denied = await requireNormativeTurn(actor, args._norm_turn_token, args._thinking_mode, args._output_format_version, context);
+          if (denied) return denied;
         }
-
-        const result = await handler(requireTurn ? withoutNormTurn(args) : args);
-        const failed = result?.isError === true;
-        await registrarEventoServicio({
-          service: "mcp",
-          operation: "tool." + name,
-          route: "/api/mcp",
-          method: "MCP",
-          outcome: failed ? "FAILURE" : "SUCCESS",
-          severity: failed ? "WARN" : "INFO",
-          durationMs: Date.now() - startedAt,
-          metadata: { tool: name },
-        });
-        return result;
-      } catch (error) {
-        await registrarEventoServicio({
-          service: "mcp",
-          operation: "tool." + name,
-          route: "/api/mcp",
-          method: "MCP",
-          outcome: "FAILURE",
-          severity: "ERROR",
-          durationMs: Date.now() - startedAt,
-          reasonCode: error instanceof Error ? error.name.slice(0, 64) : "TOOL_ERROR",
-          metadata: { tool: name, error_type: error instanceof Error ? error.name : "unknown" },
-        });
-        throw error;
-      }
+        return await handler(requireTurn ? withoutNormTurn(args) : args);
+      } catch (error) { return diagnosticFailure(error, context); }
     };
 
     if (name === "khora_mcp_health" || name === "khora_norm_open_turn" || name === "khora_norm_apply_principle" || name === "khora_norm_verify_turn" || name === "khora_norm_release_turn") {
@@ -516,6 +468,7 @@ async function handleMcpRequest(req: NextRequest) {
         };
       } catch (error) {
         return {
+          _meta: { "khora/diagnostic": diagnose(error, { operation: "khora_mcp_health", correlation_id }) },
           isError: true,
           content: [{
             type: "text",
@@ -524,7 +477,8 @@ async function handleMcpRequest(req: NextRequest) {
               status: "UNAVAILABLE",
               full_access: false,
               missing_scopes: missingScopes,
-              reason: error instanceof Error ? error.message : "MCP_HEALTH_FAILED"
+              reason: diagnose(error, { operation: "khora_mcp_health", correlation_id }).code,
+              diagnostic: diagnose(error, { operation: "khora_mcp_health", correlation_id })
             })
           }]
         };
@@ -557,10 +511,7 @@ async function handleMcpRequest(req: NextRequest) {
         });
         return { content: [{ type: "text", text: JSON.stringify(res) }] };
       } catch (error) {
-        return {
-          isError: true,
-          content: [{ type: "text", text: error instanceof Error ? error.message : "TURN_OPEN_FAILED" }],
-        };
+        return diagnosticFailure(error, { operation: "khora_norm_open_turn", correlation_id });
       }
     }
   );
@@ -588,10 +539,7 @@ async function handleMcpRequest(req: NextRequest) {
         });
         return { content: [{ type: "text", text: JSON.stringify(res) }] };
       } catch (error) {
-        return {
-          isError: true,
-          content: [{ type: "text", text: error instanceof Error ? error.message : "PRINCIPLE_APPLICATION_FAILED" }],
-        };
+        return diagnosticFailure(error, { operation: "khora_norm_apply_principle", correlation_id });
       }
     }
   );
@@ -613,10 +561,7 @@ async function handleMcpRequest(req: NextRequest) {
         });
         return { content: [{ type: "text", text: JSON.stringify(res) }] };
       } catch (error) {
-        return {
-          isError: true,
-          content: [{ type: "text", text: error instanceof Error ? error.message : "TURN_VERIFY_FAILED" }],
-        };
+        return diagnosticFailure(error, { operation: "khora_norm_verify_turn", correlation_id });
       }
     }
   );
@@ -634,10 +579,7 @@ async function handleMcpRequest(req: NextRequest) {
         const res = await releaseNormativeTurn(actor, { turn_token: args.turn_token });
         return { content: [{ type: "text", text: JSON.stringify(res) }] };
       } catch (error) {
-        return {
-          isError: true,
-          content: [{ type: "text", text: error instanceof Error ? error.message : "TURN_RELEASE_FAILED" }],
-        };
+        return diagnosticFailure(error, { operation: "khora_norm_release_turn", correlation_id });
       }
     }
   );
@@ -655,10 +597,5 @@ async function handleMcpRequest(req: NextRequest) {
   return transport.handleRequest(req);
 }
 
-export async function GET(req: NextRequest) {
-  return handleMcpRequest(req);
-}
-
-export async function POST(req: NextRequest) {
-  return handleMcpRequest(req);
-}
+export const GET = withHttpDiagnostics("mcp.GET", handleMcpRequest, registrarEventoServicio);
+export const POST = withHttpDiagnostics("mcp.POST", handleMcpRequest, registrarEventoServicio);

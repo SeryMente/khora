@@ -9,6 +9,9 @@ import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/
 import { ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 import * as contracts from "../../../lib/server/mcp-tool-contract";
 import * as receipt from "../../../lib/server/normative-receipt-schema";
+import * as diagnostics from "../../../lib/server/mcp-diagnostics";
+import * as boundary from "../../../lib/server/mcp-diagnostic-boundary";
+import * as crypto from "node:crypto";
 import * as runtime from "../../../lib/server/normative-runtime";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
@@ -18,7 +21,7 @@ const code = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTa
 // Execute the whole real route and SDK HTTP transport. Only external boundaries
 // (Next response class, identity, storage and business services) are substituted.
 // This is not proof of cryptography, OAuth, database effects or deployment.
-export function routeFixture(options: { scopes?: string[]; revoked?: boolean; denyTurn?: boolean; production?: boolean; configured?: boolean } = {}) {
+export function routeFixture(options: { scopes?: string[]; revoked?: boolean; denyTurn?: boolean; production?: boolean; configured?: boolean; failService?: boolean; healthError?: boolean; partial?: boolean; auditFail?: boolean } = {}) {
   const schemas = new Map<contracts.McpToolName, { description: string; shape: z.ZodRawShape }>();
   const calls: Array<{ name: string; args: unknown }> = [];
   const servers: McpServer[] = [];
@@ -38,9 +41,13 @@ export function routeFixture(options: { scopes?: string[]; revoked?: boolean; de
   const scopes = options.scopes ?? ["volcados:read", "runtime:read", "norm:turn"];
   const business = (name: string) => async (args?: unknown) => {
     calls.push({ name, args });
-    return { fixture: name };
+    if (options.failService) throw new Error("synthetic-secret-private-payload");
+    return options.partial ? { completo: false, resultados: [], cobertura: { examinados: 2, ilegibles: 1 } } : { fixture: name };
   };
   const modules: Record<string, unknown> = {
+    "node:crypto": crypto,
+    "@/lib/server/mcp-diagnostics": diagnostics,
+    "@/lib/server/mcp-diagnostic-boundary": boundary,
     "next/server": { NextRequest: Request, NextResponse: Response },
     "zod": { z },
     "@modelcontextprotocol/sdk/server/mcp.js": { McpServer: RecordingServer },
@@ -50,11 +57,11 @@ export function routeFixture(options: { scopes?: string[]; revoked?: boolean; de
     "@/lib/server/normative-receipt-schema": receipt,
     "@/lib/server/normative-runtime": runtime,
     "@/lib/server/mcp-config": { getMcpConfig: () => options.configured === false ? null : config },
-    "@/lib/server/jwt": { verifyJwt: (token: string) => token === "fixture-access" ? { iss: issuer, aud: config.canonicalUrl, sub: "fixture-actor", gen: 1, scope: scopes.join(" ") } : null },
+    "@/lib/server/jwt": { verifyJwtDetailed: (token: string) => token === "fixture-access" ? { ok: true, payload: { iss: issuer, aud: config.canonicalUrl, sub: "fixture-actor", gen: 1, scope: scopes.join(" ") } } : { ok: false, error: "invalid_format" } },
     "@/lib/server/oauth": { obtenerGeneracionRevocacion: async () => options.revoked ? 2 : 1 },
     "@/lib/server/mcp-db": { isProductionEnv: () => options.production === true },
     "@/lib/server/mcp-manual-token": { MANUAL_MCP_TOKEN_PREFIX: "fixture-manual-", authenticateManualMcpToken: async () => null },
-    "@/lib/server/service-observability": { registrarEventoServicio: async () => {} },
+    "@/lib/server/service-observability": { registrarEventoServicio: async () => { if (options.auditFail) throw Error("synthetic audit failure"); } },
     "@/lib/server/mcp-tools": Object.fromEntries(["Resumen", "ListarVolcados", "LeerVolcado", "BuscarVolcados", "VersionesVolcado"].map(n => ["toolKhora" + n, business(n)])),
     "@/lib/server/mcp-ui-review": { toolKhoraUiReview: business("UiReview") },
     "@/lib/server/mcp-observability": Object.fromEntries(["EstadoVivo", "EventosRecientes", "ObservacionInstantanea", "EventosDesde"].map(n => ["toolKhora" + n, business(n)])),
@@ -65,7 +72,7 @@ export function routeFixture(options: { scopes?: string[]; revoked?: boolean; de
       ...Object.fromEntries(["openNormativeTurn", "applyNormativePrinciple", "verifyNormativeTurn", "releaseNormativeTurn"].map(n => [n, business(n)])),
     },
     "@/lib/server/norm-check": {
-      getCurrentSiSnapshot: async () => ({ version: "fixture", gitCommitSha: "a".repeat(40), gitBlobSha: "b".repeat(40) }),
+      getCurrentSiSnapshot: async () => { if (options.healthError) throw new diagnostics.McpDiagnosticError("NORM_GITHUB_NOT_FOUND_OR_INACCESSIBLE", { upstream_status: 404, authentication: "sent", operation: "SI_MAIN_FETCH" }); return { version: "fixture", gitCommitSha: "a".repeat(40), gitBlobSha: "b".repeat(40) }; },
       getCurrentMethodologySnapshot: async () => ({ version: "fixture" }),
       getCurrentVerifierInfo: () => ({ protocol: receipt.NORM_CHECK_PROTOCOL, protocol_version: receipt.NORM_CHECK_PROTOCOL_VERSION, verifier_version: "fixture" }),
     },

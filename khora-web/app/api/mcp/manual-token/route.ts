@@ -1,3 +1,5 @@
+import { registrarEventoServicio } from "@/lib/server/service-observability";
+import { withHttpDiagnostics } from "@/lib/server/mcp-diagnostic-boundary";
 import { auth } from "@/auth";
 import {
   createManualMcpToken,
@@ -27,7 +29,7 @@ function noStore() {
   };
 }
 
-export async function GET() {
+async function handleGET() {
   const userEmail = await getUserEmail();
   if (!userEmail) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401, headers: noStore() });
@@ -44,7 +46,7 @@ export async function GET() {
   );
 }
 
-export async function POST(req: NextRequest) {
+async function handlePOST(req: NextRequest) {
   if (!sameOrigin(req)) {
     return NextResponse.json({ error: "Origen no autorizado" }, { status: 403, headers: noStore() });
   }
@@ -60,6 +62,8 @@ export async function POST(req: NextRequest) {
   } catch {
     return NextResponse.json({ error: "JSON inválido" }, { status: 400, headers: noStore() });
   }
+
+  if (!body || typeof body !== "object" || Array.isArray(body)) return NextResponse.json({ error: "JSON inválido" }, { status: 400, headers: noStore() });
 
   try {
     const result = await createManualMcpToken({
@@ -88,7 +92,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function DELETE(req: NextRequest) {
+async function handleDELETE(req: NextRequest) {
   if (!sameOrigin(req)) {
     return NextResponse.json({ error: "Origen no autorizado" }, { status: 403, headers: noStore() });
   }
@@ -105,6 +109,8 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: "JSON inválido" }, { status: 400, headers: noStore() });
   }
 
+  if (!body || typeof body !== "object" || Array.isArray(body)) return NextResponse.json({ error: "JSON inválido" }, { status: 400, headers: noStore() });
+
   if (typeof body.id !== "string") {
     return NextResponse.json({ error: "MANUAL_TOKEN_ID_REQUIRED" }, { status: 400, headers: noStore() });
   }
@@ -120,3 +126,9 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: message }, { status: 400, headers: noStore() });
   }
 }
+
+export const GET = withHttpDiagnostics("mcp.manual-token.GET", handleGET, registrarEventoServicio);
+
+export const POST = withHttpDiagnostics("mcp.manual-token.POST", handlePOST, registrarEventoServicio);
+
+export const DELETE = withHttpDiagnostics("mcp.manual-token.DELETE", handleDELETE, registrarEventoServicio);
