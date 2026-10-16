@@ -1,7 +1,9 @@
 // @l0 L0-002-R · @req UI-04/INGRESO-INTEGRADO
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { IngresoIngestaPanel } from "./IngresoIngestaPanel";
 import { ensamblarParrafos, Fragmento } from "../../../lib/transcripcion/ensamblar";
 import { reconciliarSegmentos, type SegmentoReconciliado } from "../../../lib/transcripcion/reconciliar";
 import { IngresoView } from "../shared/IngresoView";
@@ -31,7 +33,17 @@ function generarSesionId() {
 }
 
 export function IngresoWorkspace() {
-  return <IngresoContenido />;
+  return <Suspense fallback={null}><IngresoSeleccionado /></Suspense>;
+}
+
+function IngresoSeleccionado() {
+  const params = useSearchParams();
+  if (!params || params.get("modo") !== "ingesta") return <IngresoContenido />;
+  const volcadoId = params.get("volcado_id");
+  const rawVersion = params.get("version");
+  const version = rawVersion && /^[1-9][0-9]*$/.test(rawVersion) && Number.isSafeInteger(Number(rawVersion))
+    ? Number(rawVersion) : null;
+  return <IngresoIngestaPanel key={params.toString()} volcadoId={volcadoId} version={version} />;
 }
 
 function IngresoContenido() {

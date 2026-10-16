@@ -248,6 +248,7 @@ export default function VolcadosPage({ legacyEditorEntry = false }: { legacyEdit
   const selectVolcadoItem = async (
     id: string,
     requestedVersion: number | null = null,
+    inventory = pipelineItems,
   ) => {
     setSelectedId(id);
     setIngestaResult(null);
@@ -256,7 +257,7 @@ export default function VolcadosPage({ legacyEditorEntry = false }: { legacyEdit
     setSelectedVersionSha256(null);
     setDrawerSubTab("cockpit");
 
-    const item = pipelineItems.find((i) => i.id === id);
+    const item = inventory.find((i) => i.id === id);
     setSelectedItem(item ?? null);
 
     try {
@@ -330,11 +331,11 @@ export default function VolcadosPage({ legacyEditorEntry = false }: { legacyEdit
           );
           return;
         }
-        await selectVolcadoItem(requestedId, requestedVersion);
+        await selectVolcadoItem(requestedId, requestedVersion, items);
         return;
       }
 
-      if (!selectedId) await selectVolcadoItem(items[0].id);
+      if (!selectedId) await selectVolcadoItem(items[0].id, null, items);
     }
     void init();
   }, [fetchPipeline]);
