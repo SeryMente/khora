@@ -2,10 +2,8 @@
 import { after, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { guardarDictado } from "../../../lib/server/dictado";
-import { espejarVolcado } from "../../../lib/server/espejoNotion";
-import { generarMp3Sesion } from "@/lib/server/audio-mp3";
+import { reconciliarCustodia } from "@/lib/server/custodia-trabajos";
 import { reclamarSesion } from "@/lib/server/custodia-schema";
-import { getDb } from "@/lib/server/neon";
 import { generarTituloConGarantia, generarTituloFallback, generarTituloDeUltimoRecurso } from "../../../lib/server/titulos";
 
 export const runtime = "nodejs";
@@ -63,49 +61,12 @@ export async function POST(req: Request) {
       estadoTranscripcion: c?.estadoTranscripcion ?? null,
       fuenteEntrada,
       usuario: session.user.email,
+      tituloAutomatico: !c?.titulo?.trim(),
     });
 
-    // Persist job before responding. Conversion is secondary and must not undo capture.
-    let mp3Estado="no_aplica";
-    if(audioPartes?.length){try{await getDb().query("INSERT INTO dictado_mp3(session_id) VALUES($1) ON CONFLICT DO NOTHING",[sessionId]);mp3Estado="pendiente";}catch{mp3Estado="cola_no_confirmada";}}
-    // 3. Espejar a Notion (secundario, acotado a 8s y try/catch que no frena la respuesta)
-    after(async () => {
-      if(audioPartes?.length)await generarMp3Sesion(sessionId).catch(()=>undefined);
-      if(!c?.titulo?.trim() && texto.trim()) {
-        try {
-          const title=await generarTituloConGarantia(texto);
-          await getDb().query("UPDATE volcado SET titulo=$2 WHERE id=$1 AND titulo=$3",[r.id,title.title,tituloResolver]);
-        }catch{/* Capture remains valid. Explicit title regeneration is retryable. */}
-      }
-      try {
-      const volcado_id = r.id;
-      const version = 1;
-      const sha256 = r.sha256;
-      const caracteres = r.chars;
-
-      const audio = c?.audioUrl || null;
-      const partesAudio = Array.isArray(c?.audioPartes) ? c.audioPartes.length : null;
-      const pulidoAplicado = c?.pulidoAplicado === true;
-      const reconexiones = typeof c?.reconexiones === "number" ? c.reconexiones : null;
-
-        await espejarVolcado({
-          texto,
-          titulo: tituloResolver,
-          volcado_id,
-          version,
-          sha256,
-          fecha: c?.fecha || null,
-          caracteres,
-          audio,
-          partesAudio,
-          pulidoAplicado,
-          reconexiones,
-        });
-      } catch (espejoError) {
-        console.error("Error al espejar en Notion (posterior al archivado):", espejoError);
-      }
-    });
-
+    // Durable intents are already committed with the original. A callback is only an accelerator.
+    after(()=>reconciliarCustodia(session.user!.email!,2).then(()=>undefined).catch(()=>undefined));
+    const mp3Estado=audioPartes?.length?"pendiente":"no_aplica";
     return NextResponse.json({ ...r, titulo: tituloResolver, mp3Estado }, { status: 201 });
   } catch (e) {
     return NextResponse.json(

@@ -69,3 +69,10 @@ export function evaluarCustodiaAudio(
     indicesFaltantes: [],
   };
 }
+
+/** A stopped event alone is not proof that the extension flushed every part. */
+export function verificarCierreCaptura(evento:{status?:unknown;sessionId?:unknown;finalPartCount?:unknown},sessionId:string,partes:{parte:number;verificado?:boolean}[]):boolean {
+ const total=evento.finalPartCount;
+ return evento.status==='stopped'&&evento.sessionId===sessionId&&Number.isSafeInteger(total)&&Number(total)>0
+  &&partes.length===total&&[...partes].sort((a,b)=>a.parte-b.parte).every((p,i)=>p.parte===i+1&&p.verificado===true);
+}

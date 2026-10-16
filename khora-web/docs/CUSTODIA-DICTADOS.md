@@ -48,9 +48,13 @@ No hacer cambios en el Entorno Persistente ni crear otro tablero, almacén princ
 | Revisión visual y sus acciones | `app/sistema/volcados/page.tsx`, `app/components/shared/PipelineView.tsx` |
 | Dominio audio/no-audio | `lib/server/domainAudio.ts` |
 | Generación de títulos | `lib/server/titulos.ts` |
-| Copia secundaria de mejor esfuerzo | `lib/server/espejoNotion.ts` |
+| Espejo secundario reanudable y verificado | `lib/server/espejoNotion.ts` |
+| Cola durable, leases y reconciliación por propietario | `lib/server/custodia-trabajos.ts` |
+| Ejecutar trabajo acotado con sesión autenticada | `app/api/dictado/reconciliar/route.ts` |
+| Trabajador optativo, sin arranque implícito | `scripts/custodia-worker.ts` |
+| Autorización por propietario en recorridos principales | `lib/server/custodia-acceso.ts` |
 | Cifrado y PIN | `lib/server/cripto.ts`, `lib/server/boveda.ts` |
-| Migración aditiva | `db/migrations/030_custodia_continua.sql` |
+| Migraciones aditivas | `db/migrations/030_custodia_continua.sql`, `031_custodia_reconciliacion.sql` |
 
 Todas las rutas anteriores son relativas a `khora-web/`. Leer el código vigente antes de actualizarlo; si diverge de este mapa, corregir el documento en el mismo cambio.
 
@@ -72,7 +76,9 @@ Las escrituras solo se consideran locales confirmadas al completar la transacci�
 - `volcado`: proyección textual vigente y referencia a la captura.
 - `volcado_version`: historia textual versionada.
 - `correccion`: deltas exactos; nuevas escrituras de este flujo se cifran.
-- `dictado_mp3`: estado durable del derivado, huella original, huella/tamaño del MP3, ubicación cifrada, intentos, arrendamiento y error.
+- `dictado_mp3`: puntero del derivado vigente, huella original y del manifiesto, número de partes de origen, indicador de captura completa, huella/tamaño MP3, ubicación cifrada, intentos, arrendamiento, próxima ejecución y error saneado.
+- `dictado_mp3_historial`: derivado inmutable por sesión/manifiesto; conserva revisiones anteriores para descargas paginadas fijadas por huella.
+- `dictado_custodia_trabajo`: intención durable de título/espejo, identidad compuesta, propietario, payload cifrado, estado, intentos, lease con UUID, próxima ejecución y resultado cifrado.
 
 La migración es aditiva. Los mecanismos de compatibilidad de esquema no autorizan a un agente a ejecutar una migración productiva sin verificar el destino. La credencial de lectura del MCP no ejecuta migraciones.
 
@@ -103,7 +109,7 @@ El evaluador de manifiesto rechaza vacío, duplicados, índices extra/fuera de r
 
 Los errores de reconocimiento suspenden el reconocedor, nunca apagan la grabadora para liberar el micrófono. Si el reconocimiento en vivo no está disponible, la captura conserva audio para una transcripción posterior. Probar físicamente permisos y colisiones entre servicios del navegador.
 
-El modo Chrome/Aisthesis tiene su propio capturador de extensión. **No atribuirle automáticamente las garantías del grabador de micrófono.** La cola y confirmación final de esa extensión requieren verificación independiente; consultar la matriz de pendientes antes de certificar ese modo.
+El modo Chrome/Aisthesis tiene su propio capturador de extensión. **No atribuirle automáticamente las garantías del grabador de micrófono.** Un evento `stopped` sin `sessionId` y `finalPartCount` coincidentes con partes verificadas se rechaza para sellar. La extensión heredada no satisface todavía este contrato y debe actualizarse antes de volver a certificar archivo en ese modo. La cola y confirmación final de esa extensión requieren verificación independiente; consultar la matriz de pendientes antes de certificar ese modo.
 
 ## 7. Archivar y recuperación
 
@@ -119,7 +125,7 @@ Recuperación: autenticar identidad → leer último snapshot local y remoto →
 
 No hay texto a voz. La entrada del conversor son exclusivamente bytes de originales verificados.
 
-Al cerrar una captura con audio se registra trabajo durable y se intenta procesarlo después de persistir la captura. `ffmpeg-static` integra el codec existente FFmpeg; no se añade un proveedor de audio externo. El binario debe corresponder a la plataforma de despliegue y quedar incluido por `next.config.ts`. Preservar sus avisos/licencias y comprobar el tamaño final del paquete de la función.
+La reconciliación descubre sesiones propias con originales verificados, incluso históricas y abiertas, que no tienen trabajo MP3 o cuyo manifiesto cambió. Mientras la captura sigue abierta genera una copia **hasta N partes**, marcada `captura_completa=false`; nunca la denomina grabación completa. Al sellar vuelve a generar el derivado completo, aunque no haya aumentado N. El cierre también acelera el trabajo durable. No se exige pulsar Archivar para que una captura abierta pueda tener MP3. La cola necesita un ejecutor activo (§20): no confundir persistencia del trabajo con ejecución independiente del navegador. `ffmpeg-static` integra el codec existente FFmpeg; no se añade un proveedor de audio externo. El binario debe corresponder a la plataforma de despliegue y quedar incluido por `next.config.ts`. Preservar sus avisos/licencias y comprobar el tamaño final del paquete de la función.
 
 Estados: pendiente → procesando con arrendamiento → disponible, o fallido con causa. Un proceso vencido puede reintentarse; una marca pendiente no significa disponible.
 
@@ -133,13 +139,13 @@ Los temporales claros se crean en carpeta única y se eliminan al terminar, tamb
 
 ## 9. Acceso manual y MCP
 
-Manual: la vista de Volcados solicita el MP3 persistido. Si falta, puede solicitar una generación/reintento; no descarga HTML/JSON como si fuera audio. `GET /api/audio/:id/mp3` exige sesión, propietario y bóveda abierta; verifica bytes antes de devolverlos con `audio/mpeg`, `no-store` y huella. `POST` solicita generación, no certifica su terminación.
+Manual: Ingreso permite descargar el corte MP3 conservado de la sesión con audio; Volcados solicita el MP3 del archivo cerrado. La ruta acepta identidad de volcado, folio o sesión y verifica dueño antes de leer. El navegador comprueba también la huella antes de ofrecer la descarga. Las cabeceras `X-Captura-Completa` y `X-Audio-Hasta-Parte` distinguen corte de captura completa. Si falta, puede solicitar una generación/reintento; no descarga HTML/JSON como si fuera audio. `GET /api/audio/:id/mp3` exige sesión, propietario y bóveda abierta; verifica bytes antes de devolverlos con `audio/mpeg`, `no-store` y huella. `POST` solicita generación, no certifica su terminación.
 
 El original sigue accesible por sus rutas de partes y por el exportador de originales importados. No presentar una recodificación como original.
 
 MCP: `khora_listar_audios` y `khora_leer_audio`. Reutilizan autenticación Bearer, revocación, `volcados:read` y compuerta normativa. Filtran por propietario comprobable. No emiten enlaces públicos ni introducen una credencial nueva.
 
-Lectura: seleccionar original/parte o MP3; obtener bloques Base64 de hasta 262144 bytes; continuar con `siguiente_offset` hasta null; reconstruir y verificar la huella total declarada. La verificación se realiza sobre el objeto completo antes de servir un bloque. El original multipartes se recupera en orden de índice; conservar el manifiesto. Para escucha directa, preferir el MP3 completo. Base64 no es un resumen, una transcripción ni síntesis.
+Lectura: seleccionar original/parte o MP3; obtener bloques Base64 de hasta 262144 bytes; continuar con `siguiente_offset` hasta null; reconstruir y verificar la huella total declarada. Para MP3, conservar la huella inicial y enviar `sha256_esperado` en los bloques siguientes; el servidor lee esa revisión del historial, no el puntero que pudo cambiar durante la grabación. Una continuación sin huella se rechaza. Una huella ya emitida no debe cambiar de bytes. La verificación se realiza sobre el objeto completo antes de servir un bloque. El original multipartes se recupera en orden de índice; conservar el manifiesto. Para escucha directa, preferir el MP3 completo. Base64 no es un resumen, una transcripción ni síntesis.
 
 Las herramientas usan la base de lectura y no generan MP3, migran datos ni cambian estados. Que aparezca una herramienta en la rama no significa que el conector instalado ya la exponga: comprobar descubrimiento después del despliegue.
 
@@ -147,7 +153,7 @@ Las herramientas usan la base de lectura y no generan MP3, migran datos ni cambi
 
 La captura obtiene primero título provisional determinista; nunca espera a IA para conservarse. Después del cierre, si el operador no proporcionó título, se intenta el generador IA existente. La actualización usa comparación con el título provisional para no pisar un título cambiado entre tanto.
 
-Si la IA no está configurada o falla, el fallback no se presenta como título generado por IA. La regeneración explícita existente sigue siendo una vía de reintento. **Falta certificar y completar una cola durable de reintento automático de títulos**; el callback posrespuesta por sí solo no demuestra ejecución eventual.
+Si la IA no está configurada o falla, el fallback no se presenta como título generado por IA. La regeneración explícita existente sigue siendo una vía de reintento. La intención se inserta en la misma transacción que la captura en `dictado_custodia_trabajo`; no depende del callback. El trabajador exige resultado de nivel `ia`; un fallback conserva pendiente el reintento con backoff. La aplicación al volcado compara título provisional y propietario, por lo que no pisa una elección manual. Activar y certificar el ejecutor independiente sigue siendo una compuerta operativa; el callback posrespuesta solo acelera.
 
 No derivar títulos inventando hechos ausentes. Para audio sin texto, preservar identidad provisional y titular cuando exista contenido verificable suficiente.
 
@@ -163,7 +169,7 @@ La vista conecta hallazgos, incidentes y aprobación; el texto accesible usa la 
 
 ## 12. Espejo, respaldo y retención
 
-El espejo Notion sigue siendo secundario y de mejor esfuerzo. No es un respaldo íntegro del audio. Su deduplicación, cola durable, lectura posterior, límites de bloques y restauración NO se consideran resueltos por esta implementación.
+El espejo Notion sigue siendo secundario: **no es respaldo íntegro del audio**. Su intención se registra durablemente en la transacción de archivo. Antes de crear busca identidad exacta de volcado/versión/huella; una identidad ambigua se bloquea, no se duplica. Divide texto sin recortar espacios, saltos ni pares Unicode, en bloques de hasta 1900 unidades UTF-16, envía lotes de hasta 100 y pagina lecturas. Ante una respuesta de creación o anexado perdida, relee el prefijo ya persistido y continúa desde él. Rechaza contenido ajeno o prefijos divergentes sin borrarlos. Solo marca éxito tras releer todo y verificar la huella UTF-8. Hay timeout de 8 s por petición, separación de 350 ms y presupuesto de 100 llamadas o 240 s por intento; textos que excedan de forma sistemática ese presupuesto necesitan un cursor durable adicional, no una promesa de tamaño ilimitado. La prueba de transporte usa almacenamiento Notion sintético, no una base personal real. La restauración productiva sigue pendiente.
 
 Retención: no hay borrado automático nuevo de originales, checkpoints remotos o versiones. No añadirlo sin decisión explícita del operador. La cola local de partes puede retirarse solo tras confirmación remota; un snapshot local se retira tras comprobar cierre remoto. No usar limpieza del navegador como procedimiento de respaldo.
 
@@ -173,7 +179,7 @@ Para certificar preservación se debe restaurar base, objetos y claves en otro e
 
 AES-GCM del servidor no es E2E; servicios autorizados pueden recibir texto claro para IA o espejo. El PIN es una compuerta de acceso, no la llave criptográfica del original. Mantener las llaves fuera de Git.
 
-Las rutas nuevas de checkpoint/MP3 y herramientas de audio verifican propietario. Esto **no certifica aislamiento multiusuario de todas las rutas heredadas** del inventario, texto, partes, hallazgos o incidentes. La auditoría de autorizaciones del conjunto sigue pendiente. Los históricos sin dueño verificable se reportan, no se reclaman automáticamente desde herramientas de lectura.
+Las rutas nuevas de checkpoint/MP3 y herramientas de audio verifican propietario. También se añadieron verificaciones a audio original/manifiesto/parte/exportación, lectura de volcado/versiones, edición, revisión, título y detalle de pipeline; el listado principal filtra por propietario antes de descifrar. Esto **no certifica aislamiento multiusuario de toda la aplicación**: revisar especialmente herramientas MCP textuales heredadas, léxico y otras rutas de hallazgos/incidentes no cubiertas por esas guardas. La auditoría de autorizaciones del conjunto sigue pendiente. Los históricos sin dueño verificable se reportan, no se reclaman automáticamente desde herramientas de lectura.
 
 La integridad con SHA-256 demuestra identidad de bytes, no calidad del reconocimiento, integridad semántica ni que el micrófono capturó toda la situación física. Separar tiempo de captura, reconocimiento, recepción y edición. No inventar fechas del hecho a partir de la fecha de archivo.
 
@@ -206,7 +212,7 @@ Antes de declarar cumplido, ejecutar con identidad y almacenes de prueba:
 
 ## 15. Registro de brechas y siguiente trabajo
 
-La rama no se considera cierre universal mientras permanezcan:
+Inventario histórico del primer corte (conservado para trazabilidad). El estado vigente fila por fila está en §21; no interpretar como pendientes intactos los puntos implementados después. La rama no se considera cierre universal mientras sus compuertas materiales permanezcan abiertas:
 
 1. Certificación con PostgreSQL/Blob/navegador y commit productivo identificado.
 2. Cola automática durable de títulos y ejecución eventual verificable.
@@ -271,7 +277,7 @@ La propuesta de cambios es [#301](https://github.com/SeryMente/khora/pull/301), 
 
 La automatización remota NO está aprobada. La anotación de [GitHub Actions](https://github.com/SeryMente/khora/actions/runs/38973252329/job/117216441570) indica literalmente: "The job was not started because recent account payments have failed or your spending limit needs to be increased." Los estados automáticos de Vercel remiten a la restricción del plan Hobby para el repositorio privado de organización. Distinguir trabajos no iniciados, pruebas fallidas y verificaciones locales; no presentar ninguno como aprobación de los demás ni omitir compuertas.
 
-No hay certificación productiva ni cierre universal. Siguen vigentes las once brechas de la sección 15, incluyendo el MP3 de capturas nunca selladas, reintento durable de títulos y restauración. Ninguna prueba local autoriza borrar esas filas.
+Este párrafo describe el corte anterior: no había certificación productiva ni cierre universal. El ciclo de finalización posterior implementa varias brechas sin borrar su historia; consultar §20–§22 para el estado vigente. Ninguna prueba aislada se extrapola a producción.
 
 ## 18. Recorrido operativo desde la interfaz
 
@@ -299,10 +305,90 @@ No hay certificación productiva ni cierre universal. Siguen vigentes las once b
 - **Sin copia local ni remota confirmada**: mantener la página; el estado es un riesgo real, no «guardado». No cerrar ni iniciar otra captura pretendiendo seguridad.
 - **Parte pendiente**: reusar sesión/índice/bytes; no incrementar el índice para el mismo reintento ni borrar el original local.
 - **Respuesta de cierre perdida**: consultar la sesión; si está sellada, recuperar su identificador, no reconstruir otro archivo con otra sesión.
-- **MP3 fallido**: conservar y recuperar partes originales; solicitar reintento manual. No declarar conversión eventual garantizada mientras no exista reconciliación automática certificada.
-- **Título fallido**: conservar el título provisional y todo el contenido. Regeneración explícita disponible; cola automática pendiente.
+- **MP3 fallido**: conservar y recuperar partes originales; hay reconciliación con espera durable y reintento manual. Si supera 128 MiB o el timeout, necesita ejecución larga aprobada; repetir el mismo trabajo no elimina ese límite. Sin ejecutor activo no prometer eventualidad temporal.
+- **Título fallido**: conservar provisional y contenido; la cola automática reintenta sin aceptar fallback como IA. Hay regeneración explícita. Sin proveedor/ejecutor configurado no declarar título IA obtenido.
 - **Integridad rota**: no abrir los bytes como si fueran verificados, no reemplazar silenciosamente la huella almacenada. Investigar desde la evidencia original.
 - **Datos históricos**: inventariar propiedad, disponibilidad y partes antes de cualquier backfill. No borrar, adjudicar, sobrescribir ni declarar migrados datos no comprobados.
 - **Conflicto concurrente**: conservar ambas evidencias y exigir selección explícita; no usar el reloj de una pestaña como prueba de supremacía semántica.
 
 Para rollback, revertir código en una rama revisada; no deshacer migraciones aditivas eliminando tablas con capturas. Mantener las versiones compatibles de lectura y las claves hasta comprobar restauración. Este documento complementa `PREPARACION-VOLCADOS.md` y el contrato MCP vigente; no sustituye sus compuertas.
+
+
+## 20. Contrato operativo de reconciliación continua
+
+### Intención durable y ejecución
+
+`guardarDictadoConSesion` encola dentro del mismo `BEGIN`/`COMMIT` que conserva el archivo: título si no lo dio una persona y hay texto, y espejo secundario. Clave: tipo + volcado + versión + SHA-256. Repetir idéntica clave no duplica; un rollback no deja un trabajo huérfano. El payload y el resultado se cifran con la clave de custodia existente. No se añade un proveedor ni almacén principal distinto.
+
+Selección: trabajo del propietario, no completo, vencimiento de backoff cumplido y sin lease vigente; bloqueo `FOR UPDATE SKIP LOCKED` y asignación atómica de lease UUID de 10 minutos. Las actualizaciones finales exigen ese UUID. Estados: pendiente → procesando → completo, o fallido reintentable. Espera: 30 s, 60 s, 120 s… hasta 6 h. El generador MP3 usa igualmente UUID de lease, no compara un timestamp redondeado por el cliente. Un error guarda un código acotado, nunca el mensaje sensible del proveedor. Fallar título/espejo no revierte el original.
+
+La reconciliación intenta una sesión de audio y hasta dos trabajos secundarios por invocación normal (tope programático cinco). No registra dueño en históricos sin evidencia. Un fallo de audio no borra texto ni impide reintentos secundarios. El historial MP3 conserva copias anteriores; el puntero actual no es una identidad inmutable de descarga.
+
+### Disparadores y límites de operación
+
+- Navegador: al preparar dueño, cada 30 s y al recuperar conexión. Solicita trabajo a `POST /api/dictado/reconciliar`, autenticado, acotado a ese usuario. Respuesta 202 = solicitado, no terminado.
+- Archivo: `after()` acelera trabajo ya persistido; no es la fuente de durabilidad.
+- Ejecutable optativo: `scripts/custodia-worker.ts`, con el entorno de servicio existente. Sin argumentos informa estado **solo de lectura** y presupone migraciones aplicadas. `--execute --once` realiza una pasada acotada; `--execute` mantiene ciclos de 30 s. Detiene en SIGINT/SIGTERM. No se instala ni arranca por build o npm install.
+
+No se ha activado un proceso productivo, cron o servicio en este cambio. Si el navegador está cerrado y no hay trabajador activo, el trabajo permanece durable pero no avanza. Para activar fuera del navegador, el responsable debe aprobar el entorno de ejecución, comprobar identidad/base/Blob y presupuesto, aplicar migraciones aditivas, instalar la supervisión y verificar una captura sintética completa. No improvisar credenciales ni llamar «automático permanente» al mero archivo del script.
+
+### Acceso durante una captura abierta
+
+El MP3 puede representar un prefijo verificado. Listado, lectura y cabeceras deben informar número de partes e indicador de cierre. Una descarga paginada MCP conserva SHA-256 esperado para no mezclar cortes. El acceso a originales sigue disponible aunque no haya codec, título, transcripción, espejo o MP3. No existe aún una pantalla general certificada de todas las sesiones abiertas históricas: la recuperación actual abre la última, y MCP inventaría sesiones propias; no confundirlo con un catálogo manual universal terminado.
+
+## 21. Matriz vigente de cierre y compuertas
+
+| Fila original de §15 | Cambio de este ciclo | Qué falta para certificación universal |
+| --- | --- | --- |
+| 1 · Integración y producción | Suite ampliada y ensayos aislados separados por frontera | PostgreSQL/Blob/Notion reales, identidad de commit desplegado y recuperación extremo a extremo |
+| 2 · Títulos durables | Cola transaccional, reintentos y protección de título humano | Proveedor real y ejecutor supervisado activo |
+| 3 · MP3/histórico | Descubrimiento de sesiones verificadas sin trabajo, backoff e historial inmutable | Certificar catálogo real, excluir dueños indeterminados y activar ejecutor |
+| 4 · Capturas largas | Se conservan originales; error explícito y límite documentado | Proceso largo/streaming medido para >128 MiB y límites del proveedor |
+| 5 · Chrome/Aisthesis | Compuerta exige cierre con sesión, cuenta final y todas las partes verificadas | Persistencia propia de extensión, manifiesto final con cuenta exacta y ACK estricto; la extensión actual no emite el manifiesto final: el cierre queda bloqueado explícitamente, no se finge compatibilidad |
+| 6 · Autorización heredada | Guardas de propietario en principales rutas de custodia y pipeline | Barrido completo de herramientas textuales y demás endpoints heredados |
+| 7 · Espejo | Cola durable, identidad exacta, texto sin pérdida, paginación y relectura | Integración Notion real, presupuesto para textos extraordinarios y garantía operativa del ejecutor |
+| 8 · Respaldo | Ensayo aislado de restauración de datos cifrados y necesidad de clave | Restaurar base, Blob y claves de un entorno real independiente; definir retención y supervisión |
+| 9 · Fallos del navegador | IndexedDB real, carreras de clave y pruebas de recarga/red sintéticas | Cuota agotada, perfil privado, cierre forzado y conflictos semánticos entre pestañas soportadas |
+| 10 · Revisión humana | Catálogo/contratos estáticos y prueba de interacción automatizada | Operador presente: interfaz, seguridad y decisión de liberación |
+| 11 · No pulsar Archivar | Reconciliador genera MP3 de prefijos abiertos y reconstruye completo al sellar | Ejecutor activo, verificación física continua y catálogo manual de todas las sesiones abiertas |
+
+**Dictamen:** implementación ampliada y documentada en rama; no certificación productiva ni preservación universal demostrada. No cerrar estas compuertas por inferencia ni por una compilación. No fusionar/desplegar automáticamente antes de revisión humana y revisión de main vigente. GitHub Actions puede no iniciar por facturación y Vercel puede rechazar el despliegue por plan; esos bloqueos no son pruebas aprobadas ni fallos funcionales del código.
+
+## 22. Evidencia reproducible del ciclo de finalización
+
+Además de la suite, se incluyen:
+
+- `tests/unit/custodia_reconciliacion.test.ts`: payload cifrado, idempotencia de claves, título humano, backoff, ausencia de lease, código de error saneado, manifiesto abierto/cerrado, Unicode exacto y espejo largo cuya respuesta de anexado se pierde después de persistir.
+- `tests/integration/custodia-postgres.ts`: motor PostgreSQL real embebido (PGlite/WASM) en almacenamiento aislado, sin Neon ni TCP. Aplica las migraciones dos veces, ejecuta el endpoint real de checkpoints con autenticación sintética, verifica idempotencia/conflictos, rechazo de dueño ajeno, orden de revisiones, sello, rollback y cola. Prueba dump/restore de datos cifrados y fallo al usar clave distinta. Una conexión embebida **no prueba carreras entre conexiones ni recuperación productiva de Blob**. La dependencia de validación se instala fuera del repositorio y `PGLITE_MODULE` indica su entrada; no modifica dependencias de producción.
+- `tests/browser/custodia-workspace.mjs`: monta la pantalla real `/sistema/ingreso` en Next local con Chromium e IndexedDB reales y APIs sintéticas. No autoriza hosts públicos. Prueba escritura sin Archivar, recarga, caída simulada de red, copia local no visible en claro y sincronización posterior. No prueba audio físico ni autorización del servidor real.
+
+Los resultados finales se registran debajo después de ejecutar; una prueba añadida no cuenta como aprobada por existir. Revalidar tipos, suite, navegador, navegación, catálogo y build sobre el árbol exacto que se publique. Mantener fuera del índice los logs crudos, dumps, capturas de datos y secretos. El documento y `AGENTS.md` constituyen la ruta de descubrimiento para la siguiente IA; no crear un canon competidor.
+
+
+### Resultados del árbol de finalización (2026-10-16)
+
+- TypeScript: salida 0.
+- Suite principal: **463 correctas, 0 fallos, 0 omitidas**. Los antiguos fixtures del espejo que usaban huellas inventadas y esperaban un POST sin relectura se sustituyeron por aserciones de exactitud y por pruebas de transporte/reanudación registradas en la suite principal; no se aceptan hashes falsos para conservar compatibilidad de pruebas.
+- PostgreSQL/PGlite: **11 comprobaciones correctas**, incluidas sentencias exactas de adquisición/confirmación del lease MP3; un UUID obsoleto no actualiza el trabajo.
+- Pantalla IngresoWorkspace real con APIs sintéticas: **6 comprobaciones correctas**, sin errores JavaScript no manejados.
+- IndexedDB/codec/navegador: **8 comprobaciones correctas**, dos grabaciones sintéticas, ocho fragmentos y MP3 decodificado de 6.096979 s.
+- Contrato de navegación y catálogo visual: salida 0 en ambos. No equivale a revisión presencial.
+
+Build directo `next build --webpack`: salida 0 con AUTH_SECRET efímero aleatorio, sin bypass de autenticación. Los preflights de experiencia y extensión se ejecutan separadamente antes del commit. Publicación y commit exacto constan en el acta de la propuesta; no inferir éxito por la existencia de una rama. La evidencia tiene alcance aislado: ni estas pruebas ni el build acceden a dictados reales, certifican un micrófono físico, activan el trabajador o prueban el conector desplegado.
+
+## 23. Incidencias y memoria de prevención de este ciclo
+
+El registro canónico de errores de Notion no pudo actualizarse porque su ancestro está en la papelera. No se restauró sin permiso. Se conserva aquí el aprendizaje operativo requerido antes de otra cirugía:
+
+| Operación y síntoma | Causa e impacto | Corrección y prevención |
+| --- | --- | --- |
+| Lecturas: `No such file or directory`/ruta inexistente para checkpoints y página de sistema | Copia local parcial y rutas inferidas; solo falló la lectura | Enumerar rutas primero. Reales: `app/api/dictado/checkpoint/route.ts` y `app/sistema/ingreso/page.tsx` |
+| Parche: `AssertionError` en ancla de revisión | Dos manejadores tenían la misma ancla; cambios locales previos sin transferir | Reanudar por manejador, sin duplicar guardas; verificar hash antes de copiar y ejecutar tipos/suite |
+| Ejecutor SQL: `Top-level await ... cjs` | Prueba TS en paquete CommonJS; ensayo no inició | Encapsular en main asíncrona y respetar formato del repositorio |
+| Captura de error de Node interrumpida por PowerShell | Política Stop trató stderr como excepción | spawnSync con salida/código explícitos y log acotado, sin simular éxito del proceso hijo |
+| PGlite: `cannot insert multiple commands into a prepared statement` | Adaptador usó protocolo preparado para DDL multisentencia | exec solo para DDL sin parámetros; query parametrizado para datos. Se ejecutan migraciones reales dos veces |
+| Montaje: `Cannot read properties of undefined (reading 'filter')` | Fixture genérico incumplía contrato de mediciones, no fallo de persistencia | Fixture específico con records/perfil; conservar aserciones de recuperación y volver a ejecutar |
+| Directiva cliente precedida por import durante parche | Inserción antes del prólogo válido | Colocar use client primero; verificar montaje y build después |
+| Lease MP3 identificado por TIMESTAMPTZ | Date puede truncar microsegundos; confirmación podía no coincidir | UUID persistido y guardas SQL en éxito/error, con prueba de lease vigente y obsoleto |
+
+Nada de este apartado registra secretos, audio ni texto personal. No eliminar evidencia ni relajar aserciones para borrar un fallo del informe.

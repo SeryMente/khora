@@ -57,29 +57,48 @@ export async function convertirAudioMp3(source:Buffer|Buffer[]):Promise<{bytes:B
     const bytes=await readFile(output);if(!bytes.length)throw new Error("mp3_vacio");return {bytes,duracionSeg:decoded};
   }finally{await rm(dir,{recursive:true,force:true});}
 }
+/** Fingerprint pins a verified prefix; an open prefix is NEVER labelled a complete recording. */
+export function firmaManifiestoAudio(sessionId:string, parts:{part_index:number;bytes:number;sha256:string}[], completo:boolean):string {
+  return hashAudio(Buffer.from(JSON.stringify({sessionId,completo,partes:parts.map(p=>({indice:Number(p.part_index),bytes:Number(p.bytes),sha256:p.sha256.toLowerCase()}))})));
+}
 export async function generarMp3Sesion(sessionId:string){
   await asegurarCustodiaContinua();const db=getDb();
-  // Durable job and bounded lease: retries never overwrite a ready derivative.
+  const session=await db.query("SELECT estado,total_partes FROM dictado_session WHERE session_id=$1",[sessionId]);
+  if(!session.rows.length)throw new Error("sesion_inexistente");
+  const r=await db.query("SELECT part_index,blob_url,bytes,sha256,estado_verificacion FROM dictado_audio_parte WHERE session_id=$1 ORDER BY part_index",[sessionId]);
+  const complete=session.rows[0].estado==="complete";
+  const expected=complete?Number(session.rows[0].total_partes):r.rows.length;
+  const custody=evaluarCustodiaAudio(r.rows,expected);if(!custody.ok)throw new Error(custody.motivo);
+  const manifest=firmaManifiestoAudio(sessionId,r.rows,complete);
   await db.query("INSERT INTO dictado_mp3(session_id) VALUES($1) ON CONFLICT DO NOTHING",[sessionId]);
-  const lease=await db.query("UPDATE dictado_mp3 SET estado='procesando',intentos=intentos+1,lease_until=now()+interval '5 minutes',actualizado_en=now() WHERE session_id=$1 AND estado<>'disponible' AND (lease_until IS NULL OR lease_until<now()) RETURNING actualizado_en",[sessionId]);
+  const leaseId=randomUUID();
+  const lease=await db.query(`UPDATE dictado_mp3 SET lease_id=$3,estado='procesando',intentos=intentos+1,
+    lease_until=now()+interval '10 minutes',actualizado_en=now()
+    WHERE session_id=$1 AND (estado<>'disponible' OR source_manifest IS DISTINCT FROM $2)
+      AND siguiente_intento<=now() AND (lease_until IS NULL OR lease_until<now()) RETURNING lease_id,intentos`,[sessionId,manifest,leaseId]);
   if(!lease.rows.length)return;
-  const stamp=lease.rows[0].actualizado_en;
+  const stamp=leaseId;
   try {
-    const s=await db.query("SELECT estado,total_partes FROM dictado_session WHERE session_id=$1",[sessionId]);
-    if(s.rows[0]?.estado!=="complete")throw new Error("sesion_no_sellada");
-    const r=await db.query("SELECT part_index,blob_url,bytes,sha256,estado_verificacion FROM dictado_audio_parte WHERE session_id=$1 ORDER BY part_index",[sessionId]);
-    const ok=evaluarCustodiaAudio(r.rows,Number(s.rows[0].total_partes));if(!ok.ok)throw new Error(ok.motivo);
     if(r.rows.reduce((a,p)=>a+Number(p.bytes),0)>MAX_AUDIO_BYTES)throw new Error("mp3_limite_128MiB_requiere_proceso_largo");
     const parts:Buffer[]=[];for(const p of r.rows)parts.push(await leerBlobVerificado(p.blob_url,Number(p.bytes),p.sha256));
-    const original=Buffer.concat(parts);const sourceSha=hashAudio(original);
-    const converted=await convertirAudioMp3(agruparPartesAudio(parts));const mp3=converted.bytes,decoded=converted.duracionSeg,sha=hashAudio(mp3);
+    const sourceSha=hashAudio(Buffer.concat(parts));
+    const converted=await convertirAudioMp3(agruparPartesAudio(parts));const mp3=converted.bytes,sha=hashAudio(mp3);
     const blob=await put(`dictado/${sessionId}/acceso-${randomUUID()}.mp3.khc`,cifrarBytes(mp3),{access:"public",contentType:"application/octet-stream",addRandomSuffix:true});
     await leerBlobVerificado(blob.url,mp3.length,sha);
-    await db.query("UPDATE dictado_mp3 SET estado='disponible',source_sha256=$2,blob_url=$3,sha256=$4,bytes=$5,duracion_seg=$6,ultimo_error=NULL,lease_until=NULL,actualizado_en=now() WHERE session_id=$1 AND actualizado_en=$7",[sessionId,sourceSha,blob.url,sha,mp3.length,decoded,stamp]);
+    // Retain older derivatives: pagination/recovery must never mix two MP3 revisions.
+    await db.query(`INSERT INTO dictado_mp3_historial(id,session_id,source_manifest,source_parts,captura_completa,blob_url,sha256,bytes,duracion_seg)
+      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9) ON CONFLICT(session_id,source_manifest) DO NOTHING`,
+      [randomUUID(),sessionId,manifest,r.rows.length,complete,blob.url,sha,mp3.length,converted.duracionSeg]);
+    await db.query(`UPDATE dictado_mp3 SET estado='disponible',source_sha256=$2,blob_url=$3,sha256=$4,bytes=$5,
+      duracion_seg=$6,ultimo_error=NULL,lease_until=NULL,actualizado_en=now(),source_manifest=$8,source_parts=$9,
+      captura_completa=$10,siguiente_intento=now() WHERE session_id=$1 AND lease_id=$7`,
+      [sessionId,sourceSha,blob.url,sha,mp3.length,converted.duracionSeg,stamp,manifest,r.rows.length,complete]);
   } catch(e) {
-    // Errors contain no signed URLs or plaintext. Source bytes remain untouched.
-    const code=String((e as Error)?.message||"mp3_fallido").split("\n")[0].slice(0,180);
-    await db.query("UPDATE dictado_mp3 SET estado='fallido',ultimo_error=$2,lease_until=NULL,actualizado_en=now() WHERE session_id=$1 AND actualizado_en=$3",[sessionId,code,stamp]);
+    const message=String((e as Error)?.message||"mp3_fallido");
+    const code=message.startsWith('mp3_limite_128MiB')?'mp3_limite_128MiB_requiere_proceso_largo':message.startsWith('mp3_conversion_timeout')?'mp3_conversion_timeout':'mp3_verificacion_o_conversion_fallida';
+    const wait=Math.min(21600,30*2**Math.min(10,Math.max(0,Number(lease.rows[0].intentos)-1)));
+    await db.query(`UPDATE dictado_mp3 SET estado='fallido',ultimo_error=$2,lease_until=NULL,actualizado_en=now(),
+      siguiente_intento=now()+($4::int*interval '1 second') WHERE session_id=$1 AND lease_id=$3`,[sessionId,code,stamp,wait]);
     throw e;
   }
 }

@@ -1,3 +1,5 @@
+import { poseeVolcado } from "@/lib/server/custodia-acceso";
+import { auth } from "@/auth";
 // @l0 L0-002-R · @req REVISION-COCKPIT/REQ-1
 import { NextRequest, NextResponse } from "next/server";
 import { createHash } from "crypto";
@@ -22,6 +24,9 @@ export async function GET(
     }
 
     const { id, index } = await ctx.params;
+    const custodio=(await auth())?.user?.email;
+    if(!custodio)return NextResponse.json({error:"no_autenticado"},{status:401});
+    if(!await poseeVolcado(custodio,id))return NextResponse.json({error:"no_encontrado"},{status:404});
     const partIndex = parseInt(index, 10);
     if (isNaN(partIndex) || partIndex < 0) {
       return NextResponse.json(

@@ -1,5 +1,7 @@
-// @l0 L0-002-R · @req UI-04/INGRESO-INTEGRADO
 "use client";
+import { verificarCierreCaptura } from "@/lib/audio/custodia";
+// @l0 L0-002-R · @req UI-04/INGRESO-INTEGRADO
+
 
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { guardarSnapshotLocal, guardarAudioLocal, recuperarLocal, confirmarAudioLocal, cerrarSnapshotLocal } from "@/lib/client/custodia-local";
@@ -128,6 +130,7 @@ function IngresoContenido() {
   const finalizacionAudioRef = useRef<Promise<void> | null>(null);
   const resolverFinalizacionAudioRef = useRef<(() => void) | null>(null);
   const chromeStopResolverRef = useRef<(() => void) | null>(null);
+  const chromeCierreConfirmadoRef = useRef(false);
   const runtimeIdRef = useRef<string>("");
   const runtimeSnapshotRef = useRef<Record<string, unknown>>({});
   const checkpointEnCursoRef = useRef<Promise<void> | null>(null);
@@ -402,6 +405,15 @@ function IngresoContenido() {
     return ()=>{clearInterval(tick);window.removeEventListener("online",sync);document.removeEventListener("visibilitychange",hide);window.removeEventListener("pagehide",sync);};
   },[custodiaOwner,guardarCheckpoint]);
 
+  useEffect(()=>{
+    if(!custodiaOwner)return;
+    let running=false;
+    const tick=async()=>{if(running||!navigator.onLine)return;running=true;try{await fetch("/api/dictado/reconciliar",{method:"POST",signal:AbortSignal.timeout(10000)});}catch{}finally{running=false;}};
+    void tick();const timer=setInterval(()=>void tick(),30000);
+    window.addEventListener("online",tick);
+    return()=>{clearInterval(timer);window.removeEventListener("online",tick);};
+  },[custodiaOwner]);
+
   const ejecutarTranscripcionAutoritativa = useCallback(async () => {
     const transcriptionStartedAt = Date.now();
     observarDictado("TRANSCRIPCION_AUTORITATIVA_INICIADA", { outcome: "PENDING", metrics: { part_count: partesSubidasRef.current.length, segment_count: segmentosRef.current.length } });
@@ -538,6 +550,8 @@ function IngresoContenido() {
           void (async () => {
             if (parteTrozosRef.current.length > 0) await subirParteActual();
             observarDictado(data.status === "error" ? "CAPTURA_CHROME_PARO_FALLIDO" : "CAPTURA_CHROME_DETENIDA", { severity: data.status === "error" ? "ERROR" : "INFO", outcome: data.status === "error" ? "FAILURE" : "SUCCESS", reasonCode: data.status === "error" ? "capture_stop_error" : null, metrics: { source_mode: "chrome_live_caption", capture_state: String(data.status).slice(0, 40), shutdown_acknowledged: true } });
+            chromeCierreConfirmadoRef.current = verificarCierreCaptura(data,sesionIdRef.current||"",partesSubidasRef.current);
+            if(!chromeCierreConfirmadoRef.current)setAviso("Chrome no acreditó sesión y cuenta final de partes verificadas. Se conserva la captura, pero Archivar queda bloqueado hasta actualizar/verificar la extensión.");
             chromeStopResolverRef.current?.();
             chromeStopResolverRef.current = null;
           })();
@@ -824,6 +838,7 @@ function IngresoContenido() {
 
     modoEntradaRef.current = "chrome_live_caption";
     fuenteEntradaSesionRef.current = "chrome_live_caption";
+    chromeCierreConfirmadoRef.current = false;
     setModoEntrada("chrome_live_caption");
     activoRef.current = true;
     setEstado("dictando");
@@ -1052,6 +1067,7 @@ function IngresoContenido() {
       let audioBytes: number | null = null;
       const partes = partesSubidasRef.current;
       const fuenteEntrada = fuenteEntradaSesionRef.current;
+      if(fuenteEntrada === "chrome_live_caption" && !chromeCierreConfirmadoRef.current)throw new Error("No se puede sellar: Chrome no confirmó un cierre íntegro. El texto y los originales conservados siguen recuperables.");
       const audioEsperado = fuenteEntrada === "microfono" || fuenteEntrada === "chrome_live_caption" || fuenteEntrada === "audio_archivo";
       const audioImportado = fuenteEntrada === "audio_archivo";
       const partesGeneradas = partesRawRef.current.length;
@@ -1139,6 +1155,27 @@ function IngresoContenido() {
     }
   }, [archivado, texto, titulo, pulidosOk, observarDictado, guardarCheckpoint]);
 
+
+  const exportarMp3Conservado = useCallback(async()=>{
+    const id=sesionIdRef.current;if(!id)return;
+    setExportandoAudio(true);setError("");
+    try{
+      const path=`/api/audio/${encodeURIComponent(id)}/mp3`;
+      const response=await fetch(path,{cache:"no-store"});
+      if(response.status===409){
+        const queued=await fetch(path,{method:"POST"});
+        if(!queued.ok)throw new Error("No se pudo solicitar el MP3. Comprueba sesión y bóveda.");
+        setAviso("MP3 solicitado. El original sigue conservado; vuelve a descargar cuando termine la conversión.");return;
+      }
+      if(!response.ok||!response.headers.get("content-type")?.startsWith("audio/mpeg"))throw new Error("MP3 no disponible. Comprueba conexión y bóveda; no se descargará una respuesta de error como audio.");
+      const bytes=await response.arrayBuffer(),expected=response.headers.get("x-audio-sha256")||"";
+      const hash=Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256",bytes))).map(b=>b.toString(16).padStart(2,"0")).join("");
+      if(hash!==expected)throw new Error("La descarga no coincide con su huella; no se entregará audio no verificado.");
+      const url=URL.createObjectURL(new Blob([bytes],{type:"audio/mpeg"}));
+      try{const link=document.createElement("a");link.href=url;link.download=`khora-${id}.mp3`;link.click();}finally{setTimeout(()=>URL.revokeObjectURL(url),1000);}
+      setAviso(response.headers.get("x-captura-completa")==="true"?"MP3 completo verificado y descargado.":"MP3 de captura abierta: contiene hasta la parte "+response.headers.get("x-audio-hasta-parte")+". No acredita el cierre de la grabación.");
+    }catch(e){setError(String((e as Error)?.message||e));}finally{setExportandoAudio(false);}
+  },[]);
 
   const exportarAudioOriginal = useCallback(async () => {
     const sessionId = sesionIdRef.current;
@@ -1476,6 +1513,7 @@ function IngresoContenido() {
         onGuardar: guardar,
         onAdjuntarClick: () => fileInputRef.current?.click(),
         onExportarAudio: exportarAudioOriginal,
+        onExportarMp3: exportarMp3Conservado,
         onLimpiar: limpiar,
         onConfirmarEdicion: confirmarEdicion,
       }}

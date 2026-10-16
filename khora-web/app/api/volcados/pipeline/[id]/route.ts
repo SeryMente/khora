@@ -1,3 +1,4 @@
+import { poseeVolcado } from "@/lib/server/custodia-acceso";
 // @l0 L0-002-R · @req PIPELINE-OBSERVABILITY/REQ-1
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
@@ -14,6 +15,9 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
 
   try {
     const { id } = await ctx.params;
+    const custodio=(await auth())?.user?.email;
+    if(!custodio)return NextResponse.json({error:"no_autenticado"},{status:401});
+    if(!await poseeVolcado(custodio,id))return NextResponse.json({error:"no_encontrado"},{status:404});
     if (!id) {
       return NextResponse.json({ detail: "falta el id del volcado" }, { status: 400 });
     }

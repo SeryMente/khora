@@ -46,6 +46,7 @@ export type IngresoViewActions = {
   onRetranscribir?: () => void;
   onAdjuntarClick?: () => void;
   onExportarAudio?: () => void;
+  onExportarMp3?: () => void;
   onLimpiar?: () => void;
   onConfirmarEdicion?: () => void;
 };
@@ -241,11 +242,18 @@ export function IngresoView({
             <Icons.Paperclip size={20} strokeWidth={1.75} />
             {adjuntandoAudio ? "Adjuntando..." : "Adjuntar audio"}
           </button>
+          {conAudio && partesContador>0 && (
+            <button type="button" onClick={()=>actions.onExportarMp3?.()}
+              disabled={guardando || exportandoAudio || adjuntandoAudio}
+              className="px-4 py-2 border rounded disabled:opacity-50">
+              {exportandoAudio?"Preparando descarga…":"Descargar MP3 conservado"}
+            </button>
+          )}
           {audioExportable && (
             <button
               data-ui-id="ingreso.btn-exportar-audio"
               onClick={() => actions.onExportarAudio?.()}
-              disabled={guardando || archivado || exportandoAudio || adjuntandoAudio || guardando}
+              disabled={guardando || exportandoAudio || adjuntandoAudio}
               className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
               style={{ backgroundColor: "var(--khora-surface)", color: "var(--khora-ink)", borderColor: "var(--khora-border)" }}
             >

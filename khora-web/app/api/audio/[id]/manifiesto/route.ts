@@ -1,3 +1,5 @@
+import { poseeVolcado } from "@/lib/server/custodia-acceso";
+import { auth } from "@/auth";
 // @l0 L0-002-R · @req REVISION-COCKPIT/REQ-1
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/server/neon";
@@ -16,6 +18,9 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
     }
 
     const { id } = await ctx.params;
+    const custodio=(await auth())?.user?.email;
+    if(!custodio)return NextResponse.json({error:"no_autenticado"},{status:401});
+    if(!await poseeVolcado(custodio,id))return NextResponse.json({error:"no_encontrado"},{status:404});
     const isNumeric = /^\d+$/.test(id.trim());
 
     const db = getDb();

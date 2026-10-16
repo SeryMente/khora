@@ -17,7 +17,7 @@ export async function GET() {
   }
 
   try {
-    const data = await obtenerPipelineAggregated();
+    const data = await obtenerPipelineAggregated(session.user.email);
 
     return NextResponse.json(data);
   } catch (e: any) {

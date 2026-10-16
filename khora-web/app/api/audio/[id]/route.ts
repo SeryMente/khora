@@ -1,3 +1,5 @@
+import { poseeVolcado } from "@/lib/server/custodia-acceso";
+import { auth } from "@/auth";
 // @l0 L0-002-R · @req TRACE-SESSION/010 · @req AUD-04
 import { NextRequest, NextResponse } from "next/server";
 import { createHash } from "crypto";
@@ -15,6 +17,9 @@ export async function GET(pedido: NextRequest, contexto: { params: Promise<{ id:
     }
 
     const { id } = await contexto.params;
+    const custodio=(await auth())?.user?.email;
+    if(!custodio)return NextResponse.json({error:"no_autenticado"},{status:401});
+    if(!await poseeVolcado(custodio,id))return NextResponse.json({error:"no_encontrado"},{status:404});
     const isNumeric = /^\d+$/.test(id.trim());
 
     const db = getDb();

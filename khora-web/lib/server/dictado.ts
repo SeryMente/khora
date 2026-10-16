@@ -1,3 +1,4 @@
+import { encolarTrabajosCaptura } from "./custodia-trabajos";
 // @l0 L0-002-R · @req FIX-DICTADO/D2-D8 · @req TRACE-SESSION/010 · @req REVISION-COCKPIT/REQ-1 · @req FIX-DICTADO/D13 · @req SISTEMA-MENU/E4
 import { randomUUID, createHash } from "crypto";
 import { getDb } from "./neon";
@@ -110,6 +111,7 @@ export type AudioParte = {
 };
 
 export type EntradaDictado = {
+  tituloAutomatico?: boolean;
   texto: string;
   sessionId?: string | null;
   titulo?: string | null;
@@ -449,6 +451,12 @@ async function guardarDictadoConSesion(
       preparar = true;
     }
 
+    if(entrada.usuario)await encolarTrabajosCaptura(client,{
+      sessionId,usuario:entrada.usuario,tituloAutomatico:entrada.tituloAutomatico===true,
+      volcado_id:retorno!.id,version:1,sha256:sha,texto:entrada.texto,
+      titulo:entrada.titulo??null,caracteres:entrada.texto.length,
+      audio:entrada.audioUrl??null,partesAudio:partesPersistidas.length,pulidoAplicado:entrada.pulidoAplicado===true,
+    });
     await client.query("COMMIT");
     enTransaccion = false;
   } catch (err) {
