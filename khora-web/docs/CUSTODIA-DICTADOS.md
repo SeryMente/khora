@@ -263,6 +263,16 @@ Los logs crudos se conservan fuera del índice Git del worktree de validación. 
 
 - Primer build: el código compiló, pero la recolección de rutas se detuvo con `AUTH_SECRET env var is required — no fallback allowed`. El worktree no heredó credenciales; no se copiaron secretos productivos. Se repite con un secreto aleatorio efímero exclusivo del proceso de build, sin habilitar bypass de autenticación. Esto no prueba login ni integraciones reales.
 
+### Revalidación del corte y estado de publicación
+
+Se volvió a ejecutar la validación sobre el código exacto `498067e18e064f14c48a11e63461f7ca24206499`: tipos 0; suite 450/450, sin fallos ni omitidas; navegador 8 comprobaciones correctas con IndexedDB real y audio sintético; navegación 0; contrato visual 0; build 0. El build utilizó un AUTH_SECRET aleatorio efímero, no credenciales productivas. El árbol de archivos rastreados permaneció sin modificaciones durante esta revalidación. No equivale a ejecutar IngresoWorkspace contra servicios reales.
+
+La propuesta de cambios es [#301](https://github.com/SeryMente/khora/pull/301), aún abierta. Esta actualización es documental: no fusiona, migra ni despliega. Antes de liberar, integrar y volver a verificar el main vigente; ya existe un avance posterior a la base de la rama (`1697ee2693ed3217523ffc1d1be9b6541d7d849d`, observado durante la comprobación).
+
+La automatización remota NO está aprobada. La anotación de [GitHub Actions](https://github.com/SeryMente/khora/actions/runs/38973252329/job/117216441570) indica literalmente: "The job was not started because recent account payments have failed or your spending limit needs to be increased." Los estados automáticos de Vercel remiten a la restricción del plan Hobby para el repositorio privado de organización. Distinguir trabajos no iniciados, pruebas fallidas y verificaciones locales; no presentar ninguno como aprobación de los demás ni omitir compuertas.
+
+No hay certificación productiva ni cierre universal. Siguen vigentes las once brechas de la sección 15, incluyendo el MP3 de capturas nunca selladas, reintento durable de títulos y restauración. Ninguna prueba local autoriza borrar esas filas.
+
 ## 18. Recorrido operativo desde la interfaz
 
 | Acción o acontecimiento | Efecto implementado | Lo que NO significa |
