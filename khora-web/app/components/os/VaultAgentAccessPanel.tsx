@@ -79,8 +79,18 @@ export default function VaultAgentAccessPanel() {
         fetch("/api/security/vault-agent/history?limit=12", { cache: "no-store" }),
       ]);
       const [statusData, historyData] = await Promise.all([statusResponse.json(), historyResponse.json()]);
-      setStatus(statusData && typeof statusData === "object" ? statusData : null);
-      setHistory(historyData && typeof historyData === "object" ? historyData : null);
+      const validHistory = historyData && typeof historyData === "object" &&
+        ["total", "active", "expired", "revoked"].every((key) => Number.isInteger(historyData[key]) && historyData[key] >= 0) &&
+        Array.isArray(historyData.entries) && historyData.entries.every((entry: HistoryEntry) =>
+          entry && ["active", "expired", "revoked"].includes(entry.status) &&
+          [entry.issuedAt, entry.expiresAt, entry.scope, entry.audience].every((value) => typeof value === "string") &&
+          (entry.revokedAt === null || typeof entry.revokedAt === "string"));
+      if (!statusResponse.ok || !historyResponse.ok || !statusData || typeof statusData !== "object" ||
+          typeof statusData.active !== "boolean" || !validHistory) {
+        throw new Error("Respuesta de acceso temporal no disponible o inválida.");
+      }
+      setStatus(statusData);
+      setHistory(historyData);
     } catch {
       setStatus({ error: "No se pudo consultar el estado del acceso temporal." });
       setHistory({ total: 0, active: 0, expired: 0, revoked: 0, entries: [], error: "No se pudo consultar el historial." });

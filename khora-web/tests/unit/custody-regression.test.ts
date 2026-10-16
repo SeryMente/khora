@@ -482,7 +482,7 @@ test("CUSTODY-14: archived captures stay sealed and text-only saves receive stab
   assert.ok(saveHandler.includes("if (!sesionIdRef.current) sesionIdRef.current = generarSesionId()"));
   assert.ok(saveHandler.includes("setArchivado(true)"));
   assert.ok(saveHandler.includes("setAviso("));
-  assert.ok(saveHandler.includes("[archivado, texto, titulo, pulidosOk]"));
+  assert.ok(saveHandler.includes("[archivado, texto, titulo, pulidosOk, observarDictado]"));
 
   const attachStart = workspace.indexOf("const handleAdjuntarAudio");
   const cleanStart = workspace.indexOf("const limpiar", attachStart);

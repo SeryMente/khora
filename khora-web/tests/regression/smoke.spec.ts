@@ -10,12 +10,13 @@ test.describe('Regresión: Smoke tests de funciones entregadas', () => {
 
   test('Flujo de captura acepta entrada', async ({ page }) => {
     await page.goto('/capturar');
+    await expect(page).toHaveURL(/\/sistema\/ingreso$/);
     
 
-    const title = page.locator('h1:has-text("Captura")');
+    const title = page.locator('h1:has-text("Ingreso Integrado")');
     await expect(title).toBeVisible();
 
-    const textarea = page.locator('[placeholder="Escribe, pega o dicta…"]');
+    const textarea = page.locator('[data-ui-id="ingreso.textarea"]');
     await expect(textarea).toBeVisible();
     await textarea.fill('Probando la captura por regresión');
     await expect(textarea).toHaveValue('Probando la captura por regresión');

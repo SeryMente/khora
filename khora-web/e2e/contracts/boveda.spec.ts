@@ -3,7 +3,10 @@ import { test, expect } from "@playwright/test";
 
 test.describe("Bóveda Page Reskin - BOVEDA-01", () => {
   test.beforeEach(async ({ page }) => {
-    // Go directly to the bóveda page
+    await page.route('**/api/boveda', route => route.fulfill({ json: { configurado: false, abierta: false, minutos: 30 } }));
+    await page.route('**/api/security/vault-agent/token', route => route.fulfill({ json: { active: false } }));
+    await page.route('**/api/security/vault-agent/history?*', route => route.fulfill({ json: { total: 0, active: 0, expired: 0, revoked: 0, entries: [] } }));
+    // Test the core card independently of the delegated-access panel contract.
     await page.goto("/sistema/boveda");
   });
 
@@ -45,7 +48,7 @@ test.describe("Bóveda Page Reskin - BOVEDA-01", () => {
     expect(inputStyle).toContain("var(--khora-border)");
 
     // Find submit button and check its styling variables
-    const actionBtn = page.locator(".max-w-md button");
+    const actionBtn = page.locator(".max-w-md button").filter({ hasText: "Definir PIN" });
     await expect(actionBtn).toBeVisible();
 
     const btnStyle = await actionBtn.getAttribute("style");
@@ -57,7 +60,7 @@ test.describe("Bóveda Page Reskin - BOVEDA-01", () => {
     await expect(page.locator(".max-w-md")).toBeVisible();
 
     // Wait for the SVG elements specifically inside our vault card container
-    const svgElements = page.locator(".max-w-md svg");
+    const svgElements = page.locator('.max-w-md svg:not([data-ui-id="seguridad.boveda.agente"] svg)');
     const count = await svgElements.count();
     expect(count).toBeGreaterThan(0);
 

@@ -21,7 +21,8 @@ test.describe("Ingesta UI", () => {
       });
     });
 
-    // Navigate to the test page directly
+    await page.route("**/api/volcado", route => route.fulfill({ json: { items: [] } }));
+    // Navigate to the existing ingestion form, with no production data.
     await page.goto("/sistema/ingreso?modo=ingesta");
   });
 

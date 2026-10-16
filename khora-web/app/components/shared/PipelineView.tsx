@@ -375,11 +375,13 @@ export function PipelineView({
               filteredItems.map((item) => {
                 const isSelected = selectedId === item.id;
                 return (
-                  <div
+                  <button
+                    type="button"
+                    aria-pressed={isSelected}
                     key={item.id}
                     data-ui-id="pipeline.item-card"
                     onClick={() => actions.onSelectVolcado?.(item.id)}
-                    className={`p-3 border cursor-pointer flex flex-col space-y-1.5 rounded-none transition-all ${
+                    className={`w-full text-left p-3 border cursor-pointer flex flex-col space-y-1.5 rounded-none transition-all ${
                       isSelected
                         ? "bg-zinc-800/40 ring-1 ring-[var(--khora-accent)]"
                         : "bg-[var(--khora-surface)]"
@@ -411,7 +413,7 @@ export function PipelineView({
                         {new Date(item.recibido_en).toLocaleDateString()}
                       </span>
                     </div>
-                  </div>
+                  </button>
                 );
               })
             )}
