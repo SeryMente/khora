@@ -470,11 +470,11 @@ export async function getCurrentMethodologySnapshot(): Promise<ParsedMethodology
     }
 
     const source = normalizeText(Buffer.from(payload.content.replace(/\n/g, ""), "base64").toString("utf8"));
-    const versionMatch = source.match(/^- \\*\\*Versión:\\*\\*\\s*(v\\d+\\.\\d+\\.\\d+)/mi);
+    const versionMatch = source.match(/^- \*\*Versión:\*\*\s*(v\d+\.\d+\.\d+)/mi);
     if (!versionMatch) throw new Error("METHODOLOGY_VERSION_MISSING");
-    const versionNameMatch = source.match(/^- \\*\\*Nombre de versión:\\*\\*\\s*(.+)$/mi);
+    const versionNameMatch = source.match(/^- \*\*Nombre de versión:\*\*\s*(.+)$/mi);
     if (!versionNameMatch) throw new Error("METHODOLOGY_VERSION_NAME_MISSING");
-    const lastUpdatedMatch = source.match(/^- \\*\\*Última actualización canónica:\\*\\*\\s*(.+)$/mi);
+    const lastUpdatedMatch = source.match(/^- \*\*Última actualización canónica:\*\*\s*(.+)$/mi);
     if (!lastUpdatedMatch) throw new Error("METHODOLOGY_LAST_UPDATED_MISSING");
     const history = await fetchCanonicalMethodologyHistory(mainSha);
 
@@ -494,11 +494,11 @@ export async function getCurrentMethodologySnapshot(): Promise<ParsedMethodology
 
 export async function loadMethodologySnapshot(blobSha: string, gitCommitSha: string): Promise<ParsedMethodology> {
   const source = normalizeText(await fetchMethodologyBlob(blobSha));
-  const versionMatch = source.match(/^- \\*\\*Versión:\\*\\*\\s*(v\\d+\\.\\d+\\.\\d+)/mi);
+  const versionMatch = source.match(/^- \*\*Versión:\*\*\s*(v\d+\.\d+\.\d+)/mi);
   if (!versionMatch) throw new Error("METHODOLOGY_VERSION_MISSING");
-  const versionNameMatch = source.match(/^- \\*\\*Nombre de versión:\\*\\*\\s*(.+)$/mi);
+  const versionNameMatch = source.match(/^- \*\*Nombre de versión:\*\*\s*(.+)$/mi);
   if (!versionNameMatch) throw new Error("METHODOLOGY_VERSION_NAME_MISSING");
-  const lastUpdatedMatch = source.match(/^- \\*\\*Última actualización canónica:\\*\\*\\s*(.+)$/mi);
+  const lastUpdatedMatch = source.match(/^- \*\*Última actualización canónica:\*\*\s*(.+)$/mi);
   if (!lastUpdatedMatch) throw new Error("METHODOLOGY_LAST_UPDATED_MISSING");
   const history = await fetchCanonicalMethodologyHistory(gitCommitSha);
 
