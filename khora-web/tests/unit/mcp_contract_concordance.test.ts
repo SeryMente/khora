@@ -1,22 +1,15 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import fs from "node:fs";
-import path from "node:path";
-import vm from "node:vm";
-import { fileURLToPath } from "node:url";
-import ts from "typescript";
 import { z } from "zod";
+import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
+import { routeFixture } from "./helpers/mcp-route-fixture";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
-import { ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 import { AjvJsonSchemaValidator } from "@modelcontextprotocol/sdk/validation/ajv-provider.js";
 import { describeMcpTool, MCP_TOOL_SCOPES, type McpToolName } from "../../lib/server/mcp-tool-contract";
 import { isNormativeReceipt, normativeReceiptSchema } from "../../lib/server/normative-receipt-schema";
-import { REQUIRED_OUTPUT_FORMAT_VERSION, REQUIRED_PLATFORM, REASONING_MODES } from "../../lib/server/normative-runtime";
+import { REQUIRED_OUTPUT_FORMAT_VERSION, REQUIRED_PLATFORM } from "../../lib/server/normative-runtime";
 import { verifyNormativeReceipt } from "../../lib/server/norm-check";
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const controls = {
   _norm_turn_token: "test-token-not-a-real-credential",
   _thinking_mode: "UNKNOWN",
@@ -37,28 +30,17 @@ function receipt() {
   };
 }
 
-// Evaluate only the schema expressions in the real route; never handlers,
-// imports, database calls or credentials. A timeout bounds fixture evaluation.
-function routeContracts() {
-  const source = fs.readFileSync(path.join(root, "app/api/mcp/route.ts"), "utf8");
-  const ast = ts.createSourceFile("route.ts", source, ts.ScriptTarget.Latest, true);
-  const result: Array<{ name: McpToolName; description: string; shape: z.ZodRawShape }> = [];
-  const ungated = new Set(["khora_mcp_health", "khora_norm_open_turn", "khora_norm_apply_principle", "khora_norm_verify_turn", "khora_norm_release_turn"]);
-  function visit(node: ts.Node) {
-    if (ts.isCallExpression(node) && node.expression.getText(ast) === "gatedTool" && ts.isStringLiteral(node.arguments[0])) {
-      const name = node.arguments[0].text as McpToolName;
-      const context = { z, normativeReceiptSchema, REASONING_MODES, REQUIRED_OUTPUT_FORMAT_VERSION,
-        NORM_THINKING_MODE: z.enum(REASONING_MODES), NORM_OUTPUT_FORMAT_VERSION: z.literal(REQUIRED_OUTPUT_FORMAT_VERSION) };
-      const shape = vm.runInNewContext(`(${node.arguments[2].getText(ast)})`, context, { timeout: 1000 });
-      const description = vm.runInNewContext(`(${node.arguments[1].getText(ast)})`, {}, { timeout: 1000 });
-      result.push({ name, description, shape: ungated.has(name) ? shape : {
-        ...shape, _norm_turn_token: z.string().min(16), _thinking_mode: z.enum(REASONING_MODES), _output_format_version: z.literal(REQUIRED_OUTPUT_FORMAT_VERSION),
-      } });
-    }
-    ts.forEachChild(node, visit);
-  }
-  visit(ast);
-  return result;
+// Discover through the real route/HTTP transport, not a reconstructed gate.
+async function routeContracts() {
+  const fixture = routeFixture();
+  const client = new Client({ name: "contract-test", version: "test" });
+  try {
+    await client.connect(new StreamableHTTPClientTransport(new URL(fixture.url), {
+      fetch: fixture.fetch, requestInit: { headers: { Authorization: "Bearer fixture-access" } },
+    }));
+    await client.listTools();
+    return [...fixture.schemas].map(([name, contract]) => ({ name, ...contract }));
+  } finally { await client.close(); await fixture.close(); }
 }
 function input(name: McpToolName): Record<string, unknown> {
   if (name === "khora_mcp_health" || name === "khora_norm_open_turn") return { thinking_mode: "UNKNOWN", output_format_version: REQUIRED_OUTPUT_FORMAT_VERSION };
@@ -69,8 +51,8 @@ function input(name: McpToolName): Record<string, unknown> {
   return { ...controls, ...business };
 }
 
-test("all 15 real registration shapes generate valid schemas and accept advertised examples", () => {
-  const contracts = routeContracts();
+test("all 15 real registration shapes generate valid schemas and accept advertised examples", async () => {
+  const contracts = await routeContracts();
   assert.equal(contracts.length, 15);
   assert.deepEqual(contracts.map(x => x.name).sort(), Object.keys(MCP_TOOL_SCOPES).sort());
   const validator = new AjvJsonSchemaValidator();
@@ -93,11 +75,20 @@ test("all 15 real registration shapes generate valid schemas and accept advertis
 test("receipt schema publishes every required field and rejects their omission independently", () => {
   const schema = z.toJSONSchema(normativeReceiptSchema, { target: "draft-7", io: "input" });
   const check = new AjvJsonSchemaValidator().getValidator(JSON.parse(JSON.stringify(schema)));
-  for (const field of Object.keys(receipt())) {
-    const invalid: Record<string, unknown> = receipt(); delete invalid[field];
-    assert.equal(check(invalid).valid, false, field);
-    assert.equal(normativeReceiptSchema.safeParse(invalid).success, false, field);
-    assert.equal(isNormativeReceipt(invalid), false, field);
+  function paths(value: Record<string, unknown>, prefix: string[] = []): string[][] {
+    return Object.entries(value).flatMap(([key, child]) => {
+      const p = [...prefix, key];
+      return [p, ...(child && typeof child === "object" && !Array.isArray(child) ? paths(child as Record<string, unknown>, p) : [])];
+    });
+  }
+  for (const path of paths(receipt())) {
+    const invalid = structuredClone(receipt()) as Record<string, unknown>;
+    let parent = invalid;
+    for (const key of path.slice(0, -1)) parent = parent[key] as Record<string, unknown>;
+    delete parent[path.at(-1)!];
+    assert.equal(check(invalid).valid, false, path.join("."));
+    assert.equal(normativeReceiptSchema.safeParse(invalid).success, false, path.join("."));
+    assert.equal(isNormativeReceipt(invalid), false, path.join("."));
   }
 });
 
@@ -130,28 +121,82 @@ test("malformed receipt is rejected by the real verifier before any network requ
   } finally { globalThis.fetch = original; }
 });
 
-test("SDK tools/list and tools/call agree for all route schemas in memory (no auth or database proof)", async () => {
-  const server = new McpServer({ name: "khora-contract-fixture", version: "test" });
+async function connect(fixture: ReturnType<typeof routeFixture>) {
   const client = new Client({ name: "contract-test", version: "test" });
-  const contracts = routeContracts(); let calls = 0;
-  const tools = contracts.map(c => {
-    server.tool(c.name, c.description, c.shape, async () => { calls++; return { content: [{ type: "text", text: "schema-only fixture" }] }; });
-    return describeMcpTool(c.name, c.description, c.shape);
-  });
-  server.server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools }));
-  const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
+  await client.connect(new StreamableHTTPClientTransport(new URL(fixture.url), {
+    fetch: fixture.fetch, requestInit: { headers: { Authorization: "Bearer fixture-access" } },
+  }));
+  return client;
+}
+
+test("real route: HTTP discovery and all 15 calls agree; malformed input cannot reach service", async () => {
+  const fixture = routeFixture(); const client = await connect(fixture);
   try {
-    await Promise.all([server.connect(serverTransport), client.connect(clientTransport)]);
     const listed = await client.listTools();
     assert.equal(listed.tools.length, 15);
-    for (const c of contracts) {
-      const result = await client.callTool({ name: c.name, arguments: input(c.name) });
-      assert.notEqual(result.isError, true, c.name);
+    assert.deepEqual(listed.tools.map(x => x.name).sort(), Object.keys(MCP_TOOL_SCOPES).sort());
+    for (const tool of listed.tools) {
+      const contract = fixture.schemas.get(tool.name as McpToolName)!;
+      assert.deepEqual(tool.inputSchema, JSON.parse(JSON.stringify(describeMcpTool(tool.name as McpToolName, contract.description, contract.shape).inputSchema)));
+      assert.notEqual((await client.callTool({ name: tool.name, arguments: input(tool.name as McpToolName) })).isError, true, tool.name);
     }
-    assert.equal(calls, 15);
+    assert.equal(fixture.calls.length, 14, "health reads its snapshot separately");
+    for (const call of fixture.calls.filter(x => !x.name.endsWith("NormativeTurn") && x.name !== "applyNormativePrinciple")) {
+      for (const field of Object.keys(controls)) assert.equal(Object.hasOwn(call.args ?? {}, field), false, call.name);
+    }
     const bad = input("khora_norm_verify_turn"); delete (bad.receipt as Record<string, unknown>).output;
-    const rejected = await client.callTool({ name: "khora_norm_verify_turn", arguments: bad });
-    assert.equal(rejected.isError, true);
-    assert.equal(calls, 15, "invalid input must not reach handler");
-  } finally { await client.close(); await server.close(); }
+    assert.equal((await client.callTool({ name: "khora_norm_verify_turn", arguments: bad })).isError, true);
+    assert.equal(fixture.calls.length, 14);
+  } finally { await client.close(); await fixture.close(); }
+});
+
+test("real route: missing/revoked auth and missing configuration fail before services", async () => {
+  for (const [options, authorization, status] of [
+    [{}, "", 401], [{}, "Bearer invalid-fixture", 401],
+    [{ revoked: true }, "Bearer fixture-access", 401],
+    [{ scopes: [] }, "Bearer fixture-access", 401],
+    [{ configured: false }, "Bearer fixture-access", 503],
+    [{ production: true }, "Bearer fixture-access", 503],
+  ] as const) {
+    const fixture = routeFixture(options as Parameters<typeof routeFixture>[0]);
+    try {
+      const response = await fixture.fetch(fixture.url, { headers: { Authorization: authorization } });
+      assert.equal(response.status, status);
+      if (status === 401) assert.match(response.headers.get("www-authenticate") ?? "", /resource_metadata=/);
+      assert.equal(fixture.calls.length, 0);
+    } finally { await fixture.close(); }
+  }
+});
+
+test("real route: every substantive tool is blocked by scope or denied turn; norm opening requires scope", async () => {
+  const substantive = Object.keys(MCP_TOOL_SCOPES).filter(n => n !== "khora_mcp_health" && !n.startsWith("khora_norm_")) as McpToolName[];
+  for (const options of [{ scopes: ["norm:turn"] }, { denyTurn: true }]) {
+    const fixture = routeFixture(options); const client = await connect(fixture);
+    try {
+      for (const name of substantive) {
+        const denied = await client.callTool({ name, arguments: input(name) });
+        assert.equal(denied.isError, true, name);
+        assert.match(JSON.stringify(denied), options.denyTurn ? /NORMATIVE_TURN_REQUIRED/ : /insufficient_scope/);
+      }
+      assert.equal(fixture.calls.length, 0);
+    } finally { await client.close(); await fixture.close(); }
+  }
+  const fixture = routeFixture({ scopes: ["runtime:read"] }); const client = await connect(fixture);
+  try {
+    assert.equal((await client.callTool({ name: "khora_norm_open_turn", arguments: input("khora_norm_open_turn") })).isError, true);
+    assert.equal(fixture.calls.length, 0);
+  } finally { await client.close(); await fixture.close(); }
+});
+
+test("real route: malformed controls and numeric bounds cannot reach business services", async () => {
+  const fixture = routeFixture(); const client = await connect(fixture);
+  try {
+    for (const patch of [{ _norm_turn_token: "short" }, { _thinking_mode: "invented" }, { _output_format_version: "v0" }]) {
+      assert.equal((await client.callTool({ name: "khora_resumen", arguments: { ...input("khora_resumen"), ...patch } })).isError, true);
+    }
+    for (const patch of [{ cursor: -1 }, { cursor: 1.5 }, { limite: 0 }, { limite: 201 }]) {
+      assert.equal((await client.callTool({ name: "khora_eventos_desde", arguments: { ...input("khora_eventos_desde"), ...patch } })).isError, true);
+    }
+    assert.equal(fixture.calls.length, 0);
+  } finally { await client.close(); await fixture.close(); }
 });

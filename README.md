@@ -6,7 +6,7 @@ El subsistema Entorno Persistente Medio v1.0 se especifica en [`ep-medio-archite
 
 | Documento | Contenido |
 |---|---|
-| [`khora-web/docs/normative-check.md`](./khora-web/docs/normative-check.md) | Servidor MCP multiuso: catálogo de capacidades, permisos efectivos, contratos, conexión, diagnóstico y límites de compatibilidad |
+| [`khora-web/docs/normative-check.md`](./khora-web/docs/normative-check.md) | Documento canónico único del servidor MCP: capacidades, contratos, acceso, conexión y diagnóstico |
 | [`PREPARACION-VOLCADOS.md`](./PREPARACION-VOLCADOS.md) | Protocolos de Custodia, Fidelidad y Legibilidad que debe superar un volcado antes de llegar a revisión, y qué se muestra al operador cuando alguno falla |
 | [`UI_REVIEW.md`](./UI_REVIEW.md) | Cómo ver la interfaz vigente de Khora, incluidos los modelos que no ejecutan JavaScript |
 | [`ep-medio-architectura.md`](./ep-medio-architectura.md) | Entorno Persistente Medio v1.0 |
