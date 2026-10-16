@@ -1,11 +1,10 @@
+import { isNormativeReceipt, NORM_CHECK_PROTOCOL, NORM_CHECK_PROTOCOL_VERSION, type NormativeReceipt, type NormativePrincipleEvidence } from "./normative-receipt-schema";
+export type { NormativeReceipt, NormativePrincipleEvidence } from "./normative-receipt-schema";
 import { createHash } from "crypto";
-import { assertNormativeRuntimeContext, type NormativeRuntimeContext } from "./normative-runtime";
 import { hashCanonicalCycleOutput, validateCanonicalCycleOutput } from "./normative-output";
 
-export const NORM_CHECK_PROTOCOL = "NORM-CHECK";
-export const NORM_CHECK_PROTOCOL_VERSION = "v0.5.0";
+export { NORM_CHECK_PROTOCOL, NORM_CHECK_PROTOCOL_VERSION } from "./normative-receipt-schema";
 export const NORM_CHECK_VERIFIER_VERSION = "norm-check/0.5.0";
-const ACCEPTED_PROTOCOL_VERSIONS = new Set([NORM_CHECK_PROTOCOL_VERSION]);
 export const CANONICAL_SI_REPOSITORY = "SeryMente/metodologia";
 export const CANONICAL_SI_PATH = "SI-METACOGNITIVO.md";
 export const CANONICAL_METHODOLOGY_REPOSITORY = "SeryMente/metodologia";
@@ -19,41 +18,7 @@ type ManifestPrinciple = {
   sha256: string;
 };
 
-export type NormativePrincipleEvidence = {
-  folio: string;
-  status: "A" | "N" | "C";
-  anchor?: string | null;
-  reason_code?: string | null;
-};
 
-export type NormativeReceipt = {
-  protocol: typeof NORM_CHECK_PROTOCOL;
-  protocol_version: string;
-  cycle: { id: string; attempt: number };
-  si: {
-    version: string;
-    git_commit_sha: string;
-    git_blob_sha: string;
-    sha256: string;
-    manifest_sha256: string;
-  };
-  methodology: {
-    version: string;
-    git_commit_sha: string;
-    git_blob_sha: string;
-    sha256: string;
-  };
-  input_sha256: string;
-  nonce: string;
-  principles: NormativePrincipleEvidence[];
-  output: string;
-  output_sha256: string;
-  output_header: string;
-  methodology_output_header: string;
-  evidence_sha256: string;
-  created_at: string;
-  runtime: NormativeRuntimeContext;
-};
 
 export type VerificationResult = {
   status: "VERIFIED" | "INVALID" | "INCOMPLETE";
@@ -673,43 +638,7 @@ export async function loadSiSnapshot(blobSha: string, gitCommitSha: string): Pro
 }
 
 function validateBasicReceipt(receipt: unknown): receipt is NormativeReceipt {
-  if (!receipt || typeof receipt !== "object") return false;
-  const value = receipt as Record<string, unknown>;
-  const cycle = value.cycle as Record<string, unknown> | undefined;
-  const si = value.si as Record<string, unknown> | undefined;
-
-  if (value.protocol !== NORM_CHECK_PROTOCOL || typeof value.protocol_version !== "string" || !ACCEPTED_PROTOCOL_VERSIONS.has(value.protocol_version)) return false;
-  if (!cycle || typeof cycle.id !== "string" || cycle.id.trim().length === 0) return false;
-  if (!Number.isInteger(cycle.attempt) || Number(cycle.attempt) < 1) return false;
-  if (!si || typeof si.version !== "string" || !isHex(si.git_commit_sha, 40) || !isHex(si.git_blob_sha, 40) || !isHex(si.sha256, 64) || !isHex(si.manifest_sha256, 64)) return false;
-  const methodology = value.methodology as Record<string, unknown> | undefined;
-  if (!methodology || typeof methodology.version !== "string" || !isHex(methodology.git_commit_sha, 40) || !isHex(methodology.git_blob_sha, 40) || !isHex(methodology.sha256, 64)) return false;
-  if (typeof value.output !== "string" || value.output.length === 0) return false;
-  if (!isHex(value.input_sha256, 64) || !isHex(value.output_sha256, 64)) return false;
-  if (typeof value.nonce !== "string" || value.nonce.length < 16 || value.nonce.length > 128) return false;
-  if (!isHex(value.evidence_sha256, 64)) return false;
-  if (!Array.isArray(value.principles) || value.principles.length === 0) return false;
-  if (typeof value.created_at !== "string" || value.created_at.length < 10 || Number.isNaN(Date.parse(value.created_at))) return false;
-  if (typeof value.output_header !== "string" || value.output_header.trim().length < 32) return false;
-  if (typeof value.methodology_output_header !== "string" || value.methodology_output_header.trim().length < 32) return false;
-  try {
-    assertNormativeRuntimeContext(value.runtime);
-  } catch {
-    return false;
-  }
-
-  for (const raw of value.principles) {
-    if (!raw || typeof raw !== "object") return false;
-    const principle = raw as Record<string, unknown>;
-    if (typeof principle.folio !== "string") return false;
-    if (principle.status !== "A" && principle.status !== "N" && principle.status !== "C") return false;
-    if ((principle.status === "A" || principle.status === "C") &&
-      (typeof principle.anchor !== "string" || !/^[A-Za-z][A-Za-z0-9._:-]{0,63}$/.test(principle.anchor))) return false;
-    if (principle.status === "N" &&
-      (typeof principle.reason_code !== "string" || !/^[A-Z0-9_:-]{1,32}$/.test(principle.reason_code))) return false;
-  }
-
-  return true;
+  return isNormativeReceipt(receipt);
 }
 
 function computeEvidenceHash(receipt: NormativeReceipt): string {

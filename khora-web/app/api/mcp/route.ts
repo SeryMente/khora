@@ -8,6 +8,8 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import { ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
+import { describeMcpTool, type McpToolName } from "@/lib/server/mcp-tool-contract";
+import { normativeReceiptSchema } from "@/lib/server/normative-receipt-schema";
 import {
   toolKhoraResumen,
   toolKhoraListarVolcados,
@@ -62,10 +64,7 @@ const NORM_TURN_TOKEN = z.string().min(16).describe(
 const NORM_THINKING_MODE = z.enum(REASONING_MODES).describe(
   "Modo de razonamiento observado para el turno. Usa THINKING cuando la plataforma lo exponga; usa UNKNOWN/UNAVAILABLE cuando no exista una señal operativa. Es metadato, no bloquea la salida."
 );
-const NORM_OUTPUT_FORMAT_VERSION = z.string().refine(
-  (value) => value === REQUIRED_OUTPUT_FORMAT_VERSION,
-  "Contrato obligatorio de salida visible por ciclo."
-);
+const NORM_OUTPUT_FORMAT_VERSION = z.literal(REQUIRED_OUTPUT_FORMAT_VERSION);
 
 function withNormTurn<T extends z.ZodRawShape>(fields: T): T & { _norm_turn_token: typeof NORM_TURN_TOKEN; _thinking_mode: typeof NORM_THINKING_MODE; _output_format_version: typeof NORM_OUTPUT_FORMAT_VERSION } {
   return {
@@ -214,17 +213,19 @@ async function handleMcpRequest(req: NextRequest) {
     {
       instructions:
         "ADAPTIVE NORMATIVE GATE: cuando KHORA esta disponible, ejecuta HEALTH MCP -> OPEN TURN -> aplica cada principio mediante khora_norm_apply_principle en el orden devuelto -> VERIFY -> RELEASE antes de emitir la salida. " +
-        "La salida visible de cada turno debe cumplir el contrato v1.7.2 cualquiera que sea el escenario. " +
+        `La salida visible de cada turno debe cumplir el contrato ${REQUIRED_OUTPUT_FORMAT_VERSION} cualquiera que sea el escenario. ` +
         "Si KHORA no esta disponible o no puede verificarse, continua la respuesta sin inventar verificacion y declara K: OFF. " +
         "Si KHORA devuelve VERIFIED_RELEASE, declara K: ✓. Si devuelve un fallo normativo, declara K: ! o K: ? segun corresponda. " +
         "El modo de razonamiento es metadato operativo y no debe presentarse como prueba del pensamiento interno.",
     },
   );
 
+  const toolsList: ReturnType<typeof describeMcpTool>[] = [];
+
   const gatedTool = (
-    name: string,
+    name: McpToolName,
     description: string,
-    inputSchema: Record<string, unknown>,
+    inputSchema: z.ZodRawShape,
     handler: (args: any) => Promise<any>,
   ) => {
     const observedHandler = async (args: any, requireTurn: boolean) => {
@@ -278,13 +279,16 @@ async function handleMcpRequest(req: NextRequest) {
     };
 
     if (name === "khora_mcp_health" || name === "khora_norm_open_turn" || name === "khora_norm_apply_principle" || name === "khora_norm_verify_turn" || name === "khora_norm_release_turn") {
+      toolsList.push(describeMcpTool(name, description, inputSchema));
       return mcpServer.tool(name, description, inputSchema, async (args: any) => observedHandler(args, false));
     }
 
+    const effectiveSchema = withNormTurn(inputSchema);
+    toolsList.push(describeMcpTool(name, description, effectiveSchema));
     return mcpServer.tool(
       name,
       description,
-      withNormTurn(inputSchema as z.ZodRawShape),
+      effectiveSchema,
       async (args: any) => observedHandler(args, true),
     );
   };
@@ -597,17 +601,7 @@ async function handleMcpRequest(req: NextRequest) {
     "Verifica y registra el receipt del turno. Solo cierra el ciclo cuando KHORA devuelve VERIFIED. Usa norm:turn.",
     {
       turn_token: z.string().min(16).describe("Token opaco emitido por khora_norm_open_turn"),
-      receipt: z.object({
-        output: z.string().min(1).describe("Texto completo candidato de salida canónica del ciclo. KHORA valida estructura, identidad y hash antes de VERIFIED."),
-        output_header: z.string().min(32).describe("Encabezado SI canónico exacto del ciclo."),
-        methodology_output_header: z.string().min(32).describe("Encabezado de Metodología canónico exacto del ciclo."),
-        methodology: z.object({
-          version: z.string().min(1),
-          git_commit_sha: z.string().length(40),
-          git_blob_sha: z.string().length(40),
-          sha256: z.string().length(64),
-        }).describe("Snapshot canónico de METODOLOGIA.md del ciclo."),
-      }).passthrough().describe("Cycle Receipt NORM-CHECK v0.5.0"),
+      receipt: normativeReceiptSchema,
     },
     async (args: any) => {
       const denied = requireScope("norm:turn");
@@ -648,292 +642,7 @@ async function handleMcpRequest(req: NextRequest) {
     }
   );
 
-  // SDK 1.x no publica securitySchemes en el nivel raíz de tools/list.
-  // Publicamos una lista tipada explícita para que ChatGPT pueda detectar OAuth
-  // por herramienta, manteniendo las mismas herramientas y esquemas de entrada.
-  const toolsList = [
-    {
-      name: "khora_mcp_health",
-      description: "Comprobación discreta de acceso completo al MCP de KHORA. No ejecuta trabajo sustantivo.",
-      inputSchema: {
-        type: "object",
-        properties: {
-          thinking_mode: { type: "string", enum: [...REASONING_MODES] },
-          output_format_version: { type: "string", enum: [REQUIRED_OUTPUT_FORMAT_VERSION] },
-        },
-        required: ["thinking_mode", "output_format_version"],
-        additionalProperties: false,
-      },
-      securitySchemes: [{ type: "oauth2", scopes: ["volcados:read", "runtime:read", "norm:turn"] }],
-    },
-    {
-      name: "khora_resumen",
-      description: "Conteo por estado, caracteres y rango de fechas.",
-      inputSchema: {
-        type: "object",
-        properties: {
-          fecha_inicio: { type: "string", description: "Fecha inicio filtro ISO (YYYY-MM-DD)" },
-          fecha_fin: { type: "string", description: "Fecha fin filtro ISO (YYYY-MM-DD)" },
-          estado: { type: "string", description: "Estado del volcado" },
-        },
-        additionalProperties: false,
-      },
-      securitySchemes: [{ type: "oauth2", scopes: ["volcados:read"] }],
-    },
-    {
-      name: "khora_listar_volcados",
-      description: "Índice con metadatos y extracto. Filtros por estado, fechas u orden.",
-      inputSchema: {
-        type: "object",
-        properties: {
-          estado: { type: "string", description: "Filtrar por estado" },
-          fecha_inicio: { type: "string", description: "Filtrar por fecha inicio" },
-          fecha_fin: { type: "string", description: "Filtrar por fecha fin" },
-          orden: { type: "string", enum: ["ASC", "DESC"], description: "Orden cronológico (ASC o DESC)" },
-          limite: { type: "number", description: "Límite de resultados (max 100)" },
-          offset: { type: "number", description: "Paginación" },
-        },
-        additionalProperties: false,
-      },
-      securitySchemes: [{ type: "oauth2", scopes: ["volcados:read"] }],
-    },
-    {
-      name: "khora_leer_volcado",
-      description: "Verbatim íntegro por id (folio o UUID), o versión histórica concreta.",
-      inputSchema: {
-        type: "object",
-        properties: {
-          id: { type: "string", description: "Folio numérico o UUID único del volcado" },
-          version: { type: "number", description: "Versión histórica concreta a consultar" },
-        },
-        required: ["id"],
-        additionalProperties: false,
-      },
-      securitySchemes: [{ type: "oauth2", scopes: ["volcados:read"] }],
-    },
-    {
-      name: "khora_buscar_volcados",
-      description: "Búsqueda de frase con fragmentos de contexto y plegado de acentos.",
-      inputSchema: {
-        type: "object",
-        properties: {
-          busqueda: { type: "string", description: "Frase o texto a buscar" },
-          limite: { type: "number", description: "Límite de resultados" },
-          offset: { type: "number", description: "Paginación" },
-        },
-        required: ["busqueda"],
-        additionalProperties: false,
-      },
-      securitySchemes: [{ type: "oauth2", scopes: ["volcados:read"] }],
-    },
-    {
-      name: "khora_versiones_volcado",
-      description: "Historial de correcciones, sha256 y versión aprobada.",
-      inputSchema: {
-        type: "object",
-        properties: {
-          volcado_id: { type: "string", description: "Folio numérico o UUID del volcado" },
-        },
-        required: ["volcado_id"],
-        additionalProperties: false,
-      },
-      securitySchemes: [{ type: "oauth2", scopes: ["volcados:read"] }],
-    },
-    {
-      name: "khora_ui_review",
-      description: "Devuelve la interfaz de Khora renderizada en HTML con el corpus real del operador. Solo lectura.",
-      inputSchema: {
-        type: "object",
-        properties: {
-          pantalla: { type: "string", enum: ["ingreso", "archivo", "revision", "aprobacion", "ingesta", "registro", "grafo"] },
-          volcado: { type: "string" },
-          solo_metadatos: { type: "boolean" },
-        },
-        additionalProperties: false,
-      },
-      securitySchemes: [{ type: "oauth2", scopes: ["volcados:read"] }],
-    },
-    {
-      name: "khora_observacion_instantanea",
-      description: "Vista unificada del estado semántico actual del navegador, actividad persistida, último evento, fallos recientes y cursor de eventos. Solo lectura.",
-      inputSchema: {
-        type: "object",
-        properties: {
-          session_id: { type: "string", description: "Limitar la observación a una sesión concreta" },
-        },
-        additionalProperties: false,
-      },
-      securitySchemes: [{ type: "oauth2", scopes: ["runtime:read"] }],
-    },
-    {
-      name: "khora_eventos_desde",
-      description: "Devuelve únicamente los eventos posteriores a un cursor monotónico global. Permite mantener una visión incremental del runtime sin releer el historial.",
-      inputSchema: {
-        type: "object",
-        properties: {
-          cursor: { type: "integer", minimum: 0, description: "ID de evento ya observado; usar 0 para comenzar" },
-          limite: { type: "integer", minimum: 1, maximum: 200, description: "Máximo de eventos" },
-          session_id: { type: "string", description: "Filtrar por sesión" },
-        },
-        additionalProperties: false,
-      },
-      securitySchemes: [{ type: "oauth2", scopes: ["runtime:read"] }],
-    },
-    {
-      name: "khora_estado_vivo",
-      description: "Estado operativo actual de Khora a partir del registro persistente de runtime. Devuelve actividad reciente, sesiones observadas, última observación y fallos recientes. Solo lectura.",
-      inputSchema: {
-        type: "object",
-        properties: {},
-        additionalProperties: false,
-      },
-      securitySchemes: [{ type: "oauth2", scopes: ["runtime:read"] }],
-    },
-    {
-      name: "khora_eventos_recientes",
-      description: "Lee el flujo reciente de eventos de Khora con filtros por sesión, componente, severidad, resultado, fase, scope y categoría. Solo lectura.",
-      inputSchema: {
-        type: "object",
-        properties: {
-          segundos: { type: "number", minimum: 1, maximum: 86400, description: "Ventana retrospectiva en segundos" },
-          limite: { type: "number", minimum: 1, maximum: 200, description: "Máximo de eventos" },
-          session_id: { type: "string" },
-          component: { type: "string" },
-          severity: { type: "string", enum: ["INFO", "WARN", "ERROR", "CRITICAL"] },
-          outcome: { type: "string", enum: ["SUCCESS", "FAILURE", "PARTIAL", "SKIPPED", "PENDING"] },
-          fase: { type: "string" },
-          scope: { type: "string" },
-          category: { type: "string" },
-        },
-        additionalProperties: false,
-      },
-      securitySchemes: [{ type: "oauth2", scopes: ["runtime:read"] }],
-    },
-
-    {
-      name: "khora_norm_open_turn",
-      description: "Abre el ciclo normativo del turno y fija el snapshot exacto del SI.",
-      inputSchema: {
-        type: "object",
-        properties: {
-          conversation_id: { type: "string" },
-          turn_number: { type: "integer", minimum: 1 },
-          thinking_mode: { type: "string", enum: ["THINKING", "INSTANT", "UNKNOWN", "UNAVAILABLE"] },
-          output_format_version: { type: "string", enum: [REQUIRED_OUTPUT_FORMAT_VERSION] },
-        },
-        required: ["thinking_mode", "output_format_version"],
-        additionalProperties: false,
-      },
-      securitySchemes: [{ type: "oauth2", scopes: ["norm:turn"] }],
-    },
-    {
-      name: "khora_norm_apply_principle",
-      description: "Registra server-side la aplicación secuencial del siguiente principio del snapshot.",
-      inputSchema: {
-        type: "object",
-        properties: {
-          turn_token: { type: "string", minLength: 16 },
-          folio: { type: "string", pattern: "^P\\d{3}$" },
-          status: { type: "string", enum: ["A","N","C"] },
-          anchor: { type: "string" },
-          reason_code: { type: "string" },
-        },
-        required: ["turn_token","folio","status"],
-        additionalProperties: false,
-      },
-      securitySchemes: [{ type: "oauth2", scopes: ["norm:turn"] }],
-    },
-    {
-      name: "khora_norm_verify_turn",
-      description: "Verifica y registra el receipt del turno; solo VERIFIED cierra el ciclo.",
-      inputSchema: {
-        type: "object",
-        properties: {
-          turn_token: { type: "string", minLength: 16 },
-          receipt: {
-            type: "object",
-            properties: {
-              output_header: {
-                type: "string",
-                minLength: 32,
-                description: "REQUERIDO: encabezado SI canónico exacto del ciclo.",
-              },
-              methodology_output_header: {
-                type: "string",
-                minLength: 32,
-                description: "REQUERIDO: encabezado de Metodología canónico exacto del ciclo.",
-              },
-              methodology: {
-                type: "object",
-                properties: {
-                  version: { type: "string", minLength: 1 },
-                  git_commit_sha: { type: "string", minLength: 40, maxLength: 40 },
-                  git_blob_sha: { type: "string", minLength: 40, maxLength: 40 },
-                  sha256: { type: "string", minLength: 64, maxLength: 64 },
-                },
-                required: ["version", "git_commit_sha", "git_blob_sha", "sha256"],
-                additionalProperties: false,
-              },
-            },
-            required: ["output_header", "methodology_output_header", "methodology"],
-            additionalProperties: true,
-          },
-        },
-        required: ["turn_token", "receipt"],
-        additionalProperties: false,
-      },
-      securitySchemes: [{ type: "oauth2", scopes: ["norm:turn"] }],
-    },
-    {
-      name: "khora_norm_release_turn",
-      description: "Emite una autorización de liberación solo para un turno ya VERIFIED.",
-      inputSchema: {
-        type: "object",
-        properties: {
-          turn_token: { type: "string", minLength: 16, description: "Token del ciclo emitido por khora_norm_open_turn" },
-        },
-        required: ["turn_token"],
-        additionalProperties: false,
-      },
-      securitySchemes: [{ type: "oauth2", scopes: ["norm:turn"] }],
-    },
-  ] as any;
-
-  for (const tool of toolsList) {
-    if (
-      tool.name === "khora_mcp_health" ||
-      tool.name === "khora_norm_open_turn" ||
-      tool.name === "khora_norm_apply_principle" ||
-      tool.name === "khora_norm_verify_turn" ||
-      tool.name === "khora_norm_release_turn"
-    ) continue;
-    tool.inputSchema = tool.inputSchema || { type: "object", properties: {} };
-    tool.inputSchema.properties = {
-      ...(tool.inputSchema.properties || {}),
-      _norm_turn_token: {
-        type: "string",
-        minLength: 16,
-        description: "REQUERIDO: token del ciclo emitido por khora_norm_open_turn.",
-      },
-      _thinking_mode: {
-        type: "string",
-        enum: ["THINKING", "INSTANT", "UNKNOWN", "UNAVAILABLE"],
-        description: "REQUERIDO: ChatGPT debe estar en modo Thinking.",
-      },
-      _output_format_version: {
-        type: "string",
-        enum: [REQUIRED_OUTPUT_FORMAT_VERSION],
-        description: "REQUERIDO: contrato de salida visible por ciclo.",
-      },
-    };
-    tool.inputSchema.required = Array.from(new Set([
-      ...(Array.isArray(tool.inputSchema.required) ? tool.inputSchema.required : []),
-      "_norm_turn_token",
-      "_thinking_mode",
-      "_output_format_version",
-    ]));
-  }
-
+  // Publish schemas derived from the exact shapes registered above.
   mcpServer.server.setRequestHandler(ListToolsRequestSchema, async () => ({
     tools: toolsList,
   }));
