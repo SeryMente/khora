@@ -6,12 +6,13 @@ import benchmark from "../../../lib/generated/dictado-benchmark.json";
 const button = "px-3 py-2 border text-sm focus-visible:outline focus-visible:outline-2 disabled:opacity-40";
 const initialUsage = (): Usage => ({ duration_ms: 0, first_result_ms: null, resume_ready_ms: null, result_to_paint_ms: [], final_results: 0, reconnects: 0, protected_checks: 0, protected_changes: 0, visual_jumps: null, fidelity_error_rate: null, ended: false });
 type Settings = { enabled: boolean; sampling: SamplingState };
+const initialSettings = (): Settings => ({ enabled: false, sampling: { day: "", count: 0, last: 0 } });
 type Report = { records: ExperienceRecord[]; summary: ReturnType<typeof summarize>; profileKey: string; truncated: boolean; retentionDays: number };
 export function DictadoExperiencePanel({ busy, texto }: { busy: boolean; texto: string }) {
   const [open, setOpen] = useState(false);
   const [releaseFilter, setReleaseFilter] = useState("all");
   const [report, setReport] = useState<Report | null>(null);
-  const [settings, setSettings] = useState<Settings>({ enabled: false, sampling: { day: "", count: 0, last: 0 } });
+  const [settings, setSettings] = useState<Settings>(initialSettings);
   const [status, setStatus] = useState("");
   const [form, setForm] = useState<"sampled" | "voluntary" | null>(null);
   const [rating, setRating] = useState<"pleasant" | "neutral" | "aversive" | "">("");
@@ -30,9 +31,17 @@ export function DictadoExperiencePanel({ busy, texto }: { busy: boolean; texto: 
   const load = async () => {
     try {
       const r = await fetch("/api/dictado-experience", { cache: "no-store" });
-      const d = await r.json(); if (!r.ok) throw new Error(d.error || "Lectura no disponible.");
+      const d = await r.json();
+      if (r.status === 401) {
+        refs.current.profile = ""; pending.current = []; setReport(null); setComment(""); setForm(null); setSurvey(null); feedbackId.current = null;
+        const off = initialSettings(); refs.current.settings = off; setSettings(off);
+        meter.current = { session: "", start: 0, resume: 0, prefix: "", usage: initialUsage() };
+      }
+      if (!r.ok) throw new Error(d.error || "Lectura no disponible.");
       if (refs.current.profile !== d.profileKey) {
-        refs.current.profile = d.profileKey; pending.current = []; setComment(""); setForm(null);
+        refs.current.profile = d.profileKey; pending.current = []; setComment(""); setForm(null); setSurvey(null); feedbackId.current = null;
+        meter.current = { session: "", start: 0, resume: 0, prefix: "", usage: initialUsage() };
+        const off = initialSettings(); refs.current.settings = off; setSettings(off);
         try { const s = JSON.parse(localStorage.getItem(storageKey(d.profileKey)) || "null"); if (s && typeof s.enabled === "boolean" && s.sampling) { setSettings(s); refs.current.settings = s; } } catch {}
       }
       setReport(d); return true;

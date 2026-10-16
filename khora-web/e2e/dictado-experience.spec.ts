@@ -78,3 +78,23 @@ test("encuesta muestreada: solo después de detener, sin foco forzado ni texto e
   expect(payloads.filter(p => p.data.kind === "session").every(p => p.data.metrics.duration_ms >= 60_000)).toBe(true);
   expect(payloads.every(p => p.data.kind !== "feedback")).toBe(true);
 });
+
+
+test("cambio de perfil: no hereda consentimiento ni borradores; salida limpia datos", async ({ page }) => {
+  await page.getByRole("button", { name: "Calidad del dictado", exact: true }).click();
+  await page.getByLabel("Activar mediciones y encuestas breves del dictado").check();
+  await page.getByRole("button", { name: "Dar opinión", exact: true }).click();
+  await page.getByRole("textbox", { name: "Comentario adicional" }).fill("Borrador de otra cuenta");
+  await page.route("**/api/dictado-experience", async route => {
+    await route.fulfill({ json: { records: [], profileKey: "new-profile", truncated: false, retentionDays: 90 } });
+  });
+  await page.getByRole("button", { name: "Calidad del dictado", exact: true }).click();
+  await page.getByRole("button", { name: "Calidad del dictado", exact: true }).click();
+  await expect(page.getByLabel("Activar mediciones y encuestas breves del dictado")).not.toBeChecked();
+  await expect(page.getByRole("textbox", { name: "Comentario adicional" })).toHaveCount(0);
+  await page.route("**/api/dictado-experience", async route => { await route.fulfill({ status: 401, json: { error: "Inicia sesión." } }); });
+  await page.getByRole("button", { name: "Calidad del dictado", exact: true }).click();
+  await page.getByRole("button", { name: "Calidad del dictado", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Dar opinión", exact: true })).toBeDisabled();
+  await expect(page.getByRole("status")).toContainText("Inicia sesión");
+});
