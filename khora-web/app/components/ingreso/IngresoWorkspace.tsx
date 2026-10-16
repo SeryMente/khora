@@ -75,6 +75,8 @@ function IngresoContenido() {
   const flujoRef = useRef<any>(null);
   const trozosRef = useRef<Blob[]>([]);
   const fragmentosRef = useRef<Fragmento[]>([]);
+  // Confirmed editor content is a frozen prefix; subsequent ASR owns only its tail.
+  const baseDictadoRef = useRef<SegmentoReconciliado[]>([]);
   const ultimaMarcaTiempoRef = useRef<number>(0);
   const pendienteRef = useRef("");
   const segmentosRef = useRef<SegmentoReconciliado[]>([]);
@@ -303,19 +305,20 @@ function IngresoContenido() {
         pendienteRef.current = ensamblado;
 
         const parrafos = ensamblado.split("\n\n").filter((p) => p.trim().length > 0);
-        const existentes = [...segmentosRef.current];
+        const base = baseDictadoRef.current;
+        const existentes = segmentosRef.current.slice(base.length);
 
-        const nuevosSegmentos: SegmentoReconciliado[] = parrafos.map((p, idx) => {
+        const nuevosSegmentos: SegmentoReconciliado[] = [...base, ...parrafos.map((p, idx): SegmentoReconciliado => {
           const segExistente = existentes[idx];
           if (segExistente && (segExistente.estado === "editado_manual" || segExistente.modificadoManualmente)) {
             return segExistente;
           }
           return {
-            id: segExistente?.id ?? `seg-${idx + 1}-${Date.now()}`,
+            id: segExistente?.id ?? `seg-${base.length + idx + 1}-${Date.now()}`,
             texto: p,
             estado: "provisional_asr",
           };
-        });
+        })];
 
         segmentosRef.current = nuevosSegmentos;
         setSegmentos(nuevosSegmentos);
@@ -700,11 +703,14 @@ function IngresoContenido() {
     rec.interimResults = true;
     observarDictado("RECONOCEDOR_CONSTRUIDO", { outcome: "SUCCESS", attemptId: "recognizer-" + intento, metrics: { recognizer_attempt: intento, continuous: true, interim_results: true, recognition_supported: true, source_mode: modoEntradaRef.current } });
     rec.onstart = () => {
+      if (recRef.current !== rec) return;
       setEscuchando(true);
       abortosRef.current = 0;
       observarDictado("RECONOCEDOR_INICIADO", { outcome: "SUCCESS", attemptId: "recognizer-" + intento, durationMs: Date.now() - recognizerStartedAt, metrics: { recognizer_attempt: intento, recognizer_state: "started", recognizer_active: true, source_mode: modoEntradaRef.current } });
     };
     rec.onresult = (ev: any) => {
+      // stop() may deliver queued callbacks after an edit has started a new instance.
+      if (recRef.current !== rec) return;
       let interino = "";
       const ahora = Date.now();
       for (let i = ev.resultIndex; i < ev.results.length; i++) {
@@ -733,6 +739,7 @@ function IngresoContenido() {
       }
     };
     rec.onerror = (ev: any) => {
+      if (recRef.current !== rec) return;
       const clase = String(ev?.error ?? "unknown");
       observarDictado("ERROR_RECONOCEDOR", { severity: clase === "no-speech" ? "INFO" : clase === "aborted" ? "WARN" : "ERROR", outcome: clase === "no-speech" ? "PARTIAL" : "FAILURE", reasonCode: clase, attemptId: "recognizer-" + intento, metrics: { recognizer_attempt: intento, abort_count: abortosRef.current, was_recording: Boolean(grabRef.current), source_mode: modoEntradaRef.current } });
       void enviarEventosObservabilidadDictado();
@@ -768,6 +775,7 @@ function IngresoContenido() {
       const recognizerIsCurrent = recRef.current === rec;
       observarDictado("EVENTO_FIN_RECONOCEDOR", { severity: recognizerIsCurrent ? "INFO" : "WARN", outcome: activoRef.current ? "PENDING" : "SUCCESS", reasonCode: recognizerIsCurrent ? null : "callback_from_previous_recognizer", attemptId: "recognizer-" + intento, metrics: { recognizer_attempt: intento, recognizer_is_current: recognizerIsCurrent, recognizer_active: activoRef.current, reconnect_count: reconexionesRef.current } });
       if (activoRef.current && !recognizerIsCurrent) observarDictado("REARME_INSTANCIA_ANTERIOR", { severity: "WARN", outcome: "PARTIAL", reasonCode: "previous_recognizer_onend_while_active", attemptId: "recognizer-" + intento, metrics: { recognizer_attempt: intento, recognizer_is_current: false, recognizer_active: true } });
+      if (!recognizerIsCurrent) { void enviarEventosObservabilidadDictado(); return; }
       setEscuchando(false);
       setParcial("");
       if (!activoRef.current) { void enviarEventosObservabilidadDictado(); return; }
@@ -775,7 +783,7 @@ function IngresoContenido() {
       observarDictado("RECONEXION_PROGRAMADA", { outcome: "PENDING", attemptId: "recognizer-" + intento, metrics: { recognizer_attempt: intento, reconnect_count: reconexionesRef.current } });
       void enviarEventosObservabilidadDictado();
       rearmeRef.current = setTimeout(() => {
-        if (!activoRef.current) return;
+        if (!activoRef.current || recRef.current !== rec) return;
         reconexionesRef.current += 1;
         setReconexiones(reconexionesRef.current);
         observarDictado("RECONEXION_INICIADA", { outcome: "PENDING", attemptId: "recognizer-" + intento, metrics: { recognizer_attempt: intento, reconnect_count: reconexionesRef.current } });
@@ -785,7 +793,7 @@ function IngresoContenido() {
           observarDictado("RECONEXION_FALLIDA", { severity: "WARN", outcome: "PARTIAL", reasonCode: "restart_rejected", attemptId: "recognizer-" + intento, metrics: { reconnect_count: reconexionesRef.current } });
           try { rec.abort(); } catch {}
           rearmeRef.current = setTimeout(() => {
-            if (!activoRef.current) return;
+            if (!activoRef.current || recRef.current !== rec) return;
             try {
               rec.start();
               observarDictado("RECONEXION_REINTENTADA", { outcome: "PENDING", attemptId: "recognizer-" + intento, metrics: { reconnect_count: reconexionesRef.current, retry_count: 1 } });
@@ -1243,6 +1251,7 @@ function IngresoContenido() {
     segmentosRef.current = [];
     setSegmentos([]);
     fragmentosRef.current = [];
+    baseDictadoRef.current = [];
     ultimaMarcaTiempoRef.current = 0;
     pendienteRef.current = "";
     setPendiente("");
@@ -1318,6 +1327,16 @@ function IngresoContenido() {
       };
     });
 
+    // Start a new recognition epoch from exactly the visible, confirmed document.
+    // Old recognition paragraphs must never be matched to this prefix by index.
+    baseDictadoRef.current = nuevosSegmentos;
+    fragmentosRef.current = [];
+    ultimaMarcaTiempoRef.current = 0;
+    if (relojRef.current) clearTimeout(relojRef.current);
+    relojRef.current = null;
+    pendienteRef.current = "";
+    setPendiente("");
+    setParcial("");
     segmentosRef.current = nuevosSegmentos;
     setSegmentos(nuevosSegmentos);
   }, [texto]);
@@ -1335,7 +1354,8 @@ function IngresoContenido() {
         forzarConfirmacion,
         estabaDictando: debeReanudar,
         confirmar: aplicarEdicionInSitu,
-        desactivar: () => undefined,
+        // Escape without edits must also preserve a visible, not-yet-final ASR result.
+        desactivar: () => { if (debeReanudar) aplicarEdicionInSitu(); },
         reanudar: reanudarTrasEdicionInSitu,
       });
       observarDictado(forzarConfirmacion ? "EDICION_IN_SITU_CONFIRMADA" : "EDICION_IN_SITU_CANCELADA", { outcome: "SUCCESS", durationMs: Date.now() - editStartedAt, metrics: { confirmed: forzarConfirmacion, was_dictating: debeReanudar, chars_before: textoAntesEdicionRef.current.length, chars_after: texto.length } });
