@@ -1,3 +1,4 @@
+import { McpDiagnosticError, diagnose, type McpDiagnostic } from "./mcp-diagnostics";
 // @l0 L0-002 §4 · @req MCP-TOOL-01/REQ-1
 import { getMcpReadOnlyDb } from "./mcp-db";
 import { descifrarTexto } from "./cripto";
@@ -184,6 +185,8 @@ export async function toolKhoraListarVolcados(args: {
     limite,
     offset,
     total_retornados: items.length,
+    cobertura: { examinados: items.length, ilegibles: items.filter(item => item.error_descifrado).length },
+    completo: items.every(item => !item.error_descifrado),
   };
 }
 
@@ -196,7 +199,7 @@ export async function toolKhoraLeerVolcado(args: {
   const volcadoId = await resolverVolcadoId(args.id);
 
   if (!volcadoId) {
-    throw new Error(`Volcado con identificador o folio '${args.id}' no fue encontrado.`);
+    throw new McpDiagnosticError("MCP_VOLCADO_NOT_FOUND");
   }
 
   // Leer volcado principal con SELECT dinámico
@@ -205,7 +208,7 @@ export async function toolKhoraLeerVolcado(args: {
 
   const res = await db.query(`SELECT ${selectCols} FROM volcado WHERE id = $1`, [volcadoId]);
   if (res.rowCount === 0) {
-    throw new Error(`Volcado '${volcadoId}' no encontrado.`);
+    throw new McpDiagnosticError("MCP_VOLCADO_NOT_FOUND");
   }
 
   const volcado = res.rows[0];
@@ -220,14 +223,16 @@ export async function toolKhoraLeerVolcado(args: {
     );
 
     if (vRes.rowCount === 0) {
-      throw new Error(`Versión ${args.version} del volcado '${args.id}' no existe.`);
+      throw new McpDiagnosticError("MCP_VERSION_NOT_FOUND");
     }
 
     const vRow = vRes.rows[0];
     let textoVersion = "";
+    let errorDescifrado = false;
     try {
       textoVersion = descifrarTexto(String(vRow.texto || ""));
     } catch (e) {
+      errorDescifrado = true;
       textoVersion = "[ERROR DE DESCIFRADO]";
     }
 
@@ -242,6 +247,8 @@ export async function toolKhoraLeerVolcado(args: {
       creado_en: vRow.creado_en,
       usuario: vRow.usuario,
       es_version_historica: true,
+      error_descifrado: errorDescifrado,
+      ...(errorDescifrado ? { diagnosticos: [diagnose(new McpDiagnosticError("MCP_DECRYPTION_FAILED"), { operation: "khora_leer_volcado" })] } : {}),
     };
   }
 
@@ -261,6 +268,7 @@ export async function toolKhoraLeerVolcado(args: {
     ...metadata,
     texto: textoPlano, // Servido Verbatim
     error_descifrado: errorDescifrado,
+    ...(errorDescifrado ? { diagnosticos: [diagnose(new McpDiagnosticError("MCP_DECRYPTION_FAILED"), { operation: "khora_leer_volcado" })] } : {}),
   };
 }
 
@@ -271,7 +279,7 @@ export async function toolKhoraBuscarVolcados(args: {
   offset?: number;
 }) {
   if (!args.busqueda || !args.busqueda.trim()) {
-    throw new Error("El parámetro 'busqueda' no puede estar vacío.");
+    throw new McpDiagnosticError("MCP_INPUT_INVALID");
   }
 
   const db = getMcpReadOnlyDb();
@@ -286,13 +294,15 @@ export async function toolKhoraBuscarVolcados(args: {
 
   const busquedaFolded = foldAccents(args.busqueda.trim());
   const resultados: any[] = [];
+  let ilegibles = 0;
 
   for (const row of res.rows) {
     let textoPlano = "";
     try {
       textoPlano = descifrarTexto(String(row.texto || ""));
     } catch (e) {
-      continue; // Unreadable rows are skipped or reported
+      ilegibles += 1;
+      continue; // Report partial coverage; unreadable is not "no match".
     }
 
     const textoFolded = foldAccents(textoPlano);
@@ -321,6 +331,9 @@ export async function toolKhoraBuscarVolcados(args: {
   return {
     busqueda: args.busqueda,
     total_coincidencias: resultados.length,
+    completo: ilegibles === 0,
+    cobertura: { examinados: res.rows.length, ilegibles },
+    ...(ilegibles ? { diagnosticos: [diagnose(new McpDiagnosticError("MCP_DECRYPTION_FAILED"), { operation: "khora_buscar_volcados" })] } : {}),
     limite,
     offset,
     resultados: paginados,
@@ -335,7 +348,7 @@ export async function toolKhoraVersionesVolcado(args: {
   const id = await resolverVolcadoId(args.volcado_id);
 
   if (!id) {
-    throw new Error(`Volcado con identificador o folio '${args.volcado_id}' no encontrado.`);
+    throw new McpDiagnosticError("MCP_VOLCADO_NOT_FOUND");
   }
 
   // Verificar existencia de volcado y versión aprobada
@@ -346,12 +359,14 @@ export async function toolKhoraVersionesVolcado(args: {
   );
 
   if (vRes.rowCount === 0) {
-    throw new Error(`Volcado '${args.volcado_id}' no encontrado.`);
+    throw new McpDiagnosticError("MCP_VOLCADO_NOT_FOUND");
   }
 
   const volcado = vRes.rows[0];
 
   // Consultar historial de versiones si existe la tabla volcado_version
+  const diagnosticos: McpDiagnostic[] = [];
+  const secciones_fallidas: string[] = [];
   let versiones: any[] = [];
   try {
     const verRes = await db.query(
@@ -366,7 +381,8 @@ export async function toolKhoraVersionesVolcado(args: {
       es_aprobada: volcado.version_aprobada === r.version,
     }));
   } catch (e) {
-    // Si volcado_version no tuviera registros aún
+    diagnosticos.push(diagnose(e, { operation: "khora_versiones_volcado.versiones" }));
+    secciones_fallidas.push("versiones");
     versiones = [];
   }
 
@@ -382,6 +398,8 @@ export async function toolKhoraVersionesVolcado(args: {
     );
     auditoria = audRes.rows;
   } catch (e) {
+    diagnosticos.push(diagnose(e, { operation: "khora_versiones_volcado.auditoria" }));
+    secciones_fallidas.push("auditoria");
     auditoria = [];
   }
 
@@ -395,5 +413,8 @@ export async function toolKhoraVersionesVolcado(args: {
     aprobado_en: volcado.aprobado_en,
     versiones,
     auditoria,
+    completo: secciones_fallidas.length === 0,
+    secciones_fallidas,
+    diagnosticos,
   };
 }

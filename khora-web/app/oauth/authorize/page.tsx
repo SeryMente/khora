@@ -175,7 +175,7 @@ export default async function AuthorizePage(props: {
     redirect(
       buildRedirectUrl({
         error: "access_denied",
-        error_description: `Acceso denegado: La cuenta de Google (${userEmail}) no esta autorizada para MCP. Se requiere ${config.allowedEmail}.`,
+        error_description: "Acceso denegado: la sesión actual no está autorizada para este recurso. Inicia sesión con una cuenta autorizada; no se revela la identidad esperada.",
         state,
         iss: config.issuer,
       })
