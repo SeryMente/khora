@@ -9,6 +9,7 @@ type Settings = { enabled: boolean; sampling: SamplingState };
 type Report = { records: ExperienceRecord[]; summary: ReturnType<typeof summarize>; profileKey: string; truncated: boolean; retentionDays: number };
 export function DictadoExperiencePanel({ busy, texto }: { busy: boolean; texto: string }) {
   const [open, setOpen] = useState(false);
+  const [releaseFilter, setReleaseFilter] = useState("all");
   const [report, setReport] = useState<Report | null>(null);
   const [settings, setSettings] = useState<Settings>({ enabled: false, sampling: { day: "", count: 0, last: 0 } });
   const [status, setStatus] = useState("");
@@ -133,7 +134,8 @@ export function DictadoExperiencePanel({ busy, texto }: { busy: boolean; texto: 
     try { const r = await fetch("/api/dictado-experience", { method: "DELETE", headers: { "X-Khora-Experience-Profile": refs.current.profile } }); if (!r.ok) throw new Error(); pending.current = []; remember({ enabled: false, sampling: { day: "", count: 0, last: 0 } }); setForm(null); setComment(""); setSurvey(null); setConfirmDelete(false); await load(); setStatus("Tus mediciones y opiniones se borraron; la recopilación queda desactivada."); }
     catch { setStatus("No se pudo confirmar el borrado."); } finally { setSending(false); }
   };
-  const summary = report?.summary;
+  const filtered = report?.records.filter(r => releaseFilter === "all" || (r.clientRelease || "unattributed") === releaseFilter) || [];
+  const summary = report ? summarize(filtered) : undefined;
   return <section aria-label="Calidad del dictado" className="max-w-4xl mx-auto px-6 pb-6 space-y-3" style={{ color: "var(--khora-ink)" }}>
     <div className="flex flex-wrap gap-2">
       <button type="button" className={button} onClick={() => { setOpen(!open); if (!open) void load(); }}>Calidad del dictado</button>
@@ -161,6 +163,7 @@ export function DictadoExperiencePanel({ busy, texto }: { busy: boolean; texto: 
       <p className="text-xs">La versión probada se muestra por separado de la publicada. Un benchmark controlado no acredita voz real, comodidad ni almacenamiento productivo.</p>
       <h2 className="font-semibold">Uso real y opinión: tus datos</h2>
       {!report ? <p>Datos no disponibles; no equivale a cero fallos.</p> : <>
+        <label className="block">Versión del uso observado <select value={releaseFilter} onChange={e => setReleaseFilter(e.target.value)}><option value="all">Todas las versiones (sin atribuir mejora)</option>{Array.from(new Set(report.records.map(r => r.clientRelease || "unattributed"))).map(v => <option key={v} value={v}>{v === "unattributed" ? "Versión no identificada" : v.slice(0, 12)}</option>)}</select></label>
         <label className="block"><input type="checkbox" checked={settings.enabled} disabled={busy || sending} onChange={e => { remember({ ...settings, enabled: e.target.checked }); if (!e.target.checked) { meter.current.usage.ended = true; setSurvey(null); } }} /> Activar mediciones y encuestas breves del dictado</label>
         <p className="text-xs">Opcional. No se recopila texto dictado ni audio en estas mediciones. Invitación aleatoria tras algunas sesiones de un minuto o más; máximo dos al día, separadas por dos horas. Nunca durante la captura o edición. Datos consultables durante 90 días; eliminación al acceder después del plazo. Las opiniones voluntarias se analizan aparte.</p>
         <dl className="text-sm space-y-1">
@@ -173,7 +176,7 @@ export function DictadoExperiencePanel({ busy, texto }: { busy: boolean; texto: 
         <p className="text-xs">{summary?.ended} sesiones terminadas registradas. {report.truncated ? "Lectura parcial: se alcanzó el límite de 5000 registros." : "Ventana: últimos 90 días."} Los comentarios no se envían automáticamente a modelos ni se usan para cambiar el producto sin revisión.</p>
         <div className="flex flex-wrap gap-2"><button type="button" className={button} disabled={busy || sending} onClick={() => { void flush().then(load); }}>Actualizar / reintentar pendientes</button><button type="button" className={button} disabled={busy} onClick={exportData}>Exportar mis datos</button><button type="button" className={button} disabled={busy || sending} onClick={() => setConfirmDelete(true)}>Borrar mis datos</button></div>
         {confirmDelete && <div><p>¿Borrar tus mediciones y opiniones del dictado? No borra tus capturas ni el registro de auditoría.</p><button type="button" className={button} disabled={busy || sending} onClick={() => void remove()}>Confirmar borrado</button><button type="button" className={button} onClick={() => setConfirmDelete(false)}>Conservar</button></div>}
-        <details><summary>Mis comentarios enviados</summary>{report.records.filter(r => r.data.kind === "feedback" && r.data.comment).map(r => <p className="whitespace-pre-wrap text-sm" key={r.id}>{r.data.kind === "feedback" ? r.data.comment : ""}</p>)}</details>
+        <details><summary>Mis comentarios enviados</summary>{filtered.filter(r => r.data.kind === "feedback" && r.data.comment).map(r => <p className="whitespace-pre-wrap text-sm" key={r.id}>{r.data.kind === "feedback" ? r.data.comment : ""}</p>)}</details>
       </>}
     </div>}
     {status && <p role="status" className="text-sm">{status}</p>}

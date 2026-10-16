@@ -75,3 +75,36 @@ test("almacenamiento: comentario cifrado, idempotencia, conflicto, aislamiento y
     assert.ok(calls.filter(c => /^(SELECT|DELETE)/.test(c.sql)).every(c => c.sql.includes("owner_key=$1")));
   } finally { if (oldAuth === undefined) delete process.env.AUTH_SECRET; else process.env.AUTH_SECRET = oldAuth; if (oldKey === undefined) delete process.env.X_KHORA_KEY; else process.env.X_KHORA_KEY = oldKey; }
 });
+
+test("ruta HTTP real: autenticación, origen, cambio de perfil y privacidad", async () => {
+  const ts = await import("typescript");
+  const { readFileSync } = await import("node:fs");
+  const { createRequire } = await import("node:module");
+  const { NextRequest, NextResponse } = await import("next/server");
+  const contracts = await import("../../lib/contracts/dictado-experience");
+  const source = readFileSync("app/api/dictado-experience/route.ts", "utf8");
+  const js = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText;
+  let user: { email: string } | undefined; const saves: string[] = []; const deletions: string[] = [];
+  const oldSecret = process.env.AUTH_SECRET; process.env.AUTH_SECRET = "synthetic-http-route-auth-secret";
+  const mockStore = { experienceOwner, RETENTION_DAYS: 90, saveExperience: async (owner: string) => { saves.push(owner); return "saved"; }, readExperience: async () => ({ records: [], truncated: false }), deleteExperience: async (owner: string) => { deletions.push(owner); } };
+  const module = { exports: {} as any }; const req = createRequire(import.meta.url);
+  const requireMock = (name: string) => name === "@/auth" ? { auth: async () => user ? { user } : null } : name === "next/server" ? { NextRequest, NextResponse } : name === "@/lib/contracts/dictado-experience" ? contracts : name === "@/lib/server/dictado-experience" ? mockStore : req(name);
+  new Function("require", "module", "exports", js)(requireMock, module, module.exports);
+  const route = module.exports;
+  const request = (origin: string | null, profile: string, body: unknown = feedback()) => new NextRequest("https://khora.example.test/api/dictado-experience", { method: "POST", headers: { "content-type": "application/json", ...(origin ? { origin } : {}), "x-khora-experience-profile": profile }, body: JSON.stringify(body) });
+  try {
+    assert.equal((await route.GET()).status, 401);
+    assert.equal((await route.POST(request("https://khora.example.test", ""))).status, 401);
+    user = { email: "a@example.test" }; const ownerA = experienceOwner(user)!;
+    assert.equal((await route.POST(request("https://evil.example.test", ownerA))).status, 403);
+    assert.equal((await route.POST(request(null, ownerA))).status, 403);
+    assert.equal((await route.POST(request("https://khora.example.test", "another-profile"))).status, 409);
+    assert.equal((await route.POST(request("https://khora.example.test", ownerA, { ...feedback(), owner_key: "forged" }))).status, 400);
+    const response = await route.POST(request("https://khora.example.test", ownerA));
+    assert.equal(response.status, 200); assert.equal(saves[0], ownerA); assert.match(response.headers.get("cache-control") || "", /no-store/);
+    user = { email: "b@example.test" };
+    assert.equal((await route.POST(request("https://khora.example.test", ownerA))).status, 409); assert.equal(saves.length, 1);
+    const del = new NextRequest("https://khora.example.test/api/dictado-experience", { method: "DELETE", headers: { origin: "https://khora.example.test", "x-khora-experience-profile": ownerA } });
+    assert.equal((await route.DELETE(del)).status, 409); assert.equal(deletions.length, 0);
+  } finally { if (oldSecret === undefined) delete process.env.AUTH_SECRET; else process.env.AUTH_SECRET = oldSecret; }
+});
