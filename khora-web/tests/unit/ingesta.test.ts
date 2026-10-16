@@ -53,8 +53,20 @@ Pool.prototype.query = (async function (sql: string, params?: any[]) {
     return { rows: found };
   }
 
-  // 3. UPDATE/INSERT queries
+  // Transactional clients must acknowledge the guarded update, not contact PostgreSQL.
+  if (sqlNormalized.startsWith("update volcado")) {
+    const failure = sqlNormalized.includes("ultimo_error = $2");
+    return { rows: [{ estado: failure ? "fallido" : "ingerido" }], rowCount: 1 };
+  }
+  // BEGIN/COMMIT and audit INSERT stay inside the mock.
   return { rows: [] };
+}) as any;
+
+Pool.prototype.connect = (async function (this: Pool) {
+  return {
+    query: (sql: string, params?: any[]) => (Pool.prototype.query as unknown as (sql: string, params?: any[]) => Promise<any>).call(this, sql, params),
+    release: () => undefined,
+  };
 }) as any;
 
 import { POST } from "../../app/api/ingesta/route";
@@ -87,6 +99,22 @@ test("Ingesta Route Suite", async (t) => {
     }
   ];
 
+  await t.test("0. Missing provenance remains rejected before kernel or persistence", async () => {
+    const form = new FormData();
+    form.append("volcado_id", volcadoId);
+    form.append("version", "1");
+    dbQueriesLogged = [];
+    let kernelCalls = 0;
+    const previous = fetchMockResponse;
+    fetchMockResponse = async () => { kernelCalls++; throw new Error("Kernel must not be called"); };
+    try {
+      const response = await POST(new Request("http://localhost/api/ingesta", { method: "POST", body: form }));
+      assert.strictEqual(response.status, 400);
+      assert.strictEqual(kernelCalls, 0);
+      assert.ok(!dbQueriesLogged.some(q => /^\s*UPDATE volcado/i.test(q.sql)));
+    } finally { fetchMockResponse = previous; }
+  });
+
   await t.test("1. Ingesta de versión aprobada - Ingesta exitosa con io_id persistido", async () => {
     fetchMockResponse = async () => ({
       status: 200,
@@ -101,6 +129,7 @@ test("Ingesta Route Suite", async (t) => {
     const formData = new FormData();
     formData.append("volcado_id", volcadoId);
     formData.append("version", "1");
+    formData.append("sha256", sha);
 
     const request = new Request("http://localhost/api/ingesta", {
       method: "POST",
@@ -135,6 +164,7 @@ test("Ingesta Route Suite", async (t) => {
     const formData = new FormData();
     formData.append("volcado_id", volcadoId);
     formData.append("version", "1"); // requested 1, but approved is 2
+    formData.append("sha256", sha);
 
     const request = new Request("http://localhost/api/ingesta", {
       method: "POST",
@@ -152,11 +182,12 @@ test("Ingesta Route Suite", async (t) => {
 
   await t.test("3. Rechazo de SHA incorrecto", async () => {
     // Modify mock DB sha256_aprobado to mismatch version
-    mockDbVolcados[0].sha256_aprobado = "mismatch-sha-value";
+    mockDbVersions[0].sha256 = "mismatch-sha-value";
 
     const formData = new FormData();
     formData.append("volcado_id", volcadoId);
     formData.append("version", "1");
+    formData.append("sha256", sha);
 
     const request = new Request("http://localhost/api/ingesta", {
       method: "POST",
@@ -168,8 +199,8 @@ test("Ingesta Route Suite", async (t) => {
     const body = await response.json();
     assert.ok(body.error.includes("integridad rota"));
 
-    // Restore sha256_aprobado
-    mockDbVolcados[0].sha256_aprobado = sha;
+    // Restore the intentionally corrupted stored-version digest.
+    mockDbVersions[0].sha256 = sha;
   });
 
   await t.test("4. volcado_id inexistente", async () => {
@@ -177,6 +208,7 @@ test("Ingesta Route Suite", async (t) => {
     const formData = new FormData();
     formData.append("volcado_id", fakeId);
     formData.append("version", "1");
+    formData.append("sha256", sha);
 
     const request = new Request("http://localhost/api/ingesta", {
       method: "POST",
@@ -196,6 +228,7 @@ test("Ingesta Route Suite", async (t) => {
     const formData = new FormData();
     formData.append("volcado_id", volcadoId);
     formData.append("version", "99");
+    formData.append("sha256", sha);
 
     const request = new Request("http://localhost/api/ingesta", {
       method: "POST",
@@ -221,6 +254,7 @@ test("Ingesta Route Suite", async (t) => {
     const formData = new FormData();
     formData.append("volcado_id", volcadoId);
     formData.append("version", "1");
+    formData.append("sha256", sha);
 
     const request = new Request("http://localhost/api/ingesta", {
       method: "POST",
@@ -233,8 +267,10 @@ test("Ingesta Route Suite", async (t) => {
     // Assert state is set to 'fallido' in DB
     const updateQuery = dbQueriesLogged.find(q => q.sql.includes("UPDATE volcado"));
     assert.ok(updateQuery);
-    assert.ok(updateQuery.sql.includes("estado = $3"));
-    assert.strictEqual(updateQuery.params?.[2], "fallido");
+    assert.ok(updateQuery.sql.includes("ELSE 'fallido' END"));
+    assert.strictEqual(updateQuery.params?.[2], 1);
+    assert.strictEqual(updateQuery.params?.[3], sha);
+    assert.ok(updateQuery.sql.includes("ELSE 'fallido' END"));
     assert.strictEqual(updateQuery.params?.[1], "Kernel internal error details");
 
     // Verify audit log
@@ -255,6 +291,7 @@ test("Ingesta Route Suite", async (t) => {
     const formData = new FormData();
     formData.append("volcado_id", volcadoId);
     formData.append("version", "1");
+    formData.append("sha256", sha);
 
     const request = new Request("http://localhost/api/ingesta", {
       method: "POST",
@@ -267,7 +304,9 @@ test("Ingesta Route Suite", async (t) => {
     // State is 'fallido' in DB
     const updateQuery = dbQueriesLogged.find(q => q.sql.includes("UPDATE volcado"));
     assert.ok(updateQuery);
-    assert.strictEqual(updateQuery.params?.[2], "fallido");
+    assert.strictEqual(updateQuery.params?.[2], 1);
+    assert.strictEqual(updateQuery.params?.[3], sha);
+    assert.ok(updateQuery.sql.includes("ELSE 'fallido' END"));
     assert.strictEqual(updateQuery.params?.[1], "Request to kernel timed out");
   });
 
@@ -288,6 +327,7 @@ test("Ingesta Route Suite", async (t) => {
     const formData = new FormData();
     formData.append("volcado_id", volcadoId);
     formData.append("version", "1");
+    formData.append("sha256", sha);
 
     let request = new Request("http://localhost/api/ingesta", {
       method: "POST",
@@ -334,7 +374,9 @@ test("Ingesta Route Suite", async (t) => {
 
     updateQuery = dbQueriesLogged.find(q => q.sql.toLowerCase().includes("update volcado"));
     assert.ok(updateQuery);
-    assert.strictEqual(updateQuery.params?.[2], "fallido");
+    assert.strictEqual(updateQuery.params?.[2], 1);
+    assert.strictEqual(updateQuery.params?.[3], sha);
+    assert.ok(updateQuery.sql.includes("ELSE 'fallido' END"));
     assert.strictEqual(updateQuery.params?.[1], "Kernel offline");
   });
 });

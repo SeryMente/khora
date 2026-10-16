@@ -4,6 +4,7 @@ import contract from "../../contracts/FORMATO-REGISTRO-VERIFICACION-CICLO.schema
 export const CANONICAL_OUTPUT_FORMAT_VERSION = contract.version;
 
 type CiState = "✓" | "?" | "!";
+type RaState = "INICIAL" | "✓" | "CORRECTIVO" | "!";
 type RdcState = "SI" | "NO" | "PENDIENTE";
 type SessionState = "ACTIVA" | "INACTIVA" | "NO VERIFICADA";
 type KState = "✓" | "OFF" | "?" | "!";
@@ -15,6 +16,7 @@ export type CanonicalCycleOutputData = {
   si_header: string;
   methodology_header: string;
   ci: CiState;
+  ra: RaState;
   ubic: string;
   rdc: RdcState;
   account: string;
@@ -35,7 +37,7 @@ export type CanonicalOutputValidation = {
   data?: CanonicalCycleOutputData;
 };
 
-const HUD_PATTERN = /^ChatGPT · CI: (✓|\?|!) · UBIC: (.*?) · RDC: (SI|NO|PENDIENTE) · C: (.*?) · RDC-USO: ([0-9]+(?:\.[0-9]+)?% usado \/ [0-9]+(?:\.[0-9]+)?% restante) · S: (ACTIVA|INACTIVA|NO VERIFICADA) · F: (✓|\?|!) · K: (✓|OFF|\?|!) · T: (✓|\?|!) · RDC-CNX: (.*?) · USR: (.*?)$/;
+const HUD_PATTERN = /^ChatGPT · CI: (✓|\?|!) · RA: (INICIAL|✓|CORRECTIVO|!) · UBIC: (.*?) · RDC: (SI|NO|PENDIENTE) · C: (.*?) · RDC-USO: ([0-9]+(?:\.[0-9]+)?% usado \/ [0-9]+(?:\.[0-9]+)?% restante) · S: (ACTIVA|INACTIVA|NO VERIFICADA) · F: (✓|\?|!) · K: (✓|OFF|\?|!) · T: (✓|\?|!) · RDC-CNX: (.*?) · USR: (.*?)$/;
 const CYCLE_PATTERN = /^.+ \/ CONV-[0-9]+ \/ C[0-9]+$/;
 
 export function hashCanonicalCycleOutput(output: string): string {
@@ -46,6 +48,7 @@ export function renderCanonicalCycleOutput(data: CanonicalCycleOutputData): stri
   const hud = [
     "ChatGPT",
     "CI: " + data.ci,
+    "RA: " + data.ra,
     "UBIC: " + data.ubic,
     "RDC: " + data.rdc,
     "C: " + data.account,
@@ -106,16 +109,17 @@ export function validateCanonicalCycleOutput(
     si_header: siHeader,
     methodology_header: methodologyHeader,
     ci: hudMatch![1] as CiState,
-    ubic: hudMatch![2],
-    rdc: hudMatch![3] as RdcState,
-    account: hudMatch![4],
-    rdc_use: hudMatch![5],
-    session: hudMatch![6] as SessionState,
-    f: hudMatch![7] as CiState,
-    k: hudMatch![8] as KState,
-    t: hudMatch![9] as TState,
-    rdc_cnx: hudMatch![10],
-    usr: hudMatch![11],
+    ra: hudMatch![2] as RaState,
+    ubic: hudMatch![3],
+    rdc: hudMatch![4] as RdcState,
+    account: hudMatch![5],
+    rdc_use: hudMatch![6],
+    session: hudMatch![7] as SessionState,
+    f: hudMatch![8] as CiState,
+    k: hudMatch![9] as KState,
+    t: hudMatch![10] as TState,
+    rdc_cnx: hudMatch![11],
+    usr: hudMatch![12],
     result: resultMatch![1],
     state: stateMatch![1] as CycleState,
   };
