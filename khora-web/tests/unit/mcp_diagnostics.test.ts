@@ -10,6 +10,7 @@ import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/
 import * as diagnostics from "../../lib/server/mcp-diagnostics";
 import { diagnose, diagnosticFailure, McpDiagnosticError } from "../../lib/server/mcp-diagnostics";
 import { normalizeToolResult, withHttpDiagnostics } from "../../lib/server/mcp-diagnostic-boundary";
+import { setDbForTesting, resetDbForTesting } from "../../lib/server/neon";
 import { fetchNormativeGithub } from "../../lib/server/normative-github";
 import { routeFixture } from "./helpers/mcp-route-fixture";
 import { MCP_TOOL_SCOPES } from "../../lib/server/mcp-tool-contract";
@@ -21,8 +22,10 @@ const endpoint = "https://api.github.com/repos/SeryMente/metodologia/commits/mai
 
 async function githubFixture(work: () => Promise<void>, fetcher?: typeof fetch) {
   const token = process.env.KHORA_NORM_GITHUB_TOKEN, original = globalThis.fetch;
+  setDbForTesting({ query: async () => ({ rows: [] }) });
+  process.env.EP_ALLOWED_EMAIL ||= "test@example.com";
   try { process.env.KHORA_NORM_GITHUB_TOKEN = "synthetic-credential-not-real"; if (fetcher) globalThis.fetch = fetcher; await work(); }
-  finally { globalThis.fetch = original; if (token === undefined) delete process.env.KHORA_NORM_GITHUB_TOKEN; else process.env.KHORA_NORM_GITHUB_TOKEN = token; }
+  finally { resetDbForTesting(); globalThis.fetch = original; if (token === undefined) delete process.env.KHORA_NORM_GITHUB_TOKEN; else process.env.KHORA_NORM_GITHUB_TOKEN = token; }
 }
 test("private normative read requires dedicated credential, never broad token or anonymous fallback", async () => {
   await githubFixture(async () => { delete process.env.KHORA_NORM_GITHUB_TOKEN; await assert.rejects(fetchNormativeGithub(endpoint, "SI_MAIN_FETCH"), { message: "NORM_GITHUB_CREDENTIAL_MISSING" }); }, async () => { throw Error("Network must not run"); });

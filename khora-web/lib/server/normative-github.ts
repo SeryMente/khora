@@ -1,9 +1,14 @@
 import { McpDiagnosticError } from "./mcp-diagnostics";
+import { readGithubCredential } from "./github-credentials";
 
 // Dedicated credential: fine-grained token, Contents: read, selected normative repository only.
 // Never reuse a user's MCP Bearer or a broad GITHUB_TOKEN; never send credentials across redirects.
 export async function fetchNormativeGithub(url: string, operation: string): Promise<Response> {
-  const token = process.env.KHORA_NORM_GITHUB_TOKEN?.trim();
+  let token = process.env.KHORA_NORM_GITHUB_TOKEN?.trim();
+  if (!token) {
+    try { token = await readGithubCredential('norm') || undefined; }
+    catch { throw new McpDiagnosticError('NORM_SECRET_UNAVAILABLE'); }
+  }
   if (!token) throw new McpDiagnosticError("NORM_GITHUB_CREDENTIAL_MISSING", { authentication: "missing", operation });
   const parsed = new URL(url);
   if (parsed.origin !== "https://api.github.com" || !parsed.pathname.startsWith("/repos/SeryMente/metodologia/") || parsed.username || parsed.password) {

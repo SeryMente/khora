@@ -77,7 +77,7 @@ test("EP Security: Token creation, audience, scopes and command secrecy", async 
     assert.equal(decoded.iss, "khora-ep");
     assert.equal(decoded.aud, "https://khora.example.com/api/ep");
     assert.equal(decoded.sub, email);
-    assert.equal(decoded.scope, "ep:bootstrap ep:logs:write ep:logs:read");
+    assert.equal(decoded.scope, "ep:bootstrap ep:logs:write ep:logs:read ep:github:read");
     assert.equal(decoded.typ, "ep-session");
     assert.equal(decoded.launchMode, "normal");
 
