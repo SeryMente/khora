@@ -711,3 +711,14 @@ Registro ejecutable existente y documento único actualizados, sin otro manual. 
 - Artefacto publicado por código: `khora-web/lib/generated/dictado-benchmark.json`; especificación completa: `khora-web/docs/dictado-experience.md`.
 - Descarga local Vercel no valida DATABASE_URL ni clave; causa abierta. No se modifican secretos. Se añade compuerta de almacenamiento opt-in para candidata sin promoción de dominio: escritura, cifrado, lectura y borrado de propietario sintético.
 - Hasta verificar esa candidata: NO desplegado en dominio público, NO persistencia productiva certificada.
+
+
+### C010 · Candidata verificada y aislamiento de perfil · 2026-10-16
+Código probado `11fde5a7da7aec46b9873103ddf13213ba1c6c4f`: benchmark aprobado, 15 pruebas de navegador; suite unitaria, tipos, ui-review:check y ui:contract con salida 0. Se añadió regresión de cambio de perfil: se reinician consentimiento, borrador, muestra y sesión de métricas; 401 invalida el informe anterior.
+
+Candidata Vercel `khora-6zly05101-victorhugotorresmendez-8991s-projects.vercel.app`, sin promover dominio: build productivo real correcto y compuerta `EXPERIENCE_STORAGE_PREFLIGHT=passed write+cipher+read+delete (synthetic owner only)`. Verificados SQL real, comentario cifrado en reposo (payload sin texto), lectura descifrada y borrado de filas sintéticas. No hubo sustitución de claves. Esto resuelve el falso negativo de configuración descargada, NO valida todavía sesión humana ni micrófono físico.
+
+El proyecto Vercel usa un Build Command propio que no invoca npm prebuild. Para esta candidata se pasó configuración local temporal que antepone la compuerta y conserva después la secuencia existente de migración runtime + `next build --webpack`. No se modificó la configuración permanente del proyecto ni infraestructura del Entorno Persistente. La publicación final debe exportar main exacto, generar la procedencia y acreditar el alias; no promover esta candidata de rama como si fuese main.
+
+### Controles externos no ejecutados
+GitHub Actions, ejecución 38967613218, no inició trabajos: `The job was not started because recent account payments have failed or your spending limit needs to be increased.` Los estados Vercel de integración GitHub también señalan restricción de repositorio privado de organización en plan Hobby. No se modifican facturación, plan, visibilidad, permisos ni protecciones. Las comprobaciones ejecutadas directamente y el build Vercel son evidencia independiente, no equivalencia a Actions verde. La integración solo puede usar merge normal, sin anulación administrativa de controles.
