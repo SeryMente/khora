@@ -390,5 +390,8 @@ El registro canónico de errores de Notion no pudo actualizarse porque su ancest
 | Montaje: `Cannot read properties of undefined (reading 'filter')` | Fixture genérico incumplía contrato de mediciones, no fallo de persistencia | Fixture específico con records/perfil; conservar aserciones de recuperación y volver a ejecutar |
 | Directiva cliente precedida por import durante parche | Inserción antes del prólogo válido | Colocar use client primero; verificar montaje y build después |
 | Lease MP3 identificado por TIMESTAMPTZ | Date puede truncar microsegundos; confirmación podía no coincidir | UUID persistido y guardas SQL en éxito/error, con prueba de lease vigente y obsoleto |
+| Metadatos GitHub: `GraphQL: Projects (classic) is being deprecated ... projectCards` | gh pr edit falló tras publicar correctamente el código; no hubo merge | PATCH REST con gh api; se releyó propuesta abierta y mismo commit remoto. Usar REST para metadatos con esta versión de CLI |
 
 Nada de este apartado registra secretos, audio ni texto personal. No eliminar evidencia ni relajar aserciones para borrar un fallo del informe.
+
+Corte funcional probado y publicado: `9935d56f8458dd40035d1a757c7cc752679064f6`. La solicitud #301 se releyó abierta y no fusionada; la huella del objeto documental remoto coincidió con Git local. Esta última anotación es solo documental. No activa trabajo, migra ni despliega.
