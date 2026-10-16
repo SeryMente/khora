@@ -3,6 +3,7 @@
 
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { DictadoExperiencePanel } from "./DictadoExperiencePanel";
 import { IngresoIngestaPanel } from "./IngresoIngestaPanel";
 import { ensamblarParrafos, Fragmento } from "../../../lib/transcripcion/ensamblar";
 import { reconciliarSegmentos, type SegmentoReconciliado } from "../../../lib/transcripcion/reconciliar";
@@ -127,6 +128,8 @@ function IngresoContenido() {
   const observarDictado = useCallback((eventName: string, options: DictadoObservationOptions = {}) => {
     const sessionId = sesionIdRef.current;
     if (!sessionId) return null;
+    // Private in-memory metadata only; instrumentation must never break capture.
+    try { window.dispatchEvent(new CustomEvent("khora:dictado:observation", { detail: { sessionId, eventName, options } })); } catch {}
     return registrarEventoObservabilidadDictado({ sessionId, eventName, ...options });
   }, []);
 
@@ -1478,6 +1481,7 @@ function IngresoContenido() {
         onConfirmarEdicion: confirmarEdicion,
       }}
       />
+      <DictadoExperiencePanel texto={texto} busy={estado === "dictando" || editando || guardando || adjuntandoAudio || retranscribiendo} />
     </>
   );
 }
