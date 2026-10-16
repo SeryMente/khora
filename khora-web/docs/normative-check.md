@@ -132,11 +132,37 @@ OAuth usa PKCE; los metadatos anuncian authorization_code, refresh_token y offli
 
 La revocación negativa debe probarse con credenciales de prueba y alcance autorizado, nunca revocando accesos productivos para obtener evidencia.
 
+### Auditoría de resultados y tokens · 2026-10-16
+
+**Estado: diagnóstico confirmado; correcciones de runtime NO implementadas.** Base auditada: `dbc73afada1ad29abf46f4599d22cc3158a9a986`. Desde Notion se registró la conexión, se descubrieron las quince herramientas y una llamada real a salud devolvió `UNAVAILABLE`, `missing_scopes: []`, `reason: SI_MAIN_FETCH_404`. Esto acredita acceso a la comprobación, no lectura de dictados, ciclo completo ni revisión exacta del despliegue.
+
+**Tres credenciales distintas:** (1) Bearer OAuth/manual para acceder a Khora, incluido `volcados:read`; (2) `turn_token` emitido por Khora tras abrir el ciclo; (3) credencial del servidor para leer GitHub privado. No son intercambiables. `SeryMente/metodologia` existe, es privado y su `main` contiene `SI-METACOGNITIVO.md` y `METODOLOGIA.md`, comprobado por la conexión GitHub autorizada. En `norm-check.ts`, las consultas de revisión, contenido, historial y blobs salen sin `Authorization`: esta ruta no consume `GITHUB_TOKEN`, aunque otras partes del repositorio sí lo usan. El primer 404 ocurre en `/commits/main`, no al leer dictados ni necesariamente al localizar el archivo. No se inspeccionaron valores secretos ni configuración desplegada; no se conoce la presencia, vigencia o alcance de una credencial GitHub en producción. La conexión GitHub del agente no se transmite automáticamente al servidor Khora.
+
+| Capa / resultados inventariados | Defecto observado / criterio de corrección pendiente |
+|---|---|
+| Descubrimiento, transporte y configuración | Conservar códigos de protocolo, negociación y challenge; diferenciar JSON/esquema/método/aceptación, configuración y fallo interno. El SDK cubre parte del transporte: no llamar validado a lo no probado |
+| Bearer OAuth/manual y renovación | La entrada colapsa varias causas en 401; `verifyJwtDetailed` ya distingue errores que `verifyJwt` pierde. El manual agrupa ausencia, caducidad y revocación. Mantener respuestas públicas resistentes a enumeración y razones seguras correlacionadas en diagnóstico autorizado; no revelar existencia de tokens |
+| Registro/consentimiento OAuth y tokens manuales | Mantener `invalid_client`, `invalid_grant`, etc. y HTTP/challenges; errores de cuerpo, origen, campos y dependencias deben tener acción segura. No publicar secretos, cuentas esperadas, URL internas ni mensajes de excepción crudos |
+| Permisos y normativa | Separar permiso faltante, token ausente/inválido/caducado/revocado, ciclo cerrado/intento obsoleto, identidad/formato, orden y evidencia. No recomendar reabrir en todos los casos; `conversation_id` y `turn_number` deben llegar juntos o ninguno |
+| GitHub / fuentes normativas | `SI_MAIN_FETCH_404` omite dependencia, operación y autenticación ausente; no tiene tiempo límite explícito en esas consultas. Distinguir HTTP, red, tiempo agotado, límite de peticiones, payload, referencia, contenido e integridad; un 404 externo no prueba inexistencia |
+| Listado, lectura y búsqueda | Listado/lectura actual señalan descifrado, pero la lectura histórica devuelve un texto centinela sin bandera y buscar omite ilegibles. Señalar parcialidad, elementos afectados y cobertura; no confundir cero coincidencias con corpus íntegramente buscado |
+| Versiones/auditoría | Dos capturas de cualquier error SQL devuelven `[]`; distinguir vacío confirmado de consulta fallida, sin exponer SQL ni cadenas de conexión |
+| Revisión y observabilidad | Revisión devuelve objetos `error` envueltos sin `isError`; pueden registrarse como éxito. Distinguir pantalla inválida, fallo HTTP/red/renderizado y estado ausente/obsoleto; lo obsoleto no es caída ni sesión cerrada |
+| Verificación/liberación | Conservar `VERIFIED`, `INVALID`, `INCOMPLETE` y sus razones, intento y efectos persistidos; un rechazo funcional no equivale a excepción de transporte ni autorización de salida |
+| Telemetría e inesperados | La envoltura clasifica solo `isError` y registra a veces `Error` como razón. Unificar resultado y correlación, distinguir resultado de negocio/persistencia; causa desconocida explícita, sin inventarla ni devolver stack/payload privado |
+
+**Contrato propuesto, pendiente de revisión específica:** todos los resultados deben distinguir éxito con datos, vacío confirmado, parcial/incompleto, obsoleto/ausente, rechazo/bloqueo y fallo. Para cada problema: `code` estable, `message` claro, `stage`, `operation`, `dependency` cuando corresponda, evidencia segura observada, `retryable`, acción de recuperación y `correlation_id`; declarar impacto/efectos conocidos y cobertura si es parcial. Usar un registro único por familia de códigos, compartido por cliente y telemetría; no duplicar cadenas ni romper formatos MCP/OAuth. Un inesperado usa fallback seguro con causa no determinada e identificador rastreable; no prometer adivinar fallos no observables.
+
+**Aceptación de la corrección:** probar cada rama inventariada, las quince herramientas y límites compartidos; incluir datos/cero/ilegibles/parcial, falta de permisos, credencial caducada/revocada de prueba, turnos/recibos, errores de red/tiempo/límite/servicio/SQL y mensajes hostiles con secretos sintéticos. Comprobar flags, códigos, HTTP/challenges, acciones, correlación, redacción y no-filtración, además de compatibilidad de clientes. Fallar si una rama conocida queda sin clasificar o un fallo parcial se presenta como recuperación completa. La revisión estática no acredita ejecución de todas esas ramas.
+
+**Evidencia de esta auditoría:** cuatro reproducciones locales causales, con código real y límites externos sintéticos: consulta normativa sin autenticación, búsqueda incompleta presentada como vacía, errores de versiones/auditoría convertidos a vacío y fallo de descifrado histórico sin bandera. Confirman defectos existentes, no correcciones ni acceso productivo. Pendiente aprobar el contrato público/privado de diagnóstico y el uso de credencial servidor con lectura mínima del repositorio normativo; no cambiar permisos, identidad, redirecciones ni compuertas por esta auditoría.
+
+
 ## Compatibilidad
 
 | Recorrido | Estado demostrado | Pendiente |
 |---|---|---|
-| Notion | Admisión parcial prevista en código; conexión Khora no acreditada aquí | Autorización, identidad normativa legítima, tarea completa y recuperación |
+| Notion | Conexión registrada, catálogo descubierto y salud invocada; `SI_MAIN_FETCH_404`, sin scopes faltantes reportados | Recuperación GitHub privada, identidad normativa legítima, tarea completa y lectura de dictados |
 | ChatGPT | Identidad contemplada; conexión no probada en esta revisión | Cliente/versionado, autenticación, operación, verificación y liberación reales |
 | Segundo cliente independiente | No verificado | Identificar cliente y resolver admisión/identidad aprobadas antes de probar |
 | SDK HTTP aislado | Ruta real y transporte real con dependencias externas sustituidas | No prueba criptografía, OAuth, base de datos ni plataforma comercial |
