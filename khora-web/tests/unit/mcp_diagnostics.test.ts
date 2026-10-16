@@ -178,3 +178,28 @@ test("audit false is explicit, even when no exception is thrown", async () => {
   const result = normalizeToolResult({content:[{type:"text",text:JSON.stringify({runtime:{disponible:false,stale:true}})}]}, context);
   assert.equal(result._meta["khora/result"], "ABSENT");
 });
+
+
+test("every known diagnostic explains the problem without repeating its technical code", () => {
+  const source = fs.readFileSync(path.join(root, "lib/server/mcp-diagnostics.ts"), "utf8");
+  const definitions = source.slice(0, source.indexOf("export function diagnose"));
+  const codes = new Set([...definitions.matchAll(/\b(?:NORM_GITHUB|MCP|MANUAL_TOKEN|OAUTH|TURN|SI|METHODOLOGY|PRINCIPLE|PRINCIPLES|APPLICATION_LOG|EVIDENCE|MANIFEST|NORMATIVE|OUTPUT|RECEIPT)_[A-Z_]+\b/g)].map(match => match[0]));
+  for (const suffix of ["INVALID_FORMAT", "INVALID_HEADER", "INVALID_SIGNATURE", "INVALID_PAYLOAD", "EXPIRED"]) codes.add("TURN_TOKEN_" + suffix);
+  let checked = 0;
+  for (const code of codes) {
+    const d = diagnose(code, context); if (d.code !== code) continue;
+    checked++; assert.ok(d.message.length > 15 && d.message.length <= 230, code);
+    assert.ok(d.recovery.length > 15 && d.recovery.length <= 230, code);
+    assert.ok(!d.message.includes(code), code); assert.ok(!d.recovery.includes(code), code);
+    assert.doesNotMatch(d.message + d.recovery, /scope|Bearer|issuer|grant|payload|snapshot|ledger|runtime|challenge|normativo|normativa|correlacionad|recurso|metadatos/i, code);
+  }
+  assert.ok(checked >= 130, String(checked));
+});
+test("private instructions failures name the repository without claiming that every 404 is a missing credential", () => {
+  const missing = diagnose("NORM_GITHUB_CREDENTIAL_MISSING", context);
+  assert.match(missing.message, /falta la credencial/); assert.match(missing.recovery, /SeryMente\/metodologia/);
+  const denied = diagnose("NORM_GITHUB_NOT_FOUND_OR_INACCESSIBLE", context);
+  assert.match(denied.message, /encontrar o abrir/); assert.match(denied.message, /no permite distinguir/);
+  assert.doesNotMatch(denied.message, /falta la credencial|no existe|fue borrad/);
+  assert.match(diagnose("MCP_INTERNAL_ERROR", context).message, /todavía no sabe explicar/);
+});

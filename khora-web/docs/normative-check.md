@@ -133,6 +133,20 @@ OAuth usa PKCE; los metadatos anuncian authorization_code, refresh_token y offli
 
 La revocación negativa debe probarse con credenciales de prueba y alcance autorizado, nunca revocando accesos productivos para obtener evidencia.
 
+### Mensajes para quien usa Khora
+
+La explicación va en `message` y la acción en `recovery`; `code` queda como referencia técnica. Frases cortas, palabras comunes y responsables claros: usuario, aplicación o administrador. Nombrar el servicio y, cuando ayude a resolver el problema, el repositorio concreto. No usar el código como explicación ni atribuir una causa que no se haya comprobado. Conservar la separación entre respuesta pública y motivos protegidos de autorización.
+
+| Caso | Explicación que recibe la persona |
+|---|---|
+| Falta acceso GitHub del servidor | Al servidor Khora le falta la credencial para leer sus instrucciones privadas en GitHub. El administrador debe configurar lectura de SeryMente/metodologia; no es el token de dictados |
+| GitHub no permite encontrar/abrir las instrucciones | Khora no pudo encontrar o abrir sus instrucciones privadas en GitHub. Esa respuesta no permite distinguir entre ambas causas |
+| Acceso a Khora rechazado | Khora no recibió una credencial de acceso que pudiera aceptar. Volver a conectar; no afirmar si faltaba, venció o fue revocada |
+| Falta permiso para una operación | Esta conexión no tiene el permiso necesario para la operación que pediste. Revisar solo el permiso requerido, no conceder todos |
+| Causa desconocida | Khora encontró un fallo que todavía no sabe explicar. El administrador debe revisar el registro con el identificador de seguimiento |
+
+El texto ejecutable completo está en `mcp-diagnostics.ts`; no mantener otra lista completa de mensajes. Pruebas de redacción: explicación/acción breves, sin repetir el código ni jerga de acceso, cobertura del inventario conocido, causa desconocida explícita y ambigüedad de GitHub preservada. Cambiar el texto no cambia permisos, códigos, reintentos, evidencias o compuertas. No acredita que un despliegue anterior muestre estos mensajes.
+
 ### Contrato de resultados y credenciales · revisión 2026-10-16
 
 **Estado:** corrección integrada en main mediante #296; despliegue no verificado. Comprobación real en este ciclo: salud y apertura normativa devolvieron `SI_MAIN_FETCH_404`, sin token de turno ni lectura de dictados. No se conoce la revisión desplegada ni se deduce la configuración secreta del error. La auditoría de la base `dbc73afada1ad29abf46f4599d22cc3158a9a986` observó salud real `UNAVAILABLE`, `missing_scopes: []`, `SI_MAIN_FETCH_404`; no lectura de dictados. Confirmó consultas normativas sin Authorization hacia `SeryMente/metodologia`, existente y privado. No se inspeccionaron valores secretos ni la configuración/revisión desplegadas. El servidor no hereda la conexión GitHub del agente. Historia: C007.2 del sprint; implementación: C007.3.
