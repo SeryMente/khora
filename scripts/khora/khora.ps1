@@ -269,6 +269,28 @@ function Register-KhoraRebootCleanup {
     Register-ScheduledTask -TaskName $Task -Action $action -Trigger $trigger -Principal $principal -Force|Out-Null
 }
 function Get-KhoraGitHubToken {
+    if($script:KhoraToken -and $KhoraApiBase){
+        $candidate=$null
+        $response=$null
+        try{
+            $response=Invoke-RestMethod -Method Post -Uri ($KhoraApiBase.TrimEnd('/')+'/github-credential') -Headers @{Authorization=('Bearer '+$script:KhoraToken)} -TimeoutSec 20 -MaximumRedirection 0 -ErrorAction Stop
+            $candidate=[string]$response.token
+            if($candidate -notmatch '^github_pat_[A-Za-z0-9_]{20,240}$'){throw 'Invalid protected credential'}
+            return (ConvertTo-SecureString $candidate -AsPlainText -Force)
+        }catch{
+            $status=0
+            try{$status=[int]$_.Exception.Response.StatusCode}catch{}
+            $explanation=switch($status){
+                401 {'La sesion del entorno persistente no es valida o no autoriza recuperar el token. Genera una sesion nueva en Khora.'}
+                403 {'Esta sesion no pertenece al propietario autorizado del token GitHub.'}
+                409 {'Falta guardar el token GitHub del entorno persistente en Seguridad > Boveda.'}
+                503 {'Khora no pudo abrir la credencial protegida. Revisa la disponibilidad de la boveda y su clave de cifrado.'}
+                default {'No se pudo obtener una respuesta valida al recuperar el token GitHub. La causa no esta confirmada.'}
+            }
+            throw ($explanation+' No se uso otra credencial. HTTP='+$status)
+        }finally{$candidate=$null;$response=$null}
+    }
+
     $gh=Resolve-KhoraHostToolPath -Name 'gh'
     if($gh-and(Test-Path -LiteralPath $gh -PathType Leaf)){
         try{

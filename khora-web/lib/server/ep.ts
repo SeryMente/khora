@@ -1,5 +1,6 @@
 import { createHash, randomBytes, randomUUID } from "node:crypto";
 import { getDb } from "@/lib/server/neon";
+import { githubTokenForEp } from "./github-credentials";
 import { JwtPayload, signJwt, verifyJwtDetailed } from "@/lib/server/jwt";
 
 export type EpState = "START" | "OK" | "FAIL" | "INFO" | "SKIP";
@@ -60,7 +61,7 @@ export async function createEpSessionToken(email: string, origin: string, launch
   const jti = randomBytes(24).toString("base64url");
   const payload: EpTokenPayload = {
     iss: config.issuer, sub: email.toLowerCase(), aud: config.audience,
-    scope: "ep:bootstrap ep:logs:write ep:logs:read", gen: 1,
+    scope: "ep:bootstrap ep:logs:write ep:logs:read ep:github:read", gen: 1,
     workspaceRepos: resolvedWorkspaceRepos,
     exp, iat: now, jti, sid, typ: "ep-session", launchMode,
   };
@@ -136,7 +137,7 @@ export type EpWorkspaceRepo = {
 const DEFAULT_OEP_WORKSPACE_REPOS = ["CENSUS", "signal-interpreter"] as const;
 let repoCatalogCache: { expiresAt: number; value: EpWorkspaceRepo[] } | null = null;
 async function githubApi(path: string): Promise<any> {
-  const token = process.env.GITHUB_TOKEN?.trim();
+  const token = await githubTokenForEp();
   if (!token) throw new Error("github_catalog_unavailable");
   const response = await fetch("https://api.github.com" + path, {
     headers: { Authorization: "Bearer " + token, Accept: "application/vnd.github+json", "User-Agent": "khora-ep-catalog/1" },

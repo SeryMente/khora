@@ -4,6 +4,7 @@
 import { useEffect, useState } from "react";
 import { LockKeyhole, Clock3, TriangleAlert, Check } from "lucide-react";
 import VaultAgentAccessPanel from "./VaultAgentAccessPanel";
+import GithubSecretsPanel from "./GithubSecretsPanel";
 
 type Estado = { configurado?: boolean; abierta?: boolean; minutos?: number; error?: string };
 
@@ -227,6 +228,7 @@ export default function PaginaBoveda() {
           )}
         </div>
 
+        <GithubSecretsPanel unlocked={abierta} />
         <VaultAgentAccessPanel />
 
         {/* Response Notice */}
