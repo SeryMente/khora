@@ -120,3 +120,23 @@ test("/api/grafo retries routing discovery once through the equivalent direct Bo
     restoreEnv();
   }
 });
+
+
+test("/api/grafo timestamp fallbacks use valid Cypher in global and filtered queries", async () => {
+  const restoreEnv = withEnv({ NEO4J_URI: "bolt://localhost:7687", NEO4J_USER: "neo4j", NEO4J_PASSWORD: "test" });
+  const seen = new Set<string>();
+  const restoreDriver = mockDriver(async (query) => {
+    assert.doesNotMatch(query, /datetime\(\)\.toString\(/);
+    if (query.includes(" AS timestamp")) assert.ok(query.includes("toString(datetime())"));
+    seen.add(query);
+    if (query.includes("MATCH (e:Entity)")) return [entity("e-1"), entity("e-2")];
+    return rowsFor(query);
+  });
+  try {
+    for (const suffix of ["?limit=10", "?io_id=io-1&limit=10"]) {
+      const res = await GET(new Request("http://localhost:3000/api/grafo" + suffix));
+      assert.equal(res.status, 200);
+    }
+    assert.equal(seen.size, 6);
+  } finally { restoreDriver(); restoreEnv(); }
+});

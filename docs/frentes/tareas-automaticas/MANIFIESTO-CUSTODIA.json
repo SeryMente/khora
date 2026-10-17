@@ -1,6 +1,6 @@
 {
-  "version": 3,
-  "object_seal": "TAREAS-v0.10",
+  "version": 6,
+  "object_seal": "TAREAS-v0.13",
   "purpose": "Inventario de integridad y procedencia; no estado vivo paralelo",
   "source_of_truth": "docs/frentes/tareas-automaticas/OBJETO-CANONICO.md",
   "owner_repo": "SeryMente/khora",
@@ -20,9 +20,9 @@
     {
       "path": "OBJETO-CANONICO.md",
       "classification": "objeto_vivo",
-      "bytes": 129581,
-      "sha256": "4f5b0cbd20456bde34653159cc60df27ac3c08d9cc86583937d16a290c32f492",
-      "git_blob_sha1": "5d7a8e8ec67e1ed1783473c30724b0e64a214d66"
+      "bytes": 160570,
+      "sha256": "006e07b54c9616aa08cf299ec60a82f4254537b7b3b38d50509d955522498dff",
+      "git_blob_sha1": "dafe49f0f167b940197f4481709622c44a7ea6a2"
     },
     {
       "path": "originales/registro-notion-recibido.txt",
@@ -72,8 +72,29 @@
       "bytes": 3067,
       "sha256": "62baf66ec2cddc5ffb0bde6adf1e47c4185367fbabd80ae6129a7019afa7f50c",
       "git_blob_sha1": "cf3f6a6e2dbae7a8a6fc8c2323a6d201f1ce48a3"
+    },
+    {
+      "path": "originales/instruccion-entregas-ciclo16.txt",
+      "classification": "original_historico_inmutable",
+      "bytes": 703,
+      "sha256": "84506101980eadbdf9b2559d1d1032955b0abfea5fc78af9272255e5522bf5dd",
+      "git_blob_sha1": "85f4bc8af4fe47b305454380831d3cbe6f7ef612"
+    },
+    {
+      "path": "originales/instruccion-uso-operativo-ciclo17.txt",
+      "classification": "original_historico_inmutable",
+      "bytes": 500,
+      "sha256": "cc797cdb6142c4925cc2c705cf752b68f931bcd2d838230e433f2a6a83c259b2",
+      "git_blob_sha1": "c1053bf3f4c4a353c0c230ff387d19970a69e5cb"
+    },
+    {
+      "path": "originales/instruccion-construccion-ciclo18.txt",
+      "classification": "original_historico_inmutable",
+      "bytes": 176,
+      "sha256": "d7fd00e7fba886660b3ac6c2172dfefaefec1cbbaf744a59234e7cd5a2bbd615",
+      "git_blob_sha1": "753fc0fdd10d03f8fce66452e18f393bdb277cd5"
     }
   ],
   "self_integrity": "El manifiesto no se hashea a sí mismo; comprobar su blob/commit devuelto por GitHub.",
-  "previous_verified_documentation_commit": "2af9c102dc9937b720b4d78c3e9d367c20001568"
+  "previous_verified_documentation_commit": "e15da64209be401d3b32822168ed5ae5f16d8d87"
 }
