@@ -1,0 +1,175 @@
+{
+  "kind": "frozen_access_correction_evidence_not_live_state",
+  "anchor": "2026-10-17 · Ciclo 20 · corrección expresa del operador",
+  "scope": "Documentos nombrados o identificables del frente y sus antecedentes; no clausura recursiva de todos los enlaces del workspace ni identidad binaria de copias antiguas.",
+  "base_object_blob": "5106a98f0f873e5ad5b87564318a9580a7be5fb3",
+  "base_commit": "2012e2389deb732568a5bd384817c19499fb910c",
+  "user_correction_path": "originales/correccion-acceso-2026-10-17.txt",
+  "notion_documents": [
+    {
+      "name": "Registro histórico del frente",
+      "url": "https://app.notion.com/p/159f2ff32b6a4435952ebcf89ad563d2",
+      "verified_scope": "leído; v0.6 histórica, no objeto vivo"
+    },
+    {
+      "name": "Desarrollo · Khora",
+      "url": "https://app.notion.com/p/7145d4a3b250820388d601fafbf752bf",
+      "verified_scope": "índice leído"
+    },
+    {
+      "name": "Metodología de uso general · Marco",
+      "url": "https://app.notion.com/p/cd05d4a3b25083dcae8b812c2aca740e",
+      "verified_scope": "contenido leído"
+    },
+    {
+      "name": "Evento de adopción metodológica",
+      "url": "https://app.notion.com/p/6035d4a3b25083108e5c81e58508c396",
+      "verified_scope": "propiedades leídas; cuerpo vacío"
+    },
+    {
+      "name": "Migración Todoist",
+      "url": "https://app.notion.com/p/a115d4a3b250827e9f4201545dc61e32",
+      "verified_scope": "contenido leído; estado histórico no prueba conector actual"
+    },
+    {
+      "name": "Tareas · espejo Todoist",
+      "url": "https://app.notion.com/p/e0e5d4a3b250820ab5c1018157c28077",
+      "verified_scope": "base y esquema abiertos; consulta de filas ejecutada correctamente, sin filas devueltas"
+    },
+    {
+      "name": "Unidades de Auditoría de Fidelidad · EpisTwin",
+      "url": "https://app.notion.com/p/55d5d4a3b25083a1a14381ca70281acd",
+      "verified_scope": "leídas en recuperación; v1.2"
+    },
+    {
+      "name": "Radar Comercial · IA Personal & GraphRAG",
+      "url": "https://app.notion.com/p/5a85d4a3b25082dabe21813fa78b8d60",
+      "verified_scope": "leído; v0.1, no actualizado"
+    },
+    {
+      "name": "Anexo Técnico Exhaustivo · EpisTwin",
+      "url": "https://app.notion.com/p/3175d4a3b250837fbccb812a3e55620e",
+      "verified_scope": "leído en recuperación"
+    },
+    {
+      "name": "EpisTwin · Artículo original",
+      "url": "https://app.notion.com/p/3505d4a3b25082299ad781a788447a6b",
+      "verified_scope": "página y adjunto textual abiertos; lectura local y hash"
+    },
+    {
+      "name": "Canon académico y PDF compuesto",
+      "url": "https://app.notion.com/p/5195d4a3b25082f0993301542b1cbd8a",
+      "verified_scope": "página y PDF abiertos; 100 páginas; extraídas páginas 1–10"
+    },
+    {
+      "name": "Dossier de investigación",
+      "url": "https://app.notion.com/p/fca5d4a3b250835e922701031a36cda4",
+      "verified_scope": "contenido leído; seis líneas académicas, no atribuirlas todas a EpisTwin"
+    },
+    {
+      "name": "Unidades de Auditoría de Fidelidad · RAKG",
+      "url": "https://app.notion.com/p/a6b5d4a3b250835ca6f301c8b8454609",
+      "verified_scope": "contenido leído; 45 unidades"
+    },
+    {
+      "name": "Registro de Taxonomía",
+      "url": "https://app.notion.com/p/b915d4a3b25083d38f7801ee9ad4a493",
+      "verified_scope": "leído en recuperación; elemento existente reutilizado"
+    },
+    {
+      "name": "Auditoría y registro de unificación",
+      "url": "https://app.notion.com/p/8c05d4a3b2508353955d01361575eff7",
+      "verified_scope": "contenido completo leído y tabla de correspondencias consultada"
+    },
+    {
+      "name": "Metaprompt Canónico vigente",
+      "url": "https://app.notion.com/p/a925d4a3b2508393b2b7817f1cf431da",
+      "verified_scope": "contenido leído; v332 · NX-332m; no modificado"
+    },
+    {
+      "name": "Registro Canónico de Errores vigente",
+      "url": "https://app.notion.com/p/b7a5d4a3b2508359945e81c5957b821d",
+      "verified_scope": "contenido leído; distinto del duplicado con ancestro en papelera; escritura no probada"
+    },
+    {
+      "name": "MOTOR-1C vigente",
+      "url": "https://app.notion.com/p/d965d4a3b25082a78f1d01701728b103",
+      "verified_scope": "contenido leído; no ejecutar protocolo por mención histórica"
+    }
+  ],
+  "attached_files": [
+    {
+      "filename": "1_EpisTwin_texto_completo.txt",
+      "bytes": 50449,
+      "sha256": "a81483882a6a6858a85079b7a21c1da415356ac78d5976f9cdab55d7f76b52c6"
+    },
+    {
+      "filename": "EpisTwin_merged.pdf",
+      "bytes": 16167167,
+      "sha256": "f29ec61cc661753f73a14b11c2f7fac8a9bd2b09031751d200e124dca5bbe1ea",
+      "pages": 100,
+      "first_ten_pages_extracted_characters": 50181
+    }
+  ],
+  "migration_source": "https://app.notion.com/p/8c05d4a3b2508353955d01361575eff7",
+  "explicit_mappings": [
+    {
+      "old": "https://app.notion.com/p/42386f44318b8312940681b7c1ca5c53",
+      "current": "https://app.notion.com/p/5a85d4a3b25082dabe21813fa78b8d60",
+      "basis": "tabla del registro de unificación; Equivalente accesible; no igualdad binaria certificada por esta sesión"
+    },
+    {
+      "old": "https://app.notion.com/p/45586f44318b83429553813c12611f6b",
+      "current": "https://app.notion.com/p/5a85d4a3b25082dabe21813fa78b8d60",
+      "basis": "tabla del registro de unificación; Equivalente accesible; no igualdad binaria certificada por esta sesión"
+    },
+    {
+      "old": "https://app.notion.com/p/f4a86f44318b8343ac3401302f4c429f",
+      "current": "https://app.notion.com/p/5a85d4a3b25082dabe21813fa78b8d60",
+      "basis": "tabla del registro de unificación; Equivalente accesible; no igualdad binaria certificada por esta sesión"
+    },
+    {
+      "old": "https://app.notion.com/p/8a786f44318b8235a67e8156fd50a98d",
+      "current": "https://app.notion.com/p/b7a5d4a3b2508359945e81c5957b821d",
+      "basis": "tabla del registro de unificación; Contenido integrado"
+    }
+  ],
+  "title_route_resolutions": [
+    {
+      "old": "https://app.notion.com/p/94486f44318b828da40f01282fcfc99c",
+      "current": "https://app.notion.com/p/5a85d4a3b25082dabe21813fa78b8d60",
+      "basis": "título/función documental y ruta; antiguo ID no presente en tabla; no identidad histórica demostrada"
+    },
+    {
+      "old": "https://app.notion.com/p/05086f44318b82b7aaae01de16ddfcdf",
+      "current": "https://app.notion.com/p/3505d4a3b25082299ad781a788447a6b",
+      "basis": "título/función documental y ruta; antiguo ID no presente en tabla; no identidad histórica demostrada"
+    },
+    {
+      "old": "https://app.notion.com/p/4a886f44318b82a58958819af6533414",
+      "current": "https://app.notion.com/p/3175d4a3b250837fbccb812a3e55620e",
+      "basis": "título/función documental y ruta; antiguo ID no presente en tabla; no identidad histórica demostrada"
+    },
+    {
+      "old": "https://app.notion.com/p/4f686f44318b827f83fb017724b4929a",
+      "current": "https://app.notion.com/p/55d5d4a3b25083a1a14381ca70281acd",
+      "basis": "título/función documental y ruta; antiguo ID no presente en tabla; no identidad histórica demostrada"
+    }
+  ],
+  "unresolved_exact_identity": [
+    {
+      "url": "https://app.notion.com/p/be786f44318b838ba7ff8165583688f4",
+      "context": "cita sobre distinción RAKG/EpisTwin, junto a dossier, taxonomía y anexo",
+      "result": "El expediente histórico no identifica inequívocamente su título y la tabla de unificación no contiene ese ID. Dossier y unidades RAKG actuales sí abiertos; no se afirma que equivalgan al original."
+    }
+  ],
+  "legacy_identity_not_asserted": true,
+  "binary_replication_to_repository": false,
+  "private_pdf_scope": "No copiar PDF de 100 páginas al repo: incluye páginas personales ajenas al artículo; solo huellas y resultado de acceso.",
+  "methodology_revalidation": "Listado main confirma blobs del metacanon 1.5, metodología v0.14.14 y SI v1.6.21 sin cambios respecto a lecturas previas.",
+  "architecture_reference": "Objeto v0.4 y matriz leídos en recuperación en commit e6bc9a742ef8bd9d2990e5755d1d8a75834eb62d; sin fusión ni nueva autorización de tareas.",
+  "product_changes": false,
+  "deployment_attempted": false,
+  "remote_device_used": false,
+  "previous_access_ledger": "evidencias/recuperacion-2026-10-17.json: congelado; resultados incompletos supersedidos por este registro, nunca borrados."
+}
