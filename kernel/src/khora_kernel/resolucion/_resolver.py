@@ -82,7 +82,8 @@ def resolver(
     etiquetas_por_id: dict[str, str] = {}
 
     for t in triples:
-        contextos_por_id[t.origen_id].append(f"Actúa como origen en: {t.relacion} hacia {t.destino_id}")
+        if (t.metadata or {}).get("origen_kind") != "information_object":
+            contextos_por_id[t.origen_id].append(f"Actúa como origen en: {t.relacion} hacia {t.destino_id}")
         if str((t.metadata or {}).get("node_kind", "")).lower() != "literal":
             contextos_por_id[t.destino_id].append(
                 f"Actúa como destino en: {t.origen_id} con relación {t.relacion}"

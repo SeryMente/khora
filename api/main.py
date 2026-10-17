@@ -307,7 +307,7 @@ async def endpoint_ingesta(req: IngestaRequest):
         if existente:
             if existente["v"] == str(prov_terna["volcado_id"]) and existente["ver"] == version_terna and existente["s"] == sha_terna:
                 return {"io_id": objeto_id, "counters": {"create": 0, "update": 0, "ignore": 0}, "ts": datetime.datetime.utcnow().isoformat() + "Z", "idempotent": True}
-            raise Exception(f"Conflicto terna io_id={objeto_id}")
+            raise HTTPException(status_code=409, detail={"error": "conflicto de procedencia", "volcado_id": str(prov_terna["volcado_id"]), "version": version_terna})
 
         texto_final = req.texto
         if not texto_final and req.archivo_base64:

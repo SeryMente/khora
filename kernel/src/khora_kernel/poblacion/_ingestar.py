@@ -36,7 +36,8 @@ def transducir(
 
     entities_set = set()
     for t in triples_j7:
-        entities_set.add(t.origen_id)
+        if (t.metadata or {}).get("origen_kind") != "information_object":
+            entities_set.add(t.origen_id)
         if str((t.metadata or {}).get("node_kind", "")).lower() != "literal":
             entities_set.add(t.destino_id)
     entities = sorted(list(entities_set))
@@ -209,6 +210,7 @@ def proponer(
                 triple=triple,
                 metadata={
                     "origen_canonical": t.origen_id,
+                    "origen_kind": str((t.metadata or {}).get("origen_kind", "entity")),
                     "destino_canonical": t.destino_id,
                     "destino_kind": str((t.metadata or {}).get("node_kind", "entity")),
                     "literal_value": str((t.metadata or {}).get("literal_value", "")),
@@ -430,6 +432,10 @@ def asentar(
             dest_canonical = dest_item.label if dest_item else "desconocido"
 
             relation_meta = it.metadata or {}
+            if relation_meta.get("origen_kind") == "information_object":
+                if relation_meta.get("origen_canonical") != io_id:
+                    raise ValueError("Metadata origin must be the source InformationObject")
+                orig_canonical = io_id
             relaciones_a_escribir.append({
                 "origen_id": orig_canonical,
                 "destino_id": dest_canonical,
@@ -439,6 +445,7 @@ def asentar(
                 "capture_time": (proposal.source_provenance or {}).get("capture_time"),
                 "custody": (proposal.source_provenance or {}).get("custody"),
                 "object_kind": relation_meta.get("destino_kind", "entity"),
+                "origen_kind": relation_meta.get("origen_kind", "entity"),
                 "literal_value": relation_meta.get("literal_value"),
                 "literal_datatype": relation_meta.get("literal_datatype"),
             })
