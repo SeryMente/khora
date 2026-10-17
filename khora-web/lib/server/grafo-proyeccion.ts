@@ -51,6 +51,15 @@ async function limitada<T>(session: { run: (query: string, params: Record<string
   return { rows: result.records.slice(0, limit), truncated: result.records.length > limit };
 }
 
+// Stable display identifier derived only from the published Leiden community.
+// Zero means no published membership, not a fabricated partition.
+function communityNumber(id: string): number {
+  if (!id) return 0;
+  let hash = 2166136261;
+  for (let i = 0; i < id.length; i++) hash = Math.imul(hash ^ id.charCodeAt(i), 16777619);
+  return (hash >>> 0) || 1;
+}
+
 function esIndisponibilidad(error: any): boolean {
   const code = String(error?.code ?? "");
   const name = String(error?.name ?? "");
@@ -97,18 +106,32 @@ export async function obtenerProyeccionGrafo(filtros: Filtros = {}): Promise<Pro
       const entityQuery = ioId || volcadoId
         ? `MATCH (io:InformationObject)-[:MENTIONS]->(e:Entity)
            WHERE toString(io.io_id) IN $ioIds AND e.canonical_key IS NOT NULL
+             AND e.invalid_at IS NULL AND NOT e:User AND NOT e:InformationObject
+           OPTIONAL MATCH (e)-[membership:IN_COMMUNITY]->(c:Community)
+           WHERE membership.invalid_at IS NULL AND c.invalid_at IS NULL
+             AND membership.published = true AND c.published = true
+           WITH e, c ORDER BY c.level ASC, c.community_id ASC
+           WITH e, head(collect(c)) AS communityNode
            RETURN DISTINCT e.canonical_key AS id,
              coalesce(e.label_original, e.canonical_key, 'Sin resumen') AS summary,
-             coalesce(e.community, 0) AS community, coalesce(e.level, 0) AS level,
+             communityNode.community_id AS communityId, communityNode.graph_revision AS communityRevision,
+             coalesce(communityNode.level, 0) AS level,
              coalesce(e.centrality, 1.0) AS centrality,
              coalesce(e.provenance[0], 'Neo4j Aura') AS origen,
              coalesce(toString(e.created_at), toString(e.valid_at), toString(datetime())) AS timestamp,
              CASE WHEN e.needs_review = true THEN 'Pendiente' ELSE 'Verificado' END AS verificacion
            ORDER BY id ASC LIMIT $fetchLimit`
         : `MATCH (e:Entity) WHERE e.canonical_key IS NOT NULL
+             AND e.invalid_at IS NULL AND NOT e:User AND NOT e:InformationObject
+           OPTIONAL MATCH (e)-[membership:IN_COMMUNITY]->(c:Community)
+           WHERE membership.invalid_at IS NULL AND c.invalid_at IS NULL
+             AND membership.published = true AND c.published = true
+           WITH e, c ORDER BY c.level ASC, c.community_id ASC
+           WITH e, head(collect(c)) AS communityNode
            RETURN DISTINCT e.canonical_key AS id,
              coalesce(e.label_original, e.canonical_key, 'Sin resumen') AS summary,
-             coalesce(e.community, 0) AS community, coalesce(e.level, 0) AS level,
+             communityNode.community_id AS communityId, communityNode.graph_revision AS communityRevision,
+             coalesce(communityNode.level, 0) AS level,
              coalesce(e.centrality, 1.0) AS centrality,
              coalesce(e.provenance[0], 'Neo4j Aura') AS origen,
              coalesce(toString(e.created_at), toString(e.valid_at), toString(datetime())) AS timestamp,
@@ -117,7 +140,10 @@ export async function obtenerProyeccionGrafo(filtros: Filtros = {}): Promise<Pro
       const nodeResult = await limitada<Registro>(session, entityQuery, { ioIds }, limit);
       const nodes = nodeResult.rows.map((row) => ({
         id: str(row.get("id")), summary: str(row.get("summary"), "Sin resumen"),
-        community: num(row.get("community"), 0), level: num(row.get("level"), 0),
+        community: communityNumber(str(row.get("communityId"))),
+        communityId: row.get("communityId") == null ? null : str(row.get("communityId")),
+        communityRevision: row.get("communityRevision") == null ? null : str(row.get("communityRevision")),
+        level: num(row.get("level"), 0),
         centrality: num(row.get("centrality"), 1), origen: str(row.get("origen"), "Neo4j Aura"),
         timestamp: str(row.get("timestamp")), verificacion: str(row.get("verificacion"), "Verificado"),
       })).filter((node) => node.id.length > 0);

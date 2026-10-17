@@ -1,4 +1,5 @@
 # @l0 L0-002 · @req ING-01/REQ-1 · @acr ACR-1.1,ACR-1.2,ACR-1.3 · @ua UA-06
+import csv
 import hashlib
 import os
 from datetime import datetime, timezone
@@ -79,7 +80,13 @@ def _llm_ner(chunk: str, puerto_llm: PuertoLLM) -> list[tuple]:
     triples = []
     for line in resp.texto.splitlines():
         if "," in line:
-            parts = [p.strip() for p in line.split(",")]
+            parts = [p.strip() for p in next(csv.reader([line]))]
+            if len(parts) >= 3 and tuple(p.casefold() for p in parts[:3]) in {
+                ("origen", "relacion", "destino"),
+                ("origen", "relación", "destino"),
+                ("source", "relation", "target"),
+            }:
+                continue
             if len(parts) >= 3:
                 orig = parts[0]
                 rel = parts[1]
