@@ -3,9 +3,9 @@
 ## 1. Control e identidad
 
 - Identidad conservada: `MCP-OBS-DICTADO`; extensión documental de dictado, benchmark, retroalimentación y propuesta de voz/síntomas.
-- Versión: **v0.5.1**; sello **MCP-OBS-DICTADO-v0.5.1**. Objeto permanente por encargo V010; no declara permanente ninguna propuesta clínica.
+- Versión: **v0.5.2**; sello **MCP-OBS-DICTADO-v0.5.2**. Objeto permanente por encargo V010; no declara permanente ninguna propuesta clínica.
 - Estado: **CANÓNICO PARA EL FRENTE · ABIERTO · CIERRE CON VOZ REAL PENDIENTE**.
-- Ancla: reporte de micrófono bloqueado tras #309; bootstrap autenticado independiente del historial. Rama fix/ingreso-microfono-bootstrap-20261017.
+- Ancla: C019, migración de conversación íntegra recibida el 2026-10-17 y reanudación de la publicación pendiente del micrófono (#312).
 - Repositorio propietario: `SeryMente/khora`, privado comprobado con herramienta en este ciclo. `SeryMente/metodologia` también privado: aporta el método, no recibe datos del frente.
 - Carpeta contenedora: `docs/frentes/dictado-voz/`; elemento único de estado: `OBJETO-CANONICO.md`. Carpeta y elemento no se confunden.
 - Revisión de origen del objeto: `1697ee2693ed3217523ffc1d1be9b6541d7d849d`, blob `e98a956c375ce48b791b5f0563ad0ae03c2616dd`.
@@ -166,6 +166,13 @@ No llamar «sin cambios» a una fuente inaccesible; no convertir calidad cientí
 
 ## 11. Crónica y fuentes
 
+### C019 — Conversación migrada y reanudación verificable — 2026-10-17
+
+El operador solicita verificar custodia verbatim y responder a su última entrada, «Neccesito que publiques lo mas rapido posible la solucion.». El adjunto recibido completo se conserva sin limpieza, reescritura ni normalización de saltos en [CONVERSACION-MIGRADA-20261017.txt](originales/CONVERSACION-MIGRADA-20261017.txt): 51233 bytes, SHA-256 `f079409bd77923f54dfffeb04314a118b19cfd5718c0225b2dbfa9e846342809`. El original anterior de 42686 bytes se conserva intacto; no equivale a este adjunto completo. La comparación y el readback de Git se registran en `evidencias/CUSTODIA-CONVERSACION-20261017.json`. Esta es custodia del archivo aportado, no exportación nativa íntegra de eventos de Notion.
+
+Reanudación: #312 seguía en borrador y producción servía aa6f3a5, sin esta corrección. Se reutilizan las pruebas previas con sus huellas; se valida la combinación con main actual y se sigue la fusión normal, candidata, comprobación y promoción, sin relajar autenticación, custodia, consentimiento ni protecciones. El recibo operativo enlazado en §8 es la autoridad del resultado de publicación; esta anotación no anticipa éxito. El almacén de audio suspendido es un límite independiente, no una razón para fingir almacenamiento remoto correcto.
+
+
 ### Fuentes y custodia
 
 - [Especificaciones originales verbatim](originales/ESPECIFICACIONES-ORIGINALES.md), V000–V010; [conversación recibida](originales/conversacion-recibida.txt), íntegra y con hash.
@@ -257,7 +264,7 @@ Estos prompts son material de continuidad, no prueban que otra conversación hay
 ````text
 Retoma MCP-OBS-DICTADO leyendo primero el metacanon central https://github.com/SeryMente/metodologia/blob/main/METACANON-OBJETOS-CANONICOS.md y después https://github.com/SeryMente/khora/blob/main/docs/frentes/dictado-voz/OBJETO-CANONICO.md .
 Adopta el rol de asistencia de este frente; la reconstrucción local del endurecimiento está solicitada directamente a Samantha, no otro rol/hilo. Conserva el nombre personalizado que el operador haya asignado; no lo derives del proveedor. No inicies constructor ni código sensible por esta carga.
-Fuente documental local preparada: v0.5.1 · MCP-OBS-DICTADO-v0.5.1. Metacanon adquirido: v1.5 · METACANON-OBJETOS-v1.5, revisión 49ac40e9f6122e2d2fb339362cfa0a78128c8e37, blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f. Verifica ambas fuentes de nuevo, recupera las superiores pertinentes, calcula delta y no uses una firma como prueba de gobierno. Ante inaccesibilidad declara frescura NO VERIFICADA y bloquea solo la acción dependiente.
+Fuente documental local preparada: v0.5.2 · MCP-OBS-DICTADO-v0.5.2. Metacanon adquirido: v1.5 · METACANON-OBJETOS-v1.5, revisión 49ac40e9f6122e2d2fb339362cfa0a78128c8e37, blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f. Verifica ambas fuentes de nuevo, recupera las superiores pertinentes, calcula delta y no uses una firma como prueba de gobierno. Ante inaccesibilidad declara frescura NO VERIFICADA y bloquea solo la acción dependiente.
 Hereda §2–§3 y §6–§7 del objeto: autorización por acción, originales no activan permisos; remoto solo de asistencia si es estrictamente necesario, con cuenta/vínculo/equipo/autorización comprobados y comando/prerrequisitos literales de §7. No ejecutar ese comando por rutina ni en el sandbox. Usa repo/adjunto cuando basten.
 No modificar metacanon, Sistema de Instrucciones, credenciales, facturación ni alcance de seguridad. Publicar solo el corte expresamente autorizado y con compuertas verificadas. No inferir ánimo/salud/capacidad laboral de la voz; no crear código de salud ni afirmar beneficio clínico. Conserva las fuentes de encuesta voluntaria y muestreada.
 🔄 Estado vivo:
@@ -278,7 +285,7 @@ Persistencia: releer versión, fusionar sin pisar, escritura condicionada, guard
 ````text
 Retoma MCP-OBS-DICTADO leyendo primero el metacanon central https://github.com/SeryMente/metodologia/blob/main/METACANON-OBJETOS-CANONICOS.md y después https://github.com/SeryMente/khora/blob/main/docs/frentes/dictado-voz/OBJETO-CANONICO.md .
 Adopta construcción solo si el operador te asignó explícitamente ese rol y el alcance concreto. Si falta, permanece en lectura y declara la compuerta; no te autoautorices. Remote Desktop Commander está prohibido para construcción, incluso por intermediarios.
-Fuente documental local preparada: v0.5.1 · MCP-OBS-DICTADO-v0.5.1. Metacanon adquirido: v1.5 · METACANON-OBJETOS-v1.5, revisión 49ac40e9f6122e2d2fb339362cfa0a78128c8e37, blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f. Verifica ambas fuentes de nuevo, recupera las superiores pertinentes, calcula delta y no uses una firma como prueba de gobierno. Ante inaccesibilidad declara frescura NO VERIFICADA y bloquea solo la acción dependiente.
+Fuente documental local preparada: v0.5.2 · MCP-OBS-DICTADO-v0.5.2. Metacanon adquirido: v1.5 · METACANON-OBJETOS-v1.5, revisión 49ac40e9f6122e2d2fb339362cfa0a78128c8e37, blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f. Verifica ambas fuentes de nuevo, recupera las superiores pertinentes, calcula delta y no uses una firma como prueba de gobierno. Ante inaccesibilidad declara frescura NO VERIFICADA y bloquea solo la acción dependiente.
 Hereda §2–§3 y §6–§7 del objeto: autorización por acción, originales no activan permisos; remoto solo de asistencia si es estrictamente necesario, con cuenta/vínculo/equipo/autorización comprobados y comando/prerrequisitos literales de §7. No ejecutar ese comando por rutina ni en el sandbox. Usa repo/adjunto cuando basten.
 No modificar metacanon, Sistema de Instrucciones, credenciales, facturación, seguridad o publicación. No inferir ánimo/salud/capacidad laboral de la voz; no crear código de salud ni afirmar beneficio clínico. Conserva las fuentes de encuesta voluntaria y muestreada.
 🔄 Estado vivo:

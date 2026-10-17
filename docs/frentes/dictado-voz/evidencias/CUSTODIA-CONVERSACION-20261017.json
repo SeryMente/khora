@@ -1,0 +1,38 @@
+{
+  "schema": "khora-conversation-custody/v1",
+  "event": "C019",
+  "verifiedAt": "2026-10-17T22:07:30.358Z",
+  "source": {
+    "filename": "pasted-text.txt",
+    "bytes": 51233,
+    "sha256": "f079409bd77923f54dfffeb04314a118b19cfd5718c0225b2dbfa9e846342809",
+    "scope": "exact bytes of user-provided attachment, not a native chat export"
+  },
+  "destination": {
+    "repository": "SeryMente/khora",
+    "privateVerified": true,
+    "path": "originales/CONVERSACION-MIGRADA-20261017.txt",
+    "gitBlob": "9cc68b8a496123c0715c07590c3e27691076e2b6"
+  },
+  "previousOriginal": {
+    "path": "originales/conversacion-recibida.txt",
+    "bytes": 42686,
+    "sha256": "9eeef45f66d432b109ad4dbf04b2295bbfa990f08327c1fe7127e8a1c204abe5",
+    "equalsIncoming": false,
+    "preserved": true
+  },
+  "checks": {
+    "localByteComparison": true,
+    "credentialSignatureScan": "no matches; limited pattern scan, not a guarantee"
+  },
+  "remoteReadback": "must verify committed blob after push",
+  "incident": {
+    "operation": "git diff --cached --check",
+    "symptom": "docs/frentes/dictado-voz/originales/CONVERSACION-MIGRADA-20261017.txt:1: trailing whitespace.",
+    "cause": "exact source retains CRLF and original whitespace; plain text diff interprets CR as whitespace",
+    "impact": "five intended documentation paths staged; no custody commit, push, merge or deployment executed",
+    "correction": "mark only this verbatim source -text -diff; preserve bytes, keep whitespace checks on all other files",
+    "verification": "staged blob equality plus GitHub blob readback",
+    "prevention": "verbatim binary-safe attributes before staging exact attachments"
+  }
+}
