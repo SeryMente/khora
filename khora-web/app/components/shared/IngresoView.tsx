@@ -7,6 +7,7 @@ export type IngresoViewState = {
   archivado?: boolean;
   custodiaEstado?: string;
   custodiaReady?: boolean;
+  custodiaPreparando?: boolean;
   recuperando?: boolean;
   recuperaciones?: number;
   stream?: MediaStream | null;
@@ -39,6 +40,7 @@ export type IngresoViewState = {
 };
 
 export type IngresoViewActions = {
+  onReintentarPreparacion?: () => void;
   onRecuperar?: () => void;
   onTituloChange?: (val: string) => void;
   onIniciarEdicion?: () => void;
@@ -72,7 +74,7 @@ export function IngresoView({state:v,actions:a={},isReviewMode=false}:{state:Ing
     <div className={s.micgroup}>
      {!recording?<button data-ui-id="ingreso.btn-iniciar" className={s.primary} disabled={locked||v.editando||v.custodiaReady===false||v.conAudio} onClick={a.onIniciar}><I.Mic size={19}/>Iniciar dictado</button>:
       <button data-ui-id="ingreso.btn-detener" className={s.primary} disabled={busy} onClick={a.onDetener}><I.Square size={15}/>{v.modoEntrada==="chrome_live_caption"?"Detener captura Chrome":"Detener dictado"}</button>}
-     <div className={s.signal}><AudioActivity stream={v.stream||null} active={recording&&!v.editando}/><span data-ui-id="ingreso.status-listening">{v.editando?"Dictado en pausa":recording?(v.modoEntrada==="chrome_live_caption"?"Captura de pestaña":v.stream?"Micrófono activo":"Preparando audio"):v.conAudio?"Audio conservado por partes":"Micrófono en espera"}</span></div>
+     <div className={s.signal}><AudioActivity stream={v.stream||null} active={recording&&!v.editando}/><span data-ui-id="ingreso.status-listening">{v.custodiaReady===false?(v.custodiaPreparando?"Preparando salvaguarda…":"Captura no preparada"):v.editando?"Dictado en pausa":recording?(v.modoEntrada==="chrome_live_caption"?"Captura de pestaña":v.stream?"Micrófono activo":"Preparando audio"):v.conAudio?"Audio conservado por partes":"Micrófono en espera"}</span></div>
     </div>
     <div className={s.toolgroup}>
      <button data-ui-id="ingreso.btn-adjuntar" className={s.quiet} disabled={locked||recording||v.editando||v.custodiaReady===false} onClick={a.onAdjuntarClick}><I.Paperclip size={17}/>{v.adjuntandoAudio?"Adjuntando…":"Adjuntar audio"}</button>
@@ -103,6 +105,7 @@ Este espacio es tuyo." spellCheck/>
    {v.editando&&<div data-ui-id="ingreso.banner-edicion" className={s.editing}><span><I.PencilLine size={16}/>Edición in situ activa · tu texto se conserva.</span><button data-ui-id="ingreso.btn-confirmar-edicion" className={s.secondary} disabled={locked} onClick={a.onConfirmarEdicion}>Confirmar edición</button></div>}
    <footer className={s.sheetfooter}>
     <p role="status" aria-live="polite" data-ui-id="ingreso.custodia-status" className={s.storage}><I.ShieldCheck size={16}/><span>{v.recuperando?"Recuperando sin sustituir el original…":v.custodiaEstado||"Salvaguarda de captura"}</span></p>
+    {v.custodiaReady===false&&!v.custodiaPreparando&&a.onReintentarPreparacion&&<button className={s.secondary} onClick={a.onReintentarPreparacion}>Reintentar preparación</button>}
     <span className={s.characters}>{v.texto.length.toLocaleString('es')} caracteres</span>
    </footer>
   </section>

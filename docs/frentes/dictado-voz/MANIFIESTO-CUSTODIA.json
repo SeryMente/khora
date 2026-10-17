@@ -30,9 +30,9 @@
   "files": [
     {
       "path": "OBJETO-CANONICO.md",
-      "bytes": 137129,
-      "sha256": "513ed710f6278ae20edc0946746af7dced79a018f7f453198de02dd0fc3847bf",
-      "git_blob_sha": "885b35e0a668524e498675f106dc61902324c76e"
+      "bytes": 139300,
+      "sha256": "0b3a35c5054d10456b07cbd7847f47a6af3d275a9eb46f47ee063eb51ebe2238",
+      "git_blob_sha": "a91242e42b04debd8b015d35c901f1cbe90bfeee"
     },
     {
       "path": "CONTRATO-DICTADO-EXPERIENCE.md",
@@ -87,6 +87,36 @@
       "bytes": 3972,
       "sha256": "fcccada87418dc85f7c8e601a1dd15fd30e4fa210b6223051601f0b12b2fdebe",
       "git_blob_sha": "f5d21226ed25066d506aae92e88b9496fca5f49f"
+    },
+    {
+      "path": "evidencias/MICROFONO-BOOTSTRAP.json",
+      "bytes": 3696,
+      "sha256": "6a0e5987abc9ac8358a9f66786f03d423e48a8c6c9d831a8071730cfae2f4c47",
+      "git_blob_sha": "bcbfec1d00d619356163746e9858c54192a055cb"
+    },
+    {
+      "path": "originales/MICROFONO-BLOQUEADO.txt",
+      "bytes": 207,
+      "sha256": "57b4fd45f2638fba59bf156e3c49bd1a3e869f897ae3dc42216f2d707e8ba2ef",
+      "git_blob_sha": "c401d5aef532d86e9c6efe1418961d2409d33c06"
+    },
+    {
+      "path": "originales/CONVERSACION-MIGRADA-20261017.txt",
+      "bytes": 51233,
+      "sha256": "f079409bd77923f54dfffeb04314a118b19cfd5718c0225b2dbfa9e846342809",
+      "git_blob_sha": "d7e1749b37f40b2cfd7794411c45e6bad82ddfa1"
+    },
+    {
+      "path": "evidencias/CUSTODIA-CONVERSACION-20261017.json",
+      "bytes": 1667,
+      "sha256": "161e81d416d64b8455cae423feba7c4086f7b1006f114be7b65650a2d140e81c",
+      "git_blob_sha": "f06997f483bd932efc7d74a1b292b75555d8cb28"
+    },
+    {
+      "path": "originales/.gitattributes",
+      "bytes": 46,
+      "sha256": "f68655747291ce2740a3ff99247786c52bc88143b451649aece8973ea2638fd1",
+      "git_blob_sha": "3ae0447d9085a76b833b47adf9876d254ab0d748"
     }
   ],
   "runtime_references": [
@@ -198,5 +228,5 @@
     "pullRequest": "https://github.com/SeryMente/khora/pull/305",
     "state": "software verified; merge authorization explicit; effective merge determined by Git"
   },
-  "latestEvent": "C017 - Ingreso explicit recovery and coherent UI"
+  "latestEvent": "C019 - migrated attachment preserved byte-for-byte; microphone release resumed"
 }

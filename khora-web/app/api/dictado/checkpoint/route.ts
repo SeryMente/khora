@@ -47,7 +47,9 @@ export async function GET(req: NextRequest) {
   const email = (await auth())?.user?.email;
   if (!email) return NextResponse.json({error:"no_autenticado"},{status:401});
   try {
-    await asegurarCustodiaContinua(); const db=getDb();
+    await asegurarCustodiaContinua();
+    if(req.nextUrl.searchParams.get("bootstrap")==="1")return NextResponse.json({owner:email},{headers:{"Cache-Control":"private, no-store","Vary":"Cookie"}});
+    const db=getDb();
     if(req.nextUrl.searchParams.get("catalog")==="1"||req.nextUrl.searchParams.get("revisions")==="1")return catalogoRecuperacion(req,email);
     const requested=req.nextUrl.searchParams.get("sessionId");
     if(requested){const sealed=await db.query("SELECT s.volcado_id FROM dictado_session s LEFT JOIN volcado v ON v.id=s.volcado_id WHERE s.session_id=$1 AND s.estado='complete' AND COALESCE(s.custodia_owner,s.checkpoint_usuario,v.usuario)=$2",[requested,email]);if(sealed.rows.length)return NextResponse.json({owner:email,sealed:true,id:sealed.rows[0].volcado_id,recovery:null},{headers:{"Cache-Control":"no-store"}});}
