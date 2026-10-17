@@ -309,7 +309,7 @@ Persistencia: releer versión, fusionar sin pisar, escritura condicionada, guard
 
 ### Recibo operativo del corte de Ingreso
 
-Instantánea de implementación preparada antes de fusionar/publicar. No sustituye el estado operativo posterior. Fuente de verdad de fusión, SHA desplegado, alias y verificaciones finales: https://github.com/SeryMente/khora/pull/309 (recibo de cierre en comentarios de esa solicitud). Solo esta solicitud pertenece al corte; otras ramas no quedan acreditadas por ella. La sesión física y aceptación humana permanecen separadas.
+Instantánea de implementación preparada antes de fusionar/publicar. No sustituye el estado operativo posterior. Fuente de verdad de fusión, SHA desplegado, alias y verificaciones finales: https://github.com/SeryMente/khora/pull/312 (recibo de cierre en comentarios de esa solicitud). Solo esta solicitud pertenece al corte; otras ramas no quedan acreditadas por ella. La sesión física y aceptación humana permanecen separadas.
 
 # Anexo A · Historia íntegra anterior a la canonización v0.2.0
 
