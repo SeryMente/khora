@@ -13,11 +13,11 @@ test.use({
 
 test.describe('Dictado sin perdida anti-regresion guard', () => {
   test.beforeEach(async ({ page }) => {
-    await page.route('**/api/dictado/checkpoint', async route => {
+    await page.route('**/api/dictado/checkpoint**', async route => {
       if (route.request().method() === 'POST') {
         const body = route.request().postDataJSON();
         await route.fulfill({ json: { ok: true, sessionId: body.sessionId, revisionId: body.revisionId } });
-      } else await route.fulfill({ json: { owner: 'synthetic-custody-owner@example.invalid', recovery: null } });
+      } else await route.fulfill({ json: { owner: 'synthetic-custody-owner@example.invalid', recovery: null, items: [], nextCursor: null } });
     });
   });
 

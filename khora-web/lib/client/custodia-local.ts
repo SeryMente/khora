@@ -40,8 +40,10 @@ async function save(owner: string, id: string, bytes: ArrayBuffer, meta: Record<
     await put(db, "records", owner + ":" + id, { ...meta, owner, id, iv, data });
   } finally { db.close(); }
 }
-export async function guardarSnapshotLocal(owner: string, snapshot: CapturaSnapshot): Promise<void> {
-  await save(owner, "snapshot:" + snapshot.sessionId, new TextEncoder().encode(JSON.stringify(snapshot)).buffer, { kind: "snapshot", at: snapshot.clientAt });
+export async function guardarSnapshotLocal(owner: string, snapshot: CapturaSnapshot, immutableCut = false): Promise<void> {
+  const bytes=new TextEncoder().encode(JSON.stringify(snapshot)).buffer;
+  if(immutableCut){await save(owner,"revision:"+snapshot.sessionId+":"+snapshot.revisionId,bytes,{kind:"revision",at:snapshot.clientAt});return;}
+  await save(owner, "snapshot:" + snapshot.sessionId, bytes, { kind: "snapshot", at: snapshot.clientAt });
 }
 export async function guardarAudioLocal(owner: string, sessionId: string, part: number, blob: Blob, meta: Record<string, unknown>): Promise<void> {
   await save(owner, `audio:${sessionId}:${part}`, await blob.arrayBuffer(), { kind: "audio", sessionId, part, mime: blob.type, ...meta });
@@ -54,7 +56,7 @@ export async function recuperarLocal(owner: string): Promise<{ snapshots: Captur
     const k = await key(db, owner);
     for (const row of rows.filter(r => r.owner === owner)) {
       const bytes = await crypto.subtle.decrypt({ name: "AES-GCM", iv: row.iv, additionalData: new TextEncoder().encode(owner + ":" + row.id) }, k, row.data);
-      if (row.kind === "snapshot") result.snapshots.push(JSON.parse(new TextDecoder().decode(bytes)));
+      if (row.kind === "snapshot" || row.kind === "revision") result.snapshots.push(JSON.parse(new TextDecoder().decode(bytes)));
       else result.audios.push({ sessionId: row.sessionId, part: row.part, blob: new Blob([bytes], { type: row.mime }), meta: row });
     }
     result.snapshots.sort((a,b) => b.clientAt - a.clientAt); return result;

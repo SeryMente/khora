@@ -67,11 +67,11 @@ test("dictation checkpoints persist start, immediate inline-edit pause, resume, 
     });
   });
 
-  await page.route("**/api/dictado/checkpoint", async (route) => {
+  await page.route("**/api/dictado/checkpoint**", async (route) => {
     if (route.request().method() === "POST") {
       await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ok: true }) });
     } else {
-      await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ owner: "synthetic-custody-owner@example.invalid", recovery: null }) });
+      await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ owner: "synthetic-custody-owner@example.invalid", recovery: null, items: [], nextCursor: null }) });
     }
   });
 

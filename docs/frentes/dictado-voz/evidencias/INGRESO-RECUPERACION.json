@@ -1,0 +1,194 @@
+{
+  "schema": "khora-ingreso-recovery-validation/v1",
+  "preparedAt": "2026-10-17T20:02:46.043Z",
+  "baseSha": "362f8ff51a518506927e486b9d61feee4f6313da",
+  "branch": "feat/ingreso-recovery-redesign-20261017",
+  "visualEvidence": [
+    {
+      "name": "ingreso-desktop-empty.png",
+      "sha256": "59743e32d8ae39b5b97e9a34114796fd3ddbc71877e2dc6bbf21d468181379b8"
+    },
+    {
+      "name": "ingreso-desktop-light.png",
+      "sha256": "a829639efa00c3779b43515e9451b1ec7390ddfc9cbfc30d858379e38712303e"
+    },
+    {
+      "name": "ingreso-desktop-recording.png",
+      "sha256": "435d599033acd583664574b12f9fb57046f03a40c62e6c3abf5ab51590c7aade"
+    },
+    {
+      "name": "ingreso-desktop-recovery.png",
+      "sha256": "4bcd8f68d8cba2d64f4d9894107dc4c6134b3748b8d8a6e273253ea173c57a21"
+    },
+    {
+      "name": "ingreso-mobile-empty.png",
+      "sha256": "e1c15791a7d8fdabf553693d4f6d52c80d6387c20d37efb28ebe84449f09ca7e"
+    },
+    {
+      "name": "ingreso-mobile-recovery.png",
+      "sha256": "277feb8b16af44ea85d4ddbb67aa0b26639f1d8ca5c3940e1cfb4b320960f475"
+    }
+  ],
+  "checks": {
+    "unit": 499,
+    "browserBenchmark": 27,
+    "additionalBrowserRegression": 29,
+    "realIsolatedPostgreSQL": 11,
+    "types": "passed",
+    "navigation": "passed",
+    "uiRegistry": "passed"
+  },
+  "benchmark": {
+    "schema": "khora-dictado-benchmark/v1",
+    "status": "passed",
+    "testedAt": "2026-10-17T19:58:33.519Z",
+    "completedAt": "2026-10-17T20:01:50.705Z",
+    "sourceSha": "362f8ff51a518506927e486b9d61feee4f6313da",
+    "workingTreeDirty": true,
+    "inputFingerprint": "1c210d77067fa4328503a6b095fe02c8e29f6b2f10dc1c2e23280c4383d8d0d3",
+    "checks": [
+      {
+        "name": "Contratos, entrega, muestreo, privacidad y persistencia controlada",
+        "status": "passed"
+      },
+      {
+        "name": "Continuidad del dictado y encuesta en navegador",
+        "status": "passed"
+      }
+    ],
+    "limits": [
+      "Reconocimiento y endpoints externos controlados; no voz física ni SQL productivo.",
+      "Persistencia probada con doble de base de datos; no certificación de despliegue.",
+      "No mide fidelidad de voz ni comodidad automáticamente. Contrato/regresión, no puntuación universal.",
+      "La huella identifica entradas declaradas. sourceSha no incluye cambios locales; revisar workingTreeDirty."
+    ]
+  },
+  "files": [
+    {
+      "path": "khora-web/app/api/dictado/checkpoint/route.ts",
+      "bytes": 7455,
+      "sha256": "49f025899ec915b1581491584bba31941ae2f0b9afb2f2644ece9723b6abb803"
+    },
+    {
+      "path": "khora-web/app/components/ingreso/IngresoWorkspace.tsx",
+      "bytes": 87262,
+      "sha256": "1babed4ab4d4b4d665e916a7926c9623a4e16b797aec74b5ef27e09bb55fec78"
+    },
+    {
+      "path": "khora-web/app/components/os/KhoraShell.tsx",
+      "bytes": 1064,
+      "sha256": "67ba8d8fa208f2396d002fba90e32a49b2b1b1ce22e06e6c3e0815e4348f1d41"
+    },
+    {
+      "path": "khora-web/app/components/shared/IngresoView.tsx",
+      "bytes": 8682,
+      "sha256": "e2c57ef8a4fe0344d9d2cebc08af5b26f39a601c101354ce1307fb429d412a58"
+    },
+    {
+      "path": "khora-web/docs/CUSTODIA-DICTADOS.md",
+      "bytes": 61573,
+      "sha256": "b0872c86fbf3d8a6a34e6c1d01136af7544ffa33ff0dc98b96af70c5965c4493"
+    },
+    {
+      "path": "khora-web/e2e/contracts/dictado-observability-checkpoints.spec.ts",
+      "bytes": 5413,
+      "sha256": "4d02ac9f7866f1c6997dc8ceae707cfeaf37629383e4cd1a84d8dafc68154ffe"
+    },
+    {
+      "path": "khora-web/e2e/contracts/dictado-sin-perdida.spec.ts",
+      "bytes": 8328,
+      "sha256": "658949bc8b5e4268f6ebe8ed721dee91afa282683c028523a7d103defa20211c"
+    },
+    {
+      "path": "khora-web/e2e/dictado-edicion-continuidad.spec.ts",
+      "bytes": 15723,
+      "sha256": "ba735d58b0d95d1ea5d4ac81bb71b24dcbbd97dc618c6c72c56ffdf1f1871d48"
+    },
+    {
+      "path": "khora-web/e2e/dictado-experience.spec.ts",
+      "bytes": 12229,
+      "sha256": "72c51975390a9985650cd7b0a3ff14bdb3a5fb08959880e86f21c4290a2c48b5"
+    },
+    {
+      "path": "khora-web/lib/client/custodia-local.ts",
+      "bytes": 5411,
+      "sha256": "6fb14794417cec88267e127fd41ac1f6e0e8c240e17475c8742f7cd471a39373"
+    },
+    {
+      "path": "khora-web/lib/custodia/contrato.ts",
+      "bytes": 1009,
+      "sha256": "7dca8faf0bea1cd541261499cd3a4a57aebbc58508771c9b44c3956aa2a0a682"
+    },
+    {
+      "path": "khora-web/lib/generated/dictado-benchmark.json",
+      "bytes": 994,
+      "sha256": "4b3f5249b6db844714cf10f3ad6cc39e17809885045877c8cb84cb80063a403b"
+    },
+    {
+      "path": "khora-web/lib/ui-review/registry.ts",
+      "bytes": 25337,
+      "sha256": "7c1097bba2d7dd84481371498d3c65e848af7493cad75bf1c11126d290ed8d50"
+    },
+    {
+      "path": "khora-web/scripts/benchmark-dictado.mjs",
+      "bytes": 6314,
+      "sha256": "e80967093dff408b0c5e50fcd34b87903caf6bd29915208b7ca27b8f651d8ad0"
+    },
+    {
+      "path": "khora-web/tests/browser/custodia-workspace.mjs",
+      "bytes": 5016,
+      "sha256": "0e979350e75353cd81c0c3d094eaab1202a97fd2fd5ac1b8305af923dabd03b3"
+    },
+    {
+      "path": "khora-web/app/components/ingreso/AudioActivity.tsx",
+      "bytes": 2217,
+      "sha256": "3bea979b610d65f39efc5c821f7b54bdab2af67a1f6446bc9114846d4aff1d6d"
+    },
+    {
+      "path": "khora-web/app/components/ingreso/RecoveryDrawer.tsx",
+      "bytes": 6488,
+      "sha256": "55ac7c7b29d99f2d2326592eb044856d98f970c888c851be7e2c58de569d2415"
+    },
+    {
+      "path": "khora-web/app/components/ingreso/ingreso-studio.module.css",
+      "bytes": 8763,
+      "sha256": "1733e2d092fc914b167a94c020da6b7a3a6850165b9529d0195f2f82b5be5f2a"
+    },
+    {
+      "path": "khora-web/lib/custodia/recuperacion.ts",
+      "bytes": 709,
+      "sha256": "3254095d5672017831b0c3614fbf436244b072963d60b177e9fc7c49c0911ea2"
+    },
+    {
+      "path": "khora-web/lib/server/custodia-recuperacion.ts",
+      "bytes": 8915,
+      "sha256": "55d34b0466178de9b655f36b623f08d8fac8a10c60e17800612211bab5dff904"
+    },
+    {
+      "path": "khora-web/tests/unit/custodia_recuperacion.test.ts",
+      "bytes": 1270,
+      "sha256": "a27f8d89eb0b84fbb74a4274913c782a5c68883b35d0e0851adac17a12200e79"
+    },
+    {
+      "path": "khora-web/tests/integration/ingreso-recuperacion-postgres.ts",
+      "bytes": 6384,
+      "sha256": "d763ac8f2f6500ccc3323e3c9e8edc62551976b5067a51cc118db53c2e0fe94f"
+    },
+    {
+      "path": "khora-web/e2e/ingreso-recovery-redesign.spec.ts",
+      "bytes": 9041,
+      "sha256": "169eef4c1c20578bb0c70771c3523fb56a58aac05d4d6cc8bb21bbd26bc8161f"
+    },
+    {
+      "path": "khora-web/e2e/custodia-local-recovery.spec.ts",
+      "bytes": 584,
+      "sha256": "7994042abe5f2b220713ba3523b20cd5dc8b8fb7cb052af9cc8fad4608b1dd03"
+    }
+  ],
+  "limits": [
+    "Chromium generated media and synthetic APIs, not physical voice.",
+    "PostgreSQL/PGlite isolated real SQL, no Neon/Blob production or multi-connection locking certification.",
+    "No clinical inference, added consent or permanent listening.",
+    "Merge, deployment identity, app-authenticated production flow and user acceptance must be verified separately."
+  ]
+}

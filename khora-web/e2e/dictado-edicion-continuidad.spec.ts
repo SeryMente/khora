@@ -23,19 +23,19 @@ test.beforeEach(async ({ page }) => {
     }
     w.SpeechRecognition = w.webkitSpeechRecognition = Recognition;
   });
-  await page.route("**/api/dictado/checkpoint", async route => {
+  await page.route("**/api/dictado/checkpoint**", async route => {
     const body = route.request().postDataJSON();
     if (route.request().method() === "POST" && body?.texto) {
       await page.evaluate(text => (window as any).__dictadoContinuidad.checkpoints.push(text), body.texto);
     }
-    await route.fulfill({ json: { ok: true, owner: "synthetic-custody-owner@example.invalid", recovery: null } });
+    await route.fulfill({ json: { ok: true, owner: "synthetic-custody-owner@example.invalid", recovery: null, items: [], nextCursor:null, sessionId:body?.sessionId, revisionId:body?.revisionId } });
   });
   await page.route("**/api/observaciones/**", route => route.fulfill({ json: { ok: true, accepted: 0 } }));
   await page.goto("/sistema/ingreso?modo=dictado");
   await expect(page.locator('[data-testid="khora-splash"]')).toHaveCount(0);
   await expect(page.locator(selector)).toBeVisible();
   await page.locator('[data-ui-id="ingreso.btn-iniciar"]').click();
-  await expect(page.locator('[data-ui-id="ingreso.status-listening"]')).toContainText("escuchando");
+  await expect(page.locator('[data-ui-id="ingreso.status-listening"]')).toContainText("Micrófono activo");
 });
 
 async function emit(page: Page, text: string, final: boolean, id?: number) {
@@ -63,7 +63,7 @@ async function confirm(page: Page, escape = false) {
   if (escape) await page.keyboard.press("Escape");
   else await page.locator('[data-ui-id="ingreso.btn-confirmar-edicion"]').click();
   await expect(page.locator('[data-ui-id="ingreso.banner-edicion"]')).toHaveCount(0);
-  await expect(page.locator('[data-ui-id="ingreso.status-listening"]')).toContainText("escuchando");
+  await expect(page.locator('[data-ui-id="ingreso.status-listening"]')).toContainText("Micrófono activo");
 }
 
 async function continueAndAssert(page: Page, prefix: string, suffix = continuacion) {

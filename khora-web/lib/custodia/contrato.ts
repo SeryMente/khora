@@ -8,6 +8,8 @@ export type CapturaSnapshot = {
   sessionId: string; revisionId: string; clientAt: number; texto: string;
   parcial: string; titulo: string; fuenteEntrada: FuenteCaptura;
   duracionSeg: number; audioPartes: unknown[];
+  corteAudio?: { hastaParte: number; finMs: number };
+  recuperadaDe?: { sessionId: string; revisionId: string };
 };
 export function nuevaRevision(): Pick<CapturaSnapshot, "revisionId" | "clientAt"> {
   return { revisionId: crypto.randomUUID(), clientAt: Date.now() };
