@@ -30,9 +30,9 @@
   "files": [
     {
       "path": "OBJETO-CANONICO.md",
-      "bytes": 136652,
-      "sha256": "6d42de287f9f9edc4137d4f31ad0b43f380daa6856cbda7dc0cf32ded845bc2c",
-      "git_blob_sha": "51058d02caba080b42fece619e4a5a17ef86941d"
+      "bytes": 137129,
+      "sha256": "513ed710f6278ae20edc0946746af7dced79a018f7f453198de02dd0fc3847bf",
+      "git_blob_sha": "885b35e0a668524e498675f106dc61902324c76e"
     },
     {
       "path": "CONTRATO-DICTADO-EXPERIENCE.md",
