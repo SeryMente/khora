@@ -38,6 +38,9 @@ export async function POST(pedido: NextRequest) {
     const pin = String(cuerpo?.pin ?? "")
     const reset = cuerpo?.reset === true
     const yaHabia = await pinConfigurado()
+    if (cuerpo?.unlockOnly === true && (!yaHabia || reset)) {
+      return NextResponse.json({ error: "pin_no_configurado" }, { status: 409 })
+    }
 
     if (reset) {
       if (!yaHabia) {

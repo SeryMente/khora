@@ -213,7 +213,7 @@ export function PipelineView({
               strokeWidth={1.75}
               style={{ color: "var(--khora-accent)" }}
             />
-            Mesa de Revisión Sincrónica
+            Custodia
           </h1>
           <p className="text-sm mt-1" style={{ color: "var(--khora-accent)" }}>
             Lectura cómoda, sincronización audio ↔ texto, corrección lingüística
@@ -239,7 +239,7 @@ export function PipelineView({
               style={{ borderColor: "var(--khora-border)" }}
             >
               <span className="text-[10px] font-mono tracking-wider uppercase opacity-60">
-                Total volcados
+                Total registros de Custodia
               </span>
               <span className="text-2xl font-bold mt-1">{resumen.total}</span>
             </div>
@@ -361,7 +361,7 @@ export function PipelineView({
                 className="p-8 text-center text-xs opacity-60 border"
                 style={{ borderColor: "var(--khora-border)" }}
               >
-                Cargando lista de volcados...
+                Cargando lista de registros de Custodia...
               </div>
             ) : filteredItems.length === 0 ? (
               <div
@@ -369,7 +369,7 @@ export function PipelineView({
                 className="p-8 text-center text-xs opacity-60 border"
                 style={{ borderColor: "var(--khora-border)" }}
               >
-                No hay volcados disponibles para el filtro seleccionado.
+                No hay registros de Custodia disponibles para el filtro seleccionado.
               </div>
             ) : (
               filteredItems.map((item) => {
@@ -765,12 +765,12 @@ export function PipelineView({
                             <button
                               data-ui-id="revision.btn-download-mp3"
                               onClick={() => actions.onExportMp3?.()}
-                              disabled={!audioSourceUrl || exportingMp3}
+                              disabled={exportingMp3}
                               className="px-2 py-1 border border-emerald-500/50 bg-emerald-950/30 hover:bg-emerald-900/50 text-emerald-300 font-bold text-[10px] flex items-center gap-1 cursor-pointer shrink-0 disabled:opacity-40 disabled:cursor-not-allowed"
-                              title="Descargar el volcado completo como MP3"
+                              title="Descargar el MP3 conservado"
                             >
                               <Icons.Download size={13} />
-                              {exportingMp3 ? "Generando MP3..." : "Descargar MP3 completo"}
+                              {exportingMp3 ? "Generando MP3..." : "Descargar MP3"}
                             </button>
 
                             <input
@@ -989,7 +989,7 @@ export function PipelineView({
               </div>
             ) : (
               <div className="border p-8 text-center text-xs opacity-60 flex items-center justify-center h-full">
-                Selecciona un volcado para abrir la Mesa de Revisión.
+                Selecciona un registro para abrir la Mesa de Revisión.
               </div>
             )}
           </div>
@@ -1005,7 +1005,7 @@ export function PipelineView({
             </h3>
             <p className="text-zinc-300">
               Selecciona la causa explícita para resolver la ausencia de audio
-              en este volcado:
+              en este registro:
             </p>
             <select
               value={selectedAudioResolveCode}

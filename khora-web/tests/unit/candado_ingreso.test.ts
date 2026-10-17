@@ -75,7 +75,7 @@ test("D17 (Ingreso): Exclusión mutua estricta de 3 vías en botones de control"
 });
 
 test("D18 (Volcados): volcados/page.tsx no contiene 'Archivo Manual' ni hace POST a /api/volcado", () => {
-  const pagePath = path.resolve(__dirname, "../../app/sistema/volcados/page.tsx");
+  const pagePath = path.resolve(__dirname, "../../app/sistema/custodia/page.tsx");
   const contenido = fs.readFileSync(pagePath, "utf-8");
 
   assert.equal(contenido.includes("Archivo Manual"), false, "No debe incluir la etiqueta 'Archivo Manual'");

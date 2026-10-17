@@ -1090,7 +1090,7 @@ function IngresoContenido() {
             : !audioEsperado;
 
       if (audioEsperado && !audioIntegro) {
-        setError("No se puede archivar el volcado: Khora no ha verificado la custodia íntegra de todas las partes de audio.");
+        setError("No se puede archivar el registro: Khora no ha verificado la custodia íntegra de todas las partes de audio.");
         return;
       }
 
@@ -1139,8 +1139,8 @@ function IngresoContenido() {
           await cerrarSnapshotLocal(ownerRef.current,payload.sessionId!);
           setArchivado(true);
           setCustodiaEstado("Captura cerrada en servidor · "+dv.id+" · "+String(dv.estado||"estado no informado"));
-          setResultado((dv?.idempotent ? "volcado ya archivado " : "archivado ") + String(dv?.chars) + " caracteres, sha " + String(dv?.sha256).slice(0, 8) + (audioUrl ? `, con audio (${partes.length} partes)` : ", sin audio"));
-          setAviso("Captura sellada. La revisión y las correcciones se hacen en Volcados; pulsa Limpiar para empezar una captura nueva.");
+          setResultado((dv?.idempotent ? "registro ya archivado " : "archivado ") + String(dv?.chars) + " caracteres, sha " + String(dv?.sha256).slice(0, 8) + (audioUrl ? `, con audio (${partes.length} partes)` : ", sin audio"));
+          setAviso("Captura sellada. La revisión y las correcciones se hacen en Custodia; pulsa Limpiar para empezar una captura nueva.");
         }
       } catch (err) {
         observarDictado("GUARDADO_DICTADO_FALLIDO", { severity: "ERROR", outcome: "FAILURE", reasonCode: "network_error", durationMs: Date.now() - saveStartedAt, metrics: { chars_current: texto.length, part_count: partesSubidasRef.current.length } });

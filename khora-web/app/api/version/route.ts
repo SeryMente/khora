@@ -12,7 +12,7 @@ export async function GET() {
     rama: conValor(process.env.VERCEL_GIT_COMMIT_REF) ?? "sin-metadatos-de-git",
     desplegado_desde_git: sha !== null,
     entorno: conValor(process.env.VERCEL_ENV) ?? "local",
-    rutas: ["/sistema/volcados", "/api/volcado"],
+    rutas: ["/sistema/custodia", "/api/volcado"],
     ahora: new Date().toISOString(),
   });
 }

@@ -11,7 +11,7 @@ Toda capacidad de producto que tenga una ruta operativa debe tener una entrada a
 
 La barra inferior contiene seis dominios primarios de uso frecuente más el control de tema:
 
-- Volcados → `/sistema/volcados`
+- Custodia → `/sistema/custodia`
 - Ingreso → `/sistema/ingreso`
 - Grafo → abre Grafo / Mapa
 - Consulta → `/sistema/consulta`
@@ -100,7 +100,7 @@ Las rutas históricas de Ingreso permanecen operativas como compatibilidad y red
 - `/sistema/dictado` → `/sistema/ingreso?modo=dictado`
 - `/sistema/editar` → `/sistema/ingreso?modo=revision`
 - `/sistema/ingesta` → `/sistema/ingreso?modo=ingesta`
-- `/herramientas/bitacora` → `/sistema/volcados`
+- `/herramientas/bitacora` → `/sistema/custodia`
 - `/sistema/boveda` → `/sistema/seguridad?tab=boveda`
 - `/sistema/entorno-persistente` → `/sistema/seguridad?tab=entorno-persistente`
 - `/capturar/compartir` permanece como Share Target externo y no aparece como módulo de menú.

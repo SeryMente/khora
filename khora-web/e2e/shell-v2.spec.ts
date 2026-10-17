@@ -7,7 +7,7 @@ const routes = [
   { path: '/sistema/ingreso?modo=archivo', expectedTitle: 'Ingreso Integrado' },
   { path: '/sistema/ingreso?modo=revision', expectedTitle: 'Ingreso Integrado' },
   { path: '/sistema/ingreso?modo=ingesta', expectedTitle: 'Ingreso a memoria' },
-  { path: '/sistema/volcados', expectedTitle: 'Mesa de Revisión Sincrónica' },
+  { path: '/sistema/custodia', expectedTitle: 'Custodia' },
   { path: '/sistema/consulta', expectedTitle: 'Consola de Consulta' },
   { path: '/sistema/seguridad', expectedTitle: 'Seguridad' },
   { path: '/sistema/mcp', expectedTitle: 'Control MCP & Revocación' },
@@ -16,14 +16,14 @@ const routes = [
   { path: '/mapa', expectedTitle: 'Mapa Visual de Ramificaciones' },
   { path: '/capturar', expectedTitle: 'Ingreso Integrado' },
   { path: '/sistema/dictado', expectedTitle: 'Ingreso Integrado' },
-  { path: '/sistema/editar', expectedTitle: 'Mesa de Revisión Sincrónica' },
-  { path: '/sistema/ingesta', expectedTitle: 'Mesa de Revisión Sincrónica' },
+  { path: '/sistema/editar', expectedTitle: 'Custodia' },
+  { path: '/sistema/ingesta', expectedTitle: 'Custodia' },
 ];
 
 test.describe('Shell Navegación v3', () => {
   test('Navega por todos los dominios y verifica la renderización', async ({ page }) => {
     for (const route of routes) {
-      await page.goto('http://localhost:3000' + route.path);
+      await page.goto('' + route.path);
       await page.waitForLoadState('domcontentloaded');
       await expect(page.locator('[data-testid="khora-splash"]')).toHaveCount(0, { timeout: 3000 });
 
@@ -42,7 +42,7 @@ test.describe('Shell Navegación v3', () => {
   });
 
   test('La jerarquía de primer nivel agrupa captura dentro de ingreso', async ({ page }) => {
-    await page.goto('http://localhost:3000/sistema/volcados');
+    await page.goto('/sistema/custodia');
     await expect(page.locator('[data-testid="khora-splash"]')).toHaveCount(0, { timeout: 3000 });
 
     await expect(page.locator('[data-navigation-entry]')).toHaveCount(6);
@@ -55,7 +55,7 @@ test.describe('Shell Navegación v3', () => {
     await expect(page.getByRole('link', { name: 'Edición', exact: true })).toHaveCount(0);
     await expect(page.getByRole('link', { name: 'Ingesta', exact: true })).toHaveCount(0);
 
-    await page.goto('http://localhost:3000/sistema/ingreso');
+    await page.goto('/sistema/ingreso');
     await expect(page.locator('[data-ui-id="ingreso.textarea"]')).toBeVisible();
     await page.route('**/api/volcado', route => route.fulfill({ json: { items: [] } }));
     await page.goto('/sistema/ingreso?modo=ingesta');
@@ -95,7 +95,7 @@ test.describe('Shell Navegación v3', () => {
       { width: 390, height: 844 },
     ]) {
       await page.setViewportSize(viewport);
-      await page.goto('http://localhost:3000/sistema/volcados');
+      await page.goto('/sistema/custodia');
       await expect(page.locator('[data-testid="khora-splash"]')).toHaveCount(0, { timeout: 3000 });
       await expect(page.locator('[data-navigation-primary-count]')).toHaveAttribute('data-navigation-primary-count', '6');
 

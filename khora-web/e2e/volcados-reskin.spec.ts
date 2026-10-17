@@ -55,12 +55,12 @@ test.describe("Volcados Reskin UI", () => {
       });
     });
 
-    await page.goto("/sistema/volcados");
+    await page.goto("/sistema/custodia");
   });
 
   test("should render reskinned header and elements", async ({ page }) => {
     // Check main header
     const mainHeader = page.locator("h1");
-    await expect(mainHeader).toContainText("Mesa de Revisión Sincrónica");
+    await expect(mainHeader).toContainText("Custodia");
   });
 });

@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 const PRODUCT_ROUTES = [
   "/",
-  "/sistema/volcados",
+  "/sistema/custodia",
   "/sistema/ingreso",
   "/sistema/consulta",
   "/sistema/kpis",
@@ -99,14 +99,14 @@ for (const viewport of [
     });
 
     test("la navegación mantiene ingreso como una sola superficie y conserva submenús externos", async ({ page }) => {
-      await page.goto("/sistema/volcados", { waitUntil: "domcontentloaded" });
+      await page.goto("/sistema/custodia", { waitUntil: "domcontentloaded" });
       await expect(page.locator('[data-testid="khora-splash"]')).toHaveCount(0, { timeout: 3000 });
 
       await expect(page.locator("[data-navigation-entry]")).toHaveCount(6);
       const primaryIds = await page.locator("[data-navigation-entry]").evaluateAll((nodes) => nodes.map((node) => node.getAttribute("data-navigation-entry")));
-      expect(primaryIds).toEqual(["ingreso", "volcados", "grafo", "consulta", "seguridad", "sistema"]);
+      expect(primaryIds).toEqual(["ingreso", "custodia", "grafo", "consulta", "seguridad", "sistema"]);
       await expect(page.getByRole("link", { name: "Ingreso", exact: true })).toBeVisible();
-      await expect(page.getByRole("link", { name: "Volcados", exact: true })).toBeVisible();
+      await expect(page.getByRole("link", { name: "Custodia", exact: true })).toBeVisible();
       await expect(page.getByRole("link", { name: "Capturar", exact: true })).toHaveCount(0);
       await expect(page.getByRole("link", { name: "Dictado", exact: true })).toHaveCount(0);
       await expect(page.getByRole("link", { name: "Edición", exact: true })).toHaveCount(0);
@@ -143,11 +143,11 @@ for (const viewport of [
       const aliases: Array<[string, RegExp]> = [
         ["/sistema/boveda", /\/sistema\/seguridad\?tab=boveda$/],
         ["/sistema/entorno-persistente", /\/sistema\/seguridad\?tab=entorno-persistente$/],
-        ["/herramientas/bitacora", /\/sistema\/volcados$/],
+        ["/herramientas/bitacora", /\/sistema\/custodia$/],
         ["/capturar", /\/sistema\/ingreso$/],
         ["/sistema/dictado", /\/sistema\/ingreso$/],
         ["/sistema/editar", /\/sistema\/editar$/],
-        ["/sistema/ingesta", /\/sistema\/volcados$/],
+        ["/sistema/ingesta", /\/sistema\/custodia$/],
       ];
 
       for (const [alias, canonical] of aliases) {
