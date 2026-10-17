@@ -1,0 +1,49 @@
+(node:580) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///vercel/sandbox/data/tareas-recovery/task-extraction.test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /vercel/sandbox/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ accepts exact synthetic provenance (33.206874ms)
+✔ accepts successful zero tasks (1.357121ms)
+✔ keeps failure distinct from zero tasks (0.420924ms)
+✔ accepts incomplete failure (0.352319ms)
+✔ rejects tasks in failed response (0.539508ms)
+✔ rejects unrecognized failure (0.399051ms)
+✔ rejects missing corpus coverage (0.989146ms)
+✔ rejects unknown covered source (0.394733ms)
+✔ rejects stale covered hash (0.463498ms)
+✔ rejects stale covered version (0.502294ms)
+✔ rejects duplicate corpus input (0.479519ms)
+✔ rejects empty authorized corpus (0.195629ms)
+✔ rejects unknown evidence source (0.329841ms)
+✔ rejects stale evidence version (0.524054ms)
+✔ rejects stale evidence hash (0.329418ms)
+✔ rejects invented quotation (0.325946ms)
+✔ rejects negative offsets (0.287937ms)
+✔ rejects fractional offsets (0.313948ms)
+✔ rejects out of range offsets (0.30843ms)
+✔ rejects empty evidence (0.302294ms)
+✔ rejects empty task title (0.29476ms)
+✔ rejects oversized task title (0.311139ms)
+✔ rejects extra top level instructions (0.314475ms)
+✔ rejects extra task instructions (0.399321ms)
+✔ accepts date tied to snapshot (not semantic proof) (0.652003ms)
+✔ rejects impossible calendar day (0.4246ms)
+✔ rejects unanchored date (0.366805ms)
+✔ rejects changed timezone (0.35116ms)
+✔ rejects date with no evidence (0.332257ms)
+✔ rejects unknown source timezone (0.264884ms)
+✔ rejects malformed snapshot hash (0.154143ms)
+✔ rejects unzoned capture anchor (0.215076ms)
+✔ rejects splitting surrogate pair (0.477659ms)
+✔ does not mutate input (0.463201ms)
+✔ rejects too many tasks (0.560228ms)
+✔ rejects duplicated source report even with matching count (0.647385ms)
+✔ rejects snapshot text/hash disagreement (0.243898ms)
+ℹ tests 37
+ℹ suites 0
+ℹ pass 37
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 258.019244

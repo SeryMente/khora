@@ -1,0 +1,154 @@
+{
+  "kind": "frozen_recovery_evidence_not_live_state",
+  "anchor": "2026-10-17, ciclo 19 de recuperación, después de mensaje final interrumpido del adjunto",
+  "repo": {
+    "owner": "SeryMente",
+    "name": "khora",
+    "private_verified": true,
+    "push_permission_verified": true,
+    "base_main": "c02f5142d7609c35d8a2dc2c549726edc4016f13",
+    "previous_object_blob": "dafe49f0f167b940197f4481709622c44a7ea6a2"
+  },
+  "archive": {
+    "path": "originales/conversacion-recibida-2026-10-17.txt",
+    "bytes": 43606,
+    "sha256": "0a26f2ed27ffd8e5df27a82d177c9dbc7073c29fb2e493d570242ee77001ad98",
+    "git_blob_sha1": "17a0bc417b43ca37f32387cb2b58e15faadcb63f",
+    "scope": "exact bytes of user attachment only; not an independently authenticated export, tool trace or unseen attachment corpus",
+    "last_user_input": "Bueno... No te detengas, resuelve de extremo a extremo para cumplir mi instrucción."
+  },
+  "connections": {
+    "GitHub": "reauthentication required; not retried",
+    "GitHub (2)": "operational read and push permissions",
+    "Vercel": "reauthentication required during tool discovery; publication and current billing not verified",
+    "Desktop Commander Remote": "discovered, not invoked on any device"
+  },
+  "notion": {
+    "accessible": [
+      {
+        "url": "https://app.notion.com/p/159f2ff32b6a4435952ebcf89ad563d2",
+        "name": "Página histórica del frente",
+        "scope": "v0.6; fuente sustituida, ahora leída"
+      },
+      {
+        "url": "https://app.notion.com/p/55d5d4a3b25083a1a14381ca70281acd",
+        "name": "Unidades de Auditoría de Fidelidad — EpisTwin",
+        "scope": "v1.2; 59 unidades, no versión idéntica acreditada del enlace viejo"
+      },
+      {
+        "url": "https://app.notion.com/p/5a85d4a3b25082dabe21813fa78b8d60",
+        "name": "Radar de Investigación",
+        "scope": "v0.1; incubación; no se actualizó"
+      },
+      {
+        "url": "https://app.notion.com/p/3175d4a3b250837fbccb812a3e55620e",
+        "name": "Anexo Técnico Exhaustivo — EpisTwin",
+        "scope": "leído; no prevalece sobre correcciones posteriores"
+      },
+      {
+        "url": "https://app.notion.com/p/3505d4a3b25082299ad781a788447a6b",
+        "name": "EpisTwin: artículo original",
+        "scope": "página leída; binario adjunto no cotejado"
+      },
+      {
+        "url": "https://app.notion.com/p/41d5d4a3b250820caa3a018fef083052",
+        "name": "Registro Canónico de Errores de Terminal · Khora",
+        "scope": "lectura posible; escritura falló por ancestro en papelera"
+      },
+      {
+        "url": "https://app.notion.com/p/b915d4a3b25083d38f7801ee9ad4a493",
+        "name": "Registro de Taxonomía",
+        "scope": "leído; reutilización de elemento permanente existente"
+      },
+      {
+        "url": "https://app.notion.com/p/8375d4a3b250825cb68981b2733abb96",
+        "name": "MOTOR-1C",
+        "scope": "leído; respuesta indica deleted=true"
+      },
+      {
+        "url": "https://app.notion.com/p/a8c5d4a3b250836a87a301ef94199270",
+        "name": "Metaprompt Canónico",
+        "scope": "auto-cargado NX-330m; respuesta indica deleted=true"
+      }
+    ],
+    "inaccessible_exact_legacy_urls": [
+      "https://app.notion.com/p/05086f44318b82b7aaae01de16ddfcdf",
+      "https://app.notion.com/p/42386f44318b8312940681b7c1ca5c53",
+      "https://app.notion.com/p/45586f44318b83429553813c12611f6b",
+      "https://app.notion.com/p/4a886f44318b82a58958819af6533414",
+      "https://app.notion.com/p/4f686f44318b827f83fb017724b4929a",
+      "https://app.notion.com/p/8a786f44318b8235a67e8156fd50a98d",
+      "https://app.notion.com/p/94486f44318b828da40f01282fcfc99c",
+      "https://app.notion.com/p/be786f44318b838ba7ff8165583688f4",
+      "https://app.notion.com/p/f4a86f44318b8343ac3401302f4c429f"
+    ],
+    "not_found_interpretation": "not accessible in this session, not proof of deletion; did not retry failed IDs",
+    "unresolved": [
+      "legacy be786f44318b838ba7ff8165583688f4 counterpart not identified",
+      "binary attached to article page not byte-verified",
+      "references in historical sources not recursively exhausted"
+    ],
+    "counterparts_are_not_proven_identical": true
+  },
+  "architecture_reference": {
+    "repo": "SeryMente/khora",
+    "branch": "docs/chat-epistwin-20261017",
+    "commit": "e6bc9a742ef8bd9d2990e5755d1d8a75834eb62d",
+    "object": "docs/frentes/chat-epistwin/OBJETO-CANONICO.md",
+    "object_blob": "56e0295e167e029f946ede99efe0fcbe296289aa",
+    "version": "KHORA-CHAT-EPISTWIN-v0.4",
+    "matrix_blob": "64c96bcc5c8dab684bb46edd62254cddc7b27661",
+    "scope": "read only; approved chat text scope is not a ratified task-provider/data/interface contract; no merge"
+  },
+  "historical_originals_byte_checked": [
+    {
+      "path": "originales/registro-notion-recibido.txt",
+      "bytes": 53572,
+      "sha256": "9cb3b4a0d5523bc3cd8ee2e3c1d39813c1bc1073c44931dcd32906a5ecf33918",
+      "git_blob_sha1": "b0a8ece8468b37be506eaac462639da599bf13ac"
+    },
+    {
+      "path": "originales/continuidad-auditoria-v0.7-provisional.md",
+      "bytes": 102951,
+      "sha256": "08ced4594621521636f778eed732b2566e4c07f2c43ca0dc4e79cdc75e13179b",
+      "git_blob_sha1": "cabd9e187b1862020b7edcb52116a3dc0362437a"
+    }
+  ],
+  "product": {
+    "previous_model_25_tests_claim": "not recovered or independently verified; never inherited as proof",
+    "current_experiment": {
+      "tests": 37,
+      "passed": 37,
+      "failed": 0,
+      "test_runner": "Node.js v24.14.1 native TypeScript strip, node:test",
+      "typecheck": "strict isolated; TypeScript 5.9.3, @types/node 20.19.43; exit 0",
+      "network_inference": false,
+      "private_corpus": false,
+      "production_wiring": false,
+      "limitations": [
+        "syntactic/provenance contract, not semantic task extraction",
+        "reported source coverage is not proof of model comprehension",
+        "no persistence/deduplication worker, ownership authentication, UI, real model evaluation or end-to-end deployment tested"
+      ]
+    },
+    "publication": "NOT VERIFIED; no E1 deployment in this session",
+    "current_github_billing": "NOT VERIFIED; historical claim only"
+  },
+  "terminal_incident": {
+    "operation": "synthetic task contract tests and strict typecheck",
+    "symptom_verbatim": [
+      "Error: Cannot find module '/vercel/sandbox/data/node_modules/tsx/dist/cli.mjs'",
+      "Error: Cannot find module '/vercel/sandbox/data/node_modules/typescript/bin/tsc'"
+    ],
+    "cause": "Declared packages absent from actual sandbox; runner paths were assumed.",
+    "state_impact": "Local experimental files only; no product change.",
+    "canonical_register_attempt": {
+      "url": "https://app.notion.com/p/41d5d4a3b250820caa3a018fef083052",
+      "result": "failed",
+      "reason": "This page's ancestor is in the trash. The ancestor must be restored before this page can be updated."
+    },
+    "correction": "Use native Node TypeScript test runner and install pinned typechecker in unique temp directory, no install scripts; bounded network attempts.",
+    "verification": "Native runner retry passed 37 tests; pinned isolated strict typecheck exit 0; canonical Notion write remains blocked, incident retained here without restoring ancestor.",
+    "prevention": "Preflight actual executable paths, tool versions and bounded fallback before runner invocation."
+  }
+}
