@@ -166,6 +166,8 @@ No llamar «sin cambios» a una fuente inaccesible; no convertir calidad cientí
 
 ## 11. Crónica y fuentes
 
+Continuidad de la candidata MCP #314: [C007.9 · custodia y bloqueo de publicación](#c0079--custodia-del-intercambio-mcp-y-reanudación-de-publicación--2026-10-17). No modifica el estado de los demás trabajos del frente.
+
 ### Fuentes y custodia
 
 - [Especificaciones originales verbatim](originales/ESPECIFICACIONES-ORIGINALES.md), V000–V010; [conversación recibida](originales/conversacion-recibida.txt), íntegra y con hash.
@@ -1067,3 +1069,18 @@ Checkpoint: revisar seguridad, metodología e integración completa y reconcilia
 El operador autorizó publicar en Vercel. Esta rama integra las candidatas separadas de historial e identidad sobre main aa6f3a548c032f2ac30de32c275be17a0bd8370a; los apartados C007.6 y C007.7 conservan antecedentes, no estados actuales. La identidad sigue desactivada por defecto. No ejecutar SQL candidato, cambiar el registro privado ni activar la variante normativa sin completar revisión y autorización específicas. Publicar código no acredita activación ni recuperación funcional de audio.
 
 El workflow de main ejecuta migraciones 023–029 antes de desplegar; no se activa por esta preparación. Se mantiene la solicitud en borrador para impedir auto-merge. Pendientes: compilación/tipos y pruebas del checkout completo, revisión metodológica/seguridad, despliegue exacto y aceptación real. Ninguna prueba aislada se presenta como integración continua o prueba productiva.
+
+
+### C007.9 · Custodia del intercambio MCP y reanudación de publicación · 2026-10-17
+
+Sello de este addendum: MCP-CUSTODIA-20261017-r1. Fuente superior recuperada NX-332m; metacanon 1.5 fijado en 49ac40e9f6122e2d2fb339362cfa0a78128c8e37, aplicado a custodia privada, mismo objeto, cambios documentales mínimos y lectura de vuelta. No se crea otro frente ni manual. Esta entrada corresponde a la rama candidata #314, no sustituye ni revierte avances posteriores de main en otros trabajos.
+
+El operador pide comprobar acceso y conservación literal de la conversación aportada y retomar su última entrada: «Publica en Bursel lo que hiciste.». El texto recibido, incluido el pedido de continuidad, se conserva en [originales/CONVERSACION-MCP-RECIBIDA-20261017.txt](originales/CONVERSACION-MCP-RECIBIDA-20261017.txt): 15646 bytes UTF-8, SHA-256 `a939d3879265b767dd0e9a13bfef711081f1514e922fb4914ce23674ac3d2c8d`; se mantienen marcadores HTML, escapes, nombres de archivos y referencias colapsadas. Recibo acotado: [evidencias/CUSTODIA-MCP-20261017.json](evidencias/CUSTODIA-MCP-20261017.json). Es copia del texto aportado, NO exportación nativa completa de Notion ni custodia de adjuntos ausentes. No se reconstruyen los ZIP ni los destinos de «‣» por sus nombres. Las conversaciones anteriores custodiadas son otras fuentes y no prueban conservación de esta.
+
+Accesos: los tres enlaces Notion aportados fallan en este workspace; se recuperaron sus fuentes por búsqueda (metaprompt NX-332m, encargo y registro de errores). GitHub (2) permite leer el repositorio privado y la solicitud #314; GitHub principal requiere reautenticación. La salud autenticada actual de Khora devuelve ok:true, full_access:true, missing_scopes:[]; esto no acredita identidad legítima, historial real ni audio. No se abrieron ciclos con identidad ajena ni se leyeron dictados. Los ZIP históricos, conversación nativa y objetivos de referencias colapsadas permanecen NO VERIFICADOS.
+
+Publicación retomada sin asumir el estado del otro modelo: #314 sigue abierta, en borrador y no fusionada, head `46b2e83bb636dcf1970e106db937047ae4bb627c`. Su comentario Vercel identifica la restricción de integración Git de repositorio privado de organización en Hobby. Tras reconectar oficialmente Vercel, GET del proyecto khora-web y su alias en el equipo previsto siguen 403 forbidden. No se declara que reautenticar resuelva permisos de equipo ni que la limitación de la integración Git prohíba toda vía oficial. La consulta de checks GitHub también devuelve 403; no se trata como prueba aprobada. No hay Vercel CLI instalada en el sandbox del agente. Solo se listaron dispositivos remotos; no se accedió a terminales ni se heredaron permisos históricos del operador.
+
+Checkpoint ejecutable por rol: asistencia requiere autorización actual del equipo/entorno concreto para comprobar con la consola oficial de Vercel sus propias credenciales, mismo proyecto y equipo. Alternativa: acceso efectivo de la conexión al equipo correcto. Después, checkout completo y conciliación con main actual, pruebas integrales, revisión de seguridad/metodología y ruta de candidato sin migraciones no autorizadas; solo entonces desplegar dentro de la autorización vigente. No hacer público el repositorio, pagar, cambiar protecciones, activar identidad vinculada, ejecutar SQL ni fusionar para sortear el bloqueo. No hubo despliegue ni migración ni pruebas de negocio reales en este ciclo. El objetivo de audio e historial productivos sigue abierto.
+
+Doble revisión documental: original previo/anexos e historia preservados; solo enlace de continuidad MCP, esta entrada, fuente textual y recibo/manifiesto de custodia de estos archivos. Verificación final por blobs remotos; las pruebas históricas citadas siguen siendo antecedentes, no se presentan como repetidas.

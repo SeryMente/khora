@@ -1,0 +1,89 @@
+{
+  "schema": "khora-mcp-conversation-custody/v1",
+  "date": "2026-10-17",
+  "scope": "User-supplied textual conversation, not native event export",
+  "source": {
+    "path": "originales/CONVERSACION-MCP-RECIBIDA-20261017.txt",
+    "bytes": 15646,
+    "sha256": "a939d3879265b767dd0e9a13bfef711081f1514e922fb4914ce23674ac3d2c8d",
+    "git_blob_sha": "c5a741436ef8f1611ecb69a06e55c72b49159daf",
+    "encoding": "UTF-8",
+    "format": "literal supplied text with HTML break markers and Markdown escapes retained",
+    "native_export_comparison": "NOT_AVAILABLE",
+    "attachments_embedded": false
+  },
+  "branch": "release/mcp-history-identity-20261017",
+  "prepared_against": "46b2e83bb636dcf1970e106db937047ae4bb627c",
+  "main_observed": "c02f5142d7609c35d8a2dc2c549726edc4016f13",
+  "repository_private_verified": true,
+  "sources_access": [
+    {
+      "source": "Original three Notion URLs supplied",
+      "result": "Not accessible in this workspace; not retried"
+    },
+    {
+      "source": "Canonical Samantha page",
+      "url": "https://app.notion.com/p/a925d4a3b2508393b2b7817f1cf431da",
+      "result": "Loaded NX-332m"
+    },
+    {
+      "source": "Existing assignment",
+      "url": "https://app.notion.com/p/2cd5d4a3b25082d5aa5201ce58a5476b",
+      "result": "Loaded; historical state not treated as current"
+    },
+    {
+      "source": "Terminal error register",
+      "url": "https://app.notion.com/p/b7a5d4a3b2508359945e81c5957b821d",
+      "result": "Loaded; relevant Vercel/403/CLI antecedents inspected"
+    },
+    {
+      "source": "khora-web/docs/normative-check.md",
+      "revision": "46b2e83bb636dcf1970e106db937047ae4bb627c",
+      "result": "Retrieved"
+    },
+    {
+      "source": "docs/SPRINT-MCP-OBSERVABILIDAD-DICTADO.md",
+      "result": "Compatibility link resolves to same canonical object"
+    },
+    {
+      "source": "Khora-MCP-historial-candidata-y-evidencia.zip; Khora-MCP-identidad-candidata-y-pruebas.zip",
+      "result": "NOT_AVAILABLE: only filenames supplied"
+    },
+    {
+      "source": "Collapsed references marked with ‣ and complete original tool traces",
+      "result": "NOT_AVAILABLE: no recoverable targets in supplied text"
+    }
+  ],
+  "evidence": {
+    "pull_request": 314,
+    "draft": true,
+    "merged": false,
+    "head": "46b2e83bb636dcf1970e106db937047ae4bb627c",
+    "health": {
+      "ok": true,
+      "full_access": true,
+      "missing_scopes": [],
+      "correlation_id": "1f641ead-519e-4dc7-b158-44b1d3a9368b"
+    },
+    "github_checks": "403 Resource not accessible by personal access token",
+    "vercel_connection": "Reconnected through official Notion connection flow; both project and alias reads still 403 forbidden for intended scope",
+    "vercel_team": "team_QBa5UlffJWznZ8ogFfKjaGQb",
+    "vercel_scope": "victorhugotorresmendez-8991s-projects",
+    "vercel_git_integration": "Bot comment: Hobby team cannot deploy private organization repository",
+    "vercel_cli_in_agent_sandbox": "command -v vercel returned no path",
+    "desktop_remote": "Devices listed; no device commands or files accessed; historical permissions not reused"
+  },
+  "not_done": [
+    "native full conversation export verified",
+    "ZIP package byte verification",
+    "checkout-wide build or tests rerun",
+    "deployment created or production revision verified",
+    "migration",
+    "merge",
+    "identity feature activation",
+    "audio recovery, decoding or listening"
+  ],
+  "next_gate": "Use authorized official Vercel CLI credentials on an explicitly permitted environment for same project/team read; then verify full integration and migration-free candidate path before any deployment. No billing, visibility or protection changes.",
+  "privacy_review": "No credential signatures found in supplied text; technical transcript only, not original dictado text or audio. Not an absolute secret-detection guarantee.",
+  "verification": "Compare remote Git blob IDs of all written files after commit; native source completeness remains unverified."
+}

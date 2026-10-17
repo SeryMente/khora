@@ -30,9 +30,9 @@
   "files": [
     {
       "path": "OBJETO-CANONICO.md",
-      "bytes": 137129,
-      "sha256": "513ed710f6278ae20edc0946746af7dced79a018f7f453198de02dd0fc3847bf",
-      "git_blob_sha": "885b35e0a668524e498675f106dc61902324c76e"
+      "bytes": 146759,
+      "sha256": "2e1fc944fea77dc650d7f3e3e8ffd8a9090271399eebdb825a14320eae3523e0",
+      "git_blob_sha": "cc1f82138e95309f35c153ff63f94a30b94797b3"
     },
     {
       "path": "CONTRATO-DICTADO-EXPERIENCE.md",
@@ -87,6 +87,18 @@
       "bytes": 3972,
       "sha256": "fcccada87418dc85f7c8e601a1dd15fd30e4fa210b6223051601f0b12b2fdebe",
       "git_blob_sha": "f5d21226ed25066d506aae92e88b9496fca5f49f"
+    },
+    {
+      "path": "originales/CONVERSACION-MCP-RECIBIDA-20261017.txt",
+      "bytes": 15646,
+      "sha256": "a939d3879265b767dd0e9a13bfef711081f1514e922fb4914ce23674ac3d2c8d",
+      "git_blob_sha": "c5a741436ef8f1611ecb69a06e55c72b49159daf"
+    },
+    {
+      "path": "evidencias/CUSTODIA-MCP-20261017.json",
+      "bytes": 4011,
+      "sha256": "50e6a73a02aef58e79333686c109ef8f8148060deb62d72d190e8578bd00b394",
+      "git_blob_sha": "adbdf1c9d3c634682ea28a15d2aa97258526cc1e"
     }
   ],
   "runtime_references": [
@@ -198,5 +210,11 @@
     "pullRequest": "https://github.com/SeryMente/khora/pull/305",
     "state": "software verified; merge authorization explicit; effective merge determined by Git"
   },
-  "latestEvent": "C017 - Ingreso explicit recovery and coherent UI"
+  "latestEvent": "C017 - Ingreso explicit recovery and coherent UI",
+  "mcp_custody_addendum": {
+    "seal": "MCP-CUSTODIA-20261017-r1",
+    "branch": "release/mcp-history-identity-20261017",
+    "receipt": "evidencias/CUSTODIA-MCP-20261017.json",
+    "scope": "Only these three file hashes refreshed; unrelated entries retain their existing provenance. Not native-export completeness or production acceptance."
+  }
 }
