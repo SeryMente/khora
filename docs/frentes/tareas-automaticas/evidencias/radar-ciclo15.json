@@ -1,0 +1,68 @@
+{
+  "cutoff_date": "2026-10-17",
+  "scope": "Actualización focal de tareas personales, no inventario exhaustivo del mercado",
+  "radar_notion_updated": false,
+  "reason": "Cuatro copias ambiguas; identificación preguntada al operador, pendiente",
+  "sources": [
+    {
+      "name": "EpisTwin",
+      "url": "https://export.arxiv.org/abs/2603.06290",
+      "observed": "Historial recuperado: solo v1, 2026-03-06.",
+      "limit": "No nueva edición localizada; búsqueda GitHub por nombre sin resultados, no prueba inexistencia."
+    },
+    {
+      "name": "GraphRAG",
+      "url": "https://github.com/microsoft/graphrag/releases/tag/v3.3.0",
+      "observed": "Release 2026-10-08: SQLite performance fix.",
+      "limit": "No evidencia de una nueva capacidad personal por esta release."
+    },
+    {
+      "name": "Graphiti",
+      "url": "https://github.com/getzep/graphiti/releases/tag/v0.31.1",
+      "observed": "Release 2026-10-15; README de etiqueta recuperado.",
+      "limit": "Temporalidad/incorporación incremental ya preexistían; no instalación ni benchmark local."
+    },
+    {
+      "name": "MemGraphRAG",
+      "url": "https://github.com/XMUDeepLIT/MemGraphRAG/commit/cd6fabda1ec31a302bb283089e17c087ab7713e8",
+      "observed": "README y paper 2606.00610 recuperados.",
+      "limit": "Investigación QA, no extracción de tareas validada; cuidado con filtrar hechos raros."
+    },
+    {
+      "name": "Memora",
+      "url": "https://aclanthology.org/2026.findings-acl.1337/",
+      "observed": "ACL Findings julio2026: memoria cambiante y obsoleta.",
+      "limit": "Resultados externos; no se ejecutó benchmark."
+    },
+    {
+      "name": "Proactive Memory Agent",
+      "url": "https://github.com/yifannnwu/proactive-memory-agent/commit/89e5c0d6aadfe531a1aee42fd290d48be89973dd",
+      "observed": "Paper 2607.08716 y README recuperados: intervención o silencio.",
+      "limit": "Pruebas de agentes/terminal, no de desempeño humano."
+    },
+    {
+      "name": "Proactivity-Gym",
+      "url": "https://arxiv.org/abs/2609.37267",
+      "observed": "Preprint septiembre2026: capacidad, asignación temporal y confianza.",
+      "limit": "No integración ni release de código verificadas aquí."
+    },
+    {
+      "name": "Todoist Ramble",
+      "url": "https://www.todoist.com/help/articles/dictate-to-add-tasks-with-ramble-P1Raq7vVF",
+      "observed": "Ayuda oficial 8-oct2026: voz→tareas, señales claras, no asistente conversacional.",
+      "limit": "No ensayo del producto ni prueba de límites absolutos."
+    },
+    {
+      "name": "Omi",
+      "url": "https://www.omi.me/products/omi",
+      "observed": "Página oficial: tareas y memoria automáticas desde conversaciones.",
+      "limit": "Declaración de fabricante; sin auditoría de calidad/privacidad."
+    },
+    {
+      "name": "Screenpipe",
+      "url": "https://screenpipe.com/pipes",
+      "observed": "Página oficial: agentes programados sobre pantalla/audio.",
+      "limit": "Instrucciones incrustadas tratadas como datos; no instalación o captura."
+    }
+  ]
+}

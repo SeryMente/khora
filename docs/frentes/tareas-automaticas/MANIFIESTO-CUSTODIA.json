@@ -1,6 +1,6 @@
 {
-  "version": 2,
-  "object_seal": "TAREAS-v0.9",
+  "version": 3,
+  "object_seal": "TAREAS-v0.10",
   "purpose": "Inventario de integridad y procedencia; no estado vivo paralelo",
   "source_of_truth": "docs/frentes/tareas-automaticas/OBJETO-CANONICO.md",
   "owner_repo": "SeryMente/khora",
@@ -20,9 +20,9 @@
     {
       "path": "OBJETO-CANONICO.md",
       "classification": "objeto_vivo",
-      "bytes": 98641,
-      "sha256": "d873b2554697589249344494efe8408645e7afd38f3ea2d25de53f352562a878",
-      "git_blob_sha1": "afa74310edfb3c753e38eb571ea88793732578ca"
+      "bytes": 129581,
+      "sha256": "4f5b0cbd20456bde34653159cc60df27ac3c08d9cc86583937d16a290c32f492",
+      "git_blob_sha1": "5d7a8e8ec67e1ed1783473c30724b0e64a214d66"
     },
     {
       "path": "originales/registro-notion-recibido.txt",
@@ -58,8 +58,22 @@
       "bytes": 1103,
       "sha256": "76220c02483fd1882feaf2025dbfe9a318d95b90f0bd8eb5165dfd66d20e29c8",
       "git_blob_sha1": "7cdd88d87f52a13b6083ce92c3c0bbe2e12216b9"
+    },
+    {
+      "path": "originales/instruccion-plan-ciclo15.txt",
+      "classification": "original_historico_inmutable",
+      "bytes": 935,
+      "sha256": "4fa9620d4a878526ef2fe7389d7505824dc128e0b8595ad7b31be000fc9add8a",
+      "git_blob_sha1": "3f0e9629ae10f270c24e176e59be5136ccf291da"
+    },
+    {
+      "path": "evidencias/radar-ciclo15.json",
+      "classification": "evidencia_documental_historica",
+      "bytes": 3067,
+      "sha256": "62baf66ec2cddc5ffb0bde6adf1e47c4185367fbabd80ae6129a7019afa7f50c",
+      "git_blob_sha1": "cf3f6a6e2dbae7a8a6fc8c2323a6d201f1ce48a3"
     }
   ],
   "self_integrity": "El manifiesto no se hashea a sí mismo; comprobar su blob/commit devuelto por GitHub.",
-  "previous_verified_documentation_commit": "2518f3acd18518f030c1247f7cc053f50be6581c"
+  "previous_verified_documentation_commit": "2af9c102dc9937b720b4d78c3e9d367c20001568"
 }
