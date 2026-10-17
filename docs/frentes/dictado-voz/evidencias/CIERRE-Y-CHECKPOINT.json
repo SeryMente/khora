@@ -1,0 +1,67 @@
+{
+  "schema": "khora-front-documentary-evidence/v1",
+  "classification": "private_documentary_no_credentials_no_raw_user_audio",
+  "source_base": "1697ee2693ed3217523ffc1d1be9b6541d7d849d",
+  "historical_release": {
+    "source": "https://github.com/SeryMente/khora/pull/298#issuecomment-6224929973",
+    "merged_sha": "a5b12d54d970b3b4ff813f5c04b65bb2af15dd88",
+    "published_and_marker_verified_at_that_event": true,
+    "tests": {
+      "directed_passed": 20,
+      "browser_passed": 15,
+      "full_unit_passed": 402
+    },
+    "real_storage_probe": "passed_write_cipher_read_delete_synthetic_owner_only",
+    "github_actions": "not_started_account_billing",
+    "not_a_current_deployment_guarantee": true
+  },
+  "last_observed_mcp_health": {
+    "tool": "khora_mcp_health",
+    "status": "UNAVAILABLE",
+    "full_access": false,
+    "code": "NORM_GITHUB_CREDENTIAL_MISSING",
+    "correlation_id": "c9532592-822a-4357-9dab-04f17eebd7d5",
+    "retryable": false,
+    "not_retested_after_new_configuration": true
+  },
+  "browser_login": {
+    "reached_google": true,
+    "private_input_dismissed": true,
+    "credentials_received": false
+  },
+  "current_public_checks": [
+    {
+      "path": "/ep-main-live.json",
+      "http": 404,
+      "exception": "urllib.error.HTTPError: HTTP Error 404: Not Found",
+      "cause": "open",
+      "current_release_provenance": "not_verified"
+    },
+    {
+      "path": "/auth/signin",
+      "http": 200,
+      "checkedAt": "2026-10-16T22:25:26.179819+00:00",
+      "proves_authenticated_benchmark": false
+    }
+  ],
+  "global_error_register_write": {
+    "updated": 0,
+    "code": "tool_validation",
+    "message": "This page's ancestor is in the trash. The ancestor must be restored before this page can be updated.",
+    "restored": false,
+    "synchronization": "pending"
+  },
+  "human_milestone": {
+    "voice_session_completed": false,
+    "new_user_feedback_collected": false,
+    "closed": false
+  },
+  "voice_health_extension": {
+    "documented": true,
+    "audio_received": false,
+    "implemented": false,
+    "clinical_validation": false,
+    "first_self_reported_symptom": "not_selected"
+  },
+  "scope_of_this_change": "documentation_only_no_deploy_no_secret_mutation"
+}

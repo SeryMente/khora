@@ -10,4 +10,4 @@ El subsistema Entorno Persistente Medio v1.0 se especifica en [`ep-medio-archite
 | [`PREPARACION-VOLCADOS.md`](./PREPARACION-VOLCADOS.md) | Protocolos de Custodia, Fidelidad y Legibilidad que debe superar un volcado antes de llegar a revisión, y qué se muestra al operador cuando alguno falla |
 | [`UI_REVIEW.md`](./UI_REVIEW.md) | Cómo ver la interfaz vigente de Khora, incluidos los modelos que no ejecutan JavaScript |
 | [`ep-medio-architectura.md`](./ep-medio-architectura.md) | Entorno Persistente Medio v1.0 |
-| [`docs/SPRINT-MCP-OBSERVABILIDAD-DICTADO.md`](./docs/SPRINT-MCP-OBSERVABILIDAD-DICTADO.md) | Objeto canónico de continuidad del sprint: interoperabilidad MCP, registros de observabilidad y corrección del bug de dictado; bitácora exhaustiva por ciclo |
+| [`docs/frentes/dictado-voz/OBJETO-CANONICO.md`](./docs/frentes/dictado-voz/OBJETO-CANONICO.md) | Objeto único del frente: observabilidad MCP, dictado, benchmark, retroalimentación y propuesta delimitada de voz/síntomas; originales, evidencia y continuidad |
