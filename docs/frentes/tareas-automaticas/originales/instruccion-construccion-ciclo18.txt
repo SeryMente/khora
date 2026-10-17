@@ -1,0 +1,1 @@
+endurece el objeto canónico y asegúrate que todo esté listo para el desarrollo y luego resuelve de extremo a extremo publicando en Vercel la primera entrega del desarrollo.
