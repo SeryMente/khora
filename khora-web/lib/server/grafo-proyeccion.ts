@@ -80,7 +80,7 @@ export async function obtenerProyeccionGrafo(filtros: Filtros = {}): Promise<Pro
           AND ($volcadoId IS NULL OR toString(io.volcado_id) = $volcadoId)
         RETURN DISTINCT toString(io.io_id) AS id, toString(io.volcado_id) AS volcadoId,
           io.version AS version, io.sha256 AS sha256,
-          coalesce(toString(io.created_at), toString(io.valid_at), datetime().toString()) AS timestamp
+          coalesce(toString(io.created_at), toString(io.valid_at), toString(datetime())) AS timestamp
         ORDER BY id ASC LIMIT $fetchLimit`;
       const ioResult = await limitada<Registro>(session, ioQuery, { ioId, volcadoId }, limit);
       const informationObjects: InformationObjectGrafo[] = ioResult.rows
@@ -102,7 +102,7 @@ export async function obtenerProyeccionGrafo(filtros: Filtros = {}): Promise<Pro
              coalesce(e.community, 0) AS community, coalesce(e.level, 0) AS level,
              coalesce(e.centrality, 1.0) AS centrality,
              coalesce(e.provenance[0], 'Neo4j Aura') AS origen,
-             coalesce(toString(e.created_at), toString(e.valid_at), datetime().toString()) AS timestamp,
+             coalesce(toString(e.created_at), toString(e.valid_at), toString(datetime())) AS timestamp,
              CASE WHEN e.needs_review = true THEN 'Pendiente' ELSE 'Verificado' END AS verificacion
            ORDER BY id ASC LIMIT $fetchLimit`
         : `MATCH (e:Entity) WHERE e.canonical_key IS NOT NULL
@@ -111,7 +111,7 @@ export async function obtenerProyeccionGrafo(filtros: Filtros = {}): Promise<Pro
              coalesce(e.community, 0) AS community, coalesce(e.level, 0) AS level,
              coalesce(e.centrality, 1.0) AS centrality,
              coalesce(e.provenance[0], 'Neo4j Aura') AS origen,
-             coalesce(toString(e.created_at), toString(e.valid_at), datetime().toString()) AS timestamp,
+             coalesce(toString(e.created_at), toString(e.valid_at), toString(datetime())) AS timestamp,
              CASE WHEN e.needs_review = true THEN 'Pendiente' ELSE 'Verificado' END AS verificacion
            ORDER BY id ASC LIMIT $fetchLimit`;
       const nodeResult = await limitada<Registro>(session, entityQuery, { ioIds }, limit);
@@ -145,7 +145,7 @@ export async function obtenerProyeccionGrafo(filtros: Filtros = {}): Promise<Pro
            RETURN DISTINCT coalesce(toString(r.id), e1.canonical_key + '->' + e2.canonical_key + ':' + coalesce(r.type, 'RELATION')) AS id,
              e1.canonical_key AS source, e2.canonical_key AS target, coalesce(r.type, 'RELATION') AS type,
              coalesce(r.weight, 1.0) AS weight, coalesce(r.provenance[0], 'Neo4j Aura') AS origen,
-             coalesce(toString(r.created_at), toString(r.valid_at), datetime().toString()) AS timestamp,
+             coalesce(toString(r.created_at), toString(r.valid_at), toString(datetime())) AS timestamp,
              'Verificado' AS verificacion
            ORDER BY id ASC LIMIT $fetchLimit`
         : `MATCH (e1:Entity)-[r:RELATION]->(e2:Entity)
@@ -153,7 +153,7 @@ export async function obtenerProyeccionGrafo(filtros: Filtros = {}): Promise<Pro
            RETURN DISTINCT coalesce(toString(r.id), e1.canonical_key + '->' + e2.canonical_key + ':' + coalesce(r.type, 'RELATION')) AS id,
              e1.canonical_key AS source, e2.canonical_key AS target, coalesce(r.type, 'RELATION') AS type,
              coalesce(r.weight, 1.0) AS weight, coalesce(r.provenance[0], 'Neo4j Aura') AS origen,
-             coalesce(toString(r.created_at), toString(r.valid_at), datetime().toString()) AS timestamp,
+             coalesce(toString(r.created_at), toString(r.valid_at), toString(datetime())) AS timestamp,
              'Verificado' AS verificacion
            ORDER BY id ASC LIMIT $fetchLimit`;
       const edgeResult = nodeIds.length
