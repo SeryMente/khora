@@ -32,8 +32,8 @@ test.describe('Ingreso Integrado Screen and Layout', () => {
     const dictadoButton = page.locator('button:has-text("Iniciar dictado")').first();
     await expect(dictadoButton).toBeVisible();
 
-    // Verify "Archivar volcado" button exists
-    const saveButton = page.locator('button:has-text("Archivar volcado")').first();
+    // Verify "Archivar registro" button exists
+    const saveButton = page.locator('button:has-text("Archivar registro")').first();
     await expect(saveButton).toBeVisible();
   });
 });

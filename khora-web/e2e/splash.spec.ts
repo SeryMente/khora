@@ -44,7 +44,7 @@ for (const theme of ["dark", "light"]) {
         test(`identity ${theme} ${viewport.width}x${viewport.height}`, async ({ page }, testInfo) => {
             await page.setViewportSize(viewport);
             await observeBoot(page, theme, true);
-            await page.goto("/sistema/volcados", { waitUntil: "domcontentloaded" });
+            await page.goto("/sistema/custodia", { waitUntil: "domcontentloaded" });
             await expect.poll(async () => (await evidence(page)).frozen).toBe(true);
             const overlay = page.locator(splash);
             const word = overlay.locator("span");
@@ -92,7 +92,7 @@ for (const theme of ["dark", "light"]) {
 
 test("real timeline lasts 1200ms, then never replays on resume or client navigation", async ({ page }) => {
     await observeBoot(page);
-    await page.goto("/sistema/volcados", { waitUntil: "domcontentloaded" });
+    await page.goto("/sistema/custodia", { waitUntil: "domcontentloaded" });
     await expect(page.locator(splash)).toHaveCount(0);
     const result = await evidence(page);
     expect(result.started).toBeGreaterThan(0);
@@ -110,7 +110,7 @@ test("real timeline lasts 1200ms, then never replays on resume or client navigat
 for (const key of ["Escape", "Enter", "Space"]) {
     test(`skip ${key} consumes input and finishes without another fade`, async ({ page }) => {
         await observeBoot(page, "dark", true);
-        await page.goto("/sistema/volcados", { waitUntil: "domcontentloaded" });
+        await page.goto("/sistema/custodia", { waitUntil: "domcontentloaded" });
         await expect.poll(async () => (await evidence(page)).frozen).toBe(true);
         const elapsed = await page.evaluate(async (key) => {
             const began = performance.now();
@@ -128,18 +128,18 @@ test("touch skips without activating the underlying surface", async ({ browser }
     const page = await context.newPage();
     try {
         await observeBoot(page, "light", true);
-        await page.goto("http://localhost:3000/sistema/volcados", { waitUntil: "domcontentloaded" });
+        await page.goto("http://localhost:3000/sistema/custodia", { waitUntil: "domcontentloaded" });
         await expect.poll(async () => (await evidence(page)).frozen).toBe(true);
         await page.touchscreen.tap(195, 422);
         await expect(page.locator(splash)).toHaveCount(0);
-        await expect(page).toHaveURL(/\/sistema\/volcados$/);
+        await expect(page).toHaveURL(/\/sistema\/custodia$/);
     } finally { await context.close(); }
 });
 
 test("reduced motion retains identity for 500ms without animations", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await observeBoot(page);
-    await page.goto("/sistema/volcados", { waitUntil: "domcontentloaded" });
+    await page.goto("/sistema/custodia", { waitUntil: "domcontentloaded" });
     await expect(page.locator(splash)).toHaveAttribute("data-phase", "reduced");
     await expect(page.locator(`${splash} span`)).toHaveCSS("opacity", "1");
     expect(await page.locator(splash).evaluate(node => node.getAnimations({ subtree: true }).length)).toBe(0);
@@ -153,7 +153,7 @@ test("first server-rendered surface is opaque even before JavaScript", async ({ 
     const context = await browser.newContext({ javaScriptEnabled: false });
     const page = await context.newPage();
     try {
-        await page.goto("http://localhost:3000/sistema/volcados");
+        await page.goto("http://localhost:3000/sistema/custodia");
         await expect(page.locator(splash)).toHaveCSS("opacity", "1");
         await expect(page.locator(splash)).toHaveCSS("background-color", "rgb(0, 0, 0)");
         await expect(page.locator(`${splash} span`)).toHaveCSS("opacity", "0");
@@ -167,7 +167,7 @@ test("late local font cannot start a partial or independent exit clock", async (
         await route.continue();
     });
     await observeBoot(page);
-    await page.goto("/sistema/volcados", { waitUntil: "domcontentloaded" });
+    await page.goto("/sistema/custodia", { waitUntil: "domcontentloaded" });
     await expect(page.locator(splash)).toHaveCount(0);
     const result = await evidence(page);
     expect(result.font).toBe("ready");
@@ -182,7 +182,7 @@ test("unavailable font releases the shell instead of displaying a fallback", asy
         if (!page.isClosed()) await route.continue();
     });
     await observeBoot(page);
-    await page.goto("/sistema/volcados", { waitUntil: "domcontentloaded" });
+    await page.goto("/sistema/custodia", { waitUntil: "domcontentloaded" });
     await expect(page.locator(splash)).toHaveCount(0, { timeout: 1500 });
     expect((await evidence(page)).started).toBe(0);
     await expect(page.locator('[data-testid="khora-shell"]')).toHaveCount(1);

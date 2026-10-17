@@ -1,5 +1,6 @@
 // @l0 L0-002-R · @req FIX-DICTADO/D2-D8
 import { test, expect } from '@playwright/test';
+import { createHash } from 'node:crypto';
 
 test.use({
   permissions: ['microphone'],
@@ -12,6 +13,17 @@ test.use({
 });
 
 test.describe('Dictado por partes contract test', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/dictado/checkpoint', async route => {
+      if (route.request().method() === 'POST') {
+        const body = route.request().postDataJSON();
+        await route.fulfill({ json: { ok: true, sessionId: body.sessionId, revisionId: body.revisionId } });
+      } else {
+        await route.fulfill({ json: { owner: 'synthetic-custody-owner@example.invalid', recovery: null } });
+      }
+    });
+  });
+
   test('handles audio multipart upload, errors and limit guards', async ({ page }) => {
     // Inject auth session to skip login
     await page.addInitScript(() => {
@@ -23,6 +35,13 @@ test.describe('Dictado por partes contract test', () => {
     await page.route('**/api/audio', async (route) => {
       const request = route.request();
       const postData = request.postDataBuffer();
+      if (!postData) throw new Error('Missing audio multipart body');
+      const form = await new Request(request.url(), {
+        method: 'POST', headers: { 'content-type': request.headers()['content-type'] }, body: new Uint8Array(postData)
+      }).formData();
+      const audio = form.get('audio');
+      if (!(audio instanceof File)) throw new Error('Missing audio file');
+      const audioBytes = Buffer.from(await audio.arrayBuffer());
       if (postData) {
         audioRequests.push({
           size: postData.length,
@@ -35,9 +54,9 @@ test.describe('Dictado por partes contract test', () => {
         contentType: 'application/json',
         body: JSON.stringify({
           url: 'https://blob.vercel-storage.com/dictado/mock-part-url.webm.khc',
-          bytes: postData ? postData.length : 1234,
+          bytes: audioBytes.length,
           cifrado: true,
-          sha256: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          sha256: createHash('sha256').update(audioBytes).digest('hex'),
           verificado: true
         }),
       });
@@ -109,6 +128,8 @@ test.describe('Dictado por partes contract test', () => {
     });
 
     await page.goto('/sistema/ingreso?modo=dictado');
+    await expect(page.locator('[data-testid="khora-splash"]')).toHaveCount(0);
+    await expect(page.getByText('Salvaguarda preparada', { exact: true })).toBeVisible();
 
     // Click "Iniciar dictado"
     const startBtn = page.locator('button:has-text("Iniciar dictado")');
@@ -148,7 +169,7 @@ test.describe('Dictado por partes contract test', () => {
       });
     });
 
-    const saveBtn = page.locator('button:has-text("Archivar volcado")');
+    const saveBtn = page.locator('button:has-text("Archivar registro")');
     await saveBtn.click();
     await page.waitForTimeout(1000);
 
@@ -168,7 +189,7 @@ test.describe('Dictado por partes contract test', () => {
     expect(statsText).toContain('partes subidas:');
   });
 
-  test('no-JSON response from /api/audio does not prevent saving text', async ({ page }) => {
+  test('no-JSON audio failure blocks archive and preserves captured text', async ({ page }) => {
     await page.addInitScript(() => {
       localStorage.setItem('khora_auth_session', JSON.stringify({ authenticated: true, timestamp: Date.now() }));
     });
@@ -251,6 +272,8 @@ test.describe('Dictado por partes contract test', () => {
     });
 
     await page.goto('/sistema/ingreso?modo=dictado');
+    await expect(page.locator('[data-testid="khora-splash"]')).toHaveCount(0);
+    await expect(page.getByText('Salvaguarda preparada', { exact: true })).toBeVisible();
 
     // Start & stop dictation
     await page.locator('button:has-text("Iniciar dictado")').click();
@@ -258,14 +281,14 @@ test.describe('Dictado por partes contract test', () => {
     await page.locator('button:has-text("Detener")').click();
     await page.waitForTimeout(500);
 
-    // Save
-    await page.locator('button:has-text("Archivar volcado")').click();
+    // Attempt archive: failed audio must remain blocked.
+    await page.locator('button:has-text("Archivar registro")').click();
     await page.waitForTimeout(1000);
 
     // AUD-05: una sesión de voz sin audio verificado NO puede archivarse.
     expect(dictadoPayload).toBeNull();
 
-    const errorAlert = page.locator('main div').filter({ hasText: /No se puede archivar el volcado.*custodia íntegra/i }).last();
+    const errorAlert = page.locator('main div').filter({ hasText: /No se puede archivar el registro.*custodia íntegra/i }).last();
     await expect(errorAlert).toBeVisible();
   });
 });

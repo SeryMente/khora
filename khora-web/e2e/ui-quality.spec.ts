@@ -155,7 +155,7 @@ for (const viewport of [
         await expect(page).toHaveURL(canonical);
         await expect(page.locator("h1").first()).toBeVisible();
         if (alias === "/sistema/editar") {
-          await expect(page.getByRole("heading", { name: /mesa de revisión sincrónica/i }).first()).toBeVisible();
+          await expect(page.getByRole("heading", { name: /^Custodia$/ }).first()).toBeVisible();
         }
       }
     });

@@ -12,6 +12,15 @@ test.use({
 });
 
 test.describe('Dictado sin perdida anti-regresion guard', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/dictado/checkpoint', async route => {
+      if (route.request().method() === 'POST') {
+        const body = route.request().postDataJSON();
+        await route.fulfill({ json: { ok: true, sessionId: body.sessionId, revisionId: body.revisionId } });
+      } else await route.fulfill({ json: { owner: 'synthetic-custody-owner@example.invalid', recovery: null } });
+    });
+  });
+
   test('does not lose text during paused dictation sequence', async ({ page }) => {
     // Inject auth session to skip login
     await page.addInitScript(() => {
@@ -111,6 +120,8 @@ test.describe('Dictado sin perdida anti-regresion guard', () => {
     });
 
     await page.goto('/sistema/ingreso?modo=dictado');
+    await expect(page.locator('[data-testid="khora-splash"]')).toHaveCount(0);
+    await expect(page.getByText('Salvaguarda preparada', { exact: true })).toBeVisible();
 
     // Verify page has loaded
     const mainHeader = page.locator('h1');
@@ -131,7 +142,7 @@ test.describe('Dictado sin perdida anti-regresion guard', () => {
     const transcriptionArea = page.locator('textarea[data-ui-id="ingreso.textarea"]').first();
     await expect(transcriptionArea).toBeVisible();
 
-    const textContent = await transcriptionArea.textContent() || '';
+    const textContent = await transcriptionArea.inputValue();
     const normalizedText = textContent.toLowerCase();
 
     console.log('TRANSCRIPTION PANEL CONTENT:', textContent);
@@ -209,6 +220,8 @@ test.describe('Dictado sin perdida anti-regresion guard', () => {
     });
 
     await page.goto('/sistema/ingreso?modo=dictado');
+    await expect(page.locator('[data-testid="khora-splash"]')).toHaveCount(0);
+    await expect(page.getByText('Salvaguarda preparada', { exact: true })).toBeVisible();
     await expect(page.locator('h1')).toBeVisible();
 
     const startBtn = page.locator('button:has-text("Iniciar dictado")');
@@ -221,7 +234,7 @@ test.describe('Dictado sin perdida anti-regresion guard', () => {
     const transcriptionArea = page.locator('textarea[data-ui-id="ingreso.textarea"]').first();
     await expect(transcriptionArea).toBeVisible();
 
-    const textContent = await transcriptionArea.textContent() || '';
+    const textContent = await transcriptionArea.inputValue();
     const normalizedText = textContent.toLowerCase();
 
     // Verify content was preserved despite truncated Whisper response
