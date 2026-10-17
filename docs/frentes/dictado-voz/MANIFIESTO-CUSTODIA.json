@@ -131,16 +131,28 @@
       "git_blob_sha": "dc465016b7bb1f475f5f77166a0cb492126f45f6"
     },
     {
-      "path": "OBJETO-CANONICO.md",
-      "bytes": 182073,
-      "sha256": "24cefd6c61da0e033fb3c9528c4868a069059ced0eec1fd94a30e96239436c1f",
-      "git_blob_sha": "fa5d33044e171b03973fb00b9638208489c68083"
-    },
-    {
       "path": "evidencias/REVALIDACION-CUSTODIA-20261017.json",
       "bytes": 1488,
       "sha256": "8a6a9a8faa511ffdf4c694a7e280bb9082af9f155f9996cc02bf10007fee84a8",
       "git_blob_sha": "4a2fecc0c6aac8602229a69d9d996c120ec1c5b5"
+    },
+    {
+      "path": "originales/instruccion-continuacion-20261017.txt",
+      "bytes": 16,
+      "sha256": "c663a0cd22f71c292d43958e90e10379de6a29ff4c6be1c5bd46cbd6c5277d84",
+      "git_blob_sha": "3b129e0e96f59bf1d7376577874401d1400b477d"
+    },
+    {
+      "path": "OBJETO-CANONICO.md",
+      "bytes": 187780,
+      "sha256": "0437505526b885be2c343744f8dcfaf5898d9584e4de0800be412bdb27f78961",
+      "git_blob_sha": "438a1caa94485745ff0af6630631418b72a9e4ef"
+    },
+    {
+      "path": "evidencias/RECONEXION-AUDIO-IDENTIDAD-20261017.json",
+      "bytes": 1417,
+      "sha256": "c6360976e7509d5d5c275efefe4df2144959e9c60db02f3fa3f656e6f3fa4e35",
+      "git_blob_sha": "e5ddb0684b59ae4b45a0eab6ad99231649c2ffd6"
     }
   ],
   "runtime_references": [
@@ -246,13 +258,13 @@
     "no_secret_values_in_manifest": true
   },
   "current_preparation": {
-    "version": "0.5.5",
-    "baseSha": "ba32d6c0c0fe2f9e71dfd5273fd17e757e3cc357",
+    "version": "0.5.6",
+    "baseSha": "a77852695cb7c485b8dc336f8372734dde2235b4",
     "branch": "docs/dictado-audio-ahorro-maximo-20261017",
-    "authority": "originales/conversacion-custodia-blob-revalidada-20261017.txt",
-    "receipt": "evidencias/REVALIDACION-CUSTODIA-20261017.json",
-    "state": "received text exact; historical body matches C021; original audio untouched; cleanup blocked",
-    "review1": "13 blocks; history exact; state x3; private repository revalidated",
+    "authority": "originales/instruccion-continuacion-20261017.txt",
+    "receipt": "evidencias/RECONEXION-AUDIO-IDENTIDAD-20261017.json",
+    "state": "audio tools recovered via accepted reconnection; blocked on truthful normative identity, media integrity and quota",
+    "review1": "13 blocks, history exact, state x3",
     "review2": "remote readback required before claiming persistence"
   },
   "preparation_history": [
@@ -309,6 +321,16 @@
       "state": "received conversation preserved literally; cleanup still blocked, no audio mutations",
       "review1": "13 blocks; historical annex exact; live state x3",
       "review2": "5896198 read back: received text and object exact; four git blobs match; addendum requires final readback"
+    },
+    {
+      "version": "0.5.5",
+      "baseSha": "ba32d6c0c0fe2f9e71dfd5273fd17e757e3cc357",
+      "branch": "docs/dictado-audio-ahorro-maximo-20261017",
+      "authority": "originales/conversacion-custodia-blob-revalidada-20261017.txt",
+      "receipt": "evidencias/REVALIDACION-CUSTODIA-20261017.json",
+      "state": "received text exact; historical body matches C021; original audio untouched; cleanup blocked",
+      "review1": "13 blocks; history exact; state x3; private repository revalidated",
+      "review2": "remote readback required before claiming persistence"
     }
   ]
 }

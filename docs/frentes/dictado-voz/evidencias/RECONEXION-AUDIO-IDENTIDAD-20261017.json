@@ -1,0 +1,49 @@
+{
+  "cycle": "C023",
+  "authority": {
+    "literal": "Si pues adelante",
+    "source": "originales/instruccion-continuacion-20261017.txt"
+  },
+  "personal_instructions": {
+    "version": "332",
+    "signature": "NX-332m",
+    "page": "https://app.notion.com/p/a925d4a3b2508393b2b7817f1cf431da",
+    "loaded": true
+  },
+  "reconnection": {
+    "server": "Khora",
+    "user_accepted": true,
+    "before_audio_tools": false,
+    "after_audio_tools": true,
+    "schemas_loaded": true,
+    "scopes_changed": false
+  },
+  "health": {
+    "ok": true,
+    "full_access": true,
+    "missing_scopes": [],
+    "correlation_id": "3b192647-8662-49e4-98ec-1db569e45125"
+  },
+  "deployed_source": {
+    "version_endpoint_commit": "c02f5142d7609c35d8a2dc2c549726edc4016f13",
+    "runtime_blob": "b0bee95bb22716495f50342b0863a0563360c134",
+    "required_platform": "ChatGPT",
+    "actual_platform": "Notion",
+    "normative_turn_opened": false,
+    "substantive_audio_calls": 0
+  },
+  "mutations": {
+    "audio_deleted": 0,
+    "audio_bytes_freed": 0,
+    "production_modified": false,
+    "deployment": false,
+    "paid_changes": false
+  },
+  "review1": {
+    "core_blocks": 13,
+    "historical_annex_exact": true,
+    "live_state_equal_x3": true
+  },
+  "review2": "remote exact readback required before claiming persistence",
+  "blocked_on": "truthful admitted normative platform; then readable originals, DB manifests and quota"
+}
