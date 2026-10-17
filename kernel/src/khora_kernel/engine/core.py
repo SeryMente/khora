@@ -111,6 +111,7 @@ def _get_provider() -> PuertoLLM:
 def _policy(question: str, ht: Ht, puerto_llm: PuertoLLM) -> tuple[Lambda, str]:
     historial = "[Historial]\n" + "".join(
         f"Paso {s.n}: estado={s.state} detalle={s.detail}\n"
+        f"Observación: {json.dumps(s.observation, ensure_ascii=False)}\n"
         for s in ht.steps
     ) + "[Fin historial]\n"
     visual_available = any(e.node_id == "fallback_vqa" for e in ht.evidence)
@@ -122,6 +123,9 @@ def _policy(question: str, ht: Ht, puerto_llm: PuertoLLM) -> tuple[Lambda, str]:
         "FALLBACK solicita evidencia visual cruda y STOP termina. "
         "Usa el historial completo; no inventes observaciones. Devuelve JSON únicamente.\n"
         f"Pregunta: {question}\n{historial}"
+        f"Evidencia H_t: {json.dumps([e.__dict__ for e in ht.evidence], ensure_ascii=False)}\n"
+        f"Veredictos H_t: {json.dumps(ht.verdicts, ensure_ascii=False)}\n"
+        f"Traza H_t: {json.dumps(getattr(ht, 'trace', []), ensure_ascii=False)}\n"
         '{"accion":"RETRIEVE|REFINE|ANSWER|FALLBACK|STOP","justificacion":"..."}'
     )
     req = SolicitudLLM(prompt, "Eres la política πθ de EpisTwin.", None, {"temperature": 0.0, "role": "pi_theta"})
@@ -164,7 +168,17 @@ def _retrieve(ht: Ht, question: str, memoria: Any, contexto: Any = None) -> Ht:
             _set_last_step_observation(ht, payload),
             {"action": "RETRIEVE", **payload}
         )
-    resultado = RetrieverGraphRAG(memoria).consultar(question, contexto)
+    retrieval_question = question
+    # REFINE changes retrieval strategy, never the original question used by fVAL.
+    for step in reversed(ht.steps):
+        observation = step.observation
+        if step.state == Lambda.REFINE.value and isinstance(observation, dict):
+            refined = observation.get("refined_query")
+            if (observation.get("original_question") == question
+                    and isinstance(refined, str) and refined.strip()):
+                retrieval_question = refined.strip()
+                break
+    resultado = RetrieverGraphRAG(memoria).consultar(retrieval_question, contexto)
     node_ids = [n.id for n in resultado.subgrafo.nodos]
     community_ids = [f.id for f in resultado.fragmentos if f.id.startswith("L0_") or f.id.startswith("L1_")]
     payload = {
@@ -203,7 +217,7 @@ def _refine(ht: Ht, question: str, puerto_llm: PuertoLLM) -> Ht:
     req = SolicitudLLM(prompt, "Operador REFINE; no respondas la pregunta.", None,
                        {"temperature": 0.0, "role": "refine"})
     refined = puerto_llm.generar(req).texto
-    return _add_step(ht, Lambda.REFINE.value, "Refinamiento ejecutado.", {"refined_query": refined})
+    return _add_step(ht, Lambda.REFINE.value, "Refinamiento ejecutado.", {"refined_query": refined, "original_question": question})
 
 
 def _answer(ht: Ht, question: str, puerto_llm: PuertoLLM) -> Response:
@@ -269,7 +283,7 @@ def ejecutar_ciclo(session_id: str, pregunta: str, puerto_llm: PuertoLLM, memori
                     ):
                         final_result = FvalResult("Sufficient", None, "fallback visual validado")
                     else:
-                        final_result = fval(answer.answer, estado.ht, puerto_llm)
+                        final_result = fval(answer.answer, estado.ht, puerto_llm, question=pregunta)
                     verdict_record = {"vt": final_result.vt, "deficit_type": final_result.deficit_type,
                                       "reason": final_result.reason}
                     estado.ht = _replace_ht(estado.ht, verdicts=estado.ht.verdicts + [verdict_record])
