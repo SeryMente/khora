@@ -63,6 +63,28 @@
   "limits": [
     "Synthetic local services; no live provider validation.",
     "Six pre-existing skipped tests remain skipped.",
-    "Fresh main integration gate and remote CI status recorded separately."
-  ]
+    "Remote CI and production deployment are not certified by this local receipt."
+  ],
+  "integration": {
+    "testedHead": "437bf3eebb7c827a4dfc782f172387e2693c59b8",
+    "upstream": "a489f1b4ea2dda0bfafb852ff86bca6fb1dc45ba",
+    "unit": {
+      "passed": 503,
+      "failed": 0,
+      "skipped": 0
+    },
+    "browser": {
+      "passed": 22,
+      "failed": 0,
+      "scope": [
+        "e2e/splash.spec.ts",
+        "e2e/grafo.spec.ts"
+      ]
+    },
+    "freshProductionBuild": true,
+    "typecheck": true,
+    "navigationContract": true,
+    "uiReviewCatalog": true,
+    "identitySourceHashesUnchanged": true
+  }
 }
