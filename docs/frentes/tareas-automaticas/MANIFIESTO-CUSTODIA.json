@@ -1,6 +1,6 @@
 {
-  "version": 4,
-  "object_seal": "TAREAS-v0.11",
+  "version": 5,
+  "object_seal": "TAREAS-v0.12",
   "purpose": "Inventario de integridad y procedencia; no estado vivo paralelo",
   "source_of_truth": "docs/frentes/tareas-automaticas/OBJETO-CANONICO.md",
   "owner_repo": "SeryMente/khora",
@@ -20,9 +20,9 @@
     {
       "path": "OBJETO-CANONICO.md",
       "classification": "objeto_vivo",
-      "bytes": 140399,
-      "sha256": "35c859e7c384fba5aad2939901238ef4d44450603f66e6835675ef713cd01b25",
-      "git_blob_sha1": "47e98fa3674e7eb9d369f9f58e8c4cf6e9e08cda"
+      "bytes": 145939,
+      "sha256": "7db6e796279167951726a30ff087b83fe589a8bfe3eceaf20438f651ba4f668e",
+      "git_blob_sha1": "906d0f48433da0c31d2955108b49669d2f8fa706"
     },
     {
       "path": "originales/registro-notion-recibido.txt",
@@ -79,8 +79,15 @@
       "bytes": 703,
       "sha256": "84506101980eadbdf9b2559d1d1032955b0abfea5fc78af9272255e5522bf5dd",
       "git_blob_sha1": "85f4bc8af4fe47b305454380831d3cbe6f7ef612"
+    },
+    {
+      "path": "originales/instruccion-uso-operativo-ciclo17.txt",
+      "classification": "original_historico_inmutable",
+      "bytes": 500,
+      "sha256": "cc797cdb6142c4925cc2c705cf752b68f931bcd2d838230e433f2a6a83c259b2",
+      "git_blob_sha1": "c1053bf3f4c4a353c0c230ff387d19970a69e5cb"
     }
   ],
   "self_integrity": "El manifiesto no se hashea a sí mismo; comprobar su blob/commit devuelto por GitHub.",
-  "previous_verified_documentation_commit": "1abffca3cc07bf4bcc4c3f14c52b828344537e93"
+  "previous_verified_documentation_commit": "d6fd16a6a841af68a9b19ce9dae86e16d4fd91f2"
 }
