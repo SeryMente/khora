@@ -3,7 +3,7 @@
   "baseSha": "1abffca3cc07bf4bcc4c3f14c52b828344537e93",
   "preparedAt": "2026-10-17T20:42:05.399Z",
   "checks": {
-    "unit": 500,
+    "unit": 502,
     "browserBenchmark": 30,
     "additionalBrowserRegression": 29,
     "realIsolatedPostgreSQL": 13,
@@ -87,11 +87,11 @@
     ]
   },
   "integration": {
-    "mainSha": "a489f1b4ea2dda0bfafb852ff86bca6fb1dc45ba",
+    "mainSha": "aa6f3a548c032f2ac30de32c275be17a0bd8370a",
     "types": "passed",
-    "unit": 500,
+    "unit": 502,
     "build": "pending_candidate_vercel",
     "benchmarkInputsUnchanged": true,
-    "validatedAt": "2026-10-17T20:50:48.297Z"
+    "validatedAt": "2026-10-17T22:06:40.893Z"
   }
 }
