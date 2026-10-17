@@ -1,6 +1,6 @@
 {
-  "version": 6,
-  "object_seal": "TAREAS-v0.13",
+  "version": 7,
+  "object_seal": "TAREAS-v0.14",
   "purpose": "Inventario de integridad y procedencia; no estado vivo paralelo",
   "source_of_truth": "docs/frentes/tareas-automaticas/OBJETO-CANONICO.md",
   "owner_repo": "SeryMente/khora",
@@ -17,13 +17,6 @@
   "notion_authority_superseded": true,
   "notion_page_deleted_or_marked": false,
   "files": [
-    {
-      "path": "OBJETO-CANONICO.md",
-      "classification": "objeto_vivo",
-      "bytes": 160570,
-      "sha256": "006e07b54c9616aa08cf299ec60a82f4254537b7b3b38d50509d955522498dff",
-      "git_blob_sha1": "dafe49f0f167b940197f4481709622c44a7ea6a2"
-    },
     {
       "path": "originales/registro-notion-recibido.txt",
       "classification": "original_historico_inmutable",
@@ -93,8 +86,72 @@
       "bytes": 176,
       "sha256": "d7fd00e7fba886660b3ac6c2172dfefaefec1cbbaf744a59234e7cd5a2bbd615",
       "git_blob_sha1": "753fc0fdd10d03f8fce66452e18f393bdb277cd5"
+    },
+    {
+      "path": "originales/conversacion-recibida-2026-10-17.txt",
+      "classification": "original_historico_inmutable",
+      "bytes": 43606,
+      "sha256": "0a26f2ed27ffd8e5df27a82d177c9dbc7073c29fb2e493d570242ee77001ad98",
+      "git_blob_sha1": "17a0bc417b43ca37f32387cb2b58e15faadcb63f"
+    },
+    {
+      "path": "originales/instruccion-recuperacion-2026-10-17.txt",
+      "classification": "original_historico_inmutable",
+      "bytes": 390,
+      "sha256": "ad8f48e44849db9989d145452d56fc2e667b2b69af26b218a9c3371f33e543ce",
+      "git_blob_sha1": "d9cb5f9ac9a1c0c5316fa8e224440a4cb0080acd"
+    },
+    {
+      "path": "evidencias/recuperacion-2026-10-17.json",
+      "classification": "evidencia_experimental_congelada",
+      "bytes": 7417,
+      "sha256": "c1f14575d058771b7cdd6b21b30ed7e1f8a61d8f2bc141bce1a068b8ced03695",
+      "git_blob_sha1": "33cf843ef8e593035bde7c90bc3f348e5f3ee994"
+    },
+    {
+      "path": "evidencias/contrato-experimental-2026-10-17/task-extraction.ts",
+      "classification": "evidencia_experimental_congelada",
+      "bytes": 5101,
+      "sha256": "4460a9f5558d37dbe75d7a6034c8aaf01ea985a5a659c37f46e7b7f474aa3de3",
+      "git_blob_sha1": "95a036158573f19454a95ceb7c6bbd29cdd9da24"
+    },
+    {
+      "path": "evidencias/contrato-experimental-2026-10-17/task-extraction.test.ts",
+      "classification": "evidencia_experimental_congelada",
+      "bytes": 5342,
+      "sha256": "ae6514d78044a254219e6e42f0a8771b3138a7e432d79ff9b9526a38f86b84d0",
+      "git_blob_sha1": "b4e1a122939438b8205d56bafeca808841f920de"
+    },
+    {
+      "path": "evidencias/contrato-experimental-2026-10-17/test-output.tap",
+      "classification": "evidencia_experimental_congelada",
+      "bytes": 2329,
+      "sha256": "ca981d42ef0795b6c128c38a810b7b90e450849e80475641adee76be71b2ddff",
+      "git_blob_sha1": "23a34d6ca56b61d87516b9d59b3a727a1080246f"
+    },
+    {
+      "path": "evidencias/contrato-experimental-2026-10-17/typecheck.txt",
+      "classification": "evidencia_experimental_congelada",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "git_blob_sha1": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "evidencias/contrato-experimental-2026-10-17/README.md",
+      "classification": "evidencia_experimental_congelada",
+      "bytes": 1583,
+      "sha256": "334005ffd340d32889dbbda98f58519ab7d9aae168c0bf937d7591d27b41402e",
+      "git_blob_sha1": "430588d3ae28d0cf79f5b462419d17aac3eee7b1"
+    },
+    {
+      "path": "OBJETO-CANONICO.md",
+      "classification": "objeto_vivo",
+      "bytes": 172173,
+      "sha256": "f25639e54d8b4214483c9bd27304a134f7971f411f265f41b9fbe5f777b3f9e8",
+      "git_blob_sha1": "5106a98f0f873e5ad5b87564318a9580a7be5fb3"
     }
   ],
   "self_integrity": "El manifiesto no se hashea a sí mismo; comprobar su blob/commit devuelto por GitHub.",
-  "previous_verified_documentation_commit": "e15da64209be401d3b32822168ed5ae5f16d8d87"
+  "previous_verified_documentation_commit": "a489f1b4ea2dda0bfafb852ff86bca6fb1dc45ba",
+  "recovery_base_main": "c02f5142d7609c35d8a2dc2c549726edc4016f13"
 }

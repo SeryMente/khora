@@ -1,11 +1,11 @@
 {
   "schema": "khora-dictado-benchmark/v1",
   "status": "passed",
-  "testedAt": "2026-10-17T19:58:33.519Z",
-  "completedAt": "2026-10-17T20:01:50.705Z",
-  "sourceSha": "362f8ff51a518506927e486b9d61feee4f6313da",
+  "testedAt": "2026-10-17T20:35:22.091Z",
+  "completedAt": "2026-10-17T20:39:57.601Z",
+  "sourceSha": "1abffca3cc07bf4bcc4c3f14c52b828344537e93",
   "workingTreeDirty": true,
-  "inputFingerprint": "1c210d77067fa4328503a6b095fe02c8e29f6b2f10dc1c2e23280c4383d8d0d3",
+  "inputFingerprint": "357b8a7c7fe4aa8868db1c8d304ec09e7bc4ada0d4aeeff4943d4bfad254e0b1",
   "checks": [
     {
       "name": "Contratos, entrega, muestreo, privacidad y persistencia controlada",

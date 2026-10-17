@@ -3,9 +3,9 @@
 ## 1. Control e identidad
 
 - Identidad conservada: `MCP-OBS-DICTADO`; extensión documental de dictado, benchmark, retroalimentación y propuesta de voz/síntomas.
-- Versión: **v0.5.0**; sello **MCP-OBS-DICTADO-v0.5.0**. Objeto permanente por encargo V010; no declara permanente ninguna propuesta clínica.
+- Versión: **v0.5.2**; sello **MCP-OBS-DICTADO-v0.5.2**. Objeto permanente por encargo V010; no declara permanente ninguna propuesta clínica.
 - Estado: **CANÓNICO PARA EL FRENTE · ABIERTO · CIERRE CON VOZ REAL PENDIENTE**.
-- Ancla: rediseño de Ingreso y recuperación explícita solicitados tras uso real; base Git 362f8ff51a518506927e486b9d61feee4f6313da. Rama feat/ingreso-recovery-redesign-20261017; integración y publicación se verifican aparte.
+- Ancla: C019, migración de conversación íntegra recibida el 2026-10-17 y reanudación de la publicación pendiente del micrófono (#312).
 - Repositorio propietario: `SeryMente/khora`, privado comprobado con herramienta en este ciclo. `SeryMente/metodologia` también privado: aporta el método, no recibe datos del frente.
 - Carpeta contenedora: `docs/frentes/dictado-voz/`; elemento único de estado: `OBJETO-CANONICO.md`. Carpeta y elemento no se confunden.
 - Revisión de origen del objeto: `1697ee2693ed3217523ffc1d1be9b6541d7d849d`, blob `e98a956c375ce48b791b5f0563ad0ae03c2616dd`.
@@ -109,15 +109,15 @@ Comprobar Node/npx, fuente oficial y runtime antes; en Windows el npx.cmd oficia
 
 ### 🔄 Estado vivo
 
-Acción actual: rediseño de Ingreso y recuperación con audio implementados en rama aislada; pruebas locales y benchmark aprobados. Evidencia y huellas en evidencias/INGRESO-RECUPERACION.json; no confundir este documento con acreditación de publicación.
-Siguiente paso de asistencia: verificar la solicitud y hashes en main, publicación exacta y alias de producción; después solicitar solo la prueba humana real necesaria.
-Siguiente paso de construcción: corregir únicamente un defecto reproducido del alcance; sin análisis clínico, escucha permanente ni ampliación de consentimiento.
-Pendientes en secuencia: 1) acreditar integración normal de este corte; 2) acreditar despliegue y alias sin publicar otra revisión por inferencia; 3) sesión física del operador, recuperar audio/MP3 y opinión persistida; 4) evaluación de fidelidad y estabilidad visual completa; 5) definir primer síntoma autodeclarado antes de desarrollo sensible.
+Acción actual: corrección del bloqueo de micrófono implementada y probada; preparación autenticada independiente del catálogo histórico, error explícito y reintento sin perder texto.
+Siguiente paso de asistencia: verificar fusión/publicación en el recibo operativo enlazado en esta sección; después comprobar el navegador y micrófono físicos del operador.
+Siguiente paso de construcción: corregir solo un defecto reproducido; no relajar autenticación, custodia ni consentimiento.
+Pendientes: integración/publicación acreditadas por su recibo, sesión humana real y limitaciones externas de almacenamiento. Este documento es una instantánea anterior a integrar, no promesa de ausencia de restricciones del proveedor.
 
 ### ⚗️ En prueba / recién fallido
 
-499/499 pruebas unitarias, tipos, navegación y revisión de interfaz aprobados; benchmark 27/27 de navegador, incluida recuperación explícita con IndexedDB real. Regresión adicional de navegador 29/29 aprobada. PostgreSQL/PGlite aislado: 11 comprobaciones con consultas/transacciones reales aprobadas. Detalle y límites en el recibo.
-Voz física, comodidad humana, Neon/Blob productivos y bloqueos multiconexión: NO CERTIFICADOS por estos ensayos. La revisión visual de escritorio/móvil se conserva como evidencia controlada, no como aprobación del operador.
+500 unitarias, tipos, navegación y registro de interfaz aprobados; benchmark 30/30, regresión adicional 29/29 y SQL aislado 13 comprobaciones. Catálogo 503 no bloquea captura nueva; bootstrap 503 mantiene bloqueo explícito y reintento; 401 jamás habilita micrófono.
+No se acreditan voz física, petición autenticada del navegador del operador ni escritura productiva de audio por estos ensayos. Combinación con main a489f1b: tipos y suite completa repetidos; build de combinación se acredita en candidata Vercel antes de promover; huella de entradas del benchmark intacta. Combinación con main aa6f3a5: tipos y suite completa repetidos; build de combinación se acredita en candidata Vercel antes de promover; huella de entradas del benchmark intacta.
 
 ### 🔔 Recordatorios latentes
 
@@ -165,6 +165,13 @@ Toda salida conserva diez campos, agrupables sin ocultarlos: (1) proyecto/rol/se
 No llamar «sin cambios» a una fuente inaccesible; no convertir calidad científica o clínica en semáforo por pruebas de software. Si no hay constructor nuevo asignado, decirlo y no inventar trabajo en segundo plano.
 
 ## 11. Crónica y fuentes
+
+### C019 — Conversación migrada y reanudación verificable — 2026-10-17
+
+El operador solicita verificar custodia verbatim y responder a su última entrada, «Neccesito que publiques lo mas rapido posible la solucion.». El adjunto recibido completo se conserva sin limpieza, reescritura ni normalización de saltos en [CONVERSACION-MIGRADA-20261017.txt](originales/CONVERSACION-MIGRADA-20261017.txt): 51233 bytes, SHA-256 `f079409bd77923f54dfffeb04314a118b19cfd5718c0225b2dbfa9e846342809`. El original anterior de 42686 bytes se conserva intacto; no equivale a este adjunto completo. La comparación y el readback de Git se registran en `evidencias/CUSTODIA-CONVERSACION-20261017.json`. Esta es custodia del archivo aportado, no exportación nativa íntegra de eventos de Notion.
+
+Reanudación: #312 seguía en borrador y producción servía aa6f3a5, sin esta corrección. Se reutilizan las pruebas previas con sus huellas; se valida la combinación con main actual y se sigue la fusión normal, candidata, comprobación y promoción, sin relajar autenticación, custodia, consentimiento ni protecciones. El recibo operativo enlazado en §8 es la autoridad del resultado de publicación; esta anotación no anticipa éxito. El almacén de audio suspendido es un límite independiente, no una razón para fingir almacenamiento remoto correcto.
+
 
 ### Fuentes y custodia
 
@@ -244,6 +251,10 @@ El operador observó recuperación automática inesperada y rechazo de archivo p
 
 Recibo: evidencias/INGRESO-RECUPERACION.json. Incidentes de validación y correcciones registrados separadamente en el Registro Canónico de Errores de Terminal. Se mantienen originales y anexo histórico íntegros. Fusión, publicación y aceptación humana son compuertas distintas.
 
+### C018 · Micrófono bloqueado tras publicación
+
+El operador reporta botón desactivado con rótulo de espera. Se confirma dependencia indebida de preparación respecto al catálogo completo. Se separa bootstrap autenticado y esquema de custodia de la carga de versiones: historial 503 no revoca preparación válida. Fallo de bootstrap conserva compuerta, muestra motivo y permite reintentar sin borrar texto. Se normaliza checkpoint_en histórico mediante cast explícito y se ensaya columna TEXT; no se atribuye ese tipo al entorno real sin consulta. La causa concreta de la petición del operador sigue no observada. Original literal y recibo en originales/MICROFONO-BLOQUEADO.txt y evidencias/MICROFONO-BOOTSTRAP.json. Vercel informó khora-audio limits-exceeded-suspended / billingState suspended; es un impedimento externo de guardado remoto distinto del bloqueo de interfaz, y esta corrección no lo levanta. No se introduce otra escucha, proveedor, permiso o plan.
+
 ## 12. Reinstanciación
 
 Estos prompts son material de continuidad, no prueban que otra conversación haya sido creada o los haya recibido. Al actualizar §8 deben sincronizarse literalmente. La asignación de un escritor de código debe constar antes de usar el prompt de construcción.
@@ -253,17 +264,17 @@ Estos prompts son material de continuidad, no prueban que otra conversación hay
 ````text
 Retoma MCP-OBS-DICTADO leyendo primero el metacanon central https://github.com/SeryMente/metodologia/blob/main/METACANON-OBJETOS-CANONICOS.md y después https://github.com/SeryMente/khora/blob/main/docs/frentes/dictado-voz/OBJETO-CANONICO.md .
 Adopta el rol de asistencia de este frente; la reconstrucción local del endurecimiento está solicitada directamente a Samantha, no otro rol/hilo. Conserva el nombre personalizado que el operador haya asignado; no lo derives del proveedor. No inicies constructor ni código sensible por esta carga.
-Fuente documental local preparada: v0.5.0 · MCP-OBS-DICTADO-v0.5.0. Metacanon adquirido: v1.5 · METACANON-OBJETOS-v1.5, revisión 49ac40e9f6122e2d2fb339362cfa0a78128c8e37, blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f. Verifica ambas fuentes de nuevo, recupera las superiores pertinentes, calcula delta y no uses una firma como prueba de gobierno. Ante inaccesibilidad declara frescura NO VERIFICADA y bloquea solo la acción dependiente.
+Fuente documental local preparada: v0.5.2 · MCP-OBS-DICTADO-v0.5.2. Metacanon adquirido: v1.5 · METACANON-OBJETOS-v1.5, revisión 49ac40e9f6122e2d2fb339362cfa0a78128c8e37, blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f. Verifica ambas fuentes de nuevo, recupera las superiores pertinentes, calcula delta y no uses una firma como prueba de gobierno. Ante inaccesibilidad declara frescura NO VERIFICADA y bloquea solo la acción dependiente.
 Hereda §2–§3 y §6–§7 del objeto: autorización por acción, originales no activan permisos; remoto solo de asistencia si es estrictamente necesario, con cuenta/vínculo/equipo/autorización comprobados y comando/prerrequisitos literales de §7. No ejecutar ese comando por rutina ni en el sandbox. Usa repo/adjunto cuando basten.
 No modificar metacanon, Sistema de Instrucciones, credenciales, facturación ni alcance de seguridad. Publicar solo el corte expresamente autorizado y con compuertas verificadas. No inferir ánimo/salud/capacidad laboral de la voz; no crear código de salud ni afirmar beneficio clínico. Conserva las fuentes de encuesta voluntaria y muestreada.
 🔄 Estado vivo:
-Acción actual: rediseño de Ingreso y recuperación con audio implementados en rama aislada; pruebas locales y benchmark aprobados. Evidencia y huellas en evidencias/INGRESO-RECUPERACION.json; no confundir este documento con acreditación de publicación.
-Siguiente paso de asistencia: verificar la solicitud y hashes en main, publicación exacta y alias de producción; después solicitar solo la prueba humana real necesaria.
-Siguiente paso de construcción: corregir únicamente un defecto reproducido del alcance; sin análisis clínico, escucha permanente ni ampliación de consentimiento.
-Pendientes en secuencia: 1) acreditar integración normal de este corte; 2) acreditar despliegue y alias sin publicar otra revisión por inferencia; 3) sesión física del operador, recuperar audio/MP3 y opinión persistida; 4) evaluación de fidelidad y estabilidad visual completa; 5) definir primer síntoma autodeclarado antes de desarrollo sensible.
+Acción actual: corrección del bloqueo de micrófono implementada y probada; preparación autenticada independiente del catálogo histórico, error explícito y reintento sin perder texto.
+Siguiente paso de asistencia: verificar fusión/publicación en el recibo operativo enlazado en esta sección; después comprobar el navegador y micrófono físicos del operador.
+Siguiente paso de construcción: corregir solo un defecto reproducido; no relajar autenticación, custodia ni consentimiento.
+Pendientes: integración/publicación acreditadas por su recibo, sesión humana real y limitaciones externas de almacenamiento. Este documento es una instantánea anterior a integrar, no promesa de ausencia de restricciones del proveedor.
 ⚗️ En prueba / recién fallido:
-499/499 pruebas unitarias, tipos, navegación y revisión de interfaz aprobados; benchmark 27/27 de navegador, incluida recuperación explícita con IndexedDB real. Regresión adicional de navegador 29/29 aprobada. PostgreSQL/PGlite aislado: 11 comprobaciones con consultas/transacciones reales aprobadas. Detalle y límites en el recibo.
-Voz física, comodidad humana, Neon/Blob productivos y bloqueos multiconexión: NO CERTIFICADOS por estos ensayos. La revisión visual de escritorio/móvil se conserva como evidencia controlada, no como aprobación del operador.
+500 unitarias, tipos, navegación y registro de interfaz aprobados; benchmark 30/30, regresión adicional 29/29 y SQL aislado 13 comprobaciones. Catálogo 503 no bloquea captura nueva; bootstrap 503 mantiene bloqueo explícito y reintento; 401 jamás habilita micrófono.
+No se acreditan voz física, petición autenticada del navegador del operador ni escritura productiva de audio por estos ensayos. Combinación con main a489f1b: tipos y suite completa repetidos; build de combinación se acredita en candidata Vercel antes de promover; huella de entradas del benchmark intacta. Combinación con main aa6f3a5: tipos y suite completa repetidos; build de combinación se acredita en candidata Vercel antes de promover; huella de entradas del benchmark intacta.
 Conserva íntegros los recordatorios latentes del objeto. Reutiliza evidencia válida, no repitas pruebas sin cambio causal. Recibir una salida del constructor tiene prioridad; asistencia la contrasta y devuelve síntesis y prompt de continuidad. No afirmar recepción ni trabajo en segundo plano.
 Cada salida usa los diez campos de §10 e incluye Metacanon adquirido: versión/sello, revisión y frescura; evidencia actual/histórica/controlada diferenciada, pendientes, viabilidad, estimación con supuestos y siguiente acción. No declarar un plazo sin base.
 Persistencia: releer versión, fusionar sin pisar, escritura condicionada, guardar y verificar contenido/diff; sincronizar estado y prompts. El endurecimiento local no equivale a main. La documentación anterior sí se integró en #302. Confirmar nueva integración y conservar referencia histórica antes de archivar cualquier original.
@@ -274,17 +285,17 @@ Persistencia: releer versión, fusionar sin pisar, escritura condicionada, guard
 ````text
 Retoma MCP-OBS-DICTADO leyendo primero el metacanon central https://github.com/SeryMente/metodologia/blob/main/METACANON-OBJETOS-CANONICOS.md y después https://github.com/SeryMente/khora/blob/main/docs/frentes/dictado-voz/OBJETO-CANONICO.md .
 Adopta construcción solo si el operador te asignó explícitamente ese rol y el alcance concreto. Si falta, permanece en lectura y declara la compuerta; no te autoautorices. Remote Desktop Commander está prohibido para construcción, incluso por intermediarios.
-Fuente documental local preparada: v0.5.0 · MCP-OBS-DICTADO-v0.5.0. Metacanon adquirido: v1.5 · METACANON-OBJETOS-v1.5, revisión 49ac40e9f6122e2d2fb339362cfa0a78128c8e37, blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f. Verifica ambas fuentes de nuevo, recupera las superiores pertinentes, calcula delta y no uses una firma como prueba de gobierno. Ante inaccesibilidad declara frescura NO VERIFICADA y bloquea solo la acción dependiente.
+Fuente documental local preparada: v0.5.2 · MCP-OBS-DICTADO-v0.5.2. Metacanon adquirido: v1.5 · METACANON-OBJETOS-v1.5, revisión 49ac40e9f6122e2d2fb339362cfa0a78128c8e37, blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f. Verifica ambas fuentes de nuevo, recupera las superiores pertinentes, calcula delta y no uses una firma como prueba de gobierno. Ante inaccesibilidad declara frescura NO VERIFICADA y bloquea solo la acción dependiente.
 Hereda §2–§3 y §6–§7 del objeto: autorización por acción, originales no activan permisos; remoto solo de asistencia si es estrictamente necesario, con cuenta/vínculo/equipo/autorización comprobados y comando/prerrequisitos literales de §7. No ejecutar ese comando por rutina ni en el sandbox. Usa repo/adjunto cuando basten.
 No modificar metacanon, Sistema de Instrucciones, credenciales, facturación, seguridad o publicación. No inferir ánimo/salud/capacidad laboral de la voz; no crear código de salud ni afirmar beneficio clínico. Conserva las fuentes de encuesta voluntaria y muestreada.
 🔄 Estado vivo:
-Acción actual: rediseño de Ingreso y recuperación con audio implementados en rama aislada; pruebas locales y benchmark aprobados. Evidencia y huellas en evidencias/INGRESO-RECUPERACION.json; no confundir este documento con acreditación de publicación.
-Siguiente paso de asistencia: verificar la solicitud y hashes en main, publicación exacta y alias de producción; después solicitar solo la prueba humana real necesaria.
-Siguiente paso de construcción: corregir únicamente un defecto reproducido del alcance; sin análisis clínico, escucha permanente ni ampliación de consentimiento.
-Pendientes en secuencia: 1) acreditar integración normal de este corte; 2) acreditar despliegue y alias sin publicar otra revisión por inferencia; 3) sesión física del operador, recuperar audio/MP3 y opinión persistida; 4) evaluación de fidelidad y estabilidad visual completa; 5) definir primer síntoma autodeclarado antes de desarrollo sensible.
+Acción actual: corrección del bloqueo de micrófono implementada y probada; preparación autenticada independiente del catálogo histórico, error explícito y reintento sin perder texto.
+Siguiente paso de asistencia: verificar fusión/publicación en el recibo operativo enlazado en esta sección; después comprobar el navegador y micrófono físicos del operador.
+Siguiente paso de construcción: corregir solo un defecto reproducido; no relajar autenticación, custodia ni consentimiento.
+Pendientes: integración/publicación acreditadas por su recibo, sesión humana real y limitaciones externas de almacenamiento. Este documento es una instantánea anterior a integrar, no promesa de ausencia de restricciones del proveedor.
 ⚗️ En prueba / recién fallido:
-499/499 pruebas unitarias, tipos, navegación y revisión de interfaz aprobados; benchmark 27/27 de navegador, incluida recuperación explícita con IndexedDB real. Regresión adicional de navegador 29/29 aprobada. PostgreSQL/PGlite aislado: 11 comprobaciones con consultas/transacciones reales aprobadas. Detalle y límites en el recibo.
-Voz física, comodidad humana, Neon/Blob productivos y bloqueos multiconexión: NO CERTIFICADOS por estos ensayos. La revisión visual de escritorio/móvil se conserva como evidencia controlada, no como aprobación del operador.
+500 unitarias, tipos, navegación y registro de interfaz aprobados; benchmark 30/30, regresión adicional 29/29 y SQL aislado 13 comprobaciones. Catálogo 503 no bloquea captura nueva; bootstrap 503 mantiene bloqueo explícito y reintento; 401 jamás habilita micrófono.
+No se acreditan voz física, petición autenticada del navegador del operador ni escritura productiva de audio por estos ensayos. Combinación con main a489f1b: tipos y suite completa repetidos; build de combinación se acredita en candidata Vercel antes de promover; huella de entradas del benchmark intacta. Combinación con main aa6f3a5: tipos y suite completa repetidos; build de combinación se acredita en candidata Vercel antes de promover; huella de entradas del benchmark intacta.
 Conserva íntegros los recordatorios latentes del objeto. Reutiliza evidencia válida, no repitas pruebas sin cambio causal. Recibir una salida del constructor tiene prioridad; asistencia la contrasta y devuelve síntesis y prompt de continuidad. No afirmar recepción ni trabajo en segundo plano.
 Cada salida usa los diez campos de §10 e incluye Metacanon adquirido: versión/sello, revisión y frescura; evidencia actual/histórica/controlada diferenciada, pendientes, viabilidad, estimación con supuestos y siguiente acción. No declarar un plazo sin base.
 Persistencia: releer versión, fusionar sin pisar, escritura condicionada, guardar y verificar contenido/diff; sincronizar estado y prompts. El endurecimiento local no equivale a main. La documentación anterior sí se integró en #302. Confirmar nueva integración y conservar referencia histórica antes de archivar cualquier original.
@@ -305,7 +316,7 @@ Persistencia: releer versión, fusionar sin pisar, escritura condicionada, guard
 
 ### Recibo operativo del corte de Ingreso
 
-Instantánea de implementación preparada antes de fusionar/publicar. No sustituye el estado operativo posterior. Fuente de verdad de fusión, SHA desplegado, alias y verificaciones finales: https://github.com/SeryMente/khora/pull/309 (recibo de cierre en comentarios de esa solicitud). Solo esta solicitud pertenece al corte; otras ramas no quedan acreditadas por ella. La sesión física y aceptación humana permanecen separadas.
+Instantánea de implementación preparada antes de fusionar/publicar. No sustituye el estado operativo posterior. Fuente de verdad de fusión, SHA desplegado, alias y verificaciones finales: https://github.com/SeryMente/khora/pull/312 (recibo de cierre en comentarios de esa solicitud). Solo esta solicitud pertenece al corte; otras ramas no quedan acreditadas por ella. La sesión física y aceptación humana permanecen separadas.
 
 # Anexo A · Historia íntegra anterior a la canonización v0.2.0
 
