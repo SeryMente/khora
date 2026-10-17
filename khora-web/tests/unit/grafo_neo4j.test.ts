@@ -140,3 +140,45 @@ test("/api/grafo timestamp fallbacks use valid Cypher in global and filtered que
     assert.equal(seen.size, 6);
   } finally { restoreDriver(); restoreEnv(); }
 });
+
+
+test("/api/grafo reads published Leiden membership rather than stale entity properties", async () => {
+  const restoreEnv = withEnv({ NEO4J_URI: "bolt://localhost:7687", NEO4J_USER: "neo4j", NEO4J_PASSWORD: "test" });
+  const restoreDriver = mockDriver(async (query) => {
+    if (query.includes(" AS summary")) {
+      assert.ok(query.includes(":IN_COMMUNITY"));
+      assert.ok(query.includes("membership.published = true AND c.published = true"));
+      assert.ok(query.includes("NOT e:User AND NOT e:InformationObject"));
+      assert.doesNotMatch(query, /e\.community/);
+      return [record({ id: "e-1", summary: "Alba", community: 999, communityId: "L0_real", communityRevision: "revision-a" }),
+        record({ id: "e-2", summary: "Bruno", communityId: "L0_real", communityRevision: "revision-a" }),
+        record({ id: "e-3", summary: "Delta", communityId: "L0_other", communityRevision: "revision-a" })];
+    }
+    return rowsFor(query);
+  });
+  try {
+    const response = await GET(new Request("http://localhost/api/grafo"));
+    assert.equal(response.status, 200);
+    const body = await response.json();
+    assert.equal(body.nodes[0].communityId, "L0_real");
+    assert.equal(body.nodes[0].communityRevision, "revision-a");
+    assert.equal(body.nodes[0].community, body.nodes[1].community);
+    assert.notEqual(body.nodes[0].community, body.nodes[2].community);
+    assert.notEqual(body.nodes[0].community, 999);
+  } finally { restoreDriver(); restoreEnv(); }
+});
+
+
+test("/api/grafo preserves edge provenance and unique identities across source versions", async () => {
+  const restoreEnv = withEnv({ NEO4J_URI: "bolt://localhost:7687", NEO4J_USER: "neo4j", NEO4J_PASSWORD: "test" });
+  const restoreDriver = mockDriver(async (query) => {
+    if (query.includes("r:RELATION")) {
+      assert.ok(query.includes("coalesce(toString(r.io_id), 'legacy')"));
+      assert.ok(query.includes("r.invalid_at IS NULL"));
+      assert.ok(query.includes("r.io_id = io.io_id"));
+    }
+    return rowsFor(query);
+  });
+  try { assert.equal((await GET(new Request("http://localhost/api/grafo?io_id=io-1"))).status, 200); }
+  finally { restoreDriver(); restoreEnv(); }
+});

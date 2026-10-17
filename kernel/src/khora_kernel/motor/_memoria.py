@@ -311,7 +311,8 @@ class Neo4jMemoriaOrganizada:
             object_kind = str((t.metadata or {}).get('node_kind', 'entity')).lower()
             if t.destino_id == 'root':
                 raise ValueError('Violación UA-03: u/root no puede aparecer como cola de una relación.')
-            for node_id in [t.origen_id] + ([] if object_kind == 'literal' else [t.destino_id]):
+            subjects = [] if (t.metadata or {}).get('origen_kind') == 'information_object' else [t.origen_id]
+            for node_id in subjects + ([] if object_kind == 'literal' else [t.destino_id]):
                 entidades.setdefault(node_id, {
                     'canonical_key': node_id,
                     'label_original': node_id,
@@ -331,6 +332,7 @@ class Neo4jMemoriaOrganizada:
                 'capture_time': getattr(t.provenance, 'capture_time', None),
                 'custody': getattr(t.provenance, 'custody', None),
                 'object_kind': object_kind,
+                'origen_kind': (t.metadata or {}).get('origen_kind', 'entity'),
                 'literal_value': (t.metadata or {}).get('literal_value'),
                 'literal_datatype': (t.metadata or {}).get('literal_datatype'),
             })
@@ -917,7 +919,11 @@ def _asentar_transaccional_canonico(
 
     query_relaciones_literal = """
     UNWIND $relaciones AS rel_data
-    MATCH (origen:Entity {canonical_key: rel_data.origen_id})
+    MATCH (origen)
+    WHERE (rel_data.origen_kind = 'information_object'
+           AND origen:InformationObject AND origen.io_id = rel_data.origen_id)
+       OR (coalesce(rel_data.origen_kind, 'entity') = 'entity'
+           AND origen:Entity AND origen.canonical_key = rel_data.origen_id)
     MERGE (destino:Literal {canonical_key: 'literal:' + rel_data.destino_id})
     ON CREATE SET
         destino.id = 'literal:' + rel_data.destino_id,
@@ -1066,6 +1072,34 @@ def _asentar_transaccional_canonico(
                     if str(r.get("object_kind", "")).lower() == "literal"
                 ]
 
+                claves_entity = {e["canonical_key"] for e in entidades}
+                claves_entity.update(r["origen_id"] for r in relaciones if r.get("origen_kind") != "information_object")
+                claves_entity.update(
+                    r["destino_id"] for r in relaciones_entity
+                )
+                claves_anchor = sorted(claves_entity)
+
+                tx.run(
+                    anclaje_query,
+                    ts=ts,
+                    io_id=io_id,
+                    io_key=io_key,
+                    prov_str=prov_str_io,
+                    claves=claves_anchor,
+                    volcado_id=volcado,
+                    version=version,
+                    sha256=sha256,
+                    metadata_json=json.dumps(
+                        source_triplet.get("metadata") or {},
+                        ensure_ascii=False,
+                        sort_keys=True,
+                    ),
+                    source_schema=source_triplet.get("source_schema"),
+                    event_time=source_triplet.get("event_time"),
+                    capture_time=source_triplet.get("capture_time"),
+                    custody=source_triplet.get("custody"),
+                )
+
                 escritos = 0
                 if relaciones_entity:
                     record = tx.run(
@@ -1084,35 +1118,6 @@ def _asentar_transaccional_canonico(
                         ts=ts,
                     ).single()
                     escritos += int(record["count"]) if record else 0
-
-                claves_entity = {e["canonical_key"] for e in entidades}
-                claves_entity.update(r["origen_id"] for r in relaciones)
-                claves_entity.update(
-                    r["destino_id"] for r in relaciones_entity
-                )
-                claves_anchor = sorted(claves_entity)
-
-                if claves_anchor:
-                    tx.run(
-                        anclaje_query,
-                        ts=ts,
-                        io_id=io_id,
-                        io_key=io_key,
-                        prov_str=prov_str_io,
-                        claves=claves_anchor,
-                        volcado_id=volcado,
-                        version=version,
-                        sha256=sha256,
-                        metadata_json=json.dumps(
-                            source_triplet.get("metadata") or {},
-                            ensure_ascii=False,
-                            sort_keys=True,
-                        ),
-                        source_schema=source_triplet.get("source_schema"),
-                        event_time=source_triplet.get("event_time"),
-                        capture_time=source_triplet.get("capture_time"),
-                        custody=source_triplet.get("custody"),
-                    )
 
                 res_viol = tx.run(restriccion_query)
                 viol_count = sum(int(row[0]) for row in res_viol)
