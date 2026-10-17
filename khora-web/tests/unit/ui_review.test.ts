@@ -86,7 +86,7 @@ test("UI Review Harness Test Suite", async (t) => {
 
     for (const [label, file, symbol] of [
       ["Ingreso", "app/components/ingreso/IngresoWorkspace.tsx", "IngresoView"],
-      ["Volcados", "app/sistema/volcados/page.tsx", "PipelineView"],
+      ["Volcados", "app/sistema/custodia/page.tsx", "PipelineView"],
       ["Registro", "app/sistema/registro/page.tsx", "RegistroView"],
       ["Grafo", "app/grafo/page.tsx", "GrafoView"],
       ["Consulta", "app/sistema/consulta/page.tsx", "ConsultaView"],

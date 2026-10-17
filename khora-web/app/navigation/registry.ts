@@ -55,13 +55,13 @@ export const NAVIGATION_REGISTRY: readonly NavigationEntry[] = [
     coverage: ["/sistema/ingreso"],
   },
   {
-    id: "volcados",
-    label: "Volcados",
-    href: "/sistema/volcados",
+    id: "custodia",
+    label: "Custodia",
+    href: "/sistema/custodia",
     icon: "Files",
     kind: "direct",
     level: 1,
-    coverage: ["/sistema/volcados"],
+    coverage: ["/sistema/custodia"],
   },
   {
     id: "grafo",
@@ -142,13 +142,14 @@ export const NAVIGATION_EXEMPT_ROUTES = new Set([
 ]);
 
 export const NAVIGATION_LEGACY_ALIASES = new Map<string, string>([
+  ["/sistema/volcados", "/sistema/custodia"],
   ["/sistema/boveda", "/sistema/seguridad?tab=boveda"],
   ["/sistema/entorno-persistente", "/sistema/seguridad?tab=entorno-persistente"],
-  ["/herramientas/bitacora", "/sistema/volcados"],
+  ["/herramientas/bitacora", "/sistema/custodia"],
   ["/capturar", "/sistema/ingreso"],
   ["/sistema/dictado", "/sistema/ingreso"],
-  ["/sistema/editar", "/sistema/volcados"],
-  ["/sistema/ingesta", "/sistema/volcados"],
+  ["/sistema/editar", "/sistema/custodia"],
+  ["/sistema/ingesta", "/sistema/custodia"],
 ]);
 
 export const CANONICAL_PRODUCT_ROUTES = new Set(

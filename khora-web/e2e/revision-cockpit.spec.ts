@@ -1,7 +1,7 @@
 // @l0 L0-002-R · @req REVISION-COCKPIT/REQ-1
 import { test, expect } from "@playwright/test";
 
-test.describe("Mesa de Revisión Sincrónica (REVISION-COCKPIT/REQ-1)", () => {
+test.describe("Custodia (REVISION-COCKPIT/REQ-1)", () => {
   test.beforeEach(async ({ page, context }) => {
     await context.addCookies([
       {
@@ -15,12 +15,12 @@ test.describe("Mesa de Revisión Sincrónica (REVISION-COCKPIT/REQ-1)", () => {
 
   test("Carga de la Mesa de Revisión, elementos de sincronización, alta fricción y única acción de ingesta", async ({ page }) => {
     // 1. Navegar a la Mesa de Revisión de volcados
-    await page.goto("/sistema/volcados");
+    await page.goto("/sistema/custodia");
     await page.waitForLoadState("networkidle");
 
-    // 2. Confirmar encabezado de Mesa de Revisión Sincrónica
+    // 2. Confirmar encabezado de Custodia
     const titulo = page.locator("h1");
-    await expect(titulo).toContainText("Mesa de Revisión Sincrónica");
+    await expect(titulo).toContainText("Custodia");
 
     // 3. Seleccionar primer volcado disponible si existe
     const primerVolcado = page.locator("div.lg\\:col-span-4 div.cursor-pointer").first();

@@ -45,7 +45,7 @@ No hacer cambios en el Entorno Persistente ni crear otro tablero, almacén princ
 | Contrato público de herramientas | `lib/server/mcp-tool-contract.ts`, `docs/normative-check.md` |
 | Preparación y aprobación | `lib/server/volcados.ts` |
 | Versiones y deltas exactos | `lib/server/correcciones.ts` |
-| Revisión visual y sus acciones | `app/sistema/volcados/page.tsx`, `app/components/shared/PipelineView.tsx` |
+| Revisión visual y sus acciones | `app/sistema/custodia/page.tsx`, `app/components/shared/PipelineView.tsx` |
 | Dominio audio/no-audio | `lib/server/domainAudio.ts` |
 | Generación de títulos | `lib/server/titulos.ts` |
 | Espejo secundario reanudable y verificado | `lib/server/espejoNotion.ts` |
@@ -139,7 +139,7 @@ Los temporales claros se crean en carpeta única y se eliminan al terminar, tamb
 
 ## 9. Acceso manual y MCP
 
-Manual: Ingreso permite descargar el corte MP3 conservado de la sesión con audio; Volcados solicita el MP3 del archivo cerrado. La ruta acepta identidad de volcado, folio o sesión y verifica dueño antes de leer. El navegador comprueba también la huella antes de ofrecer la descarga. Las cabeceras `X-Captura-Completa` y `X-Audio-Hasta-Parte` distinguen corte de captura completa. Si falta, puede solicitar una generación/reintento; no descarga HTML/JSON como si fuera audio. `GET /api/audio/:id/mp3` exige sesión, propietario y bóveda abierta; verifica bytes antes de devolverlos con `audio/mpeg`, `no-store` y huella. `POST` solicita generación, no certifica su terminación.
+Manual: Ingreso permite descargar el corte MP3 conservado de la sesión con audio; Custodia solicita el MP3 del archivo cerrado. La ruta acepta identidad de volcado, folio o sesión y verifica dueño antes de leer. El navegador comprueba también la huella antes de ofrecer la descarga. Las cabeceras `X-Captura-Completa` y `X-Audio-Hasta-Parte` distinguen corte de captura completa. Si falta, puede solicitar una generación/reintento; no descarga HTML/JSON como si fuera audio. `GET /api/audio/:id/mp3` exige sesión, propietario y bóveda abierta; verifica bytes antes de devolverlos con `audio/mpeg`, `no-store` y huella. `POST` solicita generación, no certifica su terminación.
 
 El original sigue accesible por sus rutas de partes y por el exportador de originales importados. No presentar una recodificación como original.
 
@@ -290,7 +290,7 @@ Este párrafo describe el corte anterior: no había certificación productiva ni
 | Archivar | Intentar checkpoint, comprobar partes, POST dictado, transacción de cierre, verificar recibo, bloquear edición de captura | No equivale a ingesta ni a título IA/MP3 terminado |
 | Limpiar captura abierta | Rechazar descarte e indicar que se cierre primero | Nunca borrar silenciosamente para mostrar una pantalla vacía |
 | Limpiar tras cierre confirmado | Abrir otra captura sin arrastrar título o sesión anterior | No borrar el archivo del servidor |
-| Abrir Volcados | Seleccionar captura y versión, texto y reproductor por partes | Una fila de inventario no prueba disponibilidad de bytes |
+| Abrir Custodia | Seleccionar captura y versión, texto y reproductor por partes | Una fila de inventario no prueba disponibilidad de bytes |
 | Guardar edición | Enviar versión/huella base, crear versión, invalidar aprobación, conservar original y deltas | No es corrección automática ni aprobación heredada |
 | Aceptar/rechazar hallazgo | Ejecutar el callback real y recargar decisión de compuerta | Una animación sin petición no acredita resolución |
 | Resolver incidente | Pedir código explícito de resolución y llamar al servidor | No fabricar audio ausente ni cancelar incidentes por inferencia |
@@ -402,3 +402,15 @@ Corte funcional probado y publicado: `9935d56f8458dd40035d1a757c7cc752679064f6`.
 El operador autorizo expresamente integrar la propuesta #301 en main con las brechas conocidas y sin acreditar revision presencial de interfaz/seguridad. Esta excepcion de integracion no autoriza despliegue ni activacion del ejecutor y no acredita certificacion productiva ni preservacion universal. Las compuertas tecnicas de las secciones 21 y 22 siguen abiertas; no se eliminan ni se consideran aprobadas por la fusion.
 
 Base main incorporada: c9147557c42b07960e44f0b29b56ab6d9b6a8259 (incluye #302). Conflicto exclusivo en README.md resuelto conservando el enlace vigente al objeto canonico del frente dictado-voz y la entrada de custodia; se conservan los cambios de ambas ramas. Revalidacion ejecutada sobre esta combinacion en copia aislada: npm ci correcto; typecheck correcto; 474 pruebas unitarias aprobadas, cero fallos, canceladas u omitidas; contrato de navegacion y catalogo UI Review correctos; npm run build correcto, incluidos sus preflights. AUTH_SECRET efimero para compilar. No se utilizaron dictados reales, no se ejecutaron migraciones productivas ni se activo el ejecutor. Esta evidencia no certifica produccion.
+
+## 25. Custodia y desbloqueo en contexto (2026-10-16)
+
+El operador renombró la sección a Custodia y confirmó la introducción del PIN en la misma pantalla para descargar. Ruta canónica `/sistema/custodia`; `/sistema/volcados` conserva los parámetros de selección/versionado como alias. Menús y copy usan Custodia. APIs, scopes y nombres persistidos históricos permanecen compatibles.
+
+`app/components/os/CustodiaUnlock.tsx` usa el endpoint existente `/api/boveda`, sin reset ni creación: `unlockOnly` rechaza ese caso en servidor. El campo se limpia al enviar y no se persiste el PIN. Tras validar se verifica la cookie vigente y se reintenta una sola vez la descarga elegida. Cambio de selección cancela la descarga pendiente; error, red o caducidad permanecen en la pantalla.
+
+`downloadCustodiaMp3` en `lib/client/export-audio-mp3.ts` consume el MP3 conservado del servidor, valida tipo, SHA-256 y metadatos de corte antes de ofrecer bytes; no vuelve al mecanismo anterior de recodificar el original en el navegador. Un 409 solicita generación y muestra pendiente; no finge un archivo. El original y las guardas de propietario/cifrado/caducidad permanecen intactos. La interfaz de revisión conserva las acciones de aprobación/hallazgos y el envío de versión/huella base incorporados en la solicitud 301.
+
+Validación reproducible focalizada: `npx playwright test --config playwright.custodia.config.ts` desde khora-web. Usa identidad y almacenamiento sintéticos en servidor local y un MP3 generado con codec real desde PCM sintético; no certifica servicios o despliegue productivos. Los resultados anteriores a la incorporación de main 1514af4 son solo evidencia del checkpoint previo, no de esta combinación. Las brechas de las secciones 21–24 permanecen abiertas.
+
+Revalidación de la combinación sobre main 1514af4713eb8ca20e34ff2b6268f13a4ec2ed82: tipos, contratos de navegación/catálogo y compilación optimizada correctos; 480 unitarias correctas, cero fallos/omitidas; 11 passed (50.4s) en Chromium sobre paquete de producción local, incluyendo Custodia y Shell v2. La descarga verifica bytes y huella de un MP3 real producido por FFmpeg desde PCM sintético. Se mantienen fronteras de identidad/almacenamiento sustituidas en interacción y ausencia de credenciales productivas. El commit publicado y la fusión se identifican por Git y la solicitud de integración, no por un hash autorreferente. No certifica despliegue ni compuertas universales.

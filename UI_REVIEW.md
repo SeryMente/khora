@@ -35,7 +35,7 @@ Las rutas de UI Review permanecen **fail-closed** y requieren
 | Pantalla | Función | Componente compartido |
 |---|---|---|
 | `ingreso` | Dictado, escritura y adjuntar audio | `IngresoView` |
-| `archivo` | Lista de volcados | `PipelineView` |
+| `archivo` | Registros de Custodia | `PipelineView` |
 | `revision` | Revisión, audio y hallazgos | `PipelineView` |
 | `aprobacion` | Compuerta de aprobación | `PipelineView` |
 | `ingesta` | Envío al kernel | `PipelineView` |

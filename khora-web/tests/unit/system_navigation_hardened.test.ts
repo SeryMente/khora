@@ -11,7 +11,7 @@ test("primary navigation stays bounded and registry-driven", () => {
   assert.equal(NAVIGATION_REGISTRY.length, 6);
   assert.ok(NAVIGATION_REGISTRY.length <= MAX_PRIMARY_NAVIGATION_ITEMS);
   assert.deepEqual(NAVIGATION_REGISTRY.map((entry) => entry.id), [
-    "ingreso", "volcados", "grafo", "consulta", "seguridad", "sistema",
+    "ingreso", "custodia", "grafo", "consulta", "seguridad", "sistema",
   ]);
 });
 
@@ -40,8 +40,8 @@ test("legacy ingreso routes resolve to canonical semantic domains without dead m
   const aliases: Array<[string, string]> = [
     ["/capturar", "/sistema/ingreso"],
     ["/sistema/dictado", "/sistema/ingreso"],
-    ["/sistema/editar", "/sistema/volcados"],
-    ["/sistema/ingesta", "/sistema/volcados"],
+    ["/sistema/editar", "/sistema/custodia"],
+    ["/sistema/ingesta", "/sistema/custodia"],
   ];
   for (const [alias, canonical] of aliases) {
     assert.equal(NAVIGATION_LEGACY_ALIASES.get(alias), canonical);
@@ -49,8 +49,8 @@ test("legacy ingreso routes resolve to canonical semantic domains without dead m
   }
   assert.ok(readFileSync(join(root, "app/capturar/page.tsx"), "utf8").includes('redirect("/sistema/ingreso")'));
   assert.ok(readFileSync(join(root, "app/sistema/dictado/page.tsx"), "utf8").includes('redirect("/sistema/ingreso")'));
-  assert.ok(readFileSync(join(root, "app/sistema/editar/page.tsx"), "utf8").includes("VolcadosPage legacyEditorEntry"));
-  assert.ok(readFileSync(join(root, "app/sistema/ingesta/page.tsx"), "utf8").includes('redirect("/sistema/volcados")'));
+  assert.ok(readFileSync(join(root, "app/sistema/editar/page.tsx"), "utf8").includes("CustodiaPage legacyEditorEntry"));
+  assert.ok(readFileSync(join(root, "app/sistema/ingesta/page.tsx"), "utf8").includes('redirect("/sistema/custodia")'));
 });
 
 test("domain menus remain hierarchical while ingreso and volcados stay primary", () => {

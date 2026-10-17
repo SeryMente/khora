@@ -210,7 +210,7 @@ export function IngresoView({
             }}
           >
             <Icons.Check size={32} strokeWidth={1.75} />
-            {guardando ? "archivando..." : "Archivar volcado"}
+            {guardando ? "archivando..." : "Archivar registro"}
           </button>
 
           <button

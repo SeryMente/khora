@@ -71,7 +71,7 @@ export function IngresoIngestaPanel({ volcadoId: initialVolcadoId = null, versio
 
   const ingestarAprobado = useCallback(async () => {
     if (!volcadoId || !version) {
-      setError("Selecciona un volcado con versión aprobada antes de ejecutar la ingesta.");
+      setError("Selecciona un registro con versión aprobada antes de ejecutar la ingesta.");
       return;
     }
     setLoading(true);
@@ -127,15 +127,15 @@ export function IngresoIngestaPanel({ volcadoId: initialVolcadoId = null, versio
       {!volcadoId || !version ? (
         <div style={{ border: "1px solid var(--khora-border)", background: "var(--khora-surface)", padding: 16 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 12 }}>
-            <div><strong>Cola de volcados aprobados</strong><div style={{ fontSize: 12, opacity: 0.75, marginTop: 4 }}>Selecciona el objeto cuya versión aprobada quieres ingresar.</div></div>
+            <div><strong>Cola de registros de Custodia aprobados</strong><div style={{ fontSize: 12, opacity: 0.75, marginTop: 4 }}>Selecciona el objeto cuya versión aprobada quieres ingresar.</div></div>
             <button type="button" onClick={() => void cargarVolcadosListos()} disabled={loadingList} style={{ padding: "8px 12px", cursor: loadingList ? "wait" : "pointer" }}>{loadingList ? "Actualizando…" : "Actualizar"}</button>
           </div>
-          {volcados.length === 0 ? <p style={{ opacity: 0.7, margin: 0 }}>No hay volcados aprobados disponibles.</p> : (
+          {volcados.length === 0 ? <p style={{ opacity: 0.7, margin: 0 }}>No hay registros de Custodia aprobados disponibles.</p> : (
             <div style={{ display: "grid", gap: 8 }}>
               {volcados.map((item) => (
                 <button key={item.id} type="button" onClick={() => { setVolcadoId(item.id); setVersion(Number(item.version_aprobada)); setError(""); setNotice(""); setResult(null); }}
                   style={{ textAlign: "left", padding: 12, border: "1px solid var(--khora-border)", background: "transparent", color: "inherit", cursor: "pointer" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}><strong>{item.titulo || String(item.texto ?? "").slice(0, 70) || ("Volcado " + item.id.slice(0, 8))}</strong><span style={{ fontFamily: "monospace", fontSize: 11 }}>v{String(item.version_aprobada)}</span></div>
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}><strong>{item.titulo || String(item.texto ?? "").slice(0, 70) || ("Registro " + item.id.slice(0, 8))}</strong><span style={{ fontFamily: "monospace", fontSize: 11 }}>v{String(item.version_aprobada)}</span></div>
                   <div style={{ fontSize: 12, opacity: 0.7, marginTop: 4 }}>folio #{item.folio ?? item.id.slice(0, 8)} · listo para ingesta</div>
                 </button>
               ))}

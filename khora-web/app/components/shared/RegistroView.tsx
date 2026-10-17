@@ -327,7 +327,7 @@ function ItemEvento({ evt, expanded, onToggle }: { evt: EventoSistema; expanded:
               </span>
               {evt.volcado_id && (
                 <span className="opacity-70 text-[10px] border px-1 rounded" style={{ borderColor: "var(--khora-border)" }}>
-                  volcado: {evt.volcado_id.slice(0, 8)}...
+                  registro: {evt.volcado_id.slice(0, 8)}...
                 </span>
               )}
             </div>
@@ -346,7 +346,7 @@ function ItemEvento({ evt, expanded, onToggle }: { evt: EventoSistema; expanded:
             <div><strong>ID:</strong> {evt.id}</div>
             <div><strong>Estado:</strong> {evt.estado}</div>
             <div><strong>Correlación ID:</strong> {evt.correlacion_id || "N/A"}</div>
-            <div><strong>Volcado ID:</strong> {evt.volcado_id || "N/A"} (v{evt.version || 1})</div>
+            <div><strong>Registro ID:</strong> {evt.volcado_id || "N/A"} (v{evt.version || 1})</div>
             <div><strong>Hash Anterior:</strong> <code className="break-all">{evt.hash_anterior}</code></div>
             <div><strong>Event Hash:</strong> <code className="break-all">{evt.event_hash}</code></div>
           </div>

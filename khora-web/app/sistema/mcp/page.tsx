@@ -404,8 +404,8 @@ export default function PaginaMcpRevocacion() {
             <RefreshCw size={14} />
             <span>Actualizar estado</span>
           </button>
-          <a href="/sistema/volcados" style={{ color: "var(--khora-accent)" }} className="uppercase tracking-wider hover:underline">
-            Volver a Volcados
+          <a href="/sistema/custodia" style={{ color: "var(--khora-accent)" }} className="uppercase tracking-wider hover:underline">
+            Volver a Registros de Custodia
           </a>
         </div>
       </div>
