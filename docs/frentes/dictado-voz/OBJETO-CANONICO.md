@@ -116,8 +116,8 @@ Pendientes: integración/publicación acreditadas por su recibo, sesión humana 
 
 ### ⚗️ En prueba / recién fallido
 
-499 unitarias, tipos, navegación y registro de interfaz aprobados; benchmark 30/30, regresión adicional 29/29 y SQL aislado 13 comprobaciones. Catálogo 503 no bloquea captura nueva; bootstrap 503 mantiene bloqueo explícito y reintento; 401 jamás habilita micrófono.
-No se acreditan voz física, petición autenticada del navegador del operador ni escritura productiva de audio por estos ensayos.
+500 unitarias, tipos, navegación y registro de interfaz aprobados; benchmark 30/30, regresión adicional 29/29 y SQL aislado 13 comprobaciones. Catálogo 503 no bloquea captura nueva; bootstrap 503 mantiene bloqueo explícito y reintento; 401 jamás habilita micrófono.
+No se acreditan voz física, petición autenticada del navegador del operador ni escritura productiva de audio por estos ensayos. Combinación con main a489f1b: tipos y suite completa repetidos; build de combinación se acredita en candidata Vercel antes de promover; huella de entradas del benchmark intacta.
 
 ### 🔔 Recordatorios latentes
 
@@ -266,8 +266,8 @@ Siguiente paso de asistencia: verificar fusión/publicación en el recibo operat
 Siguiente paso de construcción: corregir solo un defecto reproducido; no relajar autenticación, custodia ni consentimiento.
 Pendientes: integración/publicación acreditadas por su recibo, sesión humana real y limitaciones externas de almacenamiento. Este documento es una instantánea anterior a integrar, no promesa de ausencia de restricciones del proveedor.
 ⚗️ En prueba / recién fallido:
-499 unitarias, tipos, navegación y registro de interfaz aprobados; benchmark 30/30, regresión adicional 29/29 y SQL aislado 13 comprobaciones. Catálogo 503 no bloquea captura nueva; bootstrap 503 mantiene bloqueo explícito y reintento; 401 jamás habilita micrófono.
-No se acreditan voz física, petición autenticada del navegador del operador ni escritura productiva de audio por estos ensayos.
+500 unitarias, tipos, navegación y registro de interfaz aprobados; benchmark 30/30, regresión adicional 29/29 y SQL aislado 13 comprobaciones. Catálogo 503 no bloquea captura nueva; bootstrap 503 mantiene bloqueo explícito y reintento; 401 jamás habilita micrófono.
+No se acreditan voz física, petición autenticada del navegador del operador ni escritura productiva de audio por estos ensayos. Combinación con main a489f1b: tipos y suite completa repetidos; build de combinación se acredita en candidata Vercel antes de promover; huella de entradas del benchmark intacta.
 Conserva íntegros los recordatorios latentes del objeto. Reutiliza evidencia válida, no repitas pruebas sin cambio causal. Recibir una salida del constructor tiene prioridad; asistencia la contrasta y devuelve síntesis y prompt de continuidad. No afirmar recepción ni trabajo en segundo plano.
 Cada salida usa los diez campos de §10 e incluye Metacanon adquirido: versión/sello, revisión y frescura; evidencia actual/histórica/controlada diferenciada, pendientes, viabilidad, estimación con supuestos y siguiente acción. No declarar un plazo sin base.
 Persistencia: releer versión, fusionar sin pisar, escritura condicionada, guardar y verificar contenido/diff; sincronizar estado y prompts. El endurecimiento local no equivale a main. La documentación anterior sí se integró en #302. Confirmar nueva integración y conservar referencia histórica antes de archivar cualquier original.
@@ -287,8 +287,8 @@ Siguiente paso de asistencia: verificar fusión/publicación en el recibo operat
 Siguiente paso de construcción: corregir solo un defecto reproducido; no relajar autenticación, custodia ni consentimiento.
 Pendientes: integración/publicación acreditadas por su recibo, sesión humana real y limitaciones externas de almacenamiento. Este documento es una instantánea anterior a integrar, no promesa de ausencia de restricciones del proveedor.
 ⚗️ En prueba / recién fallido:
-499 unitarias, tipos, navegación y registro de interfaz aprobados; benchmark 30/30, regresión adicional 29/29 y SQL aislado 13 comprobaciones. Catálogo 503 no bloquea captura nueva; bootstrap 503 mantiene bloqueo explícito y reintento; 401 jamás habilita micrófono.
-No se acreditan voz física, petición autenticada del navegador del operador ni escritura productiva de audio por estos ensayos.
+500 unitarias, tipos, navegación y registro de interfaz aprobados; benchmark 30/30, regresión adicional 29/29 y SQL aislado 13 comprobaciones. Catálogo 503 no bloquea captura nueva; bootstrap 503 mantiene bloqueo explícito y reintento; 401 jamás habilita micrófono.
+No se acreditan voz física, petición autenticada del navegador del operador ni escritura productiva de audio por estos ensayos. Combinación con main a489f1b: tipos y suite completa repetidos; build de combinación se acredita en candidata Vercel antes de promover; huella de entradas del benchmark intacta.
 Conserva íntegros los recordatorios latentes del objeto. Reutiliza evidencia válida, no repitas pruebas sin cambio causal. Recibir una salida del constructor tiene prioridad; asistencia la contrasta y devuelve síntesis y prompt de continuidad. No afirmar recepción ni trabajo en segundo plano.
 Cada salida usa los diez campos de §10 e incluye Metacanon adquirido: versión/sello, revisión y frescura; evidencia actual/histórica/controlada diferenciada, pendientes, viabilidad, estimación con supuestos y siguiente acción. No declarar un plazo sin base.
 Persistencia: releer versión, fusionar sin pisar, escritura condicionada, guardar y verificar contenido/diff; sincronizar estado y prompts. El endurecimiento local no equivale a main. La documentación anterior sí se integró en #302. Confirmar nueva integración y conservar referencia histórica antes de archivar cualquier original.

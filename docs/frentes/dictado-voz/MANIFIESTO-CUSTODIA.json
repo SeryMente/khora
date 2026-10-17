@@ -30,9 +30,9 @@
   "files": [
     {
       "path": "OBJETO-CANONICO.md",
-      "bytes": 136878,
-      "sha256": "c8c86a20727eb257b9428e4782dad0877cc18647b38bfce7ccb414cafef61fcb",
-      "git_blob_sha": "d16ed537630fa50df9b2a5a3a7988d62fca4495a"
+      "bytes": 137418,
+      "sha256": "0651c22fe7abfad118009407bb9115663143291caaa52e6852c00462f1083356",
+      "git_blob_sha": "6c0ff26b07bc9b999cec30d3f67993220ff100de"
     },
     {
       "path": "CONTRATO-DICTADO-EXPERIENCE.md",
@@ -90,9 +90,9 @@
     },
     {
       "path": "evidencias/MICROFONO-BOOTSTRAP.json",
-      "bytes": 3448,
-      "sha256": "19b90a60d0b35249619ea35576acd1d97f197212b2fc411bfe84e6a9309e0f0f",
-      "git_blob_sha": "a3056f732837f53450502a8c0f1760de3f2da9e6"
+      "bytes": 3696,
+      "sha256": "d4d837a459dad155e1b998544fc559497f0ebf20240b092d18de2b4e6da7706b",
+      "git_blob_sha": "580a3fff8251e2580703a94cdef19181f5a94f03"
     },
     {
       "path": "originales/MICROFONO-BLOQUEADO.txt",

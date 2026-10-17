@@ -3,7 +3,7 @@
   "baseSha": "1abffca3cc07bf4bcc4c3f14c52b828344537e93",
   "preparedAt": "2026-10-17T20:42:05.399Z",
   "checks": {
-    "unit": 499,
+    "unit": 500,
     "browserBenchmark": 30,
     "additionalBrowserRegression": 29,
     "realIsolatedPostgreSQL": 13,
@@ -85,5 +85,13 @@
         "billingState": "suspended"
       }
     ]
+  },
+  "integration": {
+    "mainSha": "a489f1b4ea2dda0bfafb852ff86bca6fb1dc45ba",
+    "types": "passed",
+    "unit": 500,
+    "build": "pending_candidate_vercel",
+    "benchmarkInputsUnchanged": true,
+    "validatedAt": "2026-10-17T20:50:48.297Z"
   }
 }
