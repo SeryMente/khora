@@ -72,9 +72,9 @@
     },
     {
       "path": "evidencias/INTEGRACION-ENDURECIMIENTO.json",
-      "bytes": 6043,
-      "sha256": "d9f48211f17c06973be164ff9098cf011cba59eb0a2b22200bf7b6fd80f95243",
-      "git_blob_sha": "924ccb77ccc891a7fc93bae2e6cdc7bca3ec93d6"
+      "bytes": 6084,
+      "sha256": "804722ed8c89db737208947b66961b52200ed3aab6c950bb121ca0df55829b16",
+      "git_blob_sha": "d7f94846a36bff50a631cd082c8e52620213aeba"
     }
   ],
   "runtime_references": [
@@ -183,7 +183,7 @@
     "version": "0.4.0",
     "baseSha": "f04e815b47fa8a7b5297561df62000478f978108",
     "receipt": "evidencias/INTEGRACION-ENDURECIMIENTO.json",
-    "pullRequest": null,
+    "pullRequest": "https://github.com/SeryMente/khora/pull/305",
     "state": "software verified; merge authorization explicit; effective merge determined by Git"
   }
 }

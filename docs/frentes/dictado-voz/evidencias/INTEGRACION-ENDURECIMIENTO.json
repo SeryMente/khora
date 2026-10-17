@@ -9,7 +9,7 @@
     "commit": "49ac40e9f6122e2d2fb339362cfa0a78128c8e37"
   },
   "mergePolicy": "normal merge only; verify pull request and main; no manual deployment",
-  "pullRequest": null,
+  "pullRequest": "https://github.com/SeryMente/khora/pull/305",
   "tests": {
     "unitPassed": 491,
     "browserPassed": 19,
