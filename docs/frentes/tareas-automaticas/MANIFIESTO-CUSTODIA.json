@@ -1,6 +1,6 @@
 {
-  "version": 3,
-  "object_seal": "TAREAS-v0.10",
+  "version": 4,
+  "object_seal": "TAREAS-v0.11",
   "purpose": "Inventario de integridad y procedencia; no estado vivo paralelo",
   "source_of_truth": "docs/frentes/tareas-automaticas/OBJETO-CANONICO.md",
   "owner_repo": "SeryMente/khora",
@@ -20,9 +20,9 @@
     {
       "path": "OBJETO-CANONICO.md",
       "classification": "objeto_vivo",
-      "bytes": 129581,
-      "sha256": "4f5b0cbd20456bde34653159cc60df27ac3c08d9cc86583937d16a290c32f492",
-      "git_blob_sha1": "5d7a8e8ec67e1ed1783473c30724b0e64a214d66"
+      "bytes": 140399,
+      "sha256": "35c859e7c384fba5aad2939901238ef4d44450603f66e6835675ef713cd01b25",
+      "git_blob_sha1": "47e98fa3674e7eb9d369f9f58e8c4cf6e9e08cda"
     },
     {
       "path": "originales/registro-notion-recibido.txt",
@@ -72,8 +72,15 @@
       "bytes": 3067,
       "sha256": "62baf66ec2cddc5ffb0bde6adf1e47c4185367fbabd80ae6129a7019afa7f50c",
       "git_blob_sha1": "cf3f6a6e2dbae7a8a6fc8c2323a6d201f1ce48a3"
+    },
+    {
+      "path": "originales/instruccion-entregas-ciclo16.txt",
+      "classification": "original_historico_inmutable",
+      "bytes": 703,
+      "sha256": "84506101980eadbdf9b2559d1d1032955b0abfea5fc78af9272255e5522bf5dd",
+      "git_blob_sha1": "85f4bc8af4fe47b305454380831d3cbe6f7ef612"
     }
   ],
   "self_integrity": "El manifiesto no se hashea a sí mismo; comprobar su blob/commit devuelto por GitHub.",
-  "previous_verified_documentation_commit": "2af9c102dc9937b720b4d78c3e9d367c20001568"
+  "previous_verified_documentation_commit": "1abffca3cc07bf4bcc4c3f14c52b828344537e93"
 }
