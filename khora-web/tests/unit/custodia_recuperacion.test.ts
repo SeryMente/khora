@@ -1,0 +1,12 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {evaluarAudioRecuperado,maximoIndiceConocido} from '../../lib/custodia/recuperacion';
+const one={parte:1,bytes:2048,sha256:'a'.repeat(64),verificado:true};
+test('recuperación remota no depende de blobs desaparecidos del heap',()=>assert.equal(evaluarAudioRecuperado([one],1).ok,true));
+test('no archiva si conoce una cola pendiente adicional',()=>assert.equal(evaluarAudioRecuperado([one],2).ok,false));
+test('no acepta huecos',()=>assert.deepEqual(evaluarAudioRecuperado([{...one,parte:2}],2).indicesFaltantes,[1]));
+test('no acepta duplicados',()=>assert.equal(evaluarAudioRecuperado([one,one],1).ok,false));
+test('no acepta verificación ausente',()=>assert.equal(evaluarAudioRecuperado([{...one,verificado:false}],1).ok,false));
+test('no acepta tamaño o huella inventados',()=>{assert.equal(evaluarAudioRecuperado([{...one,bytes:0}],1).ok,false);assert.equal(evaluarAudioRecuperado([{...one,sha256:'invalid'}],1).ok,false);});
+test('esperado se reconstruye con índices persistidos, no con cantidad de blobs',()=>assert.equal(maximoIndiceConocido([one],[{parte:3}]),3));
+test('un manifiesto vacío no equivale a audio íntegro',()=>assert.equal(evaluarAudioRecuperado([],0).ok,false));

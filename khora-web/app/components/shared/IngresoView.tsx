@@ -1,11 +1,15 @@
-// @l0 L0-002 · @req UI-04/INGRESO-INTEGRADO · Componente Presentacional Compartido de Ingreso
 "use client";
-
-import { useState, useEffect } from "react";
-import * as Icons from "lucide-react";
-
+import { useState } from "react";
+import * as I from "lucide-react";
+import { AudioActivity } from "../ingreso/AudioActivity";
+import s from "../ingreso/ingreso-studio.module.css";
 export type IngresoViewState = {
   archivado?: boolean;
+  custodiaEstado?: string;
+  custodiaReady?: boolean;
+  recuperando?: boolean;
+  recuperaciones?: number;
+  stream?: MediaStream | null;
   titulo: string;
   texto: string;
   estado: "inactivo" | "dictando";
@@ -35,6 +39,7 @@ export type IngresoViewState = {
 };
 
 export type IngresoViewActions = {
+  onRecuperar?: () => void;
   onTituloChange?: (val: string) => void;
   onIniciarEdicion?: () => void;
   onTextoChange?: (val: string) => void;
@@ -51,326 +56,63 @@ export type IngresoViewActions = {
   onConfirmarEdicion?: () => void;
 };
 
-export function IngresoView({
-  state,
-  actions = {},
-  isReviewMode = false,
-}: {
-  state: IngresoViewState;
-  actions?: IngresoViewActions;
-  isReviewMode?: boolean;
-}) {
-  const {
-    archivado = false,
-    titulo,
-    texto,
-    estado,
-    modoEntrada,
-    chromeBridgeEstado,
-    chromeCaptionActivo,
-    chromeCapturaEstado,
-    editando,
-    soportado,
-    escuchando,
-    guardando,
-    generandoTitulo,
-    retranscribiendo,
-    adjuntandoAudio,
-    exportandoAudio,
-    audioExportable,
-    conAudio,
-    partesContador,
-    bytesAcumulados,
-    reconexiones,
-    pulidosOk,
-    pulidosNo,
-    reconciliacionMensaje,
-    aviso,
-    error,
-    resultado,
-  } = state;
-
-  return (
-    <main
-      data-ui-id="ingreso.container"
-      className="max-w-4xl mx-auto p-6 space-y-6"
-      style={{
-        backgroundColor: "var(--khora-bg)",
-        color: "var(--khora-ink)",
-        paddingBottom: "6rem",
-      }}
-    >
-      {/* Cabecera de Sección */}
-      <div className="border-b pb-4" style={{ borderColor: "var(--khora-border)" }}>
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <Icons.Keyboard size={32} strokeWidth={1.75} style={{ color: "var(--khora-accent)" }} />
-          Ingreso Integrado
-        </h1>
-        <p className="text-sm mt-1" style={{ color: "var(--khora-accent)" }}>
-          Método universal combinado: Dicta en vivo, escribe o pega directamente. La transcripción es editable in-situ con protección segmentaria.
-        </p>
-      </div>
-
-      {!soportado && (
-        <div className="p-3 border rounded-none text-sm flex items-center gap-2" style={{ borderColor: "var(--khora-border)", backgroundColor: "var(--khora-surface)", color: "var(--khora-accent)" }}>
-          <Icons.TriangleAlert size={32} strokeWidth={1.75} className="shrink-0" />
-          <span>Este navegador no soporta dictado en vivo. Puedes utilizar escritura o copiar y pegar contenido.</span>
-        </div>
-      )}
-
-      {/* Inputs y Controles */}
-      <div className="space-y-4">
-        <div className="flex gap-2 items-center">
-          <input
-            data-ui-id="ingreso.titulo-input"
-            value={titulo}
-            readOnly={guardando || archivado}
-            onChange={(e) => actions.onTituloChange?.(e.target.value)}
-            placeholder="Título opcional (escribe o genera con IA)"
-            className="flex-1 p-2.5 border rounded-none text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)] focus-visible:border-[var(--khora-accent)]"
-            style={{
-              backgroundColor: "var(--khora-surface)",
-              color: "var(--khora-ink)",
-              borderColor: "var(--khora-border)",
-            }}
-          />
-          <button
-            data-ui-id="ingreso.btn-titulo-ia"
-            onClick={() => actions.onGenerarTitulo?.()}
-            disabled={guardando || archivado || generandoTitulo || !texto.trim()}
-            className="px-3 py-2.5 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)] text-xs"
-            style={{
-              backgroundColor: "var(--khora-surface)",
-              color: "var(--khora-ink)",
-              borderColor: "var(--khora-border)",
-            }}
-          >
-            <Icons.Sparkles size={16} strokeWidth={1.75} />
-            {generandoTitulo ? "Generando..." : "Título con IA"}
-          </button>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-3">
-          {estado === "inactivo" ? (
-            <>
-              <button
-                data-ui-id="ingreso.btn-iniciar"
-                onClick={() => actions.onIniciar?.()}
-                disabled={guardando || archivado || editando || adjuntandoAudio || retranscribiendo}
-                className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
-                style={{
-                  backgroundColor: "var(--khora-accent)",
-                  color: "var(--khora-bg)",
-                  borderColor: "var(--khora-accent)",
-                }}
-              >
-                <Icons.Mic size={32} strokeWidth={1.75} />
-                Iniciar dictado
-              </button>
-              <button
-                data-ui-id="ingreso.btn-chrome"
-                onClick={() => actions.onPrepararChrome?.()}
-                disabled={guardando || archivado || editando || adjuntandoAudio || retranscribiendo}
-                className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
-                style={{
-                  backgroundColor: "var(--khora-surface)",
-                  color: "var(--khora-ink)",
-                  borderColor: "var(--khora-border)",
-                }}
-              >
-                <Icons.Monitor size={24} strokeWidth={1.75} />
-                Capturar Chrome
-              </button>
-            </>
-          ) : (
-            <button
-              data-ui-id="ingreso.btn-detener"
-              onClick={() => actions.onDetener?.()}
-              className="px-4 py-2 border rounded-none cursor-pointer flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
-              style={{
-                backgroundColor: "var(--khora-surface)",
-                color: "var(--khora-ink)",
-                borderColor: "var(--khora-border)",
-              }}
-            >
-              <Icons.Pause size={32} strokeWidth={1.75} />
-              {modoEntrada === "chrome_live_caption" ? "Detener captura Chrome" : "Detener dictado"}
-            </button>
-          )}
-
-          <button
-            data-ui-id="ingreso.btn-archivar"
-            onClick={() => actions.onGuardar?.()}
-            disabled={guardando || archivado || guardando || estado === "dictando" || editando || adjuntandoAudio || retranscribiendo}
-            className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
-            style={{
-              backgroundColor: "var(--khora-surface)",
-              color: "var(--khora-ink)",
-              borderColor: "var(--khora-border)",
-            }}
-          >
-            <Icons.Check size={32} strokeWidth={1.75} />
-            {guardando ? "archivando..." : "Archivar registro"}
-          </button>
-
-          <button
-            data-ui-id="ingreso.btn-retranscribir"
-            onClick={() => actions.onRetranscribir?.()}
-            disabled={guardando || archivado || retranscribiendo || adjuntandoAudio || estado !== "inactivo"}
-            className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
-            style={{
-              backgroundColor: "var(--khora-surface)",
-              color: "var(--khora-ink)",
-              borderColor: "var(--khora-border)",
-            }}
-          >
-            <Icons.RefreshCw size={20} strokeWidth={1.75} />
-            {retranscribiendo ? "Re-transcribiendo..." : "Re-transcribir audio"}
-          </button>
-
-          <button
-            data-ui-id="ingreso.btn-adjuntar"
-            onClick={() => actions.onAdjuntarClick?.()}
-            disabled={guardando || archivado || adjuntandoAudio || retranscribiendo || estado !== "inactivo"}
-            className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
-            style={{
-              backgroundColor: "var(--khora-surface)",
-              color: "var(--khora-ink)",
-              borderColor: "var(--khora-border)",
-            }}
-          >
-            <Icons.Paperclip size={20} strokeWidth={1.75} />
-            {adjuntandoAudio ? "Adjuntando..." : "Adjuntar audio"}
-          </button>
-          {conAudio && partesContador>0 && (
-            <button type="button" onClick={()=>actions.onExportarMp3?.()}
-              disabled={guardando || exportandoAudio || adjuntandoAudio}
-              className="px-4 py-2 border rounded disabled:opacity-50">
-              {exportandoAudio?"Preparando descarga…":"Descargar MP3 conservado"}
-            </button>
-          )}
-          {audioExportable && (
-            <button
-              data-ui-id="ingreso.btn-exportar-audio"
-              onClick={() => actions.onExportarAudio?.()}
-              disabled={guardando || exportandoAudio || adjuntandoAudio}
-              className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
-              style={{ backgroundColor: "var(--khora-surface)", color: "var(--khora-ink)", borderColor: "var(--khora-border)" }}
-            >
-              <Icons.Download size={20} strokeWidth={1.75} />
-              {exportandoAudio ? "Exportando audio..." : "Exportar audio original"}
-            </button>
-          )}
-
-
-          <button
-            data-ui-id="ingreso.btn-limpiar"
-            onClick={() => actions.onLimpiar?.()}
-            disabled={guardando || estado === "dictando" || editando || adjuntandoAudio || retranscribiendo}
-            className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
-            style={{
-              backgroundColor: "var(--khora-surface)",
-              color: "var(--khora-ink)",
-              borderColor: "var(--khora-border)",
-            }}
-          >
-            <Icons.RotateCcw size={32} strokeWidth={1.75} />
-            Limpiar
-          </button>
-
-          {estado === "dictando" && (
-            <span data-ui-id="ingreso.status-listening" className="flex items-center gap-2 text-xs font-semibold" style={{ color: "var(--khora-accent)" }}>
-              <Icons.Activity size={32} strokeWidth={1.75} />
-              {modoEntrada === "chrome_live_caption"
-                ? "Chrome: captura activa / Live Caption en espera de señal"
-                : escuchando ? "escuchando" : "reconectando..."}
-            </span>
-          )}
-        </div>
-      </div>
-
-      {modoEntrada === "chrome_live_caption" && (
-        <div data-ui-id="ingreso.banner-chrome" className="p-3 border rounded-none text-sm flex items-start gap-3" style={{ borderColor: "var(--khora-border)", backgroundColor: "var(--khora-surface)", color: "var(--khora-ink)" }}>
-          <Icons.Headphones size={24} strokeWidth={1.75} style={{ color: "var(--khora-accent)" }} className="shrink-0 mt-0.5" />
-          <div>
-            <strong>Entrada Chrome Live Caption.</strong>{" "}
-            Bridge: {chromeBridgeEstado} · Live Caption: {chromeCaptionActivo ? "detectado" : "esperando"} · Audio: {chromeCapturaEstado}.
-            <div style={{ marginTop: 4, opacity: 0.8 }}>
-              Para guardar el audio de la pestaña, cambia a la pestaña que reproduce el audio y pulsa el icono de Aisthesis; luego vuelve a Khora. La reproducción del audio se conserva.
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Banner de Edición Activa */}
-      {editando && (
-        <div data-ui-id="ingreso.banner-edicion" className="p-3 border rounded-none text-sm flex items-center justify-between gap-4 animate-pulse" style={{ borderColor: "var(--khora-accent)", backgroundColor: "var(--khora-surface)", color: "var(--khora-ink)" }}>
-          <div className="flex items-center gap-2">
-            <Icons.PenTool size={32} strokeWidth={1.75} style={{ color: "var(--khora-accent)" }} />
-            <span>
-              <strong>Edición in situ activa:</strong> Pulsa Esc para confirmar los cambios o salir; si el dictado estaba activo, la escucha se reanudará automáticamente.
-            </span>
-          </div>
-          <button
-            data-ui-id="ingreso.btn-confirmar-edicion"
-            onClick={() => actions.onConfirmarEdicion?.()}
-            className="px-3 py-1 bg-[var(--khora-accent)] text-[var(--khora-bg)] font-bold text-xs rounded-none cursor-pointer hover:opacity-90"
-          >
-            Confirmar edición
-          </button>
-        </div>
-      )}
-
-      {/* Área de Texto Editable */}
-      <div className="relative">
-        <textarea
-          data-ui-id="ingreso.textarea"
-          value={texto}
-          onFocus={() => actions.onIniciarEdicion?.()}
-          onClick={() => actions.onIniciarEdicion?.()}
-          readOnly={guardando || archivado}
-          onChange={(e) => actions.onTextoChange?.(e.target.value)}
-          placeholder="Escribe, pega o inicia el dictado para transcribir..."
-          className="w-full p-4 min-h-[260px] whitespace-pre-wrap leading-relaxed border rounded-none text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)] focus-visible:border-[var(--khora-accent)]"
-          style={{
-            backgroundColor: "var(--khora-surface)",
-            borderColor: "var(--khora-border)",
-            color: "var(--khora-ink)",
-            resize: "vertical"
-          }}
-        />
-      </div>
-
-      {/* Estadísticas */}
-      <p data-ui-id="ingreso.stats" className="text-xs font-medium" style={{ color: "var(--khora-accent)" }}>
-        estado: {estado} / modo: {modoEntrada} / editando: {editando ? "sí" : "no"} / caracteres: {texto.length} / bloques pulidos: {pulidosOk} / bloques sin pulir: {pulidosNo} / audio: {conAudio ? "sí" : "no"} / partes subidas: {partesContador} ({(bytesAcumulados / (1024 * 1024)).toFixed(2)} MB) / reconexiones: {reconexiones}
-      </p>
-
-      {/* Alertas y Mensajes de Retorno */}
-      {reconciliacionMensaje.length > 0 && (
-        <div data-ui-id="ingreso.msg-reconciliacion" className="p-3 border rounded-none text-xs flex items-center gap-2" style={{ borderColor: "var(--khora-border)", backgroundColor: "var(--khora-surface)", color: "var(--khora-ink)" }}>
-          <Icons.Sparkles size={20} strokeWidth={1.75} className="shrink-0" style={{ color: "var(--khora-accent)" }} />
-          <span>{reconciliacionMensaje}</span>
-        </div>
-      )}
-      {aviso.length > 0 && (
-        <div data-ui-id="ingreso.aviso-degradado" className="p-3 border rounded-none text-sm flex items-center gap-2" style={{ borderColor: "var(--khora-border)", backgroundColor: "var(--khora-surface)", color: "var(--khora-accent)" }}>
-          <Icons.TriangleAlert size={32} strokeWidth={1.75} className="shrink-0" />
-          <span>{aviso}</span>
-        </div>
-      )}
-      {error.length > 0 && (
-        <div data-ui-id="ingreso.msg-error" className="p-3 border rounded-none text-sm flex items-center gap-2" style={{ borderColor: "var(--khora-border)", backgroundColor: "var(--khora-surface)", color: "var(--khora-accent)" }}>
-          <Icons.ShieldX size={32} strokeWidth={1.75} className="shrink-0" />
-          <span>{error}</span>
-        </div>
-      )}
-      {resultado.length > 0 && (
-        <div data-ui-id="ingreso.msg-resultado" className="p-3 border rounded-none text-sm flex items-center gap-2" style={{ borderColor: "var(--khora-border)", backgroundColor: "var(--khora-surface)", color: "var(--khora-ink)" }}>
-          <Icons.CircleDot size={32} strokeWidth={1.75} className="shrink-0" />
-          <span>{resultado}</span>
-        </div>
-      )}
-    </main>
-  );
+export function IngresoView({state:v,actions:a={},isReviewMode=false}:{state:IngresoViewState;actions?:IngresoViewActions;isReviewMode?:boolean}) {
+ const actions=a;
+ const [more,setMore]=useState(false);
+ const busy=v.guardando||v.adjuntandoAudio||v.retranscribiendo||!!v.recuperando;
+ const locked=busy||!!v.archivado;
+ const recording=v.estado==="dictando";
+ return <main data-ui-id="ingreso.container" className={s.studio}>
+  <header className={s.heading}>
+   <div><p className={s.eyebrow}>ESPACIO DE CAPTURA</p><h1>Ingreso</h1><p className={s.subtitle}>Dale espacio a lo que piensas.</p></div>
+   <button className={s.secondary} onClick={a.onRecuperar} disabled={busy||recording||v.editando} aria-haspopup="dialog"><I.History size={18}/><span>Recuperar capturas</span>{!!v.recuperaciones&&<span className={s.count}>{v.recuperaciones}</span>}</button>
+  </header>
+  <section className={s.sheet} aria-label="Captura actual">
+   <div className={s.capturebar}>
+    <div className={s.micgroup}>
+     {!recording?<button data-ui-id="ingreso.btn-iniciar" className={s.primary} disabled={locked||v.editando||v.custodiaReady===false||v.conAudio} onClick={a.onIniciar}><I.Mic size={19}/>Iniciar dictado</button>:
+      <button data-ui-id="ingreso.btn-detener" className={s.primary} disabled={busy} onClick={a.onDetener}><I.Square size={15}/>{v.modoEntrada==="chrome_live_caption"?"Detener captura Chrome":"Detener dictado"}</button>}
+     <div className={s.signal}><AudioActivity stream={v.stream||null} active={recording&&!v.editando}/><span data-ui-id="ingreso.status-listening">{v.editando?"Dictado en pausa":recording?(v.modoEntrada==="chrome_live_caption"?"Captura de pestaña":v.stream?"Micrófono activo":"Preparando audio"):v.conAudio?"Audio conservado por partes":"Micrófono en espera"}</span></div>
+    </div>
+    <div className={s.toolgroup}>
+     <button data-ui-id="ingreso.btn-adjuntar" className={s.quiet} disabled={locked||recording||v.editando||v.custodiaReady===false} onClick={a.onAdjuntarClick}><I.Paperclip size={17}/>{v.adjuntandoAudio?"Adjuntando…":"Adjuntar audio"}</button>
+     <button className={s.iconButton} aria-label="Más opciones de captura" aria-expanded={more} aria-controls="ingreso-options" onClick={()=>setMore(!more)}><I.Ellipsis size={21}/></button>
+    </div>
+   </div>
+   {more&&<div className={s.options} id="ingreso-options">
+    <button data-ui-id="ingreso.btn-chrome" className={s.secondary} disabled={locked||recording||v.editando} onClick={a.onPrepararChrome}><I.Monitor size={17}/>Capturar Chrome</button>
+    <button data-ui-id="ingreso.btn-titulo-ia" className={s.secondary} disabled={locked||v.generandoTitulo||!v.texto.trim()} onClick={a.onGenerarTitulo}><I.Sparkles size={17}/>{v.generandoTitulo?"Generando…":"Título con IA"}</button>
+    {!!a.onRetranscribir&&<button data-ui-id="ingreso.btn-retranscribir" className={s.secondary} disabled={locked||recording||!v.conAudio} onClick={a.onRetranscribir}><I.RefreshCw size={17}/>{v.retranscribiendo?"Re-transcribiendo…":"Re-transcribir audio"}</button>}
+    {v.audioExportable&&<button data-ui-id="ingreso.btn-exportar-audio" className={s.secondary} disabled={busy||v.exportandoAudio} onClick={a.onExportarAudio}><I.Download size={17}/>Exportar audio original</button>}
+   </div>}
+   {v.modoEntrada==="chrome_live_caption"&&<p data-ui-id="ingreso.banner-chrome" className={s.notice}>Captura Chrome · {v.chromeCapturaEstado}. Activa Aisthesis en la pestaña que reproduce el audio. La onda de esta pantalla representa solo el micrófono conectado, no el audio de otra pestaña.</p>}
+   {!v.soportado&&<p className={s.notice}>Este navegador no ofrece reconocimiento en vivo. Puedes conservar audio, escribir o pegar texto.</p>}
+  {(v.error||v.aviso||v.resultado||v.reconciliacionMensaje)&&<div className={s.messages}>
+   {v.error&&<p role="alert" data-ui-id="ingreso.msg-error" className={s.error}><I.CircleAlert size={18}/>{v.error}</p>}
+   {v.aviso&&<p data-ui-id="ingreso.aviso-degradado" className={s.notice}><I.Info size={18}/>{v.aviso}</p>}
+   {v.resultado&&<p data-ui-id="ingreso.msg-resultado" className={s.notice}><I.Check size={18}/>{v.resultado}</p>}
+   {v.reconciliacionMensaje&&<p data-ui-id="ingreso.msg-reconciliacion" className={s.notice}>{v.reconciliacionMensaje}</p>}
+  </div>}
+   <div className={s.editor}>
+    <label className={s.srOnly} htmlFor="ingreso-title">Título de la captura</label>
+    <input id="ingreso-title" aria-label="Título de la captura" data-ui-id="ingreso.titulo-input" className={s.title} value={v.titulo} readOnly={locked} onChange={e=>a.onTituloChange?.(e.target.value)} placeholder="Sin título" maxLength={500}/>
+    <label className={s.srOnly} htmlFor="ingreso-text">Texto de la captura</label>
+    <textarea id="ingreso-text" aria-label="Texto de la captura" data-ui-id="ingreso.textarea" className={s.textarea} value={v.texto} readOnly={locked} onFocus={()=>a.onIniciarEdicion?.()} onClick={() => actions.onIniciarEdicion?.()} onChange={e=>a.onTextoChange?.(e.target.value)} placeholder="Escribe, pega o empieza a dictar.
+Este espacio es tuyo." spellCheck/>
+   </div>
+   {v.editando&&<div data-ui-id="ingreso.banner-edicion" className={s.editing}><span><I.PencilLine size={16}/>Edición in situ activa · tu texto se conserva.</span><button data-ui-id="ingreso.btn-confirmar-edicion" className={s.secondary} disabled={locked} onClick={a.onConfirmarEdicion}>Confirmar edición</button></div>}
+   <footer className={s.sheetfooter}>
+    <p role="status" aria-live="polite" data-ui-id="ingreso.custodia-status" className={s.storage}><I.ShieldCheck size={16}/><span>{v.recuperando?"Recuperando sin sustituir el original…":v.custodiaEstado||"Salvaguarda de captura"}</span></p>
+    <span className={s.characters}>{v.texto.length.toLocaleString('es')} caracteres</span>
+   </footer>
+  </section>
+  <div className={s.bottombar}>
+   <div className={s.bottomleft}>
+    {v.conAudio&&v.partesContador>0&&<button className={s.quiet} disabled={busy||v.exportandoAudio} onClick={a.onExportarMp3}><I.Download size={17}/>{v.exportandoAudio?"Preparando descarga…":"Descargar MP3 conservado"}</button>}
+    <button data-ui-id="ingreso.btn-limpiar" className={s.quiet} disabled={busy||recording||v.editando} onClick={a.onLimpiar}><I.Plus size={18}/>{v.archivado?"Nueva captura":"Limpiar"}</button>
+   </div>
+   <button data-ui-id="ingreso.btn-archivar" className={s.archive} onClick={a.onGuardar} disabled={locked||recording||v.editando||(!v.texto.trim()&&!v.conAudio)}><I.Archive size={18}/>{v.guardando?"Archivando…":v.archivado?"Captura archivada":"Archivar registro"}</button>
+  </div>
+  {more&&<details className={s.diagnostics}><summary>Detalles de la captura</summary><p data-ui-id="ingreso.stats">Estado: {v.estado} · Audio: {v.partesContador} partes verificadas · {(v.bytesAcumulados/1048576).toFixed(2)} MB · Reconexiones: {v.reconexiones} · Bloques procesados: {v.pulidosOk} / pendientes: {v.pulidosNo}</p><p>Un corte conservado no demuestra que se haya registrado el último instante antes de una interrupción.</p></details>}
+ </main>;
 }

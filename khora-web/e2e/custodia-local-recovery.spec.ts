@@ -1,0 +1,2 @@
+import {test,expect} from '@playwright/test';import {spawnSync} from 'node:child_process';
+test('Ingreso real: selección local cifrada tras recarga, pérdida de red y original intacto',async({},testInfo)=>{test.setTimeout(120000);const result=spawnSync(process.execPath,['tests/browser/custodia-workspace.mjs'],{cwd:process.cwd(),encoding:'utf8',env:{...process.env,KHORA_TEST_URL:String(testInfo.project.use.baseURL)},timeout:100000,maxBuffer:2e6});expect(result.status,(result.stdout||'')+(result.stderr||'')).toBe(0);expect(result.stdout).toContain('"explicitRecovery":true');});

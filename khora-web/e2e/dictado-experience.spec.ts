@@ -144,6 +144,8 @@ test("eventos duplicados y tardíos no crean sesiones fantasma", async ({ page }
     }
     window.dispatchEvent(new CustomEvent("khora:dictado:observation", { detail: null }));
   });
+  // This case tests deduplication, not timer installation after mount. Use the real delivery action.
+  await page.getByRole("button", { name: "Actualizar / reintentar pendientes", exact: true }).click();
   await page.clock.runFor(31_000);
   await expect.poll(() => payloads.filter(r => r.data.kind === "session").length).toBe(1);
   const session = payloads.find(r => r.data.kind === "session");

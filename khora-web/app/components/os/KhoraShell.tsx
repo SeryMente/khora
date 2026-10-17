@@ -21,6 +21,7 @@ export default function KhoraShell({ children }: { children: ReactNode }) {
                     bottom: 0,
                     left: 0,
                     right: 0,
+                    minHeight: "6rem",
                     zIndex: 40,
                     backgroundColor: "var(--khora-surface)",
                     borderTop: "1px solid var(--khora-border)",

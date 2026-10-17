@@ -119,7 +119,7 @@ La identidad del original se contrasta separadamente del texto vigente, de modo 
 
 Durante guardado o después del sello, los controles que mutan la captura se bloquean. Limpiar no descarta una captura abierta: exige cerrar antes de comenzar otra. Tras sellar se puede abrir una captura nueva y el título anterior no se arrastra.
 
-Recuperación: autenticar identidad → leer último snapshot local y remoto → comprobar si la sesión local ya se selló → reconstruir manifiesto desde la tabla canónica → recuperar partes locales pendientes → reintentar con mismos índices → restaurar texto/título/fuente/duración. Una respuesta tardía no debe pisar contenido que ya escribió el operador. No borrar recuperables por no poder sincronizarlos.
+Recuperación vigente: abrir con identidad nueva y editor vacío → consultar inventario local/remoto → selección explícita de captura y punto → conservar borrador actual → comprobar propietario y cierre del origen → sincronizar audio local pendiente → crear captura hija transaccional con el prefijo canónico elegido → guardar acuse → aplicar texto/título/fuente/duración. El original y su historia permanecen intactos. Una respuesta tardía no debe pisar contenido escrito entretanto. No borrar recuperables por no poder sincronizarlos. Contrato completo y límites en §23.
 
 ## 8. MP3: original y derivado
 
@@ -421,3 +421,50 @@ Revalidación de la combinación sobre main 1514af4713eb8ca20e34ff2b6268f13a4ec2
 El endurecimiento de la experiencia del dictado se integra sobre main f04e815b47fa8a7b5297561df62000478f978108 sin reemplazar captura, checkpoints, custodia local/remota, PIN, MP3 ni reglas de Archivar/Limpiar. Reutiliza los eventos de observación existentes; su cola es independiente y contiene únicamente metadatos consentidos, no texto ni audio. Su falta de entrega no equivale a pérdida de la captura y su acuse no certifica custodia. Preferencias inválidas fallan apagadas; duplicados o eventos tardíos no crean sesiones adicionales. El comentario enviado voluntariamente conserva el endpoint privado/cifrado existente.
 
 Estado, evidencias y límites del frente: [objeto canónico de dictado y voz](../../docs/frentes/dictado-voz/OBJETO-CANONICO.md); contrato operativo: [benchmark y experiencia](../../docs/frentes/dictado-voz/CONTRATO-DICTADO-EXPERIENCE.md). Las pruebas de navegador conservan los fixtures vigentes de propietario de checkpoint y micrófono generado por Chromium; no son voz física ni certificación de producción. Esta integración no implementa análisis clínico ni amplía consentimiento.
+
+## 23. Ingreso rediseñado: selección explícita y cortes de recuperación
+
+### Decisión y anatomía de pantalla
+
+Instrucción posterior del operador: abrir en blanco, ofrecer versiones recuperables de forma profesional, conservar su audio y renovar la interfaz de principio a fin sin acumulación de parches. Se aprueba el diseño general de editor central, recuperaciones laterales y actividad acústica; la aceptación de uso no se presume. No se añade medidor de volumen ni decibelios, escucha permanente, nueva telemetría acústica ni análisis de salud.
+
+La pantalla abre con una identidad nueva y editor vacío: consultar inventario NO restaura contenido ni abre el micrófono. «Recuperar capturas» ofrece tarjetas con fecha, vista previa, duración, caracteres, procedencia local/remota y partes de audio. «Ver puntos guardados» permite elegir una revisión concreta y paginar, sin cargar todo el historial de una vez. Los registros ya archivados se consultan en Custodia. Las opciones secundarias se agrupan bajo «Más opciones»; el diagnóstico técnico se despliega bajo demanda, sin competir con el editor.
+
+### Recuperación no destructiva
+
+1. Autenticar propietario y consultar catálogo con `GET /api/dictado/checkpoint?catalog=1`; páginas de 20 sesiones abiertas y cursor estable por recepción/identidad. Revisiones con `?revisions=1&sessionId=...`, también paginadas. La fecha cliente se conserva, pero no acredita hora física.
+2. Guardar el borrador actual antes de sustituir la vista. Una copia local no disponible se informa sin ocultar el inventario remoto. La lectura puede funcionar aunque no haya conectividad suficiente para materializar una recuperación; recuperar exige acuse remoto.
+3. Para una copia local, comprobar si el origen ya fue archivado, reintentar sus partes con los mismos índices y sincronizar el punto seleccionado. No borrar partes locales hasta acuse verificado.
+4. `POST /api/dictado/checkpoint?recover=1` exige origen de la aplicación, selección explícita, propietario y nueva identidad. Bloquea el origen en transacción, comprueba revisión y prefijo de audio y crea una captura hija con `recuperadaDe`.
+5. La hija referencia los originales cifrados ya almacenados: no recodifica, sobrescribe ni borra el audio original. Conserva la historia del origen. Reintentar la misma selección/identidad es idempotente; selección distinta, propietario ajeno o sesión sellada se rechazan.
+6. Solo después de guardar el acuse y la copia local se aplica el texto al editor. Una respuesta fallida no vacía el borrador ni finge recuperación. El reconocimiento parcial reaparece como pendiente, no como transcripción autoritativa.
+
+No hay fusión semántica automática entre pestañas ni reclamación de objetos sin propietario. Una sesión archivada nunca se resucita mediante recuperación.
+
+### Corte vinculado de texto y audio
+
+El grabador conserva fragmentos locales aproximadamente cada segundo. Al formar una parte de subida (umbral existente de unos 5 s o 2 MiB), congela el texto/parcial/título de ese momento. Después del acuse íntegro del audio, guarda un punto inmutable con `corteAudio.hastaParte` y `finMs`; el servidor comprueba índices contiguos, tamaños, huellas, verificación y fin real del prefijo. El corte local se guarda aparte del puntero mutable, por lo que un acuse tardío no sustituye el borrador más reciente. Un fragmento sin texto también obtiene snapshot local y puede aparecer en el inventario.
+
+**Vinculación no significa alineación palabra a palabra.** El reconocimiento y MediaRecorder tienen relojes/callbacks independientes; no se afirma que cada palabra corresponda exactamente al límite acústico. Los puntos históricos sin `corteAudio` se muestran sin sincronía acreditada. Si falla el guardado del corte, se conserva el original y se informa; no se anuncia un punto remoto confirmado.
+
+La ventana de pérdida depende del último acuse remoto y de la copia local disponible. **No se garantiza «solo se perderá la última parte» frente a red prolongadamente caída, almacenamiento bloqueado, borrado del perfil, cierre abrupto o pérdida del dispositivo.** En condiciones normales, el prefijo confirmado permite elegir un corte anterior íntegro, dejando fuera el segmento no confirmado. Los puntos posteriores de texto siguen en el historial; no se eliminan para aparentar concordancia.
+
+### Archivo y MP3 de una recuperación
+
+Se corrige la guardia del cliente que comparaba partes recuperadas con blobs del heap de la sesión anterior: al recargar, ese heap está vacío y no prueba ausencia del audio persistido. El total esperado se reconstruye de índices conocidos y pendientes; el evaluador rechaza huecos, duplicados, tamaños/huellas inválidos y partes sin verificación. El servidor conserva su manifiesto estricto y su bloqueo transaccional: esta corrección NO consiste en saltarse la guardia.
+
+El MP3 sigue siendo derivado del audio original por el pipeline real de §8/§20. Recuperar partes no certifica disponibilidad instantánea del MP3. La descarga usa el flujo existente con dueño, bóveda y verificación de bytes. Se conserva la diferencia entre prefijo, captura cerrada y MP3 disponible; no hay texto a voz. Los originales no se eliminan al generar el derivado.
+
+### Actividad acústica y accesibilidad
+
+`AudioActivity.tsx` lee mediante Web Audio el MISMO `MediaStream` del grabador; no solicita otro permiso, no envía muestras ni conserva datos nuevos. La onda representa energía de señal real, no animación decorativa; queda plana al detenerse o si el flujo no está disponible. No es decibelímetro ni diagnóstico. Los recursos del analizador se cierran sin detener las pistas que usa la captura. Con movimiento reducido se actualiza menos; en segundo plano no dibuja continuamente.
+
+Panel con nombre accesible, cierre por Escape cuando no hay operación, confinamiento de tabulación, devolución de foco, bloqueo de scroll del fondo y controles de al menos 44 px. La actividad no se anuncia continuamente por lector de pantalla; el estado y los errores sí. Se revisan escritorio, móvil de 390 px, tema oscuro/claro, captura vacía, grabación, recuperación y error. Una revisión visual automatizada no sustituye la aceptación del operador.
+
+### Código, ensayos y límites
+
+Nuevos puntos de mantenimiento: `lib/server/custodia-recuperacion.ts`, `lib/custodia/recuperacion.ts`, `RecoveryDrawer.tsx`, `AudioActivity.tsx`, `ingreso-studio.module.css`; integrado en IngresoWorkspace, IngresoView, IndexedDB y ruta de checkpoint existentes. No se crea otro almacén principal.
+
+Pruebas: `tests/unit/custodia_recuperacion.test.ts`, `e2e/ingreso-recovery-redesign.spec.ts`, `tests/integration/ingreso-recuperacion-postgres.ts`. El ensayo SQL usa PostgreSQL/PGlite aislado, mismo esquema, transacciones y consultas reales; no certifica bloqueos de conexiones simultáneas ni Neon/Blob productivos. Chromium usa medio generado y respuestas API sintéticas; no voz física, reconocimiento real ni aprobación de comodidad. Se conservan las pruebas de edición/encuesta y sus aserciones de contenido; se actualiza el doble al catálogo nuevo, no se retiran guardias.
+
+Resultados y huellas del corte revisado: `docs/frentes/dictado-voz/evidencias/INGRESO-RECUPERACION.json` desde la raíz del repositorio. Estado operativo único en `OBJETO-CANONICO.md` del mismo frente. La integración y la publicación se acreditan por separado en la solicitud; este texto no certifica una versión futura ni un recorrido humano no realizado.

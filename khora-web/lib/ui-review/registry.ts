@@ -21,7 +21,7 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
       "ingreso.btn-exportar-audio",
       "ingreso.btn-limpiar",
       "ingreso.textarea",
-      "ingreso.stats"
+      "ingreso.stats", "ingreso.custodia-status"
     ]
   },
   "ingreso:chrome_live_caption": {

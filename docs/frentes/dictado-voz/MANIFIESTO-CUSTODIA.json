@@ -30,9 +30,9 @@
   "files": [
     {
       "path": "OBJETO-CANONICO.md",
-      "bytes": 135479,
-      "sha256": "a93499bef3e1ba0b55b7bcc3d66e227cfd6e88cc27dd678c637ae1f337d3fa79",
-      "git_blob_sha": "aa4daa0ebcf0b4202bb9c3684320010e66ebd532"
+      "bytes": 137129,
+      "sha256": "513ed710f6278ae20edc0946746af7dced79a018f7f453198de02dd0fc3847bf",
+      "git_blob_sha": "885b35e0a668524e498675f106dc61902324c76e"
     },
     {
       "path": "CONTRATO-DICTADO-EXPERIENCE.md",
@@ -75,6 +75,18 @@
       "bytes": 6084,
       "sha256": "804722ed8c89db737208947b66961b52200ed3aab6c950bb121ca0df55829b16",
       "git_blob_sha": "d7f94846a36bff50a631cd082c8e52620213aeba"
+    },
+    {
+      "path": "evidencias/INGRESO-RECUPERACION.json",
+      "bytes": 7107,
+      "sha256": "a79f25f1550ed3525a61223e31bc22e5fbfc197b69422838517b013e81040030",
+      "git_blob_sha": "81ae4bf1280440f529fdc04dfab770105fc35a6b"
+    },
+    {
+      "path": "originales/INGRESO-RECUPERACION.md",
+      "bytes": 3972,
+      "sha256": "fcccada87418dc85f7c8e601a1dd15fd30e4fa210b6223051601f0b12b2fdebe",
+      "git_blob_sha": "f5d21226ed25066d506aae92e88b9496fca5f49f"
     }
   ],
   "runtime_references": [
@@ -185,5 +197,6 @@
     "receipt": "evidencias/INTEGRACION-ENDURECIMIENTO.json",
     "pullRequest": "https://github.com/SeryMente/khora/pull/305",
     "state": "software verified; merge authorization explicit; effective merge determined by Git"
-  }
+  },
+  "latestEvent": "C017 - Ingreso explicit recovery and coherent UI"
 }
