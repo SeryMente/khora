@@ -8,7 +8,7 @@ if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL es obligatorio para aplicar la migración de runtime.");
 }
 
-const migrationFiles = ["023_runtime_state.sql", "024_oauth_scopes.sql", "025_normative_receipts.sql", "026_normative_turns.sql", "027_manual_mcp_tokens.sql", "028_normative_order_ledger.sql", "029_github_credentials.sql"];
+const migrationFiles = ["023_runtime_state.sql", "024_oauth_scopes.sql", "025_normative_receipts.sql", "026_normative_turns.sql", "027_manual_mcp_tokens.sql", "028_normative_order_ledger.sql", "029_github_credentials.sql", "032_graph_twins.sql"];
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
