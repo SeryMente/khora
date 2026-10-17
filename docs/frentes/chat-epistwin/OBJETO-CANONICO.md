@@ -2,198 +2,219 @@
 
 ## 1. Control e identidad
 
-- Objeto vivo único de este frente: `docs/frentes/chat-epistwin/OBJETO-CANONICO.md`, SeryMente/khora.
-- Versión documental: 0.1; sello `KHORA-CHAT-EPISTWIN-v0.1`; ancla E07, encargo directo del operador de 2026-10-17, 13:12:33 America/Mexico_City.
-- Estado: alcance y cola documentados; implementación del chat NO iniciada; conformidad global NO certificada. Entrega documental en rama `docs/chat-epistwin-20261017`; no afirmar integración en main ni despliegue.
-- Persistencia: esta revisión requiere lectura remota de vuelta y comparación antes de anunciar guardado. El recibo Git identifica su revisión; no inventar el hash del commit que contiene este archivo.
-- Carpeta: este objeto y `MATRIZ-CANON-EPISTWIN.md`, materialización técnica sin estado paralelo. Originales pertinentes y crónica se conservan como anexos aquí; no se ha recuperado un archivo íntegro de todas las respuestas anteriores del asistente.
+- Objeto vivo único: `docs/frentes/chat-epistwin/OBJETO-CANONICO.md`, SeryMente/khora.
+- Versión documental: 0.2; sello `KHORA-CHAT-EPISTWIN-v0.2`; ancla E09, instrucción directa de 2026-10-17, 13:53:01 America/Mexico_City: endurecer el plan sin bloating, con fases e hitos frecuentes y significativos de extremo a extremo.
+- Estado: planificación por fases documentada; chat NO implementado; conformidad global NO certificada. Rama `docs/chat-epistwin-20261017`, PR https://github.com/SeryMente/khora/pull/307 abierto y no fusionado al comprobarlo este ciclo. No afirmar integración en main ni despliegue.
+- Revisión anterior comprobada: commit `bf5d5b0fe9ae9f47ff82ddfd5d4d09c6b823e9ad`, blob del objeto `99665cdfc97ffa42047ea6b1d2a8447a8983b28d`. La revisión nueva requiere lectura remota de vuelta; el recibo Git identifica su commit, no se inventa un hash autorreferente.
+- Carpeta: este objeto y `MATRIZ-CANON-EPISTWIN.md`, materialización técnica sin estado paralelo. Originales pertinentes y crónica en anexos de este objeto; no se recuperó archivo íntegro de todas las respuestas anteriores del asistente. No crear otro plan, tablero ni archivo de estado.
 
 ## 2. LEER PRIMERO
 
-Entrar en modo documentación/asistencia; no comenzar código por leer este archivo. Adquirir el metacanon vigente desde su fuente autorizada y este objeto, comprobar revisiones, calcular delta y aplicar reglas pertinentes subordinadas a las instrucciones de plataforma. Firma de lectura no prueba ejecución. Citas históricas no reactivan permisos. Ante fuente caída, declarar frescura NO VERIFICADA y detener solo la acción dependiente.
+Entrar en modo documentación/asistencia; no comenzar código por leer este archivo. Recuperar metacanon vigente y objeto actual, comprobar revisiones, calcular delta y aplicar reglas pertinentes subordinadas a plataforma. Firma de lectura no prueba aplicación. Citas históricas no reactivan permisos. Fuente caída: frescura NO VERIFICADA; detener solo acción dependiente.
 
-La autorización de E07 comprende registrar el hilo, actualizar la taxonomía de auditoría y ordenar el esfuerzo. No equivale a aprobación final de diseño visual, arquitectura de integración, tratamiento de datos por terceros, gasto, incorporación de dependencias, fusión o despliegue. Reutilizar componentes existentes antes de proponer otros. No construir un segundo almacén personal a espaldas del núcleo.
+E07 autoriza registrar el hilo, actualizar taxonomía y ordenar el esfuerzo. E09 autoriza endurecer esta planificación, no ampliar producto, cambiar permisos ni empezar implementación por asociación. Diseño visual/técnico final, datos enviados a terceros, gasto, dependencias, fusión y despliegue siguen sus compuertas pertinentes. No pedir ratificación repetida de decisiones ya aprobadas; agrupar dudas materiales en H2. Reutilizar antes de crear componentes. No segundo almacén personal por omisión.
 
-Separar: (1) EpisTwin, artículo técnico; (2) Khora, producto; (3) Open WebUI, plataforma reutilizada; (4) metodología, gobierno documental. El chat es una extensión de producto, no una unidad obligatoria del paper. «Cora/Khra» se normaliza como Khora; «Grok con Q» se interpreta como Groq; Open WebUI no es wandb/OpenUI. Mantener los originales sin corregirlos.
+La ejecución futura se rige por §8: fases con salidas verificables, entregas verticales tempranas y una sola cola. Un hito no es «fácil»: es un cambio significativo demostrado. No retrasar la primera demostración funcional hasta acabar toda la auditoría; cerrar primero los invariantes de su ruta y mantener explícitas las capacidades aún no acreditadas.
+
+Separar EpisTwin (paper), Khora (producto), Open WebUI (plataforma reutilizada) y metodología (gobierno). Chat no es requisito del paper. «Cora/Khra»→Khora; «Grok con Q»→Groq; Open WebUI no es wandb/OpenUI. Originales sin corregir.
 
 ## 3. Referencia metodológica
 
 Metacanon adquirido: **1.5 · METACANON-OBJETOS-v1.5**.
-Fuente recuperada: https://github.com/SeryMente/metodologia/blob/49ac40e9f6122e2d2fb339362cfa0a78128c8e37/METACANON-OBJETOS-CANONICOS.md ; blob `32c7a65ff2e83b3b76752ba2160427bd6e851a8f`. Lectura viva de 2026-10-17. El documento indica entrega metodológica en rama `docs/metacanon-objetos-20261011`; no se presume incorporación en main por ese texto. Antes del siguiente ciclo consultar fuente actual, no solo este enlace fijado.
+Fuente: https://github.com/SeryMente/metodologia/blob/49ac40e9f6122e2d2fb339362cfa0a78128c8e37/METACANON-OBJETOS-CANONICOS.md ; blob `32c7a65ff2e83b3b76752ba2160427bd6e851a8f`. Recuperado y revalidado este ciclo, 2026-10-17; sin cambio frente a adquisición previa. El texto indica entrega metodológica en rama `docs/metacanon-objetos-20261011`; no inferir incorporación en main. En próximo ciclo comprobar fuente viva, no solo enlace fijado.
 
-| Regla central | Aplicación en este objeto/prompts | Estado y límite |
+| Regla central | Aplicación | Estado/límite |
 | --- | --- | --- |
-| §1–5, fuente única, delta y evidencia | §1, §8–13 | Adoptada documentalmente; readback requerido. |
-| §14, dictados y lectura separada | §6 y Anexo A | Originales recibidos conservados; respuestas previas solo sintetizadas. |
-| §20, carpeta por frente | §1 y §13 | Carpeta estable; no se duplica el frente de dictado-voz. |
-| §21, dos roles salvo excepción metodológica | §5 y §12 | Dos responsabilidades; no se ha instanciado otro agente. |
-| §22–23, versión visible/herencia | §3, §10 y ambos prompts | Obligatoria en toda salida; no prueba obediencia de otros modelos. |
-| §24, remoto exclusivo/necesario | §5, §7 y ambos prompts | RDC no utilizado; no necesario para documentación. |
-| §25, prioridad a salida de constructor/pronóstico | §5, §9–10 y §12 | Aplicar cuando se reciba una salida real; no inventarla. |
-| §26–27, adquisición y molde común | §2 y trece bloques | Adoptado; normas incompatibles se elevan, no se omiten. |
+| §1–5, fuente única, delta/evidencia | §1, §8–13 | Adoptada documentalmente; readback obligatorio. |
+| §14, dictados separados de interpretación | §6 y Anexo A | Originales conservados; respuestas previas solo sintetizadas. |
+| §20, carpeta por frente | §1/13 | No se duplica dictado-voz ni se crea otro plan. |
+| §21, roles separados salvo excepción | §5/12 | Dos responsabilidades; ningún agente nuevo instanciado. |
+| §22–23, versión visible/herencia | §3/10 y ambos prompts | Obligatorio; no prueba obediencia de otros modelos. |
+| §24, remoto exclusivo/necesario | §5/7 y prompts | RDC no utilizado; no necesario. |
+| §25, recepción/pronóstico | §5/8–10/12 | Hito próximo separado de cierre; sin plazos ficticios. |
+| §26–27, adquisición/molde | §2 y trece bloques | Adoptado; conflictos se elevan, no se omiten. |
 
-Delta metodológico: primera adquisición de este frente, sin revisión previa propia. Delta de proyecto: E07 añade chat reutilizando Open WebUI, local+Groq y canonización; revisión de unidades v1.1→v1.2 en Notion. No modifica el método central ni el Sistema de Instrucciones.
+Delta metodológico: ninguno observado; v1.5 y blob sin cambio. Delta proyecto: v0.1→v0.2 por E09. Sustituye lista plana como organizador por siete fases y once hitos; conserva CE-01–13 como trazabilidad, elimina tareas latentes de la ruta crítica y no añade requisitos. No modifica el método central ni el Sistema de Instrucciones.
 
 ## 4. Propósito y alcance
 
-De dónde viene: el operador pidió conocer las piezas grandes de EpisTwin, compararlas con Khora, simplificar la explicación y enumerar faltantes; luego incorporó la interfaz de chat y reutilización legal de Open WebUI.
+Origen: conocer piezas grandes de EpisTwin, compararlas con Khora, explicar faltantes con sencillez e incorporar chat propio reutilizando Open WebUI legalmente.
 
-Objetivo seleccionado: especificar y posteriormente construir una experiencia conversacional que se sienta propia de Khora, aproveche Open WebUI sin ocultar indebidamente su autoría, permita modelos locales y proveedores por API como Groq y use el núcleo EpisTwin como memoria/razonamiento autorizado. Primero cerrar correspondencia documental y evidencia de integración; no confundir una interfaz funcional con un núcleo fiel.
+Objetivo seleccionado: especificar y después construir conversación con identidad Khora, aprovechando Open WebUI y respetando autoría/licencia, con modelos locales y API como Groq, usando el núcleo EpisTwin como autoridad de memoria/razonamiento. No equiparar interfaz funcional con núcleo fiel.
 
-Seis bloques del núcleo: memoria personal tipada; constructor incremental; comunidades Leiden/resúmenes; recuperación topológica y agente; suficiencia/refinamiento visual; soberanía y borrado. La implementación ya contiene piezas: los pendientes son verificación, integración y correcciones, no una afirmación de ausencia total de código.
+Seis bloques del núcleo: memoria personal tipada; constructor incremental; Leiden/resúmenes; recuperación topológica/agente; suficiencia/refinamiento visual; soberanía/borrado. Ya hay componentes: pendiente significa verificar, integrar o corregir, no ausencia total de código.
 
-Incluido: canonización, auditoría documental, matriz de 59 unidades sin renumeración, backlog dependiente, propuesta de integración mínima y aceptación verificable. Excluido de esta entrega: implementar chat, seleccionar checkpoint definitivo, instalar Open WebUI/Ollama, comprar servicios, exponer secretos, alterar custodia de dictados/EP, fusionar o desplegar. SEA/IAR/RES y audio/video no se añaden como requisitos de fidelidad estricta de EpisTwin.
+En el sprint de desarrollo: solo lo necesario para esas capacidades, sus contratos, licencia, integración, pruebas y aceptación. En esta entrega: endurecimiento documental del plan, sin implementación. No se autoriza aquí instalar, seleccionar checkpoints finales, pagar servicios, alterar captura/EP, fusionar o desplegar. SEA/IAR/RES y audio/video no se incorporan como fidelidad estricta ni condiciones de cierre del chat.
 
-Criterio terminal del producto futuro: dos rutas de inferencia verificadas (local y Groq/API); consulta personal trazable al núcleo; controles de suficiencia y visión demostrados; separación conversación/PKG; borrado verificable en todos los derivados pertinentes; cumplimiento de licencia/atribución de versión fijada; revisión del operador y evidencia end-to-end real. Un mock o build verde no cierra estos criterios.
+Criterio terminal del sprint futuro: chat Khora con atribución/licencia conforme; dos rutas reales local/Groq; consulta personal trazable al grafo; agente/suficiencia/visión y borrado demostrados en alcance; separación conversación/PKG; validación empírica con perfil declarado; entrega aceptada y despliegue autorizado verificado si corresponde al destino aprobado. Mock, build verde o documento guardado no bastan.
 
 ## 5. Roles y colaboración
 
-Operador: fija alcance, aprueba decisiones materiales y acepta resultados. Este hilo conserva el nombre Samantha dado por el operador y funciona en este ciclo como asistencia/documentación; el nombre no transforma automáticamente el rol ni autoriza código. El constructor es la responsabilidad de implementación, todavía sin conversación/identidad nueva asignada para este frente. No importar Claudia/Samantha de otro proyecto para alterar una asignación verificable.
+Operador: alcance, decisiones materiales y aceptación. Este hilo conserva Samantha como nombre y en estos ciclos actúa en asistencia/documentación; nombre no autoriza código. Constructor: responsabilidad técnica, sin conversación/identidad nueva asignada para este frente. No importar nombres de ejemplos para alterar asignación verificable.
 
-Asistencia: mantener este objeto, revisar resultados y fuentes, detectar riesgos reales y facilitar el cierre sin bloating. Construcción: ejecutar el trabajo técnico autorizado, entregar diffs/pruebas/checkpoints. Un escritor de código; consolidación documental secuencial con relectura. No iniciar otro agente automáticamente.
+Asistencia: continuidad, fuentes/evidencia, bloqueos y cierre sin bloating. Construcción: implementación autorizada, pruebas y checkpoints. Un escritor de código; consolidación documental secuencial con relectura. No crear agentes por defecto. Trabajo concurrente solo cuando sea independiente, autorizado y no colisione; una ruta activa de demostración.
 
-Si el operador entrega salida del constructor, atenderla antes de tareas auxiliares en el primer punto seguro; distinguir lo reportado de lo comprobado; explicar novedad, viabilidad, aceptación pendiente y pronóstico, y entregar siempre un prompt completo de continuación, sin reiniciar ni repetir pruebas válidas.
+Al recibir salida del constructor, atenderla primero en punto seguro; distinguir reporte de comprobación; explicar delta, viabilidad, aceptación, siguiente hito y pronóstico; entregar siempre prompt completo de continuidad, sin reinicio ni pruebas redundantes.
 
-RDC es exclusivo del asistente y solo si existe necesidad imprescindible que repositorio/adjuntos/sandbox no resuelven. Constructor: nunca usar RDC, ni descubrimiento, ni intermediarios. Esta regla no elimina permisos ni controles superiores.
+RDC exclusivo del asistente y únicamente por necesidad imprescindible no resoluble con repo/adjuntos/sandbox. Constructor nunca usa RDC, ni descubrimiento ni intermediarios; autonomía no elimina permisos superiores.
 
 ## 6. Autoridad
 
 | Decisión | Origen/estado | Criterio |
 | --- | --- | --- |
-| Chat con identidad Khora reutilizando Open WebUI | E05→E07, dirección aprobada | No maqueta pegada ni autoría engañosa; integración y UX finales pendientes. |
-| Local y proveedores API, Groq prioritario | E07, aprobado como requisito | Una ruta real por cada modalidad, sin prometer compatibilidad con todo modelo. |
-| Revisar canon/unidades antes de construir | E01/E07 | Artículo→UA→código→prueba→traza; separar extensiones. |
-| Documentación canónica en repo Khora bajo metacanon | E07, autorizado | Carpeta única, originales, cola, continuidad y readback. |
-| Adaptador hacia núcleo por extensiones admitidas | Propuesta técnica, NO arquitectura aprobada | Evaluar Pipes/OpenAI-compatible/MCP/OpenAPI y reutilizar API existente. |
-| No auto-ingesta del historial ni memoria paralela | Salvaguarda propuesta para revisión técnica | Mantener separación explícita; aprobar política antes de implementar. |
+| Chat Khora reutilizando Open WebUI | E05/E07, dirección aprobada | Integración real, no autoría engañosa; diseño final pendiente. |
+| Local y API/Groq | E07, requisito | Una ruta real por modalidad; no compatibilidad universal prometida. |
+| Revisar canon/unidades antes de construir | E01/E07 | Paper→UA→código→prueba→traza, extensiones separadas. |
+| Objeto en repo Khora bajo metacanon | E07, autorizado | Carpeta única, originales, continuidad/readback. |
+| Fases e hitos frecuentes significativos, sin crecimiento | E09, autorizado | §8; cada tarea justifica requisito o riesgo material. |
+| Adaptador vía extensión admitida | Propuesta técnica | Elegir menor acoplamiento compatible; no arquitectura aprobada por nombrarla. |
+| No auto-ingesta del historial/memoria paralela | Salvaguarda a concretar en contrato | Separación y política explícitas antes de implementar. |
 
-### Condiciones legales y de operación
+### Licencia y operación
 
-Fuente principal: LICENSE de Open WebUI, https://github.com/open-webui/open-webui/blob/main/LICENSE y https://raw.githubusercontent.com/open-webui/open-webui/main/LICENSE ; explicación https://docs.openwebui.com/license/ . Lo leído permite usar/modificar/redistribuir con avisos, condiciones y disclaimer; no implica permiso para sugerir aval de sus autores. La licencia actual contiene restricción de branding: retirar/ocultar/reemplazar marca requiere una excepción, entre ellas no superar 50 usuarios finales individuales directos en una ventana móvil de 30 días, permiso escrito o licencia empresarial. No interpretar «50» como concurrencia ni intentar eludir el conteo. Antes de construir fijar versión/commit y revisar LICENSE de esa versión y componentes; el enlace main es mutable. El uso gratuito no vuelve gratuito hardware, hosting o tokens; Groq tiene sus propias cuotas/términos.
+Fuentes: https://github.com/open-webui/open-webui/blob/main/LICENSE ; https://raw.githubusercontent.com/open-webui/open-webui/main/LICENSE ; https://docs.openwebui.com/license/ . Lo leído permite uso/modificación/redistribución conservando avisos, condiciones y disclaimer; no permite sugerir aval de autores. La licencia actual restringe retirar/ocultar/reemplazar branding salvo excepción: hasta 50 usuarios finales individuales directos en ventana móvil de 30 días, permiso escrito o licencia empresarial. No es concurrencia ni un conteo a eludir. Fijar versión/commit y revisar licencia de esa versión y componentes en H2. Software gratuito no implica hardware, hosting o tokens gratuitos; Groq tiene términos/cuotas propios.
 
-El operador acepta las limitaciones explicadas, pero NO declaró número de usuarios ni modelo de distribución. Registrar por ahora cumplimiento condicionado, no excepción comprobada. Puede diseñarse identidad Khora preservando marca exigida y reconocimiento claro «Basado en Open WebUI», avisos de copyright/licencia y lista de modificaciones; texto/ubicación final sujetos a revisión. No prometer white-label gratuito a cualquier escala ni llamar la licencia actual BSD/Apache pura u OSI sin matiz. Reconocimiento visible y obligaciones legales son controles diferentes; el primero no sustituye el segundo.
+El operador acepta las limitaciones pero no declaró audiencia/distribución; excepción no comprobada. Identidad Khora puede convivir con branding exigido y reconocimiento «Basado en Open WebUI», avisos/licencias y modificaciones; revisión visual/legal concreta pendiente. No prometer white-label gratuito a cualquier escala ni llamar a la licencia actual BSD/Apache pura u OSI sin matiz. Atribución visible y obligación legal son controles distintos.
 
-API keys: configuración por canales seguros, del lado servidor o almacén autorizado; nunca chat, Git, logs, navegador distribuido ni ejemplos con valores reales. No pedirlas aún. La ruta local debe probarse sin egress requerido por el flujo personal; la ruta API debe declarar datos enviados y condiciones/retención del proveedor. No prometer borrado de copias externas fuera de control propio.
+Keys por configuración segura del servidor/almacén autorizado; nunca chat, Git, logs, navegador distribuido o ejemplos reales. No pedirlas antes de necesitarlas. Ruta local: verificar ausencia de salida externa requerida en el flujo personal; ruta API: declarar datos enviados y condiciones/retención. No prometer borrado de copias externas fuera del control de Khora.
 
 ## 7. Perfil de entorno
 
-Entorno de esta revisión: herramientas de GitHub/Notion/web y sandbox, sin conexión al equipo del operador. Repositorio SeryMente/khora comprobado privado mediante consulta viva de 2026-10-17; permiso push disponible. No secretos/copias de datos personales crudos añadidos. Visibilidad privada no prueba igualdad de todos los colaboradores; revalidar audiencia ante datos sensibles o cambio a público.
+Herramientas GitHub/Notion/web y sandbox, sin conexión a equipo del operador. Repo SeryMente/khora revalidado privado este ciclo, con push disponible. No secretos ni datos personales crudos añadidos; privado no garantiza igualdad de todos los colaboradores. Revalidar audiencia ante datos sensibles/cambio público.
 
-Lecturas de código: commit `362f8ff51a518506927e486b9d61feee4f6313da`; creación de rama documental desde main en `2518f3acd18518f030c1247f7cc053f50be6581c`. Main cambió entre operaciones: lecturas de kernel son evidencia del primer SHA, NO del segundo ni del despliegue. Revalidar diff antes de implementar. AGENTS.md leído; preservar entrada única y arquitectura del EP, y leer `khora-web/docs/CUSTODIA-DICTADOS.md` si un cambio toca captura/audio/archivado.
+Lecturas técnicas previas en `362f8ff51a518506927e486b9d61feee4f6313da`; rama documental nacida de main `2518f3acd18518f030c1247f7cc053f50be6581c`. Main mostrado por PR este ciclo: `2af9c102dc9937b720b4d78c3e9d367c20001568`; no se leyó su código aquí. No extrapolar lecturas antiguas a main ni despliegue. AGENTS leído previamente; preservar entrada única/arquitectura EP y leer custodia de dictados si se toca ese circuito.
 
-Host físico, recursos GPU/RAM, runtime local, modelo local, sesión de operador, credenciales Groq y SHA productivo: NO verificados. Los perfiles Windows históricos de VCU no se convierten en entorno actual.
+Host físico, GPU/RAM, runtime/modelo local, sesión de operador, credenciales Groq y revisión productiva NO verificados. Rutas Windows históricas no son entorno actual.
 
-RDC: no utilizado; no necesario. Comando heredado solo para necesidad autorizada, en equipo actual verificado, nunca en sandbox del modelo:
+RDC: no utilizado; no necesario. Comando heredado únicamente para necesidad autorizada y equipo actual verificado, nunca sandbox:
 
 ```text
 npx @wonderwhy-er/desktop-commander@latest remote --no-persist-session
 ```
 
-Verificar Node/npx, documentación oficial vigente, cuenta, conectividad y vínculo del dispositivo antes de uso; no alternativas silenciosas ni exploración remota para descubrir identidad. Este bloque no ordena ejecutar nada.
+Verificar Node/npx, documentación oficial, cuenta, conectividad y vínculo antes de uso; no alternativas silenciosas ni exploración de identidad. Documentar comando no ordena ejecutarlo.
 
 ## 8. Estado vivo
 
-### Avance documentado
+### Base comprobada y situación actual
 
-- Guía central v1.5 y AGENTS recuperados. Se buscó frente existente: docs/frentes contiene dictado-voz; búsqueda OpenWebUI sin coincidencias. Esto no demuestra inexistencia absoluta de implementación no indexada u otras ramas.
-- Artículo arXiv:2603.06290v1 recuperado en HTML completo (§1–8, declaración ética y referencias). No se ha descargado/recalculado la huella del PDF combinado congelado. No declarar equivalencia binaria HTML/PDF.
-- Unidades de Notion actualizadas a v1.2 conservando 59 IDs: corregida dirección miembro→comunidad en UA-13/51, cuatro jueces como perfil literal en UA-36, suite completa/discrepancia AC1 en UA-37, condición visual/caso negativo en UA-44, frontera O/P y límites de razonamiento privado.
-- Revisión de documentos centrales del workspace realizada, no barrido exhaustivo de todo el workspace. Resultado en §11 y matriz técnica. No se reescribieron indiscriminadamente informes históricos.
-- Lectura actual de cuatro archivos de kernel demuestra presencia de componentes, NO funcionamiento real ni pruebas ejecutadas.
+- Guía central v1.5 y objeto v0.1 revalidados; PR307 abierto/no fusionado. Privacidad del repo comprobada nuevamente.
+- Entrega previa conservada: paper HTML completo leído, UA Notion v1.2, matriz 59 IDs, cuatro archivos de kernel inspeccionados. No hubo pruebas reales del núcleo ni chat implementado. PDF combinado no rehasheado; workspace revisado focalmente, no exhaustivo.
+- E09 cambia organización y disciplina del sprint, no producto ni evidencia funcional. Fase activa: F1, H1 en curso. Ningún hito funcional se declara cerrado por esta edición del plan.
 
-### Cola única del frente
+### Regla de alcance: ninguna tarea entra por conveniencia
 
-Estados: DOCUMENTADO significa requisito conservado, no implementación. PENDIENTE significa evidencia/acción no cerrada. Cada tarea de construcción espera alcance técnico aprobado; no convertir la cola en despacho automático.
+Una tarea debe enlazar E01/E07/E09 y un criterio terminal, o corregir un riesgo material demostrado que impida ese criterio. Si no puede, se excluye del sprint. No nuevas funciones, pantallas, telemetría, infraestructura, framework de agentes, motor de memoria o reescritura general por oportunidad. Adoptar la menor modificación suficiente; refactor solo indispensable para el comportamiento aceptado, con prueba de regresión. No implementar cada capacidad upstream porque exista: mantener acceso/reutilización compatibles con lo pedido y registrar conflictos, sin ampliar este sprint a un clon de toda la plataforma.
 
-| ID/prioridad | Trabajo y dependencia | Aceptación/evidencia | Estado |
+CE-13 (SEA/IAR/RES y estudios longitudinales) permanece LATENTE y fuera del cierre; no alimenta ruta crítica, estimación ni nuevas tareas. El corpus/pruebas del sprint se limita a demostrar lo comprometido; no crear un programa de investigación aparte. Correcciones documentales focales bastan: no convertir CE-02 en limpieza de todo el workspace ni revisión ilimitada de código. Verificar el PDF citado solo si su integridad afecta una decisión concreta; no bloquear sin causa una ruta ya sustentada por el artículo canónico.
+
+### Fases y salidas del sprint completo
+
+Fases delimitan capacidades, no semanas ni cantidad de commits. Cada hito produce un resultado demostrable conservable y su evidencia. La columna CE vincula pendientes anteriores; NO abre una segunda cola. Todos los hitos siguen PENDIENTES salvo avance documental expresamente indicado.
+
+| Fase | Hito y resultado que podrás reconocer | Entrada y salida verificable | CE existentes |
 | --- | --- | --- | --- |
-| CE-01/P0 | Alinear paper↔unidades; primero | Matriz 59 IDs, correcciones con anclas, perfiles separados | Revisión documental realizada; huella PDF y segunda revisión especializada pendientes. |
-| CE-02/P0 | Contrastar documentación y código vigente; depende CE-01 | Cada afirmación actual enlaza SHA/prueba/traza; divergencias con fecha | Revisión focal hecha; cobertura completa y actualización de resúmenes vigentes pendientes. |
-| CE-03/P0 | Verificar investigador/agente e historial; CE-01/02 | Consulta multi-step; observación previa cambia próxima acción; REFINE influye en retrieval | PENDIENTE; código existe, hallazgos §11. |
-| CE-04/P0 | Suficiencia global y cambio real de flujo; CE-03 | q/Ht presentes; sufficient, textual-insufficient y visual-insufficient distinguidos; sin bypass silencioso | PENDIENTE. |
-| CE-05/P0 | Visión cruda contextual y efímera; CE-04 | Selección topológica→imagen original→VQA→respuesta; sin escritura al PKG ni fuga entre consultas | PENDIENTE; revisar retención de historia. |
-| CE-06/P0 | Borrado integral/soberanía; CE-02 | Insertar→consultar→borrar→consultar; revisar comunidades, resúmenes, índices, cachés e historial pertinente | PENDIENTE. |
-| CE-07/P0 | Base legal y alcance Open WebUI; independiente de código | Versión fijada, LICENSE/avisos/dependencias, audiencia/branding, compatibilidad y mantenimiento registrados | Dirección aprobada; perfil concreto PENDIENTE. |
-| CE-08/P1 | Diseño de integración mínima; CE-02/07 | Diagrama y contrato revisados: chat→adaptador→núcleo→proveedores, sin doble memoria ni bypass | PROPUESTA por elaborar/aprobar. |
-| CE-09/P1 | Ruta local y ruta Groq/API; CE-08 | Modelos/capacidades por rol, streaming/errores/cancelación si elegidos, keys seguras; prueba real por ruta | DOCUMENTADO, no implementado. |
-| CE-10/P1 | Interfaz visual propia Khora; CE-07/08 | Operador revisa experiencia, reconocimiento y marca conforme licencia; conservar capacidades upstream priorizadas | DOCUMENTADO, sin diseño final. |
-| CE-11/P0 de cierre | End-to-end productivo; CE-03–06/09/10 | Dos rutas reales, citas/trazas operativas, fallos honestos, revisión humana y salud del grafo en persistencia real | PENDIENTE. |
-| CE-12/P1 empírico | PersonalQA y jueces; CE-02/04 | Corpus/manifiesto/config/modelos, resultados reales y suite; indicar reducido o réplica literal | PENDIENTE; secretos/jueces no provisionados aquí. |
-| CE-13/P2 separado | Utilidad autobiográfica/longitudinal y SEA/IAR/RES | Hipótesis/control/umbral/refutación propios, sin atribución al paper | LATENTE, no expansión automática del chat. |
+| F1 · Base y contrato mínimo | H1 · Sabemos exactamente qué falta, sin rehacer lo que existe. | Entrada: canon/UA v1.2 y código fresco. Salida: brechas finitas por ruta, requisito→UA→prueba, separar existente/no probado/faltante y congelar criterios del sprint. Revisión documental avanzada; cotejo de ruta vigente pendiente. | CE-01/02 |
+| F1 · Base y contrato mínimo | H2 · Sabemos cómo unirlo legal y técnicamente. | Tras H1, versión Open WebUI, audiencia/branding, adaptador mínimo reutilizable, almacenamiento/egress y modelos por rol definidos; decisiones materiales agrupadas y aprobadas. Contrato suficiente para primera ruta, no arquitectura exhaustiva. | CE-07/08 |
+| F2 · Núcleo textual útil | H3 · El núcleo responde una consulta personal con evidencia y reconoce cuándo no sabe. | Tras H1 y permiso técnico pertinente. Consulta textual real sobre datos controlados: retrieval topológico, generación con procedencia, uso causal de observaciones, refinamiento efectivo si necesario y suficiencia respecto a q; caso textual insuficiente sin visión arbitraria. No reconstruir kernel: probar y corregir solo brechas de esa ruta. | CE-03/04 |
+| F3 · Primera conversación integrada | H4 · Ya puedo conversar con mi grafo desde el chat. | H2+H3. Franja vertical Open WebUI→adaptador→núcleo→respuesta con fuentes usando la primera ruta disponible. No maqueta ni respuesta directa que eluda grafo; aislamiento de conversación y datos personales según contrato. UI upstream reutilizada provisionalmente; identidad final aún pendiente. | CE-08/09/11, corte inicial |
+| F4 · Dos rutas de inferencia | H5 · La misma conversación funciona con un modelo local. | H4; recurso/runtime local verificado para rol necesario. Prueba real de la ruta personal local sin salida externa requerida; límites de capacidad/latencia declarados. Si ya se demostró local en H4, reutilizar evidencia, no repetir trabajo. | CE-09 |
+| F4 · Dos rutas de inferencia | H6 · Puedo usar Groq sin cambiar la autoridad de la memoria. | H4; key por canal seguro y contrato de datos aprobado. Misma consulta/casos controlados por API, evidencia del núcleo conservada, errores de proveedor honestos y sin secretos. H5/H6 se ordenan según acceso real; ninguno sustituye al otro. | CE-09 |
+| F5 · Integridad del núcleo | H7 · Cuando hace falta, vuelve a mirar la imagen original sin convertir esa observación en memoria permanente. | H4 y ruta con visión disponible. Déficit visual→selección topológica→payload original→VQA→respuesta; caso textual negativo; no escritura al PKG ni contaminación entre consultas. No exige duplicar visión en proveedores sin esa capacidad. | CE-04/05 |
+| F5 · Integridad del núcleo | H8 · Lo que borro deja de influir en las respuestas. | H4 y almacenamiento real del entorno de prueba. Insertar→consultar→borrar→consultar; revisar derivados relevantes, comunidades/resúmenes/índices/cachés e historial pertinente. Reportar límites externos; no garantía sobre retención de terceros. | CE-06 |
+| F6 · Identidad Khora | H9 · El chat se siente de Khora y reconoce correctamente la tecnología reutilizada. | H4+H2. Adaptación visual mínima conforme identidad existente, revisión del operador, branding/atribución/licencias correctos, sin romper H4–H8. No rediseño general del producto ni nuevas pantallas ajenas al chat. | CE-10/07 |
+| F7 · Validación y entrega | H10 · El conjunto pasa la evaluación acordada con resultados reales. | H5–H9. Regresión end-to-end en dos rutas, salud de grafo en persistencia real y PersonalQA/jueces con corpus/manifiesto y perfil declarado. Casos suficientes para criterios; suite requerida según perfil reducido o réplica literal, sin llamar a dos jueces paridad con cuatro. Fallos bloqueantes corregidos y vueltas a probar, sin reiterar evidencia vigente innecesariamente. | CE-11/12 |
+| F7 · Validación y entrega | H11 · Entrega aceptada y recuperable, en el destino autorizado. | H10. Revisión del operador, documentación/avisos/configuración segura, evidencia enlazada y recuperación usando mecanismos existentes. Con permiso de fusión/despliegue: revisión exacta integrada y probada en destino, sin degradar controles. Si falta permiso/acceso, «lista para entrega; aceptación/despliegue pendiente», nunca sprint productivo cerrado. | CE-11, cierre |
 
-Siguiente acción asistencial: verificar recepción documental, consolidar divergencias en la siguiente revisión de código fresco y preparar decisiones CE-07/08. Siguiente acción de construcción: leer este objeto y matriz; adquirir fuentes/gobierno; no comenzar implementación hasta resolver compuerta técnica pertinente. No solicitar una recapitulación que ya está aquí.
+H3 y resolución legal/técnica H2 pueden avanzar en trabajo independiente sin colisiones; H4 espera ambas. H5/H6 se realizan en el orden de disponibilidad; H7/H8 pueden adelantarse tras H4 si desbloquea mejor evidencia. H9 puede revisarse desde H4 sin esperar estudios empíricos. Estas flexibilidades no eliminan salidas ni autorizaciones: reducen espera, no crean frentes paralelos. H10 integra todas las salidas; H11 es cierre, no un «99 %» permanente.
+
+### Frecuencia de hitos: máxima útil, no teatral
+
+- Trabajar hacia el próximo resultado observable más pequeño que cierre una capacidad, decisión material o riesgo real. No acumular varios resultados ya demostrables para una gran presentación final; mostrarlos cuando se verifican.
+- Objetivo de planificación: una demostración significativa por bloque de trabajo coherente. Al inicio del bloque fijar hito objetivo, evidencia y dependencia; al cierre informar alcanzado/no alcanzado y motivo. Un bloque no equivale a un número fijo de horas ni llamadas.
+- Si un hito requiere varios bloques sin resultado verificable, partirlo únicamente si aparece una salida intermedia autónoma y útil que conserve evidencia para el hito padre. No contarlo dos veces ni abrir nuevos requisitos. Si es técnicamente indivisible, conservarlo y explicar por qué.
+- No contar «creé archivos», «hay endpoint», «compiló», «hice commit», documento o mock como avance funcional. Un hito documental puede cerrar una decisión, pero se rotula documental. No degradar criterios ni ocultar defectos para favorecer motivación.
+- Entregar demostraciones pronto, con límites visibles. La motivación procede de capacidades reales acumuladas, no de porcentajes o hitos inflados. La frecuencia se ajusta al trabajo observado, sin calendario ficticio ni promesa de actividad en segundo plano.
+
+### Cierre de hito y continuidad
+
+Cada cierre registra en este §8: hito, resultado contra criterio, revisión/entorno, evidencia recuperable, límites y siguiente hito. Estado único: PENDIENTE / EN CURSO / BLOQUEADO / DEMOSTRADO / ACEPTADO cuando requiere decisión humana. «Implementado» no pasa a DEMOSTRADO sin prueba; «demostrado» no implica aceptación humana. No duplicar esos estados en otro tablero.
+
+Ante bloqueo: aislar dependencia, continuar solo trabajo independiente dentro del alcance y actualizar pronóstico; no ampliar sprint para evitar esperas. Reutilizar evidencia que corresponde al mismo código/contrato/entorno; repetir solo lo afectado por cambios o vencimiento real.
+
+Próxima acción de asistencia: cerrar H1 con cotejo focal de ruta vigente, entregar brechas finitas y preparar H2 sin más expansión documental. Próxima acción de construcción: adquirir objeto/gobierno y permiso técnico, ejecutar el menor trabajo para H3, no rehacer componentes probados. Intervención del operador: únicamente las decisiones materiales agrupadas de H2 y revisiones H9/H11; no hacerle aprobar cada tarea interna. Este ciclo solo reorganizó el plan.
 
 ## 9. Aceptación y viabilidad
 
-Viabilidad sustentada de reutilización: README oficial https://github.com/open-webui/open-webui/blob/main/README.md documenta Ollama, APIs compatibles con OpenAI, GroqCloud y extensiones Pipes/Filters/Actions/Tools/Skills, MCP/MCPO/OpenAPI. Esto apoya la posibilidad, NO demuestra integración con Khora ni compatibilidad de todos los roles/checkpoints. Seleccionar el menor punto de extensión que preserve actualizaciones y núcleo; un fork profundo no es decisión tomada.
+README oficial https://github.com/open-webui/open-webui/blob/main/README.md documenta Ollama, APIs compatibles con OpenAI/GroqCloud y extensiones Pipes/Filters/Actions/Tools/Skills/MCP/MCPO/OpenAPI. Sustenta posibilidad de reutilización, no prueba integración ni compatibilidad universal. Seleccionar menor acoplamiento mantenible; fork profundo no aprobado.
 
-Mínimo demostrable futuro: un usuario envía una consulta personal, el núcleo recupera evidencia de su grafo, el generador responde con procedencia, insuficiencia se declara o redirige correctamente y cambiar entre local/Groq no cambia autoridad de memoria. El usuario entiende qué viaja a proveedor externo. «Todas las capacidades» de Open WebUI se traduce en inventario de capacidad upstream: reutilizable, conflictiva con núcleo, requiere permisos o fuera del MVP; no prometer habilitarlas todas indiscriminadamente.
+Mínimo demostrable temprano H4: consulta personal→núcleo→evidencia→respuesta en chat. No sustituye objetivo terminal: siguen obligatorias ambas rutas, visión/borrado, identidad/legalidad, evaluación y entrega H5–H11. Así se demuestra valor temprano sin recortar silenciosamente lo pedido.
 
-| Requisito | Resultado a verificar | Estado/evidencia |
+| Requisito | Evidencia/resultado | Estado actual |
 | --- | --- | --- |
-| Canonizar este hilo | Objeto con originales, cola y continuidad legible en repo privado | Archivo de esta revisión; readback remoto obligatorio. |
-| UA fieles al canon | 59 entradas con anclas, cambios y fronteras | Notion v1.2 + matriz; no certificado global. |
-| Núcleo competente | CE-03–06 y salud productiva sin atajos | Inspección estática/historia; no prueba real ejecutada aquí. |
-| Chat legal, local+API y original Khora | CE-07–11 | Viable condicionado; integración no implementada. |
-| Validación empírica | CE-12 y perfil declarado | Histórico reporta bloqueo en Validate judges; no corrida nueva. |
+| Canonización y plan delimitado | Objeto, originales, fases/CE y continuidad | Documentación v0.2; lectura remota de vuelta obligatoria. |
+| Correspondencia UA/canon | Notion v1.2 y matriz 59 IDs | Revisión documental; veredicto global no emitido. |
+| Núcleo útil y íntegro | H3/H7/H8, salud persistente | Lectura estática/historia; ejecución real pendiente. |
+| Chat propio local+Groq legal | H2/H4/H5/H6/H9 | Viable condicionado; no implementado. |
+| Validación y entrega | H10/H11 | Pendiente; jueces/secretos/destino no provisionados aquí. |
 
-Pronóstico: primer hito verificable es custodia/readback de esta entrega y selección de decisiones CE-07/08. No hay muestra de duración comparable ni inventario completo de contratos/despliegue: tiempo y ciclos de implementación/cierre NO ESTIMABLES todavía. Dependencias: alcance visual, perfil de licencia/usuarios, ruta técnica, recursos/modelos y evidencia del núcleo. Estimar por ruta crítica después de CE-02/07/08; separar esperas humanas/API. No publicar porcentaje ni repetir rangos arbitrarios. Estimación anterior de este frente: ninguna.
+Pronóstico: siguiente hito es H1, no la terminación de todos los documentos posibles. Tiempo de H1 y número de ciclos todavía NO ESTIMABLES con rigor: falta inspección de ruta vigente/tests y no hay muestra comparable. Cierre completo igualmente NO ESTIMABLE hasta identificar brechas y resolver H2, recursos local/Groq y perfil empírico. Once hitos no equivalen a once conversaciones ni once días. Tras H1/H2 estimar próximo hito y ruta crítica completa con rangos/supuestos, separar esperas humanas y recalibrar por duración observada. Conservar estimación anterior: v0.1 no estimable; v0.2 mantiene incertidumbre y mejora descomposición, no inventa aceleración. No porcentajes sin denominador verificable.
 
 ## 10. Formato de ciclo
 
-Toda salida incluye, de forma breve pero explícita: 1 proyecto/rol/sello y «Metacanon adquirido: versión/sello, revisión, frescura»; 2 dónde estamos; 3 delta metodológico y de proyecto; 4 avance con evidencia y no tocado; 5 pendientes/bloqueos; 6 viabilidad y criterios; 7 siguiente hito y cierre, tiempo/ciclos con supuestos o NO ESTIMABLE; 8 siguiente acción y mínima intervención material; 9 continuación/prompt si hay salida del constructor; 10 persistencia, revisión y checkpoint. Una fuente inaccesible no significa sin cambios. Mantener lenguaje simple.
+Salida breve y consistente: 1 proyecto/rol/sello y «Metacanon adquirido: versión/sello, revisión/frescura»; 2 fase/hito actual y panorama; 3 delta metodológico/proyecto; 4 resultado/evidencia y qué no se tocó; 5 pendientes/bloqueos finitos; 6 viabilidad frente a criterios; 7 próximo hito y cierre con tiempo/ciclos justificados o NO ESTIMABLE; 8 siguiente acción y mínima intervención material; 9 continuidad/prompt ante salida de constructor; 10 persistencia/revisión/checkpoint. Hito demostrado se anuncia en lenguaje de capacidad, con límites, sin informe ritual innecesario. Fuente inaccesible no significa sin cambios.
 
 ## 11. Crónica y fuentes
 
-### Cronología del hilo
+### Crónica
 
-E01–E06: solicitudes previas, fechas/horas individuales no disponibles en la exportación recibida; conservar orden. Asistencia respondió agrupando seis bloques, explicando faltantes y licencia; esa síntesis no es una certificación ni archivo verbatim de sus respuestas. E07: encargo directo fechado en §1. E08: este ciclo documental: guía, repositorio privado, paper, fuentes, código focal y corrección v1.2. No confundir los eventos con una corrida productiva.
+E01–E05: solicitudes previas, fechas individuales no disponibles; orden conservado. E06 es referencia explicativa, no mensaje adicional. Asistencia sintetizó seis bloques, faltantes y licencia; no archivo literal completo de respuestas. E07: encargo original de canonización/chat fechado abajo. E08: primer ciclo documental, fuentes, lectura focal de kernel, UA v1.2 y commit bf5d5b0; PR307 abierto, no implementación. E09: instrucción directa actual abajo, autoriza plan sin crecimiento. Acción: objeto 0.2, siete fases/once hitos y reglas de cadencia/alcance; no nuevas capacidades ni pruebas productivas. Método v1.5 revalidado sin delta; objeto previo y PR revalidados. Hitos funcionales aún pendientes.
 
 ### Fuentes y contradicciones del workspace
 
-- Unidades: https://www.notion.so/55d5d4a3b25083a1a14381ca70281acd ; v1.1 histórica y revisión v1.2 de este ciclo. Fuente normativa operativa para este frente; la matriz materializa referencias sin crear otra taxonomía de IDs.
-- Auditoría viva v0.9.1: https://www.notion.so/77b5d4a3b2508330951981bd7da09219 ; consolidación 2026-10-16 sobre evidencia anterior, no nueva ejecución. Reporta 171 PASS/1 SKIP/3 XFAIL, Neo4j CI y grafo estructural condicionado; requiere salud productiva, corpus y evaluación real. Son datos reportados, no pruebas propias de hoy.
-- VCU: https://www.notion.so/5175d4a3b25083e1a2d501382a961376 ; combina episodios históricos. No trasladar a hoy ramas/rutas/estado de septiembre. Su presentación de RAKG/RUVA como piezas EpisTwin no gobierna este frente: el paper cita RAKG como trabajo relacionado, no lo adopta.
-- Reporte 19-julio: https://www.notion.so/9045d4a3b25082c3b95e017b98c44286 ; evidencia histórica sobre mocks/degradaciones. No usarlo para negar cierres posteriores ni llamar real al benchmark sintético. Mantener historia, corregir referencias actuales al usarla.
-- Paper canónico público: https://arxiv.org/html/2603.06290v1 ; secciones técnicas completas recuperadas. PDF combinado citado en Notion: SHA256 f29ec61cc661753f73a14b11c2f7fac8a9bd2b09031751d200e124dca5bbe1ea, 100 páginas; EpisTwin pp.1–10. Huella heredada, no recomputada.
-- README/LICENSE oficiales de Open WebUI en §6/9; fuentes mutables que requieren pin antes de implementación. Orientación legal documental, no dictamen jurídico exhaustivo.
+- Unidades: https://www.notion.so/55d5d4a3b25083a1a14381ca70281acd ; v1.1 histórica→v1.2. Matriz materializa correspondencia sin otra taxonomía de IDs.
+- Auditoría viva v0.9.1: https://www.notion.so/77b5d4a3b2508330951981bd7da09219 ; consolidación 2026-10-16 sobre evidencia anterior, no corrida nueva. Reporta 171 PASS/1 SKIP/3 XFAIL, Neo4j CI y conformidad estructural condicionada; exige salud/corpus/evaluación real. Reportado, no prueba propia de hoy.
+- VCU: https://www.notion.so/5175d4a3b25083e1a2d501382a961376 ; mezcla episodios históricos; no trasladar ramas/rutas/estado de septiembre. RAKG/RUVA como piezas EpisTwin no gobierna este frente: RAKG solo trabajo relacionado en el paper.
+- Reporte 19-julio: https://www.notion.so/9045d4a3b25082c3b95e017b98c44286 ; evidencia histórica de mocks/degradaciones. No negar cierres posteriores ni llamar real al benchmark sintético. Preservar historia, corregir usos actuales focales.
+- Paper: https://arxiv.org/html/2603.06290v1 , secciones completas recuperadas en E08. PDF combinado citado: SHA256 f29ec61cc661753f73a14b11c2f7fac8a9bd2b09031751d200e124dca5bbe1ea,100 páginas, EpisTwin pp1–10; huella heredada, no recomputada. v1.2 corrigió UA13/51 dirección, UA36 jueces, UA37 suite/discrepancia AC1, UA44 condición visual y frontera O/P. IDs conservados.
+- Open WebUI README/LICENSE en §6/9, mutables, fijar versión H2. Orientación documental, no dictamen jurídico exhaustivo.
 
 ### Código focal y riesgos que requieren prueba
 
-Lectura en `362f8ff51a518506927e486b9d61feee4f6313da`:
+Lecturas previas en `362f8ff51a518506927e486b9d61feee4f6313da`, no actualizadas por editar el plan:
 
-1. `kernel/src/khora_kernel/engine/core.py`: existen Sigma/Lambda, política, RETRIEVE/REFINE/ANSWER, historial y guardia de grafo. `_policy` serializa estado/detalle pero no observaciones completas; `_refine` guarda refined_query y RETRIEVE sigue recibiendo pregunta original. Son riesgos de UA-18/45/17: verificar causalidad, no declararlos cerrados por nombres. Existen vías legacy y modo mark que pueden alterar validación; delimitar producción vs pruebas.
-2. `kernel/src/khora_kernel/engine/fval.py`: ruta global y adaptador legacy claim-by-claim separados. `_global_fval` recibe answer y Ht, pero el prompt no incorpora explícitamente q; verificar suficiencia respecto a pregunta, no solo respaldo de una respuesta incompleta. No declarar que basta tener una función llamada fval.
-3. `kernel/src/khora_kernel/engine/orchestrator.py`: existe ask_with_fallback que consulta delta_fb y retoma mismo historial; no prueba acceso a imágenes crudas/efimeridad ni cobertura de ruta productiva.
-4. `kernel/src/khora_kernel/epistwin_audit.py`: panel mínimo dos y AC1 existen como perfil reducido; el mensaje «UA-36 requiere al menos dos» necesita alineación documental con v1.2 antes de usarlo como certificación literal. No se modificó código. Resolution sweep declara resolution_effective=False: no presentar el barrido como parámetro causalmente efectivo.
+1. `kernel/src/khora_kernel/engine/core.py`: existen Sigma/Lambda, política, retrieval/refine/answer e historial/guardia. `_policy` serializa estado/detalle, no observaciones completas; REFINE guarda refined_query pero RETRIEVE recibe pregunta original. Riesgos UA18/45/17 a probar; nombres no cierran causalidad. Delimitar vías legacy/modo mark de producción.
+2. `kernel/src/khora_kernel/engine/fval.py`: global y adaptador legacy claim-by-claim separados; prompt global no recibe explícitamente q. Probar suficiencia respecto a consulta, no solo respaldo de respuesta incompleta.
+3. `kernel/src/khora_kernel/engine/orchestrator.py`: ask_with_fallback usa delta_fb/retoma historial; no demuestra imagen cruda, efimeridad ni uso productivo.
+4. `kernel/src/khora_kernel/epistwin_audit.py`: mínimo dos jueces/AC1 es perfil reducido; mensaje UA36 requiere alineación con v1.2 antes de certificar literal. resolution_effective=False no prueba barrido efectivo.
 
-Hallazgos estáticos = hipótesis/riesgos con evidencia de código, no fallos de producción observados. Próxima revisión debe recuperar SHA vigente y pruebas exactas; no se ejecutó kernel/CI, no se revisó toda la base ni se diagnosticó producción en este ciclo.
+Son riesgos estáticos, no fallos productivos observados. No se ejecutó kernel/CI ni se auditó base completa; revalidar solo rutas pertinentes en H1, no lectura ilimitada.
 
 ## 12. Reinstanciación
 
 ### Prompt de asistencia
 
 ```text
-Retoma el frente Khora chat/EpisTwin desde docs/frentes/chat-epistwin/OBJETO-CANONICO.md en SeryMente/khora, rama docs/chat-epistwin-20261017 mientras no haya recibo verificable de integración. Tu función es asistencia documental; Samantha es el nombre conservado de este hilo, no una autorización de código. Recupera el objeto actual y METACANON-OBJETOS-CANONICOS.md de SeryMente/metodologia; compara con Metacanon adquirido 1.5/METACANON-OBJETOS-v1.5, commit metodológico 49ac40e9f6122e2d2fb339362cfa0a78128c8e37, y declara versión/revisión/frescura en toda salida. Aplica adquisición, precedencia, delta y permisos antes de actuar. Fuente caída bloquea solo lo dependiente. Lee matriz técnica y originales; no reinicies ni crees fuente paralela. Estado: documentación v0.1 y UA Notion v1.2; chat no implementado, núcleo no certificado. Verifica persistencia/PR y continúa CE-02/07/08 con código fresco; no supongas que las lecturas del SHA 362f8ff son main actual. Distingue evidencia histórica, estática, sintética y real. Si llega salida del constructor, atiéndela primero, explica delta/viabilidad/tiempo y entrega siempre prompt completo de continuación sin repetir pruebas válidas. No bloating, sin plazos inventados ni implementación/merge/deploy por leer la cola. RDC solo asistente, necesario y autorizado; no necesario para estas fuentes. Si fuera imprescindible, verificar equipo/cuenta/runtime y usar exclusivamente npx @wonderwhy-er/desktop-commander@latest remote --no-persist-session en equipo actual, no sandbox. Revalida privacidad/concurrencia antes de guardar, preserva originales y verifica readback/diff. Usa los diez campos del §10; declara no estimable si faltan dependencias. No pidas claves por chat.
+Retoma Khora chat/EpisTwin desde docs/frentes/chat-epistwin/OBJETO-CANONICO.md, SeryMente/khora, rama docs/chat-epistwin-20261017/PR307 hasta integración comprobada. Función asistencia documental, nombre conservado Samantha; no autorización automática de código. Recupera objeto actual y metacanon central de SeryMente/metodologia; partida adquirida 1.5/METACANON-OBJETOS-v1.5, revisión 49ac40e9f6122e2d2fb339362cfa0a78128c8e37, blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f. Muestra Metacanon adquirido, revisión/frescura en toda salida; calcula delta y aplica precedencia/permiso antes de acción. Fuente caída bloquea solo lo dependiente. Objeto v0.2/ancla E09; UA Notion v1.2. Chat no implementado, núcleo no certificado, F1/H1 en curso. Sigue fases/hitos §8, una cola y demostraciones frecuentes significativas; no contar documentos/commits/mocks como capacidad, no ampliar alcance ni duplicar planes. H1 es cotejo focal y brechas finitas; H2 agrupa decisiones; H3/H4 llevan pronto a consulta/chat real sin esperar auditoría ilimitada. CE13 fuera del sprint. Conserva criterios terminales H5–H11, sin sustituir alcance por demo temprana. Reutiliza evidencia válida y revalida SHA antes de extrapolar kernel histórico. Al recibir salida del constructor atiéndela primero, explica novedad/viabilidad/tiempo y entrega prompt completo sin reiniciar ni repetir pruebas válidas. No implementación/merge/deploy por leer la cola. RDC solo asistencia con estricta necesidad y autorización, no necesario aquí; si imprescindible verificar runtime/cuenta/equipo y usar exclusivamente npx @wonderwhy-er/desktop-commander@latest remote --no-persist-session en equipo actual, no sandbox. Sin secretos por chat. Revalida privacidad/concurrencia, guarda en mismo objeto, verifica readback/diff y prompts. Usa diez campos §10; distingue hito y cierre, sin plazo/ciclos inventados ni promesas de fondo.
 ```
 
 ### Prompt de construcción
 
 ```text
-Adquiere el gobierno de docs/frentes/chat-epistwin/OBJETO-CANONICO.md y MATRIZ-CANON-EPISTWIN.md, SeryMente/khora, rama docs/chat-epistwin-20261017 hasta integración verificada. Actúa como responsabilidad de construcción sin importar nombres de otros proyectos. Comprueba revisiones del objeto y metacanon central de SeryMente/metodologia, versión de partida adquirida 1.5/METACANON-OBJETOS-v1.5, commit 49ac40e9f6122e2d2fb339362cfa0a78128c8e37; muestra Metacanon adquirido, revisión y frescura en cada salida. Aplica precedencia, alcance y permiso, no una firma. No has recibido aprobación de diseño técnico final, seguridad, gasto, merge o despliegue: adquiere alcance concreto antes de implementar. Reutiliza código existente y conserva un escritor. Primero contrasta UA v1.2 y CE-02–06 con SHA vigente, pruebas y trazas; presencia de funciones no certifica el núcleo. Diferencia perfil reducido de jueces y réplica literal de cuatro. Propón integración mínima Open WebUI→Khora→local/Groq sin segundo PKG, auto-ingesta o bypass; revisar licencia/version/usuarios, egress y keys sin secretos. No implementar toda capacidad upstream indiscriminadamente ni prometer local sin hardware medido. Nunca uses RDC para ningún fin, tampoco vía intermediarios; el comando heredado npx @wonderwhy-er/desktop-commander@latest remote --no-persist-session es exclusivo de asistencia con necesidad y permiso, no orden de ejecución. Fuente caída: frescura NO VERIFICADA y solo detener acción dependiente. Entrega checkpoint con diff, SHA, pruebas reales/sintéticas separadas, pendientes finitos, viabilidad y estimación por ruta crítica o NO ESTIMABLE. Respeta AGENTS y custodia de dictados si el cambio los toca. Guarda evidencia autorizada en la carpeta, no otra fuente de estado; revalida concurrencia y privacidad, verifica readback. No inventes recepción de prompts ni éxito productivo.
+Adquiere OBJETO-CANONICO.md v0.2/ancla E09 y MATRIZ-CANON-EPISTWIN.md de docs/frentes/chat-epistwin, SeryMente/khora, rama docs/chat-epistwin-20261017 hasta integración verificada. Rol construcción, no importar identidades ajenas. Recupera fuente viva del objeto y metacanon central SeryMente/metodologia, partida 1.5/METACANON-OBJETOS-v1.5, revisión 49ac40e9f6122e2d2fb339362cfa0a78128c8e37; muestra Metacanon adquirido, revisión/frescura por ciclo. Aplica precedencia, delta y permiso antes de acción; fuente caída limita solo lo dependiente. Plan aprobado para organización, no permiso nuevo de diseño final, seguridad, gasto, merge ni despliegue. Un escritor y cero bloating: cada tarea enlaza requisito o riesgo material para criterio terminal. Sigue §8: F1/H1 cotejo focal y brechas finitas, H2 contrato legal/técnico mínimo; con permiso, H3 núcleo textual real y H4 primera conversación integrada pronto. No reconstruyas kernel ni hagas auditoría ilimitada antes de demo. H5 local y H6 Groq según disponibilidad, ambos obligatorios; H7 visión cruda/efímera, H8 borrado, H9 identidad Khora con atribución, H10 evaluación real y H11 aceptación/entrega autorizada. CE13 fuera del sprint. Hito es resultado verificable, no commit/build/mock; si requiere varios bloques partir solo con salida útil autónoma, sin duplicar conteo ni requisitos. Reutiliza evidencia vigente, distingue reducido de réplica literal de cuatro jueces, reporta datos que salen a API y nunca secretos. No segundo PKG ni auto-ingesta silenciosa. Respeta AGENTS/custodia si el cambio los toca. Nunca RDC, ni para descubrir ni mediante intermediarios; comando heredado npx @wonderwhy-er/desktop-commander@latest remote --no-persist-session solo asistencia con necesidad y permiso. Entrega checkpoint con hito/diff/SHA/entorno/evidencia, límites, siguiente hito y pronóstico por ruta crítica o NO ESTIMABLE. Persistencia en carpeta autorizada sin fuente paralela; revalida revisión/privacidad y verifica readback. No inventes recepción de prompts ni producción certificada.
 ```
 
 ## 13. Persistencia y revisión
 
-Antes de escribir, comprobar revisión del objeto/rama y permisos/visibilidad; fusionar deltas ajenos, no sobreescribir por memoria. Versionar por evento real y sincronizar ambos prompts. Toda actualización de backlog sucede solo en §8; matriz técnica tiene referencias/evidencia, no cola alternativa. Si se produce archivo importante, guardarlo en esta carpeta con procedencia e integridad, o referencia autorizada si licencia/tamaño/seguridad impiden copia. Secretos nunca en Git.
+Revalidar revisión del objeto/rama, privacidad y permisos antes de escribir. Fusionar deltas, no sobreescribir por memoria. Actualizar versión por evento real, originales/crónica y ambos prompts. Estados/fases solo §8; matriz técnica no es otra cola. Artefactos importantes en misma carpeta con procedencia/integridad, o referencia autorizada si licencia/tamaño/seguridad impide copia; secretos nunca Git.
 
-Revisión 1 contra insumos: E01–07 conservados abajo, normalización aparte, decisiones/propuestas separadas; seis bloques y faltantes anteriores mantenidos; no copiar equipos ni permisos del ejemplo metodológico. Revisión 2: releer remoto los dos archivos, cotejar estructura de 13 bloques, originales, matriz 59 IDs, prompts y frontera licencia/evidencia. No llamar «completo» al producto por haber guardado documentos. Si falta readback, declarar checkpoint pendiente. Una carrera o fuente inaccesible es bloqueo parcial, no permiso para inventar revisión.
+Revisión 1 de v0.2: E09→reglas de alcance/cadencia, fases extremo a extremo y aceptación. CE01–12 mapeados; CE13 preservado latente fuera de cierre. No capacidades añadidas. Se conserva propósito, fuente/correcciones, límites, originales y roles de v0.1; aclaración E06 sin inventar mensaje. Plan anterior permanece recuperable en Git. Revisión 2 obligatoria tras guardar: leer resultado remoto, cotejar 13 bloques, once hitos/siete fases, cobertura CE, dependencias, original E09 y prompts; corregir omisiones antes de declarar persistencia verificada. No es prueba empírica de producto.
 
-Casos negativos documentales: sin versión central no afirmar frescura; sin aprobación no implementar; sin grafo no contestar como conocimiento personal; insuficiencia textual no activa visión por defecto; visión efímera no se ingiere; branding sin excepción comprobada no se elimina; resultado mock no certifica producción; prompt entregado no es ejecutado. Estas comprobaciones son revisión documental, no pruebas empíricas de agentes.
+Casos negativos: fuente caída no es sin cambios; sin aprobación no implementar; sin grafo no conocimiento personal; textual insuficiente no fuerza visión; a_vis no ingesta; branding sin excepción no se elimina; mock no producción; prompt entregado no ejecutado; demo temprana no cierre total; frecuencia motivadora no licencia para falsear logros; trabajo ajeno a requisitos no entra al sprint.
 
 ## Anexo A. Especificaciones originales verbatim
 
-Procedencia: mensajes del operador en este hilo; E01–06 recuperados en el contexto previo, sin fecha individual disponible; E07 mensaje directo con timestamp en §1. Se conserva grafía, incluidas Cora/Khra/OpenUI/Grok; solo se elimina envoltorio de presentación del chat. Las respuestas completas del asistente no están archivadas como verbatim: síntesis en §4/11.
+Procedencia E01–E05: mensajes recuperados en contexto previo, sin fecha individual disponible. E07/E09: mensajes directos con timestamps indicados. Se conserva grafía; solo se elimina envoltorio de presentación del chat. Respuestas completas del asistente no están archivadas verbatim; síntesis §4/11. E06 es una referencia explicativa, no una instrucción adicional.
 
 ### E01
 
@@ -222,3 +243,7 @@ La aceptación de licencia y precisión OpenWebUI/local/API están contenidas en
 ### E07 · 2026-10-17 13:12:33 America/Mexico_City
 
 > Bueno, lo que vamos a necesitar es... Sí, la licencia sí me sirve. Entonces, mira, vamos a dotarle a Cora de la capacidad de tener una interfaz de chat que se vea como original de Cora, pero utilizaremos la tecnología de OpenWebUI para no tener que hacer tanto trabajo y para además tener la excelencia que esta herramienta ya desarrollada tiene bajo la licencia de Open Source sin pagarla, con estas limitaciones que me comentas y dándole la posibilidad al modelo de integrar tanto... a Cora de integrar tanto modelos para trabajar de manera local como mediante llaves API como la de Grok con Q. Nada más, esto nos va a permitir poder utilizar la tecnología subyacente, evidentemente, de Epistwin. Entonces, añade esto a la cola de trabajo de este hilo junto con los elementos que faltan. Revisa si la unidad de revisar los documentos que tengo en este espacio de trabajo para ver si coinciden con las unidades de auditoría de Epistwin. Asegúrate que las unidades de auditoría de Epistwin correspondan al canon y luego utiliza ese documento actualizado para poder ir construyendo todo lo que tiene que ver con este esfuerzo. Lo más importante, pero lo más importante, es que documentes en un objeto canónico en el repositorio de Cora todo lo que tiene que ver con este hilo utilizando la guía metacanónica para este tipo de objetos ubicada en el repositorio de metodología. Si tienes alguna duda, me preguntas.
+
+### E09 · 2026-10-17 13:53:01 America/Mexico_City
+
+> Endurece tu plan de trabajo sin bloating, sin hacerlo crecer con cosas que no tengan que ver con mis requerimientos. y asegúrate que tengas fases de desarrollo bien delimitadas para todo el sprint, de extremo a extremo, empezando y organizándola por hitos que sean fáciles de... no fáciles. Es decir, el desarrollo debe estar organizado por fases orientadas al alcance de hitos a lo largo de todo el sprint que tengan una frecuencia tal que tenga sentido y que además me permitan tener esos hitos tan frecuentemente como sea posible, siempre y cuando se siga teniendo sentido para favorecer la necesaria motivación.
