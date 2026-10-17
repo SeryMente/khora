@@ -1,0 +1,50 @@
+{
+  "cycle": "C022",
+  "method": {
+    "version": "1.5",
+    "commit": "49ac40e9f6122e2d2fb339362cfa0a78128c8e37",
+    "delta": false
+  },
+  "source": {
+    "session": "3fc5d4a3-b250-80b4-ac88-00a9abcea55e",
+    "event": 23,
+    "path": "originales/conversacion-custodia-blob-revalidada-20261017.txt",
+    "bytes": 32430,
+    "sha256": "ac9659e7d60a3dea82e8200aab8797e6878034a3f4a1466f6427b92f2e4cd0c9",
+    "historical_conversation_matches_C021": true,
+    "native_original_chat_export_available": false,
+    "pasted_text_attachment_available": false
+  },
+  "access": {
+    "github_2": "operational",
+    "github": "needs_reauth",
+    "vercel_project": "readable",
+    "vercel_store_mcp": "403 forbidden scope",
+    "vercel_store_cli": {
+      "account_verified": true,
+      "billing_state": "Inactive",
+      "objects": 636,
+      "formatted_size": "963.69MB",
+      "access": "Public"
+    },
+    "historical_NX329": "not accessible",
+    "notion_NX330_MOTOR1C_error_registry": "readable, deleted=true, not modified",
+    "audit_page": "readable"
+  },
+  "mutations": {
+    "audio_deleted": 0,
+    "bytes_freed": 0,
+    "production_changed": false,
+    "paid_changes": false
+  },
+  "blocked_on": [
+    "verified readable original media",
+    "current database manifests, references and recovery histories"
+  ],
+  "review1": {
+    "13_core_blocks": true,
+    "historical_annex_exact": true,
+    "live_state_equal_x3": true
+  },
+  "review2": "remote exact readback required after push"
+}
