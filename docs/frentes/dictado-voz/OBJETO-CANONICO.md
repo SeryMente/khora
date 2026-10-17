@@ -3,9 +3,9 @@
 ## 1. Control e identidad
 
 - Identidad conservada: `MCP-OBS-DICTADO`; extensión documental de dictado, benchmark, retroalimentación y propuesta de voz/síntomas.
-- Versión: **v0.5.3**; sello **MCP-OBS-DICTADO-v0.5.3**. Objeto permanente por encargo V010; no declara permanente ninguna propuesta clínica.
+- Versión: **v0.5.4**; sello **MCP-OBS-DICTADO-v0.5.4**. Objeto permanente por encargo V010; no declara permanente ninguna propuesta clínica.
 - Estado: **CANÓNICO PARA EL FRENTE · ABIERTO · AHORRO SUBORDINADO A PRIVACIDAD Y FIDELIDAD · BLOQUEADO POR CUOTA**.
-- Ancla: C020, instrucción de recuperar el 14,58 % candidato sin perder calidad y sin gasto; originales/instruccion-limpieza-derivados-20261017.md. Preflight a 2026-10-17T20:46:21.108Z en evidencias/LIMPIEZA-PREFLIGHT-20261017.json. Base 7e9be621ef97880e8aad29dd72f9272a6b4cb329; no se declara ahorro ni reparación completos.
+- Ancla: C021, recuperación de la conversación pegada el 2026-10-17 y continuación de C020; fuente íntegra en originales/conversacion-custodia-blob-recibida-20261017.txt. Suspensión revalidada en Vercel por CLI en este ciclo; el inventario detallado de C020 sigue siendo histórico. No se declara ahorro ni reparación completos.
 - Repositorio propietario: `SeryMente/khora`, privado comprobado con herramienta en este ciclo. `SeryMente/metodologia` también privado: aporta el método, no recibe datos del frente.
 - Carpeta contenedora: `docs/frentes/dictado-voz/`; elemento único de estado: `OBJETO-CANONICO.md`. Carpeta y elemento no se confunden.
 - Revisión de origen del objeto: `1697ee2693ed3217523ffc1d1be9b6541d7d849d`, blob `e98a956c375ce48b791b5f0563ad0ae03c2616dd`.
@@ -115,7 +115,7 @@ Comprobar Node/npx, fuente oficial y runtime antes; en Windows el npx.cmd oficia
 
 ### 🔄 Estado vivo
 
-Acción actual: C020 autoriza intentar recuperar el espacio de derivados sin pérdida de calidad ni gasto; preflight ejecutado, limpieza bloqueada por acceso e integridad/referencias no verificables. Cero objetos borrados. Seguimiento v0.5.3 en rama documental.
+Acción actual: C021 recupera y custodia literalmente la conversación recibida; continuidad desde C020 y orden final de resolver sin avances intermedios. Almacén khora-audio comprobado ahora como Suspended / Billing State Inactive, 636 objetos; no hay limpieza segura acreditada. Cero objetos borrados por este ciclo. Seguimiento v0.5.4 en rama documental.
 Siguiente paso de asistencia: recuperar una vía autorizada de lectura de medios y consulta de manifiestos/referencias de base de datos; no pedir nuevamente permiso genérico de limpieza ni sustituirlo por una suscripción. Auditar solo los derivados candidatos y su recuperación antes de retirar.
 Siguiente paso de construcción: alcance propuesto de limpieza de derivados, conservación íntegra de maestros e impedir regeneración automática innecesaria; no implementar ni desplegar cambios de contrato sin asignación y pruebas. No borrar solo por nombre de archivo.
 Pendientes en secuencia: 1) acceso real a medios y referencias; 2) verificar fuentes, manifiestos e historial y decidir lista segura de derivados; 3) preparar cambios reversibles de referencias/retención y prevención de regeneración; 4) ejecutar solo la lista validada dentro de autorización C020; 5) medir bytes antes/después y comprobar lectura/reproducción/exportación/recuperación. Mantener originales en Blob y sin recodificar; no gastos ni nueva custodia por inferencia.
@@ -123,8 +123,8 @@ Pendientes anteriores conservados: cotejo de integración/publicación del endur
 
 ### ⚗️ En prueba / recién fallido
 
-Preflight C020 a 2026-10-17T20:46:21.108Z: originales y derivados responden HTTP 403; 15 carpetas candidatas tienen metadatos de originales, no prueba de integridad. Las rutas de entorno previamente autorizadas no contienen una dirección PostgreSQL utilizable. Sin descargas, borrados ni consultas o escrituras de base de datos.
-Las regresiones históricas de C016/INTEGRACION-ENDURECIMIENTO.json no certifican este plan, calidad acústica, respaldo externo, migración ni ahorro; no se repiten por una edición documental.
+C021: Vercel CLI revalida Suspended, Billing State Inactive y 636 objetos. La conexión Khora responde full_access=true, pero no expone consulta SQL ni herramientas de audio; eso no acredita referencias ni lectura de medios. Listado de medios por CLI abortó por pareja OIDC/store incompleta; ningún cuerpo de audio se descargó.
+C020 conserva como evidencia histórica HTTP 403 y falta de dirección PostgreSQL utilizable; no se afirma haber repetido esas lecturas ni consultas SQL en C021. Regresiones anteriores no certifican la limpieza.
 
 ### 🔔 Recordatorios latentes
 
@@ -179,6 +179,8 @@ No llamar «sin cambios» a una fuente inaccesible; no convertir calidad cientí
 ## 11. Crónica y fuentes
 
 ### Fuentes y custodia
+
+- C021: [conversación de custodia y Blob recibida literalmente](originales/conversacion-custodia-blob-recibida-20261017.txt), mensaje completo del evento 23 del chat actual; HTML, errores y orden conservados. SHA-256 `a7c3393142fe6d558f776684a8cf1c53d666ddbc9530783dc72ffe49550b8fe1`. Es el texto pegado por el operador, no exportación nativa del chat anterior ni del adjunto pasted-text.txt.
 
 - [Instrucción de ahorro máximo](originales/instruccion-ahorro-maximo-20261017.md), verbatim; [evidencia saneada y límites](evidencias/AHORRO-AUDIO-20261017.json). No contienen audio, transcripciones ni credenciales.
 
@@ -355,6 +357,22 @@ Voz física, comodidad humana, SQL productivo y publicación de esta revisión: 
 
 **Gobierno:** Metacanon v1.5 / METACANON-OBJETOS-v1.5 releído sin delta, objeto v0.5.3. Historia y ambos prompts preservados/sincronizados. No fusión ni despliegue por existir esta documentación.
 
+### C021 · Custodia literal de conversación y reanudación · 2026-10-17
+
+**Autoridad:** instrucción actual de verificar conservación verbatim y responder a la última entrada. El mensaje completo, incluida la instrucción de transferencia y la conversación pegada, queda en originales/conversacion-custodia-blob-recibida-20261017.txt. La entrada terminal histórica se conserva sin corregir: «REsuelve de extremo a extremo y no te detengas par adecirme enque vas». Interpretación separada: continuar sin informes intermedios, preservando seguridad, originales y restricciones económicas; no simular cierre.
+
+**Cotejo previo:** el archivo conversaciones anterior, originales/conversacion-recibida.txt, corresponde al hilo de dictado del 14 de octubre y no contiene la última entrada. El manifiesto v0.5.3 custodia instrucciones seleccionadas C017–C020, pero no esta conversación completa. Se agrega el original recibido, no se sobrescriben originales ni el anexo histórico. Se conserva el texto obtenido del evento 23 sin transformar etiquetas HTML, fechas, erratas, espacios ni marcadores. La fidelidad certificada se limita al mensaje recibido, no al adjunto no disponible ni a toda la exportación nativa histórica.
+
+**Adquisición aplicada:** Metacanon 1.5, revisión 49ac40e9f6122e2d2fb339362cfa0a78128c8e37 y blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f; objeto aea0d8ff11d2ba90f5162e76c31135f2ccb87cbc en 6706b748a0dcbebc380b2a69ae107269a30bad94; repositorio Khora revalidado privado. §26 → autorización documental actual y D13 separados; §27 → trece bloques, originales/historia y estado en prompts; §7/§19 → hash local más lectura remota. Fuente personal cargada NX-330m, sin afirmar vigencia de los sellos históricos NX-329m. No se modifica el metacanon ni ninguna página eliminada de Notion.
+
+**Evidencia actual:** GitHub (2) operativo; #308 abierta, no fusionada, cabeza 6706b748a0dcbebc380b2a69ae107269a30bad94 antes de esta escritura. Las conexiones llamadas GitHub y Vercel exigen reautenticación y no se reintentan; vía CLI ya autenticada de Vercel disponible, sin solicitar pago ni cambiar credenciales. Almacén khora-audio: Suspended, Billing State Inactive, 636 objetos, Size 963.69MB según formato del proveedor. No se presenta esa cifra formateada como nuevo inventario exacto de bytes. Khora health: OK, full_access=true, metodología v0.14.14; corrige el bloqueo normativo histórico, pero las herramientas expuestas siguen sin SQL arbitrario ni audio/manifiestos de recuperación.
+
+**Límite material:** no hay evidencia actual de maestros legibles, integridad, revisión fuente y referencias suficientes para una lista segura; no se elimina a ciegas ni se usan credenciales cifradas como cadenas PostgreSQL. Las rutas examinadas del perfil autorizado no aportan dirección SQL utilizable. El stock candidato 147.360.372 bytes de C020 es histórico; no se recertifica como recuperable, ni como ahorro ejecutado, ni como garantía de levantar suspensión. No se recodificó, movió, borró ni descargó audio. No se cambió plan, acceso, claves, despliegue o datos de producción.
+
+**Incidente y prevención antes de cirugía:** listado CLI de medios rechazado con síntoma exacto «Error: VERCEL_OIDC_TOKEN and BLOB_STORE_ID must both be set, or both be unset. Set both to use OIDC, unset both to use the read-write token, or pass --rw-token / --oidc-token + --store-id explicitly.» Causa confirmada: la configuración local enlazada ofrece OIDC sin store id complementario. Impacto: solo lectura abortada antes de obtener URLs; sin audio ni mutación. Corrección pendiente: proporcionar store id junto a un OIDC vigente del proyecto, sin revelar ni cambiar credenciales; preflight automático debe comprobar ambas variables conjuntamente. No repetir el mismo listado sin esa pareja validada; no se declara resuelto.
+
+**Checkpoint exacto:** conservar autorización D13 y maestros; restablecer lectura autenticada de originales y consulta de dictado_mp3/historial/revisiones; construir lista por identidad/hash, referencias y posibilidad de restauración; preparar reversión y evitar regeneración; solo entonces retirar derivados autorizados y cotejar bytes, lectura, reproducción y recuperación. La existencia de CLI autenticada no levanta la suspensión. No se pide de nuevo permiso genérico de limpieza. Cierre operativo BLOQUEADO, cierre documental sujeto a lectura de vuelta.
+
 ## 12. Reinstanciación
 
 Estos prompts son material de continuidad, no prueban que otra conversación haya sido creada o los haya recibido. Al actualizar §8 deben sincronizarse literalmente. La asignación de un escritor de código debe constar antes de usar el prompt de construcción.
@@ -368,13 +386,14 @@ Fuente documental preparada: v0.5.3 · MCP-OBS-DICTADO-v0.5.3 en rama docs/dicta
 Hereda §2–§3 y §6–§7 del objeto: autorización por acción, originales no activan permisos; remoto solo de asistencia si es estrictamente necesario, con cuenta/vínculo/equipo/autorización comprobados y comando/prerrequisitos literales de §7. No ejecutar ese comando por rutina ni en el sandbox. Usa repo/adjunto cuando basten.
 No modificar metacanon, Sistema de Instrucciones, credenciales, facturación, seguridad o publicación. No inferir ánimo/salud/capacidad laboral de la voz; no crear código de salud ni afirmar beneficio clínico. Conserva las fuentes de encuesta voluntaria y muestreada.
 🔄 Estado vivo:
-Acción actual: C020 autoriza intentar recuperar el espacio de derivados sin pérdida de calidad ni gasto; preflight ejecutado, limpieza bloqueada por acceso e integridad/referencias no verificables. Cero objetos borrados. Seguimiento v0.5.3 en rama documental.
+Acción actual: C021 recupera y custodia literalmente la conversación recibida; continuidad desde C020 y orden final de resolver sin avances intermedios. Almacén khora-audio comprobado ahora como Suspended / Billing State Inactive, 636 objetos; no hay limpieza segura acreditada. Cero objetos borrados por este ciclo. Seguimiento v0.5.4 en rama documental.
 Siguiente paso de asistencia: recuperar una vía autorizada de lectura de medios y consulta de manifiestos/referencias de base de datos; no pedir nuevamente permiso genérico de limpieza ni sustituirlo por una suscripción. Auditar solo los derivados candidatos y su recuperación antes de retirar.
 Siguiente paso de construcción: alcance propuesto de limpieza de derivados, conservación íntegra de maestros e impedir regeneración automática innecesaria; no implementar ni desplegar cambios de contrato sin asignación y pruebas. No borrar solo por nombre de archivo.
 Pendientes en secuencia: 1) acceso real a medios y referencias; 2) verificar fuentes, manifiestos e historial y decidir lista segura de derivados; 3) preparar cambios reversibles de referencias/retención y prevención de regeneración; 4) ejecutar solo la lista validada dentro de autorización C020; 5) medir bytes antes/después y comprobar lectura/reproducción/exportación/recuperación. Mantener originales en Blob y sin recodificar; no gastos ni nueva custodia por inferencia.
 Pendientes anteriores conservados: cotejo de integración/publicación del endurecimiento C016; sesión humana consentida y opinión correlacionada; conservación/estabilidad/fidelidad del circuito; definir primer síntoma autodeclarado antes de cualquier desarrollo sensible. No se cancelan por almacenamiento.
 ⚗️ En prueba / recién fallido:
-Preflight C020 a 2026-10-17T20:46:21.108Z: originales y derivados responden HTTP 403; 15 carpetas candidatas tienen metadatos de originales, no prueba de integridad. Las rutas de entorno previamente autorizadas no contienen una dirección PostgreSQL utilizable. Sin descargas, borrados ni consultas o escrituras de base de datos.
+C021: Vercel CLI revalida Suspended, Billing State Inactive y 636 objetos. La conexión Khora responde full_access=true, pero no expone consulta SQL ni herramientas de audio; eso no acredita referencias ni lectura de medios. Listado de medios por CLI abortó por pareja OIDC/store incompleta; ningún cuerpo de audio se descargó.
+C020 conserva como evidencia histórica HTTP 403 y falta de dirección PostgreSQL utilizable; no se afirma haber repetido esas lecturas ni consultas SQL en C021. Regresiones anteriores no certifican la limpieza.
 Las regresiones históricas de C016/INTEGRACION-ENDURECIMIENTO.json no certifican este plan, calidad acústica, respaldo externo, migración ni ahorro; no se repiten por una edición documental.
 Conserva íntegros los recordatorios latentes del objeto. Reutiliza evidencia válida, no repitas pruebas sin cambio causal. Recibir una salida del constructor tiene prioridad; asistencia la contrasta y devuelve síntesis y prompt de continuidad. No afirmar recepción ni trabajo en segundo plano.
 Cada salida usa los diez campos de §10 e incluye Metacanon adquirido: versión/sello, revisión y frescura; evidencia actual/histórica/controlada diferenciada, pendientes, viabilidad, estimación con supuestos y siguiente acción. No declarar un plazo sin base.
@@ -390,13 +409,14 @@ Fuente documental preparada: v0.5.3 · MCP-OBS-DICTADO-v0.5.3 en rama docs/dicta
 Hereda §2–§3 y §6–§7 del objeto: autorización por acción, originales no activan permisos; remoto solo de asistencia si es estrictamente necesario, con cuenta/vínculo/equipo/autorización comprobados y comando/prerrequisitos literales de §7. No ejecutar ese comando por rutina ni en el sandbox. Usa repo/adjunto cuando basten.
 No modificar metacanon, Sistema de Instrucciones, credenciales, facturación, seguridad o publicación. No inferir ánimo/salud/capacidad laboral de la voz; no crear código de salud ni afirmar beneficio clínico. Conserva las fuentes de encuesta voluntaria y muestreada.
 🔄 Estado vivo:
-Acción actual: C020 autoriza intentar recuperar el espacio de derivados sin pérdida de calidad ni gasto; preflight ejecutado, limpieza bloqueada por acceso e integridad/referencias no verificables. Cero objetos borrados. Seguimiento v0.5.3 en rama documental.
+Acción actual: C021 recupera y custodia literalmente la conversación recibida; continuidad desde C020 y orden final de resolver sin avances intermedios. Almacén khora-audio comprobado ahora como Suspended / Billing State Inactive, 636 objetos; no hay limpieza segura acreditada. Cero objetos borrados por este ciclo. Seguimiento v0.5.4 en rama documental.
 Siguiente paso de asistencia: recuperar una vía autorizada de lectura de medios y consulta de manifiestos/referencias de base de datos; no pedir nuevamente permiso genérico de limpieza ni sustituirlo por una suscripción. Auditar solo los derivados candidatos y su recuperación antes de retirar.
 Siguiente paso de construcción: alcance propuesto de limpieza de derivados, conservación íntegra de maestros e impedir regeneración automática innecesaria; no implementar ni desplegar cambios de contrato sin asignación y pruebas. No borrar solo por nombre de archivo.
 Pendientes en secuencia: 1) acceso real a medios y referencias; 2) verificar fuentes, manifiestos e historial y decidir lista segura de derivados; 3) preparar cambios reversibles de referencias/retención y prevención de regeneración; 4) ejecutar solo la lista validada dentro de autorización C020; 5) medir bytes antes/después y comprobar lectura/reproducción/exportación/recuperación. Mantener originales en Blob y sin recodificar; no gastos ni nueva custodia por inferencia.
 Pendientes anteriores conservados: cotejo de integración/publicación del endurecimiento C016; sesión humana consentida y opinión correlacionada; conservación/estabilidad/fidelidad del circuito; definir primer síntoma autodeclarado antes de cualquier desarrollo sensible. No se cancelan por almacenamiento.
 ⚗️ En prueba / recién fallido:
-Preflight C020 a 2026-10-17T20:46:21.108Z: originales y derivados responden HTTP 403; 15 carpetas candidatas tienen metadatos de originales, no prueba de integridad. Las rutas de entorno previamente autorizadas no contienen una dirección PostgreSQL utilizable. Sin descargas, borrados ni consultas o escrituras de base de datos.
+C021: Vercel CLI revalida Suspended, Billing State Inactive y 636 objetos. La conexión Khora responde full_access=true, pero no expone consulta SQL ni herramientas de audio; eso no acredita referencias ni lectura de medios. Listado de medios por CLI abortó por pareja OIDC/store incompleta; ningún cuerpo de audio se descargó.
+C020 conserva como evidencia histórica HTTP 403 y falta de dirección PostgreSQL utilizable; no se afirma haber repetido esas lecturas ni consultas SQL en C021. Regresiones anteriores no certifican la limpieza.
 Las regresiones históricas de C016/INTEGRACION-ENDURECIMIENTO.json no certifican este plan, calidad acústica, respaldo externo, migración ni ahorro; no se repiten por una edición documental.
 Conserva íntegros los recordatorios latentes del objeto. Reutiliza evidencia válida, no repitas pruebas sin cambio causal. Recibir una salida del constructor tiene prioridad; asistencia la contrasta y devuelve síntesis y prompt de continuidad. No afirmar recepción ni trabajo en segundo plano.
 Cada salida usa los diez campos de §10 e incluye Metacanon adquirido: versión/sello, revisión y frescura; evidencia actual/histórica/controlada diferenciada, pendientes, viabilidad, estimación con supuestos y siguiente acción. No declarar un plazo sin base.
@@ -404,6 +424,8 @@ Persistencia: releer versión, fusionar sin pisar, escritura condicionada, guard
 ````
 
 ## 13. Persistencia y revisión
+
+- C021: v0.5.4; conversación recibida conservada byte a byte, SHA-256 y Git blob en manifiesto. Anexo histórico intacto; estado vivo idéntico en núcleo y dos prompts. No confundir guardado en #308 con fusión o limpieza ejecutada.
 
 - C020: v0.5.3 sobre 7e9be621ef97880e8aad29dd72f9272a6b4cb329; permiso de limpieza y bloqueo técnico separados. Revisar fuente/autoridad, núcleo/prompts y anexo; después lectura remota y hashes. No borrar originales ni tratar una carpeta con metadatos como respaldo restaurable.
 

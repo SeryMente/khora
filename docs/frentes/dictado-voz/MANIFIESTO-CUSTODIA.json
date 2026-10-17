@@ -29,12 +29,6 @@
   },
   "files": [
     {
-      "path": "OBJETO-CANONICO.md",
-      "bytes": 168020,
-      "sha256": "7fc7d23c329facd662e30f97c8c4c75a448ce544150b20fc2974a1dac3f05f4f",
-      "git_blob_sha": "aea0d8ff11d2ba90f5162e76c31135f2ccb87cbc"
-    },
-    {
       "path": "CONTRATO-DICTADO-EXPERIENCE.md",
       "bytes": 18779,
       "sha256": "e78845598c5511ada87edc436b23d530c97cec2d0804fe77b5167a8c8c7ec1ea",
@@ -117,6 +111,24 @@
       "bytes": 1148,
       "sha256": "210d850986fa14ef45fc9f24b941448490c54f23c67cded6ab928db528d48c96",
       "git_blob_sha": "31dd8b618e0ec7e53a60a8b6464a7a3d3e669526"
+    },
+    {
+      "path": "originales/conversacion-custodia-blob-recibida-20261017.txt",
+      "bytes": 32330,
+      "sha256": "a7c3393142fe6d558f776684a8cf1c53d666ddbc9530783dc72ffe49550b8fe1",
+      "git_blob_sha": "82cf159f5c0de78f36940e6afb7ddf5a34dd07c0"
+    },
+    {
+      "path": "OBJETO-CANONICO.md",
+      "bytes": 173840,
+      "sha256": "b7fbce0179f2142c4ff1288db9d0d6996f11c425e2708611c61a0dab8310f984",
+      "git_blob_sha": "146f1841af7cef9d63b69d0e8622ecc7f641bf0d"
+    },
+    {
+      "path": "evidencias/CONTINUIDAD-VERBATIM-20261017.json",
+      "bytes": 1168,
+      "sha256": "a4efa5e7aac1c020f65369823e1ac88ab7a97360f1605d84309c85e76df08b62",
+      "git_blob_sha": "a47c54fe1d41d6605a4c3ae2e8bc49c490e713bf"
     }
   ],
   "runtime_references": [
@@ -222,12 +234,12 @@
     "no_secret_values_in_manifest": true
   },
   "current_preparation": {
-    "version": "0.5.3",
-    "baseSha": "7e9be621ef97880e8aad29dd72f9272a6b4cb329",
+    "version": "0.5.4",
+    "baseSha": "6706b748a0dcbebc380b2a69ae107269a30bad94",
     "branch": "docs/dictado-audio-ahorro-maximo-20261017",
-    "authority": "originales/instruccion-limpieza-derivados-20261017.md",
-    "receipt": "evidencias/LIMPIEZA-PREFLIGHT-20261017.json",
-    "state": "cleanup authorized; preflight blocked by readable sources and current references; zero deletions",
+    "authority": "originales/conversacion-custodia-blob-recibida-20261017.txt",
+    "receipt": "evidencias/CONTINUIDAD-VERBATIM-20261017.json",
+    "state": "received conversation preserved literally; cleanup still blocked, no audio mutations",
     "review1": "13 blocks; historical annex exact; live state x3",
     "review2": "remote readback required after push"
   },
@@ -264,6 +276,16 @@
       "receipt": "evidencias/FIDELIDAD-BLOB-20261017.json",
       "state": "fidelity fixed; live read audit confirms suspended; no audio mutation; capacity decision required",
       "review1": "13 blocks; historical annex exact; live state x3; totals cross-foot",
+      "review2": "remote readback required after push"
+    },
+    {
+      "version": "0.5.3",
+      "baseSha": "7e9be621ef97880e8aad29dd72f9272a6b4cb329",
+      "branch": "docs/dictado-audio-ahorro-maximo-20261017",
+      "authority": "originales/instruccion-limpieza-derivados-20261017.md",
+      "receipt": "evidencias/LIMPIEZA-PREFLIGHT-20261017.json",
+      "state": "cleanup authorized; preflight blocked by readable sources and current references; zero deletions",
+      "review1": "13 blocks; historical annex exact; live state x3",
       "review2": "remote readback required after push"
     }
   ]

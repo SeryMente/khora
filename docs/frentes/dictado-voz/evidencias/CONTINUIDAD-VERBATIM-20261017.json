@@ -1,0 +1,39 @@
+{
+  "cycle": "C021",
+  "scope": "custody of received text and current safe continuation",
+  "source": {
+    "session": "3fc5d4a3-b250-809c-bfcd-00a9e18bffbc",
+    "event": 23,
+    "path": "originales/conversacion-custodia-blob-recibida-20261017.txt",
+    "bytes": 32330,
+    "sha256": "a7c3393142fe6d558f776684a8cf1c53d666ddbc9530783dc72ffe49550b8fe1",
+    "native_prior_chat_export": false
+  },
+  "storage_current": {
+    "name": "khora-audio",
+    "status": "Suspended",
+    "billing_state": "Inactive",
+    "count": 636,
+    "formatted_size": "963.69MB",
+    "exact_byte_inventory_refreshed": false
+  },
+  "khora_health": {
+    "ok": true,
+    "full_access": true,
+    "audio_or_sql_tools_exposed": false
+  },
+  "mutations": {
+    "deleted_objects": 0,
+    "audio_downloaded": false,
+    "audio_recoded": false,
+    "plan_changed": false,
+    "database_mutated": false
+  },
+  "outcome": "documentary custody prepared; audio cleanup blocked by media and references verification",
+  "review1": {
+    "core_blocks": 13,
+    "historical_annex_exact": true,
+    "live_state_copies_equal": true
+  },
+  "review2": "requires remote readback matching SHA256 and git blob"
+}
