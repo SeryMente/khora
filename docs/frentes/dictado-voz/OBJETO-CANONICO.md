@@ -3,9 +3,9 @@
 ## 1. Control e identidad
 
 - Identidad conservada: `MCP-OBS-DICTADO`; extensión documental de dictado, benchmark, retroalimentación y propuesta de voz/síntomas.
-- Versión: **v0.4.0**; sello **MCP-OBS-DICTADO-v0.4.0**. Objeto permanente por encargo V010; no declara permanente ninguna propuesta clínica.
-- Estado: **CANÓNICO PARA EL FRENTE · ABIERTO · CIERRE CON VOZ REAL PENDIENTE**.
-- Ancla: instrucción de retorno y fusión de 2026-10-17 conservada en C016; integración técnica sobre main f04e815b47fa8a7b5297561df62000478f978108. Tiempos UTC y hashes de las nuevas pruebas en el recibo; no se renueva evidencia pública anterior por inferencia.
+- Versión: **v0.5.0**; sello **MCP-OBS-DICTADO-v0.5.0**. Objeto permanente por encargo V010; no declara permanente ninguna propuesta clínica.
+- Estado: **CANÓNICO PARA EL FRENTE · ABIERTO · PLAN DE AHORRO MÁXIMO DOCUMENTADO · EJECUCIÓN BLOQUEADA POR DECISIONES Y ACCESO**.
+- Ancla: instrucción del operador de ahorro máximo conservada en C017 y originales/instruccion-ahorro-maximo-20261017.md; plan preparado sobre df214e1768bb960e1dd554b6e1d9cbe3ca9c38d8. Último diagnóstico de audio y sus fechas en evidencias/AHORRO-AUDIO-20261017.json. No es ejecución ni certificación de producción.
 - Repositorio propietario: `SeryMente/khora`, privado comprobado con herramienta en este ciclo. `SeryMente/metodologia` también privado: aporta el método, no recibe datos del frente.
 - Carpeta contenedora: `docs/frentes/dictado-voz/`; elemento único de estado: `OBJETO-CANONICO.md`. Carpeta y elemento no se confunden.
 - Revisión de origen del objeto: `1697ee2693ed3217523ffc1d1be9b6541d7d849d`, blob `e98a956c375ce48b791b5f0563ad0ae03c2616dd`.
@@ -46,6 +46,8 @@ Delta adquirido: carpeta canónica, trece bloques ordenados, originales separado
 | §25, recepción del constructor | §5/§10/§12 | no se recibió otra salida de constructor en este ciclo | regla heredada; ejecución no observada |
 | regla superior de no-simulación y límites sensibles | §4/§6/§9 | sin diagnóstico ni inferencia de salud/ánimo desde biometría vocal | aplicada al alcance |
 
+Constancia C017: fuente central v1.5 y blob del objeto recuperados; misma metodología y nuevo alcance de planificación. §26 → §6/§8/C017: ninguna compresión/borrado/alta de proveedor autorizados; §27 → trece bloques preservados; §7 → cotejo y lectura de vuelta exigidos. Privacidad de Khora y Metodología comprobada; método separado de datos. No se adquiere autorización de gasto ni de pérdida de fidelidad por la palabra «máximo».
+
 ## 4. Propósito y alcance
 
 **De dónde viene:** defecto de continuidad al editar y seguir dictando; corrección original reportada satisfactoria por el operador en V000. Evoluciona a evaluar utilidad, fluidez y experiencia agradable, no solo contar errores.
@@ -56,7 +58,7 @@ Delta adquirido: carpeta canónica, trece bloques ordenados, originales separado
 
 **Qué cambió:** V010 ordena canonización con el método de Metodología; se conserva todo el historial y se explicitan el bloqueo de acceso, la procedencia actual no acreditada y los límites de salud.
 
-Incluido ahora: continuidad documental, contrato del dictado, benchmark reproducible, métricas técnicas acotadas, encuesta/opinión manual, privacidad, evidencia y plan de validación.
+Incluido ahora: plan de ahorro máximo de audio C017, sin ejecución destructiva; continuidad documental, contrato del dictado, benchmark reproducible, métricas técnicas acotadas, encuesta/opinión manual, privacidad, evidencia y plan de validación.
 
 Propuesta de ampliación aún no implementada: (a) calidad técnica del archivo, como ruido, saturación y cortes; (b) síntomas que el usuario decide declarar; (c) beneficio funcional autodeclarado/observado en tareas definidas. Separar esas fuentes y no presentar asociación como causalidad.
 
@@ -86,6 +88,8 @@ La frase «autoridad moral» y «medición de área» de V009 permanece ambigua;
 | D08, reconstrucción local | instrucción actual → reconstruir endurecimiento en copia aislada | Samantha implementa y prueba; no autoriza push ni despliegue; sin ampliación clínica ni consentimiento |
 | D07, límites de plataforma | instrucción superior → no inferir atributos sensibles de biometría vocal | prevalece; conservar original sin ejecutar esa parte |
 
+| D10, ahorro máximo | original C017 → minimizar bytes con máxima conservación verificable de voz y originales | autoriza plan y documentación; no autoriza recodificar, borrar, mover custodia, cambiar cifrado/proveedor/plan, fusionar o desplegar. Destino y fidelidad son compuertas materiales. |
+
 Toda decisión de interfaz, acceso, cifrado, salud, nuevos proveedores o captura adicional exige aprobación material según las compuertas aplicables. Guardar un documento no implica permiso nuevo de fusión o despliegue. No restaurar páginas en papelera ni cambiar credenciales para fabricar continuidad.
 
 ## 7. Perfil de entorno
@@ -108,17 +112,22 @@ Comprobar Node/npx, fuente oficial y runtime antes; en Windows el npx.cmd oficia
 
 ### 🔄 Estado vivo
 
-Acción actual: entrega técnica del endurecimiento integrada con el código vigente de Custodia y arranque, sobre main f04e815b47fa8a7b5297561df62000478f978108; verificación local de software aprobada. La instrucción actual autoriza fusión normal; el estado efectivo de integración se comprueba en la solicitud enlazada en el recibo, no por existir este archivo.
-Siguiente paso de asistencia: comprobar fusión y presencia de los hashes probados en main mediante Git; una vez presente, separar cualquier despliegue y aceptación humana. No lanzar publicación manual en Vercel como parte de este cierre.
-Siguiente paso de construcción: ninguno adicional dentro del alcance salvo defecto reproducido; no implementar análisis clínico ni ampliar consentimiento.
-Pendientes en secuencia: 1) comprobar integración Git de la entrega autorizada, o completarla si la solicitud sigue abierta sin saltar protecciones; 2) acreditar por separado versión publicada si se requiere; 3) sesión real consentida y opinión persistida correlacionadas; 4) completar conservación/estabilidad/fidelidad con alcance definido; 5) elegir primer síntoma autodeclarado antes de desarrollo sensible.
+Acción actual: plan documental de ahorro máximo de audio solicitado por el operador, C017; no se ha convertido, sustituido ni borrado audio, ni cambiado plan o producción. Seguimiento v0.5.0 en rama documental, integración pendiente de autorización.
+Siguiente paso de asistencia: resolver destino de respaldo y criterio de fidelidad con el operador; después acreditar acceso a los bytes y cobertura de originales antes de proponer ejecución del piloto.
+Siguiente paso de construcción: ninguno autorizado por esta solicitud de plan; preparar implementación solo con asignación y alcance expresos, revisión de almacenamiento/seguridad y muestras aceptadas.
+Pendientes en secuencia: 1) decidir respaldo y fidelidad; 2) recuperar lectura de Blob sin asumir gasto autorizado; 3) reconciliar inventario, duración y audios parciales; 4) respaldar y verificar restauración; 5) piloto de compresión descendente y aceptación; 6) solo con permiso, conversión por lotes, referencias y pruebas; 7) solo con permiso específico y reversibilidad, retirar copias de Blob y medir ahorro efectivo.
+Pendientes anteriores conservados: cotejo de integración/publicación del endurecimiento C016; sesión humana consentida y opinión correlacionada; conservación/estabilidad/fidelidad del circuito; definir primer síntoma autodeclarado antes de cualquier desarrollo sensible. No se cancelan ni se declaran resueltos por esta prioridad de almacenamiento.
 
 ### ⚗️ En prueba / recién fallido
 
-491/491 pruebas unitarias, tipos/navegación/interfaz y benchmark 19/19 de navegador aprobados sobre la combinación actual; 29/29 regresiones adicionales de Custodia/PIN/arranque/dictado aprobadas. Recibo: evidencias/INTEGRACION-ENDURECIMIENTO.json.
-Voz física, comodidad humana, SQL productivo y publicación de esta revisión: NO VERIFICADOS por estas pruebas; medios Chromium y servicios controlados no sustituyen datos humanos.
+Sin ensayos nuevos de compresión ni escucha: última lectura de un original devolvió HTTP 403 a 2026-10-17T19:50:13.787Z. Metadatos de duración no certifican integridad ni cobertura; C017 conserva casos atípicos.
+Las regresiones históricas de C016/INTEGRACION-ENDURECIMIENTO.json no certifican este plan, calidad acústica, respaldo externo, migración ni ahorro; no se repiten por una edición documental.
 
 ### 🔔 Recordatorios latentes
+
+- C017: comprimir y conservar ambas versiones en Blob aumenta espacio; solo sustitución/retirada aprobada libera bytes. Conservar originales bit a bit en destino aprobado y verificable; respaldo y traslado no están autorizados por el plan.
+- No confundir el máximo ahorro con aceptación de pérdida de timbre/prosodia, reducción a mono, recorte de pausas o borrado. Preguntas Q1/Q2 de C017 pendientes.
+- Folios 44 y 66 requieren reconciliación de duración/cobertura; no sustituir ni eliminar audios incompletos o de identidad dudosa. Bloqueo 403 observado, no copia de seguridad validada.
 
 - No declarar cerrado el sprint por compilación, prueba controlada, HTTP 200 o archivo guardado.
 - No se ha probado aquí micrófono físico, identidad humana nueva, comodidad ni fidelidad vocal.
@@ -149,6 +158,7 @@ Voz física, comodidad humana, SQL productivo y publicación de esta revisión: 
 | Experiencia agradable | encuesta y manual disponibles por contrato | respuestas humanas; no inferir experiencia ni ánimo de la voz |
 | Audio técnico/síntomas autodeclarados | propuesta delimitada, sin archivo recibido | finalidad y primer reporte definidos, consentimiento separado y revisión de interfaz/seguridad antes de código |
 | Detección clínica comercial | no implementada ni validada | no ofrecer; requerir definición de uso, evaluación clínica/regulatoria pertinente y límites de plataforma |
+| Ahorro máximo C017 | inventario y aritmética recuperados; plan documental, ningún archivo convertido | destino/fidelidad, lectura, cobertura, respaldo restaurable, piloto aceptado, permisos y medición antes/después |
 | Canonización portable | documentación #302 fusionada en main c9147557; núcleo de trece bloques conservado | nuevo endurecimiento local: cotejo, pruebas e integración separadas |
 
 **Protocolo de sesión real, aún no ejecutado:** (1) acreditar versión y acceso, confirmar consentimiento; (2) una sesión de voz voluntaria de al menos 60 s, edición y confirmación/reanudación/parada; (3) recoger opinión real en formulario —si no sale encuesta, usar manual y mantener `voluntary`—; (4) consultar el registro del mismo propietario, correlacionar identificador/versión/acuse y resumen persistido; (5) conservar solo evidencia saneada, no texto/audio/comentarios privados en Git. No forzar la muestra ni fabricar `sampled`. Comprobar exportación/borrado con datos de prueba separados, nunca borrar la sesión real sin permiso.
@@ -166,6 +176,8 @@ No llamar «sin cambios» a una fuente inaccesible; no convertir calidad cientí
 ## 11. Crónica y fuentes
 
 ### Fuentes y custodia
+
+- [Instrucción de ahorro máximo](originales/instruccion-ahorro-maximo-20261017.md), verbatim; [evidencia saneada y límites](evidencias/AHORRO-AUDIO-20261017.json). No contienen audio, transcripciones ni credenciales.
 
 - [Especificaciones originales verbatim](originales/ESPECIFICACIONES-ORIGINALES.md), V000–V010; [conversación recibida](originales/conversacion-recibida.txt), íntegra y con hash.
 - [Contrato técnico del componente](CONTRATO-DICTADO-EXPERIENCE.md), preservado como materialización técnica, no fuente de estado.
@@ -237,6 +249,54 @@ Incidente de entorno: PowerShell promovió una advertencia npm a NativeCommandEr
 
 La primera regresión adicional tuvo 27 aprobadas y 2 fallidas por URL fija localhost:3000 frente al servidor temporal 3177 (ERR_CONNECTION_REFUSED). La compuerta bloqueó el commit. Se corrigió solo el arnés temporal para usar 3000, sin tocar producto ni pruebas originales ni repetir compuertas vigentes; el resultado final consta en el recibo. El log del primer intento también conserva su hash.
 
+### C017 · Plan de ahorro máximo de audio · 2026-10-17
+
+**Autoridad y propósito:** el operador exige «al maximo» y pide plan, documentación en el seguimiento canónico usando el metacanon del repositorio Metodología y declaración de dudas. Original íntegro: originales/instruccion-ahorro-maximo-20261017.md. Interpretación: encontrar el mínimo almacenamiento que satisfaga los criterios humanos aprobados y preserve los originales; no es permiso para destruir información, ejecutar migración o aceptar una merma acústica no revisada.
+
+**Gobierno y persistencia:** Metacanon v1.5, METACANON-OBJETOS-v1.5, commit 49ac40e9f6122e2d2fb339362cfa0a78128c8e37, blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f. Fuente de proyecto: OBJETO-CANONICO.md; nuevo sello MCP-OBS-DICTADO-v0.5.0. No se modifica el método central. Se mantiene una fuente de estado, los trece bloques, las decisiones previas, los originales y la historia. Registro nuevo, evidencia y manifiesto dentro de la carpeta existente; no otro tablero. Rama documental propia; no fusión ni despliegue implícitos.
+
+**Base observada, con fechas y límites:** inventario de Blob de 2026-10-17T19:33:31.486Z: 636 objetos, 1.010.497.194 bytes; originales 863.136.822 y copias MP3 147.360.372. Inventario distinto de GB-mes facturado. Las 15 carpetas con MP3 contienen 98.946.850 bytes originales y 147.360.372 de MP3; no acredita revisiones idénticas. Código desplegado inspeccionado en 362f8ff51a518506927e486b9d61feee4f6313da genera MP3 a 192 kilobits/s además del original. Consulta Khora: 73 registros legibles, 34 con bytes/duración, 30 referencias distintas; 24 cercanas a 128 kilobits/s. No extrapolar esa cobertura a todos los objetos. Último sondeo de original: HTTP 403 a 19:50:13.787Z. Escucha, decodificación y calidad no verificadas.
+
+**Corrección del alcance de ahorro:** 147.360.372 bytes es el tamaño medido de los derivados, no ahorro logrado. Reemplazarlos sin conservar versiones anteriores dentro de Blob sería necesario para liberar ese espacio. Las estimaciones anteriores de ~579–687 MB suponen toda la población original a 128 kilobits/s, salida de 64–48 y ninguna copia MP3 en Blob; no son un máximo garantizado ni ahorro medido. Un solo almacén pequeño y una copia externa de originales reducen ocupación de Blob, no necesariamente almacenamiento global. No prometer cuánto se ahorra con tasas inferiores hasta medir duración real y calidad. Si se mantienen todos los originales y además se añaden comprimidos en Blob, no hay ahorro neto. La transcodificación con pérdida no mantiene identidad bit a bit ni recupera calidad.
+
+#### Plan por compuertas — ninguna fase ejecutada por este documento
+
+| Fase | Trabajo propuesto | Evidencia terminal y bloqueo |
+|---|---|---|
+| P0 · Decisiones y acceso | Resolver Q1/Q2; recuperar lectura de Blob por vía legítima sin gasto/cambio de plan implícitos. Inventario nuevo de objetos y referencias por propietario/sesión/manifiesto; preservar el inventario anterior | Lecturas autenticadas posibles, alcance/destino/fidelidad aprobados. HTTP 403 o permiso ausente bloquean copia y piloto reales, no la planificación |
+| P1 · Cobertura y respaldo | Reconciliar partes, orden, bytes, hashes, propietario y duración decodificada. Exportar originales cifrados a un destino aprobado; comprobar llaves recuperables sin publicarlas, relectura y restauración. Señalar huérfanos/revisiones parciales, no borrarlos | Cada original preservado bit a bit con manifiesto y comprobación de restauración; ninguna captura incompleta se certifica completa. Destino/integridad no verificados impiden retirar cualquier copia |
+| P2 · Piloto descendente | Con copias verificadas, comparar formato original y Opus mono a 32, 24, 16 y 12 kilobits/s como candidatos, no decisiones aprobadas; bajar solo mientras pasan aceptación y compatibilidad. Cada candidato se deriva directamente del original, nunca de otra conversión con pérdida | Medir bytes reales, duración, canales, voz lenta/rápida/suave, ruido, nombres/números/negaciones y escucha del operador. Incluir muestras largas/cortas/difíciles. Sin aceptación humana no hay perfil elegido ni lote |
+| P3 · Política de retención y acceso | Elegir el candidato más pequeño aceptado por grabación o clase, sin degradar casos difíciles. Proponer una copia optimizada operativa; MP3 solo bajo demanda cuando la compatibilidad lo requiera. Proponer deduplicación solo por hash criptográfico/identidad dentro del mismo propietario; nunca por nombre o similitud | Revisión expresa de custodia/seguridad y compatibilidad de navegadores, descargas, exportación, recuperación y herramientas. Cambiar generación automática, caducidad, proveedores o ubicación del original exige autorización; no rompe enlaces históricos ni revisiones de manifiesto |
+| P4 · Migración acotada | Tras autorización concreta de implementación, procesar lotes pequeños, reanudables e idempotentes; registrar original→derivado, duración, bytes, hashes y estado; cifrar derivados, releer/descifrar/verificar; actualizar referencias transaccionalmente sin mezclar revisiones | Prueba causal, regresión del circuito afectado y restauración; fallo se aísla y conserva referencias/originales. No copiar audios, transcripciones, claves o URLs privadas a Git/logs |
+| P5 · Liberar espacio | Solo tras respaldo restaurable, piloto aceptado, dependencias sin uso y aprobación específica de retirada: eliminar de Blob únicamente objetos enumerados aprobados. Preservar original externo conforme a custodia vigente; no modificar silenciosamente el invariante de conservar originales | Lista exacta, autorización, ausencia de referencias rotas, ventana de reversión y copia fuera del mismo almacén. No eliminación por defecto ni borrado masivo. Bajar ocupación no garantiza desbloqueo inmediato de una cuota mensual |
+| P6 · Verificación y prevención | Medir inventario/bytes antes y después, conteo/alcance, restauración, reproducción y una captura nueva. Proponer alertas de cuota, presupuesto y impedir derivados innecesarios; solo implementar tras aprobar alcance | Ahorro neto medido, audios íntegros y accesibles, nueva captura verificable. Cierre de almacenamiento separado de despliegue, aceptación de dictado y otros pendientes |
+
+**Criterio de máximo:** minimizar bytes, no fijar previamente 48 o 64 kilobits/s; elegir el menor resultado que cumpla la fidelidad acordada. No cortar silencios, acelerar voz, resumir, sintetizar, borrar transcripciones ni cambiar la línea temporal para aparentar ahorro. Reducir a mono o usar un códec con pérdida es propuesta sujeta a Q2; no sustituye archivo maestro cuando se exige timbre/prosodia o uso futuro de voz.
+
+**Casos materiales detectados:** folio 66 declara 241 s y una única parte con 65,927 s; folio 44 declara 4.458 s con 90.079 bytes. Son discrepancias, no diagnóstico de pérdida definitiva. Investigar asociación/duración/cobertura antes de convertir o retirar. Metadatos temporales/bytes y un texto largo no acreditan audio completo. Prioridad de integridad por encima de ganar espacio.
+
+**Aceptación antes de cierre:** alcance y respaldo aprobados; originales restaurables; duración decodificada y secuencia completas salvo parcialidad explícita; sin pérdida de palabras/cifras/negaciones en muestras; voz aceptada por el operador bajo Q2; ninguna regresión en transcripción comparable, reproducción, descarga, exportación o recuperación; hashes del derivado verificados, no comparados como si debieran coincidir con los del original; ahorro neto medido y referencias coherentes. La transcripción automática no es árbitro único de fidelidad ni una prueba clínica.
+
+**Reversión:** antes de retirar, volver a referencias originales sin pérdida; tras retirar solo con permiso, reponer desde respaldo verificado. Mantener mapa y llaves recuperables en custodia autorizada, nunca en este repositorio. No llamar reversible a una copia que no se probó restaurar. Si la cuota impide coexistencia temporal, usar piloto fuera de Blob y el destino aprobado; no borrar primero para obtener espacio.
+
+**Dudas materiales pendientes:** Q1: ¿autoriza conservar los originales fuera de Blob y en qué destino con disponibilidad y recuperación aceptables? No elegir nuevo proveedor ni Entorno Persistente por inferencia. Q2: ¿basta voz plenamente inteligible para dictado/transcripción o se requiere preservar también timbre, prosodia y matices para futuros usos? «Máximo» no resuelve ese compromiso. La reducción de cuota puede exigir cambios de arquitectura/custodia y presencia del operador; esta documentación no cruza esa compuerta.
+
+**Viabilidad y pronóstico:** plan viable de forma condicional; máximo real desconocido hasta obtener bytes y validar muestras. Hito siguiente: decisiones Q1/Q2 y lectura restaurada, en un checkpoint posterior si el operador puede resolver ambas y el servicio responde. Cierre no estimable todavía: depende de desbloqueo externo, destino, velocidad/volumen recuperable, perfil aprobado, lotes y autorización de retirada. No hubo estimación anterior de ejecución calibrada; no se inventan horas ni porcentaje. Cinco checkpoints técnicos posteriores propuestos (respaldo/cobertura, piloto, autorización/política, lotes, medición final), ajustables a resultados; no equivalen a cinco llamadas ni garantizan cinco turnos.
+
+**Qué no se hizo:** conversión, descarga íntegra de audio, limpieza, traslado de originales, nuevo proveedor, cambio de plan/cifrado, modificación del producto, fusión o despliegue. Ningún constructor fue iniciado.
+
+**Checkpoint previo C016, preservado literalmente:** el siguiente bloque era el estado antes de priorizar este plan; es histórico, no otra fuente de estado.
+
+```text
+Acción actual: entrega técnica del endurecimiento integrada con el código vigente de Custodia y arranque, sobre main f04e815b47fa8a7b5297561df62000478f978108; verificación local de software aprobada. La instrucción actual autoriza fusión normal; el estado efectivo de integración se comprueba en la solicitud enlazada en el recibo, no por existir este archivo.
+Siguiente paso de asistencia: comprobar fusión y presencia de los hashes probados en main mediante Git; una vez presente, separar cualquier despliegue y aceptación humana. No lanzar publicación manual en Vercel como parte de este cierre.
+Siguiente paso de construcción: ninguno adicional dentro del alcance salvo defecto reproducido; no implementar análisis clínico ni ampliar consentimiento.
+Pendientes en secuencia: 1) comprobar integración Git de la entrega autorizada, o completarla si la solicitud sigue abierta sin saltar protecciones; 2) acreditar por separado versión publicada si se requiere; 3) sesión real consentida y opinión persistida correlacionadas; 4) completar conservación/estabilidad/fidelidad con alcance definido; 5) elegir primer síntoma autodeclarado antes de desarrollo sensible.
+
+491/491 pruebas unitarias, tipos/navegación/interfaz y benchmark 19/19 de navegador aprobados sobre la combinación actual; 29/29 regresiones adicionales de Custodia/PIN/arranque/dictado aprobadas. Recibo: evidencias/INTEGRACION-ENDURECIMIENTO.json.
+Voz física, comodidad humana, SQL productivo y publicación de esta revisión: NO VERIFICADOS por estas pruebas; medios Chromium y servicios controlados no sustituyen datos humanos.
+```
+
 ## 12. Reinstanciación
 
 Estos prompts son material de continuidad, no prueban que otra conversación haya sido creada o los haya recibido. Al actualizar §8 deben sincronizarse literalmente. La asignación de un escritor de código debe constar antes de usar el prompt de construcción.
@@ -244,46 +304,51 @@ Estos prompts son material de continuidad, no prueban que otra conversación hay
 ### Prompt de asistencia
 
 ````text
-Retoma MCP-OBS-DICTADO leyendo primero el metacanon central https://github.com/SeryMente/metodologia/blob/main/METACANON-OBJETOS-CANONICOS.md y después https://github.com/SeryMente/khora/blob/main/docs/frentes/dictado-voz/OBJETO-CANONICO.md .
-Adopta el rol de asistencia de este frente; la reconstrucción local del endurecimiento está solicitada directamente a Samantha, no otro rol/hilo. Conserva el nombre personalizado que el operador haya asignado; no lo derives del proveedor. No inicies constructor ni código sensible por esta carga.
-Fuente documental local preparada: v0.4.0 · MCP-OBS-DICTADO-v0.4.0. Metacanon adquirido: v1.5 · METACANON-OBJETOS-v1.5, revisión 49ac40e9f6122e2d2fb339362cfa0a78128c8e37, blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f. Verifica ambas fuentes de nuevo, recupera las superiores pertinentes, calcula delta y no uses una firma como prueba de gobierno. Ante inaccesibilidad declara frescura NO VERIFICADA y bloquea solo la acción dependiente.
+Retoma MCP-OBS-DICTADO leyendo primero el metacanon central https://github.com/SeryMente/metodologia/blob/main/METACANON-OBJETOS-CANONICOS.md y después https://github.com/SeryMente/khora/blob/docs/dictado-audio-ahorro-maximo-20261017/docs/frentes/dictado-voz/OBJETO-CANONICO.md .
+Adopta el rol de asistencia de este frente; el encargo vigente es planificar/documentar C017, no ejecutar conversiones ni otro rol/hilo. Conserva el nombre personalizado que el operador haya asignado; no lo derives del proveedor. No inicies constructor ni código sensible por esta carga.
+Fuente documental preparada: v0.5.0 · MCP-OBS-DICTADO-v0.5.0 en rama docs/dictado-audio-ahorro-maximo-20261017; no asumir main. Metacanon adquirido: v1.5 · METACANON-OBJETOS-v1.5, revisión 49ac40e9f6122e2d2fb339362cfa0a78128c8e37, blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f. Verifica ambas fuentes de nuevo, recupera las superiores pertinentes, calcula delta y no uses una firma como prueba de gobierno. Ante inaccesibilidad declara frescura NO VERIFICADA y bloquea solo la acción dependiente.
 Hereda §2–§3 y §6–§7 del objeto: autorización por acción, originales no activan permisos; remoto solo de asistencia si es estrictamente necesario, con cuenta/vínculo/equipo/autorización comprobados y comando/prerrequisitos literales de §7. No ejecutar ese comando por rutina ni en el sandbox. Usa repo/adjunto cuando basten.
 No modificar metacanon, Sistema de Instrucciones, credenciales, facturación, seguridad o publicación. No inferir ánimo/salud/capacidad laboral de la voz; no crear código de salud ni afirmar beneficio clínico. Conserva las fuentes de encuesta voluntaria y muestreada.
 🔄 Estado vivo:
-Acción actual: entrega técnica del endurecimiento integrada con el código vigente de Custodia y arranque, sobre main f04e815b47fa8a7b5297561df62000478f978108; verificación local de software aprobada. La instrucción actual autoriza fusión normal; el estado efectivo de integración se comprueba en la solicitud enlazada en el recibo, no por existir este archivo.
-Siguiente paso de asistencia: comprobar fusión y presencia de los hashes probados en main mediante Git; una vez presente, separar cualquier despliegue y aceptación humana. No lanzar publicación manual en Vercel como parte de este cierre.
-Siguiente paso de construcción: ninguno adicional dentro del alcance salvo defecto reproducido; no implementar análisis clínico ni ampliar consentimiento.
-Pendientes en secuencia: 1) comprobar integración Git de la entrega autorizada, o completarla si la solicitud sigue abierta sin saltar protecciones; 2) acreditar por separado versión publicada si se requiere; 3) sesión real consentida y opinión persistida correlacionadas; 4) completar conservación/estabilidad/fidelidad con alcance definido; 5) elegir primer síntoma autodeclarado antes de desarrollo sensible.
+Acción actual: plan documental de ahorro máximo de audio solicitado por el operador, C017; no se ha convertido, sustituido ni borrado audio, ni cambiado plan o producción. Seguimiento v0.5.0 en rama documental, integración pendiente de autorización.
+Siguiente paso de asistencia: resolver destino de respaldo y criterio de fidelidad con el operador; después acreditar acceso a los bytes y cobertura de originales antes de proponer ejecución del piloto.
+Siguiente paso de construcción: ninguno autorizado por esta solicitud de plan; preparar implementación solo con asignación y alcance expresos, revisión de almacenamiento/seguridad y muestras aceptadas.
+Pendientes en secuencia: 1) decidir respaldo y fidelidad; 2) recuperar lectura de Blob sin asumir gasto autorizado; 3) reconciliar inventario, duración y audios parciales; 4) respaldar y verificar restauración; 5) piloto de compresión descendente y aceptación; 6) solo con permiso, conversión por lotes, referencias y pruebas; 7) solo con permiso específico y reversibilidad, retirar copias de Blob y medir ahorro efectivo.
+Pendientes anteriores conservados: cotejo de integración/publicación del endurecimiento C016; sesión humana consentida y opinión correlacionada; conservación/estabilidad/fidelidad del circuito; definir primer síntoma autodeclarado antes de cualquier desarrollo sensible. No se cancelan ni se declaran resueltos por esta prioridad de almacenamiento.
 ⚗️ En prueba / recién fallido:
-491/491 pruebas unitarias, tipos/navegación/interfaz y benchmark 19/19 de navegador aprobados sobre la combinación actual; 29/29 regresiones adicionales de Custodia/PIN/arranque/dictado aprobadas. Recibo: evidencias/INTEGRACION-ENDURECIMIENTO.json.
-Voz física, comodidad humana, SQL productivo y publicación de esta revisión: NO VERIFICADOS por estas pruebas; medios Chromium y servicios controlados no sustituyen datos humanos.
+Sin ensayos nuevos de compresión ni escucha: última lectura de un original devolvió HTTP 403 a 2026-10-17T19:50:13.787Z. Metadatos de duración no certifican integridad ni cobertura; C017 conserva casos atípicos.
+Las regresiones históricas de C016/INTEGRACION-ENDURECIMIENTO.json no certifican este plan, calidad acústica, respaldo externo, migración ni ahorro; no se repiten por una edición documental.
 Conserva íntegros los recordatorios latentes del objeto. Reutiliza evidencia válida, no repitas pruebas sin cambio causal. Recibir una salida del constructor tiene prioridad; asistencia la contrasta y devuelve síntesis y prompt de continuidad. No afirmar recepción ni trabajo en segundo plano.
 Cada salida usa los diez campos de §10 e incluye Metacanon adquirido: versión/sello, revisión y frescura; evidencia actual/histórica/controlada diferenciada, pendientes, viabilidad, estimación con supuestos y siguiente acción. No declarar un plazo sin base.
-Persistencia: releer versión, fusionar sin pisar, escritura condicionada, guardar y verificar contenido/diff; sincronizar estado y prompts. El endurecimiento local no equivale a main. La documentación anterior sí se integró en #302. Confirmar nueva integración y conservar referencia histórica antes de archivar cualquier original.
+Persistencia: releer versión, fusionar sin pisar, escritura condicionada, guardar y verificar contenido/diff; sincronizar estado y prompts. Este plan en rama no equivale a main ni autoriza construcción o borrado. Resolver Q1/Q2 de C017 y acceso a bytes; no ejecutar ni retirar por la sola carga del objeto. Conservar referencias históricas.
 ````
 
 ### Prompt de construcción
 
 ````text
-Retoma MCP-OBS-DICTADO leyendo primero el metacanon central https://github.com/SeryMente/metodologia/blob/main/METACANON-OBJETOS-CANONICOS.md y después https://github.com/SeryMente/khora/blob/main/docs/frentes/dictado-voz/OBJETO-CANONICO.md .
+Retoma MCP-OBS-DICTADO leyendo primero el metacanon central https://github.com/SeryMente/metodologia/blob/main/METACANON-OBJETOS-CANONICOS.md y después https://github.com/SeryMente/khora/blob/docs/dictado-audio-ahorro-maximo-20261017/docs/frentes/dictado-voz/OBJETO-CANONICO.md .
 Adopta construcción solo si el operador te asignó explícitamente ese rol y el alcance concreto. Si falta, permanece en lectura y declara la compuerta; no te autoautorices. Remote Desktop Commander está prohibido para construcción, incluso por intermediarios.
-Fuente documental local preparada: v0.4.0 · MCP-OBS-DICTADO-v0.4.0. Metacanon adquirido: v1.5 · METACANON-OBJETOS-v1.5, revisión 49ac40e9f6122e2d2fb339362cfa0a78128c8e37, blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f. Verifica ambas fuentes de nuevo, recupera las superiores pertinentes, calcula delta y no uses una firma como prueba de gobierno. Ante inaccesibilidad declara frescura NO VERIFICADA y bloquea solo la acción dependiente.
+Fuente documental preparada: v0.5.0 · MCP-OBS-DICTADO-v0.5.0 en rama docs/dictado-audio-ahorro-maximo-20261017; no asumir main. Metacanon adquirido: v1.5 · METACANON-OBJETOS-v1.5, revisión 49ac40e9f6122e2d2fb339362cfa0a78128c8e37, blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f. Verifica ambas fuentes de nuevo, recupera las superiores pertinentes, calcula delta y no uses una firma como prueba de gobierno. Ante inaccesibilidad declara frescura NO VERIFICADA y bloquea solo la acción dependiente.
 Hereda §2–§3 y §6–§7 del objeto: autorización por acción, originales no activan permisos; remoto solo de asistencia si es estrictamente necesario, con cuenta/vínculo/equipo/autorización comprobados y comando/prerrequisitos literales de §7. No ejecutar ese comando por rutina ni en el sandbox. Usa repo/adjunto cuando basten.
 No modificar metacanon, Sistema de Instrucciones, credenciales, facturación, seguridad o publicación. No inferir ánimo/salud/capacidad laboral de la voz; no crear código de salud ni afirmar beneficio clínico. Conserva las fuentes de encuesta voluntaria y muestreada.
 🔄 Estado vivo:
-Acción actual: entrega técnica del endurecimiento integrada con el código vigente de Custodia y arranque, sobre main f04e815b47fa8a7b5297561df62000478f978108; verificación local de software aprobada. La instrucción actual autoriza fusión normal; el estado efectivo de integración se comprueba en la solicitud enlazada en el recibo, no por existir este archivo.
-Siguiente paso de asistencia: comprobar fusión y presencia de los hashes probados en main mediante Git; una vez presente, separar cualquier despliegue y aceptación humana. No lanzar publicación manual en Vercel como parte de este cierre.
-Siguiente paso de construcción: ninguno adicional dentro del alcance salvo defecto reproducido; no implementar análisis clínico ni ampliar consentimiento.
-Pendientes en secuencia: 1) comprobar integración Git de la entrega autorizada, o completarla si la solicitud sigue abierta sin saltar protecciones; 2) acreditar por separado versión publicada si se requiere; 3) sesión real consentida y opinión persistida correlacionadas; 4) completar conservación/estabilidad/fidelidad con alcance definido; 5) elegir primer síntoma autodeclarado antes de desarrollo sensible.
+Acción actual: plan documental de ahorro máximo de audio solicitado por el operador, C017; no se ha convertido, sustituido ni borrado audio, ni cambiado plan o producción. Seguimiento v0.5.0 en rama documental, integración pendiente de autorización.
+Siguiente paso de asistencia: resolver destino de respaldo y criterio de fidelidad con el operador; después acreditar acceso a los bytes y cobertura de originales antes de proponer ejecución del piloto.
+Siguiente paso de construcción: ninguno autorizado por esta solicitud de plan; preparar implementación solo con asignación y alcance expresos, revisión de almacenamiento/seguridad y muestras aceptadas.
+Pendientes en secuencia: 1) decidir respaldo y fidelidad; 2) recuperar lectura de Blob sin asumir gasto autorizado; 3) reconciliar inventario, duración y audios parciales; 4) respaldar y verificar restauración; 5) piloto de compresión descendente y aceptación; 6) solo con permiso, conversión por lotes, referencias y pruebas; 7) solo con permiso específico y reversibilidad, retirar copias de Blob y medir ahorro efectivo.
+Pendientes anteriores conservados: cotejo de integración/publicación del endurecimiento C016; sesión humana consentida y opinión correlacionada; conservación/estabilidad/fidelidad del circuito; definir primer síntoma autodeclarado antes de cualquier desarrollo sensible. No se cancelan ni se declaran resueltos por esta prioridad de almacenamiento.
 ⚗️ En prueba / recién fallido:
-491/491 pruebas unitarias, tipos/navegación/interfaz y benchmark 19/19 de navegador aprobados sobre la combinación actual; 29/29 regresiones adicionales de Custodia/PIN/arranque/dictado aprobadas. Recibo: evidencias/INTEGRACION-ENDURECIMIENTO.json.
-Voz física, comodidad humana, SQL productivo y publicación de esta revisión: NO VERIFICADOS por estas pruebas; medios Chromium y servicios controlados no sustituyen datos humanos.
+Sin ensayos nuevos de compresión ni escucha: última lectura de un original devolvió HTTP 403 a 2026-10-17T19:50:13.787Z. Metadatos de duración no certifican integridad ni cobertura; C017 conserva casos atípicos.
+Las regresiones históricas de C016/INTEGRACION-ENDURECIMIENTO.json no certifican este plan, calidad acústica, respaldo externo, migración ni ahorro; no se repiten por una edición documental.
 Conserva íntegros los recordatorios latentes del objeto. Reutiliza evidencia válida, no repitas pruebas sin cambio causal. Recibir una salida del constructor tiene prioridad; asistencia la contrasta y devuelve síntesis y prompt de continuidad. No afirmar recepción ni trabajo en segundo plano.
 Cada salida usa los diez campos de §10 e incluye Metacanon adquirido: versión/sello, revisión y frescura; evidencia actual/histórica/controlada diferenciada, pendientes, viabilidad, estimación con supuestos y siguiente acción. No declarar un plazo sin base.
-Persistencia: releer versión, fusionar sin pisar, escritura condicionada, guardar y verificar contenido/diff; sincronizar estado y prompts. El endurecimiento local no equivale a main. La documentación anterior sí se integró en #302. Confirmar nueva integración y conservar referencia histórica antes de archivar cualquier original.
+Persistencia: releer versión, fusionar sin pisar, escritura condicionada, guardar y verificar contenido/diff; sincronizar estado y prompts. Este plan en rama no equivale a main ni autoriza construcción o borrado. Resolver Q1/Q2 de C017 y acceso a bytes; no ejecutar ni retirar por la sola carga del objeto. Conservar referencias históricas.
 ````
 
 ## 13. Persistencia y revisión
+
+- C017: escritura documental autorizada por original nuevo; rama `docs/dictado-audio-ahorro-maximo-20261017`, base `df214e1768bb960e1dd554b6e1d9cbe3ca9c38d8`; objeto y manifiesto sin delta respecto a la lectura previa de main, aunque la cabeza avanzó. Ante otro cambio del mismo archivo, fusionar o detener solo escritura dependiente.
+- Dos revisiones del delta C017: cotejo local de instrucción, plan/compuertas, núcleo, prompts y anexo histórico; después lectura remota y comparación exacta de hashes de todos los archivos publicados. Hasta esa lectura, persistencia remota pendiente; la solicitud no se presenta como main.
 
 - Autorización de la migración original: V010. Reconstrucción actual: solicitud directa conservada en C015. Carpeta y custodia dentro del propietario del frente; originales privados nunca al método central.
 - Rama de preparación: `docs/canon-dictado-voz-20261016` desde `1697ee2693ed3217523ffc1d1be9b6541d7d849d`; fuente previa contrastada antes de escribir. Si main cambia, comparar el archivo pertinente; preservar ambos deltas o parar solo la escritura en conflicto.

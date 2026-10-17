@@ -30,9 +30,9 @@
   "files": [
     {
       "path": "OBJETO-CANONICO.md",
-      "bytes": 135479,
-      "sha256": "a93499bef3e1ba0b55b7bcc3d66e227cfd6e88cc27dd678c637ae1f337d3fa79",
-      "git_blob_sha": "aa4daa0ebcf0b4202bb9c3684320010e66ebd532"
+      "bytes": 150484,
+      "sha256": "9c6906b5d42e8abcf054957efd45bb0d23e505cb0fd685e51d21e51028ca7b5a",
+      "git_blob_sha": "7562060302b6ae8eb2821fc1976787722c2f1a30"
     },
     {
       "path": "CONTRATO-DICTADO-EXPERIENCE.md",
@@ -75,6 +75,18 @@
       "bytes": 6084,
       "sha256": "804722ed8c89db737208947b66961b52200ed3aab6c950bb121ca0df55829b16",
       "git_blob_sha": "d7f94846a36bff50a631cd082c8e52620213aeba"
+    },
+    {
+      "path": "originales/instruccion-ahorro-maximo-20261017.md",
+      "bytes": 735,
+      "sha256": "96d0f2670c7f17cb8be1dcfa4b4fafa6ac60ffbfe5ad495cff97892624eed0d3",
+      "git_blob_sha": "7ff90c70d9394605f4943e149cf49c818590b60f"
+    },
+    {
+      "path": "evidencias/AHORRO-AUDIO-20261017.json",
+      "bytes": 2849,
+      "sha256": "c37eac93a1d48362f751c15a502edb9eca4c29f6941267b572941a147d72493c",
+      "git_blob_sha": "ec816169d22e02d65dc7fc5c008d261a701d8f7a"
     }
   ],
   "runtime_references": [
@@ -180,10 +192,20 @@
     "no_secret_values_in_manifest": true
   },
   "current_preparation": {
-    "version": "0.4.0",
-    "baseSha": "f04e815b47fa8a7b5297561df62000478f978108",
-    "receipt": "evidencias/INTEGRACION-ENDURECIMIENTO.json",
-    "pullRequest": "https://github.com/SeryMente/khora/pull/305",
-    "state": "software verified; merge authorization explicit; effective merge determined by Git"
-  }
+    "version": "0.5.0",
+    "baseSha": "df214e1768bb960e1dd554b6e1d9cbe3ca9c38d8",
+    "branch": "docs/dictado-audio-ahorro-maximo-20261017",
+    "receipt": "evidencias/AHORRO-AUDIO-20261017.json",
+    "state": "documentary maximum-savings plan; no migration, merge or deployment authorized",
+    "authority": "originales/instruccion-ahorro-maximo-20261017.md"
+  },
+  "preparation_history": [
+    {
+      "version": "0.4.0",
+      "baseSha": "f04e815b47fa8a7b5297561df62000478f978108",
+      "receipt": "evidencias/INTEGRACION-ENDURECIMIENTO.json",
+      "pullRequest": "https://github.com/SeryMente/khora/pull/305",
+      "state": "software verified; merge authorization explicit; effective merge determined by Git"
+    }
+  ]
 }

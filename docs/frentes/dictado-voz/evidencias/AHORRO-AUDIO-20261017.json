@@ -1,0 +1,86 @@
+{
+  "schema": "audio-storage-plan-evidence/v1",
+  "cycle": "C017",
+  "kind": "documentary_plan_not_execution",
+  "method": {
+    "repo": "SeryMente/metodologia",
+    "path": "METACANON-OBJETOS-CANONICOS.md",
+    "commit": "49ac40e9f6122e2d2fb339362cfa0a78128c8e37",
+    "blob": "32c7a65ff2e83b3b76752ba2160427bd6e851a8f",
+    "sha256": "1db7a16892310c505ec3002e9439e35c11a13b2e5e36dee2829efeda201e042c",
+    "version": "1.5"
+  },
+  "readBase": "df214e1768bb960e1dd554b6e1d9cbe3ca9c38d8",
+  "priorObjectBlob": "aa4daa0ebcf0b4202bb9c3684320010e66ebd532",
+  "inventory": [
+    {
+      "label": "Audios originales",
+      "count": 621,
+      "bytes": 863136822,
+      "MB": 863.136822,
+      "percent": 85.4170429294631
+    },
+    {
+      "label": "MP3 de acceso",
+      "count": 15,
+      "bytes": 147360372,
+      "MB": 147.360372,
+      "percent": 14.582957070536903
+    }
+  ],
+  "inventoryBytes": 1010497194,
+  "inventoryObjects": 636,
+  "inventoryAt": "2026-10-17T19:33:31.486Z",
+  "archiveCoverage": {
+    "rows": 73,
+    "withBytesAndDuration": 34,
+    "distinctAudioReferences": 30,
+    "near128Kbps": 24
+  },
+  "readProbe": {
+    "status": 403,
+    "at": "2026-10-17T19:50:13.787Z",
+    "contentDownloaded": false
+  },
+  "priorSavingsAreConditional": true,
+  "scenarios": [
+    {
+      "label": "Sin copias MP3",
+      "remainingMB": 863.136822,
+      "savedMB": 147.360372,
+      "savedPercent": 14.582957070536903,
+      "assumption": "Retirar solo derivados tras validar respaldo; tamaño medido, no ahorro realizado"
+    },
+    {
+      "label": "Voz a 64 kbit/s",
+      "remainingMB": 431.568411,
+      "savedMB": 578.928783,
+      "savedPercent": 57.29147853526845,
+      "assumption": "Modelo: todos los originales equivalen a 128 kbit/s; una sola versión a64; originales fuera de Blob"
+    },
+    {
+      "label": "Voz a 48 kbit/s",
+      "remainingMB": 323.67630825,
+      "savedMB": 686.82088575,
+      "savedPercent": 67.96860890145133,
+      "assumption": "Modelo: todos los originales equivalen a 128 kbit/s; una sola versión a48; originales fuera de Blob"
+    }
+  ],
+  "originalInstruction": "originales/instruccion-ahorro-maximo-20261017.md",
+  "openDecisions": [
+    "Q1 backup destination/custody approval",
+    "Q2 intelligibility versus timbre/prosody fidelity"
+  ],
+  "operationScope": "docs only; no audio, transcript excerpts, secrets, storage writes, deletion, billing, deployment",
+  "review1": {
+    "thirteenBlocksOrdered": true,
+    "historicalAnnexByteIdentical": true,
+    "stateMatchesBothPrompts": true,
+    "noImplementationPermissionInferred": true
+  },
+  "review2": {
+    "requirement": "Read back every saved file, verify exact content/bytes/SHA-256 and git blob against custody manifest",
+    "statusAtPreparation": "PENDING_REMOTE_READBACK"
+  },
+  "priorClinicalAndHumanValidationPendingPreserved": true
+}
