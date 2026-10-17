@@ -275,13 +275,13 @@ test.describe("Pipeline Control Tower E2E Tests", () => {
       });
     });
 
-    await page.goto("/sistema/volcados");
+    await page.goto("/sistema/custodia");
   });
 
   test("1. abrir Pipeline & 2. visualizar contadores", async ({ page }) => {
     // Check header
     const title = page.locator("h1");
-    await expect(title).toContainText("Mesa de Revisión Sincrónica");
+    await expect(title).toContainText("Custodia");
 
     // Check summary counters
     await expect(page.locator("text=Total volcados").first()).toBeVisible();

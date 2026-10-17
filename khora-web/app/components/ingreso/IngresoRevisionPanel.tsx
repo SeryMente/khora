@@ -180,7 +180,7 @@ export function IngresoRevisionPanel() {
     if (!sel) return;
     const ultima = versiones.reduce((max: number, v: any) => Math.max(max, Number(v.version)), 0);
     if (ultima < 1) {
-      setError("Este volcado no tiene versiones registradas para aprobar");
+      setError("Este registro no tiene versiones registradas para aprobar");
       return;
     }
     if (texto !== textoGuardado) {
@@ -270,8 +270,8 @@ export function IngresoRevisionPanel() {
       <div style={{ display: "flex", flexWrap: "wrap", gap: 20, alignItems: "flex-start" }}>
         {/* Lista de volcados a la izquierda */}
         <div style={{ flex: "1 1 280px", width: "100%", maxWidth: "100%", minWidth: 0, boxSizing: "border-box", maxHeight: 600, overflowY: "auto", border: "1px solid #334155", borderRadius: 8, padding: 10, background: "#0f172a" }}>
-          <h3 style={{ fontSize: 14, marginTop: 0, marginBottom: 10, opacity: 0.9 }}>Volcados registradas</h3>
-          {filas.length === 0 && <p style={{ fontSize: 13, opacity: 0.6 }}>Sin volcados</p>}
+          <h3 style={{ fontSize: 14, marginTop: 0, marginBottom: 10, opacity: 0.9 }}>Registros de Custodia registradas</h3>
+          {filas.length === 0 && <p style={{ fontSize: 13, opacity: 0.6 }}>Sin registros de Custodia</p>}
           {filas.map(f => (
             <button
               key={f.id}
@@ -311,7 +311,7 @@ export function IngresoRevisionPanel() {
         <div style={{ flex: "1 1 420px", width: "100%", minWidth: 0, boxSizing: "border-box", display: "flex", flexDirection: "column", gap: 16 }}>
           {!sel ? (
             <div style={{ padding: 40, textAlign: "center", border: "1px dashed #334155", borderRadius: 8, opacity: 0.7 }}>
-              Selecciona un volcado de la lista para iniciar el control de calidad.
+              Selecciona un registro de la lista para iniciar el control de calidad.
             </div>
           ) : (
             <>

@@ -1,3 +1,7 @@
+export class AudioVaultLockedError extends Error {
+  constructor() { super("Introduce el PIN aquí en Custodia para desbloquear el audio."); this.name = "AudioVaultLockedError"; }
+}
+
 export type Mp3ExportOptions = {
   sourceUrl: string;
   manifestUrl?: string;
@@ -29,6 +33,7 @@ export async function exportAudioAsMp3({
     const manifestResponse = await fetch(manifestUrl, { cache: "no-store" });
     let manifest: any = {};
     try { manifest = await manifestResponse.json(); } catch { manifest = {}; }
+    if (manifestResponse.status === 423) throw new AudioVaultLockedError();
     if (!manifestResponse.ok) {
       throw new Error(manifest?.detail || "No se pudo validar el manifiesto del audio.");
     }
@@ -39,6 +44,7 @@ export async function exportAudioAsMp3({
   }
 
   const response = await fetch(sourceUrl, { cache: "no-store" });
+  if (response.status === 423) throw new AudioVaultLockedError();
   if (!response.ok) {
     let detail = "";
     try {
@@ -111,4 +117,37 @@ export async function exportAudioAsMp3({
   } finally {
     await audioContext.close().catch(() => undefined);
   }
+}
+
+
+/** Download the server-preserved derivative. Never replaces an original or converts text. */
+export async function downloadCustodiaMp3({ id, filename, isCurrent = () => true }: {
+  id: string; filename: string; isCurrent?: () => boolean;
+}): Promise<{ status: 'queued' | 'cancelled' } | { status: 'downloaded'; complete: boolean; parts: number }> {
+  const endpoint = '/api/audio/' + encodeURIComponent(id) + '/mp3';
+  const response = await fetch(endpoint, { cache: 'no-store' });
+  if (response.status === 423) throw new AudioVaultLockedError();
+  if (!isCurrent()) return { status: 'cancelled' };
+  if (response.status === 409) {
+    const queued = await fetch(endpoint, { method: 'POST' });
+    if (queued.status === 423) throw new AudioVaultLockedError();
+    const result = await queued.json().catch(() => ({}));
+    if (!queued.ok || result.estado !== 'solicitado') throw new Error('No se pudo solicitar el MP3 conservado.');
+    return { status: 'queued' };
+  }
+  if (!response.ok) throw new Error('No se puede descargar el MP3 (HTTP ' + response.status + ').');
+  if (response.headers.get('content-type')?.split(';')[0].trim().toLowerCase() !== 'audio/mpeg') throw new Error('La respuesta no es un archivo MP3.');
+  const expected = response.headers.get('x-audio-sha256')?.toLowerCase() || '';
+  const complete = response.headers.get('x-captura-completa');
+  const parts = Number(response.headers.get('x-audio-hasta-parte'));
+  if (!/^[0-9a-f]{64}$/.test(expected) || !['true', 'false'].includes(complete || '') || !Number.isInteger(parts) || parts < 1) throw new Error('El MP3 no incluye metadatos de custodia verificables.');
+  const bytes = await response.arrayBuffer();
+  const digest = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', bytes))).map(b => b.toString(16).padStart(2, '0')).join('');
+  if (!bytes.byteLength || digest !== expected) throw new Error('La huella del MP3 no coincide; se bloqueó la descarga.');
+  if (!isCurrent()) return { status: 'cancelled' };
+  const url = URL.createObjectURL(new Blob([bytes], { type: 'audio/mpeg' }));
+  const link = document.createElement('a'); link.href = url; link.download = filename;
+  document.body.appendChild(link); link.click(); link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 30000);
+  return { status: 'downloaded', complete: complete === 'true', parts };
 }

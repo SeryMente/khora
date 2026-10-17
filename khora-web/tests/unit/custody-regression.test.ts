@@ -550,7 +550,7 @@ test("CUSTODY-16: session transcription endpoint requires an authenticated user"
 
 
 test("CUSTODY-17: Ingesta UI consumes the canonical pipeline digest key", () => {
-  const page = readFileSync(resolve(process.cwd(), "app/sistema/volcados/page.tsx"), "utf8");
+  const page = readFileSync(resolve(process.cwd(), "app/sistema/custodia/page.tsx"), "utf8");
   const view = readFileSync(resolve(process.cwd(), "app/components/shared/PipelineView.tsx"), "utf8");
   assert.ok(page.includes("selectedItem?.sha256_aprobada"));
   assert.ok(view.includes("selectedItem.sha256_aprobada"));

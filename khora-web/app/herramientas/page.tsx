@@ -29,7 +29,7 @@ export default function HerramientasPage() {
               </div>
               <div>
                 <h2 className="text-lg font-bold text-white tracking-tight mb-1">Bitácora 24/365</h2>
-                <p className="text-xs text-gray-400 font-mono">Acceso histórico → Volcados</p>
+                <p className="text-xs text-gray-400 font-mono">Acceso histórico → Registros de Custodia</p>
               </div>
             </div>
           </Link>

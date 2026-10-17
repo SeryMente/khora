@@ -109,7 +109,7 @@ export default function PaginaBoveda() {
             Bóveda
           </h1>
           <p className="text-xs opacity-70">
-            Tus grabaciones y volcados están cifrados. El pin abre la bóveda.
+            Tus grabaciones y registros de Custodia están cifrados. El pin abre la bóveda.
           </p>
         </div>
 
@@ -266,7 +266,7 @@ export default function PaginaBoveda() {
             style={{ color: "var(--khora-accent)" }}
             className="text-xs uppercase tracking-wider hover:underline"
           >
-            volver a la edición de volcados
+            volver a la edición de registros de Custodia
           </a>
         </div>
       </div>

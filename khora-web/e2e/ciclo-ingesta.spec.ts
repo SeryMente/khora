@@ -190,7 +190,7 @@ test.describe("Ciclo de Vida Completo: Iniciar revisión -> Aprobar -> Ingerir",
       });
     });
 
-    await page.goto("/sistema/volcados");
+    await page.goto("/sistema/custodia");
   });
 
   test.skip("ejecuta el ciclo de vida completo: archivado -> iniciar revisión -> aprobar -> ingerir [SKIP: preexistente a este PR, ver issue de seguimiento]", async ({ page }) => {
@@ -198,7 +198,7 @@ test.describe("Ciclo de Vida Completo: Iniciar revisión -> Aprobar -> Ingerir",
     await page.locator("text=Volcado de Prueba Ciclo Ingesta").first().click();
 
     // Confirmar que muestra la Mesa de Revisión
-    await expect(page.locator("h1:has-text('Mesa de Revisión Sincrónica')")).toBeVisible();
+    await expect(page.locator("h1:has-text('Custodia')")).toBeVisible();
 
     // 2. Aprobar versión (v1)
     const tecladoBtn = page.locator("button:has-text('Alternativa Teclado')");

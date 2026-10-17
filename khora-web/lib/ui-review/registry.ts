@@ -126,8 +126,8 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
   "archivo:list": {
     screen: "archivo",
     scenario: "list",
-    title: "Archivo · Lista de Volcados",
-    description: "Índice de volcados archivados en el sistema.",
+    title: "Archivo · Lista de Registros de Custodia",
+    description: "Índice de registros de Custodia archivados en el sistema.",
     status: "active",
     recommended_viewport: "desktop",
     ui_ids: [
@@ -140,8 +140,8 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
   "archivo:selected": {
     screen: "archivo",
     scenario: "selected",
-    title: "Archivo · Volcado Seleccionado",
-    description: "Volcado archivado seleccionado con panel lateral de traza.",
+    title: "Archivo · Registro Seleccionado",
+    description: "Registro archivado seleccionado con panel lateral de traza.",
     status: "active",
     recommended_viewport: "desktop",
     ui_ids: [
@@ -154,8 +154,8 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
   "archivo:empty": {
     screen: "archivo",
     scenario: "empty",
-    title: "Archivo · Sin Volcados",
-    description: "Estado vacío de la lista de volcados.",
+    title: "Archivo · Sin Registros de Custodia",
+    description: "Estado vacío de la lista de registros de Custodia.",
     status: "active",
     recommended_viewport: "desktop",
     ui_ids: [
@@ -167,7 +167,7 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
     screen: "archivo",
     scenario: "loading",
     title: "Archivo · Cargando Lista",
-    description: "Indicador de carga de la lista de volcados.",
+    description: "Indicador de carga de la lista de registros de Custodia.",
     status: "active",
     recommended_viewport: "desktop",
     ui_ids: [
@@ -179,7 +179,7 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
     screen: "archivo",
     scenario: "error",
     title: "Archivo · Error de Carga",
-    description: "Error al recuperar la lista de volcados.",
+    description: "Error al recuperar la lista de registros de Custodia.",
     status: "active",
     recommended_viewport: "desktop",
     ui_ids: [
@@ -332,7 +332,7 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
     screen: "ingesta",
     scenario: "idle",
     title: "Ingesta · Lista para Ingerir",
-    description: "Volcado aprobado con botón de ingesta en el grafo activo.",
+    description: "Registro aprobado con botón de ingesta en el grafo activo.",
     status: "active",
     recommended_viewport: "desktop",
     ui_ids: [
@@ -656,7 +656,7 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
     screen: "ingreso",
     scenario: "timeout_archivado",
     title: "Ingreso · Timeout al Archivar",
-    description: "FUNCTION_INVOCATION_TIMEOUT: la ruta critica excedio su limite. El texto no debe perderse y el volcado debe quedar recuperable.",
+    description: "FUNCTION_INVOCATION_TIMEOUT: la ruta critica excedio su limite. El texto no debe perderse y el registro debe quedar recuperable.",
     status: "active",
     recommended_viewport: "desktop",
     ui_ids: ["ingreso.container", "ingreso.msg-error", "ingreso.btn-archivar", "ingreso.textarea"]
@@ -692,7 +692,7 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
     screen: "ingreso",
     scenario: "sin_titulo",
     title: "Ingreso · Titulacion Fallida",
-    description: "El generador de titulos no respondio. Legibilidad es degradable: el volcado avanza pero el fallo queda visible y reintentable.",
+    description: "El generador de titulos no respondio. Legibilidad es degradable: el registro avanza pero el fallo queda visible y reintentable.",
     status: "active",
     recommended_viewport: "desktop",
     ui_ids: ["ingreso.container", "ingreso.titulo-input", "ingreso.btn-titulo-ia", "ingreso.msg-reconciliacion"]
@@ -700,8 +700,8 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
   "archivo:sin_titulo": {
     screen: "archivo",
     scenario: "sin_titulo",
-    title: "Archivo · Volcados sin Titulo",
-    description: "Volcados que superaron Custodia y Fidelidad pero no Legibilidad. Aparecen sin nombre y requieren titulacion manual o reintento.",
+    title: "Archivo · Registros de Custodia sin Titulo",
+    description: "Registros de Custodia que superaron Custodia y Fidelidad pero no Legibilidad. Aparecen sin nombre y requieren titulacion manual o reintento.",
     status: "active",
     recommended_viewport: "desktop",
     ui_ids: ["pipeline.container", "pipeline.list", "pipeline.item-card", "pipeline.summary"]
@@ -710,7 +710,7 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
     screen: "archivo",
     scenario: "carga_completa",
     title: "Archivo · Bandeja Densa",
-    description: "Bandeja con muchos volcados, titulos largos y descripciones de un parrafo. Verifica densidad, desbordamiento y jerarquia visual.",
+    description: "Bandeja con muchos registros de Custodia, titulos largos y descripciones de un parrafo. Verifica densidad, desbordamiento y jerarquia visual.",
     status: "active",
     recommended_viewport: "desktop",
     ui_ids: ["pipeline.container", "pipeline.list", "pipeline.item-card", "pipeline.filters", "pipeline.summary"]
@@ -719,7 +719,7 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
     screen: "archivo",
     scenario: "preparacion_fallida",
     title: "Archivo · Preparacion Fallida",
-    description: "Volcados detenidos por fallo de protocolo, con la causa exacta visible. Nunca deben aparentar normalidad ni mostrar error desconocido.",
+    description: "Registros de Custodia detenidos por fallo de protocolo, con la causa exacta visible. Nunca deben aparentar normalidad ni mostrar error desconocido.",
     status: "active",
     recommended_viewport: "desktop",
     ui_ids: ["pipeline.container", "pipeline.list", "pipeline.item-card", "pipeline.summary"]
@@ -737,7 +737,7 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
     screen: "revision",
     scenario: "audio_ausente",
     title: "Revision · Audio No Vinculado",
-    description: "Incidente audio_no_vinculado: el volcado carece de audio custodiado. Viola C2 y no puede contrastarse contra la fuente.",
+    description: "Incidente audio_no_vinculado: el registro carece de audio custodiado. Viola C2 y no puede contrastarse contra la fuente.",
     status: "active",
     recommended_viewport: "desktop",
     ui_ids: ["pipeline.container", "pipeline.drawer", "revision.banner-incidente", "revision.btn-resolver-incidente", "revision.reading-prose"]
@@ -746,7 +746,7 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
     screen: "revision",
     scenario: "integridad_violada",
     title: "Revision · Barrera de Integridad Violada",
-    description: "El SHA-256 del verbatim no coincide con el sellado. Fallo bloqueante de C3: el volcado no puede avanzar bajo ninguna circunstancia.",
+    description: "El SHA-256 del verbatim no coincide con el sellado. Fallo bloqueante de C3: el registro no puede avanzar bajo ninguna circunstancia.",
     status: "active",
     recommended_viewport: "desktop",
     ui_ids: ["pipeline.container", "pipeline.drawer", "revision.banner-incidente", "revision.cockpit-header", "revision.reading-prose"]

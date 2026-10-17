@@ -60,7 +60,7 @@ function CompartirContent() {
         body: JSON.stringify({ texto: text, titulo: "Share Target", origen: "cora-ui" }),
       });
       const saveData = await saveRes.json();
-      if (!saveRes.ok) throw new Error(saveData.detail || "Error al guardar el volcado.");
+      if (!saveRes.ok) throw new Error(saveData.detail || "Error al guardar el registro.");
 
       const savedId = saveData.id;
 

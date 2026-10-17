@@ -40,7 +40,7 @@ function SeguridadOverview({ onOpen }: { onOpen: (tab: Exclude<SecurityTab, "seg
         <span aria-hidden="true" className="flex h-11 w-11 items-center justify-center rounded-lg border" style={border}><LockKeyhole size={23} /></span>
         <p className="mt-5 text-[10px] font-bold uppercase tracking-[0.2em] opacity-50">Submódulo</p>
         <h2 className="mt-1 text-lg font-bold">Bóveda</h2>
-        <p className="mt-2 text-sm leading-relaxed opacity-70">Apertura temporal y custodia de grabaciones, volcados y secretos operativos.</p>
+        <p className="mt-2 text-sm leading-relaxed opacity-70">Apertura temporal y custodia de grabaciones, registros de Custodia y secretos operativos.</p>
       </button>
       <button type="button" onClick={() => onOpen("mcp")} className="min-h-52 rounded-xl border p-6 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--khora-accent)]" style={{ ...border, background: "var(--khora-surface)" }}>
         <span aria-hidden="true" className="flex h-11 w-11 items-center justify-center rounded-lg border" style={border}><KeyRound size={23} /></span>
