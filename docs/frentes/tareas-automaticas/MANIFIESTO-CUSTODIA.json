@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "object_seal": "TAREAS-v0.8",
+  "purpose": "Inventario de integridad y procedencia; no estado vivo paralelo",
+  "source_of_truth": "docs/frentes/tareas-automaticas/OBJETO-CANONICO.md",
+  "owner_repo": "SeryMente/khora",
+  "branch": "main",
+  "migration_authority": "docs/frentes/tareas-automaticas/originales/instruccion-migracion.txt",
+  "methodology": {
+    "version": "1.5",
+    "seal": "METACANON-OBJETOS-v1.5",
+    "commit": "49ac40e9f6122e2d2fb339362cfa0a78128c8e37",
+    "blob": "32c7a65ff2e83b3b76752ba2160427bd6e851a8f"
+  },
+  "product_audit_commit": "362f8ff51a518506927e486b9d61feee4f6313da",
+  "original_notion_page": "https://app.notion.com/p/159f2ff32b6a4435952ebcf89ad563d2",
+  "notion_authority_superseded": true,
+  "notion_page_deleted_or_marked": false,
+  "files": [
+    {
+      "path": "OBJETO-CANONICO.md",
+      "classification": "objeto_vivo",
+      "bytes": 82638,
+      "sha256": "c5566266c41666a3177e57116494acc73db034174c6994f72ad535c1f421f25a",
+      "git_blob_sha1": "95b811e0e14ba32ba9e1228f09281d77051594ca"
+    },
+    {
+      "path": "originales/registro-notion-recibido.txt",
+      "classification": "original_historico_inmutable",
+      "bytes": 53572,
+      "sha256": "9cb3b4a0d5523bc3cd8ee2e3c1d39813c1bc1073c44931dcd32906a5ecf33918",
+      "git_blob_sha1": "b0a8ece8468b37be506eaac462639da599bf13ac"
+    },
+    {
+      "path": "originales/continuidad-auditoria-v0.7-provisional.md",
+      "classification": "original_historico_inmutable",
+      "bytes": 102951,
+      "sha256": "08ced4594621521636f778eed732b2566e4c07f2c43ca0dc4e79cdc75e13179b",
+      "git_blob_sha1": "cabd9e187b1862020b7edcb52116a3dc0362437a"
+    },
+    {
+      "path": "originales/instruccion-migracion.txt",
+      "classification": "original_historico_inmutable",
+      "bytes": 196,
+      "sha256": "8b534cbf8a70fae9c04c717f1403aa42086b37d610c9f8ad5b8e851d33ad0369",
+      "git_blob_sha1": "b13e0813f1800c2034bce021b7ad254bda8dade6"
+    },
+    {
+      "path": "evidencias/comprobaciones-aisladas.json",
+      "classification": "evidencia_sintetica_historica",
+      "bytes": 1297,
+      "sha256": "0454742c8e5b61592f4ea18c20b4478e9b24353a7f690a91516b0a4a018b2342",
+      "git_blob_sha1": "dfe4b801c59ab205cfb5a90ae490f49495556ab1"
+    }
+  ],
+  "self_integrity": "El manifiesto no se hashea a sí mismo; comprobar su blob/commit devuelto por GitHub."
+}

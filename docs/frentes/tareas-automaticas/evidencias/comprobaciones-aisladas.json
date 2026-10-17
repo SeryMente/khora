@@ -1,0 +1,59 @@
+{
+  "scope": "Código original descargado, colaboradores y transporte sustituidos. Sin red, modelos, corpus personal ni suite integral.",
+  "commit": "362f8ff51a518506927e486b9d61feee4f6313da",
+  "cases": [
+    {
+      "input": "salida ilegible",
+      "options": [
+        "SI",
+        "NO"
+      ],
+      "role": "fKGC",
+      "actual": "SI",
+      "expected_existing_behavior": "SI",
+      "matches": true
+    },
+    {
+      "input": "Insufficient",
+      "options": [
+        "Sufficient",
+        "Insufficient"
+      ],
+      "role": "control",
+      "actual": "Insufficient",
+      "expected_existing_behavior": "Insufficient",
+      "matches": true
+    },
+    {
+      "input": "Verdict: Insufficient",
+      "options": [
+        "Sufficient",
+        "Insufficient"
+      ],
+      "role": "enum_sintetico",
+      "actual": "Sufficient",
+      "expected_existing_behavior": "Sufficient",
+      "matches": true
+    },
+    {
+      "input": "respuesta",
+      "options": null,
+      "role": "fSUM",
+      "actual": "respuesta",
+      "expected_existing_behavior": "respuesta",
+      "matches": true
+    }
+  ],
+  "requests_all_same_model": true,
+  "request_fields": [
+    "messages",
+    "model",
+    "temperature"
+  ],
+  "chunk_words": [
+    600,
+    501,
+    1
+  ],
+  "checks_passed": true
+}

@@ -1,0 +1,398 @@
+<aside>
+📐
+
+ESTADO · Vivo · Registro permanente del esfuerzo autorizado por el operador · Apertura: 2026-10-16 · Fase: encuadre · Función aún no especificada ni implementada en este esfuerzo. Documento subordinado al canon de Khora y a la Metodología de uso general; no sustituye el Plan Maestro ni el tablero maestro.
+
+</aside>
+
+## 1. Control e identidad
+
+Frente: tareas automáticas con inteligencia artificial para Khora. Elemento permanente autorizado; registro único en Notion. Sello documental: TAREAS-v0.6 · ancla: Ciclo 11, dictados generales y presentación mínima aceptada conceptualmente. Este sello no representa una versión implementada del producto.
+
+## 2. LEER PRIMERO
+
+Adquirir las instrucciones del operador y comprobar las fuentes vigentes antes de actuar, subordinadas a las reglas de la plataforma. No convertir citas históricas ni propuestas en permisos. Mantener la historia y actualizar el estado único al final del documento. No iniciar construcción que afecte interfaz, seguridad o arquitectura sin revisión explícita del operador. Este documento no certifica cumplimiento integral del marco ni crea permisos o conexiones.
+
+## 3. Referencia metodológica
+
+Fuente identificada y recuperada: SeryMente/metodologia, privado según consulta del repositorio en este ciclo. Archivo rector para este objeto: METACANON-OBJETOS-CANONICOS.md, versión documental 1.5, sello METACANON-OBJETOS-v1.5. Commit observado: 49ac40e9f6122e2d2fb339362cfa0a78128c8e37; Git blob: 32c7a65ff2e83b3b76752ba2160427bd6e851a8f. Recuperación inicial y nueva consulta de main devolvieron el mismo commit y blob. Su cabecera conserva una advertencia histórica sobre trabajo en rama; la lectura actual de main sí contiene este archivo, sin que ello pruebe el historial de integración.
+
+Referencias superiores recuperadas: Sistema de Instrucciones v1.6.21, blob 151333921ca3214c0adee3996cc80d5f23adb2d5; Metodología v0.14.14, blob 8a2946c767c6ecd73e71d61c0c5274b6c7b2d17f. Recuperar un archivo no equivale a certificar todos sus procedimientos o contextos.
+
+| Fuente y regla | Aplicación al frente | Evidencia o pendiente |
+| --- | --- | --- |
+| Metacanon 1.5 §1–5: objeto único, originales, delta y estado | Reutilización de esta página; crónica conservada; ancla de evento | Aplicado documentalmente en Ciclo 04 |
+| §26: adquisición y permisos verificables | Fuente, revisión, reglas y límites explícitos | No se atribuye autorización de código a una firma |
+| §27: trece bloques comunes | Núcleo presente con referencias internas al contenido único | Cotejar semántica en cada actualización; campos pendientes no equivalen a completados |
+| §24: acceso remoto exclusivo de asistencia y solo si imprescindible | No se invocó acceso remoto; GitHub y Notion bastaron | No se infieren cuenta, dispositivo ni sesión del operador |
+| §20: carpeta y objeto en repositorio propietario | El operador pidió registro en Notion | Destino de código/carpeta pendiente; no crear espejo ni trasladar la fuente sin resolverlo |
+| §3 y §8: roles y reinstanciación | Ver bloques 5 y 12 | Asignación del segundo rol y prompts definitivos pendientes |
+
+## 4. Propósito y alcance
+
+Materialización única: «Objetivo y mandato», «Encuadre funcional · Ciclo 05» y «Estado actual · Punto de continuidad», más abajo. Incluido: diseñar, implementar y verificar la lista automática y documentar cada ciclo. Fuera del alcance autorizado: duplicar tableros, inventar fuentes de entrada o decidir unilateralmente automatización, interfaz o arquitectura.
+
+## 5. Roles y colaboración
+
+Operador: decide intención, alcance y compuertas materiales. Samantha: agente de este hilo, responsable de documentar y preparar el diseño solicitado. La separación asistente/constructor del marco no demuestra que exista otra conversación activa; asignación operativa de construcción y contraparte pendiente antes de coordinar cambios. Sin escrituras de código concurrentes ni delegación remota implícita.
+
+## 6. Autoridad
+
+Autorizado: mantener este registro cada ciclo, consultar el canon e investigar Trevor AI. Definido por el operador en Ciclo 05: dictados como única entrada del sistema; generación automática de una lista de tareas; Todoist como referencia de calidad, no competencia comercial; evolución gradual. Actualización de autoridad del Ciclo 11: aceptada conceptualmente la lista sencilla presentada en Ciclo 10; ubicación y detalles de implementación pendientes. No aprobados para construcción: contrato técnico, arquitectura, decisiones de seguridad, integración con Todoist o calendarios, borrado/cierre autónomo ni política exacta de confirmación. La generación automática solicitada no debe sustituirse por captura manual obligatoria de cada tarea.
+
+## 7. Perfil de entorno
+
+Canal: Notion AI con herramientas de Notion y conexión GitHub (2) verificadas por lecturas en este ciclo. La conexión GitHub sin sufijo exige reautenticación; no impide usar GitHub (2). Equipo físico, ubicación, identidad del sistema operativo y entorno de ejecución de Khora: NO VERIFICADOS; no requeridos para esta actualización documental. No se usó acceso remoto ni se modificó un entorno del operador.
+
+## 8. Estado vivo
+
+Materialización única: «Estado actual · Punto de continuidad». Actualizar allí acción, siguiente paso, pruebas y recordatorios; no duplicar estados contradictorios en este núcleo.
+
+## 9. Aceptación y viabilidad
+
+| Requisito | Resultado y evidencia | Pendiente |
+| --- | --- | --- |
+| Registro único en Notion por ciclo | Esta página y su historial | Persistencia por lectura de vuelta después de cada escritura |
+| Consultar el canon del repositorio indicado | Metacanon 1.5 recuperado de SeryMente/metodologia | Completar adopción de campos dependientes de decisiones reales |
+| Lista automática útil y verificable | Sin implementación ni prueba de producto en este esfuerzo | Origen resuelto: dictados. Aprobar acciones permitidas y validar los casos propuestos con evidencia real |
+
+Viabilidad técnica y plazo de implementación: todavía no estimables; dependen del alcance y del contraste con la gestión de tareas existente. Próximo hito: contrastar el flujo propuesto con el código existente y someter las decisiones materiales a revisión. No implica un plazo de entrega del producto.
+
+## 10. Formato de ciclo
+
+Por instrucción expresa del operador en Ciclos 06–07, cada respuesta sustantiva de diseño mostrará un resumen acumulado muy breve, en lenguaje muy simple: definido por el operador, propuesto y pendiente, sin mezclar sus estados. Priorizar pocas líneas y una sola decisión material cuando haga falta; no convertir el diseño en preguntas sobre cada prestación obvia, como alarmas. Después indicará qué se resolvió en ese ciclo y guiará la siguiente decisión material con una recomendación concreta. Documentar aquí el delta de cada ciclo; no obligar al operador a diseñar todos los detalles. Primero cerrar y revisar el diseño completo de la entrega mínima utilizable; después iniciar su construcción autorizada, sin esperar a diseñar todas las fases futuras (precisión del Ciclo 09). Esta instrucción no ratifica automáticamente las propuestas previas.
+
+Cada entrada conservará: identidad/rol/sello y versión del metacanon; panorama; delta metodológico y de proyecto; avance y evidencia; pendientes/bloqueos; viabilidad; pronóstico con supuestos; siguiente acción; continuación/checkpoint; persistencia y revisión. Dato desconocido se declara pendiente o NO VERIFICADO. Materialización cronológica: «Historial de desarrollo».
+
+## 11. Crónica y fuentes
+
+Materialización única: «Solicitud original del operador», «Método aplicable» e «Historial de desarrollo». Conservar entradas previas literalmente; correcciones y decisiones supersedidas se explican mediante nuevas entradas.
+
+## 12. Reinstanciación
+
+Documento de continuidad: esta página, sello TAREAS-v0.6. Antes de retomar, recuperar esta fuente y el metacanon, comprobar revisión/delta, adquirir rol y permisos, leer el estado vivo literal y continuar el siguiente paso sin repetir trabajo. Los dos prompts definitivos del marco están PENDIENTES de asignación verificable de roles; no se afirma completada la portabilidad ni se inventa una contraparte.
+
+## 13. Persistencia y revisión
+
+Conservar Notion como registro solicitado; no abrir otra fuente de estado. Antes de escribir, cargar el contenido vigente y usar cambios dirigidos. Después, releer para comprobar núcleo, historia, estado y referencias. La existencia del archivo metodológico no acredita pruebas de producto, permisos ni obediencia de otras conversaciones. Adopción parcial explícita: falta resolver roles, destino de repositorio y aceptación funcional.
+
+---
+
+## Objetivo y mandato
+
+Diseñar e implementar en Khora una función de lista de tareas automática con inteligencia artificial. Documentar aquí cada ciclo sustantivo del esfuerzo, desde el encuadre hasta la verificación funcional y la entrega.
+
+### Solicitud original del operador · 2026-10-16
+
+> Tareas
+> 
+> 
+> Este es un hilo donde diseñremos e implementaremos una funcionde lista de tareas automatica con IA para Khora,
+> 
+> Cada ciclo documentras enundocumento ennotion todo el esferuzo de desarrollo,fijate en el canon para esto, en metodologia
+> 
+
+## Método aplicable
+
+Referencia rectora del método: Metodología de uso general · marco replicable, especialmente §3, §4.4–4.5, §6.1–6.2 y §7.5.
+
+- Definir el norte, alcance y criterios falsables antes de construir.
+- Separar propuestas, decisiones aprobadas y hechos verificados. No convertir una propuesta de la inteligencia artificial en una decisión del operador.
+- Diseñar el primer flujo completo útil antes de ampliar capacidades.
+- Usar el tablero maestro existente para las tarjetas de desarrollo; este documento conserva el diseño y la historia, no es un tablero paralelo. La lista de tareas que usará el producto es un objeto distinto del tablero de desarrollo.
+- Cada tarjeta ejecutable tendrá insumos con origen, dependencias, entregable, contrato, «Hecho cuando», «Fuera de alcance» y prueba real funcional.
+- Someter a revisión del operador las decisiones materiales de experiencia de usuario, seguridad y arquitectura antes de iniciar su construcción.
+- No declarar implementado, desplegado o funcional sin evidencia de la operación correspondiente. Compilar no basta.
+
+## Registro de cada ciclo
+
+Añadir una entrada cronológica, sin sobrescribir la historia: fecha y objetivo; aportaciones del operador; fuentes y artefactos consultados; propuestas y alternativas; decisiones y autorizaciones; cambios realmente realizados; pruebas ejecutadas y resultados observados; problemas y pendientes; siguiente paso concreto.
+
+Conservar literalmente las decisiones relevantes y los errores observados. Enlazar tarjetas, archivos, cambios de código y evidencia cuando existan. No registrar pruebas no ejecutadas como si hubieran pasado. Actualizar además el punto de continuidad al cerrar cada ciclo.
+
+## Encuadre funcional · Ciclo 05
+
+### Dirección fijada por el operador
+
+- Entrada actual: los mismos dictados generales que ya recibe Khora, no dictados especiales para tareas. Analizar todo su contenido para seleccionar lo pertinente; un dictado puede producir cero tareas. Dejar contenido fuera de la lista no significa borrar ni desvalorizar el dictado original. Corrección del Ciclo 07: no es una restricción permanente; el horizonte es incorporar otros canales autorizados cuando estén disponibles.
+- Resultado: lista de tareas generada automáticamente, sin exigir dictar cada tarea como comando formal ni especificar todos los pormenores del gestor.
+- Referente de calidad: Todoist, sin objetivo de competencia comercial ni obligación de reproducir toda su superficie funcional.
+- Trevor AI es objeto de investigación, no referente adoptado automáticamente. Según aclaración del Ciclo 07, evaluar primero qué aporta al propósito prostético.
+
+### Investigación de Trevor AI y Todoist
+
+La documentación oficial de Trevor AI describe creación, edición, búsqueda, finalización y eliminación de tareas por lenguaje natural; predicción de duración; sugerencias y programación automática en calendario; y planes de acción que descomponen tareas. Su asistente muestra una vista previa y solicita confirmación para cambios. No se encontró en las fuentes consultadas demostración de extracción pasiva y continua de compromisos desde dictados largos y mezclados. La capacidad documentada de conversar para crear tareas no prueba esa extracción.
+
+Todoist aporta como referencias de gestión: captura en lenguaje natural, fechas recurrentes, recordatorios, organización, prioridades y subtareas. Son dimensiones candidatas de calidad, no una lista de funciones aprobadas para la primera entrega. No se probaron las aplicaciones; esta investigación es documental. No se adoptan sus cifras publicitarias de productividad como evidencia.
+
+**Conclusión de diseño propuesta:** separar generación desde dictados, mantenimiento fiable de la lista y planificación de cuándo ejecutar. El primer flujo debe resolver la generación y la fiabilidad; calendario y estimación de duración no entran automáticamente por aparecer en Trevor AI. No integrar Trevor ni enviarle dictados por esta investigación.
+
+### Primer contrato funcional propuesto · no aprobado para construcción
+
+Flujo conceptual: dictado existente → interpretación de acciones y contexto → conciliación con tareas existentes → lista actualizada con trazabilidad. La ubicación exacta en el sistema y el procesamiento de transcripciones requieren inspección del código; no constituyen todavía una arquitectura aprobada.
+
+1. Analizar íntegramente el dictado general y su contexto disponible para identificar acciones pertinentes; no exigir órdenes formales ni contenido orientado a tareas. Extraer compromisos claros y distinguir sugerencias fundamentadas de obligaciones, sin convertir toda idea, deseo o cita en tarea. Cero tareas es un resultado válido si el análisis terminó y no encontró acciones pertinentes; distinguirlo de un fallo o análisis pendiente. El contenido no seleccionado permanece intacto en su fuente.
+2. Redactar tareas accionables conservando el sentido, y enlazar cada una con el dictado y fragmento que la originó. No alterar el original.
+3. Recuperar fechas, recurrencias y prioridades expresadas; distinguirlas de cualquier propuesta inferida. Nunca inventar un vencimiento ni convertir una duración estimada en un dato dicho por el operador.
+4. Conciliar menciones repetidas y correcciones posteriores; reprocesar el mismo dictado no debe multiplicar tareas. Una coincidencia dudosa no justifica fusionar acciones distintas.
+5. Regla de partida aceptada por el «Sí» del Ciclo 07: acciones claras se crean solas, ideas no se convierten en obligaciones y ambigüedades quedan por aclarar. La experiencia objetivo va más allá: sugerencias inteligentes y organizadas a partir del contexto disponible, no solo extracción literal de órdenes. No implica autorización de construcción o producción; trazabilidad, corrección y política detallada siguen en diseño.
+6. No cerrar, borrar o reprogramar tareas por una inferencia débil. Interpretar «ya lo hice», negaciones o retractaciones exige contexto y evidencia; reglas exactas pendientes.
+
+### Casos ilustrativos de aceptación · aún no ejecutados
+
+| Dictado sintético | Comportamiento esperado propuesto |
+| --- | --- |
+| «Mañana tengo que llamar al dentista» | Una tarea con origen y fecha anclada al momento del dictado, no al del reprocesamiento |
+| «Quizá algún día aprenda italiano» | No convertir automáticamente en compromiso firme |
+| Mismo dictado procesado dos veces | Sin tareas duplicadas |
+| «Lo del dentista, mejor el viernes» | Conciliar con contexto; no elegir silenciosamente si hay varias tareas plausibles |
+| «No tengo que llamar al dentista; ya llamé» | No crear la tarea por ignorar negación o tiempo verbal; conciliar el estado solo con referencia suficiente |
+
+Estos casos son ejemplos de diseño, no datos del operador, pruebas realizadas ni resultados aprobados. La calidad se validará con dictados reales autorizados, incluyendo omisiones, falsas tareas, duplicados, fechas erróneas y facilidad de corrección; umbrales aún pendientes.
+
+### Pendientes materiales
+
+Inspeccionar el flujo construido de dictados y el modelo real de tareas; definir política de confirmación y recuperación; aprobar contrato, interfaz y decisiones de arquitectura pertinentes antes de construir. Todoist es referente, no integración requerida. El antecedente «Migración Todoist → Khora» distingue tareas de notas y conserva originales, pero su estado histórico no certifica el producto actual.
+
+## Historial de desarrollo
+
+### Ciclo 01 · 2026-10-16 · Apertura y anclaje metodológico
+
+**Objetivo:** establecer el registro único del esfuerzo y cargar el método solicitado antes de diseñar la función.
+
+**Trabajo realizado:** búsqueda del marco metodológico, lectura del marco completo, lectura del evento «Metodología de uso general adoptada», del contenedor Desarrollo · Khora y del Registro de Taxonomía. Búsqueda inicial de antecedentes sobre tareas automáticas.
+
+**Fuentes y antecedentes localizados:**
+
+- Metodología de uso general · marco replicable: leído.
+- Metodología de uso general adoptada: leído; confirma tarjetas atómicas, juez de construcción/pruebas y prueba real por tarjeta.
+- Registro de Taxonomía: leído; elemento de Diseño/Método, icono 📐.
+- Migración Todoist → Khora · bandeja y fases: localizado en el índice; contenido aún no leído, no asumido como estado vigente.
+- Tareas · espejo de Todoist: localizada en búsqueda; esquema y datos aún no consultados.
+
+**Decisión autorizada:** abrir este registro y mantenerlo en cada ciclo del hilo. No se ha aprobado aún diseño funcional, interfaz, modelo de datos ni alcance de automatización.
+
+**Resultado:** encuadre documental preparado. No se ejecutaron cambios de código, despliegues ni pruebas de la función.
+
+**Siguiente paso:** precisar con el operador qué material transformará Khora en tareas y qué significa «automática» para el primer flujo útil; después contrastarlo con los antecedentes existentes antes de proponer el contrato funcional.
+
+### Ciclo 02 · 2026-10-16 · Localización del canon en el repositorio de metodología
+
+**Aportación del operador:** la solicitud de este hilo señala expresamente «fijate en el canon para esto, en el repositorio de metodologia». Esta precisión complementa la transcripción de apertura conservada arriba: no basta con consultar el marco en Notion.
+
+**Objetivo:** localizar y leer el canon de documentación del repositorio indicado, manteniendo este documento como registro único.
+
+**Trabajo realizado:** lectura del registro existente, del marco metodológico completo en Notion, del evento de adopción del método, del Registro de Taxonomía y del contenedor Desarrollo · Khora. Consulta de las conexiones de GitHub y búsqueda del repositorio de metodología por nombre y dentro de la cuenta autenticada 1interprete1.
+
+**Resultados observados:** la conexión «GitHub» devolvió «MCP connection requires re-authentication». La conexión «GitHub (2)» permitió consultar la identidad autenticada y buscar repositorios; la búsqueda de metodología dentro de 1interprete1 devolvió cero resultados. El listado obtenido de esa cuenta tampoco identificó el repositorio solicitado. Esto no prueba que no exista: puede estar en otra organización o fuera del alcance de la conexión.
+
+**Decisión operativa:** reutilizar este registro, conservar la historia y no sustituir el canon del repositorio por el marco de Notion. No se aprobaron requisitos funcionales ni decisiones de arquitectura, interfaz o seguridad.
+
+**Cambios y pruebas:** actualización documental de este ciclo; ninguna modificación de código, despliegue ni prueba funcional del producto.
+
+**Bloqueo y siguiente paso:** falta la dirección exacta del repositorio de metodología para leer su canon y ajustar el registro a sus exigencias. Solicitar ese enlace al operador; después retomar el encuadre funcional.
+
+### Ciclo 03 · 2026-10-16 · Precisión: Etta bajo la organización Ser y Mente
+
+**Aportación literal del operador:** «Cada ciclo documentras enundocumento ennotion todo el esferuzo de desarrollo,fijate en  el canon para esto, en el repositorio de metodologia Etta bajo la  organizacionser y mente.»
+
+**Objetivo:** identificar el canon documental de Etta en la organización indicada y preservar el registro único del esfuerzo.
+
+**Trabajo realizado y evidencia:** recuperación de este documento y del contenedor Desarrollo · Khora; lectura del Registro de Taxonomía y del protocolo MOTOR-1C. La conexión «GitHub» exige reautenticación; «GitHub (2)» permitió búsquedas. La búsqueda «metodologia etta» no devolvió repositorios. El identificador tentativo «ser-y-mente» no pudo consultarse: GitHub devolvió «The listed users and repositories cannot be searched either because the resources do not exist or you do not have permission to view them.» No se considera identificador confirmado de la organización. Otras búsquedas de nombre y referencias no identificaron el repositorio solicitado. La existencia o ausencia del repositorio NO está demostrada.
+
+**Decisión:** no sustituir el canon de Etta por el marco de Notion ni crear otro documento. Mantener aquí cada ciclo sustantivo. El enlace exacto es el dato pendiente para resolver la identificación y comprobar el acceso.
+
+**Cambios realizados:** entrada documental de este ciclo y actualización del punto de continuidad. Sin cambios de código, despliegues, decisiones de arquitectura ni pruebas funcionales del producto.
+
+**Comprobación pendiente:** releer esta entrada tras guardar para verificar su persistencia.
+
+**Siguiente paso:** recibir el enlace exacto al repositorio Etta bajo Ser y Mente, leer el canon aplicable y ajustar este documento a sus exigencias antes de continuar el diseño.
+
+### Ciclo 04 · 2026-10-16 · Repositorio identificado y adopción documental del metacanon
+
+**Aportación literal del operador:** «Tareas
+
+Este es un hilo donde diseñremos e implementaremos una funcionde lista de tareas automatica con IA para Khora, 
+
+Cada ciclo documentras enundocumento ennotion todo el esferuzo de desarrollo,fijate en  el canon para esto, en el repositorio de metodologia Esta bajo la  organizacionser y mente.»
+
+**Panorama y delta:** el bloqueo de identificación de los ciclos anteriores queda resuelto. La búsqueda «ser y mente» encontró SeryMente/metodologia; no se necesita pedir nuevamente el enlace ni se adopta «Etta» como nombre confirmado del repositorio. El alcance funcional sigue abierto.
+
+**Trabajo y evidencia:** recuperación del registro existente, lectura del Registro de Taxonomía, listado del repositorio, lectura del README, del Registro de Verificación por Ciclo y de las secciones aplicables del Metacanon 1.5; recuperación del Sistema de Instrucciones y de la Metodología. Nueva consulta de main confirmó el mismo commit y blob del metacanon. No se afirma completada toda la adquisición normativa transversal.
+
+**Cambio realizado:** incorporación del núcleo común de trece bloques mediante referencias internas a la historia y estado únicos; fuentes, hashes, adopción y huecos explícitos. Conservados los tres ciclos anteriores y el encuadre. No se creó otra página, tablero, infraestructura ni espejo en GitHub.
+
+**Autorización:** actualización documental amparada por la solicitud expresa de mantener el registro cada ciclo. Ningún cambio de código, interfaz, seguridad o arquitectura ejecutado. Ninguna prueba de producto ni despliegue.
+
+**Viabilidad y pendientes:** falta conocer qué transformará Khora en tareas, qué decisiones podrá tomar sola y un ejemplo real de resultado esperado; después contrastar los antecedentes de tareas/Todoist. Roles separados y destino del objeto en repositorio pendientes; no bloquean esta documentación en Notion.
+
+**Pronóstico:** siguiente hito, definición inicial del flujo, en el próximo intercambio si llega la intención del operador; cierre de implementación no estimable sin alcance ni inspección del código. No existe estimación anterior verificable que recalibrar.
+
+**Revisión:** primera pasada, preservación de originales e historia y separación entre autorización/propuesta/hecho; segunda pasada, lectura de vuelta pendiente tras guardar. Persistencia final solo acreditada por esa lectura, no por esta declaración.
+
+**Siguiente acción:** obtener del operador el material de entrada y el grado de automatización que espera; usarlo para redactar el primer contrato funcional sin fijar decisiones no aprobadas.
+
+### Ciclo 05 · 2026-10-16 · Dictados, referente de calidad e investigación de Trevor AI
+
+**Rol y sello:** Samantha, documentación/diseño de este hilo; TAREAS-v0.2. Metacanon adquirido: 1.5 · METACANON-OBJETOS-v1.5. Consulta fresca de main: commit 49ac40e9f6122e2d2fb339362cfa0a78128c8e37, blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f, coincidentes con la referencia anterior; sin delta metodológico detectado en ese archivo. No se certifica ejecución completa del régimen transversal.
+
+**Instrucción original del operador, íntegra:**
+
+> Fundamentalmente de los dictados, es la única entrada de datos que tiene el sistema. Hay una aplicación que se llama Trevor AI que hace algo como lo que quiero hacer. El objetivo es que el sistema genere una lista de tareas automáticamente que compita, no comercialmente, pero en términos de calidad, con lo que hace la aplicación Todoist. Te lo digo así para no tener que estar planeando todos los pormenores de este ámbito. y revisa qué hace Trevor AI con la inteligencia artificial para generar tareas de manera automática en base a, bueno, como lo hagan ellos, pero nosotros vamos a tomar como entrada los mismos dictados y ya veremos cómo va evolucionando esta parte.
+> 
+
+**Delta de proyecto:** entrada resuelta: dictados, sin solicitar de nuevo su identificación. Generación automática y referente de calidad definidos; no se exige al operador detallar todo el gestor. Alcance técnico y revisión de decisiones materiales siguen pendientes.
+
+**Trabajo:** lectura del estado de esta página; consulta fresca del metacanon; búsqueda pública y lectura focalizada de documentación oficial de Trevor AI; consulta de páginas oficiales de Todoist; lectura del antecedente Migración Todoist → Khora · bandeja y fases. Este último es antecedente documental, no prueba del estado actual de conectores o código.
+
+**Resultado:** hallazgos y límites conservados en «Encuadre funcional · Ciclo 05»; contrato inicial propuesto y casos sintéticos de aceptación, sin presentarlos como aprobaciones ni pruebas. Trevor documenta gestión conversacional y planificación; no se atribuye extracción pasiva de dictados no demostrada.
+
+**Cambios y límites:** actualización documental autorizada; ninguna escritura de código, llamada a producción, integración nueva, envío de dictados a Trevor, prueba funcional ni despliegue. El registro de Ciclo 04 fue recuperado en este ciclo y su persistencia queda observada.
+
+**Viabilidad:** dirección funcional definida; encaje técnico aún no verificado. Falta inspección de código, contrato de automatización y criterios con dictados reales. No se bloquea investigación por falta de arquitectura aprobada; sí se conserva la compuerta de construcción.
+
+**Pronóstico:** próximo hito, propuesta técnica apoyada en el código; plazo de entrega no estimable todavía, dependiente del estado real de ingesta/tareas y de las decisiones materiales. La expectativa anterior de definir el flujo se satisface a nivel de propuesta, no de aprobación o implementación.
+
+**Siguiente acción:** inspección de solo lectura del flujo actual de dictados y de las estructuras de tareas para preparar la propuesta técnica mínima; no crear otro tablero ni implementar calendario por defecto.
+
+**Persistencia y revisión:** primera pasada: cotejo de literal, dirección fijada, propuestas y evidencia. Segunda pasada: lectura de vuelta tras guardar; no declarar producto terminado por esta entrega documental.
+
+### Ciclo 06 · 2026-10-16 · Resumen acumulado y conducción del diseño
+
+**Instrucción original del operador:**
+
+> Ok, a cada ciclo vamos mostrando un resumen de lo que llevamos planeado de la funcionalidad de tareas automáticas y vamos guiando para irla resolviendo hasta que quede el diseño completo para que puedas ponerte a construirla.
+> 
+
+**Decisión y delta:** queda autorizado el formato de seguimiento acumulativo y la conducción activa del diseño. Cada ciclo distinguirá lo definido, lo propuesto y lo pendiente, avanzando con recomendaciones en lugar de un cuestionario de pormenores. Construcción posterior al cierre y revisión del diseño; no se interpreta este mensaje como aprobación general de las propuestas funcionales del Ciclo 05.
+
+**Resumen vigente:** definido: dictados como única entrada, generación automática, Todoist como referencia de calidad y Trevor AI como referencia investigada. Propuesto: extraer acciones con trazabilidad, evitar duplicados, comprender correcciones, crear automáticamente lo inequívoco y revisar ambigüedades. Pendiente: política de automatización; contenido y organización de tareas; modificaciones y cierre; presentación y revisión; encaje técnico y aceptación.
+
+**Ruta propuesta hacia diseño completo:** resolver esos cinco ámbitos con ejemplos y decisiones registradas; inspeccionar en paralelo y en solo lectura el sistema existente cuando sea pertinente. El cierre exige alcance de primera entrega y exclusiones explícitas, reglas de comportamiento y manejo de fallos, presentación revisada, encaje técnico contrastado y criterios verificables. No exige reproducir todas las funciones de Todoist.
+
+**Primera decisión guiada:** recomendar creación automática de compromisos claros, tratamiento aparte de ideas/deseos y revisión de referencias ambiguas; someter esa política al operador antes de asumirla aprobada.
+
+**Trabajo y evidencia:** lectura del registro actual y actualización dirigida de su formato y continuidad. Sin nuevas investigaciones externas, cambios de código, pruebas funcionales o despliegues. Metacanon de referencia: 1.5 · METACANON-OBJETOS-v1.5, identificado en ciclos anteriores; frescura del repositorio no revalidada en este ciclo de ajuste conversacional. No se declara diseño completo ni cumplimiento normativo integral.
+
+**Viabilidad y pronóstico:** posible continuar el diseño con la información disponible. Duración hasta diseño completo aún no estimable: depende de las decisiones materiales y de la inspección técnica. Los cinco ámbitos son cobertura de diseño, no cinco turnos obligatorios. Persistencia: resultado de la herramienta de actualización; lectura de vuelta del Ciclo 06 no realizada todavía.
+
+### Ciclo 07 · 2026-10-16 · Propósito prostético y construcción gradual
+
+**Instrucción original íntegra:**
+
+> Sí, venme diciendo las cosas, o sea, vamos haciendo el diseño, pero házmelo en términos muy, muy simples porque no puedo leer textos muy largos porque no tengo mucho... Tengo mucho trabajo, entonces... todo es la referencia de calidad, pero vamos haciéndolo, o sea, cuando tengas el diseño, lo vas a hacer por fases, porque todo es una empresa multimillonaria, multimillonaria, no la voy a duplicar en un ratito. La idea es no tener que estar pensando en si le voy a poner alarmas o ese tipo de cosas. Luego, construirla desde lo más esencial, o sea, que las fases del desarrollo tengan sentido en términos de lo que es obvio. y luego, a ver qué hace Trevor ahí, antes de tomarlo como referencia, o sea, lo que yo quiero hacer, esto es una parte de la prótesis, porque la prótesis es un sistema para un trastorno del desempeño, un trastorno de la productividad. Entonces, la lista de tareas es una parte básica, y lo que tiene que ocurrir es que conforme los datos de entrada de la prótesis, que en este momento nada más son los dictados, pero van a ampliarse a otros canales de entrada. Por ejemplo, estoy en otro hilo planeando análisis de voz con Whisper para detección de síntomas, a ver qué resulta, pero ese sería otro canal de entrada. El punto es que conforme se consideran todos los canales de entrada, el sistema debería de poder crear tareas sugeridas muy inteligentes, muy inteligentes. La experiencia debe ser tal que yo tengo mi sistema prostético y lo que obtengo es mágicamente aparecer frente a mí las tareas ya organizadas que yo debo de resolver. Por ejemplo, si tiene acceso a mi correo electrónico, pues vas a ver que me escribí en la universidad. Si tiene acceso a mi Microsoft Teams, va a tener acceso a mis clases y va a tener acceso. Entonces, si tiene acceso a mis plataformas de la universidad, pues me va a organizar para que yo pueda tomar decisiones. O sea, finalmente el proceso de toma de decisión y de manejo del tiempo debe de ser gestionado por la prótesis, para eso la voy a tener. Entonces, la lista de tareas es importante. Eso es lo que te puedo dar por ahora. Nos vemos en 1, 2, 3, 4, 5 hilos.
+> 
+
+**Normalización separada:** en este contexto «todo» se interpreta como Todoist por el antecedente explícito; el literal se conserva sin corregir. Whisper y detección de síntomas son una exploración reportada de otro hilo, no una capacidad clínica validada ni trabajo encargado a este frente. Los ejemplos de correo, Teams y universidad son condicionales; no prueban acceso ni autorizan conexiones o acciones externas.
+
+**Decisiones y delta:** el «Sí» acepta la regla inicial de acciones claras/ideas/ambigüedades. Se amplía la visión: tareas sugeridas inteligentes, ya organizadas, como parte de la prótesis de apoyo al desempeño y al manejo del tiempo y decisiones. Dictados son la entrada actual, no la única entrada para siempre. Todoist es nivel de calidad, no objetivo de réplica completa; Trevor queda como aplicación a evaluar, no patrón rector. Diseño explicado con extrema brevedad y construcción posterior por fases esenciales. La dirección de apoyo a decisiones no autoriza compromisos externos, cambios irreversibles o cesión automática de decisiones materiales.
+
+**Resumen acumulado:** definido: propósito prostético, sugerencias automáticas organizadas, entrada actual de dictados, ampliación futura de canales, referencia de calidad Todoist y desarrollo gradual. Propuesto: tareas con fuente, conciliación de repetidos/correcciones y orden comprensible por contexto y plazos conocidos. Pendiente: reglas de priorización y presentación, encaje real en código y aceptación de la primera fase. No tratar estas propuestas como diseño aprobado.
+
+**Fases propuestas, no plan técnico aprobado:** (1) lista básica fiable desde dictados, con tareas claras, origen y sin duplicados; (2) organización y seguimiento contextual, prioridades explicables y cambios de tarea; (3) asistencia para distribuir tiempo y recordatorios donde aporten valor; (4) enriquecimiento con otros canales autorizados cuando existan. Orden orientativo: los plazos dichos deben respetarse desde el inicio, y una función básica necesaria no se posterga artificialmente por esta división. No construir ahora conectores futuros, alarmas o un planificador completo. El horizonte multicanal no bloquea la primera entrega.
+
+**Evidencia y revisión:** leído el documento vigente y recuperado el Ciclo 06; actualización dirigida de dirección funcional, formato y continuidad. Metacanon de referencia 1.5, METACANON-OBJETOS-v1.5; repositorio no revalidado este ciclo, sin afirmar frescura actual. No se modificó código ni se ejecutaron pruebas o despliegues. Fuente de instrucciones: mensaje del operador de este ciclo; revisión de fidelidad contra su literal. Persistencia inicial acreditada por respuesta de escritura; lectura de vuelta pendiente.
+
+**Continuidad y pronóstico:** el operador cierra su aportación por ahora. No abrir cuestionario ni prometer trabajo de fondo. Al retomar, mostrar panorama corto y proponer la primera fase, apoyada en inspección de solo lectura del sistema existente. Cierre del diseño y tiempo de construcción no estimables todavía: dependen de ese contraste y de decisiones materiales pendientes.
+
+### Ciclo 08 · 2026-10-16 · Primera fase y contraste inicial con el código
+
+**Instrucción literal:** «Ok  sigue». Autoriza continuar el diseño, no presupone aprobación de interfaz o arquitectura ni arranque de construcción.
+
+**Resumen acumulado:** definido: apoyo prostético al desempeño, tareas automáticas organizadas, dictados actuales y más canales en el futuro; calidad Todoist sin réplica completa. Regla inicial aceptada: acciones claras se crean, ideas no son obligaciones y dudas se aclaran. Propuesto ahora: primera entrega centrada en lista fiable y breve, con orden básico y corrección sencilla. Pendiente: presentación, priorización, ciclo de vida y encaje técnico final.
+
+**Lectura real del código:** identificado SeryMente/khora y leídos AGENTS.md, khora-web/app/api/ingesta/route.ts, khora-web/lib/todoist-adapter.ts, khora-web/lib/client/dictado-observability.ts y khora-web/lib/contracts/observation.ts en commit 1697ee2693ed3217523ffc1d1be9b6541d7d849d. Referencias: ingesta, adaptador Todoist, observabilidad de dictado.
+
+**Hallazgos acotados:** la ruta de ingesta exige texto de versión aprobada con identificador, versión y hash coincidentes, y conserva controles contra cambios concurrentes. El adaptador de Todoist contiene métodos de consulta/creación/actualización/cierre, pero esa clase por sí sola no demuestra integración activa; la búsqueda de su símbolo devolvió solo su propio archivo. La observabilidad de dictado excluye texto/audio y no debe usarse como fuente del contenido para extraer tareas. No se inspeccionó exhaustivamente el núcleo ni todos los modelos de persistencia; no afirmar que no exista motor de tareas. Lectura de código no prueba funcionamiento ni despliegue.
+
+**Consecuencia de diseño propuesta:** aprovechar el contenido versionado existente para conservar origen; no reconstruir captura ni extraer transcripciones de telemetría. El punto de disparo y almacenamiento del motor de tareas sigue pendiente de rastrear en el núcleo. No alterar la aprobación de ingesta existente ni añadir otra revisión manual de cada tarea por defecto. No conectar Todoist solo porque exista un adaptador.
+
+**Primera fase propuesta, para revisión antes de construir:**
+
+- Convertir compromisos claros del dictado disponible para procesamiento en tareas breves; conservar referencia a la versión y fragmento de origen.
+- Incluir desde el inicio fecha explícita cuando exista, sin inventar vencimiento. Orden básico por plazos conocidos; sin agenda automática ni promesa de prioridad personal inferida.
+- Evitar duplicados al reintentar y no sobrescribir correcciones humanas con un reprocesamiento. Conflictos y ambigüedades quedan visibles para aclaración.
+- Proponer una presentación simple: «Hoy», «Después» y «Por aclarar». «Hoy» contiene lo vencido o con fecha de hoy, distinguiéndolos; «Después» conserva fechas futuras y tareas sin fecha, sin fingir que estas últimas carecen de importancia. No asignar fecha para rellenar una sección. Una sugerencia de prioridad contextual se distinguirá de una fecha o compromiso del usuario.
+- Permitir marcar hecha, corregir o descartar una sugerencia sin borrar el dictado. Registro de rechazo debe impedir que el mismo procesamiento la resucite sin una razón nueva.
+- Si falla la generación, conservar el dictado y mostrar extracción pendiente o fallida; lista vacía no significa que el análisis haya terminado correctamente.
+
+**Criterio de salida propuesto:** recorrer un dictado autorizado hasta su lista persistida y visible; comprobar acciones, fechas, negaciones, referencias ambiguas, reintentos, rechazo y corrección, conservación de origen y recuperación tras fallo. Ninguno de esos ensayos fue ejecutado aquí. Sin alarmas, calendario automático, conectores futuros ni envío de dictados a Todoist en esta fase.
+
+**Problemas de herramientas:** búsqueda de código con paréntesis/OR rechazada por el analizador; recuperación con consultas simples separadas. Sin impacto de estado ni cambios de código. Esta es incidencia de consulta, no error de terminal.
+
+**Método y persistencia:** registro único recuperado; Metacanon de referencia 1.5 · METACANON-OBJETOS-v1.5, sin revalidación de su fuente central en este ciclo. Se preserva la crónica, se corrige el estado y se separa evidencia/propuesta. Solo lectura de GitHub y escritura documental en Notion; sin ejecución, pruebas, nuevas conexiones o despliegue. Guardado acreditado por herramienta; no afirmar lectura de vuelta mientras no se ejecute.
+
+**Siguiente paso y pronóstico:** precisar un orden que reduzca carga sin inventar obligaciones, y contrastar la propuesta con persistencia/extracción del núcleo. No repetir al operador preguntas de detalles habituales. Diseño aún no completo; plazo de construcción no estimable sin ese contraste. La propuesta visual no queda aprobada por haber sido documentada.
+
+### Ciclo 09 · Producto mínimo viable para uso temprano
+
+**Instrucción literal:** «Bueno, que las fases del desarrollo sean congruentes con la necesidad de empezar a usarla lo más pronto posible bajo mínimo producto viable.»
+
+**Decisión:** priorizar el primer uso real. Cerrar y revisar el diseño completo de la primera entrega, no el diseño exhaustivo de todas las capacidades futuras, antes de construir. El mapa de evolución queda orientativo y no bloquea la entrega mínima. Cada fase debe aportar una mejora utilizable de principio a fin; no entregar solo infraestructura invisible.
+
+**Recorte propuesto:** primera entrega: dictado procesable → tareas claras guardadas → lista visible con fechas expresadas y orden básico → marcar hechas, corregir o descartar. Conservar origen, evitar duplicados y mostrar fallos son requisitos de fiabilidad del mínimo, no extras. Las dudas no crean obligaciones firmes. No es necesario resolver priorización avanzada, alarmas, agenda automática, nuevos canales ni el diseño visual definitivo para empezar a usarla. Una presentación básica sí requiere revisión del operador antes de construirla.
+
+**Fases propuestas:** 1, lista mínima utilizable; 2, mejorar sugerencias, orden y seguimiento con evidencia del uso; 3, asistencia de tiempo y recordatorios; otros canales según disponibilidad y autorización. El orden posterior puede cambiar por necesidad observada; no constituye autorización técnica ni obligación de construir prestaciones innecesarias.
+
+**Criterio de salida:** un dictado real autorizado produce tareas persistidas y visibles, conserva fechas y origen, permite resolverlas o corregirlas y no las duplica al reintentar. Verificación de extremo a extremo pendiente; ninguna fecha de disponibilidad prometida.
+
+**Resumen y siguiente paso:** dirección confirmada: mínimo utilizable cuanto antes; alcance mínimo propuesto arriba; pendiente cerrar disparo, almacenamiento y presentación básica, revisarlos y construir la primera entrega sin esperar el resto. Se sustituye la expectativa de cerrar todo el producto antes del primer uso por cierre del diseño de cada entrega.
+
+**Evidencia y límites:** lectura del registro vigente y actualización documental, sin cambios de código ni pruebas. Metacanon de referencia 1.5 · METACANON-OBJETOS-v1.5; fuente central no revalidada en este ajuste de alcance. Plazo no estimable hasta cerrar las dependencias técnicas mínimas; la escritura acredita registro, no funcionamiento del producto.
+
+### Ciclo 10 · Continuación y presentación mínima para revisión
+
+**Instrucciones literales:** «S», seguida de «si» durante el trabajo. Se interpretan como continuar el diseño del producto mínimo viable; no como autorización de decisiones aún no presentadas o construcción.
+
+**Resumen:** definido: dictados → tareas claras automáticas, sin convertir ideas en obligaciones; uso temprano con calidad básica y evolución por fases. Propuesto: lista persistente sencilla con fechas dichas, origen, corrección, descarte y completar. Pendiente: revisión de presentación mínima y encaje técnico final. No rediseñar el producto entero para empezar.
+
+**Inspección ejecutada:** leídos en SeryMente/khora, commit 1697ee2693ed3217523ffc1d1be9b6541d7d849d: kernel/src/khora_kernel/ports/gestor_de_tareas.py (blob 569e63cd7f0c19a6ec690f841bb2b63d55ec53ad), ports/mocks/mock_gestor_de_tareas.py (blob c991c4c13e56af1e9e1d05b080c6f6e388059bac) y tests/contrato/test_gestor_de_tareas.py (blob bd54cb527844b87161bc2c2660a5ada56b46aca7). Búsquedas de GestorDeTareas y crear_tarea devolvieron esos tres archivos. Fuente: gestor, implementación de prueba, contrato de prueba.
+
+**Hallazgo:** existe contrato para crear/completar/listar tareas; la implementación recuperada guarda en un diccionario de memoria. Las pruebas recuperadas usan esa implementación de prueba. No acredita persistencia tras reinicio, generación inteligente, interfaz o servicio productivo. Las búsquedas por símbolo no demuestran inexistencia absoluta de otras soluciones. No ejecutar ni considerar aprobadas pruebas solo por leerlas.
+
+**Propuesta visual concreta para revisión del operador:** una lista «Tareas» en Khora, sin nuevo tablero de desarrollo. Pendientes en primer plano; primero plazos vencidos y de hoy, después fechas futuras y sin fecha, sin inventar urgencia. Cada fila muestra acción breve y fecha si fue expresada; permite marcar hecha. Al abrirla: origen del dictado, corregir y descartar; completadas recuperables aparte. Dudas separadas, no mezcladas con obligaciones firmes. Estado de extracción pendiente/fallida distinguible de «no hay tareas». Esta lista única simplifica la anterior propuesta de tres grupos fijos; no elimina el tratamiento de ambigüedades. Ubicación precisa dentro de la interfaz e implementación todavía pendientes; no presentar la pantalla como construida.
+
+**Ejemplo sintético, no prueba ni dato del operador:** «Mañana debo llamar al dentista» produce una fila «Llamar al dentista», fecha correspondiente al día posterior al dictado y opción de completar. Al recargar debe seguir ahí; al reintentar el mismo dictado no debe duplicarse. Rechazar o corregir no debe perderse al reprocesar.
+
+**Encaje propuesto, pendiente de aprobación técnica:** reutilizar el contenido versionado para origen; persistencia real, no el diccionario de prueba. No imponer Todoist como dependencia ni crear una segunda captura. Rastrear almacenamiento, contexto de extracción y aislamiento por usuario antes de aprobar arquitectura y escribir código. No iniciar cambios de seguridad sin revisión.
+
+**Trabajo y límites:** lectura de GitHub y actualización de este registro único. Sin código modificado, pruebas ejecutadas o despliegue. Metacanon de referencia 1.5 · METACANON-OBJETOS-v1.5; fuente central no revalidada en este ciclo. Primera revisión: fidelidad entre pruebas leídas y afirmaciones, y separación propuesta/aprobación. Escritura acredita registro; lectura de vuelta posterior pendiente.
+
+**Siguiente paso:** obtener revisión de la lista mínima presentada y cerrar el encaje técnico restante; no repetir consultas sobre prestaciones obvias. Diseño del mínimo aún no completo; tiempo de construcción no estimable hasta definir persistencia y disparo. La necesidad de persistencia es del mínimo utilizable, no una ampliación opcional.
+
+### Ciclo 11 · Dictados generales: selección sin forzar tareas
+
+**Instrucción literal:**
+
+> Sí, por ejemplo... Sí, exacto. Sí, pero recuerda que el dictado es el dictado que hago así general, o sea, las tareas deben de lidiar con dictados que no necesariamente tienen información para decir las tareas, o sea, tiene que analizarse todo, a ver qué sirve y descartar lo que no sirva.
+> 
+
+**Decisión y delta:** aceptada conceptualmente la presentación sencilla del Ciclo 10. Se precisa el insumo: dictados generales, mezclados y no necesariamente accionables. No requerir una segunda captura, frases especiales o instrucciones para crear tareas. Examinar el conjunto y seleccionar solo acciones pertinentes. Las sugerencias contextuales deben tener fundamento y distinguirse de compromisos; no limitar el horizonte a detectar la frase «tengo que» ni inventar obligaciones para llenar la lista.
+
+**Conservación:** «descartar lo que no sirva» se aplica a la selección para tareas, no al borrado del dictado ni de contenido útil para otros fines de la prótesis. Cero tareas tras un análisis satisfactorio es válido y debe distinguirse de extracción fallida o pendiente.
+
+**Casos de aceptación añadidos, no ejecutados:** dictado narrativo sin acción pertinente → cero tareas; dictado mixto → seleccionar acciones sustentadas sin convertir el resto en obligaciones; reprocesamiento → conservar original, correcciones y prevención de duplicados. No se usaron dictados reales ni se fijaron umbrales de calidad.
+
+**Resumen acumulado:** definido: dictado libre → análisis y selección → lista sencilla automática, con origen, fechas expresadas y posibilidad de completar/corregir/descartar; sin forzar tareas. Pendiente: cerrar disparo, extracción y persistencia real antes de construir la primera entrega utilizable. Aceptación conceptual no equivale a autorización general de arquitectura o seguridad.
+
+**Evidencia y método:** recuperado el registro vigente y actualizados únicamente dirección, contrato, autoridad y continuidad; preservada la historia. Sello TAREAS-v0.6. Metacanon de referencia 1.5 · METACANON-OBJETOS-v1.5; fuente central no revalidada en este ajuste de requisitos. Sin modificación de código, ejecución de pruebas o despliegue. Lectura de vuelta requerida tras guardar.
+
+**Siguiente paso y pronóstico:** completar el encaje técnico de análisis y almacenamiento con las salvaguardas de ingesta existentes; presentar únicamente las decisiones materiales restantes. No volver a pedir aprobación de la misma lista conceptual. Plazo de construcción todavía no estimable sin resolver esas dependencias.
+
+## Estado actual · Punto de continuidad
+
+**De dónde viene:** solicitud del operador de diseñar e implementar una lista de tareas automática con inteligencia artificial en Khora, documentando cada ciclo.
+
+**Dónde está:** dirección prostética definida: tareas sugeridas inteligentes y ya organizadas para reducir la carga de decidir y manejar el tiempo. Dictados como entrada actual; otros canales como horizonte condicionado a disponibilidad y autorización. Regla inicial de acciones claras aceptada; fases y contrato técnico aún propuestos. Sin implementación o prueba de producto acreditada.
+
+**A dónde va:** definición del primer flujo útil, contratos verificables, revisión del operador y planificación de implementación en el tablero maestro existente.
+
+**Qué cambió:** aceptada conceptualmente la lista sencilla y precisado que se analizan dictados generales completos, seleccionando solo acciones pertinentes. Puede haber cero tareas; excluir contenido de la lista no autoriza borrar el original. Se mantienen el propósito prostético, el uso temprano por fases y Todoist como referencia de calidad, no réplica completa.
+
+**Acción en curso:** cierre técnico pendiente de la primera entrega; sello TAREAS-v0.6, ancla Ciclo 11. Presentación mínima aceptada conceptualmente y selección desde dictados generales precisada. Contrato de gestor e implementación en memoria inspeccionados anteriormente; sin construcción o ejecución en segundo plano.
+
+**Siguiente paso atómico:** completar el encaje de extracción desde dictados generales y persistencia real con aislamiento por usuario antes de aprobar arquitectura. La presentación conceptual ya fue revisada; no repetir esa pregunta. No construir sobre el diccionario de prueba ni esperar funciones avanzadas para cerrar el mínimo.
+
+**En prueba / recién fallido:** ninguna prueba de producto ejecutada; ningún resultado funcional declarado.
+
+**Recordatorios pendientes:** mantener este documento en cada ciclo y mostrar en el chat el resumen acumulado de la funcionalidad; distinguir definido/propuesto/pendiente; guiar con recomendaciones; cerrar y revisar el diseño antes de construir; revisar la gestión de tareas existente antes de crear estructuras nuevas; no iniciar construcción de interfaz, seguridad o arquitectura sin la revisión correspondiente del operador.
