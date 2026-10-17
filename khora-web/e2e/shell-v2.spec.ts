@@ -1,11 +1,11 @@
 import { test, expect } from '@playwright/test';
 
 const routes = [
-  { path: '/sistema/ingreso', expectedTitle: 'Ingreso Integrado' },
-  { path: '/sistema/ingreso?modo=dictado', expectedTitle: 'Ingreso Integrado' },
-  { path: '/sistema/ingreso?modo=captura', expectedTitle: 'Ingreso Integrado' },
-  { path: '/sistema/ingreso?modo=archivo', expectedTitle: 'Ingreso Integrado' },
-  { path: '/sistema/ingreso?modo=revision', expectedTitle: 'Ingreso Integrado' },
+  { path: '/sistema/ingreso', expectedTitle: 'Ingreso' },
+  { path: '/sistema/ingreso?modo=dictado', expectedTitle: 'Ingreso' },
+  { path: '/sistema/ingreso?modo=captura', expectedTitle: 'Ingreso' },
+  { path: '/sistema/ingreso?modo=archivo', expectedTitle: 'Ingreso' },
+  { path: '/sistema/ingreso?modo=revision', expectedTitle: 'Ingreso' },
   { path: '/sistema/ingreso?modo=ingesta', expectedTitle: 'Ingreso a memoria' },
   { path: '/sistema/custodia', expectedTitle: 'Custodia' },
   { path: '/sistema/consulta', expectedTitle: 'Consola de Consulta' },
@@ -14,8 +14,8 @@ const routes = [
   { path: '/sistema/otros', expectedTitle: 'Evidencia normativa' },
   { path: '/grafo', expectedTitle: 'Grafo PKG - Proyección Leiden' },
   { path: '/mapa', expectedTitle: 'Mapa Visual de Ramificaciones' },
-  { path: '/capturar', expectedTitle: 'Ingreso Integrado' },
-  { path: '/sistema/dictado', expectedTitle: 'Ingreso Integrado' },
+  { path: '/capturar', expectedTitle: 'Ingreso' },
+  { path: '/sistema/dictado', expectedTitle: 'Ingreso' },
   { path: '/sistema/editar', expectedTitle: 'Custodia' },
   { path: '/sistema/ingesta', expectedTitle: 'Custodia' },
 ];

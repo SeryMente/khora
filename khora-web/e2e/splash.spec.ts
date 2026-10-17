@@ -8,9 +8,17 @@ const viewports = [
     { width: 1180, height: 820 },
 ];
 
-async function observeBoot(page: Page, theme = "dark", freeze = false) {
-    await page.addInitScript(({ theme, freeze }) => {
+async function observeBoot(page: Page, theme = "dark", freeze = false, seed: number | null = 117) {
+    await page.addInitScript(({ theme, freeze, seed }) => {
         localStorage.setItem("khora-theme", theme);
+        const original = crypto.getRandomValues.bind(crypto) as <T extends ArrayBufferView | null>(values: T) => T;
+        crypto.getRandomValues = function<T extends ArrayBufferView | null>(values: T): T {
+            if (values instanceof Uint32Array && values.length === 1) {
+                if (seed === null) throw new Error("test: entropy unavailable");
+                values[0] = seed; return values;
+            }
+            return original(values);
+        };
         const state = { started: 0, ended: 0, font: "", frozen: false, callbacks: 0 };
         Object.assign(window, { __splashEvidence: state });
         const observer = new MutationObserver(() => {
@@ -32,7 +40,7 @@ async function observeBoot(page: Page, theme = "dark", freeze = false) {
             }
         });
         observer.observe(document, { childList: true, subtree: true, attributes: true, attributeFilter: ["data-phase"] });
-    }, { theme, freeze });
+    }, { theme, freeze, seed });
 }
 
 async function evidence(page: Page) {
@@ -48,8 +56,14 @@ for (const theme of ["dark", "light"]) {
             await expect.poll(async () => (await evidence(page)).frozen).toBe(true);
             const overlay = page.locator(splash);
             const word = overlay.locator("span");
+            const identity = overlay.locator(".khora-splash-identity");
+            await expect(overlay.locator("svg rect")).toHaveCount(6);
+            await expect(overlay.locator("svg path")).toHaveCount(1);
+            const group = await identity.boundingBox();
+            expect(group).not.toBeNull();
+            expect(Math.abs(group!.y + group!.height / 2 - viewport.height / 2)).toBeLessThanOrEqual(1);
             await expect(word).toHaveText("Khora");
-            await expect(overlay.locator("svg, img, button, progress")).toHaveCount(0);
+            await expect(overlay.locator("img, button, progress")).toHaveCount(0);
             const style = await word.evaluate((node) => {
                 const s = getComputedStyle(node);
                 const r = node.getBoundingClientRect();
@@ -62,18 +76,25 @@ for (const theme of ["dark", "light"]) {
             expect(style.family).toContain("Geist");
             expect(style.color).toBe(theme === "dark" ? "rgb(255, 255, 255)" : "rgb(28, 29, 31)");
             expect(Math.abs(style.x + style.width / 2 - viewport.width / 2)).toBeLessThanOrEqual(1);
-            expect(Math.abs(style.y + style.height / 2 - viewport.height / 2)).toBeLessThanOrEqual(1);
+            const mark = overlay.locator("svg");
+            await expect(mark).toHaveCSS("color", style.color);
+            await expect(overlay.locator("svg path")).toHaveCSS("fill", theme === "dark" ? "rgb(0, 0, 0)" : "rgb(244, 242, 239)");
+            const symbol = await mark.boundingBox();
+            expect(style.y - (symbol!.y + symbol!.height)).toBeCloseTo(24, 1);
             expect(style.width).toBeLessThanOrEqual(viewport.width * 0.34);
             await expect(overlay).toHaveCSS("background-color", theme === "dark" ? "rgb(0, 0, 0)" : "rgb(244, 242, 239)");
             await expect(page.locator("body")).toHaveCSS("background-color", theme === "dark" ? "rgb(0, 0, 0)" : "rgb(244, 242, 239)");
             await expect(page.locator('[data-testid="khora-shell"]')).toHaveCount(1);
+            await expect(identity).toHaveScreenshot(`intervalo-${theme}-${viewport.width}.png`, { animations: "allow", threshold: 2 / 255, maxDiffPixelRatio: 0.001 });
+            const initialVariant = await overlay.locator("svg").getAttribute("data-variant");
             for (const ms of [0, 130, 260, 500, 899, 900, 1050, 1199]) {
                 await overlay.evaluate((node, ms) => {
                     for (const animation of node.getAnimations({ subtree: true })) animation.currentTime = ms;
                 }, ms);
+                await expect(overlay.locator("svg")).toHaveAttribute("data-variant", initialVariant!);
                 if (ms <= 900) await expect(overlay).toHaveCSS("opacity", "1");
-                if (ms === 0) await expect(word).toHaveCSS("opacity", "0");
-                if (ms >= 260) await expect(word).toHaveCSS("opacity", "1");
+                if (ms === 0) await expect(identity).toHaveCSS("opacity", "0");
+                if (ms >= 260) await expect(identity).toHaveCSS("opacity", "1");
                 if (ms === 1050) {
                     const opacity = await overlay.evaluate(node => Number(getComputedStyle(node).opacity));
                     expect(opacity).toBeGreaterThan(0);
@@ -141,7 +162,7 @@ test("reduced motion retains identity for 500ms without animations", async ({ pa
     await observeBoot(page);
     await page.goto("/sistema/custodia", { waitUntil: "domcontentloaded" });
     await expect(page.locator(splash)).toHaveAttribute("data-phase", "reduced");
-    await expect(page.locator(`${splash} span`)).toHaveCSS("opacity", "1");
+    await expect(page.locator(`${splash} .khora-splash-identity`)).toHaveCSS("opacity", "1");
     expect(await page.locator(splash).evaluate(node => node.getAnimations({ subtree: true }).length)).toBe(0);
     await expect(page.locator(splash)).toHaveCount(0);
     const result = await evidence(page);
@@ -156,7 +177,7 @@ test("first server-rendered surface is opaque even before JavaScript", async ({ 
         await page.goto("http://localhost:3000/sistema/custodia");
         await expect(page.locator(splash)).toHaveCSS("opacity", "1");
         await expect(page.locator(splash)).toHaveCSS("background-color", "rgb(0, 0, 0)");
-        await expect(page.locator(`${splash} span`)).toHaveCSS("opacity", "0");
+        await expect(page.locator(`${splash} .khora-splash-identity`)).toHaveCSS("opacity", "0");
         await expect(page.locator('[data-testid="khora-shell"]')).toHaveCount(1);
     } finally { await context.close(); }
 });
@@ -186,4 +207,41 @@ test("unavailable font releases the shell instead of displaying a fallback", asy
     await expect(page.locator(splash)).toHaveCount(0, { timeout: 1500 });
     expect((await evidence(page)).started).toBe(0);
     await expect(page.locator('[data-testid="khora-shell"]')).toHaveCount(1);
+});
+
+
+test("bounded instances change only at a cold boot, never during one presentation", async ({ browser }) => {
+    const seen = new Set<string>();
+    for (const seed of [0, 1, 2, 117, 119, 0xffffffff]) {
+        const context = await browser.newContext();
+        try {
+            const page = await context.newPage();
+            await observeBoot(page, "dark", true, seed);
+            await page.goto("http://localhost:3000/sistema/custodia", { waitUntil: "domcontentloaded" });
+            await expect.poll(async () => (await evidence(page)).frozen).toBe(true);
+            const mark = page.locator('[data-testid="intervalo-sonoro"]');
+            const expected = ((seed ^ 0x496e7472) >>> 0) % 54;
+            await expect(mark).toHaveAttribute("data-variant", String(expected));
+            await expect(mark.locator("rect")).toHaveCount(6);
+            await expect(mark.locator("path")).toHaveCount(1);
+            const shape = await mark.innerHTML();
+            seen.add(shape);
+            await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
+            await page.waitForTimeout(100);
+            expect(await mark.innerHTML()).toBe(shape);
+            await page.keyboard.press("Escape");
+            await expect(page.locator(splash)).toHaveCount(0);
+        } finally { await context.close(); }
+    }
+    expect(seen.size).toBeGreaterThan(1);
+});
+
+test("entropy failure still reveals the canonical professional mark", async ({ page }) => {
+    await observeBoot(page, "light", true, null);
+    const errors: string[] = [];
+    page.on("pageerror", error => errors.push(error.message));
+    await page.goto("/sistema/custodia", { waitUntil: "domcontentloaded" });
+    await expect.poll(async () => (await evidence(page)).frozen).toBe(true);
+    await expect(page.locator('[data-testid="intervalo-sonoro"]')).toHaveAttribute("data-variant", "0");
+    expect(errors).toEqual([]);
 });

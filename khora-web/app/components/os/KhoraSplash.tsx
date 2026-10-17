@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import IntervaloSonoroMark from "./IntervaloSonoroMark";
+import { sampleIntervaloVariant } from "../../../lib/brand/intervalo-sonoro";
 
 const DURATION_MS = 1200;
 const FONT_DEADLINE_MS = 500;
@@ -18,14 +20,23 @@ export default function KhoraSplash({ active = true, theme, reducedMotion, onCom
     const [visible, setVisible] = useState(true);
     const surface = useRef<HTMLDivElement>(null);
     const word = useRef<HTMLSpanElement>(null);
+    const identity = useRef<HTMLDivElement>(null);
+    const sampled = useRef(false);
+    const [variant, setVariant] = useState(0);
+    useLayoutEffect(() => {
+        if (!active || sampled.current) return;
+        sampled.current = true;
+        setVariant(sampleIntervaloVariant(window.crypto));
+    }, [active]);
     const completed = useRef(false);
     const callback = useRef(onComplete);
     callback.current = onComplete;
 
     useEffect(() => {
-        if (!active || completed.current || !surface.current || !word.current) return;
+        if (!active || completed.current || !surface.current || !word.current || !identity.current) return;
         const overlay = surface.current;
         const label = word.current;
+        const lockup = identity.current;
         let disposed = false;
         let done = false;
         let timer: ReturnType<typeof setTimeout> | undefined;
@@ -90,12 +101,12 @@ export default function KhoraSplash({ active = true, theme, reducedMotion, onCom
                 return;
             }
             if (reduce) {
-                label.style.opacity = "1";
+                lockup.style.opacity = "1";
                 overlay.dataset.phase = "reduced";
                 timer = setTimeout(finish, 500);
                 return;
             }
-            const wordAnimation = label.animate([
+            const wordAnimation = lockup.animate([
                 { opacity: 0, offset: 0, easing: "cubic-bezier(0.22, 1, 0.36, 1)" },
                 { opacity: 1, offset: 260 / DURATION_MS },
                 { opacity: 1, offset: 1 },
@@ -133,7 +144,10 @@ export default function KhoraSplash({ active = true, theme, reducedMotion, onCom
         <div ref={surface} className="khora-splash" data-testid="khora-splash"
             data-duracion-ms={DURATION_MS} data-theme={theme} data-phase="font"
             aria-hidden="true">
-            <span ref={word} className="khora-splash-word">Khora</span>
+            <div ref={identity} className="khora-splash-identity">
+                <IntervaloSonoroMark variant={variant} />
+                <span ref={word} className="khora-splash-word">Khora</span>
+            </div>
         </div>
     );
 }

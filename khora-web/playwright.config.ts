@@ -4,6 +4,8 @@ const envVars = "NEXT_PUBLIC_API_URL=http://127.0.0.1:3999 PLAYWRIGHT_TEST_RUN=1
 
 export default defineConfig({
 	testDir: "./",
+	// Bundled Geist and SVG identity references use explicit viewport/theme names.
+	snapshotPathTemplate: "{testDir}/{testFilePath}-snapshots/{arg}{-projectName}{ext}",
 	testMatch: ["e2e/**/*.spec.ts", "tests/regression/**/*.spec.ts"],
 	timeout: 60_000,
 	expect: {
