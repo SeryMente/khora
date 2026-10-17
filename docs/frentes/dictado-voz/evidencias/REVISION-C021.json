@@ -1,0 +1,55 @@
+{
+  "schema": "khora-canonical-cycle-review/v1",
+  "event": "C021",
+  "method": {
+    "repo": "SeryMente/metodologia",
+    "path": "METACANON-OBJETOS-CANONICOS.md",
+    "commit": "49ac40e9f6122e2d2fb339362cfa0a78128c8e37",
+    "blob": "32c7a65ff2e83b3b76752ba2160427bd6e851a8f",
+    "sha256": "1db7a16892310c505ec3002e9439e35c11a13b2e5e36dee2829efeda201e042c",
+    "version": "1.5"
+  },
+  "baseCommit": "2012e2389deb732568a5bd384817c19499fb910c",
+  "baseObjectBlob": "a91242e42b04debd8b015d35c901f1cbe90bfeee",
+  "version": "0.5.3",
+  "previousVersion": "0.5.2",
+  "scope": "documentation only; no product deployment or remote device access",
+  "productionObservation": {
+    "url": "https://khora-web.vercel.app/api/version?canon=1792276556617093122",
+    "httpStatus": 200,
+    "serverDate": "Sat, 17 Oct 2026 22:35:56 GMT",
+    "version": {
+      "commit": "c02f5142d7609c35d8a2dc2c549726edc4016f13",
+      "rama": "HEAD",
+      "desplegado_desde_git": true,
+      "entorno": "production",
+      "rutas": [
+        "/sistema/custodia",
+        "/api/volcado"
+      ],
+      "ahora": "2026-10-17T22:35:56.661Z"
+    }
+  },
+  "releaseReceipt": {
+    "sourceUrl": "https://github.com/SeryMente/khora/pull/312#issuecomment-6242006627",
+    "snapshot": "evidencias/CIERRE-MICROFONO-PUBLICADO-20261017.md",
+    "bodySha256": "704ede7a637245f2ecd98b04d0fa6fb73ade9ddfc1d70d446269c4fb6da0ae5b",
+    "evidence": "recovered historical execution; not rerun tests"
+  },
+  "checks": {
+    "methodHashVerified": true,
+    "priorObjectMatchesManifest": true,
+    "thirteenCoreSectionsInOrder": true,
+    "annexAUnchanged": true,
+    "annexASha256": "a04a65d96b5802e3b535dd561abc61738ad7f4423a23b8488e4744a78cb96b25",
+    "stateAndTestFieldsLiteralInBothPrompts": true,
+    "originalFilesUnchanged": true,
+    "noProductFilesModified": true
+  },
+  "limitations": [
+    "No complete native chat export; attached original and later material user instructions preserved.",
+    "Temporary preparation attachment and full fresh review of every cited supporting document remain unverified.",
+    "No authenticated operator session, real voice, comfort or productive audio verification.",
+    "Post-push and merge readback must be checked before claiming persistence."
+  ]
+}

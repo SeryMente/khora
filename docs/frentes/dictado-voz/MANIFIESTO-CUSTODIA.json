@@ -30,9 +30,9 @@
   "files": [
     {
       "path": "OBJETO-CANONICO.md",
-      "bytes": 139300,
-      "sha256": "0b3a35c5054d10456b07cbd7847f47a6af3d275a9eb46f47ee063eb51ebe2238",
-      "git_blob_sha": "a91242e42b04debd8b015d35c901f1cbe90bfeee"
+      "bytes": 147234,
+      "sha256": "17e0e36309d0ba8a8c46b71433f4459a5bc3005f6d13dcf30b323349fd1d526d",
+      "git_blob_sha": "e6a9b6be98c1d4180e89dcb20615202952c18651"
     },
     {
       "path": "CONTRATO-DICTADO-EXPERIENCE.md",
@@ -117,6 +117,24 @@
       "bytes": 46,
       "sha256": "f68655747291ce2740a3ff99247786c52bc88143b451649aece8973ea2638fd1",
       "git_blob_sha": "3ae0447d9085a76b833b47adf9876d254ab0d748"
+    },
+    {
+      "path": "originales/CONTINUIDAD-C021.md",
+      "bytes": 2391,
+      "sha256": "b2f2b2e8040460dc47583613deb420694251e2fad94d4dd0b0e6bfd2dcebd20d",
+      "git_blob_sha": "0c1241491a06d371d31d8c166378e106355180ba"
+    },
+    {
+      "path": "evidencias/CIERRE-MICROFONO-PUBLICADO-20261017.md",
+      "bytes": 5737,
+      "sha256": "704ede7a637245f2ecd98b04d0fa6fb73ade9ddfc1d70d446269c4fb6da0ae5b",
+      "git_blob_sha": "f1beab77180453db4b91da44a3065ee9aa98ed31"
+    },
+    {
+      "path": "evidencias/REVISION-C021.json",
+      "bytes": 2254,
+      "sha256": "ec9db5491125f3757134670e3330d6a8b253ea256547b060ddba23b37f5a9056",
+      "git_blob_sha": "7c255795e91cfe3f7624f2a0038bd0069cca69c3"
     }
   ],
   "runtime_references": [
@@ -210,8 +228,9 @@
     "complete native event export of current Notion chat",
     "new physical microphone session and private user feedback",
     "current authenticated benchmark screen",
-    "current published source SHA",
-    "clinical reference data and any voice-health model"
+    "clinical reference data and any voice-health model",
+    "Preparacion-benchmark-y-retroalimentacion.md standalone temporary file",
+    "fresh full review of every supporting technical document cited by this sprint"
   ],
   "privacy_review": {
     "destination_private_verified_by_tool": true,
@@ -222,11 +241,33 @@
     "no_secret_values_in_manifest": true
   },
   "current_preparation": {
-    "version": "0.4.0",
-    "baseSha": "f04e815b47fa8a7b5297561df62000478f978108",
-    "receipt": "evidencias/INTEGRACION-ENDURECIMIENTO.json",
-    "pullRequest": "https://github.com/SeryMente/khora/pull/305",
-    "state": "software verified; merge authorization explicit; effective merge determined by Git"
+    "version": "0.5.3",
+    "baseSha": "2012e2389deb732568a5bd384817c19499fb910c",
+    "receipt": "evidencias/REVISION-C021.json",
+    "state": "documentation reconciliation; merge and readback checked separately"
   },
-  "latestEvent": "C019 - migrated attachment preserved byte-for-byte; microphone release resumed"
+  "latestEvent": "C021 - canonical object is primary; C020 publication and sprint-wide continuity consolidated",
+  "latest_verified_release": {
+    "commit": "c02f5142d7609c35d8a2dc2c549726edc4016f13",
+    "pullRequest": "https://github.com/SeryMente/khora/pull/312",
+    "receipt": "evidencias/CIERRE-MICROFONO-PUBLICADO-20261017.md",
+    "productionObservation": {
+      "url": "https://khora-web.vercel.app/api/version?canon=1792276556617093122",
+      "httpStatus": 200,
+      "serverDate": "Sat, 17 Oct 2026 22:35:56 GMT",
+      "version": {
+        "commit": "c02f5142d7609c35d8a2dc2c549726edc4016f13",
+        "rama": "HEAD",
+        "desplegado_desde_git": true,
+        "entorno": "production",
+        "rutas": [
+          "/sistema/custodia",
+          "/api/volcado"
+        ],
+        "ahora": "2026-10-17T22:35:56.661Z"
+      }
+    },
+    "humanAcceptance": "pending",
+    "productRebuiltThisCycle": false
+  }
 }

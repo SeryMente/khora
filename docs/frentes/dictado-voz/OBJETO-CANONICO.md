@@ -3,9 +3,9 @@
 ## 1. Control e identidad
 
 - Identidad conservada: `MCP-OBS-DICTADO`; extensión documental de dictado, benchmark, retroalimentación y propuesta de voz/síntomas.
-- Versión: **v0.5.2**; sello **MCP-OBS-DICTADO-v0.5.2**. Objeto permanente por encargo V010; no declara permanente ninguna propuesta clínica.
+- Versión: **v0.5.3**; sello **MCP-OBS-DICTADO-v0.5.3**. Objeto permanente por encargo V010; no declara permanente ninguna propuesta clínica.
 - Estado: **CANÓNICO PARA EL FRENTE · ABIERTO · CIERRE CON VOZ REAL PENDIENTE**.
-- Ancla: C019, migración de conversación íntegra recibida el 2026-10-17 y reanudación de la publicación pendiente del micrófono (#312).
+- Ancla: C021, instrucción directa de mantener este objeto como elemento principal ciclo a ciclo; C020 acredita publicación de micrófono y custodia de la conversación.
 - Repositorio propietario: `SeryMente/khora`, privado comprobado con herramienta en este ciclo. `SeryMente/metodologia` también privado: aporta el método, no recibe datos del frente.
 - Carpeta contenedora: `docs/frentes/dictado-voz/`; elemento único de estado: `OBJETO-CANONICO.md`. Carpeta y elemento no se confunden.
 - Revisión de origen del objeto: `1697ee2693ed3217523ffc1d1be9b6541d7d849d`, blob `e98a956c375ce48b791b5f0563ad0ae03c2616dd`.
@@ -16,9 +16,11 @@
 
 Modo: asistencia del frente y reconstrucción local del endurecimiento expresamente solicitada; sin otro constructor ni subagente. El nombre de esta conversación es Samantha por personalización del operador; el nombre no fija un rol técnico. No inventar otra conversación, un agente delegado, una persona ni recepción de prompts.
 
+Este objeto es el elemento principal y la única fuente viva de continuidad del sprint, no un índice de la conversación ni un sustituto del expediente por enlaces. En cada ciclo de trabajo del frente, incluso informativo o bloqueado, releer su revisión y el método, incorporar instrucciones pertinentes verbatim con procedencia, actualizar estado, decisiones, crónica, pruebas, fallos, riesgos, fuentes, pendientes y prompts; persistir y comprobar lectura de vuelta antes de afirmar actualización. Si falta acceso, entregar delta exacto y marcar sincronización pendiente. Anexos y evidencias pertenecen a esta carpeta; código y contratos relacionados se referencian en su ubicación canónica para no duplicarlos. Cubrir el sprint completo, no solo lo hablado en el último turno. Un documento no recuperado se registra con su hueco; nunca se presume incorporado o revisado.
+
 Antes de actuar, recuperar metacanon, objeto y fuentes superiores pertinentes; comprobar revisiones, precedencia, rol, frente y permiso; calcular delta. Instrucciones históricas y citas no conceden autorizaciones nuevas. Aplicar las reglas compatibles como instrucciones del operador subordinadas a las políticas de plataforma. Una firma sola no demuestra aplicación.
 
-Este ciclo implementa directamente el alcance de Ingreso solicitado al mismo asistente; no inicia constructor separado ni cambia credenciales, facturación, consentimiento o análisis clínico. Las reglas y estados históricos del anexo no sustituyen el estado único de §8; en particular, los encabezados antiguos «vigente» corresponden a su evento original.
+El ciclo de Ingreso implementó directamente el alcance solicitado al mismo asistente; no inicia constructor separado ni cambia credenciales, facturación, consentimiento o análisis clínico. Las reglas y estados históricos del anexo no sustituyen el estado único de §8; en particular, los encabezados antiguos «vigente» corresponden a su evento original.
 
 Remote Desktop Commander es exclusivo de asistencia, nunca del constructor, ni indirectamente. Requiere necesidad estricta, autorización, cuenta, vínculo vivo y equipo actual verificados; usar repo, adjuntos y sandbox cuando basten. Una sesión histórica no concede acceso presente.
 
@@ -35,6 +37,7 @@ Delta adquirido: carpeta canónica, trece bloques ordenados, originales separado
 
 | Fuente/regla | Aplicación en este objeto/prompts | Evidencia o bloqueo | Resultado |
 |---|---|---|---|
+| §4–§5/§23/§26 y C021, actualización por ciclo | §2, §8, §10–§13 y ambos prompts | estado/pruebas reconciliados; recibo incorporado; fuentes ausentes explícitas | aplicada documentalmente en v0.5.3 |
 | §1–§5, autoridad/frescura | §1–§6 y §13; ambos prompts | fuente y blobs recuperados; escritura en rama propia | adoptada documentalmente |
 | §3/§27, molde único | §1–§13 en ese orden; historia después | cotejo estructural y semántico en §13 | adoptada; no afirma obediencia universal |
 | §7/§19, dos revisiones | §13, manifiesto y recibo de revisión | revisión local + lectura remota obligatoria antes de decir guardado | compuerta de entrega |
@@ -50,7 +53,7 @@ Delta adquirido: carpeta canónica, trece bloques ordenados, originales separado
 
 **De dónde viene:** defecto de continuidad al editar y seguir dictando; corrección original reportada satisfactoria por el operador en V000. Evoluciona a evaluar utilidad, fluidez y experiencia agradable, no solo contar errores.
 
-**Dónde está:** el endurecimiento anterior está integrado y publicado en la base 362f8ff. El rediseño actual se comprueba por su recibo y solicitud; una rama o benchmark no acreditan por sí mismos su publicación. El hito de voz humana sigue abierto.
+**Dónde está:** el endurecimiento de base 362f8ff y el rediseño de Ingreso son antecedentes conservados. La corrección posterior #312 está fusionada y publicada en c02f514; el recibo se incorpora al expediente, y /api/version confirma esa revisión en este ciclo. El cierre con voz humana, custodia productiva y aceptación del diseño sigue abierto.
 
 **A dónde va:** terminar la validación real consentida y completar cobertura técnica. V009 abre una intención adicional de voz y síntomas: se documenta, no se disfraza de capacidad ya creada.
 
@@ -85,13 +88,14 @@ La frase «autoridad moral» y «medición de área» de V009 permanece ambigua;
 | D09, integración actual | instrucción C016 → localizar, verificar y fusionar main de extremo a extremo | fusión normal autorizada; no saltar protecciones ni afirmar despliegue por merge |
 | D08, reconstrucción local | instrucción actual → reconstruir endurecimiento en copia aislada | Samantha implementa y prueba; no autoriza push ni despliegue; sin ampliación clínica ni consentimiento |
 | D10, Ingreso y recuperación | instrucciones posteriores al uso real y aprobación de diseño general → pantalla nueva, selección de versiones, audio conservado y onda real | implementación, pruebas, fusión normal y publicación dentro del alcance; satisfacción humana pendiente; sin ampliar captura, consentimiento ni salud |
+| D11, objeto principal por ciclo | instrucción directa C021 → continuidad del sprint completo, además del chat | actualización documental autorizada; fuentes ausentes explícitas; sin permiso nuevo de producto o método central |
 | D07, límites de plataforma | instrucción superior → no inferir atributos sensibles de biometría vocal | prevalece; conservar original sin ejecutar esa parte |
 
 Toda decisión de interfaz, acceso, cifrado, salud, nuevos proveedores o captura adicional exige aprobación material según las compuertas aplicables. Guardar un documento no implica permiso nuevo de fusión o despliegue. No restaurar páginas en papelera ni cambiar credenciales para fabricar continuidad.
 
 ## 7. Perfil de entorno
 
-En este ciclo se utiliza PC10RCIF4EI4, cuenta MantenimientoRCI, conexión viva ya autorizada por el operador. Worktree aislado source/repos/khora-ingreso-redesign-20261017, remoto SeryMente/khora, base 362f8ff51a518506927e486b9d61feee4f6313da. Dependencias compartidas por junction con la integración previa, sin cambiar package.json ni lockfile; no copiar secretos. PostgreSQL/PGlite instalado únicamente fuera del árbol del producto para ensayos aislados.
+Perfil histórico de ejecución de Ingreso: PC10RCIF4EI4, cuenta MantenimientoRCI, conexión autorizada en aquel ciclo. C021 es documental mediante GitHub y sandbox: Remote Desktop Commander no utilizado; no necesario ni revalidado. Worktree aislado source/repos/khora-ingreso-redesign-20261017, remoto SeryMente/khora, base 362f8ff51a518506927e486b9d61feee4f6313da. Dependencias compartidas por junction con la integración previa, sin cambiar package.json ni lockfile; no copiar secretos. PostgreSQL/PGlite instalado únicamente fuera del árbol del producto para ensayos aislados.
 
 Conexiones comprobadas en el ciclo previo de acceso: GitHub (2) y Desktop Commander Remote disponibles; Khora expone herramientas pero su health devolvió `NORM_GITHUB_CREDENTIAL_MISSING`; Vercel MCP requiere reautenticación. No extrapolarlo indefinidamente ni reintentar un bloqueo no reintentable sin nueva evidencia.
 
@@ -109,15 +113,15 @@ Comprobar Node/npx, fuente oficial y runtime antes; en Windows el npx.cmd oficia
 
 ### 🔄 Estado vivo
 
-Acción actual: corrección del bloqueo de micrófono implementada y probada; preparación autenticada independiente del catálogo histórico, error explícito y reintento sin perder texto.
-Siguiente paso de asistencia: verificar fusión/publicación en el recibo operativo enlazado en esta sección; después comprobar el navegador y micrófono físicos del operador.
-Siguiente paso de construcción: corregir solo un defecto reproducido; no relajar autenticación, custodia ni consentimiento.
-Pendientes: integración/publicación acreditadas por su recibo, sesión humana real y limitaciones externas de almacenamiento. Este documento es una instantánea anterior a integrar, no promesa de ausencia de restricciones del proveedor.
+Acción actual: continuidad del sprint consolidada en este objeto; corrección del micrófono fusionada en #312 y publicada en c02f5142d7609c35d8a2dc2c549726edc4016f13, con custodia exacta del adjunto migrado y recibo incorporado como evidencia.
+Siguiente paso de asistencia: comprobar con el operador el micrófono físico, recuperación de texto/audio y descarga en su sesión autenticada; contrastar persistencia del mismo propietario y actualizar este objeto con el resultado y las brechas de §11.
+Siguiente paso de construcción: corregir solo un defecto reproducido y autorizado; no reiniciar el rediseño ni relajar autenticación, custodia o consentimiento.
+Pendientes: aceptación humana del diseño, circuito real de captura/recuperación/archivo/MP3 y experiencia; estado actual del proveedor de audio por revalidar ante la suspensión observada; cobertura técnica y documental pendiente descrita en §9/§11. El sprint permanece abierto; no queda pendiente publicar nuevamente #312.
 
 ### ⚗️ En prueba / recién fallido
 
-500 unitarias, tipos, navegación y registro de interfaz aprobados; benchmark 30/30, regresión adicional 29/29 y SQL aislado 13 comprobaciones. Catálogo 503 no bloquea captura nueva; bootstrap 503 mantiene bloqueo explícito y reintento; 401 jamás habilita micrófono.
-No se acreditan voz física, petición autenticada del navegador del operador ni escritura productiva de audio por estos ensayos. Combinación con main a489f1b: tipos y suite completa repetidos; build de combinación se acredita en candidata Vercel antes de promover; huella de entradas del benchmark intacta. Combinación con main aa6f3a5: tipos y suite completa repetidos; build de combinación se acredita en candidata Vercel antes de promover; huella de entradas del benchmark intacta.
+Corte #312: 502 unitarias y tipos sobre combinación con main aa6f3a5; benchmark previo 30/30 reutilizado por huella intacta, regresión adicional 29/29 y SQL aislado 13 comprobaciones. Candidata compilada y promovida; alias y /api/version comprobados. Evidencia histórica recuperada, no pruebas nuevas de este ciclo documental.
+Observación pública de este ciclo: /api/version 200, production, c02f5142d7609c35d8a2dc2c549726edc4016f13. No acredita voz física, sesión autenticada, experiencia humana ni escritura productiva de audio. Actions 9/9 no iniciados por facturación en el recibo del corte, no aprobados; suspensión de Blob observada antes de ese corte, sin revalidación nueva del proveedor.
 
 ### 🔔 Recordatorios latentes
 
@@ -139,7 +143,7 @@ No se acreditan voz física, petición autenticada del navegador del operador ni
 | Requisito | Resultado demostrado y entorno | Falta para cerrar |
 |---|---|---|
 | Corrección original de continuidad | V000 conserva «Quedó bien» del operador | no extender esa aceptación a nuevas funciones o versiones |
-| Benchmark visible y entrada manual | código/PR 298; artefacto `passed`; fuente probada `11fde5a7da7aec46b9873103ddf13213ba1c6c4f` | volver a acreditar versión publicada y vista autenticada actuales |
+| Benchmark visible y entrada manual | código/PR 298; artefacto `passed`; fuente probada `11fde5a7da7aec46b9873103ddf13213ba1c6c4f` | versión pública acreditada por observación de este ciclo; vista autenticada y datos reales pendientes |
 | Contratos/regresiones | acta histórica: 20 dirigidas, 15 navegador, 402 unitarias; build/tipos/interfaz aprobados | no afirmar ejecución nueva de esas pruebas en este ciclo documental |
 | Persistencia real | acta PR 298: escritura+cifrado+lectura+borrado con propietario sintético en Vercel | opinión y sesión reales del operador, lectura y efecto persistido vinculados |
 | Acceso MCP | conexión configurada y health invocado, no acceso completo | credencial normativa dedicada si sigue faltando; respetar ciclo normativo del servidor |
@@ -150,7 +154,8 @@ No se acreditan voz física, petición autenticada del navegador del operador ni
 | Experiencia agradable | encuesta y manual disponibles por contrato | respuestas humanas; no inferir experiencia ni ánimo de la voz |
 | Audio técnico/síntomas autodeclarados | propuesta delimitada, sin archivo recibido | finalidad y primer reporte definidos, consentimiento separado y revisión de interfaz/seguridad antes de código |
 | Detección clínica comercial | no implementada ni validada | no ofrecer; requerir definición de uso, evaluación clínica/regulatoria pertinente y límites de plataforma |
-| Canonización portable | documentación #302 fusionada en main c9147557; núcleo de trece bloques conservado | nuevo endurecimiento local: cotejo, pruebas e integración separadas |
+| Canonización portable | objeto único y núcleo de trece bloques; #302 y #312 integradas; adjunto de 51233 bytes preservado | actualizar cada ciclo; recuperar fuentes ausentes sin inventar cobertura total |
+| Micrófono tras #309 | #312 fusionada y publicada c02f514; 502 unitarias, build y guardias verificadas en el recibo | arranque/parada y recuperación con la voz y sesión reales del operador |
 
 **Protocolo de sesión real, aún no ejecutado:** (1) acreditar versión y acceso, confirmar consentimiento; (2) una sesión de voz voluntaria de al menos 60 s, edición y confirmación/reanudación/parada; (3) recoger opinión real en formulario —si no sale encuesta, usar manual y mantener `voluntary`—; (4) consultar el registro del mismo propietario, correlacionar identificador/versión/acuse y resumen persistido; (5) conservar solo evidencia saneada, no texto/audio/comentarios privados en Git. No forzar la muestra ni fabricar `sampled`. Comprobar exportación/borrado con datos de prueba separados, nunca borrar la sesión real sin permiso.
 
@@ -165,6 +170,33 @@ Toda salida conserva diez campos, agrupables sin ocultarlos: (1) proyecto/rol/se
 No llamar «sin cambios» a una fuente inaccesible; no convertir calidad científica o clínica en semáforo por pruebas de software. Si no hay constructor nuevo asignado, decirlo y no inventar trabajo en segundo plano.
 
 ## 11. Crónica y fuentes
+
+### C020 — Publicación comprobada del micrófono y custodia — 2026-10-17
+
+La reanudación de C019 llegó a cierre técnico de publicación: #312 fusionada normalmente en `c02f5142d7609c35d8a2dc2c549726edc4016f13`; ocho huellas de producto cotejadas; candidata `dpl_DD5RsHVrkSCoYjFoumRvRMTncNtU` compilada, comprobada y promovida al alias canónico. Pruebas: 502 unitarias/tipos tras integración; benchmark 30/30 reutilizado por huella sin cambios; 29 regresiones adicionales y 13 comprobaciones SQL aisladas. El adjunto de 51233 bytes se comparó con GitHub y el commit fusionado; el original previo no se sustituyó. Nueve trabajos de Actions observados no arrancaron por facturación y NO se cuentan como aprobados. No se levantó la suspensión de audio ni se ensayó voz física, cuenta real o comodidad. El recibo completo está [incorporado en la carpeta](evidencias/CIERRE-MICROFONO-PUBLICADO-20261017.md), con [procedencia en #312](https://github.com/SeryMente/khora/pull/312#issuecomment-6242006627). Esta crónica recoge un hecho verificado del ciclo anterior; no finge una nueva ejecución de sus pruebas.
+
+### C021 — Objeto principal, actualización por ciclo y cobertura del sprint
+
+El operador precisa que el objeto canónico es principal, debe actualizarse ciclo a ciclo y reunir el sprint completo además de la conversación. Se conserva la instrucción literal y el intercambio posterior relevante en [original de este ciclo](originales/CONTINUIDAD-C021.md). Corrección concreta: §8 y ambos prompts aún describían una fase previa a integrar/publicar y 500 unitarias; se reemplazan por el resultado efectivamente acreditado, 502 unitarias y los pendientes humanos/materiales reales. No basta con remitir al usuario a un comentario: resultado y límites pasan al núcleo; recibo y originales son anexos, no fuentes de estado paralelas.
+
+Fuentes de este ciclo: método v1.5, blob `32c7a65ff2e83b3b76752ba2160427bd6e851a8f`, sin delta metodológico; objeto v0.5.2, blob `a91242e42b04debd8b015d35c901f1cbe90bfeee`, recuperado desde main `2012e2389deb732568a5bd384817c19499fb910c`; manifiesto y recibo #312 recuperados; repositorio destino privado revalidado. Producción responde 200 y c02f514 en consulta nueva de /api/version, registrada en el recibo de auditoría. Cambios exclusivamente documentales; no modifica producto, método central, seguridad, facturación, datos de usuarios ni lanza publicación manual. Main puede tener otros cambios posteriores: no atribuirles despliegue por esta observación.
+
+### Cobertura del expediente y lagunas explícitas
+
+| Fuente/ámbito | Ubicación canónica | Cobertura y límite |
+|---|---|---|
+| Conversación migrada aportada | originales/CONVERSACION-MIGRADA-20261017.txt | íntegra, 51233 bytes; custodia verificada en C019/C020; no equivale a exportar todos los eventos nativos del chat |
+| Original anterior y decisiones iniciales | originales/conversacion-recibida.txt y ESPECIFICACIONES-ORIGINALES.md | conservados en manifiesto; historial de versiones no reemplazado |
+| Ingreso y micrófono | originales/INGRESO-RECUPERACION.md, MICROFONO-BLOQUEADO.txt; evidencias/INGRESO-RECUPERACION.json y MICROFONO-BOOTSTRAP.json | instrucciones, pruebas y límites; C017/C018 más publicación C020 |
+| Benchmark y experiencia | CONTRATO-DICTADO-EXPERIENCE.md; evidencias/benchmark-20261016.json, ENDURECIMIENTO-LOCAL.json, INTEGRACION-ENDURECIMIENTO.json | contrato e historia preservados; experiencia humana/fidelidad sin referencia no probadas |
+| Fusión y publicación #312 | evidencias/CIERRE-MICROFONO-PUBLICADO-20261017.md | recibo recuperado íntegro este ciclo, no mera mención externa |
+| Implementación y mantenimiento | khora-web/docs/CUSTODIA-DICTADOS.md, docs/dictado-experience.md, docs/observability-services.md y docs/normative-check.md bajo khora-web | fuentes técnicas referenciadas, sin duplicar implementación; revisión íntegra nueva de todos esos archivos no realizada en C021 |
+| Conversación posterior y nueva autoridad | originales/CONTINUIDAD-C021.md | mensajes originales de usuario posteriores al adjunto y respuestas de cierre pertinentes; no exportación nativa exhaustiva de herramientas/comentarios intermedios |
+| Preparación temporal mencionada | Preparacion-benchmark-y-retroalimentacion.md | citada en conversación; archivo independiente no recuperado; no afirmar incorporación literal ni pérdida permanente |
+| Históricos Notion relacionados | Anexo A §12 y §18; registro transversal de errores en §11 | referencias conservadas; no se acredita lectura íntegra nueva de todas las páginas ni escritura en páginas en papelera |
+| Uso/aceptación reales | sesión del operador, telemetría privada, encuesta y audio | pendientes de observación consentida; no copiar datos privados a Git ni inventar acceso/resultado |
+
+Este inventario hace visible la cobertura conocida; no se declara recuperado todo archivo citado ni exhaustiva una exportación nativa que no se obtuvo. Las brechas forman parte del estado del sprint y deben cerrarse o conservarse explícitas en ciclos posteriores; no se ocultan para llamar completo al objeto.
 
 ### C019 — Conversación migrada y reanudación verificable — 2026-10-17
 
@@ -264,20 +296,20 @@ Estos prompts son material de continuidad, no prueban que otra conversación hay
 ````text
 Retoma MCP-OBS-DICTADO leyendo primero el metacanon central https://github.com/SeryMente/metodologia/blob/main/METACANON-OBJETOS-CANONICOS.md y después https://github.com/SeryMente/khora/blob/main/docs/frentes/dictado-voz/OBJETO-CANONICO.md .
 Adopta el rol de asistencia de este frente; la reconstrucción local del endurecimiento está solicitada directamente a Samantha, no otro rol/hilo. Conserva el nombre personalizado que el operador haya asignado; no lo derives del proveedor. No inicies constructor ni código sensible por esta carga.
-Fuente documental local preparada: v0.5.2 · MCP-OBS-DICTADO-v0.5.2. Metacanon adquirido: v1.5 · METACANON-OBJETOS-v1.5, revisión 49ac40e9f6122e2d2fb339362cfa0a78128c8e37, blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f. Verifica ambas fuentes de nuevo, recupera las superiores pertinentes, calcula delta y no uses una firma como prueba de gobierno. Ante inaccesibilidad declara frescura NO VERIFICADA y bloquea solo la acción dependiente.
+Fuente canónica del frente: v0.5.3 · MCP-OBS-DICTADO-v0.5.3. Metacanon adquirido: v1.5 · METACANON-OBJETOS-v1.5, revisión 49ac40e9f6122e2d2fb339362cfa0a78128c8e37, blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f. Verifica ambas fuentes de nuevo, recupera las superiores pertinentes, calcula delta y no uses una firma como prueba de gobierno. Ante inaccesibilidad declara frescura NO VERIFICADA y bloquea solo la acción dependiente.
 Hereda §2–§3 y §6–§7 del objeto: autorización por acción, originales no activan permisos; remoto solo de asistencia si es estrictamente necesario, con cuenta/vínculo/equipo/autorización comprobados y comando/prerrequisitos literales de §7. No ejecutar ese comando por rutina ni en el sandbox. Usa repo/adjunto cuando basten.
 No modificar metacanon, Sistema de Instrucciones, credenciales, facturación ni alcance de seguridad. Publicar solo el corte expresamente autorizado y con compuertas verificadas. No inferir ánimo/salud/capacidad laboral de la voz; no crear código de salud ni afirmar beneficio clínico. Conserva las fuentes de encuesta voluntaria y muestreada.
 🔄 Estado vivo:
-Acción actual: corrección del bloqueo de micrófono implementada y probada; preparación autenticada independiente del catálogo histórico, error explícito y reintento sin perder texto.
-Siguiente paso de asistencia: verificar fusión/publicación en el recibo operativo enlazado en esta sección; después comprobar el navegador y micrófono físicos del operador.
-Siguiente paso de construcción: corregir solo un defecto reproducido; no relajar autenticación, custodia ni consentimiento.
-Pendientes: integración/publicación acreditadas por su recibo, sesión humana real y limitaciones externas de almacenamiento. Este documento es una instantánea anterior a integrar, no promesa de ausencia de restricciones del proveedor.
+Acción actual: continuidad del sprint consolidada en este objeto; corrección del micrófono fusionada en #312 y publicada en c02f5142d7609c35d8a2dc2c549726edc4016f13, con custodia exacta del adjunto migrado y recibo incorporado como evidencia.
+Siguiente paso de asistencia: comprobar con el operador el micrófono físico, recuperación de texto/audio y descarga en su sesión autenticada; contrastar persistencia del mismo propietario y actualizar este objeto con el resultado y las brechas de §11.
+Siguiente paso de construcción: corregir solo un defecto reproducido y autorizado; no reiniciar el rediseño ni relajar autenticación, custodia o consentimiento.
+Pendientes: aceptación humana del diseño, circuito real de captura/recuperación/archivo/MP3 y experiencia; estado actual del proveedor de audio por revalidar ante la suspensión observada; cobertura técnica y documental pendiente descrita en §9/§11. El sprint permanece abierto; no queda pendiente publicar nuevamente #312.
 ⚗️ En prueba / recién fallido:
-500 unitarias, tipos, navegación y registro de interfaz aprobados; benchmark 30/30, regresión adicional 29/29 y SQL aislado 13 comprobaciones. Catálogo 503 no bloquea captura nueva; bootstrap 503 mantiene bloqueo explícito y reintento; 401 jamás habilita micrófono.
-No se acreditan voz física, petición autenticada del navegador del operador ni escritura productiva de audio por estos ensayos. Combinación con main a489f1b: tipos y suite completa repetidos; build de combinación se acredita en candidata Vercel antes de promover; huella de entradas del benchmark intacta. Combinación con main aa6f3a5: tipos y suite completa repetidos; build de combinación se acredita en candidata Vercel antes de promover; huella de entradas del benchmark intacta.
+Corte #312: 502 unitarias y tipos sobre combinación con main aa6f3a5; benchmark previo 30/30 reutilizado por huella intacta, regresión adicional 29/29 y SQL aislado 13 comprobaciones. Candidata compilada y promovida; alias y /api/version comprobados. Evidencia histórica recuperada, no pruebas nuevas de este ciclo documental.
+Observación pública de este ciclo: /api/version 200, production, c02f5142d7609c35d8a2dc2c549726edc4016f13. No acredita voz física, sesión autenticada, experiencia humana ni escritura productiva de audio. Actions 9/9 no iniciados por facturación en el recibo del corte, no aprobados; suspensión de Blob observada antes de ese corte, sin revalidación nueva del proveedor.
 Conserva íntegros los recordatorios latentes del objeto. Reutiliza evidencia válida, no repitas pruebas sin cambio causal. Recibir una salida del constructor tiene prioridad; asistencia la contrasta y devuelve síntesis y prompt de continuidad. No afirmar recepción ni trabajo en segundo plano.
 Cada salida usa los diez campos de §10 e incluye Metacanon adquirido: versión/sello, revisión y frescura; evidencia actual/histórica/controlada diferenciada, pendientes, viabilidad, estimación con supuestos y siguiente acción. No declarar un plazo sin base.
-Persistencia: releer versión, fusionar sin pisar, escritura condicionada, guardar y verificar contenido/diff; sincronizar estado y prompts. El endurecimiento local no equivale a main. La documentación anterior sí se integró en #302. Confirmar nueva integración y conservar referencia histórica antes de archivar cualquier original.
+Persistencia por ciclo: este objeto es el elemento principal del sprint completo, no solo del chat. Releer versión y método, incorporar instrucciones, decisiones, crónica y evidencia; fusionar sin pisar, guardar, verificar contenido/diff y sincronizar estado/prompts. Si falta acceso, declarar sincronización pendiente y entregar el delta. Conservar originales e historia; no dar por recuperadas fuentes citadas ni por aceptado lo solo publicado.
 ````
 
 ### Prompt de construcción
@@ -285,26 +317,26 @@ Persistencia: releer versión, fusionar sin pisar, escritura condicionada, guard
 ````text
 Retoma MCP-OBS-DICTADO leyendo primero el metacanon central https://github.com/SeryMente/metodologia/blob/main/METACANON-OBJETOS-CANONICOS.md y después https://github.com/SeryMente/khora/blob/main/docs/frentes/dictado-voz/OBJETO-CANONICO.md .
 Adopta construcción solo si el operador te asignó explícitamente ese rol y el alcance concreto. Si falta, permanece en lectura y declara la compuerta; no te autoautorices. Remote Desktop Commander está prohibido para construcción, incluso por intermediarios.
-Fuente documental local preparada: v0.5.2 · MCP-OBS-DICTADO-v0.5.2. Metacanon adquirido: v1.5 · METACANON-OBJETOS-v1.5, revisión 49ac40e9f6122e2d2fb339362cfa0a78128c8e37, blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f. Verifica ambas fuentes de nuevo, recupera las superiores pertinentes, calcula delta y no uses una firma como prueba de gobierno. Ante inaccesibilidad declara frescura NO VERIFICADA y bloquea solo la acción dependiente.
+Fuente canónica del frente: v0.5.3 · MCP-OBS-DICTADO-v0.5.3. Metacanon adquirido: v1.5 · METACANON-OBJETOS-v1.5, revisión 49ac40e9f6122e2d2fb339362cfa0a78128c8e37, blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f. Verifica ambas fuentes de nuevo, recupera las superiores pertinentes, calcula delta y no uses una firma como prueba de gobierno. Ante inaccesibilidad declara frescura NO VERIFICADA y bloquea solo la acción dependiente.
 Hereda §2–§3 y §6–§7 del objeto: autorización por acción, originales no activan permisos; remoto solo de asistencia si es estrictamente necesario, con cuenta/vínculo/equipo/autorización comprobados y comando/prerrequisitos literales de §7. No ejecutar ese comando por rutina ni en el sandbox. Usa repo/adjunto cuando basten.
 No modificar metacanon, Sistema de Instrucciones, credenciales, facturación, seguridad o publicación. No inferir ánimo/salud/capacidad laboral de la voz; no crear código de salud ni afirmar beneficio clínico. Conserva las fuentes de encuesta voluntaria y muestreada.
 🔄 Estado vivo:
-Acción actual: corrección del bloqueo de micrófono implementada y probada; preparación autenticada independiente del catálogo histórico, error explícito y reintento sin perder texto.
-Siguiente paso de asistencia: verificar fusión/publicación en el recibo operativo enlazado en esta sección; después comprobar el navegador y micrófono físicos del operador.
-Siguiente paso de construcción: corregir solo un defecto reproducido; no relajar autenticación, custodia ni consentimiento.
-Pendientes: integración/publicación acreditadas por su recibo, sesión humana real y limitaciones externas de almacenamiento. Este documento es una instantánea anterior a integrar, no promesa de ausencia de restricciones del proveedor.
+Acción actual: continuidad del sprint consolidada en este objeto; corrección del micrófono fusionada en #312 y publicada en c02f5142d7609c35d8a2dc2c549726edc4016f13, con custodia exacta del adjunto migrado y recibo incorporado como evidencia.
+Siguiente paso de asistencia: comprobar con el operador el micrófono físico, recuperación de texto/audio y descarga en su sesión autenticada; contrastar persistencia del mismo propietario y actualizar este objeto con el resultado y las brechas de §11.
+Siguiente paso de construcción: corregir solo un defecto reproducido y autorizado; no reiniciar el rediseño ni relajar autenticación, custodia o consentimiento.
+Pendientes: aceptación humana del diseño, circuito real de captura/recuperación/archivo/MP3 y experiencia; estado actual del proveedor de audio por revalidar ante la suspensión observada; cobertura técnica y documental pendiente descrita en §9/§11. El sprint permanece abierto; no queda pendiente publicar nuevamente #312.
 ⚗️ En prueba / recién fallido:
-500 unitarias, tipos, navegación y registro de interfaz aprobados; benchmark 30/30, regresión adicional 29/29 y SQL aislado 13 comprobaciones. Catálogo 503 no bloquea captura nueva; bootstrap 503 mantiene bloqueo explícito y reintento; 401 jamás habilita micrófono.
-No se acreditan voz física, petición autenticada del navegador del operador ni escritura productiva de audio por estos ensayos. Combinación con main a489f1b: tipos y suite completa repetidos; build de combinación se acredita en candidata Vercel antes de promover; huella de entradas del benchmark intacta. Combinación con main aa6f3a5: tipos y suite completa repetidos; build de combinación se acredita en candidata Vercel antes de promover; huella de entradas del benchmark intacta.
+Corte #312: 502 unitarias y tipos sobre combinación con main aa6f3a5; benchmark previo 30/30 reutilizado por huella intacta, regresión adicional 29/29 y SQL aislado 13 comprobaciones. Candidata compilada y promovida; alias y /api/version comprobados. Evidencia histórica recuperada, no pruebas nuevas de este ciclo documental.
+Observación pública de este ciclo: /api/version 200, production, c02f5142d7609c35d8a2dc2c549726edc4016f13. No acredita voz física, sesión autenticada, experiencia humana ni escritura productiva de audio. Actions 9/9 no iniciados por facturación en el recibo del corte, no aprobados; suspensión de Blob observada antes de ese corte, sin revalidación nueva del proveedor.
 Conserva íntegros los recordatorios latentes del objeto. Reutiliza evidencia válida, no repitas pruebas sin cambio causal. Recibir una salida del constructor tiene prioridad; asistencia la contrasta y devuelve síntesis y prompt de continuidad. No afirmar recepción ni trabajo en segundo plano.
 Cada salida usa los diez campos de §10 e incluye Metacanon adquirido: versión/sello, revisión y frescura; evidencia actual/histórica/controlada diferenciada, pendientes, viabilidad, estimación con supuestos y siguiente acción. No declarar un plazo sin base.
-Persistencia: releer versión, fusionar sin pisar, escritura condicionada, guardar y verificar contenido/diff; sincronizar estado y prompts. El endurecimiento local no equivale a main. La documentación anterior sí se integró en #302. Confirmar nueva integración y conservar referencia histórica antes de archivar cualquier original.
+Persistencia por ciclo: este objeto es el elemento principal del sprint completo, no solo del chat. Releer versión y método, incorporar instrucciones, decisiones, crónica y evidencia; fusionar sin pisar, guardar, verificar contenido/diff y sincronizar estado/prompts. Si falta acceso, declarar sincronización pendiente y entregar el delta. Conservar originales e historia; no dar por recuperadas fuentes citadas ni por aceptado lo solo publicado.
 ````
 
 ## 13. Persistencia y revisión
 
 - Autorización de la migración original: V010. Reconstrucción actual: solicitud directa conservada en C015. Carpeta y custodia dentro del propietario del frente; originales privados nunca al método central.
-- Rama de preparación: `docs/canon-dictado-voz-20261016` desde `1697ee2693ed3217523ffc1d1be9b6541d7d849d`; fuente previa contrastada antes de escribir. Si main cambia, comparar el archivo pertinente; preservar ambos deltas o parar solo la escritura en conflicto.
+- Rama documental de C021: `docs/dictado-estado-v053-20261017`, basada en main `2012e2389deb732568a5bd384817c19499fb910c`; objeto y manifiesto contrastados antes de escribir. Rama original de canonización conservada en la crónica histórica. Si main cambia, comparar el archivo pertinente; preservar ambos deltas o parar solo la escritura en conflicto.
 - Original histórico conservado íntegro al final de este objeto, SHA-256 `2cd79db40b1786521df63f1b87d80d595c2df9a48bb202bf93a40ff16cce1810`; no se borran decisiones ni se reactivan permisos. Contrato anterior y adjunto tienen hashes independientes en el manifiesto.
 - Pasada 1: cotejar V000–V010 → D01–D07/aceptación, trece bloques ordenados, originales/historia conservados, privacidad, referencias y estado literal en ambos prompts. Corregir antes de escribir.
 - Pasada 2: recuperar el archivo guardado y metadatos de custodia, comparar hashes/contenido/diff, verificar enlaces y que las rutas antiguas no mantengan otro estado. Solo después afirmar persistido. El recibo del ciclo identifica revisión y pruebas de esa lectura; no usar una PR abierta como prueba de integración.
@@ -316,7 +348,7 @@ Persistencia: releer versión, fusionar sin pisar, escritura condicionada, guard
 
 ### Recibo operativo del corte de Ingreso
 
-Instantánea de implementación preparada antes de fusionar/publicar. No sustituye el estado operativo posterior. Fuente de verdad de fusión, SHA desplegado, alias y verificaciones finales: https://github.com/SeryMente/khora/pull/312 (recibo de cierre en comentarios de esa solicitud). Solo esta solicitud pertenece al corte; otras ramas no quedan acreditadas por ella. La sesión física y aceptación humana permanecen separadas.
+El estado único está actualizado en §8. La fusión/publicación c02f514 se acredita en [recibo incorporado](evidencias/CIERRE-MICROFONO-PUBLICADO-20261017.md), procedente de https://github.com/SeryMente/khora/pull/312#issuecomment-6242006627. El recibo prueba ese evento, no mantiene otro estado vivo. Solo #312 pertenece a este corte; otras ramas no quedan acreditadas. La sesión física y aceptación humana permanecen pendientes.
 
 # Anexo A · Historia íntegra anterior a la canonización v0.2.0
 
