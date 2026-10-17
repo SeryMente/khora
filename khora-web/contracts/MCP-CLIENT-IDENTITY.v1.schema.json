@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Opt-in owner-configured MCP client identity",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "client_id",
+    "grant_id",
+    "platform",
+    "assurance"
+  ],
+  "properties": {
+    "version": {
+      "const": "mcp-client-identity/v1"
+    },
+    "client_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2048,
+      "pattern": "^(?!\\s)(?![\\s\\S]*\\s$)[^\\u0000-\\u001F\\u007F]+$"
+    },
+    "grant_id": {
+      "type": "string",
+      "format": "uuid",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "platform": {
+      "enum": [
+        "ChatGPT",
+        "Notion"
+      ]
+    },
+    "assurance": {
+      "const": "owner-configured"
+    }
+  },
+  "x-receipt-protocol-version": "v0.6.0",
+  "x-output-format-version": "v1.8.0",
+  "x-limit": "Owner-authorized declaration; not vendor/model attestation."
+}

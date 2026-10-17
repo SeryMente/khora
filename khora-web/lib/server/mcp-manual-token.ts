@@ -1,8 +1,11 @@
 import { generateRandomToken, hashString, obtenerGeneracionRevocacion } from "./oauth";
+import { clientIdentityEnabled, identityProjection, configuredClientIdentity, readClientIdentity, type McpClientIdentity } from "./mcp-client-identity";
 import { getDb } from "./neon";
 import { getMcpConfig } from "./mcp-config";
 
 export const MANUAL_MCP_TOKEN_PREFIX = "khora_mcp_v1_";
+export const BOUND_MANUAL_MCP_TOKEN_PREFIX = "khora_mcp_v2_";
+export function isManualMcpToken(token: string): boolean { return token.startsWith(MANUAL_MCP_TOKEN_PREFIX) || token.startsWith(BOUND_MANUAL_MCP_TOKEN_PREFIX); }
 export const MANUAL_MCP_SCOPES = ["runtime:read", "volcados:read", "norm:turn"] as const;
 export const MANUAL_MCP_DEFAULT_EXPIRY_DAYS = 90;
 
@@ -20,6 +23,7 @@ export interface ManualMcpTokenRecord {
   expira_en: Date;
   ultimo_uso_en: Date | null;
   revocado_en: Date | null;
+  client_identity?: McpClientIdentity | null;
 }
 
 function normalizeScopes(scopes: unknown): string[] {
@@ -57,6 +61,7 @@ export async function createManualMcpToken(params: {
   scopes: unknown;
   expiresInDays?: unknown;
   label?: unknown;
+  clientId?: unknown;
 }) {
   if (!validActor(params.usuario)) throw new Error("MANUAL_TOKEN_ACTOR_INVALID");
 
@@ -67,7 +72,9 @@ export async function createManualMcpToken(params: {
   const config = getMcpConfig();
   if (!config) throw new Error("MCP_CONFIG_MISSING");
 
-  const rawToken = MANUAL_MCP_TOKEN_PREFIX + generateRandomToken(32);
+  if (params.clientId !== undefined && (typeof params.clientId !== "string" || !params.clientId.trim() || !clientIdentityEnabled())) throw new Error("MCP_CLIENT_PROFILE_REQUIRED");
+  const identity = typeof params.clientId === "string" ? configuredClientIdentity(params.clientId) : null;
+  const rawToken = (identity ? BOUND_MANUAL_MCP_TOKEN_PREFIX : MANUAL_MCP_TOKEN_PREFIX) + generateRandomToken(32);
   const tokenHash = hashString(rawToken);
   const tokenPrefix = rawToken.slice(0, MANUAL_MCP_TOKEN_PREFIX.length + 8);
   const etiqueta = normalizeLabel(params.label);
@@ -77,10 +84,10 @@ export async function createManualMcpToken(params: {
   const db = getDb();
   const result = await db.query<ManualMcpTokenRecord>(
     "INSERT INTO mcp_manual_tokens " +
-      "(token_hash, token_prefix, usuario, resource, scope, generacion, etiqueta, expira_en) " +
-      "VALUES ($1,$2,$3,$4,$5,$6,$7,$8) " +
-      "RETURNING id::text AS id, token_prefix, usuario, resource, scope, generacion, etiqueta, emitido_en, expira_en, ultimo_uso_en, revocado_en",
-    [tokenHash, tokenPrefix, params.usuario, config.canonicalUrl, scopes.join(" "), generacion, etiqueta, expiraEn]
+      "(token_hash, token_prefix, usuario, resource, scope, generacion, etiqueta, expira_en" + identityProjection() + ") " +
+      "VALUES ($1,$2,$3,$4,$5,$6,$7,$8" + (clientIdentityEnabled() ? ",$9" : "") + ") " +
+      "RETURNING id::text AS id, token_prefix, usuario, resource, scope, generacion, etiqueta, emitido_en, expira_en, ultimo_uso_en, revocado_en" + identityProjection(),
+    [tokenHash, tokenPrefix, params.usuario, config.canonicalUrl, scopes.join(" "), generacion, etiqueta, expiraEn, ...(clientIdentityEnabled() ? [JSON.stringify(identity)] : [])]
   );
 
   return {
@@ -91,12 +98,13 @@ export async function createManualMcpToken(params: {
 }
 
 export async function authenticateManualMcpToken(rawToken: string): Promise<ManualMcpTokenRecord | null> {
-  if (typeof rawToken !== "string" || !rawToken.startsWith(MANUAL_MCP_TOKEN_PREFIX)) return null;
+  if (typeof rawToken !== "string" || !isManualMcpToken(rawToken)) return null;
 
+  if (rawToken.startsWith(BOUND_MANUAL_MCP_TOKEN_PREFIX) && !clientIdentityEnabled()) return null;
   const db = getDb();
   const tokenHash = hashString(rawToken);
   const result = await db.query<ManualMcpTokenRecord>(
-    "SELECT id::text AS id, token_prefix, usuario, resource, scope, generacion, etiqueta, emitido_en, expira_en, ultimo_uso_en, revocado_en " +
+    "SELECT id::text AS id, token_prefix, usuario, resource, scope, generacion, etiqueta, emitido_en, expira_en, ultimo_uso_en, revocado_en" + identityProjection() + " " +
       "FROM mcp_manual_tokens " +
       "WHERE token_hash = $1 AND revocado_en IS NULL AND expira_en > NOW() " +
       "LIMIT 1",
@@ -105,6 +113,8 @@ export async function authenticateManualMcpToken(rawToken: string): Promise<Manu
 
   const record = result.rows[0] || null;
   if (!record) return null;
+  const identity = readClientIdentity(record.client_identity);
+  if (rawToken.startsWith(BOUND_MANUAL_MCP_TOKEN_PREFIX) && !identity) return null;
 
   await db.query(
     "UPDATE mcp_manual_tokens SET ultimo_uso_en = NOW() WHERE id = $1::uuid AND revocado_en IS NULL",
@@ -119,7 +129,7 @@ export async function listManualMcpTokens(usuario: string): Promise<ManualMcpTok
   const generacion = await obtenerGeneracionRevocacion(usuario);
   const db = getDb();
   const result = await db.query<ManualMcpTokenRecord>(
-    "SELECT id::text AS id, token_prefix, usuario, resource, scope, generacion, etiqueta, emitido_en, expira_en, ultimo_uso_en, revocado_en " +
+    "SELECT id::text AS id, token_prefix, usuario, resource, scope, generacion, etiqueta, emitido_en, expira_en, ultimo_uso_en, revocado_en" + identityProjection() + " " +
       "FROM mcp_manual_tokens " +
       "WHERE usuario = $1 AND revocado_en IS NULL AND expira_en > NOW() AND generacion = $2 " +
       "ORDER BY emitido_en DESC",

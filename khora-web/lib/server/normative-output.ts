@@ -1,3 +1,4 @@
+import { BOUND_OUTPUT_FORMAT_VERSION, type ClientPlatform } from "./mcp-client-identity";
 import { createHash } from "crypto";
 import contract from "../../contracts/FORMATO-REGISTRO-VERIFICACION-CICLO.schema.json";
 
@@ -12,6 +13,8 @@ type TState = "✓" | "?" | "!";
 type CycleState = "COMPLETADO" | "BLOQUEADO" | "PENDIENTE";
 
 export type CanonicalCycleOutputData = {
+  platform?: ClientPlatform;
+  output_format_version?: string;
   cycle: string;
   si_header: string;
   methodology_header: string;
@@ -46,7 +49,7 @@ export function hashCanonicalCycleOutput(output: string): string {
 
 export function renderCanonicalCycleOutput(data: CanonicalCycleOutputData): string {
   const hud = [
-    "ChatGPT",
+    data.output_format_version === BOUND_OUTPUT_FORMAT_VERSION ? data.platform ?? "ChatGPT" : "ChatGPT",
     "CI: " + data.ci,
     "RA: " + data.ra,
     "UBIC: " + data.ubic,
@@ -73,7 +76,7 @@ export function renderCanonicalCycleOutput(data: CanonicalCycleOutputData): stri
 
 export function validateCanonicalCycleOutput(
   output: unknown,
-  expected: { expectedSiHeader: string; expectedMethodologyHeader: string },
+  expected: { expectedSiHeader: string; expectedMethodologyHeader: string; platform?: ClientPlatform; output_format_version?: string },
 ): CanonicalOutputValidation {
   if (typeof output !== "string") return { ok: false, reasons: ["NOT_TEXT"] };
   if (output.includes("\r")) return { ok: false, reasons: ["CRLF_FORBIDDEN"] };
@@ -94,7 +97,10 @@ export function validateCanonicalCycleOutput(
   if (siHeader !== expected.expectedSiHeader) reasons.push("SI_HEADER");
   if (methodologyHeader !== expected.expectedMethodologyHeader) reasons.push("METHODOLOGY_HEADER");
 
-  const hudMatch = hud.match(HUD_PATTERN);
+  const bound = expected.output_format_version === BOUND_OUTPUT_FORMAT_VERSION;
+  if (bound && expected.platform !== "ChatGPT" && expected.platform !== "Notion") return {ok:false,reasons:["PLATFORM"]};
+  const prefix = (bound ? expected.platform : "ChatGPT") + " · ";
+  const hudMatch = hud.startsWith(prefix) ? ("ChatGPT · " + hud.slice(prefix.length)).match(HUD_PATTERN) : null;
   if (!hudMatch) reasons.push("HUD");
 
   const resultMatch = resultLine.match(/^RESULTADO: (.+)$/);
@@ -105,6 +111,7 @@ export function validateCanonicalCycleOutput(
   if (reasons.length > 0) return { ok: false, reasons };
 
   const data: CanonicalCycleOutputData = {
+    ...(bound ? {platform: expected.platform, output_format_version: BOUND_OUTPUT_FORMAT_VERSION} : {}),
     cycle,
     si_header: siHeader,
     methodology_header: methodologyHeader,

@@ -216,7 +216,9 @@ export async function toolKhoraLeerVolcado(args: {
   if (args.version !== undefined && args.version !== null) {
     // Buscar versión específica
     const vRes = await db.query(
-      `SELECT version, texto, sha256, motivo, creado_en, usuario
+      // Version rows do not store an author; keep the public nullable field
+      // without borrowing an actor from the separate revision audit.
+      `SELECT version, texto, sha256, motivo, creado_en, NULL::text AS usuario
        FROM volcado_version
        WHERE volcado_id = $1 AND version = $2`,
       [volcadoId, args.version]
@@ -370,7 +372,8 @@ export async function toolKhoraVersionesVolcado(args: {
   let versiones: any[] = [];
   try {
     const verRes = await db.query(
-      `SELECT version, sha256, motivo, creado_en, usuario
+      // Match migration 006: version authorship is unavailable, not inferred.
+      `SELECT version, sha256, motivo, creado_en, NULL::text AS usuario
        FROM volcado_version
        WHERE volcado_id = $1
        ORDER BY version ASC`,

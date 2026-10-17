@@ -11,6 +11,7 @@ import {
   obtenerGeneracionRevocacion,
   generateRandomToken,
 } from "@/lib/server/oauth";
+import { readClientIdentity } from "@/lib/server/mcp-client-identity";
 import { signJwt, verifyPkceS256 } from "@/lib/server/jwt";
 
 const SUPPORTED_SCOPES = new Set(["volcados:read", "runtime:read", "norm:turn", "offline_access"]);
@@ -117,6 +118,10 @@ async function handlePOST(req: NextRequest) {
       );
     }
 
+    const clientIdentity = readClientIdentity(record.client_identity);
+    if (clientIdentity && clientIdentity.client_id !== clientId) {
+      return NextResponse.json({error:"invalid_grant", error_description:"Invalid grant"}, {status:400});
+    }
     if (record.redirect_uri !== redirectUri) {
       return NextResponse.json(
         { error: "invalid_grant", error_description: "Invalid grant", _diagnostic_code: "OAUTH_REDIRECT_MISMATCH" },
@@ -181,11 +186,13 @@ async function handlePOST(req: NextRequest) {
         exp: nowSec + 3600,
         iat: nowSec,
         jti: generateRandomToken(16),
+        ...(clientIdentity ? {token_kind: "mcp-access", client_identity: clientIdentity} : {}),
       },
       config.jwtSecret,
     );
 
     const refreshToken = await crearRefreshToken({
+      clientIdentity,
       usuario: record.usuario,
       resource: config.canonicalUrl,
       scope,
@@ -205,7 +212,7 @@ async function handlePOST(req: NextRequest) {
       );
     }
 
-    const rotated = await rotarRefreshToken(rawRefreshToken);
+    const rotated = await rotarRefreshToken(rawRefreshToken, {clientId, resource: resourceParam || config.canonicalUrl});
     if (!rotated) {
       return NextResponse.json(
         { error: "invalid_grant", error_description: "Invalid grant", _diagnostic_code: "OAUTH_REFRESH_INACTIVE" },
@@ -214,6 +221,8 @@ async function handlePOST(req: NextRequest) {
     }
 
     const { record, newToken } = rotated;
+    const clientIdentity = readClientIdentity(record.client_identity);
+    if (clientIdentity && clientIdentity.client_id !== clientId) return NextResponse.json({error:"invalid_grant"}, {status:400});
     if (record.resource !== config.canonicalUrl) {
       return NextResponse.json(
         { error: "invalid_grant", error_description: "Invalid grant", _diagnostic_code: "OAUTH_RESOURCE_MISMATCH" },
@@ -248,6 +257,7 @@ async function handlePOST(req: NextRequest) {
         exp: nowSec + 3600,
         iat: nowSec,
         jti: generateRandomToken(16),
+        ...(clientIdentity ? {token_kind: "mcp-access", client_identity: clientIdentity} : {}),
       },
       config.jwtSecret,
     );

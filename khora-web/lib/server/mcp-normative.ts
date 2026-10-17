@@ -1,5 +1,6 @@
+import { clientIdentityEnabled, identityProjection, readClientIdentity, assertClientIdentityMatch, BOUND_OUTPUT_FORMAT_VERSION, type McpClientIdentity } from "./mcp-client-identity";
 import { generateRandomToken, obtenerGeneracionRevocacion } from "./oauth";
-import { assertNormativeRuntimeContext, REQUIRED_OUTPUT_FORMAT_VERSION, REQUIRED_PLATFORM, type NormativeRuntimeContext } from "./normative-runtime";
+import { isNormativeRuntimeContext, assertNormativeRuntimeContext, REQUIRED_OUTPUT_FORMAT_VERSION, REQUIRED_PLATFORM, type NormativeRuntimeContext } from "./normative-runtime";
 import { getDb } from "./neon";
 import { getMcpConfig } from "./mcp-config";
 import { signJwt, verifyJwtDetailed } from "./jwt";
@@ -27,6 +28,7 @@ type TurnRow = {
   turn_number: number | null;
   actor: string;
   platform: string;
+  client_identity?: McpClientIdentity | null;
   reasoning_mode: string;
   output_format_version: string;
   current_attempt: number;
@@ -157,6 +159,7 @@ function issueTurnToken(
       turn_si_git_commit_sha: row.si_git_commit_sha,
       turn_si_sha256: row.si_sha256,
       turn_manifest_sha256: row.manifest_sha256,
+      ...(runtime.client_identity ? {client_identity: runtime.client_identity} : {}),
       turn_platform: runtime.platform,
       turn_reasoning_mode: runtime.reasoning_mode,
       turn_output_format_version: runtime.output_format_version,
@@ -192,6 +195,7 @@ function issueReleaseToken(actor: string, turn: TurnRow, outputSha256: string, e
       turn_cycle_id: turn.cycle_id,
       turn_attempt: turn.current_attempt,
       turn_nonce: turn.nonce,
+      ...(turn.client_identity ? {client_identity: readClientIdentity(turn.client_identity)} : {}),
       turn_output_sha256: outputSha256,
       turn_evidence_sha256: evidenceSha256,
     },
@@ -199,7 +203,7 @@ function issueReleaseToken(actor: string, turn: TurnRow, outputSha256: string, e
   );
 }
 
-export async function releaseNormativeTurn(actor: string, input: { turn_token: string }) {
+export async function releaseNormativeTurn(actor: string, input: { turn_token: string }, clientIdentity: McpClientIdentity | null = null) {
   if (!validActor(actor)) throw new Error("TURN_ACTOR_INVALID");
   if (!input || typeof input.turn_token !== "string" || input.turn_token.length < 16) {
     throw new Error("TURN_TOKEN_INVALID");
@@ -212,6 +216,7 @@ export async function releaseNormativeTurn(actor: string, input: { turn_token: s
   const tokenResult = verifyJwtDetailed(input.turn_token, config.jwtSecret);
   if (!tokenResult.ok) throw tokenFailure("TURN_TOKEN_" + tokenResult.error.toUpperCase());
   const token = tokenResult.payload;
+  assertClientIdentityMatch(token.client_identity, clientIdentity);
   const tokenScopes = token.scope.split(/\s+/).filter(Boolean);
 
   if (
@@ -233,6 +238,7 @@ export async function releaseNormativeTurn(actor: string, input: { turn_token: s
 
   const turn = await readTurn(token.turn_cycle_id);
   if (!turn) throw new Error("TURN_NOT_FOUND");
+  assertClientIdentityMatch(turn.client_identity, token.client_identity);
   if (turn.actor !== actor) throw new Error("TURN_ACTOR_MISMATCH");
   if (turn.status !== "CLOSED") throw new Error("TURN_NOT_VERIFIED");
   if (turn.verified_attempt !== turn.current_attempt) throw new Error("TURN_VERIFIED_ATTEMPT_MISMATCH");
@@ -266,7 +272,8 @@ export async function releaseNormativeTurn(actor: string, input: { turn_token: s
   if (row.si_git_commit_sha !== turn.si_git_commit_sha || row.methodology_git_commit_sha !== turn.methodology_git_commit_sha) {
     throw new Error("TURN_RELEASE_SNAPSHOT_MISMATCH");
   }
-  const storedReceipt = row.receipt as { output?: unknown } | null;
+  const storedReceipt = row.receipt as { output?: unknown; runtime?: {client_identity?: unknown} } | null;
+  assertClientIdentityMatch(storedReceipt?.runtime?.client_identity, token.client_identity);
   if (!storedReceipt || typeof storedReceipt.output !== "string" || hashCanonicalCycleOutput(storedReceipt.output) !== row.output_sha256) {
     throw new Error("TURN_RELEASE_OUTPUT_INVALID");
   }
@@ -291,7 +298,7 @@ export async function releaseNormativeTurn(actor: string, input: { turn_token: s
 async function readTurn(cycleId: string): Promise<TurnRow | null> {
   const db = getDb();
   const result = await db.query<TurnRow>(
-    "SELECT cycle_id, conversation_id, turn_number, actor, platform, reasoning_mode, output_format_version, current_attempt, status, nonce, " +
+    "SELECT cycle_id, conversation_id, turn_number, actor, platform" + identityProjection() + ", reasoning_mode, output_format_version, current_attempt, status, nonce, " +
       "si_version, si_git_commit_sha, si_git_blob_sha, si_sha256, manifest_sha256, methodology_version, methodology_git_commit_sha, methodology_git_blob_sha, methodology_sha256, manifest, application_index, application_vector, opened_at, closed_at, verified_attempt " +
       "FROM normative_turns WHERE cycle_id = $1 LIMIT 1",
     [cycleId]
@@ -327,6 +334,7 @@ export async function openNormativeTurn(
   const cycleId = cycleIdFor(conversationId, turnNumber);
   const existing = await readTurn(cycleId);
   if (existing) {
+    assertClientIdentityMatch(existing.client_identity, input.runtime.client_identity);
     if (existing.actor !== actor) throw new Error("TURN_ACTOR_MISMATCH");
     if (existing.status === "CLOSED") throw new Error("TURN_ALREADY_CLOSED");
     if (existing.platform !== input.runtime.platform || existing.reasoning_mode !== input.runtime.reasoning_mode || existing.output_format_version !== input.runtime.output_format_version) {
@@ -364,8 +372,8 @@ export async function openNormativeTurn(
       },
       verifier: {
         protocol: "NORM-CHECK",
-        protocol_version: "v0.5.0",
-        verifier_version: "norm-check/0.5.0",
+        protocol_version: input.runtime.client_identity ? "v0.6.0" : "v0.5.0",
+        verifier_version: input.runtime.client_identity ? "norm-check/0.6.0" : "norm-check/0.5.0",
       },
     };
   }
@@ -378,17 +386,17 @@ export async function openNormativeTurn(
   const inserted = await db.query<TurnRow>(
     "INSERT INTO normative_turns (" +
       "cycle_id, conversation_id, turn_number, actor, platform, reasoning_mode, output_format_version, current_attempt, status, nonce, " +
-      "si_version, si_git_commit_sha, si_git_blob_sha, si_sha256, manifest_sha256, methodology_version, methodology_git_commit_sha, methodology_git_blob_sha, methodology_sha256, manifest, application_index, application_vector" +
-      ") VALUES ($1,$2,$3,$4,$5,$6,$7,1,'OPEN',$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,0,$19) " +
+      "si_version, si_git_commit_sha, si_git_blob_sha, si_sha256, manifest_sha256, methodology_version, methodology_git_commit_sha, methodology_git_blob_sha, methodology_sha256, manifest, application_index, application_vector" + identityProjection() +
+      ") VALUES ($1,$2,$3,$4,$5,$6,$7,1,'OPEN',$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,0,$19" + (clientIdentityEnabled() ? ",$20" : "") + ") " +
       "ON CONFLICT (cycle_id) DO NOTHING " +
-      "RETURNING cycle_id, conversation_id, turn_number, actor, platform, reasoning_mode, output_format_version, current_attempt, status, nonce, " +
+      "RETURNING cycle_id, conversation_id, turn_number, actor, platform" + identityProjection() + ", reasoning_mode, output_format_version, current_attempt, status, nonce, " +
       "si_version, si_git_commit_sha, si_git_blob_sha, si_sha256, manifest_sha256, methodology_version, methodology_git_commit_sha, methodology_git_blob_sha, methodology_sha256, manifest, application_index, application_vector, opened_at, closed_at, verified_attempt",
     [
       cycleId,
       conversationId || cycleId,
       turnNumber,
       actor,
-      REQUIRED_PLATFORM,
+      input.runtime.platform,
       input.runtime.reasoning_mode,
       input.runtime.output_format_version,
       nonce,
@@ -403,11 +411,14 @@ export async function openNormativeTurn(
       methodologySnapshot.sha256,
       JSON.stringify(snapshot.manifest),
       JSON.stringify([]),
+      ...(clientIdentityEnabled() ? [JSON.stringify(input.runtime.client_identity ?? null)] : []),
     ]
   );
 
   const row = inserted.rows[0] || await readTurn(cycleId);
   if (!row) throw new Error("TURN_CREATE_FAILED");
+  assertClientIdentityMatch(row.client_identity, input.runtime.client_identity);
+  if (row.platform !== input.runtime.platform || row.reasoning_mode !== input.runtime.reasoning_mode || row.output_format_version !== input.runtime.output_format_version) throw new Error("TURN_RUNTIME_MISMATCH");
   if (row.actor !== actor) throw new Error("TURN_ACTOR_MISMATCH");
   if (row.status !== "OPEN") throw new Error("TURN_ALREADY_CLOSED");
 
@@ -439,8 +450,8 @@ export async function openNormativeTurn(
     },
     verifier: {
       protocol: "NORM-CHECK",
-      protocol_version: "v0.5.0",
-      verifier_version: "norm-check/0.5.0",
+      protocol_version: input.runtime.client_identity ? "v0.6.0" : "v0.5.0",
+      verifier_version: input.runtime.client_identity ? "norm-check/0.6.0" : "norm-check/0.5.0",
     },
   };
 }
@@ -454,6 +465,7 @@ export async function applyNormativePrinciple(
     anchor?: string | null;
     reason_code?: string | null;
   },
+  clientIdentity: McpClientIdentity | null = null,
 ) {
   if (!validActor(actor)) throw new Error("TURN_ACTOR_INVALID");
   if (!input || typeof input.turn_token !== "string" || input.turn_token.length < 16) {
@@ -478,6 +490,7 @@ export async function applyNormativePrinciple(
   if (!tokenResult.ok) throw tokenFailure("TURN_TOKEN_" + tokenResult.error.toUpperCase());
 
   const token = tokenResult.payload;
+  assertClientIdentityMatch(token.client_identity, clientIdentity);
   const gen = await obtenerGeneracionRevocacion(actor);
   const tokenScopes = typeof token.scope === "string" ? token.scope.split(/\s+/).filter(Boolean) : [];
   if (
@@ -493,9 +506,9 @@ export async function applyNormativePrinciple(
     typeof token.turn_si_git_commit_sha !== "string" ||
     typeof token.turn_si_sha256 !== "string" ||
     typeof token.turn_manifest_sha256 !== "string" ||
-    token.turn_platform !== REQUIRED_PLATFORM ||
+    !isNormativeRuntimeContext({platform: token.turn_platform, reasoning_mode: token.turn_reasoning_mode, output_format_version: token.turn_output_format_version, client_identity: token.client_identity}) ||
     typeof token.turn_reasoning_mode !== "string" ||
-    token.turn_output_format_version !== REQUIRED_OUTPUT_FORMAT_VERSION
+    (token.turn_output_format_version !== REQUIRED_OUTPUT_FORMAT_VERSION && token.turn_output_format_version !== BOUND_OUTPUT_FORMAT_VERSION)
   ) throw new Error("TURN_TOKEN_CLAIMS_INVALID");
 
   const db = getDb();
@@ -503,13 +516,14 @@ export async function applyNormativePrinciple(
   try {
     await client.query("BEGIN");
     const result = await client.query<TurnRow>(
-      "SELECT cycle_id, conversation_id, turn_number, actor, platform, reasoning_mode, output_format_version, current_attempt, status, nonce, " +
+      "SELECT cycle_id, conversation_id, turn_number, actor, platform" + identityProjection() + ", reasoning_mode, output_format_version, current_attempt, status, nonce, " +
         "si_version, si_git_commit_sha, si_git_blob_sha, si_sha256, manifest_sha256, methodology_version, methodology_git_commit_sha, methodology_git_blob_sha, methodology_sha256, manifest, application_index, application_vector, opened_at, closed_at, verified_attempt " +
         "FROM normative_turns WHERE cycle_id = $1 FOR UPDATE",
       [token.turn_cycle_id],
     );
     const turn = result.rows[0];
     if (!turn) throw new Error("TURN_NOT_FOUND");
+    assertClientIdentityMatch(turn.client_identity, token.client_identity);
     if (turn.actor !== actor) throw new Error("TURN_ACTOR_MISMATCH");
     if (turn.status !== "OPEN") throw new Error("TURN_NOT_OPEN");
     if (token.turn_attempt !== turn.current_attempt || token.turn_nonce !== turn.nonce || token.turn_si_sha256 !== turn.si_sha256 || token.turn_manifest_sha256 !== turn.manifest_sha256 || token.turn_si_git_commit_sha !== turn.si_git_commit_sha) {
@@ -570,6 +584,7 @@ export async function assertNormativeTurnOpen(
   if (!tokenResult.ok) throw tokenFailure("TURN_TOKEN_" + tokenResult.error.toUpperCase());
 
   const token = tokenResult.payload;
+  assertClientIdentityMatch(token.client_identity, runtime.client_identity);
   const tokenScopes = token.scope.split(/\s+/).filter(Boolean);
   if (
     token.token_kind !== TURN_TOKEN_KIND ||
@@ -583,8 +598,8 @@ export async function assertNormativeTurnOpen(
     !Number.isSafeInteger(token.turn_attempt) ||
     typeof token.turn_si_sha256 !== "string" ||
     typeof token.turn_manifest_sha256 !== "string" ||
-    token.turn_platform !== REQUIRED_PLATFORM ||
-    token.turn_output_format_version !== REQUIRED_OUTPUT_FORMAT_VERSION ||
+    !isNormativeRuntimeContext({platform: token.turn_platform, reasoning_mode: token.turn_reasoning_mode, output_format_version: token.turn_output_format_version, client_identity: token.client_identity}) ||
+    (token.turn_output_format_version !== REQUIRED_OUTPUT_FORMAT_VERSION && token.turn_output_format_version !== BOUND_OUTPUT_FORMAT_VERSION) ||
     token.turn_platform !== runtime.platform ||
     token.turn_reasoning_mode !== runtime.reasoning_mode ||
     token.turn_output_format_version !== runtime.output_format_version
@@ -595,8 +610,10 @@ export async function assertNormativeTurnOpen(
 
   const turn = await readTurn(token.turn_cycle_id);
   if (!turn) throw new Error("TURN_NOT_FOUND");
+  assertClientIdentityMatch(turn.client_identity, token.client_identity);
   if (turn.actor !== actor) throw new Error("TURN_ACTOR_MISMATCH");
   if (turn.status !== "OPEN") throw new Error("TURN_NOT_OPEN");
+  if (turn.platform !== runtime.platform || turn.reasoning_mode !== runtime.reasoning_mode || turn.output_format_version !== runtime.output_format_version) throw new Error("TURN_RUNTIME_PERSISTENCE_MISMATCH");
   if (
     token.turn_nonce !== turn.nonce ||
     token.turn_attempt !== turn.current_attempt ||
@@ -610,7 +627,8 @@ export async function assertNormativeTurnOpen(
 
 export async function verifyNormativeTurn(
   actor: string,
-  input: { turn_token: string; receipt: NormativeReceipt }
+  input: { turn_token: string; receipt: NormativeReceipt },
+  clientIdentity: McpClientIdentity | null = null,
 ) {
   if (!validActor(actor)) throw new Error("TURN_ACTOR_INVALID");
   if (!input || typeof input.turn_token !== "string" || input.turn_token.length < 16) {
@@ -625,6 +643,7 @@ export async function verifyNormativeTurn(
   if (!tokenResult.ok) throw tokenFailure("TURN_TOKEN_" + tokenResult.error.toUpperCase());
 
   const token = tokenResult.payload;
+  assertClientIdentityMatch(token.client_identity, clientIdentity);
   const tokenScopes = token.scope.split(/\s+/).filter(Boolean);
   if (
     token.token_kind !== TURN_TOKEN_KIND ||
@@ -638,9 +657,9 @@ export async function verifyNormativeTurn(
     !Number.isSafeInteger(token.turn_attempt) ||
     typeof token.turn_si_sha256 !== "string" ||
     typeof token.turn_manifest_sha256 !== "string" ||
-    token.turn_platform !== REQUIRED_PLATFORM ||
+    !isNormativeRuntimeContext({platform: token.turn_platform, reasoning_mode: token.turn_reasoning_mode, output_format_version: token.turn_output_format_version, client_identity: token.client_identity}) ||
     typeof token.turn_reasoning_mode !== "string" ||
-    token.turn_output_format_version !== REQUIRED_OUTPUT_FORMAT_VERSION
+    (token.turn_output_format_version !== REQUIRED_OUTPUT_FORMAT_VERSION && token.turn_output_format_version !== BOUND_OUTPUT_FORMAT_VERSION)
   ) {
     throw new Error("TURN_TOKEN_CLAIMS_INVALID");
   }
@@ -650,6 +669,7 @@ export async function verifyNormativeTurn(
 
   const turn = await readTurn(token.turn_cycle_id);
   if (!turn) throw new Error("TURN_NOT_FOUND");
+  assertClientIdentityMatch(turn.client_identity, token.client_identity);
   if (turn.actor !== actor) throw new Error("TURN_ACTOR_MISMATCH");
 
   if (turn.status === "CLOSED") {
@@ -668,6 +688,7 @@ export async function verifyNormativeTurn(
   }
 
   const receipt = input.receipt;
+  assertClientIdentityMatch(receipt?.runtime?.client_identity, token.client_identity);
   if (!receipt || typeof receipt !== "object" || !receipt.cycle || !receipt.si || !receipt.methodology || !receipt.runtime) {
     throw new Error("TURN_RECEIPT_SCHEMA_INVALID");
   }
@@ -699,13 +720,15 @@ export async function verifyNormativeTurn(
     await client.query("BEGIN");
 
     const locked = await client.query<TurnRow>(
-      "SELECT cycle_id, conversation_id, turn_number, actor, platform, reasoning_mode, output_format_version, current_attempt, status, nonce, " +
+      "SELECT cycle_id, conversation_id, turn_number, actor, platform" + identityProjection() + ", reasoning_mode, output_format_version, current_attempt, status, nonce, " +
         "si_version, si_git_commit_sha, si_git_blob_sha, si_sha256, manifest_sha256, methodology_version, methodology_git_commit_sha, methodology_git_blob_sha, methodology_sha256, manifest, application_index, application_vector, opened_at, closed_at, verified_attempt " +
         "FROM normative_turns WHERE cycle_id = $1 FOR UPDATE",
       [turn.cycle_id]
     );
     const current = locked.rows[0];
     if (!current) throw new Error("TURN_NOT_FOUND");
+    assertClientIdentityMatch(current.client_identity, clientIdentity);
+    if (current.actor !== actor || current.nonce !== token.turn_nonce || current.platform !== token.turn_platform || current.reasoning_mode !== token.turn_reasoning_mode || current.output_format_version !== token.turn_output_format_version) throw new Error("TURN_RUNTIME_PERSISTENCE_MISMATCH");
     if (current.status === "CLOSED") throw new Error("TURN_ALREADY_CLOSED");
     if (current.current_attempt !== receipt.cycle.attempt) throw new Error("TURN_ATTEMPT_CHANGED");
     if (current.application_index !== current.manifest.length || current.application_vector.length !== current.manifest.length) {
@@ -754,7 +777,7 @@ export async function verifyNormativeTurn(
         result.application_log_sha256,
         JSON.stringify(result.reasons),
         JSON.stringify(receipt),
-        "norm-check/0.5.0",
+        receipt.runtime.client_identity ? "norm-check/0.6.0" : "norm-check/0.5.0",
         receipt.si.git_commit_sha,
       ]
     );
@@ -793,7 +816,7 @@ export async function verifyNormativeTurn(
         order_verified: result.order_verified,
         application_log_sha256: result.application_log_sha256,
         si_git_commit_sha: receipt.si.git_commit_sha,
-        verifier_version: "norm-check/0.5.0",
+        verifier_version: receipt.runtime.client_identity ? "norm-check/0.6.0" : "norm-check/0.5.0",
         recorded_at: insert.rows[0].created_at,
         receipt_id: insert.rows[0].id,
       }),

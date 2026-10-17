@@ -1,6 +1,7 @@
 // @l0 L0-002 §4 · @req MCP-OAUTH-01/REQ-5
 import { auth } from "@/auth";
 import { getMcpConfig, validateCimdClient, validateDynamicClient } from "@/lib/server/mcp-config";
+import { configuredClientIdentity } from "@/lib/server/mcp-client-identity";
 import { crearCodigoAutorizacion } from "@/lib/server/oauth";
 import { redirect } from "next/navigation";
 
@@ -185,6 +186,7 @@ export default async function AuthorizePage(props: {
   // 7. Si el usuario ya presionó "Autorizar"
   if (approved === "true") {
     const code = await crearCodigoAutorizacion({
+      clientIdentity: configuredClientIdentity(client_id),
       codeChallenge: code_challenge,
       redirectUri: redirect_uri,
       resource: resource || config.canonicalUrl,

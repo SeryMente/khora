@@ -1,5 +1,6 @@
 import { toolKhoraListarAudios, toolKhoraLeerAudio } from "@/lib/server/mcp-audios";
 import { registrarEventoServicio } from "@/lib/server/service-observability";
+import { readClientIdentity, BOUND_OUTPUT_FORMAT_VERSION, type McpClientIdentity } from "@/lib/server/mcp-client-identity";
 import { randomUUID } from "node:crypto";
 import { diagnosticFailure, diagnose } from "@/lib/server/mcp-diagnostics";
 import { installMcpDiagnostics, withHttpDiagnostics } from "@/lib/server/mcp-diagnostic-boundary";
@@ -25,9 +26,9 @@ import {
 import { toolKhoraUiReview } from "@/lib/server/mcp-ui-review";
 import { toolKhoraEstadoVivo, toolKhoraEventosRecientes, toolKhoraObservacionInstantanea, toolKhoraEventosDesde } from "@/lib/server/mcp-observability";
 import { assertNormativeTurnOpen, openNormativeTurn, applyNormativePrinciple, verifyNormativeTurn, releaseNormativeTurn } from "@/lib/server/mcp-normative";
-import { authenticateManualMcpToken, MANUAL_MCP_TOKEN_PREFIX } from "@/lib/server/mcp-manual-token";
+import { authenticateManualMcpToken, isManualMcpToken } from "@/lib/server/mcp-manual-token";
 import { getCurrentSiSnapshot, getCurrentMethodologySnapshot, getCurrentVerifierInfo } from "@/lib/server/norm-check";
-import { assertNormativeRuntimeContext, REASONING_MODES, REQUIRED_OUTPUT_FORMAT_VERSION, REQUIRED_PLATFORM, type ReasoningMode } from "@/lib/server/normative-runtime";
+import { runtimeForClientIdentity, assertNormativeRuntimeContext, REASONING_MODES, REQUIRED_OUTPUT_FORMAT_VERSION, REQUIRED_PLATFORM, type ReasoningMode } from "@/lib/server/normative-runtime";
 
 export const runtime = "nodejs";
 
@@ -68,7 +69,7 @@ const NORM_TURN_TOKEN = z.string().min(16).describe(
 const NORM_THINKING_MODE = z.enum(REASONING_MODES).describe(
   "Modo de razonamiento observado para el turno. Usa THINKING cuando la plataforma lo exponga; usa UNKNOWN/UNAVAILABLE cuando no exista una señal operativa. Es metadato, no bloquea la salida."
 );
-const NORM_OUTPUT_FORMAT_VERSION = z.literal(REQUIRED_OUTPUT_FORMAT_VERSION);
+const NORM_OUTPUT_FORMAT_VERSION = z.enum([REQUIRED_OUTPUT_FORMAT_VERSION, BOUND_OUTPUT_FORMAT_VERSION]);
 
 function withNormTurn<T extends z.ZodRawShape>(fields: T): T & { _norm_turn_token: typeof NORM_TURN_TOKEN; _thinking_mode: typeof NORM_THINKING_MODE; _output_format_version: typeof NORM_OUTPUT_FORMAT_VERSION } {
   return {
@@ -91,6 +92,7 @@ function withoutNormTurn(args: Record<string, unknown>) {
 
 async function requireNormativeTurn(
   actor: string,
+  clientIdentity: McpClientIdentity | null,
   turnToken: unknown,
   thinkingMode: unknown,
   outputFormatVersion: unknown,
@@ -98,16 +100,8 @@ async function requireNormativeTurn(
 ) {
   if (typeof turnToken !== "string") return diagnosticFailure("TURN_TOKEN_INVALID", context);
   try {
-    assertNormativeRuntimeContext({
-      platform: REQUIRED_PLATFORM,
-      reasoning_mode: thinkingMode,
-      output_format_version: outputFormatVersion,
-    });
-    await assertNormativeTurnOpen(actor, turnToken, {
-      platform: REQUIRED_PLATFORM,
-      reasoning_mode: thinkingMode as ReasoningMode,
-      output_format_version: REQUIRED_OUTPUT_FORMAT_VERSION,
-    });
+    const runtime = runtimeForClientIdentity(clientIdentity, thinkingMode, outputFormatVersion);
+    await assertNormativeTurnOpen(actor, turnToken, runtime);
     return null;
   } catch (error) {
     const result = diagnosticFailure(error, context);
@@ -143,7 +137,8 @@ async function handleMcpRequest(req: NextRequest) {
   let actor: string;
   let scopes: string[];
   let tokenGeneration: number;
-  const manualToken = token.startsWith(MANUAL_MCP_TOKEN_PREFIX)
+  let clientIdentity: McpClientIdentity | null = null;
+  const manualToken = isManualMcpToken(token)
     ? await authenticateManualMcpToken(token)
     : null;
 
@@ -151,14 +146,16 @@ async function handleMcpRequest(req: NextRequest) {
     if (manualToken.resource !== config.canonicalUrl) {
       return makeUnauthorizedResponse(config, "MCP_AUTH_RESOURCE_MISMATCH");
     }
+    try { clientIdentity = readClientIdentity(manualToken.client_identity); } catch { return makeUnauthorizedResponse(config,"MCP_CLIENT_IDENTITY_INVALID"); }
     actor = manualToken.usuario;
     scopes = manualToken.scope.split(/\s+/).filter(Boolean);
     tokenGeneration = manualToken.generacion;
   } else {
-    if (token.startsWith(MANUAL_MCP_TOKEN_PREFIX)) return makeUnauthorizedResponse(config, "MCP_MANUAL_TOKEN_INACTIVE");
+    if (isManualMcpToken(token)) return makeUnauthorizedResponse(config, "MCP_MANUAL_TOKEN_INACTIVE");
     const verified = verifyJwtDetailed(token, config.jwtSecret);
     if (!verified.ok) return makeUnauthorizedResponse(config, "MCP_AUTH_" + verified.error.toUpperCase());
     const payload = verified.payload;
+    if (payload.token_kind !== undefined && payload.token_kind !== "mcp-access") return makeUnauthorizedResponse(config,"MCP_AUTH_TOKEN_KIND_INVALID");
 
     // Verificar issuer (iss)
     if (payload.iss !== config.issuer) {
@@ -170,6 +167,8 @@ async function handleMcpRequest(req: NextRequest) {
       return makeUnauthorizedResponse(config, "MCP_AUTH_RESOURCE_MISMATCH");
     }
 
+    try { clientIdentity = readClientIdentity(payload.client_identity); } catch { return makeUnauthorizedResponse(config,"MCP_CLIENT_IDENTITY_INVALID"); }
+    if (clientIdentity && payload.token_kind !== "mcp-access") return makeUnauthorizedResponse(config,"MCP_AUTH_TOKEN_KIND_INVALID");
     scopes = (payload.scope || "").split(/\s+/).filter(Boolean);
     actor = payload.sub;
     tokenGeneration = payload.gen;
@@ -204,7 +203,7 @@ async function handleMcpRequest(req: NextRequest) {
     {
       instructions:
         "ADAPTIVE NORMATIVE GATE: cuando KHORA esta disponible, ejecuta HEALTH MCP -> OPEN TURN -> aplica cada principio mediante khora_norm_apply_principle en el orden devuelto -> VERIFY -> RELEASE antes de emitir la salida. " +
-        `La salida visible de cada turno debe cumplir el contrato ${REQUIRED_OUTPUT_FORMAT_VERSION} cualquiera que sea el escenario. ` +
+        `La salida visible del ciclo debe cumplir ${clientIdentity ? BOUND_OUTPUT_FORMAT_VERSION : REQUIRED_OUTPUT_FORMAT_VERSION}; plataforma declarada: ${clientIdentity?.platform ?? "LEGACY_UNBOUND (sin identidad de cliente verificada)"}. ` +
         "Si KHORA no esta disponible o no puede verificarse, continua la respuesta sin inventar verificacion y declara K: OFF. " +
         "Si KHORA devuelve VERIFIED_RELEASE, declara K: ✓. Si devuelve un fallo normativo, declara K: ! o K: ? segun corresponda. " +
         "El modo de razonamiento es metadato operativo y no debe presentarse como prueba del pensamiento interno.",
@@ -224,7 +223,7 @@ async function handleMcpRequest(req: NextRequest) {
       const context = { operation: name, correlation_id };
       try {
         if (requireTurn) {
-          const denied = await requireNormativeTurn(actor, args._norm_turn_token, args._thinking_mode, args._output_format_version, context);
+          const denied = await requireNormativeTurn(actor, clientIdentity, args._norm_turn_token, args._thinking_mode, args._output_format_version, context);
           if (denied) return denied;
         }
         return await handler(requireTurn ? withoutNormTurn(args) : args);
@@ -439,11 +438,7 @@ async function handleMcpRequest(req: NextRequest) {
       output_format_version: NORM_OUTPUT_FORMAT_VERSION,
     },
     async (args: any) => {
-      assertNormativeRuntimeContext({
-        platform: REQUIRED_PLATFORM,
-        reasoning_mode: args.thinking_mode,
-        output_format_version: args.output_format_version,
-      });
+      runtimeForClientIdentity(clientIdentity, args.thinking_mode, args.output_format_version);
       const requiredScopes = ["volcados:read", "runtime:read", "norm:turn"];
       const missingScopes = requiredScopes.filter((scope) => !scopes.includes(scope));
       try {
@@ -460,8 +455,9 @@ async function handleMcpRequest(req: NextRequest) {
               full_access: fullAccess,
               missing_scopes: missingScopes,
               protocol: verifier.protocol,
-              protocol_version: verifier.protocol_version,
-              verifier_version: verifier.verifier_version,
+              protocol_version: clientIdentity ? "v0.6.0" : verifier.protocol_version,
+              output_format_version: clientIdentity ? BOUND_OUTPUT_FORMAT_VERSION : REQUIRED_OUTPUT_FORMAT_VERSION,
+              verifier_version: clientIdentity ? "norm-check/0.6.0" : verifier.verifier_version,
               si_version: snapshot.version,
               si_version_name: snapshot.versionName,
               si_last_updated_at: snapshot.canonicalUpdatedAt,
@@ -470,6 +466,8 @@ async function handleMcpRequest(req: NextRequest) {
               methodology_version: methodologySnapshot.version,
               methodology_version_name: methodologySnapshot.versionName,
               methodology_last_updated_at: methodologySnapshot.canonicalUpdatedAt,
+              client_identity_status: clientIdentity ? "OWNER_CONFIGURED" : "LEGACY_UNBOUND",
+              declared_platform: clientIdentity?.platform ?? null,
               tools_contract: "SINGLE_MCP"
             })
           }]
@@ -511,11 +509,7 @@ async function handleMcpRequest(req: NextRequest) {
         const res = await openNormativeTurn(actor, {
           conversation_id: args.conversation_id,
           turn_number: args.turn_number,
-          runtime: {
-            platform: REQUIRED_PLATFORM,
-            reasoning_mode: args.thinking_mode,
-            output_format_version: args.output_format_version,
-          },
+          runtime: runtimeForClientIdentity(clientIdentity, args.thinking_mode, args.output_format_version),
         });
         return { content: [{ type: "text", text: JSON.stringify(res) }] };
       } catch (error) {
@@ -544,7 +538,7 @@ async function handleMcpRequest(req: NextRequest) {
           status: args.status,
           anchor: args.anchor,
           reason_code: args.reason_code,
-        });
+        }, clientIdentity);
         return { content: [{ type: "text", text: JSON.stringify(res) }] };
       } catch (error) {
         return diagnosticFailure(error, { operation: "khora_norm_apply_principle", correlation_id });
@@ -566,7 +560,7 @@ async function handleMcpRequest(req: NextRequest) {
         const res = await verifyNormativeTurn(actor, {
           turn_token: args.turn_token,
           receipt: args.receipt,
-        });
+        }, clientIdentity);
         return { content: [{ type: "text", text: JSON.stringify(res) }] };
       } catch (error) {
         return diagnosticFailure(error, { operation: "khora_norm_verify_turn", correlation_id });
@@ -584,7 +578,7 @@ async function handleMcpRequest(req: NextRequest) {
       const denied = requireScope("norm:turn");
       if (denied) return denied;
       try {
-        const res = await releaseNormativeTurn(actor, { turn_token: args.turn_token });
+        const res = await releaseNormativeTurn(actor, { turn_token: args.turn_token }, clientIdentity);
         return { content: [{ type: "text", text: JSON.stringify(res) }] };
       } catch (error) {
         return diagnosticFailure(error, { operation: "khora_norm_release_turn", correlation_id });

@@ -1037,3 +1037,33 @@ El proyecto Vercel usa un Build Command propio que no invoca npm prebuild. Para 
 
 ### Controles externos no ejecutados
 GitHub Actions, ejecución 38967613218, no inició trabajos: `The job was not started because recent account payments have failed or your spending limit needs to be increased.` Los estados Vercel de integración GitHub también señalan restricción de repositorio privado de organización en plan Hobby. No se modifican facturación, plan, visibilidad, permisos ni protecciones. Las comprobaciones ejecutadas directamente y el build Vercel son evidencia independiente, no equivalencia a Actions verde. La integración solo puede usar merge normal, sin anulación administrativa de controles.
+
+### C007.6 · Candidata local de historial y propuesta de identidad · 2026-10-17
+
+Alcance autorizado: corregir/probar versiones en aislamiento y preparar identidad legítima para revisión; sin migraciones productivas, fusión, despliegue ni cambios de seguridad. Base main 2af9c102dc9937b720b4d78c3e9d367c20001568, blobs fijados en el documento técnico.
+
+Ambas consultas históricas de volcado_version dejan de exigir usuario y conservan salida usuario:null, sin inferir autor desde auditoría. Prueba unitaria nueva: 19/19 aprobadas (antes 11/19; ocho fallos esperados). PostgreSQL 17.5 embebido/PGlite con migración 006 y datos sintéticos: ocho comprobaciones aprobadas, reproduciendo antes 42703 y validando después historial, lectura descifrada/huella, vacío real y preservación de datos. No acredita esquema real, autorización, observación, suite integral ni producción.
+
+El contrato y el diseño pendiente están en el mismo [documento técnico](../../../khora-web/docs/normative-check.md), no en otro manual. Diseño NO implementado: derivar un perfil legítimo del vínculo autenticado de emisión, propagarlo por renovación/ciclo/recibo y versionar sin falsear recibos históricos. No cambiar una constante para suplantar ChatGPT desde Notion.
+
+Entrega: parche y evidencia locales en rama de fixture parcial fix/mcp-version-history-schema-20261017; no publicados en GitHub, fusionados ni desplegados. Publicación pendiente de asegurar que no dispare despliegues no autorizados. Siguiente decisión: revisar diseño de identidad y transición; después autorizar su implementación y validación integral. Audio original, historial productivo, texto y observación reales quedan pendientes de identidad legítima y descubrimiento actualizado. Este addendum no cierra el frente ni modifica el estado de otros trabajos.
+
+
+### C007.7 — Candidata aislada de identidad vinculada · 2026-10-17
+
+Autorización expresa del operador: implementar el diseño de identidad en candidata aislada, sin revocaciones existentes, migraciones productivas, fusión ni despliegue. Base fijada d6ad0944e0d617a7bee253c6c7cb3e24b96f766f; fixture parcial verificado por blobs, no checkout integral ni commit upstream. Se conserva el trabajo de historial de la candidata C007.6 entregada previamente y todavía no publicada; esta ampliación no lo sustituye ni lo integra por inferencia.
+
+Identidad configurada por el propietario y vinculada a la emisión, no atestación de proveedor: código/acceso/renovación/manual → ciclo/ledger → comprobante/hash/salida/liberación. Perfil no adivinable mediante argumento libre. Contratos históricos conservados; variante vinculada v0.6.0/formato v1.8.0, función desactivada por defecto. SQL aditivo separado, sin ejecución automática ni backfill. Fuente de contrato y límites: misma guía `khora-web/docs/normative-check.md`, sección Candidata aislada de identidad; no nuevo manual.
+
+Treinta pruebas locales aprobadas con PostgreSQL embebido y SDK HTTP reales; fuentes normativas/encabezados/configuración/Next/negocio sustituidos explícitamente. Verificador y criptografía reales con datos sintéticos. Diez módulos de tipos dirigidos, no suite/build/tipos integrales ni concurrencia multi-conexión. Incluye cruce de cliente/propietario/autorización, renovación/repetición, permisos, doce guardas sustantivas, recibos, salida histórica por bytes, esquema histórico sin columnas nuevas y publicación del esquema compartido. Nunca presentar estos fixtures como cumplimiento del corpus real.
+
+Revisión final de main en este ciclo: dd5c60fc322ec47c66084c81f63359eb158f6344 (#310, lector Neo4j y su prueba). La candidata permanece fijada en d6ad0944e0d617a7bee253c6c7cb3e24b96f766f: no se afirma rebase ni ejecución integral sobre main posterior. El endpoint productivo /api/version declaró d6ad0944e0d617a7bee253c6c7cb3e24b96f766f a las 2026-10-17T20:30:27.481862Z; declaración pública, no certificación de aceptación. Ninguno contiene los cambios locales de identidad por esta conversación.
+
+Checkpoint: revisar seguridad, metodología e integración completa y reconciliar base vigente; luego aprobar separadamente esquema/configuración/transición/publicación sin efectos no autorizados y despliegue. No invocar contenido real con identidad ChatGPT falsa. Tras activación autorizada: descubrimiento actualizado, historial real y recuperación de todas las partes con integridad/decodificación; preservar texto y observación y medir Notion/otro cliente. Audio no recuperado ni escuchado; objetivo funcional abierto.
+
+
+### C007.8 · Preparación de publicación autorizada · 2026-10-17
+
+El operador autorizó publicar en Vercel. Esta rama integra las candidatas separadas de historial e identidad sobre main aa6f3a548c032f2ac30de32c275be17a0bd8370a; los apartados C007.6 y C007.7 conservan antecedentes, no estados actuales. La identidad sigue desactivada por defecto. No ejecutar SQL candidato, cambiar el registro privado ni activar la variante normativa sin completar revisión y autorización específicas. Publicar código no acredita activación ni recuperación funcional de audio.
+
+El workflow de main ejecuta migraciones 023–029 antes de desplegar; no se activa por esta preparación. Se mantiene la solicitud en borrador para impedir auto-merge. Pendientes: compilación/tipos y pruebas del checkout completo, revisión metodológica/seguridad, despliegue exacto y aceptación real. Ninguna prueba aislada se presenta como integración continua o prueba productiva.

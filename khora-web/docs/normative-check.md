@@ -223,3 +223,61 @@ La misma sección permite introducir credenciales por uso, sin crear un gestor p
 ## Custodia de audio
 
 Contrato y mantenimiento: [Custodia continua de dictados](./CUSTODIA-DICTADOS.md). Las dos herramientas de audio usan la conexión autenticada existente y `volcados:read`; no publican direcciones Blob, no incluyen credenciales y no omiten el ciclo normativo. No conceder automáticamente permisos nuevos. El contenido Base64 es privado: consumirlo como archivo, nunca copiarlo al registro de eventos. Un MP3 pendiente o fallido no es un audio disponible. Las capturas históricas sin propietario comprobable no se adjudican por inferencia.
+
+## Candidata local de historial · 2026-10-17
+
+Corrección autorizada en aislamiento: las dos proyecciones de `volcado_version` en `mcp-tools.ts` usan `NULL::text AS usuario` en vez de exigir una columna que la migración 006 no define. Se conserva el campo nullable del contrato, no se inventa autor ni se toma de la auditoría. El usuario de auditoría y del texto principal permanece sin cambios. No se añade migración ni escritura de datos.
+
+Pruebas dirigidas nuevas: `tests/unit/mcp_versions_schema.test.ts`, ejecutadas con Node 24, tsx 4.19.2 y TypeScript 5.9.3, fixture parcial. Antes: 11 aprobadas y 8 fallidas de 19; después: 19 aprobadas, cero fallidas. Cubren historial con datos/vacío real, folio e identificador, aprobaciones y auditoría, lectura histórica y texto actual, descifrado, fallos de esquema/permisos/conexión, saneamiento de errores y consultas sin escritura. La frontera de base está simulada contra las columnas de la migración real; no es prueba de autorización ni base productiva.
+
+Comprobación adicional: ocho aserciones aprobadas con PGlite 0.3.14 / PostgreSQL 17.5 embebido. La migración 006 exacta se aplicó SOLO en memoria con tablas auxiliares/datos sintéticos. El código anterior reprodujo diagnóstico MCP_DATABASE_SCHEMA y error PostgreSQL 42703 en lectura histórica. La candidata recuperó dos versiones y texto descifrado exacto/huella, mantuvo aprobación/autor de auditoría/texto actual, confirmó vacío real y dejó las versiones intactas. No se ejecutó migración productiva. El arnés y recibo se conservan en el paquete de evidencia, no son dependencias nuevas de la aplicación.
+
+Reproducir la prueba unitaria desde khora-web, con las dependencias existentes instaladas: `node --import tsx --test --test-reporter=tap tests/unit/mcp_versions_schema.test.ts`. El descubridor existente run_unit_tests.mjs incluye archivos .test.ts; la suite integral, tipos, build, observación, rutas/autorización y producción NO se ejecutaron en este fixture. `git diff --check` aprobado para la candidata; no equivale a integración continua.
+
+Base de blobs: main `2af9c102dc9937b720b4d78c3e9d367c20001568`; mcp-tools original `b6b0d4c8e740d661b73406786b503eec25994d9f`, migración `ef67587e0295bd25af4128471c81918c67701211`. Se prepara un parche aplicable a esos archivos, no un checkout integral ni historia Git de upstream. Rama local de fixture `fix/mcp-version-history-schema-20261017`; no publicada, fusionada ni desplegada. Publicar una rama podría activar automatismos externos todavía no verificados; no se autoriza un despliegue por esa vía. La revisión productiva declarada anteriormente fue `362f8ff51a518506927e486b9d61feee4f6313da`; no se declara desplegada esta corrección.
+
+Audio: sigue pendiente recuperar partes autorizadas, verificar integridad/decodificación y conciliar descubrimiento de herramientas. El defecto de identidad se conserva sin implementar y bloquea las pruebas sustantivas legítimas desde Notion. No se atribuye un 403 a cifrado o almacenamiento privado sin comprobarlo.
+
+
+
+## Candidata aislada de identidad de cliente · 2026-10-17 · NO desplegada
+
+**Alcance autorizado:** implementar y probar el vínculo de identidad en una candidata local, sin revocar accesos existentes, migrar producción, fusionar ni desplegar. Base de código verificada: `d6ad0944e0d617a7bee253c6c7cb3e24b96f766f`. Las declaraciones anteriores de identidad exclusiva ChatGPT describen el recorrido heredado; no acreditan que Notion sea ChatGPT ni que esta candidata esté activa.
+
+### Emisión y procedencia
+
+- Activación explícita `KHORA_MCP_CLIENT_IDENTITY_V2=1`; desactivada por defecto. `KHORA_MCP_CLIENT_PROFILES_JSON` relaciona identificadores de cliente exactos ya admitidos con `Notion` o `ChatGPT`. No inferir perfil por nombre, User-Agent, argumento de herramienta o proveedor del modelo.
+- El registro lo configura el propietario; **no atestigua fabricante, aplicación efectiva, modelo ni razonamiento**. Una credencial Bearer es transferible: compartirla no convierte al receptor en el cliente declarado. Cada emisión crea un `grant_id` aleatorio distinto; renovar conserva el mismo vínculo.
+- El código de autorización incorpora el vínculo solo después de las validaciones y consentimiento existentes. Intercambio coteja cliente, redirección, recurso y PKCE antes de consumir. La renovación comprueba cliente/recurso bajo bloqueo antes de rotar, propaga identidad y rechaza repetición. No se amplían redirecciones, scopes ni admisión.
+- El endpoint autenticado existente de tokens manuales acepta `client_id` opcional y lo resuelve únicamente en ese registro. No cambia la interfaz ni añade un requisito PIN que esa ruta no tenía. Una etiqueta libre nunca determina la plataforma. Emisión sin `client_id` conserva recorrido heredado; no implica identidad conocida.
+- Credenciales vinculadas usan prefijos diferenciados para código, renovación y manual; el acceso firmado incorpora `token_kind=mcp-access`. Tokens de turno/liberación no sirven como Bearer de conexión. Vinculados con función desactivada o vínculo ausente/malformado fallan cerrados, sin reinterpretarse como históricos.
+
+### Ciclo, evidencia y versiones
+
+El servidor deriva runtime de la credencial: actor, cliente, autorización concreta, turno, nonce, intento, snapshot, ledger, comprobante y salida deben ser coherentes. Las doce herramientas sustantivas comprueban la misma vinculación antes del servicio; las cuatro operaciones normativas la conservan y cotejan. La comprobación estructural no acredita comprensión ni cumplimiento del corpus real.
+
+| Recorrido | Protocolo / formato / verificador | Transición |
+|---|---|---|
+| Histórico sin vínculo | v0.5.0 / v1.7.7 / norm-check/0.5.0 | Salud declara `LEGACY_UNBOUND`, plataforma declarada null; salida histórica no se reetiqueta |
+| Vinculado explícito | v0.6.0 / v1.8.0 / norm-check/0.6.0 | Identidad persistida, firmada y cubierta por hash; salida usa su perfil autorizado |
+
+Los esquemas publicables se generan desde las formas Zod reales y mantienen variantes separadas. El helper runtime valida la versión correspondiente al vínculo; no basta escoger otra versión en los argumentos. Salud e instrucciones anuncian el contrato efectivo. No se modificó `SeryMente/metodologia`, el metaprompt ni el contrato histórico. La conformidad del contrato nuevo con la metodología externa vigente requiere revisión independiente antes de habilitarlo; las pruebas usan fuentes/encabezados sintéticos explícitos, no comprobantes del corpus real.
+
+### Esquema candidato y transición pendiente
+
+`db/candidates/mcp-client-identity-v2.sql` añade cuatro columnas JSONB nullable en códigos, renovaciones, tokens manuales y turnos. No está en el ejecutor automático de migraciones y no añade DDL de identidad al bootstrap. Se ejecutó exclusivamente sobre PostgreSQL embebido sintético. No contiene backfill, reetiquetado ni revocación. El archivo es propuesta para aprobación separada; **no ejecutarlo en producción por recibir este parche**.
+
+Primero revisar la integración completa y las reglas de la metodología; después aprobar por separado esquema, configuración privada, transición y despliegue. Mantener la función desactivada hasta completar esas compuertas. Desactivarla hace rechazar las nuevas credenciales vinculadas sin convertirlas en legacy; las históricas siguen su contrato anterior. No borrar columnas ni revocar credenciales como rollback automático. No usar un acceso heredado desde Notion para fabricar una liberación ChatGPT.
+
+### Evidencia local y límites
+
+Batería reproducible: `tests/unit/mcp_client_identity_isolated.cjs`, con Node 24, TypeScript 5.9.3, Zod 4.4.3, SDK MCP 1.30.0, Ajv 8.17.1 y PGlite 0.3.14/PostgreSQL 17.5. Treinta pruebas aprobadas: identidad, código/PKCE, renovación y repetición, tokens manuales, desactivación sin degradación, cruces de propietario/cliente/autorización, las doce compuertas sustantivas, recibos/ledger/liberación, hashes, publicación JSON Schema y descubrimiento/llamadas HTTP del SDK real. Cubre operación heredada con columnas nuevas físicamente ausentes y salida histórica byte a byte contra fixture del blob original; el fixture no es fuente de implementación.
+
+Se ejecutan funciones criptográficas, consultas PostgreSQL y verificador de comprobantes reales. Next, configuración, fuentes/encabezados normativos y servicios de contenido/observación son sustituciones explícitas; la prueba HTTP usa el transporte SDK real. Alcance de tipos: diez módulos de servidor con interfaces auxiliares tipadas; sintaxis revisada de todas las fuentes modificadas. No es compilación, tipos, suite, concurrencia multi-conexión ni integración Next completas.
+
+No se leyó ni modificó audio, dictado, secreto o acceso productivo. Las llegadas de texto/observación a sus stubs prueban la compuerta, no recuperación de datos ni disponibilidad reales. La protección probada es de fixtures; faltan permisos efectivos y ensayo negativo en entorno autorizado. La candidata de historial anterior continúa separada y sin publicar: no se incluye subrepticiamente aquí ni se declara desplegada. Primer objetivo funcional de audio/historial: abierto.
+
+
+## Preparación de publicación · 2026-10-17
+
+Autorización de publicación recibida; las dos candidatas locales se integran en una rama sobre main aa6f3a548c032f2ac30de32c275be17a0bd8370a. Los apartados de candidata anteriores son antecedentes fechados. La función de identidad permanece desactivada y el SQL candidato no se ejecuta. No se ha acreditado todavía compilación integral, despliegue, activación de identidad ni aceptación funcional. No confundir revisión del contrato con cambio autorizado de metodología externa. Véase C007.8 del objeto existente de dictado para continuidad.

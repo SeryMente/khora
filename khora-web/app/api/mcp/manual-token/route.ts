@@ -56,7 +56,7 @@ async function handlePOST(req: NextRequest) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401, headers: noStore() });
   }
 
-  let body: { scopes?: unknown; expires_in_days?: unknown; etiqueta?: unknown };
+  let body: { scopes?: unknown; expires_in_days?: unknown; etiqueta?: unknown; client_id?: unknown };
   try {
     body = await req.json();
   } catch {
@@ -71,6 +71,7 @@ async function handlePOST(req: NextRequest) {
       scopes: body.scopes,
       expiresInDays: body.expires_in_days,
       label: body.etiqueta,
+      clientId: body.client_id,
     });
 
     return NextResponse.json(

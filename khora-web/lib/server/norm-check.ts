@@ -572,6 +572,7 @@ function computeEvidenceHash(receipt: NormativeReceipt): string {
     methodology_output_header: receipt.methodology_output_header,
     created_at: receipt.created_at,
     runtime: {
+      ...(receipt.runtime.client_identity ? {client_identity: receipt.runtime.client_identity} : {}),
       platform: receipt.runtime.platform,
       reasoning_mode: receipt.runtime.reasoning_mode,
       output_format_version: receipt.runtime.output_format_version,
@@ -636,6 +637,8 @@ export async function verifyNormativeReceipt(
   if (receipt.output_header !== expectedOutputHeader) reasons.push("OUTPUT_HEADER_MISMATCH");
   if (receipt.methodology_output_header !== expectedMethodologyOutputHeader) reasons.push("METHODOLOGY_OUTPUT_HEADER_MISMATCH");
   const outputValidation = validateCanonicalCycleOutput(receipt.output, {
+    platform: receipt.runtime.platform,
+    output_format_version: receipt.runtime.output_format_version,
     expectedSiHeader: expectedOutputHeader,
     expectedMethodologyHeader: expectedMethodologyOutputHeader,
   });

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { BOUND_OUTPUT_FORMAT_VERSION } from "./mcp-client-identity";
 import { REASONING_MODES, REQUIRED_OUTPUT_FORMAT_VERSION, REQUIRED_PLATFORM, type NormativeRuntimeContext } from "./normative-runtime";
 
 export const NORM_CHECK_PROTOCOL = "NORM-CHECK";
@@ -22,7 +23,7 @@ const principle = z.union([
 
 // Structural contract shared by tools/list, the tool handler and the verifier.
 // Snapshot, hashes, dates, ledger/order and cycle state remain semantic checks.
-export const normativeReceiptSchema = z.object({
+const historicalNormativeReceiptSchema = z.object({
   protocol: z.literal(NORM_CHECK_PROTOCOL),
   protocol_version: z.literal(NORM_CHECK_PROTOCOL_VERSION),
   cycle: z.object({ id: z.string().min(1), attempt: z.number().int().min(1) }).passthrough(),
@@ -48,6 +49,25 @@ export const normativeReceiptSchema = z.object({
     output_format_version: z.literal(REQUIRED_OUTPUT_FORMAT_VERSION),
   }).passthrough(),
 }).passthrough();
+
+const boundIdentitySchema = z.object({
+  version: z.literal("mcp-client-identity/v1"),
+  client_id: z.string().min(1).max(2048).regex(/^[^\u0000-\u001F\u007F]+$/).refine(value => value.trim() === value),
+  grant_id: z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/),
+  platform: z.enum(["ChatGPT", "Notion"]),
+  assurance: z.literal("owner-configured"),
+}).strict();
+const boundNormativeReceiptSchema = historicalNormativeReceiptSchema.extend({
+  protocol_version: z.literal("v0.6.0"),
+  runtime: z.object({ platform: z.enum(["ChatGPT", "Notion"]), reasoning_mode: z.enum(REASONING_MODES), output_format_version: z.literal(BOUND_OUTPUT_FORMAT_VERSION), client_identity: boundIdentitySchema }).strict(),
+}).superRefine((value, ctx) => {
+  if (value.runtime.platform !== value.runtime.client_identity.platform) ctx.addIssue({code:"custom", message:"Client profile mismatch"});
+});
+export const normativeReceiptSchema = z.union([
+  historicalNormativeReceiptSchema.superRefine((value,ctx) => {
+    if (Object.hasOwn(value.runtime,"client_identity")) ctx.addIssue({code:"custom", message:"Historical receipt cannot carry bound identity"});
+  }), boundNormativeReceiptSchema,
+]);
 
 // Preserve the exported TypeScript surface; runtime validation remains strict.
 export type NormativePrincipleEvidence = {
