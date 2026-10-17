@@ -282,3 +282,28 @@ def test_idempotencia_y_conflicto_de_terna():
 
     with pytest.raises(Exception, match="Conflicto terna"):
         asentar(rat_conflicto, memoria, llm, emb)
+
+
+def test_metadata_origin_is_information_object_not_semantic_entity():
+    obj = ObjetoDeInformacion(
+        id="io-typed-metadata", texto="Texto",
+        provenance=Provenance(origen="test", driver="test", timestamp=datetime.now(timezone.utc).isoformat()),
+        metadata={"autor": "Ada"},
+    )
+    mem = MemoriaPruebasConTransaccion()
+    proposal = proponer(obj, mem, MockPuertoLLM(), MockPuertoEmbeddings())
+    assert not any(i.kind == "entity" and i.label == obj.id for i in proposal.items)
+    metadata_relations = [i for i in proposal.items if (i.metadata or {}).get("origen_kind") == "information_object"]
+    assert metadata_relations
+    asentar(ratificar_propuesta(proposal), mem, MockPuertoLLM(), MockPuertoEmbeddings())
+    assert obj.id not in mem.entidades
+    assert any(r.get("origen_kind") == "information_object" and r["origen_id"] == obj.id for r in mem.relaciones)
+
+
+def test_extraction_ignores_csv_headers_and_preserves_quoted_entity():
+    from khora_kernel.constructor._extraer import _llm_ner
+    class HeaderLLM:
+        def generar(self, solicitud):
+            return RespuestaLLM(modelo='unit-test', provenance=Provenance(origen='test', driver='test', timestamp=datetime.now(timezone.utc).isoformat()), texto='origen,relacion,destino,tipo_opcional\n"Alba, investigadora",COLABORA_CON,Bruno,Persona')
+    result = _llm_ner("synthetic", HeaderLLM())
+    assert result == [("Alba, investigadora", "COLABORA_CON", "Bruno", "Persona")]

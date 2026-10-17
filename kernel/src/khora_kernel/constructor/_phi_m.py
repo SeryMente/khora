@@ -34,6 +34,7 @@ def phi_m(objeto: ObjetoDeInformacion) -> list[Triple]:
         # La entidad semántica (p.ej. CRE-ATED_BY) queda reservada a ΦC/fKGC.
         metadata = {
             "node_kind": "literal",
+            "origen_kind": "information_object",
             "literal_value": str(v),
             "literal_datatype": type(v).__name__,
             "source_key": k,

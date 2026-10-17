@@ -51,6 +51,15 @@ async function limitada<T>(session: { run: (query: string, params: Record<string
   return { rows: result.records.slice(0, limit), truncated: result.records.length > limit };
 }
 
+// Stable display identifier derived only from the published Leiden community.
+// Zero means no published membership, not a fabricated partition.
+function communityNumber(id: string): number {
+  if (!id) return 0;
+  let hash = 2166136261;
+  for (let i = 0; i < id.length; i++) hash = Math.imul(hash ^ id.charCodeAt(i), 16777619);
+  return (hash >>> 0) || 1;
+}
+
 function esIndisponibilidad(error: any): boolean {
   const code = String(error?.code ?? "");
   const name = String(error?.name ?? "");
@@ -97,18 +106,32 @@ export async function obtenerProyeccionGrafo(filtros: Filtros = {}): Promise<Pro
       const entityQuery = ioId || volcadoId
         ? `MATCH (io:InformationObject)-[:MENTIONS]->(e:Entity)
            WHERE toString(io.io_id) IN $ioIds AND e.canonical_key IS NOT NULL
+             AND e.invalid_at IS NULL AND NOT e:User AND NOT e:InformationObject
+           OPTIONAL MATCH (e)-[membership:IN_COMMUNITY]->(c:Community)
+           WHERE membership.invalid_at IS NULL AND c.invalid_at IS NULL
+             AND membership.published = true AND c.published = true
+           WITH e, c ORDER BY c.level ASC, c.community_id ASC
+           WITH e, head(collect(c)) AS communityNode
            RETURN DISTINCT e.canonical_key AS id,
              coalesce(e.label_original, e.canonical_key, 'Sin resumen') AS summary,
-             coalesce(e.community, 0) AS community, coalesce(e.level, 0) AS level,
+             communityNode.community_id AS communityId, communityNode.graph_revision AS communityRevision,
+             coalesce(communityNode.level, 0) AS level,
              coalesce(e.centrality, 1.0) AS centrality,
              coalesce(e.provenance[0], 'Neo4j Aura') AS origen,
              coalesce(toString(e.created_at), toString(e.valid_at), toString(datetime())) AS timestamp,
              CASE WHEN e.needs_review = true THEN 'Pendiente' ELSE 'Verificado' END AS verificacion
            ORDER BY id ASC LIMIT $fetchLimit`
         : `MATCH (e:Entity) WHERE e.canonical_key IS NOT NULL
+             AND e.invalid_at IS NULL AND NOT e:User AND NOT e:InformationObject
+           OPTIONAL MATCH (e)-[membership:IN_COMMUNITY]->(c:Community)
+           WHERE membership.invalid_at IS NULL AND c.invalid_at IS NULL
+             AND membership.published = true AND c.published = true
+           WITH e, c ORDER BY c.level ASC, c.community_id ASC
+           WITH e, head(collect(c)) AS communityNode
            RETURN DISTINCT e.canonical_key AS id,
              coalesce(e.label_original, e.canonical_key, 'Sin resumen') AS summary,
-             coalesce(e.community, 0) AS community, coalesce(e.level, 0) AS level,
+             communityNode.community_id AS communityId, communityNode.graph_revision AS communityRevision,
+             coalesce(communityNode.level, 0) AS level,
              coalesce(e.centrality, 1.0) AS centrality,
              coalesce(e.provenance[0], 'Neo4j Aura') AS origen,
              coalesce(toString(e.created_at), toString(e.valid_at), toString(datetime())) AS timestamp,
@@ -117,7 +140,10 @@ export async function obtenerProyeccionGrafo(filtros: Filtros = {}): Promise<Pro
       const nodeResult = await limitada<Registro>(session, entityQuery, { ioIds }, limit);
       const nodes = nodeResult.rows.map((row) => ({
         id: str(row.get("id")), summary: str(row.get("summary"), "Sin resumen"),
-        community: num(row.get("community"), 0), level: num(row.get("level"), 0),
+        community: communityNumber(str(row.get("communityId"))),
+        communityId: row.get("communityId") == null ? null : str(row.get("communityId")),
+        communityRevision: row.get("communityRevision") == null ? null : str(row.get("communityRevision")),
+        level: num(row.get("level"), 0),
         centrality: num(row.get("centrality"), 1), origen: str(row.get("origen"), "Neo4j Aura"),
         timestamp: str(row.get("timestamp")), verificacion: str(row.get("verificacion"), "Verificado"),
       })).filter((node) => node.id.length > 0);
@@ -142,15 +168,16 @@ export async function obtenerProyeccionGrafo(filtros: Filtros = {}): Promise<Pro
       const edgeQuery = ioId || volcadoId
         ? `MATCH (io:InformationObject)-[:MENTIONS]->(e1:Entity)-[r:RELATION]->(e2:Entity)<-[:MENTIONS]-(io)
            WHERE toString(io.io_id) IN $ioIds AND e1.canonical_key IN $nodeIds AND e2.canonical_key IN $nodeIds
-           RETURN DISTINCT coalesce(toString(r.id), e1.canonical_key + '->' + e2.canonical_key + ':' + coalesce(r.type, 'RELATION')) AS id,
+             AND r.io_id = io.io_id AND r.invalid_at IS NULL
+           RETURN DISTINCT coalesce(toString(r.id), e1.canonical_key + '->' + e2.canonical_key + ':' + coalesce(r.type, 'RELATION') + ':' + coalesce(toString(r.io_id), 'legacy')) AS id,
              e1.canonical_key AS source, e2.canonical_key AS target, coalesce(r.type, 'RELATION') AS type,
              coalesce(r.weight, 1.0) AS weight, coalesce(r.provenance[0], 'Neo4j Aura') AS origen,
              coalesce(toString(r.created_at), toString(r.valid_at), toString(datetime())) AS timestamp,
              'Verificado' AS verificacion
            ORDER BY id ASC LIMIT $fetchLimit`
         : `MATCH (e1:Entity)-[r:RELATION]->(e2:Entity)
-           WHERE e1.canonical_key IN $nodeIds AND e2.canonical_key IN $nodeIds
-           RETURN DISTINCT coalesce(toString(r.id), e1.canonical_key + '->' + e2.canonical_key + ':' + coalesce(r.type, 'RELATION')) AS id,
+           WHERE e1.canonical_key IN $nodeIds AND e2.canonical_key IN $nodeIds AND r.invalid_at IS NULL
+           RETURN DISTINCT coalesce(toString(r.id), e1.canonical_key + '->' + e2.canonical_key + ':' + coalesce(r.type, 'RELATION') + ':' + coalesce(toString(r.io_id), 'legacy')) AS id,
              e1.canonical_key AS source, e2.canonical_key AS target, coalesce(r.type, 'RELATION') AS type,
              coalesce(r.weight, 1.0) AS weight, coalesce(r.provenance[0], 'Neo4j Aura') AS origen,
              coalesce(toString(r.created_at), toString(r.valid_at), toString(datetime())) AS timestamp,
@@ -183,7 +210,7 @@ export async function obtenerProyeccionGrafo(filtros: Filtros = {}): Promise<Pro
     });
   } catch (error) {
     if (error instanceof Neo4jNoConfiguradoError || error instanceof Neo4jInalcanzableError) throw error;
-    if (esIndisponibilidad(error)) throw new Neo4jInalcanzableError(`Neo4j no está disponible: ${String((error as any)?.message ?? error)}`);
+    if (esIndisponibilidad(error)) throw new Neo4jInalcanzableError(`Neo4j no estÃ¡ disponible: ${String((error as any)?.message ?? error)}`);
     throw error;
   }
 }
