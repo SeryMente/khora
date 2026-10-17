@@ -1,5 +1,8 @@
 import { test, expect, type Page } from "@playwright/test";
 
+// Chromium-generated media only: no physical microphone or production provider.
+test.use({ permissions: ["microphone"], launchOptions: { args: ["--use-fake-device-for-media-stream", "--use-fake-ui-for-media-stream"] } });
+
 // End-to-end browser contract: real Ingreso route + keyboard editor + deterministic
 // Web Speech callbacks. No real microphone, provider, database or auth bypass in production.
 const selector = '[data-ui-id="ingreso.textarea"]';
@@ -19,20 +22,17 @@ test.beforeEach(async ({ page }) => {
       abort() { this.stop(); }
     }
     w.SpeechRecognition = w.webkitSpeechRecognition = Recognition;
-    // Deliberately disallow physical microphone access in automated tests.
-    Object.defineProperty(navigator, "mediaDevices", { configurable: true, value: {
-      getUserMedia: async () => { throw new DOMException("No physical microphone in regression test", "NotAllowedError"); },
-    } });
   });
   await page.route("**/api/dictado/checkpoint", async route => {
     const body = route.request().postDataJSON();
     if (route.request().method() === "POST" && body?.texto) {
       await page.evaluate(text => (window as any).__dictadoContinuidad.checkpoints.push(text), body.texto);
     }
-    await route.fulfill({ json: { ok: true, recovery: null } });
+    await route.fulfill({ json: { ok: true, owner: "synthetic-custody-owner@example.invalid", recovery: null } });
   });
   await page.route("**/api/observaciones/**", route => route.fulfill({ json: { ok: true, accepted: 0 } }));
   await page.goto("/sistema/ingreso?modo=dictado");
+  await expect(page.locator('[data-testid="khora-splash"]')).toHaveCount(0);
   await expect(page.locator(selector)).toBeVisible();
   await page.locator('[data-ui-id="ingreso.btn-iniciar"]').click();
   await expect(page.locator('[data-ui-id="ingreso.status-listening"]')).toContainText("escuchando");
@@ -129,7 +129,7 @@ test("borrar un párrafo no lo resucita al continuar", async ({ page }) => {
   await expect(page.locator(selector)).not.toHaveValue(new RegExp(original));
 });
 
-test("borrar todo y limpiar no recuperan fragmentos de una época anterior", async ({ page }) => {
+test("borrar todo conserva el borrado manual y Limpiar protege una captura sin archivar", async ({ page }) => {
   await emit(page, original, true);
   await page.locator(selector).click();
   await page.keyboard.press("Control+A");
@@ -141,11 +141,12 @@ test("borrar todo y limpiar no recuperan fragmentos de una época anterior", asy
   await page.locator('[data-ui-id="ingreso.btn-detener"]').click();
   await expect(page.locator('[data-ui-id="ingreso.btn-limpiar"]')).toBeEnabled();
   await page.locator('[data-ui-id="ingreso.btn-limpiar"]').click();
-  await expect(page.locator(selector)).toHaveValue("");
-  await page.locator('[data-ui-id="ingreso.btn-iniciar"]').click();
-  await expect(page.locator('[data-ui-id="ingreso.status-listening"]')).toContainText("escuchando");
-  await emit(page, "Otra captura.", true);
-  await expect(page.locator(selector)).toHaveValue("Otra captura.");
+  // Current custody contract forbids discarding an unarchived capture.
+  await expect(page.getByText(/Antes de abrir otra captura, cierra esta con Archivar/)).toBeVisible();
+  await expect(page.locator(selector)).toHaveValue("Texto nuevo.");
+  await page.waitForTimeout(1200);
+  await expect(page.locator(selector)).toHaveValue("Texto nuevo.");
+  await expect(page.locator(selector)).not.toHaveValue(new RegExp(original));
 });
 
 test("callbacks de instancia anterior no borran parciales ni reactivan otro reconocedor", async ({ page }) => {

@@ -32,6 +32,6 @@ export default defineConfig({
 			: `${envVars} npm run build && ${envVars} ./node_modules/.bin/next start`,
 		url: "http://localhost:3000",
 		reuseExistingServer: !process.env.CI,
-		timeout: 120_000,
+		timeout: Number(process.env.PLAYWRIGHT_WEB_SERVER_TIMEOUT_MS || 120_000),
 	},
 });

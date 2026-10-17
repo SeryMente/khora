@@ -71,11 +71,12 @@ test("dictation checkpoints persist start, immediate inline-edit pause, resume, 
     if (route.request().method() === "POST") {
       await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ok: true }) });
     } else {
-      await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ recovery: null }) });
+      await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ owner: "synthetic-custody-owner@example.invalid", recovery: null }) });
     }
   });
 
   await page.goto("/sistema/ingreso?modo=dictado");
+  await expect(page.locator('[data-testid="khora-splash"]')).toHaveCount(0);
   await expect(page.locator('[data-ui-id="ingreso.btn-iniciar"]')).toBeVisible();
   await page.locator('[data-ui-id="ingreso.btn-iniciar"]').click();
   await expect.poll(

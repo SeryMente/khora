@@ -49,15 +49,46 @@ body {
     font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
 
-@keyframes splash-animation {
-    0% { opacity: 0; }
-    20% { opacity: 1; }
-    80% { opacity: 1; }
-    100% { opacity: 0; }
+/* Splash colors are intentionally independent from shell ink/surface tokens. */
+.khora-splash {
+    position: fixed;
+    inset: 0;
+    width: 100dvw;
+    height: 100dvh;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #000000;
+    color: #FFFFFF;
+    opacity: 1;
+    touch-action: none;
 }
-
-@media (prefers-reduced-motion: reduce) {
-    [data-testid="khora-splash"] { animation: none !important; }
+html[data-theme="light"] .khora-splash,
+.khora-splash[data-theme="light"] {
+    background: #F4F2EF;
+    color: #1C1D1F;
+}
+html .khora-splash[data-theme="dark"] {
+    background: #000000;
+    color: #FFFFFF;
+}
+.khora-splash-word {
+    font-family: var(--font-geist), var(--font-geist-sans), sans-serif;
+    font-size: clamp(36px, 5vw, 56px);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    line-height: 1;
+    font-kerning: normal;
+    text-transform: none;
+    opacity: 0;
+}
+/* No gray/white frame beneath the opaque SSR surface or its exit fade. */
+body:has(.khora-splash:not([data-phase="complete"])) {
+    background: #000000;
+}
+html[data-theme="light"] body:has(.khora-splash:not([data-phase="complete"])) {
+    background: #F4F2EF;
 }
 
 .khora-navigation-root {

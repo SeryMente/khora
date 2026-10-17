@@ -284,7 +284,7 @@ test.describe("Pipeline Control Tower E2E Tests", () => {
     await expect(title).toContainText("Custodia");
 
     // Check summary counters
-    await expect(page.locator("text=Total volcados").first()).toBeVisible();
+    await expect(page.locator("text=Total registros de Custodia").first()).toBeVisible();
     await expect(page.locator("text=En revisión").first()).toBeVisible();
     await expect(page.locator("text=Listos / Ingesta").first()).toBeVisible();
     await expect(page.locator("text=Grafo / Ingeridos").first()).toBeVisible();
