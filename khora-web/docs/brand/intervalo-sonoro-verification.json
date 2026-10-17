@@ -1,90 +1,121 @@
 {
-  "method": "Complete 137-case run plus causal reruns of changed tests. Not one uninterrupted green invocation. No product files changed between those runs.",
-  "complete": {
-    "passed": 126,
-    "skipped": 6,
-    "failed": 5
-  },
-  "causal": {
-    "passed": 18,
-    "failed": 1
-  },
-  "clockCausal": {
-    "passed": 1,
-    "failed": 0
-  },
-  "uniqueLatestResults": {
-    "passed": 131,
-    "skipped": 6
-  },
-  "resolved": [
-    {
-      "file": "e2e/contracts/audio-por-partes.spec.ts",
-      "title": "handles audio multipart upload, errors and limit guards",
-      "latest": "passed"
-    },
-    {
-      "file": "e2e/contracts/audio-por-partes.spec.ts",
-      "title": "no-JSON audio failure blocks archive and preserves captured text",
-      "latest": "passed"
-    },
-    {
-      "file": "e2e/dictado-experience.spec.ts",
-      "title": "eventos duplicados y tardíos no crean sesiones fantasma",
-      "latest": "passed"
-    },
-    {
-      "file": "e2e/shell-v2.spec.ts",
-      "title": "Navega por todos los dominios y verifica la renderización",
-      "latest": "passed"
-    },
-    {
-      "file": "tests/regression/smoke.spec.ts",
-      "title": "Flujo de captura acepta entrada",
-      "latest": "passed"
-    }
-  ],
-  "productSha256": {
-    "app/components/os/KhoraSplash.tsx": "b9fb64695d95e4f309a2e191e81ee10da1f9a95246098366180212d278b1ede2",
-    "app/components/os/IntervaloSonoroMark.tsx": "87c8f050ae6ba558ee005fdce149d4bf5e219b850fb914d56dfa031806330d74",
-    "lib/brand/intervalo-sonoro.ts": "593fac99e7bb4a3340fc8e60338161f18eb5c5e847462a7fc065ad3b82b8dbce",
-    "app/globals.css": "0d40555c75eed7eff1bc7dcfab2742ae1f5771347928bf83d73868f514326713"
-  },
-  "unit": {
-    "passed": 502,
-    "failed": 0,
-    "skipped": 0
-  },
-  "visualReview": {
-    "themes": 2,
-    "viewports": 4,
-    "individualFullFrameInspections": 8
-  },
-  "limits": [
-    "Synthetic local services; no live provider validation.",
-    "Six pre-existing skipped tests remain skipped.",
-    "Remote CI and production deployment are not certified by this local receipt."
-  ],
-  "integration": {
-    "testedHead": "437bf3eebb7c827a4dfc782f172387e2693c59b8",
-    "upstream": "a489f1b4ea2dda0bfafb852ff86bca6fb1dc45ba",
-    "unit": {
-      "passed": 503,
-      "failed": 0,
-      "skipped": 0
-    },
-    "browser": {
-      "passed": 22,
-      "failed": 0,
-      "scope": [
-        "e2e/splash.spec.ts",
-        "e2e/grafo.spec.ts"
-      ]
-    },
-    "freshProductionBuild": true,
-    "typecheck": true,
-    "navigationContract": true,
-    "uiReviewCatalog": true,
-    "identitySourceHashesUnchanged": true
-  }
+    "method":  "Complete 137-case run plus causal reruns of changed tests. Not one uninterrupted green invocation. No product files changed between those runs.",
+    "complete":  {
+                     "passed":  126,
+                     "skipped":  6,
+                     "failed":  5
+                 },
+    "causal":  {
+                   "passed":  18,
+                   "failed":  1
+               },
+    "clockCausal":  {
+                        "passed":  1,
+                        "failed":  0
+                    },
+    "uniqueLatestResults":  {
+                                "passed":  131,
+                                "skipped":  6
+                            },
+    "resolved":  [
+                     {
+                         "file":  "e2e/contracts/audio-por-partes.spec.ts",
+                         "title":  "handles audio multipart upload, errors and limit guards",
+                         "latest":  "passed"
+                     },
+                     {
+                         "file":  "e2e/contracts/audio-por-partes.spec.ts",
+                         "title":  "no-JSON audio failure blocks archive and preserves captured text",
+                         "latest":  "passed"
+                     },
+                     {
+                         "file":  "e2e/dictado-experience.spec.ts",
+                         "title":  "eventos duplicados y tardÃ­os no crean sesiones fantasma",
+                         "latest":  "passed"
+                     },
+                     {
+                         "file":  "e2e/shell-v2.spec.ts",
+                         "title":  "Navega por todos los dominios y verifica la renderizaciÃ³n",
+                         "latest":  "passed"
+                     },
+                     {
+                         "file":  "tests/regression/smoke.spec.ts",
+                         "title":  "Flujo de captura acepta entrada",
+                         "latest":  "passed"
+                     }
+                 ],
+    "productSha256":  {
+                          "app/components/os/KhoraSplash.tsx":  "b9fb64695d95e4f309a2e191e81ee10da1f9a95246098366180212d278b1ede2",
+                          "app/components/os/IntervaloSonoroMark.tsx":  "87c8f050ae6ba558ee005fdce149d4bf5e219b850fb914d56dfa031806330d74",
+                          "lib/brand/intervalo-sonoro.ts":  "593fac99e7bb4a3340fc8e60338161f18eb5c5e847462a7fc065ad3b82b8dbce",
+                          "app/globals.css":  "0d40555c75eed7eff1bc7dcfab2742ae1f5771347928bf83d73868f514326713"
+                      },
+    "unit":  {
+                 "passed":  502,
+                 "failed":  0,
+                 "skipped":  0
+             },
+    "visualReview":  {
+                         "themes":  2,
+                         "viewports":  4,
+                         "individualFullFrameInspections":  8
+                     },
+    "limits":  [
+                   "Synthetic local services; no live provider validation.",
+                   "Six pre-existing skipped tests remain skipped.",
+                   "Remote CI and production deployment are not certified by this local receipt."
+               ],
+    "integration":  {
+                        "testedHead":  "437bf3eebb7c827a4dfc782f172387e2693c59b8",
+                        "upstream":  "a489f1b4ea2dda0bfafb852ff86bca6fb1dc45ba",
+                        "unit":  {
+                                     "passed":  503,
+                                     "failed":  0,
+                                     "skipped":  0
+                                 },
+                        "browser":  {
+                                        "passed":  22,
+                                        "failed":  0,
+                                        "scope":  [
+                                                      "e2e/splash.spec.ts",
+                                                      "e2e/grafo.spec.ts"
+                                                  ]
+                                    },
+                        "freshProductionBuild":  true,
+                        "typecheck":  true,
+                        "navigationContract":  true,
+                        "uiReviewCatalog":  true,
+                        "identitySourceHashesUnchanged":  true
+                    },
+    "recovery20261017":  {
+                             "testedHead":  "d05b84c4652e1d60699d0a43d03b2776c7dff0e9",
+                             "integratedMain":  "2012e2389deb732568a5bd384817c19499fb910c",
+                             "verifiedAt":  "2026-10-17T22:44:11.741Z",
+                             "unit":  {
+                                          "passed":  505,
+                                          "failed":  0
+                                      },
+                             "browser":  {
+                                             "total":  140,
+                                             "expected":  134,
+                                             "unexpected":  0,
+                                             "flaky":  0,
+                                             "skipped":  6,
+                                             "ok":  true
+                                         },
+                             "reportSha256":  "a50377762efe3107ea0d600385e299714ac69c4ea89365115bc9a0c456a29503",
+                             "reportStart":  1792276666865,
+                             "reportDuration":  173404.753,
+                             "typecheck":  true,
+                             "navigationContract":  true,
+                             "uiReviewCatalog":  true,
+                             "freshProductionBuild":  true,
+                             "executionNote":  "PowerShell treated a Next middleware deprecation warning on stderr as NativeCommandError. The browser child completed independently; this receipt verifies the freshly persisted HTML report and last-run state, not the wrapper exit code.",
+                             "limits":  [
+                                            "Synthetic local providers; no production-data mutation tested.",
+                                            "Remote Actions blocked by account billing; not certified green.",
+                                            "Deployment is separately verified after merge."
+                                        ],
+                             "documentationOnlyUpstream":  "a102fba (no changes under khora-web; tested source reused without rerun)"
+                         }
 }
