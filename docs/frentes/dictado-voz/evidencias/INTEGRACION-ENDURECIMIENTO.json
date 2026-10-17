@@ -1,0 +1,184 @@
+{
+  "schema": "khora-dictado-hardening/integration-v1",
+  "createdAt": "2026-10-17T18:24:32.128Z",
+  "baseSha": "f04e815b47fa8a7b5297561df62000478f978108",
+  "branch": "fix/dictado-hardening-integrated",
+  "authorization": "Ya regrese a  la maquina de antes,  busca el endurecimiento y verifica,  fusiona en main e2e",
+  "method": {
+    "version": "1.5",
+    "commit": "49ac40e9f6122e2d2fb339362cfa0a78128c8e37"
+  },
+  "mergePolicy": "normal merge only; verify pull request and main; no manual deployment",
+  "pullRequest": "https://github.com/SeryMente/khora/pull/305",
+  "tests": {
+    "unitPassed": 491,
+    "browserPassed": 19,
+    "additionalBrowserPassed": 29,
+    "typecheck": "passed",
+    "navigation": "passed",
+    "uiReview": "passed",
+    "build": "passed as benchmark prerequisite"
+  },
+  "benchmark": {
+    "schema": "khora-dictado-benchmark/v1",
+    "status": "passed",
+    "testedAt": "2026-10-17T18:15:40.141Z",
+    "completedAt": "2026-10-17T18:18:24.827Z",
+    "sourceSha": "f04e815b47fa8a7b5297561df62000478f978108",
+    "workingTreeDirty": true,
+    "inputFingerprint": "d6df6d40e4bdc6330cf30cc6d3ecbfbf52af68a468ef6242ce4ed5453b5e7e15",
+    "checks": [
+      {
+        "name": "Contratos, entrega, muestreo, privacidad y persistencia controlada",
+        "status": "passed"
+      },
+      {
+        "name": "Continuidad del dictado y encuesta en navegador",
+        "status": "passed"
+      }
+    ],
+    "limits": [
+      "Reconocimiento y endpoints externos controlados; no voz física ni SQL productivo.",
+      "Persistencia probada con doble de base de datos; no certificación de despliegue.",
+      "No mide fidelidad de voz ni comodidad automáticamente. Contrato/regresión, no puntuación universal.",
+      "La huella identifica entradas declaradas. sourceSha no incluye cambios locales; revisar workingTreeDirty."
+    ]
+  },
+  "runStatus": [
+    {
+      "name": "install",
+      "status": 0,
+      "signal": null
+    },
+    {
+      "name": "types",
+      "status": 0,
+      "signal": null
+    },
+    {
+      "name": "units",
+      "status": 0,
+      "signal": null
+    },
+    {
+      "name": "navigation",
+      "status": 0,
+      "signal": null
+    },
+    {
+      "name": "ui",
+      "status": 0,
+      "signal": null
+    },
+    {
+      "name": "benchmark",
+      "status": 0,
+      "signal": null
+    },
+    {
+      "name": "extra-browser",
+      "status": 0,
+      "signal": null
+    }
+  ],
+  "files": [
+    {
+      "path": "docs/frentes/dictado-voz/CONTRATO-DICTADO-EXPERIENCE.md",
+      "sha256": "e78845598c5511ada87edc436b23d530c97cec2d0804fe77b5167a8c8c7ec1ea"
+    },
+    {
+      "path": "docs/frentes/dictado-voz/OBJETO-CANONICO.md",
+      "sha256": "a93499bef3e1ba0b55b7bcc3d66e227cfd6e88cc27dd678c637ae1f337d3fa79"
+    },
+    {
+      "path": "docs/frentes/dictado-voz/evidencias/ENDURECIMIENTO-LOCAL.json",
+      "sha256": "87b0f287ade6e378fa04168b2f5180e348bb9d44225b524a0d9533e2e366cc13"
+    },
+    {
+      "path": "khora-web/app/components/ingreso/DictadoExperiencePanel.tsx",
+      "sha256": "39a5ec33af95c3b97d20e8b9510540cf5665c10644ee70e13882e32011e52a0f"
+    },
+    {
+      "path": "khora-web/lib/client/dictado-experience-delivery.ts",
+      "sha256": "a40b0d23e9e283fba88cef398d73aa5f35267a57939ca8e9f61431d5a21d6ca3"
+    },
+    {
+      "path": "khora-web/lib/contracts/dictado-experience.ts",
+      "sha256": "5c1347b1b0c24d8deee29ae9a2516f5482bd770e8bd5822c74136187f99bfd94"
+    },
+    {
+      "path": "khora-web/lib/generated/dictado-benchmark.json",
+      "sha256": "8d082ee15bf3d86dba8d4d803aa3ec519b33c96355de963ead66cd6c8b5f69f4"
+    },
+    {
+      "path": "khora-web/scripts/benchmark-dictado.mjs",
+      "sha256": "c51d5bfee454896991a2d0f02eaca31c5438fd1a8895170c3b79a55304c432a3"
+    },
+    {
+      "path": "khora-web/tests/unit/dictado_experience_hardening.test.ts",
+      "sha256": "579dba89e18f27c2d668a8adf6f834cedd79042653642148a24b54f827e27029"
+    },
+    {
+      "path": "khora-web/e2e/dictado-experience.spec.ts",
+      "sha256": "139a058729cd5a561a1b3a12f9253eaea3bb88e65ad545fb44d4d034e40f504b"
+    },
+    {
+      "path": "khora-web/docs/CUSTODIA-DICTADOS.md",
+      "sha256": "71d8a732caf9f6086bbc56af0321662401a4946f9dc669085c3ffa3de4a27cf4"
+    }
+  ],
+  "logHashes": [
+    {
+      "path": "integration-install.log",
+      "sha256": "c8d2503e80650fdd8410119cb6298b067bdf3f779650e360e746f2f2d89acbb3"
+    },
+    {
+      "path": "integration-types.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "integration-units.log",
+      "sha256": "a4d352ed1d1aaefb84f305c49c1a80c6cae458a8b7ffb7af93525250bbb6b7ab"
+    },
+    {
+      "path": "integration-navigation.log",
+      "sha256": "8d36f3d0b570b72b1aa1e8852bdcd26ebdf633d8444a37114556d3985a710198"
+    },
+    {
+      "path": "integration-ui.log",
+      "sha256": "42e1190a86cbf794103e1e0112bee2fbe7bca06c6493729a4889b813de4ae323"
+    },
+    {
+      "path": "integration-benchmark.log",
+      "sha256": "02128262edd46d7692316aa12509441670e8d8174142d1d78acc3276bb7b9ae5"
+    },
+    {
+      "path": "integration-extra-browser.log",
+      "sha256": "625a33273381da4354e3d3035fd86fded6126c7efd35aa45880a1c84d6a3fbcc"
+    },
+    {
+      "path": "integration-extra-browser-first.log",
+      "sha256": "0f470802d5d68b090f2a6835aca60221c3b23b1b4c5df08cb07164f2f06c79d6"
+    },
+    {
+      "path": "benchmark-1.log",
+      "sha256": "d37c3ddddd139ee5b5872b2ed8bc19ce09feb9664bdb3b962e2155ff0723cf98"
+    },
+    {
+      "path": "benchmark-2.log",
+      "sha256": "d22c63d4d7cb13b5c93caa6b4c2f9fe0a8dc58caabd377b33fd7578b8396c1be"
+    }
+  ],
+  "limitations": [
+    "Generated media, recognition/HTTP/database fixtures; not physical voice or human comfort.",
+    "No production storage or deployment certified by this verification.",
+    "Older local receipt retained as history, not reused as evidence for current main."
+  ],
+  "environment": {
+    "node": "v24.0.0",
+    "platform": "win32",
+    "arch": "x64",
+    "device": "PC10RCIF4EI4",
+    "dependencyInstall": "npm ci exit 0; current lockfile"
+  }
+}

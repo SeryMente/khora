@@ -3,9 +3,9 @@
 ## 1. Control e identidad
 
 - Identidad conservada: `MCP-OBS-DICTADO`; extensión documental de dictado, benchmark, retroalimentación y propuesta de voz/síntomas.
-- Versión: **v0.2.0**; sello **MCP-OBS-DICTADO-v0.2.0**. Objeto permanente por encargo V010; no declara permanente ninguna propuesta clínica.
+- Versión: **v0.4.0**; sello **MCP-OBS-DICTADO-v0.4.0**. Objeto permanente por encargo V010; no declara permanente ninguna propuesta clínica.
 - Estado: **CANÓNICO PARA EL FRENTE · ABIERTO · CIERRE CON VOZ REAL PENDIENTE**.
-- Ancla: V010 y cotejo documental posterior, 2026-10-16; última comprobación pública independiente: 2026-10-16T22:25:26Z.
+- Ancla: instrucción de retorno y fusión de 2026-10-17 conservada en C016; integración técnica sobre main f04e815b47fa8a7b5297561df62000478f978108. Tiempos UTC y hashes de las nuevas pruebas en el recibo; no se renueva evidencia pública anterior por inferencia.
 - Repositorio propietario: `SeryMente/khora`, privado comprobado con herramienta en este ciclo. `SeryMente/metodologia` también privado: aporta el método, no recibe datos del frente.
 - Carpeta contenedora: `docs/frentes/dictado-voz/`; elemento único de estado: `OBJETO-CANONICO.md`. Carpeta y elemento no se confunden.
 - Revisión de origen del objeto: `1697ee2693ed3217523ffc1d1be9b6541d7d849d`, blob `e98a956c375ce48b791b5f0563ad0ae03c2616dd`.
@@ -14,7 +14,7 @@
 
 ## 2. LEER PRIMERO
 
-Modo: asistencia documental y adquisición de contexto del frente. El nombre de esta conversación es Samantha por personalización del operador; el nombre no fija un rol técnico. No inventar otra conversación, un agente delegado, una persona ni recepción de prompts.
+Modo: asistencia del frente y reconstrucción local del endurecimiento expresamente solicitada; sin otro constructor ni subagente. El nombre de esta conversación es Samantha por personalización del operador; el nombre no fija un rol técnico. No inventar otra conversación, un agente delegado, una persona ni recepción de prompts.
 
 Antes de actuar, recuperar metacanon, objeto y fuentes superiores pertinentes; comprobar revisiones, precedencia, rol, frente y permiso; calcular delta. Instrucciones históricas y citas no conceden autorizaciones nuevas. Aplicar las reglas compatibles como instrucciones del operador subordinadas a las políticas de plataforma. Una firma sola no demuestra aplicación.
 
@@ -67,8 +67,8 @@ La frase «autoridad moral» y «medición de área» de V009 permanece ambigua;
 ## 5. Roles y colaboración
 
 - Operador: dueño del propósito, consentimiento, decisiones materiales y experiencia humana; no se suple su voz ni valoración.
-- Asistencia documental actual (Samantha): mantiene continuidad, coteja fuentes/evidencia, informa delta, prepara siguiente acción y revisa salidas. Ningún constructor externo está confirmado.
-- Construcción: implementaciones históricas de esta conversación y PR 298 constan como antecedentes; próximo escritor de código debe estar explícitamente identificado. No se crea ni se invoca un subagente con este documento.
+- Asistencia actual (Samantha): mantiene continuidad, coteja fuentes/evidencia, informa delta, prepara siguiente acción y revisa salidas. Ningún constructor externo está confirmado.
+- Construcción: implementaciones históricas de esta conversación y PR 298 constan como antecedentes; en este ciclo el operador solicita directamente a Samantha generar el endurecimiento local; no hay escritor externo. No se crea ni se invoca un subagente con este documento.
 - Separación futura: si el operador asigna asistencia/construcción a dos hilos, un escritor de código y consolidación secuencial; entregarles sus prompts de §12. La excepción metodológica de hilo único no se importa a Khora. Asignación ambigua bloquea una nueva implementación, no esta documentación.
 - Una salida del constructor que entregue el operador tiene prioridad: leerla, contrastarla, sintetizar efecto/pendientes/viabilidad y emitir prompt completo de continuidad; luego reanudar auxiliares útiles sin colisiones.
 
@@ -82,13 +82,15 @@ La frase «autoridad moral» y «medición de área» de V009 permanece ambigua;
 | D04, siguiente hito | V005–V008 → sesión real y observación por conexión existente | no autoriza inventar credenciales ni usar una captura simulada como humana |
 | D05, voz/síntomas | V009 → registrar intención y evaluar viabilidad separada | sin audio recibido ni síntoma inicial seleccionado; código/consentimiento sensible pendientes |
 | D06, canonización | V010 → documentar este frente con metacanon central | migración documental en rama propia; no cambiar método central ni tratar PR como fusionado |
+| D09, integración actual | instrucción C016 → localizar, verificar y fusionar main de extremo a extremo | fusión normal autorizada; no saltar protecciones ni afirmar despliegue por merge |
+| D08, reconstrucción local | instrucción actual → reconstruir endurecimiento en copia aislada | Samantha implementa y prueba; no autoriza push ni despliegue; sin ampliación clínica ni consentimiento |
 | D07, límites de plataforma | instrucción superior → no inferir atributos sensibles de biometría vocal | prevalece; conservar original sin ejecutar esa parte |
 
 Toda decisión de interfaz, acceso, cifrado, salud, nuevos proveedores o captura adicional exige aprobación material según las compuertas aplicables. Guardar un documento no implica permiso nuevo de fusión o despliegue. No restaurar páginas en papelera ni cambiar credenciales para fabricar continuidad.
 
 ## 7. Perfil de entorno
 
-Para este ciclo bastan herramientas de repositorio, adjunto y sandbox; no depende del equipo físico del operador. Ubicación actual, perfil de host, memoria/GPU y vínculo de una nueva sesión: **NO VERIFICADOS y no requeridos para documentar**. Las cuentas/rutas Windows de la historia son evidencia de esos eventos, no permisos actuales.
+En esta integración el operador declara retorno a la máquina anterior; la conexión responde como PC10RCIF4EI4, cuenta MantenimientoRCI. Raíz aislada actual: source/repos/khora-dictado-integration-e08c01a4, remoto Git exacto SeryMente/khora y base f04e815b47fa8a7b5297561df62000478f978108. La copia de reconstrucción previa se conserva intacta. Se instaló npm ci con el lockfile vigente de main; no se reutilizó el árbol de dependencias antiguo ni se copiaron claves o archivos .env. Versiones de runtime en el recibo.
 
 Conexiones comprobadas en el ciclo previo de acceso: GitHub (2) y Desktop Commander Remote disponibles; Khora expone herramientas pero su health devolvió `NORM_GITHUB_CREDENTIAL_MISSING`; Vercel MCP requiere reautenticación. No extrapolarlo indefinidamente ni reintentar un bloqueo no reintentable sin nueva evidencia.
 
@@ -106,15 +108,15 @@ Comprobar Node/npx, fuente oficial y runtime antes; en Windows el npx.cmd oficia
 
 ### 🔄 Estado vivo
 
-Acción actual: canonizar y revisar la continuidad documental; no ejecutar un análisis clínico ni cambiar credenciales.
-Siguiente paso de asistencia: obtener acceso de lectura funcional por MCP de Khora y acreditar la versión publicada actual; si sigue faltando la credencial normativa, solicitar únicamente esa intervención material.
-Siguiente paso de construcción: no iniciar código de salud; conservar benchmark y encuesta existentes, y atender solo un defecto reproducido o una ampliación concreta aprobada.
-Pendientes en secuencia: 1) resolver acceso normativo si persiste; 2) recuperar prueba actual de procedencia del despliegue; 3) sesión real consentida, dictado/edición/reanudación/parada; 4) opinión humana, lectura y efecto persistido correlacionados; 5) completar cobertura de conservación/estabilidad/fidelidad con alcance aprobado; 6) definir primer síntoma autodeclarado y finalidad antes de abrir desarrollo sensible.
+Acción actual: entrega técnica del endurecimiento integrada con el código vigente de Custodia y arranque, sobre main f04e815b47fa8a7b5297561df62000478f978108; verificación local de software aprobada. La instrucción actual autoriza fusión normal; el estado efectivo de integración se comprueba en la solicitud enlazada en el recibo, no por existir este archivo.
+Siguiente paso de asistencia: comprobar fusión y presencia de los hashes probados en main mediante Git; una vez presente, separar cualquier despliegue y aceptación humana. No lanzar publicación manual en Vercel como parte de este cierre.
+Siguiente paso de construcción: ninguno adicional dentro del alcance salvo defecto reproducido; no implementar análisis clínico ni ampliar consentimiento.
+Pendientes en secuencia: 1) comprobar integración Git de la entrega autorizada, o completarla si la solicitud sigue abierta sin saltar protecciones; 2) acreditar por separado versión publicada si se requiere; 3) sesión real consentida y opinión persistida correlacionadas; 4) completar conservación/estabilidad/fidelidad con alcance definido; 5) elegir primer síntoma autodeclarado antes de desarrollo sensible.
 
 ### ⚗️ En prueba / recién fallido
 
-Voz física y comodidad humana: NO VERIFICADAS en la entrega de benchmark/encuesta. No hay audio adjunto ni opinión humana nueva analizada.
-Comprobación actual: marcador de versión HTTP 404; acceso /auth/signin HTTP 200. Son hechos distintos; la presencia actual del benchmark autenticado no se ha revalidado.
+491/491 pruebas unitarias, tipos/navegación/interfaz y benchmark 19/19 de navegador aprobados sobre la combinación actual; 29/29 regresiones adicionales de Custodia/PIN/arranque/dictado aprobadas. Recibo: evidencias/INTEGRACION-ENDURECIMIENTO.json.
+Voz física, comodidad humana, SQL productivo y publicación de esta revisión: NO VERIFICADOS por estas pruebas; medios Chromium y servicios controlados no sustituyen datos humanos.
 
 ### 🔔 Recordatorios latentes
 
@@ -127,8 +129,8 @@ Comprobación actual: marcador de versión HTTP 404; acceso /auth/signin HTTP 20
 - Retención física al acceder, no purga periódica garantizada; pendientes de envío/borradores solo en memoria en v1.
 - No cambiar claves, visibilidad, facturación, protecciones ni alcance de proveedores.
 - La solicitud 298 acredita cierre técnico histórico; el acta no sustituye frescura de despliegues posteriores.
-- Registro transversal de errores de Notion: escritura bloqueada porque un ancestro está en papelera; no restaurado. El incidente de este ciclo queda custodiado aquí; sincronización transversal pendiente.
-- Esta rama documental no está fusionada ni publicada por el solo hecho de existir. Actualizar solo al obtener evidencia de integración.
+- El bloqueo del antiguo registro se conserva como hecho histórico. En esta reconstrucción el registro separado 8a786f44318b8235a67e8156fd50a98d admite escritura; se registran quoting de Node y contrato de tipos del doble de proceso. No se restauró ninguna página.
+- Integración documental #302 acreditada en c9147557. Para el nuevo endurecimiento, consultar solicitud y hashes del recibo de integración; no usar el estado local anterior como estado remoto ni confundir merge con publicación.
 - No borrar estos recordatorios por silencio; liberación positiva o decisión expresa.
 
 ## 9. Aceptación y viabilidad
@@ -147,7 +149,7 @@ Comprobación actual: marcador de versión HTTP 404; acceso /auth/signin HTTP 20
 | Experiencia agradable | encuesta y manual disponibles por contrato | respuestas humanas; no inferir experiencia ni ánimo de la voz |
 | Audio técnico/síntomas autodeclarados | propuesta delimitada, sin archivo recibido | finalidad y primer reporte definidos, consentimiento separado y revisión de interfaz/seguridad antes de código |
 | Detección clínica comercial | no implementada ni validada | no ofrecer; requerir definición de uso, evaluación clínica/regulatoria pertinente y límites de plataforma |
-| Canonización portable | trece bloques, originales, historia, manifiesto y prompts preparados | readback/diff y autorización de integración; una PR abierta no es main |
+| Canonización portable | documentación #302 fusionada en main c9147557; núcleo de trece bloques conservado | nuevo endurecimiento local: cotejo, pruebas e integración separadas |
 
 **Protocolo de sesión real, aún no ejecutado:** (1) acreditar versión y acceso, confirmar consentimiento; (2) una sesión de voz voluntaria de al menos 60 s, edición y confirmación/reanudación/parada; (3) recoger opinión real en formulario —si no sale encuesta, usar manual y mantener `voluntary`—; (4) consultar el registro del mismo propietario, correlacionar identificador/versión/acuse y resumen persistido; (5) conservar solo evidencia saneada, no texto/audio/comentarios privados en Git. No forzar la muestra ni fabricar `sampled`. Comprobar exportación/borrado con datos de prueba separados, nunca borrar la sesión real sin permiso.
 
@@ -194,6 +196,47 @@ Intento de registrar el incidente en Notion: `updated=0`, fallo `tool_validation
 
 Próxima acción exacta: §8. No afirmar integración de esta rama hasta comprobar fusión; no hacer despliegue de código por una actualización documental.
 
+### C015 · Integración documental y reconstrucción local del endurecimiento
+
+**Instrucciones nuevas, verbatim:**
+
+```text
+Nada mas fusiona en main
+Cambie de maquina, nefcesito que generes ese endurecimiento aqui
+```
+
+La primera instrucción se ejecutó únicamente sobre documentación #302; GitHub devolvió merged=true, c9147557c42b07960e44f0b29b56ab6d9b6a8259. La segunda solicita reconstruir el endurecimiento: no acredita que se hayan transportado los cambios antiguos ni autoriza publicar. Se parte de main c9147557 en rama local fix/dictado-hardening-reconstructed. Copias históricas encontradas contenían cambios diversos; no se copiaron en bloque ni se tocaron otras ramas.
+
+**Delta de implementación:** ExperienceDelivery serializa la cola en memoria, valida contratos y limita 128 registros de metadatos; captura propietario en cada envío, conserva ID al reintentar y no permite que un acuse antiguo consuma la cola de otra cuenta. No persiste comentarios ni audio/texto dictado. POST tiene plazo de 15 s; un timeout significa resultado desconocido, nunca guardado confirmado. Reintento cada 30 s/en línea/manual, pausado durante captura, sin garantía de entrega tras cerrar. Revocar preferencia descarta pendientes locales, no borra lo ya guardado. Borrado desactiva primero, espera al envío activo y requiere acuse; fallo/timeout no se declara borrado.
+
+Preferencias de consentimiento y muestreo validadas estrictamente; entradas corruptas y fallo de cuota dejan recopilación apagada. Cambios de storage entre pestañas sincronizan revocación, sin prometer tope global concurrente. Eventos sin inicio, fin repetido y resultados tardíos no abren sesiones fantasma. Resúmenes deduplican ID y sesión; conflictos quedan excluidos y contabilizados, no se escoge el más favorable. El contador de alteraciones no puede superar sus comprobaciones.
+
+Benchmark invalida el verde anterior como running antes de calcular huella; registra fallo aun por entrada ausente o error de arranque, conserva etapas no ejecutadas y usa reemplazo atómico/candado contra carreras. Terminación abrupta puede dejar running/candado, nunca passed; un candado huérfano se inspecciona, no se borra a ciegas. Huella ampliada a entrega/observabilidad/pruebas/configuración/lockfile/runner. Commit base y workingTreeDirty distinguen revisión de cambios locales. No hay CI/SQL productivo/micrófono acreditados por estas regresiones.
+
+**Cierre de regresión:** primera ejecución 18/19 por interferencia del reloj virtual con una petición retenida. Corregida solo la prueba: disparador manual, causal 1/1 en 6,8 s y nueva ejecución completa 19/19. No se relajó el timeout ni el contrato del producto. No se presenta la primera ejecución como aprobada.
+
+**Evidencia local:** ver [recibo de endurecimiento](evidencias/ENDURECIMIENTO-LOCAL.json). Suite general: 444/444; tipos, navegación e interfaz: salida 0. Resultado final de navegador y huella se registran en ese recibo y lib/generated/dictado-benchmark.json; no reemplazar evidencia anterior ni presentar fixtures como humanos. Contrato ampliado sin nuevas categorías de datos, proveedores o interfaz de captura.
+
+**Incidentes:** Node inline perdió comillas bajo PowerShell; parser rechazó antes de aplicar. Corrección: aplicador .cjs con cotejo normalizado de hashes y rutas antes de escribir, sintaxis validada. TypeScript detectó contrato excesivo del doble spawnSync; se tipó dependencia mínima y tipos pasaron. Ambos registrados en el registro separado de terminal. Estado final de esta entrega: local/revisable; sin push, fusión adicional, Vercel, claves ni datos productivos.
+
+**Gobierno:** metacanon v1.5, revisión 49ac40e9 y blob 32c7a65f recuperados de nuevo; aplicación: permiso directo → alcance local; trece bloques y Anexo A preservados; originales históricos no editados; estado/prompts sincronizados; manifiesto regenerado para documentos vigentes sin alterar hashes de custodia originales. No se afirma cumplimiento por solo mostrar la firma.
+
+### C016 · Recuperación y verificación de integración con main vigente
+
+**Instrucción nueva, verbatim:**
+
+```text
+Ya regrese a  la maquina de antes,  busca el endurecimiento y verifica,  fusiona en main e2e
+```
+
+Se recuperó la copia khora-dictado-hardening-760e3328, rama local previa y parche SHA-256 6ee400143fb9232a84cae3a730278a1a1a355715f452705fbbde230ecb138eb3. Main había avanzado a f04e815b47fa8a7b5297561df62000478f978108 (Custodia/arranque). Se creó copia aislada khora-dictado-integration-e08c01a4; aplicación de tres vías sin conflictos. Se conservaron los fixtures vigentes de propietario de checkpoint y medios generados por Chromium, las reglas nuevas de Archivar/Limpiar, el circuito de PIN/MP3 y el arranque. Se acotó al panel de experiencia la selección de su mensaje de estado en una prueba nueva; no se cambió la política de datos. Dependencias nuevas de main se instalaron con su lockfile, sin reutilizar a ciegas las dependencias antiguas.
+
+Verificaciones reales de esta combinación: 491/491 unitarias, benchmark 19/19 navegador y 29/29 regresiones adicionales de Custodia/PIN/arranque/dictado; tipos, navegación, revisión de interfaz y build pasan. Recibo con huella de entradas, hashes de archivos y logs: [integración del endurecimiento](evidencias/INTEGRACION-ENDURECIMIENTO.json). No equivale a voz física, proveedor real, opinión humana o persistencia SQL de producción. El recibo enlaza la solicitud: su estado remoto y Git determinan integración efectiva.
+
+Incidente de entorno: PowerShell promovió una advertencia npm a NativeCommandError y abortó el arnés antes de obtener el código de salida. Se volvió a ejecutar npm con captura nativa y exit status explícito; todas las compuertas anteriores se ejecutaron después de instalación confirmada. Registro separado de errores actualizado. No se cambiaron claves, facturación, visibilidad, protecciones, consentimientos ni configuración de Vercel. La integración se realiza por la vía normal; no se inicia publicación manual. La automatización existente de main puede reaccionar por su propia configuración, sin que ello pruebe un despliegue exitoso.
+
+La primera regresión adicional tuvo 27 aprobadas y 2 fallidas por URL fija localhost:3000 frente al servidor temporal 3177 (ERR_CONNECTION_REFUSED). La compuerta bloqueó el commit. Se corrigió solo el arnés temporal para usar 3000, sin tocar producto ni pruebas originales ni repetir compuertas vigentes; el resultado final consta en el recibo. El log del primer intento también conserva su hash.
+
 ## 12. Reinstanciación
 
 Estos prompts son material de continuidad, no prueban que otra conversación haya sido creada o los haya recibido. Al actualizar §8 deben sincronizarse literalmente. La asignación de un escritor de código debe constar antes de usar el prompt de construcción.
@@ -201,48 +244,48 @@ Estos prompts son material de continuidad, no prueban que otra conversación hay
 ### Prompt de asistencia
 
 ````text
-Retoma MCP-OBS-DICTADO leyendo primero el metacanon central https://github.com/SeryMente/metodologia/blob/main/METACANON-OBJETOS-CANONICOS.md y después https://github.com/SeryMente/khora/blob/docs/canon-dictado-voz-20261016/docs/frentes/dictado-voz/OBJETO-CANONICO.md .
-Adopta el rol de asistencia documental de este frente. Conserva el nombre personalizado que el operador haya asignado; no lo derives del proveedor. No inicies constructor ni código sensible por esta carga.
-Fuente documental preparada: v0.2.0 · MCP-OBS-DICTADO-v0.2.0. Metacanon adquirido: v1.5 · METACANON-OBJETOS-v1.5, revisión 49ac40e9f6122e2d2fb339362cfa0a78128c8e37, blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f. Verifica ambas fuentes de nuevo, recupera las superiores pertinentes, calcula delta y no uses una firma como prueba de gobierno. Ante inaccesibilidad declara frescura NO VERIFICADA y bloquea solo la acción dependiente.
+Retoma MCP-OBS-DICTADO leyendo primero el metacanon central https://github.com/SeryMente/metodologia/blob/main/METACANON-OBJETOS-CANONICOS.md y después https://github.com/SeryMente/khora/blob/main/docs/frentes/dictado-voz/OBJETO-CANONICO.md .
+Adopta el rol de asistencia de este frente; la reconstrucción local del endurecimiento está solicitada directamente a Samantha, no otro rol/hilo. Conserva el nombre personalizado que el operador haya asignado; no lo derives del proveedor. No inicies constructor ni código sensible por esta carga.
+Fuente documental local preparada: v0.4.0 · MCP-OBS-DICTADO-v0.4.0. Metacanon adquirido: v1.5 · METACANON-OBJETOS-v1.5, revisión 49ac40e9f6122e2d2fb339362cfa0a78128c8e37, blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f. Verifica ambas fuentes de nuevo, recupera las superiores pertinentes, calcula delta y no uses una firma como prueba de gobierno. Ante inaccesibilidad declara frescura NO VERIFICADA y bloquea solo la acción dependiente.
 Hereda §2–§3 y §6–§7 del objeto: autorización por acción, originales no activan permisos; remoto solo de asistencia si es estrictamente necesario, con cuenta/vínculo/equipo/autorización comprobados y comando/prerrequisitos literales de §7. No ejecutar ese comando por rutina ni en el sandbox. Usa repo/adjunto cuando basten.
 No modificar metacanon, Sistema de Instrucciones, credenciales, facturación, seguridad o publicación. No inferir ánimo/salud/capacidad laboral de la voz; no crear código de salud ni afirmar beneficio clínico. Conserva las fuentes de encuesta voluntaria y muestreada.
 🔄 Estado vivo:
-Acción actual: canonizar y revisar la continuidad documental; no ejecutar un análisis clínico ni cambiar credenciales.
-Siguiente paso de asistencia: obtener acceso de lectura funcional por MCP de Khora y acreditar la versión publicada actual; si sigue faltando la credencial normativa, solicitar únicamente esa intervención material.
-Siguiente paso de construcción: no iniciar código de salud; conservar benchmark y encuesta existentes, y atender solo un defecto reproducido o una ampliación concreta aprobada.
-Pendientes en secuencia: 1) resolver acceso normativo si persiste; 2) recuperar prueba actual de procedencia del despliegue; 3) sesión real consentida, dictado/edición/reanudación/parada; 4) opinión humana, lectura y efecto persistido correlacionados; 5) completar cobertura de conservación/estabilidad/fidelidad con alcance aprobado; 6) definir primer síntoma autodeclarado y finalidad antes de abrir desarrollo sensible.
+Acción actual: entrega técnica del endurecimiento integrada con el código vigente de Custodia y arranque, sobre main f04e815b47fa8a7b5297561df62000478f978108; verificación local de software aprobada. La instrucción actual autoriza fusión normal; el estado efectivo de integración se comprueba en la solicitud enlazada en el recibo, no por existir este archivo.
+Siguiente paso de asistencia: comprobar fusión y presencia de los hashes probados en main mediante Git; una vez presente, separar cualquier despliegue y aceptación humana. No lanzar publicación manual en Vercel como parte de este cierre.
+Siguiente paso de construcción: ninguno adicional dentro del alcance salvo defecto reproducido; no implementar análisis clínico ni ampliar consentimiento.
+Pendientes en secuencia: 1) comprobar integración Git de la entrega autorizada, o completarla si la solicitud sigue abierta sin saltar protecciones; 2) acreditar por separado versión publicada si se requiere; 3) sesión real consentida y opinión persistida correlacionadas; 4) completar conservación/estabilidad/fidelidad con alcance definido; 5) elegir primer síntoma autodeclarado antes de desarrollo sensible.
 ⚗️ En prueba / recién fallido:
-Voz física y comodidad humana: NO VERIFICADAS en la entrega de benchmark/encuesta. No hay audio adjunto ni opinión humana nueva analizada.
-Comprobación actual: marcador de versión HTTP 404; acceso /auth/signin HTTP 200. Son hechos distintos; la presencia actual del benchmark autenticado no se ha revalidado.
+491/491 pruebas unitarias, tipos/navegación/interfaz y benchmark 19/19 de navegador aprobados sobre la combinación actual; 29/29 regresiones adicionales de Custodia/PIN/arranque/dictado aprobadas. Recibo: evidencias/INTEGRACION-ENDURECIMIENTO.json.
+Voz física, comodidad humana, SQL productivo y publicación de esta revisión: NO VERIFICADOS por estas pruebas; medios Chromium y servicios controlados no sustituyen datos humanos.
 Conserva íntegros los recordatorios latentes del objeto. Reutiliza evidencia válida, no repitas pruebas sin cambio causal. Recibir una salida del constructor tiene prioridad; asistencia la contrasta y devuelve síntesis y prompt de continuidad. No afirmar recepción ni trabajo en segundo plano.
 Cada salida usa los diez campos de §10 e incluye Metacanon adquirido: versión/sello, revisión y frescura; evidencia actual/histórica/controlada diferenciada, pendientes, viabilidad, estimación con supuestos y siguiente acción. No declarar un plazo sin base.
-Persistencia: releer versión, fusionar sin pisar, escritura condicionada, guardar y verificar contenido/diff; sincronizar estado y prompts. La rama documental no equivale a main. Confirmar integración y conservar referencia histórica antes de archivar cualquier original.
+Persistencia: releer versión, fusionar sin pisar, escritura condicionada, guardar y verificar contenido/diff; sincronizar estado y prompts. El endurecimiento local no equivale a main. La documentación anterior sí se integró en #302. Confirmar nueva integración y conservar referencia histórica antes de archivar cualquier original.
 ````
 
 ### Prompt de construcción
 
 ````text
-Retoma MCP-OBS-DICTADO leyendo primero el metacanon central https://github.com/SeryMente/metodologia/blob/main/METACANON-OBJETOS-CANONICOS.md y después https://github.com/SeryMente/khora/blob/docs/canon-dictado-voz-20261016/docs/frentes/dictado-voz/OBJETO-CANONICO.md .
+Retoma MCP-OBS-DICTADO leyendo primero el metacanon central https://github.com/SeryMente/metodologia/blob/main/METACANON-OBJETOS-CANONICOS.md y después https://github.com/SeryMente/khora/blob/main/docs/frentes/dictado-voz/OBJETO-CANONICO.md .
 Adopta construcción solo si el operador te asignó explícitamente ese rol y el alcance concreto. Si falta, permanece en lectura y declara la compuerta; no te autoautorices. Remote Desktop Commander está prohibido para construcción, incluso por intermediarios.
-Fuente documental preparada: v0.2.0 · MCP-OBS-DICTADO-v0.2.0. Metacanon adquirido: v1.5 · METACANON-OBJETOS-v1.5, revisión 49ac40e9f6122e2d2fb339362cfa0a78128c8e37, blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f. Verifica ambas fuentes de nuevo, recupera las superiores pertinentes, calcula delta y no uses una firma como prueba de gobierno. Ante inaccesibilidad declara frescura NO VERIFICADA y bloquea solo la acción dependiente.
+Fuente documental local preparada: v0.4.0 · MCP-OBS-DICTADO-v0.4.0. Metacanon adquirido: v1.5 · METACANON-OBJETOS-v1.5, revisión 49ac40e9f6122e2d2fb339362cfa0a78128c8e37, blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f. Verifica ambas fuentes de nuevo, recupera las superiores pertinentes, calcula delta y no uses una firma como prueba de gobierno. Ante inaccesibilidad declara frescura NO VERIFICADA y bloquea solo la acción dependiente.
 Hereda §2–§3 y §6–§7 del objeto: autorización por acción, originales no activan permisos; remoto solo de asistencia si es estrictamente necesario, con cuenta/vínculo/equipo/autorización comprobados y comando/prerrequisitos literales de §7. No ejecutar ese comando por rutina ni en el sandbox. Usa repo/adjunto cuando basten.
 No modificar metacanon, Sistema de Instrucciones, credenciales, facturación, seguridad o publicación. No inferir ánimo/salud/capacidad laboral de la voz; no crear código de salud ni afirmar beneficio clínico. Conserva las fuentes de encuesta voluntaria y muestreada.
 🔄 Estado vivo:
-Acción actual: canonizar y revisar la continuidad documental; no ejecutar un análisis clínico ni cambiar credenciales.
-Siguiente paso de asistencia: obtener acceso de lectura funcional por MCP de Khora y acreditar la versión publicada actual; si sigue faltando la credencial normativa, solicitar únicamente esa intervención material.
-Siguiente paso de construcción: no iniciar código de salud; conservar benchmark y encuesta existentes, y atender solo un defecto reproducido o una ampliación concreta aprobada.
-Pendientes en secuencia: 1) resolver acceso normativo si persiste; 2) recuperar prueba actual de procedencia del despliegue; 3) sesión real consentida, dictado/edición/reanudación/parada; 4) opinión humana, lectura y efecto persistido correlacionados; 5) completar cobertura de conservación/estabilidad/fidelidad con alcance aprobado; 6) definir primer síntoma autodeclarado y finalidad antes de abrir desarrollo sensible.
+Acción actual: entrega técnica del endurecimiento integrada con el código vigente de Custodia y arranque, sobre main f04e815b47fa8a7b5297561df62000478f978108; verificación local de software aprobada. La instrucción actual autoriza fusión normal; el estado efectivo de integración se comprueba en la solicitud enlazada en el recibo, no por existir este archivo.
+Siguiente paso de asistencia: comprobar fusión y presencia de los hashes probados en main mediante Git; una vez presente, separar cualquier despliegue y aceptación humana. No lanzar publicación manual en Vercel como parte de este cierre.
+Siguiente paso de construcción: ninguno adicional dentro del alcance salvo defecto reproducido; no implementar análisis clínico ni ampliar consentimiento.
+Pendientes en secuencia: 1) comprobar integración Git de la entrega autorizada, o completarla si la solicitud sigue abierta sin saltar protecciones; 2) acreditar por separado versión publicada si se requiere; 3) sesión real consentida y opinión persistida correlacionadas; 4) completar conservación/estabilidad/fidelidad con alcance definido; 5) elegir primer síntoma autodeclarado antes de desarrollo sensible.
 ⚗️ En prueba / recién fallido:
-Voz física y comodidad humana: NO VERIFICADAS en la entrega de benchmark/encuesta. No hay audio adjunto ni opinión humana nueva analizada.
-Comprobación actual: marcador de versión HTTP 404; acceso /auth/signin HTTP 200. Son hechos distintos; la presencia actual del benchmark autenticado no se ha revalidado.
+491/491 pruebas unitarias, tipos/navegación/interfaz y benchmark 19/19 de navegador aprobados sobre la combinación actual; 29/29 regresiones adicionales de Custodia/PIN/arranque/dictado aprobadas. Recibo: evidencias/INTEGRACION-ENDURECIMIENTO.json.
+Voz física, comodidad humana, SQL productivo y publicación de esta revisión: NO VERIFICADOS por estas pruebas; medios Chromium y servicios controlados no sustituyen datos humanos.
 Conserva íntegros los recordatorios latentes del objeto. Reutiliza evidencia válida, no repitas pruebas sin cambio causal. Recibir una salida del constructor tiene prioridad; asistencia la contrasta y devuelve síntesis y prompt de continuidad. No afirmar recepción ni trabajo en segundo plano.
 Cada salida usa los diez campos de §10 e incluye Metacanon adquirido: versión/sello, revisión y frescura; evidencia actual/histórica/controlada diferenciada, pendientes, viabilidad, estimación con supuestos y siguiente acción. No declarar un plazo sin base.
-Persistencia: releer versión, fusionar sin pisar, escritura condicionada, guardar y verificar contenido/diff; sincronizar estado y prompts. La rama documental no equivale a main. Confirmar integración y conservar referencia histórica antes de archivar cualquier original.
+Persistencia: releer versión, fusionar sin pisar, escritura condicionada, guardar y verificar contenido/diff; sincronizar estado y prompts. El endurecimiento local no equivale a main. La documentación anterior sí se integró en #302. Confirmar nueva integración y conservar referencia histórica antes de archivar cualquier original.
 ````
 
 ## 13. Persistencia y revisión
 
-- Autorización de esta migración: V010. Carpeta y custodia dentro del propietario del frente; originales privados nunca al método central.
+- Autorización de la migración original: V010. Reconstrucción actual: solicitud directa conservada en C015. Carpeta y custodia dentro del propietario del frente; originales privados nunca al método central.
 - Rama de preparación: `docs/canon-dictado-voz-20261016` desde `1697ee2693ed3217523ffc1d1be9b6541d7d849d`; fuente previa contrastada antes de escribir. Si main cambia, comparar el archivo pertinente; preservar ambos deltas o parar solo la escritura en conflicto.
 - Original histórico conservado íntegro al final de este objeto, SHA-256 `2cd79db40b1786521df63f1b87d80d595c2df9a48bb202bf93a40ff16cce1810`; no se borran decisiones ni se reactivan permisos. Contrato anterior y adjunto tienen hashes independientes en el manifiesto.
 - Pasada 1: cotejar V000–V010 → D01–D07/aceptación, trece bloques ordenados, originales/historia conservados, privacidad, referencias y estado literal en ambos prompts. Corregir antes de escribir.

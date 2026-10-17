@@ -8,7 +8,7 @@ export const usageSchema = z.object({
   result_to_paint_ms: z.array(ms).max(100), final_results: count, reconnects: count,
   protected_checks: count, protected_changes: count, visual_jumps: count.nullable(),
   fidelity_error_rate: z.number().min(0).max(1).nullable(), ended: z.boolean(),
-}).strict();
+}).strict().refine(m => m.protected_changes <= m.protected_checks, "Las alteraciones no pueden superar las comprobaciones.");
 export type Usage = z.infer<typeof usageSchema>;
 export const recordSchema = z.object({
   id: z.string().uuid(), sessionId: z.string().uuid(), functionId: z.literal("dictado"),
@@ -21,8 +21,25 @@ export const recordSchema = z.object({
   ]),
 }).strict();
 export type ExperienceRecord = z.infer<typeof recordSchema>;
-export type SamplingState = { day: string; count: number; last: number };
+export const settingsSchema = z.object({
+  enabled: z.boolean(),
+  sampling: z.object({
+    day: z.string().regex(/^(?:|\d{4}-\d{2}-\d{2})$/),
+    count: z.number().int().min(0).max(POLICY.dailyCap),
+    last: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER),
+  }).strict(),
+}).strict();
+export type Settings = z.infer<typeof settingsSchema>;
+export type SamplingState = Settings["sampling"];
+export function readSettings(value: unknown): Settings {
+  const parsed = settingsSchema.safeParse(value);
+  return parsed.success ? parsed.data : { enabled: false, sampling: { day: "", count: 0, last: 0 } };
+}
 export function sampleSession(durationMs: number, state: SamplingState, now: number, day: string, random: number) {
+  if (!Number.isFinite(durationMs) || durationMs < 0 || !Number.isSafeInteger(now) || now < 0 ||
+      !Number.isFinite(random) || random < 0 || random >= 1 ||
+      !settingsSchema.shape.sampling.safeParse(state).success || !/^\d{4}-\d{2}-\d{2}$/.test(day))
+    return { outcome: "ineligible" as const, probability: 0 };
   if (durationMs < POLICY.minMs) return { outcome: "ineligible" as const, probability: 0 };
   if ((state.day === day && state.count >= POLICY.dailyCap) || (state.last > 0 && now - state.last < POLICY.cooldownMs)) return { outcome: "capped" as const, probability: 0 };
   return { outcome: random >= 0 && random < POLICY.probability ? "selected" as const : "not_selected" as const, probability: POLICY.probability };
@@ -33,8 +50,26 @@ export function quantile(values: number[], q: number): number | null {
   if (!values.length) return null;
   const a = [...values].sort((x, y) => x - y); return a[Math.min(a.length - 1, Math.max(0, Math.ceil(q * a.length) - 1))];
 }
-export function summarize(records: ExperienceRecord[]) {
-  const sessions = records.filter(r => r.data.kind === "session");
+export function summarize(input: ExperienceRecord[]) {
+  // Do not silently inflate a denominator on retry, or choose a winner for conflicting IDs.
+  const byId = new Map<string, ExperienceRecord>(); const conflicts = new Set<string>();
+  let invalidRecords = 0, duplicateRecords = 0;
+  for (const value of input) {
+    const { savedAt: _savedAt, ...payload } = value as ExperienceRecord & { savedAt?: string };
+    const parsed = recordSchema.safeParse(payload);
+    if (!parsed.success) { invalidRecords++; continue; }
+    const r = parsed.data, old = byId.get(r.id);
+    if (old) { duplicateRecords++; if (JSON.stringify(old) !== JSON.stringify(r)) conflicts.add(r.id); }
+    else byId.set(r.id, r);
+  }
+  const records = [...byId.values()].filter(r => !conflicts.has(r.id));
+  const sessionMap = new Map<string, ExperienceRecord>(); const sessionConflicts = new Set<string>();
+  for (const r of records.filter(r => r.data.kind === "session")) {
+    const old = sessionMap.get(r.sessionId);
+    if (old && JSON.stringify(old.data) !== JSON.stringify(r.data)) sessionConflicts.add(r.sessionId);
+    else sessionMap.set(r.sessionId, r);
+  }
+  const sessions = [...sessionMap.values()].filter(r => !sessionConflicts.has(r.sessionId));
   const ended = sessions.flatMap(r => r.data.kind === "session" && r.data.metrics.ended ? [r.data.metrics] : []);
   const feedback = records.flatMap(r => r.data.kind === "feedback" ? [r.data] : []);
   const bySource = (source: "sampled" | "voluntary") => feedback.filter(f => f.source === source);
@@ -46,9 +81,9 @@ export function summarize(records: ExperienceRecord[]) {
     commentOnly: bySource(source).filter(f => f.rating === null).length,
   });
   const paints = ended.flatMap(s => s.result_to_paint_ms);
-  return { sessions: sessions.length, ended: ended.length,
+  return { invalidRecords, duplicateRecords, conflictingRecords: conflicts.size, conflictingSessions: sessionConflicts.size, sessions: sessions.length, ended: ended.length,
     protectedChecks: ended.reduce((n, s) => n + s.protected_checks, 0), protectedChanges: ended.reduce((n, s) => n + s.protected_changes, 0),
     paintSamples: paints.length, paintP50: quantile(paints, .5), paintP95: quantile(paints, .95),
-    shown: records.filter(r => r.data.kind === "invitation" && r.data.outcome === "shown").length,
+    shown: new Set(records.filter(r => r.data.kind === "invitation" && r.data.outcome === "shown").map(r => r.sessionId)).size,
     sampled: responses("sampled"), voluntary: responses("voluntary") };
 }

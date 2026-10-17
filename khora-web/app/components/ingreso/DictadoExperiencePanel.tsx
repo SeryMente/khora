@@ -1,11 +1,11 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { POLICY, sampleSession, normalizedPrefix, preservesPrefix, type Usage, type ExperienceRecord, type SamplingState, summarize } from "../../../lib/contracts/dictado-experience";
+import { POLICY, sampleSession, normalizedPrefix, preservesPrefix, type Usage, type ExperienceRecord, type Settings, readSettings, summarize } from "../../../lib/contracts/dictado-experience";
+import { ExperienceDelivery } from "../../../lib/client/dictado-experience-delivery";
 import benchmark from "../../../lib/generated/dictado-benchmark.json";
 
 const button = "px-3 py-2 border text-sm focus-visible:outline focus-visible:outline-2 disabled:opacity-40";
 const initialUsage = (): Usage => ({ duration_ms: 0, first_result_ms: null, resume_ready_ms: null, result_to_paint_ms: [], final_results: 0, reconnects: 0, protected_checks: 0, protected_changes: 0, visual_jumps: null, fidelity_error_rate: null, ended: false });
-type Settings = { enabled: boolean; sampling: SamplingState };
 const initialSettings = (): Settings => ({ enabled: false, sampling: { day: "", count: 0, last: 0 } });
 type Report = { records: ExperienceRecord[]; summary: ReturnType<typeof summarize>; profileKey: string; truncated: boolean; retentionDays: number };
 export function DictadoExperiencePanel({ busy, texto }: { busy: boolean; texto: string }) {
@@ -24,48 +24,66 @@ export function DictadoExperiencePanel({ busy, texto }: { busy: boolean; texto: 
   const refs = useRef({ busy, texto, settings, profile: "", release: null as string | null });
   refs.current.busy = busy; refs.current.texto = texto; refs.current.settings = settings;
   const meter = useRef({ session: "", start: 0, resume: 0, prefix: "", usage: initialUsage() });
-  const pending = useRef<ExperienceRecord[]>([]);
+  const delivery = useRef<ExperienceDelivery | null>(null);
+  const loadSequence = useRef(0);
+  const mounted = useRef(true);
+  const stoppedSessions = useRef(new Set<string>());
   const feedbackId = useRef<string | null>(null);
   const formSession = useRef<string>("");
+  const send = async (item: ExperienceRecord, owner: string) => {
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 15_000);
+    try {
+      const r = await fetch("/api/dictado-experience", { method: "POST", signal: controller.signal,
+        headers: { "Content-Type": "application/json", "X-Khora-Experience-Profile": owner }, body: JSON.stringify(item) });
+      const d = await r.json();
+      if (!r.ok || !d.ok || d.id !== item.id) throw new Error(d.error || "No se pudo confirmar el envío.");
+    } finally { window.clearTimeout(timeout); }
+  };
+  if (!delivery.current) delivery.current = new ExperienceDelivery(send, () => !refs.current.busy, () => refs.current.profile);
+  const enqueue = (item: ExperienceRecord) => {
+    if (!delivery.current!.enqueue(item)) setStatus("Se alcanzó el límite de mediciones pendientes; no se han dado por guardadas.");
+  };
   const storageKey = (profile: string) => "khora:experience:v1:" + profile;
   const load = async () => {
+    const sequence = ++loadSequence.current;
     try {
       const r = await fetch("/api/dictado-experience", { cache: "no-store" });
       const d = await r.json();
+      if (!mounted.current || sequence !== loadSequence.current) return false;
       if (r.status === 401) {
-        refs.current.profile = ""; pending.current = []; setReport(null); setComment(""); setForm(null); setSurvey(null); feedbackId.current = null;
+        refs.current.profile = ""; delivery.current!.reset(); setReport(null); setComment(""); setForm(null); setSurvey(null); setRating(""); setReason(""); feedbackId.current = null; stoppedSessions.current.clear();
         const off = initialSettings(); refs.current.settings = off; setSettings(off);
         meter.current = { session: "", start: 0, resume: 0, prefix: "", usage: initialUsage() };
       }
       if (!r.ok) throw new Error(d.error || "Lectura no disponible.");
+      if (typeof d.profileKey !== "string" || !d.profileKey || !Array.isArray(d.records)) throw new Error("Respuesta de mediciones no válida.");
       if (refs.current.profile !== d.profileKey) {
-        refs.current.profile = d.profileKey; pending.current = []; setComment(""); setForm(null); setSurvey(null); feedbackId.current = null;
+        refs.current.profile = d.profileKey; delivery.current!.reset(); setComment(""); setForm(null); setSurvey(null); setRating(""); setReason(""); feedbackId.current = null; stoppedSessions.current.clear();
         meter.current = { session: "", start: 0, resume: 0, prefix: "", usage: initialUsage() };
         const off = initialSettings(); refs.current.settings = off; setSettings(off);
-        try { const s = JSON.parse(localStorage.getItem(storageKey(d.profileKey)) || "null"); if (s && typeof s.enabled === "boolean" && s.sampling) { setSettings(s); refs.current.settings = s; } } catch {}
+        try { const s = JSON.parse(localStorage.getItem(storageKey(d.profileKey)) || "null"); const valid = readSettings(s); setSettings(valid); refs.current.settings = valid; } catch {}
       }
       setReport(d); return true;
-    } catch (e) { setStatus(e instanceof Error ? e.message : "No se pudieron leer las mediciones."); return false; }
+    } catch (e) { if (mounted.current && sequence === loadSequence.current) setStatus(e instanceof Error ? e.message : "No se pudieron leer las mediciones."); return false; }
   };
-  const remember = (next: Settings) => {
-    setSettings(next); refs.current.settings = next;
+  const remember = (value: Settings) => {
+    let next = readSettings(value);
     try { if (refs.current.profile) localStorage.setItem(storageKey(refs.current.profile), JSON.stringify(next)); }
-    catch { setStatus("No se pudo conservar la preferencia. Las encuestas automáticas quedan desactivadas."); next.enabled = false; }
+    catch { next = { ...next, enabled: false }; setStatus("No se pudo conservar la preferencia. Las encuestas automáticas quedan desactivadas."); }
+    refs.current.settings = next; setSettings(next);
+    if (!next.enabled) { delivery.current!.reset(); meter.current.usage.ended = true; setSurvey(null); }
+    return next.enabled;
   };
   const record = (sessionId: string, data: ExperienceRecord["data"]): ExperienceRecord => ({ id: crypto.randomUUID(), sessionId, functionId: "dictado", clientRelease: refs.current.release, policyVersion: POLICY.version, data });
-  const send = async (item: ExperienceRecord) => {
-    const r = await fetch("/api/dictado-experience", { method: "POST", headers: { "Content-Type": "application/json", "X-Khora-Experience-Profile": refs.current.profile }, body: JSON.stringify(item) });
-    const d = await r.json(); if (!r.ok || !d.ok || d.id !== item.id) throw new Error(d.error || "No se pudo confirmar el envío.");
-  };
   const flush = async () => {
-    if (refs.current.busy || !refs.current.profile) return;
-    while (pending.current.length) {
-      const item = pending.current[0];
-      try { await send(item); pending.current = pending.current.filter(x => x.id !== item.id); }
-      catch { setStatus("Hay mediciones pendientes; no se han dado por guardadas. Puedes reintentar aquí."); return; }
-    }
+    const owner = refs.current.profile;
+    const ok = await delivery.current!.flush();
+    if (!ok && mounted.current && owner === refs.current.profile) setStatus("Hay mediciones pendientes; no se han dado por guardadas. Puedes reintentar aquí.");
+    return ok;
   };
   useEffect(() => {
+    mounted.current = true;
     void load();
     void fetch("/ep-main-live.json", { cache: "no-store" }).then(r => r.json()).then(d => {
       if (/^[a-f0-9]{40}$/.test(d.commitSha || "")) refs.current.release = d.commitSha;
@@ -73,10 +91,13 @@ export function DictadoExperiencePanel({ busy, texto }: { busy: boolean; texto: 
     // Metadata-only event bus. The transcript never enters a network/telemetry payload.
     const listener = (event: Event) => {
       if (!refs.current.settings.enabled || !refs.current.profile) return;
-      const { sessionId, eventName, options } = (event as CustomEvent).detail;
-      if (!/^[a-f0-9-]{36}$/i.test(sessionId)) return;
+      const detail = (event as CustomEvent).detail;
+      if (!detail || typeof detail !== "object") return;
+      const { sessionId, eventName } = detail;
+      if (typeof sessionId !== "string" || !/^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(sessionId) || stoppedSessions.current.has(sessionId)) return;
       const now = performance.now();
-      if (eventName === "DICTADO_INICIO_SOLICITADO" || meter.current.session !== sessionId) meter.current = { session: sessionId, start: now, resume: 0, prefix: "", usage: initialUsage() };
+      if (eventName === "DICTADO_INICIO_SOLICITADO" && meter.current.session !== sessionId) meter.current = { session: sessionId, start: now, resume: 0, prefix: "", usage: initialUsage() };
+      if (meter.current.session !== sessionId || meter.current.usage.ended) return;
       const m = meter.current;
       if (eventName === "EDICION_IN_SITU_CIERRE_INICIADO") m.resume = now;
       if (eventName === "RECONOCEDOR_INICIADO" && m.resume) { m.usage.resume_ready_ms = Math.max(0, now - m.resume); m.resume = 0; }
@@ -92,18 +113,32 @@ export function DictadoExperiencePanel({ busy, texto }: { busy: boolean; texto: 
         }));
       }
       if (eventName === "DICTADO_DETENIDO" && !m.usage.ended) {
+        stoppedSessions.current.add(sessionId);
+        if (stoppedSessions.current.size > 512) stoppedSessions.current.delete(stoppedSessions.current.values().next().value!);
         m.usage.duration_ms = Math.max(0, now - m.start); m.usage.ended = true;
-        pending.current.push(record(sessionId, { kind: "session", metrics: { ...m.usage, result_to_paint_ms: [...m.usage.result_to_paint_ms] } }));
+        enqueue(record(sessionId, { kind: "session", metrics: { ...m.usage, result_to_paint_ms: [...m.usage.result_to_paint_ms] } }));
         const time = Date.now(); const day = new Date(time).toLocaleDateString("en-CA");
         const random = crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296;
         const choice = sampleSession(m.usage.duration_ms, refs.current.settings.sampling, time, day, random);
-        pending.current.push(record(sessionId, { kind: "invitation", ...choice }));
+        enqueue(record(sessionId, { kind: "invitation", ...choice }));
         if (choice.outcome === "selected") setSurvey(sessionId);
       }
-      void options; // Reserved metadata; no user content accepted.
+
     };
     window.addEventListener("khora:dictado:observation", listener);
-    return () => window.removeEventListener("khora:dictado:observation", listener);
+    const retry = () => { if (!refs.current.busy) void flush(); };
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === storageKey(refs.current.profile)) {
+        let value: unknown = null; try { value = JSON.parse(e.newValue || "null"); } catch {}
+        const next = readSettings(value); refs.current.settings = next; setSettings(next);
+        if (!next.enabled) { delivery.current!.reset(); meter.current.usage.ended = true; setSurvey(null); }
+      }
+    };
+    const timer = window.setInterval(retry, 30_000);
+    window.addEventListener("online", retry); window.addEventListener("storage", onStorage);
+    return () => { mounted.current = false; ++loadSequence.current; delivery.current!.reset();
+      window.removeEventListener("khora:dictado:observation", listener);
+      window.removeEventListener("online", retry); window.removeEventListener("storage", onStorage); window.clearInterval(timer); };
     // Deliberately mount once: transcript and settings are read from refs, not retained in payloads.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -113,9 +148,9 @@ export function DictadoExperiencePanel({ busy, texto }: { busy: boolean; texto: 
     if (survey && settings.enabled && !form) {
       const time = Date.now(); const day = new Date(time).toLocaleDateString("en-CA");
       const s = settings.sampling;
-      remember({ ...settings, sampling: { day, count: (s.day === day ? s.count : 0) + 1, last: time } });
+      if (!remember({ ...settings, sampling: { day, count: (s.day === day ? s.count : 0) + 1, last: time } })) return;
       formSession.current = survey; feedbackId.current = null; setRating(""); setReason(""); setComment(""); setForm("sampled"); setSurvey(null);
-      pending.current.push(record(survey, { kind: "invitation", outcome: "shown", probability: POLICY.probability }));
+      enqueue(record(survey, { kind: "invitation", outcome: "shown", probability: POLICY.probability }));
       void flush();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -129,8 +164,9 @@ export function DictadoExperiencePanel({ busy, texto }: { busy: boolean; texto: 
     setSending(true); setStatus("");
     const item = record(formSession.current, { kind: "feedback", source: form, rating: rating || null, reason: reason || null, comment: comment.trim() });
     item.id = feedbackId.current || (feedbackId.current = item.id);
-    try { await send(item); setForm(null); setComment(""); feedbackId.current = null; setStatus("Opinión guardada."); await load(); }
-    catch (e) { setStatus(e instanceof Error ? e.message : "No se guardó la opinión. Reintenta sin cerrar esta pantalla."); }
+    const owner = refs.current.profile;
+    try { await send(item, owner); if (!mounted.current || owner !== refs.current.profile) return; setForm(null); setComment(""); feedbackId.current = null; setStatus("Opinión guardada."); await load(); }
+    catch (e) { if (mounted.current && owner === refs.current.profile) setStatus(e instanceof Error ? e.message : "No se guardó la opinión. Reintenta sin cerrar esta pantalla."); }
     finally { setSending(false); }
   };
   const invalidateId = () => { feedbackId.current = null; };
@@ -140,7 +176,13 @@ export function DictadoExperiencePanel({ busy, texto }: { busy: boolean; texto: 
   };
   const remove = async () => {
     if (busy || sending) return; setSending(true);
-    try { const r = await fetch("/api/dictado-experience", { method: "DELETE", headers: { "X-Khora-Experience-Profile": refs.current.profile } }); if (!r.ok) throw new Error(); pending.current = []; remember({ enabled: false, sampling: { day: "", count: 0, last: 0 } }); setForm(null); setComment(""); setSurvey(null); setConfirmDelete(false); await load(); setStatus("Tus mediciones y opiniones se borraron; la recopilación queda desactivada."); }
+    const owner = refs.current.profile;
+    // Stop collection first, then await the previous POST before issuing DELETE.
+    remember({ ...refs.current.settings, enabled: false });
+    try { if (!await delivery.current!.flush()) throw new Error();
+      if (owner !== refs.current.profile) throw new Error();
+      const r = await fetch("/api/dictado-experience", { method: "DELETE", headers: { "X-Khora-Experience-Profile": owner } });
+      const d = await r.json(); if (!r.ok || !d.ok || owner !== refs.current.profile) throw new Error(); delivery.current!.reset(); remember({ enabled: false, sampling: { day: "", count: 0, last: 0 } }); setForm(null); setComment(""); setSurvey(null); setConfirmDelete(false); await load(); setStatus("Tus mediciones y opiniones se borraron; la recopilación queda desactivada."); }
     catch { setStatus("No se pudo confirmar el borrado."); } finally { setSending(false); }
   };
   const filtered = report?.records.filter(r => releaseFilter === "all" || (r.clientRelease || "unattributed") === releaseFilter) || [];
@@ -163,10 +205,11 @@ export function DictadoExperiencePanel({ busy, texto }: { busy: boolean; texto: 
       </label>
       <p className="text-xs">Puedes enviar solo el comentario. Se guarda cifrado y de forma privada, separado de los eventos técnicos. No incluyas contraseñas ni información que no quieras guardar. El borrador permanece solo en esta pantalla hasta enviarlo.</p>
       <div className="flex gap-2"><button type="submit" className={button} disabled={sending || (!rating && !comment.trim())}>{sending ? "Guardando…" : "Enviar opinión"}</button>
-        <button type="button" className={button} disabled={sending} onClick={() => { if (form === "sampled") pending.current.push(record(formSession.current, { kind: "invitation", outcome: "dismissed", probability: POLICY.probability })); setForm(null); setComment(""); void flush(); }}>Omitir</button></div>
+        <button type="button" className={button} disabled={sending} onClick={() => { if (form === "sampled") enqueue(record(formSession.current, { kind: "invitation", outcome: "dismissed", probability: POLICY.probability })); setForm(null); setComment(""); void flush(); }}>Omitir</button></div>
     </form>}
     {open && <div className="border p-4 space-y-3">
       <h2 className="font-semibold">Benchmark reproducible más reciente</h2>
+      <p className="text-sm">Estado de la última ejecución: {benchmark.status}.</p>
       <p className="text-sm">{benchmark.status === "not_run" ? "Sin ejecución acreditada para esta actualización." : `Ejecutado: ${benchmark.testedAt}. Versión probada: ${benchmark.sourceSha}.`}</p>
       <ul className="text-sm">{benchmark.checks.map((c: { name: string; status: string }) => <li key={c.name}>{c.name}: {c.status}</li>)}</ul>
       <p className="text-xs">La versión probada se muestra por separado de la publicada. Un benchmark controlado no acredita voz real, comodidad ni almacenamiento productivo.</p>
