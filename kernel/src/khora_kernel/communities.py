@@ -3,6 +3,7 @@ import hashlib
 import json
 import logging
 import os
+from importlib.metadata import version as package_version
 from pathlib import Path
 from typing import Dict, List
 
@@ -94,7 +95,7 @@ def _semantic_projection(memoria_grafo) -> tuple[nx.Graph, dict]:
 def _manifest(G: nx.Graph) -> dict:
     nodes = sorted(str(n) for n in G.nodes())
     edges = sorted(
-        (str(a), str(b), float(d.get("weight", 1.0)))
+        (*sorted((str(a), str(b))), float(d.get("weight", 1.0)))
         for a, b, d in G.edges(data=True)
     )
     canonical = {
@@ -238,7 +239,7 @@ def _recalcular_leiden_canonico(io_id: str, memoria_grafo, ts: str) -> dict:
         "run_timestamp": ts,
         "algorithm": {
             "implementation": "leidenalg",
-            "version": getattr(leidenalg, "__version__", "unknown"),
+            "version": package_version("leidenalg"),
             "objective": "modularity_Q",
             "resolution": "not_used_for_ModularityVertexPartition",
             "gamma_recorded": KHORA_LEIDEN_GAMMA,
