@@ -395,3 +395,10 @@ El registro canónico de errores de Notion no pudo actualizarse porque su ancest
 Nada de este apartado registra secretos, audio ni texto personal. No eliminar evidencia ni relajar aserciones para borrar un fallo del informe.
 
 Corte funcional probado y publicado: `9935d56f8458dd40035d1a757c7cc752679064f6`. La solicitud #301 se releyó abierta y no fusionada; la huella del objeto documental remoto coincidió con Git local. Esta última anotación es solo documental. No activa trabajo, migra ni despliega.
+
+
+## 24. Integracion excepcional autorizada (2026-10-16)
+
+El operador autorizo expresamente integrar la propuesta #301 en main con las brechas conocidas y sin acreditar revision presencial de interfaz/seguridad. Esta excepcion de integracion no autoriza despliegue ni activacion del ejecutor y no acredita certificacion productiva ni preservacion universal. Las compuertas tecnicas de las secciones 21 y 22 siguen abiertas; no se eliminan ni se consideran aprobadas por la fusion.
+
+Base main incorporada: c9147557c42b07960e44f0b29b56ab6d9b6a8259 (incluye #302). Conflicto exclusivo en README.md resuelto conservando el enlace vigente al objeto canonico del frente dictado-voz y la entrada de custodia; se conservan los cambios de ambas ramas. Revalidacion ejecutada sobre esta combinacion en copia aislada: npm ci correcto; typecheck correcto; 474 pruebas unitarias aprobadas, cero fallos, canceladas u omitidas; contrato de navegacion y catalogo UI Review correctos; npm run build correcto, incluidos sus preflights. AUTH_SECRET efimero para compilar. No se utilizaron dictados reales, no se ejecutaron migraciones productivas ni se activo el ejecutor. Esta evidencia no certifica produccion.

@@ -1,0 +1,141 @@
+{
+  "schema": "canonical-front-custody/v1",
+  "classification": "private",
+  "canonical_object": "OBJETO-CANONICO.md",
+  "state_sources": 1,
+  "method": {
+    "repo": "SeryMente/metodologia",
+    "path": "METACANON-OBJETOS-CANONICOS.md",
+    "commit": "49ac40e9f6122e2d2fb339362cfa0a78128c8e37",
+    "blob": "32c7a65ff2e83b3b76752ba2160427bd6e851a8f",
+    "sha256": "1db7a16892310c505ec3002e9439e35c11a13b2e5e36dee2829efeda201e042c",
+    "version": "1.5"
+  },
+  "original_source": {
+    "repo": "SeryMente/khora",
+    "commit": "1697ee2693ed3217523ffc1d1be9b6541d7d849d",
+    "path": "docs/SPRINT-MCP-OBSERVABILIDAD-DICTADO.md",
+    "blob": "e98a956c375ce48b791b5f0563ad0ae03c2616dd",
+    "sha256": "2cd79db40b1786521df63f1b87d80d595c2df9a48bb202bf93a40ff16cce1810",
+    "custody": "embedded verbatim in canonical object annex A"
+  },
+  "original_contract": {
+    "repo": "SeryMente/khora",
+    "commit": "1697ee2693ed3217523ffc1d1be9b6541d7d849d",
+    "path": "khora-web/docs/dictado-experience.md",
+    "blob": "2f4dcbed839168e04a32a0dcdd343acbc02f32ec",
+    "sha256": "451f0fa5d4ab51a121297ad6667bbfab76cc7c2467e283bad3b26d740b444255",
+    "transformation": "continuity link and custody banner only"
+  },
+  "files": [
+    {
+      "path": "OBJETO-CANONICO.md",
+      "bytes": 126566,
+      "sha256": "4665794e4c7ca1f499082e954a0338d6d1df3110c19c6b6c96055cac0a2f2cd3",
+      "git_blob_sha": "5631d3053f68afdc42f5a2d1a1b7bced13aa9a97"
+    },
+    {
+      "path": "CONTRATO-DICTADO-EXPERIENCE.md",
+      "bytes": 16225,
+      "sha256": "b9197c71d12b4b4ceb13aa4f800c5ab4d5e08607259ef97aa6ae8a3b95ad5cac",
+      "git_blob_sha": "df2bd59cc7c1d88c93ea59b4fac725fe37edd14d"
+    },
+    {
+      "path": "originales/ESPECIFICACIONES-ORIGINALES.md",
+      "bytes": 5400,
+      "sha256": "44c187f078732633b752e4f307570d89260a88bddd7b2084b098b8f53ef73c87",
+      "git_blob_sha": "a6fb381edd7e16810b873aeab2fb83ccd5bb64ce"
+    },
+    {
+      "path": "originales/conversacion-recibida.txt",
+      "bytes": 42686,
+      "sha256": "9eeef45f66d432b109ad4dbf04b2295bbfa990f08327c1fe7127e8a1c204abe5",
+      "git_blob_sha": "5980b55775120437bcad6731c0ed043f1e192aee"
+    },
+    {
+      "path": "evidencias/CIERRE-Y-CHECKPOINT.json",
+      "bytes": 2224,
+      "sha256": "625005c58849afdedf5ee27fecd0fb9dd27e9bd3b7bbe2cdee900221bb10cdd3",
+      "git_blob_sha": "0c290f87db121db88b5594ca897d322652d6a207"
+    },
+    {
+      "path": "evidencias/benchmark-20261016.json",
+      "bytes": 896,
+      "sha256": "6ee317e2d1e688acd3e0587bd8a4e596ad47f3e1f848d473f19b350f31f286f9",
+      "git_blob_sha": "b7d9a8dde443b99e18a83011cfc3c39d8df7898a"
+    }
+  ],
+  "runtime_references": [
+    {
+      "path": "khora-web/app/components/ingreso/IngresoWorkspace.tsx",
+      "commit": "1697ee2693ed3217523ffc1d1be9b6541d7d849d",
+      "custody": "kept in integration path, no parallel implementation"
+    },
+    {
+      "path": "khora-web/app/components/ingreso/DictadoExperiencePanel.tsx",
+      "commit": "1697ee2693ed3217523ffc1d1be9b6541d7d849d",
+      "custody": "kept in integration path, no parallel implementation"
+    },
+    {
+      "path": "khora-web/lib/contracts/dictado-experience.ts",
+      "commit": "1697ee2693ed3217523ffc1d1be9b6541d7d849d",
+      "custody": "kept in integration path, no parallel implementation"
+    },
+    {
+      "path": "khora-web/lib/server/dictado-experience.ts",
+      "commit": "1697ee2693ed3217523ffc1d1be9b6541d7d849d",
+      "custody": "kept in integration path, no parallel implementation"
+    },
+    {
+      "path": "khora-web/app/api/dictado-experience/route.ts",
+      "commit": "1697ee2693ed3217523ffc1d1be9b6541d7d849d",
+      "custody": "kept in integration path, no parallel implementation"
+    },
+    {
+      "path": "khora-web/scripts/benchmark-dictado.mjs",
+      "commit": "1697ee2693ed3217523ffc1d1be9b6541d7d849d",
+      "custody": "kept in integration path, no parallel implementation"
+    },
+    {
+      "path": "khora-web/lib/generated/dictado-benchmark.json",
+      "commit": "1697ee2693ed3217523ffc1d1be9b6541d7d849d",
+      "custody": "kept in integration path, no parallel implementation"
+    },
+    {
+      "path": "khora-web/e2e/dictado-experience.spec.ts",
+      "commit": "1697ee2693ed3217523ffc1d1be9b6541d7d849d",
+      "custody": "kept in integration path, no parallel implementation"
+    },
+    {
+      "path": "khora-web/tests/unit/dictado_experience.test.ts",
+      "commit": "1697ee2693ed3217523ffc1d1be9b6541d7d849d",
+      "custody": "kept in integration path, no parallel implementation"
+    },
+    {
+      "path": "khora-web/lib/server/normative-github.ts",
+      "commit": "1697ee2693ed3217523ffc1d1be9b6541d7d849d",
+      "custody": "kept in integration path, no parallel implementation"
+    },
+    {
+      "path": "khora-web/lib/server/github-credentials.ts",
+      "commit": "1697ee2693ed3217523ffc1d1be9b6541d7d849d",
+      "custody": "kept in integration path, no parallel implementation"
+    }
+  ],
+  "self_hash_excluded": true,
+  "unrecovered_or_not_generated": [
+    "complete native event export of current Notion chat",
+    "new physical microphone session and private user feedback",
+    "current authenticated benchmark screen",
+    "current published source SHA",
+    "clinical reference data and any voice-health model"
+  ],
+  "privacy_review": {
+    "destination_private_verified_by_tool": true,
+    "original_attachment_bytes": 42686,
+    "credential_signature_scan": "no token/JWT/private-key/credential-URI signatures found; not an absolute guarantee",
+    "no_credentials_or_raw_new_user_audio_intentionally_included": true,
+    "operator_authorization": "V010",
+    "no_secret_values_in_manifest": true
+  }
+}
