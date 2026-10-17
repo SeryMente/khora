@@ -1,3 +1,4 @@
+import { poseeVolcado } from "@/lib/server/custodia-acceso";
 // @l0 L0-002-R · @req REVISION/REQ-1
 import { NextResponse } from "next/server";
 import { auth } from "../../../../auth";
@@ -23,6 +24,9 @@ export async function GET(
 
   try {
     const { id } = await ctx.params;
+    const custodio=(await auth())?.user?.email;
+    if(!custodio)return NextResponse.json({error:"no_autenticado"},{status:401});
+    if(!await poseeVolcado(custodio,id))return NextResponse.json({error:"no_encontrado"},{status:404});
 
     await asegurarEsquema();
 
@@ -193,6 +197,9 @@ export async function POST(
 
   try {
     const { id } = await ctx.params;
+    const custodio=(await auth())?.user?.email;
+    if(!custodio)return NextResponse.json({error:"no_autenticado"},{status:401});
+    if(!await poseeVolcado(custodio,id))return NextResponse.json({error:"no_encontrado"},{status:404});
 
     const body = await req.json();
 

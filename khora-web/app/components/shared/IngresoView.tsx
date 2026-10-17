@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import * as Icons from "lucide-react";
 
 export type IngresoViewState = {
+  archivado?: boolean;
   titulo: string;
   texto: string;
   estado: "inactivo" | "dictando";
@@ -45,6 +46,7 @@ export type IngresoViewActions = {
   onRetranscribir?: () => void;
   onAdjuntarClick?: () => void;
   onExportarAudio?: () => void;
+  onExportarMp3?: () => void;
   onLimpiar?: () => void;
   onConfirmarEdicion?: () => void;
 };
@@ -59,6 +61,7 @@ export function IngresoView({
   isReviewMode?: boolean;
 }) {
   const {
+    archivado = false,
     titulo,
     texto,
     estado,
@@ -121,6 +124,7 @@ export function IngresoView({
           <input
             data-ui-id="ingreso.titulo-input"
             value={titulo}
+            readOnly={guardando || archivado}
             onChange={(e) => actions.onTituloChange?.(e.target.value)}
             placeholder="Título opcional (escribe o genera con IA)"
             className="flex-1 p-2.5 border rounded-none text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)] focus-visible:border-[var(--khora-accent)]"
@@ -133,7 +137,7 @@ export function IngresoView({
           <button
             data-ui-id="ingreso.btn-titulo-ia"
             onClick={() => actions.onGenerarTitulo?.()}
-            disabled={generandoTitulo || !texto.trim()}
+            disabled={guardando || archivado || generandoTitulo || !texto.trim()}
             className="px-3 py-2.5 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)] text-xs"
             style={{
               backgroundColor: "var(--khora-surface)",
@@ -152,7 +156,7 @@ export function IngresoView({
               <button
                 data-ui-id="ingreso.btn-iniciar"
                 onClick={() => actions.onIniciar?.()}
-                disabled={!soportado || editando || adjuntandoAudio || retranscribiendo}
+                disabled={guardando || archivado || editando || adjuntandoAudio || retranscribiendo}
                 className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
                 style={{
                   backgroundColor: "var(--khora-accent)",
@@ -166,7 +170,7 @@ export function IngresoView({
               <button
                 data-ui-id="ingreso.btn-chrome"
                 onClick={() => actions.onPrepararChrome?.()}
-                disabled={editando || adjuntandoAudio || retranscribiendo}
+                disabled={guardando || archivado || editando || adjuntandoAudio || retranscribiendo}
                 className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
                 style={{
                   backgroundColor: "var(--khora-surface)",
@@ -197,7 +201,7 @@ export function IngresoView({
           <button
             data-ui-id="ingreso.btn-archivar"
             onClick={() => actions.onGuardar?.()}
-            disabled={guardando || estado === "dictando" || editando || adjuntandoAudio || retranscribiendo}
+            disabled={guardando || archivado || guardando || estado === "dictando" || editando || adjuntandoAudio || retranscribiendo}
             className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
             style={{
               backgroundColor: "var(--khora-surface)",
@@ -212,7 +216,7 @@ export function IngresoView({
           <button
             data-ui-id="ingreso.btn-retranscribir"
             onClick={() => actions.onRetranscribir?.()}
-            disabled={retranscribiendo || adjuntandoAudio || estado !== "inactivo"}
+            disabled={guardando || archivado || retranscribiendo || adjuntandoAudio || estado !== "inactivo"}
             className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
             style={{
               backgroundColor: "var(--khora-surface)",
@@ -227,7 +231,7 @@ export function IngresoView({
           <button
             data-ui-id="ingreso.btn-adjuntar"
             onClick={() => actions.onAdjuntarClick?.()}
-            disabled={adjuntandoAudio || retranscribiendo || estado !== "inactivo"}
+            disabled={guardando || archivado || adjuntandoAudio || retranscribiendo || estado !== "inactivo"}
             className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
             style={{
               backgroundColor: "var(--khora-surface)",
@@ -238,11 +242,18 @@ export function IngresoView({
             <Icons.Paperclip size={20} strokeWidth={1.75} />
             {adjuntandoAudio ? "Adjuntando..." : "Adjuntar audio"}
           </button>
+          {conAudio && partesContador>0 && (
+            <button type="button" onClick={()=>actions.onExportarMp3?.()}
+              disabled={guardando || exportandoAudio || adjuntandoAudio}
+              className="px-4 py-2 border rounded disabled:opacity-50">
+              {exportandoAudio?"Preparando descarga…":"Descargar MP3 conservado"}
+            </button>
+          )}
           {audioExportable && (
             <button
               data-ui-id="ingreso.btn-exportar-audio"
               onClick={() => actions.onExportarAudio?.()}
-              disabled={exportandoAudio || adjuntandoAudio || guardando}
+              disabled={guardando || exportandoAudio || adjuntandoAudio}
               className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
               style={{ backgroundColor: "var(--khora-surface)", color: "var(--khora-ink)", borderColor: "var(--khora-border)" }}
             >
@@ -255,7 +266,7 @@ export function IngresoView({
           <button
             data-ui-id="ingreso.btn-limpiar"
             onClick={() => actions.onLimpiar?.()}
-            disabled={estado === "dictando" || editando || adjuntandoAudio || retranscribiendo}
+            disabled={guardando || estado === "dictando" || editando || adjuntandoAudio || retranscribiendo}
             className="px-4 py-2 border rounded-none cursor-pointer disabled:opacity-40 flex items-center gap-2 hover:opacity-90 transition-opacity font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)]"
             style={{
               backgroundColor: "var(--khora-surface)",
@@ -317,6 +328,7 @@ export function IngresoView({
           value={texto}
           onFocus={() => actions.onIniciarEdicion?.()}
           onClick={() => actions.onIniciarEdicion?.()}
+          readOnly={guardando || archivado}
           onChange={(e) => actions.onTextoChange?.(e.target.value)}
           placeholder="Escribe, pega o inicia el dictado para transcribir..."
           className="w-full p-4 min-h-[260px] whitespace-pre-wrap leading-relaxed border rounded-none text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--khora-accent)] focus-visible:border-[var(--khora-accent)]"

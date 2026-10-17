@@ -2,7 +2,7 @@
 import { createHash, randomUUID } from "crypto";
 import { getDb } from "./neon";
 import { reportarIncidente } from "./incidentes";
-import { crearVersion } from "./correcciones";
+import { crearVersion, asegurarEsquema } from "./correcciones";
 import { cifrarTexto, descifrarTexto } from "./cripto";
 import { generarTituloConGarantia, asignarTituloVolcado, esTituloGenericoOInvalido } from "./titulos";
 import { autoaplicarTildesSeguras } from "./tildesSeguras";
@@ -80,7 +80,7 @@ export async function prepararVolcadoParaRevision(
   actor?: string | null,
   options?: { onFailure?: "keep_captura" | "mark_fallido" }
 ): Promise<Volcado> {
-  await asegurarTabla();
+  await asegurarEsquema();
   const db = getDb();
 
   const client = await db.connect();
@@ -119,7 +119,7 @@ export async function prepararVolcadoParaRevision(
       if (!textoClaro) {
         throw new Error("Transcripción vacía al preparar versión v1");
       }
-      await crearVersion(volcadoId, textoClaro, "transcripcion original del dictado");
+      await crearVersion(volcadoId, textoClaro, "transcripcion original del dictado", client);
     }
 
     if (!textoClaro.trim()) {
@@ -132,21 +132,7 @@ export async function prepararVolcadoParaRevision(
       });
     }
 
-    if (!v.titulo || esTituloGenericoOInvalido(v.titulo)) {
-      const resGarantia = await generarTituloConGarantia(textoClaro, v.folio);
-      await asignarTituloVolcado(volcadoId, resGarantia.title, actor || "prepararVolcadoParaRevision");
-
-      if (resGarantia.nivel === "ultimo_recurso") {
-        await reportarIncidente({
-          volcadoId,
-          tipo: "titulo_ausente",
-          severidad: "baja",
-          origen: "prepararVolcadoParaRevision",
-          evidencia: { motivo: "El generador de títulos cayó a último recurso determinístico." },
-        });
-      }
-    }
-
+    // AI title generation happens after capture, outside row locks (see route).
     const updRes = await client.query(
       "UPDATE volcado SET estado = 'en_revision' WHERE id = $1 RETURNING id, folio, texto, sha256, chars, titulo, origen, driver, usuario, recibido_en, estado, io_id, intentos, ultimo_error, ultimo_intento, version_aprobada",
       [volcadoId]
@@ -302,10 +288,12 @@ export async function iniciarRevision(volcadoId: string): Promise<void> {
 }
 
 export async function aprobarVersion(volcadoId: string, version: number, aprobador?: string | null): Promise<{ version: number; sha256: string }> {
-  await asegurarTabla();
-  const db = getDb();
+  await asegurarEsquema();
+  const db = await getDb().connect();
+  try {
+  await db.query("BEGIN");
 
-  const vRes = await db.query("SELECT estado FROM volcado WHERE id = $1", [volcadoId]);
+  const vRes = await db.query("SELECT estado FROM volcado WHERE id = $1 FOR UPDATE", [volcadoId]);
   if (vRes.rows.length === 0) {
     throw new Error("Volcado no encontrado");
   }
@@ -336,6 +324,7 @@ export async function aprobarVersion(volcadoId: string, version: number, aprobad
 
   await db.query("INSERT INTO volcado_revision_auditoria (id, volcado_id, accion, estado_anterior, estado_nuevo, version, sha256, usuario) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)", [randomUUID(), volcadoId, "version_aprobada", estadoAnteriorReal, "listo_ingesta", version, sha256, aprobador ?? null]);
 
+  await db.query("COMMIT");
   await registrarEvento({
     fase: "autorizacion",
     eventId: "AUT-001",
@@ -349,6 +338,7 @@ export async function aprobarVersion(volcadoId: string, version: number, aprobad
   });
 
   return { version, sha256 };
+  } catch(e) { await db.query("ROLLBACK").catch(()=>undefined); throw e; } finally { db.release(); }
 }
 
 export async function reabrirRevision(volcadoId: string, usuario?: string | null): Promise<void> {

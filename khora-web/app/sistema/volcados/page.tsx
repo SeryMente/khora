@@ -341,25 +341,15 @@ export default function VolcadosPage({ legacyEditorEntry = false }: { legacyEdit
   }, [fetchPipeline]);
 
   const handleExportMp3 = useCallback(async () => {
-    if (!selectedId || !manifiestoPartes.length || exportingMp3) return;
-    setExportingMp3(true);
-    setAudioError(null);
+    if(!selectedId||exportingMp3)return;setExportingMp3(true);setAudioError(null);
     try {
-      const folio = selectedItem?.folio ? String(selectedItem.folio) : selectedId;
-      await exportAudioAsMp3({
-        sourceUrl: `/api/audio/${selectedId}`,
-        manifestUrl: `/api/audio/${selectedId}/manifiesto`,
-        filename: `khora-volcado-${folio}.mp3`,
-        bitrateKbps: 192,
-      });
-    } catch (err: any) {
-      setAudioError(
-        err?.message || "No se pudo generar el MP3 completo del volcado.",
-      );
-    } finally {
-      setExportingMp3(false);
-    }
-  }, [exportingMp3, manifiestoPartes.length, selectedId, selectedItem?.folio]);
+      const r=await fetch(`/api/audio/${selectedId}/mp3`,{cache:"no-store"});
+      if(r.status===409){const queued=await fetch(`/api/audio/${selectedId}/mp3`,{method:"POST"});if(!queued.ok)throw new Error("No se pudo solicitar el MP3");setAudioError("MP3 solicitado. El original se conserva; vuelve a descargar cuando finalice la conversión.");return;}
+      if(!r.ok)throw new Error("No se puede descargar el MP3 (HTTP "+r.status+")");
+      const blob=await r.blob();if(!blob.size||!blob.type.startsWith("audio/"))throw new Error("Respuesta de audio inválida");
+      const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=`khora-${selectedItem?.folio||selectedId}.mp3`;a.click();setTimeout(()=>URL.revokeObjectURL(url),30000);
+    }catch(e){setAudioError(String((e as Error).message));}finally{setExportingMp3(false);}
+  },[selectedId,selectedItem?.folio,exportingMp3]);
 
   const handleRegenerarTitulo = async () => {
     if (!selectedId) return;
@@ -398,15 +388,36 @@ export default function VolcadosPage({ legacyEditorEntry = false }: { legacyEdit
       const res = await fetch("/api/edicion", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: selectedId, texto: editableTexto }),
+        body: JSON.stringify({ id: selectedId, texto: editableTexto,versionBase:selectedVersionNumber,sha256Base:selectedVersionSha256,motivoDelta:"enmienda_contenido" }),
       });
       if (res.ok) {
-        await fetchPipeline();
-        await selectVolcadoItem(selectedId);
-      }
+        const items=await fetchPipeline();
+        await selectVolcadoItem(selectedId,null,items);
+      } else { const d=await res.json().catch(()=>({}));alert(d.detail||d.causa||"No se guardaron los cambios; conserva tu texto y recarga la versión."); }
     } catch (err: any) {
       alert("Error de red: " + err.message);
     }
+  };
+
+  const holdTimerRef=useRef<ReturnType<typeof setInterval>|null>(null);
+  const stopHolding=()=>{if(holdTimerRef.current)clearInterval(holdTimerRef.current);holdTimerRef.current=null;setIsHolding(false);setHoldProgress(0);};
+  useEffect(()=>()=>{if(holdTimerRef.current)clearInterval(holdTimerRef.current);},[]);
+  useEffect(()=>{if(holdTimerRef.current)clearInterval(holdTimerRef.current);holdTimerRef.current=null;setIsHolding(false);setHoldProgress(0);setAccessibleConfirmText("");setShowAccessibleModal(false);},[selectedId,selectedVersionNumber]);
+  const executeApproval=async()=>{
+    if(!selectedId||!selectedVersionNumber||approvingVersion)return;
+    if(gateDecision?.canApprove!==true){setAudioError("La compuerta de revisión no permite aprobar.");return;}
+    setApprovingVersion(true);
+    try{const r=await fetch(`/api/volcado/${selectedId}/aprobar`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({version:selectedVersionNumber,sha256:selectedVersionSha256})});const d=await r.json();if(!r.ok)throw new Error(d.error||d.detail||"Aprobación rechazada");setShowAccessibleModal(false);const items=await fetchPipeline();await selectVolcadoItem(selectedId,selectedVersionNumber,items);}
+    catch(e){setAudioError(String((e as Error).message));}finally{setApprovingVersion(false);stopHolding();}
+  };
+  const startHolding=()=>{stopHolding();setIsHolding(true);const started=Date.now();holdTimerRef.current=setInterval(()=>{const progress=Math.min(100,Math.floor((Date.now()-started)/20));setHoldProgress(progress);if(progress>=100){stopHolding();void executeApproval();}},50);};
+  const resolveHallazgo=async(accion:"aceptar"|"rechazar")=>{
+    const h=hallazgos[activeHallazgoIndex];if(!selectedId||!h)return;
+    try{const r=await fetch(`/api/revision/${selectedId}/hallazgos/${h.id}/resolver`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({accion})});const d=await r.json();if(!r.ok)throw new Error(d.detail||"No se resolvió el hallazgo");const items=await fetchPipeline();await selectVolcadoItem(selectedId,null,items);}catch(e){setAudioError(String((e as Error).message));}
+  };
+  const resolveAudio=async()=>{
+    const incident=incidentes.find(i=>String(i.tipo).includes("audio")&&i.estado!=="resuelto");if(!selectedId||!incident)return;
+    try{const r=await fetch(`/api/revision/${selectedId}/incidentes/${incident.id}/resolver`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({codigoResolucion:selectedAudioResolveCode})});const d=await r.json();if(!r.ok)throw new Error(d.detail||"No se resolvió el incidente");setShowAudioResolveModal(false);await loadCockpitData(selectedId,selectedVersionNumber||1);}catch(e){setAudioError(String((e as Error).message));}
   };
 
   const handleIngestApproved = async () => {
@@ -579,6 +590,13 @@ export default function VolcadosPage({ legacyEditorEntry = false }: { legacyEdit
       <PipelineView
         state={state}
         actions={{
+          onResolveHallazgo:resolveHallazgo,
+          onStartHolding:startHolding,
+          onStopHolding:stopHolding,
+          onExecuteApproval:executeApproval,
+          onOpenAudioResolveModal:()=>setShowAudioResolveModal(true),
+          onResolveAudioIncident:resolveAudio,
+
           onFilterChange: setFilter,
           onSearchChange: setSearchQuery,
           onSelectVolcado: selectVolcadoItem,

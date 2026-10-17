@@ -1048,7 +1048,7 @@ export function PipelineView({
             </h3>
             <p className="text-zinc-300">
               Escribe exactamente{" "}
-              <strong className="text-emerald-400">APROBAR v1</strong> para
+              <strong className="text-emerald-400">{`APROBAR v${selectedVersionNumber}`}</strong> para
               confirmar la autorización:
             </p>
             <input
@@ -1057,7 +1057,7 @@ export function PipelineView({
               onChange={(e) =>
                 actions.onSetAccessibleConfirmText?.(e.target.value)
               }
-              placeholder="APROBAR v1"
+              placeholder={`APROBAR v${selectedVersionNumber}`}
               className="w-full p-2 border bg-zinc-900 border-zinc-700 text-zinc-100"
             />
             <div className="flex justify-end gap-2 pt-2">
@@ -1069,7 +1069,7 @@ export function PipelineView({
               </button>
               <button
                 disabled={
-                  accessibleConfirmText !== "APROBAR v1" || approvingVersion
+                  accessibleConfirmText !== `APROBAR v${selectedVersionNumber}` || approvingVersion
                 }
                 onClick={() => actions.onExecuteApproval?.()}
                 className="px-4 py-1.5 bg-emerald-500 text-zinc-950 font-bold disabled:opacity-40"

@@ -1,3 +1,4 @@
+import { poseeVolcado } from "@/lib/server/custodia-acceso";
 // @l0 L0-002-R · @req TITULOS-LLM/REQ-1 · @req TITULOS-LLM/REQ-2
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
@@ -17,6 +18,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json().catch(() => ({}));
     let texto = typeof body?.texto === "string" ? body.texto : "";
     const volcadoId = body?.id || body?.volcadoId;
+    if(volcadoId&&!await poseeVolcado(session.user.email,String(volcadoId)))return NextResponse.json({error:"no_encontrado"},{status:404});
     let folio: number | null = null;
 
     if (!texto.trim()) {

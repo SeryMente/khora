@@ -187,6 +187,8 @@ test("Review Entrance & Incident Engine Backend", async (t) => {
     mockVolcadoState = "archivado";
     const resDictado = await guardarDictado({
       texto: "Prueba de dictado inicial",
+      sessionId: "11111111-1111-4111-8111-111111111111",
+      fuenteEntrada: "texto",
       titulo: "Dictado de prueba",
       usuario: "operador@khora.dev"
     });

@@ -149,7 +149,7 @@ export async function verificarInformationObjectNeo4j(ioId: string): Promise<{ e
   }
 }
 
-export async function obtenerPipelineAggregated(): Promise<PipelineAggregatedResult> {
+export async function obtenerPipelineAggregated(usuario?: string): Promise<PipelineAggregatedResult> {
   const db = getDb();
 
   const vRes = await db.query(`
@@ -158,8 +158,9 @@ export async function obtenerPipelineAggregated(): Promise<PipelineAggregatedRes
       recibido_en, estado, io_id, intentos, ultimo_error, ultimo_intento,
       audio_url, audio_bytes, duracion_seg, fuente, pulido_aplicado, audio_partes, version_aprobada
     FROM volcado
+    WHERE ($1::text IS NULL OR usuario=$1)
     ORDER BY recibido_en DESC
-  `);
+  `,[usuario??null]);
 
   const volcados = vRes.rows;
   if (volcados.length === 0) {

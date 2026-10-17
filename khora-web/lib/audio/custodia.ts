@@ -19,6 +19,9 @@ export function evaluarCustodiaAudio(
 ): ResultadoCustodiaAudio {
   const ordenadas = [...(partes || [])].sort((a, b) => Number(a.part_index) - Number(b.part_index));
   const total = totalEsperado ?? ordenadas.length;
+  if (!Number.isSafeInteger(total) || total <= 0 || new Set(ordenadas.map(p => Number(p.part_index))).size !== ordenadas.length || ordenadas.some(p => !Number.isSafeInteger(Number(p.part_index)) || Number(p.part_index) < 1 || Number(p.part_index) > total)) {
+    return { ok:false, motivo:"Manifiesto vacío, duplicado o con cantidad/índices inválidos.", indicesFaltantes:[] };
+  }
   const indicesFaltantes: number[] = [];
   const indicesPresentes = new Set(
     ordenadas.map((parte) => Number(parte.part_index)),
@@ -65,4 +68,11 @@ export function evaluarCustodiaAudio(
     motivo: `Custodia íntegra: ${total} partes verificadas.`,
     indicesFaltantes: [],
   };
+}
+
+/** A stopped event alone is not proof that the extension flushed every part. */
+export function verificarCierreCaptura(evento:{status?:unknown;sessionId?:unknown;finalPartCount?:unknown},sessionId:string,partes:{parte:number;verificado?:boolean}[]):boolean {
+ const total=evento.finalPartCount;
+ return evento.status==='stopped'&&evento.sessionId===sessionId&&Number.isSafeInteger(total)&&Number(total)>0
+  &&partes.length===total&&[...partes].sort((a,b)=>a.parte-b.parte).every((p,i)=>p.parte===i+1&&p.verificado===true);
 }

@@ -2,6 +2,7 @@
 import "./setup";
 import { test, describe } from "node:test";
 import assert from "node:assert";
+import { createHash } from "node:crypto";
 import { setDbForTesting, resetDbForTesting } from "../../lib/server/neon";
 import { POST } from "../../app/api/volcado/[id]/aprobar/route";
 
@@ -45,14 +46,14 @@ describe("Aprobar Volcado Route Suite", () => {
         return { rows: [] };
       }
     };
-    setDbForTesting(mockDb as any);
+    setDbForTesting({ ...mockDb, connect: async () => ({ query: mockDb.query, release() {} }) } as any);
 
     try {
       const ctx = { params: Promise.resolve({ id: "volcado-456" }) };
       const req = new Request("http://localhost/api/volcado/volcado-456/aprobar", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ version: 1 })
+        body: JSON.stringify({ version: 1, sha256: createHash("sha256").update("Texto de prueba").digest("hex") })
       });
 
       const res = await POST(req, ctx);
@@ -68,7 +69,7 @@ describe("Aprobar Volcado Route Suite", () => {
     const mockDb = {
       query: async (sql: string, params: any[]) => {
         if (sql.includes("FROM volcado WHERE id")) {
-          return { rows: [{ estado: "en_revision" }] };
+          return { rows: [{ estado: "en_revision", texto: "Texto de prueba", sha256: createHash("sha256").update("Texto de prueba").digest("hex"), session_id: null, audio_url: null, audio_partes: null }] };
         }
         if (sql.includes("MAX(version)")) {
           return { rows: [{ ultima: 1 }] };
@@ -90,14 +91,14 @@ describe("Aprobar Volcado Route Suite", () => {
         return { rows: [] };
       }
     };
-    setDbForTesting(mockDb as any);
+    setDbForTesting({ ...mockDb, connect: async () => ({ query: mockDb.query, release() {} }) } as any);
 
     try {
       const ctx = { params: Promise.resolve({ id: "volcado-789" }) };
       const req = new Request("http://localhost/api/volcado/volcado-789/aprobar", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ version: 1 })
+        body: JSON.stringify({ version: 1, sha256: createHash("sha256").update("Texto de prueba").digest("hex") })
       });
 
       const res = await POST(req, ctx);

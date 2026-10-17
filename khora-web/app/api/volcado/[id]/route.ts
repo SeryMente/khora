@@ -1,3 +1,5 @@
+import { poseeVolcado } from "@/lib/server/custodia-acceso";
+import { auth } from "@/auth";
 // @l0 L0-002-R · @req ING-03/REQ-1 · @acr ACR-1.2
 import { NextResponse } from "next/server";
 import { getDb } from "../../../../lib/server/neon";
@@ -10,6 +12,9 @@ export const dynamic = "force-dynamic";
 export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await ctx.params;
+    const custodio=(await auth())?.user?.email;
+    if(!custodio)return NextResponse.json({error:"no_autenticado"},{status:401});
+    if(!await poseeVolcado(custodio,id))return NextResponse.json({error:"no_encontrado"},{status:404});
     await asegurarEsquema();
     const db = getDb();
     const esFolio = /^\d+$/.test(id);

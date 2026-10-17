@@ -2,12 +2,13 @@
 import { after, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { guardarDictado } from "../../../lib/server/dictado";
-import { espejarVolcado } from "../../../lib/server/espejoNotion";
-import { generarTituloFallback, generarTituloDeUltimoRecurso } from "../../../lib/server/titulos";
+import { reconciliarCustodia } from "@/lib/server/custodia-trabajos";
+import { reclamarSesion } from "@/lib/server/custodia-schema";
+import { generarTituloConGarantia, generarTituloFallback, generarTituloDeUltimoRecurso } from "../../../lib/server/titulos";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 120;
+export const maxDuration = 300;
 
 export async function POST(req: Request) {
   try {
@@ -25,7 +26,7 @@ export async function POST(req: Request) {
     // El audio original puede custodiarse aunque la transcripción haya fallado.
     // guardarDictado contrasta después las partes con el manifiesto verificado en servidor.
     const audioOriginalPendiente =
-      fuenteEntrada === "audio_archivo" &&
+      fuenteEntrada !== "texto" &&
       Array.isArray(audioPartes) &&
       audioPartes.length > 0 &&
       audioPartes.every((p: any) =>
@@ -45,10 +46,12 @@ export async function POST(req: Request) {
       tituloResolver = generarTituloFallback(texto).title || generarTituloDeUltimoRecurso(texto);
     }
 
+    const sessionId = String(c?.sessionId ?? c?.sesionId ?? "");
+    await reclamarSesion(sessionId, session.user.email);
     // 2. Persistir dictado en la BD (fuente de verdad)
     const r = await guardarDictado({
       texto,
-      sessionId: c?.sessionId ?? c?.sesionId ?? null,
+      sessionId,
       titulo: tituloResolver,
       audioUrl: c?.audioUrl ?? null,
       audioBytes: c?.audioBytes ?? null,
@@ -58,40 +61,13 @@ export async function POST(req: Request) {
       estadoTranscripcion: c?.estadoTranscripcion ?? null,
       fuenteEntrada,
       usuario: session.user.email,
+      tituloAutomatico: !c?.titulo?.trim(),
     });
 
-    // 3. Espejar a Notion (secundario, acotado a 8s y try/catch que no frena la respuesta)
-    after(async () => {
-      try {
-      const volcado_id = r.id;
-      const version = 1;
-      const sha256 = r.sha256;
-      const caracteres = r.chars;
-
-      const audio = c?.audioUrl || null;
-      const partesAudio = Array.isArray(c?.audioPartes) ? c.audioPartes.length : null;
-      const pulidoAplicado = c?.pulidoAplicado === true;
-      const reconexiones = typeof c?.reconexiones === "number" ? c.reconexiones : null;
-
-        await espejarVolcado({
-          texto,
-          titulo: tituloResolver,
-          volcado_id,
-          version,
-          sha256,
-          fecha: c?.fecha || null,
-          caracteres,
-          audio,
-          partesAudio,
-          pulidoAplicado,
-          reconexiones,
-        });
-      } catch (espejoError) {
-        console.error("Error al espejar en Notion (posterior al archivado):", espejoError);
-      }
-    });
-
-    return NextResponse.json({ ...r, titulo: tituloResolver }, { status: 201 });
+    // Durable intents are already committed with the original. A callback is only an accelerator.
+    after(()=>reconciliarCustodia(session.user!.email!,2).then(()=>undefined).catch(()=>undefined));
+    const mp3Estado=audioPartes?.length?"pendiente":"no_aplica";
+    return NextResponse.json({ ...r, titulo: tituloResolver, mp3Estado }, { status: 201 });
   } catch (e) {
     return NextResponse.json(
       { detail: "no se pudo archivar el dictado", causa: String(e) },

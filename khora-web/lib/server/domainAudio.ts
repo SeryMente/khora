@@ -13,6 +13,7 @@ export function esAudioEsperado(volcado: {
   const origenNorm = (volcado.origen || "").toLowerCase().trim();
   const sessionId = (volcado.session_id || "").trim();
 
+  if (fuenteNorm === "texto" && driverNorm === "texto") return false;
   if (fuenteNorm === "dictado" || driverNorm === "dictado" || origenNorm === "dictado") {
     return true;
   }

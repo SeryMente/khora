@@ -168,7 +168,7 @@ describe("Motor de Corrección Nivel Word bajo Guardián — PROMPT 3A Suite", (
       },
     };
 
-    setDbForTesting(mockDb as any);
+    setDbForTesting({ ...mockDb, connect: async () => ({ query: mockDb.query, release() {} }) } as any);
     try {
       const res = await aplicarPropuestasCorreccion(volcadoId, ["p-obs-1"]);
       assert.strictEqual(res.exito, false);
@@ -255,7 +255,7 @@ describe("Motor de Corrección Nivel Word bajo Guardián — PROMPT 3A Suite", (
       },
     };
 
-    setDbForTesting(mockDb as any);
+    setDbForTesting({ ...mockDb, connect: async () => ({ query: mockDb.query, release() {} }) } as any);
     try {
       const res = await aplicarPropuestasCorreccion(volcadoId, ["p-sol-1", "p-sol-2"]);
       assert.strictEqual(res.exito, false);
@@ -352,7 +352,7 @@ describe("Motor de Corrección Nivel Word bajo Guardián — PROMPT 3A Suite", (
       },
     };
 
-    setDbForTesting(mockDb as any);
+    setDbForTesting({ ...mockDb, connect: async () => ({ query: mockDb.query, release() {} }) } as any);
     try {
       const res = await aplicarPropuestasCorreccion(volcadoId, ["p-ok-1", "p-ok-2"], {
         actor: "operador@khora.dev",

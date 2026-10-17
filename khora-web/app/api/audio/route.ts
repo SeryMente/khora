@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { createHash } from "crypto";
 import { cifrarBytes, descifrarBytes } from "../../../lib/server/cripto";
 import { registrarParteAudio } from "../../../lib/server/dictado";
+import { reclamarSesion } from "@/lib/server/custodia-schema";
 import { auth } from "@/auth";
 
 export const runtime = "nodejs";
@@ -64,6 +65,7 @@ export async function POST(req: Request) {
       );
     }
 
+    await reclamarSesion(String(sesionId).trim(), session.user.email);
     const destino = "dictado/" + String(sesionId).trim() + "/" + partIndex + ".webm.khc";
 
     const subido = await put(destino, cifrado, {

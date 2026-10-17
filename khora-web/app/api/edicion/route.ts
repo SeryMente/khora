@@ -1,3 +1,4 @@
+import { poseeVolcado } from "@/lib/server/custodia-acceso";
 // @l0 L0-002-R · @req ING-03/REQ-1 · @acr ACR-1.2 · @req SISTEMA-MENU/E4
 import { NextResponse } from "next/server";
 import { auth } from "../../../auth";
@@ -9,16 +10,20 @@ export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
   const session = await auth();
+  if(!session?.user?.email)return NextResponse.json({error:"no_autenticado"},{status:401});
   try {
     const c = await req.json();
     const id = typeof c?.id === "string" ? c.id : "";
     const texto = typeof c?.texto === "string" ? c.texto : "";
-    const motivoDelta = typeof c?.motivoDelta === "string" ? c.motivoDelta : "defecto_transcripcion";
+    const motivoDelta = typeof c?.motivoDelta === "string" ? c.motivoDelta : "enmienda_contenido";
 
     if (id.length === 0) return NextResponse.json({ detail: "falta el id del volcado" }, { status: 400 });
+    const custodio=(await auth())?.user?.email;
+    if(!custodio)return NextResponse.json({error:"no_autenticado"},{status:401});
+    if(!await poseeVolcado(custodio,id))return NextResponse.json({error:"no_encontrado"},{status:404});
     if (texto.trim().length === 0) return NextResponse.json({ detail: "texto vacio" }, { status: 400 });
 
-    const r = await guardarEdicion(id, texto, session?.user?.email ?? null);
+    const r = await guardarEdicion(id, texto, session.user.email, {version:Number.isInteger(c?.versionBase)?c.versionBase:undefined,sha256:typeof c?.sha256Base==="string"?c.sha256Base:undefined,motivo:motivoDelta});
 
     await registrarEvento({
       fase: "manejo",

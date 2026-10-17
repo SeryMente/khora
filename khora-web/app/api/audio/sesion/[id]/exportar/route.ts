@@ -1,3 +1,4 @@
+import { poseeSesion } from "@/lib/server/custodia-acceso";
 // @l0 L0-002-R · @req L0-003/CUSTODIA · @req ING-EXPORT-ORIGINAL
 import { createHash } from "crypto";
 import { basename } from "path";
@@ -36,6 +37,9 @@ export async function GET(
     }
 
     const { id: sessionId } = await context.params;
+    const custodio=(await auth())?.user?.email;
+    if(!custodio)return NextResponse.json({error:"no_autenticado"},{status:401});
+    if(!await poseeSesion(custodio,sessionId))return NextResponse.json({error:"no_encontrado"},{status:404});
     if (!/^[0-9a-f-]{36}$/i.test(sessionId)) {
       return NextResponse.json({ error: "session_id_invalido", detail: "Identificador de sesión inválido." }, { status: 400 });
     }

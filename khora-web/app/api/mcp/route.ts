@@ -1,3 +1,4 @@
+import { toolKhoraListarAudios, toolKhoraLeerAudio } from "@/lib/server/mcp-audios";
 import { registrarEventoServicio } from "@/lib/server/service-observability";
 import { randomUUID } from "node:crypto";
 import { diagnosticFailure, diagnose } from "@/lib/server/mcp-diagnostics";
@@ -329,6 +330,13 @@ async function handleMcpRequest(req: NextRequest) {
       return { content: [{ type: "text", text: JSON.stringify(res, null, 2) }] };
     }
   );
+
+  gatedTool("khora_listar_audios", "Índice paginado de audio original y MP3, incluidas capturas aún abiertas. Solo del propietario autenticado.", {
+    limite:z.number().int().min(1).max(100).optional(),offset:z.number().int().nonnegative().optional(),
+  },async(args:any)=>{const denied=requireScope("volcados:read");if(denied)return denied;return {content:[{type:"text",text:JSON.stringify(await toolKhoraListarAudios(actor,args))}]};});
+  gatedTool("khora_leer_audio", "Obtiene bytes auténticos verificados de un original o MP3 en bloques Base64. No crea audio ni altera datos. Continuar con siguiente_offset y sha256_esperado fijado al sha256 recibido hasta null. Una captura abierta devuelve un prefijo identificado, no una grabación completa.", {
+    id:z.string().describe("Sesión, UUID de volcado o folio"),formato:z.enum(["original","mp3"]).optional(),parte:z.number().int().positive().optional(),offset_bytes:z.number().int().nonnegative().optional(),limite_bytes:z.number().int().min(1).max(262144).optional(),sha256_esperado:z.string().regex(/^[a-f0-9]{64}$/i).optional(),
+  },async(args:any)=>{const denied=requireScope("volcados:read");if(denied)return denied;return {content:[{type:"text",text:JSON.stringify(await toolKhoraLeerAudio(actor,args))}]};});
 
   // Herramienta 6: khora_ui_review
   gatedTool(
