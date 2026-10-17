@@ -1,0 +1,36 @@
+{
+  "at": "2026-10-17T20:31:41.685Z",
+  "source": "read-only @vercel/blob list and Range status; Vercel CLI list-stores",
+  "store": "khora-audio",
+  "inventory": {
+    "objects": 636,
+    "totalBytes": 1010497194,
+    "originalObjectsByPath": 621,
+    "originalBytesByPath": 863136822,
+    "derivativeObjectsByPath": 15,
+    "derivativeBytesByPath": 147360372
+  },
+  "probe": {
+    "status": 403,
+    "requestedRange": "bytes=0-0",
+    "bodyDownloaded": false
+  },
+  "storeStatus": {
+    "at": "2026-10-17T20:32:37.9043952Z",
+    "status": "limits-exceeded-suspended",
+    "billingState": "suspended"
+  },
+  "achievedBytesSaved": 0,
+  "classificationCorrection": "strict filename regex discarded due random suffix; corrected derivative basename startsWith acceso-; path classification only",
+  "limits": [
+    "no listening or decoding",
+    "no object writes/deletes",
+    "no negative authorization runtime tests",
+    "no integrity/cipher verification of all stored media",
+    "no paid changes or migration",
+    "derivative stock not certified discardable"
+  ],
+  "authority": "originales/instruccion-fidelidad-continuacion-20261017.md",
+  "method": "METACANON-OBJETOS-v1.5",
+  "reference": "https://vercel.com/docs/vercel-blob/usage-and-pricing"
+}

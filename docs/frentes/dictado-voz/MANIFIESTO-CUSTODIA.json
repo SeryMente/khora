@@ -30,9 +30,9 @@
   "files": [
     {
       "path": "OBJETO-CANONICO.md",
-      "bytes": 156616,
-      "sha256": "caf9335c00a8d6fe637c9af8bbbf8ed90dd162f748bf4e498376b28ccc53c698",
-      "git_blob_sha": "b531e39f48ecbf9d6927abbca786c1df289dc138"
+      "bytes": 163047,
+      "sha256": "d9b6086d6b2358513c23290fe00cbb9fda86db7ac51837b184137132ed61d4c3",
+      "git_blob_sha": "d328ee4636003727b867f5e0c5c64cdca2b5fbc0"
     },
     {
       "path": "CONTRATO-DICTADO-EXPERIENCE.md",
@@ -93,6 +93,18 @@
       "bytes": 749,
       "sha256": "5d99bfdd75da20a134fd59bb27be03b113ea7052b5fc2a553ff6819d1837059b",
       "git_blob_sha": "2ad623fd9116a116bf9e4176059b4509ecacecda"
+    },
+    {
+      "path": "originales/instruccion-fidelidad-continuacion-20261017.md",
+      "bytes": 512,
+      "sha256": "60617d7a7edb54fc8f58a43e13e3318ccc91bc4b1e940fa09d507170fa920acc",
+      "git_blob_sha": "6a2fbe286afdc9babb2ade2ebded67873bc77d94"
+    },
+    {
+      "path": "evidencias/FIDELIDAD-BLOB-20261017.json",
+      "bytes": 1255,
+      "sha256": "f4c39b83e25825acf72762ece6c49095f7e6b9b910395df5880b2cbc9faf3d26",
+      "git_blob_sha": "efcf33a00d50700f8f9293e67a24cf0aba4de6c6"
     }
   ],
   "runtime_references": [
@@ -198,13 +210,14 @@
     "no_secret_values_in_manifest": true
   },
   "current_preparation": {
-    "version": "0.5.1",
-    "baseSha": "4b37dd65993159509215b6b4b94585336d6a60fa",
+    "version": "0.5.2",
+    "baseSha": "711848554efec1bd5724372947d93a0e5469cedb",
     "branch": "docs/dictado-audio-ahorro-maximo-20261017",
-    "state": "privacy correction only; originals remain in Blob; no execution/merge/deployment",
-    "authority": "originales/instruccion-privacidad-audio-20261017.md",
-    "review1": "13 blocks; historical annex exact; live state literal in both prompts",
-    "review2": "remote exact readback required after push"
+    "authority": "originales/instruccion-fidelidad-continuacion-20261017.md",
+    "receipt": "evidencias/FIDELIDAD-BLOB-20261017.json",
+    "state": "fidelity fixed; live read audit confirms suspended; no audio mutation; capacity decision required",
+    "review1": "13 blocks; historical annex exact; live state x3; totals cross-foot",
+    "review2": "remote readback required after push"
   },
   "preparation_history": [
     {
@@ -221,6 +234,15 @@
       "receipt": "evidencias/AHORRO-AUDIO-20261017.json",
       "state": "documentary maximum-savings plan; no migration, merge or deployment authorized",
       "authority": "originales/instruccion-ahorro-maximo-20261017.md"
+    },
+    {
+      "version": "0.5.1",
+      "baseSha": "4b37dd65993159509215b6b4b94585336d6a60fa",
+      "branch": "docs/dictado-audio-ahorro-maximo-20261017",
+      "state": "privacy correction only; originals remain in Blob; no execution/merge/deployment",
+      "authority": "originales/instruccion-privacidad-audio-20261017.md",
+      "review1": "13 blocks; historical annex exact; live state literal in both prompts",
+      "review2": "remote exact readback required after push"
     }
   ]
 }
