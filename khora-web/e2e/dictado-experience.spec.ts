@@ -132,7 +132,7 @@ test("cuota de almacenamiento: consentimiento falla cerrado sin activar captura"
 });
 
 test("eventos duplicados y tardíos no crean sesiones fantasma", async ({ page }) => {
-  await page.clock.install();
+
   await page.getByRole("button", { name: "Calidad del dictado", exact: true }).click();
   await page.getByLabel("Activar mediciones y encuestas breves del dictado").check();
   const payloads: any[] = [];
@@ -146,11 +146,11 @@ test("eventos duplicados y tardíos no crean sesiones fantasma", async ({ page }
   });
   // This case tests deduplication, not timer installation after mount. Use the real delivery action.
   await page.getByRole("button", { name: "Actualizar / reintentar pendientes", exact: true }).click();
-  await page.clock.runFor(31_000);
+
   await expect.poll(() => payloads.filter(r => r.data.kind === "session").length).toBe(1);
   const session = payloads.find(r => r.data.kind === "session");
   expect(session.data.metrics.final_results).toBe(0);
-  expect(payloads.filter(r => r.data.kind === "invitation")).toHaveLength(1);
+  await expect.poll(() => payloads.filter(r => r.data.kind === "invitation").length).toBe(1);
 });
 
 test("reintentos simultáneos no solapan POST ni duplican IDs", async ({ page }) => {

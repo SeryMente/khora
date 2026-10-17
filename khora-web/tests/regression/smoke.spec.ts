@@ -13,7 +13,7 @@ test.describe('Regresión: Smoke tests de funciones entregadas', () => {
     await expect(page).toHaveURL(/\/sistema\/ingreso$/);
     
 
-    const title = page.locator('h1:has-text("Ingreso Integrado")');
+    const title = page.locator('h1:has-text("Ingreso")');
     await expect(title).toBeVisible();
 
     const textarea = page.locator('[data-ui-id="ingreso.textarea"]');

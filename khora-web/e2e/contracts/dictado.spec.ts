@@ -1,51 +1,35 @@
-// @l0 L0-002-R · @req CORA-02/REQ-1 · @acr ACR-1.2
+// Recovery redesign on main (PR309): contract migration, no product change.
 import { test, expect } from '@playwright/test';
+import { prepareIngresoContract, expectPreparedIngreso } from '../helpers/ingreso-contract';
 
-test.describe('Dictado UI Reskin Contract and Layout', () => {
-  test('renders with canonical tokens, custom icons, layout, and no literal colors or cora-* classes', async ({ page }) => {
-    // Inject auth session to skip login
-    await page.addInitScript(() => {
-      localStorage.setItem('khora_auth_session', JSON.stringify({ authenticated: true, timestamp: Date.now() }));
-    });
-
+test('Dictado retains canonical tokens, icons and safe layout after recovery redesign', async ({ page }) => {
+    await prepareIngresoContract(page);
     await page.goto('/sistema/ingreso?modo=dictado');
-
-    // Verify Title element
-    const mainHeader = page.locator('h1');
-    await expect(mainHeader).toBeVisible();
-    await expect(mainHeader).toContainText('Ingreso Integrado');
-
-    // Verify main container styles (paddingBottom of 6rem, maxWidth)
-    const mainContainer = page.locator('main').first();
-    await expect(mainContainer).toHaveCSS('padding-bottom', '96px'); // 6rem = 96px
-
-    // Verify icons exist and have correct size & strokeWidth
-    // Mic icon inside h1 should have size 32 (meaning width/height of 32px) and stroke-width 1.75
-    const micIcon = page.locator('h1 svg').first();
-    await expect(micIcon).toBeVisible();
-    await expect(micIcon).toHaveAttribute('width', '32');
-    await expect(micIcon).toHaveAttribute('height', '32');
-    await expect(micIcon).toHaveAttribute('stroke-width', '1.75');
-
-    // Check input style properties
-    const inputField = page.locator('input[data-ui-id="ingreso.titulo-input"]').first();
-    await expect(inputField).toBeVisible();
-    await expect(inputField).toHaveCSS('background-color', 'rgb(23, 24, 26)'); // --khora-surface
-    await expect(inputField).toHaveCSS('color', 'rgb(199, 204, 209)'); // --khora-ink
-    await expect(inputField).toHaveCSS('border-color', 'rgb(35, 37, 42)'); // --khora-border
-
-    // Check textarea transcription container
-    const transcriptionArea = page.locator('textarea[data-ui-id="ingreso.textarea"]').first();
-    await expect(transcriptionArea).toBeVisible();
-    await expect(transcriptionArea).toHaveCSS('background-color', 'rgb(23, 24, 26)'); // --khora-surface
-    await expect(transcriptionArea).toHaveCSS('color', 'rgb(199, 204, 209)'); // --khora-ink
-    await expect(transcriptionArea).toHaveCSS('border-color', 'rgb(35, 37, 42)'); // --khora-border
-
-    // Ensure we do not have legacy styles or literal color styles or cora-* classes
-    const outerHtml = await mainContainer.innerHTML();
-    expect(outerHtml).not.toContain('class="cora-');
-    expect(outerHtml).not.toContain('color: "#b00"');
-    expect(outerHtml).not.toContain('color: "#a60"');
-    expect(outerHtml).not.toContain('color: "#070"');
-  });
+    await expectPreparedIngreso(page);
+    await expect(page.getByRole('heading', { name: 'Ingreso', exact: true })).toBeVisible();
+    const main = page.locator('[data-ui-id="ingreso.container"]');
+    await expect(main).toHaveCSS('max-width', '1000px');
+    const mic = page.locator('[data-ui-id="ingreso.btn-iniciar"] svg');
+    await expect(mic).toHaveAttribute('width', '19');
+    await expect(mic).toHaveAttribute('height', '19');
+    await expect(mic).toHaveAttribute('stroke-width', '2');
+    const ink = await main.evaluate(el => getComputedStyle(el).getPropertyValue('--khora-ink').trim());
+    for (const id of ['ingreso.titulo-input', 'ingreso.textarea']) {
+        const field = page.locator('[data-ui-id="' + id + '"]');
+        await expect(field).toBeEditable();
+        await expect(field).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+        const canonical = await field.evaluate((el, ink) => {
+            const probe = document.createElement('span'); probe.style.color = ink;
+            el.appendChild(probe); const expected = getComputedStyle(probe).color; probe.remove();
+            return { actual: getComputedStyle(el).color, expected };
+        }, ink);
+        expect(canonical.actual).toBe(canonical.expected);
+        await expect(field).toHaveCSS('border-top-width', '0px');
+    }
+    const bottom = await page.locator('[data-ui-id="ingreso.btn-archivar"]').boundingBox();
+    const dock = await page.locator('nav[aria-label="Barra de sistema"]').boundingBox();
+    expect(bottom!.y + bottom!.height).toBeLessThan(dock!.y);
+    const html = await main.innerHTML();
+    expect(html).not.toContain('class="cora-');
+    for (const legacy of ['#b00', '#a60', '#070']) expect(html).not.toContain(legacy);
 });

@@ -1,6 +1,7 @@
 // @l0 L0-002-R · @req FIX-DICTADO/D2-D8
 import { test, expect } from '@playwright/test';
 import { createHash } from 'node:crypto';
+import { prepareIngresoContract } from '../helpers/ingreso-contract';
 
 test.use({
   permissions: ['microphone'],
@@ -13,16 +14,7 @@ test.use({
 });
 
 test.describe('Dictado por partes contract test', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.route('**/api/dictado/checkpoint', async route => {
-      if (route.request().method() === 'POST') {
-        const body = route.request().postDataJSON();
-        await route.fulfill({ json: { ok: true, sessionId: body.sessionId, revisionId: body.revisionId } });
-      } else {
-        await route.fulfill({ json: { owner: 'synthetic-custody-owner@example.invalid', recovery: null } });
-      }
-    });
-  });
+  test.beforeEach(async ({ page }) => { await prepareIngresoContract(page); });
 
   test('handles audio multipart upload, errors and limit guards', async ({ page }) => {
     // Inject auth session to skip login
@@ -181,12 +173,13 @@ test.describe('Dictado por partes contract test', () => {
     expect(dictadoPayload.audioBytes).toBeGreaterThan(0);
 
     // Since /api/dictado failed with 500, we should see error in the UI
-    const errorAlert = page.locator('main div:has(svg)').filter({ hasText: /Gateway Timeout/ });
+    const errorAlert = page.locator('[data-ui-id="ingreso.msg-error"]').filter({ hasText: /Gateway Timeout/ });
     await expect(errorAlert).toBeVisible();
 
     // Let's verify status bar shows parts uploaded
-    const statsText = await page.locator('main p.text-xs.font-medium').textContent();
-    expect(statsText).toContain('partes subidas:');
+    await page.getByRole('button', { name: 'Más opciones de captura' }).click();
+    await page.locator('summary').filter({ hasText: 'Detalles de la captura' }).click();
+    await expect(page.locator('[data-ui-id="ingreso.stats"]')).toContainText(/Audio: [1-9]\d* partes verificadas/);
   });
 
   test('no-JSON audio failure blocks archive and preserves captured text', async ({ page }) => {
@@ -288,7 +281,7 @@ test.describe('Dictado por partes contract test', () => {
     // AUD-05: una sesión de voz sin audio verificado NO puede archivarse.
     expect(dictadoPayload).toBeNull();
 
-    const errorAlert = page.locator('main div').filter({ hasText: /No se puede archivar el registro.*custodia íntegra/i }).last();
+    const errorAlert = page.locator('[data-ui-id="ingreso.msg-error"]').filter({ hasText: /No se puede archivar el registro.*custodia íntegra/i });
     await expect(errorAlert).toBeVisible();
   });
 });
