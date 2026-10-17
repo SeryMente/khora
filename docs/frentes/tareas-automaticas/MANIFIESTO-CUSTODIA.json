@@ -1,6 +1,6 @@
 {
-  "version": 1,
-  "object_seal": "TAREAS-v0.8",
+  "version": 2,
+  "object_seal": "TAREAS-v0.9",
   "purpose": "Inventario de integridad y procedencia; no estado vivo paralelo",
   "source_of_truth": "docs/frentes/tareas-automaticas/OBJETO-CANONICO.md",
   "owner_repo": "SeryMente/khora",
@@ -20,9 +20,9 @@
     {
       "path": "OBJETO-CANONICO.md",
       "classification": "objeto_vivo",
-      "bytes": 82638,
-      "sha256": "c5566266c41666a3177e57116494acc73db034174c6994f72ad535c1f421f25a",
-      "git_blob_sha1": "95b811e0e14ba32ba9e1228f09281d77051594ca"
+      "bytes": 98641,
+      "sha256": "d873b2554697589249344494efe8408645e7afd38f3ea2d25de53f352562a878",
+      "git_blob_sha1": "afa74310edfb3c753e38eb571ea88793732578ca"
     },
     {
       "path": "originales/registro-notion-recibido.txt",
@@ -51,7 +51,15 @@
       "bytes": 1297,
       "sha256": "0454742c8e5b61592f4ea18c20b4478e9b24353a7f690a91516b0a4a018b2342",
       "git_blob_sha1": "dfe4b801c59ab205cfb5a90ae490f49495556ab1"
+    },
+    {
+      "path": "originales/instruccion-horizonte-ciclo14.txt",
+      "classification": "original_historico_inmutable",
+      "bytes": 1103,
+      "sha256": "76220c02483fd1882feaf2025dbfe9a318d95b90f0bd8eb5165dfd66d20e29c8",
+      "git_blob_sha1": "7cdd88d87f52a13b6083ce92c3c0bbe2e12216b9"
     }
   ],
-  "self_integrity": "El manifiesto no se hashea a sí mismo; comprobar su blob/commit devuelto por GitHub."
+  "self_integrity": "El manifiesto no se hashea a sí mismo; comprobar su blob/commit devuelto por GitHub.",
+  "previous_verified_documentation_commit": "2518f3acd18518f030c1247f7cc053f50be6581c"
 }
