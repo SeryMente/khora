@@ -1,0 +1,42 @@
+{
+  "at": "2026-10-17T20:46:21.108Z",
+  "inventory": {
+    "objects": 636,
+    "totalBytes": 1010497194,
+    "originalObjects": 621,
+    "originalBytes": 863136822,
+    "derivativeObjects": 15,
+    "derivativeBytes": 147360372
+  },
+  "allDerivativeFoldersHaveOriginalMetadata": true,
+  "probes": [
+    {
+      "kind": "original",
+      "status": 403,
+      "bodySaved": false
+    },
+    {
+      "kind": "derivative",
+      "status": 403,
+      "bodySaved": false
+    }
+  ],
+  "database": {
+    "available": false,
+    "reason": "no_valid_postgres_url_in_previously_authorized_audit_files",
+    "sqlAttempted": false
+  },
+  "storageMutations": 0,
+  "dbMutations": 0,
+  "achievedBytesSaved": 0,
+  "cleanupAuthorized": true,
+  "cleanupBlockedBy": [
+    "source readability and integrity",
+    "current manifests/references/recovery",
+    "prevent regeneration or broken references"
+  ],
+  "sourceCommitForStaticDependencies": "aa6f3a548c032f2ac30de32c275be17a0bd8370a",
+  "rawPrivateLocators": "kept only in existing remote audit directory, not in Git",
+  "authority": "originales/instruccion-limpieza-derivados-20261017.md",
+  "noPaidChange": true
+}
