@@ -35,5 +35,22 @@
     "historical_annex_exact": true,
     "live_state_copies_equal": true
   },
-  "review2": "requires remote readback matching SHA256 and git blob"
+  "review2": {
+    "commit": "5896198d1525ab8f835524114c1ed83e5f90ed05",
+    "received_text_remote_exact": true,
+    "canonical_object_remote_exact": true,
+    "four_git_blob_hashes_match": true
+  },
+  "cli_media_listing": {
+    "attempts": 2,
+    "exit_codes": [
+      1,
+      1
+    ],
+    "credential_values_exposed": false,
+    "second_attempt": "process-only BLOB_STORE_ID with finally restore",
+    "result": "same OIDC/store validation error before media URLs",
+    "root_cause": "open",
+    "no_retry_without_new_credential_evidence": true
+  }
 }

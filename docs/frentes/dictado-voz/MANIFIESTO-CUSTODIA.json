@@ -120,15 +120,15 @@
     },
     {
       "path": "OBJETO-CANONICO.md",
-      "bytes": 173840,
-      "sha256": "b7fbce0179f2142c4ff1288db9d0d6996f11c425e2708611c61a0dab8310f984",
-      "git_blob_sha": "146f1841af7cef9d63b69d0e8622ecc7f641bf0d"
+      "bytes": 174791,
+      "sha256": "22413dc5f00498d6518a24e09850be92b07ad3c3568809eb7ab953f42afc972b",
+      "git_blob_sha": "dac81b70207b1e4a7c9bdd0d881189d3af904773"
     },
     {
       "path": "evidencias/CONTINUIDAD-VERBATIM-20261017.json",
-      "bytes": 1168,
-      "sha256": "a4efa5e7aac1c020f65369823e1ac88ab7a97360f1605d84309c85e76df08b62",
-      "git_blob_sha": "a47c54fe1d41d6605a4c3ae2e8bc49c490e713bf"
+      "bytes": 1651,
+      "sha256": "0001f6209d443770f884c21bd90697f191ed5dbb38ed376b2b022db3eb4c4671",
+      "git_blob_sha": "b392a96bd9e79e700f7f76cbfbb003a0488488ff"
     }
   ],
   "runtime_references": [
@@ -241,7 +241,7 @@
     "receipt": "evidencias/CONTINUIDAD-VERBATIM-20261017.json",
     "state": "received conversation preserved literally; cleanup still blocked, no audio mutations",
     "review1": "13 blocks; historical annex exact; live state x3",
-    "review2": "remote readback required after push"
+    "review2": "5896198 read back: received text and object exact; four git blobs match; addendum requires final readback"
   },
   "preparation_history": [
     {
