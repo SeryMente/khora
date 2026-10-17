@@ -57,3 +57,16 @@ test('actividad de audio conectada al flujo real del grabador',async({page})=>{
 test('opciones secundarias y tema claro conservan orden visual',async({page})=>{
  await page.evaluate(()=>document.documentElement.dataset.theme='light');await page.getByRole('button',{name:'Más opciones de captura'}).click();await expect(page.locator('[data-ui-id="ingreso.btn-chrome"]')).toBeVisible();await page.screenshot({path:'test-results/ingreso-desktop-light.png',fullPage:true});
 });
+
+test('historial indisponible no bloquea una nueva grabación autenticada',async({page})=>{
+ await page.route('**/api/dictado/checkpoint**',route=>{const u=new URL(route.request().url());if(route.request().method()==='GET'&&u.searchParams.get('catalog')==='1')return route.fulfill({status:503,json:{error:'catalogo_no_disponible'}});return route.fallback();});
+ await page.reload();const start=page.locator('[data-ui-id="ingreso.btn-iniciar"]');await expect(start).toBeEnabled();await start.click();await expect(page.locator('[data-ui-id="ingreso.status-listening"]')).toHaveText('Micrófono activo');await expect(page.getByRole('img',{name:'Actividad real del micrófono'})).toBeVisible();await page.locator('[data-ui-id="ingreso.btn-detener"]').click();await expect(page.locator('[data-ui-id="ingreso.btn-detener"]')).toHaveCount(0);
+});
+test('preparación fallida explica bloqueo y permite reintentar sin perder texto',async({page})=>{
+ let available=false;
+ await page.route('**/api/dictado/checkpoint**',route=>{const u=new URL(route.request().url());if(route.request().method()==='GET'&&u.searchParams.get('bootstrap')==='1')return route.fulfill({status:available?200:503,json:available?{owner}:{error:'recovery_fallido'}});return route.fallback();});
+ await page.reload();const start=page.locator('[data-ui-id="ingreso.btn-iniciar"]');await expect(start).toBeDisabled();await expect(page.locator('[data-ui-id="ingreso.status-listening"]')).toHaveText('Captura no preparada');await expect(page.locator('[data-ui-id="ingreso.custodia-status"]')).toContainText('reintenta');await field(page).fill('Este texto no se pierde al reintentar.');await page.locator('[data-ui-id="ingreso.btn-confirmar-edicion"]').click();available=true;await page.getByRole('button',{name:'Reintentar preparación'}).click();await expect(start).toBeEnabled();await expect(field(page)).toHaveValue('Este texto no se pierde al reintentar.');await start.click();await expect(page.locator('[data-ui-id="ingreso.status-listening"]')).toHaveText('Micrófono activo');await page.locator('[data-ui-id="ingreso.btn-detener"]').click();
+});
+test('sin sesión no se habilita el micrófono ni se presenta como listo',async({page})=>{
+ await page.route('**/api/dictado/checkpoint**',route=>{const u=new URL(route.request().url());if(u.searchParams.get('bootstrap')==='1')return route.fulfill({status:401,json:{error:'no_autenticado'}});return route.fallback();});await page.reload();await expect(page.locator('[data-ui-id="ingreso.btn-iniciar"]')).toBeDisabled();await expect(page.locator('[data-ui-id="ingreso.custodia-status"]')).toContainText('Inicia sesión');await expect(page.locator('[data-ui-id="ingreso.status-listening"]')).toHaveText('Captura no preparada');await expect(page.locator('[data-ui-id="ingreso.btn-detener"]')).toHaveCount(0);
+});

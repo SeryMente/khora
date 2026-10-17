@@ -30,9 +30,9 @@
   "files": [
     {
       "path": "OBJETO-CANONICO.md",
-      "bytes": 137129,
-      "sha256": "513ed710f6278ae20edc0946746af7dced79a018f7f453198de02dd0fc3847bf",
-      "git_blob_sha": "885b35e0a668524e498675f106dc61902324c76e"
+      "bytes": 136878,
+      "sha256": "848db02fb0daa56c974aba7a5ffe32935c5eef40db865bde33b2a1baeed9b38d",
+      "git_blob_sha": "b54a4ea02fbf883db9673655cc5b8d0609a620f6"
     },
     {
       "path": "CONTRATO-DICTADO-EXPERIENCE.md",
@@ -87,6 +87,18 @@
       "bytes": 3972,
       "sha256": "fcccada87418dc85f7c8e601a1dd15fd30e4fa210b6223051601f0b12b2fdebe",
       "git_blob_sha": "f5d21226ed25066d506aae92e88b9496fca5f49f"
+    },
+    {
+      "path": "evidencias/MICROFONO-BOOTSTRAP.json",
+      "bytes": 3448,
+      "sha256": "19b90a60d0b35249619ea35576acd1d97f197212b2fc411bfe84e6a9309e0f0f",
+      "git_blob_sha": "a3056f732837f53450502a8c0f1760de3f2da9e6"
+    },
+    {
+      "path": "originales/MICROFONO-BLOQUEADO.txt",
+      "bytes": 207,
+      "sha256": "57b4fd45f2638fba59bf156e3c49bd1a3e869f897ae3dc42216f2d707e8ba2ef",
+      "git_blob_sha": "c401d5aef532d86e9c6efe1418961d2409d33c06"
     }
   ],
   "runtime_references": [
@@ -198,5 +210,5 @@
     "pullRequest": "https://github.com/SeryMente/khora/pull/305",
     "state": "software verified; merge authorization explicit; effective merge determined by Git"
   },
-  "latestEvent": "C017 - Ingreso explicit recovery and coherent UI"
+  "latestEvent": "C018 - authenticated capture bootstrap independent of history"
 }

@@ -1,0 +1,89 @@
+{
+  "schema": "khora-microfono-bootstrap-validation/v1",
+  "baseSha": "1abffca3cc07bf4bcc4c3f14c52b828344537e93",
+  "preparedAt": "2026-10-17T20:42:05.399Z",
+  "checks": {
+    "unit": 499,
+    "browserBenchmark": 30,
+    "additionalBrowserRegression": 29,
+    "realIsolatedPostgreSQL": 13,
+    "types": "passed",
+    "navigation": "passed",
+    "uiRegistry": "passed"
+  },
+  "benchmark": {
+    "schema": "khora-dictado-benchmark/v1",
+    "status": "passed",
+    "testedAt": "2026-10-17T20:35:22.091Z",
+    "completedAt": "2026-10-17T20:39:57.601Z",
+    "sourceSha": "1abffca3cc07bf4bcc4c3f14c52b828344537e93",
+    "workingTreeDirty": true,
+    "inputFingerprint": "357b8a7c7fe4aa8868db1c8d304ec09e7bc4ada0d4aeeff4943d4bfad254e0b1",
+    "checks": [
+      {
+        "name": "Contratos, entrega, muestreo, privacidad y persistencia controlada",
+        "status": "passed"
+      },
+      {
+        "name": "Continuidad del dictado y encuesta en navegador",
+        "status": "passed"
+      }
+    ],
+    "limits": [
+      "Reconocimiento y endpoints externos controlados; no voz física ni SQL productivo.",
+      "Persistencia probada con doble de base de datos; no certificación de despliegue.",
+      "No mide fidelidad de voz ni comodidad automáticamente. Contrato/regresión, no puntuación universal.",
+      "La huella identifica entradas declaradas. sourceSha no incluye cambios locales; revisar workingTreeDirty."
+    ]
+  },
+  "files": [
+    {
+      "path": "khora-web/app/api/dictado/checkpoint/route.ts",
+      "sha256": "2b13cd7a1171efc3ab2c36c72622f0f2dcb0cc4ac310b52ababb98be4202334e"
+    },
+    {
+      "path": "khora-web/app/components/ingreso/IngresoWorkspace.tsx",
+      "sha256": "bedc8910531023009b6c1a23a3d666ee72c55cf30822e9538e06012e55814b91"
+    },
+    {
+      "path": "khora-web/app/components/shared/IngresoView.tsx",
+      "sha256": "adad052214482590cae997063a78b4d88957e799c7063d8657fae3f846420eca"
+    },
+    {
+      "path": "khora-web/e2e/ingreso-recovery-redesign.spec.ts",
+      "sha256": "1e8c570460805b7acd91ad7ade94d7b40635911eacda88445375249b9be442dd"
+    },
+    {
+      "path": "khora-web/lib/generated/dictado-benchmark.json",
+      "sha256": "8cb5745ec266a1322123eae7d15dc95eba26713371c4a66ca300ecbe3f532f06"
+    },
+    {
+      "path": "khora-web/lib/server/custodia-recuperacion.ts",
+      "sha256": "b6f807c1861237b4810111d9b9f7723090db6b62f67846473da441221ec52b5c"
+    },
+    {
+      "path": "khora-web/tests/integration/ingreso-recuperacion-postgres.ts",
+      "sha256": "888c1197bdafb61de1e7e3d438689f9c2a80b8ea6a61231ad745e642dfe4a0bb"
+    },
+    {
+      "path": "khora-web/docs/CUSTODIA-DICTADOS.md",
+      "sha256": "94e91730224492af27c9e21b41178b1bd4d7cb8e9585d7a9aba423d07a6eb9bd"
+    }
+  ],
+  "limits": [
+    "Physical microphone and authenticated operator browser not observed.",
+    "Specific error of the operator history request is not known; confirmed defect is coupling capture readiness to history success.",
+    "Isolated SQL and controlled external services do not certify productive audio storage.",
+    "Vercel khora-audio observed limits-exceeded-suspended / billingState suspended; no remote audio-write success claimed and no billing changes authorized."
+  ],
+  "externalStorage": {
+    "observedAt": "2026-10-17T20:35:59.970Z",
+    "stores": [
+      {
+        "name": "khora-audio",
+        "status": "limits-exceeded-suspended",
+        "billingState": "suspended"
+      }
+    ]
+  }
+}

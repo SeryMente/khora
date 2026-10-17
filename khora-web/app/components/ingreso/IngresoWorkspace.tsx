@@ -103,6 +103,8 @@ function IngresoContenido() {
   const recoveryAttemptRef=useRef<{key:string;target:string;revision:string}|null>(null);
   const recuperadaDeRef=useRef<CapturaSnapshot["recuperadaDe"]>(undefined);
   const [custodiaOwner, setCustodiaOwner] = useState("");
+  const [custodiaPreparando,setCustodiaPreparando]=useState(true);
+  const [preparacionIntento,setPreparacionIntento]=useState(0);
   const [custodiaEstado, setCustodiaEstado] = useState("Preparando salvaguarda…");
   const ownerRef = useRef("");
   const vistaVivaRef = useRef({ texto, parcial, titulo, archivado });
@@ -187,19 +189,34 @@ function IngresoContenido() {
   },[recoveryCursor]);
   useEffect(()=>{
     let alive=true;
-    void(async()=>{try{
-      const response=await fetch("/api/dictado/checkpoint?catalog=1",{cache:"no-store",signal:AbortSignal.timeout(15000)});
-      if(!response.ok)throw Error();const data=await response.json();if(!alive)return;
-      if(!data.owner)throw Error();ownerRef.current=String(data.owner);setCustodiaOwner(ownerRef.current);
-      // A fresh identity is mandatory: a blank editor must never overwrite an older draft.
-      if(!sesionIdRef.current)sesionIdRef.current=generarSesionId();
-      const local=await recuperarLocal(ownerRef.current).catch(()=>{setRecoveryError("La copia local no está disponible; se muestran las capturas del servidor.");return {snapshots:[],audios:[]};});if(!alive)return;localRecoveriesRef.current=local;
-      const rows:RecoveryItem[]=Array.isArray(data.items)?data.items:[];
-      setRecoveryItems([...localCatalog(local.snapshots),...rows]);setRecoveryCursor(data.nextCursor||null);
-      setCustodiaEstado("Salvaguarda preparada");
-    }catch{if(alive){setCustodiaEstado("Salvaguarda no preparada: comprueba conexión y sesión");setRecoveryError("No se pudo consultar la recuperación. Tus capturas no se han descartado.");}}})();
-    return()=>{alive=false;};
-  },[]);
+    const controller=new AbortController();
+    setCustodiaPreparando(true);setCustodiaEstado("Preparando salvaguarda…");
+    void(async()=>{
+      try{
+        // Preparation verifies the authenticated owner and storage schema, never historical snapshots.
+        const response=await fetch("/api/dictado/checkpoint?bootstrap=1",{cache:"no-store",signal:AbortSignal.any([controller.signal,AbortSignal.timeout(15000)])});
+        if(!response.ok)throw Error(response.status===401?"sesion":"preparacion");
+        const data=await response.json();if(!alive)return;
+        if(typeof data.owner!=="string"||!data.owner.trim())throw Error("preparacion");
+        ownerRef.current=data.owner;setCustodiaOwner(data.owner);
+        if(!sesionIdRef.current)sesionIdRef.current=generarSesionId();
+        setCustodiaPreparando(false);setCustodiaEstado("Salvaguarda preparada");
+      }catch(e){
+        if(alive){setCustodiaPreparando(false);setCustodiaEstado(e instanceof Error&&e.message==="sesion"?"Inicia sesión para preparar la captura.":"No se pudo preparar la captura. Comprueba la conexión y reintenta.");}
+        return;
+      }
+      // History is optional for a NEW capture. Its failure must not revoke an authenticated bootstrap.
+      try{
+        const response=await fetch("/api/dictado/checkpoint?catalog=1",{cache:"no-store",signal:AbortSignal.any([controller.signal,AbortSignal.timeout(15000)])});
+        if(!response.ok)throw Error();const data=await response.json();if(!alive)return;
+        if(data.owner!==ownerRef.current)throw Error();
+        const local=await recuperarLocal(ownerRef.current).catch(()=>{if(alive)setRecoveryError("La copia local no está disponible; se muestran las capturas del servidor.");return {snapshots:[],audios:[]};});if(!alive)return;
+        localRecoveriesRef.current=local;
+        setRecoveryItems([...localCatalog(local.snapshots),...(Array.isArray(data.items)?data.items:[])]);setRecoveryCursor(data.nextCursor||null);
+      }catch{if(alive)setRecoveryError("El historial no está disponible ahora. Puedes iniciar una captura nueva; las anteriores no se han descartado. Reintenta desde Recuperar capturas.");}
+    })();
+    return()=>{alive=false;controller.abort();};
+  },[preparacionIntento]);
 
   useEffect(() => {
     try {
@@ -1540,7 +1557,7 @@ function IngresoContenido() {
       <IngresoView
       state={{
         archivado,
-        custodiaEstado,custodiaReady:!!custodiaOwner,recuperando,recuperaciones:recoveryItems.length,stream:streamAudio,
+        custodiaEstado,custodiaReady:!!custodiaOwner,custodiaPreparando,recuperando,recuperaciones:recoveryItems.length,stream:streamAudio,
         titulo,
         texto,
         estado,
@@ -1569,6 +1586,7 @@ function IngresoContenido() {
         resultado,
       }}
       actions={{
+        onReintentarPreparacion:()=>setPreparacionIntento(n=>n+1),
         onRecuperar:()=>{setRecoveryOpen(true);void cargarRecuperaciones();},
         onTituloChange: (value) => { if(!guardando&&!archivado&&!recuperando)setTitulo(value); },
         onIniciarEdicion: iniciarEdicionInSitu,
