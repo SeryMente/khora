@@ -2,6 +2,7 @@
 "use client";
 
 import React, { useMemo } from "react";
+import { layoutPublishedCommunities, CARD_WIDTH, CARD_HEIGHT } from "../../../lib/graph-presentation";
 import {
   Background,
   Controls,
@@ -20,6 +21,8 @@ export type GrafoNode = {
   id: string;
   summary: string;
   community: number;
+  communityId?: string | null;
+  communityRevision?: string | null;
   level: number;
   centrality: number;
   origen: string;
@@ -68,6 +71,8 @@ const COMMUNITY_PALETTE = [
 type FlowNodeData = {
   graphNode: GrafoNode;
   layer2Active: boolean;
+  communityLabel: string;
+  colorIndex: number;
   onSelect?: (node: GrafoNode) => void;
 };
 
@@ -80,16 +85,15 @@ type FlowNode = Node<FlowNodeData>;
 
 function GraphNode({ data }: NodeProps<FlowNode>) {
   const node = data.graphNode;
-  const color = data.layer2Active ? communityColor(node.community) : "#64748B";
-  const scale = Math.max(0.88, Math.min(1.3, 0.9 + Number(node.centrality || 1) * 0.08));
+  const color = data.layer2Active ? communityColor(data.colorIndex) : "#64748B";
 
   return (
     <div
       data-ui-id="grafo.flow-node"
       className="relative rounded-xl border px-2 py-2 shadow-lg"
       style={{
-        width: 230 * scale,
-        minHeight: 92,
+        width: CARD_WIDTH,
+        minHeight: CARD_HEIGHT,
         background: "var(--khora-surface)",
         color: "var(--khora-ink)",
         borderColor: color,
@@ -106,16 +110,14 @@ function GraphNode({ data }: NodeProps<FlowNode>) {
           data.onSelect?.(node);
         }}
       >
-        <span className="mb-2 block truncate text-xs font-bold" title={node.summary}>
+        <span className="mb-2 block truncate text-sm font-bold" title={node.summary}>
           {node.summary}
         </span>
-        <span className="flex flex-wrap gap-x-3 gap-y-1 text-[10px] opacity-75">
-          <span>Comunidad {node.community}</span>
-          <span>Nivel {node.level}</span>
-          <span>Centralidad {node.centrality}</span>
+        <span className="flex flex-wrap gap-x-3 gap-y-1 text-xs opacity-80">
+          <span>{data.communityLabel}</span>
         </span>
-        <span className="mt-2 block truncate text-[9px] opacity-60" title={node.origen}>
-          {node.verificacion} · {node.origen}
+        <span className="mt-2 block truncate text-xs opacity-70" title={node.origen}>
+          Estado técnico: {node.verificacion}
         </span>
       </button>
       <Handle type="source" position={Position.Right} className="!h-2 !w-2 !border-0" style={{ background: color }} />
@@ -135,22 +137,15 @@ export function GrafoView({
 }) {
   const { nodes, edges, loading, error, viewMode, layer2Active, selectedElement } = state;
 
-  const flowNodes = useMemo<Node<FlowNodeData>[]>(() => {
-    const columns = Math.max(1, Math.ceil(Math.sqrt(Math.max(nodes.length, 1))));
-    return nodes.map((node, index) => ({
-      id: node.id,
-      type: "graphNode",
-      position: {
-        x: (index % columns) * 300,
-        y: Math.floor(index / columns) * 150,
-      },
-      data: {
-        graphNode: node,
-        layer2Active,
-        onSelect: (selected) => actions.onSelectElement?.({ type: "node", data: selected }),
-      },
-    }));
-  }, [actions, layer2Active, nodes]);
+  const layout = useMemo(() => layoutPublishedCommunities(nodes, edges), [nodes, edges]);
+  const flowNodes = useMemo<Node<FlowNodeData>[]>(() => nodes.map(node => ({
+    id: node.id,
+    type: "graphNode",
+    position: layout.positions.get(node.id)!,
+    data: {graphNode:node,layer2Active,communityLabel:layout.presentation.get(node.id)!.label,
+      colorIndex:layout.presentation.get(node.id)!.colorIndex,
+      onSelect:(selected:GrafoNode) => actions.onSelectElement?.({type:"node",data:selected})},
+  })), [actions, layer2Active, nodes, layout]);
 
   const flowEdges = useMemo<Edge[]>(() => {
     const valid = new Set(nodes.map((node) => node.id));
@@ -160,25 +155,25 @@ export function GrafoView({
         id: edge.id,
         source: edge.source,
         target: edge.target,
-        label: edge.type || "RELATION",
+        label: selectedElement?.type === "edge" && selectedElement.data.id === edge.id ? (edge.type || "RELATION") : undefined,
         markerEnd: { type: MarkerType.ArrowClosed, width: 16, height: 16 },
         animated: false,
         style: { stroke: "var(--khora-accent)", strokeWidth: Math.max(1, Math.min(4, edge.weight || 1)) },
-        labelStyle: { fill: "var(--khora-ink)", fontSize: 9 },
+        labelStyle: { fill: "var(--khora-ink)", fontSize: 12 },
         labelBgStyle: { fill: "var(--khora-surface)", fillOpacity: 0.85 },
       }));
-  }, [edges, nodes]);
+  }, [edges, nodes, selectedElement]);
 
   const inspectionContent = selectedElement ? (
     <>
       <div className="mb-4 flex items-center justify-between border-b border-zinc-700 pb-2 text-xs">
         <h3 className="font-bold uppercase">
-          {selectedElement.type === "node" ? "Inspección de Comunidad" : "Inspección de Relación"}
+          {selectedElement.type === "node" ? "Inspección de entidad" : "Inspección de Relación"}
         </h3>
         <button
           type="button"
           onClick={() => actions.onSelectElement?.(null)}
-          className="cursor-pointer opacity-80 hover:opacity-100"
+          className="flex h-11 w-11 items-center justify-center rounded opacity-80 hover:opacity-100 focus-visible:ring-2"
           aria-label="Cerrar inspección"
         >
           ✕
@@ -191,16 +186,18 @@ export function GrafoView({
             <span className="block opacity-70">Resumen</span>
             <p className="mt-1">{selectedElement.data.summary}</p>
           </div>
-          <div className="grid grid-cols-2 gap-2">
-            <div><span className="opacity-70">Comunidad:</span> {selectedElement.data.community}</div>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <div><span className="opacity-70">Comunidad:</span> {layout.presentation.get(selectedElement.data.id)?.label}</div>
             <div><span className="opacity-70">Nivel:</span> {selectedElement.data.level}</div>
             <div><span className="opacity-70">Centralidad:</span> {selectedElement.data.centrality}</div>
           </div>
           <div className="rounded border border-zinc-700 bg-zinc-950 p-3">
             <span className="mb-1 block font-semibold opacity-70">Procedencia</span>
+            <p>Identificador de comunidad: {selectedElement.data.communityId || "Sin membresía publicada"}</p>
+            <p>Revisión: {selectedElement.data.communityRevision || "No disponible"}</p>
             <p>Origen: {selectedElement.data.origen}</p>
             <p>Timestamp: {selectedElement.data.timestamp}</p>
-            <p>Verificación: {selectedElement.data.verificacion}</p>
+            <p>Estado técnico: {selectedElement.data.verificacion}</p>
           </div>
         </div>
       ) : (
@@ -209,17 +206,18 @@ export function GrafoView({
           <div><span className="opacity-70">Peso:</span> {selectedElement.data.weight}</div>
           <div><span className="opacity-70">Origen:</span> {selectedElement.data.origen}</div>
           <div><span className="opacity-70">Timestamp:</span> {selectedElement.data.timestamp}</div>
-          <div><span className="opacity-70">Verificación:</span> {selectedElement.data.verificacion}</div>
+          <div><span className="opacity-70">Estado técnico:</span> {selectedElement.data.verificacion}</div>
         </div>
       )}
+      <p className="mt-4 text-sm opacity-80">El estado técnico no acredita ratificación humana. Los grupos describen la partición publicada, no rasgos de la persona.</p>
     </>
   ) : null;
 
   const inspectionPanel = selectedElement ? (
     <Panel
       position="top-right"
-      className="!m-4 !w-80 !rounded-lg !border !border-zinc-700 !p-4 !shadow-xl"
-      style={{ backgroundColor: "var(--khora-surface)", color: "var(--khora-ink)" }}
+      className="!m-3 !rounded-lg !border !border-zinc-700 !p-4 !shadow-xl break-words"
+      style={{ backgroundColor: "var(--khora-surface)", color: "var(--khora-ink)", width:"min(360px, calc(100vw - 24px))", maxHeight:"65dvh", overflowY:"auto", overflowWrap:"anywhere", pointerEvents:"all" }}
       data-ui-id="grafo.panel-inspection"
     >
       {inspectionContent}
@@ -240,26 +238,27 @@ export function GrafoView({
   return (
     <div
       data-ui-id="grafo.container"
-      className="flex min-h-screen w-full flex-col overflow-hidden font-mono"
+      className="flex min-h-screen w-full flex-col overflow-hidden font-sans"
       style={{ backgroundColor: "var(--khora-bg)", color: "var(--khora-ink)" }}
     >
       <header
         data-ui-id="grafo.header"
-        className="z-10 flex items-center justify-between border-b p-4 shadow-sm"
+        className="z-10 flex flex-col gap-4 border-b p-4 shadow-sm lg:flex-row lg:items-center lg:justify-between"
         style={{ backgroundColor: "var(--khora-surface)", borderColor: "var(--khora-border)" }}
       >
         <div>
-          <h1 className="text-xl font-bold tracking-wider" style={{ color: "var(--khora-ink)" }}>
+          <h1 className="text-lg font-semibold tracking-tight sm:text-xl" style={{ color: "var(--khora-ink)" }}>
             Grafo PKG - Proyección Leiden
           </h1>
           <p className="text-sm opacity-70">Vista de Entidades y Relaciones</p>
         </div>
 
-        <div data-ui-id="grafo.view-toggle" className="flex items-center gap-4">
+        <div data-ui-id="grafo.view-toggle" className="flex min-w-0 flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={() => actions.onSetViewMode?.("list")}
-            className="cursor-pointer rounded px-3 py-1 text-sm font-medium transition"
+            aria-pressed={viewMode === "list"}
+            className="min-h-11 cursor-pointer rounded px-3 py-2 text-sm font-medium transition"
             style={
               viewMode === "list"
                 ? { backgroundColor: "var(--khora-accent)", color: "var(--khora-bg)" }
@@ -271,7 +270,8 @@ export function GrafoView({
           <button
             type="button"
             onClick={() => actions.onSetViewMode?.("graph")}
-            className="cursor-pointer rounded px-3 py-1 text-sm font-medium transition"
+            aria-pressed={viewMode === "graph"}
+            className="min-h-11 cursor-pointer rounded px-3 py-2 text-sm font-medium transition"
             style={
               viewMode === "graph"
                 ? { backgroundColor: "var(--khora-accent)", color: "var(--khora-bg)" }
@@ -282,7 +282,7 @@ export function GrafoView({
           </button>
 
           {viewMode === "graph" && (
-            <label className="ml-4 flex cursor-pointer items-center space-x-2 text-sm">
+            <label className="flex min-h-11 w-full cursor-pointer items-center gap-2 text-sm sm:w-auto sm:pl-2">
               <input
                 type="checkbox"
                 checked={layer2Active}
@@ -295,7 +295,7 @@ export function GrafoView({
         </div>
       </header>
 
-      <main className="min-h-0 flex-1">
+      <main className="min-h-0 flex-1 pb-24">
         {loading ? (
           <div data-ui-id="grafo.loading-state" className="p-8 text-center text-xs opacity-60">
             Cargando proyecciones del grafo...
@@ -306,7 +306,7 @@ export function GrafoView({
           </div>
         ) : nodes.length === 0 ? (
           <div data-ui-id="grafo.empty-state" className="p-8 text-center text-xs opacity-60">
-            El grafo está vacío.
+            El grafo está vacío. No se han encontrado entidades para esta consulta; no se generan ejemplos personales.
           </div>
         ) : viewMode === "list" ? (
           <>
@@ -318,16 +318,16 @@ export function GrafoView({
                   key={node.id}
                   onClick={() => actions.onSelectElement?.({ type: "node", data: node })}
                   aria-label={"Inspeccionar nodo: " + node.summary}
-                  className="flex w-full cursor-pointer flex-col gap-2 rounded border p-4 text-left shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--khora-accent)]"
+                  className="flex w-full break-words cursor-pointer flex-col gap-2 rounded border p-4 text-left shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--khora-accent)]"
                   style={{ backgroundColor: "var(--khora-surface)", borderColor: "var(--khora-border)" }}
                 >
                   <p className="font-medium">{node.summary}</p>
                   <div className="flex flex-wrap gap-4 text-xs opacity-80">
-                    <span>Comunidad: {node.community}</span>
+                    <span>{layout.presentation.get(node.id)?.label}</span>
                     <span>Nivel: {node.level}</span>
                     <span>Centralidad: {node.centrality}</span>
                     <span>Origen: {node.origen}</span>
-                    <span>{node.verificacion}</span>
+                    <span>Estado técnico: {node.verificacion}</span>
                   </div>
                 </button>
               ))}
@@ -337,15 +337,16 @@ export function GrafoView({
         ) : (
           <div
             data-ui-id="grafo.flow-view"
-            className="relative h-[calc(100vh-92px)] min-h-[560px] w-full"
+            className="relative h-[70dvh] min-h-[420px] w-full"
           >
+            <p className="px-4 py-2 text-xs opacity-80">{nodes.length} entidades · {edges.length} relaciones · {layout.communityCount} comunidades publicadas. Selecciona una relación para ver su nombre. Los nombres de grupo son locales a esta vista.</p>
             <ReactFlow
               nodes={flowNodes}
               edges={flowEdges}
               nodeTypes={nodeTypes}
               fitView
               fitViewOptions={{ padding: 0.2 }}
-              minZoom={0.15}
+              minZoom={0.05}
               maxZoom={2}
               onEdgeClick={(event, edge) => {
                 event.stopPropagation();
