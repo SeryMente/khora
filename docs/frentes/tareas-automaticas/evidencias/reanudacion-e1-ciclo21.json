@@ -1,0 +1,57 @@
+{
+  "kind": "frozen_cycle_evidence_not_live_state",
+  "cycle": 21,
+  "authority_path": "originales/instruccion-reanudar-ciclo21.txt",
+  "historical_document_followup": "cerrado por instrucción expresa; sin nuevas búsquedas ni identidad inventada",
+  "base_main_read": "a102fbaf9e9cbfb0d57dfb461989f05f5b4623f3",
+  "base_object_blob": "9383edb77b91dd43d20914371d0102d7891048c9",
+  "metacanon": {
+    "version": "1.5",
+    "blob": "32c7a65ff2e83b3b76752ba2160427bd6e851a8f",
+    "commit": "49ac40e9f6122e2d2fb339362cfa0a78128c8e37"
+  },
+  "architecture_reference": {
+    "version": "0.4",
+    "blob": "56e0295e167e029f946ede99efe0fcbe296289aa",
+    "commit": "e6bc9a742ef8bd9d2990e5755d1d8a75834eb62d",
+    "read_again": true,
+    "changed": false
+  },
+  "vercel": {
+    "project_name": "khora-web",
+    "project_id": "prj_hRN86BKITXYKTnNlp0ygVhaMwFfx",
+    "team_id": "team_QBa5UlffJWznZ8ogFfKjaGQb",
+    "scope": "victorhugotorresmendez-8991s-projects",
+    "metadata_read": true,
+    "metadata_latest_deployment_id": "dpl_DD5RsHVrkSCoYjFoumRvRMTncNtU",
+    "metadata_ready_state": "READY",
+    "metadata_live": false,
+    "deployment_list": {
+      "operation": "GET /v7/deployments",
+      "status": 403,
+      "code": "forbidden",
+      "message": "Not authorized: Trying to access resource under scope \"victorhugotorresmendez-8991s-projects\". You must re-authenticate to this scope or use a token with access to this scope."
+    },
+    "cli_available": false,
+    "vercel_auth_environment_names_present": [],
+    "publishing_permission_verified": false,
+    "scope_changed_or_bypassed": false
+  },
+  "material_decisions": [
+    {
+      "kind": "interfaz",
+      "proposal": "sección Tareas, pendientes/fecha/completar; detalle corregir/descartar/origen",
+      "approved": false
+    },
+    {
+      "kind": "tratamiento de dictados",
+      "proposal": "decidir Groq para finalidad tareas o exigir local; alcance inicial limitado",
+      "approved": false
+    }
+  ],
+  "product_changes": false,
+  "new_tests_run": false,
+  "new_deployment": false,
+  "remote_used": false,
+  "private_repo_and_push_revalidated": true
+}

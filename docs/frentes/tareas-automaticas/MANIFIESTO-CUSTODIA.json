@@ -1,6 +1,6 @@
 {
-  "version": 8,
-  "object_seal": "TAREAS-v0.15",
+  "version": 9,
+  "object_seal": "TAREAS-v0.16",
   "purpose": "Inventario de integridad y procedencia; no estado vivo paralelo",
   "source_of_truth": "docs/frentes/tareas-automaticas/OBJETO-CANONICO.md",
   "owner_repo": "SeryMente/khora",
@@ -158,15 +158,29 @@
       "git_blob_sha1": "cf0c375934b5ad0405342149dfdad2aca9f187dd"
     },
     {
+      "path": "originales/instruccion-reanudar-ciclo21.txt",
+      "classification": "instruccion_literal_inmutable",
+      "bytes": 198,
+      "sha256": "656bfcffba077da940eb56869400d7a9f2c945bec7df3e9da59f5b99944b6403",
+      "git_blob_sha1": "94446f85717b6c4a02461f6fc39cc6714e54e8ae"
+    },
+    {
+      "path": "evidencias/reanudacion-e1-ciclo21.json",
+      "classification": "evidencia_documental_congelada",
+      "bytes": 2125,
+      "sha256": "0c6e599c4d4c444f82eda19848f171b58e437336a5de7c47823c553d4ef3458c",
+      "git_blob_sha1": "a089490492a1e5389ffa54d03ab5b634f611999f"
+    },
+    {
       "path": "OBJETO-CANONICO.md",
       "classification": "objeto_vivo",
-      "bytes": 179337,
-      "sha256": "3bbdc23ab680a0c0ad09d4f883b0b5ef47a8d5b9c05ac83baa28506971d192fa",
-      "git_blob_sha1": "9383edb77b91dd43d20914371d0102d7891048c9"
+      "bytes": 183939,
+      "sha256": "4788dc4ad188f777b4682515af7ad2f152988fcdce01aedcee74a002f74a54d1",
+      "git_blob_sha1": "d14ef713d3fea543734a92ca081c6f1dd3009f83"
     }
   ],
   "self_integrity": "El manifiesto no se hashea a sí mismo; comprobar su blob/commit devuelto por GitHub.",
-  "previous_verified_documentation_commit": "2012e2389deb732568a5bd384817c19499fb910c",
+  "previous_verified_documentation_commit": "727c55a0dbc31068b61dbb29b21c139a524e2cef",
   "recovery_base_main": "c02f5142d7609c35d8a2dc2c549726edc4016f13",
   "access_correction_evidence": "evidencias/verificacion-accesos-ciclo20-2026-10-17.json"
 }

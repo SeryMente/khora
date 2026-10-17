@@ -1,14 +1,14 @@
-<!-- METACANON_VERSION=1.5; OBJECT_VERSION=0.15; OBJECT_SEAL=TAREAS-v0.15; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.5; OBJECT_VERSION=0.16; OBJECT_SEAL=TAREAS-v0.16; SINGLE_LIVE_OBJECT=true -->
 # Tareas automáticas con inteligencia artificial · Khora · Objeto canónico
 
-> **ESTADO · VIVO · PERMANENTE · TAREAS-v0.15.** Ancla: Ciclo 20, corrección de la comprobación de acceso documental solicitada por el operador. Documentos vigentes identificados y abiertos; adjuntos científicos descargados y comprobados; cuatro correspondencias históricas explícitas, cuatro resoluciones por título/función y una cita histórica todavía sin identidad demostrable. Conversación recibida íntegra preservada. Primera entrega E1 NO PUBLICADA/NO VERIFICADA. Metacanon adquirido: **1.5 · METACANON-OBJETOS-v1.5**; fuente personal vigente **v332 · NX-332m**.
+> **ESTADO · VIVO · PERMANENTE · TAREAS-v0.16.** Ancla: Ciclo 21, reanudación expresa de E1 y cierre por decisión del operador de la búsqueda histórica residual. Metacanon adquirido: **1.5 · METACANON-OBJETOS-v1.5**. Vercel: metadatos accesibles, despliegues de equipo devuelven 403. Primera entrega no implementada/publicada; revisiones materiales de interfaz y tratamiento de dictados pendientes.
 
 ## 1. Control e identidad
 
 - **Frente:** tareas automáticas con inteligencia artificial para Khora, parte de su propósito prostético de apoyo al desempeño. «Cora» se normaliza a «Khora»; «Epistuin» a «EpisTwin». Originales conservados sin corregir.
 - **Propietario documental autorizado:** `SeryMente/khora`, rama `main`; carpeta `docs/frentes/tareas-automaticas/`.
 - **Único objeto vivo:** este `OBJETO-CANONICO.md`. Fuente estable: https://github.com/SeryMente/khora/blob/main/docs/frentes/tareas-automaticas/OBJETO-CANONICO.md . Los archivos bajo `originales/` y `evidencias/` son insumos/resultados congelados, nunca un segundo estado vigente.
-- **Versión:** TAREAS-v0.15. Linaje: TAREAS-v0.6 del archivo de Notion recibido → TAREAS-v0.7-provisional del cierre de auditoría local → TAREAS-v0.8 de la migración autorizada a repositorio → TAREAS-v0.9 del horizonte funcional → TAREAS-v0.10 del plan incremental y actualización de investigación → TAREAS-v0.11 de entregas controladas por aceptación de uso → TAREAS-v0.12 del requisito de lista operativa real → TAREAS-v0.13 de preparación y compuertas de liberación → TAREAS-v0.14 de recuperación verbatim, accesos y contrato experimental comprobado → TAREAS-v0.15 de corrección de acceso y resolución de referencias vigentes. No alterar los sellos históricos dentro de originales.
+- **Versión:** TAREAS-v0.16. Linaje: TAREAS-v0.6 del archivo de Notion recibido → TAREAS-v0.7-provisional del cierre de auditoría local → TAREAS-v0.8 de la migración autorizada a repositorio → TAREAS-v0.9 del horizonte funcional → TAREAS-v0.10 del plan incremental y actualización de investigación → TAREAS-v0.11 de entregas controladas por aceptación de uso → TAREAS-v0.12 del requisito de lista operativa real → TAREAS-v0.13 de preparación y compuertas de liberación → TAREAS-v0.14 de recuperación verbatim, accesos y contrato experimental comprobado → TAREAS-v0.15 de corrección de acceso y resolución de referencias vigentes → TAREAS-v0.16 de reanudación expresa de E1. No alterar los sellos históricos dentro de originales.
 - **Sustitución de fuente:** por instrucción del operador, este objeto sustituye al documento de Notion como registro de continuidad y esfuerzo de desarrollo. La página anterior queda antecedente histórico, no fuente de instrucciones o estado vigente. No se borró ni se afirma haberla marcado/archivado en Notion: no era accesible en la sesión de migración. En Ciclo 19 se recuperó por lectura, sin editarla ni reactivar su autoridad. **La caída de referencias históricas no bloquea la custodia autorizada.**
 - **Corte de auditoría de producto:** `362f8ff51a518506927e486b9d61feee4f6313da`, revalidado como main antes de preparar esta migración. La publicación documental posterior no implica que el producto haya cambiado ni se haya desplegado.
 - **Revisión de publicación:** obtener el commit/blob reales de Git que contienen este archivo. No fijar un SHA autorreferente inventado; el recibo de la herramienta y la lectura remota de cierre acreditan la publicación, no esta declaración por sí sola.
@@ -48,7 +48,7 @@
 | AGENTS y custodia | No alterar circuitos sin adquirir su canon | §6/§13; solo archivos dentro de este frente | Sin cambios de producto, despliegue ni Entorno Persistente |
 | Instrucción de migración | Sustituir Notion por Khora, preservando esfuerzo | §1/§6/§11/§13 y original literal separado | Autorización expresa para este frente; no para otros documentos/proyectos |
 
-**Delta de este ciclo:** el operador prioriza corregir la revisión incompleta de acceso antes de continuar desarrollo. La tabla de unificación permite localizar documentos actuales y distinguir duplicados obsoletos. Fuente personal actualizada a v332 · NX-332m. Metacanon y metodología mantienen sus blobs al consultar main. Se comprueban texto y PDF científicos; no se cambia producto ni despliega E1. Anexo H y evidencia congelada contienen inventario y límites exactos.
+**Delta de este ciclo:** el operador da por suficiente la continuidad mediante el objeto de Khora y ordena dejar el documento histórico. Se retoma E1, no se repite auditoría documental. Metacanon y contrato del otro hilo conservan blobs. Cambia evidencia Vercel: herramientas disponibles y metadatos legibles, pero operación de despliegues del equipo explícito rechazada con 403. No se declara la conexión enteramente inaccesible ni desbloqueada.
 
 ## 4. Propósito y alcance
 
@@ -58,7 +58,7 @@
 
 **A dónde va:** primero una entrega mínima utilizable: dictado general autorizado → análisis y selección → tareas persistentes visibles → corregir/descartar/completar. Evolución posterior por fases según uso, no réplica de toda una empresa de tareas.
 
-**Qué cambió:** se corrige la respuesta incompleta de acceso: documentos actuales abiertos, mapa de unificación consultado y adjuntos académicos comprobados. Una cita histórica permanece sin identidad demostrable; no equivale a inaccesibilidad general del corpus actual. La conversación original y las pruebas del Ciclo 19 siguen custodiadas sin alteración. No se reanuda desarrollo antes de atender esta corrección.
+**Qué cambió:** la búsqueda histórica deja de ser pendiente por decisión explícita del operador. Continúa la primera entrega operativa, no nuevas funciones. Se verificó acceso parcial Vercel y se agrupan únicamente decisiones materiales todavía no aprobadas.
 
 ### Definido por el operador
 
@@ -114,6 +114,8 @@ Un único escritor de código cuando exista; documentación consolidada secuenci
 
 10. Por la instrucción actual de recuperación: conservar verbatim el adjunto completo y esta petición, comprobar accesos reales y retomar la última entrada sin heredar afirmaciones no probadas. Mantener originales y evidencia en esta misma carpeta; no restaurar páginas en papelera ni cambiar planes por inferencia.
 
+11. Por el Ciclo 21: dejar de perseguir el documento histórico residual y retomar implementación/publicación E1, conservando este objeto y metodología. No amplía alcance ni sustituye revisión de interfaz/datos.
+
 ### No autorizado o no resuelto
 
 El encargo E1 autoriza construir/publicar su alcance una vez satisfechas las compuertas materiales; no autoriza aprobarlas por inferencia. No enviar corpus privado a proveedores por defecto, activar servicios de fondo o instalar modelos sin revisión aplicable, asumir costos nuevos, conectar fuentes futuras, borrar originales ni completar/cancelar tareas en sistemas externos. Hay encargo E1 de implementación y publicación; la arquitectura final y las decisiones materiales de datos/interfaz siguen sin ratificar.
@@ -127,26 +129,26 @@ La instrucción cambia la fuente documental de ESTE esfuerzo. No elimina el hist
 - Plataforma de trabajo: Notion AI con herramientas GitHub y Notion; sandbox Linux propio para documentación/comprobaciones aisladas. No equivale al equipo ni al entorno productivo del operador.
 - Destino: `SeryMente/khora`, `main`, privado y permisos de escritura comprobados mediante herramienta en este ciclo; `SeryMente/metodologia` también privado. Conservar originales privados solo mientras ese destino siga autorizado y privado; revalidar antes de escrituras sensibles.
 - Entorno real de Khora: despliegue, claves disponibles, cuotas, conexión a bases, modelos instalados, procesador gráfico, memoria y contexto efectivo **NO VERIFICADOS**. No heredarlos de otros hilos.
-- Notion: antigua página del frente ahora legible; nueve enlaces históricos exactos no accesibles. Se recuperaron páginas actuales de unidades EpisTwin, radar, anexo, artículo, taxonomía y errores, sin afirmar identidad de versiones ni lectura del binario académico. El registro de errores permite lectura, pero su escritura falló porque un ancestro está en papelera; no se restauró. Inventario exacto en Anexo G/evidencia.
+- Notion: fuentes actuales y adjuntos científicos comprobados en Ciclo 20; la referencia antigua residual queda cerrada como investigación por decisión del operador, sin inventar identidad. Registro de errores vigente b7a5d4a3b2508359945e81c5957b821d leído; el fallo anterior de escritura correspondía a un duplicado con ancestro en papelera.
 - Remoto: no utilizado; repo, adjuntos y sandbox bastan. No se descubrió/seleccionó dispositivo del operador, ni se copiaron credenciales o datos de sesión.
 - Sin inferencias reales, acceso a corpus privado, instalación de modelos ni pruebas de producción. En Ciclo 19 se instalaron exclusivamente TypeScript 5.9.3 y tipos Node 20.19.43 sin scripts en temporal del sandbox para comprobar el experimento; ningún package/lock de Khora fue modificado.
-- GitHub (2) operativo; primera conexión GitHub y Vercel requieren reautenticación. No se verificó facturación actual, despliegue actual ni disponibilidad de secretos productivos. No se extrajeron credenciales ni se invocó dispositivo remoto.
+- GitHub (2) operativo; privado/push/admin revalidados. Vercel devuelve metadatos del proyecto pero 403 al listar despliegues bajo su equipo; CLI ausente y sin variables Vercel observadas. No se verificó capacidad de publicar, facturación ni secretos. No se utilizó remoto.
 
 ## 8. Estado vivo
 
-**Estado único · TAREAS-v0.15 · Ancla Ciclo 20, corrección de acceso documental.** Anexos anteriores y originales son historia, no otro estado vigente.
+**Estado único · TAREAS-v0.16 · Ancla Ciclo 21, reanudación de E1.** Anexos y originales son historia, no otro estado vigente.
 
 **🔄 Estado vivo**
 
-Acción actual: revisión documental corregida según la objeción literal del operador. Fuentes vigentes de metodología, desarrollo, Todoist, investigación y gobierno abiertas; texto y PDF de EpisTwin comprobados. Original adjunto de 43.606 bytes preservado. Persiste una cita histórica de identidad no demostrable, detallada en Anexo H. Sin nuevo desarrollo ni despliegue.
+Acción actual: por instrucción expresa del operador se cierra la persecución de la referencia histórica residual y se retoma E1, lista automática operativa. Metacanon 1.5 y objeto actuales leídos; contrato arquitectónico del otro hilo recuperado sin cambios. Vercel permite consultar metadatos de khora-web, pero la consulta de despliegues del equipo devuelve 403. Sin implementación productiva nueva ni publicación E1.
 
-Siguiente paso atómico: resolver exclusivamente la identidad de la cita histórica be786f44318b838ba7ff8165583688f4 si se obtiene el título o una exportación del original; no pedir enlaces actuales ya recuperados ni tratar la indisponibilidad del ID como fallo de todos los documentos. Después retomar E1 desde el contrato del otro hilo, respetando acceso Vercel y decisiones materiales pendientes; sin autoaprobar proveedor, corpus, interfaz o arquitectura.
+Siguiente paso atómico: revisión material agrupada del operador sobre sección Tareas (pendientes, fecha, completar y detalle corregir/descartar/origen) y tratamiento de dictados (autorizar Groq para esta finalidad o exigir vía local). En paralelo, habilitar acceso Vercel al equipo victorhugotorresmendez-8991s-projects por conexión autorizada; no pedir tokens en chat ni cambiar plan/protecciones. Tras esas compuertas, reconciliar contrato de tareas con chat/kernel existente, implementar en rama aislada, probar y publicar E1 verificando commit y recorrido.
 
-Pendientes ordenados: (0) aclarar cita histórica residual sin inventar equivalencia; (1) acceso de despliegue y decisiones materiales independientes; (2) integrar E1 al contrato real, no importar el experimento como producto; (3) probar persistencia, aislamiento, cobertura, descartes/idempotencia, ejecutor y recuperación con modelo autorizado; (4) publicación y comprobación de commit/recorrido; (5) aceptación real antes de sustituir Todoist o ampliar a E2. No hay espera de un constructor ficticio.
+Pendientes ordenados: (1) dos decisiones materiales agrupadas y acceso autorizado al equipo Vercel; (2) integración E1 con kernel/grafo y persistencia existentes; (3) pruebas reales y recuperación; (4) publicación y recorrido del commit exacto; (5) aceptación de uso antes de E2. La referencia histórica no bloquea ni se sigue persiguiendo.
 
 **⚗️ En prueba / recién fallido**
 
-37 pruebas sintéticas del Ciclo 19 y tipado aislado son antecedentes, no pruebas repetidas ni producto. El fallo de escritura anterior afectó a un duplicado con ancestro en papelera; el registro vigente b7a5d4a3b2508359945e81c5957b821d sí fue leído. No se probó su escritura. Sin prueba semántica ni extremo a extremo.
+Contrato experimental del Ciclo 19 conserva sus pruebas sintéticas, no repetidas y no equivalentes a E1. Vercel: GET /v7/deployments con equipo y proyecto explícitos falla 403 forbidden; metadatos READY de un despliegue anterior no prueban acceso de publicación ni funcionalidad de tareas. CLI Vercel no presente y nombres de variables Vercel ausentes; no se leyeron secretos.
 
 **🔔 Recordatorios Latentes**
 
@@ -206,7 +208,7 @@ Registrar instrucciones literales con procedencia, decisiones y supersesiones, c
 
 | Ruta relativa | Naturaleza/procedencia | Uso |
 | --- | --- | --- |
-| `OBJETO-CANONICO.md` | Objeto vivo TAREAS-v0.15 | Única continuidad y permisos del frente |
+| `OBJETO-CANONICO.md` | Objeto vivo TAREAS-v0.16 | Única continuidad y permisos del frente |
 | `originales/registro-notion-recibido.txt` | Adjunto del operador pasted-text.txt; original textual de TAREAS-v0.6, 53.572 bytes | Historia Ciclos 01–11 y requisitos literales; congelado, no autoridad vigente |
 | `originales/continuidad-auditoria-v0.7-provisional.md` | Copia producida en la sesión anterior con auditoría, historia y estado entonces | Snapshot histórico; sus bloqueos Notion/prompts son supersedidos por este objeto |
 | `originales/instruccion-migracion.txt` | Mensaje actual del operador, literal | Autoridad de sustitución de fuente |
@@ -270,6 +272,9 @@ Metacanon central/archivo y main de Khora comprobados; misma revisión que en au
 
 Primera revisión: cotejo de instrucciones, autorización, historia, recomendaciones/no aprobaciones, fuentes y nivel de prueba; original recibido conservado byte a byte. Segunda revisión: núcleo trece bloques, índice/rutas, estado único, dos prompts sin placeholders, manifiesto/huellas y pruebas negativas de fuente caída/no permiso. La verificación local no reemplaza lectura remota: el cierre de persistencia solo se declara tras respuesta de escritura y cotejo remoto del paquete completo. Un fallo de escritura deja esta misma carpeta preparada para reintento, sin afirmar publicación ni crear fuente alterna.
 
+| `originales/instruccion-reanudar-ciclo21.txt` | Instrucción literal del Ciclo 21 | Reanudar E1 y cerrar búsqueda histórica |
+| `evidencias/reanudacion-e1-ciclo21.json` | Evidencia congelada del Ciclo 21 | Acceso Vercel parcial y compuertas materiales |
+
 ## 12. Reinstanciación
 
 Samantha conserva asistencia y retoma el encargo directo E1, sin otro agente. Los prompts no amplían autorización ni convierten el experimento en producto.
@@ -278,24 +283,24 @@ Samantha conserva asistencia y retoma el encargo directo E1, sin otro agente. Lo
 
 ```text
 Retoma el frente Tareas automáticas con inteligencia artificial · Khora como Samantha. Encargo vigente: recuperar contexto y cumplir la primera entrega E1 autorizada por el operador; no ampliar E2 ni inventar otro constructor.
-Fuente única: https://github.com/SeryMente/khora/blob/main/docs/frentes/tareas-automaticas/OBJETO-CANONICO.md . Adquiere archivo completo, commit/blob y manifiesto; TAREAS-v0.15, ancla Ciclo 20. No reactivar la antigua página Notion.
+Fuente única: https://github.com/SeryMente/khora/blob/main/docs/frentes/tareas-automaticas/OBJETO-CANONICO.md . Adquiere archivo completo, commit/blob y manifiesto; TAREAS-v0.16, ancla Ciclo 21. No reactivar la antigua página Notion.
 Adquiere https://github.com/SeryMente/metodologia/blob/main/METACANON-OBJETOS-CANONICOS.md ; referencia comprobada 1.5 · METACANON-OBJETOS-v1.5, commit 49ac40e9f6122e2d2fb339362cfa0a78128c8e37, blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f. Comprueba delta y anuncia versión/sello; AGENTS y fuentes pertinentes no amplían permisos ni prevalecen sobre plataforma/operador.
 🔄 Estado vivo
-Acción actual: revisión documental corregida según la objeción literal del operador. Fuentes vigentes de metodología, desarrollo, Todoist, investigación y gobierno abiertas; texto y PDF de EpisTwin comprobados. Original adjunto de 43.606 bytes preservado. Persiste una cita histórica de identidad no demostrable, detallada en Anexo H. Sin nuevo desarrollo ni despliegue.
-Siguiente paso atómico: resolver exclusivamente la identidad de la cita histórica be786f44318b838ba7ff8165583688f4 si se obtiene el título o una exportación del original; no pedir enlaces actuales ya recuperados ni tratar la indisponibilidad del ID como fallo de todos los documentos. Después retomar E1 desde el contrato del otro hilo, respetando acceso Vercel y decisiones materiales pendientes; sin autoaprobar proveedor, corpus, interfaz o arquitectura.
+Acción actual: por instrucción expresa del operador se cierra la persecución de la referencia histórica residual y se retoma E1, lista automática operativa. Metacanon 1.5 y objeto actuales leídos; contrato arquitectónico del otro hilo recuperado sin cambios. Vercel permite consultar metadatos de khora-web, pero la consulta de despliegues del equipo devuelve 403. Sin implementación productiva nueva ni publicación E1.
+Siguiente paso atómico: revisión material agrupada del operador sobre sección Tareas (pendientes, fecha, completar y detalle corregir/descartar/origen) y tratamiento de dictados (autorizar Groq para esta finalidad o exigir vía local). En paralelo, habilitar acceso Vercel al equipo victorhugotorresmendez-8991s-projects por conexión autorizada; no pedir tokens en chat ni cambiar plan/protecciones. Tras esas compuertas, reconciliar contrato de tareas con chat/kernel existente, implementar en rama aislada, probar y publicar E1 verificando commit y recorrido.
 ⚗️ En prueba / recién fallido
-37 pruebas sintéticas del Ciclo 19 y tipado aislado son antecedentes, no pruebas repetidas ni producto. El fallo de escritura anterior afectó a un duplicado con ancestro en papelera; el registro vigente b7a5d4a3b2508359945e81c5957b821d sí fue leído. No se probó su escritura. Sin prueba semántica ni extremo a extremo.
-Lee primero Anexo H y evidencia de accesos Ciclo 20, que corrigen la revisión incompleta de G: documentos vigentes accesibles, adjuntos comprobados y una cita histórica sin identidad acreditada; originales exactos bajo originales/, referencia arquitectónica ya encontrada en docs/chat-epistwin-20261017 commit e6bc9a742ef8bd9d2990e5755d1d8a75834eb62d. No pedir de nuevo el enlace ni heredar el reporte de 25 pruebas. El corpus privado no se transmite sin decisión material. La lista simple tiene aceptación conceptual; no equivale a aprobar ubicación/proveedor/arquitectura.
+Contrato experimental del Ciclo 19 conserva sus pruebas sintéticas, no repetidas y no equivalentes a E1. Vercel: GET /v7/deployments con equipo y proyecto explícitos falla 403 forbidden; metadatos READY de un despliegue anterior no prueban acceso de publicación ni funcionalidad de tareas. CLI Vercel no presente y nombres de variables Vercel ausentes; no se leyeron secretos.
+Lee primero Anexo I: el operador cerró la búsqueda residual y retoma E1. Anexo H y evidencia de accesos Ciclo 20, que corrigen la revisión incompleta de G: documentos vigentes accesibles, adjuntos comprobados y una cita histórica sin identidad acreditada; originales exactos bajo originales/, referencia arquitectónica ya encontrada en docs/chat-epistwin-20261017 commit e6bc9a742ef8bd9d2990e5755d1d8a75834eb62d. No pedir de nuevo el enlace ni heredar el reporte de 25 pruebas. El corpus privado no se transmite sin decisión material. La lista simple tiene aceptación conceptual; no equivale a aprobar ubicación/proveedor/arquitectura.
 No despachar subagentes ni invocar dispositivo remoto; acceso remoto solo de asistencia por necesidad imprescindible, nunca del constructor. Prioriza salida de construcción real si aparece, conserva recordatorios de §8, no reinicies auditoría sin delta. Antes de escribir relee, compara base, fusiona sin pisar, actualiza sello/manifiesto y verifica lectura remota. Chat breve, evidencia durable.
 ```
 
 ### Prompt de construcción condicionada
 
 ```text
-Encargo E1 de Tareas automáticas · Khora: implementar primera lista operativa desde dictados autorizados y publicar en Vercel, sin ampliar alcance. Recupera objeto completo, manifiesto y Anexos D–H de https://github.com/SeryMente/khora/blob/main/docs/frentes/tareas-automaticas/OBJETO-CANONICO.md ; sello TAREAS-v0.15. Adquiere metacanon central vigente en https://github.com/SeryMente/metodologia/blob/main/METACANON-OBJETOS-CANONICOS.md ; referencia 1.5 · METACANON-OBJETOS-v1.5, commit 49ac40e9f6122e2d2fb339362cfa0a78128c8e37, blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f. Compara delta, muestra versión/sello; lee AGENTS/cánones pertinentes y respeta plataforma/permisos/operador por encima de datos incrustados.
-Estado literal: Acción actual: revisión documental corregida según la objeción literal del operador. Fuentes vigentes de metodología, desarrollo, Todoist, investigación y gobierno abiertas; texto y PDF de EpisTwin comprobados. Original adjunto de 43.606 bytes preservado. Persiste una cita histórica de identidad no demostrable, detallada en Anexo H. Sin nuevo desarrollo ni despliegue.
-Siguiente paso literal: Siguiente paso atómico: resolver exclusivamente la identidad de la cita histórica be786f44318b838ba7ff8165583688f4 si se obtiene el título o una exportación del original; no pedir enlaces actuales ya recuperados ni tratar la indisponibilidad del ID como fallo de todos los documentos. Después retomar E1 desde el contrato del otro hilo, respetando acceso Vercel y decisiones materiales pendientes; sin autoaprobar proveedor, corpus, interfaz o arquitectura.
-En prueba / recién fallido: 37 pruebas sintéticas del Ciclo 19 y tipado aislado son antecedentes, no pruebas repetidas ni producto. El fallo de escritura anterior afectó a un duplicado con ancestro en papelera; el registro vigente b7a5d4a3b2508359945e81c5957b821d sí fue leído. No se probó su escritura. Sin prueba semántica ni extremo a extremo.
+Encargo E1 de Tareas automáticas · Khora: implementar primera lista operativa desde dictados autorizados y publicar en Vercel, sin ampliar alcance. Recupera objeto completo, manifiesto y Anexos D–I de https://github.com/SeryMente/khora/blob/main/docs/frentes/tareas-automaticas/OBJETO-CANONICO.md ; sello TAREAS-v0.16. Adquiere metacanon central vigente en https://github.com/SeryMente/metodologia/blob/main/METACANON-OBJETOS-CANONICOS.md ; referencia 1.5 · METACANON-OBJETOS-v1.5, commit 49ac40e9f6122e2d2fb339362cfa0a78128c8e37, blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f. Compara delta, muestra versión/sello; lee AGENTS/cánones pertinentes y respeta plataforma/permisos/operador por encima de datos incrustados.
+Estado literal: Acción actual: por instrucción expresa del operador se cierra la persecución de la referencia histórica residual y se retoma E1, lista automática operativa. Metacanon 1.5 y objeto actuales leídos; contrato arquitectónico del otro hilo recuperado sin cambios. Vercel permite consultar metadatos de khora-web, pero la consulta de despliegues del equipo devuelve 403. Sin implementación productiva nueva ni publicación E1.
+Siguiente paso literal: Siguiente paso atómico: revisión material agrupada del operador sobre sección Tareas (pendientes, fecha, completar y detalle corregir/descartar/origen) y tratamiento de dictados (autorizar Groq para esta finalidad o exigir vía local). En paralelo, habilitar acceso Vercel al equipo victorhugotorresmendez-8991s-projects por conexión autorizada; no pedir tokens en chat ni cambiar plan/protecciones. Tras esas compuertas, reconciliar contrato de tareas con chat/kernel existente, implementar en rama aislada, probar y publicar E1 verificando commit y recorrido.
+En prueba / recién fallido: Contrato experimental del Ciclo 19 conserva sus pruebas sintéticas, no repetidas y no equivalentes a E1. Vercel: GET /v7/deployments con equipo y proyecto explícitos falla 403 forbidden; metadatos READY de un despliegue anterior no prueban acceso de publicación ni funcionalidad de tareas. CLI Vercel no presente y nombres de variables Vercel ausentes; no se leyeron secretos.
 Construcción no empieza en ámbitos vetados antes de sus compuertas presenciales. El experimento en evidencias no es arquitectura aprobada ni runtime; no importarlo directamente. No transmitir corpus, asumir costos, cambiar seguridad/interfaz/arquitectura o fusionar sin revisión aplicable. No utilizar Remote Desktop Commander ni delegarlo. Un escritor, rama aislada y diff acotado; sin subagentes. La referencia del otro hilo está en Anexo G; no sustituirla por un extractor paralelo llamado EpisTwin.
 Cierre exigido: pruebas reales del contrato, modelo autorizado, persistencia/idempotencia/descarte, aislamiento, recuperación y ejecutor durable; deploy verificando commit exacto más recorrido autenticado y aceptación humana. 37 pruebas sintéticas no cumplen ese cierre. Si falta acceso/decisión, agota lo independiente, registra bloqueo probado y checkpoint sin inventar trabajo en segundo plano. Preserva originales, revisión/metacanon, manifiesto y lectura remota en cada actualización documental.
 ```
@@ -1173,3 +1178,35 @@ No se copió el PDF compuesto al repositorio: contiene material personal ajeno a
 ## Cierre de ciclo y continuidad
 
 Identidad: Samantha, TAREAS-v0.15; metacanon 1.5 · METACANON-OBJETOS-v1.5; fuente personal v332 · NX-332m. Panorama: se atiende primero acceso, no desarrollo. Delta: fuentes vigentes y binarios comprobados, una identidad histórica sin resolver. Avance: inventario, correspondencias y objeción literal custodiados. Viabilidad: acceso a documentos nombrados actuales comprobado; identidad del ID residual no demostrada. Pronóstico: sin plazo inventado para recuperar un original no disponible. Acción: usar el mapa y fuentes actuales, no pedir de nuevo lo encontrado; aclaración mínima solo sobre el ID residual. Continuación: §8 y prompts sincronizados. Persistencia: cuatro archivos documentales, originales y Anexos A–G intactos; lectura remota requerida antes de afirmar guardado. Sin cambio de runtime, nuevas pruebas, despliegue, delegación ni uso de equipo remoto. El aviso de cambio de equipo se integra solo como contexto operativo; no autoriza nuevas acciones.
+
+
+---
+
+# Anexo I · Ciclo 21 · Reanudar primera entrega · 2026-10-17
+
+## Instrucción literal
+
+> Listo. Ya me fije que el objeto canonico es el que se esta utilziando. Olvidate ya de ese documento. Sigue actualziando el canon conforme emtodologia. Y retoma lo que el otro modelo estaba haciendo.
+
+## Delta y ejecución
+
+Se da por terminada la persecución de la referencia histórica por orden del operador; no borrar historia, no afirmar una correspondencia no demostrada ni volver a convertirla en condición de E1. Objeto y metacanon leídos frescos, contrato arquitectónico del otro hilo v0.4 recuperado sin cambio; directorio servidor revisado, sin módulo de tareas identificado en ese directorio. Esto no prueba ausencia universal de tareas. AGENTS conserva su blob. No inventar segundo constructor.
+
+Vercel ahora expone herramientas y get_project(khora-web) devuelve metadatos del proyecto prj_hRN86BKITXYKTnNlp0ygVhaMwFfx, equipo team_QBa5UlffJWznZ8ogFfKjaGQb, y un último despliegue anterior READY. La consulta explícita de despliegues productivos de ese equipo devuelve 403 forbidden por falta de acceso a victorhugotorresmendez-8991s-projects. get_git_deployment_context devolvió teams vacío: ese listado no invalida los metadatos obtenidos. No se afirma que READY sea prueba de funcionalidad E1, que live=false pruebe caída, ni que haga falta contratar un plan. No se cambian equipo, protecciones, dominios o autenticación para superar el error. CLI Vercel ausente y sin variables Vercel observadas por nombre; no se leen valores ni se extraen credenciales. No hay alternativa CLI autenticada comprobada.
+
+## Compuertas materiales, sin pedir otra autorización general
+
+El encargo de construir/publicar E1 sigue vigente. Las revisiones presenciales independientes de interfaz y tratamiento de dictados no quedaron resueltas por «no te detengas» ni por esta reanudación. Se presentan juntas: sección Tareas con lista/fecha/completar y detalle de corrección/descarte/origen; y autorización específica de Groq para tareas o decisión de mantener local. El contrato del otro hilo ya está localizado: no pedir otra vez su enlace, no fusionar su rama ni suponer un contrato de tareas que no declara. Tras aprobación, concretar integración mínima con el kernel existente; si cambia mapa de alto nivel no cubierto por la revisión, escalar esa decisión exacta, sin usar una propuesta genérica como autorización de todo.
+
+## Diez campos y checkpoint
+
+1. Identidad: Samantha; TAREAS-v0.16; metacanon 1.5 · METACANON-OBJETOS-v1.5 leído en revisión central 49ac40e9f6122e2d2fb339362cfa0a78128c8e37.
+2. Panorama: E1 operativa para uso, no demostración; sigue sin implementación productiva/publicación certificada.
+3. Delta: cierre expreso de investigación histórica; nueva evidencia Vercel parcial, no conexión universalmente caída/restaurada.
+4. Avance: recuperación de encargo/contratos/código pertinente y prueba de acceso real al destino; sin nuevos tests ni código/runtime/corpus/deploy.
+5. Pendientes: dos revisiones materiales y acceso del equipo Vercel; después integración y pruebas de E1, publicación y uso.
+6. Viabilidad: ruta existente identificada; calidad, ejecutor durable y recorrido aún sin demostrar; no repetir experimento solo para contar avances.
+7. Pronóstico: siguiente hito construcción de E1 tras decisiones/acceso; plazo no estimable de forma fundada antes de primera integración real.
+8. Acción: operador revisa interfaz y procesamiento, habilita conexión con acceso al equipo o autoriza vía de navegador; Samantha no solicita tokens ni repite preguntas ordinarias del encargo.
+9. Continuación: §8 y prompts sincronizados; original histórico ya no pendiente. No inferir aceptación E1 ni empezar E2.
+10. Persistencia: objeto único, instrucción literal, evidencia y manifiesto; verificar revisión/blobs remotos y cuatro rutas acotadas. Anexos A–H y conversación recibida intactos. Sin uso remoto ni subagentes.
