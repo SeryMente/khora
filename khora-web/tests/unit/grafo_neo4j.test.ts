@@ -167,3 +167,18 @@ test("/api/grafo reads published Leiden membership rather than stale entity prop
     assert.notEqual(body.nodes[0].community, 999);
   } finally { restoreDriver(); restoreEnv(); }
 });
+
+
+test("/api/grafo preserves edge provenance and unique identities across source versions", async () => {
+  const restoreEnv = withEnv({ NEO4J_URI: "bolt://localhost:7687", NEO4J_USER: "neo4j", NEO4J_PASSWORD: "test" });
+  const restoreDriver = mockDriver(async (query) => {
+    if (query.includes("r:RELATION")) {
+      assert.ok(query.includes("coalesce(toString(r.io_id), 'legacy')"));
+      assert.ok(query.includes("r.invalid_at IS NULL"));
+      assert.ok(query.includes("r.io_id = io.io_id"));
+    }
+    return rowsFor(query);
+  });
+  try { assert.equal((await GET(new Request("http://localhost/api/grafo?io_id=io-1"))).status, 200); }
+  finally { restoreDriver(); restoreEnv(); }
+});

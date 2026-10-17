@@ -168,15 +168,16 @@ export async function obtenerProyeccionGrafo(filtros: Filtros = {}): Promise<Pro
       const edgeQuery = ioId || volcadoId
         ? `MATCH (io:InformationObject)-[:MENTIONS]->(e1:Entity)-[r:RELATION]->(e2:Entity)<-[:MENTIONS]-(io)
            WHERE toString(io.io_id) IN $ioIds AND e1.canonical_key IN $nodeIds AND e2.canonical_key IN $nodeIds
-           RETURN DISTINCT coalesce(toString(r.id), e1.canonical_key + '->' + e2.canonical_key + ':' + coalesce(r.type, 'RELATION')) AS id,
+             AND r.io_id = io.io_id AND r.invalid_at IS NULL
+           RETURN DISTINCT coalesce(toString(r.id), e1.canonical_key + '->' + e2.canonical_key + ':' + coalesce(r.type, 'RELATION') + ':' + coalesce(toString(r.io_id), 'legacy')) AS id,
              e1.canonical_key AS source, e2.canonical_key AS target, coalesce(r.type, 'RELATION') AS type,
              coalesce(r.weight, 1.0) AS weight, coalesce(r.provenance[0], 'Neo4j Aura') AS origen,
              coalesce(toString(r.created_at), toString(r.valid_at), toString(datetime())) AS timestamp,
              'Verificado' AS verificacion
            ORDER BY id ASC LIMIT $fetchLimit`
         : `MATCH (e1:Entity)-[r:RELATION]->(e2:Entity)
-           WHERE e1.canonical_key IN $nodeIds AND e2.canonical_key IN $nodeIds
-           RETURN DISTINCT coalesce(toString(r.id), e1.canonical_key + '->' + e2.canonical_key + ':' + coalesce(r.type, 'RELATION')) AS id,
+           WHERE e1.canonical_key IN $nodeIds AND e2.canonical_key IN $nodeIds AND r.invalid_at IS NULL
+           RETURN DISTINCT coalesce(toString(r.id), e1.canonical_key + '->' + e2.canonical_key + ':' + coalesce(r.type, 'RELATION') + ':' + coalesce(toString(r.io_id), 'legacy')) AS id,
              e1.canonical_key AS source, e2.canonical_key AS target, coalesce(r.type, 'RELATION') AS type,
              coalesce(r.weight, 1.0) AS weight, coalesce(r.provenance[0], 'Neo4j Aura') AS origen,
              coalesce(toString(r.created_at), toString(r.valid_at), toString(datetime())) AS timestamp,
@@ -209,7 +210,7 @@ export async function obtenerProyeccionGrafo(filtros: Filtros = {}): Promise<Pro
     });
   } catch (error) {
     if (error instanceof Neo4jNoConfiguradoError || error instanceof Neo4jInalcanzableError) throw error;
-    if (esIndisponibilidad(error)) throw new Neo4jInalcanzableError(`Neo4j no está disponible: ${String((error as any)?.message ?? error)}`);
+    if (esIndisponibilidad(error)) throw new Neo4jInalcanzableError(`Neo4j no estÃ¡ disponible: ${String((error as any)?.message ?? error)}`);
     throw error;
   }
 }
