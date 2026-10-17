@@ -30,9 +30,9 @@
   "files": [
     {
       "path": "OBJETO-CANONICO.md",
-      "bytes": 137129,
-      "sha256": "513ed710f6278ae20edc0946746af7dced79a018f7f453198de02dd0fc3847bf",
-      "git_blob_sha": "885b35e0a668524e498675f106dc61902324c76e"
+      "bytes": 147234,
+      "sha256": "17e0e36309d0ba8a8c46b71433f4459a5bc3005f6d13dcf30b323349fd1d526d",
+      "git_blob_sha": "e6a9b6be98c1d4180e89dcb20615202952c18651"
     },
     {
       "path": "CONTRATO-DICTADO-EXPERIENCE.md",
@@ -87,6 +87,54 @@
       "bytes": 3972,
       "sha256": "fcccada87418dc85f7c8e601a1dd15fd30e4fa210b6223051601f0b12b2fdebe",
       "git_blob_sha": "f5d21226ed25066d506aae92e88b9496fca5f49f"
+    },
+    {
+      "path": "evidencias/MICROFONO-BOOTSTRAP.json",
+      "bytes": 3696,
+      "sha256": "6a0e5987abc9ac8358a9f66786f03d423e48a8c6c9d831a8071730cfae2f4c47",
+      "git_blob_sha": "bcbfec1d00d619356163746e9858c54192a055cb"
+    },
+    {
+      "path": "originales/MICROFONO-BLOQUEADO.txt",
+      "bytes": 207,
+      "sha256": "57b4fd45f2638fba59bf156e3c49bd1a3e869f897ae3dc42216f2d707e8ba2ef",
+      "git_blob_sha": "c401d5aef532d86e9c6efe1418961d2409d33c06"
+    },
+    {
+      "path": "originales/CONVERSACION-MIGRADA-20261017.txt",
+      "bytes": 51233,
+      "sha256": "f079409bd77923f54dfffeb04314a118b19cfd5718c0225b2dbfa9e846342809",
+      "git_blob_sha": "d7e1749b37f40b2cfd7794411c45e6bad82ddfa1"
+    },
+    {
+      "path": "evidencias/CUSTODIA-CONVERSACION-20261017.json",
+      "bytes": 1667,
+      "sha256": "161e81d416d64b8455cae423feba7c4086f7b1006f114be7b65650a2d140e81c",
+      "git_blob_sha": "f06997f483bd932efc7d74a1b292b75555d8cb28"
+    },
+    {
+      "path": "originales/.gitattributes",
+      "bytes": 46,
+      "sha256": "f68655747291ce2740a3ff99247786c52bc88143b451649aece8973ea2638fd1",
+      "git_blob_sha": "3ae0447d9085a76b833b47adf9876d254ab0d748"
+    },
+    {
+      "path": "originales/CONTINUIDAD-C021.md",
+      "bytes": 2391,
+      "sha256": "b2f2b2e8040460dc47583613deb420694251e2fad94d4dd0b0e6bfd2dcebd20d",
+      "git_blob_sha": "0c1241491a06d371d31d8c166378e106355180ba"
+    },
+    {
+      "path": "evidencias/CIERRE-MICROFONO-PUBLICADO-20261017.md",
+      "bytes": 5737,
+      "sha256": "704ede7a637245f2ecd98b04d0fa6fb73ade9ddfc1d70d446269c4fb6da0ae5b",
+      "git_blob_sha": "f1beab77180453db4b91da44a3065ee9aa98ed31"
+    },
+    {
+      "path": "evidencias/REVISION-C021.json",
+      "bytes": 2254,
+      "sha256": "ec9db5491125f3757134670e3330d6a8b253ea256547b060ddba23b37f5a9056",
+      "git_blob_sha": "7c255795e91cfe3f7624f2a0038bd0069cca69c3"
     }
   ],
   "runtime_references": [
@@ -180,8 +228,9 @@
     "complete native event export of current Notion chat",
     "new physical microphone session and private user feedback",
     "current authenticated benchmark screen",
-    "current published source SHA",
-    "clinical reference data and any voice-health model"
+    "clinical reference data and any voice-health model",
+    "Preparacion-benchmark-y-retroalimentacion.md standalone temporary file",
+    "fresh full review of every supporting technical document cited by this sprint"
   ],
   "privacy_review": {
     "destination_private_verified_by_tool": true,
@@ -192,11 +241,33 @@
     "no_secret_values_in_manifest": true
   },
   "current_preparation": {
-    "version": "0.4.0",
-    "baseSha": "f04e815b47fa8a7b5297561df62000478f978108",
-    "receipt": "evidencias/INTEGRACION-ENDURECIMIENTO.json",
-    "pullRequest": "https://github.com/SeryMente/khora/pull/305",
-    "state": "software verified; merge authorization explicit; effective merge determined by Git"
+    "version": "0.5.3",
+    "baseSha": "2012e2389deb732568a5bd384817c19499fb910c",
+    "receipt": "evidencias/REVISION-C021.json",
+    "state": "documentation reconciliation; merge and readback checked separately"
   },
-  "latestEvent": "C017 - Ingreso explicit recovery and coherent UI"
+  "latestEvent": "C021 - canonical object is primary; C020 publication and sprint-wide continuity consolidated",
+  "latest_verified_release": {
+    "commit": "c02f5142d7609c35d8a2dc2c549726edc4016f13",
+    "pullRequest": "https://github.com/SeryMente/khora/pull/312",
+    "receipt": "evidencias/CIERRE-MICROFONO-PUBLICADO-20261017.md",
+    "productionObservation": {
+      "url": "https://khora-web.vercel.app/api/version?canon=1792276556617093122",
+      "httpStatus": 200,
+      "serverDate": "Sat, 17 Oct 2026 22:35:56 GMT",
+      "version": {
+        "commit": "c02f5142d7609c35d8a2dc2c549726edc4016f13",
+        "rama": "HEAD",
+        "desplegado_desde_git": true,
+        "entorno": "production",
+        "rutas": [
+          "/sistema/custodia",
+          "/api/volcado"
+        ],
+        "ahora": "2026-10-17T22:35:56.661Z"
+      }
+    },
+    "humanAcceptance": "pending",
+    "productRebuiltThisCycle": false
+  }
 }
