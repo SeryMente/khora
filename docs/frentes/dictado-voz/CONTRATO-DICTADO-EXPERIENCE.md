@@ -111,3 +111,16 @@ El proyecto Vercel usa un Build Command propio que no invoca npm prebuild. Para 
 
 ### Controles externos no ejecutados
 GitHub Actions, ejecución 38967613218, no inició trabajos: `The job was not started because recent account payments have failed or your spending limit needs to be increased.` Los estados Vercel de integración GitHub también señalan restricción de repositorio privado de organización en plan Hobby. No se modifican facturación, plan, visibilidad, permisos ni protecciones. Las comprobaciones ejecutadas directamente y el build Vercel son evidencia independiente, no equivalencia a Actions verde. La integración solo puede usar merge normal, sin anulación administrativa de controles.
+
+## Endurecimiento local posterior — contrato operativo
+
+- Cola exclusiva de metadatos: máximo 128, solo memoria, validación cerrada, un POST activo; feedback manual no entra en ella. Se conserva ID ante fallo; ACK debe incluir ok e ID exacto. Recarga/cierre pierden pendientes no confirmados; no se promete entrega exactamente una vez ni almacenamiento durable en cliente.
+- Reintento cada 30 s, al recuperar conexión o manualmente; comprueba estado ocupado entre registros. POST a 15 s aborta espera: resultado desconocido, reintento idempotente; no atribuir pérdida ni guardado confirmado sin acuse.
+- Propietario capturado por intento. Cambio de cuenta/revocación invalida cola; un acuse viejo no elimina nuevos elementos. Consentimiento local estricto; error de persistencia queda apagado. Evento storage sincroniza preferencia entre pestañas, no garantiza exclusión mutua global de invitaciones.
+- DELETE detiene recopilación y espera al POST activo. Si este falla/expira no confirma borrado; requiere reintento. No elimina auditoría/capturas. El servidor continúa validando origen, sesión y perfil; no se amplía consentimiento ni se altera cifrado/retención.
+- Solo inicio reconocido abre medición. Duplicado de inicio/final, evento sin inicio o resultado tardío no crean otra sesión. Se recuerdan hasta 512 sesiones cerradas por montaje; eventos de otra sesión sin inicio explícito se ignoran.
+- Resumen: ID repetido no suma; sesiones idénticas con otro ID no multiplican muestras. Contenido conflictivo del mismo ID/sesión se excluye y se contabiliza, sin escoger un resultado favorable. Datos inválidos tampoco cuentan; savedAt se trata como metadato de lectura. Invitación shown se cuenta una vez por sesión. Feedback voluntario legítimo conserva su ID propio.
+- Benchmark: candado exclusivo, running antes de precondiciones, escritura atómica, failed ante error y not_run en fases no ejecutadas. Cierre forzado puede dejar running/candado; inspeccionar proceso antes de intervenir. No interpretar running/not_run como aprobado. Registro de commit base, huella de entradas y workingTreeDirty; no atribuir cambios locales al commit base.
+- Pruebas nuevas reproducen red caída, concurrencia, propietario, pausa, cola llena, preferencias corruptas/cuota, duplicados/tardíos y fallo previo del benchmark. Persistencia real y voz humana siguen siendo verificaciones aparte.
+
+La integración/publicación se autoriza por separado. Esta ampliación no convierte la propuesta de análisis de voz en función implementada.

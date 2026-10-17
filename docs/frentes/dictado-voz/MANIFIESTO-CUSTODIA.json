@@ -25,20 +25,20 @@
     "path": "khora-web/docs/dictado-experience.md",
     "blob": "2f4dcbed839168e04a32a0dcdd343acbc02f32ec",
     "sha256": "451f0fa5d4ab51a121297ad6667bbfab76cc7c2467e283bad3b26d740b444255",
-    "transformation": "continuity link and custody banner only"
+    "transformation": "Original content preserved; continuity banner and subsequent local hardening operational addendum"
   },
   "files": [
     {
       "path": "OBJETO-CANONICO.md",
-      "bytes": 126566,
-      "sha256": "4665794e4c7ca1f499082e954a0338d6d1df3110c19c6b6c96055cac0a2f2cd3",
-      "git_blob_sha": "5631d3053f68afdc42f5a2d1a1b7bced13aa9a97"
+      "bytes": 135479,
+      "sha256": "a93499bef3e1ba0b55b7bcc3d66e227cfd6e88cc27dd678c637ae1f337d3fa79",
+      "git_blob_sha": "aa4daa0ebcf0b4202bb9c3684320010e66ebd532"
     },
     {
       "path": "CONTRATO-DICTADO-EXPERIENCE.md",
-      "bytes": 16225,
-      "sha256": "b9197c71d12b4b4ceb13aa4f800c5ab4d5e08607259ef97aa6ae8a3b95ad5cac",
-      "git_blob_sha": "df2bd59cc7c1d88c93ea59b4fac725fe37edd14d"
+      "bytes": 18779,
+      "sha256": "e78845598c5511ada87edc436b23d530c97cec2d0804fe77b5167a8c8c7ec1ea",
+      "git_blob_sha": "734948a9648b4aab37c593a32f34ced6f1651aa0"
     },
     {
       "path": "originales/ESPECIFICACIONES-ORIGINALES.md",
@@ -63,6 +63,18 @@
       "bytes": 896,
       "sha256": "6ee317e2d1e688acd3e0587bd8a4e596ad47f3e1f848d473f19b350f31f286f9",
       "git_blob_sha": "b7d9a8dde443b99e18a83011cfc3c39d8df7898a"
+    },
+    {
+      "path": "evidencias/ENDURECIMIENTO-LOCAL.json",
+      "bytes": 4561,
+      "sha256": "87b0f287ade6e378fa04168b2f5180e348bb9d44225b524a0d9533e2e366cc13",
+      "git_blob_sha": "255986c22b0ea5931a82fa227e15e00422b71200"
+    },
+    {
+      "path": "evidencias/INTEGRACION-ENDURECIMIENTO.json",
+      "bytes": 6043,
+      "sha256": "d9f48211f17c06973be164ff9098cf011cba59eb0a2b22200bf7b6fd80f95243",
+      "git_blob_sha": "924ccb77ccc891a7fc93bae2e6cdc7bca3ec93d6"
     }
   ],
   "runtime_references": [
@@ -73,13 +85,19 @@
     },
     {
       "path": "khora-web/app/components/ingreso/DictadoExperiencePanel.tsx",
-      "commit": "1697ee2693ed3217523ffc1d1be9b6541d7d849d",
-      "custody": "kept in integration path, no parallel implementation"
+      "commit": null,
+      "custody": "verified integration candidate; effective merge status in linked pull request",
+      "prepared_against": "f04e815b47fa8a7b5297561df62000478f978108",
+      "sha256": "39a5ec33af95c3b97d20e8b9510540cf5665c10644ee70e13882e32011e52a0f",
+      "historical_commit": "1697ee2693ed3217523ffc1d1be9b6541d7d849d"
     },
     {
       "path": "khora-web/lib/contracts/dictado-experience.ts",
-      "commit": "1697ee2693ed3217523ffc1d1be9b6541d7d849d",
-      "custody": "kept in integration path, no parallel implementation"
+      "commit": null,
+      "custody": "verified integration candidate; effective merge status in linked pull request",
+      "prepared_against": "f04e815b47fa8a7b5297561df62000478f978108",
+      "sha256": "5c1347b1b0c24d8deee29ae9a2516f5482bd770e8bd5822c74136187f99bfd94",
+      "historical_commit": "1697ee2693ed3217523ffc1d1be9b6541d7d849d"
     },
     {
       "path": "khora-web/lib/server/dictado-experience.ts",
@@ -93,18 +111,27 @@
     },
     {
       "path": "khora-web/scripts/benchmark-dictado.mjs",
-      "commit": "1697ee2693ed3217523ffc1d1be9b6541d7d849d",
-      "custody": "kept in integration path, no parallel implementation"
+      "commit": null,
+      "custody": "verified integration candidate; effective merge status in linked pull request",
+      "prepared_against": "f04e815b47fa8a7b5297561df62000478f978108",
+      "sha256": "c51d5bfee454896991a2d0f02eaca31c5438fd1a8895170c3b79a55304c432a3",
+      "historical_commit": "1697ee2693ed3217523ffc1d1be9b6541d7d849d"
     },
     {
       "path": "khora-web/lib/generated/dictado-benchmark.json",
-      "commit": "1697ee2693ed3217523ffc1d1be9b6541d7d849d",
-      "custody": "kept in integration path, no parallel implementation"
+      "commit": null,
+      "custody": "verified integration candidate; effective merge status in linked pull request",
+      "prepared_against": "f04e815b47fa8a7b5297561df62000478f978108",
+      "sha256": "8d082ee15bf3d86dba8d4d803aa3ec519b33c96355de963ead66cd6c8b5f69f4",
+      "historical_commit": "1697ee2693ed3217523ffc1d1be9b6541d7d849d"
     },
     {
       "path": "khora-web/e2e/dictado-experience.spec.ts",
-      "commit": "1697ee2693ed3217523ffc1d1be9b6541d7d849d",
-      "custody": "kept in integration path, no parallel implementation"
+      "commit": null,
+      "custody": "verified integration candidate; effective merge status in linked pull request",
+      "prepared_against": "f04e815b47fa8a7b5297561df62000478f978108",
+      "sha256": "139a058729cd5a561a1b3a12f9253eaea3bb88e65ad545fb44d4d034e40f504b",
+      "historical_commit": "1697ee2693ed3217523ffc1d1be9b6541d7d849d"
     },
     {
       "path": "khora-web/tests/unit/dictado_experience.test.ts",
@@ -120,6 +147,20 @@
       "path": "khora-web/lib/server/github-credentials.ts",
       "commit": "1697ee2693ed3217523ffc1d1be9b6541d7d849d",
       "custody": "kept in integration path, no parallel implementation"
+    },
+    {
+      "path": "khora-web/lib/client/dictado-experience-delivery.ts",
+      "commit": null,
+      "prepared_against": "f04e815b47fa8a7b5297561df62000478f978108",
+      "sha256": "a40b0d23e9e283fba88cef398d73aa5f35267a57939ca8e9f61431d5a21d6ca3",
+      "custody": "verified integration candidate; effective merge status in linked pull request"
+    },
+    {
+      "path": "khora-web/tests/unit/dictado_experience_hardening.test.ts",
+      "commit": null,
+      "prepared_against": "f04e815b47fa8a7b5297561df62000478f978108",
+      "sha256": "579dba89e18f27c2d668a8adf6f834cedd79042653642148a24b54f827e27029",
+      "custody": "verified integration candidate; effective merge status in linked pull request"
     }
   ],
   "self_hash_excluded": true,
@@ -137,5 +178,12 @@
     "no_credentials_or_raw_new_user_audio_intentionally_included": true,
     "operator_authorization": "V010",
     "no_secret_values_in_manifest": true
+  },
+  "current_preparation": {
+    "version": "0.4.0",
+    "baseSha": "f04e815b47fa8a7b5297561df62000478f978108",
+    "receipt": "evidencias/INTEGRACION-ENDURECIMIENTO.json",
+    "pullRequest": null,
+    "state": "software verified; merge authorization explicit; effective merge determined by Git"
   }
 }

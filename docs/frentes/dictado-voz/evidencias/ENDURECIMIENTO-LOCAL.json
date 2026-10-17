@@ -1,0 +1,122 @@
+{
+  "schema": "khora-dictado-hardening/local-v1",
+  "createdAt": "2026-10-17T02:37:06.691Z",
+  "baseSha": "c9147557c42b07960e44f0b29b56ab6d9b6a8259",
+  "branch": "fix/dictado-hardening-reconstructed",
+  "state": "local-only-not-pushed-not-deployed",
+  "authorization": "Cambie de maquina, nefcesito que generes ese endurecimiento aqui",
+  "method": {
+    "version": "1.5",
+    "commit": "49ac40e9f6122e2d2fb339362cfa0a78128c8e37"
+  },
+  "tests": {
+    "unit": 444,
+    "unitPassed": 444,
+    "directed": 31,
+    "directedPassed": 31,
+    "browser": 19,
+    "browserPassed": 19,
+    "causalConcurrencyPassed": 1,
+    "typecheck": "passed",
+    "navigation": "passed",
+    "uiReview": "passed",
+    "build": "passed as Playwright webServer prerequisite"
+  },
+  "benchmark": {
+    "schema": "khora-dictado-benchmark/v1",
+    "status": "passed",
+    "testedAt": "2026-10-17T02:34:37.702Z",
+    "completedAt": "2026-10-17T02:36:43.915Z",
+    "sourceSha": "c9147557c42b07960e44f0b29b56ab6d9b6a8259",
+    "workingTreeDirty": true,
+    "inputFingerprint": "d96d0de5a785a6576f72c0ac2a47cf7434e7a411ac3e3ac6a785e45df6ecf78f",
+    "checks": [
+      {
+        "name": "Contratos, entrega, muestreo, privacidad y persistencia controlada",
+        "status": "passed"
+      },
+      {
+        "name": "Continuidad del dictado y encuesta en navegador",
+        "status": "passed"
+      }
+    ],
+    "limits": [
+      "Reconocimiento y endpoints externos controlados; no voz física ni SQL productivo.",
+      "Persistencia probada con doble de base de datos; no certificación de despliegue.",
+      "No mide fidelidad de voz ni comodidad automáticamente. Contrato/regresión, no puntuación universal.",
+      "La huella identifica entradas declaradas. sourceSha no incluye cambios locales; revisar workingTreeDirty."
+    ]
+  },
+  "files": [
+    {
+      "path": "khora-web/app/components/ingreso/DictadoExperiencePanel.tsx",
+      "sha256": "39a5ec33af95c3b97d20e8b9510540cf5665c10644ee70e13882e32011e52a0f"
+    },
+    {
+      "path": "khora-web/lib/client/dictado-experience-delivery.ts",
+      "sha256": "a40b0d23e9e283fba88cef398d73aa5f35267a57939ca8e9f61431d5a21d6ca3"
+    },
+    {
+      "path": "khora-web/lib/contracts/dictado-experience.ts",
+      "sha256": "5c1347b1b0c24d8deee29ae9a2516f5482bd770e8bd5822c74136187f99bfd94"
+    },
+    {
+      "path": "khora-web/scripts/benchmark-dictado.mjs",
+      "sha256": "c51d5bfee454896991a2d0f02eaca31c5438fd1a8895170c3b79a55304c432a3"
+    },
+    {
+      "path": "khora-web/tests/unit/dictado_experience_hardening.test.ts",
+      "sha256": "579dba89e18f27c2d668a8adf6f834cedd79042653642148a24b54f827e27029"
+    },
+    {
+      "path": "khora-web/e2e/dictado-experience.spec.ts",
+      "sha256": "e95c31111c61fd49468c4de120f292efd0f192814d0a8136c96bf3dee37404b2"
+    },
+    {
+      "path": "khora-web/lib/generated/dictado-benchmark.json",
+      "sha256": "c4ca1dcf6f9e6da02398990d9bf0adb3ce6d1307058561118eb7e48143107151"
+    }
+  ],
+  "limitations": [
+    "Physical identity of newly indicated machine not confirmed; connected device reports PC10RCIF4EI4.",
+    "Recognition, HTTP and storage use controlled fixtures; no physical microphone, human comfort or production SQL verification.",
+    "No pushes, merges or Vercel commands in this reconstruction.",
+    "Memory-only pending metadata is lost on reload/close; max 128 records.",
+    "No voice/health detector implemented; no consent expansion."
+  ],
+  "firstBrowserAttempt": {
+    "passed": 18,
+    "failed": 1,
+    "reason": "virtual-clock interference in delayed-request fixture; corrected test only"
+  },
+  "logHashes": [
+    {
+      "path": "benchmark-1.log",
+      "sha256": "932373491e529f732abc410cc5ecfa385965d9e3b505327ef2cd5311f0b73811"
+    },
+    {
+      "path": "benchmark-2.log",
+      "sha256": "cf5a1742c996ed0b91e86822fd92f8633daa33ece6ce48df1b81850ae4c55a65"
+    },
+    {
+      "path": "hardening-unit-all.log",
+      "sha256": "a2742901e469033f33d90e8bd09366f4f39d70dbdd687a3ab595b718f42f76a6"
+    },
+    {
+      "path": "hardening-typecheck.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "hardening-navigation.log",
+      "sha256": "4cfbbfe0da6da08e4b1ba341040b24986f25517aaffd7a522adda262345be071"
+    },
+    {
+      "path": "hardening-ui-review.log",
+      "sha256": "72fa7eb7d7a515a7ee2b3bea66c28cbf9b91f07bfdf055f90232747841916d2c"
+    },
+    {
+      "path": "hardening-causal.log",
+      "sha256": "ed88c6c940876799ec9392e4179dd1b2268db43f9582d32164c576380ab6a20f"
+    }
+  ]
+}
