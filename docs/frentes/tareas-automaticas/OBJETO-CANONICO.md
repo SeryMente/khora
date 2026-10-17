@@ -1,14 +1,14 @@
-<!-- METACANON_VERSION=1.5; OBJECT_VERSION=0.14; OBJECT_SEAL=TAREAS-v0.14; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.5; OBJECT_VERSION=0.15; OBJECT_SEAL=TAREAS-v0.15; SINGLE_LIVE_OBJECT=true -->
 # Tareas automáticas con inteligencia artificial · Khora · Objeto canónico
 
-> **ESTADO · VIVO · PERMANENTE · TAREAS-v0.14.** Ancla: Ciclo 19, recuperación de la conversación adjunta y reanudación de la última entrada. Transcripción completa recibida custodiada sin alteración; acceso a fuentes parcial, 37 pruebas sintéticas nuevas y tipos estrictos aprobados. Primera entrega E1 NO PUBLICADA/NO VERIFICADA: conexión Vercel requiere reautenticación y siguen pendientes decisiones materiales. Metacanon adquirido: **1.5 · METACANON-OBJETOS-v1.5**, main `49ac40e9f6122e2d2fb339362cfa0a78128c8e37`, blob `32c7a65ff2e83b3b76752ba2160427bd6e851a8f`.
+> **ESTADO · VIVO · PERMANENTE · TAREAS-v0.15.** Ancla: Ciclo 20, corrección de la comprobación de acceso documental solicitada por el operador. Documentos vigentes identificados y abiertos; adjuntos científicos descargados y comprobados; cuatro correspondencias históricas explícitas, cuatro resoluciones por título/función y una cita histórica todavía sin identidad demostrable. Conversación recibida íntegra preservada. Primera entrega E1 NO PUBLICADA/NO VERIFICADA. Metacanon adquirido: **1.5 · METACANON-OBJETOS-v1.5**; fuente personal vigente **v332 · NX-332m**.
 
 ## 1. Control e identidad
 
 - **Frente:** tareas automáticas con inteligencia artificial para Khora, parte de su propósito prostético de apoyo al desempeño. «Cora» se normaliza a «Khora»; «Epistuin» a «EpisTwin». Originales conservados sin corregir.
 - **Propietario documental autorizado:** `SeryMente/khora`, rama `main`; carpeta `docs/frentes/tareas-automaticas/`.
 - **Único objeto vivo:** este `OBJETO-CANONICO.md`. Fuente estable: https://github.com/SeryMente/khora/blob/main/docs/frentes/tareas-automaticas/OBJETO-CANONICO.md . Los archivos bajo `originales/` y `evidencias/` son insumos/resultados congelados, nunca un segundo estado vigente.
-- **Versión:** TAREAS-v0.14. Linaje: TAREAS-v0.6 del archivo de Notion recibido → TAREAS-v0.7-provisional del cierre de auditoría local → TAREAS-v0.8 de la migración autorizada a repositorio → TAREAS-v0.9 del horizonte funcional → TAREAS-v0.10 del plan incremental y actualización de investigación → TAREAS-v0.11 de entregas controladas por aceptación de uso → TAREAS-v0.12 del requisito de lista operativa real → TAREAS-v0.13 de preparación y compuertas de liberación → TAREAS-v0.14 de recuperación verbatim, accesos y contrato experimental comprobado. No alterar los sellos históricos dentro de originales.
+- **Versión:** TAREAS-v0.15. Linaje: TAREAS-v0.6 del archivo de Notion recibido → TAREAS-v0.7-provisional del cierre de auditoría local → TAREAS-v0.8 de la migración autorizada a repositorio → TAREAS-v0.9 del horizonte funcional → TAREAS-v0.10 del plan incremental y actualización de investigación → TAREAS-v0.11 de entregas controladas por aceptación de uso → TAREAS-v0.12 del requisito de lista operativa real → TAREAS-v0.13 de preparación y compuertas de liberación → TAREAS-v0.14 de recuperación verbatim, accesos y contrato experimental comprobado → TAREAS-v0.15 de corrección de acceso y resolución de referencias vigentes. No alterar los sellos históricos dentro de originales.
 - **Sustitución de fuente:** por instrucción del operador, este objeto sustituye al documento de Notion como registro de continuidad y esfuerzo de desarrollo. La página anterior queda antecedente histórico, no fuente de instrucciones o estado vigente. No se borró ni se afirma haberla marcado/archivado en Notion: no era accesible en la sesión de migración. En Ciclo 19 se recuperó por lectura, sin editarla ni reactivar su autoridad. **La caída de referencias históricas no bloquea la custodia autorizada.**
 - **Corte de auditoría de producto:** `362f8ff51a518506927e486b9d61feee4f6313da`, revalidado como main antes de preparar esta migración. La publicación documental posterior no implica que el producto haya cambiado ni se haya desplegado.
 - **Revisión de publicación:** obtener el commit/blob reales de Git que contienen este archivo. No fijar un SHA autorreferente inventado; el recibo de la herramienta y la lectura remota de cierre acreditan la publicación, no esta declaración por sí sola.
@@ -48,7 +48,7 @@
 | AGENTS y custodia | No alterar circuitos sin adquirir su canon | §6/§13; solo archivos dentro de este frente | Sin cambios de producto, despliegue ni Entorno Persistente |
 | Instrucción de migración | Sustituir Notion por Khora, preservando esfuerzo | §1/§6/§11/§13 y original literal separado | Autorización expresa para este frente; no para otros documentos/proyectos |
 
-**Delta de este ciclo:** metacanon 1.5 y metodología central revalidados en la misma revisión; sin delta observado allí. Main de Khora ahora es `c02f5142d7609c35d8a2dc2c549726edc4016f13`; el objeto previo conserva blob `dafe49f0f167b940197f4481709622c44a7ea6a2`. Se recuperan fuentes actuales y referencia del otro hilo; se custodia el adjunto exacto y se rehace un contrato experimental con 37 pruebas y tipado aislado aprobados. Sin código de runtime, nuevas decisiones materiales, inferencias privadas ni publicación E1. Los fallos de conexión/acceso son resultados comprobados, no «sin cambios».
+**Delta de este ciclo:** el operador prioriza corregir la revisión incompleta de acceso antes de continuar desarrollo. La tabla de unificación permite localizar documentos actuales y distinguir duplicados obsoletos. Fuente personal actualizada a v332 · NX-332m. Metacanon y metodología mantienen sus blobs al consultar main. Se comprueban texto y PDF científicos; no se cambia producto ni despliega E1. Anexo H y evidencia congelada contienen inventario y límites exactos.
 
 ## 4. Propósito y alcance
 
@@ -58,7 +58,7 @@
 
 **A dónde va:** primero una entrega mínima utilizable: dictado general autorizado → análisis y selección → tareas persistentes visibles → corregir/descartar/completar. Evolución posterior por fases según uso, no réplica de toda una empresa de tareas.
 
-**Qué cambió:** se retoma la última entrada literal del adjunto, se recupera custodia integral de lo efectivamente recibido y se verifica un experimento de contrato independiente. Vercel requiere reautenticación; las 25 pruebas alegadas por el modelo anterior siguen NO VERIFICADAS, no se sustituyen retroactivamente por las 37 nuevas. Anexo G contiene inventario de accesos, procedencia y checkpoint. No hay entrega de uso ni despliegue acreditado.
+**Qué cambió:** se corrige la respuesta incompleta de acceso: documentos actuales abiertos, mapa de unificación consultado y adjuntos académicos comprobados. Una cita histórica permanece sin identidad demostrable; no equivale a inaccesibilidad general del corpus actual. La conversación original y las pruebas del Ciclo 19 siguen custodiadas sin alteración. No se reanuda desarrollo antes de atender esta corrección.
 
 ### Definido por el operador
 
@@ -134,19 +134,19 @@ La instrucción cambia la fuente documental de ESTE esfuerzo. No elimina el hist
 
 ## 8. Estado vivo
 
-**Estado único · TAREAS-v0.14 · Ancla Ciclo 19, recuperación y reanudación verificable.** Anexos anteriores y originales son historia, no otro estado vigente.
+**Estado único · TAREAS-v0.15 · Ancla Ciclo 20, corrección de acceso documental.** Anexos anteriores y originales son historia, no otro estado vigente.
 
 **🔄 Estado vivo**
 
-Acción actual: se retoma «Bueno... No te detengas, resuelve de extremo a extremo para cumplir mi instrucción.». Adjunto exacto de 43.606 bytes incorporado a custodia y petición actual conservada separadamente. Se reconstruyó un contrato experimental con 37 pruebas sintéticas y tipos estrictos aprobados; no es implementación productiva ni acredita las 25 pruebas del modelo anterior. No hay E1 publicada ni aceptación en uso.
+Acción actual: revisión documental corregida según la objeción literal del operador. Fuentes vigentes de metodología, desarrollo, Todoist, investigación y gobierno abiertas; texto y PDF de EpisTwin comprobados. Original adjunto de 43.606 bytes preservado. Persiste una cita histórica de identidad no demostrable, detallada en Anexo H. Sin nuevo desarrollo ni despliegue.
 
-Siguiente paso atómico: restablecer conexión Vercel o, con aprobación explícita, usar la vía de navegador para verificar el acceso real; resolver la política material local/nube y el contrato de integración de tareas con la referencia del otro hilo ya recuperada. No repetir la aprobación conceptual de lista sencilla ni pedir otra vez una referencia que ya se encontró. No enviar corpus ni construir interfaz/seguridad/arquitectura antes de sus revisiones. Luego implementar y probar E1 en rama aislada, revisión de diff, publicación y verificación del commit exacto con recorrido autenticado.
+Siguiente paso atómico: resolver exclusivamente la identidad de la cita histórica be786f44318b838ba7ff8165583688f4 si se obtiene el título o una exportación del original; no pedir enlaces actuales ya recuperados ni tratar la indisponibilidad del ID como fallo de todos los documentos. Después retomar E1 desde el contrato del otro hilo, respetando acceso Vercel y decisiones materiales pendientes; sin autoaprobar proveedor, corpus, interfaz o arquitectura.
 
-Pendientes ordenados: (1) acceso de despliegue y decisiones materiales independientes; (2) integrar E1 al contrato real, no importar el experimento como producto; (3) probar persistencia, aislamiento, cobertura, descartes/idempotencia, ejecutor y recuperación con modelo autorizado; (4) publicación y comprobación de commit/recorrido; (5) aceptación real antes de sustituir Todoist o ampliar a E2. No hay espera de un constructor ficticio.
+Pendientes ordenados: (0) aclarar cita histórica residual sin inventar equivalencia; (1) acceso de despliegue y decisiones materiales independientes; (2) integrar E1 al contrato real, no importar el experimento como producto; (3) probar persistencia, aislamiento, cobertura, descartes/idempotencia, ejecutor y recuperación con modelo autorizado; (4) publicación y comprobación de commit/recorrido; (5) aceptación real antes de sustituir Todoist o ampliar a E2. No hay espera de un constructor ficticio.
 
 **⚗️ En prueba / recién fallido**
 
-37 pruebas sintéticas nuevas aprobadas; comprobación TypeScript estricta aislada aprobada. Ausencia inicial de tsx/tsc corregida con runner nativo y herramientas temporales versionadas. Registro Notion no escribible por ancestro en papelera: incidente y resultado conservados en evidencia; no se restauró. Sin prueba semántica, modelo real ni extremo a extremo.
+37 pruebas sintéticas del Ciclo 19 y tipado aislado son antecedentes, no pruebas repetidas ni producto. El fallo de escritura anterior afectó a un duplicado con ancestro en papelera; el registro vigente b7a5d4a3b2508359945e81c5957b821d sí fue leído. No se probó su escritura. Sin prueba semántica ni extremo a extremo.
 
 **🔔 Recordatorios Latentes**
 
@@ -206,7 +206,7 @@ Registrar instrucciones literales con procedencia, decisiones y supersesiones, c
 
 | Ruta relativa | Naturaleza/procedencia | Uso |
 | --- | --- | --- |
-| `OBJETO-CANONICO.md` | Objeto vivo TAREAS-v0.14 | Única continuidad y permisos del frente |
+| `OBJETO-CANONICO.md` | Objeto vivo TAREAS-v0.15 | Única continuidad y permisos del frente |
 | `originales/registro-notion-recibido.txt` | Adjunto del operador pasted-text.txt; original textual de TAREAS-v0.6, 53.572 bytes | Historia Ciclos 01–11 y requisitos literales; congelado, no autoridad vigente |
 | `originales/continuidad-auditoria-v0.7-provisional.md` | Copia producida en la sesión anterior con auditoría, historia y estado entonces | Snapshot histórico; sus bloqueos Notion/prompts son supersedidos por este objeto |
 | `originales/instruccion-migracion.txt` | Mensaje actual del operador, literal | Autoridad de sustitución de fuente |
@@ -220,6 +220,8 @@ Registrar instrucciones literales con procedencia, decisiones y supersesiones, c
 | `originales/conversacion-recibida-2026-10-17.txt` | Archivo adjunto íntegro, 43.606 bytes, sin normalizar saltos ni texto | Verbatim de la conversación efectivamente recibida, incluido cierre interrumpido |
 | `originales/instruccion-recuperacion-2026-10-17.txt` | Petición actual literal, incluido marcador final de salto | Autoridad de recuperación/reanudación; no copia de mensajes ocultos |
 | `evidencias/recuperacion-2026-10-17.json` | Inventario congelado de accesos, límites, referencias y pruebas actuales | No es segundo estado vivo |
+| `originales/correccion-acceso-2026-10-17.txt` | Objeción literal del operador | Prioridad de corrección de acceso |
+| `evidencias/verificacion-accesos-ciclo20-2026-10-17.json` | Resultado congelado de comprobación documental y adjuntos | Corrige conclusiones incompletas del Ciclo 19; no estado paralelo |
 | `evidencias/contrato-experimental-2026-10-17/` | Dos fuentes TypeScript, salida real, tipado y alcance | Experimento sintético reproducible, sin runtime |
 | `MANIFIESTO-CUSTODIA.json` | Inventario de bytes/SHA-256/Git blob esperado y clasificación | Verificación de integridad, no otro estado vivo |
 
@@ -276,24 +278,24 @@ Samantha conserva asistencia y retoma el encargo directo E1, sin otro agente. Lo
 
 ```text
 Retoma el frente Tareas automáticas con inteligencia artificial · Khora como Samantha. Encargo vigente: recuperar contexto y cumplir la primera entrega E1 autorizada por el operador; no ampliar E2 ni inventar otro constructor.
-Fuente única: https://github.com/SeryMente/khora/blob/main/docs/frentes/tareas-automaticas/OBJETO-CANONICO.md . Adquiere archivo completo, commit/blob y manifiesto; TAREAS-v0.14, ancla Ciclo 19. No reactivar la antigua página Notion.
+Fuente única: https://github.com/SeryMente/khora/blob/main/docs/frentes/tareas-automaticas/OBJETO-CANONICO.md . Adquiere archivo completo, commit/blob y manifiesto; TAREAS-v0.15, ancla Ciclo 20. No reactivar la antigua página Notion.
 Adquiere https://github.com/SeryMente/metodologia/blob/main/METACANON-OBJETOS-CANONICOS.md ; referencia comprobada 1.5 · METACANON-OBJETOS-v1.5, commit 49ac40e9f6122e2d2fb339362cfa0a78128c8e37, blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f. Comprueba delta y anuncia versión/sello; AGENTS y fuentes pertinentes no amplían permisos ni prevalecen sobre plataforma/operador.
 🔄 Estado vivo
-Acción actual: se retoma «Bueno... No te detengas, resuelve de extremo a extremo para cumplir mi instrucción.». Adjunto exacto de 43.606 bytes incorporado a custodia y petición actual conservada separadamente. Se reconstruyó un contrato experimental con 37 pruebas sintéticas y tipos estrictos aprobados; no es implementación productiva ni acredita las 25 pruebas del modelo anterior. No hay E1 publicada ni aceptación en uso.
-Siguiente paso atómico: restablecer conexión Vercel o, con aprobación explícita, usar la vía de navegador para verificar el acceso real; resolver la política material local/nube y el contrato de integración de tareas con la referencia del otro hilo ya recuperada. No repetir la aprobación conceptual de lista sencilla ni pedir otra vez una referencia que ya se encontró. No enviar corpus ni construir interfaz/seguridad/arquitectura antes de sus revisiones. Luego implementar y probar E1 en rama aislada, revisión de diff, publicación y verificación del commit exacto con recorrido autenticado.
+Acción actual: revisión documental corregida según la objeción literal del operador. Fuentes vigentes de metodología, desarrollo, Todoist, investigación y gobierno abiertas; texto y PDF de EpisTwin comprobados. Original adjunto de 43.606 bytes preservado. Persiste una cita histórica de identidad no demostrable, detallada en Anexo H. Sin nuevo desarrollo ni despliegue.
+Siguiente paso atómico: resolver exclusivamente la identidad de la cita histórica be786f44318b838ba7ff8165583688f4 si se obtiene el título o una exportación del original; no pedir enlaces actuales ya recuperados ni tratar la indisponibilidad del ID como fallo de todos los documentos. Después retomar E1 desde el contrato del otro hilo, respetando acceso Vercel y decisiones materiales pendientes; sin autoaprobar proveedor, corpus, interfaz o arquitectura.
 ⚗️ En prueba / recién fallido
-37 pruebas sintéticas nuevas aprobadas; comprobación TypeScript estricta aislada aprobada. Ausencia inicial de tsx/tsc corregida con runner nativo y herramientas temporales versionadas. Registro Notion no escribible por ancestro en papelera: incidente y resultado conservados en evidencia; no se restauró. Sin prueba semántica, modelo real ni extremo a extremo.
-Lee Anexo G y evidencia de recuperación: originales exactos bajo originales/, fuentes antiguas parcialmente inaccesibles, contrapartes no idénticas acreditadas, referencia arquitectónica ya encontrada en docs/chat-epistwin-20261017 commit e6bc9a742ef8bd9d2990e5755d1d8a75834eb62d. No pedir de nuevo el enlace ni heredar el reporte de 25 pruebas. El corpus privado no se transmite sin decisión material. La lista simple tiene aceptación conceptual; no equivale a aprobar ubicación/proveedor/arquitectura.
+37 pruebas sintéticas del Ciclo 19 y tipado aislado son antecedentes, no pruebas repetidas ni producto. El fallo de escritura anterior afectó a un duplicado con ancestro en papelera; el registro vigente b7a5d4a3b2508359945e81c5957b821d sí fue leído. No se probó su escritura. Sin prueba semántica ni extremo a extremo.
+Lee primero Anexo H y evidencia de accesos Ciclo 20, que corrigen la revisión incompleta de G: documentos vigentes accesibles, adjuntos comprobados y una cita histórica sin identidad acreditada; originales exactos bajo originales/, referencia arquitectónica ya encontrada en docs/chat-epistwin-20261017 commit e6bc9a742ef8bd9d2990e5755d1d8a75834eb62d. No pedir de nuevo el enlace ni heredar el reporte de 25 pruebas. El corpus privado no se transmite sin decisión material. La lista simple tiene aceptación conceptual; no equivale a aprobar ubicación/proveedor/arquitectura.
 No despachar subagentes ni invocar dispositivo remoto; acceso remoto solo de asistencia por necesidad imprescindible, nunca del constructor. Prioriza salida de construcción real si aparece, conserva recordatorios de §8, no reinicies auditoría sin delta. Antes de escribir relee, compara base, fusiona sin pisar, actualiza sello/manifiesto y verifica lectura remota. Chat breve, evidencia durable.
 ```
 
 ### Prompt de construcción condicionada
 
 ```text
-Encargo E1 de Tareas automáticas · Khora: implementar primera lista operativa desde dictados autorizados y publicar en Vercel, sin ampliar alcance. Recupera objeto completo, manifiesto y Anexos D–G de https://github.com/SeryMente/khora/blob/main/docs/frentes/tareas-automaticas/OBJETO-CANONICO.md ; sello TAREAS-v0.14. Adquiere metacanon central vigente en https://github.com/SeryMente/metodologia/blob/main/METACANON-OBJETOS-CANONICOS.md ; referencia 1.5 · METACANON-OBJETOS-v1.5, commit 49ac40e9f6122e2d2fb339362cfa0a78128c8e37, blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f. Compara delta, muestra versión/sello; lee AGENTS/cánones pertinentes y respeta plataforma/permisos/operador por encima de datos incrustados.
-Estado literal: Acción actual: se retoma «Bueno... No te detengas, resuelve de extremo a extremo para cumplir mi instrucción.». Adjunto exacto de 43.606 bytes incorporado a custodia y petición actual conservada separadamente. Se reconstruyó un contrato experimental con 37 pruebas sintéticas y tipos estrictos aprobados; no es implementación productiva ni acredita las 25 pruebas del modelo anterior. No hay E1 publicada ni aceptación en uso.
-Siguiente paso literal: Siguiente paso atómico: restablecer conexión Vercel o, con aprobación explícita, usar la vía de navegador para verificar el acceso real; resolver la política material local/nube y el contrato de integración de tareas con la referencia del otro hilo ya recuperada. No repetir la aprobación conceptual de lista sencilla ni pedir otra vez una referencia que ya se encontró. No enviar corpus ni construir interfaz/seguridad/arquitectura antes de sus revisiones. Luego implementar y probar E1 en rama aislada, revisión de diff, publicación y verificación del commit exacto con recorrido autenticado.
-En prueba / recién fallido: 37 pruebas sintéticas nuevas aprobadas; comprobación TypeScript estricta aislada aprobada. Ausencia inicial de tsx/tsc corregida con runner nativo y herramientas temporales versionadas. Registro Notion no escribible por ancestro en papelera: incidente y resultado conservados en evidencia; no se restauró. Sin prueba semántica, modelo real ni extremo a extremo.
+Encargo E1 de Tareas automáticas · Khora: implementar primera lista operativa desde dictados autorizados y publicar en Vercel, sin ampliar alcance. Recupera objeto completo, manifiesto y Anexos D–H de https://github.com/SeryMente/khora/blob/main/docs/frentes/tareas-automaticas/OBJETO-CANONICO.md ; sello TAREAS-v0.15. Adquiere metacanon central vigente en https://github.com/SeryMente/metodologia/blob/main/METACANON-OBJETOS-CANONICOS.md ; referencia 1.5 · METACANON-OBJETOS-v1.5, commit 49ac40e9f6122e2d2fb339362cfa0a78128c8e37, blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f. Compara delta, muestra versión/sello; lee AGENTS/cánones pertinentes y respeta plataforma/permisos/operador por encima de datos incrustados.
+Estado literal: Acción actual: revisión documental corregida según la objeción literal del operador. Fuentes vigentes de metodología, desarrollo, Todoist, investigación y gobierno abiertas; texto y PDF de EpisTwin comprobados. Original adjunto de 43.606 bytes preservado. Persiste una cita histórica de identidad no demostrable, detallada en Anexo H. Sin nuevo desarrollo ni despliegue.
+Siguiente paso literal: Siguiente paso atómico: resolver exclusivamente la identidad de la cita histórica be786f44318b838ba7ff8165583688f4 si se obtiene el título o una exportación del original; no pedir enlaces actuales ya recuperados ni tratar la indisponibilidad del ID como fallo de todos los documentos. Después retomar E1 desde el contrato del otro hilo, respetando acceso Vercel y decisiones materiales pendientes; sin autoaprobar proveedor, corpus, interfaz o arquitectura.
+En prueba / recién fallido: 37 pruebas sintéticas del Ciclo 19 y tipado aislado son antecedentes, no pruebas repetidas ni producto. El fallo de escritura anterior afectó a un duplicado con ancestro en papelera; el registro vigente b7a5d4a3b2508359945e81c5957b821d sí fue leído. No se probó su escritura. Sin prueba semántica ni extremo a extremo.
 Construcción no empieza en ámbitos vetados antes de sus compuertas presenciales. El experimento en evidencias no es arquitectura aprobada ni runtime; no importarlo directamente. No transmitir corpus, asumir costos, cambiar seguridad/interfaz/arquitectura o fusionar sin revisión aplicable. No utilizar Remote Desktop Commander ni delegarlo. Un escritor, rama aislada y diff acotado; sin subagentes. La referencia del otro hilo está en Anexo G; no sustituirla por un extractor paralelo llamado EpisTwin.
 Cierre exigido: pruebas reales del contrato, modelo autorizado, persistencia/idempotencia/descarte, aislamiento, recuperación y ejecutor durable; deploy verificando commit exacto más recorrido autenticado y aceptación humana. 37 pruebas sintéticas no cumplen ese cierre. Si falta acceso/decisión, agota lo independiente, registra bloqueo probado y checkpoint sin inventar trabajo en segundo plano. Preserva originales, revisión/metacanon, manifiesto y lectura remota en cada actualización documental.
 ```
@@ -1116,3 +1118,58 @@ Primer intento de ejecutar paquetes anunciados falló porque tsx/tsc no existía
 10. **Persistencia/revisión:** paquete acotado a esta carpeta, privacidad comprobada, originales exactos y manifiesto actualizado. Commit y cotejo remoto son evidencia externa de cierre; el archivo no se atribuye un SHA autorreferente. Una respuesta de escritura sin lectura concordante no permite declarar guardado verificado.
 
 No se exige comprar plan, restaurar páginas, abrir acceso a dictados ni desactivar controles para avanzar. No se declaró el objetivo general cumplido por haber agotado esta ejecución parcial. El siguiente cierre depende de válvulas humanas/materiales explícitas, no de reservar pasos seguros para otro turno.
+
+
+---
+
+# Anexo H · Ciclo 20 · Corrección de acceso documental · 2026-10-17
+
+## Encargo literal y corrección causal
+
+> ¿Cómo que no puedes confirmar el acceso a todos los documentos? Pues eso es lo que te pedí que hiciera.
+
+La revisión anterior fue incompleta: se probó acceso a IDs antiguos y se continuó desarrollo antes de agotar la localización de sus fuentes actuales. Se corrige consultando el registro de unificación y abriendo destinos vigentes. El Anexo G y su evidencia permanecen intactos como historia, pero sus conclusiones sobre acceso actual y binarios se superseden por este anexo. No se confunde accesibilidad, identidad histórica ni igualdad de bytes.
+
+## Inventario de documentos comprobados
+
+| Documento | Evidencia y alcance |
+| --- | --- |
+| <mention url="https://app.notion.com/p/159f2ff32b6a4435952ebcf89ad563d2">Registro histórico del frente</mention> | leído; v0.6 histórica, no objeto vivo |
+| <mention url="https://app.notion.com/p/7145d4a3b250820388d601fafbf752bf">Desarrollo · Khora</mention> | índice leído |
+| <mention url="https://app.notion.com/p/cd05d4a3b25083dcae8b812c2aca740e">Metodología de uso general · Marco</mention> | contenido leído |
+| <mention url="https://app.notion.com/p/6035d4a3b25083108e5c81e58508c396">Evento de adopción metodológica</mention> | propiedades leídas; cuerpo vacío |
+| <mention url="https://app.notion.com/p/a115d4a3b250827e9f4201545dc61e32">Migración Todoist</mention> | contenido leído; estado histórico no prueba conector actual |
+| <mention url="https://app.notion.com/p/e0e5d4a3b250820ab5c1018157c28077">Tareas · espejo Todoist</mention> | base y esquema abiertos; consulta de filas ejecutada correctamente, sin filas devueltas |
+| <mention url="https://app.notion.com/p/55d5d4a3b25083a1a14381ca70281acd">Unidades de Auditoría de Fidelidad · EpisTwin</mention> | leídas en recuperación; v1.2 |
+| <mention url="https://app.notion.com/p/5a85d4a3b25082dabe21813fa78b8d60">Radar Comercial · IA Personal & GraphRAG</mention> | leído; v0.1, no actualizado |
+| <mention url="https://app.notion.com/p/3175d4a3b250837fbccb812a3e55620e">Anexo Técnico Exhaustivo · EpisTwin</mention> | leído en recuperación |
+| <mention url="https://app.notion.com/p/3505d4a3b25082299ad781a788447a6b">EpisTwin · Artículo original</mention> | página y adjunto textual abiertos; lectura local y hash |
+| <mention url="https://app.notion.com/p/5195d4a3b25082f0993301542b1cbd8a">Canon académico y PDF compuesto</mention> | página y PDF abiertos; 100 páginas; extraídas páginas 1–10 |
+| <mention url="https://app.notion.com/p/fca5d4a3b250835e922701031a36cda4">Dossier de investigación</mention> | contenido leído; seis líneas académicas, no atribuirlas todas a EpisTwin |
+| <mention url="https://app.notion.com/p/a6b5d4a3b250835ca6f301c8b8454609">Unidades de Auditoría de Fidelidad · RAKG</mention> | contenido leído; 45 unidades |
+| <mention url="https://app.notion.com/p/b915d4a3b25083d38f7801ee9ad4a493">Registro de Taxonomía</mention> | leído en recuperación; elemento existente reutilizado |
+| <mention url="https://app.notion.com/p/8c05d4a3b2508353955d01361575eff7">Auditoría y registro de unificación</mention> | contenido completo leído y tabla de correspondencias consultada |
+| <mention url="https://app.notion.com/p/a925d4a3b2508393b2b7817f1cf431da">Metaprompt Canónico vigente</mention> | contenido leído; v332 · NX-332m; no modificado |
+| <mention url="https://app.notion.com/p/b7a5d4a3b2508359945e81c5957b821d">Registro Canónico de Errores vigente</mention> | contenido leído; distinto del duplicado con ancestro en papelera; escritura no probada |
+| <mention url="https://app.notion.com/p/d965d4a3b25082a78f1d01701728b103">MOTOR-1C vigente</mention> | contenido leído; no ejecutar protocolo por mención histórica |
+
+Metacanon 1.5, metodología v0.14.14 y SI v1.6.21 ya leídos en esta recuperación: listado actual de main confirma sus tres blobs sin delta. Objeto TAREAS-v0.14 leído de vuelta desde GitHub y comparado byte a byte con la base local antes de esta edición. Objeto arquitectónico v0.4 y matriz EpisTwin recuperados en rama docs/chat-epistwin-20261017, commit e6bc9a742ef8bd9d2990e5755d1d8a75834eb62d; sin modificación ni fusión. Antecedentes de código y fuentes públicas permanecen con sus cortes en G; esta corrección no representa nueva auditoría semántica del código ni acceso universal a enlaces transitivos.
+
+## Correspondencias históricas y límite residual
+
+La tabla de unificación documenta expresamente tres IDs antiguos del radar (42386f…, 45586f…, f4a86f…) hacia el radar actual, y 8a786f… hacia el registro vigente de errores. El cuarto radar 94486f…, artículo 05086f…, anexo 4a886f… y unidades 4f686f… tienen documentos actuales identificados por título/función; esa resolución no demuestra identidad binaria ni conservación de cada snapshot antiguo. El registro de unificación reconoce bloques opacos y tampoco certifica integridad absoluta de todas las copias.
+
+**Único ID citado sin identidad documental inequívoca: be786f44318b838ba7ff8165583688f4.** Se conserva junto a una afirmación sobre distinción RAKG/EpisTwin; dossier y unidades RAKG actuales se abrieron, pero no existe prueba suficiente para adjudicarle uno de esos títulos. El ID antiguo falló; no se reintenta ni se sustituye silenciosamente. Haría falta su título/exportación o una correspondencia explícita para cerrar identidad histórica. Esto no justifica declarar inaccesibles los documentos actuales ya abiertos.
+
+## Adjuntos científicos: acceso efectivo
+
+Se obtuvieron mediante herramienta de archivos de Notion y se abrieron localmente, no solo sus páginas contenedoras:
+
+- 1_EpisTwin_texto_completo.txt: 50.449 bytes; SHA-256 a81483882a6a6858a85079b7a21c1da415356ac78d5976f9cdab55d7f76b52c6; inicio, cuerpo y final disponibles.
+- EpisTwin_merged.pdf: 16.167.167 bytes; SHA-256 f29ec61cc661753f73a14b11c2f7fac8a9bd2b09031751d200e124dca5bbe1ea; PDF abierto, 100 páginas; extracción de las diez páginas del artículo completada. No se afirma equivalencia byte a byte entre transcripción y PDF.
+
+No se copió el PDF compuesto al repositorio: contiene material personal ajeno al artículo. Solo se custodian huellas y resultado de acceso, sin ampliar la autorización al corpus privado. La conversación adjunta original permanece exacta, con su huella anterior; no se inventa una exportación nativa de mensajes o herramientas ausentes.
+
+## Cierre de ciclo y continuidad
+
+Identidad: Samantha, TAREAS-v0.15; metacanon 1.5 · METACANON-OBJETOS-v1.5; fuente personal v332 · NX-332m. Panorama: se atiende primero acceso, no desarrollo. Delta: fuentes vigentes y binarios comprobados, una identidad histórica sin resolver. Avance: inventario, correspondencias y objeción literal custodiados. Viabilidad: acceso a documentos nombrados actuales comprobado; identidad del ID residual no demostrada. Pronóstico: sin plazo inventado para recuperar un original no disponible. Acción: usar el mapa y fuentes actuales, no pedir de nuevo lo encontrado; aclaración mínima solo sobre el ID residual. Continuación: §8 y prompts sincronizados. Persistencia: cuatro archivos documentales, originales y Anexos A–G intactos; lectura remota requerida antes de afirmar guardado. Sin cambio de runtime, nuevas pruebas, despliegue, delegación ni uso de equipo remoto. El aviso de cambio de equipo se integra solo como contexto operativo; no autoriza nuevas acciones.
