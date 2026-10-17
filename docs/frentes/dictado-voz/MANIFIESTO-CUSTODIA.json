@@ -143,16 +143,28 @@
       "git_blob_sha": "3b129e0e96f59bf1d7376577874401d1400b477d"
     },
     {
-      "path": "OBJETO-CANONICO.md",
-      "bytes": 187780,
-      "sha256": "0437505526b885be2c343744f8dcfaf5898d9584e4de0800be412bdb27f78961",
-      "git_blob_sha": "438a1caa94485745ff0af6630631418b72a9e4ef"
-    },
-    {
       "path": "evidencias/RECONEXION-AUDIO-IDENTIDAD-20261017.json",
       "bytes": 1417,
       "sha256": "c6360976e7509d5d5c275efefe4df2144959e9c60db02f3fa3f656e6f3fa4e35",
       "git_blob_sha": "e5ddb0684b59ae4b45a0eab6ad99231649c2ffd6"
+    },
+    {
+      "path": "originales/conversacion-autorizacion-notion-20261017.json",
+      "bytes": 4000,
+      "sha256": "7373792606277debc901eb7034d28d8f7aba1084e7b688c305bf53d23c4cb0e2",
+      "git_blob_sha": "7e0efcfb46a9110b78a083208fbf2f7e43e82661"
+    },
+    {
+      "path": "OBJETO-CANONICO.md",
+      "bytes": 193891,
+      "sha256": "91285e87547144c2b529420602eff46e4db51783a39948132151d5ced6808a1e",
+      "git_blob_sha": "36eefec13707033a691016af9e92758c369cba13"
+    },
+    {
+      "path": "evidencias/AUTORIZACION-ACCESO-VERCEL-20261017.json",
+      "bytes": 1669,
+      "sha256": "3b224108cf19a278ff89554f159bf337c807506afb328c7d7042945de1aa995e",
+      "git_blob_sha": "c69ab45147c1e6bbefb1c9cbcbda789297b2e4e0"
     }
   ],
   "runtime_references": [
@@ -258,14 +270,14 @@
     "no_secret_values_in_manifest": true
   },
   "current_preparation": {
-    "version": "0.5.6",
-    "baseSha": "a77852695cb7c485b8dc336f8372734dde2235b4",
+    "version": "0.5.7",
+    "baseSha": "2ca099637b96a8fbe7423bbc3b1db866be0d2dac",
     "branch": "docs/dictado-audio-ahorro-maximo-20261017",
-    "authority": "originales/instruccion-continuacion-20261017.txt",
-    "receipt": "evidencias/RECONEXION-AUDIO-IDENTIDAD-20261017.json",
-    "state": "audio tools recovered via accepted reconnection; blocked on truthful normative identity, media integrity and quota",
+    "authority": "originales/conversacion-autorizacion-notion-20261017.json",
+    "receipt": "evidencias/AUTORIZACION-ACCESO-VERCEL-20261017.json",
+    "state": "specific correction authorized; blocked by actual Vercel scope and unactivated legitimate identity; original audio unchanged",
     "review1": "13 blocks, history exact, state x3",
-    "review2": "remote readback required before claiming persistence"
+    "review2": "remote readback required"
   },
   "preparation_history": [
     {
@@ -330,6 +342,16 @@
       "receipt": "evidencias/REVALIDACION-CUSTODIA-20261017.json",
       "state": "received text exact; historical body matches C021; original audio untouched; cleanup blocked",
       "review1": "13 blocks; history exact; state x3; private repository revalidated",
+      "review2": "remote readback required before claiming persistence"
+    },
+    {
+      "version": "0.5.6",
+      "baseSha": "a77852695cb7c485b8dc336f8372734dde2235b4",
+      "branch": "docs/dictado-audio-ahorro-maximo-20261017",
+      "authority": "originales/instruccion-continuacion-20261017.txt",
+      "receipt": "evidencias/RECONEXION-AUDIO-IDENTIDAD-20261017.json",
+      "state": "audio tools recovered via accepted reconnection; blocked on truthful normative identity, media integrity and quota",
+      "review1": "13 blocks, history exact, state x3",
       "review2": "remote readback required before claiming persistence"
     }
   ]
