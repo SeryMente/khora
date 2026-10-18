@@ -29,12 +29,6 @@
   },
   "files": [
     {
-      "path": "OBJETO-CANONICO.md",
-      "bytes": 147234,
-      "sha256": "17e0e36309d0ba8a8c46b71433f4459a5bc3005f6d13dcf30b323349fd1d526d",
-      "git_blob_sha": "e6a9b6be98c1d4180e89dcb20615202952c18651"
-    },
-    {
       "path": "CONTRATO-DICTADO-EXPERIENCE.md",
       "bytes": 18779,
       "sha256": "e78845598c5511ada87edc436b23d530c97cec2d0804fe77b5167a8c8c7ec1ea",
@@ -135,6 +129,96 @@
       "bytes": 2254,
       "sha256": "ec9db5491125f3757134670e3330d6a8b253ea256547b060ddba23b37f5a9056",
       "git_blob_sha": "7c255795e91cfe3f7624f2a0038bd0069cca69c3"
+    },
+    {
+      "path": "originales/DIALOGO-C022.md",
+      "bytes": 2808,
+      "sha256": "b47bda08334de8c740049582c009b85a996cd85da3666ea0ea0677b99bcd5560",
+      "git_blob_sha": "7283703a37e62c959e448dc2a3a91116e6b4e143"
+    },
+    {
+      "path": "evidencias/dialogo.test.ts",
+      "bytes": 6218,
+      "sha256": "534bb83c3238afad7e504462e7cbde75b45651a75b9e32116e4a49a5f491cdcb",
+      "git_blob_sha": "5133663e0eb9b3347a48913df209d5a17238a62e"
+    },
+    {
+      "path": "evidencias/dialogo-server.cjs",
+      "bytes": 3416,
+      "sha256": "ca95516afa6d813b1e41d61fcb2a811ee563cfb0b5a0b2cbdbd0a136d07b85e1",
+      "git_blob_sha": "0ab7203fd09f6cc1249e16a18fe709d1e3b672d3"
+    },
+    {
+      "path": "evidencias/dialogo-browser.cjs",
+      "bytes": 3752,
+      "sha256": "88c806ec1118cc521b4dc859183a114d25085df6f7191c1ada4dea15792dc8fe",
+      "git_blob_sha": "efcbc6eb00ae75aefbcdce509c6946dbe1546e45"
+    },
+    {
+      "path": "evidencias/dialogo-ui.cjs",
+      "bytes": 5971,
+      "sha256": "679e53c1f0c7d4b288180fc439bd97cdae8221f929ebb75f6cc7e7536f2d313d",
+      "git_blob_sha": "8c9e689ec026b3db901c0e1bea288b8433658273"
+    },
+    {
+      "path": "evidencias/dialogo-transcriptor.cjs",
+      "bytes": 2680,
+      "sha256": "f41f308caa649be201c8140601c561d303042bc90e48e817e62e8011b13fe24e",
+      "git_blob_sha": "f239d118d6a9b80db86d2eb1e065f6263d1f920c"
+    },
+    {
+      "path": "evidencias/DIALOGO-C022.json",
+      "bytes": 3355,
+      "sha256": "b0135c350d6be06180d08990ff614b2467f7b299fab06debedb749d6721dbecb",
+      "git_blob_sha": "2dd5e69ba0c0a903ce906af42dad710ef6af6df2"
+    },
+    {
+      "path": "evidencias/LECTURA-REMOTA-C022.json",
+      "bytes": 1461,
+      "sha256": "b5d40533a5902de8c8a80fd544f32a394a06f7e351066174b804b87b9c9d57fd",
+      "git_blob_sha": "bacd528f1813ee4edd08999e4c488d2296e3973d"
+    },
+    {
+      "path": "originales/PUBLICACION-C023.md",
+      "bytes": 452,
+      "sha256": "1e159766f8e11fbae7d4503565667650d524126c0ef1f5182f636d3e2064141b",
+      "git_blob_sha": "d854c9075176620c25f58541d75171fc973dc205"
+    },
+    {
+      "path": "evidencias/PUBLICACION-C023.json",
+      "bytes": 2683,
+      "sha256": "f75faf5e6cc31d61cf67afaea2f079f8c5df65e035856c2756e6253bf68cc6e2",
+      "git_blob_sha": "963b784f85b1f51f7bdd71c421b82b9c441e2c37"
+    },
+    {
+      "path": "originales/EQUIPO-C024.md",
+      "bytes": 285,
+      "sha256": "2802d90ba3719ecb86396bb29170cb4de8240d21ed978da52719ece9d51d35b0",
+      "git_blob_sha": "88219d3e745950dc21c936c8e6379af8a672cf35"
+    },
+    {
+      "path": "evidencias/EQUIPO-C024.json",
+      "bytes": 2194,
+      "sha256": "dc40edffbbb406cca7b4740ce7c0feace5e7d34a66b96fcc725792f2e800a1c7",
+      "git_blob_sha": "2c01cd91538ea959f07a88b733f1d1dc0048fe62"
+    },
+    {
+      "path": "OBJETO-CANONICO.md",
+      "bytes": 172615,
+      "sha256": "2b843e5b0b52e4c3b929116baef0836b59366aa460857b5ab4e9005b3992147e",
+      "git_blob_sha": "291c3245f7a0cb09d80916dc154d327b25db0429"
+    },
+    {
+      "path": "originales/SIN-EP-C025.md",
+      "bytes": 1221,
+      "sha256": "32095137433f5a85b4552101e8139cbd244a5e2f76615522458cdbec33e63973",
+      "git_blob_sha": "5c8817b0f69ee7b771755aebe0e379a7198657a7"
+    },
+    {
+      "path": "evidencias/SIN-EP-C025.json",
+      "bytes": 5004,
+      "sha256": "c961bf7e524c5fd3b7971e238732648265943cb9eb8325eff5f520f4f261fe8b",
+      "git_blob_sha": "5ecdf192f7b9400b2f5446c355401e585d171f39"
     }
   ],
   "runtime_references": [
@@ -241,12 +325,12 @@
     "no_secret_values_in_manifest": true
   },
   "current_preparation": {
-    "version": "0.5.3",
-    "baseSha": "2012e2389deb732568a5bd384817c19499fb910c",
-    "receipt": "evidencias/REVISION-C021.json",
-    "state": "documentation reconciliation; merge and readback checked separately"
+    "version": "0.6.4",
+    "baseSha": "4dca2133866421105f077bbd7079576c588d1169",
+    "receipt": "evidencias/SIN-EP-C025.json",
+    "state": "both accounts authorized, complete checkout; explicit resolve-main/live instruction; preserve current production, add dialogue; causal integration correction and final build pending"
   },
-  "latestEvent": "C021 - canonical object is primary; C020 publication and sprint-wide continuity consolidated",
+  "latestEvent": "C025 - no EP required; both accounts authorized; scope only dialogue over existing production, no unrelated graph update",
   "latest_verified_release": {
     "commit": "c02f5142d7609c35d8a2dc2c549726edc4016f13",
     "pullRequest": "https://github.com/SeryMente/khora/pull/312",

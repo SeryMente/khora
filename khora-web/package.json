@@ -21,6 +21,7 @@
     "ui:contract": "tsx scripts/check_navigation_contract.ts"
   },
   "dependencies": {
+    "@aflsolutions/graphology-communities-leiden": "1.1.1",
     "@breezystack/lamejs": "^1.2.7",
     "@google/genai": "^2.10.0",
     "@modelcontextprotocol/sdk": "^1.30.0",
@@ -31,6 +32,9 @@
     "@xyflow/react": "^12.11.2",
     "dagre": "^0.8.5",
     "dexie": "^4.4.3",
+    "ffmpeg-static": "^5.3.0",
+    "graphology": "0.26.0",
+    "graphology-types": "0.24.8",
     "lucide-react": "1.26.0",
     "motion": "^12.42.2",
     "neo4j-driver": "^6.2.0",
@@ -40,8 +44,7 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "uuid": "^11.1.1",
-    "zod": "^4.4.3",
-    "ffmpeg-static": "^5.3.0"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@playwright/test": "^1.61.1",

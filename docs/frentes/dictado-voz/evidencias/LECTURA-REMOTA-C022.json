@@ -1,0 +1,31 @@
+{
+  "commit": "ddb44ba91af98963523185d1dc932b16e6a2353f",
+  "pullRequest": 321,
+  "verifiedFiles": 23,
+  "kind": "remote PR patch reconstructed against exact saved source revisions; canonical object additionally byte-readback matched",
+  "files": [
+    "docs/frentes/dictado-voz/MANIFIESTO-CUSTODIA.json",
+    "docs/frentes/dictado-voz/OBJETO-CANONICO.md",
+    "docs/frentes/dictado-voz/evidencias/DIALOGO-C022.json",
+    "docs/frentes/dictado-voz/evidencias/dialogo-browser.cjs",
+    "docs/frentes/dictado-voz/evidencias/dialogo-server.cjs",
+    "docs/frentes/dictado-voz/evidencias/dialogo-transcriptor.cjs",
+    "docs/frentes/dictado-voz/evidencias/dialogo-ui.cjs",
+    "docs/frentes/dictado-voz/evidencias/dialogo.test.ts",
+    "docs/frentes/dictado-voz/originales/DIALOGO-C022.md",
+    "khora-web/app/api/dictado/checkpoint/route.ts",
+    "khora-web/app/api/transcribir/dialogo/route.ts",
+    "khora-web/app/components/ingreso/DialogoPanel.tsx",
+    "khora-web/app/components/ingreso/IngresoWorkspace.tsx",
+    "khora-web/app/components/shared/IngresoView.tsx",
+    "khora-web/docs/CUSTODIA-DICTADOS.md",
+    "khora-web/lib/custodia/contrato.ts",
+    "khora-web/lib/dialogo/capturar.ts",
+    "khora-web/lib/dialogo/contrato.ts",
+    "khora-web/lib/dialogo/transcribir.ts",
+    "khora-web/lib/server/audio-dialogo.ts",
+    "khora-web/lib/server/audio-mp3.ts",
+    "khora-web/lib/server/transcribir.ts",
+    "khora-web/lib/server/transcribirSesion.ts"
+  ]
+}

@@ -1,0 +1,133 @@
+{
+  "event": "C025",
+  "recordedAt": "2026-10-18T18:40:11.909449+00:00",
+  "original": "originales/SIN-EP-C025.md",
+  "methodVersion": "1.5",
+  "canonicalVersion": "0.6.4",
+  "correction": "EP not universal prerequisite; operator explicitly has only RDC on PC-14",
+  "deviceId": "03c24074-36e4-40b1-b2dc-da50be07d340",
+  "identity": "PC-14\\PC 13",
+  "role": "assistance",
+  "toolkit": {
+    "scope": "unique isolated LOCALAPPDATA/KhoraSession folder with current user/SYSTEM ACL",
+    "sources": {
+      "git": {
+        "tag": "v2.56.0.windows.2",
+        "assets": [
+          {
+            "name": "MinGit-2.56.0.2-64-bit.zip",
+            "url": "https://github.com/git-for-windows/git/releases/download/v2.56.0.windows.2/MinGit-2.56.0.2-64-bit.zip",
+            "size": 39806486,
+            "digest": "sha256:da35e72aa21c005a5a0d298cfbae110bc1609a815730ea0dde84b01a1b3cd3be"
+          }
+        ]
+      },
+      "gh": {
+        "tag": "v2.102.0",
+        "assets": [
+          {
+            "name": "gh_2.102.0_checksums.txt",
+            "url": "https://github.com/cli/cli/releases/download/v2.102.0/gh_2.102.0_checksums.txt",
+            "size": 1971,
+            "digest": "sha256:afe49e9affa232faa8212aed035417166f6ade9b9470acb53d4dbd28c0504e8d"
+          },
+          {
+            "name": "gh_2.102.0_windows_amd64.zip",
+            "url": "https://github.com/cli/cli/releases/download/v2.102.0/gh_2.102.0_windows_amd64.zip",
+            "size": 15512013,
+            "digest": "sha256:ae64e556ecc240b200f7eba60d550e4bb60d78e860e69dd88c449405b86067f4"
+          }
+        ]
+      },
+      "vercel": {
+        "version": "64.5.0",
+        "integrity": "sha512-JsWnLGHojqd0YKmLeU4NHpeCEX7/jIKNydBMNf0DGJe5W/jVb+j8lMekLkCIXqFTb8LObLoAe+OZ6/XJt4AhyQ=="
+      }
+    },
+    "verifiedNativeExitCodes": {
+      "gitVersion": 0,
+      "ghVersion": 0,
+      "vercelVersion": 0
+    },
+    "measuredVersions": {
+      "git": "2.56.0.windows.2",
+      "gh": "2.102.0",
+      "vercel": "64.5.0",
+      "node": "v24.20.0"
+    },
+    "globalPathOrPolicyChanges": false,
+    "productDependencyChanges": false
+  },
+  "authentication": {
+    "github": "verified 1interprete1; full clone obtained, protected session token, gh CLI config logout completed",
+    "vercel": "authorized; recovered protected config and verified identity/project",
+    "atRest": "Windows DPAPI current user; transient CLI auth.json removed in finally",
+    "plainVercelAuthFileAfterInvocation": false,
+    "finalCredentialCleanup": "pending after operation"
+  },
+  "vercel": {
+    "whoami": "victorhugotorresmendez-8991",
+    "team": "victorhugotorresmendez-8991s-projects",
+    "plan": "hobby",
+    "project": "khora-web",
+    "projectId": "prj_hRN86BKITXYKTnNlp0ygVhaMwFfx",
+    "rootDirectory": "khora-web",
+    "node": "24.x",
+    "nativeExitCodes": {
+      "whoami": 0,
+      "teams": 0,
+      "projectInspect": 0
+    },
+    "productionBuildCommand": "if [ \"$VERCEL_ENV\" = \"production\" ]; then node scripts/migrate-runtime.mjs; fi && next build --webpack",
+    "buildOrMigrationExecuted": false,
+    "cliDeploymentAdmissibility": "NOT VERIFIED; Git integration restriction not bypassed"
+  },
+  "incident": {
+    "symptom": "ConvertTo-SecureString : La cadena de entrada no tiene el formato correcto.",
+    "cause": "raw protected container retained Set-Content newline",
+    "correction": "Trim textual envelope before DPAPI decode",
+    "verification": "same credential recovered, whoami/team/project 0; no repeated login"
+  },
+  "notExecuted": [
+    "final full build",
+    "runtime migration",
+    "main merge",
+    "deployment",
+    "billing/visibility/security changes",
+    "new subagent"
+  ],
+  "nextMaterialInput": "none: both authorizations completed; continue automated preparation/tests and respect actual provider limits",
+  "clone": {
+    "head": "87b56d8352bc91e6b7c5ca398641ef1db00bb3cd",
+    "branch": "feat/dialogo-chrome-microfono-20261018",
+    "origin": "https://github.com/SeryMente/khora.git",
+    "initialClean": true,
+    "npmCiExit": 0
+  },
+  "initialIntegration": {
+    "types": 0,
+    "navigation": 0,
+    "dialogueTests": 24,
+    "unit": {
+      "total": 505,
+      "pass": 502,
+      "fail": 3
+    },
+    "failures": [
+      "missing UI review id ingreso.btn-dialogo",
+      "spawnSync gh ENOENT in private canonical schema comparison",
+      "exact LF heading vs CRLF working tree"
+    ],
+    "build": "not executed; gate blocked",
+    "fixRegistryCommit": "523e9eea8084afd9a4e6a1f8012acab47711c048"
+  },
+  "releaseScope": {
+    "operator": "only dialogue",
+    "productionCommit": "a0975ffaef17830471fff3adcdb804c47490ff0b",
+    "mainCommit": "4dca2133866421105f077bbd7079576c588d1169",
+    "productionAheadOfMain": 15,
+    "plan": "resolve main while preserving existing production and adding only dialogue; normal merge, exact main source deployment and verification",
+    "providerAdmissibility": "not verified",
+    "latestOperatorInstruction": "REsuelve main, ete hasta vercel live"
+  }
+}

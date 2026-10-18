@@ -198,7 +198,7 @@ export function construirPromptSTT(glosario: Record<string, string>): string {
 export async function transcribirAudioConGroq(
   audioBuffer: Buffer,
   filename = "dictado.webm",
-  opciones?: { verboseJson?: boolean; windowOffsetMs?: number }
+  opciones?: { verboseJson?: boolean; windowOffsetMs?: number; language?: string | null; preserveVerbatim?: boolean; allowEmpty?: boolean }
 ): Promise<ResultadoTranscripcion> {
   const clave = process.env.GROQ_API_KEY;
   const modelo =
@@ -225,15 +225,15 @@ export async function transcribirAudioConGroq(
 
   try {
     const glosario = obtenerGlosario();
-    const prompt = construirPromptSTT(glosario);
+    const prompt = opciones?.preserveVerbatim ? "" : construirPromptSTT(glosario);
 
     const formData = new FormData();
     const audioBlob = new Blob([new Uint8Array(audioBuffer)], { type: "audio/webm" });
     formData.append("file", audioBlob, filename);
     formData.append("model", modelo);
-    formData.append("language", "es");
+    if(opciones?.language !== null) formData.append("language", opciones?.language ?? "es");
     formData.append("temperature", "0");
-    formData.append("prompt", prompt);
+    if(prompt) formData.append("prompt", prompt);
     if (opciones?.verboseJson) {
       formData.append("response_format", "verbose_json");
     }
@@ -268,6 +268,7 @@ export async function transcribirAudioConGroq(
     const data = await res.json();
     const textoRaw = typeof data?.text === "string" ? data.text.trim() : "";
 
+    if (!textoRaw && opciones?.allowEmpty) return { texto: "", exito: true, modelo, segmentos: [] };
     if (!textoRaw) {
       await registrarEvento({
         fase: "transcripcion",
@@ -285,7 +286,7 @@ export async function transcribirAudioConGroq(
     }
 
     const offsetMs = opciones?.windowOffsetMs ?? 0;
-    const textoConGlosario = aplicarGlosario(textoRaw, glosario);
+    const textoConGlosario = opciones?.preserveVerbatim ? textoRaw : aplicarGlosario(textoRaw, glosario);
     const segmentos = Array.isArray(data?.segments)
       ? data.segments.map((s: any) => ({
           id: s.id,
@@ -293,7 +294,7 @@ export async function transcribirAudioConGroq(
           end: s.end,
           start_ms_global: Math.round(s.start * 1000) + offsetMs,
           end_ms_global: Math.round(s.end * 1000) + offsetMs,
-          text: aplicarGlosario(String(s.text || "").trim(), glosario),
+          text: opciones?.preserveVerbatim ? String(s.text || "").trim() : aplicarGlosario(String(s.text || "").trim(), glosario),
         }))
       : undefined;
 
