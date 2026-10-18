@@ -1,0 +1,10 @@
+{
+  "scope": "ROUTE_BUNDLE_AND_CLOSED_GATE_ONLY",
+  "tool": "esbuild",
+  "version": "0.25.0",
+  "checks": 2,
+  "passed": 2,
+  "auth": "explicit fixture that throws; not a real OIDC login",
+  "database": "not contacted",
+  "fullNextBuild": false
+}

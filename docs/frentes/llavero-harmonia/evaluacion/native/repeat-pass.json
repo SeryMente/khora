@@ -1,0 +1,344 @@
+{
+  "scope": "SYNTHETIC_CANDIDATE_ONLY",
+  "started": "2026-10-18T18:22:28.582Z",
+  "productionChanged": false,
+  "userCorpusRead": false,
+  "realEnteRegistered": false,
+  "tests": [
+    {
+      "name": "session_adapter_requires_verified_session_and_cookie",
+      "passed": true
+    },
+    {
+      "name": "expired_session_not_a_primary_factor",
+      "passed": true
+    },
+    {
+      "name": "verified_session_normalized_and_bound",
+      "passed": true
+    },
+    {
+      "name": "different_verified_session_has_different_binding",
+      "passed": true
+    },
+    {
+      "name": "migration_not_implicit_or_enabled_by_default",
+      "passed": true
+    },
+    {
+      "name": "runtime_requires_trusted_session_adapter",
+      "passed": true
+    },
+    {
+      "name": "postgres_adapter_requires_verified_tls",
+      "passed": true
+    },
+    {
+      "name": "placeholder_database_rejected",
+      "passed": true
+    },
+    {
+      "name": "missing_custody_key_fails_closed",
+      "passed": true
+    },
+    {
+      "name": "handler_disabled_by_default",
+      "passed": true
+    },
+    {
+      "name": "plaintext_production_origin_rejected",
+      "passed": true
+    },
+    {
+      "name": "cross_origin_rejected",
+      "passed": true
+    },
+    {
+      "name": "get_rejected",
+      "passed": true
+    },
+    {
+      "name": "wrong_content_type_rejected",
+      "passed": true
+    },
+    {
+      "name": "oversize_body_rejected_without_trusting_content_length",
+      "passed": true
+    },
+    {
+      "name": "invalid_json_rejected",
+      "passed": true
+    },
+    {
+      "name": "no_primary_session_cannot_enroll",
+      "passed": true
+    },
+    {
+      "name": "enrollment_uses_standard_authenticator_uri",
+      "passed": true
+    },
+    {
+      "name": "responses_are_non_cacheable",
+      "passed": true
+    },
+    {
+      "name": "no_cross_origin_credentials_header",
+      "passed": true
+    },
+    {
+      "name": "duplicate_enrollment_does_not_replace_secret",
+      "passed": true
+    },
+    {
+      "name": "pending_vault_cannot_authorize",
+      "passed": true
+    },
+    {
+      "name": "wrong_owner_cannot_confirm",
+      "passed": true
+    },
+    {
+      "name": "invalid_code_does_not_confirm",
+      "passed": true
+    },
+    {
+      "name": "valid_enrollment_confirmed",
+      "passed": true
+    },
+    {
+      "name": "reconfirm_not_reset",
+      "passed": true
+    },
+    {
+      "name": "enrollment_code_not_reused_for_opening",
+      "passed": true
+    },
+    {
+      "name": "expired_code_denied",
+      "passed": true
+    },
+    {
+      "name": "wrong_session_cannot_release",
+      "passed": true
+    },
+    {
+      "name": "wrong_account_cannot_release",
+      "passed": true
+    },
+    {
+      "name": "single_use_release_survives_race",
+      "passed": true
+    },
+    {
+      "name": "released_identity_has_age_format",
+      "passed": true
+    },
+    {
+      "name": "consumed_grant_rejected",
+      "passed": true
+    },
+    {
+      "name": "http_authorization_does_not_expose_identity",
+      "passed": true
+    },
+    {
+      "name": "http_release_uses_trusted_session_not_body_identity",
+      "passed": true
+    },
+    {
+      "name": "http_release_cannot_be_replayed",
+      "passed": true
+    },
+    {
+      "name": "same_code_cannot_authorize_twice_in_race",
+      "passed": true
+    },
+    {
+      "name": "expired_grant_rejected",
+      "passed": true
+    },
+    {
+      "name": "invalid_attempt_persisted_0",
+      "passed": true
+    },
+    {
+      "name": "invalid_attempt_persisted_1",
+      "passed": true
+    },
+    {
+      "name": "invalid_attempt_persisted_2",
+      "passed": true
+    },
+    {
+      "name": "invalid_attempt_persisted_3",
+      "passed": true
+    },
+    {
+      "name": "invalid_attempt_persisted_4",
+      "passed": true
+    },
+    {
+      "name": "correct_code_denied_after_attempt_budget",
+      "passed": true
+    },
+    {
+      "name": "attempt_budget_is_in_database",
+      "passed": true
+    },
+    {
+      "name": "database_never_stores_clear_identity_or_seed",
+      "passed": true
+    },
+    {
+      "name": "database_stores_only_grant_digests",
+      "passed": true
+    },
+    {
+      "name": "wrong_custody_key_cannot_unwrap",
+      "passed": true
+    },
+    {
+      "name": "envelope_bound_to_owner_and_purpose",
+      "passed": true
+    },
+    {
+      "name": "tampered_custody_envelope_rejected",
+      "passed": true
+    },
+    {
+      "name": "download_stream_hash_matches_source",
+      "passed": true
+    },
+    {
+      "name": "disk_holds_age_ciphertext_not_source",
+      "passed": true
+    },
+    {
+      "name": "cipher_file_is_private_posix",
+      "passed": true
+    },
+    {
+      "name": "analysis_runs_locally_and_is_bounded",
+      "passed": true
+    },
+    {
+      "name": "analysis_preserves_provenance_without_ratifying",
+      "passed": true
+    },
+    {
+      "name": "candidate_has_literal_character_anchors",
+      "passed": true
+    },
+    {
+      "name": "analysis_is_also_encrypted_on_disk",
+      "passed": true
+    },
+    {
+      "name": "existing_ciphertext_not_overwritten",
+      "passed": true
+    },
+    {
+      "name": "ciphertext_unchanged_after_rejected_overwrite",
+      "passed": true
+    },
+    {
+      "name": "tampered_input_never_promotes_report",
+      "passed": true
+    },
+    {
+      "name": "no_report_after_failed_authentication",
+      "passed": true
+    },
+    {
+      "name": "incorrect_provenance_never_promotes_report",
+      "passed": true
+    },
+    {
+      "name": "oversize_stream_aborts_without_promoting",
+      "passed": true
+    },
+    {
+      "name": "no_oversize_cipher_promoted",
+      "passed": true
+    },
+    {
+      "name": "failed_operations_clean_partial_ciphertexts",
+      "passed": true
+    },
+    {
+      "name": "unsafe_source_url_rejected_a474a5",
+      "passed": true
+    },
+    {
+      "name": "unsafe_source_url_rejected_48fb95",
+      "passed": true
+    },
+    {
+      "name": "unsafe_source_url_rejected_a537ae",
+      "passed": true
+    },
+    {
+      "name": "unsafe_source_url_rejected_08d2ec",
+      "passed": true
+    },
+    {
+      "name": "private_network_addresses_rejected",
+      "passed": true
+    },
+    {
+      "name": "four_mebibyte_stream_encrypted_with_bound",
+      "passed": true
+    },
+    {
+      "name": "bounded_analysis_accepts_stream_not_plaintext_file",
+      "passed": true
+    },
+    {
+      "name": "closed_client_has_no_opening_fallback",
+      "passed": true
+    },
+    {
+      "name": "encrypted_database_restoration_and_file_reopening",
+      "passed": true
+    },
+    {
+      "name": "consumed_grants_remain_consumed_after_restore",
+      "passed": true
+    },
+    {
+      "name": "used_code_stays_used_after_restore",
+      "passed": true
+    },
+    {
+      "name": "revocation_persisted",
+      "passed": true
+    },
+    {
+      "name": "revoked_vault_cannot_release_pending_grant",
+      "passed": true
+    },
+    {
+      "name": "revoked_vault_cannot_reopen",
+      "passed": true
+    },
+    {
+      "name": "expired_enrollment_rejected",
+      "passed": true
+    }
+  ],
+  "limitations": [
+    "Native Khora route prepared but not activated/deployed; live session binding, hosted Postgres/TLS, Ente enrollment and desktop delivery NOT VERIFIED",
+    "PGlite executes real embedded PostgreSQL, but does not validate hosted multi-process pg Pool concurrency",
+    "HTTP transport loopback is synthetic fixture only; not proof of Google/Takeout authenticated download",
+    "Text analysis accepts UTF-8 only, bounded at 64 MiB; no archive/PDF/universal importer claim",
+    "Custody server administrator can recover identities; not zero-knowledge",
+    "A hostile host can retain keys/plaintext after legitimate release; online checks cannot revoke captured keys",
+    "Database restore needs separately protected custody key and original authenticator; no lost-factor recovery policy or offline bypass is implemented",
+    "JavaScript cannot guarantee erasure of immutable strings, memory, paging, browser caches, or system crash dumps",
+    "Windows filesystem permissions, code signing, large Takeout archives and production backup custody NOT VERIFIED"
+  ],
+  "result": "PASSED_SYNTHETIC_CANDIDATE",
+  "finished": "2026-10-18T18:22:31.505Z",
+  "passed": 80,
+  "total": 80
+}

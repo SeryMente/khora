@@ -1,0 +1,114 @@
+{
+  "scope": "SOURCE_AND_SYNTHETIC_EVIDENCE_MANIFEST",
+  "baseCommit": "16e3c9e5dd5897a188de29f14d0322ed9aa3275f",
+  "files": [
+    {
+      "path": "khora-web/portable-vault/core.mjs",
+      "sha256": "a0f4f3cb4d941e95848fc8943570a2f333ebce5a2aef8a75365b66b4fa33ea5d",
+      "bytes": 7298
+    },
+    {
+      "path": "khora-web/portable-vault/http.mjs",
+      "sha256": "60849c29012a17882c1369cb2d9a3c152dbdee41aaa051975cabc12230b046c0",
+      "bytes": 2702
+    },
+    {
+      "path": "khora-web/portable-vault/postgres.mjs",
+      "sha256": "13c28c08da2c41d0001323b8e1dec4188b66debe47c08f0d75b4941d1f34b68c",
+      "bytes": 1812
+    },
+    {
+      "path": "khora-web/portable-vault/session.mjs",
+      "sha256": "78330032ffe008569d551e7e694d8173cfb0c87e0b10ab8756184a3f5f41ffe7",
+      "bytes": 677
+    },
+    {
+      "path": "khora-web/portable-vault/client.mjs",
+      "sha256": "558c50567bfe2a9772c044d4cebf48cdfded2b95e423ef006b33b0bd5d494733",
+      "bytes": 6418
+    },
+    {
+      "path": "khora-web/portable-vault/test.mjs",
+      "sha256": "fac688d7c7acc7f7d72d9e622c69ea69531ed1b4f8328b29acfdb528ead71b48",
+      "bytes": 16995
+    },
+    {
+      "path": "khora-web/portable-vault/migrate.mjs",
+      "sha256": "ea48f68ce01683a49bd350b68637d135e13dd49b63d76cb82878ddfc7a1a084f",
+      "bytes": 532
+    },
+    {
+      "path": "khora-web/portable-vault/postgres.d.mts",
+      "sha256": "7745e8e990f8d036fa7654615a183ef951ed2b71c9330f94949d216e806d5c92",
+      "bytes": 403
+    },
+    {
+      "path": "khora-web/portable-vault/session.d.mts",
+      "sha256": "babd74ff6232de77feeea5d734239a72d210c6fa4bace81f1bb1f596f8280253",
+      "bytes": 150
+    },
+    {
+      "path": "khora-web/portable-vault/package.json",
+      "sha256": "d2034a996bc0fb82c33363c4c883889c82d2aac1bf2e4e38afb55c0e034bef16",
+      "bytes": 559
+    },
+    {
+      "path": "khora-web/portable-vault/package-lock.json",
+      "sha256": "06913305b1dfd6dba185e12851a086dae7bc31b527a9aecb99386b89a627148d",
+      "bytes": 12804
+    },
+    {
+      "path": "khora-web/portable-vault/README.md",
+      "sha256": "e0000a6684f2ef39a393fa0e707bc38591070aacc8f3bd69cc1ebc60f79a0d54",
+      "bytes": 6866
+    },
+    {
+      "path": "khora-web/portable-vault/.gitignore",
+      "sha256": "268c440e7fcc3945a69dac52ca6d88aa869a2656a0b33e9d55a8b620c8f4aceb",
+      "bytes": 37
+    },
+    {
+      "path": "khora-web/package.json",
+      "sha256": "b7b4bac2931a777ef73dd9926cc21eb9f290a4c3fc1f5f6b284594224e167a62",
+      "bytes": 2036
+    },
+    {
+      "path": "khora-web/package-lock.json",
+      "sha256": "e24dab9c3dcff5d96d35833669b527ace0474a4f5576ce7a20363a555840a49f",
+      "bytes": 347691
+    },
+    {
+      "path": "khora-web/app/api/seguridad/boveda-portable/route.ts",
+      "sha256": "b9181940d7286b2d672fcd48aea689b2758abdf67cef51637b602aff6f12e590",
+      "bytes": 1165
+    },
+    {
+      "path": "docs/frentes/llavero-harmonia/evaluacion/native/first-pass.json",
+      "sha256": "fe99550c236713ade670eae4abaf4bc8daf70951df9664a0b0b358fa2f8b50d7",
+      "bytes": 8281
+    },
+    {
+      "path": "docs/frentes/llavero-harmonia/evaluacion/native/repeat-pass.json",
+      "sha256": "14862e2175ca40f1e08964bce81385041378089fb6ff9fc030182b21056ae0c6",
+      "bytes": 8281
+    },
+    {
+      "path": "docs/frentes/llavero-harmonia/evaluacion/native/route-evidence.json",
+      "sha256": "32bb60a156c83d1fccc0630d21e58f76c52b4f3028170ffbcbc2f8ff774c424e",
+      "bytes": 247
+    },
+    {
+      "path": "docs/frentes/llavero-harmonia/evaluacion/native/dependency-audit.json",
+      "sha256": "7676bcbc0e778e753bb30a03374eccb490b41ee7e5f47d736b2047a59f19c4bf",
+      "bytes": 1949
+    },
+    {
+      "path": "docs/frentes/llavero-harmonia/OBJETO-CANONICO.md",
+      "sha256": "ef109a633ad626363c420a5d40ed56903fbca36df74ebae9c0d44b663038c7cd",
+      "bytes": 56744
+    }
+  ],
+  "productionActivated": false,
+  "corpusRead": false,
+  "merged": false
+}

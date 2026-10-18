@@ -1,0 +1,88 @@
+{
+  "scope": "DEPENDENCY_ALERTS_NOT_EXPLOITATION_PROOF",
+  "metadata": {
+    "info": 0,
+    "low": 0,
+    "moderate": 0,
+    "high": 8,
+    "critical": 0,
+    "total": 8
+  },
+  "changedPreexistingVersions": 0,
+  "addedLockEntries": 15,
+  "highAlerts": [
+    {
+      "module": "@next/eslint-plugin-next",
+      "severity": "high",
+      "preexistingModule": true,
+      "fixAvailable": {
+        "name": "eslint-config-next",
+        "version": "14.2.35",
+        "isSemVerMajor": true
+      }
+    },
+    {
+      "module": "adm-zip",
+      "severity": "high",
+      "preexistingModule": true,
+      "fixAvailable": {
+        "name": "adm-zip",
+        "version": "0.6.1",
+        "isSemVerMajor": true
+      }
+    },
+    {
+      "module": "brace-expansion",
+      "severity": "high",
+      "preexistingModule": true,
+      "fixAvailable": true
+    },
+    {
+      "module": "braces",
+      "severity": "high",
+      "preexistingModule": true,
+      "fixAvailable": {
+        "name": "eslint-config-next",
+        "version": "14.2.35",
+        "isSemVerMajor": true
+      }
+    },
+    {
+      "module": "eslint-config-next",
+      "severity": "high",
+      "preexistingModule": true,
+      "fixAvailable": {
+        "name": "eslint-config-next",
+        "version": "14.2.35",
+        "isSemVerMajor": true
+      }
+    },
+    {
+      "module": "fast-glob",
+      "severity": "high",
+      "preexistingModule": true,
+      "fixAvailable": {
+        "name": "eslint-config-next",
+        "version": "14.2.35",
+        "isSemVerMajor": true
+      }
+    },
+    {
+      "module": "js-yaml",
+      "severity": "high",
+      "preexistingModule": true,
+      "fixAvailable": true
+    },
+    {
+      "module": "micromatch",
+      "severity": "high",
+      "preexistingModule": true,
+      "fixAvailable": {
+        "name": "eslint-config-next",
+        "version": "14.2.35",
+        "isSemVerMajor": true
+      }
+    }
+  ],
+  "automaticMajorFixApplied": false
+}
