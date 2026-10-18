@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { ordenarTurnos,formatearDialogo } from "../../../../khora-web/lib/dialogo/contrato";
+import { ordenarTurnos,formatearDialogo,formatearCaptura } from "../../../../khora-web/lib/dialogo/contrato";
 import { transcribirPistasDialogo } from "../../../../khora-web/lib/dialogo/transcribir";
 import { capturarDialogo } from "../../../../khora-web/lib/dialogo/capturar";
 class Track extends EventTarget {readyState="live";stops=0;stop(){this.readyState="ended";this.stops++;}getSettings(){return {displaySurface:"browser"};}}
@@ -50,4 +50,17 @@ test("terminar una fuente detiene ambas y declara interrupción",async()=>{
 });
 test("preflight de custodia fallido no inicia grabadoras",async()=>{
  let starts=0;await assert.rejects(capturarDialogo({antesDeGrabar:async()=>{throw Error("custody_failed");},onParte:async()=>{},onInterrupcion:()=>{},mediaDevices:{getDisplayMedia:async()=>new Stream([new Track()]) as any,getUserMedia:async()=>new Stream([new Track()]) as any},recorder:s=>{starts++;return new Recorder(s as any) as any;}}),/custody_failed/);assert.equal(starts,0);
+});
+
+test("presentación independiente conserva fuentes y texto literal",()=>{
+ const turns=[{fuente:"microphone" as const,start_ms:0,end_ms:100,texto:"Sí. Sí."},{fuente:"chrome_tab" as const,start_ms:120,end_ms:180,texto:"Hola."}];
+ const before=JSON.stringify(turns), labels={microphone:"Operador",chrome_tab:"Salida Chrome"};
+ assert.equal(formatearCaptura(turns,labels,false),"Sí. Sí.\n\nHola.");
+ assert.equal(formatearCaptura(turns,labels),formatearDialogo(turns,labels));
+ assert.equal(JSON.stringify(turns),before);
+});
+test("tiempos fraccionales de navegador se conservan como milisegundos enteros",async()=>{
+ const collected:any[]=[];let t=10.22;
+ const c=await capturarDialogo({mediaDevices:{getDisplayMedia:async()=>new Stream([new Track()]) as any,getUserMedia:async()=>new Stream([new Track()]) as any},recorder:s=>new Recorder(s as any) as any,now:()=>{t+=0.73;return t;},onParte:async p=>{collected.push(p);},onInterrupcion:()=>{}});
+ await c.detener();assert.equal(collected.length,2);assert.ok(collected.every(p=>[p.startMs,p.endMs,p.duracionMs].every(Number.isInteger)));
 });

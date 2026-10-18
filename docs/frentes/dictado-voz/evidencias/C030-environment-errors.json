@@ -1,0 +1,56 @@
+[
+  {
+    "operation": "dependency probe",
+    "symptom": "ls @types/react* exited 2",
+    "cause": "optional package glob absent",
+    "state": "no repo mutation",
+    "correction": "resolve installed packages directly",
+    "verification": "require.resolve available modules",
+    "prevention": "no glob assertions for optional dependencies"
+  },
+  {
+    "operation": "browser fixture bundle",
+    "symptom": "Could not resolve react from /data virtual entry",
+    "cause": "esbuild virtual resolver does not follow runtime NODE_PATH",
+    "state": "no source mutation",
+    "correction": "explicit nodePaths from require.resolve",
+    "verification": "rerun baseline fixture",
+    "prevention": "derive module root dynamically"
+  },
+  {
+    "operation": "browser launch",
+    "symptom": "executable does not exist at /usr/bin/chromium",
+    "cause": "environment binary is /usr/local/bin/chromium",
+    "state": "no repo mutation",
+    "correction": "derive executable with which",
+    "verification": "baseline run",
+    "prevention": "no fixed executable paths"
+  },
+  {
+    "operation": "TS syntax probe",
+    "symptom": "TypeError: Cannot read properties of undefined (reading 'ReactJSX')",
+    "cause": "installed TypeScript entry is version metadata only",
+    "state": "no remote mutation",
+    "correction": "use real esbuild parser; strict typecheck remains gate",
+    "verification": "esbuild all TS/TSX",
+    "prevention": "probe compiler exports first"
+  },
+  {
+    "operation": "normal dictation patch syntax",
+    "symptom": "Expected ) but found ; at line 613",
+    "cause": "duplicate closing block retained during targeted replacement",
+    "state": "local unpublished candidate only",
+    "correction": "remove extra closing block",
+    "verification": "all-file syntax pass",
+    "prevention": "parse every changed source before push"
+  },
+  {
+    "operation": "browser fixture baseline",
+    "symptom": "locator.waitFor: Timeout 30000ms exceeded",
+    "cause": "icon stub missing Plus; old failed fixture overlapping redirected log",
+    "state": "no production access",
+    "correction": "add icon; sequential isolated runs",
+    "verification": "baseline-results.json reproduced true",
+    "prevention": "isolated output paths and no parallel runs sharing bundle"
+  }
+]

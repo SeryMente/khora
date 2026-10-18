@@ -501,3 +501,16 @@ El reporte físico del operador invalida la aceptación funcional del primer dis
 - El servidor reconoce fuente `dialogo`, exige audio verificado y coteja el manifiesto cifrado del propietario en la transacción de archivo: estado detenido/interrumpido, total exacto, índices y presencia de ambas fuentes. El cuerpo del cliente no sustituye la prueba de custodia. Driver `dialogo` conserva procedencia; texto del diálogo y partes por fuente entran al circuito habitual de revisión/ingesta.
 - Los originales se exportan por fuente, sin concatenar los dos contenedores ni convertirlos a un falso MP3 mono. El MP3 secuencial existente sigue rechazando mezcla; no se promete una mezcla estéreo nueva.
 - Aceptación terminal pendiente: conversación real audible por pestaña y micrófono, texto al detener, archivo persistido, reapertura desde Custodia y revisión/ingesta con autorización. Pruebas sintéticas y compilación no certifican esa sesión física.
+
+
+## C030 · ciclo de captura, presentación y confirmaciones
+
+`Incluir micrófono` habilita dos originales independientes; `Organizar como diálogo` solo decide presentación. La preferencia opcional se conserva en el manifiesto y checkpoint; si falta, las sesiones anteriores mantienen el formato diálogo. Cambiar presentación no mezcla fuentes, no cambia proveedor ni autoriza ingesta. Configuración cerrada durante la captura y después de recibir audio.
+
+La URL publicada por la captura activa no es una orden de recuperación: no ejecuta la limpieza que detiene las grabadoras. Un enlace externo a otra sesión no reemplaza una captura abierta. La recuperación explícita tras recarga no reanuda grabadoras. Los tiempos de grabación se cuantizan a milisegundos enteros compatibles con columnas INTEGER.
+
+Durante parada se muestra estado vivo `Terminando y conservando audio…` antes de esperar red/proveedor y se bloquea doble clic. La recepción, custodia, transcripción y archivo son confirmaciones distintas; no se declara completa una transcripción si faltan partes. Las confirmaciones pendientes de audio se agrupan junto a la custodia, con detalle HTTP seguro y reintento explícito, no alertas nuevas por cada fragmento. Fallo de copia local sigue siendo alerta visible.
+
+Observabilidad de dictado normal: inicio, confirmación o fallo por parte con índice, HTTP, duración y confirmación local; cierre con duración y pendientes. Sin palabras dictadas, audio o mensajes privados del proveedor en métricas. La telemetría posterior al COMMIT no puede invalidar una parte ya conservada. Un reintento idéntico con nombre/MIME ausentes se acepta por igualdad PostgreSQL null-safe; otra huella, bytes, fuente o sesión sellada se siguen rechazando.
+
+Ver pruebas y límites en `docs/frentes/dictado-voz/evidencias/C030-pruebas.md`. La prueba aislada no certifica la infraestructura ni el micrófono físico de producción.

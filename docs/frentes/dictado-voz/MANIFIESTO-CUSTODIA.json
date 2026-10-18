@@ -245,12 +245,6 @@
       "git_blob_sha": "9f4a7a42035e476747b1beafd5f0e4bdb334024f"
     },
     {
-      "path": "OBJETO-CANONICO.md",
-      "bytes": 186093,
-      "sha256": "6428d28bfff2a110c90c3ad601be40d608d40d61788e6cfdf5cc69910ea98dac",
-      "git_blob_sha": "20e07f41fb12e7e439b0fbbbe578e661eec130c6"
-    },
-    {
       "path": "originales/PUBLICACION-C029.md",
       "bytes": 368,
       "sha256": "4cbcad76caed94347ea82482fc132bc4b8b5de0a07f6f29ac3949a2de4233cd8",
@@ -261,6 +255,36 @@
       "bytes": 3551,
       "sha256": "f600def618320f90d93642035ae10c5050404ab593a5edb59715ec24b9a5e7db",
       "git_blob_sha": "8b44863c4be759660a02789165442796adb62169"
+    },
+    {
+      "path": "originales/C030-instrucciones.md",
+      "bytes": 3139,
+      "sha256": "47a10ab2169ee1165ff2e39e1850f5c802b22e100b3b0b7aee71d1fcde571164",
+      "git_blob_sha": "e18663f9bb4ebcbe2494a8340e305078e5dadec9"
+    },
+    {
+      "path": "OBJETO-CANONICO.md",
+      "bytes": 188991,
+      "sha256": "92ed8363acaf75c0e8f461b3953c3abf3ed91b932ab1ddfd04c66b084cb35bd7",
+      "git_blob_sha": "888902abe7c8d20eabb14f3c9784100b527125df"
+    },
+    {
+      "path": "evidencias/C030-pruebas.md",
+      "bytes": 2291,
+      "sha256": "a9ae8bda102e5569727caac939bc678e37e8c36be6d177d350d9fe908c4758a3",
+      "git_blob_sha": "e815a8c26eebff65e283ce082d6fb7aee796fa0c"
+    },
+    {
+      "path": "evidencias/captura-c030-ui.cjs",
+      "bytes": 8389,
+      "sha256": "2dbaf3ea9b29282c387a000f5cf4559cdb8b3f3c37983b965523f84a8d3ddcff",
+      "git_blob_sha": "70a8be81d48386ad8fcb6751c21354ec489d7732"
+    },
+    {
+      "path": "evidencias/C030-archive-results.json",
+      "bytes": 1790,
+      "sha256": "9d3736472f34d76b7e38f0b5e6c4f77f84145120871a646228462081afd1d4b5",
+      "git_blob_sha": "3fda0e0263fe798f5d73df51b465c9f75e6cc35a"
     }
   ],
   "runtime_references": [
@@ -367,12 +391,11 @@
     "no_secret_values_in_manifest": true
   },
   "current_preparation": {
-    "version": "0.6.8",
-    "baseSha": "958162199a518ae5a01d317f1d68e3a55360836c",
-    "receipt": "evidencias/C029.json",
-    "state": "technical publication verified; physical acceptance pending"
+    "version": "0.6.10",
+    "baseSha": "3356bfc92965503d81b06e5637c4668afbde3a52",
+    "state": "C030 technical candidate; no human acceptance"
   },
-  "latestEvent": "C029 - dialogue in Ingreso released, READY/version/alias verified; human acceptance pending",
+  "latestEvent": "C030 - preview READY, portable archive and normal dictation fixtures passed; production pending",
   "latest_verified_release": {
     "sha": "81e571deaa46ad9abd0a6b91c5035abe871a8b55",
     "deploymentId": "dpl_7eQpbex6hbt5B3vTmtWhAwMSbE1V",
@@ -395,5 +418,16 @@
     "alias": "khora-web.vercel.app",
     "verified": true,
     "physicalAcceptance": false
+  },
+  "latest_cycle": "C030",
+  "canonical_version": "0.6.10",
+  "latest_candidate": {
+    "branch": "fix/captura-dialogo-custodia-20261018",
+    "codeCommit": "b36231bfdd719741253148d24ba0265ac8dadeb7",
+    "prebuildCommit": "06c36c9917de19eeaa0c2ea1432742294e45678e",
+    "base": "3356bfc92965503d81b06e5637c4668afbde3a52",
+    "previewDeployment": "dpl_HkHzVpp8ymTiueVnGXYs6vmvtha8",
+    "previewState": "READY",
+    "production": "pending"
   }
 }
