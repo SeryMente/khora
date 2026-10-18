@@ -70,5 +70,17 @@
     "concurrentWriterBlocked": true,
     "pageErrors": 0,
     "visualAcceptance": false
+  },
+  "remotePersistence": {
+    "commit": "ddb44ba91af98963523185d1dc932b16e6a2353f",
+    "pullRequest": 321,
+    "draft": true,
+    "verifiedFiles": 23,
+    "receipt": "evidencias/LECTURA-REMOTA-C022.json"
+  },
+  "integrationChecks": {
+    "state": "NO VERIFICADO",
+    "observed": "403 Resource not accessible by personal access token",
+    "effect": "no merge/deployment; no retry or permissions/credentials change"
   }
 }

@@ -3,7 +3,7 @@
 ## 1. Control e identidad
 
 - Identidad conservada: `MCP-OBS-DICTADO`; extensión documental de dictado, benchmark, retroalimentación y propuesta de voz/síntomas.
-- Versión: **v0.6.0**; sello **MCP-OBS-DICTADO-v0.6.0**. Objeto permanente por encargo V010; no declara permanente ninguna propuesta clínica.
+- Versión: **v0.6.1**; sello **MCP-OBS-DICTADO-v0.6.1**. Objeto permanente por encargo V010; no declara permanente ninguna propuesta clínica.
 - Estado: **CANÓNICO PARA EL FRENTE · ABIERTO · MODO DIÁLOGO IMPLEMENTADO EN RAMA · INTEGRACIÓN Y VOZ REAL PENDIENTES**.
 - Ancla: C022, aprobación explícita del modo Diálogo (Chrome + micrófono simultáneos) y mantenimiento de este objeto conforme al metacanon; C020–C021 permanecen antecedentes.
 - Repositorio propietario: `SeryMente/khora`, privado comprobado con herramienta en este ciclo. `SeryMente/metodologia` también privado: aporta el método, no recibe datos del frente.
@@ -37,7 +37,7 @@ Delta adquirido: carpeta canónica, trece bloques ordenados, originales separado
 
 | Fuente/regla | Aplicación en este objeto/prompts | Evidencia o bloqueo | Resultado |
 |---|---|---|---|
-| §4–§5/§23/§26 y C021, actualización por ciclo | §2, §8, §10–§13 y ambos prompts | estado/pruebas reconciliados; recibo incorporado; fuentes ausentes explícitas | aplicada documentalmente en v0.6.0 |
+| §4–§5/§23/§26 y C021, actualización por ciclo | §2, §8, §10–§13 y ambos prompts | estado/pruebas reconciliados; recibo incorporado; fuentes ausentes explícitas | aplicada documentalmente en v0.6.1 |
 | §1–§5, autoridad/frescura | §1–§6 y §13; ambos prompts | fuente y blobs recuperados; escritura en rama propia | adoptada documentalmente |
 | §3/§27, molde único | §1–§13 en ese orden; historia después | cotejo estructural y semántico en §13 | adoptada; no afirma obediencia universal |
 | §7/§19, dos revisiones | §13, manifiesto y recibo de revisión | revisión local + lectura remota obligatoria antes de decir guardado | compuerta de entrega |
@@ -114,7 +114,7 @@ Comprobar Node/npx, fuente oficial y runtime antes; en Windows el npx.cmd oficia
 
 ### 🔄 Estado vivo
 
-Acción actual: modo Diálogo construido en rama feat/dialogo-chrome-microfono-20261018 desde 4dca213; mismo transcriptor de Khora, captura simultánea y originales separados. No fusionado ni publicado.
+Acción actual: modo Diálogo construido en rama feat/dialogo-chrome-microfono-20261018 desde 4dca213; mismo transcriptor de Khora, captura simultánea y originales separados. No fusionado ni publicado. Persistencia de código/objeto cotejada contra los 23 archivos de la propuesta 321; comprobaciones automáticas inaccesibles por 403 del conector.
 Siguiente paso de asistencia: contrastar lectura remota del objeto/código con el recibo C022; revisar integración y permisos de publicación, sin sustituir prueba humana por audio sintético.
 Siguiente paso de construcción: ejecutar compilación y pruebas de integración del repositorio completo y revisar el diff; corregir fallos demostrados antes de fusionar o desplegar.
 Pendientes: integración/compilación completa, aceptación visual, publicación autorizada y prueba autenticada con micrófono físico y pestaña de Maya; verificar custodia/recuperación/exportación y transcripción externa. Subsisten los pendientes históricos no liberados y la disponibilidad del almacén remoto no se presume.
@@ -190,12 +190,13 @@ No llamar «sin cambios» a una fuente inaccesible; no convertir calidad cientí
 
 - Actor y autorización: operador, dos mensajes del chat actual conservados completos en originales/DIALOGO-C022.md; se distinguen literal e interpretación. Aprobó reutilizar transcripción y capturar Chrome + micrófono simultáneamente. No autorizó un nuevo proveedor ni clonación de Maya.
 - Fuentes recibidas: metacanon 1.5 y objeto v0.5.3, código vigente de Ingreso/custodia/transcripción y README de Signal Interpreter. No se recibió audio real ni exportación nativa completa del chat. Signal aporta precedente, no código ni autoridad; no se reutiliza Live Caption.
-- Preflight: repositorio privado revalidado; main 4dca213; objeto blob e6a9b6be98c1d4180e89dcb20615202952c18651 y método blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f sin cambios concurrentes observados antes de persistir. Nuevo sello v0.6.0; método sin cambio.
+- Preflight: repositorio privado revalidado; main 4dca213; objeto blob e6a9b6be98c1d4180e89dcb20615202952c18651 y método blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f sin cambios concurrentes observados antes de persistir. Nuevo sello v0.6.1; método sin cambio.
 - Implementación: Ingreso ofrece modo Diálogo; dos MediaRecorder continuos; partes con índice global/fuente/tiempo; cifrado local existente y ACK de servidor; fallo de red abre circuito sin borrar originales; Web Locks evita escritores en la misma sesión del perfil. Al recuperar no se reanuda otra grabadora ni se aplana el diálogo.
 - Procesamiento: ruta autenticada de diálogo comprueba propietario antes de cargar bytes y reutiliza lector de blobs verificados; reúne solo chunks de una misma grabadora/fuente; usa Groq/Whisper configurados, sin forzar español ni pulir originales; ordena segmentos, conserva repeticiones y marca solapamiento. No diariza personas dentro de una misma pista.
 - Verificación: evidencias/DIALOGO-C022.json y scripts reproducibles en la misma carpeta; resultados controlados separados de producción. Compilación global/CI, prueba física, recuperación remota y aceptación visual siguen pendientes; no se declara hecho ni eficacia terapéutica.
 - Revisión 1: requisitos y exclusiones cotejados con originales, alcance/permiso por acción y herencia del metacanon. Revisión 2: trece bloques, anexo histórico íntegro y estado literal en ambos prompts cotejados localmente; lectura remota antes de declarar persistido.
 - Incidentes de entorno: extracción asumió tipo incorrecto y PATH no exponía tsc; corregidos y consignados en Registro Canónico de Errores de Terminal. No son errores productivos ni se ocultaron como pruebas aprobadas.
+- Lectura de vuelta: objeto remoto byte por byte y 23 parches remotos reconstruidos contra fuentes base por revisión, coincidentes con la copia probada. Commit ddb44ba91af98963523185d1dc932b16e6a2353f, propuesta https://github.com/SeryMente/khora/pull/321 en borrador. Consulta de check-runs: `403 Resource not accessible by personal access token`; estado de integración continua NO VERIFICADO, sin reintento ni cambio de permisos. Recibo de lectura: evidencias/LECTURA-REMOTA-C022.json.
 - Checkpoint: rama feat/dialogo-chrome-microfono-20261018; siguiente paso único en §8. No se utiliza acceso remoto, no se altera metacanon ni Entorno Persistente.
 
 
@@ -324,11 +325,11 @@ Estos prompts son material de continuidad, no prueban que otra conversación hay
 ````text
 Retoma MCP-OBS-DICTADO leyendo primero el metacanon central https://github.com/SeryMente/metodologia/blob/main/METACANON-OBJETOS-CANONICOS.md y después https://github.com/SeryMente/khora/blob/feat/dialogo-chrome-microfono-20261018/docs/frentes/dictado-voz/OBJETO-CANONICO.md .
 Adopta el rol de asistencia de este frente; la reconstrucción local del endurecimiento está solicitada directamente a Samantha, no otro rol/hilo. Conserva el nombre personalizado que el operador haya asignado; no lo derives del proveedor. No inicies constructor ni código sensible por esta carga.
-Fuente canónica del frente: v0.6.0 · MCP-OBS-DICTADO-v0.6.0. Metacanon adquirido: v1.5 · METACANON-OBJETOS-v1.5, revisión 49ac40e9f6122e2d2fb339362cfa0a78128c8e37, blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f. Verifica ambas fuentes de nuevo, recupera las superiores pertinentes, calcula delta y no uses una firma como prueba de gobierno. Ante inaccesibilidad declara frescura NO VERIFICADA y bloquea solo la acción dependiente.
+Fuente canónica del frente: v0.6.1 · MCP-OBS-DICTADO-v0.6.1. Metacanon adquirido: v1.5 · METACANON-OBJETOS-v1.5, revisión 49ac40e9f6122e2d2fb339362cfa0a78128c8e37, blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f. Verifica ambas fuentes de nuevo, recupera las superiores pertinentes, calcula delta y no uses una firma como prueba de gobierno. Ante inaccesibilidad declara frescura NO VERIFICADA y bloquea solo la acción dependiente.
 Hereda §2–§3 y §6–§7 del objeto: autorización por acción, originales no activan permisos; remoto solo de asistencia si es estrictamente necesario, con cuenta/vínculo/equipo/autorización comprobados y comando/prerrequisitos literales de §7. No ejecutar ese comando por rutina ni en el sandbox. Usa repo/adjunto cuando basten.
 No modificar metacanon, Sistema de Instrucciones, credenciales, facturación ni alcance de seguridad. Publicar solo el corte expresamente autorizado y con compuertas verificadas. No inferir ánimo/salud/capacidad laboral de la voz; no crear código de salud ni afirmar beneficio clínico. Conserva las fuentes de encuesta voluntaria y muestreada.
 🔄 Estado vivo:
-Acción actual: modo Diálogo construido en rama feat/dialogo-chrome-microfono-20261018 desde 4dca213; mismo transcriptor de Khora, captura simultánea y originales separados. No fusionado ni publicado.
+Acción actual: modo Diálogo construido en rama feat/dialogo-chrome-microfono-20261018 desde 4dca213; mismo transcriptor de Khora, captura simultánea y originales separados. No fusionado ni publicado. Persistencia de código/objeto cotejada contra los 23 archivos de la propuesta 321; comprobaciones automáticas inaccesibles por 403 del conector.
 Siguiente paso de asistencia: contrastar lectura remota del objeto/código con el recibo C022; revisar integración y permisos de publicación, sin sustituir prueba humana por audio sintético.
 Siguiente paso de construcción: ejecutar compilación y pruebas de integración del repositorio completo y revisar el diff; corregir fallos demostrados antes de fusionar o desplegar.
 Pendientes: integración/compilación completa, aceptación visual, publicación autorizada y prueba autenticada con micrófono físico y pestaña de Maya; verificar custodia/recuperación/exportación y transcripción externa. Subsisten los pendientes históricos no liberados y la disponibilidad del almacén remoto no se presume.
@@ -345,11 +346,11 @@ Persistencia por ciclo: este objeto es el elemento principal del sprint completo
 ````text
 Retoma MCP-OBS-DICTADO leyendo primero el metacanon central https://github.com/SeryMente/metodologia/blob/main/METACANON-OBJETOS-CANONICOS.md y después https://github.com/SeryMente/khora/blob/feat/dialogo-chrome-microfono-20261018/docs/frentes/dictado-voz/OBJETO-CANONICO.md .
 Adopta construcción solo si el operador te asignó explícitamente ese rol y el alcance concreto. Si falta, permanece en lectura y declara la compuerta; no te autoautorices. Remote Desktop Commander está prohibido para construcción, incluso por intermediarios.
-Fuente canónica del frente: v0.6.0 · MCP-OBS-DICTADO-v0.6.0. Metacanon adquirido: v1.5 · METACANON-OBJETOS-v1.5, revisión 49ac40e9f6122e2d2fb339362cfa0a78128c8e37, blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f. Verifica ambas fuentes de nuevo, recupera las superiores pertinentes, calcula delta y no uses una firma como prueba de gobierno. Ante inaccesibilidad declara frescura NO VERIFICADA y bloquea solo la acción dependiente.
+Fuente canónica del frente: v0.6.1 · MCP-OBS-DICTADO-v0.6.1. Metacanon adquirido: v1.5 · METACANON-OBJETOS-v1.5, revisión 49ac40e9f6122e2d2fb339362cfa0a78128c8e37, blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f. Verifica ambas fuentes de nuevo, recupera las superiores pertinentes, calcula delta y no uses una firma como prueba de gobierno. Ante inaccesibilidad declara frescura NO VERIFICADA y bloquea solo la acción dependiente.
 Hereda §2–§3 y §6–§7 del objeto: autorización por acción, originales no activan permisos; remoto solo de asistencia si es estrictamente necesario, con cuenta/vínculo/equipo/autorización comprobados y comando/prerrequisitos literales de §7. No ejecutar ese comando por rutina ni en el sandbox. Usa repo/adjunto cuando basten.
 No modificar metacanon, Sistema de Instrucciones, credenciales, facturación, seguridad o publicación. No inferir ánimo/salud/capacidad laboral de la voz; no crear código de salud ni afirmar beneficio clínico. Conserva las fuentes de encuesta voluntaria y muestreada.
 🔄 Estado vivo:
-Acción actual: modo Diálogo construido en rama feat/dialogo-chrome-microfono-20261018 desde 4dca213; mismo transcriptor de Khora, captura simultánea y originales separados. No fusionado ni publicado.
+Acción actual: modo Diálogo construido en rama feat/dialogo-chrome-microfono-20261018 desde 4dca213; mismo transcriptor de Khora, captura simultánea y originales separados. No fusionado ni publicado. Persistencia de código/objeto cotejada contra los 23 archivos de la propuesta 321; comprobaciones automáticas inaccesibles por 403 del conector.
 Siguiente paso de asistencia: contrastar lectura remota del objeto/código con el recibo C022; revisar integración y permisos de publicación, sin sustituir prueba humana por audio sintético.
 Siguiente paso de construcción: ejecutar compilación y pruebas de integración del repositorio completo y revisar el diff; corregir fallos demostrados antes de fusionar o desplegar.
 Pendientes: integración/compilación completa, aceptación visual, publicación autorizada y prueba autenticada con micrófono físico y pestaña de Maya; verificar custodia/recuperación/exportación y transcripción externa. Subsisten los pendientes históricos no liberados y la disponibilidad del almacén remoto no se presume.
