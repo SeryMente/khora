@@ -1,0 +1,3 @@
+{
+  "buildCommand": "npm run typecheck && npm run ui-review:check && npm run ui:contract && npm run test:unit && node --import tsx scripts/preflight-experience.ts && node scripts/build-extension.mjs && if [ \"$VERCEL_ENV\" = \"production\" ]; then node scripts/migrate-runtime.mjs; fi && next build --webpack"
+}
