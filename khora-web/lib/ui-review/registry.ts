@@ -18,6 +18,7 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
       "ingreso.btn-archivar",
       "ingreso.btn-retranscribir",
       "ingreso.btn-adjuntar",
+      "ingreso.btn-dialogo",
       "ingreso.btn-exportar-audio",
       "ingreso.btn-limpiar",
       "ingreso.textarea",
