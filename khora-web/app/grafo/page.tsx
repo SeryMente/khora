@@ -1,6 +1,7 @@
 // @l0 L0-003 · Shared immutable proposals, independently calculated projections.
 "use client";
 import React,{useEffect,useState} from "react";
+import "./graph.css";
 import dynamic from "next/dynamic";
 import type { GrafoViewState } from "../components/shared/GrafoView";
 import type { Proposal, HumanDecision } from "../../lib/graph-twins";
@@ -17,27 +18,26 @@ export default function GrafoPage(){
  const graph=pair?.[mode];const entries=(pair?.proposals||[]).flatMap(p=>p.chunks.flatMap(c=>c.relations.map(r=>({p,r}))));
  const decisions=new Map<string,HumanDecision>();for(const j of pair?.judgments||[])decisions.set(j.proposal_id+":"+j.item_id,j);
  function audit(){if(!pair)return;const url=URL.createObjectURL(new Blob([JSON.stringify(pair,null,2)],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download="khora-grafos-"+pair.revision+".json";a.click();URL.revokeObjectURL(url);}
- return <main style={{background:"var(--khora-bg)",color:"var(--khora-ink)",minHeight:"100vh"}}>
-  <section className="border-b p-4 space-y-3" aria-label="Dos proyecciones del mismo inventario">
-   <h1 className="text-xl font-semibold">Dos grafos · un mismo inventario</h1>
-   <p>Las comunidades se calculan por separado con Leiden. El automático no representa tu ratificación.</p>
-   <div className="flex flex-wrap gap-3" role="group" aria-label="Elegir grafo">
-    <button type="button" aria-pressed={mode==="automatic"} onClick={()=>{setMode("automatic");setSelection(null);}} className="border rounded px-4 py-2">Automático · sin revisión humana ({pair?.automatic?.nodes.length??"—"})</button>
-    <button type="button" aria-pressed={mode==="curated"} onClick={()=>{setMode("curated");setSelection(null);}} className="border rounded px-4 py-2">Curado · ratificación explícita ({pair?.curated?.nodes.length??"—"})</button>
+ return <main className="graph-workspace" style={{background:"var(--khora-bg)",color:"var(--khora-ink)",minHeight:"100vh"}}>
+  <header className="graph-topbar" aria-label="Dos proyecciones del mismo inventario">
+   <div className="graph-heading"><h1>Grafo</h1><p>{mode==="automatic"?"Propuestas del sistema · sin ratificación humana":"Relaciones ratificadas por ti"}</p></div>
+   <div className="graph-modes" role="group" aria-label="Elegir grafo">
+    <button type="button" aria-pressed={mode==="automatic"} onClick={()=>{setMode("automatic");setSelection(null);}}>Automático <span>{pair?.automatic?.nodes.length??"—"}</span></button>
+    <button type="button" aria-pressed={mode==="curated"} onClick={()=>{setMode("curated");setSelection(null);}}>Curado <span>{pair?.curated?.nodes.length??"—"}</span></button>
    </div>
-   <p role="status">{pair?`${pair.completed||0} de ${pair.source_count} fuentes aprobadas procesadas · ${pair.pending_sources??pair.pending} fuentes pendientes · ${pair.pending_identity_pairs??0} pares de identidad pendientes` : "Consultando versiones aprobadas…"}{busy?" · Procesando; puedes conservar esta pantalla abierta.":""}</p>
-   {pair?.custody&&<p role="status">Custodia: {pair.custody.eligible} fuentes aptas de {pair.custody.total}. {pair.custody.excluded} quedan fuera de esta corrida hasta superar Custodia. No se aprueban ni se cambian sus estados desde aquí.</p>}
-   <p className="text-sm">Las identidades entre textos requieren propuestas con sustento adicional: una coincidencia de nombre no basta. En el curado también requieren tu ratificación. Los intervalos sin extracción quedan pendientes de revisión.</p>
-   <div className="flex flex-wrap gap-3"><button type="button" disabled={busy||vault} onClick={generate} className="border rounded px-4 py-2 disabled:opacity-50">{busy?"Procesando ambos…":"Generar / actualizar ambos grafos"}</button><button type="button" disabled={!pair?.revision||busy} onClick={audit} className="border rounded px-4 py-2">Descargar evidencia de la corrida</button></div>
-   {vault&&<a href="/sistema/boveda" className="underline">Abrir bóveda para consultar los grafos</a>}
-   {error&&<p role="alert">{error}</p>}
-   {!pair?.source_count&&pair&&<p>No hay versiones aprobadas disponibles para esta cuenta. No se ingieren borradores ni se inventan datos para llenar la vista.</p>}
-   {mode==="curated"&&graph&&!graph.nodes.length&&<p>El grafo curado está vacío hasta que ratifiques relaciones concretas del inventario. No se copian aceptaciones automáticas.</p>}
-   {graph?.truncated&&<p role="status">Vista limitada: {graph.nodes.length} de {graph.totals?.nodes} nodos; {graph.edges.length} de {graph.totals?.edges} relaciones. La pertenencia a comunidades conserva el cálculo completo.</p>}
-   {pair?.revision&&<p className="text-xs break-all">Misma revisión de publicación para ambos: {pair.revision}</p>}
-  </section>
-  <View state={{nodes:graph?.nodes||[],edges:graph?.edges||[],loading:!pair&&!error,error:null,viewMode,layer2Active:layer2,selectedElement:selection}} actions={{onSetViewMode:setViewMode,onSetLayer2Active:setLayer2,onSelectElement:setSelection}}/>
-  <section className="p-4 space-y-4" aria-label="Inventario revisable">
+   <div className="graph-actions"><button type="button" disabled={busy||vault||!pair?.source_count} onClick={generate}>{busy?"Actualizando…":"Actualizar ambos"}</button><button type="button" disabled={!pair?.revision||busy} onClick={audit} aria-label="Descargar evidencia de ambos grafos">Evidencia ↓</button></div>
+  </header>
+  <div className="graph-status" role="status"><span>{pair?`${graph?.nodes.length||0} entidades · ${graph?.edges.length||0} relaciones · ${graph?.communities||0} comunidades`:"Consultando grafo…"}</span><span>{pair?.custody?`${pair.custody.eligible} de ${pair.custody.total} fuentes aptas`:""}{busy?" · Procesando…":""}</span></div>
+  {error&&<div className="graph-notice" role="alert">{vault?<><span>La consulta está disponible sin PIN. Para generar o ratificar, abre tu bóveda existente.</span> <a href="/sistema/boveda">Abrir bóveda</a></>:error}</div>}
+  {graph?.truncated&&<p className="graph-notice">Vista limitada a {graph.nodes.length} de {graph.totals?.nodes} entidades. Las comunidades conservan el cálculo completo.</p>}
+  <View compact emptyMessage={pair?.custody&&!pair.custody.eligible?`${pair.custody.excluded} fuentes permanecen fuera hasta superar Custodia. No se han modificado ni aprobado desde aquí.`:mode==="curated"?"Las relaciones aparecerán cuando las ratifiques en el inventario. No se copian aprobaciones automáticas.":"Actualiza ambos grafos cuando haya fuentes aptas. No se añaden datos de ejemplo."} state={{nodes:graph?.nodes||[],edges:graph?.edges||[],loading:!pair&&!error,error:!pair?error:null,viewMode,layer2Active:layer2,selectedElement:selection}} actions={{onSetViewMode:setViewMode,onSetLayer2Active:setLayer2,onSelectElement:setSelection}}/>
+  <details className="graph-method"><summary>Fuentes y método <span>{pair?.pending??0} pendientes</span></summary><div>
+   <p>Un inventario, dos proyecciones. Las comunidades se calculan por separado con Leiden; no se configuran a mano.</p>
+   <p>{pair?.completed||0} de {pair?.source_count||0} fuentes aprobadas procesadas · {pair?.pending_sources??pair?.pending??0} fuentes pendientes · {pair?.pending_identity_pairs??0} pares de identidad pendientes.</p>
+   <p>Una coincidencia de nombre no basta para unir identidades. En el curado, cada unión exige además tu ratificación. Los intervalos sin extracción quedan pendientes de revisión.</p>
+   {pair?.revision&&<p className="graph-revision">Revisión compartida: {pair.revision}</p>}
+  </div></details>
+  <details className="graph-inventory"><summary>Inventario y sustento literal <span>{entries.length} relaciones</span></summary><section className="p-4 space-y-4" aria-label="Inventario revisable">
    <h2 className="text-lg font-semibold">Inventario y sustento literal</h2>
    <p>Ratificar incorpora esta relación y sus expresiones de origen/destino al grafo curado. Rechazar la retira solo del curado. Ningún botón modifica el original ni asigna comunidades.</p>
    {entries.map(({p,r})=><article key={r.id} className="border rounded p-4 space-y-2">
@@ -56,6 +56,6 @@ export default function GrafoPage(){
     <div className="flex gap-3"><button disabled={busy} type="button" className="border rounded px-3 py-2" onClick={()=>review(p.id,i.id,"accept")}>Ratificar identidad</button><button disabled={busy} type="button" className="border rounded px-3 py-2" onClick={()=>review(p.id,i.id,"reject")}>Rechazar identidad</button></div>
    </article>))}
    {pair?.limitations?.map(l=><p className="text-sm" key={l}>{l}</p>)}
-  </section>
+  </section></details>
  </main>;
 }

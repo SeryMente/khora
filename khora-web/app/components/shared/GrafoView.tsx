@@ -59,13 +59,13 @@ export type GrafoViewActions = {
 
 const COMMUNITY_PALETTE = [
   "#64748B",
-  "#818CF8",
-  "#14B8A6",
-  "#F59E0B",
-  "#E879F9",
+  "#5E9FE8",
+  "#72BC8F",
+  "#EAC26B",
+  "#BF8EDA",
   "#38BDF8",
-  "#A3E635",
-  "#FB7185",
+  "#DE9255",
+  "#DF84A8",
 ];
 
 type FlowNodeData = {
@@ -90,14 +90,15 @@ function GraphNode({ data }: NodeProps<FlowNode>) {
   return (
     <div
       data-ui-id="grafo.flow-node"
-      className="relative rounded-xl border px-2 py-2 shadow-lg"
+      className="relative rounded-lg border px-2 py-2"
       style={{
         width: CARD_WIDTH,
         minHeight: CARD_HEIGHT,
         background: "var(--khora-surface)",
         color: "var(--khora-ink)",
-        borderColor: color,
-        boxShadow: `0 0 0 1px ${color}33, 0 8px 24px rgba(0,0,0,.22)`,
+        boxShadow: "0 2px 6px rgba(0,0,0,.12)",
+        borderColor: `${color}99`,
+        borderLeft: `3px solid ${color}`,
       }}
     >
       <Handle type="target" position={Position.Left} className="!h-2 !w-2 !border-0" style={{ background: color }} />
@@ -130,10 +131,14 @@ const nodeTypes = { graphNode: GraphNode };
 export function GrafoView({
   state,
   actions = {},
+  compact = false,
+  emptyMessage,
 }: {
   state: GrafoViewState;
   actions?: GrafoViewActions;
   isReviewMode?: boolean;
+  compact?: boolean;
+  emptyMessage?: string;
 }) {
   const { nodes, edges, loading, error, viewMode, layer2Active, selectedElement } = state;
 
@@ -158,7 +163,7 @@ export function GrafoView({
         label: selectedElement?.type === "edge" && selectedElement.data.id === edge.id ? (edge.type || "RELATION") : undefined,
         markerEnd: { type: MarkerType.ArrowClosed, width: 16, height: 16 },
         animated: false,
-        style: { stroke: "var(--khora-accent)", strokeWidth: Math.max(1, Math.min(4, edge.weight || 1)) },
+        style: { stroke: selectedElement?.type === "edge" && selectedElement.data.id === edge.id ? "var(--khora-ink)" : "var(--khora-accent)", opacity: selectedElement?.type === "edge" && selectedElement.data.id !== edge.id ? .25 : .65, strokeWidth: Math.max(1.2, Math.min(2.5, Math.sqrt(edge.weight || 1))) },
         labelStyle: { fill: "var(--khora-ink)", fontSize: 12 },
         labelBgStyle: { fill: "var(--khora-surface)", fillOpacity: 0.85 },
       }));
@@ -238,7 +243,7 @@ export function GrafoView({
   return (
     <div
       data-ui-id="grafo.container"
-      className="flex min-h-screen w-full flex-col overflow-hidden font-sans"
+      className={compact ? "graph-canvas-shell flex w-full flex-col overflow-hidden font-sans" : "flex min-h-screen w-full flex-col overflow-hidden font-sans"}
       style={{ backgroundColor: "var(--khora-bg)", color: "var(--khora-ink)" }}
     >
       <header
@@ -246,12 +251,12 @@ export function GrafoView({
         className="z-10 flex flex-col gap-4 border-b p-4 shadow-sm lg:flex-row lg:items-center lg:justify-between"
         style={{ backgroundColor: "var(--khora-surface)", borderColor: "var(--khora-border)" }}
       >
-        <div>
+        {!compact&&<div>
           <h1 className="text-lg font-semibold tracking-tight sm:text-xl" style={{ color: "var(--khora-ink)" }}>
             Grafo PKG - Proyección Leiden
           </h1>
           <p className="text-sm opacity-70">Vista de Entidades y Relaciones</p>
-        </div>
+        </div>}
 
         <div data-ui-id="grafo.view-toggle" className="flex min-w-0 flex-wrap items-center gap-2">
           <button
@@ -289,15 +294,15 @@ export function GrafoView({
                 onChange={(event) => actions.onSetLayer2Active?.(event.target.checked)}
                 className="rounded"
               />
-              <span>Capa 2: Codificación Visual</span>
+              <span>Colorear comunidades</span>
             </label>
           )}
         </div>
       </header>
 
-      <main className="min-h-0 flex-1 pb-24">
+      <div className={compact ? "min-h-0 flex-1" : "min-h-0 flex-1 pb-24"}>
         {loading ? (
-          <div data-ui-id="grafo.loading-state" className="p-8 text-center text-xs opacity-60">
+          <div data-ui-id="grafo.loading-state" className="graph-centered-state p-8 text-center text-sm opacity-80">
             Cargando proyecciones del grafo...
           </div>
         ) : error ? (
@@ -305,8 +310,9 @@ export function GrafoView({
             Error: {error}
           </div>
         ) : nodes.length === 0 ? (
-          <div data-ui-id="grafo.empty-state" className="p-8 text-center text-xs opacity-60">
-            El grafo está vacío. No se han encontrado entidades para esta consulta; no se generan ejemplos personales.
+          <div data-ui-id="grafo.empty-state" className="graph-centered-state p-8 text-center text-sm opacity-80">
+            <h2 className="mb-2 text-lg font-medium">Aún no hay entidades para mostrar</h2>
+            <p>{emptyMessage || "El grafo está vacío. No se han encontrado entidades para esta consulta; no se generan ejemplos personales."}</p>
           </div>
         ) : viewMode === "list" ? (
           <>
@@ -337,7 +343,7 @@ export function GrafoView({
         ) : (
           <div
             data-ui-id="grafo.flow-view"
-            className="relative h-[70dvh] min-h-[420px] w-full"
+            className="relative h-[65dvh] min-h-[400px] w-full"
           >
             <p className="px-4 py-2 text-xs opacity-80">{nodes.length} entidades · {edges.length} relaciones · {layout.communityCount} comunidades publicadas. Selecciona una relación para ver su nombre. Los nombres de grupo son locales a esta vista.</p>
             <ReactFlow
@@ -355,13 +361,13 @@ export function GrafoView({
               }}
               proOptions={{ hideAttribution: true }}
             >
-              <Background gap={22} size={1} color="rgba(140,148,160,.16)" />
-              <Controls position="bottom-left" />
+              <Background gap={28} size={1} color="rgba(140,148,160,.12)" />
+              <Controls position="bottom-left" showInteractive={false} />
               {inspectionPanel}
             </ReactFlow>
           </div>
         )}
-      </main>
+      </div>
     </div>
   );
 }
