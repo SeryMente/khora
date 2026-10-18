@@ -1,0 +1,29 @@
+{
+  "schema": "khora.graph-gate-validation/1",
+  "date": "2026-10-18",
+  "scope": "synthetic offline gate tests, NOT product acceptance",
+  "tests_run": 66,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "successful": true,
+  "product_retested": false,
+  "production_changed": false,
+  "source_audit_commit": "f820192d02ccc48e294e83ceb38f34df2c287036",
+  "previous_audit_not_superseded": true,
+  "claims": {
+    "criterion_version": "1.2",
+    "gates": 11,
+    "mandatory_tasks": 13,
+    "adversarial_product_cases_required": 40,
+    "these_40_product_cases_executed_by_gate": false,
+    "runtime_export_adapter_implemented": false,
+    "deployment_gate_connected": false,
+    "human_receipts_authenticated": false
+  },
+  "sha256": {
+    "khora-web/scripts/graph_quality_gate.py": "732ca4928ccd1ec940a8cbf59331ca39ac9d7942e7daffbcae67b14e60204fe4",
+    "khora-web/scripts/tests/test_graph_quality_gate.py": "16b880b3f46187d843a32e3c228efe45ffbb01c875ef3437050d530d8f180d18",
+    "khora-web/docs/graph-quality-profile.json": "22c38d65c4c3abfe477b87e498a7622e90632496df6e42b3771704072f540fe6"
+  }
+}

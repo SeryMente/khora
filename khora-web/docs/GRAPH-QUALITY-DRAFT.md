@@ -1,10 +1,75 @@
 # Estándar unificador de calidad y salud del grafo de Khora
 
-**Versión 1.1 · 2026-10-18 · Especificación de aceptación, no certificado de implementación.**
+**Versión 1.2 · 2026-10-18 · Contrato operativo de aptitud, con verificador de evidencia; producto NO APTO en el corte auditado.**
 
 La redacción y documentación fueron encargadas expresamente por el operador en este hilo. Este archivo sustituye el borrador anterior **en su ubicación existente**, para no multiplicar fuentes de verdad. El sufijo histórico `DRAFT` se conserva para no romper enlaces: el documento contiene un estándar de aceptación y un perfil de realización diseñados; su adopción material y la implementación siguen pendientes. No se atribuye ratificación a umbrales, decisiones de arquitectura o diseño de interfaz que el operador no haya aprobado. Publicar este texto no implementa sus controles, no levanta los bloqueos del producto y no modifica cánones de Notion.
 
+La revisión 1.2 responde a una insuficiencia de v1.1: la lista de requisitos no obligaba operativamente a demostrar orientación, recuperación íntegra y uso, y podía interpretarse como avance aunque solo creciera la documentación. Se corrige mediante el contrato de producto del §0, un perfil técnico fijado y un verificador de evidencia con pruebas adversarias. No se afirma que el mecanismo productivo haya sido reparado.
+
 **Punto de entrada del frente:** [GRAPH-TWINS.md](GRAPH-TWINS.md). **Auditoría motivadora:** [informe y evidencias](evidence/graph-quality-2026-10-18/README.md). La expresión «DEBE» identifica una condición exigida para acreditar conformidad con este estándar cuando sea adoptado, no una descripción del comportamiento actual.
+
+## 0. Decisión operativa: si no permite hacer el trabajo, no es un grafo apto
+
+**Criterio único:** una revisión de Khora solo es apta para el alcance declarado cuando permite **orientarse, recuperar íntegramente, distinguir y reconstruir el pensamiento relevante sin falsificarlo**, sobre la misma evidencia autorizada en mapa y consulta, y conserva ese resultado al corregir o regenerar. La aptitud se demuestra con tareas completas y revisión independiente, no se deduce de haber implementado componentes.
+
+**Madurez:** significado preservado, identidad contextual reversible, procedencia y límites verificables, una revisión consistente y operación recuperable. **Sobriedad:** la representación reduce la carga de encontrar y entender sin ocultar incertidumbre ni inventar orden. **Utilidad:** completar las tareas siguientes sin inspeccionar código ni explorar cientos de etiquetas ilegibles. No son estilos decorativos ni una cantidad objetivo de comunidades.
+
+### 0.1 Pruebas de producto obligatorias, fijadas antes de construir
+
+Cada tarea guarda pregunta/objetivo, fuentes y unidades esperadas, contenido prohibido, resultado observado, recorrido en la versión real y adjudicación. La referencia no puede provenir exclusivamente de lo que el extractor decidió conservar. Los nombres de casos son estables en [el perfil ejecutable](graph-quality-profile.json).
+
+| Caso | Trabajo que debe poder hacerse | Fracaso que bloquea la capacidad |
+|---|---|---|
+| IAR_RARE | Recuperar una idea única completa, con condición, duda y contexto | Una entidad o resumen omite la parte que permite usar la idea |
+| IAR_ALIAS | Reunir formulaciones del mismo hilo distribuidas en fuentes | Solo encuentra la misma palabra o una fuente favorable |
+| IAR_DISTINCT | Separar temas/personas parecidos y conservar sus conexiones reales | Confunde afinidad, homonimia o analogía con identidad |
+| IAR_EVOLUTION | Reconstruir propuesta inicial, cambio, motivo y estado posterior | Devuelve una preferencia atemporal o borra la versión antigua |
+| IAR_REPEAT | Distinguir repetición de variación sin perder ocurrencias | Duplicados inflan evidencia o deduplicación borra evolución |
+| IAR_INCOMPLETE | Identificar qué del hilo está recuperado y qué archivo quedó fuera | Respuesta exhaustiva sobre corpus parcial o pendientes ocultos |
+| SEA_CHOICES | Separar elección realizada, deseo, cita e inferencia | Fabrica una elección o identidad del operador |
+| SEA_COUNTEREVIDENCE | Mostrar tensiones y contraejemplos pertinentes | Síntesis plausible pero unilateral o halagadora |
+| SEA_AUTHORITY | Cotejar y rechazar una interpretación sin convertir el rechazo en rasgo | Una inferencia del sistema se presenta como juicio humano |
+| MAP_ORIENT | Reconocer los hilos/comunidades relevantes y explicar su alcance | La única entrada útil es una cuadrícula total de tarjetas ilegibles |
+| MAP_FOCUS | Seguir un hilo manteniendo contexto y distinguir afinidad de identidad | El enfoque solo oculta nodos, pierde contexto o cambia silenciosamente de revisión |
+| MAP_EVIDENCE | Ir de comunidad a idea/afirmación y de esta al original correcto | Color, título o resumen no tienen sustento localizable |
+| ANSWER_ABSTAIN | Reconocer una pregunta no respondible sin éxito falso | Respuesta inventada, fuente de otro ámbito o suficiencia engañosa |
+
+La aptitud de orientación NO exige una partición semántica única ni eliminar aislados reales. Una comunidad topológica debe ser válida; además debe demostrarse su utilidad en las tareas. Una afinidad conceptual transversal se declara como tal. No se crean aristas, fusiones o temas psicológicos para conseguir una imagen convincente.
+
+### 0.2 Prueba de sobriedad, sin imponer todavía un diseño visual
+
+La revisión real debe permitir: reconocer alcance y estado; leer los rótulos necesarios en la escala de trabajo; elegir un hilo sin recorrer manualmente todo el inventario; comprender por qué sus piezas están relacionadas; abrir evidencia y regresar sin perder contexto; distinguir propuesta, juicio, pendiente y error. La vista exhaustiva puede existir como inspección, pero su existencia no satisface orientación. El zoom o una distribución por fuerzas no prueban ninguna de esas condiciones por sí solos.
+
+La adjudicación registra recorrido, capturas pertinentes y éxito/fracaso de MAP_ORIENT/MAP_FOCUS/MAP_EVIDENCE, no «me gusta». Latencia, número de interacciones y problemas de lectura se registran; no se inventan umbrales universales. El equipo prepara alternativas y evidencia; el operador revisa las decisiones materiales de interfaz en persona antes de implementarlas. Este estándar no autoriza ese rediseño en ausencia del operador.
+
+### 0.3 Regla de rechazo y expediente mínimo
+
+- **NO APTO:** existe un defecto crítico o mayor sin resolver dentro del alcance reclamado, o falla una tarea obligatoria. Es el dictamen del corte auditado, no una nueva medición de producción.
+- **EVIDENCIA INCOMPLETA:** falta una comprobación, una referencia válida, una parte del recorrido real o una autoridad exigida. No equivale a aprobación ni a defecto productivo probado.
+- **CANDIDATO TÉCNICO:** pasan las comprobaciones técnicas y existe expediente real completo; todavía no se confunde con reconocimiento autobiográfico, aprobación de diseño o autorización de despliegue.
+- **APTO PARA PILOTO FINITO:** además existe adjudicación semántica independiente y verificación de los actos humanos exigidos, para corpus/revisión/tareas explícitos. No generaliza al material futuro ni acredita por sí solo el uso existencial sostenido.
+
+No se permite una puntuación global compensatoria. No se rebajan casos ni se ocultan pendientes para producir verde. Rechazar todo tampoco pasa: las tareas respondibles deben recuperar y responder. Los casos difíciles, raros y contradictorios permanecen en la evaluación. Captura segura puede continuar mientras derivados no aptos se contienen.
+
+**Compuertas P01–P11:** integridad del expediente/contexto; fuentes y unidades; grafo y anclas; partición y resúmenes; índice/generación; recorrido real y estado visible; tareas; regresiones; recuperación/replay/aislamiento; revisión independiente/operador; inventario de defectos abiertos. Se conserva el detalle QG del resto del documento como trazabilidad, no como otra nota de salud.
+
+### 0.4 Qué se ejecuta ahora y qué todavía no
+
+[graph_quality_gate.py](../scripts/graph_quality_gate.py) es un **validador offline de un expediente exportado**, de solo lectura y sin servicios. Verifica huellas, contexto fijado por quien invoca, forma cerrada de estados, reconciliación de fuentes/unidades, referencias y anclas exactas UTF-16, cobertura declarada, partición/conectividad, evidencias de resúmenes, espacio vectorial, cadena de etapas, tareas y observaciones estructuradas de operaciones. Rechaza archivos ausentes, mezclados, alterados y rutas externas. El perfil queda ligado por huella al código para impedir su debilitamiento accidental.
+
+**Límite decisivo:** la herramienta no ejecuta las cuarenta regresiones del producto ni autentica recibos humanos o de servicios; valida los resultados entregados. No decide si una proposición o resumen es fiel, si la referencia anotada omitió una idea, si un rótulo es legible o si los registros fueron fabricados. Esas afirmaciones necesitan prueba real, adjudicación independiente y verificación en la autoridad correspondiente. Un expediente internamente consistente puede ser falso: sus campos no son un sustituto de esa verificación.
+
+No hay aún exportador productivo, integración de la compuerta en publicación ni verificación automática de recibos. **Por ello el instrumento no vuelve operante de extremo a extremo al producto.** Su salida positiva se denomina `EVIDENCE_CHECKS_PASSED_REQUIRES_AUTHORITY_VERIFICATION`, nunca «grafo certificado». Los datos sintéticos siempre producen `SYNTHETIC_ONLY` y salida no exitosa para promoción. Ninguna salida autoriza producción. [Instrucciones, pruebas y estado de implementación](evidence/graph-gate-2026-10-18/README.md).
+
+### 0.5 Orden de corrección, no expansión
+
+1. Contener estados falsos y atribuciones humanas fabricadas; conservar fuentes y ledger auténtico.
+2. Resolver el mapa de integración con el operador; después conectar identidad, afirmaciones y consumidores a una revisión compartida sin romper los contratos de ingesta/EpisTwin.
+3. Reparar identidad/replay y publicación recuperable; cerrar defectos conocidos con pruebas causales.
+4. Ejecutar las trece tareas sobre la cadena real, con referencia preparada independientemente; cerrar la orientación/comunidades sin ocultar significado.
+5. Exportar evidencia verificada de esa misma revisión, conectar el rechazo en publicación y obtener adjudicación/actos humanos pendientes. Solo entonces considerar aptitud del piloto.
+
+Hacer pasar las pruebas del validador o publicar este contrato no cierra ninguno de esos arreglos productivos. No se inicia migración, backfill, redefinición de seguridad ni cambio de interfaz bajo una autorización documental.
 
 ## 1. Criterio rector: servir sin deformar ni usurpar
 
@@ -210,7 +275,7 @@ Errores del generador contenidos **antes de promoción**, conservados y marcados
 
 Para calidad semántica y recuperación no se inventa un 95%, 98% o 99% con apariencia científica. Antes de abrir la evaluación reservada se debe aprobar y congelar un perfil con: población/uso; severidades; mínimo aceptable por dimensión y estrato; riesgo residual máximo; incertidumbre y potencia/muestra necesarias; tareas obligatorias; condiciones de degradación; responsable. Cada mínimo debe justificarse por daño de error y pérdida de capacidad tolerables, no por el resultado que ya se obtuvo.
 
-**Perfil inicial para el corpus piloto:** todos los casos adjudicados críticos y todas las tareas obligatorias de referencia deben pasar, sin generalización a población futura; se exige revisión semántica de las fusiones y afirmaciones usadas en las demostraciones. La ausencia de una referencia suficientemente cubierta o de un perfil cuantitativo aprobado impide la acreditación de producción general, pero no impide capturar fuentes ni experimentar en una proyección rotulada como candidata.
+**Perfil técnico inicial fijado en v1.2:** [graph-quality-profile.json](graph-quality-profile.json), P01–P11, N01–N40 y las trece tareas del §0 deben satisfacerse sin omisión ni sustitución. No requiere otra decisión de trámite para preparar pruebas. Para el corpus piloto, todos los casos adjudicados críticos y todas las tareas obligatorias de referencia deben pasar, sin generalización a población futura; se exige revisión semántica independiente de las fusiones y afirmaciones usadas en las demostraciones. La ausencia de una referencia suficientemente cubierta o de un perfil cuantitativo aprobado impide la acreditación de producción general, pero no impide capturar fuentes ni experimentar en una proyección rotulada como candidata.
 
 **Decisión global:** CONFORME solo si pasan conjuntamente todas las compuertas aplicables, el perfil congelado y las tareas de producto; PARCIAL identifica exactamente lo que sí pasó; NO CONFORME si hay incumplimiento; NO VERIFICABLE si falta evidencia; NO APLICA requiere justificación registrada. PARCIAL y NO VERIFICABLE no autorizan proclamar cierre integral. No se pueden excluir retrospectivamente casos difíciles ni rebajar el perfil después de ver el resultado para aprobar la misma versión.
 
@@ -323,13 +388,13 @@ Las cifras del mapa —392 entidades, 214 relaciones, 193 comunidades— no cons
 
 ## 12. Adopción y siguiente checkpoint
 
-1. Revisar materialmente este estándar con el operador: alcance inicial de aceptación, riesgo tolerable, perfil y autoridad de aprobación. No pedirle que arbitre detalles técnicos decidibles.
+1. Aplicar el perfil técnico v1.2 ya fijado para preparar/correr pruebas. Someter al operador solo las decisiones materiales pendientes: integración, diseño/seguridad y reconocimiento personal; no usar una aprobación genérica de cada requisito técnico como excusa para no avanzar.
 2. Resolver y registrar **la revisión lógica canónica del conocimiento y su integración**; cualquier cambio de mapa arquitectónico conserva su compuerta de aprobación. Varios almacenes son admisibles si su equivalencia/consistencia está probada.
 3. Crear referencia independiente con casos reales y separar evaluación reservada; no volver a presentar regresiones conocidas como pruebas ciegas.
 4. Implementar controles y pruebas trazables empezando por los fallos críticos comprobados; no ampliar la confianza en un grafo que ya falla ni prometer que el estándar textual lo reparó.
 5. Ejecutar el recorrido del §7 y las tareas de §8; publicar expediente y dictamen de alcance.
 
-**Estado de cierre documental:** estándar diseñado y hallazgos documentados. **Estado de producto:** NO CONFORME en el corte auditado; acreditación integral pendiente. **Bloqueo material:** adopción del perfil y decisión de integración requieren revisión explícita; publicar documentación no las autoemite. Ningún merge, despliegue o cambio de fuentes se autoriza con este cierre.
+**Estado de v1.2:** criterio de producto y perfil técnico fijados; validador offline implementado y probado aisladamente. **Estado de producto:** NO APTO en el corte auditado; exportación desde servicios, compuerta conectada, reparación y acreditación integral pendientes. **Bloqueo material:** integración, diseño/seguridad y actos de reconocimiento conservan su revisión explícita; publicar documentación o pasar el validador no los autoemite. Ningún merge, despliegue o cambio de fuentes se autoriza con este cierre.
 
 ## 13. Perfil de realización integral · revisión 1.1
 

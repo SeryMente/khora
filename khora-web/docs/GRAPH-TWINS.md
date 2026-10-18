@@ -1,15 +1,23 @@
 # Grafos de Khora · objeto de continuidad y aceptación del frente
 
-**Corte documental: 2026-10-18 · v3. Estado integral: NO CONFORME en la auditoría de este hilo.**
+**Corte documental: 2026-10-18 · v4. Estado integral: NO APTO en la auditoría de este hilo.**
 
 Esta es la entrada de continuidad de este frente en el repositorio. El contenido histórico inferior se conserva sin reescribirlo; sus estados, conteos y URLs describen cortes anteriores y no prevalecen sobre este corte explícito. No es el objeto de Conversación Enraizada, dictado de voz ni tareas automáticas.
 
 ## LEER PRIMERO
 
-1. [Estándar unificador de calidad y salud del grafo, v1.1](GRAPH-QUALITY-DRAFT.md): criterio rector, requisitos, compuertas, evaluación y acreditación de capacidades. Especificación diseñada por encargo del operador; adopción material y perfil cuantitativo pendientes, no certificación de producto.
+1. [Estándar unificador de calidad y salud del grafo, v1.2](GRAPH-QUALITY-DRAFT.md): criterio rector, requisitos, compuertas, evaluación y acreditación de capacidades. Especificación diseñada por encargo del operador; adopción material y perfil cuantitativo pendientes, no certificación de producto.
 2. [Auditoría integral y evidencias del 2026-10-18](evidence/graph-quality-2026-10-18/README.md): distinguir pruebas ejecutadas, código inspeccionado, límites y regresiones conocidas.
 3. [Autorización específica de originales](GRAPH-ORIGINALS-AUTHORIZATION.md): excepciona la antigua selección de solo versiones aprobadas para ese propietario y esa política; no ratifica interpretaciones ni juicios.
 4. Antecedentes históricos inferiores: decisiones y verificaciones con su alcance original; no asumir vigencia actual de sus afirmaciones de despliegue, corpus vacío o exclusividad de versiones aprobadas.
+
+## Endurecimiento operativo vigente · v1.2
+
+El encargo posterior del operador es corregir un criterio que considera inoperante. La respuesta no es otra lista más larga: el §0 del estándar fija trece tareas completas, orientación/sobriedad observables, rechazo por defecto dentro del alcance y un perfil técnico sin nota compensatoria.
+
+[Expediente del endurecimiento](evidence/graph-gate-2026-10-18/README.md): validador offline de evidencia, perfil ligado por huella y pruebas adversarias. El instrumento verifica restricciones mecánicas del expediente; no ejecuta por sí mismo la cadena productiva, no autentica los recibos ni juzga fidelidad semántica. Pruebas sintéticas del verificador no acreditan el grafo. No hay exportador productivo ni compuerta conectada a despliegue.
+
+**Estado:** NO APTO en el corte auditado. Los defectos anteriores no se dan por cerrados. El criterio está corregido y hay una pieza ejecutable de control; no se declara reparado el producto ni resuelta la cuadrícula. La integración material y la interfaz conservan revisión presencial del operador. Este cambio no altera ingesta, EpisTwin, datos, juicios ni producción.
 
 ## Revisión vigente de arquitectura y suficiencia del estándar
 
@@ -19,7 +27,7 @@ Esta es la entrada de continuidad de este frente en el repositorio. El contenido
 
 **Recomendación no aprobada:** converger reutilizando custodia/propuestas/ledger PostgreSQL y el núcleo existente, con una sola espina de evidencia y proyecciones por política; evitar otro motor paralelo. La decisión material de integración y seguridad sigue en el operador. Corregir auto-ratificación, identidad y replay antes de confiar más contenido a la cadena. No sustituir el arreglo por reorganizar el dibujo.
 
-**Siguiente checkpoint:** revisar el mapa de convergencia y el perfil piloto; los paquetes concretos y sus pruebas están en el informe. Ningún código de producto, migración, backfill, merge o despliegue se ejecuta por publicar estas especificaciones. Los estados inferiores de producción conservan su corte histórico.
+**Siguiente checkpoint:** aplicar las tareas y el perfil técnico v1.2; revisar con el operador el mapa material de convergencia; los paquetes concretos y sus pruebas están en el informe. Ningún código de producto, migración, backfill, merge o despliegue se ejecuta por publicar estas especificaciones. Los estados inferiores de producción conservan su corte histórico.
 
 ## Mandato del operador en este hilo
 
@@ -41,12 +49,12 @@ La calidad debe ser una conjunción demostrada a través de fuente, significado,
 
 ## Pendientes y siguiente checkpoint ejecutable
 
-1. Revisar/adoptar el estándar y congelar el perfil de aceptación según riesgo, sin convertir umbrales arbitrarios en ciencia.
+1. Aplicar el perfil técnico v1.2 y sus trece tareas; preparar referencia real e independiente. El perfil técnico ya está fijado; no inventar aprobación material del mapa ni del diseño.
 2. Resolver con el operador la integración lógica del conocimiento; no elegir ni migrar stack unilateralmente.
 3. Preparar referencia independiente y reparar primero los fallos críticos, con pruebas positivas y negativas y trazas reales.
 4. Probar fuente → grafo → comunidades/resúmenes → recuperación → respuesta visible → juicio → reconstrucción; acreditar por separado Síntesis Existencial Accionable e Ideación Asíncrona Recuperable.
 
-Este ciclo es **documental**. No modifica código ejecutable, originales, aprobación de fuentes, juicios ni producción; no fusiona la solicitud 318 ni autoriza despliegue. El estándar no se declara implementado. Queda prohibido retomar la expansión o el pulido como sustituto del cierre de estas compuertas.
+El corte anterior fue documental. El endurecimiento v1.2 añade código de auditoría offline y sus pruebas, no modifica código funcional del producto, originales, aprobación de fuentes, juicios ni producción; no fusiona la solicitud 318 ni autoriza despliegue. El estándar no se declara implementado. Queda prohibido retomar la expansión o el pulido como sustituto del cierre de estas compuertas.
 
 ## Antecedente histórico íntegro — no usar como estado vivo
 
