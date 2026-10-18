@@ -2,16 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { COOKIE_BOVEDA, desbloqueoVigente } from "@/lib/server/boveda";
 import { readPair, nextChunk, judge, scopedPair } from "@/lib/server/graph-twins-store";
+import {graphProviderDiagnostic,graphSafeFailure} from "@/lib/server/graph-diagnostic";
 export const runtime="nodejs";
 export const dynamic="force-dynamic";
 export const maxDuration=60;
 const uuid=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
 function reply(data:unknown,status=200){return NextResponse.json(data,{status,headers:{"Cache-Control":"private, no-store","Vary":"Cookie"}});}
 async function identity(req:NextRequest,requireVault=true){const owner=(await auth())?.user?.email;if(!owner)return {error:reply({error:"no_autenticado"},401)};if(requireVault&&!desbloqueoVigente(req.cookies.get(COOKIE_BOVEDA)?.value))return {error:reply({error:"boveda_cerrada",detail:"Abre la bóveda únicamente para generar o ratificar; consultar el grafo no requiere PIN."},423)};return {owner};}
-function failed(e:unknown){if(e instanceof Error&&e.message==="graph_scope_not_found")return reply({error:"graph_scope_not_found"},404);const message=e instanceof Error?e.message:"unknown";const safe=/^(graph_|approved_|concurrent_|extractor_|active_proposal_|judgment_|invalid_extraction|provenance_|leiden_)/.test(message)?message:"graph_operation_failed";return reply({error:safe,detail:"La operación no se declaró terminada. Los originales y los juicios previos no se han sustituido."},503);}
+function failed(e:unknown){if(e instanceof Error&&e.message==="graph_scope_not_found")return reply({error:"graph_scope_not_found"},404);const safe=graphSafeFailure(e);const pg=e&&typeof e==="object"&&"code" in e?String(e.code):"";console.error("graph_operation_failed",JSON.stringify({code:safe,kind:e instanceof Error?e.name:"unknown",database_code:/^[A-Z0-9]{5}$/.test(pg)?pg:undefined}));return reply({error:safe,detail:"La operación no se declaró terminada. Los originales y los juicios previos no se han sustituido."},503);}
 function scope(req:NextRequest){const q=req.nextUrl.searchParams,io=q.get("io_id")||q.get("ioId"),source=q.get("volcado_id")||q.get("volcadoId"),limit=q.has("limit")?Number(q.get("limit")):500;if((io&&!uuid.test(io))||(source&&!uuid.test(source))||!Number.isSafeInteger(limit)||limit<1)return {error:reply({error:"invalid_graph_scope"},400)};return {io,source,limit:Math.min(limit,2000)};}
 async function scoped(req:NextRequest,owner:string,payload:Awaited<ReturnType<typeof readPair>>){const s=scope(req);if(s.error)return s.error;return reply(await scopedPair(owner,payload,s.io!,s.source!,s.limit!));}
-export async function GET(req:NextRequest){const id=await identity(req,false);if(id.error)return id.error;try{const s=scope(req);if(s.error)return s.error;return await scoped(req,id.owner!,await readPair(id.owner!));}catch(e){return failed(e);}}
+export async function GET(req:NextRequest){const id=await identity(req,false);if(id.error)return id.error;try{if(req.nextUrl.searchParams.get("diagnostic")==="1")return reply(await graphProviderDiagnostic());const s=scope(req);if(s.error)return s.error;return await scoped(req,id.owner!,await readPair(id.owner!));}catch(e){return failed(e);}}
 export async function POST(req:NextRequest){
  const id=await identity(req);if(id.error)return id.error;
  // No cross-origin mutation, even with an authenticated cookie.
