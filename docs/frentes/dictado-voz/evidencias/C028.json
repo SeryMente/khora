@@ -11,11 +11,19 @@
     "exit": 0,
     "globalInstall": false
   },
-  "authorization": "GitHub and Vercel device flows pending human approval",
+  "authorization": "GitHub device flow pending; Vercel authorized",
   "sourceHead": "57c1a43a03c162c1040452b12fe3172819e71fae",
   "globalGates": "pending",
   "newMerge": false,
   "newDeployment": false,
   "localServer": false,
-  "physicalAcceptance": false
+  "physicalAcceptance": false,
+  "vercel": {
+    "identity": "victorhugotorresmendez-8991",
+    "project": "khora-web",
+    "id": "prj_hRN86BKITXYKTnNlp0ygVhaMwFfx",
+    "root": "khora-web",
+    "node": "24.x",
+    "projectInspectExit": 0
+  }
 }
