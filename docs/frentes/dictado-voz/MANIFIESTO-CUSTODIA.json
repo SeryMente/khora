@@ -239,16 +239,28 @@
       "git_blob_sha": "128a05fa1663ad3c3b07d8a95b4d45432850fcd3"
     },
     {
-      "path": "OBJETO-CANONICO.md",
-      "bytes": 183018,
-      "sha256": "f86237ab3576c24856e382c3f149ab4ab1095767357fa707cf322756b8f5fa14",
-      "git_blob_sha": "cc37fb7d00d212ed613c17d25e830a81c8d9d8fa"
-    },
-    {
       "path": "evidencias/C028.json",
       "bytes": 790,
       "sha256": "e59320f29ee50249efb4aaf042f5896c25295154c9ec74d163dfdde5a3151b8a",
       "git_blob_sha": "9f4a7a42035e476747b1beafd5f0e4bdb334024f"
+    },
+    {
+      "path": "OBJETO-CANONICO.md",
+      "bytes": 186093,
+      "sha256": "6428d28bfff2a110c90c3ad601be40d608d40d61788e6cfdf5cc69910ea98dac",
+      "git_blob_sha": "20e07f41fb12e7e439b0fbbbe578e661eec130c6"
+    },
+    {
+      "path": "originales/PUBLICACION-C029.md",
+      "bytes": 368,
+      "sha256": "4cbcad76caed94347ea82482fc132bc4b8b5de0a07f6f29ac3949a2de4233cd8",
+      "git_blob_sha": "38e1c209950f156ec4fe6a7effd612763e2a762a"
+    },
+    {
+      "path": "evidencias/C029.json",
+      "bytes": 3551,
+      "sha256": "f600def618320f90d93642035ae10c5050404ab593a5edb59715ec24b9a5e7db",
+      "git_blob_sha": "8b44863c4be759660a02789165442796adb62169"
     }
   ],
   "runtime_references": [
@@ -355,12 +367,12 @@
     "no_secret_values_in_manifest": true
   },
   "current_preparation": {
-    "version": "0.6.7",
+    "version": "0.6.8",
     "baseSha": "958162199a518ae5a01d317f1d68e3a55360836c",
-    "receipt": "evidencias/C028.json",
-    "state": "Vercel identity/project verified; GitHub authorization pending; C027 not released"
+    "receipt": "evidencias/C029.json",
+    "state": "technical publication verified; physical acceptance pending"
   },
-  "latestEvent": "C028 - PC14 toolkit ready, Vercel existing project authorized, GitHub pending",
+  "latestEvent": "C029 - dialogue in Ingreso released, READY/version/alias verified; human acceptance pending",
   "latest_verified_release": {
     "sha": "81e571deaa46ad9abd0a6b91c5035abe871a8b55",
     "deploymentId": "dpl_7eQpbex6hbt5B3vTmtWhAwMSbE1V",
@@ -375,5 +387,13 @@
     "acceptance": false,
     "cause": "unverified",
     "original": "originales/DIALOGO-INTEGRADO-C027.md"
+  },
+  "latest_release": {
+    "receipt": "evidencias/C029.json",
+    "commit": "77d8ee012d4cbc2a719af0684a1e47434e00d56d",
+    "deployment": "dpl_2XowmVXt3ME2KQU41vjm6BCpiWQV",
+    "alias": "khora-web.vercel.app",
+    "verified": true,
+    "physicalAcceptance": false
   }
 }
