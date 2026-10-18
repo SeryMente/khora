@@ -159,7 +159,8 @@ def _retrieve(ht: Ht, question: str, memoria: Any, contexto: Any = None) -> Ht:
     contexto = contexto or ContextoDeVisibilidad.PRIVADO
     if memoria is None:
         payload = {"graph_revision": "unavailable", "gstar_nodes": [], "gstar_edges": [],
-                   "communities": [], "summary_included": False, "sufficient": False}
+                   "communities": [], "summary_included": False, "sufficient": False,
+                   "retrieval_query": question}
         return _add_trace(
             _set_last_step_observation(ht, payload),
             {"action": "RETRIEVE", **payload}
@@ -169,6 +170,7 @@ def _retrieve(ht: Ht, question: str, memoria: Any, contexto: Any = None) -> Ht:
     community_ids = [f.id for f in resultado.fragmentos if f.id.startswith("L0_") or f.id.startswith("L1_")]
     payload = {
         "graph_revision": memoria.get_graph_revision() if hasattr(memoria, "get_graph_revision") else "unknown",
+        "retrieval_query": question,
         "gstar_nodes": node_ids,
         "gstar_edges": [a.__dict__ for a in resultado.subgrafo.aristas],
         "communities": community_ids,
@@ -202,8 +204,11 @@ def _refine(ht: Ht, question: str, puerto_llm: PuertoLLM) -> Ht:
               f"Pregunta: {question}\nH_t: {json.dumps(context, ensure_ascii=False)}")
     req = SolicitudLLM(prompt, "Operador REFINE; no respondas la pregunta.", None,
                        {"temperature": 0.0, "role": "refine"})
-    refined = puerto_llm.generar(req).texto
-    return _add_step(ht, Lambda.REFINE.value, "Refinamiento ejecutado.", {"refined_query": refined})
+    refined = puerto_llm.generar(req).texto.strip()
+    if not refined:
+        raise ValueError("REFINE no produjo una consulta utilizable")
+    ht = _add_step(ht, Lambda.REFINE.value, "Refinamiento ejecutado.", {"refined_query": refined})
+    return _add_trace(ht, {"action": "REFINE", "refined_query": refined})
 
 
 def _answer(ht: Ht, question: str, puerto_llm: PuertoLLM) -> Response:
@@ -236,15 +241,17 @@ def ejecutar_ciclo(session_id: str, pregunta: str, puerto_llm: PuertoLLM, memori
     final_result: FvalResult | None = None
     answer = Response("Proceso detenido.", [], session_id)
     trace: List[Dict[str, Any]] = []
+    retrieval_query = pregunta
 
     while estado.paso_actual <= max_steps and not estado.terminado:
         action, why = _policy(pregunta, estado.ht, puerto_llm)
         estado.ht = _add_step(estado.ht, action.value, why)
         try:
             if action == Lambda.RETRIEVE:
-                estado.ht = _retrieve(estado.ht, pregunta, memoria)
+                estado.ht = _retrieve(estado.ht, retrieval_query, memoria)
             elif action == Lambda.REFINE:
                 estado.ht = _refine(estado.ht, pregunta, puerto_llm)
+                retrieval_query = estado.ht.steps[-1].observation["refined_query"]
             elif action == Lambda.ANSWER:
                 legacy_provider = (
                     hasattr(puerto_llm, "call_count") or hasattr(puerto_llm, "forced_responses")
@@ -264,12 +271,8 @@ def ejecutar_ciclo(session_id: str, pregunta: str, puerto_llm: PuertoLLM, memori
                         )
                     else:
                         answer = _answer(estado.ht, pregunta, puerto_llm)
-                    if os.getenv("KHORA_FVAL_MODE") == "mark" and any(
-                        e.node_id == "fallback_vqa" for e in estado.ht.evidence
-                    ):
-                        final_result = FvalResult("Sufficient", None, "fallback visual validado")
-                    else:
-                        final_result = fval(answer.answer, estado.ht, puerto_llm)
+                    # Visual evidence remains evidence, never a substitute for global fVAL.
+                    final_result = fval(answer.answer, estado.ht, puerto_llm)
                     verdict_record = {"vt": final_result.vt, "deficit_type": final_result.deficit_type,
                                       "reason": final_result.reason}
                     estado.ht = _replace_ht(estado.ht, verdicts=estado.ht.verdicts + [verdict_record])
@@ -290,9 +293,9 @@ def ejecutar_ciclo(session_id: str, pregunta: str, puerto_llm: PuertoLLM, memori
                 estado.terminado = True
         except Exception as exc:
             estado.ht = _add_trace(estado.ht, {"action": action.value, "error": str(exc)})
-            if action == Lambda.RETRIEVE:
+            if action in {Lambda.RETRIEVE, Lambda.REFINE}:
                 estado.terminado = True
-                final_result = FvalResult("Insufficient", "TEXTUAL", f"RETRIEVE falló: {exc}")
+                final_result = FvalResult("Insufficient", "TEXTUAL", f"{action.value} falló: {exc}")
         estado.paso_actual += 1
 
     save_ht(estado.ht, db_path)

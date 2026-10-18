@@ -1,0 +1,23 @@
+test_empty_refinement_stops_without_using_original (repair_regressions.CycleTests.test_empty_refinement_stops_without_using_original) ... ok
+test_invalid_visual_judgment_is_not_success (repair_regressions.CycleTests.test_invalid_visual_judgment_is_not_success) ... ok
+test_mark_mode_visual_cannot_skip_global_fval (repair_regressions.CycleTests.test_mark_mode_visual_cannot_skip_global_fval) ... ok
+test_new_question_does_not_reuse_previous_refined_query (repair_regressions.CycleTests.test_new_question_does_not_reuse_previous_refined_query) ... ok
+test_real_cycle_refine_retrieve_generate_validate_and_persist (repair_regressions.CycleTests.test_real_cycle_refine_retrieve_generate_validate_and_persist) ... ok
+test_retrieval_error_cannot_become_success (repair_regressions.CycleTests.test_retrieval_error_cannot_become_success) ... ok
+test_second_refinement_replaces_retrieval_query (repair_regressions.CycleTests.test_second_refinement_replaces_retrieval_query) ... ok
+test_visual_can_pass_only_after_explicit_global_judgment (repair_regressions.CycleTests.test_visual_can_pass_only_after_explicit_global_judgment) ... ok
+test_ab_reports_all_changed_neighborhoods (repair_regressions.PartitionTests.test_ab_reports_all_changed_neighborhoods) ... ok
+test_disjoint_universe_not_comparable (repair_regressions.PartitionTests.test_disjoint_universe_not_comparable) ... ok
+test_duplicate_membership_is_rejected (repair_regressions.PartitionTests.test_duplicate_membership_is_rejected) ... ok
+test_generator_memberships_are_materialized_once (repair_regressions.PartitionTests.test_generator_memberships_are_materialized_once) ... ok
+test_label_permutation_has_maximum_stability (repair_regressions.PartitionTests.test_label_permutation_has_maximum_stability) ... ok
+test_label_renaming_is_not_ab_change (repair_regressions.PartitionTests.test_label_renaming_is_not_ab_change) ... ok
+test_no_partition_or_single_partition_not_measured (repair_regressions.PartitionTests.test_no_partition_or_single_partition_not_measured) ... ok
+test_partially_changed_universe_not_comparable (repair_regressions.PartitionTests.test_partially_changed_universe_not_comparable) ... ok
+test_real_regrouping_changes_pair_agreement (repair_regressions.PartitionTests.test_real_regrouping_changes_pair_agreement) ... ok
+test_singleton_universe_has_no_pairs (repair_regressions.PartitionTests.test_singleton_universe_has_no_pairs) ... ok
+
+----------------------------------------------------------------------
+Ran 18 tests in 0.033s
+
+OK

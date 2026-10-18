@@ -1,0 +1,8 @@
+{
+  "scope": "controlled reasoning integration with deterministic provider/retriever and real temporary SQLite; real pure partition functions; NOT live E2E",
+  "tests_run": 18,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "passed": true
+}

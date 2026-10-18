@@ -50,19 +50,36 @@ def partition_membership(parts: dict[str, Iterable[str]]) -> dict[str, str]:
     return result
 
 
-def membership_stability(partitions: list[dict[str, Iterable[str]]]) -> float:
-    if len(partitions) < 2:
-        return 1.0
+def membership_stability_report(partitions: list[dict[str, Iterable[str]]]) -> dict[str, Any]:
+    """Unadjusted Rand agreement on a fixed universe; not semantic health.
+
+    Community labels are arbitrary. An absent/composition-changing universe has
+    no scalar stability in this diagnostic and must be aligned separately.
+    """
     memberships = [partition_membership(p) for p in partitions]
-    pairs: list[float] = []
+    sizes = [len(m) for m in memberships]
+    base = {"metric": "mean_adjacent_unadjusted_rand", "universe_sizes": sizes,
+            "comparison_count": max(0, len(memberships) - 1)}
+    if len(memberships) < 2:
+        return {**base, "comparable": False, "reason": "fewer_than_two_partitions", "value": None}
+    universe = set(memberships[0])
+    if len(universe) < 2 or any(set(m) != universe for m in memberships[1:]):
+        return {**base, "comparable": False, "reason": "insufficient_or_different_universe", "value": None}
+    nodes = sorted(universe)
+    scores = []
+    denominator = len(nodes) * (len(nodes) - 1) // 2
     for left, right in zip(memberships, memberships[1:]):
-        shared = sorted(set(left) & set(right))
-        if not shared:
-            pairs.append(1.0)
-            continue
-        same = sum(left[n] == right[n] for n in shared)
-        pairs.append(same / len(shared))
-    return sum(pairs) / len(pairs)
+        agreements = sum(
+            (left[a] == left[b]) == (right[a] == right[b])
+            for i, a in enumerate(nodes) for b in nodes[i + 1:]
+        )
+        scores.append(agreements / denominator)
+    return {**base, "comparable": True, "reason": "fixed_universe", "value": sum(scores) / len(scores)}
+
+
+def membership_stability(partitions: list[dict[str, Iterable[str]]]) -> float | None:
+    """Compatibility scalar: None means NOT COMPARABLE, never perfect stability."""
+    return membership_stability_report(partitions)["value"]
 
 
 def degree_preserving_null(G: nx.Graph, seed: int = 42, swaps: int | None = None) -> nx.Graph:
@@ -126,20 +143,27 @@ def compare_community_ab(
     gstar_edges_active: Iterable[tuple[str, str]] | None = None,
     gstar_edges_disabled: Iterable[tuple[str, str]] | None = None,
 ) -> dict[str, Any]:
+    # Materialize iterables once; generator-valued memberships are supported.
+    active = {cid: tuple(members) for cid, members in active.items()}
+    disabled = {cid: tuple(members) for cid, members in disabled.items()}
+
     def sig(partition: dict[str, Iterable[str]]) -> str:
-        payload = sorted(sorted(map(str, members)) for members in partition.values())
+        payload = sorted(sorted(map(str, members)) for members in partition.values() if members)
         return hashlib.sha256(json.dumps(payload, separators=(',', ':')).encode()).hexdigest()
 
     active_members = partition_membership(active)
     disabled_members = partition_membership(disabled)
+    active_peers = {n: frozenset(active[cid]) for n, cid in active_members.items()}
+    disabled_peers = {n: frozenset(disabled[cid]) for n, cid in disabled_members.items()}
     changed_nodes = sorted(
         n for n in set(active_members) | set(disabled_members)
-        if active_members.get(n) != disabled_members.get(n)
+        if active_peers.get(n) != disabled_peers.get(n)
     )
-
     result: dict[str, Any] = {
         'changed': bool(changed_nodes),
         'changed_nodes': changed_nodes,
+        'changed_nodes_semantics': 'changed_co_membership_neighborhood_including_presence',
+        'same_universe': set(active_members) == set(disabled_members),
         'active_signature': sig(active),
         'disabled_signature': sig(disabled),
     }

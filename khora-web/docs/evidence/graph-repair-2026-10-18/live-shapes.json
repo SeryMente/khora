@@ -1,0 +1,35 @@
+{
+  "read_at": "2026-10-18T20:13:12.177Z",
+  "items": [
+    {
+      "path": "/api/grafos",
+      "status": 200,
+      "revision": "9bfc8bde-d80f-42e6-80ea-59996749c094",
+      "array_counts": {
+        "automatic": {
+          "nodes": 392,
+          "edges": 214,
+          "identities": 14
+        },
+        "curated": {
+          "nodes": 0,
+          "edges": 0,
+          "identities": 0
+        },
+        "proposals": 41,
+        "judgments": 0,
+        "limitations": 4
+      }
+    },
+    {
+      "path": "/api/grafo?limit=10",
+      "status": 200,
+      "array_counts": {
+        "nodes": 0,
+        "edges": 0,
+        "informationObjects": 0,
+        "mentions": 0
+      }
+    }
+  ]
+}

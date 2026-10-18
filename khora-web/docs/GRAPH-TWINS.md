@@ -1,6 +1,6 @@
 # Grafos de Khora · objeto de continuidad y aceptación del frente
 
-**Corte documental: 2026-10-18 · v4. Estado integral: NO APTO en la auditoría de este hilo.**
+**Corte documental: 2026-10-18 · v5. Estado integral: NO APTO en la auditoría de este hilo.**
 
 Esta es la entrada de continuidad de este frente en el repositorio. El contenido histórico inferior se conserva sin reescribirlo; sus estados, conteos y URLs describen cortes anteriores y no prevalecen sobre este corte explícito. No es el objeto de Conversación Enraizada, dictado de voz ni tareas automáticas.
 
@@ -10,6 +10,14 @@ Esta es la entrada de continuidad de este frente en el repositorio. El contenido
 2. [Auditoría integral y evidencias del 2026-10-18](evidence/graph-quality-2026-10-18/README.md): distinguir pruebas ejecutadas, código inspeccionado, límites y regresiones conocidas.
 3. [Autorización específica de originales](GRAPH-ORIGINALS-AUTHORIZATION.md): excepciona la antigua selección de solo versiones aprobadas para ese propietario y esa política; no ratifica interpretaciones ni juicios.
 4. Antecedentes históricos inferiores: decisiones y verificaciones con su alcance original; no asumir vigencia actual de sus afirmaciones de despliegue, corpus vacío o exclusividad de versiones aprobadas.
+
+## Reparación técnica iniciada · no desplegada
+
+[Correcciones y pruebas](evidence/graph-repair-2026-10-18/README.md): R07 refinamiento efectivo y trazado; R08 validador global obligatorio aun con evidencia visual; R11 métricas invariantes a etiquetas y NO COMPARABLE con universos distintos. 18 pruebas nuevas y 25 existentes seleccionadas pasan; proveedores/recuperador controlados y SQLite real temporal. No es acreditación productiva ni reparación de todos los hallazgos.
+
+Lectura real nueva: mapa automático 392 nodos/214 relaciones, curado vacío y cero juicios; proyección del núcleo vacía en `/api/grafo?limit=10`. Producción observada 81e571deaa46ad9abd0a6b91c5035abe871a8b55; snapshot 9bfc8bde-d80f-42e6-80ea-59996749c094. Las correcciones de este corte permanecen en rama, no se atribuyen al despliegue.
+
+La pregunta al operador sobre elección de bases de datos fue retirada como carga técnica impropia. La recomendación corresponde al constructor; su revisión material debe explicar consecuencias de responsabilidad, juicio y regeneración, no pedir que el operador diseñe el stack. No se infiere autorización de arquitectura, seguridad o interfaz de esa retirada.
 
 ## Endurecimiento operativo vigente · v1.2
 

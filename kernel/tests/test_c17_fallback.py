@@ -1,5 +1,6 @@
 # @l0 L0-002-R · @req KA-00/REQ-2 · @acr ACR-2.1
 import importlib
+import json
 import sqlite3
 
 import pytest
@@ -47,6 +48,17 @@ def mock_llm_provider(monkeypatch):
 
         def generar(self, solicitud):
             self.call_count += 1
+            # Global fVAL must actually run: fixture judgments cannot rely on
+            # KHORA_FVAL_MODE=mark silently accepting visual evidence.
+            if solicitud.metadata.get("role") == "fVAL":
+                visual = "fallback_vqa" in solicitud.prompt
+                return RespuestaLLM(
+                    texto=json.dumps({"vt": "Sufficient" if visual else "Insufficient",
+                                      "deficit_type": None if visual else "VISUAL",
+                                      "reason": "Explicit controlled global judgment"}),
+                    modelo="mock",
+                    provenance=Provenance(origen="mock", driver=None, timestamp="now"),
+                )
             if "Evidencia Visual VQA" in solicitud.prompt:
                 # Segunda llamada (re-síntesis)
                 return RespuestaLLM(
