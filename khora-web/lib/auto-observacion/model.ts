@@ -5,7 +5,7 @@ export function inferredOutcome(state: unknown): string {
   return ({ OK: "SUCCESS", FAIL: "FAILURE", START: "PENDING", SKIP: "SKIPPED", INFO: "PARTIAL" } as Record<string, string>)[String(state)] || "UNKNOWN";
 }
 export function finiteDuration(value: unknown): number | null {
-  return typeof value === "number" && Number.isFinite(value) && value >= 0 ? Math.min(value, 86400000) : null;
+  return typeof value === "number" && Number.isFinite(value) && value >= 0 ? Math.round(Math.min(value, 86400000)) : null;
 }
 export function parseFilters(params: URLSearchParams) {
   const phase = params.get("fase") || "";

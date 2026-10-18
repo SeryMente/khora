@@ -1,0 +1,63 @@
+{
+  "commit": "0a2e4ec8f9f47dba9d4679d52cac6b33d2139fcc",
+  "method": "get_file_contents directory metadata pinned to commit; compare returned blob SHA to git object SHA of exact submitted UTF-8 bytes",
+  "scope": "seven files changed in C004, not full repository; no full content fetch claimed",
+  "files": [
+    {
+      "path": "khora-web/lib/server/eventos.ts",
+      "bytes": 22036,
+      "sha256": "fb054bf887bc22b374e1e22841c356245cce35fb721f273005326762ea9d1518",
+      "git_blob_sha": "9de6909749ea651ba908bb2106c0142747b5568c",
+      "remote_blob_sha": "9de6909749ea651ba908bb2106c0142747b5568c",
+      "match": true
+    },
+    {
+      "path": "khora-web/app/components/shared/RegistroView.tsx",
+      "bytes": 14861,
+      "sha256": "8be935ea133d9b0c894dc1259f6eed09cb90cdaf48bea0398cc8c73a0ca5413b",
+      "git_blob_sha": "a6c85db6e48fc61c9c3eccb2f113f339432d5fe4",
+      "remote_blob_sha": "a6c85db6e48fc61c9c3eccb2f113f339432d5fe4",
+      "match": true
+    },
+    {
+      "path": "khora-web/tests/unit/auto-observacion-persistence.test.ts",
+      "bytes": 5863,
+      "sha256": "8822ad44eebb6a74f9b4f244299fd4cde7b1feb6217b7c43e4e67de914bb94ec",
+      "git_blob_sha": "625642f111fc4daecc69b4b9ade59775c8c8a9c0",
+      "remote_blob_sha": "625642f111fc4daecc69b4b9ade59775c8c8a9c0",
+      "match": true
+    },
+    {
+      "path": "docs/frentes/auto-observacion/OBJETO-CANONICO.md",
+      "bytes": 32029,
+      "sha256": "ad5b69db7ef2e9d27b48f4a49a193f83a813d10f2a5c518550dc779d5e8cb4d4",
+      "git_blob_sha": "7ce2f73dcb7623cb2bd7fc8b80f339122b4f42ea",
+      "remote_blob_sha": "7ce2f73dcb7623cb2bd7fc8b80f339122b4f42ea",
+      "match": true
+    },
+    {
+      "path": "docs/frentes/auto-observacion/MANIFIESTO-CUSTODIA.json",
+      "bytes": 1207,
+      "sha256": "7fe9861ab94ba0ba1a8be075c7d8912facad637510dbdbf3e0c98430604efffb",
+      "git_blob_sha": "cdbe9d2e559ea639133d3bd49e5df9ceda94c935",
+      "remote_blob_sha": "cdbe9d2e559ea639133d3bd49e5df9ceda94c935",
+      "match": true
+    },
+    {
+      "path": "docs/frentes/auto-observacion/evidencias/PRUEBAS-C004.json",
+      "bytes": 9154,
+      "sha256": "86550e72584503a990e12103d7121e1f0a554c901333f8a84a3e0f5dac6227a6",
+      "git_blob_sha": "002416f1f03da814117ddbcf331f67067e38ea47",
+      "remote_blob_sha": "002416f1f03da814117ddbcf331f67067e38ea47",
+      "match": true
+    },
+    {
+      "path": "docs/frentes/auto-observacion/evidencias/INCIDENCIAS-C004.json",
+      "bytes": 2678,
+      "sha256": "d447318dec5393735993f9e6bbf352fd41c80649ffd17482710dcf9526201415",
+      "git_blob_sha": "a900414b1f67bd7c4af903321ca996a113ff13d9",
+      "remote_blob_sha": "a900414b1f67bd7c4af903321ca996a113ff13d9",
+      "match": true
+    }
+  ]
+}

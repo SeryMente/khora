@@ -23,10 +23,10 @@ function pool(options: { failInsert?: boolean; failOutbox?: boolean; duplicate?:
 const event = { fase: "manejo" as const, eventId: "MAN-001", estado: "FAIL" as const, mensaje: "Synthetic failure", correlacionId: "00000000-0000-4000-8000-000000000001" };
 test("legacy failure persisted as FAILURE and new payload hash survives DB JSON roundtrip", async () => {
   const p = pool(); setDbForTesting(p.db);
-  try { const res = await registrarEventosBatch([event]); assert.equal(res.accepted, 1);
+  try { const res = await registrarEventosBatch([{ ...event, sequence: 7, eventUuid: "AAAAAAAA-AAAA-4AAA-8AAA-AAAAAAAAAAAA", durationMs: 12.7 }]); assert.equal(res.accepted, 1);
     const a = p.inserts[0]; assert.equal(a[15], "FAILURE");
     const fields = ["fase", "event_id", "estado", "mensaje", "detalle", "volcado_id", "version", "sha256", "correlacion_id", "cliente_en", "hash_anterior", "event_hash", "event_uuid", "idempotency_key", "schema_version", "outcome", "component", "causation_id", "attempt_id", "sequence", "session_id", "release_sha", "duration_ms", "metrics", "reason_code", "privacy_class"];
-    const persisted = Object.fromEntries(fields.map((k, i) => [k, (k === "detalle" || k === "metrics") && a[i] ? JSON.parse(String(a[i])) : a[i]])); assert.equal(verifyChain([persisted], false).verdict, "VERIFIED_SCOPE");
+    const persisted = Object.fromEntries(fields.map((k, i) => [k, (k === "detalle" || k === "metrics") && a[i] ? JSON.parse(String(a[i])) : a[i]])); persisted.sequence = String(persisted.sequence); persisted.event_uuid = String(persisted.event_uuid).toLowerCase(); assert.equal(a[22], 13); assert.equal(verifyChain([persisted], false).verdict, "VERIFIED_SCOPE");
   } finally { resetDbForTesting(); }
 });
 test("service partial is INFO, propagates outcome/component and metadata cannot override boundary", async () => {
@@ -41,3 +41,5 @@ test("both sinks failing is NOT_PERSISTED, no raw DB error leaked", async () => 
 test("outbox retains generated identity and sanitizes nested secret values", async () => { const p = pool({ failInsert: true }); setDbForTesting(p.db); try { const r = await registrarEventosBatch([{ ...event, detalle: { password: "PRIVATE" }, metrics: { token: "PRIVATE" } }]); assert.equal(r.results[0].reason, "EVENT_PENDING_OUTBOX"); const payload = JSON.parse(String(p.outbox[0][3])); assert.equal(payload.eventUuid, r.results[0].event_uuid); assert.equal(payload.correlacionId, event.correlacionId); assert.ok(!JSON.stringify(p.outbox).includes("PRIVATE")); assert.ok(!JSON.stringify(p.outbox).includes("fake-db-secret")); } finally { resetDbForTesting(); } });
 test("duplicate identifiers don't insert again or claim payload equality", async () => { const p = pool({ duplicate: true }); setDbForTesting(p.db); try { const r = await registrarEventosBatch([event]); assert.equal(r.duplicates, 1); assert.equal(p.inserts.length, 0); assert.match(r.results[0].reason || "", /No certifica/); } finally { resetDbForTesting(); } });
 test("exhausted outbox retries reach visible FAILED state", async () => { const p = pool(); setDbForTesting(p.db); try { const r = await procesarOutbox(); assert.equal(r.fallidos, 1); assert.match(p.updates[0], /retry_count \+ 1 >= 5 THEN 'FAILED'/); } finally { resetDbForTesting(); } });
+
+test("unsafe or fractional sequence is rejected before insertion", async () => { const p = pool(); setDbForTesting(p.db); try { const r = await registrarEventosBatch([{ ...event, sequence: Number.MAX_SAFE_INTEGER + 1 }, { ...event, sequence: 1.5 }]); assert.equal(r.rejected, 2); assert.equal(p.inserts.length, 0); } finally { resetDbForTesting(); } });

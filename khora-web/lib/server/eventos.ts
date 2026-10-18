@@ -461,7 +461,7 @@ export async function registrarEventosBatch(
       params = raw as RegistrarEventoParams;
     }
 
-    if (!["START", "OK", "FAIL", "INFO", "SKIP"].includes(params.estado) || !FASES_VALIDAS.has(params.fase) || !validarEventId(params.fase, params.eventId)) {
+    if ((params.sequence != null && (!Number.isSafeInteger(params.sequence) || params.sequence < 0)) || !["START", "OK", "FAIL", "INFO", "SKIP"].includes(params.estado) || !FASES_VALIDAS.has(params.fase) || !validarEventId(params.fase, params.eventId)) {
       response.rejected++;
       response.results.push({
         event_uuid: params.eventUuid || undefined,

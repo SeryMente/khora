@@ -1,0 +1,97 @@
+{
+  "cycle": "C005",
+  "parent_commit": "0a2e4ec8f9f47dba9d4679d52cac6b33d2139fcc",
+  "causal_before": {
+    "passed": 16,
+    "failed": 2,
+    "scope": [
+      "BIGINT/UUID representation equivalence",
+      "INTEGER duration normalization"
+    ],
+    "log": "✔ failure cannot appear as success; legacy discrepancy disclosed (5.504962ms)\n✔ diagnostic projection excludes free-form content, metrics, sessions, hashes (1.87335ms)\n✔ browser origin is a report, not trusted server attestation (0.208338ms)\n✔ invalid identifiers and timestamps fail closed (0.238636ms)\n✔ filters bounded; SQL injection, NaN, negative and huge limits rejected (0.775631ms)\n✔ durations do not serialize NaN, infinity or negative as valid measurements (0.260877ms)\n✔ recursive secret redaction covers keys, nested arrays and bearer strings (0.49886ms)\n✔ canonical hashing survives JSONB key reordering (0.290885ms)\n✔ new full correlation verifies content and links in explicit scope (0.805364ms)\n✔ payload tampering, outcome tampering and broken links detected (0.728236ms)\n✔ legacy, missing root, truncated and empty chains never falsely verified (0.50892ms)\n✔ absence of failure is not evidence of completed operation (0.538733ms)\n✔ ingress rejects malformed JSON, null, primitives, null entries and overlong batches (40.03567ms)\n✔ ingress counts actual bytes even without content-length (1.32155ms)\n✔ ingress validates idempotency key without reflecting contents (1.091813ms)\n✔ canonical hash normalizes client timestamp representation (0.401248ms)\n✖ canonical hash matches PostgreSQL BIGINT text and UUID normalization (1.617973ms)\n✖ millisecond duration fits INTEGER storage without false persistence failure (0.419392ms)\nℹ tests 18\nℹ suites 0\nℹ pass 16\nℹ fail 2\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 468.777501\n\n✖ failing tests:\n\ntest at khora-work/khora-web/tests/unit/auto-observacion.test.ts:2:7385\n✖ canonical hash matches PostgreSQL BIGINT text and UUID normalization (1.617973ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  + actual - expected\n  \n  + 'c735ad301bb8d72b05bc0f52d44cf6daf255d0925ede550e50041498445c657c'\n  - '31e17b2b4cf89db2ac44c6077a242ceae74c3ced65c94f817be9bb570ea0504e'\n  \n      at TestContext.<anonymous> (/vercel/sandbox/data/khora-work/khora-web/tests/unit/auto-observacion.test.ts:27:396)\n      at Test.runInAsyncScope (node:async_hooks:228:14)\n      at Test.run (node:internal/test_runner/test:1118:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:787:18)\n      at Test.postRun (node:internal/test_runner/test:1247:19)\n      at Test.run (node:internal/test_runner/test:1175:12)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:787:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 'c735ad301bb8d72b05bc0f52d44cf6daf255d0925ede550e50041498445c657c',\n    expected: '31e17b2b4cf89db2ac44c6077a242ceae74c3ced65c94f817be9bb570ea0504e',\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n\ntest at khora-work/khora-web/tests/unit/auto-observacion.test.ts:2:8059\n✖ millisecond duration fits INTEGER storage without false persistence failure (0.419392ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  12.7 !== 13\n  \n      at TestContext.<anonymous> (/vercel/sandbox/data/khora-work/khora-web/tests/unit/auto-observacion.test.ts:28:100)\n      at Test.runInAsyncScope (node:async_hooks:228:14)\n      at Test.run (node:internal/test_runner/test:1118:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:787:18)\n      at Test.postRun (node:internal/test_runner/test:1247:19)\n      at Test.run (node:internal/test_runner/test:1175:12)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:787:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 12.7,\n    expected: 13,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n"
+  },
+  "after": {
+    "unit_passed": 27,
+    "unit_failed": 0,
+    "route_probes_passed": 6,
+    "route_probes_failed": 0,
+    "selected_typecheck": "PASS",
+    "database": "mocked pool, PostgreSQL conversions emulated, not real DB",
+    "auth": "synthetic stub/local type declaration; not real sign-in",
+    "unit_log": "[registrarEventosBatch] EVENT_WRITE_FAILED\n[registrarEventosBatch] OUTBOX_WRITE_FAILED\n[registrarEventosBatch] EVENT_WRITE_FAILED\n✔ legacy failure persisted as FAILURE and new payload hash survives DB JSON roundtrip (3.112101ms)\n✔ service partial is INFO, propagates outcome/component and metadata cannot override boundary (2.101692ms)\n✔ invalid primitive entries are rejected without throwing (0.229345ms)\n✔ browser cannot spoof server source by supplying trusted-looking metadata (0.523829ms)\n✔ both sinks failing is NOT_PERSISTED, no raw DB error leaked (1.46267ms)\n✔ outbox retains generated identity and sanitizes nested secret values (0.627816ms)\n✔ duplicate identifiers don't insert again or claim payload equality (0.393607ms)\n✔ exhausted outbox retries reach visible FAILED state (0.376581ms)\n✔ unsafe or fractional sequence is rejected before insertion (0.235105ms)\n✔ failure cannot appear as success; legacy discrepancy disclosed (4.169701ms)\n✔ diagnostic projection excludes free-form content, metrics, sessions, hashes (0.479313ms)\n✔ browser origin is a report, not trusted server attestation (0.230936ms)\n✔ invalid identifiers and timestamps fail closed (0.225789ms)\n✔ filters bounded; SQL injection, NaN, negative and huge limits rejected (0.739133ms)\n✔ durations do not serialize NaN, infinity or negative as valid measurements (0.203291ms)\n✔ recursive secret redaction covers keys, nested arrays and bearer strings (0.473729ms)\n✔ canonical hashing survives JSONB key reordering (0.283244ms)\n✔ new full correlation verifies content and links in explicit scope (0.792843ms)\n✔ payload tampering, outcome tampering and broken links detected (0.799599ms)\n✔ legacy, missing root, truncated and empty chains never falsely verified (0.55729ms)\n✔ absence of failure is not evidence of completed operation (0.396712ms)\n✔ ingress rejects malformed JSON, null, primitives, null entries and overlong batches (34.763036ms)\n✔ ingress counts actual bytes even without content-length (1.455881ms)\n✔ ingress validates idempotency key without reflecting contents (1.033404ms)\n✔ canonical hash normalizes client timestamp representation (0.445318ms)\n✔ canonical hash matches PostgreSQL BIGINT text and UUID normalization (0.479182ms)\n✔ millisecond duration fits INTEGER storage without false persistence failure (0.133635ms)\nℹ tests 27\nℹ suites 0\nℹ pass 27\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 549.859422\n",
+    "route_log": "✔ unauthenticated denies before storage even with client key (6.534527ms)\n✔ invalid filters and missing integrity correlation return 400 before DB (2.03204ms)\n✔ missing schema returns 503 without runtime DDL (2.135914ms)\n✔ recent query parameterized, bounded, projected and connection released (4.540347ms)\n✔ query failure rolls back, releases, returns generic nonleaking 503 (0.837129ms)\n✔ integrity bounded 501 ascending, ignores phase/cursor, no evidence honest (1.103377ms)\nℹ tests 6\nℹ suites 0\nℹ pass 6\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 174.163207\n"
+  },
+  "browser_evidence_reused": "PRUEBAS-C004.json; UI/controller/CSS unchanged since tested C004",
+  "tested_code": [
+    {
+      "path": "khora-web/app/api/auto-observacion/route.ts",
+      "sha256": "743a7816d079cf81fc8fddb82012f7891b476e2098e85ab297875dffa4816968"
+    },
+    {
+      "path": "khora-web/app/api/eventos/route.ts",
+      "sha256": "7d99877a78ab1fb08161034b929ddd65ab381398b033fd7246eff8dd5a79775f"
+    },
+    {
+      "path": "khora-web/app/components/shared/RegistroView.tsx",
+      "sha256": "8be935ea133d9b0c894dc1259f6eed09cb90cdaf48bea0398cc8c73a0ca5413b"
+    },
+    {
+      "path": "khora-web/app/navigation/registry.ts",
+      "sha256": "fcd21b70d0343b6687dfd4769d3bfc4da4b7a37f2b2f12f5aa6afe8681276192"
+    },
+    {
+      "path": "khora-web/app/sistema/auto-observacion/page.tsx",
+      "sha256": "ab832af6ffc51ad0606100061e93693495040dbdee49e8ed89b5c751f792dc8c"
+    },
+    {
+      "path": "khora-web/app/sistema/registro/page.tsx",
+      "sha256": "c214826c55b998ff29c2cc9123967629e0f409f4580dea2bdc123982e27febe8"
+    },
+    {
+      "path": "khora-web/docs/system-navigation.md",
+      "sha256": "c49b1c89f019a60d3ed8528a7115b034594cbcd15ac715ce7242e4fa2114a191"
+    },
+    {
+      "path": "khora-web/e2e/shell-v2.spec.ts",
+      "sha256": "24039e8dca323e4048319499090a4a6efb283af15777d706c92502150feb5ca7"
+    },
+    {
+      "path": "khora-web/lib/auto-observacion/ingress.ts",
+      "sha256": "69d0857dd0020da609ef5d9377d079c5b7fc13fb75c79f86e9e6b0f40ff1172b"
+    },
+    {
+      "path": "khora-web/lib/auto-observacion/integrity.ts",
+      "sha256": "11d2bc827dc171f8e47bedcd8a395a08c566dca9e4bee28daa7fefbe1b1793d9"
+    },
+    {
+      "path": "khora-web/lib/auto-observacion/model.ts",
+      "sha256": "7226a849eafd90ee94c945b7298cb026ca9f9c57180afe72bb50c34ef4927390"
+    },
+    {
+      "path": "khora-web/lib/server/eventos.ts",
+      "sha256": "24d1c7793c72b6a6d5e577cf46164f6890b6a7c61029874408b0437ef0e1c65b"
+    },
+    {
+      "path": "khora-web/lib/server/service-observability.ts",
+      "sha256": "18a6da1b0c5f292bf8ab57faae274c9a98a0858c507050d44f72b8059cc3975e"
+    },
+    {
+      "path": "khora-web/lib/ui-review/registry.ts",
+      "sha256": "1f1f368a7e7625b3c6028162fe194c8bde3037943ec8ef2cfbf356a5e25a8ecf"
+    },
+    {
+      "path": "khora-web/scripts/probe_auto_observacion.mjs",
+      "sha256": "af47f3efe9f0616771c008f94c6564a4ff261c3d92857608e2985a23087e579d"
+    },
+    {
+      "path": "khora-web/tests/unit/auto-observacion-persistence.test.ts",
+      "sha256": "d32151ee0848a5d03cfcc2d3cc4b2795ebd2fa838ff5c2c7de1ec17ab4974766"
+    },
+    {
+      "path": "khora-web/tests/unit/auto-observacion.test.ts",
+      "sha256": "9ceb0993b8d442407eebc235d1677dd67ac02756c66e14d24d1f7ccbc520cfb1"
+    }
+  ],
+  "full_ci": "NOT_VERIFIED: current token cannot read check runs or commit statuses",
+  "production": "NOT_VERIFIED"
+}

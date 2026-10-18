@@ -1,11 +1,11 @@
 {
-  "version": "0.4.0",
-  "anchor": "C004",
+  "version": "0.5.0",
+  "anchor": "C005",
   "files": [
     {
       "path": "OBJETO-CANONICO.md",
-      "bytes": 32029,
-      "sha256": "ad5b69db7ef2e9d27b48f4a49a193f83a813d10f2a5c518550dc779d5e8cb4d4"
+      "bytes": 33998,
+      "sha256": "f587acad12994281ae95c0baca92279134470bb0a74fcc8cd35aa5c77d634745"
     },
     {
       "path": "evidencias/INCIDENCIAS-C004.json",
@@ -18,6 +18,11 @@
       "sha256": "bf06fb8b43e12ee4b92ad0b0e307a154b4893ed3f0b8dcff478bba55c29c044e"
     },
     {
+      "path": "evidencias/LECTURA-C004.json",
+      "bytes": 2713,
+      "sha256": "1659f19504cee84407d7ab7df860ab1151d49facdd9de2086c05dc70fa5246f8"
+    },
+    {
       "path": "evidencias/PRUEBAS-C003.json",
       "bytes": 482,
       "sha256": "07c4b2424d92787849149336438ec30ef07d20a81aca97409d7129e6e52f06ac"
@@ -26,6 +31,11 @@
       "path": "evidencias/PRUEBAS-C004.json",
       "bytes": 9154,
       "sha256": "86550e72584503a990e12103d7121e1f0a554c901333f8a84a3e0f5dac6227a6"
+    },
+    {
+      "path": "evidencias/PRUEBAS-C005.json",
+      "bytes": 10426,
+      "sha256": "eb18871d1f5cbaff7c2a725520ef33b71c9b91627daf631eed36639c5c7d0a54"
     },
     {
       "path": "originales/INSTRUCCION-U005.txt",

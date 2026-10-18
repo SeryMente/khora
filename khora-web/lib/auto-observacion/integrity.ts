@@ -13,7 +13,20 @@ export function canonical(value: unknown): string {
 /** V2 covers the persisted semantic fields, not DB id/server timestamp or administrative tampering. */
 export function hashPersistedEvent(row: ObservationRow, previous: string): string {
   const fields = ["correlacion_id", "event_uuid", "fase", "event_id", "estado", "mensaje", "volcado_id", "version", "sha256", "sequence", "session_id", "detalle", "cliente_en", "idempotency_key", "schema_version", "outcome", "component", "causation_id", "attempt_id", "release_sha", "duration_ms", "metrics", "reason_code", "privacy_class"];
-  const payload = Object.fromEntries(fields.map(k => [k, k === "cliente_en" && row[k] ? new Date(String(row[k])).toISOString() : row[k] ?? null]));
+  const uuidFields = new Set(["correlacion_id", "event_uuid", "volcado_id", "causation_id"]);
+  const payload = Object.fromEntries(fields.map(k => {
+    const value = row[k] ?? null;
+    if (value === null) return [k, null];
+    // pg returns int8 as text and UUIDs lowercase. Hash the SQL semantic representation,
+    // not whichever JS type/casing happened to be supplied by the producer.
+    if (k === "sequence") {
+      if (typeof value === "number" && !Number.isSafeInteger(value)) throw new Error("UNSAFE_SEQUENCE");
+      return [k, BigInt(String(value)).toString()];
+    }
+    if (uuidFields.has(k)) return [k, String(value).toLowerCase()];
+    if (k === "cliente_en") return [k, new Date(String(value)).toISOString()];
+    return [k, value];
+  }));
   return createHash("sha256").update(previous + canonical(payload), "utf8").digest("hex");
 }
 export function verifyChain(rows: ObservationRow[], truncated: boolean) {

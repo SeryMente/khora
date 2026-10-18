@@ -3,7 +3,7 @@
 ## 1. Control e identidad
 
 - Identidad: AUTOOBS-KHORA; nombre de subsistema ratificado por U004: **Auto-observación**. «Cora/Quora» se normaliza a Khora fuera de originales.
-- Versión: 0.4.0; sello AUTOOBS-KHORA-v0.4.0. Ancla C004: implementación en solicitud de fusión #320; 24 regresiones, seis sondas de consulta y revisión visual local aprobadas. Integración bloqueada por lectura de comprobaciones; no fusionado ni desplegado.
+- Versión: 0.5.0; sello AUTOOBS-KHORA-v0.5.0. Ancla C005: normalización de BIGINT/UUID y duración SQL corregida mediante prueba causal; 27 regresiones y seis sondas aprobadas. Interfaz C004 revisada. Integración bloqueada por lectura de comprobaciones; no fusionado ni desplegado.
 - Elemento permanente autorizado por U004. Carpeta contenedora: `docs/frentes/auto-observacion/`; único objeto de estado: `OBJETO-CANONICO.md`. No es un tablero adicional.
 - Propietario: SeryMente/khora. Privacidad actual comprobada: `private:true`, `visibility:private`, permiso `push:true` en consulta de este ciclo.
 - Rama de construcción: `docs/auto-observacion-20261018`; base comprobada `4dca2133866421105f077bbd7079576c588d1169`. No equivale a main, fusión ni despliegue.
@@ -83,7 +83,7 @@ Herramientas usadas: conexión GitHub para lectura/escritura de código y objeto
 
 ### 🔄 Estado vivo
 
-C004 · Código construido y persistido en la rama `docs/auto-observacion-20261018`; solicitud de fusión https://github.com/SeryMente/khora/pull/320 abierta en borrador, para impedir auto-merge antes de verificar compuertas. Base main comprobada `4dca2133866421105f077bbd7079576c588d1169`; construcción C003 persistida `1aea5562c124bd059b2edb48ab0670abf089cd5a`. C004 preserva clasificación USER_DATA aunque el origen sea navegador; declarar procedencia no certifica anonimización. Etiquetas de estado usan tinta del tema para contraste; color solo es apoyo no exclusivo.
+C005 · Código construido y persistido en la rama `docs/auto-observacion-20261018`; solicitud de fusión https://github.com/SeryMente/khora/pull/320 abierta en borrador, para impedir auto-merge antes de verificar compuertas. Base main comprobada `4dca2133866421105f077bbd7079576c588d1169`; construcción C003 persistida `1aea5562c124bd059b2edb48ab0670abf089cd5a`. C004 preserva clasificación USER_DATA aunque el origen sea navegador; declarar procedencia no certifica anonimización. Etiquetas de estado usan tinta del tema para contraste; color solo es apoyo no exclusivo. C005 normaliza la representación SQL de sequence/BIGINT y UUID para no declarar alteración falsa, y redondea duraciones a milisegundos enteros para INTEGER. Secuencias fraccionarias o numéricamente inseguras se rechazan antes de insertar. C004 persistido en `0a2e4ec8f9f47dba9d4679d52cac6b33d2139fcc`, sus siete blobs cotejados exactamente en `evidencias/LECTURA-C004.json`.
 
 Sistema → Auto-observación; Seguridad → auditoría filtrada; alias `/sistema/registro` conserva controlador. Cuatro vistas compartidas: Resumen/Operaciones/Eventos/Integridad. Consulta autenticada depurada, muestra reciente, límites, timeout SQL y cola muestreada. Resultado/parcialidad honestos, hash canónico V2 estable ante JSONB, legado parcial, outbox sin falsa durabilidad. Ver límites de C003 y alcance de pruebas C004.
 
@@ -91,7 +91,7 @@ Siguiente paso atómico: conseguir lectura de comprobaciones/resultados del repo
 
 ### ⚗️ En prueba / recién fallido
 
-24/24 regresiones propias aprobadas con DB simulada; 6/6 sondas de la ruta real de consulta aprobadas con auth simulado y pool simulado. Tipado estricto seleccionado PASS, no repositorio completo. Playwright local: cuatro combinaciones móvil/escritorio y claro/oscuro más escenario alias/vacío/503 aprobados; controlador/componente/CSS de producto con API sintética, no shell completo ni sesión productiva. Evidencia `evidencias/PRUEBAS-C004.json`.
+27/27 regresiones propias aprobadas con DB simulada; 6/6 sondas de la ruta real de consulta aprobadas con auth simulado y pool simulado. Tipado estricto seleccionado PASS, no repositorio completo. Playwright local: cuatro combinaciones móvil/escritorio y claro/oscuro más escenario alias/vacío/503 aprobados; controlador/componente/CSS de producto con API sintética, no shell completo ni sesión productiva. Evidencia inicial `evidencias/PRUEBAS-C004.json`; regresión causal y repetición final en `evidencias/PRUEBAS-C005.json`. Pruebas anteriores a la corrección C005: dos fallos reproducidos; después: 27/27 PASS. Conversión SQL emulada, no PostgreSQL real.
 
 Bloqueo duro: lectura de check-runs y statuses devuelve `403 Resource not accessible by personal access token`. Previews Vercel/Netlify rechazados por restricciones de plan para repo privado de organización; no se cambian privacidad ni plan. Consulta del proyecto Vercel también denegada en el ámbito probado. Escáner de secretos GitHub no disponible sin Advanced Security; no es resultado limpio. Incidencias y prevención en `evidencias/INCIDENCIAS-C004.json`. Sin fusión/despliegue comprobados.
 
@@ -104,7 +104,7 @@ Bloqueo duro: lectura de check-runs y statuses devuelve `403 Resource not access
 
 ## 9. Aceptación y viabilidad
 
-| Requisito | Resultado exigido | Evidencia requerida | Estado vigente C004 |
+| Requisito | Resultado exigido | Evidencia requerida | Estado vigente C005 |
 |---|---|---|---|
 | Objeto conforme al método | 13 bloques, originales, continuidad | manifiesto y lectura de vuelta | Paquete inicial persistido/verificado; actualización de recibo en curso |
 | Renombre | Auto-observación visible en menús/documentos pertinentes | navegación declarativa + pruebas browser | Implementado; revisión local móvil/escritorio aprobada, shell completo pendiente |
@@ -238,3 +238,9 @@ Evidencia: `evidencias/PRUEBAS-C004.json` separa 24 regresiones permanentes del 
 Bloqueos: conexión no lee checks/statuses; `mergeable_state:unstable` no identifica causas ni acredita aprobación. Vercel/Netlify comentan rechazo de previews privados de organización. La inspección de `deploy-production.yml` encuentra despliegue CLI prebuilt con secretos existentes al empujar main: no confundir restricciones de previews con imposibilidad de esa ruta, ni afirmar que se ejecutó. Sin acceso autorizado verificable a resultados no se activa auto-merge. Escáner remoto de secretos indisponible, sin comprar ni habilitar servicio. Condiciones exactas en incidencias.
 
 No tocado: privacidad del repositorio, credenciales, planes, proveedores, datos reales, retención destructiva, custodia, Entorno Persistente y equipos del operador. Sigue pendiente integración completa y comprobación productiva; este corte no se anuncia como mejor sistema mundial ni como cobertura total. La ambición del anexo A conserva sus pendientes explícitos.
+
+## Crónica C005 · Corrección causal de representación SQL
+
+Durante cotejo final se detectó que la huella V2 trataba `sequence:7` distinto de `sequence:"7"`, aunque PostgreSQL/pg devuelve BIGINT como texto; también se normalizan UUID a minúscula. Dos pruebas añadidas fallaron antes: equivalencia de huella con BIGINT/UUID normalizados y duración fraccionaria incompatible con INTEGER. Se corrigió canonicidad de esos tipos y duración entera; se añadió rechazo de secuencias inseguras/fraccionarias. La regresión del registrador simula ahora esa conversión de salida y exige cadena verificable. Resultado final: 27/27 regresiones permanentes, 6/6 sondas de consulta y tipado seleccionado PASS. No prueba una base real ni producción. La interfaz no cambió desde la revisión C004 y esa evidencia se reutiliza, sin repetirla como si fuera una prueba nueva.
+
+Persistencia C004 comprobada: comparación de los siete SHA de blob recibidos por consulta remota fijada al commit con los SHA Git calculados sobre el payload UTF-8 exacto; recibo `evidencias/LECTURA-C004.json`. C005 incluye su objeto/manifiesto y evidencia en el mismo commit. Al concluir, cotejar blobs finales contra payload; no afirmar leído antes de verificar. Sigue bloqueo externo de lectura de comprobaciones, sin gasto/permiso/credencial nuevos y sin fusión/despliegue.
