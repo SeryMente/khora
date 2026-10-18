@@ -1,0 +1,54 @@
+{
+  "result": "MANUAL_PREVIEW_READY_NOT_PRODUCT_E2E",
+  "commit": "58fd830d6eedf24dd1d2af33dd64836a5f496757",
+  "deploymentId": "dpl_APgQevuaCXZ9dcp6HY1KXhZdCEN7",
+  "url": "https://khora-1cmvzdiyr-victorhugotorresmendez-8991s-projects.vercel.app",
+  "environment": "preview",
+  "state": "READY",
+  "fullNextBuild": "passed with warnings",
+  "TypeScript": "passed",
+  "buildCacheRestored": true,
+  "syntheticTests": {
+    "passed": 80,
+    "total": 80
+  },
+  "http": [
+    {
+      "path": "/api/version",
+      "status": 200,
+      "contentType": "application/json",
+      "commitConfirmed": true,
+      "environmentConfirmed": "preview"
+    },
+    {
+      "path": "/api/seguridad/boveda-portable",
+      "method": "POST",
+      "status": 401,
+      "body": {
+        "error": "Auth required"
+      },
+      "boundary": "middleware; inner handler not exercised"
+    },
+    {
+      "path": "/sistema/seguridad",
+      "status": 307,
+      "followedRedirect": false,
+      "authenticatedScreenNotTested": true
+    }
+  ],
+  "temporaryCLISession": {
+    "logoutExit": 0,
+    "configFolderDeleted": true
+  },
+  "productionPromoted": false,
+  "realDataUsed": false,
+  "productE2E": false,
+  "automationAuthorization": "Existing project authorization used only in memory; origin prior to first curl attempt not known; not exported/deleted",
+  "pending": [
+    "operator approval of native-client/browser session bridge",
+    "screen/client packaging and real session integration",
+    "hosted storage/recovery/provider acceptance",
+    "trusted-device real-factor review",
+    "full project contract/unit suites"
+  ]
+}
