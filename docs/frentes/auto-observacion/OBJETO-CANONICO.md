@@ -3,7 +3,7 @@
 ## 1. Control e identidad
 
 - Identidad: AUTOOBS-KHORA; nombre de subsistema ratificado por U004: **Auto-observación**. «Cora/Quora» se normaliza a Khora fuera de originales.
-- Versión: 0.1.1; sello AUTOOBS-KHORA-v0.1.1. Ancla C001.1: lectura íntegra de vuelta y comparación de bytes/hashes del paquete inicial; pendiente revisión material del diseño.
+- Versión: 0.2.0; sello AUTOOBS-KHORA-v0.2.0. Ancla C002/U005: operador autoriza resolución de extremo a extremo sin nuevas aprobaciones de diseños concretos; construcción y pruebas en curso.
 - Elemento permanente autorizado por U004. Carpeta contenedora: `docs/frentes/auto-observacion/`; único objeto de estado: `OBJETO-CANONICO.md`. No es un tablero adicional.
 - Propietario: SeryMente/khora. Privacidad actual comprobada: `private:true`, `visibility:private`, permiso `push:true` en consulta de este ciclo.
 - Rama documental: `docs/auto-observacion-20261018`; base comprobada `4dca2133866421105f077bbd7079576c588d1169`. No equivale a main, fusión ni despliegue.
@@ -16,9 +16,9 @@ Adquirir este objeto, la fuente viva del Metaprompt Canónico de Samantha (v332/
 
 Comprobar revisiones y delta semántico antes de cada ciclo y de guardar; discrepancias materiales bloquean solo la acción dependiente. Firma sin fuente no acredita adquisición; fuente inaccesible conserva frescura NO VERIFICADA. Una rama o documento no acredita ejecución, recepción por otro agente ni aceptación.
 
-Rol de este ciclo: asistencia de lectura/documentación, por defecto del metacanon al no haber asignación funcional explícita. El nombre conversacional Samantha no se usa para inferir rol. Constructor aún no instanciado; no inventar segundo agente ni invocar subagentes. El operador debe asignar el rol de construcción cuando corresponda.
+Rol actual: **constructor**, asumido por encargo explícito U005 de resolver de extremo a extremo. Samantha es el único escritor; no se instancia segundo agente ni subagentes. La revisión inicial de arquitectura/interfaz queda resuelta por la decisión de alto nivel del operador y su autorización expresa para decidir detalles concretos.
 
-Candados del metaprompt: decisiones concretas de arquitectura, experiencia de usuario y seguridad requieren revisión del operador antes de iniciar construcción. U004 autoriza el objetivo, la documentación y el renombre; no se interpreta como aprobación de un diseño aún no presentado, proveedor externo, gasto, cambio de permisos ni publicación. No modificar el metaprompt ni el metacanon central.
+U005 es específico de este frente y prevalece sobre la interpretación restrictiva anterior de U004: avanzar sin pedir aprobaciones repetidas dentro del alcance. No modifica el metaprompt global ni autoriza gastos, credenciales, proveedores externos, ampliación de permisos o destrucción de datos. Integración sujeta a compuertas técnicas reales, no a nuevas preguntas de diseño.
 
 Remote Desktop Commander: no utilizado; no necesario. Exclusivo del asistente, nunca constructor; incluso descubrir dispositivos exige necesidad y autorización actuales. No heredar equipos, cuentas, permisos ni sesiones de otros frentes.
 
@@ -34,10 +34,10 @@ Frescura de adquisición: reconsulta del ciclo con el mismo blob; delta central 
 | §3/§27 trece bloques en orden | §1–13 | Cotejo estructural local; no prueba funcional |
 | §6/§24 acceso remoto exclusivo/necesario | §2, §5, §12 | Sin uso remoto |
 | §7 doble revisión | §13 | Fidelidad y readback inicial comprobados; revisión actual requiere cotejo de blob |
-| §14 originales/interpretación separados | §4, §11 y originales | U001–U004 conservados; propuesta A no aprobada |
+| §14 originales/interpretación separados | §4, §11 y originales | U001–U004 conservados; decisiones concretas delegadas por U005 |
 | §22 versión visible cada salida | §10, §12 | Obligación adoptada; no afirmar obediencia de otras conversaciones |
-| §23/§26 adquisición, permiso, propagación | §2, §3, §6, §12 | Lecturas identificadas; código bloqueado por revisión/rol |
-| §25 viabilidad/pronóstico/recepción constructor | §5, §9, §10, §12 | Sin salida de constructor recibida; no inventar plazo |
+| §23/§26 adquisición, permiso, propagación | §2, §3, §6, §12 | Lecturas identificadas; construcción autorizada en C002 por U005 |
+| §25 viabilidad/pronóstico/recepción constructor | §5, §9, §10, §12 | Constructor actual activo; no inventar evidencias ni plazo |
 
 La fuente metodológica aporta método, no recibe contenido privado del frente. `AGENTS.md` de metodologia no se recuperó (ruta no encontrada); no se afirma ausencia de toda otra norma central.
 
@@ -53,13 +53,12 @@ La fuente metodológica aporta método, no recibe contenido privado del frente. 
 
 Incluido: inventario y endurecimiento del registro existente; navegación/renombre Auto-observación; escenarios compartidos; contrato de eventos y resultados; correlación; diagnóstico depurado; integridad/retención verificables; pruebas externas sintéticas; pruebas defensivas; actualización del objeto en cada paso.
 
-Fuera de autorización actual: compras, alta/provisionamiento de proveedores, envío de datos personales fuera, ampliación de permisos, acceso remoto, fusión/despliegue, automatización de reparaciones productivas. No convertir todo Khora en event sourcing ni añadir Temporal/Kubernetes/plataforma corporativa de seguridad por defecto. Revisión del subsistema no autoriza modificar custodia o Entorno Persistente sin cargar sus fuentes y renovar compuertas pertinentes.
+Fuera de alcance: compras, alta/provisionamiento de proveedores, envío de datos personales fuera, ampliación de permisos, acceso remoto y reparaciones productivas destructivas. Fusión/despliegue solo tras superar verificaciones técnicas y comprobar el destino; nunca por aprobación de diseño supuesta. No convertir todo Khora en event sourcing ni añadir Temporal/Kubernetes/plataforma corporativa de seguridad por defecto. Revisión del subsistema no autoriza modificar custodia o Entorno Persistente sin cargar sus fuentes y renovar compuertas pertinentes.
 
 ## 5. Roles y colaboración
 
-- Operador: decide arquitectura material, diseño visible, seguridad, coste, publicación y rol de construcción.
-- Asistente actual: investigación, objeto, evidencia y continuidad; no muta código mientras rol no esté asignado.
-- Constructor: no instanciado. Al asignarse, único escritor de código; contrato y pruebas en el mismo cambio lógico; no usa Remote Desktop Commander. No se crea subagente sin petición explícita.
+- Operador: fijó objetivo, nivel de robustez y decisión de alto nivel; delegó expresamente diseños concretos y ejecución de extremo a extremo en U005.
+- Samantha, constructor actual: código, interfaz, contratos, pruebas y objeto; un solo escritor y ningún subagente. No utiliza Remote Desktop Commander.
 - Prioridad a una salida del constructor entregada por el operador: pausar auxiliares en punto seguro, leerla íntegra, contrastar evidencia, sintetizar delta/viabilidad/pendientes y entregar prompt de continuidad completo antes de retomar.
 - Objetos de dictado-voz y tareas-automaticas conservan sus alcances: referenciar dependencias, no mover ni sobrescribir su historia.
 
@@ -83,20 +82,20 @@ Herramientas usadas: conexión GitHub para lectura/escritura documental; sandbox
 
 ### 🔄 Estado vivo
 
-Acción en curso: objeto primordial y propuesta técnica documentados por instrucción U004; persistencia documental inicial verificada y recibo incorporado en rama de trabajo, sin implementación ni aceptación productiva. Siguiente paso atómico: el operador revisa la propuesta de arquitectura, interfaz y seguridad del anexo A; asignar explícitamente el rol constructor antes de mutar código conforme al metacanon. Pendientes en secuencia: aprobación material; inventario causal de código y pruebas; implementación del primer corte completo; validación funcional/privacidad/accesibilidad; revisión presencial; integración autorizada; despliegue y comprobación real cuando se autoricen. Actualizar este objeto y sus evidencias en cada paso significativo, incluso fallos y bloqueos.
+C002 · Construcción autorizada por U005. Se reutiliza eventos_sistema; no nueva base ni proveedor. Hallazgos causales: eventos de servicio no propagan outcome/component, PARTIAL cae en OK, consulta histórica prioriza eventos antiguos, fallos de outbox se anuncian guardados sin prueba. Se implementan contrato seguro, consulta autenticada acotada, integridad con alcance explícito y superficie compartida Auto-observación.
+
+Siguiente paso atómico: implementar, ejecutar regresiones defensivas y revisión visual con datos sintéticos; persistir evidencia y código juntos. Después, integrar por solicitud de fusión con compuertas reales. No esperar nuevas aprobaciones concretas de diseño.
 
 ### ⚗️ En prueba / recién fallido
 
-Revisión estática de contratos y código; no se ejecutaron pruebas funcionales ni se verificó el despliegue. Hipótesis abiertas: clasificación semántica de resultados y durabilidad de emisiones con presupuesto temporal.
+Acceso Git por terminal no disponible: autenticación no compartida con conexión GitHub. Se utiliza conexión autorizada; instantánea local selectiva, no clon completo. Ninguna prueba productiva acreditada.
 
-### 🔔 Recordatorios latentes
+### 🔔 Recordatorios Latentes
 
-- Mantener una fuente de estado, originales y pruebas del frente bajo esta carpeta.
-- Cada cambio lógico debe incluir delta, revisión, pruebas/fallos, pendientes y siguiente paso en este objeto; no declarar terminado un paso sin actualizarlo y leerlo de vuelta.
-- Diseño material del anexo A pendiente; U004 no aprueba silenciosamente el anexo.
-- No exportar contenido autobiográfico, secretos ni grabaciones para depuración.
-- No heredar permisos ni renombrar identificadores técnicos publicados sin plan de compatibilidad.
-- Verificación productiva, privacidad de exportación, revisión visual y accesibilidad pendientes.
+- No exportar dictados, mensajes, tokens ni detalles arbitrarios en diagnósticos.
+- No confundir una cadena parcial comprobada con inmutabilidad global o anclaje externo.
+- Mantener separación entre pruebas sintéticas, integración real y despliegue.
+- Sin proveedores de pago ni cambios de custodia/Entorno Persistente.
 
 ## 9. Aceptación y viabilidad
 
@@ -229,3 +228,7 @@ Ensayos aislados: acceso no autorizado, secreto ficticio, inyección en eventos/
 5. Integridad y ejercicios defensivos; paquete de incidente → prueba de regresión; cierre documental/técnico con revisión productiva autorizada.
 
 Consumir resultados seguros verificables dentro del mismo ciclo; cortes son dependencias de aceptación, no obligación de esperar turnos por comodidad. Cada corte actualiza este objeto. No guardar todas las pruebas para el final ni anunciar hecho por compilar.
+
+## Delta C002 · Autorización y decisión ejecutiva
+
+U005, original separado: `originales/INSTRUCCION-U005.txt`. Se retiran las barreras locales de rol y revisión concreta establecidas por interpretación en C001. No son bloqueos materiales. Construcción e interfaz decididas dentro de alcance, sin modificar normas centrales. Snapshot base 4dca2133866421105f077bbd7079576c588d1169; rama conserva historia documental. Validación funcional aún no ejecutada.
