@@ -191,12 +191,6 @@
       "git_blob_sha": "963b784f85b1f51f7bdd71c421b82b9c441e2c37"
     },
     {
-      "path": "OBJETO-CANONICO.md",
-      "bytes": 164466,
-      "sha256": "ad1285c1c48c634bdf6b67b5cdcd2503c3c61bc4e383cd6e283bf7a9c5c41ff9",
-      "git_blob_sha": "1c5c159a2b6084072efba980974eae90d5d58f97"
-    },
-    {
       "path": "originales/EQUIPO-C024.md",
       "bytes": 285,
       "sha256": "2802d90ba3719ecb86396bb29170cb4de8240d21ed978da52719ece9d51d35b0",
@@ -207,6 +201,24 @@
       "bytes": 2194,
       "sha256": "dc40edffbbb406cca7b4740ce7c0feace5e7d34a66b96fcc725792f2e800a1c7",
       "git_blob_sha": "2c01cd91538ea959f07a88b733f1d1dc0048fe62"
+    },
+    {
+      "path": "OBJETO-CANONICO.md",
+      "bytes": 172615,
+      "sha256": "2b843e5b0b52e4c3b929116baef0836b59366aa460857b5ab4e9005b3992147e",
+      "git_blob_sha": "291c3245f7a0cb09d80916dc154d327b25db0429"
+    },
+    {
+      "path": "originales/SIN-EP-C025.md",
+      "bytes": 1221,
+      "sha256": "32095137433f5a85b4552101e8139cbd244a5e2f76615522458cdbec33e63973",
+      "git_blob_sha": "5c8817b0f69ee7b771755aebe0e379a7198657a7"
+    },
+    {
+      "path": "evidencias/SIN-EP-C025.json",
+      "bytes": 5004,
+      "sha256": "c961bf7e524c5fd3b7971e238732648265943cb9eb8325eff5f520f4f261fe8b",
+      "git_blob_sha": "5ecdf192f7b9400b2f5446c355401e585d171f39"
     }
   ],
   "runtime_references": [
@@ -313,12 +325,12 @@
     "no_secret_values_in_manifest": true
   },
   "current_preparation": {
-    "version": "0.6.3",
+    "version": "0.6.4",
     "baseSha": "4dca2133866421105f077bbd7079576c588d1169",
-    "receipt": "evidencias/EQUIPO-C024.json",
-    "state": "PC-14 binding verified; protected environment and publication credentials not available in observed profile; no full build/merge/deployment"
+    "receipt": "evidencias/SIN-EP-C025.json",
+    "state": "both accounts authorized, complete checkout; explicit resolve-main/live instruction; preserve current production, add dialogue; causal integration correction and final build pending"
   },
-  "latestEvent": "C024 - operator selected PC-14; current identity/tools/volumes verified; protected environment/credential material blocker",
+  "latestEvent": "C025 - no EP required; both accounts authorized; scope only dialogue over existing production, no unrelated graph update",
   "latest_verified_release": {
     "commit": "c02f5142d7609c35d8a2dc2c549726edc4016f13",
     "pullRequest": "https://github.com/SeryMente/khora/pull/312",
