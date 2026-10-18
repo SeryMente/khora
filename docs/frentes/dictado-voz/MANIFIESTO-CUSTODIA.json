@@ -221,12 +221,6 @@
       "git_blob_sha": "3b2517dfcda81f8d9f0b7dd66c7d64b98b8be3ff"
     },
     {
-      "path": "OBJETO-CANONICO.md",
-      "bytes": 181049,
-      "sha256": "c327341d9f8ba5ba342adbb74c807f6c0675f75813859f5ddf762f05d3e6c150",
-      "git_blob_sha": "416ccd7b28480d75a490e5e3585600a601d193cc"
-    },
-    {
       "path": "originales/DIALOGO-INTEGRADO-C027.md",
       "bytes": 1432,
       "sha256": "a6e979baa42df3370e696d6b9a433a5c8cd63e98357cb1bf2c11a3fdee45bbd1",
@@ -237,6 +231,24 @@
       "bytes": 4189,
       "sha256": "b54cfe43b980304e6f29199dcfa759abcf18304fcb76b50678526a10a03e5279",
       "git_blob_sha": "c3c556baa864a14f89e22079c738b540f95cd954"
+    },
+    {
+      "path": "OBJETO-CANONICO.md",
+      "bytes": 182425,
+      "sha256": "53e3ca085eb4394115ad7e8c02c186084a42ba6bcab52e2fc8f443f944efe94d",
+      "git_blob_sha": "cb3ea82d09ea28e84719e7b865cad88fd83a1430"
+    },
+    {
+      "path": "originales/PUBLICACION-C028.md",
+      "bytes": 545,
+      "sha256": "5fb4af76c3cf8167bb1b331d42e651c51771c7088d13831b0ded6b06fdeece26",
+      "git_blob_sha": "128a05fa1663ad3c3b07d8a95b4d45432850fcd3"
+    },
+    {
+      "path": "evidencias/C028.json",
+      "bytes": 585,
+      "sha256": "934bf9f0ccf1138ba5785974ad08305354a29d27daee6e98e6c381106d768bba",
+      "git_blob_sha": "6847ae449a3b8ca1396c8c85db4f9b3321efb395"
     }
   ],
   "runtime_references": [
@@ -343,12 +355,12 @@
     "no_secret_values_in_manifest": true
   },
   "current_preparation": {
-    "version": "0.6.6",
+    "version": "0.6.7",
     "baseSha": "958162199a518ae5a01d317f1d68e3a55360836c",
-    "receipt": "evidencias/C027.json",
-    "state": "integrated Chrome dialogue correction prepared and controlled tests pass; PC-14 timeout blocks full validation/release"
+    "receipt": "evidencias/C028.json",
+    "state": "PC14 reconnected; GitHub/Vercel authorization pending; C027 not released"
   },
-  "latestEvent": "C027 - negative physical feedback; simplify dialogue in Ingreso, archive support prepared, PC14 unresponsive",
+  "latestEvent": "C028 - new PC14 response, isolated toolkit ready, human authorization pending",
   "latest_verified_release": {
     "sha": "81e571deaa46ad9abd0a6b91c5035abe871a8b55",
     "deploymentId": "dpl_7eQpbex6hbt5B3vTmtWhAwMSbE1V",
