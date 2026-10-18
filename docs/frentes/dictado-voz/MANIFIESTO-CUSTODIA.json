@@ -179,12 +179,6 @@
       "git_blob_sha": "bacd528f1813ee4edd08999e4c488d2296e3973d"
     },
     {
-      "path": "OBJETO-CANONICO.md",
-      "bytes": 160009,
-      "sha256": "232dc511fa6d7d29ce4b0a5f98ce68e21f8aebf2013a1aa524940a1d1be5ffb8",
-      "git_blob_sha": "757c7b9d5b60e696451208fe6b69b63542b6395a"
-    },
-    {
       "path": "originales/PUBLICACION-C023.md",
       "bytes": 452,
       "sha256": "1e159766f8e11fbae7d4503565667650d524126c0ef1f5182f636d3e2064141b",
@@ -195,6 +189,24 @@
       "bytes": 2683,
       "sha256": "f75faf5e6cc31d61cf67afaea2f079f8c5df65e035856c2756e6253bf68cc6e2",
       "git_blob_sha": "963b784f85b1f51f7bdd71c421b82b9c441e2c37"
+    },
+    {
+      "path": "OBJETO-CANONICO.md",
+      "bytes": 164466,
+      "sha256": "ad1285c1c48c634bdf6b67b5cdcd2503c3c61bc4e383cd6e283bf7a9c5c41ff9",
+      "git_blob_sha": "1c5c159a2b6084072efba980974eae90d5d58f97"
+    },
+    {
+      "path": "originales/EQUIPO-C024.md",
+      "bytes": 285,
+      "sha256": "2802d90ba3719ecb86396bb29170cb4de8240d21ed978da52719ece9d51d35b0",
+      "git_blob_sha": "88219d3e745950dc21c936c8e6379af8a672cf35"
+    },
+    {
+      "path": "evidencias/EQUIPO-C024.json",
+      "bytes": 2194,
+      "sha256": "dc40edffbbb406cca7b4740ce7c0feace5e7d34a66b96fcc725792f2e800a1c7",
+      "git_blob_sha": "2c01cd91538ea959f07a88b733f1d1dc0048fe62"
     }
   ],
   "runtime_references": [
@@ -301,12 +313,12 @@
     "no_secret_values_in_manifest": true
   },
   "current_preparation": {
-    "version": "0.6.2",
+    "version": "0.6.3",
     "baseSha": "4dca2133866421105f077bbd7079576c588d1169",
-    "receipt": "evidencias/PUBLICACION-C023.json",
-    "state": "publication authorized; PR 321 remains draft/unmerged; Git deployment rejected by Hobby private-org restriction; current device binding and full integration pending"
+    "receipt": "evidencias/EQUIPO-C024.json",
+    "state": "PC-14 binding verified; protected environment and publication credentials not available in observed profile; no full build/merge/deployment"
   },
-  "latestEvent": "C023 - explicit live Vercel instruction, provider statuses and public production observed, material equipment binding pending",
+  "latestEvent": "C024 - operator selected PC-14; current identity/tools/volumes verified; protected environment/credential material blocker",
   "latest_verified_release": {
     "commit": "c02f5142d7609c35d8a2dc2c549726edc4016f13",
     "pullRequest": "https://github.com/SeryMente/khora/pull/312",

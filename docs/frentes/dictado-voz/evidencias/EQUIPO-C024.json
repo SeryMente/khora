@@ -1,0 +1,60 @@
+{
+  "event": "C024",
+  "recordedAt": "2026-10-18T18:32:09.148304+00:00",
+  "canonicalVersion": "0.6.3",
+  "methodVersion": "1.5",
+  "operatorOriginal": "originales/EQUIPO-C024.md",
+  "remote": {
+    "purpose": "Verify existing operator environment and legitimate publication capability unavailable through GitHub/sandbox",
+    "role": "assistance",
+    "host": "PC-14",
+    "identity": "PC-14\\PC 13",
+    "deviceId": "03c24074-36e4-40b1-b2dc-da50be07d340",
+    "ping": "pong 2026-10-18T18:29:06.726Z",
+    "commands": "bounded read-only identity/tool/path/volume/auth-file-existence inventory",
+    "nodeNpmPresent": true,
+    "gitGhVercelResolvedOnPath": false,
+    "gitUsualExecutablesPresent": false,
+    "canonicalProfileRepositoryFoldersPresent": false,
+    "vercelTokenPresent": false,
+    "standardVercelAuthFilesPresent": false,
+    "logicalDisksObserved": [
+      {
+        "device": "C:",
+        "type": 3
+      },
+      {
+        "device": "E:",
+        "type": 5
+      }
+    ],
+    "protectedEnvironmentAdditionalVolumeObserved": false,
+    "caveat": "No recursive search, cross-profile read or secret values; existence not ruled out at arbitrary paths/folder mounts."
+  },
+  "pullRequest": {
+    "number": 321,
+    "state": "open",
+    "draft": true,
+    "merged": false,
+    "headBeforeCheckpoint": "74bb2d5158b4c10166c2621a5d14f8d1e3bc07ff",
+    "base": "4dca2133866421105f077bbd7079576c588d1169"
+  },
+  "incidents": {
+    "powershellInitialParser": "MissingEndCurlyBrace; no body executed; fixed linear inventory verified",
+    "sandboxIncompleteCheckout": "package.json absent in intentionally partial sources; no complete build claimed",
+    "record": "https://app.notion.com/p/7e0a41878241826cb2c781aa2ebd5070"
+  },
+  "notExecuted": [
+    "installation",
+    "repository mutation on device",
+    "checkout",
+    "full build",
+    "merge",
+    "deployment",
+    "credential/billing/security change",
+    "subagent"
+  ],
+  "nextMaterialInput": "operator connects and unlocks protected persistent environment on PC-14",
+  "latestProductionObservation": "C023; not repeated this cycle",
+  "legacyControlledTests": "C022; not rerun or promoted to current production evidence"
+}
