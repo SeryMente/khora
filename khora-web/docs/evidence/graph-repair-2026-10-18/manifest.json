@@ -1,0 +1,66 @@
+{
+  "base_commit": "0ea4d59ef7c8d5a23d56138c60f7adcdb96af461",
+  "scope": "targeted functional repairs, NOT production E2E acceptance",
+  "files": [
+    {
+      "path": "kernel/src/khora_kernel/engine/core.py",
+      "sha256": "39e255441afc09262ad1ba352a6111d3638b8204f9f942e502a8b3908612a686",
+      "bytes": 14129
+    },
+    {
+      "path": "kernel/src/khora_kernel/epistwin_audit.py",
+      "sha256": "a1080a3f94fd432cbe13017254f65fc2fb909d17ea08fea7c5cbe7bbb3d5b34b",
+      "bytes": 18387
+    },
+    {
+      "path": "kernel/tests/test_c17_fallback.py",
+      "sha256": "ef4c41ea21d2b5dd5b548eef3d164bb9b8394b1ec92a32f26912a12bf04ffb9c",
+      "bytes": 9132
+    },
+    {
+      "path": "kernel/tests/test_epistwin_audit.py",
+      "sha256": "7cc4a6516c37c963015619ef53d888378fbb3c8789f50839d969fba6853c5e6a",
+      "bytes": 6929
+    },
+    {
+      "path": "kernel/tests/test_graph_cycle_regressions.py",
+      "sha256": "cf8aa7ef424b75c58f38d4494a60cd284dbd0ac8b0c6cb53e8e46a8d66a43bb1",
+      "bytes": 8802
+    },
+    {
+      "path": "khora-web/docs/GRAPH-TWINS.md",
+      "sha256": "580832c32880632275d4d9d6fc65e3b625baed929ca2af25ea334ff5d037759c",
+      "bytes": 16416
+    },
+    {
+      "path": "khora-web/docs/evidence/graph-repair-2026-10-18/README.md",
+      "sha256": "2875b4b5147c624b01125dca1b38132fd38268540aa30be2aa4f76e18e6ebd3c",
+      "bytes": 5300
+    },
+    {
+      "path": "khora-web/docs/evidence/graph-repair-2026-10-18/existing-tests.txt",
+      "sha256": "af1e065f149be7662a01db8294a73db38b17a92b3733caf81afb6f1b6851cdb5",
+      "bytes": 99
+    },
+    {
+      "path": "khora-web/docs/evidence/graph-repair-2026-10-18/live-shapes.json",
+      "sha256": "c708e51c00c91c89cf2d2f5ca6859595f5a9358cc05d99eccbb7253f00dab0d0",
+      "bytes": 696
+    },
+    {
+      "path": "khora-web/docs/evidence/graph-repair-2026-10-18/new-tests.json",
+      "sha256": "b34a85b25093c4b3e1b8fe74d03d2661c41bb606a9a05da9cfc105a95bb98333",
+      "bytes": 243
+    },
+    {
+      "path": "khora-web/docs/evidence/graph-repair-2026-10-18/new-tests.txt",
+      "sha256": "7a13e1807205e1157830d2a65fa4c146d99ba6e45f6b415d2df51c3ee49004b2",
+      "bytes": 2511
+    },
+    {
+      "path": "khora-web/docs/evidence/graph-repair-2026-10-18/repair.json",
+      "sha256": "d00806bb5d0f888bed586446414f283e2fe10c968122ea5e039ec2fb3cacffc3",
+      "bytes": 2835
+    }
+  ]
+}

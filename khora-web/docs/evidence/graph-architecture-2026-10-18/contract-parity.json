@@ -1,0 +1,15 @@
+{
+  "id": "R10",
+  "expected": "same canonical literal envelope accepted in both languages",
+  "python": [
+    true,
+    []
+  ],
+  "typescript": {
+    "valid": false,
+    "errors": [
+      "items[0].kind debe ser 'entity' o 'relation'."
+    ]
+  },
+  "verdict": "FAIL"
+}

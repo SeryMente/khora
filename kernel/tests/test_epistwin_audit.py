@@ -95,7 +95,8 @@ def test_ab_and_longitudinal_registry():
     disabled = {"c1":["a"], "c2":["b","c"]}
     result = compare_community_ab(None, active, disabled)
     assert result["changed"] is True
-    assert set(result["changed_nodes"]) == {"b"}
+    # Every affected neighborhood changes, not just an arbitrary label assignment.
+    assert set(result["changed_nodes"]) == {"a", "b", "c"}
     events = align_longitudinal(active, disabled)
     assert events
     signal = registry_signal("community_signal", "delta_q", 0.2, "12m", "no change under null", "degree-preserving-edge-permutation")

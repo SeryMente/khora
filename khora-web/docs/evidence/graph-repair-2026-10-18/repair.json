@@ -1,0 +1,66 @@
+{
+  "schema": "khora.graph-targeted-repair/1",
+  "base_commit": "0ea4d59ef7c8d5a23d56138c60f7adcdb96af461",
+  "production_commit_observed": "81e571deaa46ad9abd0a6b91c5035abe871a8b55",
+  "source_blobs_confirmed": {
+    "kernel/src/khora_kernel/engine/core.py": "688d0dce1a99b5e0c71362adfc289f865b1567d2",
+    "kernel/src/khora_kernel/epistwin_audit.py": "71eef85a36eda917480120566554f3847e073317"
+  },
+  "changes": [
+    "R07 REFINE affects next retrieval, original question retained, query traced, blank refinement stops",
+    "R08 global fVAL always called with visual evidence; mark mode no automatic sufficient",
+    "R11 label-invariant pair agreement, noncomparable changing universes, label-invariant A/B co-membership neighborhoods"
+  ],
+  "new_tests": {
+    "scope": "controlled reasoning integration with deterministic provider/retriever and real temporary SQLite; real pure partition functions; NOT live E2E",
+    "tests_run": 18,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": true
+  },
+  "existing_tests": {
+    "count": 25,
+    "passed": 25,
+    "failed": 0,
+    "skipped": 0,
+    "scope": "selected RAZ-01/02, global/legacy fVAL, visual fallback and epistwin_audit; independent copied test files to avoid unrelated database fixtures"
+  },
+  "controlled_total": 43,
+  "live_e2e": "NOT CLOSED",
+  "deployed": false,
+  "production_mutated": false,
+  "source_originals_or_human_ledger_changed": false,
+  "architecture_or_ui_approval_inferred": false,
+  "not_closed": [
+    "H01 shared generation and visible map/query integration",
+    "H02 genuine human authority in ingestion",
+    "H03 contextual identity and source occurrences",
+    "H06 durable judgment replay",
+    "H09-H13 coherent publication/index/communities/summary scope",
+    "H14 published response/UI truth",
+    "H18 authorization propagation assessment",
+    "remaining matrices and real cognitive use tasks"
+  ],
+  "metric_compatibility_change": {
+    "membership_stability": "float or None; None is NOT COMPARABLE, includes changing universe or fewer than two meaningful partitions",
+    "changed_nodes": "all nodes whose co-membership neighborhood or presence changed; not just arbitrary community-label changes"
+  },
+  "environment": {
+    "python": "3.13.14",
+    "packages": {
+      "numpy": "2.5.3",
+      "networkx": "3.5",
+      "igraph": "0.11.9",
+      "leidenalg": "0.10.2",
+      "pytest": "8.4.2"
+    }
+  },
+  "guardrails": [
+    "no stack change, no new graph engine, no database migration/backfill",
+    "no user/auth/security/UI implementation or original rewriting",
+    "no merge or deployment",
+    "new test providers/retriever are explicit deterministic adapters; SQLite persistence is real and temporary",
+    "existing community tests use actual igraph/Leiden on synthetic graph, not a production corpus"
+  ]
+}

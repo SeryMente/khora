@@ -1,0 +1,29 @@
+✔ anchors preserve literal original positions and negation (2.705849ms)
+✔ fabricated or concatenated quotes never enter a graph (0.196693ms)
+✔ ambiguous repeated evidence is not assigned guessed coordinates (0.142019ms)
+✔ literal endpoints required, not inferred identities (0.164043ms)
+✔ automatic acceptance is system attributed and cannot leak to curated (3.878931ms)
+✔ only explicit matching owner judgments change curated (0.684286ms)
+✔ reject affects curated only, originals and automatic stay intact (0.64313ms)
+✔ same spelling across sources does not manufacture identity (7.666026ms)
+✔ fixed seed reproduces partition without desired community count (1.237358ms)
+✔ chunking retains whitespace and context, never loses tail (0.261871ms)
+✔ wrong source hashes cannot be combined under a proposal (0.506001ms)
+✔ lexical equality generates candidates, never identity acceptance (0.771745ms)
+✔ identity validation fails closed on invented evidence or unknown pairs (0.484306ms)
+✔ grounded identity merges automatic only, curated needs separate explicit judgment (1.165087ms)
+✔ examined identity pairs are not proposed twice (0.445664ms)
+✔ display source filters and limits preserve persisted membership (0.573478ms)
+✔ identity references bind immutable exact contexts without model recopy (0.8937ms)
+✔ identity references reject swapped sides and unknown pairs (0.424082ms)
+✔ identity references do not rescue old invalid raw evidence responses (0.144727ms)
+✔ identity references retain name-only evidence rejection (0.158121ms)
+✔ identity reference inputs retain both sources and uncertainty criterion (0.681546ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 21
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 165.923741

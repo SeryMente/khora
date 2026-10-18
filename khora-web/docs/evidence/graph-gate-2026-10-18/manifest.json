@@ -1,0 +1,47 @@
+{
+  "schema": "khora.graph-gate-manifest/1",
+  "scope": "criterion and offline validation only; no product acceptance",
+  "base_commit": "2ba06f4a1147be8b9e6150a8a1f74a3f6f6d2c96",
+  "files": [
+    {
+      "path": "khora-web/docs/GRAPH-QUALITY-DRAFT.md",
+      "bytes": 70162,
+      "sha256": "04282c08a321d81e1f88f07fcdd0a48db88a6aa6017e878dbd9d2ede1d669d91"
+    },
+    {
+      "path": "khora-web/docs/GRAPH-TWINS.md",
+      "bytes": 15222,
+      "sha256": "47e21bc2e9f5968196b057da718d9a7744bb1203107e72565737b64c2e53ff2a"
+    },
+    {
+      "path": "khora-web/docs/evidence/graph-gate-2026-10-18/README.md",
+      "bytes": 8686,
+      "sha256": "e68a3bfdfa2f942567d94d4b1a4d23f2cece8c8b38773f52c7fd98db36b1dff0"
+    },
+    {
+      "path": "khora-web/docs/evidence/graph-gate-2026-10-18/tests.txt",
+      "bytes": 6381,
+      "sha256": "42f6797986278d8988d643c1e126b71d7e075b369376c0f7dc74de479864522b"
+    },
+    {
+      "path": "khora-web/docs/evidence/graph-gate-2026-10-18/validation.json",
+      "bytes": 1100,
+      "sha256": "38c9aedda4112cce9b249e41602d77d0963caabc39d574325863e22a79473063"
+    },
+    {
+      "path": "khora-web/docs/graph-quality-profile.json",
+      "bytes": 2324,
+      "sha256": "22c38d65c4c3abfe477b87e498a7622e90632496df6e42b3771704072f540fe6"
+    },
+    {
+      "path": "khora-web/scripts/graph_quality_gate.py",
+      "bytes": 22619,
+      "sha256": "732ca4928ccd1ec940a8cbf59331ca39ac9d7942e7daffbcae67b14e60204fe4"
+    },
+    {
+      "path": "khora-web/scripts/tests/test_graph_quality_gate.py",
+      "bytes": 19517,
+      "sha256": "16b880b3f46187d843a32e3c228efe45ffbb01c875ef3437050d530d8f180d18"
+    }
+  ]
+}
