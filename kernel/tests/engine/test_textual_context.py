@@ -117,5 +117,46 @@ class TextualContextTests(unittest.TestCase):
             self.assertIsNone(load_ht('isolated-b', db))
 
 
+
+
+class CurrentTurnTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.db = str(Path(self.tmp.name) / 'sessions.sqlite')
+        self.old = Ht('same-chat', 'ts', steps=[
+            HtStep(1, 'REFINE', 'ts', 'old refinement', {'refined_query': 'refinamiento antiguo', 'original_question': 'misma pregunta'}),
+            HtStep(2, 'RETRIEVE', 'ts', 'old G*', {'gstar_nodes': ['old-node']})],
+            evidence=[HtEvidence('old-node', 'contexto anterior', 2)])
+        save_ht(self.old, self.db)
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def test_old_retrieval_cannot_authorize_new_answer(self):
+        provider = Provider()
+        provider.actions = iter(['ANSWER', 'STOP'])
+        result = core.ejecutar_ciclo('same-chat', 'nueva pregunta', provider, object(), self.db)
+        self.assertEqual(result.verdict, 'INSUFFICIENT')
+        self.assertFalse(any(r.metadata.get('role') == 'P_phi_generator' for r in provider.requests))
+
+    def test_same_question_does_not_reuse_previous_turn_refinement(self):
+        Retriever.seen = []
+        provider = Provider()
+        provider.actions = iter(['RETRIEVE', 'ANSWER'])
+        with patch.object(core, 'RetrieverGraphRAG', Retriever):
+            result = core.ejecutar_ciclo('same-chat', 'misma pregunta', provider, object(), self.db)
+        self.assertEqual(result.verdict, 'SUFFICIENT')
+        self.assertEqual(Retriever.seen, ['misma pregunta'])
+
+    def test_followup_preserves_previous_history_for_policy(self):
+        provider = Provider()
+        provider.actions = iter(['STOP'])
+        core.ejecutar_ciclo('same-chat', 'seguimiento', provider, object(), self.db)
+        self.assertIn('contexto anterior', provider.requests[0].prompt)
+        saved = load_ht('same-chat', self.db)
+        self.assertEqual(saved.evidence, self.old.evidence)
+        self.assertIsNone(load_ht('different-chat', self.db))
+
+
 if __name__ == '__main__':
     unittest.main()

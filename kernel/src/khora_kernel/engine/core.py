@@ -158,6 +158,21 @@ def _set_last_step_observation(ht: Ht, observation: Any, detail: str | None = No
     return _replace_ht(ht, steps=ht.steps[:-1] + [step])
 
 
+def _current_turn_steps(ht: Ht) -> List[HtStep]:
+    """Keep full H_t; distinguish retrieval performed for this invocation.
+
+    A trace marker does not introduce a new policy action or discard history.
+    Histories produced before turn markers retain direct-helper compatibility.
+    """
+    for event in reversed(getattr(ht, "trace", [])):
+        if isinstance(event, dict) and event.get("action") == "TURN_START":
+            after_step = event.get("after_step")
+            if isinstance(after_step, int) and not isinstance(after_step, bool):
+                return [step for step in ht.steps if step.n > after_step]
+            return []
+    return ht.steps
+
+
 def _retrieve(ht: Ht, question: str, memoria: Any, contexto: Any = None) -> Ht:
     from khora_kernel.api import ContextoDeVisibilidad
     contexto = contexto or ContextoDeVisibilidad.PRIVADO
@@ -170,7 +185,7 @@ def _retrieve(ht: Ht, question: str, memoria: Any, contexto: Any = None) -> Ht:
         )
     retrieval_question = question
     # REFINE changes retrieval strategy, never the original question used by fVAL.
-    for step in reversed(ht.steps):
+    for step in reversed(_current_turn_steps(ht)):
         observation = step.observation
         if step.state == Lambda.REFINE.value and isinstance(observation, dict):
             refined = observation.get("refined_query")
@@ -245,6 +260,8 @@ def _answer(ht: Ht, question: str, puerto_llm: PuertoLLM) -> Response:
 def ejecutar_ciclo(session_id: str, pregunta: str, puerto_llm: PuertoLLM, memoria: Any,
                    db_path: str = "data/khora_sessions.db") -> ValidatedResponse:
     ht = load_ht(session_id, db_path) or Ht(session_id=session_id, created_at=_now())
+    ht = _add_trace(ht, {"action": "TURN_START", "question": pregunta,
+                         "after_step": ht.steps[-1].n if ht.steps else 0})
     estado = Sigma(session_id=session_id, pregunta=pregunta, ht=ht)
     max_steps = int(os.environ.get("RAZ_MAX_PASOS", "6"))
     final_result: FvalResult | None = None
@@ -264,9 +281,9 @@ def ejecutar_ciclo(session_id: str, pregunta: str, puerto_llm: PuertoLLM, memori
                     hasattr(puerto_llm, "call_count") or hasattr(puerto_llm, "forced_responses")
                     or hasattr(puerto_llm, "action_responses")
                 )
-                retrieve_present = any(s.state == Lambda.RETRIEVE.value for s in estado.ht.steps) or memoria is None or legacy_provider
+                retrieve_present = any(s.state == Lambda.RETRIEVE.value for s in _current_turn_steps(estado.ht)) or memoria is None or legacy_provider
                 if not retrieve_present:
-                    estado.ht = _add_step(estado.ht, "GUARD", "ANSWER rechazado: no existe G*.", None)
+                    estado.ht = _add_step(estado.ht, "GUARD", "ANSWER rechazado: no existe recuperación en el turno actual.", None)
                 else:
                     # Fixture legacy: el texto de justificación era el borrador de respuesta.
                     # En producción, P_phi se invoca por separado para respetar UA-15.
