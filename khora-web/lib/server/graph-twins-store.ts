@@ -11,6 +11,7 @@ const SOURCE_SQL=`SELECT v.id,v.version_aprobada,v.sha256_aprobado,v.recibido_en
  ORDER BY v.recibido_en,v.id`;
 type DbSource={id:string;version_aprobada:number;sha256_aprobado:string;recibido_en:Date|string;texto:string;sha256:string;vigente_sha256:string};
 async function sources(db:PoolClient,owner:string):Promise<DbSource[]>{const rows=(await db.query(SOURCE_SQL,[owner])).rows as DbSource[];for(const r of rows)if(!r.texto||!r.version_aprobada||!r.sha256_aprobado||r.sha256?.trim()!==r.sha256_aprobado.trim()||r.vigente_sha256?.trim()!==r.sha256_aprobado.trim())throw new Error("approved_source_integrity_mismatch_no_silent_omission");return rows;}
+async function custodyStatus(db:PoolClient,owner:string,eligible:number){const r=await db.query("SELECT count(*)::int AS total FROM volcado WHERE usuario=$1",[owner]);const total=Number(r.rows[0].total);return {total,eligible,excluded:total-eligible,policy:"approved-version-with-matching-hash"};}
 function sourceStamp(rows:DbSource[]){return digest(JSON.stringify(rows.map(r=>[r.id,r.version_aprobada,r.sha256_aprobado])));}
 function approvedSource(r:DbSource):Source{return {volcado_id:r.id,version:Number(r.version_aprobada),sha256:r.sha256_aprobado.trim(),captured_at:new Date(r.recibido_en).toISOString()};}
 async function proposals(db:PoolClient,owner:string){
@@ -29,8 +30,8 @@ async function snapshot(db:PoolClient,owner:string){
  const identityPending=pendingIdentities(all).length;
  const completed=all.filter(p=>p.next===p.length).length;
  const payload={revision:randomUUID(),source_stamp:sourceStamp(rows),pipeline:PIPELINE,method:METHOD,prompt_hash:digest(PROMPT),prompt:PROMPT,
- model:MODEL,temperature:0,provider:"Groq (existing configured provider)",release:process.env.VERCEL_GIT_COMMIT_SHA||null,
- created_at:new Date().toISOString(),source_count:rows.length,completed,pending:rows.length-completed+identityPending,pending_sources:rows.length-completed,pending_identity_pairs:identityPending,identity_prompt:IDENTITY_PROMPT,identity_prompt_hash:digest(IDENTITY_PROMPT),identity_candidates_policy:"exact lexical candidates plus grounded relation endpoint pairs; aliases without lexical/explicit relation bridge may remain unresolved",
+ model:MODEL,temperature:0,provider:"Groq (existing configured provider)",release:process.env.VERCEL_GIT_COMMIT_SHA||process.env.KHORA_RELEASE_SHA||null,
+ created_at:new Date().toISOString(),custody:await custodyStatus(db,owner,rows.length),source_count:rows.length,completed,pending:rows.length-completed+identityPending,pending_sources:rows.length-completed,pending_identity_pairs:identityPending,identity_prompt:IDENTITY_PROMPT,identity_prompt_hash:digest(IDENTITY_PROMPT),identity_candidates_policy:"exact lexical candidates plus grounded relation endpoint pairs; aliases without lexical/explicit relation bridge may remain unresolved",
  automatic,curated,proposals:all,judgments,
  limitations:["Sin cotejo de originalidad/repetición para Ideación Asíncrona Recuperable.","Las identidades entre fuentes son propuestas del sistema con sustento textual; no equivalen a ratificación humana ni garantía semántica. Las coincidencias de nombre solo generan candidatos; pueden quedar alias sin resolver.","Un ancla verificada prueba procedencia, no fidelidad semántica. Revisión humana aún necesaria.","Los intervalos sin propuesta quedan pendientes de revisión, no descartados como carentes de contenido."]};
  await db.query(`INSERT INTO grafo_par_snapshot(owner,revision,payload_cifrado) VALUES($1,$2,$3)
@@ -40,10 +41,11 @@ async function snapshot(db:PoolClient,owner:string){
 export async function readPair(owner:string){
  const db=await getDb().connect();try{
   const rows=await sources(db,owner),r=await db.query("SELECT payload_cifrado FROM grafo_par_snapshot WHERE owner=$1",[owner]);
-  if(!r.rows.length)return {empty:true,source_count:rows.length,pending:rows.length,limitations:["Aún no se ha generado ninguna de las dos proyecciones."]};
+  const custody=await custodyStatus(db,owner,rows.length);
+  if(!r.rows.length)return {custody,empty:true,source_count:rows.length,pending:rows.length,limitations:["Aún no se ha generado ninguna de las dos proyecciones."]};
   const payload=JSON.parse(descifrarTexto(r.rows[0].payload_cifrado));
-  if(payload.pipeline!==PIPELINE||payload.model!==MODEL||payload.source_stamp!==sourceStamp(rows))return {empty:true,stale:true,source_count:rows.length,pending:rows.length,limitations:["Cambió el conjunto de versiones aprobadas. Actualiza ambas proyecciones antes de consultar datos anteriores."]};
-  return payload;
+  if(payload.pipeline!==PIPELINE||payload.model!==MODEL||payload.source_stamp!==sourceStamp(rows))return {custody,empty:true,stale:true,source_count:rows.length,pending:rows.length,limitations:["Cambió el conjunto de versiones aprobadas. Actualiza ambas proyecciones antes de consultar datos anteriores."]};
+  return {...payload,custody};
  }finally{db.release();}
 }
 export async function nextChunk(owner:string){

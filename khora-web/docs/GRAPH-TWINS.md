@@ -38,3 +38,8 @@ The first post-54b pass passed 524 unit tests, typecheck, UI/navigation contract
 After authenticated access was restored, the live owner inventory returned 42 entries, 24 archived and 18 in review, with zero approved source versions. Vault unlocking succeeded. The existing published graph was empty. No approval, source-state mutation or ingestion was performed. Expanding automatic input to unreviewed originals is a separate operator decision; do not fabricate approved tuples to get past the gate.
 
 The provisional quality framework is in GRAPH-QUALITY-DRAFT.md. It is not a ratified scoring rule and assigns no invented health score.
+
+
+## Final publication preparation
+
+Operator clarified: use only custody-ready sources; do not ingest unready originals and defer custody repair. The approved-version/hash gate remains unchanged. The paired API now reports owner-scoped custody totals, eligible and excluded counts, without returning excluded text. Synthetic integration verifies unapproved rows are excluded. Release metadata supports an explicit verified-clean-worktree manual SHA without pretending the deployment came from Git integration. Public version tests cover manual, Git precedence and invalid identity. A cloud build was already Ready at 88ec05a after fixing the direct Graphology type peer; final metadata/custody revision awaits its own cloud verification and final-domain check. No populated real graph is claimed when eligible inputs are zero.

@@ -6,7 +6,7 @@ import type { GrafoViewState } from "../components/shared/GrafoView";
 import type { Proposal, HumanDecision } from "../../lib/graph-twins";
 const View=dynamic(()=>import("../components/shared/GrafoView").then(m=>m.GrafoView),{ssr:false,loading:()=> <p className="p-4">Cargando visualización…</p>});
 type Graph={nodes:GrafoViewState["nodes"];edges:GrafoViewState["edges"];communities:number;truncated?:boolean;totals?:{nodes:number;edges:number}};
-type Pair={revision?:string;empty?:boolean;stale?:boolean;source_count:number;pending:number;pending_sources?:number;pending_identity_pairs?:number;completed?:number;automatic?:Graph;curated?:Graph;proposals?:Proposal[];judgments?:HumanDecision[];limitations?:string[];finished?:boolean};
+type Pair={custody?:{total:number;eligible:number;excluded:number;policy:string};revision?:string;empty?:boolean;stale?:boolean;source_count:number;pending:number;pending_sources?:number;pending_identity_pairs?:number;completed?:number;automatic?:Graph;curated?:Graph;proposals?:Proposal[];judgments?:HumanDecision[];limitations?:string[];finished?:boolean};
 export default function GrafoPage(){
  const [pair,setPair]=useState<Pair|null>(null),[mode,setMode]=useState<"automatic"|"curated">("automatic"),[busy,setBusy]=useState(false),[error,setError]=useState<string|null>(null),[vault,setVault]=useState(false);
  const [viewMode,setViewMode]=useState<"list"|"graph">("graph"),[layer2,setLayer2]=useState(true),[selection,setSelection]=useState<GrafoViewState["selectedElement"]>(null);
@@ -26,6 +26,7 @@ export default function GrafoPage(){
     <button type="button" aria-pressed={mode==="curated"} onClick={()=>{setMode("curated");setSelection(null);}} className="border rounded px-4 py-2">Curado · ratificación explícita ({pair?.curated?.nodes.length??"—"})</button>
    </div>
    <p role="status">{pair?`${pair.completed||0} de ${pair.source_count} fuentes aprobadas procesadas · ${pair.pending_sources??pair.pending} fuentes pendientes · ${pair.pending_identity_pairs??0} pares de identidad pendientes` : "Consultando versiones aprobadas…"}{busy?" · Procesando; puedes conservar esta pantalla abierta.":""}</p>
+   {pair?.custody&&<p role="status">Custodia: {pair.custody.eligible} fuentes aptas de {pair.custody.total}. {pair.custody.excluded} quedan fuera de esta corrida hasta superar Custodia. No se aprueban ni se cambian sus estados desde aquí.</p>}
    <p className="text-sm">Las identidades entre textos requieren propuestas con sustento adicional: una coincidencia de nombre no basta. En el curado también requieren tu ratificación. Los intervalos sin extracción quedan pendientes de revisión.</p>
    <div className="flex flex-wrap gap-3"><button type="button" disabled={busy||vault} onClick={generate} className="border rounded px-4 py-2 disabled:opacity-50">{busy?"Procesando ambos…":"Generar / actualizar ambos grafos"}</button><button type="button" disabled={!pair?.revision||busy} onClick={audit} className="border rounded px-4 py-2">Descargar evidencia de la corrida</button></div>
    {vault&&<a href="/sistema/boveda" className="underline">Abrir bóveda para consultar los grafos</a>}
