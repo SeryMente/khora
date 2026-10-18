@@ -1,7 +1,7 @@
 // @l0 L0-002 · @req VIZ-01/REQ-1 · Componente Presentacional Compartido de Grafo
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { layoutPublishedCommunities, CARD_WIDTH, CARD_HEIGHT } from "../../../lib/graph-presentation";
 import {
   Background,
@@ -30,7 +30,9 @@ export type GrafoNode = {
   verificacion: string;
 };
 
+export type GrafoEvidence = {subject:string;predicate:string;object:string;quote:string;attribution:string;modality:string;event_time:string;start:number;end:number;source:{volcado_id:string;version:number;sha256:string}};
 export type GrafoEdge = {
+  evidence?: GrafoEvidence;
   id: string;
   source: string;
   target: string;
@@ -143,17 +145,47 @@ export function GrafoView({
   const { nodes, edges, loading, error, viewMode, layer2Active, selectedElement } = state;
 
   const layout = useMemo(() => layoutPublishedCommunities(nodes, edges), [nodes, edges]);
-  const flowNodes = useMemo<Node<FlowNodeData>[]>(() => nodes.map(node => ({
+  const [query,setQuery] = useState("");
+  const [scope,setScope] = useState("initial");
+  const groups = useMemo(() => {
+    const counts = new Map<string,number>();
+    for(const n of nodes) if(n.communityId) counts.set(n.communityId,(counts.get(n.communityId)||0)+1);
+    return [...counts].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0]));
+  },[nodes]);
+  const activeScope = scope === "initial" ? (nodes.length>40 ? groups[0]?.[0]||"all" : "all") : (scope==="all"||groups.some(([id])=>id===scope)?scope:"all");
+  const normalize=(s:string)=>s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLocaleLowerCase();
+  const visibleNodes = useMemo(() => {
+    if(query.trim()) {
+      const hits=new Set(nodes.filter(n=>normalize(n.summary).includes(normalize(query.trim()))).map(n=>n.id));
+      const neighbors=new Set(hits);
+      for(const e of edges) if(hits.has(e.source)||hits.has(e.target)){neighbors.add(e.source);neighbors.add(e.target);}
+      return nodes.filter(n=>neighbors.has(n.id));
+    }
+    return activeScope==="all"?nodes:nodes.filter(n=>n.communityId===activeScope);
+  },[nodes,edges,query,activeScope]);
+  const visibleIds = new Set(visibleNodes.map(n=>n.id));
+  const visibleEdges = edges.filter(e=>visibleIds.has(e.source)&&visibleIds.has(e.target));
+  const focusLayout = useMemo(()=>layoutPublishedCommunities(visibleNodes,visibleEdges),[visibleNodes,edges]);
+  const focusKey = query.trim()+":"+activeScope+":"+visibleNodes.length;
+  function evidenceBlock(edge:GrafoEdge){return edge.evidence ? <section key={edge.id} className="mt-3 border-t pt-3 text-sm" style={{borderColor:"var(--khora-border)"}}>
+    <p className="font-medium">{edge.evidence.subject} → {edge.evidence.predicate} → {edge.evidence.object}</p>
+    <blockquote className="mt-2 border-l-2 pl-3 whitespace-pre-wrap">{edge.evidence.quote}</blockquote>
+    <p className="mt-2 opacity-75">{edge.evidence.attribution} · {edge.evidence.modality} · {edge.evidence.event_time}</p>
+    <details className="mt-2"><summary className="cursor-pointer">Ver anclaje en el original</summary><p className="mt-2 break-all">Fuente {edge.evidence.source.volcado_id} · versión {edge.evidence.source.version} · posiciones {edge.evidence.start}–{edge.evidence.end} (UTF-16) · hash {edge.evidence.source.sha256}</p></details>
+  </section> : null;}
+  const selectedRelations = selectedElement?.type==="node" ? edges.filter(e=>e.source===selectedElement.data.id||e.target===selectedElement.data.id) : [];
+
+  const flowNodes = useMemo<Node<FlowNodeData>[]>(() => visibleNodes.map(node => ({
     id: node.id,
     type: "graphNode",
-    position: layout.positions.get(node.id)!,
+    position: focusLayout.positions.get(node.id)!,
     data: {graphNode:node,layer2Active,communityLabel:layout.presentation.get(node.id)!.label,
       colorIndex:layout.presentation.get(node.id)!.colorIndex,
       onSelect:(selected:GrafoNode) => actions.onSelectElement?.({type:"node",data:selected})},
-  })), [actions, layer2Active, nodes, layout]);
+  })), [actions, layer2Active, visibleNodes, layout, focusLayout]);
 
   const flowEdges = useMemo<Edge[]>(() => {
-    const valid = new Set(nodes.map((node) => node.id));
+    const valid = new Set(visibleNodes.map((node) => node.id));
     return edges
       .filter((edge) => valid.has(edge.source) && valid.has(edge.target))
       .map((edge) => ({
@@ -167,7 +199,7 @@ export function GrafoView({
         labelStyle: { fill: "var(--khora-ink)", fontSize: 12 },
         labelBgStyle: { fill: "var(--khora-surface)", fillOpacity: 0.85 },
       }));
-  }, [edges, nodes, selectedElement]);
+  }, [edges, visibleNodes, selectedElement]);
 
   const inspectionContent = selectedElement ? (
     <>
@@ -214,6 +246,7 @@ export function GrafoView({
           <div><span className="opacity-70">Estado técnico:</span> {selectedElement.data.verificacion}</div>
         </div>
       )}
+      {selectedElement.type === "edge" ? evidenceBlock(selectedElement.data) : <section><h4 className="mt-4 text-sm font-semibold">Relaciones y texto de origen ({selectedRelations.length})</h4>{selectedRelations.map(evidenceBlock)}</section>}
       <p className="mt-4 text-sm opacity-80">El estado técnico no acredita ratificación humana. Los grupos describen la partición publicada, no rasgos de la persona.</p>
     </>
   ) : null;
@@ -222,7 +255,7 @@ export function GrafoView({
     <Panel
       position="top-right"
       className="!m-3 !rounded-lg !border !border-zinc-700 !p-4 !shadow-xl break-words"
-      style={{ backgroundColor: "var(--khora-surface)", color: "var(--khora-ink)", width:"min(360px, calc(100vw - 24px))", maxHeight:"65dvh", overflowY:"auto", overflowWrap:"anywhere", pointerEvents:"all" }}
+      style={{ backgroundColor: "var(--khora-surface)", color: "var(--khora-ink)", width:"min(440px, calc(100vw - 24px))", maxHeight:"65dvh", overflowY:"auto", overflowWrap:"anywhere", pointerEvents:"all" }}
       data-ui-id="grafo.panel-inspection"
     >
       {inspectionContent}
@@ -345,8 +378,15 @@ export function GrafoView({
             data-ui-id="grafo.flow-view"
             className="relative h-[65dvh] min-h-[400px] w-full"
           >
-            <p className="px-4 py-2 text-xs opacity-80">{nodes.length} entidades · {edges.length} relaciones · {layout.communityCount} comunidades publicadas. Selecciona una relación para ver su nombre. Los nombres de grupo son locales a esta vista.</p>
+            <div className="flex flex-wrap items-center gap-3 border-b px-4 py-2 text-sm" style={{borderColor:"var(--khora-border)"}}>
+              <label className="flex items-center gap-2">Explorar <select aria-label="Comunidad a explorar" value={activeScope} onChange={e=>{setScope(e.target.value);setQuery("");actions.onSelectElement?.(null);}} className="min-h-11 max-w-[220px] rounded border px-2" style={{background:"var(--khora-surface)",color:"var(--khora-ink)",borderColor:"var(--khora-border)"}}><option value="all">Mapa completo · {nodes.length} entidades</option>{groups.map(([id,count])=><option key={id} value={id}>{layout.presentation.get(nodes.find(n=>n.communityId===id)!.id)?.label} · {count} entidades</option>)}</select></label>
+              <label className="flex items-center gap-2">Buscar <input aria-label="Buscar en todo el grafo" placeholder="Palabra o expresión" value={query} onChange={e=>{setQuery(e.target.value);actions.onSelectElement?.(null);}} className="min-h-11 w-48 rounded border px-3" style={{background:"var(--khora-surface)",color:"var(--khora-ink)",borderColor:"var(--khora-border)"}} /></label>
+              <span role="status" className="opacity-75">{visibleNodes.length} de {nodes.length} entidades · {visibleEdges.length} relaciones visibles</span>
+              <span className="opacity-70" title="La búsqueda abarca todas las entidades y muestra también sus vecinos directos. Elegir una comunidad solo cambia la vista: no modifica los datos ni la partición.">Buscar incluye conexiones directas. Selecciona para leer el sustento.</span>
+            </div>
+            {visibleNodes.length===0 && <p className="p-4 text-sm">No hay coincidencias. Prueba otra expresión; los datos no se han modificado.</p>}
             <ReactFlow
+              key={focusKey}
               nodes={flowNodes}
               edges={flowEdges}
               nodeTypes={nodeTypes}

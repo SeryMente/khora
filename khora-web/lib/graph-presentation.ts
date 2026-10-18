@@ -11,9 +11,11 @@ export function layoutPublishedCommunities(nodes: LayoutEntity[], edges: LayoutR
   const groups = [...keys, ...(sorted.some(n => !n.communityId) ? [null] : [])];
   const positions = new Map<string,{x:number;y:number}>();
   const presentation = new Map<string,{label:string;colorIndex:number}>();
-  // Vertical bands avoid group overlap; dagre orders entities by actual intra-group edges.
+  // Two-dimensional shelf packing avoids the unreadable vertical strip.
+  // Presentation only: every published membership and every relation is preserved.
   // Missing membership stays missing. Display labels are local to this projection.
-  let top = 0;
+  let top = 0, left = 0, rowHeight = 0;
+  const targetWidth = Math.max(1000, Math.sqrt(Math.max(1,nodes.length)*CARD_WIDTH*CARD_HEIGHT*3));
   for (const key of groups) {
     const members = sorted.filter(n => (n.communityId || null) === key);
     const ids = new Set(members.map(n => n.id));
@@ -23,15 +25,19 @@ export function layoutPublishedCommunities(nodes: LayoutEntity[], edges: LayoutR
       if (e.source !== e.target && ids.has(e.source) && ids.has(e.target)) g.setEdge(e.source,e.target,{},e.id);
     }
     dagre.layout(g);
+    const width = g.graph().width || CARD_WIDTH+48;
+    const height = g.graph().height || CARD_HEIGHT+48;
+    if(left && left+width>targetWidth){top+=rowHeight+96;left=0;rowHeight=0;}
     let bottom = top;
     for (const n of members) {
       const p = g.node(n.id);
-      const position = {x:p.x-CARD_WIDTH/2,y:top+p.y-CARD_HEIGHT/2};
+      const position = {x:left+p.x-CARD_WIDTH/2,y:top+p.y-CARD_HEIGHT/2};
       positions.set(n.id,position);
       presentation.set(n.id,{label:key ? labels.get(key)! : "Sin comunidad publicada",colorIndex:key ? keys.indexOf(key)+1 : 0});
       bottom = Math.max(bottom,position.y+CARD_HEIGHT);
     }
-    top = bottom+144;
+    left += width+96;
+    rowHeight = Math.max(rowHeight,height);
   }
   return {positions,presentation,communityCount:keys.length};
 }
