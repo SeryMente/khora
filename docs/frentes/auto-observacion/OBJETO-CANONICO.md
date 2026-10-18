@@ -3,7 +3,7 @@
 ## 1. Control e identidad
 
 - Identidad: AUTOOBS-KHORA; nombre de subsistema ratificado por U004: **Auto-observación**. «Cora/Quora» se normaliza a Khora fuera de originales.
-- Versión: 0.3.0; sello AUTOOBS-KHORA-v0.3.0. Ancla C003: implementación del corte completo de Auto-observación; 24 regresiones sintéticas y tipado seleccionado comprobados; revisión visual y compuertas completas en curso.
+- Versión: 0.4.0; sello AUTOOBS-KHORA-v0.4.0. Ancla C004: implementación en solicitud de fusión #320; 24 regresiones, seis sondas de consulta y revisión visual local aprobadas. Integración bloqueada por lectura de comprobaciones; no fusionado ni desplegado.
 - Elemento permanente autorizado por U004. Carpeta contenedora: `docs/frentes/auto-observacion/`; único objeto de estado: `OBJETO-CANONICO.md`. No es un tablero adicional.
 - Propietario: SeryMente/khora. Privacidad actual comprobada: `private:true`, `visibility:private`, permiso `push:true` en consulta de este ciclo.
 - Rama de construcción: `docs/auto-observacion-20261018`; base comprobada `4dca2133866421105f077bbd7079576c588d1169`. No equivale a main, fusión ni despliegue.
@@ -49,7 +49,7 @@ La fuente metodológica aporta método, no recibe contenido privado del frente. 
 
 **A dónde va:** subsistema integrado, útil en la operación diaria, con operaciones reconstruibles, evidencia graduada, diagnóstico de incidentes, privacidad por defecto y ejercicios defensivos aislados.
 
-**Qué cambió:** U005 delega construcción integral y decisiones concretas. C003 incorpora código y pruebas causales; el diseño del anexo A queda adoptado con el alcance y límites reales de este corte.
+**Qué cambió:** U005 delega construcción integral y decisiones concretas. C003 incorpora código y pruebas causales; C004 añade revisión visual, sondas de consulta, preservación de clasificación de privacidad del navegador y registro de bloqueos externos. El anexo A es diseño adoptado; no todo su horizonte está implementado.
 
 Incluido: inventario y endurecimiento del registro existente; navegación/renombre Auto-observación; escenarios compartidos; contrato de eventos y resultados; correlación; diagnóstico depurado; integridad/retención verificables; pruebas externas sintéticas; pruebas defensivas; actualización del objeto en cada paso.
 
@@ -77,19 +77,23 @@ El análisis previo recomendó OpenTelemetry y Sentry: son candidatos, no provee
 
 Repositorio privado de producto SeryMente/khora. Código inspeccionado: Next.js/React/TypeScript, PostgreSQL mediante `pg`, Playwright; esto no prueba instalaciones locales ni despliegue activo. Host del operador, ubicación física, sesiones y recursos: NO VERIFICADOS y no necesarios para documentación.
 
-Herramientas usadas: conexión GitHub para lectura/escritura documental; sandbox Linux del agente para preparar payload y hashes. Sin acceso al equipo del operador. Credenciales productivas, telemetría y costes: no inspeccionados. El acceso del agente a GitHub no se hereda en el servidor Khora.
+Herramientas usadas: conexión GitHub para lectura/escritura de código y objeto; sandbox Linux del agente para implementación, dependencias aisladas, pruebas, Chromium y hashes. Sin acceso al equipo del operador. Credenciales productivas, telemetría y costes: no inspeccionados. El acceso del agente a GitHub no se hereda en el servidor Khora.
 
 ## 8. Estado vivo
 
 ### 🔄 Estado vivo
 
-C003 · Código implementado en rama de trabajo. Registro renombrado Auto-observación, acceso desde Sistema y auditoría filtrada desde Seguridad; ruta histórica conserva el mismo controlador. Vistas Resumen/Operaciones/Eventos/Integridad. Consulta autenticada sin bypass de prueba, proyección sin mensajes/detalles libres, keyset de recientes, límites y timeout SQL, estado de cola muestreada. Resultado de servicio propagado correctamente, metadatos no suplantan frontera, origen de navegador marcado no atestiguado. Cadena V2 con orden canónico estable ante JSONB; legado solo enlaces. Fallo doble de almacén no afirma guardado; identidad de reintento conservada y agotamiento visible.
+C004 · Código construido y persistido en la rama `docs/auto-observacion-20261018`; solicitud de fusión https://github.com/SeryMente/khora/pull/320 abierta en borrador, para impedir auto-merge antes de verificar compuertas. Base main comprobada `4dca2133866421105f077bbd7079576c588d1169`; construcción C003 persistida `1aea5562c124bd059b2edb48ab0670abf089cd5a`. C004 preserva clasificación USER_DATA aunque el origen sea navegador; declarar procedencia no certifica anonimización. Etiquetas de estado usan tinta del tema para contraste; color solo es apoyo no exclusivo.
 
-Siguiente paso atómico: revisión visual móvil/escritorio y pruebas de integración; abrir solicitud de fusión, consultar compuertas reales y corregir lo causal sin pedir diseño otra vez. No se declara fusión ni despliegue por este commit.
+Sistema → Auto-observación; Seguridad → auditoría filtrada; alias `/sistema/registro` conserva controlador. Cuatro vistas compartidas: Resumen/Operaciones/Eventos/Integridad. Consulta autenticada depurada, muestra reciente, límites, timeout SQL y cola muestreada. Resultado/parcialidad honestos, hash canónico V2 estable ante JSONB, legado parcial, outbox sin falsa durabilidad. Ver límites de C003 y alcance de pruebas C004.
+
+Siguiente paso atómico: conseguir lectura de comprobaciones/resultados del repositorio mediante la conexión existente; recuperar los resultados reales de #320, corregir fallos causales y solo después habilitar integración. No hace falta nueva aprobación de diseño. No se fuerza fusión con resultados desconocidos. La ruta existente de producción por Vercel CLI en `deploy-production.yml` se investigó: puede ser distinta de los previews de Git rechazados, pero no se ejecutó ni acredita despliegue. Después de compuertas aprobadas: integrar, comprobar revisión desplegada y probar acceso/diagnóstico en destino real.
 
 ### ⚗️ En prueba / recién fallido
 
-24/24 regresiones propias sintéticas aprobadas; tipado estricto de archivos seleccionados aprobado con TypeScript 5.9.3 y declaración local de auth (no prueba de integración de auth). Primer intento con compilador global incompatible: TS5102/baseUrl; corregido usando versión del repositorio. No pruebas productivas ni clon completo: conexión GitHub no comparte credencial con terminal.
+24/24 regresiones propias aprobadas con DB simulada; 6/6 sondas de la ruta real de consulta aprobadas con auth simulado y pool simulado. Tipado estricto seleccionado PASS, no repositorio completo. Playwright local: cuatro combinaciones móvil/escritorio y claro/oscuro más escenario alias/vacío/503 aprobados; controlador/componente/CSS de producto con API sintética, no shell completo ni sesión productiva. Evidencia `evidencias/PRUEBAS-C004.json`.
+
+Bloqueo duro: lectura de check-runs y statuses devuelve `403 Resource not accessible by personal access token`. Previews Vercel/Netlify rechazados por restricciones de plan para repo privado de organización; no se cambian privacidad ni plan. Consulta del proyecto Vercel también denegada en el ámbito probado. Escáner de secretos GitHub no disponible sin Advanced Security; no es resultado limpio. Incidencias y prevención en `evidencias/INCIDENCIAS-C004.json`. Sin fusión/despliegue comprobados.
 
 ### 🔔 Recordatorios Latentes
 
@@ -100,23 +104,23 @@ Siguiente paso atómico: revisión visual móvil/escritorio y pruebas de integra
 
 ## 9. Aceptación y viabilidad
 
-| Requisito | Resultado exigido | Evidencia requerida | Estado vigente C003 |
+| Requisito | Resultado exigido | Evidencia requerida | Estado vigente C004 |
 |---|---|---|---|
 | Objeto conforme al método | 13 bloques, originales, continuidad | manifiesto y lectura de vuelta | Paquete inicial persistido/verificado; actualización de recibo en curso |
-| Renombre | Auto-observación visible en menús/documentos pertinentes | navegación declarativa + pruebas browser | Implementado; revisión visual pendiente |
-| Compatibilidad | rutas/IDs anteriores siguen resolviendo | pruebas de aliases y consumidores | Pendiente |
+| Renombre | Auto-observación visible en menús/documentos pertinentes | navegación declarativa + pruebas browser | Implementado; revisión local móvil/escritorio aprobada, shell completo pendiente |
+| Compatibilidad | rutas/IDs anteriores siguen resolviendo | pruebas de aliases y consumidores | Alias de controlador e IDs conservados; harness local pasa; consumidores completos pendientes |
 | Diagnóstico | operación reconstruible y fallo localizado | caso sintético extremo a extremo, versión y correlación | Pendiente |
 | Resultado honesto | pendiente/parcial/fallo no se muestran como éxito confirmado | pruebas de estados y persistencia | Regresiones propias aprobadas |
-| Privacidad | secreto y dictado ficticios ausentes en exportaciones | prueba del payload realmente enviado | Proyección/entrada/redacción probadas; API integrada pendiente |
+| Privacidad | secreto y dictado ficticios ausentes en exportaciones | prueba del payload realmente enviado | Proyección/entrada/redacción probadas; seis sondas de ruta con auth/DB simulados, no integración real |
 | Integridad | alteraciones/pérdidas detectables en alcance definido | prueba negativa y verificador | V2 y enlaces comprobados sintéticamente; legado parcial explícito |
 | Resiliencia | fallos del registro visibles, sin falsa durabilidad | interrupción controlada y recuperación | Fallo doble, outbox, duplicado y agotamiento probados con DB simulada |
-| Calidad de interfaz | compartida, accesible, móvil/escritorio | harness, teclado, contraste, vacíos/carga/error, Playwright, revisión humana | Pendiente |
+| Calidad de interfaz | compartida, accesible, móvil/escritorio | harness, teclado, contraste, vacíos/carga/error, Playwright, revisión humana | Revisión del asistente y cinco escenarios locales PASS; sin certificación de accesibilidad ni shell completo |
 | Desarrollo de calidad | incidente lleva a prueba de regresión | bug sintético que falla antes/pasa después | Pendiente |
-| Seguridad defensiva | ejercicios aislados y repetibles | datos/credenciales sintéticos + control y recuperación | Pendiente |
+| Seguridad defensiva | ejercicios aislados y repetibles | datos/credenciales sintéticos + control y recuperación | Regresiones sintéticas de acceso/secretos/origen/entrada/tamper/outbox; pruebas productivas y concurrencia real pendientes |
 | Cierre | código, contratos, objeto y pruebas concordantes | revisión exacta, integración y despliegue autorizados verificados | Pendiente |
 
 Viabilidad: el repositorio ofrece mecanismos reutilizables; una evolución incremental es plausible, no una capacidad certificada. No hay métricas productivas ni costes medidos. No se rebaja el objetivo a una pantalla o documento.
-Pronóstico actualizado: el siguiente hito son compuertas completas en GitHub y revisión visual; sin estimar duración de runners o despliegue que aún no se ejecutan. La autorización de diseño/rol ya no bloquea. No sustituir pruebas de repositorio completo por el tipado de una instantánea selectiva.
+Pronóstico actualizado: construcción del corte y verificación local agotadas; siguiente hito es lectura de compuertas reales. No se puede pronosticar cierre de integración mientras la conexión devuelve 403; no hay ciclos pendientes de decisión de diseño. No sustituir el repositorio completo por tipado seleccionado, ni auth real/PostgreSQL por stubs, ni preview por despliegue de producción.
 
 ## 10. Formato de ciclo
 
@@ -184,7 +188,7 @@ Integridad: verificar el encadenamiento existente antes de añadir otro; contado
 
 ### A2. Navegación e interfaz
 
-Propuesta: **Sistema → Auto-observación** sustituye la etiqueta Registro. Ruta propuesta `/sistema/auto-observacion`; `/sistema/registro` permanece como alias compatible. Mantener identificadores técnicos y herramientas existentes donde cambiarlos rompa contratos. Actualizar registro declarativo, documentación, escenarios y pruebas conjuntamente. No añadir botón primario redundante.
+Implementado en rama: **Sistema → Auto-observación** sustituye la etiqueta Registro. Ruta `/sistema/auto-observacion`; `/sistema/registro` permanece como alias compatible. Mantener identificadores técnicos y herramientas existentes donde cambiarlos rompa contratos. Actualizar registro declarativo, documentación, escenarios y pruebas conjuntamente. No añadir botón primario redundante.
 
 Cuatro vistas internas, no cuatro módulos sueltos:
 - **Resumen:** salud observada, frescura, versión, operaciones pendientes y fallos accionables; «sin datos» y «desactualizado» nunca verdes.
@@ -224,3 +228,13 @@ Limitaciones: misma DB para evento/outbox; no hay durabilidad independiente bajo
 
 ### C003 · Incidencia de persistencia
 Primer push integral rechazado por GitHub al crear árbol: `403 Resource not accessible by personal access token`. No commit devuelto; no se afirma persistencia. El paquete incluía modificación de workflow: se elimina esa modificación y se inserta el recorrido en shell-v2.spec.ts, que ya ejecuta el pipeline vigente. Hipótesis de restricción de workflow, no certeza sobre alcance de credencial. Reintento con payload reducido, sin cambios de permisos.
+
+## Crónica C004 · Revisión, pruebas y bloqueo externo
+
+El reintento de C003 sin modificación del workflow sí produjo commit `1aea5562c124bd059b2edb48ab0670abf089cd5a`; #320 quedó abierto en borrador. El rechazo anterior no probaba incapacidad general de escritura. C004 modifica solo clasificación de privacidad de entrada y contraste de etiquetas, con repetición de regresiones y revisión visual. Autorización concreta U005 mantenida; no preguntas de diseño, no segundo agente. No se modifican workflows ni se añaden dependencias al repositorio.
+
+Evidencia: `evidencias/PRUEBAS-C004.json` separa 24 regresiones permanentes del código, seis sondas locales de ruta, cinco escenarios browser y tipado seleccionado. Capturas se revisaron en sandbox; sus hashes identifican archivos de sesión, no adjuntos permanentes en Git. Diagnóstico de fallos no revela mensaje/detalle libre. Regresión de procedencia ahora exige que USER_DATA siga siendo USER_DATA; navegador no se declara anónimo por defecto.
+
+Bloqueos: conexión no lee checks/statuses; `mergeable_state:unstable` no identifica causas ni acredita aprobación. Vercel/Netlify comentan rechazo de previews privados de organización. La inspección de `deploy-production.yml` encuentra despliegue CLI prebuilt con secretos existentes al empujar main: no confundir restricciones de previews con imposibilidad de esa ruta, ni afirmar que se ejecutó. Sin acceso autorizado verificable a resultados no se activa auto-merge. Escáner remoto de secretos indisponible, sin comprar ni habilitar servicio. Condiciones exactas en incidencias.
+
+No tocado: privacidad del repositorio, credenciales, planes, proveedores, datos reales, retención destructiva, custodia, Entorno Persistente y equipos del operador. Sigue pendiente integración completa y comprobación productiva; este corte no se anuncia como mejor sistema mundial ni como cobertura total. La ambición del anexo A conserva sus pendientes explícitos.

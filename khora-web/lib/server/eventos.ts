@@ -472,7 +472,7 @@ export async function registrarEventosBatch(
     }
 
     if (source === "browser_reported") params = { ...params, component: "browser",
-      detalle: { ...(params.detalle || {}), observation_source: "browser_reported" }, privacyClass: "ANONYMIZED_TELEMETRY" };
+      detalle: { ...(params.detalle || {}), observation_source: "browser_reported" } };
     params = { ...params, outcome: params.outcome || inferredOutcome(params.estado),
       detalle: redact(params.detalle) as Record<string, unknown> | null,
       metrics: redact(params.metrics) as Record<string, unknown> | null,

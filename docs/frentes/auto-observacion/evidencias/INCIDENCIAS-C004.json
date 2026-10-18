@@ -1,0 +1,55 @@
+{
+  "cycle": "C004",
+  "local": [
+    {
+      "symptom": "TS5102 Option baseUrl has been removed",
+      "cause": "global compiler newer than repository",
+      "correction": "use TypeScript 5.9.3 from isolated tools",
+      "verification": "selected typecheck PASS",
+      "prevention": "pin compiler to package.json"
+    },
+    {
+      "symptom": "browserType.launch: Failed to launch chromium because executable doesn't exist at /usr/bin/chromium",
+      "cause": "assumed executable path",
+      "correction": "resolve installed executable with command -v / shutil.which",
+      "verification": "Four visual theme/viewport scenarios and legacy/empty/error scenario PASS after correcting executable path",
+      "prevention": "resolve executable instead of fixed OS path"
+    },
+    {
+      "symptom": "cat: /data/khora-work/khora-web/tsconfig.json: No such file or directory",
+      "cause": "selective repository snapshot does not contain full tsconfig",
+      "correction": "use explicit selected-file tsconfig with paths; no full-repo claim",
+      "verification": "selected strict typecheck PASS",
+      "prevention": "check snapshot manifest and exact file existence before reading"
+    }
+  ],
+  "external": [
+    {
+      "operation": "read GitHub PR check runs and statuses",
+      "symptom": "403 Resource not accessible by personal access token",
+      "state": "blocked; no conclusion about check success",
+      "next": "provide connection able to read checks/statuses; then inspect actual results and repair failures before merge"
+    },
+    {
+      "operation": "Git deployment previews",
+      "symptom": "Vercel Hobby and Netlify free private organization repository restriction",
+      "sources": [
+        "https://github.com/SeryMente/khora/pull/320#issuecomment-6252250960",
+        "https://github.com/SeryMente/khora/pull/320#issuecomment-6252251138"
+      ],
+      "state": "previews rejected, not proof all deployment routes blocked",
+      "existing_route": ".github/workflows/deploy-production.yml uses stored secrets and Vercel CLI prebuilt on push main; source read, not executed or verified here"
+    },
+    {
+      "operation": "Vercel project read",
+      "symptom": "403 unauthorized scope",
+      "scope": "victorhugotorresmendez-8991s-projects",
+      "state": "no deployment verified with this connection; local Vercel CLI and CLI auth file not found at inspected standard path; not proof absence of all accounts"
+    },
+    {
+      "operation": "GitHub secret scanning",
+      "symptom": "Repository does not have GitHub Advanced Security enabled.",
+      "state": "scanner unavailable; no claim clean; no paid feature enabled"
+    }
+  ]
+}
