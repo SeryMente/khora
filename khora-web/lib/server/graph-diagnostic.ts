@@ -6,8 +6,8 @@ export async function graphProviderDiagnostic(){
  try{
   const r=await fetch("https://api.groq.com/openai/v1/models",{headers:{Authorization:`Bearer ${key}`},cache:"no-store",signal:AbortSignal.timeout(10000)});
   if(!r.ok)return {configured:true,model,http_status:r.status,status:"graph_provider_http_"+r.status};
-  const body=await r.json();const available=Array.isArray(body.data)&&body.data.some((m:{id?:unknown})=>m.id===model);
-  return {configured:true,model,http_status:r.status,model_available:available,status:available?"provider_model_available":"graph_provider_model_unavailable"};
+  const body=await r.json();const available_models=Array.isArray(body.data)?body.data.filter((m:{id?:unknown;active?:boolean})=>typeof m.id==="string"&&m.active!==false&&/^[a-zA-Z0-9_./:-]{1,150}$/.test(m.id)).map((m:{id:string})=>m.id).slice(0,100):[];const available=available_models.includes(model);
+  return {configured:true,model,http_status:r.status,model_available:available,available_models,status:available?"provider_model_available":"graph_provider_model_unavailable"};
  }catch(e){return {configured:true,model,status:e instanceof Error&&/timeout|abort/i.test(e.name)?"graph_provider_diagnostic_timeout":"graph_provider_diagnostic_failed"};}
 }
 export function graphSafeFailure(e:unknown){
