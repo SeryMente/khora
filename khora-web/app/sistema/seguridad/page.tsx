@@ -5,20 +5,22 @@ import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Container, KeyRound, LockKeyhole, ShieldCheck } from "lucide-react";
 import EntornoPersistentePanel from "@/app/components/ep/EntornoPersistentePanel";
+import { PortableVaultView } from "@/app/components/shared/PortableVaultView";
 import PaginaBoveda from "@/app/components/os/PaginaBoveda";
 import PaginaMcpRevocacion from "@/app/sistema/mcp/page";
 
-type SecurityTab = "seguridad" | "entorno-persistente" | "boveda" | "mcp";
+type SecurityTab = "seguridad" | "entorno-persistente" | "boveda" | "boveda-portable" | "mcp";
 
 const TABS: Array<{ id: SecurityTab; label: string; icon: typeof ShieldCheck }> = [
   { id: "seguridad", label: "Seguridad", icon: ShieldCheck },
   { id: "entorno-persistente", label: "Entorno Persistente", icon: Container },
   { id: "boveda", label: "Bóveda", icon: LockKeyhole },
+  { id: "boveda-portable", label: "Bóveda portable", icon: LockKeyhole },
   { id: "mcp", label: "Control MCP", icon: KeyRound },
 ];
 
 function parseTab(value: string | null): SecurityTab {
-  return value === "entorno-persistente" || value === "boveda" || value === "mcp" ? value : "seguridad";
+  return value === "entorno-persistente" || value === "boveda" || value === "boveda-portable" || value === "mcp" ? value : "seguridad";
 }
 
 function SeguridadOverview({ onOpen }: { onOpen: (tab: Exclude<SecurityTab, "seguridad">) => void }) {
@@ -29,7 +31,7 @@ function SeguridadOverview({ onOpen }: { onOpen: (tab: Exclude<SecurityTab, "seg
       <h1 className="text-2xl font-bold uppercase tracking-[0.18em]">Seguridad</h1>
       <p className="mx-auto max-w-2xl text-sm leading-relaxed opacity-70">Controles de acceso, custodia y entornos aislados. Cada responsabilidad vive en un submódulo explícito.</p>
     </header>
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-4 md:grid-cols-2">
       <button type="button" onClick={() => onOpen("entorno-persistente")} className="min-h-52 rounded-xl border p-6 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--khora-accent)]" style={{ ...border, background: "var(--khora-surface)" }}>
         <span aria-hidden="true" className="flex h-11 w-11 items-center justify-center rounded-lg border" style={border}><Container size={23} /></span>
         <p className="mt-5 text-[10px] font-bold uppercase tracking-[0.2em] opacity-50">Submódulo</p>
@@ -41,6 +43,12 @@ function SeguridadOverview({ onOpen }: { onOpen: (tab: Exclude<SecurityTab, "seg
         <p className="mt-5 text-[10px] font-bold uppercase tracking-[0.2em] opacity-50">Submódulo</p>
         <h2 className="mt-1 text-lg font-bold">Bóveda</h2>
         <p className="mt-2 text-sm leading-relaxed opacity-70">Apertura temporal y custodia de grabaciones, registros de Custodia y secretos operativos.</p>
+      </button>
+      <button type="button" onClick={() => onOpen("boveda-portable")} className="min-h-52 rounded-xl border p-6 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--khora-accent)]" style={{ ...border, background: "var(--khora-surface)" }}>
+        <span aria-hidden="true" className="flex h-11 w-11 items-center justify-center rounded-lg border" style={border}><LockKeyhole size={23} /></span>
+        <p className="mt-5 text-sm font-bold">Preparación pendiente</p>
+        <h2 className="mt-1 text-lg font-bold">Bóveda portable</h2>
+        <p className="mt-2 text-sm leading-relaxed">Copia cifrada local y autorización por apertura con Ente Auth. Protección nueva aún no activa.</p>
       </button>
       <button type="button" onClick={() => onOpen("mcp")} className="min-h-52 rounded-xl border p-6 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--khora-accent)]" style={{ ...border, background: "var(--khora-surface)" }}>
         <span aria-hidden="true" className="flex h-11 w-11 items-center justify-center rounded-lg border" style={border}><KeyRound size={23} /></span>
@@ -58,6 +66,16 @@ function SeguridadContent() {
   const [activeTab, setActiveTab] = useState<SecurityTab>("seguridad");
 
   useEffect(() => { setActiveTab(parseTab(searchParams?.get("tab") || null)); }, [searchParams]);
+
+  useEffect(() => {
+    // Keep the selected tab discoverable on narrow screens without scrolling the page.
+    const selected = document.getElementById("security-tab-" + activeTab);
+    const list = selected?.parentElement;
+    if (selected && list && list.scrollWidth > list.clientWidth) {
+      const left = selected.offsetLeft - list.offsetLeft;
+      list.scrollLeft = Math.max(0, left - (list.clientWidth - selected.offsetWidth) / 2);
+    }
+  }, [activeTab]);
 
   function openTab(tab: SecurityTab) {
     setActiveTab(tab);
@@ -120,6 +138,7 @@ function SeguridadContent() {
             {tab.id === "seguridad" && <SeguridadOverview onOpen={openTab} />}
             {tab.id === "entorno-persistente" && <EntornoPersistentePanel />}
             {tab.id === "boveda" && <PaginaBoveda />}
+            {tab.id === "boveda-portable" && <PortableVaultView />}
             {tab.id === "mcp" && <PaginaMcpRevocacion />}
           </>
         )}

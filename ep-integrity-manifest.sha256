@@ -268,7 +268,7 @@ fbf49b077ef1b61bb1ac6ac0dae9db69a3b3188af5cfbfe44b4eab90947c8573  ./khora-web/ap
 f9f4bd365fbb02670133b12299e13b574f03fba5b1829f98fc57f0f00c74e50b  ./khora-web/app/sistema/ingreso/page.tsx
 c691aa67b84479b10959d1f8d2c0e4ea83bd3b6b6e44089c3415d128c788acad  ./khora-web/app/sistema/mcp/page.tsx
 3906189ec05066ad618e3c4b586150e2673403cc6a8a1e2527c9f79755f68a16  ./khora-web/app/sistema/registro/page.tsx
-03551ad35e722367d843a11903f34b98cb1f2f2b3a2346fdba37a2949ced6c82  ./khora-web/app/sistema/seguridad/page.tsx
+2ed40af5dbc5905b08ba47a827019ef3d9a89948e1777a74470f88f3bfcb371a  ./khora-web/app/sistema/seguridad/page.tsx
 880a72913308e06e32f5d9029d1778c6e59ef0feecb2a5171ed2762c4a9de0df  ./khora-web/app/sistema/volcados/page.tsx
 c626d5e9f114a59f5bc44af2f77d0f12ba445d41303df901e8e04b6a9b6a76a0  ./khora-web/auth.ts
 64a83afd8a4e57ec223b05c3d25067615abefa17904edb334821d9c0b49d7806  ./khora-web/db/migrations/001_jules_schema.sql

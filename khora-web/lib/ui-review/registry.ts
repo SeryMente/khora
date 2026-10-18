@@ -2,6 +2,20 @@
 import { ScenarioDefinition, ScreenId } from "./types";
 
 export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
+  "boveda-portable:pending": {
+    screen: "boveda-portable", scenario: "pending",
+    title: "Bóveda portable · Preparación pendiente",
+    description: "Vista compartida sin secretos ni operaciones de autorización; acciones bloqueadas.",
+    status: "active", recommended_viewport: "desktop",
+    ui_ids: ["portable-vault.container", "portable-vault.status", "portable-vault.notice", "portable-vault.enrollment", "portable-vault.enroll", "portable-vault.download-panel", "portable-vault.download", "portable-vault.flow", "portable-vault.limits"],
+  },
+  "boveda-portable:unavailable": {
+    screen: "boveda-portable", scenario: "unavailable",
+    title: "Bóveda portable · Servicio no disponible",
+    description: "Vista compartida sin secretos ni operaciones de autorización; acciones bloqueadas.",
+    status: "active", recommended_viewport: "desktop",
+    ui_ids: ["portable-vault.container", "portable-vault.status", "portable-vault.notice", "portable-vault.enrollment", "portable-vault.enroll", "portable-vault.download-panel", "portable-vault.download", "portable-vault.flow", "portable-vault.limits"],
+  },
   // 1. Ingreso
   "ingreso:idle": {
     screen: "ingreso",
@@ -771,7 +785,8 @@ export const SCREENS: ScreenId[] = [
   "registro",
   "grafo",
   "consulta",
-  "kpi"
+  "kpi",
+  "boveda-portable"
 ];
 
 export function getScenario(screen: ScreenId, scenarioName: string): ScenarioDefinition | null {

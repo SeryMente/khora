@@ -1,0 +1,121 @@
+{
+  "scope": "isolated real changed UI source; Next navigation and unchanged modules mocked only in preview; not production acceptance",
+  "checks": [
+    {
+      "width": 1440,
+      "theme": "dark",
+      "checks": [
+        "deep-link",
+        "disabled-actions",
+        "no-inputs",
+        "no-page-overflow",
+        "active-tab-discoverable",
+        "keyboard-details",
+        "home",
+        "overview-card",
+        "arrows",
+        "invalid-tab-fallback"
+      ],
+      "result": "passed"
+    },
+    {
+      "width": 1440,
+      "theme": "light",
+      "checks": [
+        "deep-link",
+        "disabled-actions",
+        "no-inputs",
+        "no-page-overflow",
+        "active-tab-discoverable",
+        "keyboard-details",
+        "home",
+        "overview-card",
+        "arrows",
+        "invalid-tab-fallback"
+      ],
+      "result": "passed"
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "checks": [
+        "deep-link",
+        "disabled-actions",
+        "no-inputs",
+        "no-page-overflow",
+        "active-tab-discoverable",
+        "keyboard-details",
+        "home",
+        "overview-card",
+        "arrows",
+        "invalid-tab-fallback"
+      ],
+      "result": "passed"
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "checks": [
+        "deep-link",
+        "disabled-actions",
+        "no-inputs",
+        "no-page-overflow",
+        "active-tab-discoverable",
+        "keyboard-details",
+        "home",
+        "overview-card",
+        "arrows",
+        "invalid-tab-fallback"
+      ],
+      "result": "passed"
+    },
+    {
+      "width": 1440,
+      "state": "unavailable",
+      "result": "passed"
+    },
+    {
+      "width": 390,
+      "state": "unavailable",
+      "result": "passed"
+    }
+  ],
+  "errors": [],
+  "externalRequests": [],
+  "backendVerified": false,
+  "objectVersion": "KHORA-LLAVERO-v0.5",
+  "baseCommit": "4dca2133866421105f077bbd7079576c588d1169",
+  "targetedTypecheck": "passed; source scope and explicit mocks documented in README",
+  "targetedUnitTests": {
+    "passed": 4,
+    "failed": 0
+  },
+  "visualInspection": {
+    "desktopDark": "passed: hierarchy, spacing and cards aligned, no overlaps",
+    "mobileLight": "passed: stacked cards, active tab discoverable, no page overflow",
+    "unavailableMobileDark": "passed: refusal readable, closed actions, no overlap"
+  },
+  "screenshots": {
+    "boveda-portable-desktop.png": {
+      "sha256": "a12f12236babc509f01f5e7dc370705eebef4772ef333b0e8e6365a2d126305f",
+      "delivery": "chat attachment, not binary in Git"
+    },
+    "boveda-portable-mobile.png": {
+      "sha256": "1cd6c06bf4b09c66fd560f8d88011ca1beaa398ad1c6cdd1f16a0191532d8b6e",
+      "delivery": "chat attachment, not binary in Git"
+    },
+    "boveda-portable-unavailable.png": {
+      "sha256": "85b599ea269deb0dfa2fc2966fcbd8705f8123070ca7e0355192d962f7c9e2b4",
+      "delivery": "chat attachment, not binary in Git"
+    }
+  },
+  "notVerified": [
+    "full repository typecheck",
+    "full navigation/UI-review/unit/E2E gates",
+    "Next production build",
+    "Vercel deployment",
+    "Ente registration",
+    "real encrypted client",
+    "real recovery"
+  ]
+}

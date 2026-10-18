@@ -19,6 +19,7 @@ import { PipelineView } from "@/app/components/shared/PipelineView";
 import { RegistroView } from "@/app/components/shared/RegistroView";
 import { GrafoView } from "@/app/components/shared/GrafoView";
 import { ConsultaView } from "@/app/components/shared/ConsultaView";
+import { PortableVaultView } from "@/app/components/shared/PortableVaultView";
 import { KpiPanelView } from "@/app/components/shared/KpiPanelView";
 import * as Icons from "lucide-react";
 
@@ -310,6 +311,8 @@ function RenderCurrentScreen({
   fetchError: string | null;
 }) {
   switch (screen) {
+    case "boveda-portable":
+      return <div className="p-4 md:p-8"><PortableVaultView state={scenario === "unavailable" ? "unavailable" : "pending"} /></div>;
     case "ingreso":
       return (
         <IngresoView isReviewMode state={buildIngresoState(scenario, fetchError)} />

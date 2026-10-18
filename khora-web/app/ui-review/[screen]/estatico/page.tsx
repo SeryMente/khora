@@ -16,6 +16,7 @@ import { PipelineView } from "@/app/components/shared/PipelineView";
 import { RegistroView } from "@/app/components/shared/RegistroView";
 import { GrafoView } from "@/app/components/shared/GrafoView";
 import { ConsultaView } from "@/app/components/shared/ConsultaView";
+import { PortableVaultView } from "@/app/components/shared/PortableVaultView";
 import { KpiPanelView } from "@/app/components/shared/KpiPanelView";
 
 export const dynamic = "force-static";
@@ -28,6 +29,8 @@ export function generateStaticParams() {
 
 function renderScenario(screen: ScreenId, scenario: string) {
   switch (screen) {
+    case "boveda-portable":
+      return <div style={{ padding: "1.5rem" }}><PortableVaultView state={scenario === "unavailable" ? "unavailable" : "pending"} /></div>;
     case "ingreso":
       return <IngresoView isReviewMode state={buildIngresoState(scenario)} />;
     case "archivo":

@@ -15,6 +15,7 @@ const COMPONENTES_OBLIGATORIOS = [
   "GrafoView.tsx",
   "ConsultaView.tsx",
   "KpiPanelView.tsx",
+  "PortableVaultView.tsx",
 ];
 
 function uiIdsDeComponentes(): Set<string> {

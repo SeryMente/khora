@@ -9,8 +9,8 @@ import path from "path";
 
 test("UI Review Harness Test Suite", async (t) => {
   await t.test("1. Registro de pantallas y escenarios completo y no vacío", () => {
-    assert.strictEqual(SCREENS.length, 9);
-    assert.deepStrictEqual(SCREENS, ["ingreso", "archivo", "revision", "aprobacion", "ingesta", "registro", "grafo", "consulta", "kpi"]);
+    assert.strictEqual(SCREENS.length, 10);
+    assert.deepStrictEqual(SCREENS, ["ingreso", "archivo", "revision", "aprobacion", "ingesta", "registro", "grafo", "consulta", "kpi", "boveda-portable"]);
 
     for (const screen of SCREENS) {
       const scenarios = getAllScenariosForScreen(screen);
@@ -77,7 +77,7 @@ test("UI Review Harness Test Suite", async (t) => {
     const sharedDir = path.join(process.cwd(), "app", "components", "shared");
     assert.ok(fs.existsSync(sharedDir), "Debe existir app/components/shared");
 
-    const requiredComponents = ["IngresoView.tsx", "PipelineView.tsx", "RegistroView.tsx", "GrafoView.tsx", "ConsultaView.tsx", "KpiPanelView.tsx"];
+    const requiredComponents = ["IngresoView.tsx", "PipelineView.tsx", "RegistroView.tsx", "GrafoView.tsx", "ConsultaView.tsx", "KpiPanelView.tsx", "PortableVaultView.tsx"];
     for (const comp of requiredComponents) {
       const filePath = path.join(sharedDir, comp);
       assert.ok(fs.existsSync(filePath), "Falta " + comp);
@@ -91,13 +91,14 @@ test("UI Review Harness Test Suite", async (t) => {
       ["Grafo", "app/grafo/page.tsx", "GrafoView"],
       ["Consulta", "app/sistema/consulta/page.tsx", "ConsultaView"],
       ["KPIs", "app/sistema/kpis/page.tsx", "KpiPanelView"],
+      ["Bóveda portable", "app/sistema/seguridad/page.tsx", "PortableVaultView"],
     ] as const) {
       const content = fs.readFileSync(path.join(process.cwd(), file), "utf8");
       assert.ok(content.includes(symbol), label + " debe consumir " + symbol);
     }
   });
 
-  await t.test("5. Prerender semántico existe para las nueve pantallas", () => {
+  await t.test("5. Prerender semántico existe para las diez pantallas", () => {
     const staticPage = path.join(process.cwd(), "app", "ui-review", "[screen]", "estatico", "page.tsx");
     assert.ok(fs.existsSync(staticPage), "Falta app/ui-review/[screen]/estatico/page.tsx");
     const content = fs.readFileSync(staticPage, "utf8");

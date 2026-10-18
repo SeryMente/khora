@@ -21,7 +21,8 @@ export type ScreenId =
   | "registro"
   | "grafo"
   | "consulta"
-  | "kpi";
+  | "kpi"
+  | "boveda-portable";
 
 export type ScenarioStatus = "active" | "absent";
 

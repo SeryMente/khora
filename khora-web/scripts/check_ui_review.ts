@@ -41,6 +41,7 @@ async function main() {
     "GrafoView.tsx",
     "ConsultaView.tsx",
     "KpiPanelView.tsx",
+  "PortableVaultView.tsx",
   ];
 
   for (const component of requiredSharedComponents) {

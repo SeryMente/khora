@@ -97,6 +97,7 @@ export const NAVIGATION_REGISTRY: readonly NavigationEntry[] = [
       { id: "security-main", label: "Seguridad", href: "/sistema/seguridad", icon: "ShieldCheck", group: "Seguridad" },
       { id: "entorno-persistente", label: "Entorno Persistente", href: "/sistema/seguridad?tab=entorno-persistente", icon: "Container", group: "Seguridad" },
       { id: "boveda", label: "Bóveda", href: "/sistema/seguridad?tab=boveda", icon: "LockKeyhole", group: "Seguridad" },
+      { id: "boveda-portable", label: "Bóveda portable", href: "/sistema/seguridad?tab=boveda-portable", icon: "LockKeyhole", group: "Seguridad" },
       { id: "control-mcp", label: "Control MCP", href: "/sistema/seguridad?tab=mcp", icon: "KeyRound", group: "Seguridad" },
     ],
   },
