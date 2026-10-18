@@ -1,0 +1,19 @@
+{
+  "version": "0.2.0",
+  "sha256": "5813e18003762319dcd7ce50aa49fdc0acae406ba6e71c78bd48a5abf8f02b33",
+  "bytes": 15998,
+  "files": {
+    "core.mjs": "a0f4f3cb4d941e95848fc8943570a2f333ebce5a2aef8a75365b66b4fa33ea5d",
+    "bridge.mjs": "43cc86baac8b262c2ae5122529ea5d5f9ae87380b48b37b7936d903ba042d821",
+    "client.mjs": "558c50567bfe2a9772c044d4cebf48cdfded2b95e423ef006b33b0bd5d494733",
+    "native-open.mjs": "c77d03f2be62b8627814eebcd2e1705643dc6e4fc301d63655c110dbfdf98210",
+    "cli.mjs": "f08d9b96ffce8d886122b951ad3e809f3f6c2924024722089ce553d1ac17430e",
+    "package.json": "e8be71dbfdeec21fc1982cb2ec4e8aafd14d5c46fcf60d79efa2145a6cf5bca5",
+    "package-lock.json": "7cc78589a8eb360f011c2509b0ff7480e9e1cf33202d40403d40fd5266d2d2cd",
+    "LEER-PRIMERO.txt": "a7002bc06ce4b60e1c9d50ecad69531602d3af9976887a83a80bd4102bf12a6c",
+    "iniciar.cmd": "bb4e8bf7ebe4f76d7ec9dbb3a148e6bdf7390ca8f3583a16233f9a5172da8757"
+  },
+  "signedInstaller": false,
+  "requiresNode": ">=22",
+  "realWindowsRun": false
+}

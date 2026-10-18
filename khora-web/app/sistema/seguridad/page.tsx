@@ -138,7 +138,7 @@ function SeguridadContent() {
             {tab.id === "seguridad" && <SeguridadOverview onOpen={openTab} />}
             {tab.id === "entorno-persistente" && <EntornoPersistentePanel />}
             {tab.id === "boveda" && <PaginaBoveda />}
-            {tab.id === "boveda-portable" && <PortableVaultView />}
+            {tab.id === "boveda-portable" && <><PortableVaultView /><a href="/sistema/seguridad/boveda-portable" className="mt-5 block underline">Continuar con sesión de Khora y Ente Auth · cliente de revisión</a></>}
             {tab.id === "mcp" && <PaginaMcpRevocacion />}
           </>
         )}

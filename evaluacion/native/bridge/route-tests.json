@@ -1,0 +1,25 @@
+{
+  "scope": "BUNDLED_NATIVE_NEXT_ROUTES_EXPLICIT_AUTH_FIXTURE",
+  "result": "PASSED",
+  "passed": 14,
+  "checks": [
+    "browser_route_closed_by_default",
+    "native_route_closed_by_default",
+    "download_closed_by_default",
+    "closed_routes_do_not_look_up_auth",
+    "native_get_not_supported",
+    "missing_runtime_policy_stays_closed",
+    "download_requires_session",
+    "download_invalid_expiry_denied",
+    "download_expired_session_denied",
+    "download_other_account_denied",
+    "authorized_download_is_zip",
+    "zip_not_cached",
+    "zip_integrity_header_exact",
+    "zip_manifest_matches_download"
+  ],
+  "fullNextSiteBuild": false,
+  "realOIDC": false,
+  "realHostedDB": false,
+  "secretsExported": false
+}

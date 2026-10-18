@@ -2,6 +2,7 @@
 import pg from 'pg';
 import {PgStore,VaultService,VaultError} from './core.mjs';
 import {createHandler} from './http.mjs';
+import {createOpeningHandler} from './bridge.mjs';
 export function postgresConfig(raw){
  let url;try{url=new URL(raw);}catch{throw new VaultError('database_not_configured',503);}
  if(!['postgres:','postgresql:'].includes(url.protocol)||!url.hostname||url.hostname==='localhost'||url.hostname==='base')throw new VaultError('database_not_configured',503);
@@ -20,5 +21,6 @@ export function candidateRuntime({authenticate,env=process.env}){
  const handler=createHandler({service,origin:env.PORTABLE_VAULT_ORIGIN,enabled:env.PORTABLE_VAULT_ENABLED==='reviewed',authenticate:async req=>{
   const p=await authenticate(req);return p?.subject===allowed?p:null;
  }});
- return {handler,initializeSchema:()=>store.initialize(),close:async()=>{await pool.end();key.fill(0);}};
+ const openingHandler=createOpeningHandler({service,origin:env.PORTABLE_VAULT_ORIGIN,enabled:env.PORTABLE_VAULT_ENABLED==='reviewed'});
+ return {handler,openingHandler,initializeSchema:()=>store.initialize(),close:async()=>{await pool.end();key.fill(0);}};
 }

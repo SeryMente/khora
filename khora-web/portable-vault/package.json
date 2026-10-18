@@ -1,14 +1,16 @@
 {
   "name": "@khora/portable-vault-candidate",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "engines": {
     "node": ">=22"
   },
   "scripts": {
-    "test": "node test.mjs",
-    "check": "node --check core.mjs && node --check http.mjs && node --check client.mjs && node --check test.mjs && node --check postgres.mjs && node --check session.mjs && node --check migrate.mjs"
+    "test": "node test.mjs && node bridge-test.mjs",
+    "check": "node --check core.mjs && node --check http.mjs && node --check client.mjs && node --check test.mjs && node --check postgres.mjs && node --check session.mjs && node --check migrate.mjs && node --check bridge.mjs && node --check native-open.mjs && node --check cli.mjs && node --check bridge-test.mjs && node --check browser-test.mjs && node --check route-test.cjs",
+    "test:browser": "node browser-test.mjs",
+    "test:routes": "node route-test.cjs"
   },
   "dependencies": {
     "age-encryption": "0.3.1",

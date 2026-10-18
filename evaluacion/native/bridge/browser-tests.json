@@ -1,0 +1,21 @@
+{
+  "scope": "LOCAL_CHROMIUM_SYNTHETIC_IDENTITY_ONLY",
+  "result": "PASSED",
+  "passed": 8,
+  "checks": [
+    "closed_service_keeps_enrollment_disabled",
+    "closed_service_does_not_offer_download",
+    "enrollment_secret_masked_by_default",
+    "setup_secret_removed_after_confirmation",
+    "download_control_points_to_authenticated_route",
+    "browser_form_to_native_loopback_and_atomic_release",
+    "second_native_opening_revisits_form_and_new_code",
+    "no_browser_runtime_errors"
+  ],
+  "browser": "Chromium sandbox-local",
+  "realKhoraOIDC": false,
+  "realEnteApp": false,
+  "realHostedPostgres": false,
+  "realWindows": false,
+  "realCorpus": false
+}
