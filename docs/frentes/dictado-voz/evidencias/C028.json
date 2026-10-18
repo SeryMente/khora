@@ -1,0 +1,29 @@
+{
+  "event": "C028",
+  "at": "2026-10-18T20:03:51.823811+00:00",
+  "deviceId": "d62c57f2-c34c-4075-8adf-29d3f2c81b56",
+  "identity": "PC-14\\PC 13",
+  "priorSessionExists": false,
+  "toolkit": {
+    "git": "2.56.0.windows.2",
+    "gh": "2.102.0",
+    "vercel": "64.5.0",
+    "exit": 0,
+    "globalInstall": false
+  },
+  "authorization": "GitHub device flow pending; Vercel authorized",
+  "sourceHead": "57c1a43a03c162c1040452b12fe3172819e71fae",
+  "globalGates": "pending",
+  "newMerge": false,
+  "newDeployment": false,
+  "localServer": false,
+  "physicalAcceptance": false,
+  "vercel": {
+    "identity": "victorhugotorresmendez-8991",
+    "project": "khora-web",
+    "id": "prj_hRN86BKITXYKTnNlp0ygVhaMwFfx",
+    "root": "khora-web",
+    "node": "24.x",
+    "projectInspectExit": 0
+  }
+}
