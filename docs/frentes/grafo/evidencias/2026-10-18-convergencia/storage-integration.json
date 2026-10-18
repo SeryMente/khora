@@ -1,0 +1,24 @@
+{
+  "result": "PASS",
+  "checks": [
+    "migration-guard",
+    "idempotent-migration",
+    "legacy-ciphertext-preserved",
+    "paired-projection",
+    "manifest-readback",
+    "human-signature",
+    "request-idempotence",
+    "request-conflict",
+    "owner-isolation",
+    "append-only-history",
+    "revision-conflict",
+    "ledger-staleness",
+    "reject-survives-regeneration"
+  ],
+  "limitations": [
+    "synthetic-corpus",
+    "single-connection-lock-adapter",
+    "no-production-credentials",
+    "no-semantic-accreditation"
+  ]
+}

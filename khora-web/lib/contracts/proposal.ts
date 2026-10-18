@@ -31,7 +31,7 @@ export interface ProposalTriple {
 
 export interface ProposalItem {
   id: string;
-  kind: "entity" | "relation";
+  kind: "entity" | "literal" | "relation";
   label: string;
   anchor: Anchor;
   candidates: ResolutionCandidate[];
@@ -181,8 +181,8 @@ export function validateProposalEnvelope(raw: unknown): { valid: boolean; errors
       if (typeof item.id !== "string" || !/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(item.id)) {
         errors.push(`items[${idx}].id debe ser un UUID válido.`);
       }
-      if (item.kind !== "entity" && item.kind !== "relation") {
-        errors.push(`items[${idx}].kind debe ser 'entity' o 'relation'.`);
+      if (item.kind !== "entity" && item.kind !== "literal" && item.kind !== "relation") {
+        errors.push(`items[${idx}].kind debe ser 'entity', 'literal' o 'relation'.`);
       }
       if (typeof item.label !== "string" || item.label.trim().length === 0) {
         errors.push(`items[${idx}].label es obligatorio.`);

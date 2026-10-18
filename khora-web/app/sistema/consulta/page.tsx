@@ -2,6 +2,7 @@
 "use client";
 
 import React, { useState } from "react";
+import {sufficientEvidence,graphAnswer} from "@/lib/query-sufficiency";
 import {
   ConsultaView,
   ConsultaViewState,
@@ -109,10 +110,10 @@ export default function ConsultaPage() {
         const assistantMsg: MensajeChatSession = {
           id: crypto.randomUUID(),
           rol: "assistant",
-          contenido: data.respuesta || (data.suficiencia ? "Respuesta procesada." : "Sin evidencia suficiente para responder."),
+          contenido: graphAnswer(data),
           origen: "grafo",
           fuentes: Array.isArray(data.evidencia) ? (data.evidencia as Evidencia[]) : [],
-          suficiencia: Boolean(data.suficiencia),
+          suficiencia: sufficientEvidence(data.suficiencia),
           no_anclada: Boolean(data.no_anclada),
           degradacion_declarada: data.degradacion_declarada || null,
         };

@@ -1,0 +1,111 @@
+{
+  "schema": "graph-repair-evidence-v1",
+  "base_commit": "b5e7009de137db30c26ecc5f4ddbb34789f453f2",
+  "branch": "fix/graph-occurrence-history-20261018",
+  "status": "CANDIDATE_NOT_E2E_ACCEPTED",
+  "methodology": {
+    "version": "1.5",
+    "seal": "METACANON-OBJETOS-v1.5",
+    "commit": "49ac40e9f6122e2d2fb339362cfa0a78128c8e37",
+    "blob": "32c7a65ff2e83b3b76752ba2160427bd6e851a8f"
+  },
+  "attachment": {
+    "path": "docs/frentes/grafo/originales/conversacion-recibida-2026-10-18.txt",
+    "bytes": 60033,
+    "sha256": "a9996f10f6299ea6b48bae7baf1032c1eb311cfed754bd780b0dec72d3ec4052",
+    "complete_received_attachment": true,
+    "complete_original_multi_session_history": "NOT_VERIFIED",
+    "original_line_endings_preserved": true
+  },
+  "files": [
+    {
+      "path": "khora-web/lib/graph-twins.ts",
+      "sha256": "c4faa9fb475cff0157987eedb6cc2cc389d313f8ee9b097702991f27b8805fa0"
+    },
+    {
+      "path": "khora-web/lib/graph-revision.ts",
+      "sha256": "96b6c749f23102ec536f4ffd681b147f6fc606a6d9c721b8d3f1af470feb2c90"
+    },
+    {
+      "path": "khora-web/lib/graph-quality-reference.ts",
+      "sha256": "98008e390cc1e423b788241548b655751b66a998c7b5d4c691a560e942cc460c"
+    },
+    {
+      "path": "khora-web/lib/server/graph-twins-store.ts",
+      "sha256": "1e1a89f0ea5a4a18b18d2e47a0f8f3836c73ae06fef42cec32065547f8f43064"
+    },
+    {
+      "path": "khora-web/lib/query-sufficiency.ts",
+      "sha256": "77ac913f830b62c972af0055da713ea274cac44dcd776dc0ed5cc7e2fd907676"
+    },
+    {
+      "path": "khora-web/lib/contracts/proposal.ts",
+      "sha256": "6a2089bff90277d97bc85e5134feeb9164bcba05be8d887e415cd8c940c9644d"
+    },
+    {
+      "path": "khora-web/app/sistema/consulta/page.tsx",
+      "sha256": "9cf21a30ef2fdb95563fd7f83ddee731c4787a48b3f27ed565dada72af60c595"
+    },
+    {
+      "path": "khora-web/db/migrations/033_graph_snapshot_history.sql",
+      "sha256": "e2f440a3606ae5be8ef4ab653fd3f618a8d3b4211ecc9354ab47b3746db8eafa"
+    },
+    {
+      "path": "khora-web/scripts/migrate-runtime.mjs",
+      "sha256": "4a6f2bb17b129642abe882d0f311ba24e60a2af06deef59d99d99aba40d90855"
+    },
+    {
+      "path": "khora-web/tests/unit/graph_convergence.test.ts",
+      "sha256": "7a41b29406430bb23c25d13909b6d29ebf74e781215abe41dad1b98c755af1c8"
+    },
+    {
+      "path": "khora-web/tests/unit/graph_history.integration.ts",
+      "sha256": "5b0b4ffc5bd20417bcf70e342b680cdd2eed93d4c9cae4529736d0cf80888ab2"
+    },
+    {
+      "path": "kernel/src/khora_kernel/contracts/proposal.py",
+      "sha256": "f82f786d9295cad1184506298b630d2a87ac362df7d4f95d6cf01a3c2187b38c"
+    },
+    {
+      "path": "kernel/src/khora_kernel/poblacion/_ingestar.py",
+      "sha256": "3e915dfe90973af7232b6da7586a3bb5f920e27b9e82a7c982541352ce8e06c5"
+    },
+    {
+      "path": "kernel/src/khora_kernel/engine/core.py",
+      "sha256": "e00029b8b4e33e774a43735d51b6719587281548db1502499ee59601dc934c0b"
+    },
+    {
+      "path": "kernel/src/khora_kernel/engine/fval.py",
+      "sha256": "538681c4ed0e47137b15cdb7237ff171f8766f4194fcff3b9185576b6b4f35f0"
+    },
+    {
+      "path": "kernel/tests/graph/test_convergence_guards.py",
+      "sha256": "32816146a2f327c5d1a1d5aa450c46b6e8d03d5657c93a41dec15098c1d661fa"
+    }
+  ],
+  "limits": [
+    "partial local repository reconstruction; not a full clone",
+    "selected tests, not a full build or full suite",
+    "synthetic graph and controlled providers",
+    "PGlite single-connection lock adapter; no distributed concurrency proof",
+    "no production migration, backfill, deployment or operator judgment fabricated",
+    "durable legacy judgments without item fingerprints do not transfer silently across proposal UUIDs",
+    "no recovery of snapshots overwritten before migration",
+    "coordinated erasure remains a deployment blocker for the new history table"
+  ],
+  "results": {
+    "web_selected": {
+      "pass": 30,
+      "fail": 0,
+      "skip": 0
+    },
+    "python_selected": {
+      "pass": 15,
+      "fail": 0
+    },
+    "storage_integration": "PASS",
+    "targeted_types_exit": 0,
+    "full_build": "NOT_RUN",
+    "production_e2e": "NOT_VERIFIED"
+  }
+}

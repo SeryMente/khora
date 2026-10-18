@@ -122,6 +122,9 @@ def _policy(question: str, ht: Ht, puerto_llm: PuertoLLM) -> tuple[Lambda, str]:
         "FALLBACK solicita evidencia visual cruda y STOP termina. "
         "Usa el historial completo; no inventes observaciones. Devuelve JSON únicamente.\n"
         f"Pregunta: {question}\n{historial}"
+        f"Observaciones operativas: {json.dumps([s.observation for s in ht.steps if s.observation is not None], ensure_ascii=False)}\n"
+        f"Evidencia: {json.dumps([e.__dict__ for e in ht.evidence], ensure_ascii=False)}\n"
+        f"Juicios globales previos: {json.dumps(ht.verdicts, ensure_ascii=False)}\n"
         '{"accion":"RETRIEVE|REFINE|ANSWER|FALLBACK|STOP","justificacion":"..."}'
     )
     req = SolicitudLLM(prompt, "Eres la política πθ de EpisTwin.", None, {"temperature": 0.0, "role": "pi_theta"})
@@ -272,18 +275,14 @@ def ejecutar_ciclo(session_id: str, pregunta: str, puerto_llm: PuertoLLM, memori
                     else:
                         answer = _answer(estado.ht, pregunta, puerto_llm)
                     # Visual evidence remains evidence, never a substitute for global fVAL.
-                    final_result = fval(answer.answer, estado.ht, puerto_llm)
+                    final_result = fval(answer.answer, estado.ht, puerto_llm, question=pregunta)
                     verdict_record = {"vt": final_result.vt, "deficit_type": final_result.deficit_type,
                                       "reason": final_result.reason}
                     estado.ht = _replace_ht(estado.ht, verdicts=estado.ht.verdicts + [verdict_record])
                     estado.ht = _add_trace(estado.ht, {"action": "fVAL", **verdict_record})
                     if final_result.vt == "Sufficient":
                         estado.terminado = True
-                    elif final_result.deficit_type == "VISUAL" or (
-                        os.getenv("KHORA_FVAL_MODE") == "mark"
-                        and any(token in pregunta.lower() for token in ("imagen", "foto", "visual"))
-                        and final_result.vt == "Insufficient"
-                    ):
+                    elif final_result.deficit_type == "VISUAL":
                         final_result = FvalResult("Insufficient", "VISUAL", final_result.reason)
                         estado.terminado = True
             elif action == Lambda.FALLBACK:

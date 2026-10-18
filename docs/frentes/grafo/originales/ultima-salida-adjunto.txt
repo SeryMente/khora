@@ -1,0 +1,3 @@
+Sí. Cada entrada llevará la versión exacta del criterio unificador, con enlace inmutable y huella del documento.
+
+Añadiré solo lo necesario para interpretar la comparación: revisión del grafo, versión del generador, corpus y política de entrada, fecha y resultados de las pruebas. Así podremos distinguir una mejora real de un cambio de datos o de criterio.

@@ -347,3 +347,41 @@ def from_dict(data: dict) -> ProposalEnvelope:
         settlement_act=settlement_act,
         source_provenance=data.get("source_provenance"),
     )
+
+
+def validate_settlement_dependencies(proposal: ProposalEnvelope) -> None:
+    """Accepted relations may not revive missing/rejected/unreviewed endpoints.
+
+    Metadata may originate only at this proposal's source InformationObject.
+    Literals can be tails, never relation heads. No guessed replacement labels.
+    This is a dependency guard, not authentication or semantic accreditation.
+    """
+    by_id = {item.id: item for item in proposal.items}
+    if len(by_id) != len(proposal.items):
+        raise ValueError("settlement_duplicate_item_id")
+    latest = {j.item_id: j.decision for j in proposal.judgments}
+    source = (proposal.source_provenance or {}).get("io_id")
+    if not source:
+        source = str(proposal.source_triplet.volcado_id)
+        if source.startswith("io:"):
+            source = source[3:]
+    for item in proposal.items:
+        if latest.get(item.id) != "accept" or item.kind != "relation":
+            continue
+        if item.triple is None:
+            raise ValueError("settlement_relation_missing_triple")
+        meta = item.metadata or {}
+        if meta.get("origen_kind", "entity") not in {"entity", "information_object"}:
+            raise ValueError("settlement_invalid_head_kind")
+        if meta.get("origen_kind") == "information_object":
+            if meta.get("origen_canonical") != source:
+                raise ValueError("settlement_metadata_wrong_source")
+        else:
+            head = by_id.get(item.triple.origen_id)
+            if not head or latest.get(head.id) != "accept" or head.kind != "entity":
+                raise ValueError("settlement_head_not_accepted_entity")
+        tail = by_id.get(item.triple.destino_id)
+        if not tail or latest.get(tail.id) != "accept" or tail.kind not in {"entity", "literal"}:
+            raise ValueError("settlement_tail_not_accepted")
+        if meta.get("destino_kind", "entity") != tail.kind:
+            raise ValueError("settlement_tail_kind_mismatch")

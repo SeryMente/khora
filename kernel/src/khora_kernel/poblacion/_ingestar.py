@@ -20,6 +20,7 @@ from khora_kernel.contracts.proposal import (
     ProposalItem,
     ProposalTriple,
     SourceTriplet,
+    validate_settlement_dependencies,
     compute_item_id,
     compute_payload_hash,
 )
@@ -250,12 +251,14 @@ def proponer(
 
 def ratificar_propuesta(
     proposal: Union[ProposalEnvelope, dict],
-    actor: str = "operador",
+    actor: str = "system:automatic-ingestion",
     decision_default: str = "accept",
     decisiones_custom: Optional[dict[str, str]] = None,
 ) -> ProposalEnvelope:
     """
-    Helper para ratificar una propuesta generando los Judgments explícitos necesarios para asentar.
+    Construye decisiones para una política de aceptación explícitamente atribuida.
+    El valor por defecto es del sistema: nunca atribuye aceptación humana.
+    Este helper NO autentica al actor y no acredita ratificación del operador.
     """
     decisiones_custom = decisiones_custom or {}
 
@@ -366,6 +369,9 @@ def asentar(
             linea_temporal_indexada=True,
         )
 
+    validate_settlement_dependencies(proposal)
+    if "_khora_settlement" in ((proposal.source_provenance or {}).get("metadata") or {}):
+        raise ValueError("settlement_reserved_metadata_collision")
     judgment_by_item = {j.item_id: j.decision for j in proposal.judgments}
 
     # Filtrar ítems aceptados
@@ -428,8 +434,8 @@ def asentar(
             orig_item = item_by_id.get(it.triple.origen_id)
             dest_item = item_by_id.get(it.triple.destino_id)
 
-            orig_canonical = orig_item.label if orig_item else "desconocido"
-            dest_canonical = dest_item.label if dest_item else "desconocido"
+            orig_canonical = orig_item.label if orig_item else io_id
+            dest_canonical = dest_item.label
 
             relation_meta = it.metadata or {}
             if relation_meta.get("origen_kind") == "information_object":
@@ -461,7 +467,18 @@ def asentar(
         "volcado_id": proposal.source_triplet.volcado_id,
         "version": proposal.source_triplet.version,
         "sha256": proposal.source_triplet.sha256,
-        "metadata": (proposal.source_provenance or {}).get("metadata", {}),
+        "metadata": {
+            **((proposal.source_provenance or {}).get("metadata") or {}),
+            "_khora_settlement": {
+                "policy": "attributed-decisions-v1",
+                "human_ratification_authenticated": False,
+                "judgments": [
+                    {"judgment_id": j.judgment_id, "item_id": j.item_id,
+                     "decision": j.decision, "actor": j.actor, "timestamp": j.timestamp}
+                    for j in proposal.judgments
+                ],
+            },
+        },
         "source_schema": (proposal.source_provenance or {}).get("source_schema"),
         "origen": (proposal.source_provenance or {}).get("origen", "proposal"),
         "driver": (proposal.source_provenance or {}).get("driver"),

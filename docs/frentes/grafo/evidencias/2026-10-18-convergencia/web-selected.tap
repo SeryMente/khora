@@ -1,0 +1,38 @@
+✔ identity references bind immutable exact contexts without model recopy (0.95784ms)
+✔ identity references reject swapped sides and unknown pairs (0.427299ms)
+✔ identity references do not rescue old invalid raw evidence responses (0.138958ms)
+✔ identity references retain name-only evidence rejection (0.169558ms)
+✔ identity reference inputs retain both sources and uncertainty criterion (0.717107ms)
+✔ homonyms within one source stay separate and become candidates only (13.49402ms)
+✔ replay across regenerated proposal UUID requires historical exact content (1.817256ms)
+✔ changed meaning, event time, source, position or attribution cannot inherit judgment (1.303769ms)
+✔ event time contributes to extraction ID and exact fingerprint (0.364654ms)
+✔ conflicting payloads cannot silently share a relation ID (0.657003ms)
+✔ causal revision is stable but changes with every tested input (2.238222ms)
+✔ criterion reference names the exact committed criterion bytes (0.961227ms)
+✔ insufficient, unknown, objects and missing flags never become positive (0.26565ms)
+✔ web proposal contract retains literal type (0.695341ms)
+✔ anchors preserve literal original positions and negation (2.644245ms)
+✔ fabricated or concatenated quotes never enter a graph (0.182776ms)
+✔ ambiguous repeated evidence is not assigned guessed coordinates (0.140528ms)
+✔ literal endpoints required, not inferred identities (0.170977ms)
+✔ automatic acceptance is system attributed and cannot leak to curated (3.418621ms)
+✔ only explicit matching owner judgments change curated (0.769245ms)
+✔ reject affects curated only, originals and automatic stay intact (0.719889ms)
+✔ same spelling across sources does not manufacture identity (7.5177ms)
+✔ fixed seed reproduces partition without desired community count (1.380684ms)
+✔ chunking retains whitespace and context, never loses tail (0.259046ms)
+✔ wrong source hashes cannot be combined under a proposal (0.496807ms)
+✔ lexical equality generates candidates, never identity acceptance (0.83292ms)
+✔ identity validation fails closed on invented evidence or unknown pairs (0.496732ms)
+✔ grounded identity merges automatic only, curated needs separate explicit judgment (1.724765ms)
+✔ examined identity pairs are not proposed twice (0.497794ms)
+✔ display source filters and limits preserve persisted membership (0.565163ms)
+ℹ tests 30
+ℹ suites 0
+ℹ pass 30
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 470.50091

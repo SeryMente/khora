@@ -1,8 +1,9 @@
+import {graphManifest} from "../graph-revision";
 import { randomUUID } from "node:crypto";
 import type { PoolClient } from "pg";
 import { getDb } from "./neon";
 import { cifrarTexto, descifrarTexto } from "./cripto";
-import { PIPELINE, METHOD, PROMPT, digest, segment, validateExtraction, project, relationsOf, type Source, type Proposal, type HumanDecision, IDENTITY_PROMPT, pendingIdentities, identityBatch, validateIdentities, type IdentityPair, scopeGraph } from "../graph-twins";
+import { PIPELINE, METHOD, PROMPT, digest, itemFingerprint, segment, validateExtraction, project, relationsOf, type Source, type Proposal, type HumanDecision, IDENTITY_PROMPT, pendingIdentities, identityBatch, validateIdentities, type IdentityPair, scopeGraph } from "../graph-twins";
 
 import {graphModel} from "./graph-diagnostic";
 import {IDENTITY_REFERENCE_PROMPT,identityReferenceInput,validateIdentityReferences} from "./graph-identity-refs";
@@ -31,18 +32,29 @@ async function proposals(db:PoolClient,owner:string){
  WHERE p.owner=$1 AND v.usuario=$1 AND p.pipeline=$2 ORDER BY p.volcado_id`,[owner,PIPELINE]);
  return r.rows.map(r=>JSON.parse(descifrarTexto(r.payload_cifrado)) as Proposal).filter(p=>selected.some(s=>s.id===p.source.volcado_id&&s.version_aprobada===p.source.version&&s.sha256_aprobado.trim()===p.source.sha256));
 }
+async function historicalProposals(db:PoolClient,owner:string):Promise<Proposal[]>{
+ const r=await db.query(`SELECT p.payload_cifrado FROM grafo_par_propuesta p JOIN volcado v ON v.id=p.volcado_id WHERE p.owner=$1 AND v.usuario=$1 ORDER BY p.id`,[owner]);
+ return r.rows.map(r=>JSON.parse(descifrarTexto(r.payload_cifrado)) as Proposal);
+}
+function inputPolicy(owner:string){return owner===ORIGINALS_OWNER?"owner-authorized-original-v1-verified-hash-no-custody-approval":"approved-version-with-matching-hash";}
+async function causalState(db:PoolClient,owner:string,rows:DbSource[]){
+ const all=await proposals(db,owner),history=await historicalProposals(db,owner),judgments=await decisions(db,owner);
+ return {all,history,judgments,...graphManifest(all,history,judgments,{model:MODEL,identityPrompt:IDENTITY_REFERENCE_PROMPT,sourceStamp:sourceStamp(rows),inputPolicy:inputPolicy(owner)})};
+}
 async function decisions(db:PoolClient,owner:string):Promise<HumanDecision[]>{
- const r=await db.query("SELECT proposal_id,item_id,decision,actor,origin,creado_en AS created_at FROM grafo_par_juicio WHERE owner=$1 ORDER BY sequence",[owner]);
+ const r=await db.query("SELECT proposal_id,item_id,decision,actor,origin,item_fingerprint,creado_en AS created_at FROM grafo_par_juicio WHERE owner=$1 ORDER BY sequence",[owner]);
  return r.rows;
 }
 async function snapshot(db:PoolClient,owner:string){
- const all=await proposals(db,owner),judgments=await decisions(db,owner),rows=await sources(db,owner);
- const automatic=project(all,judgments,"automatic",owner),curated=project(all,judgments,"curated",owner);
+ const archive=await db.query("SELECT EXISTS(SELECT 1 FROM pg_trigger WHERE tgrelid='grafo_par_snapshot'::regclass AND tgname='grafo_par_snapshot_archivar' AND tgenabled='O') AS ready");
+ if(!archive.rows[0]?.ready)throw new Error("graph_history_migration_required");
+ const rows=await sources(db,owner),{all,history,judgments,knowledge_revision,manifest}=await causalState(db,owner,rows);
+ const automatic=project(all,judgments,"automatic",owner,history),curated=project(all,judgments,"curated",owner,history);
  const identityPending=pendingIdentities(all).length;
  const completed=all.filter(p=>p.next===p.length).length;
- const payload={revision:randomUUID(),source_stamp:sourceStamp(rows),pipeline:PIPELINE,method:METHOD,prompt_hash:digest(PROMPT),prompt:PROMPT,
+ const payload={revision:randomUUID(),knowledge_revision,manifest,source_stamp:sourceStamp(rows),pipeline:PIPELINE,method:METHOD,prompt_hash:digest(PROMPT),prompt:PROMPT,
  model:MODEL,temperature:0,provider:"Groq (existing configured provider)",release:process.env.VERCEL_GIT_COMMIT_SHA||process.env.KHORA_RELEASE_SHA||null,
- created_at:new Date().toISOString(),custody:await custodyStatus(db,owner,rows.length),source_count:rows.length,completed,pending:rows.length-completed+identityPending,pending_sources:rows.length-completed,pending_identity_pairs:identityPending,identity_prompt:IDENTITY_REFERENCE_PROMPT,identity_prompt_hash:digest(IDENTITY_REFERENCE_PROMPT),identity_evidence_binding:"source-context-reference-v1",identity_candidates_policy:"exact lexical candidates plus grounded relation endpoint pairs; aliases without lexical/explicit relation bridge may remain unresolved",
+ created_at:new Date().toISOString(),custody:await custodyStatus(db,owner,rows.length),source_count:rows.length,completed,pending:rows.length-completed+identityPending,pending_sources:rows.length-completed,pending_identity_pairs:identityPending,identity_prompt:IDENTITY_REFERENCE_PROMPT,identity_prompt_hash:digest(IDENTITY_REFERENCE_PROMPT),identity_evidence_binding:"source-context-reference-v1",identity_candidates_policy:"same-label occurrences within/across sources plus grounded relation endpoint pairs; aliases without lexical/explicit relation bridge may remain unresolved",
  automatic,curated,proposals:all,judgments,
  input_policy:owner===ORIGINALS_OWNER?"Originales v1 autorizados por el propietario; integridad verificada; sin aprobar Custodia ni ratificar relaciones.":"Solo versiones aprobadas en Custodia",
  limitations:["Sin cotejo de originalidad/repetición para Ideación Asíncrona Recuperable.","Las identidades entre fuentes son propuestas del sistema con sustento textual; no equivalen a ratificación humana ni garantía semántica. Las coincidencias de nombre solo generan candidatos; pueden quedar alias sin resolver.","Un ancla verificada prueba procedencia, no fidelidad semántica. Revisión humana aún necesaria.","Los intervalos sin propuesta quedan pendientes de revisión, no descartados como carentes de contenido."]};
@@ -52,13 +64,15 @@ async function snapshot(db:PoolClient,owner:string){
 }
 export async function readPair(owner:string){
  const db=await getDb().connect();try{
+  await db.query("BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY");
   const rows=await sources(db,owner),r=await db.query("SELECT payload_cifrado FROM grafo_par_snapshot WHERE owner=$1",[owner]);
   const custody=await custodyStatus(db,owner,rows.length);
   if(!r.rows.length)return {custody,empty:true,source_count:rows.length,pending:rows.length,limitations:["Aún no se ha generado ninguna de las dos proyecciones."]};
   const payload=JSON.parse(descifrarTexto(r.rows[0].payload_cifrado));
-  if(payload.pipeline!==PIPELINE||payload.model!==MODEL||payload.source_stamp!==sourceStamp(rows))return {custody,empty:true,stale:true,source_count:rows.length,pending:rows.length,limitations:["Cambió el conjunto de fuentes verificadas. Actualiza ambas proyecciones antes de consultar datos anteriores."]};
+  const current=await causalState(db,owner,rows);
+  if(payload.pipeline!==PIPELINE||payload.model!==MODEL||payload.source_stamp!==sourceStamp(rows)||payload.knowledge_revision!==current.knowledge_revision)return {custody,empty:true,stale:true,source_count:rows.length,pending:rows.length,limitations:["Cambió la revisión causal (fuentes, propuestas, juicios, criterio o generador). Actualiza ambas proyecciones antes de consultar datos anteriores."]};
   return {...payload,custody};
- }finally{db.release();}
+ }finally{await db.query("ROLLBACK").catch(()=>undefined);db.release();}
 }
 export async function nextChunk(owner:string){
  const db=await getDb().connect();
@@ -108,7 +122,7 @@ export async function judge(owner:string,proposalId:string,itemId:string,decisio
   if(!p||(!relationsOf([p]).some(r=>r.id===itemId)&&!(p.identities||[]).some(i=>i.id===itemId)))throw new Error("active_proposal_item_not_found");
   const existing=await db.query("SELECT owner,proposal_id,item_id,decision FROM grafo_par_juicio WHERE id=$1",[requestId]);
   if(existing.rows.length){const e=existing.rows[0];if(e.owner!==owner||e.proposal_id!==proposalId||e.item_id!==itemId||e.decision!==decision)throw new Error("judgment_request_conflict");}
-  else await db.query("INSERT INTO grafo_par_juicio(id,owner,proposal_id,item_id,decision,actor,origin) VALUES($1,$2,$3,$4,$5,$2,'graph-twins-review-v1')",[requestId,owner,proposalId,itemId,decision]);
+  else await db.query("INSERT INTO grafo_par_juicio(id,owner,proposal_id,item_id,decision,actor,origin,item_fingerprint) VALUES($1,$2,$3,$4,$5,$2,'graph-twins-review-v1',$6)",[requestId,owner,proposalId,itemId,decision,itemFingerprint(p,itemId)]);
   const result=await snapshot(db,owner);await db.query("COMMIT");return result;
  }catch(e){await db.query("ROLLBACK").catch(()=>undefined);throw e;}finally{db.release();}
 }
