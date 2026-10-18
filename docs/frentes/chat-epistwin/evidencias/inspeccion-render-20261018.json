@@ -1,0 +1,24 @@
+{
+  "type": "evidence_not_live_state",
+  "canonical_object": "../OBJETO-CANONICO.md",
+  "canonical_version": "0.14",
+  "canonical_commit_read_back": "5e0117dbee30013be754db7e968bc71ce60719b4",
+  "canonical_blob_read_back": "5942db5f80a2959c7b6e18b6190999889cf65797",
+  "method": {"version":"1.5","seal":"METACANON-OBJETOS-v1.5","blob":"32c7a65ff2e83b3b76752ba2160427bd6e851a8f","freshly_read":true,"semantic_delta":false},
+  "operator_event": {"id":"E42","timestamp":"2026-10-18T13:00:42.427-06:00","literal":"Ya quedo sigue y resuelve e2e"},
+  "render": {
+    "connected":true,
+    "workspace":{"id":"tea-d9hubrg4n6ts73bifaqg","name":"My Workspace","metadata_email":"280919.29061988@proton.me","personal_login_not_proven":true},
+    "service":{"id":"srv-d9i21ld8nd3s73aurdug","name":"khora","url":"https://khora-zy70.onrender.com","repository":"https://github.com/SeryMente/khora","branch":"main","runtime":"python","plan":"free","buildPlan":"starter","region":"oregon","instances":1,"autoDeploy":"yes","suspended":"not_suspended"},
+    "sample":{"memory_limit_bytes":536870900,"memory_usage_bytes":133754880,"cpu_limit":0.15,"is_load_test":false},
+    "postgres_instances":[],
+    "latest_deploy_observed":{"id":"dep-db9vlltg1s2s73asdaqg","status":"live","commit":"4dca2133866421105f077bbd7079576c588d1169","later_state_not_verified":true},
+    "documentation":{"url":"https://render.com/docs/free","free_persistent_disk_supported":false,"filesystem_ephemeral":true,"free_postgres_expires_days":30}
+  },
+  "vercel":{"reauthenticated":true,"project_read_succeeded":true,"environment_metadata_read":{"decrypt":false,"DATABASE_URL_present":true,"database_connectivity_proven":false},"deployment_observed":"dpl_7eQpbex6hbt5B3vTmtWhAwMSbE1V","deployment_state":"READY","deployment_from_this_front":false,"protection_unchanged":true},
+  "github":{"private_push_admin_revalidated":true,"pr317_head":"024090d95846bbadf64eb71b19e53f0a2bc95bde","pr317_draft":true,"check_runs_error":"403 Resource not accessible by personal access token","concurrent_main":"81e571deaa46ad9abd0a6b91c5035abe871a8b55","concurrent_front":"Diálogo Chrome + micrófono","concurrent_test_counts_are_report_not_own_tests":true},
+  "runtime_attempt_current":{"python3_11_found":false,"uv_found":false,"requirements_slim_download":"URLError: [Errno -2] Name or service not known","pypi_metadata_download":"URLError: [Errno -2] Name or service not known","isolated_capacity_test_ran":false,"note":"Current sandbox network failure; do not extrapolate it to Render or repeat historical successful local startup as current evidence."},
+  "second_document_review":{"remote_full_read_back":true,"thirteen_core_sections":true,"two_role_prompts":true,"originals_and_immutable_history_references":true,"E42_and_readonly_scope_checked":true,"not_product_certification":true},
+  "pending_material_gate":"Approve the limited reuse of existing Neon storage in an isolated technical schema and least-privilege access for chat/platform and durable kernel history before production DDL or access changes. No additional hosting purchase, no Vercel container, no changes to capture tables or semantic PKG.",
+  "delivery":{"ENT01_published":false,"ENT01_accepted":false,"ENT02_started":false,"production_writes":false,"new_resources_or_purchases":false,"secrets_decrypted":false,"RDC_used":false,"background_work":false,"ETA":"not estimable until persistence/access and real path verified"}
+}
