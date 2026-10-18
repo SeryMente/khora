@@ -5,20 +5,29 @@ import { cifrarTexto, descifrarTexto } from "./cripto";
 import { PIPELINE, METHOD, PROMPT, digest, segment, validateExtraction, project, relationsOf, type Source, type Proposal, type HumanDecision, IDENTITY_PROMPT, pendingIdentities, identityBatch, validateIdentities, type IdentityPair, scopeGraph } from "../graph-twins";
 
 const MODEL=process.env.GROQ_GRAPH_MODEL||process.env.GROQ_PULIDO_MODEL||"llama-3.3-70b-versatile";
-const SOURCE_SQL=`SELECT v.id,v.version_aprobada,v.sha256_aprobado,v.recibido_en,vv.texto,vv.sha256,v.sha256 AS vigente_sha256
- FROM volcado v LEFT JOIN volcado_version vv ON vv.volcado_id=v.id AND vv.version=v.version_aprobada
- WHERE v.usuario=$1 AND (v.version_aprobada IS NOT NULL OR v.sha256_aprobado IS NOT NULL)
+const ORIGINALS_OWNER="the.willfreeman@gmail.com"; // Explicit owner authorization, 2026-10-17; no custody approval.
+const SOURCE_SQL=`SELECT v.id,COALESCE(v.version_aprobada,1) AS version_aprobada,
+ COALESCE(v.sha256_aprobado,vv.sha256) AS sha256_aprobado,v.recibido_en,vv.texto,vv.sha256,v.sha256 AS vigente_sha256,
+ CASE WHEN v.version_aprobada IS NULL AND v.sha256_aprobado IS NULL THEN 'original_unreviewed' ELSE 'custody_approved' END AS input_basis
+ FROM volcado v LEFT JOIN volcado_version vv ON vv.volcado_id=v.id AND vv.version=COALESCE(v.version_aprobada,1)
+ WHERE v.usuario=$1 AND (v.version_aprobada IS NOT NULL OR v.sha256_aprobado IS NOT NULL OR $2::boolean)
  ORDER BY v.recibido_en,v.id`;
-type DbSource={id:string;version_aprobada:number;sha256_aprobado:string;recibido_en:Date|string;texto:string;sha256:string;vigente_sha256:string};
-async function sources(db:PoolClient,owner:string):Promise<DbSource[]>{const rows=(await db.query(SOURCE_SQL,[owner])).rows as DbSource[];for(const r of rows)if(!r.texto||!r.version_aprobada||!r.sha256_aprobado||r.sha256?.trim()!==r.sha256_aprobado.trim()||r.vigente_sha256?.trim()!==r.sha256_aprobado.trim())throw new Error("approved_source_integrity_mismatch_no_silent_omission");return rows;}
-async function custodyStatus(db:PoolClient,owner:string,eligible:number){const r=await db.query("SELECT count(*)::int AS total FROM volcado WHERE usuario=$1",[owner]);const total=Number(r.rows[0].total);return {total,eligible,excluded:total-eligible,policy:"approved-version-with-matching-hash"};}
-function sourceStamp(rows:DbSource[]){return digest(JSON.stringify(rows.map(r=>[r.id,r.version_aprobada,r.sha256_aprobado])));}
+type DbSource={id:string;version_aprobada:number;sha256_aprobado:string;recibido_en:Date|string;texto:string;sha256:string;vigente_sha256:string;input_basis:string};
+async function sources(db:PoolClient,owner:string):Promise<DbSource[]>{
+ const rows=(await db.query(SOURCE_SQL,[owner,owner===ORIGINALS_OWNER])).rows as DbSource[],valid:DbSource[]=[];
+ for(const r of rows){let ok=Boolean(r.texto&&r.version_aprobada&&r.sha256_aprobado&&r.sha256?.trim()===r.sha256_aprobado?.trim()&&r.vigente_sha256?.trim()===r.sha256_aprobado?.trim());
+  if(ok){try{ok=digest(descifrarTexto(r.texto))===r.sha256_aprobado.trim();}catch{ok=false;}}
+  if(!ok){if(r.input_basis==='original_unreviewed')continue;throw new Error("approved_source_integrity_mismatch_no_silent_omission");}valid.push(r);
+ }return valid;
+}
+async function custodyStatus(db:PoolClient,owner:string,eligible:number){const r=await db.query("SELECT count(*)::int AS total FROM volcado WHERE usuario=$1",[owner]);const total=Number(r.rows[0].total);return {total,eligible,excluded:total-eligible,policy:owner===ORIGINALS_OWNER?"owner-authorized-original-v1-verified-hash-no-custody-approval":"approved-version-with-matching-hash"};}
+function sourceStamp(rows:DbSource[]){return digest(JSON.stringify(rows.map(r=>[r.id,r.version_aprobada,r.sha256_aprobado,r.input_basis])));}
 function approvedSource(r:DbSource):Source{return {volcado_id:r.id,version:Number(r.version_aprobada),sha256:r.sha256_aprobado.trim(),captured_at:new Date(r.recibido_en).toISOString()};}
 async function proposals(db:PoolClient,owner:string){
+ const selected=await sources(db,owner);
  const r=await db.query(`SELECT p.payload_cifrado FROM grafo_par_propuesta p JOIN volcado v ON v.id=p.volcado_id
- WHERE p.owner=$1 AND v.usuario=$1 AND p.pipeline=$2 AND p.version=v.version_aprobada
- AND p.sha256=v.sha256_aprobado AND p.sha256=v.sha256 ORDER BY p.volcado_id`,[owner,PIPELINE]);
- return r.rows.map(r=>JSON.parse(descifrarTexto(r.payload_cifrado)) as Proposal);
+ WHERE p.owner=$1 AND v.usuario=$1 AND p.pipeline=$2 ORDER BY p.volcado_id`,[owner,PIPELINE]);
+ return r.rows.map(r=>JSON.parse(descifrarTexto(r.payload_cifrado)) as Proposal).filter(p=>selected.some(s=>s.id===p.source.volcado_id&&s.version_aprobada===p.source.version&&s.sha256_aprobado.trim()===p.source.sha256));
 }
 async function decisions(db:PoolClient,owner:string):Promise<HumanDecision[]>{
  const r=await db.query("SELECT proposal_id,item_id,decision,actor,origin,creado_en AS created_at FROM grafo_par_juicio WHERE owner=$1 ORDER BY sequence",[owner]);
@@ -33,6 +42,7 @@ async function snapshot(db:PoolClient,owner:string){
  model:MODEL,temperature:0,provider:"Groq (existing configured provider)",release:process.env.VERCEL_GIT_COMMIT_SHA||process.env.KHORA_RELEASE_SHA||null,
  created_at:new Date().toISOString(),custody:await custodyStatus(db,owner,rows.length),source_count:rows.length,completed,pending:rows.length-completed+identityPending,pending_sources:rows.length-completed,pending_identity_pairs:identityPending,identity_prompt:IDENTITY_PROMPT,identity_prompt_hash:digest(IDENTITY_PROMPT),identity_candidates_policy:"exact lexical candidates plus grounded relation endpoint pairs; aliases without lexical/explicit relation bridge may remain unresolved",
  automatic,curated,proposals:all,judgments,
+ input_policy:owner===ORIGINALS_OWNER?"Originales v1 autorizados por el propietario; integridad verificada; sin aprobar Custodia ni ratificar relaciones.":"Solo versiones aprobadas en Custodia",
  limitations:["Sin cotejo de originalidad/repetición para Ideación Asíncrona Recuperable.","Las identidades entre fuentes son propuestas del sistema con sustento textual; no equivalen a ratificación humana ni garantía semántica. Las coincidencias de nombre solo generan candidatos; pueden quedar alias sin resolver.","Un ancla verificada prueba procedencia, no fidelidad semántica. Revisión humana aún necesaria.","Los intervalos sin propuesta quedan pendientes de revisión, no descartados como carentes de contenido."]};
  await db.query(`INSERT INTO grafo_par_snapshot(owner,revision,payload_cifrado) VALUES($1,$2,$3)
  ON CONFLICT(owner) DO UPDATE SET revision=EXCLUDED.revision,payload_cifrado=EXCLUDED.payload_cifrado,actualizado_en=now()`,[owner,payload.revision,cifrarTexto(JSON.stringify(payload))]);
@@ -44,7 +54,7 @@ export async function readPair(owner:string){
   const custody=await custodyStatus(db,owner,rows.length);
   if(!r.rows.length)return {custody,empty:true,source_count:rows.length,pending:rows.length,limitations:["Aún no se ha generado ninguna de las dos proyecciones."]};
   const payload=JSON.parse(descifrarTexto(r.rows[0].payload_cifrado));
-  if(payload.pipeline!==PIPELINE||payload.model!==MODEL||payload.source_stamp!==sourceStamp(rows))return {custody,empty:true,stale:true,source_count:rows.length,pending:rows.length,limitations:["Cambió el conjunto de versiones aprobadas. Actualiza ambas proyecciones antes de consultar datos anteriores."]};
+  if(payload.pipeline!==PIPELINE||payload.model!==MODEL||payload.source_stamp!==sourceStamp(rows))return {custody,empty:true,stale:true,source_count:rows.length,pending:rows.length,limitations:["Cambió el conjunto de fuentes verificadas. Actualiza ambas proyecciones antes de consultar datos anteriores."]};
   return {...payload,custody};
  }finally{db.release();}
 }
