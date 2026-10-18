@@ -245,12 +245,6 @@
       "git_blob_sha": "9f4a7a42035e476747b1beafd5f0e4bdb334024f"
     },
     {
-      "path": "OBJETO-CANONICO.md",
-      "bytes": 186093,
-      "sha256": "6428d28bfff2a110c90c3ad601be40d608d40d61788e6cfdf5cc69910ea98dac",
-      "git_blob_sha": "20e07f41fb12e7e439b0fbbbe578e661eec130c6"
-    },
-    {
       "path": "originales/PUBLICACION-C029.md",
       "bytes": 368,
       "sha256": "4cbcad76caed94347ea82482fc132bc4b8b5de0a07f6f29ac3949a2de4233cd8",
@@ -261,6 +255,24 @@
       "bytes": 3551,
       "sha256": "f600def618320f90d93642035ae10c5050404ab593a5edb59715ec24b9a5e7db",
       "git_blob_sha": "8b44863c4be759660a02789165442796adb62169"
+    },
+    {
+      "path": "OBJETO-CANONICO.md",
+      "bytes": 187667,
+      "sha256": "3e6ff83211cfa3f3cfad249d28201b0c502ce70052021e48aabdf15ff24810d5",
+      "git_blob_sha": "69257caaf7e2ac964a36cda34c8c7b05738afc30"
+    },
+    {
+      "path": "originales/C030-instrucciones.md",
+      "bytes": 3139,
+      "sha256": "47a10ab2169ee1165ff2e39e1850f5c802b22e100b3b0b7aee71d1fcde571164",
+      "git_blob_sha": "e18663f9bb4ebcbe2494a8340e305078e5dadec9"
+    },
+    {
+      "path": "evidencias/C030-pruebas.md",
+      "bytes": 1831,
+      "sha256": "1136eaaabc0ca550043a13b92094dc802b7dba526e19e4437033f489138261cb",
+      "git_blob_sha": "9a0a7b128fdd36ac916971192a0d5db8b7648832"
     }
   ],
   "runtime_references": [
@@ -395,5 +407,12 @@
     "alias": "khora-web.vercel.app",
     "verified": true,
     "physicalAcceptance": false
+  },
+  "latest_cycle": "C030",
+  "canonical_version": "0.6.9",
+  "latest_candidate": {
+    "branch": "fix/captura-dialogo-custodia-20261018",
+    "base": "3356bfc92965503d81b06e5637c4668afbde3a52",
+    "publication": "pending"
   }
 }

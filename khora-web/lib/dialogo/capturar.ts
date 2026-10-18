@@ -16,7 +16,7 @@ export async function capturarDialogo(o:Opciones):Promise<CapturaDialogo> {
   const streams:MediaStream[]=[];const recorders:MediaRecorder[]=[];
   const totals={microphone:0,chrome_tab:0};
   const pending=new Set<Promise<void>>(); const stopped:Promise<void>[]=[];
-  const now=o.now??(()=>performance.now());let origin=0,index=0,stopping:Promise<void>|undefined,closing=false;
+  const clock=o.now??(()=>performance.now());const now=()=>Math.round(clock());let origin=0,index=0,stopping:Promise<void>|undefined,closing=false;
   let capture:CapturaDialogo|undefined;
   const release=()=>streams.forEach(s=>s.getTracks().forEach(t=>t.stop()));
   const stop=():Promise<void>=>{

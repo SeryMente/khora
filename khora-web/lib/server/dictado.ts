@@ -196,8 +196,8 @@ export async function registrarParteAudio(params: {
        WHERE dictado_audio_parte.bytes = EXCLUDED.bytes
          AND lower(dictado_audio_parte.sha256) = lower(EXCLUDED.sha256)
          AND dictado_audio_parte.fuente_audio = EXCLUDED.fuente_audio
-         AND COALESCE(dictado_audio_parte.original_name, EXCLUDED.original_name) = COALESCE(EXCLUDED.original_name, dictado_audio_parte.original_name)
-         AND COALESCE(dictado_audio_parte.mime_type, EXCLUDED.mime_type) = COALESCE(EXCLUDED.mime_type, dictado_audio_parte.mime_type)
+         AND COALESCE(dictado_audio_parte.original_name, EXCLUDED.original_name) IS NOT DISTINCT FROM COALESCE(EXCLUDED.original_name, dictado_audio_parte.original_name)
+         AND COALESCE(dictado_audio_parte.mime_type, EXCLUDED.mime_type) IS NOT DISTINCT FROM COALESCE(EXCLUDED.mime_type, dictado_audio_parte.mime_type)
          AND EXISTS (
            SELECT 1 FROM dictado_session s
            WHERE s.session_id = EXCLUDED.session_id
@@ -241,7 +241,7 @@ export async function registrarParteAudio(params: {
         endMs: params.endMs,
       },
       correlacionId: params.sessionId,
-    });
+    }).catch(()=>undefined); // Metadata telemetry cannot undo committed audio custody.
   } catch (err) {
     await db.query("ROLLBACK").catch(()=>undefined);
     await registrarEvento({

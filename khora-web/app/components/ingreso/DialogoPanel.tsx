@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { capturarDialogo, type CapturaDialogo, type ParteDialogo } from "../../../lib/dialogo/capturar";
-import { formatearDialogo, type FuenteDialogo, type ManifiestoDialogo } from "../../../lib/dialogo/contrato";
+import { formatearCaptura, type FuenteDialogo, type ManifiestoDialogo } from "../../../lib/dialogo/contrato";
 import { guardarAudioLocal, guardarSnapshotLocal, recuperarLocal, cerrarSnapshotLocal } from "../../../lib/client/custodia-local";
 import { subirAudioCustodiado } from "../../../lib/client/subir-audio-custodia";
 import { nuevaRevision, type CapturaSnapshot } from "../../../lib/custodia/contrato";
@@ -12,6 +12,8 @@ type ParteGuardada=Awaited<ReturnType<typeof subirAudioCustodiado>>;
 const initial=():ManifiestoDialogo=>({version:1,estado:"preparando",etiquetas:{microphone:"Operador",chrome_tab:"Salida Chrome"},partesEsperadas:0,turnos:[]});
 function download(blob:Blob,name:string){const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),10000);}
 export function DialogoPanel({sessionId:requested,onSalir}:{sessionId?:string|null;onSalir?:()=>void}){
+  const [recoveryTarget,setRecoveryTarget]=useState(requested);
+  const [organizarComoDialogo,setOrganizarComoDialogo]=useState(true);
   const [ready,setReady]=useState(false),[busy,setBusy]=useState(false),[active,setActive]=useState(false);
   const [error,setError]=useState(""),[notice,setNotice]=useState(""),[text,setText]=useState("");
   const [title,setTitle]=useState("Conversación"),[labels,setLabels]=useState(initial().etiquetas),[count,setCount]=useState(0);
@@ -70,6 +72,16 @@ export function DialogoPanel({sessionId:requested,onSalir}:{sessionId?:string|nu
   const finishRef=useRef(finish);finishRef.current=finish;
   const transcribeRef=useRef<()=>Promise<void>>(async()=>undefined);
   useEffect(()=>{if(!active)return;const began=Date.now();setElapsed(0);const timer=setInterval(()=>setElapsed(Math.floor((Date.now()-began)/1000)),1000);return()=>clearInterval(timer);},[active]);
+  // Next App Router propagates our own replaceState to useSearchParams. Publishing
+  // this session's URL is NOT an external recovery request and must not stop audio.
+  useEffect(()=>{
+    if(requested===id.current)return;
+    if(inProgress.current||id.current){
+      if(requested)setError("Hay una captura abierta. Archívala o exporta sus originales antes de abrir otra sesión.");
+      return;
+    }
+    setRecoveryTarget(requested);
+  },[requested]);
   useEffect(()=>{
     let cancelled=false;mounted.current=true;setReady(false);setError("");
     (async()=>{
@@ -77,23 +89,23 @@ export function DialogoPanel({sessionId:requested,onSalir}:{sessionId?:string|nu
         const r=await fetch("/api/dictado/checkpoint?bootstrap=1",{cache:"no-store",signal:AbortSignal.timeout(15000)}),d=await r.json();
         if(!r.ok||typeof d.owner!=="string"||!d.owner)throw Error("Salvaguarda no preparada. Inicia sesión y vuelve a cargar.");
         if(cancelled)return;owner.current=d.owner;
-        if(requested){
-          await acquireLock(requested);
+        if(recoveryTarget){
+          await acquireLock(recoveryTarget);
           if(cancelled){releaseLock.current?.();releaseLock.current=null;return;}
-          const recovery=await fetch("/api/dictado/checkpoint?sessionId="+encodeURIComponent(requested),{cache:"no-store"});
+          const recovery=await fetch("/api/dictado/checkpoint?sessionId="+encodeURIComponent(recoveryTarget),{cache:"no-store"});
           const data=await recovery.json();
           if(!recovery.ok||data.owner!==owner.current)throw Error("No se pudo comprobar la captura solicitada.");
           const local=await recuperarLocal(owner.current);
-          const localSnap=local.snapshots.find(x=>x.sessionId===requested&&x.fuenteEntrada==="dialogo");
+          const localSnap=local.snapshots.find(x=>x.sessionId===recoveryTarget&&x.fuenteEntrada==="dialogo");
           const remoteSnap=data.recovery?.fuenteEntrada==="dialogo"?data.recovery as CapturaSnapshot:undefined;
           const selected=localSnap&&(!remoteSnap||localSnap.clientAt>remoteSnap.clientAt)?localSnap:remoteSnap;
           if(!selected?.dialogo)throw Error("La sesión solicitada no es un diálogo recuperable.");
           if(cancelled)return;
-          id.current=requested;manifest.current=selected.dialogo;duration.current=selected.duracionSeg;
+          id.current=recoveryTarget;manifest.current=selected.dialogo;duration.current=selected.duracionSeg;
           stored.current=(data.recovery?.audioPartes||[]) as ParteGuardada[];
-          raw.current=local.audios.filter(x=>x.sessionId===requested).map(x=>({parte:x.part,blob:x.blob,fuente:x.meta.upload.fuenteAudio,startMs:x.meta.upload.startMs,endMs:x.meta.upload.endMs,duracionMs:x.meta.upload.duracionMs})).sort((a,b)=>a.parte-b.parte);
+          raw.current=local.audios.filter(x=>x.sessionId===recoveryTarget).map(x=>({parte:x.part,blob:x.blob,fuente:x.meta.upload.fuenteAudio,startMs:x.meta.upload.startMs,endMs:x.meta.upload.endMs,duracionMs:x.meta.upload.duracionMs})).sort((a,b)=>a.parte-b.parte);
           if(!["detenido","interrumpido"].includes(manifest.current.estado))manifest.current.estado="interrumpido";
-          textRef.current=selected.texto;setText(selected.texto);setLabels(manifest.current.etiquetas);setTitle(selected.titulo);setCount(stored.current.length);localConfirmed.current=new Set(raw.current.map(p=>p.parte));setLocalCount(localConfirmed.current.size);setHasSession(true);
+          textRef.current=selected.texto;setText(selected.texto);setLabels(manifest.current.etiquetas);setOrganizarComoDialogo(manifest.current.organizarComoDialogo!==false);setTitle(selected.titulo);setCount(stored.current.length);localConfirmed.current=new Set(raw.current.map(p=>p.parte));setLocalCount(localConfirmed.current.size);setHasSession(true);
           setNotice("Diálogo recuperado; no se reanuda ni se mezcla con otra grabadora. Los originales permanecen separados por fuente.");
         }
         setReady(true);
@@ -101,7 +113,7 @@ export function DialogoPanel({sessionId:requested,onSalir}:{sessionId?:string|nu
     })();
     return()=>{cancelled=true;mounted.current=false;if(capture.current){interrupted.current=true;void finishRef.current().finally(()=>{releaseLock.current?.();releaseLock.current=null;});}else{releaseLock.current?.();releaseLock.current=null;}};
   // An explicit session link is a recovery request, never an automatic resume.
-  },[requested,retryPreparation]);
+  },[recoveryTarget,retryPreparation]);
   useEffect(()=>{const warn=(e:BeforeUnloadEvent)=>{if(inProgress.current){e.preventDefault();e.returnValue="";}};window.addEventListener("beforeunload",warn);return()=>window.removeEventListener("beforeunload",warn);},[]);
   useEffect(()=>{
     if(!hasSession||active||busy||archived||archivePayload.current)return;
@@ -118,10 +130,10 @@ export function DialogoPanel({sessionId:requested,onSalir}:{sessionId?:string|nu
     if(!ready||inProgress.current||hasSession)return;
     inProgress.current=true;setBusy(true);setError("");setNotice("Selecciona la pestaña con Compartir audio y autoriza el micrófono. Aún no se está grabando.");id.current=crypto.randomUUID();
     raw.current=[];stored.current=[];duration.current=0;errorRemote.current=false;localConfirmed.current.clear();setLocalCount(0);setCount(0);
-    manifest.current={...initial(),etiquetas:{...labels}};interrupted.current=false;
+    manifest.current={...initial(),organizarComoDialogo,etiquetas:{...labels}};interrupted.current=false;
     try{
       const c=await capturarDialogo({
-        antesDeGrabar:async()=>{await acquireLock(id.current);await persist();},
+        antesDeGrabar:async()=>{if(!mounted.current)throw Error("La vista se cerró antes de grabar.");await acquireLock(id.current);await persist();if(!mounted.current)throw Error("La vista se cerró durante la preparación.");},
         onParte:async p=>{
           raw.current.push(p);manifest.current.partesEsperadas=raw.current.length;duration.current=Math.max(duration.current,p.endMs/1000);
           // Retain original chunks locally even after server ACK; recovery/export must not depend on the provider.
@@ -132,6 +144,7 @@ export function DialogoPanel({sessionId:requested,onSalir}:{sessionId?:string|nu
         },
         onInterrupcion:reason=>{interrupted.current=true;setError(reason);queueMicrotask(()=>void finishRef.current());},
       });
+      if(!mounted.current){interrupted.current=true;await c.detener();releaseLock.current?.();releaseLock.current=null;inProgress.current=false;return;}
       capture.current=c;manifest.current.estado="grabando";setMicStream(c.stream);setChromeStream(c.chromeStream);setActive(true);setHasSession(true);
       window.history.replaceState(null,"","/sistema/ingreso?modo=dialogo&sessionId="+id.current);
       setNotice("Grabando Chrome y micrófono; comprueba ambas señales. El texto aparecerá automáticamente al detener. Usa audífonos para evitar eco.");
@@ -159,7 +172,7 @@ export function DialogoPanel({sessionId:requested,onSalir}:{sessionId?:string|nu
       if(!r.ok||!Array.isArray(d.turnos))throw Error(d.detail||"No se confirmó la transcripción.");
       if(!d.exito&&manifest.current.turnos.length)throw Error("La nueva transcripción es parcial; se conserva el diálogo anterior.");
       transcriptionState.current=d.exito?"completo":"parcial";
-      manifest.current.turnos=d.turnos;textRef.current=formatearDialogo(d.turnos,manifest.current.etiquetas);setText(textRef.current);
+      manifest.current.turnos=d.turnos;textRef.current=formatearCaptura(d.turnos,manifest.current.etiquetas,manifest.current.organizarComoDialogo!==false);setText(textRef.current);
       await persist();
       setNotice(d.exito?(textRef.current.trim()?"Diálogo insertado en Ingreso. Revísalo y pulsa Archivar como volcado; la ingesta requiere la revisión y aprobación habituales.":"No se reconoció habla en los originales. Revisa las señales y exporta el audio para comprobarlo."):"Transcripción parcial: una fuente falló. Se conserva el audio; no es un diálogo completo.");
     }catch(e){transcriptionState.current="fallido";setError((e instanceof Error?e.message:"No se confirmó la transcripción.")+" Los originales se conservan; puedes reintentar o archivarlos sin inventar texto.");}
@@ -202,7 +215,7 @@ export function DialogoPanel({sessionId:requested,onSalir}:{sessionId?:string|nu
   };
   return <IngresoView state={{
     titulo:title,texto:text,estado:active?"dictando":"inactivo",modoEntrada:"chrome_live_caption",
-    dialogoChrome:true,dialogoSesion:hasSession,chromeStream,stream:micStream,
+    finalizando:busy&&active,organizarComoDialogo,dialogoChrome:true,dialogoSesion:hasSession,chromeStream,stream:micStream,
     chromeBridgeEstado:"captura nativa",chromeCaptionActivo:false,chromeCapturaEstado:active?"grabando":"inactiva",
     archivado:archived,archivoPendiente:!!archivePayload.current&&!archived,custodiaReady:ready,custodiaPreparando:!ready&&!error,
     custodiaEstado:active?`Chrome + micrófono · ${elapsed} s · ${localCount} partes recibidas · ${count} confirmadas en servidor`:archived?"Volcado archivado · "+volcadoId:hasSession?`${localCount} partes locales · ${count} confirmadas en servidor`:ready?"Salvaguarda preparada":"Salvaguarda no preparada",
@@ -217,6 +230,7 @@ export function DialogoPanel({sessionId:requested,onSalir}:{sessionId?:string|nu
     <p className={s.notice}>Originales separados y custodia cifrada de Khora. Mismo transcriptor configurado; sin Live Caption. Dos fuentes no identifican a cada persona dentro de una pista. Límite preventivo de 18 MB por fuente. No uses llamadas clínicas sin los permisos y condiciones requeridos.</p></details>{archived&&<a className={s.secondary} href="/sistema/custodia">Revisar volcado en Custodia</a>}</>
   }} actions={{
     onIniciar:()=>void start(),onPrepararChrome:()=>void start(),onDetener:()=>void finish(),
+    onOrganizarDialogoChange:enabled=>{if(!hasSession&&!active&&!busy)setOrganizarComoDialogo(enabled);},
     onDialogoChange:enabled=>{if(!enabled&&!hasSession&&!active&&!busy)onSalir?.();},
     onGuardar:()=>void archive(),onRetranscribir:archivePayload.current?undefined:()=>void transcribe(),
     onTituloChange:value=>{if(!busy&&!active&&!archived&&!archivePayload.current)setTitle(value);},
