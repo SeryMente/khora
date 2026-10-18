@@ -4,7 +4,8 @@ import { getDb } from "./neon";
 import { cifrarTexto, descifrarTexto } from "./cripto";
 import { PIPELINE, METHOD, PROMPT, digest, segment, validateExtraction, project, relationsOf, type Source, type Proposal, type HumanDecision, IDENTITY_PROMPT, pendingIdentities, identityBatch, validateIdentities, type IdentityPair, scopeGraph } from "../graph-twins";
 
-const MODEL=process.env.GROQ_GRAPH_MODEL||process.env.GROQ_PULIDO_MODEL||"llama-3.3-70b-versatile";
+import {graphModel} from "./graph-diagnostic";
+const MODEL=graphModel();
 const ORIGINALS_OWNER="the.willfreeman@gmail.com"; // Explicit owner authorization, 2026-10-17; no custody approval.
 const SOURCE_SQL=`SELECT v.id,COALESCE(v.version_aprobada,1) AS version_aprobada,
  COALESCE(v.sha256_aprobado,vv.sha256) AS sha256_aprobado,v.recibido_en,vv.texto,vv.sha256,v.sha256 AS vigente_sha256,
@@ -85,7 +86,7 @@ export async function nextChunk(owner:string){
  if(job.proposal.model!==MODEL)throw new Error("extractor_model_changed_requires_new_pipeline");
  const chunk=segment(job.text,job.proposal.next);
  const response=await fetch("https://api.groq.com/openai/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json",Authorization:`Bearer ${key}`},
- body:JSON.stringify({model:MODEL,temperature:0,max_tokens:6000,response_format:{type:"json_object"},messages:[{role:"system",content:PROMPT},{role:"user",content:JSON.stringify({source:job.proposal.source,start_utf16:chunk.start,end_utf16:chunk.end,text:chunk.text})}]}),signal:AbortSignal.timeout(35000)});
+ body:JSON.stringify({model:MODEL,temperature:0,max_completion_tokens:10000,...(MODEL.startsWith("openai/gpt-oss-")?{reasoning_effort:"medium",include_reasoning:false}:{}),response_format:{type:"json_object"},messages:[{role:"system",content:PROMPT},{role:"user",content:JSON.stringify({source:job.proposal.source,start_utf16:chunk.start,end_utf16:chunk.end,text:chunk.text})}]}),signal:AbortSignal.timeout(35000)});
  if(!response.ok)throw new Error("graph_provider_http_"+response.status);
  const completion=await response.json();const choice=completion.choices?.[0];if(choice?.finish_reason!=="stop")throw new Error("graph_provider_incomplete_response");
  const extraction=validateExtraction(JSON.parse(choice.message.content),job.text,job.proposal.source,job.proposal.next);
@@ -113,7 +114,7 @@ export async function judge(owner:string,proposalId:string,itemId:string,decisio
 
 async function processIdentities(owner:string,job:{pairs:IdentityPair[];proposals:Proposal[];stamp:string}){
  const key=process.env.GROQ_API_KEY;if(!key)throw new Error("graph_provider_not_configured");
- const response=await fetch("https://api.groq.com/openai/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json",Authorization:`Bearer ${key}`},body:JSON.stringify({model:MODEL,temperature:0,max_tokens:6000,response_format:{type:"json_object"},messages:[{role:"system",content:IDENTITY_PROMPT},{role:"user",content:JSON.stringify(job.pairs)}]}),signal:AbortSignal.timeout(35000)});
+ const response=await fetch("https://api.groq.com/openai/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json",Authorization:`Bearer ${key}`},body:JSON.stringify({model:MODEL,temperature:0,max_completion_tokens:10000,...(MODEL.startsWith("openai/gpt-oss-")?{reasoning_effort:"medium",include_reasoning:false}:{}),response_format:{type:"json_object"},messages:[{role:"system",content:IDENTITY_PROMPT},{role:"user",content:JSON.stringify(job.pairs)}]}),signal:AbortSignal.timeout(35000)});
  if(!response.ok)throw new Error("graph_identity_provider_http_"+response.status);const completion=await response.json(),choice=completion.choices?.[0];if(choice?.finish_reason!=="stop")throw new Error("graph_identity_provider_incomplete_response");
  const identities=validateIdentities(JSON.parse(choice.message.content),job.pairs,job.proposals);
  const db=await getDb().connect();try{await db.query("BEGIN");await db.query("SELECT pg_advisory_xact_lock(hashtext($1))",["graph-twins:"+owner]);if(sourceStamp(await sources(db,owner))!==job.stamp)throw new Error("approved_sources_changed_retry");const current=await proposals(db,owner);

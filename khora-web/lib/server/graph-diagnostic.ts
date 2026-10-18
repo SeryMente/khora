@@ -1,6 +1,7 @@
 // Read-only provider diagnostics: never send source text or expose credentials.
+export function graphModel(){return process.env.GROQ_GRAPH_MODEL||"openai/gpt-oss-120b";}
 export async function graphProviderDiagnostic(){
- const model=process.env.GROQ_GRAPH_MODEL||process.env.GROQ_PULIDO_MODEL||"llama-3.3-70b-versatile";
+ const model=graphModel();
  const key=process.env.GROQ_API_KEY;
  if(!key)return {configured:false,model,status:"graph_provider_not_configured"};
  try{
