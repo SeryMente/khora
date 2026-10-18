@@ -1,3 +1,4 @@
+import { finiteDuration, redact } from "../auto-observacion/model";
 import {
   getServiceCorrelationId,
   newServiceCorrelationId,
@@ -36,6 +37,7 @@ function outcomeToState(outcome: ServiceOutcome): EstadoEvento {
     case "FAILURE": return "FAIL";
     case "PENDING": return "START";
     case "SKIPPED": return "SKIP";
+    case "PARTIAL": return "INFO";
     default: return "OK";
   }
 }
@@ -73,23 +75,26 @@ export async function registrarEventoServicio(input: ServiceObservationInput): P
     eventId: eventIdFor(phase, input),
     estado: outcomeToState(outcome),
     mensaje: "SERVICE " + clampText(input.service, 120) + "." + clampText(input.operation, 160),
+    outcome,
+    component: input.service,
     detalle: {
+      metadata: redact(Object.fromEntries(Object.entries(input.metadata || {}).filter(([, value]) => typeof value === "number" || typeof value === "boolean"))),
+      severity: input.severity || (outcome === "FAILURE" ? "ERROR" : outcome === "PARTIAL" ? "WARN" : "INFO"),
       boundary: "service",
       service: clampText(input.service, 120),
       operation: clampText(input.operation, 160),
-      route: clampText(input.route, 240),
+      route: clampText(input.route?.split(/[?#]/)[0], 240),
       method: clampText(input.method, 16),
       auth_mode: input.authMode || null,
       provider: clampText(input.provider, 120),
       dependency: clampText(input.dependency, 120),
-      ...(input.metadata || {}),
     },
     correlacionId: correlationId,
     causationId: input.causationId || null,
     attemptId: input.attemptId || null,
     sessionId: input.sessionId || null,
     releaseSha: process.env.VERCEL_GIT_COMMIT_SHA || null,
-    durationMs: input.durationMs == null ? null : Math.max(0, Math.min(Number(input.durationMs), 86400000)),
+    durationMs: input.durationMs == null ? null : finiteDuration(input.durationMs),
     metrics: {
       status_code: status,
       outcome,
@@ -103,7 +108,7 @@ export function emitirEventoServicio(input: ServiceObservationInput): void {
   void registrarEventoServicio(input).catch((error) => {
     console.warn(
       "[service-observability] No se pudo persistir evento:",
-      error instanceof Error ? error.message : String(error),
+      "EVENT_PERSISTENCE_FAILED",
     );
   });
 }
@@ -140,8 +145,7 @@ export async function withServiceObservation<T>(
         durationMs: Date.now() - startedAt,
         reasonCode: error instanceof Error ? error.name.slice(0, 64) : "UNHANDLED_ERROR",
         metadata: {
-          ...(input.metadata || {}),
-          error_type: error instanceof Error ? error.name : "unknown",
+              error_type: error instanceof Error ? error.name : "unknown",
         },
       });
       throw error;
@@ -151,10 +155,11 @@ export async function withServiceObservation<T>(
 
 async function registrarEventoServicioWithinBudget(input: ServiceObservationInput): Promise<void> {
   const work = registrarEventoServicio(input).catch(() => false);
-  await Promise.race([
-    work,
-    new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 750)),
-  ]);
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    await Promise.race([work, new Promise<boolean>((resolve) => { timer = setTimeout(() => resolve(false), 750); })]);
+  } finally { if (timer) clearTimeout(timer); }
+  // Timeout is a response budget, not cancellation or a durable-write acknowledgement.
 }
 
 export function correlationIdFromRequest(request?: Request): string {

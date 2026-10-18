@@ -1,3 +1,5 @@
+import { inferredOutcome, redact, finiteDuration } from "../auto-observacion/model";
+import { hashPersistedEvent, INTEGRITY_SCHEME } from "../auto-observacion/integrity";
 // @l0 L0-002-R · @req SISTEMA-MENU/E3,E4,H
 import { createHash, randomUUID } from "crypto";
 import { getServiceCorrelationId } from "./service-context";
@@ -374,7 +376,8 @@ export interface IngestBatchResult {
  */
 export async function registrarEventosBatch(
   items: (RegistrarEventoParams | ObservationEnvelope)[],
-  batchIdempotencyKey?: string | null
+  batchIdempotencyKey?: string | null,
+  source?: "browser_reported"
 ): Promise<IngestBatchResult> {
   const db = getDb();
 
@@ -387,6 +390,11 @@ export async function registrarEventosBatch(
 
   for (let idx = 0; idx < items.length; idx++) {
     const raw = items[idx];
+    if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
+      response.rejected++;
+      response.results.push({ status: "rejected", reason: "INVALID_EVENT" });
+      continue;
+    }
 
     let params: RegistrarEventoParams;
     if ("event_uuid" in raw && "event_name" in raw) {
@@ -453,16 +461,23 @@ export async function registrarEventosBatch(
       params = raw as RegistrarEventoParams;
     }
 
-    if (!FASES_VALIDAS.has(params.fase) || !validarEventId(params.fase, params.eventId)) {
+    if (!["START", "OK", "FAIL", "INFO", "SKIP"].includes(params.estado) || !FASES_VALIDAS.has(params.fase) || !validarEventId(params.fase, params.eventId)) {
       response.rejected++;
       response.results.push({
         event_uuid: params.eventUuid || undefined,
         status: "rejected",
-        reason: `Fase (${params.fase}) o event_id (${params.eventId}) inválido`,
+        reason: "INVALID_EVENT",
       });
       continue;
     }
 
+    if (source === "browser_reported") params = { ...params, component: "browser",
+      detalle: { ...(params.detalle || {}), observation_source: "browser_reported" }, privacyClass: "ANONYMIZED_TELEMETRY" };
+    params = { ...params, outcome: params.outcome || inferredOutcome(params.estado),
+      detalle: redact(params.detalle) as Record<string, unknown> | null,
+      metrics: redact(params.metrics) as Record<string, unknown> | null,
+      durationMs: finiteDuration(params.durationMs),
+    };
     const correlacionId = params.correlacionId || getServiceCorrelationId() || randomUUID();
     const eventUuid = params.eventUuid || randomUUID();
     const idempotencyKey = params.idempotencyKey || null;
@@ -487,7 +502,7 @@ export async function registrarEventosBatch(
         response.results.push({
           event_uuid: eventUuid,
           status: "duplicate",
-          reason: "Evento duplicado omitido idénticamente (idempotente)",
+          reason: "Identificador ya registrado; no se vuelve a insertar. No certifica igualdad de contenido.",
         });
         continue;
       }
@@ -515,7 +530,8 @@ export async function registrarEventosBatch(
         }
       }
 
-      const canonical = JSON.stringify({
+      detalleJson = { ...(detalleJson || {}), __integrity_scheme: INTEGRITY_SCHEME };
+      const canonicalRow = {
         correlacion_id: correlacionId,
         event_uuid: eventUuid,
         fase: params.fase,
@@ -528,9 +544,14 @@ export async function registrarEventosBatch(
         sequence: params.sequence ?? null,
         session_id: params.sessionId ?? null,
         detalle: detalleJson,
-      });
-
-      const eventHash = sha256Hex(hashAnterior + canonical);
+        cliente_en: params.clienteEn ?? null, idempotency_key: idempotencyKey,
+        schema_version: params.schemaVersion || "1.0", outcome: params.outcome,
+        component: params.component || "system", causation_id: params.causationId ?? null,
+        attempt_id: params.attemptId ?? null, release_sha: params.releaseSha ?? null,
+        duration_ms: params.durationMs ?? null, metrics: params.metrics ?? null,
+        reason_code: params.reasonCode ?? null, privacy_class: params.privacyClass || "SYSTEM_AUDIT",
+      };
+      const eventHash = hashPersistedEvent(canonicalRow, hashAnterior);
 
       await client.query(
         `INSERT INTO eventos_sistema (
@@ -557,7 +578,7 @@ export async function registrarEventosBatch(
           eventUuid,
           idempotencyKey,
           params.schemaVersion || "1.0",
-          params.outcome || "SUCCESS",
+          params.outcome || inferredOutcome(params.estado),
           params.component || "system",
           params.causationId ?? null,
           params.attemptId ?? null,
@@ -578,25 +599,27 @@ export async function registrarEventosBatch(
         status: "inserted",
       });
     } catch (err: any) {
-      await client.query("ROLLBACK");
-      console.error("[registrarEventosBatch] Error registrando evento, mandando a Outbox:", err);
+      await client.query("ROLLBACK").catch(() => {});
+      console.error("[registrarEventosBatch] EVENT_WRITE_FAILED");
+      let queued = false;
 
       try {
-        await db.query(
+        const queuedResult = await db.query(
           `INSERT INTO eventos_outbox (event_uuid, correlacion_id, idempotency_key, payload, estado, error_ultimo)
            VALUES ($1, $2, $3, $4, 'PENDING', $5)
            ON CONFLICT (event_uuid) DO NOTHING`,
-          [eventUuid, correlacionId, idempotencyKey, JSON.stringify(params), String(err)]
+          [eventUuid, correlacionId, idempotencyKey, JSON.stringify(redact({ ...params, eventUuid, correlacionId, idempotencyKey })), "EVENT_WRITE_FAILED"]
         );
-      } catch (outboxErr) {
-        console.error("[registrarEventosBatch] Error crítico al guardar en outbox:", outboxErr);
+      queued = (queuedResult.rowCount || 0) > 0;
+      } catch {
+        console.error("[registrarEventosBatch] OUTBOX_WRITE_FAILED");
       }
 
       response.rejected++;
       response.results.push({
         event_uuid: eventUuid,
         status: "rejected",
-        reason: `Error de base de datos (guardado en Outbox): ${String(err)}`,
+        reason: queued ? "EVENT_PENDING_OUTBOX" : "EVENT_NOT_PERSISTED",
       });
     } finally {
       if (typeof client.release === "function") {
@@ -622,7 +645,7 @@ export async function procesarOutbox(): Promise<{ procesados: number; fallidos: 
   const db = getDb();
 
   const pending = await db.query(
-    `SELECT id, event_uuid, payload FROM eventos_outbox WHERE estado = 'PENDING' AND retry_count < 5 LIMIT 100`
+    `SELECT id, event_uuid, payload FROM eventos_outbox WHERE estado = 'PENDING' AND retry_count < 5 ORDER BY id ASC LIMIT 100`
   );
 
   let procesados = 0;
@@ -641,15 +664,15 @@ export async function procesarOutbox(): Promise<{ procesados: number; fallidos: 
         procesados++;
       } else {
         await db.query(
-          `UPDATE eventos_outbox SET retry_count = retry_count + 1, error_ultimo = $2 WHERE id = $1`,
+          `UPDATE eventos_outbox SET retry_count = retry_count + 1, estado = CASE WHEN retry_count + 1 >= 5 THEN 'FAILED' ELSE 'PENDING' END, error_ultimo = $2 WHERE id = $1`,
           [row.id, res.results[0]?.reason || "Error de reintento outbox"]
         );
         fallidos++;
       }
     } catch (err) {
       await db.query(
-        `UPDATE eventos_outbox SET retry_count = retry_count + 1, error_ultimo = $2 WHERE id = $1`,
-        [row.id, String(err)]
+        `UPDATE eventos_outbox SET retry_count = retry_count + 1, estado = CASE WHEN retry_count + 1 >= 5 THEN 'FAILED' ELSE 'PENDING' END, error_ultimo = $2 WHERE id = $1`,
+        [row.id, "OUTBOX_RETRY_FAILED"]
       );
       fallidos++;
     }

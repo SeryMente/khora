@@ -381,7 +381,7 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
   "registro:timeline": {
     screen: "registro",
     scenario: "timeline",
-    title: "Registro · Línea de Tiempo",
+    title: "Auto-observación · Línea de Tiempo",
     description: "Visor de eventos de sistema con semáforos de estado y filtros por fase.",
     status: "active",
     recommended_viewport: "desktop",
@@ -396,7 +396,7 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
   "registro:empty": {
     screen: "registro",
     scenario: "empty",
-    title: "Registro · Lista Vacía",
+    title: "Auto-observación · Lista Vacía",
     description: "Estado sin eventos registrados.",
     status: "active",
     recommended_viewport: "desktop",
@@ -408,7 +408,7 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
   "registro:loading": {
     screen: "registro",
     scenario: "loading",
-    title: "Registro · Cargando Eventos",
+    title: "Auto-observación · Cargando Eventos",
     description: "Estado de carga inicial de la bitácora de eventos.",
     status: "active",
     recommended_viewport: "desktop",
@@ -420,7 +420,7 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
   "registro:error": {
     screen: "registro",
     scenario: "error",
-    title: "Registro · Error de Carga",
+    title: "Auto-observación · Error de Carga",
     description: "Error al consultar la API de eventos de sistema.",
     status: "active",
     recommended_viewport: "desktop",
@@ -754,7 +754,7 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
   "registro:errores": {
     screen: "registro",
     scenario: "errores",
-    title: "Registro · Eventos Fallidos",
+    title: "Auto-observación · Eventos Fallidos",
     description: "Log con eventos FAIL de titulacion, transcripcion y archivado. Cada fallo debe declarar causa aprovechable, nunca un catch vacio.",
     status: "active",
     recommended_viewport: "desktop",

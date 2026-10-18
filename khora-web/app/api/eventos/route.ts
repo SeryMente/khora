@@ -1,3 +1,4 @@
+import { readEventBatch } from "@/lib/auto-observacion/ingress";
 // @l0 L0-002-R · @req SISTEMA-MENU/E3,E5
 import { timingSafeEqual } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
@@ -14,16 +15,17 @@ export const runtime = "nodejs";
 function validServerKey(req: NextRequest): boolean {
   const supplied = req.headers.get("x-khora-key") || "";
   const expected = process.env.KHORA_API_KEY || "";
-  if (!supplied || !expected || supplied.length !== expected.length) return false;
-  return timingSafeEqual(Buffer.from(supplied), Buffer.from(expected));
+  const a = Buffer.from(supplied), b = Buffer.from(expected);
+  if (!a.length || !b.length || a.length !== b.length) return false;
+  return timingSafeEqual(a, b);
 }
 
 export async function GET(req: NextRequest) {
   const session = await auth();
 
   const isTest =
-    process.env.PLAYWRIGHT_TEST_RUN === "1" ||
-    process.env.PLAYWRIGHT_TEST_BYPASS === "true";
+    process.env.NODE_ENV !== "production" && (process.env.PLAYWRIGHT_TEST_RUN === "1" ||
+    process.env.PLAYWRIGHT_TEST_BYPASS === "true");
   if (!session && !isTest && !validServerKey(req)) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
@@ -54,7 +56,8 @@ export async function GET(req: NextRequest) {
     const volcadoId = searchParams.get("volcado_id");
     const desde = searchParams.get("desde");
     const hasta = searchParams.get("hasta");
-    const limit = Math.max(1, Math.min(Number(searchParams.get("limit") || "1000"), 5000));
+    const requestedLimit = Number(searchParams.get("limit") || "1000");
+    const limit = Number.isFinite(requestedLimit) ? Math.max(1, Math.min(Math.floor(requestedLimit), 5000)) : 1000;
     const format = searchParams.get("format");
 
     const whereClauses: string[] = [];
@@ -113,7 +116,7 @@ export async function GET(req: NextRequest) {
       { headers: { "Cache-Control": "no-store" } }
     );
   } catch (error) {
-    console.error("Error imprevisto en GET /api/eventos:", error);
+    console.error("GET /api/eventos: EVENT_READ_FAILED");
     return NextResponse.json(
       {
         error: "Error interno procesando eventos",
@@ -133,8 +136,8 @@ export async function POST(req: NextRequest) {
   const session = await auth();
 
   const isTest =
-    process.env.PLAYWRIGHT_TEST_RUN === "1" ||
-    process.env.PLAYWRIGHT_TEST_BYPASS === "true";
+    process.env.NODE_ENV !== "production" && (process.env.PLAYWRIGHT_TEST_RUN === "1" ||
+    process.env.PLAYWRIGHT_TEST_BYPASS === "true");
   if (!session && !isTest) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
@@ -156,43 +159,18 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    let body: any;
-    try {
-      const rawText = await req.text();
-      body = JSON.parse(rawText || "{}");
-    } catch {
-      return NextResponse.json({ error: "Cuerpo JSON inválido" }, { status: 400 });
+    let batch: Awaited<ReturnType<typeof readEventBatch>>;
+    try { batch = await readEventBatch(req); }
+    catch (error) {
+      const code = error instanceof Error ? error.message : "INVALID_EVENT_BATCH";
+      return NextResponse.json({ error: code }, { status: code === "PAYLOAD_TOO_LARGE" ? 413 : 400, headers: { "Cache-Control": "no-store" } });
     }
-
-    const batchIdempotencyKey =
-      req.headers.get("x-idempotency-key") ||
-      req.headers.get("idempotency-key") ||
-      body.idempotency_key ||
-      null;
-
-    let items: any[] = [];
-    if (Array.isArray(body)) {
-      items = body;
-    } else if (Array.isArray(body.events)) {
-      items = body.events;
-    } else if (Array.isArray(body.items)) {
-      items = body.items;
-    } else if (typeof body === "object" && body !== null) {
-      items = [body];
-    }
-
-    if (items.length === 0) {
-      return NextResponse.json(
-        { error: "Se requiere al menos un evento en el lote" },
-        { status: 400 }
-      );
-    }
-
-    const result = await registrarEventosBatch(items, batchIdempotencyKey);
+    const items = batch.items;
+    const result = await registrarEventosBatch(items as Parameters<typeof registrarEventosBatch>[0], batch.key, "browser_reported");
 
     return NextResponse.json(
       {
-        ok: true,
+        ok: result.rejected === 0,
         summary: {
           accepted: result.accepted,
           duplicates: result.duplicates,
@@ -202,12 +180,12 @@ export async function POST(req: NextRequest) {
         results: result.results,
       },
       {
-        status: 200,
+        status: result.accepted + result.duplicates === 0 ? 422 : 200,
         headers: { "Cache-Control": "no-store" },
       }
     );
   } catch (error) {
-    console.error("Error imprevisto en POST /api/eventos:", error);
+    console.error("POST /api/eventos: EVENT_WRITE_FAILED");
     return NextResponse.json(
       {
         error: "Error interno procesando eventos",

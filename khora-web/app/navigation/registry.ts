@@ -103,7 +103,7 @@ export const NAVIGATION_REGISTRY: readonly NavigationEntry[] = [
   {
     id: "sistema",
     label: "Sistema",
-    href: "/sistema/registro",
+    href: "/sistema/auto-observacion",
     icon: "ScrollText",
     kind: "menu",
     level: 1,
@@ -114,7 +114,7 @@ export const NAVIGATION_REGISTRY: readonly NavigationEntry[] = [
       "/roadmap",
       "/adherence",
       "/sistema/otros",
-      "/sistema/registro",
+      "/sistema/auto-observacion",
     ],
     children: [
       { id: "herramientas", label: "Herramientas", href: "/herramientas", icon: "Wrench", group: "Herramientas" },
@@ -123,7 +123,7 @@ export const NAVIGATION_REGISTRY: readonly NavigationEntry[] = [
       { id: "roadmap", label: "Roadmap", href: "/roadmap", icon: "MapPinned", group: "Gobierno y observabilidad" },
       { id: "adherence", label: "Adherencia", href: "/adherence", icon: "Activity", group: "Gobierno y observabilidad" },
       { id: "normative", label: "Evidencia normativa", href: "/sistema/otros", icon: "FileCheck2", group: "Gobierno y observabilidad" },
-      { id: "registro", label: "Registro", href: "/sistema/registro", icon: "ScrollText", group: "Gobierno y observabilidad" },
+      { id: "registro", label: "Auto-observación", href: "/sistema/auto-observacion", icon: "ScrollText", group: "Gobierno y observabilidad" },
     ],
   },
 ] as const;
@@ -142,6 +142,7 @@ export const NAVIGATION_EXEMPT_ROUTES = new Set([
 ]);
 
 export const NAVIGATION_LEGACY_ALIASES = new Map<string, string>([
+  ["/sistema/registro", "/sistema/auto-observacion"],
   ["/sistema/volcados", "/sistema/custodia"],
   ["/sistema/boveda", "/sistema/seguridad?tab=boveda"],
   ["/sistema/entorno-persistente", "/sistema/seguridad?tab=entorno-persistente"],

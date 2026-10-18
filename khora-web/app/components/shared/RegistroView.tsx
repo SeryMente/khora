@@ -1,364 +1,76 @@
-// @l0 L0-002 · @req SISTEMA-MENU/E5 · Componente Presentacional Compartido de Visor de Eventos
+// @l0 L0-002 · @req AUTOOBS/UI · Shared by production and synthetic review. Stable legacy IDs retained.
 "use client";
-
-import { ScrollText, Clipboard, RefreshCw, Filter, Layers, ChevronDown, ChevronRight, AlertTriangle, Database, ShieldAlert } from "lucide-react";
-
+import { useEffect, useState } from "react";
+import { Activity, RefreshCw, Clipboard, ChevronDown, ShieldCheck } from "lucide-react";
+import type { IntegrityReport } from "@/lib/auto-observacion/integrity";
 export type EventoSistema = {
-  id: number;
-  fase: string;
-  event_id: string;
-  estado: "START" | "OK" | "FAIL" | "INFO" | "SKIP";
-  mensaje: string;
-  detalle: Record<string, unknown> | null;
-  volcado_id: string | null;
-  version: number | null;
-  sha256: string | null;
-  correlacion_id: string | null;
-  servidor_en: string;
-  cliente_en: string | null;
-  hash_anterior: string | null;
-  event_hash: string | null;
+  storageId?: string; id: number; fase: string; event_id: string; estado: "START" | "OK" | "FAIL" | "INFO" | "SKIP";
+  mensaje: string; detalle: Record<string, unknown> | null; volcado_id: string | null; version: number | null;
+  sha256: string | null; correlacion_id: string | null; servidor_en: string; cliente_en: string | null;
+  hash_anterior: string | null; event_hash: string | null; source?: string; duration_ms?: number | null;
+  outcome_discrepancy?: boolean; component?: string | null; reason_code?: string | null;
 };
-
 export type RegistroViewState = {
-  eventos: EventoSistema[];
-  ndjsonRaw: string;
-  loading: boolean;
-  reintentando?: boolean;
-  error: string | null;
-  reasonCode?: string | null;
-  correlationId?: string | null;
-  faseFiltro: string;
-  agruparPorCorrelacion: boolean;
-  mensajeCopiar: string;
-  expandedDetails: Record<number, boolean>;
+  eventos: EventoSistema[]; ndjsonRaw: string; loading: boolean; reintentando?: boolean; error: string | null;
+  reasonCode?: string | null; correlationId?: string | null; faseFiltro: string; agruparPorCorrelacion: boolean;
+  mensajeCopiar: string; expandedDetails: Record<number, boolean>; outbox?: { pending: number; failed: number; truncated: boolean } | null; observedAt?: string | null; hasMore?: boolean;
+  integrityFor?: string | null; integrity?: IntegrityReport | null; checkingIntegrity?: boolean; initialView?: string;
 };
-
 export type RegistroViewActions = {
-  onFaseFiltroChange?: (fase: string) => void;
-  onAgruparChange?: (agrupar: boolean) => void;
-  onCopiarNdjson?: () => void;
-  onReload?: () => void;
-  onToggleDetail?: (id: number) => void;
+  onFaseFiltroChange?: (fase: string) => void; onAgruparChange?: (value: boolean) => void; onCopiarNdjson?: () => void;
+  onReload?: () => void; onToggleDetail?: (id: number) => void; onMore?: () => void; onIntegrity?: (correlation: string) => void;
 };
-
-const ESTADO_CONFIG: Record<string, { icon: string; color: string; bg: string }> = {
-  OK: { icon: "✅", color: "#10b981", bg: "rgba(16, 185, 129, 0.1)" },
-  FAIL: { icon: "❌", color: "#ef4444", bg: "rgba(239, 68, 68, 0.1)" },
-  INFO: { icon: "ℹ️", color: "#3b82f6", bg: "rgba(59, 130, 246, 0.1)" },
-  SKIP: { icon: "⏭️", color: "#f59e0b", bg: "rgba(245, 158, 11, 0.1)" },
-  START: { icon: "▶️", color: "#8b5cf6", bg: "rgba(139, 92, 246, 0.1)" },
-};
-
-const FASE_COLORS: Record<string, string> = {
-  dictado: "#ec4899",
-  transcripcion: "#8b5cf6",
-  revision: "#3b82f6",
-  manejo: "#10b981",
-  autorizacion: "#f59e0b",
-  ingesta: "#06b6d4",
-  grafo: "#6366f1",
-  captura: "#14b8a6",
-};
-
-export function RegistroView({
-  state,
-  actions = {},
-  isReviewMode = false,
-}: {
-  state: RegistroViewState;
-  actions?: RegistroViewActions;
-  isReviewMode?: boolean;
-}) {
-  const {
-    eventos,
-    loading,
-    reintentando,
-    error,
-    reasonCode,
-    correlationId,
-    faseFiltro,
-    agruparPorCorrelacion,
-    mensajeCopiar,
-    expandedDetails,
-  } = state;
-
-  const eventosAgrupados = eventos.reduce<Record<string, EventoSistema[]>>((acc, evt) => {
-    const key = evt.correlacion_id || "sin_correlacion";
-    if (!acc[key]) acc[key] = [];
-    acc[key].push(evt);
-    return acc;
-  }, {});
-
-  const renderDiagnosticError = () => {
-    let title = "Error de Sistema";
-    let explanation = "Se produjo una anomalía al consultar el registro de eventos.";
-    let icon = <AlertTriangle size={28} className="text-amber-500" />;
-
-    if (reasonCode === "DB_UNREACHABLE") {
-      title = "Base de Datos No Disponible";
-      explanation = "No se pudo establecer conexión con el almacén de datos persistente. Por favor, intente de nuevo.";
-      icon = <Database size={28} className="text-red-400" />;
-    } else if (reasonCode === "EVENT_SCHEMA_MISSING") {
-      title = "Esquema No Preparado (Tabla Ausente)";
-      explanation = "El esquema de eventos no se encuentra instalado en la base de datos. Se requiere ejecutar la migración correspondiente.";
-      icon = <AlertTriangle size={28} className="text-amber-400" />;
-    } else if (reasonCode === "EVENT_SCHEMA_OUTDATED") {
-      title = "Esquema Obsoleto";
-      explanation = "La estructura de la tabla de eventos requiere actualización de columnas. Aplique las migraciones pendientes.";
-      icon = <AlertTriangle size={28} className="text-amber-400" />;
-    } else if (reasonCode === "EVENT_STORE_FORBIDDEN" || error?.includes("401") || error?.includes("403")) {
-      title = "Acceso No Autorizado";
-      explanation = "No tiene permisos suficientes para consultar el registro de eventos.";
-      icon = <ShieldAlert size={28} className="text-red-500" />;
-    }
-
-    return (
-      <div
-        data-ui-id="registro.error-state"
-        role="status"
-        aria-live="polite"
-        className="p-6 border rounded space-y-4 text-xs font-mono"
-        style={{ borderColor: "var(--khora-border)", background: "var(--khora-surface)" }}
-      >
-        <div className="flex items-start gap-3">
-          {icon}
-          <div className="space-y-1 flex-1">
-            <h2 className="text-sm font-bold uppercase tracking-wide text-red-400">{title}</h2>
-            <p className="opacity-80 leading-relaxed">{explanation}</p>
-            {reasonCode && (
-              <div className="flex items-center gap-2 mt-2">
-                <span className="font-bold opacity-60">Código de diagnóstico:</span>
-                <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-stone-800 text-amber-300 border border-stone-700">
-                  {reasonCode}
-                </span>
-              </div>
-            )}
-            {correlationId && (
-              <p className="opacity-60 text-[10px]">
-                Correlación: <code className="text-emerald-400">{correlationId}</code>
-              </p>
-            )}
-          </div>
+const tabs = ["Resumen", "Operaciones", "Eventos", "Integridad"] as const;
+const statusNames: Record<string, string> = { OK: "Completado", FAIL: "Fallo", START: "Pendiente", INFO: "Información / parcial", SKIP: "Omitido" };
+const tone: Record<string, string> = { OK: "var(--khora-accent)", FAIL: "#d45249", START: "#b27320", INFO: "var(--khora-ink)", SKIP: "var(--khora-ink)" };
+const panel = { borderColor: "var(--khora-border)", background: "var(--khora-surface)" };
+const control = "min-h-11 px-3 py-2 border rounded-lg text-sm focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50";
+export function RegistroView({ state, actions = {}, isReviewMode = false }: { state: RegistroViewState; actions?: RegistroViewActions; isReviewMode?: boolean }) {
+  const [tab, setTab] = useState<string>(tabs.find(t => t.toLocaleLowerCase("es") === state.initialView) || "Resumen");
+  useEffect(() => { if (state.initialView) setTab(tabs.find(t => t.toLocaleLowerCase("es") === state.initialView) || "Resumen"); }, [state.initialView]);
+  const [onlyFailures, setOnlyFailures] = useState(false);
+  const [correlation, setCorrelation] = useState("");
+  const [localExpanded, setLocalExpanded] = useState<Record<string, boolean>>({});
+  const integrity = state.integrityFor === correlation ? state.integrity : null;
+  const events = state.eventos.filter(e => (!onlyFailures || e.estado === "FAIL") && (!correlation || e.correlacion_id === correlation));
+  const groups = new Map<string, EventoSistema[]>();
+  for (const e of events) { const key = e.correlacion_id || `Sin correlación · ${e.id}`; groups.set(key, [...(groups.get(key) || []), e]); }
+  const failures = state.eventos.filter(e => e.estado === "FAIL").length;
+  const age = state.observedAt ? Date.now() - new Date(state.observedAt).getTime() : null;
+  const freshness = state.loading ? "Consultando…" : state.error ? "Consulta no disponible" : !state.eventos.length ? "Sin evidencia" : age === null ? "Frescura no comprobada" : age > 60000 ? "Muestra desactualizada" : "Consulta reciente · no acredita salud global";
+  return <main data-ui-id="registro.container" className="w-full min-w-0 p-4 md:p-8" style={{ color: "var(--khora-ink)", background: "var(--khora-bg)" }}>
+    <div className="mx-auto max-w-6xl space-y-6 min-w-0">
+      <header data-ui-id="registro.header" className="flex flex-wrap items-start justify-between gap-4 border-b pb-6" style={{ borderColor: "var(--khora-border)" }}>
+        <div className="space-y-2 min-w-0"><p className="text-xs uppercase tracking-widest opacity-70">Sistema / Diagnóstico</p>
+          <h1 className="text-3xl font-semibold tracking-tight flex items-center gap-3"><Activity aria-hidden size={28} />Auto-observación</h1>
+          <p className="text-sm opacity-75 max-w-xl">Entender qué ocurrió. Reconstruir una operación. Encontrar dónde falló.</p>
         </div>
-
-        <div className="flex justify-end pt-2 border-t" style={{ borderColor: "var(--khora-border)" }}>
-          <button
-            data-ui-id="registro.btn-reintentar"
-            onClick={() => actions.onReload?.()}
-            disabled={reintentando}
-            className="flex items-center gap-2 px-4 py-2 font-bold uppercase border rounded hover:opacity-80 transition-colors disabled:opacity-50"
-            style={{ borderColor: "var(--khora-border)", background: "var(--khora-bg)" }}
-          >
-            <RefreshCw size={14} className={reintentando ? "animate-spin" : ""} />
-            {reintentando ? "Reintentando..." : "Reintentar"}
-          </button>
-        </div>
+        <div className="flex flex-wrap gap-2"><button data-ui-id="registro.btn-copiar" className={control} style={panel} disabled={!actions.onCopiarNdjson || !events.length || !!state.error || state.loading} onClick={actions.onCopiarNdjson}><Clipboard className="inline mr-2" size={15} aria-hidden />Copiar diagnóstico seguro</button>
+          <button className={control} style={panel} disabled={!actions.onReload || state.loading} onClick={actions.onReload}><RefreshCw size={15} className="inline mr-2" aria-hidden />Actualizar</button></div>
+      </header>
+      <div className="flex flex-wrap justify-between gap-2 text-xs" role="status" aria-live="polite"><span>{isReviewMode ? "Escenario sintético · sin datos reales" : freshness}</span><span>Privacidad por defecto · sin textos ni credenciales</span></div>
+      {state.mensajeCopiar && <p role="status" className="text-sm">{state.mensajeCopiar}</p>}
+      <nav aria-label="Vistas de Auto-observación" className="flex flex-wrap gap-1 border-b pb-2" style={{ borderColor: "var(--khora-border)" }}>{tabs.map(t => <button key={t} type="button" aria-current={tab === t ? "page" : undefined} className={`${control} ${tab === t ? "font-semibold" : "opacity-70"}`} style={{ borderColor: tab === t ? "var(--khora-accent)" : "transparent" }} onClick={() => setTab(t)}>{t}</button>)}</nav>
+      <div data-ui-id="registro.filter-bar" className="flex flex-wrap items-end gap-4 p-4 rounded-xl border" style={panel}>
+        <label className="text-xs space-y-1"><span className="block">Fase del sistema</span><select id="fase-filtro-select" className={control} style={panel} value={state.faseFiltro} onChange={e => actions.onFaseFiltroChange?.(e.target.value)} disabled={!actions.onFaseFiltroChange}><option value="todas">Todas las fases</option>{["dictado", "transcripcion", "revision", "manejo", "autorizacion", "ingesta", "grafo", "captura"].map(f => <option key={f} value={f}>{f}</option>)}</select></label>
+        <label className="text-xs space-y-1 min-w-0"><span className="block">Correlación exacta en esta muestra</span><input className={`${control} w-full max-w-72`} style={panel} value={correlation} maxLength={128} onChange={e => setCorrelation(e.target.value)} placeholder="Identificador de operación" /></label>
+        <label className="text-sm min-h-11 flex gap-2 items-center"><input type="checkbox" checked={onlyFailures} onChange={e => setOnlyFailures(e.target.checked)} />Solo fallos</label>
+        <label className="text-sm min-h-11 flex gap-2 items-center"><input type="checkbox" checked={state.agruparPorCorrelacion} disabled={!actions.onAgruparChange} onChange={e => actions.onAgruparChange?.(e.target.checked)} />Agrupar eventos</label>
       </div>
-    );
-  };
-
-  return (
-    <main
-      data-ui-id="registro.container"
-      className="w-full flex justify-center p-4 py-12 font-mono min-h-screen"
-      style={{ background: "var(--khora-bg)", color: "var(--khora-ink)" }}
-    >
-      <div className="w-full max-w-5xl space-y-6">
-        {/* Header */}
-        <header data-ui-id="registro.header" className="flex flex-col md:flex-row justify-between items-start md:items-center border-b pb-4 gap-4" style={{ borderColor: "var(--khora-border)" }}>
-          <div>
-            <div className="flex items-center gap-2">
-              <ScrollText size={32} style={{ color: "var(--khora-accent)" }} />
-              <h1 className="text-2xl font-bold uppercase tracking-wider">Sistema — Visor de Eventos</h1>
-            </div>
-            <p className="text-xs opacity-70 mt-1">
-              Registro continuo de eventos, trazabilidad forense por fase y cadena de integridad hash.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              data-ui-id="registro.btn-copiar"
-              onClick={() => actions.onCopiarNdjson?.()}
-              className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase border rounded hover:opacity-80 transition-colors"
-              style={{ borderColor: "var(--khora-border)", background: "var(--khora-surface)" }}
-            >
-              <Clipboard size={16} /> Copiar todo (NDJSON)
-            </button>
-            <button
-              onClick={() => actions.onReload?.()}
-              disabled={loading || reintentando}
-              className="p-2 border rounded hover:opacity-80 transition-colors disabled:opacity-50"
-              style={{ borderColor: "var(--khora-border)", background: "var(--khora-surface)" }}
-              title="Actualizar registro"
-              aria-label="Actualizar registro"
-            >
-              <RefreshCw size={16} className={loading || reintentando ? "animate-spin" : ""} />
-            </button>
-          </div>
-        </header>
-
-        {mensajeCopiar && (
-          <div
-            role="status"
-            aria-live="polite"
-            className="p-2 text-xs border rounded flex items-center gap-2"
-            style={{ borderColor: "var(--khora-border)", background: "var(--khora-surface)" }}
-          >
-            <span>{mensajeCopiar}</span>
-          </div>
-        )}
-
-        {/* Control Bar */}
-        <div data-ui-id="registro.filter-bar" className="flex flex-wrap items-center justify-between gap-4 p-3 border rounded" style={{ borderColor: "var(--khora-border)", background: "var(--khora-surface)" }}>
-          <div className="flex items-center gap-3 text-xs">
-            <Filter size={16} style={{ color: "var(--khora-accent)" }} />
-            <label htmlFor="fase-filtro-select" className="font-bold uppercase">Fase:</label>
-            <select
-              id="fase-filtro-select"
-              value={faseFiltro}
-              onChange={(e) => actions.onFaseFiltroChange?.(e.target.value)}
-              className="p-1 border rounded bg-transparent font-mono focus:outline-none focus:ring-1 focus:ring-emerald-500"
-              style={{ borderColor: "var(--khora-border)", color: "var(--khora-ink)" }}
-            >
-              <option value="todas">Todas las fases</option>
-              <option value="dictado">Dictado</option>
-              <option value="transcripcion">Transcripción</option>
-              <option value="revision">Revisión</option>
-              <option value="manejo">Manejo</option>
-              <option value="autorizacion">Autorización</option>
-              <option value="ingesta">Ingesta</option>
-              <option value="grafo">Grafo</option>
-              <option value="captura">Captura</option>
-            </select>
-          </div>
-
-          <div className="flex items-center gap-2 text-xs">
-            <Layers size={16} style={{ color: "var(--khora-accent)" }} />
-            <label className="flex items-center gap-1.5 cursor-pointer font-bold uppercase">
-              <input
-                type="checkbox"
-                checked={agruparPorCorrelacion}
-                onChange={(e) => actions.onAgruparChange?.(e.target.checked)}
-                className="rounded focus:ring-emerald-500"
-              />
-              Agrupar por correlacion_id
-            </label>
-          </div>
-        </div>
-
-        {/* Content list */}
-        {loading ? (
-          <div
-            data-ui-id="registro.loading-state"
-            role="status"
-            aria-live="polite"
-            className="p-8 text-center text-xs opacity-60 border rounded"
-            style={{ borderColor: "var(--khora-border)", background: "var(--khora-surface)" }}
-          >
-            {reintentando ? "Reintentando consulta del registro..." : "Cargando registro de eventos..."}
-          </div>
-        ) : error ? (
-          renderDiagnosticError()
-        ) : eventos.length === 0 ? (
-          <div data-ui-id="registro.empty-state" className="p-8 text-center text-xs opacity-60 border rounded" style={{ borderColor: "var(--khora-border)" }}>
-            No se encontraron eventos en el registro.
-          </div>
-        ) : agruparPorCorrelacion ? (
-          <div data-ui-id="registro.events-list" className="space-y-6">
-            {Object.entries(eventosAgrupados).map(([correlacionId, grupoEvts]) => (
-              <section key={correlacionId} className="border rounded p-4 space-y-3" style={{ borderColor: "var(--khora-border)", background: "var(--khora-surface)" }}>
-                <header className="border-b pb-2 flex justify-between items-center text-xs">
-                  <span className="font-bold opacity-80">
-                    Correlación: <code className="text-emerald-400">{correlacionId}</code>
-                  </span>
-                  <span className="opacity-60">{grupoEvts.length} eventos</span>
-                </header>
-                <div className="space-y-2">
-                  {grupoEvts.map((evt) => (
-                    <ItemEvento key={evt.id} evt={evt} expanded={!!expandedDetails[evt.id]} onToggle={() => actions.onToggleDetail?.(evt.id)} />
-                  ))}
-                </div>
-              </section>
-            ))}
-          </div>
-        ) : (
-          <div data-ui-id="registro.events-list" className="space-y-2">
-            {eventos.map((evt) => (
-              <ItemEvento key={evt.id} evt={evt} expanded={!!expandedDetails[evt.id]} onToggle={() => actions.onToggleDetail?.(evt.id)} />
-            ))}
-          </div>
-        )}
-      </div>
-    </main>
-  );
-}
-
-function ItemEvento({ evt, expanded, onToggle }: { evt: EventoSistema; expanded: boolean; onToggle: () => void }) {
-  const cfg = ESTADO_CONFIG[evt.estado] || ESTADO_CONFIG.INFO;
-  const faseColor = FASE_COLORS[evt.fase] || "var(--khora-accent)";
-
-  return (
-    <div
-      data-ui-id="registro.event-item"
-      className="border rounded text-xs transition-colors focus-within:ring-1 focus-within:ring-emerald-500"
-      style={{ borderColor: "var(--khora-border)", background: "var(--khora-surface)" }}
-    >
-      <button
-        type="button"
-        className="w-full text-left p-3 flex items-start justify-between gap-3 focus:outline-none"
-        onClick={onToggle}
-        aria-expanded={expanded}
-      >
-        <div className="flex items-start gap-2.5 flex-1">
-          <span className="text-base select-none">{cfg.icon}</span>
-          <div className="space-y-1 flex-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <span
-                className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase text-white"
-                style={{ background: faseColor }}
-              >
-                {evt.fase}
-              </span>
-              <strong className="font-bold">{evt.event_id}</strong>
-              <span className="opacity-60 text-[11px]">
-                {new Date(evt.servidor_en).toLocaleString("es-MX")}
-              </span>
-              {evt.volcado_id && (
-                <span className="opacity-70 text-[10px] border px-1 rounded" style={{ borderColor: "var(--khora-border)" }}>
-                  registro: {evt.volcado_id.slice(0, 8)}...
-                </span>
-              )}
-            </div>
-            <p className="font-medium text-sm leading-snug">{evt.mensaje}</p>
-          </div>
-        </div>
-
-        <div className="p-1 opacity-60 hover:opacity-100">
-          {expanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
-        </div>
-      </button>
-
-      {expanded && (
-        <div className="p-3 border-t space-y-2 font-mono text-[11px]" style={{ borderColor: "var(--khora-border)", background: "var(--khora-bg)" }}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 opacity-80 border-b pb-2" style={{ borderColor: "var(--khora-border)" }}>
-            <div><strong>ID:</strong> {evt.id}</div>
-            <div><strong>Estado:</strong> {evt.estado}</div>
-            <div><strong>Correlación ID:</strong> {evt.correlacion_id || "N/A"}</div>
-            <div><strong>Registro ID:</strong> {evt.volcado_id || "N/A"} (v{evt.version || 1})</div>
-            <div><strong>Hash Anterior:</strong> <code className="break-all">{evt.hash_anterior}</code></div>
-            <div><strong>Event Hash:</strong> <code className="break-all">{evt.event_hash}</code></div>
-          </div>
-
-          <div>
-            <strong className="block mb-1 opacity-80">Detalle estructurado (JSON):</strong>
-            <pre className="p-2 border rounded overflow-x-auto whitespace-pre-wrap break-all text-[10px]" style={{ borderColor: "var(--khora-border)", background: "var(--khora-surface)" }}>
-              {evt.detalle ? JSON.stringify(evt.detalle, null, 2) : "(sin detalle)"}
-            </pre>
-          </div>
-        </div>
-      )}
+      {state.loading ? <div data-ui-id="registro.loading-state" className="p-8 border rounded-xl" style={panel} role="status">Consultando evidencia persistida…</div> : state.error ? <section data-ui-id="registro.error-state" className="p-6 border rounded-xl space-y-3" style={panel} role="alert"><h2 className="font-semibold">Auto-observación no disponible</h2><p className="text-sm">No se pudo comprobar el almacén. Esto no significa que el sistema esté sano ni que se hayan perdido los datos.</p><p className="text-xs font-mono">{state.reasonCode || "OBSERVATION_UNAVAILABLE"}</p><button data-ui-id="registro.btn-reintentar" className={control} style={panel} disabled={state.reintentando || !actions.onReload} onClick={actions.onReload}>Reintentar</button></section> : <>
+        {tab === "Resumen" && <aside className="p-4 border rounded-xl text-sm space-y-1" style={panel}><strong>Recuperación del registro</strong><p>{state.outbox ? `${state.outbox.pending} pendientes · ${state.outbox.failed} agotadas o fallidas${state.outbox.truncated ? " · muestra truncada" : ""}` : "Cola de recuperación no comprobada"}</p><p className="text-xs opacity-70">La cola comparte base de datos: una caída total puede impedir registrar y recuperar. No es una garantía de durabilidad independiente.</p></aside>}
+        {tab === "Resumen" && <section aria-label="Resumen de la muestra" className="grid grid-cols-2 lg:grid-cols-4 gap-3">{[["Eventos", state.eventos.length], ["Fallos observados", failures], ["Inicios registrados", state.eventos.filter(e => e.estado === "START").length], ["Correlaciones", new Set(state.eventos.map(e => e.correlacion_id).filter(Boolean)).size]].map(([label, value]) => <div key={label} className="p-5 border rounded-xl" style={panel}><p className="text-xs opacity-70">{label}</p><p className="text-3xl font-semibold mt-2">{value}</p><p className="text-xs opacity-60 mt-2">En la muestra cargada</p></div>)}</section>}
+        {tab === "Integridad" ? <section className="p-6 border rounded-xl space-y-4" style={panel}><h2 className="font-semibold text-lg flex gap-2 items-center"><ShieldCheck size={20} aria-hidden />Comprobar, no suponer</h2><p className="text-sm max-w-2xl">Selecciona una correlación para comprobar hasta 500 eventos de esa cadena. Los eventos históricos solo permiten comprobar enlaces; los nuevos incluyen una huella canónica de contenido.</p><label className="block text-sm">Cadena a comprobar<select className={`${control} block mt-2 w-full max-w-xl`} style={panel} value={correlation} onChange={e => setCorrelation(e.target.value)}><option value="">Seleccionar correlación</option>{[...new Set(state.eventos.map(e => e.correlacion_id).filter((v): v is string => !!v))].map(c => <option key={c} value={c}>{c}</option>)}</select></label><button className={control} style={panel} disabled={!correlation || state.checkingIntegrity || !actions.onIntegrity} onClick={() => actions.onIntegrity?.(correlation)}>{state.checkingIntegrity ? "Comprobando…" : "Verificar cadena"}</button>
+          <div role="status" aria-live="polite" className="text-sm border-t pt-4 space-y-2" style={{ borderColor: "var(--khora-border)" }}><strong>{integrity ? ({ BROKEN: "Alteración o discontinuidad detectada", NO_EVIDENCE: "Sin evidencia", PARTIAL: "Comprobación parcial", VERIFIED_SCOPE: "Contenido y enlaces coinciden en el alcance comprobado" }[integrity.verdict]) : "Todavía no comprobada"}</strong>{integrity && <p>{integrity.checked} eventos · {integrity.verifiedPayloads} contenidos V2 · {integrity.legacy} históricos · {integrity.broken} discrepancias. {integrity.truncated ? "Cadena truncada por límite." : ""}</p>}<p className="opacity-70">Sin anclaje externo: no detecta una reescritura administrativa completa. No prueba autenticidad del emisor ni cobertura total.</p></div></section> : <>
+          {tab === "Operaciones" && <p className="text-sm opacity-75">Agrupación de la muestra; un inicio sin cierre no demuestra una operación todavía activa. Un cierre no certifica toda la operación.</p>}
+          {events.length === 0 ? <div data-ui-id="registro.empty-state" className="p-8 border rounded-xl text-sm" style={panel}>No hay eventos para estos filtros. Ausencia de eventos no significa ausencia de fallos.</div> : <div data-ui-id="registro.events-list" className="space-y-3">{(tab === "Operaciones" || state.agruparPorCorrelacion ? [...groups] : [["", events]] as [string, EventoSistema[]][]).map(([id, rows]) => <section key={id} className="space-y-2 min-w-0">{id && <h2 className="text-xs font-mono break-all pt-3">{id} · {rows.length} eventos · {rows.some(e => e.estado === "FAIL") ? "Fallo observado" : "Resultado no concluyente"}</h2>}{rows.map(e => { const detailKey = e.storageId || String(e.id); const expanded = state.expandedDetails[e.id] || localExpanded[detailKey]; return <article key={detailKey} data-ui-id="registro.event-item" className="rounded-xl border overflow-hidden min-w-0" style={panel}>
+            <button className="w-full p-4 text-left flex gap-3 justify-between items-start focus-visible:outline-2 focus-visible:outline-offset-[-3px]" aria-expanded={!!expanded} onClick={() => { setLocalExpanded(x => ({ ...x, [detailKey]: !expanded })); actions.onToggleDetail?.(e.id); }}><div className="min-w-0 space-y-2"><div className="flex flex-wrap gap-3 text-xs items-center"><span className="font-semibold" style={{ color: tone[e.estado] }}>{statusNames[e.estado]}</span><span className="opacity-70">{e.fase}</span><code>{e.event_id}</code><span className="opacity-60">{e.servidor_en ? new Date(e.servidor_en).toLocaleString("es-MX") : "Hora desconocida"}</span></div><p className="text-sm">{e.estado === "FAIL" ? "La operación registró un fallo" : e.estado === "START" ? "Inicio de operación registrado" : "Evento persistido"}{e.component ? ` · ${e.component}` : ""}</p>{e.outcome_discrepancy && <p className="text-xs">Resultado histórico inconsistente: revisar estado y cobertura.</p>}</div><ChevronDown size={16} aria-hidden className="shrink-0" /></button>
+            {expanded && <dl className="border-t p-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-xs" style={{ borderColor: "var(--khora-border)" }}>{[["Correlación", e.correlacion_id || "No registrada"], ["Persistencia", "Leído del almacén del servidor"], ["Emisor", e.source === "browser_reported" ? "Declarado por navegador; no autenticidad acreditada" : "Origen histórico no atestiguado"], ["Duración", e.duration_ms == null ? "No registrada" : `${e.duration_ms} ms`], ["Código de causa", e.reason_code || "No registrado"], ["Integridad", "Usar la pestaña Integridad; persistir no significa verificar"]].map(([k, v]) => <div key={k} className="min-w-0"><dt className="opacity-60 mb-1">{k}</dt><dd className="break-all">{v}</dd></div>)}</dl>}
+          </article>; })}</section>)}</div>}
+          {state.hasMore && <button className={control} style={panel} disabled={!actions.onMore} onClick={actions.onMore}>Ver eventos anteriores</button>}
+        </>}
+        <p className="text-xs opacity-65 leading-relaxed">Lectura acotada de evidencia, no un semáforo global. Actualizar vuelve a consultar lo reciente. El diagnóstico exportado excluye mensajes, detalles libres y credenciales. No certifica que la instrumentación esté completa.</p>
+      </>}
     </div>
-  );
+  </main>;
 }

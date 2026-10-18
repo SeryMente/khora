@@ -11,7 +11,7 @@ El subsistema Entorno Persistente Medio v1.0 se especifica en [`ep-medio-archite
 | [`UI_REVIEW.md`](./UI_REVIEW.md) | C├│mo ver la interfaz vigente de Khora, incluidos los modelos que no ejecutan JavaScript |
 | [`ep-medio-architectura.md`](./ep-medio-architectura.md) | Entorno Persistente Medio v1.0 |
 | [`docs/frentes/dictado-voz/OBJETO-CANONICO.md`](./docs/frentes/dictado-voz/OBJETO-CANONICO.md) | Objeto ├║nico del frente: observabilidad MCP, dictado, benchmark, retroalimentaci├│n y propuesta delimitada de voz/s├¡ntomas; originales, evidencia y continuidad |
-| [`docs/frentes/auto-observacion/OBJETO-CANONICO.md`](./docs/frentes/auto-observacion/OBJETO-CANONICO.md) | Auto-observación: objeto único, propuesta de arquitectura/interfaz, originales, evidencia y continuidad; implementación pendiente |
+| [`docs/frentes/auto-observacion/OBJETO-CANONICO.md`](./docs/frentes/auto-observacion/OBJETO-CANONICO.md) | Auto-observación: objeto único, interfaz compartida, diagnóstico seguro, integridad V2 y pruebas; estado real de integración/despliegue en el objeto |
 
 ### Custodia continua de dictados
 

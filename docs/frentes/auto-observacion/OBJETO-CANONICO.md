@@ -3,10 +3,10 @@
 ## 1. Control e identidad
 
 - Identidad: AUTOOBS-KHORA; nombre de subsistema ratificado por U004: **Auto-observación**. «Cora/Quora» se normaliza a Khora fuera de originales.
-- Versión: 0.2.0; sello AUTOOBS-KHORA-v0.2.0. Ancla C002/U005: operador autoriza resolución de extremo a extremo sin nuevas aprobaciones de diseños concretos; construcción y pruebas en curso.
+- Versión: 0.3.0; sello AUTOOBS-KHORA-v0.3.0. Ancla C003: implementación del corte completo de Auto-observación; 24 regresiones sintéticas y tipado seleccionado comprobados; revisión visual y compuertas completas en curso.
 - Elemento permanente autorizado por U004. Carpeta contenedora: `docs/frentes/auto-observacion/`; único objeto de estado: `OBJETO-CANONICO.md`. No es un tablero adicional.
 - Propietario: SeryMente/khora. Privacidad actual comprobada: `private:true`, `visibility:private`, permiso `push:true` en consulta de este ciclo.
-- Rama documental: `docs/auto-observacion-20261018`; base comprobada `4dca2133866421105f077bbd7079576c588d1169`. No equivale a main, fusión ni despliegue.
+- Rama de construcción: `docs/auto-observacion-20261018`; base comprobada `4dca2133866421105f077bbd7079576c588d1169`. No equivale a main, fusión ni despliegue.
 - Persistencia inicial verificada: commit `4eb482c195e2ac8c1befc3041097d8bbc6e80e1e`, lectura íntegra de los tres archivos y comparación exacta con payload/manifiesto. Recibo `evidencias/LECTURA-C001.json`. Esta revisión incorpora el resultado; comprobar su blob remoto contra el esperado al terminar.
 - Recuperación: README del repositorio → carpeta del frente → este objeto → originales, evidencias y manifiesto. No crear copia de estado en Notion ni renombrar objetos de otros frentes.
 
@@ -45,11 +45,11 @@ La fuente metodológica aporta método, no recibe contenido privado del frente. 
 
 **De dónde viene:** U001/U002 investigaron la autoobservación y referentes; U003 fijó diagnóstico de bugs, calidad de desarrollo y práctica defensiva. U004 ordena realizarlo con robustez medianamente elevada y calidad de interfaz, renombrando Registro y manteniendo objeto en el repositorio.
 
-**Dónde está:** hay infraestructura previa y contratos reutilizables. No se ha construido esta evolución ni certificado su cobertura.
+**Dónde está:** corte implementado en rama: interfaz compartida de cuatro vistas, consulta autenticada depurada, hash canónico V2, corrección de outcome, cola visible y pruebas defensivas. Sin certificación productiva ni cobertura total.
 
 **A dónde va:** subsistema integrado, útil en la operación diaria, con operaciones reconstruibles, evidencia graduada, diagnóstico de incidentes, privacidad por defecto y ejercicios defensivos aislados.
 
-**Qué cambió:** se abre frente canónico por autorización; el análisis previo pasa a propuesta verificable, no a implementación supuesta.
+**Qué cambió:** U005 delega construcción integral y decisiones concretas. C003 incorpora código y pruebas causales; el diseño del anexo A queda adoptado con el alcance y límites reales de este corte.
 
 Incluido: inventario y endurecimiento del registro existente; navegación/renombre Auto-observación; escenarios compartidos; contrato de eventos y resultados; correlación; diagnóstico depurado; integridad/retención verificables; pruebas externas sintéticas; pruebas defensivas; actualización del objeto en cada paso.
 
@@ -68,7 +68,8 @@ Fuera de alcance: compras, alta/provisionamiento de proveedores, envío de datos
 |---|---|---|
 | U001–U002 | Investigar y explicar; no asumir superioridad mundial | Investigación, no compra/implementación |
 | U003 | Diagnóstico, calidad y laboratorio defensivo | Propósito explícito |
-| U004 | Realizar evolución, nombre Auto-observación, interfaz y objeto persistente | Objetivo y documentación autorizados; diseño A pendiente de presencia del operador |
+| U004 | Realizar evolución, nombre Auto-observación, interfaz y objeto persistente | Objetivo y documentación autorizados; decisiones concretas delegadas por U005 |
+| U005 | Resolver de extremo a extremo sin nuevas aprobaciones de diseños concretos | Constructor actual, arquitectura y UI dentro del alcance expresamente delegadas |
 
 El análisis previo recomendó OpenTelemetry y Sentry: son candidatos, no proveedores contratados ni decisiones aprobadas. Ninguna credencial debe guardarse en chat, Git, originales o paquete de incidente. El laboratorio no se conecta a datos reales.
 
@@ -82,13 +83,13 @@ Herramientas usadas: conexión GitHub para lectura/escritura documental; sandbox
 
 ### 🔄 Estado vivo
 
-C002 · Construcción autorizada por U005. Se reutiliza eventos_sistema; no nueva base ni proveedor. Hallazgos causales: eventos de servicio no propagan outcome/component, PARTIAL cae en OK, consulta histórica prioriza eventos antiguos, fallos de outbox se anuncian guardados sin prueba. Se implementan contrato seguro, consulta autenticada acotada, integridad con alcance explícito y superficie compartida Auto-observación.
+C003 · Código implementado en rama de trabajo. Registro renombrado Auto-observación, acceso desde Sistema y auditoría filtrada desde Seguridad; ruta histórica conserva el mismo controlador. Vistas Resumen/Operaciones/Eventos/Integridad. Consulta autenticada sin bypass de prueba, proyección sin mensajes/detalles libres, keyset de recientes, límites y timeout SQL, estado de cola muestreada. Resultado de servicio propagado correctamente, metadatos no suplantan frontera, origen de navegador marcado no atestiguado. Cadena V2 con orden canónico estable ante JSONB; legado solo enlaces. Fallo doble de almacén no afirma guardado; identidad de reintento conservada y agotamiento visible.
 
-Siguiente paso atómico: implementar, ejecutar regresiones defensivas y revisión visual con datos sintéticos; persistir evidencia y código juntos. Después, integrar por solicitud de fusión con compuertas reales. No esperar nuevas aprobaciones concretas de diseño.
+Siguiente paso atómico: revisión visual móvil/escritorio y pruebas de integración; abrir solicitud de fusión, consultar compuertas reales y corregir lo causal sin pedir diseño otra vez. No se declara fusión ni despliegue por este commit.
 
 ### ⚗️ En prueba / recién fallido
 
-Acceso Git por terminal no disponible: autenticación no compartida con conexión GitHub. Se utiliza conexión autorizada; instantánea local selectiva, no clon completo. Ninguna prueba productiva acreditada.
+24/24 regresiones propias sintéticas aprobadas; tipado estricto de archivos seleccionados aprobado con TypeScript 5.9.3 y declaración local de auth (no prueba de integración de auth). Primer intento con compilador global incompatible: TS5102/baseUrl; corregido usando versión del repositorio. No pruebas productivas ni clon completo: conexión GitHub no comparte credencial con terminal.
 
 ### 🔔 Recordatorios Latentes
 
@@ -99,23 +100,23 @@ Acceso Git por terminal no disponible: autenticación no compartida con conexió
 
 ## 9. Aceptación y viabilidad
 
-| Requisito | Resultado exigido | Evidencia requerida | Estado C001 |
+| Requisito | Resultado exigido | Evidencia requerida | Estado vigente C003 |
 |---|---|---|---|
 | Objeto conforme al método | 13 bloques, originales, continuidad | manifiesto y lectura de vuelta | Paquete inicial persistido/verificado; actualización de recibo en curso |
-| Renombre | Auto-observación visible en menús/documentos pertinentes | búsqueda de etiquetas + navegación real | Pendiente |
+| Renombre | Auto-observación visible en menús/documentos pertinentes | navegación declarativa + pruebas browser | Implementado; revisión visual pendiente |
 | Compatibilidad | rutas/IDs anteriores siguen resolviendo | pruebas de aliases y consumidores | Pendiente |
 | Diagnóstico | operación reconstruible y fallo localizado | caso sintético extremo a extremo, versión y correlación | Pendiente |
-| Resultado honesto | pendiente/parcial/fallo no se muestran como éxito confirmado | pruebas de estados y persistencia | Pendiente |
-| Privacidad | secreto y dictado ficticios ausentes en exportaciones | prueba del payload realmente enviado | Pendiente |
-| Integridad | alteraciones/pérdidas detectables en alcance definido | prueba negativa y verificador | Pendiente |
-| Resiliencia | fallos del registro visibles, sin falsa durabilidad | interrupción controlada y recuperación | Pendiente |
+| Resultado honesto | pendiente/parcial/fallo no se muestran como éxito confirmado | pruebas de estados y persistencia | Regresiones propias aprobadas |
+| Privacidad | secreto y dictado ficticios ausentes en exportaciones | prueba del payload realmente enviado | Proyección/entrada/redacción probadas; API integrada pendiente |
+| Integridad | alteraciones/pérdidas detectables en alcance definido | prueba negativa y verificador | V2 y enlaces comprobados sintéticamente; legado parcial explícito |
+| Resiliencia | fallos del registro visibles, sin falsa durabilidad | interrupción controlada y recuperación | Fallo doble, outbox, duplicado y agotamiento probados con DB simulada |
 | Calidad de interfaz | compartida, accesible, móvil/escritorio | harness, teclado, contraste, vacíos/carga/error, Playwright, revisión humana | Pendiente |
 | Desarrollo de calidad | incidente lleva a prueba de regresión | bug sintético que falla antes/pasa después | Pendiente |
 | Seguridad defensiva | ejercicios aislados y repetibles | datos/credenciales sintéticos + control y recuperación | Pendiente |
 | Cierre | código, contratos, objeto y pruebas concordantes | revisión exacta, integración y despliegue autorizados verificados | Pendiente |
 
 Viabilidad: el repositorio ofrece mecanismos reutilizables; una evolución incremental es plausible, no una capacidad certificada. No hay métricas productivas ni costes medidos. No se rebaja el objetivo a una pantalla o documento.
-Pronóstico inicial: siguiente hito es revisión material del anexo A y asignación funcional; requiere un intercambio del operador, sin duración inventada. Implementación y cierre: no estimables responsablemente hasta inventariar archivos/pruebas del corte aprobado. Esperas de proveedor, revisión, integración y despliegue se separan. No reutilizar rangos genéricos ni porcentajes sin denominador.
+Pronóstico actualizado: el siguiente hito son compuertas completas en GitHub y revisión visual; sin estimar duración de runners o despliegue que aún no se ejecutan. La autorización de diseño/rol ya no bloquea. No sustituir pruebas de repositorio completo por el tipado de una instantánea selectiva.
 
 ## 10. Formato de ciclo
 
@@ -151,28 +152,10 @@ Conversación origen: https://app.notion.com/chat?t=3fdade27f22c8078928c00a928af
 
 ## 12. Reinstanciación
 
-Los siguientes prompts se adquieren con el objeto vivo; no copian un estado alternativo. Construcción requiere asignación explícita, no basta pegar un título histórico.
-
-### Prompt de asistencia
+No hay barrera pendiente de rol ni de diseño: U005 delegó ambas dentro del frente. Un solo escritor; ningún subagente. Para reinstanciar, cargar el objeto vivo y sus evidencias, no reutilizar un estado histórico.
 
 ```text
-Retoma el frente Auto-observación de Khora en rol de asistencia. Fuente única: https://github.com/SeryMente/khora/blob/docs/auto-observacion-20261018/docs/frentes/auto-observacion/OBJETO-CANONICO.md . Recupera el objeto y el metacanon vivo https://github.com/SeryMente/metodologia/blob/main/METACANON-OBJETOS-CANONICOS.md ; referencia adquirida 1.5, METACANON-OBJETOS-v1.5, commit 49ac40e9f6122e2d2fb339362cfa0a78128c8e37, blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f. Coteja fuentes/revisiones/delta y reglas superiores antes de actuar; firma sin fuente no acredita adquisición. Muestra versión/sello metodológicos y frescura en cada salida. Recupera AGENTS.md y UI_REVIEW.md del destino por pertinencia. No modifiques metaprompt/metacanon ni infieras permisos de citas. Remote Desktop Commander es exclusivo del asistente y solo para necesidad imprescindible autorizada; no es necesario para este checkpoint. Prioriza una salida recibida del constructor y emite síntesis y prompt de continuidad. Un escritor de código; no instancies subagentes. Conserva originales y objeto actualizado por cada paso y verifica readback.
-🔄 Estado vivo
-Acción en curso: objeto primordial y propuesta técnica documentados por instrucción U004; persistencia documental inicial verificada y recibo incorporado en rama de trabajo, sin implementación ni aceptación productiva. Siguiente paso atómico: el operador revisa la propuesta de arquitectura, interfaz y seguridad del anexo A; asignar explícitamente el rol constructor antes de mutar código conforme al metacanon. Pendientes en secuencia: aprobación material; inventario causal de código y pruebas; implementación del primer corte completo; validación funcional/privacidad/accesibilidad; revisión presencial; integración autorizada; despliegue y comprobación real cuando se autoricen. Actualizar este objeto y sus evidencias en cada paso significativo, incluso fallos y bloqueos.
-⚗️ En prueba / recién fallido
-Revisión estática de contratos y código; no se ejecutaron pruebas funcionales ni se verificó el despliegue. Hipótesis abiertas: clasificación semántica de resultados y durabilidad de emisiones con presupuesto temporal.
-Siguiente paso: revisión del anexo A y asignación explícita del rol de construcción; no iniciar diseño material sin presencia del operador. No declarar implementación, fusión o despliegue por documento guardado.
-```
-
-### Prompt de construcción — condicionado a asignación y aprobación
-
-```text
-Este prompt no asigna rol ni aprueba un diseño. Solo al recibir asignación explícita del operador, actúa como constructor del frente Auto-observación de Khora. Adquiere la fuente única https://github.com/SeryMente/khora/blob/docs/auto-observacion-20261018/docs/frentes/auto-observacion/OBJETO-CANONICO.md y el metacanon vivo https://github.com/SeryMente/metodologia/blob/main/METACANON-OBJETOS-CANONICOS.md ; referencia 1.5, METACANON-OBJETOS-v1.5, commit 49ac40e9f6122e2d2fb339362cfa0a78128c8e37, blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f. Comprueba fuentes, revisiones, reglas superiores y permiso concreto antes de actuar; muestra metacanon adquirido y frescura en cada salida. Lee AGENTS.md, UI_REVIEW.md y contratos pertinentes. Si no hay asignación o aprobación de arquitectura/interfaz/seguridad, no mutes código: devuelve el requisito material exacto y continúa solo documentación autorizada. Nunca uses Remote Desktop Commander ni intermediarios para eludirlo; no crees subagentes. Conserva compatibilidad y datos; no exportes contenido sensible ni contrates proveedores, fusiones o despliegues sin autorización propia. Usa componentes reales compartidos con escenarios sintéticos, pruebas y evidencia de revisión. Actualiza este mismo objeto en cada paso lógico, con fallos, revisiones y aceptación; no crees otro estado paralelo. Relee y fusiona deltas antes de guardar; evidencia productiva/sintética separada. Entrega checkpoint con pruebas ejecutadas, límites y pendientes reales.
-🔄 Estado vivo
-Acción en curso: objeto primordial y propuesta técnica documentados por instrucción U004; persistencia documental inicial verificada y recibo incorporado en rama de trabajo, sin implementación ni aceptación productiva. Siguiente paso atómico: el operador revisa la propuesta de arquitectura, interfaz y seguridad del anexo A; asignar explícitamente el rol constructor antes de mutar código conforme al metacanon. Pendientes en secuencia: aprobación material; inventario causal de código y pruebas; implementación del primer corte completo; validación funcional/privacidad/accesibilidad; revisión presencial; integración autorizada; despliegue y comprobación real cuando se autoricen. Actualizar este objeto y sus evidencias en cada paso significativo, incluso fallos y bloqueos.
-⚗️ En prueba / recién fallido
-Revisión estática de contratos y código; no se ejecutaron pruebas funcionales ni se verificó el despliegue. Hipótesis abiertas: clasificación semántica de resultados y durabilidad de emisiones con presupuesto temporal.
-Siguiente paso: revisar el diseño A con el operador y resolver asignación; luego inventariar el corte aprobado antes de construir.
+Retoma Auto-observación de Khora como constructor, autorizado por U004/U005. Fuente única: https://github.com/SeryMente/khora/blob/docs/auto-observacion-20261018/docs/frentes/auto-observacion/OBJETO-CANONICO.md . Carga metacanon vivo https://github.com/SeryMente/metodologia/blob/main/METACANON-OBJETOS-CANONICOS.md ; referencia adquirida 1.5 · METACANON-OBJETOS-v1.5. Coteja revisiones, delta y estado vivo. Mantén un escritor y no instancies subagentes; no uses acceso remoto. No pidas nuevas aprobaciones concretas de arquitectura o UI dentro del alcance delegado. Sin compras, proveedores externos, ampliación de permisos ni destrucción de datos. Lee AGENTS.md/UI_REVIEW.md y archivos pertinentes antes de editar. Ejecuta pruebas reales, guarda resultados y actualiza este mismo objeto/manifestación en cada paso. Distingue DB simulada, tipado seleccionado, CI completa, fusión y despliegue; no declares una por otra. Siguiente paso: consultar último estado vivo y resolver compuertas técnicas pendientes hacia integración y comprobación real.
 ```
 
 ## 13. Persistencia y revisión
@@ -183,7 +166,7 @@ Pasada 1, fidelidad: U001–U004 preservados; propósito/robustez/nombre/interfa
 
 Ante concurrencia, comparar y fusionar sin pisar el otro delta. Nuevas evidencias bajo esta carpeta por clase realmente presente; no directorios vacíos ni copias de secretos. Un manifiesto verifica bytes, no legitimidad o comprensión. A cada paso del desarrollo: actualizar versión/ancla, aceptación, crónica y prompts; enlazar evidencia real. No finalizar el frente por este commit.
 
-## Anexo A · Diseño propuesto para revisión del operador — NO APROBADO
+## Anexo A · Diseño adoptado por delegación U005 — alcance real C003
 
 ### A1. Arquitectura de robustez medianamente elevada
 
@@ -232,3 +215,12 @@ Consumir resultados seguros verificables dentro del mismo ciclo; cortes son depe
 ## Delta C002 · Autorización y decisión ejecutiva
 
 U005, original separado: `originales/INSTRUCCION-U005.txt`. Se retiran las barreras locales de rol y revisión concreta establecidas por interpretación en C001. No son bloqueos materiales. Construcción e interfaz decididas dentro de alcance, sin modificar normas centrales. Snapshot base 4dca2133866421105f077bbd7079576c588d1169; rama conserva historia documental. Validación funcional aún no ejecutada.
+
+## Crónica C003 · Construcción y evidencia causal
+
+Backend/UI construidos por el constructor actual. Pruebas propias: 24/24 aprobadas, sin DB productiva. Tipado estricto seleccionado aprobado; primera ejecución falló por versión del compilador global y se corrigió alineando TypeScript 5.9.3. Cambios de contratos acompañados por pruebas; nombres estables registro.* y ruta histórica conservados. Se añade nuevo recorrido al archivo shell-v2.spec.ts ya ejecutado por UI Quality, sin modificar permisos/workflows. Incluido probe externo de solo lectura, sin programarlo ni suministrar credencial productiva. No se integra proveedor OpenTelemetry/Sentry: no necesario para el corte, no instalado, no cobertura prometida. No se toca custodia, audio, Entorno Persistente, credenciales ni permisos.
+
+Limitaciones: misma DB para evento/outbox; no hay durabilidad independiente bajo caída total. Las filas históricas no permiten reconstruir orden original de JSONB: solo enlaces, nunca hash de contenido declarado válido. V2 cubre campos semánticos persistidos, no timestamp/id de DB ni reescritura administrativa completa. Listado por id puede omitir commits tardíos al paginar; actualizar reconcilia la cola reciente, sin promesa de entrega íntegra. No retención destructiva ni borrado de historial en este frente.
+
+### C003 · Incidencia de persistencia
+Primer push integral rechazado por GitHub al crear árbol: `403 Resource not accessible by personal access token`. No commit devuelto; no se afirma persistencia. El paquete incluía modificación de workflow: se elimina esa modificación y se inserta el recorrido en shell-v2.spec.ts, que ya ejecuta el pipeline vigente. Hipótesis de restricción de workflow, no certeza sobre alcance de credencial. Reintento con payload reducido, sin cambios de permisos.

@@ -1,16 +1,21 @@
 {
-  "version": "0.2.0",
-  "anchor": "C002",
+  "version": "0.3.0",
+  "anchor": "C003",
   "files": [
     {
       "path": "OBJETO-CANONICO.md",
-      "bytes": 29496,
-      "sha256": "05755760ba14325d726ca44ba10d1476a126d7f3aadae63f9da09e0f1b105095"
+      "bytes": 28094,
+      "sha256": "e5aabff93cea2e749b5c9378b1027f0c10b86dada4ad70070bf8102d1a0458e7"
     },
     {
       "path": "evidencias/LECTURA-C001.json",
       "bytes": 781,
       "sha256": "bf06fb8b43e12ee4b92ad0b0e307a154b4893ed3f0b8dcff478bba55c29c044e"
+    },
+    {
+      "path": "evidencias/PRUEBAS-C003.json",
+      "bytes": 482,
+      "sha256": "07c4b2424d92787849149336438ec30ef07d20a81aca97409d7129e6e52f06ac"
     },
     {
       "path": "originales/INSTRUCCIONES-20261018.txt",

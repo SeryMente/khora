@@ -1,0 +1,18 @@
+{
+  "cycle": "C003",
+  "base": "4dca2133866421105f077bbd7079576c588d1169",
+  "unit_own": {
+    "passed": 24,
+    "failed": 0,
+    "mode": "synthetic mocked DB"
+  },
+  "selected_typecheck": {
+    "result": "PASS",
+    "typescript": "5.9.3",
+    "auth": "local type declaration only",
+    "whole_repository": false
+  },
+  "initial_typecheck_failure": "TS5102 global compiler baseUrl removed; aligned project compiler version",
+  "browser": "pending",
+  "production": "NOT_VERIFIED"
+}

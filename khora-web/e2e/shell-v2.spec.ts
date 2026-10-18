@@ -72,14 +72,14 @@ test.describe('Shell Navegación v3', () => {
     await page.getByRole('button', { name: 'Seguridad', exact: true }).click();
     const securityMenu = page.getByRole('navigation', { name: 'Menú Seguridad' });
     await expect(securityMenu).toBeVisible();
-    for (const name of ['Seguridad', 'Entorno Persistente', 'Bóveda', 'Control MCP']) {
+    for (const name of ['Seguridad', 'Entorno Persistente', 'Bóveda', 'Control MCP', 'Auditoría de eventos']) {
       await expect(securityMenu.getByRole('link', { name, exact: true })).toBeVisible();
     }
 
     await page.getByRole('button', { name: 'Sistema', exact: true }).click();
     const systemMenu = page.getByRole('navigation', { name: 'Menú Sistema' });
     await expect(systemMenu).toBeVisible();
-    for (const name of ['Herramientas', 'OPI / VRI', 'KPIs', 'Roadmap', 'Adherencia', 'Evidencia normativa', 'Registro']) {
+    for (const name of ['Herramientas', 'OPI / VRI', 'KPIs', 'Roadmap', 'Adherencia', 'Evidencia normativa', 'Auto-observación']) {
       await expect(systemMenu.getByRole('link', { name, exact: true })).toBeVisible();
     }
     await expect(systemMenu.getByRole('link', { name: 'Seguridad', exact: true })).toHaveCount(0);
@@ -125,4 +125,36 @@ test.describe('Shell Navegación v3', () => {
       }
     }
   });
+});
+
+// Auto-observación: canonical/legacy routes and defensive UI regression.
+const events = [{ id: "1", fase: "manejo", event_id: "MAN-900", estado: "FAIL", outcome: "FAILURE", outcome_discrepancy: false, correlacion_id: "synthetic-operation", servidor_en: "2026-01-01T00:00:00Z", component: "synthetic", duration_ms: 12, reason_code: "SYNTHETIC_FAILURE", source: "browser_reported" }];
+for (const route of ["/sistema/auto-observacion", "/sistema/registro"]) {
+  test(`${route}: shared UI, filters, operations, integrity and no raw payload`, async ({ page }) => {
+    await page.route("**/api/auto-observacion?*", async request => {
+      const integrity = new URL(request.request().url()).searchParams.get("integridad") === "1";
+      await request.fulfill({ json: integrity ? { integrity: { verdict: "PARTIAL", checked: 1, verifiedPayloads: 0, legacy: 1, broken: 0, truncated: false, rootPresent: true, scope: "synthetic" } } : { events, has_more: false, next_cursor: null, observed_at: new Date().toISOString() } });
+    });
+    await page.goto(route);
+    await expect(page.getByRole("heading", { name: "Auto-observación", exact: true })).toBeVisible();
+    await expect(page.getByText("La operación registró un fallo", { exact: false })).toBeVisible();
+    await page.getByRole("button", { name: "Operaciones", exact: true }).click();
+    await expect(page.getByRole("heading", { name: /synthetic-operation/ })).toBeVisible();
+    await page.getByRole("button", { name: "Integridad", exact: true }).click();
+    await page.getByLabel("Cadena a comprobar").selectOption("synthetic-operation");
+    await page.getByRole("button", { name: "Verificar cadena", exact: true }).click();
+    await expect(page.getByText("Comprobación parcial", { exact: true })).toBeVisible();
+    await expect(page.getByText(/Sin anclaje externo/)).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
+  });
+}
+test("empty and unavailable never look healthy", async ({ page }) => {
+  await page.route("**/api/auto-observacion?*", r => r.fulfill({ json: { events: [], observed_at: new Date().toISOString(), has_more: false } }));
+  await page.goto("/sistema/auto-observacion");
+  await expect(page.getByText(/Ausencia de eventos no significa/)).toBeVisible();
+  await page.unroute("**/api/auto-observacion?*");
+  await page.route("**/api/auto-observacion?*", r => r.fulfill({ status: 503, json: { reason_code: "OBSERVATION_UNAVAILABLE" } }));
+  await page.getByRole("button", { name: "Actualizar", exact: true }).click();
+  await expect(page.getByRole("alert")).toBeVisible();
+  await expect(page.getByText("Auto-observación no disponible", { exact: true })).toBeVisible();
 });

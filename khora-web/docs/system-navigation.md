@@ -1,7 +1,7 @@
 # Navegación canónica del sistema
 
 **Estado:** IMPLEMENTADO Y ENDURECIDO  
-**Última revisión:** 2026-10-07
+**Última revisión:** 2026-10-18
 
 ## Invariante
 
@@ -16,7 +16,7 @@ La barra inferior contiene seis dominios primarios de uso frecuente más el cont
 - Grafo → abre Grafo / Mapa
 - Consulta → `/sistema/consulta`
 - Seguridad → abre Seguridad / Entorno Persistente / Bóveda / Control MCP
-- Sistema → abre Herramientas / OPI-VRI / KPIs / Roadmap / Adherencia / Evidencia normativa / Registro
+- Sistema → abre Herramientas / OPI-VRI / KPIs / Roadmap / Adherencia / Evidencia normativa / Auto-observación
 
 **Decisión semántica:** Capturar, Dictado, Edición e Ingesta no son dominios primarios independientes. Son fases/capacidades del mismo ciclo de entrada de memoria y se alojan dentro del workspace canónico **Ingreso**.
 
@@ -48,6 +48,7 @@ El flujo canónico es **captura → transcripción/procesamiento → revisión �
 - Entorno Persistente → `/sistema/seguridad?tab=entorno-persistente`
 - Bóveda → `/sistema/seguridad?tab=boveda`
 - Control MCP → `/sistema/seguridad?tab=mcp`
+- Auditoría de eventos → `/sistema/auto-observacion?vista=eventos&fase=autorizacion` (la misma superficie, filtrada)
 
 Las rutas estables `/sistema/boveda` y `/sistema/entorno-persistente` permanecen como aliases históricos.
 
@@ -66,7 +67,9 @@ Sistema queda reservado a capacidades secundarias de administración, observabil
 - Roadmap → `/roadmap`
 - Adherencia → `/adherence`
 - Evidencia normativa → `/sistema/otros`
-- Registro → `/sistema/registro`
+- Auto-observación → `/sistema/auto-observacion`
+
+La ruta histórica `/sistema/registro` conserva acceso al mismo controlador compartido. Auto-observación ofrece Resumen, Operaciones, Eventos e Integridad. Contrato y límites: `docs/frentes/auto-observacion/OBJETO-CANONICO.md` desde la raíz.
 
 ## Comportamiento responsive obligatorio
 
