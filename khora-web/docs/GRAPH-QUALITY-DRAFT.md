@@ -1,8 +1,8 @@
 # Estándar unificador de calidad y salud del grafo de Khora
 
-**Versión 1.0 · 2026-10-18 · Especificación de aceptación, no certificado de implementación.**
+**Versión 1.1 · 2026-10-18 · Especificación de aceptación, no certificado de implementación.**
 
-La redacción y documentación fueron encargadas expresamente por el operador en este hilo. Este archivo sustituye el borrador anterior **en su ubicación existente**, para no multiplicar fuentes de verdad. El sufijo histórico `DRAFT` se conserva para no romper enlaces: el documento contiene un estándar completo diseñado, todavía pendiente de revisión material de su adopción. No se atribuye ratificación a umbrales, decisiones de arquitectura o diseño de interfaz que el operador no haya aprobado. Publicar este texto no implementa sus controles, no levanta los bloqueos del producto y no modifica cánones de Notion.
+La redacción y documentación fueron encargadas expresamente por el operador en este hilo. Este archivo sustituye el borrador anterior **en su ubicación existente**, para no multiplicar fuentes de verdad. El sufijo histórico `DRAFT` se conserva para no romper enlaces: el documento contiene un estándar de aceptación y un perfil de realización diseñados; su adopción material y la implementación siguen pendientes. No se atribuye ratificación a umbrales, decisiones de arquitectura o diseño de interfaz que el operador no haya aprobado. Publicar este texto no implementa sus controles, no levanta los bloqueos del producto y no modifica cánones de Notion.
 
 **Punto de entrada del frente:** [GRAPH-TWINS.md](GRAPH-TWINS.md). **Auditoría motivadora:** [informe y evidencias](evidence/graph-quality-2026-10-18/README.md). La expresión «DEBE» identifica una condición exigida para acreditar conformidad con este estándar cuando sea adoptado, no una descripción del comportamiento actual.
 
@@ -330,3 +330,75 @@ Las cifras del mapa —392 entidades, 214 relaciones, 193 comunidades— no cons
 5. Ejecutar el recorrido del §7 y las tareas de §8; publicar expediente y dictamen de alcance.
 
 **Estado de cierre documental:** estándar diseñado y hallazgos documentados. **Estado de producto:** NO CONFORME en el corte auditado; acreditación integral pendiente. **Bloqueo material:** adopción del perfil y decisión de integración requieren revisión explícita; publicar documentación no las autoemite. Ningún merge, despliegue o cambio de fuentes se autoriza con este cierre.
+
+## 13. Perfil de realización integral · revisión 1.1
+
+### 13.1 Corrección de suficiencia del propio estándar
+
+La versión 1.0 era un marco riguroso de aceptación, **no una receta suficiente de construcción ni una solución ya realizada**. Dejaba indeterminados los límites entre propuesta y conocimiento, el contrato de revisión compartida, la interoperabilidad real de propuestas, el replay y la validez de los instrumentos de evaluación. Esta revisión hace esos contratos obligatorios y los acompaña de un diseño de cambios trazable en [la auditoría de arquitectura](evidence/graph-architecture-2026-10-18/README.md). No promete infalibilidad semántica ni acredita requisitos solo por escribirlos.
+
+No se reemplaza el Protocolo de Ingesta ni el patrón EpisTwin. La resolución de entidades, el aseguramiento semántico, la contabilidad de cobertura y la preservación de juicios son extensiones necesarias de Khora; no se atribuyen como teoremas o prestaciones demostradas del artículo. La aprobación del texto de una transcripción **no es** aprobación de sus interpretaciones.
+
+### 13.2 Contratos adicionales obligatorios
+
+| ID | Obligación de construcción y operación | Prueba de aceptación |
+|---|---|---|
+| QG-060 | Separar estados de captura íntegra, propuesta, validación mecánica, evaluación semántica, juicio humano y publicación. Conservar razón y autoridad de cada transición | Una función de compatibilidad no puede crear `accept` con actor `operador` y luego presentarlo como ratificación humana |
+| QG-061 | Las proyecciones automática/candidata y curada usan el mismo modelo de evidencia y constructor; cambia la política de admisión, no el significado ni el esquema | La autorización de procesar originales solo habilita el plano candidato; no escribe el conocimiento ratificado ni cambia la aprobación de custodia |
+| QG-062 | Aplicar las restricciones estructurales de EpisTwin al perfil que lo reivindique: clases Entity/Literal/Blank disjuntas, sin Literal como cabeza, usuario sin cola semántica, alcance desde raíz e Information Objects y metadatos deterministas | Rechazar tipo incompatible y extremo rechazado; aceptar literales válidos en todos los contratos y preservar su trazabilidad |
+| QG-063 | Distinguir mención/ocurrencia y referente incluso dentro de una misma fuente. El identificador de mención no puede ser solo texto+fuente | Dos personas llamadas Ana en el mismo dictado siguen siendo dos menciones sin unión implícita; preservar cada aparición repetida |
+| QG-064 | Un único manifiesto lógico identifica propietario, política/plano, fuentes y versiones, esquema, código, modelos/instrucciones, propuestas, juicios, proyección, partición, resúmenes e índice. Los consumidores fijan la misma revisión | Un cambio solo de metadatos o procedencia relevante invalida lo afectado; un índice de otra revisión o espacio vectorial se rechaza, no se consulta silenciosamente |
+| QG-065 | Publicar por generación preparada y verificada con cambio atómico de puntero. Persistir trabajo de actualización y permitir reanudación tras fallo posterior al commit | Matar el proceso después de asentar y antes de indexar; el reintento completa derivados antes de acreditar éxito, sin doble asentamiento ni mezcla de versiones |
+| QG-066 | Dar identidad durable al objeto juzgado, separada de la instancia de extracción; definir mapeo exacto, conflicto y orfandad al regenerar. Ningún juicio cambia de sentido por similitud | Cambiar UUID de propuesta conservando ítems idénticos no pierde juicios; significado/fuente cambiados no heredan aceptación automáticamente |
+| QG-067 | Contrato interoperable de propuestas y consultas, con esquema único versionado, vectores de prueba y equivalencia entre Python y TypeScript | `literal` válido debe aceptarse en ambos; JSON malformado, hash divergente, juicio sin actor, estado desconocido y dependencias rechazadas fallan en ambos |
+| QG-068 | Validar los instrumentos de evaluación antes de usarlos para acreditar: invariancia al renombrar particiones, universo comparable, nulos apropiados y ablaciones efectivas | Misma partición con etiquetas permutadas da estabilidad máxima; población disjunta da NO COMPARABLE, no 1; parámetro inefectivo no cuenta como sensibilidad probada |
+| QG-069 | Comprobar causalidad de los operadores de razonamiento, lectura de historial, recuperación, generación separada, fVAL global y refinamiento visual efímero | REFINE debe afectar al RETRIEVE siguiente; presencia de hallazgo visual no sustituye fVAL; ningún modo de pruebas autoaprueba respuestas en operación |
+
+### 13.3 Plano epistémico, admisión y suficiencia
+
+La implementación debe representar por separado: **integridad de fuente**, **validez del esquema**, **fidelidad semántica evaluada**, **decisión humana**, **completitud de generación**, **suficiencia de recuperación** y **suficiencia de respuesta**. No se reducen a un booleano `verified` ni a `needs_review=false`.
+
+- **Captura:** puede continuar aunque fallen todos los derivados; original, audio esperado y versión quedan custodiados.
+- **Candidato automático:** puede mostrar hipótesis con anclas válidas, incertidumbre, pendientes y fuente seleccionada por política autorizada. No equivale a hecho, persona ratificada ni capacidad acreditada. Una evidencia automáticamente rechazada por semántica no se promueve como aceptable. El efecto de un rechazo humano sobre este plano debe declararse; conservar la propuesta para auditoría no autoriza servirla como cierta.
+- **Curado:** solo admite juicios humanos auténticos, vigentes, ligados al objeto y revisión vistos. Una relación aceptada con extremos rechazados es conflicto de admisión, no permiso para recrear los extremos.
+- **Respuesta:** toda petición fija plano, propietario y revisión autorizados. Si usa candidatos, debe declararlo y limitar sus afirmaciones a ese estatuto. No presenta una inferencia como elección del operador. Una recuperación no vacía no acredita por sí sola suficiencia global.
+- **Acreditación:** los casos críticos adjudicados y tareas respondibles deben pasar; casos sin respuesta deben abstenerse. Ninguna segunda llamada a un modelo o voto entre modelos convierte por sí sola una interpretación en infalible. Para el piloto, revisión independiente y del operador donde el canon exige reconocimiento; para generalizar, perfil estadístico y riesgo residual aprobados previamente.
+
+Las menciones preservan posición y contexto local; las unidades de sentido pueden ocupar varios fragmentos contiguos o referenciados y conservar dudas sin forzar triples. La capa semántica conserva proposición, participantes, alcance, modalidad, atribución, tiempo y evidencia. Las relaciones directas son proyecciones de afirmaciones/ocurrencias trazables, no un reemplazo destructivo de estas. La normalización lexical y vectorial solo genera candidatos de identidad; la fusión exige evidencia contextual y consistencia del componente completo, con separación reversible.
+
+### 13.4 Consistencia, derivación y memoria humana
+
+La identidad de una revisión no es un UUID nuevo por cada lectura ni únicamente el hash de nodos/aristas. Debe identificar el contenido y las dependencias que justifican servirlo, incluidos fuente, política, juicios y transformaciones. Se distingue identificador de ejecución, revisión de conocimiento y revisión de presentación. Un trabajo parcial puede tener checkpoint consultable como tal, pero no sustituir el puntero de revisión acreditada.
+
+La generación comprende datos, comunidades reificadas y pertenencias, resúmenes con fuentes y límites, índice con modelo/revisión/dimensión/normalización y contrato de consulta. Un puntero actual solo avanza después de verificar todos los derivados obligatorios del perfil. El conjunto de fuentes puede cambiar mientras se calcula: la generación se fija a su corte, comprueba vigencia al publicar y conserva el resultado anterior si queda obsoleta. No se presume transacción distribuida entre PostgreSQL, Neo4j y archivos; debe implementarse coordinación durable, reconciliación y cambio de puntero verificables.
+
+El replay distingue: (1) reproyección determinista de propuestas conservadas; (2) regeneración de extracción desde fuentes, sujeta a variación; (3) reaplicación no vacía del ledger por correspondencia demostrada. Eliminar todos los derivados no puede exigir eliminar primero juicios ligados por una clave foránea a una propuesta efímera. Los juicios permanecen, los objetos regenerados se reconcilian y los conflictos se detienen. Revocar una fusión invalida todos los derivados afectados; las respuestas históricas permanecen como evidencia inmutable de lo emitido, marcadas como obsoletas cuando corresponda, no reescritas retroactivamente.
+
+### 13.5 Comunidades útiles, no decorativas
+
+La proyección de Leiden declara tipos incluidos, dirección, pesos, autoaristas, aislados y revisión; la definición debe coincidir con lo que consume el algoritmo. Repeticiones por solape del segmentador no son evidencia independiente. Las comunidades son entidades derivadas con pertenencias, subgrafo inducido, resumen, entradas y revisión. El resumen no puede incorporar aristas inválidas ni contenido de un ámbito que el solicitante no puede leer; su autorización se calcula sobre todas sus fuentes, no se copia del parámetro de la consulta.
+
+La afinidad ideacional para la Ideación Asíncrona Recuperable puede requerir relaciones propuestas entre formulaciones distintas. No se consigue unificando por parecido ni inventando causalidad. Tales relaciones conservan tipo, evidencia y estatuto inferido; su utilidad se evalúa recuperando ideas completas y evolución, no reduciendo el número de comunidades. No se exige que temas semánticos coincidan exactamente con una partición modular.
+
+Las métricas longitudinales separan partición de identidad de comunidad, aparición/desaparición de nodos y división/fusión real; usan alineación o métricas invariantes a etiquetas. Un modelo nulo debe contrastar la misma operación de optimización y pregunta que la estadística observada; no se presenta como prueba de significación lo que solo es un contraste diagnóstico. Ningún barrido de resolución es evidencia si el objetivo no utiliza ese parámetro.
+
+### 13.6 Casos adicionales obligatorios
+
+Estos son **casos especificados**, no una afirmación de que el producto ya los pasa.
+
+| Caso | Estímulo | Resultado exigido |
+|---|---|---|
+| N29 | `ingestar()` legado sin juicios humanos | Proponer o bloquear; nunca fabricar actor humano |
+| N30 | Relación aceptada, extremos rechazados | Conflicto explícito, sin nodos recreados automáticamente |
+| N31 | Dos homónimos dentro de una fuente | Menciones distintas antes de resolución contextual |
+| N32 | Misma proposición, nuevo UUID de propuesta | Reaplicar juicio solo por correspondencia demostrada |
+| N33 | Literal válido cruzando Python/TypeScript | Igual aceptación y representación, sin perder ΦM |
+| N34 | Caída tras commit y antes de Leiden/índice | Reanudar trabajo durable; no éxito idempotente prematuro |
+| N35 | Índice de otra revisión o modelo | No consulta silenciosa ni mezcla de espacios |
+| N36 | REFINE emite consulta distinta | El siguiente RETRIEVE la ejecuta y deja traza |
+| N37 | Hallazgo visual presente, juicio insuficiente | No autoaprobar por configuración de compatibilidad |
+| N38 | Resumen de comunidad con contenido no autorizado/invalidado | Excluir o reconstruir con alcance autorizado, nunca etiquetarlo público por defecto |
+| N39 | Partición renombrada o sin miembros comunes | Invariancia a etiquetas / NO COMPARABLE |
+| N40 | Corrección solo de fuente, juicio o política sin cambiar topología | Nueva revisión lógica e invalidación causal de derivados afectados |
+
+**Compatibilidad exigida:** mantener las tres zonas de ingesta, el original y sus versiones, el ledger auténtico y separado, ΦM determinista, ΦC/fKGC distinto del razonamiento, comunidades y recuperación topológicas, generador separado, historial vinculante, fVAL global y refinamiento visual sin escritura al grafo. No se cambia de stack ni se acredita la facultad autobiográfica por añadir esta sección. Las unidades canónicas de EpisTwin siguen siendo la fuente normativa; el mapeo de esta revisión es diagnóstico, no auto-ratificación formal.

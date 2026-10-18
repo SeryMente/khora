@@ -1,0 +1,2101 @@
+{
+  "note": "Acquisition manifest, not a declaration that all files were read exhaustively. Generated caches excluded; inspection follows critical call paths in report.",
+  "files": [
+    {
+      "path": ".github/workflows/ci.yml",
+      "git_blob": "9f97e2d797e771ee18575bf41cf9568b6bf42da7",
+      "sha256": "d5f91995b64eef0c73e8b6071112843d088296b1c7dbf6f61723c3407847bb7a",
+      "lines": 57,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": ".github/workflows/deploy-production.yml",
+      "git_blob": "89a25e99dcc9ef22db3bd64d7cc4d14a370fc63e",
+      "sha256": "92fd0dc3a673e79908559d613c8cd33ba0cd2dfaf7aee032ad60e7b664f1cc77",
+      "lines": 132,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": ".github/workflows/post-deploy-smoke.yml",
+      "git_blob": "fc339ef251840f47492634979180a612747f1dea",
+      "sha256": "86404bab721189d290c996e67b110d5d35b26033377ac9f9c30f43e993678b43",
+      "lines": 50,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "api/main.py",
+      "git_blob": "bae368f07159b99c31b6c97f2bde64fb7936e57b",
+      "sha256": "ba2a3720d3fd8d439e130e4a85f8044e7dd2af187f15c7676da9b43f50839be9",
+      "lines": 620,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "api/tests/test_api_00.py",
+      "git_blob": "6fa076d91806124e428ac0cd827c47a2d225c200",
+      "sha256": "1c5c3908158edd0062b8277c2b3e179c2b85f040998b47a1cb8c6f5ba978893a",
+      "lines": 219,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "api/tests/test_chat.py",
+      "git_blob": "bdcbba825137052a20d221a4a0726933c43f7974",
+      "sha256": "10799ab6e888d0ec50bf5565465d19ccdd70cfb98c56e9760e45fb4be0414a01",
+      "lines": 116,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "docs/migracion-grafo.md",
+      "git_blob": "db368fb47bd3e12e13a0fb00c7ace9e32808c2df",
+      "sha256": "31a00f505889fe6995c536d6f64582425b25b41037d221da0f6eeb765174e5da",
+      "lines": 71,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/__init__.py",
+      "git_blob": "b3ac0f4e1c79815f598fa3e290eacabbf3f4c3b9",
+      "sha256": "b01ff60b4def02043b1c98c52606dbc88d508383e460083fdfb3813d4fa9bc6c",
+      "lines": 34,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/api.py",
+      "git_blob": "b19e9c59e0467e64f4e7db0e065410c9d4c8a7dc",
+      "sha256": "5973d575a910932829bd52e1632da4c3a3d457332dff662a4f491279c3f21eac",
+      "lines": 186,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/communities.py",
+      "git_blob": "0210c50fcbd2abf2a1ed89414e7fa3d30a8beb9d",
+      "sha256": "928a3c29640c731e81b94dc734070aafa2f9a303342475498168c2d0493a12ab",
+      "lines": 284,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/constructor/__init__.py",
+      "git_blob": "eb8545b97e7cca7e1471d37ecc1c0952c36d0696",
+      "sha256": "70d3c8e355e2325e90a3a19399bc3b1cdd3157ebdaee9259643104b583fea4d3",
+      "lines": 8,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/constructor/_extraer.py",
+      "git_blob": "ae0794c00320a0281aeec524b64901f73257506a",
+      "sha256": "9c2598d81505f8ca795c5c7e4db7bdca0d218802c0db2272afa12855755d616c",
+      "lines": 187,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/constructor/_format_boundary.py",
+      "git_blob": "916eb3d2b0b1c377fd6859c9fc0ae5583f849a97",
+      "sha256": "a5cbb252f1ea62f2861d708c95ccab175fcd9a04654eec2589e89833cecf6254",
+      "lines": 58,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/constructor/_normalizar.py",
+      "git_blob": "d601f141fa916963e649b1452908d07967a260b0",
+      "sha256": "a9847bd7f834179edfacb4eb965e162387c1331b3cd34af926e19db03a608f04",
+      "lines": 54,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/constructor/_phi_c.py",
+      "git_blob": "adc1accf1a6be6db042184695e3c0b723a2c4fe4",
+      "sha256": "1a16ddf46bf2300b2447b0a2bf1695530250da577fef028d587d0676b5374543",
+      "lines": 96,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/constructor/_phi_m.py",
+      "git_blob": "ff7455954be400ea717dab7325c08cfe96957e01",
+      "sha256": "74c278ff2c2d60bf7cf095663e42db96bdcdeaf4e90dff516ab7f57e038d2d13",
+      "lines": 55,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/consulta/__init__.py",
+      "git_blob": "7d316eb4a79c729763bdf8a1dc4986d3c5b4f208",
+      "sha256": "468892fb93dfc77bf542b1ee430d6aa56ecef06c6c106a0c8bf91ea1b1354dd2",
+      "lines": 1,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/consulta/retriever.py",
+      "git_blob": "77e34febc5c84d28996fd18f38c2d80062ddfb2e",
+      "sha256": "b84ed077386cb3ff94810fc3e0ccc9d39f52af5211c72670ec1ad335f2ec5832",
+      "lines": 320,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/contracts/__init__.py",
+      "git_blob": "cbba1637aae95d1c23f82a7965e9a19f09c8dc65",
+      "sha256": "d79cc498d78531d9adcc433aed23d6477b5d1e6910e4c4bb0aa874d29f25f441",
+      "lines": 34,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/contracts/proposal.py",
+      "git_blob": "e69b0ba4bf27fb82b741e91a2a7bfd0b979a421f",
+      "sha256": "6adc134e8088656e14f308c33b747559f0d797ca03aeb2f919c8393e03fd462a",
+      "lines": 349,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/drivers/__init__.py",
+      "git_blob": "9523e272f94f36bdbd3d3ac3bbcaf7d7c894be07",
+      "sha256": "dbe7ea94349074c0b870f8fbb92262471a2d4e4445fdafc16e2cce3e94d817c3",
+      "lines": 1,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/embeddings.py",
+      "git_blob": "ab6e618bed04b87b1051557a585e75e679055851",
+      "sha256": "0eaffc1a9e45e73028efdc57a22db5c790b4167c16c8ef91572877f1377ae44b",
+      "lines": 250,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/engine/__init__.py",
+      "git_blob": "427397cf36eb3e1b94198d85208e7ecf8dfd8d82",
+      "sha256": "ce3213d6d33bb4b8925114adec8f67e1f721e0beaad00fbbaaf53e00d2eb255f",
+      "lines": 8,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/engine/core.py",
+      "git_blob": "688d0dce1a99b5e0c71362adfc289f865b1567d2",
+      "sha256": "f96fcb74c19e1228fc18b6510839b3d8d8152dc6c627a77b74786c8e96c14e91",
+      "lines": 320,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/engine/fallback.py",
+      "git_blob": "6ab23aef6758dd0eefd6c5894db9879020de2adf",
+      "sha256": "7a70fc5710c32e0b1a6949e7b65f4a93d9ce6e6869cba5b046c98360a931696b",
+      "lines": 63,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/engine/fval.py",
+      "git_blob": "b915e3b168c013ef0c6e4f55f704a6d7e91d96ec",
+      "sha256": "cc0e7ce0f1779ed7413f9b5a5c3c4b588319e0f5b3b9ba41002244bfb60928a5",
+      "lines": 137,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/engine/history.py",
+      "git_blob": "f9aede33249cd3c9ab478a89512b6258cd8d09d1",
+      "sha256": "3c4e10944a610589b7665e2d3808d3dc99d0af5839cd2d26ffb22fc65fc2c60a",
+      "lines": 80,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/engine/orchestrator.py",
+      "git_blob": "3af2819dcb8eadbb4dcf8dc381b7edd9ea99692c",
+      "sha256": "f6d401a72d636d1a7183326a500350b92c01d1b522b60d459c4900fdb4ec0466",
+      "lines": 75,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/epistwin_audit.py",
+      "git_blob": "71eef85a36eda917480120566554f3847e073317",
+      "sha256": "a912471a26573163cd5819dab1d9463686fde709dca939933fad009f82c679d5",
+      "lines": 431,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/gravedad/__init__.py",
+      "git_blob": "6f44604eb6e9f5d4e4137b9bfd5ca2a64b6b7219",
+      "sha256": "feeb83b60bbc2afda791e9012183a31126c8d359625bdf4b7610f83785f63046",
+      "lines": 122,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/host/__init__.py",
+      "git_blob": "f3ff0394d1fc9f059eccede12dcf634d73146351",
+      "sha256": "6e4748c14dcb19dcfb2fa9b94d90ac43935ed7d3fdcfd68546347d3b3ffbbc91",
+      "lines": 19,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/host/_host.py",
+      "git_blob": "2bef045c30aa957bfb5f5ad59e0d073b3161d761",
+      "sha256": "dc68389cf45d2c467213023241f317ae1f8c8ce458d4d1a62d6fcf4dcd9ff724",
+      "lines": 107,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/host/_manifest.py",
+      "git_blob": "a3b19d61165064c13e61e91b68db909379e13380",
+      "sha256": "547c53cd8d95783c77578fed4d634d068c4f9c7322b11c4506f1156e0b9c63e7",
+      "lines": 21,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/motor/__init__.py",
+      "git_blob": "1e30f5031214f094ff4a0c56aea5eee7fd9fb578",
+      "sha256": "73c19f7c970e725c2f12d3631ba7073f6851528be51c1cc26b5cadd45e90461e",
+      "lines": 4,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/motor/_memoria.py",
+      "git_blob": "5b12ca5ec359280eedae53653a44ebf59d1989c6",
+      "sha256": "ebd9e3381b514710087ea13ab06e1b1a9f440a592bf21321d2d534f9026bd144",
+      "lines": 1325,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/motor/pyproject.toml",
+      "git_blob": "32363f4073a39e410ba48dbcb5c70b293a7cbc8a",
+      "sha256": "7b2a53a0ea6766429a4c499d340ee913e8b33b64e9cdbad3a5256c732e381f76",
+      "lines": 8,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/motor/tests/conftest.py",
+      "git_blob": "11f4ffd96950a0d44d5f644d9eea9edecfe5ee5c",
+      "sha256": "6a07ff0df5b3ca42b5a21cc213273ce2a5befefa798c522e139559447afbf4ad",
+      "lines": 49,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/motor/tests/test_bitemporal_pkg.py",
+      "git_blob": "e76d2f355dfe964d4890cb94839b552ef215eb31",
+      "sha256": "24170dbacc095c5379f4c732b68f667b4aafc59c4bb725932c23bd7389ec9340",
+      "lines": 223,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/motor_socratico/__init__.py",
+      "git_blob": "7d316eb4a79c729763bdf8a1dc4986d3c5b4f208",
+      "sha256": "468892fb93dfc77bf542b1ee430d6aa56ecef06c6c106a0c8bf91ea1b1354dd2",
+      "lines": 1,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/motor_socratico/_placeholder.py",
+      "git_blob": "03abb5b0e7998ab4eb6178199a5e3a822bb45bd0",
+      "sha256": "3f46ef4082fa1be402dcd17841ee13b2200d26ef499baba6b7636bc93ef041ba",
+      "lines": 4,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/personalqa_loader.py",
+      "git_blob": "f41530bd0bdf21bf9df883697a373352f8dd7e0f",
+      "sha256": "35e300b63799a3370449545b2709daaa8a0887eca7de5a20d3d493fb3da3e6cf",
+      "lines": 119,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/poblacion/__init__.py",
+      "git_blob": "1a895aa33135e696c9710a001e915369d74c5d62",
+      "sha256": "c6c95c690b32202f91b6694281cc7c5bdb0fb44b2b4bea66a750467f95a124ca",
+      "lines": 23,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/poblacion/_ingestar.py",
+      "git_blob": "41b4b0decf9d8b90f4e9aaedc7598ae4ba07e98c",
+      "sha256": "866e04dc3521d8abac1e087810a0eed5db2aa8dd08e2dfd0c61bc94f94b46404",
+      "lines": 548,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/poblacion/tests/__init__.py",
+      "git_blob": "7d316eb4a79c729763bdf8a1dc4986d3c5b4f208",
+      "sha256": "468892fb93dfc77bf542b1ee430d6aa56ecef06c6c106a0c8bf91ea1b1354dd2",
+      "lines": 1,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/poblacion/tests/test_ingestar.py",
+      "git_blob": "38aca0a4e3a18946076fb191b14e68573670f0cf",
+      "sha256": "9ca062ad7829696ff9e51ef1233c6f203ea07d09f219544e37ba87d21450cfd2",
+      "lines": 361,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/poblacion/tests/test_proposal.py",
+      "git_blob": "48007e19508e723ab7d8cdb881ab77885e3b9dc0",
+      "sha256": "97e875981147263898003a12659ce78379bee1e9b98454119ed4063304ee6b3a",
+      "lines": 118,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/ports/__init__.py",
+      "git_blob": "7d316eb4a79c729763bdf8a1dc4986d3c5b4f208",
+      "sha256": "468892fb93dfc77bf542b1ee430d6aa56ecef06c6c106a0c8bf91ea1b1354dd2",
+      "lines": 1,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/ports/constructor_de_apps.py",
+      "git_blob": "0868f64002d11fc155bdf850204c487f24f3dc44",
+      "sha256": "98632f20c160409bf37aa152f989cc32f8672b7384509bc11b96155ee126027b",
+      "lines": 54,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/ports/gestor_de_tareas.py",
+      "git_blob": "569e63cd7f0c19a6ec690f841bb2b63d55ec53ad",
+      "sha256": "c5641eecfbbf10d2c7f96dd7eb13690ac1c1a5f631d6ad953f76371310fe0285",
+      "lines": 43,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/ports/ingesta_de_archivos.py",
+      "git_blob": "d6f53a838bd4544c964c928200c5ae7625c329cc",
+      "sha256": "387ef0b16ce226cdffeb9222f0f0022574bdeaf2b9842b8e327c263c5ef4d150",
+      "lines": 43,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/ports/memoria_organizada.py",
+      "git_blob": "99e3fef7f64a96d4b8f3f6757d45a0877de040a5",
+      "sha256": "7c4d21a2718e748541b912fa5b0972a1abf6c96251a005d9e058990d2eb20d9e",
+      "lines": 51,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/ports/mocks/__init__.py",
+      "git_blob": "7d316eb4a79c729763bdf8a1dc4986d3c5b4f208",
+      "sha256": "468892fb93dfc77bf542b1ee430d6aa56ecef06c6c106a0c8bf91ea1b1354dd2",
+      "lines": 1,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/ports/mocks/mock_constructor_de_apps.py",
+      "git_blob": "eea62c4a3f2b0dea6bdbe82c9827b943e66f3b7a",
+      "sha256": "2e939ccab1da7c2c2fb60f9114d0548432fe9ee33c9ec8341265f178dbc6c50f",
+      "lines": 37,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/ports/mocks/mock_gestor_de_tareas.py",
+      "git_blob": "c991c4c13e56af1e9e1d05b080c6f6e388059bac",
+      "sha256": "d95d21c9ddfdd1984addef2830ea2524053c72ce9ccc3e12cd78f5c78eca9ab0",
+      "lines": 45,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/ports/mocks/mock_ingesta_de_archivos.py",
+      "git_blob": "96512c2ec7dde0a49b013ffb84fb11dc0eaf307c",
+      "sha256": "ba379c91f9de9cd9e0b02e8380b3033d571ebd2428e1214f76af3f1c28f1c3a2",
+      "lines": 30,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/ports/mocks/mock_memoria_organizada.py",
+      "git_blob": "76074523cd0c3606c27ae373b1e101bd3f9f84d2",
+      "sha256": "6d7828c216479b0b4f5a0defca88a7d7271b5b240d05627c5cd1fa0311a5bc2a",
+      "lines": 44,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/ports/mocks/mock_modelo_de_lenguaje.py",
+      "git_blob": "6f88c095e105cfe6185615649b33a55a0fc45646",
+      "sha256": "75d84b402834cca69ae0814bd878828d84f0c63a68bb3a9bf148b027fbc069ab",
+      "lines": 23,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/ports/mocks/mock_transcripcion.py",
+      "git_blob": "d8f559f7e8634ef36a01b675b159d880bed8530d",
+      "sha256": "5cc1f4e3b11814372ede896865e0fabe4af38ba22d6ad2ade0028f76313c8800",
+      "lines": 26,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/ports/modelo_de_lenguaje.py",
+      "git_blob": "812f6020ff258f97340d7bd234da3b17b881b343",
+      "sha256": "775a77ec91afe51bdcd1d3d559a4c8d86e91846a2f754f41f00dc4ee27c5f2e7",
+      "lines": 42,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/ports/transcripcion.py",
+      "git_blob": "754fbf828ba261db35adfbe3aed821c3cd19cca8",
+      "sha256": "45ac481fbec4b8ab8f7163f546adc85fc5c54f9c850a847fbccba4847b0b7748",
+      "lines": 42,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/proveedores/__init__.py",
+      "git_blob": "206b729b7dd58e75080d45c021c4e41e9b8fdabd",
+      "sha256": "b9e1e47b1307b0f0cc4dea7891f0faf9e3e9fed507e8db6a9d9afb7e0dd08b03",
+      "lines": 17,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/proveedores/llm_generico.py",
+      "git_blob": "a8c41f293bc114d0d23c0f87fb0a81c8147e97eb",
+      "sha256": "91f34ef2885920277339cf0381498b5cc0067ff57263132e915b678a29799c83",
+      "lines": 269,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/proveedores/openai.py",
+      "git_blob": "b4edd8a6ed05efb02a47d3eed2fbd6c11788d5bd",
+      "sha256": "6f6f11d37d253879f1aaf7b510beec3fd2595a950fd11b0ba8edd5a16abcc4fb",
+      "lines": 7,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/psi.py",
+      "git_blob": "e51f9f022982b0751aa923de9cbbd533b84861c8",
+      "sha256": "434eb50dbda472ac5446758d7a5a15b72989403e853014fb0f8e04b2c0ba0729",
+      "lines": 67,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/registro/__init__.py",
+      "git_blob": "7d316eb4a79c729763bdf8a1dc4986d3c5b4f208",
+      "sha256": "468892fb93dfc77bf542b1ee430d6aa56ecef06c6c106a0c8bf91ea1b1354dd2",
+      "lines": 1,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/registro/__main__.py",
+      "git_blob": "290c8005be4714a9dcf4553ffff65d31b0f766d3",
+      "sha256": "db345918ca259aa12783ee2065cb02974bd0b17dc152dba5b9154df70a485577",
+      "lines": 7,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/registro/cli.py",
+      "git_blob": "e580cac16dd6a3dbffb7ba06483a129688abe453",
+      "sha256": "78e58eacb211d7b8e5647addd3a49bffb8f64dee7773d8a931c7ef67a9f3471c",
+      "lines": 132,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/resolucion/__init__.py",
+      "git_blob": "20cd1a87d872419c9dac27aad04c0df8cfa931d7",
+      "sha256": "f0670d5a148f0a39681000b8c66e8662ba15023e8a55841c222f08be1ffd09a5",
+      "lines": 4,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/resolucion/_resolver.py",
+      "git_blob": "1c11b1461f3b0d9b6ac37c5d02d7254976d4dbdf",
+      "sha256": "c633de03f6ca8b36806e674b1dfae55c546bd4a80bd23507cddf46c7369aa45b",
+      "lines": 201,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/shell/__init__.py",
+      "git_blob": "9523e272f94f36bdbd3d3ac3bbcaf7d7c894be07",
+      "sha256": "dbe7ea94349074c0b870f8fbb92262471a2d4e4445fdafc16e2cce3e94d817c3",
+      "lines": 1,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/summaries/__init__.py",
+      "git_blob": "77e54bb7addd241a6ed2903b3d94385f4d054a58",
+      "sha256": "012beccd4e2ad9a97a211af212272c2e05fc0c438453446778e1c80872992bba",
+      "lines": 14,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/summaries/fsum.py",
+      "git_blob": "74784ea537c9d2c08cd94c5ce28b96abf2acbde4",
+      "sha256": "431b6a50b8da7b7202e2656b0ff784c2290e6948c7f1d0d8d828743afb5ce8d1",
+      "lines": 359,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/summaries.py",
+      "git_blob": "5a277536a7fe9e1fea3b10c0be4f1d3e65a53fde",
+      "sha256": "ed57c62f9b1c877a593ed9b7166e313ffb9fb95daf3a8442d2fe7d2dad521d52",
+      "lines": 15,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/tests/__init__.py",
+      "git_blob": "7d316eb4a79c729763bdf8a1dc4986d3c5b4f208",
+      "sha256": "468892fb93dfc77bf542b1ee430d6aa56ecef06c6c106a0c8bf91ea1b1354dd2",
+      "lines": 1,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/tests/test_api.py",
+      "git_blob": "a124ac596804bbc279d6c18bf68ed84c24d57272",
+      "sha256": "e74b88d4ac294b6cc1ba66ab53215172ea992b9eacefcfb9c8092ff35b6c5f7c",
+      "lines": 140,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/tvis/__init__.py",
+      "git_blob": "f182242a043a62b7eb016966a21cf727e9db31c8",
+      "sha256": "831df90578018ce71f46f17c2abc0f84b4665b0b9d03dd6670c87e020c861944",
+      "lines": 6,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/tvis/corutina.py",
+      "git_blob": "feaa90683ea15a94db9830622486c31a552a5a1c",
+      "sha256": "990333ff85c847c06db53817c58d9201698e641b05a50d273732670689193bad",
+      "lines": 57,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/src/khora_kernel/userland/__init__.py",
+      "git_blob": "9523e272f94f36bdbd3d3ac3bbcaf7d7c894be07",
+      "sha256": "dbe7ea94349074c0b870f8fbb92262471a2d4e4445fdafc16e2cce3e94d817c3",
+      "lines": 1,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/tests/communities/test_ing_04.py",
+      "git_blob": "93e81f12c2817ea10cd749859410f3e50b78ca03",
+      "sha256": "dd6496fda68a2212164c2aad9c23d3116cfebba848a191fa4e2f01aef283cea1",
+      "lines": 344,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/tests/conftest.py",
+      "git_blob": "53e57c39de2e9f24c0165c47110348c7e147dbff",
+      "sha256": "1266eebddfbc8176852c16eb7ea6b032e1377c3db009bf252e5a17e47517438a",
+      "lines": 48,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/tests/constructor/test_constructor.py",
+      "git_blob": "76f05e91cd26642434e2c26909a83cbd964a5150",
+      "sha256": "e8507de52ddf430899c4f388aef4200137659512c78787c9e3aa8c73aaa54527",
+      "lines": 160,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/tests/constructor/test_fkgc_sampling.py",
+      "git_blob": "15d93c96b14371722ac070636689ad58cab4c6f9",
+      "sha256": "1475cbd43a4432503d7f1926620705f1e968c92ec42c4fcb478d4a7fe0664782",
+      "lines": 49,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/tests/constructor/test_llm_generico.py",
+      "git_blob": "613a1ae1d8331097a09078aa90223f0adb57bd50",
+      "sha256": "5b0bc9cc38f464108065993689c83172d9e2d33f41c161ed8a1bdd8e45afdc75",
+      "lines": 47,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/tests/constructor/test_phi_c.py",
+      "git_blob": "f959474344ab6cdc56e3a8945855c145b0bc3a0d",
+      "sha256": "71b59deb4f870988e16c65a1db9f40ace1e24943fc68d0c98e10cfe8e742213e",
+      "lines": 145,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/tests/constructor/test_phi_m.py",
+      "git_blob": "a869e2cecdc3584b9fc692d20a0ed7ac393a0b92",
+      "sha256": "aecba0c66eefc210b8a2877447d275bbdfe219a2d29d2b9a01c3db72709a7739",
+      "lines": 85,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/tests/constructor/test_puerto_llm.py",
+      "git_blob": "1bd53c08655c2def8621e042e548bb1cfbf863ab",
+      "sha256": "0a14a75c01ddee3d98defa1f1ae3304f62d6076b9070084d9df2a5888fab8d34",
+      "lines": 121,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/tests/consulta/test_retriever.py",
+      "git_blob": "9868fab15a23946e2f024b1fe8ac2d8974051a05",
+      "sha256": "182701b1855a0d47efec27f7b87abb88550e474b3759a893ee88f28b5f3d1647",
+      "lines": 381,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/tests/contrato/__init__.py",
+      "git_blob": "7d316eb4a79c729763bdf8a1dc4986d3c5b4f208",
+      "sha256": "468892fb93dfc77bf542b1ee430d6aa56ecef06c6c106a0c8bf91ea1b1354dd2",
+      "lines": 1,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/tests/contrato/test_constructor_de_apps.py",
+      "git_blob": "8cd867c36aa823093edf52440f96847d9db790b6",
+      "sha256": "e0592c4dc781b20b00122312982ad9f3e7533d061a1a9dd014a099388cd1268a",
+      "lines": 49,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/tests/contrato/test_gestor_de_tareas.py",
+      "git_blob": "bd54cb527844b87161bc2c2660a5ada56b46aca7",
+      "sha256": "38139fe56977f082eee919e75db0f26267e1dd498f53c1abf0126a6251cc8204",
+      "lines": 52,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/tests/contrato/test_ingesta_de_archivos.py",
+      "git_blob": "8938aa0e6fbe490d7319a648628afd818ca51763",
+      "sha256": "8555c87dde0d496f9666d2d38fc597328eae94964547b7bdb0be692a16a5ca9f",
+      "lines": 42,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/tests/contrato/test_memoria_organizada.py",
+      "git_blob": "7f5c51bae6ac36c53b59bc566f3ecdf082eef86e",
+      "sha256": "9f426c72bb9d89d02b62179108ab9031037ef0dabeac151e3c79457cee7fdf6b",
+      "lines": 69,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/tests/contrato/test_memoria_organizada_motor.py",
+      "git_blob": "6ae3dbe159a28330223e5b622f4bb4bcc188bfcf",
+      "sha256": "1842c69ada31dc60b40a3c160c6dd3ef8ce49c2e01aaf06c95e156eff366f286",
+      "lines": 54,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/tests/contrato/test_modelo_de_lenguaje.py",
+      "git_blob": "ef59406adb658a7321ed35f2170319bd7b8ee90a",
+      "sha256": "c3c01e957ea7d041dd0cb4a37325925ed87c6a4f97a30df62c2cf4fc1c8bb3f8",
+      "lines": 45,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/tests/contrato/test_proposal_contract.py",
+      "git_blob": "104a2b9089c52e7ca5203063bdf047308bfc19e8",
+      "sha256": "d142f9e8fd670281fc49ef2a6cd60abc00a1c33b28aaf503bd68915ab560b45d",
+      "lines": 201,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/tests/contrato/test_transcripcion.py",
+      "git_blob": "059663e2f6abab5654c6102ccb6e247693731386",
+      "sha256": "a5eecade2ada07ad70467695e42ae3f54e61f80b2a0834403af4e0c3fd2faf7a",
+      "lines": 41,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/tests/engine/test_raz_01.py",
+      "git_blob": "f2c1bf98fcb62be2895764105c960a6cb17cce07",
+      "sha256": "4e59cea6fd9b4db011f8ec2cf582a1760dbddea65817c6e8af0d296847977455",
+      "lines": 124,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/tests/engine/test_raz_02.py",
+      "git_blob": "20b06f01b18eb926e2ce8af92e603922c6291ec6",
+      "sha256": "a671155331509e5d095cca9de38939cd3c56af81812617079038505f4836365f",
+      "lines": 159,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/tests/gravedad/test_export_import.py",
+      "git_blob": "2a4a4b27dd653dea31b5c5e4cd8b4af26240af3e",
+      "sha256": "ea6839f667c9191c2aadc6d0039239c625a6ae14156759c8b938dab82d4c5cf3",
+      "lines": 75,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/tests/host/test_host.py",
+      "git_blob": "36ec999a94f7e88dfa86d2a6edd4edecdc9855ce",
+      "sha256": "97c499e4cc8b9d01152d5095aa8db491d56366c6571e52b7cd07231787371f32",
+      "lines": 151,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/tests/poblacion/test_ing_03.py",
+      "git_blob": "f264c286788cde1ef209a351d3c59803aed028cd",
+      "sha256": "6073bac22ef5bfa91f03d1638ea1d9ab82fe3d39357005d50af95f71ac334879",
+      "lines": 86,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/tests/poblacion/test_p5b_kernel_propuesta_pura.py",
+      "git_blob": "544545cdd36ca2268cb4c93008ab3f9bcf578660",
+      "sha256": "10223270703248269554d4b8a7099acde2cb032df016ad8a846d98386f65e79d",
+      "lines": 309,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/tests/resolucion/test_resolucion.py",
+      "git_blob": "fb7d8cb58cf664b19c3590bb2abe3fe5bc42cd8e",
+      "sha256": "9bffa65fb074e02f9edd8f4b9c372034a07e0b8b40cb0597c818bf27486a4cb4",
+      "lines": 160,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/tests/summaries/test_ing_05.py",
+      "git_blob": "828febe8a252e3c415c7e2fdde3fb03cbc2cdc6f",
+      "sha256": "78a820c42826a8faf4a91e088597d08d20bdcbb3c5d9d42523f94dcfb08f1f97",
+      "lines": 109,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/tests/test_c17_fallback.py",
+      "git_blob": "e77fac4879b5f1ec698e8280fc81a6a512476827",
+      "sha256": "b47bd1c6b29b48bb5fd2fe489e3106987b3273d8bad11d0248ed6d61915fea64",
+      "lines": 247,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/tests/test_epistwin_audit.py",
+      "git_blob": "4be9124f9502aa8ba60074bf1d93c4028858e566",
+      "sha256": "29493bc1969096c8f131cc7892fbc5c75a70476d97ba8b05a43930013042a9e6",
+      "lines": 204,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/tests/test_faculty_contract.py",
+      "git_blob": "be95d09bbdc62af4a84c18433b5c5003f4ff7883",
+      "sha256": "92ad087c45d1534ac23488b1c597c7507113bc8f2c6205b4d9fe5f912902172e",
+      "lines": 10,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/tests/test_jc11_core.py",
+      "git_blob": "0d2a4f0ccd5f09194bacab5f614e24a47cfd5cfe",
+      "sha256": "56552e0921df3554344a185490183f032c347fbe7770534b928d70c9e0b87f5c",
+      "lines": 138,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/tests/test_jc12_fval.py",
+      "git_blob": "179e5b19eacb403fe878afc824aee20260d05a8b",
+      "sha256": "aa146936675104b4b400258d314ec203a32022e5c579888b97907bc77747c024",
+      "lines": 199,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/tests/test_jc7_embeddings.py",
+      "git_blob": "678ce2fafdbe1064761dd17067fb7186e0f2d98e",
+      "sha256": "4df7c5c3eddc759bd979ec78b49d01cd5acdd90b31b54fa7acaa571455557576",
+      "lines": 157,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/tests/test_jc8_leiden.py",
+      "git_blob": "6d9f9170de58da41540abe30cd9a638c9ebf8c1a",
+      "sha256": "0a368a8f5b64471c666f1fdbfc1de4727db4ba5649391d30de15b00a2eb3e044",
+      "lines": 176,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/tests/test_jc9_fsum.py",
+      "git_blob": "dbd76e95fdcf23d0e2f0861aa43ec64525c7520b",
+      "sha256": "a96f7e15aff9024ed274cd8767d74c9e37c4f0686b3ecd93ae023418596ac6d4",
+      "lines": 307,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/tests/test_olvidar_determinista.py",
+      "git_blob": "203647be25ff3dba58e4c637f0dd880dd80ed07a",
+      "sha256": "6f92aeb2f0f996f2517db1bb01a39f401ef821c9785d37bee41a82c11cf89096",
+      "lines": 289,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/tests/test_personalqa_loader.py",
+      "git_blob": "2631512de078eaa39513c1ba87f3bf685409612a",
+      "sha256": "169fda7994a3ee59a4228b1020f01c3725a926eb3f484ad8e60091365d7d2f5c",
+      "lines": 44,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/tests/test_personalqa_runner.py",
+      "git_blob": "39194888f330ebb5b3bd793456032ae937ea2d2e",
+      "sha256": "fe5ba8396c87fab958531b91de5129e25b7f72d6e2eaceab76b1f2eafc70e121",
+      "lines": 62,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/tests/test_proveedores_perfiles.py",
+      "git_blob": "3db9f9394e1321794fce470ccad925f52019a200",
+      "sha256": "9bb4effb12d9a07146f89c53f8a18a0065cdf3ba004daeb2f248f4bcbfc5cd37",
+      "lines": 80,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/tests/test_registro.py",
+      "git_blob": "01afcc1a4477aabb9b78ee890b06081dad3a3ac1",
+      "sha256": "504883533c560af0b0bdfebd30d9e84d4c44005dbdd63065c200562ecffdaac2",
+      "lines": 47,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/tests/test_runtime_leiden_contract.py",
+      "git_blob": "844cc796a015c19be28a9d29dacab30ee923be54",
+      "sha256": "59085e87ed0563911ace288a71fe6fb4c7e7f282bf63a3004e54c09f492f3709",
+      "lines": 30,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/tests/test_vis_01.py",
+      "git_blob": "5b3a5573031fcacfa9250d43dda8f0de731e50d1",
+      "sha256": "bde5790ef6c559294b0390d56ebf6a4e96c147a8a2f248a92e8eb6a9d6201ebb",
+      "lines": 103,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "kernel/tools/khora_audit.py",
+      "git_blob": "ca046be1e86517821bc8c414b7da010613ff0022",
+      "sha256": "ac60972576873a15dfd40b0936e176a0d0816636e9c2ccbeb7414b0b75134f23",
+      "lines": 248,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/app/api/chat/route.ts",
+      "git_blob": "cc5d937f5ece02c479d14bceff4f1f0c50ca9182",
+      "sha256": "b715ce1f99af33513694d189ba9243fa7e46845f68a3775f09e6ef44daa592c3",
+      "lines": 100,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/app/api/consulta/route.ts",
+      "git_blob": "a31823493ef78943f98f8fc23f8d38cb4a4ac74d",
+      "sha256": "2de761eda026808256563a786ee02c9c27ed8357db45a2ed1a54d52de01c013b",
+      "lines": 90,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/app/api/edicion/route.ts",
+      "git_blob": "8bc8ed16555aa354c1d5a6906e403d077657a7f6",
+      "sha256": "52c968e6d83f222b08ef3282b883f34cd359265fe0575ac6acdc9ea025a32c55",
+      "lines": 66,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/app/api/grafo/route.ts",
+      "git_blob": "8043208a222a4c83a8164adc5a4789a5942b2081",
+      "sha256": "054a20811b46bc10411a4477a6ac17801b3abc4d81c43f0ea631011d8c604ee7",
+      "lines": 31,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/app/api/grafos/route.ts",
+      "git_blob": "7546cddd0bbaaee80ee64c42f44fc5a2e33536c1",
+      "sha256": "7b048451d47fb0ab01a746c15b3bbf788b547e614f7380f901bf59cb6fd2fc58",
+      "lines": 25,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/app/api/ingesta/route.ts",
+      "git_blob": "f8b97837c1308525c0f1b6189c6fbd6dce321746",
+      "sha256": "7810a70f40f941956722c05aed11de511d642bcda2cb23ae67a1fd3f28910603",
+      "lines": 762,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/app/api/ingesta/verificar/route.ts",
+      "git_blob": "0508dc45721b7857be788fc12bdc019b99adb59b",
+      "sha256": "da7133e7329b0d018003ceb1c26c2bc756a3e0b1852a159f93ca0e512b3699e1",
+      "lines": 23,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/app/api/revision/[id]/aprobar/route.ts",
+      "git_blob": "5d2b641a264e6894c616230e04ae9ab6c336ae81",
+      "sha256": "2ce7a822b80521f47eab88ab1d94e2bbdb920ead40feae17f9b526c2ab20d99f",
+      "lines": 76,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/app/api/revision/[id]/compuerta/route.ts",
+      "git_blob": "f82ac46716baf3bae7ad2c006bf9744c6a85e46d",
+      "sha256": "d1252b4325226e2f45d7138064edcc82e26559b3813d894e719ec3351f41efbd",
+      "lines": 32,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/app/api/revision/[id]/hallazgos/[hId]/resolver/route.ts",
+      "git_blob": "498d9f8958cebef72e049d430ed10dbbc6fab7d6",
+      "sha256": "309796088b19abd810fdaf215ac7e80facde0cc1037e9851a9cfea2c9e08f292",
+      "lines": 215,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/app/api/revision/[id]/hallazgos/route.ts",
+      "git_blob": "4be93a44a3a0392318cd01283f5d77d0261a8abf",
+      "sha256": "ce9f0141c07bf4c99a80a09c7c3ef87a1a0f1f2cbb488df5e4d20d680307edf8",
+      "lines": 55,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/app/api/revision/[id]/incidentes/[incId]/resolver/route.ts",
+      "git_blob": "b9ae506ca5414f926f095e2d17f852ca6f4c8e39",
+      "sha256": "6efded7f1f37034dd7fd5072ca62a566bda51b97d11467a1cd1ef5214b131a9e",
+      "lines": 100,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/app/api/revision/[id]/incidentes/route.ts",
+      "git_blob": "3cb8b97f1dd69828f37caf48a2f5eaba703bf3cc",
+      "sha256": "8676b937b3a5f0e585df4e38bccebab19058ba338db90d8079dcd28b2d860a8e",
+      "lines": 21,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/app/api/revision/[id]/iniciar/route.ts",
+      "git_blob": "263fa273ba12478805a0771549b3b2c3a853cc21",
+      "sha256": "9038189017b6e3f9df341731c6cefd7a3ac8d83d9bb3fc880a649b54eb248bf8",
+      "lines": 29,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/app/api/revision/[id]/propuestas/aplicar/route.ts",
+      "git_blob": "55a02516e00e51eb9f7a374c6d2f5bf2246574e9",
+      "sha256": "bb2f821c3bb2690b668fbfb7cf95c4d319487d7f47572f3ba976d76fbd3317d2",
+      "lines": 58,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/app/api/revision/[id]/propuestas/route.ts",
+      "git_blob": "c5d71df7da4a713352ea1680fb551d9e0e1da7b8",
+      "sha256": "4eff181ff77fdd6be4e283df6306a598c227d18bf22e8d5be184b90395bba6cb",
+      "lines": 59,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/app/api/revision/[id]/reabrir/route.ts",
+      "git_blob": "4424417652c185e0e8f30b4d63f9bc009e6c0a8c",
+      "sha256": "a5822aa02025fe8ca8605466ffde70f7045f4a882375c4954507007a7b593c4e",
+      "lines": 28,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/app/api/revision/[id]/route.ts",
+      "git_blob": "3e51f31dc4f369bf7d756c3e5bb70e8eda587aba",
+      "sha256": "2bbaeab310d81e95873a5a2bd0f188a1ea8e50f107a2c049c38941cd1e8f850e",
+      "lines": 343,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/app/api/revision/delta/route.ts",
+      "git_blob": "1b2b24cf689ef68a37cfa9f2d01c2e0a4cd96e6f",
+      "sha256": "6b1a59d4366344a2184f83d7cd373387abb6c1f1366afcc291ab4194c53aba85",
+      "lines": 71,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/app/api/revision/sugerencias/route.ts",
+      "git_blob": "137c1e9357d2ebbb2fb006752463002f27efd9be",
+      "sha256": "cb3d2888a089f9f162ee1908bb43bf838766ec44cfe3d46f1ca7042231b17cb6",
+      "lines": 50,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/app/api/segmentar/[id]/ratificar/route.ts",
+      "git_blob": "f0ca0da7a414fe52bc203785a2c729ed3ddd1ac2",
+      "sha256": "2c7bd46e8bd03c59aaf0b85dcdf02c31ec5e548b104c04237e755147e9690f93",
+      "lines": 36,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/app/api/segmentar/[id]/route.ts",
+      "git_blob": "a84da2c394d1116ce07d533bf3f796c4817f6cfb",
+      "sha256": "16af7c68c155d4547646c08d47e9f1ae6ae06d861e3a18eca750f5741b4b8d60",
+      "lines": 36,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/app/api/versiones/route.ts",
+      "git_blob": "ed1babb5c9e745e7f95d23d63e2be9dda27852ed",
+      "sha256": "76ed603943865ccb8140bd2b118928544fe28c95a9e01f6359a00be501b9ae5c",
+      "lines": 24,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/app/api/volcado/[id]/aprobar/route.ts",
+      "git_blob": "58c4145c1dceb3c5b952465348cebfbcf55dea1c",
+      "sha256": "addf998464645872e6449dc0b84ba9494e69a62280e486c4fb189b649666cc27",
+      "lines": 37,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/app/api/volcado/[id]/route.ts",
+      "git_blob": "2d58087254044f1e3475cb2102a192db1875b872",
+      "sha256": "ba7d894ecd77d6c2a3d9445c106c0fbe302ba934354bedf32a4f12d00df0f903",
+      "lines": 36,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/app/api/volcado/route.ts",
+      "git_blob": "400dd28503a4af26a5911ab14b2e9103466d2ec2",
+      "sha256": "20e7e496c2c8314e81ad0c6b6f6c61b5f9361c506af5d57333d8d8ef88ddf5a7",
+      "lines": 49,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/app/api/volcados/pipeline/[id]/route.ts",
+      "git_blob": "c538a384033a29cdd4ec073ec365975cf67ddbbd",
+      "sha256": "72218555d3f2b740413088d150d9fe7b77ecf8635df1ab1038ac07a8d3e323cb",
+      "lines": 37,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/app/api/volcados/pipeline/route.ts",
+      "git_blob": "27f057428db8e9f73aebef738e6390d3066cba0b",
+      "sha256": "851a5d265ae017ab545e42bc65640d02750df009320f000cb202d1a3934d4284",
+      "lines": 32,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/app/components/shared/ConsultaView.tsx",
+      "git_blob": "e3f875abe2f3ed9e50a069bd7983cfb4767027e8",
+      "sha256": "510993f9b2f86deca6714cebbfa7fff66617a52aca93e34b023ae185eaed22a7",
+      "lines": 700,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/app/components/shared/GrafoView.tsx",
+      "git_blob": "1a1f0eef8782ef80ee69dd323a3a86802b0b7eef",
+      "sha256": "defc6ec00d0c7ddc4a86177bf39836a8ac0046b65d5032d7266f775c1b4e0eea",
+      "lines": 413,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/app/sistema/consulta/page.tsx",
+      "git_blob": "48bfe392ec047f81dc602f1716f9f422d1e6f91b",
+      "sha256": "a39a9de5e86829310dfdcd1569534dcd159700105f41d29e3ee640b0f3ab45cc",
+      "lines": 255,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/db/migrations/001_jules_schema.sql",
+      "git_blob": "c458c9458f1e7f8c83538369eb78c8e81b05dfdd",
+      "sha256": "64a83afd8a4e57ec223b05c3d25067615abefa17904edb334821d9c0b49d7806",
+      "lines": 35,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/db/migrations/002_kpi_entries.sql",
+      "git_blob": "11892ce33011cbad89ad26ba7a357a9a19bf92b4",
+      "sha256": "3cdaff39b67a5de6edc8fffc91a315bd6865bfb6d8cb7a7dd30765c96847e462",
+      "lines": 7,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/db/migrations/003_volcados.sql",
+      "git_blob": "706fd4cb45e7a2cc555f12cb2e28c55fbd50e939",
+      "sha256": "d031cfc56d28fcb4a33297ec5c201a25dcfb76543168bb035516d57d80836b5c",
+      "lines": 21,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/db/migrations/004_dictado.sql",
+      "git_blob": "e262fce422078aa808b03e0714862d2dbf14fe7e",
+      "sha256": "c7354e489b1ff9d10ef3d03dde889f478466d73b801f4e7ec85e26370c0a5b5b",
+      "lines": 6,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/db/migrations/005_correcciones.sql",
+      "git_blob": "1ed009b573200218cb7876ce06a3d6e621e5605d",
+      "sha256": "105b0cefd33aafd34becc579c213d13beb0226bb6fb672dcaa5d3e1bb691f6f3",
+      "lines": 12,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/db/migrations/006_versiones.sql",
+      "git_blob": "ef67587e0295bd25af4128471c81918c67701211",
+      "sha256": "1043185c48a71ed6d1a712329b25242940346412b0430832ef651f5279976b78",
+      "lines": 14,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/db/migrations/007_grafo_tablas.sql",
+      "git_blob": "629801433894deda7b51186fe2f46d3d91e03cc0",
+      "sha256": "cf14ee98f06841f02cdb87052b29d42f453507f646e40e4665789a4cd9b56f3b",
+      "lines": 49,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/db/migrations/008_revision_volcados.sql",
+      "git_blob": "91d4ccfb1800e86e7317699f12d202d8cd1decfe",
+      "sha256": "cf694f29176933fd3e09883f807e6e3b573425a286021e6de4b136e569014a36",
+      "lines": 19,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/db/migrations/009_folio.sql",
+      "git_blob": "dd4c31691676a90517707ba9b13c21e757a67e9d",
+      "sha256": "54e7b5d595e3590cddf016b1b564b528e044f83ba79b566877425853526ab53d",
+      "lines": 25,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/db/migrations/010_dictado_sessions_and_parts.sql",
+      "git_blob": "a89d55df68fedbd850761ef05c55add553c53bfd",
+      "sha256": "8e2ebcc756ab071cd62600a29153ee1360fd34202caf6f9b0be22597ba2d08e4",
+      "lines": 40,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/db/migrations/011_oauth.sql",
+      "git_blob": "ad86081152ad1e9fbf1ccc86c13186f075cfe2c6",
+      "sha256": "48513f5d3af2091c3d706899b2995bf76d86f48adcb522e7582cc7acb719943d",
+      "lines": 33,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/db/migrations/013_normalize_audio_part_indices.sql",
+      "git_blob": "db67b80b9839ded87b212577607ddb2ef76d3405",
+      "sha256": "bc4de9bac9484745f888ca0b20534db1defe139c7595dea5ca0c603c194340e3",
+      "lines": 19,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/db/migrations/014_audio_source.sql",
+      "git_blob": "1a3ae3933dc7131d6f772a2c5113430894c0bc64",
+      "sha256": "b7479aea312dbbaff503f230fe22545107dd264c063761562c1eba9118e0403a",
+      "lines": 7,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/db/migrations/014_default_estado_en_revision.sql",
+      "git_blob": "4e740b33354136aeb832e1640e405e7ecd7b3db4",
+      "sha256": "0a1499da67b739789903fc41748287b706473588a6db7d98e8390c3789cc5887",
+      "lines": 12,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/db/migrations/015_compensatory_repair_and_default_state.sql",
+      "git_blob": "85fb571bf5d7428e86c1eb4087a87ef6f22ab665",
+      "sha256": "746959b4e8374061908315a0c8c8d63f8a11e070c97f8ba0d1a9d271ccb914b4",
+      "lines": 7,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/db/migrations/016_ep_persistent_sessions.sql",
+      "git_blob": "4468d2f9e4571122d84f79ad820b3e8b1630849f",
+      "sha256": "7ef779de599d0dd02cf7caf62dd2ce5d85096856881e8351470be3ef0b988c51",
+      "lines": 44,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/db/migrations/017_segmentacion_parrafos.sql",
+      "git_blob": "70e2f8880886cb0379ddaec8e6edbc37401aa6f9",
+      "sha256": "3228530cda1d98873ec6bbeea8a18ec6e0cfd0ab9222f7c101116c583f87d1bc",
+      "lines": 3,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/db/migrations/018_ingesta_propuesta_juicios.sql",
+      "git_blob": "5e44936c4b3e1e87fa542d9f9357240522650eb8",
+      "sha256": "b28c7bf903af481bff0dd1598c3803c6eccb975408639d8c1bb0d315b2bc7e45",
+      "lines": 70,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/db/migrations/019_propuestas_correccion.sql",
+      "git_blob": "f7e318ca86d4ed878883223ca0ac1d028cb26641",
+      "sha256": "203599cb56412e5fbb6d91d1e8efa09e7ae6d1aedc9b51961eb29f1abd013535",
+      "lines": 26,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/db/migrations/020_fragmentos_anclados.sql",
+      "git_blob": "14e0ac06e22753451db8cbbd536d69fc4dbf33c4",
+      "sha256": "ed8ffae18419dbdb460b9e1503fa7fa36281ffa9d8669ba7c93e730912cd2787",
+      "lines": 19,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/db/migrations/021_eventos_durables.sql",
+      "git_blob": "3c3814096638e0b1cc5d5d24677d14f96cca5c7d",
+      "sha256": "e92a70f954498d932b74ab8a868a156c5dc9033661082be0a903cc87771131ed",
+      "lines": 45,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/db/migrations/022_reparacion_registro_eventos.sql",
+      "git_blob": "879d3b250613ec6515877cbad1e5fef60c86042d",
+      "sha256": "03a1ddfadd3b2fe6fe712d1bc5ba9b48b31e6b6118c3c43ecf4849819ae18f6e",
+      "lines": 72,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/db/migrations/023_runtime_state.sql",
+      "git_blob": "6a560ceec1200e0d2d6909ec2d4d98d4bbe1292d",
+      "sha256": "5d92f02ee0bbe3c7af0d8351c74a2b1529322da4697eac67922177213ae38799",
+      "lines": 32,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/db/migrations/024_oauth_scopes.sql",
+      "git_blob": "3575986b6202a72899bc5a8bee1f34fa9d6ceab6",
+      "sha256": "666b72eaacb74bcf34dcfa869c9c4301b214d3b2c01d970a397ff959ca913f99",
+      "lines": 15,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/db/migrations/025_normative_receipts.sql",
+      "git_blob": "905628673ec5d3bed418f83e6538d8d3d95c1cb9",
+      "sha256": "cdb474940e1c5137173670327e2e5881912120506ca66bdb477fd68974573230",
+      "lines": 39,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/db/migrations/026_normative_turns.sql",
+      "git_blob": "ab34f6a46c3e395d6e69835eab3752820486bc95",
+      "sha256": "1d18d817cb4b9528e286301dad5e8335a564299a586af204fa4a83dac895b01b",
+      "lines": 23,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/db/migrations/027_manual_mcp_tokens.sql",
+      "git_blob": "2aef97e579d87a62d829acb4d3f511a4582fc9f7",
+      "sha256": "cb8b5c4b0a9f93c5d97e3539420ced44bf5b08a0a75de3ac7a69d22b2cb4438b",
+      "lines": 28,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/db/migrations/028_normative_order_ledger.sql",
+      "git_blob": "6b3e692ba36da9915f9aa63374066f0ab3369ee8",
+      "sha256": "dbfc6f72c5b19b030c6b523f23698c38c36499629adc0e1127dc75158f016af8",
+      "lines": 18,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/db/migrations/029_github_credentials.sql",
+      "git_blob": "7784d6a82f4c0a325bd09ce9621c786aa92d2128",
+      "sha256": "50b306eb91a85e4aa875e01cc4e323ba968eac8fc75e45c59b3195397e464450",
+      "lines": 15,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/db/migrations/030_custodia_continua.sql",
+      "git_blob": "f07f0f40f4965e85fcdcba53afa75d730f24eaaa",
+      "sha256": "153efc62fcd5f1893ba866cc2a728e6d3957a6bbcd5dc29e51cd525281bbf189",
+      "lines": 19,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/db/migrations/031_custodia_reconciliacion.sql",
+      "git_blob": "877b4643dc62d396507007006007e8d31ce0721a",
+      "sha256": "d7069336a53f9a320233fafc0ac24822aa710e2fa2705be4123d24f8ee4e28f0",
+      "lines": 20,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/db/migrations/032_graph_twins.sql",
+      "git_blob": "bbc0b3de8910afea8e9ecffc2eb2c934bbf131b9",
+      "sha256": "d3c12529813fedf74f895caa6f39ab11b0e3e2fc783ac89de89e0e39d323191c",
+      "lines": 26,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/docs/GRAPH-TWINS.md",
+      "git_blob": "5a85978477868a7b5f246f67be7862cba02e8c9f",
+      "sha256": "619f8603c81df7f48f5af57ef76b955aaf5ef337ec58a04083e5b0aeeb38ef40",
+      "lines": 87,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/e2e/ciclo-ingesta.spec.ts",
+      "git_blob": "2f4ffa8d7c4737ac8557c625a32c9148162cc634",
+      "sha256": "0e816ef3388d1876938ea71b35f4201a11ecf9a0b4ff8cb620c22a6ff059f587",
+      "lines": 226,
+      "revision": "prior acquisition a097; not independently rechecked against new tree",
+      "hash_rechecked": false
+    },
+    {
+      "path": "khora-web/e2e/cora-ingesta.spec.ts",
+      "git_blob": "2ca31575fb9fbd473af28bbaf92d8f3931cf4986",
+      "sha256": "54de683d121b4d4d4660f4cc1c67f031b14651eb2a52c501ea6d923ac29e4ecc",
+      "lines": 134,
+      "revision": "prior acquisition a097; not independently rechecked against new tree",
+      "hash_rechecked": false
+    },
+    {
+      "path": "khora-web/e2e/grafo.spec.ts",
+      "git_blob": "59d2d4bad4d2cbc18474b0b20f7337b0ac535cf7",
+      "sha256": "72666aeea9e821b2ade33157a0704b48a6850d4ab22605a209b843e76c5a7ba5",
+      "lines": 118,
+      "revision": "prior acquisition a097; not independently rechecked against new tree",
+      "hash_rechecked": false
+    },
+    {
+      "path": "khora-web/lib/contracts/proposal.ts",
+      "git_blob": "1c294c922badf883ae2697105943d80c11015775",
+      "sha256": "69c3732cd5fbff318e32819ec46a1226ee51dd1ecac06321483a95ed355ddc39",
+      "lines": 242,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/graph-twins.ts",
+      "git_blob": "d948dc5422f45e63ac1d1758518d63b8da587ce3",
+      "sha256": "c9275760ff2cf02a76106e3e983758665a45ad3d155930b5849526b456c9bf5e",
+      "lines": 115,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/asistenteRevision.ts",
+      "git_blob": "735d34fa2106e3062d754800dec5a2800a9e54b5",
+      "sha256": "ed04f1377e691544ec0ae7dbc4a6c4dc0e5a09cb04aa9ede39feb3e8dfce9f36",
+      "lines": 603,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/audio-mp3.ts",
+      "git_blob": "e3e5d264fc8e652fe71ac90191184589360563a5",
+      "sha256": "43b204ef33817fabb3a41033e970be11db1a112dd930faa5fadc9fb16c1419b7",
+      "lines": 104,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/auditValidator.ts",
+      "git_blob": "be565d464f9e76db31140bed8293c6433cef4be6",
+      "sha256": "0fe1639b101d5c99c8c949be65cf8cac968ef2c95b026ced26e27380a583f541",
+      "lines": 80,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/boveda.ts",
+      "git_blob": "e7d904d1376e717bb4fdcf65907c68ccad3c8184",
+      "sha256": "01e1e908da57e2f8c080bc2a42ba9f5943caed1a8cc4a379e56d6648b9f33eba",
+      "lines": 61,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/compuerta.ts",
+      "git_blob": "70d9042b169bbaca7018cc5b2939b36fe37fb305",
+      "sha256": "82ebd3aa1cdcd76413f149c7a4e0d931628d8b39a88babdbbd3a8debc7b60844",
+      "lines": 178,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/correcciones.ts",
+      "git_blob": "3135545cf639e671e1852bf3798dd3095c93af66",
+      "sha256": "118127160e0665c85519c221026836d1cfed238d8bc860ed5d5c2bfb83c9b5cc",
+      "lines": 153,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/cripto.ts",
+      "git_blob": "92427a1cacf745142a760802247105726373faf6",
+      "sha256": "c93f62364fca15a8956a32e49a326f09e87e74c272424d58f65fe3b1909e501b",
+      "lines": 45,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/custodia-acceso.ts",
+      "git_blob": "4220912b31d26f4da266d37b2d32cc2910c17d01",
+      "sha256": "bdcd17337efd1808061e59712fd116f60c882950a126d2956c40aeb6ec34b8ab",
+      "lines": 11,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/custodia-recuperacion.ts",
+      "git_blob": "278a479db46e6f2bed72ea7d31f88cc373fa67d1",
+      "sha256": "b6f807c1861237b4810111d9b9f7723090db6b62f67846473da441221ec52b5c",
+      "lines": 70,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/custodia-schema.ts",
+      "git_blob": "3c46ac96470fa95c77cb5f5ad47822033aedd4da",
+      "sha256": "47f015ea796752b75660c258797a494629f95879bd29551d3e99319d2c0cbe14",
+      "lines": 46,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/custodia-trabajos.ts",
+      "git_blob": "753ee3a8dbb7a001ab1bcaa250d9530d83243c3d",
+      "sha256": "a52bb431be7bd92eb72d1e55367a6624ad221b003d0dd9730eb732a684ebeeb1",
+      "lines": 76,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/dictado-experience.ts",
+      "git_blob": "ef796b9bc1d6e84efc0d9a789090916232f972e2",
+      "sha256": "d7b88e1dcbfc31cf187a9f723e59287eb27de3610095846396defb7a101c4e52",
+      "lines": 65,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/dictado.ts",
+      "git_blob": "352da4cc3cc01a60fe47509f758d730727d012df",
+      "sha256": "ea28025233de7caf40694668db0b49ad3ee79b3dfb111609d369853dd377e6a7",
+      "lines": 632,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/domainAudio.ts",
+      "git_blob": "d29ea54d43e73ab77299bc5c8c14b06715116a0c",
+      "sha256": "16c9eabca0a9d8b11519c457ef5d8da533a9f6ac9ab3b770e7e014258614efa6",
+      "lines": 26,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/ep-bootstrap-content.ts",
+      "git_blob": "c20c284e07b769514b8ee78776c52d3818711028",
+      "sha256": "1655854a7dac4336eeeaa2764a9efec81e6b24718fcdabf9fe4a23892cad0a2f",
+      "lines": 2,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/ep.ts",
+      "git_blob": "ff1f345a1745a0488317a94fe0a0d5232d090568",
+      "sha256": "1c366c397bed8a983b88b4c418f9fef78849ab3342a1fe73de8e1402e326b0b8",
+      "lines": 275,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/espejoNotion.test.ts",
+      "git_blob": "b8785158d7cee0485decfa84050cd875bb96f8ba",
+      "sha256": "92c58f19c9310063029bb9dbe7d59997182257be6f6c1200c76a7612ebd272cd",
+      "lines": 6,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/espejoNotion.ts",
+      "git_blob": "24a0175768986b036856c3cd561e204e98bfc4f0",
+      "sha256": "a37ea9082f8b0f38ce75035bfcf77ec62f289ccdbfccddf55f497d1c5e778719",
+      "lines": 201,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/eventos.ts",
+      "git_blob": "48f81945bebf4728fbdcfcdddebbccc93293029c",
+      "sha256": "45928d0c94d833d4c5bf9ec9e3caaf5b61df67c583928dcfa2432093be20aed5",
+      "lines": 659,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/fragmentos.ts",
+      "git_blob": "6fc41dd2b781317b6e5dece1b37d5ff16576dd3f",
+      "sha256": "19fd0285842a0691deccb9f980681721312ea450f4bd84ddb9aef62c7fc7872e",
+      "lines": 473,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/generacion.ts",
+      "git_blob": "f241fe9dad8c0a8c54d2d6e9d16540dc9c4bc2b1",
+      "sha256": "095089824d85abf13aa56d5760b5c04a04d9ebdcfd0ebc12e0816ce2aa974df0",
+      "lines": 32,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/github-credentials.ts",
+      "git_blob": "1ada8df88b193e500434ad5a9002e7a28825cb70",
+      "sha256": "81f9a2ec6dae3440477c3bfc1c1e48cda70646d405d1803e212b2d39c916a70b",
+      "lines": 74,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/grafo-proyeccion.ts",
+      "git_blob": "7d09cc2dbe3c98ff477f6fff996345cece5b91c3",
+      "sha256": "2a5cba73f285fc8af4cdba3a2eb95e5c49f1723a11d666471dad6be866e51818",
+      "lines": 216,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/grafo.ts",
+      "git_blob": "38e342ba12de2cc3c8737ca9a1703430702d102c",
+      "sha256": "b791af688c438b566a45f28bc78c72d38888326e92b4290d7974f9d1f7c86035",
+      "lines": 560,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/graph-diagnostic.ts",
+      "git_blob": "ce4b60ba971f033028fb63ccdd27455e001cecd2",
+      "sha256": "46cb9865a828a37063b1a4389938b25ee5e49d39e933a7d22b20a32ae82c4230",
+      "lines": 17,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/graph-identity-refs.ts",
+      "git_blob": "3d704dce85e4fbd61937e7811a1b2b6968dec70b",
+      "sha256": "83a081053679753f92238ca8f503b9aad8f100775c332ef5ce32d6127c2f6854",
+      "lines": 13,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/graph-twins-store.ts",
+      "git_blob": "73f5e6d9da222fadf23d888d0fd259c261a96ad9",
+      "sha256": "60f15959510772808d629fb4c3a52939600f51ab6a7501a0aa46573445145839",
+      "lines": 142,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/importedAudio.ts",
+      "git_blob": "140eae0b89c2d909b07de1d5e0073a06f58cb8f1",
+      "sha256": "69bf901afda978131dfe0dcb39bd9624babf031e84edaa6b007b3a8f01cb3265",
+      "lines": 79,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/incidentes.ts",
+      "git_blob": "142a395c7fc316dbeb4bed3a35392965e4b00f2f",
+      "sha256": "78cdd976bf7174458aa1d71df9a40815f3c44640509bc382fee456d85b23c2e9",
+      "lines": 293,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/jwt.ts",
+      "git_blob": "0d0ed277fdc5604aea4524c8790ff513286b887f",
+      "sha256": "3abb50e3f954d6dddbdcdb1c8ed98d1bf960b02f75b3134ec9c4413a2b4cae84",
+      "lines": 86,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/mcp-audios.ts",
+      "git_blob": "d18620bb908951807c7b6a7683e08af5e0f75c4d",
+      "sha256": "b6e9654d577b817d8ed3b0108a88359285235b98614ae3c420cd603e0de44644",
+      "lines": 29,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/mcp-config.ts",
+      "git_blob": "f57964c9c5afc1a2361eda5662a6fc604add9a2e",
+      "sha256": "505a68f71ca6a15b1b9c5ad5dfa52726149537f89e10f3d7fb03e070b6f3c3cb",
+      "lines": 181,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/mcp-db.ts",
+      "git_blob": "364ba7691ff73184b21b803dce4c1422068366a0",
+      "sha256": "97119beaaf16ac3f8c4f7c3a1dc6c53bdefb62d2ca887a77ef1e3dd5b84e0a98",
+      "lines": 36,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/mcp-diagnostic-boundary.ts",
+      "git_blob": "26cdca2ed844ad03b2b78dc79f987ec56d48ae78",
+      "sha256": "513ccf075e88e1bb2a3108f79880d7110771882c5dc24228d7edcc6494b6b6bb",
+      "lines": 92,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/mcp-diagnostics.ts",
+      "git_blob": "21eaf86ef697de1e59ef36121c41999621472b9c",
+      "sha256": "1cac5f53cac8d70cc7089574edfbae28a896e1967e80cffd2f7aede80663ec4d",
+      "lines": 149,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/mcp-manual-token.ts",
+      "git_blob": "5eef392643f8dbc0db388ce24935b1792e392671",
+      "sha256": "28ff5b7b19283e53f2cd1676a819790665953969a461afb03da98d6c59669952",
+      "lines": 141,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/mcp-normative.ts",
+      "git_blob": "c475665bfdc7bbc852dda881c2f1be4dc2ac21e6",
+      "sha256": "337a46a6171ef3f8cff90917751bc575ed7ce9b447ecff22e054222fbee8da5f",
+      "lines": 847,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/mcp-observability.ts",
+      "git_blob": "49742845b70ceb5ee82f3816c1bb44a83e4eba74",
+      "sha256": "dcd241a2bc665b7e01bf0b5f63ade83c42d4151e9a0ff5af8170b7434f1de70b",
+      "lines": 249,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/mcp-tool-contract.ts",
+      "git_blob": "c9c7551fe1342b762b444a8470beb86b1939fedb",
+      "sha256": "409faa68dbb7393a6fe58315b2467c865428cbcdcc0a173bd9c7e41deececa9f",
+      "lines": 42,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/mcp-tools.ts",
+      "git_blob": "b6b0d4c8e740d661b73406786b503eec25994d9f",
+      "sha256": "136249952da0c3021488b51de41d715457383e61a4d34b59de21813b15e46169",
+      "lines": 420,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/mcp-ui-review.ts",
+      "git_blob": "e722af8601935bcee0a6409d281309d52b90629b",
+      "sha256": "5128ae0afb2c4ea155d9bd1596158220618d6efae5ed9720a81c39a674605266",
+      "lines": 127,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/neo4j-conexion.ts",
+      "git_blob": "73878e9d3c2fed3c150f9016115ec0c292a3088c",
+      "sha256": "7fa391770750065009a7ea5e5b40fe69a376c6ab52737f0317a5eda4182abd40",
+      "lines": 37,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/neon.ts",
+      "git_blob": "32a2ffd18f46627cd0ed6f4c75403bb9123f28db",
+      "sha256": "a33e9951713fc60b3a7b1f38d6a7bd72b5f1b91deb9c2984cb5535a351cfbfdf",
+      "lines": 32,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/norm-check.ts",
+      "git_blob": "8d8293b0d140ab3b7b6f7e18c4db7e54d3daf4c4",
+      "sha256": "26e7fbcb297af59d9dac9d92a4b894ca7a057e57e6c913b2539cefa901442cc5",
+      "lines": 744,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/normative-github.ts",
+      "git_blob": "26813aaa9d9a91fbbd852c3113621f1de0672bc6",
+      "sha256": "60df1d3d609e95c2aab13effc8b37fbeaca1f675263524b81763d2bc1dc808d6",
+      "lines": 41,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/normative-output.ts",
+      "git_blob": "e124f8ac4d0e2ea5e61fa76567f4ddfaa7d6f967",
+      "sha256": "220b45f00e4d0c1f6a475aadbd704c4569bffc8116893ee34f6021adebbbbf11",
+      "lines": 129,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/normative-receipt-schema.ts",
+      "git_blob": "caf7c62c39a478e229f94302f3e580ef17fdad7e",
+      "sha256": "614bee6403f5c5324ed1f88e032ed7589e88d9deb15fc4d39cc8162426c5cdc0",
+      "lines": 97,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/normative-runtime.ts",
+      "git_blob": "b0bee95bb22716495f50342b0863a0563360c134",
+      "sha256": "f9ebe2ca4bd9abb0fc0c7c2ff799ba73630d0f1802b0553b828cd45d6f6bcdaa",
+      "lines": 29,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/oauth.ts",
+      "git_blob": "17b1bd5f90d78a7ff80624ea7e3e6afd6676328c",
+      "sha256": "e76f8d6769f69e4f90da0f44b19ecb303651336f70e5b171e3fd370f6f0ef6bc",
+      "lines": 232,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/observation-runtime.ts",
+      "git_blob": "f07ac903769d52089da6ff66a84f9443de6aa8cf",
+      "sha256": "20d1b2f4c378aa258db736bff1e0c7f66c156b09691b99b8b02cba9a47e1f789",
+      "lines": 115,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/pipeline.ts",
+      "git_blob": "6befa3e9ee1813a209195c7417f81e155a87cf91",
+      "sha256": "30e6e9c1944632bea18a76dacf7303903317593fd8ab2d14e576c4b8b6dbcd83",
+      "lines": 467,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/propuestasCorreccion.ts",
+      "git_blob": "9a99b09a9588f81d550c9de8c82953718652db4d",
+      "sha256": "e561a543f27a98d689f70dc25c2966e5465232bf85dd027be71f5353ac8f43f6",
+      "lines": 862,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/propuestasRepo.ts",
+      "git_blob": "fcbe5fa86e168aa49c535957c321fdd97f2c02c3",
+      "sha256": "eb8bc917940f106639e7fb8772dff74e54d37c5ce1f95f62758cd16dc1846708",
+      "lines": 474,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/pulido.test.ts",
+      "git_blob": "d45137a600b8b1dd6dca0072cbf478af59849568",
+      "sha256": "8dae156746dae006a2dec150f36836020348fe26da46d6ee01f607535e4633d0",
+      "lines": 104,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/pulido.ts",
+      "git_blob": "92c98417ebb1c14e749003d262b8d2a311de235d",
+      "sha256": "57e44eabe6b6abdb7be2f465acaa41c7af05892cda8cda4d937bce356d23c1e6",
+      "lines": 352,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/reconciliation.ts",
+      "git_blob": "d7e280ad35a2ab59c73e4478d036ea4d80133571",
+      "sha256": "74305e04c38a531c7af2da68d9be3e1f14a393bea4b02cad96b837f434f40cec",
+      "lines": 281,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/runtime-state.ts",
+      "git_blob": "31a518174753867751410cf4cc059230c80de052",
+      "sha256": "e22c533f89a55ce60a777f2e66537d313191fa6744d9e7ce9c2175ed79421ea8",
+      "lines": 46,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/service-context.ts",
+      "git_blob": "b01a3be7f5661f41d370051eb0149ab7d55c0112",
+      "sha256": "1de6e1d5933c904fac32a0bf0c68d3357d882ee3289f67010fb823fd4efe4d2d",
+      "lines": 26,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/service-observability.ts",
+      "git_blob": "822c226cdc489f82e3a10d71e4c7f6f9ebf1ba12",
+      "sha256": "70a109f0186368b6e11675572a9b3532bfafed7a4d7218a308b141cdea5abe30",
+      "lines": 164,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/tildesSeguras.ts",
+      "git_blob": "ef2be367271614eaec84cb9b7203d84e970092b1",
+      "sha256": "a849ffec22be9865ce082f44dd18f98da3762f744191e86c29cf277c25dbe260",
+      "lines": 101,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/titulos.ts",
+      "git_blob": "09cac70db4470b6b4b7d6dabb5e82e12de18ef9c",
+      "sha256": "0801d8ccef7e73437fb675f531c4fe9414b9e7b24f28858cb387c73fc7bfc2de",
+      "lines": 689,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/transcribir.test.ts",
+      "git_blob": "44518c5d14334ada2d2941f42f4726a93bf7921b",
+      "sha256": "29279fb8fc5a8ca65edae3ce123a080e14be71bcaf0ec9af19fb423b007eaf84",
+      "lines": 83,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/transcribir.ts",
+      "git_blob": "71e47f7b433a8c33614b987e438e989dc9613a78",
+      "sha256": "34a318a529d92506318c26d2b82d06e6a65e1b3eb9344ed517741d58db91c597",
+      "lines": 663,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/transcribirSesion.ts",
+      "git_blob": "a1a52691fa28fbe532447b1fd35dd28bf75db28b",
+      "sha256": "ca2cf95995df4ef8da44e87c6268dfb170141d856a7d72b070eaca1a3ac59c85",
+      "lines": 191,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/ui-review-proyeccion.ts",
+      "git_blob": "6a471860b7a523c71cacd531ef4449c96063f953",
+      "sha256": "ba17dec4c16666d0dfd94bc28be30767a02fb14c9dd4988e90d8d7c26286dd36",
+      "lines": 205,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/utils.ts",
+      "git_blob": "6ec9a371947fe93f5cee2aaacf4342a7185b3f79",
+      "sha256": "0998c3d0db212b0e6b2cebfbf36f546d2c34cdab9e5c1a3074a949f7d4766d3a",
+      "lines": 15,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/vaultAgentToken.ts",
+      "git_blob": "dab82a9802591e67d62714d1942d127f765fad37",
+      "sha256": "b953f86425471ae2293a3bd94f2d54170e8229e74056f798b57fbabff5ce2d24",
+      "lines": 238,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/lib/server/volcados.ts",
+      "git_blob": "d0c6d863efccccdf8f566b1ab64db61be649ce9f",
+      "sha256": "50f3f8fddf043d0d41cbac16ac8fda770a127c900e8f9dedd908c8487a69ac0d",
+      "lines": 370,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/package.json",
+      "git_blob": "169762c03dfd7c71754a6d7519a491582626ae52",
+      "sha256": "4dee93f6c8c76939fb759e1a9d164a378a1be4a8efdcdcc02e1d62ec56de6dcf",
+      "lines": 67,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/scripts/run_unit_tests.mjs",
+      "git_blob": "c1d578b85003b9288619b42045be51996a5d87a4",
+      "sha256": "c7274ea8ccd15c68f732568cb2013a8bd3f178f4682831bf3288063493f0b5ad",
+      "lines": 32,
+      "revision": "prior acquisition a097; not independently rechecked against new tree",
+      "hash_rechecked": false
+    },
+    {
+      "path": "khora-web/tests/unit/graph-identity-refs.test.ts",
+      "git_blob": "ebde2303d5d3983f10c4f05a728422c0fb1a01af",
+      "sha256": "dde5c918770ac748769805815f575fc72db8cae0495aa3c23f0beee5c49f9510",
+      "lines": 13,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "khora-web/tests/unit/graph_twins.test.ts",
+      "git_blob": "0fef10cae8c0c1308bb6b7623522c30f47925e44",
+      "sha256": "4b7047b5de18aaf924ca254d08ddb08ebd1a5050eed737c5001cd9347c0fac00",
+      "lines": 25,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    },
+    {
+      "path": "puentes/unificador.py",
+      "git_blob": "43dc58441de6d7edd90caedd4bc2a22c451100cc",
+      "sha256": "4ab41e9b5ae5de2a2bd909696e7d226144321a28831e739b70d4ad57e7003518",
+      "lines": 120,
+      "revision": "f820192d02ccc48e294e83ceb38f34df2c287036",
+      "hash_rechecked": true
+    }
+  ]
+}

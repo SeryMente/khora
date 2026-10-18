@@ -1,0 +1,87 @@
+{
+  "scope": "isolated real Python functions; fixtures/mocks are explicit; no production/providers; R09 contract evidence, not a live stale-index incident",
+  "results": [
+    {
+      "id": "R04",
+      "expected": "Coincidencia lexical propone candidato, no identidad",
+      "observed": {
+        "canonical": "ana",
+        "decision": "MERGE",
+        "needs_review": false
+      },
+      "verdict": "FAIL"
+    },
+    {
+      "id": "R05",
+      "expected": "No asentar contenido sin juicio humano explícito",
+      "observed": {
+        "write_called": true,
+        "synthetic_actor": "operador",
+        "synthetic_decision": "accept"
+      },
+      "verdict": "FAIL"
+    },
+    {
+      "id": "R06",
+      "expected": "Detectar conflicto de relación aceptada con extremos rechazados",
+      "observed": {
+        "entities": [],
+        "relations": [
+          {
+            "origen_id": "ana",
+            "destino_id": "médica",
+            "relacion": "es",
+            "provenance": "00000000-0000-0000-0000-000000000001",
+            "event_time": null,
+            "capture_time": null,
+            "custody": null,
+            "object_kind": "entity",
+            "origen_kind": "entity",
+            "literal_value": null,
+            "literal_datatype": null
+          }
+        ]
+      },
+      "verdict": "FAIL"
+    },
+    {
+      "id": "R07",
+      "expected": "REFINE cambia la consulta del siguiente RETRIEVE",
+      "observed": {
+        "refined": "CONSULTA REFINADA",
+        "retrieved": [
+          "PREGUNTA ORIGINAL"
+        ]
+      },
+      "verdict": "FAIL"
+    },
+    {
+      "id": "R08",
+      "expected": "Evidencia visual no debe autoaprobar sin fVAL",
+      "observed": {
+        "verdict": "SUFFICIENT",
+        "judge_calls": 0,
+        "configuration": "KHORA_FVAL_MODE=mark; controlled lower-level execution"
+      },
+      "verdict": "FAIL"
+    },
+    {
+      "id": "R09",
+      "expected": "Índice identifica espacio/modelo y exige revisión del consumidor",
+      "observed": {
+        "meta": {
+          "graph_revision": "old-revision",
+          "invalidated": false
+        },
+        "returned": [
+          [
+            "old-node",
+            1.0
+          ]
+        ],
+        "consumer_revision_parameter": false
+      },
+      "verdict": "FAIL"
+    }
+  ]
+}

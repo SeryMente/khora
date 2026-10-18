@@ -1,0 +1,11 @@
+import {writeFileSync} from 'node:fs';
+import {digest,validateExtraction,project,PIPELINE} from './harness/graph-twins.mjs';
+const source={volcado_id:'00000000-0000-0000-0000-000000000001',version:1,sha256:'a'.repeat(64),captured_at:'2026-10-18T00:00:00Z'};
+function proposal(id,text,raw){const s={...source,sha256:digest(text)};const c=validateExtraction({relations:raw},text,s);return {id,source:s,pipeline:PIPELINE,chunks:[c],next:text.length,length:text.length,model:'fixture'};}
+const record=(s,p,o,q)=>({subject:s,predicate:p,object:o,quote:q,attribution:'operador',modality:'afirmación',event_time:'no explícito'});
+const results=[];
+let p=proposal('p-original','Ana es médica. Otra Ana es abogada.',[record('Ana','es','médica','Ana es médica.'),record('Ana','es','abogada','Otra Ana es abogada.')]);let g=project([p],[],'automatic','owner');results.push({id:'R01',expected:'homónimos no colapsados por etiqueta de fuente',observed:{anaNodes:g.nodes.filter(n=>n.labels.includes('Ana')).length,relationCount:g.edges.length},verdict:g.nodes.filter(n=>n.labels.includes('Ana')).length===1?'FAIL':'PASS'});
+const judgments=p.chunks[0].relations.map(r=>({proposal_id:p.id,item_id:r.id,decision:'accept',actor:'owner',origin:'graph-twins-review-v1',created_at:'2026-10-18T00:00:00Z'}));
+let before=project([p],judgments,'curated','owner'); let after=project([{...p,id:'p-regenerated'}],judgments,'curated','owner'); results.push({id:'R02',expected:'replay conserva aceptaciones de ítems semánticamente idénticos con nueva instancia de propuesta',observed:{beforeEdges:before.edges.length,afterEdges:after.edges.length,itemIdsUnchanged:true},verdict:after.edges.length===before.edges.length?'PASS':'FAIL'});
+const rejected=judgments.map(j=>({...j,decision:'reject'}));g=project([p],rejected,'automatic','owner');results.push({id:'R03',expected:'registrar política explícita del efecto de rechazo humano sobre vista automática; no asumir veto',observed:{automaticEdgesAfterRejection:g.edges.length,curatedEdgesAfterRejection:project([p],rejected,'curated','owner').edges.length},verdict:'POLICY_GAP_not_automatic_violation'});
+writeFileSync('./node-regressions.json',JSON.stringify({scope:'unit/controlled fixture; exact deployed projection code; no provider or production writes',results},null,2));console.log(JSON.stringify(results));

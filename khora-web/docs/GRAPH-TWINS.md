@@ -1,15 +1,25 @@
 # Grafos de Khora · objeto de continuidad y aceptación del frente
 
-**Corte documental: 2026-10-18 · v2. Estado integral: NO CONFORME en la auditoría de este hilo.**
+**Corte documental: 2026-10-18 · v3. Estado integral: NO CONFORME en la auditoría de este hilo.**
 
 Esta es la entrada de continuidad de este frente en el repositorio. El contenido histórico inferior se conserva sin reescribirlo; sus estados, conteos y URLs describen cortes anteriores y no prevalecen sobre este corte explícito. No es el objeto de Conversación Enraizada, dictado de voz ni tareas automáticas.
 
 ## LEER PRIMERO
 
-1. [Estándar unificador de calidad y salud del grafo, v1.0](GRAPH-QUALITY-DRAFT.md): criterio rector, requisitos, compuertas, evaluación y acreditación de capacidades. Especificación diseñada por encargo del operador; adopción material y perfil cuantitativo pendientes, no certificación de producto.
+1. [Estándar unificador de calidad y salud del grafo, v1.1](GRAPH-QUALITY-DRAFT.md): criterio rector, requisitos, compuertas, evaluación y acreditación de capacidades. Especificación diseñada por encargo del operador; adopción material y perfil cuantitativo pendientes, no certificación de producto.
 2. [Auditoría integral y evidencias del 2026-10-18](evidence/graph-quality-2026-10-18/README.md): distinguir pruebas ejecutadas, código inspeccionado, límites y regresiones conocidas.
 3. [Autorización específica de originales](GRAPH-ORIGINALS-AUTHORIZATION.md): excepciona la antigua selección de solo versiones aprobadas para ese propietario y esa política; no ratifica interpretaciones ni juicios.
 4. Antecedentes históricos inferiores: decisiones y verificaciones con su alcance original; no asumir vigencia actual de sus afirmaciones de despliegue, corpus vacío o exclusividad de versiones aprobadas.
+
+## Revisión vigente de arquitectura y suficiencia del estándar
+
+[Informe y expediente de arquitectura](evidence/graph-architecture-2026-10-18/README.md): 22 hallazgos trazables, 11 controles adicionales (10 defectos y una observación de política), matrices de 55 requisitos y 59 unidades de EpisTwin, y diseño de cambios con aceptación. Corte fuente f820192d02ccc48e294e83ceb38f34df2c287036; no nueva medición productiva ni auditoría exhaustiva de todo el repositorio.
+
+**Respuesta:** no hay consistencia integral. v1.0 era un marco de aceptación, no una solución de construcción suficiente; v1.1 añade contratos de realización, separación candidato/curado, identidad de ocurrencias, interoperabilidad, juicio durable, generación/revisión compartida, recuperación tras fallos y validación de instrumentos. No vuelve infalible la interpretación generativa.
+
+**Recomendación no aprobada:** converger reutilizando custodia/propuestas/ledger PostgreSQL y el núcleo existente, con una sola espina de evidencia y proyecciones por política; evitar otro motor paralelo. La decisión material de integración y seguridad sigue en el operador. Corregir auto-ratificación, identidad y replay antes de confiar más contenido a la cadena. No sustituir el arreglo por reorganizar el dibujo.
+
+**Siguiente checkpoint:** revisar el mapa de convergencia y el perfil piloto; los paquetes concretos y sus pruebas están en el informe. Ningún código de producto, migración, backfill, merge o despliegue se ejecuta por publicar estas especificaciones. Los estados inferiores de producción conservan su corte histórico.
 
 ## Mandato del operador en este hilo
 
