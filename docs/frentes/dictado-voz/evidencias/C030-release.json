@@ -1,0 +1,51 @@
+{
+  "observedAt": "2026-10-18T21:24:10.490007+00:00",
+  "deploymentId": "dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr",
+  "state": "READY",
+  "target": "production",
+  "sha": "f0dfbdcb2d79eb6289dacba272ddcc7ba2023063",
+  "pr": 326,
+  "checks": [
+    {
+      "path": "/api/version?c030=final",
+      "status": 200,
+      "redirect": null,
+      "version": {
+        "commit": "f0dfbdcb2d79eb6289dacba272ddcc7ba2023063",
+        "rama": "main",
+        "desplegado_desde_git": true,
+        "fuente_commit": "vercel-git",
+        "entorno": "production",
+        "rutas": [
+          "/sistema/custodia",
+          "/api/volcado"
+        ],
+        "ahora": "2026-10-18T21:24:10.284Z"
+      }
+    },
+    {
+      "path": "/api/dictado/checkpoint?bootstrap=1",
+      "status": 401,
+      "redirect": null
+    },
+    {
+      "path": "/api/eventos?limit=1",
+      "status": 401,
+      "redirect": null
+    },
+    {
+      "path": "/sistema/ingreso",
+      "status": 307,
+      "redirect": "/api/auth/signin?callbackUrl=%2Fsistema%2Fingreso"
+    }
+  ],
+  "limits": [
+    "No authenticated human microphone/tab session",
+    "No live provider transcription or storage roundtrip",
+    "No Vercel runtime logs: 403; not evidence of absence of errors"
+  ],
+  "rollback": {
+    "sha": "3356bfc92965503d81b06e5637c4668afbde3a52",
+    "deploymentId": "dpl_5eSqULJMyN3B1VhEbFbqh9p4Fxox"
+  }
+}
