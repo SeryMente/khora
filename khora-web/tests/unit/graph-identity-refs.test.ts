@@ -1,0 +1,13 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {digest,validateExtraction,identityCandidates,type Proposal} from "../../lib/graph-twins";
+import {identityReferenceInput,validateIdentityReferences,IDENTITY_REFERENCE_PROMPT} from "../../lib/server/graph-identity-refs";
+const text="Proyecto-731 es un proyecto documentado.";
+const proposals:Proposal[]=["a","b"].map(id=>{const source={volcado_id:id,version:1,sha256:digest(text),captured_at:"2026-01-01T00:00:00Z"};const chunk=validateExtraction({relations:[{subject:"Proyecto-731",predicate:"es",object:"un proyecto",quote:text,attribution:"fixture",modality:"afirmación",event_time:"no explícito"}]},text,source);return {id,source,pipeline:"fixture",chunks:[chunk],next:text.length,length:text.length,model:"fixture"};});
+const pair=identityCandidates(proposals).find(p=>p.left.label==="Proyecto-731"&&p.right.label==="Proyecto-731")!;
+const match={pair_id:pair.id,reason:"identificador único Proyecto-731 en ambos contextos",left_context_ref:"left",right_context_ref:"right"};
+test("identity references bind immutable exact contexts without model recopy",()=>{const [m]=validateIdentityReferences({matches:[match]},[pair],proposals);assert.equal(m.left_evidence,pair.left.relation.quote);assert.equal(m.right_evidence,pair.right.relation.quote);assert.equal(m.id,pair.id);});
+test("identity references reject swapped sides and unknown pairs",()=>{assert.throws(()=>validateIdentityReferences({matches:[{...match,left_context_ref:"right"}]},[pair],proposals),/reference/);assert.throws(()=>validateIdentityReferences({matches:[{...match,pair_id:"unknown"}]},[pair],proposals),/identity_pair/);});
+test("identity references do not rescue old invalid raw evidence responses",()=>{assert.throws(()=>validateIdentityReferences({matches:[{pair_id:pair.id,reason:"fixture",left_evidence:"inventado",right_evidence:"inventado"}]},[pair],proposals),/reference/);});
+test("identity references retain name-only evidence rejection",()=>{const bad={...pair,left:{...pair.left,relation:{...pair.left.relation,quote:pair.left.label}}};assert.throws(()=>validateIdentityReferences({matches:[match]},[bad],proposals),/identity_anchor/);});
+test("identity reference inputs retain both sources and uncertainty criterion",()=>{const [p]=identityReferenceInput([pair]);assert.equal(p.left.context,pair.left.relation.quote);assert.deepEqual(p.right.source,pair.right.relation.source);assert.match(IDENTITY_REFERENCE_PROMPT,/Misma escritura, semejanza y coaparición NO bastan/);assert.deepEqual(validateIdentityReferences({matches:[]},[pair],proposals),[]);});
