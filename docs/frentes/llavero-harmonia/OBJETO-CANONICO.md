@@ -3,7 +3,7 @@
 ## 1. Control e identidad
 
 - Identificador propuesto: KHORA-LLAVERO-01. Nombre descriptivo: Llavero · Harmonia; no se afirma ratificado un nombre nuevo.
-- Versión: 0.1, incubación. Sello: KHORA-LLAVERO-v0.1.
+- Versión: 0.2, diseño de bóveda portable y segundo factor pendiente de arquitectura. Sello: KHORA-LLAVERO-v0.2.
 - Ancla: instrucción del operador de iniciar y canonizar este sprint en la conversación del 17 de octubre de 2026, America/Mexico_City; sin hora atribuida al mensaje. Registro documental preparado el 18 de octubre de 2026 UTC.
 - Naturaleza: elemento canónico permanente autorizado por ese encargo; tipo documental 📜. La carpeta es contenedor, no segundo objeto de estado.
 - Propietario: Khora. Custodia: `SeryMente/khora/docs/frentes/llavero-harmonia/OBJETO-CANONICO.md`. Única fuente viva de este frente; no crear otro tablero o canon paralelo.
@@ -90,21 +90,21 @@ Decisión material inmediata solicitada al cierre: aprobar o no que la biografí
 
 ## 8. Estado vivo
 
-**Acción actual:** canonización documental del sprint; sin ejecución de código, generación de secretos ni cambios de cuenta.
+**Acción actual:** incorporar el mandato de bóveda descargable de Khora y registro de Khora en Ente Auth para segundo factor en cada apertura. Requisito documentado; no hay bóveda, registro ni control nuevos implementados.
 
-**Siguiente paso atómico:** obtener decisión explícita del operador sobre la separación entre autobiografía y secreto criptográfico independiente; después comparar motores y proponer arquitectura concreta antes de construir.
+**Siguiente paso atómico:** decidir si cada apertura requerirá conexión a un verificador externo al archivo descargable. Sin esa dependencia, un archivo local y modificable no puede acreditar que su pantalla de segundo factor sea una barrera criptográfica no eludible. Después verificar motor maduro compatible y proponer custodia/recuperación concreta antes de construir seguridad.
 
 Pendientes en secuencia:
-1. Resolver la decisión anterior y reconciliar con el canon de clave compartida biografía/Caja Negra/Llavero; ninguna modificación silenciosa del canon antiguo.
-2. Inventariar solo componentes y permisos pertinentes del código actual de Harmonia; verificar necesidades y orígenes oficiales de las cuatro cuentas, sin leer credenciales.
-3. Comparar integración de gestor maduro frente a construcción propia; proponer motor, custodia, recuperación, fronteras y experiencia concretas, con documentación oficial y decisión del operador.
-4. Construir únicamente lo aprobado, con datos y cuentas sintéticos; completar pruebas positivas/negativas de §9.
-5. Revisar evidencia y compuertas de interfaz, seguridad y arquitectura; probar restauración antes de cuentas reales.
-6. Pilotar una cuenta elegida y autorizada; verificar acceso y recuperación; extender solo después, sin cierres prematuros.
+1. Aprobar o rechazar conexión obligatoria por apertura y ausencia de apertura offline alternativa; definir qué componente conserva material imprescindible y qué confianza recibe. No se ha autorizado entregar claves maestras al servidor actual.
+2. Comparar motores maduros y registrar formatos, cifrado autenticado, derivación, actualización y distribución verificable; no inventar criptografía.
+3. Diseñar alta y confirmación de Ente Auth, almacenamiento protegido del secreto verificador, limitación de intentos, rechazo de reutilización, autorización breve ligada a bóveda y sesión, recuperación y revocación. Códigos, semillas y claves reales fuera de agente, Git y registros.
+4. Construir y probar únicamente arquitectura aprobada con datos sintéticos; verificar que omitir la interfaz no permite obtener el material imprescindible para descifrar. Descargar solo criptograma no equivale a autorizar apertura.
+5. Verificar recuperación y controles, revisar seguridad/interfaz, pilotar en dispositivo confiable; no abrir Takeout real en equipo de renta. Después continuar autocompletado de Harmonia por cuenta autorizada.
+6. Integrar el núcleo local de Línea Autobiográfica de Grado Forense con originales, derivados y juicio separados; nunca convertir automáticamente recuerdos en la única fuente de claves.
 
-**En prueba / recién fallido:** no se ha ejecutado código del sprint ni hay pruebas criptográficas/autocompletado aprobadas. La disponibilidad integral del corpus y los motores aún no está verificada.
+**En prueba / recién fallido:** sin pruebas de producto, alta Ente Auth ni código nuevo ejecutado. El equipo conectado fue declarado de renta por el operador; no es destino autorizado para descifrar corpus real.
 
-**Recordatorios latentes:** no dar por perdido el proyecto sin evidencia; no confundir protección futura con revocar una copia ya extraída; separar contraseñas de semillas de segundo factor; no rotar sin recuperación; no registrar biografía/credenciales en Git; aprobación documental no aprueba arquitectura; el antecedente BBX-2/3/4 puede contener trabajo reutilizable, con tarjetas históricas no accesibles.
+**Recordatorios latentes:** no dar por perdido el proyecto sin evidencia; los volcados previos se consideran exfiltrados por premisa del operador, no por demostración; no bloquear lecturas temporalmente; proteger futuro no revoca copias anteriores; separar contraseñas de semillas de segundo factor; no rotar sin recuperación; no registrar biografía/credenciales en Git; no abrir corpus en equipo no confiable; autenticación no protege texto claro frente al anfitrión; resolver linaje BBX-2/3/4 y circularidad sin reescritura silenciosa; tarjetas históricas no accesibles. Las tablas de autoridad iniciales se leen junto al delta explícito del anexo D: no son negación del permiso documental posterior ni aprobación tácita de arquitectura.
 
 ## 9. Aceptación y viabilidad
 
@@ -162,13 +162,13 @@ Dos prompts completos para roles separados, sin afirmar que existen dos sesiones
 ### Asistencia
 
 ```text
-Retoma Khora · Llavero/Harmonia como asistencia. Lee el Metaprompt Canónico https://app.notion.com/p/dd6ade27f22c83d1b7da819dfa59e40d y el método https://github.com/SeryMente/metodologia/blob/main/METACANON-OBJETOS-CANONICOS.md ; adquiere fuentes, comprueba revisión y precedencia, no solo firmas. Lee el único objeto https://github.com/SeryMente/khora/blob/docs/llavero-harmonia-20261018/docs/frentes/llavero-harmonia/OBJETO-CANONICO.md completo. Referencia adquirida al crear: Metacanon 1.5 · METACANON-OBJETOS-v1.5; objeto KHORA-LLAVERO-v0.1. Comprueba ambos en vivo, calcula delta y actualiza solo lo compatible; fuente inaccesible = frescura NO VERIFICADA. Cita literalmente Acción actual, Siguiente paso atómico y En prueba / recién fallido de §8; conserva pendientes y recordatorios. Distingue propuesta, autorización y evidencia. No inventes constructor activo ni pruebas. Antes de construir exige las aprobaciones de §6; mientras tanto ejecuta solo documentación independiente autorizada. Prioriza toda salida real del constructor y entrega un prompt de respuesta útil. Presenta los diez campos de §10, siempre «Metacanon adquirido:» con versión, sello, revisión y frescura. Remote Desktop Commander solo para asistencia cuando sea imprescindible y esté autorizado y vinculado al equipo actual; repo/sandbox bastan ahora, no lo uses. No registres secretos ni biografía, no cambies cuentas, no hagas merge ni despliegue. Relee, fusiona sin colisiones, guarda el único objeto y verifica lectura de vuelta conforme a §13.
+Retoma Khora · Llavero/Harmonia como asistencia. Lee el Metaprompt Canónico https://app.notion.com/p/dd6ade27f22c83d1b7da819dfa59e40d y el método https://github.com/SeryMente/metodologia/blob/main/METACANON-OBJETOS-CANONICOS.md ; adquiere fuentes, comprueba revisión y precedencia, no solo firmas. Lee el único objeto https://github.com/SeryMente/khora/blob/docs/llavero-harmonia-20261018/docs/frentes/llavero-harmonia/OBJETO-CANONICO.md completo. Referencia adquirida al crear: Metacanon 1.5 · METACANON-OBJETOS-v1.5; objeto KHORA-LLAVERO-v0.2; decisión vigente: anexo D y §8, no repetir como pendiente el checkpoint histórico de creación. Comprueba ambos en vivo, calcula delta y actualiza solo lo compatible; fuente inaccesible = frescura NO VERIFICADA. Cita literalmente Acción actual, Siguiente paso atómico y En prueba / recién fallido de §8; conserva pendientes y recordatorios. Distingue propuesta, autorización y evidencia. No inventes constructor activo ni pruebas. Antes de construir exige las aprobaciones de §6; mientras tanto ejecuta solo documentación independiente autorizada. Prioriza toda salida real del constructor y entrega un prompt de respuesta útil. Presenta los diez campos de §10, siempre «Metacanon adquirido:» con versión, sello, revisión y frescura. Remote Desktop Commander solo para asistencia cuando sea imprescindible y esté autorizado y vinculado al equipo actual; repo/sandbox bastan ahora, no lo uses. No registres secretos ni biografía, no cambies cuentas, no hagas merge ni despliegue. Relee, fusiona sin colisiones, guarda el único objeto y verifica lectura de vuelta conforme a §13.
 ```
 
 ### Construcción
 
 ```text
-Retoma Khora · Llavero/Harmonia como construcción, sin asumir aprobación de diseño. Lee el Metaprompt Canónico https://app.notion.com/p/dd6ade27f22c83d1b7da819dfa59e40d y el método https://github.com/SeryMente/metodologia/blob/main/METACANON-OBJETOS-CANONICOS.md ; adquiere fuentes, comprueba revisión y precedencia, no solo firmas. Lee completo https://github.com/SeryMente/khora/blob/docs/llavero-harmonia-20261018/docs/frentes/llavero-harmonia/OBJETO-CANONICO.md y AGENTS.md vigente. Referencia adquirida al crear: Metacanon 1.5 · METACANON-OBJETOS-v1.5; objeto KHORA-LLAVERO-v0.1. Comprueba ambos en vivo, calcula delta y aplica solo reglas compatibles; fuente inaccesible = frescura NO VERIFICADA. Cita literalmente Acción actual, Siguiente paso atómico y En prueba / recién fallido de §8; conserva pendientes y recordatorios. Respeta §6: no construir seguridad/interfaz/arquitectura sin revisión y decisión explícita del operador. El siguiente checkpoint es esa decisión y después comparación de motores, no código aplicado por inferencia. Remote Desktop Commander te está prohibido para todo fin, directa o indirectamente; si algo imprescindible exige equipo, informa a asistencia, no delegues una elusión. No derives contraseñas solo del corpus; no generes secretos en chat ni copies biografía; trabaja con datos sintéticos cuando el diseño se autorice. Registra fallos reales, evidencia y límites, nunca éxito simulado. No cambies cuentas, hagas merge o despliegue sin compuertas específicas. Entrega los diez campos de §10 con «Metacanon adquirido:» versión/sello/revisión/frescura, checkpoint, pruebas reales y delta del objeto. Un escritor de código y consolidación documental secuencial con relectura; no otro canon paralelo.
+Retoma Khora · Llavero/Harmonia como construcción, sin asumir aprobación de diseño. Lee el Metaprompt Canónico https://app.notion.com/p/dd6ade27f22c83d1b7da819dfa59e40d y el método https://github.com/SeryMente/metodologia/blob/main/METACANON-OBJETOS-CANONICOS.md ; adquiere fuentes, comprueba revisión y precedencia, no solo firmas. Lee completo https://github.com/SeryMente/khora/blob/docs/llavero-harmonia-20261018/docs/frentes/llavero-harmonia/OBJETO-CANONICO.md y AGENTS.md vigente. Referencia adquirida al crear: Metacanon 1.5 · METACANON-OBJETOS-v1.5; objeto KHORA-LLAVERO-v0.2; decisión vigente: anexo D y §8, no repetir como pendiente el checkpoint histórico de creación. Comprueba ambos en vivo, calcula delta y aplica solo reglas compatibles; fuente inaccesible = frescura NO VERIFICADA. Cita literalmente Acción actual, Siguiente paso atómico y En prueba / recién fallido de §8; conserva pendientes y recordatorios. Respeta §6: no construir seguridad/interfaz/arquitectura sin revisión y decisión explícita del operador. El siguiente checkpoint es esa decisión y después comparación de motores, no código aplicado por inferencia. Remote Desktop Commander te está prohibido para todo fin, directa o indirectamente; si algo imprescindible exige equipo, informa a asistencia, no delegues una elusión. No derives contraseñas solo del corpus; no generes secretos en chat ni copies biografía; trabaja con datos sintéticos cuando el diseño se autorice. Registra fallos reales, evidencia y límites, nunca éxito simulado. No cambies cuentas, hagas merge o despliegue sin compuertas específicas. Entrega los diez campos de §10 con «Metacanon adquirido:» versión/sello/revisión/frescura, checkpoint, pruebas reales y delta del objeto. Un escritor de código y consolidación documental secuencial con relectura; no otro canon paralelo.
 ```
 
 ## 13. Persistencia y revisión
@@ -231,3 +231,32 @@ La definición histórica «datos que el operador ya no puede ver» plantea circ
 6. En Harmonia multifunción, aislar privilegios del Llavero de captura, dictado y telemetría; mínimo acceso por sitio, sin observación general de contraseñas, portapapeles persistente ni logs de valores. El password puesto en un campo puede ser leído por el sitio y por componentes comprometidos con acceso suficiente: enmascarado visual no significa no-exfiltrable.
 7. Amenazas obligatorias: corpus/notas/Git extraídos; phishing y marcos; script del sitio; otras extensiones; módulo de Harmonia comprometido; sincronización o servidor comprometido; registro accidental; equipo comprometido; pérdida de dispositivo y recuperación. No prometer resistencia a un sistema operativo malicioso. Una clave robada exige revocación en el proveedor: mejorar el gestor no elimina copias ya extraídas.
 8. Despliegue gradual: diseño aprobado → pruebas sintéticas → ensayo de restauración → revisión humana → piloto individual autorizado → expansión. Antes de cada cambio real comprobar recuperación y continuidad de acceso, conservar alternativa según capacidades del proveedor, verificar éxito antes de invalidar la anterior cuando sea posible. Ninguna prueba sintética acredita seguridad de producción.
+
+
+## Anexo D. Delta vigente — bóveda descargable de Khora y Ente Auth
+
+### Mandato original nuevo (verbatim)
+
+```text
+<p>
+Hazla parte de Khora, para descargarla en cualquier equipo y poderla usar. Que Ente auth pueda registrar akhora para auth de 2f y aquye esa llave sirva para la boveda descargable 
+</p>
+```
+
+Procedencia: misma conversación primaria de §11; orden posterior al anexo A. No se atribuye hora no recuperada.
+
+### Autorización y límites
+
+- El operador aprobó anteriormente el núcleo de Línea Autobiográfica de Grado Forense perteneciente a Khora, con originales/procesamiento inicialmente locales y cifrados, sin subir Takeout al servidor ni a proveedores de inteligencia artificial, y pidió agotar pasos automatizables. Después precisó que el equipo actual es de renta.
+- Ahora solicita bóveda portable perteneciente a Khora, utilizable en equipos compatibles, con Ente Auth como segundo factor en cada apertura. Se registra como requisito autorizado, no producto terminado ni permiso para descifrar corpus en cualquier anfitrión.
+- Alta estándar: Khora emite el secreto de enrolamiento y un código QR que Ente Auth puede escanear; Ente Auth genera códigos temporales. Compatibilidad y flujo concretos aún no implementados ni probados. Nunca importar o exportar otras semillas de Ente.
+- Un código temporal no es la clave de cifrado ni fuente suficiente de entropía. El secreto de verificación tampoco se debe incluir junto al archivo portable, ni conservar un secreto alternativo que permita saltarse la autorización declarada.
+- Exigir segundo factor solo mediante una interfaz local modificable no prueba control criptográfico. Recomendación pendiente: cada apertura depende de un componente externo que retiene material imprescindible, valida segundo factor y emite autorización breve ligada a sesión/bóveda. No se elige aún proveedor, reparto criptográfico ni custodia de claves.
+- Esta recomendación cambia el perímetro y la disponibilidad: requiere conexión, no ofrece desbloqueo offline equivalente y no promete impedir retención de datos o claves por un anfitrión malicioso después de una apertura legítima. La revocación no borra copias descifradas previas.
+- Recuperación debe conservar nivel de control explícitamente aprobado; no introducir un acceso offline de emergencia mientras se promete segundo factor obligatorio en cada apertura.
+- Descargar criptograma en un equipo y descifrar allí son decisiones distintas. El origen, firma o integridad del cliente se verifican; no bastan para declarar confiable el sistema operativo anfitrión. Un equipo alquilado puede observar contenido, claves y sesión tras autorizarse: no hay garantía de uso seguro universal.
+- No cambiar BitLocker del equipo de renta, acceder a otros perfiles, descargar corpus real allí, enrolar secretos reales desde este agente, fusionar ni desplegar. No hubo mutaciones de esas clases en este delta.
+
+### Criterio de cierre del delta
+
+Documento con original, estado y permisos coherentes; guardado y relectura exacta. Esto solo acredita actualización del requisito. Producto pendiente: elección y aprobación de arquitectura, integración madura, pruebas negativas de bypass/reutilización/límites/recuperación, revisión de seguridad y piloto real voluntario en equipo confiable. El plazo de implementación no es estimable sin arquitectura/motor; el siguiente hito depende de una decisión material sobre conectividad y custodia.
