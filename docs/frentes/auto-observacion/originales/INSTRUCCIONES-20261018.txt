@@ -1,0 +1,16 @@
+# Instrucciones originales del operador · conversación de origen
+Fecha de recepción: 2026-10-18. Horas individuales no disponibles. Se conservan errores ortográficos y envoltorios recibidos. Fuente: conversación de Notion identificada en el objeto. No es una exportación íntegra del chat ni incluye salidas completas del asistente.
+
+## U001 · pregunta inicial
+¿Qué es lo que hace a un sistema de auto-observación por registro de eventos como el que tiene Quora, el mejor sistema del mundo para la auto-observación del propio sistema?
+
+## U002 · referentes
+Cómo son los sistemas equivalentes en los ejemplos de mayor calidad a nivel mundial?
+
+## U003 · propósito técnico
+<p>
+Teniendo en cuenta que Khora tiene que desarrollarse mucho, a partir de ahora, y que es un proyecto como el que es. No lo se, analizalo, y preguntante cual seria el mejor arreglo para un sistema de autoobserfvacion, que permita diagnosticar bugs, desarrollar conmas calidad, y servir de proyecto para parcticar biuenas practicas defensivas de seguridad. 
+</p>
+
+## U004 · autorización del frente y documentación
+Hazlo de robustosidad medianamente elevada. Ambicioso, y solido. <br /><br />conforme meta canon de repositorio y metodología y almacenar objeto canónico en repositorio de Cora, actualioz el sistema de refgistro de eventos denominaloo auto-observacion, la interfaz de usuario en los menús adecuados del sistema. QUe la ui sea de calidad y actualoiz a el objketo canonico a cada paso,

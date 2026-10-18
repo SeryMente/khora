@@ -1,0 +1,26 @@
+{
+  "front": "AUTOOBS-KHORA",
+  "version": "0.1.0",
+  "anchor": "C001/U004",
+  "base_commit": "4dca2133866421105f077bbd7079576c588d1169",
+  "method": {
+    "version": "1.5",
+    "seal": "METACANON-OBJETOS-v1.5",
+    "commit": "49ac40e9f6122e2d2fb339362cfa0a78128c8e37",
+    "blob": "32c7a65ff2e83b3b76752ba2160427bd6e851a8f"
+  },
+  "files": [
+    {
+      "path": "OBJETO-CANONICO.md",
+      "bytes": 28766,
+      "sha256": "622b3b6121190c5363d524ba6fe1b0db9938e5cb7c4d156ebbc965439dfa67a5",
+      "class": "canonical-state"
+    },
+    {
+      "path": "originales/INSTRUCCIONES-20261018.txt",
+      "bytes": 1492,
+      "sha256": "e7815001456a0852a7073314b5ad2609ec2d74d865399338634d0209dc0b9143",
+      "class": "operator-originals"
+    }
+  ]
+}
