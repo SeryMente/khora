@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import type { PoolClient } from "pg";
 import { getDb } from "./neon";
 import { cifrarTexto, descifrarTexto } from "./cripto";
-import { PIPELINE, METHOD, PROMPT, digest, segment, validateExtraction, project, relationsOf, type Source, type Proposal, type HumanDecision } from "../graph-twins";
+import { PIPELINE, METHOD, PROMPT, digest, segment, validateExtraction, project, relationsOf, type Source, type Proposal, type HumanDecision, IDENTITY_PROMPT, pendingIdentities, identityBatch, validateIdentities, type IdentityPair, scopeGraph } from "../graph-twins";
 
 const MODEL=process.env.GROQ_GRAPH_MODEL||process.env.GROQ_PULIDO_MODEL||"llama-3.3-70b-versatile";
 const SOURCE_SQL=`SELECT v.id,v.version_aprobada,v.sha256_aprobado,v.recibido_en,vv.texto,vv.sha256,v.sha256 AS vigente_sha256
@@ -26,12 +26,13 @@ async function decisions(db:PoolClient,owner:string):Promise<HumanDecision[]>{
 async function snapshot(db:PoolClient,owner:string){
  const all=await proposals(db,owner),judgments=await decisions(db,owner),rows=await sources(db,owner);
  const automatic=project(all,judgments,"automatic",owner),curated=project(all,judgments,"curated",owner);
+ const identityPending=pendingIdentities(all).length;
  const completed=all.filter(p=>p.next===p.length).length;
  const payload={revision:randomUUID(),source_stamp:sourceStamp(rows),pipeline:PIPELINE,method:METHOD,prompt_hash:digest(PROMPT),prompt:PROMPT,
  model:MODEL,temperature:0,provider:"Groq (existing configured provider)",release:process.env.VERCEL_GIT_COMMIT_SHA||null,
- created_at:new Date().toISOString(),source_count:rows.length,completed,pending:rows.length-completed,
+ created_at:new Date().toISOString(),source_count:rows.length,completed,pending:rows.length-completed+identityPending,pending_sources:rows.length-completed,pending_identity_pairs:identityPending,identity_prompt:IDENTITY_PROMPT,identity_prompt_hash:digest(IDENTITY_PROMPT),identity_candidates_policy:"exact lexical candidates plus grounded relation endpoint pairs; aliases without lexical/explicit relation bridge may remain unresolved",
  automatic,curated,proposals:all,judgments,
- limitations:["Sin cotejo de originalidad/repetición para Ideación Asíncrona Recuperable.","Nodos léxicos locales a cada fuente: coincidencia de escritura no prueba identidad. No hay fusiones entre fuentes.","Un ancla verificada prueba procedencia, no fidelidad semántica. Revisión humana aún necesaria.","Los intervalos sin propuesta quedan pendientes de revisión, no descartados como carentes de contenido."]};
+ limitations:["Sin cotejo de originalidad/repetición para Ideación Asíncrona Recuperable.","Las identidades entre fuentes son propuestas del sistema con sustento textual; no equivalen a ratificación humana ni garantía semántica. Las coincidencias de nombre solo generan candidatos; pueden quedar alias sin resolver.","Un ancla verificada prueba procedencia, no fidelidad semántica. Revisión humana aún necesaria.","Los intervalos sin propuesta quedan pendientes de revisión, no descartados como carentes de contenido."]};
  await db.query(`INSERT INTO grafo_par_snapshot(owner,revision,payload_cifrado) VALUES($1,$2,$3)
  ON CONFLICT(owner) DO UPDATE SET revision=EXCLUDED.revision,payload_cifrado=EXCLUDED.payload_cifrado,actualizado_en=now()`,[owner,payload.revision,cifrarTexto(JSON.stringify(payload))]);
  return payload;
@@ -41,16 +42,18 @@ export async function readPair(owner:string){
   const rows=await sources(db,owner),r=await db.query("SELECT payload_cifrado FROM grafo_par_snapshot WHERE owner=$1",[owner]);
   if(!r.rows.length)return {empty:true,source_count:rows.length,pending:rows.length,limitations:["Aún no se ha generado ninguna de las dos proyecciones."]};
   const payload=JSON.parse(descifrarTexto(r.rows[0].payload_cifrado));
-  if(payload.source_stamp!==sourceStamp(rows))return {empty:true,stale:true,source_count:rows.length,pending:rows.length,limitations:["Cambió el conjunto de versiones aprobadas. Actualiza ambas proyecciones antes de consultar datos anteriores."]};
+  if(payload.pipeline!==PIPELINE||payload.model!==MODEL||payload.source_stamp!==sourceStamp(rows))return {empty:true,stale:true,source_count:rows.length,pending:rows.length,limitations:["Cambió el conjunto de versiones aprobadas. Actualiza ambas proyecciones antes de consultar datos anteriores."]};
   return payload;
  }finally{db.release();}
 }
 export async function nextChunk(owner:string){
  const db=await getDb().connect();
  let job:{proposal:Proposal;revision:number;text:string;stamp:string}|null=null;
+ let identityJob:{pairs:IdentityPair[];proposals:Proposal[];stamp:string}|null=null;
  try{
   await db.query("BEGIN");await db.query("SELECT pg_advisory_xact_lock(hashtext($1))",["graph-twins:"+owner]);
   const rows=await sources(db,owner),all=await proposals(db,owner);
+  if(all.some(p=>p.model!==MODEL))throw new Error("extractor_model_changed_requires_new_pipeline");
   for(const r of rows){
    const source=approvedSource(r),previous=all.find(p=>p.source.volcado_id===r.id);
    if(previous&&previous.next===previous.length)continue;
@@ -60,9 +63,11 @@ export async function nextChunk(owner:string){
    const rev=await db.query("SELECT revision FROM grafo_par_propuesta WHERE id=$1",[proposal.id]);
    job={proposal,revision:Number(rev.rows[0].revision),text,stamp:sourceStamp(rows)};break;
   }
-  if(!job){const result=await snapshot(db,owner);await db.query("COMMIT");return {...result,finished:true};}
+  if(!job){const pending=pendingIdentities(all);if(pending.length)identityJob={pairs:identityBatch(pending),proposals:all,stamp:sourceStamp(rows)};else{const result=await snapshot(db,owner);await db.query("COMMIT");return {...result,finished:true};}}
   await db.query("COMMIT");
  }catch(e){await db.query("ROLLBACK").catch(()=>undefined);throw e;}finally{db.release();}
+ if(identityJob)return processIdentities(owner,identityJob);
+ if(!job)throw new Error("graph_job_missing");
  // No database transaction is held across provider latency. CAS below prevents overwrites.
  const key=process.env.GROQ_API_KEY;if(!key)throw new Error("graph_provider_not_configured");
  if(job.proposal.model!==MODEL)throw new Error("extractor_model_changed_requires_new_pipeline");
@@ -86,10 +91,30 @@ export async function judge(owner:string,proposalId:string,itemId:string,decisio
  const db=await getDb().connect();try{
   await db.query("BEGIN");await db.query("SELECT pg_advisory_xact_lock(hashtext($1))",["graph-twins:"+owner]);
   const all=await proposals(db,owner),p=all.find(p=>p.id===proposalId);
-  if(!p||!relationsOf([p]).some(r=>r.id===itemId))throw new Error("active_proposal_item_not_found");
+  if(!p||(!relationsOf([p]).some(r=>r.id===itemId)&&!(p.identities||[]).some(i=>i.id===itemId)))throw new Error("active_proposal_item_not_found");
   const existing=await db.query("SELECT owner,proposal_id,item_id,decision FROM grafo_par_juicio WHERE id=$1",[requestId]);
   if(existing.rows.length){const e=existing.rows[0];if(e.owner!==owner||e.proposal_id!==proposalId||e.item_id!==itemId||e.decision!==decision)throw new Error("judgment_request_conflict");}
   else await db.query("INSERT INTO grafo_par_juicio(id,owner,proposal_id,item_id,decision,actor,origin) VALUES($1,$2,$3,$4,$5,$2,'graph-twins-review-v1')",[requestId,owner,proposalId,itemId,decision]);
   const result=await snapshot(db,owner);await db.query("COMMIT");return result;
  }catch(e){await db.query("ROLLBACK").catch(()=>undefined);throw e;}finally{db.release();}
+}
+
+async function processIdentities(owner:string,job:{pairs:IdentityPair[];proposals:Proposal[];stamp:string}){
+ const key=process.env.GROQ_API_KEY;if(!key)throw new Error("graph_provider_not_configured");
+ const response=await fetch("https://api.groq.com/openai/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json",Authorization:`Bearer ${key}`},body:JSON.stringify({model:MODEL,temperature:0,max_tokens:6000,response_format:{type:"json_object"},messages:[{role:"system",content:IDENTITY_PROMPT},{role:"user",content:JSON.stringify(job.pairs)}]}),signal:AbortSignal.timeout(35000)});
+ if(!response.ok)throw new Error("graph_identity_provider_http_"+response.status);const completion=await response.json(),choice=completion.choices?.[0];if(choice?.finish_reason!=="stop")throw new Error("graph_identity_provider_incomplete_response");
+ const identities=validateIdentities(JSON.parse(choice.message.content),job.pairs,job.proposals);
+ const db=await getDb().connect();try{await db.query("BEGIN");await db.query("SELECT pg_advisory_xact_lock(hashtext($1))",["graph-twins:"+owner]);if(sourceStamp(await sources(db,owner))!==job.stamp)throw new Error("approved_sources_changed_retry");const current=await proposals(db,owner);
+ for(const p of current){const pairs=job.pairs.filter(i=>i.left.relation.source.volcado_id===p.source.volcado_id&&i.left.relation.source.sha256===p.source.sha256),examined=new Set(p.identity_examined||[]),fresh=pairs.filter(i=>!examined.has(i.id));if(!fresh.length)continue;
+ p.identity_examined=[...examined,...fresh.map(i=>i.id)];p.identities=[...(p.identities||[]),...identities.filter(i=>i.proposal_id===p.id&&fresh.some(x=>x.id===i.id))];p.identity_runs=[...(p.identity_runs||[]),{created_at:new Date().toISOString(),prompt_hash:digest(IDENTITY_PROMPT),model:completion.model||MODEL,provider_response_id:completion.id||null,temperature:0,candidates:fresh.length,proposed:identities.filter(i=>i.proposal_id===p.id).length}];
+ await db.query("UPDATE grafo_par_propuesta SET payload_cifrado=$1,revision=revision+1,actualizado_en=now() WHERE id=$2 AND owner=$3",[cifrarTexto(JSON.stringify(p)),p.id,owner]);}
+ const result=await snapshot(db,owner);await db.query("COMMIT");return {...result,finished:result.pending===0};}catch(e){await db.query("ROLLBACK").catch(()=>undefined);throw e;}finally{db.release();}
+}
+
+export async function scopedPair(owner:string,payload:Awaited<ReturnType<typeof readPair>>,ioId:string|null,volcadoId:string|null,limit:number){
+ let source=volcadoId;
+ if(ioId){const db=await getDb().connect();try{const r=await db.query("SELECT id FROM volcado WHERE usuario=$1 AND io_id=$2",[owner,ioId]);if(r.rows.length!==1||(source&&source!==r.rows[0].id))throw new Error("graph_scope_not_found");source=r.rows[0].id;}finally{db.release();}}
+ if(source){const db=await getDb().connect();try{const r=await db.query("SELECT id FROM volcado WHERE usuario=$1 AND id=$2",[owner,source]);if(!r.rows.length)throw new Error("graph_scope_not_found");}finally{db.release();}}
+ if(!("automatic" in payload))return {...payload,scope:{volcado_id:source,io_id:ioId,limit}};
+ return {...payload,scope:{volcado_id:source,io_id:ioId,limit},automatic:scopeGraph(payload.automatic,source,limit),curated:scopeGraph(payload.curated,source,limit)};
 }
