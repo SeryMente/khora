@@ -1,3 +1,0 @@
-{
-  "buildCommand": "npm run prebuild && if [ \"$VERCEL_ENV\" = \"production\" ]; then node scripts/migrate-runtime.mjs; fi && next build --webpack"
-}
