@@ -1,0 +1,17 @@
+{
+  "body": {
+    "degradacion_declarada": "Sin semilla knn",
+    "fragmentos": [],
+    "resumenes_incluidos": false,
+    "subgrafo": {
+      "aristas": [],
+      "nodos": []
+    },
+    "suficiencia": "insuficiente"
+  },
+  "ended_at": "2026-10-18T18:27:05.502Z",
+  "question": "Según mis dictados, ¿qué distinción hago entre pedir dinero para mis necesidades personales y solicitar financiamiento para Otro Gran Programa? Incluye las fuentes que sustentan la respuesta.",
+  "started_at": "2026-10-18T18:27:04.587Z",
+  "state": "finished",
+  "status": 200
+}

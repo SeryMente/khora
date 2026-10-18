@@ -1,0 +1,55 @@
+- main
+  - sectionheader
+    - heading "CONSOLA DE CONSULTA" [level=1, ref=e2]
+    - paragraph
+      - StaticText "Chat multi-turno streaming con selección de proveedor LLM o modo RAG sobre grafo."
+    - button "LIMPIAR SESIÓN" [ref=e3]
+  - StaticText "PERFIL:"
+  - generic
+    - combobox [expanded=false, disabled, ref=e9]: groq (Fast Inference)
+      - MenuListPopup
+        - option "open_source (Cloud Free)" [ref=e17]
+        - option "gemini (Google AI)" [ref=e18]
+        - option "groq (Fast Inference)" [selected, ref=e19]
+        - option "local (Ollama Directo)" [ref=e20]
+  - StaticText "MODELO:"
+  - textbox "Override opcional (ej. llama-3.3-70b-versatile)" [disabled, ref=e4]
+  - checkbox "MODO GRAFO (RAG)" [checked=true, ref=e5]
+  - generic
+    - article
+      - StaticText "USUARIO"
+      - StaticText "Según mis dictados, ¿qué distinción hago entre pedir dinero para mis necesidades personales y solicitar financiamiento para Otro Gran Programa? Incluye las fuentes."
+    - article
+      - StaticText "ASISTENTE"
+      - StaticText "grafo"
+      - StaticText "✓ Evidencia suficiente"
+      - StaticText "Respuesta procesada."
+      - strong
+        - StaticText "Aviso de degradación:"
+      - StaticText "Sin semilla knn"
+      - button "FUENTES / EVIDENCIA (0)" [ref=e10]
+        - StaticText "FUENTES / EVIDENCIA ("
+        - StaticText "0"
+        - StaticText ")"
+  - form
+    - textbox "Escribe tu pregunta para el grafo (RAG)..." [ref=e6]
+    - button "ENVIAR" [disabled, ref=e7]
+- navigation "Barra de sistema" [ref=e1]
+  - link "Ingreso" [ref=e11]
+    - StaticText "Ingreso"
+  - link "Custodia" [ref=e12]
+    - StaticText "Custodia"
+  - button "Grafo" [expanded=false, ref=e13]
+    - StaticText "Grafo"
+  - link "Consulta" [ref=e14]
+    - StaticText "Consulta"
+  - button "Seguridad" [expanded=false, ref=e15]
+    - StaticText "Seguridad"
+  - button "Sistema" [expanded=false, ref=e16]
+    - StaticText "Sistema"
+  - button "Cambiar a tema claro" [ref=e8]
+    - StaticText "Tema"
+- contentinfo "Versión de Khora"
+  - StaticText "v"
+  - StaticText "0.3.8"
+- alert

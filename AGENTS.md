@@ -52,3 +52,7 @@ Antes de crear código nuevo para una capacidad del EP, el agente DEBE localizar
 ## Custodia continua de dictados — lectura obligatoria
 
 Antes de modificar captura manual o transcrita, audio, checkpoints, Archivar, recuperación, títulos, versiones, MP3 o herramientas MCP de audio, leer [Custodia continua de dictados](khora-web/docs/CUSTODIA-DICTADOS.md). Es la entrada única de mantenimiento de ese circuito. Actualizar código, pruebas, contratos y ese documento en el mismo cambio. No convertir texto a voz; conservar originales además del MP3; no declarar producción certificada a partir de mocks o compilación. Mantener visibles las brechas pendientes y sus pruebas terminales.
+
+## Grafos: continuidad, calidad y no-simulación
+
+Antes de modificar extracción, identidad, comunidades, materialización o consulta sobre el grafo, leer [el objeto de continuidad del frente](khora-web/docs/GRAPH-TWINS.md) y [el estándar de calidad](khora-web/docs/GRAPH-QUALITY-DRAFT.md). Conservar explícitos su estado de adopción y los bloqueos: documentación no equivale a implementación ni acreditación. No presentar anclaje literal, métricas topológicas o pruebas con servicios simulados como prueba de fidelidad semántica o recorrido integral. Actualizar hallazgos y evidencia en el mismo cambio lógico; no multiplicar objetos canónicos paralelos ni elegir stack, diseño de interfaz o seguridad sin las autorizaciones correspondientes.

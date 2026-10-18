@@ -1,3 +1,45 @@
+# Grafos de Khora · objeto de continuidad y aceptación del frente
+
+**Corte documental: 2026-10-18 · v2. Estado integral: NO CONFORME en la auditoría de este hilo.**
+
+Esta es la entrada de continuidad de este frente en el repositorio. El contenido histórico inferior se conserva sin reescribirlo; sus estados, conteos y URLs describen cortes anteriores y no prevalecen sobre este corte explícito. No es el objeto de Conversación Enraizada, dictado de voz ni tareas automáticas.
+
+## LEER PRIMERO
+
+1. [Estándar unificador de calidad y salud del grafo, v1.0](GRAPH-QUALITY-DRAFT.md): criterio rector, requisitos, compuertas, evaluación y acreditación de capacidades. Especificación diseñada por encargo del operador; adopción material y perfil cuantitativo pendientes, no certificación de producto.
+2. [Auditoría integral y evidencias del 2026-10-18](evidence/graph-quality-2026-10-18/README.md): distinguir pruebas ejecutadas, código inspeccionado, límites y regresiones conocidas.
+3. [Autorización específica de originales](GRAPH-ORIGINALS-AUTHORIZATION.md): excepciona la antigua selección de solo versiones aprobadas para ese propietario y esa política; no ratifica interpretaciones ni juicios.
+4. Antecedentes históricos inferiores: decisiones y verificaciones con su alcance original; no asumir vigencia actual de sus afirmaciones de despliegue, corpus vacío o exclusividad de versiones aprobadas.
+
+## Mandato del operador en este hilo
+
+Documentar los hallazgos en el objeto correspondiente del repositorio; investigar estándares de proyectos de alta seriedad y diseñar un criterio unificador, riguroso y detallado para calidad y salud del grafo, conforme a la prótesis cognitiva, la Síntesis Existencial Accionable y la Ideación Asíncrona Recuperable. La preocupación no es decorar una cuadrícula, sino exigir responsabilidad sobre la integración y utilidad del mecanismo.
+
+## Estado vivo comprobado y alcance
+
+- Código observado: `a0975ffaef17830471fff3adcdb804c47490ff0b`. Snapshot: `9bfc8bde-d80f-42e6-80ea-59996749c094`; release persistido: `0a7b5ef100b66cdbdd64d80de647c6d354a9fe7e`.
+- El mapa nuevo consume propuestas/proyecciones PostgreSQL por `/api/grafos`; la consulta publicada usa Python y Neo4j. La proyección `/api/grafo` consultada está vacía y una pregunta real devuelve insuficiencia sin fragmentos. No se acredita una cadena integral compartida.
+- La interfaz convierte `"insuficiente"` a verdadero y muestra «Evidencia suficiente» con cero fuentes. Se comprobó por envío real desde la consola.
+- Las anclas/huellas examinadas son íntegras, pero validadores aceptan falsa identidad, negación deformada y un predicado sin sustento. No confundir procedencia con fidelidad.
+- El mapa visible contiene 392 entidades, 214 relaciones y 193 comunidades. No son indicadores suficientes de salud; la proyección no materializa por sí sola el mecanismo completo de comunidades y resúmenes de EpisTwin.
+- Las 21 pruebas unitarias seleccionadas pasan. Los controles negativos de auditoría reproducen cuatro fallos; no son cuatro salidas nuevas espontáneas de un proveedor. Reconstrucción desde propuestas: parcial y repetible; no demuestra replay de juicios no vacíos ni reconstrucción completa desde fuente.
+- El inventario del corte es 42 fuentes, 41 elegibles para el circuito automático por autorización específica; 12 clasificadas texto sin audio. No se inventa aprobación de custodia, no se afirma que todo texto debiera tener audio ni se atribuye una causa de pérdida sin prueba.
+
+## Criterio unificador que faltaba
+
+La calidad debe ser una conjunción demostrada a través de fuente, significado, identidad, comunidades, recuperación, respuesta y juicio; ninguna capa compensa a otra. Una partición válida, un hash correcto, citas literales o un conjunto de pruebas verdes no acreditan la utilidad de la prótesis. La fuente amorfa es el caso de uso esperado, no una excusa para imponer al operador que limpie su pensamiento.
+
+## Pendientes y siguiente checkpoint ejecutable
+
+1. Revisar/adoptar el estándar y congelar el perfil de aceptación según riesgo, sin convertir umbrales arbitrarios en ciencia.
+2. Resolver con el operador la integración lógica del conocimiento; no elegir ni migrar stack unilateralmente.
+3. Preparar referencia independiente y reparar primero los fallos críticos, con pruebas positivas y negativas y trazas reales.
+4. Probar fuente → grafo → comunidades/resúmenes → recuperación → respuesta visible → juicio → reconstrucción; acreditar por separado Síntesis Existencial Accionable e Ideación Asíncrona Recuperable.
+
+Este ciclo es **documental**. No modifica código ejecutable, originales, aprobación de fuentes, juicios ni producción; no fusiona la solicitud 318 ni autoriza despliegue. El estándar no se declara implementado. Queda prohibido retomar la expansión o el pulido como sustituto del cierre de estas compuertas.
+
+## Antecedente histórico íntegro — no usar como estado vivo
+
 # Paired graphs — candidate, NOT production acceptance
 
 This candidate implements two independently calculated projections from the same versioned extraction proposals. Automatic means system acceptance, never a human judgment. Curated includes only explicit relation-and-endpoint approvals made through this candidate's authenticated review route. Legacy `actor=operador` judgments are NOT imported as trusted human approvals.
