@@ -2,7 +2,7 @@
 
 ## Control e identidad
 
-- Sello: GRAFO-v7 · 2026-10-18. Ancla: autorización expresa posterior al adjunto: EpisTwin no negociable, convergencia y reparación de extremo a extremo, solo GitHub.
+- Sello: GRAFO-v8 · 2026-10-18. Ancla: lectura remota y cotejo del candidato 58b982c5c9ee3e4bdca15300de4f00fb205d5ece en la solicitud 328 (borrador); mandato vigente: EpisTwin no negociable y solo GitHub.
 - Carpeta permanente autorizada: `docs/frentes/grafo/`; objeto único de estado: este archivo. `khora-web/docs/GRAPH-TWINS.md` es solo puntero de compatibilidad.
 - Estado: reparación candidata probada parcialmente; **NO APTO / NO CERRADO E2E**. Persistencia remota se verifica por la revisión Git de la entrega, nunca por un hash local sintético.
 
@@ -42,11 +42,11 @@ Vercel: existe evidencia anterior de proyecto/despliegue; esta reparación NO de
 
 ## Estado vivo
 
-Acción en curso: persistir y releer candidato con expediente completo; no declarar reparación integral ni ejecutar migración productiva. Siguiente paso constructor: completar la espina de evidencia y las compuertas de propietario/revisión/borrado, después suite/build y recorrido real por el mismo conocimiento. Siguiente paso de asistencia: auditar código/expediente exactos y continuidad sin duplicar trabajo.
+Acción completada de custodia: candidato 58b982c5c9ee3e4bdca15300de4f00fb205d5ece persistido en solicitud 328 (borrador), diff remoto cotejado contra el árbol probado y original releído byte a byte. No es reparación integral ni migración productiva. Siguiente paso constructor: completar la espina de evidencia y las compuertas de propietario/revisión/borrado, después suite/build y recorrido real por el mismo conocimiento. Siguiente paso de asistencia: auditar código/expediente exactos y continuidad sin duplicar trabajo.
 
 Pendientes en secuencia: (1) borrado coordinado e interoperabilidad; (2) publicación atómica y frescura de comunidades/resúmenes/índice; (3) consulta por el agente existente con aislamiento; (4) pruebas integrales, referencia semántica y tareas reales; (5) despliegue y lectura posterior acreditados. La falta de credenciales NO explica ni excusa las partes de código aún incompletas.
 
-En prueba/recién fallido: fixtures de grafo/proveedores, almacenamiento temporal y tipos dirigidos; resultados y errores en el expediente. No hay corrida productiva actual ni comparación semántica real. Recordatorios latentes: no perder línea base; no falsear firma retrospectiva; no confundir más nodos con salud; no recuperar como hechos snapshots perdidos.
+En prueba/recién fallido: fixtures de grafo/proveedores, almacenamiento temporal y tipos dirigidos; resultados y errores en el expediente. No hay corrida productiva actual ni comparación semántica real. La lectura de checks de GitHub devolvió 403 por permisos de la conexión: estado actual de comprobaciones NO VERIFICADO; no confundirlo con el antecedente de facturación. Recordatorios latentes: no perder línea base; no falsear firma retrospectiva; no confundir más nodos con salud; no recuperar como hechos snapshots perdidos.
 
 ## Aceptación y viabilidad
 

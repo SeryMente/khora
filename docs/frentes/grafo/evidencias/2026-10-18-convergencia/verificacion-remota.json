@@ -1,0 +1,19 @@
+{
+  "candidate_commit": "58b982c5c9ee3e4bdca15300de4f00fb205d5ece",
+  "pull_request": "https://github.com/SeryMente/khora/pull/328",
+  "draft": true,
+  "remote_diff_reverse_check_exit": 0,
+  "remote_original_bytes": 60033,
+  "remote_original_sha256": "a9996f10f6299ea6b48bae7baf1032c1eb311cfed754bd780b0dec72d3ec4052",
+  "remote_original_matches_received": true,
+  "canonical_readback_git_blob": "147afe949bc7423b23f1cfdd63a16ce4b5da0906",
+  "checks_read": {
+    "status": "NOT_VERIFIED",
+    "http_status": 403,
+    "reason": "Resource not accessible by personal access token"
+  },
+  "merged": false,
+  "production_migration": false,
+  "deployment": false,
+  "status": "CANDIDATE_NOT_E2E_ACCEPTED"
+}
