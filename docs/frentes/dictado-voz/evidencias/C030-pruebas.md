@@ -8,3 +8,6 @@
 - 15 pruebas unitarias dirigidas de diálogo/captura/transcriptor aprobadas. Compilación estricta del panel y sus dependencias adquiridas aprobada (TypeScript 5.9.3); no sustituye typecheck global.
 - PostgreSQL PGlite 0.5.10 local, SQL extraído del registrador real: antes primer insert=1/reintento idéntico=0; después 1/1; huella, bytes o fuente distintos y sesión sellada siguen rechazados. Sin conexión a base productiva.
 - Síntomas reales del operador no se atribuyen enteramente a la prueba sintética: logs productivos y sesión humana siguen pendientes.
+
+- Extensión aprobada: recuperación → primer archivo HTTP 503 incierto → edición bloqueada → mismo payload en reintento → recibo válido → dos originales locales retenidos; ninguna ingesta automática. Igual en ambas presentaciones. Ver C030-archive-results.json.
+- Preview de 06c36c: dpl_HkHzVpp8ymTiueVnGXYs6vmvtha8 READY. Prebuild encadena cuatro compuertas existentes; logs individuales/check-runs no recuperados, sin conteo global inventado.
