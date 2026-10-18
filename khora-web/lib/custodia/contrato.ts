@@ -3,11 +3,12 @@ export const CHECKPOINT_IDLE_MS = 1500;
 export const CHECKPOINT_MAX_MS = 10000;
 export const AUDIO_CHECKPOINT_MS = 5000;
 export const LOCAL_CHECKPOINT_MS = 250;
-export type FuenteCaptura = "texto" | "microfono" | "chrome_live_caption" | "audio_archivo";
+export type FuenteCaptura = "texto" | "microfono" | "chrome_live_caption" | "audio_archivo" | "dialogo";
 export type CapturaSnapshot = {
   sessionId: string; revisionId: string; clientAt: number; texto: string;
   parcial: string; titulo: string; fuenteEntrada: FuenteCaptura;
   duracionSeg: number; audioPartes: unknown[];
+  dialogo?: import("../dialogo/contrato").ManifiestoDialogo;
   corteAudio?: { hastaParte: number; finMs: number };
   recuperadaDe?: { sessionId: string; revisionId: string };
 };

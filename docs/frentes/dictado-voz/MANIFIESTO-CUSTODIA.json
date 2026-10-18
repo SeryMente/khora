@@ -29,12 +29,6 @@
   },
   "files": [
     {
-      "path": "OBJETO-CANONICO.md",
-      "bytes": 147234,
-      "sha256": "17e0e36309d0ba8a8c46b71433f4459a5bc3005f6d13dcf30b323349fd1d526d",
-      "git_blob_sha": "e6a9b6be98c1d4180e89dcb20615202952c18651"
-    },
-    {
       "path": "CONTRATO-DICTADO-EXPERIENCE.md",
       "bytes": 18779,
       "sha256": "e78845598c5511ada87edc436b23d530c97cec2d0804fe77b5167a8c8c7ec1ea",
@@ -135,6 +129,54 @@
       "bytes": 2254,
       "sha256": "ec9db5491125f3757134670e3330d6a8b253ea256547b060ddba23b37f5a9056",
       "git_blob_sha": "7c255795e91cfe3f7624f2a0038bd0069cca69c3"
+    },
+    {
+      "path": "OBJETO-CANONICO.md",
+      "bytes": 153305,
+      "sha256": "4353776f939081e825ba975a93e09daad29b17f0e14b9f8a9b277e086768b21f",
+      "git_blob_sha": "05c3f2284f3f65088cfff0d8827a87222fdcda21"
+    },
+    {
+      "path": "originales/DIALOGO-C022.md",
+      "bytes": 2808,
+      "sha256": "b47bda08334de8c740049582c009b85a996cd85da3666ea0ea0677b99bcd5560",
+      "git_blob_sha": "7283703a37e62c959e448dc2a3a91116e6b4e143"
+    },
+    {
+      "path": "evidencias/DIALOGO-C022.json",
+      "bytes": 2934,
+      "sha256": "4cc248c1a335c76805b8a58e82c168f0fa125ca96fd994a0f534efd66ab51bb7",
+      "git_blob_sha": "980086db93c3a5cebde05bf87c0dd3399cb3ef07"
+    },
+    {
+      "path": "evidencias/dialogo.test.ts",
+      "bytes": 6218,
+      "sha256": "534bb83c3238afad7e504462e7cbde75b45651a75b9e32116e4a49a5f491cdcb",
+      "git_blob_sha": "5133663e0eb9b3347a48913df209d5a17238a62e"
+    },
+    {
+      "path": "evidencias/dialogo-server.cjs",
+      "bytes": 3416,
+      "sha256": "ca95516afa6d813b1e41d61fcb2a811ee563cfb0b5a0b2cbdbd0a136d07b85e1",
+      "git_blob_sha": "0ab7203fd09f6cc1249e16a18fe709d1e3b672d3"
+    },
+    {
+      "path": "evidencias/dialogo-browser.cjs",
+      "bytes": 3752,
+      "sha256": "88c806ec1118cc521b4dc859183a114d25085df6f7191c1ada4dea15792dc8fe",
+      "git_blob_sha": "efcbc6eb00ae75aefbcdce509c6946dbe1546e45"
+    },
+    {
+      "path": "evidencias/dialogo-ui.cjs",
+      "bytes": 5971,
+      "sha256": "679e53c1f0c7d4b288180fc439bd97cdae8221f929ebb75f6cc7e7536f2d313d",
+      "git_blob_sha": "8c9e689ec026b3db901c0e1bea288b8433658273"
+    },
+    {
+      "path": "evidencias/dialogo-transcriptor.cjs",
+      "bytes": 2680,
+      "sha256": "f41f308caa649be201c8140601c561d303042bc90e48e817e62e8011b13fe24e",
+      "git_blob_sha": "f239d118d6a9b80db86d2eb1e065f6263d1f920c"
     }
   ],
   "runtime_references": [
@@ -241,12 +283,12 @@
     "no_secret_values_in_manifest": true
   },
   "current_preparation": {
-    "version": "0.5.3",
-    "baseSha": "2012e2389deb732568a5bd384817c19499fb910c",
-    "receipt": "evidencias/REVISION-C021.json",
-    "state": "documentation reconciliation; merge and readback checked separately"
+    "version": "0.6.0",
+    "baseSha": "4dca2133866421105f077bbd7079576c588d1169",
+    "receipt": "evidencias/DIALOGO-C022.json",
+    "state": "implementation in feature branch; full integration/build, physical test and publication pending"
   },
-  "latestEvent": "C021 - canonical object is primary; C020 publication and sprint-wide continuity consolidated",
+  "latestEvent": "C022 - explicit approval, dual capture implementation and controlled evidence; production pending",
   "latest_verified_release": {
     "commit": "c02f5142d7609c35d8a2dc2c549726edc4016f13",
     "pullRequest": "https://github.com/SeryMente/khora/pull/312",

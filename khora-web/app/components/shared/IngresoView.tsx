@@ -82,6 +82,7 @@ export function IngresoView({state:v,actions:a={},isReviewMode=false}:{state:Ing
     </div>
    </div>
    {more&&<div className={s.options} id="ingreso-options">
+    {!locked&&!recording&&!v.editando&&<a data-ui-id="ingreso.btn-dialogo" className={s.secondary} href="/sistema/ingreso?modo=dialogo">Modo Diálogo · Chrome + micrófono</a>}
     <button data-ui-id="ingreso.btn-chrome" className={s.secondary} disabled={locked||recording||v.editando} onClick={a.onPrepararChrome}><I.Monitor size={17}/>Capturar Chrome</button>
     <button data-ui-id="ingreso.btn-titulo-ia" className={s.secondary} disabled={locked||v.generandoTitulo||!v.texto.trim()} onClick={a.onGenerarTitulo}><I.Sparkles size={17}/>{v.generandoTitulo?"Generando…":"Título con IA"}</button>
     {!!a.onRetranscribir&&<button data-ui-id="ingreso.btn-retranscribir" className={s.secondary} disabled={locked||recording||!v.conAudio} onClick={a.onRetranscribir}><I.RefreshCw size={17}/>{v.retranscribiendo?"Re-transcribiendo…":"Re-transcribir audio"}</button>}

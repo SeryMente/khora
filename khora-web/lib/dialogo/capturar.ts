@@ -1,0 +1,76 @@
+import type { FuenteDialogo } from "./contrato";
+export type ParteDialogo = { parte:number; fuente:FuenteDialogo; blob:Blob; startMs:number; endMs:number; duracionMs:number };
+export type CapturaDialogo = { detener:()=>Promise<void>; stream:MediaStream };
+type Opciones = {
+  onParte:(p:ParteDialogo)=>Promise<void>;
+  antesDeGrabar?:()=>Promise<void>;
+  onInterrupcion:(motivo:string)=>void;
+  mediaDevices?:Pick<MediaDevices,"getDisplayMedia"|"getUserMedia">;
+  recorder?:(stream:MediaStream)=>MediaRecorder;
+  now?:()=>number;
+};
+/** One recorder per source for the WHOLE session. Chunks from distinct recorders are NEVER concatenated. */
+export async function capturarDialogo(o:Opciones):Promise<CapturaDialogo> {
+  const media=o.mediaDevices??navigator.mediaDevices;
+  if(!media?.getDisplayMedia||!media?.getUserMedia)throw Error("Este navegador no permite compartir audio de pestaña y micrófono.");
+  const streams:MediaStream[]=[];const recorders:MediaRecorder[]=[];
+  const totals={microphone:0,chrome_tab:0};
+  const pending=new Set<Promise<void>>(); const stopped:Promise<void>[]=[];
+  const now=o.now??(()=>performance.now());let origin=0,index=0,stopping:Promise<void>|undefined,closing=false;
+  let capture:CapturaDialogo|undefined;
+  const release=()=>streams.forEach(s=>s.getTracks().forEach(t=>t.stop()));
+  const stop=():Promise<void>=>{
+    if(stopping)return stopping;
+    closing=true;
+    stopping=(async()=>{
+      try{
+        recorders.forEach(r=>{if(r.state!=="inactive")r.stop();});
+        // onstop follows the last dataavailable; drain local persistence after both final events.
+        await Promise.all(stopped);
+        while(pending.size)await Promise.all([...pending]);
+      }finally{release();}
+    })();
+    return stopping;
+  };
+  const interrupted=(reason:string)=>{
+    if(closing)return;
+    o.onInterrupcion(reason);
+    void stop().catch(()=>o.onInterrupcion("No se confirmó la finalización; conserva las partes recuperables."));
+  };
+  try{
+    // Called directly by a user gesture. No hidden/system-wide recording and no Live Caption dependency.
+    const tab=await media.getDisplayMedia({video:true,audio:true});streams.push(tab);
+    const tabAudio=tab.getAudioTracks();
+    const display=tab.getVideoTracks()[0]?.getSettings().displaySurface;
+    if(display&&display!=="browser")throw Error("Selecciona una pestaña de Chrome, no toda la pantalla.");
+    if(!tabAudio.length)throw Error("La pestaña no compartió audio. Selecciona la pestaña de la conversación y activa Compartir audio.");
+    const mic=await media.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true},video:false});streams.push(mic);
+    if(!mic.getAudioTracks().some(t=>t.readyState==="live"))throw Error("El micrófono no entregó una pista activa.");
+    if(tabAudio.some(t=>t.readyState!=="live"))throw Error("La pista de Chrome terminó antes de iniciar.");
+    await o.antesDeGrabar?.();
+    if(streams.some(s=>s.getAudioTracks().some(t=>t.readyState!=="live")))throw Error("Una fuente terminó durante la preparación.");
+    origin=now();
+    for(const [source,stream] of [["chrome_tab",new MediaStream(tabAudio)],["microphone",new MediaStream(mic.getAudioTracks())]] as const){
+      const r=o.recorder?o.recorder(stream):new MediaRecorder(stream,{mimeType:"audio/webm;codecs=opus",audioBitsPerSecond:64000});
+      recorders.push(r);let previous=now()-origin;
+      const done=new Promise<void>(resolve=>r.addEventListener("stop",()=>resolve(),{once:true}));
+      r.addEventListener("dataavailable",ev=>{
+        if(!ev.data.size)return;
+        const end=now()-origin;const p={parte:++index,fuente:source,blob:ev.data,startMs:previous,endMs:end,duracionMs:Math.max(0,end-previous)};previous=end;
+        let job:Promise<void>;
+        job=Promise.resolve().then(()=>o.onParte(p)).catch(()=>interrupted("No se pudo conservar una parte local. Se detuvo la captura; exporta el audio disponible.")).finally(()=>pending.delete(job));
+        pending.add(job);
+        totals[source]+=ev.data.size;
+        if(totals[source]>18_000_000)interrupted("Se alcanzó el límite preventivo de 18 MB por fuente; conserva y exporta este diálogo antes de iniciar otro.");
+      });
+      r.addEventListener("error",()=>interrupted("Falló una grabadora. La captura no se considera completa."));
+      r.start(5000);stopped.push(done);
+    }
+    streams.forEach(s=>s.getTracks().forEach(t=>t.addEventListener("ended",()=>interrupted("Una fuente dejó de compartir audio; se detuvieron ambas."),{once:true})));
+    capture={detener:stop,stream:mic};return capture;
+  }catch(e){
+    closing=true;
+    // Partial startup must also flush a recorder that did manage to start.
+    await stop().catch(()=>undefined);release();throw e;
+  }
+}

@@ -65,7 +65,8 @@ export async function generarMp3Sesion(sessionId:string){
   await asegurarCustodiaContinua();const db=getDb();
   const session=await db.query("SELECT estado,total_partes FROM dictado_session WHERE session_id=$1",[sessionId]);
   if(!session.rows.length)throw new Error("sesion_inexistente");
-  const r=await db.query("SELECT part_index,blob_url,bytes,sha256,estado_verificacion FROM dictado_audio_parte WHERE session_id=$1 ORDER BY part_index",[sessionId]);
+  const r=await db.query("SELECT part_index,blob_url,bytes,sha256,estado_verificacion,fuente_audio FROM dictado_audio_parte WHERE session_id=$1 ORDER BY part_index",[sessionId]);
+  if(new Set(r.rows.map(p=>p.fuente_audio).filter(Boolean)).size>1)throw new Error("dialogo_exporta_pistas_separadas_no_mp3_secuencial");
   const complete=session.rows[0].estado==="complete";
   const expected=complete?Number(session.rows[0].total_partes):r.rows.length;
   const custody=evaluarCustodiaAudio(r.rows,expected);if(!custody.ok)throw new Error(custody.motivo);

@@ -1,0 +1,74 @@
+{
+  "event": "C022",
+  "base": "4dca2133866421105f077bbd7079576c588d1169",
+  "branch": "feat/dialogo-chrome-microfono-20261018",
+  "method": {
+    "version": "1.5",
+    "seal": "METACANON-OBJETOS-v1.5",
+    "blob": "32c7a65ff2e83b3b76752ba2160427bd6e851a8f",
+    "freshness": "checked this cycle, unchanged"
+  },
+  "unit": {
+    "passed": 13,
+    "failed": 0,
+    "kind": "controlled adapters"
+  },
+  "server": {
+    "passed": 7,
+    "failed": 0,
+    "kind": "isolated DB/blob adapters, no production"
+  },
+  "strictTypes": "new panel, capture, dialogue logic and imported custody client contracts passed; not whole repository",
+  "syntaxFiles": 14,
+  "browser": {
+    "kind": "controlled-synthetic",
+    "browser": "153.0.8010.12",
+    "sources": {
+      "microphone": {
+        "bytes": 50235,
+        "durationSeconds": 6.18,
+        "estimatedFrequencyHz": 441.1003236245955,
+        "chunks": 2
+      },
+      "chrome_tab": {
+        "bytes": 50235,
+        "durationSeconds": 6.18,
+        "estimatedFrequencyHz": 881.3915857605178,
+        "chunks": 2
+      }
+    },
+    "finalChunksIncluded": true,
+    "tracksReleased": true
+  },
+  "limits": [
+    "Full repository typecheck/build/CI not executed from source subset",
+    "No physical microphone or real Sesame tab permission test",
+    "No authenticated production write/recovery or provider transcription",
+    "No full UI visual acceptance",
+    "No multi-person diarization or therapy efficacy claim",
+    "No merge or production deployment",
+    "Blob provider suspension in historical evidence not revalidated; runtime error remains explicit"
+  ],
+  "review": {
+    "sourceFidelity": "original encargo/approval stored separately; only authorized capture/transcription scope",
+    "methodCore": "13 blocks in order; existing historical annex preserved; state repeated literally in reinstantiation prompts",
+    "code": "one recorder per source, common clock, final dataavailable/stop barrier, local encrypted originals retained, owner authorization before server blobs, existing verified reader, fail-closed missing parts, no mono MP3 mixing",
+    "negativeCases": "denied microphone, missing tab audio, custody preflight failure, recorder start failure, final chunks, source ended, missing owner, missing/unverified parts, invalid timings, partial transcription",
+    "harnessNote": "Initial UI harness cancelled before result; CSS test adapter replaced explicit module import. Corrected harness completed; not visual review."
+  },
+  "transcriberRegression": {
+    "passed": 4,
+    "failed": 0,
+    "kind": "same Khora transcriber with simulated provider; existing defaults preserved"
+  },
+  "controlledUI": {
+    "kind": "controlled-ui-network-adapters",
+    "uploads": 4,
+    "encryptedLocalAudioParts": 4,
+    "checkpointState": "detenido",
+    "dialoguePersisted": true,
+    "concurrentWriterBlocked": true,
+    "pageErrors": 0,
+    "visualAcceptance": false
+  }
+}

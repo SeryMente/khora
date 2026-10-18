@@ -1,5 +1,6 @@
 "use client";
 import studioStyles from "./ingreso-studio.module.css";
+import { DialogoPanel } from "./DialogoPanel";
 import { RecoveryDrawer, type RecoveryItem } from "./RecoveryDrawer";
 import { evaluarAudioRecuperado, maximoIndiceConocido } from "@/lib/custodia/recuperacion";
 import { verificarCierreCaptura } from "@/lib/audio/custodia";
@@ -48,6 +49,7 @@ export function IngresoWorkspace() {
 
 function IngresoSeleccionado() {
   const params = useSearchParams();
+  if (params?.get("modo") === "dialogo") return <DialogoPanel sessionId={params.get("sessionId")} />;
   if (!params || params.get("modo") !== "ingesta") return <IngresoContenido />;
   const volcadoId = params.get("volcado_id");
   const rawVersion = params.get("version");
@@ -413,6 +415,10 @@ function IngresoContenido() {
         const v=vistaVivaRef.current;await guardarSnapshotLocal(ownerRef.current,{sessionId:initialSession,...nuevaRevision(),texto:v.texto,parcial:v.parcial,titulo:v.titulo,fuenteEntrada:fuenteEntradaSesionRef.current||"texto",duracionSeg:duracionRef.current,audioPartes:[...partesSubidasRef.current]});
         await guardarCheckpoint(true);
       }
+      const dialogCheck=selectedLocal || await fetch("/api/dictado/checkpoint?sessionId="+encodeURIComponent(item.sessionId),{cache:"no-store"}).then(async r=>r.ok?(await r.json()).recovery:null);
+      if(dialogCheck?.fuenteEntrada==="dialogo"){
+        window.location.assign("/sistema/ingreso?modo=dialogo&sessionId="+encodeURIComponent(item.sessionId));return;
+      }
       let sourceRevision=item.revisionId;
       if(item.local){
         const local=await recuperarLocal(ownerRef.current),snapshot=local.snapshots.find(x=>x.sessionId===item.sessionId&&x.revisionId===item.revisionId);
@@ -441,7 +447,9 @@ function IngresoContenido() {
       const data=await response.json();
       if(!response.ok||!data.recovery?.sessionId||data.owner!==ownerRef.current)throw Error(data.error==="sesion_sellada"?"Esta captura ya está archivada. Ábrela desde Custodia.":"No se confirmó la recuperación. El original no se modificó; puedes reintentar.");
       if(sesionIdRef.current!==initialSession||vistaVivaRef.current.texto!==initialText)throw Error("La captura cambió mientras elegías. Se conservan ambas; vuelve a consultar.");
-      const recovery:CapturaSnapshot=data.recovery;await guardarSnapshotLocal(ownerRef.current,recovery);
+      const recovery:CapturaSnapshot=data.recovery;
+      if(recovery.fuenteEntrada==="dialogo"){window.location.assign("/sistema/ingreso?modo=dialogo&sessionId="+encodeURIComponent(recovery.sessionId));return;}
+      await guardarSnapshotLocal(ownerRef.current,recovery);
       sesionIdRef.current=recovery.sessionId;recuperadaDeRef.current=recovery.recuperadaDe;
       fuenteEntradaSesionRef.current=recovery.fuenteEntrada;partesSubidasRef.current=recovery.audioPartes as typeof partesSubidasRef.current;partesRawRef.current=[];
       parteConsecutivaRef.current=maximoIndiceConocido(partesSubidasRef.current,[])+1;
