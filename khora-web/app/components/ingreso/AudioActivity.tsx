@@ -2,7 +2,7 @@
 import {useEffect,useRef,useState} from "react";
 import s from "./ingreso-studio.module.css";
 /** Reads the SAME stream as the recorder. No second microphone, telemetry or fabricated motion. */
-export function AudioActivity({stream,active}:{stream:MediaStream|null;active:boolean}){
+export function AudioActivity({stream,active,label="micrófono"}:{stream:MediaStream|null;active:boolean;label?:string}){
  const canvas=useRef<HTMLCanvasElement>(null);const [unavailable,setUnavailable]=useState(false);
  useEffect(()=>{
   const el=canvas.current;if(!el)return;const ctx=el.getContext('2d');if(!ctx)return;
@@ -19,5 +19,5 @@ export function AudioActivity({stream,active}:{stream:MediaStream|null;active:bo
   catch{setUnavailable(true);flat();}
   return()=>{cancelled=true;cancelAnimationFrame(frame);source?.disconnect();analyser?.disconnect();void audio?.close().catch(()=>undefined);};
  },[stream,active]);
- return <canvas ref={canvas} width={240} height={72} className={s.wave} role="img" aria-label={unavailable?"Actividad de audio no disponible":active&&stream?"Actividad real del micrófono":"Micrófono en espera"}/>;
+ return <canvas ref={canvas} width={240} height={72} className={s.wave} role="img" aria-label={unavailable?"Actividad de audio no disponible":active&&stream?`Actividad real de ${label}`:`${label} en espera`}/>;
 }

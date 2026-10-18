@@ -1,6 +1,6 @@
 import type { FuenteDialogo } from "./contrato";
 export type ParteDialogo = { parte:number; fuente:FuenteDialogo; blob:Blob; startMs:number; endMs:number; duracionMs:number };
-export type CapturaDialogo = { detener:()=>Promise<void>; stream:MediaStream };
+export type CapturaDialogo = { detener:()=>Promise<void>; stream:MediaStream; chromeStream:MediaStream };
 type Opciones = {
   onParte:(p:ParteDialogo)=>Promise<void>;
   antesDeGrabar?:()=>Promise<void>;
@@ -67,7 +67,7 @@ export async function capturarDialogo(o:Opciones):Promise<CapturaDialogo> {
       r.start(5000);stopped.push(done);
     }
     streams.forEach(s=>s.getTracks().forEach(t=>t.addEventListener("ended",()=>interrupted("Una fuente dejó de compartir audio; se detuvieron ambas."),{once:true})));
-    capture={detener:stop,stream:mic};return capture;
+    capture={detener:stop,stream:mic,chromeStream:new MediaStream(tabAudio)};return capture;
   }catch(e){
     closing=true;
     // Partial startup must also flush a recorder that did manage to start.

@@ -215,16 +215,28 @@
       "git_blob_sha": "5ecdf192f7b9400b2f5446c355401e585d171f39"
     },
     {
-      "path": "OBJETO-CANONICO.md",
-      "bytes": 175508,
-      "sha256": "20387a50f10e412557da3862a7de9f539195df29d4735c43599929f716ce0635",
-      "git_blob_sha": "aeb77348c4ed4ddd50ec108a5465b5769c49f2b3"
-    },
-    {
       "path": "evidencias/RELEASE-C026.json",
       "bytes": 2379,
       "sha256": "1e30eaa6641bcdd428a05f5ee12043d67a6522714fa44dbc654435d4bf5bf95e",
       "git_blob_sha": "3b2517dfcda81f8d9f0b7dd66c7d64b98b8be3ff"
+    },
+    {
+      "path": "OBJETO-CANONICO.md",
+      "bytes": 181049,
+      "sha256": "c327341d9f8ba5ba342adbb74c807f6c0675f75813859f5ddf762f05d3e6c150",
+      "git_blob_sha": "416ccd7b28480d75a490e5e3585600a601d193cc"
+    },
+    {
+      "path": "originales/DIALOGO-INTEGRADO-C027.md",
+      "bytes": 1432,
+      "sha256": "a6e979baa42df3370e696d6b9a433a5c8cd63e98357cb1bf2c11a3fdee45bbd1",
+      "git_blob_sha": "c52d7b263b75c05fc117cbb52868a27b305dbbd8"
+    },
+    {
+      "path": "evidencias/C027.json",
+      "bytes": 4189,
+      "sha256": "b54cfe43b980304e6f29199dcfa759abcf18304fcb76b50678526a10a03e5279",
+      "git_blob_sha": "c3c556baa864a14f89e22079c738b540f95cd954"
     }
   ],
   "runtime_references": [
@@ -331,12 +343,12 @@
     "no_secret_values_in_manifest": true
   },
   "current_preparation": {
-    "version": "0.6.5",
-    "baseSha": "81e571deaa46ad9abd0a6b91c5035abe871a8b55",
-    "receipt": "evidencias/RELEASE-C026.json",
-    "state": "Dialogue main release live verified; physical/authenticated-provider acceptance pending"
+    "version": "0.6.6",
+    "baseSha": "958162199a518ae5a01d317f1d68e3a55360836c",
+    "receipt": "evidencias/C027.json",
+    "state": "integrated Chrome dialogue correction prepared and controlled tests pass; PC-14 timeout blocks full validation/release"
   },
-  "latestEvent": "C026 - dialogue release main live verified; physical acceptance pending",
+  "latestEvent": "C027 - negative physical feedback; simplify dialogue in Ingreso, archive support prepared, PC14 unresponsive",
   "latest_verified_release": {
     "sha": "81e571deaa46ad9abd0a6b91c5035abe871a8b55",
     "deploymentId": "dpl_7eQpbex6hbt5B3vTmtWhAwMSbE1V",
@@ -344,5 +356,12 @@
     "receipt": "evidencias/RELEASE-C026.json",
     "observedAt": "2026-10-18T19:11:42.022Z",
     "physicalAcceptance": false
+  },
+  "latest_physical_feedback": {
+    "event": "C027",
+    "reportedBy": "operator",
+    "acceptance": false,
+    "cause": "unverified",
+    "original": "originales/DIALOGO-INTEGRADO-C027.md"
   }
 }

@@ -1,0 +1,13 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {validarArchivoDialogo} from "../../lib/dialogo/archivar";
+const parts=[{part_index:1,fuente_audio:"chrome_tab"},{part_index:2,fuente_audio:"microphone"}];
+const snapshot=()=>({fuenteEntrada:"dialogo",dialogo:{version:1 as const,estado:"detenido" as const,partesEsperadas:2,etiquetas:{microphone:"Operador",chrome_tab:"Chrome"},turnos:[]}});
+test("dialogue archive requires both sources and stopped manifest",()=>assert.deepEqual(validarArchivoDialogo(snapshot(),parts),{completo:true,partes:2}));
+test("wrong source is rejected",()=>assert.throws(()=>validarArchivoDialogo({...snapshot(),fuenteEntrada:"texto"},parts),/manifiesto/));
+test("active capture cannot be archived",()=>assert.throws(()=>validarArchivoDialogo({...snapshot(),dialogo:{...snapshot().dialogo,estado:"grabando"}},parts),/deten_ambas/));
+test("pending local parts cannot be declared complete",()=>assert.throws(()=>validarArchivoDialogo({...snapshot(),dialogo:{...snapshot().dialogo,partesEsperadas:3}},parts),/partes_pendientes/));
+test("missing source cannot be hidden behind valid global indices",()=>assert.throws(()=>validarArchivoDialogo(snapshot(),parts.map(p=>({...p,fuente_audio:"microphone"}))),/falta_una_fuente/));
+test("invalid global indices are rejected",()=>assert.throws(()=>validarArchivoDialogo(snapshot(),[parts[0],{...parts[1],part_index:3}]),/indices_invalidos/));
+test("file import is not an allowed dialogue source",()=>assert.throws(()=>validarArchivoDialogo(snapshot(),[parts[0],{...parts[1],fuente_audio:"audio_archivo"}]),/fuentes_o_indices/));
+test("interrupted capture preserves explicit partial state",()=>assert.equal(validarArchivoDialogo({...snapshot(),dialogo:{...snapshot().dialogo,estado:"interrumpido"}},parts).completo,false));

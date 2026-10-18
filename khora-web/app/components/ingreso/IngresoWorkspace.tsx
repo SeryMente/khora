@@ -49,8 +49,10 @@ export function IngresoWorkspace() {
 
 function IngresoSeleccionado() {
   const params = useSearchParams();
-  if (params?.get("modo") === "dialogo") return <DialogoPanel sessionId={params.get("sessionId")} />;
-  if (!params || params.get("modo") !== "ingesta") return <IngresoContenido />;
+  const [dialogo,setDialogo]=useState(params?.get("modo")==="dialogo");
+  if (!params || params.get("modo") !== "ingesta") return dialogo
+    ? <DialogoPanel sessionId={params?.get("modo")==="dialogo"?params.get("sessionId"):null} onSalir={()=>setDialogo(false)} />
+    : <IngresoContenido onDialogo={()=>setDialogo(true)} />;
   const volcadoId = params.get("volcado_id");
   const rawVersion = params.get("version");
   const version = rawVersion && /^[1-9][0-9]*$/.test(rawVersion) && Number.isSafeInteger(Number(rawVersion))
@@ -58,7 +60,7 @@ function IngresoSeleccionado() {
   return <IngresoIngestaPanel key={params.toString()} volcadoId={volcadoId} version={version} />;
 }
 
-function IngresoContenido() {
+function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
 
   const [segmentos, setSegmentos] = useState<SegmentoReconciliado[]>([]);
   const [pendiente, setPendiente] = useState("");
@@ -1602,6 +1604,7 @@ function IngresoContenido() {
         onGenerarTitulo: generarTituloConIA,
         onIniciar: iniciar,
         onPrepararChrome: prepararChrome,
+        onDialogoChange:(enabled)=>{if(enabled&&!texto.trim()&&!conAudio&&!titulo.trim()&&estado!=="dictando"&&!guardando)onDialogo();},
         onDetener: detener,
         onGuardar: guardar,
         onRetranscribir: ejecutarTranscripcionAutoritativa,
