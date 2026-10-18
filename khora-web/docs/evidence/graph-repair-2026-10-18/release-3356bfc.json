@@ -1,0 +1,64 @@
+{
+    "deployed_commit":  "3356bfc92965503d81b06e5637c4668afbde3a52",
+    "checks":  {
+                   "metric_consumer_search":  "definitions_tests_documents_only_no_product_consumer_found",
+                   "web_unit":  {
+                                    "fail":  0,
+                                    "pass":  545,
+                                    "skipped":  0,
+                                    "tests":  545
+                                },
+                   "navigation_contract":  0,
+                   "typecheck":  0,
+                   "github_actions":  "not_started_billing_blocked_not_passed",
+                   "ui_review_contract":  0
+               },
+    "verified_tree":  "5d1c8344a6ffd83bcc21266152e6b1dc3ff72cae",
+    "integral_verdict":  "NO_APTO",
+    "unchanged":  [
+                      "originals",
+                      "human_judgments",
+                      "source_approvals",
+                      "persisted_graph_snapshot"
+                  ],
+    "scope":  "publication_and_authenticated_read_only_smoke_not_integral_acceptance",
+    "read_at":  "2026-10-18T20:33:43.784Z",
+    "limitations":  [
+                        "No production Python service deployment demonstrated",
+                        "No unified source-to-answer pipeline demonstrated",
+                        "No graph regeneration performed",
+                        "No semantic or human acceptance claimed"
+                    ],
+    "deployment":  {
+                       "id":  "dpl_5eSqULJMyN3B1VhEbFbqh9p4Fxox",
+                       "git_source":  "github_main_exact_sha",
+                       "public_version":  "3356bfc92965503d81b06e5637c4668afbde3a52",
+                       "alias":  "https://khora-web.vercel.app",
+                       "state":  "READY",
+                       "project":  "prj_hRN86BKITXYKTnNlp0ygVhaMwFfx"
+                   },
+    "merged_pr":  318,
+    "live":  {
+                 "kernel":  {
+                                "informationObjects":  0,
+                                "mentions":  0,
+                                "edges":  0,
+                                "nodes":  0
+                            },
+                 "curated":  {
+                                 "identities":  0,
+                                 "edges":  0,
+                                 "nodes":  0
+                             },
+                 "paired_status":  200,
+                 "proposals":  41,
+                 "automatic":  {
+                                   "identities":  14,
+                                   "edges":  214,
+                                   "nodes":  392
+                               },
+                 "kernel_status":  200,
+                 "revision":  "9bfc8bde-d80f-42e6-80ea-59996749c094",
+                 "judgments":  0
+             }
+}

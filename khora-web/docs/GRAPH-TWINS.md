@@ -1,6 +1,6 @@
 # Grafos de Khora · objeto de continuidad y aceptación del frente
 
-**Corte documental: 2026-10-18 · v5. Estado integral: NO APTO en la auditoría de este hilo.**
+**Corte documental: 2026-10-18 · v6. Estado integral: NO APTO en la auditoría de este hilo.**
 
 Esta es la entrada de continuidad de este frente en el repositorio. El contenido histórico inferior se conserva sin reescribirlo; sus estados, conteos y URLs describen cortes anteriores y no prevalecen sobre este corte explícito. No es el objeto de Conversación Enraizada, dictado de voz ni tareas automáticas.
 
@@ -11,7 +11,21 @@ Esta es la entrada de continuidad de este frente en el repositorio. El contenido
 3. [Autorización específica de originales](GRAPH-ORIGINALS-AUTHORIZATION.md): excepciona la antigua selección de solo versiones aprobadas para ese propietario y esa política; no ratifica interpretaciones ni juicios.
 4. Antecedentes históricos inferiores: decisiones y verificaciones con su alcance original; no asumir vigencia actual de sus afirmaciones de despliegue, corpus vacío o exclusividad de versiones aprobadas.
 
-## Reparación técnica iniciada · no desplegada
+## Publicación verificada · no aceptación integral
+
+El operador pidió expresamente publicar lo preparado. La solicitud 318 se fusionó por la vía normal en `3356bfc92965503d81b06e5637c4668afbde3a52`, conservando los cambios concurrentes de dictado. El árbol fusionado `5d1c8344a6ffd83bcc21266152e6b1dc3ff72cae` coincide con la combinación probada. No se usó bypass administrativo.
+
+Vercel terminó READY: `dpl_5eSqULJMyN3B1VhEbFbqh9p4Fxox`, proyecto existente `prj_hRN86BKITXYKTnNlp0ygVhaMwFfx`. El alias principal y `/api/version` verificaron esa misma revisión desde Git en producción. [Recibo acotado de publicación y lectura posterior](evidence/graph-repair-2026-10-18/release-3356bfc.json).
+
+Controles de esta combinación: 545/545 pruebas unitarias web sin omisiones, tipos y contratos de navegación/revisión visual con código 0. La dependencia multimedia omitida por `--ignore-scripts` se instaló específicamente antes de repetir la suite. Las comprobaciones de GitHub no arrancaron por facturación; no se presentan como aprobadas. El barrido de consumidores de las métricas modificadas encontró definiciones, pruebas y documentos, no un consumidor productivo de esos dos contratos en el árbol inspeccionado.
+
+**La publicación NO cierra el objetivo integral.** Lectura real posterior: automático 392 nodos/214 relaciones/14 identidades; curado y juicios vacíos; `/api/grafo?limit=10` con cero nodos, aristas, objetos de información y menciones. El snapshot sigue siendo `9bfc8bde-d80f-42e6-80ea-59996749c094`. No se regeneró ni maquilló el corpus, no se cambiaron originales ni actos humanos.
+
+Las tres reparaciones Python y el verificador offline quedaron en main, pero esta publicación Next/Vercel no acredita ni despliega por sí misma el servicio Python externo ni conecta el circuito completo. Siguen pendientes integración, identidad, conservación/replay de juicios, comunidades útiles y verificación de las trece tareas reales para Síntesis Existencial Accionable e Ideación Asíncrona Recuperable. El estado integral permanece **NO APTO**. La autorización de publicar lo preparado no equivale a aprobar una nueva arquitectura, seguridad o interfaz no revisadas.
+
+Los estados de no publicación inferiores quedan como antecedentes del corte anterior, no como descripción de esta revisión. Siguiente checkpoint material: revisar el mapa concreto de responsabilidades de la convergencia ya propuesta; después construir y probar la cadena compartida, sin pedir al operador elegir tecnologías.
+
+## Reparación técnica · antecedente de preparación anterior
 
 [Correcciones y pruebas](evidence/graph-repair-2026-10-18/README.md): R07 refinamiento efectivo y trazado; R08 validador global obligatorio aun con evidencia visual; R11 métricas invariantes a etiquetas y NO COMPARABLE con universos distintos. 18 pruebas nuevas y 25 existentes seleccionadas pasan; proveedores/recuperador controlados y SQLite real temporal. No es acreditación productiva ni reparación de todos los hallazgos.
 
