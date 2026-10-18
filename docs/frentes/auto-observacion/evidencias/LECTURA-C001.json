@@ -1,0 +1,24 @@
+{
+  "event": "C001.1",
+  "verified_commit": "4eb482c195e2ac8c1befc3041097d8bbc6e80e1e",
+  "verification": "full returned content compared byte-for-byte with prepared files; SHA256 and size checked against manifest",
+  "files": [
+    {
+      "path": "OBJETO-CANONICO.md",
+      "bytes": 28766,
+      "sha256": "622b3b6121190c5363d524ba6fe1b0db9938e5cb7c4d156ebbc965439dfa67a5"
+    },
+    {
+      "path": "originales/INSTRUCCIONES-20261018.txt",
+      "bytes": 1492,
+      "sha256": "e7815001456a0852a7073314b5ad2609ec2d74d865399338634d0209dc0b9143"
+    },
+    {
+      "path": "MANIFIESTO-CUSTODIA.json",
+      "bytes": 745,
+      "sha256": "e601f830ada6cb86f6d0443eba6f394a7be45a686fdd289fbff6b7b2d2165f30"
+    }
+  ],
+  "functional_tests": "not executed",
+  "code_changes": false
+}

@@ -3,12 +3,12 @@
 ## 1. Control e identidad
 
 - Identidad: AUTOOBS-KHORA; nombre de subsistema ratificado por U004: **Auto-observación**. «Cora/Quora» se normaliza a Khora fuera de originales.
-- Versión: 0.1.0; sello AUTOOBS-KHORA-v0.1.0. Ancla C001/U004: encargo explícito de robustez medianamente elevada, interfaz de calidad y objeto actualizado a cada paso.
+- Versión: 0.1.1; sello AUTOOBS-KHORA-v0.1.1. Ancla C001.1: lectura íntegra de vuelta y comparación de bytes/hashes del paquete inicial; pendiente revisión material del diseño.
 - Elemento permanente autorizado por U004. Carpeta contenedora: `docs/frentes/auto-observacion/`; único objeto de estado: `OBJETO-CANONICO.md`. No es un tablero adicional.
 - Propietario: SeryMente/khora. Privacidad actual comprobada: `private:true`, `visibility:private`, permiso `push:true` en consulta de este ciclo.
 - Rama documental: `docs/auto-observacion-20261018`; base comprobada `4dca2133866421105f077bbd7079576c588d1169`. No equivale a main, fusión ni despliegue.
-- Persistencia: verificar mediante lectura posterior del objeto y manifiesto. El manifiesto identifica bytes/hashes esperados; no demuestra por sí solo lectura de vuelta.
-- Recuperación: carpeta del frente → este objeto → originales y manifiesto. No crear copia de estado en Notion ni renombrar objetos de otros frentes.
+- Persistencia inicial verificada: commit `4eb482c195e2ac8c1befc3041097d8bbc6e80e1e`, lectura íntegra de los tres archivos y comparación exacta con payload/manifiesto. Recibo `evidencias/LECTURA-C001.json`. Esta revisión incorpora el resultado; comprobar su blob remoto contra el esperado al terminar.
+- Recuperación: README del repositorio → carpeta del frente → este objeto → originales, evidencias y manifiesto. No crear copia de estado en Notion ni renombrar objetos de otros frentes.
 
 ## 2. LEER PRIMERO
 
@@ -30,10 +30,10 @@ Frescura de adquisición: reconsulta del ciclo con el mismo blob; delta central 
 
 | Gobierno central | Aplicación en este hijo | Evidencia/estado |
 |---|---|---|
-| §1–5 objeto único, originales, delta | §1, §8, §11, §13; originales U001–U004 | Adoptado documentalmente; lectura guardada pendiente al preparar payload |
+| §1–5 objeto único, originales, delta | §1, §8, §11, §13; originales U001–U004 | Adoptado documentalmente; paquete inicial leído de vuelta y cotejado en C001.1 |
 | §3/§27 trece bloques en orden | §1–13 | Cotejo estructural local; no prueba funcional |
 | §6/§24 acceso remoto exclusivo/necesario | §2, §5, §12 | Sin uso remoto |
-| §7 doble revisión | §13 | Fidelidad local revisada; readback posterior obligatorio |
+| §7 doble revisión | §13 | Fidelidad y readback inicial comprobados; revisión actual requiere cotejo de blob |
 | §14 originales/interpretación separados | §4, §11 y originales | U001–U004 conservados; propuesta A no aprobada |
 | §22 versión visible cada salida | §10, §12 | Obligación adoptada; no afirmar obediencia de otras conversaciones |
 | §23/§26 adquisición, permiso, propagación | §2, §3, §6, §12 | Lecturas identificadas; código bloqueado por revisión/rol |
@@ -83,7 +83,7 @@ Herramientas usadas: conexión GitHub para lectura/escritura documental; sandbox
 
 ### 🔄 Estado vivo
 
-Acción en curso: objeto primordial y propuesta técnica documentados por instrucción U004; persistencia documental en rama de trabajo, sin implementación ni aceptación productiva. Siguiente paso atómico: el operador revisa la propuesta de arquitectura, interfaz y seguridad del anexo A; asignar explícitamente el rol constructor antes de mutar código conforme al metacanon. Pendientes en secuencia: aprobación material; inventario causal de código y pruebas; implementación del primer corte completo; validación funcional/privacidad/accesibilidad; revisión presencial; integración autorizada; despliegue y comprobación real cuando se autoricen. Actualizar este objeto y sus evidencias en cada paso significativo, incluso fallos y bloqueos.
+Acción en curso: objeto primordial y propuesta técnica documentados por instrucción U004; persistencia documental inicial verificada y recibo incorporado en rama de trabajo, sin implementación ni aceptación productiva. Siguiente paso atómico: el operador revisa la propuesta de arquitectura, interfaz y seguridad del anexo A; asignar explícitamente el rol constructor antes de mutar código conforme al metacanon. Pendientes en secuencia: aprobación material; inventario causal de código y pruebas; implementación del primer corte completo; validación funcional/privacidad/accesibilidad; revisión presencial; integración autorizada; despliegue y comprobación real cuando se autoricen. Actualizar este objeto y sus evidencias en cada paso significativo, incluso fallos y bloqueos.
 
 ### ⚗️ En prueba / recién fallido
 
@@ -102,7 +102,7 @@ Revisión estática de contratos y código; no se ejecutaron pruebas funcionales
 
 | Requisito | Resultado exigido | Evidencia requerida | Estado C001 |
 |---|---|---|---|
-| Objeto conforme al método | 13 bloques, originales, continuidad | manifiesto y lectura de vuelta | Preparado; verificar persistencia |
+| Objeto conforme al método | 13 bloques, originales, continuidad | manifiesto y lectura de vuelta | Paquete inicial persistido/verificado; actualización de recibo en curso |
 | Renombre | Auto-observación visible en menús/documentos pertinentes | búsqueda de etiquetas + navegación real | Pendiente |
 | Compatibilidad | rutas/IDs anteriores siguen resolviendo | pruebas de aliases y consumidores | Pendiente |
 | Diagnóstico | operación reconstruible y fallo localizado | caso sintético extremo a extremo, versión y correlación | Pendiente |
@@ -128,7 +128,7 @@ Formato no garantiza ejecución. Desconocidos se declaran. En cada cambio de có
 
 ### C001 · 2026-10-18 · apertura documental
 
-Entrada U004: nuevo encargo. Acciones comprobadas: lectura de AGENTS.md, README.md, UI_REVIEW.md, navegación y rutas de frentes; metacanon 1.5 adquirido/reconsultado; privacidad del repo comprobada; rama documental creada desde base exacta; objeto y custodia preparados. Revisión estática previa de contratos y código reutilizada, sin repetir pruebas inexistentes.
+Entrada U004: nuevo encargo. Acciones comprobadas: lectura de AGENTS.md, README.md, UI_REVIEW.md, navegación y rutas de frentes; metacanon 1.5 adquirido/reconsultado; privacidad del repo comprobada; rama documental creada desde base exacta; objeto y custodia preparados. C001.1: paquete inicial guardado en `4eb482c195e2ac8c1befc3041097d8bbc6e80e1e`, releído íntegramente y comparado byte a byte; tamaños y SHA256 coinciden con manifiesto. Recibo en `evidencias/LECTURA-C001.json`; entrada de recuperación añadida al README en la misma rama. Revisión estática previa de contratos y código reutilizada, sin repetir pruebas inexistentes.
 
 No se tocaron código, interfaz, permisos, proveedores, bases de datos ni despliegues. No hubo constructor ni pruebas funcionales. La creación de documentos no cierra el objetivo. Delta de proyecto: nace fuente única y propuesta A; delta metodológico entre recuperaciones: mismo blob.
 
@@ -159,7 +159,7 @@ Los siguientes prompts se adquieren con el objeto vivo; no copian un estado alte
 ```text
 Retoma el frente Auto-observación de Khora en rol de asistencia. Fuente única: https://github.com/SeryMente/khora/blob/docs/auto-observacion-20261018/docs/frentes/auto-observacion/OBJETO-CANONICO.md . Recupera el objeto y el metacanon vivo https://github.com/SeryMente/metodologia/blob/main/METACANON-OBJETOS-CANONICOS.md ; referencia adquirida 1.5, METACANON-OBJETOS-v1.5, commit 49ac40e9f6122e2d2fb339362cfa0a78128c8e37, blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f. Coteja fuentes/revisiones/delta y reglas superiores antes de actuar; firma sin fuente no acredita adquisición. Muestra versión/sello metodológicos y frescura en cada salida. Recupera AGENTS.md y UI_REVIEW.md del destino por pertinencia. No modifiques metaprompt/metacanon ni infieras permisos de citas. Remote Desktop Commander es exclusivo del asistente y solo para necesidad imprescindible autorizada; no es necesario para este checkpoint. Prioriza una salida recibida del constructor y emite síntesis y prompt de continuidad. Un escritor de código; no instancies subagentes. Conserva originales y objeto actualizado por cada paso y verifica readback.
 🔄 Estado vivo
-Acción en curso: objeto primordial y propuesta técnica documentados por instrucción U004; persistencia documental en rama de trabajo, sin implementación ni aceptación productiva. Siguiente paso atómico: el operador revisa la propuesta de arquitectura, interfaz y seguridad del anexo A; asignar explícitamente el rol constructor antes de mutar código conforme al metacanon. Pendientes en secuencia: aprobación material; inventario causal de código y pruebas; implementación del primer corte completo; validación funcional/privacidad/accesibilidad; revisión presencial; integración autorizada; despliegue y comprobación real cuando se autoricen. Actualizar este objeto y sus evidencias en cada paso significativo, incluso fallos y bloqueos.
+Acción en curso: objeto primordial y propuesta técnica documentados por instrucción U004; persistencia documental inicial verificada y recibo incorporado en rama de trabajo, sin implementación ni aceptación productiva. Siguiente paso atómico: el operador revisa la propuesta de arquitectura, interfaz y seguridad del anexo A; asignar explícitamente el rol constructor antes de mutar código conforme al metacanon. Pendientes en secuencia: aprobación material; inventario causal de código y pruebas; implementación del primer corte completo; validación funcional/privacidad/accesibilidad; revisión presencial; integración autorizada; despliegue y comprobación real cuando se autoricen. Actualizar este objeto y sus evidencias en cada paso significativo, incluso fallos y bloqueos.
 ⚗️ En prueba / recién fallido
 Revisión estática de contratos y código; no se ejecutaron pruebas funcionales ni se verificó el despliegue. Hipótesis abiertas: clasificación semántica de resultados y durabilidad de emisiones con presupuesto temporal.
 Siguiente paso: revisión del anexo A y asignación explícita del rol de construcción; no iniciar diseño material sin presencia del operador. No declarar implementación, fusión o despliegue por documento guardado.
@@ -170,7 +170,7 @@ Siguiente paso: revisión del anexo A y asignación explícita del rol de constr
 ```text
 Este prompt no asigna rol ni aprueba un diseño. Solo al recibir asignación explícita del operador, actúa como constructor del frente Auto-observación de Khora. Adquiere la fuente única https://github.com/SeryMente/khora/blob/docs/auto-observacion-20261018/docs/frentes/auto-observacion/OBJETO-CANONICO.md y el metacanon vivo https://github.com/SeryMente/metodologia/blob/main/METACANON-OBJETOS-CANONICOS.md ; referencia 1.5, METACANON-OBJETOS-v1.5, commit 49ac40e9f6122e2d2fb339362cfa0a78128c8e37, blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f. Comprueba fuentes, revisiones, reglas superiores y permiso concreto antes de actuar; muestra metacanon adquirido y frescura en cada salida. Lee AGENTS.md, UI_REVIEW.md y contratos pertinentes. Si no hay asignación o aprobación de arquitectura/interfaz/seguridad, no mutes código: devuelve el requisito material exacto y continúa solo documentación autorizada. Nunca uses Remote Desktop Commander ni intermediarios para eludirlo; no crees subagentes. Conserva compatibilidad y datos; no exportes contenido sensible ni contrates proveedores, fusiones o despliegues sin autorización propia. Usa componentes reales compartidos con escenarios sintéticos, pruebas y evidencia de revisión. Actualiza este mismo objeto en cada paso lógico, con fallos, revisiones y aceptación; no crees otro estado paralelo. Relee y fusiona deltas antes de guardar; evidencia productiva/sintética separada. Entrega checkpoint con pruebas ejecutadas, límites y pendientes reales.
 🔄 Estado vivo
-Acción en curso: objeto primordial y propuesta técnica documentados por instrucción U004; persistencia documental en rama de trabajo, sin implementación ni aceptación productiva. Siguiente paso atómico: el operador revisa la propuesta de arquitectura, interfaz y seguridad del anexo A; asignar explícitamente el rol constructor antes de mutar código conforme al metacanon. Pendientes en secuencia: aprobación material; inventario causal de código y pruebas; implementación del primer corte completo; validación funcional/privacidad/accesibilidad; revisión presencial; integración autorizada; despliegue y comprobación real cuando se autoricen. Actualizar este objeto y sus evidencias en cada paso significativo, incluso fallos y bloqueos.
+Acción en curso: objeto primordial y propuesta técnica documentados por instrucción U004; persistencia documental inicial verificada y recibo incorporado en rama de trabajo, sin implementación ni aceptación productiva. Siguiente paso atómico: el operador revisa la propuesta de arquitectura, interfaz y seguridad del anexo A; asignar explícitamente el rol constructor antes de mutar código conforme al metacanon. Pendientes en secuencia: aprobación material; inventario causal de código y pruebas; implementación del primer corte completo; validación funcional/privacidad/accesibilidad; revisión presencial; integración autorizada; despliegue y comprobación real cuando se autoricen. Actualizar este objeto y sus evidencias en cada paso significativo, incluso fallos y bloqueos.
 ⚗️ En prueba / recién fallido
 Revisión estática de contratos y código; no se ejecutaron pruebas funcionales ni se verificó el despliegue. Hipótesis abiertas: clasificación semántica de resultados y durabilidad de emisiones con presupuesto temporal.
 Siguiente paso: revisar el diseño A con el operador y resolver asignación; luego inventariar el corte aprobado antes de construir.
@@ -180,7 +180,7 @@ Siguiente paso: revisar el diseño A con el operador y resolver asignación; lue
 
 Revisiones previas: metacanon reconsultado sin cambio de blob y listado de frentes sin objeto Auto-observación; rama creada en base exacta. Destino privado comprobado antes de preparar la escritura. Usar commit único del paquete documental, luego recuperar objeto/manifiesto por revisión resultante y comparar hashes; no afirmar readback antes de ejecutarlo.
 
-Pasada 1, fidelidad: U001–U004 preservados; propósito/robustez/nombre/interfaz/persistencia mapeados; propuesta ≠ aprobación; no permisos heredados ni datos de ejemplos. Pasada 2: cotejo local del molde, fuentes, estado y prompts; readback remoto requerido para cerrar persistencia. No se certifica conformidad empírica de modelos ni funcionamiento productivo.
+Pasada 1, fidelidad: U001–U004 preservados; propósito/robustez/nombre/interfaz/persistencia mapeados; propuesta ≠ aprobación; no permisos heredados ni datos de ejemplos. Pasada 2: cotejo local del molde, fuentes, estado y prompts; readback remoto del paquete inicial comprobado en C001.1; no confundir con pruebas funcionales. No se certifica conformidad empírica de modelos ni funcionamiento productivo.
 
 Ante concurrencia, comparar y fusionar sin pisar el otro delta. Nuevas evidencias bajo esta carpeta por clase realmente presente; no directorios vacíos ni copias de secretos. Un manifiesto verifica bytes, no legitimidad o comprensión. A cada paso del desarrollo: actualizar versión/ancla, aceptación, crónica y prompts; enlazar evidencia real. No finalizar el frente por este commit.
 

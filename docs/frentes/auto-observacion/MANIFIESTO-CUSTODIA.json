@@ -1,7 +1,7 @@
 {
   "front": "AUTOOBS-KHORA",
-  "version": "0.1.0",
-  "anchor": "C001/U004",
+  "version": "0.1.1",
+  "anchor": "C001.1",
   "base_commit": "4dca2133866421105f077bbd7079576c588d1169",
   "method": {
     "version": "1.5",
@@ -12,15 +12,18 @@
   "files": [
     {
       "path": "OBJETO-CANONICO.md",
-      "bytes": 28766,
-      "sha256": "622b3b6121190c5363d524ba6fe1b0db9938e5cb7c4d156ebbc965439dfa67a5",
-      "class": "canonical-state"
+      "bytes": 29461,
+      "sha256": "3de0a142cc6e11a2a5441f58e4636e73446680a96dd82783fec7b91584be1d5a"
+    },
+    {
+      "path": "evidencias/LECTURA-C001.json",
+      "bytes": 781,
+      "sha256": "bf06fb8b43e12ee4b92ad0b0e307a154b4893ed3f0b8dcff478bba55c29c044e"
     },
     {
       "path": "originales/INSTRUCCIONES-20261018.txt",
       "bytes": 1492,
-      "sha256": "e7815001456a0852a7073314b5ad2609ec2d74d865399338634d0209dc0b9143",
-      "class": "operator-originals"
+      "sha256": "e7815001456a0852a7073314b5ad2609ec2d74d865399338634d0209dc0b9143"
     }
   ]
 }
