@@ -1,0 +1,83 @@
+{
+  "event": "C026",
+  "main": "81e571deaa46ad9abd0a6b91c5035abe871a8b55",
+  "tested": "2a9a4bd9479499ecdf4a916050690eddfb6dd895",
+  "projectId": "prj_hRN86BKITXYKTnNlp0ygVhaMwFfx",
+  "startedAt": "2026-10-18T19:08:37.980Z",
+  "promoted": true,
+  "identicalTestedTree": true,
+  "origin": "https://github.com/SeryMente/khora.git",
+  "previousDeployment": {
+    "id": "dpl_AMYnsAsyxHDCAdYo72Wx8ovio4XU",
+    "url": "khora-mnxh4vzoo-victorhugotorresmendez-8991s-projects.vercel.app"
+  },
+  "deploy-c026": {
+    "exit": 0,
+    "signal": null,
+    "at": "2026-10-18T19:10:07.812Z"
+  },
+  "success": true,
+  "completedAt": "2026-10-18T19:11:42.022Z",
+  "deployment": {
+    "id": "dpl_7eQpbex6hbt5B3vTmtWhAwMSbE1V",
+    "url": "khora-6ftt0wibl-victorhugotorresmendez-8991s-projects.vercel.app",
+    "readyState": "READY",
+    "target": "production",
+    "projectId": "prj_hRN86BKITXYKTnNlp0ygVhaMwFfx",
+    "gitSha": "81e571deaa46ad9abd0a6b91c5035abe871a8b55"
+  },
+  "promote-c026": {
+    "exit": 0,
+    "signal": null,
+    "at": "2026-10-18T19:11:40.907Z"
+  },
+  "liveVersion": {
+    "commit": "81e571deaa46ad9abd0a6b91c5035abe871a8b55",
+    "rama": "main",
+    "desplegado_desde_git": true,
+    "fuente_commit": "vercel-git",
+    "entorno": "production",
+    "rutas": [
+      "/sistema/custodia",
+      "/api/volcado"
+    ],
+    "ahora": "2026-10-18T19:11:47.742Z"
+  },
+  "smoke": [
+    {
+      "route": "/sistema/ingreso?modo=dialogo",
+      "status": 307,
+      "location": "/api/auth/signin?callbackUrl=%2Fsistema%2Fingreso%3Fmodo%3Ddialogo"
+    },
+    {
+      "route": "/api/transcribir/dialogo",
+      "status": 401,
+      "location": null
+    }
+  ],
+  "aliasDeployment": "dpl_7eQpbex6hbt5B3vTmtWhAwMSbE1V",
+  "canonicalVersion": "0.6.5",
+  "physicalAcceptance": "NOT VERIFIED",
+  "providerTranscription": "NOT VERIFIED",
+  "runtimeCodeChangesAfterRelease": false,
+  "credentialCleanup": {
+    "remainingFiles": [],
+    "ownCliAuthDirectoriesRemoved": true,
+    "otherUserConfigurationsTouched": false,
+    "observedAt": "2026-10-18T19:12:27.9137453Z",
+    "physicalSecureEraseClaim": false
+  },
+  "globalUnitTests": {
+    "pass": 537,
+    "fail": 0
+  },
+  "dialogueTests": {
+    "pass": 24,
+    "fail": 0
+  },
+  "configuredLocalBuild": {
+    "exit": 0,
+    "dialogueRouteCompiled": true,
+    "logSha256": "b8ee1929dc342f177b25a0332e42f32af744a7546b7bbdf87ad7700ec77ae2ba"
+  }
+}

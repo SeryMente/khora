@@ -203,12 +203,6 @@
       "git_blob_sha": "2c01cd91538ea959f07a88b733f1d1dc0048fe62"
     },
     {
-      "path": "OBJETO-CANONICO.md",
-      "bytes": 172615,
-      "sha256": "2b843e5b0b52e4c3b929116baef0836b59366aa460857b5ab4e9005b3992147e",
-      "git_blob_sha": "291c3245f7a0cb09d80916dc154d327b25db0429"
-    },
-    {
       "path": "originales/SIN-EP-C025.md",
       "bytes": 1221,
       "sha256": "32095137433f5a85b4552101e8139cbd244a5e2f76615522458cdbec33e63973",
@@ -219,6 +213,18 @@
       "bytes": 5004,
       "sha256": "c961bf7e524c5fd3b7971e238732648265943cb9eb8325eff5f520f4f261fe8b",
       "git_blob_sha": "5ecdf192f7b9400b2f5446c355401e585d171f39"
+    },
+    {
+      "path": "OBJETO-CANONICO.md",
+      "bytes": 175508,
+      "sha256": "20387a50f10e412557da3862a7de9f539195df29d4735c43599929f716ce0635",
+      "git_blob_sha": "aeb77348c4ed4ddd50ec108a5465b5769c49f2b3"
+    },
+    {
+      "path": "evidencias/RELEASE-C026.json",
+      "bytes": 2379,
+      "sha256": "1e30eaa6641bcdd428a05f5ee12043d67a6522714fa44dbc654435d4bf5bf95e",
+      "git_blob_sha": "3b2517dfcda81f8d9f0b7dd66c7d64b98b8be3ff"
     }
   ],
   "runtime_references": [
@@ -325,33 +331,18 @@
     "no_secret_values_in_manifest": true
   },
   "current_preparation": {
-    "version": "0.6.4",
-    "baseSha": "4dca2133866421105f077bbd7079576c588d1169",
-    "receipt": "evidencias/SIN-EP-C025.json",
-    "state": "both accounts authorized, complete checkout; explicit resolve-main/live instruction; preserve current production, add dialogue; causal integration correction and final build pending"
+    "version": "0.6.5",
+    "baseSha": "81e571deaa46ad9abd0a6b91c5035abe871a8b55",
+    "receipt": "evidencias/RELEASE-C026.json",
+    "state": "Dialogue main release live verified; physical/authenticated-provider acceptance pending"
   },
-  "latestEvent": "C025 - no EP required; both accounts authorized; scope only dialogue over existing production, no unrelated graph update",
+  "latestEvent": "C026 - dialogue release main live verified; physical acceptance pending",
   "latest_verified_release": {
-    "commit": "c02f5142d7609c35d8a2dc2c549726edc4016f13",
-    "pullRequest": "https://github.com/SeryMente/khora/pull/312",
-    "receipt": "evidencias/CIERRE-MICROFONO-PUBLICADO-20261017.md",
-    "productionObservation": {
-      "url": "https://khora-web.vercel.app/api/version?canon=1792276556617093122",
-      "httpStatus": 200,
-      "serverDate": "Sat, 17 Oct 2026 22:35:56 GMT",
-      "version": {
-        "commit": "c02f5142d7609c35d8a2dc2c549726edc4016f13",
-        "rama": "HEAD",
-        "desplegado_desde_git": true,
-        "entorno": "production",
-        "rutas": [
-          "/sistema/custodia",
-          "/api/volcado"
-        ],
-        "ahora": "2026-10-17T22:35:56.661Z"
-      }
-    },
-    "humanAcceptance": "pending",
-    "productRebuiltThisCycle": false
+    "sha": "81e571deaa46ad9abd0a6b91c5035abe871a8b55",
+    "deploymentId": "dpl_7eQpbex6hbt5B3vTmtWhAwMSbE1V",
+    "url": "https://khora-web.vercel.app",
+    "receipt": "evidencias/RELEASE-C026.json",
+    "observedAt": "2026-10-18T19:11:42.022Z",
+    "physicalAcceptance": false
   }
 }
