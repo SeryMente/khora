@@ -1,0 +1,7 @@
+{
+  "first_passed": 24,
+  "repeat_passed": 24,
+  "expected_missing_engine_stop": true,
+  "source_sha256": "9351e96ecbe1c7299a370fef93dd8984d09399deaf62f72205ea7e7016b62ad1",
+  "secret_values_persisted": false
+}

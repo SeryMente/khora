@@ -3,7 +3,7 @@
 ## 1. Control e identidad
 
 - Identificador propuesto: KHORA-LLAVERO-01. Nombre descriptivo: Llavero · Harmonia; no se afirma ratificado un nombre nuevo.
-- Versión: 0.2, diseño de bóveda portable y segundo factor pendiente de arquitectura. Sello: KHORA-LLAVERO-v0.2.
+- Versión: 0.3, conexión obligatoria aprobada y viabilidad de motores ensayada con datos sintéticos. Sello: KHORA-LLAVERO-v0.3.
 - Ancla: instrucción del operador de iniciar y canonizar este sprint en la conversación del 17 de octubre de 2026, America/Mexico_City; sin hora atribuida al mensaje. Registro documental preparado el 18 de octubre de 2026 UTC.
 - Naturaleza: elemento canónico permanente autorizado por ese encargo; tipo documental 📜. La carpeta es contenedor, no segundo objeto de estado.
 - Propietario: Khora. Custodia: `SeryMente/khora/docs/frentes/llavero-harmonia/OBJETO-CANONICO.md`. Única fuente viva de este frente; no crear otro tablero o canon paralelo.
@@ -12,7 +12,7 @@
 
 ## 2. LEER PRIMERO
 
-Modo: adquisición de gobierno y preparación documental; no ejecución automática de código, cambios de cuentas o decisiones criptográficas. Antes de actuar, recuperar este objeto, el metacanon y las fuentes superiores pertinentes, cotejar revisión, rol, alcance y permiso. Una firma sola no acredita aplicación. Fuente inaccesible significa frescura NO VERIFICADA; bloquear solo la acción dependiente y continuar lo independiente autorizado.
+Modo: adquisición de gobierno y evaluación técnica sintética controlada. No autoriza cuentas, semillas reales, producción ni decisiones de custodia pendientes; ver §8 y anexo E. Antes de actuar, recuperar este objeto, el metacanon y las fuentes superiores pertinentes, cotejar revisión, rol, alcance y permiso. Una firma sola no acredita aplicación. Fuente inaccesible significa frescura NO VERIFICADA; bloquear solo la acción dependiente y continuar lo independiente autorizado.
 
 Precedencia: reglas de plataforma → instrucciones actuales del operador y su Metaprompt Canónico → gobierno del proyecto → metacanon compatible → este objeto. Citas históricas y propuestas no conceden permisos. El alcance concreto de seguridad/interfaz/arquitectura requiere presencia y decisión explícitas del operador conforme al Metaprompt, principios 012 y 013; «Empieza» autoriza iniciar este trabajo documental, no aprobar silenciosamente sus decisiones materiales.
 
@@ -44,11 +44,11 @@ Frescura de adquisición: fuentes recuperadas en este ciclo; próxima ejecución
 
 **De dónde viene:** el operador teme exfiltración del proyecto, pidió cambios de contraseña de Ente Auth y Proton Mail y ahora prioriza un sprint de Llavero en Harmonia. Los cambios de cuenta anteriores no se ejecutaron. El canon de Capa Integración ya describe Llavero y separación entre credenciales y corpus sellado; no se inventa un producto paralelo.
 
-**Dónde está:** preparación documental. No hay gestor nuevo implementado ni protección criptográfica nueva acreditada. La expresión «autenticación biográfica inversa» tiene antecedente canónico: claves derivadas de datos biográficos que el operador ya no puede ver. No sustituir esa definición silenciosamente; resolver su viabilidad y circularidad con el operador.
+**Dónde está:** evaluación técnica sintética de motores existentes, no bóveda de producción. No hay gestor nuevo integrado ni protección nueva acreditada sobre datos del operador. La expresión «autenticación biográfica inversa» tiene antecedente canónico: claves derivadas de datos biográficos que el operador ya no puede ver. No sustituir esa definición silenciosamente; resolver su viabilidad y circularidad con el operador.
 
 **A dónde va:** contraseñas únicas y complejas de al menos 20 caracteres, generadas y custodiadas localmente por un motor maduro, utilizables mediante Harmonia en servicios explícitos, con recuperación ensayada y límites transparentes. La relación con autobiografía queda definida y aprobada sin hacer del corpus extraíble el único secreto.
 
-**Qué cambió:** la intención se convierte en frente documental con requisito autobiográfico puntual, modelo de amenaza, compuertas y aceptación. No cambia el software ni las credenciales existentes.
+**Qué cambió:** se aprobó conexión obligatoria con segundo factor en cada apertura, sin acceso offline alternativo, y se ejecutó un ensayo reproducible con age y OpenBao; detalle, evidencia y límites en anexo E y evaluacion/. No cambia el software de producción ni las credenciales existentes.
 
 Incluido: criterio de candidatos autobiográficos; comparación de integración madura; diseño de generación/custodia/recuperación; adaptador de autocompletado; pruebas sintéticas; incorporación gradual posterior por cuenta. Destinos iniciales: Ente Auth web, Gmail/Google, Proton Mail y GitHub; identidades, modos de cuenta y orígenes exactos por verificar antes de programar adaptadores.
 
@@ -58,7 +58,7 @@ Objetivo terminal del sprint de producto: motor e interfaz aprobados, implementa
 
 ## 5. Roles y colaboración
 
-El método base nombra Claudia como asistente y Samantha como constructor; no se inventa una sesión activa de Claudia ni se atribuye su revisión. El usuario identifica a este agente como Samantha. Esta entrega es canonización documental por Samantha, sin construcción de código ni segundo agente. Cualquier reasignación posterior requiere declaración explícita, no inferencia por proveedor/modelo.
+El método base nombra Claudia como asistente y Samantha como constructor; no se inventa una sesión activa de Claudia ni se atribuye su revisión. El usuario identifica a este agente como Samantha. La creación fue documental por Samantha; la revisión actual añade un arnés de evaluación sintética, sin implementación de producto ni segundo agente. Cualquier reasignación posterior requiere declaración explícita, no inferencia por proveedor/modelo.
 
 - Operador: decisiones de seguridad, recuperación, arquitectura y experiencia; selección privada/ratificación de candidatos; autorización individual de cambios de cuenta.
 - Asistencia, cuando se instancie: adquirir fuentes, revisar evidencia, mantener este único estado y emitir la respuesta útil al constructor. Único rol potencialmente habilitable para acceso remoto necesario y autorizado.
@@ -72,37 +72,37 @@ El método base nombra Claudia como asistente y Samantha como constructor; no se
 | Iniciar y crear objeto canónico de este sprint | Autorización explícita actual del operador |
 | Llavero dentro de Harmonia y corpus/credenciales separados | Antecedente canónico recuperado; estado técnico vigente no demostrado por el antecedente |
 | Criterio autobiográfico del anexo B | Propuesta puntual solicitada; no selección de hechos reales ni prueba de entropía |
-| Secretos aleatorios y factor independiente del corpus | Recomendación de seguridad; arquitectura material pendiente de aprobación |
+| Custodia cifrada separada del corpus y dependencia de autorización en línea por apertura | Perímetro aprobado por el operador; custodia, motor productivo y recuperación pendientes; anexo E |
 | Elegir motor, esquema criptográfico, custodia, recuperación y permisos de extensión | Pendiente de decisión en persona del operador antes de construir |
 | Modificar código, integrar en main, desplegar o rotar una cuenta | No ejecutado; bloqueado hasta cumplir aprobaciones y aceptación aplicables |
 | Reescribir cánones previos para reconciliar contradicciones | No autorizado por esta entrega; elevar delta concreto |
 
-Decisión material inmediata solicitada al cierre: aprobar o no que la biografía sea una capa auxiliar y nunca el único secreto capaz de regenerar credenciales, con motor maduro independiente. Si el operador exige derivación exclusivamente del corpus, registrar incompatibilidad con resistir su exfiltración; no implementarla bajo la etiqueta de protección robusta.
+Checkpoint histórico de creación, sustituido por §8 y anexo E: separar biografía y secreto criptográfico independiente. No volver a pedir la decisión de conectividad ya aprobada. Si el operador exige derivación exclusivamente del corpus, registrar incompatibilidad con resistir su exfiltración; no implementarla bajo la etiqueta de protección robusta.
 
 ## 7. Perfil de entorno
 
 - Entorno observado: herramientas de GitHub autenticadas y sandbox de documentación; repositorio privado con permiso de escritura reportado por el conector.
-- Equipo actual del operador, ubicación física, sistema operativo, perfil de Chrome, sesión local y persistencia de un gestor: NO VERIFICADOS; no necesarios para este documento.
+- Equipo conectado: Windows 11 Pro, declarado por el operador como computadora de renta. No se autoriza custodiar ni descifrar allí el corpus. Las comprobaciones remotas previas fueron diagnósticas; esta evaluación se ejecuta únicamente en sandbox Linux.
 - No se presupone que sandbox o navegador del agente sean el dispositivo confiable del usuario. No enviar secretos reales a ellos.
 - Producción, permisos efectivos de Harmonia, versión desplegada, corpus íntegro actual y configuración de proveedores: NO VERIFICADOS para aceptación de este sprint.
 - El conector Khora respondió en la investigación previa del mismo hilo con rechazo de credencial upstream; no se recuperó todo el corpus. No confundir acceso a algunos cánones con inventario completo de activos.
-- Remote Desktop Commander: no utilizado para este sprint; no necesario. Ninguna cuenta/equipo ni permiso previo se hereda.
+- Remote Desktop Commander: no usado en la evaluación actual; diagnóstico previo registrado sin leer archivos personales ni alterar cifrado. Ninguna cuenta/equipo ni permiso previo se hereda.
 
 ## 8. Estado vivo
 
-**Acción actual:** incorporar el mandato de bóveda descargable de Khora y registro de Khora en Ente Auth para segundo factor en cada apertura. Requisito documentado; no hay bóveda, registro ni control nuevos implementados.
+**Acción actual:** conexión obligatoria por apertura y segundo factor Ente Auth aprobados, sin desbloqueo offline alternativo. Evaluación real y aislada de OpenBao 2.7.1 y age 1.3.2 completada sobre archivo e identidades sintéticos: 24 comprobaciones aprobadas en dos corridas independientes, más prueba negativa de motor ausente. No hay cliente de bóveda, alta real Ente, servicio productivo ni corpus real procesado.
 
-**Siguiente paso atómico:** decidir si cada apertura requerirá conexión a un verificador externo al archivo descargable. Sin esa dependencia, un archivo local y modificable no puede acreditar que su pantalla de segundo factor sea una barrera criptográfica no eludible. Después verificar motor maduro compatible y proponer custodia/recuperación concreta antes de construir seguridad.
+**Siguiente paso atómico:** decidir custodia productiva del servicio separado de autorización: propietario/administradores, alojamiento y costo autorizado, respaldo y recuperación. Recomendación técnica candidata: OpenBao para segundo factor y liberación restringida de material, age para archivo cifrado; no elegir alojamiento ni crear gasto por inferencia. Su administrador puede acceder al material descifrable; no es arquitectura de conocimiento cero.
 
 Pendientes en secuencia:
-1. Aprobar o rechazar conexión obligatoria por apertura y ausencia de apertura offline alternativa; definir qué componente conserva material imprescindible y qué confianza recibe. No se ha autorizado entregar claves maestras al servidor actual.
-2. Comparar motores maduros y registrar formatos, cifrado autenticado, derivación, actualización y distribución verificable; no inventar criptografía.
-3. Diseñar alta y confirmación de Ente Auth, almacenamiento protegido del secreto verificador, limitación de intentos, rechazo de reutilización, autorización breve ligada a bóveda y sesión, recuperación y revocación. Códigos, semillas y claves reales fuera de agente, Git y registros.
-4. Construir y probar únicamente arquitectura aprobada con datos sintéticos; verificar que omitir la interfaz no permite obtener el material imprescindible para descifrar. Descargar solo criptograma no equivale a autorizar apertura.
-5. Verificar recuperación y controles, revisar seguridad/interfaz, pilotar en dispositivo confiable; no abrir Takeout real en equipo de renta. Después continuar autocompletado de Harmonia por cuenta autorizada.
-6. Integrar el núcleo local de Línea Autobiográfica de Grado Forense con originales, derivados y juicio separados; nunca convertir automáticamente recuerdos en la única fuente de claves.
+1. Aprobar ubicación y confianza del custodio (y presupuesto si requiere servicio nuevo); aún no hay endpoint productivo de OpenBao designado/verificado ni permiso para alojar claves en el servidor actual.
+2. Revisar recuperación y administración: respaldo cifrado, control de root/unseal, restauración probada, cambios de segundo factor y ausencia de vía offline que contradiga el requisito.
+3. Construir adaptador y cliente aprobados; autenticación primaria de Khora, alta privada de Ente, permisos por cuenta/bóveda, límites distribuidos por cuenta y origen, carreras/reinicio, transporte cifrado con certificado válido y registros sin secretos. El arnés de investigación no es ese adaptador.
+4. Integrar custodia local reutilizando el mecanismo cifrado existente sin crear otra entrada paralela del Entorno Persistente ni lanzar su despliegue automático. Verificar descarga directa en destino protegido y procesamiento de archivos grandes sin memoria no acotada.
+5. Revisar interfaz, seguridad y recuperación; piloto en dispositivo confiable, nunca descifrado real en el equipo de renta. Después continuar autocompletado de Harmonia por cuenta autorizada.
+6. Integrar Línea Autobiográfica de Grado Forense con originales, derivados y juicio separados; no usar recuerdos como única fuente de claves.
 
-**En prueba / recién fallido:** sin pruebas de producto, alta Ente Auth ni código nuevo ejecutado. El equipo conectado fue declarado de renta por el operador; no es destino autorizado para descifrar corpus real.
+**En prueba / recién fallido:** ensayo sintético Linux aprobado con motores reales; no prueba Windows, QR de Ente, archivo grande, despliegue, copia de seguridad ni restauración productiva. Motor ausente aborta con código de salida 2, como prueba negativa prevista.
 
 **Recordatorios latentes:** no dar por perdido el proyecto sin evidencia; los volcados previos se consideran exfiltrados por premisa del operador, no por demostración; no bloquear lecturas temporalmente; proteger futuro no revoca copias anteriores; separar contraseñas de semillas de segundo factor; no rotar sin recuperación; no registrar biografía/credenciales en Git; no abrir corpus en equipo no confiable; autenticación no protege texto claro frente al anfitrión; resolver linaje BBX-2/3/4 y circularidad sin reescritura silenciosa; tarjetas históricas no accesibles. Las tablas de autoridad iniciales se leen junto al delta explícito del anexo D: no son negación del permiso documental posterior ni aprobación tácita de arquitectura.
 
@@ -162,13 +162,13 @@ Dos prompts completos para roles separados, sin afirmar que existen dos sesiones
 ### Asistencia
 
 ```text
-Retoma Khora · Llavero/Harmonia como asistencia. Lee el Metaprompt Canónico https://app.notion.com/p/dd6ade27f22c83d1b7da819dfa59e40d y el método https://github.com/SeryMente/metodologia/blob/main/METACANON-OBJETOS-CANONICOS.md ; adquiere fuentes, comprueba revisión y precedencia, no solo firmas. Lee el único objeto https://github.com/SeryMente/khora/blob/docs/llavero-harmonia-20261018/docs/frentes/llavero-harmonia/OBJETO-CANONICO.md completo. Referencia adquirida al crear: Metacanon 1.5 · METACANON-OBJETOS-v1.5; objeto KHORA-LLAVERO-v0.2; decisión vigente: anexo D y §8, no repetir como pendiente el checkpoint histórico de creación. Comprueba ambos en vivo, calcula delta y actualiza solo lo compatible; fuente inaccesible = frescura NO VERIFICADA. Cita literalmente Acción actual, Siguiente paso atómico y En prueba / recién fallido de §8; conserva pendientes y recordatorios. Distingue propuesta, autorización y evidencia. No inventes constructor activo ni pruebas. Antes de construir exige las aprobaciones de §6; mientras tanto ejecuta solo documentación independiente autorizada. Prioriza toda salida real del constructor y entrega un prompt de respuesta útil. Presenta los diez campos de §10, siempre «Metacanon adquirido:» con versión, sello, revisión y frescura. Remote Desktop Commander solo para asistencia cuando sea imprescindible y esté autorizado y vinculado al equipo actual; repo/sandbox bastan ahora, no lo uses. No registres secretos ni biografía, no cambies cuentas, no hagas merge ni despliegue. Relee, fusiona sin colisiones, guarda el único objeto y verifica lectura de vuelta conforme a §13.
+Retoma Khora · Llavero/Harmonia como asistencia. Lee el Metaprompt Canónico https://app.notion.com/p/dd6ade27f22c83d1b7da819dfa59e40d y el método https://github.com/SeryMente/metodologia/blob/main/METACANON-OBJETOS-CANONICOS.md ; adquiere fuentes, comprueba revisión y precedencia, no solo firmas. Lee el único objeto https://github.com/SeryMente/khora/blob/docs/llavero-harmonia-20261018/docs/frentes/llavero-harmonia/OBJETO-CANONICO.md completo. Referencia adquirida al crear: Metacanon 1.5 · METACANON-OBJETOS-v1.5; objeto KHORA-LLAVERO-v0.3; decisión vigente: anexo E y §8; conexión obligatoria ya aprobada, no volver a pedirla. Comprueba ambos en vivo, calcula delta y actualiza solo lo compatible; fuente inaccesible = frescura NO VERIFICADA. Cita literalmente Acción actual, Siguiente paso atómico y En prueba / recién fallido de §8; conserva pendientes y recordatorios. Distingue propuesta, autorización y evidencia. No inventes constructor activo ni pruebas. Antes de construir exige las aprobaciones de §6; mientras tanto ejecuta solo documentación independiente autorizada. Prioriza toda salida real del constructor y entrega un prompt de respuesta útil. Presenta los diez campos de §10, siempre «Metacanon adquirido:» con versión, sello, revisión y frescura. Remote Desktop Commander solo para asistencia cuando sea imprescindible y esté autorizado y vinculado al equipo actual; repo/sandbox bastan ahora, no lo uses. No registres secretos ni biografía, no cambies cuentas, no hagas merge ni despliegue. Relee, fusiona sin colisiones, guarda el único objeto y verifica lectura de vuelta conforme a §13.
 ```
 
 ### Construcción
 
 ```text
-Retoma Khora · Llavero/Harmonia como construcción, sin asumir aprobación de diseño. Lee el Metaprompt Canónico https://app.notion.com/p/dd6ade27f22c83d1b7da819dfa59e40d y el método https://github.com/SeryMente/metodologia/blob/main/METACANON-OBJETOS-CANONICOS.md ; adquiere fuentes, comprueba revisión y precedencia, no solo firmas. Lee completo https://github.com/SeryMente/khora/blob/docs/llavero-harmonia-20261018/docs/frentes/llavero-harmonia/OBJETO-CANONICO.md y AGENTS.md vigente. Referencia adquirida al crear: Metacanon 1.5 · METACANON-OBJETOS-v1.5; objeto KHORA-LLAVERO-v0.2; decisión vigente: anexo D y §8, no repetir como pendiente el checkpoint histórico de creación. Comprueba ambos en vivo, calcula delta y aplica solo reglas compatibles; fuente inaccesible = frescura NO VERIFICADA. Cita literalmente Acción actual, Siguiente paso atómico y En prueba / recién fallido de §8; conserva pendientes y recordatorios. Respeta §6: no construir seguridad/interfaz/arquitectura sin revisión y decisión explícita del operador. El siguiente checkpoint es esa decisión y después comparación de motores, no código aplicado por inferencia. Remote Desktop Commander te está prohibido para todo fin, directa o indirectamente; si algo imprescindible exige equipo, informa a asistencia, no delegues una elusión. No derives contraseñas solo del corpus; no generes secretos en chat ni copies biografía; trabaja con datos sintéticos cuando el diseño se autorice. Registra fallos reales, evidencia y límites, nunca éxito simulado. No cambies cuentas, hagas merge o despliegue sin compuertas específicas. Entrega los diez campos de §10 con «Metacanon adquirido:» versión/sello/revisión/frescura, checkpoint, pruebas reales y delta del objeto. Un escritor de código y consolidación documental secuencial con relectura; no otro canon paralelo.
+Retoma Khora · Llavero/Harmonia como construcción, sin asumir aprobación de diseño. Lee el Metaprompt Canónico https://app.notion.com/p/dd6ade27f22c83d1b7da819dfa59e40d y el método https://github.com/SeryMente/metodologia/blob/main/METACANON-OBJETOS-CANONICOS.md ; adquiere fuentes, comprueba revisión y precedencia, no solo firmas. Lee completo https://github.com/SeryMente/khora/blob/docs/llavero-harmonia-20261018/docs/frentes/llavero-harmonia/OBJETO-CANONICO.md y AGENTS.md vigente. Referencia adquirida al crear: Metacanon 1.5 · METACANON-OBJETOS-v1.5; objeto KHORA-LLAVERO-v0.3; decisión vigente: anexo E y §8; conexión obligatoria ya aprobada, no volver a pedirla. Comprueba ambos en vivo, calcula delta y aplica solo reglas compatibles; fuente inaccesible = frescura NO VERIFICADA. Cita literalmente Acción actual, Siguiente paso atómico y En prueba / recién fallido de §8; conserva pendientes y recordatorios. Respeta §6: no construir seguridad/interfaz/arquitectura sin revisión y decisión explícita del operador. El siguiente checkpoint es custodia/alojamiento/recuperación de §8; la evaluación sintética ya realizada no aprueba implementación productiva por inferencia. Remote Desktop Commander te está prohibido para todo fin, directa o indirectamente; si algo imprescindible exige equipo, informa a asistencia, no delegues una elusión. No derives contraseñas solo del corpus; no generes secretos en chat ni copies biografía; trabaja con datos sintéticos cuando el diseño se autorice. Registra fallos reales, evidencia y límites, nunca éxito simulado. No cambies cuentas, hagas merge o despliegue sin compuertas específicas. Entrega los diez campos de §10 con «Metacanon adquirido:» versión/sello/revisión/frescura, checkpoint, pruebas reales y delta del objeto. Un escritor de código y consolidación documental secuencial con relectura; no otro canon paralelo.
 ```
 
 ## 13. Persistencia y revisión
@@ -260,3 +260,57 @@ Procedencia: misma conversación primaria de §11; orden posterior al anexo A. N
 ### Criterio de cierre del delta
 
 Documento con original, estado y permisos coherentes; guardado y relectura exacta. Esto solo acredita actualización del requisito. Producto pendiente: elección y aprobación de arquitectura, integración madura, pruebas negativas de bypass/reutilización/límites/recuperación, revisión de seguridad y piloto real voluntario en equipo confiable. El plazo de implementación no es estimable sin arquitectura/motor; el siguiente hito depende de una decisión material sobre conectividad y custodia.
+
+
+## Anexo E. Aprobación de conexión y evaluación sintética verificable
+
+### Decisión primaria y alcance
+
+Pregunta previa de Samantha: «¿Apruebas que la bóveda sea descargable, pero que cada apertura requiera conexión y autorización con Ente Auth, sin desbloqueo alternativo fuera de línea?»
+
+Respuesta literal del operador:
+
+```text
+Si.
+```
+
+Esto aprueba conexión obligatoria, Ente Auth por apertura y ausencia de alternativa offline. No aprueba un proveedor, gasto, envío de corpus ni custodia productiva de claves. Sustituye exclusivamente la condición pendiente de conectividad del anexo D; sus otros límites permanecen.
+
+### Reutilización y alternativas
+
+- Bitwarden: su documentación distingue login y unlock; el segundo factor no se exige al desbloquear una sesión iniciada y admite acceso offline. No satisface por sí solo este requisito de cada apertura. Sigue siendo candidato para custodia de credenciales del Llavero, no solución demostrada para esta bóveda documental.
+- Cryptomator Hub: integra autenticación externa y cliente de archivos cifrados, pero su guía permite sesión ya iniciada y documenta recuperación fuera de Hub. No se acreditó el requisito estricto sin adaptación y revisión. No se inventa una ausencia de capacidad.
+- OpenBao: motor existente con Login MFA, secretos de identidad, políticas y Transit; candidato ensayado, no servidor de producción elegido. age: formato/cifrador de archivos existente, candidato ensayado, no criptografía propia. No se sustituye el gestor de contraseñas por un cifrador de documentos.
+- Entorno Persistente: se leyó AGENTS.md y ep-medio-architectura.md desde main 4dca2133866421105f077bbd7079576c588d1169. Ya existe contenedor BitLocker y entrada única. No se duplica ni se ejecuta: su arranque implica despliegue de main y no es apropiado iniciarlo solo para este ensayo. No se modificó su estructura ni manifiesto.
+
+### Ensayo ejecutado
+
+Implementación de investigación en evaluacion/openbao-smoke.py. El script inicia OpenBao en modo dev exclusivamente en loopback y memoria, crea identidades/secretos aleatorios sintéticos, aplica MFA y política por clave, cifra un archivo artificial con age y envuelve su identidad privada mediante Transit. El secreto sintético viaja por entrada estándar a age, no por argumentos ni un archivo de identidad. Solo el criptograma temporal toca disco; se elimina al terminar. No se lee Takeout ni otros datos del operador. El proceso servidor se detiene en finally.
+
+Resultado: **24 comprobaciones aprobadas**, repetidas en otra instancia limpia, más aborto esperado al faltar el motor. Datos completos sanitizados en synthetic-evidence.json, repeat-evidence.json, negative-evidence.json y verification.json. La cifra cuenta comprobaciones, no escenarios independientes ni una auditoría de seguridad.
+
+Comprobado en ese entorno: archivo no abre con identidad incorrecta; contraseña sola no entrega token; código incorrecto/vencido no autoriza; código correcto permite una liberación; identidad liberada abre realmente el archivo sintético; modificación del criptograma produce rechazo; token de un uso no permite segunda liberación; solicitud y código ya usados no reautorizan; token vencido no libera; permiso para una clave no permite otra; agotamiento del presupuesto de intentos rechaza incluso un código correcto para esa solicitud.
+
+No comprobado: interfaz real de Ente, permisos de app, autenticación primaria real de Khora, límites por cuenta/IP entre solicitudes y réplicas, carreras simultáneas, reinicio/almacenamiento durable, transporte productivo con certificados, Windows, sandbox del cliente, memoria de archivos grandes, descarga autenticada de Google, promoción atómica de salida validada, copia de seguridad, restauración, disponibilidad y revocación en producción. En particular, una salida de descifrado parcialmente producida nunca debe promoverse si falla la autenticación final del archivo.
+
+### Confianza y bloqueos
+
+El custodio OpenBao recibe la identidad de age para envolverla y puede recuperarla; su administrador también puede hacerlo. No se promete conocimiento cero ni que ese servicio sea incapaz de descifrar un corpus cuya copia obtuviera. No se transmitió corpus real al servicio sintético. Seleccionar su alojamiento, controles administrativos, respaldo y recuperación es una decisión de seguridad material aún pendiente.
+
+Las autorizaciones online no impiden que un equipo malicioso conserve la identidad o el contenido entregado en una apertura válida. El control se exige en el cliente cooperante y para futuras liberaciones del servidor; no revoca una capacidad de descifrado ya copiada. No abrir corpus real en equipo de renta.
+
+Modo dev y HTTP loopback solo son adecuados para esta prueba sintética, no para producción. Los binarios oficiales descargados coincidieron con los digests publicados en los metadatos de sus releases por HTTPS; no se verificó de forma independiente la firma del editor. No distribuir esos binarios como cliente de Khora ni declarar cadena de suministro auditada.
+
+### Fuentes oficiales y evidencia
+
+- https://bitwarden.com/en-gb/help/setup-two-step-login-authenticator/
+- https://bitwarden.com/blog/configuring-bitwarden-clients-for-offline-access/
+- https://docs.cryptomator.org/hub/user-guide/access-vault
+- https://docs.cryptomator.org/hub/vault-management
+- https://openbao.org/docs/auth/login-mfa/
+- https://openbao.org/docs/api/auth/userpass/
+- https://openbao.org/docs/api/secret/identity/mfa/totp/
+- https://openbao.org/docs/api/secret/transit/
+- https://github.com/FiloSottile/age/blob/main/cmd/age/age.go
+
+El anexo E es la referencia actual sobre aprobación y ensayo; las secciones de creación conservan antecedentes, no resultados de producto nuevos. Hito de evaluación cerrado en este ciclo; la puesta en uso sigue bloqueada por custodia/alojamiento y por el piloto en equipo confiable. No hay plazo productivo defendible antes de resolverlos.

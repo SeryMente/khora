@@ -1,0 +1,117 @@
+{
+  "scope": "SYNTHETIC_ENGINE_EVALUATION_ONLY",
+  "production_changed": false,
+  "real_corpus_read": false,
+  "tests": [
+    {
+      "name": "downloaded_file_without_correct_identity_cannot_decrypt",
+      "passed": true
+    },
+    {
+      "name": "portable_ciphertext_does_not_contain_plain_key",
+      "passed": true
+    },
+    {
+      "name": "without_authentication_no_key_release",
+      "passed": true
+    },
+    {
+      "name": "primary_factor_alone_has_no_access_token_wrong",
+      "passed": true
+    },
+    {
+      "name": "wrong_code_has_no_access_token",
+      "passed": true
+    },
+    {
+      "name": "primary_factor_alone_has_no_access_token_success",
+      "passed": true
+    },
+    {
+      "name": "valid_password_and_otp_issue_one_use_token",
+      "passed": true
+    },
+    {
+      "name": "short_token_lifetime",
+      "passed": true
+    },
+    {
+      "name": "authorized_unwrap_matches_original_key",
+      "passed": true
+    },
+    {
+      "name": "online_authorization_unlocks_actual_encrypted_file",
+      "passed": true
+    },
+    {
+      "name": "tampered_file_is_rejected",
+      "passed": true
+    },
+    {
+      "name": "used_token_cannot_open_again",
+      "passed": true
+    },
+    {
+      "name": "same_mfa_request_cannot_be_replayed",
+      "passed": true
+    },
+    {
+      "name": "primary_factor_alone_has_no_access_token_success",
+      "passed": true
+    },
+    {
+      "name": "used_otp_cannot_authorize_new_request",
+      "passed": true
+    },
+    {
+      "name": "primary_factor_alone_has_no_access_token_isolation",
+      "passed": true
+    },
+    {
+      "name": "token_for_a_cannot_unwrap_b",
+      "passed": true
+    },
+    {
+      "name": "primary_factor_alone_has_no_access_token_expiry",
+      "passed": true
+    },
+    {
+      "name": "expired_unused_token_cannot_open",
+      "passed": true
+    },
+    {
+      "name": "primary_factor_alone_has_no_access_token_attempts",
+      "passed": true
+    },
+    {
+      "name": "repeated_invalid_codes_never_release_token",
+      "passed": true
+    },
+    {
+      "name": "valid_code_denied_after_attempt_budget_exhausted",
+      "passed": true
+    },
+    {
+      "name": "primary_factor_alone_has_no_access_token_replay",
+      "passed": true
+    },
+    {
+      "name": "stale_code_cannot_authorize",
+      "passed": true
+    }
+  ],
+  "limits": [
+    "OpenBao dev mode is not production deployment",
+    "No real Ente enrollment or desktop client tested",
+    "Only small synthetic file encrypted; no large-file storage, backup or restore certified",
+    "Service administrator can decrypt transit material; not zero-knowledge",
+    "Authorized malicious host can retain released material",
+    "Release binary digest checked; publisher signature not independently checked"
+  ],
+  "file_engine": "v1.3.2",
+  "engine": "2.7.1",
+  "result": "PASSED_SYNTHETIC_ENGINE_EVALUATION",
+  "server_stopped": true,
+  "passed": 24,
+  "total": 24
+}

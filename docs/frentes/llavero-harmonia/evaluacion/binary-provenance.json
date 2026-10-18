@@ -1,0 +1,7 @@
+{
+  "version": "v2.7.1",
+  "source": "https://github.com/openbao/openbao/releases/download/v2.7.1/openbao_2.7.1_linux_amd64.tar.gz",
+  "sha256": "0e2f1ce10d124e03112b50dd2fbec6b78003783253bc3a91587938f39d1e2243",
+  "verification": "Matches digest in GitHub official release metadata over HTTPS; publisher signature not independently verified",
+  "scope": "SYNTHETIC_EVALUATION_ONLY"
+}

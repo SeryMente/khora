@@ -1,0 +1,19 @@
+{
+  "scope": "SYNTHETIC_ENGINE_EVALUATION_ONLY",
+  "production_changed": false,
+  "real_corpus_read": false,
+  "tests": [],
+  "limits": [
+    "OpenBao dev mode is not production deployment",
+    "No real Ente enrollment or desktop client tested",
+    "Only small synthetic file encrypted; no large-file storage, backup or restore certified",
+    "Service administrator can decrypt transit material; not zero-knowledge",
+    "Authorized malicious host can retain released material",
+    "Release binary digest checked; publisher signature not independently checked"
+  ],
+  "result": "SAFE_STOP",
+  "failure": "SAFE_STOP:ENGINE_BINARY_MISSING",
+  "server_stopped": true,
+  "passed": 0,
+  "total": 0
+}
