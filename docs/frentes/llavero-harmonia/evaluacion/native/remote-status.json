@@ -1,0 +1,21 @@
+{
+  "commit": "8ff648166b166e55d0eceec99096f92b8a93ec9b",
+  "source": "GitHub pull_request_read get_status/get_check_runs",
+  "combinedStatus": "failure",
+  "vercel": {
+    "contexts": 5,
+    "description": "Cannot deploy from a private GitHub organization repository on the Hobby plan"
+  },
+  "netlify": "Deploy Preview failed.",
+  "checkRuns": {
+    "httpStatus": 403,
+    "description": "Resource not accessible by personal access token",
+    "retry": false
+  },
+  "draft": true,
+  "merged": false,
+  "manualDeploymentExecuted": false,
+  "privateRepositoryMadePublic": false,
+  "billingChanged": false,
+  "limit": "Automatic deployment route observed is blocked; no claim that an authorized manual deployment is impossible."
+}
