@@ -40,6 +40,7 @@ export async function POST(req:Request){
  }catch{return NextResponse.json({code:'NORMATIVE_TURN_REQUIRED'},{status:409});}
  try{
   const repo=blogRepository();
+  if(body.action==='resume')return NextResponse.json(await repo.resume(actor,body.publicationId),{headers:{'Cache-Control':'no-store'}});
   if(body.action==='prepare'){
    const r=body.revision as Revision;const digest=revisionHash(r);
    await repo.save(actor,r,body.expectedRevision??null);

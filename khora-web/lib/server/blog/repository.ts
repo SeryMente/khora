@@ -57,6 +57,10 @@ export class BlogRepository {
       const s=await this.source(c,actor,r.sourceId,r.sourceVersion);
       const a=approve(r,actor,s,new Date().toISOString(),obfuscatedExposure);
       if(a.digest!==expectedDigest)throw new Error('APPROVAL_CONFLICT');
+      // Refusal cancelled unsent receipts. Approval must not succeed with an inert outbox.
+      // Require a new exact preview rather than implicitly resurrecting cancelled work.
+      const cancelled=await c.query("SELECT 1 FROM blog_delivery WHERE editorial_id=$1 AND revision=$2 AND state='cancelled'",[id,r.revision]);
+      if(cancelled.rows.length)throw new Error('CANCELLED_REVISION_REQUIRES_NEW_PREVIEW');
       await c.query("UPDATE blog_editorial SET approval_cipher=$2,export_snapshot=$3::jsonb,approved_digest=$4,ever_approved=true,consent='approved', changed_seq=DEFAULT,updated_at=now() WHERE id=$1",[id,this.cipher.encrypt(canonical(a)),canonical(r.entry),a.digest]);
       for(const target of ['blog','facebook']){
         await c.query('INSERT INTO blog_delivery(editorial_id,revision,target,digest) VALUES($1,$2,$3,$4) ON CONFLICT DO NOTHING',[id,r.revision,target,a.digest]);
@@ -129,6 +133,23 @@ export class BlogRepository {
     const d=await this.db.query('SELECT revision,target,state,url,proof_hash,last_code FROM blog_delivery WHERE editorial_id=$1 ORDER BY revision,target',[id]);
     const row=q.rows[0],current=d.rows.filter(x=>x.revision===row.revision);
     return {...row,deliveries:d.rows,filter:row.consent==='declined'?'archived_without_permission':current.length===2&&current.every(x=>x.state==='confirmed')?'published_both':row.consent==='approved'?'publication_pending':'awaiting_decision'};
+  }
+  /** Owner-only resume under the SAME authenticated/normative route. No original text,
+   * provider credentials or approval cipher is returned. Source integrity is rechecked. */
+  async resume(actor:string,id:string){
+    return this.transaction(async c=>{
+      const q=await c.query('SELECT payload_cipher FROM blog_editorial WHERE id=$1 AND owner=$2 FOR SHARE',[id,actor]);
+      if(!q.rows.length)throw new Error('EDITORIAL_FORBIDDEN');
+      const revision:Revision=JSON.parse(this.cipher.decrypt(q.rows[0].payload_cipher));
+      const source=await this.source(c,actor,revision.sourceId,revision.sourceVersion);
+      if(source.sha256!==revision.sourceHash||source.obfuscated!==revision.obfuscated)throw new Error('SOURCE_INTEGRITY');
+      revisionCheck(revision);
+      const qStatus=await c.query('SELECT id,revision,consent,obfuscated FROM blog_editorial WHERE id=$1 AND owner=$2',[id,actor]);
+      const d=await c.query('SELECT revision,target,state,url,proof_hash,last_code FROM blog_delivery WHERE editorial_id=$1 ORDER BY revision,target',[id]);
+      const row=qStatus.rows[0];if(!row||row.revision!==revision.revision)throw new Error('EDITORIAL_CONFLICT');
+      const current=d.rows.filter(x=>x.revision===row.revision);
+      return {revision,digest:hash(canonical(revision)),status:{...row,deliveries:d.rows,filter:row.consent==='declined'?'archived_without_permission':current.length===2&&current.every(x=>x.state==='confirmed')?'published_both':row.consent==='approved'?'publication_pending':'awaiting_decision'}};
+    });
   }
   async eligible(actor:string,after:string='0',limit=20){
     if(!actor||!/^\d{1,18}$/.test(after)||!Number.isSafeInteger(limit)||limit<1||limit>100)throw new Error('CURSOR_INVALID');
