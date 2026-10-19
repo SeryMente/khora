@@ -33,7 +33,7 @@ export async function catalogoRecuperacion(req:NextRequest,email:string){
 /** Fork an explicitly selected checkpoint, never overwrite the original session/history. */
 export async function recuperarCheckpoint(req:NextRequest,email:string){
  if(req.headers.get('origin')!==req.nextUrl.origin)return json({error:'origen_no_permitido'},403);
- const parsed=z.object({sourceSessionId:uuid,revisionId:uuid,sessionId:uuid}).strict().safeParse(await req.json().catch(()=>null));
+ const parsed=z.object({sourceSessionId:uuid,revisionId:uuid,sessionId:uuid,archiveSelected:z.literal(true).optional()}).strict().safeParse(await req.json().catch(()=>null));
  if(!parsed.success)return json({error:'seleccion_invalida'},400);
  const p=parsed.data;if(p.sessionId===p.sourceSessionId)return json({error:'sesion_nueva_requerida'},400);
  const c=await getDb().connect();
@@ -48,12 +48,12 @@ export async function recuperarCheckpoint(req:NextRequest,email:string){
  if(original.sessionId!==p.sourceSessionId||original.revisionId!==p.revisionId){await c.query('ROLLBACK');return json({error:'revision_inconsistente'},409);}
  const all=(await c.query(partesSql,[p.sourceSessionId])).rows;
  // Legacy snapshots carry no synchronized cut. Preserve their recorded manifest, never invent alignment.
- const total=original.corteAudio?.hastaParte??(Array.isArray(original.audioPartes)?original.audioPartes.length:0);
+ const total=original.corteAudio?.hastaParte??original.dialogo?.partesEsperadas??original.audioPartesEsperadas??(Array.isArray(original.audioPartes)?original.audioPartes.length:0);
  const parts=all.filter((x:any)=>x.parte<=total);
  if(total>0&&!evaluarCustodiaAudio(parts.map((x:any)=>({part_index:x.parte,bytes:x.bytes,sha256:x.sha256,estado_verificacion:x.verificado?'verificado':'pendiente'})),total).ok){await c.query('ROLLBACK');return json({error:'audio_no_verificado'},409);}
  const existing=await c.query(`SELECT custodia_owner,estado FROM dictado_session WHERE session_id=$1 FOR UPDATE`,[p.sessionId]);
  if(existing.rows.length){
-  if(existing.rows[0].estado==='complete'){await c.query('ROLLBACK');return json({error:'sesion_sellada'},409);}
+  if(existing.rows[0].estado==='complete'&&!p.archiveSelected){await c.query('ROLLBACK');return json({error:'sesion_sellada'},409);}
   const old=await c.query(`SELECT snapshot FROM dictado_checkpoint WHERE session_id=$1 AND usuario=$2 ORDER BY creado_en LIMIT 1`,[p.sessionId,email]);
   const saved=old.rows[0]?JSON.parse(descifrarTexto(old.rows[0].snapshot)):null;
   if(existing.rows[0].custodia_owner!==email||saved?.recuperadaDe?.sessionId!==p.sourceSessionId||saved?.recuperadaDe?.revisionId!==p.revisionId){await c.query('ROLLBACK');return json({error:'conflicto_recuperacion'},409);}

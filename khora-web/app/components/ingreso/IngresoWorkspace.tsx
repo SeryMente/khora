@@ -1,6 +1,6 @@
 "use client";
 import {archivarRecuperada} from "../../../lib/client/archivar-recuperada";
-import {firmaCustodia,luzCustodia} from "../../../lib/custodia/estado";
+import {firmaCustodia,luzCustodia,audioCustodiadoCompleto} from "../../../lib/custodia/estado";
 import {useTituloCaptura} from "../../../lib/client/use-titulo-captura";
 import { CLASIFICACION_INICIAL, clasificacionRecuperada, type ClasificacionEntrada, iniciarIntencion, huellaTexto, type PublicationIntent } from "../../../lib/custodia/editorial";
 import { PublicacionCapturaPendiente } from "./PublicacionCapturaPendiente";
@@ -160,6 +160,7 @@ function IngresoContenido({onDialogo,clasificacion,onClasificacionChange}:{onDia
   const modoEntradaRef = useRef<"ninguno" | "microfono" | "chrome_live_caption">("ninguno");
   const fuenteEntradaSesionRef = useRef<"texto" | "microfono" | "chrome_live_caption" | "audio_archivo" | null>(null);
   const parteConsecutivaRef = useRef<number>(1);
+  const audioFallidoRef=useRef(new Set<number>());
   const partesSubidasRef = useRef<{ parte: number; url: string; bytes: number; fuenteAudio?: "microphone" | "chrome_tab" | "audio_archivo"; nombreOriginal?: string | null; mimeType?: string | null; start_ms?: number; end_ms?: number; duracion_ms?: number; sha256?: string; verificado?: boolean }[]>([]);
   const parteTrozosRef = useRef<Blob[]>([]);
   const parteInicioRef = useRef<number>(0);
@@ -399,17 +400,18 @@ function IngresoContenido({onDialogo,clasificacion,onClasificacionChange}:{onDia
     }
   }, []);
 
+  const firmaActualCustodia=()=>{const v=vistaVivaRef.current;return firmaCustodia({sessionId:sesionIdRef.current,texto:v.texto,parcial:v.parcial,titulo:v.titulo,audioPartes:partesSubidasRef.current,audioPartesEsperadas:Math.max(parteConsecutivaRef.current-1,maximoIndiceConocido(partesSubidasRef.current,partesRawRef.current),parteTrozosRef.current.length?parteConsecutivaRef.current:0),fuenteEntrada:fuenteEntradaSesionRef.current||"texto",tipoEntrada:v.tipoEntrada,ofuscada:v.ofuscada});};
   const guardarCheckpoint = useCallback(async (forzar = false) => {
     if (!ownerRef.current || vistaVivaRef.current.archivado) return;
     if (!sesionIdRef.current) sesionIdRef.current = generarSesionId();
     const v = vistaVivaRef.current;
-    const current: CapturaSnapshot = { sessionId:sesionIdRef.current, ...nuevaRevision(), texto:v.texto, parcial:v.parcial, titulo:v.titulo, tipoEntrada:v.tipoEntrada,ofuscada:v.ofuscada,publicationIntent:publicationIntentRef.current, fuenteEntrada:fuenteEntradaSesionRef.current || "texto", duracionSeg:duracionRef.current, audioPartes:[...partesSubidasRef.current], recuperadaDe:recuperadaDeRef.current };
+    const current: CapturaSnapshot = { sessionId:sesionIdRef.current, ...nuevaRevision(), texto:v.texto, parcial:v.parcial, titulo:v.titulo, tipoEntrada:v.tipoEntrada,ofuscada:v.ofuscada,publicationIntent:publicationIntentRef.current, fuenteEntrada:fuenteEntradaSesionRef.current || "texto", duracionSeg:duracionRef.current, audioPartes:[...partesSubidasRef.current],audioPartesEsperadas:Math.max(parteConsecutivaRef.current-1,maximoIndiceConocido(partesSubidasRef.current,partesRawRef.current),parteTrozosRef.current.length?parteConsecutivaRef.current:0), recuperadaDe:recuperadaDeRef.current };
     if(!current.texto && !current.parcial && !current.audioPartes.length && !activoRef.current) return;
     const signature=firmaCustodia(current);
     if(!forzar && signature===ultimoCheckpointTextoRef.current)return;
     const owner=ownerRef.current;
     const task=(checkpointEnCursoRef.current||Promise.resolve()).catch(()=>undefined).then(async()=>{
-      try { await guardarSnapshotLocal(owner,current);setCustodiaProof(signature);setCustodiaFailure(false);setCustodiaEstado("Conservado en este dispositivo; sincronizando…"); }
+      try { await guardarSnapshotLocal(owner,current);if(firmaActualCustodia()===signature){setCustodiaProof(signature);setCustodiaFailure(false);setCustodiaEstado("Conservado en este dispositivo; sincronizando…");} }
       catch {setCustodiaFailure(true);setCustodiaEstado("ERROR: no se pudo conservar en este dispositivo");setAviso("Falló la custodia local; mantén esta página abierta. Se intentará la copia remota.");}
       try {
         const r=await fetch("/api/dictado/checkpoint",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(current),signal:AbortSignal.timeout(15000)});
@@ -417,7 +419,7 @@ function IngresoContenido({onDialogo,clasificacion,onClasificacionChange}:{onDia
         if(r.status===409&&d.error==="sesion_sellada") {await cerrarSnapshotLocal(owner,current.sessionId);if(sesionIdRef.current===current.sessionId)setArchivado(true);return;}
         if(!r.ok||d.revisionId!==current.revisionId||d.sessionId!==current.sessionId)throw new Error("checkpoint_no_confirmado");
         ultimoCheckpointTextoRef.current=signature;
-        if(sesionIdRef.current===current.sessionId){setCustodiaProof(signature);setCustodiaFailure(false);}
+        if(firmaActualCustodia()===signature){setCustodiaProof(signature);setCustodiaFailure(false);}
         if(sesionIdRef.current===current.sessionId)setCustodiaEstado("Checkpoint confirmado en el servidor");
       }catch {if(sesionIdRef.current===current.sessionId)setCustodiaEstado("Sin confirmación remota; consulta el estado de la copia local");}
     });
@@ -442,7 +444,7 @@ function IngresoContenido({onDialogo,clasificacion,onClasificacionChange}:{onDia
       await escrituraLocalRef.current;
       if(selectedLocal)await guardarSnapshotLocal(ownerRef.current,selectedLocal,true);
       if(!vistaVivaRef.current.archivado&&(initialText||partesSubidasRef.current.length)){
-        const v=vistaVivaRef.current;await guardarSnapshotLocal(ownerRef.current,{sessionId:initialSession,...nuevaRevision(),texto:v.texto,parcial:v.parcial,titulo:v.titulo,tipoEntrada:v.tipoEntrada,ofuscada:v.ofuscada,publicationIntent:publicationIntentRef.current,fuenteEntrada:fuenteEntradaSesionRef.current||"texto",duracionSeg:duracionRef.current,audioPartes:[...partesSubidasRef.current]});
+        const v=vistaVivaRef.current;await guardarSnapshotLocal(ownerRef.current,{sessionId:initialSession,...nuevaRevision(),texto:v.texto,parcial:v.parcial,titulo:v.titulo,tipoEntrada:v.tipoEntrada,ofuscada:v.ofuscada,publicationIntent:publicationIntentRef.current,fuenteEntrada:fuenteEntradaSesionRef.current||"texto",duracionSeg:duracionRef.current,audioPartes:[...partesSubidasRef.current],audioPartesEsperadas:Math.max(parteConsecutivaRef.current-1,maximoIndiceConocido(partesSubidasRef.current,partesRawRef.current),parteTrozosRef.current.length?parteConsecutivaRef.current:0)});
         await guardarCheckpoint(true);
       }
       const dialogCheck=selectedLocal || await fetch("/api/dictado/checkpoint?sessionId="+encodeURIComponent(item.sessionId),{cache:"no-store"}).then(async r=>r.ok?(await r.json()).recovery:null);
@@ -482,7 +484,7 @@ function IngresoContenido({onDialogo,clasificacion,onClasificacionChange}:{onDia
       await guardarSnapshotLocal(ownerRef.current,recovery);
       sesionIdRef.current=recovery.sessionId;recuperadaDeRef.current=recovery.recuperadaDe;
       fuenteEntradaSesionRef.current=recovery.fuenteEntrada;partesSubidasRef.current=recovery.audioPartes as typeof partesSubidasRef.current;partesRawRef.current=[];
-      parteConsecutivaRef.current=maximoIndiceConocido(partesSubidasRef.current,[])+1;
+      parteConsecutivaRef.current=Math.max(recovery.audioPartesEsperadas??recovery.corteAudio?.hastaParte??0,maximoIndiceConocido(partesSubidasRef.current,[]))+1;
       duracionRef.current=recovery.duracionSeg||0;setTitulo(recovery.titulo||"");onClasificacionChange(clasificacionRecuperada(recovery));publicationIntentRef.current=recovery.publicationIntent;
       const recoveredText=textoRecuperable(recovery),segment:SegmentoReconciliado={id:"recovery-"+recovery.sessionId,texto:recoveredText,estado:"pendiente_error"};
       segmentosRef.current=[segment];setSegmentos([segment]);baseDictadoRef.current=[];fragmentosRef.current=[];pendienteRef.current=recoveredText;setPendiente(recoveredText);setParcial("");setTexto(recoveredText);
@@ -498,10 +500,10 @@ function IngresoContenido({onDialogo,clasificacion,onClasificacionChange}:{onDia
     void (async ()=>{
       if(!sesionIdRef.current)sesionIdRef.current=generarSesionId();
       const v=vistaVivaRef.current;if(!v.texto&&!v.parcial&&!partesSubidasRef.current.length)return;
-      const snapshot:CapturaSnapshot={sessionId:sesionIdRef.current,...nuevaRevision(),texto:v.texto,parcial:v.parcial,titulo:v.titulo,tipoEntrada:v.tipoEntrada,ofuscada:v.ofuscada,publicationIntent:publicationIntentRef.current,fuenteEntrada:fuenteEntradaSesionRef.current||"texto",duracionSeg:duracionRef.current,audioPartes:[...partesSubidasRef.current],recuperadaDe:recuperadaDeRef.current};
+      const snapshot:CapturaSnapshot={sessionId:sesionIdRef.current,...nuevaRevision(),texto:v.texto,parcial:v.parcial,titulo:v.titulo,tipoEntrada:v.tipoEntrada,ofuscada:v.ofuscada,publicationIntent:publicationIntentRef.current,fuenteEntrada:fuenteEntradaSesionRef.current||"texto",duracionSeg:duracionRef.current,audioPartes:[...partesSubidasRef.current],audioPartesEsperadas:Math.max(parteConsecutivaRef.current-1,maximoIndiceConocido(partesSubidasRef.current,partesRawRef.current),parteTrozosRef.current.length?parteConsecutivaRef.current:0),recuperadaDe:recuperadaDeRef.current};
       snapshotRef.current=snapshot;
       escrituraLocalRef.current=escrituraLocalRef.current.catch(()=>undefined).then(()=>guardarSnapshotLocal(custodiaOwner,snapshot));
-      void escrituraLocalRef.current.then(()=>{setCustodiaProof(firmaCustodia(snapshot));setCustodiaFailure(false);setCustodiaEstado("Conservado en este dispositivo; confirmación remota pendiente");}).catch(()=>{setCustodiaFailure(true);setCustodiaEstado("ERROR: custodia local no disponible");});
+      void escrituraLocalRef.current.then(()=>{if(firmaActualCustodia()===firmaCustodia(snapshot)){setCustodiaProof(firmaCustodia(snapshot));setCustodiaFailure(false);setCustodiaEstado("Conservado en este dispositivo; confirmación remota pendiente");}}).catch(()=>{setCustodiaFailure(true);setCustodiaEstado("ERROR: custodia local no disponible");});
     })();
     const idleTimer=setTimeout(()=>void guardarCheckpoint(),CHECKPOINT_IDLE_MS);
     return ()=>{clearTimeout(idleTimer);};
@@ -602,9 +604,10 @@ function IngresoContenido({onDialogo,clasificacion,onClasificacionChange}:{onDia
       try {
         await escrituraLocalRef.current.catch(()=>undefined);
         try {await guardarAudioLocal(ownerRef.current,sesionId,parteActual,blob,{upload});localSaved=true;}
-        catch {setError("No se pudo conservar una parte de audio localmente. Mantén abierta la captura; se intentará la copia remota.");}
+        catch {if(sesionIdRef.current===sesionId)setCustodiaFailure(true);setError("No se pudo conservar una parte de audio localmente. Mantén abierta la captura; se intentará la copia remota.");}
         const part=await subirAudioCustodiado(sesionId,parteActual,blob,upload);
         if(sesionIdRef.current===sesionId){
+          audioFallidoRef.current.delete(parteActual);
           partesSubidasRef.current=partesSubidasRef.current.filter(p=>p.parte!==parteActual).concat(part).sort((a,b)=>a.parte-b.parte);
           setPartesContador(partesSubidasRef.current.length);setBytesAcumulados(partesSubidasRef.current.reduce((n,p)=>n+p.bytes,0));setConAudio(true);
         }
@@ -613,7 +616,7 @@ function IngresoContenido({onDialogo,clasificacion,onClasificacionChange}:{onDia
         observarDictado("PARTE_AUDIO_SUBIDA_CONFIRMADA",{outcome:"SUCCESS",attemptId:"parte-"+parteActual,durationMs:Date.now()-uploadStartedAt,metrics:{part_index:parteActual,upload_verified:true,media_part_bytes:blob.size}});
         await confirmarAudioLocal(ownerRef.current,sesionId,parteActual).catch(()=>setCustodiaDetalle("Audio confirmado en servidor; actualización del recibo local pendiente."));
         if(sesionIdRef.current===sesionId&&evaluarAudioRecuperado(partesSubidasRef.current.filter(p=>p.parte<=parteActual),parteActual).ok){
-          const cut:CapturaSnapshot={sessionId:sesionId,...cutRevision,texto:cutView.texto,parcial:cutView.parcial,titulo:cutView.titulo,tipoEntrada:cutView.tipoEntrada,ofuscada:cutView.ofuscada,publicationIntent:publicationIntentRef.current,fuenteEntrada:fuenteEntradaSesionRef.current||"microfono",duracionSeg:endMs/1000,audioPartes:partesSubidasRef.current.filter(p=>p.parte<=parteActual),corteAudio:{hastaParte:parteActual,finMs:endMs},recuperadaDe:recuperadaDeRef.current};
+          const cut:CapturaSnapshot={sessionId:sesionId,...cutRevision,texto:cutView.texto,parcial:cutView.parcial,titulo:cutView.titulo,tipoEntrada:cutView.tipoEntrada,ofuscada:cutView.ofuscada,publicationIntent:publicationIntentRef.current,fuenteEntrada:fuenteEntradaSesionRef.current||"microfono",duracionSeg:endMs/1000,audioPartes:partesSubidasRef.current.filter(p=>p.parte<=parteActual),audioPartesEsperadas:parteActual,corteAudio:{hastaParte:parteActual,finMs:endMs},recuperadaDe:recuperadaDeRef.current};
           // Immutable boundary evidence is additional; a late acknowledgement cannot replace the editor.
           const cutTask=(checkpointEnCursoRef.current||Promise.resolve()).catch(()=>undefined).then(async()=>{
             await guardarSnapshotLocal(ownerRef.current,cut,true);
@@ -623,6 +626,7 @@ function IngresoContenido({onDialogo,clasificacion,onClasificacionChange}:{onDia
           await cutTask.catch(()=>setCustodiaEstado("Audio conservado; punto conjunto pendiente de confirmación"));
         }
       } catch(e) {
+        if(!localSaved&&sesionIdRef.current===sesionId){audioFallidoRef.current.add(parteActual);setCustodiaFailure(true);}
         const failure=e as {httpStatus?:number;reasonCode?:string};
         pendingUploadsRef.current.set(parteActual,ejecutarSubida);setAudioPendiente(pendingUploadsRef.current.size);
         setCustodiaDetalle((localSaved?"Copia local confirmada.":"Copia local NO confirmada; mantén esta pestaña abierta.")+" Última respuesta: "+(failure.httpStatus?"HTTP "+failure.httpStatus:"red o tiempo de espera")+". No se archivará como completo mientras falten confirmaciones.");
@@ -747,6 +751,7 @@ function IngresoContenido({onDialogo,clasificacion,onClasificacionChange}:{onDia
             duracion_ms: Number(data.duracionMs || 0),
           });
           partesSubidasRef.current.sort((a, b) => a.parte - b.parte);
+          parteConsecutivaRef.current=Math.max(parteConsecutivaRef.current,part+1);
           setPartesContador(partesSubidasRef.current.length);
           setBytesAcumulados((total) => total + bytes);
           setConAudio(true);
@@ -806,7 +811,7 @@ function IngresoContenido({onDialogo,clasificacion,onClasificacionChange}:{onDia
           const owner=ownerRef.current,localView={...vistaVivaRef.current};
           escrituraLocalRef.current=escrituraLocalRef.current.catch(()=>undefined).then(async()=>{
             await guardarAudioLocal(owner,sid,index,localBlob,{upload});
-            await guardarSnapshotLocal(owner,{sessionId:sid,...nuevaRevision(),texto:localView.texto,parcial:localView.parcial,titulo:localView.titulo,tipoEntrada:localView.tipoEntrada,ofuscada:localView.ofuscada,publicationIntent:publicationIntentRef.current,fuenteEntrada:"microfono",duracionSeg:Math.max(0,(now-inicioRef.current)/1000),audioPartes:[...partesSubidasRef.current]});
+            await guardarSnapshotLocal(owner,{sessionId:sid,...nuevaRevision(),texto:localView.texto,parcial:localView.parcial,titulo:localView.titulo,tipoEntrada:localView.tipoEntrada,ofuscada:localView.ofuscada,publicationIntent:publicationIntentRef.current,fuenteEntrada:"microfono",duracionSeg:Math.max(0,(now-inicioRef.current)/1000),audioPartes:[...partesSubidasRef.current],audioPartesEsperadas:Math.max(parteConsecutivaRef.current-1,maximoIndiceConocido(partesSubidasRef.current,partesRawRef.current),parteTrozosRef.current.length?parteConsecutivaRef.current:0)});
           });
           void escrituraLocalRef.current.catch(()=>setCustodiaEstado("ERROR: fragmento de audio sin copia local confirmada"));
           const totalSize = parteTrozosRef.current.reduce((sum, chunk) => sum + chunk.size, 0);
@@ -1016,6 +1021,7 @@ function IngresoContenido({onDialogo,clasificacion,onClasificacionChange}:{onDia
     fuenteEntradaSesionRef.current = "microfono";
     setModoEntrada("microfono");
     parteConsecutivaRef.current = 1;
+    audioFallidoRef.current.clear();
     partesSubidasRef.current = [];
     partesRawRef.current = [];
     parteTrozosRef.current = [];
@@ -1489,6 +1495,7 @@ function IngresoContenido({onDialogo,clasificacion,onClasificacionChange}:{onDia
 
     sesionIdRef.current = "";
     parteConsecutivaRef.current = 1;
+    audioFallidoRef.current.clear();
     partesSubidasRef.current = [];
     partesRawRef.current = [];
     parteTrozosRef.current = [];
@@ -1598,6 +1605,7 @@ function IngresoContenido({onDialogo,clasificacion,onClasificacionChange}:{onDia
 
   const generarTituloConIA = async () => {
     if (!texto.trim()) return;
+    const source=texto,session=sesionIdRef.current;
     setGenerandoTitulo(true);
     setError("");
     try {
@@ -1608,7 +1616,7 @@ function IngresoContenido({onDialogo,clasificacion,onClasificacionChange}:{onDia
       });
       const data = await r.json();
       if (r.ok && typeof (data?.title ?? data?.titulo)==="string" && (data.title ?? data.titulo).trim()) {
-        setTitulo(data.title ?? data.titulo);
+        if(sesionIdRef.current===session&&vistaVivaRef.current.texto===source&&!vistaVivaRef.current.archivado)setTitulo(data.title ?? data.titulo);
       } else {
         setError(data.detail || "Error al generar título.");
       }
@@ -1633,7 +1641,7 @@ function IngresoContenido({onDialogo,clasificacion,onClasificacionChange}:{onDia
       state={{
         editorialExtra:<PublicacionCapturaPendiente owner={custodiaOwner} refresh={Number(archivado)+editorialRefresh}/>,
         clasificacion,archivado,finalizando,audioPendiente,custodiaDetalle,
-        custodiaLuz:luzCustodia({archivedReceipt:archivoReceiptVerified,exactSnapshot:custodiaProof===firmaCustodia({sessionId:sesionIdRef.current,texto,parcial,titulo,audioPartes:partesSubidasRef.current,...clasificacion}),audioComplete:audioPendiente===0,inFlight:estado==="dictando"||finalizando||guardando||recuperando,confirmedFailure:custodiaFailure}),
+        custodiaLuz:luzCustodia({archivedReceipt:archivoReceiptVerified,exactSnapshot:custodiaProof===firmaCustodia({sessionId:sesionIdRef.current,texto,parcial,titulo,audioPartes:partesSubidasRef.current,audioPartesEsperadas:Math.max(parteConsecutivaRef.current-1,maximoIndiceConocido(partesSubidasRef.current,partesRawRef.current),parteTrozosRef.current.length?parteConsecutivaRef.current:0),fuenteEntrada:fuenteEntradaSesionRef.current||"texto",...clasificacion}),audioComplete:audioCustodiadoCompleto({fuenteEntrada:fuenteEntradaSesionRef.current||"texto",audioPartes:partesSubidasRef.current,audioPartesEsperadas:Math.max(parteConsecutivaRef.current-1,maximoIndiceConocido(partesSubidasRef.current,partesRawRef.current),parteTrozosRef.current.length?parteConsecutivaRef.current:0)},audioPendiente),inFlight:estado==="dictando"||finalizando||guardando||recuperando,confirmedFailure:custodiaFailure||audioFallidoRef.current.size>0}),
         custodiaEstado,custodiaReady:!!custodiaOwner,custodiaPreparando,recuperando,recuperaciones:recoveryItems.length,stream:streamAudio,
         titulo,
         texto,

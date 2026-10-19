@@ -1,5 +1,5 @@
 "use client";
-import {firmaCustodia,luzCustodia} from "../../../lib/custodia/estado";
+import {firmaCustodia,luzCustodia,audioCustodiadoCompleto} from "../../../lib/custodia/estado";
 import {useTituloCaptura} from "../../../lib/client/use-titulo-captura";
 import { CLASIFICACION_INICIAL, clasificacionRecuperada, type ClasificacionEntrada, type PublicationIntent, iniciarIntencion, huellaTexto } from "../../../lib/custodia/editorial";
 import { useEffect, useRef, useState } from "react";
@@ -49,7 +49,7 @@ export function DialogoPanel({sessionId:requested,onSalir,clasificacion=CLASIFIC
   const raw=useRef<ParteDialogo[]>([]),stored=useRef<ParteGuardada[]>([]),capture=useRef<CapturaDialogo|null>(null);
   const queue=useRef<Promise<void>>(Promise.resolve()),localQueue=useRef<Promise<void>>(Promise.resolve());
   const errorRemote=useRef(false),duration=useRef(0),interrupted=useRef(false),mounted=useRef(true),inProgress=useRef(false);
-  const snapshot=():CapturaSnapshot=>({sessionId:id.current,...nuevaRevision(),texto:textRef.current,parcial:"",titulo:visible.current.title,tipoEntrada:visible.current.tipoEntrada,ofuscada:visible.current.ofuscada,publicationIntent:publicationIntent.current,fuenteEntrada:"dialogo",duracionSeg:duration.current,audioPartes:[...stored.current],dialogo:{...manifest.current,partesEsperadas:manifest.current.partesEsperadas}});
+  const snapshot=():CapturaSnapshot=>({sessionId:id.current,...nuevaRevision(),texto:textRef.current,parcial:"",titulo:visible.current.title,tipoEntrada:visible.current.tipoEntrada,ofuscada:visible.current.ofuscada,publicationIntent:publicationIntent.current,fuenteEntrada:"dialogo",duracionSeg:duration.current,audioPartes:[...stored.current],dialogo:{...manifest.current,etiquetas:{...manifest.current.etiquetas},turnos:manifest.current.turnos.map(t=>({...t})),partesEsperadas:manifest.current.partesEsperadas}});
   const persist=async(remote=true)=>{
     const snap=snapshot();
     localQueue.current=localQueue.current.catch(()=>undefined).then(()=>guardarSnapshotLocal(owner.current,snap));try{await localQueue.current;}catch(e){setCustodiaFailure(true);throw e;}setCustodiaProof(firmaCustodia(snap));setCustodiaFailure(false);
@@ -236,7 +236,7 @@ export function DialogoPanel({sessionId:requested,onSalir,clasificacion=CLASIFIC
     finalizando:busy&&active,organizarComoDialogo,dialogoChrome:true,dialogoSesion:hasSession,chromeStream,stream:micStream,
     chromeBridgeEstado:"captura nativa",chromeCaptionActivo:false,chromeCapturaEstado:active?"grabando":"inactiva",
     archivado:archived,archivoPendiente:!!archivePayload.current&&!archived,custodiaReady:ready,custodiaPreparando:!ready&&!error,
-    custodiaLuz:luzCustodia({archivedReceipt:archivoReceiptVerified,exactSnapshot:custodiaProof===firmaCustodia(snapshot()),audioComplete:raw.current.length===stored.current.length&&!errorRemote.current,inFlight:active||busy,confirmedFailure:custodiaFailure}),
+    custodiaLuz:luzCustodia({archivedReceipt:archivoReceiptVerified,exactSnapshot:custodiaProof===firmaCustodia(snapshot()),audioComplete:audioCustodiadoCompleto(snapshot()),inFlight:active||busy,confirmedFailure:custodiaFailure}),
     custodiaEstado:active?`Chrome + micrófono · ${elapsed} s · ${localCount} partes recibidas · ${count} confirmadas en servidor`:archived?"Volcado archivado · "+volcadoId:hasSession?`${localCount} partes locales · ${count} confirmadas en servidor`:ready?"Salvaguarda preparada":"Salvaguarda no preparada",
     editando:false,soportado:true,escuchando:active,guardando:archiveBusy.current,procesando:busy,generandoTitulo:false,retranscribiendo:transcribing.current,adjuntandoAudio:false,exportandoAudio:false,audioExportable:false,
     conAudio:hasSession,partesContador:count,bytesAcumulados:stored.current.reduce((n,p)=>n+p.bytes,0),reconexiones:0,pulidosOk:0,pulidosNo:0,reconciliacionMensaje:"",aviso:notice,error,resultado:archived?"Volcado disponible en Custodia":"",
