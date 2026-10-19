@@ -1,3 +1,4 @@
+import { validarArchivoDialogo } from "../dialogo/archivar";
 import { encolarTrabajosCaptura } from "./custodia-trabajos";
 // @l0 L0-002-R · @req FIX-DICTADO/D2-D8 · @req TRACE-SESSION/010 · @req REVISION-COCKPIT/REQ-1 · @req FIX-DICTADO/D13 · @req SISTEMA-MENU/E4
 import { randomUUID, createHash } from "crypto";
@@ -122,7 +123,7 @@ export type EntradaDictado = {
   usuario?: string | null;
   audioPartes?: AudioParte[] | null;
   estadoTranscripcion?: string | null;
-  fuenteEntrada?: "texto" | "microfono" | "chrome_live_caption" | "audio_archivo" | null;
+  fuenteEntrada?: "texto" | "microfono" | "chrome_live_caption" | "audio_archivo" | "dialogo" | null;
 };
 
 export async function registrarParteAudio(params: {
@@ -195,8 +196,8 @@ export async function registrarParteAudio(params: {
        WHERE dictado_audio_parte.bytes = EXCLUDED.bytes
          AND lower(dictado_audio_parte.sha256) = lower(EXCLUDED.sha256)
          AND dictado_audio_parte.fuente_audio = EXCLUDED.fuente_audio
-         AND COALESCE(dictado_audio_parte.original_name, EXCLUDED.original_name) = COALESCE(EXCLUDED.original_name, dictado_audio_parte.original_name)
-         AND COALESCE(dictado_audio_parte.mime_type, EXCLUDED.mime_type) = COALESCE(EXCLUDED.mime_type, dictado_audio_parte.mime_type)
+         AND COALESCE(dictado_audio_parte.original_name, EXCLUDED.original_name) IS NOT DISTINCT FROM COALESCE(EXCLUDED.original_name, dictado_audio_parte.original_name)
+         AND COALESCE(dictado_audio_parte.mime_type, EXCLUDED.mime_type) IS NOT DISTINCT FROM COALESCE(EXCLUDED.mime_type, dictado_audio_parte.mime_type)
          AND EXISTS (
            SELECT 1 FROM dictado_session s
            WHERE s.session_id = EXCLUDED.session_id
@@ -240,7 +241,7 @@ export async function registrarParteAudio(params: {
         endMs: params.endMs,
       },
       correlacionId: params.sessionId,
-    });
+    }).catch(()=>undefined); // Metadata telemetry cannot undo committed audio custody.
   } catch (err) {
     await db.query("ROLLBACK").catch(()=>undefined);
     await registrarEvento({
@@ -326,6 +327,13 @@ async function guardarDictadoConSesion(
     );
     const partesPersistidas = partesRes.rows ?? [];
     const partesRecibidas = entrada.audioPartes ?? [];
+    if(entrada.fuenteEntrada==="dialogo"){
+      // Read the owner's actual persisted checkpoint under the existing session lock.
+      const cp=await client.query("SELECT snapshot FROM dictado_checkpoint WHERE session_id=$1 AND usuario=$2 ORDER BY client_at DESC,creado_en DESC LIMIT 1",[sessionId,entrada.usuario]);
+      if(!cp.rows[0]?.snapshot)throw Error("dialogo_manifiesto_no_disponible");
+      validarArchivoDialogo(JSON.parse(descifrarTexto(cp.rows[0].snapshot)),partesPersistidas);
+    }
+
 
     // Nunca aceptar audio declarado por el navegador si no existe y está verificado
     // en el almacén canónico vinculado a esa sesión.
@@ -409,7 +417,7 @@ async function guardarDictadoConSesion(
           entrada.texto.length,
           entrada.titulo ?? null,
           "web",
-          entrada.fuenteEntrada === "chrome_live_caption" ? "chrome_live_caption" : entrada.fuenteEntrada === "audio_archivo" ? "audio_archivo" : entrada.fuenteEntrada === "texto" ? "texto" : "dictado",
+          entrada.fuenteEntrada === "dialogo" ? "dialogo" : entrada.fuenteEntrada === "chrome_live_caption" ? "chrome_live_caption" : entrada.fuenteEntrada === "audio_archivo" ? "audio_archivo" : entrada.fuenteEntrada === "texto" ? "texto" : "dictado",
           entrada.usuario ?? null,
           "archivado",
           entrada.fuenteEntrada === "texto" ? "texto" : "dictado",
@@ -519,7 +527,7 @@ export async function guardarDictado(entrada: EntradaDictado) {
   const correlacionId = sessionId || randomUUID();
   const requiereAudioVerificado =
     Boolean(sessionId) &&
-    (entrada.fuenteEntrada === "microfono" || entrada.fuenteEntrada === "chrome_live_caption" || entrada.fuenteEntrada === "audio_archivo");
+    (entrada.fuenteEntrada === "dialogo" || entrada.fuenteEntrada === "microfono" || entrada.fuenteEntrada === "chrome_live_caption" || entrada.fuenteEntrada === "audio_archivo");
 
   if (requiereAudioVerificado) {
     if (!Array.isArray(entrada.audioPartes) || entrada.audioPartes.length === 0) {
@@ -560,7 +568,7 @@ export async function guardarDictado(entrada: EntradaDictado) {
         entrada.texto.length,
         entrada.titulo ?? null,
         "web",
-        entrada.fuenteEntrada === "chrome_live_caption" ? "chrome_live_caption" : entrada.fuenteEntrada === "audio_archivo" ? "audio_archivo" : entrada.fuenteEntrada === "texto" ? "texto" : "dictado",
+        entrada.fuenteEntrada === "dialogo" ? "dialogo" : entrada.fuenteEntrada === "chrome_live_caption" ? "chrome_live_caption" : entrada.fuenteEntrada === "audio_archivo" ? "audio_archivo" : entrada.fuenteEntrada === "texto" ? "texto" : "dictado",
         entrada.usuario ?? null,
         "archivado",
         entrada.fuenteEntrada === "texto" ? "texto" : "dictado",

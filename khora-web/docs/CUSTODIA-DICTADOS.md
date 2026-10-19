@@ -473,3 +473,44 @@ Resultados y huellas del corte revisado: `docs/frentes/dictado-voz/evidencias/IN
 ### 23.1 · Preparación independiente del historial
 
 `GET /api/dictado/checkpoint?bootstrap=1` autentica y prepara el esquema existente; devuelve solo el propietario, con caché privada deshabilitada. No descifra ni lista versiones. Solo ese acuse habilita captura nueva; un 401/500 conserva el bloqueo y ofrece reintento sin modificar texto. El catálogo se consulta después y su fallo no revoca una preparación válida. Micrófono no preparado ya no se presenta como simple espera. El historial y los originales no se descartan. La compatibilidad de checkpoint_en TEXT se resuelve con conversión explícita al consultar, sin migración destructiva. Ensayos específicos: catálogo 503 con arranque/parada, bootstrap 503/reintento preservando texto y 401 sin habilitación. Estas pruebas no levantan límites o suspensiones de Blob ni certifican escritura productiva de audio.
+
+
+## Modo Diálogo · C022 · captura dual autorizada
+
+Estado/autoridad/evidencia únicos: `docs/frentes/dictado-voz/OBJETO-CANONICO.md`, C022. Implementación en rama; no certificada en producción. Acceso: Ingreso → Más opciones → Modo Diálogo, o `/sistema/ingreso?modo=dialogo`.
+
+- `DialogoPanel.tsx` usa `lib/dialogo/capturar.ts`: pestaña con audio compartido y micrófono explícito, un MediaRecorder continuo por fuente y un reloj común. No extrae Live Caption ni usa el puente de Signal Interpreter. Usa audífonos; cancelación de eco no garantiza separación perfecta.
+- Cada fragmento se conserva con `guardarAudioLocal` cifrado; `/api/audio` verifica bytes/SHA y registra `fuente_audio`. No se eliminan los originales locales por ACK. El snapshot cifrado existente añade manifiesto `dialogo`, estado y cantidad final; no hay tabla ni proveedor nuevo. Fallo local detiene ambas; fallo remoto conserva copia local y abre circuito de envío hasta reintento explícito.
+- Al detener se esperan ambos `stop`, últimos `dataavailable` y cola local/remota; fuente interrumpida se declara. Límite preventivo de 18 MB por fuente, no garantía de tamaño bajo suspensión extrema. No reanudar una sesión con nuevos recorders. Las partes de cada fuente se concatenan únicamente porque pertenecen a la misma instancia continua; nunca mezclar fuentes en un WebM ni MP3 secuencial.
+- `/api/transcribir/dialogo` autoriza dueño y verifica cantidad/índices/huellas antes de reconstruir cada original con lector existente. Usa el mismo transcriptor configurado en Khora; solo en diálogo habilita idioma automático, texto sin glosario/pulido y silencio sin texto inventado. Devuelve segmentos temporales, fuente y solapamientos; no identifica personas dentro de una pista ni promete fidelidad clínica.
+- Exportaciones: dos originales WebM separados y JSON con diálogo/manifiesto; la ruta GET exige sesión autenticada y dueño, `private, no-store`. No se crea una síntesis de voz ni MP3 mezclado. El modo mono y generador MP3 rechazan fuentes distintas para impedir aplanamiento accidental.
+- Recuperación explícita por enlace `sessionId` o catálogo de Ingreso; mantiene mismo diálogo detenido, conserva estado interrumpido al recuperar captura abierta y no inventa cierre. Web Locks protege contra dos escritores del mismo perfil; no es una lease distribuida entre dispositivos. No abrir el mismo diálogo para modificarlo en dos dispositivos.
+- La transcripción se ejecuta después de detener; no hay diálogo transcrito en vivo, análisis clínico, integración de Sesame, escucha permanente ni ingesta automática. Archivo/cierre formal del diálogo y MP3 sincronizado multicanal no se ofrecen en este corte. Los checkpoints siguen recuperables.
+- Validación controlada y límites: recibo `docs/frentes/dictado-voz/evidencias/DIALOGO-C022.json`; prueba de dos pistas reproducibles con MediaRecorder real y audio sintético, no micrófono físico ni llamada médica. Antes de publicar: checkout completo, build/tipos/suites de regresión, revisión de interfaz y prueba de permisos/custodia/proveedor reales.
+
+
+## Corrección C027 · Diálogo dentro de Escuchar a Chrome
+
+El reporte físico del operador invalida la aceptación funcional del primer diseño: no encontró la entrada y no observó texto de su conversación con Maya. La causa de esa captura particular permanece abierta; no afirmar audio perdido ni recuperado sin identificar y revisar su sesión. La publicación C026 solo acreditaba código/versión, no ese uso real.
+
+- No hay pantalla de diálogo ni enlace separado en Más opciones. Ingreso mantiene su editor/encabezado y muestra **Escuchar a Chrome** directamente; dentro aparece **Incluir micrófono y organizar como diálogo**. La casilla no inicia captura ni concede permisos. Solo puede cambiarse antes de contenido/audio, sin descartar borradores.
+- Los enlaces históricos `?modo=dialogo&sessionId=…` abren el mismo editor de Ingreso con el controlador de recuperación, no otra ventana. Los dos originales, reloj, custodia, autorización y proveedor existentes se reutilizan.
+- Al iniciar hay selección explícita de pestaña y Compartir audio más permiso de micrófono. La falta de audio de pestaña o permiso aborta con error visible; nunca declara grabando por el solo hecho de elegir ventana.
+- Mientras graba se muestran señales reales de **ambas** fuentes y partes locales/remotas por separado. No inventa texto ni confunde bytes/actividad con habla reconocida. La transcripción aparece automáticamente **al detener**, no son subtítulos en vivo. Si falla el proveedor, se conservan originales y el reintento.
+- El mismo editor permite revisar texto/título y **Archivar como volcado** mediante POST /api/dictado, con recibo ID/sessionId/SHA; cierre local solo tras recibo. Fallo de limpieza local no reabre el original sellado. No hay aprobación ni ingesta automática.
+- El servidor reconoce fuente `dialogo`, exige audio verificado y coteja el manifiesto cifrado del propietario en la transacción de archivo: estado detenido/interrumpido, total exacto, índices y presencia de ambas fuentes. El cuerpo del cliente no sustituye la prueba de custodia. Driver `dialogo` conserva procedencia; texto del diálogo y partes por fuente entran al circuito habitual de revisión/ingesta.
+- Los originales se exportan por fuente, sin concatenar los dos contenedores ni convertirlos a un falso MP3 mono. El MP3 secuencial existente sigue rechazando mezcla; no se promete una mezcla estéreo nueva.
+- Aceptación terminal pendiente: conversación real audible por pestaña y micrófono, texto al detener, archivo persistido, reapertura desde Custodia y revisión/ingesta con autorización. Pruebas sintéticas y compilación no certifican esa sesión física.
+
+
+## C030 · ciclo de captura, presentación y confirmaciones
+
+`Incluir micrófono` habilita dos originales independientes; `Organizar como diálogo` solo decide presentación. La preferencia opcional se conserva en el manifiesto y checkpoint; si falta, las sesiones anteriores mantienen el formato diálogo. Cambiar presentación no mezcla fuentes, no cambia proveedor ni autoriza ingesta. Configuración cerrada durante la captura y después de recibir audio.
+
+La URL publicada por la captura activa no es una orden de recuperación: no ejecuta la limpieza que detiene las grabadoras. Un enlace externo a otra sesión no reemplaza una captura abierta. La recuperación explícita tras recarga no reanuda grabadoras. Los tiempos de grabación se cuantizan a milisegundos enteros compatibles con columnas INTEGER.
+
+Durante parada se muestra estado vivo `Terminando y conservando audio…` antes de esperar red/proveedor y se bloquea doble clic. La recepción, custodia, transcripción y archivo son confirmaciones distintas; no se declara completa una transcripción si faltan partes. Las confirmaciones pendientes de audio se agrupan junto a la custodia, con detalle HTTP seguro y reintento explícito, no alertas nuevas por cada fragmento. Fallo de copia local sigue siendo alerta visible.
+
+Observabilidad de dictado normal: inicio, confirmación o fallo por parte con índice, HTTP, duración y confirmación local; cierre con duración y pendientes. Sin palabras dictadas, audio o mensajes privados del proveedor en métricas. La telemetría posterior al COMMIT no puede invalidar una parte ya conservada. Un reintento idéntico con nombre/MIME ausentes se acepta por igualdad PostgreSQL null-safe; otra huella, bytes, fuente o sesión sellada se siguen rechazando.
+
+Ver pruebas y límites en `docs/frentes/dictado-voz/evidencias/C030-pruebas.md`. La prueba aislada no certifica la infraestructura ni el micrófono físico de producción.

@@ -1,0 +1,14 @@
+[
+  {
+    "folder": "baseline",
+    "first": 1,
+    "identicalRetry": 0,
+    "conflictsAndSealed": "not exercised"
+  },
+  {
+    "folder": "repo",
+    "first": 1,
+    "identicalRetry": 1,
+    "conflictsAndSealed": "rejected"
+  }
+]

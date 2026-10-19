@@ -1,0 +1,3 @@
+# Owner-authorized original inputs
+
+Explicit authorization: the.willfreeman@gmail.com, 2026-10-17, to build automatic graph within eight minutes. Original v1 may enter only for that authenticated owner, with matching stored/current/version hash and recomputed plaintext SHA256. Invalid or absent original v1 is excluded, not repaired in place. Approved sources retain fail-closed checks. No custody status, original or judgment is changed. Curated projection still requires explicit human relation and identity judgments. Pipeline bumped so older snapshots/proposals cannot mix. Source policy is declared in snapshot. Generation and judging still require existing vault protection; reading does not.

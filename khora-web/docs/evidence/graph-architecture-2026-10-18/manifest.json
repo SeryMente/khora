@@ -1,0 +1,102 @@
+{
+  "schema": "khora-architecture-audit-evidence/v1",
+  "source_commit": "f820192d02ccc48e294e83ceb38f34df2c287036",
+  "functional_code_parent": "a0975ffaef17830471fff3adcdb804c47490ff0b",
+  "standard": "1.1",
+  "requirements": 55,
+  "negative_cases_specified": 40,
+  "epistwin_units_mapped": 59,
+  "findings": 22,
+  "new_controls": 11,
+  "failed_controls": 10,
+  "policy_observations": 1,
+  "execution_scope": "local isolated exact-source functions and contract checks; prior production evidence referenced with its original cut; no new production mutation/provider calls",
+  "formal_certification": false,
+  "files": [
+    {
+      "path": "AUDITORIA-ARQUITECTURA.md",
+      "sha256": "679ee7d78ce8c9743af09df1fbc6b482bd322b3fe5e00136e99387102bc89cf0",
+      "bytes": 30768
+    },
+    {
+      "path": "INDICE-CODIGO.md",
+      "sha256": "6fb7d97fdd6febaf9eab30ca42ebd40f865ad66d42ff37bd368fe45e477cc6dc",
+      "bytes": 6394
+    },
+    {
+      "path": "MATRIZ-EPISTWIN.md",
+      "sha256": "452e9d75bfa2897629caee03cf064c520843caa54256abf4bd454a35de27889e",
+      "bytes": 7267
+    },
+    {
+      "path": "MATRIZ-ESTANDAR.md",
+      "sha256": "deebfe937e18343ae099d1f3ebc3ad113258addeefeb812adcd18b34d5f06816",
+      "bytes": 12109
+    },
+    {
+      "path": "README.md",
+      "sha256": "bff9f77a3c6f25e9b3565ee9669790aecaa43155bbfee4aa3433c007f30b84c8",
+      "bytes": 3175
+    },
+    {
+      "path": "REPRODUCIR.md",
+      "sha256": "1888ef926cfeac0473cf7329372ba37bf704d20399d46bfb50bd36c44fea35fa",
+      "bytes": 2102
+    },
+    {
+      "path": "contract-parity.json",
+      "sha256": "0b829512ca05d63aefacc5715d9aca05044ea070ec0d1f255b5a75e989cb1be8",
+      "bytes": 269
+    },
+    {
+      "path": "contract-parity.mjs",
+      "sha256": "89cd33e39a853ad99530883ec8b25a073322a3daf03c426d1f5f8d1550c0f4ea",
+      "bytes": 680
+    },
+    {
+      "path": "literal-envelope.json",
+      "sha256": "f48415fc3e033815bf28b7bb5882e18c6806658b707cd8e804aefce3fe343801",
+      "bytes": 679
+    },
+    {
+      "path": "metric-regressions.json",
+      "sha256": "7bdf8bfcf68d16d07b5145bbe9c35946c08182472b2506f995141139187d3868",
+      "bytes": 438
+    },
+    {
+      "path": "metric-regressions.py",
+      "sha256": "da47940e74b3a20b859fbe2870664fbdc7030a40f89bf556f0eb9e9eca44cdf7",
+      "bytes": 1193
+    },
+    {
+      "path": "new-regressions.mjs",
+      "sha256": "a0eb73b019fd7ac2ff818c70ec78dc8688545b0ea10e04d15a0ec6d31401df90",
+      "bytes": 2348
+    },
+    {
+      "path": "node-regressions.json",
+      "sha256": "55c6abc70055c20e0251fbcec8c9640bd27b3b5cd016d5a7eededf4c32b98261",
+      "bytes": 937
+    },
+    {
+      "path": "python-regressions.json",
+      "sha256": "cff58421e58653a239a1d6bd96c668fe88ffc6368fb48ec3713c17dfb3ae5b88",
+      "bytes": 2314
+    },
+    {
+      "path": "python-regressions.py",
+      "sha256": "43f484fc02525f3a7a6a88ab0d2038313914fce38e7ff168b9266357a1e65aed",
+      "bytes": 5214
+    },
+    {
+      "path": "results.json",
+      "sha256": "de8da0c4a15f188002af2446a95d3e423753ddf8214a221d2025e69b7d5c6a90",
+      "bytes": 4018
+    },
+    {
+      "path": "source-manifest.json",
+      "sha256": "e6ff6e1b035072069cb28db45642ed14364ea98bb0fb5bcdf3af9cb8d8697bc3",
+      "bytes": 86456
+    }
+  ]
+}

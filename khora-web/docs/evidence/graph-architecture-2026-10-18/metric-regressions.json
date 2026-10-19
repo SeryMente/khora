@@ -1,0 +1,11 @@
+{
+  "id": "R11",
+  "expected": "Invariancia al renombrar etiquetas; sin poblaci\u00f3n com\u00fan no se declara estabilidad perfecta",
+  "observed": {
+    "same_partition_renamed": 0.0,
+    "disjoint_population": 1.0,
+    "ab_changed_for_renaming": true
+  },
+  "verdict": "FAIL",
+  "scope": "Exact three AST-extracted pure functions; networkx unavailable locally, no graph algorithm executed; not a measured longitudinal product result"
+}

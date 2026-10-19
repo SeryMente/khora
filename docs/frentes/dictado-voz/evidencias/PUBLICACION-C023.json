@@ -1,0 +1,79 @@
+{
+  "observedAt": "2026-10-18T18:24:13.809254+00:00",
+  "results": [
+    {
+      "url": "https://khora-web.vercel.app/api/version",
+      "status": 200,
+      "finalUrl": "https://khora-web.vercel.app/api/version",
+      "contentType": "application/json",
+      "bytes": 264,
+      "json": {
+        "commit": "a0975ffaef17830471fff3adcdb804c47490ff0b",
+        "rama": "sin-metadatos-de-git",
+        "desplegado_desde_git": false,
+        "fuente_commit": "manual-verified-clean-worktree",
+        "entorno": "production",
+        "rutas": [
+          "/sistema/custodia",
+          "/api/volcado"
+        ],
+        "ahora": "2026-10-18T18:24:12.826Z"
+      }
+    },
+    {
+      "url": "https://khora-web.vercel.app/sistema/ingreso?modo=dialogo",
+      "status": 200,
+      "finalUrl": "https://khora-web.vercel.app/auth/signin?callbackUrl=https%3A%2F%2Fkhora-web.vercel.app%2Fsistema%2Fingreso%3Fmodo%3Ddialogo",
+      "contentType": "text/html; charset=utf-8",
+      "bytes": 22313,
+      "dialogueMarkers": {
+        "Modo Diálogo": false,
+        "DialogoPanel": false,
+        "Iniciar diálogo": false
+      },
+      "note": "Public response/redirect only; no authenticated dialogue acceptance."
+    }
+  ],
+  "event": "C023",
+  "authorizationOriginal": "originales/PUBLICACION-C023.md",
+  "pullRequest": 321,
+  "headObserved": "3502680679861cbeb0f93b8310f0e921266f1019",
+  "baseObserved": "4dca2133866421105f077bbd7079576c588d1169",
+  "draftObserved": true,
+  "mergedObserved": false,
+  "gitDeployment": {
+    "combinedStatus": "failure",
+    "vercelDescription": "Cannot deploy from a private GitHub organization repository on the Hobby plan",
+    "scope": "Git integration; CLI path not tested or certified exempt",
+    "source": "https://github.com/SeryMente/khora/pull/321/checks"
+  },
+  "checkRunsAccess": {
+    "state": "not accessible",
+    "observed": "403 Resource not accessible by personal access token",
+    "retried": false
+  },
+  "remoteBinding": {
+    "deviceNamesObserved": [
+      "PC10RCIF4EI4",
+      "PC-14"
+    ],
+    "currentAuthorizedEquipment": "NOT VERIFIED",
+    "remoteCommandsExecuted": false
+  },
+  "scope": {
+    "mergedThisCycle": false,
+    "deployedThisCycle": false,
+    "fullBuildThisCycle": false,
+    "credentialsChanged": false,
+    "billingChanged": false,
+    "repositoryMadePublic": false,
+    "newSubagent": false
+  },
+  "publicationRequirement": {
+    "canonicalProject": "khora-web",
+    "canonicalAlias": "https://khora-web.vercel.app",
+    "required": true,
+    "localSufficiency": false,
+    "nextMaterialInput": "operator confirms current authorized equipment; then verify canonical legitimate deployment availability"
+  }
+}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { LockKeyhole } from "lucide-react";
 
 const IDLE_MS = 5 * 60 * 1000;
@@ -25,6 +26,7 @@ export function reportKhoraActivity() {
 }
 
 export default function AutoLockProvider({ children }: { children: React.ReactNode }) {
+  const graphReading = usePathname() === "/grafo";
   const [locked, setLocked] = useState(false);
   const [pin, setPin] = useState("");
   const [error, setError] = useState("");
@@ -34,6 +36,7 @@ export default function AutoLockProvider({ children }: { children: React.ReactNo
 
   const arm = useCallback(() => {
     if (timerRef.current !== null) window.clearTimeout(timerRef.current);
+    if (graphReading) return;
     const remaining = Math.max(1000, IDLE_MS - (Date.now() - lastActivityRef.current));
     timerRef.current = window.setTimeout(() => {
       if (Date.now() - lastActivityRef.current >= IDLE_MS) {
@@ -56,7 +59,7 @@ export default function AutoLockProvider({ children }: { children: React.ReactNo
         arm();
       }
     }, remaining);
-  }, []);
+  }, [graphReading]);
 
   const activity = useCallback(() => {
     if (locked) return;
@@ -65,6 +68,11 @@ export default function AutoLockProvider({ children }: { children: React.ReactNo
   }, [arm, locked]);
 
   useEffect(() => {
+    if (graphReading) {
+      if (timerRef.current !== null) window.clearTimeout(timerRef.current);
+      lastActivityRef.current = Date.now();
+      return;
+    }
     window.__KHORA_REPORT_ACTIVITY = activity;
     const events = ["pointerdown", "keydown", "touchstart", "wheel", "focus"];
     events.forEach((eventName) => window.addEventListener(eventName, activity, { passive: true }));
@@ -75,7 +83,7 @@ export default function AutoLockProvider({ children }: { children: React.ReactNo
       if (timerRef.current !== null) window.clearTimeout(timerRef.current);
       delete window.__KHORA_REPORT_ACTIVITY;
     };
-  }, [activity, arm]);
+  }, [activity, arm, graphReading]);
 
   async function unlock() {
     setError("");
@@ -112,16 +120,16 @@ export default function AutoLockProvider({ children }: { children: React.ReactNo
   return (
     <>
       <div
-        aria-hidden={locked}
+        aria-hidden={locked && !graphReading}
         style={{
-          filter: locked ? "blur(10px)" : undefined,
-          pointerEvents: locked ? "none" : undefined,
+          filter: locked && !graphReading ? "blur(10px)" : undefined,
+          pointerEvents: locked && !graphReading ? "none" : undefined,
         }}
       >
         {children}
       </div>
 
-      {locked && (
+      {locked && !graphReading && (
         <div
           data-testid="khora-autolock"
           role="dialog"

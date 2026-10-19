@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "scope": "historical audit evidence; not product certification",
+  "audited_commit": "a0975ffaef17830471fff3adcdb804c47490ff0b",
+  "files": [
+    {
+      "path": "AUDITORIA-INTEGRAL.md",
+      "bytes": 10279,
+      "sha256": "a97a620d0d4c5fabac3e875c389c7052b5949f6e3b183728f2b9e2ac7361117b"
+    },
+    {
+      "path": "README.md",
+      "bytes": 3497,
+      "sha256": "c1528a2f2b9431bab14b64fd4037e0a830b7ff90c3b47f450e22c7c0c346cb20"
+    },
+    {
+      "path": "documentary-validation.json",
+      "bytes": 367,
+      "sha256": "516d40157ba9ba9bd042c9ccfde20ad73d9d000ca6411d91125770d21191674b"
+    },
+    {
+      "path": "query.json",
+      "bytes": 560,
+      "sha256": "0983b7db5a74a4a091b9f832a3e1995557a47507304bf7a413d0e038de7198da"
+    },
+    {
+      "path": "regression-evidence.json",
+      "bytes": 1989,
+      "sha256": "9e10b6355d6495626e0881e45c6894f9f2d15698fc2ed9a3089bea4e5284a7a6"
+    },
+    {
+      "path": "ui-query-evidence.txt",
+      "bytes": 2100,
+      "sha256": "af8d252155a583eea67d9a5e942f158e48b264f5b52ade6d6c2374be5962e3a2"
+    },
+    {
+      "path": "unit-results.txt",
+      "bytes": 1779,
+      "sha256": "0f3a3cf3311633725cd7eb5805b75281d694f1d4725ac4a064db9f75c70a1a56"
+    }
+  ]
+}

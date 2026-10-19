@@ -1,0 +1,33 @@
+{
+  "scope": "unit/controlled fixture; exact deployed projection code; no provider or production writes",
+  "results": [
+    {
+      "id": "R01",
+      "expected": "homónimos no colapsados por etiqueta de fuente",
+      "observed": {
+        "anaNodes": 1,
+        "relationCount": 2
+      },
+      "verdict": "FAIL"
+    },
+    {
+      "id": "R02",
+      "expected": "replay conserva aceptaciones de ítems semánticamente idénticos con nueva instancia de propuesta",
+      "observed": {
+        "beforeEdges": 2,
+        "afterEdges": 0,
+        "itemIdsUnchanged": true
+      },
+      "verdict": "FAIL"
+    },
+    {
+      "id": "R03",
+      "expected": "registrar política explícita del efecto de rechazo humano sobre vista automática; no asumir veto",
+      "observed": {
+        "automaticEdgesAfterRejection": 2,
+        "curatedEdgesAfterRejection": 0
+      },
+      "verdict": "POLICY_GAP_not_automatic_violation"
+    }
+  ]
+}

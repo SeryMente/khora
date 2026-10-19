@@ -1,0 +1,124 @@
+{
+  "event": "C029",
+  "canonicalVersion": "0.6.8",
+  "method": "METACANON-OBJETOS-v1.5",
+  "release": {
+    "event": "C029",
+    "main": "77d8ee012d4cbc2a719af0684a1e47434e00d56d",
+    "tested": "906e87fef29e46ef1e640e7423aa7543bc52569d",
+    "projectId": "prj_hRN86BKITXYKTnNlp0ygVhaMwFfx",
+    "startedAt": "2026-10-18T20:19:27.050Z",
+    "promoted": true,
+    "identicalTestedTree": true,
+    "origin": "https://github.com/SeryMente/khora.git",
+    "previousDeployment": {
+      "id": "dpl_7eQpbex6hbt5B3vTmtWhAwMSbE1V",
+      "url": "khora-6ftt0wibl-victorhugotorresmendez-8991s-projects.vercel.app"
+    },
+    "deploy-c029": {
+      "exit": 0,
+      "signal": null,
+      "at": "2026-10-18T20:20:52.923Z"
+    },
+    "deployment": {
+      "id": "dpl_2XowmVXt3ME2KQU41vjm6BCpiWQV",
+      "url": "khora-8mqe1ogml-victorhugotorresmendez-8991s-projects.vercel.app",
+      "readyState": "READY",
+      "target": "production",
+      "projectId": "prj_hRN86BKITXYKTnNlp0ygVhaMwFfx",
+      "gitSha": "77d8ee012d4cbc2a719af0684a1e47434e00d56d"
+    },
+    "promote-c029": {
+      "exit": 0,
+      "signal": null,
+      "at": "2026-10-18T20:20:59.002Z"
+    },
+    "liveVersion": {
+      "commit": "77d8ee012d4cbc2a719af0684a1e47434e00d56d",
+      "rama": "main",
+      "desplegado_desde_git": true,
+      "fuente_commit": "vercel-git",
+      "entorno": "production",
+      "rutas": [
+        "/sistema/custodia",
+        "/api/volcado"
+      ],
+      "ahora": "2026-10-18T20:21:06.178Z"
+    },
+    "smoke": [
+      {
+        "route": "/sistema/ingreso",
+        "status": 307,
+        "location": "/api/auth/signin?callbackUrl=%2Fsistema%2Fingreso"
+      },
+      {
+        "route": "/sistema/ingreso?modo=dialogo",
+        "status": 307,
+        "location": "/api/auth/signin?callbackUrl=%2Fsistema%2Fingreso%3Fmodo%3Ddialogo"
+      },
+      {
+        "route": "/api/transcribir/dialogo",
+        "status": 401,
+        "location": null
+      }
+    ],
+    "aliasDeployment": "dpl_2XowmVXt3ME2KQU41vjm6BCpiWQV",
+    "success": true,
+    "completedAt": "2026-10-18T20:21:00.098Z"
+  },
+  "verification": {
+    "sha": "906e87fef29e46ef1e640e7423aa7543bc52569d",
+    "results": [
+      {
+        "name": "types",
+        "exit": 0,
+        "error": null,
+        "sha256": "52736032cc8923f2b6cee859d8849032951e23ef36229ffd763d007bc887deff"
+      },
+      {
+        "name": "navigation",
+        "exit": 0,
+        "error": null,
+        "sha256": "e54ed51500743670f904378cbf5ad06933b3f0295750b2ac44b5c5094e3b7c21"
+      },
+      {
+        "name": "ui-review",
+        "exit": 0,
+        "error": null,
+        "sha256": "46f9b74c5bf84786cbf724af6dfadfad774e4f5bbbe90b5633ec1b35055c2b6a"
+      },
+      {
+        "name": "unit",
+        "exit": 0,
+        "error": null,
+        "sha256": "8aab127f296a90a7bd97abea0db2c3b7698fcf3097fcf2dcbc783a05ac1ffabb"
+      },
+      {
+        "name": "build",
+        "exit": 0,
+        "error": null,
+        "sha256": "94b109162b34a33ba12988b3c8be3a78217d7f04b280a8afed417d43c823a560"
+      }
+    ]
+  },
+  "unit": {
+    "tests": 545,
+    "pass": 545,
+    "fail": 0,
+    "skip": 0
+  },
+  "physicalAcceptance": false,
+  "realHumanProviderArchiveReopenTest": false,
+  "cleanup": {
+    "at": "2026-10-18T20:22:25.666Z",
+    "githubLogoutExit": 0,
+    "vercelLogoutExit": 0,
+    "ownHelperEntriesRemoved": 2,
+    "githubConfigAbsent": true,
+    "vercelConfigAbsent": true,
+    "buildEnvAbsent": true,
+    "success": true
+  },
+  "runtimeSource": "77d8ee012d4cbc2a719af0684a1e47434e00d56d",
+  "documentationAfterRelease": true
+}

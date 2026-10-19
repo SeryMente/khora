@@ -1,0 +1,126 @@
+{
+  "event": "C027",
+  "recordedAt": "2026-10-18T19:49:34.705875+00:00",
+  "baseMain": "958162199a518ae5a01d317f1d68e3a55360836c",
+  "branch": "fix/dialogo-en-ingreso-c027",
+  "canonicalVersion": "0.6.6",
+  "methodVersion": "1.5",
+  "original": "originales/DIALOGO-INTEGRADO-C027.md",
+  "operatorReportedPhysicalTest": "failed: no visible transcript, entry hard to find; cause unverified",
+  "preparedCorrection": [
+    "same Ingreso editor",
+    "Chrome subfunction checkbox",
+    "two real activity meters",
+    "automatic transcription after stop",
+    "archive as volcado via existing custody",
+    "immutable retry payload"
+  ],
+  "unit": {
+    "pass": 21,
+    "fail": 0,
+    "skip": 0
+  },
+  "controlledBrowser": {
+    "pass": 6,
+    "fail": 0,
+    "results": [
+      {
+        "case": "real MediaRecorder synthetic two-source → automatic transcription adapter → same editor → archive receipt",
+        "pass": true,
+        "uploadedParts": 4,
+        "sourceCount": 2
+      },
+      {
+        "case": "zero-byte stop cannot call provider or claim complete capture",
+        "pass": true
+      },
+      {
+        "case": "no-tab-audio",
+        "pass": true
+      },
+      {
+        "case": "denied",
+        "pass": true
+      },
+      {
+        "case": "legacy URL, failed archive then same-session retry without deleting originals",
+        "pass": true
+      },
+      {
+        "case": "provider failure retains originals and explicit retry inserts text",
+        "pass": true
+      }
+    ],
+    "realProvider": false,
+    "physicalMicrophone": false,
+    "realEncryptedLocalStorage": false
+  },
+  "fullTypesBuildRegression": "NOT VERIFIED for C027",
+  "merge": false,
+  "newDeployment": false,
+  "physicalAcceptance": false,
+  "realProvider": false,
+  "realEncryptedLocalStorage": false,
+  "blocker": {
+    "device": "PC-14",
+    "deviceId": "03c24074-36e4-40b1-b2dc-da50be07d340",
+    "callId": "c574c6d7-3f55-4198-93db-703e60788348",
+    "state": "failed",
+    "error": "Timeout - no response from device",
+    "completedAt": "2026-10-18T19:39:35.48058+00:00",
+    "otherDeviceUsed": false,
+    "pendingCallsRetried": false
+  },
+  "epRequired": false,
+  "next": "restore response of authorized PC-14, exact checkout/global gates/build, authorized normal merge and deployment, physical acceptance",
+  "artifacts": [
+    {
+      "path": "khora-web/app/api/dictado/route.ts",
+      "sha256": "6d1f84171a5f84eb086d361b31dcc76fd6f751c7204a3c9e41babc8d52595250"
+    },
+    {
+      "path": "khora-web/app/components/ingreso/AudioActivity.tsx",
+      "sha256": "7c52e7ee47d67dc7c91f989ac8aee4dacf4e1f6c8658b5a3836df6a3f70547f0"
+    },
+    {
+      "path": "khora-web/app/components/ingreso/DialogoPanel.tsx",
+      "sha256": "7902d9353a3be504009059ff1fb2fa1287d44ca0efa662a077826b0f70756149"
+    },
+    {
+      "path": "khora-web/app/components/ingreso/IngresoWorkspace.tsx",
+      "sha256": "32f08be51f65b5d470f4dc625332c078702499b1ce7e8c9349a8405eb4af50e7"
+    },
+    {
+      "path": "khora-web/app/components/shared/IngresoView.tsx",
+      "sha256": "aadc315c8301036225ee0cf9ae387d0ffcf8e60fde075110c26fba61e52c0cfc"
+    },
+    {
+      "path": "khora-web/docs/CUSTODIA-DICTADOS.md",
+      "sha256": "14f6d57d7113b5053fd2189e748753a831638fb0cb874348d9627dacc5b26b78"
+    },
+    {
+      "path": "khora-web/lib/dialogo/archivar.ts",
+      "sha256": "e2f182b9b4dc6ad88cbb3a1440ac021f047f95817f535e108d945e7ba02f24c3"
+    },
+    {
+      "path": "khora-web/lib/dialogo/capturar.ts",
+      "sha256": "2b50a00a756da5342b0bc938736b86d715087d5bbc89ab87b9fc1abb06477d21"
+    },
+    {
+      "path": "khora-web/lib/server/audio-dialogo.ts",
+      "sha256": "0cb388ade2fed2768d0dbc1d7271d5d32f8503ba89b0dfbea2bef9c7a04d98e1"
+    },
+    {
+      "path": "khora-web/lib/server/dictado.ts",
+      "sha256": "a4860ad811f193c121f3d44b7b4193ad94e4ca3d283da2cde10687e02dc1be8c"
+    },
+    {
+      "path": "khora-web/lib/ui-review/registry.ts",
+      "sha256": "141df0ecac996e9cd1b397b65832b81b09e23e9cbee1ceffe6d3aa33337c943a"
+    },
+    {
+      "path": "khora-web/tests/unit/dialogo-archivo.test.ts",
+      "sha256": "64e0a846a9e16eb133b51a917524d514d4aff29f5793ac6c32d1f20af7448146"
+    }
+  ]
+}

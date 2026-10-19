@@ -1,0 +1,14 @@
+{
+  "event": "C030",
+  "candidateCommit": "ec0a47d3b88cdca13f9b882248603b22b500c4fc",
+  "deploymentId": "dpl_252P53oY97VyHAvWKdEbzo2tqP8X",
+  "state": "ERROR",
+  "errorCode": "ENOENT",
+  "errorStep": "buildStep",
+  "commandExit": 1,
+  "rootCause": "NOT_VERIFIED; detailed logs forbidden 403 under owning scope",
+  "activeProduction": "f0dfbdcb2d79eb6289dacba272ddcc7ba2023063",
+  "promoted": false,
+  "candidate": "C030-vercel-gates-candidate.json",
+  "checkpoint": "Obtain authorized logs for the exact deployment; diagnose failing gate; retain all criteria; causal test then preview; normal merge and exact main publication only if approved."
+}

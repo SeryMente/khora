@@ -30,6 +30,7 @@ interface ParteAudioDB {
   part_index: number;
   blob_url: string;
   blob_path?: string | null;
+  fuente_audio?: string | null;
   start_ms?: number | null;
   end_ms?: number | null;
 }
@@ -51,7 +52,7 @@ export async function transcribirSesion(
 
   if (sessionId) {
     const res = await db.query(
-      `SELECT part_index, blob_url, blob_path, start_ms, end_ms
+      `SELECT part_index, blob_url, blob_path, start_ms, end_ms, fuente_audio
        FROM dictado_audio_parte
        WHERE session_id = $1
        ORDER BY part_index ASC`,
@@ -59,6 +60,7 @@ export async function transcribirSesion(
     );
     partes = res.rows.map((r) => ({
       part_index: Number(r.part_index),
+      fuente_audio: r.fuente_audio,
       blob_url: String(r.blob_url),
       blob_path: r.blob_path ? String(r.blob_path) : null,
       start_ms: r.start_ms !== null ? Number(r.start_ms) : null,
@@ -79,6 +81,7 @@ export async function transcribirSesion(
       if (Array.isArray(audioPartesRaw) && audioPartesRaw.length > 0) {
         partes = audioPartesRaw.map((p: any) => ({
           part_index: Number(p.parte || p.part_index || 1),
+          fuente_audio: p.fuenteAudio || p.fuente_audio,
           blob_url: String(p.url || p.blob_url),
           start_ms: p.start_ms ? Number(p.start_ms) : null,
           end_ms: p.end_ms ? Number(p.end_ms) : null,
@@ -102,6 +105,8 @@ export async function transcribirSesion(
       motivoReconciliacion: "No se encontraron partes de audio para la sesión o volcado especificado.",
     };
   }
+
+  if(new Set(partes.map(p=>p.fuente_audio).filter(Boolean)).size>1)throw new Error("dialogo_usa_transcripcion_por_fuentes_no_dictado_mono");
 
   // 2. Transcribir cada parte recuperando blob -> descifrarBytes -> transcribirAudioConGroq
   const partesExitosas: { partIndex: number; texto: string; intervalo: IntervaloTemporal }[] = [];

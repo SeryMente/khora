@@ -1,0 +1,9 @@
+[
+  {
+    "scenario": "reactive-route baseline",
+    "reproduced": true,
+    "active": 0,
+    "recovered": 1,
+    "errors": []
+  }
+]

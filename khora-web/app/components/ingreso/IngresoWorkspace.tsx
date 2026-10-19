@@ -1,5 +1,6 @@
 "use client";
 import studioStyles from "./ingreso-studio.module.css";
+import { DialogoPanel } from "./DialogoPanel";
 import { RecoveryDrawer, type RecoveryItem } from "./RecoveryDrawer";
 import { evaluarAudioRecuperado, maximoIndiceConocido } from "@/lib/custodia/recuperacion";
 import { verificarCierreCaptura } from "@/lib/audio/custodia";
@@ -48,7 +49,10 @@ export function IngresoWorkspace() {
 
 function IngresoSeleccionado() {
   const params = useSearchParams();
-  if (!params || params.get("modo") !== "ingesta") return <IngresoContenido />;
+  const [dialogo,setDialogo]=useState(params?.get("modo")==="dialogo");
+  if (!params || params.get("modo") !== "ingesta") return dialogo
+    ? <DialogoPanel sessionId={params?.get("modo")==="dialogo"?params.get("sessionId"):null} onSalir={()=>setDialogo(false)} />
+    : <IngresoContenido onDialogo={()=>setDialogo(true)} />;
   const volcadoId = params.get("volcado_id");
   const rawVersion = params.get("version");
   const version = rawVersion && /^[1-9][0-9]*$/.test(rawVersion) && Number.isSafeInteger(Number(rawVersion))
@@ -56,7 +60,7 @@ function IngresoSeleccionado() {
   return <IngresoIngestaPanel key={params.toString()} volcadoId={volcadoId} version={version} />;
 }
 
-function IngresoContenido() {
+function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
 
   const [segmentos, setSegmentos] = useState<SegmentoReconciliado[]>([]);
   const [pendiente, setPendiente] = useState("");
@@ -68,6 +72,11 @@ function IngresoContenido() {
   const [pulidosOk, setPulidosOk] = useState(0);
   const [pulidosNo, setPulidosNo] = useState(0);
   const [guardando, setGuardando] = useState(false);
+  const [finalizando,setFinalizando]=useState(false);
+  const finalizandoRef=useRef(false);
+  const pendingUploadsRef=useRef(new Map<number,()=>Promise<void>>());
+  const [audioPendiente,setAudioPendiente]=useState(0);
+  const [custodiaDetalle,setCustodiaDetalle]=useState("");
   const [generandoTitulo, setGenerandoTitulo] = useState(false);
   const [retranscribiendo, setRetranscribiendo] = useState(false);
   const [adjuntandoAudio, setAdjuntandoAudio] = useState(false);
@@ -413,6 +422,10 @@ function IngresoContenido() {
         const v=vistaVivaRef.current;await guardarSnapshotLocal(ownerRef.current,{sessionId:initialSession,...nuevaRevision(),texto:v.texto,parcial:v.parcial,titulo:v.titulo,fuenteEntrada:fuenteEntradaSesionRef.current||"texto",duracionSeg:duracionRef.current,audioPartes:[...partesSubidasRef.current]});
         await guardarCheckpoint(true);
       }
+      const dialogCheck=selectedLocal || await fetch("/api/dictado/checkpoint?sessionId="+encodeURIComponent(item.sessionId),{cache:"no-store"}).then(async r=>r.ok?(await r.json()).recovery:null);
+      if(dialogCheck?.fuenteEntrada==="dialogo"){
+        window.location.assign("/sistema/ingreso?modo=dialogo&sessionId="+encodeURIComponent(item.sessionId));return;
+      }
       let sourceRevision=item.revisionId;
       if(item.local){
         const local=await recuperarLocal(ownerRef.current),snapshot=local.snapshots.find(x=>x.sessionId===item.sessionId&&x.revisionId===item.revisionId);
@@ -441,7 +454,9 @@ function IngresoContenido() {
       const data=await response.json();
       if(!response.ok||!data.recovery?.sessionId||data.owner!==ownerRef.current)throw Error(data.error==="sesion_sellada"?"Esta captura ya está archivada. Ábrela desde Custodia.":"No se confirmó la recuperación. El original no se modificó; puedes reintentar.");
       if(sesionIdRef.current!==initialSession||vistaVivaRef.current.texto!==initialText)throw Error("La captura cambió mientras elegías. Se conservan ambas; vuelve a consultar.");
-      const recovery:CapturaSnapshot=data.recovery;await guardarSnapshotLocal(ownerRef.current,recovery);
+      const recovery:CapturaSnapshot=data.recovery;
+      if(recovery.fuenteEntrada==="dialogo"){window.location.assign("/sistema/ingreso?modo=dialogo&sessionId="+encodeURIComponent(recovery.sessionId));return;}
+      await guardarSnapshotLocal(ownerRef.current,recovery);
       sesionIdRef.current=recovery.sessionId;recuperadaDeRef.current=recovery.recuperadaDe;
       fuenteEntradaSesionRef.current=recovery.fuenteEntrada;partesSubidasRef.current=recovery.audioPartes as typeof partesSubidasRef.current;partesRawRef.current=[];
       parteConsecutivaRef.current=maximoIndiceConocido(partesSubidasRef.current,[])+1;
@@ -490,7 +505,7 @@ function IngresoContenido() {
     const transcriptionStartedAt = Date.now();
     observarDictado("TRANSCRIPCION_AUTORITATIVA_INICIADA", { outcome: "PENDING", metrics: { part_count: partesSubidasRef.current.length, segment_count: segmentosRef.current.length } });
     void enviarEventosObservabilidadDictado();
-    if (!sesionIdRef.current || partesSubidasRef.current.length === 0) {
+    if (!sesionIdRef.current || partesSubidasRef.current.length === 0 || pendingUploadsRef.current.size>0) {
       estadoTranscripcionRef.current = partesRawRef.current.length > 0 ? "fallido" : null;
       observarDictado("TRANSCRIPCION_AUTORITATIVA_OMITIDA", { outcome: "SKIPPED", reasonCode: !sesionIdRef.current ? "no_session" : "no_verified_parts", metrics: { part_count: partesSubidasRef.current.length, segment_count: segmentosRef.current.length } });
       void enviarEventosObservabilidadDictado();
@@ -563,16 +578,20 @@ function IngresoContenido() {
     const cutView={...vistaVivaRef.current};
     const cutRevision=nuevaRevision();
     const ejecutarSubida = async () => {
+      let localSaved=false;
       try {
         await escrituraLocalRef.current.catch(()=>undefined);
-        try {await guardarAudioLocal(ownerRef.current,sesionId,parteActual,blob,{upload});}
-        catch {setAviso("No se pudo conservar el audio localmente; se intentará el servidor. Mantén abierta la captura.");}
+        try {await guardarAudioLocal(ownerRef.current,sesionId,parteActual,blob,{upload});localSaved=true;}
+        catch {setError("No se pudo conservar una parte de audio localmente. Mantén abierta la captura; se intentará la copia remota.");}
         const part=await subirAudioCustodiado(sesionId,parteActual,blob,upload);
         if(sesionIdRef.current===sesionId){
           partesSubidasRef.current=partesSubidasRef.current.filter(p=>p.parte!==parteActual).concat(part).sort((a,b)=>a.parte-b.parte);
           setPartesContador(partesSubidasRef.current.length);setBytesAcumulados(partesSubidasRef.current.reduce((n,p)=>n+p.bytes,0));setConAudio(true);
         }
-        await confirmarAudioLocal(ownerRef.current,sesionId,parteActual);
+        pendingUploadsRef.current.delete(parteActual);setAudioPendiente(pendingUploadsRef.current.size);
+        if(!pendingUploadsRef.current.size)setCustodiaDetalle("");
+        observarDictado("PARTE_AUDIO_SUBIDA_CONFIRMADA",{outcome:"SUCCESS",attemptId:"parte-"+parteActual,durationMs:Date.now()-uploadStartedAt,metrics:{part_index:parteActual,upload_verified:true,media_part_bytes:blob.size}});
+        await confirmarAudioLocal(ownerRef.current,sesionId,parteActual).catch(()=>setCustodiaDetalle("Audio confirmado en servidor; actualización del recibo local pendiente."));
         if(sesionIdRef.current===sesionId&&evaluarAudioRecuperado(partesSubidasRef.current.filter(p=>p.parte<=parteActual),parteActual).ok){
           const cut:CapturaSnapshot={sessionId:sesionId,...cutRevision,texto:cutView.texto,parcial:cutView.parcial,titulo:cutView.titulo,fuenteEntrada:fuenteEntradaSesionRef.current||"microfono",duracionSeg:endMs/1000,audioPartes:partesSubidasRef.current.filter(p=>p.parte<=parteActual),corteAudio:{hastaParte:parteActual,finMs:endMs},recuperadaDe:recuperadaDeRef.current};
           // Immutable boundary evidence is additional; a late acknowledgement cannot replace the editor.
@@ -583,8 +602,14 @@ function IngresoContenido() {
           });checkpointEnCursoRef.current=cutTask;
           await cutTask.catch(()=>setCustodiaEstado("Audio conservado; punto conjunto pendiente de confirmación"));
         }
-      } catch(e) {setAviso("Parte "+parteActual+" pendiente: no hay confirmación íntegra del servidor. La copia local, si se confirmó, se reintentará al recuperar la sesión.");}
+      } catch(e) {
+        const failure=e as {httpStatus?:number;reasonCode?:string};
+        pendingUploadsRef.current.set(parteActual,ejecutarSubida);setAudioPendiente(pendingUploadsRef.current.size);
+        setCustodiaDetalle((localSaved?"Copia local confirmada.":"Copia local NO confirmada; mantén esta pestaña abierta.")+" Última respuesta: "+(failure.httpStatus?"HTTP "+failure.httpStatus:"red o tiempo de espera")+". No se archivará como completo mientras falten confirmaciones.");
+        observarDictado("PARTE_AUDIO_SUBIDA_FALLIDA",{severity:"WARN",outcome:"PARTIAL",attemptId:"parte-"+parteActual,reasonCode:failure.reasonCode||"upload_failed",durationMs:Date.now()-uploadStartedAt,metrics:{part_index:parteActual,upload_verified:false,confirmed:localSaved,http_status:failure.httpStatus||0,network_online:navigator.onLine}});
+      }
     };
+    pendingUploadsRef.current.set(parteActual,ejecutarSubida);setAudioPendiente(pendingUploadsRef.current.size);
 
     const anteriorSubida = subidaEnCursoRef.current || Promise.resolve();
     const nuevaSubida = anteriorSubida.then(ejecutarSubida);
@@ -920,6 +945,7 @@ function IngresoContenido() {
     if(partesSubidasRef.current.length||partesRawRef.current.length){setError("Cierra esta captura antes de iniciar otra fuente de audio.");return;}
     setError("");
     setAviso("");
+    pendingUploadsRef.current.clear();setAudioPendiente(0);setCustodiaDetalle("");
     setResultado("");
     setReconexiones(0);
     if (!sesionIdRef.current) sesionIdRef.current = generarSesionId();
@@ -954,6 +980,7 @@ function IngresoContenido() {
 
     setError("");
     setAviso("");
+    pendingUploadsRef.current.clear();setAudioPendiente(0);setCustodiaDetalle("");
     setResultado("");
     setReconexiones(0);
     reconexionesRef.current = 0;
@@ -999,7 +1026,16 @@ function IngresoContenido() {
     setEstabaDictando(false);
   }, [arrancarReconocedor, arrancarGrabacion, observarDictado, soportado, guardando, archivado]);
 
+  const reintentarCustodia=async()=>{
+    if(finalizandoRef.current)return;
+    const task=(subidaEnCursoRef.current||Promise.resolve()).catch(()=>undefined).then(async()=>{for(const retry of [...pendingUploadsRef.current.values()])await retry();});
+    subidaEnCursoRef.current=task;await task;await guardarCheckpoint(true);
+  };
   const detener = useCallback(async () => {
+    if(finalizandoRef.current)return;
+    finalizandoRef.current=true;setFinalizando(true);
+    const stopBegan=Date.now();
+    try {
     observarDictado("DICTADO_DETENCION_SOLICITADA", { outcome: "PENDING", metrics: { source_mode: modoEntradaRef.current, active: activoRef.current, was_listening: escuchando } });
     void enviarEventosObservabilidadDictado();
     if (modoEntradaRef.current === "chrome_live_caption") {
@@ -1050,6 +1086,11 @@ function IngresoContenido() {
       setEstado("inactivo");
       observarDictado("DICTADO_DETENIDO", { outcome: "SUCCESS", durationMs: duracionRef.current * 1000, metrics: { source_mode: "microfono", part_count: partesSubidasRef.current.length, segment_count: segmentosRef.current.length } });
       await enviarEventosObservabilidadDictado();
+    }
+    } finally {
+      finalizandoRef.current=false;setFinalizando(false);
+      observarDictado("CIERRE_AUDIO_FINALIZADO",{outcome:pendingUploadsRef.current.size?"PARTIAL":"SUCCESS",durationMs:Date.now()-stopBegan,metrics:{pending_chunks:pendingUploadsRef.current.size,part_count:partesSubidasRef.current.length}});
+      void enviarEventosObservabilidadDictado();
     }
   }, [estabilizarEmision, detenerGrabacion, ejecutarTranscripcionAutoritativa, enviarChromeCommand, subirParteActual, observarDictado, escuchando, guardarCheckpoint]);
 
@@ -1556,7 +1597,7 @@ function IngresoContenido() {
       />
       <IngresoView
       state={{
-        archivado,
+        archivado,finalizando,audioPendiente,custodiaDetalle,
         custodiaEstado,custodiaReady:!!custodiaOwner,custodiaPreparando,recuperando,recuperaciones:recoveryItems.length,stream:streamAudio,
         titulo,
         texto,
@@ -1594,7 +1635,9 @@ function IngresoContenido() {
         onGenerarTitulo: generarTituloConIA,
         onIniciar: iniciar,
         onPrepararChrome: prepararChrome,
+        onDialogoChange:(enabled)=>{if(enabled&&!texto.trim()&&!conAudio&&!titulo.trim()&&estado!=="dictando"&&!guardando)onDialogo();},
         onDetener: detener,
+        onReintentarCustodia:()=>void reintentarCustodia(),
         onGuardar: guardar,
         onRetranscribir: ejecutarTranscripcionAutoritativa,
         onAdjuntarClick: () => fileInputRef.current?.click(),

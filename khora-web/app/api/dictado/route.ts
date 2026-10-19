@@ -19,6 +19,7 @@ export async function POST(req: Request) {
     const c = await req.json();
     const texto = typeof c?.texto === "string" ? c.texto : "";
     const fuenteEntrada =
+      c?.fuenteEntrada === "dialogo" ? "dialogo" :
       c?.fuenteEntrada === "chrome_live_caption" ? "chrome_live_caption" :
       c?.fuenteEntrada === "audio_archivo" ? "audio_archivo" :
       c?.fuenteEntrada === "texto" ? "texto" : "microfono";

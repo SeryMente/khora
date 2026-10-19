@@ -1,0 +1,50 @@
+[
+  {
+    "scenario": "dialogue capture",
+    "routeSurvived": true,
+    "finalChunks": true,
+    "indexedDBRecords": 3,
+    "explicitRecovery": true,
+    "errors": [],
+    "requests": [
+      "/api/dictado/checkpoint?bootstrap=1",
+      "/api/dictado/checkpoint?bootstrap=1",
+      "/api/dictado/checkpoint",
+      "/api/audio",
+      "/api/dictado/checkpoint",
+      "/api/audio",
+      "/api/dictado/checkpoint",
+      "/api/dictado/checkpoint",
+      "/api/dictado/checkpoint",
+      "/api/transcribir/dialogo",
+      "/api/dictado/checkpoint",
+      "/api/dictado/checkpoint?bootstrap=1",
+      "/api/dictado/checkpoint?bootstrap=1",
+      "/api/dictado/checkpoint?sessionId=d022e79e-31eb-41e8-a146-40a0154c005e"
+    ]
+  },
+  {
+    "scenario": "plain dual capture",
+    "routeSurvived": true,
+    "finalChunks": true,
+    "indexedDBRecords": 3,
+    "explicitRecovery": true,
+    "errors": [],
+    "requests": [
+      "/api/dictado/checkpoint?bootstrap=1",
+      "/api/dictado/checkpoint?bootstrap=1",
+      "/api/dictado/checkpoint",
+      "/api/audio",
+      "/api/dictado/checkpoint",
+      "/api/audio",
+      "/api/dictado/checkpoint",
+      "/api/dictado/checkpoint",
+      "/api/dictado/checkpoint",
+      "/api/transcribir/dialogo",
+      "/api/dictado/checkpoint",
+      "/api/dictado/checkpoint?bootstrap=1",
+      "/api/dictado/checkpoint?bootstrap=1",
+      "/api/dictado/checkpoint?sessionId=5122485b-a56e-418d-95f0-2a34acbede22"
+    ]
+  }
+]

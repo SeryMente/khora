@@ -1,0 +1,55 @@
+{
+  "tested_at": "2026-10-18T18:27:34.848Z",
+  "deployed_commit": "a0975ffaef17830471fff3adcdb804c47490ff0b",
+  "snapshot_release": "0a7b5ef100b66cdbdd64d80de647c6d354a9fe7e",
+  "snapshot_revision": "9bfc8bde-d80f-42e6-80ea-59996749c094",
+  "environment": "isolated Node 24; exact deployed graph source; TypeScript syntax stripped with Node builtin; pinned production graph dependencies; no external model calls; no production writes",
+  "existing_unit_tests": {
+    "total": 21,
+    "passed": 21
+  },
+  "integrity": {
+    "relations": 214,
+    "matching_original_hashes": 214,
+    "matching_utf16_anchors": 214
+  },
+  "reconstruction": {
+    "from_persisted_proposals_not_fresh_model_extraction": true,
+    "twice_same_partition": true,
+    "matches_live_snapshot_partition": true,
+    "originals_unchanged": true,
+    "judgment_count": 0,
+    "nonempty_judgment_reapplication_tested": false,
+    "community_nodes_in_output": 0
+  },
+  "semantic_regressions": [
+    {
+      "name": "identity_original_anchor_validator",
+      "input": "La agencia me cortó el flujo de llamadas de interpretación; agency and call flow are distinct referents",
+      "expected": "reject",
+      "observed": "accepted_false_identity",
+      "error": null,
+      "verdict": "NO_CONFORME"
+    },
+    {
+      "name": "identity_current_reference_validator",
+      "input": "La agencia me cortó el flujo de llamadas de interpretación; agency and call flow are distinct referents",
+      "expected": "reject",
+      "observed": "accepted_false_identity",
+      "error": null,
+      "verdict": "NO_CONFORME"
+    },
+    {
+      "name": "nonexclusive_scope_is_not_negation",
+      "expected": "reject_changed_meaning",
+      "observed": "accepted_changed_meaning",
+      "verdict": "NO_CONFORME"
+    },
+    {
+      "name": "literal_endpoints_do_not_validate_predicate",
+      "expected": "reject_unsupported_predicate",
+      "observed": "accepted_unsupported_predicate",
+      "verdict": "NO_CONFORME"
+    }
+  ]
+}

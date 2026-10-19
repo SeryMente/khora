@@ -29,12 +29,6 @@
   },
   "files": [
     {
-      "path": "OBJETO-CANONICO.md",
-      "bytes": 147234,
-      "sha256": "17e0e36309d0ba8a8c46b71433f4459a5bc3005f6d13dcf30b323349fd1d526d",
-      "git_blob_sha": "e6a9b6be98c1d4180e89dcb20615202952c18651"
-    },
-    {
       "path": "CONTRATO-DICTADO-EXPERIENCE.md",
       "bytes": 18779,
       "sha256": "e78845598c5511ada87edc436b23d530c97cec2d0804fe77b5167a8c8c7ec1ea",
@@ -135,6 +129,222 @@
       "bytes": 2254,
       "sha256": "ec9db5491125f3757134670e3330d6a8b253ea256547b060ddba23b37f5a9056",
       "git_blob_sha": "7c255795e91cfe3f7624f2a0038bd0069cca69c3"
+    },
+    {
+      "path": "originales/DIALOGO-C022.md",
+      "bytes": 2808,
+      "sha256": "b47bda08334de8c740049582c009b85a996cd85da3666ea0ea0677b99bcd5560",
+      "git_blob_sha": "7283703a37e62c959e448dc2a3a91116e6b4e143"
+    },
+    {
+      "path": "evidencias/dialogo-server.cjs",
+      "bytes": 3416,
+      "sha256": "ca95516afa6d813b1e41d61fcb2a811ee563cfb0b5a0b2cbdbd0a136d07b85e1",
+      "git_blob_sha": "0ab7203fd09f6cc1249e16a18fe709d1e3b672d3"
+    },
+    {
+      "path": "evidencias/dialogo-browser.cjs",
+      "bytes": 3752,
+      "sha256": "88c806ec1118cc521b4dc859183a114d25085df6f7191c1ada4dea15792dc8fe",
+      "git_blob_sha": "efcbc6eb00ae75aefbcdce509c6946dbe1546e45"
+    },
+    {
+      "path": "evidencias/dialogo-ui.cjs",
+      "bytes": 5971,
+      "sha256": "679e53c1f0c7d4b288180fc439bd97cdae8221f929ebb75f6cc7e7536f2d313d",
+      "git_blob_sha": "8c9e689ec026b3db901c0e1bea288b8433658273"
+    },
+    {
+      "path": "evidencias/dialogo-transcriptor.cjs",
+      "bytes": 2680,
+      "sha256": "f41f308caa649be201c8140601c561d303042bc90e48e817e62e8011b13fe24e",
+      "git_blob_sha": "f239d118d6a9b80db86d2eb1e065f6263d1f920c"
+    },
+    {
+      "path": "evidencias/DIALOGO-C022.json",
+      "bytes": 3355,
+      "sha256": "b0135c350d6be06180d08990ff614b2467f7b299fab06debedb749d6721dbecb",
+      "git_blob_sha": "2dd5e69ba0c0a903ce906af42dad710ef6af6df2"
+    },
+    {
+      "path": "evidencias/LECTURA-REMOTA-C022.json",
+      "bytes": 1461,
+      "sha256": "b5d40533a5902de8c8a80fd544f32a394a06f7e351066174b804b87b9c9d57fd",
+      "git_blob_sha": "bacd528f1813ee4edd08999e4c488d2296e3973d"
+    },
+    {
+      "path": "originales/PUBLICACION-C023.md",
+      "bytes": 452,
+      "sha256": "1e159766f8e11fbae7d4503565667650d524126c0ef1f5182f636d3e2064141b",
+      "git_blob_sha": "d854c9075176620c25f58541d75171fc973dc205"
+    },
+    {
+      "path": "evidencias/PUBLICACION-C023.json",
+      "bytes": 2683,
+      "sha256": "f75faf5e6cc31d61cf67afaea2f079f8c5df65e035856c2756e6253bf68cc6e2",
+      "git_blob_sha": "963b784f85b1f51f7bdd71c421b82b9c441e2c37"
+    },
+    {
+      "path": "originales/EQUIPO-C024.md",
+      "bytes": 285,
+      "sha256": "2802d90ba3719ecb86396bb29170cb4de8240d21ed978da52719ece9d51d35b0",
+      "git_blob_sha": "88219d3e745950dc21c936c8e6379af8a672cf35"
+    },
+    {
+      "path": "evidencias/EQUIPO-C024.json",
+      "bytes": 2194,
+      "sha256": "dc40edffbbb406cca7b4740ce7c0feace5e7d34a66b96fcc725792f2e800a1c7",
+      "git_blob_sha": "2c01cd91538ea959f07a88b733f1d1dc0048fe62"
+    },
+    {
+      "path": "originales/SIN-EP-C025.md",
+      "bytes": 1221,
+      "sha256": "32095137433f5a85b4552101e8139cbd244a5e2f76615522458cdbec33e63973",
+      "git_blob_sha": "5c8817b0f69ee7b771755aebe0e379a7198657a7"
+    },
+    {
+      "path": "evidencias/SIN-EP-C025.json",
+      "bytes": 5004,
+      "sha256": "c961bf7e524c5fd3b7971e238732648265943cb9eb8325eff5f520f4f261fe8b",
+      "git_blob_sha": "5ecdf192f7b9400b2f5446c355401e585d171f39"
+    },
+    {
+      "path": "evidencias/RELEASE-C026.json",
+      "bytes": 2379,
+      "sha256": "1e30eaa6641bcdd428a05f5ee12043d67a6522714fa44dbc654435d4bf5bf95e",
+      "git_blob_sha": "3b2517dfcda81f8d9f0b7dd66c7d64b98b8be3ff"
+    },
+    {
+      "path": "originales/DIALOGO-INTEGRADO-C027.md",
+      "bytes": 1432,
+      "sha256": "a6e979baa42df3370e696d6b9a433a5c8cd63e98357cb1bf2c11a3fdee45bbd1",
+      "git_blob_sha": "c52d7b263b75c05fc117cbb52868a27b305dbbd8"
+    },
+    {
+      "path": "evidencias/C027.json",
+      "bytes": 4189,
+      "sha256": "b54cfe43b980304e6f29199dcfa759abcf18304fcb76b50678526a10a03e5279",
+      "git_blob_sha": "c3c556baa864a14f89e22079c738b540f95cd954"
+    },
+    {
+      "path": "originales/PUBLICACION-C028.md",
+      "bytes": 545,
+      "sha256": "5fb4af76c3cf8167bb1b331d42e651c51771c7088d13831b0ded6b06fdeece26",
+      "git_blob_sha": "128a05fa1663ad3c3b07d8a95b4d45432850fcd3"
+    },
+    {
+      "path": "evidencias/C028.json",
+      "bytes": 790,
+      "sha256": "e59320f29ee50249efb4aaf042f5896c25295154c9ec74d163dfdde5a3151b8a",
+      "git_blob_sha": "9f4a7a42035e476747b1beafd5f0e4bdb334024f"
+    },
+    {
+      "path": "originales/PUBLICACION-C029.md",
+      "bytes": 368,
+      "sha256": "4cbcad76caed94347ea82482fc132bc4b8b5de0a07f6f29ac3949a2de4233cd8",
+      "git_blob_sha": "38e1c209950f156ec4fe6a7effd612763e2a762a"
+    },
+    {
+      "path": "evidencias/C029.json",
+      "bytes": 3551,
+      "sha256": "f600def618320f90d93642035ae10c5050404ab593a5edb59715ec24b9a5e7db",
+      "git_blob_sha": "8b44863c4be759660a02789165442796adb62169"
+    },
+    {
+      "path": "OBJETO-CANONICO.md",
+      "bytes": 194785,
+      "sha256": "092ff9b9d03e7e805f929a4daceda3b72b2fbdb5a00ee526c3b8d7d5e2bebd92",
+      "git_blob_sha": "a29ad8e3221128f2b59caa00fc8ed3ded87c89a2"
+    },
+    {
+      "path": "evidencias/dialogo.test.ts",
+      "bytes": 7331,
+      "sha256": "f12e2838d2ec03bc6f5789f7760c12c41959f88b36ef8f5cbcac251fa8a37de0",
+      "git_blob_sha": "bd84597fb390e12c0ff0a6b6c1125efd1258f3cc"
+    },
+    {
+      "path": "evidencias/captura-c030-ui.cjs",
+      "bytes": 8389,
+      "sha256": "2dbaf3ea9b29282c387a000f5cf4559cdb8b3f3c37983b965523f84a8d3ddcff",
+      "git_blob_sha": "70a8be81d48386ad8fcb6751c21354ec489d7732"
+    },
+    {
+      "path": "evidencias/captura-c030-normal.cjs",
+      "bytes": 7012,
+      "sha256": "468b8fd11551fc852a03af9edd05e6312829252df9af586182c143bcf0cecb00",
+      "git_blob_sha": "5b0dc17230158c924cca2e448ec5fd11739bd866"
+    },
+    {
+      "path": "evidencias/captura-c030-adapters.cjs",
+      "bytes": 1836,
+      "sha256": "f65b2fe8a9174fda0123206d3ba6139928171d2c4c3dc2c42f3ff235d954205c",
+      "git_blob_sha": "f6227fe0a470fe11fa7d1385e96711f70a44c798"
+    },
+    {
+      "path": "evidencias/C030-baseline-results.json",
+      "bytes": 132,
+      "sha256": "a11e7ecedf2c701c248dce5f7c06917f82dff38761cef5fe5b58c01250f2753a",
+      "git_blob_sha": "fb14f5a304937b967518a89d7bbeeeb490dcb932"
+    },
+    {
+      "path": "evidencias/C030-repo-results.json",
+      "bytes": 1458,
+      "sha256": "516113ed64f7f23ba091617f1dc169017fd6d38df0b14ad68cc848d623e20cba",
+      "git_blob_sha": "06d4b65837f97000bede7536b6c3ca7b25c29dea"
+    },
+    {
+      "path": "evidencias/C030-normal-results.json",
+      "bytes": 1395,
+      "sha256": "1e3833293e5b20c9de2656b7d184614038dd7cc828a5c6820ebccddd8aa07dc1",
+      "git_blob_sha": "538e70bdf538c858ab0ab4dca3abaeb461bdef86"
+    },
+    {
+      "path": "evidencias/C030-sql-results.json",
+      "bytes": 229,
+      "sha256": "6a2243ffae81eb8003818f03aced7daa4013ea0f96e3b4ec2440ba104655409c",
+      "git_blob_sha": "0100b193bcbd3e829e2b71fc2fbae258dad8e918"
+    },
+    {
+      "path": "evidencias/C030-environment-errors.json",
+      "bytes": 2294,
+      "sha256": "e9426a0c9bc5268760cd9d8f3ff9760197220f5c890f77c4dc3078155756c16a",
+      "git_blob_sha": "76b46b456f9693d90ac4e38ce1d362c81506397e"
+    },
+    {
+      "path": "evidencias/C030-pruebas.md",
+      "bytes": 2291,
+      "sha256": "a9ae8bda102e5569727caac939bc678e37e8c36be6d177d350d9fe908c4758a3",
+      "git_blob_sha": "e815a8c26eebff65e283ce082d6fb7aee796fa0c"
+    },
+    {
+      "path": "evidencias/C030-archive-results.json",
+      "bytes": 1790,
+      "sha256": "9d3736472f34d76b7e38f0b5e6c4f77f84145120871a646228462081afd1d4b5",
+      "git_blob_sha": "3fda0e0263fe798f5d73df51b465c9f75e6cc35a"
+    },
+    {
+      "path": "evidencias/C030-release.json",
+      "bytes": 1365,
+      "sha256": "0b2c4727aa9fa8d1735280bdef7dc0cffc997816bdd3621b6d2edbaa1282d610",
+      "git_blob_sha": "42597bab5ed8969251ecddbf6a19b509e7474230"
+    },
+    {
+      "path": "evidencias/C030-vercel-gates-candidate.json",
+      "bytes": 151,
+      "sha256": "c548d1b90cbeb4ad6ddcacd5b2a24c52d3ac5e7ce626e2a1f258ad31df67b338",
+      "git_blob_sha": "ed7fe1531b325de465076ed111c9bc51e944aaf3"
+    },
+    {
+      "path": "evidencias/C030-gate-blocker.json",
+      "bytes": 647,
+      "sha256": "bfcf3090a8cebf60c979e91bbda2cb4f2b4a56c8be5b1d8fddf52105c0e197b9",
+      "git_blob_sha": "4dcdcb1ceeb2cb10b0dad6f3a26c85d7945ef603"
+    },
+    {
+      "path": "originales/C030-instrucciones.md",
+      "bytes": 3139,
+      "sha256": "47a10ab2169ee1165ff2e39e1850f5c802b22e100b3b0b7aee71d1fcde571164",
+      "git_blob_sha": "e18663f9bb4ebcbe2494a8340e305078e5dadec9"
     }
   ],
   "runtime_references": [
@@ -241,33 +451,90 @@
     "no_secret_values_in_manifest": true
   },
   "current_preparation": {
-    "version": "0.5.3",
-    "baseSha": "2012e2389deb732568a5bd384817c19499fb910c",
-    "receipt": "evidencias/REVISION-C021.json",
-    "state": "documentation reconciliation; merge and readback checked separately"
+    "version": "0.6.12",
+    "baseSha": "f0dfbdcb2d79eb6289dacba272ddcc7ba2023063",
+    "receipt": "evidencias/C030-release.json",
+    "state": "functional production verified; effective gate blocked and human acceptance pending"
   },
-  "latestEvent": "C021 - canonical object is primary; C020 publication and sprint-wide continuity consolidated",
+  "latestEvent": "C030 - functional production verified; effective global gate failed, unpromoted, logs forbidden; no full e2e claim",
   "latest_verified_release": {
-    "commit": "c02f5142d7609c35d8a2dc2c549726edc4016f13",
-    "pullRequest": "https://github.com/SeryMente/khora/pull/312",
-    "receipt": "evidencias/CIERRE-MICROFONO-PUBLICADO-20261017.md",
-    "productionObservation": {
-      "url": "https://khora-web.vercel.app/api/version?canon=1792276556617093122",
-      "httpStatus": 200,
-      "serverDate": "Sat, 17 Oct 2026 22:35:56 GMT",
-      "version": {
-        "commit": "c02f5142d7609c35d8a2dc2c549726edc4016f13",
-        "rama": "HEAD",
-        "desplegado_desde_git": true,
-        "entorno": "production",
-        "rutas": [
-          "/sistema/custodia",
-          "/api/volcado"
-        ],
-        "ahora": "2026-10-17T22:35:56.661Z"
+    "sha": "f0dfbdcb2d79eb6289dacba272ddcc7ba2023063",
+    "deploymentId": "dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr",
+    "url": "https://khora-web.vercel.app",
+    "receipt": "evidencias/C030-release.json",
+    "observedAt": "2026-10-18T21:24:10.490007+00:00",
+    "physicalAcceptance": false,
+    "technicalPublicationVerified": true
+  },
+  "latest_physical_feedback": {
+    "event": "C030",
+    "reportedBy": "operator",
+    "acceptance": false,
+    "cause": "partially reproduced in fixture; full production cause not verified",
+    "original": "originales/C030-instrucciones.md"
+  },
+  "latest_release": {
+    "sha": "f0dfbdcb2d79eb6289dacba272ddcc7ba2023063",
+    "deploymentId": "dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr",
+    "url": "https://khora-web.vercel.app",
+    "receipt": "evidencias/C030-release.json",
+    "observedAt": "2026-10-18T21:24:10.490007+00:00",
+    "physicalAcceptance": false,
+    "technicalPublicationVerified": true
+  },
+  "latest_cycle": "C030",
+  "canonical_version": "0.6.12",
+  "latest_candidate": {
+    "branch": "fix/captura-dialogo-custodia-20261018",
+    "codeCommit": "b36231bfdd719741253148d24ba0265ac8dadeb7",
+    "prebuildCommit": "06c36c9917de19eeaa0c2ea1432742294e45678e",
+    "base": "3356bfc92965503d81b06e5637c4668afbde3a52",
+    "previewDeployment": "dpl_HkHzVpp8ymTiueVnGXYs6vmvtha8",
+    "previewState": "READY",
+    "production": "verified",
+    "releaseCommit": "f0dfbdcb2d79eb6289dacba272ddcc7ba2023063"
+  },
+  "release_history": [
+    {
+      "event": "pre-C030-manifest-reconciliation",
+      "latest_release": {
+        "receipt": "evidencias/C029.json",
+        "commit": "77d8ee012d4cbc2a719af0684a1e47434e00d56d",
+        "deployment": "dpl_2XowmVXt3ME2KQU41vjm6BCpiWQV",
+        "alias": "khora-web.vercel.app",
+        "verified": true,
+        "physicalAcceptance": false
+      },
+      "latest_verified_release": {
+        "sha": "81e571deaa46ad9abd0a6b91c5035abe871a8b55",
+        "deploymentId": "dpl_7eQpbex6hbt5B3vTmtWhAwMSbE1V",
+        "url": "https://khora-web.vercel.app",
+        "receipt": "evidencias/RELEASE-C026.json",
+        "observedAt": "2026-10-18T19:11:42.022Z",
+        "physicalAcceptance": false
       }
-    },
-    "humanAcceptance": "pending",
-    "productRebuiltThisCycle": false
+    }
+  ],
+  "file_history": [
+    {
+      "event": "C030-correct-stale-runner-entry",
+      "path": "evidencias/dialogo.test.ts",
+      "previous": {
+        "path": "evidencias/dialogo.test.ts",
+        "bytes": 6218,
+        "sha256": "534bb83c3238afad7e504462e7cbde75b45651a75b9e32116e4a49a5f491cdcb",
+        "git_blob_sha": "5133663e0eb9b3347a48913df209d5a17238a62e"
+      },
+      "actual": {
+        "bytes": 7331,
+        "sha256": "f12e2838d2ec03bc6f5789f7760c12c41959f88b36ef8f5cbcac251fa8a37de0",
+        "git_blob_sha": "bd84597fb390e12c0ff0a6b6c1125efd1258f3cc"
+      }
+    }
+  ],
+  "quality_gate": {
+    "state": "blocked",
+    "receipt": "evidencias/C030-gate-blocker.json",
+    "activeConfigChanged": false
   }
 }

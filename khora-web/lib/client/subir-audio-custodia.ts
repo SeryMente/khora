@@ -7,7 +7,7 @@ export async function subirAudioCustodiado(sessionId: string, part: number, blob
       const r=await fetch("/api/audio",{method:"POST",body:form,signal:AbortSignal.timeout(30000)});
       const d=await r.json().catch(()=>({}));
       if(!r.ok||d.verificado!==true||!/^[a-f0-9]{64}$/i.test(d.sha256||"")||Number(d.bytes)!==blob.size) {
-        const e=new Error(d.detail||`audio_http_${r.status}`);
+        const e=Object.assign(new Error(d.detail||`audio_http_${r.status}`),{httpStatus:r.status,reasonCode:typeof d.error==="string"&&/^[a-z0-9_]{1,80}$/.test(d.error)?d.error:"audio_no_confirmado"});
         if(r.status>=400&&r.status<500&&r.status!==408&&r.status!==429) throw Object.assign(e,{permanent:true});
         throw e;
       }
