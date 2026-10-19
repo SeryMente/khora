@@ -1,4 +1,3 @@
-
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {BlogTextWorkflow,readReference,type Draft,type Reference} from '../../lib/blog/text-workflow';

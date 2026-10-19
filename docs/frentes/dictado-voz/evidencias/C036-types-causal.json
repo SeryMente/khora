@@ -5,7 +5,7 @@
     {
       "code": 2339,
       "file": "tests/unit/blog-text-workflow.test.ts",
-      "line": 45,
+      "line": 44,
       "message": "Property 'revision' does not exist on type 'never'."
     }
   ],
