@@ -1067,58 +1067,16 @@
       "git_blob_sha": "a5e36bb6b9e452b9f7be79785c795b711bb043e6"
     },
     {
-      "path": "OBJETO-CANONICO.md",
-      "bytes": 267926,
-      "sha256": "0d80c817c1977339c5e7394632b41661b8fe88b046ec84c3a3f2c6a692f0dafe",
-      "git_blob_sha": "63bc6cf475bcea74a388f4d876d4312e831e794b"
-    },
-    {
       "path": "evidencias/C041/access.json",
       "bytes": 557,
       "sha256": "2c7ae17d22fbf1259a741456b53136c7924e7b6d9d1d3d74fd30530c34eaa3e9",
       "git_blob_sha": "fd7bdbc61f51438f5861302ec6319f7acc63535d"
     },
     {
-      "path": "evidencias/C041/browser-c041.cjs",
-      "bytes": 7838,
-      "sha256": "06bbaa28b414aedfec97d33c440041936e68217ed864fe3e97fab4e2898be0b7",
-      "git_blob_sha": "533c41eddc0acf58164f21a5222d4663cd8f5de6"
-    },
-    {
-      "path": "evidencias/C041/c041-browser-results.json",
-      "bytes": 211,
-      "sha256": "4220ded3fd96a695ae7cc04ab847e5aa519cb81a2abb5b1e3b51cf8c91d049fb",
-      "git_blob_sha": "e8f28c4417ff1a7a63d0ce0c279afb9bc83e8e73"
-    },
-    {
-      "path": "evidencias/C041/c041-mode-results.json",
-      "bytes": 140,
-      "sha256": "519e9091e40818c90a1a050a4940daccb2ad66b1f6a940909b4f3965466b1faf",
-      "git_blob_sha": "326a5ac2ca174b120b58a0ed83bb12782291c13c"
-    },
-    {
-      "path": "evidencias/C041/c041-server-results.json",
-      "bytes": 145,
-      "sha256": "59ba80e6ddd6f7e9897134c008fef4e9e9030ba852909a0ab3b94485b5de3294",
-      "git_blob_sha": "ff55a4f6d6d0c0be6e9c546b736912c518a5ffd3"
-    },
-    {
-      "path": "evidencias/C041/c041-types.log",
-      "bytes": 0,
-      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "git_blob_sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
-    },
-    {
       "path": "evidencias/C041/deployment-C040.json",
       "bytes": 419,
       "sha256": "4fc38e2ccff6510973902cf566632dd48b83d95a907e3716bd2f30f85ec11589",
       "git_blob_sha": "49be875f46b63e31888b8585ee629151be9088d6"
-    },
-    {
-      "path": "evidencias/C041/errors.jsonl",
-      "bytes": 3443,
-      "sha256": "954846ad3570173417da9f186b086906cd870e621767347b3d7d611dd1bb2a4a",
-      "git_blob_sha": "8747e543c6d4ce2dab9dbf85b7c0dd49ae749ba4"
     },
     {
       "path": "evidencias/C041/test-c041.cjs",
@@ -1139,10 +1097,76 @@
       "git_blob_sha": "d0581c20ad612c1f4b16865387426955e3ebe1a8"
     },
     {
+      "path": "OBJETO-CANONICO.md",
+      "bytes": 274389,
+      "sha256": "b9261825a36a74f1366926faca46913943da01576fb4b47a6a57ce9bfd6abf80",
+      "git_blob_sha": "aaa39ebaa7c60ab1f9287dc801c6d423181fb913"
+    },
+    {
       "path": "originales/C041-salidas-visibles.txt",
-      "bytes": 907,
-      "sha256": "118f8bc3dd774a908ad58b155baf8bd60444f5d228c002dd4b249c496fffa26f",
-      "git_blob_sha": "f8a4d3a146cc7319be3eeadaaa09f56b3b766942"
+      "bytes": 1816,
+      "sha256": "f0e0cabd1e40a4aa283d3f826d32a20ff35bd251cd48c2b8f48cdf38bc9e5dbe",
+      "git_blob_sha": "49f542618b2794a4ca38213006806619487ca81c"
+    },
+    {
+      "path": "evidencias/C041/c041-browser-results.json",
+      "bytes": 211,
+      "sha256": "1a8e9422da572f77ceb412f66574bd9b41e0f46d8976f0bec65854d224b2e448",
+      "git_blob_sha": "5e9f0d9dc9d1d9877f71895363836e522a491373"
+    },
+    {
+      "path": "evidencias/C041/c041-server-results.json",
+      "bytes": 145,
+      "sha256": "59ba80e6ddd6f7e9897134c008fef4e9e9030ba852909a0ab3b94485b5de3294",
+      "git_blob_sha": "ff55a4f6d6d0c0be6e9c546b736912c518a5ffd3"
+    },
+    {
+      "path": "evidencias/C041/c041-mode-results.json",
+      "bytes": 140,
+      "sha256": "519e9091e40818c90a1a050a4940daccb2ad66b1f6a940909b4f3965466b1faf",
+      "git_blob_sha": "326a5ac2ca174b120b58a0ed83bb12782291c13c"
+    },
+    {
+      "path": "evidencias/C041/c041-types.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "git_blob_sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "evidencias/C041/errors.jsonl",
+      "bytes": 4517,
+      "sha256": "c00b6249c690a8f48054fed5198ed8906f68ea7d079c4121deea6cb0ded6fe6b",
+      "git_blob_sha": "169479bcd49d5b1d281f9c967d8e4467f1ad7d36"
+    },
+    {
+      "path": "evidencias/C041/unit.log",
+      "bytes": 1820,
+      "sha256": "3872dddf69b576176714d5409ada5196cfa6dbaa7c49b591acf480577b5a6c46",
+      "git_blob_sha": "6926b8a1cfefc5d01a2e9cf4f282476414c93ebb"
+    },
+    {
+      "path": "evidencias/C041/route-results.json",
+      "bytes": 104,
+      "sha256": "bf7033366b55d560c30194c573ff755bb799a2af8bc30b10e30c1ec385f913a9",
+      "git_blob_sha": "f789b7c86c4120b8c1e75017a9840d3655b13eb8"
+    },
+    {
+      "path": "evidencias/C041/browser-results.json",
+      "bytes": 137,
+      "sha256": "e2af2461448604d070f2b6db4e21cc7fb6b0850278eabe29ccd04fbcf071d1a6",
+      "git_blob_sha": "4af486da0eadd7a1f2c722ac01ad2af024db046b"
+    },
+    {
+      "path": "evidencias/C041/browser-c041.cjs",
+      "bytes": 8497,
+      "sha256": "10fceb36417e98f917ef4c277b50d470a81289aae797a326fc8523e33b8a0c10",
+      "git_blob_sha": "48c1a8886e44bc708c30f01fd3db99f139cce37d"
+    },
+    {
+      "path": "evidencias/C041/deployment-C041.json",
+      "bytes": 444,
+      "sha256": "2142c6c7aa137e7d63eba12fe0cdac57ab77e27a30ed87d35119d74274143f47",
+      "git_blob_sha": "6659f978eb82f4d4b3191998ca109c7db8d1bf22"
     }
   ],
   "runtime_references": [
@@ -1252,15 +1276,18 @@
     "base": "eda718288fa61bf4df016751d46631fa8e71054a",
     "production": false,
     "publication": false,
-    "fullBuild": "requested through versioned config, pending",
+    "fullBuild": "ERROR BUILD_UTILS_SPAWN_1; specific stage unknown logs403",
     "counts": {
       "server": 39,
       "mode": 26,
-      "chromium": 24
+      "chromium": 28,
+      "regressionUnit": 21,
+      "regressionRoute": 20,
+      "regressionChromium": 21
     },
     "clipRead": false
   },
-  "latestEvent": "C041 preview C040 verified; current dual live-prefix tests; user leaving/RDC timeout; Meta not provided",
+  "latestEvent": "C041 full prebuild ERROR without specific logs; current dependency corrected and final scoped tests pass",
   "latest_verified_release": {
     "event": "C038",
     "state": "READY",
@@ -1307,8 +1334,8 @@
     "rollbackDeploymentId": "dpl_12FCcmkeXDBbLRqoi6eyd5gqKVKK",
     "summaryImplemented": false
   },
-  "latest_cycle": "C041",
-  "canonical_version": "0.6.27",
+  "latest_cycle": "C041.1",
+  "canonical_version": "0.6.28",
   "latest_candidate": {
     "branch": "feat/ingreso-autobiografico-20261019",
     "production": true,
@@ -1567,6 +1594,78 @@
         "bytes": 260606,
         "sha256": "9efb259f6595a39a69b1e47f24f924e60d65bd410e98631fec675b3241840107",
         "git_blob_sha": "1f619a407ff13fba4fc2309048612107fd4e004e"
+      }
+    },
+    {
+      "event": "C041.1",
+      "previous": {
+        "path": "OBJETO-CANONICO.md",
+        "bytes": 267926,
+        "sha256": "0d80c817c1977339c5e7394632b41661b8fe88b046ec84c3a3f2c6a692f0dafe",
+        "git_blob_sha": "63bc6cf475bcea74a388f4d876d4312e831e794b"
+      }
+    },
+    {
+      "event": "C041.1",
+      "previous": {
+        "path": "originales/C041-salidas-visibles.txt",
+        "bytes": 907,
+        "sha256": "118f8bc3dd774a908ad58b155baf8bd60444f5d228c002dd4b249c496fffa26f",
+        "git_blob_sha": "f8a4d3a146cc7319be3eeadaaa09f56b3b766942"
+      }
+    },
+    {
+      "event": "C041.1",
+      "previous": {
+        "path": "evidencias/C041/c041-browser-results.json",
+        "bytes": 211,
+        "sha256": "4220ded3fd96a695ae7cc04ab847e5aa519cb81a2abb5b1e3b51cf8c91d049fb",
+        "git_blob_sha": "e8f28c4417ff1a7a63d0ce0c279afb9bc83e8e73"
+      }
+    },
+    {
+      "event": "C041.1",
+      "previous": {
+        "path": "evidencias/C041/c041-server-results.json",
+        "bytes": 145,
+        "sha256": "59ba80e6ddd6f7e9897134c008fef4e9e9030ba852909a0ab3b94485b5de3294",
+        "git_blob_sha": "ff55a4f6d6d0c0be6e9c546b736912c518a5ffd3"
+      }
+    },
+    {
+      "event": "C041.1",
+      "previous": {
+        "path": "evidencias/C041/c041-mode-results.json",
+        "bytes": 140,
+        "sha256": "519e9091e40818c90a1a050a4940daccb2ad66b1f6a940909b4f3965466b1faf",
+        "git_blob_sha": "326a5ac2ca174b120b58a0ed83bb12782291c13c"
+      }
+    },
+    {
+      "event": "C041.1",
+      "previous": {
+        "path": "evidencias/C041/c041-types.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "git_blob_sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+      }
+    },
+    {
+      "event": "C041.1",
+      "previous": {
+        "path": "evidencias/C041/errors.jsonl",
+        "bytes": 3443,
+        "sha256": "954846ad3570173417da9f186b086906cd870e621767347b3d7d611dd1bb2a4a",
+        "git_blob_sha": "8747e543c6d4ce2dab9dbf85b7c0dd49ae749ba4"
+      }
+    },
+    {
+      "event": "C041.1",
+      "previous": {
+        "path": "evidencias/C041/browser-c041.cjs",
+        "bytes": 7838,
+        "sha256": "06bbaa28b414aedfec97d33c440041936e68217ed864fe3e97fab4e2898be0b7",
+        "git_blob_sha": "533c41eddc0acf58164f21a5222d4663cd8f5de6"
       }
     }
   ],

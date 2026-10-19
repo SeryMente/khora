@@ -1,4 +1,4 @@
 {
-  "checks": 24,
+  "checks": 28,
   "scope": "real React, native MediaRecorder on oscillators, IndexedDB/AES-GCM, current controller/view; accelerated cadence, synthetic upload/checkpoint/transcriber; no actual call/provider"
 }
