@@ -1,0 +1,50 @@
+{
+  "result": "PASSED_LOCAL_BUILT_RUNTIME_CLOSED_BY_DEFAULT",
+  "identity": "synthetic process-only signing configuration; test auth bypass flags absent; no real provider login",
+  "listening": "127.0.0.1 only",
+  "vaultFlags": "absent",
+  "hostedDatabase": "not configured or used",
+  "deployment": false,
+  "checks": [
+    {
+      "path": "/api/version",
+      "method": "GET",
+      "status": 200,
+      "contentType": "application/json",
+      "cacheControl": null,
+      "body": "{\"commit\":\"sin-metadatos-de-git\",\"rama\":\"sin-metadatos-de-git\",\"desplegado_desde_git\":false,\"fuente_commit\":\"no-verificado\",\"entorno\":\"local\",\"rutas\":[\"/sistema/custodia\",\"/api/volcado\"],\"ahora\":\"2026-10-19T16:40:20.017Z\"}"
+    },
+    {
+      "path": "/api/oauth/portable-vault/open",
+      "method": "POST",
+      "status": 503,
+      "contentType": "application/json",
+      "cacheControl": "no-store, private",
+      "body": "{\"error\":\"portable_vault_not_activated\"}"
+    },
+    {
+      "path": "/api/seguridad/boveda-portable",
+      "method": "POST",
+      "status": 401,
+      "contentType": "application/json",
+      "cacheControl": null,
+      "body": "{\"error\":\"Auth required\"}"
+    },
+    {
+      "path": "/api/seguridad/boveda-portable/cliente",
+      "method": "GET",
+      "status": 401,
+      "contentType": "application/json",
+      "cacheControl": null,
+      "body": "{\"error\":\"Auth required\"}"
+    },
+    {
+      "path": "/sistema/seguridad/boveda-portable",
+      "method": "GET",
+      "status": 307,
+      "contentType": null,
+      "cacheControl": null,
+      "body": "(body not recorded)"
+    }
+  ]
+}

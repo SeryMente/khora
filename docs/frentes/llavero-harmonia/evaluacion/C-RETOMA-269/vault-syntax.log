@@ -1,0 +1,4 @@
+
+> @khora/portable-vault-candidate@0.2.0 check
+> node --check core.mjs && node --check http.mjs && node --check client.mjs && node --check test.mjs && node --check postgres.mjs && node --check session.mjs && node --check migrate.mjs && node --check bridge.mjs && node --check native-open.mjs && node --check cli.mjs && node --check bridge-test.mjs && node --check browser-test.mjs && node --check route-test.cjs
+

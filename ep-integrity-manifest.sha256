@@ -446,8 +446,8 @@ dac4f7655cc8f3b18c50ccd9cee11d780f8841ac24368d318f3d9daa8dd0577a  ./khora-web/ma
 979b29917a479b98c2e093289bb5b42da27e5dca596be33f0068db22d7a9a22e  ./khora-web/metadata.json
 2aed85c9d0112615f6ad1ac52eb26726f4af2c47f29e6decbeb20be6de9f8ecf  ./khora-web/middleware.ts
 0a3e191a99ace83480b259685a68f951068c9cff2a4de2cfa0f53c169f9df114  ./khora-web/next.config.ts
-e1363c3511b6415fe6a8c6a8db5976fdbfb44ace6187e18c084e8cbd4bb3f069  ./khora-web/package.json
-106e4e042083b978174befa8b497b252acc2ebbebae6582c5f4bc33b521c4b77  ./khora-web/package-lock.json
+a118310b55b937bc5824af0b3e2322f2f1795ccca553302757987efc27260a90  ./khora-web/package.json
+3b5bf7bb48a889349e0c42c216aad050dbcb87af0fd4bbd82e5453faae6f5b1d  ./khora-web/package-lock.json
 7b2dfe403ee98aacec3e6c3e6126ab4223c5e5d8b2cea31a1ce96452af253502  ./khora-web/pages/_app.tsx
 5a9ffe983477f3858670e151c19534377d6c523cc8ceadc838cc69fafed5411e  ./khora-web/pages/404.tsx
 3e76fbd3eba01f49986c63dcb38be111b44844906f56a275dd0629ad2e693000  ./khora-web/playwright.config.ts

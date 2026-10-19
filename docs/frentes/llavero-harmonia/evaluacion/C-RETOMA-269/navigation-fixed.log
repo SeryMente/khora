@@ -1,0 +1,5 @@
+
+> khora-web@0.3.8 ui:contract
+> tsx scripts/check_navigation_contract.ts
+
+✅ Contrato de navegación íntegro: jerarquía, cobertura, enlaces, aliases y rutas verificadas.

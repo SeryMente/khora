@@ -1,0 +1,781 @@
+
+> khora-web@0.3.8 test:unit
+> node scripts/run_unit_tests.mjs
+
+▶ Aprobar Volcado Route Suite
+  ✔ 1. Retorna 400 cuando falta version o es invalida (< 1 o no entero) (6.092662ms)
+  ✔ 2. Retorna 409 cuando la versión no existe o el SHA256 no coincide (1.183901ms)
+  ✔ 3. Retorna 200 con { version, sha256 } en exito (4.440268ms)
+✔ Aprobar Volcado Route Suite (12.661739ms)
+▶ Continuous Audio Playback Machine Suite
+  ✔ 1. Monotonic global time formatting (formatMs) (0.602034ms)
+  ✔ 2. Global seek math resolves correct part index and local offset (0.234594ms)
+  ✔ 3. Auto-advancement check between consecutive parts (0.156339ms)
+  ✔ 4. Gap detection (>1000ms) halts playback explicitly (0.131089ms)
+  ✔ 5. Empty part bytes (0 bytes) halts playback explicitly (0.193087ms)
+  ✔ 6. Word timing matching finds exact active word (0.173967ms)
+  ✔ 7. Real WebM audio buffer generation (smoke test with >= 2 parts) (0.270733ms)
+✔ Continuous Audio Playback Machine Suite (4.094641ms)
+✔ custodia: acepta partes contiguas, no vacías y verificadas (1.461484ms)
+✔ custodia: rechaza un hueco de índice (0.250962ms)
+✔ custodia: rechaza parte no verificada (0.255445ms)
+✔ custodia: rechaza SHA-256 inválido (0.189468ms)
+✔ custodia: rechaza bytes vacíos (0.168568ms)
+✔ audio playback controller uses one-based UI positions with legacy zero-based storage (1.380131ms)
+✔ audio playback controller clamps seeks outside the manifest (0.158978ms)
+✔ audio playback reports a locked vault instead of a codec error (33.017154ms)
+✔ audio playback preserves specific server failures (0.541033ms)
+▶ Audio Range & Word Timing Backend
+  ✔ interpolarPalabrasDeSegmentos genera marcas temporales aproximadas correctamente (1.162737ms)
+✔ Audio Range & Word Timing Backend (1.930773ms)
+✔ authoritative transcription sends only a session reference (42.409801ms)
+✔ authoritative transcription converts plain-text 413 into a controlled result (0.730154ms)
+✔ authoritative transcription preserves JSON server errors (0.553244ms)
+CONTEO DE ESTADOS ANTES: {"archivado":1,"en_revision":1}
+HUÉRFANOS V1 EN REVISIÓN ANTES: 0
+Lote de 2 volcados elegibles. Dry-run: true
+[DRY-RUN] Se procesaría volcado ID a23adfcf-2494-48f1-bf9a-c4a089e47417 (#1) estado 'archivado'
+[DRY-RUN] Se procesaría volcado ID c298b142-ea63-41b3-b14a-cdecbaf56cba (#2) estado 'en_revision'
+CONTEO DE ESTADOS ANTES: {"archivado":1}
+HUÉRFANOS V1 EN REVISIÓN ANTES: 0
+Lote de 1 volcados elegibles. Dry-run: false
+✓ Procesado volcado ID b391a391-16e5-4461-8d87-31f512aa9fb7 (#1) a 'en_revision' con v1
+CONTEO DE ESTADOS DESPUÉS: {"en_revision":1}
+HUÉRFANOS V1 EN REVISIÓN DESPUÉS: 0
+CONTEO DE ESTADOS ANTES: {"en_revision":1}
+HUÉRFANOS V1 EN REVISIÓN ANTES: 0
+CONTEO DE ESTADOS DESPUÉS: {"en_revision":1}
+HUÉRFANOS V1 EN REVISIÓN DESPUÉS: 0
+CONTEO DE ESTADOS ANTES: {"archivado":105}
+HUÉRFANOS V1 EN REVISIÓN ANTES: 0
+Lote de 50 volcados elegibles. Dry-run: false
+✓ Procesado volcado ID 840bcdfe-8e15-44d6-a595-93ebe93bf336 (#1) a 'en_revision' con v1
+✓ Procesado volcado ID 5ec4d933-9263-40a1-a803-954afb2fcfd7 (#2) a 'en_revision' con v1
+✓ Procesado volcado ID 5c75a026-50a5-4460-bd47-56c35b537b02 (#3) a 'en_revision' con v1
+✓ Procesado volcado ID 67c8027c-8406-4d70-a25c-4e9a73b32cab (#4) a 'en_revision' con v1
+✓ Procesado volcado ID 30e1ae6b-0f80-4a66-8dff-7b6ead0c58e8 (#5) a 'en_revision' con v1
+✓ Procesado volcado ID 6cbba638-22b1-4cab-a1ca-e4b8fdc2ac63 (#6) a 'en_revision' con v1
+✓ Procesado volcado ID d0b6ef88-64c2-4541-928f-cacdfff9cfd1 (#7) a 'en_revision' con v1
+✓ Procesado volcado ID 522eb3e7-df7f-43f5-afaa-d1dd2e1717fa (#8) a 'en_revision' con v1
+✓ Procesado volcado ID 9e447ee3-b894-4b71-9058-9aade47b407c (#9) a 'en_revision' con v1
+✓ Procesado volcado ID 504761bd-27a4-428b-8d84-ab2ea44bddf7 (#10) a 'en_revision' con v1
+✓ Procesado volcado ID 19793c68-bd91-4bd2-9c51-c9e2c22199ad (#11) a 'en_revision' con v1
+✓ Procesado volcado ID f862f540-a77a-4b1b-bac7-8edd00c7213a (#12) a 'en_revision' con v1
+✓ Procesado volcado ID 53f142ff-0aff-487f-b4e1-b4ddaf60b742 (#13) a 'en_revision' con v1
+✓ Procesado volcado ID 49b0d84f-efa1-4c74-b5f5-ec868d2a2a29 (#14) a 'en_revision' con v1
+✓ Procesado volcado ID 1a10779e-393d-4238-b022-1258bf3485d4 (#15) a 'en_revision' con v1
+✓ Procesado volcado ID 77a913f1-4f15-4f02-b5f1-64600508b962 (#16) a 'en_revision' con v1
+✓ Procesado volcado ID cefd7538-1bff-4722-99b6-7911f4695371 (#17) a 'en_revision' con v1
+✓ Procesado volcado ID 9cc779d2-5f7c-4410-b732-b73a571e3d0c (#18) a 'en_revision' con v1
+✓ Procesado volcado ID 3c17d3cd-aa74-4c38-953b-13b10e8ea5fb (#19) a 'en_revision' con v1
+✓ Procesado volcado ID 3c86aba5-ca18-4cf9-aa17-7f4a6bd7ac31 (#20) a 'en_revision' con v1
+✓ Procesado volcado ID d11090d7-a5c2-4814-b5c3-e599af20e657 (#21) a 'en_revision' con v1
+✓ Procesado volcado ID 592909ff-efa8-4a00-9983-2522a5443724 (#22) a 'en_revision' con v1
+✓ Procesado volcado ID d5240eef-c7f0-4fc1-9746-2317ca6d21d3 (#23) a 'en_revision' con v1
+✓ Procesado volcado ID 053fd2c9-8ebf-46e9-9ea2-df8a94625a86 (#24) a 'en_revision' con v1
+✓ Procesado volcado ID 9315b14b-c048-489b-91fe-a72a26ed66b9 (#25) a 'en_revision' con v1
+✓ Procesado volcado ID b49091e2-17f3-48ae-9fa2-fae74c981c68 (#26) a 'en_revision' con v1
+✓ Procesado volcado ID 01ab32bb-3eb5-4c69-9b77-20629124ee8a (#27) a 'en_revision' con v1
+✓ Procesado volcado ID e3eacbc0-eb7e-4fd8-b91c-aff398dad357 (#28) a 'en_revision' con v1
+✓ Procesado volcado ID 38fe9d7a-5af8-44db-8b2c-7dae0b3fca81 (#29) a 'en_revision' con v1
+✓ Procesado volcado ID 3248e396-f949-4ae6-b5a4-6f80723de1d3 (#30) a 'en_revision' con v1
+✓ Procesado volcado ID 12a722d2-e9fa-4ddb-96df-d48a6bd2f5b9 (#31) a 'en_revision' con v1
+✓ Procesado volcado ID d6e82bb3-9cc6-4194-9bcf-8a8181de8bfd (#32) a 'en_revision' con v1
+✓ Procesado volcado ID b4923e08-fb8f-4bd4-bdd7-69b4abc87909 (#33) a 'en_revision' con v1
+✓ Procesado volcado ID 57d1a176-7637-43c8-975e-215573a8b11a (#34) a 'en_revision' con v1
+✓ Procesado volcado ID e2e25882-3518-4a76-8528-d1fa8df6c32e (#35) a 'en_revision' con v1
+✓ Procesado volcado ID f68d8e6c-3f30-4a6e-8dd4-a2bc254ba58f (#36) a 'en_revision' con v1
+✓ Procesado volcado ID 1a22a460-a7b5-4a81-b85a-a3c90d861ce8 (#37) a 'en_revision' con v1
+✓ Procesado volcado ID 37c313f0-ceef-4bdb-a3ed-59b9f07ccbe4 (#38) a 'en_revision' con v1
+✓ Procesado volcado ID b65b2bcb-2704-419e-988e-3d7b1df1e54b (#39) a 'en_revision' con v1
+✓ Procesado volcado ID f0ba1286-6e64-4c98-b18d-e5b1be08b445 (#40) a 'en_revision' con v1
+✓ Procesado volcado ID 67056cb1-5263-48f3-8e86-6b07739cc60f (#41) a 'en_revision' con v1
+✓ Procesado volcado ID bbd8ff3f-1b18-438f-ac86-fc72a8562612 (#42) a 'en_revision' con v1
+✓ Procesado volcado ID 019dc574-de6e-4da5-a782-4554726abfe6 (#43) a 'en_revision' con v1
+✓ Procesado volcado ID 49bb44a1-a0e1-429a-af72-6b52886d74e0 (#44) a 'en_revision' con v1
+✓ Procesado volcado ID 2c1cc676-7766-438e-8ed7-76a884dbc967 (#45) a 'en_revision' con v1
+✓ Procesado volcado ID 0180721d-0ab5-4882-91a4-4786c023b85c (#46) a 'en_revision' con v1
+✓ Procesado volcado ID 25789c84-818c-4fa5-bf3b-8c9580a33d15 (#47) a 'en_revision' con v1
+✓ Procesado volcado ID 0c0a5610-6a93-4f0c-b0b1-616c737e6364 (#48) a 'en_revision' con v1
+✓ Procesado volcado ID 27cd74f9-6c3f-4499-8fae-94bd24dd4c84 (#49) a 'en_revision' con v1
+✓ Procesado volcado ID c5414bdb-ff48-457b-8d34-433fcb1b4d8b (#50) a 'en_revision' con v1
+Lote de 50 volcados elegibles. Dry-run: false
+✓ Procesado volcado ID e6710965-5e99-435a-9dec-5f365da27ec6 (#51) a 'en_revision' con v1
+✓ Procesado volcado ID 1256b79f-21cf-4c38-acf4-9a6910223b7a (#52) a 'en_revision' con v1
+✓ Procesado volcado ID 903eff3b-d1ac-407a-b35e-ac0ae529681f (#53) a 'en_revision' con v1
+✓ Procesado volcado ID 89d530f8-df8e-4316-97ac-e1e63753d812 (#54) a 'en_revision' con v1
+✓ Procesado volcado ID 54585152-2eef-420a-ab8b-28115d916aa1 (#55) a 'en_revision' con v1
+✓ Procesado volcado ID 53c48601-3b29-4686-b49f-80a023a61f27 (#56) a 'en_revision' con v1
+✓ Procesado volcado ID e3784e5c-9184-4c30-b67c-3103a57a8d16 (#57) a 'en_revision' con v1
+✓ Procesado volcado ID f14c8765-9265-4a9a-96a7-ee6da1df500a (#58) a 'en_revision' con v1
+✓ Procesado volcado ID 201d350e-e066-46e9-b6d4-42cdefd46edc (#59) a 'en_revision' con v1
+✓ Procesado volcado ID 81f516fb-fff3-4d71-b179-fa953aa4cbaa (#60) a 'en_revision' con v1
+✓ Procesado volcado ID 5bc2953a-a7b4-4d3b-87d9-4d21eb8e9b33 (#61) a 'en_revision' con v1
+✓ Procesado volcado ID ac8665f4-3bd9-4f08-93da-6f2fb09c4d5d (#62) a 'en_revision' con v1
+✓ Procesado volcado ID 3f23c032-d213-45b2-8afa-b817afa20da4 (#63) a 'en_revision' con v1
+✓ Procesado volcado ID f2f90c62-9691-4b3d-bdb0-66e35078a810 (#64) a 'en_revision' con v1
+✓ Procesado volcado ID 65b88360-ad54-4895-8bf1-61f0e96b9241 (#65) a 'en_revision' con v1
+✓ Procesado volcado ID 8702aad7-9e2e-4b87-9117-7349b5297b21 (#66) a 'en_revision' con v1
+✓ Procesado volcado ID e870a4ef-12c6-474e-9148-5578197d55a6 (#67) a 'en_revision' con v1
+✓ Procesado volcado ID 0dbe1828-483a-4df4-adcf-6c06e13a2ba5 (#68) a 'en_revision' con v1
+✓ Procesado volcado ID d826063b-2fd5-4f20-ae09-6b64a084fd0f (#69) a 'en_revision' con v1
+✓ Procesado volcado ID 21850a2a-3faf-475e-9882-92a734c68d78 (#70) a 'en_revision' con v1
+✓ Procesado volcado ID 26e9c579-7d7e-4b13-b013-a1fa9aec4536 (#71) a 'en_revision' con v1
+✓ Procesado volcado ID a2997cc5-73df-4505-b524-31f1cfe1a20e (#72) a 'en_revision' con v1
+✓ Procesado volcado ID 6f56e918-aa66-43a3-8de4-5beb3994fa31 (#73) a 'en_revision' con v1
+✓ Procesado volcado ID 0dccb29c-4a7b-4dd5-95dd-2f90710f84b0 (#74) a 'en_revision' con v1
+✓ Procesado volcado ID 9301814c-16f5-4a13-be78-86b23dd8fd7c (#75) a 'en_revision' con v1
+✓ Procesado volcado ID 67412ede-74d8-4541-8214-ca01ef9831b4 (#76) a 'en_revision' con v1
+✓ Procesado volcado ID 35ab0c5e-a8dc-4442-aa66-1182d3a8b925 (#77) a 'en_revision' con v1
+✓ Procesado volcado ID 49c3a4e0-5bbf-434d-ba2b-397fc73ad666 (#78) a 'en_revision' con v1
+✓ Procesado volcado ID 9731100d-a81b-463d-8036-8428f5a72ac4 (#79) a 'en_revision' con v1
+✓ Procesado volcado ID 7ebe3428-5f36-4fd0-b2f8-7abf69b987ab (#80) a 'en_revision' con v1
+✓ Procesado volcado ID df9daa92-3b4e-4209-b012-be956a1448ab (#81) a 'en_revision' con v1
+✓ Procesado volcado ID 0fde39ab-64c7-4a6b-a85e-35c970bec1d9 (#82) a 'en_revision' con v1
+✓ Procesado volcado ID 5af6b519-0a4a-460b-9ef5-45efd7e6a577 (#83) a 'en_revision' con v1
+✓ Procesado volcado ID e5cdca75-6885-403d-9c11-af5601e4847c (#84) a 'en_revision' con v1
+✓ Procesado volcado ID e820f1af-9c93-46a1-af75-8d7aa896ff6b (#85) a 'en_revision' con v1
+✓ Procesado volcado ID cee2cba9-288d-41a7-b447-bcf21861a359 (#86) a 'en_revision' con v1
+✓ Procesado volcado ID 5c7e2994-62c6-4102-aa74-ea92e2ba2980 (#87) a 'en_revision' con v1
+✓ Procesado volcado ID f3817c23-3879-49dd-bc3a-3caab8c287b5 (#88) a 'en_revision' con v1
+✓ Procesado volcado ID 7ebe6db8-033e-4293-a3b6-9b6e5600ba9a (#89) a 'en_revision' con v1
+✓ Procesado volcado ID af318e76-f94f-4404-aab1-d8e72dbd52d7 (#90) a 'en_revision' con v1
+✓ Procesado volcado ID 1a563835-5b0c-429c-8bbb-d00c1af220f9 (#91) a 'en_revision' con v1
+✓ Procesado volcado ID 1b046f93-84a5-461e-a616-731bb8d04f1b (#92) a 'en_revision' con v1
+✓ Procesado volcado ID 650998a2-5a6b-4a43-b688-6ac549fd3164 (#93) a 'en_revision' con v1
+✓ Procesado volcado ID aa85ede7-19cd-4d73-811b-73d08a52d4e5 (#94) a 'en_revision' con v1
+✓ Procesado volcado ID 023864a1-5dca-4642-9cf1-dd0bae9b1f9e (#95) a 'en_revision' con v1
+✓ Procesado volcado ID deb1b9aa-2e20-436a-9234-bf91f68a9546 (#96) a 'en_revision' con v1
+✓ Procesado volcado ID 7ca53c10-3cac-426b-a276-a2b2da569816 (#97) a 'en_revision' con v1
+✓ Procesado volcado ID ba73d70f-859b-4786-9e68-35fbbf2629ac (#98) a 'en_revision' con v1
+✓ Procesado volcado ID 9da13e31-68c3-4e17-8eb5-2187bf1cc28d (#99) a 'en_revision' con v1
+✓ Procesado volcado ID 95d7dbac-9ca1-4c1d-a92c-52442440412e (#100) a 'en_revision' con v1
+Lote de 5 volcados elegibles. Dry-run: false
+✓ Procesado volcado ID 7c1fdf3f-0cd7-46e5-9ff2-7d6df9adb57e (#101) a 'en_revision' con v1
+✓ Procesado volcado ID 7ab569a8-09bf-4c2a-a28b-143db25a5603 (#102) a 'en_revision' con v1
+✓ Procesado volcado ID 626dd33b-b043-4ae2-9423-61ab61480e01 (#103) a 'en_revision' con v1
+✓ Procesado volcado ID 73772d2b-064e-42d9-a4ba-556008d36e11 (#104) a 'en_revision' con v1
+✓ Procesado volcado ID 1b88e8e3-3715-4d0a-8393-9252a0aef6f5 (#105) a 'en_revision' con v1
+CONTEO DE ESTADOS DESPUÉS: {"en_revision":105}
+HUÉRFANOS V1 EN REVISIÓN DESPUÉS: 0
+✔ Caso 1: archivado con palabra que tildesSeguras cambiaría (verbatim, sha256 y chars inmutables) (6.856854ms)
+✔ Caso 2: reparación de en_revision sin v1 (1.460127ms)
+✔ Caso 3: dry-run informa por estado y huérfanos de v1 SIN mutar (1.499608ms)
+✔ Caso 4: Idempotencia real (segunda corrida = 0 elegibles procesados) (2.91498ms)
+✔ Caso 5: Procesamiento de más de 100 filas en lotes (45.693953ms)
+✔ D12 (1): Reconstrucción idéntica -> aceptado===true, deficit===0 (2.206426ms)
+✔ D12 (2): Truncado de cola -> aceptado===false, textoResultado === anterior (íntegro), perdidaDetectada===true (0.299856ms)
+✔ D12 (3): Corrección de UNA palabra en frase corta ('jora' -> 'khora') -> aceptado===true, deficit===0, textoResultado===nuevo (0.190241ms)
+✔ D12 (4): Varias correcciones dispersas (misma longitud, palabras distintas) -> aceptado===true, deficit===0 (0.176877ms)
+✔ D12 (5): Borrado de cláusula interna anclado -> aceptado===true, fusionado===true, textoResultado incluye 'leche' y 'huevos' (0.252127ms)
+✔ D12 (6): 'yo digo digo lo que pienso' idéntico -> dos ocurrencias de 'digo' sobreviven (0.208187ms)
+✔ D12 (7): nuevo==='' -> aceptado===false, textoResultado===anterior, perdidaDetectada===true (0.121965ms)
+✔ D16 (Ingreso): reconciliarSegmentos bloquea pérdida de texto previa ante Whisper incompleto (2.044928ms)
+✔ D17 (Ingreso): Exclusión mutua estricta de 3 vías en botones de control (0.220172ms)
+✔ D18 (Volcados): volcados/page.tsx no contiene 'Archivo Manual' ni hace POST a /api/volcado (0.328198ms)
+✔ capture_contract: 11 valid states exist and valid session passes (2.536998ms)
+✔ capture_contract: transient state timeouts have explicit fallback states (0.15719ms)
+✔ capture_contract: FAILS on non-monotonic journal sequence (0.380217ms)
+✔ capture_contract: FAILS when an audio part lacks ACK (0.186275ms)
+✔ capture_contract: FAILS/ignores callback from stale epoch (0.16563ms)
+✔ capture_contract: FAILS complete state transition with missing audio parts or incomplete coverage (1.608101ms)
+✔ capture_contract: FAILS on telemetry envelope containing raw text or audio (1.394398ms)
+✔ capture_contract: FAILS on invalid state transitions not allowed by state machine (0.205766ms)
+✔ Proxy API /api/chat - Rechaza cuerpos de solicitud inválidos con HTTP 400 (6.682022ms)
+✔ Proxy API /api/chat - Transmite stream SSE correctamente cuando el backend responde 200 (4.142725ms)
+✔ buildConsultaState - Genera estados deterministas para escenarios sintéticos (0.425961ms)
+✔ ChatGPT CIMD client can exchange a runtime-only authorization code (39.406995ms)
+✔ runtime-only grant refuses escalation to volcados:read at token exchange (152.387948ms)
+▶ Linguistic Findings & Server Gate Evaluator
+  ✔ evaluarCompuertaAprobacion devuelve canApprove true y gate_hash cuando no hay bloqueadores (7.291603ms)
+✔ Linguistic Findings & Server Gate Evaluator (8.108286ms)
+✔ custodia rechaza vacío (1.109845ms)
+✔ custodia rechaza duplicado (0.335179ms)
+✔ custodia rechaza sobrante (0.130506ms)
+✔ custodia rechaza hueco (0.101253ms)
+✔ custodia rechaza negativo (0.105959ms)
+✔ custodia rechaza no verificado (0.134144ms)
+✔ custodia rechaza sin huella (0.18553ms)
+✔ custodia acepta manifiesto exacto (0.112629ms)
+✔ delta exacto "termino" -> "término" (0.948812ms)
+✔ delta exacto "hola" -> "hola." (0.829956ms)
+✔ delta exacto "a b" -> "a  b" (0.108785ms)
+✔ delta exacto "" -> "nuevo" (0.074082ms)
+✔ delta exacto "original" -> "" (0.086777ms)
+✔ delta exacto "A" -> "a" (0.069336ms)
+✔ sin cambio no crea delta (0.56756ms)
+✔ texto manual no requiere audio por tener sesión (0.147563ms)
+✔ dictado sí requiere audio (0.063992ms)
+✔ parcial se recupera sin fingir que es final (0.193758ms)
+✔ frecuencia remota tiene límite y el audio no espera archivo (0.084545ms)
+✔ GET versiones no crea versiones (0.152297ms)
+✔ MCP audio preserva scope y dueño (0.269975ms)
+✔ no hay texto a voz en el conversor (0.192325ms)
+✔ la documentación existe y es descubrible (0.436618ms)
+✔ errores de reconocimiento no desactivan la grabadora de custodia (0.58743ms)
+✔ codec real: WAV a MP3 reproducible sin mutar el original (122.911928ms)
+✔ codec rechaza fuente vacía (0.415114ms)
+✔ codec rechaza bytes que no son audio (5.605282ms)
+✔ codec real concatena dos grabaciones completas (114.015693ms)
+✔ export: manifest 423 becomes typed vault lock before audio read (35.216057ms)
+✔ export: audio expiry also becomes typed vault lock (0.849874ms)
+✔ export: unverified audio remains blocked (0.376053ms)
+✔ preserved MP3: lock uses the same typed prompt (0.505438ms)
+✔ preserved MP3: 409 requests work but never pretends download completed (0.573681ms)
+✔ preserved MP3: missing custody headers block download (0.798696ms)
+✔ la espera de reintento es acotada y crece (0.973328ms)
+✔ encolar conserva payload cifrado e identidades independientes (1.977481ms)
+✔ título manual no solicita título IA (0.30525ms)
+✔ un trabajador sin lease no ejecuta servicios (0.348803ms)
+✔ un fallo secundario conserva un trabajo reintentable y oculta errores sensibles (0.722356ms)
+✔ huella de MP3 fija prefijo y estado de cierre (0.315447ms)
+✔ espejo conserva exactamente 0 unidades UTF-16 (0.304713ms)
+✔ espejo conserva exactamente 31 unidades UTF-16 (0.112799ms)
+✔ espejo conserva exactamente 7904 unidades UTF-16 (0.290724ms)
+✔ propietario ausente nunca consulta ni reclama registros (0.513411ms)
+✔ consulta de propietario usa parámetro y no acepta resultado vacío (0.312481ms)
+✔ espejo largo se reanuda sin duplicar y verifica texto exacto (2506.293562ms)
+✔ Chrome exige identidad, cuenta final y todas las partes verificadas (0.447683ms)
+✔ recuperación remota no depende de blobs desaparecidos del heap (1.147593ms)
+✔ no archiva si conoce una cola pendiente adicional (0.148777ms)
+✔ no acepta huecos (0.765109ms)
+✔ no acepta duplicados (0.15449ms)
+✔ no acepta verificación ausente (0.178646ms)
+✔ no acepta tamaño o huella inventados (0.135478ms)
+✔ esperado se reconstruye con índices persistidos, no con cantidad de blobs (0.35429ms)
+✔ un manifiesto vacío no equivale a audio íntegro (0.120138ms)
+{"evento":"promocion_revision_fallida","volcadoId":"941abba1-d9e1-40b0-99e4-2bfdfa6a01da","error":"Transcripción vacía al preparar versión v1","actor":"custody-test@example.invalid","politica":"keep_captura"}
+✔ CUSTODY-01: retrying the same session returns the sealed volcado instead of inserting a duplicate (261.016698ms)
+✔ CUSTODY-02: a retry that changes text under an archived session is rejected and leaves the original untouched (138.745097ms)
+✔ CUSTODY-03: client-declared verified audio without a matching server manifest cannot be archived (1.604545ms)
+✔ CUSTODY-04: a stored transcript that no longer matches its sealed SHA cannot pass idempotency checks (99.165929ms)
+✔ CUSTODY-05: retrying an audio part with different bytes/hash is rejected without replacing the first part (1.709261ms)
+✔ CUSTODY-06: text-only capture with a stable session ID archives without inventing an audio requirement (244.373126ms)
+✔ CUSTODY-08: verified imported audio can be archived even when transcription is empty (202.175468ms)
+✔ CUSTODY-09: Ingreso exposes export only for verified imported audio and server re-verifies the original (11.862008ms)
+✔ CUSTODY-11: transcript network failure must return the verified original locator (0.274847ms)
+✔ CUSTODY-12: original export works from verified import custody before or after archive (0.28457ms)
+✔ CUSTODY-14: archived captures stay sealed and text-only saves receive stable session IDs (0.605015ms)
+✔ CUSTODY-15: browser download honors the preserved UTF-8 filename from the server (1.008044ms)
+✔ CUSTODY-13: fresh installations create custody tables before applying compatibility ALTERs (0.225658ms)
+✔ CUSTODY-10: stale ingestion failures cannot overwrite a newer approved version (0.160099ms)
+✔ CUSTODY-07: verification failures never delete stored audio and staging is deleted only after verified linkage (0.440247ms)
+✔ CUSTODY-16: session transcription endpoint requires an authenticated user (0.145402ms)
+✔ CUSTODY-17: Ingesta UI consumes the canonical pipeline digest key (0.37171ms)
+✔ dialogue archive requires both sources and stopped manifest (1.444097ms)
+✔ wrong source is rejected (0.382221ms)
+✔ active capture cannot be archived (0.156968ms)
+✔ pending local parts cannot be declared complete (0.157979ms)
+✔ missing source cannot be hidden behind valid global indices (0.153569ms)
+✔ invalid global indices are rejected (0.125843ms)
+✔ file import is not an allowed dialogue source (0.326526ms)
+✔ interrupted capture preserves explicit partial state (0.167072ms)
+✔ Prueba 1: Una frase corta con pausas (12.03172ms)
+✔ Prueba 2: Una idea larga con pausas intermedias (0.487072ms)
+✔ Prueba 3: Dos ideas consecutivas separadas por pausa mayor (0.174799ms)
+✔ Prueba 4: Nombres propios y términos del glosario (0.400466ms)
+✔ Prueba 5: Texto con repetición explícita (se conserva íntegramente) (0.207272ms)
+✔ Prueba 6: Caso en que Groq esté indisponible (fallback grace) (0.248323ms)
+✔ Prueba 7 (@req FIX-DICTADO/D9): Whisper responde con exito pero truncado (falta una cláusula completa) -> no pierde texto (1.964632ms)
+✔ Prueba 8 (@req FIX-DICTADO/D9): Whisper responde con exito y corrige UNA palabra mal oída -> el guardián ACEPTA Whisper (0.293203ms)
+✔ Prueba 9 (@req FIX-DICTADO/D9): Repetición real de palabras ('digo digo') sobrevive íntegra de punta a punta (0.560672ms)
+✔ Prueba 10 (@req FIX-DICTADO/D9): Desajuste en el número de párrafos entre ASR y Whisper no pierde contenido en reconciliarSegmentos (1.536471ms)
+✔ muestreo: elegibilidad, frontera probabilística, topes y cambio de día (19.455186ms)
+✔ muestreo: distribución determinista y probabilidad registrada (7.336104ms)
+✔ conservación: detecta sustitución de igual longitud, no solo caracteres (0.192743ms)
+✔ comentario manual sin valoración, límites y contrato cerrado (7.437093ms)
+✔ resumen: cero datos no es cero fallos; fuentes y comentarios solos separados (0.864923ms)
+✔ propietario: identidad de servidor, rechazo anónimo y separación (0.472158ms)
+✔ almacenamiento: comentario cifrado, idempotencia, conflicto, aislamiento y borrado (206.352607ms)
+✔ ruta HTTP real: autenticación, origen, cambio de perfil y privacidad (1394.405936ms)
+Contratos, entrega, muestreo, privacidad y persistencia controlada: failed
+✔ preferencias corruptas y entradas numéricas no habilitan recopilación ni muestreo (3.903498ms)
+✔ contrato rechaza más alteraciones que comprobaciones (3.368588ms)
+✔ resumen independiente del orden: reintentos y sesiones duplicadas no inflan muestras (4.100933ms)
+✔ resumen excluye conflictos en lugar de escoger el resultado favorable (0.590175ms)
+✔ entrega serializada: llamadas simultáneas y nuevos registros no se solapan (1.950484ms)
+✔ fallo de red o acuse inválido conserva ID; reintento sin duplicar (0.380496ms)
+✔ cambio de perfil: acuse anterior no consume cola nueva ni cambia propietario (0.486029ms)
+✔ captura ocupada pausa la entrega entre registros (0.346534ms)
+✔ cola acotada solo de metadatos; no admite comentario manual (0.710225ms)
+✔ benchmark invalida verde antes de huella y declara fallo si falta entrada (10.10792ms)
+✔ benchmark registra fallos de arranque y no ejecuta la etapa siguiente (9.164788ms)
+✔ dictation telemetry uses USER_DATA, drops raw transcript fields, and dequeues only after acknowledgement (5.582861ms)
+✔ dictation event queue survives a failed HTTP response and retries with the same UUID and idempotency key (0.715414ms)
+✔ dictation telemetry preserves a rejected event until the next acknowledged delivery (2.440468ms)
+✔ dictation telemetry schedules automatic backoff retry after a server rejection (8.404548ms)
+✔ edición in situ: Esc con cambios confirma y reanuda una sola vez (2.152779ms)
+✔ edición in situ: Esc sin cambios desactiva y reanuda una sola vez (0.34047ms)
+✔ edición in situ: confirmar por botón conserva la ruta de confirmación (0.370831ms)
+✔ edición in situ: comparación cruda detecta cualquier cambio (0.194904ms)
+✔ edición in situ: la página registra y libera Escape (1.145984ms)
+✔ EP Security: Token creation, audience, scopes and command secrecy (11.337595ms)
+✔ EP Security: DB Rate limit enforcement (5 tokens per 15 mins) (4.008786ms)
+✔ EP Security: POST /api/ep/token platform parameter handling and command secrecy (11.851972ms)
+✔ EP Security: public authentication codes never expose internal errors (0.745926ms)
+✔ EP Security UI isolates Entorno Persistente as a submodule and keeps credentials ephemeral (0.495484ms)
+✔ EP Security: Middleware 308 redirect opens the Entorno Persistente submodule (0.84244ms)
+✔ EP token conserva audience, session y scopes (1.52901ms)
+✔ JWT rechaza firma alterada en tiempo constante (0.893012ms)
+✔ JWT rechaza algoritmo distinto aun con firma valida (0.239721ms)
+✔ JWT rechaza expiracion exacta y formatos no canonicos (0.238815ms)
+✔ 1. Base de datos no disponible responde 503 con DB_UNREACHABLE, retryable=true y cero detalles internos (6.615866ms)
+✔ 2. Esquema ausente produce EVENT_SCHEMA_MISSING y GET no ejecuta DDL (1.11785ms)
+✔ 3. Esquema histórico detecta columnas faltantes como EVENT_SCHEMA_OUTDATED y simula migración 022 (1.455579ms)
+✔ 4. Rol sin permisos DDL puede ejecutar GET/POST si el esquema ya está migrado (0.927899ms)
+✔ 5. Migración 022 es sintácticamente válida e incluye transacción (BEGIN/COMMIT) e idempotencia (4.461319ms)
+✔ 6. GET /api/eventos soporta JSON y NDJSON con filtros y redacción de secretos (1.007628ms)
+✔ 7. Diagnóstico sanitizado ante error grave no filtra detalles internos (0.703378ms)
+✔ OBS-1: Validación de privacidad prohíbe audio crudo, base64 blobs y claves de transcripción (9.20999ms)
+✔ OBS-1: Ingestión batch con deduplicación por event_uuid e idempotencia idéntica (4.239528ms)
+✔ OBS-1: Eventos de dictado User Data preservan clase, fallo y secuencia fuera del rango 999 (6.566927ms)
+✔ OBS-1: El estado de evento refleja los outcomes PENDING y SKIPPED de dictado (2.884931ms)
+✔ OBS-1: Cadena de hashes por correlación preserva integridad determinista (1.275881ms)
+✔ OBS-1: Endpoint POST /api/eventos procesa lotes JSON y aplica redacción de secretos (1.360452ms)
+✔ OBS-1: Outbox procesa reintentos pendientes tras fallos temporales (0.283993ms)
+✔ OBS-1: Desempeño a volumen (lote de eventos en secuencia) (6.545053ms)
+✔ registrarEvento nunca lanza ni bloquea aunque la DB falle (6.464519ms)
+✔ redacción de secretos en cleanSecretos funciona correctamente (0.36876ms)
+✔ validación de event_id por fase exige patrón ^{PREFIJO}-[0-9]{3}$ (0.335796ms)
+✔ perdidaDetectada=true activa registro de evento en reconciliarTranscripcion (5.731284ms)
+✔ GET /api/eventos con format=ndjson genera estructura x-ndjson (7.385581ms)
+✔ 009_folio.sql migration file contains exact required DDL and backfill statements (13.36668ms)
+✔ folio logic: backfill SQL simulation (0.358703ms)
+▶ PROMPT 8 — Fragmentos Literales Anclados (Arranque IAR) Suite
+  ✔ 1. Cálculo determinista de ID (UUIDv5) e Idempotencia conforme al contrato 5-0 (1.215252ms)
+  ✔ 2. Offsets Unicode UTF-16, emojis, acentos y combining marks (0.395566ms)
+  ✔ 3. Cobertura 100% contigua, cero huecos y cero solapes no declarados (4.356278ms)
+  ✔ 4. Inmutabilidad por corrida y persistencia append-only con nuevo sello (1.534585ms)
+  ✔ 5. Manejo de versión obsoleta (1.398218ms)
+  ✔ 6. Trazabilidad Inversa (fragment_id -> cita -> terna -> volcado) (0.462281ms)
+  ✔ 7. Manejo seguro de texto vacío (0.928944ms)
+✔ PROMPT 8 — Fragmentos Literales Anclados (Arranque IAR) Suite (11.506947ms)
+✔ Caso 1: sin KHORA_SHELL (undefined), todo es vigente sin importar rutasOs (1.153212ms)
+✔ Caso 2: cadena vacía en shellEnv no es 'os' (0.162633ms)
+✔ Caso 3: mayúsculas en shellEnv ('OS') no activan — falla seguro, no falla abierto (0.119543ms)
+✔ Caso 4: espacio en la variable de entorno (' os') no activa — falla seguro (0.1051ms)
+✔ Caso 5: caso base, shellEnv='os' y la ruta está declarada en rutasOs (0.131405ms)
+✔ Caso 6: pathname='/os' ya está en el árbol de destino, no se reescribe dos veces (0.313565ms)
+✔ Caso 7: pathname='/os/' startsWith('/os') también atrapa el slash final (0.217494ms)
+✔ Caso 8: ruta '/nucleo' no declarada en rutasOs ({'/'}), aunque el shell esté activo (0.106353ms)
+✔ Caso 9: sin slash final en rutasOs ({'/nucleo'}) para '/nucleo/' -> no hay match; cero normalización (0.42848ms)
+✔ Caso 10: rutasOs con múltiples entradas ({'/', '/nucleo'}), ambas activas de forma independiente (0.399522ms)
+✔ Caso 11: pathname '' vacío es un caso defensivo, resuelve a vigente y no revienta (0.203454ms)
+✔ Caso 12: rutasOs vacío nunca activa nada, ni con el shell prendido (0.091384ms)
+✔ token format rejects classic tokens, whitespace and unbounded input (1.230036ms)
+✔ stored secret is authenticated ciphertext; GET metadata and audit never contain it (2.006351ms)
+✔ norm and EP are isolated and ciphertext cannot be moved between purposes or users (1.014938ms)
+✔ plaintext and tampered ciphertext fail closed (0.651016ms)
+✔ deletion is repeatable and removes only the selected purpose (0.621103ms)
+✔ GitHub validation is bounded and destination is fixed per purpose (3.170909ms)
+✔ GitHub 401 does not save or leak upstream body (155.438411ms)
+✔ GitHub 403 does not save or leak upstream body (42.601634ms)
+✔ GitHub 404 does not save or leak upstream body (24.301087ms)
+✔ GitHub 429 does not save or leak upstream body (16.056639ms)
+✔ GitHub 500 does not save or leak upstream body (16.023272ms)
+✔ GitHub network exception is sanitized and leaves previous credential intact (15.565918ms)
+✔ route requires owner, unlocked vault, correct origin and bounded JSON (119.463389ms)
+✔ route saves and returns only metadata; responses prohibit caching (8.667744ms)
+✔ database-backed change limit cannot be bypassed by new server instance (0.985034ms)
+✔ MCP reads saved normative credential without using EP credential (0.881399ms)
+✔ database failure is not reported as absent secret or upstream GitHub failure (1.039441ms)
+✔ EP secret export requires new explicit scopes and owner; never returns norm secret (8.661406ms)
+✔ bootstrap bytes match committed generator and secret retrieval never uses MCP or clipboard (0.715757ms)
+✔ UI is write-only, purpose-specific and locked by vault state, with no browser persistence (0.32718ms)
+Neo4j-backed graph query error: Neo4jInalcanzableError: Neo4j no estÃ¡ disponible: offline
+    at obtenerProyeccionGrafo (/data/khora-integration/khora-merge-d7v1c0pt/khora-web/lib/server/grafo-proyeccion.ts:213:42)
+    at async GET (/data/khora-integration/khora-merge-d7v1c0pt/khora-web/app/api/grafo/route.ts:19:24)
+    at async TestContext.<anonymous> (/data/khora-integration/khora-merge-d7v1c0pt/khora-web/tests/unit/grafo_neo4j.test.ts:71:15)
+    at async Test.run (node:internal/test_runner/test:1125:7)
+    at async Test.processPendingSubtests (node:internal/test_runner/test:787:7) {
+  code: 'NEO4J_UNREACHABLE'
+}
+Neo4j-backed graph query error: Error: invalid Cypher
+    at <anonymous> (/data/khora-integration/khora-merge-d7v1c0pt/khora-web/tests/unit/grafo_neo4j.test.ts:69:148)
+    at Object.run (/data/khora-integration/khora-merge-d7v1c0pt/khora-web/tests/unit/grafo_neo4j.test.ts:15:135)
+    at limitada (/data/khora-integration/khora-merge-d7v1c0pt/khora-web/lib/server/grafo-proyeccion.ts:50:32)
+    at <anonymous> (/data/khora-integration/khora-merge-d7v1c0pt/khora-web/lib/server/grafo-proyeccion.ts:94:30)
+    at ejecutarConFallbackNeo4j (/data/khora-integration/khora-merge-d7v1c0pt/khora-web/lib/server/neo4j-conexion.ts:27:20)
+    at obtenerProyeccionGrafo (/data/khora-integration/khora-merge-d7v1c0pt/khora-web/lib/server/grafo-proyeccion.ts:83:18)
+    at GET (/data/khora-integration/khora-merge-d7v1c0pt/khora-web/app/api/grafo/route.ts:19:30)
+    at TestContext.<anonymous> (/data/khora-integration/khora-merge-d7v1c0pt/khora-web/tests/unit/grafo_neo4j.test.ts:74:17)
+    at async Test.run (node:internal/test_runner/test:1125:7)
+    at async Test.processPendingSubtests (node:internal/test_runner/test:787:7)
+Neo4j-backed graph query error: Neo4jNoConfiguradoError: Credenciales de Neo4j no configuradas en las variables de entorno (NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD)
+    at obtenerProyeccionGrafo (/data/khora-integration/khora-merge-d7v1c0pt/khora-web/lib/server/grafo-proyeccion.ts:76:41)
+    at GET (/data/khora-integration/khora-merge-d7v1c0pt/khora-web/app/api/grafo/route.ts:19:30)
+    at TestContext.<anonymous> (/data/khora-integration/khora-merge-d7v1c0pt/khora-web/tests/unit/grafo_neo4j.test.ts:83:23)
+    at Test.runInAsyncScope (node:async_hooks:228:14)
+    at Test.run (node:internal/test_runner/test:1118:25)
+    at Test.processPendingSubtests (node:internal/test_runner/test:787:18)
+    at Test.postRun (node:internal/test_runner/test:1247:19)
+    at Test.run (node:internal/test_runner/test:1175:12)
+    at async Test.processPendingSubtests (node:internal/test_runner/test:787:7) {
+  code: 'NEO4J_UNCONFIGURED'
+}
+✔ /api/grafo exposes filtered InformationObject and MENTIONS without dangling edges (8.516969ms)
+✔ /api/grafo declares truncation and clamps large limits (1.193032ms)
+✔ /api/grafo rejects invalid limits instead of silently defaulting (1.002211ms)
+✔ /api/grafo distinguishes unavailable Neo4j (503) from query defects (500) (10.802156ms)
+✔ /api/grafo returns 503 when Neo4j credentials are missing (1.22503ms)
+✔ /api/grafo retries routing discovery once through the equivalent direct Bolt URI (1.989475ms)
+✔ /api/grafo timestamp fallbacks use valid Cypher in global and filtered queries (1.962306ms)
+✔ /api/grafo reads published Leiden membership rather than stale entity properties (1.370287ms)
+✔ /api/grafo preserves edge provenance and unique identities across source versions (1.06394ms)
+✔ identity references bind immutable exact contexts without model recopy (1.171658ms)
+✔ identity references reject swapped sides and unknown pairs (0.53001ms)
+✔ identity references do not rescue old invalid raw evidence responses (0.151408ms)
+✔ identity references retain name-only evidence rejection (0.171809ms)
+✔ identity reference inputs retain both sources and uncertainty criterion (0.795ms)
+✔ shelf packing preserves every node and avoids card overlap (157.417592ms)
+✔ missing membership is not invented (1.044769ms)
+✔ graph reading has no vault factor, mutations retain it (0.997894ms)
+✔ idle PIN exemption is confined to graph route (0.245695ms)
+✔ compact graph retains distinct human review and traceability (0.241599ms)
+✔ layout uses canonical published membership, never numeric hash (16.527966ms)
+✔ layout is deterministic across input order and retains every entity (7.369277ms)
+✔ empty and isolated entities are valid, no invented community (1.054204ms)
+✔ manual verified release does not impersonate Git deployment (13.167121ms)
+✔ actual Git metadata takes precedence over manual release (0.947727ms)
+✔ missing or malformed manual identity remains unverified (3.319607ms)
+✔ anchors preserve literal original positions and negation (3.99136ms)
+✔ fabricated or concatenated quotes never enter a graph (0.421728ms)
+✔ ambiguous repeated evidence is not assigned guessed coordinates (0.192958ms)
+✔ literal endpoints required, not inferred identities (0.173924ms)
+✔ automatic acceptance is system attributed and cannot leak to curated (4.230585ms)
+✔ only explicit matching owner judgments change curated (1.182212ms)
+✔ reject affects curated only, originals and automatic stay intact (0.827565ms)
+✔ same spelling across sources does not manufacture identity (9.542178ms)
+✔ fixed seed reproduces partition without desired community count (2.031026ms)
+✔ chunking retains whitespace and context, never loses tail (0.528448ms)
+✔ wrong source hashes cannot be combined under a proposal (0.561305ms)
+✔ lexical equality generates candidates, never identity acceptance (1.572572ms)
+✔ identity validation fails closed on invented evidence or unknown pairs (0.548706ms)
+✔ grounded identity merges automatic only, curated needs separate explicit judgment (1.54313ms)
+✔ examined identity pairs are not proposed twice (0.545289ms)
+✔ display source filters and limits preserve persisted membership (0.623851ms)
+✔ detects the real MP3 signature instead of trusting the filename (2.224508ms)
+✔ decrypts an AES-GCM staging payload without changing bytes (1.534009ms)
+✔ accepts only a staging URL bound to the same session (0.433472ms)
+✔ keeps the product limit above the supplied 13.97 MB sample (0.293406ms)
+▶ Ingesta Route Suite
+  ✔ 0. Missing provenance remains rejected before kernel or persistence (11.78602ms)
+  ✔ 1. Ingesta de versión aprobada - Ingesta exitosa con io_id persistido (54.677324ms)
+  ✔ 2. Rechazo de versión no aprobada (4.934128ms)
+  ✔ 3. Rechazo de SHA incorrecto (57.701128ms)
+  ✔ 4. volcado_id inexistente (2.509345ms)
+  ✔ 5. versión inexistente (45.459735ms)
+  ✔ 6. Fallo del kernel (500 Error) (47.346105ms)
+  ✔ 7. Request Timeout (105.001764ms)
+  ✔ 8. Retry & Idempotency - Allows retry from fallido and ingerido (157.159963ms)
+✔ Ingesta Route Suite (543.80164ms)
+✔ all 54 instances preserve six mirrored bars and one interior cut (2.249671ms)
+✔ deterministic cosmetic seeds reach every bounded variant (4.817306ms)
+✔ unavailable entropy and invalid inputs use a canonical static instance (0.384357ms)
+▶ KPIs Suite - Métricas LLM, Fan-Out y Benchmarks de Frontera
+  ✔ 1. Cálculo correcto de TTFT y TPS con tokens reales y estimados (0.592542ms)
+  ✔ 1b. Manejo de evento usage con completion_tokens vs fallback a estimado por caracteres (0.203082ms)
+  ✔ 1c. Ventana de generación usa lastChunkTime y previene distorsión por latencia de usage/fin (0.188808ms)
+  ✔ 2. El fan-out a N perfiles tolera el fallo parcial de uno sin afectar a los demás (0.310268ms)
+  ✔ 3. El panel se degrada con un mensaje claro si ningún perfil tiene credenciales configuradas (0.148019ms)
+  ✔ 4. Integridad de la tabla estática de benchmarks de frontera y catálogo de modelos (0.820772ms)
+✔ KPIs Suite - Métricas LLM, Fan-Out y Benchmarks de Frontera (4.087088ms)
+✔ all 17 real registration shapes generate valid schemas and accept advertised examples (295.339935ms)
+✔ receipt schema publishes every required field and rejects their omission independently (45.729422ms)
+✔ receipt preserves evidence extras and enforces conditional principle evidence (1.883021ms)
+✔ semantic date/whitespace checks and platform restriction remain fail closed (0.628102ms)
+✔ malformed receipt is rejected by the real verifier before any network request (0.917879ms)
+✔ real route: HTTP discovery and all 17 calls agree; malformed input cannot reach service (308.141755ms)
+✔ real route: missing/revoked auth and missing configuration fail before services (13.747955ms)
+✔ real route: every substantive tool is blocked by scope or denied turn; norm opening requires scope (380.929854ms)
+✔ real route: malformed controls and numeric bounds cannot reach business services (76.623259ms)
+✔ DCR registers and validates a Notion public client (20.582726ms)
+✔ DCR rejects non-Notion redirects and tampering (3.035477ms)
+✔ private normative read requires dedicated credential, never broad token or anonymous fallback (4.412649ms)
+✔ normative read sends auth only to the selected GitHub repo and forbids redirects (69.053377ms)
+✔ GitHub 401 classified as NORM_GITHUB_CREDENTIAL_REJECTED (5.402449ms)
+✔ GitHub 403 classified as NORM_GITHUB_FORBIDDEN (1.392575ms)
+✔ GitHub 404 classified as NORM_GITHUB_NOT_FOUND_OR_INACCESSIBLE (0.63999ms)
+✔ GitHub 403 classified as NORM_GITHUB_RATE_LIMITED (0.610046ms)
+✔ GitHub 429 classified as NORM_GITHUB_RATE_LIMITED (2.734062ms)
+✔ GitHub 500 classified as NORM_GITHUB_UNAVAILABLE (0.684888ms)
+✔ GitHub 422 classified as NORM_GITHUB_HTTP_ERROR (0.636515ms)
+✔ GitHub network and malformed JSON fail explicitly without leaking upstream body (6.068683ms)
+✔ GitHub response size is bounded and cannot be mistaken for a valid source (32.660606ms)
+✔ GitHub timeout aborts the request and reports the observed timeout (0.464978ms)
+✔ all ten normative GitHub fetches use the authenticated bounded helper (0.332098ms)
+✔ unknown errors, SQL details, hostile names and credentials do not enter public diagnostics (4.752146ms)
+✔ known normative codes stay exact with condition-specific recovery (0.623356ms)
+✔ SQL states are classified without echoing SQL or exception text (0.157628ms)
+✔ partial, empty, stale and rejected verification remain distinguishable from success (0.40669ms)
+✔ real SDK validation errors are sanitized before being returned to the client (120.41806ms)
+✔ all fifteen tools sanitize unexpected exceptions; health retains upstream evidence (213.800587ms)
+✔ audit persistence exception never replaces or repeats the business outcome (27.646842ms)
+✔ HTTP auth failure preserves standard status/challenge without exposing private reason (1.172423ms)
+✔ HTTP success bodies are not consumed or transformed; unknown exceptions are safe (0.590998ms)
+✔ unreadable search rows report partial coverage, never a complete empty search (75.266224ms)
+✔ failed versions/audit queries are partial, distinguishable from confirmed empty lists (37.772456ms)
+✔ historical decryption failure is flagged and cannot be represented as a successful verbatim read (49.900581ms)
+✔ fixed HTTP input errors have actionable safe diagnoses; hostile details remain redacted (9.049054ms)
+✔ consent denial does not disclose either account in a redirect (0.371788ms)
+✔ audit false is explicit, even when no exception is thrown (0.501715ms)
+✔ every known diagnostic explains the problem without repeating its technical code (6.034238ms)
+✔ private instructions failures name the repository without claiming that every 404 is a missing credential (0.227319ms)
+✔ manual Bearer token is high-entropy, scoped, expiring and stored by hash (2.426706ms)
+✔ manual Bearer token authentication accepts only live hash-backed tokens (0.455113ms)
+✔ canonical MCP accepts a valid manual Bearer token and still enforces global generation revocation (37.251014ms)
+✔ normative gate accepts a valid open turn token bound to its snapshot (12.090513ms)
+✔ normative gate rejects a closed turn (1.632029ms)
+✔ normative gate rejects a token with mismatched snapshot (0.643921ms)
+✔ normative gate rejects a token after global revocation (0.559044ms)
+✔ cycle verification output record preserves cycle, attempt, verdict and evidence (0.533663ms)
+✔ server-side principle application enforces canonical order and builds the complete ledger (5.101629ms)
+✔ normative verification rejects replay of a token after the turn is closed (5.161044ms)
+✔ normative attempt idempotency only accepts the exact recorded nonce and evidence (0.273303ms)
+✔ 026_normative_turns define un ciclo normativo único y sus invariantes (1.400556ms)
+✔ 027_manual_mcp_tokens define un Bearer manual revocable, scoped and expirable (0.419707ms)
+✔ migrate-runtime incluye 027_manual_mcp_tokens (0.242942ms)
+✔ 028_normative_order_ledger define el ledger server-side y el binding de snapshot (0.266445ms)
+✔ migrate-runtime incluye 028_normative_order_ledger (0.211618ms)
+✔ normative turn inserts keep SQL placeholder cardinality aligned (0.476079ms)
+✔ 1. Concurrent refresh token rotation produces exactly 1 success and 1 invalid_grant (2.116282ms)
+✔ 2. MCP_CANONICAL_URL semantics and metadata endpoints consistency (6.577847ms)
+✔ 2b. PKCE S256 verification behavior (0.499864ms)
+✔ 2c. Atomic authorization code consumption & resource validation in /api/oauth/token (23.314019ms)
+✔ 3. JWT validation on /api/mcp (iss, aud, scope, gen, exp) (28.289415ms)
+✔ 4. Missing KHORA_READONLY_DATABASE_URL in production returns 503 (0.76871ms)
+✔ 5. MCP Tools signature and export validation (0.239141ms)
+✔ MCP preserves root securitySchemes for all seventeen tools (6.02954ms)
+✔ route publishes derived schemas and retains authentication and normative gate (0.495916ms)
+✔ one canonical document covers the exact tool catalog and current output version (0.85778ms)
+To get started with GitHub CLI, please run:  gh auth login
+Alternatively, populate the GH_TOKEN environment variable with a GitHub API authentication token.
+✖ KHORA local contract matches the canonical Metodología contract (288.677203ms)
+✔ parser no depende de la sección 5 para delimitar el catálogo (3.101681ms)
+✔ parser rechaza folios duplicados (0.9515ms)
+✔ parser rechaza principios sin estado canónico (0.324286ms)
+✔ parser rechaza preponderancia fuera del dominio 0..1 (0.306287ms)
+✔ formato canónico del SI conserva identidad y antigüedad relativa (0.431716ms)
+✔ formato canónico cambia a horas y luego a fecha absoluta sin alterar la identidad (0.415507ms)
+✔ formato canónico de Metodología conserva identidad y antigüedad relativa (0.321227ms)
+▶ methodology snapshots parse canonical Markdown and reject missing required fields
+  ✔ current: valid (41.334089ms)
+  ✔ stored: valid (4.000227ms)
+  ✔ current: missing version (11.676603ms)
+  ✔ stored: missing version (1.219295ms)
+  ✔ current: invalid version (1.085731ms)
+  ✔ stored: invalid version (2.324042ms)
+  ✔ current: missing name (1.075453ms)
+  ✔ stored: missing name (4.989071ms)
+  ✔ current: missing date (1.441031ms)
+  ✔ stored: missing date (0.940123ms)
+✔ methodology snapshots parse canonical Markdown and reject missing required fields (291.171749ms)
+✔ uses the local canonical contract version (0.7944ms)
+✔ renders and validates the exact six-line canonical output (1.268514ms)
+✔ rejects extra text, line count drift, bad states and non-canonical renderings (0.4514ms)
+✔ hash is exact and deterministic (0.372584ms)
+✔ rejects missing and invalid canonical RA states (2.216075ms)
+✔ accepts all supported runtime reasoning states (2.489311ms)
+✔ rejects unknown output format (0.156926ms)
+✔ rejects an incomplete runtime contract (0.124286ms)
+✔ JWT signing and verification (4.172536ms)
+✔ PKCE S256 verifier and challenge validation (1.804916ms)
+✔ foldAccents preserves character index map (0.369283ms)
+✔ 024_oauth_scopes agrega scope a códigos y refresh tokens sin destruir defaults (0.868617ms)
+✔ mapCap0ToObs1 bijectively transforms CAP-0 envelope to OBS-1 envelope (0.807546ms)
+✔ mapObs1ToCap0 bijectively transforms OBS-1 envelope to CAP-0 envelope (1.666943ms)
+✔ ObservationBatch v2 valida cobertura diagnóstica y NDJSON (7.936817ms)
+✔ ObservationBatch v2 rechaza métricas que intenten transportar texto o audio (1.361372ms)
+✔ ObservationBatch v2 rechaza claves de contexto que podrían filtrar navegación o texto (2.143521ms)
+✔ ObservationBatch v2 rechaza inconsistencias del resumen (0.892611ms)
+✔ ObservationBatch v2 limita valores JSON diagnósticos (3.045367ms)
+✔ ObservationBatch v2 rechaza strings diagnósticas excesivamente largas (0.428736ms)
+✔ ObservationEvent conserva scope, categoría y severidad al entrar al almacén SQL (1.163203ms)
+✔ Batch 1: scheduler es por evento, agrupado y acotado (0.954083ms)
+✔ Batch 1: reinicio recupera pendientes y los fallos respetan backoff (0.860393ms)
+✔ Batch 1: existe un único camino de envío y permite manual + automático (0.436603ms)
+✔ Batch 1: el transporte de observaciones es directo al runtime y el content-script usa sesión (0.223182ms)
+✔ Batch 1: no quedan saltos de línea literales que inutilicen los scripts de extensión (0.230236ms)
+▶ Perfil Local Suite - Inferencia Ollama, Script PowerShell y TPS
+  ✔ 1. Generación correcta de script PowerShell sin exponer $env:OLLAMA_ORIGINS='*' (0.627234ms)
+  ✔ 2. Cálculo exacto de TPS a partir de eval_count y eval_duration (nanosegundos) (0.196477ms)
+  ✔ 3. Diagnóstico de salud proactivo en 4 estados (no_instalado, sin_modelo, listo, error) (37.948775ms)
+  ✔ 4. Inferencia con mock de respuesta NDJSON nativa de Ollama parsea chunks y calcula TPS (4.047097ms)
+  ✔ 5. No regresión: el perfil 'local' coexiste en model_catalog.ts sin alterar los otros 3 (4.563015ms)
+  ✔ 6. Parseo binario de ventana de contexto en tokens reales (parsearContextoTokensBinario) (0.335164ms)
+  ✔ 7. Resolución dinámica de modelo local (resolverModeloYVentanaLocal) en los 3 casos (0.34745ms)
+✔ Perfil Local Suite - Inferencia Ollama, Script PowerShell y TPS (49.575004ms)
+▶ Pipeline Suite
+  ✔ 1. pipeline completo (2.045642ms)
+  ✔ 2. volcado archivado (0.871059ms)
+  ✔ 3. volcado pendiente de revisión (0.475307ms)
+  ✔ 4. volcado revisado (en_revision) (0.438699ms)
+  ✔ 5. volcado aprobado (0.401556ms)
+  ✔ 6. volcado ingerido (0.420745ms)
+  ✔ 7. ingesta fallida (0.313391ms)
+  ✔ 8. dictado sin audio (0.283442ms)
+  ✔ 9. audio sin texto (0.364273ms)
+  ✔ 10. audio parcial (0.576457ms)
+  ✔ 11. versión modificada (0.435664ms)
+  ✔ 12. provenance roto (0.436235ms)
+  ✔ 13. entrada manual sin audio no genera anomalía (0.457821ms)
+  ✔ 14. io_id correctamente relacionado (0.384631ms)
+  ✔ 15. agregaciones (0.4346ms)
+  ✔ 16. ausencia de N+1 evidente (0.279212ms)
+  ✔ 17. idempotencia (36.509278ms)
+✔ Pipeline Suite (47.868847ms)
+✔ portable vault remains inside existing security menu (1.376322ms)
+✔ production and both review renderers use the same shared view (0.385144ms)
+✔ both closed states register exactly the identifiers present in the shared view (1.017492ms)
+✔ pending surface cannot handle secrets or perform fake protected operations (0.252303ms)
+▶ Primer Vínculo Harness Suite
+  ✔ 1. Ejecución Exitosa: Volcado listo_ingesta aterriza en Neo4j y se verifica de forma independiente (73.656834ms)
+  ✔ 2. Idempotencia: Volcado ya ingerido reporta idempotent=true y ratificacion=null sin duplicar (0.54547ms)
+  ✔ 3. Rechazo claro si volcado no está en listo_ingesta (0.220582ms)
+  ✔ 4. Dry-run: Valida origen y hace healthcheck del kernel sin modificar BD ni Neo4j (37.45706ms)
+  ✔ 5. Manejo de error en el bridge Python (HTTP 500) (51.510186ms)
+  ✔ 6. Dry-run falla cerrado cuando Neo4j no está saludable (37.032721ms)
+  ✔ 7. Un volcado fallido puede reintentarse sin intervención manual (39.765464ms)
+  ✔ 8. Tolera respuesta sin io_id y verifica por identidad persistida sin mezclar namespaces (39.087931ms)
+✔ Primer Vínculo Harness Suite (343.298084ms)
+✔ proposal_contract: valid envelope passes validation (6.148383ms)
+✔ proposal_contract: FAILS on incomplete source triplet (1.190061ms)
+✔ proposal_contract: FAILS on altered payload hash (3.146222ms)
+✔ proposal_contract: FAILS on invalid anchor (0.732979ms)
+✔ proposal_contract: FAILS on unknown schema version (0.496899ms)
+✔ proposal_contract: Judgment Zone modifications do NOT alter or invalidate payload_hash (0.613975ms)
+✔ proposal_contract: computeItemId produces deterministic UUIDv5 (0.702235ms)
+▶ Motor de Corrección Nivel Word bajo Guardián — PROMPT 3A Suite
+  ✔ 1. Construcción determinista de Terna y Sello SHA-256 (1.891784ms)
+  ✔ 2. Offsets Unicode, emojis, acentos y combining marks con slice exacto JS UTF-16 (2.670385ms)
+  ✔ 3. Respuesta LLM malformada o vacía es tolerada de forma segura (2.211178ms)
+  ✔ 4. Detección de solapamientos y cálculo de ítems en conflicto (0.685302ms)
+  ✔ 5. Intento de aplicar con SHA vencido o versión obsoleta es rechazado (2.22324ms)
+  ✔ 6. Intento de aplicar lote con solapamiento rechaza el lote y marca ítems como pendiente_revision (0.811756ms)
+  ✔ 7. Aceptación exitosa de lote no solapado crea NUEVA volcado_version e inmutabilidad fuente (3.139958ms)
+✔ Motor de Corrección Nivel Word bajo Guardián — PROMPT 3A Suite (15.580389ms)
+✔ propuestasRepo: mapping between JudgmentDecision and AccionJuicio is bidirectional and exact (1.148945ms)
+✔ propuestasRepo: guardarPropuesta y reconstrucción offline idéntica (sin Neo4j) (18.676925ms)
+✔ propuestasRepo: guardarPropuesta es idempotente para la misma terna y payload_hash (0.684592ms)
+✔ propuestasRepo: registrarJuicio es append-only y no modifica payload_hash ni elimina dictámenes previos (1.14659ms)
+✔ propuestasRepo: RECHAZA dictamen o asiento si la propuesta está vencida (10.067372ms)
+✔ propuestasRepo: RECHAZA dictamen o asiento si el SHA256 del volcado cambió (propuesta obsoleta) (1.919129ms)
+✔ propuestasRepo: reintento de registrarActaAsiento en propuesta ya asentada lanza conflicto (2.874199ms)
+✔ reconciliarSegmentos reemplaza segmentos provisionales por autoritativos (1.902268ms)
+✔ reconciliarSegmentos PROTEGE strictly un segmento editado manualmente (0.337317ms)
+✔ reconciliarTranscripcion respeta bandera modificadoManualmente (0.259212ms)
+CONTEO DE ESTADOS ANTES: {"archivado":2}
+HUÉRFANOS V1 EN REVISIÓN ANTES: 1
+Lote de 2 volcados elegibles. Dry-run: false
+✓ Procesado volcado ID id-1 (#1) a 'en_revision' con v1
+✓ Procesado volcado ID id-2 (#2) a 'en_revision' con v1
+CONTEO DE ESTADOS DESPUÉS: {"en_revision":2}
+HUÉRFANOS V1 EN REVISIÓN DESPUÉS: 1
+CONTEO DE ESTADOS ANTES: {"en_revision":2}
+HUÉRFANOS V1 EN REVISIÓN ANTES: 1
+CONTEO DE ESTADOS DESPUÉS: {"en_revision":2}
+HUÉRFANOS V1 EN REVISIÓN DESPUÉS: 1
+▶ Review Entrance & Incident Engine Backend
+  ✔ 1. Crear volcado (ruta directa y dictado) deja estado == S_REVISION ('en_revision') en feliz (192.432654ms)
+  ✔ 2. Si la promoción falla en creación: estado == S_CAPTURA ('archivado') + 1 log de fallo + verbatim se conserva (42.133377ms)
+  ✔ 6. Vista 'Todos' en la UI incluye la unión de todos los estados y no expone S_CAPTURA de forma aislada (0.434036ms)
+  ✔ 3, 4, 5. Backfill idempotente, sha256 inmutable y conteo de archivados (238.43575ms)
+  ✔ resolverIncidente valida códigos específicos para audio_no_recuperable (1.206872ms)
+✔ Review Entrance & Incident Engine Backend (476.426752ms)
+✔ runtime snapshot acepta estado semántico y rechaza contenido sensible (6.673374ms)
+✔ 023_runtime_state define almacenamiento idempotente del snapshot vivo (0.824732ms)
+✔ runtime telemetry no conserva transporte de observaciones vía GitHub (0.785342ms)
+▶ Segmentación en Párrafos Re-ejecutable y Guardián Duro
+  ✔ 1. Camino feliz: normalizar(verbatim) === normalizar(propuesta) (igualdad EXACTA de caracteres no-blancos) (4.032914ms)
+  ✔ 2. sha256(verbatim) idéntico antes y después de generar y ratificar (4.845737ms)
+  ✔ 3. Segunda ejecución: solo cambia el campo de propuesta; verbatim y sha256 intactos (2.953744ms)
+  ✔ 4. Guardián duro: con output mutado (palabra cambiada/borrada), RECHAZA, no persiste y emite exactamente 1 evento FAIL (1.212828ms)
+  ✔ 5. Ratificación: hasta no ratificar, texto oficial no cambia; tras ratificar, fija timestamp de ratificación (1.253535ms)
+✔ Segmentación en Párrafos Re-ejecutable y Guardián Duro (15.318864ms)
+✔ service observability contract covers the service boundaries (1.339019ms)
+✔ primary navigation stays bounded and registry-driven (1.45997ms)
+✔ system menu only exposes secondary surfaces (0.328702ms)
+✔ ingreso is the capture surface and volcados is the downstream archive/review domain (0.192453ms)
+✔ legacy ingreso routes resolve to canonical semantic domains without dead modes (0.399243ms)
+✔ domain menus remain hierarchical while ingreso and volcados stay primary (0.275167ms)
+✔ canonical coverage is unique (0.305299ms)
+✔ shell renders the registry and keeps menu panels un-clipped (0.267834ms)
+▶ Tildes Seguras & Groq Suite
+  ✔ 1. autoaplicarTildesSeguras corrige formas obligatorias e inequívocas (0.816996ms)
+  ✔ 2. autoaplicarTildesSeguras no autoaplica formas ambiguas (mas vs más, esta vs está) (0.472722ms)
+  ✔ 3. idempotencia: ejecutar dos veces no altera el texto (0.203945ms)
+✔ Tildes Seguras & Groq Suite (2.378227ms)
+▶ Titulos Suite - PROMPT TIT-1A Engine Tests & Golden Cases
+  ✔ 1. segmentarTextoEnChunks aplica solapamiento real (overlapChars) sin cortar contexto (0.807771ms)
+  ✔ 2. Idea central ubicada al final en un documento multi-chunk (12+ chunks) (3.881576ms)
+  ✔ 3. Un solo hilo ideacional claro (0.572289ms)
+  ✔ 4. Cinco hilos temáticos sintetizados sin rebasar límite de longitud (0.418399ms)
+  ✔ 5. Dictado repetitivo con deduplicación de ideas (0.351352ms)
+  ✔ 6. Preservación de nombres propios ratificados (Dąbrowski, Groq, Juan Pérez) (0.566651ms)
+  ✔ 7. Manejo correcto de negaciones explícitas (0.29735ms)
+  ✔ 8. Transcripción centrada en una pregunta o interrogante clave (0.389281ms)
+  ✔ 9. Tomar decisiones o acuerdos formales como eje del título (0.290646ms)
+  ✔ 10. Material heterogéneo y multidisciplinario (0.305992ms)
+  ✔ 11. Fallback sin API key distribuye el análisis por todo el documento y calcula offsets válidos (0.251651ms)
+  ✔ 12. Detección y rechazo de títulos genéricos o prohibidos (0.218909ms)
+  ✔ 13. Offset matching de evidencia literal (buscarOffsetLiteral) (0.120492ms)
+  ✔ 14. generarTituloDeUltimoRecurso garantiza siempre un título no vacío sin fallar (1.575258ms)
+  ✔ 15. generarTituloConGarantia devuelve un TituloConGarantiaResult completo y nunca falla (0.411446ms)
+  ✔ A. IDEA-CENTRAL-AL-FINAL: texto con >=14 chunks donde la afirmación central aparece SOLO en el último chunk (3.642195ms)
+  ✔ B. IDEA-EN-CHUNK-12: término distintivo inyectado únicamente en el chunk 12 (1.270962ms)
+  ✔ C. TRES-HILOS: texto multihilo con 3 líneas ideacionales claras debe exponer las 3 (0.219693ms)
+  ✔ D. ORACIÓN-CLAVE-TARDÍA: oración decisiva es la 4ª dentro de un bloque (0.406895ms)
+  ✔ E. OVERLAP-FRONTERA: bigrama en el límite de chunk aparece íntegro con overlapChars > 0 (0.124268ms)
+  ✔ F. FALLBACK-DISTRIBUIDO: sin API key sobre texto con inicio genérico y señal al centro/final (0.364737ms)
+  ✔ NO-REGRESIÓN: comprobación explícita de no truncamiento sobre chunks 11/12 (1.459387ms)
+✔ Titulos Suite - PROMPT TIT-1A Engine Tests & Golden Cases (20.484869ms)
+✔ unirDosTranscriptsConOverlap deduplica el solapamiento de palabras de forma determinista (2.051944ms)
+✔ unirDosTranscriptsConOverlap maneja superposición exacta con puntuación y mayúsculas variadas (0.263347ms)
+✔ unirDosTranscriptsConOverlap si no hay solapamiento concatena limpiamente (0.205744ms)
+✔ unirTranscriptsConOverlap deduplica una secuencia de múltiples chunks de audio (0.335575ms)
+▶ UI Review Harness Test Suite
+  ✔ 1. Registro de pantallas y escenarios completo y no vacío (1.694004ms)
+  ✔ 2. ReviewFixtureAdapter opera exclusivamente con datos sintéticos y cero llamadas mutantes (0.334474ms)
+  ✔ 3. Fail-Closed Security: KHORA_UI_REVIEW_MODE=1 permite acceso, sin la variable responde 404 (106.503663ms)
+  ✔ 4. Fuente única de componentes presentacionales (1.553719ms)
+  ✔ 5. Prerender semántico existe para las diez pantallas (0.212757ms)
+✔ UI Review Harness Test Suite (111.990713ms)
+✔ existen todos los componentes compartidos obligatorios (0.906848ms)
+✔ ningun data-ui-id de produccion queda sin registrar (1.573045ms)
+✔ el registro no declara ui_ids fantasmas (0.876808ms)
+✔ cada pantalla declarada tiene escenarios y estados tipados (1.431396ms)
+✔ los escenarios de error y vacío son deterministas (0.202456ms)
+✔ los fixtures no contienen credenciales ni endpoints reales (0.200873ms)
+ℹ tests 549
+ℹ suites 5
+ℹ pass 548
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 77686.626009
+
+✖ failing tests:
+
+test at tests/unit/methodology_contract_sync.test.ts:2:1186
+✖ KHORA local contract matches the canonical Metodología contract (288.677203ms)
+  Error: Command failed: gh api -H Accept: application/vnd.github.raw+json repos/SeryMente/metodologia/contents/FORMATO-REGISTRO-VERIFICACION-CICLO.schema.json
+  To get started with GitHub CLI, please run:  gh auth login
+  Alternatively, populate the GH_TOKEN environment variable with a GitHub API authentication token.
+  
+      at genericNodeError (node:internal/errors:985:15)
+      at wrappedFn (node:internal/errors:539:14)
+      at checkExecSyncError (node:child_process:925:11)
+      at execFileSync (node:child_process:961:15)
+      at TestContext.<anonymous> (/data/khora-integration/khora-merge-d7v1c0pt/khora-web/tests/unit/methodology_contract_sync.test.ts:17:18)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:358:3) {
+    status: 4,
+    signal: null,
+    output: [ null, '', 'To get started with GitHub CLI, please run:  gh auth login\nAlternatively, populate the GH_TOKEN environment variable with a GitHub API authentication token.\n' ],
+    pid: 3468,
+    stdout: '',
+    stderr: 'To get started with GitHub CLI, please run:  gh auth login\nAlternatively, populate the GH_TOKEN environment variable with a GitHub API authentication token.\n'
+  }
+[unit-runner] status=1 signal=null

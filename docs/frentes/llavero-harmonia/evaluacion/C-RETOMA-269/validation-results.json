@@ -1,0 +1,81 @@
+{
+  "typecheck": {
+    "exit": 0,
+    "duration_seconds": 20.9,
+    "command": [
+      "npm",
+      "run",
+      "typecheck"
+    ],
+    "scope": "local synthetic only; no production, real identity, factor or hosted database"
+  },
+  "ui-review": {
+    "exit": 0,
+    "duration_seconds": 0.6,
+    "command": [
+      "npm",
+      "run",
+      "ui-review:check"
+    ],
+    "scope": "local synthetic only; no production, real identity, factor or hosted database"
+  },
+  "navigation": {
+    "exit": 1,
+    "duration_seconds": 0.6,
+    "command": [
+      "npm",
+      "run",
+      "ui:contract"
+    ],
+    "scope": "local synthetic only; no production, real identity, factor or hosted database"
+  },
+  "unit": {
+    "exit": 1,
+    "duration_seconds": 79.7,
+    "command": [
+      "npm",
+      "run",
+      "test:unit"
+    ],
+    "scope": "local synthetic only; no production, real identity, factor or hosted database"
+  },
+  "vault-syntax": {
+    "exit": 0,
+    "duration_seconds": 0.8,
+    "command": [
+      "npm",
+      "run",
+      "check"
+    ],
+    "scope": "local synthetic only; no production, real identity, factor or hosted database"
+  },
+  "vault-core-bridge": {
+    "exit": 0,
+    "duration_seconds": 12.4,
+    "command": [
+      "npm",
+      "test"
+    ],
+    "scope": "local synthetic only; no production, real identity, factor or hosted database"
+  },
+  "vault-browser": {
+    "exit": 0,
+    "duration_seconds": 9.6,
+    "command": [
+      "npm",
+      "run",
+      "test:browser"
+    ],
+    "scope": "local synthetic only; no production, real identity, factor or hosted database"
+  },
+  "vault-routes": {
+    "exit": 0,
+    "duration_seconds": 0.4,
+    "command": [
+      "npm",
+      "run",
+      "test:routes"
+    ],
+    "scope": "local synthetic only; no production, real identity, factor or hosted database"
+  }
+}

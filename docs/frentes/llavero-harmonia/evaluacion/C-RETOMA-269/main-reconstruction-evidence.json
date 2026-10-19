@@ -1,0 +1,198 @@
+{
+  "actualMain": "b5e7009de137db30c26ecc5f4ddbb34789f453f2",
+  "method": "local historical object tree plus exact PR326/327 diffs; immutable frontend tree verified against authenticated GitHub main listing",
+  "checks": [
+    {
+      "path": "khora-web/.env.example",
+      "expected": "af41e96387cc9c1a6b344117d28fee2108e35907",
+      "actual": "af41e96387cc9c1a6b344117d28fee2108e35907",
+      "match": true
+    },
+    {
+      "path": "khora-web/.gitignore",
+      "expected": "65abb90786764111efd2caece349bf97e37d05c1",
+      "actual": "65abb90786764111efd2caece349bf97e37d05c1",
+      "match": true
+    },
+    {
+      "path": "khora-web/.vercel-disparador",
+      "expected": "af43bde0e02028d9eaab92cabdd55b26aa5e7d49",
+      "actual": "af43bde0e02028d9eaab92cabdd55b26aa5e7d49",
+      "match": true
+    },
+    {
+      "path": "khora-web/README.md",
+      "expected": "e215bc4ccf138bbc38ad58ad57e92135484b3c0f",
+      "actual": "e215bc4ccf138bbc38ad58ad57e92135484b3c0f",
+      "match": true
+    },
+    {
+      "path": "khora-web/README_PDPC.md",
+      "expected": "44706bbcc2e4e9cb36d326c38eaab2b658dc719a",
+      "actual": "44706bbcc2e4e9cb36d326c38eaab2b658dc719a",
+      "match": true
+    },
+    {
+      "path": "khora-web/app",
+      "expected": "003ca4f7951862324eb83f177a32b580050a3ce6",
+      "actual": "003ca4f7951862324eb83f177a32b580050a3ce6",
+      "match": true
+    },
+    {
+      "path": "khora-web/auth.ts",
+      "expected": "dc87c3cfa142bd01f46c2a26577f7923c5e0f58a",
+      "actual": "dc87c3cfa142bd01f46c2a26577f7923c5e0f58a",
+      "match": true
+    },
+    {
+      "path": "khora-web/contracts",
+      "expected": "cafde5cdd034464b7028920a9ad56c6e7076f92e",
+      "actual": "cafde5cdd034464b7028920a9ad56c6e7076f92e",
+      "match": true
+    },
+    {
+      "path": "khora-web/db",
+      "expected": "a8c2ef6739d045df50c4e1dba7b39c4a7917ed07",
+      "actual": "a8c2ef6739d045df50c4e1dba7b39c4a7917ed07",
+      "match": true
+    },
+    {
+      "path": "khora-web/docs",
+      "expected": "b5819e55a7d4b29baeba78a02ae248ec55275ded",
+      "actual": "b5819e55a7d4b29baeba78a02ae248ec55275ded",
+      "match": true
+    },
+    {
+      "path": "khora-web/e2e",
+      "expected": "a18833bd8f6031f341dd45b4215ae471565b472f",
+      "actual": "a18833bd8f6031f341dd45b4215ae471565b472f",
+      "match": true
+    },
+    {
+      "path": "khora-web/extension",
+      "expected": "ab55a5263f4aad450a487238c6df5668c0d6732e",
+      "actual": "ab55a5263f4aad450a487238c6df5668c0d6732e",
+      "match": true
+    },
+    {
+      "path": "khora-web/firebase-applet-config.json",
+      "expected": "bfca9575ef0f4f589a5c21869e02d2e3fc9607a2",
+      "actual": "bfca9575ef0f4f589a5c21869e02d2e3fc9607a2",
+      "match": true
+    },
+    {
+      "path": "khora-web/lib",
+      "expected": "00443d27d292e1d70123fdb296d508dc08296266",
+      "actual": "00443d27d292e1d70123fdb296d508dc08296266",
+      "match": true
+    },
+    {
+      "path": "khora-web/map",
+      "expected": "b49badf820bc27b72e1034907ba196c70d0ff5bf",
+      "actual": "b49badf820bc27b72e1034907ba196c70d0ff5bf",
+      "match": true
+    },
+    {
+      "path": "khora-web/metadata.json",
+      "expected": "96ad0577e2923237100389830db31168fb43062a",
+      "actual": "96ad0577e2923237100389830db31168fb43062a",
+      "match": true
+    },
+    {
+      "path": "khora-web/middleware.ts",
+      "expected": "dbd01817872994a7229dcb329716fb9f724d1814",
+      "actual": "dbd01817872994a7229dcb329716fb9f724d1814",
+      "match": true
+    },
+    {
+      "path": "khora-web/next.config.ts",
+      "expected": "a37abfb46a21de8831ee6c258324def518deca97",
+      "actual": "a37abfb46a21de8831ee6c258324def518deca97",
+      "match": true
+    },
+    {
+      "path": "khora-web/next_run.log",
+      "expected": "51bec0915a04c0bdfec9423c9684a65e0f7f7852",
+      "actual": "51bec0915a04c0bdfec9423c9684a65e0f7f7852",
+      "match": true
+    },
+    {
+      "path": "khora-web/npm_output.log",
+      "expected": "3bca62616f92832a4328a0c13beddd8232fad997",
+      "actual": "3bca62616f92832a4328a0c13beddd8232fad997",
+      "match": true
+    },
+    {
+      "path": "khora-web/package-lock.json",
+      "expected": "987316f16dae22a60766b7354d81b34e11857960",
+      "actual": "987316f16dae22a60766b7354d81b34e11857960",
+      "match": true
+    },
+    {
+      "path": "khora-web/package.json",
+      "expected": "9d3124a7a0cbd231d7eb5451b541c501d2b407f5",
+      "actual": "9d3124a7a0cbd231d7eb5451b541c501d2b407f5",
+      "match": true
+    },
+    {
+      "path": "khora-web/pages",
+      "expected": "88a4f7cb81f6ac36c5b0bdf51e4b2fcf6409c20e",
+      "actual": "88a4f7cb81f6ac36c5b0bdf51e4b2fcf6409c20e",
+      "match": true
+    },
+    {
+      "path": "khora-web/playwright.benchmark.config.ts",
+      "expected": "3beea076198eccbb876266eebe5709d87787aad8",
+      "actual": "3beea076198eccbb876266eebe5709d87787aad8",
+      "match": true
+    },
+    {
+      "path": "khora-web/playwright.config.ts",
+      "expected": "8e1302847ef495d679d2635e7121d7c83ab12974",
+      "actual": "8e1302847ef495d679d2635e7121d7c83ab12974",
+      "match": true
+    },
+    {
+      "path": "khora-web/playwright.custodia.config.ts",
+      "expected": "7d3eb80651398d0d8432384fe0b4cb1652be92af",
+      "actual": "7d3eb80651398d0d8432384fe0b4cb1652be92af",
+      "match": true
+    },
+    {
+      "path": "khora-web/postcss.config.mjs",
+      "expected": "c7bcb4b1ee14cd5e25078c2c934529afdd2a7df9",
+      "actual": "c7bcb4b1ee14cd5e25078c2c934529afdd2a7df9",
+      "match": true
+    },
+    {
+      "path": "khora-web/public",
+      "expected": "894e1fdf25ef21cc67f90c859655926adcae77d8",
+      "actual": "894e1fdf25ef21cc67f90c859655926adcae77d8",
+      "match": true
+    },
+    {
+      "path": "khora-web/scripts",
+      "expected": "d7540d38ef3f9e5cc1fd683984c4adf23c03c915",
+      "actual": "d7540d38ef3f9e5cc1fd683984c4adf23c03c915",
+      "match": true
+    },
+    {
+      "path": "khora-web/server_test.log",
+      "expected": "f0b7f1c381b498be8411fdb5f50aba8f86643041",
+      "actual": "f0b7f1c381b498be8411fdb5f50aba8f86643041",
+      "match": true
+    },
+    {
+      "path": "khora-web/tests",
+      "expected": "b7c36e87a52d8650735ea5de7c02cdb5433c6dc8",
+      "actual": "b7c36e87a52d8650735ea5de7c02cdb5433c6dc8",
+      "match": true
+    },
+    {
+      "path": "khora-web/tsconfig.json",
+      "expected": "e7ff3a26b4400007243cc9a73fea3d9307e795a3",
+      "actual": "e7ff3a26b4400007243cc9a73fea3d9307e795a3",
+      "match": true
+    }
+  ]
+}

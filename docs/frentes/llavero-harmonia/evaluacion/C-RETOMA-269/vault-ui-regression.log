@@ -1,0 +1,12 @@
+✔ portable vault remains inside existing security menu (0.772738ms)
+✔ production and both review renderers use the same shared view (0.283746ms)
+✔ both closed states register exactly the identifiers present in the shared view (0.857491ms)
+✔ pending surface cannot handle secrets or perform fake protected operations (0.207874ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 215.052464

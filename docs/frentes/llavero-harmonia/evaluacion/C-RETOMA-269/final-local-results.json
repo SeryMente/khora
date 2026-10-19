@@ -1,0 +1,53 @@
+{
+  "navigation-fixed": {
+    "exit": 0,
+    "duration_seconds": 0.4,
+    "command": [
+      "npm",
+      "run",
+      "ui:contract"
+    ],
+    "synthetic": true,
+    "productionChanged": false
+  },
+  "vault-ui-regression": {
+    "exit": 0,
+    "duration_seconds": 0.4,
+    "command": [
+      "node",
+      "node_modules/tsx/dist/cli.mjs",
+      "--import",
+      "./tests/unit/setup.ts",
+      "--test",
+      "tests/unit/portable_vault_ui.test.ts"
+    ],
+    "synthetic": true,
+    "productionChanged": false
+  },
+  "unit-runtime-corrected": {
+    "exit": 1,
+    "duration_seconds": 78.0,
+    "command": [
+      "npm",
+      "run",
+      "test:unit"
+    ],
+    "synthetic": true,
+    "productionChanged": false
+  },
+  "diagnostic-full-build": {
+    "exit": 0,
+    "duration_seconds": 78.4,
+    "command": [
+      "node",
+      "node_modules/next/dist/bin/next",
+      "build",
+      "--webpack"
+    ],
+    "synthetic": true,
+    "productionChanged": false,
+    "auth": "existing PLAYWRIGHT_TEST_RUN synthetic flag",
+    "prebuildGateCertified": false,
+    "reason": "diagnostic compile independent of known unavailable gh auth; no deployment"
+  }
+}

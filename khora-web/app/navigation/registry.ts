@@ -92,7 +92,7 @@ export const NAVIGATION_REGISTRY: readonly NavigationEntry[] = [
     icon: "ShieldCheck",
     kind: "menu",
     level: 1,
-    coverage: ["/sistema/seguridad", "/sistema/mcp"],
+    coverage: ["/sistema/seguridad", "/sistema/mcp", "/sistema/seguridad/boveda-portable", "/sistema/seguridad/boveda-portable/abrir"],
     children: [
       { id: "security-main", label: "Seguridad", href: "/sistema/seguridad", icon: "ShieldCheck", group: "Seguridad" },
       { id: "entorno-persistente", label: "Entorno Persistente", href: "/sistema/seguridad?tab=entorno-persistente", icon: "Container", group: "Seguridad" },

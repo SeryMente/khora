@@ -1,0 +1,8 @@
+{
+  "result": "PASSED",
+  "method": "independent JSON equality after authenticated GitHub MCP read; not a replacement for gh-based unit test",
+  "canonicalCommit": "a466b6b46f266de6a6ccd656e071eb7a07dc0e10",
+  "canonicalBlob": "232590a1f6339e2517e67038e1b5f7e8bd1638e3",
+  "localSHA256": "ed765e58cef0095a0a99dc2c89d2c1b3f1c5ec1bfcf33745ad9cbc072298b3d4",
+  "remoteSHA256": "ed765e58cef0095a0a99dc2c89d2c1b3f1c5ec1bfcf33745ad9cbc072298b3d4"
+}

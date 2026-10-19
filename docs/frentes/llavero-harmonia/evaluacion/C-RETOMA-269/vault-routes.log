@@ -1,0 +1,5 @@
+
+> @khora/portable-vault-candidate@0.2.0 test:routes
+> node route-test.cjs
+
+{"result":"PASSED_ROUTE_AND_DISTRIBUTION_FIXTURE","passed":14}

@@ -1,0 +1,6 @@
+
+> @khora/portable-vault-candidate@0.2.0 test
+> node test.mjs && node bridge-test.mjs
+
+{"result":"PASSED_SYNTHETIC_CANDIDATE","passed":80,"total":80}
+{"result":"PASSED_SYNTHETIC_BRIDGE_ONLY","passed":34}

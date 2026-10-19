@@ -12,6 +12,8 @@ test("portable vault remains inside existing security menu", () => {
   assert.equal(links.length, 1);
   assert.equal(links[0].href, "/sistema/seguridad?tab=boveda-portable");
   assert.ok(security?.children?.some(n => n.id === "boveda"));
+  assert.ok(security?.coverage.includes("/sistema/seguridad/boveda-portable"));
+  assert.ok(security?.coverage.includes("/sistema/seguridad/boveda-portable/abrir"));
 });
 test("production and both review renderers use the same shared view", () => {
   for (const p of ["app/sistema/seguridad/page.tsx", "app/ui-review/ReviewHarnessShell.tsx", "app/ui-review/[screen]/estatico/page.tsx"]) {

@@ -1,0 +1,219 @@
+▲ Next.js 16.4.0 (webpack)
+✓ Running next.config.ts took 24ms
+- Experiments (use with caution):
+  · serverActions
+
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead.
+
+  To migrate automatically, run:
+  npx @next/codemod@canary middleware-to-proxy .
+
+  Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+⚠ Compiled with warnings in 2.1s
+
+./node_modules/next/dist/esm/server/app-render/dynamic-rendering.js
+A Node.js API is used (process.cwd at line: 986) which is not supported in the Edge Runtime.
+Learn more: https://nextjs.org/docs/api-reference/edge-runtime
+
+Import trace for requested module:
+./node_modules/next/dist/esm/server/app-render/dynamic-rendering.js
+./node_modules/next/dist/esm/server/request/connection.js
+./node_modules/next/dist/esm/server/web/exports/index.js
+./node_modules/next/dist/esm/api/server.js
+
+./node_modules/next/dist/esm/server/app-render/dynamic-rendering.js
+A Node.js API is used (process.cwd at line: 986) which is not supported in the Edge Runtime.
+Learn more: https://nextjs.org/docs/api-reference/edge-runtime
+
+Import trace for requested module:
+./node_modules/next/dist/esm/server/app-render/dynamic-rendering.js
+./node_modules/next/dist/esm/server/request/connection.js
+./node_modules/next/dist/esm/server/web/exports/index.js
+./node_modules/next/dist/esm/api/server.js
+
+./node_modules/jose/dist/webapi/lib/deflate.js
+A Node.js API is used (CompressionStream at line: 10) which is not supported in the Edge Runtime.
+Learn more: https://nextjs.org/docs/api-reference/edge-runtime
+
+Import trace for requested module:
+./node_modules/jose/dist/webapi/lib/deflate.js
+./node_modules/jose/dist/webapi/jwe/flattened/encrypt.js
+./node_modules/jose/dist/webapi/index.js
+./node_modules/@auth/core/jwt.js
+./node_modules/@auth/core/lib/init.js
+./node_modules/@auth/core/lib/index.js
+./node_modules/@auth/core/index.js
+./node_modules/next-auth/index.js
+./auth.ts
+
+./node_modules/jose/dist/webapi/lib/deflate.js
+A Node.js API is used (DecompressionStream at line: 26) which is not supported in the Edge Runtime.
+Learn more: https://nextjs.org/docs/api-reference/edge-runtime
+
+Import trace for requested module:
+./node_modules/jose/dist/webapi/lib/deflate.js
+./node_modules/jose/dist/webapi/jwe/flattened/encrypt.js
+./node_modules/jose/dist/webapi/index.js
+./node_modules/@auth/core/jwt.js
+./node_modules/@auth/core/lib/init.js
+./node_modules/@auth/core/lib/index.js
+./node_modules/@auth/core/index.js
+./node_modules/next-auth/index.js
+./auth.ts
+
+✓ Compiled successfully in 42s
+  Running TypeScript ...
+  Finished TypeScript in 14.6s ...
+  Collecting page data using 1 worker ...
+  Generating static pages using 1 worker (0/79) ...
+  Generating static pages using 1 worker (19/79) 
+  Generating static pages using 1 worker (39/79) 
+  Generating static pages using 1 worker (59/79) 
+✓ Generating static pages using 1 worker (79/79) in 2.2s
+  Finalizing page optimization ...
+  Collecting build traces ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ƒ /.well-known/oauth-authorization-server
+├ ƒ /.well-known/oauth-protected-resource
+├ ƒ /.well-known/oauth-protected-resource/api/mcp
+├ ○ /adherence
+├ ƒ /api/audio
+├ ƒ /api/audio/[id]
+├ ƒ /api/audio/[id]/manifiesto
+├ ƒ /api/audio/[id]/mp3
+├ ƒ /api/audio/[id]/parte/[index]
+├ ƒ /api/audio/importar/procesar
+├ ƒ /api/audio/importar/token
+├ ƒ /api/audio/sesion/[id]/exportar
+├ ƒ /api/auditoria
+├ ƒ /api/auth/[...nextauth]
+├ ƒ /api/board/orchestrate/tick
+├ ƒ /api/board/view
+├ ƒ /api/boveda
+├ ƒ /api/chat
+├ ƒ /api/consulta
+├ ƒ /api/dictado
+├ ƒ /api/dictado-archivo/titulo
+├ ƒ /api/dictado-experience
+├ ƒ /api/dictado/checkpoint
+├ ƒ /api/dictado/reconciliar
+├ ƒ /api/edicion
+├ ƒ /api/ep/bootstrap
+├ ƒ /api/ep/events
+├ ƒ /api/ep/github-credential
+├ ƒ /api/ep/logs
+├ ƒ /api/ep/repos
+├ ƒ /api/ep/token
+├ ƒ /api/ep/workspace
+├ ƒ /api/eventos
+├ ƒ /api/fragmentos/[id]
+├ ƒ /api/fragmentos/generar
+├ ƒ /api/github/webhook
+├ ƒ /api/grafo
+├ ƒ /api/grafos
+├ ƒ /api/ingesta
+├ ƒ /api/ingesta/verificar
+├ ƒ /api/jules/approve
+├ ƒ /api/jules/audit/validate
+├ ƒ /api/jules/audit/verdict
+├ ƒ /api/jules/autorespond
+├ ƒ /api/jules/poll/tick
+├ ƒ /api/jules/sources
+├ ƒ /api/jules/trigger
+├ ƒ /api/kpi/minutes
+├ ƒ /api/mcp
+├ ƒ /api/mcp/manual-token
+├ ƒ /api/mcp/revocacion
+├ ƒ /api/norm-check
+├ ƒ /api/oauth/portable-vault/open
+├ ƒ /api/oauth/register
+├ ƒ /api/oauth/token
+├ ƒ /api/observaciones/runtime
+├ ƒ /api/observaciones/runtime-state
+├ ƒ /api/pulir
+├ ƒ /api/revision/[id]
+├ ƒ /api/revision/[id]/aprobar
+├ ƒ /api/revision/[id]/compuerta
+├ ƒ /api/revision/[id]/hallazgos
+├ ƒ /api/revision/[id]/hallazgos/[hId]/resolver
+├ ƒ /api/revision/[id]/incidentes
+├ ƒ /api/revision/[id]/incidentes/[incId]/resolver
+├ ƒ /api/revision/[id]/iniciar
+├ ƒ /api/revision/[id]/propuestas
+├ ƒ /api/revision/[id]/propuestas/aplicar
+├ ƒ /api/revision/[id]/reabrir
+├ ƒ /api/revision/delta
+├ ƒ /api/revision/sugerencias
+├ ƒ /api/security/github-credentials
+├ ƒ /api/security/lock
+├ ƒ /api/security/vault-agent/history
+├ ƒ /api/security/vault-agent/introspect
+├ ƒ /api/security/vault-agent/token
+├ ƒ /api/segmentar/[id]
+├ ƒ /api/segmentar/[id]/ratificar
+├ ƒ /api/seguridad/boveda-portable
+├ ƒ /api/seguridad/boveda-portable/cliente
+├ ƒ /api/status
+├ ƒ /api/transcribir
+├ ƒ /api/transcribir/archivo
+├ ƒ /api/transcribir/dialogo
+├ ƒ /api/transcribir/sesion
+├ ƒ /api/version
+├ ƒ /api/versiones
+├ ƒ /api/volcado
+├ ƒ /api/volcado/[id]
+├ ƒ /api/volcado/[id]/aprobar
+├ ƒ /api/volcados/pipeline
+├ ƒ /api/volcados/pipeline/[id]
+├ ƒ /auth/signin
+├ ○ /capturar
+├ ○ /capturar/compartir
+├ ○ /grafo
+├ ○ /herramientas
+├ ○ /herramientas/bitacora
+├ ○ /herramientas/opi-vri
+├ ○ /icon.svg
+├ ○ /mapa
+├ ƒ /oauth/authorize
+├ ○ /offline
+├ ○ /roadmap
+├ ○ /sistema/boveda
+├ ○ /sistema/consulta
+├ ○ /sistema/custodia
+├ ○ /sistema/dictado
+├ ○ /sistema/editar
+├ ○ /sistema/entorno-persistente
+├ ○ /sistema/ingesta
+├ ○ /sistema/ingreso
+├ ○ /sistema/kpis
+├ ○ /sistema/mcp
+├ ○ /sistema/otros
+├ ○ /sistema/registro
+├ ○ /sistema/seguridad
+├ ƒ /sistema/seguridad/boveda-portable
+├ ƒ /sistema/seguridad/boveda-portable/abrir
+├ ƒ /sistema/volcados
+├ ƒ /ui-review
+├ ƒ /ui-review/[screen]
+├   /ui-review/[screen]/estatico
+│ ├ ● /ui-review/ingreso/estatico
+│ ├ ● /ui-review/archivo/estatico
+│ ├ ● /ui-review/revision/estatico
+│ └ ● [+7 more paths]
+├ ○ /ui-review/estatico
+└ ƒ /ui-review/manifest.json
+
+Route (pages)
+┌   /_app
+└ ○ /404
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+●  (SSG)      prerendered as static HTML (uses generateStaticParams)
+ƒ  (Dynamic)  server-rendered on demand
+

@@ -1,0 +1,5 @@
+
+> @khora/portable-vault-candidate@0.2.0 test:browser
+> node browser-test.mjs
+
+{"result":"PASSED_LOCAL_BROWSER_FIXTURE","passed":8}

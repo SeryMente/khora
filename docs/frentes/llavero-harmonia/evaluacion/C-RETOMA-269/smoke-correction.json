@@ -1,0 +1,8 @@
+{
+  "operation": "local built server smoke",
+  "symptomVerbatim": "assert all(x['status'] in [401,307] for x in out[2:])\nAssertionError",
+  "cause": "harness set existing PLAYWRIGHT_TEST_RUN=1, which also enables middleware auth bypass; unsuitable for checking anonymous middleware boundary",
+  "impact": "local process terminated in finally; no deployment, real credentials, hosted data or repository production changed; first HTTP responses were not persisted",
+  "correction": "repeat only causal smoke with both test bypass flags absent and isolated synthetic signing/provider configuration in process memory; record statuses before assertions",
+  "prevention": "middleware auth boundary checks must explicitly reject both auth bypass flags; test fixtures never presented as real OIDC acceptance"
+}

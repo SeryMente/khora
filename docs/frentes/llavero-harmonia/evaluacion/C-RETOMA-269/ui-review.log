@@ -1,0 +1,7 @@
+
+> khora-web@0.3.8 ui-review:check
+> tsx scripts/check_ui_review.ts
+
+🔍 Verificando contrato UI Review completo...
+
+✅ UI Review íntegro: escenarios, ui_ids, componentes compartidos y prerender presentes.
