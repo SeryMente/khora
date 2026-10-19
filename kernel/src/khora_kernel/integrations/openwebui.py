@@ -22,6 +22,8 @@ class KernelChatBinding:
     puerto_llm: Any
     memoria: Any
     db_path: str
+    turn_guard: Any = None
+    contexto: Any = None
 
 
 def _question(body: dict) -> str:
@@ -63,34 +65,39 @@ class Pipe:
                 or binding.user_id != user_id or binding.chat_id != __chat_id__
                 or not isinstance(binding.session_id, str) or not binding.session_id.strip()
                 or not isinstance(binding.db_path, str) or not binding.db_path.strip()
-                or binding.memoria is None or binding.puerto_llm is None):
+                or binding.memoria is None or binding.puerto_llm is None
+                or not callable(binding.turn_guard)
+                or binding.contexto is None):
             raise PermissionError("El anfitrión no resolvió una conversación autorizada del núcleo.")
 
-        # Only the real kernel orchestrator may retrieve/generate/validate.
-        # Client messages, model, owner and metadata never choose storage/access.
-        from khora_kernel.engine.core import ejecutar_ciclo
+        # The guard, kernel call and evidence snapshot all run in ONE thread.
+        # Request cancellation must not release the PostgreSQL lock while its
+        # synchronous worker is still writing history in the background.
+        def run_turn():
+            from khora_kernel.engine.core import ejecutar_ciclo
+            from khora_kernel.engine.history import load_ht
+            with binding.turn_guard():
+                result = ejecutar_ciclo(
+                    binding.session_id, question, binding.puerto_llm,
+                    binding.memoria, binding.db_path, contexto=binding.contexto,
+                )
+                evidence = []
+                if result.verdict == "SUFFICIENT" and result.citations and result.answer.strip():
+                    ht = load_ht(binding.session_id, binding.db_path)
+                    citations = set(result.citations)
+                    evidence = [item for item in (ht.evidence if ht else []) if item.node_id in citations]
+                return result, evidence
+
         try:
-            result = await asyncio.to_thread(
-                ejecutar_ciclo, binding.session_id, question,
-                binding.puerto_llm, binding.memoria, binding.db_path,
-            )
+            result, evidence = await asyncio.to_thread(run_turn)
         except Exception:
-            # Provider/graph exceptions can contain endpoints or credentials.
-            raise RuntimeError("El núcleo no pudo completar la consulta; no se generó una respuesta alternativa.") from None
+            raise RuntimeError("El núcleo no pudo completar la consulta o verificar sus fuentes; no se generó una respuesta alternativa.") from None
 
         if result.verdict != "SUFFICIENT":
             return "No hay evidencia suficiente para responder esta pregunta con confianza. No se presenta como válida una respuesta sin respaldo."
         if not result.citations or not result.answer.strip():
             return "No se pudo verificar una respuesta con fuentes del núcleo."
-
-        # Use the upstream citation event only for actual persisted kernel evidence.
-        from khora_kernel.engine.history import load_ht
-        try:
-            ht = await asyncio.to_thread(load_ht, binding.session_id, binding.db_path)
-        except Exception:
-            raise RuntimeError("No se pudieron verificar las fuentes del núcleo.") from None
         citations = set(result.citations)
-        evidence = [item for item in (ht.evidence if ht else []) if item.node_id in citations]
         if not evidence or not citations.issubset({item.node_id for item in evidence}):
             return "No se pudieron recuperar todas las fuentes de la respuesta; no se presenta como verificada."
         if __event_emitter__ is not None:

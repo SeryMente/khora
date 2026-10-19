@@ -264,7 +264,7 @@ def _answer(ht: Ht, question: str, puerto_llm: PuertoLLM) -> Response:
 
 
 def ejecutar_ciclo(session_id: str, pregunta: str, puerto_llm: PuertoLLM, memoria: Any,
-                   db_path: str = "data/khora_sessions.db") -> ValidatedResponse:
+                   db_path: str = "data/khora_sessions.db", *, contexto: Any = None) -> ValidatedResponse:
     ht = load_ht(session_id, db_path) or Ht(session_id=session_id, created_at=_now())
     ht = _add_trace(ht, {"action": "TURN_START", "question": pregunta,
                          "after_step": ht.steps[-1].n if ht.steps else 0})
@@ -279,7 +279,8 @@ def ejecutar_ciclo(session_id: str, pregunta: str, puerto_llm: PuertoLLM, memori
         estado.ht = _add_step(estado.ht, action.value, why)
         try:
             if action == Lambda.RETRIEVE:
-                estado.ht = _retrieve(estado.ht, pregunta, memoria)
+                estado.ht = (_retrieve(estado.ht, pregunta, memoria) if contexto is None
+                             else _retrieve(estado.ht, pregunta, memoria, contexto=contexto))
             elif action == Lambda.REFINE:
                 estado.ht = _refine(estado.ht, pregunta, puerto_llm)
             elif action == Lambda.ANSWER:

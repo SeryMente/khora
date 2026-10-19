@@ -1,5 +1,7 @@
 """Controlled native Pipe contract; NOT a running Open WebUI/graph/model test."""
 import asyncio
+from contextlib import nullcontext
+from khora_kernel.api import ContextoDeVisibilidad
 import tempfile
 import unittest
 from pathlib import Path
@@ -13,7 +15,7 @@ class OpenWebUIPipeTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.db = str(Path(self.tmp.name) / 'history.sqlite')
-        self.binding = KernelChatBinding('u1', 'c1', 'server-session', object(), object(), self.db)
+        self.binding = KernelChatBinding('u1', 'c1', 'server-session', object(), object(), self.db, nullcontext, ContextoDeVisibilidad.TRANSPARENTE)
         self.request = NS(app=NS(state=NS(khora_chat_binding=lambda **kw: self.binding)))
         save_ht(Ht('server-session', 'ts', evidence=[HtEvidence('n1', 'fuente controlada', 1)]), self.db)
         self.kw = dict(__user__={'id': 'u1'}, __request__=self.request, __chat_id__='c1')
@@ -30,7 +32,7 @@ class OpenWebUIPipeTests(unittest.TestCase):
         self.body.update(session_id='attacker', user={'id':'attacker'}, model='override', metadata={'chat_id':'attacker'})
         with patch('khora_kernel.engine.core.ejecutar_ciclo', return_value=self.result) as kernel:
             self.assertEqual(self.run_pipe(), 'respuesta controlada')
-            kernel.assert_called_once_with('server-session', 'pregunta', self.binding.puerto_llm, self.binding.memoria, self.db)
+            kernel.assert_called_once_with('server-session', 'pregunta', self.binding.puerto_llm, self.binding.memoria, self.db, contexto=ContextoDeVisibilidad.TRANSPARENTE)
 
     def test_missing_host_binding_is_closed(self):
         self.request.app.state.khora_chat_binding = None

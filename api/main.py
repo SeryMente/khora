@@ -25,6 +25,7 @@ except ImportError:
 
 neo4j_driver = None
 neo4j_config = {}
+chat_runtime = None
 
 def _is_identity_constraint_conflict(error: Exception) -> bool:
     detail = str(error).lower()
@@ -100,12 +101,22 @@ async def lifespan(app: FastAPI):
         # We fail fast here if Neo4j is unreachable during startup.
         raise RuntimeError(f"Neo4j connection failed on startup: {e}")
 
-    yield
+    if chat_runtime is not None:
+        async with chat_runtime.lifespan(neo4j_config):
+            yield
+    else:
+        yield
 
     if neo4j_driver:
         neo4j_driver.close()
 
 app = FastAPI(title="Khora API Bridge", lifespan=lifespan)
+
+if os.getenv("KHORA_CHAT_ENABLED") == "1":
+    from api.chat_runtime import NativeChatRuntime
+    chat_runtime = NativeChatRuntime()
+    app.mount("/khora-chat", chat_runtime.app)
+
 
 origins = []
 if "KHORA_WEB_ORIGIN" in os.environ:

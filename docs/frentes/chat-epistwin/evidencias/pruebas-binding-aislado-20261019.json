@@ -1,0 +1,138 @@
+{
+  "type": "evidence_not_live_state",
+  "baseline": "fa4df912acfb9805d040a958c7d963f3d35ad80c",
+  "main": "bd29c924393fcbd9183100f66b2e50c87b791207",
+  "date": "2026-10-19",
+  "scope": "draft opt-in proxy, native ownership/binding and durable-turn locking; no production configuration",
+  "checks": {
+    "focused_python": {
+      "passed": 42,
+      "subtests": 17,
+      "real_model_graph": false
+    },
+    "proxy_node": {
+      "passed": 7,
+      "upstream": "controlled fetch"
+    },
+    "full_frontend_prebuild": {
+      "passed": 562,
+      "failed": 0
+    },
+    "next_production_build": {
+      "exit_code": 0,
+      "production_deploy": false
+    },
+    "postgresql_live": {
+      "version": "15.18",
+      "passed": 8,
+      "skipped": 0,
+      "residual_rows": 0,
+      "stopped": true,
+      "same_conversation_processes": 6,
+      "tls": false
+    },
+    "native_openwebui": {
+      "type": "isolated_official_native_auth_ownership_postgresql_probe",
+      "checks": {
+        "direct_render_rejected": true,
+        "config": 200,
+        "native_auto_user_a": true,
+        "native_auto_user_b": true,
+        "foreign_token_rejected": true,
+        "durable_chat_created": true,
+        "owner_read": true,
+        "foreign_chat_rejected": true,
+        "native_ownership_binding": true,
+        "foreign_binding_rejected": true,
+        "models_status": 200,
+        "native_pipe_model_visible": true,
+        "user_id_a": "87a85dc5-8741-41d6-a71e-d4cde944b804",
+        "chat_id": "f2b37737-6840-45c3-92a0-f91c31238f4a"
+      },
+      "limits": [
+        "artificial users only",
+        "no real provider or graph",
+        "not production",
+        "polling/websocket and full circuit not verified"
+      ]
+    }
+  },
+  "not_verified": [
+    "Neon17 Python/TLS and least privilege runtime",
+    "durable native schema/migrations in existing Neon",
+    "socket/polling transport and signed identity binding",
+    "Khora signout/native token lifecycle",
+    "production provider/graph end-to-end with citations and followup",
+    "512MiB Render combined load/restart",
+    "deployment or operator acceptance"
+  ],
+  "deployment_gates": {
+    "pr_remains_draft": true,
+    "feature_default_disabled": true,
+    "requirements_production_slim_not_integrated": true,
+    "no_production_sql_env_merge_or_deploy": true
+  },
+  "error_memory": [
+    {
+      "operation": "binding focused tests collection",
+      "symptom": "ModuleNotFoundError: No module named testcontainers",
+      "cause": "root kernel conftest imports testcontainers even for isolated unit tests",
+      "impact": "collection aborted; no runtime or production changes",
+      "correction": "installed testcontainers in dedicated venv",
+      "verification": "42 passed, 17 subtests passed",
+      "prevention": "include root conftest imports in dependency preflight"
+    },
+    {
+      "operation": "explicit public context in existing core",
+      "symptom": "Expected fval to have been called once. Called 0 times.",
+      "cause": "legacy test replacement of _retrieve takes three arguments; passing contexto=None as a new keyword caused TypeError in RETRIEVE and correctly stopped before fVAL",
+      "impact": "one controlled regression failed; no publication",
+      "correction": "preserve existing three-argument invocation when contexto is None; pass explicit context only when supplied",
+      "verification": "42 passed, 17 subtests passed",
+      "prevention": "maintain old call shape for optional compatibility defaults"
+    },
+    {
+      "operation": "full web prebuild",
+      "symptom": "Error: spawnSync gh ENOENT",
+      "cause": "gh installed in own tools directory but not exported in subprocess PATH; methodology contract test uses gh fallback for private repo",
+      "impact": "prebuild stopped before Next compile; 561 of 562 tests passed; no deploy",
+      "correction": "export verified gh tools directory in PATH then causal methodology test before mandatory build",
+      "verification": "causal test passed; full prebuild562/562 and Next build exit0",
+      "prevention": "include transitive CLI used by tests in preflight"
+    },
+    {
+      "operation": "real PostgreSQL exception-release test",
+      "symptom": "HistoryStorageError instead of expected ValueError",
+      "cause": "test expected unsanitized exception; existing history driver intentionally wraps failures while rolling back",
+      "impact": "7 tests passed, one expectation failed; disposable cluster stopped",
+      "correction": "expect documented sanitized exception and then acquire same lock again",
+      "verification": "8 real PG15.18 tests passed; zero rows; stopped",
+      "prevention": "assert public error contract rather than inner implementation exception"
+    },
+    {
+      "operation": "native model discovery with ordinary authenticated users",
+      "symptom": "native_pipe_model_visible=false after HTTP200",
+      "cause": "upstream0.12.3 requires model metadata/access grant in addition to active Function; no admin bypass exists",
+      "impact": "native users/ownership/foreign-token rejection passed; model unavailable; no production changes",
+      "correction": "register native Models row and read-only grant for authenticated app users; keep write/admin/model bypass disabled",
+      "verification": "official native discovery passed for ordinary user",
+      "prevention": "include ordinary-user model discovery in runtime startup gate"
+    },
+    {
+      "operation": "official native model registration",
+      "symptom": "AttributeError: NoneType object has no attribute model_dump",
+      "cause": "upstream Functions and Models APIs have opposite positional argument order; used Function call shape for Models",
+      "impact": "isolated database only; probe aborted before service activation",
+      "correction": "keyword form_data/user_id with explicit nonhuman runtime author marker, no account/login creation",
+      "verification": "official native auth/ownership/model probe exit0",
+      "prevention": "use exact inspected keyword signatures for distinct upstream APIs"
+    }
+  ],
+  "logs_sha256": {
+    "runtime-contract-tests.log": "db903e1eb1e5a9896d6e9f6455efb910d89e900bff997ca498ec68f531763325",
+    "proxy-tests.log": "5997c98a10833f1aec921fc50de51498c65f0c180ab82224050f889e7f75fa5a",
+    "postgres-live-tests.log": "8489c557aa14471a93c097b6a205140370fdc30bd0626fc398eb55b7e2dfedeb",
+    "full-web-build.log": "3407f8e9baa1b9c527319bf9c90d7e63272b343cec7fb03124aade36d0e5ede7",
+    "native-probe.log": "ba8ba05c4b9b19a3ede1fa7ef70aeea27d07a3ff87fee535e112a3ff0a161f75"
+  }
+}
