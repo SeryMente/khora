@@ -1,0 +1,71 @@
+{
+  "type": "evidence_not_live_state",
+  "date_utc": "2026-10-19T19:48:57.339945+00:00",
+  "source_canonical_blob": "cdfdf65875fe6d58de5246ab9cc4ad8390a40f88",
+  "code_readback": {
+    "verified_files": 17,
+    "commit": "fa4df912acfb9805d040a958c7d963f3d35ad80c",
+    "method": "full_remote_diff_reconstructed_against_exact_loaded_main_sources",
+    "all_exact": true
+  },
+  "code_sync_head": "fa4df912acfb9805d040a958c7d963f3d35ad80c",
+  "code_sync_base": "bd29c924393fcbd9183100f66b2e50c87b791207",
+  "render_access": "official connection accepted/list_workspaces and get_service succeeded; no service mutation",
+  "vercel_access": "official CLI login succeeded and exact project/team GET exit0; MCP teams empty/team403 remains distinct",
+  "render_current_sample": {
+    "at": "2026-10-19T19:41:09Z",
+    "memory_limit_bytes": 536870900,
+    "instance_memory_bytes": {
+      "kbz4b": 113070080,
+      "c9kd2": 2281472
+    },
+    "cpu_limit_kbz4b": 0.15,
+    "warning": "different instances during deployment, not joint capacity evidence"
+  },
+  "isolated_official_openwebui_probe": {
+    "type": "isolated_official_openwebui_idle_resource_probe_not_production",
+    "openwebui": "0.12.3 official wheel + official slim requirements",
+    "api": "import of unmodified api.main only; API lifespan/Neo4j connectivity NOT run",
+    "listen": "127.0.0.1:18519",
+    "no_real_provider_or_personal_data": true,
+    "not_proven": [
+      "Render cgroup fit",
+      "combined production lifespan",
+      "load peak",
+      "authenticated binding",
+      "runtime secret and durable PostgreSQL",
+      "production deployment"
+    ],
+    "responses": {
+      "/health": 200,
+      "/": 200,
+      "/api/v1/auths/": 401,
+      "/api/config": 200
+    },
+    "peak_rss_kib_observed": 381312,
+    "peak_hwm_kib_observed": 381312,
+    "startup_process_exit": null,
+    "success": true,
+    "probe_process_stopped": true
+  },
+  "wheel_sha256": "6d716039a5c15ecdb1db12f99dd9c79ea5c86d3d7bbd9a67054dd26f1f534747",
+  "slim_requirements_sha256": "6dc3e004a3935f4bcc19f804f791e536c1f4be381049d866f842b2c2e4a88509",
+  "production_mutation": false,
+  "ent01_delivered": false,
+  "acceptance": false,
+  "approval_scope": {
+    "status": "APPROVED_EXPLICITLY_E53_E54",
+    "proposal": [
+      "existing Khora login; no second account/open signup",
+      "no direct Render access to chat; authenticated Khora path only",
+      "initial public/artificial technical corpus; no private notes; Groq"
+    ],
+    "not_implied_by": [
+      "API key entry",
+      "connection accepted",
+      "general E2E order",
+      "silence"
+    ]
+  },
+  "implementation_status": "in progress; authenticated proxy/binding/durable production runtime not implemented or published"
+}
