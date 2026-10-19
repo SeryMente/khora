@@ -2,10 +2,10 @@
 
 ## 1. Control e identidad
 
-- Objeto vivo único: `docs/frentes/chat-epistwin/OBJETO-CANONICO.md`, SeryMente/khora, rama `docs/chat-epistwin-20261017`. Versión **0.16**, sello **KHORA-CHAT-EPISTWIN-v0.16**, ancla **E57 + migración exclusiva solicitada por E55–57, 2026-10-19**. **ENT01 NO entregada/publicada/aceptada; sin ENT02.**
+- Objeto vivo único: `docs/frentes/chat-epistwin/OBJETO-CANONICO.md`, SeryMente/khora, rama `docs/chat-epistwin-20261017`. Versión **0.17**, sello **KHORA-CHAT-EPISTWIN-v0.17**, ancla **E58 · recepción del relevo y comprobación de accesos, 2026-10-19**. **ENT01 NO entregada/publicada/aceptada; sin ENT02.**
 - Candidato de código vigente: **PR331**, `fix/chat-epistwin-ent01-main-20261019`. Código e8816b80aef6b58a839c938ff3f53302f8383396, 17 archivos cotejados exactamente mediante diff remoto; sincronizado después con main, cabeza fa4df912acfb9805d040a958c7d963f3d35ad80c/base bd29c924393fcbd9183100f66b2e50c87b791207, draft/no fusionado, mergeable_state observado unstable, no dirty ni PASS de checks inferido. Revalidar antes de promover.
 - **PR317 cerrado sin fusionar**, título marcado sustituido por331; rama/historia10d5a91 conservadas. No trabajar dos candidatos ni reabrir el conflicto antiguo como estado vigente. La nueva rama nació de b5e7009de137db30c26ecc5f4ddbb34789f453f2 y preserva correcciones concurrentes de main.
-- Khora privado con push/admin comprobados. Esta revisión documental sustituye blob0.15 cdfdf65875fe6d58de5246ab9cc4ad8390a40f88, mediante comparación de revisión antes de escribir. Snapshot0.15 íntegro: ee6670a5f29fc78f1861b0206d698790a29c88e6; historia anterior§11. No desplegar rama documental.
+- Khora privado con push/admin revalidados por GitHub en E58. Esta revisión sustituye blob0.16 57ee902a5ba6738653f65ba5ff450312a92b5c35 mediante comparación de revisión antes de escribir; snapshot0.16 íntegro en95000c48990159f960ea67947bb8c01eb4546250. El commit42e1efb33dcdcf47abd66eb9ac5abfd57ca53632 es el checkpoint de contenido aportado por el operador; la punta documental observada95000c4 sirve el mismo blob. Snapshot0.15 íntegro: ee6670a5f29fc78f1861b0206d698790a29c88e6; historia anterior§11. No desplegar rama documental.
 - Candidato0.13 histórico:93136B/SHA25611c1370e9abfc48a18d2ce471694faa1b9ff168f717b864aab1b04a60e5ed155; no commit/custodia binaria remota inventados. El adjunto recuperado contiene una copia0.15 exacta, no prueba nueva de producto.
 
 ## 2. LEER PRIMERO
@@ -34,6 +34,8 @@ No nuevo pago/plan, repo público, bypass, secretos en chat/Git/log/navegador, e
 | §26–27 adquisición/molde | §2 y trece bloques/12 | Adoptado subordinadamente, límites por acción dependiente. |
 
 Delta0.15→0.16: adquisición del adjunto confirmada sin delta previo; nuevaPC-14 verificada, solo asistencia. Recuperadas red/Python3.11/driver/PostgreSQL y accesosVercelCLI/Render. Candidato331 sobre main, preservando fVAL global y REFINE seguro;317 cerrado sinmerge. Nuevas pruebas reales/causales, arranque oficialslim y medición aislada; no construcción de auth compartida ni despliegue. Revisión de seguridad/corpus aprobada expresamente porE53/E54; implementación en curso, sin atribuir todavía cierre al producto. Evidencia histórica0.15 íntegra en snapshot§11.
+
+Delta0.16→0.17/E58: recepción íntegra de este objeto y metacanon1.5 sin delta de contenido; PR331/head/base/17rutas coinciden. GitHubMCP requirió reautenticación y se recuperó por conexión oficial; GitCLI continúa sin credencial propia. Se preparó GitHubCLI2.102.0 oficial con digestSHA256 verificado y se inició su device flow; autorización humana pendiente. No código, nuevo test, configuración productiva, SQL, merge ni despliegue. Los enlaces Notion de origen no son accesibles en el espacio destino; la fuente superior viva autoload/cargada en destino es v332/NX-332m y su registro local de errores fue leído. No interpretar esos enlaces inaccesibles como revocación de E53/E54.
 
 ## 4. Propósito y alcance
 
@@ -106,13 +108,23 @@ Proyectoexistente still-sunset-02412999/khora/free, defaultbr-gentle-band-ah23rc
 - **Entrada privada de secretos:** `request-worker-secrets` NO sirve para este despliegue (requiere un Worker existente). No se llamó y no se creó un Worker para sortearlo. Usar conexiones oficiales o formulario privado de la plataforma pertinente, sin pedir pegar claves en texto. Mantener separación entre secreto de OpenWebUI, credenciales de DB, clave del bridge y proveedor. No descifrar variables productivas existentes para acelerar la migración.
 - **Persistencia del login entre hilos NO garantizada.** Los IDs de proyectos/servicios sí se conservan aquí; cada credencial/catálogo/archivo se verifica en destino. «Conectado antes» no es «capacidad disponible ahora», pero tampoco autoriza repetir todas las altas sin una prueba fallida.
 
+### Recepción E58 · accesos efectivos del entorno destino
+
+- GitHubMCP: conexión oficial recuperada; lectura de ambos repositorios, AGENTS, auth/rutas, Pipe e historial y evidencia remota comprobada. Khora sigue privado/push/admin. PR331 open/draft/merged=false/headfa4df912/basebd29c924/17archivos, sin delta observado. El estado de checks no fue comprobado ni se infiere de unstable.
+- Sandbox destino: no contiene /data/chat-ent01 ni su login Vercel; se recuperaron objeto/metacanon y tres archivos exactos de código/prueba bajo /data/khora-continuidad/source, cotejados por blob. No checkout completo ni dependencias históricas heredadas. Git local devolvió exactamente `fatal: could not read Username for 'https://github.com': No such device or address`; no mutación remota.
+- GitHubCLI2.102.0 oficial descargado de cli/cli con digestSHA256 del asset cotejado. `gh auth status` confirmó falta de login. Device flow oficial iniciado; falta aprobación humana en github.com/login/device. No guardar aquí el código temporal ni contenido de sesión. Primer intento sin salida observable detenido; segundo con registro local explícito. El aviso de clipboard ausente no invalida el código manual. No instalar utilidades de clipboard ni extraer credenciales del conector. El proceso pendiente es únicamente autenticación, no implementación ni despliegue.
+- Vercel/Vercel2/Vercel3: catálogo actual indica needs_reauth; no se reintentaron consultas históricamente fallidas ni se afirma accesoCLI heredado. Render y NeonKhora no aparecen en el catálogo destino; los IDs y recursos de§7 se conservan, no son conexiones funcionales actuales. Se restablecerán oficialmente cuando su fase los necesite; no pedir esquemaNeon ni secretos enchat. KhoraMCP figura disponible; no se extrajeron tokens ni se usó como puente para eludir controles.
+- Fuente superior disponible en destino: https://app.notion.com/p/dd6ade27f22c83d1b7da819dfa59e40d, v332/NX-332m, cargada en este turno. Registro leído: https://app.notion.com/p/0e6ade27f22c8339a98181fa1c1b0c0a. MOTOR-1C leído: https://app.notion.com/p/90c096b6c4904711a8129a7f4012efe1. Las URLs de origen en la cápsula no fueron accesibles y no se reintentaron; no afirmar que se leyó su contenido vivo. No se modificaron fuentes superiores.
+- Fuentes upstream oficiales de0.12.3/91ea4e3 recuperadas para continuar: auths/chats/utils.auth/models.chats/functions/main/config. Se cotejó que trusted-email requiere cabecera y compara usuarioJWT/correo; ownership estricto dispone de Chats.get_chat_by_id_and_user_id. Son lecturas, no proxy/binding implementados. No usar permiso admin ni chats compartidos como ownership implícito.
+- Remote Desktop Commander no utilizado; no necesario para construcción ni adquisición. No escanear equipo.
+
 ### Acceso remoto para asistencia
 
 list_devices verifica nuevaPC-14 online, a960759c-7557-451d-936a-73aa791f5f58; equipos anterioresoffline no heredados. No comando remoto, construcción ni extracción de datos realizado. Solo asistencia estrictamente necesaria puede usar ese dispositivo; construcción jamásRDC. El userlog registra cuentaelathanor111@gmail.com y ruta deperfilPC13; son datos declarados, no identidadWindows/repo comprobados. No guardar códigos de autorización ni claves enGit. Iniciadorcanónico solo si vuelve a ser necesario: `npx @wonderwhy-er/desktop-commander@latest remote --no-persist-session`.
 
 ## 8. Estado vivo
 
-**ENT01 pausada por traslado de hilo, NO publicada/entregada/aceptada.** Código vigentePR331;317 cerradosinfusión y conservada. No ENT02, nuevohosting, compra, envproductiva, autenticaciónproductiva, ingesta, migracióndatos ni publicación de este agente.
+**ENT01 recibida en destino por E58, NO publicada/entregada/aceptada. Bloqueo actual: autorización GitHubCLI propia para checkout completo; no nueva decisión de acceso/corpus.** Código vigentePR331;317 cerradosinfusión y conservada. No ENT02, nuevohosting, compra, envproductiva, autenticaciónproductiva, ingesta, migracióndatos ni publicación de este agente.
 
 ### Hecho y verificado en el ciclo actual
 
@@ -132,11 +144,15 @@ FuentevisualbuildOOM/arranqueanterior y24tests históricos0.15 permanecen en sna
 
 **🔄 Estado vivo**
 
-ENT01 pausada exclusivamente para migración; PR331 abierto, draft y sin merge, head fa4df912acfb9805d040a958c7d963f3d35ad80c. Aprobación E53/E54 vigente para acceso actual de Khora, sin entrada directa por Render y pruebas públicas/artificiales con Groq. Binding autenticado, durabilidad productiva, circuito real y publicación aún pendientes. No ENT02.
+ENT01 recibida en destino y todavía no entregada; PR331 revalidado abierto, draft y sin merge, head fa4df912acfb9805d040a958c7d963f3d35ad80c/base bd29c924393fcbd9183100f66b2e50c87b791207, 17 archivos. Aprobación E53/E54 vigente: acceso actual Khora, sin entrada directa Render y pruebas públicas/artificiales con Groq. GitHubMCP recuperado; autorización GitHubCLI propia pendiente para checkout completo. Siguiente paso: completar ese acceso, recuperar la revisión exacta y continuar auth/propiedad/binding y durabilidad existentes. No ENT02.
 
 **⚗️ En prueba / recién fallido**
 
-Pruebas aisladas y arranque oficial slim verificados; no full build, Neon Python/TLS, carga Render, aislamiento autenticado ni recorrido productivo. No hay implementación ni deploy en segundo plano.
+Evidencia aislada y arranque slim del origen conservados, no repetidos en destino; sin full build, Neon Python/TLS, carga Render ni aislamiento/recorrido productivos. Solo device flow GitHub pendiente, no implementación ni deploy en segundo plano.
+
+### Recepción E58 y bloqueo comprobado
+
+E58 activa la instancia receptora: la pausa exclusiva de migración E55–57 terminó, sin revocar E53/E54. Se adquirieron íntegramente0.16/metacanon1.5 y AGENTS; sin delta del objeto respecto del checkpoint y sin cambio de candidato. No repetir la autorización material ni recuperar317. La primera respuesta distinguió fuentes adquiridas de acceso inicialmente fallido; la conexiónGitHub se restableció y luego se confirmó PR331. Bloqueo probado para checkout completo: Git no tiene credencial; pedir únicamente aprobación del device flow oficial ya iniciado. No código/producto modificado durante esta adquisición.
 
 ### Revisión material aprobada y checkpoint exacto
 
@@ -219,11 +235,11 @@ Upstreamfijo https://github.com/open-webui/open-webui/tree/91ea4e3421d1d8069f13d
 
 #### Mapa de adquisición sin reconstrucción innecesaria
 
-1. Leer fuente superior de Samantha, versión observada330/firma NX-330m: https://app.notion.com/p/c85a41878241830588e181f4c02fbab4. No heredar la firma histórica NX-332 como actual. No modificar esa fuente sin autorización específica.
+1. Fuente superior vigente comprobada en destino E58: https://app.notion.com/p/dd6ade27f22c83d1b7da819dfa59e40d, v332/NX-332m. El enlace de origen https://app.notion.com/p/c85a41878241830588e181f4c02fbab4 (observado entonces330/NX-330m) no es accesible aquí; no confundir firma histórica con adquisición viva. No modificar la fuente sin autorización específica.
 2. Leer este objeto en la rama documental y comprobar versión0.16/sello KHORA-CHAT-EPISTWIN-v0.16/anclaE57; si existe versión posterior, comparar y usar la más fresca, sin sobrescribirla con este snapshot.
 3. Leer metacanon1.5/METACANON-OBJETOS-v1.5 y su matriz de adquisición/aplicación §26 y molde§27; no confundir versión del objeto con versión del método. Referencia fuente/revisión en§3. Subordinado a plataforma y normas superiores.
 4. Leer raíz AGENTS de Khora para la revisión a trabajar. Fuentes EP/custodia/audio solo antes de tocar esos ámbitos; el frente de chat no autoriza absorberlos. Para grafo, releer GRAPH-TWINS/GRAPH-QUALITY-DRAFT: el estado global auditado NO APTO no ha sido reparado aquí.
-5. Consultar registro de errores antes de la siguiente cirugía: https://app.notion.com/p/7e0a41878241826cb2c781aa2ebd5070. Motor canónico de cierre: https://app.notion.com/p/9e3a4187824182bda4cf81ad67e9ff76. No simular que cargar un protocolo equivale a haberlo ejecutado; respetar sus compuertas y las reglas superiores.
+5. Consultar registro vigente en destino antes de la siguiente cirugía: https://app.notion.com/p/0e6ade27f22c8339a98181fa1c1b0c0a. Motor canónico leído: https://app.notion.com/p/90c096b6c4904711a8129a7f4012efe1. Enlaces de origen inaccesibles conservados como procedencia: registro7e0a41878241826cb2c781aa2ebd5070 y motor9e3a4187824182bda4cf81ad67e9ff76. No simular que cargar un protocolo equivale a haberlo ejecutado; respetar sus compuertas y las reglas superiores.
 6. Leer PR331, sus17archivos, `pruebas-aisladas-20261019.json` en la revisión de código y `continuidad-20261019.json` en la rama documental. El primer JSON declara Render no recuperado a la hora de su captura: **histórico**, supersedido por continuidad y§7; no alterar retrospectivamente evidencia fechada ni tomar esa frase como bloqueo vigente.
 7. Recuperar los logs/hashes/cápsula de trabajo descritos abajo; si falta el sandbox, bajar del repositorio privado los textos de evidencia y la revisión de código, no pedir al operador reexplicar el proyecto. La ausencia de caché no borra el trabajo versionado.
 
@@ -297,6 +313,7 @@ La instancia receptora responde brevemente con: fuente/revisión/sello leídos, 
 ### Asistencia
 
 ```text
+CHECKPOINT RECEPTOR E58: objeto vigente0.17/KHORA-CHAT-EPISTWIN-v0.17. E58 ya activó continuidad; E55–57 son pausa histórica de origen, no prohibición de construir aquí. Fuente superior real destino v332/NX-332m: https://app.notion.com/p/dd6ade27f22c83d1b7da819dfa59e40d. GitHubMCP recuperado; GitHubCLI oficial device flow pendiente para checkout completo. No código nuevo, SQL, merge ni deploy. Releer accesos efectivos E58 en§7; no heredar archivos/credenciales/runtimes. Completar accesoGit, obtener revisión exacta y continuar el siguiente paso de§8. El texto siguiente conserva antecedentes históricos0.16/E57 y no los convierte en estado actual.
 CONTINUIDAD EXACTA, NO REINICIO: E55/E56/E57 ordenaron cerrar este hilo únicamente documentando y entregar migración. Este prompt activa la recepción en otra instancia del mismo frente y rol, conservando autorizaciónE53/E54. Leer§11 «Cápsula de migración» completo antes de implementar. No heredar sandbox/credenciales sin verificación; no duplicar canon/board/candidato. No código posterior afa4df912. NeonKhora se conectó oficialmente después, sin SQL nuevo. Canon0.16/E57 es el checkpoint de migración, noE52 niE46. No repetir aprobaciones ya obtenidas.
 Retoma Khora Conversación Enraizada como Samantha, encargo directo de implementar/publicarENT01, no constructor externo inventado. Lee objeto vivo SeryMente/khora, rama docs/chat-epistwin-20261017, docs/frentes/chat-epistwin/OBJETO-CANONICO.md; partida0.16/KHORA-CHAT-EPISTWIN-v0.16/E57+migraciónexclusiva19oct. Lee metacanon central SeryMente/metodologia/docs/metacanon-objetos-20261011/METACANON-OBJETOS-CANONICOS.md, partida1.5/METACANON-OBJETOS-v1.5/bfb63751f060596e344d5768e31085100bb20751/blob32c7a65ff2e83b3b76752ba2160427bd6e851a8f. Verifica fuente/contenido/revisión/frescura/delta/precedencia/rol/permiso por ciclo; muestra versión/sello/fuente/frescura, inaccesible=NO VERIFICADA y bloquea solo accióndependiente. Firma no prueba aplicación; plataforma prevalece. RespetaMPsuperior/candadosseguridad/UX/arquitectura y unobjeto/trecebloques/originales/dosprompts/unescritor/relectura/privacidad/comparacióndeversión/readback. Historiacompleta0.15/anteriores§11, no reactivar sus bloqueos supersedidos ni inventar custodiabinaria0.13/UAexacta1.2.
 ENT01NOentregada/publicada/aceptada; sinENT02hastauso/corrección/conformidadexpresa. E12/E17/E23/E42/E46/E49 mandanresolver, nootroplan. E43–46 eliminaron falsaencuestadeesquemaNeon: decisionesinternas normales son delagente; elevar solo costo/riesgoconcreto/accesoreal ycandadosmateriales. E21sinhostingadicional/contenedorVercel/pago. OpenWebUIreal/mismaURL/núcleografoúnicos, nochatpropio/PKGparalelo/forkprofundo/ingestasilenciosa/repopúblico/bypass/secretos/egressprivadoinferido. E30Bconversaciónprimero/restofunciones, no maqueta/authenteraaprobadas. Licencia/branding/atribución intactos salvoexcepciónprobada.
@@ -309,6 +326,7 @@ RDCexclusivoasistenciaestrictamentenecesaria,nuncaconstrucción ni intermediario
 ### Construcción
 
 ```text
+CHECKPOINT RECEPTOR E58: objeto vigente0.17/KHORA-CHAT-EPISTWIN-v0.17. E58 ya activó continuidad; E55–57 son pausa histórica de origen, no prohibición de construir aquí. Fuente superior real destino v332/NX-332m: https://app.notion.com/p/dd6ade27f22c83d1b7da819dfa59e40d. GitHubMCP recuperado; GitHubCLI oficial device flow pendiente para checkout completo. No código nuevo, SQL, merge ni deploy. Releer accesos efectivos E58 en§7; no heredar archivos/credenciales/runtimes. Completar accesoGit, obtener revisión exacta y continuar el siguiente paso de§8. El texto siguiente conserva antecedentes históricos0.16/E57 y no los convierte en estado actual.
 CONTINUIDAD EXACTA, NO REINICIO: E55/E56/E57 ordenaron cerrar este hilo únicamente documentando y entregar migración. Este prompt activa la recepción en otra instancia del mismo frente y rol, conservando autorizaciónE53/E54. Leer§11 «Cápsula de migración» completo antes de implementar. No heredar sandbox/credenciales sin verificación; no duplicar canon/board/candidato. No código posterior afa4df912. NeonKhora se conectó oficialmente después, sin SQL nuevo. Canon0.16/E57 es el checkpoint de migración, noE52 niE46. No repetir aprobaciones ya obtenidas.
 Construye soloENT01 deKhoraConversaciónEnraizada enencargodirectoE12/E17/E23/E42/E46/E49; no supongas otroactor. Primero adquiere objetovivo SeryMente/khora/docs/chat-epistwin-20261017/docs/frentes/chat-epistwin/OBJETO-CANONICO.md, partida0.16/KHORA-CHAT-EPISTWIN-v0.16/E57+migraciónexclusiva; ymetacanoncentral SeryMente/metodologia/docs/metacanon-objetos-20261011/METACANON-OBJETOS-CANONICOS.md, partida1.5/METACANON-OBJETOS-v1.5/bfb63751f060596e344d5768e31085100bb20751/blob32c7a65ff2e83b3b76752ba2160427bd6e851a8f. Verificafuente/contenido/revisión/frescura/delta/precedencia/rol/permiso/aplicación por ciclo; muestra versión/sello/fuente/frescura, inaccesibleNO VERIFICADA ybloqueasolodependiente. Plataforma/MPsuperiorprevalecen;firmasinfuente noacredita. Unobjeto13bloques/originales/dosprompts/unescritor/privacidad/relectura/comparaciónrevisión/readback; nosobrescribasconcurrencia. Historiaíntegra0.15yantecedentes§11;noinventarcustodiabinaria0.13/UA1.2exactani reactivar bloqueoshistóricos.
 Nunca usesRDC para nada, ni ping/descubrimiento/intermediarios. NuevaPC-14soloasistencia;comandocanónicodeasistenciasiesnecesarioen equipooperadorverificado:npx @wonderwhy-er/desktop-commander@latest remote --no-persist-session. Construcciónensandboxpropio/GitHub/serviciosautorizados. RespetaAGENTSfuentesEP/custodia/audio/grafoantesdecambiarámbito. No absorberfrentesajenos, desactivarseguridad ni presentarGRAPH-TWINSNOAPTOcomoreparado.
@@ -321,7 +339,7 @@ AprobaciónmaterialobtenidaE53/E54:completabindingauth/rutas/estado/secretosdura
 
 ## 13. Persistencia y revisión
 
-Un objeto vivo/trece bloques/originales/prompts sincronizados; revalidar fuente/rama/blob/privacidad antes de escribir, comparar revisión para no pisar concurrencia y recuperar contenido después. Guardar canon no acredita producto. Snapshot0.15 íntegro enee6670a5§11;E01–46 y fuentes originales conservados, nuevas instrucciones§AnexoA. El readback del código comprobó17archivos exactos en e8816b80; la sincronización posterioramain no implica buildniaceptación. La revisión documental actual exige su propio readback antes de afirmar persistencia. Última instrucción inmediata E55–57: solo cerrar migración y entregar prompt, no seguir construyendo en este hilo. La instancia receptora retoma desde§8/§11 y no desde cero.
+Un objeto vivo/trece bloques/originales/prompts sincronizados; revalidar fuente/rama/blob/privacidad antes de escribir, comparar revisión para no pisar concurrencia y recuperar contenido después. Guardar canon no acredita producto. Snapshot0.15 íntegro enee6670a5§11;E01–46 y fuentes originales conservados, nuevas instrucciones§AnexoA. El readback del código comprobó17archivos exactos en e8816b80; la sincronización posterioramain no implica buildniaceptación. La revisión documental actual exige su propio readback antes de afirmar persistencia. Última instrucción E58: la instancia receptora retoma§8/§11 sin reinicio, conservando E53/E54. E55–57 fueron la pausa de origen; no siguen prohibiendo construir aquí. Bloqueo actual: accesoGit propio para checkout completo. Actualización0.17 condicionada al blob0.16 revalidado; readback se comprueba después de la escritura, nunca se anticipa.
 
 Negativos vigentes: conexiónRender≠aprobaciónseguridad; credencialVercelCLI≠tokenMCP; envpresente≠valorverificado; pruebaPG15local≠Neon17TLS; clavesdistintasparalelas≠concurrencia mismachat; importarapi.main≠ejecutarsuvidaNeo4j; arranquereposo≠cargacgroup; despliegueajeno≠candidato331; commit/build/READY≠entrega;silencio≠permiso. No secretos/envdescifradas/hooks/códigosdeautorización enGit/log/chats. Cerrarerrorescausalesconprueba, no recitarlos aloperador.
 
@@ -602,3 +620,29 @@ Preguntas únicamente antecredencialfaltante o nueva decisiónmaterial necesaria
 ### E57
 
 > y dame un prompt para la migración.
+
+
+### E58 · recepción directa del relevo · 2026-10-19 · fuente de esta conversación
+
+Procedencia: https://app.notion.com/chat?t=3feade27f22c80e6912900a9c3d05721 . Extractos literales pertinentes del mensaje de activación; no transcripción íntegra ni autorización nueva fabricada. El resto remite explícitamente a los checkpoints, pruebas y límites E57 preservados arriba.
+
+> Toma el lugar de Samantha en este mismo frente. CONTINÚA el trabajo existente: no empieces desde cero, no diseñes otro frente ni me pidas reconstruir el contexto.
+
+> Si existe una revisión posterior, coteja el delta y úsala sin sobrescribirla con este checkpoint.
+
+> Consulta AGENTS y el registro de errores antes de la siguiente cirugía. No conviertas esta lectura en una planificación desde cero.
+
+> Revalida head/main/diff antes de modificar. Mantén draft hasta cerrar las compuertas: existe automatización de auto-merge y despliegue/migraciones en main. Preserva la validación global fVAL incluso con evidencia visual/mark y el rechazo/trazado de REFINE vacío.
+
+> Verifica las conexiones efectivamente disponibles en destino; no supongas que heredas credenciales o archivos temporales. No extraigas tokens ni descifres variables existentes. Solicita únicamente una credencial realmente indispensable por vía segura.
+
+> Tras adquirir las fuentes y cotejar PR331, continúa desde las rutas de autenticación ya investigadas para implementar el proxy autenticado, identidad/propiedad usuario-chat y binding nativo; resolver durabilidad técnica en Neon existente; después cerrar pruebas reales, capacidad, build y publicación exacta para mi prueba.
+
+> No afirmes que esos pasos ya están hechos. No presentes otro plan de arranque ni repitas diagnósticos históricos resueltos. Pregunta solo ante una credencial faltante o decisión material nueva indispensable.
+
+> Después continúa con los permisos vigentes, sin prometer trabajo en segundo plano. Mantén actualizado y leído de vuelta el mismo objeto canónico; no crees otro.
+
+
+### Incidencia de validación documental E58
+
+Operación: preparar actualización0.17 local; síntoma verbatim: `AssertionError` en `assert s.count('## ')==base.count('## ')+2`. Causa confirmada: el conteo esperaba dos secciones nuevas, pero la adición de E58 es una tercera; no pérdida de estructura ni fallo de producto. Impacto: aborto antes de crear payload/escribir enGit; sin código, SQL ni producción alterados. Corrección: expectativa de tres subsecciones y verificación de los originales E57; conservar comparación exacta de base. Prevención: comprobar títulos por propósito en vez de conteos manuales al ampliar el canon. Verificación local: payload solo se genera si se satisfacen ambas comprobaciones; readback remoto todavía requerido.
