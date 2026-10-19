@@ -35,6 +35,7 @@ export class PostgresDelivery implements DeliveryStore {
       if(state==='confirmed'&&!data?.receipt)throw new Error('DELIVERY_PROOF_REQUIRED');
       const result=await c.query(`UPDATE blog_delivery SET state=$4,external_id=COALESCE($5,external_id),url=COALESCE($6,url),proof_hash=COALESCE($7,proof_hash),last_code=$8,attempts=attempts+CASE WHEN $4='submitting' THEN 1 ELSE 0 END,lease_until=CASE WHEN $4 IN ('submitting','unknown') THEN lease_until ELSE NULL END,updated_at=now() WHERE editorial_id=$1 AND revision=$2 AND target=$3 AND state NOT IN ('confirmed','cancelled') AND (attempts<5 OR $4<>'submitting') AND lease_token=$9 RETURNING target`,[id,revision,target,state,data?.receipt?.id||data?.externalId||null,data?.receipt?.url||null,data?.receipt?.proofHash||null,data?.code||null,this.leases.get(id+':'+revision+':'+target)||null]);
       if(!result.rows.length)throw new Error('DELIVERY_CONFLICT');
+      await c.query('UPDATE blog_editorial SET changed_seq=DEFAULT,updated_at=now() WHERE id=$1',[id]);
       await this.repo.history(c,this.actor,r,'delivery_'+target+'_'+state,{target,state,receipt:data?.receipt||null,code:data?.code||null});
     });
   }

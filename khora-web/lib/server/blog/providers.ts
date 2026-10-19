@@ -4,9 +4,9 @@ const site='https://serymente.github.io/otrogranprograma/blog/';
 // No tokens in URLs, thrown errors, returned objects or persisted logs.
 async function json(response:Response,code:string){if(!response.ok)throw new Error(code+'_'+response.status);return response.json();}
 export class GitHubBlog {
-  token:string; fetcher:typeof fetch;
-  constructor(token:string,fetcher:typeof fetch=fetch){if(!token)throw new Error('GITHUB_PUBLISHER_UNCONFIGURED');this.token=token;this.fetcher=fetcher;}
-  async request(path:string,init:RequestInit={}){return this.fetcher('https://api.github.com/repos/SeryMente/otrogranprograma/'+path,{...init,redirect:'error',signal:AbortSignal.timeout(20000),headers:{Accept:'application/vnd.github+json',Authorization:`Bearer ${this.token}`,'Content-Type':'application/json','X-GitHub-Api-Version':'2022-11-28'}});}
+  #token:string; fetcher:typeof fetch;
+  constructor(token:string,fetcher:typeof fetch=fetch){if(!token)throw new Error('GITHUB_PUBLISHER_UNCONFIGURED');this.#token=token;this.fetcher=fetcher;}
+  async request(path:string,init:RequestInit={}){return this.fetcher('https://api.github.com/repos/SeryMente/otrogranprograma/'+path,{...init,redirect:'error',signal:AbortSignal.timeout(20000),headers:{Accept:'application/vnd.github+json',Authorization:`Bearer ${this.#token}`,'Content-Type':'application/json','X-GitHub-Api-Version':'2022-11-28'}});}
   async publish(e:PublicEntry):Promise<{id:string}>{
     e=publicEntry(e);const path=`contents/blog/entries/${e.slug}.json`;const old=await this.request(path+'?ref=main');
     if(old.ok){const d=await old.json();const decoded=JSON.parse(Buffer.from(d.content,'base64').toString('utf8'));
@@ -34,9 +34,9 @@ export class GitHubBlog {
   }
 }
 export class MetaPage {
-  token:string;pageId:string;fetcher:typeof fetch;
-  constructor(pageToken:string,verifiedPageId:string,fetcher:typeof fetch=fetch){if(!pageToken||!/^[0-9]+$/.test(verifiedPageId))throw new Error('META_UNCONFIGURED');this.token=pageToken;this.pageId=verifiedPageId;this.fetcher=fetcher;}
-  async request(path:string,init:RequestInit={}){if(!/^[a-zA-Z0-9_/?=,&.-]+$/.test(path))throw new Error('META_PATH');return this.fetcher('https://graph.facebook.com/v26.0/'+path,{...init,redirect:'error',signal:AbortSignal.timeout(20000),headers:{Authorization:`Bearer ${this.token}`,'Content-Type':'application/json'}});}
+  #token:string;pageId:string;fetcher:typeof fetch;
+  constructor(pageToken:string,verifiedPageId:string,fetcher:typeof fetch=fetch){if(!pageToken||!/^[0-9]+$/.test(verifiedPageId))throw new Error('META_UNCONFIGURED');this.#token=pageToken;this.pageId=verifiedPageId;this.fetcher=fetcher;}
+  async request(path:string,init:RequestInit={}){if(!/^[a-zA-Z0-9_/?=,&.-]+$/.test(path))throw new Error('META_PATH');return this.fetcher('https://graph.facebook.com/v26.0/'+path,{...init,redirect:'error',signal:AbortSignal.timeout(20000),headers:{Authorization:`Bearer ${this.#token}`,'Content-Type':'application/json'}});}
   async verifyIdentity():Promise<{id:string;name:string}>{
     const p=await json(await this.request('me?fields=id,name'),'META_IDENTITY_FAILED');
     if(p.id!==this.pageId)throw new Error('META_PAGE_MISMATCH');return {id:p.id,name:p.name};

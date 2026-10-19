@@ -38,3 +38,5 @@ test('Meta discovery requires explicit content task',async()=>{const f=(async()=
 test('Meta discovery bounded cursor loop',async()=>{let n=0;const f=(async()=>{n++;return new Response(JSON.stringify({data:[],paging:{next:'do-not-follow-secret-url',cursors:{after:'same'}}}),{status:200});})as typeof fetch;await assert.rejects(()=>discoverPage('fake','61595788700651',f),/CURSOR/);assert.equal(n,2);});
 
 test("source classification not trusted from public client",()=>assert.throws(()=>approve(fixture(),"owner",{...source,kind:"conversacion_maya"},now),/SOURCE_NOT_BLOG/));
+
+test('provider objects never serialize credentials',()=>{assert(!JSON.stringify(new GitHubBlog('synthetic-secret')).includes('synthetic-secret'));assert(!JSON.stringify(new MetaPage('synthetic-secret','61595788700651')).includes('synthetic-secret'));});
