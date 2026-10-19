@@ -1,0 +1,21 @@
+{
+  "type": "migration_readback_verification",
+  "at_utc": "2026-10-19T20:26:55.034515+00:00",
+  "canonical_commit": "42e1efb33dcdcf47abd66eb9ac5abfd57ca53632",
+  "canonical_git_blob": "57ee902a5ba6738653f65ba5ff450312a92b5c35",
+  "canonical_sha256": "93938227f782e64531d2d1d4ed9a667d3f716e88191d2a05ce85fc0ce2e82608",
+  "remote_equals_local_byte_for_byte": true,
+  "bytes": 75332,
+  "structure": "13 exact central headings, original E01–46 entire annex retained, E47–57 added verbatim, two role prompts",
+  "evidence_remote_git_blobs_verified": 12,
+  "product_status": "not_delivered_not_published_not_accepted",
+  "code_head": "fa4df912acfb9805d040a958c7d963f3d35ad80c",
+  "migration_only": true,
+  "portable_package": {
+    "filename": "Khora-chat-migracion-v0.16.zip",
+    "bytes": 190675,
+    "sha256": "5c6d4dc427d60d8a006a7249f852947ed7dfb4dd856653bab69d5096658f937e",
+    "scope": "immutable partial working snapshot plus technical evidence; no credentials; delivered as session attachment",
+    "source_of_truth": "remote canonical object, not zip"
+  }
+}

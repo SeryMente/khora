@@ -1,0 +1,27 @@
+/handoff · Khora · Conversación Enraizada · Chat y fidelidad EpisTwin
+
+Toma el lugar de Samantha en este mismo frente. CONTINÚA el trabajo existente: no empieces desde cero, no diseñes otro frente ni me pidas reconstruir el contexto.
+
+Lee íntegramente y en este orden:
+1. La fuente superior vigente de Samantha enlazada en §11 del objeto siguiente. En origen se confirmó v330 / NX-330m; comprueba su revisión real, no la afirmes de memoria.
+2. El objeto vivo único: https://github.com/SeryMente/khora/blob/docs/chat-epistwin-20261017/docs/frentes/chat-epistwin/OBJETO-CANONICO.md
+   Checkpoint: v0.16 / KHORA-CHAT-EPISTWIN-v0.16 / E57. Commit documental 42e1efb33dcdcf47abd66eb9ac5abfd57ca53632; blob 57ee902a5ba6738653f65ba5ff450312a92b5c35. Si hay una revisión posterior, coteja el delta y úsala sin pisarla.
+3. El metacanon central: https://github.com/SeryMente/metodologia/blob/docs/metacanon-objetos-20261011/METACANON-OBJETOS-CANONICOS.md
+   Fuente observada: versión1.5 / METACANON-OBJETOS-v1.5, commit bfb63751f060596e344d5768e31085100bb20751. Aplica sus compuertas, trece bloques y prompts, subordinado a plataforma y fuente superior.
+4. En el objeto: §7 accesos/entorno; §8 estado y pendientes; §11 Cápsula de migración COMPLETA, mapa de código, pruebas, errores, dependencias y decisiones; §12 prompts de rol; anexos originales E01–57. Consulta AGENTS y registro de errores antes de la siguiente cirugía.
+
+Estado al cierre de este ciclo: ENT01 pausada exclusivamente para migración; PR331 abierto, draft y sin merge, head fa4df912acfb9805d040a958c7d963f3d35ad80c. Aprobación E53/E54 vigente para acceso actual de Khora, sin entrada directa por Render y pruebas públicas/artificiales con Groq. Binding autenticado, durabilidad productiva, circuito real y publicación aún pendientes. No ENT02.
+
+Pruebas aisladas y arranque oficial slim verificados; no full build, Neon Python/TLS, carga Render, aislamiento autenticado ni recorrido productivo. No hay implementación ni deploy en segundo plano.
+
+Retoma PR331: https://github.com/SeryMente/khora/pull/331, rama fix/chat-epistwin-ent01-main-20261019. PR317 está cerrado sin merge y conservado; no lo reabras ni vuelvas a resolver su conflicto. Revalida head/main/diff antes de tocar código. Mantén draft hasta las compuertas: existe automatización de auto-merge y deploy/migraciones en main. Preserva fVAL global incluso con evidencia visual/mark y rechazo/traza de REFINE vacío.
+
+Reutiliza evidencia válida: 12 pruebas focales, 5 PostgreSQL15 reales desechables sin skip, 27 controladas +4subtests, 10 frontend y arranque oficial OpenWebUI0.12.3 slim. Sus límites están documentados; no son full build, Neon17/TLS, carga512MiB ni producción. No repitas pruebas sin cambio relevante ni heredes bloqueos históricos ya resueltos.
+
+E53/E54 YA aprobaron acceso actual de Khora/sin segunda cuenta/registro cerrado, chat solo mediante Khora autenticado y pruebas públicas/artificiales con Groq/sin notas personales. No preguntes esa aprobación ni la ubicación del esquema Neon otra vez. OpenWebUI real, misma URL, núcleo/grafo únicos; sin otro hosting/plan/pago, chat sustituto, memoria paralela, ingesta silenciosa, bypass ni secretos en cliente/Git. Construcción nunca mediante Remote Desktop Commander. No ENT02 antes de uso/corrección/conformidad explícita de ENT01.
+
+Vercel CLI y Render fueron recuperados; Neon Khora se conectó oficialmente con alcance al proyecto existente, sin SQL nuevo. Verifica capacidad real de las conexiones en destino; no supongas herencia del sandbox ni extraigas tokens/descifres env. El ZIP, si se adjunta, es respaldo parcial con hashes/sin credenciales; el estado vivo sigue en el objeto remoto. No hagas depender la continuidad de archivos temporales que quizá no existan.
+
+Siguiente paso: tras adquirir las fuentes y cotejar PR331, continuar desde las rutas auth ya investigadas para implementar proxy autenticado, identidad/propiedad usuario-chat y binding nativo; durabilidad técnica en Neon existente; luego pruebas reales, capacidad/build y publicación exacta para mi prueba. No afirmes que esos pasos ya están hechos ni presentes un plan de arranque nuevo. Pregunta únicamente ante una credencial realmente faltante o una decisión material nueva indispensable.
+
+En tu primera respuesta confirma brevemente el checkpoint adquirido, decisiones y evidencia reutilizada, el delta real si existe y la primera acción concreta. Continúa desde ahí con los permisos vigentes; no prometas trabajo en segundo plano. Mantén el mismo objeto actualizado y leído de vuelta, sin crear otro canon.
