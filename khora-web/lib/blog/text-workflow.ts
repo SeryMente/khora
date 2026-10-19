@@ -23,24 +23,25 @@ export function readReference(x:unknown):Reference|null{
  return {schema:1,sessionId:r.sessionId,publicationId:r.publicationId,slug:r.slug,sourceHash:r.sourceHash,obfuscated:r.obfuscated,...(r.sourceId?{sourceId:r.sourceId,sourceVersion:1}:{})};
 }
 export class BlogTextWorkflow{
- private ref:Reference|null;private token='';private original='';private pending:RevisionEditorial|null=null;private prepared:Preview|null=null;private receipt:Receipt|null=null;private busy=false;
+ private ref:Reference|null;private token='';private original='';private pending:RevisionEditorial|null=null;private prepared:Preview|null=null;private receipt:Receipt|null=null;private busy=false;private decisionPending=false;
  constructor(private transport:Transport,private journal:Journal){this.ref=readReference(journal.read());}
  get reference(){return this.ref?copy(this.ref):null;}
  get preview(){return this.prepared?copy(this.prepared):null;}
  get statusReceipt(){return this.receipt?copy(this.receipt):null;}
- get locked(){return this.receipt?.consent==='approved';}
+ get locked(){return this.decisionPending||this.receipt?.consent==='approved';}
  private async exclusive<T>(fn:()=>Promise<T>){if(this.busy)fail('OPERATION_IN_PROGRESS');this.busy=true;try{return await fn();}finally{this.busy=false;}}
  private async post(action:string,payload:Record<string,unknown>={},norm=true):Promise<any>{
   if(norm&&!this.token){
-   const opened=await this.post('open_turn',{_thinking_mode:'UNAVAILABLE',_output_format_version:'v1.7.7'},false);
+   let opened:any;try{opened=await this.post('open_turn',{_thinking_mode:'UNAVAILABLE',_output_format_version:'v1.7.7'},false);}catch(e){if(action==='decide'&&payload.decision===true&&this.prepared){this.decisionPending=false;this.receipt={revision:this.prepared.revision.revision,consent:'pending',filter:'approval_blocked',deliveries:[]};}throw e;}
    if(opened?.turn?.status!=='OPEN'||typeof opened?.turn?.turn_token!=='string'||!opened.turn.turn_token)fail('NORMATIVE_TURN_UNAVAILABLE');
    this.token=opened.turn.turn_token;
   }
   const data={action,...payload,...(norm?{_thinking_mode:'UNAVAILABLE',_output_format_version:'v1.7.7',_norm_turn_token:this.token}:{})};
   const raw=JSON.stringify(data);if(raw.length>240000)fail('EDITORIAL_TRANSPORT_TOO_LARGE');
+  if(action==='decide'&&payload.decision===true&&this.prepared){this.decisionPending=true;this.receipt={revision:this.prepared.revision.revision,consent:'pending',filter:'approval_receipt_unconfirmed',deliveries:[]};}
   let response:Response;try{response=await this.transport('/api/blog/editorial',{method:'POST',credentials:'same-origin',cache:'no-store',headers:{'Content-Type':'application/json'},body:raw});}catch{return fail('RESPONSE_UNCERTAIN');}
   let value:any;try{value=await response.json();}catch{return fail('RESPONSE_INVALID');}
-  if(!response.ok){if(value?.code==='NORMATIVE_TURN_REQUIRED')this.token='';return fail(typeof value?.code==='string'&&/^[A-Z_]+$/.test(value.code)?value.code:'EDITORIAL_REQUEST_FAILED');}
+  if(!response.ok){if(value?.code==='NORMATIVE_TURN_REQUIRED')this.token='';if(action==='decide'&&payload.decision===true&&this.prepared&&['AUTH_REQUIRED','ORIGIN_FORBIDDEN','NORMATIVE_TURN_REQUIRED'].includes(value?.code)){this.decisionPending=false;this.receipt={revision:this.prepared.revision.revision,consent:'pending',filter:'approval_blocked',deliveries:[]};}return fail(typeof value?.code==='string'&&/^[A-Z_]+$/.test(value.code)?value.code:'EDITORIAL_REQUEST_FAILED');}
   return value;
  }
  async archive(text:string,obfuscated:boolean):Promise<Reference>{return this.exclusive(async()=>{
@@ -84,17 +85,17 @@ export class BlogTextWorkflow{
  private acceptStatus(v:any):Receipt{
   if(!this.ref||(v.id??v.publicationId)!==this.ref.publicationId||!Array.isArray(v.deliveries)||!['pending','approved','declined'].includes(v.consent)||v.revision!==undefined&&(!Number.isSafeInteger(v.revision)||v.revision<1))fail('STATUS_RECEIPT_MISMATCH');
   if(this.prepared&&v.revision!==undefined&&v.revision!==this.prepared.revision.revision)fail('EDITORIAL_REVISION_CHANGED');
-  this.receipt=copy(v);return copy(v);
+  this.receipt=copy(v);this.decisionPending=false;return copy(v);
  }
  async decide(decision:boolean,obfuscatedExposure=false):Promise<Receipt>{return this.exclusive(async()=>{
   if(typeof decision!=='boolean'||!this.ref?.sourceId)fail('DECISION_INVALID');
+  if(this.decisionPending)fail('APPROVAL_RECONCILIATION_REQUIRED');
   if(!decision&&!this.prepared){
    return this.acceptStatus(await this.post('decline_archived',{reference:{publicationId:this.ref.publicationId,sourceId:this.ref.sourceId,sourceVersion:1,sourceHash:this.ref.sourceHash}},false));
   }
   if(!this.prepared||this.pending)fail('EXACT_PREVIEW_REQUIRED');
   if(decision&&this.ref.obfuscated&&!obfuscatedExposure)fail('OBFUSCATED_EXPLICIT_DECISION_REQUIRED');
   // A lost response can mean approval committed. Freeze further editing until status reconciliation.
-  if(decision)this.receipt={revision:this.prepared.revision.revision,consent:'approved',filter:'approval_receipt_unconfirmed',deliveries:[]};
   return this.acceptStatus(await this.post('decide',{publicationId:this.ref.publicationId,digest:this.prepared.digest,decision,obfuscatedExposure},decision));
  });}
  async status():Promise<Receipt>{return this.exclusive(async()=>{

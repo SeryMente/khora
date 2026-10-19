@@ -69,7 +69,7 @@ try{
  check(calls.filter(c=>c.body.action==='decide'&&c.body.decision===false).length===1,'explicit refusal recorded');
  await page.getByRole('button',{name:'Preparar y verificar previa exacta'}).click();await page.getByText('Revisión 2 · Huella exacta:',{exact:false}).waitFor();
  check(calls.filter(c=>c.body.action==='prepare').at(-1).body.revision.revision===2,'new revision after refusal');
- await page.getByRole('button',{name:'Sí, publicar esta versión exacta en ambos'}).click();await page.getByText('Aprobación enviada.',{exact:false}).waitFor();
+ await page.getByRole('button',{name:'Sí, publicar esta versión exacta en ambos'}).click();await page.getByText('Aprobación registrada.',{exact:false}).waitFor();
  check(await page.getByLabel('Título público',{exact:true}).isDisabled(),'approved draft frozen');
  check(!await page.getByText('Publicación comprobada en ambos destinos.',{exact:true}).count(),'pending not declared published');
  const journal=await page.evaluate(()=>JSON.stringify({session:{...sessionStorage},local:{...localStorage}}));
@@ -84,6 +84,19 @@ try{
  check(await page.getByLabel('Texto original',{exact:true}).inputValue()==='','resume never restores private original from server');
  check(calls.filter(c=>c.body.action==='decide'&&c.body.decision===true).length===1,'reload/status never resubmits consent');
  check(!calls.some(c=>c.url==='/api/blog/dispatch'),'browser never holds dispatch secret or calls dispatch');
+ const blocked=await context.newPage();blocked.setDefaultTimeout(8000);blocked.on('pageerror',e=>errors.push(e.message));await blocked.setViewportSize({width:390,height:844});
+ await blocked.goto(origin);await blocked.getByLabel('Texto original',{exact:true}).fill('Nota ofuscada sintética, no publicar.');await blocked.getByLabel('Entrada ofuscada',{exact:false}).check();await blocked.getByRole('button',{name:'Conservar original y preparar borrador'}).click();await blocked.getByLabel('Título público',{exact:true}).waitFor();
+ await blocked.getByLabel('Formato en Facebook',{exact:true}).selectOption('full_text');await blocked.getByLabel('Texto exacto de Facebook').fill('Nota ofuscada sintética, no publicar.');
+ await blocked.route('**/api/blog/editorial',async route=>{const b=route.request().postDataJSON();if(b.action==='open_turn')await route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({code:'NORMATIVE_TURN_UNAVAILABLE'})});else await route.continue();});
+ await blocked.getByRole('button',{name:'Preparar y verificar previa exacta'}).click();await blocked.getByRole('alert').waitFor();
+ check(await blocked.getByText('NORMATIVE_TURN_UNAVAILABLE',{exact:true}).count()===1,'real browser adapter surfaces normative rejection');
+ check(await blocked.getByRole('button',{name:'Sí, publicar esta versión exacta en ambos'}).count()===0,'no exact preview/approval after blocked normative turn');
+ check(await blocked.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'mobile error state no overflow');
+ await blocked.screenshot({path:path.join(output,'07-mobile-normative-blocked.png'),fullPage:true});await blocked.setViewportSize({width:1280,height:900});await blocked.screenshot({path:path.join(output,'08-desktop-normative-blocked.png'),fullPage:true});
+ await blocked.unroute('**/api/blog/editorial');await blocked.getByRole('button',{name:'Preparar y verificar previa exacta'}).click();await blocked.getByRole('heading',{name:'3. Revisa antes de autorizar'}).waitFor();
+ check(await blocked.getByRole('button',{name:'Sí, publicar esta versión exacta en ambos'}).isDisabled(),'obfuscated preview cannot approve without explicit exposure');
+ await blocked.getByLabel('Autorizo expresamente la exposición pública',{exact:false}).check();check(await blocked.getByRole('button',{name:'Sí, publicar esta versión exacta en ambos'}).isEnabled(),'exposure only enables explicit decision; no automatic POST');
+ check(calls.filter(c=>c.body.action==='decide'&&c.body.decision===true).length===1,'new ofuscada scenario never published implicitly');
  check(errors.length===0,'no browser runtime errors');
  await writeFile(path.join(output,'browser-report.json'),JSON.stringify({scope:'isolated local React/WebCrypto; synthetic HTTP API, receipts and auth/normative; NO real publication',checks,apiRequests:calls.length,archiveRequests:calls.filter(c=>c.url==='/api/dictado').length,approvalRequests:calls.filter(c=>c.body.action==='decide'&&c.body.decision===true).length,errors},null,2));
  console.log(JSON.stringify({checks,scope:'local UI, synthetic HTTP, no publication',output}));

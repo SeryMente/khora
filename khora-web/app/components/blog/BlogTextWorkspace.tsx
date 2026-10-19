@@ -20,7 +20,7 @@ export default function BlogTextWorkspace(){
  },[text,archived,busy,preview,draft.body]);
  const run=async(fn:()=>Promise<void>)=>{setBusy(true);setError('');try{await fn();setReceipt(workflow.current!.statusReceipt);}catch(e){setReceipt(workflow.current?.statusReceipt??null);setError(e instanceof Error?e.message:'OPERACION_NO_VERIFICADA');}finally{setBusy(false);}};
  const change=(field:keyof Draft,value:string)=>{setDraft(d=>({...d,[field]:value}));setPreview(null);setExposure(false);};
- const frozen=busy||receipt?.consent==='approved';
+ const frozen=busy||workflow.current?.locked===true;
  const resume=()=>run(async()=>{const p=await workflow.current!.resume();setPreview(p);setDraft({title:p.revision.entry.title,body:p.revision.entry.body,date:p.revision.entry.date,...p.revision.facebook});setFormatChosen(true);});
  const refresh=()=>run(async()=>{await workflow.current!.status();});
  useEffect(()=>{
@@ -53,7 +53,7 @@ export default function BlogTextWorkspace(){
    <label style={label}><span id="blog-facebook-label">Texto exacto de Facebook</span><textarea aria-labelledby="blog-facebook-label" rows={5} style={{...control,resize:'vertical'}} maxLength={60000} value={draft.message} disabled={frozen} onChange={e=>change('message',e.target.value)}/></label>
    <p>Si eliges texto completo, pega aquí el texto completo que deseas publicar. No se sustituye automáticamente por otro borrador.</p>
    <button style={button} disabled={frozen||!formatChosen||!draft.title.trim()||!draft.body.trim()||!draft.message.trim()} onClick={()=>run(async()=>{setPreview(await workflow.current!.prepare(draft));setExposure(false);})}>Preparar y verificar previa exacta</button>
-   <button style={button} disabled={busy||!!preview||receipt?.consent==='approved'} onClick={()=>run(async()=>{await workflow.current!.decide(false);})}>No publicar: conservar sin permiso</button>
+   <button style={button} disabled={busy||!!preview||workflow.current?.locked===true} onClick={()=>run(async()=>{await workflow.current!.decide(false);})}>No publicar: conservar sin permiso</button>
   </section>}
   {preview&&<section style={box} aria-labelledby="preview-heading"><h2 id="preview-heading">3. Revisa antes de autorizar</h2>
    <article aria-label="Previa exacta del blog"><p>Blog · {preview.revision.entry.date}</p><h3>{preview.revision.entry.title}</h3><p style={{whiteSpace:'pre-wrap'}}>{preview.revision.entry.body}</p></article>
@@ -62,10 +62,10 @@ export default function BlogTextWorkspace(){
    {ofuscada&&<label style={{display:'flex',gap:12,alignItems:'center',minHeight:44}}><input type="checkbox" checked={exposure} disabled={frozen} onChange={e=>setExposure(e.target.checked)}/>Autorizo expresamente la exposición pública de esta versión ofuscada. No implica anonimato garantizado.</label>}
    <strong>¿Quieres que esta entrada se publique en el blog y en la Página de Facebook?</strong>
    <button style={button} disabled={frozen||ofuscada&&!exposure} onClick={()=>run(async()=>{await workflow.current!.decide(true,exposure);})}>Sí, publicar esta versión exacta en ambos</button>
-   <button style={button} disabled={busy||receipt?.consent==='approved'} onClick={()=>run(async()=>{await workflow.current!.decide(false);})}>No, conservar sin permiso</button>
+   <button style={button} disabled={busy||workflow.current?.locked===true} onClick={()=>run(async()=>{await workflow.current!.decide(false);})}>No, conservar sin permiso</button>
   </section>}
   {receipt&&<section style={box} aria-labelledby="receipt-heading"><h2 id="receipt-heading">4. Comprobantes por destino</h2>
-   <p role="status">{workflow.current?.publishedBoth()?'Publicación comprobada en ambos destinos.':receipt.consent==='declined'?'Conservada sin permiso de publicación.':receipt.consent==='approved'?'Aprobación enviada. La publicación en ambos destinos aún no está comprobada.':'Pendiente de decisión.'}</p>
+   <p role="status">{workflow.current?.publishedBoth()?'Publicación comprobada en ambos destinos.':receipt.consent==='declined'?'Conservada sin permiso de publicación.':receipt.filter==='approval_blocked'?'Aprobación bloqueada: no hay permiso registrado por esta solicitud.':receipt.filter==='approval_receipt_unconfirmed'?'Solicitud de aprobación sin comprobante. Consulta el estado antes de continuar.':receipt.consent==='approved'?'Aprobación registrada. La publicación en ambos destinos aún no está comprobada.':'Pendiente de decisión.'}</p>
    {['blog','facebook'].map(target=>{const d=receipt.deliveries.find(x=>x.target===target&&x.revision===receipt.revision);return <div key={target}><strong>{target==='blog'?'Blog GitHub':'Página de Facebook'}</strong><p>{d?d.state:'Sin comprobante'}{d?.last_code?' · '+d.last_code:''}</p>{d?.state==='confirmed'&&d.url&&/^https:\/\//.test(d.url)&&<a style={{display:'inline-block',minHeight:44,padding:'8px 0'}} href={d.url} target="_blank" rel="noopener noreferrer">Abrir comprobante</a>}</div>;})}
    <p>La cola del servidor ejecuta las entregas solo si sus proveedores y automatización están habilitados. Un recibo pendiente o incierto no autoriza un segundo envío manual. Esta pantalla consulta estados; no activa credenciales ni el planificador.</p>
    <button style={button} disabled={busy} onClick={refresh}>Actualizar comprobantes</button>
