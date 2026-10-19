@@ -15,7 +15,10 @@
     "filename": "Khora-chat-migracion-v0.16.zip",
     "bytes": 190675,
     "sha256": "5c6d4dc427d60d8a006a7249f852947ed7dfb4dd856653bab69d5096658f937e",
-    "scope": "immutable partial working snapshot plus technical evidence; no credentials; delivered as session attachment",
-    "source_of_truth": "remote canonical object, not zip"
+    "scope": "prepared and integrity-verified in source sandbox; session attachment transfer FAILED twice; no user-facing attachment delivered",
+    "source_of_truth": "remote canonical object, not zip",
+    "transfer_status": "NOT_DELIVERED_COMPUTER_HELPER_FAILED",
+    "continuity_dependency": false,
+    "fallback": "All live canonical context and 14 technical evidence/prompt/verification files are already persisted in private GitHub; use the exact code branch and source references instead of requiring this sandbox ZIP."
   }
 }
