@@ -341,12 +341,6 @@
       "git_blob_sha": "e18663f9bb4ebcbe2494a8340e305078e5dadec9"
     },
     {
-      "path": "OBJETO-CANONICO.md",
-      "bytes": 199338,
-      "sha256": "2cc3752de863c17436ee0bed086d091aa1a8b9d26973a0511f7656de247507c2",
-      "git_blob_sha": "f6cd23152063d7f51cb96d19b4fb95ba4b082dd7"
-    },
-    {
       "path": "evidencias/C031-unit.log",
       "bytes": 856,
       "sha256": "557b790f40f37653219be7564fceaf6b75671b815361db72e206fbc9338f4076",
@@ -389,10 +383,28 @@
       "git_blob_sha": "eb09f93d7fbd24a110b743a5a6353c6237ec07d6"
     },
     {
+      "path": "OBJETO-CANONICO.md",
+      "bytes": 201796,
+      "sha256": "4bae8f9d49dae6304a537b1e9a7b1508679c8377af01643d45185d57e506ddbb",
+      "git_blob_sha": "2470dbf1fde360c53035f67cb11f53867e9c59d7"
+    },
+    {
+      "path": "originales/C031-salida-final.md",
+      "bytes": 1206,
+      "sha256": "54916303b3de3bd44565dab02cc821bbcefa3bcd732f1091ae1bad4863b3c115",
+      "git_blob_sha": "581289aa8c975082afd6344a419f866a6e60de7a"
+    },
+    {
       "path": "originales/C031-extractos-recibidos.json",
-      "bytes": 4542,
-      "sha256": "17ed21f69010e1c777203bf0d2e4ae0a35b111d5fb4ec9fbd30e7d9cdf7b56b9",
-      "git_blob_sha": "d9d28e13f3ae492c0d02b6360d30a0b4da35e167"
+      "bytes": 8169,
+      "sha256": "b67814a31dd695c75c67da028bfcd067fb4f5629964ef3d9c08690431bcb9e67",
+      "git_blob_sha": "bdfbbb77ee6d24d5f142248b3c1da98acfa8864b"
+    },
+    {
+      "path": "evidencias/C031-readback-code.json",
+      "bytes": 339,
+      "sha256": "1e142325ec25a9f1ac41403865d7053449afbfcbd5765c059730204f51cc3de6",
+      "git_blob_sha": "6108c41d9a47a85bf2ef8aab7ed56a1b598976b7"
     }
   ],
   "runtime_references": [
@@ -499,13 +511,13 @@
     "no_secret_values_in_manifest": true
   },
   "current_preparation": {
-    "version": "0.6.13",
+    "version": "0.6.14",
     "baseSha": "b5e7009de137db30c26ecc5f4ddbb34789f453f2",
     "branch": "feat/ingreso-autobiografico-20261019",
     "receipt": "evidencias/C031-results.json",
-    "state": "draft; not deployed; actual failure cause unverified"
+    "state": "draft PR330; objective not reached; browser/recovery investigation deferred by operator"
   },
-  "latestEvent": "C031 draft, real audio custody failure unresolved; public audio requirement blocks Yes",
+  "latestEvent": "C031 final honest checkpoint; audio public implementation absent; no deployment",
   "latest_verified_release": {
     "sha": "f0dfbdcb2d79eb6289dacba272ddcc7ba2023063",
     "deploymentId": "dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr",
@@ -532,12 +544,14 @@
     "technicalPublicationVerified": true
   },
   "latest_cycle": "C031",
-  "canonical_version": "0.6.13",
+  "canonical_version": "0.6.14",
   "latest_candidate": {
     "branch": "feat/ingreso-autobiografico-20261019",
     "base": "b5e7009de137db30c26ecc5f4ddbb34789f453f2",
     "production": false,
-    "publicAudio": false
+    "publicAudio": false,
+    "codeCommit": "bd90b7d094879a35d6f90c625325ec3137b244fc",
+    "pullRequest": 330
   },
   "release_history": [
     {
@@ -584,6 +598,24 @@
         "bytes": 194785,
         "sha256": "092ff9b9d03e7e805f929a4daceda3b72b2fbdb5a00ee526c3b8d7d5e2bebd92",
         "git_blob_sha": "a29ad8e3221128f2b59caa00fc8ed3ded87c89a2"
+      }
+    },
+    {
+      "event": "C031-final",
+      "previous": {
+        "path": "OBJETO-CANONICO.md",
+        "bytes": 199338,
+        "sha256": "2cc3752de863c17436ee0bed086d091aa1a8b9d26973a0511f7656de247507c2",
+        "git_blob_sha": "f6cd23152063d7f51cb96d19b4fb95ba4b082dd7"
+      }
+    },
+    {
+      "event": "C031-final",
+      "previous": {
+        "path": "originales/C031-extractos-recibidos.json",
+        "bytes": 4542,
+        "sha256": "17ed21f69010e1c777203bf0d2e4ae0a35b111d5fb4ec9fbd30e7d9cdf7b56b9",
+        "git_blob_sha": "d9d28e13f3ae492c0d02b6360d30a0b4da35e167"
       }
     }
   ],
