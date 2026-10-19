@@ -1,0 +1,6 @@
+{
+  "files": 36,
+  "status": "pass",
+  "compiler": "esbuild 0.25.0",
+  "limits": "syntax transform only, not dependency graph or full Next build"
+}

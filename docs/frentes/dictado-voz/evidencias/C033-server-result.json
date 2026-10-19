@@ -1,0 +1,17 @@
+{
+  "checks": [
+    "persisted expected tail prevents incomplete fork",
+    "normal recovery of sealed child still blocked",
+    "explicit archive retry may reuse exact owned sealed child",
+    "archive retry cannot access foreign child",
+    "source owner isolation remains active",
+    "origin guard blocks foreign browser",
+    "false flag cannot widen explicit retry operation",
+    "source session cannot be reused as child",
+    "new exact fork clones references and preserves parent"
+  ],
+  "limits": [
+    "actual recovery handler/validators and audio integrity predicate",
+    "DB/auth/encryption/Next response are isolated fixtures; not production or PostgreSQL integration"
+  ]
+}

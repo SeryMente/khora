@@ -593,12 +593,6 @@
       "git_blob_sha": "f5e1de7cde717b869a6097197daccb06f70d1f13"
     },
     {
-      "path": "OBJETO-CANONICO.md",
-      "bytes": 210349,
-      "sha256": "b9bf7fb77d4e817664308602a8e8ba5cde0b2d15ca0660a0f81a5172717ad876",
-      "git_blob_sha": "8150364aeb5b7603744771bc74490beb0950ddb3"
-    },
-    {
       "path": "originales/C032-salida.md",
       "bytes": 5693,
       "sha256": "56e04889f90e43fd0195039cae046f8f8dc55e171747ed33403ca4fb7ba3c6f9",
@@ -609,6 +603,90 @@
       "bytes": 7955,
       "sha256": "5120a3a987502ffeb326fd506a35f19df237fffdd185d329bfe57e9c0a9a7134",
       "git_blob_sha": "6d27609ab4bc9bd22ba7e068629a2381cb9cd8e6"
+    },
+    {
+      "path": "OBJETO-CANONICO.md",
+      "bytes": 220103,
+      "sha256": "2d8416714daf11a013089a0429af5a80672306aac34df44a56694b7b6ec8c390",
+      "git_blob_sha": "9d6644ae7da0fb30541422c328a4ed8b612b0532"
+    },
+    {
+      "path": "originales/C033-instrucciones.json",
+      "bytes": 1806,
+      "sha256": "01b23016038a5d8c841550b6ce18e726890d844ed483ac9aeb473313245d34e5",
+      "git_blob_sha": "26111a974085420eba0aa52c7953ea0ed3e48c57"
+    },
+    {
+      "path": "evidencias/C033-matriz.md",
+      "bytes": 3463,
+      "sha256": "98f17424c73ee3171b3d0343372d7cfc24e52abfd3623e509e566a49ff21e3ad",
+      "git_blob_sha": "3d7a9c24b5e56abff09c312d911798d9f70d0844"
+    },
+    {
+      "path": "evidencias/C033-tests-joint.txt",
+      "bytes": 6129,
+      "sha256": "fd4996e0930d775c2976c234f881e64a641407de1d76011105236cc7bbb46db9",
+      "git_blob_sha": "64b8ba1e0f8774e9cdf441b23e2f4bcddbd2f116"
+    },
+    {
+      "path": "evidencias/C033-browser-result.json",
+      "bytes": 3217,
+      "sha256": "bfd3ddbd7d9447b002ddbb61a70d89436788233120fb1433128553612691839a",
+      "git_blob_sha": "570633a93f819da2afe15b9a9c3ffec85cebfb6d"
+    },
+    {
+      "path": "evidencias/C033-server-result.json",
+      "bytes": 690,
+      "sha256": "aae97583fe5acf98f88347328edd02ef269c9e398e1150a279c0ba78324d0668",
+      "git_blob_sha": "5652ba36d0f0c2d8fd77f486de91d09e86f5e6ab"
+    },
+    {
+      "path": "evidencias/C033-syntax.json",
+      "bytes": 147,
+      "sha256": "0f357b1ac37682df44728b018e8a2b0860d87a24e376ae89058fd02b6f4c5ab3",
+      "git_blob_sha": "bc8d21ea3b747b5fd8a13ea3a711a7aa031ffa99"
+    },
+    {
+      "path": "evidencias/C033-code-readback.json",
+      "bytes": 3022,
+      "sha256": "3e5cbb2269155b5742a13c05a1e6bddac53a63def0616ea8044da06a1289c917",
+      "git_blob_sha": "9575d2284f6e1cdcb79467b1f757ffd5ec80e8fe"
+    },
+    {
+      "path": "evidencias/C033-preview-http.json",
+      "bytes": 710,
+      "sha256": "392251f6bb5a3dac2f7f4a136da4d3b16bfc8ea078ba64cfc069bebeff4a248b",
+      "git_blob_sha": "55afa24cdae05442213b1491978b5a2c724251bd"
+    },
+    {
+      "path": "evidencias/C033-browser-test.mjs",
+      "bytes": 7404,
+      "sha256": "729bae81c048e96672ad7824de582c9ed3faf891e3d1ce76d10b1a7b5939b7ce",
+      "git_blob_sha": "5923e37948b2f8c79dce97c94d240771ad126be7"
+    },
+    {
+      "path": "evidencias/C033-server-test.mjs",
+      "bytes": 4392,
+      "sha256": "ac15eaec561216037f566a5648bbbf9be7eaa84878e3308a8f48f6172c624a64",
+      "git_blob_sha": "808b762d22c183636d296412b14d01b75f2cf213"
+    },
+    {
+      "path": "evidencias/C033-preview-ready.json",
+      "bytes": 1173,
+      "sha256": "9f32667269096795a69004e25169b430d156d470080c64717939ecaee05be015",
+      "git_blob_sha": "4c643e69606b75651e6aa35d88aaacf28f30bb17"
+    },
+    {
+      "path": "evidencias/C033-implementacion.json",
+      "bytes": 5744,
+      "sha256": "67b271ec9114cf2f9a6a970d714f80d82c27d94891c94ba1c54d69a74a46661a",
+      "git_blob_sha": "7870cb96ef19043498a8693b943f8068c7d227f5"
+    },
+    {
+      "path": "originales/C033-salida.md",
+      "bytes": 2773,
+      "sha256": "24c3b26f4d2978f097a43cfc13a88b2eb9c8c50833b49a6c2460b0c90f36cc8e",
+      "git_blob_sha": "2a4ff69130821a8860d5fc09209e121af2e95b33"
     }
   ],
   "runtime_references": [
@@ -715,14 +793,14 @@
     "no_secret_values_in_manifest": true
   },
   "current_preparation": {
-    "version": "0.6.18",
+    "version": "0.6.19",
     "baseSha": "b5e7009de137db30c26ecc5f4ddbb34789f453f2",
     "branch": "feat/ingreso-autobiografico-20261019",
-    "receipt": "evidencias/C032-recuperacion.json",
-    "state": "integrated candidate; full gates/deploy/Meta/normative and real custody remain unverified",
-    "observed_head": "1ee239c009d5c9499ac80ad93b12e8204cc61977"
+    "receipt": "evidencias/C033-implementacion.json",
+    "state": "tested candidate; preview READY; no production or complete E2E acceptance",
+    "observed_head": "bdc0255df9c9573575b25082706197a55bef7211"
   },
-  "latestEvent": "C032 contextual recovery and documentary reconciliation; PR330 draft and Git deploy failures revalidated",
+  "latestEvent": "C033 implementation and centralization; local tests; exact preview READY; protected access and acceptance pending",
   "latest_verified_release": {
     "sha": "f0dfbdcb2d79eb6289dacba272ddcc7ba2023063",
     "deploymentId": "dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr",
@@ -748,16 +826,27 @@
     "physicalAcceptance": false,
     "technicalPublicationVerified": true
   },
-  "latest_cycle": "C032",
-  "canonical_version": "0.6.18",
+  "latest_cycle": "C033",
+  "canonical_version": "0.6.19",
   "latest_candidate": {
     "branch": "feat/ingreso-autobiografico-20261019",
     "base": "b5e7009de137db30c26ecc5f4ddbb34789f453f2",
     "production": false,
     "publicAudio": false,
-    "codeCommit": "19b3966b6cdefc6edebea7d18e8e88acf102356b",
+    "codeCommit": "bdc0255df9c9573575b25082706197a55bef7211",
     "pullRequest": 330,
-    "observedHead": "1ee239c009d5c9499ac80ad93b12e8204cc61977"
+    "observedHead": "bdc0255df9c9573575b25082706197a55bef7211",
+    "preview": {
+      "deployment": "dpl_3i1uggfnr2cGt89iRMCQvXJq2qWA",
+      "state": "READY",
+      "commit": "bdc0255df9c9573575b25082706197a55bef7211",
+      "target": null,
+      "url": "https://khora-10mve3uo2-victorhugotorresmendez-8991s-projects.vercel.app",
+      "logs": 403,
+      "http": "redirects to Vercel login; application not verified",
+      "settings_changed": false,
+      "protection_bypass_created": false
+    }
   },
   "release_history": [
     {
@@ -895,6 +984,15 @@
         "sha256": "083be253f002dd7e4cc4e9cd15248f070906a86b874742ac14b09a59af5e65d2",
         "git_blob_sha": "0b5fc645565a23a1ed83a46791284f889b6afb75"
       }
+    },
+    {
+      "event": "C033",
+      "previous": {
+        "path": "OBJETO-CANONICO.md",
+        "bytes": 210349,
+        "sha256": "b9bf7fb77d4e817664308602a8e8ba5cde0b2d15ca0660a0f81a5172717ad876",
+        "git_blob_sha": "8150364aeb5b7603744771bc74490beb0950ddb3"
+      }
     }
   ],
   "quality_gate": {
@@ -932,6 +1030,18 @@
         "publicAudio": false,
         "codeCommit": "bd90b7d094879a35d6f90c625325ec3137b244fc",
         "pullRequest": 330
+      }
+    },
+    {
+      "event": "C033",
+      "previous": {
+        "branch": "feat/ingreso-autobiografico-20261019",
+        "base": "b5e7009de137db30c26ecc5f4ddbb34789f453f2",
+        "production": false,
+        "publicAudio": false,
+        "codeCommit": "19b3966b6cdefc6edebea7d18e8e88acf102356b",
+        "pullRequest": 330,
+        "observedHead": "1ee239c009d5c9499ac80ad93b12e8204cc61977"
       }
     }
   ],
