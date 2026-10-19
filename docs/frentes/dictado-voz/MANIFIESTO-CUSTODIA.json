@@ -557,12 +557,6 @@
       "git_blob_sha": "41657af7fc6dfe2ac18a9f9258f15d77260b5691"
     },
     {
-      "path": "OBJETO-CANONICO.md",
-      "bytes": 204318,
-      "sha256": "083be253f002dd7e4cc4e9cd15248f070906a86b874742ac14b09a59af5e65d2",
-      "git_blob_sha": "0b5fc645565a23a1ed83a46791284f889b6afb75"
-    },
-    {
       "path": "evidencias/C031-readback-bloqueos.json",
       "bytes": 871,
       "sha256": "e3a69131907ef3ae23f9e6b5617087242e57e4649fe9c26b8b4e57636425591b",
@@ -579,6 +573,42 @@
       "bytes": 7696,
       "sha256": "8b9cd35fe7147ea7687bc29cbd95c1f75db32565ab4e69e3187ceb45c2d50742",
       "git_blob_sha": "de8ec124a3d24b0e49877789fc72f455c2124160"
+    },
+    {
+      "path": "originales/C032-conversacion-recibida-saneada.txt",
+      "bytes": 116630,
+      "sha256": "e86d2f750816a40cbb87457f65f2f3da06ef1a4168014c8617f6d3a6dc5306ca",
+      "git_blob_sha": "f4d1f13e8c58369f7dfe98660d9bf5e3b527f971"
+    },
+    {
+      "path": "originales/C032-instruccion.txt",
+      "bytes": 192,
+      "sha256": "2cecf8a9d8f21a704e5099c53be6464e73bce89e94909c02468da880a869d5b8",
+      "git_blob_sha": "b95301ed16a7cf677836412e4bd081329d1e3fdf"
+    },
+    {
+      "path": "originales/C032-ultima-salida-recibida.txt",
+      "bytes": 3853,
+      "sha256": "c71a9d2f48ba5357a730c430525b28dcc67feb9298938df32195d602676ac3be",
+      "git_blob_sha": "f5e1de7cde717b869a6097197daccb06f70d1f13"
+    },
+    {
+      "path": "OBJETO-CANONICO.md",
+      "bytes": 210349,
+      "sha256": "b9bf7fb77d4e817664308602a8e8ba5cde0b2d15ca0660a0f81a5172717ad876",
+      "git_blob_sha": "8150364aeb5b7603744771bc74490beb0950ddb3"
+    },
+    {
+      "path": "originales/C032-salida.md",
+      "bytes": 5693,
+      "sha256": "56e04889f90e43fd0195039cae046f8f8dc55e171747ed33403ca4fb7ba3c6f9",
+      "git_blob_sha": "8b830385220ddfacbff5d7c9aa0aeca8e72e8d1f"
+    },
+    {
+      "path": "evidencias/C032-recuperacion.json",
+      "bytes": 7955,
+      "sha256": "5120a3a987502ffeb326fd506a35f19df237fffdd185d329bfe57e9c0a9a7134",
+      "git_blob_sha": "6d27609ab4bc9bd22ba7e068629a2381cb9cd8e6"
     }
   ],
   "runtime_references": [
@@ -685,13 +715,14 @@
     "no_secret_values_in_manifest": true
   },
   "current_preparation": {
-    "version": "0.6.17",
+    "version": "0.6.18",
     "baseSha": "b5e7009de137db30c26ecc5f4ddbb34789f453f2",
     "branch": "feat/ingreso-autobiografico-20261019",
-    "receipt": "evidencias/C031-results.json",
-    "state": "integrated candidate; full gates/deploy/Meta/normative and real custody remain unverified"
+    "receipt": "evidencias/C032-recuperacion.json",
+    "state": "integrated candidate; full gates/deploy/Meta/normative and real custody remain unverified",
+    "observed_head": "1ee239c009d5c9499ac80ad93b12e8204cc61977"
   },
-  "latestEvent": "C031 exact remote readback; Vercel private-org Hobby failure and checks403 observed",
+  "latestEvent": "C032 contextual recovery and documentary reconciliation; PR330 draft and Git deploy failures revalidated",
   "latest_verified_release": {
     "sha": "f0dfbdcb2d79eb6289dacba272ddcc7ba2023063",
     "deploymentId": "dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr",
@@ -717,15 +748,16 @@
     "physicalAcceptance": false,
     "technicalPublicationVerified": true
   },
-  "latest_cycle": "C031",
-  "canonical_version": "0.6.17",
+  "latest_cycle": "C032",
+  "canonical_version": "0.6.18",
   "latest_candidate": {
     "branch": "feat/ingreso-autobiografico-20261019",
     "base": "b5e7009de137db30c26ecc5f4ddbb34789f453f2",
     "production": false,
     "publicAudio": false,
-    "codeCommit": "bd90b7d094879a35d6f90c625325ec3137b244fc",
-    "pullRequest": 330
+    "codeCommit": "19b3966b6cdefc6edebea7d18e8e88acf102356b",
+    "pullRequest": 330,
+    "observedHead": "1ee239c009d5c9499ac80ad93b12e8204cc61977"
   },
   "release_history": [
     {
@@ -854,6 +886,15 @@
         "sha256": "e19332787783bda0c2c999a572d90af6ca567bf3ce4254b54d7042e657738eac",
         "git_blob_sha": "c195d690e5ec78e6e4915e75696c7f39053bbb80"
       }
+    },
+    {
+      "event": "C032",
+      "previous": {
+        "path": "OBJETO-CANONICO.md",
+        "bytes": 204318,
+        "sha256": "083be253f002dd7e4cc4e9cd15248f070906a86b874742ac14b09a59af5e65d2",
+        "git_blob_sha": "0b5fc645565a23a1ed83a46791284f889b6afb75"
+      }
     }
   ],
   "quality_gate": {
@@ -881,6 +922,27 @@
       "previewState": "READY",
       "production": "verified",
       "releaseCommit": "f0dfbdcb2d79eb6289dacba272ddcc7ba2023063"
+    },
+    {
+      "event": "C032-retain-previous-candidate-entry",
+      "previous": {
+        "branch": "feat/ingreso-autobiografico-20261019",
+        "base": "b5e7009de137db30c26ecc5f4ddbb34789f453f2",
+        "production": false,
+        "publicAudio": false,
+        "codeCommit": "bd90b7d094879a35d6f90c625325ec3137b244fc",
+        "pullRequest": 330
+      }
     }
-  ]
+  ],
+  "current_attachment_custody": {
+    "received_bytes": 116542,
+    "received_sha256": "1c82bbe7e266e5654cb49229f2cb4085409305090e20cf67221dd82819a3a93c",
+    "archived": "originales/C032-conversacion-recibida-saneada.txt",
+    "encoding": "UTF-8",
+    "line_endings": "CRLF preserved",
+    "omitted_values": 2,
+    "omitted_occurrences": 4,
+    "native_export_complete": false
+  }
 }
