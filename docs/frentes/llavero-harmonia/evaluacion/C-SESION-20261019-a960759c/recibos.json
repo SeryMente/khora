@@ -1,0 +1,70 @@
+{
+  "cycle": "C-SESION-20261019-a960759c",
+  "baseCommit": "81acf4cdac15ddbcca2151727754563887b8fff8",
+  "methodCommit": "a466b6b46f266de6a6ccd656e071eb7a07dc0e10",
+  "khoraIdentity": {
+    "email": "the.willfreeman@gmail.com",
+    "source": "direct operator message",
+    "authenticatedSubjectVerified": false
+  },
+  "device": {
+    "id": "a960759c-7557-451d-936a-73aa791f5f58",
+    "host": "PC-14",
+    "profile": "C:\\Users\\PC 13",
+    "root": "C:\\Users\\PC13~1\\AppData\\Local\\Temp\\khora-llavero-3376b2101b654700995912e0edfa62b6",
+    "probed": true
+  },
+  "processes": {
+    "githubLogin": 16592,
+    "vercelLogin": 17700,
+    "boundedRunner": 6756
+  },
+  "authStatus": "WAITING_FOR_USER_APPROVAL",
+  "productionChanged": false,
+  "testsPassed": null,
+  "receipts": [
+    152,
+    153,
+    154,
+    163,
+    171,
+    196,
+    201,
+    210,
+    214,
+    219,
+    225,
+    226,
+    235,
+    237,
+    238,
+    246
+  ],
+  "omissions": [
+    "Device/user codes are not archived",
+    "User log normalized; not verbatim",
+    "Intermediate auth requests not archived with codes"
+  ],
+  "files": {
+    "docs/frentes/llavero-harmonia/OBJETO-CANONICO.md": {
+      "sha256": "c1af4c7fdce1af2944d116f2fc3f511a65b294e1cfcd1955c54f6cef2bbe2c45",
+      "blob": "b80fd9aeffc28545fd458f894b8c5b1723bc0d36"
+    },
+    "docs/frentes/llavero-harmonia/originales/C-SESION-20261019-a960759c-operador-sanitizado.txt": {
+      "sha256": "003297dcce78d2b4d835a3dd6659cf0ef7b1a51b121919eb0e52c15573058dff",
+      "blob": "0d0b8000a1fd61d15afb5ee6117e84dd27579bd4"
+    },
+    "docs/frentes/llavero-harmonia/originales/C-SESION-20261019-a960759c-salida.md": {
+      "sha256": "8d7cb7d6d088a2ead559e32ad69e33acfae2dcbf382906cd6dc2968802c229db",
+      "blob": "76e335d11a509a175a3f6c52da91c709db801e91"
+    },
+    "docs/frentes/llavero-harmonia/cronica/C-SESION-20261019-a960759c.md": {
+      "sha256": "a55eb3f796fb4c8f1fa51e2053d7e08e573158d0ee2d5863104515f51129b909",
+      "blob": "a6dd6fd692bf747a644bd8d6355435b7d044ee9a"
+    },
+    "docs/frentes/llavero-harmonia/evaluacion/C-SESION-20261019-a960759c/resume-windows.cjs": {
+      "sha256": "f21cb238d0cf041fc1d326a6251309fcd81cdbeddb19d8bf696fab384f46fa38",
+      "blob": "f7b42a51d903612897534393e37df286364117ef"
+    }
+  }
+}
