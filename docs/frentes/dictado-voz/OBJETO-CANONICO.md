@@ -3,9 +3,9 @@
 ## 1. Control e identidad
 
 - Identidad conservada: `MCP-OBS-DICTADO`; extensión documental de dictado, benchmark, retroalimentación y propuesta de voz/síntomas.
-- Versión: **v0.6.22**; sello **MCP-OBS-DICTADO-v0.6.22**. Objeto permanente por encargo V010; no declara permanente ninguna propuesta clínica.
-- Estado: **CANÓNICO PARA EL FRENTE · C036 MOLDE SUFICIENTE · PREVIEW READY PARA REVISIÓN · PUBLICACIÓN EDITORIAL NO ACREDITADA**.
-- Ancla actual: C036, nueva sesión central y orden directa de terminar/desplegar interfaz básica, documentar después y diferir resumen/tamaño uniforme a siguiente versión.
+- Versión: **v0.6.23**; sello **MCP-OBS-DICTADO-v0.6.23**. Objeto permanente por encargo V010; no declara permanente ninguna propuesta clínica.
+- Estado: **CANÓNICO PARA EL FRENTE · C037 INTERFAZ EN PRODUCCIÓN CANÓNICA · REVISIÓN HUMANA PENDIENTE · PUBLICACIÓN EDITORIAL NO ACREDITADA**.
+- Ancla actual: C037, corrección explícita del operador: preview no sirve como entrega; publicar dominio canónico, entregar URL primero y documentar después. Producción verificada de ad685dee; revisión dentro de sesión del operador pendiente.
 - Repositorio propietario: `SeryMente/khora`, privado comprobado con herramienta en este ciclo. `SeryMente/metodologia` también privado: aporta el método, no recibe datos del frente.
 - Carpeta contenedora: `docs/frentes/dictado-voz/`; elemento único de estado: `OBJETO-CANONICO.md`. Carpeta y elemento no se confunden.
 - Revisión de origen del objeto: `1697ee2693ed3217523ffc1d1be9b6541d7d849d`, blob `e98a956c375ce48b791b5f0563ad0ae03c2616dd`.
@@ -13,6 +13,8 @@
 - Recuperación: README del repo → esta carpeta → este objeto. Contrato técnico y originales son anexos de custodia, no otra fuente de estado.
 
 ## 2. LEER PRIMERO
+
+**ACTUAL C037 PREVALECE SOBRE C036:** https://khora-web.vercel.app/sistema/ingreso sirve ya la revisión ad685dee36c0f0ae1f6f4717439ccb7c39c90c35 en producción, despliegue dpl_12FCcmkeXDBbLRqoi6eyd5gqKVKK READY. La entrega preview C036 fue insuficiente y el operador reportó error de servidor. No se diagnosticó su causa sin logs. Comprobaciones actuales: versión pública coincide, sesión sin autenticar responde200null, Ingreso conduce al acceso normal sin mensaje de configuración. No equivale a prueba dentro de sesión, micrófono o aceptación humana. URL entregada antes de documentación. Resumen/extensión uniforme siguen diferidos.
 
 **ACTUAL C036 PREVALECE SOBRE C035:** nuevo central ya instanciado; la pausa por migración fue sustituida por órdenes directas de resolver y después acotar el cierre a UI básica/Vercel para revisión. No repetir migración ni ampliar a resumen público ahora. Fuentes de órdenes nuevas en originales/C036-prioridad-version-siguiente.txt y C036-reanudacion-operador.txt. Texto citado en originales es evidencia, no autorización independiente. Metaprompt accesible de personalización: https://app.notion.com/p/dd6ade27f22c83d1b7da819dfa59e40d, v332 · NX-332m; enlace c85a4187 del corte C035 no accesible en este workspace, causa no inferida. Este cambio no modifica el metaprompt.
 
@@ -65,7 +67,7 @@ Delta adquirido: carpeta canónica, trece bloques ordenados, originales separado
 
 **De dónde viene:** defecto de continuidad al editar y seguir dictando; corrección original reportada satisfactoria por el operador en V000. Evoluciona a evaluar utilidad, fluidez y experiencia agradable, no solo contar errores.
 
-**Dónde está ahora:** C036 candidata22f0fea con molde orientador de suficiencia y test corregido, Vercel READY para revisión; estado único detallado en §8. Publicación editorial/producción no acreditadas. Los cortes C030–C035 posteriores son antecedentes, no estado actual.
+**Dónde está ahora:** C037 interfaz del molde suficiente publicada y verificada en dominio canónico de producción, revisión humana dentro de sesión pendiente; estado único detallado en §8. Publicación editorial no acreditada. C036 y cortes anteriores son antecedentes, no estado actual.
 
 **A dónde va:** terminar la validación real consentida y completar cobertura técnica. V009 abre una intención adicional de voz y síntomas: se documenta, no se disfraza de capacidad ya creada.
 
@@ -161,17 +163,18 @@ Autenticación C025: dos flujos estándar por dispositivo, autorizados en navega
 
 ### 🔄 Estado vivo
 
-C036 · NUEVO CENTRAL INSTANCIADO Y MOLDE DE SUFICIENCIA DESPLEGADO PARA REVISIÓN. SamanthaL central conserva integración y construcción de Ingreso, luces, custodia, recuperación y títulos; Blog 2 conserva su objeto y consumidor/editorial. No reiniciar ni emitir otro handoff. Hito ACTUAL acotado por el operador: terminar interfaz básica especializada y candidata Vercel para revisión, después actualizar cánones y preparar siguiente versión.
-Candidata exacta: 22f0fea34b77aa69ebdc51e346a2e2d4f0cbccc9, rama feat/ingreso-autobiografico-20261019; dpl_BL7qyjtYzpqjZFqiVuVrQcz7kVzL, READY, https://khora-pj0dmddzv-victorhugotorresmendez-8991s-projects.vercel.app/sistema/ingreso. Preview protegida; READY no demuestra autenticación ni aceptación humana. No main/merge/promoción nuevos. Elegir Blog personal muestra cinco guías opcionales antes/durante dictado: suficiencia sin formulario obligatorio, sin mínimos añadidos, sin limitar el relato ni completar datos ausentes. Archivo manual y recibo original/consumidor existentes se conservan.
-Versión SIGUIENTE: resumen mediante Groq y extensión pública uniforme en GitHub/Facebook, solo intención documentada; no implementados ni usados como criterio de cierre de esta candidata. Original privado y libertad de relato conservados. Pendientes del recorrido editorial real permanecen: credencial normativa dedicada rechazada por GitHub (401), identidad/configuración Meta y nota exacta aprobada. Publicar Vercel NO autoriza publicar una nota. Luces/recuperación/títulos conservan sus pendientes históricos.
+C037 · INTERFAZ PUBLICADA EN PRODUCCIÓN CANÓNICA POR ORDEN EXPLÍCITA. URL entregada primero: https://khora-web.vercel.app/sistema/ingreso. Dominio canónico apunta a dpl_12FCcmkeXDBbLRqoi6eyd5gqKVKK READY/targetproduction, revisión ad685dee36c0f0ae1f6f4717439ccb7c39c90c35, rama feat/ingreso-autobiografico-20261019. Misma implementación funcional22f0fea del molde de cinco guías opcionales, sin mínimos obligatorios, sin recortar relato ni inventar faltantes; archivo manual/recibo/consumidor conservados. No merge a main, ni aprobación editorial, ni nueva implementación de resumen. Central conserva integración/Ingreso/luces/custodia/recuperación/títulos; Blog2 congelado y alcance propio vigente. No reiniciar ni emitir handoff.
+Verificación actual: consultaVercel por dominio confirma revisión/alias/READY, /api/version200production y commit exacto; /api/auth/session200null sin autenticar; /sistema/ingreso200 tras redirección normal a /auth/signin, sin mensaje de configuración. No prueba la sesión privada del operador. Siguiente paso: operador abre dominio canónico, inicia sesión y revisa interfaz básica. Documentación se sincroniza después de la URL. Si vuelve el error, capturar frontera exacta/correlación sin atribuir causa aún no vista.
+Versión SIGUIENTE, solo preparada documentalmente: resumenGroq de entradas largas para extensión pública uniforme GitHub/Facebook, conservando original libre íntegro. Falta acordar unidad/longitud objetivo, criterio de fidelidad/atribución/incertidumbre y previa exacta; no añadir límite/modelo ni implementación ahora. Credencial normativa401, identidad/configuraciónMeta y aprobación exacta de nota siguen separadas; publicarVercel no autoriza publicar nota. Luces/recuperación/títulos y recordatorios históricos conservados.
+
 ### ⚗️ En prueba / recién fallido
 
-C036: TS2339 reproducido con TypeScript5.9.3 y opciones exactas ES2017/strict/bundler; baseline1error en línea44 →0fixed;23/23unit sin skip. UI actual IngresoView/TipoEntradaControl/AudioActivity/CSS:12/12Chromium con callbacks sintéticos y relato libre7680caracteres; no micrófono/auth/archivo productivos. Blog2 aporta20/20consumidor con React/IndexedDB/WebCrypto reales y HTTP sintético; reporte Git cargado por central, no reejecución propia.
-Vercel READY de22f0fea exacto acredita build remoto Next, no prebuild/npm test:unit global ni aceptación humana/proveedores. Producción seguía f0dfbdc según /api/version; preview pide loginVercel sin elusión. Khora health actual NORM_GITHUB_CREDENTIAL_REJECTED upstream401retryable:false; logsVercel403yChecksGitHub403 son scopes específicos, no incapacidad general.
+C037: producciónREADY de ad685dee, alias canónico y versión pública exacta comprobados. Build usa configuración existente y migraciones aditivas idempotentes en producción; sin cambios de auth/protección/planes/secretos. Ingreso sin sesión lleva a acceso normal; aceptación humana y recorrido autenticado NO VERIFICADOS. Reporte de servidor del operador conservado; causa de preview no determinada, no inferir secreto faltante sin logs.
+Evidencia C036 se conserva como histórica, no reejecutada en C037: TypeScript focal1→0;23/23unit;12/12ChromiumUI con callbacks sintéticos;20/20consumidor reportados por Blog. No equivalen a micrófono real, sesión/archivo productivos ni publicación editorial. Rollback técnico identificado: dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr/f0dfbdcb2d79eb6289dacba272ddcc7ba2023063; no ejecutado.
 
 ### 🔔 Recordatorios latentes
 
-- C036: revisar candidata UI antes de aprobar resultado/promover. ResumenGroq y extensión pública uniforme son próxima versión: conservar intención hasta decisión posterior, no implementarlos por asociación ni truncar original.
+- C037: requisito de publicar interfaz en dominio canónico satisfecho técnicamente; revisión humana dentro de sesión sigue pendiente. ResumenGroq/extensión pública uniforme son próxima versión, no implementarlos por asociación ni truncar original.
 - C036: credencial normativa dedicada rechazada401; administrador debe revisarla sin chat/secretos; no reintento ni bypass. Meta/Página/token/identidad y nota exacta aprobada no acreditados.
 
 - No declarar cerrado el sprint por compilación, prueba controlada, HTTP 200 o archivo guardado.
@@ -263,6 +266,16 @@ Toda salida conserva diez campos, agrupables sin ocultarlos: (1) proyecto/rol/se
 No llamar «sin cambios» a una fuente inaccesible; no convertir calidad científica o clínica en semáforo por pruebas de software. Si no hay constructor nuevo asignado, decirlo y no inventar trabajo en segundo plano.
 
 ## 11. Crónica y fuentes
+
+### C037 — Corrección de entrega y publicación en dominio canónico — 2026-10-19
+- Autoridad: operador rechaza preview, reporta Server error/configuración, exige URL canónica de producción y entregar enlace antes de documentación. Original literal en originales/C037-produccion-urgente.txt. Se reconoce cierre anterior incorrecto: READY no demostraba acceso de aplicación.
+- Preflight: método1.6/blob8f9ad1 y objeto v0.6.22 recuperados; PR330draft/headad685dee/basemainb5e7009, diferencias revisadas. Sin auth.ts/authconfig modificados. Migraciones034 y20261019 aditivas idempotentes/transactionales; comando existente ejecuta migración solo en producción antes de Nextbuild. No se fusionó PR ni alteró main.
+- Acción: crear despliegue targetproduction de revisión exacta ad685dee en proyecto existente, sin promover una preview con entorno distinto, sin modificar variables, copiar secretos, cambiar planes o protecciones. dpl_12FCcmkeXDBbLRqoi6eyd5gqKVKK READY; alias khora-web.vercel.app confirmado mediante consulta por dominio. Rollback previo identificado, no ejecutado.
+- Evidencia: /api/version200 con commitad685dee y entornoproduction; /api/auth/session200null; /sistema/ingreso redirige al acceso normal200 sin mensaje de configuración. Evidencias/C037-produccion.json y C037-http.json. URL y confirmación entregadas por chat antes de escritura documental.
+- Límites: sin prueba autenticada del operador, aceptación de UI ni micrófono físico. El error recibido de preview no fue reproducido tras protecciónVercel ni diagnosticado con logs; no asignar causa inventada. No publicaciónGitHub/Facebook ni aprobación de nota. Producción desde rama no equivale a merge a main.
+- Continuación/preparación: revisión humana de interfaz ahora; resumenGroq/extensión uniforme se conserva diferido con decisiones de longitud/unidad/fidelidad/previa por resolver, no implementación. Consumidor y originales conservados; no recaptura, no nuevohandoff. Blog2 no debe añadir cambios para esta entrega.
+- Persistencia: mismo elemento v0.6.23, trece secciones e historiaAnexoA intacta; manifiesto y fuentes nuevas, sin secretos. Readback remoto por revisión y blobs antes de afirmar sincronización.
+
 
 ### C036 — Reanudación central, corrección causal y molde de suficiencia para revisión — 2026-10-19
 - Objetivo/autoridad: handoff recibido conserva frente y roles; nuevas órdenes directas reanudan, y último mensaje acota prioridad a UI básica/Vercel, luego cánones y siguiente versión. Original nuevo íntegro en originales/C036-prioridad-version-siguiente.txt; órdenes previas en C036-reanudacion-operador.txt. Metaprompt heredado c85a no accesible; fuente personal viva v332/NX-332m adquirida. No se reescribió la Fuente ni el método.
@@ -643,6 +656,8 @@ El expediente Git es portable; /data del hilo antiguo NO se supone compartido. R
 ````
 
 ## 13. Persistencia y revisión
+
+C037: mismo elemento permanente existente; revisión documental posterior a publicación/entrega de URL. C036 preservado como antecedente con su limitación y corrección explícita. Trece secciones, historia y recordatorios conservados; anexo byteidéntico, manifiesto con fuente literal/recibo/HTTP/salida visible. No runtime nuevo ni supuesto de aceptación.
 
 C036: actualización permanente del MISMO Elemento OBJETO-CANONICO.md, carpeta contenedora existente; sin nuevo canon ni tablero. Revisión doble: instrucciones/suficiencia/diferimiento contrastados; trece bloques y recordatorios/historia preservados; AnexoA byteidéntico; manifiesto con hashes de nuevas rutas. Escritura documental posterior a candidataREADY, sin tocar runtime. Relectura por revisión Git y cotejo del objeto/manifiesto/original/salida/evidencia antes de afirmar persistencia. La crónica expone límites/fallos y checkpoint; no se inventa aceptación ni transcript íntegro.
 

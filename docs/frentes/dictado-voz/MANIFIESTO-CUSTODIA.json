@@ -827,12 +827,6 @@
       "git_blob_sha": "b69048dd855ce185f8eaf381891dc59a60f89351"
     },
     {
-      "path": "OBJETO-CANONICO.md",
-      "bytes": 233027,
-      "sha256": "57e778dd7e06cfe53637f981494e68c014d0922a20ffaf01b416b7cafa92cabf",
-      "git_blob_sha": "bc1c8aff8a3a44c69253e6eaf319b8047984073c"
-    },
-    {
       "path": "originales/C036-prioridad-version-siguiente.txt",
       "bytes": 1655,
       "sha256": "49176a6b7068217983bf9750e2b13cf0a1978d70b239e048d793f8d254daba17",
@@ -879,6 +873,36 @@
       "bytes": 1462,
       "sha256": "9276a428bd7bd0389793897853ce520a2ab25df2f520eb4b55986b276ed20828",
       "git_blob_sha": "f0bf004620db41eb35a4ca7d6c731e41b56eaa40"
+    },
+    {
+      "path": "OBJETO-CANONICO.md",
+      "bytes": 236641,
+      "sha256": "bcf08097ffcc5e8f13b931785fd6ca1997ac20d6dbedf20a2936c03f311a450e",
+      "git_blob_sha": "bf2daf0ecc08f6e3d0a84a02aabe54b2440c4f52"
+    },
+    {
+      "path": "originales/C037-produccion-urgente.txt",
+      "bytes": 572,
+      "sha256": "d7085e546a6632d518888c5b9beb399e4523db5c8d6b8b3a1da39c5d87f41af1",
+      "git_blob_sha": "fafd8e4d7ea3c53ffff253ae4e2747c5f688443e"
+    },
+    {
+      "path": "originales/C037-entrega-url.md",
+      "bytes": 455,
+      "sha256": "5865b8067db520cb495dc4fd2161da8fd474a2b61baee6a8ebf67f537a4ffcea",
+      "git_blob_sha": "60af9ee574b150b3cca6bc5418422598b9516308"
+    },
+    {
+      "path": "evidencias/C037-produccion.json",
+      "bytes": 589,
+      "sha256": "5a175b09ac41a4c9bdbe3fb2425bc6753709ecf0262b5b5f1e5de5ac5b910425",
+      "git_blob_sha": "bf621f0de6c12052348a2f171e00a94537df7887"
+    },
+    {
+      "path": "evidencias/C037-http.json",
+      "bytes": 940,
+      "sha256": "f5de94ed5aa3d6903a6351c742b3dd92ef04a656d7a637d598c58bfa3399cc76",
+      "git_blob_sha": "b9d08f58af517e1f35ab0de3a2733949b80404c5"
     }
   ],
   "runtime_references": [
@@ -985,46 +1009,67 @@
     "no_secret_values_in_manifest": true
   },
   "current_preparation": {
-    "event": "C036",
-    "state": "preview-ready-for-review",
-    "code": "22f0fea34b77aa69ebdc51e346a2e2d4f0cbccc9",
+    "event": "C037",
+    "state": "production-published-awaiting-human-review",
     "future_summary": "deferred-not-implemented"
   },
-  "latestEvent": "C036",
+  "latestEvent": "C037",
   "latest_verified_release": {
-    "sha": "f0dfbdcb2d79eb6289dacba272ddcc7ba2023063",
-    "deploymentId": "dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr",
-    "url": "https://khora-web.vercel.app",
-    "receipt": "evidencias/C030-release.json",
-    "observedAt": "2026-10-18T21:24:10.490007+00:00",
+    "event": "C037",
+    "commit": "ad685dee36c0f0ae1f6f4717439ccb7c39c90c35",
+    "deploymentId": "dpl_12FCcmkeXDBbLRqoi6eyd5gqKVKK",
+    "state": "READY",
+    "target": "production",
+    "alias": "khora-web.vercel.app",
+    "url": "https://khora-web.vercel.app/sistema/ingreso",
+    "rollbackDeploymentId": "dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr",
+    "technicalPublicationVerified": true,
     "physicalAcceptance": false,
-    "technicalPublicationVerified": true
+    "authenticatedApplicationVerified": false,
+    "mergedToMain": false,
+    "editorialPublication": false,
+    "summaryImplementation": false,
+    "reportedPreviewErrorCause": "not determined"
   },
   "latest_physical_feedback": {
-    "event": "C030",
+    "event": "C037",
     "reportedBy": "operator",
     "acceptance": false,
-    "cause": "partially reproduced in fixture; full production cause not verified",
-    "original": "originales/C030-instrucciones.md"
+    "report": "preview server configuration error; canonical production required",
+    "original": "originales/C037-produccion-urgente.txt",
+    "newProductionAcceptance": "pending"
   },
   "latest_release": {
-    "sha": "f0dfbdcb2d79eb6289dacba272ddcc7ba2023063",
-    "deploymentId": "dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr",
-    "url": "https://khora-web.vercel.app",
-    "receipt": "evidencias/C030-release.json",
-    "observedAt": "2026-10-18T21:24:10.490007+00:00",
+    "event": "C037",
+    "commit": "ad685dee36c0f0ae1f6f4717439ccb7c39c90c35",
+    "deploymentId": "dpl_12FCcmkeXDBbLRqoi6eyd5gqKVKK",
+    "state": "READY",
+    "target": "production",
+    "alias": "khora-web.vercel.app",
+    "url": "https://khora-web.vercel.app/sistema/ingreso",
+    "rollbackDeploymentId": "dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr",
+    "technicalPublicationVerified": true,
     "physicalAcceptance": false,
-    "technicalPublicationVerified": true
+    "authenticatedApplicationVerified": false,
+    "mergedToMain": false,
+    "editorialPublication": false,
+    "summaryImplementation": false,
+    "reportedPreviewErrorCause": "not determined"
   },
-  "latest_cycle": "C036",
-  "canonical_version": "0.6.22",
+  "latest_cycle": "C037",
+  "canonical_version": "0.6.23",
   "latest_candidate": {
     "branch": "feat/ingreso-autobiografico-20261019",
+    "base": "b5e7009de137db30c26ecc5f4ddbb34789f453f2",
+    "production": true,
+    "publicAudio": false,
     "codeCommit": "22f0fea34b77aa69ebdc51e346a2e2d4f0cbccc9",
-    "deployment": "dpl_BL7qyjtYzpqjZFqiVuVrQcz7kVzL",
-    "state": "READY",
-    "production": false,
-    "publicAudio": false
+    "releaseCommit": "ad685dee36c0f0ae1f6f4717439ccb7c39c90c35",
+    "deploymentId": "dpl_12FCcmkeXDBbLRqoi6eyd5gqKVKK",
+    "deploymentState": "READY",
+    "url": "https://khora-web.vercel.app/sistema/ingreso",
+    "pullRequest": 330,
+    "mergedToMain": false
   },
   "release_history": [
     {
@@ -1044,6 +1089,27 @@
         "receipt": "evidencias/RELEASE-C026.json",
         "observedAt": "2026-10-18T19:11:42.022Z",
         "physicalAcceptance": false
+      }
+    },
+    {
+      "event": "C037-retain-prior",
+      "latest_release": {
+        "sha": "f0dfbdcb2d79eb6289dacba272ddcc7ba2023063",
+        "deploymentId": "dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr",
+        "url": "https://khora-web.vercel.app",
+        "receipt": "evidencias/C030-release.json",
+        "observedAt": "2026-10-18T21:24:10.490007+00:00",
+        "physicalAcceptance": false,
+        "technicalPublicationVerified": true
+      },
+      "latest_verified_release": {
+        "sha": "f0dfbdcb2d79eb6289dacba272ddcc7ba2023063",
+        "deploymentId": "dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr",
+        "url": "https://khora-web.vercel.app",
+        "receipt": "evidencias/C030-release.json",
+        "observedAt": "2026-10-18T21:24:10.490007+00:00",
+        "physicalAcceptance": false,
+        "technicalPublicationVerified": true
       }
     }
   ],
@@ -1171,13 +1237,22 @@
         "sha256": "b9bf7fb77d4e817664308602a8e8ba5cde0b2d15ca0660a0f81a5172717ad876",
         "git_blob_sha": "8150364aeb5b7603744771bc74490beb0950ddb3"
       }
+    },
+    {
+      "event": "C037",
+      "previous": {
+        "path": "OBJETO-CANONICO.md",
+        "bytes": 233027,
+        "sha256": "57e778dd7e06cfe53637f981494e68c014d0922a20ffaf01b416b7cafa92cabf",
+        "git_blob_sha": "bc1c8aff8a3a44c69253e6eaf319b8047984073c"
+      }
     }
   ],
   "quality_gate": {
-    "state": "preview-ready-awaiting-human-review",
+    "state": "production-published-awaiting-human-review",
     "receipt": "evidencias/C030-gate-blocker.json",
     "activeConfigChanged": false,
-    "currentEvidence": "evidencias/C036-cierre.json",
+    "currentEvidence": "evidencias/C037-produccion.json",
     "currentFirstMilestone": "Khora Ingreso specialized Blog mold before dictation -> generated transcript -> manual archive -> exact joint consent -> GitHub Blog then Facebook, no public audio"
   },
   "method_history": [
@@ -1247,6 +1322,19 @@
         },
         "deploymentId": "dpl_jLTALH6xrtcDqoKNd5Tc3B927TfB",
         "deploymentState": "ERROR"
+      }
+    },
+    {
+      "event": "C037-retain-C036-preview",
+      "previous": {
+        "branch": "feat/ingreso-autobiografico-20261019",
+        "codeCommit": "22f0fea34b77aa69ebdc51e346a2e2d4f0cbccc9",
+        "deployment": "dpl_BL7qyjtYzpqjZFqiVuVrQcz7kVzL",
+        "state": "READY",
+        "production": true,
+        "publicAudio": false,
+        "deploymentId": "dpl_12FCcmkeXDBbLRqoi6eyd5gqKVKK",
+        "releaseCommit": "ad685dee36c0f0ae1f6f4717439ccb7c39c90c35"
       }
     }
   ],
