@@ -40,5 +40,5 @@ export function publicadoEnAmbos(value:{revision?:number;filter?:string;deliveri
  return value.filter==="published_both"&&["blog","facebook"].every(target=>value.deliveries?.some(d=>d.target===target&&d.revision===value.revision&&d.state==="confirmed"&&!!d.url&&/^[a-f0-9]{64}$/i.test(d.proof_hash||"")));
 }
 
-/** Contract v1 carries text only; publishing it cannot satisfy the operator's audio requirement. */
-export const PUBLIC_AUDIO_CONTRACT_READY = false;
+/** Operator explicitly authorized a text-only cut; this is not consent to any entry. */
+export const TEXT_ONLY_PUBLICATION_AUTHORIZED = true;

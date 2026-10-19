@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { guardarIntencionEditorialLocal, recuperarIntencionesEditorialesLocal, type IntencionEditorialLocal } from "../../../lib/client/custodia-local";
-import { PUBLIC_AUDIO_CONTRACT_READY, canonicoEditorial, huellaTexto, publicadoEnAmbos, type RevisionEditorial } from "../../../lib/custodia/editorial";
+import { TEXT_ONLY_PUBLICATION_AUTHORIZED, canonicoEditorial, huellaTexto, publicadoEnAmbos, type RevisionEditorial } from "../../../lib/custodia/editorial";
 import s from "./ingreso-studio.module.css";
 const runtime={_thinking_mode:"UNAVAILABLE",_output_format_version:"v1.7.7"};
 type Status={revision?:number;consent:string;filter:string;deliveries?:Array<{revision:number;target:string;state:string;url?:string;proof_hash?:string}>};
@@ -22,8 +22,8 @@ export function PublicacionCapturaPendiente({owner,refresh=0}:{owner:string;refr
 function Entrada({owner,initial,onSaved}:{owner:string;initial:IntencionEditorialLocal;onSaved:()=>Promise<void>}){
  const [row,setRow]=useState(initial),[busy,setBusy]=useState(false),[error,setError]=useState("");
  const [title,setTitle]=useState(row.request?.entry.title||row.draft?.title||""),[body,setBody]=useState(row.request?.entry.body||row.draft?.body||"");
- const [format,setFormat]=useState<""|"link"|"full_text">(row.request?.facebook.format||"");
- const [message,setMessage]=useState(row.request?.facebook.message||"");
+ const [format,setFormat]=useState<""|"link"|"full_text">(row.request?.facebook.format||"full_text");
+ const [message,setMessage]=useState(row.request?.facebook.message||[row.draft?.title,row.draft?.body].filter(Boolean).join("\n\n"));
  const [exposure,setExposure]=useState(false),[status,setStatus]=useState<Status|null>(null),[previewVisible,setPreviewVisible]=useState(false);
  const token=useRef("");
  useEffect(()=>setRow(initial),[initial]);
@@ -50,7 +50,7 @@ function Entrada({owner,initial,onSaved}:{owner:string;initial:IntencionEditoria
   }catch(e){token.current="";setError(e instanceof Error?e.message:"No se confirmó la vista previa.");}finally{setBusy(false);}
  };
  const decide=async(decision:boolean)=>{
-  if(busy||decision&&(!PUBLIC_AUDIO_CONTRACT_READY||!previewVisible||!row.prepared||!row.request||row.request.obfuscated&&!exposure))return;
+  if(busy||decision&&(!TEXT_ONLY_PUBLICATION_AUTHORIZED||!previewVisible||!row.prepared||!row.request||row.request.obfuscated&&!exposure))return;
   setBusy(true);setError("");
   try{
    const next={...row,intent:{...row.intent,decision,state:"awaiting_editorial_receipt" as const},obfuscatedExposure:decision&&exposure};
@@ -75,7 +75,7 @@ function Entrada({owner,initial,onSaved}:{owner:string;initial:IntencionEditoria
  const locked=busy||!!row.request||row.intent.decision!==null;
  return <article className={s.editorialPanel}>
   <h2>¿Quieres que esta entrada se publique en el blog y en la Página de Facebook?</h2>
-  <p role="status">Publicación con audio pendiente de integración y verificación. El botón Sí permanece bloqueado; puedes conservar la captura sin publicarla. Ofuscada no anonimiza tu voz.</p>
+  <p role="status">Corte autorizado: se publicará únicamente texto. El audio permanece privado en Custodia y no se publicará. Revisa el texto exacto de ambos destinos antes de decidir.</p>
   <p>El archivo en Custodia es independiente de la publicación. Siempre se autorizan ambos destinos o ninguno.</p>
   {!row.receipt&&<p role="status">Recibo de archivo pendiente. Recupera y reintenta el archivo de la misma captura; no se inventará una referencia ni se publicará.</p>}
   {row.receipt&&row.intent.decision===null&&<fieldset disabled={locked} className={s.editorialForm}><legend>Representación pública que se revisará</legend>
@@ -85,9 +85,9 @@ function Entrada({owner,initial,onSaved}:{owner:string;initial:IntencionEditoria
    <label>Texto exacto de Facebook<textarea aria-label="Texto exacto de Facebook" value={message} maxLength={60000} onChange={e=>setMessage(e.target.value)}/></label>
   </fieldset>}
   {row.receipt&&row.intent.decision===null&&<button className={s.secondary} disabled={busy} onClick={()=>void prepare()}>{busy?"Preparando…":row.request?"Recuperar la misma vista previa":"Preparar vista previa de ambos destinos"}</button>}
-  {previewVisible&&row.request&&<section className={s.editorialPreview} aria-label="Vista previa verificada"><h3>Blog · {row.request.entry.title}</h3><p>Fecha pública: {row.request.entry.date}</p><p style={{whiteSpace:"pre-wrap"}}>{row.request.entry.body}</p><h3>Facebook · {row.request.facebook.format==="link"?"Enlace al blog con mensaje":"Texto completo"}</h3><p style={{whiteSpace:"pre-wrap"}}>{row.request.facebook.message}</p><p>Esta vista previa solo acredita el texto. El contrato de audio público sigue pendiente: no permite autorizar la publicación completa. La marca privada «ofuscada» y los metadatos privados no se publican.</p></section>}
+  {previewVisible&&row.request&&<section className={s.editorialPreview} aria-label="Vista previa verificada"><h3>Blog · {row.request.entry.title}</h3><p>Fecha pública: {row.request.entry.date}</p><p style={{whiteSpace:"pre-wrap"}}>{row.request.entry.body}</p><h3>Facebook · {row.request.facebook.format==="link"?"Enlace al blog con mensaje":"Texto completo"}</h3><p style={{whiteSpace:"pre-wrap"}}>{row.request.facebook.message}</p><p>Esta autorización cubre únicamente el texto mostrado. No se publicarán el audio, la marca privada «ofuscada» ni metadatos privados.</p></section>}
   {previewVisible&&row.request?.obfuscated&&row.intent.decision===null&&<label><input type="checkbox" checked={exposure} onChange={e=>setExposure(e.target.checked)}/> He revisado este texto ofuscado y autorizo expresamente que se exponga públicamente tal como aparece.</label>}
-  {row.intent.decision===null&&<div className={s.editorialActions}><button className={s.primary} disabled={!PUBLIC_AUDIO_CONTRACT_READY||busy||!row.receipt||!previewVisible||!row.prepared||!!row.request?.obfuscated&&!exposure} onClick={()=>void decide(true)}>Sí, publicar en ambos</button><button className={s.secondary} disabled={busy} onClick={()=>void decide(false)}>No, conservar sin publicar</button></div>}
+  {row.intent.decision===null&&<div className={s.editorialActions}><button className={s.primary} disabled={!TEXT_ONLY_PUBLICATION_AUTHORIZED||busy||!row.receipt||!previewVisible||!row.prepared||!!row.request?.obfuscated&&!exposure} onClick={()=>void decide(true)}>Sí, publicar en ambos</button><button className={s.secondary} disabled={busy} onClick={()=>void decide(false)}>No, conservar sin publicar</button></div>}
   {row.intent.decision!==null&&<p role="status">{row.intent.decision?publicadoEnAmbos(status||{})?"Publicación confirmada en ambos destinos.":"Autorización solicitada. La publicación en ambos destinos todavía no está confirmada.":"Elegiste no publicar. La captura permanece en Custodia si su recibo de archivo está confirmado."}</p>}
   {(row.prepared||row.intent.decision===false&&row.receipt)&&<button className={s.secondary} disabled={busy} onClick={()=>void reconcile()}>Comprobar estado sin reenviar publicaciones</button>}
   {status?.deliveries?.map(d=><p key={d.target+":"+d.revision}>{d.target==="blog"?"Blog":"Facebook"} · revisión {d.revision}: {d.state}</p>)}

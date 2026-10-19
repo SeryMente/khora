@@ -15,5 +15,5 @@ import {bloqueoTranscripcion} from "../../lib/custodia/transcripcion";
 test("pending parts never report that no part exists",()=>{const b=bloqueoTranscripcion("session",3,1)!;assert.equal(b.code,"pending_uploads");assert.match(b.message,/3 parte/);assert.doesNotMatch(b.message,/ninguna parte/);});
 test("no verified parts is not a local-loss claim",()=>{assert.match(bloqueoTranscripcion("session",0,0)!.message,/no prueba que el audio local se haya perdido/);assert.equal(bloqueoTranscripcion("",2,0)!.code,"no_session");assert.equal(bloqueoTranscripcion("session",2,0),null);});
 
-import {PUBLIC_AUDIO_CONTRACT_READY} from "../../lib/custodia/editorial";
-test("text-only contract cannot authorize required public audio",()=>assert.equal(PUBLIC_AUDIO_CONTRACT_READY,false));
+import {TEXT_ONLY_PUBLICATION_AUTHORIZED} from "../../lib/custodia/editorial";
+test("operator-authorized text-only cut does not include audio",()=>assert.equal(TEXT_ONLY_PUBLICATION_AUTHORIZED,true));

@@ -383,28 +383,46 @@
       "git_blob_sha": "eb09f93d7fbd24a110b743a5a6353c6237ec07d6"
     },
     {
-      "path": "OBJETO-CANONICO.md",
-      "bytes": 201796,
-      "sha256": "4bae8f9d49dae6304a537b1e9a7b1508679c8377af01643d45185d57e506ddbb",
-      "git_blob_sha": "2470dbf1fde360c53035f67cb11f53867e9c59d7"
-    },
-    {
       "path": "originales/C031-salida-final.md",
       "bytes": 1206,
       "sha256": "54916303b3de3bd44565dab02cc821bbcefa3bcd732f1091ae1bad4863b3c115",
       "git_blob_sha": "581289aa8c975082afd6344a419f866a6e60de7a"
     },
     {
-      "path": "originales/C031-extractos-recibidos.json",
-      "bytes": 8169,
-      "sha256": "b67814a31dd695c75c67da028bfcd067fb4f5629964ef3d9c08690431bcb9e67",
-      "git_blob_sha": "bdfbbb77ee6d24d5f142248b3c1da98acfa8864b"
-    },
-    {
       "path": "evidencias/C031-readback-code.json",
       "bytes": 339,
       "sha256": "1e142325ec25a9f1ac41403865d7053449afbfcbd5765c059730204f51cc3de6",
       "git_blob_sha": "6108c41d9a47a85bf2ef8aab7ed56a1b598976b7"
+    },
+    {
+      "path": "OBJETO-CANONICO.md",
+      "bytes": 202969,
+      "sha256": "0abe6b4a92fe96de4fe34f3ae1ad3b8df0b685f6403ccf3a6718630f5b11bae4",
+      "git_blob_sha": "0522c47555b15ef05ecccc1ad285275741b09d74"
+    },
+    {
+      "path": "evidencias/C031-unit-text-only.log",
+      "bytes": 860,
+      "sha256": "c3abc401ea923e9f4413246137e7ff5cd5c859ea929e37a2cdf82a036a84a407",
+      "git_blob_sha": "02fc087243a1e8f74433b2811fb9bf5802b91ac8"
+    },
+    {
+      "path": "evidencias/C031-archive-text-only-results.json",
+      "bytes": 529,
+      "sha256": "4c6e0b6879df8a8733311b4525c28578d52cf3a4833e29a9393a2dc48b041551",
+      "git_blob_sha": "e8336f0a86af788d3d789f961a38df76aed7d311"
+    },
+    {
+      "path": "originales/C031-reporte-texto.md",
+      "bytes": 1389,
+      "sha256": "0944a96bbf29802ea5228740b8c2538d14b515418d54af19ae6fb50828295df2",
+      "git_blob_sha": "b34fcc9b90d6a9c0f5e461daa1c83d5b49a5bd0a"
+    },
+    {
+      "path": "originales/C031-extractos-recibidos.json",
+      "bytes": 8827,
+      "sha256": "946b846831ff993961cc82168d2e3ba45a0ae4278d15e0a5083190a07c6ea1b9",
+      "git_blob_sha": "4f25629d8f7c3e89422eab199fb7e65ca2f600d9"
     }
   ],
   "runtime_references": [
@@ -511,13 +529,13 @@
     "no_secret_values_in_manifest": true
   },
   "current_preparation": {
-    "version": "0.6.14",
+    "version": "0.6.15",
     "baseSha": "b5e7009de137db30c26ecc5f4ddbb34789f453f2",
     "branch": "feat/ingreso-autobiografico-20261019",
     "receipt": "evidencias/C031-results.json",
-    "state": "draft PR330; objective not reached; browser/recovery investigation deferred by operator"
+    "state": "draft text-only; not deployed; blockers normative auth and Meta plus integration"
   },
-  "latestEvent": "C031 final honest checkpoint; audio public implementation absent; no deployment",
+  "latestEvent": "C031 text-only authorized; positive publication still unverified",
   "latest_verified_release": {
     "sha": "f0dfbdcb2d79eb6289dacba272ddcc7ba2023063",
     "deploymentId": "dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr",
@@ -544,7 +562,7 @@
     "technicalPublicationVerified": true
   },
   "latest_cycle": "C031",
-  "canonical_version": "0.6.14",
+  "canonical_version": "0.6.15",
   "latest_candidate": {
     "branch": "feat/ingreso-autobiografico-20261019",
     "base": "b5e7009de137db30c26ecc5f4ddbb34789f453f2",
@@ -616,6 +634,24 @@
         "bytes": 4542,
         "sha256": "17ed21f69010e1c777203bf0d2e4ae0a35b111d5fb4ec9fbd30e7d9cdf7b56b9",
         "git_blob_sha": "d9d28e13f3ae492c0d02b6360d30a0b4da35e167"
+      }
+    },
+    {
+      "event": "C031-text-only",
+      "previous": {
+        "path": "OBJETO-CANONICO.md",
+        "bytes": 201796,
+        "sha256": "4bae8f9d49dae6304a537b1e9a7b1508679c8377af01643d45185d57e506ddbb",
+        "git_blob_sha": "2470dbf1fde360c53035f67cb11f53867e9c59d7"
+      }
+    },
+    {
+      "event": "C031-text-only",
+      "previous": {
+        "path": "originales/C031-extractos-recibidos.json",
+        "bytes": 8169,
+        "sha256": "b67814a31dd695c75c67da028bfcd067fb4f5629964ef3d9c08690431bcb9e67",
+        "git_blob_sha": "bdfbbb77ee6d24d5f142248b3c1da98acfa8864b"
       }
     }
   ],

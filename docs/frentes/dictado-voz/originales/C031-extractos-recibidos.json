@@ -71,6 +71,16 @@
       "role": "assistant",
       "content": "El hilo del Blog acaba de confirmar el bloqueo decisivo: **la publicación del audio, su reproductor y el consentimiento que cubra texto y voz todavía no están implementados**. No es algo que se resuelva solo iniciando sesión en Facebook.\n\n**Debí habértelo advertido antes de comprometer el cierre.** No voy a consumir tu reserva de revisión ni pedirte credenciales para un flujo que aún no puede funcionar de extremo a extremo. Dejo el avance y el punto exacto de continuación guardados; no tocaré los recuperados ni publicaré una entrada incompleta.",
       "order": 14
+    },
+    {
+      "role": "user",
+      "content": "Bien, si no se puede con audio por lo pronto, nada más la transcripción, bien ordenada y bien formateada para la publicación en el blog y en la página de Facebook.",
+      "order": 15
+    },
+    {
+      "role": "user",
+      "content": "Bueno, como estás trabajando en equipo con el otro hilo, el otro hilo se detuvo. Tú vas a fungir de hilo administrador o asistente y además de constructor para lo que tiene que ver con el dictado y el otro para el blog. Así como están, lo que digo es que tú me vas a reportar a mí. Dime cuánto falta, dónde estamos parados, qué si...",
+      "order": 16
     }
   ]
 }
