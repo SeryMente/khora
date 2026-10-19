@@ -39,10 +39,18 @@ export function analyzeCronicaCoverage(text: string): CronicaCoverage {
   if (typeof text !== 'string' || !text.trim()) return {items};
   // Recompute from the current transcript on EVERY call. No sticky completion state.
   // Split contrast clauses but not ordinary commas; qualifiers conservatively scope a clause.
-  const fragments = text.split(/(?:[.!?;\n]+|,?\s+(?:pero|sino)\s+)/i);
+  const masked = maskQuotes(text);
+  const splitter = /(?:[.!?;\n]+|,?\s+(?:pero|sino)\s+)/gi;
+  const fragments: Array<{raw:string;masked:string}> = [];
+  let offset=0; let boundary: RegExpExecArray | null;
+  while ((boundary=splitter.exec(text)) !== null) {
+    fragments.push({raw:text.slice(offset,boundary.index),masked:masked.slice(offset,boundary.index)});
+    offset=boundary.index+boundary[0].length;
+  }
+  fragments.push({raw:text.slice(offset),masked:masked.slice(offset)});
   for (const fragment of fragments) {
-    const evidence = fragment.trim();
-    const cue = maskQuotes(evidence);
+    const evidence = fragment.raw.trim();
+    const cue = fragment.masked.trim();
     if (!cue.trim() || uncertain.test(cue) || negative.test(cue) || futureOrConditional.test(cue.replace(/(?:esta|por la|de la) ma[ñn]ana/gi, 'esta tarde')) || reported.test(cue)) continue;
     const own = ownActivity.test(cue) && !thirdPerson.test(cue) && !bounded('(?:mi|el|su|un) (?:trabajo|camino|estudio)').test(cue);
     // Avoid an unqualified other person's episode becoming the operator's checklist.

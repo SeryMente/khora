@@ -45,3 +45,7 @@ test('contracted locative al is recognized',()=>assert.deepEqual(flags('Ayer fui
 
 test('unclosed quote in live transcript never becomes own evidence',()=>assert.deepEqual(flags('Ella dijo: «Hoy trabajé en casa'),[false,false,false]));
 test('past morning phrase is retained without guessing future',()=>assert.deepEqual(flags('Ayer por la mañana trabajé en casa.'),[true,true,true]));
+
+test('quoted multi-sentence narrative never becomes operator evidence',()=>assert.deepEqual(flags('Ella dijo: «Ayer descansé. Hoy trabajé en casa». '),[false,false,false]));
+test('unclosed multi-sentence quote stays masked during live dictation',()=>assert.deepEqual(flags('Dijo: «Ayer descansé. Hoy trabajé en casa'),[false,false,false]));
+test('own narrative after closed quote remains eligible',()=>assert.deepEqual(flags('«Ayer caminé». Hoy trabajé en casa.'),[true,true,true]));
