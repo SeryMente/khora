@@ -2,6 +2,7 @@
 "use client";
 
 import React, { useState } from "react";
+import KhoraPending from "../os/KhoraPending";
 import {
   PenLine,
   Send,
@@ -606,8 +607,7 @@ export function ConsultaView({
                 background: "var(--khora-surface)",
               }}
             >
-              <Loader2 size={16} className="animate-spin text-emerald-400" />
-              <span>Generando respuesta en streaming...</span>
+              <KhoraPending label="Generando respuesta." />
             </div>
           )}
         </section>

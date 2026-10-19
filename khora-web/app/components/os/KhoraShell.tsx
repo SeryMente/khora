@@ -14,8 +14,8 @@ export default function KhoraShell({ children }: { children: ReactNode }) {
                 color: "var(--khora-ink)",
             }}
         >
-            <div style={{ flex: 1, width: "100%", paddingBottom: "6rem" }}>{children}</div>
-            <div
+            <div data-khora-shell-content style={{ flex: 1, width: "100%", paddingBottom: "6rem" }}>{children}</div>
+            <div data-khora-system-navigation
                 style={{
                     position: "fixed",
                     bottom: 0,

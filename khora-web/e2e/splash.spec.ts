@@ -9,6 +9,7 @@ const viewports = [
 ];
 
 async function observeBoot(page: Page, theme = "dark", freeze = false, seed: number | null = 117) {
+    if (freeze) { await page.clock.install(); await page.clock.pauseAt(new Date()); }
     await page.addInitScript(({ theme, freeze, seed }) => {
         localStorage.setItem("khora-theme", theme);
         const original = crypto.getRandomValues.bind(crypto) as <T extends ArrayBufferView | null>(values: T) => T;
@@ -19,11 +20,12 @@ async function observeBoot(page: Page, theme = "dark", freeze = false, seed: num
             }
             return original(values);
         };
-        const state = { started: 0, ended: 0, font: "", frozen: false, callbacks: 0 };
+        const state = { activated: 0, started: 0, ended: 0, font: "", frozen: false, callbacks: 0 };
         Object.assign(window, { __splashEvidence: state });
         const observer = new MutationObserver(() => {
             const overlay = document.querySelector<HTMLElement>('[data-testid="khora-splash"]');
             if (overlay && ["running", "reduced"].includes(overlay.dataset.phase || "") && !state.started) {
+                state.activated = Number(overlay.dataset.budgetStarted || 0);
                 state.started = performance.now();
                 state.font = overlay.dataset.fontStatus || "";
                 if (freeze && overlay.dataset.phase === "running") {
@@ -44,7 +46,7 @@ async function observeBoot(page: Page, theme = "dark", freeze = false, seed: num
 }
 
 async function evidence(page: Page) {
-    return page.evaluate(() => (window as unknown as { __splashEvidence: { started: number; ended: number; font: string; frozen: boolean; callbacks: number } }).__splashEvidence);
+    return page.evaluate(() => (window as unknown as { __splashEvidence: { activated: number; started: number; ended: number; font: string; frozen: boolean; callbacks: number } }).__splashEvidence);
 }
 
 for (const theme of ["dark", "light"]) {
@@ -89,7 +91,7 @@ for (const theme of ["dark", "light"]) {
             const initialVariant = await overlay.locator("svg").getAttribute("data-variant");
             for (const ms of [0, 130, 260, 500, 899, 900, 1050, 1199]) {
                 await overlay.evaluate((node, ms) => {
-                    for (const animation of node.getAnimations({ subtree: true })) animation.currentTime = ms;
+                    for (const animation of node.getAnimations({ subtree: true })) animation.currentTime = ms * Number(animation.effect?.getTiming().duration || 1200) / 1200;
                 }, ms);
                 await expect(overlay.locator("svg")).toHaveAttribute("data-variant", initialVariant!);
                 if (ms <= 900) await expect(overlay).toHaveCSS("opacity", "1");
@@ -111,14 +113,14 @@ for (const theme of ["dark", "light"]) {
     }
 }
 
-test("real timeline lasts 1200ms, then never replays on resume or client navigation", async ({ page }) => {
+test("presentation budget includes font readiness and is at most 1200ms, then never replays on resume or client navigation", async ({ page }) => {
     await observeBoot(page);
     await page.goto("/sistema/custodia", { waitUntil: "domcontentloaded" });
     await expect(page.locator(splash)).toHaveCount(0);
     const result = await evidence(page);
     expect(result.started).toBeGreaterThan(0);
-    expect(result.ended - result.started).toBeGreaterThanOrEqual(1170);
-    expect(result.ended - result.started).toBeLessThanOrEqual(1230);
+    expect(result.ended - result.activated).toBeGreaterThanOrEqual(1170);
+    expect(result.ended - result.activated).toBeLessThanOrEqual(1230);
     expect(result.font).toBe("ready");
     expect(result.callbacks).toBe(1);
     await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
@@ -166,18 +168,16 @@ test("reduced motion retains identity for 500ms without animations", async ({ pa
     expect(await page.locator(splash).evaluate(node => node.getAnimations({ subtree: true }).length)).toBe(0);
     await expect(page.locator(splash)).toHaveCount(0);
     const result = await evidence(page);
-    expect(result.ended - result.started).toBeGreaterThanOrEqual(470);
-    expect(result.ended - result.started).toBeLessThanOrEqual(530);
+    expect(result.ended - result.activated).toBeGreaterThanOrEqual(470);
+    expect(result.ended - result.activated).toBeLessThanOrEqual(530);
 });
 
-test("first server-rendered surface is opaque even before JavaScript", async ({ browser }) => {
+test("disabled JavaScript cannot trap access behind the SSR presentation", async ({ browser }) => {
     const context = await browser.newContext({ javaScriptEnabled: false });
     const page = await context.newPage();
     try {
         await page.goto("http://localhost:3000/sistema/custodia");
-        await expect(page.locator(splash)).toHaveCSS("opacity", "1");
-        await expect(page.locator(splash)).toHaveCSS("background-color", "rgb(0, 0, 0)");
-        await expect(page.locator(`${splash} .khora-splash-identity`)).toHaveCSS("opacity", "0");
+        await expect(page.locator(splash)).not.toBeVisible();
         await expect(page.locator('[data-testid="khora-shell"]')).toHaveCount(1);
     } finally { await context.close(); }
 });
@@ -192,8 +192,8 @@ test("late local font cannot start a partial or independent exit clock", async (
     await expect(page.locator(splash)).toHaveCount(0);
     const result = await evidence(page);
     expect(result.font).toBe("ready");
-    expect(result.ended - result.started).toBeGreaterThanOrEqual(1170);
-    expect(result.ended - result.started).toBeLessThanOrEqual(1230);
+    expect(result.ended - result.activated).toBeGreaterThanOrEqual(1170);
+    expect(result.ended - result.activated).toBeLessThanOrEqual(1230);
 });
 
 // Infrastructure failure is fail-open to the shell, never a fake font identity.

@@ -2,7 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import IntervaloSonoroMark from "./IntervaloSonoroMark";
-import { sampleIntervaloVariant } from "../../../lib/brand/intervalo-sonoro";
+import { useBootVariant } from "../../../lib/brand/use-boot-variant";
 
 const DURATION_MS = 1200;
 const FONT_DEADLINE_MS = 500;
@@ -14,26 +14,22 @@ export type KhoraSplashProps = {
     onComplete?: () => void;
 };
 
-/** The opaque SSR surface exists before hydration. One animation clock starts
- * after the local Geist font is ready (bounded to 500 ms), never after a fetch. */
+/** Opaque SSR surface; bounded presentation budget includes local font readiness. */
 export default function KhoraSplash({ active = true, theme, reducedMotion, onComplete }: KhoraSplashProps = {}) {
     const [visible, setVisible] = useState(true);
     const surface = useRef<HTMLDivElement>(null);
     const word = useRef<HTMLSpanElement>(null);
     const identity = useRef<HTMLDivElement>(null);
-    const sampled = useRef(false);
-    const [variant, setVariant] = useState(0);
+    const variant = useBootVariant();
     useLayoutEffect(() => {
-        if (!active || sampled.current) return;
-        sampled.current = true;
-        setVariant(sampleIntervaloVariant(window.crypto));
-    }, [active]);
+        if (document.documentElement.dataset.khoraBoot === "skip" || document.documentElement.dataset.khoraBootComplete === "true") setVisible(false);
+    }, []);
     const completed = useRef(false);
     const callback = useRef(onComplete);
     callback.current = onComplete;
 
     useEffect(() => {
-        if (!active || completed.current || !surface.current || !word.current || !identity.current) return;
+        if (!active || completed.current || !surface.current || !word.current || !identity.current || document.documentElement.dataset.khoraBoot === "skip" || document.documentElement.dataset.khoraBootComplete === "true") return;
         const overlay = surface.current;
         const label = word.current;
         const lockup = identity.current;
@@ -44,11 +40,15 @@ export default function KhoraSplash({ active = true, theme, reducedMotion, onCom
         const animations: Animation[] = [];
         const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
         const reduce = reducedMotion ?? motion.matches;
+        const began = performance.now();
+        const budget = reduce ? 500 : DURATION_MS;
+        overlay.dataset.budgetStarted = String(began);
 
         const finish = (skip = false) => {
             if (disposed || done) return;
             done = true;
             completed.current = true;
+            document.documentElement.dataset.khoraBootComplete = "true";
             clearTimeout(timer);
             clearTimeout(fontTimer);
             // No exit animation when skipped, and no click/key reaches the shell.
@@ -64,6 +64,12 @@ export default function KhoraSplash({ active = true, theme, reducedMotion, onCom
             setVisible(false);
             callback.current?.();
         };
+        timer = setTimeout(() => finish(true), budget);
+        const hidden = () => { if (document.visibilityState === "hidden") finish(true); };
+        const restored = (event: PageTransitionEvent) => { if (event.persisted) finish(true); };
+        document.addEventListener("visibilitychange", hidden);
+        window.addEventListener("pageshow", restored);
+        if (document.visibilityState === "hidden") finish(true);
         const keydown = (event: KeyboardEvent) => {
             if (done || !["Escape", "Enter", " "].includes(event.key)) return;
             event.preventDefault();
@@ -103,19 +109,20 @@ export default function KhoraSplash({ active = true, theme, reducedMotion, onCom
             if (reduce) {
                 lockup.style.opacity = "1";
                 overlay.dataset.phase = "reduced";
-                timer = setTimeout(finish, 500);
                 return;
             }
+            const remaining = Math.max(0, DURATION_MS - (performance.now() - began));
+            if (remaining < 300 || typeof lockup.animate !== "function") { finish(true); return; }
             const wordAnimation = lockup.animate([
                 { opacity: 0, offset: 0, easing: "cubic-bezier(0.22, 1, 0.36, 1)" },
                 { opacity: 1, offset: 260 / DURATION_MS },
                 { opacity: 1, offset: 1 },
-            ], { duration: DURATION_MS, fill: "forwards" });
+            ], { duration: remaining, fill: "forwards" });
             const surfaceAnimation = overlay.animate([
                 { opacity: 1, offset: 0 },
                 { opacity: 1, offset: 900 / DURATION_MS, easing: "ease-in" },
                 { opacity: 0, offset: 1 },
-            ], { duration: DURATION_MS, fill: "forwards" });
+            ], { duration: remaining, fill: "forwards" });
             animations.push(wordAnimation, surfaceAnimation);
             // Both effects share exactly the same document timeline origin.
             const time = document.timeline.currentTime;
@@ -125,11 +132,13 @@ export default function KhoraSplash({ active = true, theme, reducedMotion, onCom
             surfaceAnimation.onfinish = () => finish();
             overlay.dataset.phase = "running";
         };
-        void start();
+        void start().catch(() => finish(true));
         return () => {
             disposed = true;
             clearTimeout(timer);
             clearTimeout(fontTimer);
+            document.removeEventListener("visibilitychange", hidden);
+            window.removeEventListener("pageshow", restored);
             document.removeEventListener("keydown", keydown, true);
             document.removeEventListener("pointerdown", pointerdown, true);
             for (const animation of animations) {

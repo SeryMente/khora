@@ -7,6 +7,7 @@ import { GlobalFooter } from "./components/GlobalFooter";
 import KhoraSplash from "./components/os/KhoraSplash";
 import KhoraShell from "./components/os/KhoraShell";
 import AutoLockProvider from "./components/AutoLockProvider";
+import { BOOT_PRESENTATION_SCRIPT } from "../lib/brand/boot-presentation";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -41,7 +42,7 @@ export const metadata: Metadata = {
         telephone: false,
     },
     icons: {
-        icon: "/khora-mark.svg",
+        icon: { url: "/khora-mark.svg?v=intervalo-1", type: "image/svg+xml" },
         apple: "/apple-touch-icon.png",
     },
 };
@@ -63,9 +64,11 @@ export default function RootLayout({
             <head>
                 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
                 <meta name="theme-color" content="#0a0a0b" />
-                <link rel="icon" href="/khora-mark.svg" type="image/svg+xml" />
+                <link rel="icon" href="/khora-mark.svg?v=intervalo-1" type="image/svg+xml" />
                 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
                 <script dangerouslySetInnerHTML={{ __html: GUION_TEMA }} />
+                <script dangerouslySetInnerHTML={{ __html: BOOT_PRESENTATION_SCRIPT }} />
+                <noscript><style>{`.khora-splash{display:none!important}`}</style></noscript>
             </head>
             <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
                 <TelemetryProvider>
