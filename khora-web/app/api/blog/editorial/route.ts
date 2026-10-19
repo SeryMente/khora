@@ -1,3 +1,4 @@
+import {assertPublicAudioContractReady} from '@/lib/server/blog/public-audio-policy';
 import {NextResponse} from 'next/server';
 import {auth} from '@/auth';
 import {blogRepository} from '@/lib/server/blog/service';
@@ -26,6 +27,11 @@ export async function POST(req:Request){
   try{const repo=blogRepository();await repo.decline(actor,body.publicationId,body.digest);return NextResponse.json(await repo.status(actor,body.publicationId));}
   catch{return NextResponse.json({code:'DECLINE_NOT_RECORDED'},{status:409});}
  }
+ // Text-only approval is superseded by the operator's mandatory-audio requirement.
+ // Preserve refusal/status and draft recovery; never accept legacy positive consent.
+ if(body.action==='decide'&&body.decision===true){
+  try{assertPublicAudioContractReady();}catch{return NextResponse.json({code:'PUBLIC_AUDIO_CONTRACT_REQUIRED'},{status:409});}
+ }
  if(body.action==='open_turn'){
   try{
    assertNormativeRuntimeContext({platform:REQUIRED_PLATFORM,reasoning_mode:body._thinking_mode,output_format_version:body._output_format_version});
@@ -43,7 +49,7 @@ export async function POST(req:Request){
    const r=body.revision as Revision;const digest=revisionHash(r);
    await repo.save(actor,r,body.expectedRevision??null);
    let metadata:any;try{metadata={state:'proposed',result:await repo.extractMetadata(actor,r.publicationId,process.env.GROQ_API_KEY||'')};}catch{metadata={state:'pending',code:'METADATA_NOT_EXTRACTED'};}
-   return NextResponse.json({metadata,publicationId:r.publicationId,revision:r.revision,digest,preview:r.entry,facebook:r.facebook,question:'¿Quieres que esta entrada se publique en el blog y en la Página de Facebook?',destinations:['blog','facebook']});
+   return NextResponse.json({publicationReady:false,audioRequired:true,blocker:'PUBLIC_AUDIO_CONTRACT_REQUIRED',metadata,publicationId:r.publicationId,revision:r.revision,digest,preview:r.entry,facebook:r.facebook,question:'¿Quieres que esta entrada se publique en el blog y en la Página de Facebook?',destinations:['blog','facebook']});
   }
   if(body.action==='decide'&&typeof body.decision==='boolean'){
    if(body.decision)await repo.approveExact(actor,body.publicationId,body.digest,body.obfuscatedExposure===true);

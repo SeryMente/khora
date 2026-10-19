@@ -42,3 +42,17 @@ test("source classification not trusted from public client",()=>assert.throws(()
 test('provider objects never serialize credentials',()=>{assert(!JSON.stringify(new GitHubBlog('synthetic-secret')).includes('synthetic-secret'));assert(!JSON.stringify(new MetaPage('synthetic-secret','61595788700651')).includes('synthetic-secret'));});
 
 test('session adapter supplies neither external cycle identifier (official random turn)',async()=>{const {readFile}=await import('node:fs/promises');const route=await readFile(new URL('../../app/api/blog/editorial/route.ts',import.meta.url),'utf8');assert.match(route,/openNormativeTurn\(actor,\{runtime:/);assert(!route.includes("conversation_id:'blog-editorial-session'"));});
+
+
+test('mandatory audio fails closed, independent of environment flags',async()=>{
+ const {assertPublicAudioContractReady}=await import('../../lib/server/blog/public-audio-policy');
+ const previous=process.env.BLOG_SYNC_ENABLED;try{process.env.BLOG_SYNC_ENABLED='1';assert.throws(()=>assertPublicAudioContractReady(),/^Error: PUBLIC_AUDIO_CONTRACT_REQUIRED$/);}finally{if(previous===undefined)delete process.env.BLOG_SYNC_ENABLED;else process.env.BLOG_SYNC_ENABLED=previous;}
+ const {readFile}=await import('node:fs/promises');
+ const editorial=await readFile(new URL('../../app/api/blog/editorial/route.ts',import.meta.url),'utf8');
+ const dispatch=await readFile(new URL('../../app/api/blog/dispatch/route.ts',import.meta.url),'utf8');
+ assert(editorial.indexOf('assertPublicAudioContractReady();')<editorial.indexOf('await repo.approveExact'));
+ assert(editorial.indexOf("body.action==='decline_archived'")<editorial.indexOf('assertPublicAudioContractReady();'));
+ assert(dispatch.indexOf('assertPublicAudioContractReady();')<dispatch.indexOf("process.env.BLOG_SYNC_ENABLED"));
+ assert(dispatch.indexOf('assertPublicAudioContractReady();')<dispatch.indexOf('await deliver('));
+ assert(editorial.includes('publicationReady:false,audioRequired:true'));
+});

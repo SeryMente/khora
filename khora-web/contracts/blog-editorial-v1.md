@@ -2,6 +2,21 @@
 
 No es objeto canónico ni fuente de estado vivo. Gobierno único: SeryMente/metodologia/frentes/blog-personal/OBJETO-CANONICO.md. Ampliación del operador y coordinación Ingreso de 2026-10-19. Implementación en rama de desarrollo; no equivale a despliegue.
 
+## Enmienda prioritaria: audio obligatorio · publicación BLOQUEADA
+Decisión explícita del operador comunicada por Ingreso: cada entrada pública incluye el audio. El esquema1 descrito más abajo es legado **texto-only**, útil solo para conservar/revisar borradores; ya NO permite aprobar ni publicar. No confundir una prueba del núcleo con activación del contrato ampliado.
+
+Guardarraíl servidor: `decide:true` responde409 `PUBLIC_AUDIO_CONTRACT_REQUIRED`; dispatcher autenticado responde503 con el mismo código incluso si `BLOG_SYNC_ENABLED=1` y hay trabajos antes aprobados. `prepare` declara `publicationReady:false,audioRequired:true,blocker:'PUBLIC_AUDIO_CONTRACT_REQUIRED'`. No hay variable de entorno que quite esta compuerta. No/decline_archived/status y archivo manual son independientes. UI no debe activar Sí. No habilitar solo por recibir audio: hace falta implementar y revisar el contrato completo.
+
+Contrato mínimo requerido para sustituir el legado (PENDIENTE, no campos aceptados todavía):
+- Recibo propio de audio ya archivado íntegro y verificado: identidad estable del activo, asociación al volcado/version, sha256 de bytes, tamaño y MIME real; propietario derivado de autenticación. Tiempos de captura/recepción separados; desconocidos null. No presentar checkpoint como archivo.
+- Representación pública explícitamente seleccionada y separada: activo de audio reproducible, hash/tamaño/MIME y referencia pública estable verificables. Nunca URL privada/cifrada, token, clave, ruta interna o metadatos privados. Original se conserva sin reemplazar. No crear un almacén/proveedor nuevo por comodidad; resolver desde custodia e infraestructura existentes tras verificar sus capacidades.
+- Vista previa reproducible de los bytes públicos exactos junto al texto y al enlace/texto de Facebook; digest nuevo que cubra ambos activos y sus versiones/huellas y representación Facebook. Modificar texto/audio o representación invalida aprobación; ningún consentimiento schema1 es migrable automáticamente.
+- Pregunta única Sí(ambos)/No después del archivado, consentimiento explícito que cubra exposición pública de la voz. Ofuscada NO anonimiza voz; requiere revisión expresa y nunca descifrar alusiones. No exportar marca/aclaraciones privadas por defecto.
+- Facebook publica **enlace al artículo que contiene audio** y texto exacto revisado; no carga nativa de audio ni texto completo inferidos. Identidad y permisos oficiales de Página siguen siendo prerrequisitos.
+- Verificación independiente de bytes públicos y reproducción, publicación por destino y recuperación sin duplicados, antes de afirmar conexión o cierre. No publicar fixtures. Audio fuente íntegro no disponible/verificado = bloqueo material, no fabricar audio ni afirmar integridad.
+
+La implementación de almacenamiento/exportación/reproducción/digest ampliado permanece pendiente; solo se implementa el bloqueo fail-closed. No se ha desplegado ni aplicado migración ni configurado secretos. Los apartados siguientes documentan el núcleo legado y sus pruebas, subordinados a esta enmienda.
+
 ## Frontera y nombres finales
 Ingreso conserva captura, audio, texto, títulos, selector, ofuscada, checkpoints y archivado MANUAL. Tipos `general | conversacion_maya | interpretacion_simultanea | blog_personal`; en el volcado archivado, columnas servidor `tipo_entrada` y `ofuscada` (boolean). Si faltan, Blog falla cerrado con SOURCE_EDITORIAL_CLASSIFICATION_REQUIRED; jamás confía kind/ofuscada del cliente; todo volcado se archiva solo por acción humana, incluidos recuperados. Selector, autosave, checkpoint y marca no consienten publicación. Blog acepta únicamente `blog_personal`; no lee transversalmente otros tipos.
 

@@ -1,3 +1,4 @@
+import {assertPublicAudioContractReady} from '@/lib/server/blog/public-audio-policy';
 import {NextResponse} from 'next/server';
 import {timingSafeEqual} from 'node:crypto';
 import {getCurrentSiSnapshot,getCurrentMethodologySnapshot} from '@/lib/server/norm-check';
@@ -11,6 +12,8 @@ export async function POST(req:Request){
  const key=process.env.BLOG_DISPATCH_SECRET||'';const supplied=req.headers.get('authorization')||'';
  const expected='Bearer '+key;
  if(key.length<32||Buffer.byteLength(supplied)!==Buffer.byteLength(expected)||!timingSafeEqual(Buffer.from(supplied),Buffer.from(expected)))return NextResponse.json({code:'AUTH_REQUIRED'},{status:401});
+ // Blocks even previously approved text-only jobs; neither flags nor credentials bypass it.
+ try{assertPublicAudioContractReady();}catch{return NextResponse.json({code:'PUBLIC_AUDIO_CONTRACT_REQUIRED'},{status:503});}
  if(process.env.BLOG_SYNC_ENABLED!=='1')return NextResponse.json({code:'BLOG_SYNC_DISABLED'},{status:503});
  // Dedicated service executes already approved immutable jobs, not model ingestion/ratification.
  // Preserve the normative upstream dependency; unavailable credentials block sends, never bypass.
