@@ -1,0 +1,38 @@
+{
+  "cycle": "C-EXPLORACION-01",
+  "base_commit": "01faaa7c8379743003347f2c5f0458b44cdfce2c",
+  "method_commit": "3ab59423160e78a9047d3663622ade45c3aa717e",
+  "method_version": "1.6",
+  "object_seal": "GRAFO-v10",
+  "delivered": "proposal and documented route, not a new visualization",
+  "real_snapshot_obtained": false,
+  "production_changed": false,
+  "files": {
+    "docs/frentes/grafo/OBJETO.md": {
+      "sha256": "1725a309a476219b40984ef21314dfa5dd0a75b74ebcfdfd117b3a2f84aa8db7",
+      "utf8_bytes": 16417
+    },
+    "docs/frentes/grafo/originales/C-EXPLORACION-01-operador.txt": {
+      "sha256": "ede890b7f4f452757da9555380a39d78a998c741f9be64cab79e941c187fb0ba",
+      "utf8_bytes": 176
+    },
+    "docs/frentes/grafo/cronica/C-EXPLORACION-01.md": {
+      "sha256": "560d3e48e46166ae8ea23adda074bc31ff035a68e7c34f941acaa73d27d0ef27",
+      "utf8_bytes": 5657
+    },
+    "docs/frentes/grafo/cronica/C-EXPLORACION-01-salida.md": {
+      "sha256": "99440d3ac8784ea68bf3abfb573d149d277cdf59571143cc78cd3ece350155dc",
+      "utf8_bytes": 2897
+    },
+    "docs/frentes/grafo/cronica/C-EXPLORACION-01-intermedias.md": {
+      "sha256": "ce1aa2a28c5f6b4e03ef32c5a4617ef9b5a2043c0bebde8448d0331f294bdfea",
+      "utf8_bytes": 305
+    },
+    "docs/frentes/grafo/originales/C-EXPLORACION-01-aviso-conexion.txt": {
+      "sha256": "1dbd2ed54da0670bbfc2f908990e773a65e1756d1db7675eb0c50781d1e08a5c",
+      "utf8_bytes": 882
+    }
+  },
+  "readback": "Compare returned remote Git blobs to exact prepared bytes before emitting archived output",
+  "informational_remote_notice": "Received, not independently verified; no new authority; no remote connection used"
+}
