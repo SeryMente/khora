@@ -1,0 +1,24 @@
+{
+  "passed": 13,
+  "checks": [
+    "real archive handler accepts text-only Blog with no audio",
+    "response does not claim pending MP3 for absent audio",
+    "archive returns Blog classification and version",
+    "handler forwards exact Unicode text and manual title",
+    "handler does not fabricate audio",
+    "archive claims stable session for authenticated owner",
+    "custody callback is separate from archive receipt",
+    "explicit empty audio array is accepted for text-only",
+    "empty text with absent audio is rejected before persistence",
+    "unauthenticated archive remains blocked",
+    "invalid classification fails before persistence: tipoEntrada",
+    "invalid classification fails before persistence: ofuscada",
+    "missing title uses fallback without a real model dependency"
+  ],
+  "scope": "actual pinned API route, real Request/Response and classification predicate; auth/database/title/after are isolated fixtures",
+  "limits": [
+    "no production persistence or authenticated browser",
+    "no real LLM or publication",
+    "does not validate full guardarDictado implementation"
+  ]
+}

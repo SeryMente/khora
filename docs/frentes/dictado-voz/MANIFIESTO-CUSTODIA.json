@@ -606,9 +606,9 @@
     },
     {
       "path": "OBJETO-CANONICO.md",
-      "bytes": 220103,
-      "sha256": "2d8416714daf11a013089a0429af5a80672306aac34df44a56694b7b6ec8c390",
-      "git_blob_sha": "9d6644ae7da0fb30541422c328a4ed8b612b0532"
+      "bytes": 225728,
+      "sha256": "57c6193ad08381717b9448768e3d32c5671f413c191c7b4ca54ecc1d75b755cd",
+      "git_blob_sha": "86b0b2c309ef5b845a82209aebdb10bd03b792fc"
     },
     {
       "path": "originales/C033-instrucciones.json",
@@ -687,6 +687,54 @@
       "bytes": 2773,
       "sha256": "24c3b26f4d2978f097a43cfc13a88b2eb9c8c50833b49a6c2460b0c90f36cc8e",
       "git_blob_sha": "2a4ff69130821a8860d5fc09209e121af2e95b33"
+    },
+    {
+      "path": "originales/C034-instrucciones.json",
+      "bytes": 1685,
+      "sha256": "f7116ce19003d7a2ed14cb36dfe059ae54c0dbe1a9a208b8fa1d7b47901af86a",
+      "git_blob_sha": "7e311cb8635f9b777a4bcb8a019db066ab858a9c"
+    },
+    {
+      "path": "evidencias/C034-text-browser-result.json",
+      "bytes": 1230,
+      "sha256": "3733341afdd437333f3fc0e51bc17a309e509ba18635d5722dca181d2c571028",
+      "git_blob_sha": "9781c2d0d7b0682752573fb71286724409761552"
+    },
+    {
+      "path": "evidencias/C034-text-route-result.json",
+      "bytes": 1117,
+      "sha256": "2b9b53f6adbf93838a55feba7c75316f5a5858c602912c56eddd1e7147d6c42e",
+      "git_blob_sha": "ff5c29ea79799f53f922aef1cce4cf69b23cc43b"
+    },
+    {
+      "path": "evidencias/C034-env-inventory.json",
+      "bytes": 5817,
+      "sha256": "5678b6197d81bc011e68429d33f891c062ceef685f211c03fd957dc9e9adea9c",
+      "git_blob_sha": "f5dbdcefe024cadd34231b60add42229095ed07f"
+    },
+    {
+      "path": "evidencias/C034-terminal-errors.json",
+      "bytes": 719,
+      "sha256": "e3d99a40dbf60948c96e0c471427efcef407efba454d37cd20d835a7f87ac375",
+      "git_blob_sha": "35f9f87c11c2b3b5040aabf93ada3e007b63dfbc"
+    },
+    {
+      "path": "evidencias/C034-text-browser.mjs",
+      "bytes": 6209,
+      "sha256": "6f9eb4b0b9faf8df5a141571030e34dde73f4dd4a8d658eaa5f74f09f917eea3",
+      "git_blob_sha": "8b7b4c5b55a68b933911db9900b773b825472923"
+    },
+    {
+      "path": "evidencias/C034-text-route.mjs",
+      "bytes": 4537,
+      "sha256": "6bd66498bdc898075b73941de4c7873b34ece23bf42449e6cbeaf79166489d75",
+      "git_blob_sha": "2dd265a304771f670e49b4d66ea2e6f9ada4d18f"
+    },
+    {
+      "path": "evidencias/C034-coordinacion.json",
+      "bytes": 1972,
+      "sha256": "97a40d05675b379173bfaf075582c23ef9ee9dd1f06f3d394dcf871ddd128953",
+      "git_blob_sha": "94ca9d5e53efb13852d3577a7a8ae8015d678ea3"
     }
   ],
   "runtime_references": [
@@ -800,7 +848,7 @@
     "state": "tested candidate; preview READY; no production or complete E2E acceptance",
     "observed_head": "bdc0255df9c9573575b25082706197a55bef7211"
   },
-  "latestEvent": "C033 implementation and centralization; local tests; exact preview READY; protected access and acceptance pending",
+  "latestEvent": "C034 explicit text-only Blog milestone, coordinated parallel implementation and current isolated tests/configuration audit",
   "latest_verified_release": {
     "sha": "f0dfbdcb2d79eb6289dacba272ddcc7ba2023063",
     "deploymentId": "dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr",
@@ -826,8 +874,8 @@
     "physicalAcceptance": false,
     "technicalPublicationVerified": true
   },
-  "latest_cycle": "C033",
-  "canonical_version": "0.6.19",
+  "latest_cycle": "C034",
+  "canonical_version": "0.6.20",
   "latest_candidate": {
     "branch": "feat/ingreso-autobiografico-20261019",
     "base": "b5e7009de137db30c26ecc5f4ddbb34789f453f2",
@@ -835,7 +883,7 @@
     "publicAudio": false,
     "codeCommit": "bdc0255df9c9573575b25082706197a55bef7211",
     "pullRequest": 330,
-    "observedHead": "bdc0255df9c9573575b25082706197a55bef7211",
+    "observedHead": "7826aa537e6573fd99edffd4bd19eae57cc8b94f",
     "preview": {
       "deployment": "dpl_3i1uggfnr2cGt89iRMCQvXJq2qWA",
       "state": "READY",
@@ -998,7 +1046,9 @@
   "quality_gate": {
     "state": "blocked",
     "receipt": "evidencias/C030-gate-blocker.json",
-    "activeConfigChanged": false
+    "activeConfigChanged": false,
+    "currentEvidence": "evidencias/C034-coordinacion.json",
+    "currentFirstMilestone": "text only; audio deferred"
   },
   "method_history": [
     {
