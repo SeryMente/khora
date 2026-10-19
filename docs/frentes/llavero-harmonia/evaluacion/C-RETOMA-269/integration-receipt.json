@@ -1,0 +1,12 @@
+{
+  "pr": 319,
+  "head": "18a52a4d2bc47bee306a7e0d67cd3a0d05595197",
+  "main": "b5e7009de137db30c26ecc5f4ddbb34789f453f2",
+  "mergeable_state": "clean",
+  "draft": true,
+  "merged": false,
+  "verification": "Authenticated readback: all 33 khora-web top-level file/tree entries equal exact local merged candidate; package and lock dependency maps equal",
+  "entries": 33,
+  "production": false,
+  "deployment": false
+}

@@ -1,0 +1,10 @@
+{
+  "originalInstruction": "originales/C-RETOMA-269-operador.txt",
+  "output": "originales/C-RETOMA-269-salida.md",
+  "sha256": "2f5778aabc773e681f12a48fb802765a897d0166c5447f92655ffa836def3d06",
+  "encoding": "UTF-8",
+  "lineEndings": "LF",
+  "transformations": "prepared final visible response, including citations and terminal LF; to be emitted identically after authenticated readback",
+  "historicalCoverage": "incomplete; only current cycle final output and received instruction certified here",
+  "commentaryOutputs": "not certified as verbatim persisted by this cycle; summary in chronicle only"
+}
