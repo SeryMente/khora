@@ -45,6 +45,11 @@ CREATE TABLE IF NOT EXISTS blog_publication_refusal (
   created_at timestamptz NOT NULL DEFAULT now(), superseded_at timestamptz,
   UNIQUE(owner,volcado_id,source_version,source_hash)
 );
+CREATE TABLE IF NOT EXISTS blog_refusal_events (
+  publication_id uuid NOT NULL, owner text NOT NULL, source_version integer NOT NULL,
+  source_hash char(64) NOT NULL, created_at timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY(publication_id,owner,source_version,source_hash)
+);
 -- Refusal is private: never include this table in public export or broad read grants.
 -- Do not grant readonly/global roles access to encrypted drafts or originals here.
 COMMIT;

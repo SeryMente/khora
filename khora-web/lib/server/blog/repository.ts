@@ -81,16 +81,17 @@ export class BlogRepository {
         const row=current.rows[0];if(row.owner!==actor||row.id!==ref.publicationId||row.volcado_id!==ref.sourceId)throw new Error('REFUSAL_CONFLICT');
         const revision:Revision=JSON.parse(this.cipher.decrypt(row.payload_cipher));
         if(revision.sourceVersion!==ref.sourceVersion||revision.sourceHash!==ref.sourceHash)throw new Error('REFUSAL_CONFLICT');
-        const sent=await c.query("SELECT 1 FROM blog_delivery WHERE editorial_id=$1 AND state IN ('submitting','unknown','confirmed')",[ref.publicationId]);
+        const sent=await c.query("SELECT 1 FROM blog_delivery WHERE editorial_id=$1 AND revision=$2 AND state IN ('submitting','unknown','confirmed')",[ref.publicationId,revision.revision]);
         if(sent.rows.length)throw new Error('WITHDRAWAL_REVIEW_REQUIRED');
         await c.query("UPDATE blog_editorial SET consent='declined',approval_cipher=NULL,export_snapshot=NULL,approved_digest=NULL,changed_seq=DEFAULT,updated_at=now() WHERE id=$1",[ref.publicationId]);
         await c.query("UPDATE blog_delivery SET state='cancelled' WHERE editorial_id=$1 AND state IN ('pending','blocked')",[ref.publicationId]);
         await this.history(c,actor,revision,'publication_declined_receipt',{decision:false,sourceVersion:ref.sourceVersion,sourceHash:ref.sourceHash});
       }
       const previous=await c.query('SELECT owner,volcado_id,source_version,source_hash FROM blog_publication_refusal WHERE publication_id=$1 FOR UPDATE',[ref.publicationId]);
-      if(previous.rows.length){const row=previous.rows[0];if(row.owner!==actor||row.volcado_id!==ref.sourceId||row.source_version!==ref.sourceVersion||row.source_hash!==ref.sourceHash)throw new Error('REFUSAL_CONFLICT');}
+      if(previous.rows.length){const row=previous.rows[0];if(row.owner!==actor||row.volcado_id!==ref.sourceId)throw new Error('REFUSAL_CONFLICT');}
       const flag=source.rows[0].obfuscated==='true'?true:source.rows[0].obfuscated==='false'?false:null;
-      await c.query('INSERT INTO blog_publication_refusal(publication_id,owner,volcado_id,source_version,source_hash,obfuscated) VALUES($1,$2,$3,$4,$5,$6) ON CONFLICT(publication_id) DO UPDATE SET superseded_at=NULL',[ref.publicationId,actor,ref.sourceId,ref.sourceVersion,ref.sourceHash,flag]);
+      await c.query('INSERT INTO blog_publication_refusal(publication_id,owner,volcado_id,source_version,source_hash,obfuscated) VALUES($1,$2,$3,$4,$5,$6) ON CONFLICT(publication_id) DO UPDATE SET source_version=excluded.source_version,source_hash=excluded.source_hash,obfuscated=excluded.obfuscated,superseded_at=NULL',[ref.publicationId,actor,ref.sourceId,ref.sourceVersion,ref.sourceHash,flag]);
+      await c.query('INSERT INTO blog_refusal_events(publication_id,owner,source_version,source_hash) VALUES($1,$2,$3,$4) ON CONFLICT DO NOTHING',[ref.publicationId,actor,ref.sourceVersion,ref.sourceHash]);
     });return this.refusal(actor,ref.publicationId);
   }
   async extractMetadata(actor:string,id:string,providerKey:string){
@@ -113,11 +114,13 @@ export class BlogRepository {
       if(!q.rows.length)throw new Error('EDITORIAL_FORBIDDEN');
       const r:Revision=JSON.parse(this.cipher.decrypt(q.rows[0].payload_cipher));
       if(hash(canonical(r))!==expectedDigest)throw new Error('EDITORIAL_CONFLICT');
-      const sent=await c.query("SELECT 1 FROM blog_delivery WHERE editorial_id=$1 AND state IN ('submitting','unknown','confirmed')",[id]);
+      const sent=await c.query("SELECT 1 FROM blog_delivery WHERE editorial_id=$1 AND revision=$2 AND state IN ('submitting','unknown','confirmed')",[id,r.revision]);
       if(sent.rows.length)throw new Error('WITHDRAWAL_REVIEW_REQUIRED');
       await c.query("UPDATE blog_editorial SET consent='declined',approval_cipher=NULL,export_snapshot=NULL,approved_digest=NULL,changed_seq=DEFAULT,updated_at=now() WHERE id=$1",[id]);
       await c.query("UPDATE blog_delivery SET state='cancelled' WHERE editorial_id=$1 AND state IN ('pending','blocked')",[id]);
       await this.history(c,actor,r,'publication_declined', {digest:expectedDigest,decision:false});
+      await c.query('INSERT INTO blog_publication_refusal(publication_id,owner,volcado_id,source_version,source_hash,obfuscated) VALUES($1,$2,$3,$4,$5,$6) ON CONFLICT(publication_id) DO UPDATE SET source_version=excluded.source_version,source_hash=excluded.source_hash,obfuscated=excluded.obfuscated,superseded_at=NULL',[id,actor,r.sourceId,r.sourceVersion,r.sourceHash,r.obfuscated]);
+      await c.query('INSERT INTO blog_refusal_events(publication_id,owner,source_version,source_hash) VALUES($1,$2,$3,$4) ON CONFLICT DO NOTHING',[id,actor,r.sourceVersion,r.sourceHash]);
     });
   }
   async status(actor:string,id:string){

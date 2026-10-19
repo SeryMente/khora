@@ -51,5 +51,9 @@ test('transactional editorial migration / ownership / decisions / deliveries',{s
  assert.equal((await query('SELECT approval_cipher FROM blog_editorial')).rows[0].approval_cipher,null);
  const tomb=(await query('SELECT * FROM blog_public_export')).rows[0];assert.equal(tomb.withdrawn,true);assert.equal(tomb.snapshot,null);
  assert.equal((await repo.status('owner',r.publicationId)).filter,'awaiting_decision');
+ await repo.declineArchived('owner',ref);assert.equal((await repo.refusal('owner',r.publicationId))!.consent,'declined');
+ assert.equal((await query("SELECT * FROM blog_delivery WHERE revision=1 AND state='confirmed'")).rows.length,2); // No to new draft does not pretend to erase old publications
+ assert.equal((await query('SELECT * FROM blog_refusal_events')).rows.length,1); // idempotent same source receipt
+
  await db.close();
 });
