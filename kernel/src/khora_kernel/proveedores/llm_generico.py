@@ -62,6 +62,7 @@ class ProveedorLLMGenerico:
         headers = {
             "Content-Type": "application/json",
             "Authorization": f"Bearer {self.api_key}",
+            "User-Agent": "Khora-Kernel/1.0",
         }
 
         messages: List[Dict[str, Any]] = []
@@ -131,6 +132,7 @@ class ProveedorLLMGenerico:
         headers = {
             "Content-Type": "application/json",
             "Authorization": f"Bearer {self.api_key}",
+            "User-Agent": "Khora-Kernel/1.0",
         }
 
         data = {
@@ -198,6 +200,7 @@ class ProveedorLLMGenerico:
         headers = {
             "Content-Type": "application/json",
             "Authorization": f"Bearer {api_key}",
+            "User-Agent": "Khora-Kernel/1.0",
         }
 
         data = {

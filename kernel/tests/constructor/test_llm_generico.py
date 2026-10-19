@@ -3,6 +3,7 @@
 from unittest.mock import MagicMock, patch
 
 from khora_kernel.proveedores.llm_generico import ProveedorLLMGenerico
+from khora_kernel.api import SolicitudLLM
 
 
 def test_embeddings_override_env_vars(monkeypatch):
@@ -24,6 +25,7 @@ def test_embeddings_override_env_vars(monkeypatch):
         req = mock_urlopen.call_args[0][0]
         assert req.full_url == "https://api.openai.com/v1/embeddings"
         assert req.headers["Authorization"] == "Bearer openai-embeddings-key"
+        assert req.get_header("User-agent") == "Khora-Kernel/1.0"
 
 
 def test_embeddings_fallback_default(monkeypatch):
@@ -45,3 +47,27 @@ def test_embeddings_fallback_default(monkeypatch):
         req = mock_urlopen.call_args[0][0]
         assert req.full_url == "https://api.groq.com/openai/v1/embeddings"
         assert req.headers["Authorization"] == "Bearer groq-key"
+        assert req.get_header("User-agent") == "Khora-Kernel/1.0"
+
+
+def test_generar_identifies_kernel_without_exposing_key():
+    provider = ProveedorLLMGenerico("https://provider.invalid/v1", "test-key", "test-model")
+    response = MagicMock()
+    response.read.return_value = b'{"choices":[{"message":{"content":"ok"}}]}'
+    response.__enter__.return_value = response
+    with patch("urllib.request.urlopen", return_value=response) as opened:
+        result = provider.generar(SolicitudLLM("public test", None, None, {}))
+        assert result.texto == "ok"
+        request = opened.call_args[0][0]
+        assert request.get_header("User-agent") == "Khora-Kernel/1.0"
+        assert request.get_header("Authorization") == "Bearer test-key"
+
+
+def test_generar_stream_identifies_kernel():
+    provider = ProveedorLLMGenerico("https://provider.invalid/v1", "test-key", "test-model")
+    response = MagicMock()
+    response.__iter__.return_value = iter([b'data: {"choices":[{"delta":{"content":"ok"}}]}', b'data: [DONE]'])
+    with patch("urllib.request.urlopen", return_value=response) as opened:
+        assert "ok" in list(provider.generar_stream([{"role":"user","content":"public test"}]))
+        request = opened.call_args[0][0]
+        assert request.get_header("User-agent") == "Khora-Kernel/1.0"

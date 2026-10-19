@@ -1,0 +1,87 @@
+{
+  "captured_at": "2026-10-19T22:03:28.010999+00:00",
+  "scope": "Public artificial provider and fVAL controls; not native UI/graph end-to-end or operator acceptance",
+  "direct": {
+    "credential_received_encrypted": true,
+    "provider_status": 200,
+    "model": "openai/gpt-oss-120b",
+    "public_probe_response": "KHORA_GROQ_OK",
+    "usage": {
+      "queue_time": 0.03252948,
+      "prompt_tokens": 86,
+      "prompt_time": 0.003561745,
+      "completion_tokens": 76,
+      "completion_time": 0.158589967,
+      "total_tokens": 162,
+      "total_time": 0.162151712,
+      "completion_tokens_details": {
+        "reasoning_tokens": 61
+      }
+    }
+  },
+  "kernel_provider": {
+    "real_kernel_provider": true,
+    "model": "openai/gpt-oss-120b",
+    "generar_response": "KHORA_KERNEL_GROQ_OK",
+    "stream_response": "KHORA_STREAM_GROQ_OK",
+    "generar_ok": true,
+    "stream_ok": true
+  },
+  "global_fval": {
+    "scope": "real Groq and global kernel fVAL; Ht explicitly artificial, no graph retrieval, no production certificate",
+    "results": [
+      {
+        "case": "supported",
+        "verdict": "Sufficient",
+        "expected": "Sufficient",
+        "passed": true,
+        "reason": "El H_t incluye una evidencia textual que afirma explícitamente que la probeta ALFA contiene exactamente 23 mililitros de agua, lo cual respalda completamente la respuesta proporcionada."
+      },
+      {
+        "case": "unsupported",
+        "verdict": "Insufficient",
+        "expected": "Insufficient",
+        "passed": true,
+        "reason": "La evidencia proporcionada en H_t indica que la probeta ALFA contiene exactamente 23 mililitros de agua, mientras que la respuesta afirma que contiene 32 mililitros. La respuesta no está respaldada por la información disponible y, de hecho, contradice la evidencia textual."
+      },
+      {
+        "case": "off_question",
+        "verdict": "Insufficient",
+        "expected": "Insufficient",
+        "passed": true,
+        "reason": "El H_t solo contiene evidencia de que la probeta ALFA contiene 23 mililitros de agua y no proporciona ninguna información sobre quién la creó. Por lo tanto, la respuesta no está respaldada por la evidencia disponible y además no responde a la pregunta original."
+      }
+    ],
+    "all_passed": true
+  },
+  "render_before_header_fix": {
+    "session": {
+      "authenticated": true,
+      "emailPresent": true
+    },
+    "result": {
+      "status": 502,
+      "body": "{\"detail\":{\"error\":\"PROVEEDOR_ERROR\",\"perfil\":\"groq\",\"codigo\":403,\"mensaje\":\"HTTP Error 403: Forbidden\"}}"
+    }
+  },
+  "environment_deploy": {
+    "id": "dep-dbb94b8m7kps73ekhpf0",
+    "commit": "bd29c924393fcbd9183100f66b2e50c87b791207",
+    "observed_status": "live"
+  },
+  "unit_tests": {
+    "file": "kernel/tests/constructor/test_llm_generico.py",
+    "passed": 4
+  },
+  "privacy": {
+    "clipboard_transfer": "RSA-OAEP ciphertext only; explicit operator authorization",
+    "personal_notes_used": false,
+    "secret_values_in_evidence": false
+  },
+  "limits": [
+    "No native OpenWebUI public deployment",
+    "No real graph recovery/citations",
+    "No Render native runtime load/restart",
+    "No ENT01 acceptance"
+  ]
+}
