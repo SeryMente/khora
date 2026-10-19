@@ -419,12 +419,6 @@
       "git_blob_sha": "4f25629d8f7c3e89422eab199fb7e65ca2f600d9"
     },
     {
-      "path": "OBJETO-CANONICO.md",
-      "bytes": 201897,
-      "sha256": "4406c1a8f974bd9b80febf5fc22f57bda24bc77be8562dabd66e0cc8fa2150c9",
-      "git_blob_sha": "e5a6e50b3ad9b2a43442617ee496689cbf9c53e5"
-    },
-    {
       "path": "evidencias/C031-banco/README.md",
       "bytes": 760,
       "sha256": "78b134b0090f69d3fd55006262685eeea5d2453c82bad012e66ef0e20828f69d",
@@ -563,10 +557,28 @@
       "git_blob_sha": "41657af7fc6dfe2ac18a9f9258f15d77260b5691"
     },
     {
+      "path": "OBJETO-CANONICO.md",
+      "bytes": 204318,
+      "sha256": "083be253f002dd7e4cc4e9cd15248f070906a86b874742ac14b09a59af5e65d2",
+      "git_blob_sha": "0b5fc645565a23a1ed83a46791284f889b6afb75"
+    },
+    {
+      "path": "evidencias/C031-readback-bloqueos.json",
+      "bytes": 871,
+      "sha256": "e3a69131907ef3ae23f9e6b5617087242e57e4649fe9c26b8b4e57636425591b",
+      "git_blob_sha": "2217d4cd4b50dfb82f82aa1913198773461d0034"
+    },
+    {
+      "path": "originales/C031-entrega-consolidada.md",
+      "bytes": 4131,
+      "sha256": "b8a0b3be32b8ca80cdaf35e7e1c44b638b2655ce2779aa93cb2336069ad7e7cb",
+      "git_blob_sha": "379b9e79327023d062ba822cce52f10b4acfcd4a"
+    },
+    {
       "path": "originales/C031-continuacion-autorizada.json",
-      "bytes": 2620,
-      "sha256": "507d4497854c3c8ad01002988d12bb96473a796add47da25197cd00ee2eee6a9",
-      "git_blob_sha": "e111a08787f92e37a98925e0869ec523608e0f20"
+      "bytes": 7484,
+      "sha256": "e19332787783bda0c2c999a572d90af6ca567bf3ce4254b54d7042e657738eac",
+      "git_blob_sha": "c195d690e5ec78e6e4915e75696c7f39053bbb80"
     }
   ],
   "runtime_references": [
@@ -673,13 +685,13 @@
     "no_secret_values_in_manifest": true
   },
   "current_preparation": {
-    "version": "0.6.16",
+    "version": "0.6.17",
     "baseSha": "b5e7009de137db30c26ecc5f4ddbb34789f453f2",
     "branch": "feat/ingreso-autobiografico-20261019",
     "receipt": "evidencias/C031-results.json",
     "state": "integrated candidate; full gates/deploy/Meta/normative and real custody remain unverified"
   },
-  "latestEvent": "C031 autonomous five-front continuation; integrated isolated candidate, production unverified",
+  "latestEvent": "C031 exact remote readback; Vercel private-org Hobby failure and checks403 observed",
   "latest_verified_release": {
     "sha": "f0dfbdcb2d79eb6289dacba272ddcc7ba2023063",
     "deploymentId": "dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr",
@@ -706,7 +718,7 @@
     "technicalPublicationVerified": true
   },
   "latest_cycle": "C031",
-  "canonical_version": "0.6.16",
+  "canonical_version": "0.6.17",
   "latest_candidate": {
     "branch": "feat/ingreso-autobiografico-20261019",
     "base": "b5e7009de137db30c26ecc5f4ddbb34789f453f2",
@@ -805,6 +817,24 @@
         "bytes": 202969,
         "sha256": "0abe6b4a92fe96de4fe34f3ae1ad3b8df0b685f6403ccf3a6718630f5b11bae4",
         "git_blob_sha": "0522c47555b15ef05ecccc1ad285275741b09d74"
+      }
+    },
+    {
+      "event": "C031-readback",
+      "previous": {
+        "path": "OBJETO-CANONICO.md",
+        "bytes": 201897,
+        "sha256": "4406c1a8f974bd9b80febf5fc22f57bda24bc77be8562dabd66e0cc8fa2150c9",
+        "git_blob_sha": "e5a6e50b3ad9b2a43442617ee496689cbf9c53e5"
+      }
+    },
+    {
+      "event": "C031-readback",
+      "previous": {
+        "path": "originales/C031-continuacion-autorizada.json",
+        "bytes": 2620,
+        "sha256": "507d4497854c3c8ad01002988d12bb96473a796add47da25197cd00ee2eee6a9",
+        "git_blob_sha": "e111a08787f92e37a98925e0869ec523608e0f20"
       }
     }
   ],

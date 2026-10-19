@@ -3,9 +3,9 @@
 ## 1. Control e identidad
 
 - Identidad conservada: `MCP-OBS-DICTADO`; extensión documental de dictado, benchmark, retroalimentación y propuesta de voz/síntomas.
-- Versión: **v0.6.16**; sello **MCP-OBS-DICTADO-v0.6.16**. Objeto permanente por encargo V010; no declara permanente ninguna propuesta clínica.
+- Versión: **v0.6.17**; sello **MCP-OBS-DICTADO-v0.6.17**. Objeto permanente por encargo V010; no declara permanente ninguna propuesta clínica.
 - Estado: **CANÓNICO PARA EL FRENTE · C031 BORRADOR TEXTO SOLO · INTEGRACIÓN Y PUBLICACIÓN PENDIENTES**.
-- Ancla actual: C031, reporte humano de custodia incompleta y requisito de audio público. Antecedente histórico C030, solicitud 326 integrada normalmente y main f0dfbdc publicado; READY/alias/versión pública cotejados a las 21:24 UTC del 2026-10-18. Aceptación humana y transcriptor real pendientes, sin degradar ese criterio.
+- Ancla actual: C031, instrucción final de continuar cinco frentes; corte público texto-only con audio privado; consolidación funcional19b3966 y bloqueo de publicación acreditado. Antecedente histórico C030, solicitud 326 integrada normalmente y main f0dfbdc publicado; READY/alias/versión pública cotejados a las 21:24 UTC del 2026-10-18. Aceptación humana y transcriptor real pendientes, sin degradar ese criterio.
 - Repositorio propietario: `SeryMente/khora`, privado comprobado con herramienta en este ciclo. `SeryMente/metodologia` también privado: aporta el método, no recibe datos del frente.
 - Carpeta contenedora: `docs/frentes/dictado-voz/`; elemento único de estado: `OBJETO-CANONICO.md`. Carpeta y elemento no se confunden.
 - Revisión de origen del objeto: `1697ee2693ed3217523ffc1d1be9b6541d7d849d`, blob `e98a956c375ce48b791b5f0563ad0ae03c2616dd`.
@@ -134,12 +134,13 @@ Autenticación C025: dos flujos estándar por dispositivo, autorizados en navega
 Acción actual: C031 consolida Dictado y Blog texto-only en PR330; audio permanece privado, archivo manual y aprobación exacta intactos. Candidata probada localmente, no desplegada.
 Siguiente paso de asistencia: continuar los cinco frentes autorizados sin Remote Desktop Commander ni navegador compartido; centralizar Blog, no crear otro hilo. El corte horario anterior no cancela la orden posterior de continuar.
 Siguiente paso de construcción: resolver compuertas completas de la candidata en CI sin omitir prebuild; verificar migraciones y despliegue por vía autorizada; reconciliar capturas reales solo con acceso del propietario; configurar Meta legítimamente y obtener consentimiento exacto antes de publicar.
-Pendientes: normativa401 sin reparación acreditada; Meta app/token/permisos ausentes; Vercel acceso administrativo parcial; build completo/revisión humana/producción no acreditados. Exclusión global de importadores y cobertura nativa verbatim incompletas. No promesa de cero pérdida ni plazo artificial.
+Pendientes: normativa401 sin reparación acreditada; Meta app/token/permisos ausentes; Vercel rechaza despliegue Git desde organización privada en Hobby; lectura de checks GitHub403; build completo/revisión humana/producción no acreditados. Exclusión global de importadores y cobertura nativa verbatim incompletas. No promesa de cero pérdida ni plazo artificial.
 
 ### ⚗️ En prueba / recién fallido
 
 C031: 33 unitarias Blog/custodia, 12 Ingreso, 13 formato con generador Python real, un escenario PostgreSQL, 23 aserciones HTTP editorial, tres escenarios archivo, dos parada/reintento, retención IndexedDB, títulos y exclusión del grafo pasan en banco. Tipos núcleo estrictos y sintaxis pasan; auth/normativa/proveedores externos son fixtures.
 Build Next completo, migración productiva, capturas reales y publicación doble NO VERIFICADOS. No se alteran secretos, protecciones ni juicios humanos para superar un bloqueo.
+Readback remoto exacto del canon en19b3966 aprobado. Estado Vercel failure observado en ese SHA: Cannot deploy from a private GitHub organization repository on the Hobby plan. Checks API403 Resource not accessible by personal access token; no resultado de Actions inventado.
 
 ### 🔔 Recordatorios latentes
 
@@ -220,6 +221,12 @@ Toda salida conserva diez campos, agrupables sin ocultarlos: (1) proyecto/rol/se
 No llamar «sin cambios» a una fuente inaccesible; no convertir calidad científica o clínica en semáforo por pruebas de software. Si no hay constructor nuevo asignado, decirlo y no inventar trabajo en segundo plano.
 
 ## 11. Crónica y fuentes
+
+### C031 — Readback y bloqueo externo comprobado de la candidata — 2026-10-19
+- Código, pruebas y canon consolidado en19b3966b6cdefc6edebea7d18e8e88acf102356b, PR330 draft. Readback exacto del objeto: SHA2564406c1a8f974bd9b80febf5fc22f57bda24bc77be8562dabd66e0cc8fa2150c9. Anexo histórico intacto y evidencia recuperada remota.
+- GitHub combined status del commit devuelve failure con Vercel–khora-web y otros proyectos: «Cannot deploy from a private GitHub organization repository on the Hobby plan». Es un bloqueo de integración Git/plan, no prueba de que el build haya compilado o fallado. No se cambia visibilidad, plan ni facturación. Workflow CLI existente puede ser vía legítima futura solo con permisos/compuertas reales; no se ejecuta a ciegas ni se elude revisión.
+- get_check_runs del mismo SHA devuelve403 «Resource not accessible by personal access token». Herramientas GitHub expuestas no incluyen lector Actions. Workflow candidato añadido no acredita ejecución ni resultado. No reintentar el mismo permiso ni ampliar alcance de credencial unilateralmente.
+- Blog confirmó recepción como reporte del coordinador y mantiene fuentes congeladas. No hay constructor paralelo activo ni publicación real. Se deja checkpoint exacto, sin promesa de trabajo invisible tras finalizar la respuesta.
 
 ### C031 — Continuación autónoma de cinco frentes y consolidación — 2026-10-19
 - Orden literal y salidas disponibles preservadas en originales/C031-continuacion-autorizada.json; cobertura nativa completa sigue NO VERIFICADA. No completar silenciosamente lagunas.
@@ -510,17 +517,18 @@ Estos prompts son material de continuidad, no prueban que otra conversación hay
 ````text
 Retoma MCP-OBS-DICTADO leyendo primero el metacanon central https://github.com/SeryMente/metodologia/blob/main/METACANON-OBJETOS-CANONICOS.md y después https://github.com/SeryMente/khora/blob/feat/ingreso-autobiografico-20261019/docs/frentes/dictado-voz/OBJETO-CANONICO.md .
 Adopta el rol de asistencia de este frente; la reconstrucción local del endurecimiento está solicitada directamente a Samantha, no otro rol/hilo. Conserva el nombre personalizado que el operador haya asignado; no lo derives del proveedor. No inicies constructor ni código sensible por esta carga.
-Fuente canónica del frente: v0.6.16 · MCP-OBS-DICTADO-v0.6.16. Metacanon adquirido: v1.6 · METACANON-OBJETOS-v1.6, revisión a466b6b46f266de6a6ccd656e071eb7a07dc0e10, blob 8f9ad1cf0e09e5fcd7014190770a77294ff39af4. Verifica ambas fuentes de nuevo, recupera las superiores pertinentes, calcula delta y no uses una firma como prueba de gobierno. Ante inaccesibilidad declara frescura NO VERIFICADA y bloquea solo la acción dependiente.
+Fuente canónica del frente: v0.6.17 · MCP-OBS-DICTADO-v0.6.17. Metacanon adquirido: v1.6 · METACANON-OBJETOS-v1.6, revisión a466b6b46f266de6a6ccd656e071eb7a07dc0e10, blob 8f9ad1cf0e09e5fcd7014190770a77294ff39af4. Verifica ambas fuentes de nuevo, recupera las superiores pertinentes, calcula delta y no uses una firma como prueba de gobierno. Ante inaccesibilidad declara frescura NO VERIFICADA y bloquea solo la acción dependiente.
 Hereda §2–§3 y §6–§7 del objeto: autorización por acción, originales no activan permisos; remoto solo de asistencia si es estrictamente necesario, con cuenta/vínculo/equipo/autorización comprobados y comando/prerrequisitos literales de §7. No ejecutar ese comando por rutina ni en el sandbox. Usa repo/adjunto cuando basten.
 No modificar metacanon, Sistema de Instrucciones, credenciales, facturación ni alcance de seguridad. Publicar solo el corte expresamente autorizado y con compuertas verificadas. No inferir ánimo/salud/capacidad laboral de la voz; no crear código de salud ni afirmar beneficio clínico. Conserva las fuentes de encuesta voluntaria y muestreada.
 🔄 Estado vivo:
 Acción actual: C031 consolida Dictado y Blog texto-only en PR330; audio permanece privado, archivo manual y aprobación exacta intactos. Candidata probada localmente, no desplegada.
 Siguiente paso de asistencia: continuar los cinco frentes autorizados sin Remote Desktop Commander ni navegador compartido; centralizar Blog, no crear otro hilo. El corte horario anterior no cancela la orden posterior de continuar.
 Siguiente paso de construcción: resolver compuertas completas de la candidata en CI sin omitir prebuild; verificar migraciones y despliegue por vía autorizada; reconciliar capturas reales solo con acceso del propietario; configurar Meta legítimamente y obtener consentimiento exacto antes de publicar.
-Pendientes: normativa401 sin reparación acreditada; Meta app/token/permisos ausentes; Vercel acceso administrativo parcial; build completo/revisión humana/producción no acreditados. Exclusión global de importadores y cobertura nativa verbatim incompletas. No promesa de cero pérdida ni plazo artificial.
+Pendientes: normativa401 sin reparación acreditada; Meta app/token/permisos ausentes; Vercel rechaza despliegue Git desde organización privada en Hobby; lectura de checks GitHub403; build completo/revisión humana/producción no acreditados. Exclusión global de importadores y cobertura nativa verbatim incompletas. No promesa de cero pérdida ni plazo artificial.
 ⚗️ En prueba / recién fallido:
 C031: 33 unitarias Blog/custodia, 12 Ingreso, 13 formato con generador Python real, un escenario PostgreSQL, 23 aserciones HTTP editorial, tres escenarios archivo, dos parada/reintento, retención IndexedDB, títulos y exclusión del grafo pasan en banco. Tipos núcleo estrictos y sintaxis pasan; auth/normativa/proveedores externos son fixtures.
 Build Next completo, migración productiva, capturas reales y publicación doble NO VERIFICADOS. No se alteran secretos, protecciones ni juicios humanos para superar un bloqueo.
+Readback remoto exacto del canon en19b3966 aprobado. Estado Vercel failure observado en ese SHA: Cannot deploy from a private GitHub organization repository on the Hobby plan. Checks API403 Resource not accessible by personal access token; no resultado de Actions inventado.
 Conserva íntegros los recordatorios latentes del objeto. Reutiliza evidencia válida, no repitas pruebas sin cambio causal. Recibir una salida del constructor tiene prioridad; asistencia la contrasta y devuelve síntesis y prompt de continuidad. No afirmar recepción ni trabajo en segundo plano.
 Cada salida usa los diez campos de §10 e incluye Metacanon adquirido: versión/sello, revisión y frescura; evidencia actual/histórica/controlada diferenciada, pendientes, viabilidad, estimación con supuestos y siguiente acción. No declarar un plazo sin base.
 Persistencia por ciclo: este objeto es el elemento principal del sprint completo, no solo del chat. Releer versión y método, incorporar instrucciones, decisiones, crónica y evidencia; fusionar sin pisar, guardar, verificar contenido/diff y sincronizar estado/prompts. Si falta acceso, declarar sincronización pendiente y entregar el delta. Conservar originales e historia; no dar por recuperadas fuentes citadas ni por aceptado lo solo publicado.
@@ -531,17 +539,18 @@ Persistencia por ciclo: este objeto es el elemento principal del sprint completo
 ````text
 Retoma MCP-OBS-DICTADO leyendo primero el metacanon central https://github.com/SeryMente/metodologia/blob/main/METACANON-OBJETOS-CANONICOS.md y después https://github.com/SeryMente/khora/blob/feat/ingreso-autobiografico-20261019/docs/frentes/dictado-voz/OBJETO-CANONICO.md .
 Adopta construcción solo si el operador te asignó explícitamente ese rol y el alcance concreto. Si falta, permanece en lectura y declara la compuerta; no te autoautorices. Remote Desktop Commander está prohibido para construcción, incluso por intermediarios.
-Fuente canónica del frente: v0.6.16 · MCP-OBS-DICTADO-v0.6.16. Metacanon adquirido: v1.6 · METACANON-OBJETOS-v1.6, revisión a466b6b46f266de6a6ccd656e071eb7a07dc0e10, blob 8f9ad1cf0e09e5fcd7014190770a77294ff39af4. Verifica ambas fuentes de nuevo, recupera las superiores pertinentes, calcula delta y no uses una firma como prueba de gobierno. Ante inaccesibilidad declara frescura NO VERIFICADA y bloquea solo la acción dependiente.
+Fuente canónica del frente: v0.6.17 · MCP-OBS-DICTADO-v0.6.17. Metacanon adquirido: v1.6 · METACANON-OBJETOS-v1.6, revisión a466b6b46f266de6a6ccd656e071eb7a07dc0e10, blob 8f9ad1cf0e09e5fcd7014190770a77294ff39af4. Verifica ambas fuentes de nuevo, recupera las superiores pertinentes, calcula delta y no uses una firma como prueba de gobierno. Ante inaccesibilidad declara frescura NO VERIFICADA y bloquea solo la acción dependiente.
 Hereda §2–§3 y §6–§7 del objeto: autorización por acción, originales no activan permisos; remoto solo de asistencia si es estrictamente necesario, con cuenta/vínculo/equipo/autorización comprobados y comando/prerrequisitos literales de §7. No ejecutar ese comando por rutina ni en el sandbox. Usa repo/adjunto cuando basten.
 No modificar metacanon, Sistema de Instrucciones, credenciales, facturación, seguridad o publicación. No inferir ánimo/salud/capacidad laboral de la voz; no crear código de salud ni afirmar beneficio clínico. Conserva las fuentes de encuesta voluntaria y muestreada.
 🔄 Estado vivo:
 Acción actual: C031 consolida Dictado y Blog texto-only en PR330; audio permanece privado, archivo manual y aprobación exacta intactos. Candidata probada localmente, no desplegada.
 Siguiente paso de asistencia: continuar los cinco frentes autorizados sin Remote Desktop Commander ni navegador compartido; centralizar Blog, no crear otro hilo. El corte horario anterior no cancela la orden posterior de continuar.
 Siguiente paso de construcción: resolver compuertas completas de la candidata en CI sin omitir prebuild; verificar migraciones y despliegue por vía autorizada; reconciliar capturas reales solo con acceso del propietario; configurar Meta legítimamente y obtener consentimiento exacto antes de publicar.
-Pendientes: normativa401 sin reparación acreditada; Meta app/token/permisos ausentes; Vercel acceso administrativo parcial; build completo/revisión humana/producción no acreditados. Exclusión global de importadores y cobertura nativa verbatim incompletas. No promesa de cero pérdida ni plazo artificial.
+Pendientes: normativa401 sin reparación acreditada; Meta app/token/permisos ausentes; Vercel rechaza despliegue Git desde organización privada en Hobby; lectura de checks GitHub403; build completo/revisión humana/producción no acreditados. Exclusión global de importadores y cobertura nativa verbatim incompletas. No promesa de cero pérdida ni plazo artificial.
 ⚗️ En prueba / recién fallido:
 C031: 33 unitarias Blog/custodia, 12 Ingreso, 13 formato con generador Python real, un escenario PostgreSQL, 23 aserciones HTTP editorial, tres escenarios archivo, dos parada/reintento, retención IndexedDB, títulos y exclusión del grafo pasan en banco. Tipos núcleo estrictos y sintaxis pasan; auth/normativa/proveedores externos son fixtures.
 Build Next completo, migración productiva, capturas reales y publicación doble NO VERIFICADOS. No se alteran secretos, protecciones ni juicios humanos para superar un bloqueo.
+Readback remoto exacto del canon en19b3966 aprobado. Estado Vercel failure observado en ese SHA: Cannot deploy from a private GitHub organization repository on the Hobby plan. Checks API403 Resource not accessible by personal access token; no resultado de Actions inventado.
 Conserva íntegros los recordatorios latentes del objeto. Reutiliza evidencia válida, no repitas pruebas sin cambio causal. Recibir una salida del constructor tiene prioridad; asistencia la contrasta y devuelve síntesis y prompt de continuidad. No afirmar recepción ni trabajo en segundo plano.
 Cada salida usa los diez campos de §10 e incluye Metacanon adquirido: versión/sello, revisión y frescura; evidencia actual/histórica/controlada diferenciada, pendientes, viabilidad, estimación con supuestos y siguiente acción. No declarar un plazo sin base.
 Persistencia por ciclo: este objeto es el elemento principal del sprint completo, no solo del chat. Releer versión y método, incorporar instrucciones, decisiones, crónica y evidencia; fusionar sin pisar, guardar, verificar contenido/diff y sincronizar estado/prompts. Si falta acceso, declarar sincronización pendiente y entregar el delta. Conservar originales e historia; no dar por recuperadas fuentes citadas ni por aceptado lo solo publicado.
@@ -549,11 +558,11 @@ Persistencia por ciclo: este objeto es el elemento principal del sprint completo
 
 ## 13. Persistencia y revisión
 
-- C031 consolidación v0.6.16: mismas tres copias literales de estado/pruebas; anexo histórico idéntico; manifest actualizado. Escritura privada en rama no acredita merge, deploy ni historia nativa íntegra. Readback remoto obligatorio.
+- C031 consolidación v0.6.17: mismas tres copias literales de estado/pruebas; anexo histórico idéntico; manifest actualizado. Escritura privada en rama no acredita merge, deploy ni historia nativa íntegra. Readback remoto obligatorio.
 
 - C031: versión0.6.14; metacanon1.6 adquirido. Estado literal en §8 y ambos prompts, anexo histórico inalterado, originales disponibles y evidencias anexadas. Lectura Git posterior obligatoria; no afirmar custodia completa del chat ni resultado productivo.
 
-- C030 cierre documental: v0.6.16, release main f0dfbdc/READY/alias/versión y límites documentados; recibo, estados literales y manifiesto sincronizados. Esta escritura posterior conserva el release probado, no inventa otro build ni aceptación.
+- C030 cierre documental: v0.6.17, release main f0dfbdc/READY/alias/versión y límites documentados; recibo, estados literales y manifiesto sincronizados. Esta escritura posterior conserva el release probado, no inventa otro build ni aceptación.
 
 - C030: mismo objeto y carpeta, instrucciones nuevas literales, pruebas portables y registro central actualizado. Commit funcional b36231 y prebuild 06c36c; preview READY acreditado. Producción nueva pendiente; readback antes de integración.
 
