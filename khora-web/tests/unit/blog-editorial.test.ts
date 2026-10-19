@@ -40,3 +40,5 @@ test('Meta discovery bounded cursor loop',async()=>{let n=0;const f=(async()=>{n
 test("source classification not trusted from public client",()=>assert.throws(()=>approve(fixture(),"owner",{...source,kind:"conversacion_maya"},now),/SOURCE_NOT_BLOG/));
 
 test('provider objects never serialize credentials',()=>{assert(!JSON.stringify(new GitHubBlog('synthetic-secret')).includes('synthetic-secret'));assert(!JSON.stringify(new MetaPage('synthetic-secret','61595788700651')).includes('synthetic-secret'));});
+
+test('session adapter supplies neither external cycle identifier (official random turn)',async()=>{const {readFile}=await import('node:fs/promises');const route=await readFile(new URL('../../app/api/blog/editorial/route.ts',import.meta.url),'utf8');assert.match(route,/openNormativeTurn\(actor,\{runtime:/);assert(!route.includes("conversation_id:'blog-editorial-session'"));});

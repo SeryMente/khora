@@ -22,7 +22,7 @@ export async function POST(req:Request){
  if(body.action==='open_turn'){
   try{
    assertNormativeRuntimeContext({platform:REQUIRED_PLATFORM,reasoning_mode:body._thinking_mode,output_format_version:body._output_format_version});
-   const turn=await openNormativeTurn(actor,{conversation_id:'blog-editorial-session',runtime:{platform:REQUIRED_PLATFORM,reasoning_mode:body._thinking_mode as ReasoningMode,output_format_version:REQUIRED_OUTPUT_FORMAT_VERSION}});
+   const turn=await openNormativeTurn(actor,{runtime:{platform:REQUIRED_PLATFORM,reasoning_mode:body._thinking_mode as ReasoningMode,output_format_version:REQUIRED_OUTPUT_FORMAT_VERSION}});
    return NextResponse.json(turn,{headers:{'Cache-Control':'no-store'}});
   }catch{return NextResponse.json({code:'NORMATIVE_TURN_UNAVAILABLE'},{status:503});}
  }
