@@ -6,9 +6,9 @@ La candidata incluye:
 - Títulos automáticos sucesivos y luz única basada en comprobaciones.
 - Tipos de entrada, exclusión de interpretación en las rutas revisadas y preparación literal del texto para Blog/Facebook, siempre con vista previa y consentimiento.[^https://github.com/SeryMente/khora/blob/19b3966b6cdefc6edebea7d18e8e88acf102356b/docs/frentes/dictado-voz/evidencias/C031-consolidacion.json]
 
-**Bloqueos comprobados:** Vercel rechaza el repositorio privado de organización en Hobby; GitHub deniega leer los checks. Siguen sin acreditarse la reparación del acceso normativo ni la configuración oficial de Meta. No cambié planes, permisos, credenciales ni visibilidad para forzarlo.[^https://github.com/SeryMente/khora/commit/19b3966b6cdefc6edebea7d18e8e88acf102356b]
+**Bloqueos comprobados:** Vercel rechaza el repositorio privado de organización en Hobby; GitHub deniega leer los checks. Siguen sin acreditarse la reparación del acceso normativo ni la configuración oficial de Meta. No cambié planes, permisos, credenciales ni visibilidad para forzarlo.[^https://github.com/SeryMente/khora/blob/39238a0afd9d7af393e37a67d7c125279fe1a558/docs/frentes/dictado-voz/evidencias/C031-readback-bloqueos.json]
 
-Las pruebas aisladas pasaron; **tus capturas reales no fueron inspeccionadas ni se publicó una entrada**. El código, las evidencias, los bloqueos y la continuidad quedaron conservados; la cobertura verbatim de todo el historial sigue incompleta.
+Las pruebas aisladas pasaron; **tus capturas reales no fueron inspeccionadas ni se publicó una entrada**. El código, las evidencias, los bloqueos y la continuidad quedaron conservados; la cobertura verbatim de todo el historial sigue incompleta.[^https://github.com/SeryMente/khora/blob/39238a0afd9d7af393e37a67d7c125279fe1a558/docs/frentes/dictado-voz/OBJETO-CANONICO.md]
 
 <edit_reference ids="editref_7bF4ea-OjOn3">
 Registrados errores y comprobaciones de la consolidación
@@ -17,7 +17,7 @@ Registrados errores y comprobaciones de la consolidación
 ```text
 /handoff · Dictado y Blog
 Retoma leyendo:
-1. Metaprompt Canónico de Samantha — https://app.notion.com/p/a8c5d4a3b250836a87a301ef94199270 — v330 · NX-330m; la página figura eliminada, no fingir fuente viva.
+1. <mention url="https://app.notion.com/p/a8c5d4a3b250836a87a301ef94199270">Metaprompt Canónico de Samantha</mention> — v330 · NX-330m; la página figura eliminada, no fingir fuente viva.
 2. Objeto canónico — https://github.com/SeryMente/khora/blob/feat/ingreso-autobiografico-20261019/docs/frentes/dictado-voz/OBJETO-CANONICO.md — MCP-OBS-DICTADO-v0.6.17. Carga también su metacanon central y respeta sus compuertas.
 
 🔄 Estado vivo:
