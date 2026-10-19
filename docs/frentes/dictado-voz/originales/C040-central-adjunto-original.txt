@@ -1,0 +1,330 @@
+
+Notion AI · 2:38 PM
+/handoff · Khora · Central Ingreso/Dictado y coordinación Blog
+
+Retoma como SamanthaL, hilo CENTRALIZANTE y constructor de Ingreso. Hereda integración, luces, custodia, recuperación, títulos y coordinación con el nuevo constructor Blog. El operador ordenó migrar ambos hilos por agotamiento de uso; NO reiniciar el proyecto ni volver a diseñarlo desde cero.
+
+Lee, en este orden:
+1. Metaprompt Canónico de Samantha:
+https://app.notion.com/p/c85a41878241830588e181f4c02fbab4
+Referencia al corte: v330 · NX-330m. Comprueba la fuente viva.
+2. Metacanon:
+https://github.com/SeryMente/metodologia/blob/main/METACANON-OBJETOS-CANONICOS.md
+Referencia: v1.6 · METACANON-OBJETOS-v1.6.
+3. Objeto canónico CENTRAL:
+https://github.com/SeryMente/khora/blob/feat/ingreso-autobiografico-20261019/docs/frentes/dictado-voz/OBJETO-CANONICO.md
+Corte verificado: MCP-OBS-DICTADO-v0.6.21, commit documental bfa0c2702034015ee3327611678d5286bc219f62. Lee sus13secciones, recordatorios latentes y crónica C035. Recupera fuentes originales C032/C035 y evidencias pertinentes.
+4. Prompt completo persistido:
+https://github.com/SeryMente/khora/blob/bfa0c2702034015ee3327611678d5286bc219f62/docs/frentes/dictado-voz/originales/C035-prompt-migracion-central.txt
+5. Canon BLOG:
+https://github.com/SeryMente/metodologia/blob/docs/blog-editorial-sync-20261019/frentes/blog-personal/OBJETO-CANONICO.md
+
+Estado al cierre de este ciclo:
+C035 · MIGRACIÓN SOLICITADA POR OPERADOR AL 98% DE USO. Nuevo hilo hereda SamanthaL centralizante y construcción de Ingreso, coordinación con nuevo hilo Blog, luces, custodia, recuperación y títulos. No reiniciar el proyecto. Hito correcto: seleccionar Blog personal y usar molde orientador EN INGRESO antes/durante dictado → transcripción generada en Khora → Archivar registro manual → previa exacta y decisión conjunta → GitHub Blog → Facebook, sin publicar audio. Escribir/pegar en /sistema/blog NO sustituye este recorrido.
+Código central integrado c0dcb2e26f9df31273bbf654ffc52222a7d9d887, rama feat/ingreso-autobiografico-20261019; entrega Blog3fcfe4c integrada, siete blobs cotejados. Nueva preview dpl_jLTALH6xrtcDqoKNd5Tc3B927TfB ERROR lint_or_type_error, no READY ni producción. Blog reportó TS2339 reproducible en test44 y corrección mínima no aplicada. Siguiente paso: registrar nuevos hilos/roles, reproducir y corregir ese test con configuración global, verificar molde/captura y consumidor existentes antes de añadir código, probar recorrido real y desplegar candidata exacta. No recapturar una transcripción ya archivada.
+Pendientes materiales: revisión presencial de interfaz, normativa y proveedores reales, nota exacta aprobada y automatización efectiva. No publicación real acreditada. Luces/recuperación/títulos conservan su trabajo y pendientes históricos. No más implementación en el hilo saliente: corte de documentación y migración por orden actual.
+
+⚗️ En prueba / recién fallido:
+C035 central:99/99 unit sin skip,27 comprobaciones React/Chromium/WebCrypto con HTTP/auth/recibos sintéticos,12 gateseditorial+12gatesdispatch aislados; tipos5.9.3 núcleo+JSX exit0 EXCLUYERON testglobal. No equivalen a publicación ni buildcompleto.
+Vercel nueva candidataERROR; logs403específico. Blog halló TS2339 test44 por estrechamiento assert.equal(next.preview,null); propuesta const initialPreview=next.preview;assert.equal(initialPreview,null); reproduce1error→0 en su banco ES2017, no aplicada ni verificada central. No asumir única causa.
+
+Siguiente paso: registrar nuevos hilos/roles, reproducir y corregir ese test con configuración global, verificar molde/captura y consumidor existentes antes de añadir código, probar recorrido real y desplegar candidata exacta.
+
+Conserva todos los recordatorios latentes del objeto. El molde orienta el dictado, no obliga a llenar un formulario ni inventa datos faltantes. La captura existente produce transcripción y recibo; revisa IngresoWorkspace y PublicacionCapturaPendiente antes de construir otra integración.
+
+Central consolida; Blog conserva su alcance y objeto propio. Identifica la NUEVA sesión Blog cuando esté disponible; no envíes trabajo a las sesiones antiguas ni inventes identificadores. Un escritor por archivo.
+
+El expediente Git es portable; el sandbox /data antiguo NO se supone compartido. Revalida acceso, rama, main y diferencias antes de escribir. La última consulta GitHub exigió reautenticación después de verificar la documentación central; si persiste, declara el bloqueo y no simules lectura.
+
+No interpretes los403de logs como incapacidad general de Vercel: crear y consultar despliegues sí funcionó. No cambiar planes, desproteger ni copiar secretos a preview. No fusionar ni promover sin compuertas aplicables. Publicación requiere aprobación del texto exacto para ambos destinos; un No conserva Custodia sin publicar. Actualiza el mismo objeto y manifiesto por ciclo. Retoma el checkpoint; no vuelvas a emitir un handoff salvo petición.
+2:38 PM
+Retomo como SamanthaL, centralizando Ingreso y la coordinación con Blog, sin reiniciar el diseño ni emitir otro handoff.
+
+La página de metaprompt enlazada no es accesible; la fuente cargada en esta sesión es v332 · NX-332m, posterior al corte citado. Continúo verificando el expediente Git; no daré por compartido el sandbox anterior ni por resuelto el fallo del despliegue.
+
+Worked for 1m 53s
+A que te refiers con que no es accesible
+2:40 PM
+Me refiero solo al enlace del metaprompt incluido en el handoff, no al proyecto ni a GitHub.
+
+Al intentar abrir esa página, Notion respondió: «No se encontró la página; ninguna página con ese identificador es accesible en este workspace». Eso no permite distinguir si fue eliminada, movida a otro espacio o si faltan permisos; no voy a asumir la causa.
+
+Sí tengo cargado tu 🧬Metaprompt Canónico de Samantha · Workspace v332 · NX-332m​, v332 · NX-332m. El enlace del handoff apuntaba a otra página, citada como v330.⁠
+⁠
+
+GitHub sí respondió: recuperé el metacanon, el objeto central y el canon Blog. Ese enlace antiguo no bloquea la recuperación del proyecto.
+
+Metacanon adquirido: v1.6 · METACANON-OBJETOS-v1.6, comprobado en a466b6b.
+
+2:40 PM
+Ah ok, todo lisot? Mandale un mensaje al hilo blog 2, para que se ponga en sintonia, ya necesito termianr este update. 
+2:40 PM
+Worked for 25s
+Ya le envié el mensaje a Blog 2 con el checkpoint, el objetivo y el reparto de archivos. La herramienta confirmó que quedó en ejecución; aún no tengo su respuesta.
+
+Todavía no está listo el update. Central conserva la corrección del test y la verificación de compilación; Blog revisa el consumidor de la transcripción existente, sin duplicar captura ni rediseñar. Después falta comprobar el recorrido desde Ingreso y la candidata desplegada. No se publicará texto sin tu aprobación exacta.
+
+Tiempo de cierre: aún no estimable hasta verificar la compilación y los bloqueos reales de publicación.
+
+Metacanon adquirido: v1.6 · METACANON-OBJETOS-v1.6.
+
+2:41 PM
+REsuelve de extremo a extremo, ya sin excusas. 
+2:41 PM
+Retomar ejecución central desde fuentes recuperadas
+Voy a ejecutar la corrección, comprobar el recorrido desde Ingreso y desplegar la candidata exacta. Blog 2 seguirá su alcance sin tocar los archivos centrales. No daré el update por cerrado solo porque compile, ni confundiré tu orden de terminar con aprobación de un texto público aún no revisado.
+
+Worked for 5m 21s
+El error de tipos ya está reproducido y corregido en la copia aislada: la prueba causal pasa de un error a cero, y las 23 pruebas de regresión pasan sin omisiones.
+
+También confirmé un hueco del recorrido: Ingreso ya conserva transcripción, intención y recibo, pero su selector no muestra el molde orientador. La pantalla manual del Blog no lo sustituye. Estoy separando ese pendiente de interfaz de la corrección de compilación; no lo daré por resuelto con pruebas de otra pantalla.
+
+Worked for 56s
+La corrección ya está guardada en Git y Vercel está compilando esa revisión exacta.
+
+Para cerrar el cambio visual sin rediseñar Ingreso, propongo mostrar al seleccionar Blog personal estas cinco guías opcionales, visibles antes y durante el dictado: qué registrar; cuándo y con qué certeza; qué ocurrió y en qué contexto; cómo lo viviste y qué significa; qué continúa. Sin campos obligatorios, sin completar datos por ti y sin alterar el dictado ni el archivo manual.
+
+¿Apruebas ese bloque tal cual? Mientras respondes, continúo con las verificaciones independientes.
+
+Worked for 1m 57s
+Termina lo más rápido posible de actualizar y publicar en Vercel. Cuando ya termines y que yo pueda revisar la actualización. Claro, el molde es parte de la interfaz especializada para tomar con suficiencia, suficiencia es la palabra clave aquí, una entrada autobiográfica. Necesito verificar la interfaz de usuario básica. Ahora, otra condición es que suficiente es suficiente, pero no me va a limitar para yo decir lo que yo quiera decir. Entonces, en el GitHub y en el Facebook va a aparecer nada más, si la entrada es muy grande, debe de aparecer un resumen. para que siempre las entradas tengan el mismo tamaño, el mismo tamaño, el mismo tamaño y las personas si es que lo leen se acostumbren a leer algo del mismo tamaño, ¿de acuerdo? Eso significa que se va a utilizar la llave Grok para procesar el resumen con un criterio adecuado. Pero esto déjalo para la versión siguiente. Por ahora, la secuencia es hacer eso y luego actualizar los cánones y luego prepararnos para esa actualización.
+2:51 PM
+Entendido: cierro esta versión con el molde de suficiencia en Ingreso, sin limitar lo que puedas dictar, y la despliego para que revises la interfaz básica. Después actualizo los cánones.
+
+El resumen mediante Groq y la extensión uniforme para GitHub y Facebook quedan para la versión siguiente; no los implementaré ahora.
+
+Worked for 8m 4s
+La nueva candidata del molde ya está READY en Vercel. Las cinco guías están incorporadas, y pasaron las comprobaciones de escritorio y móvil, incluida la conservación de un relato libre de 7.680 caracteres sin exigir respuestas al molde.
+
+Estoy terminando la custodia y la actualización del canon. El resumen y el tamaño uniforme siguen fuera de esta entrega.
+
+Worked for 2m 23s
+La candidata con el molde ya está desplegada en Vercel y está READY para tu revisión.⁠
+
+⁠
+
+Abrir Ingreso actualizado
+
+Selecciona «Nota autobiográfica · blog personal». Verás las cinco guías de suficiencia antes y durante el dictado, sin campos obligatorios ni restricciones nuevas sobre tu relato. «Archivar registro» sigue siendo manual.⁠
+
+⁠
+
+Es una preview protegida, no el dominio habitual de producción; puede pedir tu sesión de Vercel. No desactivé protecciones ni publiqué ninguna nota en redes.
+
+Canon central actualizado a v0.6.22 y Blog coordinado en v12. El resumen mediante Groq y la extensión uniforme quedaron documentados para la versión siguiente, sin implementarlos ahora.⁠
+
+⁠⁠
+
+⁠
+
+El siguiente hito es tu revisión de la interfaz; no añado más alcance a esta entrega. Metacanon adquirido: v1.6 · METACANON-OBJETOS-v1.6.
+
+Registrados y corregidos los fallos del banco de pruebas
+3:02 PM
+No, pero ¿por qué candidata? O sea, eso no quedó bien. Necesitaba, para empezar, no cargó porque me dio error de servidor. La necesito publicar en el URL canónico de producción.
+Server error
+There is a problem with the server configuration.
+Check the server logs for more information.
+3:03 PM
+Reviewing migration processes
+Tienes razón: te entregué una preview cuando necesitabas el dominio canónico de producción, y que estuviera READY no probaba que pudieras abrir la aplicación. Fue un cierre incorrecto.
+
+Voy a comprobar el error de servidor y publicar la revisión correcta en https://khora-web.vercel.app, con verificación del dominio y de la respuesta de la aplicación, no solo del build.
+
+Worked for 53s
+Primero entrégame la URL y después haces todo lo demás, documentación, etcétera, porque urge.
+3:04 PM
+URL canónica: Abrir Ingreso en producción
+
+Ese es el enlace que debes usar. La actualización nueva aún no está confirmada allí; ahora hago la publicación y la verificación. La documentación queda después.
+
+Worked for 2m 49s
+Ya está publicada en producción: abrir Ingreso.
+
+Verifiqué que el dominio canónico sirve la revisión nueva y que, sin sesión, lleva al inicio de sesión normal, sin el error de configuración. Falta tu revisión dentro de la aplicación con tu sesión. Ahora actualizo la documentación; el resumen de longitud uniforme queda para la siguiente versión.⁠
+
+⁠
+
+Worked for 2m 4s
+Ya puedes abrir la actualización en producción:
+
+Abrir Ingreso
+El dominio canónico sirve la revisión nueva. Sin sesión, muestra el acceso normal, sin el error de configuración; queda pendiente tu revisión dentro de la aplicación.⁠
+
+⁠
+
+La documentación quedó actualizada y Blog 2 avisado. El resumen de extensión uniforme sigue reservado para la siguiente versión.
+
+3:10 PM
+Fíjate lo que te voy a decir, vamos a concentrarnos en la nota autobiográfica blog personal. Busca una forma de denominarla más simplificada. y luego, esta parte va a ser un poquito difícil, pero sí quiero, o sea, no nada más quiero que sea como tipo, seleccionar el tipo de entrada de ese tipo y con la guía, ¿no? O sea, de hecho, no quiero la guía, lo que quiero es que automáticamente o directamente en cuanto seleccione el tipo de entrada, me permita apretar el botón Iniciar dictado, que ya está ahí, pero sin tener que leer todo lo que dice. Una entrada autobiográfica suficiente, estas guías orientan tu dictado, no son campos obligatorios. Todo eso déjalo como un tooltip escondido, o sea, porque si no, se ve muy engorroso. y lo que necesitamos hacer es algo más inteligente y cómodo. La palabra clave aquí es cómodo. Repito, la palabra clave aquí es cómodo, ¿sí? Entonces, yo empiezo a dictar, y debe haber algunos elementos visuales en pantalla que conforme yo voy dictando y conforme se está analizando en vivo la transcripción y el contenido del dictado, algunos elementos tipo checklist empiecen a desaparecer. Por ejemplo, la fecha, el lugar, ¿de acuerdo? Y así sucesivamente para dar cumplimiento a los elementos suficientes, mínimos, para una entrada autobiográfica suficiente. Vamos a trabajar con los mínimos, porque como todavía no tengo el estándar para la línea autobiográfica forense, nada más los mínimos de cara a lo que vamos a publicar al blog. Si te acuerdas lo que te dije que era necesario para el blog y por qué era necesario, por la identidad, motivos políticos y todo eso, van a ser entradas de tipo, o estoy haciendo esto, o estoy en este lugar, estoy trabajando en esto. Es una crónica, ¿de acuerdo? Es una crónica y por eso te lo digo para que pienses cuáles van a ser los elementos suficientes. Me queda un minuto para darte instrucciones. Coordínate con blog2 para hacer realidad de manera más robusta esta parte. Vuelvo como en 20 minutos y procura entregarme un hito publicado en el URL de producción, algo más pulido que esto, en los términos de lo que te acabo de decir. es muy importante que sí cumplas con las especificaciones que te estoy pidiendo y me des algo pulido, pulido, ¿de acuerdo? Nos vemos en un rato. Adiós.
+3:12 PM
+Worked for 23s
+Voy a llamarla «Crónica personal». El dictado quedará a la vista, sin el bloque explicativo; la ayuda estará escondida y los pendientes discretos desaparecerán conforme el relato los cubra, sin obligarte a completarlos ni limitar lo que quieras decir.
+
+Me coordino con Blog 2 para trabajar los mínimos de una crónica pública —no un estándar forense— y publicar el hito en el mismo dominio de producción. Objetivo: dejarlo revisable durante estos veinte minutos. NX-332m.
+
+Worked for 4s
+Y no te detengas hasta terminar por nada del mundo. Adiós.
+3:13 PM
+Worked for 10m 33s
+La pantalla ya está más despejada: Crónica personal, botón de dictado visible y ayuda bajo el icono de información. Las tres pistas —momento, lugar y qué haces— se retiran al detectar menciones y reaparecen si borras el texto; no bloquean el archivo.
+
+Pasaron las pruebas locales de detección, interacción y tipos, y revisé las vistas móviles y de escritorio. Ahora publico esta revisión en producción; después comprobaré el dominio canónico.
+
+Worked for 4m 3s
+Ya está publicada: abrir Crónica personal en producción.
+
+Comprobé que el dominio canónico sirve la revisión nueva y que el acceso sin sesión funciona sin el error de configuración. Puedes seleccionar Crónica personal y empezar a dictar sin abrir la ayuda; las pistas reaccionan al texto sin exigir completarlas.⁠
+
+⁠
+
+Cierro ahora la documentación y el aviso a Blog 2. La prueba con tu micrófono y tu sesión queda para tu revisión.
+
+Worked for 1m 14s
+Crónica personal ya está en producción
+Verifiqué que el dominio canónico sirve la actualización nueva.⁠
+
+⁠
+
+Nombre simplificado: «Crónica personal».
+Dictado directo: seleccionas el tipo y pulsas Iniciar dictado, sin leer instrucciones.
+Ayuda escondida: disponible bajo el icono de información.
+Pistas discretas: momento, lugar y qué haces desaparecen al detectar menciones en la transcripción; reaparecen si borras ese contenido. No obligan a completar nada ni bloquean el archivo.⁠
+
+⁠
+Pasaron 66 pruebas unitarias y 31 comprobaciones de interacción; revisé móvil y escritorio. La detección es local y orientativa, no verificación de hechos. Tu sesión y micrófono reales quedan para tu revisión.⁠
+
+⁠
+
+Blog 2 quedó coordinado y el canon actualizado. El resumen uniforme sigue reservado para la siguiente versión.
+
+Metacanon adquirido: 1.6 · METACANON-OBJETOS-v1.6.
+
+Registré y verifiqué las correcciones del banco de pruebas
+Bueno, te sigo pasando retroalimentación. Las pistas opcionales no son opcionales si ya se seleccionó el tipo de entrada crónica personal, se vuelven obligatorias en la versión, en el nivel suficiente que es el que se tiene que alcanzar al menos para esta versión. Más adelante, cuando haya algo más que suficiencia, va a haber algunas opcionales. Dime, para planear esto, bueno, creo que sería mejor si decidiéramos cuál va a ser el cómo se va a ver la entrada estándar tanto en el blog como en Facebook. Hablemos de eso para decidir qué es lo que vamos a incluir en esta parte.
+3:29 PM
+Worked for 14s
+Sí. Corrijo el criterio: al seleccionar Crónica personal, los elementos del nivel suficiente pasan a ser obligatorios, no pistas opcionales. Lo que debemos decidir ahora es qué necesita contener la publicación para considerarla suficiente; después ajustamos la captura a ese resultado. No cambio código todavía.
+
+El propósito documentado es dejar constancia cotidiana de tu vida y construir una representación propia, bajo tu control, no solo alojada en Facebook. Eso favorece una crónica concreta y reconocible, sin convertir cada entrada en un expediente forense.⁠
+
+⁠
+
+Mi propuesta: una misma crónica en ambos destinos
+El blog sería el archivo principal; Facebook mostraría la misma crónica completa y un enlace a su versión en el blog. No un texto distinto ni solamente un anuncio que obligue a salir de Facebook para leerte.
+
+La entrada estándar tendría esta forma:
+
+Título breve y concreto
+Fecha del episodio · Lugar general
+
+Crónica en primera persona: qué estoy haciendo, qué hice o qué me ocurrió, con el contexto indispensable para entenderlo.
+
+Autoría
+
+En Facebook añadiríamos al final el enlace al blog. Es una propuesta para decidir contigo, no un formato ya aprobado.
+
+Qué sería suficiente
+Separaría lo que tú debes aportar de lo que el sistema puede preparar:
+
+Elemento	Mínimo necesario
+Momento del episodio	Cuándo ocurre u ocurrió, con la precisión que realmente conoces. No confundirlo con la fecha de publicación.
+Situación o lugar	Dónde se sitúa la experiencia, a un nivel general pertinente. No exigir domicilio ni ubicación precisa.
+Hecho o actividad propia	Qué estás haciendo, hiciste o viviste. Algo que permita entender qué estás dejando registrado de tu día.
+Título	El sistema lo propone a partir del relato, sin añadir hechos.
+Autoría	La aporta la configuración del blog; no tienes que dictar tu nombre cada vez.
+Así, no exigiría emociones, una enseñanza, una conclusión ni una justificación política en cada entrada. Pueden aparecer cuando formen parte de lo que quieras contar, pero no son indispensables para estas crónicas mínimas.
+
+Y una distinción importante: detectar una mención no equivale a que el elemento esté suficientemente expresado. El checklist actual no puede convertirse en obligatorio simplemente cambiándole la etiqueta.
+
+Sobre el tamaño constante
+Recomiendo fijar una extensión editorial habitual, no una altura visual idéntica: las líneas cambian entre Facebook, el blog y cada pantalla. Los relatos largos se resumirían; los cortos no deberían rellenarse artificialmente.
+
+Primero decidiría esto contigo: ¿quieres que Facebook contenga la misma crónica completa que el blog —mi recomendación—, o prefieres una presentación breve que remita al blog? Esa elección nos permite concretar después la extensión y el contenido obligatorio.
+
+3:31 PM
+Si elegimos, este... Bueno, para cada entrada se va a generar una imagen conforme a algún criterio específico. Más adelante vamos a utilizar MidJourney y las referencias de estilo de MidJourney, pero por ahora utilizaremos el servicio de generación de imágenes de Google con la API gratuita. Creo que hay una API gratuita. No obstante, no considéralo ya en esta versión, pero no lo hagas todavía realidad. Otra cosa que debemos considerar es la inclusión de audios. Por ahora, no consideres, todavía no vamos a hacer realidad la inclusión de audios, pero va a ser obligatoria en siguientes entregas. Lo que quiero ya es hacer realidad el propósito básico que es el que ya sabes, el que me estás... Entonces, está bien. Nada más me pregunto hasta qué punto Facebook tiene, por ejemplo, capacidad de mostrar audio. El audio va a ser prácticamente el contenido principal, la transcripción. El resumen va a ser un acompañante. Cuando, reitero, cuando la entrada sea muy grande, se va a tener que utilizar un criterio muy afinado de mucha calidad para poder reducir una entrada grande a un resumen que sí represente la esencia de cada uno de los puntos de la entrada, así la entrada dure una hora. ¿Me explico? Por eso tenemos que trabajar en ese criterio. Por ahora, de hecho, el contenido va a tener que ser modificado siempre para la parte del contenido de texto. Lo único que pasa crudo hacia las entradas, cuando son entradas de crónica, es el audio, ¿de acuerdo? Pero como te digo, vamos trabajando por hitos que nos den los mínimos viables.
+3:34 PM
+Worked for 21s
+Sí, te explicas. El audio será la pieza principal; el texto será una elaboración editorial que lo acompañe, no una transcripción cruda publicada automáticamente. Y avanzamos por hitos: no activamos ahora ni audio ni generación de imágenes.
+
+Así queda el diseño
+Parte	Función	Alcance ahora
+Texto público	Convertir lo dictado en una crónica legible y fiel. Siempre se trabaja editorialmente, aunque sea breve.	Es el hito inmediato que estamos definiendo.
+Resumen	Representar los puntos sustantivos cuando el relato sea largo, conservando su sentido.	Afinar el criterio antes de automatizarlo.
+Imagen por entrada	Acompañar la crónica con una identidad visual consistente.	Contemplada en el diseño, sin implementarla todavía.
+Audio original	Permitir escuchar tu relato sin reescribirlo ni sustituirlo por una voz generada.	Obligatorio en entregas posteriores, no en la actual.
+Facebook y el audio
+No daría por confirmado que una publicación normal de Página pueda incorporar un archivo de audio con reproductor propio. La vía que sí encontré documentada por Meta es publicar vídeo con audio. Para esa entrega futura, una posibilidad sería acompañar tu grabación con la imagen de la entrada y publicarla como vídeo, conservando el archivo original en el blog. Sería una adaptación de formato, no una edición de tu narración. La lectura directa de esas páginas devolvió un bloqueo de acceso; esta conclusión se apoya en sus extractos oficiales indexados, no en una prueba con nuestra Página.⁠
+
+⁠⁠
+
+⁠
+
+Sobre Google y la gratuidad
+Comprobé la tarifa oficial: los modelos de generación de imágenes consultados figuran sin nivel gratuito de la interfaz de programación. Algunos pueden probarse en Google AI Studio, pero eso no demuestra una cuota gratuita para integrarlos en Khora. Por ahora dejamos Google como proveedor por evaluar, sin activar facturación ni prometer gratuidad.⁠
+
+⁠
+
+El criterio editorial es lo importante ahora
+Propongo que “modificar el texto” signifique mejorar su expresión, nunca modificar lo ocurrido ni lo que sostienes:
+
+Quitar muletillas y repeticiones que no aporten sentido.
+Ordenar y redactar sin añadir hechos, motivos ni conclusiones.
+Conservar diferencias entre experiencia, interpretación, duda e intención.
+Mantener las rectificaciones que cambien el significado.
+En relatos largos, identificar primero todos los puntos sustantivos y comprobar después dónde queda representado cada uno en el resumen.
+Hay una tensión que debemos resolver expresamente: un tamaño rígido no siempre permite representar suficientemente todos los puntos de una hora de relato. No la resolvería eliminando asuntos importantes a escondidas. Mi recomendación es una pieza breve de extensión habitual y, cuando haga falta, un desarrollo editorial ampliado en el blog.
+
+Para el siguiente paso, centrémonos en cómo debe sonar ese texto trabajado: propongo una crónica sobria, en primera persona, concreta y reconocible como tuya, sin tono promocional, sin adornos inventados y sin convertir cada episodio en una moraleja.
+
+3:35 PM
+Bueno, este... Investiga si es posible sustituir los videos una vez publicados por otros actualizados que tengan prácticamente el mismo contenido, pero con algunas mejoras. Eso nos permitiría trabajar de manera progresiva en el contenido que publicamos en el pasado. Las imágenes son también parte de lo que podemos construir más adelante que tengamos más dinero. Todo esto tiene que estar debidamente documentado en el plan de trabajo, ya sea de blog o de dictado. Asegúrate de hacer la separación. Ahorita te lo digo todo a ti porque tú eres el hilo centralizante, pero cada frente de trabajo tiene un objeto canónico que debe registrar de manera, eso sí, exhaustiva. Repito, exhaustiva y repito otra vez, exhaustiva todos los elementos que vayan surgiendo, incluidas las entradas verbatim de lo que yo estoy dictando como instrucción. Este criterio editorial es uno de los elementos que vamos a estar puliendo, así que salvaguárdalo. Me parece que corresponde al área de dictado, más que nada, porque dictado es lo que le va a pasar a blog, lo que tiene que manejar de cara a los activos... perdón, le va a pasar a los activos que están de cara al público. Y sí, una crónica sobria en primera persona, concreta y reconocible como mía, correcto. Mientras más sobria, mejor. Está bien. ¿Qué tan viable es un elemento... ahorita está muy de moda lo que es el deepfake. ¿Puedo hacer un deepfake de mí mismo para lo que viene siendo una imagen, un video de mi propio rostro que yo pueda controlar?
+3:37 PM
+Voy a comprobar dos cosas: si Facebook permite sustituir el vídeo conservando la publicación y qué opciones existen para crear un avatar de tu propio rostro.
+
+También voy a guardar tus instrucciones literales y el criterio editorial aprobado, con responsabilidades separadas: Dictado prepara el contenido; Blog gestiona los activos públicos, su publicación y sus revisiones. Coordinaré el registro con Blog 2 para no dejarlo solo en este chat.
+
+Worked for 7m 18s
+Encontré una vía técnica que merece comprobarse: Meta documenta parámetros para reemplazar un vídeo, pero todavía no he confirmado que conserven la publicación, su enlace y sus interacciones en nuestra Página.
+
+También confirmé que existen servicios para crear un avatar de tu propio rostro y animarlo con tu audio grabado. No hace falta sustituir tu narración por una voz sintética para usar esa modalidad. Mi recomendación es distinguir siempre esa representación de una grabación real del episodio.⁠
+
+⁠⁠
+
+⁠
+
+El criterio y los dictados ya están guardados y cotejados en Dictado; estoy cerrando la custodia separada de Blog 2.
+
+De todos modos, sí necesito que te concentres para que me des una versión de crónica personal que pueda empezar a utilizar ya a partir de ahora y que se pueda empezar a publicar en los blogs. y luego tenemos que revisar interpretación simultánea porque lo necesito para ponerme a trabajar como intérprete. En este momento el problema es que si yo selecciono interpretación simultánea ya no debería elegir escuchar a Chrome, ni organizar como diálogo, porque ya se sabe que voy a utilizar esas funciones. Tampoco incluir micrófono y organizar como diálogo. Es decir, los tipos de entrada deben de ser armonizados junto con la luz indicadora que también quedó como echamos el vapor con la interfaz de usuario actual. La conversación con Maya al seleccionarla también me da escuchar a Chrome, también me da escuchar, organizar como diálogo, también me da incluir micrófono y también debe de abrir en una nueva pestaña el enlace de acceso a Maya directo. Por ahora voy a ponerme a interpretar unas llamadas para ver qué tal funciona el sistema ya tomando llamadas en la plataforma Cloud Interpreter. Estas son mis prioridades. Línea autobiográfica de los blogs y la transcripción para interpretación no es simultánea, es consecutiva, consecutiva, aguas.
+3:46 PM
+Resuelve de extremo a extremo conforme la urgencia, pero resuélvelo todo, de todos modos, de extremo a extremo.
+3:46 PM
+Blog 2
+Blog 2
+Voy a cerrar dos prioridades en este orden: Crónica personal utilizable para preparar y revisar una publicación, e Interpretación consecutiva con la configuración de captura ya resuelta al seleccionarla, sin controles redundantes.
+
+También revisaré el modo Maya y la luz de conservación. No iniciaré grabaciones ni compartiré audio por seleccionar un tipo: se mantendrá el botón de inicio y los permisos del navegador. Coordino con Blog 2 la parte editorial y de publicación mientras trabajo en Ingreso.
+
+Worked for 4s
+Creo que ya te he dado todo lo que necesitas. Si necesitas algo, te detienes. Si no necesitas algo o si no hay un bloqueante verdadero, no te detienes. Nada más me vas entregando sin detenerte los hitos que resuelvas de extremo a extremo al interior de la secuencia más amplia de resolver de extremo a extremo todo lo que ya te di.
+3:47 PM
+Worked for 3m 7s
+Hay un bloqueo real para publicar notas: el servidor rechaza la credencial normativa dedicada. Eso no impide preparar la crónica ni desplegar la interfaz; Blog 2 está trabajando en la revisión editorial mientras yo resuelvo los modos de captura.
+
+La interpretación quedará nombrada consecutiva, con Chrome, micrófono y diálogo preconfigurados. La captura actual transcribe al detener, no en vivo; no voy a presentarla como algo que todavía no hace.
+
+Worked for 5m 36s
+Sí, mira, es importante que resuelvas por urgencia, ¿de acuerdo? y lo más pronto posible. No te quiero interrumpir, pero quiero reforzar esta directriz para que sí quede como se necesita. Entonces, resuelve conforme a la urgencia que ya te he dicho. Si tienes poca claridad respecto a cuál es la jerarquía de urgencia, pregúntamela y te paso retroalimentación adicional. Interpretación consecutiva, como vas a renombrar, no funciona, ¿de acuerdo? No está agarrando ni lo del micrófono ni lo de la pestaña de cromo. Ahora, Signal Interpreter va a ser descontinuada en favor de armonía, que es la extensión de Cora. Signal Interpreter va a ser absorbida por la extensión de Cora para nada más manejar una extensión multiuso que va a servir de apoyo para el sistema Cora en el navegador cromo. Por ahora eso es lo que te puedo adelantar, nada más tómalo en cuenta, pero busca el repositorio Signal Interpreter y, no, nada más tómalo en cuenta. No hagas nada todavía con el repositorio Signal Interpreter y me conformo con que en la interfaz de Cora para el tipo de entrada a interpretación consecutiva sí me des algo que sí capture el diálogo conforme yo hablo y conforme se expresa tanto el LEP, que es el Limited English Proficient, la persona que no habla inglés, mi cliente, que es la persona que habla nada más inglés, y conforme hable yo, que soy el intérprete que hablo inglés-español. Sí revisa mejor el repositorio de Signal Interpreter para ver qué puedes aprovechar revisando de manera exhaustiva lo que hay ahí, pero no lo hagas hasta que ya le toque a eso en la secuencia, por la cuestión de la urgencia que te decía al inicio de esta entrada, y no hagas más de lo que te pido, pero tampoco menos.
+3:58 PM
+Entendido: no basta con renombrarlo. La prioridad sigue siendo cerrar Crónica personal y después corregir la captura de interpretación consecutiva: audio de la pestaña y de tu micrófono, con transcripción durante la conversación.
+
+Registraré Signal Interpreter como futuro alcance de Harmonia, la extensión de Khora. Revisaré ese repositorio cuando llegue el turno de interpretación, sin modificarlo ni adelantar la migración. No intentaré atribuir a cada persona una voz que la pista de audio no permita distinguir.
+
+Worked for 3s
+Creo que ya te he dado todo lo que necesitas. Si necesitas algo, te detienes. Si no necesitas algo o si no hay un bloqueante verdadero, no te detienes. Nada más me vas entregando sin detenerte los hitos que resuelvas de extremo a extremo al interior de la secuencia más amplia de resolver de extremo a extremo todo lo que ya te di.
+3:58 PM
+Worked for 2m 18s
+You’re out of credits for now.
+You’ve used your trial AI allowance and your monthly Notion credits. You can use AI again in 2 hours, or upgrade now to restore Notion AI features.
+4:01 PM

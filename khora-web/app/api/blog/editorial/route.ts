@@ -1,3 +1,4 @@
+import {elaborarCronica} from '@/lib/server/cronica-editorial';
 import {NextResponse} from 'next/server';
 import {auth} from '@/auth';
 import {blogRepository} from '@/lib/server/blog/service';
@@ -40,6 +41,14 @@ export async function POST(req:Request){
  }catch{return NextResponse.json({code:'NORMATIVE_TURN_REQUIRED'},{status:409});}
  try{
   const repo=blogRepository();
+  if(body.action==='elaborate'){
+   const ref=body.reference;
+   if(!ref||typeof ref.sourceId!=='string'||!/^[a-f0-9-]{36}$/.test(ref.sourceId)||!Number.isSafeInteger(ref.sourceVersion)||ref.sourceVersion<1||!/^[a-f0-9]{64}$/.test(ref.sourceHash))return NextResponse.json({code:'CRONICA_REFERENCE_INVALID'},{status:400});
+   const source=await repo.transaction(c=>repo.source(c,actor,ref.sourceId,ref.sourceVersion));
+   if(source.sha256!==ref.sourceHash)throw Error('SOURCE_INTEGRITY');
+   const proposal=await elaborarCronica(source.text,source.sha256,process.env.GROQ_API_KEY||'');
+   return NextResponse.json({proposal},{headers:{'Cache-Control':'no-store'}});
+  }
   if(body.action==='resume')return NextResponse.json(await repo.resume(actor,body.publicationId),{headers:{'Cache-Control':'no-store'}});
   if(body.action==='prepare'){
    const r=body.revision as Revision;const digest=revisionHash(r);
