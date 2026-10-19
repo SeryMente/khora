@@ -3,7 +3,10 @@
  * Plaintext and released identities exist in memory: this does NOT secure a malicious host. */
 import {Encrypter,Decrypter} from 'age-encryption';
 import {createReadStream,createWriteStream} from 'node:fs';
-import {mkdir,link,unlink,chmod} from 'node:fs/promises';
+import {mkdir,link,unlink,chmod,stat} from 'node:fs/promises';
+import {once} from 'node:events';
+import {execFile} from 'node:child_process';
+import {promisify} from 'node:util';
 import {dirname,resolve} from 'node:path';
 import {Readable} from 'node:stream';
 import {pipeline} from 'node:stream/promises';
@@ -32,15 +35,30 @@ export async function remoteStream(raw,{maxBytes=64*1024*1024,timeoutMs=30000}={
   });r.on('timeout',()=>r.destroy(Error('source_timeout')));r.on('error',()=>reject(Error('source_unavailable')));
  });
 }
+const execPrivate=promisify(execFile);
+// Read-only OS ACL verification. Never broadens permissions or changes global policy.
+// SYSTEM/Administrators on Windows have the same host-control caveat as POSIX root.
+const windowsPrivateCheck=`$ErrorActionPreference='Stop'; $sid=[Security.Principal.WindowsIdentity]::GetCurrent().User; $acl=Get-Acl -LiteralPath $env:KHORA_PRIVATE_CIPHER_PATH; if($acl.GetOwner([Security.Principal.SecurityIdentifier]).Value -ne $sid.Value){throw 'owner'}; $trusted=@($sid.Value,'S-1-5-18','S-1-5-32-544'); $rights=0; foreach($r in $acl.GetAccessRules($true,$true,[Security.Principal.SecurityIdentifier])){if($r.AccessControlType -eq [Security.AccessControl.AccessControlType]::Allow){if($trusted -notcontains $r.IdentityReference.Value){throw 'untrusted_allow'}; if($r.IdentityReference.Value -eq $sid.Value){$rights=$rights -bor [int]$r.FileSystemRights}}}; if(($rights -band 3) -ne 3){throw 'owner_read_write'}; Write-Output 'PRIVATE_CIPHER_ACL_VERIFIED'`;
+export async function assertPrivateCipher(file){
+ try{
+  if(process.platform==='win32'){
+   const {stdout}=await execPrivate('powershell.exe',['-NoLogo','-NoProfile','-NonInteractive','-Command',windowsPrivateCheck],{env:{...process.env,KHORA_PRIVATE_CIPHER_PATH:resolve(file)},timeout:15000,maxBuffer:4096,windowsHide:true});
+   if(stdout.trim()!=='PRIVATE_CIPHER_ACL_VERIFIED')throw Error();
+  }else if(((await stat(file)).mode&0o777)!==0o600)throw Error();
+  return true;
+ }catch{throw Error('cipher_permissions_unverified');}
+}
 async function atomicCipher(stream,path){
  const target=resolve(path),temp=target+'.partial-'+randomUUID();await mkdir(dirname(target),{recursive:true,mode:0o700});
- let created=false;
+ let created=false,sink;
  try{
-  const sink=createWriteStream(temp,{flags:'wx',mode:0o600});created=true;
+  sink=createWriteStream(temp,{flags:'wx',mode:0o600});await once(sink,'open');created=true;
+  // Check before writing and promoting, including real Windows ACLs (mode is not an ACL).
+  await assertPrivateCipher(temp);
   await pipeline(Readable.fromWeb(stream),sink);
   // link is create-if-absent; unlike rename, it NEVER overwrites an existing target.
   await link(temp,target);await chmod(target,0o600);
- }finally{if(created)await unlink(temp).catch(()=>{});}
+ }finally{if(sink&&!sink.closed)sink.destroy();if(created)await unlink(temp).catch(()=>{});}
 }
 export class PortableSession {
  #identity;#recipient;

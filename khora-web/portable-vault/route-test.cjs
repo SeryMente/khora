@@ -1,9 +1,9 @@
-const fs=require('node:fs');const path=require('node:path');const crypto=require('node:crypto');const assert=require('node:assert/strict');const {createRequire}=require('node:module');
+const {pathToFileURL}=require('node:url');const fs=require('node:fs');const path=require('node:path');const crypto=require('node:crypto');const assert=require('node:assert/strict');const {createRequire}=require('node:module');
 (async()=>{
  const root=process.env.KHORA_QA_ROOT||path.resolve(__dirname,'..');const requireRoot=createRequire(path.join(root,'package.json'));const esbuild=requireRoot('esbuild');const out=fs.mkdtempSync(path.join(root,'.qa-native-'));
  const definitions={browser:'app/api/seguridad/boveda-portable/route.ts',native:'app/api/oauth/portable-vault/open/route.ts',download:'app/api/seguridad/boveda-portable/cliente/route.ts'};const routes={};
  for(const [name,entry]of Object.entries(definitions)){
-  const file=path.join(out,name+'.mjs');await esbuild.build({entryPoints:[path.join(root,entry)],outfile:file,bundle:true,platform:'node',format:'esm',packages:'external',plugins:[{name:'EXPLICIT_SYNTHETIC_AUTH_ONLY',setup(b){b.onResolve({filter:/(^|\/)auth$/},()=>({path:'auth-fixture',namespace:'fixture'}));b.onLoad({filter:/.*/,namespace:'fixture'},()=>({contents:'export async function auth(){globalThis.__authCalls=(globalThis.__authCalls||0)+1;return globalThis.__syntheticSession??null;}'}));}}]});routes[name]=await import(file);
+  const file=path.join(out,name+'.mjs');await esbuild.build({entryPoints:[path.join(root,entry)],outfile:file,bundle:true,platform:'node',format:'esm',packages:'external',plugins:[{name:'EXPLICIT_SYNTHETIC_AUTH_ONLY',setup(b){b.onResolve({filter:/(^|\/)auth$/},()=>({path:'auth-fixture',namespace:'fixture'}));b.onLoad({filter:/.*/,namespace:'fixture'},()=>({contents:'export async function auth(){globalThis.__authCalls=(globalThis.__authCalls||0)+1;return globalThis.__syntheticSession??null;}'}));}}]});routes[name]=await import(pathToFileURL(file).href);
  }
  const fields=['PORTABLE_VAULT_ENABLED','PORTABLE_VAULT_ALLOWED_SUBJECT','PORTABLE_VAULT_ORIGIN','PORTABLE_VAULT_CUSTODY_KEY_B64','DATABASE_URL'];const saved=Object.fromEntries(fields.map(k=>[k,process.env[k]]));const cwd=process.cwd();const checks=[];const ok=(n,c)=>{assert.ok(c,n);checks.push(n);};
  try{

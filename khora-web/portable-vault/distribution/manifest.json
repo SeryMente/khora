@@ -1,17 +1,17 @@
 {
-  "version": "0.2.0",
-  "sha256": "5813e18003762319dcd7ce50aa49fdc0acae406ba6e71c78bd48a5abf8f02b33",
-  "bytes": 15998,
+  "version": "0.2.1",
+  "sha256": "56e67704834f2554882c72236ea11a310fd0adefbd3d7d211e7d8217bc71596b",
+  "bytes": 16840,
   "files": {
-    "core.mjs": "a0f4f3cb4d941e95848fc8943570a2f333ebce5a2aef8a75365b66b4fa33ea5d",
-    "bridge.mjs": "43cc86baac8b262c2ae5122529ea5d5f9ae87380b48b37b7936d903ba042d821",
-    "client.mjs": "558c50567bfe2a9772c044d4cebf48cdfded2b95e423ef006b33b0bd5d494733",
-    "native-open.mjs": "c77d03f2be62b8627814eebcd2e1705643dc6e4fc301d63655c110dbfdf98210",
-    "cli.mjs": "f08d9b96ffce8d886122b951ad3e809f3f6c2924024722089ce553d1ac17430e",
-    "package.json": "e8be71dbfdeec21fc1982cb2ec4e8aafd14d5c46fcf60d79efa2145a6cf5bca5",
-    "package-lock.json": "7cc78589a8eb360f011c2509b0ff7480e9e1cf33202d40403d40fd5266d2d2cd",
     "LEER-PRIMERO.txt": "a7002bc06ce4b60e1c9d50ecad69531602d3af9976887a83a80bd4102bf12a6c",
-    "iniciar.cmd": "bb4e8bf7ebe4f76d7ec9dbb3a148e6bdf7390ca8f3583a16233f9a5172da8757"
+    "bridge.mjs": "43cc86baac8b262c2ae5122529ea5d5f9ae87380b48b37b7936d903ba042d821",
+    "cli.mjs": "f08d9b96ffce8d886122b951ad3e809f3f6c2924024722089ce553d1ac17430e",
+    "client.mjs": "c36d479a5d02596de19c52d49cf62a49ddff7059d4f2d919bcfdc6bc7869a850",
+    "core.mjs": "a0f4f3cb4d941e95848fc8943570a2f333ebce5a2aef8a75365b66b4fa33ea5d",
+    "iniciar.cmd": "bb4e8bf7ebe4f76d7ec9dbb3a148e6bdf7390ca8f3583a16233f9a5172da8757",
+    "native-open.mjs": "c77d03f2be62b8627814eebcd2e1705643dc6e4fc301d63655c110dbfdf98210",
+    "package-lock.json": "fe1f734695f25db5365d967fd2e763a9349733cf50206dfef6c3a0618979cb8d",
+    "package.json": "ebb874b4f8ccf9d9f03d178f350805386aa56a0e51bb793f0e62551522df573a"
   },
   "signedInstaller": false,
   "requiresNode": ">=22",

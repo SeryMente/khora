@@ -1,0 +1,15 @@
+
+> @khora/portable-vault-candidate@0.2.1 check
+> node --check core.mjs && node --check http.mjs && node --check client.mjs && node --check test.mjs && node --check postgres.mjs && node --check session.mjs && node --check migrate.mjs && node --check bridge.mjs && node --check native-open.mjs && node --check cli.mjs && node --check bridge-test.mjs && node --check browser-test.mjs && node --check route-test.cjs
+
+
+> @khora/portable-vault-candidate@0.2.1 test
+> node test.mjs && node bridge-test.mjs
+
+{"result":"PASSED_SYNTHETIC_CANDIDATE","passed":81,"total":81}
+{"result":"PASSED_SYNTHETIC_BRIDGE_ONLY","passed":34}
+
+> @khora/portable-vault-candidate@0.2.1 test:routes
+> node route-test.cjs
+
+{"result":"PASSED_ROUTE_AND_DISTRIBUTION_FIXTURE","passed":14}

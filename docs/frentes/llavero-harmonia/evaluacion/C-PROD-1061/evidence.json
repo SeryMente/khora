@@ -1,0 +1,37 @@
+{
+  "cycle": "C-PROD-1061",
+  "baseBranchCommit": "cfa028f19f57796841da911b37b244dc2d035ded",
+  "methodCommit": "a466b6b46f266de6a6ccd656e071eb7a07dc0e10",
+  "receipt1061": {
+    "scope": "metadata only; raw output not archived because contains unrelated config prefixes",
+    "oidcProduction": true,
+    "portableVaultKeysPresent": false,
+    "databaseSchemaChecked": false
+  },
+  "receipt1099": {
+    "pid": 13724,
+    "syntaxExit": 0,
+    "nextStage": "private-core-bridge",
+    "terminalResult": "NOT_VERIFIED"
+  },
+  "receipt1118": {
+    "tool": "get_tool_result",
+    "callId": "11536f92-3e95-4020-86d7-521ee4fe62d9",
+    "status": "failed",
+    "error": "Timeout - no response from device",
+    "retryOriginal": false
+  },
+  "linuxFinal": {
+    "receipt": 1123,
+    "exit": 0,
+    "core": 81,
+    "bridge": 34,
+    "routes": 14
+  },
+  "productionChanged": false,
+  "realEnte": false,
+  "realSession": false,
+  "historicalVerbatimComplete": false,
+  "encoding": "UTF-8; LF; originals add terminal LF, no invented message timestamp",
+  "omissions": "Intermediate compacted messages not recreated; auth links/codes/secrets excluded. Final text prepared separately for exact readback."
+}

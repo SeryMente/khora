@@ -5,6 +5,7 @@ import {randomBytes} from 'node:crypto';
 import {mkdtemp,readFile,writeFile,cp,readdir,rm,stat} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
+import {fileURLToPath} from 'node:url';
 import {Readable} from 'node:stream';
 import {createServer} from 'node:http';
 import {VaultService,PGliteStore,VaultError,hash} from './core.mjs';
@@ -12,7 +13,7 @@ import {createHandler} from './http.mjs';
 import {candidateRuntime,postgresConfig} from './postgres.mjs';
 import {principalFromVerifiedSession} from './session.mjs';
 import {spawnSync} from 'node:child_process';
-import {PortableSession,publicAddress,sourceURL} from './client.mjs';
+import {PortableSession,publicAddress,sourceURL,assertPrivateCipher} from './client.mjs';
 const evidence={scope:'SYNTHETIC_CANDIDATE_ONLY',started:new Date().toISOString(),productionChanged:false,userCorpusRead:false,realEnteRegistered:false,tests:[],limitations:[
  'Native Khora route prepared but not activated/deployed; live session binding, hosted Postgres/TLS, Ente enrollment and desktop delivery NOT VERIFIED',
  'PGlite executes real embedded PostgreSQL, but does not validate hosted multi-process pg Pool concurrency',
@@ -40,7 +41,7 @@ try{
  const sp=principalFromVerifiedSession(goodSession,'authjs.session-token=synthetic; other=ignored',clock);
  check('verified_session_normalized_and_bound',sp.subject==='synthetic@example.invalid'&&sp.binding.length===64);
  check('different_verified_session_has_different_binding',sp.binding!==principalFromVerifiedSession(goodSession,'authjs.session-token=different',clock).binding);
- const migration=spawnSync(process.execPath,[new URL('./migrate.mjs',import.meta.url).pathname],{encoding:'utf8',env:{PATH:process.env.PATH}});
+ const migration=spawnSync(process.execPath,[fileURLToPath(new URL('./migrate.mjs',import.meta.url))],{encoding:'utf8',env:{PATH:process.env.PATH}});
  check('migration_not_implicit_or_enabled_by_default',migration.status===1&&migration.stderr.trim()==='SAFE_STOP: migration_not_authorized');
  await rejects('runtime_requires_trusted_session_adapter',()=>candidateRuntime({env:{}}),'trusted_session_adapter_required');
  check('postgres_adapter_requires_verified_tls',postgresConfig('postgresql://synthetic:synthetic@db.invalid/synthetic?sslmode=no-verify').ssl.rejectUnauthorized===true);
@@ -112,7 +113,13 @@ try{
  check('download_stream_hash_matches_source',provenance.sha256===hash(source)&&provenance.bytes===Buffer.byteLength(source));
  const cipherBytes=await readFile(cipher);
  check('disk_holds_age_ciphertext_not_source',cipherBytes.subarray(0,22).toString().startsWith('age-encryption.org/v1')&&!cipherBytes.includes(Buffer.from(source)));
- check('cipher_file_is_private_posix',(await stat(cipher)).mode%512===384);
+ check('cipher_file_is_private_for_current_platform',await assertPrivateCipher(cipher));
+ const permissionProbe=join(dir,'synthetic-permissions-probe.age');await writeFile(permissionProbe,'SYNTHETIC ACL PROBE',{mode:0o644});
+ if(process.platform==='win32'){
+  const ps=spawnSync('powershell.exe',['-NoLogo','-NoProfile','-NonInteractive','-Command',"$ErrorActionPreference='Stop'; $a=Get-Acl -LiteralPath $env:KHORA_PERMISSION_PROBE; $sid=New-Object Security.Principal.SecurityIdentifier('S-1-5-32-545'); $r=New-Object Security.AccessControl.FileSystemAccessRule($sid,[Security.AccessControl.FileSystemRights]::Read,[Security.AccessControl.AccessControlType]::Allow); $a.AddAccessRule($r); Set-Acl -LiteralPath $env:KHORA_PERMISSION_PROBE -AclObject $a"],{env:{...process.env,KHORA_PERMISSION_PROBE:permissionProbe},encoding:'utf8'});
+  if(ps.status!==0)throw Error('synthetic_acl_fixture_failed');
+ }
+ await rejects('untrusted_cipher_permissions_rejected',()=>assertPrivateCipher(permissionProbe),'cipher_permissions_unverified');
  const summary=await session.analyzeText(cipher,report,{provenance});
  check('analysis_runs_locally_and_is_bounded',summary.candidates===1&&summary.lines===3);
  const analysis=await session.readReport(report);

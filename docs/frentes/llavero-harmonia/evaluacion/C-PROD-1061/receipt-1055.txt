@@ -1,0 +1,160 @@
+Process started with PID 2620 (shell: powershell)
+Initial output:
+VALIDATION_STATUS_JSON={"sourceCommit":"2e48e7b8512a77df56807e0a24fd6dbba25a4866","platform":"win32","node":"v24.22.0","scope":"isolated source copy, synthetic only; no deploy/production/hosted DB/real factors","stages":{"install-web":{"exit":0,"signal":null,"error":null,"seconds":22},"install-portable":{"exit":0,"signal":null,"error":null,"seconds":1},"full-prebuild-and-build":{"exit":0,"signal":null,"error":null,"seconds":71},"portable-check":{"exit":0,"signal":null,"error":null,"seconds":1},"portable-core-bridge":{"exit":1,"signal":null,"error":null,"seconds":0}},"canonicalBlob":"232590a1f6339e2517e67038e1b5f7e8bd1638e3","archiveSha256":"06ad1e1d02c8ec8953c8607902139ec814c335bbf4b384d41ac87072ec9a7307","contractComparison":"MATCH, authenticated CLI response","state":"BLOCKED","blocker":"validation_failed:portable-core-bridge"}
+FULL_GATE_RECEIPT
+[unit-runner] status=0 signal=null
+EXPERIENCE_STORAGE_PREFLIGHT=not_requested
+�o" Compiled successfully in 25.4s
+  Finished TypeScript in 9.0s ...
+PREVIEW_SMOKE_JSON={
+  "deployment": "dpl_6J89AHDSv89PiJvurK74pgoML7Wj",
+  "url": "https://khora-883ou8kw5-victorhugotorresmendez-8991s-projects.vercel.app",
+  "target": "preview",
+  "commit": "2e48e7b8512a77df56807e0a24fd6dbba25a4866",
+  "realSession": false,
+  "realEnte": false,
+  "realHostedStorage": false,
+  "productionChanged": false,
+  "checks": [
+    {
+      "name": "version",
+      "expected": 200,
+      "status": 200,
+      "curlExit": 0,
+      "passed": true,
+      "observedCommit": "2e48e7b8512a77df56807e0a24fd6dbba25a4866",
+      "environment": "preview",
+      "commitSource": "manual-verified-clean-worktree"
+    },
+    {
+      "name": "native-disabled",
+      "expected": 503,
+      "status": 503,
+      "curlExit": 0,
+      "passed": true,
+      "error": "portable_vault_not_activated"
+    },
+    {
+      "name": "browser-anonymous",
+      "expected": 401,
+      "status": 401,
+      "curlExit": 0,
+      "passed": true
+    },
+    {
+      "name": "download-anonymous",
+      "expected": 401,
+      "status": 401,
+      "curlExit": 0,
+      "passed": true
+    },
+    {
+      "name": "screen-anonymous",
+      "expected": 307,
+      "status": 307,
+      "curlExit": 0,
+      "passed": true
+    },
+    {
+      "name": "auth-providers",
+      "expected": 200,
+      "status": 500,
+      "curlExit": 0,
+      "passed": false
+    }
+  ],
+  "failureStage": "auth-providers",
+  "stderrTail": "Vercel CLI 64.5.0 (Node.js 24.22.0)\n",
+  "result": "BLOCKED",
+  "failure": "preview_smoke_failed:auth-providers"
+}
+
+WINDOWS_FIX_JSON={
+  "scope": "synthetic harness-only fixes; all assertions retained; no client security change",
+  "changes": [
+    "test.mjs",
+    "route-test.cjs"
+  ],
+  "tests": {
+    "core-after-path-fix": {
+      "exit": 1,
+      "tail": "{\"result\":\"SAFE_STOP\",\"passed\":52,\"total\":53,\"failure\":\"CHECK_FAILED:cipher_file_is_private_posix\"}\n"
+    },
+    "routes-after-path-fix": {
+      "exit": 0,
+      "tail": "{\"result\":\"PASSED_ROUTE_AND_DISTRIBUTION_FIXTURE\",\"passed\":14}\n"
+    }
+  }
+}
+
+AUTH_DIAG_JSON={
+  "scope": "preview auth configuration metadata only; no env values output",
+  "envMetadataReadExit": 0,
+  "requiredKeyTargets": [
+    {
+      "key": "AUTH_SECRET",
+      "target": [
+        "preview"
+      ],
+      "type": "sensitive",
+      "gitBranch": null
+    },
+    {
+      "key": "AUTH_SECRET",
+      "target": [
+        "preview"
+      ],
+      "type": "sensitive",
+      "gitBranch": "fix/audio-vault-error-state"
+    },
+    {
+      "key": "AUTH_SECRET",
+      "target": [
+        "preview"
+      ],
+      "type": "sensitive",
+      "gitBranch": "fix/audio-player-runtime"
+    },
+    {
+      "key": "AUTH_SECRET",
+      "target": [
+        "production"
+      ],
+      "type": "sensitive",
+      "gitBranch": null
+    },
+    {
+      "key": "OIDC_ISSUER_URL",
+      "target": [
+        "production"
+      ],
+      "type": "sensitive",
+      "gitBranch": null
+    },
+    {
+      "key": "OIDC_CLIENT_SECRET",
+      "target": [
+        "production"
+      ],
+      "type": "sensitive",
+      "gitBranch": null
+    },
+    {
+      "key": "OIDC_CLIENT_ID",
+      "target": [
+        "production"
+      ],
+      "type": "sensitive",
+      "gitBranch": null
+    }
+  ],
+  "logExit": 2,
+  "logTransportError": null,
+  "errorSignals": []
+}
+
+NO_CREDENTIALS_OR_AUTH_CODES_INCLUDED
+
+✅ Process 2620 has finished execution
+
+[executed on device: PC-14 (5563676f-4710-42b6-ae7f-4fe47b9dfbc4)]
