@@ -606,9 +606,9 @@
     },
     {
       "path": "OBJETO-CANONICO.md",
-      "bytes": 225728,
-      "sha256": "57c6193ad08381717b9448768e3d32c5671f413c191c7b4ca54ecc1d75b755cd",
-      "git_blob_sha": "86b0b2c309ef5b845a82209aebdb10bd03b792fc"
+      "bytes": 221908,
+      "sha256": "e2d96c32e624faa8acc0684e2f4b0696dad543ef3d2183699805018ec015eaca",
+      "git_blob_sha": "456bfa12865da1cfd0cb5699072e7f5d8366ef9f"
     },
     {
       "path": "originales/C033-instrucciones.json",
@@ -747,6 +747,72 @@
       "bytes": 1669,
       "sha256": "0111b7e906f37de10df31753ad7c582e44bd6d73a22b2fdfa80283cee957453c",
       "git_blob_sha": "082a0b2bb0fb1e7e4278202358dfd176d8a3f655"
+    },
+    {
+      "path": "originales/C035-prompt-migracion-central.txt",
+      "bytes": 4424,
+      "sha256": "cd163b7947c697a203dbb3400556cfc4f836ad4c59cd7dfa3dbd18531629f04d",
+      "git_blob_sha": "58b993df9bb8a1923ed236ffdb88de3fcaa8c0ce"
+    },
+    {
+      "path": "originales/C035-instrucciones-y-correcciones.txt",
+      "bytes": 1270,
+      "sha256": "ee24a0a8b285228cf99d10bd5788274b85f5d681514751d61fae72c1717266e9",
+      "git_blob_sha": "a7d44a0a02a979e1da3141b99e02ea58307d3403"
+    },
+    {
+      "path": "originales/C035-extractos-conversacion-original.txt",
+      "bytes": 14257,
+      "sha256": "cd0df25d18e37504162fc4445cf17793f9d954da7c3b93068f19d2a25935bab9",
+      "git_blob_sha": "8e6c3c1f70c22fbd75e6c6cbdf717c95ee6ee83d"
+    },
+    {
+      "path": "evidencias/C035-integracion.json",
+      "bytes": 2394,
+      "sha256": "2045923c5653192fe61e77623ef493289d9ce22555293a3b24f1dafebf31c0c7",
+      "git_blob_sha": "41108553c08ba1fa7c8b7de5ee503ff584ab0ae6"
+    },
+    {
+      "path": "evidencias/C035-unit.log",
+      "bytes": 8079,
+      "sha256": "dd041761be11b7636fd53d16f46c275f8b0db54cbbb9a5d71a7ff546665bc33f",
+      "git_blob_sha": "0516f274a6c03a10b1c6e39c040948af50af262a"
+    },
+    {
+      "path": "evidencias/C035-browser.json",
+      "bytes": 219,
+      "sha256": "996b82baf5887c5d42d0678f27c0e3bb183d0fecca68a923c0c2ba3fa4e27976",
+      "git_blob_sha": "5c956a84d0e28ba6acf071da8dea5248632452ad"
+    },
+    {
+      "path": "evidencias/C035-editorial-gates.json",
+      "bytes": 953,
+      "sha256": "678149733d2b64df3cc44aeb169d9b1317e6efb95d2795812f255bf3a4996e87",
+      "git_blob_sha": "1c2236ae29a709db94cb420156fc1d85655f2b9e"
+    },
+    {
+      "path": "evidencias/C035-dispatch-gates.json",
+      "bytes": 1027,
+      "sha256": "bb2d554f2845dfbb025090b16b4f3139bfbcf466972de52245954dd5f1f8b6d1",
+      "git_blob_sha": "69a522a5d0ae80b2104de7a34357b90bfddeb282"
+    },
+    {
+      "path": "evidencias/C035-editorial-gates.mjs",
+      "bytes": 5152,
+      "sha256": "bf50d365407064698ef11dcb57d2b8ad5a4116c5dbd0bce86160236b4dbab3aa",
+      "git_blob_sha": "0213ebd842de10d810e3aa3811ee683ac0c8e356"
+    },
+    {
+      "path": "evidencias/C035-dispatch-gates.mjs",
+      "bytes": 4336,
+      "sha256": "759c83b64044b7421ef2c3a496f69fb389bd94c2bada2022b14f7c28ace4bec7",
+      "git_blob_sha": "404721da5f68cc3933c2be69037708921bf20430"
+    },
+    {
+      "path": "evidencias/C035-reproduccion.md",
+      "bytes": 1715,
+      "sha256": "50a210abc7215deb45952f6968a5b8440bd42c344f9032d73b1d66930759a079",
+      "git_blob_sha": "2aec4979dd45fada623138154fe90a02e963ed2c"
     }
   ],
   "runtime_references": [
@@ -860,7 +926,7 @@
     "state": "tested candidate; preview READY; no production or complete E2E acceptance",
     "observed_head": "bdc0255df9c9573575b25082706197a55bef7211"
   },
-  "latestEvent": "C034 explicit text-only Blog milestone, coordinated parallel implementation and current isolated tests/configuration audit",
+  "latestEvent": "C035 authorized migration; final code integrated, global build failed, input-mold interpretation corrected",
   "latest_verified_release": {
     "sha": "f0dfbdcb2d79eb6289dacba272ddcc7ba2023063",
     "deploymentId": "dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr",
@@ -886,8 +952,8 @@
     "physicalAcceptance": false,
     "technicalPublicationVerified": true
   },
-  "latest_cycle": "C034",
-  "canonical_version": "0.6.20",
+  "latest_cycle": "C035",
+  "canonical_version": "0.6.21",
   "latest_candidate": {
     "branch": "feat/ingreso-autobiografico-20261019",
     "base": "b5e7009de137db30c26ecc5f4ddbb34789f453f2",
@@ -895,7 +961,7 @@
     "publicAudio": false,
     "codeCommit": "bdc0255df9c9573575b25082706197a55bef7211",
     "pullRequest": 330,
-    "observedHead": "7826aa537e6573fd99edffd4bd19eae57cc8b94f",
+    "observedHead": "c0dcb2e26f9df31273bbf654ffc52222a7d9d887",
     "preview": {
       "deployment": "dpl_3i1uggfnr2cGt89iRMCQvXJq2qWA",
       "state": "READY",
@@ -906,7 +972,9 @@
       "http": "redirects to Vercel login; application not verified",
       "settings_changed": false,
       "protection_bypass_created": false
-    }
+    },
+    "deploymentId": "dpl_jLTALH6xrtcDqoKNd5Tc3B927TfB",
+    "deploymentState": "ERROR"
   },
   "release_history": [
     {
@@ -1059,8 +1127,8 @@
     "state": "blocked",
     "receipt": "evidencias/C030-gate-blocker.json",
     "activeConfigChanged": false,
-    "currentEvidence": "evidencias/C034-coordinacion.json",
-    "currentFirstMilestone": "text only; audio deferred"
+    "currentEvidence": "evidencias/C035-integracion.json",
+    "currentFirstMilestone": "Khora Ingreso specialized Blog mold before dictation -> generated transcript -> manual archive -> exact joint consent -> GitHub Blog then Facebook, no public audio"
   },
   "method_history": [
     {

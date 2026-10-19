@@ -1,0 +1,142 @@
+Líneas 459–496
+Blog
+Por ahora los modos de diálogo van a ser este conversación con Maya e interpretación simultánea. y también van a ser este entrada de blog personal. El blog personal también va a aportar datos, interpretación simultánea no aporta datos para el corpus del grafo de relación personal. Es una aplicación, sí se van a guardar los datos, pero para para un proyecto lateral mío. No se espera que interpretación simultánea aparezca en la versión comercial. se guardan los volcados y todo, pero no se utilizan para el GRP. Conversación con Maya sí se utiliza para el GRP. y estoy diseñando una forma de entrada para entrada de blog personal que tienen que seguir un formato que nos dé resultados. Es decir, tienen que servir como sustrato para la línea autobiográfica forense. Dicho eso, pueden tener alguna especie de molde que me permita satisfacer las condiciones básicas que requerirían los datos unitarios para la línea autobiográfica forense. ¿Qué opinas?
+10:20 AM
+Worked for 42s
+Sí: un molde ligero puede mejorar mucho el valor autobiográfico de las entradas, siempre que ayude a precisar lo que cuentas sin dirigir lo que debes pensar o recordar. No lo convertiría en un interrogatorio ni en un formulario obligatorio.
+
+Los tres tipos de entrada
+Según lo que acabas de definir:
+
+Tipo	Conserva audio y volcados	Destino al grafo de relación personal
+Conversación con Maya	Sí	Sí, sujeto a revisión y ratificación
+Interpretación simultánea	Sí, para tu proyecto lateral	Excluida; fuera del alcance comercial previsto
+Blog personal	Sí	Sí, como sustrato autobiográfico, sujeto a revisión y ratificación
+Guardar y aportar al grafo deben ser decisiones independientes. Además, en una conversación con Maya debe conservarse quién dijo cada cosa: una sugerencia de Maya no puede convertirse en una convicción tuya. Esa separación ya está exigida por el criterio de ingesta existente.⁠
+⁠
+
+Molde propuesto para el blog personal
+Lo plantearía como una entrada libre con una breve comprobación al terminar, apoyada en estas preguntas:
+
+Pregunta orientadora	Qué permite conservar
+¿Qué ocurrió, recordaste o pensaste?	El contenido, distinguiendo acontecimiento, recuerdo, idea, intención o duda.
+¿Cuándo ocurrió? ¿Qué tan segura es esa fecha?	Fecha exacta, aproximada, intervalo o desconocida, sin inventar precisión.
+¿Quiénes participaron y en qué contexto?	Personas, lugares y circunstancias que tú hayas identificado.
+¿Qué observaste y qué interpretaste?	Separación entre lo percibido, lo contado por alguien y tu elaboración.
+¿Qué significó para ti entonces y qué significa ahora?	Tu perspectiva en dos momentos, sin reemplazar una por otra.
+¿Qué cambió, decidiste o quedó abierto?	Decisiones, rectificaciones, consecuencias e incertidumbres.
+No todas las preguntas aplicarán a todas las entradas. “No lo recuerdo” o “no sé cuándo” son datos válidos, no huecos que el modelo deba rellenar.
+
+La parte forense no debes cargarla tú
+El sistema debe conservar automáticamente el original, audio cuando exista, fecha de captura, versiones, huellas y vínculo exacto entre cada dato extraído y las palabras que lo sostienen. También debe separar cuándo sucedió algo de cuándo lo registraste. Son requisitos del protocolo existente, no garantías que un buen molde pueda sustituir.⁠
+⁠
+
+Y “grado forense” significa poder reconstruir y auditar lo registrado: demostrar que relataste algo no demuestra por sí solo que el acontecimiento sucedió así.⁠
+⁠
+
+Mi recomendación: empiezas contando libremente; al terminar, el sistema propone únicamente las aclaraciones pertinentes que falten. Por ejemplo: «¿Eso ocurrió hoy o estás recordando otro momento?». Sin completar por ti, sin preguntas sugestivas y sin impedir guardar una entrada incompleta.
+
+Este molde es una propuesta, no una definición ya ratificada de “dato unitario”: el protocolo deja expresamente abierta esa definición.⁠
+
+Líneas 648–688
+https://www.facebook.com/profile.php?id=61595788700651
+Esta es la página a la que se van a publicar las entradas del blog personal. Entonces, por último, creo que ya tenemos el esquema completo. Quiero que el blog consista en entradas rápidas que sirvan de crónica. La idea, te lo comento para que me ayudes a diseñarlo correctamente. soy una persona que por razones políticas no está... La identidad que tiene es prácticamente lo que yo puedo recordar y lo que pueden recordar las personas que hablaban conmigo. No hay un registro de mi identidad, como suele pasar con personas indigentes, con personas que quedan fuera hasta cierto punto del sistema. Nada más que yo no me resigno a que sea de esa manera. Entonces, la idea de tener un blog de esta naturaleza es tener una identidad. Entonces, yo todos los días voy a pasar a dictar una, dos o tres veces de manera suficiente como para satisfacción al molde. Ese molde tiene que servir para publicarlo, hacerlo público en la página de Facebook. De esa manera, si algo me sucediera, yo no podría sino tener algún registro de mi identidad y con eso podría empezar a revertir la tendencia que por razones políticas me ha puesto en esta posición.
+10:35 AM
+Entiendo mejor el propósito: no buscas solamente publicar textos, sino construir una crónica continua, reconocible y conservada de tu propia voz y de tu vida. El diseño debe ayudarte a hacerlo con poca fricción, sin obligarte a reconstruirte desde cero cada día.
+
+El destino que indicas es esta Página de Facebook. Su identificación como destino no significa que la conexión de publicación ya esté configurada.
+
+El molde debe ayudarte a contar, no examinarte
+Para una, dos o tres entradas diarias, propongo crónicas breves que se entiendan por sí mismas, sin extensión mínima obligatoria:
+
+Qué quiero dejar registrado. Un acontecimiento, una actividad, una conversación, un recuerdo o una idea de hoy.
+Cuándo ocurrió. Distinguir «hoy» de un recuerdo anterior; admitir fechas aproximadas.
+Qué hice o qué me ocurrió. El núcleo concreto del relato, con el contexto que quieras proporcionar.
+Cómo lo viví y qué significado tiene para mí. Tu perspectiva, diferenciada de lo que puedes afirmar sobre otras personas.
+Qué continúa. Algo que cambió, una decisión, una pregunta o lo que quedó abierto, cuando corresponda.
+No necesitas cubrir los cinco puntos en cada dictado. El sistema extraería automáticamente lo que esté presente y preguntaría solo por una aclaración realmente importante. Una entrada breve o incompleta también debe poder conservarse.
+
+Una forma natural de empezar sería:
+
+«Quiero dejar registrado lo siguiente…»
+
+No hace falta que cada entrada sea solemne ni excepcional: lo cotidiano también construye continuidad.
+
+Dos versiones, con destinos diferentes
+Una misma captura debería producir dos objetos relacionados, no confundidos:
+
+Registro privado en Khora	Crónica pública
+Audio original, transcripción, versiones y metadatos de procedencia.	Texto que autorizas publicar, con fecha y enlace permanente.
+Puede contener detalles sensibles.	Omite detalles que no hayas autorizado hacer públicos.
+Sustrato para la línea autobiográfica y revisión del grafo.	Presencia pública en el blog y, después, en Facebook.
+El sistema puede organizar y puntuar tu relato, pero no añadir vivencias, motivos o certezas para hacer la historia más convincente. El original debe seguir disponible y cada transformación debe poder rastrearse; eso coincide con el protocolo de ingesta existente.⁠
+⁠
+
+Por seguridad, el molde no debería exigir ubicación exacta, rutinas futuras, documentos de identidad ni nombres completos de terceros. Puedes contar tu vida sin revelar automáticamente dónde encontrarte.
+
+Publicación y conservación
+El recorrido que recomiendo es:
+
+Dictar → conservar → extraer metadatos → preparar la crónica → autorizar su versión pública → publicar en el blog → publicar en la Página de Facebook.
+
+Después de tu autorización, el resto puede automatizarse. Cada destino debe tener confirmación independiente: si Facebook falla, no se pierde la entrada ni se vuelve a publicar duplicada en el blog.
+
+Líneas 824–850
+La primera versión debe extraer metadatos automáticamente, sin formulario obligatorio ni acceso privilegiado al dispositivo.
+
+El autor cuenta libremente. El molde orientador es:
+- Qué quiere dejar registrado.
+- Cuándo ocurrió y con qué precisión.
+- Qué hizo o qué le ocurrió y en qué contexto.
+- Cómo lo vivió y qué significado le atribuye.
+- Qué cambió, decidió o quedó abierto.
+
+No exigir cubrir todos los puntos ni una longitud mínima. Una entrada incompleta se conserva. Preguntar solo por aclaraciones materiales, sin preguntas sugestivas.
+
+Extraer como propuestas:
+- Tiempo del hecho, separado del tiempo de captura y recepción.
+- Precisión temporal: exacta, aproximada, intervalo o desconocida.
+- Personas, lugares y contexto expresados.
+- Acontecimiento relatado, recuerdo, idea, intención, decisión, duda o hipótesis.
+- Autoría y atribución de cada afirmación.
+- Origen del conocimiento cuando esté expresado.
+- Emociones y significado declarados, sin diagnósticos.
+- Rectificaciones y relaciones explícitas con otros episodios.
+- Ambigüedades e incertidumbre.
+
+Cada metadato debe anclar al fragmento exacto de una versión identificada del volcado. No inferir identidad, causas o fechas para completar casillas. No convertir una sugerencia de Maya en una convicción del autor. Extracción automática no equivale a ratificación automática ni a escritura automática al grafo.
+
+Conservar originales, versiones, huellas, métodos y actos de revisión. No redefinir silenciosamente la unidad de información del protocolo de ingesta.
+
+6. ENTRADAS OFUSCADAS
+
+Líneas 1007–1024
+de manera consistente.
+pero primero y antes que nada, vamos a trabajar con lo que tiene que ver con la parte que te quedaste tú de las tareas, de lo del blog, para resolver eso primero. Dame interfaz para los diferentes tipos de, bueno, todo lo que tiene que ver con lo que quedó del blog, la diferenciación de las entradas desde ingreso y todo lo que acabas de decir, incluyendo el punto número cuatro, el punto número cinco y lo demás, las luces, etcétera. Organízate de nuevo y dame la lista de trabajo.
+10:50 AM
+Reordeno el trabajo: primero resolvemos nuestra parte de Ingreso para los nuevos tipos de entrada; después recuperación, audio y títulos. Cada función se prueba de extremo a extremo y se publica en Vercel antes de pasar a la siguiente.
+
+No vamos a agrupar todo en una entrega grande. Tampoco voy a interpretar tu experiencia positiva con la recuperación como prueba de que hoy sea imposible perder datos: esa protección debe comprobarse y endurecerse.
+
+1. Tipos de entrada desde Ingreso
+Construir una selección clara entre:
+
+Conversación con Maya: elegible para el grafo de relación personal, mediante su revisión correspondiente.
+Interpretación simultánea: conservación para tu proyecto lateral, excluida del grafo personal.
+Blog personal: entrega al elemento Blog que construye el otro hilo.
+Separar tres decisiones: tipo de entrada, fuentes de audio y organización de la transcripción. Elegir “blog personal” no debe obligarte a grabar dos fuentes ni autorizar publicación pública.
+
+Aquí corresponde también la marca «ofuscada» para la entrada completa, persistida y recuperable, sin interpretación automática de sus alusiones.
+
+Aceptación: el tipo y la marca sobreviven a guardar, recuperar y archivar; el contrato entregado al blog coincide con el acordado con su constructor. No duplicamos su editor, extracción autobiográfica, conexión externa ni publicación.
+
+Líneas 1095–1103
+10:52 AM
+Pásame el punto número 2 al número 3 y comienza. El resultado objetivo para esta sesión va a ser poder guardar una nota autobiográfica que automáticamente se publique hacia la página de Facebook que acabamos de crear y al blog de GitHub Pages. Cuando yo termino de capturar la entrada autobiográfica y la guardo de manera manual, es decir, automáticamente estas entradas, como todos los volcados, el archivado como tal siempre se activa de manera manual, porque ya sea que yo recupere algo o que lo capture, siempre voy a tener que tener un paso manual en el cual yo diga, archiva registro. Eso es lo que permite la entrada de cualquier entrada al sistema de custodia. En ese momento, para lo que tiene que ver con las entradas autobiográficas, o no sé cómo les vamos a llamar, se me tiene que preguntar de manera muy explícita, ¿quieres que esta entrada se publique en el blog y en la página de Facebook? Siempre va a ser en los dos, no se prevé un escenario en el que solamente vaya a ser una de ambas cosas, así que no hay necesidad de preguntar por una o por otra. Entonces, no, pues que no. Si le pongo que no, se pasa a custodia y sí, el sistema más adelante me tendría que permitir diferenciar, además de las entradas ofuscadas, entradas que por un lado se hayan publicado, se hayan pasado a la fase de custodia, pero que por otro no se hayan elegido no publicarlas en el blog y en las redes sociales, permitiéndome filtrar por ambas categorías.
+10:53 AM
+Cambio el orden: captura de los modos pasa al punto 2 y la luz de salvaguarda al 3. Empiezo por los tipos de entrada y el contrato con el Blog.
+
+El objetivo queda fijado así: «Archivar registro» siempre es manual. Para una entrada autobiográfica, ese paso preguntará explícitamente: «¿Quieres publicar esta entrada en el blog y en la Página de Facebook?» Un «Sí» autoriza ambos destinos; un «No» la conserva en Custodia sin publicación. La marca «ofuscada» seguirá siendo independiente. También distinguiremos autorización, publicación pendiente y publicación confirmada, para no llamar «publicada» a una entrega incompleta.
+
+Worked for 10m 23s
+El contrato del Blog ya está disponible: este hilo conservará el tipo de entrada y la marca «ofuscada» en los checkpoints y en el registro archivado. La publicación se tramitará después del recibo de custodia, con vista previa y tu decisión explícita.
