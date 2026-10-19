@@ -1,4 +1,5 @@
 "use client";
+import {prepareLiteralTranscript,assertPagesTextCompatible} from "../../../lib/blog/transcript-preparation";
 import { useEffect, useRef, useState } from "react";
 import { guardarIntencionEditorialLocal, recuperarIntencionesEditorialesLocal, type IntencionEditorialLocal } from "../../../lib/client/custodia-local";
 import { TEXT_ONLY_PUBLICATION_AUTHORIZED, canonicoEditorial, huellaTexto, publicadoEnAmbos, type RevisionEditorial } from "../../../lib/custodia/editorial";
@@ -21,9 +22,11 @@ export function PublicacionCapturaPendiente({owner,refresh=0}:{owner:string;refr
 }
 function Entrada({owner,initial,onSaved}:{owner:string;initial:IntencionEditorialLocal;onSaved:()=>Promise<void>}){
  const [row,setRow]=useState(initial),[busy,setBusy]=useState(false),[error,setError]=useState("");
- const [title,setTitle]=useState(row.request?.entry.title||row.draft?.title||""),[body,setBody]=useState(row.request?.entry.body||row.draft?.body||"");
+ let literalDraft:ReturnType<typeof prepareLiteralTranscript>|null=null;let preparationError="";
+ try{if(row.draft?.body?.trim())literalDraft=prepareLiteralTranscript(row.draft.body);}catch{preparationError="No se pudo preparar esta transcripción íntegra para publicación. El original archivado permanece intacto; no se truncó ni autorizó su publicación.";}
+ const [title,setTitle]=useState(row.request?.entry.title||row.draft?.title||literalDraft?.titleProposal?.text||""),[body,setBody]=useState(row.request?.entry.body||literalDraft?.body||"");
  const [format,setFormat]=useState<""|"link"|"full_text">(row.request?.facebook.format||"full_text");
- const [message,setMessage]=useState(row.request?.facebook.message||[row.draft?.title,row.draft?.body].filter(Boolean).join("\n\n"));
+ const [message,setMessage]=useState(row.request?.facebook.message||[row.draft?.title||literalDraft?.titleProposal?.text,literalDraft?.body].filter(Boolean).join("\n\n"));
  const [exposure,setExposure]=useState(false),[status,setStatus]=useState<Status|null>(null),[previewVisible,setPreviewVisible]=useState(false);
  const token=useRef("");
  useEffect(()=>setRow(initial),[initial]);
@@ -40,6 +43,7 @@ function Entrada({owner,initial,onSaved}:{owner:string;initial:IntencionEditoria
    if(!request){
     if(!format||!message.trim()||!title.trim()||!body.trim())throw Error("Completa el texto público y el formato/texto de Facebook antes de preparar la vista previa.");
     request={publicationId:row.intent.publicationId,revision:1,sourceId:row.receipt.volcado_id,sourceVersion:row.receipt.version,sourceHash:row.receipt.sha256,kind:"blog_personal",obfuscated:row.draft?.obfuscated===true,entry:{schema:1,slug:"cronica-"+row.intent.publicationId,title,date:row.draft!.date,body,source:{kind:"khora",sha256:await huellaTexto(body)}},facebook:{format,message}};
+    assertPagesTextCompatible(request.entry);
     await save({...row,request});
    }
    const d=await call({action:"prepare",expectedRevision:null,revision:request,...await turn()});
@@ -74,11 +78,12 @@ function Entrada({owner,initial,onSaved}:{owner:string;initial:IntencionEditoria
  };
  const locked=busy||!!row.request||row.intent.decision!==null;
  return <article className={s.editorialPanel}>
+  {preparationError&&<p role="alert">{preparationError}</p>}
   <h2>¿Quieres que esta entrada se publique en el blog y en la Página de Facebook?</h2>
   <p role="status">Corte autorizado: se publicará únicamente texto. El audio permanece privado en Custodia y no se publicará. Revisa el texto exacto de ambos destinos antes de decidir.</p>
   <p>El archivo en Custodia es independiente de la publicación. Siempre se autorizan ambos destinos o ninguno.</p>
   {!row.receipt&&<p role="status">Recibo de archivo pendiente. Recupera y reintenta el archivo de la misma captura; no se inventará una referencia ni se publicará.</p>}
-  {row.receipt&&row.intent.decision===null&&<fieldset disabled={locked} className={s.editorialForm}><legend>Representación pública que se revisará</legend>
+  {row.receipt&&row.intent.decision===null&&<fieldset disabled={locked} className={s.editorialForm}><legend>Representación pública que se revisará</legend><p>Se prepararon párrafos conservando las palabras y el orden de la transcripción. No se corrigieron hechos ni se infirieron fechas. Revisa ambos textos.</p>
    <label>Título público<input aria-label="Título público" value={title} maxLength={160} onChange={e=>setTitle(e.target.value)}/></label>
    <label>Texto del blog<textarea aria-label="Texto del blog" value={body} maxLength={200000} onChange={e=>setBody(e.target.value)}/></label>
    <label>Formato de Facebook<select aria-label="Formato de Facebook" value={format} onChange={e=>setFormat(e.target.value as typeof format)}><option value="">Elige el formato</option><option value="link">Enlace al blog con mensaje</option><option value="full_text">Texto completo</option></select></label>

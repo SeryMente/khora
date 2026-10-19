@@ -467,3 +467,7 @@ Estos son **casos especificados**, no una afirmación de que el producto ya los 
 | N40 | Corrección solo de fuente, juicio o política sin cambiar topología | Nueva revisión lógica e invalidación causal de derivados afectados |
 
 **Compatibilidad exigida:** mantener las tres zonas de ingesta, el original y sus versiones, el ledger auténtico y separado, ΦM determinista, ΦC/fKGC distinto del razonamiento, comunidades y recuperación topológicas, generador separado, historial vinculante, fVAL global y refinamiento visual sin escritura al grafo. No se cambia de stack ni se acredita la facultad autobiográfica por añadir esta sección. Las unidades canónicas de EpisTwin siguen siendo la fuente normativa; el mapeo de esta revisión es diagnóstico, no auto-ratificación formal.
+
+
+### C031 · Política editorial de exclusión (candidata no desplegada)
+Interpretación simultánea se conserva en Custodia pero se excluye de la ruta UI de ingesta y del conjunto de fuentes de ambas proyecciones de Graph Twins. El sello de fuentes incluye la revisión de esta política; una proyección previa queda obsoleta, no se sirve como vigente. Se conservan el denominador total y el conteo excluido. Esto no limpia retrospectivamente Neo4j ni garantiza que todo importador externo cumpla la política; esas rutas siguen sin acreditar. No cambia juicios humanos, integridad, aprobación de Custodia ni el dictamen semántico NO APTO del expediente. Pruebas y límites: docs/frentes/dictado-voz/evidencias/C031-consolidacion.json.

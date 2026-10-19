@@ -1,4 +1,6 @@
 "use client";
+import {firmaCustodia,luzCustodia} from "../../../lib/custodia/estado";
+import {useTituloCaptura} from "../../../lib/client/use-titulo-captura";
 import { CLASIFICACION_INICIAL, clasificacionRecuperada, type ClasificacionEntrada, type PublicationIntent, iniciarIntencion, huellaTexto } from "../../../lib/custodia/editorial";
 import { useEffect, useRef, useState } from "react";
 import { capturarDialogo, type CapturaDialogo, type ParteDialogo } from "../../../lib/dialogo/capturar";
@@ -18,6 +20,9 @@ export function DialogoPanel({sessionId:requested,onSalir,clasificacion=CLASIFIC
   const [organizarComoDialogo,setOrganizarComoDialogo]=useState(true);
   const [ready,setReady]=useState(false),[busy,setBusy]=useState(false),[active,setActive]=useState(false);
   const [error,setError]=useState(""),[notice,setNotice]=useState(""),[text,setText]=useState("");
+  const [custodiaProof,setCustodiaProof]=useState("");
+  const [custodiaFailure,setCustodiaFailure]=useState(false);
+  const [archivoReceiptVerified,setArchivoReceiptVerified]=useState(false);
   const [title,setTitle]=useState("Conversación"),[labels,setLabels]=useState(initial().etiquetas),[count,setCount]=useState(0);
   const [hasSession,setHasSession]=useState(false),[archived,setArchived]=useState(false),[volcadoId,setVolcadoId]=useState("");
   const [micStream,setMicStream]=useState<MediaStream|null>(null),[chromeStream,setChromeStream]=useState<MediaStream|null>(null);
@@ -47,7 +52,7 @@ export function DialogoPanel({sessionId:requested,onSalir,clasificacion=CLASIFIC
   const snapshot=():CapturaSnapshot=>({sessionId:id.current,...nuevaRevision(),texto:textRef.current,parcial:"",titulo:visible.current.title,tipoEntrada:visible.current.tipoEntrada,ofuscada:visible.current.ofuscada,publicationIntent:publicationIntent.current,fuenteEntrada:"dialogo",duracionSeg:duration.current,audioPartes:[...stored.current],dialogo:{...manifest.current,partesEsperadas:manifest.current.partesEsperadas}});
   const persist=async(remote=true)=>{
     const snap=snapshot();
-    localQueue.current=localQueue.current.catch(()=>undefined).then(()=>guardarSnapshotLocal(owner.current,snap));await localQueue.current;
+    localQueue.current=localQueue.current.catch(()=>undefined).then(()=>guardarSnapshotLocal(owner.current,snap));try{await localQueue.current;}catch(e){setCustodiaFailure(true);throw e;}setCustodiaProof(firmaCustodia(snap));setCustodiaFailure(false);
     if(remote){
       const r=await fetch("/api/dictado/checkpoint",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(snap),signal:AbortSignal.timeout(15000)});
       const d=await r.json().catch(()=>({}));if(!r.ok||d.revisionId!==snap.revisionId)throw Error("Checkpoint remoto pendiente; conserva esta pestaña y exporta los originales.");
@@ -204,7 +209,7 @@ export function DialogoPanel({sessionId:requested,onSalir,clasificacion=CLASIFIC
       if(!receipt.id||receipt.sessionId!==id.current||!/^[a-f0-9]{64}$/i.test(receipt.sha256||""))throw Error("Recibo de archivo inválido. Conserva esta sesión y reintenta.");
       if(await huellaTexto(String(payload.texto))!==String(receipt.sha256).toLowerCase()||receipt.version!==1||receipt.tipoEntrada!==payload.tipoEntrada||receipt.ofuscada!==payload.ofuscada)throw Error("El recibo no acredita el contenido y la clasificación enviados.");
       // Mark the remote seal immediately: a local cleanup error must not permit editing the archived original.
-      setArchived(true);setVolcadoId(receipt.id);setNotice("Volcado archivado con ambos originales. Continúa en Custodia para revisar, aprobar e ingerir; no se ingirió automáticamente.");
+      setArchivoReceiptVerified(true);setArchived(true);setVolcadoId(receipt.id);setNotice("Volcado archivado con ambos originales. Continúa en Custodia para revisar, aprobar e ingerir; no se ingirió automáticamente.");
       if(publicationIntent.current&&payload.tipoEntrada==="blog_personal") {
         publicationIntent.current={...publicationIntent.current,state:"awaiting_decision"};
         await guardarIntencionEditorialLocal(owner.current,{sessionId:id.current,intent:publicationIntent.current,draft:{title:visible.current.title,body:textRef.current,date:new Date().toISOString(),obfuscated:visible.current.ofuscada},receipt:{volcado_id:receipt.id,version:receipt.version,sha256:receipt.sha256}}).catch(()=>setError("Archivo confirmado; recibo editorial local pendiente. No dupliques la captura."));
@@ -225,11 +230,13 @@ export function DialogoPanel({sessionId:requested,onSalir,clasificacion=CLASIFIC
     }catch(e){setError(e instanceof Error?e.message:"No se pudo exportar el original.");}
     finally{setBusy(false);}
   };
+  useTituloCaptura(text,id.current,!archived&&!busy,setTitle);
   return <IngresoView state={{
     editorialExtra:<PublicacionCapturaPendiente owner={owner.current} refresh={Number(archived)}/>,clasificacion,titulo:title,texto:text,estado:active?"dictando":"inactivo",modoEntrada:"chrome_live_caption",
     finalizando:busy&&active,organizarComoDialogo,dialogoChrome:true,dialogoSesion:hasSession,chromeStream,stream:micStream,
     chromeBridgeEstado:"captura nativa",chromeCaptionActivo:false,chromeCapturaEstado:active?"grabando":"inactiva",
     archivado:archived,archivoPendiente:!!archivePayload.current&&!archived,custodiaReady:ready,custodiaPreparando:!ready&&!error,
+    custodiaLuz:luzCustodia({archivedReceipt:archivoReceiptVerified,exactSnapshot:custodiaProof===firmaCustodia(snapshot()),audioComplete:raw.current.length===stored.current.length&&!errorRemote.current,inFlight:active||busy,confirmedFailure:custodiaFailure}),
     custodiaEstado:active?`Chrome + micrófono · ${elapsed} s · ${localCount} partes recibidas · ${count} confirmadas en servidor`:archived?"Volcado archivado · "+volcadoId:hasSession?`${localCount} partes locales · ${count} confirmadas en servidor`:ready?"Salvaguarda preparada":"Salvaguarda no preparada",
     editando:false,soportado:true,escuchando:active,guardando:archiveBusy.current,procesando:busy,generandoTitulo:false,retranscribiendo:transcribing.current,adjuntandoAudio:false,exportandoAudio:false,audioExportable:false,
     conAudio:hasSession,partesContador:count,bytesAcumulados:stored.current.reduce((n,p)=>n+p.bytes,0),reconexiones:0,pulidosOk:0,pulidosNo:0,reconciliacionMensaje:"",aviso:notice,error,resultado:archived?"Volcado disponible en Custodia":"",

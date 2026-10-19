@@ -529,3 +529,15 @@ Ver pruebas y límites en `docs/frentes/dictado-voz/evidencias/C030-pruebas.md`.
 
 ### Enmienda posterior C031: texto-only autorizado por operador
 La instrucción posterior permite ESTE corte con transcripción ordenada/formateada solamente. TEXT_ONLY_PUBLICATION_AUTHORIZED=true sustituye la guarda de audio en front, no el consentimiento de ninguna entrada. Preview exacto y ofuscada obligatorios; Sí conserva turno normativo, No independiente. Audio permanece privado, no se envía a blog/Meta. App/backend Blog deben incorporar la misma autorización antes de integrar. Prepare no genera automáticamente el borrador: falta transcripción real/edición pública revisada. Sin despliegue ni Meta verificados, no afirmar resultado.
+
+
+### C031 · Consolidación posterior (candidata, no desplegada)
+- El operador reabrió los cinco frentes y retiró el corte horario como límite de continuación. Sigue sin navegador compartido; no se requiere Remote Desktop Commander ni se usa para construcción.
+- Audio local: ACK solo anota remoteConfirmedAt; el sellado solo anota archived_snapshot. No se borra ciphertext/audio. SHA local recalculado y recibo remoto ligado a sesión/parte/fuente/bytes/SHA antes de aceptar. No garantiza supervivencia frente a borrado del perfil, cuotas, pérdida física ni capturas que nunca llegaron a guardarse.
+- Archivar esta captura en panel usa exclusivamente punto elegido por dueño/revisión. Audio local se adjunta solo dentro del corte acreditado; si no hay corte, solo partes ya asociadas. Punto sin audio no inventa vinculación ni se degrada silenciosamente a texto. Ver puntos guardados y selección histórica se conservan.
+- Títulos: corrige title frente a titulo; hook periódico usa contenido suficiente, aborta cambio de sesión, evita respuestas obsoletas y nunca inventa título ante fallo. Checkpoints mantienen título de su momento, no se sobrescriben versiones antiguas.
+- Luz única: azul solo recibo íntegro de archivo; verde fingerprint exacto con audio completo; amarillo pendiente/en vuelo; rojo fallo confirmado sin prueba actual. Cambiar texto/título/clasificación/audio invalida verde antiguo. Detalle desplegable conserva diagnóstico, no alertas intrusivas por cada parte normal.
+- Integración Blog texto-only con preparación extractiva literal y guard Pages≤100 en servidor/proveedor. Ningún permiso de publicación por prellenar ni por selección de tipo. Preparación no inventa hechos, cronología ni fecha del evento; el original permanece intacto. Audio sigue privado.
+- Migraciones administrativas reales:034_ingreso_clasificacion.sql y20261019_blog_editorial.sql en runner existente, no033 duplicada, no DDL editorial por solicitud. Aplicadas dos veces solo sobre PostgreSQL aislado; producción no migrada.
+- Interpretación excluida de UI ingesta y selección paired; material conservado. No acredita importadores externos ni borra historia Neo4j. Ver GRAPH-TWINS y GRAPH-QUALITY-DRAFT.
+- Evidencia ejecutada y límites: docs/frentes/dictado-voz/evidencias/C031-consolidacion.json. Ninguna prueba sintética acredita publicación, recuperación de veinte capturas reales ni despliegue.

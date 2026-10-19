@@ -56,6 +56,15 @@ export async function GET(req: NextRequest) {
     const requested=req.nextUrl.searchParams.get("sessionId");
     if(requested){const sealed=await db.query("SELECT s.volcado_id FROM dictado_session s LEFT JOIN volcado v ON v.id=s.volcado_id WHERE s.session_id=$1 AND s.estado='complete' AND COALESCE(s.custodia_owner,s.checkpoint_usuario,v.usuario)=$2",[requested,email]);if(sealed.rows.length)return NextResponse.json({owner:email,sealed:true,id:sealed.rows[0].volcado_id,recovery:null},{headers:{"Cache-Control":"no-store"}});}
 
+    const revisionId=req.nextUrl.searchParams.get("revisionId");
+    if(requested&&revisionId){
+      const selected=await db.query("SELECT snapshot,sha256 FROM dictado_checkpoint WHERE session_id=$1 AND revision_id=$2 AND usuario=$3",[requested,revisionId,email]);
+      if(!selected.rows.length)return NextResponse.json({error:"punto_no_disponible"},{status:404});
+      const snapshot=JSON.parse(descifrarTexto(selected.rows[0].snapshot));
+      const exactText=snapshot.texto+(snapshot.parcial?"\n\n"+snapshot.parcial:"");
+      if(snapshot.sessionId!==requested||snapshot.revisionId!==revisionId||createHash("sha256").update(exactText).digest("hex")!==selected.rows[0].sha256)throw Error("integridad");
+      return NextResponse.json({owner:email,recovery:snapshot},{headers:{"Cache-Control":"private, no-store","Vary":"Cookie"}});
+    }
     const r=await db.query(`SELECT s.session_id,s.checkpoint_text,s.checkpoint_sha256,s.checkpoint_en,s.actualizado_en,c.snapshot FROM dictado_session s LEFT JOIN LATERAL(SELECT snapshot FROM dictado_checkpoint WHERE session_id=s.session_id AND usuario=$1 ORDER BY client_at DESC,creado_en DESC LIMIT 1)c ON true WHERE COALESCE(s.custodia_owner,s.checkpoint_usuario)=$1 AND s.estado<>'complete' AND ($2::text IS NULL OR s.session_id=$2) ORDER BY COALESCE(s.checkpoint_en::timestamptz,s.actualizado_en) DESC LIMIT 1`,[email,requested]);
     if(!r.rows.length) return NextResponse.json({owner:email,recovery:null},{headers:{"Cache-Control":"no-store"}});
     const row=r.rows[0]; const snapshot=row.snapshot?JSON.parse(descifrarTexto(row.snapshot)):{};

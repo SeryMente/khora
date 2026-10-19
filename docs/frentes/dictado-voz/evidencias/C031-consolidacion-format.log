@@ -1,0 +1,25 @@
+(node:4996) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///data/khora-ingreso-c031/integrated/khora-web/tests/unit/blog-transcript-preparation.test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /data/khora-ingreso-c031/integrated/khora-web/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ paragraph preparation keeps exact original spans and every non-whitespace character (2.107673ms)
+✔ does not infer identities, dates, emotion, causality or ratify Maya suggestions (0.352594ms)
+✔ preserves existing paragraph order, emphasis, attribution and obfuscated text (0.246371ms)
+✔ never invents punctuation or splits unpunctuated long utterance (0.370905ms)
+✔ title is a literal proposal, not a generated event or date (0.215821ms)
+✔ long first token has no invented or silently truncated title (0.246121ms)
+✔ empty or oversized transcripts and invalid options fail without truncation (0.798667ms)
+✔ browser-shareable module has no Node imports, network, storage or current time (7.870951ms)
+✔ literal property corpus including Unicode, quotes, script and repeated whitespace (1.522158ms)
+✔ Pages-compatible schema accepts exact text payload and forbids audio/private fields (1.287497ms)
+✔ Pages slug limit mismatch is exposed: legacy accepts101, transport guard rejects (0.663641ms)
+✔ requires explicit zoned publication date without using event/capture defaults (0.422861ms)
+✔ actual current Python generator matches provider publication, archive and rendered verification (128.646113ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 285.954693
