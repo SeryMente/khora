@@ -8,6 +8,9 @@ export type CapturaSnapshot = {
   sessionId: string; revisionId: string; clientAt: number; texto: string;
   parcial: string; titulo: string; fuenteEntrada: FuenteCaptura;
   duracionSeg: number; audioPartes: unknown[];
+  tipoEntrada?: import("./editorial").TipoEntrada;
+  ofuscada?: boolean;
+  publicationIntent?: import("./editorial").PublicationIntent;
   dialogo?: import("../dialogo/contrato").ManifiestoDialogo;
   corteAudio?: { hastaParte: number; finMs: number };
   recuperadaDe?: { sessionId: string; revisionId: string };

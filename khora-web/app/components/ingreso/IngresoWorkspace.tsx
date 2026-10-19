@@ -1,4 +1,7 @@
 "use client";
+import { CLASIFICACION_INICIAL, clasificacionRecuperada, type ClasificacionEntrada, iniciarIntencion, huellaTexto, type PublicationIntent } from "../../../lib/custodia/editorial";
+import { PublicacionCapturaPendiente } from "./PublicacionCapturaPendiente";
+import { bloqueoTranscripcion } from "../../../lib/custodia/transcripcion";
 import studioStyles from "./ingreso-studio.module.css";
 import { DialogoPanel } from "./DialogoPanel";
 import { RecoveryDrawer, type RecoveryItem } from "./RecoveryDrawer";
@@ -8,7 +11,7 @@ import { verificarCierreCaptura } from "@/lib/audio/custodia";
 
 
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
-import { guardarSnapshotLocal, guardarAudioLocal, recuperarLocal, confirmarAudioLocal, cerrarSnapshotLocal } from "@/lib/client/custodia-local";
+import { guardarIntencionEditorialLocal, guardarSnapshotLocal, guardarAudioLocal, recuperarLocal, confirmarAudioLocal, cerrarSnapshotLocal } from "@/lib/client/custodia-local";
 import { subirAudioCustodiado } from "@/lib/client/subir-audio-custodia";
 import { CHECKPOINT_IDLE_MS, CHECKPOINT_MAX_MS, AUDIO_CHECKPOINT_MS, LOCAL_CHECKPOINT_MS, nuevaRevision, textoRecuperable, type CapturaSnapshot } from "@/lib/custodia/contrato";
 
@@ -49,10 +52,11 @@ export function IngresoWorkspace() {
 
 function IngresoSeleccionado() {
   const params = useSearchParams();
+  const [clasificacion,setClasificacion]=useState<ClasificacionEntrada>(CLASIFICACION_INICIAL);
   const [dialogo,setDialogo]=useState(params?.get("modo")==="dialogo");
   if (!params || params.get("modo") !== "ingesta") return dialogo
-    ? <DialogoPanel sessionId={params?.get("modo")==="dialogo"?params.get("sessionId"):null} onSalir={()=>setDialogo(false)} />
-    : <IngresoContenido onDialogo={()=>setDialogo(true)} />;
+    ? <DialogoPanel sessionId={params?.get("modo")==="dialogo"?params.get("sessionId"):null} clasificacion={clasificacion} onClasificacionChange={setClasificacion} onSalir={()=>setDialogo(false)} />
+    : <IngresoContenido clasificacion={clasificacion} onClasificacionChange={setClasificacion} onDialogo={()=>setDialogo(true)} />;
   const volcadoId = params.get("volcado_id");
   const rawVersion = params.get("version");
   const version = rawVersion && /^[1-9][0-9]*$/.test(rawVersion) && Number.isSafeInteger(Number(rawVersion))
@@ -60,7 +64,7 @@ function IngresoSeleccionado() {
   return <IngresoIngestaPanel key={params.toString()} volcadoId={volcadoId} version={version} />;
 }
 
-function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
+function IngresoContenido({onDialogo,clasificacion,onClasificacionChange}:{onDialogo:()=>void;clasificacion:ClasificacionEntrada;onClasificacionChange:(value:ClasificacionEntrada)=>void}) {
 
   const [segmentos, setSegmentos] = useState<SegmentoReconciliado[]>([]);
   const [pendiente, setPendiente] = useState("");
@@ -116,8 +120,9 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
   const [preparacionIntento,setPreparacionIntento]=useState(0);
   const [custodiaEstado, setCustodiaEstado] = useState("Preparando salvaguarda…");
   const ownerRef = useRef("");
-  const vistaVivaRef = useRef({ texto, parcial, titulo, archivado });
-  vistaVivaRef.current = { texto, parcial, titulo, archivado };
+  const publicationIntentRef=useRef<PublicationIntent|undefined>(undefined);
+  const vistaVivaRef = useRef({ texto, parcial, titulo, archivado, ...clasificacion });
+  vistaVivaRef.current = { texto, parcial, titulo, archivado, ...clasificacion };
   const snapshotRef = useRef<CapturaSnapshot | null>(null);
   const escrituraLocalRef = useRef<Promise<void>>(Promise.resolve());
   const recRef = useRef<any>(null);
@@ -390,9 +395,9 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
     if (!ownerRef.current || vistaVivaRef.current.archivado) return;
     if (!sesionIdRef.current) sesionIdRef.current = generarSesionId();
     const v = vistaVivaRef.current;
-    const current: CapturaSnapshot = { sessionId:sesionIdRef.current, ...nuevaRevision(), texto:v.texto, parcial:v.parcial, titulo:v.titulo, fuenteEntrada:fuenteEntradaSesionRef.current || "texto", duracionSeg:duracionRef.current, audioPartes:[...partesSubidasRef.current], recuperadaDe:recuperadaDeRef.current };
+    const current: CapturaSnapshot = { sessionId:sesionIdRef.current, ...nuevaRevision(), texto:v.texto, parcial:v.parcial, titulo:v.titulo, tipoEntrada:v.tipoEntrada,ofuscada:v.ofuscada,publicationIntent:publicationIntentRef.current, fuenteEntrada:fuenteEntradaSesionRef.current || "texto", duracionSeg:duracionRef.current, audioPartes:[...partesSubidasRef.current], recuperadaDe:recuperadaDeRef.current };
     if(!current.texto && !current.parcial && !current.audioPartes.length && !activoRef.current) return;
-    const signature=JSON.stringify([current.texto,current.parcial,current.titulo,current.audioPartes]);
+    const signature=JSON.stringify([current.texto,current.parcial,current.titulo,current.audioPartes,current.tipoEntrada,current.ofuscada,current.publicationIntent]);
     if(!forzar && signature===ultimoCheckpointTextoRef.current)return;
     const owner=ownerRef.current;
     const task=(checkpointEnCursoRef.current||Promise.resolve()).catch(()=>undefined).then(async()=>{
@@ -419,7 +424,7 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
       await escrituraLocalRef.current;
       if(selectedLocal)await guardarSnapshotLocal(ownerRef.current,selectedLocal,true);
       if(!vistaVivaRef.current.archivado&&(initialText||partesSubidasRef.current.length)){
-        const v=vistaVivaRef.current;await guardarSnapshotLocal(ownerRef.current,{sessionId:initialSession,...nuevaRevision(),texto:v.texto,parcial:v.parcial,titulo:v.titulo,fuenteEntrada:fuenteEntradaSesionRef.current||"texto",duracionSeg:duracionRef.current,audioPartes:[...partesSubidasRef.current]});
+        const v=vistaVivaRef.current;await guardarSnapshotLocal(ownerRef.current,{sessionId:initialSession,...nuevaRevision(),texto:v.texto,parcial:v.parcial,titulo:v.titulo,tipoEntrada:v.tipoEntrada,ofuscada:v.ofuscada,publicationIntent:publicationIntentRef.current,fuenteEntrada:fuenteEntradaSesionRef.current||"texto",duracionSeg:duracionRef.current,audioPartes:[...partesSubidasRef.current]});
         await guardarCheckpoint(true);
       }
       const dialogCheck=selectedLocal || await fetch("/api/dictado/checkpoint?sessionId="+encodeURIComponent(item.sessionId),{cache:"no-store"}).then(async r=>r.ok?(await r.json()).recovery:null);
@@ -460,7 +465,7 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
       sesionIdRef.current=recovery.sessionId;recuperadaDeRef.current=recovery.recuperadaDe;
       fuenteEntradaSesionRef.current=recovery.fuenteEntrada;partesSubidasRef.current=recovery.audioPartes as typeof partesSubidasRef.current;partesRawRef.current=[];
       parteConsecutivaRef.current=maximoIndiceConocido(partesSubidasRef.current,[])+1;
-      duracionRef.current=recovery.duracionSeg||0;setTitulo(recovery.titulo||"");
+      duracionRef.current=recovery.duracionSeg||0;setTitulo(recovery.titulo||"");onClasificacionChange(clasificacionRecuperada(recovery));publicationIntentRef.current=recovery.publicationIntent;
       const recoveredText=textoRecuperable(recovery),segment:SegmentoReconciliado={id:"recovery-"+recovery.sessionId,texto:recoveredText,estado:"pendiente_error"};
       segmentosRef.current=[segment];setSegmentos([segment]);baseDictadoRef.current=[];fragmentosRef.current=[];pendienteRef.current=recoveredText;setPendiente(recoveredText);setParcial("");setTexto(recoveredText);
       setArchivado(false);setEditando(false);setEstado("inactivo");setModoEntrada("ninguno");modoEntradaRef.current="ninguno";setStreamAudio(null);
@@ -475,14 +480,14 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
     void (async ()=>{
       if(!sesionIdRef.current)sesionIdRef.current=generarSesionId();
       const v=vistaVivaRef.current;if(!v.texto&&!v.parcial&&!partesSubidasRef.current.length)return;
-      const snapshot:CapturaSnapshot={sessionId:sesionIdRef.current,...nuevaRevision(),texto:v.texto,parcial:v.parcial,titulo:v.titulo,fuenteEntrada:fuenteEntradaSesionRef.current||"texto",duracionSeg:duracionRef.current,audioPartes:[...partesSubidasRef.current],recuperadaDe:recuperadaDeRef.current};
+      const snapshot:CapturaSnapshot={sessionId:sesionIdRef.current,...nuevaRevision(),texto:v.texto,parcial:v.parcial,titulo:v.titulo,tipoEntrada:v.tipoEntrada,ofuscada:v.ofuscada,publicationIntent:publicationIntentRef.current,fuenteEntrada:fuenteEntradaSesionRef.current||"texto",duracionSeg:duracionRef.current,audioPartes:[...partesSubidasRef.current],recuperadaDe:recuperadaDeRef.current};
       snapshotRef.current=snapshot;
       escrituraLocalRef.current=escrituraLocalRef.current.catch(()=>undefined).then(()=>guardarSnapshotLocal(custodiaOwner,snapshot));
       void escrituraLocalRef.current.then(()=>setCustodiaEstado("Conservado en este dispositivo; confirmación remota pendiente")).catch(()=>setCustodiaEstado("ERROR: custodia local no disponible"));
     })();
     const idleTimer=setTimeout(()=>void guardarCheckpoint(),CHECKPOINT_IDLE_MS);
     return ()=>{clearTimeout(idleTimer);};
-  },[texto,parcial,titulo,partesContador,custodiaOwner,archivado,guardando,guardarCheckpoint]);
+  },[texto,parcial,titulo,clasificacion,partesContador,custodiaOwner,archivado,guardando,guardarCheckpoint]);
   useEffect(()=>{
     if(!custodiaOwner)return;
     const tick=setInterval(()=>void guardarCheckpoint(),CHECKPOINT_MAX_MS);
@@ -505,15 +510,12 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
     const transcriptionStartedAt = Date.now();
     observarDictado("TRANSCRIPCION_AUTORITATIVA_INICIADA", { outcome: "PENDING", metrics: { part_count: partesSubidasRef.current.length, segment_count: segmentosRef.current.length } });
     void enviarEventosObservabilidadDictado();
-    if (!sesionIdRef.current || partesSubidasRef.current.length === 0 || pendingUploadsRef.current.size>0) {
+    const bloqueo=bloqueoTranscripcion(sesionIdRef.current,partesSubidasRef.current.length,pendingUploadsRef.current.size);
+    if (bloqueo) {
       estadoTranscripcionRef.current = partesRawRef.current.length > 0 ? "fallido" : null;
-      observarDictado("TRANSCRIPCION_AUTORITATIVA_OMITIDA", { outcome: "SKIPPED", reasonCode: !sesionIdRef.current ? "no_session" : "no_verified_parts", metrics: { part_count: partesSubidasRef.current.length, segment_count: segmentosRef.current.length } });
+      observarDictado("TRANSCRIPCION_AUTORITATIVA_OMITIDA", { outcome:"SKIPPED",reasonCode:bloqueo.code,metrics:{part_count:partesSubidasRef.current.length,pending_chunks:pendingUploadsRef.current.size,segment_count:segmentosRef.current.length} });
       void enviarEventosObservabilidadDictado();
-      if (trozosRef.current.length > 0) {
-        setReconciliacionMensaje(
-          "No se enviará el audio completo al servidor: ninguna parte quedó almacenada y vinculada a la sesión.",
-        );
-      }
+      setReconciliacionMensaje(bloqueo.message);
       return;
     }
     const textoPreview = texto || segmentosRef.current.map((s) => s.texto).join("\n\n");
@@ -593,7 +595,7 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
         observarDictado("PARTE_AUDIO_SUBIDA_CONFIRMADA",{outcome:"SUCCESS",attemptId:"parte-"+parteActual,durationMs:Date.now()-uploadStartedAt,metrics:{part_index:parteActual,upload_verified:true,media_part_bytes:blob.size}});
         await confirmarAudioLocal(ownerRef.current,sesionId,parteActual).catch(()=>setCustodiaDetalle("Audio confirmado en servidor; actualización del recibo local pendiente."));
         if(sesionIdRef.current===sesionId&&evaluarAudioRecuperado(partesSubidasRef.current.filter(p=>p.parte<=parteActual),parteActual).ok){
-          const cut:CapturaSnapshot={sessionId:sesionId,...cutRevision,texto:cutView.texto,parcial:cutView.parcial,titulo:cutView.titulo,fuenteEntrada:fuenteEntradaSesionRef.current||"microfono",duracionSeg:endMs/1000,audioPartes:partesSubidasRef.current.filter(p=>p.parte<=parteActual),corteAudio:{hastaParte:parteActual,finMs:endMs},recuperadaDe:recuperadaDeRef.current};
+          const cut:CapturaSnapshot={sessionId:sesionId,...cutRevision,texto:cutView.texto,parcial:cutView.parcial,titulo:cutView.titulo,tipoEntrada:cutView.tipoEntrada,ofuscada:cutView.ofuscada,publicationIntent:publicationIntentRef.current,fuenteEntrada:fuenteEntradaSesionRef.current||"microfono",duracionSeg:endMs/1000,audioPartes:partesSubidasRef.current.filter(p=>p.parte<=parteActual),corteAudio:{hastaParte:parteActual,finMs:endMs},recuperadaDe:recuperadaDeRef.current};
           // Immutable boundary evidence is additional; a late acknowledgement cannot replace the editor.
           const cutTask=(checkpointEnCursoRef.current||Promise.resolve()).catch(()=>undefined).then(async()=>{
             await guardarSnapshotLocal(ownerRef.current,cut,true);
@@ -786,7 +788,7 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
           const owner=ownerRef.current,localView={...vistaVivaRef.current};
           escrituraLocalRef.current=escrituraLocalRef.current.catch(()=>undefined).then(async()=>{
             await guardarAudioLocal(owner,sid,index,localBlob,{upload});
-            await guardarSnapshotLocal(owner,{sessionId:sid,...nuevaRevision(),texto:localView.texto,parcial:localView.parcial,titulo:localView.titulo,fuenteEntrada:"microfono",duracionSeg:Math.max(0,(now-inicioRef.current)/1000),audioPartes:[...partesSubidasRef.current]});
+            await guardarSnapshotLocal(owner,{sessionId:sid,...nuevaRevision(),texto:localView.texto,parcial:localView.parcial,titulo:localView.titulo,tipoEntrada:localView.tipoEntrada,ofuscada:localView.ofuscada,publicationIntent:publicationIntentRef.current,fuenteEntrada:"microfono",duracionSeg:Math.max(0,(now-inicioRef.current)/1000),audioPartes:[...partesSubidasRef.current]});
           });
           void escrituraLocalRef.current.catch(()=>setCustodiaEstado("ERROR: fragmento de audio sin copia local confirmada"));
           const totalSize = parteTrozosRef.current.reduce((sum, chunk) => sum + chunk.size, 0);
@@ -1182,6 +1184,12 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
       return;
     }
     if (!sesionIdRef.current) sesionIdRef.current = generarSesionId();
+    if(clasificacion.tipoEntrada==="blog_personal") {
+      try {
+        publicationIntentRef.current=await iniciarIntencion(texto,publicationIntentRef.current);
+        await guardarIntencionEditorialLocal(ownerRef.current,{sessionId:sesionIdRef.current,intent:publicationIntentRef.current,draft:{title:titulo,body:texto,date:new Date().toISOString(),obfuscated:clasificacion.ofuscada}});
+      } catch {setError("No se pudo conservar la intención editorial. No se envió el archivo ni se autorizó publicación; conserva esta pestaña y reintenta.");return;}
+    }
     await guardarCheckpoint(true);
     setGuardando(true);
     const saveStartedAt = Date.now();
@@ -1217,7 +1225,7 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
             : !audioEsperado;
 
       if (audioEsperado && !audioIntegro) {
-        setError("No se puede archivar el registro: Khora no ha verificado la custodia íntegra de todas las partes de audio.");
+        setError(`Archivo pendiente: ${partes.length} parte(s) de audio confirmada(s), ${partesGeneradas} generada(s) y ${pendingUploadsRef.current.size} pendiente(s) de sincronización. Falta acreditar la integridad del audio; no se envió el archivo. Revisa «Detalle de sincronización de audio» y usa «Reintentar sincronización». Mantén esta pestaña abierta y exporta el audio disponible.`);
         return;
       }
 
@@ -1239,6 +1247,7 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
         audioPartes: partes.length > 0 ? partes : null,
         estadoTranscripcion: estadoTranscripcionRef.current || null,
         fuenteEntrada: fuenteEntradaSesionRef.current || "texto",
+        tipoEntrada:clasificacion.tipoEntrada,ofuscada:clasificacion.ofuscada,
       };
 
       let rv: Response;
@@ -1263,8 +1272,13 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
         } else {
           observarDictado("GUARDADO_DICTADO_COMPLETADO", { outcome: "SUCCESS", durationMs: Date.now() - saveStartedAt, metrics: { response_ok: true, chars_current: texto.length, part_count: partesSubidasRef.current.length } });
           if(!dv?.id||dv?.sessionId!==payload.sessionId||!/^[a-f0-9]{64}$/i.test(String(dv?.sha256||"")))throw new Error("Recibo de archivo inválido");
-          await cerrarSnapshotLocal(ownerRef.current,payload.sessionId!);
+          if(await huellaTexto(payload.texto)!==String(dv.sha256).toLowerCase()||dv.version!==1||dv.tipoEntrada!==payload.tipoEntrada||dv.ofuscada!==payload.ofuscada)throw new Error("El recibo no acredita el contenido y la clasificación enviados");
           setArchivado(true);
+          if(publicationIntentRef.current&&payload.tipoEntrada==="blog_personal") {
+            publicationIntentRef.current={...publicationIntentRef.current,state:"awaiting_decision"};
+            await guardarIntencionEditorialLocal(ownerRef.current,{sessionId:payload.sessionId!,intent:publicationIntentRef.current,draft:{title:titulo,body:texto,date:new Date().toISOString(),obfuscated:clasificacion.ofuscada},receipt:{volcado_id:dv.id,version:dv.version,sha256:dv.sha256}}).catch(()=>setError("Archivo confirmado en servidor. Actualización del recibo editorial local pendiente; no dupliques el archivo ni publiques sin reconciliarlo."));
+          }
+          await cerrarSnapshotLocal(ownerRef.current,payload.sessionId!).catch(()=>setError("Archivo confirmado; cierre de copia local pendiente. No dupliques este archivo."));
           setCustodiaEstado("Captura cerrada en servidor · "+dv.id+" · "+String(dv.estado||"estado no informado"));
           setResultado((dv?.idempotent ? "registro ya archivado " : "archivado ") + String(dv?.chars) + " caracteres, sha " + String(dv?.sha256).slice(0, 8) + (audioUrl ? `, con audio (${partes.length} partes)` : ", sin audio"));
           setAviso("Captura sellada. La revisión y las correcciones se hacen en Custodia; pulsa Limpiar para empezar una captura nueva.");
@@ -1280,7 +1294,7 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
       setGuardando(false);
       await enviarEventosObservabilidadDictado();
     }
-  }, [archivado, texto, titulo, pulidosOk, observarDictado, guardarCheckpoint]);
+  }, [archivado, texto, titulo, clasificacion, pulidosOk, observarDictado, guardarCheckpoint]);
 
 
   const exportarMp3Conservado = useCallback(async()=>{
@@ -1419,7 +1433,7 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
       await guardarCheckpoint(true);
       setAviso("Antes de abrir otra captura, cierra esta con Archivar. No se descartó ningún contenido.");return;
     }
-    setTitulo("");recuperadaDeRef.current=undefined;setStreamAudio(null);
+    setTitulo("");onClasificacionChange(CLASIFICACION_INICIAL);publicationIntentRef.current=undefined;recuperadaDeRef.current=undefined;setStreamAudio(null);
 
     observarDictado("CAPTURA_LIMPIADA", { outcome: "SUCCESS", metrics: { source_mode: modoEntradaRef.current, chars_before: texto.length, part_count: partesSubidasRef.current.length } });
     void enviarEventosObservabilidadDictado();
@@ -1597,7 +1611,8 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
       />
       <IngresoView
       state={{
-        archivado,finalizando,audioPendiente,custodiaDetalle,
+        editorialExtra:<PublicacionCapturaPendiente owner={custodiaOwner} refresh={Number(archivado)}/>,
+        clasificacion,archivado,finalizando,audioPendiente,custodiaDetalle,
         custodiaEstado,custodiaReady:!!custodiaOwner,custodiaPreparando,recuperando,recuperaciones:recoveryItems.length,stream:streamAudio,
         titulo,
         texto,
@@ -1627,6 +1642,7 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
         resultado,
       }}
       actions={{
+        onClasificacionChange:value=>{if(!guardando&&!archivado&&!recuperando&&estado!=="dictando")onClasificacionChange(value);},
         onReintentarPreparacion:()=>setPreparacionIntento(n=>n+1),
         onRecuperar:()=>{setRecoveryOpen(true);void cargarRecuperaciones();},
         onTituloChange: (value) => { if(!guardando&&!archivado&&!recuperando)setTitulo(value); },

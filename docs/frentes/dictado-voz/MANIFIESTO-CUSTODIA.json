@@ -6,10 +6,10 @@
   "method": {
     "repo": "SeryMente/metodologia",
     "path": "METACANON-OBJETOS-CANONICOS.md",
-    "commit": "49ac40e9f6122e2d2fb339362cfa0a78128c8e37",
-    "blob": "32c7a65ff2e83b3b76752ba2160427bd6e851a8f",
-    "sha256": "1db7a16892310c505ec3002e9439e35c11a13b2e5e36dee2829efeda201e042c",
-    "version": "1.5"
+    "version": "1.6",
+    "commit": "a466b6b46f266de6a6ccd656e071eb7a07dc0e10",
+    "blob": "8f9ad1cf0e09e5fcd7014190770a77294ff39af4",
+    "sha256": "dab6680cbcdb6530e4616f8b13d1e0d5f1ff0885508203d1c5eac22fd86250ee"
   },
   "original_source": {
     "repo": "SeryMente/khora",
@@ -251,12 +251,6 @@
       "git_blob_sha": "8b44863c4be759660a02789165442796adb62169"
     },
     {
-      "path": "OBJETO-CANONICO.md",
-      "bytes": 194785,
-      "sha256": "092ff9b9d03e7e805f929a4daceda3b72b2fbdb5a00ee526c3b8d7d5e2bebd92",
-      "git_blob_sha": "a29ad8e3221128f2b59caa00fc8ed3ded87c89a2"
-    },
-    {
       "path": "evidencias/dialogo.test.ts",
       "bytes": 7331,
       "sha256": "f12e2838d2ec03bc6f5789f7760c12c41959f88b36ef8f5cbcac251fa8a37de0",
@@ -345,6 +339,60 @@
       "bytes": 3139,
       "sha256": "47a10ab2169ee1165ff2e39e1850f5c802b22e100b3b0b7aee71d1fcde571164",
       "git_blob_sha": "e18663f9bb4ebcbe2494a8340e305078e5dadec9"
+    },
+    {
+      "path": "OBJETO-CANONICO.md",
+      "bytes": 199338,
+      "sha256": "2cc3752de863c17436ee0bed086d091aa1a8b9d26973a0511f7656de247507c2",
+      "git_blob_sha": "f6cd23152063d7f51cb96d19b4fb95ba4b082dd7"
+    },
+    {
+      "path": "evidencias/C031-unit.log",
+      "bytes": 856,
+      "sha256": "557b790f40f37653219be7564fceaf6b75671b815361db72e206fbc9338f4076",
+      "git_blob_sha": "0f9df1df8fa2e2756fd249055d790c023438ab15"
+    },
+    {
+      "path": "evidencias/C031-archive-results.json",
+      "bytes": 500,
+      "sha256": "f675ba73470b1d50eae9aa2a37313c61d0a2a84ed90395b92591fdcd56a486c3",
+      "git_blob_sha": "5a1ef43246f1380cc1bd7b1c9fed8a4b022b57fc"
+    },
+    {
+      "path": "evidencias/C031-normal-results.json",
+      "bytes": 1395,
+      "sha256": "1e3833293e5b20c9de2656b7d184614038dd7cc828a5c6820ebccddd8aa07dc1",
+      "git_blob_sha": "538e70bdf538c858ab0ab4dca3abaeb461bdef86"
+    },
+    {
+      "path": "evidencias/C031-classification-results.json",
+      "bytes": 290,
+      "sha256": "70f490c557612c04bfcad30ba21dd496d603215c17d72650a388e0207de52cf7",
+      "git_blob_sha": "1d273c038ffee6012cce76c7c03351959374e72a"
+    },
+    {
+      "path": "evidencias/C031-terminal-errors.json",
+      "bytes": 3487,
+      "sha256": "387dbc019c6023243abf0bdc6e5f3af6ea1658f116bdea844bc651db04152dad",
+      "git_blob_sha": "22b4538a6bad5f70a6c52e212ccf9fdb90c2e151"
+    },
+    {
+      "path": "evidencias/C031-pruebas.md",
+      "bytes": 1355,
+      "sha256": "c1e5c4fa5168d6bb015982e85289ca2a5e5ee459cf90a26f3231ed4017420e81",
+      "git_blob_sha": "3b562db18a85bbe5f2812bb25e52d19d97a5e1ee"
+    },
+    {
+      "path": "evidencias/C031-results.json",
+      "bytes": 5105,
+      "sha256": "d515b0c797cf8818d29072317bf571f6d958673d2263f70c3bda1b4e252d4af2",
+      "git_blob_sha": "eb09f93d7fbd24a110b743a5a6353c6237ec07d6"
+    },
+    {
+      "path": "originales/C031-extractos-recibidos.json",
+      "bytes": 4542,
+      "sha256": "17ed21f69010e1c777203bf0d2e4ae0a35b111d5fb4ec9fbd30e7d9cdf7b56b9",
+      "git_blob_sha": "d9d28e13f3ae492c0d02b6360d30a0b4da35e167"
     }
   ],
   "runtime_references": [
@@ -451,12 +499,13 @@
     "no_secret_values_in_manifest": true
   },
   "current_preparation": {
-    "version": "0.6.12",
-    "baseSha": "f0dfbdcb2d79eb6289dacba272ddcc7ba2023063",
-    "receipt": "evidencias/C030-release.json",
-    "state": "functional production verified; effective gate blocked and human acceptance pending"
+    "version": "0.6.13",
+    "baseSha": "b5e7009de137db30c26ecc5f4ddbb34789f453f2",
+    "branch": "feat/ingreso-autobiografico-20261019",
+    "receipt": "evidencias/C031-results.json",
+    "state": "draft; not deployed; actual failure cause unverified"
   },
-  "latestEvent": "C030 - functional production verified; effective global gate failed, unpromoted, logs forbidden; no full e2e claim",
+  "latestEvent": "C031 draft, real audio custody failure unresolved; public audio requirement blocks Yes",
   "latest_verified_release": {
     "sha": "f0dfbdcb2d79eb6289dacba272ddcc7ba2023063",
     "deploymentId": "dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr",
@@ -482,17 +531,13 @@
     "physicalAcceptance": false,
     "technicalPublicationVerified": true
   },
-  "latest_cycle": "C030",
-  "canonical_version": "0.6.12",
+  "latest_cycle": "C031",
+  "canonical_version": "0.6.13",
   "latest_candidate": {
-    "branch": "fix/captura-dialogo-custodia-20261018",
-    "codeCommit": "b36231bfdd719741253148d24ba0265ac8dadeb7",
-    "prebuildCommit": "06c36c9917de19eeaa0c2ea1432742294e45678e",
-    "base": "3356bfc92965503d81b06e5637c4668afbde3a52",
-    "previewDeployment": "dpl_HkHzVpp8ymTiueVnGXYs6vmvtha8",
-    "previewState": "READY",
-    "production": "verified",
-    "releaseCommit": "f0dfbdcb2d79eb6289dacba272ddcc7ba2023063"
+    "branch": "feat/ingreso-autobiografico-20261019",
+    "base": "b5e7009de137db30c26ecc5f4ddbb34789f453f2",
+    "production": false,
+    "publicAudio": false
   },
   "release_history": [
     {
@@ -530,11 +575,43 @@
         "sha256": "f12e2838d2ec03bc6f5789f7760c12c41959f88b36ef8f5cbcac251fa8a37de0",
         "git_blob_sha": "bd84597fb390e12c0ff0a6b6c1125efd1258f3cc"
       }
+    },
+    {
+      "event": "C031",
+      "path": "OBJETO-CANONICO.md",
+      "previous": {
+        "path": "OBJETO-CANONICO.md",
+        "bytes": 194785,
+        "sha256": "092ff9b9d03e7e805f929a4daceda3b72b2fbdb5a00ee526c3b8d7d5e2bebd92",
+        "git_blob_sha": "a29ad8e3221128f2b59caa00fc8ed3ded87c89a2"
+      }
     }
   ],
   "quality_gate": {
     "state": "blocked",
     "receipt": "evidencias/C030-gate-blocker.json",
     "activeConfigChanged": false
-  }
+  },
+  "method_history": [
+    {
+      "repo": "SeryMente/metodologia",
+      "path": "METACANON-OBJETOS-CANONICOS.md",
+      "commit": "49ac40e9f6122e2d2fb339362cfa0a78128c8e37",
+      "blob": "32c7a65ff2e83b3b76752ba2160427bd6e851a8f",
+      "sha256": "1db7a16892310c505ec3002e9439e35c11a13b2e5e36dee2829efeda201e042c",
+      "version": "1.5"
+    }
+  ],
+  "candidate_history": [
+    {
+      "branch": "fix/captura-dialogo-custodia-20261018",
+      "codeCommit": "b36231bfdd719741253148d24ba0265ac8dadeb7",
+      "prebuildCommit": "06c36c9917de19eeaa0c2ea1432742294e45678e",
+      "base": "3356bfc92965503d81b06e5637c4668afbde3a52",
+      "previewDeployment": "dpl_HkHzVpp8ymTiueVnGXYs6vmvtha8",
+      "previewState": "READY",
+      "production": "verified",
+      "releaseCommit": "f0dfbdcb2d79eb6289dacba272ddcc7ba2023063"
+    }
+  ]
 }

@@ -1,17 +1,19 @@
 "use client";
+import { CLASIFICACION_INICIAL, clasificacionRecuperada, type ClasificacionEntrada, type PublicationIntent, iniciarIntencion, huellaTexto } from "../../../lib/custodia/editorial";
 import { useEffect, useRef, useState } from "react";
 import { capturarDialogo, type CapturaDialogo, type ParteDialogo } from "../../../lib/dialogo/capturar";
 import { formatearCaptura, type FuenteDialogo, type ManifiestoDialogo } from "../../../lib/dialogo/contrato";
-import { guardarAudioLocal, guardarSnapshotLocal, recuperarLocal, cerrarSnapshotLocal } from "../../../lib/client/custodia-local";
+import { guardarIntencionEditorialLocal, guardarAudioLocal, guardarSnapshotLocal, recuperarLocal, cerrarSnapshotLocal } from "../../../lib/client/custodia-local";
 import { subirAudioCustodiado } from "../../../lib/client/subir-audio-custodia";
 import { nuevaRevision, type CapturaSnapshot } from "../../../lib/custodia/contrato";
 import { IngresoView } from "../shared/IngresoView";
+import { PublicacionCapturaPendiente } from "./PublicacionCapturaPendiente";
 import s from "./ingreso-studio.module.css";
 
 type ParteGuardada=Awaited<ReturnType<typeof subirAudioCustodiado>>;
 const initial=():ManifiestoDialogo=>({version:1,estado:"preparando",etiquetas:{microphone:"Operador",chrome_tab:"Salida Chrome"},partesEsperadas:0,turnos:[]});
 function download(blob:Blob,name:string){const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),10000);}
-export function DialogoPanel({sessionId:requested,onSalir}:{sessionId?:string|null;onSalir?:()=>void}){
+export function DialogoPanel({sessionId:requested,onSalir,clasificacion=CLASIFICACION_INICIAL,onClasificacionChange}:{sessionId?:string|null;onSalir?:()=>void;clasificacion?:ClasificacionEntrada;onClasificacionChange?:(value:ClasificacionEntrada)=>void}){
   const [recoveryTarget,setRecoveryTarget]=useState(requested);
   const [organizarComoDialogo,setOrganizarComoDialogo]=useState(true);
   const [ready,setReady]=useState(false),[busy,setBusy]=useState(false),[active,setActive]=useState(false);
@@ -20,7 +22,8 @@ export function DialogoPanel({sessionId:requested,onSalir}:{sessionId?:string|nu
   const [hasSession,setHasSession]=useState(false),[archived,setArchived]=useState(false),[volcadoId,setVolcadoId]=useState("");
   const [micStream,setMicStream]=useState<MediaStream|null>(null),[chromeStream,setChromeStream]=useState<MediaStream|null>(null);
   const [localCount,setLocalCount]=useState(0),[elapsed,setElapsed]=useState(0),[retryPreparation,setRetryPreparation]=useState(0);
-  const visible=useRef({title,text});visible.current={title,text};
+  const visible=useRef({title,text,...clasificacion});visible.current={title,text,...clasificacion};
+  const publicationIntent=useRef<PublicationIntent|undefined>(undefined);
   const archivePayload=useRef<Record<string,unknown>|null>(null);
   const archiveBusy=useRef(false),stopping=useRef(false),transcribing=useRef(false);
   const transcriptionState=useRef<string|null>(null);
@@ -41,7 +44,7 @@ export function DialogoPanel({sessionId:requested,onSalir}:{sessionId?:string|nu
   const raw=useRef<ParteDialogo[]>([]),stored=useRef<ParteGuardada[]>([]),capture=useRef<CapturaDialogo|null>(null);
   const queue=useRef<Promise<void>>(Promise.resolve()),localQueue=useRef<Promise<void>>(Promise.resolve());
   const errorRemote=useRef(false),duration=useRef(0),interrupted=useRef(false),mounted=useRef(true),inProgress=useRef(false);
-  const snapshot=():CapturaSnapshot=>({sessionId:id.current,...nuevaRevision(),texto:textRef.current,parcial:"",titulo:visible.current.title,fuenteEntrada:"dialogo",duracionSeg:duration.current,audioPartes:[...stored.current],dialogo:{...manifest.current,partesEsperadas:manifest.current.partesEsperadas}});
+  const snapshot=():CapturaSnapshot=>({sessionId:id.current,...nuevaRevision(),texto:textRef.current,parcial:"",titulo:visible.current.title,tipoEntrada:visible.current.tipoEntrada,ofuscada:visible.current.ofuscada,publicationIntent:publicationIntent.current,fuenteEntrada:"dialogo",duracionSeg:duration.current,audioPartes:[...stored.current],dialogo:{...manifest.current,partesEsperadas:manifest.current.partesEsperadas}});
   const persist=async(remote=true)=>{
     const snap=snapshot();
     localQueue.current=localQueue.current.catch(()=>undefined).then(()=>guardarSnapshotLocal(owner.current,snap));await localQueue.current;
@@ -105,7 +108,7 @@ export function DialogoPanel({sessionId:requested,onSalir}:{sessionId?:string|nu
           stored.current=(data.recovery?.audioPartes||[]) as ParteGuardada[];
           raw.current=local.audios.filter(x=>x.sessionId===recoveryTarget).map(x=>({parte:x.part,blob:x.blob,fuente:x.meta.upload.fuenteAudio,startMs:x.meta.upload.startMs,endMs:x.meta.upload.endMs,duracionMs:x.meta.upload.duracionMs})).sort((a,b)=>a.parte-b.parte);
           if(!["detenido","interrumpido"].includes(manifest.current.estado))manifest.current.estado="interrumpido";
-          textRef.current=selected.texto;setText(selected.texto);setLabels(manifest.current.etiquetas);setOrganizarComoDialogo(manifest.current.organizarComoDialogo!==false);setTitle(selected.titulo);setCount(stored.current.length);localConfirmed.current=new Set(raw.current.map(p=>p.parte));setLocalCount(localConfirmed.current.size);setHasSession(true);
+          publicationIntent.current=selected.publicationIntent;onClasificacionChange?.(clasificacionRecuperada(selected));textRef.current=selected.texto;setText(selected.texto);setLabels(manifest.current.etiquetas);setOrganizarComoDialogo(manifest.current.organizarComoDialogo!==false);setTitle(selected.titulo);setCount(stored.current.length);localConfirmed.current=new Set(raw.current.map(p=>p.parte));setLocalCount(localConfirmed.current.size);setHasSession(true);
           setNotice("Diálogo recuperado; no se reanuda ni se mezcla con otra grabadora. Los originales permanecen separados por fuente.");
         }
         setReady(true);
@@ -119,7 +122,7 @@ export function DialogoPanel({sessionId:requested,onSalir}:{sessionId?:string|nu
     if(!hasSession||active||busy||archived||archivePayload.current)return;
     const timer=setTimeout(()=>void persist().catch(()=>setError("Edición local conservada; checkpoint remoto pendiente.")),1500);
     return()=>clearTimeout(timer);
-  },[title,text,hasSession,active,busy,archived]);
+  },[title,text,clasificacion,hasSession,active,busy,archived]);
   const upload=async(p:ParteDialogo)=>{
     if(stored.current.some(x=>x.parte===p.parte))return;
     const meta={fuenteAudio:p.fuente,startMs:p.startMs,endMs:p.endMs,duracionMs:p.duracionMs};
@@ -186,17 +189,26 @@ export function DialogoPanel({sessionId:requested,onSalir}:{sessionId?:string|nu
       if(!id.current||!stored.current.length||errorRemote.current||stored.current.length!==manifest.current.partesEsperadas)throw Error("Confirma todas las partes de audio antes de archivar. Los originales no se borraron.");
       if(!["detenido","interrumpido"].includes(manifest.current.estado))throw Error("Detén ambas fuentes antes de archivar.");
       if(!archivePayload.current){
+      if(visible.current.tipoEntrada==="blog_personal") {
+        publicationIntent.current=await iniciarIntencion(textRef.current,publicationIntent.current);
+        await guardarIntencionEditorialLocal(owner.current,{sessionId:id.current,intent:publicationIntent.current,draft:{title:visible.current.title,body:textRef.current,date:new Date().toISOString(),obfuscated:visible.current.ofuscada}});
+      }
       await persist();
       const ordered=[...stored.current].sort((a,b)=>a.parte-b.parte);
-      archivePayload.current={sessionId:id.current,texto:textRef.current,titulo:visible.current.title.trim()||null,fuenteEntrada:"dialogo",audioPartes:ordered,audioUrl:ordered[0].url,audioBytes:ordered.reduce((n,p)=>n+p.bytes,0),duracionSeg:Math.ceil(duration.current),pulidoAplicado:false,estadoTranscripcion:transcriptionState.current||"pendiente"};
+      archivePayload.current={sessionId:id.current,texto:textRef.current,titulo:visible.current.title.trim()||null,tipoEntrada:visible.current.tipoEntrada,ofuscada:visible.current.ofuscada,fuenteEntrada:"dialogo",audioPartes:ordered,audioUrl:ordered[0].url,audioBytes:ordered.reduce((n,p)=>n+p.bytes,0),duracionSeg:Math.ceil(duration.current),pulidoAplicado:false,estadoTranscripcion:transcriptionState.current||"pendiente"};
       }
       const payload=archivePayload.current;
       const response=await fetch("/api/dictado",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload),signal:AbortSignal.timeout(120000)});
       const receipt=await response.json().catch(()=>({}));
       if(!response.ok)throw Error(receipt.detail||"No se confirmó el archivo. Reintenta sin iniciar otra captura.");
       if(!receipt.id||receipt.sessionId!==id.current||!/^[a-f0-9]{64}$/i.test(receipt.sha256||""))throw Error("Recibo de archivo inválido. Conserva esta sesión y reintenta.");
+      if(await huellaTexto(String(payload.texto))!==String(receipt.sha256).toLowerCase()||receipt.version!==1||receipt.tipoEntrada!==payload.tipoEntrada||receipt.ofuscada!==payload.ofuscada)throw Error("El recibo no acredita el contenido y la clasificación enviados.");
       // Mark the remote seal immediately: a local cleanup error must not permit editing the archived original.
       setArchived(true);setVolcadoId(receipt.id);setNotice("Volcado archivado con ambos originales. Continúa en Custodia para revisar, aprobar e ingerir; no se ingirió automáticamente.");
+      if(publicationIntent.current&&payload.tipoEntrada==="blog_personal") {
+        publicationIntent.current={...publicationIntent.current,state:"awaiting_decision"};
+        await guardarIntencionEditorialLocal(owner.current,{sessionId:id.current,intent:publicationIntent.current,draft:{title:visible.current.title,body:textRef.current,date:new Date().toISOString(),obfuscated:visible.current.ofuscada},receipt:{volcado_id:receipt.id,version:receipt.version,sha256:receipt.sha256}}).catch(()=>setError("Archivo confirmado; recibo editorial local pendiente. No dupliques la captura."));
+      }
       await cerrarSnapshotLocal(owner.current,id.current).catch(()=>setError("Volcado confirmado en servidor; limpieza del borrador local pendiente. No dupliques el archivo."));
     }catch(e){setError((e instanceof Error?e.message:"No se confirmó el archivo.")+(archivePayload.current?" Reintenta Archivar con esta misma sesión y texto; no se duplicará voluntariamente ni se descartarán originales.":""));}
     finally{archiveBusy.current=false;setBusy(false);}
@@ -214,7 +226,7 @@ export function DialogoPanel({sessionId:requested,onSalir}:{sessionId?:string|nu
     finally{setBusy(false);}
   };
   return <IngresoView state={{
-    titulo:title,texto:text,estado:active?"dictando":"inactivo",modoEntrada:"chrome_live_caption",
+    editorialExtra:<PublicacionCapturaPendiente owner={owner.current} refresh={Number(archived)}/>,clasificacion,titulo:title,texto:text,estado:active?"dictando":"inactivo",modoEntrada:"chrome_live_caption",
     finalizando:busy&&active,organizarComoDialogo,dialogoChrome:true,dialogoSesion:hasSession,chromeStream,stream:micStream,
     chromeBridgeEstado:"captura nativa",chromeCaptionActivo:false,chromeCapturaEstado:active?"grabando":"inactiva",
     archivado:archived,archivoPendiente:!!archivePayload.current&&!archived,custodiaReady:ready,custodiaPreparando:!ready&&!error,
@@ -229,6 +241,7 @@ export function DialogoPanel({sessionId:requested,onSalir}:{sessionId?:string|nu
     </>}
     <p className={s.notice}>Originales separados y custodia cifrada de Khora. Mismo transcriptor configurado; sin Live Caption. Dos fuentes no identifican a cada persona dentro de una pista. Límite preventivo de 18 MB por fuente. No uses llamadas clínicas sin los permisos y condiciones requeridos.</p></details>{archived&&<a className={s.secondary} href="/sistema/custodia">Revisar volcado en Custodia</a>}</>
   }} actions={{
+    onClasificacionChange:value=>{if(!busy&&!active&&!archived&&!archivePayload.current)onClasificacionChange?.(value);},
     onIniciar:()=>void start(),onPrepararChrome:()=>void start(),onDetener:()=>void finish(),
     onOrganizarDialogoChange:enabled=>{if(!hasSession&&!active&&!busy)setOrganizarComoDialogo(enabled);},
     onDialogoChange:enabled=>{if(!enabled&&!hasSession&&!active&&!busy)onSalir?.();},

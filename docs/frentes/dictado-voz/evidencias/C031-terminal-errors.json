@@ -1,0 +1,65 @@
+[
+  {
+    "operation": "optional scripts inventory",
+    "symptom": "ls: cannot access '/data/khora-ingreso-c031/repo/khora-web/scripts': No such file or directory",
+    "cause": "partial source checkout; scripts not downloaded",
+    "stateImpact": "read only; no change",
+    "correction": "inspect only verified paths; do not claim whole repository build",
+    "verification": "known source paths readable",
+    "prevention": "existence guard for optional inventory"
+  },
+  {
+    "operation": "normal browser regression",
+    "symptom": "Error: Cannot find module 'esbuild'",
+    "cause": "copied harness omitted original dependency search path",
+    "stateImpact": "tests did not run; source not affected",
+    "correction": "reuse existing test tool node_modules via NODE_PATH",
+    "verification": "pending next test",
+    "prevention": "explicit dependency path in runner"
+  },
+  {
+    "operation": "test dependency inspection/retry",
+    "symptom": "Error: Cannot find module 'esbuild'; ls: cannot access '/data/node_modules': No such file or directory",
+    "cause": "declared global preinstalled modules absent in resumed computer; original tools only held TypeScript/PGlite",
+    "stateImpact": "no application execution; dependency gate failed",
+    "correction": "install test-only dependencies in isolated tools directory",
+    "verification": "pending installation and tests",
+    "prevention": "require.resolve before invoking harness; do not assume runtime modules survive context changes"
+  },
+  {
+    "operation": "archive browser fixture",
+    "symptom": "TypeError: Cannot read properties of undefined (reading 'tipoEntrada')",
+    "cause": "normal harness deliberately stubs cerrarEdicionInSitu to throw; archive scenario now exercises it, causing no committed text/checkpoint",
+    "stateImpact": "test failure, no production execution",
+    "correction": "load actual owned edicion-in-situ source and remove only that fixture adapter",
+    "verification": "rerun pending",
+    "prevention": "record adapter scope in evidence and fail on browser errors before downstream assertions"
+  },
+  {
+    "operation": "normal regression selector",
+    "symptom": "strict mode violation: getByText('Detalle de sincronización de audio') resolved to 2 elements",
+    "cause": "new diagnostic also names the detail summary; broad test locator is ambiguous",
+    "stateImpact": "test failed; no production change",
+    "correction": "exact summary locator",
+    "verification": "pending rerun",
+    "prevention": "role/tag and exact text selectors"
+  },
+  {
+    "operation": "sandbox read/kill",
+    "symptom": "sandbox infrastructure error",
+    "cause": "transient sandbox infrastructure; not application code",
+    "stateImpact": "read command interrupted, no product mutation",
+    "correction": "bounded retry checked sandbox and payload readable",
+    "verification": "sandbox-ok; payload-presente",
+    "prevention": "bounded recovery, no repeated product mutations"
+  },
+  {
+    "operation": "optional AGENTS path read",
+    "symptom": "head: cannot open '/data/khora-ingreso-c031/AGENTS.md' for reading: No such file or directory",
+    "cause": "AGENTS was read earlier from source, not copied to this root",
+    "stateImpact": "read-only diagnostic exit1",
+    "correction": "reuse already loaded instructions, do not claim new read",
+    "verification": "existing source instructions applied",
+    "prevention": "check file existence before optional local read"
+  }
+]

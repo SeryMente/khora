@@ -1,9 +1,13 @@
 "use client";
 import { useState } from "react";
 import * as I from "lucide-react";
+import { TipoEntradaControl } from "../ingreso/TipoEntradaControl";
+import type { ClasificacionEntrada } from "../../../lib/custodia/editorial";
 import { AudioActivity } from "../ingreso/AudioActivity";
 import s from "../ingreso/ingreso-studio.module.css";
 export type IngresoViewState = {
+  clasificacion?: ClasificacionEntrada;
+  editorialExtra?: import("react").ReactNode;
   archivado?: boolean;
   procesando?: boolean;
   finalizando?: boolean;
@@ -50,6 +54,7 @@ export type IngresoViewState = {
 };
 
 export type IngresoViewActions = {
+  onClasificacionChange?: (value: ClasificacionEntrada) => void;
   onReintentarPreparacion?: () => void;
   onRecuperar?: () => void;
   onTituloChange?: (val: string) => void;
@@ -84,6 +89,7 @@ export function IngresoView({state:v,actions:a={},isReviewMode=false}:{state:Ing
    {(a.onRecuperar||isReviewMode)&&<button className={s.secondary} onClick={a.onRecuperar} disabled={busy||recording||v.editando} aria-haspopup="dialog"><I.History size={18}/><span>Recuperar capturas</span>{!!v.recuperaciones&&<span className={s.count}>{v.recuperaciones}</span>}</button>}
   </header>
   <section className={s.sheet} aria-label="Captura actual">
+   {v.clasificacion&&a.onClasificacionChange&&<TipoEntradaControl value={v.clasificacion} onChange={a.onClasificacionChange} disabled={locked||recording||!!v.archivoPendiente}/>}
    <div className={s.capturebar}>
     <div className={s.micgroup}>
      {!recording?<button data-ui-id="ingreso.btn-iniciar" className={s.primary} disabled={locked||v.editando||v.custodiaReady===false||v.conAudio||!!v.dialogoSesion} onClick={a.onIniciar}><I.Mic size={19}/>{v.dialogoChrome?"Iniciar Chrome + micrófono":"Iniciar dictado"}</button>:
@@ -141,6 +147,7 @@ export function IngresoView({state:v,actions:a={},isReviewMode=false}:{state:Ing
    </div>
    <button data-ui-id="ingreso.btn-archivar" className={s.archive} onClick={a.onGuardar} disabled={locked||recording||v.editando||(!v.texto.trim()&&!v.conAudio)}><I.Archive size={18}/>{v.guardando?"Archivando…":v.archivado?"Captura archivada":v.dialogoChrome?"Archivar como volcado":"Archivar registro"}</button>
   </div>
+  {v.editorialExtra}
   {more&&<details className={s.diagnostics}><summary>Detalles de la captura</summary><p data-ui-id="ingreso.stats">Estado: {v.estado} · Audio: {v.partesContador} partes verificadas · {(v.bytesAcumulados/1048576).toFixed(2)} MB · Reconexiones: {v.reconexiones} · Bloques procesados: {v.pulidosOk} / pendientes: {v.pulidosNo}</p><p>Un corte conservado no demuestra que se haya registrado el último instante antes de una interrupción.</p></details>}
  </main>;
 }

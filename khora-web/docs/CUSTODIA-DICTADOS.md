@@ -514,3 +514,14 @@ Durante parada se muestra estado vivo `Terminando y conservando audio…` antes 
 Observabilidad de dictado normal: inicio, confirmación o fallo por parte con índice, HTTP, duración y confirmación local; cierre con duración y pendientes. Sin palabras dictadas, audio o mensajes privados del proveedor en métricas. La telemetría posterior al COMMIT no puede invalidar una parte ya conservada. Un reintento idéntico con nombre/MIME ausentes se acepta por igualdad PostgreSQL null-safe; otra huella, bytes, fuente o sesión sellada se siguen rechazando.
 
 Ver pruebas y límites en `docs/frentes/dictado-voz/evidencias/C030-pruebas.md`. La prueba aislada no certifica la infraestructura ni el micrófono físico de producción.
+
+
+## C031 · Clasificación editorial y archivo manual (borrador, no desplegado)
+
+- `tipo_entrada` = general|conversacion_maya|interpretacion_simultanea|blog_personal y `ofuscada` boolean en volcado mediante migración administrativa034. Snapshot tipoEntrada/ofuscada opcionales para legado, defecto general/false. Nunca autorización de publicación por selección o checkpoint.
+- Migración034 debe ejecutarse y verificarse antes de desplegar este cliente/servidor conjuntamente. No autodeclarar migración ni ejecutar DDL nuevo en solicitud de usuario. Exclusión global de interpretación del grafo todavía pendiente; no basta guardar tipo.
+- Archivo siempre manual. Para blog_personal se conserva intención cifrada por propietario y sesión ANTES del POST. Recibo debe coincidir en sessionId, textoSHA256, version1, tipoEntrada y ofuscada; después se sella interfaz. Journal editorial persiste tras cerrar snapshot; no guarda tokens normativos.
+- Revisión editorial estable/bytes canónicos persistidos antes de prepare; fecha, slug, publicaciónUUID y revisión no se recalculan en reintento. No usa decline_archived posterior a recibo, sin texto público ni token normativo; status reconcilia respuesta perdida.
+- NUEVA exigencia: blog incluye audio. Contrato actual solo texto NO basta: PUBLIC_AUDIO_CONTRACT_READY=false mantiene Sí bloqueado incluso con preview y exposición de ofuscada. Falta representación pública de audio íntegro archivado, reproducción preview, hash/tamaño/MIME/asociación y consentimiento de voz cubiertos por digest. No publicar URL cifrada privada ni ningún fixture.
+- Corrección diagnóstica: transcripción final distingue sesión ausente, partes pendientes y ausencia de partes verificadas; archivo informa conteos sin levantar guarda de integridad. No es prueba de reparación de falla remota. Solicitar detalleHTTP real, mantener pestaña, exportar disponible; no declarar pérdida local a partir de mensaje genérico.
+- No se cambia Ver puntos guardados. Recuperación directa, indicador único, títulos y exclusión de grafo permanecen pendientes. Pruebas dirigidas locales con proveedores/auth sustituidos no son E2E productivo. Ver único estado vivo docs/frentes/dictado-voz/OBJETO-CANONICO.md.
