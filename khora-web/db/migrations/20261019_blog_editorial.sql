@@ -38,5 +38,13 @@ CREATE OR REPLACE VIEW blog_public_export AS
    e.consent<>'approved' AS withdrawn,
    COALESCE((SELECT jsonb_agg(jsonb_build_object('target',d.target,'state',d.state,'url',d.url,'proofHash',d.proof_hash)) FROM blog_delivery d WHERE d.editorial_id=e.id AND d.revision=e.revision),'[]'::jsonb) AS deliveries
  FROM blog_editorial e WHERE e.kind='blog_personal' AND e.ever_approved=true;
+CREATE TABLE IF NOT EXISTS blog_publication_refusal (
+  publication_id uuid PRIMARY KEY, owner text NOT NULL,
+  volcado_id uuid NOT NULL REFERENCES volcado(id), source_version integer NOT NULL,
+  source_hash char(64) NOT NULL, obfuscated boolean,
+  created_at timestamptz NOT NULL DEFAULT now(), superseded_at timestamptz,
+  UNIQUE(owner,volcado_id,source_version,source_hash)
+);
+-- Refusal is private: never include this table in public export or broad read grants.
 -- Do not grant readonly/global roles access to encrypted drafts or originals here.
 COMMIT;

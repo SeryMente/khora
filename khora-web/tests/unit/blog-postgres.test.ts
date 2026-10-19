@@ -19,6 +19,12 @@ test('transactional editorial migration / ownership / decisions / deliveries',{s
  const r:Revision={publicationId:'11111111-1111-4111-8111-111111111111',revision:1,sourceId:sid,sourceVersion:1,sourceHash:hash(text),kind:'blog_personal',obfuscated:false,entry:{schema:1,slug:'prueba-local',title:'Prueba privada',date:'2026-10-18T20:00:00-06:00',body:'Versión pública sintética.',source:{kind:'khora',sha256:hash('Versión pública sintética.')}},facebook:{format:'link',message:'Prueba aprobada'}};
  const repo=new BlogRepository(pool,cipher);
  await assert.rejects(()=>repo.save('other',r,null),/FORBIDDEN/);
+ const ref={publicationId:r.publicationId,sourceId:r.sourceId,sourceVersion:r.sourceVersion,sourceHash:r.sourceHash};
+ await assert.rejects(()=>repo.declineArchived('other',ref),/FORBIDDEN/);
+ assert.equal((await repo.declineArchived('owner',ref))!.filter,'archived_without_permission');
+ await repo.declineArchived('owner',ref);assert.equal((await query('SELECT * FROM blog_publication_refusal')).rows.length,1);
+ assert.equal((await query('SELECT * FROM blog_editorial')).rows.length,0);assert.equal((await query('SELECT * FROM blog_delivery')).rows.length,0);
+ await assert.rejects(()=>repo.declineArchived('owner',{...ref,sourceHash:hash('wrong')}),/FORBIDDEN/);
  await repo.save('owner',r,null);await repo.save('owner',r,null); // lost response, same stable identity
  assert.equal((await query('SELECT * FROM blog_editorial')).rows.length,1);
  await repo.decline('owner',r.publicationId,revisionHash(r));
@@ -27,7 +33,7 @@ test('transactional editorial migration / ownership / decisions / deliveries',{s
  await assert.rejects(()=>repo.status('other',r.publicationId),/FORBIDDEN/);
  await assert.rejects(()=>repo.approveExact('owner',r.publicationId,'wrong',false),/CONFLICT/);
  await repo.approveExact('owner',r.publicationId,revisionHash(r),false);await repo.approveExact('owner',r.publicationId,revisionHash(r),false);
- assert.equal((await query('SELECT * FROM blog_delivery')).rows.length,2);
+ assert.equal((await query('SELECT * FROM blog_delivery')).rows.length,2);assert.equal(await repo.refusal('owner',r.publicationId),null);
  const exported=(await query('SELECT * FROM blog_public_export WHERE owner=$1',['owner'])).rows;
  assert.equal(exported.length,1);assert(!JSON.stringify(exported).includes(sid));assert(!JSON.stringify(exported).includes(text));
  let bs=0,fs=0;const b={publish:async()=>{bs++;return {id:'commit'};},verify:async()=>({id:'slug',url:'https://serymente.github.io/otrogranprograma/blog/entradas/prueba-local/',proofHash:hash('blog')})};
@@ -38,7 +44,7 @@ test('transactional editorial migration / ownership / decisions / deliveries',{s
  assert.equal((await repo.status('owner',r.publicationId)).filter,'publication_pending');
  assert.equal(await deliver(out,b,f,r.publicationId,1,'facebook'),'confirmed');
  assert.equal((await repo.status('owner',r.publicationId)).filter,'published_both');
- assert.equal(fs,1);assert.equal(bs,0);
+ assert.equal(fs,1);assert.equal(bs,0);await assert.rejects(()=>repo.declineArchived('owner',ref),/WITHDRAWAL/);
  assert.equal(await deliver(out,b,f,r.publicationId,1,'facebook'),'not_claimed');assert.equal(fs,1);
  const r2={...r,revision:2,entry:{...r.entry,title:'Revisión 2'}};
  await repo.save('owner',r2,1);

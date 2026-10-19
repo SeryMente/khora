@@ -13,6 +13,13 @@ export async function POST(req:Request){
  const config=getMcpConfig();
  if(!config||config.allowedEmail.toLowerCase()!==actor.toLowerCase()||req.headers.get('origin')!==config.issuer)return NextResponse.json({code:'ORIGIN_FORBIDDEN'},{status:403});
  let body:any;try{const raw=await req.text();if(raw.length>240000)return NextResponse.json({code:'TOO_LARGE'},{status:413});body=JSON.parse(raw);}catch{return NextResponse.json({code:'JSON_INVALID'},{status:400});}
+ if(body.action==='decline_archived'){
+  try{return NextResponse.json(await blogRepository().declineArchived(actor,body.reference));}
+  catch(e){const code=e instanceof Error&&/^[A-Z_]+$/.test(e.message)?e.message:'REFUSAL_NOT_RECORDED';return NextResponse.json({code},{status:409});}
+ }
+ if(body.action==='status'){
+  try{const negative=await blogRepository().refusal(actor,body.publicationId);if(negative)return NextResponse.json(negative);}catch{return NextResponse.json({code:'REFUSAL_STATUS_UNAVAILABLE'},{status:503});}
+ }
  // Refusal only cancels unsent work; never grants publication or reads originals.
  // Keep archiving/refusal operational when normative upstream prevents positive authorization.
  if(body.action==='decide'&&body.decision===false){
