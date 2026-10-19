@@ -1,0 +1,17 @@
+test_failure_is_sanitized_and_no_sqlite_fallback (__main__.PostgreSQLControlledTests.test_failure_is_sanitized_and_no_sqlite_fallback) ... ok
+test_init_is_read_only (__main__.PostgreSQLControlledTests.test_init_is_read_only) ... ok
+test_loopback_allows_explicit_test_configuration (__main__.PostgreSQLControlledTests.test_loopback_allows_explicit_test_configuration) ... ok
+test_missing_returns_none_and_missing_driver_fails_closed (__main__.PostgreSQLControlledTests.test_missing_returns_none_and_missing_driver_fails_closed) ... ok
+test_remote_ssl_cannot_be_disabled_by_url (__main__.PostgreSQLControlledTests.test_remote_ssl_cannot_be_disabled_by_url) ... ok
+test_roundtrip_uses_fixed_schema_parameterized_jsonb (__main__.PostgreSQLControlledTests.test_roundtrip_uses_fixed_schema_parameterized_jsonb) ... ok
+test_string_payload_supported (__main__.PostgreSQLControlledTests.test_string_payload_supported) ... ok
+test_existing_legacy_row_defaults (__main__.SQLiteHistoryTests.test_existing_legacy_row_defaults) ... ok
+test_missing_session_and_separate_keys (__main__.SQLiteHistoryTests.test_missing_session_and_separate_keys) ... ok
+test_roundtrip_all_fields_and_restart (__main__.SQLiteHistoryTests.test_roundtrip_all_fields_and_restart) ... ok
+test_unsupported_url_does_not_create_local_directory (__main__.SQLiteHistoryTests.test_unsupported_url_does_not_create_local_directory) ... ok
+test_update_no_duplicates (__main__.SQLiteHistoryTests.test_update_no_duplicates) ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 0.018s
+
+OK

@@ -1,0 +1,6 @@
+{
+  "verified_files": 17,
+  "commit": "fa4df912acfb9805d040a958c7d963f3d35ad80c",
+  "method": "full_remote_diff_reconstructed_against_exact_loaded_main_sources",
+  "all_exact": true
+}

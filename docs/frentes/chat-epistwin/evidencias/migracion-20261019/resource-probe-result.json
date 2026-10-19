@@ -1,0 +1,26 @@
+{
+  "type": "isolated_official_openwebui_idle_resource_probe_not_production",
+  "openwebui": "0.12.3 official wheel + official slim requirements",
+  "api": "import of unmodified api.main only; API lifespan/Neo4j connectivity NOT run",
+  "listen": "127.0.0.1:18519",
+  "no_real_provider_or_personal_data": true,
+  "not_proven": [
+    "Render cgroup fit",
+    "combined production lifespan",
+    "load peak",
+    "authenticated binding",
+    "runtime secret and durable PostgreSQL",
+    "production deployment"
+  ],
+  "responses": {
+    "/health": 200,
+    "/": 200,
+    "/api/v1/auths/": 401,
+    "/api/config": 200
+  },
+  "peak_rss_kib_observed": 381312,
+  "peak_hwm_kib_observed": 381312,
+  "startup_process_exit": null,
+  "success": true,
+  "probe_process_stopped": true
+}

@@ -1,0 +1,35 @@
+{
+  "type": "immutable_migration_evidence_not_live_state",
+  "captured_at_utc": "2026-10-19T20:23:17.437137+00:00",
+  "canonical_version": "0.16",
+  "anchor": "E57",
+  "canonical_sha256": "93938227f782e64531d2d1d4ed9a667d3f716e88191d2a05ce85fc0ce2e82608",
+  "code_head": "fa4df912acfb9805d040a958c7d963f3d35ad80c",
+  "candidate": "https://github.com/SeryMente/khora/pull/331",
+  "code_unchanged_since_sync": true,
+  "product_mutation_after_migration_request": false,
+  "files": {
+    "frontend-tests.log": "f3dbf9373db70fe17e632a239e0366436434c5e71d8498b9a0b6f47a778d44a6",
+    "history-live311.log": "b375e36487066e36da1815b56fe882cf2cf66c8d16853fb79ca2ea014d0b63bb",
+    "history-unit311.log": "2e16582868911bb1e72ff8d189b6664ea2d5851efe3ad4a946b90f0e6fc38f29",
+    "manifest.json": "6ace97aceb56ddceda4ad007797e3dc1241202961714507aa5585a107f899d6c",
+    "openwebui-Dockerfile": "55d201460cb6d04e412f38ab0ef85390997e28ad3dfad16d98226985b6c9295d",
+    "openwebui-requirements-slim.txt": "6dc3e004a3935f4bcc19f804f791e536c1f4be381049d866f842b2c2e4a88509",
+    "readback.json": "6f3c00eca63602cacb5432f3a28c7ccb1610ace85270f548de9d9cead90cba40",
+    "reconciliation-tests.log": "a585317be064f4ab5a7e1e8c8e177b8637415c9d3bf7bb3e835d8dd612f7f981",
+    "resource-probe-result.json": "c368139ecf156eebafeadc60002f3fb5713d6a416fa163248ff3b1f0d396ce8a",
+    "resource-probe.py": "f0c6c64eee7dae77c544444d29083b1bf475c1fb332b1fc1bba805bbbe578264",
+    "run-history.sh": "1789f3da4e5a94adea7b9c4132bf813c5d609e9050089b150982d2eda5a3cf86"
+  },
+  "exclusions": [
+    "credentials",
+    "env values",
+    "Vercel raw responses/hooks",
+    "signed download URLs",
+    "virtualenvs",
+    "node_modules",
+    "local databases",
+    "private personal corpus"
+  ],
+  "warning": "Historic runners contain session-local paths; adapt environment from exact source, not production."
+}

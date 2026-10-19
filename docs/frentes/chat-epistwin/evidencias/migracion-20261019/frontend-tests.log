@@ -1,0 +1,18 @@
+✔ insuficiente textual nunca se convierte en true (1.072667ms)
+✔ contrato real Python conserva fragmentos sin simular respuesta (0.776403ms)
+✔ contrato generado conserva respuesta y fuentes sin alterar metadatos (0.283003ms)
+✔ booleanos explícitos mantienen compatibilidad (0.163006ms)
+✔ valores desconocidos no confirman suficiencia (0.220692ms)
+✔ no anclada explícita invalida suficiencia, strings no se coaccionan (0.155308ms)
+✔ recuperación vacía no muestra éxito ni certificado de suficiencia (0.145801ms)
+✔ evidencia y fragmentos malformados no se inventan ni interpolan (1.24018ms)
+✔ payload ilegible falla explícitamente (0.60143ms)
+✔ la página usa el adaptador y no la coerción booleana defectuosa (0.358881ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 175.530449

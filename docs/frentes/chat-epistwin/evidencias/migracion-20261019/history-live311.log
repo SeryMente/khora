@@ -1,0 +1,10 @@
+test_full_history_roundtrip_and_update_across_connections (__main__.PostgreSQLLiveHistoryTests.test_full_history_roundtrip_and_update_across_connections) ... ok
+test_malformed_json_fails_closed (__main__.PostgreSQLLiveHistoryTests.test_malformed_json_fails_closed) ... ok
+test_missing_key_and_no_cross_key_read (__main__.PostgreSQLLiveHistoryTests.test_missing_key_and_no_cross_key_read) ... ok
+test_parallel_distinct_keys_do_not_overwrite_each_other (__main__.PostgreSQLLiveHistoryTests.test_parallel_distinct_keys_do_not_overwrite_each_other) ... ok
+test_persistence_across_python_processes (__main__.PostgreSQLLiveHistoryTests.test_persistence_across_python_processes) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.301s
+
+OK
