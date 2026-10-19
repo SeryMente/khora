@@ -1,0 +1,24 @@
+name: Blog editorial delivery
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/15 * * * *'
+permissions: {}
+concurrency:
+  group: blog-editorial-delivery
+  cancel-in-progress: false
+jobs:
+  deliver-approved-target:
+    if: vars.BLOG_SYNC_ENABLED == '1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Call authenticated existing Khora server
+        env:
+          BLOG_DISPATCH_SECRET: ${{ secrets.BLOG_DISPATCH_SECRET }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${#BLOG_DISPATCH_SECRET}" -ge 32
+          # Secret stays in environment/stdin, not process arguments, logs or URLs.
+          printf 'header = "Authorization: Bearer %s"\n' "$BLOG_DISPATCH_SECRET" | curl --config - --fail --silent --show-error --max-time 70 --request POST https://khora-web.vercel.app/api/blog/dispatch
