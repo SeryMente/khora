@@ -241,8 +241,10 @@ for (const viewport of [
       await firstTab.focus();
       await page.keyboard.press("End");
       await expect(page.getByRole("tab", { name: "Control MCP", exact: true })).toHaveAttribute("aria-selected", "true");
+      await expect(page.getByRole("tab", { name: "Control MCP", exact: true })).toBeFocused();
       await page.keyboard.press("Home");
       await expect(page.getByRole("tab", { name: "Seguridad", exact: true })).toHaveAttribute("aria-selected", "true");
+      await expect(page.getByRole("tab", { name: "Seguridad", exact: true })).toBeFocused();
       await page.keyboard.press("ArrowRight");
       await expect(page.getByRole("tab", { name: "Entorno Persistente", exact: true })).toHaveAttribute("aria-selected", "true");
     });
@@ -253,7 +255,7 @@ for (const viewport of [
           status: 200,
           contentType: "application/json",
           body: JSON.stringify({
-            nodes: [
+            source_count: 1, pending: 0, revision: "ui-fixture", automatic: { nodes: [
               {
                 id: "node-ui-001",
                 summary: "Nodo sintético accesible",
@@ -265,7 +267,7 @@ for (const viewport of [
                 verificacion: "VERIFIED",
               },
             ],
-            edges: [],
+            edges: [], communities: 1 }, curated: { nodes: [], edges: [], communities: 0 }, proposals: [], judgments: [],
           }),
         });
       });
@@ -278,10 +280,10 @@ for (const viewport of [
       await node.focus();
       await page.keyboard.press("Enter");
 
-      await expect(page.getByRole("heading", { name: "Inspección de Comunidad", exact: true })).toBeVisible();
+      await expect(page.getByRole("heading", { name: "Inspección de entidad", exact: true })).toBeVisible();
 
       await page.getByRole("button", { name: "Cerrar inspección" }).click();
-      await expect(page.getByRole("heading", { name: "Inspección de Comunidad", exact: true })).toHaveCount(0);
+      await expect(page.getByRole("heading", { name: "Inspección de entidad", exact: true })).toHaveCount(0);
     });
 
     test("el tema cambia mediante control nativo y conserva accesibilidad", async ({ page }) => {

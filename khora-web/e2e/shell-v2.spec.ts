@@ -12,7 +12,7 @@ const routes = [
   { path: '/sistema/seguridad', expectedTitle: 'Seguridad' },
   { path: '/sistema/mcp', expectedTitle: 'Control MCP & Revocación' },
   { path: '/sistema/otros', expectedTitle: 'Evidencia normativa' },
-  { path: '/grafo', expectedTitle: 'Grafo PKG - Proyección Leiden' },
+  { path: '/grafo', expectedTitle: 'Grafo' },
   { path: '/mapa', expectedTitle: 'Mapa Visual de Ramificaciones' },
   { path: '/capturar', expectedTitle: 'Ingreso' },
   { path: '/sistema/dictado', expectedTitle: 'Ingreso' },

@@ -1,0 +1,30 @@
+
+Running 1 test using 1 worker
+
+  x  1 [chromium] › e2e\splash.spec.ts:249:5 › available primary Geist is not suppressed by a broken fallback face (361ms)
+
+
+  1) [chromium] › e2e\splash.spec.ts:249:5 › available primary Geist is not suppressed by a broken fallback face 
+
+    Error: expect(received).toBeGreaterThan(expected)
+
+    Expected: > 0
+    Received:   0
+
+      260 |     await expect(page.locator(splash)).toHaveCount(0);
+      261 |     const result = await evidence(page);
+    > 262 |     expect(result.started).toBeGreaterThan(0);
+          |                            ^
+      263 |     expect(result.font).toBe("ready");
+      264 |     expect(result.callbacks).toBe(1);
+      265 | });
+        at C:\Users\PC 13\AppData\Local\Temp\khora-splash-audit-95f645d5b33846eea429071779b17247\source\SeryMente-khora-b5e7009de137db30c26ecc5f4ddbb34789f453f2\khora-web\e2e\splash.spec.ts:262:28
+
+    attachment #1: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\e2e-splash-available-prima-461c2-d-by-a-broken-fallback-face-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\e2e-splash-available-prima-461c2-d-by-a-broken-fallback-face-chromium\error-context.md
+
+  1 failed
+    [chromium] › e2e\splash.spec.ts:249:5 › available primary Geist is not suppressed by a broken fallback face 

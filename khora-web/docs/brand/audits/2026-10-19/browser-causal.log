@@ -1,0 +1,87 @@
+
+Running 50 tests using 1 worker
+
+  ok  1 [chromium] › e2e\ingreso-recovery-redesign.spec.ts:24:5 › entrada limpia; nada restaura ni inicia micrófono por abrir (1.8s)
+  ok  2 [chromium] › e2e\ingreso-recovery-redesign.spec.ts:30:5 › elige corte con audio y archiva sin depender del heap anterior (2.0s)
+  ok  3 [chromium] › e2e\ingreso-recovery-redesign.spec.ts:40:5 › consulta puntos, cambia selección y devuelve el foco al cerrar (1.8s)
+  ok  4 [chromium] › e2e\ingreso-recovery-redesign.spec.ts:43:5 › fallo de recuperación no borra lo escrito ni finge éxito (1.9s)
+  ok  5 [chromium] › e2e\ingreso-recovery-redesign.spec.ts:48:5 › móvil: sin desbordamientos, panel usable y captura intacta (1.8s)
+  x   6 [chromium] › e2e\ingreso-recovery-redesign.spec.ts:54:5 › actividad de audio conectada al flujo real del grabador (26.8s)
+  ok  7 [chromium] › e2e\ingreso-recovery-redesign.spec.ts:57:5 › opciones secundarias y tema claro conservan orden visual (1.8s)
+  ok  8 [chromium] › e2e\ingreso-recovery-redesign.spec.ts:61:5 › historial indisponible no bloquea una nueva grabación autenticada (3.4s)
+  ok  9 [chromium] › e2e\ingreso-recovery-redesign.spec.ts:65:5 › preparación fallida explica bloqueo y permite reintentar sin perder texto (3.3s)
+  ok 10 [chromium] › e2e\ingreso-recovery-redesign.spec.ts:70:5 › sin sesión no se habilita el micrófono ni se presenta como listo (1.7s)
+  ok 11 [chromium] › e2e\parity.spec.ts:6:5 › Las interfaces reales conservan los campos y obligatoriedad del kernel (84ms)
+  ok 12 [chromium] › e2e\shell-v2.spec.ts:24:7 › Shell Navegación v3 › Navega por todos los dominios y verifica la renderización (23.8s)
+  ok 13 [chromium] › e2e\shell-v2.spec.ts:44:7 › Shell Navegación v3 › La jerarquía de primer nivel agrupa captura dentro de ingreso (3.5s)
+  ok 14 [chromium] › e2e\shell-v2.spec.ts:90:7 › Shell Navegación v3 › Cada submenu se abre, conserva su icono y queda dentro del viewport (6.8s)
+  ok 15 [chromium] › e2e\splash.spec.ts:52:13 › identity dark 390x844 (928ms)
+  ok 16 [chromium] › e2e\splash.spec.ts:52:13 › identity dark 768x1024 (1.0s)
+  ok 17 [chromium] › e2e\splash.spec.ts:52:13 › identity dark 1024x768 (940ms)
+  ok 18 [chromium] › e2e\splash.spec.ts:52:13 › identity dark 1180x820 (959ms)
+  ok 19 [chromium] › e2e\splash.spec.ts:52:13 › identity light 390x844 (693ms)
+  ok 20 [chromium] › e2e\splash.spec.ts:52:13 › identity light 768x1024 (798ms)
+  ok 21 [chromium] › e2e\splash.spec.ts:52:13 › identity light 1024x768 (768ms)
+  ok 22 [chromium] › e2e\splash.spec.ts:52:13 › identity light 1180x820 (728ms)
+  ok 23 [chromium] › e2e\splash.spec.ts:114:5 › real timeline lasts 1200ms, then never replays on resume or client navigation (1.6s)
+  ok 24 [chromium] › e2e\splash.spec.ts:132:9 › skip Escape consumes input and finishes without another fade (285ms)
+  ok 25 [chromium] › e2e\splash.spec.ts:132:9 › skip Enter consumes input and finishes without another fade (309ms)
+  ok 26 [chromium] › e2e\splash.spec.ts:132:9 › skip Space consumes input and finishes without another fade (312ms)
+  ok 27 [chromium] › e2e\splash.spec.ts:147:5 › touch skips without activating the underlying surface (243ms)
+  ok 28 [chromium] › e2e\splash.spec.ts:160:5 › reduced motion retains identity for 500ms without animations (1.1s)
+  ok 29 [chromium] › e2e\splash.spec.ts:173:5 › first server-rendered surface is opaque even before JavaScript (124ms)
+  ok 30 [chromium] › e2e\splash.spec.ts:185:5 › late local font cannot start a partial or independent exit clock (2.1s)
+  ok 31 [chromium] › e2e\splash.spec.ts:200:5 › unavailable font releases the shell instead of displaying a fallback (770ms)
+  ok 32 [chromium] › e2e\splash.spec.ts:213:5 › bounded instances change only at a cold boot, never during one presentation (2.2s)
+  ok 33 [chromium] › e2e\splash.spec.ts:239:5 › entropy failure still reveals the canonical professional mark (271ms)
+  ok 34 [chromium] › e2e\splash.spec.ts:249:5 › available primary Geist is not suppressed by a broken fallback face (1.5s)
+  ok 35 [chromium] › e2e\ui-quality.spec.ts:86:9 › UI Quality · desktop › todas las superficies de producto renderizan y mantienen accesibilidad básica (25.5s)
+  ok 36 [chromium] › e2e\ui-quality.spec.ts:101:9 › UI Quality · desktop › la navegación mantiene ingreso como una sola superficie y conserva submenús externos (3.3s)
+  ok 37 [chromium] › e2e\ui-quality.spec.ts:142:9 › UI Quality · desktop › los aliases históricos resuelven a superficies canónicas (643ms)
+  ok 38 [chromium] › e2e\ui-quality.spec.ts:163:9 › UI Quality · desktop › ING-DIRECT-01 contract: editor alias retains direct route and only the opened approved tuple is sent (3.6s)
+  ok 39 [chromium] › e2e\ui-quality.spec.ts:228:9 › UI Quality · desktop › las pestañas de Seguridad exponen semántica ARIA coherente (1.6s)
+  ok 40 [chromium] › e2e\ui-quality.spec.ts:252:9 › UI Quality · desktop › el grafo mantiene interacción accesible por teclado (1.7s)
+  ok 41 [chromium] › e2e\ui-quality.spec.ts:289:9 › UI Quality · desktop › el tema cambia mediante control nativo y conserva accesibilidad (1.6s)
+  ok 42 [chromium] › e2e\ui-quality.spec.ts:86:9 › UI Quality · mobile › todas las superficies de producto renderizan y mantienen accesibilidad básica (25.3s)
+  ok 43 [chromium] › e2e\ui-quality.spec.ts:101:9 › UI Quality · mobile › la navegación mantiene ingreso como una sola superficie y conserva submenús externos (3.3s)
+  ok 44 [chromium] › e2e\ui-quality.spec.ts:142:9 › UI Quality · mobile › los aliases históricos resuelven a superficies canónicas (599ms)
+  ok 45 [chromium] › e2e\ui-quality.spec.ts:163:9 › UI Quality · mobile › ING-DIRECT-01 contract: editor alias retains direct route and only the opened approved tuple is sent (3.5s)
+  ok 46 [chromium] › e2e\ui-quality.spec.ts:228:9 › UI Quality · mobile › las pestañas de Seguridad exponen semántica ARIA coherente (1.6s)
+  ok 47 [chromium] › e2e\ui-quality.spec.ts:252:9 › UI Quality · mobile › el grafo mantiene interacción accesible por teclado (1.6s)
+  ok 48 [chromium] › e2e\ui-quality.spec.ts:289:9 › UI Quality · mobile › el tema cambia mediante control nativo y conserva accesibilidad (1.6s)
+  ok 49 [chromium] › e2e\ui-quality.spec.ts:302:5 › UI Review · las 9 pantallas tienen prerender semántico (1.1s)
+  ok 50 [chromium] › e2e\ui-quality.spec.ts:312:5 › UI Review · el prerender de las 9 pantallas funciona sin JavaScript (543ms)
+
+
+  1) [chromium] › e2e\ingreso-recovery-redesign.spec.ts:54:5 › actividad de audio conectada al flujo real del grabador 
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: locator('[data-ui-id="ingreso.aviso-degradado"]')
+    Expected substring: "pendiente"
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toContainText" with timeout 15000ms
+      - waiting for locator('[data-ui-id="ingreso.aviso-degradado"]')
+
+
+      53 | });
+      54 | test('actividad de audio conectada al flujo real del grabador',async({page})=>{
+    > 55 |  await page.locator('[data-ui-id="ingreso.btn-iniciar"]').click();await expect(page.getByRole('img',{name:'Actividad real de micrófono'})).toBeVisible();await expect(page.locator('[data-ui-id="ingreso.status-listening"]')).toContainText('Micrófono activo');await expect.poll(()=>page.getByRole('img',{name:'Actividad real de micrófono'}).evaluate((c:any)=>{const pixels=c.getContext('2d').getImageData(0,0,240,30).data;return pixels.some((x:number,i:number)=>i%4===3&&x>0);})).toBe(true);await expect(page.locator('[data-ui-id="ingreso.aviso-degradado"]')).toContainText('pendiente');expect(await page.locator('[data-ui-id="ingreso.aviso-degradado"]').evaluate(el=>el.getBoundingClientRect().bottom<document.querySelector('nav[aria-label="Barra de sistema"]')!.getBoundingClientRect().top)).toBe(true);await page.screenshot({path:'test-results/ingreso-desktop-recording.png',fullPage:true});await page.locator('[data-ui-id="ingreso.btn-detener"]').click();await expect(page.getByRole('img',{name:'Micrófono en espera'})).toBeVisible();
+         |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              ^
+      56 | });
+      57 | test('opciones secundarias y tema claro conservan orden visual',async({page})=>{
+      58 |  await page.evaluate(()=>document.documentElement.dataset.theme='light');await page.getByRole('button',{name:'Más opciones de captura'}).click();await expect(page.locator('[data-ui-id="ingreso.btn-chrome"]')).toBeVisible();await page.screenshot({path:'test-results/ingreso-desktop-light.png',fullPage:true});
+        at C:\Users\PC 13\AppData\Local\Temp\khora-splash-audit-95f645d5b33846eea429071779b17247\source\SeryMente-khora-b5e7009de137db30c26ecc5f4ddbb34789f453f2\khora-web\e2e\ingreso-recovery-redesign.spec.ts:55:558
+
+    attachment #1: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\..\test-results\e2e-ingreso-recovery-redes-b6c2d--al-flujo-real-del-grabador-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\..\test-results\e2e-ingreso-recovery-redes-b6c2d--al-flujo-real-del-grabador-chromium\error-context.md
+
+  1 failed
+    [chromium] › e2e\ingreso-recovery-redesign.spec.ts:54:5 › actividad de audio conectada al flujo real del grabador 
+  49 passed (3.0m)

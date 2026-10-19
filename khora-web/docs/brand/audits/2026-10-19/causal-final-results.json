@@ -1,0 +1,441 @@
+{
+  "config": {
+    "argv": [
+      "C:\\Users\\PC 13\\AppData\\Local\\Temp\\rdc-c2f7f007c8d54b79a0aa6b09e69e0c6d\\node-v22.23.3-win-x64\\node.exe",
+      "C:\\Users\\PC 13\\AppData\\Local\\Temp\\khora-splash-audit-95f645d5b33846eea429071779b17247\\source\\SeryMente-khora-b5e7009de137db30c26ecc5f4ddbb34789f453f2\\khora-web\\node_modules\\@playwright\\test\\cli.js",
+      "test",
+      "--config",
+      "playwright.audit.config.ts",
+      "e2e/ingreso-recovery-redesign.spec.ts"
+    ],
+    "configFile": "C:\\Users\\PC 13\\AppData\\Local\\Temp\\khora-splash-audit-95f645d5b33846eea429071779b17247\\source\\SeryMente-khora-b5e7009de137db30c26ecc5f4ddbb34789f453f2\\khora-web\\playwright.audit.config.ts",
+    "rootDir": "C:/Users/PC 13/AppData/Local/Temp/khora-splash-audit-95f645d5b33846eea429071779b17247/source/SeryMente-khora-b5e7009de137db30c26ecc5f4ddbb34789f453f2/khora-web",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "C:/Users/PC 13/AppData/Local/Temp/khora-splash-audit-95f645d5b33846eea429071779b17247/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "C:/Users/PC 13/AppData/Local/Temp/khora-splash-audit-95f645d5b33846eea429071779b17247/source/SeryMente-khora-b5e7009de137db30c26ecc5f4ddbb34789f453f2/khora-web",
+        "testIgnore": [],
+        "testMatch": [
+          "e2e/**/*.spec.ts",
+          "tests/regression/**/*.spec.ts"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "C:\\Users\\PC 13\\AppData\\Local\\Temp\\khora-splash-audit-95f645d5b33846eea429071779b17247\\causal-final-results.json"
+        }
+      ],
+      [
+        "html",
+        {
+          "open": "never",
+          "outputFolder": "C:\\Users\\PC 13\\AppData\\Local\\Temp\\khora-splash-audit-95f645d5b33846eea429071779b17247\\playwright-report"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.61.1",
+    "workers": 1,
+    "webServer": {
+      "command": "node node_modules/next/dist/bin/next start -p 3000",
+      "url": "http://localhost:3000",
+      "reuseExistingServer": false,
+      "timeout": 120000
+    }
+  },
+  "suites": [
+    {
+      "title": "e2e\\ingreso-recovery-redesign.spec.ts",
+      "file": "e2e/ingreso-recovery-redesign.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "entrada limpia; nada restaura ni inicia micrófono por abrir",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1788,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-19T20:08:20.440Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d4464d70356b6d3f561d-79e9bac6441766b01aa3",
+          "file": "e2e/ingreso-recovery-redesign.spec.ts",
+          "line": 24,
+          "column": 5
+        },
+        {
+          "title": "elige corte con audio y archiva sin depender del heap anterior",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1990,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-19T20:08:22.325Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d4464d70356b6d3f561d-961700b0c1ce361559a2",
+          "file": "e2e/ingreso-recovery-redesign.spec.ts",
+          "line": 30,
+          "column": 5
+        },
+        {
+          "title": "consulta puntos, cambia selección y devuelve el foco al cerrar",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1761,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-19T20:08:24.329Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d4464d70356b6d3f561d-b65ed47b08564508e4e3",
+          "file": "e2e/ingreso-recovery-redesign.spec.ts",
+          "line": 40,
+          "column": 5
+        },
+        {
+          "title": "fallo de recuperación no borra lo escrito ni finge éxito",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1840,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-19T20:08:26.100Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d4464d70356b6d3f561d-61e8c250f30149f89b0d",
+          "file": "e2e/ingreso-recovery-redesign.spec.ts",
+          "line": 43,
+          "column": 5
+        },
+        {
+          "title": "móvil: sin desbordamientos, panel usable y captura intacta",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1829,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-19T20:08:27.950Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d4464d70356b6d3f561d-2b1322afacb371a081f1",
+          "file": "e2e/ingreso-recovery-redesign.spec.ts",
+          "line": 48,
+          "column": 5
+        },
+        {
+          "title": "actividad de audio conectada al flujo real del grabador",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 13878,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-19T20:08:29.788Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d4464d70356b6d3f561d-31397f2b26cd00ea14bd",
+          "file": "e2e/ingreso-recovery-redesign.spec.ts",
+          "line": 54,
+          "column": 5
+        },
+        {
+          "title": "opciones secundarias y tema claro conservan orden visual",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1706,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-19T20:08:43.676Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d4464d70356b6d3f561d-0fecd447f1b74c29927a",
+          "file": "e2e/ingreso-recovery-redesign.spec.ts",
+          "line": 57,
+          "column": 5
+        },
+        {
+          "title": "historial indisponible no bloquea una nueva grabación autenticada",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3264,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-19T20:08:45.391Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d4464d70356b6d3f561d-699e5716285cc696c40d",
+          "file": "e2e/ingreso-recovery-redesign.spec.ts",
+          "line": 61,
+          "column": 5
+        },
+        {
+          "title": "preparación fallida explica bloqueo y permite reintentar sin perder texto",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3324,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-19T20:08:48.665Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d4464d70356b6d3f561d-7e69a9286590c0429388",
+          "file": "e2e/ingreso-recovery-redesign.spec.ts",
+          "line": 65,
+          "column": 5
+        },
+        {
+          "title": "sin sesión no se habilita el micrófono ni se presenta como listo",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1698,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-19T20:08:51.999Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d4464d70356b6d3f561d-7b4e4abcbe6a4c4fa4cd",
+          "file": "e2e/ingreso-recovery-redesign.spec.ts",
+          "line": 70,
+          "column": 5
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-19T20:08:18.487Z",
+    "duration": 35330.032999999996,
+    "expected": 10,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

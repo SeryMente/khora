@@ -1,0 +1,85 @@
+{
+  "date": "2026-10-19T20:09:09.698Z",
+  "testedBase": "b5e7009de137db30c26ecc5f4ddbb34789f453f2",
+  "publishBase": "bd29c924393fcbd9183100f66b2e50c87b791207",
+  "concurrentChanges": [
+    "docs/frentes/tareas-automaticas/MANIFIESTO-CUSTODIA.json",
+    "docs/frentes/tareas-automaticas/OBJETO-CANONICO.md",
+    "docs/frentes/tareas-automaticas/evidencias/cotejo-y-restauracion-original-3fda4187.json",
+    "docs/frentes/tareas-automaticas/evidencias/reanudacion-sesion-3fda4187.json",
+    "docs/frentes/tareas-automaticas/originales/conversacion-recibida-sesion-3fda4187.txt",
+    "docs/frentes/tareas-automaticas/originales/reanudacion-sesion-3fda4187.json",
+    "docs/frentes/tareas-automaticas/originales/salida-reanudacion-3fda4187.md"
+  ],
+  "unit": {
+    "passed": 545,
+    "failed": 0
+  },
+  "browser": {
+    "expected": 135,
+    "skipped": 6,
+    "unexpected": 0,
+    "flaky": 0,
+    "mode": "complete scan plus targeted causal rerun, NOT one single green scan",
+    "full": {
+      "startTime": "2026-10-19T19:54:58.808Z",
+      "duration": 422008.429,
+      "expected": 129,
+      "skipped": 6,
+      "unexpected": 6,
+      "flaky": 0
+    },
+    "causal": {
+      "startTime": "2026-10-19T20:03:16.642Z",
+      "duration": 179505.734,
+      "expected": 49,
+      "skipped": 0,
+      "unexpected": 1,
+      "flaky": 0
+    },
+    "finalCausal": {
+      "startTime": "2026-10-19T20:08:18.487Z",
+      "duration": 35330.032999999996,
+      "expected": 10,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "coveredFailureIds": [
+      "d4464d70356b6d3f561d-79e9bac6441766b01aa3",
+      "d4464d70356b6d3f561d-31397f2b26cd00ea14bd",
+      "d4464d70356b6d3f561d-699e5716285cc696c40d",
+      "0155a2df86eec7003bce-4fd376c942d2ee152c1e",
+      "0155a2df86eec7003bce-3ab04a2c681a215dbf86",
+      "0155a2df86eec7003bce-9e912e8e961f31b19e28"
+    ]
+  },
+  "causalBefore": {
+    "failed": 1,
+    "started": 0
+  },
+  "scope": "Primary Geist only; broken fallback must not suppress approved identity. No visual redesign.",
+  "files": [
+    {
+      "path": "khora-web/app/components/os/KhoraSplash.tsx",
+      "sha256": "d7e4d57e0ca499cd63b9c1e521c0d9ea32475cec9783b6b4e646e25b71e9d366"
+    },
+    {
+      "path": "khora-web/e2e/splash.spec.ts",
+      "sha256": "43e3a9d2782bcd5195c5d9563a03d9384c38356fb64157730ca77f21323390c1"
+    },
+    {
+      "path": "khora-web/e2e/shell-v2.spec.ts",
+      "sha256": "b659ea6b66356ecaaeb84b076f76ce22ea6aa3216c8731aee718600574b7adc1"
+    },
+    {
+      "path": "khora-web/e2e/ui-quality.spec.ts",
+      "sha256": "ba4d58ed58ff18a70ebd0961296a758d524cb80f647524f8544e5e9daa8bd900"
+    },
+    {
+      "path": "khora-web/e2e/ingreso-recovery-redesign.spec.ts",
+      "sha256": "a666829a5d5c2b2ef965a5c11bd5820f61bf98bd4ceba4999399ff18427ada5b"
+    }
+  ],
+  "canonical": "https://app.notion.com/p/3d2a4187824182f9929b812a7a4de31b"
+}

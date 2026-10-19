@@ -1,0 +1,15 @@
+
+Running 10 tests using 1 worker
+
+  ok  1 [chromium] › e2e\ingreso-recovery-redesign.spec.ts:24:5 › entrada limpia; nada restaura ni inicia micrófono por abrir (1.8s)
+  ok  2 [chromium] › e2e\ingreso-recovery-redesign.spec.ts:30:5 › elige corte con audio y archiva sin depender del heap anterior (2.0s)
+  ok  3 [chromium] › e2e\ingreso-recovery-redesign.spec.ts:40:5 › consulta puntos, cambia selección y devuelve el foco al cerrar (1.8s)
+  ok  4 [chromium] › e2e\ingreso-recovery-redesign.spec.ts:43:5 › fallo de recuperación no borra lo escrito ni finge éxito (1.8s)
+  ok  5 [chromium] › e2e\ingreso-recovery-redesign.spec.ts:48:5 › móvil: sin desbordamientos, panel usable y captura intacta (1.8s)
+  ok  6 [chromium] › e2e\ingreso-recovery-redesign.spec.ts:54:5 › actividad de audio conectada al flujo real del grabador (13.9s)
+  ok  7 [chromium] › e2e\ingreso-recovery-redesign.spec.ts:57:5 › opciones secundarias y tema claro conservan orden visual (1.7s)
+  ok  8 [chromium] › e2e\ingreso-recovery-redesign.spec.ts:61:5 › historial indisponible no bloquea una nueva grabación autenticada (3.3s)
+  ok  9 [chromium] › e2e\ingreso-recovery-redesign.spec.ts:65:5 › preparación fallida explica bloqueo y permite reintentar sin perder texto (3.3s)
+  ok 10 [chromium] › e2e\ingreso-recovery-redesign.spec.ts:70:5 › sin sesión no se habilita el micrófono ni se presenta como listo (1.7s)
+
+  10 passed (35.3s)

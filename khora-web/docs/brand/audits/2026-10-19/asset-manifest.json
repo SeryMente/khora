@@ -1,0 +1,95 @@
+{
+  "sha": "b5e7009de137db30c26ecc5f4ddbb34789f453f2",
+  "assets": [
+    {
+      "path": "khora-web/app/components/os/IntervaloSonoroMark.tsx",
+      "bytes": 752,
+      "sha256": "87c8f050ae6ba558ee005fdce149d4bf5e219b850fb914d56dfa031806330d74",
+      "url": "https://github.com/SeryMente/khora/blob/b5e7009de137db30c26ecc5f4ddbb34789f453f2/khora-web/app/components/os/IntervaloSonoroMark.tsx"
+    },
+    {
+      "path": "khora-web/app/components/os/KhoraSplash.tsx",
+      "bytes": 6721,
+      "sha256": "b9fb64695d95e4f309a2e191e81ee10da1f9a95246098366180212d278b1ede2",
+      "url": "https://github.com/SeryMente/khora/blob/b5e7009de137db30c26ecc5f4ddbb34789f453f2/khora-web/app/components/os/KhoraSplash.tsx"
+    },
+    {
+      "path": "khora-web/docs/brand/intervalo-sonoro-verification.json",
+      "bytes": 6515,
+      "sha256": "ca9a33804226559807788a9c46d29000736d2159689ce54e9abf9357902f685b",
+      "url": "https://github.com/SeryMente/khora/blob/b5e7009de137db30c26ecc5f4ddbb34789f453f2/khora-web/docs/brand/intervalo-sonoro-verification.json"
+    },
+    {
+      "path": "khora-web/docs/brand/intervalo-sonoro.md",
+      "bytes": 1899,
+      "sha256": "7e4c4084cdb65e2e7e413a694b49b321f09fcdc9f3eda955cabd6a43531c92a3",
+      "url": "https://github.com/SeryMente/khora/blob/b5e7009de137db30c26ecc5f4ddbb34789f453f2/khora-web/docs/brand/intervalo-sonoro.md"
+    },
+    {
+      "path": "khora-web/e2e/splash.spec.ts",
+      "bytes": 14159,
+      "sha256": "cf0480593a9bee17d93c2a9ae3e8b3c4b9ab5cb3552aa06b899b07972a82eab4",
+      "url": "https://github.com/SeryMente/khora/blob/b5e7009de137db30c26ecc5f4ddbb34789f453f2/khora-web/e2e/splash.spec.ts"
+    },
+    {
+      "path": "khora-web/e2e/splash.spec.ts-snapshots/intervalo-dark-1024-chromium.png",
+      "bytes": 4363,
+      "sha256": "94aa3c3cc328475e3b3e556de548cd173abb8f91c096cedc447b84573bd209a0",
+      "url": "https://github.com/SeryMente/khora/blob/b5e7009de137db30c26ecc5f4ddbb34789f453f2/khora-web/e2e/splash.spec.ts-snapshots/intervalo-dark-1024-chromium.png"
+    },
+    {
+      "path": "khora-web/e2e/splash.spec.ts-snapshots/intervalo-dark-1180-chromium.png",
+      "bytes": 4547,
+      "sha256": "ef0121b304011113f7bce6eb8cc29e3c1968dc541bc12b912b33f79168707719",
+      "url": "https://github.com/SeryMente/khora/blob/b5e7009de137db30c26ecc5f4ddbb34789f453f2/khora-web/e2e/splash.spec.ts-snapshots/intervalo-dark-1180-chromium.png"
+    },
+    {
+      "path": "khora-web/e2e/splash.spec.ts-snapshots/intervalo-dark-390-chromium.png",
+      "bytes": 3454,
+      "sha256": "12653085b287e8109b26cbc245d88c3f66016153d945d189ae6281dab4e5fa8a",
+      "url": "https://github.com/SeryMente/khora/blob/b5e7009de137db30c26ecc5f4ddbb34789f453f2/khora-web/e2e/splash.spec.ts-snapshots/intervalo-dark-390-chromium.png"
+    },
+    {
+      "path": "khora-web/e2e/splash.spec.ts-snapshots/intervalo-dark-768-chromium.png",
+      "bytes": 3618,
+      "sha256": "c2f44a790de28334eb8b14a8bb60eafe351777fd93dd659623953f96e379d0b6",
+      "url": "https://github.com/SeryMente/khora/blob/b5e7009de137db30c26ecc5f4ddbb34789f453f2/khora-web/e2e/splash.spec.ts-snapshots/intervalo-dark-768-chromium.png"
+    },
+    {
+      "path": "khora-web/e2e/splash.spec.ts-snapshots/intervalo-light-1024-chromium.png",
+      "bytes": 4747,
+      "sha256": "09bc8708b9a99c166b70266129ac654751c3d51194921a7049ad364859605c1f",
+      "url": "https://github.com/SeryMente/khora/blob/b5e7009de137db30c26ecc5f4ddbb34789f453f2/khora-web/e2e/splash.spec.ts-snapshots/intervalo-light-1024-chromium.png"
+    },
+    {
+      "path": "khora-web/e2e/splash.spec.ts-snapshots/intervalo-light-1180-chromium.png",
+      "bytes": 4863,
+      "sha256": "2db1baefedd677ce08a8ea29f4477f8d1415af24c376582f2bd88fe93f8258ea",
+      "url": "https://github.com/SeryMente/khora/blob/b5e7009de137db30c26ecc5f4ddbb34789f453f2/khora-web/e2e/splash.spec.ts-snapshots/intervalo-light-1180-chromium.png"
+    },
+    {
+      "path": "khora-web/e2e/splash.spec.ts-snapshots/intervalo-light-390-chromium.png",
+      "bytes": 3754,
+      "sha256": "12c7bedf492f1790c9d4ea93a6d4855358f0f228fae78eafe1691c4d19db0471",
+      "url": "https://github.com/SeryMente/khora/blob/b5e7009de137db30c26ecc5f4ddbb34789f453f2/khora-web/e2e/splash.spec.ts-snapshots/intervalo-light-390-chromium.png"
+    },
+    {
+      "path": "khora-web/e2e/splash.spec.ts-snapshots/intervalo-light-768-chromium.png",
+      "bytes": 3935,
+      "sha256": "2d0cd0689e7b0ee03cbfecb70e7fbd7a290bf68c6e5cf60b32ca6b059801864d",
+      "url": "https://github.com/SeryMente/khora/blob/b5e7009de137db30c26ecc5f4ddbb34789f453f2/khora-web/e2e/splash.spec.ts-snapshots/intervalo-light-768-chromium.png"
+    },
+    {
+      "path": "khora-web/lib/brand/intervalo-sonoro.ts",
+      "bytes": 1781,
+      "sha256": "593fac99e7bb4a3340fc8e60338161f18eb5c5e847462a7fc065ad3b82b8dbce",
+      "url": "https://github.com/SeryMente/khora/blob/b5e7009de137db30c26ecc5f4ddbb34789f453f2/khora-web/lib/brand/intervalo-sonoro.ts"
+    },
+    {
+      "path": "khora-web/tests/unit/intervalo_sonoro.test.ts",
+      "bytes": 2105,
+      "sha256": "1a0d55ba0089a22a78226011050572b936cea092fce239deb1deca574e0e0507",
+      "url": "https://github.com/SeryMente/khora/blob/b5e7009de137db30c26ecc5f4ddbb34789f453f2/khora-web/tests/unit/intervalo_sonoro.test.ts"
+    }
+  ]
+}

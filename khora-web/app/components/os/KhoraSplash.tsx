@@ -81,9 +81,9 @@ export default function KhoraSplash({ active = true, theme, reducedMotion, onCom
 
         const start = async () => {
             // Resolve the actual next/font family, not a remotely fetched font.
-            const family = getComputedStyle(label).fontFamily;
+            const family = getComputedStyle(label).fontFamily.split(",")[0].trim();
             const fontReady = Promise.all([
-                document.fonts.load(`600 36px ${family}`),
+                document.fonts.load(`600 36px ${family}`, "Khora"),
                 document.fonts.ready,
             ]).then(() => "ready", () => "deadline");
             const deadline = new Promise<string>((resolve) => {
@@ -95,7 +95,7 @@ export default function KhoraSplash({ active = true, theme, reducedMotion, onCom
             overlay.dataset.fontStatus = fontStatus;
             // Never reveal a browser fallback as if it were the approved identity.
             // A missing local asset must not trap the user on a blank surface.
-            if (fontStatus !== "ready" && !document.fonts.check(`600 36px ${family}`)) {
+            if (fontStatus !== "ready" && !document.fonts.check(`600 36px ${family}`, "Khora")) {
                 overlay.dataset.fontStatus = "unavailable";
                 finish(true);
                 return;

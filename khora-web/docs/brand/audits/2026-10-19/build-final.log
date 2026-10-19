@@ -1,0 +1,3693 @@
+
+> khora-web@0.3.8 prebuild
+> npm run typecheck && npm run ui-review:check && npm run ui:contract && npm run test:unit && node --import tsx scripts/preflight-experience.ts && node scripts/build-extension.mjs
+
+
+> khora-web@0.3.8 typecheck
+> tsc --noEmit
+
+
+> khora-web@0.3.8 ui-review:check
+> tsx scripts/check_ui_review.ts
+
+🔍 Verificando contrato UI Review completo...
+
+✅ UI Review íntegro: escenarios, ui_ids, componentes compartidos y prerender presentes.
+
+> khora-web@0.3.8 ui:contract
+> tsx scripts/check_navigation_contract.ts
+
+✅ Contrato de navegación íntegro: jerarquía, cobertura, enlaces, aliases y rutas verificadas.
+
+> khora-web@0.3.8 test:unit
+> node scripts/run_unit_tests.mjs
+
+TAP version 13
+# Subtest: Aprobar Volcado Route Suite
+    # Subtest: 1. Retorna 400 cuando falta version o es invalida (< 1 o no entero)
+    ok 1 - 1. Retorna 400 cuando falta version o es invalida (< 1 o no entero)
+      ---
+      duration_ms: 9.7776
+      type: 'test'
+      ...
+    # Subtest: 2. Retorna 409 cuando la versión no existe o el SHA256 no coincide
+    ok 2 - 2. Retorna 409 cuando la versión no existe o el SHA256 no coincide
+      ---
+      duration_ms: 2.0422
+      type: 'test'
+      ...
+    # Subtest: 3. Retorna 200 con { version, sha256 } en exito
+    ok 3 - 3. Retorna 200 con { version, sha256 } en exito
+      ---
+      duration_ms: 7.4214
+      type: 'test'
+      ...
+    1..3
+ok 1 - Aprobar Volcado Route Suite
+  ---
+  duration_ms: 20.9573
+  type: 'suite'
+  ...
+# Subtest: Continuous Audio Playback Machine Suite
+    # Subtest: 1. Monotonic global time formatting (formatMs)
+    ok 1 - 1. Monotonic global time formatting (formatMs)
+      ---
+      duration_ms: 1.6054
+      type: 'test'
+      ...
+    # Subtest: 2. Global seek math resolves correct part index and local offset
+    ok 2 - 2. Global seek math resolves correct part index and local offset
+      ---
+      duration_ms: 0.401
+      type: 'test'
+      ...
+    # Subtest: 3. Auto-advancement check between consecutive parts
+    ok 3 - 3. Auto-advancement check between consecutive parts
+      ---
+      duration_ms: 0.2785
+      type: 'test'
+      ...
+    # Subtest: 4. Gap detection (>1000ms) halts playback explicitly
+    ok 4 - 4. Gap detection (>1000ms) halts playback explicitly
+      ---
+      duration_ms: 0.3144
+      type: 'test'
+      ...
+    # Subtest: 5. Empty part bytes (0 bytes) halts playback explicitly
+    ok 5 - 5. Empty part bytes (0 bytes) halts playback explicitly
+      ---
+      duration_ms: 0.2022
+      type: 'test'
+      ...
+    # Subtest: 6. Word timing matching finds exact active word
+    ok 6 - 6. Word timing matching finds exact active word
+      ---
+      duration_ms: 0.2534
+      type: 'test'
+      ...
+    # Subtest: 7. Real WebM audio buffer generation (smoke test with >= 2 parts)
+    ok 7 - 7. Real WebM audio buffer generation (smoke test with >= 2 parts)
+      ---
+      duration_ms: 0.3643
+      type: 'test'
+      ...
+    1..7
+ok 2 - Continuous Audio Playback Machine Suite
+  ---
+  duration_ms: 8.189
+  type: 'test'
+  ...
+# Subtest: custodia: acepta partes contiguas, no vacías y verificadas
+ok 3 - custodia: acepta partes contiguas, no vacías y verificadas
+  ---
+  duration_ms: 2.7483
+  type: 'test'
+  ...
+# Subtest: custodia: rechaza un hueco de índice
+ok 4 - custodia: rechaza un hueco de índice
+  ---
+  duration_ms: 0.379
+  type: 'test'
+  ...
+# Subtest: custodia: rechaza parte no verificada
+ok 5 - custodia: rechaza parte no verificada
+  ---
+  duration_ms: 0.3966
+  type: 'test'
+  ...
+# Subtest: custodia: rechaza SHA-256 inválido
+ok 6 - custodia: rechaza SHA-256 inválido
+  ---
+  duration_ms: 0.2858
+  type: 'test'
+  ...
+# Subtest: custodia: rechaza bytes vacíos
+ok 7 - custodia: rechaza bytes vacíos
+  ---
+  duration_ms: 0.3705
+  type: 'test'
+  ...
+# Subtest: audio playback controller uses one-based UI positions with legacy zero-based storage
+ok 8 - audio playback controller uses one-based UI positions with legacy zero-based storage
+  ---
+  duration_ms: 2.3069
+  type: 'test'
+  ...
+# Subtest: audio playback controller clamps seeks outside the manifest
+ok 9 - audio playback controller clamps seeks outside the manifest
+  ---
+  duration_ms: 0.2512
+  type: 'test'
+  ...
+# Subtest: audio playback reports a locked vault instead of a codec error
+ok 10 - audio playback reports a locked vault instead of a codec error
+  ---
+  duration_ms: 46.4575
+  type: 'test'
+  ...
+# Subtest: audio playback preserves specific server failures
+ok 11 - audio playback preserves specific server failures
+  ---
+  duration_ms: 1.0688
+  type: 'test'
+  ...
+# Subtest: Audio Range & Word Timing Backend
+    # Subtest: interpolarPalabrasDeSegmentos genera marcas temporales aproximadas correctamente
+    ok 1 - interpolarPalabrasDeSegmentos genera marcas temporales aproximadas correctamente
+      ---
+      duration_ms: 1.4289
+      type: 'test'
+      ...
+    1..1
+ok 12 - Audio Range & Word Timing Backend
+  ---
+  duration_ms: 2.8757
+  type: 'test'
+  ...
+# Subtest: authoritative transcription sends only a session reference
+ok 13 - authoritative transcription sends only a session reference
+  ---
+  duration_ms: 47.4781
+  type: 'test'
+  ...
+# Subtest: authoritative transcription converts plain-text 413 into a controlled result
+ok 14 - authoritative transcription converts plain-text 413 into a controlled result
+  ---
+  duration_ms: 1.9209
+  type: 'test'
+  ...
+# Subtest: authoritative transcription preserves JSON server errors
+ok 15 - authoritative transcription preserves JSON server errors
+  ---
+  duration_ms: 0.6885
+  type: 'test'
+  ...
+# CONTEO DE ESTADOS ANTES: {"archivado":1,"en_revision":1}
+# HUÉRFANOS V1 EN REVISIÓN ANTES: 0
+# Lote de 2 volcados elegibles. Dry-run: true
+# [DRY-RUN] Se procesaría volcado ID e8164b17-3afe-4f3e-b8d5-173886f9dfb7 (\#1) estado 'archivado'
+# [DRY-RUN] Se procesaría volcado ID 3f39ae80-1bbc-4f92-b8fc-ba302346f8c1 (\#2) estado 'en_revision'
+# CONTEO DE ESTADOS ANTES: {"archivado":1}
+# HUÉRFANOS V1 EN REVISIÓN ANTES: 0
+# Lote de 1 volcados elegibles. Dry-run: false
+# ✓ Procesado volcado ID d5c9ce82-44d9-4b4f-8438-ec19385dad6d (\#1) a 'en_revision' con v1
+# CONTEO DE ESTADOS DESPUÉS: {"en_revision":1}
+# HUÉRFANOS V1 EN REVISIÓN DESPUÉS: 0
+# CONTEO DE ESTADOS ANTES: {"en_revision":1}
+# HUÉRFANOS V1 EN REVISIÓN ANTES: 0
+# CONTEO DE ESTADOS DESPUÉS: {"en_revision":1}
+# HUÉRFANOS V1 EN REVISIÓN DESPUÉS: 0
+# CONTEO DE ESTADOS ANTES: {"archivado":105}
+# HUÉRFANOS V1 EN REVISIÓN ANTES: 0
+# Lote de 50 volcados elegibles. Dry-run: false
+# ✓ Procesado volcado ID a4f51959-8eac-4127-9656-896077c9cbe7 (\#1) a 'en_revision' con v1
+# ✓ Procesado volcado ID bde961b5-3ead-4031-8983-88425d30bf23 (\#2) a 'en_revision' con v1
+# ✓ Procesado volcado ID fac88b84-0332-4f38-9e88-b804a07c996e (\#3) a 'en_revision' con v1
+# ✓ Procesado volcado ID ef05f4b0-0689-41c3-a9bc-91b5cd7b78ac (\#4) a 'en_revision' con v1
+# ✓ Procesado volcado ID 7b4065e6-2492-42f5-a0d6-5d533d01e71a (\#5) a 'en_revision' con v1
+# ✓ Procesado volcado ID 2eb445ea-8671-4cd2-b543-f60df8ca234e (\#6) a 'en_revision' con v1
+# ✓ Procesado volcado ID 3de84464-8281-4fd7-b80d-1816685ae131 (\#7) a 'en_revision' con v1
+# ✓ Procesado volcado ID 4fa1fb7f-cbce-4628-9dcf-533798b0bee4 (\#8) a 'en_revision' con v1
+# ✓ Procesado volcado ID 561e74ff-5cca-4da0-9c2b-bae8d651a57d (\#9) a 'en_revision' con v1
+# ✓ Procesado volcado ID 8640f9a8-7bcc-491a-881b-fc4e9022526a (\#10) a 'en_revision' con v1
+# ✓ Procesado volcado ID fcdbc83f-300c-4923-9e30-9b28d05a7f77 (\#11) a 'en_revision' con v1
+# ✓ Procesado volcado ID 7bc5ce06-ebce-44eb-84ff-34aa3ab28520 (\#12) a 'en_revision' con v1
+# ✓ Procesado volcado ID 7b09eace-e3b1-42fd-a9c8-00379f033a87 (\#13) a 'en_revision' con v1
+# ✓ Procesado volcado ID e5049796-4ed2-4dd8-8105-2175b544ff78 (\#14) a 'en_revision' con v1
+# ✓ Procesado volcado ID 9015685a-afb5-4038-aeb3-c6e13e53e393 (\#15) a 'en_revision' con v1
+# ✓ Procesado volcado ID 9e6c9ce4-78cc-499c-86e4-522c9f2557a5 (\#16) a 'en_revision' con v1
+# ✓ Procesado volcado ID e414a7ec-65fa-446c-b00f-482449f1fed0 (\#17) a 'en_revision' con v1
+# ✓ Procesado volcado ID 247b23d9-f92e-42e3-bc27-7e45c1dd9259 (\#18) a 'en_revision' con v1
+# ✓ Procesado volcado ID 0f27bbe6-6099-418c-a7d6-d284bde0d773 (\#19) a 'en_revision' con v1
+# ✓ Procesado volcado ID 11d17c5a-7a99-4604-8cf0-6f192ed48b19 (\#20) a 'en_revision' con v1
+# ✓ Procesado volcado ID 15c5ff3d-be51-4205-86a5-481a8a2307e0 (\#21) a 'en_revision' con v1
+# ✓ Procesado volcado ID 3f4cf0ff-8d8f-4679-93b5-5da4811c9cae (\#22) a 'en_revision' con v1
+# ✓ Procesado volcado ID e6f760ef-5bfc-4e6e-8ca0-d22f735a9d3d (\#23) a 'en_revision' con v1
+# ✓ Procesado volcado ID fb8aeeda-b706-4499-aeba-15a80647a1db (\#24) a 'en_revision' con v1
+# ✓ Procesado volcado ID adff93fb-c6ae-483f-87b0-22bd4c82b147 (\#25) a 'en_revision' con v1
+# ✓ Procesado volcado ID 01e4814a-ad69-4376-860c-638203925579 (\#26) a 'en_revision' con v1
+# ✓ Procesado volcado ID 4e4e254f-8b67-4de3-82ed-532dc57b7d5b (\#27) a 'en_revision' con v1
+# ✓ Procesado volcado ID d8d6565d-20f8-459b-9987-94cd8b982350 (\#28) a 'en_revision' con v1
+# ✓ Procesado volcado ID 416afdb6-abcd-424d-adaa-bfb6f428d88e (\#29) a 'en_revision' con v1
+# ✓ Procesado volcado ID 59fd6284-fd5b-40eb-bae4-c96a50c8dbfa (\#30) a 'en_revision' con v1
+# ✓ Procesado volcado ID 012abcbf-09cd-4272-8fb1-e37ef521d080 (\#31) a 'en_revision' con v1
+# ✓ Procesado volcado ID 6a64ccda-4733-4ca5-9073-7412903899e5 (\#32) a 'en_revision' con v1
+# ✓ Procesado volcado ID 9238b52b-1ca6-403f-9cce-b5800a267d8c (\#33) a 'en_revision' con v1
+# ✓ Procesado volcado ID 72e6bb52-2f76-49c3-a530-8466f551c5f1 (\#34) a 'en_revision' con v1
+# ✓ Procesado volcado ID 489b7857-3bd8-4bef-b729-932d20edbd32 (\#35) a 'en_revision' con v1
+# ✓ Procesado volcado ID 4670c894-6e7c-4167-be51-1c6158c35967 (\#36) a 'en_revision' con v1
+# ✓ Procesado volcado ID f80bbbab-1cf9-427b-9dfa-e3848d2e7d5f (\#37) a 'en_revision' con v1
+# ✓ Procesado volcado ID 25d02966-e5a1-4f67-b8bb-82a8872c002c (\#38) a 'en_revision' con v1
+# ✓ Procesado volcado ID 74707ed9-2631-46bc-b427-14480eb9f965 (\#39) a 'en_revision' con v1
+# ✓ Procesado volcado ID 6828a9ba-6eeb-4f1a-8718-b552b9bbb47d (\#40) a 'en_revision' con v1
+# ✓ Procesado volcado ID ece77466-b39a-4809-842c-99e8e797f10d (\#41) a 'en_revision' con v1
+# ✓ Procesado volcado ID 33222467-86dd-4d47-b680-3831fed96a96 (\#42) a 'en_revision' con v1
+# ✓ Procesado volcado ID e7f3a282-7cef-4bfa-89d2-6df8eeccfc0a (\#43) a 'en_revision' con v1
+# ✓ Procesado volcado ID fb0efe3c-0202-4ea7-80f2-b87f90432b05 (\#44) a 'en_revision' con v1
+# ✓ Procesado volcado ID 90c33e6a-898d-465b-8012-4457603daff6 (\#45) a 'en_revision' con v1
+# ✓ Procesado volcado ID f0d2163a-3223-4abd-a189-7d5196cb9360 (\#46) a 'en_revision' con v1
+# ✓ Procesado volcado ID 0a011b9e-407d-4f07-97fc-2de539d0b73b (\#47) a 'en_revision' con v1
+# ✓ Procesado volcado ID 5d791094-e427-4924-9e5f-219a45d85f8a (\#48) a 'en_revision' con v1
+# ✓ Procesado volcado ID e30e5dc6-7fd5-4e4f-ad70-19752443deb2 (\#49) a 'en_revision' con v1
+# ✓ Procesado volcado ID 06f3d669-02fb-4845-9250-e5b3e7b81c77 (\#50) a 'en_revision' con v1
+# Lote de 50 volcados elegibles. Dry-run: false
+# ✓ Procesado volcado ID 7ee82d00-e968-4736-a3a4-00fd810cca9b (\#51) a 'en_revision' con v1
+# ✓ Procesado volcado ID c609f11b-8427-4f68-8559-487466d263b2 (\#52) a 'en_revision' con v1
+# ✓ Procesado volcado ID d379bade-2fd7-4f0a-845e-652da719a154 (\#53) a 'en_revision' con v1
+# ✓ Procesado volcado ID 8d4332f8-3edd-4d18-a447-08f61967a1e9 (\#54) a 'en_revision' con v1
+# ✓ Procesado volcado ID f3966962-9d9e-4706-94ef-dcf449c3ba89 (\#55) a 'en_revision' con v1
+# ✓ Procesado volcado ID cfd64c94-b596-4cff-9e7e-e1c422232e98 (\#56) a 'en_revision' con v1
+# ✓ Procesado volcado ID 56424a79-bb46-44e3-8ab1-133d9ee3ddba (\#57) a 'en_revision' con v1
+# ✓ Procesado volcado ID d2fd044a-3d59-4d76-9129-573e6ef4cd56 (\#58) a 'en_revision' con v1
+# ✓ Procesado volcado ID ac613c2e-f04b-4c96-9029-1670e32206ba (\#59) a 'en_revision' con v1
+# ✓ Procesado volcado ID d088968f-6dac-408c-84e5-c1e1f8891441 (\#60) a 'en_revision' con v1
+# ✓ Procesado volcado ID 9270bd31-ad73-4085-afd1-cca04e7187f4 (\#61) a 'en_revision' con v1
+# ✓ Procesado volcado ID f298696b-6802-4a5f-9151-ed3e2f18e636 (\#62) a 'en_revision' con v1
+# ✓ Procesado volcado ID 3f16391d-011a-4e55-bc89-ee596369d7a1 (\#63) a 'en_revision' con v1
+# ✓ Procesado volcado ID 2081bef9-9634-4fac-adc7-70dc848ac959 (\#64) a 'en_revision' con v1
+# ✓ Procesado volcado ID 2e645ce2-c5c9-43ff-b38c-a01f8d78d6d5 (\#65) a 'en_revision' con v1
+# ✓ Procesado volcado ID 31e827a1-bc53-4f2e-ba7d-31419999544c (\#66) a 'en_revision' con v1
+# ✓ Procesado volcado ID b7d5d957-0e32-40c6-8369-e79680734fbc (\#67) a 'en_revision' con v1
+# ✓ Procesado volcado ID d9839641-6396-49a2-862c-70de6e183842 (\#68) a 'en_revision' con v1
+# ✓ Procesado volcado ID df7bd0db-9b85-49f2-a7ae-86cd2ebc7383 (\#69) a 'en_revision' con v1
+# ✓ Procesado volcado ID d59df677-ef9d-4663-852f-2b61e2ce1d49 (\#70) a 'en_revision' con v1
+# ✓ Procesado volcado ID aaaef34b-b4e1-45be-b690-9fb04059a8a1 (\#71) a 'en_revision' con v1
+# ✓ Procesado volcado ID 65504ece-1f98-42cb-aca6-b712344890d5 (\#72) a 'en_revision' con v1
+# ✓ Procesado volcado ID 93dbe106-1359-4cae-849c-76992bac5d49 (\#73) a 'en_revision' con v1
+# ✓ Procesado volcado ID 4f51595c-8151-4012-b32d-24c5786e4a8a (\#74) a 'en_revision' con v1
+# ✓ Procesado volcado ID 550696da-96af-478f-85d5-90ce3a97099c (\#75) a 'en_revision' con v1
+# ✓ Procesado volcado ID a360504b-81c9-410f-ba8e-c271847ae862 (\#76) a 'en_revision' con v1
+# ✓ Procesado volcado ID 5ef81f8c-0f46-4cdc-b9a4-9545bb466861 (\#77) a 'en_revision' con v1
+# ✓ Procesado volcado ID 945b4677-212e-4dd1-a389-0554e50c130a (\#78) a 'en_revision' con v1
+# ✓ Procesado volcado ID b5b6d505-0589-4776-a641-ca22c9e7a6e0 (\#79) a 'en_revision' con v1
+# ✓ Procesado volcado ID 6db9c665-df4f-4945-a5cc-b0e8b6a3b3d3 (\#80) a 'en_revision' con v1
+# ✓ Procesado volcado ID 78f3d130-071d-446e-b51f-432d83156437 (\#81) a 'en_revision' con v1
+# ✓ Procesado volcado ID bd09e119-9e7a-4daa-a04e-82b5e46798cd (\#82) a 'en_revision' con v1
+# ✓ Procesado volcado ID 9d188595-b7b4-451e-8b1e-1ad96eae41fc (\#83) a 'en_revision' con v1
+# ✓ Procesado volcado ID 97a62031-6402-494d-9ad9-9afb52f136ff (\#84) a 'en_revision' con v1
+# ✓ Procesado volcado ID a546cef4-3303-4300-adeb-d5e1e873091f (\#85) a 'en_revision' con v1
+# ✓ Procesado volcado ID 4c3ce9db-f0ee-4f5b-bc21-96c67a259107 (\#86) a 'en_revision' con v1
+# ✓ Procesado volcado ID 2fa739f8-2999-476f-8595-2b87e4b621a4 (\#87) a 'en_revision' con v1
+# ✓ Procesado volcado ID aed58b6c-ef2d-4e5b-9dab-5fcef85674f7 (\#88) a 'en_revision' con v1
+# ✓ Procesado volcado ID f13819c3-5d83-4cac-8cb9-7d0005c55ccb (\#89) a 'en_revision' con v1
+# ✓ Procesado volcado ID 1f441907-617d-4459-ab08-a566a67a5c91 (\#90) a 'en_revision' con v1
+# ✓ Procesado volcado ID 557f412e-4d0d-4455-9835-b241797174f2 (\#91) a 'en_revision' con v1
+# ✓ Procesado volcado ID f58181e4-c79b-49a0-856f-a454bc8da4ad (\#92) a 'en_revision' con v1
+# ✓ Procesado volcado ID 553508b6-f04a-45f2-b115-7619490e1323 (\#93) a 'en_revision' con v1
+# ✓ Procesado volcado ID a5c920fd-40be-4624-b782-f22b3c5a8a3e (\#94) a 'en_revision' con v1
+# ✓ Procesado volcado ID 762b9e32-a345-4c68-8acf-81c49482707b (\#95) a 'en_revision' con v1
+# ✓ Procesado volcado ID 44926f7c-954e-4cab-81b2-c67b4a8aa2be (\#96) a 'en_revision' con v1
+# ✓ Procesado volcado ID 29b03ac3-c952-4053-ac51-17c5d6f96196 (\#97) a 'en_revision' con v1
+# ✓ Procesado volcado ID cd1e40d7-b8b9-4690-ab2e-e3eaffe6e67b (\#98) a 'en_revision' con v1
+# ✓ Procesado volcado ID cfeabab6-6d38-40bb-b07d-c876e0bc79e4 (\#99) a 'en_revision' con v1
+# ✓ Procesado volcado ID 5d88dd54-7e18-44c6-bdd9-f926ed7ef2c8 (\#100) a 'en_revision' con v1
+# Lote de 5 volcados elegibles. Dry-run: false
+# ✓ Procesado volcado ID 18e00b13-98fa-48ba-867d-db82262aa284 (\#101) a 'en_revision' con v1
+# ✓ Procesado volcado ID facbf56d-4144-48ff-aa2c-26a90fefd282 (\#102) a 'en_revision' con v1
+# ✓ Procesado volcado ID dcecbec7-3fb3-4c84-adcd-03982c8cdfe6 (\#103) a 'en_revision' con v1
+# ✓ Procesado volcado ID 620c633d-71ae-4499-ad34-a39b142fad52 (\#104) a 'en_revision' con v1
+# ✓ Procesado volcado ID 349f5ed7-4662-4f76-a2f9-0a5ed534dd1a (\#105) a 'en_revision' con v1
+# CONTEO DE ESTADOS DESPUÉS: {"en_revision":105}
+# HUÉRFANOS V1 EN REVISIÓN DESPUÉS: 0
+# Subtest: Caso 1: archivado con palabra que tildesSeguras cambiaría (verbatim, sha256 y chars inmutables)
+ok 16 - Caso 1: archivado con palabra que tildesSeguras cambiaría (verbatim, sha256 y chars inmutables)
+  ---
+  duration_ms: 8.5854
+  type: 'test'
+  ...
+# Subtest: Caso 2: reparación de en_revision sin v1
+ok 17 - Caso 2: reparación de en_revision sin v1
+  ---
+  duration_ms: 9.1158
+  type: 'test'
+  ...
+# Subtest: Caso 3: dry-run informa por estado y huérfanos de v1 SIN mutar
+ok 18 - Caso 3: dry-run informa por estado y huérfanos de v1 SIN mutar
+  ---
+  duration_ms: 2.4682
+  type: 'test'
+  ...
+# Subtest: Caso 4: Idempotencia real (segunda corrida = 0 elegibles procesados)
+ok 19 - Caso 4: Idempotencia real (segunda corrida = 0 elegibles procesados)
+  ---
+  duration_ms: 3.6935
+  type: 'test'
+  ...
+# Subtest: Caso 5: Procesamiento de más de 100 filas en lotes
+ok 20 - Caso 5: Procesamiento de más de 100 filas en lotes
+  ---
+  duration_ms: 126.4299
+  type: 'test'
+  ...
+# Subtest: D12 (1): Reconstrucción idéntica -> aceptado===true, deficit===0
+ok 21 - D12 (1): Reconstrucción idéntica -> aceptado===true, deficit===0
+  ---
+  duration_ms: 3.1582
+  type: 'test'
+  ...
+# Subtest: D12 (2): Truncado de cola -> aceptado===false, textoResultado === anterior (íntegro), perdidaDetectada===true
+ok 22 - D12 (2): Truncado de cola -> aceptado===false, textoResultado === anterior (íntegro), perdidaDetectada===true
+  ---
+  duration_ms: 0.477
+  type: 'test'
+  ...
+# Subtest: D12 (3): Corrección de UNA palabra en frase corta ('jora' -> 'khora') -> aceptado===true, deficit===0, textoResultado===nuevo
+ok 23 - D12 (3): Corrección de UNA palabra en frase corta ('jora' -> 'khora') -> aceptado===true, deficit===0, textoResultado===nuevo
+  ---
+  duration_ms: 0.2989
+  type: 'test'
+  ...
+# Subtest: D12 (4): Varias correcciones dispersas (misma longitud, palabras distintas) -> aceptado===true, deficit===0
+ok 24 - D12 (4): Varias correcciones dispersas (misma longitud, palabras distintas) -> aceptado===true, deficit===0
+  ---
+  duration_ms: 0.3523
+  type: 'test'
+  ...
+# Subtest: D12 (5): Borrado de cláusula interna anclado -> aceptado===true, fusionado===true, textoResultado incluye 'leche' y 'huevos'
+ok 25 - D12 (5): Borrado de cláusula interna anclado -> aceptado===true, fusionado===true, textoResultado incluye 'leche' y 'huevos'
+  ---
+  duration_ms: 0.3799
+  type: 'test'
+  ...
+# Subtest: D12 (6): 'yo digo digo lo que pienso' idéntico -> dos ocurrencias de 'digo' sobreviven
+ok 26 - D12 (6): 'yo digo digo lo que pienso' idéntico -> dos ocurrencias de 'digo' sobreviven
+  ---
+  duration_ms: 0.3016
+  type: 'test'
+  ...
+# Subtest: D12 (7): nuevo==='' -> aceptado===false, textoResultado===anterior, perdidaDetectada===true
+ok 27 - D12 (7): nuevo==='' -> aceptado===false, textoResultado===anterior, perdidaDetectada===true
+  ---
+  duration_ms: 0.3157
+  type: 'test'
+  ...
+# Subtest: D16 (Ingreso): reconciliarSegmentos bloquea pérdida de texto previa ante Whisper incompleto
+ok 28 - D16 (Ingreso): reconciliarSegmentos bloquea pérdida de texto previa ante Whisper incompleto
+  ---
+  duration_ms: 5.9779
+  type: 'test'
+  ...
+# Subtest: D17 (Ingreso): Exclusión mutua estricta de 3 vías en botones de control
+ok 29 - D17 (Ingreso): Exclusión mutua estricta de 3 vías en botones de control
+  ---
+  duration_ms: 0.3934
+  type: 'test'
+  ...
+# Subtest: D18 (Volcados): volcados/page.tsx no contiene 'Archivo Manual' ni hace POST a /api/volcado
+ok 30 - D18 (Volcados): volcados/page.tsx no contiene 'Archivo Manual' ni hace POST a /api/volcado
+  ---
+  duration_ms: 0.4707
+  type: 'test'
+  ...
+# Subtest: capture_contract: 11 valid states exist and valid session passes
+ok 31 - capture_contract: 11 valid states exist and valid session passes
+  ---
+  duration_ms: 3.1103
+  type: 'test'
+  ...
+# Subtest: capture_contract: transient state timeouts have explicit fallback states
+ok 32 - capture_contract: transient state timeouts have explicit fallback states
+  ---
+  duration_ms: 0.5766
+  type: 'test'
+  ...
+# Subtest: capture_contract: FAILS on non-monotonic journal sequence
+ok 33 - capture_contract: FAILS on non-monotonic journal sequence
+  ---
+  duration_ms: 0.5679
+  type: 'test'
+  ...
+# Subtest: capture_contract: FAILS when an audio part lacks ACK
+ok 34 - capture_contract: FAILS when an audio part lacks ACK
+  ---
+  duration_ms: 0.3125
+  type: 'test'
+  ...
+# Subtest: capture_contract: FAILS/ignores callback from stale epoch
+ok 35 - capture_contract: FAILS/ignores callback from stale epoch
+  ---
+  duration_ms: 0.2848
+  type: 'test'
+  ...
+# Subtest: capture_contract: FAILS complete state transition with missing audio parts or incomplete coverage
+ok 36 - capture_contract: FAILS complete state transition with missing audio parts or incomplete coverage
+  ---
+  duration_ms: 0.3993
+  type: 'test'
+  ...
+# Subtest: capture_contract: FAILS on telemetry envelope containing raw text or audio
+ok 37 - capture_contract: FAILS on telemetry envelope containing raw text or audio
+  ---
+  duration_ms: 1.8019
+  type: 'test'
+  ...
+# Subtest: capture_contract: FAILS on invalid state transitions not allowed by state machine
+ok 38 - capture_contract: FAILS on invalid state transitions not allowed by state machine
+  ---
+  duration_ms: 0.2948
+  type: 'test'
+  ...
+# Subtest: Proxy API /api/chat - Rechaza cuerpos de solicitud inválidos con HTTP 400
+ok 39 - Proxy API /api/chat - Rechaza cuerpos de solicitud inválidos con HTTP 400
+  ---
+  duration_ms: 22.5715
+  type: 'test'
+  ...
+# Subtest: Proxy API /api/chat - Transmite stream SSE correctamente cuando el backend responde 200
+ok 40 - Proxy API /api/chat - Transmite stream SSE correctamente cuando el backend responde 200
+  ---
+  duration_ms: 3.3673
+  type: 'test'
+  ...
+# Subtest: buildConsultaState - Genera estados deterministas para escenarios sintéticos
+ok 41 - buildConsultaState - Genera estados deterministas para escenarios sintéticos
+  ---
+  duration_ms: 0.5278
+  type: 'test'
+  ...
+# Subtest: ChatGPT CIMD client can exchange a runtime-only authorization code
+ok 42 - ChatGPT CIMD client can exchange a runtime-only authorization code
+  ---
+  duration_ms: 33.3482
+  type: 'test'
+  ...
+# Subtest: runtime-only grant refuses escalation to volcados:read at token exchange
+ok 43 - runtime-only grant refuses escalation to volcados:read at token exchange
+  ---
+  duration_ms: 227.4376
+  type: 'test'
+  ...
+# Subtest: Linguistic Findings & Server Gate Evaluator
+    # Subtest: evaluarCompuertaAprobacion devuelve canApprove true y gate_hash cuando no hay bloqueadores
+    ok 1 - evaluarCompuertaAprobacion devuelve canApprove true y gate_hash cuando no hay bloqueadores
+      ---
+      duration_ms: 4.933
+      type: 'test'
+      ...
+    1..1
+ok 44 - Linguistic Findings & Server Gate Evaluator
+  ---
+  duration_ms: 6.1577
+  type: 'suite'
+  ...
+# Subtest: custodia rechaza vacío
+ok 45 - custodia rechaza vacío
+  ---
+  duration_ms: 2.0935
+  type: 'test'
+  ...
+# Subtest: custodia rechaza duplicado
+ok 46 - custodia rechaza duplicado
+  ---
+  duration_ms: 0.4374
+  type: 'test'
+  ...
+# Subtest: custodia rechaza sobrante
+ok 47 - custodia rechaza sobrante
+  ---
+  duration_ms: 0.2595
+  type: 'test'
+  ...
+# Subtest: custodia rechaza hueco
+ok 48 - custodia rechaza hueco
+  ---
+  duration_ms: 0.208
+  type: 'test'
+  ...
+# Subtest: custodia rechaza negativo
+ok 49 - custodia rechaza negativo
+  ---
+  duration_ms: 0.1818
+  type: 'test'
+  ...
+# Subtest: custodia rechaza no verificado
+ok 50 - custodia rechaza no verificado
+  ---
+  duration_ms: 0.2367
+  type: 'test'
+  ...
+# Subtest: custodia rechaza sin huella
+ok 51 - custodia rechaza sin huella
+  ---
+  duration_ms: 0.2073
+  type: 'test'
+  ...
+# Subtest: custodia acepta manifiesto exacto
+ok 52 - custodia acepta manifiesto exacto
+  ---
+  duration_ms: 0.2033
+  type: 'test'
+  ...
+# Subtest: delta exacto "termino" -> "término"
+ok 53 - delta exacto "termino" -> "término"
+  ---
+  duration_ms: 1.6595
+  type: 'test'
+  ...
+# Subtest: delta exacto "hola" -> "hola."
+ok 54 - delta exacto "hola" -> "hola."
+  ---
+  duration_ms: 0.6446
+  type: 'test'
+  ...
+# Subtest: delta exacto "a b" -> "a  b"
+ok 55 - delta exacto "a b" -> "a  b"
+  ---
+  duration_ms: 0.3139
+  type: 'test'
+  ...
+# Subtest: delta exacto "" -> "nuevo"
+ok 56 - delta exacto "" -> "nuevo"
+  ---
+  duration_ms: 0.1434
+  type: 'test'
+  ...
+# Subtest: delta exacto "original" -> ""
+ok 57 - delta exacto "original" -> ""
+  ---
+  duration_ms: 2.9506
+  type: 'test'
+  ...
+# Subtest: delta exacto "A" -> "a"
+ok 58 - delta exacto "A" -> "a"
+  ---
+  duration_ms: 0.1695
+  type: 'test'
+  ...
+# Subtest: sin cambio no crea delta
+ok 59 - sin cambio no crea delta
+  ---
+  duration_ms: 0.3395
+  type: 'test'
+  ...
+# Subtest: texto manual no requiere audio por tener sesión
+ok 60 - texto manual no requiere audio por tener sesión
+  ---
+  duration_ms: 0.2078
+  type: 'test'
+  ...
+# Subtest: dictado sí requiere audio
+ok 61 - dictado sí requiere audio
+  ---
+  duration_ms: 0.1188
+  type: 'test'
+  ...
+# Subtest: parcial se recupera sin fingir que es final
+ok 62 - parcial se recupera sin fingir que es final
+  ---
+  duration_ms: 0.1554
+  type: 'test'
+  ...
+# Subtest: frecuencia remota tiene límite y el audio no espera archivo
+ok 63 - frecuencia remota tiene límite y el audio no espera archivo
+  ---
+  duration_ms: 0.1377
+  type: 'test'
+  ...
+# Subtest: GET versiones no crea versiones
+ok 64 - GET versiones no crea versiones
+  ---
+  duration_ms: 0.272
+  type: 'test'
+  ...
+# Subtest: MCP audio preserva scope y dueño
+ok 65 - MCP audio preserva scope y dueño
+  ---
+  duration_ms: 0.5201
+  type: 'test'
+  ...
+# Subtest: no hay texto a voz en el conversor
+ok 66 - no hay texto a voz en el conversor
+  ---
+  duration_ms: 0.3705
+  type: 'test'
+  ...
+# Subtest: la documentación existe y es descubrible
+ok 67 - la documentación existe y es descubrible
+  ---
+  duration_ms: 0.9027
+  type: 'test'
+  ...
+# Subtest: errores de reconocimiento no desactivan la grabadora de custodia
+ok 68 - errores de reconocimiento no desactivan la grabadora de custodia
+  ---
+  duration_ms: 1.1322
+  type: 'test'
+  ...
+# Subtest: codec real: WAV a MP3 reproducible sin mutar el original
+ok 69 - codec real: WAV a MP3 reproducible sin mutar el original
+  ---
+  duration_ms: 507.9897
+  type: 'test'
+  ...
+# Subtest: codec rechaza fuente vacía
+ok 70 - codec rechaza fuente vacía
+  ---
+  duration_ms: 0.625
+  type: 'test'
+  ...
+# Subtest: codec rechaza bytes que no son audio
+ok 71 - codec rechaza bytes que no son audio
+  ---
+  duration_ms: 48.3721
+  type: 'test'
+  ...
+# Subtest: codec real concatena dos grabaciones completas
+ok 72 - codec real concatena dos grabaciones completas
+  ---
+  duration_ms: 430.3586
+  type: 'test'
+  ...
+# Subtest: export: manifest 423 becomes typed vault lock before audio read
+ok 73 - export: manifest 423 becomes typed vault lock before audio read
+  ---
+  duration_ms: 73.4694
+  type: 'test'
+  ...
+# Subtest: export: audio expiry also becomes typed vault lock
+ok 74 - export: audio expiry also becomes typed vault lock
+  ---
+  duration_ms: 1.869
+  type: 'test'
+  ...
+# Subtest: export: unverified audio remains blocked
+ok 75 - export: unverified audio remains blocked
+  ---
+  duration_ms: 0.5987
+  type: 'test'
+  ...
+# Subtest: preserved MP3: lock uses the same typed prompt
+ok 76 - preserved MP3: lock uses the same typed prompt
+  ---
+  duration_ms: 0.6831
+  type: 'test'
+  ...
+# Subtest: preserved MP3: 409 requests work but never pretends download completed
+ok 77 - preserved MP3: 409 requests work but never pretends download completed
+  ---
+  duration_ms: 1.8655
+  type: 'test'
+  ...
+# Subtest: preserved MP3: missing custody headers block download
+ok 78 - preserved MP3: missing custody headers block download
+  ---
+  duration_ms: 1.3152
+  type: 'test'
+  ...
+# Subtest: la espera de reintento es acotada y crece
+ok 79 - la espera de reintento es acotada y crece
+  ---
+  duration_ms: 1.4363
+  type: 'test'
+  ...
+# Subtest: encolar conserva payload cifrado e identidades independientes
+ok 80 - encolar conserva payload cifrado e identidades independientes
+  ---
+  duration_ms: 2.8078
+  type: 'test'
+  ...
+# Subtest: título manual no solicita título IA
+ok 81 - título manual no solicita título IA
+  ---
+  duration_ms: 0.4037
+  type: 'test'
+  ...
+# Subtest: un trabajador sin lease no ejecuta servicios
+ok 82 - un trabajador sin lease no ejecuta servicios
+  ---
+  duration_ms: 0.6921
+  type: 'test'
+  ...
+# Subtest: un fallo secundario conserva un trabajo reintentable y oculta errores sensibles
+ok 83 - un fallo secundario conserva un trabajo reintentable y oculta errores sensibles
+  ---
+  duration_ms: 0.729
+  type: 'test'
+  ...
+# Subtest: huella de MP3 fija prefijo y estado de cierre
+ok 84 - huella de MP3 fija prefijo y estado de cierre
+  ---
+  duration_ms: 0.4534
+  type: 'test'
+  ...
+# Subtest: espejo conserva exactamente 0 unidades UTF-16
+ok 85 - espejo conserva exactamente 0 unidades UTF-16
+  ---
+  duration_ms: 0.3212
+  type: 'test'
+  ...
+# Subtest: espejo conserva exactamente 31 unidades UTF-16
+ok 86 - espejo conserva exactamente 31 unidades UTF-16
+  ---
+  duration_ms: 0.1535
+  type: 'test'
+  ...
+# Subtest: espejo conserva exactamente 7904 unidades UTF-16
+ok 87 - espejo conserva exactamente 7904 unidades UTF-16
+  ---
+  duration_ms: 0.5549
+  type: 'test'
+  ...
+# Subtest: propietario ausente nunca consulta ni reclama registros
+ok 88 - propietario ausente nunca consulta ni reclama registros
+  ---
+  duration_ms: 0.7145
+  type: 'test'
+  ...
+# Subtest: consulta de propietario usa parámetro y no acepta resultado vacío
+ok 89 - consulta de propietario usa parámetro y no acepta resultado vacío
+  ---
+  duration_ms: 0.4539
+  type: 'test'
+  ...
+# Subtest: espejo largo se reanuda sin duplicar y verifica texto exacto
+ok 90 - espejo largo se reanuda sin duplicar y verifica texto exacto
+  ---
+  duration_ms: 2574.4416
+  type: 'test'
+  ...
+# Subtest: Chrome exige identidad, cuenta final y todas las partes verificadas
+ok 91 - Chrome exige identidad, cuenta final y todas las partes verificadas
+  ---
+  duration_ms: 0.6113
+  type: 'test'
+  ...
+# Subtest: recuperación remota no depende de blobs desaparecidos del heap
+ok 92 - recuperación remota no depende de blobs desaparecidos del heap
+  ---
+  duration_ms: 1.7483
+  type: 'test'
+  ...
+# Subtest: no archiva si conoce una cola pendiente adicional
+ok 93 - no archiva si conoce una cola pendiente adicional
+  ---
+  duration_ms: 0.2219
+  type: 'test'
+  ...
+# Subtest: no acepta huecos
+ok 94 - no acepta huecos
+  ---
+  duration_ms: 1.0167
+  type: 'test'
+  ...
+# Subtest: no acepta duplicados
+ok 95 - no acepta duplicados
+  ---
+  duration_ms: 0.2172
+  type: 'test'
+  ...
+# Subtest: no acepta verificación ausente
+ok 96 - no acepta verificación ausente
+  ---
+  duration_ms: 0.3579
+  type: 'test'
+  ...
+# Subtest: no acepta tamaño o huella inventados
+ok 97 - no acepta tamaño o huella inventados
+  ---
+  duration_ms: 0.198
+  type: 'test'
+  ...
+# Subtest: esperado se reconstruye con índices persistidos, no con cantidad de blobs
+ok 98 - esperado se reconstruye con índices persistidos, no con cantidad de blobs
+  ---
+  duration_ms: 0.3655
+  type: 'test'
+  ...
+# Subtest: un manifiesto vacío no equivale a audio íntegro
+ok 99 - un manifiesto vacío no equivale a audio íntegro
+  ---
+  duration_ms: 0.171
+  type: 'test'
+  ...
+# {"evento":"promocion_revision_fallida","volcadoId":"09bcc797-7e3a-4af9-9cb7-3673b161c0c5","error":"Transcripción vacía al preparar versión v1","actor":"custody-test@example.invalid","politica":"keep_captura"}
+# Subtest: CUSTODY-01: retrying the same session returns the sealed volcado instead of inserting a duplicate
+ok 100 - CUSTODY-01: retrying the same session returns the sealed volcado instead of inserting a duplicate
+  ---
+  duration_ms: 325.862
+  type: 'test'
+  ...
+# Subtest: CUSTODY-02: a retry that changes text under an archived session is rejected and leaves the original untouched
+ok 101 - CUSTODY-02: a retry that changes text under an archived session is rejected and leaves the original untouched
+  ---
+  duration_ms: 236.0547
+  type: 'test'
+  ...
+# Subtest: CUSTODY-03: client-declared verified audio without a matching server manifest cannot be archived
+ok 102 - CUSTODY-03: client-declared verified audio without a matching server manifest cannot be archived
+  ---
+  duration_ms: 2.1127
+  type: 'test'
+  ...
+# Subtest: CUSTODY-04: a stored transcript that no longer matches its sealed SHA cannot pass idempotency checks
+ok 103 - CUSTODY-04: a stored transcript that no longer matches its sealed SHA cannot pass idempotency checks
+  ---
+  duration_ms: 156.2067
+  type: 'test'
+  ...
+# Subtest: CUSTODY-05: retrying an audio part with different bytes/hash is rejected without replacing the first part
+ok 104 - CUSTODY-05: retrying an audio part with different bytes/hash is rejected without replacing the first part
+  ---
+  duration_ms: 1.6885
+  type: 'test'
+  ...
+# Subtest: CUSTODY-06: text-only capture with a stable session ID archives without inventing an audio requirement
+ok 105 - CUSTODY-06: text-only capture with a stable session ID archives without inventing an audio requirement
+  ---
+  duration_ms: 420.0897
+  type: 'test'
+  ...
+# Subtest: CUSTODY-08: verified imported audio can be archived even when transcription is empty
+ok 106 - CUSTODY-08: verified imported audio can be archived even when transcription is empty
+  ---
+  duration_ms: 296.1855
+  type: 'test'
+  ...
+# Subtest: CUSTODY-09: Ingreso exposes export only for verified imported audio and server re-verifies the original
+ok 107 - CUSTODY-09: Ingreso exposes export only for verified imported audio and server re-verifies the original
+  ---
+  duration_ms: 1.4708
+  type: 'test'
+  ...
+# Subtest: CUSTODY-11: transcript network failure must return the verified original locator
+ok 108 - CUSTODY-11: transcript network failure must return the verified original locator
+  ---
+  duration_ms: 0.8626
+  type: 'test'
+  ...
+# Subtest: CUSTODY-12: original export works from verified import custody before or after archive
+ok 109 - CUSTODY-12: original export works from verified import custody before or after archive
+  ---
+  duration_ms: 0.5595
+  type: 'test'
+  ...
+# Subtest: CUSTODY-14: archived captures stay sealed and text-only saves receive stable session IDs
+ok 110 - CUSTODY-14: archived captures stay sealed and text-only saves receive stable session IDs
+  ---
+  duration_ms: 0.68
+  type: 'test'
+  ...
+# Subtest: CUSTODY-15: browser download honors the preserved UTF-8 filename from the server
+ok 111 - CUSTODY-15: browser download honors the preserved UTF-8 filename from the server
+  ---
+  duration_ms: 0.5926
+  type: 'test'
+  ...
+# Subtest: CUSTODY-13: fresh installations create custody tables before applying compatibility ALTERs
+ok 112 - CUSTODY-13: fresh installations create custody tables before applying compatibility ALTERs
+  ---
+  duration_ms: 0.2759
+  type: 'test'
+  ...
+# Subtest: CUSTODY-10: stale ingestion failures cannot overwrite a newer approved version
+ok 113 - CUSTODY-10: stale ingestion failures cannot overwrite a newer approved version
+  ---
+  duration_ms: 0.236
+  type: 'test'
+  ...
+# Subtest: CUSTODY-07: verification failures never delete stored audio and staging is deleted only after verified linkage
+ok 114 - CUSTODY-07: verification failures never delete stored audio and staging is deleted only after verified linkage
+  ---
+  duration_ms: 0.6486
+  type: 'test'
+  ...
+# Subtest: CUSTODY-16: session transcription endpoint requires an authenticated user
+ok 115 - CUSTODY-16: session transcription endpoint requires an authenticated user
+  ---
+  duration_ms: 0.2314
+  type: 'test'
+  ...
+# Subtest: CUSTODY-17: Ingesta UI consumes the canonical pipeline digest key
+ok 116 - CUSTODY-17: Ingesta UI consumes the canonical pipeline digest key
+  ---
+  duration_ms: 0.861
+  type: 'test'
+  ...
+# Subtest: dialogue archive requires both sources and stopped manifest
+ok 117 - dialogue archive requires both sources and stopped manifest
+  ---
+  duration_ms: 2.3929
+  type: 'test'
+  ...
+# Subtest: wrong source is rejected
+ok 118 - wrong source is rejected
+  ---
+  duration_ms: 0.6342
+  type: 'test'
+  ...
+# Subtest: active capture cannot be archived
+ok 119 - active capture cannot be archived
+  ---
+  duration_ms: 0.2235
+  type: 'test'
+  ...
+# Subtest: pending local parts cannot be declared complete
+ok 120 - pending local parts cannot be declared complete
+  ---
+  duration_ms: 0.2071
+  type: 'test'
+  ...
+# Subtest: missing source cannot be hidden behind valid global indices
+ok 121 - missing source cannot be hidden behind valid global indices
+  ---
+  duration_ms: 0.3485
+  type: 'test'
+  ...
+# Subtest: invalid global indices are rejected
+ok 122 - invalid global indices are rejected
+  ---
+  duration_ms: 0.2203
+  type: 'test'
+  ...
+# Subtest: file import is not an allowed dialogue source
+ok 123 - file import is not an allowed dialogue source
+  ---
+  duration_ms: 0.4076
+  type: 'test'
+  ...
+# Subtest: interrupted capture preserves explicit partial state
+ok 124 - interrupted capture preserves explicit partial state
+  ---
+  duration_ms: 0.2075
+  type: 'test'
+  ...
+# Subtest: Prueba 1: Una frase corta con pausas
+ok 125 - Prueba 1: Una frase corta con pausas
+  ---
+  duration_ms: 23.2656
+  type: 'test'
+  ...
+# Subtest: Prueba 2: Una idea larga con pausas intermedias
+ok 126 - Prueba 2: Una idea larga con pausas intermedias
+  ---
+  duration_ms: 1.0372
+  type: 'test'
+  ...
+# Subtest: Prueba 3: Dos ideas consecutivas separadas por pausa mayor
+ok 127 - Prueba 3: Dos ideas consecutivas separadas por pausa mayor
+  ---
+  duration_ms: 0.2539
+  type: 'test'
+  ...
+# Subtest: Prueba 4: Nombres propios y términos del glosario
+ok 128 - Prueba 4: Nombres propios y términos del glosario
+  ---
+  duration_ms: 2.7476
+  type: 'test'
+  ...
+# Subtest: Prueba 5: Texto con repetición explícita (se conserva íntegramente)
+ok 129 - Prueba 5: Texto con repetición explícita (se conserva íntegramente)
+  ---
+  duration_ms: 10.1609
+  type: 'test'
+  ...
+# Subtest: Prueba 6: Caso en que Groq esté indisponible (fallback grace)
+ok 130 - Prueba 6: Caso en que Groq esté indisponible (fallback grace)
+  ---
+  duration_ms: 0.4553
+  type: 'test'
+  ...
+# Subtest: Prueba 7 (@req FIX-DICTADO/D9): Whisper responde con exito pero truncado (falta una cláusula completa) -> no pierde texto
+ok 131 - Prueba 7 (@req FIX-DICTADO/D9): Whisper responde con exito pero truncado (falta una cláusula completa) -> no pierde texto
+  ---
+  duration_ms: 13.7339
+  type: 'test'
+  ...
+# Subtest: Prueba 8 (@req FIX-DICTADO/D9): Whisper responde con exito y corrige UNA palabra mal oída -> el guardián ACEPTA Whisper
+ok 132 - Prueba 8 (@req FIX-DICTADO/D9): Whisper responde con exito y corrige UNA palabra mal oída -> el guardián ACEPTA Whisper
+  ---
+  duration_ms: 0.8769
+  type: 'test'
+  ...
+# Subtest: Prueba 9 (@req FIX-DICTADO/D9): Repetición real de palabras ('digo digo') sobrevive íntegra de punta a punta
+ok 133 - Prueba 9 (@req FIX-DICTADO/D9): Repetición real de palabras ('digo digo') sobrevive íntegra de punta a punta
+  ---
+  duration_ms: 1.0806
+  type: 'test'
+  ...
+# Subtest: Prueba 10 (@req FIX-DICTADO/D9): Desajuste en el número de párrafos entre ASR y Whisper no pierde contenido en reconciliarSegmentos
+ok 134 - Prueba 10 (@req FIX-DICTADO/D9): Desajuste en el número de párrafos entre ASR y Whisper no pierde contenido en reconciliarSegmentos
+  ---
+  duration_ms: 1.4076
+  type: 'test'
+  ...
+# Subtest: muestreo: elegibilidad, frontera probabilística, topes y cambio de día
+ok 135 - muestreo: elegibilidad, frontera probabilística, topes y cambio de día
+  ---
+  duration_ms: 4.349
+  type: 'test'
+  ...
+# Subtest: muestreo: distribución determinista y probabilidad registrada
+ok 136 - muestreo: distribución determinista y probabilidad registrada
+  ---
+  duration_ms: 11.9983
+  type: 'test'
+  ...
+# Subtest: conservación: detecta sustitución de igual longitud, no solo caracteres
+ok 137 - conservación: detecta sustitución de igual longitud, no solo caracteres
+  ---
+  duration_ms: 0.308
+  type: 'test'
+  ...
+# Subtest: comentario manual sin valoración, límites y contrato cerrado
+ok 138 - comentario manual sin valoración, límites y contrato cerrado
+  ---
+  duration_ms: 4.0708
+  type: 'test'
+  ...
+# Subtest: resumen: cero datos no es cero fallos; fuentes y comentarios solos separados
+ok 139 - resumen: cero datos no es cero fallos; fuentes y comentarios solos separados
+  ---
+  duration_ms: 1.49
+  type: 'test'
+  ...
+# Subtest: propietario: identidad de servidor, rechazo anónimo y separación
+ok 140 - propietario: identidad de servidor, rechazo anónimo y separación
+  ---
+  duration_ms: 0.8569
+  type: 'test'
+  ...
+# Subtest: almacenamiento: comentario cifrado, idempotencia, conflicto, aislamiento y borrado
+ok 141 - almacenamiento: comentario cifrado, idempotencia, conflicto, aislamiento y borrado
+  ---
+  duration_ms: 498.1324
+  type: 'test'
+  ...
+# Subtest: ruta HTTP real: autenticación, origen, cambio de perfil y privacidad
+ok 142 - ruta HTTP real: autenticación, origen, cambio de perfil y privacidad
+  ---
+  duration_ms: 1550.6653
+  type: 'test'
+  ...
+# Contratos, entrega, muestreo, privacidad y persistencia controlada: failed
+# Subtest: preferencias corruptas y entradas numéricas no habilitan recopilación ni muestreo
+ok 143 - preferencias corruptas y entradas numéricas no habilitan recopilación ni muestreo
+  ---
+  duration_ms: 5.6716
+  type: 'test'
+  ...
+# Subtest: contrato rechaza más alteraciones que comprobaciones
+ok 144 - contrato rechaza más alteraciones que comprobaciones
+  ---
+  duration_ms: 4.7258
+  type: 'test'
+  ...
+# Subtest: resumen independiente del orden: reintentos y sesiones duplicadas no inflan muestras
+ok 145 - resumen independiente del orden: reintentos y sesiones duplicadas no inflan muestras
+  ---
+  duration_ms: 8.0467
+  type: 'test'
+  ...
+# Subtest: resumen excluye conflictos en lugar de escoger el resultado favorable
+ok 146 - resumen excluye conflictos en lugar de escoger el resultado favorable
+  ---
+  duration_ms: 0.7339
+  type: 'test'
+  ...
+# Subtest: entrega serializada: llamadas simultáneas y nuevos registros no se solapan
+ok 147 - entrega serializada: llamadas simultáneas y nuevos registros no se solapan
+  ---
+  duration_ms: 1.5209
+  type: 'test'
+  ...
+# Subtest: fallo de red o acuse inválido conserva ID; reintento sin duplicar
+ok 148 - fallo de red o acuse inválido conserva ID; reintento sin duplicar
+  ---
+  duration_ms: 1.0029
+  type: 'test'
+  ...
+# Subtest: cambio de perfil: acuse anterior no consume cola nueva ni cambia propietario
+ok 149 - cambio de perfil: acuse anterior no consume cola nueva ni cambia propietario
+  ---
+  duration_ms: 1.7548
+  type: 'test'
+  ...
+# Subtest: captura ocupada pausa la entrega entre registros
+ok 150 - captura ocupada pausa la entrega entre registros
+  ---
+  duration_ms: 0.7003
+  type: 'test'
+  ...
+# Subtest: cola acotada solo de metadatos; no admite comentario manual
+ok 151 - cola acotada solo de metadatos; no admite comentario manual
+  ---
+  duration_ms: 1.41
+  type: 'test'
+  ...
+# Subtest: benchmark invalida verde antes de huella y declara fallo si falta entrada
+ok 152 - benchmark invalida verde antes de huella y declara fallo si falta entrada
+  ---
+  duration_ms: 11.6427
+  type: 'test'
+  ...
+# Subtest: benchmark registra fallos de arranque y no ejecuta la etapa siguiente
+ok 153 - benchmark registra fallos de arranque y no ejecuta la etapa siguiente
+  ---
+  duration_ms: 21.3424
+  type: 'test'
+  ...
+# Subtest: dictation telemetry uses USER_DATA, drops raw transcript fields, and dequeues only after acknowledgement
+ok 154 - dictation telemetry uses USER_DATA, drops raw transcript fields, and dequeues only after acknowledgement
+  ---
+  duration_ms: 5.4945
+  type: 'test'
+  ...
+# Subtest: dictation event queue survives a failed HTTP response and retries with the same UUID and idempotency key
+ok 155 - dictation event queue survives a failed HTTP response and retries with the same UUID and idempotency key
+  ---
+  duration_ms: 1.1304
+  type: 'test'
+  ...
+# Subtest: dictation telemetry preserves a rejected event until the next acknowledged delivery
+ok 156 - dictation telemetry preserves a rejected event until the next acknowledged delivery
+  ---
+  duration_ms: 1.7325
+  type: 'test'
+  ...
+# Subtest: dictation telemetry schedules automatic backoff retry after a server rejection
+ok 157 - dictation telemetry schedules automatic backoff retry after a server rejection
+  ---
+  duration_ms: 11.1441
+  type: 'test'
+  ...
+# Subtest: edición in situ: Esc con cambios confirma y reanuda una sola vez
+ok 158 - edición in situ: Esc con cambios confirma y reanuda una sola vez
+  ---
+  duration_ms: 2.2858
+  type: 'test'
+  ...
+# Subtest: edición in situ: Esc sin cambios desactiva y reanuda una sola vez
+ok 159 - edición in situ: Esc sin cambios desactiva y reanuda una sola vez
+  ---
+  duration_ms: 0.327
+  type: 'test'
+  ...
+# Subtest: edición in situ: confirmar por botón conserva la ruta de confirmación
+ok 160 - edición in situ: confirmar por botón conserva la ruta de confirmación
+  ---
+  duration_ms: 0.2706
+  type: 'test'
+  ...
+# Subtest: edición in situ: comparación cruda detecta cualquier cambio
+ok 161 - edición in situ: comparación cruda detecta cualquier cambio
+  ---
+  duration_ms: 0.1864
+  type: 'test'
+  ...
+# Subtest: edición in situ: la página registra y libera Escape
+ok 162 - edición in situ: la página registra y libera Escape
+  ---
+  duration_ms: 1.6237
+  type: 'test'
+  ...
+# Subtest: EP Security: Token creation, audience, scopes and command secrecy
+ok 163 - EP Security: Token creation, audience, scopes and command secrecy
+  ---
+  duration_ms: 5.608
+  type: 'test'
+  ...
+# Subtest: EP Security: DB Rate limit enforcement (5 tokens per 15 mins)
+ok 164 - EP Security: DB Rate limit enforcement (5 tokens per 15 mins)
+  ---
+  duration_ms: 2.805
+  type: 'test'
+  ...
+# Subtest: EP Security: POST /api/ep/token platform parameter handling and command secrecy
+ok 165 - EP Security: POST /api/ep/token platform parameter handling and command secrecy
+  ---
+  duration_ms: 31.5531
+  type: 'test'
+  ...
+# Subtest: EP Security: public authentication codes never expose internal errors
+ok 166 - EP Security: public authentication codes never expose internal errors
+  ---
+  duration_ms: 1.2099
+  type: 'test'
+  ...
+# Subtest: EP Security UI isolates Entorno Persistente as a submodule and keeps credentials ephemeral
+ok 167 - EP Security UI isolates Entorno Persistente as a submodule and keeps credentials ephemeral
+  ---
+  duration_ms: 1.413
+  type: 'test'
+  ...
+# Subtest: EP Security: Middleware 308 redirect opens the Entorno Persistente submodule
+ok 168 - EP Security: Middleware 308 redirect opens the Entorno Persistente submodule
+  ---
+  duration_ms: 1.8217
+  type: 'test'
+  ...
+# Subtest: EP token conserva audience, session y scopes
+ok 169 - EP token conserva audience, session y scopes
+  ---
+  duration_ms: 3.0735
+  type: 'test'
+  ...
+# Subtest: JWT rechaza firma alterada en tiempo constante
+ok 170 - JWT rechaza firma alterada en tiempo constante
+  ---
+  duration_ms: 11.9731
+  type: 'test'
+  ...
+# Subtest: JWT rechaza algoritmo distinto aun con firma valida
+ok 171 - JWT rechaza algoritmo distinto aun con firma valida
+  ---
+  duration_ms: 0.4479
+  type: 'test'
+  ...
+# Subtest: JWT rechaza expiracion exacta y formatos no canonicos
+ok 172 - JWT rechaza expiracion exacta y formatos no canonicos
+  ---
+  duration_ms: 3.6938
+  type: 'test'
+  ...
+# Subtest: 1. Base de datos no disponible responde 503 con DB_UNREACHABLE, retryable=true y cero detalles internos
+ok 173 - 1. Base de datos no disponible responde 503 con DB_UNREACHABLE, retryable=true y cero detalles internos
+  ---
+  duration_ms: 10.5015
+  type: 'test'
+  ...
+# Subtest: 2. Esquema ausente produce EVENT_SCHEMA_MISSING y GET no ejecuta DDL
+ok 174 - 2. Esquema ausente produce EVENT_SCHEMA_MISSING y GET no ejecuta DDL
+  ---
+  duration_ms: 3.2344
+  type: 'test'
+  ...
+# Subtest: 3. Esquema histórico detecta columnas faltantes como EVENT_SCHEMA_OUTDATED y simula migración 022
+ok 175 - 3. Esquema histórico detecta columnas faltantes como EVENT_SCHEMA_OUTDATED y simula migración 022
+  ---
+  duration_ms: 7.4678
+  type: 'test'
+  ...
+# Subtest: 4. Rol sin permisos DDL puede ejecutar GET/POST si el esquema ya está migrado
+ok 176 - 4. Rol sin permisos DDL puede ejecutar GET/POST si el esquema ya está migrado
+  ---
+  duration_ms: 4.8046
+  type: 'test'
+  ...
+# Subtest: 5. Migración 022 es sintácticamente válida e incluye transacción (BEGIN/COMMIT) e idempotencia
+ok 177 - 5. Migración 022 es sintácticamente válida e incluye transacción (BEGIN/COMMIT) e idempotencia
+  ---
+  duration_ms: 1.0223
+  type: 'test'
+  ...
+# Subtest: 6. GET /api/eventos soporta JSON y NDJSON con filtros y redacción de secretos
+ok 178 - 6. GET /api/eventos soporta JSON y NDJSON con filtros y redacción de secretos
+  ---
+  duration_ms: 2.4536
+  type: 'test'
+  ...
+# Subtest: 7. Diagnóstico sanitizado ante error grave no filtra detalles internos
+ok 179 - 7. Diagnóstico sanitizado ante error grave no filtra detalles internos
+  ---
+  duration_ms: 1.5593
+  type: 'test'
+  ...
+# Subtest: OBS-1: Validación de privacidad prohíbe audio crudo, base64 blobs y claves de transcripción
+ok 180 - OBS-1: Validación de privacidad prohíbe audio crudo, base64 blobs y claves de transcripción
+  ---
+  duration_ms: 3.5969
+  type: 'test'
+  ...
+# Subtest: OBS-1: Ingestión batch con deduplicación por event_uuid e idempotencia idéntica
+ok 181 - OBS-1: Ingestión batch con deduplicación por event_uuid e idempotencia idéntica
+  ---
+  duration_ms: 4.98
+  type: 'test'
+  ...
+# Subtest: OBS-1: Eventos de dictado User Data preservan clase, fallo y secuencia fuera del rango 999
+ok 182 - OBS-1: Eventos de dictado User Data preservan clase, fallo y secuencia fuera del rango 999
+  ---
+  duration_ms: 11.6942
+  type: 'test'
+  ...
+# Subtest: OBS-1: El estado de evento refleja los outcomes PENDING y SKIPPED de dictado
+ok 183 - OBS-1: El estado de evento refleja los outcomes PENDING y SKIPPED de dictado
+  ---
+  duration_ms: 4.3199
+  type: 'test'
+  ...
+# Subtest: OBS-1: Cadena de hashes por correlación preserva integridad determinista
+ok 184 - OBS-1: Cadena de hashes por correlación preserva integridad determinista
+  ---
+  duration_ms: 2.1597
+  type: 'test'
+  ...
+# Subtest: OBS-1: Endpoint POST /api/eventos procesa lotes JSON y aplica redacción de secretos
+ok 185 - OBS-1: Endpoint POST /api/eventos procesa lotes JSON y aplica redacción de secretos
+  ---
+  duration_ms: 2.2761
+  type: 'test'
+  ...
+# Subtest: OBS-1: Outbox procesa reintentos pendientes tras fallos temporales
+ok 186 - OBS-1: Outbox procesa reintentos pendientes tras fallos temporales
+  ---
+  duration_ms: 0.6015
+  type: 'test'
+  ...
+# Subtest: OBS-1: Desempeño a volumen (lote de eventos en secuencia)
+ok 187 - OBS-1: Desempeño a volumen (lote de eventos en secuencia)
+  ---
+  duration_ms: 10.0051
+  type: 'test'
+  ...
+# Subtest: registrarEvento nunca lanza ni bloquea aunque la DB falle
+ok 188 - registrarEvento nunca lanza ni bloquea aunque la DB falle
+  ---
+  duration_ms: 4.1128
+  type: 'test'
+  ...
+# Subtest: redacción de secretos en cleanSecretos funciona correctamente
+ok 189 - redacción de secretos en cleanSecretos funciona correctamente
+  ---
+  duration_ms: 1.8936
+  type: 'test'
+  ...
+# Subtest: validación de event_id por fase exige patrón ^{PREFIJO}-[0-9]{3}$
+ok 190 - validación de event_id por fase exige patrón ^{PREFIJO}-[0-9]{3}$
+  ---
+  duration_ms: 0.8449
+  type: 'test'
+  ...
+# Subtest: perdidaDetectada=true activa registro de evento en reconciliarTranscripcion
+ok 191 - perdidaDetectada=true activa registro de evento en reconciliarTranscripcion
+  ---
+  duration_ms: 3.5882
+  type: 'test'
+  ...
+# Subtest: GET /api/eventos con format=ndjson genera estructura x-ndjson
+ok 192 - GET /api/eventos con format=ndjson genera estructura x-ndjson
+  ---
+  duration_ms: 8.8723
+  type: 'test'
+  ...
+# Subtest: 009_folio.sql migration file contains exact required DDL and backfill statements
+ok 193 - 009_folio.sql migration file contains exact required DDL and backfill statements
+  ---
+  duration_ms: 2.96
+  type: 'test'
+  ...
+# Subtest: folio logic: backfill SQL simulation
+ok 194 - folio logic: backfill SQL simulation
+  ---
+  duration_ms: 0.5395
+  type: 'test'
+  ...
+# Subtest: PROMPT 8 — Fragmentos Literales Anclados (Arranque IAR) Suite
+    # Subtest: 1. Cálculo determinista de ID (UUIDv5) e Idempotencia conforme al contrato 5-0
+    ok 1 - 1. Cálculo determinista de ID (UUIDv5) e Idempotencia conforme al contrato 5-0
+      ---
+      duration_ms: 2.7955
+      type: 'test'
+      ...
+    # Subtest: 2. Offsets Unicode UTF-16, emojis, acentos y combining marks
+    ok 2 - 2. Offsets Unicode UTF-16, emojis, acentos y combining marks
+      ---
+      duration_ms: 0.5967
+      type: 'test'
+      ...
+    # Subtest: 3. Cobertura 100% contigua, cero huecos y cero solapes no declarados
+    ok 3 - 3. Cobertura 100% contigua, cero huecos y cero solapes no declarados
+      ---
+      duration_ms: 6.2291
+      type: 'test'
+      ...
+    # Subtest: 4. Inmutabilidad por corrida y persistencia append-only con nuevo sello
+    ok 4 - 4. Inmutabilidad por corrida y persistencia append-only con nuevo sello
+      ---
+      duration_ms: 2.1809
+      type: 'test'
+      ...
+    # Subtest: 5. Manejo de versión obsoleta
+    ok 5 - 5. Manejo de versión obsoleta
+      ---
+      duration_ms: 3.1577
+      type: 'test'
+      ...
+    # Subtest: 6. Trazabilidad Inversa (fragment_id -> cita -> terna -> volcado)
+    ok 6 - 6. Trazabilidad Inversa (fragment_id -> cita -> terna -> volcado)
+      ---
+      duration_ms: 0.7949
+      type: 'test'
+      ...
+    # Subtest: 7. Manejo seguro de texto vacío
+    ok 7 - 7. Manejo seguro de texto vacío
+      ---
+      duration_ms: 1.5005
+      type: 'test'
+      ...
+    1..7
+ok 195 - PROMPT 8 — Fragmentos Literales Anclados (Arranque IAR) Suite
+  ---
+  duration_ms: 22.2605
+  type: 'suite'
+  ...
+# Subtest: Caso 1: sin KHORA_SHELL (undefined), todo es vigente sin importar rutasOs
+ok 196 - Caso 1: sin KHORA_SHELL (undefined), todo es vigente sin importar rutasOs
+  ---
+  duration_ms: 1.5915
+  type: 'test'
+  ...
+# Subtest: Caso 2: cadena vacía en shellEnv no es 'os'
+ok 197 - Caso 2: cadena vacía en shellEnv no es 'os'
+  ---
+  duration_ms: 0.3495
+  type: 'test'
+  ...
+# Subtest: Caso 3: mayúsculas en shellEnv ('OS') no activan — falla seguro, no falla abierto
+ok 198 - Caso 3: mayúsculas en shellEnv ('OS') no activan — falla seguro, no falla abierto
+  ---
+  duration_ms: 0.203
+  type: 'test'
+  ...
+# Subtest: Caso 4: espacio en la variable de entorno (' os') no activa — falla seguro
+ok 199 - Caso 4: espacio en la variable de entorno (' os') no activa — falla seguro
+  ---
+  duration_ms: 0.1813
+  type: 'test'
+  ...
+# Subtest: Caso 5: caso base, shellEnv='os' y la ruta está declarada en rutasOs
+ok 200 - Caso 5: caso base, shellEnv='os' y la ruta está declarada en rutasOs
+  ---
+  duration_ms: 0.1996
+  type: 'test'
+  ...
+# Subtest: Caso 6: pathname='/os' ya está en el árbol de destino, no se reescribe dos veces
+ok 201 - Caso 6: pathname='/os' ya está en el árbol de destino, no se reescribe dos veces
+  ---
+  duration_ms: 0.2124
+  type: 'test'
+  ...
+# Subtest: Caso 7: pathname='/os/' startsWith('/os') también atrapa el slash final
+ok 202 - Caso 7: pathname='/os/' startsWith('/os') también atrapa el slash final
+  ---
+  duration_ms: 0.1962
+  type: 'test'
+  ...
+# Subtest: Caso 8: ruta '/nucleo' no declarada en rutasOs ({'/'}), aunque el shell esté activo
+ok 203 - Caso 8: ruta '/nucleo' no declarada en rutasOs ({'/'}), aunque el shell esté activo
+  ---
+  duration_ms: 0.1743
+  type: 'test'
+  ...
+# Subtest: Caso 9: sin slash final en rutasOs ({'/nucleo'}) para '/nucleo/' -> no hay match; cero normalización
+ok 204 - Caso 9: sin slash final en rutasOs ({'/nucleo'}) para '/nucleo/' -> no hay match; cero normalización
+  ---
+  duration_ms: 0.5663
+  type: 'test'
+  ...
+# Subtest: Caso 10: rutasOs con múltiples entradas ({'/', '/nucleo'}), ambas activas de forma independiente
+ok 205 - Caso 10: rutasOs con múltiples entradas ({'/', '/nucleo'}), ambas activas de forma independiente
+  ---
+  duration_ms: 0.6551
+  type: 'test'
+  ...
+# Subtest: Caso 11: pathname '' vacío es un caso defensivo, resuelve a vigente y no revienta
+ok 206 - Caso 11: pathname '' vacío es un caso defensivo, resuelve a vigente y no revienta
+  ---
+  duration_ms: 0.3443
+  type: 'test'
+  ...
+# Subtest: Caso 12: rutasOs vacío nunca activa nada, ni con el shell prendido
+ok 207 - Caso 12: rutasOs vacío nunca activa nada, ni con el shell prendido
+  ---
+  duration_ms: 1.5002
+  type: 'test'
+  ...
+# Subtest: token format rejects classic tokens, whitespace and unbounded input
+ok 208 - token format rejects classic tokens, whitespace and unbounded input
+  ---
+  duration_ms: 1.7591
+  type: 'test'
+  ...
+# Subtest: stored secret is authenticated ciphertext; GET metadata and audit never contain it
+ok 209 - stored secret is authenticated ciphertext; GET metadata and audit never contain it
+  ---
+  duration_ms: 3.4096
+  type: 'test'
+  ...
+# Subtest: norm and EP are isolated and ciphertext cannot be moved between purposes or users
+ok 210 - norm and EP are isolated and ciphertext cannot be moved between purposes or users
+  ---
+  duration_ms: 1.7199
+  type: 'test'
+  ...
+# Subtest: plaintext and tampered ciphertext fail closed
+ok 211 - plaintext and tampered ciphertext fail closed
+  ---
+  duration_ms: 0.8283
+  type: 'test'
+  ...
+# Subtest: deletion is repeatable and removes only the selected purpose
+ok 212 - deletion is repeatable and removes only the selected purpose
+  ---
+  duration_ms: 1.1166
+  type: 'test'
+  ...
+# Subtest: GitHub validation is bounded and destination is fixed per purpose
+ok 213 - GitHub validation is bounded and destination is fixed per purpose
+  ---
+  duration_ms: 3.8129
+  type: 'test'
+  ...
+# Subtest: GitHub 401 does not save or leak upstream body
+ok 214 - GitHub 401 does not save or leak upstream body
+  ---
+  duration_ms: 145.2667
+  type: 'test'
+  ...
+# Subtest: GitHub 403 does not save or leak upstream body
+ok 215 - GitHub 403 does not save or leak upstream body
+  ---
+  duration_ms: 26.0597
+  type: 'test'
+  ...
+# Subtest: GitHub 404 does not save or leak upstream body
+ok 216 - GitHub 404 does not save or leak upstream body
+  ---
+  duration_ms: 37.0724
+  type: 'test'
+  ...
+# Subtest: GitHub 429 does not save or leak upstream body
+ok 217 - GitHub 429 does not save or leak upstream body
+  ---
+  duration_ms: 23.1237
+  type: 'test'
+  ...
+# Subtest: GitHub 500 does not save or leak upstream body
+ok 218 - GitHub 500 does not save or leak upstream body
+  ---
+  duration_ms: 20.6963
+  type: 'test'
+  ...
+# Subtest: GitHub network exception is sanitized and leaves previous credential intact
+ok 219 - GitHub network exception is sanitized and leaves previous credential intact
+  ---
+  duration_ms: 15.5591
+  type: 'test'
+  ...
+# Subtest: route requires owner, unlocked vault, correct origin and bounded JSON
+ok 220 - route requires owner, unlocked vault, correct origin and bounded JSON
+  ---
+  duration_ms: 123.4093
+  type: 'test'
+  ...
+# Subtest: route saves and returns only metadata; responses prohibit caching
+ok 221 - route saves and returns only metadata; responses prohibit caching
+  ---
+  duration_ms: 13.5744
+  type: 'test'
+  ...
+# Subtest: database-backed change limit cannot be bypassed by new server instance
+ok 222 - database-backed change limit cannot be bypassed by new server instance
+  ---
+  duration_ms: 1.6743
+  type: 'test'
+  ...
+# Subtest: MCP reads saved normative credential without using EP credential
+ok 223 - MCP reads saved normative credential without using EP credential
+  ---
+  duration_ms: 1.7839
+  type: 'test'
+  ...
+# Subtest: database failure is not reported as absent secret or upstream GitHub failure
+ok 224 - database failure is not reported as absent secret or upstream GitHub failure
+  ---
+  duration_ms: 0.8851
+  type: 'test'
+  ...
+# Subtest: EP secret export requires new explicit scopes and owner; never returns norm secret
+ok 225 - EP secret export requires new explicit scopes and owner; never returns norm secret
+  ---
+  duration_ms: 8.9177
+  type: 'test'
+  ...
+# Subtest: bootstrap bytes match committed generator and secret retrieval never uses MCP or clipboard
+ok 226 - bootstrap bytes match committed generator and secret retrieval never uses MCP or clipboard
+  ---
+  duration_ms: 1.2718
+  type: 'test'
+  ...
+# Subtest: UI is write-only, purpose-specific and locked by vault state, with no browser persistence
+ok 227 - UI is write-only, purpose-specific and locked by vault state, with no browser persistence
+  ---
+  duration_ms: 0.5045
+  type: 'test'
+  ...
+# Neo4j-backed graph query error: Neo4jInalcanzableError: Neo4j no estÃ¡ disponible: offline
+#     at obtenerProyeccionGrafo (C:\\Users\\PC 13\\AppData\\Local\\Temp\\khora-splash-audit-95f645d5b33846eea429071779b17247\\source\\SeryMente-khora-b5e7009de137db30c26ecc5f4ddbb34789f453f2\\khora-web\\lib\\server\\grafo-proyeccion.ts:213:42)
+#     at async GET (C:\\Users\\PC 13\\AppData\\Local\\Temp\\khora-splash-audit-95f645d5b33846eea429071779b17247\\source\\SeryMente-khora-b5e7009de137db30c26ecc5f4ddbb34789f453f2\\khora-web\\app\\api\\grafo\\route.ts:19:24)
+#     at async TestContext.<anonymous> (C:\\Users\\PC 13\\AppData\\Local\\Temp\\khora-splash-audit-95f645d5b33846eea429071779b17247\\source\\SeryMente-khora-b5e7009de137db30c26ecc5f4ddbb34789f453f2\\khora-web\\tests\\unit\\grafo_neo4j.test.ts:71:15)
+#     at async Test.run (node:internal/test_runner/test:1054:7)
+#     at async Test.processPendingSubtests (node:internal/test_runner/test:744:7) {
+#   code: 'NEO4J_UNREACHABLE'
+# }
+# Neo4j-backed graph query error: Error: invalid Cypher
+#     at <anonymous> (C:\\Users\\PC 13\\AppData\\Local\\Temp\\khora-splash-audit-95f645d5b33846eea429071779b17247\\source\\SeryMente-khora-b5e7009de137db30c26ecc5f4ddbb34789f453f2\\khora-web\\tests\\unit\\grafo_neo4j.test.ts:69:148)
+#     at Object.run (C:\\Users\\PC 13\\AppData\\Local\\Temp\\khora-splash-audit-95f645d5b33846eea429071779b17247\\source\\SeryMente-khora-b5e7009de137db30c26ecc5f4ddbb34789f453f2\\khora-web\\tests\\unit\\grafo_neo4j.test.ts:15:135)
+#     at limitada (C:\\Users\\PC 13\\AppData\\Local\\Temp\\khora-splash-audit-95f645d5b33846eea429071779b17247\\source\\SeryMente-khora-b5e7009de137db30c26ecc5f4ddbb34789f453f2\\khora-web\\lib\\server\\grafo-proyeccion.ts:50:32)
+#     at <anonymous> (C:\\Users\\PC 13\\AppData\\Local\\Temp\\khora-splash-audit-95f645d5b33846eea429071779b17247\\source\\SeryMente-khora-b5e7009de137db30c26ecc5f4ddbb34789f453f2\\khora-web\\lib\\server\\grafo-proyeccion.ts:94:30)
+#     at ejecutarConFallbackNeo4j (C:\\Users\\PC 13\\AppData\\Local\\Temp\\khora-splash-audit-95f645d5b33846eea429071779b17247\\source\\SeryMente-khora-b5e7009de137db30c26ecc5f4ddbb34789f453f2\\khora-web\\lib\\server\\neo4j-conexion.ts:27:20)
+#     at obtenerProyeccionGrafo (C:\\Users\\PC 13\\AppData\\Local\\Temp\\khora-splash-audit-95f645d5b33846eea429071779b17247\\source\\SeryMente-khora-b5e7009de137db30c26ecc5f4ddbb34789f453f2\\khora-web\\lib\\server\\grafo-proyeccion.ts:83:18)
+#     at GET (C:\\Users\\PC 13\\AppData\\Local\\Temp\\khora-splash-audit-95f645d5b33846eea429071779b17247\\source\\SeryMente-khora-b5e7009de137db30c26ecc5f4ddbb34789f453f2\\khora-web\\app\\api\\grafo\\route.ts:19:30)
+#     at TestContext.<anonymous> (C:\\Users\\PC 13\\AppData\\Local\\Temp\\khora-splash-audit-95f645d5b33846eea429071779b17247\\source\\SeryMente-khora-b5e7009de137db30c26ecc5f4ddbb34789f453f2\\khora-web\\tests\\unit\\grafo_neo4j.test.ts:74:17)
+#     at async Test.run (node:internal/test_runner/test:1054:7)
+#     at async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+# Neo4j-backed graph query error: Neo4jNoConfiguradoError: Credenciales de Neo4j no configuradas en las variables de entorno (NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD)
+#     at obtenerProyeccionGrafo (C:\\Users\\PC 13\\AppData\\Local\\Temp\\khora-splash-audit-95f645d5b33846eea429071779b17247\\source\\SeryMente-khora-b5e7009de137db30c26ecc5f4ddbb34789f453f2\\khora-web\\lib\\server\\grafo-proyeccion.ts:76:41)
+#     at GET (C:\\Users\\PC 13\\AppData\\Local\\Temp\\khora-splash-audit-95f645d5b33846eea429071779b17247\\source\\SeryMente-khora-b5e7009de137db30c26ecc5f4ddbb34789f453f2\\khora-web\\app\\api\\grafo\\route.ts:19:30)
+#     at TestContext.<anonymous> (C:\\Users\\PC 13\\AppData\\Local\\Temp\\khora-splash-audit-95f645d5b33846eea429071779b17247\\source\\SeryMente-khora-b5e7009de137db30c26ecc5f4ddbb34789f453f2\\khora-web\\tests\\unit\\grafo_neo4j.test.ts:83:23)
+#     at Test.runInAsyncScope (node:async_hooks:214:14)
+#     at Test.run (node:internal/test_runner/test:1047:25)
+#     at Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+#     at Test.postRun (node:internal/test_runner/test:1173:19)
+#     at Test.run (node:internal/test_runner/test:1101:12)
+#     at async Test.processPendingSubtests (node:internal/test_runner/test:744:7) {
+#   code: 'NEO4J_UNCONFIGURED'
+# }
+# Subtest: /api/grafo exposes filtered InformationObject and MENTIONS without dangling edges
+ok 228 - /api/grafo exposes filtered InformationObject and MENTIONS without dangling edges
+  ---
+  duration_ms: 10.752
+  type: 'test'
+  ...
+# Subtest: /api/grafo declares truncation and clamps large limits
+ok 229 - /api/grafo declares truncation and clamps large limits
+  ---
+  duration_ms: 1.7371
+  type: 'test'
+  ...
+# Subtest: /api/grafo rejects invalid limits instead of silently defaulting
+ok 230 - /api/grafo rejects invalid limits instead of silently defaulting
+  ---
+  duration_ms: 1.5788
+  type: 'test'
+  ...
+# Subtest: /api/grafo distinguishes unavailable Neo4j (503) from query defects (500)
+ok 231 - /api/grafo distinguishes unavailable Neo4j (503) from query defects (500)
+  ---
+  duration_ms: 8.2018
+  type: 'test'
+  ...
+# Subtest: /api/grafo returns 503 when Neo4j credentials are missing
+ok 232 - /api/grafo returns 503 when Neo4j credentials are missing
+  ---
+  duration_ms: 1.2974
+  type: 'test'
+  ...
+# Subtest: /api/grafo retries routing discovery once through the equivalent direct Bolt URI
+ok 233 - /api/grafo retries routing discovery once through the equivalent direct Bolt URI
+  ---
+  duration_ms: 1.8496
+  type: 'test'
+  ...
+# Subtest: /api/grafo timestamp fallbacks use valid Cypher in global and filtered queries
+ok 234 - /api/grafo timestamp fallbacks use valid Cypher in global and filtered queries
+  ---
+  duration_ms: 2.8327
+  type: 'test'
+  ...
+# Subtest: /api/grafo reads published Leiden membership rather than stale entity properties
+ok 235 - /api/grafo reads published Leiden membership rather than stale entity properties
+  ---
+  duration_ms: 2.4296
+  type: 'test'
+  ...
+# Subtest: /api/grafo preserves edge provenance and unique identities across source versions
+ok 236 - /api/grafo preserves edge provenance and unique identities across source versions
+  ---
+  duration_ms: 1.3369
+  type: 'test'
+  ...
+# Subtest: identity references bind immutable exact contexts without model recopy
+ok 237 - identity references bind immutable exact contexts without model recopy
+  ---
+  duration_ms: 1.6461
+  type: 'test'
+  ...
+# Subtest: identity references reject swapped sides and unknown pairs
+ok 238 - identity references reject swapped sides and unknown pairs
+  ---
+  duration_ms: 1.9043
+  type: 'test'
+  ...
+# Subtest: identity references do not rescue old invalid raw evidence responses
+ok 239 - identity references do not rescue old invalid raw evidence responses
+  ---
+  duration_ms: 0.4158
+  type: 'test'
+  ...
+# Subtest: identity references retain name-only evidence rejection
+ok 240 - identity references retain name-only evidence rejection
+  ---
+  duration_ms: 0.2789
+  type: 'test'
+  ...
+# Subtest: identity reference inputs retain both sources and uncertainty criterion
+ok 241 - identity reference inputs retain both sources and uncertainty criterion
+  ---
+  duration_ms: 1.4658
+  type: 'test'
+  ...
+# Subtest: shelf packing preserves every node and avoids card overlap
+ok 242 - shelf packing preserves every node and avoids card overlap
+  ---
+  duration_ms: 234.1908
+  type: 'test'
+  ...
+# Subtest: missing membership is not invented
+ok 243 - missing membership is not invented
+  ---
+  duration_ms: 1.9311
+  type: 'test'
+  ...
+# Subtest: graph reading has no vault factor, mutations retain it
+ok 244 - graph reading has no vault factor, mutations retain it
+  ---
+  duration_ms: 1.9519
+  type: 'test'
+  ...
+# Subtest: idle PIN exemption is confined to graph route
+ok 245 - idle PIN exemption is confined to graph route
+  ---
+  duration_ms: 0.5311
+  type: 'test'
+  ...
+# Subtest: compact graph retains distinct human review and traceability
+ok 246 - compact graph retains distinct human review and traceability
+  ---
+  duration_ms: 0.4454
+  type: 'test'
+  ...
+# Subtest: layout uses canonical published membership, never numeric hash
+ok 247 - layout uses canonical published membership, never numeric hash
+  ---
+  duration_ms: 42.2583
+  type: 'test'
+  ...
+# Subtest: layout is deterministic across input order and retains every entity
+ok 248 - layout is deterministic across input order and retains every entity
+  ---
+  duration_ms: 13.8959
+  type: 'test'
+  ...
+# Subtest: empty and isolated entities are valid, no invented community
+ok 249 - empty and isolated entities are valid, no invented community
+  ---
+  duration_ms: 2.1643
+  type: 'test'
+  ...
+# Subtest: manual verified release does not impersonate Git deployment
+ok 250 - manual verified release does not impersonate Git deployment
+  ---
+  duration_ms: 7.2059
+  type: 'test'
+  ...
+# Subtest: actual Git metadata takes precedence over manual release
+ok 251 - actual Git metadata takes precedence over manual release
+  ---
+  duration_ms: 1.0278
+  type: 'test'
+  ...
+# Subtest: missing or malformed manual identity remains unverified
+ok 252 - missing or malformed manual identity remains unverified
+  ---
+  duration_ms: 0.8819
+  type: 'test'
+  ...
+# Subtest: anchors preserve literal original positions and negation
+ok 253 - anchors preserve literal original positions and negation
+  ---
+  duration_ms: 2.9929
+  type: 'test'
+  ...
+# Subtest: fabricated or concatenated quotes never enter a graph
+ok 254 - fabricated or concatenated quotes never enter a graph
+  ---
+  duration_ms: 0.699
+  type: 'test'
+  ...
+# Subtest: ambiguous repeated evidence is not assigned guessed coordinates
+ok 255 - ambiguous repeated evidence is not assigned guessed coordinates
+  ---
+  duration_ms: 0.3572
+  type: 'test'
+  ...
+# Subtest: literal endpoints required, not inferred identities
+ok 256 - literal endpoints required, not inferred identities
+  ---
+  duration_ms: 0.2597
+  type: 'test'
+  ...
+# Subtest: automatic acceptance is system attributed and cannot leak to curated
+ok 257 - automatic acceptance is system attributed and cannot leak to curated
+  ---
+  duration_ms: 5.9276
+  type: 'test'
+  ...
+# Subtest: only explicit matching owner judgments change curated
+ok 258 - only explicit matching owner judgments change curated
+  ---
+  duration_ms: 1.4273
+  type: 'test'
+  ...
+# Subtest: reject affects curated only, originals and automatic stay intact
+ok 259 - reject affects curated only, originals and automatic stay intact
+  ---
+  duration_ms: 2.5041
+  type: 'test'
+  ...
+# Subtest: same spelling across sources does not manufacture identity
+ok 260 - same spelling across sources does not manufacture identity
+  ---
+  duration_ms: 27.3656
+  type: 'test'
+  ...
+# Subtest: fixed seed reproduces partition without desired community count
+ok 261 - fixed seed reproduces partition without desired community count
+  ---
+  duration_ms: 2.3079
+  type: 'test'
+  ...
+# Subtest: chunking retains whitespace and context, never loses tail
+ok 262 - chunking retains whitespace and context, never loses tail
+  ---
+  duration_ms: 0.6115
+  type: 'test'
+  ...
+# Subtest: wrong source hashes cannot be combined under a proposal
+ok 263 - wrong source hashes cannot be combined under a proposal
+  ---
+  duration_ms: 0.8403
+  type: 'test'
+  ...
+# Subtest: lexical equality generates candidates, never identity acceptance
+ok 264 - lexical equality generates candidates, never identity acceptance
+  ---
+  duration_ms: 1.4656
+  type: 'test'
+  ...
+# Subtest: identity validation fails closed on invented evidence or unknown pairs
+ok 265 - identity validation fails closed on invented evidence or unknown pairs
+  ---
+  duration_ms: 0.8392
+  type: 'test'
+  ...
+# Subtest: grounded identity merges automatic only, curated needs separate explicit judgment
+ok 266 - grounded identity merges automatic only, curated needs separate explicit judgment
+  ---
+  duration_ms: 2.7672
+  type: 'test'
+  ...
+# Subtest: examined identity pairs are not proposed twice
+ok 267 - examined identity pairs are not proposed twice
+  ---
+  duration_ms: 0.9132
+  type: 'test'
+  ...
+# Subtest: display source filters and limits preserve persisted membership
+ok 268 - display source filters and limits preserve persisted membership
+  ---
+  duration_ms: 1.1037
+  type: 'test'
+  ...
+# Subtest: detects the real MP3 signature instead of trusting the filename
+ok 269 - detects the real MP3 signature instead of trusting the filename
+  ---
+  duration_ms: 3.4325
+  type: 'test'
+  ...
+# Subtest: decrypts an AES-GCM staging payload without changing bytes
+ok 270 - decrypts an AES-GCM staging payload without changing bytes
+  ---
+  duration_ms: 1.5232
+  type: 'test'
+  ...
+# Subtest: accepts only a staging URL bound to the same session
+ok 271 - accepts only a staging URL bound to the same session
+  ---
+  duration_ms: 0.3175
+  type: 'test'
+  ...
+# Subtest: keeps the product limit above the supplied 13.97 MB sample
+ok 272 - keeps the product limit above the supplied 13.97 MB sample
+  ---
+  duration_ms: 0.2448
+  type: 'test'
+  ...
+# Subtest: Ingesta Route Suite
+    # Subtest: 0. Missing provenance remains rejected before kernel or persistence
+    ok 1 - 0. Missing provenance remains rejected before kernel or persistence
+      ---
+      duration_ms: 20.4642
+      type: 'test'
+      ...
+    # Subtest: 1. Ingesta de versión aprobada - Ingesta exitosa con io_id persistido
+    ok 2 - 1. Ingesta de versión aprobada - Ingesta exitosa con io_id persistido
+      ---
+      duration_ms: 97.4814
+      type: 'test'
+      ...
+    # Subtest: 2. Rechazo de versión no aprobada
+    ok 3 - 2. Rechazo de versión no aprobada
+      ---
+      duration_ms: 2.3323
+      type: 'test'
+      ...
+    # Subtest: 3. Rechazo de SHA incorrecto
+    ok 4 - 3. Rechazo de SHA incorrecto
+      ---
+      duration_ms: 87.4306
+      type: 'test'
+      ...
+    # Subtest: 4. volcado_id inexistente
+    ok 5 - 4. volcado_id inexistente
+      ---
+      duration_ms: 2.4988
+      type: 'test'
+      ...
+    # Subtest: 5. versión inexistente
+    ok 6 - 5. versión inexistente
+      ---
+      duration_ms: 84.0706
+      type: 'test'
+      ...
+    # Subtest: 6. Fallo del kernel (500 Error)
+    ok 7 - 6. Fallo del kernel (500 Error)
+      ---
+      duration_ms: 85.7257
+      type: 'test'
+      ...
+    # Subtest: 7. Request Timeout
+    ok 8 - 7. Request Timeout
+      ---
+      duration_ms: 80.0777
+      type: 'test'
+      ...
+    # Subtest: 8. Retry & Idempotency - Allows retry from fallido and ingerido
+    ok 9 - 8. Retry & Idempotency - Allows retry from fallido and ingerido
+      ---
+      duration_ms: 230.699
+      type: 'test'
+      ...
+    1..9
+ok 273 - Ingesta Route Suite
+  ---
+  duration_ms: 774.729
+  type: 'test'
+  ...
+# Subtest: all 54 instances preserve six mirrored bars and one interior cut
+ok 274 - all 54 instances preserve six mirrored bars and one interior cut
+  ---
+  duration_ms: 2.6771
+  type: 'test'
+  ...
+# Subtest: deterministic cosmetic seeds reach every bounded variant
+ok 275 - deterministic cosmetic seeds reach every bounded variant
+  ---
+  duration_ms: 2.4519
+  type: 'test'
+  ...
+# Subtest: unavailable entropy and invalid inputs use a canonical static instance
+ok 276 - unavailable entropy and invalid inputs use a canonical static instance
+  ---
+  duration_ms: 0.2927
+  type: 'test'
+  ...
+# Subtest: KPIs Suite - Métricas LLM, Fan-Out y Benchmarks de Frontera
+    # Subtest: 1. Cálculo correcto de TTFT y TPS con tokens reales y estimados
+    ok 1 - 1. Cálculo correcto de TTFT y TPS con tokens reales y estimados
+      ---
+      duration_ms: 1.4597
+      type: 'test'
+      ...
+    # Subtest: 1b. Manejo de evento usage con completion_tokens vs fallback a estimado por caracteres
+    ok 2 - 1b. Manejo de evento usage con completion_tokens vs fallback a estimado por caracteres
+      ---
+      duration_ms: 0.2939
+      type: 'test'
+      ...
+    # Subtest: 1c. Ventana de generación usa lastChunkTime y previene distorsión por latencia de usage/fin
+    ok 3 - 1c. Ventana de generación usa lastChunkTime y previene distorsión por latencia de usage/fin
+      ---
+      duration_ms: 0.2752
+      type: 'test'
+      ...
+    # Subtest: 2. El fan-out a N perfiles tolera el fallo parcial de uno sin afectar a los demás
+    ok 4 - 2. El fan-out a N perfiles tolera el fallo parcial de uno sin afectar a los demás
+      ---
+      duration_ms: 0.47
+      type: 'test'
+      ...
+    # Subtest: 3. El panel se degrada con un mensaje claro si ningún perfil tiene credenciales configuradas
+    ok 5 - 3. El panel se degrada con un mensaje claro si ningún perfil tiene credenciales configuradas
+      ---
+      duration_ms: 0.2288
+      type: 'test'
+      ...
+    # Subtest: 4. Integridad de la tabla estática de benchmarks de frontera y catálogo de modelos
+    ok 6 - 4. Integridad de la tabla estática de benchmarks de frontera y catálogo de modelos
+      ---
+      duration_ms: 1.2471
+      type: 'test'
+      ...
+    1..6
+ok 277 - KPIs Suite - Métricas LLM, Fan-Out y Benchmarks de Frontera
+  ---
+  duration_ms: 6.1968
+  type: 'test'
+  ...
+# Subtest: all 17 real registration shapes generate valid schemas and accept advertised examples
+ok 278 - all 17 real registration shapes generate valid schemas and accept advertised examples
+  ---
+  duration_ms: 218.3253
+  type: 'test'
+  ...
+# Subtest: receipt schema publishes every required field and rejects their omission independently
+ok 279 - receipt schema publishes every required field and rejects their omission independently
+  ---
+  duration_ms: 25.2861
+  type: 'test'
+  ...
+# Subtest: receipt preserves evidence extras and enforces conditional principle evidence
+ok 280 - receipt preserves evidence extras and enforces conditional principle evidence
+  ---
+  duration_ms: 2.2115
+  type: 'test'
+  ...
+# Subtest: semantic date/whitespace checks and platform restriction remain fail closed
+ok 281 - semantic date/whitespace checks and platform restriction remain fail closed
+  ---
+  duration_ms: 0.9349
+  type: 'test'
+  ...
+# Subtest: malformed receipt is rejected by the real verifier before any network request
+ok 282 - malformed receipt is rejected by the real verifier before any network request
+  ---
+  duration_ms: 1.2317
+  type: 'test'
+  ...
+# Subtest: real route: HTTP discovery and all 17 calls agree; malformed input cannot reach service
+ok 283 - real route: HTTP discovery and all 17 calls agree; malformed input cannot reach service
+  ---
+  duration_ms: 299.6771
+  type: 'test'
+  ...
+# Subtest: real route: missing/revoked auth and missing configuration fail before services
+ok 284 - real route: missing/revoked auth and missing configuration fail before services
+  ---
+  duration_ms: 12.5763
+  type: 'test'
+  ...
+# Subtest: real route: every substantive tool is blocked by scope or denied turn; norm opening requires scope
+ok 285 - real route: every substantive tool is blocked by scope or denied turn; norm opening requires scope
+  ---
+  duration_ms: 392.0468
+  type: 'test'
+  ...
+# Subtest: real route: malformed controls and numeric bounds cannot reach business services
+ok 286 - real route: malformed controls and numeric bounds cannot reach business services
+  ---
+  duration_ms: 103.3236
+  type: 'test'
+  ...
+# Subtest: DCR registers and validates a Notion public client
+ok 287 - DCR registers and validates a Notion public client
+  ---
+  duration_ms: 14.1909
+  type: 'test'
+  ...
+# Subtest: DCR rejects non-Notion redirects and tampering
+ok 288 - DCR rejects non-Notion redirects and tampering
+  ---
+  duration_ms: 43.7824
+  type: 'test'
+  ...
+# Subtest: private normative read requires dedicated credential, never broad token or anonymous fallback
+ok 289 - private normative read requires dedicated credential, never broad token or anonymous fallback
+  ---
+  duration_ms: 3.1726
+  type: 'test'
+  ...
+# Subtest: normative read sends auth only to the selected GitHub repo and forbids redirects
+ok 290 - normative read sends auth only to the selected GitHub repo and forbids redirects
+  ---
+  duration_ms: 35.1928
+  type: 'test'
+  ...
+# Subtest: GitHub 401 classified as NORM_GITHUB_CREDENTIAL_REJECTED
+ok 291 - GitHub 401 classified as NORM_GITHUB_CREDENTIAL_REJECTED
+  ---
+  duration_ms: 1.3094
+  type: 'test'
+  ...
+# Subtest: GitHub 403 classified as NORM_GITHUB_FORBIDDEN
+ok 292 - GitHub 403 classified as NORM_GITHUB_FORBIDDEN
+  ---
+  duration_ms: 0.6235
+  type: 'test'
+  ...
+# Subtest: GitHub 404 classified as NORM_GITHUB_NOT_FOUND_OR_INACCESSIBLE
+ok 293 - GitHub 404 classified as NORM_GITHUB_NOT_FOUND_OR_INACCESSIBLE
+  ---
+  duration_ms: 0.7009
+  type: 'test'
+  ...
+# Subtest: GitHub 403 classified as NORM_GITHUB_RATE_LIMITED
+ok 294 - GitHub 403 classified as NORM_GITHUB_RATE_LIMITED
+  ---
+  duration_ms: 0.7108
+  type: 'test'
+  ...
+# Subtest: GitHub 429 classified as NORM_GITHUB_RATE_LIMITED
+ok 295 - GitHub 429 classified as NORM_GITHUB_RATE_LIMITED
+  ---
+  duration_ms: 0.5402
+  type: 'test'
+  ...
+# Subtest: GitHub 500 classified as NORM_GITHUB_UNAVAILABLE
+ok 296 - GitHub 500 classified as NORM_GITHUB_UNAVAILABLE
+  ---
+  duration_ms: 0.5557
+  type: 'test'
+  ...
+# Subtest: GitHub 422 classified as NORM_GITHUB_HTTP_ERROR
+ok 297 - GitHub 422 classified as NORM_GITHUB_HTTP_ERROR
+  ---
+  duration_ms: 1.2772
+  type: 'test'
+  ...
+# Subtest: GitHub network and malformed JSON fail explicitly without leaking upstream body
+ok 298 - GitHub network and malformed JSON fail explicitly without leaking upstream body
+  ---
+  duration_ms: 1.9455
+  type: 'test'
+  ...
+# Subtest: GitHub response size is bounded and cannot be mistaken for a valid source
+ok 299 - GitHub response size is bounded and cannot be mistaken for a valid source
+  ---
+  duration_ms: 8.5702
+  type: 'test'
+  ...
+# Subtest: GitHub timeout aborts the request and reports the observed timeout
+ok 300 - GitHub timeout aborts the request and reports the observed timeout
+  ---
+  duration_ms: 0.7002
+  type: 'test'
+  ...
+# Subtest: all ten normative GitHub fetches use the authenticated bounded helper
+ok 301 - all ten normative GitHub fetches use the authenticated bounded helper
+  ---
+  duration_ms: 0.5722
+  type: 'test'
+  ...
+# Subtest: unknown errors, SQL details, hostile names and credentials do not enter public diagnostics
+ok 302 - unknown errors, SQL details, hostile names and credentials do not enter public diagnostics
+  ---
+  duration_ms: 0.6327
+  type: 'test'
+  ...
+# Subtest: known normative codes stay exact with condition-specific recovery
+ok 303 - known normative codes stay exact with condition-specific recovery
+  ---
+  duration_ms: 0.7545
+  type: 'test'
+  ...
+# Subtest: SQL states are classified without echoing SQL or exception text
+ok 304 - SQL states are classified without echoing SQL or exception text
+  ---
+  duration_ms: 0.2255
+  type: 'test'
+  ...
+# Subtest: partial, empty, stale and rejected verification remain distinguishable from success
+ok 305 - partial, empty, stale and rejected verification remain distinguishable from success
+  ---
+  duration_ms: 0.6439
+  type: 'test'
+  ...
+# Subtest: real SDK validation errors are sanitized before being returned to the client
+ok 306 - real SDK validation errors are sanitized before being returned to the client
+  ---
+  duration_ms: 87.4414
+  type: 'test'
+  ...
+# Subtest: all fifteen tools sanitize unexpected exceptions; health retains upstream evidence
+ok 307 - all fifteen tools sanitize unexpected exceptions; health retains upstream evidence
+  ---
+  duration_ms: 282.9648
+  type: 'test'
+  ...
+# Subtest: audit persistence exception never replaces or repeats the business outcome
+ok 308 - audit persistence exception never replaces or repeats the business outcome
+  ---
+  duration_ms: 52.489
+  type: 'test'
+  ...
+# Subtest: HTTP auth failure preserves standard status/challenge without exposing private reason
+ok 309 - HTTP auth failure preserves standard status/challenge without exposing private reason
+  ---
+  duration_ms: 1.6255
+  type: 'test'
+  ...
+# Subtest: HTTP success bodies are not consumed or transformed; unknown exceptions are safe
+ok 310 - HTTP success bodies are not consumed or transformed; unknown exceptions are safe
+  ---
+  duration_ms: 1.1032
+  type: 'test'
+  ...
+# Subtest: unreadable search rows report partial coverage, never a complete empty search
+ok 311 - unreadable search rows report partial coverage, never a complete empty search
+  ---
+  duration_ms: 83.7774
+  type: 'test'
+  ...
+# Subtest: failed versions/audit queries are partial, distinguishable from confirmed empty lists
+ok 312 - failed versions/audit queries are partial, distinguishable from confirmed empty lists
+  ---
+  duration_ms: 46.7408
+  type: 'test'
+  ...
+# Subtest: historical decryption failure is flagged and cannot be represented as a successful verbatim read
+ok 313 - historical decryption failure is flagged and cannot be represented as a successful verbatim read
+  ---
+  duration_ms: 34.0059
+  type: 'test'
+  ...
+# Subtest: fixed HTTP input errors have actionable safe diagnoses; hostile details remain redacted
+ok 314 - fixed HTTP input errors have actionable safe diagnoses; hostile details remain redacted
+  ---
+  duration_ms: 4.5574
+  type: 'test'
+  ...
+# Subtest: consent denial does not disclose either account in a redirect
+ok 315 - consent denial does not disclose either account in a redirect
+  ---
+  duration_ms: 0.338
+  type: 'test'
+  ...
+# Subtest: audit false is explicit, even when no exception is thrown
+ok 316 - audit false is explicit, even when no exception is thrown
+  ---
+  duration_ms: 0.5383
+  type: 'test'
+  ...
+# Subtest: every known diagnostic explains the problem without repeating its technical code
+ok 317 - every known diagnostic explains the problem without repeating its technical code
+  ---
+  duration_ms: 2.006
+  type: 'test'
+  ...
+# Subtest: private instructions failures name the repository without claiming that every 404 is a missing credential
+ok 318 - private instructions failures name the repository without claiming that every 404 is a missing credential
+  ---
+  duration_ms: 0.1684
+  type: 'test'
+  ...
+# Subtest: manual Bearer token is high-entropy, scoped, expiring and stored by hash
+ok 319 - manual Bearer token is high-entropy, scoped, expiring and stored by hash
+  ---
+  duration_ms: 2.731
+  type: 'test'
+  ...
+# Subtest: manual Bearer token authentication accepts only live hash-backed tokens
+ok 320 - manual Bearer token authentication accepts only live hash-backed tokens
+  ---
+  duration_ms: 0.4836
+  type: 'test'
+  ...
+# Subtest: canonical MCP accepts a valid manual Bearer token and still enforces global generation revocation
+ok 321 - canonical MCP accepts a valid manual Bearer token and still enforces global generation revocation
+  ---
+  duration_ms: 41.3704
+  type: 'test'
+  ...
+# Subtest: normative gate accepts a valid open turn token bound to its snapshot
+ok 322 - normative gate accepts a valid open turn token bound to its snapshot
+  ---
+  duration_ms: 5.5185
+  type: 'test'
+  ...
+# Subtest: normative gate rejects a closed turn
+ok 323 - normative gate rejects a closed turn
+  ---
+  duration_ms: 0.8978
+  type: 'test'
+  ...
+# Subtest: normative gate rejects a token with mismatched snapshot
+ok 324 - normative gate rejects a token with mismatched snapshot
+  ---
+  duration_ms: 0.4432
+  type: 'test'
+  ...
+# Subtest: normative gate rejects a token after global revocation
+ok 325 - normative gate rejects a token after global revocation
+  ---
+  duration_ms: 0.3675
+  type: 'test'
+  ...
+# Subtest: cycle verification output record preserves cycle, attempt, verdict and evidence
+ok 326 - cycle verification output record preserves cycle, attempt, verdict and evidence
+  ---
+  duration_ms: 0.2957
+  type: 'test'
+  ...
+# Subtest: server-side principle application enforces canonical order and builds the complete ledger
+ok 327 - server-side principle application enforces canonical order and builds the complete ledger
+  ---
+  duration_ms: 3.0041
+  type: 'test'
+  ...
+# Subtest: normative verification rejects replay of a token after the turn is closed
+ok 328 - normative verification rejects replay of a token after the turn is closed
+  ---
+  duration_ms: 1.1732
+  type: 'test'
+  ...
+# Subtest: normative attempt idempotency only accepts the exact recorded nonce and evidence
+ok 329 - normative attempt idempotency only accepts the exact recorded nonce and evidence
+  ---
+  duration_ms: 0.2464
+  type: 'test'
+  ...
+# Subtest: 026_normative_turns define un ciclo normativo único y sus invariantes
+ok 330 - 026_normative_turns define un ciclo normativo único y sus invariantes
+  ---
+  duration_ms: 1.7477
+  type: 'test'
+  ...
+# Subtest: 027_manual_mcp_tokens define un Bearer manual revocable, scoped and expirable
+ok 331 - 027_manual_mcp_tokens define un Bearer manual revocable, scoped and expirable
+  ---
+  duration_ms: 0.4959
+  type: 'test'
+  ...
+# Subtest: migrate-runtime incluye 027_manual_mcp_tokens
+ok 332 - migrate-runtime incluye 027_manual_mcp_tokens
+  ---
+  duration_ms: 0.4149
+  type: 'test'
+  ...
+# Subtest: 028_normative_order_ledger define el ledger server-side y el binding de snapshot
+ok 333 - 028_normative_order_ledger define el ledger server-side y el binding de snapshot
+  ---
+  duration_ms: 0.5092
+  type: 'test'
+  ...
+# Subtest: migrate-runtime incluye 028_normative_order_ledger
+ok 334 - migrate-runtime incluye 028_normative_order_ledger
+  ---
+  duration_ms: 0.2889
+  type: 'test'
+  ...
+# Subtest: normative turn inserts keep SQL placeholder cardinality aligned
+ok 335 - normative turn inserts keep SQL placeholder cardinality aligned
+  ---
+  duration_ms: 0.5668
+  type: 'test'
+  ...
+# Subtest: 1. Concurrent refresh token rotation produces exactly 1 success and 1 invalid_grant
+ok 336 - 1. Concurrent refresh token rotation produces exactly 1 success and 1 invalid_grant
+  ---
+  duration_ms: 2.7213
+  type: 'test'
+  ...
+# Subtest: 2. MCP_CANONICAL_URL semantics and metadata endpoints consistency
+ok 337 - 2. MCP_CANONICAL_URL semantics and metadata endpoints consistency
+  ---
+  duration_ms: 8.5102
+  type: 'test'
+  ...
+# Subtest: 2b. PKCE S256 verification behavior
+ok 338 - 2b. PKCE S256 verification behavior
+  ---
+  duration_ms: 0.4123
+  type: 'test'
+  ...
+# Subtest: 2c. Atomic authorization code consumption & resource validation in /api/oauth/token
+ok 339 - 2c. Atomic authorization code consumption & resource validation in /api/oauth/token
+  ---
+  duration_ms: 25.7297
+  type: 'test'
+  ...
+# Subtest: 3. JWT validation on /api/mcp (iss, aud, scope, gen, exp)
+ok 340 - 3. JWT validation on /api/mcp (iss, aud, scope, gen, exp)
+  ---
+  duration_ms: 34.4547
+  type: 'test'
+  ...
+# Subtest: 4. Missing KHORA_READONLY_DATABASE_URL in production returns 503
+ok 341 - 4. Missing KHORA_READONLY_DATABASE_URL in production returns 503
+  ---
+  duration_ms: 33.4536
+  type: 'test'
+  ...
+# Subtest: 5. MCP Tools signature and export validation
+ok 342 - 5. MCP Tools signature and export validation
+  ---
+  duration_ms: 0.7373
+  type: 'test'
+  ...
+# Subtest: MCP preserves root securitySchemes for all seventeen tools
+ok 343 - MCP preserves root securitySchemes for all seventeen tools
+  ---
+  duration_ms: 9.3734
+  type: 'test'
+  ...
+# Subtest: route publishes derived schemas and retains authentication and normative gate
+ok 344 - route publishes derived schemas and retains authentication and normative gate
+  ---
+  duration_ms: 0.5149
+  type: 'test'
+  ...
+# Subtest: one canonical document covers the exact tool catalog and current output version
+ok 345 - one canonical document covers the exact tool catalog and current output version
+  ---
+  duration_ms: 0.8405
+  type: 'test'
+  ...
+# Subtest: KHORA local contract matches the canonical Metodología contract
+ok 346 - KHORA local contract matches the canonical Metodología contract
+  ---
+  duration_ms: 828.9927
+  type: 'test'
+  ...
+# Subtest: parser no depende de la sección 5 para delimitar el catálogo
+ok 347 - parser no depende de la sección 5 para delimitar el catálogo
+  ---
+  duration_ms: 3.2606
+  type: 'test'
+  ...
+# Subtest: parser rechaza folios duplicados
+ok 348 - parser rechaza folios duplicados
+  ---
+  duration_ms: 0.8869
+  type: 'test'
+  ...
+# Subtest: parser rechaza principios sin estado canónico
+ok 349 - parser rechaza principios sin estado canónico
+  ---
+  duration_ms: 0.294
+  type: 'test'
+  ...
+# Subtest: parser rechaza preponderancia fuera del dominio 0..1
+ok 350 - parser rechaza preponderancia fuera del dominio 0..1
+  ---
+  duration_ms: 0.2652
+  type: 'test'
+  ...
+# Subtest: formato canónico del SI conserva identidad y antigüedad relativa
+ok 351 - formato canónico del SI conserva identidad y antigüedad relativa
+  ---
+  duration_ms: 0.447
+  type: 'test'
+  ...
+# Subtest: formato canónico cambia a horas y luego a fecha absoluta sin alterar la identidad
+ok 352 - formato canónico cambia a horas y luego a fecha absoluta sin alterar la identidad
+  ---
+  duration_ms: 0.3567
+  type: 'test'
+  ...
+# Subtest: formato canónico de Metodología conserva identidad y antigüedad relativa
+ok 353 - formato canónico de Metodología conserva identidad y antigüedad relativa
+  ---
+  duration_ms: 0.3459
+  type: 'test'
+  ...
+# Subtest: methodology snapshots parse canonical Markdown and reject missing required fields
+    # Subtest: current: valid
+    ok 1 - current: valid
+      ---
+      duration_ms: 33.3115
+      type: 'test'
+      ...
+    # Subtest: stored: valid
+    ok 2 - stored: valid
+      ---
+      duration_ms: 2.4482
+      type: 'test'
+      ...
+    # Subtest: current: missing version
+    ok 3 - current: missing version
+      ---
+      duration_ms: 2.5482
+      type: 'test'
+      ...
+    # Subtest: stored: missing version
+    ok 4 - stored: missing version
+      ---
+      duration_ms: 1.2425
+      type: 'test'
+      ...
+    # Subtest: current: invalid version
+    ok 5 - current: invalid version
+      ---
+      duration_ms: 1.519
+      type: 'test'
+      ...
+    # Subtest: stored: invalid version
+    ok 6 - stored: invalid version
+      ---
+      duration_ms: 1.358
+      type: 'test'
+      ...
+    # Subtest: current: missing name
+    ok 7 - current: missing name
+      ---
+      duration_ms: 1.2931
+      type: 'test'
+      ...
+    # Subtest: stored: missing name
+    ok 8 - stored: missing name
+      ---
+      duration_ms: 1.1599
+      type: 'test'
+      ...
+    # Subtest: current: missing date
+    ok 9 - current: missing date
+      ---
+      duration_ms: 2.1196
+      type: 'test'
+      ...
+    # Subtest: stored: missing date
+    ok 10 - stored: missing date
+      ---
+      duration_ms: 3.0711
+      type: 'test'
+      ...
+    1..10
+ok 354 - methodology snapshots parse canonical Markdown and reject missing required fields
+  ---
+  duration_ms: 244.795
+  type: 'test'
+  ...
+# Subtest: uses the local canonical contract version
+ok 355 - uses the local canonical contract version
+  ---
+  duration_ms: 1.3681
+  type: 'test'
+  ...
+# Subtest: renders and validates the exact six-line canonical output
+ok 356 - renders and validates the exact six-line canonical output
+  ---
+  duration_ms: 1.9435
+  type: 'test'
+  ...
+# Subtest: rejects extra text, line count drift, bad states and non-canonical renderings
+ok 357 - rejects extra text, line count drift, bad states and non-canonical renderings
+  ---
+  duration_ms: 0.6773
+  type: 'test'
+  ...
+# Subtest: hash is exact and deterministic
+ok 358 - hash is exact and deterministic
+  ---
+  duration_ms: 0.6663
+  type: 'test'
+  ...
+# Subtest: rejects missing and invalid canonical RA states
+ok 359 - rejects missing and invalid canonical RA states
+  ---
+  duration_ms: 1.4108
+  type: 'test'
+  ...
+# Subtest: accepts all supported runtime reasoning states
+ok 360 - accepts all supported runtime reasoning states
+  ---
+  duration_ms: 1.7786
+  type: 'test'
+  ...
+# Subtest: rejects unknown output format
+ok 361 - rejects unknown output format
+  ---
+  duration_ms: 1.0322
+  type: 'test'
+  ...
+# Subtest: rejects an incomplete runtime contract
+ok 362 - rejects an incomplete runtime contract
+  ---
+  duration_ms: 1.4438
+  type: 'test'
+  ...
+# Subtest: JWT signing and verification
+ok 363 - JWT signing and verification
+  ---
+  duration_ms: 2.8176
+  type: 'test'
+  ...
+# Subtest: PKCE S256 verifier and challenge validation
+ok 364 - PKCE S256 verifier and challenge validation
+  ---
+  duration_ms: 0.5917
+  type: 'test'
+  ...
+# Subtest: foldAccents preserves character index map
+ok 365 - foldAccents preserves character index map
+  ---
+  duration_ms: 0.5267
+  type: 'test'
+  ...
+# Subtest: 024_oauth_scopes agrega scope a códigos y refresh tokens sin destruir defaults
+ok 366 - 024_oauth_scopes agrega scope a códigos y refresh tokens sin destruir defaults
+  ---
+  duration_ms: 1.0881
+  type: 'test'
+  ...
+# Subtest: mapCap0ToObs1 bijectively transforms CAP-0 envelope to OBS-1 envelope
+ok 367 - mapCap0ToObs1 bijectively transforms CAP-0 envelope to OBS-1 envelope
+  ---
+  duration_ms: 0.9966
+  type: 'test'
+  ...
+# Subtest: mapObs1ToCap0 bijectively transforms OBS-1 envelope to CAP-0 envelope
+ok 368 - mapObs1ToCap0 bijectively transforms OBS-1 envelope to CAP-0 envelope
+  ---
+  duration_ms: 0.9117
+  type: 'test'
+  ...
+# Subtest: ObservationBatch v2 valida cobertura diagnóstica y NDJSON
+ok 369 - ObservationBatch v2 valida cobertura diagnóstica y NDJSON
+  ---
+  duration_ms: 11.371
+  type: 'test'
+  ...
+# Subtest: ObservationBatch v2 rechaza métricas que intenten transportar texto o audio
+ok 370 - ObservationBatch v2 rechaza métricas que intenten transportar texto o audio
+  ---
+  duration_ms: 1.8945
+  type: 'test'
+  ...
+# Subtest: ObservationBatch v2 rechaza claves de contexto que podrían filtrar navegación o texto
+ok 371 - ObservationBatch v2 rechaza claves de contexto que podrían filtrar navegación o texto
+  ---
+  duration_ms: 2.9463
+  type: 'test'
+  ...
+# Subtest: ObservationBatch v2 rechaza inconsistencias del resumen
+ok 372 - ObservationBatch v2 rechaza inconsistencias del resumen
+  ---
+  duration_ms: 2.2147
+  type: 'test'
+  ...
+# Subtest: ObservationBatch v2 limita valores JSON diagnósticos
+ok 373 - ObservationBatch v2 limita valores JSON diagnósticos
+  ---
+  duration_ms: 1.375
+  type: 'test'
+  ...
+# Subtest: ObservationBatch v2 rechaza strings diagnósticas excesivamente largas
+ok 374 - ObservationBatch v2 rechaza strings diagnósticas excesivamente largas
+  ---
+  duration_ms: 1.3351
+  type: 'test'
+  ...
+# Subtest: ObservationEvent conserva scope, categoría y severidad al entrar al almacén SQL
+ok 375 - ObservationEvent conserva scope, categoría y severidad al entrar al almacén SQL
+  ---
+  duration_ms: 2.014
+  type: 'test'
+  ...
+# Subtest: Batch 1: scheduler es por evento, agrupado y acotado
+ok 376 - Batch 1: scheduler es por evento, agrupado y acotado
+  ---
+  duration_ms: 1.9859
+  type: 'test'
+  ...
+# Subtest: Batch 1: reinicio recupera pendientes y los fallos respetan backoff
+ok 377 - Batch 1: reinicio recupera pendientes y los fallos respetan backoff
+  ---
+  duration_ms: 1.6754
+  type: 'test'
+  ...
+# Subtest: Batch 1: existe un único camino de envío y permite manual + automático
+ok 378 - Batch 1: existe un único camino de envío y permite manual + automático
+  ---
+  duration_ms: 0.8782
+  type: 'test'
+  ...
+# Subtest: Batch 1: el transporte de observaciones es directo al runtime y el content-script usa sesión
+ok 379 - Batch 1: el transporte de observaciones es directo al runtime y el content-script usa sesión
+  ---
+  duration_ms: 0.6153
+  type: 'test'
+  ...
+# Subtest: Batch 1: no quedan saltos de línea literales que inutilicen los scripts de extensión
+ok 380 - Batch 1: no quedan saltos de línea literales que inutilicen los scripts de extensión
+  ---
+  duration_ms: 3.302
+  type: 'test'
+  ...
+# Subtest: Perfil Local Suite - Inferencia Ollama, Script PowerShell y TPS
+    # Subtest: 1. Generación correcta de script PowerShell sin exponer $env:OLLAMA_ORIGINS='*'
+    ok 1 - 1. Generación correcta de script PowerShell sin exponer $env:OLLAMA_ORIGINS='*'
+      ---
+      duration_ms: 1.1264
+      type: 'test'
+      ...
+    # Subtest: 2. Cálculo exacto de TPS a partir de eval_count y eval_duration (nanosegundos)
+    ok 2 - 2. Cálculo exacto de TPS a partir de eval_count y eval_duration (nanosegundos)
+      ---
+      duration_ms: 0.305
+      type: 'test'
+      ...
+    # Subtest: 3. Diagnóstico de salud proactivo en 4 estados (no_instalado, sin_modelo, listo, error)
+    ok 3 - 3. Diagnóstico de salud proactivo en 4 estados (no_instalado, sin_modelo, listo, error)
+      ---
+      duration_ms: 30.4923
+      type: 'test'
+      ...
+    # Subtest: 4. Inferencia con mock de respuesta NDJSON nativa de Ollama parsea chunks y calcula TPS
+    ok 4 - 4. Inferencia con mock de respuesta NDJSON nativa de Ollama parsea chunks y calcula TPS
+      ---
+      duration_ms: 3.4242
+      type: 'test'
+      ...
+    # Subtest: 5. No regresión: el perfil 'local' coexiste en model_catalog.ts sin alterar los otros 3
+    ok 5 - 5. No regresión: el perfil 'local' coexiste en model_catalog.ts sin alterar los otros 3
+      ---
+      duration_ms: 0.2954
+      type: 'test'
+      ...
+    # Subtest: 6. Parseo binario de ventana de contexto en tokens reales (parsearContextoTokensBinario)
+    ok 6 - 6. Parseo binario de ventana de contexto en tokens reales (parsearContextoTokensBinario)
+      ---
+      duration_ms: 1.5033
+      type: 'test'
+      ...
+    # Subtest: 7. Resolución dinámica de modelo local (resolverModeloYVentanaLocal) en los 3 casos
+    ok 7 - 7. Resolución dinámica de modelo local (resolverModeloYVentanaLocal) en los 3 casos
+      ---
+      duration_ms: 0.5189
+      type: 'test'
+      ...
+    1..7
+ok 381 - Perfil Local Suite - Inferencia Ollama, Script PowerShell y TPS
+  ---
+  duration_ms: 40.3315
+  type: 'test'
+  ...
+# Subtest: Pipeline Suite
+    # Subtest: 1. pipeline completo
+    ok 1 - 1. pipeline completo
+      ---
+      duration_ms: 3.8312
+      type: 'test'
+      ...
+    # Subtest: 2. volcado archivado
+    ok 2 - 2. volcado archivado
+      ---
+      duration_ms: 1.8131
+      type: 'test'
+      ...
+    # Subtest: 3. volcado pendiente de revisión
+    ok 3 - 3. volcado pendiente de revisión
+      ---
+      duration_ms: 0.6476
+      type: 'test'
+      ...
+    # Subtest: 4. volcado revisado (en_revision)
+    ok 4 - 4. volcado revisado (en_revision)
+      ---
+      duration_ms: 0.6825
+      type: 'test'
+      ...
+    # Subtest: 5. volcado aprobado
+    ok 5 - 5. volcado aprobado
+      ---
+      duration_ms: 0.7274
+      type: 'test'
+      ...
+    # Subtest: 6. volcado ingerido
+    ok 6 - 6. volcado ingerido
+      ---
+      duration_ms: 0.5512
+      type: 'test'
+      ...
+    # Subtest: 7. ingesta fallida
+    ok 7 - 7. ingesta fallida
+      ---
+      duration_ms: 0.6283
+      type: 'test'
+      ...
+    # Subtest: 8. dictado sin audio
+    ok 8 - 8. dictado sin audio
+      ---
+      duration_ms: 0.68
+      type: 'test'
+      ...
+    # Subtest: 9. audio sin texto
+    ok 9 - 9. audio sin texto
+      ---
+      duration_ms: 0.768
+      type: 'test'
+      ...
+    # Subtest: 10. audio parcial
+    ok 10 - 10. audio parcial
+      ---
+      duration_ms: 0.607
+      type: 'test'
+      ...
+    # Subtest: 11. versión modificada
+    ok 11 - 11. versión modificada
+      ---
+      duration_ms: 0.4052
+      type: 'test'
+      ...
+    # Subtest: 12. provenance roto
+    ok 12 - 12. provenance roto
+      ---
+      duration_ms: 0.3773
+      type: 'test'
+      ...
+    # Subtest: 13. entrada manual sin audio no genera anomalía
+    ok 13 - 13. entrada manual sin audio no genera anomalía
+      ---
+      duration_ms: 0.3603
+      type: 'test'
+      ...
+    # Subtest: 14. io_id correctamente relacionado
+    ok 14 - 14. io_id correctamente relacionado
+      ---
+      duration_ms: 0.3264
+      type: 'test'
+      ...
+    # Subtest: 15. agregaciones
+    ok 15 - 15. agregaciones
+      ---
+      duration_ms: 0.4335
+      type: 'test'
+      ...
+    # Subtest: 16. ausencia de N+1 evidente
+    ok 16 - 16. ausencia de N+1 evidente
+      ---
+      duration_ms: 0.3031
+      type: 'test'
+      ...
+    # Subtest: 17. idempotencia
+    ok 17 - 17. idempotencia
+      ---
+      duration_ms: 66.3459
+      type: 'test'
+      ...
+    1..17
+ok 382 - Pipeline Suite
+  ---
+  duration_ms: 83.6525
+  type: 'test'
+  ...
+# Subtest: Primer Vínculo Harness Suite
+    # Subtest: 1. Ejecución Exitosa: Volcado listo_ingesta aterriza en Neo4j y se verifica de forma independiente
+    ok 1 - 1. Ejecución Exitosa: Volcado listo_ingesta aterriza en Neo4j y se verifica de forma independiente
+      ---
+      duration_ms: 102.8642
+      type: 'test'
+      ...
+    # Subtest: 2. Idempotencia: Volcado ya ingerido reporta idempotent=true y ratificacion=null sin duplicar
+    ok 2 - 2. Idempotencia: Volcado ya ingerido reporta idempotent=true y ratificacion=null sin duplicar
+      ---
+      duration_ms: 0.5615
+      type: 'test'
+      ...
+    # Subtest: 3. Rechazo claro si volcado no está en listo_ingesta
+    ok 3 - 3. Rechazo claro si volcado no está en listo_ingesta
+      ---
+      duration_ms: 0.2708
+      type: 'test'
+      ...
+    # Subtest: 4. Dry-run: Valida origen y hace healthcheck del kernel sin modificar BD ni Neo4j
+    ok 4 - 4. Dry-run: Valida origen y hace healthcheck del kernel sin modificar BD ni Neo4j
+      ---
+      duration_ms: 92.1148
+      type: 'test'
+      ...
+    # Subtest: 5. Manejo de error en el bridge Python (HTTP 500)
+    ok 5 - 5. Manejo de error en el bridge Python (HTTP 500)
+      ---
+      duration_ms: 91.1732
+      type: 'test'
+      ...
+    # Subtest: 6. Dry-run falla cerrado cuando Neo4j no está saludable
+    ok 6 - 6. Dry-run falla cerrado cuando Neo4j no está saludable
+      ---
+      duration_ms: 60.6301
+      type: 'test'
+      ...
+    # Subtest: 7. Un volcado fallido puede reintentarse sin intervención manual
+    ok 7 - 7. Un volcado fallido puede reintentarse sin intervención manual
+      ---
+      duration_ms: 80.961
+      type: 'test'
+      ...
+    # Subtest: 8. Tolera respuesta sin io_id y verifica por identidad persistida sin mezclar namespaces
+    ok 8 - 8. Tolera respuesta sin io_id y verifica por identidad persistida sin mezclar namespaces
+      ---
+      duration_ms: 69.9641
+      type: 'test'
+      ...
+    1..8
+ok 383 - Primer Vínculo Harness Suite
+  ---
+  duration_ms: 563.9104
+  type: 'test'
+  ...
+# Subtest: proposal_contract: valid envelope passes validation
+ok 384 - proposal_contract: valid envelope passes validation
+  ---
+  duration_ms: 3.3594
+  type: 'test'
+  ...
+# Subtest: proposal_contract: FAILS on incomplete source triplet
+ok 385 - proposal_contract: FAILS on incomplete source triplet
+  ---
+  duration_ms: 0.8681
+  type: 'test'
+  ...
+# Subtest: proposal_contract: FAILS on altered payload hash
+ok 386 - proposal_contract: FAILS on altered payload hash
+  ---
+  duration_ms: 0.3995
+  type: 'test'
+  ...
+# Subtest: proposal_contract: FAILS on invalid anchor
+ok 387 - proposal_contract: FAILS on invalid anchor
+  ---
+  duration_ms: 0.5664
+  type: 'test'
+  ...
+# Subtest: proposal_contract: FAILS on unknown schema version
+ok 388 - proposal_contract: FAILS on unknown schema version
+  ---
+  duration_ms: 0.5043
+  type: 'test'
+  ...
+# Subtest: proposal_contract: Judgment Zone modifications do NOT alter or invalidate payload_hash
+ok 389 - proposal_contract: Judgment Zone modifications do NOT alter or invalidate payload_hash
+  ---
+  duration_ms: 1.3901
+  type: 'test'
+  ...
+# Subtest: proposal_contract: computeItemId produces deterministic UUIDv5
+ok 390 - proposal_contract: computeItemId produces deterministic UUIDv5
+  ---
+  duration_ms: 0.465
+  type: 'test'
+  ...
+# Subtest: Motor de Corrección Nivel Word bajo Guardián — PROMPT 3A Suite
+    # Subtest: 1. Construcción determinista de Terna y Sello SHA-256
+    ok 1 - 1. Construcción determinista de Terna y Sello SHA-256
+      ---
+      duration_ms: 1.5665
+      type: 'test'
+      ...
+    # Subtest: 2. Offsets Unicode, emojis, acentos y combining marks con slice exacto JS UTF-16
+    ok 2 - 2. Offsets Unicode, emojis, acentos y combining marks con slice exacto JS UTF-16
+      ---
+      duration_ms: 2.1855
+      type: 'test'
+      ...
+    # Subtest: 3. Respuesta LLM malformada o vacía es tolerada de forma segura
+    ok 3 - 3. Respuesta LLM malformada o vacía es tolerada de forma segura
+      ---
+      duration_ms: 1.5399
+      type: 'test'
+      ...
+    # Subtest: 4. Detección de solapamientos y cálculo de ítems en conflicto
+    ok 4 - 4. Detección de solapamientos y cálculo de ítems en conflicto
+      ---
+      duration_ms: 0.4535
+      type: 'test'
+      ...
+    # Subtest: 5. Intento de aplicar con SHA vencido o versión obsoleta es rechazado
+    ok 5 - 5. Intento de aplicar con SHA vencido o versión obsoleta es rechazado
+      ---
+      duration_ms: 2.4821
+      type: 'test'
+      ...
+    # Subtest: 6. Intento de aplicar lote con solapamiento rechaza el lote y marca ítems como pendiente_revision
+    ok 6 - 6. Intento de aplicar lote con solapamiento rechaza el lote y marca ítems como pendiente_revision
+      ---
+      duration_ms: 0.7434
+      type: 'test'
+      ...
+    # Subtest: 7. Aceptación exitosa de lote no solapado crea NUEVA volcado_version e inmutabilidad fuente
+    ok 7 - 7. Aceptación exitosa de lote no solapado crea NUEVA volcado_version e inmutabilidad fuente
+      ---
+      duration_ms: 3.4208
+      type: 'test'
+      ...
+    1..7
+ok 391 - Motor de Corrección Nivel Word bajo Guardián — PROMPT 3A Suite
+  ---
+  duration_ms: 14.0667
+  type: 'suite'
+  ...
+# Subtest: propuestasRepo: mapping between JudgmentDecision and AccionJuicio is bidirectional and exact
+ok 392 - propuestasRepo: mapping between JudgmentDecision and AccionJuicio is bidirectional and exact
+  ---
+  duration_ms: 1.7986
+  type: 'test'
+  ...
+# Subtest: propuestasRepo: guardarPropuesta y reconstrucción offline idéntica (sin Neo4j)
+ok 393 - propuestasRepo: guardarPropuesta y reconstrucción offline idéntica (sin Neo4j)
+  ---
+  duration_ms: 5.7902
+  type: 'test'
+  ...
+# Subtest: propuestasRepo: guardarPropuesta es idempotente para la misma terna y payload_hash
+ok 394 - propuestasRepo: guardarPropuesta es idempotente para la misma terna y payload_hash
+  ---
+  duration_ms: 3.5438
+  type: 'test'
+  ...
+# Subtest: propuestasRepo: registrarJuicio es append-only y no modifica payload_hash ni elimina dictámenes previos
+ok 395 - propuestasRepo: registrarJuicio es append-only y no modifica payload_hash ni elimina dictámenes previos
+  ---
+  duration_ms: 2.3029
+  type: 'test'
+  ...
+# Subtest: propuestasRepo: RECHAZA dictamen o asiento si la propuesta está vencida
+ok 396 - propuestasRepo: RECHAZA dictamen o asiento si la propuesta está vencida
+  ---
+  duration_ms: 1.4313
+  type: 'test'
+  ...
+# Subtest: propuestasRepo: RECHAZA dictamen o asiento si el SHA256 del volcado cambió (propuesta obsoleta)
+ok 397 - propuestasRepo: RECHAZA dictamen o asiento si el SHA256 del volcado cambió (propuesta obsoleta)
+  ---
+  duration_ms: 0.6213
+  type: 'test'
+  ...
+# Subtest: propuestasRepo: reintento de registrarActaAsiento en propuesta ya asentada lanza conflicto
+ok 398 - propuestasRepo: reintento de registrarActaAsiento en propuesta ya asentada lanza conflicto
+  ---
+  duration_ms: 0.8181
+  type: 'test'
+  ...
+# Subtest: reconciliarSegmentos reemplaza segmentos provisionales por autoritativos
+ok 399 - reconciliarSegmentos reemplaza segmentos provisionales por autoritativos
+  ---
+  duration_ms: 3.993
+  type: 'test'
+  ...
+# Subtest: reconciliarSegmentos PROTEGE strictly un segmento editado manualmente
+ok 400 - reconciliarSegmentos PROTEGE strictly un segmento editado manualmente
+  ---
+  duration_ms: 1.0007
+  type: 'test'
+  ...
+# Subtest: reconciliarTranscripcion respeta bandera modificadoManualmente
+ok 401 - reconciliarTranscripcion respeta bandera modificadoManualmente
+  ---
+  duration_ms: 0.4999
+  type: 'test'
+  ...
+# CONTEO DE ESTADOS ANTES: {"archivado":2}
+# HUÉRFANOS V1 EN REVISIÓN ANTES: 1
+# Lote de 2 volcados elegibles. Dry-run: false
+# ✓ Procesado volcado ID id-1 (\#1) a 'en_revision' con v1
+# ✓ Procesado volcado ID id-2 (\#2) a 'en_revision' con v1
+# CONTEO DE ESTADOS DESPUÉS: {"en_revision":2}
+# HUÉRFANOS V1 EN REVISIÓN DESPUÉS: 1
+# CONTEO DE ESTADOS ANTES: {"en_revision":2}
+# HUÉRFANOS V1 EN REVISIÓN ANTES: 1
+# CONTEO DE ESTADOS DESPUÉS: {"en_revision":2}
+# HUÉRFANOS V1 EN REVISIÓN DESPUÉS: 1
+# Subtest: Review Entrance & Incident Engine Backend
+    # Subtest: 1. Crear volcado (ruta directa y dictado) deja estado == S_REVISION ('en_revision') en feliz
+    ok 1 - 1. Crear volcado (ruta directa y dictado) deja estado == S_REVISION ('en_revision') en feliz
+      ---
+      duration_ms: 257.8722
+      type: 'test'
+      ...
+    # Subtest: 2. Si la promoción falla en creación: estado == S_CAPTURA ('archivado') + 1 log de fallo + verbatim se conserva
+    ok 2 - 2. Si la promoción falla en creación: estado == S_CAPTURA ('archivado') + 1 log de fallo + verbatim se conserva
+      ---
+      duration_ms: 48.787
+      type: 'test'
+      ...
+    # Subtest: 6. Vista 'Todos' en la UI incluye la unión de todos los estados y no expone S_CAPTURA de forma aislada
+    ok 3 - 6. Vista 'Todos' en la UI incluye la unión de todos los estados y no expone S_CAPTURA de forma aislada
+      ---
+      duration_ms: 0.2468
+      type: 'test'
+      ...
+    # Subtest: 3, 4, 5. Backfill idempotente, sha256 inmutable y conteo de archivados
+    ok 4 - 3, 4, 5. Backfill idempotente, sha256 inmutable y conteo de archivados
+      ---
+      duration_ms: 305.8208
+      type: 'test'
+      ...
+    # Subtest: resolverIncidente valida códigos específicos para audio_no_recuperable
+    ok 5 - resolverIncidente valida códigos específicos para audio_no_recuperable
+      ---
+      duration_ms: 1.2958
+      type: 'test'
+      ...
+    1..5
+ok 402 - Review Entrance & Incident Engine Backend
+  ---
+  duration_ms: 615.7566
+  type: 'test'
+  ...
+# Subtest: runtime snapshot acepta estado semántico y rechaza contenido sensible
+ok 403 - runtime snapshot acepta estado semántico y rechaza contenido sensible
+  ---
+  duration_ms: 6.0347
+  type: 'test'
+  ...
+# Subtest: 023_runtime_state define almacenamiento idempotente del snapshot vivo
+ok 404 - 023_runtime_state define almacenamiento idempotente del snapshot vivo
+  ---
+  duration_ms: 1.5232
+  type: 'test'
+  ...
+# Subtest: runtime telemetry no conserva transporte de observaciones vía GitHub
+ok 405 - runtime telemetry no conserva transporte de observaciones vía GitHub
+  ---
+  duration_ms: 0.9985
+  type: 'test'
+  ...
+# Subtest: Segmentación en Párrafos Re-ejecutable y Guardián Duro
+    # Subtest: 1. Camino feliz: normalizar(verbatim) === normalizar(propuesta) (igualdad EXACTA de caracteres no-blancos)
+    ok 1 - 1. Camino feliz: normalizar(verbatim) === normalizar(propuesta) (igualdad EXACTA de caracteres no-blancos)
+      ---
+      duration_ms: 6.5565
+      type: 'test'
+      ...
+    # Subtest: 2. sha256(verbatim) idéntico antes y después de generar y ratificar
+    ok 2 - 2. sha256(verbatim) idéntico antes y después de generar y ratificar
+      ---
+      duration_ms: 3.5261
+      type: 'test'
+      ...
+    # Subtest: 3. Segunda ejecución: solo cambia el campo de propuesta; verbatim y sha256 intactos
+    ok 3 - 3. Segunda ejecución: solo cambia el campo de propuesta; verbatim y sha256 intactos
+      ---
+      duration_ms: 1.9636
+      type: 'test'
+      ...
+    # Subtest: 4. Guardián duro: con output mutado (palabra cambiada/borrada), RECHAZA, no persiste y emite exactamente 1 evento FAIL
+    ok 4 - 4. Guardián duro: con output mutado (palabra cambiada/borrada), RECHAZA, no persiste y emite exactamente 1 evento FAIL
+      ---
+      duration_ms: 1.3238
+      type: 'test'
+      ...
+    # Subtest: 5. Ratificación: hasta no ratificar, texto oficial no cambia; tras ratificar, fija timestamp de ratificación
+    ok 5 - 5. Ratificación: hasta no ratificar, texto oficial no cambia; tras ratificar, fija timestamp de ratificación
+      ---
+      duration_ms: 1.0253
+      type: 'test'
+      ...
+    1..5
+ok 406 - Segmentación en Párrafos Re-ejecutable y Guardián Duro
+  ---
+  duration_ms: 15.6814
+  type: 'suite'
+  ...
+# Subtest: service observability contract covers the service boundaries
+ok 407 - service observability contract covers the service boundaries
+  ---
+  duration_ms: 2.2855
+  type: 'test'
+  ...
+# Subtest: primary navigation stays bounded and registry-driven
+ok 408 - primary navigation stays bounded and registry-driven
+  ---
+  duration_ms: 2.9435
+  type: 'test'
+  ...
+# Subtest: system menu only exposes secondary surfaces
+ok 409 - system menu only exposes secondary surfaces
+  ---
+  duration_ms: 0.3025
+  type: 'test'
+  ...
+# Subtest: ingreso is the capture surface and volcados is the downstream archive/review domain
+ok 410 - ingreso is the capture surface and volcados is the downstream archive/review domain
+  ---
+  duration_ms: 0.8041
+  type: 'test'
+  ...
+# Subtest: legacy ingreso routes resolve to canonical semantic domains without dead modes
+ok 411 - legacy ingreso routes resolve to canonical semantic domains without dead modes
+  ---
+  duration_ms: 1.9567
+  type: 'test'
+  ...
+# Subtest: domain menus remain hierarchical while ingreso and volcados stay primary
+ok 412 - domain menus remain hierarchical while ingreso and volcados stay primary
+  ---
+  duration_ms: 0.4362
+  type: 'test'
+  ...
+# Subtest: canonical coverage is unique
+ok 413 - canonical coverage is unique
+  ---
+  duration_ms: 0.5235
+  type: 'test'
+  ...
+# Subtest: shell renders the registry and keeps menu panels un-clipped
+ok 414 - shell renders the registry and keeps menu panels un-clipped
+  ---
+  duration_ms: 0.3898
+  type: 'test'
+  ...
+# Subtest: Tildes Seguras & Groq Suite
+    # Subtest: 1. autoaplicarTildesSeguras corrige formas obligatorias e inequívocas
+    ok 1 - 1. autoaplicarTildesSeguras corrige formas obligatorias e inequívocas
+      ---
+      duration_ms: 1.199
+      type: 'test'
+      ...
+    # Subtest: 2. autoaplicarTildesSeguras no autoaplica formas ambiguas (mas vs más, esta vs está)
+    ok 2 - 2. autoaplicarTildesSeguras no autoaplica formas ambiguas (mas vs más, esta vs está)
+      ---
+      duration_ms: 0.3546
+      type: 'test'
+      ...
+    # Subtest: 3. idempotencia: ejecutar dos veces no altera el texto
+    ok 3 - 3. idempotencia: ejecutar dos veces no altera el texto
+      ---
+      duration_ms: 0.3169
+      type: 'test'
+      ...
+    1..3
+ok 415 - Tildes Seguras & Groq Suite
+  ---
+  duration_ms: 3.4465
+  type: 'test'
+  ...
+# Subtest: Titulos Suite - PROMPT TIT-1A Engine Tests & Golden Cases
+    # Subtest: 1. segmentarTextoEnChunks aplica solapamiento real (overlapChars) sin cortar contexto
+    ok 1 - 1. segmentarTextoEnChunks aplica solapamiento real (overlapChars) sin cortar contexto
+      ---
+      duration_ms: 1.0655
+      type: 'test'
+      ...
+    # Subtest: 2. Idea central ubicada al final en un documento multi-chunk (12+ chunks)
+    ok 2 - 2. Idea central ubicada al final en un documento multi-chunk (12+ chunks)
+      ---
+      duration_ms: 4.5304
+      type: 'test'
+      ...
+    # Subtest: 3. Un solo hilo ideacional claro
+    ok 3 - 3. Un solo hilo ideacional claro
+      ---
+      duration_ms: 0.4869
+      type: 'test'
+      ...
+    # Subtest: 4. Cinco hilos temáticos sintetizados sin rebasar límite de longitud
+    ok 4 - 4. Cinco hilos temáticos sintetizados sin rebasar límite de longitud
+      ---
+      duration_ms: 0.4487
+      type: 'test'
+      ...
+    # Subtest: 5. Dictado repetitivo con deduplicación de ideas
+    ok 5 - 5. Dictado repetitivo con deduplicación de ideas
+      ---
+      duration_ms: 0.3572
+      type: 'test'
+      ...
+    # Subtest: 6. Preservación de nombres propios ratificados (Dąbrowski, Groq, Juan Pérez)
+    ok 6 - 6. Preservación de nombres propios ratificados (Dąbrowski, Groq, Juan Pérez)
+      ---
+      duration_ms: 0.4624
+      type: 'test'
+      ...
+    # Subtest: 7. Manejo correcto de negaciones explícitas
+    ok 7 - 7. Manejo correcto de negaciones explícitas
+      ---
+      duration_ms: 0.2523
+      type: 'test'
+      ...
+    # Subtest: 8. Transcripción centrada en una pregunta o interrogante clave
+    ok 8 - 8. Transcripción centrada en una pregunta o interrogante clave
+      ---
+      duration_ms: 0.3083
+      type: 'test'
+      ...
+    # Subtest: 9. Tomar decisiones o acuerdos formales como eje del título
+    ok 9 - 9. Tomar decisiones o acuerdos formales como eje del título
+      ---
+      duration_ms: 0.38
+      type: 'test'
+      ...
+    # Subtest: 10. Material heterogéneo y multidisciplinario
+    ok 10 - 10. Material heterogéneo y multidisciplinario
+      ---
+      duration_ms: 0.4479
+      type: 'test'
+      ...
+    # Subtest: 11. Fallback sin API key distribuye el análisis por todo el documento y calcula offsets válidos
+    ok 11 - 11. Fallback sin API key distribuye el análisis por todo el documento y calcula offsets válidos
+      ---
+      duration_ms: 0.3061
+      type: 'test'
+      ...
+    # Subtest: 12. Detección y rechazo de títulos genéricos o prohibidos
+    ok 12 - 12. Detección y rechazo de títulos genéricos o prohibidos
+      ---
+      duration_ms: 0.2486
+      type: 'test'
+      ...
+    # Subtest: 13. Offset matching de evidencia literal (buscarOffsetLiteral)
+    ok 13 - 13. Offset matching de evidencia literal (buscarOffsetLiteral)
+      ---
+      duration_ms: 0.1246
+      type: 'test'
+      ...
+    # Subtest: 14. generarTituloDeUltimoRecurso garantiza siempre un título no vacío sin fallar
+    ok 14 - 14. generarTituloDeUltimoRecurso garantiza siempre un título no vacío sin fallar
+      ---
+      duration_ms: 0.8696
+      type: 'test'
+      ...
+    # Subtest: 15. generarTituloConGarantia devuelve un TituloConGarantiaResult completo y nunca falla
+    ok 15 - 15. generarTituloConGarantia devuelve un TituloConGarantiaResult completo y nunca falla
+      ---
+      duration_ms: 0.356
+      type: 'test'
+      ...
+    # Subtest: A. IDEA-CENTRAL-AL-FINAL: texto con >=14 chunks donde la afirmación central aparece SOLO en el último chunk
+    ok 16 - A. IDEA-CENTRAL-AL-FINAL: texto con >=14 chunks donde la afirmación central aparece SOLO en el último chunk
+      ---
+      duration_ms: 2.0804
+      type: 'test'
+      ...
+    # Subtest: B. IDEA-EN-CHUNK-12: término distintivo inyectado únicamente en el chunk 12
+    ok 17 - B. IDEA-EN-CHUNK-12: término distintivo inyectado únicamente en el chunk 12
+      ---
+      duration_ms: 3.0656
+      type: 'test'
+      ...
+    # Subtest: C. TRES-HILOS: texto multihilo con 3 líneas ideacionales claras debe exponer las 3
+    ok 18 - C. TRES-HILOS: texto multihilo con 3 líneas ideacionales claras debe exponer las 3
+      ---
+      duration_ms: 0.4248
+      type: 'test'
+      ...
+    # Subtest: D. ORACIÓN-CLAVE-TARDÍA: oración decisiva es la 4ª dentro de un bloque
+    ok 19 - D. ORACIÓN-CLAVE-TARDÍA: oración decisiva es la 4ª dentro de un bloque
+      ---
+      duration_ms: 0.6249
+      type: 'test'
+      ...
+    # Subtest: E. OVERLAP-FRONTERA: bigrama en el límite de chunk aparece íntegro con overlapChars > 0
+    ok 20 - E. OVERLAP-FRONTERA: bigrama en el límite de chunk aparece íntegro con overlapChars > 0
+      ---
+      duration_ms: 0.1876
+      type: 'test'
+      ...
+    # Subtest: F. FALLBACK-DISTRIBUIDO: sin API key sobre texto con inicio genérico y señal al centro/final
+    ok 21 - F. FALLBACK-DISTRIBUIDO: sin API key sobre texto con inicio genérico y señal al centro/final
+      ---
+      duration_ms: 0.4072
+      type: 'test'
+      ...
+    # Subtest: NO-REGRESIÓN: comprobación explícita de no truncamiento sobre chunks 11/12
+    ok 22 - NO-REGRESIÓN: comprobación explícita de no truncamiento sobre chunks 11/12
+      ---
+      duration_ms: 2.0218
+      type: 'test'
+      ...
+    1..22
+ok 416 - Titulos Suite - PROMPT TIT-1A Engine Tests & Golden Cases
+  ---
+  duration_ms: 23.6895
+  type: 'test'
+  ...
+# Subtest: unirDosTranscriptsConOverlap deduplica el solapamiento de palabras de forma determinista
+ok 417 - unirDosTranscriptsConOverlap deduplica el solapamiento de palabras de forma determinista
+  ---
+  duration_ms: 9.3851
+  type: 'test'
+  ...
+# Subtest: unirDosTranscriptsConOverlap maneja superposición exacta con puntuación y mayúsculas variadas
+ok 418 - unirDosTranscriptsConOverlap maneja superposición exacta con puntuación y mayúsculas variadas
+  ---
+  duration_ms: 0.6594
+  type: 'test'
+  ...
+# Subtest: unirDosTranscriptsConOverlap si no hay solapamiento concatena limpiamente
+ok 419 - unirDosTranscriptsConOverlap si no hay solapamiento concatena limpiamente
+  ---
+  duration_ms: 0.5381
+  type: 'test'
+  ...
+# Subtest: unirTranscriptsConOverlap deduplica una secuencia de múltiples chunks de audio
+ok 420 - unirTranscriptsConOverlap deduplica una secuencia de múltiples chunks de audio
+  ---
+  duration_ms: 0.9825
+  type: 'test'
+  ...
+# Subtest: UI Review Harness Test Suite
+    # Subtest: 1. Registro de pantallas y escenarios completo y no vacío
+    ok 1 - 1. Registro de pantallas y escenarios completo y no vacío
+      ---
+      duration_ms: 1.9033
+      type: 'test'
+      ...
+    # Subtest: 2. ReviewFixtureAdapter opera exclusivamente con datos sintéticos y cero llamadas mutantes
+    ok 2 - 2. ReviewFixtureAdapter opera exclusivamente con datos sintéticos y cero llamadas mutantes
+      ---
+      duration_ms: 0.3727
+      type: 'test'
+      ...
+    # Subtest: 3. Fail-Closed Security: KHORA_UI_REVIEW_MODE=1 permite acceso, sin la variable responde 404
+    ok 3 - 3. Fail-Closed Security: KHORA_UI_REVIEW_MODE=1 permite acceso, sin la variable responde 404
+      ---
+      duration_ms: 106.8979
+      type: 'test'
+      ...
+    # Subtest: 4. Fuente única de componentes presentacionales
+    ok 4 - 4. Fuente única de componentes presentacionales
+      ---
+      duration_ms: 3.4127
+      type: 'test'
+      ...
+    # Subtest: 5. Prerender semántico existe para las nueve pantallas
+    ok 5 - 5. Prerender semántico existe para las nueve pantallas
+      ---
+      duration_ms: 0.3865
+      type: 'test'
+      ...
+    1..5
+ok 421 - UI Review Harness Test Suite
+  ---
+  duration_ms: 114.5173
+  type: 'test'
+  ...
+# Subtest: existen todos los componentes compartidos obligatorios
+ok 422 - existen todos los componentes compartidos obligatorios
+  ---
+  duration_ms: 1.9259
+  type: 'test'
+  ...
+# Subtest: ningun data-ui-id de produccion queda sin registrar
+ok 423 - ningun data-ui-id de produccion queda sin registrar
+  ---
+  duration_ms: 3.0868
+  type: 'test'
+  ...
+# Subtest: el registro no declara ui_ids fantasmas
+ok 424 - el registro no declara ui_ids fantasmas
+  ---
+  duration_ms: 1.1891
+  type: 'test'
+  ...
+# Subtest: cada pantalla declarada tiene escenarios y estados tipados
+ok 425 - cada pantalla declarada tiene escenarios y estados tipados
+  ---
+  duration_ms: 2.5906
+  type: 'test'
+  ...
+# Subtest: los escenarios de error y vacío son deterministas
+ok 426 - los escenarios de error y vacío son deterministas
+  ---
+  duration_ms: 0.5502
+  type: 'test'
+  ...
+# Subtest: los fixtures no contienen credenciales ni endpoints reales
+ok 427 - los fixtures no contienen credenciales ni endpoints reales
+  ---
+  duration_ms: 0.3596
+  type: 'test'
+  ...
+1..427
+# tests 545
+# suites 5
+# pass 545
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 8198.383
+[unit-runner] status=0 signal=null
+EXPERIENCE_STORAGE_PREFLIGHT=not_requested
+Building extension zip for version 0.3.5...
+Removing old zip: harmonia-v0.3.5.zip
+Successfully created C:\Users\PC 13\AppData\Local\Temp\khora-splash-audit-95f645d5b33846eea429071779b17247\source\SeryMente-khora-b5e7009de137db30c26ecc5f4ddbb34789f453f2\khora-web\public\downloads\harmonia-v0.3.5.zip
+
+> khora-web@0.3.8 build
+> next build --webpack
+
+▲ Next.js 16.4.0 (webpack)
+✓ Running next.config.ts took 33ms
+- Experiments (use with caution):
+  · serverActions
+
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead.
+
+  To migrate automatically, run:
+  npx @next/codemod@canary middleware-to-proxy .
+
+  Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+✓ Compiled successfully in 12.9s
+  Running TypeScript ...
+  Finished TypeScript in 4.2s ...
+  Collecting page data using 15 workers ...
+  Generating static pages using 15 workers (0/78) ...
+  Generating static pages using 15 workers (19/78) 
+  Generating static pages using 15 workers (38/78) 
+  Generating static pages using 15 workers (58/78) 
+✓ Generating static pages using 15 workers (78/78) in 2.4s
+  Finalizing page optimization ...
+  Collecting build traces ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ƒ /.well-known/oauth-authorization-server
+├ ƒ /.well-known/oauth-protected-resource
+├ ƒ /.well-known/oauth-protected-resource/api/mcp
+├ ○ /adherence
+├ ƒ /api/audio
+├ ƒ /api/audio/[id]
+├ ƒ /api/audio/[id]/manifiesto
+├ ƒ /api/audio/[id]/mp3
+├ ƒ /api/audio/[id]/parte/[index]
+├ ƒ /api/audio/importar/procesar
+├ ƒ /api/audio/importar/token
+├ ƒ /api/audio/sesion/[id]/exportar
+├ ƒ /api/auditoria
+├ ƒ /api/auth/[...nextauth]
+├ ƒ /api/board/orchestrate/tick
+├ ƒ /api/board/view
+├ ƒ /api/boveda
+├ ƒ /api/chat
+├ ƒ /api/consulta
+├ ƒ /api/dictado
+├ ƒ /api/dictado-archivo/titulo
+├ ƒ /api/dictado-experience
+├ ƒ /api/dictado/checkpoint
+├ ƒ /api/dictado/reconciliar
+├ ƒ /api/edicion
+├ ƒ /api/ep/bootstrap
+├ ƒ /api/ep/events
+├ ƒ /api/ep/github-credential
+├ ƒ /api/ep/logs
+├ ƒ /api/ep/repos
+├ ƒ /api/ep/token
+├ ƒ /api/ep/workspace
+├ ƒ /api/eventos
+├ ƒ /api/fragmentos/[id]
+├ ƒ /api/fragmentos/generar
+├ ƒ /api/github/webhook
+├ ƒ /api/grafo
+├ ƒ /api/grafos
+├ ƒ /api/ingesta
+├ ƒ /api/ingesta/verificar
+├ ƒ /api/jules/approve
+├ ƒ /api/jules/audit/validate
+├ ƒ /api/jules/audit/verdict
+├ ƒ /api/jules/autorespond
+├ ƒ /api/jules/poll/tick
+├ ƒ /api/jules/sources
+├ ƒ /api/jules/trigger
+├ ƒ /api/kpi/minutes
+├ ƒ /api/mcp
+├ ƒ /api/mcp/manual-token
+├ ƒ /api/mcp/revocacion
+├ ƒ /api/norm-check
+├ ƒ /api/oauth/register
+├ ƒ /api/oauth/token
+├ ƒ /api/observaciones/runtime
+├ ƒ /api/observaciones/runtime-state
+├ ƒ /api/pulir
+├ ƒ /api/revision/[id]
+├ ƒ /api/revision/[id]/aprobar
+├ ƒ /api/revision/[id]/compuerta
+├ ƒ /api/revision/[id]/hallazgos
+├ ƒ /api/revision/[id]/hallazgos/[hId]/resolver
+├ ƒ /api/revision/[id]/incidentes
+├ ƒ /api/revision/[id]/incidentes/[incId]/resolver
+├ ƒ /api/revision/[id]/iniciar
+├ ƒ /api/revision/[id]/propuestas
+├ ƒ /api/revision/[id]/propuestas/aplicar
+├ ƒ /api/revision/[id]/reabrir
+├ ƒ /api/revision/delta
+├ ƒ /api/revision/sugerencias
+├ ƒ /api/security/github-credentials
+├ ƒ /api/security/lock
+├ ƒ /api/security/vault-agent/history
+├ ƒ /api/security/vault-agent/introspect
+├ ƒ /api/security/vault-agent/token
+├ ƒ /api/segmentar/[id]
+├ ƒ /api/segmentar/[id]/ratificar
+├ ƒ /api/status
+├ ƒ /api/transcribir
+├ ƒ /api/transcribir/archivo
+├ ƒ /api/transcribir/dialogo
+├ ƒ /api/transcribir/sesion
+├ ƒ /api/version
+├ ƒ /api/versiones
+├ ƒ /api/volcado
+├ ƒ /api/volcado/[id]
+├ ƒ /api/volcado/[id]/aprobar
+├ ƒ /api/volcados/pipeline
+├ ƒ /api/volcados/pipeline/[id]
+├ ƒ /auth/signin
+├ ○ /capturar
+├ ○ /capturar/compartir
+├ ○ /grafo
+├ ○ /herramientas
+├ ○ /herramientas/bitacora
+├ ○ /herramientas/opi-vri
+├ ○ /icon.svg
+├ ○ /mapa
+├ ƒ /oauth/authorize
+├ ○ /offline
+├ ○ /roadmap
+├ ○ /sistema/boveda
+├ ○ /sistema/consulta
+├ ○ /sistema/custodia
+├ ○ /sistema/dictado
+├ ○ /sistema/editar
+├ ○ /sistema/entorno-persistente
+├ ○ /sistema/ingesta
+├ ○ /sistema/ingreso
+├ ○ /sistema/kpis
+├ ○ /sistema/mcp
+├ ○ /sistema/otros
+├ ○ /sistema/registro
+├ ○ /sistema/seguridad
+├ ƒ /sistema/volcados
+├ ƒ /ui-review
+├ ƒ /ui-review/[screen]
+├   /ui-review/[screen]/estatico
+│ ├ ● /ui-review/ingreso/estatico
+│ ├ ● /ui-review/archivo/estatico
+│ ├ ● /ui-review/revision/estatico
+│ └ ● [+6 more paths]
+├ ○ /ui-review/estatico
+└ ƒ /ui-review/manifest.json
+
+Route (pages)
+┌   /_app
+└ ○ /404
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+●  (SSG)      prerendered as static HTML (uses generateStaticParams)
+ƒ  (Dynamic)  server-rendered on demand
+

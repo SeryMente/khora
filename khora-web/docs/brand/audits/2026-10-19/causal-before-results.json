@@ -1,0 +1,172 @@
+{
+  "config": {
+    "argv": [
+      "C:\\Users\\PC 13\\AppData\\Local\\Temp\\rdc-c2f7f007c8d54b79a0aa6b09e69e0c6d\\node-v22.23.3-win-x64\\node.exe",
+      "C:\\Users\\PC 13\\AppData\\Local\\Temp\\khora-splash-audit-95f645d5b33846eea429071779b17247\\source\\SeryMente-khora-b5e7009de137db30c26ecc5f4ddbb34789f453f2\\khora-web\\node_modules\\@playwright\\test\\cli.js",
+      "test",
+      "--config",
+      "playwright.audit.config.ts",
+      "e2e/splash.spec.ts",
+      "--grep",
+      "available.*primary.*Geist"
+    ],
+    "configFile": "C:\\Users\\PC 13\\AppData\\Local\\Temp\\khora-splash-audit-95f645d5b33846eea429071779b17247\\source\\SeryMente-khora-b5e7009de137db30c26ecc5f4ddbb34789f453f2\\khora-web\\playwright.audit.config.ts",
+    "rootDir": "C:/Users/PC 13/AppData/Local/Temp/khora-splash-audit-95f645d5b33846eea429071779b17247/source/SeryMente-khora-b5e7009de137db30c26ecc5f4ddbb34789f453f2/khora-web",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "C:/Users/PC 13/AppData/Local/Temp/khora-splash-audit-95f645d5b33846eea429071779b17247/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "C:/Users/PC 13/AppData/Local/Temp/khora-splash-audit-95f645d5b33846eea429071779b17247/source/SeryMente-khora-b5e7009de137db30c26ecc5f4ddbb34789f453f2/khora-web",
+        "testIgnore": [],
+        "testMatch": [
+          "e2e/**/*.spec.ts",
+          "tests/regression/**/*.spec.ts"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "C:\\Users\\PC 13\\AppData\\Local\\Temp\\khora-splash-audit-95f645d5b33846eea429071779b17247\\playwright-results.json"
+        }
+      ],
+      [
+        "html",
+        {
+          "open": "never",
+          "outputFolder": "C:\\Users\\PC 13\\AppData\\Local\\Temp\\khora-splash-audit-95f645d5b33846eea429071779b17247\\playwright-report"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.61.1",
+    "workers": 1,
+    "webServer": {
+      "command": "node node_modules/next/dist/bin/next start -p 3000",
+      "url": "http://localhost:3000",
+      "reuseExistingServer": false,
+      "timeout": 120000
+    }
+  },
+  "suites": [
+    {
+      "title": "e2e\\splash.spec.ts",
+      "file": "e2e/splash.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "available primary Geist is not suppressed by a broken fallback face",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 361,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m\n    at C:\\Users\\PC 13\\AppData\\Local\\Temp\\khora-splash-audit-95f645d5b33846eea429071779b17247\\source\\SeryMente-khora-b5e7009de137db30c26ecc5f4ddbb34789f453f2\\khora-web\\e2e\\splash.spec.ts:262:28",
+                    "location": {
+                      "file": "C:\\Users\\PC 13\\AppData\\Local\\Temp\\khora-splash-audit-95f645d5b33846eea429071779b17247\\source\\SeryMente-khora-b5e7009de137db30c26ecc5f4ddbb34789f453f2\\khora-web\\e2e\\splash.spec.ts",
+                      "column": 28,
+                      "line": 262
+                    },
+                    "snippet": "\u001b[0m \u001b[90m 260 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(splash))\u001b[33m.\u001b[39mtoHaveCount(\u001b[35m0\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 261 |\u001b[39m     \u001b[36mconst\u001b[39m result \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m evidence(page)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 262 |\u001b[39m     expect(result\u001b[33m.\u001b[39mstarted)\u001b[33m.\u001b[39mtoBeGreaterThan(\u001b[35m0\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                            \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 263 |\u001b[39m     expect(result\u001b[33m.\u001b[39mfont)\u001b[33m.\u001b[39mtoBe(\u001b[32m\"ready\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 264 |\u001b[39m     expect(result\u001b[33m.\u001b[39mcallbacks)\u001b[33m.\u001b[39mtoBe(\u001b[35m1\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 265 |\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\PC 13\\AppData\\Local\\Temp\\khora-splash-audit-95f645d5b33846eea429071779b17247\\source\\SeryMente-khora-b5e7009de137db30c26ecc5f4ddbb34789f453f2\\khora-web\\e2e\\splash.spec.ts",
+                        "column": 28,
+                        "line": 262
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m\n\n  260 |     await expect(page.locator(splash)).toHaveCount(0);\n  261 |     const result = await evidence(page);\n> 262 |     expect(result.started).toBeGreaterThan(0);\n      |                            ^\n  263 |     expect(result.font).toBe(\"ready\");\n  264 |     expect(result.callbacks).toBe(1);\n  265 | });\n    at C:\\Users\\PC 13\\AppData\\Local\\Temp\\khora-splash-audit-95f645d5b33846eea429071779b17247\\source\\SeryMente-khora-b5e7009de137db30c26ecc5f4ddbb34789f453f2\\khora-web\\e2e\\splash.spec.ts:262:28"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-19T19:46:14.795Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "video",
+                      "contentType": "video/webm",
+                      "path": "C:\\Users\\PC 13\\AppData\\Local\\Temp\\khora-splash-audit-95f645d5b33846eea429071779b17247\\test-results\\e2e-splash-available-prima-461c2-d-by-a-broken-fallback-face-chromium\\video.webm"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\PC 13\\AppData\\Local\\Temp\\khora-splash-audit-95f645d5b33846eea429071779b17247\\test-results\\e2e-splash-available-prima-461c2-d-by-a-broken-fallback-face-chromium\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\PC 13\\AppData\\Local\\Temp\\khora-splash-audit-95f645d5b33846eea429071779b17247\\source\\SeryMente-khora-b5e7009de137db30c26ecc5f4ddbb34789f453f2\\khora-web\\e2e\\splash.spec.ts",
+                    "column": 28,
+                    "line": 262
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "fbd8533e68529095bc97-ad880ae19fd580c133bd",
+          "file": "e2e/splash.spec.ts",
+          "line": 249,
+          "column": 5
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-19T19:46:12.856Z",
+    "duration": 2564.705,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}

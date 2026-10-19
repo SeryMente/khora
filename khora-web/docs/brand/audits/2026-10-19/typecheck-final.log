@@ -1,0 +1,4 @@
+
+> khora-web@0.3.8 typecheck
+> tsc --noEmit
+

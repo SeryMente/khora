@@ -245,3 +245,21 @@ test("entropy failure still reveals the canonical professional mark", async ({ p
     await expect(page.locator('[data-testid="intervalo-sonoro"]')).toHaveAttribute("data-variant", "0");
     expect(errors).toEqual([]);
 });
+
+test("available primary Geist is not suppressed by a broken fallback face", async ({ page }) => {
+    await page.addInitScript(() => {
+        const fonts = document.fonts;
+        const load = fonts.load.bind(fonts);
+        const check = fonts.check.bind(fonts);
+        fonts.load = (font, text) => font.includes("Fallback")
+            ? Promise.reject(new Error("A network error occurred.")) : load(font, text);
+        fonts.check = (font, text) => !font.includes("Fallback") && check(font, text);
+    });
+    await observeBoot(page);
+    await page.goto("/sistema/custodia", { waitUntil: "domcontentloaded" });
+    await expect(page.locator(splash)).toHaveCount(0);
+    const result = await evidence(page);
+    expect(result.started).toBeGreaterThan(0);
+    expect(result.font).toBe("ready");
+    expect(result.callbacks).toBe(1);
+});
