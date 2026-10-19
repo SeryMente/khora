@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "cycle": "C-AUTENTICIDAD-01",
+  "role": "Samantha, construcción y documentación por mandato directo",
+  "base_khora_commit": "ddae54c474a478849be9c7d9d757cfca48729c39",
+  "method": {
+    "version": "1.6",
+    "commit": "3ab59423160e78a9047d3663622ade45c3aa717e",
+    "sha256": "dab6680cbcdb6530e4616f8b13d1e0d5f1ff0885508203d1c5eac22fd86250ee",
+    "readback_exact": true
+  },
+  "criterion_document_version": "1.3",
+  "runtime_criterion_version_unchanged": "1.2",
+  "source": "Direct user message in session 3fd5d4a3-b250-807a-8bd7-00a9fde7ee9d; raw visible text preserved, terminal LF added",
+  "scope": "Documentary only; no production/code change; no real-corpus semantic evaluation",
+  "checks": {
+    "thirteen_core_blocks_exact_order": true,
+    "historical_method_sections_preserved": true,
+    "operator_literal_and_visible_outputs_prepared": true,
+    "runtime_reference_not_relabelled": true,
+    "prior_tests_not_claimed_rerun": true,
+    "model_behavior_not_guaranteed": true
+  },
+  "files": {
+    "docs/frentes/grafo/OBJETO.md": {
+      "sha256": "e3be88c62f8edaf53d0d778dfcb73b4e0b61de820bd38e6578dfa91c467c6690",
+      "utf8_bytes": 15447,
+      "git_blob_sha1": "b68d34c206799a68a68e30c1be2eeedf1a49eba5"
+    },
+    "khora-web/docs/GRAPH-QUALITY-DRAFT.md": {
+      "sha256": "0660e618700ef177d97be46216481e5240e5b30bf445b227c6f31ddce2fbcc74",
+      "utf8_bytes": 75655,
+      "git_blob_sha1": "7651d4478102daa2f04337ee81977394ab51221c"
+    },
+    "docs/frentes/grafo/originales/C-AUTENTICIDAD-01-operador.txt": {
+      "sha256": "e805e2716a0ec2705d209869a71962341f81d2b7ab6ebcfe894ad6f15d59de5d",
+      "utf8_bytes": 5139,
+      "git_blob_sha1": "70379d9aaed8e7e26a1d5decb20ce5bf2fdb3f5a"
+    },
+    "docs/frentes/grafo/cronica/C-AUTENTICIDAD-01.md": {
+      "sha256": "10b642444cd53c44c05a044637b781918b3280c91f0e23423ef2a40bd8b948f6",
+      "utf8_bytes": 7952,
+      "git_blob_sha1": "6ecfd0dc7b47cee9a1a4f584dab704d6c2e22961"
+    },
+    "docs/frentes/grafo/cronica/C-AUTENTICIDAD-01-salida.md": {
+      "sha256": "94d9b2f8bed477542b4cd81ce7da6984cada4bdccc2e29dc84faadec4e3a0cb2",
+      "utf8_bytes": 5477,
+      "git_blob_sha1": "d62bd6b0d181da9df02e904bd8d4a368ebe18211"
+    },
+    "docs/frentes/grafo/cronica/C-AUTENTICIDAD-01-intermedias.md": {
+      "sha256": "662f240641a3cc67f32a4788d192be33cbfc791994eaa987925023f2f038f193",
+      "utf8_bytes": 1027,
+      "git_blob_sha1": "bf75965c293ab8ec139645ecec1d18190cade6cf"
+    }
+  },
+  "persistence_verification": "Read back files by returned commit and compare exact bytes/hashes before emitting stored final output. This manifest identifies content; its own commit is supplied by enclosing Git authority, not a synthetic self-hash.",
+  "history_gap": "No claim that all earlier post-attachment cycles or nested conversations were received/archived."
+}

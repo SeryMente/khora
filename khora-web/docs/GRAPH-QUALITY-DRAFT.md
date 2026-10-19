@@ -1,6 +1,6 @@
 # Estándar unificador de calidad y salud del grafo de Khora
 
-**Versión 1.2 · 2026-10-18 · Contrato operativo de aptitud, con verificador de evidencia; producto NO APTO en el corte auditado.**
+**Versión 1.3 · evento C-AUTENTICIDAD-01 · Autenticidad preponderante y aprendizaje ciclo a ciclo; producto NO APTO en el último corte auditado.**
 
 La redacción y documentación fueron encargadas expresamente por el operador en este hilo. Este archivo sustituye el borrador anterior **en su ubicación existente**, para no multiplicar fuentes de verdad. El sufijo histórico `DRAFT` se conserva para no romper enlaces: el documento contiene un estándar de aceptación y un perfil de realización diseñados; su adopción material y la implementación siguen pendientes. No se atribuye ratificación a umbrales, decisiones de arquitectura o diseño de interfaz que el operador no haya aprobado. Publicar este texto no implementa sus controles, no levanta los bloqueos del producto y no modifica cánones de Notion.
 
@@ -71,6 +71,24 @@ No hay aún exportador productivo, integración de la compuerta en publicación 
 
 Hacer pasar las pruebas del validador o publicar este contrato no cierra ninguno de esos arreglos productivos. No se inicia migración, backfill, redefinición de seguridad ni cambio de interfaz bajo una autorización documental.
 
+### 0.6 Autenticidad como exigencia preponderante, no certificación automática
+
+**Pregunta rectora de cada ciclo:** ¿estamos construyendo relaciones suficientemente fieles como para que lo que agrupe Leiden tenga sentido? La responsabilidad alcanza fuente, ingesta, interpretación, identidad, proyección, comunidades, resumen, recuperación y presentación. El estándar EpisTwin sigue siendo inicial y no negociable; las extensiones de Khora se identifican y justifican, no se atribuyen al artículo.
+
+Autenticidad significa aquí fidelidad trazable al sentido y contexto disponibles, preservación de negación, duda, agencia, temporalidad, metáfora, contradicción, ideas raras y límites de cobertura; ausencia de relaciones o identidades fabricadas para producir una imagen o narrativa convincente. Es una definición de trabajo operacionalizable y revisable, no una medición de la esencia del sujeto, diagnóstico ni garantía de verdad. Verificar procedencia o topología no prueba por sí solo fidelidad semántica; reconocer una interpretación tampoco convierte cualquier hecho externo en verdadero.
+
+En la crónica de cada ciclo del frente registrar: etapa afectada; riesgo concreto de deformación, omisión o falso orden; evidencia examinada y contexto real/sintético/histórico; dictamen **demostrado para el caso / refutado / pendiente de prueba / no afectado con razón**; consecuencia en diseño y siguiente contraste. No declarar «autenticidad verificada» para todo el grafo por un caso favorable, una cita, una métrica, unanimidad entre modelos ni por esta norma.
+
+El modelo corrige con claridad los supuestos empíricos o técnicos incorrectos del operador: qué proposición requiere corrección, qué evidencia la sustenta o falta, versión corregida y efecto en el trabajo. Si no puede decidir, registra hipótesis y prueba pendiente; no llama patológica una intuición, no complace una inferencia infundada ni suplanta su autoridad sobre su experiencia. También rectifica sus propios errores. Una duda útil no se borra del original.
+
+**Emergencia sin ordenar la entrada:** no exigir al operador clasificar cada volcado ni validar cada arista antes de un mapa exploratorio automático. Distinguir candidato automático de juicio humano y de evidencia suficientemente validada. No imponer grupos o aristas para lograr una lectura psicológica deseada; permitir aislados, ambigüedad, pertenencias justificadas por el método y resultados incómodos. Estabilidad bajo perturbaciones es diagnóstico de robustez, no prueba de verdad. Ingesta y estándar ayudan a exigir/comprobar fidelidad; no garantizan por sí solos autenticidad del resultado de Leiden.
+
+**Reserva visual vigente:** la Síntesis Existencial Accionable busca una comprensión abstracta, revisable y sustentada de sí que ayude a decidir. El operador aún debe precisar sus criterios funcionales y los de Ideación Asíncrona Recuperable. Las tareas existentes son referencias técnicas provisionales, no definiciones finales ratificadas de esas facultades. No declarar requisitos completos ni diseñar/implementar otra representación visual por inferencia de este texto. Mantener captura, fuentes y trazabilidad; al inicio de cada ciclo sustantivo y ante una nueva definición, revisar si ya existen criterios explícitos suficientes. Cuando existan, registrar su fuente/revisión y proponer correspondencia facultad → tarea → interacción visual → prueba con el operador. Revisar visualización no equivale a autorizarla. No prometer monitoreo en segundo plano ni una automatización no configurada.
+
+**Separar éxitos:** aprender y disponer de un objeto que permita gobernar el frente es un resultado documental real; no sustituye publicar la primera versión del grafo. La madurez del grafo y la utilidad de las facultades necesitan evidencia propia. Mejor organización puede ayudar al sistema con el mismo modelo, pero no acredita «cinco veces más inteligencia». Comparar recuperación/generación frente a una buena base textual con el mismo corpus, modelo y tareas; medir fidelidad y utilidad por separado. Este contraste no es una modificación de la arquitectura inicial.
+
+**Estado de adopción:** en este ciclo se autoriza el criterio documental 1.3 y su revisión recurrente. No se altera código, base de datos ni la referencia causal ejecutable 1.2: esa referencia sigue identificando exactamente el criterio utilizado por el candidato anterior. Antes de evaluar/promover un nuevo candidato con 1.3, vincular su manifiesto a esta versión exacta por commit/huella y ejecutar las comprobaciones afectadas; nunca relabelar snapshots antiguos ni fingir que el validador implementa esta revisión semántica. No hay aprobación retroactiva ni relajación de compuertas previas.
+
 ## 1. Criterio rector: servir sin deformar ni usurpar
 
 Un grafo de Khora es apto para la prótesis cognitiva **si conserva y permite recuperar el contenido y su evolución sin falsificar su sentido, hace visibles sus límites y mantiene en el operador la autoridad sobre su propia interpretación**. La apariencia, el número de entidades, la densidad, la modularidad o la cantidad de pruebas verdes no sustituyen esta aptitud.
@@ -83,12 +101,12 @@ Para una afirmación ofrecida como sustentada, la admisibilidad es la conjunció
 
 Ningún estándar honesto garantiza ausencia absoluta de errores futuros en interpretación generativa. La garantía de ingeniería exigida aquí es más precisa: impedir promoción o proclamación de calidad sin evidencia vigente; detectar, limitar, corregir y poder reconstruir lo defectuoso; declarar el riesgo residual y nunca confundir ausencia de observación con ausencia de error.
 
-### 1.1 Dos usos que fijan qué significa «bueno»
+### 1.1 Dos usos orientadores, con criterios finales aún pendientes
 
-- **Síntesis Existencial Accionable:** hacer visible una propuesta de jerarquía de valores y dirección del ideal **desde elecciones, conflictos y renuncias registrados**, no inventar identidad ni extraer diagnósticos. Toda afirmación debe ser anclada, rechazable y versionada; mostrar contraejemplos. La capacidad solo se acredita con trazabilidad, reconocimiento explícito del operador y uso registrado. Una síntesis plausible o halagadora no basta.
+- **Síntesis Existencial Accionable:** ayudar a comprender de forma abstracta, revisable y sustentada quién soy para tomar decisiones, conforme al propósito expresado por el operador. La anterior propuesta de jerarquía de valores desde elecciones, conflictos y renuncias registrados es una posible operacionalización, no una definición exhaustiva ni criterio final ratificado; no inventar identidad ni extraer diagnósticos. Toda afirmación debe ser anclada, rechazable y versionada; mostrar contraejemplos. La capacidad solo se acredita con trazabilidad, reconocimiento explícito del operador y uso registrado. Una síntesis plausible o halagadora no basta.
 - **Ideación Asíncrona Recuperable:** conservar ideación amorfa y distribuida y devolverla íntegra, agrupada por afinidad y con evolución temporal, para crear y diseñar. No debe exigir estructurar la entrada, eliminar repeticiones o borrar contradicciones para lograr un dibujo ordenado. Una lista de entidades o un resumen con pérdidas no acredita la capacidad.
 
-Gobiernan las definiciones específicas de <mention url="https://app.notion.com/p/686a41878241833db38281c4106407a7">Síntesis Existencial Accionable</mention> y de <mention url="https://app.notion.com/p/453a4187824183efafac81daa6b48206">los objetivos de Khora</mention>, no las expansiones incorrectas o secciones históricas superadas que puedan persistir en material de desarrollo.
+Las referencias siguientes se conservan como antecedentes que deben cotejarse; no sustituyen la precisión funcional todavía pendiente ni la reserva visual de §0.6. Gobiernan las definiciones específicas de <mention url="https://app.notion.com/p/686a41878241833db38281c4106407a7">Síntesis Existencial Accionable</mention> y de <mention url="https://app.notion.com/p/453a4187824183efafac81daa6b48206">los objetivos de Khora</mention>, no las expansiones incorrectas o secciones históricas superadas que puedan persistir en material de desarrollo.
 
 ## 2. Fundamento externo y límites de adopción
 
@@ -332,7 +350,9 @@ Los ejemplos son especificaciones de pruebas, **no pruebas implementadas ni ejec
 | N27 | Borrado autorizado en entorno de prueba | Ausencia comprobada en los derivados incluidos en la política; declarar copias/retención restantes |
 | N28 | Reconstrucción con decisiones aceptada/rechazada/revocada | Reaplicar con revisión y resolver conflictos; no usar ledger vacío como prueba suficiente |
 
-## 8. Acreditación específica de las capacidades
+## 8. Pruebas candidatas de las capacidades, pendientes de criterios funcionales finales
+
+La reserva de §0.6 gobierna la acreditación visual y de facultades. Estas pruebas siguen siendo controles útiles, pero no bastan para proclamar definidas o acreditadas las facultades; no se eliminan exigencias de fidelidad ya justificadas.
 
 ### 8.1 Ideación Asíncrona Recuperable
 
