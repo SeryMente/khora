@@ -111,6 +111,7 @@ def _get_provider() -> PuertoLLM:
 def _policy(question: str, ht: Ht, puerto_llm: PuertoLLM) -> tuple[Lambda, str]:
     historial = "[Historial]\n" + "".join(
         f"Paso {s.n}: estado={s.state} detalle={s.detail}\n"
+        f"Observación: {json.dumps(s.observation, ensure_ascii=False)}\n"
         for s in ht.steps
     ) + "[Fin historial]\n"
     visual_available = any(e.node_id == "fallback_vqa" for e in ht.evidence)
@@ -122,6 +123,9 @@ def _policy(question: str, ht: Ht, puerto_llm: PuertoLLM) -> tuple[Lambda, str]:
         "FALLBACK solicita evidencia visual cruda y STOP termina. "
         "Usa el historial completo; no inventes observaciones. Devuelve JSON únicamente.\n"
         f"Pregunta: {question}\n{historial}"
+        f"Evidencia H_t: {json.dumps([e.__dict__ for e in ht.evidence], ensure_ascii=False)}\n"
+        f"Veredictos H_t: {json.dumps(ht.verdicts, ensure_ascii=False)}\n"
+        f"Traza H_t: {json.dumps(getattr(ht, 'trace', []), ensure_ascii=False)}\n"
         '{"accion":"RETRIEVE|REFINE|ANSWER|FALLBACK|STOP","justificacion":"..."}'
     )
     req = SolicitudLLM(prompt, "Eres la política πθ de EpisTwin.", None, {"temperature": 0.0, "role": "pi_theta"})
@@ -154,6 +158,21 @@ def _set_last_step_observation(ht: Ht, observation: Any, detail: str | None = No
     return _replace_ht(ht, steps=ht.steps[:-1] + [step])
 
 
+def _current_turn_steps(ht: Ht) -> List[HtStep]:
+    """Keep full H_t; distinguish retrieval performed for this invocation.
+
+    A trace marker does not introduce a new policy action or discard history.
+    Histories produced before turn markers retain direct-helper compatibility.
+    """
+    for event in reversed(getattr(ht, "trace", [])):
+        if isinstance(event, dict) and event.get("action") == "TURN_START":
+            after_step = event.get("after_step")
+            if isinstance(after_step, int) and not isinstance(after_step, bool):
+                return [step for step in ht.steps if step.n > after_step]
+            return []
+    return ht.steps
+
+
 def _retrieve(ht: Ht, question: str, memoria: Any, contexto: Any = None) -> Ht:
     from khora_kernel.api import ContextoDeVisibilidad
     contexto = contexto or ContextoDeVisibilidad.PRIVADO
@@ -165,12 +184,22 @@ def _retrieve(ht: Ht, question: str, memoria: Any, contexto: Any = None) -> Ht:
             _set_last_step_observation(ht, payload),
             {"action": "RETRIEVE", **payload}
         )
-    resultado = RetrieverGraphRAG(memoria).consultar(question, contexto)
+    retrieval_question = question
+    # REFINE changes retrieval strategy, never the original question used by fVAL.
+    for step in reversed(_current_turn_steps(ht)):
+        observation = step.observation
+        if step.state == Lambda.REFINE.value and isinstance(observation, dict):
+            refined = observation.get("refined_query")
+            if (observation.get("original_question") == question
+                    and isinstance(refined, str) and refined.strip()):
+                retrieval_question = refined.strip()
+                break
+    resultado = RetrieverGraphRAG(memoria).consultar(retrieval_question, contexto)
     node_ids = [n.id for n in resultado.subgrafo.nodos]
     community_ids = [f.id for f in resultado.fragmentos if f.id.startswith("L0_") or f.id.startswith("L1_")]
     payload = {
         "graph_revision": memoria.get_graph_revision() if hasattr(memoria, "get_graph_revision") else "unknown",
-        "retrieval_query": question,
+        "retrieval_query": retrieval_question,
         "gstar_nodes": node_ids,
         "gstar_edges": [a.__dict__ for a in resultado.subgrafo.aristas],
         "communities": community_ids,
@@ -207,7 +236,8 @@ def _refine(ht: Ht, question: str, puerto_llm: PuertoLLM) -> Ht:
     refined = puerto_llm.generar(req).texto.strip()
     if not refined:
         raise ValueError("REFINE no produjo una consulta utilizable")
-    ht = _add_step(ht, Lambda.REFINE.value, "Refinamiento ejecutado.", {"refined_query": refined})
+    ht = _add_step(ht, Lambda.REFINE.value, "Refinamiento ejecutado.",
+                   {"refined_query": refined, "original_question": question})
     return _add_trace(ht, {"action": "REFINE", "refined_query": refined})
 
 
@@ -236,30 +266,30 @@ def _answer(ht: Ht, question: str, puerto_llm: PuertoLLM) -> Response:
 def ejecutar_ciclo(session_id: str, pregunta: str, puerto_llm: PuertoLLM, memoria: Any,
                    db_path: str = "data/khora_sessions.db") -> ValidatedResponse:
     ht = load_ht(session_id, db_path) or Ht(session_id=session_id, created_at=_now())
+    ht = _add_trace(ht, {"action": "TURN_START", "question": pregunta,
+                         "after_step": ht.steps[-1].n if ht.steps else 0})
     estado = Sigma(session_id=session_id, pregunta=pregunta, ht=ht)
     max_steps = int(os.environ.get("RAZ_MAX_PASOS", "6"))
     final_result: FvalResult | None = None
     answer = Response("Proceso detenido.", [], session_id)
     trace: List[Dict[str, Any]] = []
-    retrieval_query = pregunta
 
     while estado.paso_actual <= max_steps and not estado.terminado:
         action, why = _policy(pregunta, estado.ht, puerto_llm)
         estado.ht = _add_step(estado.ht, action.value, why)
         try:
             if action == Lambda.RETRIEVE:
-                estado.ht = _retrieve(estado.ht, retrieval_query, memoria)
+                estado.ht = _retrieve(estado.ht, pregunta, memoria)
             elif action == Lambda.REFINE:
                 estado.ht = _refine(estado.ht, pregunta, puerto_llm)
-                retrieval_query = estado.ht.steps[-1].observation["refined_query"]
             elif action == Lambda.ANSWER:
                 legacy_provider = (
                     hasattr(puerto_llm, "call_count") or hasattr(puerto_llm, "forced_responses")
                     or hasattr(puerto_llm, "action_responses")
                 )
-                retrieve_present = any(s.state == Lambda.RETRIEVE.value for s in estado.ht.steps) or memoria is None or legacy_provider
+                retrieve_present = any(s.state == Lambda.RETRIEVE.value for s in _current_turn_steps(estado.ht)) or memoria is None or legacy_provider
                 if not retrieve_present:
-                    estado.ht = _add_step(estado.ht, "GUARD", "ANSWER rechazado: no existe G*.", None)
+                    estado.ht = _add_step(estado.ht, "GUARD", "ANSWER rechazado: no existe recuperación en el turno actual.", None)
                 else:
                     # Fixture legacy: el texto de justificación era el borrador de respuesta.
                     # En producción, P_phi se invoca por separado para respetar UA-15.
@@ -271,8 +301,8 @@ def ejecutar_ciclo(session_id: str, pregunta: str, puerto_llm: PuertoLLM, memori
                         )
                     else:
                         answer = _answer(estado.ht, pregunta, puerto_llm)
-                    # Visual evidence remains evidence, never a substitute for global fVAL.
-                    final_result = fval(answer.answer, estado.ht, puerto_llm)
+                    # Preserve main: visual evidence never replaces global fVAL.
+                    final_result = fval(answer.answer, estado.ht, puerto_llm, question=pregunta)
                     verdict_record = {"vt": final_result.vt, "deficit_type": final_result.deficit_type,
                                       "reason": final_result.reason}
                     estado.ht = _replace_ht(estado.ht, verdicts=estado.ht.verdicts + [verdict_record])

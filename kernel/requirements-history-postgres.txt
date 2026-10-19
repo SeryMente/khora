@@ -1,0 +1,2 @@
+# Opt-in history driver; SQLite remains dependency-free and default.
+psycopg[binary]>=3.1,<4

@@ -7,8 +7,8 @@ import {
   ConsultaViewState,
   PerfilProveedor,
   MensajeChatSession,
-  Evidencia,
 } from "@/app/components/shared/ConsultaView";
+import { normalizarRespuestaConsulta } from "@/lib/client/consultaGrafo";
 import { ejecutarInferenciaOllamaLocal } from "@/lib/client/ollamaLocal";
 
 export default function ConsultaPage() {
@@ -109,12 +109,7 @@ export default function ConsultaPage() {
         const assistantMsg: MensajeChatSession = {
           id: crypto.randomUUID(),
           rol: "assistant",
-          contenido: data.respuesta || (data.suficiencia ? "Respuesta procesada." : "Sin evidencia suficiente para responder."),
-          origen: "grafo",
-          fuentes: Array.isArray(data.evidencia) ? (data.evidencia as Evidencia[]) : [],
-          suficiencia: Boolean(data.suficiencia),
-          no_anclada: Boolean(data.no_anclada),
-          degradacion_declarada: data.degradacion_declarada || null,
+          ...normalizarRespuestaConsulta(data),
         };
 
         setMensajes([...nuevosMensajes, assistantMsg]);

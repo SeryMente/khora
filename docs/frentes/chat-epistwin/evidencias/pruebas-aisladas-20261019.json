@@ -1,0 +1,83 @@
+{
+  "type": "isolated_test_evidence_not_live_state",
+  "at": "2026-10-19T19:35:46.507601+00:00",
+  "base_main": "b5e7009de137db30c26ecc5f4ddbb34789f453f2",
+  "source_pr317_head": "10d5a91ca7df7f92b804f1d43c98589f98c4f798",
+  "python": "3.11.17",
+  "postgresql": "15.18 disposable loopback",
+  "tests": {
+    "history_unit": {
+      "pass": 12,
+      "sqlite_real": 5,
+      "postgres_driver_controlled": 7
+    },
+    "history_postgres_real": {
+      "pass": 5,
+      "skip": 0,
+      "details": [
+        "roundtrip_and_upsert",
+        "distinct_keys",
+        "malformed_history_closed",
+        "read_in_separate_python_process",
+        "parallel_distinct_key_writes"
+      ]
+    },
+    "context_pipe_main_regression": {
+      "pass": 27,
+      "subtests": 4,
+      "controlled": true
+    },
+    "frontend_contract": {
+      "pass": 10
+    }
+  },
+  "postgres_residual_rows": 0,
+  "postgres_process_stopped": true,
+  "safety": [
+    "main_global_fval_preserved_even_with_visual_evidence",
+    "main_empty_refine_failure_and_trace_preserved",
+    "original_question_and_current_turn_guard_retained",
+    "no_ddl_runtime_or_sqlite_fallback_on_pg_error"
+  ],
+  "not_verified": [
+    "full_checkout_build",
+    "entire_kernel_suite",
+    "neon_driver_and_tls",
+    "openwebui_binding_and_user_isolation",
+    "same_conversation_concurrency",
+    "render_capacity_and_persistence",
+    "production_model_graph_corpus_egress",
+    "deployment",
+    "operator_acceptance"
+  ],
+  "access": {
+    "rdc": "PC-14 a960759c-7557-451d-936a-73aa791f5f58 online via list_devices; not used for construction",
+    "vercel_mcp": "team members 403 and teams empty after reconnection",
+    "vercel_cli": "official device authentication completed; own credentials GET existing project exit0 with exact project/team",
+    "render": "connection not completed; do not retry automatically"
+  },
+  "file_sha256": {
+    ".github/workflows/chat-history-postgres.yml": "e65b239cf1f2198d9936a892e01c1abc99a0400343310854a7ef69ed26c70ad3",
+    "docs/frentes/chat-epistwin/migraciones/001_kernel_history_postgres.sql": "c4a752364a4f79eb0011106ca56c2382e36720303736c907203b417fd6965c4b",
+    "kernel/requirements-history-postgres.txt": "35cc6efaa6b13978b21a7abb649ad3aa99d84c8261c756cbc5f93a9b56613abf",
+    "kernel/src/khora_kernel/engine/core.py": "4e4dabe008cfbff73caa26c5672be4fd733e925fa02187d50b6348d5379187fe",
+    "kernel/src/khora_kernel/engine/fval.py": "cb24ec04b7639efa874796a60e3dc3390dd632b1b2019e1eb0ff8deb79423663",
+    "kernel/src/khora_kernel/engine/history.py": "f35d1550a4e852ce3b2c6aad4ba73c779f6e9eeeb44fa3b933dd9674f4192586",
+    "kernel/src/khora_kernel/integrations/__init__.py": "79f6df8cea989263a2cc0f078a62778732323bd33156aacaf94f9945c41e6d96",
+    "kernel/src/khora_kernel/integrations/openwebui.py": "19466ec98e3033fe589ca88e20999e6ee6313b2a2d3d4f00f0adb160e5cad02e",
+    "kernel/tests/engine/test_history_postgres_live.py": "1fbfd53bba7de62cdd291af3ee4bf7bf89aef71c1c41cd35e3045280b512779a",
+    "kernel/tests/engine/test_history_storage.py": "ea1569ce0770d3e35f3088e3bafb00d9e9d1a158ac09587d8ff72e1bed941d45",
+    "kernel/tests/engine/test_openwebui_pipe.py": "7cbbb53c58d628ab97753ba9bf0d2df4240255645b00f8c77d6b1e8ca5fae912",
+    "kernel/tests/engine/test_textual_context.py": "917ec4ad0e599c4c939b2b10a07f17f5c6900514816e74772d09ba58a4ced15f",
+    "khora-web/app/sistema/consulta/page.tsx": "3fba9c259a3020d94e99fdfc9fec3b65a9c0f814b2768eed6ccd8cb98b3fe348",
+    "khora-web/lib/client/consultaGrafo.ts": "5ddcccdb3515657be3e9420c851202196956d441ddfe091a560b330aca3f80d8",
+    "khora-web/tests/unit/consulta_grafo_contract.test.ts": "25e4593050ce21c68622a06950da46d3682354fb2ddd38d099effbeaae4e720c",
+    "kernel/tests/engine/test_chat_main_reconciliation.py": "2c159321fad575ef387aeb912421ced8c2542ea7a0ecc6b615041b7b28e1a110"
+  },
+  "log_sha256": {
+    "history-unit311.log": "2e16582868911bb1e72ff8d189b6664ea2d5851efe3ad4a946b90f0e6fc38f29",
+    "history-live311.log": "b375e36487066e36da1815b56fe882cf2cf66c8d16853fb79ca2ea014d0b63bb",
+    "reconciliation-tests.log": "a585317be064f4ab5a7e1e8c8e177b8637415c9d3bf7bb3e835d8dd612f7f981",
+    "frontend-tests.log": "f3dbf9373db70fe17e632a239e0366436434c5e71d8498b9a0b6f47a778d44a6"
+  }
+}

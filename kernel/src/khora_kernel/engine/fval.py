@@ -40,7 +40,7 @@ def _clean_json(text: str) -> str:
     return text.strip().replace("```json", "").replace("```", "").strip()
 
 
-def _global_fval(answer: str, ht: Any, puerto_llm: PuertoLLM) -> FvalResult:
+def _global_fval(answer: str, ht: Any, puerto_llm: PuertoLLM, question: str | None = None) -> FvalResult:
     history = {
         "steps": [s.__dict__ for s in ht.steps],
         "evidence": [e.__dict__ for e in ht.evidence],
@@ -49,8 +49,11 @@ def _global_fval(answer: str, ht: Any, puerto_llm: PuertoLLM) -> FvalResult:
     prompt = (
         "Evalúa si la respuesta está completamente respaldada por H_t. "
         "Evalúa GLOBALMENTE si H_t contiene evidencia suficiente para respaldar la respuesta. "
+        "Si se proporciona la pregunta original, comprueba además que la respuesta la resuelva; "
+        "una respuesta respaldada pero ajena o incompleta no es suficiente. "
         "No hagas verificación claim-by-claim. VISUAL solo si la insuficiencia exige evidencia "
         "no textual/visual. Devuelve JSON.\n"
+        f"PREGUNTA ORIGINAL:\n{question if question is not None else 'No proporcionada (compatibilidad)'}\n"
         f"ANSWER:\n{answer}\nH_t:\n{json.dumps(history, ensure_ascii=False)}\n"
         '{"vt":"Sufficient|Insufficient","deficit_type":"VISUAL|TEXTUAL|null","reason":"..."}'
     )
@@ -114,10 +117,10 @@ def _legacy_fval(resp: Response, ht: Any, db_path: str) -> FvalResult:
     return result
 
 
-def fval(answer: Any, ht: Any, puerto_llm_or_db: Any) -> FvalResult:
+def fval(answer: Any, ht: Any, puerto_llm_or_db: Any, *, question: str | None = None) -> FvalResult:
     if isinstance(answer, Response) and isinstance(puerto_llm_or_db, str):
         return _legacy_fval(answer, ht, puerto_llm_or_db)
-    return _global_fval(str(answer), ht, puerto_llm_or_db)
+    return _global_fval(str(answer), ht, puerto_llm_or_db, question=question)
 
 
 def get_verdict(answer_or_session: str, context_or_db: Any) -> Any:
