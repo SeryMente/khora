@@ -1,0 +1,12 @@
+{
+  "sha": "eda718288fa61bf4df016751d46631fa8e71054a",
+  "id": "dpl_FXhPbEU5RPuJ7eGwTDRWRFeSej2s",
+  "state": "READY",
+  "target": "preview",
+  "url": "https://khora-hm2qnu1sp-victorhugotorresmendez-8991s-projects.vercel.app",
+  "verifiedBy": [
+    "Vercel get_deployment",
+    "authorized RDC Vercel API logs"
+  ],
+  "scope": "Next build only; configured buildCommand skips npm prebuild; not production/publication"
+}

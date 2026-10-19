@@ -1672,7 +1672,13 @@ function IngresoContenido({onDialogo,clasificacion,onClasificacionChange}:{onDia
         resultado,
       }}
       actions={{
-        onClasificacionChange:value=>{if(!guardando&&!archivado&&!recuperando&&estado!=="dictando")onClasificacionChange(value);},
+        onClasificacionChange:value=>{if(!guardando&&!archivado&&!recuperando&&estado!=="dictando"){
+          if((value.tipoEntrada==="interpretacion_simultanea"||value.tipoEntrada==="conversacion_maya")&&value.tipoEntrada!==clasificacion.tipoEntrada){
+            if(texto.trim()||conAudio||titulo.trim()){setError("Conserva o archiva esta captura antes de iniciar un diálogo nuevo. No se cambió el tipo ni se descartó contenido.");return;}
+            onClasificacionChange(value);onDialogo();return;
+          }
+          onClasificacionChange(value);
+        }},
         onReintentarPreparacion:()=>setPreparacionIntento(n=>n+1),
         onRecuperar:()=>{setRecoveryOpen(true);void cargarRecuperaciones();},
         onTituloChange: (value) => { if(!guardando&&!archivado&&!recuperando)setTitulo(value); },

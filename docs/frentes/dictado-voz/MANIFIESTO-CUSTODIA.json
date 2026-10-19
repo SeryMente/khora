@@ -989,12 +989,6 @@
       "git_blob_sha": "ec8843e18d95207e5365f3f6db15ae66301b5cd6"
     },
     {
-      "path": "OBJETO-CANONICO.md",
-      "bytes": 260606,
-      "sha256": "9efb259f6595a39a69b1e47f24f924e60d65bd410e98631fec675b3241840107",
-      "git_blob_sha": "1f619a407ff13fba4fc2309048612107fd4e004e"
-    },
-    {
       "path": "evidencias/C040/alcance.json",
       "bytes": 608,
       "sha256": "ccdbf90724cf8035abe970ccda4a340f817e2f93750671224321d1bbbe514eb0",
@@ -1071,6 +1065,84 @@
       "bytes": 2094,
       "sha256": "5e7dee4c4da5279d7b8c624927780efdb7be29d43f582b18dcd5418bd9b30105",
       "git_blob_sha": "a5e36bb6b9e452b9f7be79785c795b711bb043e6"
+    },
+    {
+      "path": "OBJETO-CANONICO.md",
+      "bytes": 267926,
+      "sha256": "0d80c817c1977339c5e7394632b41661b8fe88b046ec84c3a3f2c6a692f0dafe",
+      "git_blob_sha": "63bc6cf475bcea74a388f4d876d4312e831e794b"
+    },
+    {
+      "path": "evidencias/C041/access.json",
+      "bytes": 557,
+      "sha256": "2c7ae17d22fbf1259a741456b53136c7924e7b6d9d1d3d74fd30530c34eaa3e9",
+      "git_blob_sha": "fd7bdbc61f51438f5861302ec6319f7acc63535d"
+    },
+    {
+      "path": "evidencias/C041/browser-c041.cjs",
+      "bytes": 7838,
+      "sha256": "06bbaa28b414aedfec97d33c440041936e68217ed864fe3e97fab4e2898be0b7",
+      "git_blob_sha": "533c41eddc0acf58164f21a5222d4663cd8f5de6"
+    },
+    {
+      "path": "evidencias/C041/c041-browser-results.json",
+      "bytes": 211,
+      "sha256": "4220ded3fd96a695ae7cc04ab847e5aa519cb81a2abb5b1e3b51cf8c91d049fb",
+      "git_blob_sha": "e8f28c4417ff1a7a63d0ce0c279afb9bc83e8e73"
+    },
+    {
+      "path": "evidencias/C041/c041-mode-results.json",
+      "bytes": 140,
+      "sha256": "519e9091e40818c90a1a050a4940daccb2ad66b1f6a940909b4f3965466b1faf",
+      "git_blob_sha": "326a5ac2ca174b120b58a0ed83bb12782291c13c"
+    },
+    {
+      "path": "evidencias/C041/c041-server-results.json",
+      "bytes": 145,
+      "sha256": "59ba80e6ddd6f7e9897134c008fef4e9e9030ba852909a0ab3b94485b5de3294",
+      "git_blob_sha": "ff55a4f6d6d0c0be6e9c546b736912c518a5ffd3"
+    },
+    {
+      "path": "evidencias/C041/c041-types.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "git_blob_sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "evidencias/C041/deployment-C040.json",
+      "bytes": 419,
+      "sha256": "4fc38e2ccff6510973902cf566632dd48b83d95a907e3716bd2f30f85ec11589",
+      "git_blob_sha": "49be875f46b63e31888b8585ee629151be9088d6"
+    },
+    {
+      "path": "evidencias/C041/errors.jsonl",
+      "bytes": 3443,
+      "sha256": "954846ad3570173417da9f186b086906cd870e621767347b3d7d611dd1bb2a4a",
+      "git_blob_sha": "8747e543c6d4ce2dab9dbf85b7c0dd49ae749ba4"
+    },
+    {
+      "path": "evidencias/C041/test-c041.cjs",
+      "bytes": 5303,
+      "sha256": "6f8bbe4472ee84f72ffd552ffeb8a667eb6a3b203eb738e78696598918e4e187",
+      "git_blob_sha": "b0359f5fb6c20f95c549fdf4b1540e85e865b8ff"
+    },
+    {
+      "path": "evidencias/C041/test-mode-c041.cjs",
+      "bytes": 1929,
+      "sha256": "0b11508d3f09a11649926deb2717a4dab88b85200f152591314a297d6c3e3dfe",
+      "git_blob_sha": "b4c18aad0f8c0f4d365cbc545911082dbe59bcb6"
+    },
+    {
+      "path": "originales/C041-instrucciones-visibles.txt",
+      "bytes": 1165,
+      "sha256": "be623f09f2601cd6f5d0c890166ef96435f879e1f49ea7b03e04bddad0ed27da",
+      "git_blob_sha": "d0581c20ad612c1f4b16865387426955e3ebe1a8"
+    },
+    {
+      "path": "originales/C041-salidas-visibles.txt",
+      "bytes": 907,
+      "sha256": "118f8bc3dd774a908ad58b155baf8bd60444f5d228c002dd4b249c496fffa26f",
+      "git_blob_sha": "f8a4d3a146cc7319be3eeadaaa09f56b3b766942"
     }
   ],
   "runtime_references": [
@@ -1177,12 +1249,18 @@
     "no_secret_values_in_manifest": true
   },
   "current_preparation": {
-    "base": "cdc74b3fdaf33487435c34462cc016dd2e3092b2",
+    "base": "eda718288fa61bf4df016751d46631fa8e71054a",
+    "production": false,
     "publication": false,
-    "build": "pending actual CI result",
-    "candidate": "C040 worked proposal + Meta readback patch"
+    "fullBuild": "requested through versioned config, pending",
+    "counts": {
+      "server": 39,
+      "mode": 26,
+      "chromium": 24
+    },
+    "clipRead": false
   },
-  "latestEvent": "C040 continuation actual Central3fd5/BLOG3fe5 and operator8min",
+  "latestEvent": "C041 preview C040 verified; current dual live-prefix tests; user leaving/RDC timeout; Meta not provided",
   "latest_verified_release": {
     "event": "C038",
     "state": "READY",
@@ -1229,8 +1307,8 @@
     "rollbackDeploymentId": "dpl_12FCcmkeXDBbLRqoi6eyd5gqKVKK",
     "summaryImplemented": false
   },
-  "latest_cycle": "C040",
-  "canonical_version": "0.6.26",
+  "latest_cycle": "C041",
+  "canonical_version": "0.6.27",
   "latest_candidate": {
     "branch": "feat/ingreso-autobiografico-20261019",
     "production": true,
@@ -1480,6 +1558,15 @@
         "bytes": 254016,
         "sha256": "6c20786b81d253cd2885bd8a55f70e4b5e1bc5b926b19241cffe601b75368a14",
         "git_blob_sha": "e078eee5da71f4683eb19bf0c91c224c68e09e47"
+      }
+    },
+    {
+      "event": "C041",
+      "previous": {
+        "path": "OBJETO-CANONICO.md",
+        "bytes": 260606,
+        "sha256": "9efb259f6595a39a69b1e47f24f924e60d65bd410e98631fec675b3241840107",
+        "git_blob_sha": "1f619a407ff13fba4fc2309048612107fd4e004e"
       }
     }
   ],

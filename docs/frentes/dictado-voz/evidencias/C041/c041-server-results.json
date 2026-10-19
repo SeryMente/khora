@@ -1,0 +1,4 @@
+{
+  "checks": 39,
+  "scope": "real audio loader, real route, transcriber ordering; synthetic DB/blob/auth/HTTP; no capture or provider account"
+}
