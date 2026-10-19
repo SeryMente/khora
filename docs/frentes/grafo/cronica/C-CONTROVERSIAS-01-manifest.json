@@ -1,0 +1,33 @@
+{
+  "cycle": "C-CONTROVERSIAS-01",
+  "base_commit": "b0f4956a4290625fe1b770e3edd0f6b61b70b768",
+  "object": "GRAFO-v16",
+  "method": "METACANON-OBJETOS-v1.6; reread; unchanged",
+  "criterion": "1.4; unchanged",
+  "source": "current direct user message; literal; no invented event/time",
+  "private_verified_result": 1351,
+  "intermediate_assistant_messages": 0,
+  "files": {
+    "docs/frentes/grafo/OBJETO.md": {
+      "bytes": 38759,
+      "sha256": "168aeefb5ae64c2cb2d567e9c0781dd9a3012f2dccb3906ffe4ff37d5d08360c",
+      "git_blob_sha1": "4b67d370150ab88d29b61b9861a71788613f9f1d"
+    },
+    "docs/frentes/grafo/originales/C-CONTROVERSIAS-01-operador.txt": {
+      "bytes": 1204,
+      "sha256": "6c3862e080e89545c5f99deb4bf51a8d635f1bda77ee60640ef35572c482fcd7",
+      "git_blob_sha1": "aa0d266dca3706ef59040b030b32c957fa817e41"
+    },
+    "docs/frentes/grafo/cronica/C-CONTROVERSIAS-01-salida.md": {
+      "bytes": 3322,
+      "sha256": "10e7db575bf235698f3a2f72f11adc115806e600ddda8b6b043e6a0a2828ce2e",
+      "git_blob_sha1": "753511f3d05c05737be962c37c052ec0c463e310"
+    },
+    "docs/frentes/grafo/cronica/C-CONTROVERSIAS-01.md": {
+      "bytes": 3750,
+      "sha256": "22aef0c2c9e29f17727237ab04ed88a2db6a75940fb8ae77cf20b833e6e1426f",
+      "git_blob_sha1": "eeacbde1f2249cea65a56b48436513d99856dd77"
+    }
+  },
+  "verification": "Read immutable commit and compare blobs before emitting prepared exact final. No product proof or automatic resolution of controversies."
+}
