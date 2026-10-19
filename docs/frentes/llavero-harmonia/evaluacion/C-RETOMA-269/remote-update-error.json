@@ -1,0 +1,9 @@
+{
+  "operation": "GitHub update PR319 branch, expected head 5b967d73132a038f6c4a80203c5066c23629a231",
+  "symptomVerbatim": "failed to update pull request branch: merge conflict between base and head",
+  "impact": "code/evidence commit persisted; branch was not updated with main; no main merge or deployment",
+  "correction": "Sort dependency keys to preserve main layout and insert vault dependencies independently; refresh existing integrity hash",
+  "verification": "Reconstructed exact candidate merged locally with verified main without conflicts; dependency versions and scripts unchanged",
+  "cause": "ffmpeg-static was relocated by main while new vault dependencies appended to same historical tail; values correct but overlapping textual hunk",
+  "prevention": "Run merge-tree against main on exact published payload before remote branch update"
+}

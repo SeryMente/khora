@@ -30,6 +30,7 @@
     "@types/pg": "^8.20.0",
     "@vercel/blob": "^2.6.1",
     "@xyflow/react": "^12.11.2",
+    "age-encryption": "0.3.1",
     "dagre": "^0.8.5",
     "dexie": "^4.4.3",
     "ffmpeg-static": "^5.3.0",
@@ -40,13 +41,12 @@
     "neo4j-driver": "^6.2.0",
     "next": "^16.2.10",
     "next-auth": "^5.0.0-beta.32",
+    "otplib": "13.5.0",
     "pg": "^8.22.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "uuid": "^11.1.1",
-    "zod": "^4.4.3",
-    "otplib": "13.5.0",
-    "age-encryption": "0.3.1"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@playwright/test": "^1.61.1",
