@@ -26,6 +26,19 @@ export async function POST(req:Request){
   try{const repo=blogRepository();await repo.decline(actor,body.publicationId,body.digest);return NextResponse.json(await repo.status(actor,body.publicationId));}
   catch{return NextResponse.json({code:'DECLINE_NOT_RECORDED'},{status:409});}
  }
+ // Preparation is owner-authenticated, source-verified and NEVER publishes or calls a provider.
+ // Normative unavailability still blocks positive consent and dispatch, not editorial work.
+ if(body.action==='prepare'){
+  try{
+   const r=body.revision as Revision,digest=revisionHash(r);
+   await blogRepository().save(actor,r,body.expectedRevision??null);
+   return NextResponse.json({representation:'text_only',audioPublic:false,
+    metadata:{state:'pending',code:'METADATA_NOT_REQUESTED'},publicationId:r.publicationId,
+    revision:r.revision,digest,preview:r.entry,facebook:r.facebook,
+    question:'¿Quieres que esta entrada se publique en el blog y en la Página de Facebook?',
+    destinations:['blog','facebook']},{headers:{'Cache-Control':'no-store'}});
+  }catch(e){const code=e instanceof Error&&/^[A-Z_]+$/.test(e.message)?e.message:'EDITORIAL_PREPARATION_FAILED';return NextResponse.json({code},{status:409});}
+ }
  // Explicit operator authorization: text-only for this cut; audio remains private.
  if(body.action==='open_turn'){
   try{
@@ -41,12 +54,6 @@ export async function POST(req:Request){
  try{
   const repo=blogRepository();
   if(body.action==='resume')return NextResponse.json(await repo.resume(actor,body.publicationId),{headers:{'Cache-Control':'no-store'}});
-  if(body.action==='prepare'){
-   const r=body.revision as Revision;const digest=revisionHash(r);
-   await repo.save(actor,r,body.expectedRevision??null);
-   let metadata:any;try{metadata={state:'proposed',result:await repo.extractMetadata(actor,r.publicationId,process.env.GROQ_API_KEY||'')};}catch{metadata={state:'pending',code:'METADATA_NOT_EXTRACTED'};}
-   return NextResponse.json({representation:'text_only',audioPublic:false,metadata,publicationId:r.publicationId,revision:r.revision,digest,preview:r.entry,facebook:r.facebook,question:'¿Quieres que esta entrada se publique en el blog y en la Página de Facebook?',destinations:['blog','facebook']});
-  }
   if(body.action==='decide'&&typeof body.decision==='boolean'){
    if(body.decision)await repo.approveExact(actor,body.publicationId,body.digest,body.obfuscatedExposure===true);
    else await repo.decline(actor,body.publicationId,body.digest);

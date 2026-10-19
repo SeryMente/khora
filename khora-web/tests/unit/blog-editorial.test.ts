@@ -1,21 +1,26 @@
+import {editorialReviewPayload} from '../../lib/blog/editorial-review';
+function reviewed(r:Revision):Revision {
+ r.editorialReview={schema:1,policy:'cronica-suficiente-v1',reviewedPayloadHash:hash(canonical(editorialReviewPayload(r))),worked:true,soberFirstPerson:true,faithful:true,
+ items:[{id:'when',sourceQuote:'Ayer',publicQuote:'Ayer'},{id:'where',sourceQuote:'casa',publicQuote:'casa'},{id:'what',sourceQuote:'caminé',publicQuote:'caminé'}]};return r;
+}
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {hash,approve,publishable,revisionHash,checkProposals,publicEntry,retention,maySendFacebook,type Source,type Revision} from '../../lib/server/blog/domain';
+import {hash,canonical,approve,publishable,revisionHash,checkProposals,publicEntry,retention,maySendFacebook,type Source,type Revision} from '../../lib/server/blog/domain';
 import {proposeMetadata} from '../../lib/server/blog/metadata';
 import {deliver,type DeliveryStore} from '../../lib/server/blog/delivery';
 import {GitHubBlog,MetaPage,discoverPage} from '../../lib/server/blog/providers';
-const source:Source={id:'private-source',version:1,sha256:hash('Ayer caminé. Sentí calma.'),text:'Ayer caminé. Sentí calma.',owner:'owner',receivedAt:'2026-10-19T02:00:00Z',capturedAt:null,kind:'blog_personal',obfuscated:false};
-function fixture():Revision{return {publicationId:'11111111-1111-4111-8111-111111111111',revision:1,sourceId:source.id,sourceVersion:1,sourceHash:source.sha256,kind:'blog_personal',obfuscated:false,entry:{schema:1,slug:'prueba-local',title:'Prueba sintética privada',date:'2026-10-18T20:00:00-06:00',body:'No se publica.',source:{kind:'khora',sha256:hash('No se publica.')}},facebook:{format:'link',message:'Texto aprobado sintético'}};}
+const source:Source={id:'private-source',version:1,sha256:hash('Ayer caminé. Sentí calma. En casa.'),text:'Ayer caminé. Sentí calma. En casa.',owner:'owner',receivedAt:'2026-10-19T02:00:00Z',capturedAt:null,kind:'blog_personal',obfuscated:false};
+function fixture():Revision{return reviewed({publicationId:'11111111-1111-4111-8111-111111111111',revision:1,sourceId:source.id,sourceVersion:1,sourceHash:source.sha256,kind:'blog_personal',obfuscated:false,entry:{schema:1,slug:'prueba-local',title:'Prueba sintética privada',date:'2026-10-18T20:00:00-06:00',body:'Ayer caminé en casa. Sentí calma.',source:{kind:'khora',sha256:hash('Ayer caminé en casa. Sentí calma.')}},facebook:{format:'link',message:'Texto aprobado sintético'}});}
 const now='2026-10-19T02:00:00Z';
 test('exact version approves, private identifiers never projected',()=>{const r=fixture();const entry=publishable(r,approve(r,'owner',source,now),'owner',source);assert(!JSON.stringify(entry).includes(source.id));assert.equal(entry.source.sha256,hash(entry.body));});
 test('unauthorized actor rejected',()=>assert.throws(()=>approve(fixture(),'other',source,now),/FORBIDDEN/));
 test('missing approval rejected',()=>assert.throws(()=>publishable(fixture(),null,'owner',source),/APPROVAL/));
-test('editing body invalidates exact approval',()=>{const r=fixture(),a=approve(r,'owner',source,now);r.entry.body='Otro texto';r.entry.source.sha256=hash(r.entry.body);assert.throws(()=>publishable(r,a,'owner',source),/APPROVAL/);});
-test('editing Facebook format invalidates approval',()=>{const r=fixture(),a=approve(r,'owner',source,now);r.facebook={format:'full_text',message:'Distinto'};assert.throws(()=>publishable(r,a,'owner',source),/APPROVAL/);});
+test('editing body invalidates exact approval',()=>{const r=fixture(),a=approve(r,'owner',source,now);r.entry.body='Otro texto';r.entry.source.sha256=hash(r.entry.body);assert.throws(()=>publishable(r,a,'owner',source),/APPROVAL|EDITORIAL/);});
+test('editing Facebook format invalidates approval',()=>{const r=fixture(),a=approve(r,'owner',source,now);r.facebook={format:'full_text',message:'Distinto'};assert.throws(()=>publishable(r,a,'owner',source),/APPROVAL|EDITORIAL/);});
 test('source version change rejected',()=>{const r=fixture(),a=approve(r,'owner',source,now);assert.throws(()=>publishable(r,a,'owner',{...source,version:2}),/VERSION/);});
 for(const kind of ['conversacion_maya','interpretacion_simultanea'] as const)test('exclude '+kind,()=>assert.throws(()=>approve({...fixture(),kind},'owner',source,now),/ELIGIBLE/));
 test('three independent decisions',()=>{assert.equal(retention('conversacion_maya').graphEligible,true);assert.equal(retention('conversacion_maya').publicConsent,false);assert.equal(retention('interpretacion_simultanea').graphEligible,false);});
-test('obfuscation needs explicit decision, flag not exported',()=>{const r={...fixture(),obfuscated:true};assert.throws(()=>approve(r,'owner',{...source,obfuscated:true},now),/OBFUSCATED/);const e=publishable(r,approve(r,'owner',{...source,obfuscated:true},now,true),'owner',{...source,obfuscated:true});assert(!('obfuscated'in e));});
+test('obfuscation needs explicit decision, flag not exported',()=>{const r=reviewed({...fixture(),obfuscated:true});assert.throws(()=>approve(r,'owner',{...source,obfuscated:true},now),/OBFUSCATED/);const e=publishable(r,approve(r,'owner',{...source,obfuscated:true},now,true),'owner',{...source,obfuscated:true});assert(!('obfuscated'in e));});
 test('reject extra private fields',()=>assert.throws(()=>publicEntry({...fixture().entry,obfuscated:true} as any),/FIELDS/));
 test('reject ambiguous public date',()=>assert.throws(()=>publicEntry({...fixture().entry,date:'ayer'}),/TIME/));
 test('source hash integrity',()=>assert.throws(()=>approve(fixture(),'owner',{...source,text:'alterado'},now),/INTEGRITY/));

@@ -1,3 +1,4 @@
+import {assertEditorialReview,editorialReviewPayload} from '../../blog/editorial-review';
 import {proposeMetadata} from './metadata';
 import { hash, canonical, publishable, approve, revisionCheck, type Source, type Revision, type Approval } from './domain';
 type Result={rows:any[];rowCount?:number|null};
@@ -28,6 +29,7 @@ export class BlogRepository {
     await this.transaction(async c=>{
       const source=await this.source(c,actor,r.sourceId,r.sourceVersion);
       if(source.sha256!==r.sourceHash)throw new Error('SOURCE_INTEGRITY');
+      assertEditorialReview(r,hash(canonical(editorialReviewPayload(r))),source.text);
       if(source.obfuscated!==r.obfuscated)throw new Error('SOURCE_FLAGS_CHANGED');
       const current=await c.query('SELECT * FROM blog_editorial WHERE id=$1 FOR UPDATE',[r.publicationId]);
       if(current.rows.length){

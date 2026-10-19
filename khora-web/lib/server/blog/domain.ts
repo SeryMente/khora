@@ -1,3 +1,4 @@
+import {assertEditorialReview,editorialReviewPayload,type EditorialReview} from '../../blog/editorial-review';
 import {assertPagesTextCompatible} from '../../blog/transcript-preparation';
 import { createHash } from 'node:crypto';
 export type EntryKind = 'blog_personal' | 'conversacion_maya' | 'interpretacion_simultanea' | 'general';
@@ -7,7 +8,7 @@ export type Proposal = { field: string; value: string; anchor: Anchor; status: '
 export const metadataFields = ['event_time', 'time_precision', 'person', 'place', 'context', 'claim_kind', 'attribution', 'knowledge_origin', 'emotion', 'meaning', 'correction', 'episode_relation', 'uncertainty'] as const;
 export type PublicEntry = { schema: 1; slug: string; title: string; date: string; body: string; source: {kind: 'khora'; sha256: string} };
 export type FacebookChoice = { format: 'link'; message: string } | { format: 'full_text'; message: string };
-export type Revision = { publicationId: string; revision: number; sourceId: string; sourceVersion: number; sourceHash: string; kind: EntryKind; obfuscated: boolean; entry: PublicEntry; facebook: FacebookChoice };
+export type Revision = { publicationId: string; revision: number; sourceId: string; sourceVersion: number; sourceHash: string; kind: EntryKind; obfuscated: boolean; entry: PublicEntry; facebook: FacebookChoice; editorialReview?:EditorialReview };
 export type Approval = { digest: string; actor: string; approvedAt: string; obfuscatedExposure: boolean };
 export function fail(code: string): never { throw new Error(code); }
 export function hash(text: string): string { return createHash('sha256').update(text, 'utf8').digest('hex'); }
@@ -52,10 +53,12 @@ export function revisionCheck(r: Revision): void {
   if (!f || !['link','full_text'].includes(f.format)) fail('FACEBOOK_FORMAT_REQUIRED');
   if (typeof f.message!=='string' || !f.message.trim() || f.message.length>60000) fail('FACEBOOK_TEXT_REQUIRED');
   if (Object.keys(f).sort().join(',') !== 'format,message') fail('FACEBOOK_FIELDS');
+  assertEditorialReview(r,hash(canonical(editorialReviewPayload(r))));
 }
 export function revisionHash(r: Revision): string { revisionCheck(r); return hash(canonical(r)); }
 export function approve(r: Revision, actor: string, source: Source, now: string, obfuscatedExposure=false): Approval {
   sourceCheck(source,actor); revisionCheck(r);
+  assertEditorialReview(r,hash(canonical(editorialReviewPayload(r))),source.text);
   if(r.sourceId!==source.id || r.sourceVersion!==source.version || r.sourceHash!==source.sha256) fail('SOURCE_VERSION_CHANGED');
   if(r.obfuscated!==source.obfuscated)fail('SOURCE_FLAGS_CHANGED');
   if(r.obfuscated && !obfuscatedExposure) fail('OBFUSCATED_EXPLICIT_DECISION_REQUIRED');
@@ -64,6 +67,7 @@ export function approve(r: Revision, actor: string, source: Source, now: string,
 }
 export function publishable(r: Revision,a: Approval|null,actor: string,s: Source): PublicEntry {
   sourceCheck(s,actor);
+  revisionCheck(r);assertEditorialReview(r,hash(canonical(editorialReviewPayload(r))),s.text);
   if(r.obfuscated!==s.obfuscated)fail('SOURCE_FLAGS_CHANGED');
   if(!a || a.actor!==actor || a.digest!==revisionHash(r) || r.obfuscated&&!a.obfuscatedExposure) fail('APPROVAL_REQUIRED');
   if(r.sourceId!==s.id || r.sourceVersion!==s.version || r.sourceHash!==s.sha256) fail('SOURCE_VERSION_CHANGED');
