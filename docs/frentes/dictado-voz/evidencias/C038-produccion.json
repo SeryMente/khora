@@ -1,0 +1,19 @@
+{
+  "event": "C038",
+  "state": "READY",
+  "target": "production",
+  "sourceCommit": "a74b40582cb0dfd762209a69675e469914a380ec",
+  "canonicalCommit": "a74b40582cb0dfd762209a69675e469914a380ec",
+  "branch": "feat/ingreso-autobiografico-20261019",
+  "deploymentId": "dpl_86iMKAAGQoQEE1zXHfsinuoeKWDb",
+  "alias": "khora-web.vercel.app",
+  "url": "https://khora-web.vercel.app/sistema/ingreso",
+  "observedAt": "2026-10-19T21:28:13.895Z",
+  "technicalPublicationVerified": true,
+  "authenticatedApplicationVerified": false,
+  "physicalAcceptance": false,
+  "editorialPublication": false,
+  "mergedToMain": false,
+  "rollbackDeploymentId": "dpl_12FCcmkeXDBbLRqoi6eyd5gqKVKK",
+  "summaryImplemented": false
+}

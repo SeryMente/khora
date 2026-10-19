@@ -1,0 +1,44 @@
+{
+  "sourceCommit": "a74b40582cb0dfd762209a69675e469914a380ec",
+  "blogIntegration": {
+    "commit": "95b374c5bfc44d2900ea73c47c0f43fc3401f4c0",
+    "files": 2,
+    "moduleBlob": "0419271026a301b4d6bc64a847dcc23369ca5bc6",
+    "testBlob": "6ae11f6e5c69efad8ee29161c0b815b4bf9fa464",
+    "entireBranchIntegrated": false
+  },
+  "runtimeReadback": {
+    "sixRuntimeBlobsMatched": true,
+    "unitTestBlobMatched": true
+  },
+  "workspaceDiff": "one display-only textoProvisional:parcial property; no capture/archive/consent mutation",
+  "tests": {
+    "unitCurrent": 66,
+    "skipped": 0,
+    "chromiumCurrent": 31,
+    "pageErrors": 0,
+    "typescript": "5.9.3",
+    "focalDiagnostics": 0,
+    "fullRepositoryTypecheck": false,
+    "physicalMicrophone": false,
+    "authenticatedApplication": false
+  },
+  "visualInspection": {
+    "mobileInitial": "pass; start visible without scrolling; no horizontal overflow",
+    "mobileDuring": "pass; covered cues removed, capture action unchanged",
+    "mobilePartial": "pass; only two pending cues remain with quiet mention count",
+    "mobileHelp": "pass; touch/keyboard-triggered help scrolls inside its own box, Escape closes",
+    "desktopDark": "pass; clean hierarchy and generous writing space",
+    "desktopLight": "pass; no overlap or overflow, active private mark visible"
+  },
+  "semanticLimits": [
+    "local lexical mention detection, not general semantic understanding or truth verification",
+    "some wording and lowercase unknown places remain undetected",
+    "no obligations, exact location, minimum narrative length, forensic standard or editorial approval added"
+  ],
+  "sources": {
+    "U01": "https://github.com/SeryMente/metodologia/blob/482725063fa47e60186027e9abe55986affca680/frentes/blog-personal/originales/U01-necesidad.txt",
+    "U03": "normalized handoff, not original transcript; same commit originales/U03-ampliacion-normalizada.txt"
+  },
+  "deferred": "Groq summary and uniform public length not implemented"
+}

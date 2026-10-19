@@ -3,9 +3,9 @@
 ## 1. Control e identidad
 
 - Identidad conservada: `MCP-OBS-DICTADO`; extensión documental de dictado, benchmark, retroalimentación y propuesta de voz/síntomas.
-- Versión: **v0.6.23**; sello **MCP-OBS-DICTADO-v0.6.23**. Objeto permanente por encargo V010; no declara permanente ninguna propuesta clínica.
-- Estado: **CANÓNICO PARA EL FRENTE · C037 INTERFAZ EN PRODUCCIÓN CANÓNICA · REVISIÓN HUMANA PENDIENTE · PUBLICACIÓN EDITORIAL NO ACREDITADA**.
-- Ancla actual: C037, corrección explícita del operador: preview no sirve como entrega; publicar dominio canónico, entregar URL primero y documentar después. Producción verificada de ad685dee; revisión dentro de sesión del operador pendiente.
+- Versión: **v0.6.24**; sello **MCP-OBS-DICTADO-v0.6.24**. Objeto permanente por encargo V010; no declara permanente ninguna propuesta clínica.
+- Estado: **CANÓNICO PARA EL FRENTE · C038 CRÓNICA PERSONAL CÓMODA EN PRODUCCIÓN · REVISIÓN HUMANA PENDIENTE · PUBLICACIÓN EDITORIAL NO ACREDITADA**.
+- Ancla actual: C038, orden directa de comodidad y crónica mínima pública: nombre corto, ayuda oculta, dictado inmediato y pistas que desaparecen al detectar menciones en vivo. Producción canónica de a74b4058 verificada; aceptación humana pendiente.
 - Repositorio propietario: `SeryMente/khora`, privado comprobado con herramienta en este ciclo. `SeryMente/metodologia` también privado: aporta el método, no recibe datos del frente.
 - Carpeta contenedora: `docs/frentes/dictado-voz/`; elemento único de estado: `OBJETO-CANONICO.md`. Carpeta y elemento no se confunden.
 - Revisión de origen del objeto: `1697ee2693ed3217523ffc1d1be9b6541d7d849d`, blob `e98a956c375ce48b791b5f0563ad0ae03c2616dd`.
@@ -13,6 +13,8 @@
 - Recuperación: README del repo → esta carpeta → este objeto. Contrato técnico y originales son anexos de custodia, no otra fuente de estado.
 
 ## 2. LEER PRIMERO
+
+**ACTUAL C038 PREVALECE SOBRE C037/C036:** «Crónica personal», dictado a la vista, ayuda oculta accesible a toque/teclado y tres pistas opcionales —momento, lugar amplio y qué haces— que desaparecen por menciones del relato y reaparecen al borrar. Análisis local léxico, no comprensión semántica general, verificación de verdad ni estándar forense. Producción canónica https://khora-web.vercel.app/sistema/ingreso sirve a74b40582cb0dfd762209a69675e469914a380ec, despliegue dpl_86iMKAAGQoQEE1zXHfsinuoeKWDb READY. Sin formulario, obligación de cubrir pistas, límite de relato o autorización editorial nuevos. Originales C038 conservados. ResumenGroq y extensión pública uniforme siguen diferidos.
 
 **ACTUAL C037 PREVALECE SOBRE C036:** https://khora-web.vercel.app/sistema/ingreso sirve ya la revisión ad685dee36c0f0ae1f6f4717439ccb7c39c90c35 en producción, despliegue dpl_12FCcmkeXDBbLRqoi6eyd5gqKVKK READY. La entrega preview C036 fue insuficiente y el operador reportó error de servidor. No se diagnosticó su causa sin logs. Comprobaciones actuales: versión pública coincide, sesión sin autenticar responde200null, Ingreso conduce al acceso normal sin mensaje de configuración. No equivale a prueba dentro de sesión, micrófono o aceptación humana. URL entregada antes de documentación. Resumen/extensión uniforme siguen diferidos.
 
@@ -67,7 +69,7 @@ Delta adquirido: carpeta canónica, trece bloques ordenados, originales separado
 
 **De dónde viene:** defecto de continuidad al editar y seguir dictando; corrección original reportada satisfactoria por el operador en V000. Evoluciona a evaluar utilidad, fluidez y experiencia agradable, no solo contar errores.
 
-**Dónde está ahora:** C037 interfaz del molde suficiente publicada y verificada en dominio canónico de producción, revisión humana dentro de sesión pendiente; estado único detallado en §8. Publicación editorial no acreditada. C036 y cortes anteriores son antecedentes, no estado actual.
+**Dónde está ahora:** C038 Crónica personal cómoda publicada en dominio canónico, con ayuda oculta y pistas locales en vivo; revisión humana dentro de sesión pendiente. Estado único en §8. C037/C036 son antecedentes, no estado actual.
 
 **A dónde va:** terminar la validación real consentida y completar cobertura técnica. V009 abre una intención adicional de voz y síntomas: se documenta, no se disfraza de capacidad ya creada.
 
@@ -163,18 +165,18 @@ Autenticación C025: dos flujos estándar por dispositivo, autorizados en navega
 
 ### 🔄 Estado vivo
 
-C037 · INTERFAZ PUBLICADA EN PRODUCCIÓN CANÓNICA POR ORDEN EXPLÍCITA. URL entregada primero: https://khora-web.vercel.app/sistema/ingreso. Dominio canónico apunta a dpl_12FCcmkeXDBbLRqoi6eyd5gqKVKK READY/targetproduction, revisión ad685dee36c0f0ae1f6f4717439ccb7c39c90c35, rama feat/ingreso-autobiografico-20261019. Misma implementación funcional22f0fea del molde de cinco guías opcionales, sin mínimos obligatorios, sin recortar relato ni inventar faltantes; archivo manual/recibo/consumidor conservados. No merge a main, ni aprobación editorial, ni nueva implementación de resumen. Central conserva integración/Ingreso/luces/custodia/recuperación/títulos; Blog2 congelado y alcance propio vigente. No reiniciar ni emitir handoff.
-Verificación actual: consultaVercel por dominio confirma revisión/alias/READY, /api/version200production y commit exacto; /api/auth/session200null sin autenticar; /sistema/ingreso200 tras redirección normal a /auth/signin, sin mensaje de configuración. No prueba la sesión privada del operador. Siguiente paso: operador abre dominio canónico, inicia sesión y revisa interfaz básica. Documentación se sincroniza después de la URL. Si vuelve el error, capturar frontera exacta/correlación sin atribuir causa aún no vista.
-Versión SIGUIENTE, solo preparada documentalmente: resumenGroq de entradas largas para extensión pública uniforme GitHub/Facebook, conservando original libre íntegro. Falta acordar unidad/longitud objetivo, criterio de fidelidad/atribución/incertidumbre y previa exacta; no añadir límite/modelo ni implementación ahora. Credencial normativa401, identidad/configuraciónMeta y aprobación exacta de nota siguen separadas; publicarVercel no autoriza publicar nota. Luces/recuperación/títulos y recordatorios históricos conservados.
+C038 · CRÓNICA PERSONAL CÓMODA PUBLICADA EN PRODUCCIÓN CANÓNICA. https://khora-web.vercel.app/sistema/ingreso, revisión a74b40582cb0dfd762209a69675e469914a380ec, rama feat/ingreso-autobiografico-20261019; despliegue dpl_86iMKAAGQoQEE1zXHfsinuoeKWDb READY/production/alias canónico. Nombre simplificado, Iniciar dictado inmediato y explicación bajo ayuda nativa accesible con toque, teclado y Escape. Momento/Lugar/Qué haces se retiran según menciones detectadas en texto estable y parcial de voz y reaparecen al eliminar; pistas opcionales, no gate de archivo/publicación ni prueba de verdad/identidad. Original libre, archivo manual, recibo/consumidor y revisión exacta conjunta intactos. No merge a main ni publicación de nota.
+Coordinación ejecutada con Blog2 existente: entrega final95b374c5 con SOLO módulo puro cronica-coverage.ts y test; siete blobs de integración cotejados en central, sin integrar rama completa ni testbrowser previo. Central único escritor UI/captura/despliegue; Blog v13/C-BLOG-010 propio. Fuentes U01 recuperada literal y U03 normalizada se contrastaron: constancia cotidiana/representación propia y relato incompleto conservable; no se inventa requisito político adicional o identificación legal. Este hito NO define la línea autobiográfica forense.
+Siguiente paso: operador abre producción, selecciona Crónica personal y prueba comodidad/dictado con sesión real. La detección por expresiones locales puede pasar por alto giros o lugares desconocidos: no forzar al autor ni convertir pendiente en ausencia. Versión siguiente conserva resumenGroq/extensión pública uniforme sin implementación; decisiones de longitud/unidad/fidelidad/atribución/previa pendientes. Compuertas editoriales normativas401/Meta/nota exacta siguen separadas y no se reintentaron por este hito. Luces/custodia/recuperación/títulos y recordatorios históricos conservados.
 
 ### ⚗️ En prueba / recién fallido
 
-C037: producciónREADY de ad685dee, alias canónico y versión pública exacta comprobados. Build usa configuración existente y migraciones aditivas idempotentes en producción; sin cambios de auth/protección/planes/secretos. Ingreso sin sesión lleva a acceso normal; aceptación humana y recorrido autenticado NO VERIFICADOS. Reporte de servidor del operador conservado; causa de preview no determinada, no inferir secreto faltante sin logs.
-Evidencia C036 se conserva como histórica, no reejecutada en C037: TypeScript focal1→0;23/23unit;12/12ChromiumUI con callbacks sintéticos;20/20consumidor reportados por Blog. No equivalen a micrófono real, sesión/archivo productivos ni publicación editorial. Rollback técnico identificado: dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr/f0dfbdcb2d79eb6289dacba272ddcc7ba2023063; no ejecutado.
+C038:66/66unit actuales sin skip (43analizador+23regresióneditorial);31/31Chromium con componentes/CSS reales, callbacks/estado sintéticos y red solo localhost; cero errores de página. TypeScript5.9.3 ES2017/Bundler estricto focal UI/analizador/test cero diagnósticos; no chequeo local global. Seis capturas desktop/móvil, claro/oscuro, ayuda/pendientes/dictado inspeccionadas: sin desbordamiento, botón inicial visible móvil, relato largo intacto e incompleto archivable. No micrófono físico ni sesión/auth/DB/editorial productivos.
+Producción Nextbuild remoto READY del SHA exacto, alias y /api/version200production coinciden; /api/auth/session200null y /sistema/ingreso llega al acceso normal200 sin error de configuración. No aceptación humana ni garantía de reconocimiento semántico general. Fallos de arnés JSX y dependencia de copia parcial registrados/corregidos antes de escribir; no defectos productivos atribuidos. Rollback disponible al release anterior dpl_12FCcmkeXDBbLRqoi6eyd5gqKVKK/ad685dee; no ejecutado.
 
 ### 🔔 Recordatorios latentes
 
-- C037: requisito de publicar interfaz en dominio canónico satisfecho técnicamente; revisión humana dentro de sesión sigue pendiente. ResumenGroq/extensión pública uniforme son próxima versión, no implementarlos por asociación ni truncar original.
+- C038: publicación de Crónica personal cómoda en dominio canónico satisfecha técnicamente; revisión humana de comodidad y dictado real pendiente. No confundir tres pistas léxicas opcionales con suficiencia forense/verdad. ResumenGroq/extensión uniforme siguen próxima versión, sin truncar original.
 - C036: credencial normativa dedicada rechazada401; administrador debe revisarla sin chat/secretos; no reintento ni bypass. Meta/Página/token/identidad y nota exacta aprobada no acreditados.
 
 - No declarar cerrado el sprint por compilación, prueba controlada, HTTP 200 o archivo guardado.
@@ -266,6 +268,19 @@ Toda salida conserva diez campos, agrupables sin ocultarlos: (1) proyecto/rol/se
 No llamar «sin cambios» a una fuente inaccesible; no convertir calidad científica o clínica en semáforo por pruebas de software. Si no hay constructor nuevo asignado, decirlo y no inventar trabajo en segundo plano.
 
 ## 11. Crónica y fuentes
+
+### C038 — Crónica cómoda, ayuda escondida y pistas locales en vivo — 2026-10-19
+- Autoridad/originales: mensaje directo exige foco en crónica mínima pública, comodidad, nombre sencillo, sin guía visible, checklist que desaparece al dictar, coordinaciónBlog2 y hito en producción; segunda orden pide continuar hasta terminar. Ambos íntegros en originales/C038-comodidad-operador.txt; salidas visibles archivadas aparte. No permiso nuevo de nota/editorial/secretos ni estándar forense inventado.
+- Recuperación: metapromptv332/NX-332m y método1.6/blob8f9ad1 actuales, centralv0.6.23/blobbf2daf0 en cd80ca3a leídos. U01necesidad literal/blob323067f y U03normalizada/blobfbdb22e recuperados desde metodologia4827250, usados como antecedentes, no instrucciones nuevas. Propósito constancia/representación propia; contexto político no se convierte en afirmación corroborada ni exigencia de datos sensibles.
+- Diseño decidido dentro del encargo: nombre Crónica personal; ayuda oculta con details/summary accesible, no hover-only; botón de dictado visible en primer viewport móvil. Tres anclas orientativas de crónica pública: momento, lugar amplio y actividad/hecho propio. No dirección exacta, terceros, identificación legal, obligación, límite o campos nuevos. Lugar y actividad respetan relato incierto; el detector no completa vacíos.
+- Colaboración: sesiónBlog2 existente contactada; aportó dos archivos nuevos congelados en95b374c5. Módulo04192710 y test6ae11f6e cargados/cotejados e integrados literalmente, no rama completa. Central modificó exclusivamente UI/css y un campo de vista textoProvisional:parcial de IngresoWorkspace; ningún callback de captura/archivo/recibo/consentimiento alterado. No reenvío/recaptura/dispatch nuevos.
+- Análisis: módulo local puro devuelve when/where/what, covered y evidencia literal; recalcula con cada cambio estable/provisional, excluye conservadoramente negaciones/incertidumbre/futuro/citas, sin red/reloj/modelo/ubicacióninferida/persistencia. No promete comprensión general ni ausencia de falsos resultados; ciertos giros o topónimos en minúsculas quedan pendientes intencionalmente. UI llama menciones, no validación de hechos.
+- Evidencia actual:43/43unit analizador reejecutadas con central,66/66con23regresiones editoriales;31/31Chromium actual realUI/React/CSS y datos/callbacks sintéticos, sin requests externos. TypeScript5.9.3focal0diagnósticos, no confundir con bancoBlog7.0.2 ni chequeoglobal. Móvil390 y desktop1280, seis screenshots inspeccionados. Borrado restaura pistas, interim no reescribe original, relato largo sin truncar, faltantes no bloqueanArchivar, ayuda por teclado/Escape y marcaofuscada conservadas.
+- Fallos/aprendizaje: arnés JSX omitía una llave de actions (Unexpected >); corregido en banco, no producto. Tipos focales fallaron por contrato transitivo ausente de copia parcial; recuperados contratos exactos y0diagnósticos sin aflojarstrict. Ambos registrados en registro separadoNotion antes de siguiente cirugía. Esbuild/transpilación no sustituyen tipos y build global.
+- Código/despliegue: central a74b40582cb0dfd762209a69675e469914a380ec; siete blobs runtime/test cotejados. Vercel targetproduction dpl_86iMKAAGQoQEE1zXHfsinuoeKWDb READY con configuración existente; dominio canónico y versión pública coinciden. No overrideauth/secrets/planes/protección ni mergePR330/main. ComprobacionesHTTP en evidencia; URL comunicada antes de documentación final.
+- Límites: build y pruebas controladas no acreditan micrófono/sesiónprivada/aceptación humana/editorial. Errorprevio C037 no diagnosticado retroactivamente. Normativa/Meta/notaaprobada siguen en su frontera; no inventar publicación ni reintentar401 como parte de UI. ResumenGroq/extensiónuniforme no implementados.
+- Persistencia/checkpoint: mismo Elemento v0.6.24 y manifiesto,13secciones y AnexoA byteidéntico, originales/evidencias/salidas presentes sin secretos ni razonamiento interno. Relectura por commit/blobs antes de afirmar sincronización. Operador revisa producción; siguienteversión preparada documentalmente, no handoff.
+
 
 ### C037 — Corrección de entrega y publicación en dominio canónico — 2026-10-19
 - Autoridad: operador rechaza preview, reporta Server error/configuración, exige URL canónica de producción y entregar enlace antes de documentación. Original literal en originales/C037-produccion-urgente.txt. Se reconoce cierre anterior incorrecto: READY no demostraba acceso de aplicación.
@@ -656,6 +671,8 @@ El expediente Git es portable; /data del hilo antiguo NO se supone compartido. R
 ````
 
 ## 13. Persistencia y revisión
+
+C038: mismo elemento permanente y carpeta existente, documentación después de URL productiva. Versión0.6.24 conserva13secciones, recordatorios, historiaAnexoA y originales; manifiesto incluye integración exacta de Blog y evidencia central. PrivacidadGit revalidada. Lectura remota/blobs requerida antes de afirmar cierre documental; revisión humana sigue pendiente.
 
 C037: mismo elemento permanente existente; revisión documental posterior a publicación/entrega de URL. C036 preservado como antecedente con su limitación y corrección explícita. Trece secciones, historia y recordatorios conservados; anexo byteidéntico, manifiesto con fuente literal/recibo/HTTP/salida visible. No runtime nuevo ni supuesto de aceptación.
 
