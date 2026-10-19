@@ -1,0 +1,14 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "Process started with PID 15124 (shell: powershell.exe)\nInitial output:\nGENERAL_GATE_SUMMARY\r\n    ok 4 - 4. Guardi�n duro: con output mutado (palabra cambiada/borrada), RECHAZA, no persiste y emite exactamente 1 evento FAIL\r\n# Subtest: Titulos Suite - PROMPT TIT-1A Engine Tests & Golden Cases\r\nok 420 - Titulos Suite - PROMPT TIT-1A Engine Tests & Golden Cases\r\n  duration_ms: 27.5489\r\n  duration_ms: 0.3548\r\n    # Subtest: 3. Fail-Closed Security: KHORA_UI_REVIEW_MODE=1 permite acceso, sin la variable responde 404\r\n    ok 3 - 3. Fail-Closed Security: KHORA_UI_REVIEW_MODE=1 permite acceso, sin la variable responde 404\r\n# tests 549\r\n# pass 549\r\n# fail 0\r\n[unit-runner] status=0 signal=null\r\nEXPERIENCE_STORAGE_PREFLIGHT=not_requested\r\nROUTE_SUMMARY\r\n> @khora/portable-vault-candidate@0.2.1 test:routes\r\n> node route-test.cjs\r\n\r\n{\"result\":\"PASSED_ROUTE_AND_DISTRIBUTION_FIXTURE\",\"passed\":14}\r\nWINDOWS_CORE_SUMMARY\r\n> node test.mjs && node bridge-test.mjs\r\n\r\n{\"result\":\"SAFE_STOP\",\"passed\":50,\"total\":50,\"failure\":\"cipher_permissions_unverified\"}\r\nCHECKPOINT_JSON\r\n{\n  \"scope\": \"isolated synthetic prebuild and routes only; no production migration or deployment\",\n  \"source\": \"81acf4cdac15ddbcca2151727754563887b8fff8\",\n  \"stages\": {\n    \"install-web\": {\n      \"exit\": 0,\n      \"error\": null,\n      \"signal\": null\n    },\n    \"prebuild\": {\n      \"exit\": 0,\n      \"error\": null,\n      \"signal\": null\n    },\n    \"routes\": {\n      \"exit\": 0,\n      \"error\": null,\n      \"signal\": null\n    }\n  }\n}\r\n\n✅ Process 15124 has finished execution"
+    },
+    {
+      "type": "text",
+      "text": "\n[executed on device: PC-14 (a960759c-7557-451d-936a-73aa791f5f58)]"
+    }
+  ],
+  "name": "start_process",
+  "moduleName": "Remote Desktop Commander"
+}

@@ -1,0 +1,90 @@
+{
+  "cycle": "C-SESION-20261019-a960759c",
+  "sourceCommit": "81acf4cdac15ddbcca2151727754563887b8fff8",
+  "checkpointSuperseded": "dfe9da47d16713153d301f5a73e01ba1253723f9",
+  "auth": {
+    "github": {
+      "status": "success",
+      "account": "1interprete1",
+      "khoraPrivatePush": true,
+      "metodologiaPrivate": true
+    },
+    "vercel": {
+      "status": "success",
+      "project": "khora-web",
+      "projectId": "prj_hRN86BKITXYKTnNlp0ygVhaMwFfx",
+      "scope": "victorhugotorresmendez-8991s-projects"
+    }
+  },
+  "tests": {
+    "node": "22.23.3",
+    "platform": "win32",
+    "installPortableExit": 0,
+    "syntaxExit": 0,
+    "coreExit": 1,
+    "coreFailure": "cipher_permissions_unverified",
+    "coreObservedChecksBeforeAbort": 50,
+    "coreSuiteComplete": false,
+    "bridgeRun": false,
+    "prebuildExit": 0,
+    "general": {
+      "total": 549,
+      "pass": 549,
+      "fail": 0
+    },
+    "routes": {
+      "passed": 14,
+      "syntheticAuthFixture": true
+    },
+    "nextBuildNew": false,
+    "hostedStorageTest": false
+  },
+  "aclDiagnosis": {
+    "ownerSid": "S-1-5-32-544",
+    "ownerEqualsCurrentUser": false,
+    "onlyTrustedAllowRulesObserved": true,
+    "probe": "own empty file",
+    "probeCleaned": true,
+    "productAclChanged": false,
+    "proposedFixApproved": false
+  },
+  "productionMetadata": {
+    "keysPresent": [
+      "AUTH_SECRET",
+      "OIDC_ISSUER_URL",
+      "OIDC_CLIENT_SECRET",
+      "OIDC_CLIENT_ID",
+      "DATABASE_URL"
+    ],
+    "portableVaultKeysPresent": false,
+    "valuesArchived": false
+  },
+  "productionChanged": false,
+  "realEnte": false,
+  "realSession": false,
+  "operatorKhoraEmail": "the.willfreeman@gmail.com",
+  "receiptEvents": [
+    274,
+    276,
+    286,
+    287,
+    295,
+    308,
+    314,
+    331,
+    342,
+    346
+  ],
+  "pending": "Explicit decision on creation of private new client files, then hosted schema/custody/recovery/real session acceptance",
+  "files": {
+    "docs/frentes/llavero-harmonia/OBJETO-CANONICO.md": "c3c3e5ed052b9eda5f529428aa903f9e0497e2a3",
+    "docs/frentes/llavero-harmonia/originales/C-SESION-20261019-a960759c-operador-sanitizado.txt": "0d0b8000a1fd61d15afb5ee6117e84dd27579bd4",
+    "docs/frentes/llavero-harmonia/originales/C-SESION-20261019-a960759c-salida.md": "9be9ef38272dcf0ebb38e5772b0170c3f69c5cb9",
+    "docs/frentes/llavero-harmonia/cronica/C-SESION-20261019-a960759c.md": "ade9376eba821f650bf05d18d95e917ee7a05333",
+    "docs/frentes/llavero-harmonia/evaluacion/C-SESION-20261019-a960759c/resume-windows.cjs": "f7b42a51d903612897534393e37df286364117ef",
+    "docs/frentes/llavero-harmonia/evaluacion/C-SESION-20261019-a960759c/recibos.json": "e05f0ef649edba670551432c808d135664984115",
+    "docs/frentes/llavero-harmonia/originales/C-SESION-20261019-a960759c-salida-preparada-no-emitida.md": "61ff50bf168c582d70e1cc29097dcc7e6e338b86",
+    "docs/frentes/llavero-harmonia/evaluacion/C-SESION-20261019-a960759c/receipt-gates-346.json": "6a9d644821cd3679a436985d01f2403dd27be028",
+    "docs/frentes/llavero-harmonia/evaluacion/C-SESION-20261019-a960759c/independent-gates.cjs": "58b9a98c5e77f716e6439260dec8593d2eb586d9"
+  }
+}
