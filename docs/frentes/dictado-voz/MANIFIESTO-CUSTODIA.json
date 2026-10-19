@@ -735,6 +735,18 @@
       "bytes": 1972,
       "sha256": "97a40d05675b379173bfaf075582c23ef9ee9dd1f06f3d394dcf871ddd128953",
       "git_blob_sha": "94ca9d5e53efb13852d3577a7a8ae8015d678ea3"
+    },
+    {
+      "path": "originales/C034-salida.md",
+      "bytes": 1450,
+      "sha256": "b1eea9c9cade101bc2f2a4db0adbca3add0f578c7b9cc6ccfcfd4645f3eb25f4",
+      "git_blob_sha": "0b84514e0dd5740f7fcd89cff20d452127e309a1"
+    },
+    {
+      "path": "evidencias/C034-public-readiness.json",
+      "bytes": 1669,
+      "sha256": "0111b7e906f37de10df31753ad7c582e44bd6d73a22b2fdfa80283cee957453c",
+      "git_blob_sha": "082a0b2bb0fb1e7e4278202358dfd176d8a3f655"
     }
   ],
   "runtime_references": [
@@ -1104,5 +1116,6 @@
     "omitted_values": 2,
     "omitted_occurrences": 4,
     "native_export_complete": false
-  }
+  },
+  "current_public_readiness": "evidencias/C034-public-readiness.json"
 }
