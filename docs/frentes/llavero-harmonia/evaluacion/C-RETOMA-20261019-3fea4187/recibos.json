@@ -1,0 +1,113 @@
+{
+  "cycle": "C-RETOMA-20261019-3fea4187",
+  "session": "3fea4187-8241-80f2-9d08-00a9b6435a14",
+  "sourceAttachment": {
+    "name": "pasted-text.txt",
+    "bytes": 42720,
+    "sha256": "3116fa119641e041351c6b9bfd67694d392fc909604ee4f7bc8baa6a0a6011c9",
+    "encoding": "UTF-8",
+    "crlf": 448,
+    "redactions": [
+      {
+        "line": 69,
+        "reason": "código histórico de autorización de dispositivo; no archivar secretos"
+      },
+      {
+        "line": 83,
+        "reason": "código histórico de autorización de dispositivo; no archivar secretos"
+      },
+      {
+        "line": 115,
+        "reason": "código histórico de autorización de dispositivo; no archivar secretos"
+      },
+      {
+        "line": 118,
+        "reason": "código histórico de autorización de dispositivo; no archivar secretos"
+      },
+      {
+        "line": 123,
+        "reason": "código histórico de autorización de dispositivo; no archivar secretos"
+      },
+      {
+        "line": 179,
+        "reason": "código histórico de autorización de dispositivo; no archivar secretos"
+      },
+      {
+        "line": 230,
+        "reason": "código histórico de autorización de dispositivo; no archivar secretos"
+      },
+      {
+        "line": 373,
+        "reason": "código histórico de autorización de dispositivo; no archivar secretos"
+      },
+      {
+        "line": 394,
+        "reason": "código histórico de autorización de dispositivo; no archivar secretos"
+      }
+    ],
+    "fullHistoricalConversationCertified": false
+  },
+  "acquired": {
+    "methodCommit": "a466b6b46f266de6a6ccd656e071eb7a07dc0e10",
+    "methodBlob": "8f9ad1cf0e09e5fcd7014190770a77294ff39af4",
+    "baseCommit": "edae3b762a4b7b404ae1405b01f8132cb13db6c0",
+    "baseObjectBlob": "cf236db1b1bfcbeb39d68f316b44fbacb311ecb3",
+    "repoPrivate": true,
+    "pullRequest": {
+      "number": 319,
+      "draft": true,
+      "merged": false,
+      "mergeable_state": "unstable",
+      "summaryOutdated": true
+    }
+  },
+  "toolReceiptsThisSession": {
+    "object": 47,
+    "method": 64,
+    "AGENTS": 53,
+    "PR": 76,
+    "privacy": 89,
+    "lastOutput": 75,
+    "linuxEvidence": 98,
+    "evidenceIndex": 99,
+    "taxonomy": 97
+  },
+  "execution": {
+    "remoteUsed": false,
+    "testsRerun": false,
+    "productionChanged": false,
+    "codeChanged": false
+  },
+  "checks": {
+    "orderedCoreSections": 13,
+    "initialReview": "targeted authority/freshness corrections; original history preserved",
+    "readback": "Required after push: compare each uploaded blob SHA and read canonical/output. Never infer success from this field."
+  },
+  "files": {
+    "docs/frentes/llavero-harmonia/OBJETO-CANONICO.md": {
+      "bytes": 76302,
+      "sha256": "6e354d5e72e7e3486e8e1de253305d4f4a290c218e27ca1c79ab381546846717",
+      "gitBlobSha": "ae89d71fe80563b1c1c6eb7add5a7bb5e6608f27"
+    },
+    "docs/frentes/llavero-harmonia/originales/C-RETOMA-20261019-3fea4187-operador.txt": {
+      "bytes": 186,
+      "sha256": "71a64ce6389dfe1081e6b929a8f9b4466a4eabc6731764880781e27241846bee",
+      "gitBlobSha": "a0cc3ab06c36f077bd0ff4a41324d4da5e44abbe"
+    },
+    "docs/frentes/llavero-harmonia/originales/C-RETOMA-20261019-3fea4187-adjunto-sanitizado.txt": {
+      "bytes": 42945,
+      "sha256": "273f35970b61186da84e0526b17bc70e520658c1a5134466742616e0aab80bac",
+      "gitBlobSha": "5452b2b522bc440adc61eb45f8388b0fbae33eb4"
+    },
+    "docs/frentes/llavero-harmonia/originales/C-RETOMA-20261019-3fea4187-salida.md": {
+      "bytes": 2124,
+      "sha256": "bef4fae16ff7179875d6efa6c3937d134f08e25d345585d1a3206c0aeb3092a7",
+      "gitBlobSha": "37d77baac9121be8277c3b789b362d4b62a5f09d"
+    },
+    "docs/frentes/llavero-harmonia/cronica/C-RETOMA-20261019-3fea4187.md": {
+      "bytes": 4098,
+      "sha256": "cac67905b5d626e7ff322390b28f46c85ee4dbf9f9d9c8bd8f2e278a5ceb2f3c",
+      "gitBlobSha": "3d8fbe289443e1856d5b1e166bdc58718f31c3e3"
+    }
+  }
+}
