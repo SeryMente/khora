@@ -92,12 +92,44 @@ async def register_native_pipe():
 
 
 
+def make_native_guard(native,*,key):
+    from api.chat_polling import NativePollingGate
+    from open_webui.utils.auth import get_verified_user_by_token
+    async def resolve(token):
+        return await get_verified_user_by_token(token,getattr(native.state,'redis',None))
+    async def native_with_revocation(scope,receive,send):
+        if scope.get('method')=='POST' and scope.get('path','').rstrip('/').endswith('/api/v1/auths/signout'):
+            from open_webui.internal.db import get_async_db
+            from open_webui.models.auths import Auths
+            from open_webui.socket.main import disconnect_user_sessions
+            headers=dict(scope.get('headers',[]))
+            authorization=headers.get(b'authorization',b'').decode('latin1')
+            token=authorization[7:] if authorization.startswith('Bearer ') else ''
+            user=await resolve(token) if token else None
+            subject=scope.get('state',{}).get('khora_chat_subject')
+            if user is None or user.email!=subject:
+                await send({'type':'http.response.start','status':401,'headers':[]})
+                return await send({'type':'http.response.body','body':b'Invalid session'})
+            # Official durable revocation, not a second token database or Redis fallback.
+            async with get_async_db() as db:
+                if not await Auths.revoke_sessions_by_user_id(user.id,db=db):
+                    raise RuntimeError('No se pudo revocar la sesion nativa.')
+                await db.commit()
+            await disconnect_user_sessions(user.id)
+        if scope.get('path','').rstrip('/').endswith('/ws/socket.io'):
+            from open_webui.socket.main import app as socket_app
+            child={**scope,'path':'/ws/socket.io/','root_path':''}
+            return await socket_app(child,receive,send)
+        return await native(scope,receive,send)
+    return ChatIdentityGuard(native_with_revocation,key=key,polling=NativePollingGate(resolve))
+
+
 class NativeChatRuntime:
     def __init__(self):
         key,self.history=configure_native_environment()
         from open_webui.main import app as native
         self.native=native
-        self.app=ChatIdentityGuard(native,key=key)
+        self.app=make_native_guard(native,key=key)
 
     @asynccontextmanager
     async def lifespan(self,neo4j_config):

@@ -1,0 +1,80 @@
+{
+  "type": "evidence_not_live_state",
+  "baseline": "c51e722d2a8553071d07d0376025377b633661a4",
+  "date": "2026-10-19",
+  "neon": {
+    "project": "still-sunset-02412999",
+    "postgresql": "17.11",
+    "sslmode": "verify-full",
+    "sslrootcert": "system",
+    "client_libpq_ssl_in_use": true,
+    "server_compute_pg_stat_ssl": false,
+    "tls_termination": "client to Neon proxy; compute leg separate",
+    "native_schema": "khora_openwebui",
+    "native_tables_migrated": 48,
+    "runtime_role": "khora_chat_runtime",
+    "public_volcado_read": false,
+    "runtime_create_schema": false,
+    "migration_role": "khora_chat_migrator",
+    "migration_role_disabled_after_bootstrap": true,
+    "history_driver_connect_pass": true,
+    "synthetic_users_after_cleanup": 0,
+    "synthetic_chats_after_cleanup": 0
+  },
+  "native": {
+    "type": "real_neon17_tls_native_polling_and_ownership_not_production_deploy",
+    "checks": {
+      "direct_render_rejected": true,
+      "foreign_token_rejected": true,
+      "owner_durable_read": true,
+      "foreign_chat_rejected": true,
+      "native_model_visible": true,
+      "foreign_polling_sid_rejected": true,
+      "foreign_socket_token_rejected": true,
+      "native_polling_connected": true,
+      "native_user_join": true,
+      "native_citation_transport": true,
+      "foreign_join_rejected": true,
+      "logout": true,
+      "logged_out_token_revoked": true,
+      "chat_independent_connection": true,
+      "synthetic_users_cleaned": true
+    },
+    "limits": [
+      "local signed proxy not deployed",
+      "no real graph/provider inference",
+      "not Render load or browser E2E"
+    ]
+  },
+  "local_checks": {
+    "engine_passed": 64,
+    "engine_subtests_passed": 17,
+    "polling_and_asgi_passed": 10,
+    "max_native_probe_rss_kib": 338120,
+    "slim_build": "KHORA_NATIVE_SLIM_BUILD_OK; unchanged official wheel SHA256 verified",
+    "full_frontend_prebuild_passed": 563,
+    "full_next_production_build_exit_code": 0
+  },
+  "not_verified": [
+    "deployed authenticated browser circuit",
+    "real graph/Groq inference and citations",
+    "Render combined 512MiB load/restart",
+    "operator acceptance"
+  ],
+  "publication": {
+    "pr_draft": true,
+    "merge": false,
+    "render_env_modified": false,
+    "render_build_command_change_pending": true,
+    "render_browser_login_required": true,
+    "no_production_chat_enabled": true
+  },
+  "logs_sha256": {
+    "neon-bootstrap.log": "5585c884358dd18b1c0bfb4d376cfa4670e99ba9ad3180db8885ebb5f2887a51",
+    "neon-native-probe.log": "7807f0d267c31047fcddfb37df2440056a1b62804b87bb80c42791d400969b06",
+    "slim-build-final.log": "b793087c10e4bdc6bec6430756bd4304d1a42f1320b336b677e4d8664162848f",
+    "engine-final-tests.log": "084c8ba88386dde704b5d25edff6031fd858f581db5d8bba482b304d79506124",
+    "polling-tests.log": "40bfd4344a3eb1c606998014b2da30a6e67c7e7643e444298223a1d22650e0c7",
+    "full-web-build-final-polling.log": "bd3474122e059b422d1d17fe8d89ea5cc74be2c1e980c56e4a6fd9252969a7bb"
+  }
+}

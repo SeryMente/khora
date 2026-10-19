@@ -10,7 +10,7 @@ const RUTAS_OS = new Set<string>(["/"]);
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|ep-main-live\\.json$|auth/signin|api/auth|api/version|api/eventos|\\.well-known).*)",
+    "/((?!_next/static|_next/image|favicon.ico|ep-main-live\\.json$|auth/signin|api/auth|api/eventos|\\.well-known).*)",
   ],
 };
 

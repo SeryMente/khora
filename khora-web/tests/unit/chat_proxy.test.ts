@@ -10,7 +10,7 @@ test('disabled or unauthenticated chat is closed',async()=>{
  assert.equal((await proxyOpenWebUI(request(),'a@test',{...config,enabled:false},noFetch)).status,404);
 });
 test('existing Khora routes, traversal and dangerous APIs are not proxied',async()=>{
- for(const path of ['/sistema','/api/chat','/api/auth/session','/api/ingesta','/api/v1/functions','/api/v1/memories','//evil.test','/../private','/%2e%2e/private','/ws/socket.io']) assert.equal(openWebUIPath(path),false,path);
+ for(const path of ['/sistema','/api/chat','/api/auth/session','/api/ingesta','/api/v1/functions','/api/v1/memories','//evil.test','/../private','/%2e%2e/private']) assert.equal(openWebUIPath(path),false,path);
  assert.equal((await proxyOpenWebUI(request('/api/v1/auths/signup','POST',{origin:'https://khora.example.test'}),'a@test',config,noFetch)).status,403);
 });
 test('mutations require exact same-origin and browser API keys are rejected',async()=>{
@@ -46,4 +46,13 @@ test('external redirects and errors are redacted',async()=>{
  assert.equal((await proxyOpenWebUI(request(),'a@test',config,redirect)).status,502);
  const broken=(async()=>{throw Error('PRIVATE_URL_SENTINEL')}) as typeof fetch;
  assert.equal((await proxyOpenWebUI(request(),'a@test',config,broken)).status,502);
+});
+
+test('native polling and owner task routes are bounded; admin routes remain closed',async()=>{
+ assert.equal(openWebUIPath('/ws/socket.io/'),true);
+ assert.equal(openWebUIPath('/api/tasks/chat/12345678-1234-1234-1234-123456789abc'),true);
+ assert.equal(openWebUIPath('/api/tasks/chat/12345678-1234-1234-1234-123456789abc/stop'),true);
+ for(const p of ['/api/tasks','/api/tasks/stop/arbitrary','/api/tasks/chat/../../other']) assert.equal(openWebUIPath(p),false);
+ const req=new Request('https://khora.example.test/api/khora-chat/proxy?path='+encodeURIComponent('/ws/socket.io/')+'&EIO=4&transport=websocket');
+ assert.equal((await proxyOpenWebUI(req,'a@test',config,noFetch)).status,403);
 });

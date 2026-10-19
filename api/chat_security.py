@@ -21,10 +21,11 @@ def signature(key, method, path_query, subject, timestamp, body):
 
 
 class ChatIdentityGuard:
-    def __init__(self, app, *, key):
+    def __init__(self, app, *, key, polling=None):
         if not isinstance(key,str) or len(key)<32:
             raise ValueError('Se requiere clave de bridge estable y segura.')
         self.app,self.key=app,key
+        self.polling=polling
 
     async def __call__(self, scope, receive, send):
         if scope['type']=='lifespan':
@@ -64,6 +65,9 @@ class ChatIdentityGuard:
         path=scope['path']+('?' + query if query else '')
         expected=signature(self.key,scope['method'],path,subject,timestamp,body)
         if not hmac.compare_digest(expected,mac): return await fail(401)
+        is_polling=scope["path"].rstrip("/").endswith("/ws/socket.io")
+        if is_polling and (self.polling is None or not await self.polling.authorize(scope,subject,bytes(body))):
+            return await fail(403)
         # Strip every client trusted header/cookie, then supply only signed identity.
         filtered=[(name,value) for name,value in scope.get('headers',[])
                   if not name.lower().startswith((b'x-khora',b'x-openwebui',b'x-forwarded',b'remote-user'))
@@ -76,4 +80,6 @@ class ChatIdentityGuard:
             if not delivered:
                 delivered=True;return {'type':'http.request','body':bytes(body),'more_body':False}
             return await receive()
+        if is_polling:
+            return await self.polling.run(self.app,child,replay,send,subject)
         return await self.app(child,replay,send)

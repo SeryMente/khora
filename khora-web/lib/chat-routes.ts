@@ -1,7 +1,7 @@
 /** Only Open WebUI routes; existing Khora /sistema, /api/chat and auth stay intact. */
 export function openWebUIPath(path: string): boolean {
   if (/[\\\u0000-\u001f]/.test(path) || path.includes('..') || path.includes('%')) return false;
-  return path === '/' || path === '/auth' || path === '/api/config' || path === '/api/models' ||
+  return /^\/api\/tasks\/chat\/[0-9a-f-]{36}(?:\/stop)?$/.test(path) || path === '/ws/socket.io' || path === '/ws/socket.io/' || path === '/api/version' || path === '/'  || path === '/auth' || path === '/api/config' || path === '/api/models' ||
     path === '/api/chat/completions' || path === '/api/chat/completed' ||
     path === '/manifest.json' || path === '/user.png' || path === '/favicon.png' ||
     path.startsWith('/c/') || path.startsWith('/_app/') || path.startsWith('/static/') ||

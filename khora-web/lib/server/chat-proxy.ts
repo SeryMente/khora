@@ -39,6 +39,7 @@ export async function proxyOpenWebUI(request: Request, email: string | null | un
   if (path.startsWith('/api/v1/auths') && !['/api/v1/auths','/api/v1/auths/','/api/v1/auths/signin','/api/v1/auths/signout','/api/v1/auths/update/timezone'].includes(path)) return fail(403, 'Operation unavailable');
   if (path.startsWith('/api/v1/models') && !['GET','HEAD'].includes(request.method)) return fail(403,'Operation unavailable');
   if (/^\/api\/v1\/chats\/.*(?:share|import|export|stats|all\/db|list\/user)/.test(path)) return fail(403,'Operation unavailable');
+  if (path.startsWith('/ws/socket.io') && (source.searchParams.get('transport') !== 'polling' || source.searchParams.get('EIO') !== '4')) return fail(403,'Transport unavailable');
   const token = request.headers.get('authorization');
   if (token && !/^Bearer [A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(token)) return fail(401, 'Invalid session');
   if (Number(request.headers.get('content-length') || 0) > MAX_BODY) return fail(413, 'Request too large');
@@ -47,7 +48,7 @@ export async function proxyOpenWebUI(request: Request, email: string | null | un
   const subject = chatSubject(email, key);
   const timestamp = Math.floor(Date.now() / 1000).toString();
   const headers = new Headers();
-  for (const name of ['accept','accept-language','content-type','last-event-id']) {
+  for (const name of ['accept','accept-language','content-type','last-event-id','origin']) {
     const value = request.headers.get(name); if (value) headers.set(name,value);
   }
   if (token) headers.set('Authorization', token);
