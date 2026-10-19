@@ -1,0 +1,9 @@
+{
+  "operation": "optional source inspection before remote validation",
+  "symptomVerbatim": "bash exit_code: 2; stdout emitted; optional sed target absent; stderr empty",
+  "cause": "last optional sed targeted non-existing lib/portable-vault-config.ts without bounded existence guard",
+  "stateImpact": "read only; no source or credentials changed",
+  "correction": "guard file existence; choose source paths from directory inventory",
+  "verification": "existing setup.ts and api/version read successfully; absent optional target is not an application failure",
+  "prevention": "test -f before optional reads; optional absence must not fail an unrelated inspection"
+}

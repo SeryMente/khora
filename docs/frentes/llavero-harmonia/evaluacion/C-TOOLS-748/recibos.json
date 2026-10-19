@@ -1,0 +1,34 @@
+{
+  "cycle": "C-TOOLS-748",
+  "anchor": "first installation process receipt748 of current user instruction, no invented user sequence or time",
+  "base": "2e48e7b8512a77df56807e0a24fd6dbba25a4866",
+  "methodology": "1.6 at a466b6b46f266de6a6ccd656e071eb7a07dc0e10; compatible except current explicit operator exception allowing necessary remote installation/execution",
+  "authority": "current direct user explicitly authorizes RDC use for missing tools and E2E execution; exception scoped to this task, no change to parent method nor assumed production/security acceptance",
+  "observations": {
+    "734": "connected remote account identity and permission checked; account/device identifiers not copied into repository",
+    "735": "explicit current device ping succeeded",
+    "740": "official Vercel MCP reconnection accepted by user",
+    "748": "isolated temporary tools installation started",
+    "758": "GitHub CLI2.102.0 checksum verified against official release checksums; sha256 ae64e556ecc240b200f7eba60d550e4bb60d78e860e69dd88c449405b86067f4",
+    "766": "Vercel64.5.0 installed with npm, 285 packages, exit0, no global install",
+    "759": "reconnected Vercel MCP teams list empty",
+    "767": "MCP project access403, intended team scope not authorized; no unchanged retry",
+    "783": "local CLI device login succeeded; whoami and scoped project inspect khora-web succeeded, project prj_hRN86BKITXYKTnNlp0ygVhaMwFfx; no deployment",
+    "807": "bounded post-auth synthetic validation receiver started; source commit2e48e7b8512a77df56807e0a24fd6dbba25a4866; no new auth loop",
+    "814,816": "validation receiver and original GitHub login still waiting, no further output"
+  },
+  "checkpoint": "temporary CLI configuration retained until task complete; root and PIDs in agent-only remote-state.json, not credentials or codes. Next: approve existing GitHub device authorization; poll original receiver and validation process. On expiry do not silently promise active access. Do not log out Vercel just after listing projects.",
+  "limits": [
+    "No new tests completed",
+    "No source deployment, production, hosted migration, real identity/factor/corpus acceptance",
+    "Browser session not inspected or copied",
+    "No tokens/cookies/codes copied to repository",
+    "Authentication prompt containing codes omitted, so complete literal coverage is not claimed"
+  ],
+  "hashes": {
+    "docs/frentes/llavero-harmonia/originales/C-TOOLS-748-operador.txt": "e8770357f7799b37150395bbcd290c869d486e00ab2cff1ab4f9d4b38cb7b909",
+    "docs/frentes/llavero-harmonia/originales/C-TOOLS-748-comentarios.md": "64f08dc9b58aba5f421a6e6af1d4eaf77e1618851af3bb8e107522860e208020",
+    "docs/frentes/llavero-harmonia/originales/C-TOOLS-748-salida.md": "c71749e49a18532302d9f022174fd38280e1559bc44445799ea0d841a502b0d7"
+  },
+  "encoding": "UTF-8 LF; terminal LF added, commentary messages separated by blank lines; one sensitive authorization prompt deliberately omitted; exact final prepared and readback required"
+}

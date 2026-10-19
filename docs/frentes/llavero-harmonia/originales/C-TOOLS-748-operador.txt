@@ -1,0 +1,1 @@
+Si están disponibles, ¿tienes acceso a Vercel y a RC local? ¿O qué fue lo que pasó? Instala lo que tengas que instalar, es decir, si no viene instalado el CLI de Vercel o GitHub, pues instálalo, para eso es RDC. Sí, tienes autorizado todo lo que necesites para resolver de extremo a extremo lo que te piden.
