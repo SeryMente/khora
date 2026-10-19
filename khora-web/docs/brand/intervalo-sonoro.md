@@ -32,7 +32,8 @@ and production delivery. This extends the October 17 scope; it does not redesign
 the six-bar grammar, authentication provider, session policy or app-install icons.
 
 - Cold document navigation may present the identity; reload, history restoration,
-  same-origin return and technical/auth handoff do not. No elapsed-time/30-minute
+  same-origin return and technical/auth handoff do not. Offline and share-target
+  entry never spend the user intention on a welcome animation. No elapsed-time/30-minute
   replay rule. Client navigation and visibility changes do not restart it.
 - The 1200ms normal / 500ms reduced-motion limits include the local font wait after
   hydration. Missing font, hidden page, failed animation and omitted presentation
@@ -59,3 +60,11 @@ not application E2E, production authentication or deployment evidence. Record th
 current application gates, exact commit, deployment target, readiness and live
 route checks separately. No plan changes, protection bypass or alternate project.
 Final UI/security approval by the operator must remain explicit before main merge.
+
+### Test environment correction
+
+The Playwright build environment now uses the same documented synthetic JWT key
+as the canonical test configuration and normative-token fixtures. Real signature
+validation, revocation and replay protection are unchanged. The full unit suite
+passed 548 tests before the final offline/share-route predicate extension; its
+causal tests and final application browser run are recorded in the delivery evidence.

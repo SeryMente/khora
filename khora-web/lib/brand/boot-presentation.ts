@@ -1,6 +1,6 @@
 /** Cosmetic presentation only. Never a session, authorization or identity signal. */
 export function isTechnicalEntry(pathname: string): boolean {
-    return /^\/(auth|oauth|api|ui-review)(\/|$)/.test(pathname);
+    return /^\/(auth|oauth|api|ui-review)(\/|$)|^\/(offline|capturar\/compartir)\/?$/.test(pathname);
 }
 export function shouldPresentBoot(type: string, pathname: string, internalReferrer: boolean, handoff: boolean): boolean {
     return !isTechnicalEntry(pathname) && type !== "reload" && type !== "back_forward" && !internalReferrer && !handoff;
@@ -10,7 +10,7 @@ function prepareBoot() {
     const root = document.documentElement;
     let show = false;
     try {
-        const technical = /^\/(auth|oauth|api|ui-review)(\/|$)/.test(location.pathname);
+        const technical = /^\/(auth|oauth|api|ui-review)(\/|$)|^\/(offline|capturar\/compartir)\/?$/.test(location.pathname);
         const type = (performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined)?.type || "navigate";
         let handoff = false;
         try {

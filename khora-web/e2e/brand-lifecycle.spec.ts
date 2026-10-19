@@ -17,7 +17,7 @@ for (const theme of ["dark", "light"]) for (const width of [390,1180]) {
   await expect(page.getByRole("button",{name:"Continuar con mi cuenta"})).toBeFocused();
   await info.attach(`access-${theme}-${width}`,{body:await page.screenshot(),contentType:"image/png"});
   await page.goto("/auth/signin?error=Configuration");
-  await expect(page.getByRole("alert")).toHaveText("No se pudo completar el acceso. Inténtalo de nuevo con tu cuenta.");
+  await expect(page.locator(".khora-auth").getByRole("alert")).toHaveText("No se pudo completar el acceso. Inténtalo de nuevo con tu cuenta.");
   await expect(page.locator(".khora-auth")).not.toContainText("Configuration");
   await info.attach(`access-error-${theme}-${width}`,{body:await page.screenshot(),contentType:"image/png"});
   expect(errors).toEqual([]);
@@ -66,13 +66,18 @@ test("favicons remain public and geometrically canonical",async({request})=>{
 });
 
 test("secondary wait is delayed, local, stable and honest about prolonged work",async({page},info)=>{
+ await page.goto('/ui-review/consulta?scenario=idle');
+ await expect(page.locator('[data-ui-id="consulta.form-input"]')).toBeVisible();
  await page.clock.install(); await page.clock.pauseAt(new Date());
- await page.goto('/ui-review/consulta?scenario=generating');
+ await page.locator('select').selectOption('generating');
  const pending=page.getByTestId('khora-pending');
+ await expect.poll(async()=>{ await page.clock.runFor(1); return pending.count(); }).toBe(1);
  await expect(pending).toBeVisible();
  await expect(page.locator('html')).toHaveAttribute('data-khora-variant',/\d+/);
  await expect(pending.getByRole('status')).toHaveCount(0);
- await page.clock.runFor(300);
+ await page.clock.runFor(280);
+ await expect(pending.getByRole('status')).toHaveCount(0);
+ await page.clock.runFor(30);
  await expect(pending.getByRole('status')).toContainText('Generando respuesta.');
  const variant=await pending.locator('svg').getAttribute('data-variant');
  await expect(page.locator('[data-ui-id="consulta.form-input"]')).toBeVisible();
@@ -83,4 +88,10 @@ test("secondary wait is delayed, local, stable and honest about prolonged work",
  await expect(pending.locator('svg')).toHaveAttribute('data-variant',variant!);
  await page.goto('/ui-review/consulta?scenario=idle');
  await expect(page.getByTestId('khora-pending')).toHaveCount(0);
+});
+
+for (const route of ["/offline", "/capturar/compartir"]) test(`technical entry ${route} never blocks intent with a welcome`,async({page})=>{
+ await page.goto(route,{waitUntil:"domcontentloaded"});
+ await expect(page.locator("html")).toHaveAttribute("data-khora-boot","skip");
+ await expect(page.locator('[data-testid="khora-splash"]')).not.toBeVisible();
 });
