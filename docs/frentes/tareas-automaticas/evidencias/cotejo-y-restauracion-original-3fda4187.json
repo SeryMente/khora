@@ -1,0 +1,98 @@
+{
+  "event": "REANUDACION-3fda4187-20261018",
+  "operation": "serialización de archivos de custodia y cotejo remoto",
+  "first_commit": "0c0eda725565788d56c1bde13d3e825f9b10ee89",
+  "first_readback": [
+    {
+      "path": "docs/frentes/tareas-automaticas/OBJETO-CANONICO.md",
+      "expected": {
+        "bytes": 196233,
+        "sha256": "0549faf7084384933c460a3ec99004feb3a19d9a2e53032cceac0957866c37b9",
+        "git_blob_sha1": "f7dcb5df10f46e64559822903e2e37939322ac94"
+      },
+      "observed": {
+        "bytes": 196233,
+        "sha256": "0549faf7084384933c460a3ec99004feb3a19d9a2e53032cceac0957866c37b9",
+        "git_blob_sha1": "f7dcb5df10f46e64559822903e2e37939322ac94"
+      },
+      "match": true
+    },
+    {
+      "path": "docs/frentes/tareas-automaticas/MANIFIESTO-CUSTODIA.json",
+      "expected": {
+        "bytes": 9517,
+        "sha256": "b9367fd536f2c5fdc9b27e28d811197ba47f2fa4a0326712e8f3ad6c7909992b",
+        "git_blob_sha1": "9e67d9e5a2e6f13d261a6742b7fce0cfaa30b085"
+      },
+      "observed": {
+        "bytes": 9517,
+        "sha256": "b9367fd536f2c5fdc9b27e28d811197ba47f2fa4a0326712e8f3ad6c7909992b",
+        "git_blob_sha1": "9e67d9e5a2e6f13d261a6742b7fce0cfaa30b085"
+      },
+      "match": true
+    },
+    {
+      "path": "docs/frentes/tareas-automaticas/evidencias/reanudacion-sesion-3fda4187.json",
+      "expected": {
+        "bytes": 4734,
+        "sha256": "df17399d625d8d8d567a6b120047ee82aacc88891d1935e2077f5823d81da682",
+        "git_blob_sha1": "4f74857c4de46980cd2a284cc4eb052bb3a36c32"
+      },
+      "observed": {
+        "bytes": 4734,
+        "sha256": "df17399d625d8d8d567a6b120047ee82aacc88891d1935e2077f5823d81da682",
+        "git_blob_sha1": "4f74857c4de46980cd2a284cc4eb052bb3a36c32"
+      },
+      "match": true
+    },
+    {
+      "path": "docs/frentes/tareas-automaticas/originales/conversacion-recibida-sesion-3fda4187.txt",
+      "expected": {
+        "bytes": 43954,
+        "sha256": "15c838b7f48a320df50a6c6cbd4f03d83387d922130c93395f6d736ffdf3dfa4",
+        "git_blob_sha1": "55abba9f50ea6ad5c32ec77627a72feeec23cdba"
+      },
+      "observed": {
+        "bytes": 43467,
+        "sha256": "0d9ff0a560f1f34a1dbdfdba05a72291211231e6c11791088ecf2eb89648782d",
+        "git_blob_sha1": "f401bc1301f79af63d9cc49ca7f93fd229e9b2f6"
+      },
+      "match": false
+    },
+    {
+      "path": "docs/frentes/tareas-automaticas/originales/reanudacion-sesion-3fda4187.json",
+      "expected": {
+        "bytes": 1944,
+        "sha256": "e58a3247f359e03cafd55352f08b6b2a851bf666f5ce8039974e357595021c6f",
+        "git_blob_sha1": "6558c92d5c5a041223ebba32c80ee47e32c80fc7"
+      },
+      "observed": {
+        "bytes": 1944,
+        "sha256": "e58a3247f359e03cafd55352f08b6b2a851bf666f5ce8039974e357595021c6f",
+        "git_blob_sha1": "6558c92d5c5a041223ebba32c80ee47e32c80fc7"
+      },
+      "match": true
+    },
+    {
+      "path": "docs/frentes/tareas-automaticas/originales/salida-reanudacion-3fda4187.md",
+      "expected": {
+        "bytes": 1902,
+        "sha256": "ad070257c13defe19f430493c679f7b279b4c5029f1ca20d023074e0f47460a1",
+        "git_blob_sha1": "e8cebb00741629b393b8805edb6fc7551c7f4deb"
+      },
+      "observed": {
+        "bytes": 1902,
+        "sha256": "ad070257c13defe19f430493c679f7b279b4c5029f1ca20d023074e0f47460a1",
+        "git_blob_sha1": "e8cebb00741629b393b8805edb6fc7551c7f4deb"
+      },
+      "match": true
+    }
+  ],
+  "symptom_verbatim": "successfully downloaded text file (SHA: f401bc1301f79af63d9cc49ca7f93fd229e9b2f6)",
+  "root_cause": "Path.read_text() normalizó CRLF a LF al construir el contenido del adjunto para push_files; el manifiesto conservó correctamente la huella original. No es pérdida de caracteres del texto, sí incumplimiento de identidad binaria.",
+  "state_impact": "Objeto, manifiesto, mensajes, evidencia y salida coincidieron exactamente; solo el adjunto nuevo se guardó con saltos normalizados. No se declaró éxito al operador. No se tocó producto ni archivos históricos previos.",
+  "correction": "Restaurar el adjunto a los bytes originales autorizados mediante read_bytes().decode(utf-8), sin normalización; preservar los demás archivos.",
+  "verification": "Primera lectura de seis archivos obtenida y cotejada. Corrección local cotejada byte a byte con el archivo recibido. Lectura remota posterior de la corrección obligatoria antes de emitir salida final; no predeclarada en este recibo.",
+  "prevention": "Para todo archivo textual original, serializar con read_bytes().decode(utf-8); antes de cada escritura comprobar sha256(content.encode(utf-8)) contra el archivo original. Comparar siempre bytes y Git blob en lectura remota.",
+  "product_changed": false
+}

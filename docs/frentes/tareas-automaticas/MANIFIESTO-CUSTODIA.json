@@ -1,5 +1,5 @@
 {
-  "version": 10,
+  "version": 11,
   "object_seal": "TAREAS-v0.17",
   "purpose": "Inventario de integridad y procedencia; no estado vivo paralelo",
   "source_of_truth": "docs/frentes/tareas-automaticas/OBJETO-CANONICO.md",
@@ -206,12 +206,20 @@
       "bytes": 4734,
       "sha256": "df17399d625d8d8d567a6b120047ee82aacc88891d1935e2077f5823d81da682",
       "git_blob_sha1": "4f74857c4de46980cd2a284cc4eb052bb3a36c32"
+    },
+    {
+      "path": "evidencias/cotejo-y-restauracion-original-3fda4187.json",
+      "classification": "incidencia_y_correccion_de_custodia",
+      "bytes": 4697,
+      "sha256": "5daefb586f35d8cc5385b4ee61710de09b096e1ade5950bc551c43723ead9855",
+      "git_blob_sha1": "3148cf96b860ea4a9b49a15f1a92aee9f2f47197"
     }
   ],
   "self_integrity": "El manifiesto no se hashea a sí mismo; comprobar su blob/commit devuelto por GitHub.",
-  "previous_verified_documentation_commit": "b5e7009de137db30c26ecc5f4ddbb34789f453f2",
+  "previous_verified_documentation_commit": "0c0eda725565788d56c1bde13d3e825f9b10ee89",
   "recovery_base_main": "b5e7009de137db30c26ecc5f4ddbb34789f453f2",
   "access_correction_evidence": "evidencias/verificacion-accesos-ciclo20-2026-10-17.json",
   "current_event": "REANUDACION-3fda4187-20261018",
-  "current_evidence": "evidencias/reanudacion-sesion-3fda4187.json"
+  "current_evidence": "evidencias/reanudacion-sesion-3fda4187.json",
+  "readback_correction_evidence": "evidencias/cotejo-y-restauracion-original-3fda4187.json"
 }
