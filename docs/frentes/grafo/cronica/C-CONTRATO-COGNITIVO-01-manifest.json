@@ -1,0 +1,70 @@
+{
+  "cycle": "C-CONTRATO-COGNITIVO-01",
+  "anchor": {
+    "session": "3fd5d4a3-b250-807a-8bd7-00a9fde7ee9d",
+    "user_event": 1189
+  },
+  "base_commit": "7809b0afa56ed0e329d9e21c96c23ad9b589aff9",
+  "object_version": "GRAFO-v15",
+  "criterion_documentary_version": "1.4",
+  "unchanged_executable_reference_version": "1.2",
+  "method": {
+    "version": "1.6",
+    "seal": "METACANON-OBJETOS-v1.6",
+    "commit": "a466b6b46f266de6a6ccd656e071eb7a07dc0e10",
+    "blob": "8f9ad1cf0e09e5fcd7014190770a77294ff39af4",
+    "delta": "none; reread §28"
+  },
+  "privacy": {
+    "verified_private": true,
+    "evidence_session_result": 1233,
+    "no_visibility_or_permissions_change": true,
+    "not_product_ingestion": true
+  },
+  "notion_glossary": {
+    "url": "https://app.notion.com/p/7515d4a3b250830898d58143e5886965",
+    "version": "1.4",
+    "edit_reference_id": "editref_jD2pkNKyDvv_",
+    "write_result": 1262,
+    "readback_result": 1266,
+    "contentLastEditedAt": 1792431051651,
+    "content_exact_readback": true,
+    "content_sha256": "25b97edd6cb7db56c41e35969e9b224501009ba8a3c7a258becca187661b9efa"
+  },
+  "files": {
+    "docs/frentes/grafo/OBJETO.md": {
+      "bytes": 33719,
+      "sha256": "72a022b1ae436254ddbd382115083a0bd84b82b8cbc6f6fa94854045b977ed36",
+      "git_blob_sha1": "8446f6c9fbbe736d61f5e211859acd3eb6d14b8e"
+    },
+    "khora-web/docs/GRAPH-QUALITY-DRAFT.md": {
+      "bytes": 77835,
+      "sha256": "83df330cae4a9122e038e9a353646d1db1ef658062b966ecafaa5943598a3b5b",
+      "git_blob_sha1": "a42894877739c0bb6c876a621b38a64e337db632"
+    },
+    "docs/frentes/grafo/originales/C-CONTRATO-COGNITIVO-01-operador.txt": {
+      "bytes": 12406,
+      "sha256": "92254d8d802a6e551d287b5c2c30a29a10c0cb16b78a30aadd41b028c05666d6",
+      "git_blob_sha1": "f6ea660e5d0e75670101e4d570ba7cd3ddeb43d5"
+    },
+    "docs/frentes/grafo/cronica/C-CONTRATO-COGNITIVO-01-salida.md": {
+      "bytes": 5343,
+      "sha256": "ad5e0326aa00c4a13adf80e9f6b85649285bc756cfa157da5f1de005ed735c39",
+      "git_blob_sha1": "5b5cc8caddf0b26bb94d0eeb00d29bc738af40cc"
+    },
+    "docs/frentes/grafo/cronica/C-CONTRATO-COGNITIVO-01-intermedias.md": {
+      "bytes": 726,
+      "sha256": "40ac64102c98d45e1ad1557b3579b9b99febab95a8447602e9c64664506ae863",
+      "git_blob_sha1": "d5938f0616abe6500c84c13a3032f396f8b59a09"
+    },
+    "docs/frentes/grafo/cronica/C-CONTRATO-COGNITIVO-01.md": {
+      "bytes": 9774,
+      "sha256": "80f641276f4b82c04467f587577d7aa4a5f49d358cc3029d327145046e460495",
+      "git_blob_sha1": "d05902b13f5dc350a8217408f199e91509e83bee"
+    }
+  },
+  "verification_contract": "Require push receipt and immutable revision readback before final. Local hashes are not remote evidence. This manifest cannot contain its future commit without a second commit; compare returned commit blobs, not a fabricated self-reference.",
+  "product_tests_this_cycle": false,
+  "product_status": "NO APTO / NO CERRADO E2E",
+  "merge_or_deploy": false
+}

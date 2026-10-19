@@ -1,6 +1,6 @@
 # Estándar unificador de calidad y salud del grafo de Khora
 
-**Versión 1.3 · evento C-AUTENTICIDAD-01 · Autenticidad preponderante y aprendizaje ciclo a ciclo; producto NO APTO en el último corte auditado.**
+**Versión 1.4 · evento C-CONTRATO-COGNITIVO-01 · Alineación documental con el Contrato cognitivo del grafo; producto NO APTO en el último corte auditado.**
 
 La redacción y documentación fueron encargadas expresamente por el operador en este hilo. Este archivo sustituye el borrador anterior **en su ubicación existente**, para no multiplicar fuentes de verdad. El sufijo histórico `DRAFT` se conserva para no romper enlaces: el documento contiene un estándar de aceptación y un perfil de realización diseñados; su adopción material y la implementación siguen pendientes. No se atribuye ratificación a umbrales, decisiones de arquitectura o diseño de interfaz que el operador no haya aprobado. Publicar este texto no implementa sus controles, no levanta los bloqueos del producto y no modifica cánones de Notion.
 
@@ -88,6 +88,16 @@ El modelo corrige con claridad los supuestos empíricos o técnicos incorrectos 
 **Separar éxitos:** aprender y disponer de un objeto que permita gobernar el frente es un resultado documental real; no sustituye publicar la primera versión del grafo. La madurez del grafo y la utilidad de las facultades necesitan evidencia propia. Mejor organización puede ayudar al sistema con el mismo modelo, pero no acredita «cinco veces más inteligencia». Comparar recuperación/generación frente a una buena base textual con el mismo corpus, modelo y tareas; medir fidelidad y utilidad por separado. Este contraste no es una modificación de la arquitectura inicial.
 
 **Estado de adopción:** en este ciclo se autoriza el criterio documental 1.3 y su revisión recurrente. No se altera código, base de datos ni la referencia causal ejecutable 1.2: esa referencia sigue identificando exactamente el criterio utilizado por el candidato anterior. Antes de evaluar/promover un nuevo candidato con 1.3, vincular su manifiesto a esta versión exacta por commit/huella y ejecutar las comprobaciones afectadas; nunca relabelar snapshots antiguos ni fingir que el validador implementa esta revisión semántica. No hay aprobación retroactiva ni relajación de compuertas previas.
+
+### 0.7 Alineación con el Contrato cognitivo del grafo · revisión documental 1.4
+
+El operador ratifica el nombre y la pregunta «¿Este grafo permite ejercer las capacidades que justifican construirlo sin deformar las fuentes?». La **definición rectora única** reside en el [objeto canónico del frente, Contrato cognitivo del grafo](../../docs/frentes/grafo/OBJETO.md#contrato-cognitivo-del-grafo--can%C3%B3nico); no se crea otro algoritmo, estándar, archivo rector ni fuente de estado. Este criterio hace operativas las exigencias de calidad y salud bajo ese contrato y la realización fiel de EpisTwin, que permanece no negociable.
+
+El propósito guía representación, recuperación y pruebas de utilidad; no autoriza fabricar relaciones ni normalizar a la persona hacia una narrativa preferida. La autenticidad de representación no equivale a verdad externa: testimonio, creencia, afirmación contrastable, inferencia y juicio humano deben conservar su distinción, contexto y revisabilidad. Preservar una afirmación no ratifica su contenido clínico o espiritual. No se promete esencia personal perfecta ni cero interpretación; se exige declarar y contrastar las mediaciones y sus fallos, con evidencia contraria, corpus, revisión y alcance explícitos. El rechazo/corrección del usuario no equivale a validar hechos externos.
+
+La reconciliación de los diseños existentes de Síntesis Existencial Accionable e Ideación Asíncrona Recuperable seguirá facultad → tarea → pérdida inaceptable → requisito → prueba → estado/conflicto. Las filas iniciales del objeto son candidatas: no certifican madurez conjunta ni requieren terminar ambas facultades antes de reparar fundamentos. La reserva del diseño visual y las compuertas materiales siguen vigentes.
+
+Esta revisión es documental. No ejecuta pruebas, no cambia código, pesos, extracción, comunidades, interfaz, acceso ni tratamiento de datos productivos. El candidato previo mantiene su referencia causal exacta a 1.2; el cumplimiento de 1.4 no se atribuye a esos recibos ni se cambian retrospectivamente. La historia de 1.1–1.3 permanece como antecedente, no como sello vigente.
 
 ## 1. Criterio rector: servir sin deformar ni usurpar
 
