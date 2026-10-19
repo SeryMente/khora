@@ -2,7 +2,14 @@
 
 No es objeto canónico ni fuente de estado vivo. Gobierno único: SeryMente/metodologia/frentes/blog-personal/OBJETO-CANONICO.md. Ampliación del operador y coordinación Ingreso de 2026-10-19. Implementación en rama de desarrollo; no equivale a despliegue.
 
-## Enmienda prioritaria: audio obligatorio · publicación BLOQUEADA
+## Enmienda vigente: corte autorizado solo transcripción
+Instrucción explícita nueva del operador comunicada por Ingreso: «Bien, si no se puede con audio por lo pronto, nada más la transcripción, bien ordenada y bien formateada para la publicación en el blog y en la página de Facebook.» Para ESTE corte se retira únicamente el bloqueo `PUBLIC_AUDIO_CONTRACT_REQUIRED` en API/dispatcher. Audio permanece privado, no se exporta ni se publica su URL/metadatos. El contrato schema1 texto-only vuelve a ser elegible para revisión, NO aprobación automática ni publicación de fixtures. La ampliación de audio siguiente se conserva como historia y futuro pendiente, NO veto vigente al corte textual.
+
+Se mantienen sin cambios: archivo manual previo/recibo propio verificado, clasificación blog, owner autenticado/Origin, ciclo normativo real, digest de versión exacta, consentimiento conjunto Sí(ambos)/No, revisión de texto ofuscado, outbox, comprobantes por destino, controles de credenciales y activación. `prepare` informa `representation:'text_only',audioPublic:false`; recibe `revision.entry` YA preparado y extrae propuestas de metadatos, **no genera ni ordena/formatea automáticamente una transcripción**. El texto público debe prepararse fielmente desde fuente real, sin inventar/suprimir incertidumbre, presentarse completo con representación Facebook y aprobarse por versión. Formatear no autoriza alterar hechos ni adoptar afirmaciones de terceros como propias. Si es corrección editorial, conservar fuente/versión y cambiar digest, no sobrescribir original.
+
+Esta reversión de una compuerta no despliega ni migra el backend, no repara normativa401 ni acredita app/permisos Meta. Sin esas dependencias y nota real aprobada, no declarar publicación operativa ni prometer cierre en el corte.
+
+## Historia de ampliación: audio obligatorio · SUSPENDIDO para este corte
 Decisión explícita del operador comunicada por Ingreso: cada entrada pública incluye el audio. El esquema1 descrito más abajo es legado **texto-only**, útil solo para conservar/revisar borradores; ya NO permite aprobar ni publicar. No confundir una prueba del núcleo con activación del contrato ampliado.
 
 Guardarraíl servidor: `decide:true` responde409 `PUBLIC_AUDIO_CONTRACT_REQUIRED`; dispatcher autenticado responde503 con el mismo código incluso si `BLOG_SYNC_ENABLED=1` y hay trabajos antes aprobados. `prepare` declara `publicationReady:false,audioRequired:true,blocker:'PUBLIC_AUDIO_CONTRACT_REQUIRED'`. No hay variable de entorno que quite esta compuerta. No/decline_archived/status y archivo manual son independientes. UI no debe activar Sí. No habilitar solo por recibir audio: hace falta implementar y revisar el contrato completo.

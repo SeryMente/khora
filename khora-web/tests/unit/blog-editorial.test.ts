@@ -44,15 +44,18 @@ test('provider objects never serialize credentials',()=>{assert(!JSON.stringify(
 test('session adapter supplies neither external cycle identifier (official random turn)',async()=>{const {readFile}=await import('node:fs/promises');const route=await readFile(new URL('../../app/api/blog/editorial/route.ts',import.meta.url),'utf8');assert.match(route,/openNormativeTurn\(actor,\{runtime:/);assert(!route.includes("conversation_id:'blog-editorial-session'"));});
 
 
-test('mandatory audio fails closed, independent of environment flags',async()=>{
- const {assertPublicAudioContractReady}=await import('../../lib/server/blog/public-audio-policy');
- const previous=process.env.BLOG_SYNC_ENABLED;try{process.env.BLOG_SYNC_ENABLED='1';assert.throws(()=>assertPublicAudioContractReady(),/^Error: PUBLIC_AUDIO_CONTRACT_REQUIRED$/);}finally{if(previous===undefined)delete process.env.BLOG_SYNC_ENABLED;else process.env.BLOG_SYNC_ENABLED=previous;}
+test('explicit text-only cut removes only audio barrier and preserves authorization gates',async()=>{
  const {readFile}=await import('node:fs/promises');
  const editorial=await readFile(new URL('../../app/api/blog/editorial/route.ts',import.meta.url),'utf8');
  const dispatch=await readFile(new URL('../../app/api/blog/dispatch/route.ts',import.meta.url),'utf8');
- assert(editorial.indexOf('assertPublicAudioContractReady();')<editorial.indexOf('await repo.approveExact'));
- assert(editorial.indexOf("body.action==='decline_archived'")<editorial.indexOf('assertPublicAudioContractReady();'));
- assert(dispatch.indexOf('assertPublicAudioContractReady();')<dispatch.indexOf("process.env.BLOG_SYNC_ENABLED"));
- assert(dispatch.indexOf('assertPublicAudioContractReady();')<dispatch.indexOf('await deliver('));
- assert(editorial.includes('publicationReady:false,audioRequired:true'));
+ assert(!editorial.includes('assertPublicAudioContractReady'));assert(!dispatch.includes('assertPublicAudioContractReady'));
+ assert(!editorial.includes('PUBLIC_AUDIO_CONTRACT_REQUIRED'));assert(!dispatch.includes('PUBLIC_AUDIO_CONTRACT_REQUIRED'));
+ assert(editorial.includes("representation:'text_only',audioPublic:false"));
+ assert(editorial.includes('await assertNormativeTurnOpen(actor,body._norm_turn_token'));
+ assert(editorial.includes("req.headers.get('origin')!==config.issuer"));
+ assert(editorial.includes('await repo.approveExact(actor,body.publicationId,body.digest,body.obfuscatedExposure===true)'));
+ assert(editorial.includes("body.action==='decline_archived'"));
+ assert(dispatch.includes("process.env.BLOG_SYNC_ENABLED!=='1'"));assert(dispatch.includes('timingSafeEqual'));
+ assert(dispatch.includes('await getCurrentSiSnapshot();await getCurrentMethodologySnapshot();'));
+ assert(dispatch.includes("process.env.BLOG_META_ADMIN_VERIFIED!=='1'"));
 });
