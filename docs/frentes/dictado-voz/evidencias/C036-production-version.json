@@ -1,0 +1,5 @@
+{
+  "url": "https://khora-web.vercel.app/api/version",
+  "status": 200,
+  "body": "{\"commit\":\"f0dfbdcb2d79eb6289dacba272ddcc7ba2023063\",\"rama\":\"main\",\"desplegado_desde_git\":true,\"fuente_commit\":\"vercel-git\",\"entorno\":\"production\",\"rutas\":[\"/sistema/custodia\",\"/api/volcado\"],\"ahora\":\"2026-10-19T20:49:21.239Z\"}"
+}

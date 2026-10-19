@@ -605,12 +605,6 @@
       "git_blob_sha": "6d27609ab4bc9bd22ba7e068629a2381cb9cd8e6"
     },
     {
-      "path": "OBJETO-CANONICO.md",
-      "bytes": 221908,
-      "sha256": "e2d96c32e624faa8acc0684e2f4b0696dad543ef3d2183699805018ec015eaca",
-      "git_blob_sha": "456bfa12865da1cfd0cb5699072e7f5d8366ef9f"
-    },
-    {
       "path": "originales/C033-instrucciones.json",
       "bytes": 1806,
       "sha256": "01b23016038a5d8c841550b6ce18e726890d844ed483ac9aeb473313245d34e5",
@@ -813,6 +807,78 @@
       "bytes": 1715,
       "sha256": "50a210abc7215deb45952f6968a5b8440bd42c344f9032d73b1d66930759a079",
       "git_blob_sha": "2aec4979dd45fada623138154fe90a02e963ed2c"
+    },
+    {
+      "path": "evidencias/C036-types-causal.json",
+      "bytes": 385,
+      "sha256": "a12909a7cd20fb5e333d5e3a55e70c34240af6b1044188552ef28c54a0fe7db2",
+      "git_blob_sha": "fc0ef7cf0d1d738474a82792eac6a942273b3158"
+    },
+    {
+      "path": "evidencias/C036-unit.log",
+      "bytes": 2065,
+      "sha256": "5a736350dca1b12fb9dcd12a3f4fc7078dab4a07d303cb8508287c6a2ed3eda3",
+      "git_blob_sha": "15dce4e3f35b405ddb8516ae00988d468bdd046a"
+    },
+    {
+      "path": "evidencias/C036-molde-browser.json",
+      "bytes": 722,
+      "sha256": "902e17a11f7381930b919e9c618f5d6dee6877cdd82dba3586c2a6ee3b8ea36f",
+      "git_blob_sha": "b69048dd855ce185f8eaf381891dc59a60f89351"
+    },
+    {
+      "path": "OBJETO-CANONICO.md",
+      "bytes": 233027,
+      "sha256": "57e778dd7e06cfe53637f981494e68c014d0922a20ffaf01b416b7cafa92cabf",
+      "git_blob_sha": "bc1c8aff8a3a44c69253e6eaf319b8047984073c"
+    },
+    {
+      "path": "originales/C036-prioridad-version-siguiente.txt",
+      "bytes": 1655,
+      "sha256": "49176a6b7068217983bf9750e2b13cf0a1978d70b239e048d793f8d254daba17",
+      "git_blob_sha": "96ae809992ceccfc62b5cd593d8ed1bf3eb1e392"
+    },
+    {
+      "path": "originales/C036-salida-final.md",
+      "bytes": 1609,
+      "sha256": "d69c8c2822f4b20d663fb46bdff8c2eeab6862b5634ec664f1c416007bc98750",
+      "git_blob_sha": "e5103e817ab65ea25951c56fe735a9efafdba9e3"
+    },
+    {
+      "path": "evidencias/C036-vercel-ready.json",
+      "bytes": 1435,
+      "sha256": "83c2989393ab4e1da5f5e5f2e280f9506c4ef017f94918e586713659a0058f81",
+      "git_blob_sha": "0ee53412cc3e8a027ba8bf3eb29336b75d533a21"
+    },
+    {
+      "path": "evidencias/C036-khora-health.json",
+      "bytes": 1498,
+      "sha256": "6ce1893ed8bf91942441b737969676ff0ee92e4814d22888c796a8c0b00e901f",
+      "git_blob_sha": "d059431ea85347d7b787527373dea3f450b539f9"
+    },
+    {
+      "path": "evidencias/C036-blog-consumer-report-source.json",
+      "bytes": 1707,
+      "sha256": "d0f26f7cbb249bebe924fa8b7cf9d647bcd7161b93ea693c1dea189e5726529c",
+      "git_blob_sha": "697b9e9bf11911607eb892ecc275d8733de7a6db"
+    },
+    {
+      "path": "evidencias/C036-production-version.json",
+      "bytes": 341,
+      "sha256": "0b4b84dd96033261a73b2e693d0322d542b874c790b3b90aa76d3602ff1a14d9",
+      "git_blob_sha": "8b10938f8d5513de385f955265748c33558e2cd1"
+    },
+    {
+      "path": "evidencias/C036-http-readiness.json",
+      "bytes": 1046,
+      "sha256": "8b40ecdcf7ff32dac33565ba84e9a24771ed8f54e0df26dfd16a7b1094b8f591",
+      "git_blob_sha": "9f0694167b0e11350587216420ba0242ce8afbcd"
+    },
+    {
+      "path": "evidencias/C036-cierre.json",
+      "bytes": 1462,
+      "sha256": "9276a428bd7bd0389793897853ce520a2ab25df2f520eb4b55986b276ed20828",
+      "git_blob_sha": "f0bf004620db41eb35a4ca7d6c731e41b56eaa40"
     }
   ],
   "runtime_references": [
@@ -919,14 +985,12 @@
     "no_secret_values_in_manifest": true
   },
   "current_preparation": {
-    "version": "0.6.19",
-    "baseSha": "b5e7009de137db30c26ecc5f4ddbb34789f453f2",
-    "branch": "feat/ingreso-autobiografico-20261019",
-    "receipt": "evidencias/C033-implementacion.json",
-    "state": "tested candidate; preview READY; no production or complete E2E acceptance",
-    "observed_head": "bdc0255df9c9573575b25082706197a55bef7211"
+    "event": "C036",
+    "state": "preview-ready-for-review",
+    "code": "22f0fea34b77aa69ebdc51e346a2e2d4f0cbccc9",
+    "future_summary": "deferred-not-implemented"
   },
-  "latestEvent": "C035 authorized migration; final code integrated, global build failed, input-mold interpretation corrected",
+  "latestEvent": "C036",
   "latest_verified_release": {
     "sha": "f0dfbdcb2d79eb6289dacba272ddcc7ba2023063",
     "deploymentId": "dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr",
@@ -952,29 +1016,15 @@
     "physicalAcceptance": false,
     "technicalPublicationVerified": true
   },
-  "latest_cycle": "C035",
-  "canonical_version": "0.6.21",
+  "latest_cycle": "C036",
+  "canonical_version": "0.6.22",
   "latest_candidate": {
     "branch": "feat/ingreso-autobiografico-20261019",
-    "base": "b5e7009de137db30c26ecc5f4ddbb34789f453f2",
+    "codeCommit": "22f0fea34b77aa69ebdc51e346a2e2d4f0cbccc9",
+    "deployment": "dpl_BL7qyjtYzpqjZFqiVuVrQcz7kVzL",
+    "state": "READY",
     "production": false,
-    "publicAudio": false,
-    "codeCommit": "bdc0255df9c9573575b25082706197a55bef7211",
-    "pullRequest": 330,
-    "observedHead": "c0dcb2e26f9df31273bbf654ffc52222a7d9d887",
-    "preview": {
-      "deployment": "dpl_3i1uggfnr2cGt89iRMCQvXJq2qWA",
-      "state": "READY",
-      "commit": "bdc0255df9c9573575b25082706197a55bef7211",
-      "target": null,
-      "url": "https://khora-10mve3uo2-victorhugotorresmendez-8991s-projects.vercel.app",
-      "logs": 403,
-      "http": "redirects to Vercel login; application not verified",
-      "settings_changed": false,
-      "protection_bypass_created": false
-    },
-    "deploymentId": "dpl_jLTALH6xrtcDqoKNd5Tc3B927TfB",
-    "deploymentState": "ERROR"
+    "publicAudio": false
   },
   "release_history": [
     {
@@ -1124,10 +1174,10 @@
     }
   ],
   "quality_gate": {
-    "state": "blocked",
+    "state": "preview-ready-awaiting-human-review",
     "receipt": "evidencias/C030-gate-blocker.json",
     "activeConfigChanged": false,
-    "currentEvidence": "evidencias/C035-integracion.json",
+    "currentEvidence": "evidencias/C036-cierre.json",
     "currentFirstMilestone": "Khora Ingreso specialized Blog mold before dictation -> generated transcript -> manual archive -> exact joint consent -> GitHub Blog then Facebook, no public audio"
   },
   "method_history": [
@@ -1172,6 +1222,31 @@
         "codeCommit": "19b3966b6cdefc6edebea7d18e8e88acf102356b",
         "pullRequest": 330,
         "observedHead": "1ee239c009d5c9499ac80ad93b12e8204cc61977"
+      }
+    },
+    {
+      "event": "C036-retain-prior",
+      "previous": {
+        "branch": "feat/ingreso-autobiografico-20261019",
+        "base": "b5e7009de137db30c26ecc5f4ddbb34789f453f2",
+        "production": false,
+        "publicAudio": false,
+        "codeCommit": "bdc0255df9c9573575b25082706197a55bef7211",
+        "pullRequest": 330,
+        "observedHead": "c0dcb2e26f9df31273bbf654ffc52222a7d9d887",
+        "preview": {
+          "deployment": "dpl_3i1uggfnr2cGt89iRMCQvXJq2qWA",
+          "state": "READY",
+          "commit": "bdc0255df9c9573575b25082706197a55bef7211",
+          "target": null,
+          "url": "https://khora-10mve3uo2-victorhugotorresmendez-8991s-projects.vercel.app",
+          "logs": 403,
+          "http": "redirects to Vercel login; application not verified",
+          "settings_changed": false,
+          "protection_bypass_created": false
+        },
+        "deploymentId": "dpl_jLTALH6xrtcDqoKNd5Tc3B927TfB",
+        "deploymentState": "ERROR"
       }
     }
   ],
