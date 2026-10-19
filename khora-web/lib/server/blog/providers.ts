@@ -37,7 +37,7 @@ export class GitHubBlog {
 export class MetaPage {
   #token:string;pageId:string;fetcher:typeof fetch;
   constructor(pageToken:string,verifiedPageId:string,fetcher:typeof fetch=fetch){if(!pageToken||!/^[0-9]+$/.test(verifiedPageId))throw new Error('META_UNCONFIGURED');this.#token=pageToken;this.pageId=verifiedPageId;this.fetcher=fetcher;}
-  async request(path:string,init:RequestInit={}){if(!/^[a-zA-Z0-9_/?=,&.-]+$/.test(path))throw new Error('META_PATH');return this.fetcher('https://graph.facebook.com/v26.0/'+path,{...init,redirect:'error',signal:AbortSignal.timeout(20000),headers:{Authorization:`Bearer ${this.#token}`,'Content-Type':'application/json'}});}
+  async request(path:string,init:RequestInit={}){if(!/^[a-zA-Z0-9_/?=,&.{}-]+$/.test(path))throw new Error('META_PATH');return this.fetcher('https://graph.facebook.com/v26.0/'+path,{...init,redirect:'error',signal:AbortSignal.timeout(20000),headers:{Authorization:`Bearer ${this.#token}`,'Content-Type':'application/json'}});}
   async verifyIdentity():Promise<{id:string;name:string}>{
     const p=await json(await this.request('me?fields=id,name'),'META_IDENTITY_FAILED');
     if(p.id!==this.pageId)throw new Error('META_PAGE_MISMATCH');return {id:p.id,name:p.name};
