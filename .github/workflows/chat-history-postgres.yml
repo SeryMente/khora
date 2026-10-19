@@ -1,0 +1,46 @@
+name: Chat history PostgreSQL
+on:
+  push:
+    branches: [fix/chat-epistwin-consulta-contract]
+    paths:
+      - kernel/src/khora_kernel/engine/history.py
+      - kernel/tests/engine/test_history_storage.py
+      - kernel/tests/engine/test_history_postgres_live.py
+      - kernel/requirements-history-postgres.txt
+      - .github/workflows/chat-history-postgres.yml
+  pull_request:
+    paths:
+      - kernel/src/khora_kernel/engine/history.py
+      - kernel/tests/engine/test_history_storage.py
+      - kernel/tests/engine/test_history_postgres_live.py
+      - kernel/requirements-history-postgres.txt
+      - .github/workflows/chat-history-postgres.yml
+permissions:
+  contents: read
+jobs:
+  isolated-history:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: khora_history_test
+          POSTGRES_USER: history_test
+          POSTGRES_PASSWORD: disposable-ci-only
+        ports: [5432:5432]
+        options: >-
+          --health-cmd "pg_isready -U history_test -d khora_history_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      KHORA_TEST_HISTORY_POSTGRES: postgresql://history_test:disposable-ci-only@127.0.0.1:5432/khora_history_test?sslmode=disable
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r kernel/requirements-history-postgres.txt
+      - run: python kernel/tests/engine/test_history_storage.py
+      - run: python kernel/tests/engine/test_history_postgres_live.py
