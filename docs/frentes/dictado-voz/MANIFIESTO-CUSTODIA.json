@@ -899,12 +899,6 @@
       "git_blob_sha": "b9d08f58af517e1f35ab0de3a2733949b80404c5"
     },
     {
-      "path": "OBJETO-CANONICO.md",
-      "bytes": 242184,
-      "sha256": "15bd52d85d23b2b0f0a4f3590be60a5e9e4ce6c27559d98022cdff6dd63ec55a",
-      "git_blob_sha": "73608d94fea0478ef75753e250cd77cc73bec558"
-    },
-    {
       "path": "originales/C038-comodidad-operador.txt",
       "bytes": 2618,
       "sha256": "d698205d63762ac549fa777a76d0e98d525a0a2f07b8d1d9d7073c06e349aa6f",
@@ -963,6 +957,42 @@
       "bytes": 9822,
       "sha256": "3deb91cda7516283b1fc068bc494a240bdd74fbae3940d948280cb6cab7cbccd",
       "git_blob_sha": "191a41c036a3341a5946301ab883243b0cd02794"
+    },
+    {
+      "path": "OBJETO-CANONICO.md",
+      "bytes": 254016,
+      "sha256": "6c20786b81d253cd2885bd8a55f70e4b5e1bc5b926b19241cffe601b75368a14",
+      "git_blob_sha": "e078eee5da71f4683eb19bf0c91c224c68e09e47"
+    },
+    {
+      "path": "originales/C039-instrucciones-verbatim.txt",
+      "bytes": 4344,
+      "sha256": "83220c826493aece99e2c85403d7b229b1343972263c7be9752dc616b615c210",
+      "git_blob_sha": "03e366c1e223d27306bd4131cb272ccd5ec1f9fd"
+    },
+    {
+      "path": "originales/C039-criterio-editorial.md",
+      "bytes": 2653,
+      "sha256": "696e49569286394451f05b50b1cd1dba3fc4a02deb9c9963fc4a38730cbb9e56",
+      "git_blob_sha": "0e5aec232504a373c8efebc13142b84af441a86b"
+    },
+    {
+      "path": "originales/C039-salida-progreso.md",
+      "bytes": 455,
+      "sha256": "5c14580c04d4032fdaeacf102e34605f3d684d7c72b6c14390d00be6a3d0e4f3",
+      "git_blob_sha": "f57feff72c992f0930946242a217b28f54209a70"
+    },
+    {
+      "path": "evidencias/C039-investigacion.txt",
+      "bytes": 2279,
+      "sha256": "017656ccfb52d7c55adf6b6a1eef9e7da93d7e6f5dda4a8e6a1873895fc8de55",
+      "git_blob_sha": "25f39e09d51eeed43fa7a29210e26835e710459b"
+    },
+    {
+      "path": "evidencias/C039-alcance.json",
+      "bytes": 612,
+      "sha256": "cb69d71a221bb4d2a048b64be76dce51aa96af3a4359bb06491b5e58ec12a520",
+      "git_blob_sha": "ec8843e18d95207e5365f3f6db15ae66301b5cd6"
     }
   ],
   "runtime_references": [
@@ -1069,11 +1099,16 @@
     "no_secret_values_in_manifest": true
   },
   "current_preparation": {
-    "event": "C038",
-    "state": "comfortable-chronicle-production-published-awaiting-human-review",
-    "future_summary": "deferred-not-implemented"
+    "event": "C039",
+    "state": "editorial-minimum-and-media-planning",
+    "requiredSufficiency": true,
+    "exactStandard": "pending discussion",
+    "image": "deferred-budget",
+    "audio": "required-future-not-enabled",
+    "avatar": "feasibility-only-no-training",
+    "metaReplace": "documented-mechanism-not-operationally-verified"
   },
-  "latestEvent": "C038",
+  "latestEvent": "C039",
   "latest_verified_release": {
     "event": "C038",
     "state": "READY",
@@ -1120,8 +1155,8 @@
     "rollbackDeploymentId": "dpl_12FCcmkeXDBbLRqoi6eyd5gqKVKK",
     "summaryImplemented": false
   },
-  "latest_cycle": "C038",
-  "canonical_version": "0.6.24",
+  "latest_cycle": "C039",
+  "canonical_version": "0.6.25",
   "latest_candidate": {
     "branch": "feat/ingreso-autobiografico-20261019",
     "production": true,
@@ -1354,13 +1389,22 @@
         "sha256": "bcf08097ffcc5e8f13b931785fd6ca1997ac20d6dbedf20a2936c03f311a450e",
         "git_blob_sha": "bf2daf0ecc08f6e3d0a84a02aabe54b2440c4f52"
       }
+    },
+    {
+      "event": "C039",
+      "previous": {
+        "path": "OBJETO-CANONICO.md",
+        "bytes": 242184,
+        "sha256": "15bd52d85d23b2b0f0a4f3590be60a5e9e4ce6c27559d98022cdff6dd63ec55a",
+        "git_blob_sha": "73608d94fea0478ef75753e250cd77cc73bec558"
+      }
     }
   ],
   "quality_gate": {
-    "state": "production-published-awaiting-human-review",
+    "state": "sufficient-editorial-standard-pending-definition",
     "receipt": "evidencias/C030-gate-blocker.json",
     "activeConfigChanged": false,
-    "currentEvidence": "evidencias/C038-produccion.json",
+    "currentEvidence": "evidencias/C039-alcance.json",
     "currentFirstMilestone": "Khora Ingreso specialized Blog mold before dictation -> generated transcript -> manual archive -> exact joint consent -> GitHub Blog then Facebook, no public audio"
   },
   "method_history": [

@@ -3,9 +3,9 @@
 ## 1. Control e identidad
 
 - Identidad conservada: `MCP-OBS-DICTADO`; extensión documental de dictado, benchmark, retroalimentación y propuesta de voz/síntomas.
-- Versión: **v0.6.24**; sello **MCP-OBS-DICTADO-v0.6.24**. Objeto permanente por encargo V010; no declara permanente ninguna propuesta clínica.
-- Estado: **CANÓNICO PARA EL FRENTE · C038 CRÓNICA PERSONAL CÓMODA EN PRODUCCIÓN · REVISIÓN HUMANA PENDIENTE · PUBLICACIÓN EDITORIAL NO ACREDITADA**.
-- Ancla actual: C038, orden directa de comodidad y crónica mínima pública: nombre corto, ayuda oculta, dictado inmediato y pistas que desaparecen al detectar menciones en vivo. Producción canónica de a74b4058 verificada; aceptación humana pendiente.
+- Versión: **v0.6.25**; sello **MCP-OBS-DICTADO-v0.6.25**. Objeto permanente por encargo V010; no declara permanente ninguna propuesta clínica.
+- Estado: **CANÓNICO PARA EL FRENTE · C039 PLAN EDITORIAL Y MEDIOS SEPARADO POR FRENTES · SUFICIENCIA OBLIGATORIA POR DEFINIR/IMPLEMENTAR · SIN NUEVA PUBLICACIÓN**.
+- Ancla actual: C039, tres dictados directos corrigen opcionalidad, fijan texto siempre trabajado/audiooriginal futuro, sobriedad ratificada y custodia exhaustiva por objetos; investigación de sustituciónFacebook y avatarpropio sin implementar.
 - Repositorio propietario: `SeryMente/khora`, privado comprobado con herramienta en este ciclo. `SeryMente/metodologia` también privado: aporta el método, no recibe datos del frente.
 - Carpeta contenedora: `docs/frentes/dictado-voz/`; elemento único de estado: `OBJETO-CANONICO.md`. Carpeta y elemento no se confunden.
 - Revisión de origen del objeto: `1697ee2693ed3217523ffc1d1be9b6541d7d849d`, blob `e98a956c375ce48b791b5f0563ad0ae03c2616dd`.
@@ -13,6 +13,8 @@
 - Recuperación: README del repo → esta carpeta → este objeto. Contrato técnico y originales son anexos de custodia, no otra fuente de estado.
 
 ## 2. LEER PRIMERO
+
+**ACTUAL C039 PREVALECE SOBRE C038 Y ANTERIORES:** Crónica personal exige el nivel suficiente mínimo; «pistas opcionales» es HISTORIA y sigue como deuda de la interfaz instalada, no norma vigente. Plantilla pública/campos exactos/momento de exigibilidad aún se discuten antes de modificar código. Dictado posee criterioeditorial y elaboración de texto que entrega a activos públicos; Blog posee publicación, medios, versiones/enlaces/actualizaciones por destino. Texto siempre trabajado, único contenido crudo futuroaudiooriginal; audioobligatorio en entregas posteriores, imágenesdiferidasporpresupuesto y avatarpropio soloestudio. Sobriedad/primerapersona/concreción/vozreconocible aprobadas literalmente. Tres dictados íntegros en originales/C039-instrucciones-verbatim.txt; criterio separado, crónica y plan en este objeto. No nueva implementación, despliegue, entrenamiento ni publicaciónautorizados por estas consultas.
 
 **ACTUAL C038 PREVALECE SOBRE C037/C036:** «Crónica personal», dictado a la vista, ayuda oculta accesible a toque/teclado y tres pistas opcionales —momento, lugar amplio y qué haces— que desaparecen por menciones del relato y reaparecen al borrar. Análisis local léxico, no comprensión semántica general, verificación de verdad ni estándar forense. Producción canónica https://khora-web.vercel.app/sistema/ingreso sirve a74b40582cb0dfd762209a69675e469914a380ec, despliegue dpl_86iMKAAGQoQEE1zXHfsinuoeKWDb READY. Sin formulario, obligación de cubrir pistas, límite de relato o autorización editorial nuevos. Originales C038 conservados. ResumenGroq y extensión pública uniforme siguen diferidos.
 
@@ -69,7 +71,7 @@ Delta adquirido: carpeta canónica, trece bloques ordenados, originales separado
 
 **De dónde viene:** defecto de continuidad al editar y seguir dictando; corrección original reportada satisfactoria por el operador en V000. Evoluciona a evaluar utilidad, fluidez y experiencia agradable, no solo contar errores.
 
-**Dónde está ahora:** C038 Crónica personal cómoda publicada en dominio canónico, con ayuda oculta y pistas locales en vivo; revisión humana dentro de sesión pendiente. Estado único en §8. C037/C036 son antecedentes, no estado actual.
+**Dónde está ahora:** C039 planificación editorial/medios y registro exhaustivo; nivel suficiente obligatorio, definiciónfinal pendiente. InterfazC038 es antecedente técnico con texto«opcional» aún no corregido; no hubo cambio runtime enC039. Responsabilidades y plan actuales en§5/§8/§9.
 
 **A dónde va:** terminar la validación real consentida y completar cobertura técnica. V009 abre una intención adicional de voz y síntomas: se documenta, no se disfraza de capacidad ya creada.
 
@@ -85,6 +87,13 @@ La frase «autoridad moral» y «medición de área» de V009 permanece ambigua;
 
 ## 5. Roles y colaboración
 
+C039 · Separación explícita por orden del operador:
+- **Ingreso/Dictado (este objeto, centralSamanthaL):** captura/transcripción/originales, suficiencia mínima y criterio editorial sobrio en primera persona, elaboración de texto/resumen fiel, cotejo de puntos sustantivos y entrega autorizada a activos públicos. No administrar publicaciones ajenas por inferencia.
+- **Blog (objeto propio existente):** representación por destino, empaquetado y mediospúblicos, proveedor/coste/retención de imágenes/avatares, alojamiento/reproducciónaudio, publicación y comprobantes, revisiones/historial, URLs e investigación/prueba de sustituciónFacebook. Criterioeditorial remite al propietarioDictado, no versión paralela.
+- **Contrato compartido por acordar, no implementado:** original/version/huella → texto trabajado y resumen cotejado → revisión exacta/consentimiento → activos públicos/versiones/confirmaciones. Originalprivado y revisiones públicas no se sobrescriben silenciosamente. Un escritor por archivo; Blog conserva su propio canon y manifiesto.
+- Original de instrucciones central se entrega literalmente a Blog como fuente recibida para que registre exhaustivamente su alcance, no para crear otro hilo ni reconstruir citas desde resumen.
+
+
 C036 vigente: CENTRAL SamanthaL/construcción Ingreso = session://55bade27-f22c-8108-a269-00039938ee4f/3feade27-f22c-8016-928e-00a9f513f6b3; BLOG2 = session://55bade27-f22c-8108-a269-00039938ee4f/3feade27-f22c-8026-97b8-00a91cccfb18. Blog2 localizado con query_sessions y mensajes efectivamente enviados; respuesta recibida y fuente Git de su canon v12 recuperada. No se creó agente ni se envió trabajo a sesiones antiguas. Un escritor por archivo: central TipoEntradaControl/IngresoView/IngresoWorkspace/test unitario reservado y este objeto; Blog consumidor/editorial y SU objeto. Blog congeló ampliación para no retrasar candidata. Test opcional66ad5610 no integrado ni requerido para esta UI.
 
 Antecedentes de roles anteriores:
@@ -96,6 +105,8 @@ Antecedentes de roles anteriores:
 - Una salida del constructor que entregue el operador tiene prioridad: leerla, contrastarla, sintetizar efecto/pendientes/viabilidad y emitir prompt completo de continuidad; luego reanudar auxiliares útiles sin colisiones.
 
 ## 6. Autoridad
+
+C039: U-C039-01–03 son mensajes directos actuales; autorizan investigación, planificación y documentación exhaustiva en objetos existentes. Aprobación editorial literal: «Y sí, una crónica sobria en primera persona, concreta y reconocible como mía, correcto. Mientras más sobria, mejor.» No aprueban proveedor, coste, subida de rostro/voz, clonación, entrenamiento, generarimagen/vídeo, publicar audio ni sustituir publicaciones reales.
 
 C036: órdenes directas «REsuelve de extremo a extremo, ya sin excusas» y posterior «Termina lo más rápido posible de actualizar y publicar en Vercel» sustituyen pausa por migración; última orden acota la entrega a interfaz básica para revisión y confirma suficiencia sin limitar el relato. Se presentó bloque exacto cinco guías y operador ratificó el molde como parte de la interfaz especializada. Autoriza construcción/candidata actual, no aprobación humana inventada del resultado ni nota editorial exacta. ResumenGroq/tamaño uniforme expresamente SIGUIENTE VERSIÓN; no se implementan ahora ni se elige longitud sin decisión. Sin cambios de secretos, proveedores, seguridad, plan, visibilidad, protección, main ni promoción. Acceso/aceptación y permiso para publicar contenido siguen siendo compuertas separadas.
 
@@ -165,18 +176,21 @@ Autenticación C025: dos flujos estándar por dispositivo, autorizados en navega
 
 ### 🔄 Estado vivo
 
-C038 · CRÓNICA PERSONAL CÓMODA PUBLICADA EN PRODUCCIÓN CANÓNICA. https://khora-web.vercel.app/sistema/ingreso, revisión a74b40582cb0dfd762209a69675e469914a380ec, rama feat/ingreso-autobiografico-20261019; despliegue dpl_86iMKAAGQoQEE1zXHfsinuoeKWDb READY/production/alias canónico. Nombre simplificado, Iniciar dictado inmediato y explicación bajo ayuda nativa accesible con toque, teclado y Escape. Momento/Lugar/Qué haces se retiran según menciones detectadas en texto estable y parcial de voz y reaparecen al eliminar; pistas opcionales, no gate de archivo/publicación ni prueba de verdad/identidad. Original libre, archivo manual, recibo/consumidor y revisión exacta conjunta intactos. No merge a main ni publicación de nota.
-Coordinación ejecutada con Blog2 existente: entrega final95b374c5 con SOLO módulo puro cronica-coverage.ts y test; siete blobs de integración cotejados en central, sin integrar rama completa ni testbrowser previo. Central único escritor UI/captura/despliegue; Blog v13/C-BLOG-010 propio. Fuentes U01 recuperada literal y U03 normalizada se contrastaron: constancia cotidiana/representación propia y relato incompleto conservable; no se inventa requisito político adicional o identificación legal. Este hito NO define la línea autobiográfica forense.
-Siguiente paso: operador abre producción, selecciona Crónica personal y prueba comodidad/dictado con sesión real. La detección por expresiones locales puede pasar por alto giros o lugares desconocidos: no forzar al autor ni convertir pendiente en ausencia. Versión siguiente conserva resumenGroq/extensión pública uniforme sin implementación; decisiones de longitud/unidad/fidelidad/atribución/previa pendientes. Compuertas editoriales normativas401/Meta/nota exacta siguen separadas y no se reintentaron por este hito. Luces/custodia/recuperación/títulos y recordatorios históricos conservados.
+C039 · CRÓNICA PÚBLICA EN DEFINICIÓN, CON SUFICIENCIA OBLIGATORIA Y CRITERIO EDITORIAL CUSTODIADO. Tres instrucciones directas completas guardadas; aprueba sobriedad máxima, primera persona, concreción y voz reconocible. Dictado prepara el contenido que entregará a activos públicos; Blog administra esos activos, destinos, medios y evolución. No diseñar la línea forense por inferencia ni inventar datos para llenar mínimos. Actual códigoC038 aún contiene «pistas opcionales» y análisis léxico; eso no cumple automáticamente la exigencia editorial vigente. Próximo paso: acordar entrada pública estándar, campos suficientes y compuerta de revisión, después implementar el delta expresamente decidido. Relato libre y custodia de original no se convierten silenciosamente en obligación de formularios o pérdida de incompletos.
+Texto público SIEMPRE trabajado; transcripcióncruda no se vuelca por defecto. Audiooriginal será la pieza principal y único contenido que pase crudo en entregas futuras; obligatorio futuro, no activo ahora. Resumen acompañante debe representar esencia de cada punto sustantivo incluso en relato de1hora; longitudfinal y criterio de compresión aún por pulir, sin prometer tamaño rígido y cobertura íntegra simultáneos. Imágenesporentrada previstas pero diferidas por presupuesto, Googlegratuidad no acreditada, MidJourney/estilos para futuro. Avatarpropio es investigación, no proveedor contratado ni consentimiento de biometría/voz.
+Investigación: Meta PageVideos indexado documenta replace_video_id/swap_mode=replace y códigooficial leído los incluye; existencia de mecanismo acreditada, NO funcionamiento en nuestraPágina/publicaciónorgánica ni conservaciónID/URL/reacciones/comentarios/vistas/subtítulos/fecha. HeyGen documenta avatarpropio consentido y animación con audio real; viable técnicamente, coste/control/retención/calidad no validados, rutaDigitalTwin crea también vozclonada separada. No asumirfree ni borrarvoz al borraravatar. Versiónpúblicayoriginal deben seguir vinculados si evolucionan. Producción/recuentoC038 son antecedentes no revalidados ni redeployados enC039; cero nuevas mutaciones de runtime, cuentas o activos públicos.
 
 ### ⚗️ En prueba / recién fallido
 
-C038:66/66unit actuales sin skip (43analizador+23regresióneditorial);31/31Chromium con componentes/CSS reales, callbacks/estado sintéticos y red solo localhost; cero errores de página. TypeScript5.9.3 ES2017/Bundler estricto focal UI/analizador/test cero diagnósticos; no chequeo local global. Seis capturas desktop/móvil, claro/oscuro, ayuda/pendientes/dictado inspeccionadas: sin desbordamiento, botón inicial visible móvil, relato largo intacto e incompleto archivable. No micrófono físico ni sesión/auth/DB/editorial productivos.
-Producción Nextbuild remoto READY del SHA exacto, alias y /api/version200production coinciden; /api/auth/session200null y /sistema/ingreso llega al acceso normal200 sin error de configuración. No aceptación humana ni garantía de reconocimiento semántico general. Fallos de arnés JSX y dependencia de copia parcial registrados/corregidos antes de escribir; no defectos productivos atribuidos. Rollback disponible al release anterior dpl_12FCcmkeXDBbLRqoi6eyd5gqKVKK/ad685dee; no ejecutado.
+C039 es investigación y documentación, no prueba de producto: lecturaactual método1.6/centralv0.6.24 y privacidadrepo confirmadas; fuentesMeta indexadas, carga directaMeta403; SDKMeta y docsHeyGen cargados. No lecturaautenticadaMeta, reemplazoreal, imagen/avatar/audio creados, ni prueba depermisos, costes o voz originalrenderizada. C038 tenía66unit/31Chromium/tipos5.9.3focal y producción técnica acreditada; evidencia histórica, no reejecución actual ni aceptación humana.
+Pendiente material para viabilidadoperativa: pruebaMeta autorizada sobre un caso controlado que determine qué identidades/interacciones/permalinks conserva, y evaluación de proveedoravatar sobre coste/datos/voz/eliminación. No usar anuncios/creatividades como prueba de sustituciónorgánica ni borrar/republicar como si conservara la publicación. La UI de suficiencia requiere decisión de estándar, no solo renombrar opcional por obligatorio.
 
 ### 🔔 Recordatorios latentes
 
-- C038: publicación de Crónica personal cómoda en dominio canónico satisfecha técnicamente; revisión humana de comodidad y dictado real pendiente. No confundir tres pistas léxicas opcionales con suficiencia forense/verdad. ResumenGroq/extensión uniforme siguen próxima versión, sin truncar original.
+- C039: salvaguardar criterio editorial y tres dictados íntegros; registroexhaustivo porfrente, no solo chat/resumen. Separar lo ratificado de propuestas abiertas y no inventar aceptación de proveedor/coste/biometría.
+- C039: sustituciónMeta condicionada a prueba autorizada; no garantizar conservaciónURL/interacciones ni hacer borrado+repost por defecto. Avatarrepresentacional no es evidencia de filmación/presencia; audiooriginal no se sustituye por vozsintética. Estas salvaguardas de representación son propuestas de diseño documentadas para revisión, no permiso de producción.
+
+- C039: nivel suficiente obligatorio para Crónica personal supersede opcionalidadC038. Definir plantilla/campos/revisión y luego corregir UI; no equiparar detectorléxico con suficiencia/verdad ni estándarforense. Conservar original libre. Resumen, audiofuturoobligatorio, imágenesdiferidas y avatarpropio siguen en plan sin activar. RevisiónhumanaC038 pendiente, no liberada por silencio.
 - C036: credencial normativa dedicada rechazada401; administrador debe revisarla sin chat/secretos; no reintento ni bypass. Meta/Página/token/identidad y nota exacta aprobada no acreditados.
 
 - No declarar cerrado el sprint por compilación, prueba controlada, HTTP 200 o archivo guardado.
@@ -193,6 +207,22 @@ Producción Nextbuild remoto READY del SHA exacto, alias y /api/version200produc
 - No borrar estos recordatorios por silencio; liberación positiva o decisión expresa.
 
 ## 9. Aceptación y viabilidad
+
+### C039 · Plan de trabajo por hitos y propietario (vigente, sin ejecución nueva)
+
+| Hito | Propietario del contenido/objeto | Alcance y condición de cierre | Estado |
+| --- | --- | --- | --- |
+| 1 · Crónica textual suficiente | Dictado: estándar y elaboración; Blog: representación/destinos | Acordar plantilla pública blog/Facebook y mínimos exigibles; texto sobrio, en primera persona, concreto y reconocible como del autor; siempre trabajado y revisado, sin inventar datos. Definir qué se exige y cuándo. | Sobriedad aprobada; formato final y compuerta abiertos. UIopcionalC038 es deuda explícita, no cumplimiento actual. |
+| 2 · Elaboración y resumen fiel de relato largo | Dictado, entrega a Blog | Inventario de puntos sustantivos y anclas de cada uno en original/version; resumen conserva esencia sin añadir hechos ni borrar matices/rectificaciones/incertidumbre. Criterio se refina; longitudobjetivo vs cobertura íntegra requiere decisión explícita. | Requisito directo; algoritmo, modelo/Groq, longitud y pruebas de calidad no aprobados/implementados. |
+| 3 · Audiooriginal público como pieza principal | Dictado custodia/entrega; Blog medio/reproductor/destino | Audiooriginal íntegro/versionado, consentimientoexacto y posibilidad de revisión; decidir alojamiento y reproducción por destino, posible contenedorvídeoFacebook. No vozclonada como sustituto del original. | Obligatorio en entregas futuras, NO activar en hito actual. |
+| 4 · Imagen por entrada e identidad visual | Blog, usando textoaprobado de Dictado | Acordar criterio visual/procedencia/etiquetado y presupuesto. Google candidato, cuotaAPIgratis noacreditada; MidJourney/referencias de estilo futuros. | Diferido explícitamente por presupuesto; sin llamadas, cuenta ni pagos. |
+| 5 · Mejora progresiva de publicaciones y vídeos | Blog | Mantener identidadcanónica deentrada y versionado del activo; comprobar en pruebaautorizada si replace_video_id/swap_mode conserva postID/videoID/permalink/fecha/comentarios/reacciones/vistas/captions; gestionar fallback como nueva versión, no mismoobjeto si no lo es. | MecanismoMeta documentado, elegibilidad/garantías operativas NO VERIFICADAS. No sustitución/borrado/publicación real. |
+| 6 · Avatar audiovisual del propio autor | Blog medios/proveedor; Dictado fidelidad de voz/contenido | Evaluar servicioexistente antes de construir; material propio, consentimiento, coste, retención/entrenamiento/eliminación rostro+voz, calidad. Preferir audiooriginal como entrada; distinguir avatar de toma documental y pedir revisión de representación. | Consulta de viabilidad, no implementación ni elección de proveedor. |
+
+**Formato público aún propuesto, no ratificado en bloque:** título breve; fecha del episodio y lugar general; crónica primera persona; autoría. Misma crónica completa en blog/Facebook más enlace alblog fue recomendación del asistente, no respuesta expresa a esa elección. Título/autoría pueden prepararse automáticamente como propuesta, no introducir hechos. Elementos semánticos actualeswhen/where/what requieren criterio suficiente más fino y manejo de desconocido/precisión; no cambiar el código sin cerrar esa decisión.
+
+**Evolución sin falsear historia, propuesta a acordar:** conservar original privado y versiones, distinguir fechaepisodio/captura/publicación/revisión, mejorar presentación sin alterar silenciosamente loque realmente ocurrió o se dijo. Si cambia el sentido del relato, tratarlo como revisióneditorial material con nueva aprobación exacta; Meta no garantiza que terceros borren copias antiguas. No asumir que una imagen generada o un avatar demuestran presencia física en el episodio.
+
 
 **C036 estado actual:** objetivo acotado «UI básica especializada lista en Vercel para revisión» → guía opcional antes/durante dictado sin exigir cinco respuestas →12checks propios de UI reales/callbacks sintéticos y build remoto READY22f0fea → candidata revisable con acceso legítimoVercel/Khora; aceptación humana pendiente. TS2339 causal corregido y23unit actuales pasan. Blog2consumidor20checks son su evidencia cargada, no publicación productiva. No exigir resumen uniforme ahora. El objetivo histórico completo dictado→archivo→ambosdestinos sigue abierto por credencialnormativa401/configMeta/notaexacta/revisión; no sustituirlo por deploy ni plazo inventado. Siguiente hito de revisión depende del operador; sin fecha/ciclos humanos inventados. Construcción y despliegue de candidata actual terminados en este ciclo; ejecución segura restante es custodia/readback.
 
@@ -268,6 +298,18 @@ Toda salida conserva diez campos, agrupables sin ocultarlos: (1) proyecto/rol/se
 No llamar «sin cambios» a una fuente inaccesible; no convertir calidad científica o clínica en semáforo por pruebas de software. Si no hay constructor nuevo asignado, decirlo y no inventar trabajo en segundo plano.
 
 ## 11. Crónica y fuentes
+
+### C039 — Suficiencia obligatoria, criterio editorial, medios y revisión progresiva — 2026-10-19
+- Objetivo/autoridad: tres mensajes directos U-C039-01–03 fijan nivel suficiente obligatorio, debate de formato público, texto siempre elaborado, audiooriginalcrudo futuroobligatorio, imagenprevista perodiferida, mejoraprogresiva y documentación exhaustiva/verbatim porfrente. U03aprueba literalmente sobriedad/primera persona/concreción/voz reconocible y pregunta avatarpropio. No se infiere consentimiento para subir rostro, clonar voz, elegirplan o publicar.
+- Corrección de criterio: «opcionales»C038queda histórico, no vigente. No cambiar solo etiqueta y convertir expresiónléxica en validación. Separar obligación de suficiencia pública de libre captura/custodiaoriginal; los campos exactos/exigibilidad/unknown siguen abiertos y se definen conversando antes de cirugía. Interfaz existente no modificada, deuda declarada.
+- Criterio editorial salvaguardado: aprobaciónliteral y propuestaasistente separadas en originales/C039-criterio-editorial.md. Quitar muletillas/repeticiones, ordenar sin añadir hechos, preservar relato/interpretación/duda/intención y rectificaciones, cotejar inventario de puntos son propuesta de refinamiento, no aprobación global inferida. Cobertura de cada punto y texto siempre trabajado sí son órdenes directas. Longitudrígida vs relato1h es decisión abierta, no atajo de omisión o relleno.
+- Roles/plan: Dictado propietario del criterio y elaboración de contenido que va a activos públicos; Blog propietario de representación, medios, publicación, versiones/enlaces y mejoras de activos. Mismo objeto porfrente, no canonparalelo; planhitos y matrizdepropiedad en§9. Originales íntegros enviados a sesiónBlog2 existente con investigación y límites; Blog documenta su alcance y no código. No hilos nuevos ni escritores concurrentes.
+- InvestigaciónMeta: búsquedaoficialPageVideos mostró replace_video_id y swap_mode=replace; carga403limitada a esa fuente. SDKoficialMeta advideo.py leído confirma campos/enum; mecanismo documentado no asegura vídeoorgánico ya publicado de nuestraPágina ni conservaID/URL/interacciones/fecha/captions. No extrapolartransferenciafeedback de ads a orgánico. Caso de prueba autorizada pendiente; no tocarPágina para investigar por iniciativa.
+- Investigaciónavatar: docsHeyGen cargadas confirmanDigitalTwin desde vídeo propio+consentimientomisma persona y rutaaudio-to-video con audio grabado/asset, hasta30min por petición, segmentos/composición para1hora. Candidatoexistente no proveedor aprobado; avatar/voz se gestionan separado, borrado de avatar no borra voz segúnfuente. No entrenamiento, generación, pago, clonación ni subida dedatosrealizadas. Control de outputs no es control absoluto de copias externas. Audiooriginal es fuente a preservar, avatarrepresentaciónnoactaregistro.
+- Imágenes/audio: instruccionesdifierenimagenporpresupuesto y audiofuturoobligatorio, no activarlosahora. TarifaGoogle antesconsultada noofrecefreeTier para modelosimagen revisados; AIStudio gratis no pruebaAPIgratis. MidJourney/estilos siguen futuro. Facebookvídeo conaudio documentado no significa MP3nativo probado ni permiso de hacerprimernota.
+- Evidencia/límites: método1.6/centralv0.6.24/manifiesto leídos, privacidadkhora revalidada. C039sololecturas+documentación y mensajes a existenteBlog2. PruebasC038históricas, ningunaejecuciónruntime/despliegue/merge/cuenta/publicaciónreal enC039. Investigación primaria fuente/estado/noverificado en evidencias/C039-investigacion.txt. No reconstruir transcriptnativo ni razonamiento interno.
+- Persistencia/checkpoint: mismo Elemento v0.6.25,13secciones/AnexoA intactos, tresdictadosverbatim, criterio y recibo de investigación, manifiesto actualizados; lectura de vuelta y cotejoblobs antes de afirmar guardado. Blog debe confirmar custodia propia sin atribuírsela central por enviarle mensaje. Conversacióncontinúa paraacordar estándar y compuertas; no handoff.
+
 
 ### C038 — Crónica cómoda, ayuda escondida y pistas locales en vivo — 2026-10-19
 - Autoridad/originales: mensaje directo exige foco en crónica mínima pública, comodidad, nombre sencillo, sin guía visible, checklist que desaparece al dictar, coordinaciónBlog2 y hito en producción; segunda orden pide continuar hasta terminar. Ambos íntegros en originales/C038-comodidad-operador.txt; salidas visibles archivadas aparte. No permiso nuevo de nota/editorial/secretos ni estándar forense inventado.
@@ -671,6 +713,8 @@ El expediente Git es portable; /data del hilo antiguo NO se supone compartido. R
 ````
 
 ## 13. Persistencia y revisión
+
+C039: documentación permanente autorizada en mismoElementoprivado, sin nuevo canon/tablero ni runtime. Tresdictados recibidos íntegros UTF-8/LF con procedencia, propuestas separadas y criterio ratificado inequívoco. Trecebloques y AnexoA byteidénticos, manifiesto custodia con hashes y relectura por revisiónGit antes de declarar sincronización. Esta custodia no acredita que Bloghaya escrito hasta su recibo propio, ni exporter chatnativo completo.
 
 C038: mismo elemento permanente y carpeta existente, documentación después de URL productiva. Versión0.6.24 conserva13secciones, recordatorios, historiaAnexoA y originales; manifiesto incluye integración exacta de Blog y evidencia central. PrivacidadGit revalidada. Lectura remota/blobs requerida antes de afirmar cierre documental; revisión humana sigue pendiente.
 
