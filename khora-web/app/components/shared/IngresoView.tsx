@@ -4,6 +4,7 @@ import { useState } from "react";
 import * as I from "lucide-react";
 import { TipoEntradaControl } from "../ingreso/TipoEntradaControl";
 import type { ClasificacionEntrada } from "../../../lib/custodia/editorial";
+import { CronicaCoverage } from "../ingreso/CronicaCoverage";
 import { AudioActivity } from "../ingreso/AudioActivity";
 import s from "../ingreso/ingreso-studio.module.css";
 export type IngresoViewState = {
@@ -29,6 +30,7 @@ export type IngresoViewState = {
   stream?: MediaStream | null;
   titulo: string;
   texto: string;
+  textoProvisional?: string;
   estado: "inactivo" | "dictando";
   modoEntrada: "ninguno" | "microfono" | "chrome_live_caption";
   chromeBridgeEstado: string;
@@ -85,9 +87,10 @@ export function IngresoView({state:v,actions:a={},isReviewMode=false}:{state:Ing
  const busy=!!v.finalizando||!!v.procesando||v.guardando||v.adjuntandoAudio||v.retranscribiendo||!!v.recuperando;
  const locked=busy||!!v.archivado;
  const recording=v.estado==="dictando";
+ const cronica=v.clasificacion?.tipoEntrada==="blog_personal";
  return <main data-ui-id="ingreso.container" className={s.studio}>
   <header className={s.heading}>
-   <div><p className={s.eyebrow}>ESPACIO DE CAPTURA</p><h1>Ingreso</h1><p className={s.subtitle}>Dale espacio a lo que piensas.</p></div>
+   <div><p className={s.eyebrow}>{cronica?"INGRESO · BLOG PERSONAL":"ESPACIO DE CAPTURA"}</p><h1>{cronica?"Crónica personal":"Ingreso"}</h1><p className={s.subtitle}>{cronica?"Tu día, en tus palabras.":"Dale espacio a lo que piensas."}</p></div>
    {(a.onRecuperar||isReviewMode)&&<button className={s.secondary} onClick={a.onRecuperar} disabled={busy||recording||v.editando} aria-haspopup="dialog"><I.History size={18}/><span>Recuperar capturas</span>{!!v.recuperaciones&&<span className={s.count}>{v.recuperaciones}</span>}</button>}
   </header>
   <section className={s.sheet} aria-label="Captura actual">
@@ -104,6 +107,7 @@ export function IngresoView({state:v,actions:a={},isReviewMode=false}:{state:Ing
      <button className={s.iconButton} aria-label="Más opciones de captura" aria-expanded={more} aria-controls="ingreso-options" onClick={()=>setMore(!more)}><I.Ellipsis size={21}/></button>
     </div>
    </div>
+   {cronica&&<CronicaCoverage text={v.texto} provisional={v.textoProvisional}/> }
    {more&&<div className={s.options} id="ingreso-options">
     {(a.onGenerarTitulo||isReviewMode)&&<button data-ui-id="ingreso.btn-titulo-ia" className={s.secondary} disabled={locked||v.generandoTitulo||!v.texto.trim()} onClick={a.onGenerarTitulo}><I.Sparkles size={17}/>{v.generandoTitulo?"Generando…":"Título con IA"}</button>}
     {!!a.onRetranscribir&&<button data-ui-id="ingreso.btn-retranscribir" className={s.secondary} disabled={locked||recording||!v.conAudio} onClick={a.onRetranscribir}><I.RefreshCw size={17}/>{v.retranscribiendo?"Re-transcribiendo…":"Re-transcribir audio"}</button>}
@@ -132,7 +136,7 @@ export function IngresoView({state:v,actions:a={},isReviewMode=false}:{state:Ing
     <label className={s.srOnly} htmlFor="ingreso-title">Título de la captura</label>
     <input id="ingreso-title" aria-label="Título de la captura" data-ui-id="ingreso.titulo-input" className={s.title} value={v.titulo} readOnly={locked||!!v.archivoPendiente||(!!v.dialogoChrome&&recording)} onChange={e=>a.onTituloChange?.(e.target.value)} placeholder="Sin título" maxLength={500}/>
     <label className={s.srOnly} htmlFor="ingreso-text">Texto de la captura</label>
-    <textarea id="ingreso-text" aria-label="Texto de la captura" data-ui-id="ingreso.textarea" className={s.textarea} value={v.texto} readOnly={locked||!!v.archivoPendiente||(!!v.dialogoChrome&&recording)} onFocus={()=>a.onIniciarEdicion?.()} onClick={() => actions.onIniciarEdicion?.()} onChange={e=>a.onTextoChange?.(e.target.value)} placeholder={v.dialogoChrome?(v.organizarComoDialogo===false?"La transcripción de ambas fuentes aparecerá aquí al detener. Los originales se conservan separados.":"El diálogo aparecerá aquí al detener Chrome y micrófono. Durante la captura, comprueba las dos señales de audio."):"Escribe, pega o empieza a dictar.\nEste espacio es tuyo."} spellCheck/>
+    <textarea id="ingreso-text" aria-label="Texto de la captura" data-ui-id="ingreso.textarea" className={s.textarea} value={v.texto} readOnly={locked||!!v.archivoPendiente||(!!v.dialogoChrome&&recording)} onFocus={()=>a.onIniciarEdicion?.()} onClick={() => actions.onIniciarEdicion?.()} onChange={e=>a.onTextoChange?.(e.target.value)} placeholder={v.dialogoChrome?(v.organizarComoDialogo===false?"La transcripción de ambas fuentes aparecerá aquí al detener. Los originales se conservan separados.":"El diálogo aparecerá aquí al detener Chrome y micrófono. Durante la captura, comprueba las dos señales de audio."):cronica?"Empieza a contar.\nLa transcripción aparecerá aquí.":"Escribe, pega o empieza a dictar.\nEste espacio es tuyo."} spellCheck/>
    </div>
    {v.editando&&<div data-ui-id="ingreso.banner-edicion" className={s.editing}><span><I.PencilLine size={16}/>Edición in situ activa · tu texto se conserva.</span><button data-ui-id="ingreso.btn-confirmar-edicion" className={s.secondary} disabled={locked} onClick={a.onConfirmarEdicion}>Confirmar edición</button></div>}
    <footer className={s.sheetfooter}>

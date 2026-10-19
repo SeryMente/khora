@@ -1645,6 +1645,7 @@ function IngresoContenido({onDialogo,clasificacion,onClasificacionChange}:{onDia
         custodiaEstado,custodiaReady:!!custodiaOwner,custodiaPreparando,recuperando,recuperaciones:recoveryItems.length,stream:streamAudio,
         titulo,
         texto,
+        textoProvisional:parcial,
         estado,
         modoEntrada,
         chromeBridgeEstado,
