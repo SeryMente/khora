@@ -6,10 +6,10 @@
   "method": {
     "repo": "SeryMente/metodologia",
     "path": "METACANON-OBJETOS-CANONICOS.md",
-    "version": "1.6",
-    "commit": "a466b6b46f266de6a6ccd656e071eb7a07dc0e10",
-    "blob": "8f9ad1cf0e09e5fcd7014190770a77294ff39af4",
-    "sha256": "dab6680cbcdb6530e4616f8b13d1e0d5f1ff0885508203d1c5eac22fd86250ee"
+    "version": "1.8",
+    "commit": "5f11cf5ade6f5577e1d6bd19206ccbaf19cc9394",
+    "blob": "8bc5d7c900ec4bca9fd3131bb635746b50cec1e5",
+    "sha256": "95e4dff3228b3408c48e264591cf318aa428739ee599a03b3210284bedd9223e"
   },
   "original_source": {
     "repo": "SeryMente/khora",
@@ -1349,12 +1349,6 @@
       "git_blob_sha": "bdb3be182678411509210b69752884b9b94898a6"
     },
     {
-      "path": "OBJETO-CANONICO.md",
-      "bytes": 299327,
-      "sha256": "97dd7e11cf2bad87486bdbe22caf537e46e75d76c563b7237e76516b7be7ba54",
-      "git_blob_sha": "37bddb561cb4b176f60002d6ee07fd4d3673ab13"
-    },
-    {
       "path": "evidencias/C047/vercel-build-summary.txt",
       "bytes": 1775,
       "sha256": "b081cfcec5962ed4784a79873d1ec5b32abf7c4856e04557a53ac77a50c04a1f",
@@ -1377,6 +1371,48 @@
       "bytes": 562,
       "sha256": "d93b1d59be1ce8f3eda25adc45710c5c8941d40c555c5fbc74c0135ddae90873",
       "git_blob_sha": "2225147dc6397ec9518c4ade67d6a9ba3084f4bd"
+    },
+    {
+      "path": "originales/C048-event1416-representacion-herramienta.txt",
+      "bytes": 12930,
+      "sha256": "41ce10ed7c464f32fea7eeea30a330ee73905e6198b8271af31445cfda13a66e",
+      "git_blob_sha": "4f4ce8d603f985b180132ae5222ae16b732ebfc9"
+    },
+    {
+      "path": "originales/C048-adjunto-conversacion-redactado.txt",
+      "bytes": 180714,
+      "sha256": "736554f85817821af62979de4da9e4827098355ea9ef058e9c35b39b72b7ef0b",
+      "git_blob_sha": "bb58430e8db3796f66734420004c959c928b0683"
+    },
+    {
+      "path": "originales/C048-procedencia.json",
+      "bytes": 1467,
+      "sha256": "40e60771bb859ce1ad2cf8034c6ae10af6e43faacbbaeafd783a29765cb9b6a0",
+      "git_blob_sha": "2b92f19e261d56842e1d9e74e438b19136b900de"
+    },
+    {
+      "path": "evidencias/C048-plan-y-contrastes.md",
+      "bytes": 5685,
+      "sha256": "f471ae3a3dc7f688158bb3f289dfc9db174af1d13e91b9fc78a33c072f200dfb",
+      "git_blob_sha": "8d6d69d7ced9ad29cd004c794139e60598d43c75"
+    },
+    {
+      "path": "evidencias/C048-recibo.json",
+      "bytes": 1291,
+      "sha256": "78afd29bd70f44745c65b79c03519ea2c192f3760a6e4b0ef24d43a686241584",
+      "git_blob_sha": "db9058b4ec2d0ce46e8770c213f61cdcf6d2037b"
+    },
+    {
+      "path": "originales/C048-salidas-visibles-parciales.md",
+      "bytes": 1115,
+      "sha256": "d28faf56ae8c8e79583067942a4d25dbb5cd40144abda6e168ca46270b229087",
+      "git_blob_sha": "2ec00d15546f0b5aaab6618e0a46f6f8ed9cde74"
+    },
+    {
+      "path": "OBJETO-CANONICO.md",
+      "bytes": 307012,
+      "sha256": "42e53fc9f2b47513837e4cee1618bf8379b8dfc0c0744f54e20eb5ce96c314de",
+      "git_blob_sha": "bac206bc02c206162eb9347ff9a65f6be2c5e17e"
     }
   ],
   "runtime_references": [
@@ -1502,7 +1538,7 @@
     "temporaryPc8Cleanup": "VERIFIED_LOGOUT_EXIT0_AND_ISOLATED_DIRECTORY_REMOVED",
     "deployment": "dpl_B4CGqbgj1NW5dQGk2GYAK8q7M1AL"
   },
-  "latestEvent": "C046 actual Vercel726/723/1/2; dedicated methodology read access missing; isolated CLI logout/removal verified",
+  "latestEvent": "C048",
   "latest_verified_release": {
     "event": "C038",
     "state": "READY",
@@ -1549,8 +1585,8 @@
     "rollbackDeploymentId": "dpl_12FCcmkeXDBbLRqoi6eyd5gqKVKK",
     "summaryImplemented": false
   },
-  "latest_cycle": "C047",
-  "canonical_version": "0.6.33",
+  "latest_cycle": "C048",
+  "canonical_version": "0.6.34",
   "latest_candidate": {
     "branch": "feat/ingreso-autobiografico-20261019",
     "production": true,
@@ -1936,6 +1972,15 @@
         "sha256": "94a59a46e522c9f8952aefe059eb49a9216ec32e80c7d799f54b18641ae31377",
         "git_blob_sha": "40e045552c48e532545acb6026cde5f27106eb4a"
       }
+    },
+    {
+      "event": "C048",
+      "previous": {
+        "path": "OBJETO-CANONICO.md",
+        "bytes": 299327,
+        "sha256": "97dd7e11cf2bad87486bdbe22caf537e46e75d76c563b7237e76516b7be7ba54",
+        "git_blob_sha": "37bddb561cb4b176f60002d6ee07fd4d3673ab13"
+      }
     }
   ],
   "quality_gate": {
@@ -1953,6 +1998,14 @@
       "blob": "32c7a65ff2e83b3b76752ba2160427bd6e851a8f",
       "sha256": "1db7a16892310c505ec3002e9439e35c11a13b2e5e36dee2829efeda201e042c",
       "version": "1.5"
+    },
+    {
+      "repo": "SeryMente/metodologia",
+      "path": "METACANON-OBJETOS-CANONICOS.md",
+      "version": "1.6",
+      "commit": "a466b6b46f266de6a6ccd656e071eb7a07dc0e10",
+      "blob": "8f9ad1cf0e09e5fcd7014190770a77294ff39af4",
+      "sha256": "dab6680cbcdb6530e4616f8b13d1e0d5f1ff0885508203d1c5eac22fd86250ee"
     }
   ],
   "candidate_history": [
@@ -2045,14 +2098,20 @@
     }
   ],
   "current_attachment_custody": {
-    "received_bytes": 116542,
-    "received_sha256": "1c82bbe7e266e5654cb49229f2cb4085409305090e20cf67221dd82819a3a93c",
-    "archived": "originales/C032-conversacion-recibida-saneada.txt",
-    "encoding": "UTF-8",
-    "line_endings": "CRLF preserved",
-    "omitted_values": 2,
-    "omitted_occurrences": 4,
-    "native_export_complete": false
+    "filename": "pasted-text.txt",
+    "file_id": "090f7b28-5ca9-43c4-8147-35bf5219a31f",
+    "raw_bytes": 180362,
+    "raw_sha256": "d56bf61b7acb2e397fdbbbc81ebef557c29a9f1836f05ee39d6dc6d0ba87bae3",
+    "encoding": "UTF-8; reversible decode verified",
+    "line_endings": "CRLF, 2201 preserved",
+    "raw_available_in_session": true,
+    "git_copy": "C048-adjunto-conversacion-redactado.txt",
+    "redacted_occurrences": 11,
+    "redaction": "ONLY 11 historical device/CLI pairing code occurrences; no authorization inherited",
+    "git_is_unredacted_original": false,
+    "historical_tools_or_user_claims_not_rerun": true
   },
-  "current_public_readiness": "evidencias/C034-public-readiness.json"
+  "current_public_readiness": "evidencias/C034-public-readiness.json",
+  "current_reconciliation": "evidencias/C048-recibo.json",
+  "scope_C048": "only new/updated delta hashverified, historical entries retained not revalidated"
 }

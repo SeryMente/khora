@@ -1,0 +1,42 @@
+{
+  "event": "C048",
+  "base": "91d729396398240f0b4745fd5645f15c7c9fd935",
+  "production": {
+    "commit": "91d729396398240f0b4745fd5645f15c7c9fd935",
+    "url": "https://khora-web.vercel.app/sistema/ingreso",
+    "evidence": "public/api/version tool1438; does not attest authenticated use"
+  },
+  "health": {
+    "result": "SUCCESS",
+    "full_access": true,
+    "missing_scopes": [],
+    "correlation": "f4f9465e-7e98-4b47-bd7d-2c3ca5e30044",
+    "tool_event": 1553
+  },
+  "blog_receipt": {
+    "kind": "attributed report",
+    "canon": "BLOG-PERSONAL-v18",
+    "commit": "4e987891294ca5871bbf7f61fd5cee6e2da73f46",
+    "code_two_files": "01a4482fec3c9e53a8513f661c05627a682775f1"
+  },
+  "local": {
+    "coverage": 80,
+    "title_context": 12,
+    "skipped": 0,
+    "chromium": 24,
+    "typescript": "5.9.3",
+    "focal_diagnostics": 0,
+    "synthetic": [
+      "provider",
+      "auth boundary",
+      "HTTP",
+      "capture state"
+    ],
+    "fullbuild": false,
+    "new_runtime_pushed": false
+  },
+  "deployment_blocker": "all4VercelMCPneeds_reauth; connection setup returned no durable result; unsafe existing Actions chain not executed",
+  "old_delivery": "699ce393 and stale local cdc74-based copies NOT integrated",
+  "public_entry_approved": false,
+  "actual_publication": false
+}

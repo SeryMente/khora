@@ -3,9 +3,9 @@
 ## 1. Control e identidad
 
 - Identidad conservada: `MCP-OBS-DICTADO`; extensión documental de dictado, benchmark, retroalimentación y propuesta de voz/síntomas.
-- Versión: **v0.6.33**; sello **MCP-OBS-DICTADO-v0.6.33**. Objeto permanente por encargo V010; no declara permanente ninguna propuesta clínica.
-- Estado: **C047 · CANDIDATA e170406 ERROR CON726PRUEBAS/723PASS/1FAIL/2SKIP · FALTA LECTURA PRIVADA DEDICADA EN BUILD · CLI TEMPORAL COMPARTIDA CERRADA Y ELIMINADA · NO NEXT/PRODUCCIÓN/PUBLICACIÓN**.
-- Ancla actual: e170406da0a2e4b8cff58644d24cb3f6b5827f48; preview dpl_B4CGqbgj1NW5dQGk2GYAK8q7M1AL ERROR por METHODOLOGY_BUILD_READ_CREDENTIAL_REQUIRED. Resultado y limpieza real en C047.
+- Versión: **v0.6.34**; sello **MCP-OBS-DICTADO-v0.6.34**. Objeto permanente por encargo V010; no declara permanente ninguna propuesta clínica.
+- Estado: **C048 · PRODUCCIÓN91d729 REANCLADA; HEALTH OK; TÍTULO/CHECKLIST/MICROBLOG EN CORRECCIÓN LOCAL; SIN NUEVA PUBLICACIÓN**.
+- Ancla actual: producción91d729396398240f0b4745fd5645f15c7c9fd935 y retroalimentación nativa1416/1478; este commit es documental, no otro release. Estado único §8/C048; C047 y previos son antecedentes.
 - Repositorio propietario: `SeryMente/khora`, privado comprobado con herramienta en este ciclo. `SeryMente/metodologia` también privado: aporta el método, no recibe datos del frente.
 - Carpeta contenedora: `docs/frentes/dictado-voz/`; elemento único de estado: `OBJETO-CANONICO.md`. Carpeta y elemento no se confunden.
 - Revisión de origen del objeto: `1697ee2693ed3217523ffc1d1be9b6541d7d849d`, blob `e98a956c375ce48b791b5f0563ad0ae03c2616dd`.
@@ -13,6 +13,8 @@
 - Recuperación: README del repo → esta carpeta → este objeto. Contrato técnico y originales son anexos de custodia, no otra fuente de estado.
 
 ## 2. LEER PRIMERO
+
+C048 vigente: leer §8 primero. Todos los «ACTUAL» de ciclos anteriores conservados debajo son snapshots históricos, no bloqueo/permiso/rol vigente. No reconstruir fuentes ausentes ni mezclar entregas obsoletas.
 
 **ACTUAL C041.1 — reemplaza pendientes de compilación C041, no borra historia:** código remoto 1ca4f69c53262c3696eb57f800ed97176aeb3d66. Preview dpl_C25Lc9cwoRrNh6pShnoDGrQz77KG termina ERROR / BUILD_UTILS_SPAWN_1 al ejecutar npm run build con prebuild completo. No se conoce etapa/causa específica: logs oficiales403, check-runs403 y PC14 no responde. No atribuir el fallo al registro UI ni a aprobación humana: check_ui_review verifica integridad del registro, no consta fallo causal. No quitar prebuild ni promover a producción. C040 READY histórico continúa siendo solo Next build y no sustituye este gate fallido.
 
@@ -49,6 +51,8 @@ Remote Desktop Commander es exclusivo de asistencia, nunca del constructor, ni i
 Bloquear solo la acción dependiente de una compuerta no comprobada; continuar lo independiente autorizado. No simular voz humana, satisfacción, escritura productiva, lectura completa de fuentes ausentes ni conformidad de modelos externos.
 
 ## 3. Referencia metodológica
+
+C048: adquirido Metacanon1.8 · METACANON-OBJETOS-v1.8, commit5f11cf5ade6f5577e1d6bd19206ccbaf19cc9394/blob8bc5d7c900ec4bca9fd3131bb635746b50cec1e5. Espejo de gobiernov333/NX-333m verificado; personalización cargóv332 y no se modificó. Delta1.7–1.8: directorio canónico, originales y salidas visibles con procedencia, continuidad entre conversaciones; este update no acredita sincronización automática, cifrado o exportación completa. Las menciones1.6 siguientes son historia.
 
 C036 relectura metodológica: main a466b6b/blob8f9ad1c; Metacanon adquirido v1.6 · METACANON-OBJETOS-v1.6, sin delta frente a C035. §24: remoto no utilizado ni necesario; §26: reparto y autorización actuales comprobados; §27:13bloques/historia preservados; §28: instrucciones, evidencias y salida efectiva custodiadas, readback exigido. La privacidad de SeryMente/khora se revalidó private=true antes de escribir. Autoridad visual: operador ratifica molde de suficiencia después de presentación exacta de cinco guías; revisión de la candidata final permanece humana y pendiente.
 
@@ -96,6 +100,8 @@ Excluido: clasificar ánimo, enfermedad, capacidad laboral o «autoridad moral»
 La frase «autoridad moral» y «medición de área» de V009 permanece ambigua; no se normaliza como autorización para un veredicto clínico o laboral. Comercialización y finalidad médica requieren definición, revisión especializada y evaluación regulatoria del mercado de destino antes de formular promesas.
 
 ## 5. Roles y colaboración
+
+C048 roles actuales verificables: Central session://55bade27-f22c-8108-a269-00039938ee4f/3feade27-f22c-8016-928e-00a9f513f6b3; Blog2 session://55bade27-f22c-8108-a269-00039938ee4f/3feade27-f22c-8026-97b8-00a91cccfb18. Un escritor por archivo; cesión editorial puntual declarada y no extendida a captura, UIcentral, títulos, observación o deploy. No crear agentes adicionales.
 
 C039 · Separación explícita por orden del operador:
 - **Ingreso/Dictado (este objeto, centralSamanthaL):** captura/transcripción/originales, suficiencia mínima y criterio editorial sobrio en primera persona, elaboración de texto/resumen fiel, cotejo de puntos sustantivos y entrega autorizada a activos públicos. No administrar publicaciones ajenas por inferencia.
@@ -186,6 +192,20 @@ Autenticación C025: dos flujos estándar por dispositivo, autorizados en navega
 
 ### 🔄 Estado vivo
 
+**ACTUAL C048 — REANCLAJE SOBRE PRODUCCIÓN91d729; NUEVA RETROALIMENTACIÓN ADQUIRIDA; CORRECCIONES LOCALES, NO NUEVO DESPLIEGUE.** /api/version público confirmó producción `91d729396398240f0b4745fd5645f15c7c9fd935` y rama feat/ingreso-autobiografico-20261019; /api/auth/session respondió200/null: solo frontera no autenticada, no prueba de cuenta. Khora health en este ciclo vuelve SUCCESS/OK/full_access:true/missing_scopes:[], correlación f4f9465e-7e98-4b47-bd7d-2c3ca5e30044. El 401 normativo y ERROR de C047 son historia supersedida para ese estado, no bloqueos actuales; tampoco se inventa cómo se repararon. No se reejecutó aquí el fullbuild reportado en el adjunto.
+
+El operador probó captura y dice que volvió a funcionar; causa no acreditada. Abiertos: título anticipado, pistas fecha/lugar/actividad inestables, recuperación/audioMP3 históricos y suficiencia real del microblog. Código productivo inspeccionado: hook de título6palabras/30caracteres más generador garantizado explica que un texto de prueba pueda producir título; detector léxico calificaba párrafos completos, faltaban cibercafé/cybernet y trataba bareestoy como actividad; render provisional recomputaba sin estabilización. Son causas de código/reproducción local, no telemetría forense del caso real.
+
+Avance local sobre91d729, separado de la copia obsoleta cdc74: SOLO2blobs Blog01a4482 seleccionados; 80/80unit del detector y12/12contexto título, sin omisiones. TypeScript5.9.3 ES2017/strict/Bundler focal0diagnósticos;24comprobaciones React/Chromium/CSS/cola/validadorprivacidad reales con estado/HTTP/proveedor sintéticos. No voz, Groq, cuenta ni publicación reales. Esperando más contexto… sustituye Sin título en borrador; título vivo puede esperar y nunca usa fallback garantizado. Nueva detección y estabilización en revisión local, AÚN NO PUSH de runtime. No integrar699ce393 ni rama completa Blog: contiene historia obsoleta que regresaría C040–47.
+
+Blog2 actualizó su único objeto hasta BLOG-PERSONAL-v18/C-BLOG-015, commit4e987891294ca5871bbf7f61fd5cee6e2da73f46; recibo atribuido a Blog, no prueba propia ni publicación. Original1478 queda allí con redacción mínima de código histórico; central conserva original1416 y copia redactada del adjunto180362bytes, huella del raw/puntero nativo y límites de cobertura. Roles activos: este central3fe...8016 y Blog2...8026, no las sesiones3fd5/3fe5 antiguas. Se cedió a Blog2 SOLO delta editorial sobre91d729 para separar micro público corto y revisión humana3mínimos ligada a versión/hash, sin tocar captura/títulos/UIcentral.
+
+Secuencia inmediata: terminar prueba de ruta título/auth y cierre visual→integrar selectivamente detector+título/observación+delta editorial revisado→prebuild/Next completos de SHA exacta→revisión/producción por canal autorizado→dictado real, archivo manual, elaboración breve, cotejo mínimo y previa exacta→decisión conjunta y comprobantes independientes GitHubBlog/Página. Sin primera nota ni permisos reales Meta acreditados. No conserva original y Custodia sin publicar. Audio público, imágenes, avatar, resumen uniforme avanzado, metadatos forenses ampliados y autenticación autobiográfica son futuros separados; no se activan por este registro.
+
+Despliegue: conexiones Vercel4 necesitan reautenticación; dos intentos de iniciar reconexión sin resultado durable, NO afirmar conectadas. Repo ofrece workflow producción, pero Blog comprobó que incluye migraciónDB y cadena smoke contra dominio viejo con rollback último main no ligado al SHA: NO usarlo como bypass de revisión ni dispararlo para probar acceso. Actions candidato solo hace pruebas, no acredita preview. No cambiar facturación, permisos, secretos, RDC, main o migraciones; agotar mientras tanto código/pruebas/documentación que no dependan del acceso.
+
+**Antecedentes de estado conservados; C048 prevalece:**
+
 **ACTUAL C047 — resultado real y bloqueo material probado.** La candidata exacta e170406da0a2e4b8cff58644d24cb3f6b5827f48, preview dpl_B4CGqbgj1NW5dQGk2GYAK8q7M1AL (khora-egmzfv747-victorhugotorresmendez-8991s-projects.vercel.app), terminó ERROR. Prebuild llegó al runner íntegro:726pruebas,723PASS,1FAIL,2SKIP. El único fallo es METHODOLOGY_BUILD_READ_CREDENTIAL_REQUIRED: falta KHORA_NORM_GITHUB_TOKEN dedicado con Contents:read de SeryMente/metodologia en ese entorno de build. Ya no falla por gh. Las4regresiones nuevas del lector están incluidas en el conteo global; no se suma el banco aislado otra vez. No Nextbuild, preflight final ni extensión acreditados. Los errores Neo4j que salen en resumen pertenecen a negativos aprobados, no se atribuyen a producción. Dos omisiones observadas, sin inventar la segunda causa. No repetir despliegue sin cambiar la precondición ni usar broadGITHUB_TOKEN/tokenasistente/bóveda ni suprimir comparación del contrato.
 
 El operador continúa su proyecto musical por cuenta propia; NO encargó a Central abrir ese frente. Central retoma Dictado/Blog existente y entrega checklist; dependencia material de acceso impide la siguiente compilación y no se oculta con status READY. Archivo manual, preservación original, representación pública trabajada y consentimiento exacto conjunto permanecen; no aprobación de nota ni permisos Meta acreditados. Validaciones locales11retención/20títulos anteriores no prueban capturas históricas ni sesión real. No nuevas llamadas normativas401, mutación de permisos, migración, main, producción ni publicación.
@@ -240,10 +260,14 @@ Investigación: Meta PageVideos indexado documenta replace_video_id/swap_mode=re
 
 ### ⚗️ En prueba / recién fallido
 
+C048: captura volvió según operador; siguen título anticipado/pistas inestables/audio histórico. 80+12unit/24Chromium y tiposfocales5.9.3 locales, NO fullbuild/voz/servicios reales ni nuevo deploy. Vercel requiere reautorización; saludKhora actualOK, no401vigente.
+
 C039 es investigación y documentación, no prueba de producto: lecturaactual método1.6/centralv0.6.24 y privacidadrepo confirmadas; fuentesMeta indexadas, carga directaMeta403; SDKMeta y docsHeyGen cargados. No lecturaautenticadaMeta, reemplazoreal, imagen/avatar/audio creados, ni prueba depermisos, costes o voz originalrenderizada. C038 tenía66unit/31Chromium/tipos5.9.3focal y producción técnica acreditada; evidencia histórica, no reejecución actual ni aceptación humana.
 Pendiente material para viabilidadoperativa: pruebaMeta autorizada sobre un caso controlado que determine qué identidades/interacciones/permalinks conserva, y evaluación de proveedoravatar sobre coste/datos/voz/eliminación. No usar anuncios/creatividades como prueba de sustituciónorgánica ni borrar/republicar como si conservara la publicación. La UI de suficiencia requiere decisión de estándar, no solo renombrar opcional por obligatorio.
 
 ### 🔔 Recordatorios latentes
+
+- C048: no perder microblog corto suficiente;3mínimos obligatorios antes de preparación pública, no limitar relato/archivo. Títulos/contexto y transiciones observables sin verbaraw. Línea forense/metadatos y llave autobiográfica inversa quedan investigación privada separada; no activar recopilación, nuevos accesos, sustitución de autenticación ni publicación de corpus. Originales/riesgos/pendientes previos conservados.
 
 - C039: salvaguardar criterio editorial y tres dictados íntegros; registroexhaustivo porfrente, no solo chat/resumen. Separar lo ratificado de propuestas abiertas y no inventar aceptación de proveedor/coste/biometría.
 - C039: sustituciónMeta condicionada a prueba autorizada; no garantizar conservaciónURL/interacciones ni hacer borrado+repost por defecto. Avatarrepresentacional no es evidencia de filmación/presencia; audiooriginal no se sustituye por vozsintética. Estas salvaguardas de representación son propuestas de diseño documentadas para revisión, no permiso de producción.
@@ -265,6 +289,8 @@ Pendiente material para viabilidadoperativa: pruebaMeta autorizada sobre un caso
 - No borrar estos recordatorios por silencio; liberación positiva o decisión expresa.
 
 ## 9. Aceptación y viabilidad
+
+C048: [contraste y secuencia vigentes](evidencias/C048-plan-y-contrastes.md) supersede etiquetas de vigencia de planes anteriores sin borrarlos. La aceptación exige flujo real y contenido exacto aprobado, no una mención léxica ni un recuento de pruebas.
 
 ### C039 · Plan de trabajo por hitos y propietario (vigente, sin ejecución nueva)
 
@@ -356,6 +382,10 @@ Toda salida conserva diez campos, agrupables sin ocultarlos: (1) proyecto/rol/se
 No llamar «sin cambios» a una fuente inaccesible; no convertir calidad científica o clínica en semáforo por pruebas de software. Si no hay constructor nuevo asignado, decirlo y no inventar trabajo en segundo plano.
 
 ## 11. Crónica y fuentes
+
+### C048 — Reconciliación de producción, instrucciones nuevas y corrección causal selectiva
+
+Se detectó copia local obsoleta antes de cualquier pushde código; se descartó su integración. Se releyó canon realv0.6.33/blob37bddb y producción91d729, saludactualOK. Original1416 y adjunto propio conhash/CRLF adquiridos con límites explícitos;1478 delegado al únicoBlog, v18/C015 recibido. [Recibo](evidencias/C048-recibo.json), [procedencia](originales/C048-procedencia.json), [contraste/plan](evidencias/C048-plan-y-contrastes.md). DosblobscausalesBlogcopiados, pruebaslocales80+12/24navegador y tipos5.9.3focal, sin runtime remoto ni release. Errores de tooling locales registrados, no atribuidos a producción. Próximo cierre: integraciónselectiva+API/auth+micro/review→fullbuild→canallegítimo/revisión→producciónexacta. No usar deployworkflow con migración/revertinseguro como bypass, no nuevosagentes ni secretos. Lectura exhaustiva del adjunto aún no acreditada; salidas preservadas son parciales identificadas, no todo el transcript.
 
 ### C047 — Compilación íntegra comprobada, dependencia de lectura y limpieza aislada
 **ACTUAL C047 — resultado real y bloqueo material probado.** La candidata exacta e170406da0a2e4b8cff58644d24cb3f6b5827f48, preview dpl_B4CGqbgj1NW5dQGk2GYAK8q7M1AL (khora-egmzfv747-victorhugotorresmendez-8991s-projects.vercel.app), terminó ERROR. Prebuild llegó al runner íntegro:726pruebas,723PASS,1FAIL,2SKIP. El único fallo es METHODOLOGY_BUILD_READ_CREDENTIAL_REQUIRED: falta KHORA_NORM_GITHUB_TOKEN dedicado con Contents:read de SeryMente/metodologia en ese entorno de build. Ya no falla por gh. Las4regresiones nuevas del lector están incluidas en el conteo global; no se suma el banco aislado otra vez. No Nextbuild, preflight final ni extensión acreditados. Los errores Neo4j que salen en resumen pertenecen a negativos aprobados, no se atribuyen a producción. Dos omisiones observadas, sin inventar la segunda causa. No repetir despliegue sin cambiar la precondición ni usar broadGITHUB_TOKEN/tokenasistente/bóveda ni suprimir comparación del contrato.
@@ -799,6 +829,8 @@ El operador reporta botón desactivado con rótulo de espera. Se confirma depend
 
 ## 12. Reinstanciación
 
+C048: continuar en las dos sesiones vigentes §5, no reemitir handoff ni adoptar STOP/roles antiguos. §8 contiene el checkpoint único. No hay permiso para otros equipos, portapapeles, tokens, migraciones o publicaciones por leer este expediente.
+
 C047 ACTUAL: §8/v0.6.33; código e170406, doc posterior no cambia runtime.726tests723PASS1FAIL2SKIP, credencial dedicada build faltante comprobada; CLI aislada PC8 cerrada/eliminada. No reintentar ni saltar contrato. Central3fd5/BLOG3fe5 existentes; siguientes compuertas: acceso seguro→fullbuild→sesión real→consentimiento y proveedores. No handoff solicitado.
 
 C046 checkpoint ACTUAL: §8/v0.6.32 gobierna; builder central permanece en esta sesión3fd5 y BLOG3fe5 existente, sin nuevos agentes. Prioridad exclusiva: configurar lectura normativa dedicada legítima en build, ejecutar prebuild/Next íntegros en SHA final y continuar aceptación real; no adoptar los prompts históricos como STOP ni abrir otra auditoría. Bancos locales11retención/20títulos/4lector no sustituyen servicios ni autorizaciones. No handoff nuevo solicitado.
@@ -836,6 +868,8 @@ El expediente Git es portable; /data del hilo antiguo NO se supone compartido. R
 ````
 
 ## 13. Persistencia y revisión
+
+C048: mismo Elemento permanente autorizado dentro de carpeta privada existente; no canon/tablero nuevo. Trece bloques y AnexoA preservados. Manifiesto añade solo delta y conserva huellas históricas sin fingir relectura de todo anexo antiguo. Copia del adjunto redactada explícitamente; raw conhash/puntero separado, no identidad binaria ficticia. Readback Git exacto de todos los archivos de este delta requerido antes de afirmar guardado.
 
 C040: actualización del mismo objeto permanente por encargo actual; originales pertinentes completos y separados, fuentes/procedencia y límites de cobertura; manifiesto conserva historia y añade nuevos archivos con hashes. Readback por commit/blob requerido antes de afirmar persistencia. No declara restaurado registro Notion en papelera ni compilación/despliegue/publicación.
 
