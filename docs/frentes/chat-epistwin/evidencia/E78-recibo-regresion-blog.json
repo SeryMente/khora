@@ -1,0 +1,204 @@
+{
+  "event": "E78",
+  "first_attempt": {
+    "checked_at": "2026-10-20T22:52:23.749Z",
+    "http": 503,
+    "body": {
+      "error": "Chat request failed"
+    },
+    "presentation": null,
+    "cache": "no-store",
+    "classification": "upstream status503 via exact b1d7 proxy; root cause unproven"
+  },
+  "bounded_repeat": {
+    "checked_at": "2026-10-20T22:54:50.252Z",
+    "expected_source": "b1d7d995df941f26da893e594e49bed778a38acf",
+    "intercepted_html": false,
+    "new_chat_or_ingestion": false,
+    "api": [
+      {
+        "path": "/api/config",
+        "status": 200,
+        "type": "application/json"
+      },
+      {
+        "path": "/api/config",
+        "status": 200,
+        "type": "application/json"
+      },
+      {
+        "path": "/api/v1/chats/",
+        "status": 308,
+        "type": "application/json"
+      },
+      {
+        "path": "/api/v1/chats",
+        "status": 200,
+        "type": "application/json"
+      },
+      {
+        "path": "/api/models",
+        "status": 200,
+        "type": "application/json"
+      },
+      {
+        "path": "/api/v1/chats/",
+        "status": 308,
+        "type": "application/json"
+      },
+      {
+        "path": "/api/v1/chats",
+        "status": 200,
+        "type": "application/json"
+      }
+    ],
+    "page_errors": [],
+    "document": {
+      "status": 200,
+      "presentation": "pinned-css-inline-v1",
+      "cache": "private, no-store"
+    },
+    "desktop": {
+      "font": "-apple-system, BlinkMacSystemFont, Inter, Vazirmatn, ui-sans-serif, system-ui, \"Segoe UI\", Roboto, Ubuntu, Cantarell, \"Noto Sans\", sans-serif, \"Helvetica Neue\", Arial, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+      "flex": "flex",
+      "composer": true,
+      "amber": true,
+      "inline_styles": [
+        {
+          "name": "Toaster.DKF17Rty.css",
+          "sha256": "a8a60fdd2bee2a1b436c8de5ace21208de358d11cd0584fd53b6d2d54486d41d",
+          "bytes": 13157
+        },
+        {
+          "name": "Modal.CSlFhZkq.css",
+          "sha256": "4949a4a48ceb842a6c1f73574d08ece374e213418852e0c94b8bd7f86b49722a",
+          "bytes": 188
+        },
+        {
+          "name": "0.MeCDKVUP.css",
+          "sha256": "276ca3d02fdbed48b3263be57f40fba9bafef7ebcdd44bb626a6b6a760b5a92d",
+          "bytes": 320194
+        }
+      ],
+      "overflow": false,
+      "viewport": 1366,
+      "svg_max_width": 20,
+      "broken_images": 0,
+      "loaded_fonts": [
+        "Inter"
+      ],
+      "source_buttons": 3
+    },
+    "version": {
+      "status": 200,
+      "data": {
+        "commit": "b1d7d995df941f26da893e594e49bed778a38acf",
+        "rama": "sin-metadatos-de-git",
+        "desplegado_desde_git": false,
+        "fuente_commit": "manual-verified-clean-worktree",
+        "entorno": "production",
+        "rutas": [
+          "/sistema/custodia",
+          "/api/volcado"
+        ],
+        "ahora": "2026-10-20T22:55:35.101Z"
+      }
+    },
+    "mobile": {
+      "font": "-apple-system, BlinkMacSystemFont, Inter, Vazirmatn, ui-sans-serif, system-ui, \"Segoe UI\", Roboto, Ubuntu, Cantarell, \"Noto Sans\", sans-serif, \"Helvetica Neue\", Arial, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+      "flex": "flex",
+      "composer": true,
+      "amber": true,
+      "inline_styles": [
+        {
+          "name": "Toaster.DKF17Rty.css",
+          "sha256": "a8a60fdd2bee2a1b436c8de5ace21208de358d11cd0584fd53b6d2d54486d41d",
+          "bytes": 13157
+        },
+        {
+          "name": "Modal.CSlFhZkq.css",
+          "sha256": "4949a4a48ceb842a6c1f73574d08ece374e213418852e0c94b8bd7f86b49722a",
+          "bytes": 188
+        },
+        {
+          "name": "0.MeCDKVUP.css",
+          "sha256": "276ca3d02fdbed48b3263be57f40fba9bafef7ebcdd44bb626a6b6a760b5a92d",
+          "bytes": 320194
+        }
+      ],
+      "overflow": false,
+      "viewport": 390,
+      "svg_max_width": 20,
+      "broken_images": 0,
+      "loaded_fonts": [
+        "Inter"
+      ],
+      "source_buttons": 3
+    },
+    "error": "locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n  - waiting for getByRole('heading', { name: /Crónica/i }).first() to be visible\n"
+  },
+  "chat_regression_passed": true,
+  "global_verifier_passed": false,
+  "global_verifier_failure": "Incorrect heading Crónica assumption; separate shell check passed",
+  "independent_ingreso": {
+    "checked_at": "2026-10-20T23:00:16.916Z",
+    "private_text_extracted": false,
+    "screenshots": false,
+    "clicks": false,
+    "storage_read": false,
+    "page_errors": [],
+    "failed_requests": [],
+    "http": 200,
+    "path": "/sistema/ingreso",
+    "shell": {
+      "cronica_present": true,
+      "ingreso_present": true,
+      "login_form": false,
+      "editable_count": 1,
+      "button_count": 13,
+      "momento_present": false,
+      "microphone_control": false,
+      "cronica_option": true,
+      "capture_controls": [
+        {
+          "grabar": false,
+          "detener": false,
+          "audio": true,
+          "voz": false,
+          "importar": false
+        }
+      ],
+      "heading_cronica": false
+    },
+    "passed": true
+  },
+  "official_logs": [
+    {
+      "timestamp": "2026-10-20T22:53:46.68544846Z",
+      "event": "Waiting for application startup"
+    },
+    {
+      "timestamp": "2026-10-20T22:53:51.19311382Z",
+      "event": "KHORA_E72_INDEX_RECOVERED",
+      "graph_writes": false,
+      "nodes_indexed": 4,
+      "relations": 2,
+      "dimension": 1024
+    }
+  ],
+  "causal_limit": "Startup and recovery correlated, not proof of cold start/OOM/root cause. No stable availability guarantee.",
+  "no_mutations": [
+    "deployment",
+    "rollback",
+    "Render",
+    "DB",
+    "ingestion",
+    "new chat",
+    "new messages",
+    "editorial decisions"
+  ],
+  "no_secret_extraction": true,
+  "ingreso_content_extracted": false,
+  "human_acceptance": false,
+  "personal_circuit_proven": false
+}
