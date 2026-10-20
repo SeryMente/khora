@@ -18,3 +18,6 @@ fi
 if [ -n "${KHORA_CHAT_E72_INGEST:-}" ] && [ "${KHORA_CHAT_E72_INGEST}" != "0" ]; then
     python -m api.chat_public_fixture
 fi
+if [ -n "${KHORA_CHAT_E72_VERIFY_CHAT:-}" ] && [ "${KHORA_CHAT_E72_VERIFY_CHAT}" != "0" ]; then
+    python -m api.probe_chat_ownership
+fi

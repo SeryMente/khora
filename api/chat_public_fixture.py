@@ -167,7 +167,7 @@ def ingest_authorized(memory):
             session.execute_write(publish)
         _STAGE="strict_index_sealing"
         result=ensure_index(memory)
-    return {**result,'source_created':created,'source_sha256':SOURCE_SHA,
+    return {**result,'graph_writes':True,'source_created':created,'source_sha256':SOURCE_SHA,
             'scope':'one_authorized_fictional_source','personal_notes_read':False}
 
 
