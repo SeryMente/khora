@@ -1,0 +1,3 @@
+Procedencia: cuerpo literal visible del operador; no exportación completa ni recibo de conexión con códigos de vinculación.
+
+<b>Authorize Device</b><br />Enter the code from your device to authenticate it to your Vercel account.Could not verify user code. Review the spelling or issue a new code from your device.Awaiting code to display request details…

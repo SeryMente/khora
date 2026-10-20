@@ -1097,12 +1097,6 @@
       "git_blob_sha": "d0581c20ad612c1f4b16865387426955e3ebe1a8"
     },
     {
-      "path": "OBJETO-CANONICO.md",
-      "bytes": 274389,
-      "sha256": "b9261825a36a74f1366926faca46913943da01576fb4b47a6a57ce9bfd6abf80",
-      "git_blob_sha": "aaa39ebaa7c60ab1f9287dc801c6d423181fb913"
-    },
-    {
       "path": "originales/C041-salidas-visibles.txt",
       "bytes": 1816,
       "sha256": "f0e0cabd1e40a4aa283d3f826d32a20ff35bd251cd48c2b8f48cdf38bc9e5dbe",
@@ -1167,6 +1161,42 @@
       "bytes": 444,
       "sha256": "2142c6c7aa137e7d63eba12fe0cdac57ab77e27a30ed87d35119d74274143f47",
       "git_blob_sha": "6659f978eb82f4d4b3191998ca109c7db8d1bf22"
+    },
+    {
+      "path": "OBJETO-CANONICO.md",
+      "bytes": 277388,
+      "sha256": "17cf2d16b9ce2fa02ffaea3fcb73ccadd8d4204aaff542d348be5517b7337bf0",
+      "git_blob_sha": "b8e9ec48970a7536ecc7e8cb06e72ba82f9b6c31"
+    },
+    {
+      "path": "evidencias/C042/vercel-C041-build.log",
+      "bytes": 5692,
+      "sha256": "043f95d7e591ac247a156bd9a2de9ea1c56f8c59c69b35a5ddff31be872eb267",
+      "git_blob_sha": "0ddba90f98ff223b4c8f501bc604c0fd47f1a6f1"
+    },
+    {
+      "path": "evidencias/C042/navigation-results.json",
+      "bytes": 419,
+      "sha256": "4c8dda201b596f481234f901320f2e3661b09371123eacdb3df77d3fffeea625",
+      "git_blob_sha": "243932ef57474fef8df1f80bef7403e8a7c1d906"
+    },
+    {
+      "path": "evidencias/C042/causal-bank.cjs",
+      "bytes": 3929,
+      "sha256": "01c2dbdd640694584efda1c95f8769a8d79d14a41f322c52ff6a067b2b4bb5e1",
+      "git_blob_sha": "12df5ee5910f435f1758edff930727ad6f18767d"
+    },
+    {
+      "path": "evidencias/C042/errors.jsonl",
+      "bytes": 5052,
+      "sha256": "4d7568f60279d953ab1da154e90241f7a81d116cd4147cac7aab259b3c916a7b",
+      "git_blob_sha": "75b83dacafc0bc38b4118388c7d5b5846cb7dc61"
+    },
+    {
+      "path": "originales/C042-error-login-visible.txt",
+      "bytes": 361,
+      "sha256": "2d4d5c8fce44b47a416a0a77c3433de20f7f4dbe6701bf40d0e8a083dba4d484",
+      "git_blob_sha": "0d7d74970a748819a7b29ed6426489904f458d92"
     }
   ],
   "runtime_references": [
@@ -1276,7 +1306,7 @@
     "base": "eda718288fa61bf4df016751d46631fa8e71054a",
     "production": false,
     "publication": false,
-    "fullBuild": "ERROR BUILD_UTILS_SPAWN_1; specific stage unknown logs403",
+    "fullBuild": "C041 cause now known: orphan Blog route; C042 registry correction tested, full build pending",
     "counts": {
       "server": 39,
       "mode": 26,
@@ -1287,7 +1317,7 @@
     },
     "clipRead": false
   },
-  "latestEvent": "C041 full prebuild ERROR without specific logs; current dependency corrected and final scoped tests pass",
+  "latestEvent": "PC8 CLI actual login and build logs recovered; orphan Blog route cause fixed without bypass, new full build pending",
   "latest_verified_release": {
     "event": "C038",
     "state": "READY",
@@ -1334,8 +1364,8 @@
     "rollbackDeploymentId": "dpl_12FCcmkeXDBbLRqoi6eyd5gqKVKK",
     "summaryImplemented": false
   },
-  "latest_cycle": "C041.1",
-  "canonical_version": "0.6.28",
+  "latest_cycle": "C042",
+  "canonical_version": "0.6.29",
   "latest_candidate": {
     "branch": "feat/ingreso-autobiografico-20261019",
     "production": true,
@@ -1666,6 +1696,15 @@
         "bytes": 7838,
         "sha256": "06bbaa28b414aedfec97d33c440041936e68217ed864fe3e97fab4e2898be0b7",
         "git_blob_sha": "533c41eddc0acf58164f21a5222d4663cd8f5de6"
+      }
+    },
+    {
+      "event": "C042",
+      "previous": {
+        "path": "OBJETO-CANONICO.md",
+        "bytes": 274389,
+        "sha256": "b9261825a36a74f1366926faca46913943da01576fb4b47a6a57ce9bfd6abf80",
+        "git_blob_sha": "aaa39ebaa7c60ab1f9287dc801c6d423181fb913"
       }
     }
   ],
