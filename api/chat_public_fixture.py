@@ -9,6 +9,9 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
+
+_STAGE = "initialization"
 from datetime import datetime, timezone
 import numpy as np
 from khora_kernel import embeddings as em
@@ -73,6 +76,8 @@ def _inspect(memory):
 
 
 def ingest_authorized(memory):
+    global _STAGE
+    _STAGE="scope_preflight"
     if os.getenv('KHORA_CHAT_E72_INGEST') != SOURCE_SHA:
         raise RuntimeError("E72_EXACT_AUTHORIZATION_REQUIRED")
     existing=_inspect(memory)
@@ -81,6 +86,7 @@ def ingest_authorized(memory):
         space=em._embedding_space_id()
         if existing is None:
             # Validate real provider output BEFORE writing any graph data.
+            _STAGE="real_provider_embedding"
             vectors=[em.embed_text(text) for _,_,text in ITEMS]
             now=datetime.now(timezone.utc).isoformat()
             provenance=Provenance(origen='E72:fuente-ficticia-autorizada:'+SOURCE_SHA,
@@ -93,11 +99,13 @@ def ingest_authorized(memory):
             byid={e['canonical_key']:e for e in entities}
             for (key,label,_),vector in zip(ITEMS,vectors):
                 byid[PREFIX+key].update(label_original=label,embedding=vector)
+            _STAGE="existing_transactional_writer"
             memory.asentar_transaccional(entities,relations,{
                 'origen':provenance.origen,'driver':provenance.driver,'version':1,
                 'sha256':SOURCE_SHA,'source_schema':SCHEMA,
                 'metadata':{'original_text':SOURCE,'authorization':'E72','fictional':True,
                             'annotation':'explicit_manual_not_llm_extraction'}},IO_ID,now)
+            _STAGE="post_write_scope_verification"
             existing=_inspect(memory)
         # Idempotent resume/publication after a crash; unknown IDs/source never updated.
         nodes,_=existing
@@ -111,6 +119,7 @@ def ingest_authorized(memory):
             if node['space'] not in (None,space) or node['sha'] not in (None,SOURCE_SHA):
                 raise RuntimeError('E72_EMBEDDING_SPACE_CHANGED')
             rows.append({'id':node['id'],'description':text,'embedding':vector})
+        _STAGE="bounded_publication"
         with memory._driver.session() as session:
             def publish(tx):
                 row=tx.run("""MATCH (io:InformationObject {io_id:$io, sha256:$sha, source_schema:$schema})
@@ -125,6 +134,7 @@ def ingest_authorized(memory):
                   io=IO_ID,ids=IDS,sha=SOURCE_SHA).single()
                 if not row or row['n']!=2: raise RuntimeError('E72_PUBLICATION_SCOPE_INVALID')
             session.execute_write(publish)
+        _STAGE="strict_index_sealing"
         result=ensure_index(memory)
     return {**result,'source_created':created,'source_sha256':SOURCE_SHA,
             'scope':'one_authorized_fictional_source','personal_notes_read':False}
@@ -165,9 +175,21 @@ def main():
         memory=Neo4jMemoriaOrganizada(os.environ['NEO4J_URI'],os.environ['NEO4J_USER'],os.environ['NEO4J_PASSWORD'])
         report=ingest_authorized(memory)
         print('KHORA_E72_FIXTURE '+json.dumps(report,sort_keys=True))
-    except Exception:
-        # Never echo a provider/driver exception, env value, URI or token.
-        print('KHORA_E72_FIXTURE {"verified":false,"error":"E72_BOUNDED_FIXTURE_FAILED"}')
+    except Exception as exc:
+        # Enumerated codes only; never include free-form exception messages.
+        safe={"verified":False,"error":"E72_BOUNDED_FIXTURE_FAILED","stage":_STAGE}
+        if type(exc) in (RuntimeError,em.SemanticEmbeddingUnavailable) and re.fullmatch(r"(?:E72|EMBEDDING)_[A-Z_]+",str(exc)):
+            safe['guard_code']=str(exc)
+        cause=exc
+        for _ in range(5):
+            code=getattr(cause,'code',None)
+            if isinstance(code,str) and re.fullmatch(r"Neo\.[A-Za-z.]+",code):
+                safe['neo4j_code']=code
+                break
+            cause=cause.__cause__ or cause.__context__
+            if cause is None: break
+        safe['exception_class']=type(exc).__name__ if type(exc).__name__ in {'RuntimeError','Exception','ValueError','TypeError','KeyError','CypherSyntaxError','ClientError','ServiceUnavailable','SemanticEmbeddingUnavailable'} else 'RedactedError'
+        print('KHORA_E72_FIXTURE '+json.dumps(safe,sort_keys=True))
         raise SystemExit(1) from None
     finally:
         if memory is not None: memory.cerrar()
