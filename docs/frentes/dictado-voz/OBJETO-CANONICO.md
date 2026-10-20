@@ -3,9 +3,9 @@
 ## 1. Control e identidad
 
 - Identidad conservada: `MCP-OBS-DICTADO`; extensión documental de dictado, benchmark, retroalimentación y propuesta de voz/síntomas.
-- Versión: **v0.6.34**; sello **MCP-OBS-DICTADO-v0.6.34**. Objeto permanente por encargo V010; no declara permanente ninguna propuesta clínica.
-- Estado: **C048 · PRODUCCIÓN91d729 REANCLADA; HEALTH OK; TÍTULO/CHECKLIST/MICROBLOG EN CORRECCIÓN LOCAL; SIN NUEVA PUBLICACIÓN**.
-- Ancla actual: producción91d729396398240f0b4745fd5645f15c7c9fd935 y retroalimentación nativa1416/1478; este commit es documental, no otro release. Estado único §8/C048; C047 y previos son antecedentes.
+- Versión: **v0.6.35**; sello **MCP-OBS-DICTADO-v0.6.35**. Objeto permanente por encargo V010; no declara permanente ninguna propuesta clínica.
+- Estado: **C049 · HITO 1 REANCLADO; BLOB SUSPENDIDO POR CUOTA; ALTERNATIVA GRATUITA EN EVALUACIÓN; SIN MIGRACIÓN NI NUEVO RELEASE**.
+- Ancla actual: relectura de producción91d729396398240f0b4745fd5645f15c7c9fd935, diagnóstico CLI de khora-audio y nueva instrucción de almacenamiento del operador. Este commit es documental, no otro release. Estado único §8/C049; C048 y previos son antecedentes.
 - Repositorio propietario: `SeryMente/khora`, privado comprobado con herramienta en este ciclo. `SeryMente/metodologia` también privado: aporta el método, no recibe datos del frente.
 - Carpeta contenedora: `docs/frentes/dictado-voz/`; elemento único de estado: `OBJETO-CANONICO.md`. Carpeta y elemento no se confunden.
 - Revisión de origen del objeto: `1697ee2693ed3217523ffc1d1be9b6541d7d849d`, blob `e98a956c375ce48b791b5f0563ad0ae03c2616dd`.
@@ -14,7 +14,7 @@
 
 ## 2. LEER PRIMERO
 
-C048 vigente: leer §8 primero. Todos los «ACTUAL» de ciclos anteriores conservados debajo son snapshots históricos, no bloqueo/permiso/rol vigente. No reconstruir fuentes ausentes ni mezclar entregas obsoletas.
+C049 vigente: leer §8 primero. La nueva orden prioriza Hito 1 y solución del almacenamiento; el orden inmediato C048 queda como antecedente, no se pierde su trabajo local. Todos los «ACTUAL» de ciclos anteriores conservados debajo son snapshots históricos, no bloqueo/permiso/rol vigente. No reconstruir fuentes ausentes ni mezclar entregas obsoletas.
 
 **ACTUAL C041.1 — reemplaza pendientes de compilación C041, no borra historia:** código remoto 1ca4f69c53262c3696eb57f800ed97176aeb3d66. Preview dpl_C25Lc9cwoRrNh6pShnoDGrQz77KG termina ERROR / BUILD_UTILS_SPAWN_1 al ejecutar npm run build con prebuild completo. No se conoce etapa/causa específica: logs oficiales403, check-runs403 y PC14 no responde. No atribuir el fallo al registro UI ni a aprobación humana: check_ui_review verifica integridad del registro, no consta fallo causal. No quitar prebuild ni promover a producción. C040 READY histórico continúa siendo solo Next build y no sustituye este gate fallido.
 
@@ -100,6 +100,8 @@ Excluido: clasificar ánimo, enfermedad, capacidad laboral o «autoridad moral»
 La frase «autoridad moral» y «medición de área» de V009 permanece ambigua; no se normaliza como autorización para un veredicto clínico o laboral. Comercialización y finalidad médica requieren definición, revisión especializada y evaluación regulatoria del mercado de destino antes de formular promesas.
 
 ## 5. Roles y colaboración
+
+C049: este hilo retoma asistencia centralizante por petición directa de migración/ejecución: session://ecea4187-8241-819b-af83-0003b7c205f7/3fea4187-8241-805a-a526-00a99e9d743d. Las sesiones C048 pertenecen a otro workspace y el acceso de sesión fue rechazado; no se finge haberlas contactado ni se crean reemplazos. Universo-datos escribió desde session://ecea4187-8241-819b-af83-0003b7c205f7/3fea4187-8241-80f2-9d08-00a9b6435a14 y conserva escritura exclusiva de docs/frentes/universo-datos/ en su rama; este hilo confirmó límites, sin delegar nueva construcción. Código Blog/otros trabajos locales C048 no integrados ni sobrescritos.
 
 C048 roles actuales verificables: Central session://55bade27-f22c-8108-a269-00039938ee4f/3feade27-f22c-8016-928e-00a9f513f6b3; Blog2 session://55bade27-f22c-8108-a269-00039938ee4f/3feade27-f22c-8026-97b8-00a91cccfb18. Un escritor por archivo; cesión editorial puntual declarada y no extendida a captura, UIcentral, títulos, observación o deploy. No crear agentes adicionales.
 
@@ -191,6 +193,22 @@ Autenticación C025: dos flujos estándar por dispositivo, autorizados en navega
 ## 8. Estado vivo
 
 ### 🔄 Estado vivo
+
+**ACTUAL C049 — HITO 1 Y ALMACENAMIENTO.** El operador exige resolver por hitos y entregar en la URL de PRODUCCIÓN Vercel, no solo preview; revisión humana al terminar cada hito antes del siguiente. Adjunto nuevo 349c38ee-173b-4893-8fb7-d741747602a3 leído íntegro en el ciclo; no equivale al adjunto inicial. Prioridad: Hito1 puntos1–7,10–12; Hito2 títulos8–9; Hito3 diálogos13–14; Hito4 autobiografía/decisiones15–16,19–21; Hito5 destinos17–18; punto22 exige producción para todos. No adelantar publicación Blog ni títulos sobre custodia.
+
+Producción /api/version revalidada:91d729396398240f0b4745fd5645f15c7c9fd935, production, rama feat/ingreso-autobiografico-20261019. Git HEAD4fb3b7d5f07efef770eac398646ff9d87f86b505 documental distinto; no confundir HEAD con runtime. GitHub/Vercel MCP no disponibles, pero CLI existentes autorizadas en equipo actual PC10RCIF4EI4 funcionan; no repetir que toda Vercel está inaccesible. No se leyeron valores de credenciales. No se revalidó health autenticado en C049: SUCCESS C048 es antecedente, no evidencia actual.
+
+Almacén khora-audio: consulta oficial autenticada CLI devuelve status=limits-exceeded-suspended, billingState=suspended, usageQuotaExceeded=true, size=1010497194 bytes, count=636, isTokenExpired=false. Esto prueba suspensión por cuota, no qué dimensión exacta agotó la franquicia ni cuándo se restablece. La documentación Vercel Hobby indica bloqueo de acceso por exceso y espera de30d; no inferir fecha de desbloqueo de este almacén. No se tocaron plan, cargos, objetos, claves ni permisos; tampoco se descargaron audios privados para diagnosticar.
+
+Código inspeccionado: ruta audio cifra antes de put, relee, descifra y contrasta bytes/SHA256; MP3 conserva original y restringe host a .blob.vercel-storage.com; importación y reconciliación también dependen de Blob. Cambiar token/URL no implementa migración segura. No ampliar hosts indiscriminadamente ni permitir URL arbitraria. No relajar cierres/hashes para hacer archivable un audio inaccesible.
+
+Nueva orden literal en originales/C049-almacenamiento.txt. Comparación oficial: R2 Standard10GB-mes,1M escrituras y10M lecturas, salida gratuita, excedentes facturables; B2 primeros10GB gratis y salida gratuita acotada3x almacenamiento medio, caps configurables con límites/excepciones; Supabase Free1GB y pausa por inactividad, no recomendado para quitar esta fragilidad. Propuesta sujeta a aprobación material: B2 privado sin activar plan/cargos, verificar cuenta y controles de gasto antes de conexión; R2 alternativa si se acepta esquema de facturación por exceso. Ningún servicio ofrece garantía de gratuito ilimitado o cero fallos. No existe cuenta/destino nuevo provisionado ni capacidad real restante verificada.
+
+Próximo paso material: decisión informada del operador sobre proveedor/perímetro/coste. Tras aprobación y acceso legítimo: prueba aislada cifrar→escribir→leer→descifrar→hash→reproducción; preservar identificadores y manifiestos; nueva escritura al destino aprobado, lectura compatible para originales previos, copia por objeto verificada cuando origen sea accesible; no borrar Blob ni afirmar migrados los bloqueados. Conservación local es contingencia, no sustituto equivalente de persistencia remota. Integrar todos los consumidores, cuotas/errores observables, regresión y gate completo antes de producción. En paralelo siguen pendientes causas reproducibles de archivado nuevo/histórico y pruebas Hito1 sin modificar Ver puntos guardados.
+
+Hito1 NO terminado: no se ejecutó publicación nueva, compilación integral, prueba de usuario o recuperación de todos los originales. Cambiar proveedor para capturas futuras no recupera por sí solo objetos bloqueados del anterior. La transición final debe verificarse en producción sin fabricar verde/azul ni consentimiento. Este ciclo es diagnóstico/propuesta/documentación, cero mutaciones de runtime.
+
+**Historia conservada: C049 prevalece sobre prioridades y acceso C048.**
 
 **ACTUAL C048 — REANCLAJE SOBRE PRODUCCIÓN91d729; NUEVA RETROALIMENTACIÓN ADQUIRIDA; CORRECCIONES LOCALES, NO NUEVO DESPLIEGUE.** /api/version público confirmó producción `91d729396398240f0b4745fd5645f15c7c9fd935` y rama feat/ingreso-autobiografico-20261019; /api/auth/session respondió200/null: solo frontera no autenticada, no prueba de cuenta. Khora health en este ciclo vuelve SUCCESS/OK/full_access:true/missing_scopes:[], correlación f4f9465e-7e98-4b47-bd7d-2c3ca5e30044. El 401 normativo y ERROR de C047 son historia supersedida para ese estado, no bloqueos actuales; tampoco se inventa cómo se repararon. No se reejecutó aquí el fullbuild reportado en el adjunto.
 
@@ -290,6 +308,8 @@ Pendiente material para viabilidadoperativa: pruebaMeta autorizada sobre un caso
 
 ## 9. Aceptación y viabilidad
 
+C049: Hito1 exige audio real verificable/descargable o estado parcial franco; archivo manual de captura nueva e histórica con recibo Custodia; preservación y reintentos; recuperación tras recarga; cuatro luces actuales veraces; mensajes comprensibles y observabilidad; todo servido en producción exacta y presentado al operador. Bloqueo Blob pendiente y proveedor sustituto no aprobado impiden declarar hito cerrado. No sustituir esta compuerta por pruebas sintéticas o un READY.
+
 C048: [contraste y secuencia vigentes](evidencias/C048-plan-y-contrastes.md) supersede etiquetas de vigencia de planes anteriores sin borrarlos. La aceptación exige flujo real y contenido exacto aprobado, no una mención léxica ni un recuento de pruebas.
 
 ### C039 · Plan de trabajo por hitos y propietario (vigente, sin ejecución nueva)
@@ -382,6 +402,10 @@ Toda salida conserva diez campos, agrupables sin ocultarlos: (1) proyecto/rol/se
 No llamar «sin cambios» a una fuente inaccesible; no convertir calidad científica o clínica en semáforo por pruebas de software. Si no hay constructor nuevo asignado, decirlo y no inventar trabajo en segundo plano.
 
 ## 11. Crónica y fuentes
+
+### C049 — Hito1, cuota Blob y alternativas sin gasto autorizado
+
+Se releyó canon remoto v0.6.34/blobbac206bc02c206162eb9347ff9a65f6be2c5e17e, producción y almacén. Se reutilizó CLI autenticada existente ante MCP fallidos, sin exportar secretos. Se creó checkout aislado temporal completo sobre4fb3b7d y se inspeccionaron contratos/rutas; ninguna corrección productiva aplicada todavía. Revisión oficial de cuotas en evidencia C049-almacenamiento.md, distinción límites conocidos/desconocidos y autorización pendiente. Universo-datos recibió coordinación de límites sin cambio de código. Original íntegro de la nueva instrucción, propuesta y recibo de diagnóstico conservados; documentación en rama aislada para no disparar producción/migración. La integración documental en rama funcional está pendiente, no hay despliegue nuevo. No es exportación nativa completa del hilo.
 
 ### C048 — Reconciliación de producción, instrucciones nuevas y corrección causal selectiva
 
@@ -828,6 +852,8 @@ Recibo: evidencias/INGRESO-RECUPERACION.json. Incidentes de validación y correc
 El operador reporta botón desactivado con rótulo de espera. Se confirma dependencia indebida de preparación respecto al catálogo completo. Se separa bootstrap autenticado y esquema de custodia de la carga de versiones: historial 503 no revoca preparación válida. Fallo de bootstrap conserva compuerta, muestra motivo y permite reintentar sin borrar texto. Se normaliza checkpoint_en histórico mediante cast explícito y se ensaya columna TEXT; no se atribuye ese tipo al entorno real sin consulta. La causa concreta de la petición del operador sigue no observada. Original literal y recibo en originales/MICROFONO-BLOQUEADO.txt y evidencias/MICROFONO-BOOTSTRAP.json. Vercel informó khora-audio limits-exceeded-suspended / billingState suspended; es un impedimento externo de guardado remoto distinto del bloqueo de interfaz, y esta corrección no lo levanta. No se introduce otra escucha, proveedor, permiso o plan.
 
 ## 12. Reinstanciación
+
+C049: retomar §8 y evidencia C049-almacenamiento.md con este central y roles §5, sin repetir migración ni construir sustituto Blog. Objetivo pendiente Hito1 live; primer bloqueo material decisión/provisión de almacenamiento gratuito acotado, sin facturación ni lectura indiscriminada de secretos. Producción91d729 no es HEAD4fb3. No prometer copia de Blob inaccesible ni asumir vigentes permisos de otros equipos/sesiones.
 
 C048: continuar en las dos sesiones vigentes §5, no reemitir handoff ni adoptar STOP/roles antiguos. §8 contiene el checkpoint único. No hay permiso para otros equipos, portapapeles, tokens, migraciones o publicaciones por leer este expediente.
 
