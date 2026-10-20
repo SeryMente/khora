@@ -78,3 +78,6 @@ secrets/env-vault.enc.json.pre-restore-*
 
 .vercel
 .env*
+
+# Generated unchanged from the pinned Open WebUI wheel at prebuild
+/khora-web/public/user.png

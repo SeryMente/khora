@@ -21,7 +21,7 @@ export function staticDestination(name) {
   if (name.includes("\\") || name.split("/").includes("..")) throw Error("UPSTREAM_STATIC_UNSAFE_PATH");
   if (name.startsWith(PREFIX)) {
     const relative = name.slice(PREFIX.length);
-    if (["_app/", "assets/", "licenses/"].some(p => relative.startsWith(p))) return relative;
+    if (relative === "user.png" || ["_app/", "assets/", "licenses/"].some(p => relative.startsWith(p))) return relative;
   }
   if (name.startsWith(LICENSE_PREFIX)) {
     const relative = name.slice(LICENSE_PREFIX.length);
@@ -67,7 +67,8 @@ export async function prepare(file, publicRoot) {
     await writeFile(destination, bytes);
     manifest.push({ path: relative, bytes: bytes.length, sha256: sha256(bytes) });
   }
-  if (!manifest.some(x => x.path === "assets/fonts/Inter-Variable.ttf")
+  if (!manifest.some(x => x.path === "user.png")
+      || !manifest.some(x => x.path === "assets/fonts/Inter-Variable.ttf")
       || !manifest.some(x => x.path === "OPENWEBUI-LICENSE.txt")
       || !manifest.some(x => x.path.startsWith("_app/immutable/"))) {
     throw Error("UPSTREAM_STATIC_INCOMPLETE");

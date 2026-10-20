@@ -13,5 +13,10 @@ export function openWebUIPath(path: string): boolean {
 
 /** Pinned, unchanged wheel assets on the same Vercel host, after real auth(). */
 export function bundledOpenWebUIAsset(path: string): boolean {
-  return openWebUIPath(path) && ['/_app/', '/assets/', '/licenses/'].some(prefix => path.startsWith(prefix));
+  return path === '/user.png' || (openWebUIPath(path) && ['/_app/', '/assets/', '/licenses/'].some(prefix => path.startsWith(prefix)));
+}
+
+/** Generic upstream icon only; this never opens native user/profile APIs. */
+export function nativeDefaultAvatarPath(path: string): boolean {
+  return /^\/api\/v1\/users\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/profile\/image$/.test(path);
 }
