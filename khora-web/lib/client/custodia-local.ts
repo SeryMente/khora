@@ -1,5 +1,6 @@
 "use client";
 import type { CapturaSnapshot } from "../custodia/contrato";
+import {canonicoEditorial,huellaTexto,type RevisionEditorial} from "../custodia/editorial";
 // Non-extractable device key, not E2E and not protection against same-origin XSS.
 // IndexedDB quota/private-mode errors MUST reach the UI. Never claim durability on failure.
 const DB = "khora-custodia-v1";
@@ -89,14 +90,49 @@ export type IntencionEditorialLocal = {
   request?: import("../custodia/editorial").RevisionEditorial;
   prepared?: {digest:string};
   obfuscatedExposure?:boolean;
+  /** Last server revision inspected before an explicit replacement preview. Not consent. */
+  revisionBase?:number;
+  proposal?:PropuestaEditorialLocal;
   elaboration?:{method:"cronica-sobria-v1";sourceHash:string;bodyHash:string;reviewed:true};
 };
+/** Only the public proposal is added; original remains in draft. No runtime/provider tokens.
+ * Entire proposal and its owner/source/revision binding live inside the existing AES-GCM record. */
+export type TrabajoEditorialLocal={title:string;body:string;facebook:RevisionEditorial["facebook"];reviewed:boolean};
+export type PropuestaEditorialLocal=TrabajoEditorialLocal & {
+  owner:string;publicationId:string;sourceId:string;sourceVersion:number;sourceHash:string;
+  revision:number;bodyHash:string;digest:string;
+};
+export function revisionPropuestaEditorial(row:IntencionEditorialLocal):number {
+  const revision=row.request?.revision??((row.revisionBase??0)+1);
+  if(!Number.isSafeInteger(revision)||revision<1)throw Error("EDITORIAL_PROPOSAL_REVISION");
+  return revision;
+}
+export async function crearPropuestaEditorialLocal(owner:string,row:IntencionEditorialLocal,work:TrabajoEditorialLocal):Promise<PropuestaEditorialLocal>{
+  const ref=row.receipt;
+  if(!owner||!ref||!ref.volcado_id||!Number.isSafeInteger(ref.version)||ref.version<1||!/^[a-f0-9]{64}$/.test(ref.sha256)||!row.intent.publicationId)throw Error("EDITORIAL_PROPOSAL_CONTEXT");
+  if(typeof work.title!=="string"||work.title.length>160||typeof work.body!=="string"||work.body.length>200000||!["link","full_text"].includes(work.facebook?.format)||typeof work.facebook?.message!=="string"||work.facebook.message.length>60000||typeof work.reviewed!=="boolean")throw Error("EDITORIAL_PROPOSAL_TEXT");
+  // Explicit allowlist: never spread model responses, the original, or normative credentials.
+  const value={owner,publicationId:row.intent.publicationId,sourceId:ref.volcado_id,sourceVersion:ref.version,sourceHash:ref.sha256,revision:revisionPropuestaEditorial(row),title:work.title,body:work.body,facebook:{format:work.facebook.format,message:work.facebook.message},reviewed:work.reviewed,bodyHash:await huellaTexto(work.body)};
+  return {...value,digest:await huellaTexto(canonicoEditorial(value))};
+}
+export async function validarPropuestaEditorialLocal(owner:string,row:IntencionEditorialLocal):Promise<PropuestaEditorialLocal|null>{
+  if(!row.proposal)return null;
+  const p=row.proposal,expected=await crearPropuestaEditorialLocal(owner,row,p);
+  if(canonicoEditorial(p)!==canonicoEditorial(expected))throw Error("EDITORIAL_PROPOSAL_INTEGRITY");
+  if(row.request&&(p.title!==row.request.entry.title||p.body!==row.request.entry.body||canonicoEditorial(p.facebook)!==canonicoEditorial(row.request.facebook)))throw Error("EDITORIAL_PROPOSAL_INTEGRITY");
+  return p;
+}
+export async function guardarPropuestaEditorialLocal(owner:string,row:IntencionEditorialLocal,work:TrabajoEditorialLocal):Promise<IntencionEditorialLocal>{
+  const next={...row,proposal:await crearPropuestaEditorialLocal(owner,row,work)};
+  await guardarIntencionEditorialLocal(owner,next);return next;
+}
 const editorialWrites=new Map<string,Promise<void>>();
 export async function guardarIntencionEditorialLocal(owner:string, value:IntencionEditorialLocal):Promise<void> {
   const id=owner+":"+value.sessionId;
   const next=(editorialWrites.get(id)||Promise.resolve()).catch(()=>undefined).then(async()=>{
     const previous=(await recuperarIntencionesEditorialesLocal(owner)).find(x=>x.sessionId===value.sessionId&&x.intent.publicationId===value.intent.publicationId);
     const merged={...previous,...value,draft:previous?.draft||value.draft};
+    await validarPropuestaEditorialLocal(owner,merged);
     await save(owner,"publication:"+value.sessionId,new TextEncoder().encode(JSON.stringify(merged)).buffer,{kind:"publication",at:Date.now()});
   });
   editorialWrites.set(id,next);
@@ -110,7 +146,8 @@ export async function recuperarIntencionesEditorialesLocal(owner:string):Promise
     const k=await key(db,owner); const result:IntencionEditorialLocal[]=[];
     for(const row of rows.filter(r=>r.owner===owner&&r.kind==="publication")) {
       const bytes=await crypto.subtle.decrypt({name:"AES-GCM",iv:row.iv,additionalData:new TextEncoder().encode(owner+":"+row.id)},k,row.data);
-      result.push(JSON.parse(new TextDecoder().decode(bytes)));
+      const value:IntencionEditorialLocal=JSON.parse(new TextDecoder().decode(bytes));
+      await validarPropuestaEditorialLocal(owner,value);result.push(value);
     }
     return result;
   } finally {db.close();}
