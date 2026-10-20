@@ -1253,12 +1253,6 @@
       "git_blob_sha": "f344ede02025dda120652eefe39ce24155233ee9"
     },
     {
-      "path": "OBJETO-CANONICO.md",
-      "bytes": 292352,
-      "sha256": "f18dd45def472ec15ca80626497253064f6a913397872e5c591f3ca7155b1448",
-      "git_blob_sha": "b3830aece3dd1580996962237fcc14cd89024699"
-    },
-    {
       "path": "evidencias/C046/c045-prepare.cjs",
       "bytes": 3447,
       "sha256": "8bf702d55c455db2adb6ba892ea1405630c253eecf0449406aff8d9b73405c59",
@@ -1353,6 +1347,36 @@
       "bytes": 108,
       "sha256": "d2def449046bd69388fa00c8e0e751ce6e5d42446e90c28983ea87443e257bcc",
       "git_blob_sha": "bdb3be182678411509210b69752884b9b94898a6"
+    },
+    {
+      "path": "OBJETO-CANONICO.md",
+      "bytes": 299395,
+      "sha256": "94a59a46e522c9f8952aefe059eb49a9216ec32e80c7d799f54b18641ae31377",
+      "git_blob_sha": "40e045552c48e532545acb6026cde5f27106eb4a"
+    },
+    {
+      "path": "evidencias/C047/vercel-build-summary.txt",
+      "bytes": 1775,
+      "sha256": "b081cfcec5962ed4784a79873d1ec5b32abf7c4856e04557a53ac77a50c04a1f",
+      "git_blob_sha": "8dbf25d86046da5a0ee6b6a20f49034ebd508ee9"
+    },
+    {
+      "path": "evidencias/C047/cleanup.json",
+      "bytes": 220,
+      "sha256": "900f925f948afeebacb7f46dcda70174ec5300789180e700cd434ad3c1fdd75e",
+      "git_blob_sha": "5688be4d671833944be5e6d480c58ddb1f2743ea"
+    },
+    {
+      "path": "evidencias/C047/scope.json",
+      "bytes": 394,
+      "sha256": "0084b5a1de8214193bc79bf6a33f3bb33ce26ed7b18fde421c874100dd55cefe",
+      "git_blob_sha": "cf23ef90c81dbe047de0ca07869b10707cecf881"
+    },
+    {
+      "path": "originales/C047-continuidad.txt",
+      "bytes": 562,
+      "sha256": "d93b1d59be1ce8f3eda25adc45710c5c8941d40c555c5fbc74c0135ddae90873",
+      "git_blob_sha": "2225147dc6397ec9518c4ade67d6a9ba3084f4bd"
     }
   ],
   "runtime_references": [
@@ -1459,10 +1483,10 @@
     "no_secret_values_in_manifest": true
   },
   "current_preparation": {
-    "base": "8925bfafd826fd06ebc940f2227f0f6b5981e0cf",
+    "base": "e170406da0a2e4b8cff58644d24cb3f6b5827f48",
     "production": false,
     "publication": false,
-    "fullBuild": "719pass1fail2skip on C044; C046 native reader not fullbuilt without dedicated access",
+    "fullBuild": "ERROR:726tests/723pass/1fail/2skip; missing dedicated build credential; Next not reached",
     "counts": {
       "server": 39,
       "mode": 26,
@@ -1475,9 +1499,10 @@
     "nativeReaderTests": 4,
     "retentionChecks": 11,
     "titleChecks": 20,
-    "temporaryPc8Cleanup": "pending"
+    "temporaryPc8Cleanup": "VERIFIED_LOGOUT_EXIT0_AND_ISOLATED_DIRECTORY_REMOVED",
+    "deployment": "dpl_B4CGqbgj1NW5dQGk2GYAK8q7M1AL"
   },
-  "latestEvent": "Real full suite719pass1fail2skip; native test reader removes gh dependency without bypass; real private access/build still pending; retention11,title20 proofs",
+  "latestEvent": "C046 actual Vercel726/723/1/2; dedicated methodology read access missing; isolated CLI logout/removal verified",
   "latest_verified_release": {
     "event": "C038",
     "state": "READY",
@@ -1524,8 +1549,8 @@
     "rollbackDeploymentId": "dpl_12FCcmkeXDBbLRqoi6eyd5gqKVKK",
     "summaryImplemented": false
   },
-  "latest_cycle": "C046",
-  "canonical_version": "0.6.32",
+  "latest_cycle": "C047",
+  "canonical_version": "0.6.33",
   "latest_candidate": {
     "branch": "feat/ingreso-autobiografico-20261019",
     "production": true,
@@ -1892,6 +1917,15 @@
         "bytes": 284272,
         "sha256": "6e0795fddb8770d531c198d836f4b5ca9034dcf7d3e80fc8a96fa03edf6fe358",
         "git_blob_sha": "6fa0c3208e38aa232d01daf5e6a5cd93eb4798bf"
+      }
+    },
+    {
+      "event": "C047",
+      "previous": {
+        "path": "OBJETO-CANONICO.md",
+        "bytes": 292352,
+        "sha256": "f18dd45def472ec15ca80626497253064f6a913397872e5c591f3ca7155b1448",
+        "git_blob_sha": "b3830aece3dd1580996962237fcc14cd89024699"
       }
     }
   ],

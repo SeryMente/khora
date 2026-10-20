@@ -1,0 +1,15 @@
+{
+  "code": "e170406da0a2e4b8cff58644d24cb3f6b5827f48",
+  "deployment": "dpl_B4CGqbgj1NW5dQGk2GYAK8q7M1AL",
+  "state": "ERROR",
+  "total": 726,
+  "pass": 723,
+  "fail": 1,
+  "skip": 2,
+  "failure": "METHODOLOGY_BUILD_READ_CREDENTIAL_REQUIRED",
+  "nextBuildVerified": false,
+  "production": false,
+  "publication": false,
+  "secretValuesRead": false,
+  "zipBinaryIndependentlyVerified": false
+}
