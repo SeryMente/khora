@@ -2,7 +2,7 @@
 
 ## 1. Control e identidad
 
-- Objeto vivo único: `docs/frentes/chat-epistwin/OBJETO-CANONICO.md`, SeryMente/khora, rama `docs/chat-epistwin-20261017`. Versión **0.29**, sello **KHORA-CHAT-EPISTWIN-v0.29**, ancla **E74 · publicación combinada6d29682 y recorrido real verificados; cierre técnico listo para prueba humana, no aceptación ni ENT02; 2026-10-20**. **ENT01 publicada y técnicamente verificada para prueba del operador; NO aceptada; sin ENT02.**
+- Objeto vivo único: `docs/frentes/chat-epistwin/OBJETO-CANONICO.md`, SeryMente/khora, rama `docs/chat-epistwin-20261017`. Versión **0.30**, sello **KHORA-CHAT-EPISTWIN-v0.30**, ancla **E75 · operador reporta interfaz sin estilos; reparación848b391 comprobada localmente, pendiente publicación coordinada; 2026-10-20**. **ENT01 publicada con H08 REABIERTO por fallo visual del operador; reparación local verificada, aún NO publicada ni aceptada; sin ENT02.**
 - Fuentes vigentes diferenciadas: **web publicada6d29682eb5eab336785dd2f00b1d0d90ac7a09b4**, rama `release/storage-chat-b2-20261020-513bcd14`, alias **https://khora-web.vercel.app → dpl_BCEBkJPcCorVc4mBF8NnyyF4Qsac**; publicación única realizada/verificada por centralDictado. Padre399929a integra webmínimo/chat+storage205 preservado; único delta posterior doccherrypickc738, no código extra. **Render live5192ec3232244f8d709b7c163b4643c52afd7c0e /dep-dbbrbbfavr4c73dbu600**, finished2026-10-20T18:44:22.055898Z, ingestaE72=0/índiceE72=1 y reutilización oficial de sesión por operación, pool2/overflow0. **PR331 open/draft/head5192ec3/sinmerge**, main **bd29c924393fcbd9183100f66b2e50c87b791207** revalidado. Sin promociones/rollback competitivos; no usar candidatos anterioresGE4/5CG como actuales. Accesos GitHubCLI/VercelCLI/Neon/Render/Groq/Voyage resueltos, no pedirlos otra vez. ReciboE74 en§7/§11 y archivo inmutable enlazado.
 - **PR317 cerrado sin fusionar**, título marcado sustituido por331; rama/historia10d5a91 conservadas. No trabajar dos candidatos ni reabrir el conflicto antiguo como estado vigente. La nueva rama nació de b5e7009de137db30c26ecc5f4ddbb34789f453f2 y preserva correcciones concurrentes de main.
 - Khora privado con push/admin revalidados por GitHub en E68. Esta revisión sustituye blob0.16 57ee902a5ba6738653f65ba5ff450312a92b5c35 mediante comparación de revisión antes de escribir; snapshot0.16 íntegro en95000c48990159f960ea67947bb8c01eb4546250. El commit42e1efb33dcdcf47abd66eb9ac5abfd57ca53632 es el checkpoint de contenido aportado por el operador; la punta documental observada95000c4 sirve el mismo blob. Snapshot0.15 íntegro: ee6670a5f29fc78f1861b0206d698790a29c88e6; historia anterior§11. No desplegar rama documental.
@@ -270,9 +270,17 @@ Delta E71 verificado antes de esta aprobación: GitHubCLI/VercelCLI autenticados
 - Rutasexistentes con sesión **/sistema/ingreso200, /sistema/custodia200, /sistema/consulta200, /grafo200** sinrecuperar/enviar notas alproveedor; /sistema/grafo fue ruta supuesta incorrecta404, no regresión. Guardiaspropiasfinales18:55:05UTC **proxyanónimo401/nativodirecto401**. No nuevapromoción/ingesta/escrituraDB paraeste recorrido. Publicacióncombinada preservó21blobsreservados deDictado ydeps/lock; no atribuir aceptacióndeaudio a esta comprobación.
 - **H01–H08 acreditados SOLO dentrodel alcanceENT01/acotamientos del§8. H09 pendiente de prueba/corrección/conformidad expresa del operador.** Puede probarse ya; no aceptación porCI/READY/otroagente/mandato previo de acabar. ENT02 no habilitada. No quedan credenciales, selecciónNeon ni autorización de esta fuente por pedir. WarningobservabilidadHTTPError sigue separado; no anunciarlo resuelto ni ampliar este cierre a brechasEpisTwin/mapa/archivopersonal.
 
+### E75 · fallo visual del operador y reparación de transporte
+
+- El operador aportó captura real en el chatab2cd529 sin estilos ni iconos normales y autorizó literalmente «Ok corrige y vuelve a presentar. Buen trabajo.». **La declaración E74 de presentación lista fue insuficiente; H08 reabierto y H09 permanece pendiente.** La causa puntual de la descarga/aplicación en SU navegador no fue capturada: no atribuir a caché, extensiones o autenticación como hechos. Reproducción causal propia bloqueando3CSS iniciales produjo tipografíaTimesNewRoman ySVG1350px; no equivale a demostrar la causa de su navegador.
+- Rama aislada **fix/chat-css-e75-20261020**, commit **848b391cc26f16fc928b171073df3c5d64cecddf**, padreEXACTO **6d29682eb5eab336785dd2f00b1d0d90ac7a09b4**. Push yreadbackremoto exactos. **9rutas/143inserciones/7eliminaciones**, inventario reservado/aceptado por centralDictado: .gitignore excluyeuser.pnggenerado; proxyroute; nuevochat-presentation.ts; chat-routes; middleware; next.configtracing3CSS; preparadorassets; pruebaspresentation/static. package/lock/vercel.json/api/kernel/storage invariables. No DB/migrador/ingesta/Render/credenciales/promoción en estehilo.
+- Transporte: HTMLnativoGET /,/auth,/c/ incluye bytes originales de3CSS iniciales0.12.3, hasheados SHA256 antesdeservir, en ordenoriginal; enlacesdisabled se conservan como marcadoresdelpreloaderSvelte. No modificación delCSS/nuevo diseño/fork/licencia. Si archivos/hash/contratoHTMLfaltan:503explicito/no-store, no interfaznativa sinestilos. JSON/SSE no seconsumen. TracingNext incluyeesos3archivos yconservaffmpeg/configrestante. Avatar: imagen genérica OFICIAL user.png, despuésauth ysoloGET/HEADdeformatoUUID/profile/image; NO abre/proxy APIs deperfiles, NOconsulta identidad ni simula fotoreal. Assets5584=5583previos+user.png7858B, wheelfijadooriginalidéntico.
+- Pruebas **30PASS/0FAIL/0SKIP**, **typecheck0**, diffcheck0. Banco inicialmente vinculó node_modulesprevio aB2 ytipos fallaronTS2307; se corrigió usando banco combinadoexistente, sin modificar manifests/lock/storage. QA navegadorreal producciónHTML+respuesta transformada LOCAL:3CSSbloqueadas; desktop1366ymóvil390,3stylesinline/fuentecorrecta/flex/compositor/ámbar/iconos≤20px/0imágenesrotas/sinoverflow/0pageerrors; capturasinspeccionadas. **Esto prueba elparchelocal, NO es publicaciónlive.** Sin nuevaspreguntas, cuenta, ingesta o lecturaarchivo.
+- Recibo inmutable: https://github.com/SeryMente/khora/blob/95fa74e28a9b51cdf403b35ece9b54128f2063fb/docs/frentes/chat-epistwin/evidencia/E75-recibo-reparacion-presentacion.json; lecturaexactacomprobada. CentralDictado mantiene promociónúnica y trabajaC051sobre6d; aceptó integraciónporcherrypick848b391, pero NO hay candidata/deploynuevo reportado al persistir. Próximascompuertas: combinar con12rutasCrónica/almacenamientoajenas→fullgateúnico→tracing3CSS→publicacióncentral→verificaciónHTTP/capturas propias enaliasfinal, sinmock deHTML→prueba/conformidadoperador. No presentar848comoaceptada/live ni cerrarH08porQAinterceptada.
+
 ## 8. Estado vivo
 
-**ENT01 publicada y técnicamente verificada para prueba; NO aceptada por el operador. ENT02 no habilitada.** E74 gobierna el estadoactual;0.28 íntegro encommit956ad38a2ed21b7c910b235326c5a66ff365b627.
+**ENT01 publicada pero H08 REABIERTO por fallo visual reportado por operador. Reparación848b391 verificada localmente, pendiente integración/publicación única central; NO aceptada. ENT02 no habilitada.** E75 gobierna estadoactual; E74 queda como evidencia histórica técnica, no aceptación visual.
 
 ### Checklist fijo H01–H09
 
@@ -285,17 +293,17 @@ Delta E71 verificado antes de esta aprobación: GitHubCLI/VercelCLI autenticados
 | H05 | ✓ | Respuesta/citas/seguimiento/insuficiencia e historial recuperado conpaginación trasreload en publicaciónfinal6d29682. |
 | H06 | ✓ acotado | Lookupoficialreal propietario/no-propietario, Htdurable, sin cuentaextra, guardiasanónimas401. |
 | H07 | ✓ acotado | Reiniciosinreingesta/índicedurable ydoschats simultáneoscorrectos trasajusteoficial; RAMmáxmuestreada387952640B<536870900B. No estrés/SLA. |
-| H08 | ✓ | MismaURL/dpl_BCE/fuente6d29682, promociónúnica central,21blobsstorage preservados, rutasexistentes comprobadas/licencias intactas. |
+| H08 | ↻ REABIERTO | Reparación848b391/base6d,30PASS/tipos0 yQAconCSSbloqueado local; falta publicacióncentral yverificaciónpropia SINmock enaliasfinal. |
 | H09 | □ | Prueba/correcciones/conformidad explícita del operador, no inferida. |
 
 **🔄 Estado vivo**
 
-Acción en curso: primera entrega técnica publicada y verificada en https://khora-web.vercel.app, fuente web6d29682/Render5192ec3; pendiente exclusivamente prueba y conformidad del operador. Siguiente paso atómico: el operador prueba la conversación con la fuente ficticia Lumen/Cobalto, revisa citas, repregunta e insuficiencia y comunica cualquier discrepancia. Pendientes en secuencia: prueba humana → corregir hallazgos si existen → conformidad expresa → solo entonces evaluar ENT02. No reingerir, no importar notas, no nuevas claves ni promoción/rollback sin coordinación con centralDictado. PR331 permanece draft y main sin merge.
+Acción en curso: reparar el fallo visual real del chat. Fuente848b391/base6d29682 subida y verificada localmente; centralDictado integrará con sus correcciones C051 y será único promotor. Siguiente paso atómico: recibir fuente/candidata combinada, comprobar tracing3CSS y ejecutar verificación visual/HTTP propia sobre alias publicado, SIN interceptar HTML. Pendientes en secuencia: integración/fullgate central → publicación única → H08 real → prueba/correcciones/conformidad del operador. No nuevas ingestas, archivo personal, DB, Render, credenciales, promoción/rollback competitivo ni ENT02. PR331 sigue draft/main sin merge.
 
 **⚗️ En prueba / recién fallido**
 
-Prueba humana pendiente; carga acotada y recorrido final aprobados, no garantía universal. FalloModelnotfound anterior corregido y preservado como histórico.
-WarningobservabilidadHTTPError separado sin cierreacreditado; no importación de notas/archivo ni acreditación globalEpisTwin.
+Interfaz sin estilos reportada por operador; reparación848b391 pasó30pruebas/tipos0 yQAcon3CSSbloqueadas local, aún NOlive. H08 reabierto/H09pendiente.
+Causa puntual del navegador del operador no demostrada; warningobservabilidadHTTPError sigue separado, sin cierreacreditado.
 
 **🔔 Recordatorios Latentes**
 
@@ -307,9 +315,9 @@ WarningobservabilidadHTTPError separado sin cierreacreditado; no importación de
 
 ## 9. Aceptación y viabilidad
 
-**Criterios técnicos ENT01 comprobados dentro del corpus ficticio autorizado:** conversación textual nativa real, un núcleo/grafo existente, Groq/Voyage reales, fuentes auténticas/insuficiencia, seguimiento, persistencia/propiedad y doschats bajo límite512MiB, mismaURL/publicacióncoordinada preservando otrosfrentes. No simular extracciónLLM, corpuspersonal, comunidades, auditoría globalEpisTwin, servicio local sin egress ni prueba de estrés.
+**Evidencia técnica anterior E74, ahora con H08 reabierto por fallo visual:** conversación textual nativa real, un núcleo/grafo existente, Groq/Voyage reales, fuentes auténticas/insuficiencia, seguimiento, persistencia/propiedad y doschats bajo límite512MiB, mismaURL/publicacióncoordinada preservando otrosfrentes. No simular extracciónLLM, corpuspersonal, comunidades, auditoría globalEpisTwin, servicio local sin egress ni prueba de estrés.
 
-**Compuerta humana vigente:** usuario debe usar, revisar/corregir y dar conformidad expresa. Tiempo de esta revisión depende del operador; no estimar aceptación ni prometertrabajo de fondo. No hay más paso automatizable previo que exija nueva credencial/autorización de la fuente o nueva publicación. Ante hallazgo, corregirlo en alcance y volver a verificar sin ampliar datos/costos/permisos.
+**Compuerta humana vigente:** usuario debe usar, revisar/corregir y dar conformidad expresa. Tiempo de esta revisión depende del operador; no estimar aceptación ni prometertrabajo de fondo. E75 requiere integración/publicación coordinada del parche848b391 y nueva verificación visual real; no pedir nuevas credenciales/ingesta ni trasladar al operador la depuración. Ante hallazgo, corregirlo en alcance y volver a verificar sin ampliar datos/costos/permisos.
 
 No nuevohosting/plan/contenedorVercel/repopúblico. La ingesta artificial E72 es excepción específica yaejecutada ydeshabilitada para nuevosbuilds; no acceso al archivo por inferencia. Conservar histórico completo en AnexoA y snapshotsGit, no reactivar bloqueos cerrados.
 
@@ -437,15 +445,15 @@ La instancia receptora responde brevemente con: fuente/revisión/sello leídos, 
 
 Retoma el hilo de Khora · Conversación Enraizada leyendo, en este orden:
 1. Metaprompt Canónico de Samantha (Fuente viva) — https://app.notion.com/p/c85a41878241830588e181f4c02fbab4 — v330 · NX-330m.
-2. Objeto canónico vivo único de este frente (persistencia de contexto, no crear otra VCU) — https://github.com/SeryMente/khora/blob/docs/chat-epistwin-20261017/docs/frentes/chat-epistwin/OBJETO-CANONICO.md — KHORA-CHAT-EPISTWIN-v0.29/anclaE74; adquirir delta posterior sin sobrescribir.
+2. Objeto canónico vivo único de este frente (persistencia de contexto, no crear otra VCU) — https://github.com/SeryMente/khora/blob/docs/chat-epistwin-20261017/docs/frentes/chat-epistwin/OBJETO-CANONICO.md — KHORA-CHAT-EPISTWIN-v0.30/anclaE75; adquirir delta posterior sin sobrescribir.
 3. Metacanon central SeryMente/metodologia, rama docs/metacanon-objetos-20261011/METACANON-OBJETOS-CANONICOS.md — versión1.5/METACANON-OBJETOS-v1.5/commitbfb63751f060596e344d5768e31085100bb20751/blob32c7a65ff2e83b3b76752ba2160427bd6e851a8f; comprobarfrescura y conservarrolSamantha/encargo directo, no otroactor/RDCconstrucción.
 
-Estado al cierre de este ciclo: Acción en curso: primera entrega técnica publicada y verificada en https://khora-web.vercel.app, fuente web6d29682/Render5192ec3; pendiente exclusivamente prueba y conformidad del operador. Siguiente paso atómico: el operador prueba la conversación con la fuente ficticia Lumen/Cobalto, revisa citas, repregunta e insuficiencia y comunica cualquier discrepancia. Pendientes en secuencia: prueba humana → corregir hallazgos si existen → conformidad expresa → solo entonces evaluar ENT02. No reingerir, no importar notas, no nuevas claves ni promoción/rollback sin coordinación con centralDictado. PR331 permanece draft y main sin merge.
+Estado al cierre de este ciclo: Acción en curso: reparar el fallo visual real del chat. Fuente848b391/base6d29682 subida y verificada localmente; centralDictado integrará con sus correcciones C051 y será único promotor. Siguiente paso atómico: recibir fuente/candidata combinada, comprobar tracing3CSS y ejecutar verificación visual/HTTP propia sobre alias publicado, SIN interceptar HTML. Pendientes en secuencia: integración/fullgate central → publicación única → H08 real → prueba/correcciones/conformidad del operador. No nuevas ingestas, archivo personal, DB, Render, credenciales, promoción/rollback competitivo ni ENT02. PR331 sigue draft/main sin merge.
 
-Prueba humana pendiente; carga acotada y recorrido final aprobados, no garantía universal. FalloModelnotfound anterior corregido y preservado como histórico.
-WarningobservabilidadHTTPError separado sin cierreacreditado; no importación de notas/archivo ni acreditación globalEpisTwin.
+Interfaz sin estilos reportada por operador; reparación848b391 pasó30pruebas/tipos0 yQAcon3CSSbloqueadas local, aún NOlive. H08 reabierto/H09pendiente.
+Causa puntual del navegador del operador no demostrada; warningobservabilidadHTTPError sigue separado, sin cierreacreditado.
 
-Siguiente paso: prueba del operador, corregir discrepancias si existen y recibir conformidad expresa; no ENT02 por inferencia.
+Siguiente paso: integración/publicaciónúnica central de848b391+C051, verificacióndealiasreal sinmock ysoloentonces prueba/conformidadhumana; no ENT02.
 
 Contexto mínimo verificado: fuenteweb6d29682eb5eab336785dd2f00b1d0d90ac7a09b4/dpl_BCEBkJPcCorVc4mBF8NnyyF4Qsac/aliasKhora; Render5192ec3232244f8d709b7c163b4643c52afd7c0e/dep-dbbrbbfavr4c73dbu600/free512MiB/autoDeployoff. PR331draft/mainbd29c924393fcbd9183100f66b2e50c87b791207,sinmerge. AccesosCLI/MCP yaresueltos,no pedirclaves ni extraerJWT/env. E72 autorizóSOLO «Lumen es una baliza ficticia de color ámbar. Cobalto es un vehículo ficticio de color azul.»/SHAf3c99ebb1fa023be68c85996391e0401b20e248ed66a664c69d22f446a48c5df/IOent01-public-fiction-e72-v1. Yaingresada por escritorreal conanotaciónmanualhonesta,4nodos/2rels/Voyage1024; ingestaflag0 yíndiceflag1, recuperación derivada sinproveedor/escrituraNeo4j. No personalnotes/importarchive/convergenciaPG→Neo4j/nuevostack/hosting/costos/ENT02. Guardiasanónimas401 y propietario/no-propietario reales; oficialSESSION_SHARINGtrue reutiliza sesión explícita poroperación, no usuarios, pool2/overflow0, sinbypass.
 
@@ -453,7 +461,8 @@ Pruebas propiasfinales: Lumen→ámbar/citas4, repregunta→balizaficticia/citas
 
 Coordinación: centralDictado session://ecea4187-8241-819b-af83-0003b7c205f7/3fea4187-8241-805a-a526-00a99e9d743d promotorúnico; NO nuevaspromociones/rollback sincoordinar, no tocarsusrutas/canon/credenciales. Web399929a/base205b7c20 preservó21blobs/depslock, únicoprebuildprefix yvercel.jsonnpmrunbuildsinmigrador; release6d29682añadeSOLOdocc738central. Su pruebaaudio/aceptación siguen ensufrente, no mezclarconENT01chat.
 
-H01–H08✓SOLOalcanceacotado; H09pendiente. ChecklistfijoH01–H09/metacanon1.5/sello enavances, evidencia/noETAinventada/nofondo. Preservar13bloques/originales, compararblob yreadbackexacto, sincronizarambosprompts. Fuentev332espacioanteriorinaccesible,no fingircarga. No reactivarlogin/ingesta pendientes históricos ni confundir UIpaginada con pérdida.
+H01–H07conservanevidenciaacotada; H08REABIERTOporfallovisualdeloperador; H09pendiente.
+ReparaciónE75:848b391cc26f16fc928b171073df3c5d64cecddf/base6d29682,9rutas/30PASS/tipos0/QA3CSSbloqueadasdesktop+móvil. AúnNOlive; centralDictadointegraC051/promueveúnico. HTMLGETtransporta3CSSoficialesinmutadas/hasheadas/trazadas,avatarGENÉRICOlocalautenticado,NOproxydeperfiles; JSON/SSE/DB/Render/ingesta/lock/storageintactos. VerificarheaderX-Khora-Native-Presentation:pinned-css-inline-v1/3styles/compositor/capturasrealesytracingtrasdeploy. No presentartestHTMLinterceptadocomoresultadopúblico. ChecklistfijoH01–H09/metacanon1.5/sello enavances, evidencia/noETAinventada/nofondo. Preservar13bloques/originales, compararblob yreadbackexacto, sincronizarambosprompts. Fuentev332espacioanteriorinaccesible,no fingircarga. No reactivarlogin/ingesta pendientes históricos ni confundir UIpaginada con pérdida.
 ```
 
 ### Prompt de continuidad de construcción
@@ -463,15 +472,15 @@ H01–H08✓SOLOalcanceacotado; H09pendiente. ChecklistfijoH01–H09/metacanon1.
 
 Retoma el hilo de Khora · Conversación Enraizada leyendo, en este orden:
 1. Metaprompt Canónico de Samantha (Fuente viva) — https://app.notion.com/p/c85a41878241830588e181f4c02fbab4 — v330 · NX-330m.
-2. Objeto canónico vivo único de este frente (persistencia de contexto, no crear otra VCU) — https://github.com/SeryMente/khora/blob/docs/chat-epistwin-20261017/docs/frentes/chat-epistwin/OBJETO-CANONICO.md — KHORA-CHAT-EPISTWIN-v0.29/anclaE74; adquirir delta posterior sin sobrescribir.
+2. Objeto canónico vivo único de este frente (persistencia de contexto, no crear otra VCU) — https://github.com/SeryMente/khora/blob/docs/chat-epistwin-20261017/docs/frentes/chat-epistwin/OBJETO-CANONICO.md — KHORA-CHAT-EPISTWIN-v0.30/anclaE75; adquirir delta posterior sin sobrescribir.
 3. Metacanon central SeryMente/metodologia, rama docs/metacanon-objetos-20261011/METACANON-OBJETOS-CANONICOS.md — versión1.5/METACANON-OBJETOS-v1.5/commitbfb63751f060596e344d5768e31085100bb20751/blob32c7a65ff2e83b3b76752ba2160427bd6e851a8f; comprobarfrescura y conservarrolSamantha/encargo directo, no otroactor/RDCconstrucción.
 
-Estado al cierre de este ciclo: Acción en curso: primera entrega técnica publicada y verificada en https://khora-web.vercel.app, fuente web6d29682/Render5192ec3; pendiente exclusivamente prueba y conformidad del operador. Siguiente paso atómico: el operador prueba la conversación con la fuente ficticia Lumen/Cobalto, revisa citas, repregunta e insuficiencia y comunica cualquier discrepancia. Pendientes en secuencia: prueba humana → corregir hallazgos si existen → conformidad expresa → solo entonces evaluar ENT02. No reingerir, no importar notas, no nuevas claves ni promoción/rollback sin coordinación con centralDictado. PR331 permanece draft y main sin merge.
+Estado al cierre de este ciclo: Acción en curso: reparar el fallo visual real del chat. Fuente848b391/base6d29682 subida y verificada localmente; centralDictado integrará con sus correcciones C051 y será único promotor. Siguiente paso atómico: recibir fuente/candidata combinada, comprobar tracing3CSS y ejecutar verificación visual/HTTP propia sobre alias publicado, SIN interceptar HTML. Pendientes en secuencia: integración/fullgate central → publicación única → H08 real → prueba/correcciones/conformidad del operador. No nuevas ingestas, archivo personal, DB, Render, credenciales, promoción/rollback competitivo ni ENT02. PR331 sigue draft/main sin merge.
 
-Prueba humana pendiente; carga acotada y recorrido final aprobados, no garantía universal. FalloModelnotfound anterior corregido y preservado como histórico.
-WarningobservabilidadHTTPError separado sin cierreacreditado; no importación de notas/archivo ni acreditación globalEpisTwin.
+Interfaz sin estilos reportada por operador; reparación848b391 pasó30pruebas/tipos0 yQAcon3CSSbloqueadas local, aún NOlive. H08 reabierto/H09pendiente.
+Causa puntual del navegador del operador no demostrada; warningobservabilidadHTTPError sigue separado, sin cierreacreditado.
 
-Siguiente paso: prueba del operador, corregir discrepancias si existen y recibir conformidad expresa; no ENT02 por inferencia.
+Siguiente paso: integración/publicaciónúnica central de848b391+C051, verificacióndealiasreal sinmock ysoloentonces prueba/conformidadhumana; no ENT02.
 
 Contexto mínimo verificado: fuenteweb6d29682eb5eab336785dd2f00b1d0d90ac7a09b4/dpl_BCEBkJPcCorVc4mBF8NnyyF4Qsac/aliasKhora; Render5192ec3232244f8d709b7c163b4643c52afd7c0e/dep-dbbrbbfavr4c73dbu600/free512MiB/autoDeployoff. PR331draft/mainbd29c924393fcbd9183100f66b2e50c87b791207,sinmerge. AccesosCLI/MCP yaresueltos,no pedirclaves ni extraerJWT/env. E72 autorizóSOLO «Lumen es una baliza ficticia de color ámbar. Cobalto es un vehículo ficticio de color azul.»/SHAf3c99ebb1fa023be68c85996391e0401b20e248ed66a664c69d22f446a48c5df/IOent01-public-fiction-e72-v1. Yaingresada por escritorreal conanotaciónmanualhonesta,4nodos/2rels/Voyage1024; ingestaflag0 yíndiceflag1, recuperación derivada sinproveedor/escrituraNeo4j. No personalnotes/importarchive/convergenciaPG→Neo4j/nuevostack/hosting/costos/ENT02. Guardiasanónimas401 y propietario/no-propietario reales; oficialSESSION_SHARINGtrue reutiliza sesión explícita poroperación, no usuarios, pool2/overflow0, sinbypass.
 
@@ -479,12 +488,13 @@ Pruebas propiasfinales: Lumen→ámbar/citas4, repregunta→balizaficticia/citas
 
 Coordinación: centralDictado session://ecea4187-8241-819b-af83-0003b7c205f7/3fea4187-8241-805a-a526-00a99e9d743d promotorúnico; NO nuevaspromociones/rollback sincoordinar, no tocarsusrutas/canon/credenciales. Web399929a/base205b7c20 preservó21blobs/depslock, únicoprebuildprefix yvercel.jsonnpmrunbuildsinmigrador; release6d29682añadeSOLOdocc738central. Su pruebaaudio/aceptación siguen ensufrente, no mezclarconENT01chat.
 
-H01–H08✓SOLOalcanceacotado; H09pendiente. ChecklistfijoH01–H09/metacanon1.5/sello enavances, evidencia/noETAinventada/nofondo. Preservar13bloques/originales, compararblob yreadbackexacto, sincronizarambosprompts. Fuentev332espacioanteriorinaccesible,no fingircarga. No reactivarlogin/ingesta pendientes históricos ni confundir UIpaginada con pérdida.
+H01–H07conservanevidenciaacotada; H08REABIERTOporfallovisualdeloperador; H09pendiente.
+ReparaciónE75:848b391cc26f16fc928b171073df3c5d64cecddf/base6d29682,9rutas/30PASS/tipos0/QA3CSSbloqueadasdesktop+móvil. AúnNOlive; centralDictadointegraC051/promueveúnico. HTMLGETtransporta3CSSoficialesinmutadas/hasheadas/trazadas,avatarGENÉRICOlocalautenticado,NOproxydeperfiles; JSON/SSE/DB/Render/ingesta/lock/storageintactos. VerificarheaderX-Khora-Native-Presentation:pinned-css-inline-v1/3styles/compositor/capturasrealesytracingtrasdeploy. No presentartestHTMLinterceptadocomoresultadopúblico. ChecklistfijoH01–H09/metacanon1.5/sello enavances, evidencia/noETAinventada/nofondo. Preservar13bloques/originales, compararblob yreadbackexacto, sincronizarambosprompts. Fuentev332espacioanteriorinaccesible,no fingircarga. No reactivarlogin/ingesta pendientes históricos ni confundir UIpaginada con pérdida.
 ```
 
 ## 13. Persistencia y revisión
 
-Fuente única de estado y permisos: este objeto, rama documental, versión0.29/selloKHORA-CHAT-EPISTWIN-v0.29/anclaE74. Recibo inmutable no es otro tablero/objeto vivo: https://github.com/SeryMente/khora/blob/1ffdac416c8b40af6dd01d87697b774e497689a2/docs/frentes/chat-epistwin/evidencia/E74-recibo-publicacion-ent01.json; SHA256delrecibo8ad02233d557151ea6ad54c3643062a64a618a60076ea2e548880a8b7bb882dd, readbackexacto comprobado. Los13bloques y AnexoAoriginal se conservan; §8/§9/§12 actualizados sin reactivar estadosantiguos. Versionesanteriores completas enGit:0.28/956ad38a2ed21b7c910b235326c5a66ff365b627 y0.27/aebd840ce668ca0420267c6040eaf01c1406c475.
+Fuente única de estado y permisos: este objeto, rama documental, versión0.30/selloKHORA-CHAT-EPISTWIN-v0.30/anclaE75. ReciboE75inmutable(noobjetovivo): https://github.com/SeryMente/khora/blob/95fa74e28a9b51cdf403b35ece9b54128f2063fb/docs/frentes/chat-epistwin/evidencia/E75-recibo-reparacion-presentacion.json. El reciboanteriorE74es histórico, no aprobaciónvisual trasfalloE75. Recibo inmutable no es otro tablero/objeto vivo: https://github.com/SeryMente/khora/blob/1ffdac416c8b40af6dd01d87697b774e497689a2/docs/frentes/chat-epistwin/evidencia/E74-recibo-publicacion-ent01.json; SHA256delrecibo8ad02233d557151ea6ad54c3643062a64a618a60076ea2e548880a8b7bb882dd, readbackexacto comprobado. Los13bloques y AnexoAoriginal se conservan; §8/§9/§12 actualizados sin reactivar estadosantiguos. Versionesanteriores completas enGit:0.28/956ad38a2ed21b7c910b235326c5a66ff365b627 y0.27/aebd840ce668ca0420267c6040eaf01c1406c475.
 
 Antes de siguiente escritura: volver a cargar/compararblob, fusionardeltas y bloquear colisión; comprobar metacanonvivo, no asumir ausencia de cambios por memoria. Guardar/releerbyteporbyte ysincronizarprompts. Esta actualización exige readback delcontenido para declararsepersistida; no anticiparlo. No hubo merge ni promoción de rama documental.
 
@@ -951,3 +961,14 @@ Fuente de coordinación/promoción: hilo centralDictado, checkpoint con fuente6d
 > Puedes hacer recorrido finalH05/H08 en ESTEalias usando tusesión, sinpublicación/ingesta/DBnuevas, sinaceptaciónporoperador niENT02.
 
 Interpretación separada: prueba técnica en publicaciónexacta autorizada y ejecutada; no aceptaciónhumana ni reencargo de pruebaaudio a estehilo. RecibospropiosE74/§7/archivo inmutable, checklist yestadoactual§8. Operador aún debe usar/corregir/darconformidad; no nuevaingesta/archivo/ENT02 por silencio.
+
+
+### E75 · corrección solicitada por el operador
+
+> Esto que es?
+
+Captura adjunta de interfaz real sin estilos. Respuesta reconoce fallo/H08reabierto ynoatribuyecausa sinprueba. Autorizaciónliteral posterior:
+
+> Ok corrige y vuelve a presentar. Buen trabajo.
+
+Ejecución848b391/recibopropio§7; noaceptaciónhumana/ENT02 por elogio ni prueba local. Mantenerpromocióncentralúnica ycorreccionesCrónicareservadas.
