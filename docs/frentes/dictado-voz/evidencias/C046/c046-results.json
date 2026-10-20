@@ -1,0 +1,6 @@
+{
+  "status": "PASS",
+  "tests": 4,
+  "livePrivateComparison": "not invoked; no dedicated credential provided, remains mandatory in full build",
+  "security": "pinned source/main, no redirects/cache/gh/broadtoken/skip; safe diagnostics; size/time caps"
+}
