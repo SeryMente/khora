@@ -1,0 +1,3 @@
+<p>
+Si hay un problema con el almacenamiento de audio,  debemos resolverlo. Si vercel blog se convirtio enunproblema debemos buscar una forma de almacenamiento persistente gratuito que no nos de problemas. 
+</p>

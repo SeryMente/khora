@@ -68,12 +68,24 @@ export async function importAndTranscribeAudio(args: {
   });
   const stagingPath = `staging/audio/${args.sessionId}/${crypto.randomUUID()}.khstaging`;
 
-  const stagingBlob = await upload(stagingPath, stagingFile, {
-    access: "public",
-    handleUploadUrl: "/api/audio/importar/token",
-    multipart: true,
-    clientPayload: JSON.stringify({ sessionId: args.sessionId }),
+  const policyResponse = await fetch("/api/audio/importar/token", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ kind: "storage-policy", sessionId: args.sessionId, bytes: stagingFile.size }),
   });
+  const policy = await readJson(policyResponse);
+  if (!policyResponse.ok) throw new Error(policy.detail || "No se pudo preparar el almacenamiento cifrado");
+  let stagingBlob: { url: string };
+  if (policy.provider === "b2") {
+    const response = await fetch(policy.uploadUrl, { method: "PUT", body: stagingFile,
+      headers: { "Content-Type": "application/octet-stream", "x-amz-server-side-encryption": "AES256" }, redirect: "error" });
+    if (!response.ok) throw new Error("No se pudo subir el audio cifrado; el archivo local permanece intacto");
+    stagingBlob = { url: policy.url };
+  } else if (policy.provider === "vercel-blob") {
+    stagingBlob = await upload(stagingPath, stagingFile, {
+      access: "public", handleUploadUrl: "/api/audio/importar/token", multipart: true,
+      clientPayload: JSON.stringify({ sessionId: args.sessionId }),
+    });
+  } else throw new Error("Proveedor de almacenamiento no reconocido");
 
   const storedResponse = await fetch("/api/audio/importar/procesar", {
     method: "POST",

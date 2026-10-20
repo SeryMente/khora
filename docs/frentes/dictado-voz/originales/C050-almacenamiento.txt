@@ -1,0 +1,11 @@
+Procedencia: conversación central actual; transcripción literal de órdenes pertinentes visibles. No es exportación nativa completa. No contiene secretos.
+
+El problema de Vercelblock nos va a retrasar, pero vamos a tratar de manejarlo lo mejor posible. Necesito que me ayudes a resolverlo de extremo a extremo. Identifica un servicio que no nos dé nada más un gigabyte de almacenamiento, por eso incurrimos en este problema, es demasiado poco, que sea gratuito y que podamos acceder por API y que nos sirva para guardar el contenido cifrado de todos los datos de usuario de Cora, incluyendo el registro de eventos, los volcados, los archivos de audio, el grafo y lo que resulte. Entre otros posibles que has de poder identificar si analizas todo el sistema. Utiliza la conexión RDC o tu navegador compartido, lo que sea más rápido, insisto, lo que sea más rápido y eficiente y nada más venme pidiendo con tu navegador compartido o mediante la técnica de tomar del portapapeles elementos que sea necesario compartirte y que sean secretos para que resuelvas esto de extremo a extremo lo más rápido posible. 10 gigabytes está bien, pero quiero que lo hagas tú y nada más le hagamos así como te estoy diciendo, a ver si lo podemos resolver en tiempo récord, con efectividad.
+
+Es posible que te pida 2fa una vez, me dice sy te paso el codigo
+
+Estoy seguro que tengo el  usuario y contraseña a lo mejor se introdujo incorrecto probemos denuevo
+
+La tnego en  el portapapeles
+
+Copietodo a ver si logras identificrlo
