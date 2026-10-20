@@ -69,3 +69,22 @@ def test_collision_checked_before_any_provider_call(monkeypatch):
     with pytest.raises(RuntimeError,match='COLLISION'):
         f.ingest_authorized(MagicMock())
     embed.assert_not_called()
+
+
+def test_batch_is_real_single_request_validated(monkeypatch):
+    from khora_kernel import proveedores
+    provider=MagicMock();provider.incrustar.return_value=[[1.0]*1024 for _ in range(4)]
+    monkeypatch.setattr(proveedores,'ProveedorLLMGenerico',lambda:provider)
+    monkeypatch.setattr(f.em,'_embedding_space_id',lambda:'space')
+    result=f._embed_source_batch()
+    assert len(result)==4 and all(len(v)==1024 for v in result)
+    provider.incrustar.assert_called_once_with([text for _,_,text in f.ITEMS])
+
+
+def test_invalid_batch_is_not_hash_fallback(monkeypatch):
+    from khora_kernel import proveedores
+    provider=MagicMock();provider.incrustar.return_value=[[0.0]*1024]*4
+    monkeypatch.setattr(proveedores,'ProveedorLLMGenerico',lambda:provider)
+    monkeypatch.setattr(f.em,'_embedding_space_id',lambda:'space')
+    with pytest.raises(RuntimeError,match='REAL_PROVIDER_BATCH_FAILED'):
+        f._embed_source_batch()

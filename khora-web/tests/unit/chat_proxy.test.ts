@@ -56,3 +56,16 @@ test('native polling and owner task routes are bounded; admin routes remain clos
  const req=new Request('https://khora.example.test/api/khora-chat/proxy?path='+encodeURIComponent('/ws/socket.io/')+'&EIO=4&transport=websocket');
  assert.equal((await proxyOpenWebUI(req,'a@test',config,noFetch)).status,403);
 });
+
+test('official native API roots regain required slash before signature, not arbitrary paths',async()=>{
+ for(const path of ['/api/v1/auths','/api/v1/chats','/api/v1/folders','/api/v1/models']) {
+  const transport=(async(url:URL|string|Request,init:RequestInit)=>{
+   assert.equal(new URL(String(url)).pathname,'/khora-chat'+path+'/');
+   const h=new Headers(init.headers);
+   assert.equal(h.get('x-khora-chat-signature'),chatSignature(config.apiKey,'GET','/khora-chat'+path+'/',chatSubject('a@test',config.apiKey),h.get('x-khora-chat-timestamp')!,new Uint8Array()));
+   return Response.json([]);
+  }) as typeof fetch;
+  const response=await proxyOpenWebUI(request(path),'a@test',config,transport);
+  assert.match(response.headers.get('content-type')||'',/application\/json/);
+ }
+});

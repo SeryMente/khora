@@ -75,6 +75,37 @@ def _inspect(memory):
     return nodes, edges
 
 
+def _embed_source_batch():
+    """One genuine provider batch; bounded429 recovery, never hash fallback."""
+    import time
+    import urllib.error
+    from khora_kernel.proveedores import ProveedorLLMGenerico
+    em._embedding_space_id()
+    provider=ProveedorLLMGenerico()
+    for attempt in range(3):
+        try:
+            vectors=provider.incrustar([text for _,_,text in ITEMS])
+            if len(vectors)!=4:
+                raise RuntimeError('E72_PROVIDER_BATCH_INVALID')
+            return [em._validated_semantic_vector(v) for v in vectors]
+        except Exception as exc:
+            cause=exc
+            code=None
+            for _ in range(5):
+                if isinstance(cause,urllib.error.HTTPError):
+                    code=cause.code
+                    break
+                cause=cause.__cause__ or cause.__context__
+                if cause is None: break
+            if code==429 and attempt<2:
+                print('KHORA_E72_PROVIDER '+json.dumps({'http_status':429,'retry_seconds':65,'attempt':attempt+1}),flush=True)
+                time.sleep(65)
+                continue
+            if isinstance(code,int) and 400<=code<=599:
+                print('KHORA_E72_PROVIDER '+json.dumps({'http_status':code,'attempt':attempt+1}),flush=True)
+            raise RuntimeError('E72_REAL_PROVIDER_BATCH_FAILED') from exc
+
+
 def ingest_authorized(memory):
     global _STAGE
     _STAGE="scope_preflight"
@@ -87,7 +118,7 @@ def ingest_authorized(memory):
         if existing is None:
             # Validate real provider output BEFORE writing any graph data.
             _STAGE="real_provider_embedding"
-            vectors=[em.embed_text(text) for _,_,text in ITEMS]
+            vectors=_embed_source_batch()
             now=datetime.now(timezone.utc).isoformat()
             provenance=Provenance(origen='E72:fuente-ficticia-autorizada:'+SOURCE_SHA,
                 driver='anotacion-explicita-Samantha-no-extraccion-LLM',timestamp=now,

@@ -31,7 +31,10 @@ export async function proxyOpenWebUI(request: Request, email: string | null | un
   try {
     target = new URL(config.apiUrl);
     if (target.protocol !== 'https:' || target.username || target.password || target.search || target.hash || target.pathname.replace(/\/$/,'') !== '') return fail(503, 'Chat runtime unavailable');
-    target.pathname = '/khora-chat' + path;
+    // Next canonicalizes trailing slashes before middleware. Restore only the
+    // official API roots that require '/', avoiding the upstream SPA catchall.
+    const nativePath = ['/api/v1/auths','/api/v1/chats','/api/v1/folders','/api/v1/models'].includes(path) ? path + '/' : path;
+    target.pathname = '/khora-chat' + nativePath;
     source.searchParams.delete('path');
     target.search = source.searchParams.toString();
   } catch { return fail(503, 'Chat runtime unavailable'); }
