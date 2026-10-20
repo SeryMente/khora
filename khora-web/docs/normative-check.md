@@ -17,7 +17,7 @@ Antes de ejecutar ese recorrido desde otra plataforma, resolver la identidad nor
 
 ## Catálogo
 
-`?` indica opcional; los demás campos son obligatorios. Toda herramienta sustantiva añade **`_norm_turn_token`** (mínimo 16 caracteres), **`_thinking_mode`** y **`_output_format_version`**. Modos: `THINKING`, `INSTANT`, `UNKNOWN`, `UNAVAILABLE`; no inventar una señal observada. La versión deriva de `REQUIRED_OUTPUT_FORMAT_VERSION`: **v1.7.7** en esta base. La gobernanza usa NORM-CHECK **v0.5.0**, verificador `norm-check/0.5.0`; servidor anunciado `khora-mcp` **1.3.0**. Son versiones distintas.
+`?` indica opcional; los demás campos son obligatorios. Toda herramienta sustantiva añade **`_norm_turn_token`** (mínimo 16 caracteres), **`_thinking_mode`** y **`_output_format_version`**. Modos: `THINKING`, `INSTANT`, `UNKNOWN`, `UNAVAILABLE`; no inventar una señal observada. El catálogo actual contiene diecinueve herramientas (catorce sustantivas y cinco de salud/gobernanza). La versión deriva de `REQUIRED_OUTPUT_FORMAT_VERSION`: **v1.7.7** en esta base. La gobernanza usa NORM-CHECK **v0.5.0**, verificador `norm-check/0.5.0`; servidor anunciado `khora-mcp` **1.3.0**. Son versiones distintas.
 
 | Herramienta / propósito | Entradas de negocio | Salida principal / límite |
 |---|---|---|
@@ -29,16 +29,18 @@ Antes de ejecutar ese recorrido desde otra plataforma, resolver la identidad nor
 | `khora_listar_audios` / inventariar audio | `limite?` (1–100), `offset?` | Capturas del propietario, incluidas abiertas; partes y estado del MP3. El índice no certifica los bytes. Requiere `volcados:read` y ciclo normativo. |
 | `khora_leer_audio` / recuperar bytes | `id` (sesión, UUID o folio), `formato?` (`original`/`mp3`), `parte?`, `offset_bytes?`, `limite_bytes?` (1–262144) | Bytes Base64 tras relectura, descifrado y comprobación de tamaño/SHA-256; `siguiente_offset` hasta null. Original por parte ordenada; MP3 derivado completo. No genera voz ni muta datos. Solo propietario. |
 | `khora_ui_review` / revisar representación | `pantalla?`, `volcado?`, `solo_metadatos?` | Inventario o HTML con corpus real; controles sin respuesta. Pantallas: ingreso, archivo, revision, aprobacion, ingesta, registro, grafo |
+| `khora_blog_cambios` / cambios públicos aprobados | `after?` (cadena decimal de 1–18 dígitos), `limit?` (entero 1–100) | `items` con `publicationId`, `revision`, `cursor`, `digest`, `withdrawn`, `entry`, `deliveries`; `next` es el cursor del último elemento o el cursor recibido. Predeterminados: `after="0"`, `limit=20`. Solo proyección pública del propietario autenticado; incluye tombstones opacos, no originales ni borradores. |
+| `khora_blog_estado` / estado público y comprobantes | `publicationId` (UUID) | `publicationId`, `revision`, `digest`, `withdrawn`, `entry`, `deliveries`; solo elemento del propietario previamente aprobado, con recibos por destino; no devuelve originales ni borradores. |
 | `khora_observacion_instantanea` / estado observado | `session_id?` | `runtime`, actividad de cinco minutos, última observación, sesiones, fallos, `event_cursor`, almacenamiento e interpretación; umbral de estado obsoleto 15 000 ms |
 | `khora_estado_vivo` / consulta de estado unificada | Ninguna | Reutiliza la observación instantánea sin filtro; no es una fuente distinta |
 | `khora_eventos_desde` / lectura incremental | `cursor?` entero ≥0, `limite?` entero 1–200, `session_id?` | `cursor_entrada`, `cursor_siguiente`, `limite`, `retornados`, `hay_mas`, `eventos`; continuar con el cursor devuelto |
 | `khora_eventos_recientes` / diagnóstico retrospectivo | `segundos?`, `limite?`, `session_id?`, `component?`, `severity?`, `outcome?`, `fase?`, `scope?`, `category?` | `ventana_segundos`, `limite`, `retornados`, `eventos`; ventana 1–86400 s (300 predeterminado), 1–200 eventos (50 predeterminado) |
 
-**Permisos efectivos:** las primeras seis herramientas requieren `volcados:read` **y** `norm:turn`; las cuatro de observabilidad, `runtime:read` **y** `norm:turn`. El permiso de negocio anunciado en `securitySchemes` se conserva; `norm:turn` es necesario para abrir/completar el ciclo, no una concesión implícita.
+**Permisos efectivos:** las ocho herramientas de contenido, audio y revisión requieren `volcados:read` **y** `norm:turn`; las cuatro de observabilidad, `runtime:read` **y** `norm:turn`; las dos de Blog, `blog:read` **y** `norm:turn`. `blog:read` no concede lectura transversal de volcados. El actor del Bearer se pasa a ambos servicios Blog; la consulta en servidor restringe `owner` y lee únicamente `blog_public_export` (proyecciones aprobadas o tombstones), no originales/borradores. El permiso de negocio anunciado en `securitySchemes` se conserva; `norm:turn` es necesario para abrir/completar el ciclo, no una concesión implícita.
 
 | Herramienta / propósito | Entradas (sin los tres controles sustantivos) | Permiso / salida y efecto |
 |---|---|---|
-| `khora_mcp_health` / diagnóstico de acceso completo | `thinking_mode`, `output_format_version` | Publica los tres permisos. Informa `ok`, `status`, `full_access`, `missing_scopes`, versiones/hashes o razón de indisponibilidad. Una concesión parcial produce `DEGRADED`, no prueba caída total ni exige ampliar permisos para una tarea parcial |
+| `khora_mcp_health` / diagnóstico de acceso completo | `thinking_mode`, `output_format_version` | Publica `volcados:read`, `runtime:read` y `norm:turn` (no anuncia ni acredita `blog:read`). Informa `ok`, `status`, `full_access`, `missing_scopes`, versiones/hashes o razón de indisponibilidad. Una concesión parcial produce `DEGRADED`, no prueba caída total ni exige ampliar permisos para una tarea parcial |
 | `khora_norm_open_turn` / fijar ciclo y fuentes | `conversation_id?`, `turn_number?` entero positivo, `thinking_mode`, `output_format_version` | `norm:turn`; persiste/reutiliza turno, devuelve identidad, intento, token y snapshots; ver contrato ejecutable |
 | `khora_norm_apply_principle` / registrar siguiente principio | `turn_token`, `folio` (`P` + tres dígitos), `status` (`A`/`N`/`C`), `anchor?`, `reason_code?` | `norm:turn`; ledger persistido, secuencia, total, siguiente principio, completitud; A/C requieren anchor válido y N razón válida |
 | `khora_norm_verify_turn` / verificar y registrar | `turn_token`, `receipt` completo | `norm:turn`; `result`, `verification_record`, persistencia/cierre o siguiente intento; solo `VERIFIED` cierra |
@@ -70,12 +72,12 @@ El comprobante `receipt` se comparte con el verificador mediante [normative-rece
 
 Los extras permitidos no sustituyen campos obligatorios ni se convierten silenciosamente. `cycle.id` solo blanco, fechas inválidas y encabezados blancos se rechazan semánticamente aunque un JSON Schema estructural pueda admitirlos. Los tipos públicos exportados se conservan; un campo auxiliar presente con tipo inválido no se repara.
 
-**Ejemplos válidos sin secretos:** `input(name)` y `receipt()` en [mcp_contract_concordance.test.ts](../tests/unit/mcp_contract_concordance.test.ts) generan entradas completas para las quince herramientas y se prueban contra publicación y registro reales. Son fixtures sintéticos ejecutables en aislamiento: sus tokens/hashes no autorizan uso productivo ni acreditan un ciclo verificado. La estructura exacta evoluciona en el esquema, no en copias de JSON en guías.
+**Ejemplos válidos sin secretos (cobertura histórica del banco citado, no certificación de las diecinueve herramientas actuales):** `input(name)` y `receipt()` en [mcp_contract_concordance.test.ts](../tests/unit/mcp_contract_concordance.test.ts) generan entradas completas para las quince herramientas y se prueban contra publicación y registro reales. Son fixtures sintéticos ejecutables en aislamiento: sus tokens/hashes no autorizan uso productivo ni acreditan un ciclo verificado. La estructura exacta evoluciona en el esquema, no en copias de JSON en guías.
 
 ## Ciclo normativo
 
 1. **OPEN:** `khora_norm_open_turn` fija SI (Sistema de Instrucciones) y metodología de `SeryMente/metodologia`, contrastando H1 → lectura → H2; solo acepta snapshot estable. Emite identidad de ciclo, intento, nonce, token, manifiesto y encabezados. Token de turno: 12 horas según la implementación.
-2. **TAREA:** las diez herramientas sustantivas verifican actor, ciclo, intento, nonce, snapshot y contexto de runtime antes de invocar el servicio. Los tres controles se retiran antes de pasar argumentos al manejador de negocio.
+2. **TAREA:** las catorce herramientas sustantivas verifican actor, ciclo, intento, nonce, snapshot y contexto de runtime antes de invocar el servicio. Los tres controles se retiran antes de pasar argumentos al manejador de negocio.
 3. **APLICACIÓN:** `khora_norm_apply_principle` persiste el siguiente folio en el orden canónico; no admite saltos/reordenación. A=aplicado, N=no aplicable, C=conflicto resuelto. Las condiciones de anchor/razón también se comprueban en el servicio.
 4. **VERIFY:** bloquea turno, coteja ledger completo/ordenado con receipt, calcula hashes y valida fuentes históricas, cobertura (faltantes, duplicados, desconocidos), encabezados y salida. Solo `VERIFIED` cierra; `INVALID/INCOMPLETE` conserva el intento y prepara el siguiente. No reutilizar token de intento anterior/cerrado.
 5. **RELEASE:** solo tras verificación consistente libera salida/hash, orden y comprobante; emite `VERIFIED_RELEASE` y token de liberación de cinco minutos. No es permiso para saltar verificación en otro ciclo.
@@ -111,6 +113,7 @@ OAuth usa PKCE; los metadatos anuncian authorization_code, refresh_token y offli
 | Familia | Fuente y efectos que deben distinguirse |
 |---|---|
 | Contenido/revisión | `volcado`, versiones y auditoría; descifrado de texto/HTML real autorizado. Lectura del corpus, no prueba de cobertura de toda captura/dictado |
+| Blog público | `blog_public_export`; solo proyecciones previamente aprobadas o tombstones del propietario autenticado y comprobantes separados por destino. Estas herramientas no registran aprobación ni publican; la ausencia de snapshot no autoriza recuperar un original. |
 | Observabilidad | `khora_runtime_state` y `eventos_sistema`; tiempos, sesiones y eventos persistidos, no telemetría privada de la mente/ventana del modelo |
 | Gobernanza | Fuentes versionadas de metodología, turnos/ledger y comprobantes; lecturas históricas, caché por blob y escrituras normativas |
 | Envoltura de servicio | Eventos de llamada con operación, correlación, resultado, duración y razón; no incluir payloads/secretos. Middleware HTTP y bridge FastAPI conservan trazabilidad en los almacenes existentes |
@@ -197,7 +200,7 @@ Con dependencias del lockfile instaladas, ejecutar desde `khora-web`:
 node --import tsx --test tests/unit/mcp_contract_concordance.test.ts tests/unit/mcp_tool_auth_metadata.test.ts tests/unit/norm_check_parser.test.ts tests/unit/mcp_diagnostics.test.ts
 ```
 
-La prueba documental coteja las quince filas contra el catálogo ejecutable y comprueba versión/enlace desde README. Resultados y entorno del último ciclo: [Addendum C007](../../docs/SPRINT-MCP-OBSERVABILIDAD-DICTADO.md). No sustituye `npm run typecheck`, compilación/suite integrales ni pruebas autenticadas del despliegue. GitHub negó acceso a check-runs; las vistas previas de proveedores quedaron bloqueadas por sus planes. El escáner remoto no estaba habilitado: revisión local acotada no es certificación exhaustiva.
+La prueba documental coteja las diecinueve filas contra el catálogo ejecutable y comprueba versión/enlace desde README. Resultados y entorno del último ciclo: [Addendum C007](../../docs/SPRINT-MCP-OBSERVABILIDAD-DICTADO.md). No sustituye `npm run typecheck`, compilación/suite integrales ni pruebas autenticadas del despliegue. GitHub negó acceso a check-runs; las vistas previas de proveedores quedaron bloqueadas por sus planes. El escáner remoto no estaba habilitado: revisión local acotada no es certificación exhaustiva.
 
 **Regla de mantenimiento:** cambio de herramienta/entrada → misma forma Zod y catálogo → pruebas positivas/negativas → evidencia versionada. Cambios de permisos, admisión, identidad o experiencia requieren presencia/aprobación específica; no esconderlos en un refactor documental. La fusión #296 se autorizó por separado; no deducir de ella autorización para cambiar identidad, provisionar secretos o ejecutar un despliegue manual.
 

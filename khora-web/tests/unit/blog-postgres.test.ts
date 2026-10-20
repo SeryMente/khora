@@ -7,8 +7,9 @@ import {hash,revisionHash,type Revision} from '../../lib/server/blog/domain';
 import {deliver} from '../../lib/server/blog/delivery';
 // Optional isolated test dependency, not needed by production. Set BLOG_TEST_PGLITE_MODULE to its file URL.
 const modulePath=process.env.BLOG_TEST_PGLITE_MODULE;
-const {PGlite}=modulePath?await import(modulePath):{PGlite:null};
-test('transactional editorial migration / ownership / decisions / deliveries',{skip:!PGlite},async()=>{
+test('transactional editorial migration / ownership / decisions / deliveries',{skip:!modulePath},async()=>{
+ // Import only inside the async test: the canonical tsx runner emits CommonJS.
+ const {PGlite}=await import(modulePath!);
  const db=new PGlite();const query=async(sql:string,p?:unknown[])=>db.query(sql,p);
  const pool={query,connect:async()=>({query,release(){}})};
  const cipher={encrypt:(s:string)=>'enc:'+Buffer.from(s).toString('base64'),decrypt:(s:string)=>Buffer.from(s.slice(4),'base64').toString('utf8')};
