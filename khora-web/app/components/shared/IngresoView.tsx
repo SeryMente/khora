@@ -24,6 +24,8 @@ export type IngresoViewState = {
   chromeExtra?: import("react").ReactNode;
   custodiaEstado?: string;
   custodiaLuz?: LuzCustodia;
+  custodiaArchivoAnterior?: boolean;
+  custodiaPuntoDetalle?: string;
   custodiaReady?: boolean;
   custodiaPreparando?: boolean;
   recuperando?: boolean;
@@ -144,7 +146,7 @@ export function IngresoView({state:v,actions:a={},isReviewMode=false}:{state:Ing
    </div>
    {v.editando&&<div data-ui-id="ingreso.banner-edicion" className={s.editing}><span><I.PencilLine size={16}/>Edición in situ activa · tu texto se conserva.</span><button data-ui-id="ingreso.btn-confirmar-edicion" className={s.secondary} disabled={locked} onClick={a.onConfirmarEdicion}>Confirmar edición</button></div>}
    <footer className={s.sheetfooter}>
-    <div className={s.storage}><span role="status" aria-live="polite" data-ui-id="ingreso.custodia-status" data-custodia-estado={v.custodiaLuz||"amarillo"} aria-label={descripcionLuz[v.custodiaLuz||"amarillo"]} title={descripcionLuz[v.custodiaLuz||"amarillo"]} style={{display:"inline-block",width:14,height:14,borderRadius:"50%",background:({azul:"#2563eb",verde:"#15803d",amarillo:"#ca8a04",rojo:"#dc2626"})[v.custodiaLuz||"amarillo"],border:"2px solid currentColor"}}/><details className={s.diagnostics}><summary>Detalle de conservación</summary><p>{descripcionLuz[v.custodiaLuz||"amarillo"]}. {v.custodiaEstado}</p><p>La confirmación cubre el contenido acreditado, no segmentos aún en memoria. El almacenamiento de este dispositivo puede desaparecer si se borra el perfil o falla el equipo.</p></details></div>
+    <div className={s.storage}>{v.custodiaArchivoAnterior&&<span role="status" aria-label="Registro anterior archivado con recibo verificado" title="Registro anterior archivado; esta luz azul no acredita la captura nueva" tabIndex={0} style={{display:"inline-block",width:14,height:14,flexShrink:0,borderRadius:"50%",background:"#2563eb",border:"2px solid currentColor"}}/>}<span tabIndex={0} role="status" aria-live="polite" data-ui-id="ingreso.custodia-status" data-custodia-estado={v.custodiaLuz||"amarillo"} aria-label={descripcionLuz[v.custodiaLuz||"amarillo"]} title={v.custodiaPuntoDetalle||descripcionLuz[v.custodiaLuz||"amarillo"]} style={{display:"inline-block",width:14,height:14,flexShrink:0,borderRadius:"50%",background:({azul:"#2563eb",verde:"#15803d",amarillo:"#ca8a04",rojo:"#dc2626"})[v.custodiaLuz||"amarillo"],border:"2px solid currentColor"}}/><details className={s.diagnostics}><summary>Detalle de conservación</summary><p>{descripcionLuz[v.custodiaLuz||"amarillo"]}. {v.custodiaPuntoDetalle||v.custodiaEstado}</p>{v.custodiaArchivoAnterior&&<p>La luz azul conserva el recibo del registro anterior. No significa que la captura nueva ya esté archivada.</p>}<p>La confirmación cubre el contenido acreditado, no segmentos aún en memoria. El almacenamiento de este dispositivo puede desaparecer si se borra el perfil o falla el equipo.</p></details></div>
     {v.custodiaReady===false&&!v.custodiaPreparando&&a.onReintentarPreparacion&&<button className={s.secondary} onClick={a.onReintentarPreparacion}>Reintentar preparación</button>}
     {!!v.custodiaDetalle&&<details className={s.diagnostics}><summary>Detalle de sincronización de audio</summary><p>{v.custodiaDetalle}</p>{a.onReintentarCustodia&&<button className={s.secondary} disabled={busy} onClick={a.onReintentarCustodia}>Reintentar sincronización</button>}</details>}
     <span className={s.characters}>{v.texto.length.toLocaleString('es')} caracteres</span>

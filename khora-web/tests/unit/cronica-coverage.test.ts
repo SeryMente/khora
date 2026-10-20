@@ -2,9 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {analyzeCronicaCoverage} from '../../lib/ingreso/cronica-coverage';
 const flags=(s:string)=>analyzeCronicaCoverage(s).items.map(i=>i.covered);
-test('stable contract and optional labels, empty remains pending',()=>{
+test('stable requirement contract and friendly labels, empty remains pending',()=>{
  const a=analyzeCronicaCoverage('');assert.deepEqual(a.items.map(i=>i.id),['when','where','what']);
- for(const i of a.items){assert.equal(i.covered,false);assert.equal(i.evidence,null);assert.match(i.label,/opcional/);}
+ for(const i of a.items){assert.equal(i.covered,false);assert.equal(i.evidence,null);assert.doesNotMatch(i.label,/opcional/);}
 });
 for (const text of ['Hoy trabajé en casa.','Ayer caminé en el parque.','El lunes escribí en la biblioteca.','El 19 de octubre de 2026 estudié en Querétaro.','2026-10-19 estuve en la oficina.']) {
  test('explicit narrative: '+text,()=>assert.deepEqual(flags(text),[true,true,true]));
@@ -49,3 +49,10 @@ test('past morning phrase is retained without guessing future',()=>assert.deepEq
 test('quoted multi-sentence narrative never becomes operator evidence',()=>assert.deepEqual(flags('Ella dijo: «Ayer descansé. Hoy trabajé en casa». '),[false,false,false]));
 test('unclosed multi-sentence quote stays masked during live dictation',()=>assert.deepEqual(flags('Dijo: «Ayer descansé. Hoy trabajé en casa'),[false,false,false]));
 test('own narrative after closed quote remains eligible',()=>assert.deepEqual(flags('«Ayer caminé». Hoy trabajé en casa.'),[true,true,true]));
+
+test('live unpunctuated clauses retain explicit place and activity before later uncertainty',()=>assert.deepEqual(flags('Esta mañana me encuentro en el csec que es centro comunitario estatal Querétaro he estado trabajando tomando llamadas estoy revisando una prueba no sé si terminaré luego supongo que esperaré'),[true,true,true]));
+test('bare estoy is not activity',()=>assert.deepEqual(flags('Estoy.'),[false,false,false]));
+test('uncertain own clause does not become asserted after a split',()=>assert.deepEqual(flags('Creo que estoy trabajando en casa.'),[false,false,false]));
+test('reported first person remains attributed',()=>assert.deepEqual(flags('Ella dijo que estoy trabajando en casa.'),[false,false,false]));
+test('capture timestamp is never substituted for narrative moment',()=>assert.deepEqual(flags('Estoy revisando una prueba en el CSEC.'),[false,true,true]));
+test('moment remains friendly, source is exact and can remain relative',()=>{const s='Durante la mañana he estado trabajando en el centro comunitario';const a=analyzeCronicaCoverage(s);assert.equal(a.items[0].label,'Momento');assert.deepEqual(a.items.map(i=>i.covered),[true,true,true]);for(const i of a.items)assert.ok(s.includes(i.evidence!));});

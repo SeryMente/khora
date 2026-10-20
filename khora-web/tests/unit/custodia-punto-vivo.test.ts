@@ -1,0 +1,14 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {aceptarPunto,puntoVigente,luzCustodia,falloCustodiaDefinitivo,type PuntoRecuperacion} from '../../lib/custodia/estado';
+const p:PuntoRecuperacion={sessionId:'s',revisionId:'r1',hastaParte:1,finMs:5000,cutAt:10000};
+const base={archivedReceipt:false,exactSnapshot:false,audioComplete:false,inFlight:true,confirmedFailure:false};
+test('Whisper request or active capture alone never proves recovery',()=>assert.equal(luzCustodia(base),'amarillo'));
+test('confirmed joint cut permits live green without certifying volatile tail',()=>assert.equal(luzCustodia({...base,liveCheckpoint:puntoVigente(p,'s',11000)}),'verde'));
+test('real delay expires from capture time not late receipt time',()=>{assert.equal(puntoVigente(p,'s',30000),true);assert.equal(puntoVigente(p,'s',30001),false);assert.equal(puntoVigente(p,'s',9999),false);});
+test('cross-session receipt never covers new dictation',()=>{assert.equal(puntoVigente(p,'other',11000),false);assert.equal(aceptarPunto(null,p,'other'),null);});
+test('late lower or duplicate cut cannot freshen or regress checkpoint',()=>{assert.equal(aceptarPunto(p,{...p,cutAt:20000},'s'),p);assert.equal(aceptarPunto(p,{...p,hastaParte:2,finMs:4000},'s'),p);});
+test('strictly later valid cut advances',()=>assert.equal(aceptarPunto(p,{...p,revisionId:'r2',hastaParte:2,finMs:10000,cutAt:15000},'s')?.hastaParte,2));
+test('explicit error wins over green; current archive retains its independent receipt',()=>{assert.equal(luzCustodia({...base,liveCheckpoint:true,confirmedFailure:true}),'rojo');assert.equal(luzCustodia({...base,archivedReceipt:true,confirmedFailure:true}),'azul');});
+test('idle edited snapshot cannot reuse live cut',()=>assert.equal(luzCustodia({...base,inFlight:false}),'amarillo'));
+test('definite refusal and integrity failure are not ordinary waiting',()=>{for(const httpStatus of [400,401,403,404,409,422])assert.equal(falloCustodiaDefinitivo({httpStatus}),true);for(const httpStatus of [408,429,500,503])assert.equal(falloCustodiaDefinitivo({httpStatus}),false);assert.equal(falloCustodiaDefinitivo({reasonCode:'receipt_mismatch'}),true);assert.equal(falloCustodiaDefinitivo({}),false);});

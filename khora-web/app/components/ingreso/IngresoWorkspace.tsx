@@ -1,6 +1,6 @@
 "use client";
 import {archivarRecuperada} from "../../../lib/client/archivar-recuperada";
-import {firmaCustodia,luzCustodia,audioCustodiadoCompleto} from "../../../lib/custodia/estado";
+import {firmaCustodia,luzCustodia,audioCustodiadoCompleto,aceptarPunto,puntoVigente,falloCustodiaDefinitivo,type PuntoRecuperacion} from "../../../lib/custodia/estado";
 import {useTituloCaptura} from "../../../lib/client/use-titulo-captura";
 import { CLASIFICACION_INICIAL, clasificacionRecuperada, type ClasificacionEntrada, iniciarIntencion, huellaTexto, type PublicationIntent } from "../../../lib/custodia/editorial";
 import { PublicacionCapturaPendiente } from "./PublicacionCapturaPendiente";
@@ -92,8 +92,16 @@ function IngresoContenido({onDialogo,clasificacion,onClasificacionChange}:{onDia
   const [archivado, setArchivado] = useState(false);
   const [custodiaProof,setCustodiaProof]=useState("");
   const [custodiaFailure,setCustodiaFailure]=useState(false);
+  // Transport/recorder errors survive unrelated successful local text writes.
+  const erroresCustodiaRef=useRef(new Set<string>());
+  const [erroresCustodia,setErroresCustodia]=useState(0);
+  const registrarErrorCustodia=useCallback((key:string,failed:boolean)=>{if(failed)erroresCustodiaRef.current.add(key);else erroresCustodiaRef.current.delete(key);setErroresCustodia(erroresCustodiaRef.current.size);},[]);
   const [archivoReceiptVerified,setArchivoReceiptVerified]=useState(false);
+  const [ultimoArchivoConfirmado,setUltimoArchivoConfirmado]=useState("");
+  const [puntoRecuperacion,setPuntoRecuperacion]=useState<PuntoRecuperacion|null>(null);
+  const [relojCustodia,setRelojCustodia]=useState(0);
   useEffect(()=>{if(!archivado)setArchivoReceiptVerified(false);},[archivado]);
+  useEffect(()=>{if(estado!=="dictando")return;setRelojCustodia(Date.now());const timer=window.setInterval(()=>setRelojCustodia(Date.now()),1000);return()=>window.clearInterval(timer);},[estado]);
   const [soportado, setSoportado] = useState(true);
   const [conAudio, setConAudio] = useState(false);
   const [escuchando, setEscuchando] = useState(false);
@@ -417,11 +425,12 @@ function IngresoContenido({onDialogo,clasificacion,onClasificacionChange}:{onDia
         const r=await fetch("/api/dictado/checkpoint",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(current),signal:AbortSignal.timeout(15000)});
         const d=await r.json().catch(()=>({}));
         if(r.status===409&&d.error==="sesion_sellada") {await cerrarSnapshotLocal(owner,current.sessionId);if(sesionIdRef.current===current.sessionId)setArchivado(true);return;}
-        if(!r.ok||d.revisionId!==current.revisionId||d.sessionId!==current.sessionId)throw new Error("checkpoint_no_confirmado");
+        if(!r.ok||d.revisionId!==current.revisionId||d.sessionId!==current.sessionId)throw Object.assign(new Error("checkpoint_no_confirmado"),{httpStatus:r.status,reasonCode:r.ok?"checkpoint_no_confirmado":undefined});
+        if(sesionIdRef.current===current.sessionId)registrarErrorCustodia("checkpoint",false);
         ultimoCheckpointTextoRef.current=signature;
         if(firmaActualCustodia()===signature){setCustodiaProof(signature);setCustodiaFailure(false);}
         if(sesionIdRef.current===current.sessionId)setCustodiaEstado("Checkpoint confirmado en el servidor");
-      }catch {if(sesionIdRef.current===current.sessionId)setCustodiaEstado("Sin confirmación remota; consulta el estado de la copia local");}
+      }catch(cause) {if(sesionIdRef.current===current.sessionId){if(falloCustodiaDefinitivo(cause as {httpStatus?:number;reasonCode?:string}))registrarErrorCustodia("checkpoint",true);setCustodiaEstado("Sin confirmación remota; consulta el estado de la copia local");}}
     });
     checkpointEnCursoRef.current=task;await task;
   }, []);
@@ -607,7 +616,7 @@ function IngresoContenido({onDialogo,clasificacion,onClasificacionChange}:{onDia
         catch {if(sesionIdRef.current===sesionId)setCustodiaFailure(true);setError("No se pudo conservar una parte de audio localmente. Mantén abierta la captura; se intentará la copia remota.");}
         const part=await subirAudioCustodiado(sesionId,parteActual,blob,upload);
         if(sesionIdRef.current===sesionId){
-          audioFallidoRef.current.delete(parteActual);
+          audioFallidoRef.current.delete(parteActual);registrarErrorCustodia("audio-"+parteActual,false);
           partesSubidasRef.current=partesSubidasRef.current.filter(p=>p.parte!==parteActual).concat(part).sort((a,b)=>a.parte-b.parte);
           setPartesContador(partesSubidasRef.current.length);setBytesAcumulados(partesSubidasRef.current.reduce((n,p)=>n+p.bytes,0));setConAudio(true);
         }
@@ -621,13 +630,20 @@ function IngresoContenido({onDialogo,clasificacion,onClasificacionChange}:{onDia
           const cutTask=(checkpointEnCursoRef.current||Promise.resolve()).catch(()=>undefined).then(async()=>{
             await guardarSnapshotLocal(ownerRef.current,cut,true);
             const response=await fetch("/api/dictado/checkpoint",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(cut),signal:AbortSignal.timeout(15000)});
-            const receipt=await response.json();if(!response.ok||receipt.revisionId!==cut.revisionId)throw Error("corte_no_confirmado");
+            const receipt=await response.json();if(!response.ok||receipt.revisionId!==cut.revisionId||receipt.sessionId!==cut.sessionId){const err=Object.assign(Error("corte_no_confirmado"),{httpStatus:response.status,reasonCode:response.ok?"corte_no_confirmado":undefined});throw err;}
+            if(sesionIdRef.current===sesionId){
+              for(const key of erroresCustodiaRef.current)if(key.startsWith("corte-")&&Number(key.slice(6))<=parteActual)registrarErrorCustodia(key,false);
+              setPuntoRecuperacion(previous=>aceptarPunto(previous,{sessionId:sesionId,revisionId:cut.revisionId,hastaParte:parteActual,finMs:endMs,cutAt:ahoraMs},sesionIdRef.current));
+              setRelojCustodia(Date.now());
+              setCustodiaEstado(`Punto conjunto confirmado: texto y audio hasta ${Math.floor(endMs/1000)} s (parte ${parteActual}). El tramo posterior sigue en captura; no está incluido en este recibo.`);
+            }
           });checkpointEnCursoRef.current=cutTask;
-          await cutTask.catch(()=>setCustodiaEstado("Audio conservado; punto conjunto pendiente de confirmación"));
+          await cutTask.catch((cause)=>{if(sesionIdRef.current!==sesionId)return;if(falloCustodiaDefinitivo(cause))registrarErrorCustodia("corte-"+parteActual,true);setCustodiaEstado("Audio conservado; punto conjunto pendiente de confirmación. El detalle del error no equivale a pérdida del audio.");});
         }
       } catch(e) {
         if(!localSaved&&sesionIdRef.current===sesionId){audioFallidoRef.current.add(parteActual);setCustodiaFailure(true);}
         const failure=e as {httpStatus?:number;reasonCode?:string};
+        if(sesionIdRef.current===sesionId&&falloCustodiaDefinitivo(failure))registrarErrorCustodia("audio-"+parteActual,true);
         pendingUploadsRef.current.set(parteActual,ejecutarSubida);setAudioPendiente(pendingUploadsRef.current.size);
         setCustodiaDetalle((localSaved?"Copia local confirmada.":"Copia local NO confirmada; mantén esta pestaña abierta.")+" Última respuesta: "+(failure.httpStatus?"HTTP "+failure.httpStatus:"red o tiempo de espera")+". No se archivará como completo mientras falten confirmaciones.");
         observarDictado("PARTE_AUDIO_SUBIDA_FALLIDA",{severity:"WARN",outcome:"PARTIAL",attemptId:"parte-"+parteActual,reasonCode:failure.reasonCode||"upload_failed",durationMs:Date.now()-uploadStartedAt,metrics:{part_index:parteActual,upload_verified:false,confirmed:localSaved,http_status:failure.httpStatus||0,network_online:navigator.onLine}});
@@ -795,6 +811,7 @@ function IngresoContenido({onDialogo,clasificacion,onClasificacionChange}:{onDia
       const grabadora = new MediaRecorder(flujo);
       grabadora.onstart = () => observarDictado("GRABACION_INICIADA", { outcome: "SUCCESS", durationMs: Date.now() - recorderStartedAt, metrics: { recorder_state: String(grabadora.state), source_mode: modoEntradaRef.current } });
       grabadora.onerror = () => {
+        registrarErrorCustodia("grabadora",true);
         observarDictado("ERROR_GRABADORA", { severity: "ERROR", outcome: "FAILURE", reasonCode: "media_recorder_error", metrics: { recorder_state: String(grabadora.state), source_mode: modoEntradaRef.current } });
         void enviarEventosObservabilidadDictado();
       };
@@ -1297,7 +1314,7 @@ function IngresoContenido({onDialogo,clasificacion,onClasificacionChange}:{onDia
           observarDictado("GUARDADO_DICTADO_COMPLETADO", { outcome: "SUCCESS", durationMs: Date.now() - saveStartedAt, metrics: { response_ok: true, chars_current: texto.length, part_count: partesSubidasRef.current.length } });
           if(!dv?.id||dv?.sessionId!==payload.sessionId||!/^[a-f0-9]{64}$/i.test(String(dv?.sha256||"")))throw new Error("Recibo de archivo inválido");
           if(await huellaTexto(payload.texto)!==String(dv.sha256).toLowerCase()||dv.version!==1||dv.tipoEntrada!==payload.tipoEntrada||dv.ofuscada!==payload.ofuscada)throw new Error("El recibo no acredita el contenido y la clasificación enviados");
-          setArchivoReceiptVerified(true);setArchivado(true);
+          setArchivoReceiptVerified(true);setUltimoArchivoConfirmado(ownerRef.current);setArchivado(true);
           if(publicationIntentRef.current&&payload.tipoEntrada==="blog_personal") {
             publicationIntentRef.current={...publicationIntentRef.current,state:"awaiting_decision"};
             await guardarIntencionEditorialLocal(ownerRef.current,{sessionId:payload.sessionId!,intent:publicationIntentRef.current,draft:{title:titulo,body:texto,date:new Date().toISOString(),obfuscated:clasificacion.ofuscada},receipt:{volcado_id:dv.id,version:dv.version,sha256:dv.sha256}}).catch(()=>setError("Archivo confirmado en servidor. Actualización del recibo editorial local pendiente; no dupliques el archivo ni publiques sin reconciliarlo."));
@@ -1485,6 +1502,7 @@ function IngresoContenido({onDialogo,clasificacion,onClasificacionChange}:{onDia
     setChromeCaptionActivo(false);
     setChromeCapturaEstado("inactiva");
     setTexto("");
+    setPuntoRecuperacion(null);setCustodiaProof("");setCustodiaFailure(false);erroresCustodiaRef.current.clear();setErroresCustodia(0);
     setArchivado(false);
     setEditando(false);
     setEstabaDictando(false);
@@ -1641,7 +1659,9 @@ function IngresoContenido({onDialogo,clasificacion,onClasificacionChange}:{onDia
       state={{
         editorialExtra:<PublicacionCapturaPendiente owner={custodiaOwner} refresh={Number(archivado)+editorialRefresh}/>,
         clasificacion,archivado,finalizando,audioPendiente,custodiaDetalle,
-        custodiaLuz:luzCustodia({archivedReceipt:archivoReceiptVerified,exactSnapshot:custodiaProof===firmaCustodia({sessionId:sesionIdRef.current,texto,parcial,titulo,audioPartes:partesSubidasRef.current,audioPartesEsperadas:Math.max(parteConsecutivaRef.current-1,maximoIndiceConocido(partesSubidasRef.current,partesRawRef.current),parteTrozosRef.current.length?parteConsecutivaRef.current:0),fuenteEntrada:fuenteEntradaSesionRef.current||"texto",...clasificacion}),audioComplete:audioCustodiadoCompleto({fuenteEntrada:fuenteEntradaSesionRef.current||"texto",audioPartes:partesSubidasRef.current,audioPartesEsperadas:Math.max(parteConsecutivaRef.current-1,maximoIndiceConocido(partesSubidasRef.current,partesRawRef.current),parteTrozosRef.current.length?parteConsecutivaRef.current:0)},audioPendiente),inFlight:estado==="dictando"||finalizando||guardando||recuperando,confirmedFailure:custodiaFailure||audioFallidoRef.current.size>0}),
+        custodiaArchivoAnterior:!!custodiaOwner&&ultimoArchivoConfirmado===custodiaOwner&&!archivoReceiptVerified,
+        custodiaPuntoDetalle:estado==="dictando"&&puntoRecuperacion?.sessionId===sesionIdRef.current?`Punto confirmado hasta ${Math.floor(puntoRecuperacion.finMs/1000)} s (parte ${puntoRecuperacion.hastaParte}). El tramo de dictado posterior todavía no está cubierto. Si el punto no avanza en 20 s, la luz pasa a amarillo.`:undefined,
+        custodiaLuz:luzCustodia({archivedReceipt:archivoReceiptVerified,liveCheckpoint:estado==="dictando"&&!finalizando&&!guardando&&!recuperando&&puntoVigente(puntoRecuperacion,sesionIdRef.current,relojCustodia),exactSnapshot:custodiaProof===firmaCustodia({sessionId:sesionIdRef.current,texto,parcial,titulo,audioPartes:partesSubidasRef.current,audioPartesEsperadas:Math.max(parteConsecutivaRef.current-1,maximoIndiceConocido(partesSubidasRef.current,partesRawRef.current),parteTrozosRef.current.length?parteConsecutivaRef.current:0),fuenteEntrada:fuenteEntradaSesionRef.current||"texto",...clasificacion}),audioComplete:audioCustodiadoCompleto({fuenteEntrada:fuenteEntradaSesionRef.current||"texto",audioPartes:partesSubidasRef.current,audioPartesEsperadas:Math.max(parteConsecutivaRef.current-1,maximoIndiceConocido(partesSubidasRef.current,partesRawRef.current),parteTrozosRef.current.length?parteConsecutivaRef.current:0)},audioPendiente),inFlight:estado==="dictando"||finalizando||guardando||recuperando,confirmedFailure:custodiaFailure||erroresCustodia>0||audioFallidoRef.current.size>0}),
         custodiaEstado,custodiaReady:!!custodiaOwner,custodiaPreparando,recuperando,recuperaciones:recoveryItems.length,stream:streamAudio,
         titulo,
         texto,

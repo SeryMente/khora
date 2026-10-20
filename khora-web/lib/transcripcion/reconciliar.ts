@@ -283,7 +283,7 @@ export function evaluarCoberturaYReconciliar(
     cobertura,
     huecoMaximo,
     textoResultado: antTrim,
-    motivo: `Pérdida de contenido detectada (déficit: ${deficitTotal} palabras, cobertura ${(cobertura * 100).toFixed(1)}%). Se conservó el texto previo.`,
+    motivo: `Se rechazó una transcripción incompleta (diferencia: ${deficitTotal} palabras; cobertura respecto al texto previo: ${(cobertura * 100).toFixed(1)}%). Se conservó el texto previo sin reemplazarlo. Este aviso no confirma pérdida del original.`,
     perdidaDetectada: true,
     deficit: deficitTotal,
   };

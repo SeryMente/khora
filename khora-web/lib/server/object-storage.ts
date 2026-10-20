@@ -3,10 +3,16 @@ import { randomUUID } from 'node:crypto';
 import { S3Client, PutObjectCommand, GetObjectCommand, ListObjectsV2Command,
   ListObjectVersionsCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { put as putBlob, del as delBlob } from '@vercel/blob';
+import { del as delBlob } from '@vercel/blob';
 import { b2Endpoint, b2ObjectUrl, parseB2ObjectUrl, legacyBlobUrl, safeObjectKey, stagingKeyForSession } from '../storage/object-reference';
 export function storageLocation() { return { bucket: process.env.KHORA_B2_BUCKET_NAME || '', region: process.env.KHORA_B2_REGION || 'us-east-005' }; }
-export function b2Enabled() { return process.env.KHORA_OBJECT_STORAGE === 'b2'; }
+/** Backblaze is the sole NEW-write backend. A missing flag must never fall back to Blob.
+ * Legacy references remain readable; historical migration is a separate operation. */
+export function b2Enabled() {
+ const selected=process.env.KHORA_OBJECT_STORAGE;
+ if(selected&&selected!=='b2')throw new Error('storage_backend_not_supported');
+ return true;
+}
 function client() {
   const {region}=storageLocation(), accessKeyId=process.env.KHORA_B2_KEY_ID, secretAccessKey=process.env.KHORA_B2_APPLICATION_KEY;
   if(!accessKeyId||!secretAccessKey||!process.env.KHORA_B2_BUCKET_NAME) throw new Error('storage_b2_not_configured');
@@ -26,7 +32,7 @@ export async function fetchStoredObject(value: string, _init?: RequestInit): Pro
 }
 export async function putEncryptedObject(pathname: string, data: Buffer, options: {access:'public';contentType?:string;addRandomSuffix?:boolean}) {
   if(data.length<32||data.subarray(0,4).toString('ascii')!=='KHC1') throw new Error('storage_requires_encrypted_envelope');
-  if(!b2Enabled()) return putBlob(pathname,data,options);
+  b2Enabled(); // Fail closed on an unsupported backend; never write new originals to Blob.
   const c=storageLocation(), key=safeObjectKey(pathname.startsWith('khora/')?pathname:'khora/'+pathname);
   // Never overwrite an earlier capture. The DB receipt is committed only after independent reread/hash.
   const unique=key.replace(/(\.[^/.]+)?$/,`-${randomUUID()}$1`);

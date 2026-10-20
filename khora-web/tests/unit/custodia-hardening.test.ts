@@ -52,8 +52,9 @@ test('source cut expected count and dialogue mutation invalidate an older proof'
  for(const delta of [{fuenteEntrada:'chrome_live_caption' as const},{audioPartesEsperadas:2},{corteAudio:{hastaParte:1,finMs:400}},{dialogo:{version:1 as const,estado:'detenido' as const,etiquetas:{microphone:'M',chrome_tab:'C'},partesEsperadas:1,turnos:[]}}])assert.notEqual(firmaCustodia({...s,...delta}),firmaCustodia(s));
  assert.equal(firmaCustodia(s),firmaCustodia({...s}));
 });
-test('confirmed audio failure is red even with saved text; recoverable archive failure is still green',()=>{
+test('archive failure alone leaves confirmed recoverable snapshot green',()=>assert.equal(luzCustodia({...initial,exactSnapshot:true,audioComplete:true}),'verde'));
+test('confirmed custody failure is red even with saved text; archive-only failure does not erase recovery',()=>{
  assert.equal(luzCustodia({...initial,exactSnapshot:true,audioComplete:false,confirmedFailure:true}),'rojo');
- assert.equal(luzCustodia({...initial,exactSnapshot:true,audioComplete:true,confirmedFailure:true}),'verde');
+ assert.equal(luzCustodia({...initial,exactSnapshot:true,audioComplete:true,confirmedFailure:true}),'rojo');
  assert.equal(luzCustodia({...initial,exactSnapshot:true,audioComplete:true,inFlight:true,confirmedFailure:true}),'rojo');
 });

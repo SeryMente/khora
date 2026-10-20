@@ -21,11 +21,27 @@ export function audioCustodiadoCompleto(s:Pick<CapturaSnapshot,'fuenteEntrada'|'
  }
  return true;
 }
+/** A live green acknowledges a bounded, joint text+audio cut, NOT the unsubmitted tail.
+ * Age is measured at capture, never at acknowledgement (late receipts cannot freshen it).
+ * A different session or a regressing cut cannot authorize the light. */
+export type PuntoRecuperacion = {sessionId:string;revisionId:string;hastaParte:number;finMs:number;cutAt:number};
+export function aceptarPunto(actual:PuntoRecuperacion|null,nuevo:PuntoRecuperacion,sesion:string):PuntoRecuperacion|null {
+ if(nuevo.sessionId!==sesion||!nuevo.revisionId||!Number.isSafeInteger(nuevo.hastaParte)||nuevo.hastaParte<1||!Number.isFinite(nuevo.finMs)||nuevo.finMs<0||!Number.isFinite(nuevo.cutAt))return actual?.sessionId===sesion?actual:null;
+ if(actual?.sessionId===sesion&&(nuevo.hastaParte<=actual.hastaParte||nuevo.finMs<actual.finMs||nuevo.cutAt<actual.cutAt))return actual;
+ return nuevo;
+}
+export function puntoVigente(p:PuntoRecuperacion|null,sesion:string,now:number,maxAgeMs=20000):boolean {
+ return !!p&&p.sessionId===sesion&&p.hastaParte>0&&now>=p.cutAt&&now-p.cutAt<=maxAgeMs;
+}
+export function falloCustodiaDefinitivo(e:{httpStatus?:number;reasonCode?:string}):boolean {
+ const status=e.httpStatus||0;
+ return (status>=400&&status<500&&status!==408&&status!==429)||/hash|checksum|receipt|recibo|invalid|mismatch|integrity|corte_no_confirmado|checkpoint_no_confirmado/.test(e.reasonCode||'');
+}
 /** A recovered checkpoint is not an archive. Old receipts never cover newer content. */
-export function luzCustodia(p:{archivedReceipt:boolean;exactSnapshot:boolean;audioComplete:boolean;inFlight:boolean;confirmedFailure:boolean}):LuzCustodia{
+export function luzCustodia(p:{archivedReceipt:boolean;exactSnapshot:boolean;audioComplete:boolean;inFlight:boolean;confirmedFailure:boolean;liveCheckpoint?:boolean}):LuzCustodia{
  if(p.archivedReceipt)return 'azul';
- if(p.exactSnapshot&&p.audioComplete&&!p.inFlight)return 'verde';
  if(p.confirmedFailure)return 'rojo';
+ if(p.liveCheckpoint||(p.exactSnapshot&&p.audioComplete&&!p.inFlight))return 'verde';
  return 'amarillo';
 }
-export const descripcionLuz:Record<LuzCustodia,string>={azul:'Registro archivado con recibo verificado',verde:'Contenido actual confirmado en recuperables',amarillo:'Confirmación del contenido actual pendiente',rojo:'Error de conservación detectado; revisa el detalle'};
+export const descripcionLuz:Record<LuzCustodia,string>={azul:'Registro archivado con recibo verificado',verde:'Punto de recuperación confirmado; consulta el alcance',amarillo:'Punto de recuperación pendiente o con retraso',rojo:'Error de conservación detectado; revisa el detalle'};
