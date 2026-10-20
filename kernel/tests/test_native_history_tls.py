@@ -60,3 +60,17 @@ def test_native_webui_resolves_system_and_preserves_explicit_root(monkeypatch,ro
     query=parse_qs(urlsplit(os.environ["DATABASE_URL"]).query)
     assert query["sslmode"]==["verify-full"]
     assert query["sslrootcert"]==[certifi.where() if root=="system" else root]
+
+
+def test_official_session_reuse_prevents_nested_pool_exhaustion_without_access_bypass(monkeypatch):
+    for key in ['KHORA_API_KEY','KHORA_CHAT_WEBUI_SECRET']:
+        monkeypatch.setenv(key,'synthetic-value-'*4)
+    monkeypatch.setenv('KHORA_CHAT_HISTORY_DATABASE_URL','postgresql://user@db.example.test/history')
+    monkeypatch.setenv('KHORA_CHAT_WEBUI_DATABASE_URL','postgresql://user@db.example.test/native')
+    configure_native_environment()
+    import os
+    assert os.environ['DATABASE_ENABLE_SESSION_SHARING']=='true'
+    assert os.environ['DATABASE_POOL_SIZE']=='2'
+    assert os.environ['DATABASE_POOL_MAX_OVERFLOW']=='0'
+    assert os.environ['ENABLE_ADMIN_CHAT_ACCESS']=='false'
+    assert os.environ['ENABLE_SIGNUP']=='false'

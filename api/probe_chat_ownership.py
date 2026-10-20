@@ -9,6 +9,7 @@ import os
 import uuid
 
 async def probe(chat_id,history):
+    from open_webui.env import DATABASE_ENABLE_SESSION_SHARING
     from open_webui.models.chats import Chats
     from khora_kernel.integrations.openwebui_host import OpenWebUIHostBinding
     from khora_kernel.engine.history import load_ht
@@ -26,7 +27,8 @@ async def probe(chat_id,history):
     if not denied: raise RuntimeError('E72_FOREIGN_OWNER_NOT_DENIED')
     ht=await asyncio.to_thread(load_ht,owned.session_id,history)
     if ht is None or not ht.evidence: raise RuntimeError('E72_HISTORY_NOT_DURABLE')
-    return {'owner_resolved':True,'non_owner_denied':True,'existing_chat_only':True,
+    return {'official_per_operation_session_reuse':DATABASE_ENABLE_SESSION_SHARING,
+            'owner_resolved':True,'non_owner_denied':True,'existing_chat_only':True,
             'new_accounts':0,'graph_writes':False,'history_present':True,
             'evidence_count':len(ht.evidence),'steps_count':len(ht.steps)}
 

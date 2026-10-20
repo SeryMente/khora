@@ -54,6 +54,9 @@ def configure_native_environment():
         'ENABLE_FOLLOW_UP_GENERATION':'false','ENABLE_AUTOCOMPLETE_GENERATION':'false',
         'ENABLE_DB_MIGRATIONS':'false','ENABLE_PERSISTENT_CONFIG':'false',
         'DATABASE_POOL_SIZE':'2','DATABASE_POOL_MAX_OVERFLOW':'0','DATABASE_POOL_TIMEOUT':'8',
+        # Official per-operation session reuse prevents nested model/grant lookups
+        # exhausting the small pool. This does not share sessions across users.
+        'DATABASE_ENABLE_SESSION_SHARING':'true',
         'DEFAULT_MODELS':PIPE_ID,'ENABLE_FUNCTIONS':'true',
         'FROM_INIT_PY':'true','ENV':'prod','USE_SLIM_DOCKER':'true',
         'OFFLINE_MODE':'true','HF_HUB_OFFLINE':'1','ENABLE_VERSION_UPDATE_CHECK':'false',
