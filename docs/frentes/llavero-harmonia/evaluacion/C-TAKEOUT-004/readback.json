@@ -1,0 +1,17 @@
+{
+  "commit": "a8572afd4aec1ce0251a9016b160df48774c77a9",
+  "matched_git_blobs": {
+    "khora-web/lib/server/takeout/README.md": "a19f0be66af71b8459bf2d47f920f2fde2da5745",
+    "khora-web/lib/server/takeout/b2-store.ts": "130d9513c27f58bc56e09ef24c526b7cf9b959d2",
+    "khora-web/lib/server/takeout/encrypted-store.d.mts": "23f4e2cdb67d7084e43ba9f70afdd9fd40dba2c8",
+    "khora-web/lib/server/takeout/encrypted-store.mjs": "b7849fa4b6201086a0be79402b92b3f3c9a1c100",
+    "khora-web/lib/server/takeout/google-auth.mjs": "d8f059fa022ddba2ed59d9b61569fb4acc49d4c8",
+    "khora-web/lib/server/takeout/transfer.d.mts": "1853acdfd4f3568aedd500cbaab8535cb0eb5705",
+    "khora-web/lib/server/takeout/transfer.mjs": "35fa006287ac9a8cbb2fb78061ea7ff7d886b232",
+    "khora-web/tests/unit/takeout-google-auth.test.mjs": "45e1db3bb0deaa17565101aeabe3df14702ee87e",
+    "khora-web/tests/unit/takeout-transfer.test.mjs": "5b838066fc3e5ae0563cb4d17c5cab85d4706ac7",
+    "khora-web/tests/unit/takeout.test.ts": "aeebca23b6dd8b96e078db47c828f9629bbb3723",
+    "khora-web/lib/server/takeout/evidence.c004.json": "8960915c569956e2b7f79e42e9cc5917bfb86f0e"
+  },
+  "verified": true
+}

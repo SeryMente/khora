@@ -1,0 +1,68 @@
+{
+  "cycle": "C-TAKEOUT-004",
+  "status": "implementation_partial_not_e2e",
+  "baseline": "4ff209fba2bd02d6e61516c7c598e7260ae69871",
+  "transfer_version": "0.1.0",
+  "google_protocol_version": "0.1.0",
+  "tests": {
+    "synthetic_cases": 66,
+    "pass": 66,
+    "fail": 0,
+    "skipped": 0,
+    "scope": "canonical_cipher_real; Google_and_storage_simulated"
+  },
+  "cipher_git_blob": "92427a1cacf745142a760802247105726373faf6",
+  "source_sha256": {
+    "khora-web/lib/server/takeout/README.md": "7a1982352a74491bcd759d6a0533e199191555ad39cc17943bb60dd76c5c93f9",
+    "khora-web/lib/server/takeout/b2-store.ts": "d6ab98a019976b547ffcc19a2505c61aa6ccaf2908606b029adf478fc58ca472",
+    "khora-web/lib/server/takeout/encrypted-store.d.mts": "7328dc01dc2e50f15777af618d5967951798fda68e31af2a00b01482958e8346",
+    "khora-web/lib/server/takeout/encrypted-store.mjs": "ef681f57607998fcc26c998694618316ce99a95ea9f40f111db2f1b55643042f",
+    "khora-web/lib/server/takeout/google-auth.mjs": "e39229062fea041b78f3e864d2040d9e942cab98232db743a7ffa7dfe71e9e2d",
+    "khora-web/lib/server/takeout/transfer.d.mts": "601217c83a32e60a6bdf44d078fb9e615bd7cfc12a1bd0e0b3f6070350a32557",
+    "khora-web/lib/server/takeout/transfer.mjs": "9d86f3ea2cc8fa6951f2ef1115e7bfd0deeb02077f6085ba0b2bfe2ead9db53c",
+    "khora-web/tests/unit/takeout-google-auth.test.mjs": "3666c887bc8cca4f56dee5e066369b3220d99148b93dd9a573fc35f80c82aa84",
+    "khora-web/tests/unit/takeout-transfer.test.mjs": "c1cafc5d407a9ce75df245dc8d160d4bad652f87e6d00e5bff28077da0de40d1",
+    "khora-web/tests/unit/takeout.test.ts": "4071c9f433a6cd2f39b8b1d89c990287ad4fa460fbf14902a1e3791da5e3d29c"
+  },
+  "not_verified": [
+    "global_typecheck",
+    "full_application_build",
+    "real_Google_authorization",
+    "Google_Picker",
+    "real_B2_transfer",
+    "durable_jobs",
+    "archive_parser",
+    "corpus_consumer",
+    "quota_budget",
+    "production_deployment",
+    "authenticated_acceptance"
+  ],
+  "access": {
+    "vercel_mcp": "reconnected_but_target_team_403",
+    "authorized_old_rdc": "offline",
+    "new_online_rdc": "not_used_without_binding",
+    "google_cloud_config": "not_verified",
+    "render_runtime": "not_approved_for_this_front"
+  },
+  "production_effects": false,
+  "code_commit": "a8572afd4aec1ce0251a9016b160df48774c77a9",
+  "code_readback": "11_git_blobs_exact",
+  "wrapper": {
+    "pass": 1,
+    "fail": 0,
+    "child_environment": "allowlist_PATH_NODE_NO_WARNINGS_only"
+  },
+  "canonical_base_blob": "c3c3e5ed052b9eda5f529428aa903f9e0497e2a3",
+  "canonical_version": "0.17",
+  "method": {
+    "version": "1.9",
+    "commit": "a8d612145cd64a46a13567c9779efd19b6cce9d7",
+    "blob": "ec67e18a34b1f0a48b579dc1edf96d54b38fbd6f"
+  },
+  "cli_attempt": {
+    "version": "64.5.0",
+    "npm_integrity": "sha512-JsWnLGHojqd0YKmLeU4NHpeCEX7/jIKNydBMNf0DGJe5W/jVb+j8lMekLkCIXqFTb8LObLoAe+OZ6/XJt4AhyQ==",
+    "result": "login_interrupted_no_challenge_observed_no_authentication_claim"
+  },
+  "selected_transcript_scope": "five_visible_direct_operator_messages_not_complete_history"
+}
