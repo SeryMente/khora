@@ -1,0 +1,205 @@
+{
+  "schema_version": "khora-documentary-source-manifest/0.1",
+  "status": "DOCUMENTARY_NOT_PRODUCT_CERTIFICATION",
+  "base_commit": "bd29c924393fcbd9183100f66b2e50c87b791207",
+  "sources": [
+    {
+      "repository": "SeryMente/khora",
+      "path": "AGENTS.md",
+      "revision": "bd29c924393fcbd9183100f66b2e50c87b791207",
+      "url": "https://github.com/SeryMente/khora/blob/bd29c924393fcbd9183100f66b2e50c87b791207/AGENTS.md",
+      "role": "instrucciones de repositorio",
+      "evidence": "lectura de documento o código; no verificación productiva",
+      "blob_sha": "4c8e6c06af6a14458af80948b2dff58e3bc84fdb"
+    },
+    {
+      "repository": "SeryMente/khora",
+      "path": "README.md",
+      "revision": "bd29c924393fcbd9183100f66b2e50c87b791207",
+      "url": "https://github.com/SeryMente/khora/blob/bd29c924393fcbd9183100f66b2e50c87b791207/README.md",
+      "role": "índice de documentos",
+      "evidence": "lectura de documento o código; no verificación productiva",
+      "blob_sha": "9f3431cc5a394962ebed04a03fc06c486a5c2d81"
+    },
+    {
+      "repository": "SeryMente/khora",
+      "path": "khora-web/docs/CUSTODIA-DICTADOS.md",
+      "revision": "bd29c924393fcbd9183100f66b2e50c87b791207",
+      "url": "https://github.com/SeryMente/khora/blob/bd29c924393fcbd9183100f66b2e50c87b791207/khora-web/docs/CUSTODIA-DICTADOS.md",
+      "role": "custodia continua y separación de medios",
+      "evidence": "lectura de documento o código; no verificación productiva",
+      "blob_sha": "661706171cde293d740b7f3480a084fe7825d2d1"
+    },
+    {
+      "repository": "SeryMente/khora",
+      "path": "khora-web/docs/GRAPH-TWINS.md",
+      "revision": "bd29c924393fcbd9183100f66b2e50c87b791207",
+      "url": "https://github.com/SeryMente/khora/blob/bd29c924393fcbd9183100f66b2e50c87b791207/khora-web/docs/GRAPH-TWINS.md",
+      "role": "objeto existente del grafo y circuitos",
+      "evidence": "lectura de documento o código; no verificación productiva",
+      "blob_sha": "a7e7885ee8f5faf387206015b37c74ddaa4f099f"
+    },
+    {
+      "repository": "SeryMente/khora",
+      "path": "khora-web/docs/GRAPH-QUALITY-DRAFT.md",
+      "revision": "bd29c924393fcbd9183100f66b2e50c87b791207",
+      "url": "https://github.com/SeryMente/khora/blob/bd29c924393fcbd9183100f66b2e50c87b791207/khora-web/docs/GRAPH-QUALITY-DRAFT.md",
+      "role": "estándar diseñado de calidad; límites de aptitud",
+      "evidence": "lectura de documento o código; no verificación productiva",
+      "blob_sha": "bb4f385b6b358a88a7a4328e0d67e37bd6b619f7"
+    },
+    {
+      "repository": "SeryMente/khora",
+      "path": "khora-web/docs/GRAPH-ORIGINALS-AUTHORIZATION.md",
+      "revision": "bd29c924393fcbd9183100f66b2e50c87b791207",
+      "url": "https://github.com/SeryMente/khora/blob/bd29c924393fcbd9183100f66b2e50c87b791207/khora-web/docs/GRAPH-ORIGINALS-AUTHORIZATION.md",
+      "role": "excepción específica del original",
+      "evidence": "lectura de documento o código; no verificación productiva",
+      "blob_sha": "2559dfb372d0a57ea2b619ea1ae121915a87d49c"
+    },
+    {
+      "repository": "SeryMente/khora",
+      "path": "khora-web/docs/evidence/graph-architecture-2026-10-18/AUDITORIA-ARQUITECTURA.md",
+      "revision": "bd29c924393fcbd9183100f66b2e50c87b791207",
+      "url": "https://github.com/SeryMente/khora/blob/bd29c924393fcbd9183100f66b2e50c87b791207/khora-web/docs/evidence/graph-architecture-2026-10-18/AUDITORIA-ARQUITECTURA.md",
+      "role": "brechas auditadas históricas de integración",
+      "evidence": "lectura de documento o código; no verificación productiva",
+      "blob_sha": "600b5cdd59641c424f2419640d7aaea1f42953a7"
+    },
+    {
+      "repository": "SeryMente/khora",
+      "path": "khora-web/lib/server/volcados.ts",
+      "revision": "bd29c924393fcbd9183100f66b2e50c87b791207",
+      "url": "https://github.com/SeryMente/khora/blob/bd29c924393fcbd9183100f66b2e50c87b791207/khora-web/lib/server/volcados.ts",
+      "role": "modelo de fuente y aprobación",
+      "evidence": "lectura de documento o código; no verificación productiva",
+      "blob_sha": "d0c6d863efccccdf8f566b1ab64db61be649ce9f"
+    },
+    {
+      "repository": "SeryMente/khora",
+      "path": "khora-web/lib/server/fragmentos.ts",
+      "revision": "bd29c924393fcbd9183100f66b2e50c87b791207",
+      "url": "https://github.com/SeryMente/khora/blob/bd29c924393fcbd9183100f66b2e50c87b791207/khora-web/lib/server/fragmentos.ts",
+      "role": "anclaje y representación",
+      "evidence": "lectura de documento o código; no verificación productiva",
+      "blob_sha": "6fc41dd2b781317b6e5dece1b37d5ff16576dd3f"
+    },
+    {
+      "repository": "SeryMente/khora",
+      "path": "khora-web/lib/server/eventos.ts",
+      "revision": "bd29c924393fcbd9183100f66b2e50c87b791207",
+      "url": "https://github.com/SeryMente/khora/blob/bd29c924393fcbd9183100f66b2e50c87b791207/khora-web/lib/server/eventos.ts",
+      "role": "observabilidad, no biografía",
+      "evidence": "lectura de documento o código; no verificación productiva",
+      "blob_sha": "48f81945bebf4728fbdcfcdddebbccc93293029c"
+    },
+    {
+      "repository": "SeryMente/khora",
+      "path": "khora-web/lib/server/dictado-experience.ts",
+      "revision": "bd29c924393fcbd9183100f66b2e50c87b791207",
+      "url": "https://github.com/SeryMente/khora/blob/bd29c924393fcbd9183100f66b2e50c87b791207/khora-web/lib/server/dictado-experience.ts",
+      "role": "experiencia y retención específica",
+      "evidence": "lectura de documento o código; no verificación productiva",
+      "blob_sha": "ef796b9bc1d6e84efc0d9a789090916232f972e2"
+    },
+    {
+      "repository": "SeryMente/khora",
+      "path": "docs/frentes/dictado-voz/OBJETO-CANONICO.md",
+      "revision": "4fb3b7d5f07efef770eac398646ff9d87f86b505",
+      "url": "https://github.com/SeryMente/khora/blob/4fb3b7d5f07efef770eac398646ff9d87f86b505/docs/frentes/dictado-voz/OBJETO-CANONICO.md",
+      "role": "alcance y estado de Dictado v0.6.34",
+      "evidence": "lectura de documento o código; no verificación productiva"
+    },
+    {
+      "repository": "SeryMente/khora",
+      "path": "docs/frentes/llavero-harmonia/OBJETO-CANONICO.md",
+      "revision": "a91b5f2cde3fe9f1a24dc8ebb948d586be43b543",
+      "url": "https://github.com/SeryMente/khora/blob/a91b5f2cde3fe9f1a24dc8ebb948d586be43b543/docs/frentes/llavero-harmonia/OBJETO-CANONICO.md",
+      "role": "llavero v0.16 y condiciones autobiográficas del Anexo B",
+      "evidence": "lectura de documento o código; no verificación productiva"
+    },
+    {
+      "repository": "SeryMente/metodologia",
+      "path": "METACANON-OBJETOS-CANONICOS.md",
+      "revision": "a1c519d587effd0974db3788204ddfd9ad39d215",
+      "url": "https://github.com/SeryMente/metodologia/blob/a1c519d587effd0974db3788204ddfd9ad39d215/METACANON-OBJETOS-CANONICOS.md",
+      "role": "metacanon adquirido 1.8",
+      "evidence": "lectura de documento o código; no verificación productiva",
+      "blob_sha": "2c234f8924c75444a47ad423f6654dca329c7d4a"
+    },
+    {
+      "url": "https://app.notion.com/p/9e2a4187824182f4aff201e5fdb702a8",
+      "title": "Plan Maestro",
+      "role": "norte y gobernanza",
+      "revision": "lectura en este ciclo; contenido mutable, no snapshot completo en Git"
+    },
+    {
+      "url": "https://app.notion.com/p/453a4187824183efafac81daa6b48206",
+      "title": "Tres objetivos",
+      "role": "SEA, IAR, RES",
+      "revision": "lectura en este ciclo; contenido mutable, no snapshot completo en Git"
+    },
+    {
+      "url": "https://app.notion.com/p/3faa41878241831eb86d01d6c19c8c99",
+      "title": "Canon de ingesta",
+      "role": "originales/derivados/juicios",
+      "revision": "lectura en este ciclo; contenido mutable, no snapshot completo en Git"
+    },
+    {
+      "url": "https://app.notion.com/p/a2ea418782418398993481960fe63b53",
+      "title": "VCU Khora v23",
+      "role": "contexto y alcances históricos",
+      "revision": "lectura en este ciclo; contenido mutable, no snapshot completo en Git"
+    },
+    {
+      "url": "https://app.notion.com/p/214a41878241832b8bc181cfbab47d5b",
+      "title": "Glosario Operativo del Workspace",
+      "role": "equivalencia terminológica; delta de este ciclo",
+      "revision": "lectura en este ciclo; contenido mutable, no snapshot completo en Git"
+    },
+    {
+      "url": "https://app.notion.com/p/547a418782418209b3d381d4a350aafe",
+      "title": "Registro de Taxonomía",
+      "role": "clasificación previa a escritura",
+      "revision": "lectura en este ciclo; contenido mutable, no snapshot completo en Git"
+    }
+  ],
+  "sessions": {
+    "origin": "session://ecea4187-8241-819b-af83-0003b7c205f7/3fea4187-8241-80f2-9d08-00a9b6435a14",
+    "dictado": "session://ecea4187-8241-819b-af83-0003b7c205f7/3fea4187-8241-805a-a526-00a99e9d743d"
+  },
+  "coverage": {
+    "inspected": "cánones y objetos de estado, directorios principales y muestras de código; alcance semántico transversal",
+    "not_inspected": [
+      "cada archivo del proyecto",
+      "cada repositorio relacionado",
+      "bases de datos y registros privados",
+      "Takeout real",
+      "servicios y secretos productivos"
+    ],
+    "not_executed": [
+      "importación",
+      "pruebas funcionales A01–A32",
+      "cambios de seguridad",
+      "migración",
+      "merge",
+      "despliegue"
+    ]
+  },
+  "authority": {
+    "ratified": [
+      "encargo documental",
+      "corpus de datos autobiográficos = corpus autobiográfico"
+    ],
+    "proposed": [
+      "contratos lógicos",
+      "requisitos derivados",
+      "criterios y etapas"
+    ],
+    "pending": [
+      "revisión material del operador",
+      "implementación autorizada",
+      "aceptación funcional"
+    ]
+  }
+}

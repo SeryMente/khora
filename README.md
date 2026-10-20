@@ -15,3 +15,7 @@ El subsistema Entorno Persistente Medio v1.0 se especifica en [`ep-medio-archite
 ### Custodia continua de dictados
 
 Contrato, mapa de c├│digo, garant├¡as, recuperaci├│n, audio original/MP3, herramientas y pruebas: [Custodia continua de dictados](./khora-web/docs/CUSTODIA-DICTADOS.md). Lectura obligatoria para cambios futuros; el documento distingue implementaci├│n de certificaci├│n productiva y enumera las brechas a├║n abiertas.
+
+### Universo de datos y corpus autobiográfico
+
+[Objeto canónico de persistencia](./docs/frentes/universo-datos/OBJETO-CANONICO.md) · [Especificación del universo](./docs/frentes/universo-datos/ESPECIFICACION-UNIVERSO-DATOS.md) · [Especificación del corpus autobiográfico](./docs/frentes/universo-datos/ESPECIFICACION-CORPUS-AUTOBIOGRAFICO.md). Contratos documentales v0.1, fuentes y casos de aceptación; no equivalen a implementación, aprobación de arquitectura/seguridad o acreditación de producción.
