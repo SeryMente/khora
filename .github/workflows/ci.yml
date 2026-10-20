@@ -50,6 +50,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+      - name: Corpus autobiografico - version y contrato
+        run: node ../scripts/check_autobiographical_corpus.mjs
       - run: npm ci
       - run: npm run typecheck
       - run: npm run ui-review:check

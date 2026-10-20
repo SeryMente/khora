@@ -1,0 +1,78 @@
+{
+  "cycle": "C-UNIVERSO-002",
+  "spec_version": "0.2.0",
+  "schema_version": "0.1.0",
+  "environment": {
+    "node": "v24.14.1",
+    "scope": "isolated Linux workspace; synthetic data only"
+  },
+  "result": "REFERENCE_CONTRACT_CHECKS_PASSED",
+  "tests_passed": 45,
+  "tests_failed": 0,
+  "repeat_runs_passed": 2,
+  "negative_gate_cases": [
+    {
+      "case": "stale_spec",
+      "result": "REJECTED",
+      "exit_code": 1
+    },
+    {
+      "case": "tampered_schema",
+      "result": "REJECTED",
+      "exit_code": 1
+    },
+    {
+      "case": "type_drift",
+      "result": "REJECTED",
+      "exit_code": 1
+    },
+    {
+      "case": "missing_gate",
+      "result": "REJECTED",
+      "exit_code": 1
+    },
+    {
+      "case": "unsupported_keyword",
+      "result": "REJECTED",
+      "exit_code": 1
+    },
+    {
+      "case": "missing_resource",
+      "result": "REJECTED",
+      "exit_code": 1
+    }
+  ],
+  "checks": [
+    "JavaScript syntax",
+    "JSON parsing",
+    "YAML parsing",
+    "schema hash",
+    "generated declarations equality",
+    "spec/docs/architecture version equality",
+    "discovery rule",
+    "build/test and CI gate connection",
+    "relative references"
+  ],
+  "not_verified": [
+    "full application compilation and typecheck",
+    "remote CI run",
+    "runtime producer/consumer integration",
+    "source/actor/policy authenticity",
+    "semantic acceptance",
+    "real corpus",
+    "deployment",
+    "authentication security"
+  ],
+  "files": {
+    "contracts/corpus-autobiografico/schema.v0.1.0.json": "ef40d493c6eeb3ed88f1eb0b0da93ebab5f877de078a4fef074fff515a60df05",
+    "contracts/corpus-autobiografico/current.json": "07a4e14cbf4bd0495da084a203c3b02f3d8c33fa22138bb1e39ed622813f1e0c",
+    "contracts/corpus-autobiografico/index.mjs": "86b0ffc4269c90d56746051bbccc55dcf4aaa2be322475cf3577ef1999aa3085",
+    "contracts/corpus-autobiografico/generate-types.mjs": "df2347bc7f5f71a06be939a8b5c1834b1c33082cde34939d4a7097b701f0c712",
+    "contracts/corpus-autobiografico/contract.test.mjs": "52228f5d8b2687112f9963432814d3836298753437cf3db255475f4a9909e0fa",
+    "contracts/corpus-autobiografico/README.md": "3880952a2925efa2ab6b6273d43cdf170cd960aa52e4c8deb67523e8674d55ad",
+    "contracts/corpus-autobiografico/index.d.mts": "27b455244a6f6d55b12954cc920dea7d926e13f517376c99a9f0e0706c536f5f",
+    "contracts/corpus-autobiografico/fixtures/synthetic-unit.json": "66d0298ce1e0d78c81b1c7957ad6614074806b814fa20a86034363e96cb02270",
+    "scripts/check_autobiographical_corpus.mjs": "933499d865c9cd046671b81cfec6db3e1c11b71ec441e06b5448f732bcb27de1"
+  },
+  "npm_contract_entrypoint": "PASSED"
+}

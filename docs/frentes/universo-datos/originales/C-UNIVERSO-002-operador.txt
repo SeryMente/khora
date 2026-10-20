@@ -1,0 +1,3 @@
+<p>
+Debe de quedar la especifiacion, bien acotada, enel  codigo, y en la arquitectura, y enla documetncion,  el corpus ab pra que sea utilizado para cualquier caso de uso, facilmente reconocible, para  que todo se haga conforme la version  actual. Versionalo. 
+</p>

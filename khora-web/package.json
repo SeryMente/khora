@@ -9,7 +9,7 @@
     "start": "next start",
     "e2e": "playwright test",
     "e2e:report": "playwright show-report",
-    "test:unit": "node scripts/run_unit_tests.mjs",
+    "test:unit": "npm run corpus:check && node scripts/run_unit_tests.mjs",
     "typecheck": "tsc --noEmit",
     "ui-review:check": "tsx scripts/check_ui_review.ts",
     "ui-review:export": "tsx scripts/export_ui_review.ts",
@@ -18,7 +18,8 @@
     "repair:volcados": "tsx scripts/repair_volcados.ts",
     "migrate:ep": "node scripts/migrate-ep.mjs",
     "migrate:runtime": "node scripts/migrate-runtime.mjs",
-    "ui:contract": "tsx scripts/check_navigation_contract.ts"
+    "ui:contract": "tsx scripts/check_navigation_contract.ts",
+    "corpus:check": "node ../scripts/check_autobiographical_corpus.mjs"
   },
   "dependencies": {
     "@aflsolutions/graphology-communities-leiden": "1.1.1",

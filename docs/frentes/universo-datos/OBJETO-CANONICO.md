@@ -2,17 +2,17 @@
 
 ## 1. Control e identidad
 
-Versión documental 0.1 · sello KHORA-UNIVERSO-DATOS-v0.1 · ciclo C-UNIVERSO-001. Directorio contenedor: `docs/frentes/universo-datos/`. Este archivo es el único núcleo de estado del frente; las especificaciones son elementos permanentes de tipo 📜, no objetos de estado rivales. Responsable: operador; escritor de este directorio: SamanthaL en el hilo de origen. Rama documental: `docs/universo-datos-3fea4187`. Base observada: `bd29c924393fcbd9183100f66b2e50c87b791207` de `SeryMente/khora`.
+Versión de especificación 0.2.0 · contrato de intercambio 0.1.0 · sello KHORA-UNIVERSO-DATOS-v0.2.0 · ciclo C-UNIVERSO-002. Directorio contenedor: `docs/frentes/universo-datos/`. Este archivo es el único núcleo de estado del frente; las especificaciones son elementos permanentes de tipo 📜, no objetos de estado rivales. Responsable: operador; escritor de este directorio: SamanthaL en el hilo de origen. Rama documental: `docs/universo-datos-3fea4187`. Base observada: `bd29c924393fcbd9183100f66b2e50c87b791207` de `SeryMente/khora`.
 
 ## 2. LEER PRIMERO
 
-**Encargo documental, no implementación ni certificación.** Están ratificados por el operador el encargo y los sinónimos «corpus de datos autobiográficos» / «corpus autobiográfico». Los contratos derivados, criterios de aceptación y modelo lógico de esta versión son propuestas de especificación pendientes de revisión material. No se atribuye aprobación humana a su redacción por el modelo. No se cambia arquitectura, seguridad, captura, publicación, autenticación, datos productivos ni proveedor de almacenamiento. No se autoriza un nuevo despliegue.
+**Encargo ampliado: contrato de código y arquitectura/documentación versionadas; no certificación productiva.** Están ratificados por el operador el encargo y los sinónimos «corpus de datos autobiográficos» / «corpus autobiográfico». Los contratos derivados, criterios de aceptación y modelo lógico de esta versión son propuestas de especificación pendientes de revisión material. No se atribuye aprobación humana a su redacción por el modelo. Se añade un módulo compartido de referencia y su encaje arquitectónico; no se cambia el mapa de servicios, seguridad, captura, publicación, autenticación, datos productivos ni proveedor de almacenamiento. No se autoriza un nuevo despliegue.
 
 Leer [universo](ESPECIFICACION-UNIVERSO-DATOS.md), [corpus](ESPECIFICACION-CORPUS-AUTOBIOGRAFICO.md), [casos de aceptación](pruebas/CASOS-ACEPTACION.md) y [fuentes y cobertura](FUENTES-Y-COBERTURA.json). «DEBE» indica una condición diseñada para futura conformidad; no demuestra que el producto ya la cumpla.
 
 ## 3. Referencia metodológica
 
-Metacanon adquirido: **1.8 · METACANON-OBJETOS-v1.8**, repositorio `SeryMente/metodologia`, revisión `a1c519d587effd0974db3788204ddfd9ad39d215`, archivo `METACANON-OBJETOS-CANONICOS.md`. Se aplica directorio con núcleo único, originales, crónica, evidencia y restitución del contexto. No se declara una ejecución de protocolos formales ni se modifica el metaprompt personal cargado NX-330m. La futura sincronización permanente es requisito, no servicio construido por esta entrega.
+Metacanon adquirido: **1.8 · METACANON-OBJETOS-v1.8**, repositorio `SeryMente/metodologia`, revisión `a1c519d587effd0974db3788204ddfd9ad39d215`, archivo `METACANON-OBJETOS-CANONICOS.md`. Frescura C-UNIVERSO-002: fuente actual `57649141551a234d13208f72d42f6a12191d093f`, blob `141b7475542532bbae69751c4e046bda9d3d7e2b`; sigue versión 1.8. Delta: estado de su propio proyecto y laboratorio; no se importan esas tareas ni cambia la asignación del operador a este frente. Se aplica directorio con núcleo único, originales, crónica, evidencia y restitución del contexto. No se declara una ejecución de protocolos formales ni se modifica el metaprompt personal cargado NX-330m. La futura sincronización permanente es requisito, no servicio construido por esta entrega.
 
 ## 4. Propósito y alcance
 
@@ -37,33 +37,33 @@ Documentación en repositorio verificado privado; ello no autoriza guardar autob
 
 **De dónde viene:** importador urgente de Takeout por enlace, análisis autobiográfico privado revisable y posible aplicación de autenticación; luego ampliación explícita al universo de datos y coordinación con dictado crónica personal.
 
-**Dónde está:** especificación v0.1 documentada en rama propia, sin merge ni despliegue. El código y los cánones fueron inspeccionados selectivamente; no se auditó cada archivo, despliegue o dato. El grafo tiene brechas de integración documentadas, no reparadas por esta entrega.
+**Dónde está:** especificación 0.2.0 y contrato de referencia 0.1.0 en rama propia, sin merge ni despliegue. El código y los cánones fueron inspeccionados selectivamente; no se auditó cada archivo, despliegue o dato. El grafo tiene brechas de integración documentadas, no reparadas por esta entrega.
 
 **A dónde va:** revisión del contrato común con el operador y los frentes existentes; después, solo mediante autorización correspondiente, implementación del mínimo viable privado y pruebas reales de extremo a extremo.
 
-**Qué cambió:** términos canónicos fijados; corpus situado como subconjunto multicanal; fuentes, afirmaciones, juicios, derivados y publicaciones separados; requisitos y pruebas por etapas persistidos.
+**Qué cambió:** registro único `contracts/corpus-autobiografico/current.json`, esquema de intercambio cerrado, módulo ejecutable, tipos derivados, regresión sintética, compuerta de consistencia y conexión al circuito de pruebas/compilación e integración continua; [arquitectura y adopción](ARQUITECTURA-Y-CONTRATO.md) e [historial](CHANGELOG.md). Consumidores productivos aún no integrados.
 
 **Acción / siguiente paso atómico:** revisar con el operador alcance de retención, procesamiento externo y datos sensibles del mínimo viable antes de implementar. No hace falta elegir ya el proveedor definitivo para evaluar el contrato lógico. Tiempo de implementación: NO ESTIMABLE con las decisiones y pruebas pendientes, no se inventa duración.
 
-**En prueba / recién fallido:** esta entrega valida documentos, no comportamiento productivo. Dictado informó suspensión del almacén de audio; ese dato es reporte de otra sesión, no verificación directa de este frente.
+**En prueba / recién fallido:** esta entrega prueba el contrato local con datos sintéticos y valida documentos, no comportamiento productivo. Dictado informó suspensión del almacén de audio; ese dato es reporte de otra sesión, no verificación directa de este frente.
 
 **Recordatorios latentes:** resultados autobiográficos urgentes en posición temporal privada; no construir bóveda completa por deriva; no depender de una cuenta Windows controlada por el operador; no publicar corpus; conservar originales recuperables; ningún uso de biografía como único factor criptográfico.
 
 ## 9. Aceptación y viabilidad
 
-Aceptación documental: fuente literal conservada, especificaciones vinculadas, términos concordantes, estados observados/diseñados separados, revisión de fidelidad y de persistencia, casos falsables y fuentes fijadas. La aceptación funcional exige ejecutar los casos sobre la cadena real; está **PENDIENTE**. La aprobación material de seguridad, arquitectura e interfaz está **PENDIENTE**. Ni aprobar estos documentos ni aprobar un grafo acredita los demás componentes.
+Aceptación documental: fuente literal conservada, especificaciones vinculadas, términos concordantes, estados observados/diseñados separados, revisión de fidelidad y de persistencia, casos falsables y fuentes fijadas. El contrato de referencia cuenta con regresión sintética local en el recibo de C-UNIVERSO-002. La aceptación funcional exige ejecutar los casos sobre la cadena real; está **PENDIENTE**. La aprobación material de seguridad, arquitectura e interfaz está **PENDIENTE**. Ni aprobar estos documentos ni aprobar un grafo acredita los demás componentes.
 
 ## 10. Formato de ciclo
 
-Cada ciclo agrega un evento a `cronica/`, conserva originales pertinentes sin secretos, declara recursos/escritor, enlaza revisión anterior, registra derivaciones, decisiones humanas auténticas y evidencia. No sobrescribir el núcleo sin releerlo y cotejar su sello. Una revisión futura puede reusar evidencia vigente, no inventar recibos ni convertir test sintético en certificación. La siguiente salida exacta queda en `originales/C-UNIVERSO-001-salida.md`; los recibos de las herramientas permanecen en el hilo.
+Cada ciclo agrega un evento a `cronica/`, conserva originales pertinentes sin secretos, declara recursos/escritor, enlaza revisión anterior, registra derivaciones, decisiones humanas auténticas y evidencia. No sobrescribir el núcleo sin releerlo y cotejar su sello. Una revisión futura puede reusar evidencia vigente, no inventar recibos ni convertir test sintético en certificación. La salida del ciclo actual queda en `originales/C-UNIVERSO-002-salida.md`; la anterior permanece en `originales/C-UNIVERSO-001-salida.md`; los recibos de las herramientas permanecen en el hilo.
 
 ## 11. Crónica y fuentes
 
-Evento: [C-UNIVERSO-001](cronica/C-UNIVERSO-001.md). Fuentes fijadas en [manifiesto](FUENTES-Y-COBERTURA.json). Documentos históricos son antecedentes, no confirmación de producción actual. El mensaje de Dictado sobre almacenamiento se conserva como reporte atribuido mínimo, sin copiar correo ni identificadores de cuenta. No se persiste aquí el dictado filosófico/autobiográfico completo ni material laboral incidental.
+Eventos: [C-UNIVERSO-001](cronica/C-UNIVERSO-001.md) y [C-UNIVERSO-002](cronica/C-UNIVERSO-002.md). Fuentes fijadas en [manifiesto](FUENTES-Y-COBERTURA.json). Documentos históricos son antecedentes, no confirmación de producción actual. El mensaje de Dictado sobre almacenamiento se conserva como reporte atribuido mínimo, sin copiar correo ni identificadores de cuenta. No se persiste aquí el dictado filosófico/autobiográfico completo ni material laboral incidental.
 
 ## 12. Reinstanciación
 
-Un modelo nuevo debe leer este núcleo, ambas especificaciones, casos y manifiesto; recuperar el último evento y las revisiones actuales de los objetos de Dictado y llavero antes de modificar interfaces compartidas. Estado terminal de este ciclo: entrega documental, producto no implementado por este frente. Reanudar con revisión material del mínimo viable, no con una migración ni una apertura de acceso inferida.
+Un modelo nuevo debe leer este núcleo, ambas especificaciones, casos y manifiesto; recuperar el último evento y las revisiones actuales de los objetos de Dictado y llavero antes de modificar interfaces compartidas. Estado terminal de este ciclo: contrato de referencia implementado y probado localmente; consumidores y producto no integrados ni desplegados por este frente. Reanudar con revisión material del mínimo viable, no con una migración ni una apertura de acceso inferida.
 
 ## 13. Persistencia y revisión
 

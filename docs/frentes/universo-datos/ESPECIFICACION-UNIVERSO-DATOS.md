@@ -1,6 +1,7 @@
+<!-- CORPUS_SPEC_VERSION=0.2.0; CORPUS_SCHEMA_VERSION=0.1.0 -->
 # Universo de datos de Khora · Especificación de dominio
 
-Versión 0.1 · KHORA-UNIVERSO-DATOS-v0.1 · estatuto y estado en [objeto único](OBJETO-CANONICO.md). Especificación lógica propuesta; no nueva arquitectura aprobada. Procedencia por sección: U1–U3 sintetizan intención y fuentes; U4–U12 son contratos derivados para revisión; U13 inventaría evidencia y brechas. [Manifiesto de fuentes](FUENTES-Y-COBERTURA.json).
+Versión 0.2.0 · KHORA-UNIVERSO-DATOS-v0.2.0 · estatuto y estado en [objeto único](OBJETO-CANONICO.md). Especificación lógica propuesta; no nueva arquitectura aprobada. Procedencia por sección: U1–U3 sintetizan intención y fuentes; U4–U12 son contratos derivados para revisión; U13 inventaría evidencia y brechas. [Manifiesto de fuentes](FUENTES-Y-COBERTURA.json).
 
 ## U1. Identidad, norte y límites
 
@@ -142,3 +143,7 @@ Se revisaron fuentes normativas y muestras de código de captura, volcados, frag
 Lo existente incluye modelos de volcados/fragmentos y documentación de custodia. La auditoría fijada en el manifiesto describe dos circuitos de grafo y riesgos de juicio automático mal rotulado, identidad, anclas, replay, índices, propietario y borrado. Se trasladan como condiciones que bloquean acreditar consumidores afectados, no como incidentes nuevos comprobados ni reparaciones realizadas.
 
 El criterio antiguo «solo aprobado» se conserva para el ámbito curado y se confronta con la excepción posterior, específica, del original. No se generaliza la excepción. La antigua visión de repositorio provisional/publicable no habilita guardar corpus privado real. El reporte actual del hilo Dictado indica almacén de audio suspendido; este frente no lo verificó por CLI y no selecciona reemplazo. Cambiar almacén no cambia titularidad, permisos o carácter privado del contenido.
+
+## Contrato de código, versión y alcance implementado
+
+Registro único: [`contracts/corpus-autobiografico/current.json`](../../../contracts/corpus-autobiografico/current.json). Especificación 0.2.0 y formato de intercambio 0.1.0 son versiones separadas. [Arquitectura y adopción](ARQUITECTURA-Y-CONTRATO.md); [cambios](CHANGELOG.md). Existe esquema cerrado y validador de referencia ejecutable para unidades; las reglas semánticas, permisos efectivos, verificación de fuentes, integración de productores/consumidores y pruebas reales siguen pendientes. El código implementa un perfil mínimo de intercambio, no todas las capacidades de este documento.

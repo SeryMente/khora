@@ -1,0 +1,45 @@
+{
+  "contract_id": "khora.corpus-autobiografico",
+  "canonical_names": [
+    "corpus de datos autobiográficos",
+    "corpus autobiográfico"
+  ],
+  "spec_version": "0.2.0",
+  "current_schema_version": "0.1.0",
+  "accepted_schema_versions": [
+    "0.1.0"
+  ],
+  "schema_file": "schema.v0.1.0.json",
+  "schema_sha256": "ef40d493c6eeb3ed88f1eb0b0da93ebab5f877de078a4fef074fff515a60df05",
+  "specification": "../../docs/frentes/universo-datos/ESPECIFICACION-CORPUS-AUTOBIOGRAFICO.md",
+  "architecture": "../../docs/frentes/universo-datos/ARQUITECTURA-Y-CONTRATO.md",
+  "compatibility": "exact_version_only_no_implicit_migration",
+  "runtime_scope": "reference_validation_only_no_production_consumers_integrated",
+  "production_status": "not_deployed",
+  "consumer_adoption": [
+    {
+      "consumer": "dictado",
+      "status": "pending_integration"
+    },
+    {
+      "consumer": "takeout_importer",
+      "status": "pending_integration"
+    },
+    {
+      "consumer": "graph",
+      "status": "pending_integration"
+    },
+    {
+      "consumer": "lina",
+      "status": "pending_integration"
+    },
+    {
+      "consumer": "blog",
+      "status": "pending_integration"
+    },
+    {
+      "consumer": "autobiographical_authentication",
+      "status": "pending_integration"
+    }
+  ]
+}

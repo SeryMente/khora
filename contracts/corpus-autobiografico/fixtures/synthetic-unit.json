@@ -1,0 +1,54 @@
+{
+  "contract_id": "khora.corpus-autobiografico",
+  "schema_version": "0.1.0",
+  "corpus_id": "synthetic-corpus",
+  "unit_id": "synthetic-unit",
+  "revision": 1,
+  "subject": {
+    "subject_ref": "subject:synthetic",
+    "attribution": "explicit"
+  },
+  "source": {
+    "source_id": "source:synthetic",
+    "revision": 1,
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "occurrence_id": "occurrence:synthetic",
+    "channel": "synthetic-text",
+    "medium": "text",
+    "representation": "utf8-original",
+    "integrity": "verified"
+  },
+  "anchor": {
+    "coordinates": "utf16",
+    "start": 0,
+    "end": 20
+  },
+  "content": "Ejemplo sintético: una decisión narrada, no un hecho real del operador.",
+  "modality": "self_report",
+  "eligibility": "pertinent",
+  "event_time": {
+    "status": "unknown"
+  },
+  "captured_at": "2026-01-01T00:00:00Z",
+  "review": {
+    "status": "accepted",
+    "actor_kind": "human",
+    "actor_ref": "actor:synthetic",
+    "source_revision": 1,
+    "decided_at": "2026-01-01T01:00:00Z"
+  },
+  "governance": {
+    "owner_ref": "owner:synthetic",
+    "policy_ref": "policy:synthetic",
+    "policy_revision": 1,
+    "sensitivity": "private",
+    "retention": "temporary",
+    "retention_policy_ref": "retention:synthetic",
+    "expires_at": "2026-01-02T00:00:00Z"
+  },
+  "derivation": {
+    "generation_ref": "generation:synthetic",
+    "pipeline_version": "synthetic-1",
+    "policy_ref": "extraction:synthetic"
+  }
+}

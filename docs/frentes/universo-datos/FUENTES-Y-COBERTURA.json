@@ -1,6 +1,6 @@
 {
   "schema_version": "khora-documentary-source-manifest/0.1",
-  "status": "DOCUMENTARY_NOT_PRODUCT_CERTIFICATION",
+  "status": "REFERENCE_CONTRACT_IMPLEMENTED_NOT_PRODUCT_CERTIFICATION",
   "base_commit": "bd29c924393fcbd9183100f66b2e50c87b791207",
   "sources": [
     {
@@ -184,6 +184,10 @@
       "migración",
       "merge",
       "despliegue"
+    ],
+    "executed_in_current_cycle": [
+      "regresión estructural sintética del contrato de referencia",
+      "compuertas de consistencia y sus casos negativos"
     ]
   },
   "authority": {
@@ -201,5 +205,14 @@
       "implementación autorizada",
       "aceptación funcional"
     ]
+  },
+  "spec_version": "0.2.0",
+  "current_contract": "../../../contracts/corpus-autobiografico/current.json",
+  "current_cycle": "C-UNIVERSO-002",
+  "methodology_current": {
+    "revision": "57649141551a234d13208f72d42f6a12191d093f",
+    "blob_sha": "141b7475542532bbae69751c4e046bda9d3d7e2b",
+    "version": "1.8",
+    "delta": "solo estado del proyecto metodológico; no trasladar su laboratorio a Khora"
   }
 }

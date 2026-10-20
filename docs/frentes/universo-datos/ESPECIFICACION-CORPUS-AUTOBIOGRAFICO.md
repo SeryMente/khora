@@ -1,6 +1,7 @@
+<!-- CORPUS_SPEC_VERSION=0.2.0; CORPUS_SCHEMA_VERSION=0.1.0 -->
 # Corpus de datos autobiográficos · Corpus autobiográfico
 
-Versión 0.1 · términos canónicos intercambiables ratificados por el operador. Contrato propuesto para revisión, subordinado al [universo](ESPECIFICACION-UNIVERSO-DATOS.md) y al [objeto único](OBJETO-CANONICO.md). No se crea una nueva base física por nombrar este subconjunto.
+Versión 0.2.0 · términos canónicos intercambiables ratificados por el operador. Contrato propuesto para revisión, subordinado al [universo](ESPECIFICACION-UNIVERSO-DATOS.md) y al [objeto único](OBJETO-CANONICO.md). No se crea una nueva base física por nombrar este subconjunto.
 
 ## C1. Qué es y qué no es
 
@@ -140,3 +141,7 @@ Una modificación de fuente o permiso marca dependencias afectadas e impide usar
 La especificación se considera cubierta documentalmente al vincular estas reglas a [casos falsables](pruebas/CASOS-ACEPTACION.md). El corpus mínimo solo se acredita con un lote autorizado real y revisión del operador: recuperar fuente; distinguir hecho narrado/deseo/cita/hipótesis; atribución correcta o abstención; no terceros/secreto indebidos; aceptación/rechazo durable; permisos y retirada efectivos; recuperación tras fallo; salida temporal utilizable.
 
 Un conjunto de fichas bien formadas no acredita autenticidad, utilidad o seguridad. Una prueba sintética no acredita producción. No hay corpus real importado, LINA implementada o autenticación acreditada por este documento. Las pruebas permanecen NO EJECUTADAS en producto hasta tener evidencia propia.
+
+## Contrato de código, versión y alcance implementado
+
+Registro único: [`contracts/corpus-autobiografico/current.json`](../../../contracts/corpus-autobiografico/current.json). Especificación 0.2.0 y formato de intercambio 0.1.0 son versiones separadas. [Arquitectura y adopción](ARQUITECTURA-Y-CONTRATO.md); [cambios](CHANGELOG.md). Existe esquema cerrado y validador de referencia ejecutable para unidades; las reglas semánticas, permisos efectivos, verificación de fuentes, integración de productores/consumidores y pruebas reales siguen pendientes. El código implementa un perfil mínimo de intercambio, no todas las capacidades de este documento.
