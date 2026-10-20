@@ -1,0 +1,15 @@
+{
+  "cycle": "C-TAKEOUT-005",
+  "status": "partial_not_deployed",
+  "synthetic_tests": 76,
+  "pass": 76,
+  "fail": 0,
+  "services_real": false,
+  "browser_observation": {
+    "project": "athanor-478307",
+    "existing_khora_client": "observed_unchanged",
+    "takeout_client": "draft_not_created",
+    "secret_values_read": false
+  },
+  "production_changed": false
+}

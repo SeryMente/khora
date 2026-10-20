@@ -21,7 +21,7 @@ por este archivo. Promoción serializada por el hilo central.
 - `google-auth.mjs`: protocolo de autorización de Google acotado a `drive.file`,
   PKCE S256, URL de retorno HTTPS configurada, mismo usuario/same-browser state,
   consumo atómico de un solo uso y errores sin texto privado del proveedor.
-  NO es ruta HTTP, sesión Khora, almacenamiento de tokens ni Google Picker.
+  Incluye renovación del permiso vinculada al dueño/cliente y conservación de rotación de refresh token; el llamador aún debe serializar y guardar cifrado antes de usarlo. NO es ruta HTTP, sesión Khora, almacenamiento de tokens ni Google Picker.
 - `tests/unit/takeout.test.ts` conecta los ensayos aislados con el descubrimiento
   `.test.ts` del runner existente; el proceso hijo usa una allowlist de entorno,
   sin heredar claves reales. Requiere Node con stripTypeScriptTypes (22.6+).
@@ -67,7 +67,7 @@ por este archivo. Promoción serializada por el hilo central.
 
 `node --test khora-web/tests/unit/takeout-transfer.test.mjs khora-web/tests/unit/takeout-google-auth.test.mjs`
 
-66 casos sintéticos, cifrador canónico exacto KHC1/AES-256-GCM; red Google y
+76 casos sintéticos, cifrador canónico exacto KHC1/AES-256-GCM; red Google y
 almacenamiento en memoria simulados de forma explícita. NO es certificación
 criptográfica, revisión independiente ni prueba integral productiva. El binding
 B2 tiene comprobación de sintaxis; falta comprobación global de tipos y build.
