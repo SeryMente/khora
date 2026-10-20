@@ -3,9 +3,9 @@
 ## 1. Control e identidad
 
 - Identidad conservada: `MCP-OBS-DICTADO`; extensión documental de dictado, benchmark, retroalimentación y propuesta de voz/síntomas.
-- Versión: **v0.6.38**; sello **MCP-OBS-DICTADO-v0.6.38**. Objeto permanente por encargo V010; no declara permanente ninguna propuesta clínica.
-- Estado: **C050 · B2 Y CONVERSACIÓN ENRAIZADA COMBINADOS LIVE EN VERCEL; FUENTE6d29682e VERIFICADA; PRUEBA HUMANA/HITO1 Y RESPALDO UNIVERSAL ABIERTOS**.
-- Ancla actual: C050, orden expresa de resolver almacenamiento gratuito cifrado y pruebas/configuración realizadas desde PC10RCIF4EI4 y navegador compartido. Producción canónica https://khora-web.vercel.app sirve6d29682eb5eab336785dd2f00b1d0d90ac7a09b4, despliegue dpl_BCEBkJPcCorVc4mBF8NnyyF4Qsac, alias/API verificados tras promoción única. GE4/d94 y91d72939 se conservan como antecedentes/rollback, no runtime vigente. Estado único §8/C050; C049 y anteriores son historia.
+- Versión: **v0.6.39**; sello **MCP-OBS-DICTADO-v0.6.39**. Objeto permanente por encargo V010; no declara permanente ninguna propuesta clínica.
+- Estado: **C051 · CORRECCIONES DE CRÓNICA/B2 PROBADAS LOCALMENTE; INTEGRACIÓN VISUAL CHAT Y COMPUERTA LIVE EN CURSO; PUBLICACIÓN BLOG/FACEBOOK NO ACREDITADA**.
+- Ancla actual: C051, retroalimentación real del operador y orden de corregir/publicar en producción; C050, orden expresa de resolver almacenamiento gratuito cifrado y pruebas/configuración realizadas desde PC10RCIF4EI4 y navegador compartido. Producción canónica https://khora-web.vercel.app sirve6d29682eb5eab336785dd2f00b1d0d90ac7a09b4, despliegue dpl_BCEBkJPcCorVc4mBF8NnyyF4Qsac, alias/API verificados tras promoción única. GE4/d94 y91d72939 se conservan como antecedentes/rollback, no runtime vigente. Estado único §8/C050; C049 y anteriores son historia.
 - Repositorio propietario: `SeryMente/khora`, privado comprobado con herramienta en este ciclo. `SeryMente/metodologia` también privado: aporta el método, no recibe datos del frente.
 - Carpeta contenedora: `docs/frentes/dictado-voz/`; elemento único de estado: `OBJETO-CANONICO.md`. Carpeta y elemento no se confunden.
 - Revisión de origen del objeto: `1697ee2693ed3217523ffc1d1be9b6541d7d849d`, blob `e98a956c375ce48b791b5f0563ad0ae03c2616dd`.
@@ -14,7 +14,9 @@
 
 ## 2. LEER PRIMERO
 
-C050 vigente: leer §8 primero. La autorización directa de provisión sustituye la aprobación pendiente de proveedor C049, pero no autoriza cargos, publicación pública ni borrado de originales. C049 histórico: leer §8 primero. La nueva orden prioriza Hito 1 y solución del almacenamiento; el orden inmediato C048 queda como antecedente, no se pierde su trabajo local. Todos los «ACTUAL» de ciclos anteriores conservados debajo son snapshots históricos, no bloqueo/permiso/rol vigente. No reconstruir fuentes ausentes ni mezclar entregas obsoletas.
+C051 vigente: leer §8 primero. Reemplaza la semántica histórica verde=versión instantánea completa durante dictado por verde=punto conjunto confirmado, con alcance y tramo vivo explícitos; no debilita custodia ni original. «Momento» conserva su etiqueta amigable por orden posterior del operador. C050 es antecedente de producción, no cierre del recorrido Blog/Facebook.
+
+C050 histórico: leer §8 primero. La autorización directa de provisión sustituye la aprobación pendiente de proveedor C049, pero no autoriza cargos, publicación pública ni borrado de originales. C049 histórico: leer §8 primero. La nueva orden prioriza Hito 1 y solución del almacenamiento; el orden inmediato C048 queda como antecedente, no se pierde su trabajo local. Todos los «ACTUAL» de ciclos anteriores conservados debajo son snapshots históricos, no bloqueo/permiso/rol vigente. No reconstruir fuentes ausentes ni mezclar entregas obsoletas.
 
 **ACTUAL C041.1 — reemplaza pendientes de compilación C041, no borra historia:** código remoto 1ca4f69c53262c3696eb57f800ed97176aeb3d66. Preview dpl_C25Lc9cwoRrNh6pShnoDGrQz77KG termina ERROR / BUILD_UTILS_SPAWN_1 al ejecutar npm run build con prebuild completo. No se conoce etapa/causa específica: logs oficiales403, check-runs403 y PC14 no responde. No atribuir el fallo al registro UI ni a aprobación humana: check_ui_review verifica integridad del registro, no consta fallo causal. No quitar prebuild ni promover a producción. C040 READY histórico continúa siendo solo Next build y no sustituye este gate fallido.
 
@@ -194,6 +196,34 @@ Autenticación C025: dos flujos estándar por dispositivo, autorizados en navega
 
 ### 🔄 Estado vivo
 
+### C051 — Revisión humana de Crónica, conservación y continuidad editorial
+
+**Mandato vigente y rol:** este hilo sigue centralizando Dictado/audio y promoción única. El operador probó Crónica personal real, vio luz amarilla continua, archivo azul y aviso de diferencia entre transcripciones; pide corrección integral LIVE en https://khora-web.vercel.app/sistema/ingreso, eficiencia y continuidad hasta blog GitHub→Página de Facebook. No confundir con perfil personal ni dar por satisfecho ese recorrido por mostrar un botón. Orden posterior: mantener «Momento» amigable/ambiguo en la captura y diferenciar internamente el tiempo del hecho de la captura; publicación debe hacer comprensible el momento sin inventar precisión. Otra orden: coordinar con hilo Seguridad y estándar del corpus autobiográfico. Autorización no equivale a aprobar texto público particular ni a nuevos permisos/cargos.
+
+**Privacidad de originales:** la conversación nativa conserva el dictado completo. No se copia la narración autobiográfica financiera/subjetiva del operador al repositorio como fixture. Solo se persisten instrucciones operativas y pruebas sintéticas. No alterar ni borrar audio/volcado de su prueba.
+
+**Cambios causales C051:**
+- Luz activa verde SOLO tras recibo conjunto de revisión+sesión, texto y prefijo de audio verificado; Whisper no acredita persistencia. Edad desde el corte, no desde recibo tardío; a20s sin avance pasa a amarillo. Tramo posterior explícitamente no cubierto. En reposo vuelve a exigir identidad exacta y manifiesto completo. Rojo de error real tiene prioridad y errores de transporte/grabadora no se borran por un guardado local de texto ajeno al fallo.
+- Archivo manual permanece separado: azul del recibo actual; tras Nueva captura se retiene indicador azul anterior por propietario y puede coexistir con el verde de la nueva sesión. No reabrir archivo sellado ni mezclar sesiones. Estado anterior no persiste por inferencia tras reinicio del componente.
+- Checklist «Requisitos de crónica personal»: Momento/Lugar/Qué haces,0–3, salida animada reversible de elementos cumplidos y movimiento reducido. Misma captura libre, sin exigir formulario ni impedir archivo de contenido incompleto; vaciedad sigue bloqueada como antes. Detección lexical local y literal, no certificación, extracción generativa ni ratificación/ingesta automática. CSEC/centro comunitario y cláusulas positivas antes de dudas posteriores se reconocen. Borrado reabre requisitos.
+- Reconciliación mantiene intacto rechazo de sustitución incompleta y texto previo. Copy ahora dice que se rechazó una transcripción incompleta, no que se perdió el original; no prueba por sí mismo integridad de audio.
+- Backblaze es selección por defecto para escrituras nuevas y único backend admitido en transporte; selección incompatible falla explícitamente antes de red, nunca escribe por fallback en Vercel Blob. Lectura de referencias históricas se conserva. No migración/borrado de históricos; no equiparar esto con respaldo universal de eventos/grafo/corpus/DB. Credenciales existentes, cifrado KHC1, propiedad, huellas y denegación privada intactos.
+
+**Pruebas propias actuales:**127/127unitarias focales,0fail/0skip; TypeScript de proyecto0 antes de ajuste cosmético final.42 comprobaciones Chromium reales de componentes React a1280/390, movimiento reducido y0pageerrors, servicios/estado sintéticos; no grabación de voz ni recuperación productiva por esas pruebas. Capturas inspeccionadas. Primera corrida126/124/2fail conservada: normalización «Durante la mañana» y aserción histórica de error=verde; segunda prueba visual erró por fixture vacío, producto protegido correctamente. Registro Notion de terminal actualizado antes de cirugía y repetición.
+
+**Coordinación de presentación Chat:** constructor entregó848b391cc26f16fc928b171073df3c5d64cecddf, padre exacto6d.9rutas reservadas,3CSS oficiales con hash y avatar genérico autenticado, sin abrir lectura de perfiles. Reporta30pruebas/tipos y navegador propios; atribuido, no prueba propia. Integración por cherry-pick aislado y gate remoto conjunto todavía pendiente. Render/DB/ingesta no se modifican. Central único promotor; prohibición concurrente comunicada.
+
+**Coordinación Blog:** hilo original session://ecea4187-8241-819b-af83-0003b7c205f7/3fea4187-8241-8071-ba63-00a9a1b52f89 recibe encargo actual de auditar recorrido y requisitos, sin nueva recaptura, secretos ni promoción. Intención existente viene de Ingreso→transcripción→archivo→PublicacionCapturaPendiente. No reutilizar /sistema/blog como sustituto. Publicar ambos destinos requiere previa/consentimiento exacto y proveedores/planificador reales; no afirmados aquí.
+
+**Coordinación corpus/Seguridad:** solicitud enviada a autor del estándar session://ecea4187-8241-819b-af83-0003b7c205f7/3fea4187-8241-80f2-9d08-00a9b6435a14 con referencia49de30bde952152f14c1fe67a07bf11a329e89cb, contrato khora.corpus-autobiografico0.1.0, especificación0.2.0, pendiente confirmar vigente. Original privado+owner+huella+revisión/ancla; corpus independiente de publicación; evidencia/afirmación/ratificación distintas. Checklist no materializa objetos del corpus ni produce consentimiento. No introducir esquema paralelo ni declarar consumidor integrado antes de validar contrato real.
+
+
+**Respuesta recibida del responsable del estándar (herramienta/mensaje):** confirmó lectura vigente49de30bde952152f14c1fe67a07bf11a329e89cb; schema0.1.0/spec0.2.0, consumidores pending_integration. Compatibilidad SOLO conceptual sobre la descripción C051, no código inspeccionado ni integración demostrada. Contrato cerrado: contract_id/schema_version; corpus_id/unit_id/revision; subject con atribución; source_id/revisión/sha256/occurrence_id/channel/medium/representation/integrity; anchor y coordenadas/rango explícitos; content/modality/eligibility; event_time con estado/descripción; captured_at real distinto de expressed_at/imported_at; review; governance(owner/policy+revision/sensitivity/retention+policy); derivation(generation/pipelineversion/policy). Texto/audio fuentes y huellas separadas con relaciones trazables; nunca hash de audio como hash de texto. Sesión/checkpoint por referencias, sin ampliar propiedades de esquema cerrado. Candidate+unreviewed/proposed hasta acto humano específico; validador no autentica actor ni consentimiento ni verdad ni anclas. Event_time desconocido declarado, no fecha capturada por sustitución. Lugar/actividad son contenido/ancla, no geolocalización inventada. Previas públicas y autorización por destino/proyección fuera del esquema mínimo; accepted NO permiso para publicar. Cifrado requiere además integridad byte/huella y políticas externas. No hay consumidor corpus integrado por C051. El mismo hilo está cerrando importador Takeout independiente: no convertirlo en dependencia de esta publicación ni asumir su objetivo como nuestro encargo.
+
+**Continuación:** integrar deltas no solapados; compilar candidata con prebuild completo, prueba B2 real y chat; verificar tracing3CSS, fuente/API y rutas privadas; promover solo si alias previo sigue6d; rollback solo a6d si esta promoción falla y sigue siendo nuestra. Persistir recibos técnicos y estado exacto después. Hito humano de revisión sigue abierto; publicación real Blog/Facebook y respaldo universal no acreditados. No fusionar main ni publicar el relato del operador por inferencia.
+
+**Antecedente C050, no estado terminal C051:**
+
 **ACTUAL C050 — CONTINUIDAD CENTRALIZANTE, ALMACENAMIENTO PRIVADO GRATUITO.** Se mantiene el sprint de22 puntos/5hitos; Hito1 NO cerrado hasta producción y recorrido humano verificable. El operador ordenó resolver de extremo a extremo almacenamiento gratuito accesible por API,10GB aceptables, para todos los datos cifrados de Khora (audio, volcados, eventos, grafo y otros). Autorizó navegador/RDC y uso privado del portapapeles para secretos necesarios. No se pide otra vez aprobación de B2. Fuente personal cargada NX-330m; no afirmar carga de otra versión por verla citada en antecedentes.
 
 **Hechos comprobados C050:** cuenta Backblaze autenticada tras recuperación autorizada de contraseña y verificación de correo; se seleccionó confiar este navegador. B2 habilitado, depósito khora-userdata-ecea4187 /35b8cbd6623b54a5a9130c18, región us-east-005, privado, cifrado SSE-B2, conserva versiones, ObjectLock desactivado. Sin tarjeta ni plan de pago ni eventos de cobro añadidos. Cuenta muestra topes reales gratuitos:10GB almacenamiento;1GB descarga/día;2500 operaciones claseB/día y2500 claseC/día. Editar caps exige tarjeta, por lo que no se alteraron. No prometer ilimitado, cuota de salida3x como si sustituyera este límite real, ni ausencia de fallos.
@@ -309,6 +339,8 @@ Texto público SIEMPRE trabajado; transcripcióncruda no se vuelca por defecto. 
 Investigación: Meta PageVideos indexado documenta replace_video_id/swap_mode=replace y códigooficial leído los incluye; existencia de mecanismo acreditada, NO funcionamiento en nuestraPágina/publicaciónorgánica ni conservaciónID/URL/reacciones/comentarios/vistas/subtítulos/fecha. HeyGen documenta avatarpropio consentido y animación con audio real; viable técnicamente, coste/control/retención/calidad no validados, rutaDigitalTwin crea también vozclonada separada. No asumirfree ni borrarvoz al borraravatar. Versiónpúblicayoriginal deben seguir vinculados si evolucionan. Producción/recuentoC038 son antecedentes no revalidados ni redeployados enC039; cero nuevas mutaciones de runtime, cuentas o activos públicos.
 
 ### ⚗️ En prueba / recién fallido
+
+C051:127unitarias/42Chromium/tipos aprobados localmente; primer banco fallido documentado y corregido. Fullgate/B2real/presentaciónChat/promoción nueva todavía pendientes; no cierre humano ni publicación Blog/Facebook.
 
 C050: producción combinada6d29682e verificada, gate773/771pass/0fail/2skipheredados y S3/CORS real aprobados. Prueba humana autenticada de audio y restore universal aún pendientes; no sustituirlos por pruebas sintéticas.
 
@@ -438,6 +470,10 @@ Toda salida conserva diez campos, agrupables sin ocultarlos: (1) proyecto/rol/se
 No llamar «sin cambios» a una fuente inaccesible; no convertir calidad científica o clínica en semáforo por pruebas de software. Si no hay constructor nuevo asignado, decirlo y no inventar trabajo en segundo plano.
 
 ## 11. Crónica y fuentes
+
+### C051 — Crónica personal, Backblaze y coherencia del corpus
+
+Mandato, originales operativos, diferencias de política, modificaciones, pruebas causales, fallos, límites y coordinación actual completos en §8/C051. La narración autobiográfica privada permanece en conversación/custodia; no se incorpora como fixture al repositorio. Gate/live todavía pendiente a este corte.
 
 ### C050 — Provisión B2 privada, integración combinada y promoción única LIVE
 
