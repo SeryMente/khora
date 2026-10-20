@@ -21,6 +21,13 @@ FETCH_HEAD
 
 node_modules/
 
+# Generated verbatim Open WebUI 0.12.3 assets, integrity-checked during prebuild.
+/khora-web/public/_app/
+/khora-web/public/assets/
+/khora-web/public/licenses/
+/khora-web/public/OPENWEBUI-LICENSE*.txt
+/khora-web/public/openwebui-static-manifest.json
+
 # Artefactos JS compilados (usamos tsx sobre .ts)
 khora-web/lib/utils/*.js
 khora-web/tests/*.js

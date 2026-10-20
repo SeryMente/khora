@@ -1,3 +1,3 @@
 {
-  "buildCommand": "if [ \"$VERCEL_ENV\" = \"production\" ]; then node scripts/migrate-runtime.mjs; fi && npm run build"
+  "buildCommand": "npm run build"
 }
