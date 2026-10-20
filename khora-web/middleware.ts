@@ -1,6 +1,6 @@
 // @l0 L0-002 §4 · @req AUTH-F1-01/REQ-1 · @acr ACR-1.2 · @req UI-REVIEW/SECURITY
 import { auth } from "@/auth";
-import { openWebUIPath } from "./lib/chat-routes";
+import { bundledOpenWebUIAsset, openWebUIPath } from "./lib/chat-routes";
 import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
 import { resolverGeneracion } from "./lib/server/generacion";
 
@@ -55,7 +55,7 @@ const authMiddleware = auth((req) => {
 
   // Native chat is explicit opt-in; never expose the bridge key in an external rewrite.
   // The Node route independently rechecks the real session (test bypass is not authority).
-  if (process.env.KHORA_CHAT_ENABLED === "1" && openWebUIPath(pathname)) {
+  if (process.env.KHORA_CHAT_ENABLED === "1" && openWebUIPath(pathname) && !bundledOpenWebUIAsset(pathname)) {
     const destino = req.nextUrl.clone();
     destino.pathname = "/api/khora-chat/proxy";
     destino.searchParams.set("path", pathname);
