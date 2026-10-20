@@ -1,3 +1,5 @@
+ESTADO CORREGIDO: SALIDA PREPARADA NO EMITIDA. No es registro de respuesta final efectiva.
+
 **No está cerrado de extremo a extremo todavía.** El núcleo de transferencia cifrada y autorización Google ya quedó guardado en GitHub y leído de vuelta: 66 pruebas sintéticas aprobadas. No se importaron datos tuyos ni se cambió producción.[^https://github.com/SeryMente/khora/commit/a8572afd4aec1ce0251a9016b160df48774c77a9]
 
 El acceso de Vercel reconectó, pero el proyecto de Khora devuelve `403`. Probé también la vía oficial aislada: no llegó a emitir un desafío de autorización y detuve esa espera. El otro hilo conserva un acceso válido en la máquina actual; no voy a usarla por inferencia.
