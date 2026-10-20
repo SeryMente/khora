@@ -1,6 +1,6 @@
 // @l0 L0-002 §4 · @req AUTH-F1-01/REQ-1 · @acr ACR-1.2 · @req UI-REVIEW/SECURITY
 import { auth } from "@/auth";
-import { bundledOpenWebUIAsset, openWebUIPath } from "./lib/chat-routes";
+import { bundledOpenWebUIAsset, nativeDefaultAvatarPath, openWebUIPath } from "./lib/chat-routes";
 import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
 import { resolverGeneracion } from "./lib/server/generacion";
 
@@ -51,6 +51,12 @@ const authMiddleware = auth((req) => {
     const url = new URL("/api/auth/signin", req.nextUrl.origin);
     url.searchParams.set("callbackUrl", req.nextUrl.pathname + req.nextUrl.search);
     return NextResponse.redirect(url);
+  }
+
+  // The native profile-picture URL gets only the generic pinned upstream icon.
+  // Never proxy user UUIDs, query profiles or grant access to another identity.
+  if (process.env.KHORA_CHAT_ENABLED === "1" && ['GET', 'HEAD'].includes(req.method) && nativeDefaultAvatarPath(pathname)) {
+    return NextResponse.rewrite(new URL('/user.png', req.nextUrl.origin));
   }
 
   // Native chat is explicit opt-in; never expose the bridge key in an external rewrite.
