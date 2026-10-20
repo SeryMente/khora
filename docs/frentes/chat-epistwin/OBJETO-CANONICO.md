@@ -2,7 +2,7 @@
 
 ## 1. Control e identidad
 
-- Objeto vivo único: `docs/frentes/chat-epistwin/OBJETO-CANONICO.md`, SeryMente/khora, rama `docs/chat-epistwin-20261017`. Versión **0.22**, sello **KHORA-CHAT-EPISTWIN-v0.22**, ancla **E63 · Render autorizado, compilación nativa publicada con flag0 y Neon técnico recuperado; acceso Vercel pendiente, 2026-10-19**. **ENT01 NO entregada/publicada/aceptada; sin ENT02.**
+- Objeto vivo único: `docs/frentes/chat-epistwin/OBJETO-CANONICO.md`, SeryMente/khora, rama `docs/chat-epistwin-20261017`. Versión **0.23**, sello **KHORA-CHAT-EPISTWIN-v0.23**, ancla **E64 · Vercel autorizado y producción concurrente revalidada; checkout reproducible pendiente de autorización GitHubCLI, 2026-10-19**. **ENT01 NO entregada/publicada/aceptada; sin ENT02.**
 - Candidato de código vigente: **PR331**, `fix/chat-epistwin-ent01-main-20261019`, cabeza **3eb0f1f38977c42203db7581abb516a91a0a5357**, base/main **bd29c924393fcbd9183100f66b2e50c87b791207**; open/draft/merged=false/40archivos revalidados por GitHubMCP. Delta sobre4c6c40b: User-Agent explícito del proveedor Python para generar/stream/embeddings, cuatro pruebas focales y evidencia Groq/fVAL real. **Backend Render publicado en esa cabeza con chat nativo explícitamente apagado; frontend nativo NO publicado.** No confundir este despliegue parcial o la ruta preexistente/api/chat con ENT01 ni con fidelidad integral del grafo.
 - **PR317 cerrado sin fusionar**, título marcado sustituido por331; rama/historia10d5a91 conservadas. No trabajar dos candidatos ni reabrir el conflicto antiguo como estado vigente. La nueva rama nació de b5e7009de137db30c26ecc5f4ddbb34789f453f2 y preserva correcciones concurrentes de main.
 - Khora privado con push/admin revalidados por GitHub en E58. Esta revisión sustituye blob0.16 57ee902a5ba6738653f65ba5ff450312a92b5c35 mediante comparación de revisión antes de escribir; snapshot0.16 íntegro en95000c48990159f960ea67947bb8c01eb4546250. El commit42e1efb33dcdcf47abd66eb9ac5abfd57ca53632 es el checkpoint de contenido aportado por el operador; la punta documental observada95000c4 sirve el mismo blob. Snapshot0.15 íntegro: ee6670a5f29fc78f1861b0206d698790a29c88e6; historia anterior§11. No desplegar rama documental.
@@ -182,13 +182,22 @@ Esta subsección supersede el perfilGroq pendiente deE61 y el bloqueo de contras
 - Vercel: catálogoMCP no cargó (incluida conexiónVercel4); listado deservidores confirma conexiones, no sesiónutilizable. CLIoficial64.5.0 restaurado; whoami=Loggedout en entornoactual. GitHubstatus331 confirma que el despliegueGit automático falló por repositorioorganizaciónprivado/Hobby; no autoriza pago, hacerrepo público ni crearhosting. RecuperaciónCLIoficial iniciada con enlace/código efímeros solo enchat; requiere aprobaciónhumana. No copiar códigos aGit ni prometerpublicaciónenfondo. Estadofrontendconcurrente no revalidado ni sobrescrito; continuar porCLI en elproyectoexistente cuando autorice, conservandoE53/E54.
 - EvidenciaE59/E60/E62 reutilizada con sus límites: esta compilación real no acredita OpenWebUI habilitado, carga512MiB/reinicio nativo, recuperaciónsemánticapositiva/citas ni aceptaciónENT01. No extracción/notasprivadas/ingestiónsinaprobación niENT02.
 
+### E64 · Vercel autorizado y preflight de publicación sin sobrescribir producción
+
+- Original del operador: «Autorizado», en respuesta al enlace oficial de recuperaciónVercel deE63. CLI64.5.0 confirma signedin/cuenta victorhugotorresmendez-8991; projectinspect verifica prj_hRN86BKITXYKTnNlp0ygVhaMwFfx/equipo team_QBa5UlffJWznZ8ogFfKjaGQb/rootkhora-web/Node24.x. No pedir otra autorizaciónVercel ni clavesRender/Groq.
+- Producción efectiva revalidada mediante APIoficial: dpl_86iMKAAGQoQEE1zXHfsinuoeKWDb, READY, alias khora-web.vercel.app; GitSource a74b40582cb0dfd762209a69675e469914a380ec/frente feat/ingreso-autobiografico-20261019, no331. No se cambió alias/despliegue/frontend/main. Commit a74b405 inspeccionado: cambios de crónica/Ingreso y lib/ingreso/cronica-coverage.ts, no son descartables ni autorización para fusionar330; preservarlos al integrar.
+- Metadatos deenvproduction leídos sin valores/descifrado: KHORA_API_URL/KHORA_API_KEY/X_KHORA_KEY presentes y solo production; GROQ_API_KEY production/preview/development. No copiar claves acliente/Git ni usar preview como equivalente productivo. Buildconfig real delproyecto: production ejecuta migrate-runtime.mjs antesdenextbuild; revisar precondiciones/migraciones antes de publicar, no lanzar por comodidad.
+- Recuperación de fuentes: Vercel /v6/deployments/.../files devolvió Filetree404, igual conteamId explícito; endpoint no ofrece árbol descargable de ese deployment, causa interna noacreditada. No implica falta de acceso alproyecto. Envls inicial sinvínculolocal rechazado; corregido con .vercel/project.json local usando solo IDs conocidos, envmetadatos yaPASS. Ninguna cirugía remota en esos intentos.
+- GitHubMCP permite directorios/archivos y commitparches; se inspeccionaron raícesapp/lib/scripts/public y proxy vigente, sin cambiar código. Sus URLs temporales dearchivo solo pueden usarse talcual, nunca extraer/reutilizar tokens para otroendpoint. El sandbox anterior sigue sin checkout completo; sesiónwebGitHub devuelve404/signinvisible. GitHubCLI oficialv2.102.0 restaurado deassetoficial con checksum publicado verificado; autenticaciónoficial de checkout iniciada y solicitada enchat, sin códigoefímero/clave enGit. No declarar GitHubMCPinaccesible ni afirmar que Vercelautorizado entrega por sí mismo uncheckout.
+- Checkpoint operativo: después de autorizarGitHubCLI, recuperar git completo de SeryMente/khora, verificar remoto/head/main/diff, integrar preservando331 y produccióna74b sin tocar main/mergeautomático; comprobar build/precondiciones/envs/límites y continuar las compuertas nativas reales ya pendientes. Render y Neon deE63 siguen como últimaevidencia, no se disparó otrodeploy. Todavía NO ENT01, ni entrega/aceptación/citas/carga512MiB acreditadas.
+
 ### Acceso remoto para asistencia
 
 list_devices verifica nuevaPC-14 online, a960759c-7557-451d-936a-73aa791f5f58; equipos anterioresoffline no heredados. No comando remoto, construcción ni extracción de datos realizado. Solo asistencia estrictamente necesaria puede usar ese dispositivo; construcción jamásRDC. El userlog registra cuentaelathanor111@gmail.com y ruta deperfilPC13; son datos declarados, no identidadWindows/repo comprobados. No guardar códigos de autorización ni claves enGit. Iniciadorcanónico solo si vuelve a ser necesario: `npx @wonderwhy-er/desktop-commander@latest remote --no-persist-session`.
 
 ## 8. Estado vivo
 
-**ENT01 en implementación, NO publicada/entregada/aceptada.** PR331/3eb0f1f draft/sinmerge. Backend LIVE con compilaciónoficialnativa ya instalada enRender, mismaURL/free/chatnativo=0/autoDeployoff; credencialNeontécnica recuperada yTLSreal verificado. Circuito preexistente Khora→Groq HTTP200/streaming despuésdeldeploy. No otra claveGroq/Render niPC-8. Pendientes autorizaciónVercelactual, recuperaciónnativareal/citas, capacidad/reinicio ypublicaciónfrontend sinpisarotrofrente.
+**ENT01 en implementación, NO publicada/entregada/aceptada.** PR331/3eb0f1f draft/sinmerge. Backend LIVE con compilaciónoficialnativa ya instalada enRender, mismaURL/free/chatnativo=0/autoDeployoff; credencialNeontécnica recuperada yTLSreal verificado. Circuito preexistente Khora→Groq HTTP200/streaming despuésdeldeploy. No otra claveGroq/Render niPC-8. Vercelactual yaautorizado yproducciónconcurrente revalidada; pendiente checkoutGitHubCLI, recuperaciónnativareal/citas, capacidad/reinicio ypublicaciónfrontend sinpisarotrofrente.
 
 ### Evidencia histórica de origen · reutilizar si archivos/supuestos no cambian
 
@@ -227,11 +236,11 @@ FuentevisualbuildOOM/arranqueanterior y24tests históricos0.15 permanecen en sna
 
 **🔄 Estado vivo**
 
-ENT01 noentregada. PR331/3eb0f1f38977c42203db7581abb516a91a0a5357 abierto/draft/sinmerge, mainbd29c924393fcbd9183100f66b2e50c87b791207. Render dep-dbbbhulg1s2s738b07hg LIVE/mismaURL/free/rama331/autoDeployoff; buildoficialslimOpenWebUI0.12.3 pasa, KHORA_CHAT_ENABLED=0. Secretostécnicosnativos provisionados sin recrear schema/roles y NeonPG17.11/TLSverify-full/aislamiento runtime verificados. CircuitoKhoraautenticado→Vercel→Render→Groq HTTP200/streamingreal posdeploy; NO OpenWebUI habilitado ni fidelidadrecuperación/citas. Siguiente paso atómico: completar autorizaciónoficialVercelCLI iniciada enchat (whoamiLoggedout; no otrobearerRender/Groq), revalidarproducciónconcurrente ypreservarla antesdepublicación. Después verificar proxy/propiedad/durabilidadnativos, corpuspúblicoaprobado/recuperaciónsemántica sinhashfallback, capacidad512MiB/reinicio yrecorridocompleto; uso/corrección/conformidadoperador antesENT02. No notasprivadas, ingestasilenciosa, hosting/pago ni trabajoenfondo.
+ENT01 noentregada. PR331/3eb0f1f38977c42203db7581abb516a91a0a5357 abierto/draft/sinmerge, mainbd29c924393fcbd9183100f66b2e50c87b791207. Render dep-dbbbhulg1s2s738b07hg LIVE/mismaURL/free/rama331/autoDeployoff; buildoficialslimOpenWebUI0.12.3 pasa, KHORA_CHAT_ENABLED=0. Secretostécnicosnativos provisionados sin recrear schema/roles y NeonPG17.11/TLSverify-full/aislamiento runtime verificados. CircuitoKhoraautenticado→Vercel→Render→Groq HTTP200/streamingreal posdeploy; NO OpenWebUI habilitado ni fidelidadrecuperación/citas. Siguiente paso atómico: completar autorizaciónoficialGitHubCLI decheckout iniciada enchat, recuperarrepo/verificarremoto/head/main/diff ypreservarproduccióna74b/Ingreso antesdepublicar. VercelCLIyaautorizado/proyectocorrecto; clavespuente están soloenproduction, sinlecturadevalores; revisar migracionesprebuild antesdecualquierpublicación. No repetirVercel/Render/Groq. Después verificar proxy/propiedad/durabilidadnativos, corpuspúblicoaprobado/recuperaciónsemántica sinhashfallback, capacidad512MiB/reinicio yrecorridocompleto; uso/corrección/conformidadoperador antesENT02. No notasprivadas, ingestasilenciosa, hosting/pago ni trabajoenfondo.
 
 **⚗️ En prueba / recién fallido**
 
-Renderbuildslimreal/NeonTLS/Groqstream PASS; nativoapagado. VercelCLIautorización pendiente; recuperación/citas/carga/reinicionativo/aceptación siguen NO VERIFICADOS.
+Renderbuildslimreal/NeonTLS/Groqstream PASS; nativoapagado. VercelCLIautorizado; checkoutGitHubCLIautorización pendiente. Recuperación/citas/carga/reinicionativo/aceptación siguen NO VERIFICADOS.
 
 ### Recepción E58 · bloqueo histórico resuelto en E59
 
@@ -253,7 +262,7 @@ Upstream OpenWebUI0.12.3, `routers/auths.py` líneas aproximadas660–745: el mo
 
 ### Pendientes finitos de implementación para la instancia receptora
 
-1. Completar autorizaciónoficialVercelCLI ya iniciada, comprobar cuenta/proyecto/producciónconcurrente ypreservarla. RenderCLI yaautorizado; buildslim ysecretosnativos ya recuperados. No pedir otra claveGroq/Render ni recrear schema/roles.
+1. Completar autorizaciónoficialGitHubCLI decheckout ya iniciada; recuperar git completo yverificarremoto/head/main/diff antes de integrar preservando331/produccióna74b. VercelCLI yaautorizado yproducciónrevalidada; envspuente soloenproduction, migracionesprebuild requierenpreflight. RenderCLI/buildslim/secretosnativos ya recuperados. No pedir otra claveGroq/Render/Vercel ni recrear schema/roles.
 2. Verificar proxyautenticado/identidad/propiedad/durabilidadnativos sin entradaRenderdirecta; resolver recuperaciónsemánticapública real/corpusaprobado en núcleo/grafoexistentes. Proyecciónconsultada vacía yfallbackhash no acreditan fidelidad. Probarrespuesta/citas/fVALglobal/insuficiencia/repregunta/aislamiento medianteOpenWebUI, no solo chatdirectoGroq. Sin notasprivadas/ingestasilenciosa/motorparalelo.
 3. Cerrar capacidadconjunta512MiB/reinicio/regresiónnativa antesdehabilitar/publicar. Buildslim remoto yaPASS y servicioLIVE; KHORA_CHAT_ENABLED=0/rama331/autoDeployoff. EnvMCP dispara deploy; controlarcommitexacto sin duplicarlo. No nuevo hosting/plan/pago.
 4. Publicar frontendexacto preservandofrenteconcurrente/mismaURL, comprobarOpenWebUIcompleto/corregir y obteneruso/conformidadexpresa antesENT02. No READY/build/GroqdirectocomoENT01. Mantener esteobjetoreleído; no prometersegundoplano niETAinventada.
@@ -791,3 +800,11 @@ Original verbatim del operador:
 > Autorizada la herramienta de render
 
 Interpretación separada: completar recuperación oficialRender y continuar el encargo vigente; no autoriza pago, publicacióninsegura, uso de notasprivadas ni aceptaciónENT01. Hechos y límites nuevos en§7E63/§8; autorizaciónVercel se solicita únicamente por accesoactualausente probado, sin repetirRender/Groq.
+
+### E64 · autorización Vercel · 2026-10-19
+
+Original verbatim del operador, en respuesta a la recuperación oficialVercel iniciada:
+
+> Autorizado
+
+Interpretaciónseparada: autorizaciónVercelconfirmada porCLI; no autorizaciónGitHubCLI porinferencia ni conformidadENT01. Evidencia ycheckpoint en§7E64/§8. Código de dispositivoGitHub solicitado soloenchat, nuncaenGit.
