@@ -145,6 +145,11 @@ class NativeChatRuntime:
         memory=Neo4jMemoriaOrganizada(neo4j_config['uri'],neo4j_config['user'],neo4j_config['password'])
         try:
             init_db(self.history) # Only verifies the existing kernel schema; no DDL.
+            if os.getenv('KHORA_CHAT_E72_INDEX') == '1':
+                import asyncio, json
+                from api.chat_public_fixture import ensure_index
+                report=await asyncio.to_thread(ensure_index,memory)
+                print('KHORA_E72_INDEX_RECOVERED '+json.dumps(report,sort_keys=True))
             async with self.native.router.lifespan_context(self.native):
                 await register_native_pipe()
                 install_host_binding(self.native,puerto_llm=provider,memoria=memory,db_path=self.history)

@@ -14,3 +14,7 @@ python -c 'import importlib.metadata as m; assert m.version("open-webui")=="0.12
 if [ "${KHORA_CHAT_PUBLIC_READINESS_PROBE:-0}" = "1" ]; then
     python -m api.probe_chat_public_readiness
 fi
+
+if [ -n "${KHORA_CHAT_E72_INGEST:-}" ] && [ "${KHORA_CHAT_E72_INGEST}" != "0" ]; then
+    python -m api.chat_public_fixture
+fi
