@@ -2,7 +2,7 @@
 
 ## 1. Control e identidad
 
-- Objeto vivo único: `docs/frentes/chat-epistwin/OBJETO-CANONICO.md`, SeryMente/khora, rama `docs/chat-epistwin-20261017`. Versión **0.26**, sello **KHORA-CHAT-EPISTWIN-v0.26**, ancla **E70 · checklist solicitado por el operador; arranque nativo aa1d56ff activo con Neon, frontend y recorrido integral pendientes; 2026-10-20**. **ENT01 NO entregada/publicada/aceptada; sin ENT02.**
+- Objeto vivo único: `docs/frentes/chat-epistwin/OBJETO-CANONICO.md`, SeryMente/khora, rama `docs/chat-epistwin-20261017`. Versión **0.27**, sello **KHORA-CHAT-EPISTWIN-v0.27**, ancla **E72 · autorización expresa de una única fuente ficticia para prueba acotada; ejecución y aceptación pendientes; 2026-10-20**. **ENT01 NO entregada/publicada/aceptada; sin ENT02.**
 - Candidato de código vigente: **PR331**, `fix/chat-epistwin-ent01-main-20261019`, cabeza **aa1d56ff23dfe2537d738669905ab4df5acf8e1d**, base/main **bd29c924393fcbd9183100f66b2e50c87b791207**; open/draft/merged=false/123 archivos/10 commits revalidados E68. No fusionar ni quitar draft. Integración de producción a74b405 conservada en558f093e. **Render live enaa1d56ff23dfe2537d738669905ab4df5acf8e1d**, deploydep-dbbq0prrjlhs73eqpep0/finished2026-10-20T17:13:44.091989Z; KHORA_CHAT_ENABLED=1 fusionado explícitamente, sin leer otros valores. Arranque nativo con Neon superó el fallo previo de confianza; no recorrido completo ni capacidad acreditados. Frontend público reporta91d729396398240f0b4745fd5645f15c7c9fd935 por/api/version; no publicó este hilo ni acredita ENT01. Cotejar producción concurrente antes de promover. Voyage ya fue provisionado y probado con corpus artificial E67; no volver a pedir su clave. El estado0.24/E66 de credencial ausente queda histórico, supersedido por§7E67/E68.
 - **PR317 cerrado sin fusionar**, título marcado sustituido por331; rama/historia10d5a91 conservadas. No trabajar dos candidatos ni reabrir el conflicto antiguo como estado vigente. La nueva rama nació de b5e7009de137db30c26ecc5f4ddbb34789f453f2 y preserva correcciones concurrentes de main.
 - Khora privado con push/admin revalidados por GitHub en E68. Esta revisión sustituye blob0.16 57ee902a5ba6738653f65ba5ff450312a92b5c35 mediante comparación de revisión antes de escribir; snapshot0.16 íntegro en95000c48990159f960ea67947bb8c01eb4546250. El commit42e1efb33dcdcf47abd66eb9ac5abfd57ca53632 es el checkpoint de contenido aportado por el operador; la punta documental observada95000c4 sirve el mismo blob. Snapshot0.15 íntegro: ee6670a5f29fc78f1861b0206d698790a29c88e6; historia anterior§11. No desplegar rama documental.
@@ -238,6 +238,16 @@ Esta subsección supersede el perfilGroq pendiente deE61 y el bloqueo de contras
 ### Acceso remoto para asistencia
 
 list_devices verifica nuevaPC-14 online, a960759c-7557-451d-936a-73aa791f5f58; equipos anterioresoffline no heredados. No comando remoto, construcción ni extracción de datos realizado. Solo asistencia estrictamente necesaria puede usar ese dispositivo; construcción jamásRDC. El userlog registra cuentaelathanor111@gmail.com y ruta deperfilPC13; son datos declarados, no identidadWindows/repo comprobados. No guardar códigos de autorización ni claves enGit. Iniciadorcanónico solo si vuelve a ser necesario: `npx @wonderwhy-er/desktop-commander@latest remote --no-persist-session`.
+
+### E72 · autorización material expresa de prueba acotada
+
+Original del operador, respuesta directa a la solicitud «¿Autorizas esa ingesta de prueba acotada? La necesito como excepción expresa a la prohibición vigente de ingesta; no habilita la segunda entrega ni importa tu archivo.»:
+
+> Si la necesitas si, nada mas que no se convierta enun problema. Sigue resolviendo y no te detengas.
+
+Interpretación separada: SÍ autoriza exclusivamente incorporar una fuente ficticia identificada, «Lumen es una baliza ficticia de color ámbar. Cobalto es un vehículo ficticio de color azul.», al núcleo/grafo existente para probar ENT01. No autoriza importar notas/archivo personal, converger mapaPostgreSQL→Neo4j, ampliar arquitectura/egress/costos, ENT02 ni aceptación anticipada. Colisiones/composición desconocida bloquean solo la escritura afectada. Usar fuente con hash/procedencia y alcance identificable, vectores Voyage reales sin hashfallback, índice derivado recuperable y ruta de retirada limitada a ese origen. No fingir extracción LLM: la fuente de prueba es anotada explícitamente. Ejecutar positivos/citas/insuficiencia/seguimiento/propiedad/carga/reinicio/publicación; mantener PR331 draft/sinmerge.
+
+Delta E71 verificado antes de esta aprobación: GitHubCLI/VercelCLI autenticados, no volver a pedirlos; Render af11d3b271960ffa8ae29e1e6a0eefe3b76d8b70 live; Voyage real estricto1024 con texto artificial. Diagnóstico READ de proyecciónNeo4j:0nodos semánticos activos/0públicos, índice sinmetadata/huella/revisión/sello; NO significa archivo personal vacío. d7d8cd00 preservó delta producción91d72939; d94c9954a61ddbcce78b4b3c728540650474af83 corrige entrega de estáticos oficiales intactos tras autenticación. CandidatoVercel dpl_GE4jRo82xrPH9qr8B55L68vmGY9J READY/build747PASS de749 con2omitidas, NO prueba UI/ENT01. Dos pruebas previas fueron revertidas a dpl_DwpBmN77u3C5LWFYq5FMykPqcqkr; alias último observado producción91d72939. H01✓/H02◐/H03✓/H04en ejecución autorizada/H05pendiente/H06◐/H07pendiente/H08◐/H09pendiente. Estado vigente E72 supersede pendientes de login/decisión de ingesta históricos E70 y anteriores.
 
 ## 8. Estado vivo
 
@@ -930,3 +940,10 @@ Originalverbatimdeloperador:
 > Donde se quedo el otro modelo? Pero si revisa toda la covnersacion, y no solo unfragmento, sobre todo el  segmento final, donde se quedo’ Puedes hacer un checklist que me indique lo que falta ants de tener el primer  hito? Y presentarmelo a cada paso?
 
 Lecturaseparada: explicarúltimopuntorealdeladjuntoíntegro, noelcheckpointatrasadoE66; presentarlistafijaen cadaavance ymarcarcambiossolo conevidencia. MaterializaciónH01–H09en§8yherencia§10/§12. Elotro modeloterminócorrigiendoTLSdespués deprovisionar/probarVoyage; nofaltabasuclave. Recepciónactualcontinúa nativoaa1d56ff; entregaENT01siguependiente. No actoradicional ni plan nuevo.
+
+
+### E72 · respuesta de autorización acotada · sesión actual
+
+> Si la necesitas si, nada mas que no se convierta enun problema. Sigue resolviendo y no te detengas.
+
+Contexto y límites vigentes en§7/E72; no aceptación ENT01 ni permiso ENT02.
