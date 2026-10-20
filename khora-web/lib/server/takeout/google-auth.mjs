@@ -27,14 +27,14 @@ export function beginDriveAuthorization({owner,config,now=Date.now()}){
 }
 function digestChallenge(s){return createHash('sha256').update(s).digest('base64url')}
 function matchState(a,b){if(!opaque(a)||!opaque(b))return false;const aa=Buffer.from(a),bb=Buffer.from(b);return aa.length===bb.length&&timingSafeEqual(aa,bb)}
-async function exchange(fields,fetcher,now){
+async function exchange(fields,fetcher,now,allowInheritedScope=false){
  let r;try{r=await fetcher('https://oauth2.googleapis.com/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded','Accept':'application/json'},body:new URLSearchParams(fields),redirect:'error',cache:'no-store',signal:AbortSignal.timeout(20000)})}catch{fail('GOOGLE_TOKEN_TRANSPORT_FAILED')}
  if(!r.ok){await r.body?.cancel().catch(()=>{});fail('GOOGLE_GRANT_REJECTED')}
  if(!r.body)fail('GOOGLE_TOKEN_INVALID');const reader=r.body.getReader();let n=0;const chunks=[];
  try{for(;;){const {done,value}=await reader.read();if(done)break;n+=value.length;if(n>65536)fail('GOOGLE_TOKEN_INVALID');chunks.push(Buffer.from(value))}}finally{await reader.cancel().catch(()=>{});reader.releaseLock()}
  let t;try{t=JSON.parse(Buffer.concat(chunks).toString('utf8'))}catch{fail('GOOGLE_TOKEN_INVALID')}
  if(typeof t.access_token!=='string'||t.access_token.length<8||t.access_token.length>16384||/[\x00-\x20\x7f]/.test(t.access_token)||t.token_type?.toLowerCase()!=='bearer'||!Number.isInteger(t.expires_in)||t.expires_in<1||t.expires_in>7200)fail('GOOGLE_TOKEN_INVALID');
- if(t.scope!==DRIVE_SCOPE)fail('GOOGLE_SCOPE_MISMATCH');
+ if(t.scope!==DRIVE_SCOPE&&!(allowInheritedScope&&t.scope===undefined))fail('GOOGLE_SCOPE_MISMATCH');
  if(t.refresh_token!==undefined&&(typeof t.refresh_token!=='string'||t.refresh_token.length<8||t.refresh_token.length>16384||/[\x00-\x20\x7f]/.test(t.refresh_token)))fail('GOOGLE_TOKEN_INVALID');
  return {access_token:t.access_token,expires_at:now+t.expires_in*1000,...(t.refresh_token?{refresh_token:t.refresh_token}:{}),scope:DRIVE_SCOPE};
 }
@@ -47,4 +47,16 @@ export async function finishDriveAuthorization({owner,state,cookieState,code,con
  if(!t||Object.keys(t).some(k=>!['owner','state_hash','verifier','client_id','redirect_uri','expires_at'].includes(k))||t.owner!==owner||t.state_hash!==digest(state)||!opaque(t.verifier)||t.client_id!==config.clientId||t.redirect_uri!==config.redirectUri||!Number.isSafeInteger(t.expires_at)||t.expires_at<=now||t.expires_at>now+600000)fail('GOOGLE_STATE_EXPIRED_OR_USED');
  if(typeof config.clientSecret!=='string'||config.clientSecret.length<8||config.clientSecret.length>4096)fail('GOOGLE_CLIENT_NOT_CONFIGURED');
  return exchange({client_id:config.clientId,client_secret:config.clientSecret,code,code_verifier:t.verifier,redirect_uri:config.redirectUri,grant_type:'authorization_code'},fetcher,now);
+}
+
+/** Server-only refresh. Caller must load an authenticated owner-bound encrypted
+ * grant, serialize refresh and durably CAS-save the result before use. This
+ * helper neither authorizes a browser nor makes a long-running job durable. */
+export async function refreshDriveAuthorization({owner,grant,config,fetcher=fetch,now=Date.now()}){
+ configuration(config);
+ if(!ownerOK(owner)||!Number.isSafeInteger(now)||now<0||!grant||grant.owner!==owner||grant.scope!==DRIVE_SCOPE||grant.client_id!==config.clientId||Object.keys(grant).some(k=>!['owner','scope','client_id','refresh_token'].includes(k)))fail('GOOGLE_REFRESH_GRANT_INVALID');
+ if(typeof grant.refresh_token!=='string'||grant.refresh_token.length<8||grant.refresh_token.length>16384||/[\x00-\x20\x7f]/.test(grant.refresh_token))fail('GOOGLE_REFRESH_GRANT_INVALID');
+ if(typeof config.clientSecret!=='string'||config.clientSecret.length<8||config.clientSecret.length>4096)fail('GOOGLE_CLIENT_NOT_CONFIGURED');
+ const next=await exchange({client_id:config.clientId,client_secret:config.clientSecret,refresh_token:grant.refresh_token,grant_type:'refresh_token'},fetcher,now,true);
+ return {...next,refresh_token:next.refresh_token??grant.refresh_token};
 }
