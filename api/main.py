@@ -69,9 +69,26 @@ def _graph_health_payload(checks: dict) -> dict:
     ok = all(isinstance(value, int) and value == 0 for value in defects.values())
     return {"ok": ok, "defects": defects, **checks}
 
+def _embedding_configuration_presence(environ=None):
+    """Presence-only startup diagnostics; never return/log environment values.
+
+    Historical Windows setup is not proof of Render setup. This does not select
+    a provider, transfer a key, make a network call, enable chat or read a corpus.
+    """
+    env = os.environ if environ is None else environ
+    return {
+        "base_url_present": bool(env.get("KHORA_EMBEDDINGS_BASE_URL", "").strip()),
+        "adapter_key_present": bool(env.get("KHORA_EMBEDDINGS_API_KEY", "").strip()),
+        "model_present": bool(env.get("KHORA_EMBEDDINGS_MODEL", "").strip()),
+        "voyage_key_alias_present": bool(env.get("VOYAGE_API_KEY", "").strip()),
+        "voyage_model_matches_historical": env.get("KHORA_EMBEDDINGS_MODEL") == "voyage-4-large",
+    }
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global neo4j_driver
+    logging.warning("KHORA_EMBEDDINGS_CONFIGURATION %s", json.dumps(_embedding_configuration_presence(), sort_keys=True))
     missing_vars = []
 
     uri = os.getenv("NEO4J_URI")
