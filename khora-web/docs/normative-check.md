@@ -72,7 +72,7 @@ El comprobante `receipt` se comparte con el verificador mediante [normative-rece
 
 Los extras permitidos no sustituyen campos obligatorios ni se convierten silenciosamente. `cycle.id` solo blanco, fechas inválidas y encabezados blancos se rechazan semánticamente aunque un JSON Schema estructural pueda admitirlos. Los tipos públicos exportados se conservan; un campo auxiliar presente con tipo inválido no se repara.
 
-**Ejemplos válidos sin secretos (cobertura histórica del banco citado, no certificación de las diecinueve herramientas actuales):** `input(name)` y `receipt()` en [mcp_contract_concordance.test.ts](../tests/unit/mcp_contract_concordance.test.ts) generan entradas completas para las quince herramientas y se prueban contra publicación y registro reales. Son fixtures sintéticos ejecutables en aislamiento: sus tokens/hashes no autorizan uso productivo ni acreditan un ciclo verificado. La estructura exacta evoluciona en el esquema, no en copias de JSON en guías.
+**Ejemplos válidos sin secretos (banco aislado, no certificación productiva):** `input(name)` y `receipt()` en [mcp_contract_concordance.test.ts](../tests/unit/mcp_contract_concordance.test.ts) generan entradas completas para las diecinueve herramientas y se prueban contra los esquemas y el registro real por transporte SDK, con dependencias externas sustituidas. Son fixtures sintéticos ejecutables en aislamiento: sus tokens/hashes no autorizan uso productivo ni acreditan un ciclo verificado. La estructura exacta evoluciona en el esquema, no en copias de JSON en guías.
 
 ## Ciclo normativo
 
@@ -90,7 +90,7 @@ Los extras permitidos no sustituyen campos obligatorios ni se convierten silenci
 
 ## Autorización y configuración
 
-OAuth usa PKCE; los metadatos anuncian authorization_code, refresh_token y offline_access. La renovación depende también del cliente. `KHORA_API_KEY` es compatibilidad servidor-a-servidor, no credencial de usuario/modelo. Los Bearer de OAuth validan firma, issuer, audiencia, actor, scopes y generación; los manuales validan hash, recurso, vigencia, revocación individual y generación. No basta que un token tenga formato correcto. El challenge inicial anuncia runtime:read; no representa el conjunto mínimo efectivo de todas las herramientas.
+OAuth usa PKCE; los metadatos anuncian authorization_code, refresh_token y offline_access. La renovación depende también del cliente. `KHORA_API_KEY` es compatibilidad servidor-a-servidor, no credencial de usuario/modelo. Los Bearer de OAuth validan firma, issuer, audiencia, actor, scopes y generación; los manuales validan hash, recurso, vigencia, revocación individual y generación. No basta que un token tenga formato correcto. El challenge inicial anuncia runtime:read; no representa el conjunto mínimo efectivo de todas las herramientas. Los metadatos anuncian `blog:read`, pero en esta revisión la lista admitida por la emisión manual y `SUPPORTED_SCOPES` de `/api/oauth/token` todavía no lo incluyen. El catálogo de diecinueve herramientas y los fixtures con ese scope no acreditan que un cliente pueda obtenerlo por esos emisores; esa concordancia de emisión queda pendiente, sin ampliar permisos desde las pruebas.
 
 | Configuración del servidor | Uso; valores nunca incluidos en este documento |
 |---|---|
