@@ -28,3 +28,14 @@ Este expediente no contiene secretos. Estado vigente y continuación: OBJETO-CAN
 
 ## Fronteras
 No se borraron originales ni se cerró Hito1, ni se migró PostgreSQL/Neo4j ni se habilitó publicación. Registros de terminal no contienen contraseñas, claves, tokens, códigos de verificación ni sus huellas. La claveB2 no se halla en archivos del repo ni argumentos del proceso; transferencia cifrada efímera y entrada estándar al CLI.
+
+## Resultado remoto posterior, 2026-10-20
+- Commit205b7c20f7f8ab3f56e2c68b8b07065df0bc014a, rama feat/storage-b2-20261020, base4fb3b7d5f07efef770eac398646ff9d87f86b505.22rutas explícitas, push/cabeza cotejados;18archivos preparados cotejados porSHA256.
+- Proceso8492 exit0/321.58s. Candidata dpl_M4A14hSMrDhyweitkorboeM896Ch, READY, sin promoción de este central.
+- Log remoto750tests/748pass/0fail/2skip heredados; TypeScript y contratosUI/navegación0; Next81páginas. No borrar skips heredados ni decir sin omisiones.
+- Mensajes exactos: `[storage-preflight] encrypted roundtrip, exact hashes, anonymous denial, signed upload, exact-origin CORS passed`; `[storage-preflight] exact synthetic versions removed`.
+- Proceso18688: API candidata /api/version200/SHA205b7c20/ramaesperada/production; audio y token de importación401sin sesión. No autenticar por bypass de aplicación.
+- Incidente real: orden remota reejecutó migrador legado pese a --local-config externo. Proceso19092: fetch91d72939 exit0, diff de migrador+SQL contra205b7c20 exit0/salida vacía. Registro Notion actualizado; no afirmar sin migraciones ni sin efectosDB.
+- Proceso19968: alias canónico khora-web.vercel.app→dpl_GE4jRo82xrPH9qr8B55L68vmGY9J. Proceso20844: /api/version canónico401. Metadata CLI sin GitSHA no permite atribuir revisión. Constructor Enraizamiento3 identificó sus dosCLI y fuente; ver §8 del canon para acuerdo de integración, no borrar ni promover por encima.
+- Universo-datos informó contrato corpus autobiográfico arquitectura0.2.0/ejecutable0.1.0, commit49de30bde952152f14c1fe67a07bf11a329e89cb, sin merge/deploy/integración de consumidores. Reporte atribuido, no adopción implícita de sus23rutas ni código modificado por esa noticia.
+- Los diagnósticos auxiliares ASCII/archivo parcial fallaron antes de mutación, fueron registrados y corregidos. Ninguna salida contiene secretos.
