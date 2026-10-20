@@ -71,8 +71,12 @@ def _postgres(db_path: str) -> Iterator[Any]:
         }
         if not local:
             options["sslmode"] = "verify-full"
-            if not parse_qs(urlsplit(db_path).query).get("sslrootcert"):
-                options["sslrootcert"] = "system"
+            root = parse_qs(urlsplit(db_path).query).get("sslrootcert", [""])[-1]
+            if root in {"", "system"}:
+                # Binary libpq can use a different compiled-in OpenSSL store.
+                # Use maintained Mozilla roots, never disable chain/host checks.
+                import certifi
+                options["sslrootcert"] = certifi.where()
         with driver.connect(db_path, **options) as conn:
             yield conn
     except Exception as exc:

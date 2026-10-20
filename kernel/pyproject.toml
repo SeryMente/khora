@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "khora-kernel"
 version = "0.1.0"
 requires-python = ">=3.11"
-dependencies = []
+dependencies = ["certifi>=2024.7.4"]
 
 [project.scripts]
 khora = "khora_kernel.registro.cli:main"

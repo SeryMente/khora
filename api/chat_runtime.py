@@ -33,7 +33,9 @@ def configure_native_environment():
     query=dict(parse_qsl(parsed.query))
     if parsed.hostname not in {'localhost','127.0.0.1','::1'}:
         query['sslmode']='verify-full'
-        query.setdefault('sslrootcert','system')
+        if query.get('sslrootcert', '') in {'', 'system'}:
+            import certifi
+            query['sslrootcert'] = certifi.where()
     query['options']='-c search_path=khora_openwebui'
     database=urlunsplit(parsed._replace(query=urlencode(query)))
     settings={

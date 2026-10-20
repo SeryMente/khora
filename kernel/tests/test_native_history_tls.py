@@ -3,13 +3,14 @@ from contextlib import contextmanager
 from types import SimpleNamespace as NS
 from urllib.parse import parse_qs,urlsplit
 import logging
+import certifi
 import pytest
 from khora_kernel.engine import history
 from api.chat_runtime import configure_native_environment
 
 
-@pytest.mark.parametrize("url,root",[("postgresql://user@db.example.test/history","system"),("postgresql://user@db.example.test/history?sslmode=disable","system"),("postgresql://user@db.example.test/history?sslrootcert=/explicit/ca.pem",None)])
-def test_remote_verify_full_with_system_or_explicit_trust(monkeypatch,url,root):
+@pytest.mark.parametrize("url,root",[("postgresql://user@db.example.test/history",certifi.where()),("postgresql://user@db.example.test/history?sslmode=disable",certifi.where()),("postgresql://user@db.example.test/history?sslrootcert=system",certifi.where()),("postgresql://user@db.example.test/history?sslrootcert=/explicit/ca.pem",None)])
+def test_remote_verify_full_with_mozilla_or_explicit_trust(monkeypatch,url,root):
     captured={}
     @contextmanager
     def connect(path,**options):captured.update(options);yield object()
@@ -45,5 +46,17 @@ def test_native_webui_preserves_verify_full_and_adds_system_roots(monkeypatch):
     configure_native_environment()
     import os
     query=parse_qs(urlsplit(os.environ["DATABASE_URL"]).query)
-    assert query["sslmode"]==["verify-full"] and query["sslrootcert"]==["system"]
+    assert query["sslmode"]==["verify-full"] and query["sslrootcert"]==[certifi.where()]
     assert query["options"]==["-c search_path=khora_openwebui"]
+
+
+@pytest.mark.parametrize("root",["system","/explicit/ca.pem"])
+def test_native_webui_resolves_system_and_preserves_explicit_root(monkeypatch,root):
+    for key in ["KHORA_API_KEY","KHORA_CHAT_WEBUI_SECRET"]:monkeypatch.setenv(key,"synthetic-value-"*4)
+    monkeypatch.setenv("KHORA_CHAT_HISTORY_DATABASE_URL","postgresql://user@db.example.test/history")
+    monkeypatch.setenv("KHORA_CHAT_WEBUI_DATABASE_URL",f"postgresql://user@db.example.test/native?sslrootcert={root}")
+    configure_native_environment()
+    import os
+    query=parse_qs(urlsplit(os.environ["DATABASE_URL"]).query)
+    assert query["sslmode"]==["verify-full"]
+    assert query["sslrootcert"]==[certifi.where() if root=="system" else root]

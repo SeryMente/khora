@@ -1,0 +1,28 @@
+{
+  "scope": "Mozilla trust store for binary libpq; preserve verify-full and explicit custom CA",
+  "predecessor": "313efe35263807f039073d85e0be1ad03a511a34",
+  "tests": {
+    "passed": 106,
+    "skipped_existing_opt_in_pg": 8,
+    "deselected_live_neo4j": 2,
+    "subtests": 17,
+    "log_sha256": "07e0c17a7b1e09bdd528679e858ef97f0d63fcc0cb630010bf6a3810528b1404"
+  },
+  "files": {
+    "kernel/src/khora_kernel/engine/history.py": "e0b3d7d473d909f2ed777d85d0ff8f2c05a3d867e8cad499e38881bb73850f33",
+    "api/chat_runtime.py": "622a0a8c497894beea877f849bc012e43c40ba83c6e536561632eb9b42b2c443",
+    "kernel/pyproject.toml": "da96252205416545a409d4a6c8aaae1254cc6f989fecc365bfc2ad668e0fc56a",
+    "kernel/tests/test_native_history_tls.py": "282ddcc13d08b17a170b9670ffedf23e1c4183b881e07583c6a31386d5d35886"
+  },
+  "not_proven": [
+    "production TLS handshake",
+    "native lifespan",
+    "real graph citations",
+    "E2E",
+    "capacity",
+    "operator acceptance"
+  ],
+  "previous_live_failure": "KHORA_HISTORY_STORAGE_FAILURE category=tls_verification sqlstate=unavailable",
+  "no_credentials_read": true,
+  "no_tls_bypass": true
+}
