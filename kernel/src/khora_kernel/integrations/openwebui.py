@@ -76,11 +76,17 @@ class Pipe:
         def run_turn():
             from khora_kernel.engine.core import ejecutar_ciclo
             from khora_kernel.engine.history import load_ht
-            with binding.turn_guard():
+            from khora_kernel.embeddings import require_semantic_embeddings
+            with binding.turn_guard(), require_semantic_embeddings():
                 result = ejecutar_ciclo(
                     binding.session_id, question, binding.puerto_llm,
                     binding.memoria, binding.db_path, contexto=binding.contexto,
                 )
+                # Kernel preserves technical faults in Ht; do not label an
+                # unavailable semantic index/provider as ordinary insufficiency.
+                if any(isinstance(event, dict) and str(event.get("error", "")).startswith("EMBEDDING_")
+                       for event in getattr(result, "trace", [])):
+                    raise RuntimeError("SEMANTIC_RETRIEVAL_UNAVAILABLE")
                 evidence = []
                 if result.verdict == "SUFFICIENT" and result.citations and result.answer.strip():
                     ht = load_ht(binding.session_id, binding.db_path)

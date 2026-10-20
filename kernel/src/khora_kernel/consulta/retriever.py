@@ -35,7 +35,7 @@ class RetrieverGraphRAG(MotorDeConsulta):
         self.max_community_nodes = 200
 
     def consultar(self, pregunta: str, contexto: ContextoDeVisibilidad) -> ResultadoDeConsulta:
-        from khora_kernel.embeddings import knn
+        from khora_kernel.embeddings import knn, semantic_embeddings_required
 
         degradacion: list[str] = []
 
@@ -44,7 +44,11 @@ class RetrieverGraphRAG(MotorDeConsulta):
         if not getattr(self.memoria, "_driver", None) and hasattr(self.memoria, "mock_multi_hop") and self.puerto_embeddings is None:
             return self._consultar_mock([], contexto, degradacion)
 
-        semillas = knn(pregunta, 8)
+        if semantic_embeddings_required():
+            revision = self.memoria.get_graph_revision() if hasattr(self.memoria, "get_graph_revision") else None
+            semillas = knn(pregunta, 8, expected_graph_revision=revision)
+        else:
+            semillas = knn(pregunta, 8)
         semillas_ids = [sid for sid, _ in semillas]
         if not semillas_ids:
             return self._retornar_insuficiente(["Sin semilla knn"])
@@ -68,11 +72,13 @@ class RetrieverGraphRAG(MotorDeConsulta):
                     WHERE e.invalid_at IS NULL
                       AND c.invalid_at IS NULL
                       AND c.published = true
+                      AND ($private OR coalesce(e.visibilidad,'privado') = 'transparente')
                     RETURN DISTINCT sid, c.community_id AS community_id
                     ORDER BY community_id
                     """,
                     seeds=semillas_ids,
                     revision=graph_revision,
+                    private=contexto == ContextoDeVisibilidad.PRIVADO,
                 ))
                 community_ids = sorted({r["community_id"] for r in community_rows if r["community_id"]})
 
@@ -90,12 +96,14 @@ class RetrieverGraphRAG(MotorDeConsulta):
                         WHERE e.invalid_at IS NULL
                           AND c.invalid_at IS NULL
                           AND c.published = true
+                          AND ($private OR coalesce(e.visibilidad,'privado') = 'transparente')
                         RETURN DISTINCT e.canonical_key AS id
                         LIMIT $lim
                         """,
                         cids=community_ids,
                         revision=graph_revision,
                         lim=self.max_community_nodes,
+                        private=contexto == ContextoDeVisibilidad.PRIVADO,
                     )
                     member_ids = {r["id"] for r in member_rows if r["id"]}
 
@@ -106,6 +114,8 @@ class RetrieverGraphRAG(MotorDeConsulta):
                     WHERE all(x IN nodes(p) WHERE x.invalid_at IS NULL
                       AND any(label IN labels(x) WHERE label IN ['Entity','Literal','Blank']))
                       AND any(label IN labels(e) WHERE label IN ['Entity','Literal','Blank'])
+                      AND ($private OR all(x IN nodes(p) WHERE coalesce(x.visibilidad,'privado') = 'transparente'))
+                      AND ($private OR all(r IN relationships(p) WHERE r.invalid_at IS NULL AND coalesce(r.visibilidad,'privado') = 'transparente'))
                     RETURN DISTINCT
                       [x IN nodes(p) | coalesce(x.id,x.canonical_key)] AS path_nodes,
                       [x IN relationships(p) | {
@@ -115,6 +125,7 @@ class RetrieverGraphRAG(MotorDeConsulta):
                       }] AS path_edges
                     """,
                     seeds=semillas_ids,
+                    private=contexto == ContextoDeVisibilidad.PRIVADO,
                 )
                 expanded_ids: set[str] = set(semillas_ids) | member_ids
                 for row in expansion_rows:
@@ -134,6 +145,7 @@ class RetrieverGraphRAG(MotorDeConsulta):
                       AND any(label IN labels(a) WHERE label IN ['Entity','Literal','Blank'])
                       AND any(label IN labels(b) WHERE label IN ['Entity','Literal','Blank'])
                       AND a.canonical_key IN $ids AND b.canonical_key IN $ids
+                      AND ($private OR coalesce(r.visibilidad,'privado') = 'transparente')
                     RETURN coalesce(a.id,a.canonical_key) AS source,
                            coalesce(b.id,b.canonical_key) AS target,
                            coalesce(r.type,type(r)) AS relation,
@@ -148,6 +160,7 @@ class RetrieverGraphRAG(MotorDeConsulta):
                     ORDER BY source, target, relation
                     """,
                     ids=list(visible_ids),
+                    private=contexto == ContextoDeVisibilidad.PRIVADO,
                 )
 
                 node_rows = session.run(
@@ -208,12 +221,22 @@ class RetrieverGraphRAG(MotorDeConsulta):
                             graph_revision:$revision
                         })
                         WHERE c.invalid_at IS NULL AND c.published = true
+                          AND ($private OR (
+                            coalesce(c.visibilidad,'privado') = 'transparente'
+                            AND EXISTS { MATCH (:Entity)-[:IN_COMMUNITY]->(c) }
+                            AND NOT EXISTS {
+                              MATCH (member)-[:IN_COMMUNITY]->(c)
+                              WHERE member.invalid_at IS NOT NULL
+                                 OR coalesce(member.visibilidad,'privado') <> 'transparente'
+                            }
+                          ))
                         RETURN c.community_id AS id, c.summary AS summary,
                                c.graph_revision AS graph_revision
                         ORDER BY id
                         """,
                         cids=community_ids,
                         revision=graph_revision,
+                        private=contexto == ContextoDeVisibilidad.PRIVADO,
                     ):
                         if row["summary"]:
                             summaries.append(row["id"])

@@ -2,6 +2,8 @@
 import hashlib
 import json
 import os
+from contextlib import contextmanager
+from contextvars import ContextVar
 from pathlib import Path
 from typing import Any, List, Tuple
 
@@ -19,6 +21,48 @@ META_FILE = MAP_FILE.with_name(MAP_FILE.stem + "_meta.json")
 TEXT_FILE = MAP_FILE.with_name(MAP_FILE.stem + "_texts.json")
 _MODEL = None
 _MODEL_CALL_COUNT = 0
+
+# Native chat must never turn a provider failure into hash-based "semantics".
+_SEMANTIC_REQUIRED = ContextVar("khora_semantic_required", default=False)
+
+
+class SemanticEmbeddingUnavailable(RuntimeError):
+    """Safe machine code only: never include provider exceptions or secrets."""
+
+
+@contextmanager
+def require_semantic_embeddings():
+    token = _SEMANTIC_REQUIRED.set(True)
+    try:
+        yield
+    finally:
+        _SEMANTIC_REQUIRED.reset(token)
+
+
+def semantic_embeddings_required() -> bool:
+    return _SEMANTIC_REQUIRED.get()
+
+
+def _embedding_space_id() -> str:
+    endpoint = os.environ.get("KHORA_EMBEDDINGS_BASE_URL", "").rstrip("/")
+    model = os.environ.get("KHORA_EMBEDDINGS_MODEL", "").strip()
+    if not endpoint or not model or not os.environ.get("KHORA_EMBEDDINGS_API_KEY", "").strip():
+        raise SemanticEmbeddingUnavailable("EMBEDDING_PROVIDER_NOT_CONFIGURED")
+    # Hash endpoint/model/dimension, not credentials; distinct models never mix.
+    contract = json.dumps([endpoint, model, EMBED_DIM], separators=(",", ":"))
+    return hashlib.sha256(contract.encode()).hexdigest()
+
+
+def _validated_semantic_vector(vector) -> List[float]:
+    try:
+        array = np.asarray(vector, dtype=np.float32)
+        valid = array.shape == (EMBED_DIM,) and np.isfinite(array).all() and float(np.linalg.norm(array)) > 0
+    except (TypeError, ValueError, OverflowError):
+        valid = False
+    if not valid:
+        raise SemanticEmbeddingUnavailable("EMBEDDING_VECTOR_INVALID")
+    return array.tolist()
+
 
 
 def get_model() -> Any:
@@ -64,20 +108,30 @@ def _fallback_embedding(text: str, dim: int = EMBED_DIM) -> List[float]:
 def embed_text(text: str) -> List[float]:
     global _MODEL_CALL_COUNT
     _MODEL_CALL_COUNT += 1
+    strict = semantic_embeddings_required()
     try:
+        if strict:
+            _embedding_space_id()
         if os.getenv("KHORA_EMB_OFFLINE", "").lower() in {"1", "true", "yes"}:
+            if strict:
+                raise SemanticEmbeddingUnavailable("EMBEDDING_OFFLINE_NOT_SEMANTIC")
             return _fallback_embedding(text)
-        if os.getenv("KHORA_LLM_BASE_URL"):
+        if os.getenv("KHORA_EMBEDDINGS_BASE_URL") or os.getenv("KHORA_LLM_BASE_URL"):
             from khora_kernel.proveedores import ProveedorLLMGenerico
-            emb = ProveedorLLMGenerico().incrustar([text])[0]
-            if len(emb) == EMBED_DIM:
-                return emb
-            return _fallback_embedding(text)
+            vectors = ProveedorLLMGenerico().incrustar([text])
+            if strict:
+                if len(vectors) != 1:
+                    raise SemanticEmbeddingUnavailable("EMBEDDING_RESPONSE_INVALID")
+                return _validated_semantic_vector(vectors[0])
+            emb = vectors[0]
+            return emb if len(emb) == EMBED_DIM else _fallback_embedding(text)
         model = get_model()
         emb = model.encode(text, normalize_embeddings=True)
         result = emb.tolist() if isinstance(emb, np.ndarray) else list(emb)
         return result if len(result) == EMBED_DIM else _fallback_embedding(text)
     except Exception:
+        if strict:
+            raise SemanticEmbeddingUnavailable("EMBEDDING_PROVIDER_UNAVAILABLE") from None
         return _fallback_embedding(text)
 
 
@@ -178,23 +232,23 @@ def _save_index(
     MAP_FILE.parent.mkdir(parents=True, exist_ok=True)
     with INDEX_FILE.open("wb") as fh:
         np.savez_compressed(fh, vectors=vectors.astype(np.float32))
-    MAP_FILE.write_text(
-        json.dumps(ids, ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
-    META_FILE.write_text(
-        json.dumps(
-            {"graph_revision": graph_revision, "invalidated": False},
-            ensure_ascii=False,
-            indent=2,
-        ),
-        encoding="utf-8",
-    )
+    MAP_FILE.write_text(json.dumps(ids, ensure_ascii=False, indent=2), encoding="utf-8")
     if texts is not None:
-        TEXT_FILE.write_text(
-            json.dumps(texts, ensure_ascii=False, indent=2),
-            encoding="utf-8",
-        )
+        TEXT_FILE.write_text(json.dumps(texts, ensure_ascii=False, indent=2), encoding="utf-8")
+    strict = semantic_embeddings_required()
+    metadata = {
+        "graph_revision": graph_revision,
+        "invalidated": False,
+        "embedding_space_sha256": _embedding_space_id() if strict else None,
+    }
+    if strict:
+        metadata["artifacts_sha256"] = {
+            "vectors": hashlib.sha256(INDEX_FILE.read_bytes()).hexdigest(),
+            "ids": hashlib.sha256(MAP_FILE.read_bytes()).hexdigest(),
+            "texts": hashlib.sha256(TEXT_FILE.read_bytes()).hexdigest() if TEXT_FILE.exists() else None,
+        }
+    # Seal last: readers reject partial/replaced artifacts rather than mixing them.
+    META_FILE.write_text(json.dumps(metadata, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 def invalidate_index() -> None:
@@ -209,8 +263,27 @@ def invalidate_index() -> None:
     )
 
 
-def knn(query: str, k: int) -> List[Tuple[str, float]]:
-    if _read_meta().get("invalidated") is True:
+def knn(query: str, k: int, *, expected_graph_revision: str | None = None) -> List[Tuple[str, float]]:
+    meta = _read_meta()
+    if semantic_embeddings_required():
+        space = _embedding_space_id()
+        if (not expected_graph_revision or expected_graph_revision == "unknown"
+                or meta.get("graph_revision") != expected_graph_revision
+                or meta.get("invalidated") is True
+                or meta.get("embedding_space_sha256") != space):
+            raise SemanticEmbeddingUnavailable("EMBEDDING_INDEX_NOT_VERIFIED")
+        try:
+            actual = {
+                "vectors": hashlib.sha256(INDEX_FILE.read_bytes()).hexdigest(),
+                "ids": hashlib.sha256(MAP_FILE.read_bytes()).hexdigest(),
+                "texts": hashlib.sha256(TEXT_FILE.read_bytes()).hexdigest() if TEXT_FILE.exists() else None,
+            }
+            intact = meta.get("artifacts_sha256") == actual
+        except OSError:
+            intact = False
+        if not intact:
+            raise SemanticEmbeddingUnavailable("EMBEDDING_INDEX_ARTIFACTS_UNVERIFIED")
+    elif meta.get("invalidated") is True:
         return []
 
     ids = _read_ids()

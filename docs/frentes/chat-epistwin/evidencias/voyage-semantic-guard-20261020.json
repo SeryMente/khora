@@ -1,0 +1,92 @@
+{
+  "base_remote_commit": "638715af70af70896327116ce288654b8554df51",
+  "scope": "ENT01 native semantic safety; no UI/main/graph writes",
+  "public_voyage_probe": {
+    "provider": "Voyage",
+    "model": "voyage-4-large",
+    "public_artificial_only": true,
+    "notes_sent": false,
+    "credential_printed": false,
+    "attempts": 1,
+    "http_status": 200,
+    "vectors_count": 2,
+    "dimensions": [
+      1024,
+      1024
+    ],
+    "finite": true,
+    "usage": {
+      "total_tokens": 20
+    },
+    "ok": true
+  },
+  "actual_kernel_adapter_probe": {
+    "provider": "Voyage",
+    "model": "voyage-4-large",
+    "scope": "temporary synthetic index; no live graph; no personal notes",
+    "actual_existing_adapter": true,
+    "hash_fallback_used": false,
+    "index": {
+      "graph_revision": "artificial-revision-v1",
+      "nodes_indexed": 2,
+      "dimension": 1024
+    },
+    "ordered_ids": [
+      "artificial-lumen",
+      "artificial-cobalt"
+    ],
+    "positive_match": true,
+    "space_fingerprint_present": true,
+    "seconds": 0.519,
+    "ok": true
+  },
+  "controlled_tests": {
+    "passed": 94,
+    "subtests_passed": 17,
+    "skipped": 8,
+    "deselected": 2,
+    "limits": "existing opt-in PostgreSQL tests skipped; live Neo4j integration deselected; E59/E60 evidence reused, not rerun",
+    "log_sha256": "05322cd8ec66c12ebb19dfd17d5b2b3d56e9fa896e54efc035013a09c900e1a9"
+  },
+  "render_configuration": {
+    "deploy": "dep-dbbdb0om7kps73eio3ig",
+    "commit": "638715af70af70896327116ce288654b8554df51",
+    "status": "live",
+    "finished_at": "2026-10-20T02:46:24.602139Z",
+    "native_chat_enabled": false,
+    "environment_merge_replace": false,
+    "startup_presence": {
+      "adapter_key_present": true,
+      "base_url_present": true,
+      "model_present": true,
+      "voyage_key_alias_present": false,
+      "voyage_model_matches_historical": true
+    }
+  },
+  "guards": [
+    "native ContextVar scope, no semantic hash fallback",
+    "provider/model/dimension + exact graph revision and index artifacts integrity",
+    "public summaries require explicitly public community and all visible members; unknown private",
+    "public paths reject private/unknown/invalidated nodes and relationships",
+    "kernel semantic fault surfaced as technical error, not evidence insufficiency"
+  ],
+  "unchanged": [
+    "global fVAL visual/mark",
+    "empty REFINE rejection/tracing",
+    "PR draft/no merge",
+    "production Ingreso/Blog",
+    "native chat flag off"
+  ],
+  "not_verified": [
+    "live graph/index/citations",
+    "real Neo4j execution of privacy Cypher",
+    "native cloud capacity/restart",
+    "deployed frontend end-to-end/operator acceptance"
+  ],
+  "files_sha256": {
+    "kernel/src/khora_kernel/embeddings.py": "ffac883f58fb3d46f5764e4c4082f7bae7d6abfd3daa83942674814194a9d32b",
+    "kernel/src/khora_kernel/consulta/retriever.py": "8af4b7626134c7a58750456e1db6a7370c3be67830352f0ff525b74757afb60b",
+    "kernel/src/khora_kernel/integrations/openwebui.py": "cc2c4121201dd081905a018b767ec0a40ab060abe40746cb19dd9e4649e97913",
+    "kernel/tests/test_semantic_chat_guard.py": "d66f1f17efb9d8dd91b23963d0b4368bcaf1679ed021d331bb1a20f0324bd619"
+  }
+}
