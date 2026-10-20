@@ -1,0 +1,155 @@
+{
+  "event": "E74",
+  "checked_at": "2026-10-20T18:55:05Z",
+  "scope": "ENT01 approved fictional source only; operator acceptance pending",
+  "web": {
+    "alias": "https://khora-web.vercel.app",
+    "deployment": "dpl_BCEBkJPcCorVc4mBF8NnyyF4Qsac",
+    "source_commit": "6d29682eb5eab336785dd2f00b1d0d90ac7a09b4",
+    "source_mode": "manual-verified-clean-worktree",
+    "public_version_status": 200,
+    "promoter": "central Dictado; not this thread",
+    "combined_parent": "399929a1757323a00119beed7690efb77d6d99fa"
+  },
+  "runtime": {
+    "source_commit": "5192ec3232244f8d709b7c163b4643c52afd7c0e",
+    "deployment": "dep-dbbrbbfavr4c73dbu600",
+    "live_at": "2026-10-20T18:44:22.055898Z",
+    "official_per_operation_session_reuse": true,
+    "pool_size": 2,
+    "max_overflow": 0,
+    "ingest_flag": "0",
+    "index_recovery": "four verified persisted source vectors; no provider call or Neo4j write during recovery"
+  },
+  "fixture": {
+    "source_sha256": "f3c99ebb1fa023be68c85996391e0401b20e248ed66a664c69d22f446a48c5df",
+    "io_id": "ent01-public-fiction-e72-v1",
+    "nodes": 4,
+    "relations": 2,
+    "embedding_dimension": 1024,
+    "graph_revision": "7afe755124ac572f83fbb0b96ce1284b94366d12cf8c4fd45181500ed20b376f",
+    "annotation": "explicit manual fictional-source annotation; not LLM extraction or global EpisTwin accreditation",
+    "personal_archive_ingested": false
+  },
+  "native_ui_after_final_reload": {
+    "checks": [
+      {
+        "path": "/grafo",
+        "status": 200,
+        "redirected": false,
+        "finalPath": "/grafo"
+      },
+      {
+        "manifestStatus": 200,
+        "version": "0.12.3",
+        "wheel_sha256": "6d716039a5c15ecdb1db12f99dd9c79ea5c86d3d7bbd9a67054dd26f1f534747",
+        "manifest_sha256": "ab45e96f2d55b7bf220310e6906cd9a3a8e5b1cd39efda478200958242ad9f09",
+        "file_count": 5583,
+        "matches_expected_manifest": true
+      }
+    ],
+    "history": {
+      "followup": true,
+      "insufficiency": true,
+      "initial_answer": true,
+      "latest_answer": true,
+      "sidebar_today": true,
+      "composer": true
+    }
+  },
+  "native_api_observed": [
+    {
+      "path": "/api/config",
+      "status": 200,
+      "type": "application/json"
+    },
+    {
+      "path": "/api/config",
+      "status": 200,
+      "type": "application/json"
+    },
+    {
+      "path": "/api/v1/chats/",
+      "status": 308,
+      "type": "application/json"
+    },
+    {
+      "path": "/api/v1/chats/",
+      "status": 308,
+      "type": "application/json"
+    },
+    {
+      "path": "/api/v1/chats",
+      "status": 200,
+      "type": "application/json"
+    },
+    {
+      "path": "/api/v1/chats",
+      "status": 200,
+      "type": "application/json"
+    },
+    {
+      "path": "/api/models",
+      "status": 200,
+      "type": "application/json"
+    }
+  ],
+  "page_errors_during_final_observation": [],
+  "existing_routes": {
+    "/sistema/ingreso": 200,
+    "/sistema/custodia": 200,
+    "/sistema/consulta": 200,
+    "/grafo": 200
+  },
+  "history_notes": "native last-message pagination initially hid older turns; actual scroll restored first answer and contextual followup. Incorrect guessed /sistema/grafo404 is not the actual /grafo route.",
+  "guard_checks": {
+    "anonymous_frontend_proxy": 401,
+    "anonymous_direct_native": 401
+  },
+  "concurrency": {
+    "started_at": "2026-10-20T18:45:46Z",
+    "native_posts_200_at": [
+      "2026-10-20T18:46:14.171435632Z",
+      "2026-10-20T18:46:23.60082782Z"
+    ],
+    "chat_ids": [
+      "ab2cd529-3930-49f1-aee9-ad1c49e40301",
+      "b7887592-b4f7-4cc9-b547-ddd8e10c23ed"
+    ],
+    "completed_answers": [
+      "Ámbar",
+      "El vehículo ficticio Cobalto tiene el color azul."
+    ],
+    "native_done_flags": [
+      true,
+      true
+    ],
+    "citations_each": 4,
+    "neon_current_answers_verified": true,
+    "sampled_memory_bytes_max": 387952640,
+    "memory_limit_bytes": 536870900,
+    "scope_limit": "two test chats, not multitenant stress or latency SLA"
+  },
+  "tests": {
+    "runtime_causal_passed": 48,
+    "runtime_live_env_skipped": 1,
+    "combined_frontend_causal_passed": 23,
+    "combined_typecheck_exit": 0,
+    "combined_fullbuild_reported_by_promoter": {
+      "total": 773,
+      "pass": 771,
+      "fail": 0,
+      "inherited_skip": 2
+    },
+    "reserved_non_package_blobs_exact": 21,
+    "b2_credentials_exported_by_this_thread": false
+  },
+  "remaining_human_gate": "operator use, report discrepancies, correction if needed, explicit acceptance before ENT02",
+  "limitations": [
+    "No personal notes or archive ingested",
+    "No full EpisTwin fidelity claim",
+    "No ENT02 or operator acceptance",
+    "Observability HTTPError warning remains separate; no universal reliability claim",
+    "No main merge; PR331 remains draft"
+  ]
+}
