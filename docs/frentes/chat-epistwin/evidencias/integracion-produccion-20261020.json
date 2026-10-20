@@ -1,0 +1,416 @@
+{
+  "kind": "isolated_integration_not_published_not_accepted",
+  "base_pr331": "3eb0f1f38977c42203db7581abb516a91a0a5357",
+  "main": "bd29c924393fcbd9183100f66b2e50c87b791207",
+  "preserved_published_frontend": "a74b40582cb0dfd762209a69675e469914a380ec",
+  "runtime_production_patches": {
+    "worktree": "/data/khora-continuidad/integration-ent01-227rbkw5",
+    "applied": [
+      "bd90b7d094879a35d6f90c625325ec3137b244fc",
+      "b5ad2bfd6581a0a92ec302024cf846d83756a419",
+      "19b3966b6cdefc6edebea7d18e8e88acf102356b",
+      "bdc0255df9c9573575b25082706197a55bef7211",
+      "c0dcb2e26f9df31273bbf654ffc52222a7d9d887",
+      "b32f7c5ee888bb617446bb152d3b5041bdae4ed0",
+      "22f0fea34b77aa69ebdc51e346a2e2d4f0cbccc9",
+      "a74b40582cb0dfd762209a69675e469914a380ec"
+    ]
+  },
+  "tests": {
+    "unit": {
+      "tests": 719,
+      "pass": 719,
+      "fail": 0,
+      "skipped": 0
+    },
+    "next_build_exit": 0,
+    "next_version": "16.4.0",
+    "typescript": true,
+    "ui_review": true,
+    "navigation": true,
+    "blog_database": "PGlite real temporary, not Neon/production",
+    "blog_generator": {
+      "commit": "fb02d26a5f39838c6bd692b937d93bb21fd75761",
+      "blob": "bbaaf1f0d7f0cc7d0f13fbdb0e027c7191aa3e05",
+      "local_only": true
+    }
+  },
+  "files": [
+    {
+      "path": "khora-web/app/.well-known/oauth-authorization-server/route.ts",
+      "sha256": "382d4ae244bfd9e9273ef5c24b061399ef1e9f03d57299f95ada9dec0dc996dd",
+      "bytes": 1134
+    },
+    {
+      "path": "khora-web/app/api/audio/route.ts",
+      "sha256": "033c678531e089143fc4fe86a6c430799ec0b3f08756371aef4b79c30f759ce9",
+      "bytes": 7103
+    },
+    {
+      "path": "khora-web/app/api/dictado/checkpoint/route.ts",
+      "sha256": "3e1ab92f9173a3ddea826124725a80e6ab26377c8fe66766fd0c5f1ca1aadec9",
+      "bytes": 9544
+    },
+    {
+      "path": "khora-web/app/api/dictado/route.ts",
+      "sha256": "0e19c82b4008723e7801652da75f2a587f84f0924cf8ff5be5ef7e352a665dd7",
+      "bytes": 3913
+    },
+    {
+      "path": "khora-web/app/api/ingesta/route.ts",
+      "sha256": "7797764268900389544819b2b45f5b0176b11919daaac7d7d6e6c4c2e47b0562",
+      "bytes": 20898
+    },
+    {
+      "path": "khora-web/app/api/mcp/route.ts",
+      "sha256": "822e6ed54e9e604449346bbfb58dc78c823eca88a200f8010829e180e1c1e552",
+      "bytes": 27611
+    },
+    {
+      "path": "khora-web/app/components/ingreso/DialogoPanel.tsx",
+      "sha256": "78d15a22a1d78d762657769d1c041091da9db9291bc29101b351f01eca3f04fa",
+      "bytes": 25202
+    },
+    {
+      "path": "khora-web/app/components/ingreso/IngresoWorkspace.tsx",
+      "sha256": "0a57e11928d2327ff65f1585886ca56b9c67a461da96d7df707039aeae7a97c4",
+      "bytes": 100764
+    },
+    {
+      "path": "khora-web/app/components/ingreso/RecoveryDrawer.tsx",
+      "sha256": "6b69c933b4b1ac2a24c62bb1816fc4764ea5fe5c4e17f70ccf7a2359712c4da3",
+      "bytes": 6717
+    },
+    {
+      "path": "khora-web/app/components/ingreso/ingreso-studio.module.css",
+      "sha256": "5cf3808110df2bc7e28d3d863ed281450f7180b36e5d81df32a095977212d7ef",
+      "bytes": 12828
+    },
+    {
+      "path": "khora-web/app/components/shared/IngresoView.tsx",
+      "sha256": "9b62cf7afcf898dbced3675b0a70b851a08856f84b2770822b71cf4460c50831",
+      "bytes": 13892
+    },
+    {
+      "path": "khora-web/app/navigation/registry.ts",
+      "sha256": "24b695921d1b4774d9a9a8c2f92a918447dd8d8649a278127d5606747816bba7",
+      "bytes": 5223
+    },
+    {
+      "path": "khora-web/app/oauth/authorize/page.tsx",
+      "sha256": "f0e36b3b6537b6f4e7016f776b129c4b8f9dfff3bf082cddbd37f6536ea9ffbb",
+      "bytes": 11472
+    },
+    {
+      "path": "khora-web/docs/CUSTODIA-DICTADOS.md",
+      "sha256": "6d9d62b921fd674b5228bb3368d52743ccd1278cbef41f111a333fa09989cc72",
+      "bytes": 75557
+    },
+    {
+      "path": "khora-web/docs/GRAPH-QUALITY-DRAFT.md",
+      "sha256": "17d19407500b4799eb75e42c603654ce28858dec9c4a53d10ebac61f689d65e8",
+      "bytes": 70903
+    },
+    {
+      "path": "khora-web/docs/GRAPH-TWINS.md",
+      "sha256": "6294bd1baab6b28a9a9948afe4df5b932ddfbed6f5d6635885b83ab36bde48ac",
+      "bytes": 17168
+    },
+    {
+      "path": "khora-web/docs/normative-check.md",
+      "sha256": "9f235abb95b83e13e1a8f8b0a5a86a59721203a93072322669e6c9d0dcad959e",
+      "bytes": 36505
+    },
+    {
+      "path": "khora-web/lib/client/custodia-local.ts",
+      "sha256": "a9a38cf8521cc20bc33ed2a09b5d529152eaaabb3791cb76a2c76eb19a0e572e",
+      "bytes": 8213
+    },
+    {
+      "path": "khora-web/lib/client/subir-audio-custodia.ts",
+      "sha256": "7081da6ee60085a65d41ef0c6607c7fc580ec58c872d6c02c3e990e0264bf89a",
+      "bytes": 1871
+    },
+    {
+      "path": "khora-web/lib/custodia/contrato.ts",
+      "sha256": "17ee5bb59cc3969e1dccbd9e4fc796f8abedf4966378099396681337e6415916",
+      "bytes": 1331
+    },
+    {
+      "path": "khora-web/lib/server/custodia-recuperacion.ts",
+      "sha256": "c7e7c0922fde53036a754325d87cb818e5f7280f2eca67481a5b3b509855fac6",
+      "bytes": 9083
+    },
+    {
+      "path": "khora-web/lib/server/dictado.ts",
+      "sha256": "e379b10239239dc0ef051226fd7f3be88c5f6c06987c8935f10a3b4ac77d7010",
+      "bytes": 26823
+    },
+    {
+      "path": "khora-web/lib/server/graph-twins-store.ts",
+      "sha256": "fb435d31ee8e0b89fd4d7f9cda1b2997a0d08a36054a3401b5fe214936463eee",
+      "bytes": 17525
+    },
+    {
+      "path": "khora-web/lib/server/mcp-config.ts",
+      "sha256": "249db73610de508f3618a0a2c30b7947007a03e3f6604c20b1efd46772d6c876",
+      "bytes": 5848
+    },
+    {
+      "path": "khora-web/lib/server/mcp-tool-contract.ts",
+      "sha256": "37a59c31834e71745dc9042790bf461ea0c10219897922454f80cbef6467c272",
+      "bytes": 1719
+    },
+    {
+      "path": "khora-web/scripts/migrate-runtime.mjs",
+      "sha256": "b0cf3d8bc4984a241f3b51ffa342c58855fdd2d45553bfa67c6a7f76677b8103",
+      "bytes": 1131
+    },
+    {
+      "path": "khora-web/tests/unit/custody-regression.test.ts",
+      "sha256": "2b499f002001793f2f2d4371c2830b42a5dda7d5d7b045e4d218527026059d2c",
+      "bytes": 23983
+    },
+    {
+      "path": "khora-web/tests/unit/helpers/mcp-route-fixture.ts",
+      "sha256": "f2a8438d4cb0ce67d919c5e4bcbcf143451fc509de3ebce4503208f3a833241d",
+      "bytes": 7013
+    },
+    {
+      "path": "khora-web/tests/unit/mcp_contract_concordance.test.ts",
+      "sha256": "9ebfbff48d5989e82731380e247abfde9f984c3c2646b8310213b276234c6d01",
+      "bytes": 11997
+    },
+    {
+      "path": "khora-web/tests/unit/mcp_oauth.test.ts",
+      "sha256": "39e8f482e9d8c5b02ceedcd54f99b9ca14ae13c680650eeaa46ab68d6adfac73",
+      "bytes": 17745
+    },
+    {
+      "path": "khora-web/tests/unit/mcp_tool_auth_metadata.test.ts",
+      "sha256": "565e07fafc00fa7fc1cfb950764d124ff997cb4d69754464997a4cf0498254a7",
+      "bytes": 3418
+    },
+    {
+      "path": "khora-web/tests/unit/methodology_contract_sync.test.ts",
+      "sha256": "5f2f29a0d4f2dc83776af2de879c0308cb18632e43992549bc62a7a0906091b6",
+      "bytes": 2286
+    },
+    {
+      "path": "khora-web/tests/unit/system_navigation_hardened.test.ts",
+      "sha256": "d7da507dad7228ec36884a9171db0ffd58c31850dcb3a782c860d382c5df6c9b",
+      "bytes": 4107
+    },
+    {
+      "path": "khora-web/app/api/blog/dispatch/route.ts",
+      "sha256": "8c7c05a0ea9ca330642b7960213db6068cf534473d9e7a62c2bca9808e657e99",
+      "bytes": 2890
+    },
+    {
+      "path": "khora-web/app/api/blog/editorial/route.ts",
+      "sha256": "fbff3b0e83fc5faf4d1579722c11d46df3b6881199a905aa020714a69452b831",
+      "bytes": 4822
+    },
+    {
+      "path": "khora-web/app/components/blog/BlogTextWorkspace.tsx",
+      "sha256": "e5bc67bac0a2688285a844394e3ddfb77ec54cbedf3f08ebca713b47514f849d",
+      "bytes": 12106
+    },
+    {
+      "path": "khora-web/app/components/ingreso/CronicaCoverage.tsx",
+      "sha256": "2096c2f7f88fa8cfabcf38166d81a422df85cd09692cbbaf74ba6972997df7e3",
+      "bytes": 1959
+    },
+    {
+      "path": "khora-web/app/components/ingreso/PublicacionCapturaPendiente.tsx",
+      "sha256": "4883168047ebf0b96ebd8369aa49fe32f6115841d9d29832c4d77aa991348a88",
+      "bytes": 11695
+    },
+    {
+      "path": "khora-web/app/components/ingreso/TipoEntradaControl.tsx",
+      "sha256": "59f571884a088d759260091a2aa589d17d55eee1ab928796236d339e9e9ca143",
+      "bytes": 3303
+    },
+    {
+      "path": "khora-web/app/sistema/blog/page.tsx",
+      "sha256": "c543a7515cfe8b4638a0f424ae8d4839c1192f18691c899f598bab713df2c254",
+      "bytes": 138
+    },
+    {
+      "path": "khora-web/contracts/blog-editorial-v1.md",
+      "sha256": "2c61c98b15ac9b7a5513578951b69c5be4890343d5b57a4900ef9469972a875e",
+      "bytes": 20205
+    },
+    {
+      "path": "khora-web/db/migrations/034_ingreso_clasificacion.sql",
+      "sha256": "be26513cb9eb0ee5411022ed23a4f448af0c983ca0c71010994da72f83582e82",
+      "bytes": 600
+    },
+    {
+      "path": "khora-web/db/migrations/20261019_blog_editorial.sql",
+      "sha256": "aa0f4cca230ae7e52a11ce2ffe6651801084bcaa34988a5a829198625a48649a",
+      "bytes": 3549
+    },
+    {
+      "path": "khora-web/lib/blog/text-workflow.ts",
+      "sha256": "a71eca1997e9a866a012281906da0d773aad849452cd695abfeef972260c9330",
+      "bytes": 11145
+    },
+    {
+      "path": "khora-web/lib/blog/transcript-preparation.ts",
+      "sha256": "7739238c65900a49aa1c2812f39ea6ce3eef8b7bcb795aa31b23692ee74b15b7",
+      "bytes": 5074
+    },
+    {
+      "path": "khora-web/lib/client/archivar-recuperada.ts",
+      "sha256": "aa78772a6fcd63a7b63ca846df7a08b5263c36f9882c20779a4a96981e2c4ec0",
+      "bytes": 6217
+    },
+    {
+      "path": "khora-web/lib/client/use-titulo-captura.ts",
+      "sha256": "1eb45fb18aca10ea3ad2e73b1317ec5c179e6097e1f5f72d668e645870b5bd6c",
+      "bytes": 1632
+    },
+    {
+      "path": "khora-web/lib/custodia/archivo-recuperado.ts",
+      "sha256": "5659261e637e1c653927a16b0dfbced14ab20c8036cde85dca8c894f3537198a",
+      "bytes": 1920
+    },
+    {
+      "path": "khora-web/lib/custodia/editorial.ts",
+      "sha256": "5953861d74bd3d5682da38fe945f4160d0e47efa35da60bd143d2b5d4544e611",
+      "bytes": 3007
+    },
+    {
+      "path": "khora-web/lib/custodia/estado.ts",
+      "sha256": "06b3edf3bf0a1f4528528854bbc86be0acfc54234e6c0a87e78f6580692622bc",
+      "bytes": 2654
+    },
+    {
+      "path": "khora-web/lib/custodia/transcripcion.ts",
+      "sha256": "82de9d9168de440f34c26c3315e8d3b9d75e22e8be771b585ac0722200336ae4",
+      "bytes": 1058
+    },
+    {
+      "path": "khora-web/lib/ingreso/cronica-coverage.ts",
+      "sha256": "9305c34e7093f29d05ea8fb55566775bcc9e59cf4d1847061cfa89cb90e42874",
+      "bytes": 6110
+    },
+    {
+      "path": "khora-web/lib/server/blog/delivery.ts",
+      "sha256": "c344967dc81d326b37035edf9354f95547e5992f95ded70ac51053bdb423db5d",
+      "bytes": 3242
+    },
+    {
+      "path": "khora-web/lib/server/blog/domain.ts",
+      "sha256": "6f6798114ce438ed5b6eb33c234bc5f32485bf2cbb86218ccd9db64a113c3cf8",
+      "bytes": 6653
+    },
+    {
+      "path": "khora-web/lib/server/blog/mcp.ts",
+      "sha256": "7abfa6c670ff46156006a1c5077a8b5f51e42e799993c765599056c353d9da8f",
+      "bytes": 1392
+    },
+    {
+      "path": "khora-web/lib/server/blog/metadata.ts",
+      "sha256": "442035fcb189ddf75e302dd390d99e15209d5840dacedba06375be009edf1f80",
+      "bytes": 5223
+    },
+    {
+      "path": "khora-web/lib/server/blog/outbox.ts",
+      "sha256": "df5acacfc985ee367a5d0d87f0826d959bb06c754640bfa1d4a4c1a92c83b88f",
+      "bytes": 4031
+    },
+    {
+      "path": "khora-web/lib/server/blog/providers.ts",
+      "sha256": "dd253ae3070daf8fc3f33d9f1be53ea2d87436337332e82320a1d16eae0d0adc",
+      "bytes": 6454
+    },
+    {
+      "path": "khora-web/lib/server/blog/public-audio-policy.ts",
+      "sha256": "a01a41ec411aeca81dc3f1760d84ad1d05f42133a81fd9c2075cf90f07f56288",
+      "bytes": 294
+    },
+    {
+      "path": "khora-web/lib/server/blog/repository.ts",
+      "sha256": "5d9005cb2b0fcf702f21007b1ad298dff81fa55db803c41c9b0adc741195b7a9",
+      "bytes": 16146
+    },
+    {
+      "path": "khora-web/lib/server/blog/service.ts",
+      "sha256": "df49bc78e93b7f5880ff5e16066b86643c5768583e13260ce999e4e3453cdc59",
+      "bytes": 245
+    },
+    {
+      "path": "khora-web/tests/browser/blog-text-workflow.local.test.mjs",
+      "sha256": "d70969fcdc4b31d851ebefd533271b4a0b8cad3275f868d65893778d942ee912",
+      "bytes": 13582
+    },
+    {
+      "path": "khora-web/tests/unit/archivo-recuperado.test.ts",
+      "sha256": "50064acf81f30836cb937373ae641428934bdd39a888709ffda9dee4b7b7c21f",
+      "bytes": 2268
+    },
+    {
+      "path": "khora-web/tests/unit/blog-editorial.test.ts",
+      "sha256": "81facaa619dc14193e52eba4abf9037033903da17e116fc435e99fc1d5b232d0",
+      "bytes": 9540
+    },
+    {
+      "path": "khora-web/tests/unit/blog-metadata-hardening.test.ts",
+      "sha256": "c93aa74df07c6b751dbd94539787cc173e4a3c0a1b60976a0348dc4f51736125",
+      "bytes": 9240
+    },
+    {
+      "path": "khora-web/tests/unit/blog-postgres.test.ts",
+      "sha256": "a91807d52f0241199d3c0c108f5d572ad1e7ccbd8e212d0af56fb9bb02c05e1d",
+      "bytes": 5846
+    },
+    {
+      "path": "khora-web/tests/unit/blog-register.mjs",
+      "sha256": "6306d408464f7964be1b2ab36581760af88bf5e9256526f24a5a829e9915458b",
+      "bytes": 391
+    },
+    {
+      "path": "khora-web/tests/unit/blog-text-workflow.test.ts",
+      "sha256": "e0a6df3c41a251c67229eeeebcb8c9be6d8a5ae1d7773839fbff51d3f6595972",
+      "bytes": 12475
+    },
+    {
+      "path": "khora-web/tests/unit/blog-transcript-preparation.test.ts",
+      "sha256": "598fc7025ff4e7465322c8a7babc2186a6d8b225aa1d99fc6b9032ef0b4b7d14",
+      "bytes": 8156
+    },
+    {
+      "path": "khora-web/tests/unit/chat_ingreso_navigation.test.ts",
+      "sha256": "579d5a1815bf5bc86a007800f6fd6acde3642d30767164f236e8111f5665730b",
+      "bytes": 608
+    },
+    {
+      "path": "khora-web/tests/unit/cronica-coverage.test.ts",
+      "sha256": "3672ab52cab9645c26d84eef1d3c9ed7a905ac4efe6bcb19f9c57c170b6872c5",
+      "bytes": 5493
+    },
+    {
+      "path": "khora-web/tests/unit/custodia-hardening.test.ts",
+      "sha256": "5f6f9a58baf867f812e6a4ee53ee556129f10f2d520668060de312f9e70cf07d",
+      "bytes": 5736
+    },
+    {
+      "path": "khora-web/tests/unit/ingreso-editorial.test.ts",
+      "sha256": "3beaf58fe7768e0469a33e81b06541c6171b544bf3edeeed9f471fae7ec6106d",
+      "bytes": 3300
+    }
+  ],
+  "limits": [
+    "No alias, merge, deploy or feature flag changed",
+    "No native productive graph/model/citation circuit",
+    "No native Render load/restart test",
+    "Voyage historical model voyage-4-large found; portable runtime access unverified",
+    "No personal source read or ingestion"
+  ],
+  "logs": {
+    "integration-units-complete.log": "0d136baf865ca1f1f158a38cd7931e2908a1b6eaf8276b4f41842264f84e8ac1",
+    "integration-build-final.log": "918559c9cf8f938e893fb7c8cc08629eea8b61fa8d216186bacdd6bc0fb71f3e"
+  }
+}

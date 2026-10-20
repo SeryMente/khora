@@ -57,7 +57,7 @@ function makeDb(state: FakeState) {
       return { rows: state.parts.map((p) => ({ ...p })), rowCount: state.parts.length };
     }
 
-    if (normalized.includes("select id, texto, texto_original, sha256, chars, audio_partes, estado, session_id from volcado")) {
+    if (normalized.includes("select id, texto, texto_original, sha256, chars, audio_partes, estado, session_id, tipo_entrada, ofuscada from volcado")) {
       return { rows: state.volume ? [{ ...state.volume }] : [], rowCount: state.volume ? 1 : 0 };
     }
 
@@ -203,6 +203,8 @@ function seedLinkedArchive(texto: string, sessionId = "session-archive-001") {
       audio_partes: null,
       session_id: sessionId,
       estado: "en_revision",
+      tipo_entrada: "general",
+      ofuscada: false,
     },
     versions: [{ version: 1 }],
     log: [],
@@ -482,7 +484,7 @@ test("CUSTODY-14: archived captures stay sealed and text-only saves receive stab
   assert.ok(saveHandler.includes("if (!sesionIdRef.current) sesionIdRef.current = generarSesionId()"));
   assert.ok(saveHandler.includes("setArchivado(true)"));
   assert.ok(saveHandler.includes("setAviso("));
-  assert.ok(saveHandler.includes("[archivado, texto, titulo, pulidosOk, observarDictado, guardarCheckpoint]"));
+  assert.ok(saveHandler.includes("[archivado, texto, titulo, clasificacion, pulidosOk, observarDictado, guardarCheckpoint]"));
 
   const attachStart = workspace.indexOf("const handleAdjuntarAudio");
   const cleanStart = workspace.indexOf("const limpiar", attachStart);

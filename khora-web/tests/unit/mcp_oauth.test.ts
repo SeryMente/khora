@@ -115,14 +115,14 @@ test("2. MCP_CANONICAL_URL semantics and metadata endpoints consistency", async 
   assert.equal(protectedMeta.resource, "https://khora.example.com/api/mcp");
   assert.ok(!protectedMeta.resource.includes("/api/mcp/api/mcp"));
   assert.deepEqual(protectedMeta.authorization_servers, ["https://khora.example.com"]);
-  assert.deepEqual(protectedMeta.scopes_supported, ["runtime:read", "volcados:read", "norm:turn"]);
+  assert.deepEqual(protectedMeta.scopes_supported, ["runtime:read", "volcados:read", "norm:turn", "blog:read"]);
 
   const authRes = await getAuthServerMetadata();
   const authMeta = await authRes.json();
   assert.equal(authMeta.issuer, "https://khora.example.com");
   assert.equal(authMeta.authorization_endpoint, "https://khora.example.com/oauth/authorize");
   assert.equal(authMeta.token_endpoint, "https://khora.example.com/api/oauth/token");
-  assert.deepEqual(authMeta.scopes_supported, ["runtime:read", "volcados:read", "norm:turn", "offline_access"]);
+  assert.deepEqual(authMeta.scopes_supported, ["runtime:read", "volcados:read", "norm:turn", "offline_access", "blog:read"]);
 });
 
 test("2b. PKCE S256 verification behavior", () => {

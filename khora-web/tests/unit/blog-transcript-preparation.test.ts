@@ -1,0 +1,40 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {prepareLiteralTranscript,assertPagesTextCompatible} from '../../lib/blog/transcript-preparation';
+import {hash,revisionCheck,type Revision} from '../../lib/server/blog/domain';
+import {GitHubBlog} from '../../lib/server/blog/providers';
+const literal='Maya dijo: «quizá ocurra; no lo sé». Yo NO lo afirmo. Ayer —creo— fui a [sitio X]. **No sé quién era**. '.repeat(4);
+const entry=(body:string)=>({schema:1 as const,slug:'prueba-privada-no-publicar',title:'Prueba sintética privada <script> &',date:'2026-10-19T12:00:00-06:00',body,source:{kind:'khora' as const,sha256:hash(body)}});
+test('paragraph preparation keeps exact original spans and every non-whitespace character',()=>{const draft=prepareLiteralTranscript(literal,{paragraphTarget:80});assert(draft.paragraphs.length>1);for(const span of draft.paragraphs)assert.equal(literal.slice(span.start,span.end),span.text);assert.equal(draft.body.replace(/\s/g,''),literal.replace(/\s/g,''));assert.equal(draft.requiresExactPreview,true);assert.equal(draft.publicAudio,false);assert(Object.isFrozen(draft));assert(Object.isFrozen(draft.paragraphs));});
+test('does not infer identities, dates, emotion, causality or ratify Maya suggestions',()=>{const text='Tal vez Maya sugirió que era A. No recuerdo cuándo. En X quizá pasó algo; no sé. ¿O fue otro día?';const d=prepareLiteralTranscript(text);assert.equal(d.body,text);assert(!('date'in d));assert(!('approval'in d));assert(!('metadata'in d));});
+test('preserves existing paragraph order, emphasis, attribution and obfuscated text',()=>{const text='  NO dije eso.\n\nMaya: «podría ser».\nYo: **no confirmado**.\n\n[A]… no descifrar.  ';const d=prepareLiteralTranscript(text);assert.equal(d.body,text.trim());assert.equal(d.paragraphs.length,3);assert.equal(text.slice(d.titleProposal!.start,d.titleProposal!.end),d.titleProposal!.text);});
+test('never invents punctuation or splits unpunctuated long utterance',()=>{const text='quizá '.repeat(200).trim();assert.equal(prepareLiteralTranscript(text,{paragraphTarget:80}).body,text);});
+test('title is a literal proposal, not a generated event or date',()=>{const text='¿Tal vez ocurrió? No estoy seguro.\n\nOtra cosa.';const d=prepareLiteralTranscript(text);assert.equal(d.titleProposal!.text,'¿Tal vez ocurrió?');assert.equal(text.slice(d.titleProposal!.start,d.titleProposal!.end),d.titleProposal!.text);});
+test('long first token has no invented or silently truncated title',()=>{assert.equal(prepareLiteralTranscript('x'.repeat(170)).titleProposal,null);});
+test('empty or oversized transcripts and invalid options fail without truncation',()=>{for(const text of ['',' \n ','x'.repeat(200001)])assert.throws(()=>prepareLiteralTranscript(text),/TRANSCRIPT/);assert.throws(()=>prepareLiteralTranscript('Texto.',{paragraphTarget:0}),/TARGET/);});
+test('browser-shareable module has no Node imports, network, storage or current time',async()=>{const {readFile}=await import('node:fs/promises');const code=await readFile(new URL('../../lib/blog/transcript-preparation.ts',import.meta.url),'utf8');assert(!/from ['"]|\bfetch\(|localStorage|sessionStorage|Date\.now|new Date|process\./.test(code));});
+test('literal property corpus including Unicode, quotes, script and repeated whitespace',()=>{for(const token of ['áéíóú','👩🏽‍💻','<script>no()</script>','«¿no?»','**quizá**','[X]','Maya:\tNO','2020?']){const text=('  '+token+'… \t\n').repeat(60)+'\n\nNo sé.';const d=prepareLiteralTranscript(text,{paragraphTarget:80});assert.equal(d.body.replace(/\s/g,''),text.replace(/\s/g,''));for(const p of d.paragraphs)assert.equal(text.slice(p.start,p.end),p.text);}});
+test('Pages-compatible schema accepts exact text payload and forbids audio/private fields',()=>{const e=entry('No se publica.');assertPagesTextCompatible(e);for(const key of ['audio','ofuscada','sourceId','token'])assert.throws(()=>assertPagesTextCompatible({...e,[key]:'private'}),/SCHEMA/);});
+test('Pages slug limit mismatch is exposed: legacy accepts101, transport guard rejects',()=>{const e={...entry('No se publica.'),slug:'a'.repeat(101)};const r:Revision={publicationId:'11111111-1111-4111-8111-111111111111',revision:1,sourceId:'private',sourceVersion:1,sourceHash:hash('private'),kind:'blog_personal',obfuscated:false,entry:e,facebook:{format:'full_text',message:e.body}};assert.throws(()=>revisionCheck(r),/PAGES_SLUG/);assert.throws(()=>assertPagesTextCompatible(e),/PAGES_SLUG/);assertPagesTextCompatible({...e,slug:'a'.repeat(100)});});
+test('requires explicit zoned publication date without using event/capture defaults',()=>{for(const date of ['ayer','2026-10-19','2026-10-19T12:00:00','2026-02-30T12:00:00Z','2026-10-19T24:00:00Z','0000-01-01T00:00:00Z'])assert.throws(()=>assertPagesTextCompatible({...entry('No se publica.'),date}),/DATE/);});
+test('actual current Python generator matches provider publication, archive and rendered verification',{skip:process.env.BLOG_GENERATOR_PATH?false:'Set BLOG_GENERATOR_PATH to the verified public generator to run actual-generator compatibility; not verified by this invocation'},async()=>{
+ const generator=process.env.BLOG_GENERATOR_PATH;
+ if(!generator)throw new Error('BLOG_GENERATOR_PATH_REQUIRED: provide actual checked public generator; never skip compatibility');
+ const {mkdtemp,mkdir,copyFile,writeFile,readFile,rm}=await import('node:fs/promises');const {tmpdir}=await import('node:os');const {join}=await import('node:path');const {spawnSync}=await import('node:child_process');
+ const root=await mkdtemp(join(tmpdir(),'blog-compat-private-'));
+ try{
+  await mkdir(join(root,'scripts'));await mkdir(join(root,'blog/entries'),{recursive:true});await copyFile(generator,join(root,'scripts/build-personal-blog.py'));
+  const original='Maya dijo: «no sé».\n\nYo: quizá <script>alert(1)</script> & una duda.\nNO afirmo causa ni fecha.\n\n[A] queda así.';
+  const e=entry(prepareLiteralTranscript(original,{paragraphTarget:80}).body);assertPagesTextCompatible(e);
+  let saved:any;
+  const writeTransport=(async(url:any,init:any)=>{assert(String(url).endsWith('contents/blog/entries/'+e.slug+'.json')||String(url).endsWith('?ref=main'));if(init.method==='PUT'){const request=JSON.parse(init.body);assert.equal(request.branch,'main');saved=JSON.parse(Buffer.from(request.content,'base64').toString('utf8'));return new Response(JSON.stringify({commit:{sha:'synthetic-commit'}}));}return new Response('{}',{status:404});}) as typeof fetch;
+  await new GitHubBlog('synthetic-only',writeTransport).publish(e);assert.deepEqual(saved,e);
+  await writeFile(join(root,'blog/entries',e.slug+'.json'),JSON.stringify(saved));const built=spawnSync('python3',[join(root,'scripts/build-personal-blog.py')],{encoding:'utf8'});assert.equal(built.status,0,built.stderr);
+  const archive=await readFile(join(root,'blog/archivo.json'),'utf8');const html=await readFile(join(root,'blog/entradas',e.slug,'index.html'),'utf8');
+  assert.deepEqual(JSON.parse(archive).entries,[e]);assert(!html.includes('<script>alert'));assert(html.includes('&lt;script&gt;alert'));assert(html.includes(hash(e.body)));assert((await readFile(join(root,'blog/feed.xml'),'utf8')).includes(e.slug));
+  const fetchPublic=(async(url:any)=>new Response(String(url).endsWith('archivo.json')?archive:html)) as typeof fetch;
+  const receipt=await new GitHubBlog('synthetic-only',fetchPublic).verify(e);assert(receipt);assert.equal(receipt!.id,e.slug);assert.equal(receipt!.url,'https://serymente.github.io/otrogranprograma/blog/entradas/'+e.slug+'/');
+  const badTransport=(async(url:any)=>new Response(String(url).endsWith('archivo.json')?archive:html.replaceAll('NO afirmo','SÍ afirmo'))) as typeof fetch;assert.equal(await new GitHubBlog('synthetic-only',badTransport).verify(e),null);
+  await writeFile(join(root,'blog/entries',e.slug+'.json'),JSON.stringify({...e,slug:'a'.repeat(101)}));const rejected=spawnSync('python3',[join(root,'scripts/build-personal-blog.py')],{encoding:'utf8'});assert.notEqual(rejected.status,0);
+ }finally{await rm(root,{recursive:true,force:true});}
+});

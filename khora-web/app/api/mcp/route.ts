@@ -1,3 +1,4 @@
+import {blogChanges,blogPublicStatus} from "@/lib/server/blog/mcp";
 import { toolKhoraListarAudios, toolKhoraLeerAudio } from "@/lib/server/mcp-audios";
 import { registrarEventoServicio } from "@/lib/server/service-observability";
 import { randomUUID } from "node:crypto";
@@ -179,12 +180,12 @@ async function handleMcpRequest(req: NextRequest) {
   if (
     !actor ||
     !Number.isSafeInteger(tokenGeneration) ||
-    (!scopes.includes("volcados:read") && !scopes.includes("runtime:read") && !scopes.includes("norm:turn"))
+    (!scopes.includes("volcados:read") && !scopes.includes("runtime:read") && !scopes.includes("norm:turn") && !scopes.includes("blog:read"))
   ) {
     return makeUnauthorizedResponse(config);
   }
 
-  const requireScope = (scope: "volcados:read" | "runtime:read" | "norm:turn") =>
+  const requireScope = (scope: "volcados:read" | "runtime:read" | "norm:turn" | "blog:read") =>
     scopes.includes(scope)
       ? null
       : scopeFailure(config, scope, correlation_id);
@@ -245,6 +246,13 @@ async function handleMcpRequest(req: NextRequest) {
       async (args: any) => observedHandler(args, true),
     );
   };
+
+  gatedTool("khora_blog_cambios", "Cambios de versiones públicas aprobadas del propietario; incluye tombstones opacos. No concede lectura de volcados.", {
+    after:z.string().regex(/^\d{1,18}$/).optional(),limit:z.number().int().min(1).max(100).optional(),
+  },async(args:any)=>{const denied=requireScope("blog:read");if(denied)return denied;return {content:[{type:"text",text:JSON.stringify(await blogChanges(actor,args.after,args.limit))}]};});
+  gatedTool("khora_blog_estado", "Versión pública y recibos independientes de un elemento previamente aprobado del propietario. No devuelve originales ni borradores.", {
+    publicationId:z.string().uuid(),
+  },async(args:any)=>{const denied=requireScope("blog:read");if(denied)return denied;return {content:[{type:"text",text:JSON.stringify(await blogPublicStatus(actor,args.publicationId))}]};});
 
   // Herramienta 1: khora_resumen
   gatedTool(

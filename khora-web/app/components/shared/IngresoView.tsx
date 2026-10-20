@@ -1,9 +1,15 @@
 "use client";
+import {descripcionLuz,type LuzCustodia} from "../../../lib/custodia/estado";
 import { useState } from "react";
 import * as I from "lucide-react";
+import { TipoEntradaControl } from "../ingreso/TipoEntradaControl";
+import type { ClasificacionEntrada } from "../../../lib/custodia/editorial";
+import { CronicaCoverage } from "../ingreso/CronicaCoverage";
 import { AudioActivity } from "../ingreso/AudioActivity";
 import s from "../ingreso/ingreso-studio.module.css";
 export type IngresoViewState = {
+  clasificacion?: ClasificacionEntrada;
+  editorialExtra?: import("react").ReactNode;
   archivado?: boolean;
   procesando?: boolean;
   finalizando?: boolean;
@@ -16,6 +22,7 @@ export type IngresoViewState = {
   chromeStream?: MediaStream | null;
   chromeExtra?: import("react").ReactNode;
   custodiaEstado?: string;
+  custodiaLuz?: LuzCustodia;
   custodiaReady?: boolean;
   custodiaPreparando?: boolean;
   recuperando?: boolean;
@@ -23,6 +30,7 @@ export type IngresoViewState = {
   stream?: MediaStream | null;
   titulo: string;
   texto: string;
+  textoProvisional?: string;
   estado: "inactivo" | "dictando";
   modoEntrada: "ninguno" | "microfono" | "chrome_live_caption";
   chromeBridgeEstado: string;
@@ -50,6 +58,7 @@ export type IngresoViewState = {
 };
 
 export type IngresoViewActions = {
+  onClasificacionChange?: (value: ClasificacionEntrada) => void;
   onReintentarPreparacion?: () => void;
   onRecuperar?: () => void;
   onTituloChange?: (val: string) => void;
@@ -78,12 +87,14 @@ export function IngresoView({state:v,actions:a={},isReviewMode=false}:{state:Ing
  const busy=!!v.finalizando||!!v.procesando||v.guardando||v.adjuntandoAudio||v.retranscribiendo||!!v.recuperando;
  const locked=busy||!!v.archivado;
  const recording=v.estado==="dictando";
+ const cronica=v.clasificacion?.tipoEntrada==="blog_personal";
  return <main data-ui-id="ingreso.container" className={s.studio}>
   <header className={s.heading}>
-   <div><p className={s.eyebrow}>ESPACIO DE CAPTURA</p><h1>Ingreso</h1><p className={s.subtitle}>Dale espacio a lo que piensas.</p></div>
+   <div><p className={s.eyebrow}>{cronica?"INGRESO · BLOG PERSONAL":"ESPACIO DE CAPTURA"}</p><h1>{cronica?"Crónica personal":"Ingreso"}</h1><p className={s.subtitle}>{cronica?"Tu día, en tus palabras.":"Dale espacio a lo que piensas."}</p></div>
    {(a.onRecuperar||isReviewMode)&&<button className={s.secondary} onClick={a.onRecuperar} disabled={busy||recording||v.editando} aria-haspopup="dialog"><I.History size={18}/><span>Recuperar capturas</span>{!!v.recuperaciones&&<span className={s.count}>{v.recuperaciones}</span>}</button>}
   </header>
   <section className={s.sheet} aria-label="Captura actual">
+   {v.clasificacion&&a.onClasificacionChange&&<TipoEntradaControl value={v.clasificacion} onChange={a.onClasificacionChange} disabled={locked||recording||!!v.archivoPendiente}/>}
    <div className={s.capturebar}>
     <div className={s.micgroup}>
      {!recording?<button data-ui-id="ingreso.btn-iniciar" className={s.primary} disabled={locked||v.editando||v.custodiaReady===false||v.conAudio||!!v.dialogoSesion} onClick={a.onIniciar}><I.Mic size={19}/>{v.dialogoChrome?"Iniciar Chrome + micrófono":"Iniciar dictado"}</button>:
@@ -96,6 +107,7 @@ export function IngresoView({state:v,actions:a={},isReviewMode=false}:{state:Ing
      <button className={s.iconButton} aria-label="Más opciones de captura" aria-expanded={more} aria-controls="ingreso-options" onClick={()=>setMore(!more)}><I.Ellipsis size={21}/></button>
     </div>
    </div>
+   {cronica&&<CronicaCoverage text={v.texto} provisional={v.textoProvisional}/> }
    {more&&<div className={s.options} id="ingreso-options">
     {(a.onGenerarTitulo||isReviewMode)&&<button data-ui-id="ingreso.btn-titulo-ia" className={s.secondary} disabled={locked||v.generandoTitulo||!v.texto.trim()} onClick={a.onGenerarTitulo}><I.Sparkles size={17}/>{v.generandoTitulo?"Generando…":"Título con IA"}</button>}
     {!!a.onRetranscribir&&<button data-ui-id="ingreso.btn-retranscribir" className={s.secondary} disabled={locked||recording||!v.conAudio} onClick={a.onRetranscribir}><I.RefreshCw size={17}/>{v.retranscribiendo?"Re-transcribiendo…":"Re-transcribir audio"}</button>}
@@ -124,11 +136,11 @@ export function IngresoView({state:v,actions:a={},isReviewMode=false}:{state:Ing
     <label className={s.srOnly} htmlFor="ingreso-title">Título de la captura</label>
     <input id="ingreso-title" aria-label="Título de la captura" data-ui-id="ingreso.titulo-input" className={s.title} value={v.titulo} readOnly={locked||!!v.archivoPendiente||(!!v.dialogoChrome&&recording)} onChange={e=>a.onTituloChange?.(e.target.value)} placeholder="Sin título" maxLength={500}/>
     <label className={s.srOnly} htmlFor="ingreso-text">Texto de la captura</label>
-    <textarea id="ingreso-text" aria-label="Texto de la captura" data-ui-id="ingreso.textarea" className={s.textarea} value={v.texto} readOnly={locked||!!v.archivoPendiente||(!!v.dialogoChrome&&recording)} onFocus={()=>a.onIniciarEdicion?.()} onClick={() => actions.onIniciarEdicion?.()} onChange={e=>a.onTextoChange?.(e.target.value)} placeholder={v.dialogoChrome?(v.organizarComoDialogo===false?"La transcripción de ambas fuentes aparecerá aquí al detener. Los originales se conservan separados.":"El diálogo aparecerá aquí al detener Chrome y micrófono. Durante la captura, comprueba las dos señales de audio."):"Escribe, pega o empieza a dictar.\nEste espacio es tuyo."} spellCheck/>
+    <textarea id="ingreso-text" aria-label="Texto de la captura" data-ui-id="ingreso.textarea" className={s.textarea} value={v.texto} readOnly={locked||!!v.archivoPendiente||(!!v.dialogoChrome&&recording)} onFocus={()=>a.onIniciarEdicion?.()} onClick={() => actions.onIniciarEdicion?.()} onChange={e=>a.onTextoChange?.(e.target.value)} placeholder={v.dialogoChrome?(v.organizarComoDialogo===false?"La transcripción de ambas fuentes aparecerá aquí al detener. Los originales se conservan separados.":"El diálogo aparecerá aquí al detener Chrome y micrófono. Durante la captura, comprueba las dos señales de audio."):cronica?"Empieza a contar.\nLa transcripción aparecerá aquí.":"Escribe, pega o empieza a dictar.\nEste espacio es tuyo."} spellCheck/>
    </div>
    {v.editando&&<div data-ui-id="ingreso.banner-edicion" className={s.editing}><span><I.PencilLine size={16}/>Edición in situ activa · tu texto se conserva.</span><button data-ui-id="ingreso.btn-confirmar-edicion" className={s.secondary} disabled={locked} onClick={a.onConfirmarEdicion}>Confirmar edición</button></div>}
    <footer className={s.sheetfooter}>
-    <p role="status" aria-live="polite" data-ui-id="ingreso.custodia-status" className={s.storage}><I.ShieldCheck size={16}/><span>{v.audioPendiente?`Audio: ${v.audioPendiente} parte(s) con confirmación remota pendiente. Conserva esta pestaña o exporta antes de cerrarla.`:v.recuperando?"Recuperando sin sustituir el original…":v.custodiaEstado||"Salvaguarda de captura"}</span></p>
+    <div className={s.storage}><span role="status" aria-live="polite" data-ui-id="ingreso.custodia-status" data-custodia-estado={v.custodiaLuz||"amarillo"} aria-label={descripcionLuz[v.custodiaLuz||"amarillo"]} title={descripcionLuz[v.custodiaLuz||"amarillo"]} style={{display:"inline-block",width:14,height:14,borderRadius:"50%",background:({azul:"#2563eb",verde:"#15803d",amarillo:"#ca8a04",rojo:"#dc2626"})[v.custodiaLuz||"amarillo"],border:"2px solid currentColor"}}/><details className={s.diagnostics}><summary>Detalle de conservación</summary><p>{descripcionLuz[v.custodiaLuz||"amarillo"]}. {v.custodiaEstado}</p><p>La confirmación cubre el contenido acreditado, no segmentos aún en memoria. El almacenamiento de este dispositivo puede desaparecer si se borra el perfil o falla el equipo.</p></details></div>
     {v.custodiaReady===false&&!v.custodiaPreparando&&a.onReintentarPreparacion&&<button className={s.secondary} onClick={a.onReintentarPreparacion}>Reintentar preparación</button>}
     {!!v.custodiaDetalle&&<details className={s.diagnostics}><summary>Detalle de sincronización de audio</summary><p>{v.custodiaDetalle}</p>{a.onReintentarCustodia&&<button className={s.secondary} disabled={busy} onClick={a.onReintentarCustodia}>Reintentar sincronización</button>}</details>}
     <span className={s.characters}>{v.texto.length.toLocaleString('es')} caracteres</span>
@@ -141,6 +153,7 @@ export function IngresoView({state:v,actions:a={},isReviewMode=false}:{state:Ing
    </div>
    <button data-ui-id="ingreso.btn-archivar" className={s.archive} onClick={a.onGuardar} disabled={locked||recording||v.editando||(!v.texto.trim()&&!v.conAudio)}><I.Archive size={18}/>{v.guardando?"Archivando…":v.archivado?"Captura archivada":v.dialogoChrome?"Archivar como volcado":"Archivar registro"}</button>
   </div>
+  {v.editorialExtra}
   {more&&<details className={s.diagnostics}><summary>Detalles de la captura</summary><p data-ui-id="ingreso.stats">Estado: {v.estado} · Audio: {v.partesContador} partes verificadas · {(v.bytesAcumulados/1048576).toFixed(2)} MB · Reconexiones: {v.reconexiones} · Bloques procesados: {v.pulidosOk} / pendientes: {v.pulidosNo}</p><p>Un corte conservado no demuestra que se haya registrado el último instante antes de una interrupción.</p></details>}
  </main>;
 }

@@ -52,7 +52,7 @@ export const NAVIGATION_REGISTRY: readonly NavigationEntry[] = [
     icon: "Keyboard",
     kind: "direct",
     level: 1,
-    coverage: ["/sistema/ingreso"],
+    coverage: ["/sistema/ingreso", "/sistema/blog"],
   },
   {
     id: "custodia",

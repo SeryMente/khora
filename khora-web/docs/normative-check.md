@@ -21,6 +21,8 @@ Antes de ejecutar ese recorrido desde otra plataforma, resolver la identidad nor
 
 | Herramienta / propósito | Entradas de negocio | Salida principal / límite |
 |---|---|---|
+| `khora_blog_cambios` / recuperar cambios públicos | `after?` entero decimal de hasta 18 cifras, `limit?` (1–100) | Proyección pública aprobada del propietario, cursor incremental y tombstones; nunca originales ni borradores. Requiere `blog:read` y ciclo normativo. |
+| `khora_blog_estado` / consultar publicación | `publicationId` UUID | Versión pública y recibos independientes del propietario; no concede lectura de volcados. Requiere `blog:read` y ciclo normativo. |
 | `khora_resumen` / dimensionar volcados | `fecha_inicio?`, `fecha_fin?`, `estado?` | `por_estado`, `total`, `filtros_aplicados`; agregados, no contenido |
 | `khora_listar_volcados` / inventariar | `estado?`, `fecha_inicio?`, `fecha_fin?`, `orden?` (`ASC`/`DESC`), `limite?`, `offset?` | `volcados`, `limite`, `offset`, `total_retornados`; extracto de 300 caracteres, no verbatim completo; máximo 100 |
 | `khora_leer_volcado` / recuperar texto | `id` (folio o UUID), `version?` | Actual: metadatos, `texto`, `error_descifrado`; histórica: `volcado_id`, `folio`, `titulo`, `version`, `texto`, `sha256`, `motivo`, `creado_en`, `usuario`, `es_version_historica` |
@@ -34,7 +36,7 @@ Antes de ejecutar ese recorrido desde otra plataforma, resolver la identidad nor
 | `khora_eventos_desde` / lectura incremental | `cursor?` entero ≥0, `limite?` entero 1–200, `session_id?` | `cursor_entrada`, `cursor_siguiente`, `limite`, `retornados`, `hay_mas`, `eventos`; continuar con el cursor devuelto |
 | `khora_eventos_recientes` / diagnóstico retrospectivo | `segundos?`, `limite?`, `session_id?`, `component?`, `severity?`, `outcome?`, `fase?`, `scope?`, `category?` | `ventana_segundos`, `limite`, `retornados`, `eventos`; ventana 1–86400 s (300 predeterminado), 1–200 eventos (50 predeterminado) |
 
-**Permisos efectivos:** las primeras seis herramientas requieren `volcados:read` **y** `norm:turn`; las cuatro de observabilidad, `runtime:read` **y** `norm:turn`. El permiso de negocio anunciado en `securitySchemes` se conserva; `norm:turn` es necesario para abrir/completar el ciclo, no una concesión implícita.
+**Permisos efectivos:** las ocho herramientas de volcados, audio y revisión requieren `volcados:read` **y** `norm:turn`; las cuatro de observabilidad, `runtime:read` **y** `norm:turn`; las dos de Blog, `blog:read` **y** `norm:turn`. El permiso de negocio anunciado en `securitySchemes` se conserva; `norm:turn` es necesario para abrir/completar el ciclo, no una concesión implícita.
 
 | Herramienta / propósito | Entradas (sin los tres controles sustantivos) | Permiso / salida y efecto |
 |---|---|---|
@@ -70,12 +72,12 @@ El comprobante `receipt` se comparte con el verificador mediante [normative-rece
 
 Los extras permitidos no sustituyen campos obligatorios ni se convierten silenciosamente. `cycle.id` solo blanco, fechas inválidas y encabezados blancos se rechazan semánticamente aunque un JSON Schema estructural pueda admitirlos. Los tipos públicos exportados se conservan; un campo auxiliar presente con tipo inválido no se repara.
 
-**Ejemplos válidos sin secretos:** `input(name)` y `receipt()` en [mcp_contract_concordance.test.ts](../tests/unit/mcp_contract_concordance.test.ts) generan entradas completas para las quince herramientas y se prueban contra publicación y registro reales. Son fixtures sintéticos ejecutables en aislamiento: sus tokens/hashes no autorizan uso productivo ni acreditan un ciclo verificado. La estructura exacta evoluciona en el esquema, no en copias de JSON en guías.
+**Ejemplos válidos sin secretos:** `input(name)` y `receipt()` en [mcp_contract_concordance.test.ts](../tests/unit/mcp_contract_concordance.test.ts) generan entradas completas para las diecinueve herramientas y se prueban contra publicación y registro reales. Son fixtures sintéticos ejecutables en aislamiento: sus tokens/hashes no autorizan uso productivo ni acreditan un ciclo verificado. La estructura exacta evoluciona en el esquema, no en copias de JSON en guías.
 
 ## Ciclo normativo
 
 1. **OPEN:** `khora_norm_open_turn` fija SI (Sistema de Instrucciones) y metodología de `SeryMente/metodologia`, contrastando H1 → lectura → H2; solo acepta snapshot estable. Emite identidad de ciclo, intento, nonce, token, manifiesto y encabezados. Token de turno: 12 horas según la implementación.
-2. **TAREA:** las diez herramientas sustantivas verifican actor, ciclo, intento, nonce, snapshot y contexto de runtime antes de invocar el servicio. Los tres controles se retiran antes de pasar argumentos al manejador de negocio.
+2. **TAREA:** las catorce herramientas sustantivas verifican actor, ciclo, intento, nonce, snapshot y contexto de runtime antes de invocar el servicio. Los tres controles se retiran antes de pasar argumentos al manejador de negocio.
 3. **APLICACIÓN:** `khora_norm_apply_principle` persiste el siguiente folio en el orden canónico; no admite saltos/reordenación. A=aplicado, N=no aplicable, C=conflicto resuelto. Las condiciones de anchor/razón también se comprueban en el servicio.
 4. **VERIFY:** bloquea turno, coteja ledger completo/ordenado con receipt, calcula hashes y valida fuentes históricas, cobertura (faltantes, duplicados, desconocidos), encabezados y salida. Solo `VERIFIED` cierra; `INVALID/INCOMPLETE` conserva el intento y prepara el siguiente. No reutilizar token de intento anterior/cerrado.
 5. **RELEASE:** solo tras verificación consistente libera salida/hash, orden y comprobante; emite `VERIFIED_RELEASE` y token de liberación de cinco minutos. No es permiso para saltar verificación en otro ciclo.
