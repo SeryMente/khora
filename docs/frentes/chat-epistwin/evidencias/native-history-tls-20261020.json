@@ -1,0 +1,32 @@
+{
+  "base_remote_commit": "7152e11d150bf2df91ad6f2e9de0db6b12bf868c",
+  "native_startup_failure": {
+    "deploy": "dep-dbbdgfff3r2c738g9hqg",
+    "time": "2026-10-20T02:59:19Z",
+    "error": "HistoryStorageError: No se pudo acceder al historial PostgreSQL; no se usó almacenamiento alternativo.",
+    "phase": "init_db before OpenWebUI lifespan",
+    "root_cause": "not yet confirmed; explicit system TLS roots absent unlike prior successful Neon probe"
+  },
+  "changes": [
+    "verify-full kept for remote history",
+    "use sslrootcert=system only when no explicit root",
+    "native OpenWebUI URL uses explicit/system roots",
+    "closed-vocabulary diagnostic category/sqlstate without driver text/URL/credentials"
+  ],
+  "tests": {
+    "passed": 103,
+    "subtests_passed": 17,
+    "skipped_existing_optin_pg": 8,
+    "deselected_live_neo4j": 2,
+    "log_sha256": "4e12dd2a237a103e255c0f4813301a22080aa50da34d5a2281ebb617a20e23f9"
+  },
+  "no_ddl_or_sqlite_fallback": true,
+  "no_credential_rotation": true,
+  "frontend_unchanged": true,
+  "remote_retest_pending": true,
+  "files_sha256": {
+    "kernel/src/khora_kernel/engine/history.py": "71d84864b714c35aa50e05511e29c13d8aa6d87809b43d837ed408ed45c0fe01",
+    "api/chat_runtime.py": "c6017d80696f80f1705f274c26e2e545da0b1ec45b73fd48e0743a5a88a9449a",
+    "kernel/tests/test_native_history_tls.py": "f0c8d550d805f7dc58f5dda4632270d8d5d901f6f713e0c9b7cabe7878311fc6"
+  }
+}

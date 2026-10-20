@@ -6,6 +6,8 @@ runtime credentials need SELECT/INSERT/UPDATE, not CREATE or access to PKG data.
 No automatic migration, connection-secret logging, or fallback to ephemeral SQLite.
 """
 import json
+import logging
+import re
 import os
 import sqlite3
 from contextlib import contextmanager
@@ -13,7 +15,7 @@ from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from importlib import import_module
 from typing import Any, Iterator, List, Optional
-from urllib.parse import urlsplit
+from urllib.parse import urlsplit, parse_qs
 
 
 @dataclass(frozen=True)
@@ -69,9 +71,27 @@ def _postgres(db_path: str) -> Iterator[Any]:
         }
         if not local:
             options["sslmode"] = "verify-full"
+            if not parse_qs(urlsplit(db_path).query).get("sslrootcert"):
+                options["sslrootcert"] = "system"
         with driver.connect(db_path, **options) as conn:
             yield conn
-    except Exception:
+    except Exception as exc:
+        # Operational diagnostics use a closed vocabulary, never driver text,
+        # URLs, SQL, subjects/certificates, credentials or history contents.
+        state = getattr(exc, "sqlstate", None)
+        state = state if isinstance(state, str) and re.fullmatch(r"[0-9A-Z]{5}", state) else "unavailable"
+        text = str(exc).lower()
+        category = (
+            "driver_missing" if isinstance(exc, ImportError) else
+            "authentication" if state in {"28P01", "28000"} else
+            "permission" if state == "42501" else
+            "schema_missing" if state == "42P01" else
+            "tls_root_missing" if "root certificate file" in text and "does not exist" in text else
+            "tls_verification" if "certificate verify failed" in text else
+            "timeout" if "timeout" in text or "timed out" in text else
+            "connection_or_query"
+        )
+        logging.warning("KHORA_HISTORY_STORAGE_FAILURE category=%s sqlstate=%s", category, state)
         raise HistoryStorageError(
             "No se pudo acceder al historial PostgreSQL; no se usó almacenamiento alternativo."
         ) from None

@@ -31,7 +31,9 @@ def configure_native_environment():
         if not valid: raise RuntimeError('Chat requiere PostgreSQL durable explícito.')
     parsed=urlsplit(database)
     query=dict(parse_qsl(parsed.query))
-    if parsed.hostname not in {'localhost','127.0.0.1','::1'}: query['sslmode']='verify-full'
+    if parsed.hostname not in {'localhost','127.0.0.1','::1'}:
+        query['sslmode']='verify-full'
+        query.setdefault('sslrootcert','system')
     query['options']='-c search_path=khora_openwebui'
     database=urlunsplit(parsed._replace(query=urlencode(query)))
     settings={
