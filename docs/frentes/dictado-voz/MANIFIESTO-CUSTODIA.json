@@ -1350,9 +1350,9 @@
     },
     {
       "path": "OBJETO-CANONICO.md",
-      "bytes": 299395,
-      "sha256": "94a59a46e522c9f8952aefe059eb49a9216ec32e80c7d799f54b18641ae31377",
-      "git_blob_sha": "40e045552c48e532545acb6026cde5f27106eb4a"
+      "bytes": 299327,
+      "sha256": "97dd7e11cf2bad87486bdbe22caf537e46e75d76c563b7237e76516b7be7ba54",
+      "git_blob_sha": "37bddb561cb4b176f60002d6ee07fd4d3673ab13"
     },
     {
       "path": "evidencias/C047/vercel-build-summary.txt",
@@ -1926,6 +1926,15 @@
         "bytes": 292352,
         "sha256": "f18dd45def472ec15ca80626497253064f6a913397872e5c591f3ca7155b1448",
         "git_blob_sha": "b3830aece3dd1580996962237fcc14cd89024699"
+      }
+    },
+    {
+      "event": "C047-anchor-readback-correction",
+      "previous": {
+        "path": "OBJETO-CANONICO.md",
+        "bytes": 299395,
+        "sha256": "94a59a46e522c9f8952aefe059eb49a9216ec32e80c7d799f54b18641ae31377",
+        "git_blob_sha": "40e045552c48e532545acb6026cde5f27106eb4a"
       }
     }
   ],

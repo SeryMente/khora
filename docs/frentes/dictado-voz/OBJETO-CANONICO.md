@@ -5,7 +5,7 @@
 - Identidad conservada: `MCP-OBS-DICTADO`; extensión documental de dictado, benchmark, retroalimentación y propuesta de voz/síntomas.
 - Versión: **v0.6.33**; sello **MCP-OBS-DICTADO-v0.6.33**. Objeto permanente por encargo V010; no declara permanente ninguna propuesta clínica.
 - Estado: **C047 · CANDIDATA e170406 ERROR CON726PRUEBAS/723PASS/1FAIL/2SKIP · FALTA LECTURA PRIVADA DEDICADA EN BUILD · CLI TEMPORAL COMPARTIDA CERRADA Y ELIMINADA · NO NEXT/PRODUCCIÓN/PUBLICACIÓN**.
-- Ancla actual:8925bfafd826fd06ebc940f2227f0f6b5981e0cf; preview dpl_64Jki33bFA1Bc1y2XRR9indFkKCr ERROR solo comparación privada. C046 corrige lector del test, no amplía permisos; falta acceso dedicado y nuevo build. Evidencia real y simulada separadas.
+- Ancla actual: e170406da0a2e4b8cff58644d24cb3f6b5827f48; preview dpl_B4CGqbgj1NW5dQGk2GYAK8q7M1AL ERROR por METHODOLOGY_BUILD_READ_CREDENTIAL_REQUIRED. Resultado y limpieza real en C047.
 - Repositorio propietario: `SeryMente/khora`, privado comprobado con herramienta en este ciclo. `SeryMente/metodologia` también privado: aporta el método, no recibe datos del frente.
 - Carpeta contenedora: `docs/frentes/dictado-voz/`; elemento único de estado: `OBJETO-CANONICO.md`. Carpeta y elemento no se confunden.
 - Revisión de origen del objeto: `1697ee2693ed3217523ffc1d1be9b6541d7d849d`, blob `e98a956c375ce48b791b5f0563ad0ae03c2616dd`.
