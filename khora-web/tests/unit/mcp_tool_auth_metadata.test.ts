@@ -9,11 +9,15 @@ import { describeMcpTool, MCP_TOOL_SCOPES, type McpToolName } from "../../lib/se
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const runtimeTools = ["khora_observacion_instantanea", "khora_eventos_desde", "khora_estado_vivo", "khora_eventos_recientes"] as const;
 const dataTools = ["khora_resumen", "khora_listar_volcados", "khora_leer_volcado", "khora_buscar_volcados", "khora_versiones_volcado", "khora_ui_review", "khora_listar_audios", "khora_leer_audio"] as const;
+const blogTools = ["khora_blog_cambios", "khora_blog_estado"] as const;
 const normTools = ["khora_norm_open_turn", "khora_norm_apply_principle", "khora_norm_verify_turn", "khora_norm_release_turn"] as const;
 
 test("MCP preserves root securitySchemes for all nineteen tools", () => {
   assert.equal(Object.keys(MCP_TOOL_SCOPES).length, 19);
-  for (const [names, scopes] of [[runtimeTools, ["runtime:read"]], [dataTools, ["volcados:read"]], [normTools, ["norm:turn"]], [["khora_blog_cambios", "khora_blog_estado"], ["blog:read"]]] as const) {
+  const expectedNames = [...runtimeTools, ...dataTools, ...blogTools, ...normTools, "khora_mcp_health"];
+  assert.equal(new Set(expectedNames).size, 19);
+  assert.deepEqual([...expectedNames].sort(), Object.keys(MCP_TOOL_SCOPES).sort());
+  for (const [names, scopes] of [[runtimeTools, ["runtime:read"]], [dataTools, ["volcados:read"]], [blogTools, ["blog:read"]], [normTools, ["norm:turn"]]] as const) {
     for (const name of names) {
       assert.deepEqual(describeMcpTool(name as McpToolName, "test", {}).securitySchemes, [{ type: "oauth2", scopes: [...scopes] }]);
     }
@@ -33,6 +37,16 @@ test("route publishes derived schemas and retains authentication and normative g
   assert.match(route, /await assertNormativeTurnOpen/);
   assert.match(route, /tokenGeneration !== currentGen/);
   assert.doesNotMatch(route, /const toolsList = \[/);
+  for (const name of blogTools) {
+    const start = route.indexOf('gatedTool("' + name + '",');
+    assert.ok(start >= 0, name + " is registered through the normative wrapper");
+    const end = route.indexOf("gatedTool(", start + 1);
+    const registration = route.slice(start, end < 0 ? undefined : end);
+    assert.match(registration, /requireScope\("blog:read"\)/);
+    assert.match(registration, name === "khora_blog_cambios"
+      ? /blogChanges\(actor,args\.after,args\.limit\)/
+      : /blogPublicStatus\(actor,args\.publicationId\)/);
+  }
 });
 
 test("one canonical document covers the exact tool catalog and current output version", () => {

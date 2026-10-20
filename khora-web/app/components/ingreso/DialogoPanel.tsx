@@ -32,6 +32,9 @@ export function DialogoPanel({sessionId:requested,onSalir,clasificacion=CLASIFIC
   const archivePayload=useRef<Record<string,unknown>|null>(null);
   const archiveBusy=useRef(false),stopping=useRef(false),transcribing=useRef(false);
   const transcriptionState=useRef<string|null>(null);
+  const liveJob=useRef<Promise<void>|null>(null),lastLivePart=useRef(0),lastLiveAt=useRef(0);
+  const [liveTranscribing,setLiveTranscribing]=useState(false);
+  const liveAbort=useRef<AbortController|null>(null);
 
   const releaseLock=useRef<(()=>void)|null>(null);
   const acquireLock=async(sessionId:string)=>{
@@ -63,9 +66,10 @@ export function DialogoPanel({sessionId:requested,onSalir,clasificacion=CLASIFIC
     stopping.current=true;
     setBusy(true);
     try{
-      await current.detener();capture.current=null;
+      await current.detener();capture.current=null;liveAbort.current?.abort();
       manifest.current.estado=interrupted.current?"interrumpido":"detenido";
       await queue.current;
+      await liveJob.current;
       await persist();
       const sources=new Set(raw.current.map(p=>p.fuente));
       if(!sources.has("microphone")||!sources.has("chrome_tab")){
@@ -78,7 +82,18 @@ export function DialogoPanel({sessionId:requested,onSalir,clasificacion=CLASIFIC
     finally{capture.current=null;stopping.current=false;inProgress.current=false;setActive(false);setMicStream(null);setChromeStream(null);setBusy(false);}
   };
   const finishRef=useRef(finish);finishRef.current=finish;
-  const transcribeRef=useRef<()=>Promise<void>>(async()=>undefined);
+  const transcribeRef=useRef<(parcial?:boolean)=>Promise<void>>(async()=>undefined);
+  useEffect(()=>{
+    if(!active)return;
+    const timer=setInterval(()=>{
+      if(stopping.current||liveJob.current||errorRemote.current||!mounted.current)return;
+      const parts=stored.current,cut=parts.length;
+      if(cut<=lastLivePart.current||!parts.some(p=>p.fuenteAudio==="microphone")||!parts.some(p=>p.fuenteAudio==="chrome_tab")||Date.now()-lastLiveAt.current<20000)return;
+      lastLiveAt.current=Date.now();
+      const job=transcribeRef.current(true);liveJob.current=job;void job.finally(()=>{if(liveJob.current===job)liveJob.current=null;});
+    },1000);
+    return()=>{clearInterval(timer);liveAbort.current?.abort();};
+  },[active]);
   useEffect(()=>{if(!active)return;const began=Date.now();setElapsed(0);const timer=setInterval(()=>setElapsed(Math.floor((Date.now()-began)/1000)),1000);return()=>clearInterval(timer);},[active]);
   // Next App Router propagates our own replaceState to useSearchParams. Publishing
   // this session's URL is NOT an external recovery request and must not stop audio.
@@ -155,7 +170,7 @@ export function DialogoPanel({sessionId:requested,onSalir,clasificacion=CLASIFIC
       if(!mounted.current){interrupted.current=true;await c.detener();releaseLock.current?.();releaseLock.current=null;inProgress.current=false;return;}
       capture.current=c;manifest.current.estado="grabando";setMicStream(c.stream);setChromeStream(c.chromeStream);setActive(true);setHasSession(true);
       window.history.replaceState(null,"","/sistema/ingreso?modo=dialogo&sessionId="+id.current);
-      setNotice("Grabando Chrome y micrófono; comprueba ambas señales. El texto aparecerá automáticamente al detener. Usa audífonos para evitar eco.");
+      setNotice("Grabando Chrome y micrófono; comprueba ambas señales. La transcripción se actualizará por avances verificados, con latencia; al detener se revisa el conjunto completo. Usa audífonos para evitar eco.");
     }catch(e){
       manifest.current.estado="interrumpido";interrupted.current=true;
       await queue.current;
@@ -171,20 +186,26 @@ export function DialogoPanel({sessionId:requested,onSalir,clasificacion=CLASIFIC
     catch{errorRemote.current=true;setError("Custodia remota pendiente; los originales locales no se borraron.");}
     finally{setBusy(false);}
   };
-  const transcribe=async()=>{
+  const transcribe=async(parcial=false)=>{
     if(transcribing.current||archiveBusy.current||archived||archivePayload.current)return;
-    transcribing.current=true;setBusy(true);setError("");setNotice("Transcribiendo ambas fuentes desde los originales conservados…");
+    if(parcial&&(!inProgress.current||stopping.current))return;
+    const corte=stored.current.length;
+    const controller=parcial?new AbortController():null;if(parcial)liveAbort.current=controller;
+    transcribing.current=true;if(parcial)setLiveTranscribing(true);else{setBusy(true);setError("");setNotice("Transcribiendo ambas fuentes desde los originales conservados…");}
     try{
       await persist();
-      const r=await fetch("/api/transcribir/dialogo",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sessionId:id.current}),signal:AbortSignal.timeout(240000)}),d=await r.json();
+      const r=await fetch("/api/transcribir/dialogo",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sessionId:id.current,...(parcial?{parcial:true,hastaParte:corte}:{})}),signal:controller?AbortSignal.any([controller.signal,AbortSignal.timeout(240000)]):AbortSignal.timeout(240000)}),d=await r.json();
       if(!r.ok||!Array.isArray(d.turnos))throw Error(d.detail||"No se confirmó la transcripción.");
       if(!d.exito&&manifest.current.turnos.length)throw Error("La nueva transcripción es parcial; se conserva el diálogo anterior.");
-      transcriptionState.current=d.exito?"completo":"parcial";
+      if(!mounted.current)return;
+      if(parcial&&(!d.parcial||d.hastaParte!==corte||!d.exito))throw Error("Avance pendiente: no se confirmaron ambas transcripciones.");
+      transcriptionState.current=parcial?"parcial":d.exito?"completo":"parcial";
       manifest.current.turnos=d.turnos;textRef.current=formatearCaptura(d.turnos,manifest.current.etiquetas,manifest.current.organizarComoDialogo!==false);setText(textRef.current);
       await persist();
+      if(parcial){lastLivePart.current=corte;setNotice("Transcripción provisional hasta "+corte+" partes verificadas. La captura sigue abierta; no es el registro completo.");return;}
       setNotice(d.exito?(textRef.current.trim()?"Diálogo insertado en Ingreso. Revísalo y pulsa Archivar como volcado; la ingesta requiere la revisión y aprobación habituales.":"No se reconoció habla en los originales. Revisa las señales y exporta el audio para comprobarlo."):"Transcripción parcial: una fuente falló. Se conserva el audio; no es un diálogo completo.");
-    }catch(e){transcriptionState.current="fallido";setError((e instanceof Error?e.message:"No se confirmó la transcripción.")+" Los originales se conservan; puedes reintentar o archivarlos sin inventar texto.");}
-    finally{transcribing.current=false;setBusy(false);}
+    }catch(e){if(parcial){setNotice("Avance de transcripción pendiente; el texto anterior y los originales se conservan. Se reintentará con nuevas partes.");return;}transcriptionState.current="fallido";setError((e instanceof Error?e.message:"No se confirmó la transcripción.")+" Los originales se conservan; puedes reintentar o archivarlos sin inventar texto.");}
+    finally{transcribing.current=false;if(parcial){liveAbort.current=null;setLiveTranscribing(false);}else setBusy(false);}
   };
   transcribeRef.current=transcribe;
   const archive=async()=>{
@@ -233,13 +254,13 @@ export function DialogoPanel({sessionId:requested,onSalir,clasificacion=CLASIFIC
   useTituloCaptura(text,id.current,!archived&&!busy,setTitle);
   return <IngresoView state={{
     editorialExtra:<PublicacionCapturaPendiente owner={owner.current} refresh={Number(archived)}/>,clasificacion,titulo:title,texto:text,estado:active?"dictando":"inactivo",modoEntrada:"chrome_live_caption",
-    finalizando:busy&&active,organizarComoDialogo,dialogoChrome:true,dialogoSesion:hasSession,chromeStream,stream:micStream,
+    transcripcionPorAvances:true,finalizando:busy&&active,organizarComoDialogo,dialogoChrome:true,dialogoSesion:hasSession,chromeStream,stream:micStream,
     chromeBridgeEstado:"captura nativa",chromeCaptionActivo:false,chromeCapturaEstado:active?"grabando":"inactiva",
     archivado:archived,archivoPendiente:!!archivePayload.current&&!archived,custodiaReady:ready,custodiaPreparando:!ready&&!error,
     custodiaLuz:luzCustodia({archivedReceipt:archivoReceiptVerified,exactSnapshot:custodiaProof===firmaCustodia(snapshot()),audioComplete:audioCustodiadoCompleto(snapshot()),inFlight:active||busy,confirmedFailure:custodiaFailure}),
     custodiaEstado:active?`Chrome + micrófono · ${elapsed} s · ${localCount} partes recibidas · ${count} confirmadas en servidor`:archived?"Volcado archivado · "+volcadoId:hasSession?`${localCount} partes locales · ${count} confirmadas en servidor`:ready?"Salvaguarda preparada":"Salvaguarda no preparada",
-    editando:false,soportado:true,escuchando:active,guardando:archiveBusy.current,procesando:busy,generandoTitulo:false,retranscribiendo:transcribing.current,adjuntandoAudio:false,exportandoAudio:false,audioExportable:false,
-    conAudio:hasSession,partesContador:count,bytesAcumulados:stored.current.reduce((n,p)=>n+p.bytes,0),reconexiones:0,pulidosOk:0,pulidosNo:0,reconciliacionMensaje:"",aviso:notice,error,resultado:archived?"Volcado disponible en Custodia":"",
+    editando:false,soportado:true,escuchando:active,guardando:archiveBusy.current,procesando:busy,generandoTitulo:false,retranscribiendo:!active&&transcribing.current,adjuntandoAudio:false,exportandoAudio:false,audioExportable:false,
+    conAudio:hasSession,partesContador:count,bytesAcumulados:stored.current.reduce((n,p)=>n+p.bytes,0),reconexiones:0,pulidosOk:0,pulidosNo:0,reconciliacionMensaje:"",aviso:liveTranscribing?"Actualizando transcripción provisional; puedes detener la captura.":notice,error,resultado:archived?"Volcado disponible en Custodia":"",
     chromeExtra:<><details className={s.diagnostics}><summary>Originales y detalles de captura</summary>{hasSession&&!active&&<>
       <button className={s.secondary} disabled={busy||archived} onClick={()=>void retry()}>Reintentar conservar</button>
       <button className={s.secondary} disabled={busy} onClick={()=>void exportAudio("microphone")}>Exportar micrófono</button>
@@ -248,7 +269,7 @@ export function DialogoPanel({sessionId:requested,onSalir,clasificacion=CLASIFIC
     </>}
     <p className={s.notice}>Originales separados y custodia cifrada de Khora. Mismo transcriptor configurado; sin Live Caption. Dos fuentes no identifican a cada persona dentro de una pista. Límite preventivo de 18 MB por fuente. No uses llamadas clínicas sin los permisos y condiciones requeridos.</p></details>{archived&&<a className={s.secondary} href="/sistema/custodia">Revisar volcado en Custodia</a>}</>
   }} actions={{
-    onClasificacionChange:value=>{if(!busy&&!active&&!archived&&!archivePayload.current)onClasificacionChange?.(value);},
+    onClasificacionChange:value=>{if(!busy&&!active&&!archived&&!archivePayload.current){onClasificacionChange?.(value);if(!hasSession&&value.tipoEntrada!=="conversacion_maya"&&value.tipoEntrada!=="interpretacion_simultanea")onSalir?.();}},
     onIniciar:()=>void start(),onPrepararChrome:()=>void start(),onDetener:()=>void finish(),
     onOrganizarDialogoChange:enabled=>{if(!hasSession&&!active&&!busy)setOrganizarComoDialogo(enabled);},
     onDialogoChange:enabled=>{if(!enabled&&!hasSession&&!active&&!busy)onSalir?.();},

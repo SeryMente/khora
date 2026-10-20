@@ -89,6 +89,7 @@ export type IntencionEditorialLocal = {
   request?: import("../custodia/editorial").RevisionEditorial;
   prepared?: {digest:string};
   obfuscatedExposure?:boolean;
+  elaboration?:{method:"cronica-sobria-v1";sourceHash:string;bodyHash:string;reviewed:true};
 };
 const editorialWrites=new Map<string,Promise<void>>();
 export async function guardarIntencionEditorialLocal(owner:string, value:IntencionEditorialLocal):Promise<void> {

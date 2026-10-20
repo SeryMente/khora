@@ -2,7 +2,7 @@
 import { Info } from "lucide-react";
 import { type ClasificacionEntrada, TIPOS_ENTRADA } from "../../../lib/custodia/editorial";
 import s from "./ingreso-studio.module.css";
-const labels = {general:"Entrada general", conversacion_maya:"Conversación con Maya", interpretacion_simultanea:"Interpretación simultánea", blog_personal:"Crónica personal"};
+const labels = {general:"Entrada general", conversacion_maya:"Conversación con Maya", interpretacion_simultanea:"Interpretación consecutiva", blog_personal:"Crónica personal"};
 export function TipoEntradaControl({value,onChange,disabled=false}:{value:ClasificacionEntrada;onChange:(value:ClasificacionEntrada)=>void;disabled?:boolean}) {
  const cronica=value.tipoEntrada==="blog_personal";
  const privacidad=<label className={s.entryPrivacy}><input disabled={disabled} data-ui-id="ingreso.ofuscada" type="checkbox" checked={value.ofuscada} onChange={e=>onChange({...value,ofuscada:e.target.checked})}/> Entrada ofuscada</label>;

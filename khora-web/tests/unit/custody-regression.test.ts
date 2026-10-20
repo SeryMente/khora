@@ -88,6 +88,8 @@ function makeDb(state: FakeState) {
         io_id: null,
         audio_partes: params[14],
         session_id: params[15],
+        tipo_entrada: params[17],
+        ofuscada: params[18],
         folio: 1,
         recibido_en: new Date(),
         version_aprobada: null,
@@ -558,4 +560,11 @@ test("CUSTODY-17: Ingesta UI consumes the canonical pipeline digest key", () => 
   assert.ok(view.includes("selectedItem.sha256_aprobada"));
   assert.ok(!page.includes("selectedItem?.sha256_aprobado"));
   assert.ok(!view.includes("selectedItem.sha256_aprobado"));
+});
+
+test("CUSTODY-18: sealed classification cannot change under an idempotent retry", async () => {
+ for (const change of [{tipoEntrada: "blog_personal" as const}, {ofuscada: true}]) {
+  const texto="Original inmutable del operador.";const {state,sessionId}=seedLinkedArchive(texto);const originalCiphertext=state.volume.texto;setDbForTesting(makeDb(state) as any);
+  try {await assert.rejects(()=>guardarDictado({texto,sessionId,...change}),/Conflicto de idempotencia/);assert.equal(state.volumeInsertCount,0);assert.equal(state.volume.texto,originalCiphertext);assert.equal(state.volume.tipo_entrada,"general");assert.equal(state.volume.ofuscada,false);} finally{resetDbForTesting();}
+ }
 });

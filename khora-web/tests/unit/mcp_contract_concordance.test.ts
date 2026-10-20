@@ -47,6 +47,7 @@ function input(name: McpToolName): Record<string, unknown> {
   if (name === "khora_norm_apply_principle") return { turn_token: controls._norm_turn_token, folio: "P001", status: "A", anchor: "ContractTest" };
   if (name === "khora_norm_verify_turn") return { turn_token: controls._norm_turn_token, receipt: receipt() };
   if (name === "khora_norm_release_turn") return { turn_token: controls._norm_turn_token };
+  if (name === "khora_blog_cambios") return { ...controls, after: "0", limit: 20 };
   if (name === "khora_blog_estado") return { ...controls, publicationId: "11111111-1111-4111-8111-111111111111" };
   const business = (name === "khora_leer_volcado" || name === "khora_leer_audio") ? { id: "1" } : name === "khora_buscar_volcados" ? { busqueda: "fixture" } : name === "khora_versiones_volcado" ? { volcado_id: "1" } : {};
   return { ...controls, ...business };
@@ -142,6 +143,10 @@ test("real route: HTTP discovery and all 19 calls agree; malformed input cannot 
       assert.notEqual((await client.callTool({ name: tool.name, arguments: input(tool.name as McpToolName) })).isError, true, tool.name);
     }
     assert.equal(fixture.calls.length, 18, "health reads its snapshot separately");
+    assert.deepEqual(fixture.calls.filter(call => call.name.startsWith("Blog")), [
+      { name: "BlogChanges", args: { actor: "fixture-actor", after: "0", limit: 20 } },
+      { name: "BlogPublicStatus", args: { actor: "fixture-actor", publicationId: "11111111-1111-4111-8111-111111111111" } },
+    ]);
     for (const call of fixture.calls.filter(x => !x.name.endsWith("NormativeTurn") && x.name !== "applyNormativePrinciple")) {
       for (const field of Object.keys(controls)) assert.equal(Object.hasOwn(call.args ?? {}, field), false, call.name);
     }
@@ -197,6 +202,14 @@ test("real route: malformed controls and numeric bounds cannot reach business se
     }
     for (const patch of [{ cursor: -1 }, { cursor: 1.5 }, { limite: 0 }, { limite: 201 }]) {
       assert.equal((await client.callTool({ name: "khora_eventos_desde", arguments: { ...input("khora_eventos_desde"), ...patch } })).isError, true);
+    }
+    for (const [name, patch] of [
+      ["khora_blog_cambios", { after: "-1" }], ["khora_blog_cambios", { after: "1.5" }],
+      ["khora_blog_cambios", { after: "1".repeat(19) }], ["khora_blog_cambios", { limit: 0 }],
+      ["khora_blog_cambios", { limit: 101 }], ["khora_blog_cambios", { limit: 1.5 }],
+      ["khora_blog_estado", { publicationId: "not-a-uuid" }],
+    ] as const) {
+      assert.equal((await client.callTool({ name, arguments: { ...input(name), ...patch } })).isError, true, name);
     }
     assert.equal(fixture.calls.length, 0);
   } finally { await client.close(); await fixture.close(); }

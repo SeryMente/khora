@@ -52,6 +52,7 @@ export const NAVIGATION_REGISTRY: readonly NavigationEntry[] = [
     icon: "Keyboard",
     kind: "direct",
     level: 1,
+    // Existing auxiliary editor belongs to Ingreso; no new primary navigation.
     coverage: ["/sistema/ingreso", "/sistema/blog"],
   },
   {
