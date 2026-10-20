@@ -1,0 +1,305 @@
+{
+  "event": "E77",
+  "scope": "published visual repair only; no personal ingestion or full EpisTwin accreditation",
+  "web_source": "4ff209fba2bd02d6e61516c7c598e7260ae69871",
+  "deployment_reported_by_promoter": "dpl_3jg86dPcWcMBYsFJaKu9V8UT294t",
+  "promoter": "centralDictado only",
+  "alias": "https://khora-web.vercel.app",
+  "own_live_check": {
+    "checked_at": "2026-10-20T19:36:05.735Z",
+    "expected_source": "4ff209fba2bd02d6e61516c7c598e7260ae69871",
+    "intercepted_html": false,
+    "new_chat_or_ingestion": false,
+    "api": [
+      {
+        "path": "/api/config",
+        "status": 200,
+        "type": "application/json"
+      },
+      {
+        "path": "/api/config",
+        "status": 200,
+        "type": "application/json"
+      },
+      {
+        "path": "/api/v1/chats/",
+        "status": 308,
+        "type": "application/json"
+      },
+      {
+        "path": "/api/v1/chats/",
+        "status": 308,
+        "type": "application/json"
+      },
+      {
+        "path": "/api/v1/chats",
+        "status": 200,
+        "type": "application/json"
+      },
+      {
+        "path": "/api/v1/chats",
+        "status": 200,
+        "type": "application/json"
+      },
+      {
+        "path": "/api/models",
+        "status": 200,
+        "type": "application/json"
+      },
+      {
+        "path": "/api/config",
+        "status": 200,
+        "type": "application/json"
+      },
+      {
+        "path": "/api/config",
+        "status": 200,
+        "type": "application/json"
+      },
+      {
+        "path": "/api/v1/chats/",
+        "status": 308,
+        "type": "application/json"
+      },
+      {
+        "path": "/api/v1/chats/",
+        "status": 308,
+        "type": "application/json"
+      },
+      {
+        "path": "/api/v1/chats",
+        "status": 200,
+        "type": "application/json"
+      },
+      {
+        "path": "/api/v1/chats",
+        "status": 200,
+        "type": "application/json"
+      },
+      {
+        "path": "/api/models",
+        "status": 200,
+        "type": "application/json"
+      }
+    ],
+    "page_errors": [],
+    "document": {
+      "status": 200,
+      "presentation": "pinned-css-inline-v1",
+      "cache": "private, no-store"
+    },
+    "desktop": {
+      "font": "-apple-system, BlinkMacSystemFont, Inter, Vazirmatn, ui-sans-serif, system-ui, \"Segoe UI\", Roboto, Ubuntu, Cantarell, \"Noto Sans\", sans-serif, \"Helvetica Neue\", Arial, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+      "flex": "flex",
+      "composer": true,
+      "amber": true,
+      "inline_styles": [
+        {
+          "name": "Toaster.DKF17Rty.css",
+          "sha256": "a8a60fdd2bee2a1b436c8de5ace21208de358d11cd0584fd53b6d2d54486d41d",
+          "bytes": 13157
+        },
+        {
+          "name": "Modal.CSlFhZkq.css",
+          "sha256": "4949a4a48ceb842a6c1f73574d08ece374e213418852e0c94b8bd7f86b49722a",
+          "bytes": 188
+        },
+        {
+          "name": "0.MeCDKVUP.css",
+          "sha256": "276ca3d02fdbed48b3263be57f40fba9bafef7ebcdd44bb626a6b6a760b5a92d",
+          "bytes": 320194
+        }
+      ],
+      "overflow": false,
+      "viewport": 1366,
+      "svg_max_width": 20,
+      "broken_images": 0,
+      "loaded_fonts": [
+        "Inter"
+      ],
+      "source_buttons": 3
+    },
+    "version": {
+      "status": 200,
+      "data": {
+        "commit": "4ff209fba2bd02d6e61516c7c598e7260ae69871",
+        "rama": "sin-metadatos-de-git",
+        "desplegado_desde_git": false,
+        "fuente_commit": "manual-verified-clean-worktree",
+        "entorno": "production",
+        "rutas": [
+          "/sistema/custodia",
+          "/api/volcado"
+        ],
+        "ahora": "2026-10-20T19:36:53.390Z"
+      }
+    },
+    "mobile": {
+      "font": "-apple-system, BlinkMacSystemFont, Inter, Vazirmatn, ui-sans-serif, system-ui, \"Segoe UI\", Roboto, Ubuntu, Cantarell, \"Noto Sans\", sans-serif, \"Helvetica Neue\", Arial, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+      "flex": "flex",
+      "composer": true,
+      "amber": true,
+      "inline_styles": [
+        {
+          "name": "Toaster.DKF17Rty.css",
+          "sha256": "a8a60fdd2bee2a1b436c8de5ace21208de358d11cd0584fd53b6d2d54486d41d",
+          "bytes": 13157
+        },
+        {
+          "name": "Modal.CSlFhZkq.css",
+          "sha256": "4949a4a48ceb842a6c1f73574d08ece374e213418852e0c94b8bd7f86b49722a",
+          "bytes": 188
+        },
+        {
+          "name": "0.MeCDKVUP.css",
+          "sha256": "276ca3d02fdbed48b3263be57f40fba9bafef7ebcdd44bb626a6b6a760b5a92d",
+          "bytes": 320194
+        }
+      ],
+      "overflow": false,
+      "viewport": 390,
+      "svg_max_width": 20,
+      "broken_images": 0,
+      "loaded_fonts": [
+        "Inter"
+      ],
+      "source_buttons": 3
+    },
+    "css_blocked": {
+      "font": "-apple-system, BlinkMacSystemFont, Inter, Vazirmatn, ui-sans-serif, system-ui, \"Segoe UI\", Roboto, Ubuntu, Cantarell, \"Noto Sans\", sans-serif, \"Helvetica Neue\", Arial, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+      "flex": "flex",
+      "composer": true,
+      "amber": true,
+      "inline_styles": [
+        {
+          "name": "Toaster.DKF17Rty.css",
+          "sha256": "a8a60fdd2bee2a1b436c8de5ace21208de358d11cd0584fd53b6d2d54486d41d",
+          "bytes": 13157
+        },
+        {
+          "name": "Modal.CSlFhZkq.css",
+          "sha256": "4949a4a48ceb842a6c1f73574d08ece374e213418852e0c94b8bd7f86b49722a",
+          "bytes": 188
+        },
+        {
+          "name": "0.MeCDKVUP.css",
+          "sha256": "276ca3d02fdbed48b3263be57f40fba9bafef7ebcdd44bb626a6b6a760b5a92d",
+          "bytes": 320194
+        }
+      ],
+      "overflow": false,
+      "viewport": 390,
+      "svg_max_width": 20,
+      "broken_images": 0,
+      "loaded_fonts": [
+        "Inter"
+      ],
+      "source_buttons": 3
+    },
+    "passed": true
+  },
+  "own_anonymous_checks": {
+    "checked_at": "2026-10-20T19:34:59.261050+00:00",
+    "anonymous": {
+      "/api/version": {
+        "status": 200,
+        "type": "application/json",
+        "version": {
+          "commit": "4ff209fba2bd02d6e61516c7c598e7260ae69871",
+          "rama": "sin-metadatos-de-git",
+          "desplegado_desde_git": false,
+          "fuente_commit": "manual-verified-clean-worktree",
+          "entorno": "production",
+          "rutas": [
+            "/sistema/custodia",
+            "/api/volcado"
+          ],
+          "ahora": "2026-10-20T19:34:59.300Z"
+        }
+      },
+      "/api/khora-chat/proxy?path=%2F": {
+        "status": 401,
+        "type": "application/json"
+      },
+      "/api/v1/users/814209db-8c1e-49f0-afcd-87a4208c66fe/profile/image": {
+        "status": 401,
+        "type": "application/json"
+      }
+    }
+  },
+  "own_git_invariance": {
+    "combined_source": "4ff209fba2bd02d6e61516c7c598e7260ae69871",
+    "original_source": "848b391cc26f16fc928b171073df3c5d64cecddf",
+    "all_nine_blobs_identical": true,
+    "paths": [
+      {
+        "path": ".gitignore",
+        "combined_blob": "2f5df265692d21d0a0f6e34f3feb7453a77f83b7",
+        "repair_blob": "2f5df265692d21d0a0f6e34f3feb7453a77f83b7",
+        "identical": true
+      },
+      {
+        "path": "khora-web/app/api/khora-chat/proxy/route.ts",
+        "combined_blob": "a7a65fc85cc462f8ae689900a1002290d8744e0f",
+        "repair_blob": "a7a65fc85cc462f8ae689900a1002290d8744e0f",
+        "identical": true
+      },
+      {
+        "path": "khora-web/lib/chat-routes.ts",
+        "combined_blob": "cc15833fb5b7d48c737d519ce0812905131c6dff",
+        "repair_blob": "cc15833fb5b7d48c737d519ce0812905131c6dff",
+        "identical": true
+      },
+      {
+        "path": "khora-web/lib/server/chat-presentation.ts",
+        "combined_blob": "189e640639cac1fe1326a4fb8a593490e9186837",
+        "repair_blob": "189e640639cac1fe1326a4fb8a593490e9186837",
+        "identical": true
+      },
+      {
+        "path": "khora-web/middleware.ts",
+        "combined_blob": "bb5c370de92380eecb04691396f0b6580a03a30a",
+        "repair_blob": "bb5c370de92380eecb04691396f0b6580a03a30a",
+        "identical": true
+      },
+      {
+        "path": "khora-web/next.config.ts",
+        "combined_blob": "5af633e1a0e15a5ac7e6f55088d65c8fd8301a97",
+        "repair_blob": "5af633e1a0e15a5ac7e6f55088d65c8fd8301a97",
+        "identical": true
+      },
+      {
+        "path": "khora-web/scripts/prepare-openwebui-static.mjs",
+        "combined_blob": "863b80b19dd8266049210d9f6008c8b62ad60703",
+        "repair_blob": "863b80b19dd8266049210d9f6008c8b62ad60703",
+        "identical": true
+      },
+      {
+        "path": "khora-web/tests/unit/chat_presentation.test.ts",
+        "combined_blob": "2418535cd67d42c27a8c8b6107bbc2507dc019d4",
+        "repair_blob": "2418535cd67d42c27a8c8b6107bbc2507dc019d4",
+        "identical": true
+      },
+      {
+        "path": "khora-web/tests/unit/chat_static_assets.test.ts",
+        "combined_blob": "a8b85f5b0573e5d9cc5db11a4a4eb9fab80d6517",
+        "repair_blob": "a8b85f5b0573e5d9cc5db11a4a4eb9fab80d6517",
+        "identical": true
+      }
+    ]
+  },
+  "local_causal_tests": {
+    "pass": 30,
+    "fail": 0,
+    "skip": 0,
+    "typecheck_exit": 0
+  },
+  "artifact_claim": "functional deployed file read and exact CSS hashes proved; .nft itself not inspected",
+  "runtime_source_unchanged_by_this_repair": "5192ec3232244f8d709b7c163b4643c52afd7c0e",
+  "no_new_ingestion_db_render_credentials_or_concurrent_promotion": true,
+  "human_acceptance": false,
+  "personal_file_import_authorized": true,
+  "personal_source_and_lot_identified": false,
+  "personal_provider_egress_permission_resolved": false,
+  "original_goal": "EpisTwin architectural fidelity; Open WebUI is interface, not substitute"
+}
