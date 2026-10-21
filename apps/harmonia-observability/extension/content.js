@@ -113,7 +113,7 @@
     if(!force&&now-H.lastSentAt<4000){H.droppedScans++;return;}
     H.lastFingerprint=signature;H.lastSentAt=now;
     const payload={
-      catalogVersion:'0.1.0',features,controls:controls.map(({signature,...c})=>c),
+      catalogVersion:'0.1.1',features,controls:controls.map(({signature,...c})=>c),
       structure:struct,stylesheets:styleSheets(),
       layout:{main:styleSummary(root),composer:styleSummary(comp),assistant:styleSummary(root?.querySelector('[data-message-author-role="assistant"]'))},
       counts:{controls:controls.length,userMessages:root?$$('[data-message-author-role="user"]',root).length:0,assistantMessages:root?$$('[data-message-author-role="assistant"]',root).length:0,styleSheets:document.styleSheets.length},
