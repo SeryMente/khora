@@ -56,21 +56,21 @@ function compactReference(surface,record){
   controlCount:surface.controls.length,nodeCount:surface.structure.total,stylesheetCount:surface.stylesheets.length,viewport:surface.viewport,
   privacy:{conversationTextCaptured:false,composerTextCaptured:false,fieldValuesCaptured:false,hrefsCaptured:false,imageUrlsCaptured:false,menusExcluded:true}};
 }
-function updateCoverage(event){
+function updateCoverage(event,details={}){
  if(event.type!=='ui.surface.scan'&&event.type!=='ui.surface.reused')return;
  const features=catalog.features.filter(f=>f.scope!=='out'),p=event.payload||{};
  const previous=index.coverage||{observedFeatureIds:[],unknownControls:[],scanCount:0,deduplicatedScans:0};
- const featureIds=listStrings(p.features,100,120).filter(id=>features.some(f=>f.id===id));
+ const featureIds=listStrings(details.features||p.features,100,120).filter(id=>features.some(f=>f.id===id));
  previous.observedFeatureIds=[...new Set([...(previous.observedFeatureIds||[]),...featureIds])].sort();
- const unknown=(Array.isArray(p.controls)?p.controls:[]).filter(c=>!c.testId&&!c.label).map(c=>[text(c.tag,24),text(c.role,40),text(c.type,24),text(c.placeholder,80)].join('|')).filter(Boolean);
+ const unknown=Array.isArray(details.unknownControlSignatures)?details.unknownControlSignatures:(Array.isArray(p.controls)?p.controls:[]).filter(control=>!control.testId&&!control.label).map(control=>[text(control.tag,24),text(control.role,40),text(control.type,24)].join('|')).filter(Boolean);
  previous.unknownControls=[...new Set([...(previous.unknownControls||[]),...unknown])].slice(-100);
  previous.scanCount=(previous.scanCount||0)+1;
  if(event.type==='ui.surface.reused')previous.deduplicatedScans=(previous.deduplicatedScans||0)+1;
  previous.lastScanAt=event.capturedAt;previous.lastSessionId=event.sessionId;
  previous.lastFingerprint=text(p.fingerprint,64);previous.lastVisibleFeatureIds=featureIds;
- previous.lastControlCount=number(p.controlCount,p.controls&&p.controls.length||0);
- previous.lastNodeCount=number(p.nodeCount,p.structure&&p.structure.total||0);
- previous.stylesheetCount=number(p.stylesheetCount,p.stylesheets&&p.stylesheets.length||0);
+ previous.lastControlCount=number(details.controlCount,p.controlCount??(p.controls&&p.controls.length||0));
+ previous.lastNodeCount=number(details.nodeCount,p.nodeCount??(p.structure&&p.structure.total||0));
+ previous.stylesheetCount=number(details.stylesheetCount,p.stylesheetCount??(p.stylesheets&&p.stylesheets.length||0));
  const totalWeight=features.reduce((n,f)=>n+featureWeight(f),0);
  const sourceIds=new Set(catalog.sources.filter(s=>s.verificationStatus==='content-read').map(s=>s.id));
  const documented=f=>Array.isArray(f.docs)&&f.docs.some(id=>sourceIds.has(id));
@@ -110,10 +110,10 @@ function recordEvent(event,res){
  if(event.type==='ui.surface.scan'||event.type==='ui.surface.reused'){
   const surface=sanitizeSurface(event),fingerprint=surface.fingerprint,day=new Date(when).toISOString().slice(0,10);
   const surfaceFile=path.join(surfacesDir,fingerprint+'.json'),alreadyOnDisk=fs.existsSync(surfaceFile);
-  let record=index.surfaceFingerprints[fingerprint]||null;
   const isNewSurface=!alreadyOnDisk;
-  if(isNewSurface){atomicWrite(surfaceFile,surface);index.uniqueSurfaceCount=(index.uniqueSurfaceCount||0)+1;}
-  if(!record){record={fingerprint,surfaceFile:path.relative(root,surfaceFile).split(path.sep).join('/'),firstAt:event.capturedAt,firstSessionId:event.sessionId,firstEventId:event.eventId,features:surface.features,controlCount:surface.controls.length,nodeCount:surface.structure.total,stylesheetCount:surface.stylesheets.length,viewport:surface.viewport,seenCount:0,sessionIds:[]};}
+  let record=index.surfaceFingerprints[fingerprint]||null;
+  if(!record){record={fingerprint,surfaceFile:path.relative(root,surfaceFile).split(path.sep).join('/'),firstAt:event.capturedAt,firstSessionId:event.sessionId,firstEventId:event.eventId,features:surface.features,controlCount:surface.controls.length,nodeCount:surface.structure.total,stylesheetCount:surface.stylesheets.length,viewport:surface.viewport,unknownControlSignatures:surface.controls.filter(control=>!control.testId&&!control.label).map(control=>[control.tag,control.role,control.type].join('|')),seenCount:0,sessionIds:[]};}
+  if(!Array.isArray(record.unknownControlSignatures))record.unknownControlSignatures=surface.controls.filter(control=>!control.testId&&!control.label).map(control=>[control.tag,control.role,control.type].join('|'));
   record.lastSeenAt=event.capturedAt;record.seenCount=(record.seenCount||0)+1;
   if(!record.sessionIds.includes(event.sessionId))record.sessionIds=[...record.sessionIds,event.sessionId].slice(-100);
   index.surfaceFingerprints[fingerprint]=record;
@@ -122,12 +122,14 @@ function recordEvent(event,res){
   const storedType=isNewSurface?'ui.surface.scan':'ui.surface.reused';
   const stored={...event,type:storedType,payload:compactReference(surface,record)};
   const file=path.join(originalsDir,day,event.sessionId+'.jsonl'),line=JSON.stringify(stored)+'\n',bytes=Buffer.byteLength(line);
-  if(index.totalBytes+bytes>MAX){index.stopped=true;persist();return {tooLarge:true};}
+  const surfaceBytes=isNewSurface?Buffer.byteLength(JSON.stringify(surface,null,2),'utf8'):0;
+  if(index.totalBytes+surfaceBytes+bytes>MAX){index.stopped=true;persist();return {tooLarge:true};}
+  if(isNewSurface){atomicWrite(surfaceFile,surface);index.uniqueSurfaceCount=(index.uniqueSurfaceCount||0)+1;index.totalBytes+=surfaceBytes;}
   fs.appendFileSync(file,line,'utf8');index.totalBytes+=bytes;
   const session=index.sessions[event.sessionId]||{firstAt:event.capturedAt,lastAt:event.capturedAt,events:0,types:{},file:path.relative(root,file).split(path.sep).join('/'),lastEventSha256:null};
   session.lastAt=event.capturedAt;session.events++;session.types[storedType]=(session.types[storedType]||0)+1;
   session.lastEventSha256=crypto.createHash('sha256').update(line).digest('hex');index.sessions[event.sessionId]=session;
-  updateCoverage(stored);
+  updateCoverage(stored,{features:record.features,unknownControlSignatures:record.unknownControlSignatures,controlCount:record.controlCount,nodeCount:record.nodeCount,stylesheetCount:record.stylesheetCount});
   index.seenEventIds[event.eventId]={capturedAt:event.capturedAt,sessionId:event.sessionId,storedType,ordinal:session.events};
   pruneSeenEventIds();persist();
   return {duplicate:false,storedType,ordinal:session.events,deduplicated:!isNewSurface,surfaceRef:record.surfaceFile};
