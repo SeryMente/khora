@@ -110,7 +110,7 @@
     return [...new Uint8Array(digest)].map(byte=>byte.toString(16).padStart(2,'0')).join('');
   }
   let lastControls='';
-  async function scan(force=false) {
+  async function scanOnce(force=false) {
     if(!H.active)return;
     const root=mainRegion(), comp=composer();
     if(!root&&!comp)return;
@@ -121,11 +121,11 @@
     const viewport={width:innerWidth,height:innerHeight,devicePixelRatio:window.devicePixelRatio||1};
     const sheetSummary=styleSheets();
     const signature=JSON.stringify({features,controls:controls.map(c=>c.signature),structureNodes:struct.nodes,styles:sheetSummary.map(s=>[s.path,s.ruleCount,s.crossOriginOrInaccessible]),viewport});
-    const now=Date.now();
-    if(!force&&signature===H.lastFingerprint)return;
-    if(!force&&now-H.lastSentAt<4000){H.droppedScans++;return;}
-    H.lastFingerprint=signature;H.lastSentAt=now;
     const fingerprint=await fingerprintOf(signature);
+    const now=Date.now();
+    if(!force&&fingerprint===H.lastFingerprint)return;
+    if(!force&&now-H.lastSentAt<4000){H.droppedScans++;return;}
+    H.lastFingerprint=fingerprint;H.lastSentAt=now;
     const payload={
       catalogVersion:'0.1.2',fingerprint,features,controls:controls.map(({signature,...c})=>c),
       structure:struct,stylesheets:sheetSummary,viewport,
@@ -135,6 +135,14 @@
       droppedScans:H.droppedScans
     };
     await chrome.runtime.sendMessage({kind:'harmonia:event',event:{type:'ui.surface.scan',payload}}).catch(()=>{});
+  }
+  let scanInFlight=false,rescanPending=false;
+  async function scan(force=false){
+    if(scanInFlight){rescanPending=true;return;}
+    scanInFlight=true;
+    try{
+      do{rescanPending=false;await scanOnce(force);force=false;}while(rescanPending&&H.active);
+    }finally{scanInFlight=false;}
   }
   function scheduleScan(){if(timer)clearTimeout(timer);timer=setTimeout(()=>{timer=null;void scan(false);},1600);}
   function start(message){
@@ -162,7 +170,6 @@
   }
   function stop(){
     if(!H.active)return;
-    void scan(true);
     H.active=false;
     if(observer)observer.disconnect();observer=null;
     if(timer)clearTimeout(timer);timer=null;
