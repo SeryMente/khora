@@ -94,8 +94,11 @@ async function stopSession(tabId,reason){
 }
 async function injectTab(tab){
  if(!autoEnabled||!tab?.id||!valid(tab.url))return;
- try{await chrome.scripting.executeScript({target:{tabId:tab.id},files:['content.js']});}
- catch(e){lastError='No se pudo inyectar observación en una pestaña: '+String(e.message||e);}
+ try{
+  await chrome.scripting.executeScript({target:{tabId:tab.id},files:['content.js']});
+  await chrome.tabs.sendMessage(tab.id,{kind:'harmonia:start',automatic:true});
+ }
+ catch(e){lastError='No se pudo activar observación en una pestaña: '+String(e.message||e);}
 }
 async function injectExistingTabs(tabs){
  for(const tab of tabs||[]){if(!valid(tab.url))continue;await injectTab(tab);}
