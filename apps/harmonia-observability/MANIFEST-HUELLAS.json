@@ -32,8 +32,14 @@
   ],
   "checks": {
     "catalogReviewedAt": "2026-10-21",
-    "catalogFeatureCount": 37,
+    "catalogFeatureCount": 44,
     "officialSourceCount": 16,
-    "scope": "main conversational surface; settings and account menus excluded"
+    "scope": "main conversational surface; settings and account menus excluded",
+    "catalogVersion": "0.1.2",
+    "verifiedSourceCount": 16,
+    "weightedPoints": 68,
+    "verifiedDocumentedFeatures": 40,
+    "documentationWeightedPercent": 91,
+    "combinedPercentBeforeNaturalObservation": 46
   }
 }
