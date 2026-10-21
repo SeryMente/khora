@@ -19,8 +19,11 @@ try {
       "JS_SYNTAX_OK=$rel"
     }
     $manifest = Get-Content -LiteralPath (Join-Path $root 'extension\manifest.json') -Raw | ConvertFrom-Json
-    if ($manifest.manifest_version -ne 3 -or $manifest.version -ne '0.2.0') { throw 'Versión o tipo de manifiesto inesperado.' }
+    if ($manifest.manifest_version -ne 3 -or $manifest.version -ne '0.3.0') { throw 'Versión o tipo de manifiesto inesperado.' }
     if (-not ($manifest.host_permissions -contains 'https://chatgpt.com/*') -or -not ($manifest.host_permissions -contains 'http://127.0.0.1:47321/*')) { throw 'Los permisos de host no coinciden con el alcance mínimo esperado.' }
+    if (-not ($manifest.content_scripts | Where-Object { $_.matches -contains 'https://chatgpt.com/*' -and $_.js -contains 'content.js' -and $_.run_at -eq 'document_idle' })) { throw 'Falta la inyección automática de content.js en chatgpt.com.' }
+    if ($manifest.permissions -contains 'debugger') { throw 'El modo automático no debe solicitar el permiso debugger.' }
+    'AUTO_CONTENT_SCRIPT=VALID'
     'EXTENSION_MANIFEST=VALID'
     $catalog = Get-Content -LiteralPath (Join-Path $root 'coverage-catalog.json') -Raw | ConvertFrom-Json
     if ($catalog.schema -ne 'harmonia.coverage-catalog.v1' -or @($catalog.features).Count -lt 30 -or @($catalog.sources).Count -lt 10) { throw 'El catálogo público no contiene la estructura mínima esperada.' }
