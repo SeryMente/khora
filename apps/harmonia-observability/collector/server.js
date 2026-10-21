@@ -19,7 +19,7 @@ if(!index.surfaceFingerprints||typeof index.surfaceFingerprints!=='object')index
 if(!index.seenEventIds||typeof index.seenEventIds!=='object')index.seenEventIds={};
 if(!Number.isFinite(index.uniqueSurfaceCount))index.uniqueSurfaceCount=fs.readdirSync(surfacesDir).filter(name=>/^[0-9a-f]{64}\.json$/.test(name)).length;
 function featureWeight(feature){return feature.priority==='core'?2:1;}
-function text(value,max){return typeof value==='string'?value.replace(/[\\r\\n\\t]+/g,' ').replace(/\\s+/g,' ').slice(0,max):'';}
+function text(value,max){return typeof value==='string'?value.replace(/[\r\n\t]+/g,' ').replace(/\s+/g,' ').slice(0,max):'';}
 function number(value,fallback=0){const n=Number(value);return Number.isFinite(n)?n:fallback;}
 function listStrings(value,maxItems=100,maxLength=120){return Array.isArray(value)?value.filter(v=>typeof v==='string').slice(0,maxItems).map(v=>v.slice(0,maxLength)):[];}
 function sanitizeControl(c){return {tag:text(c&&c.tag,24),role:text(c&&c.role,40),label:text(c&&c.label,90),testId:text(c&&c.testId,70),placeholder:text(c&&c.placeholder,80),type:text(c&&c.type,24),disabled:!!(c&&c.disabled),expanded:text(c&&c.expanded,10)};}
@@ -105,7 +105,7 @@ function recordEvent(event,res){
  if(!validUUID(event.eventId)||!validUUID(event.sessionId)||typeof event.type!=='string'||!event.type||!event.capturedAt)throw Error('invalid-event-identity');
  const replay=index.seenEventIds[event.eventId];
  if(replay)return {duplicate:true,storedType:replay.storedType||event.type,ordinal:replay.ordinal||0};
- if(!/^ui\\.surface\\.(scan|reused)$|^capture\\./.test(event.type))throw Error('event-type-out-of-scope');
+ if(!/^ui\.surface\.(scan|reused)$|^capture\./.test(event.type))throw Error('event-type-out-of-scope');
  const when=Date.parse(event.capturedAt);if(!Number.isFinite(when))throw Error('invalid-event-date');
  if(event.type==='ui.surface.scan'||event.type==='ui.surface.reused'){
   const surface=sanitizeSurface(event),fingerprint=surface.fingerprint,day=new Date(when).toISOString().slice(0,10);
@@ -143,7 +143,7 @@ function recordEvent(event,res){
  index.seenEventIds[event.eventId]={capturedAt:stored.capturedAt,sessionId:stored.sessionId,storedType:stored.type,ordinal:session.events};
  pruneSeenEventIds();persist();return {duplicate:false,storedType:stored.type,ordinal:session.events,deduplicated:false};
 }
-function safeSessionUrl(raw){try{const u=new URL(raw);if(u.protocol!=='https:'||u.hostname!=='chatgpt.com')return null;return u.origin+u.pathname.replace(/\\/c\\/[^/]+/,'/c/[conversation]').replace(/\\/g\\/[^/]+/,'/g/[gpt]');}catch{return null;}}
+function safeSessionUrl(raw){try{const u=new URL(raw);if(u.protocol!=='https:'||u.hostname!=='chatgpt.com')return null;return u.origin+u.pathname.replace(/\/c\/[^/]+/,'/c/[conversation]').replace(/\/g\/[^/]+/,'/g/[gpt]');}catch{return null;}}
 function pruneSeenEventIds(){const ids=Object.keys(index.seenEventIds);if(ids.length>MAX_SEEN_EVENTS){for(const id of ids.slice(0,ids.length-MAX_SEEN_EVENTS))delete index.seenEventIds[id];}}
 const server=http.createServer((req,res)=>{
  const origin=req.headers.origin;if(!originOK(origin))return reply(req,res,403,{error:'origin-not-allowed'});
