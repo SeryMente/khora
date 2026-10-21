@@ -1,0 +1,18 @@
+{
+  "writeHttp": 201,
+  "verifiedAt": "2026-10-21T01:35:30.229Z",
+  "project": "prj_hRN86BKITXYKTnNlp0ygVhaMwFfx",
+  "env": [
+    {
+      "id": "c6psLRF3SFPu7QoC",
+      "key": "NEXT_PUBLIC_TAKEOUT_GOOGLE_PICKER_KEY",
+      "type": "encrypted",
+      "target": [
+        "production"
+      ],
+      "gitBranch": null
+    }
+  ],
+  "complete": true,
+  "deploymentChanged": false
+}

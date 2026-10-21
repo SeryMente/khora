@@ -1,0 +1,36 @@
+{
+  "writeHttp": 201,
+  "verifiedAt": "2026-10-21T01:32:11.449Z",
+  "project": "prj_hRN86BKITXYKTnNlp0ygVhaMwFfx",
+  "env": [
+    {
+      "id": "ULcwZIRqheZkWC7j",
+      "key": "TAKEOUT_GOOGLE_CLIENT_ID",
+      "type": "encrypted",
+      "target": [
+        "production"
+      ],
+      "gitBranch": null
+    },
+    {
+      "id": "bsafoqVya5NIfk07",
+      "key": "TAKEOUT_GOOGLE_CLIENT_SECRET",
+      "type": "sensitive",
+      "target": [
+        "production"
+      ],
+      "gitBranch": null
+    },
+    {
+      "id": "NiMOdGeXBKeypzB8",
+      "key": "NEXT_PUBLIC_TAKEOUT_GOOGLE_APP_ID",
+      "type": "encrypted",
+      "target": [
+        "production"
+      ],
+      "gitBranch": null
+    }
+  ],
+  "complete": true,
+  "deploymentChanged": false
+}
