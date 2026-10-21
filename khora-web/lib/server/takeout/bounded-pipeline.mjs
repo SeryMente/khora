@@ -45,7 +45,7 @@ class ArchiveReader extends yauzl.RandomAccessReader{
    }
   })());
  }
- _destroy(cb){this.cache.clear();cb()}
+ close(cb){this.cache.clear();setImmediate(cb)}
 }
 const openZip=(reader,size)=>new Promise((resolve,reject)=>yauzl.fromRandomAccessReader(reader,size,{autoClose:true,lazyEntries:true,decodeStrings:true,validateEntrySizes:true,strictFileNames:true},(e,z)=>e?reject(new TransferError('ZIP_INVALID')):resolve(z)));
 async function entryBytes(zip,entry){

@@ -1,0 +1,4 @@
+import { NextRequest,NextResponse } from "next/server";import { auth } from "@/auth";import { cancelJob,getJob } from "@/lib/server/takeout/runtime";
+export const runtime="nodejs";export const dynamic="force-dynamic";
+export async function GET(_req:NextRequest,{params}:{params:Promise<{id:string}>}){const owner=(await auth())?.user?.email;if(!owner)return NextResponse.json({error:"not_authenticated"},{status:401});const {id}=await params;const data=await getJob(owner,id);return data?NextResponse.json(data,{headers:{"Cache-Control":"no-store"}}):NextResponse.json({error:"not_found"},{status:404})}
+export async function DELETE(_req:NextRequest,{params}:{params:Promise<{id:string}>}){const owner=(await auth())?.user?.email;if(!owner)return NextResponse.json({error:"not_authenticated"},{status:401});const {id}=await params;return await cancelJob(owner,id)?NextResponse.json({canceled:true}):NextResponse.json({error:"not_found"},{status:404})}

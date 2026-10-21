@@ -1,0 +1,4 @@
+import { NextResponse } from "next/server";import { auth } from "@/auth";import { getFreshAccessToken,loadGrant,takeoutArchiveLimit } from "@/lib/server/takeout/runtime";
+export const runtime="nodejs";export const dynamic="force-dynamic";
+const noStore={"Cache-Control":"no-store, max-age=0"};
+export async function GET(){const owner=(await auth())?.user?.email;if(!owner)return NextResponse.json({error:"not_authenticated"},{status:401,headers:noStore});const grant=await loadGrant(owner);if(!grant)return NextResponse.json({connected:false,limitBytes:takeoutArchiveLimit()},{headers:noStore});try{return NextResponse.json({connected:true,accessToken:await getFreshAccessToken(owner),apiKey:process.env.NEXT_PUBLIC_TAKEOUT_GOOGLE_PICKER_KEY||"",appId:process.env.NEXT_PUBLIC_TAKEOUT_GOOGLE_APP_ID||"",limitBytes:takeoutArchiveLimit()},{headers:noStore})}catch{return NextResponse.json({error:"google_reconnect_required"},{status:409,headers:noStore})}}
