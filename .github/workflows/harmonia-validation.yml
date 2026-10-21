@@ -1,0 +1,46 @@
+name: Harmonia validation
+
+on:
+  push:
+    branches:
+      - 'feat/harmonia-e2e-*'
+    paths:
+      - 'apps/harmonia-observability/**'
+      - '.github/workflows/harmonia-validation.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'apps/harmonia-observability/**'
+      - '.github/workflows/harmonia-validation.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  source-contract-and-e2e:
+    name: Source contract and local collector E2E
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check JavaScript syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in apps/harmonia-observability/extension/*.js; do
+            node --check "$file"
+          done
+          node --check apps/harmonia-observability/collector/server.js
+          for file in apps/harmonia-observability/tests/*.js apps/harmonia-observability/scripts/*.js; do
+            node --check "$file"
+          done
+      - name: Validate source contracts and mirrored catalog
+        run: node apps/harmonia-observability/scripts/validate-source.js
+      - name: Run unit and real local-HTTP collector E2E tests
+        run: node --test apps/harmonia-observability/tests/*.test.js
