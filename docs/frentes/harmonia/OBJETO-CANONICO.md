@@ -15,7 +15,7 @@ Modo ejecución del frente Harmonia, no adaptación del método ni continuación
 
 El prompt de asistente activa asistencia y continuidad; el de constructor activa ejecución de desarrollo. No intercambiar roles ni importar la excepción de hilo único metodológico. No crear agentes/sesiones por iniciativa de este archivo. Solo el asistente puede usar Remote Desktop Commander (RDC), exclusivamente cuando el hito necesita el equipo y las fuentes del repositorio/sandbox no bastan; el constructor nunca lo invoca ni lo elude por intermediarios.
 
-Objetivo inmediato vigente: completar la primera prueba real desde el paquete v0.1.0 ya entregado. **No construir, instalar, capturar ni acceder al equipo desde el hilo emisor de Metacanon.** Este hilo conserva el control, usa Remote Desktop Commander dentro del alcance autorizado y no declara carga/captura sin evidencia.
+Objetivo inmediato vigente: reparar la ubicación del paquete v0.1.0 sin usar la raíz prohibida y solo después completar la primera prueba real. **No construir, instalar, capturar ni acceder al equipo desde el hilo emisor de Metacanon.** Este hilo conserva el control, usa Remote Desktop Commander dentro del alcance autorizado y no declara carga/captura sin evidencia.
 
 ## 3. Referencia metodológica
 
@@ -39,7 +39,7 @@ Resto del método vigente aplicable por pertinencia; citas históricas, ejemplos
 
 **De dónde viene:** U01 exige una semilla urgente para observar empíricamente ChatGPT en Google Chrome; U03 exige entradas/salidas y un frente propio, no ejecución en Metacanon.
 
-**Dónde está:** primera semilla v0.1.0 construida en `apps/harmonia-observability/`, conservada en Git y colocada con runtime autónomo en el Escritorio real resuelto por Windows del dispositivo conectado. Colector, persistencia, reinicio, índice y huellas aprobaron una prueba sintética; la extensión todavía no fue cargada en Chrome ni ensayada sobre una conversación real.
+**Dónde está:** primera semilla v0.1.0 construida en `apps/harmonia-observability/` y conservada en Git. Colector, persistencia, reinicio, índice y huellas aprobaron una prueba sintética. La colocación local anterior es inválida por raíz prohibida; todavía no existe una entrega autorizada para fila4 ni carga/ensayo real en Chrome.
 
 **A dónde va:** observabilidad en vivo e indexable que permita al hilo Metacanon examinar el trabajo de otro hilo mediante RDC, sin obligar al operador a narrarlo de nuevo. Mejorar extensión y marco por cortes, a partir de **observaciones empíricas del operador + datos**, preservando ambos y distinguiendo inferencias.
 
@@ -68,7 +68,7 @@ Excluido del paquete: captura de credenciales/cookies/borradores/otras pestañas
 
 | Estado | Contenido y fuente |
 | --- | --- |
-| Autorizado y ejecutado | Construcción, persistencia y entrega en Escritorio de la semilla v0.1.0 por orden explícita de cierre extremo a extremo. Implementación limitada a pestaña elegida, activación manual y almacenamiento local. |
+| Autorizado y ejecutado | Construcción y persistencia en Git de la semilla v0.1.0. El intento de entrega local quedó invalidado por usar una raíz prohibida; no cuenta como entrega. |
 | Requisitos ratificados | Observación en tiempo real, entradas, salidas, texto transitorio visible, HTML/CSS/consola, consulta por RDC e indexación, por U01/U03. Son criterios a ensayar, no capacidades ya probadas. |
 | Implementado, pendiente de revisión real | Permiso `debugger`, canal local `127.0.0.1`, originales JSONL/índice, tope 1 GiB sin borrado y panel mínimo coherente con Khora. La primera captura real exige aceptación visible al cargar la extensión y pulsar Iniciar. |
 | Pendiente material | Carga manual en Chrome, conversación de prueba sin datos sensibles, calibración de latencia/retención y revisión del panel en funcionamiento. Atención automatizada del modelo no fue implementada ni aprobada. |
@@ -109,7 +109,7 @@ Primer propietario: el operador autoriza instanciar el hilo fresco de asistencia
 | Persistencia/indexación | Recuperación por criterios, reinicio, duplicados/huecos y retención acordada; carga representativa | SINTÉTICO APROBADO en Windows: 5 eventos, reinicio e integridad; carga real pendiente |
 | Mejora empírica | Caso original + observación humana + diagnóstico + cambio aprobado + regresión + nuevo uso | PENDIENTE |
 
-Este ciclo cierra construcción y entrega del primer paquete, no la aceptación funcional sobre ChatGPT. No se inventan métricas de fidelidad ni latencia antes de la muestra real. Cronología: intención → implementación → prueba sintética → carga humana pendiente → ensayo real → corte empírico.
+Este ciclo cierra construcción del primer paquete y documenta una entrega local fallida por ubicación; no cierra entrega autorizada ni aceptación funcional sobre ChatGPT. No se inventan métricas de fidelidad ni latencia antes de la muestra real. Cronología: intención → implementación → prueba sintética → carga humana pendiente → ensayo real → corte empírico.
 
 ### Primer contrato comprobable · antecedente e implementación inicial
 
@@ -125,7 +125,7 @@ Fuente: U01/U03 y orden actual HARMONIA-REANUDACION-01. No se elige stack ni per
 - **Prueba independiente de atención:** observar un ciclo real de lectura/respuesta del modelo, pausas y límites; capturador en funcionamiento no demuestra modelo atendiendo entre turnos. Sin mecanismo autorizado/ensayado, atención continua NO VERIFICADA.
 - **Corte empírico:** original + observación literal del operador + hipótesis separada + decisión de cambio + regresión + versión. No autoaprobar ni modificar Metacanon desde Harmonia.
 
-**Compuerta material inmediata:** acción humana de Chrome: cargar la carpeta `extension`, aceptar el aviso de depuración al iniciar y usar una conversación de prueba sin datos sensibles. Después, este hilo puede medir y cotejar la captura real por Remote Desktop Commander. Cualquier ampliación de permisos, pestañas, retención, nube o automatización vuelve a revisión material.
+**Compuerta material inmediata:** resolver o confirmar la redirección contradictoria del Escritorio de fila4 y reparar la ubicación desde una fuente segura sin usar la copia prohibida. Después: acción humana de Chrome para cargar `extension`, aceptar el aviso de depuración y usar una conversación sin datos sensibles; entonces cotejar la captura real. Cualquier ampliación de permisos, pestañas, retención, nube o automatización vuelve a revisión material.
 
 ### Diagnóstico de antecedentes · lectura, no instalación
 
@@ -135,7 +135,7 @@ En revisión 4384c84336a93770e70a484ce0a9708144b7cc99: manifest0.3.5 (blob9bf22c
 
 Mantener los diez campos centrales, en forma legible y compacta, sin pared de texto: 1) frente/rol/sello + Metacanon adquirido, revisión/frescura; 2) dónde estamos; 3) delta de método y proyecto; 4) avance, evidencia/entorno y no tocado; 5) pendientes/bloqueos; 6) viabilidad ligada a intención y aceptación; 7) tiempo/ciclos hasta próximo hito y cierre, supuestos/confianza/deriva o «no estimable» con causa; 8) siguiente acción e intervención material mínima; 9) continuación/prompt ante devolución del constructor o checkpoint del constructor; 10) custodia/revisión/ancla y próximo checkpoint. No esconder campos desconocidos ni repetir auditorías vacías.
 
-Presión de créditos vigente: condensar decisiones y pruebas por riesgo, reutilizar evidencia vigente. Estimación restante: un ciclo de carga/prueba real tras la intervención humana de Chrome; deriva desconocida si la interfaz actual de ChatGPT cambia selectores o no expone texto transitorio. No bajar criterios para declarar cierre. El control no se acredita por un checklist textual.
+Presión de créditos vigente: condensar decisiones y pruebas por riesgo, reutilizar evidencia vigente. Estimación restante: un ciclo de reparación de ubicación tras resolver la redirección y un ciclo de carga/prueba real; deriva desconocida si la interfaz de ChatGPT cambia selectores o no expone texto transitorio. No bajar criterios para declarar cierre. El control no se acredita por un checklist textual.
 
 ## 11. Crónica y fuentes
 
