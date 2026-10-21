@@ -124,17 +124,18 @@
       const el=elements[index],role=attr(el,'data-message-author-role',12);
       if(role!=='user'&&role!=='assistant')continue;
       const key=role+':'+index;liveKeys.add(key);
-      const visibleText=String(el.innerText||'').replace(/\\r\\n?/g,'\\n').slice(0,100000);
+      const visibleText=String(el.innerText||'').replace(/\r\n?/g,'\n').slice(0,100000);
       if(!visibleText)continue;
       const sha=await fingerprintOf(visibleText),previous=H.lastMessages.get(key);
+      const messageStreaming=role==='assistant'&&isStreaming&&index===elements.length-1;
       const wasStreaming=!!previous?.streaming;
-      if(previous?.sha===sha&&wasStreaming===isStreaming)continue;
+      if(previous?.sha===sha&&wasStreaming===messageStreaming)continue;
       let operation='replace',delta='',text=visibleText;
       if(previous&&visibleText.startsWith(previous.text)&&visibleText.length>previous.text.length){operation='append';delta=visibleText.slice(previous.text.length);text='';}
-      else if(previous&&visibleText===previous.text&&wasStreaming&&!isStreaming){operation='complete';text='';}
-      const payload={regionKey:currentRegion,messageKey:key,role,index,operation,delta,text,contentSha256:sha,visible:true,streaming:isStreaming,truncated:visibleText.length>=100000,hiddenReasoningCaptured:false};
+      else if(previous&&visibleText===previous.text&&wasStreaming&&!messageStreaming){operation='complete';text='';}
+      const payload={regionKey:currentRegion,messageKey:key,role,index,operation,delta,text,contentSha256:sha,visible:true,streaming:messageStreaming,truncated:visibleText.length>=100000,hiddenReasoningCaptured:false};
       await chrome.runtime.sendMessage({kind:'harmonia:event',event:{type:'conversation.visible.delta',payload}}).catch(()=>{});
-      H.lastMessages.set(key,{text:visibleText,sha,streaming:isStreaming});
+      H.lastMessages.set(key,{text:visibleText,sha,streaming:messageStreaming});
     }
     for(const key of H.lastMessages.keys())if(!liveKeys.has(key))H.lastMessages.delete(key);
   }
