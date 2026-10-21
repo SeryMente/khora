@@ -104,6 +104,11 @@
       return {index:i,path,crossOriginOrInaccessible:error,ruleCount:rules};
     });
   }
+  async function fingerprintOf(value){
+    const bytes=new TextEncoder().encode(value);
+    const digest=await crypto.subtle.digest('SHA-256',bytes);
+    return [...new Uint8Array(digest)].map(byte=>byte.toString(16).padStart(2,'0')).join('');
+  }
   let lastControls='';
   async function scan(force=false) {
     if(!H.active)return;
@@ -114,14 +119,16 @@
     const features=featureIds(root,comp,controls);
     const struct=structure(root||comp?.closest('form')||comp,controls);
     const viewport={width:innerWidth,height:innerHeight,devicePixelRatio:window.devicePixelRatio||1};
-    const signature=JSON.stringify({features,controls:controls.map(c=>c.signature),nodes:Math.round(struct.total/20)*20,styles:styleSheets().map(s=>[s.path,s.ruleCount,s.crossOriginOrInaccessible]),viewport});
+    const sheetSummary=styleSheets();
+    const signature=JSON.stringify({features,controls:controls.map(c=>c.signature),structureNodes:struct.nodes,styles:sheetSummary.map(s=>[s.path,s.ruleCount,s.crossOriginOrInaccessible]),viewport});
     const now=Date.now();
     if(!force&&signature===H.lastFingerprint)return;
     if(!force&&now-H.lastSentAt<4000){H.droppedScans++;return;}
     H.lastFingerprint=signature;H.lastSentAt=now;
+    const fingerprint=await fingerprintOf(signature);
     const payload={
-      catalogVersion:'0.1.2',features,controls:controls.map(({signature,...c})=>c),
-      structure:struct,stylesheets:styleSheets(),viewport,
+      catalogVersion:'0.1.2',fingerprint,features,controls:controls.map(({signature,...c})=>c),
+      structure:struct,stylesheets:sheetSummary,viewport,
       layout:{main:styleSummary(root),composer:styleSummary(comp),assistant:styleSummary(root?.querySelector('[data-message-author-role="assistant"]'))},
       counts:{controls:controls.length,userMessages:root?$$('[data-message-author-role="user"]',root).length:0,assistantMessages:root?$$('[data-message-author-role="assistant"]',root).length:0,styleSheets:document.styleSheets.length},
       privacy:{conversationTextCaptured:false,composerTextCaptured:false,fieldValuesCaptured:false,hrefsCaptured:false,imageUrlsCaptured:false,menusExcluded:true},
@@ -137,13 +144,21 @@
     window.addEventListener('popstate',scheduleScan,true);
     window.addEventListener('hashchange',scheduleScan,true);
     void scan(true);
-    observer=new MutationObserver(scheduleScan);
+    observer=new MutationObserver(records=>{
+      const relevant=records.some(record=>{
+        const target=record.target?.nodeType===1?record.target:record.target?.parentElement;
+        if(!target||excluded(target))return false;
+        if(record.type==='attributes')return true;
+        if(record.type==='childList')return [...record.addedNodes,...record.removedNodes].some(node=>node.nodeType===1&&!excluded(node));
+        return false;
+      });
+      if(relevant)scheduleScan();
+    });
     const root=mainRegion()||document.body;
     observer.observe(root,{subtree:true,childList:true,attributes:true,attributeFilter:['class','role','aria-label','aria-live','aria-busy','data-testid','data-message-author-role','disabled','data-state']});
     const comp=composer();
     if(comp&&!root?.contains(comp))observer.observe(comp.closest('form')||comp.parentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['class','role','aria-label','aria-live','aria-busy','data-testid','disabled','data-state']});
-    const periodic=setInterval(()=>{if(!H.active){clearInterval(periodic);return;}void scan(false);},10000);
-    H.periodic=periodic;
+    // Sin sondeo periódico: las mutaciones estructurales y el viewport activan el barrido.
   }
   function stop(){
     if(!H.active)return;
@@ -151,7 +166,7 @@
     H.active=false;
     if(observer)observer.disconnect();observer=null;
     if(timer)clearTimeout(timer);timer=null;
-    if(H.periodic)clearInterval(H.periodic);H.periodic=null;
+    H.periodic=null;
     window.removeEventListener('resize',scheduleScan);
     window.removeEventListener('popstate',scheduleScan,true);
     window.removeEventListener('hashchange',scheduleScan,true);
