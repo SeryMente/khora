@@ -1,0 +1,12 @@
+{
+  "schema": "responsabilidad-frente/1",
+  "front": "harmonia",
+  "status": "unassigned",
+  "owner_thread": null,
+  "instance": null,
+  "generation": 0,
+  "expiry": null,
+  "authorization_ref": "docs/frentes/harmonia/originales/HARMONIA-INSTANCIACION-01-operador.jsonl#U03",
+  "bootstrap_scope": "initialize documentation only; first identified assistant thread may claim atomically if still unassigned; never overwrite an owner",
+  "enforcement": "cooperative registry; no server fencing of arbitrary writes"
+}
