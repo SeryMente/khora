@@ -59,6 +59,10 @@ const server=http.createServer((req,res)=>{
   if(req.url==='/health')return reply(req,res,200,{ok:true,root,maxBytes:MAX,totalBytes:index.totalBytes,stopped:index.stopped,updatedAt:index.updatedAt});
   return reply(req,res,200,index);
  }
+ if(req.method==='POST'&&req.url==='/shutdown'){
+  if(!authOK(req))return reply(req,res,401,{error:'unauthorized'});
+  persist();reply(req,res,200,{ok:true,stopping:true});setTimeout(()=>server.close(()=>console.log('HARMONIA_COLLECTOR_STOPPED')),80);return;
+ }
  if(req.method!=='POST'||req.url!=='/events')return reply(req,res,404,{error:'not-found'});
  if(!authOK(req))return reply(req,res,401,{error:'unauthorized'});
  if(index.stopped)return reply(req,res,507,{error:'storage-limit-stop-no-deletion'});
