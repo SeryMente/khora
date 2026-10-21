@@ -6,11 +6,13 @@
   "permissions": [
     "scripting",
     "storage",
-    "tabs"
+    "tabs",
+    "alarms"
   ],
   "host_permissions": [
     "https://chatgpt.com/*",
-    "http://127.0.0.1:47321/*"
+    "http://127.0.0.1:47321/*",
+    "https://raw.githubusercontent.com/SeryMente/khora/*"
   ],
   "background": {
     "service_worker": "service-worker.js"
