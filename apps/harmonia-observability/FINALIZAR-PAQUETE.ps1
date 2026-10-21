@@ -1,7 +1,7 @@
 $ErrorActionPreference = 'Stop'
 $desktop = 'C:\Users\fila4\Desktop'
 $root = $PSScriptRoot
-$data = 'C:\Users\fila4\AppData\Local\Harmonia\surface-index-v0.2.0\data'
+$data = 'C:\Users\fila4\AppData\Local\Harmonia\surface-index-v0.3.0\data'
 $node = Join-Path $root 'runtime\node.exe'
 $authFile = Join-Path $root 'extension\local-auth.js'
 $log = Join-Path $desktop 'log.txt'
@@ -41,7 +41,7 @@ try {
     if (-not $match.Success) { throw 'El archivo local de credencial no tiene un token de 64 caracteres hexadecimales.' }
     $token = $match.Groups[1].Value
     $health = Invoke-RestMethod -Uri 'http://127.0.0.1:47321/health' -Headers @{ 'x-harmonia-token' = $token } -TimeoutSec 5
-    if (-not $health.ok -or $health.root -ne $data -or $health.stopped) { throw 'La salud del colector no coincide con el almacén v0.2.' }
+    if (-not $health.ok -or $health.root -ne $data -or $health.stopped) { throw 'La salud del colector no coincide con el almacén v0.3.' }
     'SERVICE_HEALTH=OK'
     try {
         Invoke-RestMethod -Uri 'http://127.0.0.1:47321/health' -TimeoutSec 3 | Out-Null
