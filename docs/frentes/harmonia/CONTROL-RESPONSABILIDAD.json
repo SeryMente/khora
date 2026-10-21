@@ -1,12 +1,14 @@
 {
   "schema": "responsabilidad-frente/1",
   "front": "harmonia",
-  "status": "unassigned",
-  "owner_thread": null,
-  "instance": null,
-  "generation": 0,
+  "status": "assigned",
+  "owner_thread": "400a4187-8241-8023-b3dd-00a96d379015",
+  "instance": "samanthal-harmonia-notion-400a4187",
+  "generation": 1,
   "expiry": null,
-  "authorization_ref": "docs/frentes/harmonia/originales/HARMONIA-INSTANCIACION-01-operador.jsonl#U03",
-  "bootstrap_scope": "initialize documentation only; first identified assistant thread may claim atomically if still unassigned; never overwrite an owner",
+  "authorization_ref": "https://app.notion.com/chat?t=400a418782418023b3dd00a96d379015; user request 2026-10-21T01:32:51.944Z; bootstrap U03",
+  "acquired_at": "2026-10-21T01:34:35Z",
+  "previous_blob": "0141ace6b40485de407f5207872dec4a9123e546",
+  "bootstrap_scope": "identified fresh assistant assumes Harmonia continuity; does not authorize installation, capture or material architecture/security decisions",
   "enforcement": "cooperative registry; no server fencing of arbitrary writes"
 }
