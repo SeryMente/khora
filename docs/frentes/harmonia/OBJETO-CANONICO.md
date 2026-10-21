@@ -3,7 +3,7 @@
 ## 1. Control e identidad
 
 - Nombre normalizado: **Harmonia**, extensión compañera de **Khora**; «Armonía» y «Cora» de los dictados se conservan literalmente en originales. No renombrar producto o repositorio por transcripción.
-- Identificador del frente: `harmonia`. Versión **0.2**; sello **HARMONIA-v0.2**. Ancla: orden de reanudación / HARMONIA-REANUDACION-01, corte 2026-10-21T01:37:07.144886+00:00. Antecedente preservado: HARMONIA-INSTANCIACION-01.
+- Identificador del frente: `harmonia`. Versión **0.3**; sello **HARMONIA-v0.3**. Ancla: orden de construcción de extremo a extremo / HARMONIA-OBSERVABILIDAD-01, corte 2026-10-21T01:52:01.177490+00:00. Antecedente preservado: HARMONIA-INSTANCIACION-01.
 - Frente permanente por creación expresa del operador; no servicio operativo. Esta creación no declara aprobadas propuestas técnicas ni instala extensión.
 - Repositorio propietario: `SeryMente/khora`, privado comprobado mediante GitHub en este ciclo; base observada bd29c924393fcbd9183100f66b2e50c87b791207. Contenedor `docs/frentes/harmonia/`; único elemento de estado `OBJETO-CANONICO.md`. Los demás archivos son custodia/ayuda, no estados paralelos.
 - Persistencia: objeto inicial recuperado desde main en 0ee2559082c1935905c8fde1513ccdfe247131ed, blob 56d3f85b03f6b4fecfd7ea54e316cac55abb918d. Este delta requiere publicación y lectura de vuelta; su revisión real es el recibo externo, no una revisión futura inventada.
@@ -43,7 +43,7 @@ Resto del método vigente aplicable por pertinencia; citas históricas, ejemplos
 
 **A dónde va:** observabilidad en vivo e indexable que permita al hilo Metacanon examinar el trabajo de otro hilo mediante RDC, sin obligar al operador a narrarlo de nuevo. Mejorar extensión y marco por cortes, a partir de **observaciones empíricas del operador + datos**, preservando ambos y distinguiendo inferencias.
 
-**Qué cambió:** reanudación en hilo fresco, control generación1 y primer contrato propuesto en §9; sin cambios de método, código, instalación ni equipo.
+**Qué cambió:** orden de construcción de extremo a extremo, aclaración de16 exigencias por Metodología y denominación de trabajo Observabilidad del trabajo con IA (sin alta en glosario); observación/transporte/atención separados, dos ritmos de mejora. Viabilidad inspeccionada y paquete de decisiones propuesto; sin cambios de método, código, instalación ni equipo.
 
 Incluido como requisitos del producto, NO como capacidades ya demostradas:
 - Observar la estructura HTML representada en el documento de la página, CSS/estilos pertinentes y eventos de consola desde el inicio de captura; precisar cobertura y huecos, no prometer historia anterior al enganche.
@@ -78,6 +78,8 @@ Primer propietario: el operador autoriza instanciar el hilo fresco de asistencia
 
 ## 7. Perfil de entorno
 
+- Actualización del ciclo: última consulta Remote Desktop Commander sin dispositivos Online; PC-14 pasó de Online a Offline. Mensaje propagado informa Windows/perfil C:\Users\PC 13 y autorización del dispositivo pendiente; no acredita identidad ni Escritorio. Código/enlace con código y ruta temporal omitidos deliberadamente de custodia permanente. Entrega autorizada en Escritorio real, ruta a resolver por Windows solo tras vínculo/permiso; paquete/carga/pruebas se verifican por separado.
+
 - Reportado por el operador: Google Chrome, ChatGPT gratuito y conexión RDC en esa plataforma; dos conversaciones previstas. Modelo exacto, límites vigentes, conectividad y capacidad de herramientas NO VERIFICADOS en el equipo.
 - Equipo/sistema operativo, rutas locales, identidad Chrome, versión instalada y recursos: NO VERIFICADOS; no importar datos de otros frentes.
 - Repositorio privado revalidado por búsqueda GitHub en este ciclo; escritura disponible. Plataforma de asistencia actual: Notion, no ChatGPT; no extrapolar herramientas/modelo a ChatGPT. Remote Desktop Commander (RDC): **no utilizado; no necesario para este diagnóstico documental**.
@@ -85,13 +87,15 @@ Primer propietario: el operador autoriza instanciar el hilo fresco de asistencia
 
 ## 8. Estado vivo
 
-**🔄 Estado vivo:** Acción actual: asistente reanudado en Notion y responsabilidad generación1 adquirida y leída de vuelta; contrato inicial de captura preparado como propuesta en §9. Siguiente paso: obtener decisión material sobre prueba limitada y permiso de inventario remoto de solo lectura; después verificar equipo/vínculo y proponer canal local, destino/retención y permisos concretos antes de construir. Pendientes en secuencia: aprobar alcance de prueba; inventario necesario y autorizado del Chrome y Remote Desktop Commander reales; completar revisión de componentes reutilizables; decidir arquitectura/seguridad/retención; encargo acotado al constructor (no instanciado); captura real de entradas/salidas/transitorios y HTML/CSS/consola; consulta remota e índice; interrupciones/latencia; ensayo separado de atención del modelo; primer corte empírico. No instalación ni captura realizadas.
+**🔄 Estado vivo:** Acción actual: revisión de viabilidad y trazabilidad16 completada documentalmente para Observabilidad del trabajo con IA, primera implementación ChatGPT/Chrome; propuesta de acceso/arquitectura/custodia/interacción en propuestas/OBSERVABILIDAD-PLAN-01.md, NO APROBADA. No código construido ni instalación/captura. Siguiente paso: decisión específica del operador sobre el paquete propuesto y dispositivo realmente autorizado y vínculo confirmado; última lista sin dispositivos Online; sin ello no ejecutar en equipo ni construir lo protegido por candados de datos/interfaz/arquitectura. Luego inventario acotado de runtime/extensión/destino y revisión de pantalla/ruta antes de captura; construcción autorizada, pruebas controladas, ensayo real en los dos hilos, reinicio/recuperación, prueba independiente de atención y mejora con incidente+corte. Todos los pendientes funcionales anteriores permanecen; no interpretar la orden general como aprobación de permisos aún no presentados.
 
 **⚗️ En prueba / recién fallido:** No se ha construido, instalado ni ejecutado la semilla. Captura continua, recuperación de texto transitorio, consulta RDC, latencia, retención/indexación y atención sostenida del hilo Metacanon: NO VERIFICADAS.
 
 **🔔 Recordatorios latentes:** no rebajar tiempo real a resúmenes posteriores; no fingir atención sostenida; distinguir texto visible de razonamiento privado; conservar originales y observaciones del operador; decisiones materiales presentes antes de construir; constructor sin RDC; no autoactualizar el marco; no copiar registros sensibles a Git ni traer estado de otros frentes. Nada de esto se libera por omisión.
 
 ## 9. Aceptación y viabilidad
+
+- Orden de entrega propagada: dejar paquete en Escritorio real listo para Cargar descomprimida. Estados actuales: paquete del observador SIN CONSTRUIR; entrega en Escritorio NO EJECUTADA (conexión no disponible); carga Chrome NO EJECUTADA; funcionamiento NO ENSAYADO; atención permanente NO VERIFICADA. Propuesta material pendiente no se convierte en aprobación por la orden general.
 
 | Requisito → resultado esperado | Evidencia requerida y entorno | Estado |
 | --- | --- | --- |
@@ -106,7 +110,9 @@ Primer propietario: el operador autoriza instanciar el hilo fresco de asistencia
 
 El objetivo de este ciclo es responsabilidad verificable, contexto recuperado y primer contrato propuesto; no equivale a aceptación del producto. No métricas de fidelidad inventadas, garantías de perfección o proyección temporal sin muestra. Cronología de revisión: intención→criterios→resultado→evidencia→límite; revisión documental no cierra cinco puertas funcionales del marco.
 
-### Primer contrato comprobable · propuesta, NO APROBADA
+### Primer contrato comprobable · antecedente propuesto, NO APROBADO
+
+Ampliación vigente de intención y propuesta, sin implementación: `propuestas/OBSERVABILIDAD-PLAN-01.md`. Se preserva el contrato inicial como antecedente; no limitar el objetivo completo a una consulta bajo demanda ni solo a cortes periódicos.
 
 Fuente: U01/U03 y orden actual HARMONIA-REANUDACION-01. No se elige stack ni permiso debugger por este texto.
 
@@ -131,6 +137,8 @@ Mantener los diez campos centrales, en forma legible y compacta, sin pared de te
 Presión de créditos vigente: condensar decisiones y pruebas por riesgo, reutilizar evidencia vigente. Estimación inicial del producto: NO ESTIMABLE sin probar entorno/permisos/captura; próxima entrega documental no requiere acceso remoto. No bajar criterios para dar una fecha cómoda. El control no se acredita por un checklist textual.
 
 ## 11. Crónica y fuentes
+
+- Ciclo actual: `cronica/HARMONIA-OBSERVABILIDAD-01.md`; orden literal `originales/HARMONIA-OBSERVABILIDAD-01.jsonl`; salida preparada `originales/HARMONIA-OBSERVABILIDAD-01-salida.md`; propuesta y trazabilidad16 `propuestas/OBSERVABILIDAD-PLAN-01.md`. Comunicación de Metodología recibida en este chat y fuente de sesión identificada; literal íntegro de esa comunicación aún no copiado al repositorio (laguna explícita, no se reconstruye desde la matriz).
 
 - Ciclo actual: `cronica/HARMONIA-REANUDACION-01.md`; entrada actual literal, acuse visible y salida final preparada en `originales/HARMONIA-REANUDACION-01.jsonl` y `originales/HARMONIA-REANUDACION-01-salida.md`. Cobertura explícita del corte; no conversación completa ni captura futura.
 - Refresco metodológico: misma versión1.10/huella53db16723ec90d555d207a9a94e4f1dfd58adf07, fuente leída en c4ba129; último commit de la ruta obtenido de API:246abe6e6d9443014cfb54fce7b26b774b2840a0, modificado2026-10-20T23:06:03Z. No delta metodológico observado; no vigilante de fondo.
