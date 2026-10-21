@@ -147,7 +147,7 @@ async function claimJob(id:string){await ensureTakeoutSchema();const token=rando
 async function release(id:string,token:string){await db().query("UPDATE khora_takeout_jobs SET lease_owner=NULL,lease_until=NULL WHERE id=$1 AND lease_owner=$2",[id,token]);}
 async function saveClaim(claim:any,state:JobState,status:string,phase:string,active=true,error:string|null=null){const r=await db().query(`UPDATE khora_takeout_jobs SET sealed=$1,status=$2,phase=$3,active=$4,error_code=$5,version=version+1,lease_owner=NULL,lease_until=NULL,updated_at=now() WHERE id=$6 AND lease_owner=$7 AND version=$8 RETURNING version`,[seal("job",claim.owner,claim.row.id,state),status,phase,active,error,claim.row.id,claim.token,claim.version]);if(r.rowCount!==1)throw new Error("TAKEOUT_JOB_CAS_CONFLICT");}
 export type StepResult={done:boolean;busy?:boolean;status:string;phase:string};
-export async function processTakeoutJobStep(id:string):Promise<StepResult>{
+export async function processTakeoutJobStep(id:string,finalAttempt=false):Promise<StepResult>{
  const claim=await claimJob(id);if(!claim)return {done:false,busy:true,status:"running",phase:"busy"};
  try{
   const {advanceTransferChunk}=await import("./transfer.mjs");const {verifyArchiveStep,parseZipStep}=await import("./bounded-pipeline.mjs");
@@ -166,5 +166,5 @@ export async function processTakeoutJobStep(id:string):Promise<StepResult>{
   claim.state.parseCursor=parsed.cursor;claim.state.sourceCount=parsed.cursor.units;claim.state.extractedBytes=parsed.cursor.expanded;
   if(parsed.done){await saveClaim(claim,claim.state,"completed","review",false);return {done:true,status:"completed",phase:"review"};}
   await saveClaim(claim,claim.state,"running","parse");return {done:false,status:"running",phase:"parse"};
- }catch(e:any){const code=typeof e?.code==="string"?e.code:(typeof e?.message==="string"&&/^TAKEOUT_[A-Z0-9_]+$/.test(e.message)?e.message:"TAKEOUT_PROCESSING_FAILED");try{await saveClaim(claim,claim.state,"failed","failed",false,code)}catch{await release(id,claim.token)}return {done:true,status:"failed",phase:"failed"};}
+ }catch(e:any){const code=typeof e?.code==="string"?e.code:(typeof e?.message==="string"&&/^[A-Z][A-Z0-9_]+$/.test(e.message)?e.message:"TAKEOUT_PROCESSING_FAILED");if(finalAttempt){try{await saveClaim(claim,claim.state,"failed","failed",false,code)}catch{await release(id,claim.token)}return {done:true,status:"failed",phase:"failed"};}await release(id,claim.token);throw new Error(code);}
 }
