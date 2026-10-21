@@ -3,7 +3,7 @@
 ## 1. Control e identidad
 
 - Identificador propuesto: KHORA-LLAVERO-01. Nombre descriptivo: Llavero · Harmonia; no se afirma ratificado un nombre nuevo.
-- Versión: 0.19 · C-TAKEOUT-006. Prioridad urgente: importar Google Takeout remotamente hacia el corpus privado cifrado; implementación parcial guardada, cierre extremo a extremo NO verificado. Sello: KHORA-LLAVERO-v0.19.
+- Versión: 0.20 · C-TAKEOUT-007. Prioridad urgente: importar Google Takeout remotamente hacia el corpus privado cifrado; implementación parcial guardada, cierre extremo a extremo NO verificado. Sello: KHORA-LLAVERO-v0.20.
 - Ancla vigente: mandato directo «Okay pero no te detengas!» · C-TAKEOUT-005; base de código y compuertas en §8.
 - Ancla histórica de retoma: encargo directo de buscar, actualizar y retomar el objeto en la sesión 3fea4187-8241-80f2-9d08-00a9b6435a14; ciclo C-RETOMA-20261019-3fea4187, recibido el 19 de octubre de 2026. No se inventa número de turno. Autoridad productiva previa conservada: «No lo hagas previo, habilítalo para producción.» (C-PROD-1061); ejecución C-EXEC-857 y herramientas C-TOOLS-748. Esta retoma no acredita ejecución productiva.
 - Ancla: instrucción del operador de iniciar y canonizar este sprint en la conversación del 17 de octubre de 2026, America/Mexico_City; sin hora atribuida al mensaje. Registro documental preparado el 18 de octubre de 2026 UTC.
@@ -100,6 +100,22 @@ Checkpoint histórico de creación, sustituido por §8 y anexo E: separar biogra
 - Remote Desktop Commander: no usado en la evaluación actual; diagnóstico previo registrado sin leer archivos personales ni alterar cifrado. Ninguna cuenta/equipo ni permiso previo se hereda. Actualización C-E2E-637: se efectuó diagnóstico local acotado, sin acceso a archivos personales ni secretos; desviación de rol documentada, no autorización general de construcción remota.
 
 ## 8. Estado vivo
+
+### C-TAKEOUT-007 · acceso recuperado y persistencia de autorización
+
+Mandato vigente: resolver extremo a extremo, sin gasto adicional; nueva conexión PC14 proporcionada por operador y propagación pedida SOLO de datos de conexión, no actividad terminal. DeviceId09357947-7fe6-4c54-9392-17348f80fe01 fue verificado Online; servidor mcp.desktopcommander.app/cuenta RDC elathanor111@gmail.com. Datos enviados a Dictado, Blog, Enraizamiento3, SignalInterpreter y Análisis/unificación Workspaces. No se amplían alcances de esos frentes ni se despacha trabajo.
+
+Acceso Vercel RESUELTO desde entorno aislado del agente mediante flujo oficial device code, completado por titular; tokens solo en directorio temporal protegido fuera del workspace y fuera de PC14/Git/Notion/salidas. API del equipo comprobó plan hobby/estado active el2026-10-21T01:16:37.855Z, sin cambios de plan. API proyecto verificó idprj_hRN86BKITXYKTnNlp0ygVhaMwFfx, nombrekhora-web, raízkhora-web, repoSeryMente/khora y Fluidactivo. Solo nombres/destinos de configuración en recibo público, no valores. MCP se reconectó pero mantuvo403 del equipo; no se confunde con el acceso API que sí funciona. PC14 no recibió sesión Vercel persistente. Herramienta64.5.0 temporal/SRI/ayuda verificadas; incidentes PowerShell corregidos y registrados en fuente separada.
+
+Código parcial actualizado `d8f1ca4cdaf41f501e292ba49c52c47a062821a3` en feat/takeout-import-3fea4187: auth-store.mjs cifra transacción KHC1 y consume mediante DELETE RETURNING de un solo uso ligado a dueño/nonce/expiración. Bloquea texto claro, sustitución de ciphertext, metadatos de expiración alterados y errores con datos privados. Esquema SQL es BORRADOR NO APLICADO; sin rutas/DB/productivo. 88/88 pruebas sintéticas y wrapper1/1, cifrador canónico real con clave sintética, PostgreSQL/Google/objetos simulados. Corrigió el wrapper que aún esperaba66casos; no se había acreditado ese wrapper en C005. No se heredan claves del padre.
+
+**Siguiente paso vigente:** completar GoogleCloud real. Navegador devuelve de nuevo Signed out pese a autenticación anterior; causa NOdemostrada. Preparar entrada privada, no pedir contraseña/cookies en chat ni instalar credenciales en host compartido. Cliente Takeout aún NOcreado. Luego configurar de forma aislada con callbackexacto/Pickerdrive.file y manejo cifrado servidor.
+
+Pendientes causales: (1) Googlecliente/Picker/config y rutas con sesiónKhora reales; (2) escoger/autorizar y cualificar ejecución recuperable dentro de Hobby, comprobar cuotas/contención para no agotar proyecto compartido, sin gasto; Workflows aún NOadoptado ni activado; (3) persistencia real verificadaTLS/DB/jobs/renovación/cancelación/retención, parser acotado y adaptador corpus privado/no revisado; (4) buildglobal, pruebas servicios reales/recuperación, revisión operador y promoción central serializada. PlanHobby no acredita cuotas remanentes ni B2hardcaps. No usar getDbexistente con rejectUnauthorized:false para material de autorización nuevo sin corregir/revisar enlaceTLS. No modificar pool compartido por inferencia. No importación real ni cierreE2E acreditados.
+
+Fuentes anteriores conservadas abajo como historia; los pasos atómicos de C006/C005 quedan supersedidos por este bloque C007.
+
+### Histórico C-TAKEOUT-006
 
 ### Restricción vigente C-TAKEOUT-006 · gasto adicional cero
 

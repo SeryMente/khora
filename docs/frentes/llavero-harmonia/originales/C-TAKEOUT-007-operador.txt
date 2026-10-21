@@ -1,0 +1,7 @@
+Corte seleccionado de mensajes directos visibles, NO historial completo ni transcripción de terminal:
+
+Propaga datos de conbexion a los otros hilos nada mas los datos de conexion, no la actividad de la terminal de rdc
+
+Y continua con lo tuyo
+
+Que falta? Necesito que rwsuelvas e2e
