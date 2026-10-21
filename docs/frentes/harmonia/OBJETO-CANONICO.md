@@ -240,7 +240,7 @@ Catálogo versionado en `apps/harmonia-observability/coverage-catalog.json`, esq
 - Índice combinado inicial: **46%**, media de las proporciones documentada y observada. Es un indicador del mapa, no de exactitud de captura ni del funcionamiento de las capacidades.
 - Fuentes y fecha verificada quedan registradas en el catálogo. La documentación pública no es exhaustiva de todos los despliegues; las notas de OpenAI advierten variación por plan, modelo, región, espacio de trabajo y rollout.
 - Catálogo de revisión pública actual incluye Home/capacidades, carga de archivos y audio, voz/dictado, búsqueda web, investigación profunda, análisis de datos, imágenes, bloques de escritura/código, proyectos, apps conectadas, enlaces compartidos, reporte/feedback, solución de errores y notas de lanzamiento.
-- El catálogo se amplió con Inteligent UI y componentes interactivos, respuestas parciales mientras se usan herramientas, progreso de tareas paralelas, gráficos interactivos, Canvas y artefactos de diapositivas. Las notas de lanzamiento de ChatGPT describen estas novedades en octubre de 2026. El inventario no implica que todas estén disponibles en esta cuenta.
+- El catálogo se amplió con Intelligent UI y componentes interactivos, respuestas parciales mientras se usan herramientas, progreso de tareas paralelas, gráficos interactivos, Canvas y artefactos de diapositivas. Las notas de lanzamiento de ChatGPT describen estas novedades en octubre de 2026. El inventario no implica que todas estén disponibles en esta cuenta.
 
 ### Implementación local v0.2.0
 
