@@ -1,7 +1,10 @@
 try { importScripts('local-auth.js'); } catch {}
 const COLLECTOR='http://127.0.0.1:47321';
 const TOKEN=String(globalThis.HARMONIA_TOKEN||'');
-const STORE={sessions:'harmoniaAutoSessions',enabled:'harmoniaAutoEnabled',events:'harmoniaEventCount',fingerprints:'harmoniaKnownSurfaceFingerprints'};
+const STORE={sessions:'harmoniaAutoSessions',enabled:'harmoniaAutoEnabled',events:'harmoniaEventCount',fingerprints:'harmoniaKnownSurfaceFingerprints',repositorySync:'harmoniaRepositorySync'};
+const REPO_BUILD_INFO='https://raw.githubusercontent.com/SeryMente/khora/main/apps/harmonia-observability/extension/build-info.json';
+const REPO_CATALOG='https://raw.githubusercontent.com/SeryMente/khora/main/apps/harmonia-observability/coverage-catalog.json';
+const REPO_SYNC_ALARM='harmonia-repository-sync';
 let sessions={};
 let autoEnabled=true;
 let eventCount=0;
@@ -21,6 +24,8 @@ const ready=(async()=>{
   for(const key of Object.keys(sessions))if(!live.has(key))delete sessions[key];
   await saveSessions();
   await refreshKnownFingerprints();
+  await syncRepository();
+  chrome.alarms.create(REPO_SYNC_ALARM,{delayInMinutes:1,periodInMinutes:360});
 })();
 let storageQueue=Promise.resolve();
 function saveSessions(){
@@ -37,6 +42,47 @@ async function checkHealth(){
   try{const response=await fetch(`${COLLECTOR}/health`,{headers:headers(),cache:'no-store'});collector=response.ok;lastError=response.ok?null:`Colector respondió HTTP ${response.status}`;}
   catch(error){collector=false;lastError=String(error.message||error);}
   return collector;
+}
+function compareVersions(a,b){
+ const pa=String(a||'0.0.0').split('.').map(x=>Number.parseInt(x,10)||0),pb=String(b||'0.0.0').split('.').map(x=>Number.parseInt(x,10)||0);
+ for(let i=0;i<3;i++){if((pa[i]||0)>(pb[i]||0))return 1;if((pa[i]||0)<(pb[i]||0))return -1;}
+ return 0;
+}
+async function syncRepository(){
+ const checkedAt=new Date().toISOString();
+ const saved=await chrome.storage.local.get([STORE.repositorySync]);
+ const previous=saved[STORE.repositorySync]||{};
+ try{
+  const [localResponse,remoteBuildResponse,remoteCatalogResponse]=await Promise.all([
+   fetch(chrome.runtime.getURL('build-info.json'),{cache:'no-store'}),
+   fetch(REPO_BUILD_INFO,{cache:'no-store',headers:{'Accept':'application/json'}}),
+   fetch(REPO_CATALOG,{cache:'no-store',headers:{'Accept':'application/json'}})
+  ]);
+  if(!localResponse.ok||!remoteBuildResponse.ok||!remoteCatalogResponse.ok)throw new Error('No se pudieron leer los metadatos y el catálogo desde main.');
+  const [localBuild,remoteBuild,remoteCatalog]=await Promise.all([localResponse.json(),remoteBuildResponse.json(),remoteCatalogResponse.json()]);
+  if(localBuild.schema!=='harmonia.repository-build.v1'||remoteBuild.schema!=='harmonia.repository-build.v1'||typeof remoteBuild.sourceRevision!=='string'||!/^([0-9a-f]{7,40})$/i.test(remoteBuild.sourceRevision))throw new Error('Los metadatos de versión del repositorio no superaron la validación.');
+  if(remoteCatalog.schema!=='harmonia.coverage-catalog.v1'||!Array.isArray(remoteCatalog.features)||!Array.isArray(remoteCatalog.sources))throw new Error('El catálogo del repositorio tiene un esquema inesperado.');
+  const manifest=chrome.runtime.getManifest();
+  const localVersion=String(manifest.version||localBuild.version||'0.0.0');
+  const remoteVersion=String(remoteBuild.version||'0.0.0');
+  const codeUpdateAvailable=compareVersions(remoteVersion,localVersion)>0||String(remoteBuild.sourceRevision)!==String(localBuild.sourceRevision);
+  const catalogUpdateAvailable=String(remoteCatalog.version)!==String(localBuild.catalogVersion||'')||JSON.stringify(remoteCatalog)!==JSON.stringify(previous.catalog||null);
+  const status=codeUpdateAvailable?'update-available':catalogUpdateAvailable?'catalog-updated':'current';
+  const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(remoteCatalog)));
+  const catalogSha256=[...new Uint8Array(digest)].map(byte=>byte.toString(16).padStart(2,'0')).join('');
+  const state={schema:'harmonia.repository-sync.v1',repository:'SeryMente/khora',branch:'main',sourcePath:'apps/harmonia-observability',
+   status,checkedAt,lastSuccessfulSyncAt:checkedAt,localVersion,remoteVersion,localRevision:String(localBuild.sourceRevision),remoteRevision:String(remoteBuild.sourceRevision),
+   updateAvailable:codeUpdateAvailable,catalogVersion:String(remoteCatalog.version||''),catalogSha256,catalog:remoteCatalog,error:null,
+   policy:'Solo sincroniza metadatos y catálogo JSON validados; nunca descarga ni ejecuta JavaScript remoto.'};
+  await chrome.storage.local.set({[STORE.repositorySync]:state});
+  return state;
+ }catch(error){
+  const state={...previous,schema:'harmonia.repository-sync.v1',repository:'SeryMente/khora',branch:'main',status:'error',checkedAt,
+   lastSuccessfulSyncAt:previous.lastSuccessfulSyncAt||null,error:String(error.message||error),
+   policy:'Solo sincroniza metadatos y catálogo JSON validados; nunca descarga ni ejecuta JavaScript remoto.'};
+  await chrome.storage.local.set({[STORE.repositorySync]:state});
+  return state;
+ }
 }
 async function refreshKnownFingerprints(){
  if(!TOKEN)return;
@@ -174,11 +220,12 @@ chrome.runtime.onMessage.addListener((message,sender,respond)=>{
   if(message.kind==='harmonia:auto-settings')return {enabled:autoEnabled};
   if(message.kind==='harmonia:get'){
    await checkHealth();
+   const syncData=await chrome.storage.local.get([STORE.repositorySync]);
    let coverage=null;
    if(collector){try{const response=await fetch(`${COLLECTOR}/coverage`,{headers:headers(),cache:'no-store'});if(response.ok)coverage=await response.json();else throw new Error(`Colector HTTP ${response.status}`);}catch(error){lastError=String(error.message||error);}}
    return {version:'0.3.0',autoEnabled,active:autoEnabled&&Object.keys(sessions).length>0,activeTabs:Object.keys(sessions).length,
     sessions:Object.entries(sessions).map(([tabId,session])=>({tabId,startedAt:session.startedAt,lastAt:session.lastAt,events:session.events})),
-    collector,lastError,events:eventCount,coverage};
+    collector,lastError,events:eventCount,coverage,repositorySync:syncData[STORE.repositorySync]||null};
   }
   if(message.kind==='harmonia:set-auto')return setAutoEnabled(message.enabled);
   if(message.kind==='harmonia:event'&&sender.tab?.id)return onObservedEvent(message,sender);
@@ -194,3 +241,6 @@ chrome.tabs.onUpdated.addListener((tabId,changeInfo,tab)=>{
  });
 });
 void ready.then(async()=>{if(autoEnabled)await injectExistingTabs(await chrome.tabs.query({url:'https://chatgpt.com/*'}));});
+chrome.alarms.onAlarm.addListener(alarm=>{if(alarm.name===REPO_SYNC_ALARM)void syncRepository();});
+chrome.runtime.onInstalled.addListener(()=>{void ready.then(async()=>{chrome.alarms.create(REPO_SYNC_ALARM,{delayInMinutes:1,periodInMinutes:360});await syncRepository();if(autoEnabled)await injectExistingTabs(await chrome.tabs.query({url:'https://chatgpt.com/*'}));});});
+chrome.runtime.onStartup.addListener(()=>{void ready.then(async()=>{chrome.alarms.create(REPO_SYNC_ALARM,{delayInMinutes:1,periodInMinutes:360});await syncRepository();if(autoEnabled)await injectExistingTabs(await chrome.tabs.query({url:'https://chatgpt.com/*'}));});});
