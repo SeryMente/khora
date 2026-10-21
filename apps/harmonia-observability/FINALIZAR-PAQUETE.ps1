@@ -95,7 +95,7 @@ try {
     'DESTINATION=' + $root
     'DATA_ROOT=' + $data
     'SERVICE_PID=' + (Get-Content -LiteralPath (Join-Path $root 'collector\service.pid') -Raw).Trim()
-    'V0_2_EXTENSION_LOADED=RELOAD_REQUIRED_NOT_VERIFIED'
+    'AUTO_CAPTURE_STATUS=RELOAD_REQUIRED_NOT_VERIFIED'
     'NATURAL_COVERAGE=AWAITING_POST_RELOAD_SCAN'
 } finally {
     Stop-Transcript | Out-Null
