@@ -221,6 +221,7 @@ function compactSurface(sanitized){
   privacy:{visibleMessageTextCaptured:true,composerTextCaptured:false,fieldValuesCaptured:false,hrefsCaptured:false,imageUrlsCaptured:false,hiddenReasoningCaptured:false,menusExcluded:true}};
 }
 async function processSurfaceScan(tab,session,payload){
+ if(!(await canObserveTab(tab)))return false;
  payload.regionKey=regionFor(tab.url);payload.regionPolicyVersion=HarmoniaRegionPolicy.POLICY_VERSION;
  const sanitized=sanitizeScan(payload);
  if(!/^[0-9a-f]{64}$/.test(sanitized.fingerprint))throw new Error('La firma estructural no es válida.');
