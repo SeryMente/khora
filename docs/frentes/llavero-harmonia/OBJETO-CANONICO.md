@@ -3,7 +3,7 @@
 ## 1. Control e identidad
 
 - Identificador propuesto: KHORA-LLAVERO-01. Nombre descriptivo: Llavero · Harmonia; no se afirma ratificado un nombre nuevo.
-- Versión: 0.18 · C-TAKEOUT-005. Prioridad urgente: importar Google Takeout remotamente hacia el corpus privado cifrado; implementación parcial guardada, cierre extremo a extremo NO verificado. Sello: KHORA-LLAVERO-v0.18.
+- Versión: 0.19 · C-TAKEOUT-006. Prioridad urgente: importar Google Takeout remotamente hacia el corpus privado cifrado; implementación parcial guardada, cierre extremo a extremo NO verificado. Sello: KHORA-LLAVERO-v0.19.
 - Ancla vigente: mandato directo «Okay pero no te detengas!» · C-TAKEOUT-005; base de código y compuertas en §8.
 - Ancla histórica de retoma: encargo directo de buscar, actualizar y retomar el objeto en la sesión 3fea4187-8241-80f2-9d08-00a9b6435a14; ciclo C-RETOMA-20261019-3fea4187, recibido el 19 de octubre de 2026. No se inventa número de turno. Autoridad productiva previa conservada: «No lo hagas previo, habilítalo para producción.» (C-PROD-1061); ejecución C-EXEC-857 y herramientas C-TOOLS-748. Esta retoma no acredita ejecución productiva.
 - Ancla: instrucción del operador de iniciar y canonizar este sprint en la conversación del 17 de octubre de 2026, America/Mexico_City; sin hora atribuida al mensaje. Registro documental preparado el 18 de octubre de 2026 UTC.
@@ -100,6 +100,18 @@ Checkpoint histórico de creación, sustituido por §8 y anexo E: separar biogra
 - Remote Desktop Commander: no usado en la evaluación actual; diagnóstico previo registrado sin leer archivos personales ni alterar cifrado. Ninguna cuenta/equipo ni permiso previo se hereda. Actualización C-E2E-637: se efectuó diagnóstico local acotado, sin acceso a archivos personales ni secretos; desviación de rol documentada, no autorización general de construcción remota.
 
 ## 8. Estado vivo
+
+### Restricción vigente C-TAKEOUT-006 · gasto adicional cero
+
+Mandato directo del operador: «No puedo pagar nada ahora». No contratar planes, aceptar pruebas con conversión a pago, habilitar sobregiros/cobros por uso ni reprovisionar servicios por inferencia. Esta restricción incluye almacenamiento, operaciones, transferencia, cómputo, colas y ejecución; no solo la cuota nominal de B2. No cambiar bucket/credenciales/permisos ni degradar cifrado/aislamiento para ahorrar.
+
+Vercel documenta Hobby gratuito con pausas al agotar cuotas en la mayoría de los casos; Workflows y Queues tienen cupos incluidos y los pasos conservan límites de Functions. Esto NO acredita el plan ni el saldo real del equipo Khora. Fuentes públicas consultadas: https://vercel.com/docs/plans/hobby ; https://vercel.com/docs/workflows/pricing ; https://vercel.com/docs/queues/pricing . Sin plan/cuota/enforcement comprobados NO habilitar ejecución ni prometer ausencia de cargos. Workflows sigue propuesta NO adoptada; coste cero no equivale disponibilidad ilimitada, y agotamiento puede pausar también funciones del proyecto compartido.
+
+Acceso: intento metadata CLI en PC10autorizado86580320 devolvió dispositivo offline, sin ejecutar comando; PC14nuevo09357947 NO autorizado por inferencia. list_teams MCP devolvió requires re-authentication. Primer intento create_user_connection no dejó recibo durable: FALLIDO/NO CONFIRMADO, no conexión renovada por afirmación. Reconectar usando herramienta oficial y volver a verificar plan/cuotas, sin activar ni contratar. No pedir secretos en chat.
+
+**Siguiente paso prioritario:** restablecer consulta autorizada del proyecto y acreditar plan y capacidad gratuita con pausa sin cobro; si la condición falla, no activar. La integración técnica de abajo permanece parcial. Google Cloud fue reautenticado mediante entrada privada durante C006; no se guardaron contraseñas. Cliente Takeout aún NO creado. Central confirmó gasto cero y ningún servicio nuevo de su parte; confirmación Meta independiente.
+
+### Implementación C-TAKEOUT-005 conservada
 
 **Acción actual:** C-TAKEOUT-005. Mandatos directos «Si autorizo.» y «Okay pero no te detengas!». Autorización puntual PC10 para herramientas/configuración del mismo proyecto, sin descargar Takeout ni cambiar Windows; no promoción propia. CLI del proyecto real consultada con decrypt=false: solo nombres/destinos, ningún valor secreto. Configuración B2/cifrado/login presente; no nombres Google Drive/Picker en esa lista. Esto no prueba inexistencia global de clientes Google.
 
