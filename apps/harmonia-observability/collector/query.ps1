@@ -1,7 +1,7 @@
 param([string]$Session,[string]$Type,[string]$Since,[int]$Limit=100,[switch]$Coverage)
 $ErrorActionPreference='Stop'
 $root = $env:HARMONIA_DATA
-if (-not $root) { $root = Join-Path $env:LOCALAPPDATA 'Harmonia\surface-index-v0.2.0\data' }
+if (-not $root) { $root = 'C:\Users\fila4\AppData\Local\Harmonia\surface-index-v0.2.0\data' }
 $indexPath = Join-Path $root 'index.json'
 if (-not (Test-Path -LiteralPath $indexPath)) { throw "Índice no disponible: $indexPath" }
 $idx = Get-Content -LiteralPath $indexPath -Raw | ConvertFrom-Json
