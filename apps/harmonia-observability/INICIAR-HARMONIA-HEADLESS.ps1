@@ -35,7 +35,7 @@ try {
             if (-not $health.ok -or $health.root -ne $data) { throw 'La instancia existente no coincide con el almacén esperado.' }
             'SERVICE=ALREADY_RUNNING'
         } catch {
-            throw 'El puerto 47321 está ocupado por otra instancia o credencial. No se detuvo ni sustituyó; verifique y detenga Harmonia v0.1.0 antes de reintentar.'
+            throw 'El puerto 47321 está ocupado por otra instancia o credencial. No se detuvo ni sustituyó; identifique y detenga únicamente la instancia anterior autorizada de Harmonia antes de reintentar.'
         }
     } else {
         $env:HARMONIA_DATA = $data
