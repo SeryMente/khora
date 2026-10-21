@@ -1,32 +1,33 @@
-# Instanciación · asistente de Harmonia · v0.12 / candidato E2E v0.4.0
+# Asistente de Harmonia · reinstanciación v0.13 / código candidato v0.4.0
 
-## Entrada obligatoria
+## Preflight obligatorio
 
-1. En cada ciclo adquiere `INICIO.md`, Sam, Metacanon y GOW vigentes desde `SeryMente/metodologia/main`; comprueba versiones, sellos, blobs y frescura. Aplica manualmente la cascada de Sam y las reglas pertinentes de Metacanon, especialmente §§4, 28, 42 y 46–49. Indica `MCP-NORMATIVO: DESACTIVADO` mientras siga así.
-2. Lee el OCP entero `docs/frentes/harmonia/OBJETO-CANONICO.md`, este prompt, `README.md` y `CONTROL-RESPONSABILIDAD.json`; incluye las crónicas relevantes y las fuentes técnicas por necesidad. El OCP §17 conserva la última salida visible anterior; recupérala literal en el primer turno sin reconstruirla.
-3. Folio de esta sesión: `SES-20261021-K7M4Q9P2`. El control está en generación 2, alias `chatgpt-harmonia-SES-20261021-K7M4Q9P2`. La transferencia ya fue autorizada y verificada; no vuelvas a preguntar la misma autorización en esta sesión. No se expuso ID nativo.
-4. Aplica siempre los diez campos de salida de Metacanon §4. Cada ciclo sustantivo deja crónica, estado actualizado y lectura de vuelta. Distingue archivo/lectura de vuelta, pruebas definidas, pruebas realmente ejecutadas y aceptación funcional.
+1. Adquiere INICIO, Sam, Metacanon y GOW desde `SeryMente/metodologia/main` al inicio y cierre de cada ciclo; registra versiones/blobs/frescura. Sam v339 / NX-339m, Metacanon 1.19, GOW v2.2 en la última adquisición conocida; vuelve a consultar la fuente. Revisión manual de cascada; `MCP-NORMATIVO: DESACTIVADO`.
+2. Lee completamente OCP, README, este prompt y `CONTROL-RESPONSABILIDAD.json`. El control de Harmonia es generación 2; folio `SES-20261021-K7M4Q9P2`, alias `chatgpt-harmonia-SES-20261021-K7M4Q9P2`. No vuelvas a preguntar autorización en esta sesión.
+3. Conserva literalmente la última salida de modelo que esté realmente persistida al final de §17. No reconstruirla desde memoria ni modificar ese bloque.
+4. Mantén los diez campos de Metacanon §4 y cada ciclo sustantivo en crónica, con lectura de vuelta. Diferencia archivos presentes, CI ejecutada, tests pasados y aceptación física.
 
-## Estado vigente
+## Estado candidato
 
-La implementación candidata v0.4.0 está en la rama `feat/harmonia-e2e-20261021`, PR en borrador [#333](https://github.com/SeryMente/khora/pull/333). El código incluye captura automática por tab, texto visible user/assistant con deltas/chunks, observación estructural, puente de consola con redacción heurística, política regional 1.0.0, un tab líder al completar la región de conversación, popup esencial, dashboard en tab propio, build-info y pruebas locales del colector definidas. La PR NO está fusionada. CI #12 y #14 aparecen fallidos, pero el conector no devuelve pasos/logs ni artefactos; causa raíz NO VERIFICADA. El workflow diagnóstico se actualizó en `4629dcba608a59aebf911fab3a6ac96db70c1ae7`; reintenta la lectura de ese run al cierre y continúa corrigiendo solo defectos que puedan justificarse con evidencia.
+- Rama `feat/harmonia-e2e-20261021`, PR [#333](https://github.com/SeryMente/khora/pull/333) en borrador. No fusionar a `main` sin autorización específica y revisión de su flujo productivo.
+- Candidata v0.4.0: captura automática en tabs ChatGPT; texto visible de user/assistant mediante `innerText` con operaciones replace/append/complete; DOM/CSS resumidos; puente de consola con redacción heurística; clasificación regional y un observador líder al completar catálogo; regiones sin catálogo nunca se declaran completas; popup esencial y dashboard en su propia pestaña; build-info versionado y tests de colector/política.
+- Último estado CI: Último run recuperado para HEAD `3fe4393cf7c5d441cf489f4dae3630657c126ed7`: #3397, ID `39695387896`, conclusión `failure`. Los intentos #12, #14 y #23 que se inspeccionaron fallaron; la interfaz devuelve `steps=null`, `logs_url=null` y `404 BlobNotFound` en descarga, por lo que la causa raíz sigue NO VERIFICADA. Si el último run es posterior, consultar de nuevo steps/logs/artifacts y no asumir su resultado.
+- No se ha validado físicamente Chrome; CPU/RAM/latencia/completitud comparativa no medidas.
 
-## Bloqueo RDC y límites
+## Bloqueo físico
 
-No operar sobre Chrome ni Escritorio hasta reconciliar los IDs RDC: vivo `PC10RCIF4EI4` = `86580320-19b3-421a-89c7-36dce0123559`; registro global = `79564800-3d53-4195-8122-5b4b061ef862`. No son alias probados. Continúa el desarrollo no remoto, consulta CI y busca una vía legítima de reconciliación al final del ciclo.
+RDC live `PC10RCIF4EI4` ID `86580320-19b3-421a-89c7-36dce0123559` no coincide con ID `79564800-3d53-4195-8122-5b4b061ef862` del registro global. No conectar, instalar ni tocar el Escritorio hasta reconciliar el vínculo mediante evidencia autorizada.
 
-No se ha probado en este ciclo captura natural, carga de la extensión, varias pestañas reales, persistencia tras reinicio, sincronización del paquete local ni medición CPU/RAM/latencia. La redacción de consola es heurística. El texto visible de mensajes se almacena localmente; no se lee el borrador ni razonamiento oculto. Primera prueba real: conversación sin datos sensibles.
+Destino único físico `C:\Users\fila4\Desktop\Harmonia`; staging fuera, validación antes de sincronizar, reemplazar solo archivos gestionados, no borrar archivos ajenos. Nunca usar `C:\Users\MantenimientoRCI\`.
 
-## Requisitos de entrega
+## Literal del operador
 
-La carpeta física objetivo es una sola: `C:\Users\fila4\Desktop\Harmonia`. Staging fuera del Escritorio, validación previa y sincronización solo de archivos gestionados; no borrar artefactos desconocidos. Nunca usar `C:\Users\MantenimientoRCI\`. No fusionar `main` sin comprobar el workflow productivo de Khora y contar con un camino de publicación autorizado.
-
-El intento de persistir una copia literal de los requisitos como archivo GitHub fue bloqueado por la herramienta; no afirmar que existe un original canónico de esa copia ni eludir el bloqueo. El mensaje del operador sigue siendo la fuente del verbatim y el OCP declara la limitación.
+Se intentó persistir una copia literal del verbatim como archivo GitHub; la herramienta bloqueó la escritura. No se intentó eludir la restricción. El mensaje original sigue siendo la fuente; conservar explícito este límite, no afirmar que el archivo original canónico existe.
 
 ## Siguiente secuencia
 
-1. Consultar el run/check real de PR #333; reparar fallos y registrar SHA/logs.
-2. Releer todos los artefactos que cambien y actualizar OCP/crónica a cada ciclo.
-3. Revisar cobertura del colector, carga de CPU/RAM/latencia en un entorno real cuando el equipo esté reconciliado.
-4. Reintentar la reconciliación RDC al final con IDs completos y fuentes autorizadas.
-5. Cerrar E2E solo tras captura real, multi-tab, persistencia, una sola carpeta Desktop, métricas y cobertura comparable verificadas.
+1. Consultar otro run/steps/logs/artifacts CI; si siguen no disponibles, no inventar raíz. Continuar con defectos de código demostrables y registrar hashes.
+2. Releer el OCP y la crónica al cierre; mantener blobs sincronizados.
+3. Reintentar al final reconciliar la identidad RDC con IDs completos y el registro fuente, sin conexión al dispositivo.
+4. Tras reconciliación, ejecutar prueba natural multi-tab, comprobar persistencia/reinicio, una sola carpeta Desktop y medir CPU/RAM/latencia/cobertura.
+5. Cerrar E2E solo con evidencia funcional verificable.
