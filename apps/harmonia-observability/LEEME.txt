@@ -1,0 +1,18 @@
+HARMONIA · OBSERVABILIDAD DEL TRABAJO CON IA · v0.1.0
+
+ESTADO: paquete colocado; todavía no equivale a extensión cargada ni a funcionamiento probado.
+
+PRIMERA CARGA
+1. Abra INICIAR-HARMONIA.cmd y mantenga la ventana abierta.
+2. En Chrome abra chrome://extensions, active Modo desarrollador y pulse Cargar descomprimida.
+3. Elija la carpeta extension dentro de este paquete.
+4. Abra una conversación de prueba sin datos sensibles en chatgpt.com.
+5. Abra Harmonia desde Extensiones y pulse Iniciar en esta pestaña. Chrome mostrará que la depuración está activa.
+6. Al terminar, pulse Detener captura.
+
+CUSTODIA
+Los originales quedan fuera de Git en %LOCALAPPDATA%\Harmonia\data. El colector se detiene al alcanzar 1 GiB y no borra datos.
+CONSULTAR-HARMONIA.cmd lista sesiones. Para una sesión: CONSULTAR-HARMONIA.cmd -Session ID
+
+LÍMITES
+Solo observa la pestaña elegida mientras se activa manualmente. No captura cookies, credenciales, borradores ni otras pestañas. El texto visible no es razonamiento interno privado. La captura continua no demuestra atención continua del modelo.

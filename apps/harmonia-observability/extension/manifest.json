@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "Harmonia · Observabilidad del trabajo con IA",
+  "version": "0.1.0",
+  "description": "Observador local y explícito para una pestaña elegida de ChatGPT.",
+  "permissions": [
+    "activeTab",
+    "debugger",
+    "scripting",
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://chatgpt.com/*",
+    "http://127.0.0.1:47321/*"
+  ],
+  "background": {
+    "service_worker": "service-worker.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Harmonia"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
+}

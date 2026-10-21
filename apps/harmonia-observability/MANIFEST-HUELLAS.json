@@ -1,0 +1,17 @@
+{
+  "schema": "harmonia.package.v1",
+  "version": "0.1.0",
+  "files": {
+    "CONSULTAR-HARMONIA.cmd": "b3d29b9a63fe3d7fb2540671597e6b6e06aa81a9f490cccd489836284939b244",
+    "INICIAR-HARMONIA.cmd": "44154a6c0a966f5ee9998c1fcf0319f99a0d6de4d325f8428efcdfce974522e6",
+    "LEEME.txt": "1bd1907989e42f552e35c2d9d86bb7c6024817e53c65ea2c027eacf2b3f2ef57",
+    "collector/query.ps1": "67386cbd484d20acb44af4ca9301ba0a147507c841836dc70692fb5c06e06583",
+    "collector/server.js": "0e36f61a501dd6cf9ecd49c0ee4dd4b50333efbc0738f7d9047ff24460e27c38",
+    "extension/content.js": "5d601ecbb9001556b39405badddfa2486361146bd8b1a9c0858b23eddc05ea1b",
+    "extension/manifest.json": "0d27c82fc55aa90ad02786c5fc3813a0be1529f50d8cc4bc5f285b72a63f4144",
+    "extension/popup.css": "50546f89138dfefa56010d2711ed47955ecee66f6dd2a3b15ecbda32930f8d3c",
+    "extension/popup.html": "2ea545ba4f1c967dda6271f1c7a360c29c08a26eb1af1e9ec1ceb059436ca01b",
+    "extension/popup.js": "7d4d2ad5a72476f288d364e8fab92bd12cd1d5d6cd51ea83fdd402e6e555281f",
+    "extension/service-worker.js": "8019f951835f7303ad9e332e360dd95eb52c978bc23e14fcc2bb9120fe1f9433"
+  }
+}
