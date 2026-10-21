@@ -255,7 +255,12 @@ async function stopSession(tabId,reason){
 function installConsoleBridgeMainWorld(){
  if(window.__harmoniaConsoleBridgeV1?.installed)return;
  const originals={};
- const redact=value=>String(value||'').slice(0,4000).replace(/\\bBearer\\s+[^\\s]+/gi,'Bearer [REDACTED]').replace(/\\bsk-[A-Za-z0-9_-]{12,}\\b/g,'[REDACTED_KEY]').replace(/\\beyJ[A-Za-z0-9_-]{20,}\\.[A-Za-z0-9_-]{10,}\\.[A-Za-z0-9_-]{10,}\\b/g,'[REDACTED_JWT]').replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}/gi,'[REDACTED_EMAIL]').replace(/([?&](?:token|key|auth|code|session|password|secret)=)[^&#\\s]+/gi,'$1[REDACTED]');
+ const redact=value=>String(value||'').slice(0,4000)
+  .replace(/\bBearer\s+[^\s]+/gi,'Bearer [REDACTED]')
+  .replace(/\bsk-[A-Za-z0-9_-]{12,}\b/g,'[REDACTED_KEY]')
+  .replace(/\beyJ[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b/g,'[REDACTED_JWT]')
+  .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi,'[REDACTED_EMAIL]')
+  .replace(/([?&](?:token|key|auth|code|session|password|secret)=)[^&#\s]+/gi,'$1[REDACTED]');
  const summarize=value=>{
   if(value instanceof Error)return {type:'Error',value:redact(value.name+': '+value.message+' '+String(value.stack||'')).slice(0,2000)};
   if(typeof value==='string')return {type:'string',value:redact(value).slice(0,1000)};
