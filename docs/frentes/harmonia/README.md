@@ -1,25 +1,30 @@
 # Harmonia · carpeta canónica del frente
 
-Entrada única de estado: [OBJETO-CANONICO.md](OBJETO-CANONICO.md). El OCP v0.12 conserva estado vivo, requisitos, decisiones, límites y siguiente paso; el historial está en las crónicas por ciclo. No crear una segunda fuente de estado.
+Entrada única de estado: [OBJETO-CANONICO.md](OBJETO-CANONICO.md), versión candidata **0.13 / HARMONIA-v0.13** en esta rama. No crear fuentes de estado paralelas.
 
-- [Asistente · retoma v0.11](prompts/ASISTENTE.md): instrucciones de entrada, gobierno, titularidad confirmada y orden de continuación.
-- [Constructor · no instanciado](prompts/CONSTRUCTOR.md): ejecutar solo bajo el régimen de roles vigente; no utilizar RDC.
-- [Control exclusivo](CONTROL-RESPONSABILIDAD.json): generación 2, folio activo `SES-20261021-K7M4Q9P2`, alias `chatgpt-harmonia-SES-20261021-K7M4Q9P2`; la transferencia fue verificada por lectura de vuelta.
+- [Asistente · reinstanciación](prompts/ASISTENTE.md): estado y próximos pasos, gobierno y compuertas.
+- [Constructor · no instanciado](prompts/CONSTRUCTOR.md): su régimen no habilita RDC.
+- [Control de responsabilidad](CONTROL-RESPONSABILIDAD.json): generación 2, folio activo `SES-20261021-K7M4Q9P2`, alias `chatgpt-harmonia-SES-20261021-K7M4Q9P2`; la transferencia está confirmada por lectura de vuelta.
 - [Crónica de transferencia](cronica/HARMONIA-TRANSFER-RESPONSABILIDAD-20261021.md).
-- [Crónica E2E 02](cronica/HARMONIA-E2E-02-20261021.md): candidato v0.4.0, huellas, pruebas definidas, resultados aún pendientes y bloqueos.
+- [Crónica E2E 02](cronica/HARMONIA-E2E-02-20261021.md): implementaciones candidatas, hashes, fallos CI y límites de evidencia.
 
-## Código y revisión
+## Candidata E2E
 
-El código canónico de producción sigue en `main` y no se modifica desde este branch. La candidata v0.4.0 se trabaja en `feat/harmonia-e2e-20261021` y PR en borrador [#333](https://github.com/SeryMente/khora/pull/333). No está fusionada ni aceptada E2E. CI: los runs #12 y #14 de `Harmonia validation` aparecen como fallidos. El conector no expone steps/logs ni artefactos (`404 BlobNotFound`); la causa raíz no está verificada. El workflow diagnóstico se actualizó en el commit `4629dcba608a59aebf911fab3a6ac96db70c1ae7`, pero el run siguiente sigue sin resultados recuperables. No declarar PASS ni atribuir una causa sin evidencia.
+- Rama: `feat/harmonia-e2e-20261021`.
+- PR [#333](https://github.com/SeryMente/khora/pull/333): abierta como borrador, no fusionada.
+- Código candidato v0.4.0: captura automática por tab, texto visible user/assistant con reemplazos/deltas/finalización, estructura/estilos resumidos, consola con redacción heurística, política regional, tab líder tras completitud, popup esencial y dashboard propio.
+- La región de conversación solo puede completarse si todas las capacidades del catálogo están observadas, al menos cinco huellas distintas y dos sesiones distintas. Regiones sin catálogo quedan no mapeadas.
+- Hay pruebas y workflow definidos. `Último run #3397: failure`; el diagnóstico es insuficiente debido a que el conector no expone steps/logs/artifacts. No declarar PASS ni inventar causa.
+- No se fusiona a `main`: el flujo de main puede activar despliegue de Khora y migraciones productivas.
 
-## Estado de aceptación
+## Bloqueo RDC y entrega física
 
-El candidato contiene captura automática de estructura y texto visible, política regional, popup esencial y dashboard en tab propio, metadatos build-info y pruebas automatizadas. Esto prueba que los archivos existen en la rama, no que Chrome los haya ejecutado. Captura natural, multi-tab real, mediciones CPU/RAM/latencia y carpeta física única de Escritorio siguen pendientes.
+Discrepancia de ID sin resolver: listado vivo `PC10RCIF4EI4` ID `86580320-19b3-421a-89c7-36dce0123559`; registro global ID `79564800-3d53-4195-8122-5b4b061ef862`. No asumir alias; no conectarse, instalar ni manipular el Escritorio mientras no se reconcilie.
 
-## Seguridad del entorno
+Destino físico acordado: única carpeta `C:\Users\fila4\Desktop\Harmonia`. Cuando se autorice el equipo: preparar staging fuera del Escritorio, validar y sincronizar solo archivos gestionados. No borrar artefactos desconocidos. Nunca usar `C:\Users\MantenimientoRCI\`.
 
-No realizar operaciones en equipo remoto hasta reconciliar la discrepancia de IDs RDC: listado vivo `PC10RCIF4EI4` con ID `86580320-19b3-421a-89c7-36dce0123559`; el registro global conserva `79564800-3d53-4195-8122-5b4b061ef862`. No asumir que son alias. No tocar el Escritorio mientras ese bloqueo siga abierto.
+## Privacidad y no-simulación
 
-La única carpeta acordada para una futura publicación física es `C:\Users\fila4\Desktop\Harmonia`. Preparar staging fuera del Escritorio; luego sincronizar únicamente archivos gestionados y nunca borrar artefactos desconocidos. Nunca usar `C:\Users\MantenimientoRCI\`.
+Se conservan localmente los textos visibles de mensajes porque son parte del objetivo. No se leen borradores del compositor, valores de campos, URLs completas/imágenes ni razonamiento oculto. La redacción de consola es heurística, no anonimización garantizada. Primera prueba real con conversación sin datos sensibles.
 
-La copia literal de los requisitos que se intentó guardar como artefacto GitHub fue bloqueada por la herramienta. Esta limitación está explícita en el OCP y la crónica; no se afirma que la copia se haya persistido canónicamente.
+La copia literal de los requisitos como archivo GitHub fue bloqueada por la herramienta; no se eludió el control. La instrucción original sigue siendo el mensaje del operador y la laguna se documenta en OCP/crónica.
