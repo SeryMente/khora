@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { NATIVE_INITIAL_STYLES, loadNativeStyles, inlineNativeStyles, presentNativeHTML } from '../../lib/server/chat-presentation';
-const fixture = '<!doctype html><html><head><title>Open WebUI</title>' + NATIVE_INITIAL_STYLES.map(x => `<link href="/_app/immutable/assets/${x.name}" rel="stylesheet">`).join('') + '</head><body>LICENSE: unchanged upstream shell</body></html>';
+const fixture = '<!doctype html><html><head><title>Open WebUI</title>' + NATIVE_INITIAL_STYLES.map(x => `<link href="/_app/immutable/assets/${x.name}" rel="stylesheet">`).join('') + '</head><body><div style="display: contents">LICENSE: unchanged upstream shell</div></body></html>';
 
 test('missing pinned CSS fails closed before serving an unstyled native interface', async () => {
   const reader = async () => { throw Error('ENOENT_PRIVATE_SENTINEL'); };

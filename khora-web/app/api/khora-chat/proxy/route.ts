@@ -1,4 +1,5 @@
 import { auth, signOut } from '@/auth';
+import { nativeDocumentPath, nativeUnavailablePage, presentNativeConfig, presentNativeModels } from '@/lib/server/chat-experience';
 import { presentNativeHTML } from '@/lib/server/chat-presentation';
 import { proxyOpenWebUI } from '@/lib/server/chat-proxy';
 export const runtime = 'nodejs';
@@ -16,7 +17,10 @@ async function handle(request: Request) {
     return Response.json({ status: true, redirect_url: '/auth/signin' }, { headers: { 'Cache-Control': 'no-store' } });
   }
   const nativePath = new URL(request.url).searchParams.get('path') || '';
-  if (request.method === 'GET' && (nativePath === '/' || nativePath === '/auth' || nativePath.startsWith('/c/'))) {
+  if (request.method === 'GET' && nativePath === '/api/models') return presentNativeModels(response);
+  if (request.method === 'GET' && nativePath === '/api/config') return presentNativeConfig(response);
+  if (request.method === 'GET' && nativeDocumentPath(nativePath)) {
+    if (response.status >= 500) return nativeUnavailablePage(response.status);
     return presentNativeHTML(response);
   }
   return response;

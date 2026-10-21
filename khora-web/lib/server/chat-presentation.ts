@@ -4,6 +4,7 @@
 import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
+import { addKhoraExperience, nativeUnavailablePage } from './chat-experience';
 
 export const NATIVE_INITIAL_STYLES = [
   { name: 'Toaster.DKF17Rty.css', sha256: 'a8a60fdd2bee2a1b436c8de5ace21208de358d11cd0584fd53b6d2d54486d41d' },
@@ -39,16 +40,15 @@ export async function presentNativeHTML(response: Response, reader?: StyleReader
   if (response.status !== 200 || !response.headers.get('content-type')?.includes('text/html')) return response;
   try {
     const styles = reader ? await loadNativeStyles(reader) : await (verified ??= loadNativeStyles().catch(error => { verified = undefined; throw error; }));
-    const html = inlineNativeStyles(await response.text(), styles);
+    const html = addKhoraExperience(inlineNativeStyles(await response.text(), styles));
     const headers = new Headers(response.headers);
     headers.delete('content-length');
     headers.delete('content-encoding');
     headers.set('Cache-Control', 'private, no-store');
     headers.set('X-Khora-Native-Presentation', 'pinned-css-inline-v1');
+    headers.set('X-Khora-Native-Experience', 'enraizamiento-v1');
     return new Response(html, { status: 200, headers });
   } catch {
-    return new Response('<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Chat temporalmente no disponible</title></head><body><main><h1>No se pudo cargar la presentación del chat</h1><p>No se ha borrado tu conversación. Vuelve a intentar en unos momentos.</p><p><a href="">Volver a intentar</a></p></main></body></html>', {
-      status: 503, headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'private, no-store', 'X-Content-Type-Options': 'nosniff' },
-    });
+    return nativeUnavailablePage(503, true);
   }
 }
