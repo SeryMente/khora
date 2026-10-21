@@ -58,15 +58,19 @@ async function postEvent(tabId,session,type,payload={},source='extension'){
   await saveSessions();return true;
  }catch(e){collector=false;lastError=String(e.message||e);return false;}
 }
+const sessionInitializers={};
 async function ensureSession(tab){
  const key=String(tab.id);
+ if(sessionInitializers[key])return sessionInitializers[key];
  if(sessions[key])return sessions[key];
  if(!autoEnabled||!tab?.id||!valid(tab.url))return null;
- const session={id:crypto.randomUUID(),startedAt:new Date().toISOString(),lastAt:null,events:0,url:safePageUrl(tab.url)};
- sessions[key]=session;
- await saveSessions();
- await postEvent(tab.id,session,'capture.started',{url:session.url,version:'0.3.0',mode:'automatic-interface-architecture',privacy:{conversationTextCaptured:false,composerTextCaptured:false,fieldValuesCaptured:false,hrefsCaptured:false,imageUrlsCaptured:false,menusExcluded:true}});
- return session;
+ sessionInitializers[key]=(async()=>{
+  const session={id:crypto.randomUUID(),startedAt:new Date().toISOString(),lastAt:null,events:0,url:safePageUrl(tab.url)};
+  sessions[key]=session;await saveSessions();
+  await postEvent(tab.id,session,'capture.started',{url:session.url,version:'0.3.0',mode:'automatic-interface-architecture',privacy:{conversationTextCaptured:false,composerTextCaptured:false,fieldValuesCaptured:false,hrefsCaptured:false,imageUrlsCaptured:false,menusExcluded:true}});
+  return session;
+ })();
+ try{return await sessionInitializers[key];}finally{delete sessionInitializers[key];}
 }
 async function onObservedEvent(message,sender){
  const tab=sender.tab;
