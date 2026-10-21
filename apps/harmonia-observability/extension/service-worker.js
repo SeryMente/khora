@@ -196,28 +196,29 @@ function sanitizeStructure(structure){
 function sanitizeScan(p){
  const controls=Array.isArray(p.controls)?p.controls.slice(0,100).map(sanitizeControl):[];
  const stylesheets=Array.isArray(p.stylesheets)?p.stylesheets.slice(0,80).map(sheet=>({index:Number(sheet?.index||0),path:boundedString(sheet?.path,180),crossOriginOrInaccessible:!!sheet?.crossOriginOrInaccessible,ruleCount:sheet?.ruleCount??null})):[];
- const layout=p.layout&&typeof p.layout==='object'?p.layout:{};
- const sanitizedLayout={};
+ const layout=p.layout&&typeof p.layout==='object'?p.layout:{},sanitizedLayout={};
  for(const key of ['main','composer','assistant']){
-  const value=layout[key];
-  if(!value||typeof value!=='object')continue;
+  const value=layout[key];if(!value||typeof value!=='object')continue;
   sanitizedLayout[key]={tag:boundedString(value.tag,24),role:boundedString(value.role,30),testId:boundedString(value.testId,70),
    classes:Array.isArray(value.classes)?value.classes.slice(0,5).map(x=>boundedString(x,50)):[],
    display:boundedString(value.display,24),position:boundedString(value.position,24),flexDirection:boundedString(value.flexDirection,24),overflow:boundedString(value.overflow,24),
    fontSize:boundedString(value.fontSize,16),width:Number(value.width||0),height:Number(value.height||0)};
  }
  return {catalogVersion:boundedString(p.catalogVersion,24),fingerprint:boundedString(p.fingerprint,64),
+  regionKey:['conversation','home','project','gpt','search','share','other'].includes(p.regionKey)?p.regionKey:'other',
+  regionPolicyVersion:boundedString(p.regionPolicyVersion,24),
   features:Array.isArray(p.features)?p.features.filter(x=>typeof x==='string'&&x.length<120).slice(0,100):[],controls,
   structure:sanitizeStructure(p.structure),stylesheets,
   viewport:p.viewport&&typeof p.viewport==='object'?{width:Number(p.viewport.width||0),height:Number(p.viewport.height||0),devicePixelRatio:Number(p.viewport.devicePixelRatio||1)}:null,
   layout:sanitizedLayout,
   counts:{controls:controls.length,userMessages:Number(p.counts?.userMessages||0),assistantMessages:Number(p.counts?.assistantMessages||0),styleSheets:Number(p.counts?.styleSheets||stylesheets.length)},
-  privacy:{conversationTextCaptured:false,composerTextCaptured:false,fieldValuesCaptured:false,hrefsCaptured:false,imageUrlsCaptured:false,menusExcluded:true}};
+  privacy:{visibleMessageTextCaptured:true,composerTextCaptured:false,fieldValuesCaptured:false,hrefsCaptured:false,imageUrlsCaptured:false,hiddenReasoningCaptured:false,menusExcluded:true}};
 }
 function compactSurface(sanitized){
- return {catalogVersion:sanitized.catalogVersion,fingerprint:sanitized.fingerprint,features:sanitized.features,
+ return {catalogVersion:sanitized.catalogVersion,fingerprint:sanitized.fingerprint,regionKey:sanitized.regionKey,
+  regionPolicyVersion:sanitized.regionPolicyVersion,features:sanitized.features,
   controlCount:sanitized.controls.length,nodeCount:sanitized.structure.total,stylesheetCount:sanitized.stylesheets.length,viewport:sanitized.viewport,
-  privacy:{conversationTextCaptured:false,composerTextCaptured:false,fieldValuesCaptured:false,hrefsCaptured:false,imageUrlsCaptured:false,menusExcluded:true}};
+  privacy:{visibleMessageTextCaptured:true,composerTextCaptured:false,fieldValuesCaptured:false,hrefsCaptured:false,imageUrlsCaptured:false,hiddenReasoningCaptured:false,menusExcluded:true}};
 }
 async function processSurfaceScan(tab,session,payload){
  payload.regionKey=regionFor(tab.url);payload.regionPolicyVersion=HarmoniaRegionPolicy.POLICY_VERSION;
