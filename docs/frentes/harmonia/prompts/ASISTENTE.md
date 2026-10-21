@@ -1,4 +1,4 @@
-# Instanciación · asistente de Harmonia · v0.11 / candidato E2E v0.4.0
+# Instanciación · asistente de Harmonia · v0.12 / candidato E2E v0.4.0
 
 ## Entrada obligatoria
 
@@ -9,7 +9,7 @@
 
 ## Estado vigente
 
-La implementación candidata v0.4.0 está en la rama `feat/harmonia-e2e-20261021`, PR en borrador [#333](https://github.com/SeryMente/khora/pull/333). El código incluye captura automática por tab, texto visible user/assistant con deltas/chunks, observación estructural, puente de consola con redacción heurística, política regional 1.0.0, un tab líder al completar la región de conversación, popup esencial, dashboard en tab propio, build-info y pruebas locales del colector definidas. El PR NO está fusionado; los resultados de CI deben consultarse y cualquier fallo corregirse antes de declarar PASS.
+La implementación candidata v0.4.0 está en la rama `feat/harmonia-e2e-20261021`, PR en borrador [#333](https://github.com/SeryMente/khora/pull/333). El código incluye captura automática por tab, texto visible user/assistant con deltas/chunks, observación estructural, puente de consola con redacción heurística, política regional 1.0.0, un tab líder al completar la región de conversación, popup esencial, dashboard en tab propio, build-info y pruebas locales del colector definidas. La PR NO está fusionada. CI #12 y #14 aparecen fallidos, pero el conector no devuelve pasos/logs ni artefactos; causa raíz NO VERIFICADA. El workflow diagnóstico se actualizó en `4629dcba608a59aebf911fab3a6ac96db70c1ae7`; reintenta la lectura de ese run al cierre y continúa corrigiendo solo defectos que puedan justificarse con evidencia.
 
 ## Bloqueo RDC y límites
 
