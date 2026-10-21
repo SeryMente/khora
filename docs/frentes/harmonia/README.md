@@ -1,6 +1,6 @@
 # Harmonia · carpeta canónica del frente
 
-Entrada única de estado: [OBJETO-CANONICO.md](OBJETO-CANONICO.md). El OCP v0.11 conserva estado vivo, requisitos, decisiones, límites y siguiente paso; el historial está en las crónicas por ciclo. No crear una segunda fuente de estado.
+Entrada única de estado: [OBJETO-CANONICO.md](OBJETO-CANONICO.md). El OCP v0.12 conserva estado vivo, requisitos, decisiones, límites y siguiente paso; el historial está en las crónicas por ciclo. No crear una segunda fuente de estado.
 
 - [Asistente · retoma v0.11](prompts/ASISTENTE.md): instrucciones de entrada, gobierno, titularidad confirmada y orden de continuación.
 - [Constructor · no instanciado](prompts/CONSTRUCTOR.md): ejecutar solo bajo el régimen de roles vigente; no utilizar RDC.
@@ -10,7 +10,7 @@ Entrada única de estado: [OBJETO-CANONICO.md](OBJETO-CANONICO.md). El OCP v0.11
 
 ## Código y revisión
 
-El código canónico de producción sigue en `main` y no se modifica desde este branch. La candidata v0.4.0 se trabaja en `feat/harmonia-e2e-20261021` y PR en borrador [#333](https://github.com/SeryMente/khora/pull/333). No está fusionada ni aceptada E2E. El workflow de validación Harmonia comprueba sintaxis, contratos de fuente y pruebas del colector HTTP local; su resultado se considera pendiente hasta leer el run/status real.
+El código canónico de producción sigue en `main` y no se modifica desde este branch. La candidata v0.4.0 se trabaja en `feat/harmonia-e2e-20261021` y PR en borrador [#333](https://github.com/SeryMente/khora/pull/333). No está fusionada ni aceptada E2E. CI: los runs #12 y #14 de `Harmonia validation` aparecen como fallidos. El conector no expone steps/logs ni artefactos (`404 BlobNotFound`); la causa raíz no está verificada. El workflow diagnóstico se actualizó en el commit `4629dcba608a59aebf911fab3a6ac96db70c1ae7`, pero el run siguiente sigue sin resultados recuperables. No declarar PASS ni atribuir una causa sin evidencia.
 
 ## Estado de aceptación
 
