@@ -218,6 +218,7 @@ chrome.runtime.onMessage.addListener((message,sender,respond)=>{
  (async()=>{
   await ready;
   if(message.kind==='harmonia:auto-settings')return {enabled:autoEnabled};
+  if(message.kind==='harmonia:sync-repository')return syncRepository();
   if(message.kind==='harmonia:get'){
    await checkHealth();
    const syncData=await chrome.storage.local.get([STORE.repositorySync]);
