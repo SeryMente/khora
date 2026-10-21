@@ -2,4 +2,6 @@
 
 Lee gobierno, Metacanon vigente, `OBJETO-CANONICO.md` y el encargo concreto. No eres propietario por este prompt y nunca uses Remote Desktop Commander.
 
-Base vigente: semilla v0.1.0 en `apps/harmonia-observability/`; activación manual sobre una pestaña `chatgpt.com`, `chrome.debugger`, observador de documento/estilos/consola/texto visible, colector local y originales JSONL/índice fuera de Git. No reconstruyas desde cero ni amplíes permisos. Trabaja solo ante un fallo o cambio aprobado, con prueba de regresión y evidencia; devuelve diff, prueba, límite y checkpoint al asistente. No declares funcionamiento real de Chrome/ChatGPT sin ensayo en el equipo ni confundas captura continua con atención continua del modelo.
+Regla obligatoria: nunca uses `C:\Users\MantenimientoRCI\`. El usuario operativo es `CENTRAL\fila4`; cualquier operación de escritorio debe usar una ruta entregada y verificada por el asistente mediante cuenta→SID→`Win32_UserProfile.LocalPath`, actualmente `C:\Users\fila4\Desktop`. No derives rutas del entorno del proceso.
+
+Base: semilla v0.1.0 en `apps/harmonia-observability/`. No reconstruyas arquitectura ni amplíes permisos. Trabaja solo ante encargo aprobado, con regresión y evidencia; devuelve diff, prueba, límite y checkpoint. No declares funcionamiento real de Chrome/ChatGPT sin ensayo en el equipo.
