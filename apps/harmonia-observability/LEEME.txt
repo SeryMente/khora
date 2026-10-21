@@ -1,4 +1,4 @@
-HARMONIA · MAPA DE LA INTERFAZ CONVERSACIONAL · v0.2.0
+HARMONIA · MAPA DE LA INTERFAZ CONVERSACIONAL · v0.3.0
 
 OBJETIVO
 Primera fase: reunir un inventario empírico y documental de la superficie conversacional de ChatGPT accesible desde Chrome. El índice mide cobertura del mapeo, no la completitud funcional de la extensión. Configuración, menús de cuenta y navegación general quedan fuera del alcance.
@@ -8,9 +8,9 @@ ANTES DE CARGAR LA EXTENSIÓN
 2. El arranque genera extension\local-auth.js con una credencial local aleatoria. Ese archivo está excluido de Git; no lo comparta ni lo copie a repositorios.
 3. Cuando el colector quede en HEALTH=OK, abra chrome://extensions, active el modo desarrollador y seleccione Cargar descomprimida.
 4. Seleccione la carpeta extension dentro de este paquete.
-5. En la pestaña de chatgpt.com que quiere estudiar, abra Harmonia y pulse Iniciar mapeo en esta pestaña. Chrome puede mostrar el aviso de depuración.
-6. Navegue y utilice la interfaz de forma natural. El popup recalcula el índice al consultar el estado; cada cambio estructural relevante se persiste en el índice local.
-7. Para terminar, pulse Detener captura. Para comprobar el índice desde consola, ejecute CONSULTAR-HARMONIA.cmd -Coverage.
+5. Tras recargar la extensión una vez, el mapeo arranca automáticamente en todas las pestañas `https://chatgpt.com/` abiertas y en las que se abran después. No hay que pulsar Iniciar en cada pestaña; el popup permite pausar/reanudar globalmente.
+6. Navega de forma natural. El popup recalcula el índice al consultar el estado; cada cambio estructural relevante se persiste.
+7. Para comprobar el índice desde consola, ejecuta CONSULTAR-HARMONIA.cmd -Coverage. Al recargar el código en chrome://extensions, Chrome puede reiniciar el contexto de la extensión.
 
 ÍNDICE DE COMPLETITUD
 - Documentación oficial: proporción ponderada de capacidades del catálogo con al menos una fuente pública oficial leída y enlazada; el catálogo marca las fuentes verificadas y su fecha de revisión.
@@ -21,11 +21,11 @@ ANTES DE CARGAR LA EXTENSIÓN
 - Una característica observada no implica que se haya probado su funcionamiento. Las diferencias de plan, región y despliegue pueden cambiar la interfaz visible.
 
 ALCANCE Y PRIVACIDAD
-El observador recopila metadatos estructurales de la región principal, etiquetas accesibles de controles, roles, clases/atributos estructurales, recuentos de elementos y metadatos acotados de estilos. No guarda el texto de los mensajes, el texto escrito en el compositor, los valores de campos, URLs de enlaces, URLs de imágenes ni el HTML bruto. Omite menús, diálogos y navegación. Ninguna extensión puede garantizar que todos los metadatos visibles estén libres de información sensible; revise antes de exportar y no publique los JSONL.
+El observador automático recopila metadatos estructurales de la región principal, etiquetas accesibles de controles, roles, clases/atributos estructurales, recuentos de elementos y metadatos acotados de estilos. No guarda el texto de los mensajes, el texto escrito en el compositor, los valores de campos, URLs de enlaces, URLs de imágenes ni el HTML bruto. Omite menús, diálogos y navegación. Ninguna extensión puede garantizar que todos los metadatos visibles estén libres de información sensible; revise antes de exportar y no publique los JSONL.
 No captura cookies, contraseñas, borradores ni otras pestañas. No accede a razonamiento privado no expuesto por la interfaz. La continuidad del observador no significa que un modelo esté atendiendo de manera continua.
 
 DATOS Y CUSTODIA
-Los originales quedan fuera de Git en %LOCALAPPDATA%\Harmonia\surface-index-v0.2.0\data. El servicio escucha únicamente en 127.0.0.1:47321 y detiene escrituras al alcanzar 1 GiB sin borrar datos. El objeto coverage-index vive en index.json y puede consultarse con CONSULTAR-HARMONIA.cmd -Coverage.
+Los originales quedan fuera de Git en %LOCALAPPDATA%\Harmonia\surface-index-v0.3.0\data. El servicio escucha únicamente en 127.0.0.1:47321 y detiene escrituras al alcanzar 1 GiB sin borrar datos. El objeto coverage-index vive en index.json y puede consultarse con CONSULTAR-HARMONIA.cmd -Coverage.
 El archivo extension\local-auth.js contiene una credencial local; no subirlo ni compartirlo. Los cambios de código se mantienen en SeryMente/khora; el directorio runtime y logs también se excluyen de Git.
 
 FUENTES DOCUMENTALES
