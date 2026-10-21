@@ -121,7 +121,7 @@ function recordEvent(event,res){
   if(keys.length>MAX_INDEXED_SURFACES){for(const oldKey of keys.slice(0,keys.length-MAX_INDEXED_SURFACES))delete index.surfaceFingerprints[oldKey];}
   const storedType=isNewSurface?'ui.surface.scan':'ui.surface.reused';
   const stored={...event,type:storedType,payload:compactReference(surface,record)};
-  const file=path.join(originalsDir,day,event.sessionId+'.jsonl'),line=JSON.stringify(stored)+'\\n',bytes=Buffer.byteLength(line);
+  const file=path.join(originalsDir,day,event.sessionId+'.jsonl'),line=JSON.stringify(stored)+'\n',bytes=Buffer.byteLength(line);
   if(index.totalBytes+bytes>MAX){index.stopped=true;persist();return {tooLarge:true};}
   fs.appendFileSync(file,line,'utf8');index.totalBytes+=bytes;
   const session=index.sessions[event.sessionId]||{firstAt:event.capturedAt,lastAt:event.capturedAt,events:0,types:{},file:path.relative(root,file).split(path.sep).join('/'),lastEventSha256:null};
@@ -134,7 +134,7 @@ function recordEvent(event,res){
  }
  const day=new Date(when).toISOString().slice(0,10),file=path.join(originalsDir,day,event.sessionId+'.jsonl');
  const stored={schema:'harmonia.event.v1',eventId:event.eventId,sessionId:event.sessionId,conversation:typeof event.conversation==='string'?event.conversation.slice(0,80):null,type:event.type,source:text(event.source,40),capturedAt:new Date(when).toISOString(),payload:event.type==='capture.started'?{url:safeSessionUrl(event.payload&&event.payload.url),version:text(event.payload&&event.payload.version,24),mode:text(event.payload&&event.payload.mode,60),privacy:{conversationTextCaptured:false,composerTextCaptured:false,fieldValuesCaptured:false,hrefsCaptured:false,imageUrlsCaptured:false,menusExcluded:true}}:event.type==='capture.stopped'?{reason:text(event.payload&&event.payload.reason,80),durationMs:Math.max(0,number(event.payload&&event.payload.durationMs))}:{reason:'event-suppressed'}};
- const line=JSON.stringify(stored)+'\\n',bytes=Buffer.byteLength(line);
+ const line=JSON.stringify(stored)+'\n',bytes=Buffer.byteLength(line);
  if(index.totalBytes+bytes>MAX){index.stopped=true;persist();return {tooLarge:true};}
  fs.appendFileSync(file,line,'utf8');index.totalBytes+=bytes;
  const session=index.sessions[event.sessionId]||{firstAt:stored.capturedAt,lastAt:stored.capturedAt,events:0,types:{},file:path.relative(root,file).split(path.sep).join('/'),lastEventSha256:null};
