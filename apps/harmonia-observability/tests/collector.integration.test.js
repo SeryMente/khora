@@ -57,14 +57,23 @@ test('collector en HTTP local: auth, CORS, deltas visibles, redacción, persiste
  assert.equal(extensionCors.status,204);
 
  const session1=uuid();
+ const initialText='Respuesta visible parcial\\nSegunda línea';
  const visiblePayload={regionKey:'conversation',messageKey:'assistant:1',role:'assistant',index:1,operation:'replace',
-  delta:'',text:'Respuesta visible parcial\nSegunda línea',contentSha256:crypto.createHash('sha256').update('respuesta-visible').digest('hex'),
+  delta:'',text:initialText,contentSha256:crypto.createHash('sha256').update(initialText).digest('hex'),
   visible:true,streaming:true,truncated:false,hiddenReasoningCaptured:false,chunkIndex:0,chunkCount:1};
  const visibleEvent={schema:'harmonia.event.v1',eventId:uuid(),sessionId:session1,conversation:'tab-11',type:'conversation.visible.delta',
   source:'page-observer',capturedAt:new Date().toISOString(),payload:visiblePayload};
  const visibleResponse=await request(base,'/events',{method:'POST',headers:{'content-type':'application/json','x-harmonia-token':token},body:JSON.stringify(visibleEvent)});
  assert.equal(visibleResponse.status,201);
  let visibleBody=await visibleResponse.json();assert.equal(visibleBody.storedType,'conversation.visible.delta');
+ const appendedText=initialText+' y continuación';
+ const appendEvent={...visibleEvent,eventId:uuid(),payload:{...visiblePayload,operation:'append',delta:' y continuación',text:'',contentSha256:crypto.createHash('sha256').update(appendedText).digest('hex'),streaming:true,chunkIndex:0,chunkCount:1}};
+ const appendResponse=await request(base,'/events',{method:'POST',headers:{'content-type':'application/json','x-harmonia-token':token},body:JSON.stringify(appendEvent)});
+ assert.equal(appendResponse.status,201);
+ const appendBody=await appendResponse.json();assert.equal(appendBody.storedType,'conversation.visible.delta');
+ const completeEvent={...visibleEvent,eventId:uuid(),payload:{...visiblePayload,operation:'complete',delta:'',text:'',contentSha256:crypto.createHash('sha256').update(appendedText).digest('hex'),streaming:false,chunkIndex:0,chunkCount:1}};
+ const completeResponse=await request(base,'/events',{method:'POST',headers:{'content-type':'application/json','x-harmonia-token':token},body:JSON.stringify(completeEvent)});
+ assert.equal(completeResponse.status,201);
 
  const consoleEvent={schema:'harmonia.event.v1',eventId:uuid(),sessionId:session1,conversation:'tab-11',type:'console.observed',
   source:'page-observer',capturedAt:new Date().toISOString(),payload:{regionKey:'conversation',level:'error',entries:[
