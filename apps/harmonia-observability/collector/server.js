@@ -10,6 +10,33 @@ fs.mkdirSync(root,{recursive:true});
 const idxPath=path.join(root,'index.json');
 let index={schema:'harmonia.index.v1',updatedAt:null,sessions:{},totalBytes:0,stopped:false};
 try{const saved=JSON.parse(fs.readFileSync(idxPath,'utf8'));if(saved.schema==='harmonia.index.v1')index=saved;}catch{}
+const catalogPath=path.join(__dirname,'..','coverage-catalog.json');
+const catalog=JSON.parse(fs.readFileSync(catalogPath,'utf8'));
+function featureWeight(feature){return feature.priority==='core'?2:1;}
+function updateCoverage(event){
+ if(event.type!=='ui.surface.scan')return;
+ const features=catalog.features.filter(f=>f.scope!=='out'),p=event.payload||{};
+ const previous=index.coverage||{observedFeatureIds:[],unknownControls:[],scanCount:0};
+ previous.observedFeatureIds=[...new Set([...(previous.observedFeatureIds||[]),...(Array.isArray(p.features)?p.features:[])])].filter(id=>features.some(f=>f.id===id)).sort();
+ const unknown=(Array.isArray(p.controls)?p.controls:[]).filter(c=>!c.testId&&!c.label).map(c=>[c.tag,c.role,c.type,c.placeholder].join('|')).filter(Boolean);
+ previous.unknownControls=[...new Set([...(previous.unknownControls||[]),...unknown])].slice(0,100);
+ previous.scanCount=(previous.scanCount||0)+1;previous.lastScanAt=event.capturedAt;previous.lastSessionId=event.sessionId;
+ previous.lastVisibleFeatureIds=Array.isArray(p.features)?p.features:[];previous.lastControlCount=Array.isArray(p.controls)?p.controls.length:0;
+ previous.lastNodeCount=p.structure?.total||0;
+ const totalWeight=features.reduce((n,f)=>n+featureWeight(f),0);
+ const docs=features.filter(f=>Array.isArray(f.docs)&&f.docs.length>0);
+ const observed=features.filter(f=>previous.observedFeatureIds.includes(f.id));
+ const docWeight=docs.reduce((n,f)=>n+featureWeight(f),0);
+ const observedWeight=observed.reduce((n,f)=>n+featureWeight(f),0);
+ previous.catalogVersion=catalog.version;previous.catalogReviewedAt=catalog.reviewedAt;previous.featureCount=features.length;
+ previous.documentation={covered:docs.length,total:features.length,weightedPoints:docWeight,totalWeightedPoints:totalWeight,percent:Math.round(100*docWeight/totalWeight)};
+ previous.naturalObservation={covered:observed.length,total:features.length,weightedPoints:observedWeight,totalWeightedPoints:totalWeight,percent:Math.round(100*observedWeight/totalWeight)};
+ previous.combinedPercent=Math.round(100*(docWeight+observedWeight)/(2*totalWeight));
+ previous.pendingDocumentationIds=features.filter(f=>!f.docs?.length).map(f=>f.id);
+ previous.pendingObservationIds=features.filter(f=>!previous.observedFeatureIds.includes(f.id)).map(f=>f.id);
+ previous.unknownControlCount=previous.unknownControls.length;
+ index.coverage=previous;
+}
 function persist(){index.updatedAt=new Date().toISOString();const tmp=idxPath+'.tmp';fs.writeFileSync(tmp,JSON.stringify(index,null,2),'utf8');fs.renameSync(tmp,idxPath);}
 function originOK(origin){return !origin||/^chrome-extension:\/\/[a-p]{32}$/.test(origin);}
 function authOK(req){const given=Buffer.from(String(req.headers['x-harmonia-token']||''));const expected=Buffer.from(TOKEN);return given.length===expected.length&&crypto.timingSafeEqual(given,expected);}
@@ -48,7 +75,7 @@ const server=http.createServer((req,res)=>{
    const dir=path.join(root,'originals',day);fs.mkdirSync(dir,{recursive:true});
    const file=path.join(dir,event.sessionId+'.jsonl'),line=JSON.stringify(event)+'\n',bytes=Buffer.byteLength(line);
    if(index.totalBytes+bytes>MAX){index.stopped=true;persist();return reply(req,res,507,{error:'storage-limit-stop-no-deletion'});}
-   fs.appendFileSync(file,line,'utf8');index.totalBytes+=bytes;
+   fs.appendFileSync(file,line,'utf8');index.totalBytes+=bytes;updateCoverage(event);
    const session=index.sessions[event.sessionId]||{firstAt:event.capturedAt,lastAt:event.capturedAt,events:0,types:{},file:path.relative(root,file),lastEventSha256:null};
    session.lastAt=event.capturedAt;session.events++;session.types[event.type]=(session.types[event.type]||0)+1;
    session.lastEventSha256=crypto.createHash('sha256').update(line).digest('hex');
