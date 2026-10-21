@@ -211,7 +211,7 @@
       const relevant=records.some(record=>{
         const target=record.target?.nodeType===1?record.target:record.target?.parentElement;
         if(!target||excluded(target))return false;
-        if(record.type==='attributes')return true;
+        if(record.type==='attributes'||record.type==='characterData')return true;
         if(record.type==='childList')return [...record.addedNodes,...record.removedNodes].some(node=>node.nodeType===1&&!excluded(node));
         return false;
       });
