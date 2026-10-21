@@ -4,10 +4,10 @@
 ## 1. Control e identidad
 
 - Nombre normalizado: **Harmonia**, extensión compañera de **Khora**; «Armonía» y «Cora» de los dictados se conservan literalmente en originales. No renombrar producto o repositorio por transcripción.
-- Identificador del frente: `harmonia`. Versión del objeto **0.5**; sello **HARMONIA-v0.5**; corte de estado **2026-10-21**. Este corte reemplaza los estados operativos obsoletos de v0.4, sin borrar el historial de cómo se llegó aquí.
+- Identificador del frente: `harmonia`. Versión del objeto **0.6**; sello **HARMONIA-v0.6**; corte de estado **2026-10-21**. Este corte registra la primera fase de mapeo de la superficie conversacional mediante una extensión de observación estructural y un índice de completitud documental/empírico. Conserva v0.5 y los cortes de v0.1.0 como historial.
 - Repositorio propietario: `SeryMente/khora`, rama `main`; objeto canónico en `docs/frentes/harmonia/OBJETO-CANONICO.md`. El blob de la versión anterior v0.4 fue `9a186ea789ea5aacab8dd06cf9f6edf364b89531`. Primera publicación del estado completo: commit `892adad897d6bd36c797ec2343ff7f4893b853bf`; lectura de vuelta en `main` confirmada y blob verificado `03ec5d127e0913dfe1f61e8588ba53b8abaa8e5f`. El recibo se refiere al contenido integral v0.5; toda modificación posterior debe adquirir su propio commit y lectura de vuelta. Nunca anticipar un SHA.
-- Fuente de código original: `apps/harmonia-observability/`, con antecedentes en commits `96efc0f736011d3a7b76f2ebd2151d1ab27e9ab4` y `9a1851137e1c01817febe82c87b4f24a2388a917`. El paquete del Escritorio contiene cambios locales adicionales descritos en §14; esos cambios **no están sincronizados a GitHub** por esta actualización documental.
-- Frente permanente por creación expresa del operador; producto aún **no aceptado como observador real en producción**. Servicio local de recolección iniciado y validado de forma sintética; carga de la extensión en Chrome y captura real de ChatGPT no verificadas.
+- Fuente de código vigente: `apps/harmonia-observability/` en `main`, con la extensión de mapeo v0.2.0, `coverage-catalog.json` y scripts/validador sincronizados a GitHub en este ciclo. El paquete materializado en el Escritorio se reconstruyó desde esos archivos y contiene solo el runtime portable y una credencial local excluidos del repositorio; su manifiesto local de huellas se regeneró tras las validaciones.
+- Frente permanente por creación expresa del operador. El servicio local v0.2.0 está iniciado y validado; el paquete de mapeo está preparado en el Escritorio, pero la nueva extensión aún **no se ha cargado ni probado en Chrome**. La observación real demostrada anteriormente corresponde a la versión v0.1.0 y no se hereda como prueba de funcionamiento de v0.2.0.
 - Control exclusivo vigente: `CONTROL-RESPONSABILIDAD.json`, generación **1**, propietario `400a4187-8241-8023-b3dd-00a96d379015`, instancia `samanthal-harmonia-notion-400a4187` (Notion, asistente), según la adquisición condicional registrada previamente. El control no se modificó en este corte; esta edición del objeto no transfiere propiedad ni crea una segunda instancia responsable.
 - Destino de paquete comprobado y usado mediante ruta física explícita: `C:\Users\fila4\Desktop\Harmonia-Observabilidad-v0.1.0`. Datos locales: `C:\Users\fila4\AppData\Local\Harmonia\data`. No usar rutas derivadas del perfil del proceso RDC para resolver estos destinos.
 
@@ -51,9 +51,9 @@ Resto del método vigente aplicable por pertinencia; citas históricas, ejemplos
 
 **Implementación local actual:** extensión Manifest V3 basada en el código de `apps/harmonia-observability/`, popup con el título corregido a **«Qué observa Harmonia»**, service worker con encabezado de token para el colector, colector Node HTTP de loopback en `127.0.0.1:47321`, originales JSONL, `index.json` por sesión y scripts de inicio, parada, consulta, reconstrucción y verificación. El archivo `MANIFEST-HUELLAS.json` fue regenerado y validado para 17 archivos del paquete; Node portable cuenta además con verificación de integridad registrada en §14.
 
-**Estado real de la prueba:** el servicio local está activo y superó verificaciones de salud, autenticación básica, CORS, sintaxis, manifiesto y persistencia sintética. En el almacén hay actualmente dos eventos de instalación sintéticos distribuidos en dos sesiones, marcados `capturedFromChatGPT=false`. No son evidencia de una conversación real. No se verificó la carga de la extensión en Chrome, no se ejecutó una conversación real instrumentada y no se midió la latencia real de punta a punta.
+**Estado real de la prueba:** la versión v0.1.0 capturó previamente estructura/HTML del documento, mutaciones DOM y consola de una pestaña real, pero no acreditó completitud de todos los mensajes. En este corte se construyó y publicó la versión v0.2.0 enfocada en arquitectura de interfaz: estructura y roles DOM, clases/etiquetas accesibles de controles, rasgos de CSS y viewport, sin guardar el texto de conversación, el texto del compositor, valores de campos, HTML bruto ni URLs completas. El servicio v0.2.0 está activo, protegido por token local, y el almacén nuevo comienza vacío. La extensión v0.2.0 aún requiere carga manual y una prueba natural; no se ha producido su primer barrido de cobertura.
 
-**Límites del capturador actual:** `extension/content.js` conserva limitaciones de la implementación base: normaliza y recorta texto (12 KiB), limita el HTML inicial a 1 MiB y las reglas CSS por hoja a 250 KiB, y la ruta de parada puede descartar el buffer pendiente porque desactiva la captura antes de llamar a la función de vaciado. Por tanto, no está demostrada la completitud y no debe presentarse todavía como observador fiel. El código local es híbrido y difiere de la fuente Git; revisar/difundir los deltas antes de hacer otra entrega.
+**Límites del capturador:** los cortes de texto/HTML de la versión v0.1.0 son antecedentes históricos, no el alcance del escáner estructural v0.2.0. Los detectores de funciones de la nueva versión son heurísticos: observan la presencia de señales DOM conocidas, no verifican que cada control o herramienta funcione correctamente. No prometer cobertura perfecta en todos los planes, regiones o despliegues.
 
 **Canal y arquitectura futura:** el transporte que efectivamente opera es HTTP local + JSONL/índice JSON. Native Messaging + SQLite en modo WAL + WebSocket se ha considerado como dirección de mejora, pero **no está implementado ni probado**. Tampoco existe un consumidor permanente que entregue por sí solo los eventos a otros hilos de ChatGPT. Desde otra conversación solo puede haber consulta cuando un asistente autorizado inicia una operación RDC; no hay escucha permanente entre conversaciones demostrada.
 
@@ -183,7 +183,7 @@ Regla del entorno persistente: no usar `C:\Users\MantenimientoRCI\` como raíz o
 
 La publicación y la lectura posterior del objeto canónico acreditan únicamente esta actualización documental. No certifican el código local, la carga de la extensión, la captura real ni la atención permanente de otros hilos.
 
-## 14. Corte técnico comprobado · 2026-10-21
+## 14. Corte técnico histórico de v0.1.0 · 2026-10-21
 
 ### 14.1. Paquete y componentes locales
 
@@ -224,3 +224,34 @@ No incluirlos en métricas de captura real.
 ### 14.5. Criterio de continuidad
 
 La siguiente entrega técnica debe revisar y corregir primero los defectos de completitud, publicar de forma revisable el delta de código local y probar la persistencia con eventos controlados. Una prueba real solo se inicia con autorización explícita para la acción visible en Chrome y usando una conversación sin datos sensibles. Medir y reportar por separado completitud, disponibilidad, estabilidad y latencia; solo tras esas evidencias decidir si se migra al bus avanzado y qué automatización queda autorizada.
+
+## 15. Fase 1 · mapa de la superficie conversacional · 2026-10-21
+
+### Nombre y alcance
+
+Nombre operativo: **inventario de la superficie conversacional de ChatGPT en Chrome**; nombre corto: **Mapa de superficie conversacional**. Esta fase busca describir la arquitectura de interfaz accesible al usuario para construir las fases posteriores sobre evidencia observada y documentación pública. Incluye región principal del hilo, representaciones de mensajes, compositor, controles inmediatos, estados de generación, fuentes, bloques y resultados de herramientas. Excluye Configuración, preferencias de cuenta, menús administrativos, navegación general de la barra lateral y elementos de Chrome. No pretende inspeccionar razonamiento interno privado.
+
+### Índice de completitud
+
+Catálogo versionado en `apps/harmonia-observability/coverage-catalog.json`, esquema `harmonia.coverage-catalog.v1`, versión 0.1.2. Corte: **44 capacidades**, **16 fuentes oficiales leídas** durante la revisión documental del 2026-10-21. Cuarenta capacidades ya disponen de al menos una fuente pública oficial leída/enlazada; cuatro siguen sin fuente directa asociada. Las capacidades centrales ponderan 2 puntos y las de soporte 1, total de **68 puntos**.
+
+- Cobertura documental ponderada: **91%** (62/68 puntos).
+- Observación natural: parte de **0%** para la versión 0.2.0, que aún no se ha cargado. Sube cuando el usuario carga la extensión y navega; se marca una capacidad cuando se detecta su huella estructural dentro de la pestaña seleccionada.
+- Índice combinado inicial: **46%**, media de las proporciones documentada y observada. Es un indicador del mapa, no de exactitud de captura ni del funcionamiento de las capacidades.
+- Fuentes y fecha verificada quedan registradas en el catálogo. La documentación pública no es exhaustiva de todos los despliegues; las notas de OpenAI advierten variación por plan, modelo, región, espacio de trabajo y rollout.
+- Catálogo de revisión pública actual incluye Home/capacidades, carga de archivos y audio, voz/dictado, búsqueda web, investigación profunda, análisis de datos, imágenes, bloques de escritura/código, proyectos, apps conectadas, enlaces compartidos, reporte/feedback, solución de errores y notas de lanzamiento.
+- El catálogo se amplió con Inteligent UI y componentes interactivos, respuestas parciales mientras se usan herramientas, progreso de tareas paralelas, gráficos interactivos, Canvas y artefactos de diapositivas. Las notas de lanzamiento de ChatGPT describen estas novedades en octubre de 2026. El inventario no implica que todas estén disponibles en esta cuenta.
+
+### Implementación local v0.2.0
+
+- Carpeta preparada: `C:\Users\fila4\Desktop\Harmonia-Observabilidad-v0.2.0`.
+- Raíz de datos independiente: `C:\Users\fila4\AppData\Local\Harmonia\surface-index-v0.2.0\data`. No se mezcla con el almacén v0.1.0, que conserva su histórico fuera del árbol de código.
+- Servicio local: Node.js portable 22.23.4, listener solo en `127.0.0.1:47321`, PID observado 7200 en la última comprobación. La comprobación de salud, petición sin credencial rechazada por HTTP 401 y CORS (origen simulado de extensión admitido; origen web ajeno rechazado por HTTP 403) pasaron.
+- Prueba final del paquete: código de salida 0; `node --check` pasó en content script, service worker, popup y colector; manifiesto MV3 v0.2.0; `CONTENT_CAPTURE=STRUCTURE_ONLY_DECLARED`; manifiesto local de huellas válido para 16 archivos; catálogo 44/16.
+- Carga v0.2.0 en Chrome: **NO VERIFICADA; REQUIERE ACCIÓN MANUAL DEL OPERADOR**. El primer escaneo natural está pendiente. Desactivar la extensión anterior v0.1.0, actualizar la pestaña y cargar el directorio `extension` de esta nueva carpeta para evitar que el debugger o el observador anterior colisionen.
+- Metadatos observados: jerarquía acotada de DOM, roles, clases, test IDs, etiquetas accesibles de controles, dimensiones de viewport, recuentos y metadatos de hojas de estilo. La extensión omite navegación/menús, no serializa texto de mensajes ni HTML bruto y sanitiza IDs de ruta en eventos de consola. No elimina el riesgo de que alguna etiqueta accesible o metadato incluya información sensible; mantener la prueba local y no publicar los JSONL.
+- El índice persiste en el servicio junto a eventos locales y se conserva también en `chrome.storage.local`; el popup presenta el valor documental, observación natural, combinado, funciones pendientes, controles sin clasificar y fuentes. CLI: `CONSULTAR-HARMONIA.cmd -Coverage`.
+
+### Siguiente aceptación
+
+Una vez que el operador cargue v0.2.0 y pulse **Iniciar mapeo en esta pestaña**, navegar de forma natural por una única pestaña elegida. Verificar que el índice registra escaneos, que nuevos paneles/controles actualizan los IDs observados y que la consulta local reporta los mismos valores. Luego confrontar cada función detectada con la documentación y observar casos no reconocidos, sin convertir la presencia de un selector en prueba de funcionamiento. Mantener por separado completitud del mapa, disponibilidad del colector, estabilidad y latencia. No se captura texto de conversación en esta fase.
