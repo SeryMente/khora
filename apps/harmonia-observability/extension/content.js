@@ -38,7 +38,7 @@
     if (root && $$('pre code,pre,[data-testid*="code-block"]',root).length) ids.add('response.code-block');
     if (root && $$('table,[role="table"]',root).length) ids.add('response.data-table');
     if (root && $$('svg.recharts-surface,canvas,[data-testid*="chart"],[aria-label*="chart" i]',root).length) ids.add('response.data-chart');
-    if (root && $$('img',root).some(el=>!excluded(el)&&!el.closest('nav,aside'))) ids.add('response.image-generation');
+    if (root && $('[data-message-author-role="assistant"] img,article img',root).some(el=>{const r=el.getBoundingClientRect();return r.width>=128&&r.height>=80&&!el.closest('button,[role="button"]');})) ids.add('response.image-generation');
     if (root && $$('a[href^="http"]',root).some(el=>el.closest('[data-message-author-role="assistant"],article'))) ids.add('conversation.citations');
     if (root && $$('a[download],[data-testid*="download"],[data-testid*="file-card"],[data-testid*="artifact"]',root).length) ids.add('response.file-output');
     if (root && $$('[data-testid*="artifact"],[data-testid*="canvas"],[data-testid*="writing-block"]',root).length) ids.add('response.writing-block');
@@ -93,8 +93,8 @@
     return [...document.styleSheets].slice(0,80).map((s,i)=>{
       let rules=null,error=false;
       try{rules=s.cssRules?.length??null;}catch{error=true;}
-      let path=null;
-      try{const u=new URL(s.href||location.href);path=u.origin+u.pathname;}catch{}
+      let path=s.href?'stylesheet':'inline-style';
+      if(s.href){try{const u=new URL(s.href);path=u.origin+u.pathname;}catch{path='external-stylesheet';}}
       return {index:i,path,crossOriginOrInaccessible:error,ruleCount:rules};
     });
   }
