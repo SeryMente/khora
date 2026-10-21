@@ -121,7 +121,7 @@ function sanitizeVisibleDelta(p){
  const sha=typeof p.contentSha256==='string'&&/^[0-9a-f]{64}$/i.test(p.contentSha256)?p.contentSha256.toLowerCase():'';
  return {regionKey:['conversation','home','project','gpt','search','share','other'].includes(p.regionKey)?p.regionKey:'other',
   messageKey:p.messageKey,role,index:number(p.index),operation,delta,text:content,contentSha256:sha,
-  visible:p.visible===true,streaming:p.streaming===true,truncated:p.truncated===true,hiddenReasoningCaptured:false};
+  visible:p.visible===true,streaming:p.streaming===true,truncated:p.truncated===true,chunkIndex:Math.max(0,number(p.chunkIndex)),chunkCount:Math.min(1000,Math.max(1,number(p.chunkCount,1))),hiddenReasoningCaptured:false};
 }
 function sanitizeConsoleEvent(p){
  const level=['log','info','warn','error','debug'].includes(p?.level)?p.level:'log';
