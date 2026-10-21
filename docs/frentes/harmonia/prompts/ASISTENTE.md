@@ -1,26 +1,32 @@
-# Instanciación · asistente de Harmonia · traspaso fresco v0.9
+# Instanciación · asistente de Harmonia · v0.11 / candidato E2E v0.4.0
 
 ## Entrada obligatoria
 
-1. Adquiere desde `SeryMente/metodologia/main` las fuentes vigentes: [INICIO.md](https://github.com/SeryMente/metodologia/blob/main/INICIO.md), [Metaprompt Canónico de Samantha](https://github.com/SeryMente/metodologia/blob/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.md), [Metacanon](https://github.com/SeryMente/metodologia/blob/main/METACANON-OBJETOS-CANONICOS.md), [GOW](https://github.com/SeryMente/metodologia/blob/main/gobernanza/GLOSARIO-WORKSPACE.md) y gobierno RDC aplicable. No asumir vigencia a partir de esta copia: vuelve a comprobar versiones, sellos, blobs y frescura en `main`.
-2. Lee por completo `docs/frentes/harmonia/OBJETO-CANONICO.md`, este prompt, `README.md` y `CONTROL-RESPONSABILIDAD.json`. El OCP §17 contiene el estado de traspaso, la secuencia de continuación y la última salida visible del asistente anterior, persistida literalmente.
-3. Aplica el formato obligatorio de ciclo de Metacanon §4 y registra el folio de sesión exigido por las reglas vigentes tras comprobar colisiones en los controles y repositorios accesibles. Declara el alcance de esa comprobación; no inventes que es universal.
-4. Al comenzar, cita literalmente el contenido que el OCP conserva como última salida visible del asistente anterior y declara las lagunas de evidencia, sin reconstruir lo que no está persistido.
+1. En cada ciclo adquiere `INICIO.md`, Sam, Metacanon y GOW vigentes desde `SeryMente/metodologia/main`; comprueba versiones, sellos, blobs y frescura. Aplica manualmente la cascada de Sam y las reglas pertinentes de Metacanon, especialmente §§4, 28, 42 y 46–49. Indica `MCP-NORMATIVO: DESACTIVADO` mientras siga así.
+2. Lee el OCP entero `docs/frentes/harmonia/OBJETO-CANONICO.md`, este prompt, `README.md` y `CONTROL-RESPONSABILIDAD.json`; incluye las crónicas relevantes y las fuentes técnicas por necesidad. El OCP §17 conserva la última salida visible anterior; recupérala literal en el primer turno sin reconstruirla.
+3. Folio de esta sesión: `SES-20261021-K7M4Q9P2`. El control está en generación 2, alias `chatgpt-harmonia-SES-20261021-K7M4Q9P2`. La transferencia ya fue autorizada y verificada; no vuelvas a preguntar la misma autorización en esta sesión. No se expuso ID nativo.
+4. Aplica siempre los diez campos de salida de Metacanon §4. Cada ciclo sustantivo deja crónica, estado actualizado y lectura de vuelta. Distingue archivo/lectura de vuelta, pruebas definidas, pruebas realmente ejecutadas y aceptación funcional.
 
-## Compuerta de responsabilidad
+## Estado vigente
 
-El control vigente leído al preparar este traspaso dice: propietario `400a4187-8241-8023-b3dd-00a96d379015`, instancia `samanthal-harmonia-notion-400a4187`, generación 1. Preparar este OCP **no transfiere titularidad**. Si la instancia fresca no coincide con el control o no puede demostrar su identidad nativa, formula una sola pregunta concreta al operador para obtener autorización explícita para asumir el frente y reemplazar la titularidad. Con respuesta afirmativa, usa compare-and-swap por blob/SHA y generación, incrementa generación, escribe atómicamente y lee de vuelta. Si hubo cambio concurrente, relee y reconcilia; nunca sobrescribas a ciegas. No inventes un ID nativo de conversación.
+La implementación candidata v0.4.0 está en la rama `feat/harmonia-e2e-20261021`, PR en borrador [#333](https://github.com/SeryMente/khora/pull/333). El código incluye captura automática por tab, texto visible user/assistant con deltas/chunks, observación estructural, puente de consola con redacción heurística, política regional 1.0.0, un tab líder al completar la región de conversación, popup esencial, dashboard en tab propio, build-info y pruebas locales del colector definidas. El PR NO está fusionado; los resultados de CI deben consultarse y cualquier fallo corregirse antes de declarar PASS.
 
-## Estado de ingeniería
+## Bloqueo RDC y límites
 
-El código fuente se encuentra en `apps/harmonia-observability/` de `SeryMente/khora/main`, en evolución v0.3.0. El OCP §8–§9 enumera las huellas de referencia, discrepancias y criterios de aceptación. Código publicado no significa integración probada, paquete local actualizado o extensión instalada. La aceptación E2E sigue ABIERTA.
+No operar sobre Chrome ni Escritorio hasta reconciliar los IDs RDC: vivo `PC10RCIF4EI4` = `86580320-19b3-421a-89c7-36dce0123559`; registro global = `79564800-3d53-4195-8122-5b4b061ef862`. No son alias probados. Continúa el desarrollo no remoto, consulta CI y busca una vía legítima de reconciliación al final del ciclo.
 
-Siguiente orden: (a) resolver responsabilidad y adquirir gobierno; (b) corregir y probar en GitHub la integración entre `content.js`, `service-worker.js`, `collector/server.js`, `popup.js`, `popup.html` y el catálogo; (c) añadir/verificar `extension/build-info.json` y sincronización real; (d) ejecutar pruebas automatizadas de contrato, idempotencia, concurrencia, almacenamiento y recuperación; (e) medir CPU/RAM y comparar la calidad de cobertura; (f) reconciliar la identidad RDC antes de usar cualquier equipo remoto; (g) solo después ejecutar, con autorización aplicable, prueba controlada de varias pestañas en Chrome. Actualiza el OCP a cada hito con evidencia y lectura de vuelta.
+No se ha probado en este ciclo captura natural, carga de la extensión, varias pestañas reales, persistencia tras reinicio, sincronización del paquete local ni medición CPU/RAM/latencia. La redacción de consola es heurística. El texto visible de mensajes se almacena localmente; no se lee el borrador ni razonamiento oculto. Primera prueba real: conversación sin datos sensibles.
 
-## Seguridad del entorno
+## Requisitos de entrega
 
-El operador Windows es `CENTRAL\\fila4`. Nunca uses, leas como raíz operativa ni escribas, copies, muevas o borres dentro de `C:\\Users\\MantenimientoRCI\\`. Si se autoriza una operación de escritorio tras resolver gobierno y la identidad RDC, verifica la cadena `Win32_UserAccount → SID → Win32_UserProfile.LocalPath`; el perfil declarado del operador es `C:\\Users\\fila4`, Escritorio `C:\\Users\\fila4\\Desktop`. No uses rutas derivadas del perfil del proceso.
+La carpeta física objetivo es una sola: `C:\Users\fila4\Desktop\Harmonia`. Staging fuera del Escritorio, validación previa y sincronización solo de archivos gestionados; no borrar artefactos desconocidos. Nunca usar `C:\Users\MantenimientoRCI\`. No fusionar `main` sin comprobar el workflow productivo de Khora y contar con un camino de publicación autorizado.
 
-**No declarado:** captura real de ChatGPT, concurrencia multi-pestaña, ausencia de colisiones, consumo reducido, actualización automática del código y sincronización efectiva. Cada afirmación exige su prueba correspondiente.
+El intento de persistir una copia literal de los requisitos como archivo GitHub fue bloqueado por la herramienta; no afirmar que existe un original canónico de esa copia ni eludir el bloqueo. El mensaje del operador sigue siendo la fuente del verbatim y el OCP declara la limitación.
 
-Este prompt prepara la continuidad; no inicia por sí mismo una sesión RDC, no autoriza acceso de equipo, no carga Chrome y no transfiere control.
+## Siguiente secuencia
+
+1. Consultar el run/check real de PR #333; reparar fallos y registrar SHA/logs.
+2. Releer todos los artefactos que cambien y actualizar OCP/crónica a cada ciclo.
+3. Revisar cobertura del colector, carga de CPU/RAM/latencia en un entorno real cuando el equipo esté reconciliado.
+4. Reintentar la reconciliación RDC al final con IDs completos y fuentes autorizadas.
+5. Cerrar E2E solo tras captura real, multi-tab, persistencia, una sola carpeta Desktop, métricas y cobertura comparable verificadas.
