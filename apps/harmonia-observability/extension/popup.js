@@ -16,6 +16,10 @@ const percent=(n,d)=>d?Math.round(100*n/d):0;
 const pctText=(n,d)=>percent(n,d)+'%';
 function setBar(id,value){$(id).style.width=Math.max(0,Math.min(100,value))+'%';}
 function formatDate(value){if(!value)return 'Aún no hay observaciones naturales.';const date=new Date(value);return Number.isNaN(date.getTime())?'Último barrido sin fecha válida.':'Último barrido: '+date.toLocaleString();}
+function isDocumented(feature){
+  const verifiedSources=new Set((catalog?.sources||[]).filter(source=>source.verificationStatus==='content-read').map(source=>source.id));
+  return Array.isArray(feature.docs)&&feature.docs.some(id=>verifiedSources.has(id));
+}
 function sourceList(){
   const box=$('#sourcesList');box.replaceChildren();
   for(const source of catalog.sources||[]){
@@ -27,7 +31,7 @@ function sourceList(){
 }
 function pendingList(observed){
   const box=$('#pendingList');box.replaceChildren();
-  const pending=(catalog.features||[]).filter(f=>!f.docs?.length||!observed.has(f.id));
+  const pending=(catalog.features||[]).filter(f=>!isDocumented(f)||!observed.has(f.id));
   for(const f of pending.slice(0,12)){
     const row=document.createElement('div');row.className='pending-item';
     const state=[];
@@ -56,7 +60,7 @@ async function paint(){
     const obsPct=percent(observedWeight,totalWeight);
     const combinedPct=percent(documentedWeight+observedWeight,2*totalWeight);
     $('#indexValue').textContent=combinedPct+'%';
-    $('#docsValue').textContent=pctText(documentedWeight,totalWeight)+' · '+features.filter(f=>f.docs?.length).length+'/'+features.length+' elementos';
+    $('#docsValue').textContent=pctText(documentedWeight,totalWeight)+' · '+features.filter(isDocumented).length+'/'+features.length+' elementos';
     $('#observedValue').textContent=pctText(observedWeight,totalWeight)+' · '+observedFeatures.length+'/'+features.length+' elementos';
     $('#totalValue').textContent=features.length+' · '+totalWeight+' puntos ponderados';
     $('#unknownValue').textContent=(coverage.unknownControls||[]).length;
