@@ -1,0 +1,95 @@
+$ErrorActionPreference = 'Stop'
+$desktop = 'C:\Users\fila4\Desktop'
+$root = $PSScriptRoot
+$data = 'C:\Users\fila4\AppData\Local\Harmonia\surface-index-v0.2.0\data'
+$node = Join-Path $root 'runtime\node.exe'
+$authFile = Join-Path $root 'extension\local-auth.js'
+$log = Join-Path $desktop 'log.txt'
+Start-Transcript -LiteralPath $log -Force | Out-Null
+try {
+    $required = @(
+      'CONSULTAR-HARMONIA.cmd','INICIAR-HARMONIA.cmd','INICIAR-HARMONIA-HEADLESS.ps1','DETENER-HARMONIA-HEADLESS.ps1','FINALIZAR-PAQUETE.ps1','LEEME.txt','coverage-catalog.json',
+      'collector\query.ps1','collector\server.js','extension\content.js','extension\manifest.json','extension\popup.css','extension\popup.html','extension\popup.js','extension\service-worker.js',
+      'runtime\node.exe','runtime\NODE-LICENSE.txt','extension\local-auth.js'
+    )
+    foreach ($rel in $required) { if (-not (Test-Path -LiteralPath (Join-Path $root $rel) -PathType Leaf)) { throw "Falta artefacto necesario: $rel" } }
+    foreach ($rel in @('extension\content.js','extension\service-worker.js','extension\popup.js','collector\server.js')) {
+      & $node --check (Join-Path $root $rel)
+      if ($LASTEXITCODE -ne 0) { throw "Falló la sintaxis JavaScript: $rel" }
+      "JS_SYNTAX_OK=$rel"
+    }
+    $manifest = Get-Content -LiteralPath (Join-Path $root 'extension\manifest.json') -Raw | ConvertFrom-Json
+    if ($manifest.manifest_version -ne 3 -or $manifest.version -ne '0.2.0') { throw 'Versión o tipo de manifiesto inesperado.' }
+    if (-not ($manifest.host_permissions -contains 'https://chatgpt.com/*') -or -not ($manifest.host_permissions -contains 'http://127.0.0.1:47321/*')) { throw 'Los permisos de host no coinciden con el alcance mínimo esperado.' }
+    'EXTENSION_MANIFEST=VALID'
+    $catalog = Get-Content -LiteralPath (Join-Path $root 'coverage-catalog.json') -Raw | ConvertFrom-Json
+    if ($catalog.schema -ne 'harmonia.coverage-catalog.v1' -or @($catalog.features).Count -lt 30 -or @($catalog.sources).Count -lt 10) { throw 'El catálogo público no contiene la estructura mínima esperada.' }
+    $observer = Get-Content -LiteralPath (Join-Path $root 'extension\content.js') -Raw
+    if ($observer -match 'outerHTML|innerHTML|\.textContent|\.value\s*=') { throw 'El observador contiene una ruta que podría leer contenido o valores; revisar antes de distribuir.' }
+    if ($observer -notmatch 'conversationTextCaptured:false' -or $observer -notmatch 'composerTextCaptured:false') { throw 'No se declaró minimización explícita del contenido.' }
+    'CONTENT_CAPTURE=STRUCTURE_ONLY_DECLARED'
+    if (-not (Test-Path -LiteralPath $authFile)) { throw 'No existe el archivo de credencial local.' }
+    $auth = Get-Content -LiteralPath $authFile -Raw
+    $match = [regex]::Match($auth, "HARMONIA_TOKEN\s*=\s*'([0-9a-f]{64})'")
+    if (-not $match.Success) { throw 'El archivo local de credencial no tiene un token de 64 caracteres hexadecimales.' }
+    $token = $match.Groups[1].Value
+    $health = Invoke-RestMethod -Uri 'http://127.0.0.1:47321/health' -Headers @{ 'x-harmonia-token' = $token } -TimeoutSec 5
+    if (-not $health.ok -or $health.root -ne $data -or $health.stopped) { throw 'La salud del colector no coincide con el almacén v0.2.' }
+    'SERVICE_HEALTH=OK'
+    try {
+        Invoke-RestMethod -Uri 'http://127.0.0.1:47321/health' -TimeoutSec 3 | Out-Null
+        throw 'El colector aceptó una petición sin credencial.'
+    } catch {
+        $status = 0
+        try { $status = [int]$_.Exception.Response.StatusCode } catch {}
+        if ($status -ne 401) { throw 'La prueba sin credencial no devolvió HTTP 401.' }
+        'AUTH_NO_TOKEN=REJECTED_401'
+    }
+    $allowedOrigin = 'chrome-extension://' + ('a' * 32)
+    $preflight = Invoke-WebRequest -Uri 'http://127.0.0.1:47321/events' -Method Options -Headers @{ Origin=$allowedOrigin; 'Access-Control-Request-Method'='POST'; 'Access-Control-Request-Headers'='content-type,x-harmonia-token' } -UseBasicParsing -TimeoutSec 5
+    if ([int]$preflight.StatusCode -ne 204 -or $preflight.Headers['Access-Control-Allow-Origin'] -ne $allowedOrigin) { throw 'Falló CORS para origen simulado de Chrome extension.' }
+    'CORS_EXTENSION_ORIGIN=OK'
+    try {
+        Invoke-WebRequest -Uri 'http://127.0.0.1:47321/events' -Method Options -Headers @{ Origin='https://blocked.example'; 'Access-Control-Request-Method'='POST' } -UseBasicParsing -TimeoutSec 5 | Out-Null
+        throw 'CORS aceptó un origen web externo.'
+    } catch {
+        $status = 0
+        try { $status = [int]$_.Exception.Response.StatusCode } catch {}
+        if ($status -ne 403) { throw 'El rechazo CORS no devolvió HTTP 403.' }
+        'CORS_WEB_ORIGIN=REJECTED_403'
+    }
+    $allowed = @(
+      'CONSULTAR-HARMONIA.cmd','INICIAR-HARMONIA.cmd','INICIAR-HARMONIA-HEADLESS.ps1','DETENER-HARMONIA-HEADLESS.ps1','FINALIZAR-PAQUETE.ps1','LEEME.txt','coverage-catalog.json',
+      'collector\query.ps1','collector\server.js','extension\content.js','extension\manifest.json','extension\popup.css','extension\popup.html','extension\popup.js','extension\service-worker.js','runtime\NODE-LICENSE.txt'
+    )
+    $hashes = [ordered]@{}
+    foreach ($rel in $allowed) {
+      $full = Join-Path $root $rel
+      $hashes[$rel] = (Get-FileHash -LiteralPath $full -Algorithm SHA256).Hash.ToLowerInvariant()
+    }
+    $exeHash = (Get-FileHash -LiteralPath $node -Algorithm SHA256).Hash.ToLowerInvariant()
+    $package = [ordered]@{
+      schema = 'harmonia.package.v1'
+      version = $manifest.version
+      generatedAt = [DateTime]::UtcNow.ToString('o')
+      source = 'SeryMente/khora main; local token file intentionally excluded'
+      runtime = [ordered]@{ version = (& $node --version).Trim(); architecture='win-x64'; nodeZipSha256='cbc74b5e0982c9dbb41525fd8fb5dcd32fbee237863f7829072f4639a1ce5f20'; nodeExeSha256=$exeHash }
+      files = $hashes
+    }
+    $package | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $root 'MANIFEST-HUELLAS.json') -Encoding UTF8
+    $readback = Get-Content -LiteralPath (Join-Path $root 'MANIFEST-HUELLAS.json') -Raw | ConvertFrom-Json
+    if ($readback.version -ne '0.2.0' -or $readback.runtime.nodeExeSha256 -ne $exeHash) { throw 'Falló la lectura de vuelta del manifiesto de huellas.' }
+    'HASH_MANIFEST=VALID'
+    'HASHED_FILES=' + $hashes.Count
+    'NODE_VERSION=' + (& $node --version).Trim()
+    'EXTENSION_VERSION=' + $manifest.version
+    'CATALOG_FEATURES=' + @($catalog.features).Count
+    'CATALOG_SOURCES=' + @($catalog.sources).Count
+    'DESTINATION=' + $root
+    'DATA_ROOT=' + $data
+    'SERVICE_PID=' + (Get-Content -LiteralPath (Join-Path $root 'collector\service.pid') -Raw).Trim()
+    'V0_2_EXTENSION_LOADED=RELOAD_REQUIRED_NOT_VERIFIED'
+    'NATURAL_COVERAGE=AWAITING_POST_RELOAD_SCAN'
+} finally {
+    Stop-Transcript | Out-Null
+}
