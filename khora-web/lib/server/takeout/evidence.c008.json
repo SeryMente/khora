@@ -1,0 +1,16 @@
+{
+  "cycle": "C-TAKEOUT-008",
+  "base_feature_commit": "d8f1ca4cdaf41f501e292ba49c52c47a062821a3",
+  "synthetic_tests": 98,
+  "passed": 98,
+  "failed": 0,
+  "skipped": 0,
+  "wrapper_tests": 1,
+  "tls_network_verified": false,
+  "db_migrated": false,
+  "deployed": false,
+  "end_to_end": false,
+  "google_oauth_client_created": true,
+  "google_new_variables_production_only": true,
+  "runtime_architecture_approval_pending": true
+}
