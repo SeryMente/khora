@@ -3,7 +3,7 @@
 ## 1. Control e identidad
 
 - Nombre normalizado: **Harmonia**, extensión compañera de **Khora**; «Armonía» y «Cora» de los dictados se conservan literalmente en originales. No renombrar producto o repositorio por transcripción.
-- Identificador del frente: `harmonia`. Versión **0.3**; sello **HARMONIA-v0.3**. Ancla: orden de construcción de extremo a extremo / HARMONIA-OBSERVABILIDAD-01, corte 2026-10-21T01:52:01.177490+00:00. Antecedente preservado: HARMONIA-INSTANCIACION-01.
+- Identificador del frente: `harmonia`. Versión **0.4**; sello **HARMONIA-v0.4**. Ancla: primera semilla construida y paquete colocado / HARMONIA-ENTREGA-01, corte 2026-10-21. Antecedente preservado: HARMONIA-INSTANCIACION-01.
 - Frente permanente por creación expresa del operador; no servicio operativo. Esta creación no declara aprobadas propuestas técnicas ni instala extensión.
 - Repositorio propietario: `SeryMente/khora`, privado comprobado mediante GitHub en este ciclo; base observada bd29c924393fcbd9183100f66b2e50c87b791207. Contenedor `docs/frentes/harmonia/`; único elemento de estado `OBJETO-CANONICO.md`. Los demás archivos son custodia/ayuda, no estados paralelos.
 - Persistencia: objeto inicial recuperado desde main en 0ee2559082c1935905c8fde1513ccdfe247131ed, blob 56d3f85b03f6b4fecfd7ea54e316cac55abb918d. Este delta requiere publicación y lectura de vuelta; su revisión real es el recibo externo, no una revisión futura inventada.
@@ -39,11 +39,11 @@ Resto del método vigente aplicable por pertinencia; citas históricas, ejemplos
 
 **De dónde viene:** U01 exige una semilla urgente para observar empíricamente ChatGPT en Google Chrome; U03 exige entradas/salidas y un frente propio, no ejecución en Metacanon.
 
-**Dónde está:** responsabilidad adquirida por asistente en Notion; antecedentes revisados, primer contrato preparado como propuesta. Extensión operativa no materializada según el operador; no se probó instalación/captura.
+**Dónde está:** primera semilla v0.1.0 construida en `apps/harmonia-observability/`, conservada en Git y colocada con runtime autónomo en el Escritorio real resuelto por Windows del dispositivo conectado. Colector, persistencia, reinicio, índice y huellas aprobaron una prueba sintética; la extensión todavía no fue cargada en Chrome ni ensayada sobre una conversación real.
 
 **A dónde va:** observabilidad en vivo e indexable que permita al hilo Metacanon examinar el trabajo de otro hilo mediante RDC, sin obligar al operador a narrarlo de nuevo. Mejorar extensión y marco por cortes, a partir de **observaciones empíricas del operador + datos**, preservando ambos y distinguiendo inferencias.
 
-**Qué cambió:** orden de construcción de extremo a extremo, aclaración de16 exigencias por Metodología y denominación de trabajo Observabilidad del trabajo con IA (sin alta en glosario); observación/transporte/atención separados, dos ritmos de mejora. Viabilidad inspeccionada y paquete de decisiones propuesto; sin cambios de método, código, instalación ni equipo.
+**Qué cambió:** construida la semilla v0.1.0 con activación manual sobre una pestaña `chatgpt.com`, permiso `debugger`, observador del documento, estilos y consola, colector local, originales JSONL e índice por sesión fuera de Git y parada a 1 GiB sin borrado. Código: commits `96efc0f736011d3a7b76f2ebd2151d1ab27e9ab4` y `9a1851137e1c01817febe82c87b4f24a2388a917`. Entrega comprobada en `C:\Users\MantenimientoRCI\Desktop\Harmonia-Observabilidad-v0.1.0`; Chrome detectado, pero carga y captura real pendientes de la intervención humana de “Cargar descomprimida”.
 
 Incluido como requisitos del producto, NO como capacidades ya demostradas:
 - Observar la estructura HTML representada en el documento de la página, CSS/estilos pertinentes y eventos de consola desde el inicio de captura; precisar cobertura y huecos, no prometer historia anterior al enganche.
@@ -87,15 +87,15 @@ Primer propietario: el operador autoriza instanciar el hilo fresco de asistencia
 
 ## 8. Estado vivo
 
-**🔄 Estado vivo:** Acción actual: revisión de viabilidad y trazabilidad16 completada documentalmente para Observabilidad del trabajo con IA, primera implementación ChatGPT/Chrome; propuesta de acceso/arquitectura/custodia/interacción en propuestas/OBSERVABILIDAD-PLAN-01.md, NO APROBADA. No código construido ni instalación/captura. Siguiente paso: decisión específica del operador sobre el paquete propuesto y dispositivo realmente autorizado y vínculo confirmado; última lista sin dispositivos Online; sin ello no ejecutar en equipo ni construir lo protegido por candados de datos/interfaz/arquitectura. Luego inventario acotado de runtime/extensión/destino y revisión de pantalla/ruta antes de captura; construcción autorizada, pruebas controladas, ensayo real en los dos hilos, reinicio/recuperación, prueba independiente de atención y mejora con incidente+corte. Todos los pendientes funcionales anteriores permanecen; no interpretar la orden general como aprobación de permisos aún no presentados.
+**🔄 Estado vivo:** Acción actual: semilla v0.1.0 construida, persistida y colocada en el Escritorio del dispositivo Windows conectado. El paquete usa selección explícita de una pestaña ChatGPT, captura HTML/estilos/consola/texto visible y entradas enviadas, excluye borradores/cookies/credenciales/otras pestañas y entrega eventos a un colector local. Runtime Node v22.23.3 incluido; 11 archivos bajo manifiesto con huellas verificadas. Prueba sintética Windows: 5 eventos, reinicio, recuperación e integridad del original aprobados. Siguiente paso atómico: el operador carga `extension` mediante Chrome → Extensiones → Modo desarrollador → Cargar descomprimida y abre una conversación de prueba sin datos sensibles; entonces este hilo ejecuta el cotejo real de entrada/generación/transitorio/HTML/CSS/consola, consulta por RDC y recuperación tras reinicio. No declarar instalada en Chrome ni funcional sobre ChatGPT hasta esa prueba.
 
-**⚗️ En prueba / recién fallido:** No se ha construido, instalado ni ejecutado la semilla. Captura continua, recuperación de texto transitorio, consulta RDC, latencia, retención/indexación y atención sostenida del hilo Metacanon: NO VERIFICADAS.
+**⚗️ En prueba / recién fallido:** PASÓ: construcción estática, huellas, colector local, persistencia/indexación sintética y recuperación tras reinicio en Windows real. PENDIENTE por compuerta humana de Chrome: carga de la extensión, depuración de la pestaña, captura real, latencia/huecos, texto transitorio y consumo por el otro hilo. Atención continua del modelo sigue fuera de lo demostrado.
 
-**🔔 Recordatorios latentes:** no rebajar tiempo real a resúmenes posteriores; no fingir atención sostenida; distinguir texto visible de razonamiento privado; conservar originales y observaciones del operador; decisiones materiales presentes antes de construir; constructor sin RDC; no autoactualizar el marco; no copiar registros sensibles a Git ni traer estado de otros frentes. Nada de esto se libera por omisión.
+**🔔 Recordatorios latentes:** no rebajar tiempo real a resúmenes posteriores; no fingir atención sostenida; distinguir texto visible de razonamiento privado; conservar originales y observaciones del operador; no autoactualizar el marco; no copiar registros sensibles a Git. El paquete colocado no equivale a extensión cargada; la prueba sintética no equivale a ChatGPT real.
 
 ## 9. Aceptación y viabilidad
 
-- Orden de entrega propagada: dejar paquete en Escritorio real listo para Cargar descomprimida. Estados actuales: paquete del observador SIN CONSTRUIR; entrega en Escritorio NO EJECUTADA (conexión no disponible); carga Chrome NO EJECUTADA; funcionamiento NO ENSAYADO; atención permanente NO VERIFICADA. Propuesta material pendiente no se convierte en aprobación por la orden general.
+- Orden de entrega ejecutada: paquete v0.1.0 construido y colocado en el Escritorio real resuelto por Windows, con huellas verificadas y runtime autónomo. Estados separados: paquete COLOCADO/LISTO; colector ENSAYADO sintéticamente en Windows; carga Chrome NO EJECUTADA; funcionamiento ChatGPT NO ENSAYADO; atención permanente NO VERIFICADA.
 
 | Requisito → resultado esperado | Evidencia requerida y entorno | Estado |
 | --- | --- | --- |
@@ -105,7 +105,7 @@ Primer propietario: el operador autoriza instanciar el hilo fresco de asistencia
 | Captura y entrega en vivo | Tiempos de ocurrencia/captura/entrega/lectura y pruebas de interrupción; latencia real, no solo timestamp fabricado | NO EJECUTADO; umbral por calibrar |
 | Consulta RDC sin narración manual | El asistente autorizado recupera intervalo/incidente desde equipo real; respuestas referidas a eventos | NO EJECUTADO |
 | Atención sostenida del modelo | Prueba específica de ciclo de lectura/atención, pausas y límites ChatGPT | NO VERIFICADO; captura continua no lo acredita |
-| Persistencia/indexación | Recuperación por criterios, reinicio, duplicados/huecos y retención acordada; carga representativa | NO EJECUTADO; destino por decidir |
+| Persistencia/indexación | Recuperación por criterios, reinicio, duplicados/huecos y retención acordada; carga representativa | SINTÉTICO APROBADO en Windows: 5 eventos, reinicio e integridad; carga real pendiente |
 | Mejora empírica | Caso original + observación humana + diagnóstico + cambio aprobado + regresión + nuevo uso | PENDIENTE |
 
 El objetivo de este ciclo es responsabilidad verificable, contexto recuperado y primer contrato propuesto; no equivale a aceptación del producto. No métricas de fidelidad inventadas, garantías de perfección o proyección temporal sin muestra. Cronología de revisión: intención→criterios→resultado→evidencia→límite; revisión documental no cierra cinco puertas funcionales del marco.
