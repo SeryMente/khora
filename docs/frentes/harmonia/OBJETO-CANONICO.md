@@ -15,7 +15,7 @@ Modo ejecución del frente Harmonia, no adaptación del método ni continuación
 
 El prompt de asistente activa asistencia y continuidad; el de constructor activa ejecución de desarrollo. No intercambiar roles ni importar la excepción de hilo único metodológico. No crear agentes/sesiones por iniciativa de este archivo. Solo el asistente puede usar Remote Desktop Commander (RDC), exclusivamente cuando el hito necesita el equipo y las fuentes del repositorio/sandbox no bastan; el constructor nunca lo invoca ni lo elude por intermediarios.
 
-Objetivo inmediato de este ciclo: reanudar asistencia, adquirir control y preparar contrato comprobable propuesto; no ejecutar captura sin decisiones materiales. **No construir, instalar, capturar ni acceder al equipo desde el hilo emisor de Metacanon.** El hilo nuevo reconstruye contexto, conserva requisitos y conduce el frente según compuertas. Una falta concreta bloquea esa acción, no toda lectura/análisis independiente.
+Objetivo inmediato vigente: completar la primera prueba real desde el paquete v0.1.0 ya entregado. **No construir, instalar, capturar ni acceder al equipo desde el hilo emisor de Metacanon.** Este hilo conserva el control, usa Remote Desktop Commander dentro del alcance autorizado y no declara carga/captura sin evidencia.
 
 ## 3. Referencia metodológica
 
@@ -108,9 +108,9 @@ Primer propietario: el operador autoriza instanciar el hilo fresco de asistencia
 
 Este ciclo cierra construcción y entrega del primer paquete, no la aceptación funcional sobre ChatGPT. No se inventan métricas de fidelidad ni latencia antes de la muestra real. Cronología: intención → implementación → prueba sintética → carga humana pendiente → ensayo real → corte empírico.
 
-### Primer contrato comprobable · antecedente propuesto, NO APROBADO
+### Primer contrato comprobable · antecedente e implementación inicial
 
-Ampliación vigente de intención y propuesta, sin implementación: `propuestas/OBSERVABILIDAD-PLAN-01.md`. Se preserva el contrato inicial como antecedente; no limitar el objetivo completo a una consulta bajo demanda ni solo a cortes periódicos.
+La intención y trazabilidad permanecen en `propuestas/OBSERVABILIDAD-PLAN-01.md`; la selección técnica acotada fue materializada en v0.1.0 por la orden posterior de cierre extremo a extremo. El contrato inicial se conserva como antecedente y criterios de la prueba real; no limitar el objetivo completo a una consulta bajo demanda ni solo a cortes periódicos.
 
 Fuente: U01/U03 y orden actual HARMONIA-REANUDACION-01. No se elige stack ni permiso debugger por este texto.
 
@@ -122,7 +122,7 @@ Fuente: U01/U03 y orden actual HARMONIA-REANUDACION-01. No se elige stack ni per
 - **Prueba independiente de atención:** observar un ciclo real de lectura/respuesta del modelo, pausas y límites; capturador en funcionamiento no demuestra modelo atendiendo entre turnos. Sin mecanismo autorizado/ensayado, atención continua NO VERIFICADA.
 - **Corte empírico:** original + observación literal del operador + hipótesis separada + decisión de cambio + regresión + versión. No autoaprobar ni modificar Metacanon desde Harmonia.
 
-**Compuerta material inmediata:** aprobar/rechazar alcance de prueba anterior y autorizar o no inventario remoto de solo lectura de identidad/vínculo, versión Chrome, extensión existente y rutas pertinentes. No equivale a instalar/capturar. Segunda compuerta posterior: canal, permisos exactos, almacenamiento/retención y arquitectura, con evidencia del inventario. Producto/tiempo no estimables antes de estas decisiones y prueba real.
+**Compuerta material inmediata:** acción humana de Chrome: cargar la carpeta `extension`, aceptar el aviso de depuración al iniciar y usar una conversación de prueba sin datos sensibles. Después, este hilo puede medir y cotejar la captura real por Remote Desktop Commander. Cualquier ampliación de permisos, pestañas, retención, nube o automatización vuelve a revisión material.
 
 ### Diagnóstico de antecedentes · lectura, no instalación
 
@@ -164,4 +164,4 @@ Al comenzar/cerrar cada ciclo: leer núcleo/control/método; comprobar privacida
 
 Control de responsabilidad: `responsabilidad-frente/1`, generación1 asignada según §1; bootstrap generación0 conservado en historia. Nuevos receptores no reclaman si hay propietario. Reanudación por el mismo hilo requiere cotejar identidad y generación. Primera adquisición solo desde sin propietario por sustitución condicional del blob leído e identidad/autorización explícitas. Conflicto o dueño existente ⇒ no adquirido; no reintentar con nuevo SHA para ganar. Liberar/transferir requiere autoridad expresa y generación nueva; sin expiración, sin borrar para liberar. Nunca actualizar este control por push genérico. Es un registro cooperativo; no mediador transaccional ni garantía frente a todas las vías de escritura.
 
-La creación de este objeto no cambia gobierno, método, AGENTS.md, código existente, despliegue ni seguridad del equipo. Cierre documental requiere comparación del contenido publicado; sin acceso entregar copia/delta NO GUARDADO, sin fingir custodia. Ningún enlace de recibo o prompt alternativo crea otro Estado vivo.
+La actualización de este objeto no cambia gobierno, método ni AGENTS.md. El código y la entrega se versionan por sus propios commits y evidencias; el objeto solo registra su estado comprobado. Cierre documental requiere comparación del contenido publicado; ningún enlace de recibo o prompt alternativo crea otro Estado vivo.
