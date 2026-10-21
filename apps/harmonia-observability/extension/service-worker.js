@@ -155,7 +155,6 @@ async function reconcileRegionLeaders(regionKey,preferredTabId,refresh=false){
  if(!regionKey)return;if(refresh)await refreshRegionCoverage();
  if(regionStatus(regionKey)!=='complete'){
   delete regionLeaders[regionKey];await chrome.storage.local.set({[STORE.regionLeaders]:regionLeaders});
-  if(autoEnabled){const tabs=(await chrome.tabs.query({url:'https://chatgpt.com/*'})).filter(t=>regionFor(t.url)===regionKey);for(const tab of tabs)await injectTab(tab,true);}
   return;
  }
  const tabs=(await chrome.tabs.query({url:'https://chatgpt.com/*'})).filter(t=>regionFor(t.url)===regionKey);
