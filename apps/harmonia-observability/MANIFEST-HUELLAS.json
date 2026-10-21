@@ -1,26 +1,34 @@
 {
   "schema": "harmonia.source-manifest.v1",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "generatedAt": null,
-  "purpose": "Inventario del árbol de fuentes. Las huellas SHA-256 del paquete construido se regeneran en el Escritorio por FINALIZAR-PAQUETE.ps1; nunca incluye credenciales ni datos de captura.",
+  "purpose": "Local ChatGPT observation: rendered user/assistant text deltas, DOM/CSS structure and redacted page console; automatic multi-tab region coordination; dedicated dashboard tab.",
   "source": "SeryMente/khora main",
   "trackedFiles": [
     "CONSULTAR-HARMONIA.cmd",
-    "INICIAR-HARMONIA.cmd",
-    "INICIAR-HARMONIA-HEADLESS.ps1",
     "DETENER-HARMONIA-HEADLESS.ps1",
     "FINALIZAR-PAQUETE.ps1",
+    "INICIAR-HARMONIA-HEADLESS.ps1",
+    "INICIAR-HARMONIA.cmd",
     "LEEME.txt",
-    "coverage-catalog.json",
     "collector/query.ps1",
     "collector/server.js",
+    "coverage-catalog.json",
+    "extension/build-info.json",
     "extension/content.js",
+    "extension/coverage-catalog.json",
+    "extension/dashboard.css",
+    "extension/dashboard.html",
+    "extension/dashboard.js",
     "extension/manifest.json",
     "extension/popup.css",
     "extension/popup.html",
     "extension/popup.js",
+    "extension/region-policy.js",
     "extension/service-worker.js",
-    "extension/coverage-catalog.json"
+    "scripts/validate-source.js",
+    "tests/collector.integration.test.js",
+    "tests/region-policy.test.js"
   ],
   "excludedLocalArtifacts": [
     "extension/local-auth.js",
@@ -45,6 +53,16 @@
     "catalogMirrorRequired": true,
     "automaticTabs": true,
     "debuggerPermissionRemoved": true,
-    "dataRoot": "C:\\Users\\fila4\\AppData\\Local\\Harmonia\\surface-index-v0.3.0\\data"
+    "dataRoot": "C:\\Users\\fila4\\AppData\\Local\\Harmonia\\surface-index-v0.3.0\\data",
+    "visibleMessagesCaptured": true,
+    "partialAndFinalResponses": true,
+    "pageConsoleRedaction": "heuristic; secrets may escape pattern matching",
+    "regionCompletionPolicy": "44 current catalog features + at least 5 distinct fingerprints + at least 2 sessions for conversation region",
+    "unmappedRegionsRemainIncomplete": true,
+    "oneObserverAfterCompletion": true,
+    "dedicatedDashboardTab": true,
+    "essentialPopup": true,
+    "releaseChannel": "candidate",
+    "physicalChromeE2E": "NOT VERIFIED"
   }
 }
