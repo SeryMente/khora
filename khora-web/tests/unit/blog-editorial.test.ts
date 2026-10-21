@@ -57,5 +57,7 @@ test('explicit text-only cut removes only audio barrier and preserves authorizat
  assert(editorial.includes("body.action==='decline_archived'"));
  assert(dispatch.includes("process.env.BLOG_SYNC_ENABLED!=='1'"));assert(dispatch.includes('timingSafeEqual'));
  assert(dispatch.includes('await getCurrentSiSnapshot();await getCurrentMethodologySnapshot();'));
- assert(dispatch.includes("process.env.BLOG_META_ADMIN_VERIFIED!=='1'"));
+ const providerConfig=await readFile(new URL('../../lib/server/blog/provider-config.ts',import.meta.url),'utf8');
+ assert(dispatch.includes('blogProvidersConfigured(providerEnv)'));
+ assert(providerConfig.includes("env.BLOG_META_ADMIN_VERIFIED === '1'"));
 });

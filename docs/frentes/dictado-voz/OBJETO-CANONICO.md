@@ -3,9 +3,9 @@
 ## 1. Control e identidad
 
 - Identidad conservada: `MCP-OBS-DICTADO`; extensión documental de dictado, benchmark, retroalimentación y propuesta de voz/síntomas.
-- Versión: **v0.6.41**; sello **MCP-OBS-DICTADO-v0.6.41**. Objeto permanente por encargo V010; no declara permanente ninguna propuesta clínica.
-- Estado: **C051 · CRÓNICA/LUCES Y B2 LIVE4ff209f; CHAT H08 REAL APROBADO; REVISIÓN HUMANA PENDIENTE; BLOG/FACEBOOK NO PUBLICADOS**.
-- Ancla actual: C051, retroalimentación real del operador y orden de corregir/publicar en producción; C050, orden expresa de resolver almacenamiento gratuito cifrado y pruebas/configuración realizadas desde PC10RCIF4EI4 y navegador compartido. Producción canónica https://khora-web.vercel.app sirve4ff209fba2bd02d6e61516c7c598e7260ae69871, despliegue dpl_3jg86dPcWcMBYsFJaKu9V8UT294t, alias/API verificados tras promoción única.6d29682e/dpl_BCEBkJPcCorVc4mBF8NnyyF4Qsac es rollback conocido, no runtime actual. GE4/d94 y91d72939 se conservan como antecedentes/rollback, no runtime vigente. Estado único §8/C050; C049 y anteriores son historia.
+- Versión: **v0.6.45**; sello **MCP-OBS-DICTADO-v0.6.45**. Objeto permanente por encargo V010; no declara permanente ninguna propuesta clínica.
+- Estado: **C053 · IDENTIDAD META API VERIFICADA/PARCHE FOCAL PROBADO; META REAUTH Y DESPLIEGUE BLOQUEADOS; NO PUBLICACIÓN REAL**.
+- Ancla actual: C053, reautenticación Meta rechazada y corrección independiente del identificador API, sin cambio runtime; C052, integración editorial34ac y promoción única b1; C051, retroalimentación real del operador y orden de corregir/publicar en producción; C050, orden expresa de resolver almacenamiento gratuito cifrado y pruebas/configuración realizadas desde PC10RCIF4EI4 y navegador compartido. Producción canónica https://khora-web.vercel.app sirveb1d7d995df941f26da893e594e49bed778a38acf, candidata khora-rjl1blnkt, alias/API verificados tras promoción única.4ff209f/dpl_3jg86dPcWcMBYsFJaKu9V8UT294t es rollback conocido de C052, no runtime actual.6d es antecedente. GE4/d94 y91d72939 se conservan como antecedentes/rollback, no runtime vigente. Estado único §8/C050; C049 y anteriores son historia.
 - Repositorio propietario: `SeryMente/khora`, privado comprobado con herramienta en este ciclo. `SeryMente/metodologia` también privado: aporta el método, no recibe datos del frente.
 - Carpeta contenedora: `docs/frentes/dictado-voz/`; elemento único de estado: `OBJETO-CANONICO.md`. Carpeta y elemento no se confunden.
 - Revisión de origen del objeto: `1697ee2693ed3217523ffc1d1be9b6541d7d849d`, blob `e98a956c375ce48b791b5f0563ad0ae03c2616dd`.
@@ -14,7 +14,9 @@
 
 ## 2. LEER PRIMERO
 
-C051 vigente: leer §8 primero. Reemplaza la semántica histórica verde=versión instantánea completa durante dictado por verde=punto conjunto confirmado, con alcance y tramo vivo explícitos; no debilita custodia ni original. «Momento» conserva su etiqueta amigable por orden posterior del operador. C050 es antecedente de producción, no cierre del recorrido Blog/Facebook.
+C053 vigente: leer §8 y evidencias/C053-identidad-meta.md primero; C052 es el último runtime acreditado, no publicación externa. Antecedente:  recuperación editorial y custodia de propuestas publicadas técnicamente, sin acreditar proveedores ni primera publicación.
+
+C051 histórico: leer §8 primero. Reemplaza la semántica histórica verde=versión instantánea completa durante dictado por verde=punto conjunto confirmado, con alcance y tramo vivo explícitos; no debilita custodia ni original. «Momento» conserva su etiqueta amigable por orden posterior del operador. C050 es antecedente de producción, no cierre del recorrido Blog/Facebook.
 
 C050 histórico: leer §8 primero. La autorización directa de provisión sustituye la aprobación pendiente de proveedor C049, pero no autoriza cargos, publicación pública ni borrado de originales. C049 histórico: leer §8 primero. La nueva orden prioriza Hito 1 y solución del almacenamiento; el orden inmediato C048 queda como antecedente, no se pierde su trabajo local. Todos los «ACTUAL» de ciclos anteriores conservados debajo son snapshots históricos, no bloqueo/permiso/rol vigente. No reconstruir fuentes ausentes ni mezclar entregas obsoletas.
 
@@ -196,6 +198,34 @@ Autenticación C025: dos flujos estándar por dispositivo, autorizados en navega
 
 ### 🔄 Estado vivo
 
+### C053 — Identidad API verificada, corrección probada; Meta/operación pendientes
+
+Acción en curso: central resolvió la diferencia entre identificador público de Tercer Ámbito61595788700651 y API1354217727781437 mediante Graph autenticado+tareas CREATE_CONTENT+/me y redirección pública comprobada. Parche mínimo provider-config/dispatch/pruebas preparado en rama fix/blog-meta-api-identity-c053-20261021, base exacta3613a230 (runtimeb1 más dos documentos);19/19 nuevas pruebas0skip y tipos estrictos5.9.3ES2017 aprobados. No fullbuild/deploy/publicación ni env instaladas; runtime C052 no sustituido por este registro.
+
+Bloqueo duro actual: Meta rechazó dos veces reautenticación específica para secreto de app; no seguir reintentando el valor ni cambiar contraseña sin autorización. La sesión de Facebook y permisos de Página se verificaron, pero no equivalen a credencial duradera/configuración/env/primera publicación. Primer token accidentalmente expuesto fue revocado con success=true; nunca copiarlo a docs. RDC propios todos offline en4613; nuevo log aún esperando autorización no acredita equipo operativo.
+
+Siguiente paso atómico: resolver control de Meta desde sesión legítima y acceso operativo de despliegue; después configurar menor alcance/probar candidata/promoción única/entrada exacta aprobada y verificar recibos Blog→Facebook. Mientras falta esa intervención se agotó el cambio independiente seguro de ID/candados/pruebas/persistencia. Chat E79 y Takeout avanzan bajo sus propios encargos; no convertir sus reportes en entrega central ni promover por mensaje. Detalles, instrucciones, errores y límites en evidencias/C053-identidad-meta.md. Sin costos nuevos, sin modificación B2/audio/captura/corpus/DB ni configuraciones Takeout.
+
+### C052 — Recuperación editorial integrada y publicada
+
+**Mandato/rol:** central conserva promoción única de Khora, continuidad de Crónica→transcripción→archivo→previa autorizada→GitHub Pages→Página Facebook; no recaptura en pantalla manual ni inferencia de consentimiento. Operador pidió actualizaciones aproximadamente cada cinco minutos durante ejecución activa; se informó avance real y dependencia del contexto activo, no temporizador inexistente. Se preservan narración original privada, B2, luces, esquema corpus y chat.
+
+**Entrega del constructor Blog:**34ac81c222397ab0e1e91c77cec8b9db21f6a903, rama feat/blog-intent-recovery-20261020, padre exacto4ff209f. Su workspace se reinició antes de persistir; recuperó archivos desde comandos conservados y repitió9/9unitarias+39Chromium+TS5.9.3estrictoES2017JSX, luego push/readback. Esas pruebas focales son evidencia atribuida del constructor: IndexedDB/AES reales, HTTP/auth/normativa sintéticos; NO publicación productiva. Central verificó por Git los cuatro blobs y base: PublicacionCapturaPendiente.tsx=82dce2691a3aef5c93e4ed1d59ba88f35730708c; custodia-local.ts=3cda572e29aa506b51ab36c5a1ade8f16bea4ccb; blog-intent-recovery.test.ts=a85477f2cde8c2a42c19da9d64332cc539893a6c; blog-intent-recovery.local.test.mjs=abfde0b341449da61794cda6512d2403e3be9da6. Cuatro rutas autorizadas, ninguna más. Su canon propio avanzó por otro hilo a v18/C015; registrará esta entrega como anexo cronológico sin pisar originales/ciclos posteriores. No igualar v18/C015/01a4482 con esta nueva entrega34ac ni reiniciar el frente.
+
+**Correcciones concretas:** recupera misma versión exacta por resume/digest antes de reintento explícito; si servidor ya aprobó, reconcilia sin nueva aprobación. Revisiones antiguas requieren nueva previa/revisión sin heredar consentimiento. Propuesta elaborada conservada en AES-GCM existente, ligada a owner/fuente/revisión/huellas, sin tokens normativos ni duplicar original. Momento del hecho permanece narrado/desconocido si no se precisa, separado de marca local registro/archivo; conserva etiqueta amigable «Momento» en captura. El cliente nunca despacha directamente a proveedores.
+
+**Integración propia central:** rama integrate/blog-recovery-c052-1792536279377, fuente runtime b1d7d995df941f26da893e594e49bed778a38acf. Base4ff+cherry-pick34ac+dos cierres documentalesff235779/1dda3519. Cuatro blobs finales idénticos; rutas de almacenamiento, chat, next.config, package/lock/vercel.json protegidas idénticas a4ff. Rama subida/readback de cabeza, árbol limpio antes de deploy. No main merge, migración, nueva ingesta, cambio Render/DB, credenciales o proveedores.
+
+**Compuerta completa REAL:**807pruebas/805PASS/0FAIL/2SKIP heredados; TypeScript/Next/build completos aprobados. Comando efectivo npm run build, sin migrate-runtime ni migraciones administrativas; compilación31.4s/READY5min. Prueba B2 real de subida firmada/origenCORS exacto/escritura y lectura cifrada/huellas/denegación anónima y limpieza solo de versiones sintéticas propias. Dos skips se conservan explícitos: no afirmar todo comprobado por el generador real en esta corrida. BLOG_GENERATOR_PATH está referenciado SOLO en test de compatibilidad del generador Python, NO en app/lib: corrección al listado C051 que lo presentó como requisito operativo del despachador. No hace falta Python/generador local en función Vercel para GitHubBlog, que escribe JSON y verifica Pages.
+
+**Publicación técnica:** despliegue desde https://khora-rjl1blnkt-victorhugotorresmendez-8991s-projects.vercel.app; alias canónico https://khora-web.vercel.app sirve fuente exactab1d7d995df941f26da893e594e49bed778a38acf mediante exportación manual verificada, no metadata Git inventada. Promoción serial única, guardas de fuente/READY/log completo/alias previo4ff/flags; límites de sesión/audio/proxy privados verificados. Recibo de promoción positivo obligatorio antes de guardar este cierre. Rollback de esta candidata es dpl_3jg86dPcWcMBYsFJaKu9V8UT294t/fuente4ff, NO6d histórico. No rollback ejecutado. Captura/recuperación/audio humanos y aprobación editorial reales siguen pendientes. Chat mantiene códigoidéntico; se solicita regresión funcional autenticada sobre nueva fuente, no se hereda recibo4ff como nueva prueba.
+
+**Proveedores todavía no configurados/acreditados:** auditoría previa de nombres sin valores encontró BLOG_* ausente en Vercel, sin secreto BLOG_DISPATCH_SECRET ni variable BLOG_SYNC_ENABLED en GitHub. Requisitos runtime: BLOG_DISPATCH_SECRET, BLOG_SYNC_ENABLED, BLOG_GITHUB_TOKEN, BLOG_META_PAGE_TOKEN, BLOG_META_PAGE_ID=61595788700651, BLOG_META_ADMIN_VERIFIED tras verificación real (nunca poner1 por inferencia). Page pública abierta sin sesión se identifica como Tercer Ámbito; eso NO acredita administración, token ni CREATE_CONTENT. Formulario de login preparado en pestaña propia sin extraer credenciales. No activar planificador15min existente ni publicar al blog por separado evadiendo consentimiento conjunto. Una llamada despacha un destino; Facebook espera recibo del blog. No segundo planificador ni promesa de publicación inmediata.
+
+**Estado vivo:** recuperación editorial LIVEb1 y código B2/Crónica/luces/chat preservado; gate funcional REABIERTO por503 upstream Chat, no PASS heredado. Siguiente paso: diagnóstico/recuperación real de Chat y prueba independiente de Ingreso, luego ensayo humano; acceso legítimo de Página/GitHub por entrada privada, configurar y verificar permisos sin revelar valores; obtener consentimiento del texto exacto en ambos destinos y comprobar cadena real. Corpus estándar0.1.0 continúa pending_integration; checklist no ratifica verdad ni concede publicación. Respaldos DB/grafo/eventos y migración histórica Blob siguen abiertos. Runtime b1 distinto del commit documental terminal, sin redeploy por documentación. Referencias de Takeout comunicadas: CLI central vigente mismo proyecto/team, GoogleOAuth/Picker drive.file y runtime duradero Takeout NO acreditados; no inferir RenderChat reutilizable ni autorizar otros dispositivos por estar online.
+
+**C051 histórico, políticas aún vigentes salvo estado runtime y pendientes actualizados por C052:**
+
 ### C051 — Revisión humana de Crónica, conservación y continuidad editorial
 
 **Mandato vigente y rol:** este hilo sigue centralizando Dictado/audio y promoción única. El operador probó Crónica personal real, vio luz amarilla continua, archivo azul y aviso de diferencia entre transcripciones; pide corrección integral LIVE en https://khora-web.vercel.app/sistema/ingreso, eficiencia y continuidad hasta blog GitHub→Página de Facebook. No confundir con perfil personal ni dar por satisfecho ese recorrido por mostrar un botón. Orden posterior: mantener «Momento» amigable/ambiguo en la captura y diferenciar internamente el tiempo del hecho de la captura; publicación debe hacer comprensible el momento sin inventar precisión. Otra orden: coordinar con hilo Seguridad y estándar del corpus autobiográfico. Autorización no equivale a aprobar texto público particular ni a nuevos permisos/cargos.
@@ -340,6 +370,8 @@ Investigación: Meta PageVideos indexado documenta replace_video_id/swap_mode=re
 
 ### ⚗️ En prueba / recién fallido
 
+C052: fullgate807/805PASS0FAIL2SKIP, build/B2real y promoción b1 aprobados. Ensayo humano y regresión autenticada de nueva fuente pendientes; proveedores/primera publicación no acreditados. Reinicio del entorno del constructor recuperado/retesteado, no fallo observado de producción.
+
 C051:127unitarias/42Chromium focales, fullgate798/796PASS0FAIL2SKIP y tipos/Next/B2real aprobados; promoción4ff y límites privados verificados. Primer banco fallido documentado/corregido. Presentación Chat autenticada aprobada por recibo del constructor; ensayo humano y publicación Blog/Facebook pendientes.
 
 C050: producción combinada6d29682e verificada, gate773/771pass/0fail/2skipheredados y S3/CORS real aprobados. Prueba humana autenticada de audio y restore universal aún pendientes; no sustituirlos por pruebas sintéticas.
@@ -470,6 +502,8 @@ Toda salida conserva diez campos, agrupables sin ocultarlos: (1) proyecto/rol/se
 No llamar «sin cambios» a una fuente inaccesible; no convertir calidad científica o clínica en semáforo por pruebas de software. Si no hay constructor nuevo asignado, decirlo y no inventar trabajo en segundo plano.
 
 ## 11. Crónica y fuentes
+
+C053: ciclo, originales pertinentes, pruebas y límites exactos en evidencias/C053-identidad-meta.md. No se persisten secretos ni enlaces efímeros.
 
 ### C051 — Crónica personal, Backblaze y coherencia del corpus
 
@@ -932,6 +966,8 @@ El operador reporta botón desactivado con rótulo de espera. Se confirma depend
 
 ## 12. Reinstanciación
 
+C053 ACTUAL: continuar este central desde §8, rama fix/blog-meta-api-identity-c053-20261021 base3613, sin nuevo handoff. El login Meta no elimina la reautenticación del secreto; no usar ID público como API. Runtime b1 sigue último acreditado; no adoptar instrucciones antiguas como STOP actual.
+
 C049: retomar §8 y evidencia C049-almacenamiento.md con este central y roles §5, sin repetir migración ni construir sustituto Blog. Objetivo pendiente Hito1 live; primer bloqueo material decisión/provisión de almacenamiento gratuito acotado, sin facturación ni lectura indiscriminada de secretos. Producción91d729 no es HEAD4fb3. No prometer copia de Blob inaccesible ni asumir vigentes permisos de otros equipos/sesiones.
 
 C048: continuar en las dos sesiones vigentes §5, no reemitir handoff ni adoptar STOP/roles antiguos. §8 contiene el checkpoint único. No hay permiso para otros equipos, portapapeles, tokens, migraciones o publicaciones por leer este expediente.
@@ -973,6 +1009,8 @@ El expediente Git es portable; /data del hilo antiguo NO se supone compartido. R
 ````
 
 ## 13. Persistencia y revisión
+
+C053: mismo Elemento permanente privado y trece bloques/AnexoA conservados; delta central mínimo4rutas de código/prueba y evidencia/doc. Relectura exacta por commit requerida; tipos/pruebas focales no equivalen a Next/proveedores/publicación.
 
 C048: mismo Elemento permanente autorizado dentro de carpeta privada existente; no canon/tablero nuevo. Trece bloques y AnexoA preservados. Manifiesto añade solo delta y conserva huellas históricas sin fingir relectura de todo anexo antiguo. Copia del adjunto redactada explícitamente; raw conhash/puntero separado, no identidad binaria ficticia. Readback Git exacto de todos los archivos de este delta requerido antes de afirmar guardado.
 
@@ -1771,3 +1809,15 @@ GitHub Actions, ejecución 38967613218, no inició trabajos: `The job was not st
 
 
 **Actualización H08 autenticado, recibo del constructor Chat:** hilo session://ecea4187-8241-819b-af83-0003b7c205f7/3ffa4187-8241-808d-aab2-00a92fee5f8c confirmó prueba REAL sobre fuente4ff209f,19:36:05–19:36:53UTC, tras recuperar sesión legítima sin extraer valores PIN/JWT/cookies. HTML200 con X-Khora-Native-Presentation=pinned-css-inline-v1 y cache private,no-store; tres CSS inline comparadas exactamente por hash, longitudes13157/188/320194bytes. Inter cargada, flex/compositor/respuesta ámbar/fuentes visibles; SVGmáx20px, cero imágenes rotas/overflow/pageerrors en1366x768 y390x844. Capturas reales abiertas e inspeccionadas por constructor. Al bloquear las tres peticiones CSS externas SIN interceptar ni simular HTML se mantienen fuentes/compositor/respuesta e imágenes correctas. APIsconfig/modelos/historial200JSON después de redirección308 legítima; versión200fuente4ff y límites anónimos401. No503ni fallo de hash; no rollback. Evidencia funcional de archivos empaquetados/lectura/hash, NO inspección .nft. Resultado atribuido al constructor, no nueva prueba propia del central. H08visual técnicamente aprobado; H09humano/EpisTwincompleto NO acreditados. Sin nuevas promociones, DB, Render ni ingesta. La pendiente de presentación autenticada del corte anterior queda resuelta por este recibo; permanecen prueba humana, recorrido Blog/Facebook, integración corpus y respaldo universal.
+
+
+**C052 — Gate funcional REABIERTO por503 real posterior a promoción:** constructor Chat recibió22:52:23.749UTC HTTP503 en misma ruta /c/ con sesión legítima, cache no-store y sin cabecera de presentación. Cuerpo real corto {"error":"Chat request failed"}; código chat-proxy exacto b1 confirma que esa cadena retransmite status>=400 de upstream. NO error del helperCSS/archivo/hash (HTML503 private,no-store), ni falta de configuración local (Chat runtime unavailable). Causa raíz del503 upstream NO VERIFICADA; salud Render timeout25s y guardia directa401 no acreditan salud nativa. APIversion200b1 y límites anónimos siguen correctos. CLI logs consultada por central mediante spawnSync terminó0 y confirmó dos solicitudes503, sin extraer cuerpos privados ni credenciales. Consulta previa --help emitió NativeCommandError de PowerShell por banner normal a stderr, sin mutación; registrado/corregido en Registro Canónico de Errores antes de otra cirugía.
+
+**Efecto en estado vivo:** promoción técnica b1 y fullgate siguen hechos, pero revisión funcional completa NO aprobada ni entregada como terminada. H08 de4ff no se hereda para b1. Central pausó loginFacebook: la llamada de entrada privada no dejó resultado durable y se considera FALLIDA; no inferir login ni credenciales recibidas. No nuevos posts/tokens/planificador/ingesta/DB/Render. Hilo Chat inspecciona salud/logs y repite misma ruta; comprobar Ingreso independientemente sin extraer originales ni capturar/publicar datos. Central no hace rollback ciego a4ff si el fallo es upstream independiente; conserva exclusividad/guardas de alias. Siguiente paso atómico: diagnosticar y resolver/verificar503 o restauración causal si corresponde, luego ensayo humano editorial y conexión legítima de proveedores. Sin garantía ni plazo inventado mientras causa/salud no estén verificadas.
+
+
+**C052 — Recibo final de disponibilidad recuperada E78 (constructor Chat):** fuente exactab1d7d995, sin redeploy/rollback/mutación. Misma ruta Chat autenticada volvió a HTML200, cabecera pinned-css-inline-v1 y tres huellas CSS oficiales exactas, tipografía Inter/compositor/historial/modelos/config200; desktop1366/móvil390 sin overflow, imágenes rotas ni erroresJS, capturas ficticias inspeccionadas. Mantener primer503 como incidencia real: startup22:53:46Z e índice recuperado22:53:51Z correlacionados, causa del arranque NO probada. Gate de disponibilidad Chat acotadamente recuperado, no SLA universal ni causa raíz cerrada.
+
+**Ingreso comprobado por separado:**22:59:21Z/23:00:16Z HTTP200/ruta exacta, opción Crónica personal presente, un editable/13botones y control audio, sin formulario de login, erroresJS o requests fallidas. No cambió modo ni leyó borradores/storage ni hizo capturas/clics de datos. La espera del verificador por heading semántico «Crónica» inexistente se corrigió como defecto del verificador, NO fallo de aplicación; Momento/botón específico de grabar NO comprobados en modo actual, no atribuir. Estos recibos no acreditan grabación/recuperación/checkpoint ni estados editoriales productivos; esas pruebas humanas permanecen abiertas.
+
+**Estado vivo actualizado:** parche editorial C052 sigue LIVEb1, disponibilidad Chat/Ingreso autenticados comprobada por recibo E78 atribuido; causa raíz del arranque upstream abierta. Siguiente paso: ensayo humano del flujo de recuperación editorial y audio, acceso legítimo Página/GitHub mediante formulario privado (primer intento de herramienta no durable, no asumir login), configuración verificable y primera entrada exacta autorizada a ambos destinos. Mantener corpus privado/no integrado y respaldo universal/históricos sin declarar completados. Fuente runtimeb1 invariable; cierre documental distinto y sin nuevo deploy.
