@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Harmonia · Observabilidad del trabajo con IA",
-  "version": "0.1.0",
-  "description": "Observador local y explícito para una pestaña elegida de ChatGPT.",
+  "version": "0.2.0",
+  "description": "Mapeador local de estructura y controles de la superficie conversacional de ChatGPT en Chrome, sin conservar el texto de los mensajes.",
   "permissions": [
     "activeTab",
     "debugger",
