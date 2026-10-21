@@ -42,7 +42,13 @@
     if (root && $$('a[href^="http"]',root).some(el=>el.closest('[data-message-author-role="assistant"],article'))) ids.add('conversation.citations');
     if (root && $$('a[download],[data-testid*="download"],[data-testid*="file-card"],[data-testid*="artifact"]',root).length) ids.add('response.file-output');
     if (root && $$('[data-testid*="artifact"],[data-testid*="canvas"],[data-testid*="writing-block"]',root).length) ids.add('response.writing-block');
-    if (root && $$('[aria-busy="true"],[data-is-streaming="true"],[data-testid*="stop"]',root).length) ids.add('conversation.response-streaming');
+    if (root && $('[aria-busy="true"],[data-is-streaming="true"],[data-testid*="stop"]',root).length) { ids.add('conversation.response-streaming'); ids.add('conversation.partial-generation'); }
+    if (root && $('[data-testid*="agent-progress"],[data-testid*="agent-run"],[data-testid*="task-progress"],[data-testid*="subagent"]',root).length) ids.add('conversation.agent-progress');
+    if (root && $('[data-testid*="interactive-widget"],[data-testid*="interactive-ui"],[role="application"],[data-testid*="calculator"],[data-testid*="bill-split"],[data-testid*="game-widget"]',root).some(el=>visible(el)&&!excluded(el))) ids.add('response.interactive-widget');
+    if (root && $('[data-message-author-role="assistant"] [class*="grid-cols-2"],[data-message-author-role="assistant"] [class*="grid-cols-3"],[data-testid*="side-by-side"],[data-testid*="comparison-panel"]',root).some(el=>visible(el)&&!excluded(el))) ids.add('response.side-by-side-visuals');
+    if (root && $('[data-testid*="interactive-chart"],button[aria-label*="interactive chart" i],button[aria-label*="gráfico interactivo" i]',root).some(el=>visible(el)&&!excluded(el))) ids.add('response.interactive-chart');
+    if (root && $('[data-testid*="canvas"]',root).some(el=>visible(el)&&!excluded(el))) ids.add('response.canvas-workspace');
+    if (root && $('[data-testid*="slide"],[data-testid*="presentation"]',root).some(el=>visible(el)&&!excluded(el))) ids.add('response.slides-editor');
 
     const has=(re)=>re.test(hay);
     if (has(/send-button|send message|send prompt|enviar mensaje|enviar prompt/)) ids.add('composer.send');
@@ -113,7 +119,7 @@
     if(!force&&now-H.lastSentAt<4000){H.droppedScans++;return;}
     H.lastFingerprint=signature;H.lastSentAt=now;
     const payload={
-      catalogVersion:'0.1.1',features,controls:controls.map(({signature,...c})=>c),
+      catalogVersion:'0.1.2',features,controls:controls.map(({signature,...c})=>c),
       structure:struct,stylesheets:styleSheets(),
       layout:{main:styleSummary(root),composer:styleSummary(comp),assistant:styleSummary(root?.querySelector('[data-message-author-role="assistant"]'))},
       counts:{controls:controls.length,userMessages:root?$$('[data-message-author-role="user"]',root).length:0,assistantMessages:root?$$('[data-message-author-role="assistant"]',root).length:0,styleSheets:document.styleSheets.length},
