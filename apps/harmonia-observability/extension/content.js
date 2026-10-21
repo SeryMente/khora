@@ -111,6 +111,7 @@
   }
   function regionKey(){return globalThis.HarmoniaRegionPolicy?.classifyRegion(location.href)||'conversation';}
   function streamActive(root){return !!root?.querySelector('[aria-busy="true"],[data-is-streaming="true"],[data-testid*="stop"]');}
+  const MAX_MESSAGE_CHARS=2000000, MESSAGE_CHUNK_CHARS=80000;
   async function snapshotVisibleMessages(){
     if(!H.active)return;
     const root=mainRegion();if(!root)return;
@@ -118,24 +119,37 @@
     if(H.regionKey&&H.regionKey!==currentRegion)H.lastMessages.clear();
     H.regionKey=currentRegion;
     const isStreaming=streamActive(root);
-    const elements=$('[data-message-author-role="user"],[data-message-author-role="assistant"]',root).filter(el=>visible(el)&&!excluded(el)).slice(0,200);
+    const elements=$$('[data-message-author-role="user"],[data-message-author-role="assistant"]',root).filter(el=>visible(el)&&!excluded(el)).slice(0,200);
     const liveKeys=new Set();
     for(let index=0;index<elements.length;index++){
       const el=elements[index],role=attr(el,'data-message-author-role',12);
       if(role!=='user'&&role!=='assistant')continue;
       const key=role+':'+index;liveKeys.add(key);
-      const visibleText=String(el.innerText||'').replace(/\r\n?/g,'\n').slice(0,100000);
-      if(!visibleText)continue;
+      const fullText=String(el.innerText||'').replace(/\r\n?/g,'\n');
+      if(!fullText)continue;
+      const truncated=fullText.length>MAX_MESSAGE_CHARS;
+      const visibleText=fullText.slice(0,MAX_MESSAGE_CHARS);
       const sha=await fingerprintOf(visibleText),previous=H.lastMessages.get(key);
       const messageStreaming=role==='assistant'&&isStreaming&&index===elements.length-1;
       const wasStreaming=!!previous?.streaming;
       if(previous?.sha===sha&&wasStreaming===messageStreaming)continue;
-      let operation='replace',delta='',text=visibleText;
-      if(previous&&visibleText.startsWith(previous.text)&&visibleText.length>previous.text.length){operation='append';delta=visibleText.slice(previous.text.length);text='';}
-      else if(previous&&visibleText===previous.text&&wasStreaming&&!messageStreaming){operation='complete';text='';}
-      const payload={regionKey:currentRegion,messageKey:key,role,index,operation,delta,text,contentSha256:sha,visible:true,streaming:messageStreaming,truncated:visibleText.length>=100000,hiddenReasoningCaptured:false};
-      await chrome.runtime.sendMessage({kind:'harmonia:event',event:{type:'conversation.visible.delta',payload}}).catch(()=>{});
-      H.lastMessages.set(key,{text:visibleText,sha,streaming:messageStreaming});
+      let operation='replace',remaining=visibleText,completedOnly=false;
+      if(previous&&visibleText===previous.text&&wasStreaming&&!messageStreaming){operation='complete';remaining='';completedOnly=true;}
+      else if(previous&&visibleText.startsWith(previous.text)&&visibleText.length>previous.text.length){operation='append';remaining=visibleText.slice(previous.text.length);}
+      let offset=0,failed=false;
+      do{
+        const chunk=remaining.slice(offset,offset+MESSAGE_CHUNK_CHARS);
+        const chunkOperation=completedOnly?'complete':(operation==='replace'&&offset===0?'replace':'append');
+        const payload={regionKey:currentRegion,messageKey:key,role,index,operation:chunkOperation,
+          delta:chunkOperation==='append'?chunk:'',text:chunkOperation==='replace'?chunk:'',
+          contentSha256:sha,visible:true,streaming:messageStreaming,truncated,hiddenReasoningCaptured:false,
+          chunkIndex:Math.floor(offset/MESSAGE_CHUNK_CHARS),chunkCount:completedOnly?1:Math.max(1,Math.ceil(remaining.length/MESSAGE_CHUNK_CHARS))};
+        const result=await chrome.runtime.sendMessage({kind:'harmonia:event',event:{type:'conversation.visible.delta',payload}}).catch(()=>null);
+        if(!result?.ok||result.value!==true){failed=true;break;}
+        if(completedOnly)break;
+        offset+=chunk.length;
+      }while(offset<remaining.length);
+      if(!failed)H.lastMessages.set(key,{text:visibleText,sha,streaming:messageStreaming});
     }
     for(const key of H.lastMessages.keys())if(!liveKeys.has(key))H.lastMessages.delete(key);
   }
