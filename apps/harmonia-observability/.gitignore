@@ -1,0 +1,6 @@
+/extension/local-auth.js
+/collector/service.pid
+/collector/service.stdout.log
+/collector/service.stderr.log
+/runtime/
+*.jsonl
