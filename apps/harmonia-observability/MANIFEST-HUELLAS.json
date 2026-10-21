@@ -19,7 +19,8 @@
     "extension/popup.css",
     "extension/popup.html",
     "extension/popup.js",
-    "extension/service-worker.js"
+    "extension/service-worker.js",
+    "extension/coverage-catalog.json"
   ],
   "excludedLocalArtifacts": [
     "extension/local-auth.js",
@@ -40,6 +41,7 @@
     "weightedPoints": 68,
     "verifiedDocumentedFeatures": 40,
     "documentationWeightedPercent": 91,
-    "combinedPercentBeforeNaturalObservation": 46
+    "combinedPercentBeforeNaturalObservation": 46,
+    "catalogMirrorRequired": true
   }
 }
