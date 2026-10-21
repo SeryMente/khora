@@ -8,7 +8,7 @@ $log = Join-Path $desktop 'log.txt'
 Start-Transcript -LiteralPath $log -Force | Out-Null
 try {
     $required = @(
-      'CONSULTAR-HARMONIA.cmd','INICIAR-HARMONIA.cmd','INICIAR-HARMONIA-HEADLESS.ps1','DETENER-HARMONIA-HEADLESS.ps1','FINALIZAR-PAQUETE.ps1','LEEME.txt','coverage-catalog.json',
+      'CONSULTAR-HARMONIA.cmd','INICIAR-HARMONIA.cmd','INICIAR-HARMONIA-HEADLESS.ps1','DETENER-HARMONIA-HEADLESS.ps1','FINALIZAR-PAQUETE.ps1','LEEME.txt','coverage-catalog.json','extension\coverage-catalog.json',
       'collector\query.ps1','collector\server.js','extension\content.js','extension\manifest.json','extension\popup.css','extension\popup.html','extension\popup.js','extension\service-worker.js',
       'runtime\node.exe','runtime\NODE-LICENSE.txt','extension\local-auth.js'
     )
@@ -24,6 +24,10 @@ try {
     'EXTENSION_MANIFEST=VALID'
     $catalog = Get-Content -LiteralPath (Join-Path $root 'coverage-catalog.json') -Raw | ConvertFrom-Json
     if ($catalog.schema -ne 'harmonia.coverage-catalog.v1' -or @($catalog.features).Count -lt 30 -or @($catalog.sources).Count -lt 10) { throw 'El catálogo público no contiene la estructura mínima esperada.' }
+    $rootCatalogHash = (Get-FileHash -LiteralPath (Join-Path $root 'coverage-catalog.json') -Algorithm SHA256).Hash
+    $extensionCatalogHash = (Get-FileHash -LiteralPath (Join-Path $root 'extension\coverage-catalog.json') -Algorithm SHA256).Hash
+    if ($rootCatalogHash -ne $extensionCatalogHash) { throw 'El catálogo de la raíz no coincide con el catálogo cargado por la extensión.' }
+    'COVERAGE_CATALOG_MIRROR=MATCH'
     $observer = Get-Content -LiteralPath (Join-Path $root 'extension\content.js') -Raw
     if ($observer -match 'outerHTML|innerHTML|\.textContent|\.value\s*=') { throw 'El observador contiene una ruta que podría leer contenido o valores; revisar antes de distribuir.' }
     if ($observer -notmatch 'conversationTextCaptured:false' -or $observer -notmatch 'composerTextCaptured:false') { throw 'No se declaró minimización explícita del contenido.' }
@@ -60,7 +64,7 @@ try {
     }
     $allowed = @(
       'CONSULTAR-HARMONIA.cmd','INICIAR-HARMONIA.cmd','INICIAR-HARMONIA-HEADLESS.ps1','DETENER-HARMONIA-HEADLESS.ps1','FINALIZAR-PAQUETE.ps1','LEEME.txt','coverage-catalog.json',
-      'collector\query.ps1','collector\server.js','extension\content.js','extension\manifest.json','extension\popup.css','extension\popup.html','extension\popup.js','extension\service-worker.js','runtime\NODE-LICENSE.txt'
+      'collector\query.ps1','collector\server.js','extension\content.js','extension\coverage-catalog.json','extension\manifest.json','extension\popup.css','extension\popup.html','extension\popup.js','extension\service-worker.js','runtime\NODE-LICENSE.txt'
     )
     $hashes = [ordered]@{}
     foreach ($rel in $allowed) {
