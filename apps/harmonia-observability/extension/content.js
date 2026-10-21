@@ -1,6 +1,6 @@
 (()=> {
-  if (globalThis.__harmoniaObserver?.active) return;
-  const H = globalThis.__harmoniaObserver = { active:false, lastFingerprint:null, lastSentAt:0, droppedScans:0 };
+  if (globalThis.__harmoniaObserver?.version==='0.3.0') return;
+  const H = globalThis.__harmoniaObserver = { version:'0.3.0', active:false, lastFingerprint:null, lastSentAt:0, droppedScans:0 };
   let observer=null, timer=null, sessionId=null;
 
   const $ = (sel, root=document) => root.querySelector(sel);
@@ -160,4 +160,7 @@
     if(message?.kind==='harmonia:start')start(message);
     if(message?.kind==='harmonia:stop')stop();
   });
+  chrome.runtime.sendMessage({kind:'harmonia:auto-settings'}).then(response=>{
+    if(response?.ok&&response.value?.enabled)start({automatic:true});
+  }).catch(()=>{});
 })();
