@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Harmonia · Observabilidad del trabajo con IA",
-  "version": "0.3.0",
-  "description": "Mapeo automático y local de estructura y controles de las pestañas de chatgpt.com, sin capturar texto de conversación.",
+  "version": "0.4.0",
+  "description": "Observabilidad local automática y multi-pestaña de ChatGPT: estructura, consola y texto visible de mensajes; no captura borradores ni razonamiento oculto.",
   "permissions": [
     "scripting",
     "storage",
@@ -19,7 +19,7 @@
   },
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Harmonia · mapeo automático"
+    "default_title": "Harmonia · estado y panel"
   },
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"
@@ -30,6 +30,7 @@
         "https://chatgpt.com/*"
       ],
       "js": [
+        "region-policy.js",
         "content.js"
       ],
       "run_at": "document_idle"
