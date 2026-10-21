@@ -1,99 +1,96 @@
 const $=selector=>document.querySelector(selector);
 const toggle=$('#toggle');
 let catalog=null;
-async function call(kind){
-  if(!globalThis.chrome?.runtime?.sendMessage)return {ok:true,value:{active:false,collector:false,events:0,lastError:'La vista previa no está conectada a Chrome.'}};
-  return new Promise(resolve=>chrome.runtime.sendMessage({kind},response=>resolve(response||{ok:false,error:chrome.runtime.lastError?.message||'Sin respuesta del service worker'})));
+async function call(kind,payload={}) {
+  if(!globalThis.chrome?.runtime?.sendMessage) return {ok:false,error:'La vista previa no está conectada a Chrome.'};
+  return new Promise(resolve=>chrome.runtime.sendMessage({kind,...payload},response=>resolve(response||{ok:false,error:chrome.runtime.lastError?.message||'Sin respuesta del service worker'})));
 }
 async function loadCatalog(){
-  const response=await fetch(chrome.runtime.getURL('coverage-catalog.json'),{cache:'no-store'});
-  if(!response.ok)throw new Error('No se pudo cargar coverage-catalog.json');
+  const url=chrome.runtime.getURL('coverage-catalog.json');
+  const response=await fetch(url,{cache:'no-store'});
+  if(!response.ok)throw new Error('No se pudo cargar el catálogo local ('+response.status+'). Recarga la extensión en chrome://extensions.');
   catalog=await response.json();
-  return catalog;
+  if(!Array.isArray(catalog.features)||!Array.isArray(catalog.sources))throw new Error('El catálogo local tiene un formato no válido.');
 }
-const weights=feature=>feature.priority==='core'?2:1;
+const weight=feature=>feature.priority==='core'?2:1;
 const percent=(n,d)=>d?Math.round(100*n/d):0;
 const pctText=(n,d)=>percent(n,d)+'%';
 function setBar(id,value){$(id).style.width=Math.max(0,Math.min(100,value))+'%';}
-function formatDate(value){if(!value)return 'Aún no hay observaciones naturales.';const date=new Date(value);return Number.isNaN(date.getTime())?'Último barrido sin fecha válida.':'Último barrido: '+date.toLocaleString();}
 function isDocumented(feature){
-  const verifiedSources=new Set((catalog?.sources||[]).filter(source=>source.verificationStatus==='content-read').map(source=>source.id));
-  return Array.isArray(feature.docs)&&feature.docs.some(id=>verifiedSources.has(id));
+ const verified=new Set((catalog?.sources||[]).filter(s=>s.verificationStatus==='content-read').map(s=>s.id));
+ return Array.isArray(feature.docs)&&feature.docs.some(id=>verified.has(id));
 }
 function sourceList(){
-  const box=$('#sourcesList');box.replaceChildren();
-  for(const source of catalog.sources||[]){
-    const row=document.createElement('div');row.className='source-row';
-    const id=document.createElement('span');id.textContent=source.id;
-    const link=document.createElement('a');link.href=source.url;link.target='_blank';link.rel='noopener noreferrer';link.textContent=source.title+(source.verificationStatus==='content-read'?' · leído '+(source.checkedAt||''):' · pendiente de leer');
-    row.append(id,link);box.append(row);
-  }
+ const box=$('#sourcesList');box.replaceChildren();
+ for(const source of catalog.sources||[]){
+  const row=document.createElement('div');row.className='source-row';
+  const id=document.createElement('span');id.textContent=source.id;
+  const link=document.createElement('a');link.href=source.url;link.target='_blank';link.rel='noopener noreferrer';
+  link.textContent=source.title+(source.verificationStatus==='content-read'?' · leído '+(source.checkedAt||''):' · pendiente de leer');
+  row.append(id,link);box.append(row);
+ }
 }
 function pendingList(observed){
-  const box=$('#pendingList');box.replaceChildren();
-  const pending=(catalog.features||[]).filter(f=>!isDocumented(f)||!observed.has(f.id));
-  for(const f of pending.slice(0,12)){
-    const row=document.createElement('div');row.className='pending-item';
-    const state=[];
-    if(!isDocumented(f))state.push('sin fuente oficial leída');
-    if(!observed.has(f.id))state.push('no observada naturalmente');
-    row.textContent=f.label+' — '+state.join('; ');box.append(row);
-  }
-  if(!pending.length){const p=document.createElement('p');p.textContent='Todos los elementos del catálogo tienen fuente y al menos una observación natural.';box.append(p);}
+ const box=$('#pendingList');box.replaceChildren();
+ const pending=(catalog.features||[]).filter(f=>!isDocumented(f)||!observed.has(f.id));
+ for(const feature of pending.slice(0,16)){
+  const row=document.createElement('div');row.className='pending-item';
+  const statuses=[];
+  if(!isDocumented(feature))statuses.push('sin fuente oficial leída');
+  if(!observed.has(feature.id))statuses.push('no observada naturalmente');
+  row.textContent=feature.label+' — '+statuses.join('; ');box.append(row);
+ }
+ if(!pending.length){const p=document.createElement('p');p.textContent='Todas las capacidades del catálogo tienen documentación verificada y al menos una observación natural.';box.append(p);}
+}
+function formatDate(value){
+ if(!value)return 'Esperando el primer barrido natural.';
+ const d=new Date(value);return Number.isNaN(d.getTime())?'Último barrido sin fecha válida.':'Último barrido: '+d.toLocaleString();
 }
 async function paint(){
-  let result;
-  try{
-    if(!catalog)await loadCatalog();
-    result=await call('harmonia:get');
-    if(!result?.ok)throw new Error(result?.error||'No se pudo consultar el estado local.');
-    const state=result.value||{},coverage=state.coverage||{};
-    const features=(catalog.features||[]).filter(f=>f.scope!=='out');
-    const totalWeight=features.reduce((n,f)=>n+weights(f),0);
-    const verifiedSources=new Set((catalog.sources||[]).filter(source=>source.verificationStatus==='content-read').map(source=>source.id));
-    const isDocumented=feature=>Array.isArray(feature.docs)&&feature.docs.some(id=>verifiedSources.has(id));
-    const documentedWeight=features.filter(isDocumented).reduce((n,f)=>n+weights(f),0);
-    const observed=new Set(coverage.observedFeatureIds||[]);
-    const observedFeatures=features.filter(f=>observed.has(f.id));
-    const observedWeight=observedFeatures.reduce((n,f)=>n+weights(f),0);
-    const docPct=percent(documentedWeight,totalWeight);
-    const obsPct=percent(observedWeight,totalWeight);
-    const combinedPct=percent(documentedWeight+observedWeight,2*totalWeight);
-    $('#indexValue').textContent=combinedPct+'%';
-    $('#docsValue').textContent=pctText(documentedWeight,totalWeight)+' · '+features.filter(isDocumented).length+'/'+features.length+' elementos';
-    $('#observedValue').textContent=pctText(observedWeight,totalWeight)+' · '+observedFeatures.length+'/'+features.length+' elementos';
-    $('#totalValue').textContent=features.length+' · '+totalWeight+' puntos ponderados';
-    $('#unknownValue').textContent=(coverage.unknownControls||[]).length;
-    setBar('#overallBar',combinedPct);setBar('#docsBar',docPct);setBar('#observedBar',obsPct);
-    $('#lastScan').textContent=formatDate(coverage.lastScanAt);
-    $('#events').textContent=(state.events||0)+' eventos aceptados · '+(coverage.scanCount||0)+' barridos';
-    if(state.active){
-      $('#dot').className='dot live';$('#headline').textContent='Captura de arquitectura activa';
-      $('#detail').textContent=state.collector?'Pestaña elegida · estructura/controles sin texto de conversación.':'Captura local con error de colector: '+(state.lastError||'sin detalle');
-      toggle.textContent='Detener captura';toggle.className='stop';toggle.disabled=false;
-    }else if(state.collector){
-      $('#dot').className='dot';$('#headline').textContent='Lista para iniciar';
-      $('#detail').textContent='Abre la pestaña ChatGPT que quieras mapear y activa la captura de forma explícita.';
-      toggle.textContent='Iniciar mapeo en esta pestaña';toggle.className='';toggle.disabled=false;
-    }else{
-      $('#dot').className='dot off';$('#headline').textContent='Colector desconectado o sin credencial';
-      $('#detail').textContent=state.lastError||'Ejecuta INICIAR-HARMONIA-HEADLESS.ps1.';
-      toggle.textContent='Colector requerido';toggle.className='';toggle.disabled=true;
-    }
-    sourceList();pendingList(observed);
-  }catch(error){
-    $('#dot').className='dot off';$('#headline').textContent='No se pudo calcular el índice';
-    $('#detail').textContent=String(error.message||error);
-    toggle.disabled=true;
-  }
+ try{
+  if(!catalog)await loadCatalog();
+  const response=await call('harmonia:get');
+  if(!response.ok)throw new Error(response.error||'No se pudo consultar el service worker.');
+  const state=response.value||{},coverage=state.coverage||{};
+  const features=(catalog.features||[]).filter(f=>f.scope!=='out');
+  const totalWeight=features.reduce((n,f)=>n+weight(f),0);
+  const docWeight=features.filter(isDocumented).reduce((n,f)=>n+weight(f),0);
+  const observed=new Set(coverage.observedFeatureIds||[]);
+  const observedFeatures=features.filter(f=>observed.has(f.id));
+  const observedWeight=observedFeatures.reduce((n,f)=>n+weight(f),0);
+  const docPct=percent(docWeight,totalWeight),naturalPct=percent(observedWeight,totalWeight);
+  const totalPct=percent(docWeight+observedWeight,2*totalWeight);
+  $('#indexValue').textContent=totalPct+'%';
+  $('#docsValue').textContent=pctText(docWeight,totalWeight)+' · '+features.filter(isDocumented).length+'/'+features.length+' capacidades';
+  $('#observedValue').textContent=pctText(observedWeight,totalWeight)+' · '+observedFeatures.length+'/'+features.length+' capacidades';
+  $('#totalValue').textContent=features.length+' · '+totalWeight+' puntos ponderados';
+  $('#unknownValue').textContent=(coverage.unknownControls||[]).length;
+  setBar('#overallBar',totalPct);setBar('#docsBar',docPct);setBar('#observedBar',naturalPct);
+  $('#lastScan').textContent=formatDate(coverage.lastScanAt);
+  $('#events').textContent=(state.events||0)+' eventos aceptados · '+(coverage.scanCount||0)+' barridos · '+(state.activeTabs||0)+' pestañas';
+  $('#dot').className=state.autoEnabled?(state.collector?'dot live':'dot off'):'dot';
+  $('#headline').textContent=!state.collector?'Colector no disponible':state.autoEnabled?'Captura automática '+(state.activeTabs?'activa':'habilitada'):'Captura automática pausada';
+  $('#detail').textContent=!state.collector?(state.lastError||'Ejecuta INICIAR-HARMONIA.cmd.'):state.autoEnabled
+   ?'Todas las pestañas de chatgpt.com · '+state.activeTabs+' con captura detectada · solo estructura y controles.'
+   :'La captura está pausada. Puedes reanudarla desde aquí.';
+  toggle.textContent=state.autoEnabled?'Pausar captura automática':'Reanudar captura automática';
+  toggle.className=state.autoEnabled?'stop':'';
+  toggle.disabled=!state.collector;
+  sourceList();pendingList(observed);
+ }catch(error){
+  $('#dot').className='dot off';$('#headline').textContent='No se pudo calcular el índice';
+  $('#detail').textContent=String(error.message||error);
+  $('#sourcesList').replaceChildren();$('#pendingList').replaceChildren();
+  toggle.disabled=true;toggle.textContent='Colector o catálogo requerido';
+ }
 }
 toggle.addEventListener('click',async()=>{
-  toggle.disabled=true;
-  const prior=await call('harmonia:get');
-  if(!prior?.ok){alert(prior?.error||'No se pudo leer el estado de Harmonia.');await paint();return;}
-  const response=await call(prior.value?.active?'harmonia:stop':'harmonia:start');
-  if(!response?.ok)alert(response?.error||'La acción no se pudo completar.');
-  await paint();
+ toggle.disabled=true;
+ const status=await call('harmonia:get');
+ if(!status.ok){alert(status.error||'No se pudo leer el estado.');await paint();return;}
+ const response=await call('harmonia:set-auto',{enabled:!status.value?.autoEnabled});
+ if(!response.ok)alert(response.error||'No se pudo cambiar el modo automático.');
+ await paint();
 });
 $('#refresh').addEventListener('click',()=>void paint());
 void paint();
