@@ -4,7 +4,7 @@
 ## 1. Control e identidad
 
 - Nombre normalizado: **Harmonia**, extensión compañera de **Khora**; «Armonía» y «Cora» de los dictados se conservan literalmente en originales. No renombrar producto o repositorio por transcripción.
-- Identificador del frente: `harmonia`. Versión del objeto **0.10**; sello **HARMONIA-v0.10**; corte de estado **2026-10-21**. Este corte registra la transferencia confirmada de responsabilidad a generación 2, enlaza la crónica verificable y refresca las referencias de gobierno; no cambia ni acepta la implementación técnica. Conserva v0.9 y las versiones anteriores como historial.
+- Identificador del frente: `harmonia`. Versión del objeto **0.11**; sello **HARMONIA-v0.11**; corte de estado **2026-10-21**. Este corte registra el candidato v0.4.0 en la rama `feat/harmonia-e2e-20261021`, añade el catálogo de comprobaciones/criterios E2E y enlaza la crónica del ciclo. No declara CI ni prueba física aprobadas, no se ha fusionado con `main` y conserva las versiones anteriores como historial.
 - Repositorio propietario: `SeryMente/khora`, rama `main`; objeto canónico en `docs/frentes/harmonia/OBJETO-CANONICO.md`. El blob de la versión anterior v0.4 fue `9a186ea789ea5aacab8dd06cf9f6edf364b89531`. Primera publicación del estado completo: commit `892adad897d6bd36c797ec2343ff7f4893b853bf`; lectura de vuelta en `main` confirmada y blob verificado `03ec5d127e0913dfe1f61e8588ba53b8abaa8e5f`. El recibo se refiere al contenido integral v0.5. Corte v0.6: commit inicial `3cb7901c2223cd41773185b93f17133e459e7a69`, blob `d1f524c383cc71c13f89e8d3aa3886ac3533fcdb`. Corte v0.7: commit inicial `55c2e8ba053265c219b2d941665c5cb3730107de`, blob `bbd08e2da15be17486e7515fd11eda7df57fca2b`; lectura de vuelta y corrección del catálogo documentadas. Nunca anticipar un SHA.
 - Fuente de código vigente: `apps/harmonia-observability/` en `main`, con la extensión de observabilidad y captura automática en evolución (rama `main`, versión de código en revisión E2E), `coverage-catalog.json` y scripts/validador. No inferir que el código fuente, el paquete local y el runtime ejecutado están sincronizados sin prueba de huellas. El paquete materializado en el Escritorio se reconstruyó desde esos archivos y contiene solo el runtime portable y una credencial local excluidos del repositorio; su manifiesto local de huellas se regeneró tras las validaciones.
 - Frente permanente por creación expresa del operador. El paquete local usado anteriormente está en `C:\\Users\\fila4\\Desktop\\Harmonia-Observabilidad-v0.2.0`; su sincronización con las últimas versiones de `main` **NO VERIFICADA**. El runtime debe considerarse desincronizado hasta comparar huellas y reiniciar con el colector actualizado. La versión 0.3.0 del código fuente no está aceptada funcionalmente en Chrome; no hereda pruebas de v0.1.0 ni de validaciones anteriores.
@@ -102,70 +102,77 @@ Resto del método vigente aplicable por pertinencia; citas históricas, ejemplos
 
 ## 8. Estado vivo
 
-**🔄 Estado operativo al 2026-10-21 · transferencia de responsabilidad v0.10:** la fuente vigente es `SeryMente/khora/main`. La generación 2 quedó confirmada y el estado vivo/crónica se sincronizan en esta revisión. Los criterios de arquitectura multiámbito de §16 siguen temporales. No se declara completado el cierre E2E.
+**🔄 Estado operativo al 2026-10-21 · candidato v0.11 / código Harmonia v0.4.0:** el control de responsabilidad sigue en generación 2. Los requisitos de aceptación proceden exclusivamente del verbatim del operador; este OCP distingue código presente de comportamiento probado. La rama candidata es `feat/harmonia-e2e-20261021`; no se ha fusionado ni se ha activado producción. `main` conserva el corte canónico v0.10 hasta que el candidato supere revisión/CI y se autorice el flujo correspondiente.
 
-**Fuente de código (blobs verificados en la lectura de este ciclo):**
-- Manifiesto MV3 v0.3.0: blob `5c2dd6d616c4ba19541d03df8fbc4abc6f0a11b6`.
-- Content script: `600f2bfb742aeb6f481fbb36ac762fd0d6907088`.
-- Service worker: `49d65381accdc33ce501eca6c4b5f2dd47a014b2`.
-- Colector: `34b98945da3db4604e62a3c9baa367ce024a0a5c`.
-- Popup JavaScript: `89c2e24b3c0dbbda6ad215434278f3004cdf8b2e`.
-- Popup HTML: `ab177e395ea177b4bed05e6e843b43f4b754f7e6`.
+**Gobierno adquirido y revisado en este ciclo:** Metacanon 1.19 / `METACANON-OBJETOS-v1.19`, blob `76fddd36a79e02340b7f4620cca8851cf8e305ac`; Sam v339 / `NX-339m`, blob `fdc996078bd611492e46d6b3abf569fbb4a6effa`; GOW v2.2, blob `6d4f8aff292ae173d9ceeba03694597bd2f16488`; INICIO blob `4dd3e16b61405c0bf60afead4054af6f36b7f917`. Cascada de Sam revisada manualmente; `MCP-NORMATIVO: DESACTIVADO`. La antigüedad exacta del último commit de Metacanon no se consultó: NO VERIFICADA.
 
-Estos son blobs de archivos individuales, no una certificación de integración. La UI ya tiene el área de sincronización y contadores en HTML/CSS, pero el popup JavaScript leído no termina de enlazar esos elementos al estado; el sincronizador espera `extension/build-info.json`, cuya existencia en `main` no está acreditada. No declarar periódica y operativa la sincronización hasta crear/validar dicho metadato y probar la UI completa.
+**Archivos de fuente candidatos — blob SHA de cada archivo en la rama de trabajo:**
+- Manifest v0.4.0: `902968968cc121590a0d6b60fd10c06ea12f5409`.
+- Content script v0.4.0: `4fcd3c4b516d3c465a8f079ce085905114005f8a`.
+- Service worker: `d20ecbad8a01fb793199061e3275fe2cff22c331`.
+- Colector: `eee49bcfca4f998082d189a253d7bf77314020f3`.
+- Política regional: `a41f003c80f1cacf4e7c3a7bdd265c673963c002`.
+- Popup esencial: HTML `5e026d2609c6cd708c179eb1c7a323d6c1c3ece6`, JS `15778131511494add6342706b1153e8c38cf48ee`, CSS `44eedd94f47b08a0d5cb4117b9d19ecc6f51fd84`.
+- Panel propio: HTML `1d2ca4b19b632b26e14767db1432b6ce0b46c383`, JS `d3a064bb2ea626beca5186d08be110df7803e999`, CSS `46623c741979f8d4df902b6661a8543286eb30cf`.
+- `extension/build-info.json`: `4619e452eced2a1c03f1938243549d8cc9a23ff6`, esquema `harmonia.repository-build.v1`, versión 0.4.0, fuente `542cd821ffdb1fb7c6c617bbe457322a4218b21f`, política 1.0.0 y catálogo 0.1.2.
+- Pruebas: `tests/region-policy.test.js` blob `3185cbb4b4dee350fee30b36d1a40f70eaa1cd2f`; `tests/collector.integration.test.js` blob `2532684c9885e7d31b58620cc1411d7fc76cd704`.
+- Validador: `scripts/validate-source.js` blob `ddf9fe1be4fbd89a775225f9a4e6d70d750a8b1d`.
+- Workflow de CI: `.github/workflows/harmonia-validation.yml` blob `da81f27c3e945ac10aed85b03a50c74c55aa6742`.
+- Finalizador PowerShell: `ca0a77a420229c572f4f891fc0ff4d3ced3b138f`; LEEME `c4c24d48b2d61b52cd27e48cc8f33d6bafae94f3`; manifiesto de huellas `79f6bcbafe975bc08d215dc3608aa7e74d17c0df`.
 
-**Diseño implementado en código fuente, aún no aceptado funcionalmente:** inyección automática para `https://chatgpt.com/*`; permiso `debugger` retirado; observador activado por mutaciones relevantes sin sondeo fijo de diez segundos; fingerprints SHA-256 y control single-flight local; cola de eventos; endpoint de huellas del colector; archivo separado por superficie única y avistamientos compactos; deduplicación de ID de evento acotada en el índice. Estas características necesitan pruebas de contrato, concurrencia, recuperación y retención. El fingerprint actual se calcula después de recolectar la estructura, por lo que la omisión del recorrido de elementos ya reconocidos no está lograda.
+**Capacidades implementadas en el candidato, todavía no aceptadas funcionalmente:**
+- Captura automática declarada por content script al abrir una pestaña ChatGPT, con sesiones independientes por pestaña.
+- Texto visible de mensajes user/assistant con reemplazos, deltas, finalización y fragmentación de respuestas grandes. No usa `outerHTML`, `innerHTML`, `textContent` ni valores del compositor/campos; no pretende capturar razonamiento oculto.
+- Observación estructural bajo mutaciones, resumen de CSS/viewport y puente de consola que captura llamadas de consola, errores no manejados y rechazos de promesas. La redacción es heurística, no una garantía de anonimización.
+- Completitud regional versionada: la región de conversación requiere todas las capacidades del catálogo vigente, al menos cinco huellas estructurales distintas y dos sesiones diferentes. Después conserva un único tab líder; los demás tabs de la región se apagan. Las regiones sin catálogo quedan no mapeadas, no falsamente completas.
+- Popup reducido a estado/pausa y apertura del panel; dashboard en pestaña propia, reutilizable y con refresco mientras está visible.
+- Integración del colector con saneamiento por tipo, índices/originales locales y estado regional; pruebas de contrato/política y prueba HTTP local de colector definida.
 
-**Entorno local:** el paquete que se utilizó previamente está bajo `C:\\Users\\fila4\\Desktop\\Harmonia-Observabilidad-v0.2.0`; datos previstos para esta revisión bajo `C:\\Users\\fila4\\AppData\\Local\\Harmonia\\surface-index-v0.3.0\\data`. Las últimas ediciones publicadas no están comprobadas contra la carpeta local ni contra el proceso Node activo. PID, salud y contrato en ejecución: **NO VERIFICADOS en este corte**. No escribir sobre el equipo ni ejecutar acciones remotas hasta reconciliar la identidad RDC registrada, conforme a §16.5 y al gobierno vigente.
+**Verificación realmente realizada:** lectura de vuelta individual de los archivos editados en la rama y escritura de una crónica del ciclo. **No se ha ejecutado todavía** el workflow CI, `node --check`, el validador estático ni las pruebas `node --test` en un runner; no declarar PASS hasta recuperar los resultados. La existencia de tests es evidencia de código de prueba, no de que pasaron.
 
-**Gobierno y responsabilidad:** Metacanon `METACANON-OBJETOS-v1.19` (blob `76fddd36a79e02340b7f4620cca8851cf8e305ac`), Sam `v339 / NX-339m` (blob `fdc996078bd611492e46d6b3abf569fbb4a6effa`) y GOW `v2.2` (blob `6d4f8aff292ae173d9ceeba03694597bd2f16488`) se adquirieron y revisaron desde `SeryMente/metodologia/main` en este ciclo. `CONTROL-RESPONSABILIDAD.json` quedó en generación 2, folio `SES-20261021-K7M4Q9P2`, alias `chatgpt-harmonia-SES-20261021-K7M4Q9P2`, lectura de vuelta verificada. La fecha/hora del último commit de Metacanon no se consultó: antigüedad exacta NO VERIFICADA. Las pruebas técnicas de E2E siguen abiertas.
+**Entorno físico:** el paquete local histórico está en `C:\\Users\\fila4\\Desktop\\Harmonia-Observabilidad-v0.2.0`; la carpeta única objetivo es `C:\\Users\\fila4\\Desktop\\Harmonia`. El Escritorio y Chrome NO fueron tocados. Continúa bloqueado el acceso remoto por la discrepancia RDC documentada en §16.5/§17. No se han obtenido capturas reales, lecturas del runtime actual ni huellas del paquete instalado.
 
-**⚗️ En prueba / recién fallido:** no se dispone de una prueba integral posterior a los cambios recientes del colector y sincronizador. Una validación previa de paquete no certifica este árbol. No se ha verificado la carga de v0.3.0 en Chrome, captura real, varias pestañas, estado actual del colector, sincronización real, métricas CPU/RAM ni igualdad de cobertura contra la referencia.
-
-**Reglas de conservación:** no incluir credenciales locales, JSONL reales ni datos sensibles en Git. Mantener eventos originales y superficies únicas/referencias separadas. No llamar «sin colisiones» al sistema antes de las pruebas de idempotencia/concurrencia y reconciliación del índice.
+**Límite de documentación:** se intentó crear en GitHub una copia literal de las instrucciones del operador; la herramienta bloqueó esa escritura. No se intentó eludir el control. La crónica documenta el propósito y la laguna, pero no afirma que el verbatim haya quedado persistido como original GitHub. La transcripción de la conversación es la fuente original; la copia local del checkpoint es solo un espejo subordinado.
 
 ## 9. Aceptación y viabilidad
 
-La aceptación E2E sigue **ABIERTA**. Este ciclo confirmó la titularidad exclusiva en el control canónico y actualizó el estado/crónica. La fuente `main` contiene los cambios recientes, pero las validaciones previas ocurrieron antes de parte de ellos. No ejecutar pruebas en el equipo hasta reconciliar la discrepancia de identidad RDC; la reparación y las pruebas aisladas de repositorio pueden continuar.
+La aceptación E2E continúa **ABIERTA**. El control de titularidad quedó confirmado; el código de candidato está en rama separada y requiere ejecución de pruebas, revisión y validación física. No confundir existencia de código con comportamiento de Chrome.
 
-| Requisito → resultado esperado | Evidencia disponible | Estado |
+| Requisito del verbatim → resultado esperado | Evidencia actual | Estado |
 | --- | --- | --- |
-| OCP listo para migración | §16 contiene notas arquitectónicas temporales; §17 conserva la última salida visible previa; la transferencia se registra en §1/§13/§17 y en la crónica enlazada en §11 | TRANSFERENCIA VERIFICADA; aceptación E2E sigue abierta |
-| Versión y gobierno | Metacanon 1.19 / `76fddd36a79e02340b7f4620cca8851cf8e305ac`; Sam v339 / NX-339m / `fdc996078bd611492e46d6b3abf569fbb4a6effa`; GOW v2.2 / `6d4f8aff292ae173d9ceeba03694597bd2f16488` | ADQUIRIDOS Y REVISADOS EN ESTE CICLO; antigüedad exacta del commit de Metacanon NO VERIFICADA |
-| Fuente de código | Blobs de manifiesto, content script, service worker, colector y popup leídos desde main | IDENTIFICADOS; integración E2E no probada |
-| Captura automática | Content script de manifiesto para chatgpt.com e inyección de pestañas presentes/nuevas en service worker | CÓDIGO PRESENTE; Chrome no probado |
-| Estructura y privacidad | Contrato estructural con etiquetas/roles/metadatos limitados, texto de mensajes declarado excluido | DECLARADO; falta auditoría de datos de punta a punta |
-| Deduplicación entre pestañas | Fingerprint y ruta de superficie única/reutilizada presentes en código | PARCIAL; faltan pruebas de replay, convergencia y atomicidad del conjunto archivo+índice |
-| Integridad del banco | Eventos JSONL por sesión/día, índice, archivos de superficies y cache de event IDs | NO PROBADA bajo concurrencia; recuperación/crash consistency pendiente |
-| Sincronización del repositorio | Alarma, fetch de build metadata y catálogo implementados en service worker | INCOMPLETA; falta `build-info.json` y enlace funcional en popup.js |
-| Sintaxis / contrato de eventos | Una validación anterior al último delta había pasado | OBSOLETA; repetir sobre todos los scripts del árbol actual |
-| Seguridad del colector | Autenticación y CORS existían previamente | REPROBAR en el árbol actual; límites de petición y almacenamiento incluidos en el código, aún no ensayados |
-| Pruebas de superficies nuevas/repetidas | No hay resultados E2E posteriores a los últimos cambios | PENDIENTE |
-| Prueba multi-pestaña real | Sin evidencia observada de Chrome | PENDIENTE |
-| CPU, RAM y latencia | Sin mediciones comparables | PENDIENTE; no afirmar bajo consumo |
-| Sincronización real de `main` y UI | Sin resultado persistido del sincronizador y el popup aún no está plenamente enlazado | PENDIENTE |
-| Arquitectura multiámbito | Criterios temporales de diseño registrados en §16.1 | NOTA TEMPORAL; módulos/contratos aún no diseñados ni implementados |
-| Prueba final en Chrome | No verificada; equipo RDC bloqueado por discrepancia de identidad | PENDIENTE DE RECONCILIACIÓN Y AUTORIZACIÓN |
+| Captura automática al abrir un tab ChatGPT | Manifest v0.4.0 y service worker incluyen la inyección/inyección de pestañas presentes | IMPLEMENTADO EN CÓDIGO; Chrome NO PROBADO |
+| Múltiples tabs | Sesiones indexadas por tabId, control serializado de superficies y estado de líder por región | PARCIALMENTE IMPLEMENTADO; concurrencia y cierre/navegación necesitan pruebas |
+| Indicador de exploración completa por región | Política 1.0.0: catálogo, todas las capacidades, 5 huellas distintas y 2 sesiones para conversación | IMPLEMENTADO EN CÓDIGO; falta prueba y calibración empírica |
+| Una sola pestaña observa una región completa | Líder persistido, tabs secundarios enviados a stop; el líder se reevalúa tras cierre/navegación | IMPLEMENTADO EN CÓDIGO; no probado en navegador, carreras requieren CI/E2E |
+| Detectar actualizaciones en una región ya explorada | El tab líder continúa observando mutaciones/eventos | PARCIAL; cambio natural no probado |
+| Capturar entradas y respuestas parciales/finales visibles | Deltas desde `innerText`, IDs, huellas y fragmentación de mensajes | IMPLEMENTADO EN CÓDIGO; fidelidad real todavía NO VERIFICADA |
+| Captura estructural, estilos y consola | Content script + puente MAIN world con redacción heurística | IMPLEMENTADO EN CÓDIGO; límites de privacidad y fidelidad requieren revisión real |
+| Multiámbito | Clasificador de rutas y estado por región; solo conversación posee catálogo de completitud | BASE IMPLEMENTADA; arquitectura extensible de módulos/contratos aún incompleta |
+| UI principal en su propio tab | `dashboard.html/js/css`, el service worker abre/reutiliza tab | IMPLEMENTADO EN CÓDIGO; UX aún no revisada en Chrome |
+| Popup limitado a lo esencial | Estado, pausa/reanudación, abrir panel | IMPLEMENTADO EN CÓDIGO; falta verificación visual |
+| Primera versión entregable sin esperar optimización posterior | Rama candidata v0.4.0 separada, diseñada para PR de revisión y CI sin tocar producción | CANDIDATO PREPARADO; PR/CI todavía pendientes al redactar este corte |
+| Optimización sin sacrificar calidad | Deltas/chunks, batch de consola, huellas y no duplicar observador al completar región | PARCIAL; CPU/RAM/latencia/cobertura no medidos |
+| Catálogo/build-info/sincronización de metadatos | Build-info versionado y UI de sync | IMPLEMENTADO EN CÓDIGO; ejecución de sincronización no probada |
+| Autenticación, CORS, persistencia, redacción y completitud regional | Pruebas automáticas definidas con colector en directorio temporal | TESTS DEFINIDOS; resultado CI pendiente |
+| Una sola carpeta genérica `Desktop\\Harmonia` | Ruta acordada y finalizador actualizado para paquete 0.4.0 | NO APLICADO en la máquina por bloqueo RDC |
+| Prueba E2E en Chrome real, varias pestañas | No hay ejecución observada en Chrome | PENDIENTE |
+| Revisión del verbatim en fuente canónica | Se intentó persistencia literal, bloqueada por la herramienta; se declaró la laguna sin eludirla | VERBATIM CANÓNICO NO PERSISTIDO; original sigue siendo el mensaje del operador |
 
-Orden obligatorio de aceptación:
-1. **COMPLETADO:** confirmar transferencia de titularidad mediante comparación del blob `dab4eb84680a556af4e6bed029ebb234a42a2cfe`, escritura condicionada, generación `1 → 2` y lectura de vuelta con blob `7f214260956a01c1d52f871f46f1d82c311ab020`. Se usa alias operativo porque no se expuso un ID nativo.
-2. **COMPLETADO EN ESTE CICLO:** adquirir y revisar Metacanon, Sam y GOW desde `SeryMente/metodologia/main`; los hashes y límites de frescura se detallan en §3.
-3. Revisar/reparar código fuente primero sin acceso remoto al equipo: crear el build-info comprobable, conectar la UI de popup, unificar el contrato de evento, corregir deficiencias del colector e incorporar pruebas automáticas.
-4. Ejecutar pruebas aisladas y reproducibles en entorno temporal: autenticación/CORS, eventos válidos/invalidos, UUID, deduplicación/replay, límite de tamaño, archivo de superficie, índice, reinicio, reconstrucción y concurrencia.
-5. Verificar el control RDC contra el registro global antes de cualquier ejecución remota; el dispositivo de nombre similar no basta para escoger identidad.
-6. Solo tras la reconciliación, sincronizar el paquete local con main usando huellas exactas, reiniciar el colector actualizado y ejecutar el verificador integral.
-7. La prueba visible multi-pestaña en Chrome exige la autorización correspondiente. Medir CPU/RAM/latencia y comparar cobertura con una referencia no optimizada. Sin esos datos, la aceptación permanece abierta.
-
-No reducir la lista de criterios para aparentar cierre ni usar una prueba sintética como prueba de captura real.
+Orden operativo:
+1. Abrir PR en borrador desde `feat/harmonia-e2e-20261021`, sin merge ni deployment.
+2. Consultar CI real, reparar cualquier fallo y releer resultados/logs.
+3. Actualizar OCP/README/prompt con el PR, checks, commits y resultados verificados.
+4. Reintentar al final la reconciliación RDC mediante registros autorizados; no asumir que los nombres iguales implican IDs equivalentes.
+5. Solo con el equipo identificado, instalar/cargar, probar captura natural multi-tab, guardar el paquete gestionado únicamente en `C:\\Users\\fila4\\Desktop\\Harmonia`, medir recursos y comparar cobertura con referencia.
+6. La aceptación se cierra solo al tener evidencia real de persistencia, actualización regional, ausencia de colisiones, métricas y fidelidad de captura.
 
 ## 10. Formato de ciclo
 
-Mantener los diez campos centrales, legibles y compactos, sin pared de texto: 1) frente/rol/sello + Metacanon adquirido, revisión/frescura; 2) dónde estamos; 3) delta de método y proyecto; 4) avance, evidencia/entorno y no tocado; 5) pendientes/bloqueos; 6) viabilidad ligada a intención y aceptación; 7) tiempo/ciclos al próximo hito y cierre, supuestos/confianza/deriva o «no estimable» con causa; 8) siguiente acción e intervención material mínima; 9) continuación/prompt ante devolución del constructor o checkpoint; 10) custodia/revisión/ancla y próximo checkpoint.
+Conservar los diez campos obligatorios de Metacanon §4. En este corte: próximo hito = ejecutar CI real en PR de borrador y reparar fallos; aceptación física = bloqueada por identidad RDC, sin estimación fiable de ciclos porque depende de los resultados CI y la reconciliación de dispositivo. No declarar alta calidad por número de commits ni certificar E2E por pruebas sintéticas.
 
-En el corte actual no es estimable el número de ciclos para completar la prueba real: depende de decisión del operador sobre carga visible, revisión de los defectos de completitud y reconciliación de permisos/roles. Próxima acción recomendada: sincronizar los cambios locales al código con un commit revisable; corregir y probar pérdida de buffer/truncamientos; decidir la arquitectura de transporte y controles de datos; después, solo con autorización expresa, ejecutar la prueba real en Chrome. No reducir criterios de aceptación para aparentar cierre.
+El candidato está en `feat/harmonia-e2e-20261021`; no se debe fusionar en `main` sin revisar el workflow productivo de Khora. En cada arreglo de CI: registrar el error observado, el cambio, la huella nueva y la lectura de vuelta en la crónica; después actualizar este OCP y el prompt de asistente.
 
-La evidencia del ciclo de transferencia queda en [la crónica de responsabilidad](cronica/HARMONIA-TRANSFER-RESPONSABILIDAD-20261021.md); el control y la crónica fueron leídos de vuelta desde `main`. Las validaciones de paquete citadas en el corte técnico siguen siendo evidencia histórica y no certifican E2E en el código actual.
-
+Evidencia del ciclo actual: [crónica E2E 02](cronica/HARMONIA-E2E-02-20261021.md), blob `c36245b204ac405ef7b3a536efb682ac127c5a7e`. Estado de CI y PR: aún no comprobado/creado al emitir esta revisión del OCP.
 
 ## 11. Crónica y fuentes
 
@@ -173,11 +180,12 @@ La evidencia del ciclo de transferencia queda en [la crónica de responsabilidad
 - Ciclos anteriores: `cronica/HARMONIA-OBSERVABILIDAD-01.md`, originales `originales/HARMONIA-OBSERVABILIDAD-01.jsonl`, salida `originales/HARMONIA-OBSERVABILIDAD-01-salida.md`, propuesta `propuestas/OBSERVABILIDAD-PLAN-01.md`, y ciclo `cronica/HARMONIA-REANUDACION-01.md` con originales y salida en los archivos ya citados por v0.4.
 - Semilla inicial: `cronica/HARMONIA-INSTANCIACION-01.md`, originales `originales/HARMONIA-INSTANCIACION-01-operador.jsonl`, `originales/PROCEDENCIA.md` y evidencia `evidencias/HARMONIA-INSTANCIACION-01-revision.json`. Cobertura limitada a los mensajes directos archivados; no representa toda la conversación.
 - Transferencia de titularidad de este ciclo: [cronica/HARMONIA-TRANSFER-RESPONSABILIDAD-20261021.md](cronica/HARMONIA-TRANSFER-RESPONSABILIDAD-20261021.md), commit `8ec0d113524034bef30a7101c0d7814ede89927e`, blob `fc00e82957f3997bb450b4cb8d0de717ce3f6d82`; conserva el folio, el cambio de generación, los SHA, los límites y las salidas visibles emitidas en el ciclo.
+- Ciclo E2E 02 (rama candidata): [cronica/HARMONIA-E2E-02-20261021.md](cronica/HARMONIA-E2E-02-20261021.md), commit `46459fec4398291ce98e1b90fe706860635aab60`, blob `c36245b204ac405ef7b3a536efb682ac127c5a7e`; relaciona las capacidades construidas, las huellas de los archivos, las pruebas aún no ejecutadas, los bloqueos y el resultado del intento de conservar el verbatim literal.
 - Método central referenciado: `https://github.com/SeryMente/metodologia/blob/main/METACANON-OBJETOS-CANONICOS.md`, versión 1.10 / sello METACANON-OBJETOS-v1.10, hash y revisión descritos en §3. La frescura exige una nueva consulta cuando se reanude; no asumir que permanece sin cambios.
-- Gobierno obligatorio: `https://github.com/SeryMente/metodologia/blob/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.md` y README de procedencia; referencia v333 / NX-333m heredada por el objeto. Igualdad byte a byte del espejo histórico y estado actualizado no se verificaron en este corte.
+- Gobierno obligatorio actualizado: Sam v339 / `NX-339m`, blob `fdc996078bd611492e46d6b3abf569fbb4a6effa`; GOW v2.2, blob `6d4f8aff292ae173d9ceeba03694597bd2f16488`; INICIO blob `4dd3e16b61405c0bf60afead4054af6f36b7f917`. Fuentes releídas desde `SeryMente/metodologia/main` para este ciclo; antigüedad exacta del último commit de Metacanon NO VERIFICADA.
 - Fuentes técnicas históricas: `https://developer.chrome.com/docs/extensions/develop/concepts/content-scripts` y `https://developer.chrome.com/docs/extensions/reference/api/debugger`. Referencias no equivalen a permiso de instrumentar.
 - Evidencia local del corte 2026-10-21: salida de `FINALIZAR-PAQUETE.ps1` (exit code 0; sintaxis, manifest, salud, auth, CORS, persistencia sintética y 17 huellas); logs de servicio en la carpeta local del paquete; datos y originales JSONL en la ruta de datos. No se publica una copia del log, token ni conversación real.
-- La modificación local del popup a `Qué observa Harmonia`, runtime portable, colector, service worker, scripts headless y manifiesto de huellas no se comprometió al árbol de código `apps/harmonia-observability/` en este corte. Se requiere comparación y sincronización de código antes de tratar GitHub como fuente de esos deltas locales.
+- Candidato de integración E2E v0.4.0: archivos de extensión, colector, dashboard, política regional, build-info, pruebas y workflow CI se guardaron en `feat/harmonia-e2e-20261021`; sus blobs exactos, estado de ejecución y límites constan en §8 y en la crónica del ciclo. La lectura de vuelta prueba el contenido de la rama, no que el workflow haya pasado ni que el código esté instalado localmente.
 
 
 ## 12. Reinstanciación
@@ -350,15 +358,16 @@ Control de responsabilidad actualizado en este OCP v0.10: generación **2**, fol
 
 ### Prioridades de continuación
 
-1. **✅ Transferencia resuelta para esta sesión:** folio `SES-20261021-K7M4Q9P2`, generación 2, lectura de vuelta comprobada; la crónica está enlazada en §11. En una sesión futura, leer el control y generar folio nuevo tras comprobar colisiones. El cierre E2E no hereda aceptación de este hito de gobernanza.
-2. Corregir E2E íntegramente sobre `main`: la implementación actual está dividida entre el content script, service worker, colector y popup; no asumir compatibilidad por compartir número de versión.
-3. Completar `extension/build-info.json`, incluyendo esquema `harmonia.repository-build.v1`, versión, revisión fuente y versión del catálogo; enlazar los elementos de estado en `popup.js`. Sin esos cambios, la sincronización periódica es incompleta.
-4. Añadir pruebas reproducibles para superficies nuevas/repetidas, idempotencia de eventos, escrituras atómicas, límite de almacenamiento y recuperación. Tratar por separado descriptor de superficie única y cada avistamiento. Conservar el evento de avistamiento aunque el descriptor sea deduplicado.
-5. Reparar cualquier discrepancia del contrato de eventos entre el observador y el colector. El colector debe validar y normalizar todos los datos; no confiar en el payload recibido ni registrar contenido libre de controles.
-6. Medir recursos y cobertura comparando un observador de referencia con el optimizado. El fingerprint actual se calcula después de recorrer/serializar el árbol: la petición de no reexaminar elementos reconocidos queda abierta.
-7. Antes de instalar, cargar o probar Chrome en equipo remoto, reconciliar identidad de RDC: el dispositivo en vivo nombrado `PC10RCIF4EI4` tenía ID `86580320-19b3-421a-89c7-36dce0123559`, distinto del ID que muestra el registro global para otro dispositivo de nombre similar (`79564800-3d53-4195-8122-5b4b061ef862`). No tratar los nombres como alias. Mientras siga la discrepancia, no realizar acciones en ese equipo; continuar con pruebas aisladas del repositorio.
-8. Actualizar este OCP después de cada hito relevante (fallo, arreglo, prueba, huella, resultado, bloqueo); nunca marcar una casilla sin evidencia. Mantener la arquitectura multiámbito de §16 como temporal hasta formalización mediante el FT de Metacanon.
-9. Una vez completada la integración y las pruebas no remotas, hacer read-back del paquete y el OCP; solo entonces decidir la prueba real en Chrome y marcar E2E según evidencia observada.
+1. **✅ Titularidad resuelta:** folio `SES-20261021-K7M4Q9P2`, generación 2, lectura de vuelta verificada. En esta sesión no volver a preguntar la autorización ya emitida.
+2. **✅ Candidato inicial construido, aceptación abierta:** rama `feat/harmonia-e2e-20261021`, código v0.4.0 con contenido visible, política regional, dashboard propio, popup esencial, build-info y pruebas. No se ha fusionado con `main`.
+3. **Siguiente paso inmediato:** abrir PR en borrador, sin merge, disparar/consultar CI y reparar los fallos que efectivamente aparezcan. En cada ciclo conservar error, fix, hashes y read-back.
+4. **Criterio regional:** solo conversación tiene catálogo de completitud (todas las capacidades, mínimo cinco huellas y dos sesiones). Las otras regiones no se consideran exploradas por completo. Validar en pruebas que, una vez completo, solo un tab permanezca observando y que el líder se reevalúe al cerrar/navegar.
+5. **Privacidad y datos:** se capturan textos visibles user/assistant porque forman parte del objetivo; no borradores, valores de campos, URLs completas, URLs de imágenes ni razonamiento oculto. Redacción de consola heurística: no garantía contra todo secreto. La primera prueba natural debe ser una conversación sin datos sensibles.
+6. **Desempeño:** no certificar ahorro de CPU/RAM ni conservación de cobertura hasta medir frente a una referencia no optimizada. El chunking y los lotes son una estrategia candidata, no una medición.
+7. **Bloqueo RDC:** resolver el choque de IDs `86580320-19b3-421a-89c7-36dce0123559` vs `79564800-3d53-4195-8122-5b4b061ef862` antes de tocar Escritorio o Chrome. Mientras tanto, seguir con CI y arreglos de repositorio.
+8. **Verbatim original:** el intento de guardar la copia literal dentro del OCP fue bloqueado por la herramienta; no se buscó eludirla. El original permanece en el mensaje del operador y la crónica declara el hueco; una copia externa local no se debe presentar como canon.
+9. **Entrega física posterior:** staging fuera del Escritorio; validar; sustituir solo archivos gestionados dentro de `C:\\Users\\fila4\\Desktop\\Harmonia`; verificar una única carpeta del proyecto sin borrar nada ajeno; iniciar colector, cargar extensión de forma visible y validar la prueba multi-tab. No usar `C:\\Users\\MantenimientoRCI\\`.
+10. Actualizar el OCP tras cada resultado. La última salida visible del asistente anterior que sigue al final de §17 se conserva sin alteración; no la reescribir ni resumir.
 
 ### Última salida visible del asistente anterior (transcrita literalmente para continuidad)
 
