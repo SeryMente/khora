@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Harmonia · Panel de observabilidad</title>
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+  <header class="top">
+    <div class="brand"><div class="mark" aria-hidden="true">H</div><div><h1>Harmonia</h1><p>Panel de observabilidad · v0.4.0</p></div></div>
+    <div class="headActions"><span id="updatedAt" class="muted">Consultando estado…</span><button id="refresh">Actualizar</button></div>
+  </header>
+  <main>
+    <section class="hero" aria-live="polite">
+      <span id="statusDot" class="dot"></span>
+      <div><h2 id="headline">Consultando colector…</h2><p id="summary">La observación es automática al abrir pestañas de chatgpt.com, cuando Chrome tiene cargada la extensión y el colector local está disponible.</p></div>
+      <button id="toggle" disabled>Comprobando…</button>
+    </section>
+    <section class="grid">
+      <article class="panel"><h2>Estado operativo</h2><dl id="operational"></dl></article>
+      <article class="panel"><h2>Sincronización del repositorio</h2><dl id="repository"></dl><p id="syncPolicy" class="muted"></p><button id="syncNow" class="secondary">Consultar main</button></article>
+    </section>
+    <section class="panel">
+      <div class="sectionHead"><div><h2>Regiones y coordinación de pestañas</h2><p class="muted">Una región no se considera completa hasta superar los criterios explícitos del catálogo. Las regiones no mapeadas no se declaran completas.</p></div></div>
+      <div id="regions" class="regions"><p class="muted">Cargando regiones…</p></div>
+    </section>
+    <section class="grid">
+      <article class="panel"><h2>Cobertura de la conversación</h2><dl id="coverage"></dl><p id="coverageNote" class="muted"></p></article>
+      <article class="panel"><h2>Pestañas observadas</h2><div id="sessions" class="sessions"><p class="muted">Esperando sesiones…</p></div></article>
+    </section>
+    <section class="panel privacy">
+      <h2>Contrato de observación y privacidad</h2>
+      <p>Se registran la estructura visible, metadatos de controles, HTML estructural resumido, resumen CSS/consola y el texto visible de mensajes del usuario y del asistente, incluidos cambios parciales observables. No se leen borradores del compositor, valores de campos, enlaces completos, URLs de imágenes ni razonamiento oculto. La redacción de consola es heurística y no garantiza detectar toda información sensible; evita usar conversaciones con datos sensibles durante la prueba.</p>
+      <p>La captura continua no significa que haya un modelo atendiendo continuamente. La completitud regional es una condición de exploración del catálogo, no un certificado de calidad o exhaustividad universal.</p>
+    </section>
+    <footer>Datos locales del colector · sin publicación externa de eventos por este panel.</footer>
+  </main>
+  <script src="region-policy.js"></script>
+  <script src="dashboard.js"></script>
+</body>
+</html>
