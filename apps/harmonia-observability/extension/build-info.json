@@ -1,0 +1,33 @@
+{
+  "schema": "harmonia.repository-build.v1",
+  "version": "0.4.0",
+  "sourceRevision": "022e9bd1920968596594f81c8b5f72c3b6b04b30",
+  "catalogVersion": "0.1.2",
+  "regionPolicyVersion": "1.0.0",
+  "releaseChannel": "candidate",
+  "captureContract": {
+    "automaticOnChatGptTabOpen": true,
+    "multipleTabs": true,
+    "visibleUserAndAssistantMessages": true,
+    "partialAndFinalMessageUpdates": true,
+    "pageConsoleWithHeuristicRedaction": true,
+    "htmlAndCssStructure": true,
+    "composerDrafts": false,
+    "formFieldValues": false,
+    "fullUrls": false,
+    "imageUrls": false,
+    "hiddenReasoning": false
+  },
+  "regionCompletion": {
+    "onlyRegionsWithCatalogCanComplete": true,
+    "conversationMinimumDistinctSurfaces": 5,
+    "conversationMinimumSessions": 2,
+    "onlyOneObserverAfterCompletion": true,
+    "otherRegionsRemainUnmappedUntilCataloged": true
+  },
+  "ui": {
+    "compactPopup": true,
+    "dedicatedDashboardTab": true
+  },
+  "generatedBy": "Harmonia source repository"
+}
