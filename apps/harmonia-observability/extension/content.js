@@ -1,7 +1,7 @@
 (()=> {
-  if (globalThis.__harmoniaObserver?.version==='0.3.0') return;
-  const H = globalThis.__harmoniaObserver = { version:'0.3.0', active:false, lastFingerprint:null, lastSentAt:0, droppedScans:0 };
-  let observer=null, timer=null, sessionId=null;
+  if (globalThis.__harmoniaObserver?.version==='0.4.0') return;
+  const H = globalThis.__harmoniaObserver = { version:'0.4.0', active:false, lastFingerprint:null, lastSentAt:0, droppedScans:0, lastMessages:new Map(), regionKey:null };
+  let observer=null, timer=null, messageTimer=null, sessionId=null;
 
   const $ = (sel, root=document) => root.querySelector(sel);
   const $$ = (sel, root=document) => [...root.querySelectorAll(sel)];
@@ -109,6 +109,43 @@
     const digest=await crypto.subtle.digest('SHA-256',bytes);
     return [...new Uint8Array(digest)].map(byte=>byte.toString(16).padStart(2,'0')).join('');
   }
+  function regionKey(){return globalThis.HarmoniaRegionPolicy?.classifyRegion(location.href)||'conversation';}
+  function streamActive(root){return !!root?.querySelector('[aria-busy="true"],[data-is-streaming="true"],[data-testid*="stop"]');}
+  async function snapshotVisibleMessages(){
+    if(!H.active)return;
+    const root=mainRegion();if(!root)return;
+    const currentRegion=regionKey();
+    if(H.regionKey&&H.regionKey!==currentRegion)H.lastMessages.clear();
+    H.regionKey=currentRegion;
+    const isStreaming=streamActive(root);
+    const elements=$('[data-message-author-role="user"],[data-message-author-role="assistant"]',root).filter(el=>visible(el)&&!excluded(el)).slice(0,200);
+    const liveKeys=new Set();
+    for(let index=0;index<elements.length;index++){
+      const el=elements[index],role=attr(el,'data-message-author-role',12);
+      if(role!=='user'&&role!=='assistant')continue;
+      const key=role+':'+index;liveKeys.add(key);
+      const visibleText=String(el.innerText||'').replace(/\\r\\n?/g,'\\n').slice(0,100000);
+      if(!visibleText)continue;
+      const sha=await fingerprintOf(visibleText),previous=H.lastMessages.get(key);
+      const wasStreaming=!!previous?.streaming;
+      if(previous?.sha===sha&&wasStreaming===isStreaming)continue;
+      let operation='replace',delta='',text=visibleText;
+      if(previous&&visibleText.startsWith(previous.text)&&visibleText.length>previous.text.length){operation='append';delta=visibleText.slice(previous.text.length);text='';}
+      else if(previous&&visibleText===previous.text&&wasStreaming&&!isStreaming){operation='complete';text='';}
+      const payload={regionKey:currentRegion,messageKey:key,role,index,operation,delta,text,contentSha256:sha,visible:true,streaming:isStreaming,truncated:visibleText.length>=100000,hiddenReasoningCaptured:false};
+      await chrome.runtime.sendMessage({kind:'harmonia:event',event:{type:'conversation.visible.delta',payload}}).catch(()=>{});
+      H.lastMessages.set(key,{text:visibleText,sha,streaming:isStreaming});
+    }
+    for(const key of H.lastMessages.keys())if(!liveKeys.has(key))H.lastMessages.delete(key);
+  }
+  function scheduleMessageSnapshot(){if(!H.active||messageTimer)return;messageTimer=setTimeout(()=>{messageTimer=null;void snapshotVisibleMessages();},350);}
+  function consoleEvent(event){
+    if(!H.active||!event?.detail||typeof event.detail!=='object')return;
+    let detail;try{detail=JSON.parse(JSON.stringify(event.detail));}catch{return;}
+    const entries=Array.isArray(detail.entries)?detail.entries.slice(0,10).map(item=>({type:safe(item?.type,24),value:safe(item?.value,1000)})):[];
+    const payload={regionKey:regionKey(),level:safe(detail.level,16),entries,observedAt:new Date().toISOString(),source:'page-console-bridge'};
+    void chrome.runtime.sendMessage({kind:'harmonia:event',event:{type:'console.observed',payload}}).catch(()=>{});
+  }
   let lastControls='';
   async function scanOnce(force=false) {
     if(!H.active)return;
@@ -120,7 +157,8 @@
     const struct=structure(root||comp?.closest('form')||comp,controls);
     const viewport={width:innerWidth,height:innerHeight,devicePixelRatio:window.devicePixelRatio||1};
     const sheetSummary=styleSheets();
-    const signature=JSON.stringify({features,controls:controls.map(c=>c.signature),structureNodes:struct.nodes,styles:sheetSummary.map(s=>[s.path,s.ruleCount,s.crossOriginOrInaccessible]),viewport});
+    const currentRegion=regionKey();
+    const signature=JSON.stringify({regionKey:currentRegion,features,controls:controls.map(c=>c.signature),structureNodes:struct.nodes,styles:sheetSummary.map(s=>[s.path,s.ruleCount,s.crossOriginOrInaccessible]),viewport});
     const fingerprint=await fingerprintOf(signature);
     const now=Date.now();
     if(!force&&fingerprint===H.lastFingerprint)return;
@@ -131,7 +169,8 @@
       structure:struct,stylesheets:sheetSummary,viewport,
       layout:{main:styleSummary(root),composer:styleSummary(comp),assistant:styleSummary(root?.querySelector('[data-message-author-role="assistant"]'))},
       counts:{controls:controls.length,userMessages:root?$$('[data-message-author-role="user"]',root).length:0,assistantMessages:root?$$('[data-message-author-role="assistant"]',root).length:0,styleSheets:document.styleSheets.length},
-      privacy:{conversationTextCaptured:false,composerTextCaptured:false,fieldValuesCaptured:false,hrefsCaptured:false,imageUrlsCaptured:false,menusExcluded:true},
+      regionKey:currentRegion,
+      privacy:{visibleMessageTextCaptured:true,composerTextCaptured:false,fieldValuesCaptured:false,hrefsCaptured:false,imageUrlsCaptured:false,hiddenReasoningCaptured:false,menusExcluded:true},
       droppedScans:H.droppedScans
     };
     await chrome.runtime.sendMessage({kind:'harmonia:event',event:{type:'ui.surface.scan',payload}}).catch(()=>{});
@@ -151,7 +190,8 @@
     window.addEventListener('resize',scheduleScan,{passive:true});
     window.addEventListener('popstate',scheduleScan,true);
     window.addEventListener('hashchange',scheduleScan,true);
-    void scan(true);
+    window.addEventListener('harmonia:console-observed',consoleEvent,false);
+    void scan(true);scheduleMessageSnapshot();
     observer=new MutationObserver(records=>{
       const relevant=records.some(record=>{
         const target=record.target?.nodeType===1?record.target:record.target?.parentElement;
@@ -160,10 +200,10 @@
         if(record.type==='childList')return [...record.addedNodes,...record.removedNodes].some(node=>node.nodeType===1&&!excluded(node));
         return false;
       });
-      if(relevant)scheduleScan();
+      if(relevant){scheduleScan();scheduleMessageSnapshot();}
     });
     const root=mainRegion()||document.body;
-    observer.observe(root,{subtree:true,childList:true,attributes:true,attributeFilter:['class','role','aria-label','aria-live','aria-busy','data-testid','data-message-author-role','disabled','data-state']});
+    observer.observe(root,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['class','role','aria-label','aria-live','aria-busy','data-testid','data-message-author-role','disabled','data-state']});
     const comp=composer();
     if(comp&&!root?.contains(comp))observer.observe(comp.closest('form')||comp.parentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['class','role','aria-label','aria-live','aria-busy','data-testid','disabled','data-state']});
     // Sin sondeo periódico: las mutaciones estructurales y el viewport activan el barrido.
@@ -173,16 +213,18 @@
     H.active=false;
     if(observer)observer.disconnect();observer=null;
     if(timer)clearTimeout(timer);timer=null;
-    H.periodic=null;
+    if(messageTimer)clearTimeout(messageTimer);messageTimer=null;
+    H.periodic=null;H.lastMessages.clear();
     window.removeEventListener('resize',scheduleScan);
     window.removeEventListener('popstate',scheduleScan,true);
     window.removeEventListener('hashchange',scheduleScan,true);
+    window.removeEventListener('harmonia:console-observed',consoleEvent,false);
   }
   chrome.runtime.onMessage.addListener(message=>{
     if(message?.kind==='harmonia:start')start(message);
     if(message?.kind==='harmonia:stop')stop();
   });
   chrome.runtime.sendMessage({kind:'harmonia:auto-settings'}).then(response=>{
-    if(response?.ok&&response.value?.enabled)start({automatic:true});
+    if(response?.ok&&response.value?.enabled&&response.value?.observe!==false)start({automatic:true});
   }).catch(()=>{});
 })();
