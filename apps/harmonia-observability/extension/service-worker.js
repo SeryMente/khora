@@ -18,7 +18,6 @@ const ready=(async()=>{
   const live=new Set(tabs.filter(t=>t.id&&valid(t.url)).map(t=>String(t.id)));
   for(const key of Object.keys(sessions))if(!live.has(key))delete sessions[key];
   await saveSessions();
-  if(autoEnabled)await injectExistingTabs(tabs);
 })();
 function saveSessions(){return chrome.storage.local.set({[STORE.sessions]:sessions,[STORE.enabled]:autoEnabled,[STORE.events]:eventCount});}
 function headers(extra={}){return {...extra,'x-harmonia-token':TOKEN};}
@@ -142,5 +141,6 @@ chrome.tabs.onUpdated.addListener((tabId,changeInfo,tab)=>{
   if(changeInfo.status==='complete'&&valid(tab?.url))await injectTab(tab);
  });
 });
+void ready.then(async()=>{if(autoEnabled)await injectExistingTabs(await chrome.tabs.query({url:'https://chatgpt.com/*'}));});
 chrome.runtime.onInstalled.addListener(()=>{void ready.then(async()=>{if(autoEnabled)await injectExistingTabs(await chrome.tabs.query({url:'https://chatgpt.com/*'}));});});
 chrome.runtime.onStartup.addListener(()=>{void ready.then(async()=>{if(autoEnabled)await injectExistingTabs(await chrome.tabs.query({url:'https://chatgpt.com/*'}));});});
