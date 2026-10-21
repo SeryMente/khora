@@ -54,7 +54,7 @@ Incluido como requisitos del producto, NO como capacidades ya demostradas:
 - Registro vasto, durable e indexable, originales separados de resúmenes; consultas por conversación, secuencia, intervalo, versión e incidente. Destino/retención/controles de privacidad por decidir con el operador antes de capturar datos reales; no volcar conversaciones crudas a Git por defecto.
 - Vincular evidencia original, observación humana, hipótesis, cambio aprobado y prueba; efectuar cortes/versiones reversibles según hallazgos. No convertir observaciones humanas en métricas ficticias ni dejar que el modelo se autoapruebe.
 
-Excluido de esta instanciación: código, instalación, acceso remoto, captura efectiva, servicios, automatización de mensajes/consumo, captura de credenciales/cookies, publicación externa de registros, cambio de arquitectura/seguridad no aprobado y modificación automática del metacanon. No afirmar que RDC elimina límites del plan o que un hilo mantiene atención perpetua.
+Excluido del paquete: captura de credenciales/cookies/borradores/otras pestañas, publicación externa de registros, vigilancia indiscriminada, modificación automática del Metacanon y promesa de atención perpetua. La carga manual en Chrome y la captura real requieren el acto visible del operador sobre la carpeta entregada; no se sustituyen por la colocación del paquete.
 
 ## 5. Roles y colaboración
 
@@ -68,21 +68,19 @@ Excluido de esta instanciación: código, instalación, acceso remoto, captura e
 
 | Estado | Contenido y fuente |
 | --- | --- |
-| Autorizado ahora | Reanudación de asistencia y continuidad por orden actual; adquisición condicional del control sin propietario y documentación/diagnóstico. La orden de desarrollar no resuelve decisiones reservadas de datos, arquitectura o seguridad. |
-| Requisitos ratificados | Observación en tiempo real, entradas, salidas, texto transitorio visible, HTML/CSS/consola, RDC e indexación, por U01/U03. Son requisitos, no pruebas ni permisos generales de captura. |
-| Propuesto, no decidido | Tecnología de cola/índice, canal local, uso de permiso debugger, política de retención/cifrado, distribución o sincronización y atención automatizada del modelo. |
-| Pendiente material | Alcance de pestañas/datos, permisos de depuración, almacenamiento/retención y arquitectura concreta; revisar con operador antes de construir lo afectado. El «Sí» de U03 seguido de una redirección documental no se amplía a permisos irrestrictos. |
-| Vetado en este hilo emisor | Desarrollar/instalar la extensión o empezar vigilancia. No modificar Metacanon ni trasladar propiedad de ese frente. |
+| Autorizado y ejecutado | Construcción, persistencia y entrega en Escritorio de la semilla v0.1.0 por orden explícita de cierre extremo a extremo. Implementación limitada a pestaña elegida, activación manual y almacenamiento local. |
+| Requisitos ratificados | Observación en tiempo real, entradas, salidas, texto transitorio visible, HTML/CSS/consola, consulta por RDC e indexación, por U01/U03. Son criterios a ensayar, no capacidades ya probadas. |
+| Implementado, pendiente de revisión real | Permiso `debugger`, canal local `127.0.0.1`, originales JSONL/índice, tope 1 GiB sin borrado y panel mínimo coherente con Khora. La primera captura real exige aceptación visible al cargar la extensión y pulsar Iniciar. |
+| Pendiente material | Carga manual en Chrome, conversación de prueba sin datos sensibles, calibración de latencia/retención y revisión del panel en funcionamiento. Atención automatizada del modelo no fue implementada ni aprobada. |
+| Vetado | Vigilancia indiscriminada, cookies/credenciales/borradores, otros sitios o pestañas, nube, autoescritura del Metacanon y declaración de atención perpetua. |
 
 Primer propietario: el operador autoriza instanciar el hilo fresco de asistencia mediante el prompt. Al usarlo, identificar la instancia real; si el control sigue sin propietario, adquirirlo por comparación atómica del SHA leído y lectura posterior. No fabricar ID nativo: si la plataforma no lo expone, usar identificador de instancia explícito verificable por el operador, marcado como tal; si no puede verificarse, lectura/propuestas y bloqueo preciso. Este bootstrap no autoriza dos hilos a reclamar ni suplantación. Propietario existente ⇒ STOP de adquisición, sin reemplazarlo.
 
 ## 7. Perfil de entorno
 
-- Actualización del ciclo: última consulta Remote Desktop Commander sin dispositivos Online; PC-14 pasó de Online a Offline. Mensaje propagado informa Windows/perfil C:\Users\PC 13 y autorización del dispositivo pendiente; no acredita identidad ni Escritorio. Código/enlace con código y ruta temporal omitidos deliberadamente de custodia permanente. Entrega autorizada en Escritorio real, ruta a resolver por Windows solo tras vínculo/permiso; paquete/carga/pruebas se verifican por separado.
-
-- Reportado por el operador: Google Chrome, ChatGPT gratuito y conexión RDC en esa plataforma; dos conversaciones previstas. Modelo exacto, límites vigentes, conectividad y capacidad de herramientas NO VERIFICADOS en el equipo.
-- Equipo/sistema operativo, rutas locales, identidad Chrome, versión instalada y recursos: NO VERIFICADOS; no importar datos de otros frentes.
-- Repositorio privado revalidado por búsqueda GitHub en este ciclo; escritura disponible. Plataforma de asistencia actual: Notion, no ChatGPT; no extrapolar herramientas/modelo a ChatGPT. Remote Desktop Commander (RDC): **no utilizado; no necesario para este diagnóstico documental**.
+- Actualización del ciclo: Remote Desktop Commander conectó `PC10RCIF4EI4` (`86580320-19b3-421a-89c7-36dce0123559`), Windows 11 Pro, usuario `MantenimientoRCI`. Windows resolvió el Escritorio como `C:\Users\MantenimientoRCI\Desktop`. La entrega se hizo solo en ese dispositivo en línea; no se equiparó con PC-14 ni con el perfil histórico PC 13.
+- Google Chrome localizado en `C:\Program Files\Google\Chrome\Application\chrome.exe`. Identidad/sesión ChatGPT y carga de la extensión: NO VERIFICADAS.
+- Repositorio privado disponible; código y evidencia persistidos. Plataforma de asistencia actual: Notion. Remote Desktop Commander se utilizó para identidad, ruta, colocación, huellas y prueba sintética del colector; no para capturar una conversación real.
 - Antecedentes: `khora-web/extension/harmonia/`, su contrato de módulos, manifest y telemetría, vistos en bd29c924393fcbd9183100f66b2e50c87b791207. No se certifica instalación; revisar actuales antes de reutilizar. Si la intervención afecta Entorno Persistente o captura de dictados, adquirir previamente las fuentes pertinentes indicadas por AGENTS.md, sin crear arquitectura paralela.
 
 ## 8. Estado vivo
@@ -108,7 +106,7 @@ Primer propietario: el operador autoriza instanciar el hilo fresco de asistencia
 | Persistencia/indexación | Recuperación por criterios, reinicio, duplicados/huecos y retención acordada; carga representativa | SINTÉTICO APROBADO en Windows: 5 eventos, reinicio e integridad; carga real pendiente |
 | Mejora empírica | Caso original + observación humana + diagnóstico + cambio aprobado + regresión + nuevo uso | PENDIENTE |
 
-El objetivo de este ciclo es responsabilidad verificable, contexto recuperado y primer contrato propuesto; no equivale a aceptación del producto. No métricas de fidelidad inventadas, garantías de perfección o proyección temporal sin muestra. Cronología de revisión: intención→criterios→resultado→evidencia→límite; revisión documental no cierra cinco puertas funcionales del marco.
+Este ciclo cierra construcción y entrega del primer paquete, no la aceptación funcional sobre ChatGPT. No se inventan métricas de fidelidad ni latencia antes de la muestra real. Cronología: intención → implementación → prueba sintética → carga humana pendiente → ensayo real → corte empírico.
 
 ### Primer contrato comprobable · antecedente propuesto, NO APROBADO
 
@@ -134,9 +132,11 @@ En revisión 4384c84336a93770e70a484ce0a9708144b7cc99: manifest0.3.5 (blob9bf22c
 
 Mantener los diez campos centrales, en forma legible y compacta, sin pared de texto: 1) frente/rol/sello + Metacanon adquirido, revisión/frescura; 2) dónde estamos; 3) delta de método y proyecto; 4) avance, evidencia/entorno y no tocado; 5) pendientes/bloqueos; 6) viabilidad ligada a intención y aceptación; 7) tiempo/ciclos hasta próximo hito y cierre, supuestos/confianza/deriva o «no estimable» con causa; 8) siguiente acción e intervención material mínima; 9) continuación/prompt ante devolución del constructor o checkpoint del constructor; 10) custodia/revisión/ancla y próximo checkpoint. No esconder campos desconocidos ni repetir auditorías vacías.
 
-Presión de créditos vigente: condensar decisiones y pruebas por riesgo, reutilizar evidencia vigente. Estimación inicial del producto: NO ESTIMABLE sin probar entorno/permisos/captura; próxima entrega documental no requiere acceso remoto. No bajar criterios para dar una fecha cómoda. El control no se acredita por un checklist textual.
+Presión de créditos vigente: condensar decisiones y pruebas por riesgo, reutilizar evidencia vigente. Estimación restante: un ciclo de carga/prueba real tras la intervención humana de Chrome; deriva desconocida si la interfaz actual de ChatGPT cambia selectores o no expone texto transitorio. No bajar criterios para declarar cierre. El control no se acredita por un checklist textual.
 
 ## 11. Crónica y fuentes
+
+- Ciclo actual: `cronica/HARMONIA-ENTREGA-01.md`; evidencia `evidencias/HARMONIA-ENTREGA-01.json`. Código en `apps/harmonia-observability/`; commits `96efc0f736011d3a7b76f2ebd2151d1ab27e9ab4` y `9a1851137e1c01817febe82c87b4f24a2388a917`; estado/custodia en `412b64ebe64055680fae1e2e090bdc8e34097c24`.
 
 - Ciclo actual: `cronica/HARMONIA-OBSERVABILIDAD-01.md`; orden literal `originales/HARMONIA-OBSERVABILIDAD-01.jsonl`; salida preparada `originales/HARMONIA-OBSERVABILIDAD-01-salida.md`; propuesta y trazabilidad16 `propuestas/OBSERVABILIDAD-PLAN-01.md`. Comunicación de Metodología recibida en este chat y fuente de sesión identificada; literal íntegro de esa comunicación aún no copiado al repositorio (laguna explícita, no se reconstruye desde la matriz).
 
