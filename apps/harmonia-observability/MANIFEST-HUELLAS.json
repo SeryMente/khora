@@ -1,6 +1,6 @@
 {
   "schema": "harmonia.source-manifest.v1",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "generatedAt": null,
   "purpose": "Inventario del árbol de fuentes. Las huellas SHA-256 del paquete construido se regeneran en el Escritorio por FINALIZAR-PAQUETE.ps1; nunca incluye credenciales ni datos de captura.",
   "source": "SeryMente/khora main",
@@ -42,6 +42,9 @@
     "verifiedDocumentedFeatures": 40,
     "documentationWeightedPercent": 91,
     "combinedPercentBeforeNaturalObservation": 46,
-    "catalogMirrorRequired": true
+    "catalogMirrorRequired": true,
+    "automaticTabs": true,
+    "debuggerPermissionRemoved": true,
+    "dataRoot": "C:\\Users\\fila4\\AppData\\Local\\Harmonia\\surface-index-v0.3.0\\data"
   }
 }
