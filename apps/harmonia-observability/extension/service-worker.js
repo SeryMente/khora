@@ -1,7 +1,8 @@
 try { importScripts('local-auth.js'); } catch {}
+importScripts('region-policy.js');
 const COLLECTOR='http://127.0.0.1:47321';
 const TOKEN=String(globalThis.HARMONIA_TOKEN||'');
-const STORE={sessions:'harmoniaAutoSessions',enabled:'harmoniaAutoEnabled',events:'harmoniaEventCount',fingerprints:'harmoniaKnownSurfaceFingerprints',repositorySync:'harmoniaRepositorySync'};
+const STORE={sessions:'harmoniaAutoSessions',enabled:'harmoniaAutoEnabled',events:'harmoniaEventCount',fingerprints:'harmoniaKnownSurfaceFingerprints',repositorySync:'harmoniaRepositorySync',regionCoverage:'harmoniaRegionCoverage',regionLeaders:'harmoniaRegionLeaders'};
 const REPO_BUILD_INFO='https://raw.githubusercontent.com/SeryMente/khora/main/apps/harmonia-observability/extension/build-info.json';
 const REPO_CATALOG='https://raw.githubusercontent.com/SeryMente/khora/main/apps/harmonia-observability/coverage-catalog.json';
 const REPO_SYNC_ALARM='harmonia-repository-sync';
@@ -11,31 +12,38 @@ let eventCount=0;
 let lastError=null;
 let collector=false;
 let knownFingerprints=new Set();
+let regionCoverage={};
+let regionLeaders={};
 let surfaceQueue=Promise.resolve();
 const ready=(async()=>{
-  const saved=await chrome.storage.local.get([STORE.sessions,STORE.enabled,STORE.events,STORE.fingerprints]);
+  const saved=await chrome.storage.local.get([STORE.sessions,STORE.enabled,STORE.events,STORE.fingerprints,STORE.regionCoverage,STORE.regionLeaders]);
   sessions=saved[STORE.sessions]||{};
   autoEnabled=saved[STORE.enabled]!==false;
   eventCount=Number(saved[STORE.events]||0);
   knownFingerprints=new Set(Array.isArray(saved[STORE.fingerprints])?saved[STORE.fingerprints]:[]);
+  regionCoverage=saved[STORE.regionCoverage]&&typeof saved[STORE.regionCoverage]==='object'?saved[STORE.regionCoverage]:{};
+  regionLeaders=saved[STORE.regionLeaders]&&typeof saved[STORE.regionLeaders]==='object'?saved[STORE.regionLeaders]:{};
   await chrome.storage.local.set({[STORE.enabled]:autoEnabled});
   const tabs=await chrome.tabs.query({url:'https://chatgpt.com/*'});
   const live=new Set(tabs.filter(tab=>tab.id&&valid(tab.url)).map(tab=>String(tab.id)));
   for(const key of Object.keys(sessions))if(!live.has(key))delete sessions[key];
   await saveSessions();
   await refreshKnownFingerprints();
+  await refreshRegionCoverage();
   await syncRepository();
   chrome.alarms.create(REPO_SYNC_ALARM,{delayInMinutes:1,periodInMinutes:360});
 })();
 let storageQueue=Promise.resolve();
 function saveSessions(){
  const snapshot=Object.fromEntries(Object.entries(sessions).map(([key,session])=>[key,{...session}]));
- const state={[STORE.sessions]:snapshot,[STORE.enabled]:autoEnabled,[STORE.events]:eventCount};
+ const state={[STORE.sessions]:snapshot,[STORE.enabled]:autoEnabled,[STORE.events]:eventCount,[STORE.regionCoverage]:regionCoverage,[STORE.regionLeaders]:regionLeaders};
  storageQueue=storageQueue.then(()=>chrome.storage.local.set(state));
  return storageQueue;
 }
 function headers(extra={}){return {...extra,'x-harmonia-token':TOKEN};}
 function valid(url=''){try{const u=new URL(url);return u.protocol==='https:'&&u.hostname==='chatgpt.com';}catch{return false;}}
+function regionFor(url){return HarmoniaRegionPolicy.classifyRegion(url);}
+function privacyContract(){return {visibleMessageTextCaptured:true,composerTextCaptured:false,fieldValuesCaptured:false,hrefsCaptured:false,imageUrlsCaptured:false,hiddenReasoningCaptured:false,menusExcluded:true,consoleValuesRedacted:true};}
 function safePageUrl(raw){try{const u=new URL(raw);return u.origin+u.pathname.replace(/\/c\/[^/]+/,'/c/[conversation]').replace(/\/g\/[^/]+/,'/g/[gpt]');}catch{return 'https://chatgpt.com/';}}
 async function checkHealth(){
   if(!TOKEN){collector=false;lastError='Falta la credencial local de Harmonia.';return false;}
@@ -112,19 +120,64 @@ async function postEvent(tabId,session,type,payload={},source='extension'){
   const ack=await response.json();
   collector=true;lastError=null;eventCount++;session.events=(session.events||0)+1;session.lastAt=event.capturedAt;
   await saveSessions();
-  return {ok:true,storedType:ack.storedType||type,deduplicated:!!ack.deduplicated,eventId:event.eventId};
+  return {ok:true,storedType:ack.storedType||type,deduplicated:!!ack.deduplicated,eventId:event.eventId,regionExploration:ack.regionExploration||null};
  }catch(error){collector=false;lastError=String(error.message||error);return {ok:false,error:lastError};}
 }
 const sessionInitializers={};
+async function refreshRegionCoverage(){
+ if(!TOKEN)return regionCoverage;
+ try{const response=await fetch(`${COLLECTOR}/coverage`,{headers:headers(),cache:'no-store'});if(!response.ok)throw new Error(`Colector HTTP ${response.status}`);
+  const coverage=await response.json();regionCoverage=coverage.regions&&typeof coverage.regions==='object'?coverage.regions:{};
+  await chrome.storage.local.set({[STORE.regionCoverage]:regionCoverage});
+ }catch(error){lastError='No se pudo actualizar el estado de exploración regional: '+String(error.message||error);}
+ return regionCoverage;
+}
+function regionStatus(key){
+ const state=regionCoverage[key];
+ if(!state)return HarmoniaRegionPolicy.getRegionDescriptor(key).completionSupported?'exploring':'unmapped';
+ if(state.status==='complete'&&state.policyVersion===HarmoniaRegionPolicy.POLICY_VERSION&&state.catalogVersion==='0.1.2')return 'complete';
+ return state.status||'exploring';
+}
+async function ensureRegionLeader(regionKey,preferredTabId){
+ if(regionStatus(regionKey)!=='complete')return null;
+ const tabs=(await chrome.tabs.query({url:'https://chatgpt.com/*'})).filter(t=>regionFor(t.url)===regionKey);
+ const candidate=HarmoniaRegionPolicy.chooseLeader(tabs,regionLeaders[regionKey],preferredTabId);
+ if(candidate===null){delete regionLeaders[regionKey];await chrome.storage.local.set({[STORE.regionLeaders]:regionLeaders});return null;}
+ if(regionLeaders[regionKey]!==candidate){regionLeaders[regionKey]=candidate;await chrome.storage.local.set({[STORE.regionLeaders]:regionLeaders});}
+ return candidate;
+}
+async function canObserveTab(tab){
+ if(!autoEnabled||!tab?.id||!valid(tab.url))return false;
+ const key=regionFor(tab.url);if(regionStatus(key)!=='complete')return true;
+ return (await ensureRegionLeader(key,tab.id))===tab.id;
+}
+async function reconcileRegionLeaders(regionKey,preferredTabId,refresh=false){
+ if(!regionKey)return;if(refresh)await refreshRegionCoverage();
+ if(regionStatus(regionKey)!=='complete'){
+  delete regionLeaders[regionKey];await chrome.storage.local.set({[STORE.regionLeaders]:regionLeaders});
+  if(autoEnabled){const tabs=(await chrome.tabs.query({url:'https://chatgpt.com/*'})).filter(t=>regionFor(t.url)===regionKey);for(const tab of tabs)await injectTab(tab,true);}
+  return;
+ }
+ const tabs=(await chrome.tabs.query({url:'https://chatgpt.com/*'})).filter(t=>regionFor(t.url)===regionKey);
+ const leader=HarmoniaRegionPolicy.chooseLeader(tabs,regionLeaders[regionKey],preferredTabId);
+ if(leader===null){delete regionLeaders[regionKey];await chrome.storage.local.set({[STORE.regionLeaders]:regionLeaders});return;}
+ regionLeaders[regionKey]=leader;await chrome.storage.local.set({[STORE.regionLeaders]:regionLeaders});
+ for(const tab of tabs){if(!tab.id)continue;if(tab.id===leader){if(autoEnabled)await injectTab(tab,true);continue;}
+  try{await chrome.tabs.sendMessage(tab.id,{kind:'harmonia:stop'});}catch{}
+  await stopSession(tab.id,'region-exploration-complete-standby');await removeConsoleBridge(tab.id);
+ }
+}
+
 async function ensureSession(tab){
- const key=String(tab.id);
+ const key=String(tab.id),regionKey=regionFor(tab.url);
  if(sessionInitializers[key])return sessionInitializers[key];
- if(sessions[key])return sessions[key];
  if(!autoEnabled||!tab?.id||!valid(tab.url))return null;
+ if(sessions[key]&&sessions[key].regionKey===regionKey)return sessions[key];
+ if(sessions[key])await stopSession(tab.id,'region-navigation');
  sessionInitializers[key]=(async()=>{
-  const session={id:crypto.randomUUID(),startedAt:new Date().toISOString(),lastAt:null,events:0,url:safePageUrl(tab.url)};
+  const session={id:crypto.randomUUID(),startedAt:new Date().toISOString(),lastAt:null,events:0,url:safePageUrl(tab.url),regionKey};
   sessions[key]=session;await saveSessions();
-  await postEvent(tab.id,session,'capture.started',{url:session.url,version:'0.3.0',mode:'automatic-interface-architecture',privacy:{conversationTextCaptured:false,composerTextCaptured:false,fieldValuesCaptured:false,hrefsCaptured:false,imageUrlsCaptured:false,menusExcluded:true}});
+  await postEvent(tab.id,session,'capture.started',{url:session.url,version:'0.4.0',mode:'automatic-interface-observation',regionKey,privacy:privacyContract()});
   return session;
  })();
  try{return await sessionInitializers[key];}finally{delete sessionInitializers[key];}
@@ -168,65 +221,90 @@ function compactSurface(sanitized){
   privacy:{conversationTextCaptured:false,composerTextCaptured:false,fieldValuesCaptured:false,hrefsCaptured:false,imageUrlsCaptured:false,menusExcluded:true}};
 }
 async function processSurfaceScan(tab,session,payload){
+ payload.regionKey=regionFor(tab.url);payload.regionPolicyVersion=HarmoniaRegionPolicy.POLICY_VERSION;
  const sanitized=sanitizeScan(payload);
  if(!/^[0-9a-f]{64}$/.test(sanitized.fingerprint))throw new Error('La firma estructural no es válida.');
- const alreadyKnown=knownFingerprints.has(sanitized.fingerprint);
- const type=alreadyKnown?'ui.surface.reused':'ui.surface.scan';
- const body=alreadyKnown?compactSurface(sanitized):sanitized;
- const response=await postEvent(tab.id,session,type,body,'page-observer');
+ const alreadyKnown=knownFingerprints.has(sanitized.fingerprint),type=alreadyKnown?'ui.surface.reused':'ui.surface.scan';
+ const response=await postEvent(tab.id,session,type,alreadyKnown?compactSurface(sanitized):sanitized,'page-observer');
  if(!response.ok)return false;
  await rememberFingerprint(sanitized.fingerprint);
+ if(response.regionExploration&&typeof response.regionExploration==='object'){
+  const key=payload.regionKey||regionFor(tab.url);regionCoverage[key]=response.regionExploration;
+  await chrome.storage.local.set({[STORE.regionCoverage]:regionCoverage});await reconcileRegionLeaders(key,tab.id);
+ }
  return true;
 }
 async function onObservedEvent(message,sender){
- const tab=sender.tab;
- if(!autoEnabled||!tab?.id||!valid(tab.url))return false;
+ const tab=sender.tab;if(!autoEnabled||!tab?.id||!valid(tab.url))return false;
  const type=String(message?.event?.type||'');
- if(type!=='ui.surface.scan')return false;
- const session=await ensureSession(tab);
- if(!session)return false;
- const payload=message.event.payload||{};
- const run=()=>processSurfaceScan(tab,session,payload);
- const next=surfaceQueue.then(run,run);
- surfaceQueue=next.catch(error=>{lastError=String(error.message||error);});
- return next;
+ if(!['ui.surface.scan','conversation.visible.delta','console.observed'].includes(type))return false;
+ if(!(await canObserveTab(tab))){try{await chrome.tabs.sendMessage(tab.id,{kind:'harmonia:stop'});}catch{}await stopSession(tab.id,'region-observer-standby');await removeConsoleBridge(tab.id);return false;}
+ const session=await ensureSession(tab);if(!session)return false;
+ const payload=message.event.payload||{},regionKey=regionFor(tab.url);
+ if(type==='ui.surface.scan'){
+  const next=surfaceQueue.then(()=>processSurfaceScan(tab,session,payload),()=>processSurfaceScan(tab,session,payload));
+  surfaceQueue=next.catch(error=>{lastError=String(error.message||error);});return next;
+ }
+ payload.regionKey=regionKey;return (await postEvent(tab.id,session,type,payload,'page-observer')).ok;
 }
 async function stopSession(tabId,reason){
  const key=String(tabId),session=sessions[key];if(!session)return;
  await postEvent(tabId,session,'capture.stopped',{reason,durationMs:Date.now()-Date.parse(session.startedAt)});
  delete sessions[key];await saveSessions();
 }
-async function injectTab(tab){
- if(!autoEnabled||!tab?.id||!valid(tab.url))return;
+function installConsoleBridgeMainWorld(){
+ if(window.__harmoniaConsoleBridgeV1?.installed)return;
+ const originals={};
+ const redact=value=>String(value||'').slice(0,4000).replace(/\\bBearer\\s+[^\\s]+/gi,'Bearer [REDACTED]').replace(/\\bsk-[A-Za-z0-9_-]{12,}\\b/g,'[REDACTED_KEY]').replace(/\\beyJ[A-Za-z0-9_-]{20,}\\.[A-Za-z0-9_-]{10,}\\.[A-Za-z0-9_-]{10,}\\b/g,'[REDACTED_JWT]').replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}/gi,'[REDACTED_EMAIL]').replace(/([?&](?:token|key|auth|code|session|password|secret)=)[^&#\\s]+/gi,'$1[REDACTED]');
+ const summarize=value=>{
+  if(value instanceof Error)return {type:'Error',value:redact(value.name+': '+value.message+' '+String(value.stack||'')).slice(0,2000)};
+  if(typeof value==='string')return {type:'string',value:redact(value).slice(0,1000)};
+  if(value===null)return {type:'null',value:'null'};
+  if(['number','boolean','undefined','bigint','symbol'].includes(typeof value))return {type:typeof value,value:redact(value).slice(0,120)};
+  if(typeof value==='object')return {type:Array.isArray(value)?'array':'object',value:'keys='+Object.keys(value).slice(0,20).join(',')};
+  return {type:typeof value,value:''};
+ };
+ for(const level of ['log','info','warn','error','debug']){if(typeof console[level]!=='function')continue;originals[level]=console[level];const original=console[level].bind(console);console[level]=function(...args){try{window.dispatchEvent(new CustomEvent('harmonia:console-observed',{detail:{level,entries:args.slice(0,10).map(summarize),observedAt:Date.now()}}));}catch{}return original(...args);};}
+ Object.defineProperty(window,'__harmoniaConsoleBridgeV1',{configurable:true,value:{installed:true,originals}});
+}
+async function removeConsoleBridge(tabId){
+ try{await chrome.scripting.executeScript({target:{tabId},world:'MAIN',func:function(){const bridge=window.__harmoniaConsoleBridgeV1;if(!bridge?.originals)return;for(const [level,original] of Object.entries(bridge.originals))try{console[level]=original;}catch{}try{delete window.__harmoniaConsoleBridgeV1;}catch{}}});}catch{}
+}
+
+async function injectTab(tab,force=false){
+ if(!autoEnabled||!tab?.id||!valid(tab.url))return;if(!force&&!(await canObserveTab(tab)))return;
  try{
-  await chrome.scripting.executeScript({target:{tabId:tab.id},files:['content.js']});
-  await chrome.tabs.sendMessage(tab.id,{kind:'harmonia:start',automatic:true});
+  await chrome.scripting.executeScript({target:{tabId:tab.id},world:'MAIN',func:installConsoleBridgeMainWorld});
+  await chrome.scripting.executeScript({target:{tabId:tab.id},files:['region-policy.js','content.js']});
+  await chrome.tabs.sendMessage(tab.id,{kind:'harmonia:start',automatic:true,regionKey:regionFor(tab.url)});
  }catch(error){lastError='No se pudo activar observación en una pestaña: '+String(error.message||error);}
 }
-async function injectExistingTabs(tabs){
- for(const tab of tabs||[]){if(!valid(tab.url))continue;await injectTab(tab);}
-}
+async function injectExistingTabs(tabs){for(const tab of tabs||[]){if(valid(tab.url))await injectTab(tab);}}
 async function setAutoEnabled(value){
- await ready;autoEnabled=!!value;
- await chrome.storage.local.set({[STORE.enabled]:autoEnabled});
+ await ready;autoEnabled=!!value;await chrome.storage.local.set({[STORE.enabled]:autoEnabled});
  const tabs=await chrome.tabs.query({url:'https://chatgpt.com/*'});
  if(autoEnabled)await injectExistingTabs(tabs);
- else for(const tab of tabs){if(!tab.id)continue;try{await chrome.tabs.sendMessage(tab.id,{kind:'harmonia:stop'});}catch{}await stopSession(tab.id,'automatic-capture-paused');}
+ else for(const tab of tabs){if(!tab.id)continue;try{await chrome.tabs.sendMessage(tab.id,{kind:'harmonia:stop'});}catch{}await stopSession(tab.id,'automatic-capture-paused');await removeConsoleBridge(tab.id);}
  return {autoEnabled,activeTabs:Object.keys(sessions).length};
 }
 chrome.runtime.onMessage.addListener((message,sender,respond)=>{
  (async()=>{
   await ready;
-  if(message.kind==='harmonia:auto-settings')return {enabled:autoEnabled};
+  if(message.kind==='harmonia:auto-settings')return {enabled:autoEnabled,observe:autoEnabled?await canObserveTab(sender.tab):false,regionKey:sender.tab?.url?regionFor(sender.tab.url):null};
+  if(message.kind==='harmonia:open-dashboard'){
+   const url=chrome.runtime.getURL('dashboard.html'),tabs=await chrome.tabs.query({url});
+   if(tabs[0]?.id){await chrome.tabs.update(tabs[0].id,{active:true});return {opened:true,reused:true,tabId:tabs[0].id};}
+   const tab=await chrome.tabs.create({url});return {opened:true,reused:false,tabId:tab.id};
+  }
   if(message.kind==='harmonia:sync-repository')return syncRepository();
   if(message.kind==='harmonia:get'){
-   await checkHealth();
+   await checkHealth();await refreshRegionCoverage();
    const syncData=await chrome.storage.local.get([STORE.repositorySync]);
    let coverage=null;
    if(collector){try{const response=await fetch(`${COLLECTOR}/coverage`,{headers:headers(),cache:'no-store'});if(response.ok)coverage=await response.json();else throw new Error(`Colector HTTP ${response.status}`);}catch(error){lastError=String(error.message||error);}}
-   return {version:'0.3.0',autoEnabled,active:autoEnabled&&Object.keys(sessions).length>0,activeTabs:Object.keys(sessions).length,
-    sessions:Object.entries(sessions).map(([tabId,session])=>({tabId,startedAt:session.startedAt,lastAt:session.lastAt,events:session.events})),
-    collector,lastError,events:eventCount,coverage,repositorySync:syncData[STORE.repositorySync]||null};
+   return {version:'0.4.0',autoEnabled,active:autoEnabled&&Object.keys(sessions).length>0,activeTabs:Object.keys(sessions).length,
+    sessions:Object.entries(sessions).map(([tabId,session])=>({tabId,startedAt:session.startedAt,lastAt:session.lastAt,events:session.events,regionKey:session.regionKey})),
+    regionCoverage,regionLeaders,collector,lastError,events:eventCount,coverage,repositorySync:syncData[STORE.repositorySync]||null};
   }
   if(message.kind==='harmonia:set-auto')return setAutoEnabled(message.enabled);
   if(message.kind==='harmonia:event'&&sender.tab?.id)return onObservedEvent(message,sender);
@@ -234,14 +312,20 @@ chrome.runtime.onMessage.addListener((message,sender,respond)=>{
  })().then(value=>respond({ok:true,value})).catch(error=>respond({ok:false,error:String(error.message||error)}));
  return true;
 });
-chrome.tabs.onRemoved.addListener(tabId=>{void ready.then(()=>stopSession(tabId,'tab-closed'));});
-chrome.tabs.onUpdated.addListener((tabId,changeInfo,tab)=>{
- void ready.then(async()=>{
-  if(!autoEnabled)return;
-  if(tab?.url&&!valid(tab.url))await stopSession(tabId,'tab-left-chatgpt');
- });
-});
-void ready.then(async()=>{if(autoEnabled)await injectExistingTabs(await chrome.tabs.query({url:'https://chatgpt.com/*'}));});
+chrome.tabs.onRemoved.addListener(tabId=>{void ready.then(async()=>{
+ const previous=sessions[String(tabId)],regionKey=previous?.regionKey;await stopSession(tabId,'tab-closed');if(regionKey)await reconcileRegionLeaders(regionKey,undefined,true);
+});});
+chrome.tabs.onUpdated.addListener((tabId,changeInfo,tab)=>{void ready.then(async()=>{
+ if(!changeInfo.url||!tab?.url)return;
+ const previous=sessions[String(tabId)],oldRegion=previous?.regionKey;
+ if(!valid(tab.url)){await stopSession(tabId,'tab-left-chatgpt');await removeConsoleBridge(tabId);if(oldRegion)await reconcileRegionLeaders(oldRegion,undefined,true);return;}
+ const nextRegion=regionFor(tab.url);
+ if(oldRegion&&oldRegion!==nextRegion)await stopSession(tabId,'region-navigation');
+ if(autoEnabled)await injectTab(tab);
+ if(oldRegion&&oldRegion!==nextRegion)await reconcileRegionLeaders(oldRegion,undefined,true);
+ await reconcileRegionLeaders(nextRegion,tabId,true);
+});});
+void ready.then(async()=>{if(autoEnabled){const tabs=await chrome.tabs.query({url:'https://chatgpt.com/*'});await injectExistingTabs(tabs);for(const key of Object.keys(regionCoverage))await reconcileRegionLeaders(key);}});
 chrome.alarms.onAlarm.addListener(alarm=>{if(alarm.name===REPO_SYNC_ALARM)void syncRepository();});
 chrome.runtime.onInstalled.addListener(()=>{void ready.then(async()=>{chrome.alarms.create(REPO_SYNC_ALARM,{delayInMinutes:1,periodInMinutes:360});await syncRepository();if(autoEnabled)await injectExistingTabs(await chrome.tabs.query({url:'https://chatgpt.com/*'}));});});
 chrome.runtime.onStartup.addListener(()=>{void ready.then(async()=>{chrome.alarms.create(REPO_SYNC_ALARM,{delayInMinutes:1,periodInMinutes:360});await syncRepository();if(autoEnabled)await injectExistingTabs(await chrome.tabs.query({url:'https://chatgpt.com/*'}));});});
