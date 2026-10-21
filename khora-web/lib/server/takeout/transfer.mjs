@@ -1,9 +1,9 @@
-/** Takeout transfer kernel 0.1.0. Server-only. No cookies, arbitrary URLs, disks or LLMs.
+/** Takeout transfer kernel 0.2.0. Server-only. No cookies, arbitrary URLs, disks or LLMs.
  * This is not an HTTP route or durable queue. Trusted adapters must enforce owner,
  * OAuth grants, quota, durable locking/CAS, retention and encryption of receipts.
  */
 import { createHash, randomUUID } from 'node:crypto';
-export const TRANSFER_VERSION = '0.1.0';
+export const TRANSFER_VERSION = '0.2.0';
 export const CHUNK_BYTES = 8 * 1024 * 1024;
 export const MAX_ARCHIVE_BYTES = 50 * 1024 ** 3;
 const DRIVE = 'https://www.googleapis.com/drive/v3/files/';
@@ -76,7 +76,7 @@ export function validateReceipt(r,owner) {
     assert(p && p.start===offset && integer(p.bytes) && p.bytes===Math.min(CHUNK_BYTES,r.size-offset) && p.bytes>0 && hashPattern.test(p.sha256) && typeof p.reference==='string' && p.reference.length>0 && p.reference.length<=2000,'RECEIPT_PART_INVALID');
     offset+=p.bytes;
   }
-  assert(offset<=r.size&&r.next_offset===offset&&['transferring','stored_verified'].includes(r.status),'RECEIPT_STATE_INVALID');
+  assert(offset<=r.size&&r.next_offset===offset&&['transferring','downloaded','stored_verified'].includes(r.status),'RECEIPT_STATE_INVALID');
   assert(r.status==='transferring'?offset<r.size:offset===r.size,'RECEIPT_STATE_INVALID');
   assert(r.status==='stored_verified'?hashPattern.test(r.archive_sha256):r.archive_sha256===null,'RECEIPT_DIGEST_INVALID');
   return r;
@@ -103,9 +103,9 @@ async function readVerified(store,r,part) {
  * The encrypted write may remain orphaned after a failed read/CAS; preserve it for
  * bounded reconciliation, never delete originals or pretend rollback occurred.
  */
-export async function advanceTransfer({receipt,owner,accessToken,store,fetcher=fetch}) {
+async function advanceTransferInternal({receipt,owner,accessToken,store,fetcher=fetch},finalize) {
   const r=structuredClone(validateReceipt(receipt,owner)); adaptersValid(store);
-  if(r.status==='stored_verified') return r;
+  if(r.status==='stored_verified'||r.status==='downloaded') return r;
   await metadata(fetcher,r.file_id,accessToken,r);
   const start=r.next_offset,end=Math.min(r.size-1,start+CHUNK_BYTES-1),length=end-start+1;
   const response=await request(fetcher,r.file_id,accessToken,{range:`bytes=${start}-${end}`});
@@ -122,7 +122,8 @@ export async function advanceTransfer({receipt,owner,accessToken,store,fetcher=f
   assert(typeof reference==='string'&&reference.length>0&&reference.length<=2000,'STORE_REFERENCE_INVALID');
   const part={start,bytes:length,sha256:digest(raw),reference};
   await readVerified(store,r,part); r.parts.push(part);r.next_offset=end+1;
-  if(r.next_offset===r.size) {
+  if(r.next_offset===r.size&&!finalize) r.status='downloaded';
+  if(r.next_offset===r.size&&finalize) {
     const hash=createHash('sha256');
     for(const p of r.parts) hash.update(await readVerified(store,r,p));
     r.archive_sha256=hash.digest('hex');r.status='stored_verified';
@@ -139,4 +140,17 @@ export async function verifyRestoration({receipt,owner,store}) {
   for(const p of r.parts){const data=await readVerified(store,r,p);hash.update(data);bytes+=data.length;}
   assert(bytes===r.size&&hash.digest('hex')===r.archive_sha256,'RESTORATION_INTEGRITY_FAILED');
   return {verified:true,bytes,sha256:r.archive_sha256};
+}
+
+/** Bounded production entry: one range, one encrypted write and independent
+ * readback. Completion means downloaded, NEVER stored_verified/corpus complete.
+ * Whole-archive verification is a separately checkpointed phase. */
+export async function advanceTransferChunk(args){return advanceTransferInternal(args,false)}
+/** Legacy full finalization retained only for existing bounded laboratory tests.
+ * Production Workflows MUST call advanceTransferChunk, not this function. */
+export async function advanceTransfer(args){return advanceTransferInternal(args,true)}
+export async function readTransferPart({receipt,owner,store,index}){
+ const r=validateReceipt(receipt,owner);adaptersValid(store);
+ assert(Number.isInteger(index)&&index>=0&&index<r.parts.length,'PART_INDEX_INVALID');
+ return readVerified(store,r,r.parts[index]);
 }
