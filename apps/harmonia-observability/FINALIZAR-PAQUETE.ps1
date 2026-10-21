@@ -85,7 +85,7 @@ try {
     }
     $package | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $root 'MANIFEST-HUELLAS.json') -Encoding UTF8
     $readback = Get-Content -LiteralPath (Join-Path $root 'MANIFEST-HUELLAS.json') -Raw | ConvertFrom-Json
-    if ($readback.version -ne '0.2.0' -or $readback.runtime.nodeExeSha256 -ne $exeHash) { throw 'Falló la lectura de vuelta del manifiesto de huellas.' }
+    if ($readback.version -ne '0.3.0' -or $readback.runtime.nodeExeSha256 -ne $exeHash) { throw 'Falló la lectura de vuelta del manifiesto de huellas.' }
     'HASH_MANIFEST=VALID'
     'HASHED_FILES=' + $hashes.Count
     'NODE_VERSION=' + (& $node --version).Trim()
