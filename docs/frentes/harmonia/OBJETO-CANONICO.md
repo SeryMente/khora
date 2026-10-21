@@ -4,7 +4,7 @@
 ## 1. Control e identidad
 
 - Nombre normalizado: **Harmonia**, extensión compañera de **Khora**; «Armonía» y «Cora» de los dictados se conservan literalmente en originales. No renombrar producto o repositorio por transcripción.
-- Identificador del frente: `harmonia`. Versión del objeto **0.11**; sello **HARMONIA-v0.11**; corte de estado **2026-10-21**. Este corte registra el candidato v0.4.0 en la rama `feat/harmonia-e2e-20261021`, añade el catálogo de comprobaciones/criterios E2E y enlaza la crónica del ciclo. No declara CI ni prueba física aprobadas, no se ha fusionado con `main` y conserva las versiones anteriores como historial.
+- Identificador del frente: `harmonia`. Versión del objeto **0.12**; sello **HARMONIA-v0.12**; corte de estado **2026-10-21**. Este corte registra el candidato v0.4.0, la PR #333 en borrador, el primer fallo de CI y la actualización del workflow para preservar diagnósticos. No declara aceptación técnica ni física, no se ha fusionado con `main` y conserva las versiones anteriores como historial.
 - Repositorio propietario: `SeryMente/khora`, rama `main`; objeto canónico en `docs/frentes/harmonia/OBJETO-CANONICO.md`. El blob de la versión anterior v0.4 fue `9a186ea789ea5aacab8dd06cf9f6edf364b89531`. Primera publicación del estado completo: commit `892adad897d6bd36c797ec2343ff7f4893b853bf`; lectura de vuelta en `main` confirmada y blob verificado `03ec5d127e0913dfe1f61e8588ba53b8abaa8e5f`. El recibo se refiere al contenido integral v0.5. Corte v0.6: commit inicial `3cb7901c2223cd41773185b93f17133e459e7a69`, blob `d1f524c383cc71c13f89e8d3aa3886ac3533fcdb`. Corte v0.7: commit inicial `55c2e8ba053265c219b2d941665c5cb3730107de`, blob `bbd08e2da15be17486e7515fd11eda7df57fca2b`; lectura de vuelta y corrección del catálogo documentadas. Nunca anticipar un SHA.
 - Fuente de código vigente: `apps/harmonia-observability/` en `main`, con la extensión de observabilidad y captura automática en evolución (rama `main`, versión de código en revisión E2E), `coverage-catalog.json` y scripts/validador. No inferir que el código fuente, el paquete local y el runtime ejecutado están sincronizados sin prueba de huellas. El paquete materializado en el Escritorio se reconstruyó desde esos archivos y contiene solo el runtime portable y una credencial local excluidos del repositorio; su manifiesto local de huellas se regeneró tras las validaciones.
 - Frente permanente por creación expresa del operador. El paquete local usado anteriormente está en `C:\\Users\\fila4\\Desktop\\Harmonia-Observabilidad-v0.2.0`; su sincronización con las últimas versiones de `main` **NO VERIFICADA**. El runtime debe considerarse desincronizado hasta comparar huellas y reiniciar con el colector actualizado. La versión 0.3.0 del código fuente no está aceptada funcionalmente en Chrome; no hereda pruebas de v0.1.0 ni de validaciones anteriores.
@@ -102,7 +102,7 @@ Resto del método vigente aplicable por pertinencia; citas históricas, ejemplos
 
 ## 8. Estado vivo
 
-**🔄 Estado operativo al 2026-10-21 · candidato v0.11 / código Harmonia v0.4.0:** el control de responsabilidad sigue en generación 2. Los requisitos de aceptación proceden exclusivamente del verbatim del operador; este OCP distingue código presente de comportamiento probado. La rama candidata es `feat/harmonia-e2e-20261021`; no se ha fusionado ni se ha activado producción. `main` conserva el corte canónico v0.10 hasta que el candidato supere revisión/CI y se autorice el flujo correspondiente.
+**🔄 Estado operativo al 2026-10-21 · candidato v0.12 / código Harmonia v0.4.0:** el control de responsabilidad sigue en generación 2. Los requisitos de aceptación proceden exclusivamente del verbatim del operador; este OCP distingue código presente de comportamiento probado. La rama candidata es `feat/harmonia-e2e-20261021`; no se ha fusionado ni se ha activado producción. `main` conserva el corte canónico v0.10 hasta que el candidato supere revisión/CI y se autorice el flujo correspondiente.
 
 **Gobierno adquirido y revisado en este ciclo:** Metacanon 1.19 / `METACANON-OBJETOS-v1.19`, blob `76fddd36a79e02340b7f4620cca8851cf8e305ac`; Sam v339 / `NX-339m`, blob `fdc996078bd611492e46d6b3abf569fbb4a6effa`; GOW v2.2, blob `6d4f8aff292ae173d9ceeba03694597bd2f16488`; INICIO blob `4dd3e16b61405c0bf60afead4054af6f36b7f917`. Cascada de Sam revisada manualmente; `MCP-NORMATIVO: DESACTIVADO`. La antigüedad exacta del último commit de Metacanon no se consultó: NO VERIFICADA.
 
@@ -128,7 +128,7 @@ Resto del método vigente aplicable por pertinencia; citas históricas, ejemplos
 - Popup reducido a estado/pausa y apertura del panel; dashboard en pestaña propia, reutilizable y con refresco mientras está visible.
 - Integración del colector con saneamiento por tipo, índices/originales locales y estado regional; pruebas de contrato/política y prueba HTTP local de colector definida.
 
-**Verificación realmente realizada:** lectura de vuelta individual de los archivos editados en la rama y escritura de una crónica del ciclo. **No se ha ejecutado todavía** el workflow CI, `node --check`, el validador estático ni las pruebas `node --test` en un runner; no declarar PASS hasta recuperar los resultados. La existencia de tests es evidencia de código de prueba, no de que pasaron.
+**Verificación realmente realizada:** lectura de vuelta de los archivos editados y crónica, creación de PR [#333](https://github.com/SeryMente/khora/pull/333) en borrador. El primer run #12 de `Harmonia validation` terminó en `failure`; también fallaron `UI Quality`, `khora-ok / gate` y `CI`. El conector devolvió pasos vacíos y el endpoint de logs respondió `404 BlobNotFound`, por lo que la causa exacta sigue NO VERIFICADA. Se actualizó el workflow en commit `4629dcba608a59aebf911fab3a6ac96db70c1ae7` para generar códigos separados y cargar diagnósticos; al último sondeo aún no aparecía un run posterior para ese commit. No declarar PASS. La existencia de tests es evidencia de código de prueba, no de que pasaron.
 
 **Entorno físico:** el paquete local histórico está en `C:\\Users\\fila4\\Desktop\\Harmonia-Observabilidad-v0.2.0`; la carpeta única objetivo es `C:\\Users\\fila4\\Desktop\\Harmonia`. El Escritorio y Chrome NO fueron tocados. Continúa bloqueado el acceso remoto por la discrepancia RDC documentada en §16.5/§17. No se han obtenido capturas reales, lecturas del runtime actual ni huellas del paquete instalado.
 
@@ -150,7 +150,7 @@ La aceptación E2E continúa **ABIERTA**. El control de titularidad quedó confi
 | Multiámbito | Clasificador de rutas y estado por región; solo conversación posee catálogo de completitud | BASE IMPLEMENTADA; arquitectura extensible de módulos/contratos aún incompleta |
 | UI principal en su propio tab | `dashboard.html/js/css`, el service worker abre/reutiliza tab | IMPLEMENTADO EN CÓDIGO; UX aún no revisada en Chrome |
 | Popup limitado a lo esencial | Estado, pausa/reanudación, abrir panel | IMPLEMENTADO EN CÓDIGO; falta verificación visual |
-| Primera versión entregable sin esperar optimización posterior | Rama candidata v0.4.0 separada, diseñada para PR de revisión y CI sin tocar producción | CANDIDATO PREPARADO; PR/CI todavía pendientes al redactar este corte |
+| Primera versión entregable sin esperar optimización posterior | Rama candidata v0.4.0 separada y PR [#333](https://github.com/SeryMente/khora/pull/333) en borrador | CANDIDATO PREPARADO; CI inicial fallido, run diagnóstico posterior pendiente |
 | Optimización sin sacrificar calidad | Deltas/chunks, batch de consola, huellas y no duplicar observador al completar región | PARCIAL; CPU/RAM/latencia/cobertura no medidos |
 | Catálogo/build-info/sincronización de metadatos | Build-info versionado y UI de sync | IMPLEMENTADO EN CÓDIGO; ejecución de sincronización no probada |
 | Autenticación, CORS, persistencia, redacción y completitud regional | Pruebas automáticas definidas con colector en directorio temporal | TESTS DEFINIDOS; resultado CI pendiente |
@@ -159,9 +159,9 @@ La aceptación E2E continúa **ABIERTA**. El control de titularidad quedó confi
 | Revisión del verbatim en fuente canónica | Se intentó persistencia literal, bloqueada por la herramienta; se declaró la laguna sin eludirla | VERBATIM CANÓNICO NO PERSISTIDO; original sigue siendo el mensaje del operador |
 
 Orden operativo:
-1. Abrir PR en borrador desde `feat/harmonia-e2e-20261021`, sin merge ni deployment.
-2. Consultar CI real, reparar cualquier fallo y releer resultados/logs.
-3. Actualizar OCP/README/prompt con el PR, checks, commits y resultados verificados.
+1. **✅ PR #333 abierta en borrador**, no fusionada; no hacer merge ni deployment.
+2. Consultar los resultados asociados al commit `4629dcba608a59aebf911fab3a6ac96db70c1ae7`; recoger el artefacto de diagnóstico si aparece y reparar cada fallo con evidencia. El run #12 inicial falló sin logs recuperables.
+3. Actualizar OCP/README/prompt después de cada fix, con nuevo commit, blob y resultado real.
 4. Reintentar al final la reconciliación RDC mediante registros autorizados; no asumir que los nombres iguales implican IDs equivalentes.
 5. Solo con el equipo identificado, instalar/cargar, probar captura natural multi-tab, guardar el paquete gestionado únicamente en `C:\\Users\\fila4\\Desktop\\Harmonia`, medir recursos y comparar cobertura con referencia.
 6. La aceptación se cierra solo al tener evidencia real de persistencia, actualización regional, ausencia de colisiones, métricas y fidelidad de captura.
@@ -172,7 +172,7 @@ Conservar los diez campos obligatorios de Metacanon §4. En este corte: próximo
 
 El candidato está en `feat/harmonia-e2e-20261021`; no se debe fusionar en `main` sin revisar el workflow productivo de Khora. En cada arreglo de CI: registrar el error observado, el cambio, la huella nueva y la lectura de vuelta en la crónica; después actualizar este OCP y el prompt de asistente.
 
-Evidencia del ciclo actual: [crónica E2E 02](cronica/HARMONIA-E2E-02-20261021.md), blob `c36245b204ac405ef7b3a536efb682ac127c5a7e`. Estado de CI y PR: aún no comprobado/creado al emitir esta revisión del OCP.
+Evidencia del ciclo actual: [crónica E2E 02](cronica/HARMONIA-E2E-02-20261021.md), commit de actualización `8aecbf6c8484597670cbb8888025a5cc584f07ee`, blob `64ede27b90906fb32163427858fc5d00a34ec2dd`. PR [#333](https://github.com/SeryMente/khora/pull/333) abierta en borrador. CI inicial fallido; causa NO VERIFICADA y run diagnóstico posterior pendiente.
 
 ## 11. Crónica y fuentes
 
@@ -180,7 +180,7 @@ Evidencia del ciclo actual: [crónica E2E 02](cronica/HARMONIA-E2E-02-20261021.m
 - Ciclos anteriores: `cronica/HARMONIA-OBSERVABILIDAD-01.md`, originales `originales/HARMONIA-OBSERVABILIDAD-01.jsonl`, salida `originales/HARMONIA-OBSERVABILIDAD-01-salida.md`, propuesta `propuestas/OBSERVABILIDAD-PLAN-01.md`, y ciclo `cronica/HARMONIA-REANUDACION-01.md` con originales y salida en los archivos ya citados por v0.4.
 - Semilla inicial: `cronica/HARMONIA-INSTANCIACION-01.md`, originales `originales/HARMONIA-INSTANCIACION-01-operador.jsonl`, `originales/PROCEDENCIA.md` y evidencia `evidencias/HARMONIA-INSTANCIACION-01-revision.json`. Cobertura limitada a los mensajes directos archivados; no representa toda la conversación.
 - Transferencia de titularidad de este ciclo: [cronica/HARMONIA-TRANSFER-RESPONSABILIDAD-20261021.md](cronica/HARMONIA-TRANSFER-RESPONSABILIDAD-20261021.md), commit `8ec0d113524034bef30a7101c0d7814ede89927e`, blob `fc00e82957f3997bb450b4cb8d0de717ce3f6d82`; conserva el folio, el cambio de generación, los SHA, los límites y las salidas visibles emitidas en el ciclo.
-- Ciclo E2E 02 (rama candidata): [cronica/HARMONIA-E2E-02-20261021.md](cronica/HARMONIA-E2E-02-20261021.md), commit `46459fec4398291ce98e1b90fe706860635aab60`, blob `c36245b204ac405ef7b3a536efb682ac127c5a7e`; relaciona las capacidades construidas, las huellas de los archivos, las pruebas aún no ejecutadas, los bloqueos y el resultado del intento de conservar el verbatim literal.
+- Ciclo E2E 02 (rama candidata): [cronica/HARMONIA-E2E-02-20261021.md](cronica/HARMONIA-E2E-02-20261021.md), blob vigente `64ede27b90906fb32163427858fc5d00a34ec2dd`; conserva el candidato, el fallo inicial de CI, la ausencia de logs recuperables y el workflow diagnóstico actualizado.
 - Método central referenciado: `https://github.com/SeryMente/metodologia/blob/main/METACANON-OBJETOS-CANONICOS.md`, versión 1.10 / sello METACANON-OBJETOS-v1.10, hash y revisión descritos en §3. La frescura exige una nueva consulta cuando se reanude; no asumir que permanece sin cambios.
 - Gobierno obligatorio actualizado: Sam v339 / `NX-339m`, blob `fdc996078bd611492e46d6b3abf569fbb4a6effa`; GOW v2.2, blob `6d4f8aff292ae173d9ceeba03694597bd2f16488`; INICIO blob `4dd3e16b61405c0bf60afead4054af6f36b7f917`. Fuentes releídas desde `SeryMente/metodologia/main` para este ciclo; antigüedad exacta del último commit de Metacanon NO VERIFICADA.
 - Fuentes técnicas históricas: `https://developer.chrome.com/docs/extensions/develop/concepts/content-scripts` y `https://developer.chrome.com/docs/extensions/reference/api/debugger`. Referencias no equivalen a permiso de instrumentar.
@@ -358,9 +358,9 @@ Control de responsabilidad actualizado en este OCP v0.10: generación **2**, fol
 
 ### Prioridades de continuación
 
-1. **✅ Titularidad resuelta:** folio `SES-20261021-K7M4Q9P2`, generación 2, lectura de vuelta verificada. En esta sesión no volver a preguntar la autorización ya emitida.
-2. **✅ Candidato inicial construido, aceptación abierta:** rama `feat/harmonia-e2e-20261021`, código v0.4.0 con contenido visible, política regional, dashboard propio, popup esencial, build-info y pruebas. No se ha fusionado con `main`.
-3. **Siguiente paso inmediato:** abrir PR en borrador, sin merge, disparar/consultar CI y reparar los fallos que efectivamente aparezcan. En cada ciclo conservar error, fix, hashes y read-back.
+1. **✅ Titularidad resuelta:** folio `SES-20261021-K7M4Q9P2`, generación 2, lectura de vuelta verificada. No volver a preguntar la autorización ya emitida en esta sesión.
+2. **✅ Candidato v0.4.0 construido:** rama `feat/harmonia-e2e-20261021`, PR [#333](https://github.com/SeryMente/khora/pull/333) abierta como borrador; no fusionada.
+3. **⚠️ CI inicial fallido, diagnóstico incompleto:** `Harmonia validation` run 12 falló y otros gates existentes también fallaron. Los pasos/logs no se pudieron recuperar; no se inventa una causa. Workflow diagnóstico actualizado en commit `4629dcba608a59aebf911fab3a6ac96db70c1ae7`, con artifact upload; consultar ese run y reparar evidencia por evidencia antes de declarar PASS.
 4. **Criterio regional:** solo conversación tiene catálogo de completitud (todas las capacidades, mínimo cinco huellas y dos sesiones). Las otras regiones no se consideran exploradas por completo. Validar en pruebas que, una vez completo, solo un tab permanezca observando y que el líder se reevalúe al cerrar/navegar.
 5. **Privacidad y datos:** se capturan textos visibles user/assistant porque forman parte del objetivo; no borradores, valores de campos, URLs completas, URLs de imágenes ni razonamiento oculto. Redacción de consola heurística: no garantía contra todo secreto. La primera prueba natural debe ser una conversación sin datos sensibles.
 6. **Desempeño:** no certificar ahorro de CPU/RAM ni conservación de cobertura hasta medir frente a una referencia no optimizada. El chunking y los lotes son una estrategia candidata, no una medición.
