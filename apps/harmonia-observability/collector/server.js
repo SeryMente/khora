@@ -2,6 +2,7 @@ const http=require('http');
 const fs=require('fs');
 const path=require('path');
 const crypto=require('crypto');
+const regionPolicy=require('../extension/region-policy.js');
 const HOST='127.0.0.1',PORT=Number(process.env.HARMONIA_PORT||47321),MAX=1024**3,MAX_REQUEST=1_000_000,MAX_SEEN_EVENTS=20000,MAX_INDEXED_SURFACES=5000;
 const TOKEN=String(process.env.HARMONIA_TOKEN||'');
 if(!TOKEN)throw new Error('HARMONIA_TOKEN is required; load the local auth config first.');
@@ -40,26 +41,29 @@ function sanitizeLayout(layout){
 function sanitizeSurface(event){
  const p=event.payload||{};
  if(typeof p.fingerprint!=='string'||!/^[0-9a-f]{64}$/.test(p.fingerprint))throw Error('invalid-surface-fingerprint');
+ const rawRegion=text(p.regionKey,32),regionKey=['conversation','home','project','gpt','search','share','other'].includes(rawRegion)?rawRegion:'other';
  const controls=Array.isArray(p.controls)?p.controls.slice(0,100).map(sanitizeControl):[];
- const sheets=sanitizeStyleSheets(p.stylesheets);
- const counts=p.counts||{};
- return {schema:'harmonia.surface.v1',fingerprint:p.fingerprint,catalogVersion:text(p.catalogVersion,24),features:listStrings(p.features,100,120),
-  controls,structure:sanitizeStructure(p.structure),stylesheets:sheets,
+ const sheets=sanitizeStyleSheets(p.stylesheets),counts=p.counts||{};
+ return {schema:'harmonia.surface.v1',fingerprint:p.fingerprint,catalogVersion:text(p.catalogVersion,24),regionKey,
+  regionPolicyVersion:text(p.regionPolicyVersion,24),features:listStrings(p.features,100,120),controls,
+  structure:sanitizeStructure(p.structure),stylesheets:sheets,
   viewport:p.viewport&&typeof p.viewport==='object'?{width:number(p.viewport.width),height:number(p.viewport.height),devicePixelRatio:number(p.viewport.devicePixelRatio,1)}:null,
   layout:sanitizeLayout(p.layout),
   counts:{controls:controls.length,userMessages:number(counts.userMessages),assistantMessages:number(counts.assistantMessages),styleSheets:number(counts.styleSheets,sheets.length)},
-  privacy:{conversationTextCaptured:false,composerTextCaptured:false,fieldValuesCaptured:false,hrefsCaptured:false,imageUrlsCaptured:false,menusExcluded:true},
+  privacy:{visibleMessageTextCaptured:true,composerTextCaptured:false,fieldValuesCaptured:false,hrefsCaptured:false,imageUrlsCaptured:false,hiddenReasoningCaptured:false,menusExcluded:true},
   firstObservedAt:event.capturedAt,firstSessionId:event.sessionId,firstEventId:event.eventId};
 }
 function compactReference(surface,record){
- return {fingerprint:surface.fingerprint,surfaceRef:record.surfaceFile,catalogVersion:surface.catalogVersion,features:surface.features,
-  controlCount:surface.controls.length,nodeCount:surface.structure.total,stylesheetCount:surface.stylesheets.length,viewport:surface.viewport,
-  privacy:{conversationTextCaptured:false,composerTextCaptured:false,fieldValuesCaptured:false,hrefsCaptured:false,imageUrlsCaptured:false,menusExcluded:true}};
+ return {fingerprint:surface.fingerprint,surfaceRef:record.surfaceFile,catalogVersion:surface.catalogVersion,regionKey:surface.regionKey,
+  regionPolicyVersion:surface.regionPolicyVersion,features:surface.features,controlCount:surface.controls.length,nodeCount:surface.structure.total,
+  stylesheetCount:surface.stylesheets.length,viewport:surface.viewport,
+  privacy:{visibleMessageTextCaptured:true,composerTextCaptured:false,fieldValuesCaptured:false,hrefsCaptured:false,imageUrlsCaptured:false,hiddenReasoningCaptured:false,menusExcluded:true}};
 }
 function updateCoverage(event,details={}){
  if(event.type!=='ui.surface.scan'&&event.type!=='ui.surface.reused')return;
  const features=catalog.features.filter(f=>f.scope!=='out'),p=event.payload||{};
- const previous=index.coverage||{observedFeatureIds:[],unknownControls:[],scanCount:0,deduplicatedScans:0};
+ const previous=index.coverage||{observedFeatureIds:[],unknownControls:[],scanCount:0,deduplicatedScans:0,regions:{}};
+ if(!previous.regions||typeof previous.regions!=='object')previous.regions={};
  const featureIds=listStrings(details.features||p.features,100,120).filter(id=>features.some(f=>f.id===id));
  previous.observedFeatureIds=[...new Set([...(previous.observedFeatureIds||[]),...featureIds])].sort();
  const unknown=Array.isArray(details.unknownControlSignatures)?details.unknownControlSignatures:(Array.isArray(p.controls)?p.controls:[]).filter(control=>!control.testId&&!control.label).map(control=>[text(control.tag,24),text(control.role,40),text(control.type,24)].join('|')).filter(Boolean);
@@ -83,7 +87,56 @@ function updateCoverage(event,details={}){
  previous.verifiedSourceCount=sourceIds.size;previous.pendingDocumentationIds=features.filter(f=>!documented(f)).map(f=>f.id);
  previous.pendingObservationIds=features.filter(f=>!previous.observedFeatureIds.includes(f.id)).map(f=>f.id);
  previous.unknownControlCount=previous.unknownControls.length;previous.uniqueSurfaceCount=index.uniqueSurfaceCount;
- index.coverage=previous;
+ const rawRegion=text(p.regionKey,32),regionKey=['conversation','home','project','gpt','search','share','other'].includes(rawRegion)?rawRegion:'other';
+ const region=previous.regions[regionKey]||{regionKey,observedFeatureIds:[],surfaceFingerprints:[],sessionIds:[],scanCount:0,status:'exploring'};
+ region.observedFeatureIds=[...new Set([...(region.observedFeatureIds||[]),...featureIds])].sort();
+ region.surfaceFingerprints=[...new Set([...(region.surfaceFingerprints||[]),text(p.fingerprint,64)].filter(Boolean))].slice(-500);
+ region.sessionIds=[...new Set([...(region.sessionIds||[]),event.sessionId])].slice(-100);
+ region.scanCount=(region.scanCount||0)+1;region.lastScanAt=event.capturedAt;region.lastSessionId=event.sessionId;
+ region.catalogVersion=String(catalog.version||'');region.requiredCatalogVersion=String(catalog.version||'');region.policyVersion=regionPolicy.POLICY_VERSION;
+ const required=regionPolicy.getRegionDescriptor(regionKey).completionSupported?features.map(f=>f.id):[];
+ const evaluation=regionPolicy.evaluateExploration(region,required,{regionKey});
+ Object.assign(region,{status:evaluation.status,complete:evaluation.complete,requiredCount:evaluation.requiredCount,observedCount:evaluation.observedCount,
+  missingFeatureIds:evaluation.missingFeatureIds,distinctSurfaceCount:evaluation.distinctSurfaceCount,sessionCount:evaluation.sessionCount,
+  reason:evaluation.reason,updatedAt:event.capturedAt});
+ previous.regions[regionKey]=region;index.coverage=previous;
+}
+function redactConsoleValue(value,max=1000){
+ return String(value||'').slice(0,max)
+  .replace(/\bBearer\s+[^\s]+/gi,'Bearer [REDACTED]')
+  .replace(/\bsk-[A-Za-z0-9_-]{12,}\b/g,'[REDACTED_KEY]')
+  .replace(/\beyJ[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b/g,'[REDACTED_JWT]')
+  .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi,'[REDACTED_EMAIL]')
+  .replace(/([?&](?:token|key|auth|code|session|password|secret)=)[^&#\s]+/gi,'$1[REDACTED]');
+}
+function sanitizeVisibleDelta(p){
+ const role=p&&['user','assistant'].includes(p.role)?p.role:'';
+ const validKey=typeof p?.messageKey==='string'&&/^(user|assistant):[0-9]{1,4}$/.test(p.messageKey);
+ const operation=['append','replace','complete'].includes(p?.operation)?p.operation:'';
+ if(!role||!validKey||!operation)throw Error('invalid-visible-message-contract');
+ const delta=operation==='append'?String(p.delta||'').slice(0,100000):'';
+ const content=operation==='replace'?String(p.text||'').slice(0,100000):'';
+ if(operation==='append'&&!delta)throw Error('empty-visible-message-delta');
+ if(operation==='replace'&&!content)throw Error('empty-visible-message-replacement');
+ const sha=typeof p.contentSha256==='string'&&/^[0-9a-f]{64}$/i.test(p.contentSha256)?p.contentSha256.toLowerCase():'';
+ return {regionKey:['conversation','home','project','gpt','search','share','other'].includes(p.regionKey)?p.regionKey:'other',
+  messageKey:p.messageKey,role,index:number(p.index),operation,delta,text:content,contentSha256:sha,
+  visible:p.visible===true,streaming:p.streaming===true,truncated:p.truncated===true,hiddenReasoningCaptured:false};
+}
+function sanitizeConsoleEvent(p){
+ const level=['log','info','warn','error','debug'].includes(p?.level)?p.level:'log';
+ const entries=Array.isArray(p?.entries)?p.entries.slice(0,10).map(item=>({type:text(item?.type,24),value:redactConsoleValue(item?.value,1000)})):[];
+ return {regionKey:['conversation','home','project','gpt','search','share','other'].includes(p?.regionKey)?p.regionKey:'other',
+  level,entries,observedAt:text(p?.observedAt,40),source:'page-console-bridge',redactionsApplied:true};
+}
+function sanitizeStoredPayload(event){
+ const p=event.payload||{};
+ if(event.type==='capture.started')return {url:safeSessionUrl(p.url),version:text(p.version,24),mode:text(p.mode,60),regionKey:text(p.regionKey,32),
+  privacy:{visibleMessageTextCaptured:true,composerTextCaptured:false,fieldValuesCaptured:false,hrefsCaptured:false,imageUrlsCaptured:false,hiddenReasoningCaptured:false,menusExcluded:true,consoleValuesRedacted:true}};
+ if(event.type==='capture.stopped')return {reason:text(p.reason,80),durationMs:Math.max(0,number(p.durationMs))};
+ if(event.type==='conversation.visible.delta')return sanitizeVisibleDelta(p);
+ if(event.type==='console.observed')return sanitizeConsoleEvent(p);
+ return {reason:'event-suppressed'};
 }
 function atomicWrite(file,value){
  fs.mkdirSync(path.dirname(file),{recursive:true});
@@ -105,7 +158,7 @@ function recordEvent(event,res){
  if(!validUUID(event.eventId)||!validUUID(event.sessionId)||typeof event.type!=='string'||!event.type||!event.capturedAt)throw Error('invalid-event-identity');
  const replay=index.seenEventIds[event.eventId];
  if(replay)return {duplicate:true,storedType:replay.storedType||event.type,ordinal:replay.ordinal||0};
- if(!/^ui\.surface\.(scan|reused)$|^capture\./.test(event.type))throw Error('event-type-out-of-scope');
+ if(!/^ui\.surface\.(scan|reused)$|^capture\./.test(event.type)&&!['conversation.visible.delta','console.observed'].includes(event.type))throw Error('event-type-out-of-scope');
  const when=Date.parse(event.capturedAt);if(!Number.isFinite(when))throw Error('invalid-event-date');
  if(event.type==='ui.surface.scan'||event.type==='ui.surface.reused'){
   const surface=sanitizeSurface(event),fingerprint=surface.fingerprint,day=new Date(when).toISOString().slice(0,10);
@@ -132,10 +185,10 @@ function recordEvent(event,res){
   updateCoverage(stored,{features:record.features,unknownControlSignatures:record.unknownControlSignatures,controlCount:record.controlCount,nodeCount:record.nodeCount,stylesheetCount:record.stylesheetCount});
   index.seenEventIds[event.eventId]={capturedAt:event.capturedAt,sessionId:event.sessionId,storedType,ordinal:session.events};
   pruneSeenEventIds();persist();
-  return {duplicate:false,storedType,ordinal:session.events,deduplicated:!isNewSurface,surfaceRef:record.surfaceFile};
+  return {duplicate:false,storedType,ordinal:session.events,deduplicated:!isNewSurface,surfaceRef:record.surfaceFile,regionExploration:index.coverage&&index.coverage.regions&&index.coverage.regions[surface.regionKey]||null};
  }
  const day=new Date(when).toISOString().slice(0,10),file=path.join(originalsDir,day,event.sessionId+'.jsonl');
- const stored={schema:'harmonia.event.v1',eventId:event.eventId,sessionId:event.sessionId,conversation:typeof event.conversation==='string'?event.conversation.slice(0,80):null,type:event.type,source:text(event.source,40),capturedAt:new Date(when).toISOString(),payload:event.type==='capture.started'?{url:safeSessionUrl(event.payload&&event.payload.url),version:text(event.payload&&event.payload.version,24),mode:text(event.payload&&event.payload.mode,60),privacy:{conversationTextCaptured:false,composerTextCaptured:false,fieldValuesCaptured:false,hrefsCaptured:false,imageUrlsCaptured:false,menusExcluded:true}}:event.type==='capture.stopped'?{reason:text(event.payload&&event.payload.reason,80),durationMs:Math.max(0,number(event.payload&&event.payload.durationMs))}:{reason:'event-suppressed'}};
+ const stored={schema:'harmonia.event.v1',eventId:event.eventId,sessionId:event.sessionId,conversation:typeof event.conversation==='string'?event.conversation.slice(0,80):null,type:event.type,source:text(event.source,40),capturedAt:new Date(when).toISOString(),payload:sanitizeStoredPayload(event)};
  const line=JSON.stringify(stored)+'\n',bytes=Buffer.byteLength(line);
  if(index.totalBytes+bytes>MAX){index.stopped=true;persist();return {tooLarge:true};}
  fs.appendFileSync(file,line,'utf8');index.totalBytes+=bytes;
@@ -169,7 +222,7 @@ const server=http.createServer((req,res)=>{
    const event=JSON.parse(body),result=recordEvent(event,res);
    if(result.tooLarge)return reply(req,res,507,{error:'storage-limit-stop-no-deletion'});
    if(result.duplicate)return reply(req,res,200,{ok:true,eventId:event.eventId,duplicate:true,storedType:result.storedType,ordinal:result.ordinal});
-   return reply(req,res,201,{ok:true,eventId:event.eventId,ordinal:result.ordinal,storedType:result.storedType,deduplicated:result.deduplicated,surfaceRef:result.surfaceRef||null});
+   return reply(req,res,201,{ok:true,eventId:event.eventId,ordinal:result.ordinal,storedType:result.storedType,deduplicated:result.deduplicated,surfaceRef:result.surfaceRef||null,regionExploration:result.regionExploration||null});
   }catch(error){return reply(req,res,400,{error:String(error.message||error)});}
  });
 });
