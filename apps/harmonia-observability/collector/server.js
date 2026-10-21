@@ -24,7 +24,9 @@ function updateCoverage(event){
  previous.lastVisibleFeatureIds=Array.isArray(p.features)?p.features:[];previous.lastControlCount=Array.isArray(p.controls)?p.controls.length:0;
  previous.lastNodeCount=p.structure?.total||0;
  const totalWeight=features.reduce((n,f)=>n+featureWeight(f),0);
- const docs=features.filter(f=>Array.isArray(f.docs)&&f.docs.length>0);
+ const verifiedSourceIds=new Set(catalog.sources.filter(source=>source.verificationStatus==='content-read').map(source=>source.id));
+ const isDocumented=feature=>Array.isArray(feature.docs)&&feature.docs.some(id=>verifiedSourceIds.has(id));
+ const docs=features.filter(isDocumented);
  const observed=features.filter(f=>previous.observedFeatureIds.includes(f.id));
  const docWeight=docs.reduce((n,f)=>n+featureWeight(f),0);
  const observedWeight=observed.reduce((n,f)=>n+featureWeight(f),0);
@@ -32,7 +34,8 @@ function updateCoverage(event){
  previous.documentation={covered:docs.length,total:features.length,weightedPoints:docWeight,totalWeightedPoints:totalWeight,percent:Math.round(100*docWeight/totalWeight)};
  previous.naturalObservation={covered:observed.length,total:features.length,weightedPoints:observedWeight,totalWeightedPoints:totalWeight,percent:Math.round(100*observedWeight/totalWeight)};
  previous.combinedPercent=Math.round(100*(docWeight+observedWeight)/(2*totalWeight));
- previous.pendingDocumentationIds=features.filter(f=>!f.docs?.length).map(f=>f.id);
+ previous.verifiedSourceCount=verifiedSourceIds.size;
+ previous.pendingDocumentationIds=features.filter(f=>!isDocumented(f)).map(f=>f.id);
  previous.pendingObservationIds=features.filter(f=>!previous.observedFeatureIds.includes(f.id)).map(f=>f.id);
  previous.unknownControlCount=previous.unknownControls.length;
  index.coverage=previous;
