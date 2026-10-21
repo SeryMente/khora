@@ -3,9 +3,9 @@
 ## 1. Control e identidad
 
 - Identidad conservada: `MCP-OBS-DICTADO`; extensión documental de dictado, benchmark, retroalimentación y propuesta de voz/síntomas.
-- Versión: **v0.6.44**; sello **MCP-OBS-DICTADO-v0.6.44**. Objeto permanente por encargo V010; no declara permanente ninguna propuesta clínica.
-- Estado: **C052 · EDITORIAL LIVEb1; CHAT/INGRESO AUTH RECUPERADOS; PRUEBA HUMANA/PROVEEDORES/BLOG/FACEBOOK PENDIENTES**.
-- Ancla actual: C052, integración editorial34ac y promoción única b1; C051, retroalimentación real del operador y orden de corregir/publicar en producción; C050, orden expresa de resolver almacenamiento gratuito cifrado y pruebas/configuración realizadas desde PC10RCIF4EI4 y navegador compartido. Producción canónica https://khora-web.vercel.app sirveb1d7d995df941f26da893e594e49bed778a38acf, candidata khora-rjl1blnkt, alias/API verificados tras promoción única.4ff209f/dpl_3jg86dPcWcMBYsFJaKu9V8UT294t es rollback conocido de C052, no runtime actual.6d es antecedente. GE4/d94 y91d72939 se conservan como antecedentes/rollback, no runtime vigente. Estado único §8/C050; C049 y anteriores son historia.
+- Versión: **v0.6.45**; sello **MCP-OBS-DICTADO-v0.6.45**. Objeto permanente por encargo V010; no declara permanente ninguna propuesta clínica.
+- Estado: **C053 · IDENTIDAD META API VERIFICADA/PARCHE FOCAL PROBADO; META REAUTH Y DESPLIEGUE BLOQUEADOS; NO PUBLICACIÓN REAL**.
+- Ancla actual: C053, reautenticación Meta rechazada y corrección independiente del identificador API, sin cambio runtime; C052, integración editorial34ac y promoción única b1; C051, retroalimentación real del operador y orden de corregir/publicar en producción; C050, orden expresa de resolver almacenamiento gratuito cifrado y pruebas/configuración realizadas desde PC10RCIF4EI4 y navegador compartido. Producción canónica https://khora-web.vercel.app sirveb1d7d995df941f26da893e594e49bed778a38acf, candidata khora-rjl1blnkt, alias/API verificados tras promoción única.4ff209f/dpl_3jg86dPcWcMBYsFJaKu9V8UT294t es rollback conocido de C052, no runtime actual.6d es antecedente. GE4/d94 y91d72939 se conservan como antecedentes/rollback, no runtime vigente. Estado único §8/C050; C049 y anteriores son historia.
 - Repositorio propietario: `SeryMente/khora`, privado comprobado con herramienta en este ciclo. `SeryMente/metodologia` también privado: aporta el método, no recibe datos del frente.
 - Carpeta contenedora: `docs/frentes/dictado-voz/`; elemento único de estado: `OBJETO-CANONICO.md`. Carpeta y elemento no se confunden.
 - Revisión de origen del objeto: `1697ee2693ed3217523ffc1d1be9b6541d7d849d`, blob `e98a956c375ce48b791b5f0563ad0ae03c2616dd`.
@@ -14,7 +14,7 @@
 
 ## 2. LEER PRIMERO
 
-C052 vigente: leer §8 primero; recuperación editorial y custodia de propuestas publicadas técnicamente, sin acreditar proveedores ni primera publicación.
+C053 vigente: leer §8 y evidencias/C053-identidad-meta.md primero; C052 es el último runtime acreditado, no publicación externa. Antecedente:  recuperación editorial y custodia de propuestas publicadas técnicamente, sin acreditar proveedores ni primera publicación.
 
 C051 histórico: leer §8 primero. Reemplaza la semántica histórica verde=versión instantánea completa durante dictado por verde=punto conjunto confirmado, con alcance y tramo vivo explícitos; no debilita custodia ni original. «Momento» conserva su etiqueta amigable por orden posterior del operador. C050 es antecedente de producción, no cierre del recorrido Blog/Facebook.
 
@@ -197,6 +197,14 @@ Autenticación C025: dos flujos estándar por dispositivo, autorizados en navega
 ## 8. Estado vivo
 
 ### 🔄 Estado vivo
+
+### C053 — Identidad API verificada, corrección probada; Meta/operación pendientes
+
+Acción en curso: central resolvió la diferencia entre identificador público de Tercer Ámbito61595788700651 y API1354217727781437 mediante Graph autenticado+tareas CREATE_CONTENT+/me y redirección pública comprobada. Parche mínimo provider-config/dispatch/pruebas preparado en rama fix/blog-meta-api-identity-c053-20261021, base exacta3613a230 (runtimeb1 más dos documentos);19/19 nuevas pruebas0skip y tipos estrictos5.9.3ES2017 aprobados. No fullbuild/deploy/publicación ni env instaladas; runtime C052 no sustituido por este registro.
+
+Bloqueo duro actual: Meta rechazó dos veces reautenticación específica para secreto de app; no seguir reintentando el valor ni cambiar contraseña sin autorización. La sesión de Facebook y permisos de Página se verificaron, pero no equivalen a credencial duradera/configuración/env/primera publicación. Primer token accidentalmente expuesto fue revocado con success=true; nunca copiarlo a docs. RDC propios todos offline en4613; nuevo log aún esperando autorización no acredita equipo operativo.
+
+Siguiente paso atómico: resolver control de Meta desde sesión legítima y acceso operativo de despliegue; después configurar menor alcance/probar candidata/promoción única/entrada exacta aprobada y verificar recibos Blog→Facebook. Mientras falta esa intervención se agotó el cambio independiente seguro de ID/candados/pruebas/persistencia. Chat E79 y Takeout avanzan bajo sus propios encargos; no convertir sus reportes en entrega central ni promover por mensaje. Detalles, instrucciones, errores y límites en evidencias/C053-identidad-meta.md. Sin costos nuevos, sin modificación B2/audio/captura/corpus/DB ni configuraciones Takeout.
 
 ### C052 — Recuperación editorial integrada y publicada
 
@@ -494,6 +502,8 @@ Toda salida conserva diez campos, agrupables sin ocultarlos: (1) proyecto/rol/se
 No llamar «sin cambios» a una fuente inaccesible; no convertir calidad científica o clínica en semáforo por pruebas de software. Si no hay constructor nuevo asignado, decirlo y no inventar trabajo en segundo plano.
 
 ## 11. Crónica y fuentes
+
+C053: ciclo, originales pertinentes, pruebas y límites exactos en evidencias/C053-identidad-meta.md. No se persisten secretos ni enlaces efímeros.
 
 ### C051 — Crónica personal, Backblaze y coherencia del corpus
 
@@ -956,6 +966,8 @@ El operador reporta botón desactivado con rótulo de espera. Se confirma depend
 
 ## 12. Reinstanciación
 
+C053 ACTUAL: continuar este central desde §8, rama fix/blog-meta-api-identity-c053-20261021 base3613, sin nuevo handoff. El login Meta no elimina la reautenticación del secreto; no usar ID público como API. Runtime b1 sigue último acreditado; no adoptar instrucciones antiguas como STOP actual.
+
 C049: retomar §8 y evidencia C049-almacenamiento.md con este central y roles §5, sin repetir migración ni construir sustituto Blog. Objetivo pendiente Hito1 live; primer bloqueo material decisión/provisión de almacenamiento gratuito acotado, sin facturación ni lectura indiscriminada de secretos. Producción91d729 no es HEAD4fb3. No prometer copia de Blob inaccesible ni asumir vigentes permisos de otros equipos/sesiones.
 
 C048: continuar en las dos sesiones vigentes §5, no reemitir handoff ni adoptar STOP/roles antiguos. §8 contiene el checkpoint único. No hay permiso para otros equipos, portapapeles, tokens, migraciones o publicaciones por leer este expediente.
@@ -997,6 +1009,8 @@ El expediente Git es portable; /data del hilo antiguo NO se supone compartido. R
 ````
 
 ## 13. Persistencia y revisión
+
+C053: mismo Elemento permanente privado y trece bloques/AnexoA conservados; delta central mínimo4rutas de código/prueba y evidencia/doc. Relectura exacta por commit requerida; tipos/pruebas focales no equivalen a Next/proveedores/publicación.
 
 C048: mismo Elemento permanente autorizado dentro de carpeta privada existente; no canon/tablero nuevo. Trece bloques y AnexoA preservados. Manifiesto añade solo delta y conserva huellas históricas sin fingir relectura de todo anexo antiguo. Copia del adjunto redactada explícitamente; raw conhash/puntero separado, no identidad binaria ficticia. Readback Git exacto de todos los archivos de este delta requerido antes de afirmar guardado.
 
