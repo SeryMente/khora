@@ -255,13 +255,14 @@ async function stopSession(tabId,reason){
 }
 function installConsoleBridgeMainWorld(){
  if(window.__harmoniaConsoleBridgeV1?.installed)return;
- const originals={};
+ const originals={},handlers=[];
  const redact=value=>String(value||'').slice(0,4000)
   .replace(/\bBearer\s+[^\s]+/gi,'Bearer [REDACTED]')
   .replace(/\bsk-[A-Za-z0-9_-]{12,}\b/g,'[REDACTED_KEY]')
   .replace(/\beyJ[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b/g,'[REDACTED_JWT]')
   .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi,'[REDACTED_EMAIL]')
   .replace(/([?&](?:token|key|auth|code|session|password|secret)=)[^&#\s]+/gi,'$1[REDACTED]');
+ const emit=(level,entries)=>{try{window.dispatchEvent(new CustomEvent('harmonia:console-observed',{detail:{level,entries:entries.slice(0,10),observedAt:Date.now()}}));}catch{}};
  const summarize=value=>{
   if(value instanceof Error)return {type:'Error',value:redact(value.name+': '+value.message+' '+String(value.stack||'')).slice(0,2000)};
   if(typeof value==='string')return {type:'string',value:redact(value).slice(0,1000)};
@@ -270,13 +271,29 @@ function installConsoleBridgeMainWorld(){
   if(typeof value==='object')return {type:Array.isArray(value)?'array':'object',value:'keys='+Object.keys(value).slice(0,20).join(',')};
   return {type:typeof value,value:''};
  };
- for(const level of ['log','info','warn','error','debug']){if(typeof console[level]!=='function')continue;originals[level]=console[level];const original=console[level].bind(console);console[level]=function(...args){try{window.dispatchEvent(new CustomEvent('harmonia:console-observed',{detail:{level,entries:args.slice(0,10).map(summarize),observedAt:Date.now()}}));}catch{}return original(...args);};}
- Object.defineProperty(window,'__harmoniaConsoleBridgeV1',{configurable:true,value:{installed:true,originals}});
+ for(const level of ['log','info','warn','error','debug']){
+  if(typeof console[level]!=='function')continue;
+  originals[level]=console[level];const original=console[level].bind(console);
+  console[level]=function(...args){emit(level,args.slice(0,10).map(summarize));return original(...args);};
+ }
+ const onError=event=>emit('error',[{type:'uncaught-error',value:redact(event?.message||'Uncaught page error').slice(0,2000)}]);
+ const onRejection=event=>{
+  const reason=event?.reason;
+  const value=reason instanceof Error?reason.name+': '+reason.message:(typeof reason==='string'?reason:(reason&&typeof reason==='object'?'Promise rejection object keys='+Object.keys(reason).slice(0,20).join(','):String(reason)));
+  emit('error',[{type:'unhandled-rejection',value:redact(value).slice(0,2000)}]);
+ };
+ window.addEventListener('error',onError);handlers.push(['error',onError]);
+ window.addEventListener('unhandledrejection',onRejection);handlers.push(['unhandledrejection',onRejection]);
+ Object.defineProperty(window,'__harmoniaConsoleBridgeV1',{configurable:true,value:{installed:true,originals,handlers}});
 }
 async function removeConsoleBridge(tabId){
- try{await chrome.scripting.executeScript({target:{tabId},world:'MAIN',func:function(){const bridge=window.__harmoniaConsoleBridgeV1;if(!bridge?.originals)return;for(const [level,original] of Object.entries(bridge.originals))try{console[level]=original;}catch{}try{delete window.__harmoniaConsoleBridgeV1;}catch{}}});}catch{}
+ try{await chrome.scripting.executeScript({target:{tabId},world:'MAIN',func:function(){
+  const bridge=window.__harmoniaConsoleBridgeV1;if(!bridge)return;
+  for(const [level,original] of Object.entries(bridge.originals||{}))try{console[level]=original;}catch{}
+  for(const [name,handler] of bridge.handlers||[])try{window.removeEventListener(name,handler);}catch{}
+  try{delete window.__harmoniaConsoleBridgeV1;}catch{}
+ }});}catch{}
 }
-
 async function injectTab(tab,force=false){
  if(!autoEnabled||!tab?.id||!valid(tab.url))return;if(!force&&!(await canObserveTab(tab)))return;
  try{
