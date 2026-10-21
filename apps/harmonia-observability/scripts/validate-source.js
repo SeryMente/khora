@@ -43,7 +43,7 @@ assert.match(content,/hiddenReasoningCaptured:false/);
 assert.match(worker,/importScripts\('region-policy\.js'\)/);
 assert.match(worker,/harmonia:open-dashboard/);
 assert.match(worker,/consoleValuesRedacted:true/);
-assert.match(worker,/await canObserveTab\(tab\)\)return false/);
+assert.match(worker,/await canObserveTab\(tab\)\)\)return false/);
 assert.match(collector,/sanitizeVisibleDelta/);
 assert.match(collector,/sanitizeConsoleEvent/);
 assert.match(collector,/previous\.regions\[regionKey\]=region/);
