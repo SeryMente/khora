@@ -5,7 +5,7 @@ const crypto=require('crypto');
 const HOST='127.0.0.1',PORT=47321,MAX=1024**3,MAX_REQUEST=1_000_000;
 const TOKEN=String(process.env.HARMONIA_TOKEN||'');
 if(!TOKEN)throw new Error('HARMONIA_TOKEN is required; load the local auth config first.');
-const root=process.env.HARMONIA_DATA||path.join(process.env.LOCALAPPDATA||process.cwd(),'Harmonia','data');
+const root=process.env.HARMONIA_DATA||'C:\\Users\\fila4\\AppData\\Local\\Harmonia\\surface-index-v0.2.0\\data';
 fs.mkdirSync(root,{recursive:true});
 const idxPath=path.join(root,'index.json');
 let index={schema:'harmonia.index.v1',updatedAt:null,sessions:{},totalBytes:0,stopped:false};
