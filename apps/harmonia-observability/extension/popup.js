@@ -21,7 +21,7 @@ function sourceList(){
   for(const source of catalog.sources||[]){
     const row=document.createElement('div');row.className='source-row';
     const id=document.createElement('span');id.textContent=source.id;
-    const link=document.createElement('a');link.href=source.url;link.target='_blank';link.rel='noopener noreferrer';link.textContent=source.title;
+    const link=document.createElement('a');link.href=source.url;link.target='_blank';link.rel='noopener noreferrer';link.textContent=source.title+(source.verificationStatus==='content-read'?' · leído '+(source.checkedAt||''):' · pendiente de leer');
     row.append(id,link);box.append(row);
   }
 }
@@ -31,7 +31,7 @@ function pendingList(observed){
   for(const f of pending.slice(0,12)){
     const row=document.createElement('div');row.className='pending-item';
     const state=[];
-    if(!f.docs?.length)state.push('sin fuente oficial enlazada');
+    if(!isDocumented(f))state.push('sin fuente oficial leída');
     if(!observed.has(f.id))state.push('no observada naturalmente');
     row.textContent=f.label+' — '+state.join('; ');box.append(row);
   }
@@ -46,7 +46,9 @@ async function paint(){
     const state=result.value||{},coverage=state.coverage||{};
     const features=(catalog.features||[]).filter(f=>f.scope!=='out');
     const totalWeight=features.reduce((n,f)=>n+weights(f),0);
-    const documentedWeight=features.filter(f=>Array.isArray(f.docs)&&f.docs.length>0).reduce((n,f)=>n+weights(f),0);
+    const verifiedSources=new Set((catalog.sources||[]).filter(source=>source.verificationStatus==='content-read').map(source=>source.id));
+    const isDocumented=feature=>Array.isArray(feature.docs)&&feature.docs.some(id=>verifiedSources.has(id));
+    const documentedWeight=features.filter(isDocumented).reduce((n,f)=>n+weights(f),0);
     const observed=new Set(coverage.observedFeatureIds||[]);
     const observedFeatures=features.filter(f=>observed.has(f.id));
     const observedWeight=observedFeatures.reduce((n,f)=>n+weights(f),0);
