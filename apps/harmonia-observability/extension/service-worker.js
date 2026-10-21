@@ -56,7 +56,7 @@ chrome.debugger.onEvent.addListener((src,method,params)=>{
  if(!state.active||src.tabId!==state.tabId)return;
  if(method==='Runtime.consoleAPICalled')emit('console.message',{level:params.type,argCount:(params.args||[]).length,argTypes:(params.args||[]).map(a=>a.type||'unknown'),timestamp:params.timestamp},'chrome.debugger');
  else if(method==='Runtime.exceptionThrown')emit('console.exception',{exceptionType:params.exceptionDetails?.exception?.type||null,lineNumber:params.exceptionDetails?.lineNumber||null,columnNumber:params.exceptionDetails?.columnNumber||null},'chrome.debugger');
- else if(method==='Log.entryAdded'){const e=params.entry||{};let pagePath=null;try{const u=new URL(e.url||'');pagePath=u.origin+u.pathname.replace(/\\/c\\/[^/]+/,'/c/[conversation]').replace(/\\/g\\/[^/]+/,'/g/[gpt]');}catch{}emit('console.entry',{source:e.source||null,level:e.level||null,url:pagePath,textLength:String(e.text||'').length,timestamp:e.timestamp||null},'chrome.debugger');}
+ else if(method==='Log.entryAdded'){const e=params.entry||{};let pagePath=null;try{const u=new URL(e.url||'');pagePath=u.origin+u.pathname.replace(/\/c\/[^/]+/,'/c/[conversation]').replace(/\/g\/[^/]+/,'/g/[gpt]');}catch{}emit('console.entry',{source:e.source||null,level:e.level||null,url:pagePath,textLength:String(e.text||'').length,timestamp:e.timestamp||null},'chrome.debugger');}
 });
 chrome.debugger.onDetach.addListener((src,reason)=>{if(state.active&&src.tabId===state.tabId)stop(`debugger-detached:${reason}`);});
 chrome.tabs.onRemoved.addListener(id=>{if(state.active&&id===state.tabId)stop('tab-closed');});
