@@ -1,35 +1,48 @@
-HARMONIA · MAPA DE LA INTERFAZ CONVERSACIONAL · v0.3.0
+HARMONIA · OBSERVABILIDAD LOCAL DE CHATGPT
+Versión fuente: 0.4.0 · candidata para revisión · Manifest V3.
+Chrome real y paquete del Escritorio: NO VERIFICADOS.
 
-OBJETIVO
-Primera fase: reunir un inventario empírico y documental de la superficie conversacional de ChatGPT accesible desde Chrome. El índice mide cobertura del mapeo, no la completitud funcional de la extensión. Configuración, menús de cuenta y navegación general quedan fuera del alcance.
+PROPÓSITO
+Una vez cargada en Chrome y con el colector local activo, Harmonia observa automáticamente las pestañas de chatgpt.com. Conserva eventos locales, estructura de interfaz, estilos resumidos y mensajes visibles para reconstruir la evolución de la interfaz. No instala la extensión por sí sola ni garantiza atención continua de un modelo.
 
-ANTES DE CARGAR LA EXTENSIÓN
-1. Ejecute INICIAR-HARMONIA.cmd y confirme SERVICE=STARTED o SERVICE=ALREADY_RUNNING.
-2. El arranque genera extension\local-auth.js con una credencial local aleatoria. Ese archivo está excluido de Git; no lo comparta ni lo copie a repositorios.
-3. Cuando el colector quede en HEALTH=OK, abra chrome://extensions, active el modo desarrollador y seleccione Cargar descomprimida.
-4. Seleccione la carpeta extension dentro de este paquete.
-5. Tras recargar la extensión una vez, el mapeo arranca automáticamente en todas las pestañas `https://chatgpt.com/` abiertas y en las que se abran después. No hay que pulsar Iniciar en cada pestaña; el popup permite pausar/reanudar globalmente.
-6. Navega de forma natural. El popup recalcula el índice al consultar el estado; cada cambio estructural relevante se persiste.
-7. Para comprobar el índice desde consola, ejecuta CONSULTAR-HARMONIA.cmd -Coverage. Al recargar el código en chrome://extensions, Chrome puede reiniciar el contexto de la extensión.
+CAPTURA
+- Estructura DOM resumida, roles/etiquetas de controles, señales de interfaz, CSS resumido y viewport.
+- Texto renderizado de mensajes de usuario y asistente mediante innerText en nodos de mensaje identificados, capturando reemplazos, fragmentos incrementales y la transición a respuesta completa.
+- Los mensajes grandes se envían en fragmentos ordenados de 80.000 caracteres; cada nodo se limita a 2.000.000 de caracteres y marca truncamiento si excede ese límite.
+- Métodos console.log/info/warn/error/debug de la página, con redacción heurística de patrones de tokens, JWT, claves y correos.
+- Huellas SHA-256, sesión, pestaña, región, tipo de evento y marca temporal.
 
-ÍNDICE DE COMPLETITUD
-- Documentación oficial: proporción ponderada de capacidades del catálogo con al menos una fuente pública oficial leída y enlazada; el catálogo marca las fuentes verificadas y su fecha de revisión.
-- Corte del catálogo en esta versión: 44 capacidades, 16 fuentes oficiales leídas; 40 capacidades tienen al menos una fuente oficial leída (91% de puntos ponderados, antes de la observación natural). Este corte no equivale a un mapeo exhaustivo de todas las cuentas y despliegues.
-- Observación natural: proporción ponderada de capacidades cuya presencia se detectó en una pestaña durante la navegación.
-- Índice combinado: media de las dos proporciones ponderadas. Las capacidades centrales pesan el doble que las de soporte.
-- Los controles sin clasificar quedan contabilizados aparte para revisión. Añadir capacidades nuevas al catálogo aumenta el denominador, evita inflar artificialmente el porcentaje y mantiene visible el trabajo pendiente.
-- Una característica observada no implica que se haya probado su funcionamiento. Las diferencias de plan, región y despliegue pueden cambiar la interfaz visible.
+EXCLUSIONES Y PRIVACIDAD
+No lee borradores del compositor, valores de campos, URLs completas, URLs de imágenes, cookies ni razonamiento interno oculto. El texto de mensajes sí se almacena deliberadamente en el banco local porque es un requisito de observabilidad. Los valores de consola pueden incluir información sensible; la redacción heurística no detecta todos los secretos. La primera prueba real debe utilizar una conversación sin datos sensibles. El panel no publica el banco en servicios externos.
 
-ALCANCE Y PRIVACIDAD
-El observador automático recopila metadatos estructurales de la región principal, etiquetas accesibles de controles, roles, clases/atributos estructurales, recuentos de elementos y metadatos acotados de estilos. No guarda el texto de los mensajes, el texto escrito en el compositor, los valores de campos, URLs de enlaces, URLs de imágenes ni el HTML bruto. Omite menús, diálogos y navegación. Ninguna extensión puede garantizar que todos los metadatos visibles estén libres de información sensible; revise antes de exportar y no publique los JSONL.
-No captura cookies, contraseñas, borradores ni otras pestañas. No accede a razonamiento privado no expuesto por la interfaz. La continuidad del observador no significa que un modelo esté atendiendo de manera continua.
+PESTAÑAS Y COMPLETITUD REGIONAL
+Se mantiene una sesión por pestaña. Una región conversacional solo se declara completa cuando se observaron todas las capacidades del catálogo vigente, al menos cinco huellas estructurales distintas y dos sesiones diferentes. Entonces el sistema conserva un tab líder y apaga la observación en las demás pestañas de esa región. El líder se reevalúa si se cierra o navega fuera.
+Actualmente solo la región de conversación tiene catálogo de completitud. Inicio, proyectos, GPTs, búsqueda, compartido y otras rutas permanecen no mapeadas: no se declaran completas ni se apagan basándose en una señal falsa.
 
-DATOS Y CUSTODIA
-Los originales quedan fuera de Git en %LOCALAPPDATA%\Harmonia\surface-index-v0.3.0\data. El servicio escucha únicamente en 127.0.0.1:47321 y detiene escrituras al alcanzar 1 GiB sin borrar datos. El objeto coverage-index vive en index.json y puede consultarse con CONSULTAR-HARMONIA.cmd -Coverage.
-El archivo extension\local-auth.js contiene una credencial local; no subirlo ni compartirlo. Los cambios de código se mantienen en SeryMente/khora; el directorio runtime y logs también se excluyen de Git.
+INTERFAZ
+El popup al hacer clic en el icono se limita a estado, pausa/reanudación y apertura del panel completo. El panel principal se abre en una pestaña propia y reutiliza una ya abierta. Refresca el estado cada cinco segundos solo mientras está visible.
 
-FUENTES DOCUMENTALES
-El catálogo coverage-catalog.json contiene 44 capacidades, sus detectores heurísticos y 16 fuentes del Centro de ayuda y notas de lanzamiento de OpenAI verificadas el 2026-10-21. La documentación pública incluye capacidades recientes de Intelligent UI, resultados interactivos, creación de imágenes, gráficos interactivos, tareas de investigación, voz y creación/edición de slides; su disponibilidad depende de plan, región, modelo, espacio de trabajo y despliegue. Las capacidades sin fuente leída o sin observación natural permanecen pendientes. No se declara que la lista documentada sea exhaustiva para todos los planes o despliegues.
+DESEMPEÑO Y GARANTÍAS
+Los barridos responden a mutaciones y filtros de relevancia; los cambios de texto también disparan observación. Las superficies repetidas se compactan, sin suprimir el evento de avistamiento. CPU, RAM, latencia y cobertura deben medirse frente a una referencia no optimizada antes de declarar éxito. Los tests aislados no prueban que Chrome haya cargado la extensión ni que la captura real funcione.
 
-LIMITACIONES CONOCIDAS
-La extensión registra presencia/estructura de controles y respuestas, no una traza completa de todas las acciones funcionales. La captura de texto transitorio, estado de cada herramienta, todas las acciones de mensajes y todos los formatos de respuesta requieren exploración y pruebas dirigidas. El índice combinado no es un SLA ni un indicador de precisión.
+COLECTOR LOCAL
+Endpoint: http://127.0.0.1:47321
+Credencial local: extension/local-auth.js, excluida de Git y de evidencia compartible. No copiarla al repositorio, crónica ni prompts.
+Datos: C:\Users\fila4\AppData\Local\Harmonia\surface-index-v0.3.0\data. Se conserva esta ruta histórica para no dividir el índice al actualizar a v0.4.0.
+Scripts: INICIAR-HARMONIA-HEADLESS.ps1 inicia y verifica el colector; DETENER-HARMONIA-HEADLESS.ps1 solicita cierre autenticado; FINALIZAR-PAQUETE.ps1 valida el paquete. El registro PowerShell se escribe en C:\Users\fila4\Desktop\log.txt y se sobrescribe.
+
+ENTREGA EN ESCRITORIO
+La única carpeta acordada es C:\Users\fila4\Desktop\Harmonia. La preparación debe hacerse fuera del Escritorio, validarse y después sincronizar solo archivos gestionados. No borrar archivos/carpetas ajenos al proyecto. Esta disposición no se ha aplicado físicamente porque el ID RDC aún no está reconciliado.
+
+VALIDACIÓN
+Pruebas: tests/region-policy.test.js y tests/collector.integration.test.js. Validador de fuente: scripts/validate-source.js. CI: .github/workflows/harmonia-validation.yml. Las pruebas locales pueden verificar contratos y persistencia del colector, pero no la captura real en Chrome.
+
+PENDIENTES DE ACEPTACIÓN
+1. Ejecutar CI y reparar sus fallos.
+2. Verificar integridad, replay, persistencia/reinicio y concurrencia del colector.
+3. Revisar el cambio en PR; no mezclar en main a ciegas porque main activa el flujo de publicación de Khora.
+4. Reconciliar identidad RDC.
+5. En el equipo autorizado, mantener una única carpeta Desktop\Harmonia, iniciar el colector, cargar/recargar la extensión y ejecutar la prueba multi-pestaña en Chrome.
+6. Medir CPU, RAM, latencia y completitud frente a la referencia no optimizada.
+
+No confundir versión, compilación, commit, PR o prueba aislada con instalación, sincronización local o aceptación E2E.
