@@ -26,7 +26,9 @@ Inspección del paquete 0.12.3:
 - Los cuatro flags tienen valor predeterminado `False`; la presencia del código **no acredita que estén habilitados en producción**.
 - La búsqueda y lectura entre canales depende de permisos, configuración y herramientas realmente expuestas al modelo; tampoco se da por habilitada por la mera presencia del router.
 
-Gate obligatorio antes de activar el espacio de trabajo: leer configuración efectiva del runtime y ejecutar pruebas autenticadas de Channels, apps/bots, búsqueda autorizada y sub-agents en background. Hasta entonces, el estado es `capacidad incluida / habilitación no acreditada`.
+Verificación autenticada de la publicación E79 (`e65b4e3c180e1a5cbc8003ff3124d48df63c07de`, Open WebUI `0.12.3`): `/api/config` respondió 200 y solo expuso `features.enable_websocket=false` entre las claves relacionadas; no expuso flags de Channels o Sub-agents. La interfaz publicada no mostró acceso a Channels. No se leyeron tokens ni almacenamiento del navegador para forzar endpoints nativos.
+
+Estado efectivo: `capacidad incluida / Channels, apps/bots, búsqueda entre canales y Sub-agents no habilitados ni acreditados`. Gate obligatorio antes de activar el espacio de trabajo: habilitar de forma controlada, confirmar permisos y ejecutar pruebas autenticadas de Channels, apps/bots, búsqueda autorizada, eventos y sub-agents en background.
 
 ## 3. Registro durable de frentes
 
