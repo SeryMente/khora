@@ -4,9 +4,9 @@
 ## 1. Control e identidad
 
 - Nombre normalizado: **Harmonia**, extensión compañera de **Khora**; «Armonía» y «Cora» de los dictados se conservan literalmente en originales. No renombrar producto o repositorio por transcripción.
-- Identificador del frente: `harmonia`. Versión del objeto **0.7**; sello **HARMONIA-v0.7**; corte de estado **2026-10-21**. Este corte registra y corrige el fallo de carga del catálogo en el popup v0.2.0. Conserva v0.6, v0.5 y los cortes de v0.1.0 como historial.
+- Identificador del frente: `harmonia`. Versión del objeto **0.8**; sello **HARMONIA-v0.8**; corte de estado **2026-10-21**. Este corte conserva v0.7 como historial, registra criterios arquitectónicos temporales multiámbito y abre la comprobación E2E de la captura automática, deduplicación, eficiencia y sincronización. Conserva v0.6, v0.5 y los cortes de v0.1.0 como historial.
 - Repositorio propietario: `SeryMente/khora`, rama `main`; objeto canónico en `docs/frentes/harmonia/OBJETO-CANONICO.md`. El blob de la versión anterior v0.4 fue `9a186ea789ea5aacab8dd06cf9f6edf364b89531`. Primera publicación del estado completo: commit `892adad897d6bd36c797ec2343ff7f4893b853bf`; lectura de vuelta en `main` confirmada y blob verificado `03ec5d127e0913dfe1f61e8588ba53b8abaa8e5f`. El recibo se refiere al contenido integral v0.5. Corte v0.6: commit inicial `3cb7901c2223cd41773185b93f17133e459e7a69`, blob `d1f524c383cc71c13f89e8d3aa3886ac3533fcdb`. Corte v0.7: commit inicial `55c2e8ba053265c219b2d941665c5cb3730107de`, blob `bbd08e2da15be17486e7515fd11eda7df57fca2b`; lectura de vuelta y corrección del catálogo documentadas. Nunca anticipar un SHA.
-- Fuente de código vigente: `apps/harmonia-observability/` en `main`, con la extensión de mapeo v0.2.0, `coverage-catalog.json` y scripts/validador sincronizados a GitHub en este ciclo. El paquete materializado en el Escritorio se reconstruyó desde esos archivos y contiene solo el runtime portable y una credencial local excluidos del repositorio; su manifiesto local de huellas se regeneró tras las validaciones.
+- Fuente de código vigente: `apps/harmonia-observability/` en `main`, con la extensión de observabilidad y captura automática en evolución (rama `main`, versión de código en revisión E2E), `coverage-catalog.json` y scripts/validador. No inferir que el código fuente, el paquete local y el runtime ejecutado están sincronizados sin prueba de huellas. El paquete materializado en el Escritorio se reconstruyó desde esos archivos y contiene solo el runtime portable y una credencial local excluidos del repositorio; su manifiesto local de huellas se regeneró tras las validaciones.
 - Frente permanente por creación expresa del operador. El servicio local v0.2.0 está iniciado y validado; el paquete de mapeo está preparado en el Escritorio, pero la nueva extensión aún **no se ha cargado ni probado en Chrome**. La observación real demostrada anteriormente corresponde a la versión v0.1.0 y no se hereda como prueba de funcionamiento de v0.2.0.
 - Control exclusivo vigente: `CONTROL-RESPONSABILIDAD.json`, generación **1**, propietario `400a4187-8241-8023-b3dd-00a96d379015`, instancia `samanthal-harmonia-notion-400a4187` (Notion, asistente), según la adquisición condicional registrada previamente. El control no se modificó en este corte; esta edición del objeto no transfiere propiedad ni crea una segunda instancia responsable.
 - Destino de paquete comprobado y usado mediante ruta física explícita: `C:\Users\fila4\Desktop\Harmonia-Observabilidad-v0.1.0`. Datos locales: `C:\Users\fila4\AppData\Local\Harmonia\data`. No usar rutas derivadas del perfil del proceso RDC para resolver estos destinos.
@@ -256,3 +256,66 @@ Catálogo versionado en `apps/harmonia-observability/coverage-catalog.json`, esq
 ### Siguiente aceptación
 
 Una vez que el operador cargue v0.2.0 y pulse **Iniciar mapeo en esta pestaña**, navegar de forma natural por una única pestaña elegida. Verificar que el índice registra escaneos, que nuevos paneles/controles actualizan los IDs observados y que la consulta local reporta los mismos valores. Luego confrontar cada función detectada con la documentación y observar casos no reconocidos, sin convertir la presencia de un selector en prueba de funcionamiento. Mantener por separado completitud del mapa, disponibilidad del colector, estabilidad y latencia. No se captura texto de conversación en esta fase.
+
+
+## 16. Notas temporales de arquitectura y cierre E2E · 2026-10-21
+
+> **Estado: TEMPORAL / PROPUESTA DE ARQUITECTURA.** Este registro se incorpora por instrucción explícita del operador para conservar el criterio y llevarlo después a su forma canónica mediante el FT de Metacanon. No sustituye ni reinterpreta el canon vigente; las propuestas aquí descritas no se consideran ratificadas hasta la revisión correspondiente.
+
+### 16.1. Criterio arquitectónico: Harmonia multiámbito, modular y ubicua
+
+Harmonia debe diseñarse desde ahora como una extensión multiámbito/multiuso de Khora, preparada para incorporar de manera progresiva capacidades correspondientes a distintos ámbitos de la vida de una persona. La ubicuidad de Khora exige anticipar esa evolución desde la arquitectura, no añadir módulos improvisados uno a uno. La organización del sistema de archivos, las fronteras entre módulos, los contratos, los permisos, la persistencia, la UI y la UX deben permitir agregar, retirar, configurar y supervisar ámbitos sin rediseñar el núcleo común ni crear fuentes de verdad competidoras.
+
+Criterios de diseño propuestos:
+
+1. **Núcleo pequeño y extensiones por ámbito.** Separar el runtime común (ciclo de vida, permisos, configuración, telemetría, sincronización y adaptadores compartidos) de los módulos de ámbito. La observabilidad de ChatGPT será un ámbito, no la identidad total de Harmonia.
+2. **Contrato uniforme de módulo.** Cada ámbito declarará como mínimo identidad estable, versión y compatibilidad, capacidades, permisos mínimos, configuración validada, espacio lógico de persistencia, esquema de eventos, estado de salud y estrategia de migración. No se admitirán módulos que escriban fuera de su espacio ni que redefinan contratos globales implícitamente.
+3. **Sistema de archivos predecible.** Mantener directorios compartidos para contratos, runtime, servicios y UI, y un directorio aislado por módulo/ámbito para su implementación, recursos, pruebas y documentación. Los detalles finales de rutas quedan como propuesta hasta una auditoría de la extensión ya existente.
+4. **Datos sin colisiones.** Cada registro tendrá ámbito, esquema/versionado, identidad de sesión, identidad de origen, marca temporal, identificador de evento e idempotency key o equivalente. El almacenamiento distinguirá eventos originales, superficies estructurales únicas, avistamientos/referencias y agregados derivados. Deduplicar la estructura no significa eliminar evidencia de cuándo y dónde se observó.
+5. **Eficiencia sin pérdida de observabilidad.** Preferir observación incremental impulsada por cambios pertinentes, fingerprints compactos, reutilización de conocimiento estructural, single-flight por pestaña y límites de concurrencia globales; evitar sondeos permanentes, serializaciones redundantes, DOM snapshots repetidos y escrituras pequeñas indiscriminadas. La poda o compactación nunca debe borrar evidencia requerida para auditoría. La equivalencia de cobertura debe medirse contra una referencia sin optimizar.
+6. **Sincronización verificable.** Separar sincronización periódica de datos públicos de configuración/catálogo y detección de nueva versión del código. Mostrar rama, revisión/versión local, revisión remota, fecha del último éxito, resultado y error. La extensión no ejecutará código remoto obtenido de `main`; el código actualizado requiere un mecanismo de distribución e instalación controlado, revisión de integridad y una aceptación explícita o política de actualización compatible.
+7. **UI/UX multiámbito.** La interfaz distinguirá ámbitos habilitados, estado y frescura, permisos, errores, última sincronización y uso de recursos cuando sea medible. Los ajustes serán locales al ámbito cuando corresponda; los controles globales permanecerán claramente separados. Evitar paneles monolíticos, estados ficticios, acciones ambiguas y términos técnicos innecesarios para el operador.
+8. **Pruebas como barrera arquitectónica.** Añadir pruebas de esquema, aislamiento, idempotencia, concurrencia, migración, recuperación, uso de recursos, sincronización y compatibilidad. Un módulo nuevo no se considera integrado solo porque su carpeta y manifiesto existan.
+
+### 16.2. Captura multi-pestaña de ChatGPT
+
+El objetivo operativo expresado es observar automáticamente todas las pestañas HTTPS de `chatgpt.com`, sin activar manualmente cada pestaña, manteniendo un banco de datos limpio y sin colisiones. La calidad de la observación tiene prioridad: la deduplicación debe reducir cómputo y almacenamiento sin ocultar cambios relevantes ni perder avistamientos distintos.
+
+El código en revisión contiene inyección automática, identidad separada por sesión, huella SHA-256 de la estructura, filtrado de mutaciones y eliminación del sondeo estructural periódico de diez segundos. También se incorporó una ruta de superficies únicas con referencias compactas y un índice de huellas en el colector. **Estos cambios no equivalen todavía a aceptación E2E:** requieren prueba de integración exacta, ensayo de concurrencia/idempotencia, y comparación de cobertura y recursos con varias pestañas. El fingerprint se calcula después de inspeccionar la estructura; por tanto, evitar el recorrido completo de elementos conocidos sigue siendo una optimización pendiente.
+
+La persistencia debe separar al menos:
+- **Superficie única:** descripción estructural normalizada identificada por fingerprint.
+- **Avistamiento:** fingerprint, pestaña/sesión, instante, versión de observador y contexto estructural no textual permitido.
+- **Evento de control:** inicio, parada, error o transición; sin texto de conversación.
+- **Índice derivado:** características observadas, agregados y pendientes; reconstruible y reconciliable con los eventos originales.
+
+La deduplicación entre pestañas podrá compactar la descripción estructural, pero conservará los avistamientos que permitan reconstruir procedencia y evolución. Evitar identificar conversaciones por título o texto; emplear identificadores técnicos acotados y sanitizados. Las escrituras deberán ser atómicas/serializadas o transaccionales y los eventos repetidos deberán ser idempotentes.
+
+### 16.3. Sincronización con el repositorio de Harmonia
+
+La sincronización periódica con `SeryMente/khora` (`main`) es un requisito. La primera etapa puede sincronizar catálogo y metadatos JSON tras validar esquema, versión, integridad y límites de tamaño. Debe guardar el último resultado de sync y hacerlo visible en el popup. La detección de nueva versión de código es solo señal de disponibilidad; no significa que los archivos ejecutables se hayan reemplazado. No evaluar como éxito una llamada programada, alarma creada o JSON descargado si el estado real no fue validado y persistido.
+
+### 16.4. Checklist E2E y estado del corte
+
+- [x] Se publicó en el manifiesto la inyección de `content.js` al cargar `chatgpt.com`.
+- [x] Se eliminó el permiso `debugger` del manifiesto.
+- [x] Se añadió observación impulsada por mutaciones relevantes y se quitó el sondeo fijo del observador.
+- [x] Se implementó generación de fingerprint estructural y un control single-flight local por pestaña.
+- [x] Se añadió al código del colector un índice de fingerprints y soporte para observaciones repetidas compactas.
+- [x] Se comenzó el control de sincronización periódica de metadatos y catálogo desde `main`.
+- [ ] Crear/validar el metadato remoto de release requerido por el sincronizador y completar la visualización de estado.
+- [ ] Sincronizar a disco todas las versiones vigentes de scripts, colector, manifiesto, UI, catálogo y verificador antes de probar.
+- [ ] Verificar sintaxis JS y contrato compartido de eventos (`ui.surface.scan`/referencias de superficie).
+- [ ] Ejecutar pruebas del colector: autenticación, CORS, límite de almacenamiento, superficie nueva/repetida, persistencia atómica, reinicio y reconstrucción del índice.
+- [ ] Probar varias pestañas en Chrome; verificar cierre/navegación, no colisión de sesiones y ausencia de eventos perdidos o duplicados.
+- [ ] Medir CPU/RAM, barridos y latencia con una y varias pestañas; comparar cobertura frente a referencia y documentar si la calidad se conserva.
+- [ ] Verificar una sincronización efectiva con `main`, el estado mostrado en el popup y el procedimiento controlado cuando haya código nuevo.
+- [ ] Recargar/validar en Chrome la revisión final instalada.
+- [ ] Formalizar posteriormente estas notas temporales por el FT de Metacanon.
+
+**Límite de evidencia de este corte:** el verificador integral pasó antes de varias modificaciones posteriores de optimización/sincronización. Por ello, el resultado histórico no constituye una prueba del árbol actual. Hasta completar las casillas E2E no declarar lista la entrega ni afirmar consumo bajo, ausencia de colisiones o sincronización funcional.
+
+### 16.5. Bitácora incremental de ejecución
+
+- **Paso 0 — 2026-10-21, instrucción del operador:** primero actualizar este OCP; después resolver el cierre E2E; documentar cada hito importante aquí. La presente sección y los avances marcados arriba son temporales, no canon final.
+- **Paso 1 — inspección de código fuente:** se confirmó que el servicio local arrancado anteriormente corresponde a una versión anterior de algunos cambios recientes; requiere reinicio después de sincronizar y validar archivos.
