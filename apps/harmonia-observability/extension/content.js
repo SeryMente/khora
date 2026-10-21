@@ -1,6 +1,6 @@
 (()=> {
   if (globalThis.__harmoniaObserver?.version==='0.4.0') return;
-  const H = globalThis.__harmoniaObserver = { version:'0.4.0', active:false, lastFingerprint:null, lastSentAt:0, droppedScans:0, lastMessages:new Map(), regionKey:null };
+  const H = globalThis.__harmoniaObserver = { version:'0.4.0', active:false, lastFingerprint:null, lastSentAt:0, droppedScans:0, lastMessages:new Map(), regionKey:null, consoleQueue:[], consoleFlushTimer:null, consoleFlushBusy:false };
   let observer=null, timer=null, messageTimer=null, sessionId=null;
 
   const $ = (sel, root=document) => root.querySelector(sel);
@@ -162,12 +162,31 @@
     for(const key of H.lastMessages.keys())if(!liveKeys.has(key))H.lastMessages.delete(key);
   }
   function scheduleMessageSnapshot(){if(!H.active||messageTimer)return;messageTimer=setTimeout(()=>{messageTimer=null;void snapshotVisibleMessages();},350);}
+  function scheduleConsoleFlush(delay=150){
+    if(H.consoleFlushTimer||!H.active)return;
+    H.consoleFlushTimer=setTimeout(()=>{H.consoleFlushTimer=null;void flushConsoleQueue();},delay);
+  }
+  async function flushConsoleQueue(){
+    if(H.consoleFlushBusy||!H.active||!H.consoleQueue.length)return;
+    H.consoleFlushBusy=true;
+    const batch=H.consoleQueue.splice(0,50);
+    const result=await chrome.runtime.sendMessage({kind:'harmonia:event',event:{type:'console.observed',payload:{
+      regionKey:regionKey(),level:'log',entries:batch,observedAt:new Date().toISOString(),source:'page-console-bridge',batched:true
+    }}}).catch(()=>null);
+    const ok=!!(result?.ok&&result.value===true);
+    if(!ok)H.consoleQueue.unshift(...batch);
+    H.consoleFlushBusy=false;
+    if(H.active&&H.consoleQueue.length)scheduleConsoleFlush(ok?50:1000);
+  }
   function consoleEvent(event){
     if(!H.active||!event?.detail||typeof event.detail!=='object')return;
     let detail;try{detail=JSON.parse(JSON.stringify(event.detail));}catch{return;}
-    const entries=Array.isArray(detail.entries)?detail.entries.slice(0,10).map(item=>({type:safe(item?.type,24),value:safe(item?.value,1000)})):[];
-    const payload={regionKey:regionKey(),level:safe(detail.level,16),entries,observedAt:new Date().toISOString(),source:'page-console-bridge'};
-    void chrome.runtime.sendMessage({kind:'harmonia:event',event:{type:'console.observed',payload}}).catch(()=>{});
+    const level=safe(detail.level,16)||'log';
+    const entries=Array.isArray(detail.entries)?detail.entries.slice(0,10):[];
+    for(const item of entries){
+      H.consoleQueue.push({type:level+'/'+safe(item?.type,24),value:String(item?.value??'').slice(0,1000)});
+    }
+    scheduleConsoleFlush();
   }
   let lastControls='';
   async function scanOnce(force=false) {
@@ -209,7 +228,7 @@
   function scheduleScan(){if(timer)clearTimeout(timer);timer=setTimeout(()=>{timer=null;void scan(false);},1600);}
   function start(message){
     if(H.active)return;
-    H.active=true;sessionId=message?.sessionId||null;
+    H.active=true;sessionId=message?.sessionId||null;scheduleConsoleFlush(0);
     window.addEventListener('resize',scheduleScan,{passive:true});
     window.addEventListener('popstate',scheduleScan,true);
     window.addEventListener('hashchange',scheduleScan,true);
@@ -245,7 +264,7 @@
   }
   chrome.runtime.onMessage.addListener(message=>{
     if(message?.kind==='harmonia:start')start(message);
-    if(message?.kind==='harmonia:stop')stop();
+    if(message?.kind==='harmonia:stop'){if(H.consoleFlushTimer)clearTimeout(H.consoleFlushTimer);H.consoleFlushTimer=null;stop();}
   });
   chrome.runtime.sendMessage({kind:'harmonia:auto-settings'}).then(response=>{
     if(response?.ok&&response.value?.enabled&&response.value?.observe!==false)start({automatic:true});
