@@ -132,10 +132,18 @@
       const sha=await fingerprintOf(visibleText),previous=H.lastMessages.get(key);
       const messageStreaming=role==='assistant'&&isStreaming&&index===elements.length-1;
       const wasStreaming=!!previous?.streaming;
-      if(previous?.sha===sha&&wasStreaming===messageStreaming)continue;
+      if(previous?.sha===sha){
+        if(wasStreaming&&!messageStreaming){
+          const result=await chrome.runtime.sendMessage({kind:'harmonia:event',event:{type:'conversation.visible.delta',payload:{
+            regionKey:currentRegion,messageKey:key,role,index,operation:'complete',delta:'',text:'',contentSha256:sha,
+            visible:true,streaming:false,truncated:visibleText.length>=MAX_MESSAGE_CHARS,hiddenReasoningCaptured:false,
+            chunkIndex:0,chunkCount:1}}}).catch(()=>null);
+          if(result?.ok&&result.value===true)H.lastMessages.set(key,{text:visibleText,sha,streaming:false});
+        }else H.lastMessages.set(key,{text:visibleText,sha,streaming:messageStreaming});
+        continue;
+      }
       let operation='replace',remaining=visibleText,completedOnly=false;
-      if(previous&&visibleText===previous.text&&wasStreaming&&!messageStreaming){operation='complete';remaining='';completedOnly=true;}
-      else if(previous&&visibleText.startsWith(previous.text)&&visibleText.length>previous.text.length){operation='append';remaining=visibleText.slice(previous.text.length);}
+      if(previous&&visibleText.startsWith(previous.text)&&visibleText.length>previous.text.length){operation='append';remaining=visibleText.slice(previous.text.length);}
       let offset=0,failed=false;
       do{
         const chunk=remaining.slice(offset,offset+MESSAGE_CHUNK_CHARS);
