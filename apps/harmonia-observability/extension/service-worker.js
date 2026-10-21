@@ -22,7 +22,13 @@ const ready=(async()=>{
   await saveSessions();
   await refreshKnownFingerprints();
 })();
-function saveSessions(){return chrome.storage.local.set({[STORE.sessions]:sessions,[STORE.enabled]:autoEnabled,[STORE.events]:eventCount});}
+let storageQueue=Promise.resolve();
+function saveSessions(){
+ const snapshot=Object.fromEntries(Object.entries(sessions).map(([key,session])=>[key,{...session}]));
+ const state={[STORE.sessions]:snapshot,[STORE.enabled]:autoEnabled,[STORE.events]:eventCount};
+ storageQueue=storageQueue.then(()=>chrome.storage.local.set(state));
+ return storageQueue;
+}
 function headers(extra={}){return {...extra,'x-harmonia-token':TOKEN};}
 function valid(url=''){try{const u=new URL(url);return u.protocol==='https:'&&u.hostname==='chatgpt.com';}catch{return false;}}
 function safePageUrl(raw){try{const u=new URL(raw);return u.origin+u.pathname.replace(/\/c\/[^/]+/,'/c/[conversation]').replace(/\/g\/[^/]+/,'/g/[gpt]');}catch{return 'https://chatgpt.com/';}}
