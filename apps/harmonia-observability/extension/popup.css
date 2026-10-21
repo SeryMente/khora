@@ -53,3 +53,13 @@ details p{margin:8px 0 0}
  button.secondary{background:#383836;color:#fff}
  .sources a,.indexValue{color:#c7bdff}
 }
+
+.sync{border:1px solid #e6e5e3;border-radius:12px;padding:12px 14px;margin-bottom:13px;background:#fff}
+.syncHead{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.syncHead p{font-size:11px;color:#77736e;margin:0 0 6px}
+#repoDetail{font-size:12px;line-height:1.45;color:#67645f;margin:5px 0 8px}
+.repoDot{width:10px;height:10px;border-radius:50%;background:#d5803b;border:2px solid #fbebde;flex:none}
+.repoDot.live{background:#46a171;border-color:#d8ecdf}
+.repoDot.off{background:#e56458;border-color:#fce9e7}
+.actions a{color:#5f4bb6;font-size:12px;text-decoration:none}
+.actions a:hover{text-decoration:underline}
