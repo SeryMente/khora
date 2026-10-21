@@ -1,7 +1,7 @@
 $ErrorActionPreference = 'Stop'
 $desktop = 'C:\Users\fila4\Desktop'
 $root = $PSScriptRoot
-$data = 'C:\Users\fila4\AppData\Local\Harmonia\surface-index-v0.2.0\data'
+$data = 'C:\Users\fila4\AppData\Local\Harmonia\surface-index-v0.3.0\data'
 $node = Join-Path $root 'runtime\node.exe'
 $collectorDir = Join-Path $root 'collector'
 $authFile = Join-Path $root 'extension\local-auth.js'
