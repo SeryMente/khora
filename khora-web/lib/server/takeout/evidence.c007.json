@@ -1,0 +1,16 @@
+{
+  "cycle": "C-TAKEOUT-007",
+  "status": "partial_not_deployed",
+  "tests": 88,
+  "pass": 88,
+  "fail": 0,
+  "skip": 0,
+  "wrapper_pass": 1,
+  "database": "mocked_atomic_query_not_real_postgresql",
+  "encryption": "existing_canonical_cipher_real_synthetic_key",
+  "schema_applied": false,
+  "routes_integrated": false,
+  "production_changed": false,
+  "budget": "zero_additional_spend",
+  "vercel_plan": "hobby_verified_api"
+}

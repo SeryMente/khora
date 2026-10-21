@@ -22,6 +22,7 @@ por este archivo. Promoción serializada por el hilo central.
   PKCE S256, URL de retorno HTTPS configurada, mismo usuario/same-browser state,
   consumo atómico de un solo uso y errores sin texto privado del proveedor.
   Incluye renovación del permiso vinculada al dueño/cliente y conservación de rotación de refresh token; el llamador aún debe serializar y guardar cifrado antes de usarlo. NO es ruta HTTP, sesión Khora, almacenamiento de tokens ni Google Picker.
+- `auth-store.mjs`: almacena transacciones OAuth cifradas KHC1 y consume mediante una sola sentencia DELETE RETURNING restringida por dueño/nonce/expiración. Autoriza antes de consultar; valida dueño/nonce también dentro del sobre cifrado. SQL y transporte simulados en los ensayos; NO es certificación PostgreSQL real. `auth-store.schema.sql` es borrador no aplicado ni descubierto por migraciones automáticas. No almacena tokens Google ni crea un job duradero. Exige pool con TLS verificado: NO enlazar sin revisión al getDb existente que desactiva rejectUnauthorized.
 - `tests/unit/takeout.test.ts` conecta los ensayos aislados con el descubrimiento
   `.test.ts` del runner existente; el proceso hijo usa una allowlist de entorno,
   sin heredar claves reales. Requiere Node con stripTypeScriptTypes (22.6+).
@@ -65,9 +66,9 @@ por este archivo. Promoción serializada por el hilo central.
 
 ## Ensayo y evidencia
 
-`node --test khora-web/tests/unit/takeout-transfer.test.mjs khora-web/tests/unit/takeout-google-auth.test.mjs`
+`node --test khora-web/tests/unit/takeout-transfer.test.mjs khora-web/tests/unit/takeout-google-auth.test.mjs khora-web/tests/unit/takeout-auth-store.test.mjs`
 
-76 casos sintéticos, cifrador canónico exacto KHC1/AES-256-GCM; red Google y
+88 casos sintéticos, cifrador canónico exacto KHC1/AES-256-GCM; red Google y
 almacenamiento en memoria simulados de forma explícita. NO es certificación
 criptográfica, revisión independiente ni prueba integral productiva. El binding
 B2 tiene comprobación de sintaxis; falta comprobación global de tipos y build.
