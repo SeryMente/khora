@@ -2,7 +2,7 @@ try { importScripts('local-auth.js'); } catch {}
 const COLLECTOR='http://127.0.0.1:47321';
 const TOKEN=String(globalThis.HARMONIA_TOKEN||'');
 let state={active:false,tabId:null,sessionId:null,startedAt:null,collector:false,lastError:null,events:0};
-const ready=chrome.storage.local.get(['harmoniaState']).then(r=>{if(r.harmoniaState)state={...state,...r.harmoniaState};}).catch(()=>{});
+const ready=chrome.storage.local.get(['harmoniaState']).then(r=>{if(r.harmoniaState?.version==='0.2.0')state={...state,...r.harmoniaState};else void chrome.storage.local.set({harmoniaState:state});}).catch(()=>{});
 const save=()=>chrome.storage.local.set({harmoniaState:state});
 function headers(extra={}){return {...extra,'x-harmonia-token':TOKEN};}
 function safePageUrl(raw){try{const u=new URL(raw);return u.origin+u.pathname.replace(/\/c\/[^/]+/,'/c/[conversation]').replace(/\/g\/[^/]+/,'/g/[gpt]');}catch{return 'https://chatgpt.com/';}}
@@ -13,8 +13,8 @@ async function coverageRecord(event){
  const controls=Array.isArray(p.controls)?p.controls:[];
  const unknown=controls.filter(c=>!c.testId&&!c.label).map(c=>[c.tag,c.role,c.type,c.placeholder].join('|')).filter(Boolean).slice(0,100);
  const current=(await chrome.storage.local.get(['harmoniaCoverage'])).harmoniaCoverage||{schema:'harmonia.coverage-index.v1',observedFeatureIds:[],unknownControls:[],scanCount:0,observations:0};
- current.observedFeatureIds=[...new Set([...current.observedFeatureIds,...allowedFeatures])].sort();
- current.unknownControls=[...new Set([...current.unknownControls,...unknown])].slice(0,100);
+ current.observedFeatureIds=[...new Set([...(current.observedFeatureIds||[]),...allowedFeatures])].sort();
+ current.unknownControls=[...new Set([...(current.unknownControls||[]),...unknown])].slice(0,100);
  current.scanCount=(current.scanCount||0)+1;current.lastScanAt=event.capturedAt;current.lastFeatureIds=allowedFeatures;
  current.lastControlCount=controls.length;current.lastNodeCount=p.structure?.total||0;
  current.stylesheetCount=p.counts?.styleSheets||0;current.lastPrivacy=p.privacy||{};
@@ -30,7 +30,7 @@ async function start(tab){
  if(state.active)throw new Error('Ya hay una captura activa.');
  if(!tab?.id||!valid(tab.url))throw new Error('Elige una pestaña abierta en chatgpt.com.');
  if(!await health())throw new Error(state.lastError||'Inicia primero el colector local.');
- state={active:true,tabId:tab.id,sessionId:crypto.randomUUID(),startedAt:new Date().toISOString(),collector:true,lastError:null,events:0};await save();
+ state={version:'0.2.0',active:true,tabId:tab.id,sessionId:crypto.randomUUID(),startedAt:new Date().toISOString(),collector:true,lastError:null,events:0};await save();
  try{
   await chrome.debugger.attach({tabId:tab.id},'1.3');
   for(const method of ['Runtime.enable','Log.enable'])await chrome.debugger.sendCommand({tabId:tab.id},method);
