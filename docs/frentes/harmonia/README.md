@@ -1,30 +1,31 @@
 # Harmonia · carpeta canónica del frente
 
-Entrada única de estado: [OBJETO-CANONICO.md](OBJETO-CANONICO.md), versión candidata **0.13 / HARMONIA-v0.13** en esta rama. No crear fuentes de estado paralelas.
+Fuente única de estado: [OBJETO-CANONICO.md](OBJETO-CANONICO.md), candidato **0.14 / HARMONIA-v0.14** en esta rama. No crear fuentes de estado paralelas.
 
-- [Asistente · reinstanciación](prompts/ASISTENTE.md): estado y próximos pasos, gobierno y compuertas.
-- [Constructor · no instanciado](prompts/CONSTRUCTOR.md): su régimen no habilita RDC.
-- [Control de responsabilidad](CONTROL-RESPONSABILIDAD.json): generación 2, folio activo `SES-20261021-K7M4Q9P2`, alias `chatgpt-harmonia-SES-20261021-K7M4Q9P2`; la transferencia está confirmada por lectura de vuelta.
+- [Asistente · reinstanciación](prompts/ASISTENTE.md): estado vigente, gobierno y siguientes pasos.
+- [Constructor · no instanciado](prompts/CONSTRUCTOR.md): el constructor no utiliza RDC.
+- [Control de responsabilidad](CONTROL-RESPONSABILIDAD.json): generación 2, folio `SES-20261021-K7M4Q9P2`, alias `chatgpt-harmonia-SES-20261021-K7M4Q9P2`; la transferencia se verificó mediante lectura de vuelta.
 - [Crónica de transferencia](cronica/HARMONIA-TRANSFER-RESPONSABILIDAD-20261021.md).
-- [Crónica E2E 02](cronica/HARMONIA-E2E-02-20261021.md): implementaciones candidatas, hashes, fallos CI y límites de evidencia.
+- [Crónica E2E 02](cronica/HARMONIA-E2E-02-20261021.md): módulos, hashes, CI y bloqueos.
 
-## Candidata E2E
+## Candidata E2E v0.4.0
 
-- Rama: `feat/harmonia-e2e-20261021`.
-- PR [#333](https://github.com/SeryMente/khora/pull/333): abierta como borrador, no fusionada.
-- Código candidato v0.4.0: captura automática por tab, texto visible user/assistant con reemplazos/deltas/finalización, estructura/estilos resumidos, consola con redacción heurística, política regional, tab líder tras completitud, popup esencial y dashboard propio.
-- La región de conversación solo puede completarse si todas las capacidades del catálogo están observadas, al menos cinco huellas distintas y dos sesiones distintas. Regiones sin catálogo quedan no mapeadas.
-- Hay pruebas y workflow definidos. `Último run #3397: failure`; el diagnóstico es insuficiente debido a que el conector no expone steps/logs/artifacts. No declarar PASS ni inventar causa.
-- No se fusiona a `main`: el flujo de main puede activar despliegue de Khora y migraciones productivas.
+Rama `feat/harmonia-e2e-20261021`, PR [#333](https://github.com/SeryMente/khora/pull/333) abierta en borrador, no fusionada. Código candidato: captura automática por tab; mensajes visibles user/assistant con replace/append/complete y chunks; estructura/estilos resumidos; consola con redacción heurística; política regional y líder único al completar el catálogo; popup esencial y dashboard en su propia pestaña; build-info y pruebas automatizadas definidas.
 
-## Bloqueo RDC y entrega física
+La región de conversación solo se considera completa con todas las capacidades del catálogo, cinco huellas estructurales distintas y dos sesiones diferentes. Las demás regiones quedan no mapeadas hasta que tengan catálogo.
 
-Discrepancia de ID sin resolver: listado vivo `PC10RCIF4EI4` ID `86580320-19b3-421a-89c7-36dce0123559`; registro global ID `79564800-3d53-4195-8122-5b4b061ef862`. No asumir alias; no conectarse, instalar ni manipular el Escritorio mientras no se reconcilie.
+## CI y estado real
 
-Destino físico acordado: única carpeta `C:\Users\fila4\Desktop\Harmonia`. Cuando se autorice el equipo: preparar staging fuera del Escritorio, validar y sincronizar solo archivos gestionados. No borrar artefactos desconocidos. Nunca usar `C:\Users\MantenimientoRCI\`.
+El último run consultado para HEAD `f37d636caa1be9006a522d1d3d4fa56852a958c7` es #3402 (ID `39695776229`), `CI`, estado `completed`, conclusión `failure`. Los runs #12/#14/#23 inspeccionados fallaron. Steps/logs/artifacts no son accesibles en el conector (`steps=null`, `logs_url=null`, `404 BlobNotFound`); causa raíz NO VERIFICADA. No declarar PASS.
 
-## Privacidad y no-simulación
+## Bloqueo RDC
 
-Se conservan localmente los textos visibles de mensajes porque son parte del objetivo. No se leen borradores del compositor, valores de campos, URLs completas/imágenes ni razonamiento oculto. La redacción de consola es heurística, no anonimización garantizada. Primera prueba real con conversación sin datos sensibles.
+El dispositivo live `PC10RCIF4EI4` tiene ID `86580320-19b3-421a-89c7-36dce0123559`; el registro global contiene `79564800-3d53-4195-8122-5b4b061ef862`. No son alias probados. No conectar, instalar, abrir Chrome ni manipular Desktop mientras siga la discrepancia.
 
-La copia literal de los requisitos como archivo GitHub fue bloqueada por la herramienta; no se eludió el control. La instrucción original sigue siendo el mensaje del operador y la laguna se documenta en OCP/crónica.
+Carpeta física objetivo: una sola `C:\Users\fila4\Desktop\Harmonia`. Staging fuera del Escritorio, validar antes y sincronizar solo archivos gestionados. No borrar artefactos desconocidos. Nunca usar `C:\Users\MantenimientoRCI\`.
+
+## Privacidad/no simulación
+
+Los textos visibles se guardan localmente porque son el objetivo del producto. No se leen borradores, valores de campos, URLs completas/URLs de imágenes ni razonamiento oculto. La redacción de consola es heurística, no anonimización garantizada. Primera prueba real con conversación sin datos sensibles.
+
+La herramienta bloqueó la escritura de una copia verbatim como archivo GitHub. No se intentó eludirlo; el mensaje original del operador sigue siendo la fuente y el límite permanece documentado.
