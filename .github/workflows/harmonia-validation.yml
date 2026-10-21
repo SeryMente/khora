@@ -29,18 +29,52 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Check JavaScript syntax
+      - name: Run diagnostics with per-suite exit codes
         shell: bash
         run: |
-          set -euo pipefail
-          for file in apps/harmonia-observability/extension/*.js; do
-            node --check "$file"
+          set +e
+          OUT="$RUNNER_TEMP/harmonia-validation"
+          mkdir -p "$OUT"
+          SUMMARY="$OUT/summary.txt"
+          : > "$SUMMARY"
+          OVERALL=0
+
+          : > "$OUT/syntax.log"
+          for file in apps/harmonia-observability/extension/*.js apps/harmonia-observability/collector/server.js apps/harmonia-observability/tests/*.js apps/harmonia-observability/scripts/*.js; do
+            node --check "$file" >> "$OUT/syntax.log" 2>&1
+            CODE=$?
+            if [ "$CODE" -ne 0 ]; then
+              echo "SYNTAX FAIL exit=$CODE file=$file" | tee -a "$SUMMARY"
+              OVERALL=1
+            fi
           done
-          node --check apps/harmonia-observability/collector/server.js
-          for file in apps/harmonia-observability/tests/*.js apps/harmonia-observability/scripts/*.js; do
-            node --check "$file"
-          done
-      - name: Validate source contracts and mirrored catalog
-        run: node apps/harmonia-observability/scripts/validate-source.js
-      - name: Run unit and real local-HTTP collector E2E tests
-        run: node --test apps/harmonia-observability/tests/*.test.js
+          echo "SYNTAX_EXIT=$OVERALL" >> "$SUMMARY"
+
+          node apps/harmonia-observability/scripts/validate-source.js > "$OUT/source-contract.log" 2>&1
+          CODE=$?
+          echo "SOURCE_CONTRACT_EXIT=$CODE" | tee -a "$SUMMARY"
+          if [ "$CODE" -ne 0 ]; then OVERALL=1; fi
+
+          node --test apps/harmonia-observability/tests/*.test.js > "$OUT/collector-e2e.log" 2>&1
+          CODE=$?
+          echo "COLLECTOR_E2E_EXIT=$CODE" | tee -a "$SUMMARY"
+          if [ "$CODE" -ne 0 ]; then OVERALL=1; fi
+
+          echo "=== SOURCE CONTRACT ==="
+          cat "$OUT/source-contract.log"
+          echo "=== LOCAL COLLECTOR E2E ==="
+          cat "$OUT/collector-e2e.log"
+          echo "=== SYNTAX DIAGNOSTIC ==="
+          cat "$OUT/syntax.log"
+          echo "=== SUMMARY ==="
+          cat "$SUMMARY"
+          exit "$OVERALL"
+      - name: Upload validation diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: harmonia-validation-diagnostics
+          path: |
+            ${{ runner.temp }}/harmonia-validation/
+          if-no-files-found: warn
+          retention-days: 7
