@@ -113,14 +113,15 @@
     const controls=roots.flatMap(r=>controlsIn(r)).filter((c,i,a)=>a.findIndex(x=>x.signature===c.signature)===i).slice(0,100);
     const features=featureIds(root,comp,controls);
     const struct=structure(root||comp?.closest('form')||comp,controls);
-    const signature=JSON.stringify({features,controls:controls.map(c=>c.signature),nodes:Math.round(struct.total/20)*20,styles:styleSheets().map(s=>[s.path,s.ruleCount,s.crossOriginOrInaccessible])});
+    const viewport={width:innerWidth,height:innerHeight,devicePixelRatio:window.devicePixelRatio||1};
+    const signature=JSON.stringify({features,controls:controls.map(c=>c.signature),nodes:Math.round(struct.total/20)*20,styles:styleSheets().map(s=>[s.path,s.ruleCount,s.crossOriginOrInaccessible]),viewport});
     const now=Date.now();
     if(!force&&signature===H.lastFingerprint)return;
     if(!force&&now-H.lastSentAt<4000){H.droppedScans++;return;}
     H.lastFingerprint=signature;H.lastSentAt=now;
     const payload={
       catalogVersion:'0.1.2',features,controls:controls.map(({signature,...c})=>c),
-      structure:struct,stylesheets:styleSheets(),
+      structure:struct,stylesheets:styleSheets(),viewport,
       layout:{main:styleSummary(root),composer:styleSummary(comp),assistant:styleSummary(root?.querySelector('[data-message-author-role="assistant"]'))},
       counts:{controls:controls.length,userMessages:root?$$('[data-message-author-role="user"]',root).length:0,assistantMessages:root?$$('[data-message-author-role="assistant"]',root).length:0,styleSheets:document.styleSheets.length},
       privacy:{conversationTextCaptured:false,composerTextCaptured:false,fieldValuesCaptured:false,hrefsCaptured:false,imageUrlsCaptured:false,menusExcluded:true},
@@ -132,6 +133,9 @@
   function start(message){
     if(H.active)return;
     H.active=true;sessionId=message?.sessionId||null;
+    window.addEventListener('resize',scheduleScan,{passive:true});
+    window.addEventListener('popstate',scheduleScan,true);
+    window.addEventListener('hashchange',scheduleScan,true);
     void scan(true);
     observer=new MutationObserver(scheduleScan);
     const root=mainRegion()||document.body;
@@ -148,6 +152,9 @@
     if(observer)observer.disconnect();observer=null;
     if(timer)clearTimeout(timer);timer=null;
     if(H.periodic)clearInterval(H.periodic);H.periodic=null;
+    window.removeEventListener('resize',scheduleScan);
+    window.removeEventListener('popstate',scheduleScan,true);
+    window.removeEventListener('hashchange',scheduleScan,true);
   }
   chrome.runtime.onMessage.addListener(message=>{
     if(message?.kind==='harmonia:start')start(message);
