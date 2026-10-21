@@ -9,17 +9,17 @@ Start-Transcript -LiteralPath $log -Force | Out-Null
 try {
     $required = @(
       'CONSULTAR-HARMONIA.cmd','INICIAR-HARMONIA.cmd','INICIAR-HARMONIA-HEADLESS.ps1','DETENER-HARMONIA-HEADLESS.ps1','FINALIZAR-PAQUETE.ps1','LEEME.txt','coverage-catalog.json','extension\coverage-catalog.json',
-      'collector\query.ps1','collector\server.js','extension\content.js','extension\manifest.json','extension\popup.css','extension\popup.html','extension\popup.js','extension\service-worker.js',
+      'collector\query.ps1','collector\server.js','extension\build-info.json','extension\content.js','extension\dashboard.css','extension\dashboard.html','extension\dashboard.js','extension\manifest.json','extension\popup.css','extension\popup.html','extension\popup.js','extension\region-policy.js','extension\service-worker.js',
       'runtime\node.exe','runtime\NODE-LICENSE.txt','extension\local-auth.js'
     )
     foreach ($rel in $required) { if (-not (Test-Path -LiteralPath (Join-Path $root $rel) -PathType Leaf)) { throw "Falta artefacto necesario: $rel" } }
-    foreach ($rel in @('extension\content.js','extension\service-worker.js','extension\popup.js','collector\server.js')) {
+    foreach ($rel in @('extension\content.js','extension\service-worker.js','extension\popup.js','extension\region-policy.js','extension\dashboard.js','collector\server.js')) {
       & $node --check (Join-Path $root $rel)
       if ($LASTEXITCODE -ne 0) { throw "Falló la sintaxis JavaScript: $rel" }
       "JS_SYNTAX_OK=$rel"
     }
     $manifest = Get-Content -LiteralPath (Join-Path $root 'extension\manifest.json') -Raw | ConvertFrom-Json
-    if ($manifest.manifest_version -ne 3 -or $manifest.version -ne '0.3.0') { throw 'Versión o tipo de manifiesto inesperado.' }
+    if ($manifest.manifest_version -ne 3 -or $manifest.version -ne '0.4.0') { throw 'Versión o tipo de manifiesto inesperado.' }
     if (-not ($manifest.host_permissions -contains 'https://chatgpt.com/*') -or -not ($manifest.host_permissions -contains 'http://127.0.0.1:47321/*')) { throw 'Los permisos de host no coinciden con el alcance mínimo esperado.' }
     if (-not ($manifest.content_scripts | Where-Object { $_.matches -contains 'https://chatgpt.com/*' -and $_.js -contains 'content.js' -and $_.run_at -eq 'document_idle' })) { throw 'Falta la inyección automática de content.js en chatgpt.com.' }
     if ($manifest.permissions -contains 'debugger') { throw 'El modo automático no debe solicitar el permiso debugger.' }
