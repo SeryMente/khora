@@ -77,9 +77,10 @@ test('collector en HTTP local: auth, CORS, deltas visibles, redacción, persiste
 
  const required=catalog.features.filter(f=>f.scope!=='out').map(f=>f.id);
  assert.ok(required.length>=30,'el catálogo del frente debe incluir una cobertura relevante');
+ const session2=uuid();
  const regionResults=[];
  for(let i=0;i<5;i++){
-  const sessionId=i<3?session1:uuid();
+  const sessionId=i<3?session1:session2;
   const fingerprint=crypto.createHash('sha256').update('surface-'+i).digest('hex');
   const event={schema:'harmonia.event.v1',eventId:uuid(),sessionId,conversation:'tab-region-'+i,type:'ui.surface.scan',
    source:'page-observer',capturedAt:new Date(Date.now()+i).toISOString(),
