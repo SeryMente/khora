@@ -13,7 +13,8 @@ ANTES DE CARGAR LA EXTENSIÓN
 7. Para terminar, pulse Detener captura. Para comprobar el índice desde consola, ejecute CONSULTAR-HARMONIA.cmd -Coverage.
 
 ÍNDICE DE COMPLETITUD
-- Documentación oficial: proporción ponderada de capacidades del catálogo con al menos una fuente pública oficial enlazada.
+- Documentación oficial: proporción ponderada de capacidades del catálogo con al menos una fuente pública oficial leída y enlazada; el catálogo marca las fuentes verificadas y su fecha de revisión.
+- Corte del catálogo en esta versión: 44 capacidades, 16 fuentes oficiales leídas; 40 capacidades tienen al menos una fuente oficial leída (91% de puntos ponderados, antes de la observación natural). Este corte no equivale a un mapeo exhaustivo de todas las cuentas y despliegues.
 - Observación natural: proporción ponderada de capacidades cuya presencia se detectó en una pestaña durante la navegación.
 - Índice combinado: media de las dos proporciones ponderadas. Las capacidades centrales pesan el doble que las de soporte.
 - Los controles sin clasificar quedan contabilizados aparte para revisión. Añadir capacidades nuevas al catálogo aumenta el denominador, evita inflar artificialmente el porcentaje y mantiene visible el trabajo pendiente.
@@ -28,7 +29,7 @@ Los originales quedan fuera de Git en %LOCALAPPDATA%\Harmonia\surface-index-v0.2
 El archivo extension\local-auth.js contiene una credencial local; no subirlo ni compartirlo. Los cambios de código se mantienen en SeryMente/khora; el directorio runtime y logs también se excluyen de Git.
 
 FUENTES DOCUMENTALES
-El catálogo coverage-catalog.json contiene los enlaces del Centro de ayuda oficial consultados para esta versión y la fecha de revisión. Las funciones sin fuente enlazada o sin observación natural permanecen pendientes. No se declara que la lista documentada sea exhaustiva para todos los planes o despliegues.
+El catálogo coverage-catalog.json contiene 44 capacidades, sus detectores heurísticos y 16 fuentes del Centro de ayuda y notas de lanzamiento de OpenAI verificadas el 2026-10-21. La documentación pública incluye capacidades recientes de Intelligent UI, resultados interactivos, creación de imágenes, gráficos interactivos, tareas de investigación, voz y creación/edición de slides; su disponibilidad depende de plan, región, modelo, espacio de trabajo y despliegue. Las capacidades sin fuente leída o sin observación natural permanecen pendientes. No se declara que la lista documentada sea exhaustiva para todos los planes o despliegues.
 
 LIMITACIONES CONOCIDAS
 La extensión registra presencia/estructura de controles y respuestas, no una traza completa de todas las acciones funcionales. La captura de texto transitorio, estado de cada herramienta, todas las acciones de mensajes y todos los formatos de respuesta requieren exploración y pruebas dirigidas. El índice combinado no es un SLA ni un indicador de precisión.
