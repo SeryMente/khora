@@ -2,7 +2,7 @@
 
 - Fecha operativa: 2026-10-22 (America/Mexico_City).
 - Frente: Harmonia · repositorio `SeryMente/khora`.
-- OCP: `docs/frentes/harmonia/OBJETO-CANONICO.md`, actualización propuesta v0.23, §30.
+- OCP: `docs/frentes/harmonia/OBJETO-CANONICO.md`, siguiente revisión documental v0.23, §30.
 - Rol: asistente.
 - Folio activo: `SES-20261022-R8Q4N6P1`; control de responsabilidad generación 5, blob `ac797019939f2f93dcbe2c98b73b36d71b30a900`.
 - Transferencia: commit `822c09b59cba59e7ae8c4ddfd959502367e7af6c`; lectura de vuelta comprobada.
@@ -16,58 +16,55 @@
 - GOW: v2.2, blob `6d4f8aff292ae173d9ceeba03694597bd2f16488`; revisado al inicio del ciclo. No surgió nueva convención terminológica.
 - Revisión manual de la cascada Sam y principios pertinentes completada; `MCP-NORMATIVO: DESACTIVADO`.
 
-## Estado de partida verificado documentalmente
+## Estado de partida
 
-- El OCP previo v0.22 / blob `5be741d6ace785ab1102051ee8ad55ac10987de1` sitúa la candidata v0.4.0 en el Escritorio del destino RDC `PC-14`, UUID `345f64ee-5d6a-429f-a97c-dab44f44cddb`, perfil `C:\Users\PC 13`, carpeta `C:\Users\PC 13\Desktop\Harmonia`.
-- §29 conserva el resultado de entrega: una sola carpeta de proyecto `Harmonia`; directorio de carga de Chrome `C:\Users\PC 13\Desktop\Harmonia\extension`; paquete con 9/9 archivos JavaScript parseables, `HARMONIA_SOURCE_CONTRACT_OK`, 5/5 pruebas locales y 22/22 hashes válidos.
-- Esas pruebas/lecturas son la última evidencia persistida encontrada, no se repitieron en este ciclo.
-- La extensión no se ha cargado ni probado en una conversación natural de Chrome. La aceptación E2E sigue ABIERTA.
-- PR #333 continúa como candidata v0.4.0, abierta en borrador y no fusionada; `main` mantiene v0.3.0. No se cambia código ni se usa RDC en este ciclo.
-- GitHub Actions continúa sin diagnóstico raíz: los últimos jobs consultados fallaron antes de asignar runner, sin pasos/logs/artefactos utilizables. Esto es incidencia de infraestructura sin causa determinada, no prueba de que el código falló.
-- El registro de dispositivo actual mostró online al UUID de PC-14 citado arriba y a otro equipo PC10RCIF4EI4. No se ejecutaron acciones remotas; cualquier nueva mutación exige reconfirmar cuenta/perfil/destino.
+- El OCP previo v0.22 / blob `5be741d6ace785ab1102051ee8ad55ac10987de1` registra la candidata v0.4.0 en el Escritorio del destino RDC `PC-14`, UUID `345f64ee-5d6a-429f-a97c-dab44f44cddb`, perfil `C:\Users\PC 13`.
+- §29 conserva el resultado de entrega: una sola carpeta `C:\Users\PC 13\Desktop\Harmonia`; carpeta de carga de Chrome `C:\Users\PC 13\Desktop\Harmonia\extension`; 9/9 archivos JavaScript parseables, `HARMONIA_SOURCE_CONTRACT_OK`, 5/5 pruebas Node locales y 22/22 hashes válidos.
+- Son las últimas evidencias persistidas disponibles; no se repitieron pruebas locales ni se inspeccionó el Escritorio en este ciclo.
+- La extensión no se ha cargado ni probado en una conversación natural de Chrome. E2E permanece ABIERTA.
+- La candidata v0.4.0 sigue en PR #333, abierta en borrador y sin fusionar; `main` mantiene v0.3.0. No se modificó código.
+- Los últimos workflows consultados de GitHub Actions fallaron antes de asignar runner, sin pasos/logs/artefactos legibles. Causa raíz NO DETERMINADA. El CI local básico pasa según §29; no confundir ambos resultados.
+- El inventario RDC muestra online a ese UUID de PC-14 y también a PC10RCIF4EI4. No se realizó ninguna operación remota; el perfil/cuenta debe reconfirmarse antes de una futura mutación.
 
-## Checklist actualizado (código candidata vs pruebas reales)
+## Checklist actualizado de los 17 criterios conservados
 
-Leyenda: ✅ evidencia suficiente para este criterio acotado; 🟡 implementación/evidencia parcial que no demuestra aceptación; ⬜ pendiente; ⏸️ diferido hasta después de E2E.
+Leyenda: ✅ criterio acotado documentado/verificado; 🟡 parcial, falta prueba o integración; ⬜ pendiente; ⏸️ pospuesto hasta después de E2E.
 
-### A. Esencial para primera aceptación E2E
+1. 🟡 **Captura automática en todas las pestañas de ChatGPT.** Está implementada en la candidata v0.4.0 según el código/documentación; no se ha cargado en Chrome ni validado con una conversación natural.
+2. ✅/**alcance: código candidato** **Eliminación del permiso `debugger`.** La candidata declara observación estructural sin ese permiso; la carga real de la extensión aún no está probada.
+3. 🟡 **Sesiones y pestañas independientes.** El candidato conserva estado por pestaña y política regional; falta ensayo físico multi-pestaña para confirmar que no mezcla sesiones ni pierde deltas.
+4. 🟡 **Banco de datos organizado, limpio y consistente.** El colector pasó 5/5 pruebas locales según §29; integridad, orden y recuperación bajo conversación real y varias pestañas siguen sin demostración E2E.
+5. 🟡 **Deduplicación de superficies con SHA-256 y referencias compactas.** El manifiesto de archivos local dio 22/22 hashes correctos; esto no prueba por sí solo idempotencia de eventos, ausencia de duplicados ni conservación de avistamientos.
+6. ⏸️ **Reducción de CPU.** La estrategia candidata restringe barridos estructurales redundantes; CPU real no está medida. Medir después de E2E.
+7. ⏸️ **Reducción de RAM.** No existe medición comparativa ni aceptación de la optimización incremental; diferida después de E2E.
+8. ⏸️ **Demostrar que optimizaciones preservan calidad/cobertura.** Pendiente hasta disponer de una prueba E2E aceptada y una referencia comparable.
+9. 🟡 **Sincronización periódica con el repositorio canónico.** Hay build-info/metadatos en la candidata, pero no se ha demostrado sincronización efectiva y periódica. `main` permanece en v0.3.0 y no contiene toda la candidata v0.4.0.
+10. 🟡 **Separar sincronización de metadatos de actualización de código ejecutable.** La candidata incorpora metadatos de versión/revisión y el gobierno prohíbe ejecutar JavaScript remoto; falta prueba integrada del flujo real de sincronización/actualización controlada.
+11. ⏸️ **Arquitectura multiámbito.** Existe una propuesta candidata no aprobada; se difiere hasta aceptar el ámbito actual de observabilidad.
+12. ⏸️ **Modularidad, contratos comunes, almacenamiento aislado y permisos multiámbito.** No declararlo implementado/aceptado; sigue parte de la propuesta no esencial.
+13. ⏸️ **UX/UI para descubrir y supervisar futuros ámbitos.** Aplazado hasta después de E2E; no anteponer retoques visuales.
+14. ✅/**documentación temporal, no aprobación** **Notas temporales de arquitectura en el OCP.** §16 ya documenta la visión multiámbito, eficiencia, integridad, colisiones y sincronización.
+15. ✅/**registro hecho; ejecución futura pendiente** **Declaración de provisionalidad y formalización posterior por Metacanon.** La condición temporal queda documentada; el FT de Metacanon aún debe decidir/formalizar la propuesta.
+16. 🟡 **Coherencia código–colector–manifiestos–paquete.** El paquete local tuvo 22/22 hashes correctos y build-info fijó revisión de fuente candidata; no hay igualdad total demostrada con `main`, ni la candidata está fusionada.
+17. ⬜ **Aceptación E2E final.** Pendiente: abrir varias pestañas, observar eventos reales, comprobar ausencia de colisiones/pérdidas, persistencia y recuperación, sincronización y recursos. Solo declarar aceptación tras evidencia real.
 
-1. 🟡 **Gate de código/CI:** contrato estático y 9/9 parseos, 5/5 pruebas Node locales; los workflows GitHub siguen sin runner asignado y sin logs legibles. No reintentar a ciegas ni atribuir causa raíz.
-2. 🟡 **Captura automática en pestañas de ChatGPT:** existe en la candidata v0.4.0, pero no se ha cargado/re-cargado en Chrome ni validado con mensajes naturales.
-3. 🟡 **Sesiones y varias pestañas:** la candidata mantiene sesiones por pestaña y coordinación regional; existe prueba aislada de política, pero no aceptación física multi-pestaña ni medición de cero colisiones.
-4. 🟡 **Persistencia e integridad funcional:** el colector pasó 5/5 pruebas locales y el paquete 22/22 hashes; faltan pruebas E2E de mensajes reales, concurrencia, reinicio, reconstrucción/recuperación y ausencia de pérdida/duplicación.
-5. 🟡 **UI y distribución/metadatos:** paquete v0.4.0 y build-info existen en candidata; no hay prueba en Chrome ni sincronización real confirmada entre `main`, rama candidata y paquete físico.
-6. 🟡 **Gate automatizado antes de aceptar:** hay señales locales favorables, pero falta la ejecución reproducible integral con artefactos claros para el conjunto de aceptación. El problema de runner de GitHub sigue separado y con causa raíz NO DETERMINADA.
-7. ✅/**revalidar antes de mutación** **Destino físico:** la entrega anterior identifica PC-14 / UUID `345f64ee-5d6a-429f-a97c-dab44f44cddb` y el perfil `C:\Users\PC 13`; el proveedor lo muestra online en el inventario observado. No se operó el equipo en este ciclo.
-8. ✅/**lectura anterior, no repetida hoy** **Carpeta única:** §29 registra la única carpeta de proyecto `Desktop\Harmonia`, con la extensión en `Desktop\Harmonia\extension`. Conservar el contenedor genérico y no crear otra carpeta por versión.
-9. ⬜ **E2E físico y aceptación:** todavía no se ha cargado/re-cargado la extensión en Chrome ni ejecutado la prueba natural sin datos sensibles. Debe verificar captura al abrir, entradas, respuestas parciales/finales expuestas, varias pestañas, persistencia, estado de sincronización y consultas desde otro hilo solo en el alcance permitido.
+## Bloqueos y pendientes transversales del esencial
 
-### B. No esencial: después de aceptar E2E
-
-10. ⏸️ **CPU:** no hay línea base de consumo real. Medir y optimizar después de E2E.
-11. ⏸️ **RAM, recorrido incremental y fingerprints:** sin medición comparativa ni prueba de que la optimización preserva cobertura.
-12. ⏸️ **Generalización multiámbito:** propuesta candidata no aprobada; no es prerrequisito de la primera aceptación de la observabilidad de ChatGPT.
-13. ⏸️ **Modularidad/contratos/almacenamiento y permisos para otros ámbitos:** completar dentro de la generalización multiámbito, sujeto al frente Metacanon y aprobación pertinente.
-14. ⏸️ **UI/UX multiámbito:** refinamiento de futuros dominios; no anteponerlo a la aceptación del núcleo actual.
-15. ⏸️ **Métricas avanzadas, objetivos de desempeño y retención:** recoger primero datos reales y una línea base.
-16. ✅/**documentado, formalización pendiente** **Notas de arquitectura temporales:** §16 y propuestas candidatas documentan la visión; no confieren aprobación. Formalización posterior por el FT Metacanon sigue pendiente.
-17. 🟡 **Sincronización integral código–colector–manifiestos–paquete:** hashes del paquete local verificados históricamente 22/22; la igualdad con `main` no está demostrada porque la candidata sigue en PR #333 y `main` conserva v0.3.0.
-18. ⏸️ **Validar que las optimizaciones no degradan cobertura:** requiere una línea base y comparación posterior a E2E.
-19. ⬜ **Aceptación final:** varias pestañas activas, cero colisiones no controladas, persistencia íntegra, sincronización comprobada y recursos medidos; solo puede declararse con evidencia real de Chrome.
-
-## Siguiente paso seleccionado
-
-Trabajar por partes y no reabrir el trabajo no esencial. El siguiente paso de máximo valor es la prueba física E2E con la candidata ya entregada: cargar `C:\Users\PC 13\Desktop\Harmonia\extension` en `chrome://extensions` mediante «Cargar descomprimida» y probar una conversación sin datos sensibles. Después, leer los originales/index y comprobar persistencia/varias pestañas. No afirmar que este paso se ejecutó ahora.
+- **Primer paso pendiente:** cargar `C:\Users\PC 13\Desktop\Harmonia\extension` mediante `chrome://extensions` → «Cargar descomprimida», y ejecutar una conversación de prueba sin datos sensibles.
+- **Después:** comprobar envío de eventos, mensajes parciales/finales expuestos por la interfaz, sesiones de varias pestañas, lectura de originales/índice y persistencia tras reinicio. La consulta desde otro hilo requiere prueba independiente y no hay consumidor permanente demostrado.
+- **CI de GitHub:** mantener como incidencia de infraestructura separada; no reintentar a ciegas, no afirmar causa raíz y no atribuirla a código sin logs. El CI local 5/5 documentado no equivale a que GitHub Actions haya pasado.
+- **Carpeta única:** ya registrada como entregada en §29. No crear otra carpeta por versión ni borrar/reemplazar hasta revalidar la identidad del equipo y el paquete.
+- **No esencial:** CPU/RAM/fingerprints, generalización multiámbito, UX avanzada y métricas van después de E2E. Aplicar regla anti-loop: reabrir solo por fallo reproducible, instrucción expresa o riesgo material.
 
 ## Salida por ciclo — Metacanon §4
 
-1. **Identidad/gobierno:** Harmonia · `SeryMente/khora` · OCP ruta heredada `docs/frentes/harmonia/` · folio `SES-20261022-R8Q4N6P1` · gen5 · Sam v339/NX-339m · Metacanon 1.21/METACANON-OBJETOS-v1.21, blob `cae8387a576ba4914d086a47bf57fe925717efca`, edad de commit NO VERIFICADA · GOW v2.2 blob `6d4f8aff292ae173d9ceeba03694597bd2f16488` · `MCP-NORMATIVO: DESACTIVADO`.
-2. **Dónde estamos:** paquete candidata v0.4.0 previamente entregado; E2E abierta.
-3. **Delta:** se elaboró el checklist actualizado, separando verificado, parcial, pendiente y diferido.
-4. **Avance:** titularidad gen5 confirmada por CAS/read-back; fuentes rectoras releídas; último estado de producto contrastado con §29.
-5. **Falta:** cargar Chrome y hacer E2E real; después persistencia multi-pestaña/recuperación; CI GitHub sigue con causa raíz desconocida.
-6. **Viabilidad:** la primera prueba E2E es alcanzable con el paquete ya documentado, si el dispositivo y Chrome siguen disponibles; el resultado no está demostrado.
-7. **Tiempo/ciclos:** no se añade estimación al checklist porque el paso inmediato es una prueba manual con resultado aún desconocido; la estimación previa de 10–26 h correspondía al conjunto amplio, no al paquete ya entregado y no debe usarse como tiempo remanente actual.
-8. **Siguiente acción:** carga de la carpeta `extension` en Chrome y prueba natural sin datos sensibles.
-9. **Continuación:** no se ejecutaron operaciones locales ni se modificó código en este ciclo; el usuario pidió primero el checklist actualizado.
-10. **Persistencia:** este registro se incorpora al OCP; la instrucción original se preserva verbatim por su JSONL dedicado. Cada escritura debe leerse de vuelta.
+1. **Identidad/gobierno:** Harmonia · `SeryMente/khora` · ruta OCP heredada `docs/frentes/harmonia/` · folio `SES-20261022-R8Q4N6P1` · generación 5 · Sam v339/NX-339m · Metacanon 1.21/METACANON-OBJETOS-v1.21, blob `cae8387a576ba4914d086a47bf57fe925717efca`, edad de commit NO VERIFICADA · GOW v2.2, blob `6d4f8aff292ae173d9ceeba03694597bd2f16488` · `MCP-NORMATIVO: DESACTIVADO`.
+2. **Dónde estamos:** paquete candidata v0.4.0 entregado según último registro; E2E abierta.
+3. **Delta:** checklist previo contrastado y actualizado; se separan evidencia, pendientes y optimización diferida.
+4. **Avance:** transferencia gen5 verificada por CAS/read-back; fuentes metodológicas releídas; OCP §29 recuperado.
+5. **Falta:** prueba real Chrome, multi-pestaña, persistencia/recuperación y verificación integrada de sincronización; causa del fallo de runner CI sigue desconocida.
+6. **Viabilidad:** probar la candidata ya entregada es el siguiente hito de mayor valor; no es resultado conseguido en este ciclo.
+7. **Tiempo/ciclos:** no actualizar el rango amplio de §28 como tiempo restante; el paso inmediato es una prueba manual y el resultado aún es desconocido.
+8. **Siguiente acción:** carga de `extension` en Chrome y prueba natural sin datos sensibles.
+9. **Continuación:** no se ejecutaron operaciones locales ni se modificó código en este ciclo; se pidió actualizar el checklist y trabajar por partes.
+10. **Persistencia:** entrada verbatim dedicada, esta crónica y el nuevo bloque §30 del OCP. Verificar todas las escrituras mediante read-back.
