@@ -9,7 +9,7 @@ Entrada única de estado: [OBJETO-CANONICO.md](OBJETO-CANONICO.md). El OCP conse
 
 ## Fuente de código y aceptación
 
-El código fuente en evolución se mantiene en `apps/harmonia-observability/` de `SeryMente/khora/main`. El OCP §8–§9 registra las huellas de los archivos, limitaciones y criterios de aceptación. La versión fuente v0.3.0 no se considera aceptada E2E. No deducir que el paquete del escritorio, el colector ejecutado y el código de `main` están sincronizados sin comparar huellas y probarlo.
+El código fuente en evolución se mantiene en `apps/harmonia-observability/` de `SeryMente/khora/main`. `main` permanece en v0.3.0 sin aceptación E2E; la candidata v0.4.0 está en [PR #333](https://github.com/SeryMente/khora/pull/333), en borrador y sin fusionar. El OCP §19 mantiene la auditoría técnica; **§21 es la secuencia operativa vigente: primero esenciales para la captura, integridad y E2E; optimizaciones CPU/RAM/huellas y generalización multiámbito solo después de aceptar la primera entrega**. La crónica del orden está en [HARMONIA-PRIORIZACION-SES-20261021-F8R3M6Q2.md](cronica/HARMONIA-PRIORIZACION-SES-20261021-F8R3M6Q2.md). No deducir sincronización entre `main`, paquete local y colector sin comparar huellas y probarlo.
 
 No realizar operaciones en equipo remoto hasta reconciliar la discrepancia entre la identidad RDC observada en vivo y el registro global. No usar ni leer `C:\\Users\\MantenimientoRCI\\`; las rutas operativas autorizadas para el operador son explícitas y deben volver a verificarse antes de una acción local.
 
