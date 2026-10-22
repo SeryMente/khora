@@ -26,3 +26,8 @@ Control exclusivo: generación 5, folio activo `SES-20261022-R8Q4N6P1`, blob `ac
 [Traza real saneada](datos/observaciones/HARMONIA-TRAZA-OBSERVACION-REDACTADA-20261022.jsonl) y [manifiesto](datos/observaciones/HARMONIA-TRAZA-OBSERVACION-REDACTADA-20261022.manifest.json) están guardados en main. La traza tiene 627 eventos (611 de consola, 10 de inicio, 6 de parada), cero malformados y no contiene eventos estructurales ni mensajes visibles. [Fixture sintética](datos/observaciones/HARMONIA-POOL-MINIMO-V1-SINTETICO.jsonl) aporta 11 eventos de diseño, cinco huellas y dos sesiones; no demuestra captura real. Ver [baseline](evidencias/HARMONIA-OBSERVACION-BASELINE-20261022.json) y [criterio de suficiencia](evidencias/HARMONIA-CRITERIO-SUFICIENCIA-POOL-V1.md).
 
 La publicación puntual quedó verificada por lectura de vuelta exacta. La publicación automática recurrente desde la extensión no está implementada; el worker sincroniza metadatos de solo lectura y no sube observaciones.
+
+
+## Estado activo · SES-20261022-Q7M4K9V2
+
+OCP v0.25. Control de frente: generación 6; titularidad verificada por lectura de vuelta. El dispositivo RDC autorizado PC-14, UUID 345f64ee-5d6a-429f-a97c-dab44f44cddb, aparece OFFLINE. No se realizaron operaciones locales ni pruebas de Chrome en esta retoma. Instrucciones completas conservadas en originales/HARMONIA-RETOMA-E2E-SES-20261022-Q7M4K9V2.jsonl, U18. La última salida anterior del modelo es NO DISPONIBLE; véase OCP §32. Reanudar solo después de que el mismo ID esté online y su identidad se verifique.
