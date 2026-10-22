@@ -3,18 +3,22 @@
 ## 1. Control e identidad
 
 - Identidad conservada: `MCP-OBS-DICTADO`; extensión documental de dictado, benchmark, retroalimentación y propuesta de voz/síntomas.
-- Versión: **v0.6.46**; sello **MCP-OBS-DICTADO-v0.6.46**. Objeto permanente por encargo V010; no declara permanente ninguna propuesta clínica.
-- Estado: **C054 · CORRECCIÓN CHECKLIST/MOMENTO/METADATOS DOCUMENTADA; NUEVO COMPORTAMIENTO PENDIENTE DE IMPLEMENTAR Y VERIFICAR; NO PUBLICACIÓN EDITORIAL**.
-- Ancla actual: C053, reautenticación Meta rechazada y corrección independiente del identificador API, sin cambio runtime; C052, integración editorial34ac y promoción única b1; C051, retroalimentación real del operador y orden de corregir/publicar en producción; C050, orden expresa de resolver almacenamiento gratuito cifrado y pruebas/configuración realizadas desde PC10RCIF4EI4 y navegador compartido. Producción canónica https://khora-web.vercel.app sirveb1d7d995df941f26da893e594e49bed778a38acf, candidata khora-rjl1blnkt, alias/API verificados tras promoción única.4ff209f/dpl_3jg86dPcWcMBYsFJaKu9V8UT294t es rollback conocido de C052, no runtime actual.6d es antecedente. GE4/d94 y91d72939 se conservan como antecedentes/rollback, no runtime vigente. Estado único §8/C050; C049 y anteriores son historia.
+- Versión: **v0.6.47**; sello **MCP-OBS-DICTADO-v0.6.47**. C055 es una actualización documental de continuidad/verbatim; no declara implementados cambios de producto ni convierte propuestas clínicas en funciones permanentes.
+- Estado: **C055 · AUDITORÍA DE INSTRUCCIONES VERBATIM Y CONTINUIDAD DOCUMENTADA; C054 ESPECIFICACIÓN FUNCIONAL AÚN PENDIENTE DE IMPLEMENTAR/VERIFICAR; SIN CAMBIOS DE CÓDIGO, PRUEBAS DE PRODUCTO, DESPLIEGUE NI PUBLICACIÓN EN C055**.
+- Ancla técnica heredada de C054 (NO REVERIFICADA EN C055): C053, reautenticación Meta rechazada y corrección independiente del identificador API, sin cambio runtime; C052, integración editorial34ac y promoción única b1; C051, retroalimentación real del operador y orden de corregir/publicar en producción; C050, orden expresa de resolver almacenamiento gratuito cifrado y pruebas/configuración realizadas desde PC10RCIF4EI4 y navegador compartido. Producción canónica https://khora-web.vercel.app sirveb1d7d995df941f26da893e594e49bed778a38acf, candidata khora-rjl1blnkt, alias/API verificados tras promoción única.4ff209f/dpl_3jg86dPcWcMBYsFJaKu9V8UT294t es rollback conocido de C052, no runtime actual.6d es antecedente. GE4/d94 y91d72939 se conservan como antecedentes/rollback, no runtime vigente. Estado único §8/C050; C049 y anteriores son historia.
 - Repositorio propietario: `SeryMente/khora`, privado comprobado con herramienta en este ciclo. `SeryMente/metodologia` también privado: aporta el método, no recibe datos del frente.
 - Carpeta contenedora: `docs/frentes/dictado-voz/`; elemento único de estado: `OBJETO-CANONICO.md`. Carpeta y elemento no se confunden.
+- **Sesión activa:** `SES-20261022-C7N4M2Q8`, alias operativo `chatgpt-dictado-voz-SES-20261022-C7N4M2Q8`, generación 1 del único `CONTROL-RESPONSABILIDAD.json`. No es un ID nativo de conversación. La búsqueda exacta en nueve repositorios accesibles no halló coincidencias adicionales, pero la unicidad global queda `NO VERIFICADA` por cobertura incompleta.
+- **OCP actualizado en esta rama de trabajo:** `integrate/blog-c053-production-20261021`. `main` aún expone una revisión anterior (v0.6.14 al corte leído); C055 no ha fusionado ramas ni cambiado código. No presentar el estado de esta rama como prueba de integración en `main`.
 - Revisión de origen del objeto: `1697ee2693ed3217523ffc1d1be9b6541d7d849d`, blob `e98a956c375ce48b791b5f0563ad0ae03c2616dd`.
 - Migración documental: mismo objeto e historia, no segundo tablero. Las rutas antiguas quedan como enlaces sin estado operativo. La rama documental no equivale a integración en main, publicación o aprobación de código.
 - Recuperación: README del repo → esta carpeta → este objeto. Contrato técnico y originales son anexos de custodia, no otra fuente de estado.
 
 ## 2. LEER PRIMERO
 
-C054 vigente: consultar §8/C054. Sustituye Qué haces por Qué pasa; exige suficiencia semántica viva, Fecha/Hora verificadas con reapertura, Momento normalizado y metadatos privados transversales. Especificación documentada, no código desplegado. C053 y sus estados de despliegue debajo son antecedentes; ver límites de verificación en C054.5.
+C055 vigente: leer §8/C055 y `originales/C055-instrucciones-verbatim-auditoria-20261019-20261022.txt`. El archivo añade U01–U45 que no estaban conservadas literalmente en C054 ni en C038/C039 consultados; la orden de checklist/Momento/IPv4/metadatos que comienza `Escucha,  no esta bien resuelto.` ya está verbatim en §8/C054.7 y no se duplica. `Última salida previa persistida del modelo anterior: NO DISPONIBLE / NO VERIFICADA`: el texto final del adjunto no figura como una salida íntegra previamente persistida dentro del OCP; §47.4 prohíbe reconstruirla.
+
+C054 histórico: especificación de checklist/Momento/metadatos; su estado de implementación sigue pendiente y no se vuelve una entrega por actualizar documentación. C053 y sus estados de despliegue debajo son antecedentes; ver límites de verificación en C054.5.
 
 C053 vigente: leer §8 y evidencias/C053-identidad-meta.md primero; C052 es el último runtime acreditado, no publicación externa. Antecedente:  recuperación editorial y custodia de propuestas publicadas técnicamente, sin acreditar proveedores ni primera publicación.
 
@@ -57,6 +61,14 @@ Remote Desktop Commander es exclusivo de asistencia, nunca del constructor, ni i
 Bloquear solo la acción dependiente de una compuerta no comprobada; continuar lo independiente autorizado. No simular voz humana, satisfacción, escritura productiva, lectura completa de fuentes ausentes ni conformidad de modelos externos.
 
 ## 3. Referencia metodológica
+
+### C055 · Método normativo vigente, adquirido desde `SeryMente/metodologia/main`
+
+- `INICIO.md`: blob `c57c866a8d5299d360e1bb1e318f34a573d9ccc7`.
+- Metacanon: versión **1.21**, blob `cae8387a576ba4914d086a47bf57fe925717efca`. Aplicados §§4, 42, 46–48 y 51 para salida de ciclo, titularidad/folio, preservación de ruta heredada y alcance del inventario.
+- Samantha: **v339 · NX-339m**, blob `fdc996078bd611492e46d6b3abf569fbb4a6effa`. Cascada de principios revisada manualmente; no se ha ejecutado una validación normativa por MCP.
+- GOW: **v2.2**, blob `6d4f8aff292ae173d9ceeba03694597bd2f16488`; leído al inicio del ciclo. Revisión de cierre pendiente hasta terminar las escrituras.
+- `MCP-NORMATIVO: DESACTIVADO`. Las referencias a Metacanon 1.6/1.8, NX-330m/NX-332m y otras firmas antiguas conservan carácter histórico; no se reinterpretan como gobierno actual.
 
 C048: adquirido Metacanon1.8 · METACANON-OBJETOS-v1.8, commit5f11cf5ade6f5577e1d6bd19206ccbaf19cc9394/blob8bc5d7c900ec4bca9fd3131bb635746b50cec1e5. Espejo de gobiernov333/NX-333m verificado; personalización cargóv332 y no se modificó. Delta1.7–1.8: directorio canónico, originales y salidas visibles con procedencia, continuidad entre conversaciones; este update no acredita sincronización automática, cifrado o exportación completa. Las menciones1.6 siguientes son historia.
 
@@ -198,6 +210,44 @@ Autenticación C025: dos flujos estándar por dispositivo, autorizados en navega
 
 ## 8. Estado vivo
 
+### C055 — Auditoría de instrucciones verbatim y continuidad — 2026-10-22
+
+**Tipo de ciclo:** documentación/custodia, no implementación. Fuente revisada: adjunto del operador `Texto pegado(8).txt`, referencia de conversación `turn0file0`, 136.019 bytes y 1.432 líneas. El archivo es una transcripción pegada que mezcla turnos directos, respuestas del asistente y material de una conversación anterior; no es una exportación nativa íntegra.
+
+**Resultado de cotejo:** se comparó el adjunto con C054/v0.6.46, `originales/C038-comodidad-operador.txt` y `originales/C039-instrucciones-verbatim.txt`. Se detectaron 45 registros seleccionados de mensajes/directivas del operador que no estaban conservados literalmente en esos originales ni en el C054 consultado. Se preservaron, sin normalizar ortografía o erratas, en [C055-instrucciones-verbatim-auditoria-20261019-20261022.txt](originales/C055-instrucciones-verbatim-auditoria-20261019-20261022.txt), U01–U45. C054.7 ya conserva literalmente la orden del 2026-10-21 que comienza «Escucha,  no esta bien resuelto.» y enumera checklist, Fecha/Hora, Lugar/IPv4, metadatos de adquisición, Momento y el cambio «Qué pasa»; no se duplicó.
+
+**Instrucciones que el canon debe aplicar como continuidad, no como un encargo nuevo:**
+1. **Alcance del central:** mantener la responsabilidad de Ingreso/Dictado, luces, custodia, recuperación, títulos e integración; coordinar Blog sin apropiarse de su trabajo ni abandonarlo. “Blog” es el nombre correcto; “Block” es una errata histórica.
+2. **Entrada autobiográfica:** el tipo “Blog personal” y su molde pertenecen a Ingreso antes/durante el dictado. El dictado produce la transcripción; luego el operador archiva manualmente. Una pantalla para pegar texto o una recaptura no sustituye este recorrido.
+3. **Primer hito de contenido:** transcripción generada por Khora desde el dictado → revisión de versión pública → consentimiento explícito del texto exacto para ambos destinos → blog de GitHub y Página de Facebook. El audio se conserva de forma privada cuando exista; no se publica como parte del primer hito. Un “No” conserva Custodia y no publica.
+4. **Sprints por hitos:** un incremento funcional, usable, probado y publicado en la URL canónica de producción de Vercel (no sólo en preview/local) por vez; el operador verifica antes de pasar al siguiente. Mostrar checklist breve y actualizarlo al progresar. Los bloqueos de un subsistema no paralizan trabajo independiente. El listado de “22 elementos” no pudo reconstruirse: el fragmento que presuntamente lo define no aparece completo en el adjunto; no inferirlo de una cita del asistente.
+5. **Orden funcional recuperado:** Hito 1 prioriza recuperación/archivado confiables, preservación del original, verificación del audio realmente disponible, descarga y diagnósticos; títulos consistentes después; luego diálogos/modos, crónica/decisiones y publicación conjunta. El estado de cada punto distingue histórico/reportado, implementado, probado localmente, desplegado y aceptado por el operador.
+6. **Cuatro luces de custodia:** azul = archivo manual cerrado; verde = punto de recuperación real que cubre el contenido pertinente actual; amarillo = retraso/espera real con vía de continuación; rojo = error concreto detectado. Un guardado viejo no puede volver verde contenido nuevo. Tras archivar un registro y continuar dictando, puede coexistir azul (registro anterior archivado) y verde (nuevo tramo recuperable). Sólo sustituyen mensajes inferiores de “checkpoint confirmado en el servidor” cuando las condiciones rigurosas estén implementadas y verificadas.
+7. **Tipos y corpus:** Conversación con Maya y Blog personal pueden aportar al GRP/corpus según el contrato y revisión correspondientes. Interpretación simultánea se conserva para el proyecto lateral y permanece excluida del GRP/comercial. Captura/custodia, ingesta en grafo, elaboración pública y publicación son decisiones independientes.
+8. **Crónica personal:** los requisitos mínimos de suficiencia deben ser visibles como checklist vivo, sin formulario obligatorio ni guía extensa permanente; el campo “Momento” puede mantenerse amigable/ambiguo en la experiencia de dictado, pero normalizarse a representación clara en la vista pública. La crónica es libre: no se reduce a “qué haces”. No se inventan datos ni se ratifican automáticamente metadatos propuestos.
+9. **Adquisición y almacenamiento:** queda registrada la petición de metadatos automatizados transversales; el C054 contiene su diseño técnico y salvaguardas. Backblaze fue una decisión histórica de almacenamiento privado/cifrado tras el bloqueo de Vercel Blob, pero C055 no revalidó credenciales/configuración, migraciones, cifrado real, cuotas ni retención. No declarar resuelto sin evidencia actual.
+10. **Facebook/seguridad:** la intención inicial de publicación automática en perfil personal quedó refinada por la limitación descrita en el historial: el destino automático acordado del hito es la Página de Facebook; el perfil personal requiere intervención del usuario. La confirmación de Meta/proveedores reales y consentimiento exacto no se infieren. Las autorizaciones de contraseña/2FA contenidas en el archivo son históricas y específicas; no son permisos vigentes.
+11. **Cadencia de actualización:** el pedido “Actualizame cada 5 minutos” (U40) pertenece a la conversación de 2026-10-20; queda como contexto histórico de comunicación, no como automatización programada ni promesa de trabajo en segundo plano.
+
+**Última salida previa del modelo:** `NO DISPONIBLE / NO VERIFICADA`. Aunque el adjunto contiene salida del asistente después de la instrucción de C054.7, no encontré esa respuesta guardada como salida íntegra previamente persistida dentro del OCP. No la reconstruí ni la presenté como una salida anterior del canon, conforme a Metacanon §47.4.
+
+**Evidencia y límites:** el archivo C055 quedó guardado como original separado. No se hizo modificación de código, prueba de producto, build, despliegue, promoción, publicación editorial ni acceso nuevo a Vercel/Meta/Backblaze. No se inspeccionó la interfaz visual en este ciclo. La cobertura es la del texto pegado y los originales enumerados; no prueba exhaustividad del historial nativo ni ausencia de instrucciones en fuentes no accesibles. Las autorizaciones, diagnósticos, pruebas y afirmaciones de las respuestas históricas permanecen como reportes históricos hasta que una fuente actual las corrobore.
+
+**Estado del checklist C055**
+| Elemento | Estado | Siguiente comprobación |
+|---|---|---|
+| Cotejo C054/C038/C039 frente al adjunto | HECHO Y VERIFICADO por lectura textual | Mantener el archivo original y su procedencia |
+| Instrucciones faltantes U01–U45 | DOCUMENTADAS verbatim en archivo nuevo | Leer cada una desde el original, no sólo el resumen |
+| Instrucción directa del 2026-10-21 | YA DOCUMENTADA en C054.7 | No duplicar |
+| Última salida anterior guardada | NO DISPONIBLE / NO VERIFICADA | No reconstruir; preservar esta declaración |
+| Lista original de 22 elementos | PENDIENTE / fuente incompleta | Recuperar el fragmento original si está disponible |
+| Cambios de producto de C054 | PENDIENTES de implementación/validación | Próximo ciclo de construcción, sin asumir aceptación |
+| Producción y publicación Blog/Página | NO VERIFICADAS por C055 | Verificar permisos y artefactos reales antes de publicar |
+| Sincronización en `main` | PENDIENTE; `main` aún contenía v0.6.14 al corte de lectura | Integración normal posterior; no cambiar código ni afirmar que esta rama ya está en `main` |
+
+**Evidencia de ciclo:** objeto actualizado en la rama `integrate/blog-c053-production-20261021`, con original separado C055; lectura de vuelta de ambos artefactos pendiente de finalizar junto con la actualización del manifiesto.
+
+### C054 — Corrección del checklist, Momento y metadatos de adquisición
 ### C054 — Corrección del checklist, Momento y metadatos de adquisición
 
 **Registro documental, no implementación ni despliegue.** Fecha de registro obtenida del equipo: 2026-10-21; hora y offset en el recibo Git. Fuente inicial limpia: 07168e5d2fb47812020f74d1251c230dc74a607a, rama integrate/blog-c053-production-20261021. Operador pide corregir suficiencia/UX y registrar sus órdenes. Este ciclo prioriza registro y checklist de situación; no declara satisfecho el cambio de producto por escribir su especificación.
