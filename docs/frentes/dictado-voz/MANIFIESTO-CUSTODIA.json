@@ -357,6 +357,12 @@
       "bytes": 2641,
       "sha256": "4959c65dd69bf0ecd7eadce072b29853cc0709602b694b3f09cf93923bfe913c",
       "git_blob_sha": "afb6acb0571f2a24c3726afc55bf500e6ab4fa48"
+    },
+    {
+      "path": "originales/INSTRUCCIONES-VERBATIM-TAIL-C032-20261022.jsonl",
+      "bytes": 6339,
+      "sha256": "19179001955a3f98adfd1770f83f0de63166be549f0af75edbd5ae1e27a0bf4c",
+      "git_blob_sha": "fb35dc95c877e86ac75273b7e4496b4999841e06"
     }
   ],
   "runtime_references": [
@@ -453,7 +459,8 @@
     "clinical reference data and any voice-health model",
     "Preparacion-benchmark-y-retroalimentacion.md standalone temporary file",
     "fresh full review of every supporting technical document cited by this sprint",
-    "complete native export of this ChatGPT conversation for C031; only visible user entries/commentaries were preserved"
+    "complete native export of this ChatGPT conversation for C031; only visible user entries/commentaries were preserved",
+    "complete verbatim export of the full source conversation; C032 preserves selected closing user instructions U01–U06 only"
   ],
   "privacy_review": {
     "destination_private_verified_by_tool": true,
@@ -464,12 +471,12 @@
     "no_secret_values_in_manifest": true
   },
   "current_preparation": {
-    "version": "0.6.13",
+    "version": "0.6.14",
     "baseSha": "f0dfbdcb2d79eb6289dacba272ddcc7ba2023063",
     "receipt": "evidencias/C030-release.json",
-    "state": "C030 product release unchanged; C031 documentary continuity/control/prompt update read back; global quality gate and human acceptance remain pending"
+    "state": "C032 documentary-only update: closing verbatim directives read back; checklist/Groq/metadata/Momento requirements are not implemented or production-verified"
   },
-  "latestEvent": "C031 — responsibility control initialized, visible conversation entries preserved, OCP/prompts/manifest updated; no product-code or deployment changes; MCP-NORMATIVO disabled",
+  "latestEvent": "C032 — closing verbatim operator instructions U01–U06 preserved; OCP/prompts updated; documentation only; MCP-NORMATIVO disabled",
   "latest_verified_release": {
     "sha": "f0dfbdcb2d79eb6289dacba272ddcc7ba2023063",
     "deploymentId": "dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr",
@@ -495,8 +502,8 @@
     "physicalAcceptance": false,
     "technicalPublicationVerified": true
   },
-  "latest_cycle": "C031",
-  "canonical_version": "0.6.13",
+  "latest_cycle": "C032",
+  "canonical_version": "0.6.14",
   "latest_candidate": {
     "branch": "fix/captura-dialogo-custodia-20261018",
     "codeCommit": "b36231bfdd719741253148d24ba0265ac8dadeb7",
@@ -582,12 +589,26 @@
     "complete_native_export": false,
     "latest_prior_model_output": "not_available_not_verified"
   },
-  "latest_product_event": "C030 — functional production verified; effective global gate failed, unpromoted, logs inaccessible; no full E2E claim",
+  "latest_product_event": "C030 — last product state remains technically published; effective global gate and human acceptance remain pending, not revalidated in C031/C032",
   "latest_object": {
-    "version": "0.6.13",
+    "version": "0.6.14",
     "ref": "main",
-    "blob_sha": "14fa6bbc086c422a568cf9a926cdbd6ff4c2460c",
-    "commit": "dc5ea4500cfd8db8c7446697062f1302e8d43c12",
-    "state": "C031 documentary continuity persisted; product state remains C030; MCP-NORMATIVO disabled"
+    "blob_sha": "8d0466379d8e8b8356ec46001dc61dbf7839f78f",
+    "commit": "3c709828fcb84835236435e0340a1ad039a8e1fa",
+    "state": "C032 verbatim instructions documented; product state unchanged; no tests or deployment"
+  },
+  "recent_verbatim_instruction_ingestion": {
+    "path": "originales/INSTRUCCIONES-VERBATIM-TAIL-C032-20261022.jsonl",
+    "full_path": "docs/frentes/dictado-voz/originales/INSTRUCCIONES-VERBATIM-TAIL-C032-20261022.jsonl",
+    "blob": "fb35dc95c877e86ac75273b7e4496b4999841e06",
+    "commit": "d959100921cd4ee06d0bf0538a6bb4ade5720a15",
+    "sha256": "19179001955a3f98adfd1770f83f0de63166be549f0af75edbd5ae1e27a0bf4c",
+    "bytes": 6339,
+    "records": 7,
+    "priority_record": "U06",
+    "latest_requested_format": "clean, ordered checklist; not a wall of text",
+    "source_native_export": false,
+    "historical_claim_C054_v0_6_46": "not verified in main or currently fetched feature-branch OCP",
+    "implementation_status": "documented_only"
   }
 }
