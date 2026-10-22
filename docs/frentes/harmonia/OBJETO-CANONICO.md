@@ -4,7 +4,7 @@
 ## 1. Control e identidad
 
 - Nombre normalizado: **Harmonia**, extensión compañera de **Khora**; «Armonía» y «Cora» de los dictados se conservan literalmente en originales. No renombrar producto o repositorio por transcripción.
-- Identificador del frente: `harmonia`. Versión del objeto **0.19**; sello **HARMONIA-v0.19**; corte de estado **2026-10-21/22**. Este corte registra un refinamiento UX accesible en la candidata y las validaciones estáticas repetidas; CI sigue sin runner, RDC sin identidad autorizada y E2E sin aceptación. Se conserva esencial primero y optimización al final.
+- Identificador del frente: `harmonia`. Versión del objeto **0.20**; sello **HARMONIA-v0.20**; corte de estado **2026-10-21/22**. Este corte registra el diagnóstico adicional del bloqueo de CI frente al estado público de GitHub, conserva las evidencias de UX/código candidato y confirma que CI/RDC impiden aún la aceptación E2E. Se mantiene esencial primero y optimización al final.
 - Repositorio propietario: `SeryMente/khora`, rama `main`; objeto canónico en `docs/frentes/harmonia/OBJETO-CANONICO.md`. El blob de la versión anterior v0.4 fue `9a186ea789ea5aacab8dd06cf9f6edf364b89531`. Primera publicación del estado completo: commit `892adad897d6bd36c797ec2343ff7f4893b853bf`; lectura de vuelta en `main` confirmada y blob verificado `03ec5d127e0913dfe1f61e8588ba53b8abaa8e5f`. El recibo se refiere al contenido integral v0.5. Corte v0.6: commit inicial `3cb7901c2223cd41773185b93f17133e459e7a69`, blob `d1f524c383cc71c13f89e8d3aa3886ac3533fcdb`. Corte v0.7: commit inicial `55c2e8ba053265c219b2d941665c5cb3730107de`, blob `bbd08e2da15be17486e7515fd11eda7df57fca2b`; lectura de vuelta y corrección del catálogo documentadas. Nunca anticipar un SHA.
 - Fuente de código vigente: `apps/harmonia-observability/` en `main`, con la extensión de observabilidad y captura automática en evolución (rama `main`, versión de código en revisión E2E), `coverage-catalog.json` y scripts/validador. No inferir que el código fuente, el paquete local y el runtime ejecutado están sincronizados sin prueba de huellas. El paquete materializado en el Escritorio se reconstruyó desde esos archivos y contiene solo el runtime portable y una credencial local excluidos del repositorio; su manifiesto local de huellas se regeneró tras las validaciones.
 - Frente permanente por creación expresa del operador. El paquete local usado anteriormente está en `C:\\Users\\fila4\\Desktop\\Harmonia-Observabilidad-v0.2.0`; su sincronización con las últimas versiones de `main` **NO VERIFICADA**. El runtime debe considerarse desincronizado hasta comparar huellas y reiniciar con el colector actualizado. La versión 0.3.0 del código fuente no está aceptada funcionalmente en Chrome; no hereda pruebas de v0.1.0 ni de validaciones anteriores.
@@ -690,3 +690,35 @@ En la revisión de archivos de la candidata:
 - El refinamiento UX está implementado como candidata y leído de vuelta. Las métricas avanzadas, protocolo de rendimiento y arquitectura multiámbito permanecen propuestas documentales no aprobadas.
 - Los esenciales siguen abiertos: runner CI real, prueba de integración del colector ejecutada, identidad RDC autorizada, paquete sincronizado en la carpeta única y Chrome E2E físico.
 - La optimización de CPU/RAM/fingerprints/latencia no se ha iniciado ni medido. Debe seguir siendo la última fase, tras aceptación E2E.
+
+
+## 27. Diagnóstico adicional del bloqueo de CI · 2026-10-22
+
+### Datos observados en el repositorio candidato
+
+- Head actual de la rama revisable: `fed3c6e01a058e4e993c0a3d98d2ace854d51ba8`.
+- `Harmonia validation` run `39711328931`; job `119603101763`: `completed/failure`, `runner_id=0`, `runner_name=""`, `steps=[]`, sin artefactos descargables. `CI` run `39711328941` también falló.
+- La misma firma (jobs que acaban en unos segundos sin runner/pasos/logs, `BlobNotFound`) se repitió en varios heads de la rama y tras reintentar un job. No hay prueba de que se ejecutaran `node --check`, el validador o `node --test` en un runner GitHub.
+- Se probaron los endpoints de lectura de permisos/uso de Actions mediante el conector GitHub; el conector rechazó esas rutas como no permitidas. No se pudo consultar la configuración de facturación/restricciones de la organización desde esta interfaz.
+
+### Contraste externo y cautela
+
+- Página pública de estado de GitHub: [GitHub Status](https://www.githubstatus.com/). Registró degradación de Actions junto con Pull Requests/Webhooks el **21 de octubre de 2026**, con mensajes de recuperación a las 16:57–17:09 UTC. Al consultar, la página mostraba Actions como Operational, aunque conservaba la incidencia de retrasos de Pull Requests/Webhooks.
+- Hay reportes comunitarios publicados en septiembre de 2026 con la misma firma técnica (job fallido antes de asignar runner, `runner_id=0`, cero pasos y sin logs): [Discussion #209001](https://github.com/orgs/community/discussions/209001) y [Discussion #209031](https://github.com/orgs/community/discussions/209031). Son casos de otros repositorios; no prueban la causa de Harmonia.
+- **Conclusión acotada:** los síntomas apuntan a fallo de provisionamiento/arranque del job antes de ejecutar el workflow, no a una aserción conocida que haya fallado en el código. La causa exacta (incidente residual de GitHub, límite/restricción de cuenta/org, o política de runner) queda **NO DETERMINADA**. No cambiar el código ni la política de producción a ciegas para intentar arreglarlo.
+
+### Acciones alternativas intentadas y límite restante
+
+1. Reintentar el job de Harmonia una vez.
+2. Verificar jobs, pasos, logs y artefactos de los runs nuevos.
+3. Verificar el estado público del servicio.
+4. Intentar leer la configuración/uso de Actions mediante sus endpoints; el conector los rechazó.
+
+No insistir con reintentos sin un cambio en la capacidad de provisionamiento. La siguiente ruta requiere inspección de Settings/Billing/Actions de la organización por un propietario autorizado o abrir un caso con GitHub Support aportando run IDs `39711328931` / `39711328941` y job ID `119603101763`. Los datos de este objeto no afirman que esa comprobación externa ya haya ocurrido.
+
+### Estado operativo resultante
+
+- CI de la candidata: **BLOQUEADO ANTES DE EJECUTAR PASOS; CAUSA EXACTA NO DETERMINADA**.
+- Código: 23/23 contratos estáticos, 9/9 JS parseables y 12 aserciones aisladas de política regional; esto no reemplaza la prueba de Node/collector/Chrome.
+- Entorno de destino: UUID autorizado aún no verificado; no hubo conexión/Chrome/Escritorio.
+- E2E esencial: **ABIERTO**. Se continúa con propuestas y UX no esencial en la rama candidata; no se optimiza hasta aceptar E2E.
