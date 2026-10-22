@@ -67,7 +67,7 @@ Bloquear solo la acción dependiente de una compuerta no comprobada; continuar l
 - `INICIO.md`: blob `c57c866a8d5299d360e1bb1e318f34a573d9ccc7`.
 - Metacanon: versión **1.21**, blob `cae8387a576ba4914d086a47bf57fe925717efca`. Aplicados §§4, 42, 46–48 y 51 para salida de ciclo, titularidad/folio, preservación de ruta heredada y alcance del inventario.
 - Samantha: **v339 · NX-339m**, blob `fdc996078bd611492e46d6b3abf569fbb4a6effa`. Cascada de principios revisada manualmente; no se ha ejecutado una validación normativa por MCP.
-- GOW: **v2.2**, blob `6d4f8aff292ae173d9ceeba03694597bd2f16488`; leído al inicio del ciclo. Revisión de cierre pendiente hasta terminar las escrituras.
+- GOW: **v2.2**, blob `6d4f8aff292ae173d9ceeba03694597bd2f16488`; leído al inicio y releído al cierre después de las escrituras. La versión/blob coincide; revisión de cierre completada.
 - `MCP-NORMATIVO: DESACTIVADO`. Las referencias a Metacanon 1.6/1.8, NX-330m/NX-332m y otras firmas antiguas conservan carácter histórico; no se reinterpretan como gobierno actual.
 
 C048: adquirido Metacanon1.8 · METACANON-OBJETOS-v1.8, commit5f11cf5ade6f5577e1d6bd19206ccbaf19cc9394/blob8bc5d7c900ec4bca9fd3131bb635746b50cec1e5. Espejo de gobiernov333/NX-333m verificado; personalización cargóv332 y no se modificó. Delta1.7–1.8: directorio canónico, originales y salidas visibles con procedencia, continuidad entre conversaciones; este update no acredita sincronización automática, cifrado o exportación completa. Las menciones1.6 siguientes son historia.
@@ -247,7 +247,7 @@ Autenticación C025: dos flujos estándar por dispositivo, autorizados en navega
 | Producción y publicación Blog/Página | NO VERIFICADAS por C055 | Verificar permisos y artefactos reales antes de publicar |
 | Sincronización en `main` | PENDIENTE; `main` aún contenía v0.6.14 al corte de lectura | Integración normal posterior; no cambiar código ni afirmar que esta rama ya está en `main` |
 
-**Evidencia de ciclo:** objeto actualizado en la rama `integrate/blog-c053-production-20261021`, con original separado C055; lectura de vuelta de ambos artefactos pendiente de finalizar junto con la actualización del manifiesto.
+**Evidencia de ciclo:** objeto, original verbatim C055 y control de responsabilidad cotejados por lectura posterior exacta en `integrate/blog-c053-production-20261021`; GOW v2.2 releído al cierre. Se actualiza y relee el manifiesto de custodia a continuación. Sin cambios de código, build, pruebas de producto, despliegue ni publicación editorial.
 
 ### C054 — Corrección del checklist, Momento y metadatos de adquisición
 ### C054 — Corrección del checklist, Momento y metadatos de adquisición
