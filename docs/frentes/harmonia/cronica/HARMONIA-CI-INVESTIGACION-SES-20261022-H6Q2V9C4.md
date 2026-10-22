@@ -41,8 +41,15 @@ Los rangos suponen runner/entorno habilitado y ausencia de defectos arquitectón
 | 8. Carpeta única de Escritorio | 30–75 min | destino RDC explícitamente autorizado y paquete validado |
 | 9. E2E físico/aceptación | 1.5–3 h | hitos previos completados y Chrome real disponible |
 
-Total orientativo de trabajo activo: 10–24 horas, potencialmente no continuo. Tiempo de calendario no estimable hasta liberar CI y autorizar el destino RDC. No optimizar antes de aceptación E2E.
+Total orientativo de trabajo activo: 10–26 horas, potencialmente no continuo. Tiempo de calendario no estimable hasta liberar CI y autorizar el destino RDC. No optimizar antes de aceptación E2E.
 
 ## Siguiente acción
 
 El hito 1 permanece ABIERTO/BLOQUEADO. Conseguir que un propietario autorizado inspeccione Settings/Billing/Actions o elevar a GitHub Support los runs y jobs arriba señalados. Evitar reintentos ciegos y no atribuir los fallos al código sin logs. Tras desbloquear runner, ejecutar las suites del workflow `harmonia-validation.yml` y registrar salidas/hashes antes de avanzar.
+
+
+## Sincronización documental posterior al primer registro
+
+- README actualizado a OCP v0.21: commit `c5dddfa2a114ef787172a94a70fee6f9439c0891`, blob releído `576856970a7c10218ec483cc94142ef86afd6d2f`.
+- Prompt de asistente actualizado a generación 4 y OCP v0.21/§28: commit `f749e24b6d88901bd3a6ecfc8b5afbe6a90fe5d8`, blob releído `74e09105fd8268b963be5fbf49f38d32774e3b29`.
+- OCP inicial de este ciclo: commit `c34baa58bc7a99d0c21d36897e0d57970a83ec70`, blob releído `7dadb869dc2daa26dfb5b66b4c50ad2de00cd86b`. Una actualización final secuencial del OCP registrará el read-back de esta crónica y corregirá la suma estimada a 10–26 horas.
