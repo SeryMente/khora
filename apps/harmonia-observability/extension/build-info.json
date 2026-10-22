@@ -1,7 +1,7 @@
 {
   "schema": "harmonia.repository-build.v1",
   "version": "0.4.0",
-  "sourceRevision": "74804ea592c5879ccda91330e7d08b13af3501e9",
+  "sourceRevision": "7e405a7be004c7df80886a7a38387e539465d426",
   "catalogVersion": "0.1.2",
   "regionPolicyVersion": "1.0.0",
   "releaseChannel": "candidate",
