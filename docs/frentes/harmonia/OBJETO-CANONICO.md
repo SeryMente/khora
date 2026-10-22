@@ -4,7 +4,7 @@
 ## 1. Control e identidad
 
 - Nombre normalizado: **Harmonia**, extensión compañera de **Khora**; «Armonía» y «Cora» de los dictados se conservan literalmente en originales. No renombrar producto o repositorio por transcripción.
-- Identificador del frente: `harmonia`. Versión del objeto **0.18**; sello **HARMONIA-v0.18**; corte de estado **2026-10-21/22**. Este corte añade la propuesta candidata de UX/métricas y el protocolo de rendimiento posterior a E2E, mantiene la prioridad esencial primero y optimización al final, y conserva los bloqueos de CI y RDC. No declara cierre E2E.
+- Identificador del frente: `harmonia`. Versión del objeto **0.19**; sello **HARMONIA-v0.19**; corte de estado **2026-10-21/22**. Este corte registra un refinamiento UX accesible en la candidata y las validaciones estáticas repetidas; CI sigue sin runner, RDC sin identidad autorizada y E2E sin aceptación. Se conserva esencial primero y optimización al final.
 - Repositorio propietario: `SeryMente/khora`, rama `main`; objeto canónico en `docs/frentes/harmonia/OBJETO-CANONICO.md`. El blob de la versión anterior v0.4 fue `9a186ea789ea5aacab8dd06cf9f6edf364b89531`. Primera publicación del estado completo: commit `892adad897d6bd36c797ec2343ff7f4893b853bf`; lectura de vuelta en `main` confirmada y blob verificado `03ec5d127e0913dfe1f61e8588ba53b8abaa8e5f`. El recibo se refiere al contenido integral v0.5. Corte v0.6: commit inicial `3cb7901c2223cd41773185b93f17133e459e7a69`, blob `d1f524c383cc71c13f89e8d3aa3886ac3533fcdb`. Corte v0.7: commit inicial `55c2e8ba053265c219b2d941665c5cb3730107de`, blob `bbd08e2da15be17486e7515fd11eda7df57fca2b`; lectura de vuelta y corrección del catálogo documentadas. Nunca anticipar un SHA.
 - Fuente de código vigente: `apps/harmonia-observability/` en `main`, con la extensión de observabilidad y captura automática en evolución (rama `main`, versión de código en revisión E2E), `coverage-catalog.json` y scripts/validador. No inferir que el código fuente, el paquete local y el runtime ejecutado están sincronizados sin prueba de huellas. El paquete materializado en el Escritorio se reconstruyó desde esos archivos y contiene solo el runtime portable y una credencial local excluidos del repositorio; su manifiesto local de huellas se regeneró tras las validaciones.
 - Frente permanente por creación expresa del operador. El paquete local usado anteriormente está en `C:\\Users\\fila4\\Desktop\\Harmonia-Observabilidad-v0.2.0`; su sincronización con las últimas versiones de `main` **NO VERIFICADA**. El runtime debe considerarse desincronizado hasta comparar huellas y reiniciar con el colector actualizado. La versión 0.3.0 del código fuente no está aceptada funcionalmente en Chrome; no hereda pruebas de v0.1.0 ni de validaciones anteriores.
@@ -642,9 +642,9 @@ Se volvió a consultar el inventario vivo y el registro global RDC:
 
 - Propuesta: [HARMONIA-UX-METRICAS-RENDIMIENTO-CANDIDATA.md](https://github.com/SeryMente/khora/blob/feat/harmonia-e2e-20261021/docs/frentes/harmonia/propuestas/HARMONIA-UX-METRICAS-RENDIMIENTO-CANDIDATA.md).
 - Ruta en la rama de revisión: `docs/frentes/harmonia/propuestas/HARMONIA-UX-METRICAS-RENDIMIENTO-CANDIDATA.md`.
-- Commit: `11418a029f01dc015ecbbe223075b13f7ab4e14d`; blob `5d1c8d841567939cb5e25f61dc670edf74cc3f87`; lectura de vuelta verificada.
+- Commit inicial: `11418a029f01dc015ecbbe223075b13f7ab4e14d`; blob actualizado tras documentar la mejora UX: `ea7faf4a8be8d31e704f69f26266088c1ea1c74b`; lectura de vuelta verificada.
 - Alcance: mejoras UX para no confundir estados de catálogo/documentación/observación/completitud; accesibilidad y claridad del panel; métricas agregadas de eventos, integridad, latencia, recursos y estado de sincronización; un protocolo reproducible para la fase de rendimiento.
-- Estado: **CANDIDATA DOCUMENTAL; NO IMPLEMENTADA; NO ES POLÍTICA VIGENTE**. No se cambió el comportamiento del dashboard ni del colector con este documento.
+- Estado del protocolo de métricas/rendimiento: **CANDIDATO DOCUMENTAL; NO APROBADO COMO POLÍTICA VIGENTE**. Una primera mejora UX sí se implementó en la rama candidata (guía desplegable accesible, HTML/CSS y guardas de validación); no cambia captura, colector, métricas recolectadas ni políticas de datos.
 - La propuesta prohíbe fijar retención, borrar automáticamente originales, enviar telemetría externa o optimizar sin una decisión y prueba separadas.
 
 ### Compuerta de rendimiento
@@ -654,10 +654,39 @@ Queda reafirmada la orden del operador: la optimización va al final. No ejecuta
 ### Estado de la rama revisable
 
 - PR #333 sigue abierta, en borrador y sin fusionar. Head actual de la rama tras la propuesta de UX/métricas: `11418a029f01dc015ecbbe223075b13f7ab4e14d`.
-- El run `CI` `39711070504` para ese head acabó en fallo. El último run específico `Harmonia validation` sobre código era `39710596780`, también fallido con `runner_id=0`, sin pasos, logs ni artefactos recuperables. No hay evidencia de ejecución de las suites Node; siguen NO VERIFICADAS.
+- El run `CI` `39711070504` del head previo terminó en fallo. Para el head actual tras el glosario UX (`fed3c6e01a058e4e993c0a3d98d2ace854d51ba8`), `Harmonia validation` `39711328931` y `CI` `39711328941` terminaron en fallo; el job `119603101763` tiene `runner_id=0`, `runner_name=""`, `steps=[]` y no hay artefactos descargables. No hay evidencia de ejecución de las suites Node; siguen NO VERIFICADAS.
 - La propuesta multiámbito anterior permanece en el mismo branch, commit `263f3f18605e456db5bee3195d447a33bfa3bf0e`, blob `3e80ff93ff566ea7fa5c317028159185646b1901`; tampoco está aprobada ni implementada.
 - Main no se fusionó con la candidata; por ello, el código publicado en `main` permanece v0.3.0.
 
 ### Dictamen no esencial y secuencia
 
 Se prepararon dos propuestas documentales no esenciales en rama; no se implementó la arquitectura generalizada ni la UX/métricas, y no se realizó optimización prematura. El siguiente trabajo de producto posterior a E2E será ratificar arquitectura, instrumentar métricas que no expongan contenido, refinar UX y luego optimizar con una línea base. Esas tareas no reemplazan los esenciales aún abiertos: CI con runner real, pruebas colector, reconciliación RDC, carpeta única y Chrome E2E físico.
+
+
+## 26. Refinamiento UX de bajo riesgo · candidata v0.4.0 · 2026-10-22
+
+### Implementación efectuada en la rama revisable
+
+Se añadió al dashboard una guía desplegable accesible para interpretar cuatro grupos de indicadores: índice combinado frente a precisión, superficies únicas frente a barridos, completitud regional frente a falta de catálogo, y revisión remota frente a código realmente instalado. Usa `<details>/<summary>` nativos sin JavaScript nuevo y estilo con foco de teclado visible. No modifica eventos, captura, colector, permisos, retención ni datos persistidos.
+
+Artefactos re-leídos desde `feat/harmonia-e2e-20261021`:
+- `extension/dashboard.html`: blob `ea8cdd453b98780bbc8928b1fc0ecf42148b7bcd`.
+- `extension/dashboard.css`: blob `19c50217f6f8b3f5a36ba00bf4164412433006d9`.
+- `scripts/validate-source.js`: blob `4b8101cb57751738d84aa43e0acc86fa8ec40c6b`.
+- `extension/build-info.json`: blob `c0f38a0e587afd2844be858bdc8a569eecdfd476`, `sourceRevision=74804ea592c5879ccda91330e7d08b13af3501e9` (head revisado inmediatamente antes de la actualización de metadatos, no el commit posterior de metadatos).
+- Propuesta UX/métricas revisada: blob `ea7faf4a8be8d31e704f69f26266088c1ea1c74b`; la sección 8 distingue claramente la mejora implementada de las métricas/optimizaciones todavía diferidas.
+
+### Validación aislada repetida
+
+En la revisión de archivos de la candidata:
+- **23/23 comprobaciones estáticas** pasaron, incluidas las nuevas sobre el glosario de métricas y la diferencia entre mapeo y precisión.
+- **9/9 archivos JavaScript** del conjunto leído se pudieron parsear con el motor V8 de esta sesión.
+- **12/12 aserciones aisladas** de la lógica de política regional pasaron.
+- Estos resultados no equivalen a `node --test`, a una ejecución real del colector ni a Chrome. No afirmar aceptación E2E ni rendimiento medido.
+
+### Estado de runner y cierre
+
+- Para el head `fed3c6e01a058e4e993c0a3d98d2ace854d51ba8`, los runs `Harmonia validation` `39711328931` y `CI` `39711328941` acabaron en `failure`. Job `119603101763`: `runner_id=0`, `runner_name=""`, `steps=[]`; lista de artefactos vacía. La suite del colector y las suites Node no están verificadas como ejecutadas.
+- El refinamiento UX está implementado como candidata y leído de vuelta. Las métricas avanzadas, protocolo de rendimiento y arquitectura multiámbito permanecen propuestas documentales no aprobadas.
+- Los esenciales siguen abiertos: runner CI real, prueba de integración del colector ejecutada, identidad RDC autorizada, paquete sincronizado en la carpeta única y Chrome E2E físico.
+- La optimización de CPU/RAM/fingerprints/latencia no se ha iniciado ni medido. Debe seguir siendo la última fase, tras aceptación E2E.
