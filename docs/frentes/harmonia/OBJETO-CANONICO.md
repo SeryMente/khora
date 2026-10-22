@@ -4,7 +4,7 @@
 ## 1. Control e identidad
 
 - Nombre normalizado: **Harmonia**, extensión compañera de **Khora**; «Armonía» y «Cora» de los dictados se conservan literalmente en originales. No renombrar producto o repositorio por transcripción.
-- Identificador del frente: `harmonia`. Versión del objeto **0.15**; sello **HARMONIA-v0.15**; corte de estado **2026-10-21**. Este corte persiste el orden esencial/no esencial solicitado, enlaza la crónica y alinea el README y el prompt de continuidad. Las optimizaciones siguen explícitamente al final; la aceptación E2E continúa abierta.
+- Identificador del frente: `harmonia`. Versión del objeto **0.16**; sello **HARMONIA-v0.16**; corte de estado **2026-10-21**. Este corte registra la corrección de captura multi-pestaña en la candidata v0.4.0, los resultados estáticos aislados, el nuevo bloqueo medible de CI y las condiciones RDC sin resolver. Se mantiene la prioridad esencial primero y optimización al final; no declara aceptación E2E.
 - Repositorio propietario: `SeryMente/khora`, rama `main`; objeto canónico en `docs/frentes/harmonia/OBJETO-CANONICO.md`. El blob de la versión anterior v0.4 fue `9a186ea789ea5aacab8dd06cf9f6edf364b89531`. Primera publicación del estado completo: commit `892adad897d6bd36c797ec2343ff7f4893b853bf`; lectura de vuelta en `main` confirmada y blob verificado `03ec5d127e0913dfe1f61e8588ba53b8abaa8e5f`. El recibo se refiere al contenido integral v0.5. Corte v0.6: commit inicial `3cb7901c2223cd41773185b93f17133e459e7a69`, blob `d1f524c383cc71c13f89e8d3aa3886ac3533fcdb`. Corte v0.7: commit inicial `55c2e8ba053265c219b2d941665c5cb3730107de`, blob `bbd08e2da15be17486e7515fd11eda7df57fca2b`; lectura de vuelta y corrección del catálogo documentadas. Nunca anticipar un SHA.
 - Fuente de código vigente: `apps/harmonia-observability/` en `main`, con la extensión de observabilidad y captura automática en evolución (rama `main`, versión de código en revisión E2E), `coverage-catalog.json` y scripts/validador. No inferir que el código fuente, el paquete local y el runtime ejecutado están sincronizados sin prueba de huellas. El paquete materializado en el Escritorio se reconstruyó desde esos archivos y contiene solo el runtime portable y una credencial local excluidos del repositorio; su manifiesto local de huellas se regeneró tras las validaciones.
 - Frente permanente por creación expresa del operador. El paquete local usado anteriormente está en `C:\\Users\\fila4\\Desktop\\Harmonia-Observabilidad-v0.2.0`; su sincronización con las últimas versiones de `main` **NO VERIFICADA**. El runtime debe considerarse desincronizado hasta comparar huellas y reiniciar con el colector actualizado. La versión 0.3.0 del código fuente no está aceptada funcionalmente en Chrome; no hereda pruebas de v0.1.0 ni de validaciones anteriores.
@@ -528,3 +528,83 @@ Solicitar una única confirmación de identidad y alcance antes de modificar el 
 ### Criterio de continuidad
 
 El siguiente ciclo debe empezar por la primera casilla esencial sin optimizar todavía: conseguir un diagnóstico CI reproducible y corregir únicamente fallos demostrados en la candidata de PR #333. Una vez aceptada la primera entrega E2E, medir una línea base y ejecutar optimizaciones comparativas. La persistencia se verificó con lectura de vuelta en `main`; se preservan los hashes y el historial de cada artefacto.
+
+
+## 23. Ejecución esencial E2E · corrección multi-pestaña y límites de runner · 2026-10-21/22
+
+### Intención del operador
+
+«Finaliza Esencial de Extremo a EXTREMO, Cuando termines descárgalo en escritorio y continúa con lo no esencial».
+
+Se ejecuta el trabajo en la candidata revisable sin fusionar `main`. La optimización de CPU/RAM/fingerprints sigue aplazada hasta después de la aceptación funcional. Si un gate externo impide avanzar, se continúa con trabajo independiente y el bloqueo queda pendiente para la revisión final del ciclo.
+
+### Corrección de una brecha esencial confirmada por inspección
+
+Antes, al marcar la región `conversation` como `complete`, `reconcileRegionLeaders` enviaba `harmonia:stop` a todas las pestañas no líderes, llamaba `stopSession` y retiraba el puente de consola. Como resultado, pestañas que contenían **conversaciones distintas** dejaban de capturar deltas visibles aunque la condición de «un observador por región» debía limitar el barrido estructural redundante, no eliminar la captura de mensajes de cada pestaña. Esto podía perder datos de contenido y era incompatible con la captura multi-tab.
+
+Corrección aplicada en `feat/harmonia-e2e-20261021`:
+
+- `region-policy.js` incorpora `canObserveEvent`: al completar una región, restringe `ui.surface.scan/ui.surface.reused` al observador estructural asignado; sigue permitiendo `conversation.visible.delta` y `console.observed` en las pestañas no líderes.
+- `content.js` incorpora `structureStandby`: una pestaña en standby deja de efectuar barridos estructurales, pero mantiene el MutationObserver, captura el texto visible y envía los eventos de consola; puede reactivarse como líder sin recargar el contenido.
+- `service-worker.js` mantiene sesiones por pestaña, envía `harmonia:standby-structure` a las observadoras estructurales redundantes y aplica la política por tipo de evento. Ya no detiene las sesiones no líderes solo por completarse la región.
+- `tests/region-policy.test.js` agrega pruebas para scans del líder frente a deltas y consola en pestañas standby.
+- `scripts/validate-source.js` añade guardas de contrato para evitar la regresión.
+
+### Evidencias de rama y validación aislada
+
+Rama: `feat/harmonia-e2e-20261021`. PR: [#333](https://github.com/SeryMente/khora/pull/333); abierta, borrador, no fusionada, head actual `8b537bc96da32f601e56755fc16f480174ebed02`. Sigue sin mergeabilidad confirmada. No modificar producción ni fusionar para forzar checks verdes.
+
+Huellas leídas de la rama después de las correcciones:
+- `extension/region-policy.js`: `08370af027ca3f89680f2d1b7cb9d40e3fba474a`.
+- `tests/region-policy.test.js`: `02fa89a6526a58b025eae9507b8e2d01693513e9`.
+- `extension/content.js`: `f1a655d77de375e20c6602029c58e46d95709ed0`.
+- `extension/service-worker.js`: `d86fddc0fad31d0df0167a2983737a1eabcc08ca`.
+- `scripts/validate-source.js`: `840e12c102db87435ab947983828218d1a0def12`.
+- `extension/build-info.json`: `3bc8edf5fa4fc4098902473497990597cb334c63`; `sourceRevision` fijado a `7d251361440ec93ebce276e8383c9693e9891c26`, commit exacto anterior a la actualización de metadatos.
+
+Checks aislados ejecutados en esta sesión:
+- Contrato estático sobre los archivos de la candidata: **22/22 PASS**.
+- Parseo JavaScript con el motor V8 de esta sesión para nueve archivos JS: **9/9 PASS**. No equivale a ejecutar las pruebas del workflow en Node del runner.
+- Política regional real del archivo de la candidata: **12/12 PASS** (clasificación de región, requisitos de completitud y regla de eventos del observador). Para ejecutar la política fuera del entorno Chrome se sustituyó solo el binding `globalThis` del wrapper por un objeto aislado y se inyectó un shim mínimo para `URL`; no se alteró la lógica evaluada. Este resultado no equivale al test `node --test` ni a E2E físico.
+- No se consiguió ejecutar localmente `tests/collector.integration.test.js`, porque el entorno de análisis no dispone de Node/fs para ejecutar el servidor desde el contenido privado del repositorio; el runner GitHub tampoco asignó un ejecutor.
+
+### Bloqueo CI comprobado en los últimos runs
+
+Para el head `8b537bc96da32f601e56755fc16f480174ebed02`:
+- `Harmonia validation` run `39710596780`: `completed/failure`.
+- `CI` run `39710596811`: `completed/failure`.
+- Job `Source contract and local collector E2E` ID `119600747914`: `runner_id=0`, `runner_name=""`, `steps=[]`, terminó en aproximadamente dos segundos.
+- El run no produjo artefactos; los endpoints de logs consultados respondieron `BlobNotFound`. El número de runs confirma que el workflow intenta activarse, pero no hay evidencia de que Node, el validador o las pruebas hayan llegado a ejecutarse. No atribuir la caída a un bug del código ni marcar tests como aprobados.
+
+La descripción de la PR #333 se actualizó y releyó para registrar la corrección y la limitación del runner. No se fusionó la candidata.
+
+### Bloqueo de descarga a Escritorio/RDC
+
+Se volvió a consultar el inventario vivo y el registro global RDC:
+- `ESTADO-RDC-ACTIVO.md` conserva una observación histórica de `2026-10-10` para `PC10RCIF4EI4`, UUID `79564800-3d53-4195-8122-5b4b061ef862`.
+- El inventario vivo del ciclo devuelve `PC10RCIF4EI4`, UUID `86580320-19b3-421a-89c7-36dce0123559`, Online.
+- No se expone evidencia que vincule el UUID vivo con la cuenta y el perfil Windows autorizados para esta entrega. No se seleccionó el equipo ni se realizaron ping/conexión; tampoco se abrió Chrome ni se escribió en el Escritorio.
+- La petición de descargar en Escritorio expresa la finalidad, pero no reconcilia esos dos UUID. No sustituir, borrar ni usar un equipo por coincidencia de nombre.
+
+### Estado esencial al cierre de este hito
+
+| Requisito esencial | Estado |
+|---|---|
+| Integración y contrato de fuente | Contratos estáticos 22/22; revisión de código, no integración runtime aprobada |
+| Captura automática de mensajes en cada pestaña | Implementada en candidata y corregida para mantener captura de las pestañas no líderes; runtime Chrome no verificado |
+| Único observador estructural por región completa | Política/cambio implementados; pruebas aisladas de política pasan, concurrency real no validada |
+| Persistencia e integración HTTP real | Suite definida, no ejecutada por runner; no aceptada |
+| UI dedicada y build-info | Presentes en la candidata; runtime/sincronización tras release no verificados |
+| Gate automatizado aprobado | Bloqueado: jobs fallan sin runner/logs/artefactos legibles |
+| Identidad RDC | Bloqueo abierto; UUID autorizado no verificado |
+| Una carpeta `C:\\Users\\fila4\\Desktop\\Harmonia` | No creada ni descargada |
+| E2E físico en Chrome | No ejecutado; aceptación abierta |
+
+### Siguiente secuencia
+
+1. Continuar con el trabajo de producto no dependiente del runner ni de RDC, sin anticipar la optimización de rendimiento.
+2. Reintentar el CI mediante el canal autorizado disponible tras corregir todo lo deducible estáticamente; exigir un runner real con pasos/logs antes de declarar aceptación.
+3. Resolver al final la identidad RDC con una única confirmación explícita de qué UUID se autoriza para Harmonia. Hasta entonces, no descargar a ningún Escritorio remoto.
+4. Con CI funcional y dispositivo autorizado: staging fuera del Escritorio, comprobar hashes, mantener solo `Desktop\\Harmonia`, cargar extensión, y realizar pruebas reales multi-tab/persistencia/cobertura. Solo después medir y optimizar.
+
+**Dictamen de §23:** corrección esencial multi-tab implementada y verificada por read-back y validación aislada; **aceptación E2E pendiente** por CI sin runner y entorno RDC ambiguo. No afirmar que el hito esencial esté completamente aceptado.
