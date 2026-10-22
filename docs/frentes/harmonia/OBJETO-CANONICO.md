@@ -932,4 +932,4 @@ No declarar que la candidata ya completa absolutamente todo lo discutido:
 7. **Tiempo:** entrega de carpeta resuelta dentro del límite operativo; no estimar el cierre E2E antes de realizar la carga real.
 8. **Siguiente acción:** cargar `C:\Users\PC 13\Desktop\Harmonia\extension` y ejecutar la prueba natural.
 9. **Continuación:** asistente mantiene el frente; no se fusionó a `main`; optimización diferida.
-10. **Persistencia:** OCP y originales actualizados; la crónica se sincroniza en el siguiente paso secuencial.
+10. **Persistencia:** OCP, originales, crónica, README y prompt actualizados secuencialmente y releídos. Originales verbatim blob `313bf444fc35df49696dfe72e6ed19c9328e3172`; crónica blob `542fef5e15e23a26bf0cc93ba86a0eac69db007e`; README blob `e9ea402264a89ec489d2657cc2ec0156b8a5e0b3`; prompt blob `f3e6dbe0346e87abe0cb5b00f058b99f4ff36d44`; GOW de cierre v2.2 blob `6d4f8aff292ae173d9ceeba03694597bd2f16488`. Este cambio cierra el recibo documental del ciclo.
