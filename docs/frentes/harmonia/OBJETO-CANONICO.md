@@ -4,7 +4,7 @@
 ## 1. Control e identidad
 
 - Nombre normalizado: **Harmonia**, extensión compañera de **Khora**; «Armonía» y «Cora» de los dictados se conservan literalmente en originales. No renombrar producto o repositorio por transcripción.
-- Identificador del frente: `harmonia`. Versión del objeto **0.23**; sello **HARMONIA-v0.23**; corte de estado **2026-10-22**. Este corte actualiza el checklist esencial/no esencial y registra el nuevo folio activo gen5. Se conservan como última evidencia de paquete el runtime v0.4.0 entregado, CI local 5/5 y manifiesto local 22/22 de §29; no se repitieron pruebas físicas en este ciclo. La aceptación E2E real en Chrome sigue abierta; no confundir paquete entregado con extensión cargada ni captura natural validada.
+- Identificador del frente: `harmonia`. Versión del objeto **0.24**; sello **HARMONIA-v0.24**; corte de estado **2026-10-22**. Este corte actualiza el checklist esencial/no esencial y registra el nuevo folio activo gen5. Se conservan como última evidencia de paquete el runtime v0.4.0 entregado, CI local 5/5 y manifiesto local 22/22 de §29; no se repitieron pruebas físicas en este ciclo. La aceptación E2E real en Chrome sigue abierta; no confundir paquete entregado con extensión cargada ni captura natural validada.
 - Repositorio propietario: `SeryMente/khora`, rama `main`; objeto canónico en `docs/frentes/harmonia/OBJETO-CANONICO.md`. El blob de la versión anterior v0.4 fue `9a186ea789ea5aacab8dd06cf9f6edf364b89531`. Primera publicación del estado completo: commit `892adad897d6bd36c797ec2343ff7f4893b853bf`; lectura de vuelta en `main` confirmada y blob verificado `03ec5d127e0913dfe1f61e8588ba53b8abaa8e5f`. El recibo se refiere al contenido integral v0.5. Corte v0.6: commit inicial `3cb7901c2223cd41773185b93f17133e459e7a69`, blob `d1f524c383cc71c13f89e8d3aa3886ac3533fcdb`. Corte v0.7: commit inicial `55c2e8ba053265c219b2d941665c5cb3730107de`, blob `bbd08e2da15be17486e7515fd11eda7df57fca2b`; lectura de vuelta y corrección del catálogo documentadas. Nunca anticipar un SHA.
 - Fuente de código vigente: `apps/harmonia-observability/` en `main`, con la extensión de observabilidad y captura automática en evolución (rama `main`, versión de código en revisión E2E), `coverage-catalog.json` y scripts/validador. No inferir que el código fuente, el paquete local y el runtime ejecutado están sincronizados sin prueba de huellas. El paquete materializado en el Escritorio se reconstruyó desde esos archivos y contiene solo el runtime portable y una credencial local excluidos del repositorio; su manifiesto local de huellas se regeneró tras las validaciones.
 - Frente permanente por creación expresa del operador. El paquete local usado anteriormente está en `C:\\Users\\fila4\\Desktop\\Harmonia-Observabilidad-v0.2.0`; su sincronización con las últimas versiones de `main` **NO VERIFICADA**. El runtime debe considerarse desincronizado hasta comparar huellas y reiniciar con el colector actualizado. La versión 0.3.0 del código fuente no está aceptada funcionalmente en Chrome; no hereda pruebas de v0.1.0 ni de validaciones anteriores.
@@ -974,3 +974,52 @@ Leyenda: ✅ criterio acotado documentado/verificado; 🟡 parcial, falta prueba
 ### Siguiente acción seleccionada
 
 Cargar `C:\\Users\\PC 13\\Desktop\\Harmonia\\extension` en `chrome://extensions` mediante «Cargar descomprimida» y ejecutar una conversación de prueba sin datos sensibles. Después revisar eventos capturados, sesiones de varias pestañas y persistencia tras reinicio. El checklist separa ese hito esencial de optimizaciones/rendimiento y de la propuesta multiámbito; no se reabre lo no esencial antes de E2E aceptado.
+
+
+## 31. Pool de observación suficiente v1, evidencia y bloqueo de sincronización — SES-20261022-R8Q4N6P1
+
+### Objetivo terminal
+
+Entregar datos observados persistidos en el repositorio que sirvan para construir la extensión, con una puerta de suficiencia finita. No convertir el catálogo completo de 68 capacidades del paquete local v0.5.0 ni la exploración de todas las regiones en condiciones de cierre del pool básico.
+
+### Evidencia y artefactos guardados en `main`
+
+- Criterio de aceptación finito: `docs/frentes/harmonia/evidencias/HARMONIA-CRITERIO-SUFICIENCIA-POOL-V1.md`.
+- Baseline real: `docs/frentes/harmonia/evidencias/HARMONIA-OBSERVACION-BASELINE-20261022.json`.
+- Traza local real saneada: `docs/frentes/harmonia/datos/observaciones/HARMONIA-TRAZA-OBSERVACION-REDACTADA-20261022.jsonl`, SHA-256 `a56aea6044f7a4ee94bd6a255a9ef24eacd78c003cf7144b72327d6176c90f21`, blob publicado `9a34f1b87bb77c75af87d6d5e12734f661995621`. El contenido remoto se leyó de vuelta y coincidió exactamente con el contenido saneado local.
+- Manifiesto de la traza: `docs/frentes/harmonia/datos/observaciones/HARMONIA-TRAZA-OBSERVACION-REDACTADA-20261022.manifest.json`, read-back exacto.
+- Pool sintético de referencia: `docs/frentes/harmonia/datos/observaciones/HARMONIA-POOL-MINIMO-V1-SINTETICO.jsonl`, 11 eventos, 5 huellas estructurales, 2 sessionId y dos pestañas etiquetadas. Cada evento lleva `source=synthetic_fixture` y `fixture=true`; no se cuenta como observación natural ni como aceptación E2E.
+- Índice y orientación de los datos: `docs/frentes/harmonia/datos/observaciones/README.md`.
+
+### Diagnóstico de la traza real
+
+La exportación real contiene 627 eventos válidos, 0 líneas malformadas: `capture.started=10`, `console.observed=611`, `capture.stopped=6`. Los valores de consola fueron reemplazados por `[REDACTED]`; no se incluyeron cuerpos reales de mensajes. La inspección no encontró eventos `ui.surface.scan/reused` ni `conversation.visible.delta`. Por ello, **la traza real es evidencia diagnóstica, no un pool suficiente para construir la extensión**.
+
+En el equipo autorizado, la versión local observada es 0.5.0 y sus pruebas locales actuales pasan: 8 archivos JavaScript parseables, `HARMONIA_SOURCE_CONTRACT_OK`, 7/7 pruebas Node. No confundir estas pruebas sintéticas/unitarias con captura natural de Chrome. El `E2E-CHROME-EVIDENCIA.json` anterior terminó en `FAIL` con `No ChatGPT test tab`; la ejecución del runner PowerShell posterior fue bloqueada por la política local de scripts. No cambiar esa política ni forzar la interfaz; la E2E natural sigue ABIERTA.
+
+### Puerta finita de suficiencia del pool v1
+
+El pool real se declara SUFICIENTE al cumplir conjuntamente: (a) dos sesiones reales en dos pestañas; (b) al menos cinco huellas estructurales distintas; (c) observación del contenedor de conversación, roles de usuario/asistente, controles de composición/envío sin leer los borradores; (d) al menos un mensaje visible de cada rol por sesión y un flujo de respuesta progresiva hasta estado final cuando la interfaz exponga esos estados; (e) IDs/esquema/timestamps/sesiones consistentes, 0 registros malformados, cero mezcla entre sesiones y repetición idempotente de un eventId; (f) persistencia JSONL/índice verificada después de reiniciar el colector; (g) exportación saneada, hash SHA-256 y read-back exacto desde el repositorio canónico.
+
+La cobertura exhaustiva de las 68 funciones, menús poco frecuentes, otras regiones, CPU/RAM, optimización incremental y UX multiámbito queda FUERA de esta puerta y no la mantiene amarilla. Reabrir solo por fallo reproducible, pérdida/mezcla/corrupción material, requisito nuevo explícito o evidencia concreta de una clase de dato faltante.
+
+### Persistencia canónica: puntual vs automática
+
+La traza saneada, su manifiesto, el criterio y la fixture se publicaron en `main` a través del conector GitHub y se verificaron mediante read-back. Esto cierra **la persistencia de esta entrega**, no la publicación automática de futuras capturas desde el equipo. La versión local de la extensión consulta `build-info.json` y catálogo remotos; no hace upload de los eventos a GitHub. El dispositivo no tiene `gh`, checkout Git local, credencial Git autenticada o variable token del repositorio disponible; el conector autorizado de ChatGPT no expone su credencial a la extensión. Por tanto, `AUTOSYNC_LOCAL→GITHUB=NO CONFIGURADO`. No incrustar tokens en JavaScript ni subirlos al repositorio.
+
+### Siguiente acción de máximo valor y límite de cierre
+
+El artefacto de diseño y la traza diagnóstica ya están persistidos. La tarea de captura no puede marcarse como pool real suficiente hasta corregir/probar la emisión de eventos estructurales y de mensajes visibles; la tarea de sincronización perpetua no puede marcarse automática hasta habilitar un canal de escritura autenticado desde el dispositivo o un servicio de ingesta gobernado. No continuar con arquitectura multiámbito ni optimizaciones antes de estas dos condiciones esenciales.
+
+### Salida obligatoria del ciclo — Metacanon §4
+
+1. **Identidad y gobierno:** Harmonia, `SeryMente/khora`; OCP v0.24 / `HARMONIA-v0.24`; folio activo `SES-20261022-R8Q4N6P1`, generación 5. Metacanon 1.21 / `METACANON-OBJETOS-v1.21`, blob `cae8387a576ba4914d086a47bf57fe925717efca`; Sam v339 / `NX-339m`; GOW v2.2. `MCP-NORMATIVO: DESACTIVADO`.
+2. **Dónde estamos:** la traza diagnóstica y la fixture están persistidas en main; no hay pool real suficiente ni upload automático desde la máquina.
+3. **Delta:** se definió una puerta finita de suficiencia y se separó cobertura exhaustiva de criterios esenciales. La versión local 0.5.0 no se declara sincronizada con la fuente de main.
+4. **Avance verificable:** la traza tiene 627 eventos válidos, 0 líneas malformadas y SHA-256 verificado; fixture 11 eventos/5 huellas/2 sesiones; los tres archivos de datos se leyeron de vuelta exactamente. Sintaxis local 8/8, contrato fuente aprobado y pruebas Node 7/7.
+5. **Pendientes:** captura natural de mensajes/superficies, prueba tras reinicio y autorización/mecanismo de publicación automática local→GitHub.
+6. **Viabilidad:** existe evidencia persistida para diagnóstico y una fixture para desarrollo inmediato; la traza real no satisface el pool v1.
+7. **Tiempo:** artefactos escritos en el repositorio en este ciclo; no se ofrece una estimación ficticia para captura natural o credenciales no disponibles.
+8. **Siguiente acción:** corregir la ruta de observación que solo produjo consola; ejecutar la prueba natural permitida y establecer canal de publicación autenticado, sin credenciales embebidas.
+9. **Continuación:** cobertura avanzada, optimización y multiámbito permanecen no bloqueantes; no reabrir sin fallo/necessidad objetiva.
+10. **Persistencia:** OCP/README/prompts/crónica/originales se actualizan y verifican conforme al cierre de ciclo; la sincronización futura desde la extensión continúa NO CONFIGURADA hasta que exista canal autorizado.
