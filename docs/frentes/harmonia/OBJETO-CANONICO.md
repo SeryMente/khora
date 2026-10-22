@@ -517,7 +517,7 @@ Solicitar una única confirmación de identidad y alcance antes de modificar el 
 ### Resultado y fuentes canónicas
 
 - La secuencia operativa se encuentra en §21: **esenciales primero** (captura automática fiel, multi-pestaña/región, persistencia íntegra, UI separada, metadatos/sincronización, pruebas automatizadas, identidad RDC, carpeta única y E2E físico); **no esenciales para la primera aceptación después** (optimización CPU/RAM/huellas, generalización multiámbito, refinamiento UX multiámbito y métricas avanzadas).
-- OCP actualizado a v0.15 / `HARMONIA-v0.15`; commit `PENDIENTE-DE-COMPLETAR-TRAS-WRITE` (el commit exacto y blob de este cambio se registran en la crónica tras la lectura de vuelta). La versión previa v0.14 se conserva en Git.
+- OCP actualizado a v0.15 / `HARMONIA-v0.15`; commit de primera escritura `109838cba10ceb0824a77263d6b96d247bd89af6`, blob `40aa1c11c1bed68b0dca2b474fd9472ca3dfcb01`, lectura de vuelta verificada. La versión previa v0.14 se conserva en Git.
 - Crónica dedicada: [HARMONIA-PRIORIZACION-SES-20261021-F8R3M6Q2.md](cronica/HARMONIA-PRIORIZACION-SES-20261021-F8R3M6Q2.md), commit `7a7050fa4ef76945da437ae6976da94bc6e7930b`, blob `bb8e913099b2a2afc445f0cac6ef2be863cb268d`; creación/read-back verificados.
 - README alineado: commit `f5e5f54c33eeacaf3347dd5fababb83f9ba813d5`, blob `a81d1a56b4ff31de3ac87051992e90ed2bff530b`; read-back verificado.
 - Prompt de asistente alineado a la priorización: commit `9fbfd0b7ebc645f3b7cd92ca521a55badb869fd8`, blob `533c6574a2d4e88e0a56371a3190a28afcbda805`; tras publicar v0.15, el prompt debe apuntar a esa nueva versión de OCP y a §22.
