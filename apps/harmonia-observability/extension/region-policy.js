@@ -74,5 +74,9 @@
     return candidates.slice().sort((a,b)=>a.id-b.id)[0].id;
   }
   function canObserve(regionStatus,isLeader){return regionStatus!=='complete'||!!isLeader;}
-  return {POLICY_VERSION,REGIONS,classifyRegion,getRegionDescriptor,evaluateExploration,chooseLeader,canObserve};
+  function canObserveEvent(regionStatus,isLeader,eventType){
+    if(['ui.surface.scan','ui.surface.reused'].includes(String(eventType||'')))return canObserve(regionStatus,isLeader);
+    return ['conversation.visible.delta','console.observed','capture.started','capture.stopped'].includes(String(eventType||''));
+  }
+  return {POLICY_VERSION,REGIONS,classifyRegion,getRegionDescriptor,evaluateExploration,chooseLeader,canObserve,canObserveEvent};
 });
