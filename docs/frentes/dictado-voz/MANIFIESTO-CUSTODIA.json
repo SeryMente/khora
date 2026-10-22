@@ -6,10 +6,10 @@
   "method": {
     "repo": "SeryMente/metodologia",
     "path": "METACANON-OBJETOS-CANONICOS.md",
-    "version": "1.8",
-    "commit": "5f11cf5ade6f5577e1d6bd19206ccbaf19cc9394",
-    "blob": "8bc5d7c900ec4bca9fd3131bb635746b50cec1e5",
-    "sha256": "95e4dff3228b3408c48e264591cf318aa428739ee599a03b3210284bedd9223e"
+    "version": "1.21",
+    "blob": "cae8387a576ba4914d086a47bf57fe925717efca",
+    "source_branch": "main",
+    "acquired_at": "2026-10-22"
   },
   "original_source": {
     "repo": "SeryMente/khora",
@@ -1410,9 +1410,15 @@
     },
     {
       "path": "OBJETO-CANONICO.md",
-      "bytes": 307012,
-      "sha256": "42e53fc9f2b47513837e4cee1618bf8379b8dfc0c0744f54e20eb5ce96c314de",
-      "git_blob_sha": "bac206bc02c206162eb9347ff9a65f6be2c5e17e"
+      "bytes": 382968,
+      "sha256": "170c95c9a7916dd1c932cadc5ca7676ec32d128c676eb76a52e97509ccfb8845",
+      "git_blob_sha": "b11b3b585fbc950e1e708d3a2c466e1cfe95d6c1"
+    },
+    {
+      "path": "originales/C055-instrucciones-verbatim-auditoria-20261019-20261022.txt",
+      "bytes": 27112,
+      "sha256": "d356316c6429a33baed606796e71d1e37d39913a7b1d1f10708f46c846e81c48",
+      "git_blob_sha": "9124178c802d5f5ecdc64cb1f173f07900208474"
     }
   ],
   "runtime_references": [
@@ -1538,7 +1544,7 @@
     "temporaryPc8Cleanup": "VERIFIED_LOGOUT_EXIT0_AND_ISOLATED_DIRECTORY_REMOVED",
     "deployment": "dpl_B4CGqbgj1NW5dQGk2GYAK8q7M1AL"
   },
-  "latestEvent": "C048",
+  "latestEvent": "C055",
   "latest_verified_release": {
     "event": "C038",
     "state": "READY",
@@ -1586,7 +1592,7 @@
     "summaryImplemented": false
   },
   "latest_cycle": "C048",
-  "canonical_version": "0.6.34",
+  "canonical_version": "0.6.47",
   "latest_candidate": {
     "branch": "feat/ingreso-autobiografico-20261019",
     "production": true,
@@ -2006,6 +2012,14 @@
       "commit": "a466b6b46f266de6a6ccd656e071eb7a07dc0e10",
       "blob": "8f9ad1cf0e09e5fcd7014190770a77294ff39af4",
       "sha256": "dab6680cbcdb6530e4616f8b13d1e0d5f1ff0885508203d1c5eac22fd86250ee"
+    },
+    {
+      "repo": "SeryMente/metodologia",
+      "path": "METACANON-OBJETOS-CANONICOS.md",
+      "version": "1.21",
+      "blob": "cae8387a576ba4914d086a47bf57fe925717efca",
+      "source_branch": "main",
+      "acquired_at": "2026-10-22"
     }
   ],
   "candidate_history": [
@@ -2113,5 +2127,49 @@
   },
   "current_public_readiness": "evidencias/C034-public-readiness.json",
   "current_reconciliation": "evidencias/C048-recibo.json",
-  "scope_C048": "only new/updated delta hashverified, historical entries retained not revalidated"
+  "scope_C048": "only new/updated delta hashverified, historical entries retained not revalidated",
+  "latestCycle": "C055",
+  "current_governance_C055": {
+    "acquired_at": "2026-10-22",
+    "inicio_blob": "c57c866a8d5299d360e1bb1e318f34a573d9ccc7",
+    "metacanon": {
+      "version": "1.21",
+      "blob": "cae8387a576ba4914d086a47bf57fe925717efca"
+    },
+    "sam": {
+      "version": "v339",
+      "signature": "NX-339m",
+      "blob": "fdc996078bd611492e46d6b3abf569fbb4a6effa",
+      "cascade_review": "manual"
+    },
+    "gow": {
+      "version": "v2.2",
+      "blob": "6d4f8aff292ae173d9ceeba03694597bd2f16488",
+      "reviewed_at_cycle_start": true,
+      "close_recheck_pending": true
+    },
+    "mcp_normative": "DISABLED"
+  },
+  "operator_instruction_audit_C055": {
+    "source": {
+      "filename": "Texto pegado(8).txt",
+      "conversation_ref": "turn0file0",
+      "bytes": 136019,
+      "lines": 1432,
+      "native_export": false
+    },
+    "verbatim_original": {
+      "path": "originales/C055-instrucciones-verbatim-auditoria-20261019-20261022.txt",
+      "bytes": 27112,
+      "sha256": "d356316c6429a33baed606796e71d1e37d39913a7b1d1f10708f46c846e81c48",
+      "git_blob_sha": "9124178c802d5f5ecdc64cb1f173f07900208474",
+      "entries": "U01–U45"
+    },
+    "already_present_no_duplicate": "2026-10-21 direct instruction in §8/C054.7, beginning «Escucha,  no esta bien resuelto.»",
+    "excluded_from_persistence": "RDC PowerShell payload, device-pairing/authentication codes, credentials, cookies/tokens, email addresses; not needed for instruction corpus.",
+    "latest_previous_assistant_output": "NOT_AVAILABLE_NOT_VERIFIED_IN_OCP; no reconstruction",
+    "coverage": "targeted audit of supplied pasted conversation only, not exhaustive native history",
+    "product_changes_in_this_cycle": "none"
+  },
+  "scope_C055": "C055 adds a targeted verbatim instruction audit from the supplied pasted conversation. Existing history remains unchanged; native conversation coverage is not certified. No product code, tests, build, deployment, or editorial publication was changed or verified in this cycle."
 }
