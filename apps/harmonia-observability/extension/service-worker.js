@@ -240,8 +240,12 @@ async function onObservedEvent(message,sender){
  if(!['ui.surface.scan','conversation.visible.delta','console.observed'].includes(type))return false;
  const session=await ensureSession(tab);if(!session)return false;
  const payload=message.event.payload||{},regionKey=regionFor(tab.url);
+ const isStructuralObserver=type==='ui.surface.scan'?await canObserveTab(tab):false;
+ if(!HarmoniaRegionPolicy.canObserveEvent(regionStatus(regionKey),isStructuralObserver,type)){
+  if(type==='ui.surface.scan'){try{await chrome.tabs.sendMessage(tab.id,{kind:'harmonia:standby-structure'});}catch{}}
+  return false;
+ }
  if(type==='ui.surface.scan'){
-  if(!(await canObserveTab(tab))){try{await chrome.tabs.sendMessage(tab.id,{kind:'harmonia:standby-structure'});}catch{}return false;}
   const next=surfaceQueue.then(()=>processSurfaceScan(tab,session,payload),()=>processSurfaceScan(tab,session,payload));
   surfaceQueue=next.catch(error=>{lastError=String(error.message||error);});return next;
  }
