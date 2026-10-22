@@ -1,6 +1,6 @@
 (()=> {
   if (globalThis.__harmoniaObserver?.version==='0.4.0') return;
-  const H = globalThis.__harmoniaObserver = { version:'0.4.0', active:false, lastFingerprint:null, lastSentAt:0, droppedScans:0, lastMessages:new Map(), regionKey:null, consoleQueue:[], consoleFlushTimer:null, consoleFlushBusy:false };
+  const H = globalThis.__harmoniaObserver = { version:'0.4.0', active:false, structureStandby:false, lastFingerprint:null, lastSentAt:0, droppedScans:0, lastMessages:new Map(), regionKey:null, consoleQueue:[], consoleFlushTimer:null, consoleFlushBusy:false };
   let observer=null, timer=null, messageTimer=null, sessionId=null;
 
   const $ = (sel, root=document) => root.querySelector(sel);
@@ -190,7 +190,7 @@
   }
   let lastControls='';
   async function scanOnce(force=false) {
-    if(!H.active)return;
+    if(!H.active||H.structureStandby)return;
     const root=mainRegion(), comp=composer();
     if(!root&&!comp)return;
     const roots=[...new Set([root,comp?.closest('form')||comp?.parentElement].filter(Boolean))];
@@ -219,21 +219,29 @@
   }
   let scanInFlight=false,rescanPending=false;
   async function scan(force=false){
+    if(!H.active||H.structureStandby)return;
     if(scanInFlight){rescanPending=true;return;}
     scanInFlight=true;
     try{
       do{rescanPending=false;await scanOnce(force);force=false;}while(rescanPending&&H.active);
     }finally{scanInFlight=false;}
   }
-  function scheduleScan(){if(timer)clearTimeout(timer);timer=setTimeout(()=>{timer=null;void scan(false);},1600);}
+  function scheduleScan(){if(!H.active||H.structureStandby)return;if(timer)clearTimeout(timer);timer=setTimeout(()=>{timer=null;void scan(false);},1600);}
+  function setStructureStandby(value){
+    const wasStandby=H.structureStandby;
+    H.structureStandby=!!value;
+    if(H.structureStandby){if(timer)clearTimeout(timer);timer=null;}
+    else if(H.active&&wasStandby){void scan(true);}
+  }
   function start(message){
-    if(H.active)return;
-    H.active=true;sessionId=message?.sessionId||null;scheduleConsoleFlush(0);
+    const structureStandby=message?.structureObserver===false;
+    if(H.active){setStructureStandby(structureStandby);return;}
+    H.active=true;H.structureStandby=structureStandby;sessionId=message?.sessionId||null;scheduleConsoleFlush(0);
     window.addEventListener('resize',scheduleScan,{passive:true});
     window.addEventListener('popstate',scheduleScan,true);
     window.addEventListener('hashchange',scheduleScan,true);
     window.addEventListener('harmonia:console-observed',consoleEvent,false);
-    void scan(true);scheduleMessageSnapshot();
+    if(!H.structureStandby)void scan(true);scheduleMessageSnapshot();
     observer=new MutationObserver(records=>{
       const relevant=records.some(record=>{
         const target=record.target?.nodeType===1?record.target:record.target?.parentElement;
@@ -242,7 +250,7 @@
         if(record.type==='childList')return [...record.addedNodes,...record.removedNodes].some(node=>node.nodeType===1&&!excluded(node));
         return false;
       });
-      if(relevant){scheduleScan();scheduleMessageSnapshot();}
+      if(relevant){if(!H.structureStandby)scheduleScan();scheduleMessageSnapshot();}
     });
     const root=mainRegion()||document.body;
     observer.observe(root,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['class','role','aria-label','aria-live','aria-busy','data-testid','data-message-author-role','disabled','data-state']});
@@ -264,9 +272,11 @@
   }
   chrome.runtime.onMessage.addListener(message=>{
     if(message?.kind==='harmonia:start')start(message);
+    if(message?.kind==='harmonia:standby-structure')setStructureStandby(true);
+    if(message?.kind==='harmonia:observe-structure')setStructureStandby(false);
     if(message?.kind==='harmonia:stop'){if(H.consoleFlushTimer)clearTimeout(H.consoleFlushTimer);H.consoleFlushTimer=null;stop();}
   });
   chrome.runtime.sendMessage({kind:'harmonia:auto-settings'}).then(response=>{
-    if(response?.ok&&response.value?.enabled&&response.value?.observe!==false)start({automatic:true});
+    if(response?.ok&&response.value?.enabled)start({automatic:true,structureObserver:response.value?.observe!==false});
   }).catch(()=>{});
 })();
