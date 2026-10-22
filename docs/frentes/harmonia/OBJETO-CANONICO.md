@@ -760,7 +760,7 @@ Estas cifras son **tiempo de trabajo activo estimado**, no una promesa de ejecuc
 | 8. Carpeta única de Escritorio | 30–75 min para staging, huellas, sustitución controlada y read-back | Solo después de identificar y autorizar el dispositivo; rollback preservando la última candidata válida | Media-baja |
 | 9. E2E físico y aceptación | 1.5–3 h de pruebas en Chrome, recolección de evidencia y cierre de defectos menores | Depende de los hitos 1–8, del equipo autorizado y de una sesión natural de prueba | Baja |
 
-Estimación agregada orientativa: **10–24 horas activas**, no necesariamente continuas. La duración total de calendario puede superar ese rango por el bloqueo de Actions y la autorización del destino RDC; a día de hoy no existe fecha de cierre fiable. No iniciar rendimiento antes de aceptar E2E.
+Estimación agregada orientativa: **10–26 horas activas**, no necesariamente continuas. La duración total de calendario puede superar ese rango por el bloqueo de Actions y la autorización del destino RDC; a día de hoy no existe fecha de cierre fiable. No iniciar rendimiento antes de aceptar E2E.
 
 ### Resultado del ciclo y siguiente acción
 
@@ -769,3 +769,13 @@ Estimación agregada orientativa: **10–24 horas activas**, no necesariamente c
 - El contenido literal de la última salida anterior sí está conservado en §17 y fue recuperado en esta lectura. La declaración conversacional inmediatamente anterior de que estaba «NO DISPONIBLE» fue incorrecta y queda rectificada por este registro.
 - Carpeta Desktop, extensión y Chrome permanecen sin modificar en este ciclo.
 - Próximo paso: obtener el diagnóstico/permiso de Settings/Billing/Actions desde el propietario autorizado o iniciar soporte con las evidencias exactas; después ejecutar las suites sin reintentos ciegos.
+
+
+### Persistencia documental re-verificada tras corrección de estimación
+
+- README v0.21: commit `c5dddfa2a114ef787172a94a70fee6f9439c0891`, blob verificado `576856970a7c10218ec483cc94142ef86afd6d2f`.
+- Prompt de asistente con titularidad gen4 y OCP v0.21: commit `f749e24b6d88901bd3a6ecfc8b5afbe6a90fe5d8`, blob verificado `74e09105fd8268b963be5fbf49f38d32774e3b29`.
+- Crónica de investigación (versión corregida, estimación agregada 10–26 h activas): commit `54e8f1ee8821d03e635d115b99499ff32bee2125`, blob verificado `81535b74a982095d883512eaa0a10b5007d0f6b8`.
+- El OCP anterior a esta lectura final era commit `c34baa58bc7a99d0c21d36897e0d57970a83ec70`, blob `7dadb869dc2daa26dfb5b66b4c50ad2de00cd86b`. La estimación se reconcilió matemáticamente con la suma de los nueve intervalos: 10.25–25.5 h; se redondea a **10–26 h activas**. El tiempo de calendario sigue sin poder predecirse hasta resolver el acceso a Actions y la autorización del dispositivo.
+- El primer intento de validación de README reportó un error porque el verificador consultaba la estructura incorrecta de la respuesta. La relectura independiente confirmó que README sí se había guardado con v0.21. Se corrigió el verificador, y los read-backs del prompt y de la crónica sí coinciden con sus SHA.
+- No se modificó código fuente. No se ejecutó Chrome ni se tocó Escritorio; no se repitieron los workflows fallidos.
