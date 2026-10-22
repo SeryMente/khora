@@ -57,3 +57,10 @@ La última salida visible de modelo inmediatamente anterior no estuvo disponible
 8. **Siguiente acción:** iniciar/reinstanciar Remote Device con el comando oficial indicado y retornar RDC-HANDSHAKE; repetir inventario en vivo.
 9. **Continuación:** no reconstruir salida previa no conservada; continuar desde los gates finitos y no reabrir mejoras diferidas.
 10. **Persistencia:** U18 creado y leído de vuelta; control gen6 CAS/read-back; OCP actualizado de blob 0e80b074cfee7e46cde0e493619ae67f586fd9bd a a5bb7c6158974c21282f5d356bcc4f969c906947 por commit 305ac523efe123f96df23c2c427014fe0bedf655; crónica actual en esta ruta, su SHA y read-back se verifican tras crearla. El Escritorio sigue NO VERIFICADO.
+
+
+## Anexo de cierre documental — 2026-10-22
+
+Después de la creación inicial de esta crónica se precisó el registro de fidelidad textual: el archivo fuente adjunto tiene SHA-256 f4fd1dd636ed6f756f33812bca7aea6c1b045974bcff036552baf1d43d4d9063 y 11,251 bytes; la herramienta de lectura extrae 10,954 caracteres Unicode y normaliza los finales de línea CRLF a LF. El registro U18 conserva exactamente esa extracción textual, comprobada por read-back; no se declara réplica binaria. El blob actual de U18 continúa siendo 32576e0fe10deca59ccdcca3fe77de87b2453bf8.
+
+Tras la corrección de fidelidad y de §4.10, el blob final de OCP quedó en 77ccb340a5759be3b368b258eb359dec07e87829, commit 167931a9a59c6383f21c4dc87a498e27a4fa8c6c. README de continuidad actualizado y leído de vuelta: blob 2d432ad021917b2f145251886bfd53fab3ea814e, commit 188468c11047707c3bdac90e0582a0c4ea80291b. El estado de la máquina no cambió: PC-14 / 345f64ee-5d6a-429f-a97c-dab44f44cddb sigue siendo el único destino autorizado y permanece OFFLINE; no hubo pruebas ni mutaciones locales.
