@@ -1410,15 +1410,21 @@
     },
     {
       "path": "OBJETO-CANONICO.md",
-      "bytes": 382968,
-      "sha256": "170c95c9a7916dd1c932cadc5ca7676ec32d128c676eb76a52e97509ccfb8845",
-      "git_blob_sha": "b11b3b585fbc950e1e708d3a2c466e1cfe95d6c1"
+      "bytes": 383691,
+      "sha256": "07633f7fa0a66c27113add93077905ce481dd3caca28805e4f83785435e00239",
+      "git_blob_sha": "65c1d40e689bfdbfd950d5748b5989b7d1c774de"
     },
     {
       "path": "originales/C055-instrucciones-verbatim-auditoria-20261019-20261022.txt",
       "bytes": 27112,
       "sha256": "d356316c6429a33baed606796e71d1e37d39913a7b1d1f10708f46c846e81c48",
       "git_blob_sha": "9124178c802d5f5ecdc64cb1f173f07900208474"
+    },
+    {
+      "path": "CONTROL-RESPONSABILIDAD.json",
+      "bytes": 2759,
+      "sha256": "89d2db6741c0e755ee23b55f5c54a683887e11e094f41dd7dde74835d725bb28",
+      "git_blob_sha": "0f0b02a5bc9cd976ac5ab8e5b3e5a8a853866adb"
     }
   ],
   "runtime_references": [
@@ -2146,7 +2152,8 @@
       "version": "v2.2",
       "blob": "6d4f8aff292ae173d9ceeba03694597bd2f16488",
       "reviewed_at_cycle_start": true,
-      "close_recheck_pending": true
+      "reviewed_at_cycle_close": true,
+      "close_recheck_pending": false
     },
     "mcp_normative": "DISABLED"
   },
@@ -2169,7 +2176,19 @@
     "excluded_from_persistence": "RDC PowerShell payload, device-pairing/authentication codes, credentials, cookies/tokens, email addresses; not needed for instruction corpus.",
     "latest_previous_assistant_output": "NOT_AVAILABLE_NOT_VERIFIED_IN_OCP; no reconstruction",
     "coverage": "targeted audit of supplied pasted conversation only, not exhaustive native history",
-    "product_changes_in_this_cycle": "none"
+    "product_changes_in_this_cycle": "none",
+    "control": {
+      "path": "CONTROL-RESPONSABILIDAD.json",
+      "blob": "0f0b02a5bc9cd976ac5ab8e5b3e5a8a853866adb",
+      "folio": "SES-20261022-C7N4M2Q8",
+      "generation": 1,
+      "readback_identical_to_main": true
+    },
+    "object": {
+      "version": "v0.6.47",
+      "blob": "65c1d40e689bfdbfd950d5748b5989b7d1c774de",
+      "branch": "integrate/blog-c053-production-20261021"
+    }
   },
   "scope_C055": "C055 adds a targeted verbatim instruction audit from the supplied pasted conversation. Existing history remains unchanged; native conversation coverage is not certified. No product code, tests, build, deployment, or editorial publication was changed or verified in this cycle."
 }
