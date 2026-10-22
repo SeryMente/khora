@@ -1,13 +1,13 @@
 # Harmonia · transferencia confirmada · SES-20261022-6E3A91F7
 
-La autorización afirmativa del operador quedó registrada literalmente como `Si` en [U19](HARMONIA-TRANSFER-SES-20261022-6E3A91F7.jsonl).
+La autorización afirmativa del operador quedó registrada literalmente como `Si` en [U19](https://github.com/SeryMente/khora/blob/main/docs/frentes/harmonia/originales/HARMONIA-TRANSFER-SES-20261022-6E3A91F7.jsonl).
 
 ## Resultado de titularidad
 
 - Frente: Harmonia · `SeryMente/khora`.
-- OCP: `docs/frentes/harmonia/OBJETO-CANONICO.md`, corte documental previo v0.25; esta transferencia quedó asentada en v0.26.
+- OCP: [OBJETO-CANONICO.md · v0.26](https://github.com/SeryMente/khora/blob/main/docs/frentes/harmonia/OBJETO-CANONICO.md), corte documental previo v0.25; esta transferencia quedó asentada en v0.26.
 - Folio nuevo: `SES-20261022-6E3A91F7`.
-- Control exclusivo: generación 6 → 7. Commit de transferencia: `0a654c4d76ac2b85ccba62d479c6c44abe371090`.
+- Control exclusivo ([CONTROL-RESPONSABILIDAD.json](https://github.com/SeryMente/khora/blob/main/docs/frentes/harmonia/CONTROL-RESPONSABILIDAD.json)): generación 6 → 7. Commit de transferencia: `0a654c4d76ac2b85ccba62d479c6c44abe371090`.
 - Blob de lectura de vuelta del control: `636a43c6e89355bba94154f2e48f465226030396`.
 - Comprobaciones de lectura de vuelta: SHA esperado, generación 7, folio y alias nuevos, estado `assigned`, titular anterior generación 6 / folio `SES-20261022-Q7M4K9V2`, blob previo y evento de autorización coincidieron.
 - Alias: `chatgpt-harmonia-SES-20261022-6E3A91F7`. La plataforma no expuso ID nativo; `owner_thread=null` no lo inventa.
@@ -30,5 +30,5 @@ El paquete local referido como Harmonia v0.5.0, el destino actual y su estructur
 7. **Tiempo/ciclos:** cierre físico/E2E NO ESTIMABLE mientras falte el handshake del dispositivo autorizado.
 8. **Siguiente acción:** en PC-14, reactivar Remote Desktop Commander con `npx @wonderwhy-er/desktop-commander@latest remote` desde la terminal elevada pertinente; enviar el RDC-HANDSHAKE con dispositivo, UUID, conectividad/ping, usuario Windows y perfil. Después volver a consultar el inventario y actuar solo sobre el UUID exacto.
 9. **Continuación:** no repetir exploración ni pruebas históricas por rutina; retomar desde los gates de OCP §32 y no reabrir optimizaciones de CPU/RAM o multiámbito antes de la puerta esencial.
-10. **Persistencia:** original U19 guardado y leído de vuelta exactamente (blob `2f8e8b4c1aca2e80df01fcb8513d27f2f0f2936c`); control actualizado y leído de vuelta; crónica, OCP v0.26, README y prompt de asistente se sincronizan en este cierre y se comprobarán por lectura de vuelta. La última salida visible de este ciclo queda conservada en este archivo.
+10. **Persistencia:** [Original U19](https://github.com/SeryMente/khora/blob/main/docs/frentes/harmonia/originales/HARMONIA-TRANSFER-SES-20261022-6E3A91F7.jsonl) guardado y leído de vuelta exactamente (blob `2f8e8b4c1aca2e80df01fcb8513d27f2f0f2936c`); [control](https://github.com/SeryMente/khora/blob/main/docs/frentes/harmonia/CONTROL-RESPONSABILIDAD.json) actualizado y leído de vuelta; [crónica](https://github.com/SeryMente/khora/blob/main/docs/frentes/harmonia/cronica/HARMONIA-TRANSFER-SES-20261022-6E3A91F7.md), [OCP v0.26](https://github.com/SeryMente/khora/blob/main/docs/frentes/harmonia/OBJETO-CANONICO.md), [README](https://github.com/SeryMente/khora/blob/main/docs/frentes/harmonia/README.md) y [prompt de asistente](https://github.com/SeryMente/khora/blob/main/docs/frentes/harmonia/prompts/ASISTENTE.md) se sincronizaron en este cierre y se comprobaron por lectura de vuelta. La última salida visible de este ciclo queda conservada en este archivo.
 
