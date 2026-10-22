@@ -469,7 +469,7 @@
     "receipt": "evidencias/C030-release.json",
     "state": "C030 product release unchanged; C031 documentary continuity/control/prompt update read back; global quality gate and human acceptance remain pending"
   },
-  "latestEvent": "C031 — responsibility control initialized, visible conversation entries preserved, OCP/prompts/manifest updated; no product-code or deployment changes",
+  "latestEvent": "C031 — responsibility control initialized, visible conversation entries preserved, OCP/prompts/manifest updated; no product-code or deployment changes; MCP-NORMATIVO disabled",
   "latest_verified_release": {
     "sha": "f0dfbdcb2d79eb6289dacba272ddcc7ba2023063",
     "deploymentId": "dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr",
@@ -586,8 +586,8 @@
   "latest_object": {
     "version": "0.6.13",
     "ref": "main",
-    "blob_sha": "c7894a1a73fd46e903a0e380fc5e008fed78e1f1",
-    "commit": "cce60cbdd65f8a23eb611bb18d66434ee5b7fcbb",
-    "state": "C031 documentary continuity persisted; product state remains C030"
+    "blob_sha": "14fa6bbc086c422a568cf9a926cdbd6ff4c2460c",
+    "commit": "dc5ea4500cfd8db8c7446697062f1302e8d43c12",
+    "state": "C031 documentary continuity persisted; product state remains C030; MCP-NORMATIVO disabled"
   }
 }
