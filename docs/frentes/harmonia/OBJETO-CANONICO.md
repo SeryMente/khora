@@ -4,7 +4,7 @@
 ## 1. Control e identidad
 
 - Nombre normalizado: **Harmonia**, extensión compañera de **Khora**; «Armonía» y «Cora» de los dictados se conservan literalmente en originales. No renombrar producto o repositorio por transcripción.
-- Identificador del frente: `harmonia`. Versión del objeto **0.17**; sello **HARMONIA-v0.17**; corte de estado **2026-10-21/22**. Este corte añade la propuesta documental multiámbito como trabajo no esencial, mantiene la prioridad esencial primero y optimización al final, y conserva el bloqueo de aceptación E2E (CI sin runner y RDC sin identidad autorizada confirmada). No declara cierre E2E.
+- Identificador del frente: `harmonia`. Versión del objeto **0.18**; sello **HARMONIA-v0.18**; corte de estado **2026-10-21/22**. Este corte añade la propuesta candidata de UX/métricas y el protocolo de rendimiento posterior a E2E, mantiene la prioridad esencial primero y optimización al final, y conserva los bloqueos de CI y RDC. No declara cierre E2E.
 - Repositorio propietario: `SeryMente/khora`, rama `main`; objeto canónico en `docs/frentes/harmonia/OBJETO-CANONICO.md`. El blob de la versión anterior v0.4 fue `9a186ea789ea5aacab8dd06cf9f6edf364b89531`. Primera publicación del estado completo: commit `892adad897d6bd36c797ec2343ff7f4893b853bf`; lectura de vuelta en `main` confirmada y blob verificado `03ec5d127e0913dfe1f61e8588ba53b8abaa8e5f`. El recibo se refiere al contenido integral v0.5. Corte v0.6: commit inicial `3cb7901c2223cd41773185b93f17133e459e7a69`, blob `d1f524c383cc71c13f89e8d3aa3886ac3533fcdb`. Corte v0.7: commit inicial `55c2e8ba053265c219b2d941665c5cb3730107de`, blob `bbd08e2da15be17486e7515fd11eda7df57fca2b`; lectura de vuelta y corrección del catálogo documentadas. Nunca anticipar un SHA.
 - Fuente de código vigente: `apps/harmonia-observability/` en `main`, con la extensión de observabilidad y captura automática en evolución (rama `main`, versión de código en revisión E2E), `coverage-catalog.json` y scripts/validador. No inferir que el código fuente, el paquete local y el runtime ejecutado están sincronizados sin prueba de huellas. El paquete materializado en el Escritorio se reconstruyó desde esos archivos y contiene solo el runtime portable y una credencial local excluidos del repositorio; su manifiesto local de huellas se regeneró tras las validaciones.
 - Frente permanente por creación expresa del operador. El paquete local usado anteriormente está en `C:\\Users\\fila4\\Desktop\\Harmonia-Observabilidad-v0.2.0`; su sincronización con las últimas versiones de `main` **NO VERIFICADA**. El runtime debe considerarse desincronizado hasta comparar huellas y reiniciar con el colector actualizado. La versión 0.3.0 del código fuente no está aceptada funcionalmente en Chrome; no hereda pruebas de v0.1.0 ni de validaciones anteriores.
@@ -634,3 +634,30 @@ Se volvió a consultar el inventario vivo y el registro global RDC:
 - Descarga al Escritorio: no realizada. El inventario RDC vivo y el registro global muestran UUID distintos bajo el mismo nombre visible; falta confirmar cuál identidad se autoriza para Harmonia. No usar ni modificar un equipo por semejanza de nombre.
 - E2E esencial: **ABIERTO**. No reportar terminado, instalado ni aceptado.
 - Trabajo no esencial: **propuesta documental multiámbito creada y releída**; implementación posterior condicionada a ratificación formal y a no comprometer los esenciales.
+
+
+## 25. UX, métricas y optimización posterior · propuesta candidata · 2026-10-22
+
+### Artefacto de trabajo no esencial
+
+- Propuesta: [HARMONIA-UX-METRICAS-RENDIMIENTO-CANDIDATA.md](https://github.com/SeryMente/khora/blob/feat/harmonia-e2e-20261021/docs/frentes/harmonia/propuestas/HARMONIA-UX-METRICAS-RENDIMIENTO-CANDIDATA.md).
+- Ruta en la rama de revisión: `docs/frentes/harmonia/propuestas/HARMONIA-UX-METRICAS-RENDIMIENTO-CANDIDATA.md`.
+- Commit: `11418a029f01dc015ecbbe223075b13f7ab4e14d`; blob `5d1c8d841567939cb5e25f61dc670edf74cc3f87`; lectura de vuelta verificada.
+- Alcance: mejoras UX para no confundir estados de catálogo/documentación/observación/completitud; accesibilidad y claridad del panel; métricas agregadas de eventos, integridad, latencia, recursos y estado de sincronización; un protocolo reproducible para la fase de rendimiento.
+- Estado: **CANDIDATA DOCUMENTAL; NO IMPLEMENTADA; NO ES POLÍTICA VIGENTE**. No se cambió el comportamiento del dashboard ni del colector con este documento.
+- La propuesta prohíbe fijar retención, borrar automáticamente originales, enviar telemetría externa o optimizar sin una decisión y prueba separadas.
+
+### Compuerta de rendimiento
+
+Queda reafirmada la orden del operador: la optimización va al final. No ejecutar una campaña de rendimiento hasta que la primera entrega esencial E2E esté aceptada. Después, establecer una línea base sobre un corpus fijo y comparar cada cambio individual en CPU/RAM/latencia, eventos perdidos/duplicados, orden de deltas, cobertura y recuperación. Cualquier pérdida de datos, discrepancia no explicada de cobertura o debilitamiento de privacidad invalida esa optimización.
+
+### Estado de la rama revisable
+
+- PR #333 sigue abierta, en borrador y sin fusionar. Head actual de la rama tras la propuesta de UX/métricas: `11418a029f01dc015ecbbe223075b13f7ab4e14d`.
+- El run `CI` `39711070504` para ese head acabó en fallo. El último run específico `Harmonia validation` sobre código era `39710596780`, también fallido con `runner_id=0`, sin pasos, logs ni artefactos recuperables. No hay evidencia de ejecución de las suites Node; siguen NO VERIFICADAS.
+- La propuesta multiámbito anterior permanece en el mismo branch, commit `263f3f18605e456db5bee3195d447a33bfa3bf0e`, blob `3e80ff93ff566ea7fa5c317028159185646b1901`; tampoco está aprobada ni implementada.
+- Main no se fusionó con la candidata; por ello, el código publicado en `main` permanece v0.3.0.
+
+### Dictamen no esencial y secuencia
+
+Se prepararon dos propuestas documentales no esenciales en rama; no se implementó la arquitectura generalizada ni la UX/métricas, y no se realizó optimización prematura. El siguiente trabajo de producto posterior a E2E será ratificar arquitectura, instrumentar métricas que no expongan contenido, refinar UX y luego optimizar con una línea base. Esas tareas no reemplazan los esenciales aún abiertos: CI con runner real, pruebas colector, reconciliación RDC, carpeta única y Chrome E2E físico.
