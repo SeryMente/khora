@@ -55,4 +55,10 @@ test('leader selection preserves an existing leader, then prefers active or chos
  assert.equal(policy.canObserve('exploring',false),true);
  assert.equal(policy.canObserve('complete',false),false);
  assert.equal(policy.canObserve('complete',true),true);
+ assert.equal(policy.canObserveEvent('exploring',false,'ui.surface.scan'),true);
+ assert.equal(policy.canObserveEvent('complete',false,'ui.surface.scan'),false);
+ assert.equal(policy.canObserveEvent('complete',false,'ui.surface.reused'),false);
+ assert.equal(policy.canObserveEvent('complete',false,'conversation.visible.delta'),true);
+ assert.equal(policy.canObserveEvent('complete',false,'console.observed'),true);
+ assert.equal(policy.canObserveEvent('complete',false,'unknown.event'),false);
 });
