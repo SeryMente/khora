@@ -36,3 +36,29 @@ No esenciales para la primera aceptación, pero conservados como trabajo posteri
 - Prompt actual de continuidad apunta al OCP v0.15 / §§21–22: commit `068c526b5c5f6f5757382fa83f4b6387548893ef`, blob `41f2879bc979dc2b050843b07f4f28f256386d44`, read-back verificado.
 - README actualizado y leído de vuelta: commit `f5e5f54c33eeacaf3347dd5fababb83f9ba813d5`, blob `a81d1a56b4ff31de3ac87051992e90ed2bff530b`.
 - Próximo paso de ingeniería: ejecutar la primera casilla esencial del OCP §21—recuperar evidencia CI interpretable en PR #333 y reparar únicamente fallos concretos—sin anticipar optimizaciones ni fusionar a `main`.
+
+
+## Continuación del ciclo esencial/no esencial · 2026-10-22
+
+### Corrección candidata esencial y diagnóstico de CI
+
+- Se corrigió en la rama `feat/harmonia-e2e-20261021` una regresión lógica en la coordinación regional: las pestañas no líderes ya no se detienen por completo al completarse la región. Solo suspenden el barrido estructural redundante y conservan captura de mensajes visibles y consola por pestaña.
+- Política `region-policy.js`: blob `08370af027ca3f89680f2d1b7cb9d40e3fba474a`; pruebas regionales `02fa89a6526a58b025eae9507b8e2d01693513e9`; `content.js` `f1a655d77de375e20c6602029c58e46d95709ed0`; `service-worker.js` `d86fddc0fad31d0df0167a2983737a1eabcc08ca`; validador `840e12c102db87435ab947983828218d1a0def12`.
+- Validación aislada sobre los contenidos leídos de la rama: 22/22 contratos estáticos, 9/9 archivos JavaScript parseables con V8 y 12/12 aserciones de política regional. No equivale a ejecutar `node --test`, a un test real del colector ni a Chrome E2E.
+- En el head `8b537bc96da32f601e56755fc16f480174ebed02`, `Harmonia validation` run `39710596780` y `CI` run `39710596811` siguen fallidos. El job `119600747914` reporta `runner_id=0`, `runner_name=""`, sin pasos, sin artefactos y sin logs descargables. Por ello, el resultado de las suites reales permanece NO VERIFICADO; no se atribuye la causa a un test específico.
+- PR #333 permanece abierta, en borrador y no fusionada. La descripción de PR actualizada quedó leída de vuelta; main no fue fusionado ni desplegado por esta operación.
+
+### Trabajo no esencial iniciado, sin aprobar arquitectura
+
+- Se creó en la rama candidata la propuesta `docs/frentes/harmonia/propuestas/HARMONIA-MULTIAMBITO-ARQUITECTURA-CANDIDATA.md`, commit `263f3f18605e456db5bee3195d447a33bfa3bf0e`, blob `3e80ff93ff566ea7fa5c317028159185646b1901`, leída de vuelta. Define un contrato candidato para descriptors de ámbito, adaptadores, catálogo, persistencia aislada, permisos mínimos, incorporación y criterios de prueba. Está marcada **NO APROBADA / NO VIGENTE**; no altera el núcleo ni activa nuevos ámbitos.
+- El OCP canónico se elevó a v0.17 con §24 para enlazar la propuesta y conservar explícitamente los bloqueos: commit `1ca1624d340a408c6629e395921311c2f1bc3dc0`, blob `a07f6f1c9f25f3be2047944516cf716f10e4631d`, read-back verificado.
+- Prompt de continuidad actualizado para OCP v0.17 / §§21–24: commit `d1101f1dd8d7a301c6dcb6133ffb0bf91a2d7fac`, blob `d865a4b04c51790de4b2e452f6a66905c92ef72b`, read-back verificado.
+- README alineado con el nuevo OCP y la propuesta candidata: commit `778836294ae75fe5fe0551a97e5db552d66a18e5`, blob `909cd894ed90404591b8ce639609e046d681c3a4`, read-back verificado.
+
+### Bloqueos reevaluados y límite de aceptación
+
+- **CI:** se siguió la ruta de reejecución del job y se verificaron los metadatos del resultado. El proveedor no asigna runner y no entrega logs/artefactos. Reintentar sin reparar o cambiar esta condición repite el mismo estado; no hay una forma segura desde el conector para obligar a GitHub a asignar runner ni para inventar los resultados.
+- **RDC:** la lista viva sigue identificando `PC10RCIF4EI4` como `86580320-19b3-421a-89c7-36dce0123559`; el registro global tiene una observación histórica de `2026-10-10` para `79564800-3d53-4195-8122-5b4b061ef862`. El nombre no resuelve la identidad ni autorización. No se seleccionó terminal, no hubo ping/conexión, no se abrió Chrome y no se tocó el Escritorio.
+- **Descarga a Desktop:** no realizada porque la identidad autorizada de destino aún no puede verificarse. Destino previsto cuando esté resuelto: una sola carpeta `C:\\Users\\fila4\\Desktop\\Harmonia`, staging fuera del Escritorio y reemplazo de archivos gestionados solo después de verificar hashes.
+- **Estado esencial:** **NO CERRADO** — falta runner CI útil, test real del colector, identidad autorizada, paquete en la carpeta única y Chrome E2E.
+- **Siguiente del trabajo no esencial:** ampliar el documento candidato de UX/métricas o preparar pruebas de contrato multiámbito en rama, sin implementar decisiones de permisos/almacenamiento no ratificadas y sin ejecutar optimizaciones antes de aceptar E2E.
