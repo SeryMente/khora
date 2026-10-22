@@ -5,7 +5,7 @@ La autorización afirmativa del operador quedó registrada literalmente como `Si
 ## Resultado de titularidad
 
 - Frente: Harmonia · `SeryMente/khora`.
-- OCP: `docs/frentes/harmonia/OBJETO-CANONICO.md`, corte documental previo v0.25; esta transferencia se asentará en v0.26.
+- OCP: `docs/frentes/harmonia/OBJETO-CANONICO.md`, corte documental previo v0.25; esta transferencia quedó asentada en v0.26.
 - Folio nuevo: `SES-20261022-6E3A91F7`.
 - Control exclusivo: generación 6 → 7. Commit de transferencia: `0a654c4d76ac2b85ccba62d479c6c44abe371090`.
 - Blob de lectura de vuelta del control: `636a43c6e89355bba94154f2e48f465226030396`.
