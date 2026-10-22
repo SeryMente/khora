@@ -1410,9 +1410,9 @@
     },
     {
       "path": "OBJETO-CANONICO.md",
-      "bytes": 383691,
-      "sha256": "07633f7fa0a66c27113add93077905ce481dd3caca28805e4f83785435e00239",
-      "git_blob_sha": "65c1d40e689bfdbfd950d5748b5989b7d1c774de"
+      "bytes": 383783,
+      "sha256": "578922f84ea2d99bbef754a6f9712baf8ac961341913021697d7ed701c3a3f95",
+      "git_blob_sha": "823178974cee16ef46c5ad15ca0f9591d80cd93b"
     },
     {
       "path": "originales/C055-instrucciones-verbatim-auditoria-20261019-20261022.txt",
@@ -2186,8 +2186,16 @@
     },
     "object": {
       "version": "v0.6.47",
-      "blob": "65c1d40e689bfdbfd950d5748b5989b7d1c774de",
+      "blob": "823178974cee16ef46c5ad15ca0f9591d80cd93b",
       "branch": "integrate/blog-c053-production-20261021"
+    },
+    "original_sha256": "d356316c6429a33baed606796e71d1e37d39913a7b1d1f10708f46c846e81c48",
+    "readback": {
+      "object_blob": "823178974cee16ef46c5ad15ca0f9591d80cd93b",
+      "original_blob": "9124178c802d5f5ecdc64cb1f173f07900208474",
+      "control_blob": "0f0b02a5bc9cd976ac5ab8e5b3e5a8a853866adb",
+      "manifest_write_after_object": true,
+      "hashes_and_blobs_match": true
     }
   },
   "scope_C055": "C055 adds a targeted verbatim instruction audit from the supplied pasted conversation. Existing history remains unchanged; native conversation coverage is not certified. No product code, tests, build, deployment, or editorial publication was changed or verified in this cycle."
