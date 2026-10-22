@@ -73,3 +73,37 @@ No esenciales para la primera aceptación, pero conservados como trabajo posteri
 - Prompt de continuidad actualizado a OCP v0.18, §§21–25: commit `3ad6a82e25817aa29712af673b32c1a6775b36de`, blob `6101270329c1e8dd2dd44fb19e37bc2b06f2572c`, leído de vuelta. README actualizado para enlazar ambas propuestas: commit `fded820f00b9b1f9886646b2ea4a69c46fdd7414`, blob `c826df0cf1890fbcc9cd4a57d12abb3b1efb194a`, leído de vuelta.
 - Head del PR #333 tras las dos propuestas: `11418a029f01dc015ecbbe223075b13f7ab4e14d`; PR abierta en borrador, no fusionada. El último run CI `39711070504` falló. No hay evidencia de runner ni ejecución de las pruebas.
 - Esenciales siguen abiertos: runner CI real, integración/recuperación del colector bajo Node, identidad RDC autorizada, carpeta única del Escritorio y Chrome E2E real.
+
+
+## Refinamiento UX accesible implementado · 2026-10-22
+
+### Cambio candidato realizado
+
+Se añadió a la candidata v0.4.0 una sección de ayuda desplegable, accesible por teclado, que explica índice combinado vs precisión, superficies únicas vs barridos, completitud regional vs regiones sin catálogo y revisión remota vs código instalado. Es una mejora de presentación/documentación dentro del panel; no altera el contrato de captura, el colector, los permisos, la retención ni la telemetría.
+
+- Dashboard HTML: blob `ea8cdd453b98780bbc8928b1fc0ecf42148b7bcd`.
+- Dashboard CSS: blob `19c50217f6f8b3f5a36ba00bf4164412433006d9`.
+- Validador estático: blob `4b8101cb57751738d84aa43e0acc86fa8ec40c6b`.
+- Build metadata: blob `c0f38a0e587afd2844be858bdc8a569eecdfd476`, source revision `74804ea592c5879ccda91330e7d08b13af3501e9`, HEAD revisado inmediatamente antes de esa actualización de metadatos.
+- Propuesta UX/métricas actualizada para diferenciar la guía implementada de métricas/optimización aún diferidas: blob `ea7faf4a8be8d31e704f69f26266088c1ea1c74b`.
+
+### Validación posterior al cambio de UX
+
+La revisión independiente de los archivos de `feat/harmonia-e2e-20261021` obtuvo:
+- Contratos estáticos: **23/23 PASS**.
+- Parseo V8 aislado de los archivos JS seleccionados: **9/9 PASS**.
+- Política regional: **12/12 aserciones PASS**.
+- Catálogo: 44 capacidades dentro del ámbito; catálogo raíz y espejo de extensión coinciden en contenido.
+- Estas verificaciones no ejecutan `node --test`, no arrancan el servidor del colector y no sustituyen Chrome real.
+
+### CI/RDC/Escritorio a la revisión de cierre
+
+- Head actual de PR #333: `fed3c6e01a058e4e993c0a3d98d2ace854d51ba8`, abierta en borrador y no fusionada.
+- `Harmonia validation` run `39711328931`, `CI` run `39711328941`; job específico `119603101763`, con `runner_id=0`, `runner_name=""`, `steps=[]`, y ningún artefacto recuperable. No hay evidencia de ejecución de la suite Node.
+- No se conectó a RDC, no se abrió Chrome ni se escribió en el Escritorio. Sigue sin verificarse qué UUID corresponde al dispositivo autorizado para Harmonia.
+- No se aplicaron optimizaciones de CPU/RAM/fingerprints/latencia. Las propuestas multiámbito y de métricas siguen no aprobadas; el glosario UX sí está en la candidata, pendiente de validación visual en Chrome.
+- OCP canónico v0.19 / §26: commit `a250a8c62a2f78bf26c8815fd77f5abf2692530a`, blob `ab9e3fd8bc18a09738042e748bb6e0221673bf64`, read-back verificado.
+- Prompt de continuidad actualizado a OCP v0.19: commit `9859283c2238085a78fc4ee8c71b16d151cd79af`, blob `5a0fa6f1366d91a4cab9a20afff2293fa2d55c5a`, read-back verificado.
+- README actualizado: commit `b1e02cfd386b0a45d29c321af42173848a4820bc`, blob `9f9e9058bcf4031c7dadec964a6b71d74f3791c5`, read-back verificado.
+
+**Dictamen:** hubo avance verificable en fuente y UX candidata; el esencial no puede marcarse cerrado. Los bloqueos de runner y dispositivo impiden la aceptación E2E y la descarga a la carpeta única. Las mejoras no esenciales documentales siguen en rama revisable, sin sustituir los gate esenciales.
