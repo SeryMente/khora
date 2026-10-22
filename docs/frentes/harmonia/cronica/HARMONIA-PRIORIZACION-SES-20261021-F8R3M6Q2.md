@@ -107,3 +107,17 @@ La revisión independiente de los archivos de `feat/harmonia-e2e-20261021` obtuv
 - README actualizado: commit `b1e02cfd386b0a45d29c321af42173848a4820bc`, blob `9f9e9058bcf4031c7dadec964a6b71d74f3791c5`, read-back verificado.
 
 **Dictamen:** hubo avance verificable en fuente y UX candidata; el esencial no puede marcarse cerrado. Los bloqueos de runner y dispositivo impiden la aceptación E2E y la descarga a la carpeta única. Las mejoras no esenciales documentales siguen en rama revisable, sin sustituir los gate esenciales.
+
+
+## Diagnóstico final de provisionamiento CI · 2026-10-22
+
+- Se contrastó el estado público de GitHub. La página oficial registró degradación de Actions/Pull Requests/Webhooks el **21 de octubre de 2026** y mensajes de recuperación hacia 16:57–17:09 UTC. Al consultarse, Actions aparecía Operational, pero los jobs de Harmonia continuaron fallando horas después. Fuente: https://www.githubstatus.com/ (recuperado el 2026-10-22).
+- El patrón `runner_id=0`, `runner_name=""`, cero pasos y sin logs/artefactos coincide con reportes comunitarios de fallos anteriores a asignar un runner. Son comparables síntomas externos, no evidencia de que la causa sea la misma para SeryMente. Referencias: https://github.com/orgs/community/discussions/209001 y https://github.com/orgs/community/discussions/209031.
+- Runs actuales del head candidato `fed3c6e01a058e4e993c0a3d98d2ace854d51ba8`: `Harmonia validation` `39711328931`, `CI` `39711328941`; job `119603101763`, runner sin asignar, pasos vacíos y artefactos vacíos. No hay evidencia de ejecución de Node/tests.
+- Se intentó consultar endpoints de permisos/uso de GitHub Actions desde el conector, pero fueron rechazados como no permitidos. No se inspeccionó la facturación privada de la organización ni se abrió soporte, por no disponer de un canal autorizado para ello. Causa exacta: **NO DETERMINADA**.
+- Dictamen limitado: el error ocurre antes de los pasos del workflow y no hay evidencia de una aserción del código que haya fallado. El camino restante es que un propietario autorizado inspeccione Settings/Billing/Actions o que se abra un caso con GitHub Support con los run/job IDs. No repetir reintentos ciegos ni cambiar el código para intentar reparar un runner que no llegó a iniciar.
+- OCP canónico actualizado a v0.20, §27: commit `be18afe44e1de4191e881796af6b4ff5ec2ffec4`, blob `68c4c4d7d7bcbed8a560fbc135c6418b3b0d73b2`, lectura de vuelta verificada.
+- Prompt de continuidad actualizado a OCP v0.20: commit `d4187dcb1fc257c524a02647372d86644d005ede`, blob `1178e394bff5a5b0fea2d4f0b598f8bf55fef536`, lectura de vuelta verificada.
+- README actualizado: commit `6cc9cec30c9e3553b783d2a827ed1822fc95e9a7`, blob `744f3b1ee95bc6316bfb651823a45a850a838ece`, lectura de vuelta verificada.
+
+**Límite al cierre:** no se descargó al Escritorio ni se conectó al RDC; el UUID vivo sigue sin asociación de autorización demostrada. El E2E esencial sigue ABIERTO. Las dos propuestas no esenciales y el refinamiento de guía UX siguen en la rama de revisión, el PR continúa en borrador, y ninguna optimización de rendimiento fue ejecutada.
