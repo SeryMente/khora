@@ -178,7 +178,7 @@ function recordEvent(event,res){
   const surfaceBytes=isNewSurface?Buffer.byteLength(JSON.stringify(surface,null,2),'utf8'):0;
   if(index.totalBytes+surfaceBytes+bytes>MAX){index.stopped=true;persist();return {tooLarge:true};}
   if(isNewSurface){atomicWrite(surfaceFile,surface);index.uniqueSurfaceCount=(index.uniqueSurfaceCount||0)+1;index.totalBytes+=surfaceBytes;}
-  fs.appendFileSync(file,line,'utf8');index.totalBytes+=bytes;
+  fs.mkdirSync(path.dirname(file),{recursive:true}); fs.appendFileSync(file,line,'utf8');index.totalBytes+=bytes;
   const session=index.sessions[event.sessionId]||{firstAt:event.capturedAt,lastAt:event.capturedAt,events:0,types:{},file:path.relative(root,file).split(path.sep).join('/'),lastEventSha256:null};
   session.lastAt=event.capturedAt;session.events++;session.types[storedType]=(session.types[storedType]||0)+1;
   session.lastEventSha256=crypto.createHash('sha256').update(line).digest('hex');index.sessions[event.sessionId]=session;
@@ -191,7 +191,7 @@ function recordEvent(event,res){
  const stored={schema:'harmonia.event.v1',eventId:event.eventId,sessionId:event.sessionId,conversation:typeof event.conversation==='string'?event.conversation.slice(0,80):null,type:event.type,source:text(event.source,40),capturedAt:new Date(when).toISOString(),payload:sanitizeStoredPayload(event)};
  const line=JSON.stringify(stored)+'\n',bytes=Buffer.byteLength(line);
  if(index.totalBytes+bytes>MAX){index.stopped=true;persist();return {tooLarge:true};}
- fs.appendFileSync(file,line,'utf8');index.totalBytes+=bytes;
+ fs.mkdirSync(path.dirname(file),{recursive:true}); fs.appendFileSync(file,line,'utf8');index.totalBytes+=bytes;
  const session=index.sessions[event.sessionId]||{firstAt:stored.capturedAt,lastAt:stored.capturedAt,events:0,types:{},file:path.relative(root,file).split(path.sep).join('/'),lastEventSha256:null};
  session.lastAt=stored.capturedAt;session.events++;session.types[stored.type]=(session.types[stored.type]||0)+1;
  session.lastEventSha256=crypto.createHash('sha256').update(line).digest('hex');index.sessions[event.sessionId]=session;
