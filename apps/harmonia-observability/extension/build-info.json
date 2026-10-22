@@ -1,7 +1,7 @@
 {
   "schema": "harmonia.repository-build.v1",
   "version": "0.4.0",
-  "sourceRevision": "6499dd172db2f959f1c2c064db0ed501bd35cc73",
+  "sourceRevision": "7d251361440ec93ebce276e8383c9693e9891c26",
   "catalogVersion": "0.1.2",
   "regionPolicyVersion": "1.0.0",
   "releaseChannel": "candidate",
@@ -29,5 +29,5 @@
     "compactPopup": true,
     "dedicatedDashboardTab": true
   },
-  "generatedBy": "Harmonia source repository; sourceRevision pins the branch HEAD immediately before this metadata-only update."
+  "generatedBy": "Harmonia source repository; sourceRevision pins the exact branch HEAD immediately before this metadata-only update."
 }
