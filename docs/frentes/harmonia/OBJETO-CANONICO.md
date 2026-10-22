@@ -4,7 +4,7 @@
 ## 1. Control e identidad
 
 - Nombre normalizado: **Harmonia**, extensión compañera de **Khora**; «Armonía» y «Cora» de los dictados se conservan literalmente en originales. No renombrar producto o repositorio por transcripción.
-- Identificador del frente: `harmonia`. Versión del objeto **0.14**; sello **HARMONIA-v0.14**; corte de estado **2026-10-21**. Este corte reorganiza los requisitos verbatim por esencialidad y fija las optimizaciones para la última fase. Conserva las salidas históricas de §17 y la transferencia verificada de §18; no declara aceptación E2E.
+- Identificador del frente: `harmonia`. Versión del objeto **0.15**; sello **HARMONIA-v0.15**; corte de estado **2026-10-21**. Este corte persiste el orden esencial/no esencial solicitado, enlaza la crónica y alinea el README y el prompt de continuidad. Las optimizaciones siguen explícitamente al final; la aceptación E2E continúa abierta.
 - Repositorio propietario: `SeryMente/khora`, rama `main`; objeto canónico en `docs/frentes/harmonia/OBJETO-CANONICO.md`. El blob de la versión anterior v0.4 fue `9a186ea789ea5aacab8dd06cf9f6edf364b89531`. Primera publicación del estado completo: commit `892adad897d6bd36c797ec2343ff7f4893b853bf`; lectura de vuelta en `main` confirmada y blob verificado `03ec5d127e0913dfe1f61e8588ba53b8abaa8e5f`. El recibo se refiere al contenido integral v0.5. Corte v0.6: commit inicial `3cb7901c2223cd41773185b93f17133e459e7a69`, blob `d1f524c383cc71c13f89e8d3aa3886ac3533fcdb`. Corte v0.7: commit inicial `55c2e8ba053265c219b2d941665c5cb3730107de`, blob `bbd08e2da15be17486e7515fd11eda7df57fca2b`; lectura de vuelta y corrección del catálogo documentadas. Nunca anticipar un SHA.
 - Fuente de código vigente: `apps/harmonia-observability/` en `main`, con la extensión de observabilidad y captura automática en evolución (rama `main`, versión de código en revisión E2E), `coverage-catalog.json` y scripts/validador. No inferir que el código fuente, el paquete local y el runtime ejecutado están sincronizados sin prueba de huellas. El paquete materializado en el Escritorio se reconstruyó desde esos archivos y contiene solo el runtime portable y una credencial local excluidos del repositorio; su manifiesto local de huellas se regeneró tras las validaciones.
 - Frente permanente por creación expresa del operador. El paquete local usado anteriormente está en `C:\\Users\\fila4\\Desktop\\Harmonia-Observabilidad-v0.2.0`; su sincronización con las últimas versiones de `main` **NO VERIFICADA**. El runtime debe considerarse desincronizado hasta comparar huellas y reiniciar con el colector actualizado. La versión 0.3.0 del código fuente no está aceptada funcionalmente en Chrome; no hereda pruebas de v0.1.0 ni de validaciones anteriores.
@@ -506,3 +506,25 @@ Solicitar una única confirmación de identidad y alcance antes de modificar el 
 **Primero funcionamiento e integridad → después pruebas automatizadas reproducibles → luego identidad RDC y paquete único → después E2E físico y aceptación → al final optimización de rendimiento y generalización.** No anticipar optimización para bloquear la primera entrega, ni marcar requisitos esenciales como cumplidos sin evidencia.
 
 **Estado al emitir esta priorización:** la candidata v0.4.0 de PR #333 contiene parte importante del trabajo de captura, coordinación regional, build-info, dashboard y pruebas, pero permanece en borrador; los checks consultados figuran fallidos y el diagnóstico es insuficiente. `main` sigue en v0.3.0. No hay aceptación E2E física ni carpeta única aplicada. El frente continúa ABIERTO.
+
+
+## 22. Persistencia de la priorización y handoff actualizado · SES-20261021-F8R3M6Q2 · 2026-10-21
+
+### Instrucción del operador
+
+«Las optimizacioens eran para el final. Organiza por esencuial. Y no esencial la lista y damela de nuevo.»
+
+### Resultado y fuentes canónicas
+
+- La secuencia operativa se encuentra en §21: **esenciales primero** (captura automática fiel, multi-pestaña/región, persistencia íntegra, UI separada, metadatos/sincronización, pruebas automatizadas, identidad RDC, carpeta única y E2E físico); **no esenciales para la primera aceptación después** (optimización CPU/RAM/huellas, generalización multiámbito, refinamiento UX multiámbito y métricas avanzadas).
+- OCP actualizado a v0.15 / `HARMONIA-v0.15`; commit `PENDIENTE-DE-COMPLETAR-TRAS-WRITE` (el commit exacto y blob de este cambio se registran en la crónica tras la lectura de vuelta). La versión previa v0.14 se conserva en Git.
+- Crónica dedicada: [HARMONIA-PRIORIZACION-SES-20261021-F8R3M6Q2.md](cronica/HARMONIA-PRIORIZACION-SES-20261021-F8R3M6Q2.md), commit `7a7050fa4ef76945da437ae6976da94bc6e7930b`, blob `bb8e913099b2a2afc445f0cac6ef2be863cb268d`; creación/read-back verificados.
+- README alineado: commit `f5e5f54c33eeacaf3347dd5fababb83f9ba813d5`, blob `a81d1a56b4ff31de3ac87051992e90ed2bff530b`; read-back verificado.
+- Prompt de asistente alineado a la priorización: commit `9fbfd0b7ebc645f3b7cd92ca521a55badb869fd8`, blob `533c6574a2d4e88e0a56371a3190a28afcbda805`; tras publicar v0.15, el prompt debe apuntar a esa nueva versión de OCP y a §22.
+- Metodología adquirida en esta retoma: Metacanon 1.20 / `METACANON-OBJETOS-v1.20`, blob `eb066d7b7445710cd96d6abb3acf2c33639d8f41`; Sam v339 / `NX-339m`, blob `fdc996078bd611492e46d6b3abf569fbb4a6effa`; GOW v2.2, blob `6d4f8aff292ae173d9ceeba03694597bd2f16488`. Edad exacta del último commit de Metacanon `NO VERIFICADA`; revisión manual de cascada Sam y GOW hecha al inicio. `MCP-NORMATIVO: DESACTIVADO`.
+- No se modificó código de Harmonia ni se fusionó PR #333. No se ejecutó Chrome, no se conectó al dispositivo RDC y no se tocó el Escritorio. E2E permanece abierto.
+- Estado de titularidad: `CONTROL-RESPONSABILIDAD.json` generación 3, folio `SES-20261021-F8R3M6Q2`, blob `26d49ba490ddc6f7c0c3eb4f42a3287b42c87719`.
+
+### Criterio de continuidad
+
+El siguiente ciclo debe empezar por la primera casilla esencial sin optimizar todavía: conseguir un diagnóstico CI reproducible y corregir únicamente fallos demostrados en la candidata de PR #333. Una vez aceptada la primera entrega E2E, medir una línea base y ejecutar optimizaciones comparativas. El estado de esta sección se considera persistido solo tras comparar el contenido guardado en `main` y completar los hashes reales de este mismo ciclo; no usar el marcador temporal si la lectura de vuelta no se completa.
