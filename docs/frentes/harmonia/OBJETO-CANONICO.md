@@ -4,7 +4,7 @@
 ## 1. Control e identidad
 
 - Nombre normalizado: **Harmonia**, extensión compañera de **Khora**; «Armonía» y «Cora» de los dictados se conservan literalmente en originales. No renombrar producto o repositorio por transcripción.
-- Identificador del frente: `harmonia`. Versión del objeto **0.12**; sello **HARMONIA-v0.12**; corte de estado **2026-10-21**. Este corte registra la auditoría del checklist literal contra `main` y el PR candidato, el estado observado de los checks CI y los límites de aceptación; conserva intacta la salida histórica de §17 y la transferencia verificada de §18. No declara aceptación E2E.
+- Identificador del frente: `harmonia`. Versión del objeto **0.13**; sello **HARMONIA-v0.13**; corte de estado **2026-10-21**. Este corte añade una segunda comprobación del bloqueo RDC contra el registro global y el inventario vivo, y conserva el checklist técnico de §19. La salida histórica de §17 y la transferencia verificada de §18 permanecen intactas. No declara aceptación E2E.
 - Repositorio propietario: `SeryMente/khora`, rama `main`; objeto canónico en `docs/frentes/harmonia/OBJETO-CANONICO.md`. El blob de la versión anterior v0.4 fue `9a186ea789ea5aacab8dd06cf9f6edf364b89531`. Primera publicación del estado completo: commit `892adad897d6bd36c797ec2343ff7f4893b853bf`; lectura de vuelta en `main` confirmada y blob verificado `03ec5d127e0913dfe1f61e8588ba53b8abaa8e5f`. El recibo se refiere al contenido integral v0.5. Corte v0.6: commit inicial `3cb7901c2223cd41773185b93f17133e459e7a69`, blob `d1f524c383cc71c13f89e8d3aa3886ac3533fcdb`. Corte v0.7: commit inicial `55c2e8ba053265c219b2d941665c5cb3730107de`, blob `bbd08e2da15be17486e7515fd11eda7df57fca2b`; lectura de vuelta y corrección del catálogo documentadas. Nunca anticipar un SHA.
 - Fuente de código vigente: `apps/harmonia-observability/` en `main`, con la extensión de observabilidad y captura automática en evolución (rama `main`, versión de código en revisión E2E), `coverage-catalog.json` y scripts/validador. No inferir que el código fuente, el paquete local y el runtime ejecutado están sincronizados sin prueba de huellas. El paquete materializado en el Escritorio se reconstruyó desde esos archivos y contiene solo el runtime portable y una credencial local excluidos del repositorio; su manifiesto local de huellas se regeneró tras las validaciones.
 - Frente permanente por creación expresa del operador. El paquete local usado anteriormente está en `C:\\Users\\fila4\\Desktop\\Harmonia-Observabilidad-v0.2.0`; su sincronización con las últimas versiones de `main` **NO VERIFICADA**. El runtime debe considerarse desincronizado hasta comparar huellas y reiniciar con el colector actualizado. La versión 0.3.0 del código fuente no está aceptada funcionalmente en Chrome; no hereda pruebas de v0.1.0 ni de validaciones anteriores.
@@ -102,7 +102,7 @@ Resto del método vigente aplicable por pertinencia; citas históricas, ejemplos
 
 ## 8. Estado vivo
 
-**🔄 Estado operativo al 2026-10-21 · auditoría E2E v0.12:** la fuente vigente es `SeryMente/khora/main`; la titularidad activa es generación 3 / `SES-20261021-F8R3M6Q2`. `main` conserva el código v0.3.0. La candidata v0.4.0 permanece en PR #333, borrador y no fusionado. Los criterios multiámbito de §16 siguen temporales. No se declara completado el cierre E2E.
+**🔄 Estado operativo al 2026-10-21 · auditoría E2E v0.13:** titularidad generación 3 / `SES-20261021-F8R3M6Q2`. `main` conserva la extensión v0.3.0; la candidata v0.4.0 sigue en PR #333, borrador y no fusionado. La comprobación más reciente de RDC confirma dos IDs distintos bajo el mismo nombre visible y no determina cuál está autorizado para este proyecto; véase §20. Los criterios multiámbito de §16 siguen temporales y E2E continúa abierto.
 
 **Fuente de código (blobs verificados en la lectura de este ciclo):**
 - Manifiesto MV3 v0.3.0: blob `5c2dd6d616c4ba19541d03df8fbc4abc6f0a11b6`.
@@ -442,7 +442,7 @@ El checklist se limita a requisitos expresados por el operador en la conversaci�
 
 ### Bloqueo de equipo remoto, pendiente
 
-La última evidencia conservada sigue siendo discrepante: el listado vivo identificó `PC10RCIF4EI4` con ID `86580320-19b3-421a-89c7-36dce0123559`, mientras el registro global contiene `79564800-3d53-4195-8122-5b4b061ef862`. No hay base para tratarlos como alias del mismo dispositivo. No ejecutar RDC/Chrome/Escritorio hasta reconciliar ambos registros por evidencia verificable. Mientras tanto, continuar con correcciones aisladas en la rama de revisión y pruebas que no dependan del dispositivo.
+En la auditoría de §19 el registro parecía discrepante frente a la lista viva. La comprobación posterior de solo lectura documentada en §20 confirma que el registro global es una instantánea histórica del 2026-10-10 y el inventario vivo actual devuelve otro UUID para el mismo nombre visible. La diferencia de identidad es real, pero todavía no se sabe qué UUID corresponde al equipo autorizado para Harmonia. No ejecutar RDC/Chrome/Escritorio hasta que el operador identifique la identidad autorizada y autorice su registro.
 
 ### Siguiente secuencia operativa
 
@@ -453,3 +453,25 @@ La última evidencia conservada sigue siendo discrepante: el listado vivo identi
 5. Formalizar después el diseño multiámbito por el FT de Metacanon. No confundir el cierre documental con la aceptación del producto.
 
 **Dictamen:** la candidata v0.4.0 cubre más requisitos en código que `main` v0.3.0, pero todavía no está aceptada. El cierre E2E permanece **ABIERTO**.
+
+
+## 20. Segunda investigación del bloqueo RDC · 2026-10-21
+
+### Fuentes consultadas, sin conectar al equipo
+
+1. Registro global en `SeryMente/metodologia/main/ESTADO-RDC-ACTIVO.md`, blob `851c15ba94662b56423707d1d86398e0d1c23b85`. El archivo se describe a sí mismo como registro operativo mutable, no fuente de conectividad actual ni selector global. La última observación que registra es del `2026-10-10T15:56:08.039Z`: cuenta `elathanor111@gmail.com`, nombre `PC10RCIF4EI4`, ID `79564800-3d53-4195-8122-5b4b061ef862`, activo en ese momento.
+2. Inventario vivo obtenido con `Remote Desktop Commander list_devices` el 2026-10-21. Devuelve `PC10RCIF4EI4`, ID `86580320-19b3-421a-89c7-36dce0123559`, **Online**, visto hace unos dos minutos; no devuelve el ID registrado `79564800-3d53-4195-8122-5b4b061ef862`. Muestra además otro registro histórico offline de nombre igual con ID `3bb48b75-46eb-4505-adbd-3c0ed6779124`.
+3. El inventario vivo no expone la cuenta RDC asociada al ID `86580320-19b3-421a-89c7-36dce0123559` ni su asociación autorizada con el perfil Windows `CENTRAL\\fila4`. La coincidencia del nombre no identifica la cuenta, la máquina física o su autorización.
+
+### Qué se resolvió y qué permanece abierto
+
+- **Resuelto:** la fuente de la discrepancia está mejor delimitada: se estaba comparando una observación global histórica (10 de octubre) con el inventario vivo actual (21 de octubre). El proveedor vivo es la fuente para conectividad actual; el registro histórico conserva identidades y no selecciona por sí solo el destino de esta conversación.
+- **No resuelto:** los UUID son diferentes; no son alias demostrados. Las fuentes disponibles no enlazan el ID vivo con la cuenta autorizada ni confirman que sea el dispositivo aprobado para Harmonia. Tampoco hay una autorización explícita del operador para añadir esa identidad como entrada nueva al registro global.
+- **Alternativa segura agotada en este ciclo:** repetir la consulta viva y leer el registro original completo. La vía siguiente exige una decisión del operador: confirmar cuál identidad RDC desea autorizar para Harmonia y autorizar, si corresponde, registrar esa identidad como entrada separada, sin borrar ni reemplazar registros históricos.
+- **No se realizó:** ping, conexión, lectura/escritura de archivos remotos, navegación Chrome, instalación o carga de extensión, ni operación sobre el Escritorio. No se seleccionó ningún dispositivo para una operación posterior.
+
+### Condición exacta para desbloquear
+
+Solicitar una única confirmación de identidad y alcance antes de modificar el registro global o seleccionar el equipo. Tras la confirmación, releer el registro vigente, escribir por comparación SHA/revisión conservando las identidades históricas, releer y cotejar; luego verificar la asociación de usuario Windows → SID → `LocalPath` en el equipo ya autorizado. El único destino de paquete seguirá siendo `C:\\Users\\fila4\\Desktop\\Harmonia`, con staging fuera del Escritorio y sin limpieza destructiva previa.
+
+**Dictamen RDC:** **BLOQUEO PARCIALMENTE DIAGNOSTICADO; IDENTIDAD AUTORIZADA NO VERIFICADA.**
