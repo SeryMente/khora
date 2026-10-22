@@ -38,3 +38,12 @@ El paquete Harmonia v0.4.0 está en `C:/Users/PC 13/Desktop/Harmonia`; la carpet
 ## Checklist actualizado · SES-20261022-R8Q4N6P1
 
 El checklist vigente de 17 criterios y la prioridad del siguiente hito están en el OCP §30 y en [la crónica del ciclo](https://github.com/SeryMente/khora/blob/main/docs/frentes/harmonia/cronica/HARMONIA-CHECKLIST-SES-20261022-R8Q4N6P1.md). No repetir de memoria el pronóstico amplio 10–26 h como estimación restante del paquete ya entregado. Estado: transferencia gen5 verificada; v0.4.0 entregada según §29, pendiente carga real en Chrome y aceptación E2E.
+
+
+## Actualización vigente — SES-20261022-R8Q4N6P1
+
+El OCP actual es v0.24 / HARMONIA-v0.24, §§1–31. El criterio finito del pool v1 está en evidencias/HARMONIA-CRITERIO-SUFICIENCIA-POOL-V1.md; no exigir cubrir exhaustivamente las 68 funciones del catálogo para cerrar el pool básico.
+
+En main se guardaron y leyeron de vuelta: traza real saneada de 627 eventos, manifiesto, baseline, fixture sintética de 11 eventos (5 huellas/2 sesiones), README de datos, criterio de suficiencia, instrucciones originales y crónica. La traza real contiene 611 eventos de consola, 10 arranques y 6 paradas; no contiene superficies estructurales ni mensajes visibles y por tanto es diagnóstica, no suficiente. La fixture es solo sintética.
+
+El paquete local verificado es v0.5.0 (8/8 JS parseables, HARMONIA_SOURCE_CONTRACT_OK, tests Node 7/7), pero no se declara sincronizado con main. El E2E natural de Chrome sigue abierto. La publicación puntual de los artefactos anteriores está confirmada; la publicación automática continua desde el equipo aún no está implementada porque el worker solo consulta metadatos remotos y no sube los eventos. No afirmar que la extensión cumple la sincronización hasta implementar y probar el flujo autenticado.
