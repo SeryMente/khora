@@ -32,4 +32,7 @@ No esenciales para la primera aceptación, pero conservados como trabajo posteri
 
 - OCP actualizado a v0.14 con §21 «Priorización por esencialidad; optimización al final», commit `f42fe8795da110e7a04d0129619be3631a4836ba`, blob `763f91697cf8ff7dbc63520352504ddc3f5436b0`, read-back verificado.
 - Prompt de asistente alineado con §21 y la secuencia esencial → RDC/carpeta única → E2E físico → optimización: commit `9fbfd0b7ebc645f3b7cd92ca521a55badb869fd8`, blob `533c6574a2d4e88e0a56371a3190a28afcbda805`, read-back verificado.
-- Próximo paso: enlazar esta crónica desde OCP/README, releer cada archivo y mantener la prioridad del operador sin invertirla.
+- Finalización documental: OCP §21–§22 enlaza esta crónica y conserva la lista esencial/no esencial. El OCP v0.15 fue corregido para registrar la alineación final del prompt: commit de esa corrección `bd2f41ca479fb30405f5558a83a23bdc7e198b32`, blob `7d02ca9a0c2eb50ce98cdf8c3c6edf8ec639de94`, read-back verificado.
+- Prompt actual de continuidad apunta al OCP v0.15 / §§21–22: commit `068c526b5c5f6f5757382fa83f4b6387548893ef`, blob `41f2879bc979dc2b050843b07f4f28f256386d44`, read-back verificado.
+- README actualizado y leído de vuelta: commit `f5e5f54c33eeacaf3347dd5fababb83f9ba813d5`, blob `a81d1a56b4ff31de3ac87051992e90ed2bff530b`.
+- Próximo paso de ingeniería: ejecutar la primera casilla esencial del OCP §21—recuperar evidencia CI interpretable en PR #333 y reparar únicamente fallos concretos—sin anticipar optimizaciones ni fusionar a `main`.
