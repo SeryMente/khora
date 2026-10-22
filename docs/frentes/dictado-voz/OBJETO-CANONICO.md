@@ -247,7 +247,7 @@ Autenticación C025: dos flujos estándar por dispositivo, autorizados en navega
 | Producción y publicación Blog/Página | NO VERIFICADAS por C055 | Verificar permisos y artefactos reales antes de publicar |
 | Sincronización en `main` | PENDIENTE; `main` aún contenía v0.6.14 al corte de lectura | Integración normal posterior; no cambiar código ni afirmar que esta rama ya está en `main` |
 
-**Evidencia de ciclo:** objeto, original verbatim C055 y control de responsabilidad cotejados por lectura posterior exacta en `integrate/blog-c053-production-20261021`; GOW v2.2 releído al cierre. Se actualiza y relee el manifiesto de custodia a continuación. Sin cambios de código, build, pruebas de producto, despliegue ni publicación editorial.
+**Evidencia de ciclo:** objeto, original verbatim C055 y control de responsabilidad cotejados por lectura posterior exacta en `integrate/blog-c053-production-20261021`; GOW v2.2 releído al cierre. El manifiesto de custodia se actualizó y releyó después de esta revisión, y sus blobs registrados se cotejaron contra el OCP, el original y el control. Sin cambios de código, build, pruebas de producto, despliegue ni publicación editorial.
 
 ### C054 — Corrección del checklist, Momento y metadatos de adquisición
 ### C054 — Corrección del checklist, Momento y metadatos de adquisición
