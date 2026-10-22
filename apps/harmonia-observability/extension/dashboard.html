@@ -29,6 +29,25 @@
       <article class="panel"><h2>Cobertura de la conversación</h2><dl id="coverage"></dl><p id="coverageNote" class="muted"></p></article>
       <article class="panel"><h2>Pestañas observadas</h2><div id="sessions" class="sessions"><p class="muted">Esperando sesiones…</p></div></article>
     </section>
+    <section class="panel metrics-guide" aria-labelledby="metricsGuideTitle">
+      <h2 id="metricsGuideTitle">Cómo interpretar los indicadores</h2>
+      <details>
+        <summary>Índice combinado y cobertura documental</summary>
+        <p>El índice combinado combina capacidades documentadas con observaciones naturales de interfaz. Es una medida de mapeo, no una precisión de captura, no un porcentaje de conversaciones cubiertas y no una garantía de exhaustividad.</p>
+      </details>
+      <details>
+        <summary>Superficies únicas y barridos</summary>
+        <p>Las superficies únicas cuentan huellas estructurales distintas; los barridos cuentan observaciones. Una superficie repetida puede seguir aportando un nuevo avistamiento sin volver a almacenar su estructura completa.</p>
+      </details>
+      <details>
+        <summary>Exploración completa y regiones sin catálogo</summary>
+        <p>Una región solo puede figurar como completa si su catálogo y sus umbrales verificables se han satisfecho. Sin catálogo suficiente, el estado correcto es “sin catálogo de completitud”; no se infiere completitud por analogía.</p>
+      </details>
+      <details>
+        <summary>Versión local y sincronización del repositorio</summary>
+        <p>La versión remota es metadato consultado del repositorio, no prueba de que ese código esté instalado. Harmonia no ejecuta JavaScript remoto para actualizarse automáticamente. Compara hashes y valida el paquete antes de sustituir archivos.</p>
+      </details>
+    </section>
     <section class="panel privacy">
       <h2>Contrato de observación y privacidad</h2>
       <p>Se registran la estructura visible, metadatos de controles, HTML estructural resumido, resumen CSS/consola y el texto visible de mensajes del usuario y del asistente, incluidos cambios parciales observables. No se leen borradores del compositor, valores de campos, enlaces completos, URLs de imágenes ni razonamiento oculto. La redacción de consola es heurística y no garantiza detectar toda información sensible; evita usar conversaciones con datos sensibles durante la prueba.</p>
