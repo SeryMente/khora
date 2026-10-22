@@ -9,16 +9,16 @@ Entrada única de estado: [OBJETO-CANONICO.md](OBJETO-CANONICO.md). El OCP conse
 
 ## Fuente de código y aceptación
 
-El código publicado en `main` sigue en v0.3.0 sin aceptación E2E. La candidata v0.4.0 está en [PR #333](https://github.com/SeryMente/khora/pull/333), abierta en borrador y sin fusionar; el fix de persistencia local se encuentra en la rama candidata y pasó 5/5 pruebas Node locales. El OCP vigente es **v0.24**; §31 fija el criterio finito para el pool mínimo v1. Los artefactos reales saneados y la fixture sintética están en docs/frentes/harmonia/datos/observaciones/. La captura natural suficiente sigue pendiente; no confundir tests locales ni fixture con E2E de Chrome. Carpeta entregada: `C:\Users\PC 13\Desktop\Harmonia`; Chrome → Cargar descomprimida: `C:\Users\PC 13\Desktop\Harmonia\extension`. La extensión no se ha cargado ni probado naturalmente en Chrome; E2E sigue ABIERTA. La arquitectura multiámbito y UX/métricas siguen siendo propuestas no aprobadas. No inferir sincronización entre `main`, rama candidata y paquete local sin comparar huellas.
+El código publicado en `main` sigue en v0.3.0 sin aceptación E2E. La candidata v0.4.0 está en [PR #333](https://github.com/SeryMente/khora/pull/333), abierta en borrador y sin fusionar; el fix de persistencia local se encuentra en la rama candidata y pasó 5/5 pruebas Node locales. El OCP vigente es **v0.26**; §31 conserva el criterio finito para el pool mínimo v1 y §33 registra la transferencia de titularidad vigente y el bloqueo técnico actual. Los artefactos reales saneados y la fixture sintética están en docs/frentes/harmonia/datos/observaciones/. La captura natural suficiente sigue pendiente; no confundir tests locales ni fixture con E2E de Chrome. Carpeta entregada: `C:\Users\PC 13\Desktop\Harmonia`; Chrome → Cargar descomprimida: `C:\Users\PC 13\Desktop\Harmonia\extension`. La extensión no se ha cargado ni probado naturalmente en Chrome; E2E sigue ABIERTA. La arquitectura multiámbito y UX/métricas siguen siendo propuestas no aprobadas. No inferir sincronización entre `main`, rama candidata y paquete local sin comparar huellas.
 
 La entrega previa quedó registrada para `PC-14` / UUID `345f64ee-5d6a-429f-a97c-dab44f44cddb`, perfil `C:\\Users\\PC 13`; el inventario actual mostró ese UUID online. La discrepancia de la instantánea histórica se resuelve para aquella entrega, pero antes de cualquier nueva mutación remota se debe reconfirmar cuenta → SID → perfil según Sam P036. Nunca usar ni leer `C:\\Users\\MantenimientoRCI\\` como raíz operativa.
 
 La formalización del criterio multiámbito de §16 sigue pendiente mediante el FT de Metacanon; sus notas siguen siendo temporales hasta entonces.
 
 
-## Continuidad activa · SES-20261022-R8Q4N6P1
+## Continuidad histórica · SES-20261022-R8Q4N6P1 (generación 5 sustituida)
 
-Control exclusivo: generación 5, folio activo `SES-20261022-R8Q4N6P1`, blob `ac797019939f2f93dcbe2c98b73b36d71b30a900`; titularidad leída de vuelta y verificada. La unicidad global del folio no está verificada fuera de los repositorios y controles accesibles. Estado siguiente: no crear otra carpeta; hacer la prueba E2E de Chrome con la carpeta ya entregada, y mantener las optimizaciones para después.
+Control histórico de generación 5, folio `SES-20261022-R8Q4N6P1`, blob `ac797019939f2f93dcbe2c98b73b36d71b30a900`. Esta titularidad fue sustituida primero por gen6 y después por gen7 mediante transferencias registradas con CAS y lectura de vuelta. El bloque se conserva solo como historia; ya no determina el titular ni el siguiente paso.
 
 
 ## Entrega del pool mínimo suficiente — SES-20261022-R8Q4N6P1
@@ -28,6 +28,8 @@ Control exclusivo: generación 5, folio activo `SES-20261022-R8Q4N6P1`, blob `ac
 La publicación puntual quedó verificada por lectura de vuelta exacta. La publicación automática recurrente desde la extensión no está implementada; el worker sincroniza metadatos de solo lectura y no sube observaciones.
 
 
-## Estado activo · SES-20261022-Q7M4K9V2
+## Estado activo · SES-20261022-6E3A91F7
 
-OCP v0.25. Control de frente: generación 6; titularidad verificada por lectura de vuelta. El dispositivo RDC autorizado PC-14, UUID 345f64ee-5d6a-429f-a97c-dab44f44cddb, aparece OFFLINE. No se realizaron operaciones locales ni pruebas de Chrome en esta retoma. Instrucciones completas conservadas en originales/HARMONIA-RETOMA-E2E-SES-20261022-Q7M4K9V2.jsonl, U18. La última salida anterior del modelo es NO DISPONIBLE; véase OCP §32. Reanudar solo después de que el mismo ID esté online y su identidad se verifique.
+OCP v0.26. Control exclusivo: generación 7; folio `SES-20261022-6E3A91F7`; blob del control releído `636a43c6e89355bba94154f2e48f465226030396`; transferencia desde gen6 mediante commit `0a654c4d76ac2b85ccba62d479c6c44abe371090`. Autorización `Si` literal: [original U19](originales/HARMONIA-TRANSFER-SES-20261022-6E3A91F7.jsonl). [Crónica de transferencia](cronica/HARMONIA-TRANSFER-SES-20261022-6E3A91F7.md) y [última salida íntegra](originales/HARMONIA-TRANSFER-SES-20261022-6E3A91F7-salida.md).
+
+La consulta viva de RDC de este ciclo confirma que el UUID autorizado de PC-14 `345f64ee-5d6a-429f-a97c-dab44f44cddb` continúa OFFLINE. No se usó el otro dispositivo online. No hubo operaciones locales ni pruebas de Chrome, CI o E2E en este ciclo; el paquete local y la raíz directamente cargable siguen NO VERIFICADOS. Reanudar operaciones locales solo tras recuperar el mismo UUID y verificar usuario/perfil Windows.
