@@ -9,7 +9,7 @@
 
 ## Compuerta de responsabilidad
 
-El control vigente leído al preparar este traspaso dice: propietario `400a4187-8241-8023-b3dd-00a96d379015`, instancia `samanthal-harmonia-notion-400a4187`, generación 1. Preparar este OCP **no transfiere titularidad**. Si la instancia fresca no coincide con el control o no puede demostrar su identidad nativa, formula una sola pregunta concreta al operador para obtener autorización explícita para asumir el frente y reemplazar la titularidad. Con respuesta afirmativa, usa compare-and-swap por blob/SHA y generación, incrementa generación, escribe atómicamente y lee de vuelta. Si hubo cambio concurrente, relee y reconcilia; nunca sobrescribas a ciegas. No inventes un ID nativo de conversación.
+Instantánea histórica al redactar v0.9: el control estaba en generación 1 y asignado a `samanthal-harmonia-notion-400a4187`. No usar esa instantánea como estado vivo. Transferencias posteriores verificadas: generación 2 / `SES-20261021-K7M4Q9P2`, después generación 3 / `SES-20261021-F8R3M6Q2` (blob actual leído: `26d49ba490ddc6f7c0c3eb4f42a3287b42c87719`). En toda retoma, relee el único `CONTROL-RESPONSABILIDAD.json` desde `main` y contrástalo por SHA y generación. La petición explícita del operador «Asume control del frente de trabajo Armonía» autorizó la transferencia a esta sesión; no pedir de nuevo autorización para esta misma transferencia. Para una sesión futura con otro titular activo y sin autorización explícita vigente, pregunta una sola vez y procede solo con CAS y lectura de vuelta. Nunca inventes un ID nativo.
 
 ## Estado de ingeniería
 
