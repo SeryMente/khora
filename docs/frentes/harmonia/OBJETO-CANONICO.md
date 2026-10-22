@@ -1078,7 +1078,7 @@ Procedimiento oficial para reanudar RDC: el usuario inicia/reinstancia Remote De
 - La comprobación de lectura de vuelta validó SHA devuelto, generación 7, folio, alias/instancia, estado `assigned`, titular anterior gen6 y folio anterior, blob previo y evento de autorización. No se fabricó ID nativo (`owner_thread=null`).
 - Búsqueda de colisiones: seis controles encontrados en los árboles de nueve repositorios SeryMente accesibles y búsqueda exacta de código del folio completo sin resultados. Unicidad global `NO VERIFICADA`.
 - Gobierno adquirido desde `SeryMente/metodologia/main`: INICIO blob `c57c866a8d5299d360e1bb1e318f34a573d9ccc7`; Sam v339 / `NX-339m`, blob `fdc996078bd611492e46d6b3abf569fbb4a6effa`; Metacanon 1.21 / `METACANON-OBJETOS-v1.21`, blob `cae8387a576ba4914d086a47bf57fe925717efca`, commit/edad exactos `NO VERIFICADOS`; GOW v2.2, blob `6d4f8aff292ae173d9ceeba03694597bd2f16488`, reread at cycle close. Manual Sam cascade review; `MCP-NORMATIVO: DESACTIVADO`.
-- Salida del ciclo preservada en [salida literal](originales/HARMONIA-TRANSFER-SES-20261022-6E3A91F7-salida.md), blob `22a3374229f21eaf9fb7a244392c2dd7496d7a0d`; crónica [HARMONIA-TRANSFER-SES-20261022-6E3A91F7.md](cronica/HARMONIA-TRANSFER-SES-20261022-6E3A91F7.md), blob `9b96bd8687d176f6788b8c0d19a64d605cc53259`.
+- Salida del ciclo preservada en [salida literal](originales/HARMONIA-TRANSFER-SES-20261022-6E3A91F7-salida.md), blob `bdcb0b2de2e940ef60a27ae06d07bd7ea905e4d5`; crónica [HARMONIA-TRANSFER-SES-20261022-6E3A91F7.md](cronica/HARMONIA-TRANSFER-SES-20261022-6E3A91F7.md), blob `4fac1b31cb8e49512072cf0a033625190c1ac9aa`.
 
 ### Consulta RDC y bloqueo actual
 
@@ -1105,7 +1105,7 @@ Siguiente gate: el operador debe iniciar/reinstanciar Remote Desktop Commander e
 
 ### Última salida visible del modelo de este ciclo (verbatim)
 
-Fuente: [`originales/HARMONIA-TRANSFER-SES-20261022-6E3A91F7-salida.md`](originales/HARMONIA-TRANSFER-SES-20261022-6E3A91F7-salida.md), blob `22a3374229f21eaf9fb7a244392c2dd7496d7a0d`; contenido reproducido íntegramente a continuación, sin reconstrucción:
+Fuente: [`originales/HARMONIA-TRANSFER-SES-20261022-6E3A91F7-salida.md`](originales/HARMONIA-TRANSFER-SES-20261022-6E3A91F7-salida.md), blob `bdcb0b2de2e940ef60a27ae06d07bd7ea905e4d5`; contenido reproducido íntegramente a continuación, sin reconstrucción:
 
 ~~~markdown
 # Harmonia · transferencia confirmada · SES-20261022-6E3A91F7
@@ -1115,7 +1115,7 @@ La autorización afirmativa del operador quedó registrada literalmente como `Si
 ## Resultado de titularidad
 
 - Frente: Harmonia · `SeryMente/khora`.
-- OCP: `docs/frentes/harmonia/OBJETO-CANONICO.md`, corte documental previo v0.25; esta transferencia se asentará en v0.26.
+- OCP: `docs/frentes/harmonia/OBJETO-CANONICO.md`, corte documental previo v0.25; esta transferencia quedó asentada en v0.26.
 - Folio nuevo: `SES-20261022-6E3A91F7`.
 - Control exclusivo: generación 6 → 7. Commit de transferencia: `0a654c4d76ac2b85ccba62d479c6c44abe371090`.
 - Blob de lectura de vuelta del control: `636a43c6e89355bba94154f2e48f465226030396`.
