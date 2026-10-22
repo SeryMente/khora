@@ -162,8 +162,7 @@ async function reconcileRegionLeaders(regionKey,preferredTabId,refresh=false){
  if(leader===null){delete regionLeaders[regionKey];await chrome.storage.local.set({[STORE.regionLeaders]:regionLeaders});return;}
  regionLeaders[regionKey]=leader;await chrome.storage.local.set({[STORE.regionLeaders]:regionLeaders});
  for(const tab of tabs){if(!tab.id)continue;if(tab.id===leader){if(autoEnabled)await injectTab(tab,true);continue;}
-  try{await chrome.tabs.sendMessage(tab.id,{kind:'harmonia:stop'});}catch{}
-  await stopSession(tab.id,'region-exploration-complete-standby');await removeConsoleBridge(tab.id);
+  try{await chrome.tabs.sendMessage(tab.id,{kind:'harmonia:standby-structure'});}catch{}
  }
 }
 
@@ -239,10 +238,10 @@ async function onObservedEvent(message,sender){
  const tab=sender.tab;if(!autoEnabled||!tab?.id||!valid(tab.url))return false;
  const type=String(message?.event?.type||'');
  if(!['ui.surface.scan','conversation.visible.delta','console.observed'].includes(type))return false;
- if(!(await canObserveTab(tab))){try{await chrome.tabs.sendMessage(tab.id,{kind:'harmonia:stop'});}catch{}await stopSession(tab.id,'region-observer-standby');await removeConsoleBridge(tab.id);return false;}
  const session=await ensureSession(tab);if(!session)return false;
  const payload=message.event.payload||{},regionKey=regionFor(tab.url);
  if(type==='ui.surface.scan'){
+  if(!(await canObserveTab(tab))){try{await chrome.tabs.sendMessage(tab.id,{kind:'harmonia:standby-structure'});}catch{}return false;}
   const next=surfaceQueue.then(()=>processSurfaceScan(tab,session,payload),()=>processSurfaceScan(tab,session,payload));
   surfaceQueue=next.catch(error=>{lastError=String(error.message||error);});return next;
  }
@@ -295,11 +294,12 @@ async function removeConsoleBridge(tabId){
  }});}catch{}
 }
 async function injectTab(tab,force=false){
- if(!autoEnabled||!tab?.id||!valid(tab.url))return;if(!force&&!(await canObserveTab(tab)))return;
+ if(!autoEnabled||!tab?.id||!valid(tab.url))return;
+ const structureObserver=force?true:await canObserveTab(tab);
  try{
   await chrome.scripting.executeScript({target:{tabId:tab.id},world:'MAIN',func:installConsoleBridgeMainWorld});
   await chrome.scripting.executeScript({target:{tabId:tab.id},files:['region-policy.js','content.js']});
-  await chrome.tabs.sendMessage(tab.id,{kind:'harmonia:start',automatic:true,regionKey:regionFor(tab.url)});
+  await chrome.tabs.sendMessage(tab.id,{kind:'harmonia:start',automatic:true,regionKey:regionFor(tab.url),structureObserver});
  }catch(error){lastError='No se pudo activar observación en una pestaña: '+String(error.message||error);}
 }
 async function injectExistingTabs(tabs){for(const tab of tabs||[]){if(valid(tab.url))await injectTab(tab);}}
