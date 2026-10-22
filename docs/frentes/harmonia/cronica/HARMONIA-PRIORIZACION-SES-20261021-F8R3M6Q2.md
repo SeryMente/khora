@@ -62,3 +62,14 @@ No esenciales para la primera aceptación, pero conservados como trabajo posteri
 - **Descarga a Desktop:** no realizada porque la identidad autorizada de destino aún no puede verificarse. Destino previsto cuando esté resuelto: una sola carpeta `C:\\Users\\fila4\\Desktop\\Harmonia`, staging fuera del Escritorio y reemplazo de archivos gestionados solo después de verificar hashes.
 - **Estado esencial:** **NO CERRADO** — falta runner CI útil, test real del colector, identidad autorizada, paquete en la carpeta única y Chrome E2E.
 - **Siguiente del trabajo no esencial:** ampliar el documento candidato de UX/métricas o preparar pruebas de contrato multiámbito en rama, sin implementar decisiones de permisos/almacenamiento no ratificadas y sin ejecutar optimizaciones antes de aceptar E2E.
+
+
+## UX/métricas y compuertas de rendimiento diferido · 2026-10-22
+
+- Propuesta de UX/métricas/rendimiento creada en la rama candidata: `docs/frentes/harmonia/propuestas/HARMONIA-UX-METRICAS-RENDIMIENTO-CANDIDATA.md`, commit `11418a029f01dc015ecbbe223075b13f7ab4e14d`, blob `5d1c8d841567939cb5e25f61dc670edf74cc3f87`, lectura de vuelta verificada.
+- Contenido: distinguir estados de catálogo/documentación/observación/completitud; accesibilidad y claridad del dashboard; métricas agregadas de eventos y latencia; protocolo de línea base, recursos y compuertas de cobertura; políticas de retención y borrado explícitamente no decididas.
+- No se optimizó CPU/RAM/fingerprints ni se cambió el comportamiento del dashboard/colector; hacerlo antes de aceptar E2E contradice la prioridad del operador. Las propuestas de multiámbito y UX/métricas permanecen documentales, no aprobadas.
+- OCP actualizado a v0.18, §25, commit `940e07424ca697a77c7f60c2f2bc9094af559426`, blob `1f5b37e805e64049004c01f4fae371b316ec221d`, lectura de vuelta verificada.
+- Prompt de continuidad actualizado a OCP v0.18, §§21–25: commit `3ad6a82e25817aa29712af673b32c1a6775b36de`, blob `6101270329c1e8dd2dd44fb19e37bc2b06f2572c`, leído de vuelta. README actualizado para enlazar ambas propuestas: commit `fded820f00b9b1f9886646b2ea4a69c46fdd7414`, blob `c826df0cf1890fbcc9cd4a57d12abb3b1efb194a`, leído de vuelta.
+- Head del PR #333 tras las dos propuestas: `11418a029f01dc015ecbbe223075b13f7ab4e14d`; PR abierta en borrador, no fusionada. El último run CI `39711070504` falló. No hay evidencia de runner ni ejecución de las pruebas.
+- Esenciales siguen abiertos: runner CI real, integración/recuperación del colector bajo Node, identidad RDC autorizada, carpeta única del Escritorio y Chrome E2E real.
