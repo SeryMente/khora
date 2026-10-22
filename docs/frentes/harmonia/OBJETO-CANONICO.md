@@ -4,7 +4,7 @@
 ## 1. Control e identidad
 
 - Nombre normalizado: **Harmonia**, extensión compañera de **Khora**; «Armonía» y «Cora» de los dictados se conservan literalmente en originales. No renombrar producto o repositorio por transcripción.
-- Identificador del frente: `harmonia`. Versión del objeto **0.21**; sello **HARMONIA-v0.21**; corte de estado **2026-10-22**. Este corte registra la primera investigación operativa de resolución esencial: relectura de titularidad, PR #333, workflows y runs de Actions; confirma que los jobs de CI fallan antes de ejecutar pasos y deja explícitas las estimaciones de los nueve hitos, incluyendo las dependencias externas. Se mantiene esencial primero y optimización al final.
+- Identificador del frente: `harmonia`. Versión del objeto **0.22**; sello **HARMONIA-v0.22**; corte de estado **2026-10-22**. Este corte registra la entrega pragmática del paquete v0.4.0 en el Escritorio del dispositivo RDC autenticado, la corrección probada del directorio diario del colector, CI local 5/5 y preservación verbatim U06–U17. La aceptación E2E real en Chrome sigue abierta; no confundir paquete entregado con extensión cargada ni captura natural validada.
 - Repositorio propietario: `SeryMente/khora`, rama `main`; objeto canónico en `docs/frentes/harmonia/OBJETO-CANONICO.md`. El blob de la versión anterior v0.4 fue `9a186ea789ea5aacab8dd06cf9f6edf364b89531`. Primera publicación del estado completo: commit `892adad897d6bd36c797ec2343ff7f4893b853bf`; lectura de vuelta en `main` confirmada y blob verificado `03ec5d127e0913dfe1f61e8588ba53b8abaa8e5f`. El recibo se refiere al contenido integral v0.5. Corte v0.6: commit inicial `3cb7901c2223cd41773185b93f17133e459e7a69`, blob `d1f524c383cc71c13f89e8d3aa3886ac3533fcdb`. Corte v0.7: commit inicial `55c2e8ba053265c219b2d941665c5cb3730107de`, blob `bbd08e2da15be17486e7515fd11eda7df57fca2b`; lectura de vuelta y corrección del catálogo documentadas. Nunca anticipar un SHA.
 - Fuente de código vigente: `apps/harmonia-observability/` en `main`, con la extensión de observabilidad y captura automática en evolución (rama `main`, versión de código en revisión E2E), `coverage-catalog.json` y scripts/validador. No inferir que el código fuente, el paquete local y el runtime ejecutado están sincronizados sin prueba de huellas. El paquete materializado en el Escritorio se reconstruyó desde esos archivos y contiene solo el runtime portable y una credencial local excluidos del repositorio; su manifiesto local de huellas se regeneró tras las validaciones.
 - Frente permanente por creación expresa del operador. El paquete local usado anteriormente está en `C:\\Users\\fila4\\Desktop\\Harmonia-Observabilidad-v0.2.0`; su sincronización con las últimas versiones de `main` **NO VERIFICADA**. El runtime debe considerarse desincronizado hasta comparar huellas y reiniciar con el colector actualizado. La versión 0.3.0 del código fuente no está aceptada funcionalmente en Chrome; no hereda pruebas de v0.1.0 ni de validaciones anteriores.
@@ -779,3 +779,157 @@ Estimación agregada orientativa: **10–26 horas activas**, no necesariamente c
 - El OCP anterior a esta lectura final era commit `c34baa58bc7a99d0c21d36897e0d57970a83ec70`, blob `7dadb869dc2daa26dfb5b66b4c50ad2de00cd86b`. La estimación se reconcilió matemáticamente con la suma de los nueve intervalos: 10.25–25.5 h; se redondea a **10–26 h activas**. El tiempo de calendario sigue sin poder predecirse hasta resolver el acceso a Actions y la autorización del dispositivo.
 - El primer intento de validación de README reportó un error porque el verificador consultaba la estructura incorrecta de la respuesta. La relectura independiente confirmó que README sí se había guardado con v0.21. Se corrigió el verificador, y los read-backs del prompt y de la crónica sí coinciden con sus SHA.
 - No se modificó código fuente. No se ejecutó Chrome ni se tocó Escritorio; no se repitieron los workflows fallidos.
+
+
+## 29. Entrega pragmática de paquete, CI local y persistencia verbatim — SES-20261022-H6Q2V9C4 — 2026-10-22
+
+### Estado general
+
+El operador fijó un límite duro de 20 minutos para entregar la carpeta en el Escritorio de este dispositivo. Se priorizó entrega física verificable y CI local sobre la espera por GitHub Actions. No iniciar un ciclo de retoques estéticos: reabrir trabajo solo ante fallo reproducible, instrucción explícita o riesgo material documentado.
+
+**Resultado:** paquete Harmonia v0.4.0 en `C:\Users\PC 13\Desktop\Harmonia`; carpeta para Chrome → Cargar descomprimida: `C:\Users\PC 13\Desktop\Harmonia\extension`. Lectura final de vuelta: única carpeta de proyecto Harmonia en ese Escritorio = `Harmonia`. Destino RDC autenticado: `PC-14`, UUID `345f64ee-5d6a-429f-a97c-dab44f44cddb`; identidad Windows `PC-14\PC 13`; perfil `C:\Users\PC 13`.
+
+**Límite de aceptación:** la carpeta está entregada y validada localmente; la extensión no se cargó ni recargó en Chrome. `AUTO_CAPTURE_STATUS=RELOAD_REQUIRED_NOT_VERIFIED`, `NATURAL_COVERAGE=AWAITING_POST_RELOAD_SCAN`. La aceptación E2E sigue ABIERTA.
+
+### Instrucciones directas del operador — verbatim
+
+Fuente persistente de los mensajes de este ciclo: `originales/HARMONIA-ENTREGA-ESCRITORIO-01.jsonl`, blob leído de vuelta `313bf444fc35df49696dfe72e6ed19c9328e3172`. Grafías, errores tipográficos, espacios y puntuación se conservan intencionalmente. Esta copia literal dentro del OCP evita depender de la ventana de conversación.
+
+### U06 — HARMONIA-RETOMA-20261022
+
+```text
+Asume control del frente de trabajo Armonía y además utiliza este fragmento de conversación por si te falta algún pedacito de contexto. Y repite el checklist basado en mis instrucciones verbatim para saber dónde nos quedamos
+
+Documenta perfecta y exhaustivcamente el canon de persistencia a cada paso del camino.&#x20;
+```
+
+
+### U07 — HARMONIA-ETA-20261022
+
+```text
+10-26 horas activas es demasdiado. Cuentas con las isntrucciones verbatim?
+```
+
+
+### U08 — HARMONIA-ENTREGA-ESCRITORIO-01
+
+```text
+Tengo 20 minutos. Es el tiempo del que dispones para entregarme la nuevaw carpeta d el aextension en el escritorio de este dispositivo
+```
+
+
+### U09 — HARMONIA-ENTREGA-ESCRITORIO-01
+
+```text
+No mas. Asi que ten cuidado
+```
+
+
+### U10 — HARMONIA-ENTREGA-ESCRITORIO-01
+
+```text
+Tengo 20 minutos. Es el tiempo del que dispones para entregarme la nuevaw carpeta d el aextension en el escritorio de este dispositivo
+```
+
+
+### U11 — HARMONIA-CIERRE-DE-ENTREGA-01
+
+```text
+Necwesitoq ue entregues todo lo atnerior. Que guardes siempre mis isntrucioens verbatim, que nunca nos quedemos sin ellas. Siempr edeben de persitir en el OCP. para que te refieras a ellas, hasta la ultima coma.   Que lo que me entregues en escriutorio para cargar en chrome, sea una version, que ya contenga todo lo que dijimos.   QUe no vayas a caer en un loop infinito de pseudo mejora obsesiva. Se practico.   Empoieza ahora, documenta todo a cada paso, y resuelve de extremo a extrmeo.  El tracking del progreso es igualmente importante. siempre en tu razonamiento, iras dandome una idea general de donde estgamos, a dodne vamos, en el sentido general de la expreison y en el sentido ultra concreto simultaneamente.
+
+#
+
+Necesitoq ue uses el entorno local para pruebas automaticas ci si es que lo ves mas rapido, quye la opcion de github
+```
+
+
+### U12 — HARMONIA-RETOMA-VERBATIM
+
+```text
+Ahora si resuelve E2e, y deja una sola carpeeta en escritorio. Nucna debe de haber mas de una crpeta en escritorio,  por dispositivo RDC autorizado,  para un proyecto.  Si hay una carpet,a se borra, y se sustituye pro la nueva, o se sustituyen los rchivos, lo que sea mas facil (Eto supone que debe dde ser nombrada de modo generico, para nto tener que borrar el folder contenedor o no lo se)
+```
+
+
+### U13 — HARMONIA-RETOMA-VERBATIM
+
+```text
+Cuales bloqueos?
+```
+
+
+### U14 — HARMONIA-RETOMA-VERBATIM
+
+```text
+Bloqueo 1. Probaste otros medios? No sueles lo de los bloqueos,  vamos resolveindo uno por uno
+```
+
+
+### U15 — HARMONIA-RETOMA-VERBATIM
+
+```text
+Las optimizacioens eran para el final. Organiza por esencuial. Y no esencial la lista y damela de nuevo.
+```
+
+
+### U16 — HARMONIA-RETOMA-VERBATIM
+
+```text
+Finaliza Esencial de Extremo a EXTREMO, Cuando termines descárgalo en escritorio y continúa con lo no esencial
+```
+
+
+### U17 — HARMONIA-ENTREGA-ESCRITORIO-01
+
+```text
+Tengo 20 minutos. Es el tiempo del que dispones para entregarme la nuevaw carpeta d el aextension en el escritorio de este dispositivo
+```
+
+
+### Defecto funcional descubierto y corregido
+
+Se eligió CI local con Node portable v22.23.4 x64 porque GitHub Actions seguía fallando antes de asignar runner y no entregaba logs utilizables. La primera prueba real local falló con HTTP 400/`ENOENT`: el colector no creaba `originals\YYYY-MM-DD` antes de anexar el JSONL. Se corrigió añadiendo `fs.mkdirSync(path.dirname(file),{recursive:true})` antes de los dos puntos de anexado.
+
+Fix en rama candidata: commit `7e405a7be004c7df80886a7a38387e539465d426`, blob de `collector/server.js` `b513213543f21ff8f726f49ce93a046c843d4918`. `extension/build-info.json` fija `sourceRevision=7e405a7be004c7df80886a7a38387e539465d426`; commit de metadatos `d0bc715c7350847e03e53d09274804c4b8ffcce1`, blob `8d1971fd22da3a0a2e3d120a33528caf484af4f7`. PR #333 sigue en borrador, abierta y sin fusionar.
+
+### Validación local y manifiesto final
+
+- Parseo JavaScript: 9/9 archivos. `HARMONIA_SOURCE_CONTRACT_OK`.
+- Suite Node local después del fix: 5 pruebas aprobadas, 0 fallidas.
+- Node portable v22.23.4: ZIP SHA-256 `cbc74b5e0982c9dbb41525fd8fb5dcd32fbee237863f7829072f4639a1ce5f20`; `node.exe` SHA-256 `dccc52de28d8df2ee22d2062424f8c563070d95d8ad70c54c4bf01d590dec14f`.
+- Colector: PID observado 16396; salud autenticada OK, solicitud sin token HTTP 401; CORS de extensión aceptado y origen web externo rechazado HTTP 403. Catálogo espejo coincidente; 44 funciones y 16 fuentes de catálogo.
+- El finalizador verificó estructura, permisos, build-info y salud; generó manifiesto de 22 archivos. Comprobación independiente: 22/22 hashes correctos. SHA-256 final de `MANIFEST-HUELLAS.json`: `17b2d5bb1aefc12587378b4999f1dab06c2d30f1ead0f03f044df9a17b18578c`.
+- La procedencia del manifiesto está fijada a `SeryMente/khora`, rama `feat/harmonia-e2e-20261021`, revisión `7e405a7be004c7df80886a7a38387e539465d426`. La credencial `extension/local-auth.js` queda local y excluida de Git/evidencias compartibles.
+- Se descubrió y corrigió un error sintáctico introducido al editar la procedencia del finalizador; después se ejecutó el finalizador y la comprobación independiente de 22/22 hashes pasó.
+- Se adaptaron las rutas del paquete al perfil real `C:\Users\PC 13`; datos en `C:\Users\PC 13\AppData\Local\Harmonia\surface-index-v0.3.0\data`.
+
+### Cobertura solicitada y límites reales
+
+El paquete candidato implementa inyección automática en `chatgpt.com`, observación estructural DOM, CSS resumido, consola con redacción heurística, texto renderizado de mensajes de usuario/asistente y cambios incrementales cuando el DOM los expone, coordinación en la región conversacional catalogada, panel dedicado, catálogo y persistencia JSONL/índice local. No lee borradores ni valores de campos.
+
+No declarar que la candidata ya completa absolutamente todo lo discutido:
+- No captura razonamiento interno oculto. Solo puede observar texto que la interfaz exponga dentro del contrato permitido; transitorios reales aún NO ENSAYADOS.
+- No se demostró un consumidor permanente de otro hilo ChatGPT. El almacén puede consultarse por RDC, pero la observación entre dos hilos en tiempo real aún debe probarse.
+- No se cargó/re-cargó Chrome ni se capturó conversación natural. E2E sigue ABIERTA.
+- Solo la región de conversación tiene catálogo de completitud; otras regiones siguen sin mapa validado.
+- CPU/RAM y latencia real no están medidas. Optimización diferida hasta aceptación.
+
+### Regla anti-loop y tracking
+
+1. No hacer retoques de estética ni perseguir sensación de progreso.
+2. Reabrir solo por fallo reproducible, instrucción explícita o riesgo material documentado.
+3. Cada ciclo informa estado general y avance concreto; distinguir código, sintaxis, tests, carga Chrome y E2E natural.
+4. Mantener todas las instrucciones directas del operador en el OCP y en `originales/`, sin normalizar grafías, espacios o puntuación.
+5. Siguiente paso de máximo valor: cargar `C:\Users\PC 13\Desktop\Harmonia\extension` en `chrome://extensions` como extensión descomprimida y ejecutar una prueba natural sin datos sensibles, después verificar persistencia y consulta desde el segundo hilo por RDC.
+
+### Salida obligatoria del ciclo — Metacanon §4
+
+1. **Identidad y gobierno:** Harmonia, `SeryMente/khora`; OCP v0.22 / `HARMONIA-v0.22`; folio SES-20261022-H6Q2V9C4, generación 4. Metacanon 1.20, Sam v339 / NX-339m, GOW v2.2; MCP normativo desactivado.
+2. **Dónde estamos:** paquete v0.4.0 en Escritorio; CI local pasa; Chrome E2E permanece abierto.
+3. **Delta:** corregido directorio diario del colector; build-info y manifiesto local alineados; instrucciones verbatim U06–U17 persistidas en `originales/` y reproducidas aquí.
+4. **Avance verificable:** 9/9 parseables, contrato aprobado, 5/5 pruebas, 22/22 hashes, colector sano y una sola carpeta `Desktop\Harmonia`.
+5. **Pendientes:** cargar Chrome, verificar captura natural, varias pestañas, persistencia tras reinicio y consulta desde el segundo hilo.
+6. **Viabilidad:** paquete entregado y validado localmente; no aceptar E2E sin prueba natural.
+7. **Tiempo:** entrega de carpeta resuelta dentro del límite operativo; no estimar el cierre E2E antes de realizar la carga real.
+8. **Siguiente acción:** cargar `C:\Users\PC 13\Desktop\Harmonia\extension` y ejecutar la prueba natural.
+9. **Continuación:** asistente mantiene el frente; no se fusionó a `main`; optimización diferida.
+10. **Persistencia:** OCP y originales actualizados; la crónica se sincroniza en el siguiente paso secuencial.
