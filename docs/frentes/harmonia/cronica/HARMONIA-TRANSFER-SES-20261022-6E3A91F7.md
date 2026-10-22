@@ -9,7 +9,7 @@
 - Folio de sesión: `SES-20261022-6E3A91F7`.
 - Instancia/alias operativo: `chatgpt-harmonia-SES-20261022-6E3A91F7`. `owner_thread=null): no hubo ID nativo expuesto por las herramientas.
 - Evento: `HARMONIA-TRANSFER-SES-20261022-6E3A91F7`.
-- Salida visible del ciclo conservada íntegramente en `originales/HARMONIA-TRANSFER-SES-20261022-6E3A91F7-salida.md`, blob `bdcb0b2de2e940ef60a27ae06d07bd7ea905e4d5`.
+- Salida visible del ciclo conservada íntegramente en `originales/HARMONIA-TRANSFER-SES-20261022-6E3A91F7-salida.md`, blob `81dc1aff77a25f09b5b65e69802f2e274af2a34c`.
 
 ## Gobierno adquirido en main
 
@@ -57,7 +57,7 @@ Se invocó `list_devices` de Remote Desktop Commander inmediatamente después de
 1. **Identidad/gobierno:** Harmonia · `SeryMente/khora` · OCP heredado `docs/frentes/harmonia/OBJETO-CANONICO.md` · folio `SES-20261022-6E3A91F7` · control generación 7. Metacanon 1.21 / `METACANON-OBJETOS-v1.21`, blob `cae8387a576ba4914d086a47bf57fe925717efca`, edad de commit NO VERIFICADA; Sam v339 / `NX-339m`, blob `fdc996078bd611492e46d6b3abf569fbb4a6effa`; GOW v2.2, blob `6d4f8aff292ae173d9ceeba03694597bd2f16488`. Cascada Sam revisada manualmente; `MCP-NORMATIVO: DESACTIVADO`.
 2. **Dónde estamos:** titularidad trasladada y comprobada; el estado del paquete y aceptación técnica siguen abiertos, con operación física bloqueada.
 3. **Delta:** autorización U19 preservada; gen6 → gen7; OCP asciende a v0.26 y puntos de entrada sincronizados.
-4. **Avance/evidencia:** commit de control `0a654c4d76ac2b85ccba62d479c6c44abe371090`, blob read-back `636a43c6e89355bba94154f2e48f465226030396`; U19 blob `2f8e8b4c1aca2e80df01fcb8513d27f2f0f2936c`; salida persistida blob `bdcb0b2de2e940ef60a27ae06d07bd7ea905e4d5`; consulta RDC constató destino exacto offline. No hubo ejecución local ni pruebas.
+4. **Avance/evidencia:** commit de control `0a654c4d76ac2b85ccba62d479c6c44abe371090`, blob read-back `636a43c6e89355bba94154f2e48f465226030396`; U19 blob `2f8e8b4c1aca2e80df01fcb8513d27f2f0f2936c`; salida persistida blob `81dc1aff77a25f09b5b65e69802f2e274af2a34c`; consulta RDC constató destino exacto offline. No hubo ejecución local ni pruebas.
 5. **Qué falta:** handshake PC-14, cuenta→SID→perfil→Escritorio, inventario local, raíz MV3, CI/headless, colector/persistencia, fixtures sintéticas, E2E natural real y hashes verificados.
 6. **Viabilidad:** la titularidad está resuelta; solo lectura y preparación de repositorio mientras el dispositivo exacto permanezca offline. No hay evidencia de paquete directamente cargable ni E2E completo.
 7. **Tiempo/ciclos:** cierre físico/E2E NO ESTIMABLE hasta resolver la dependencia externa del handshake.
