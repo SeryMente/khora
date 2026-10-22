@@ -4,7 +4,7 @@
 ## 1. Control e identidad
 
 - Nombre normalizado: **Harmonia**, extensión compañera de **Khora**; «Armonía» y «Cora» de los dictados se conservan literalmente en originales. No renombrar producto o repositorio por transcripción.
-- Identificador del frente: `harmonia`. Versión del objeto **0.16**; sello **HARMONIA-v0.16**; corte de estado **2026-10-21**. Este corte registra la corrección de captura multi-pestaña en la candidata v0.4.0, los resultados estáticos aislados, el nuevo bloqueo medible de CI y las condiciones RDC sin resolver. Se mantiene la prioridad esencial primero y optimización al final; no declara aceptación E2E.
+- Identificador del frente: `harmonia`. Versión del objeto **0.17**; sello **HARMONIA-v0.17**; corte de estado **2026-10-21/22**. Este corte añade la propuesta documental multiámbito como trabajo no esencial, mantiene la prioridad esencial primero y optimización al final, y conserva el bloqueo de aceptación E2E (CI sin runner y RDC sin identidad autorizada confirmada). No declara cierre E2E.
 - Repositorio propietario: `SeryMente/khora`, rama `main`; objeto canónico en `docs/frentes/harmonia/OBJETO-CANONICO.md`. El blob de la versión anterior v0.4 fue `9a186ea789ea5aacab8dd06cf9f6edf364b89531`. Primera publicación del estado completo: commit `892adad897d6bd36c797ec2343ff7f4893b853bf`; lectura de vuelta en `main` confirmada y blob verificado `03ec5d127e0913dfe1f61e8588ba53b8abaa8e5f`. El recibo se refiere al contenido integral v0.5. Corte v0.6: commit inicial `3cb7901c2223cd41773185b93f17133e459e7a69`, blob `d1f524c383cc71c13f89e8d3aa3886ac3533fcdb`. Corte v0.7: commit inicial `55c2e8ba053265c219b2d941665c5cb3730107de`, blob `bbd08e2da15be17486e7515fd11eda7df57fca2b`; lectura de vuelta y corrección del catálogo documentadas. Nunca anticipar un SHA.
 - Fuente de código vigente: `apps/harmonia-observability/` en `main`, con la extensión de observabilidad y captura automática en evolución (rama `main`, versión de código en revisión E2E), `coverage-catalog.json` y scripts/validador. No inferir que el código fuente, el paquete local y el runtime ejecutado están sincronizados sin prueba de huellas. El paquete materializado en el Escritorio se reconstruyó desde esos archivos y contiene solo el runtime portable y una credencial local excluidos del repositorio; su manifiesto local de huellas se regeneró tras las validaciones.
 - Frente permanente por creación expresa del operador. El paquete local usado anteriormente está en `C:\\Users\\fila4\\Desktop\\Harmonia-Observabilidad-v0.2.0`; su sincronización con las últimas versiones de `main` **NO VERIFICADA**. El runtime debe considerarse desincronizado hasta comparar huellas y reiniciar con el colector actualizado. La versión 0.3.0 del código fuente no está aceptada funcionalmente en Chrome; no hereda pruebas de v0.1.0 ni de validaciones anteriores.
@@ -608,3 +608,29 @@ Se volvió a consultar el inventario vivo y el registro global RDC:
 4. Con CI funcional y dispositivo autorizado: staging fuera del Escritorio, comprobar hashes, mantener solo `Desktop\\Harmonia`, cargar extensión, y realizar pruebas reales multi-tab/persistencia/cobertura. Solo después medir y optimizar.
 
 **Dictamen de §23:** corrección esencial multi-tab implementada y verificada por read-back y validación aislada; **aceptación E2E pendiente** por CI sin runner y entorno RDC ambiguo. No afirmar que el hito esencial esté completamente aceptado.
+
+
+## 24. Trabajo no esencial iniciado · propuesta multiámbito candidata · 2026-10-22
+
+### Artefacto creado en la rama de revisión
+
+- Propuesta: [HARMONIA-MULTIAMBITO-ARQUITECTURA-CANDIDATA.md](https://github.com/SeryMente/khora/blob/feat/harmonia-e2e-20261021/docs/frentes/harmonia/propuestas/HARMONIA-MULTIAMBITO-ARQUITECTURA-CANDIDATA.md).
+- Ruta: `docs/frentes/harmonia/propuestas/HARMONIA-MULTIAMBITO-ARQUITECTURA-CANDIDATA.md`.
+- Commit de creación: `263f3f18605e456db5bee3195d447a33bfa3bf0e`; blob `3e80ff93ff566ea7fa5c317028159185646b1901`; lectura de vuelta comprobada.
+- Alcance: propuesta no aprobada para descriptores de ámbito, adaptadores con contrato común, catálogos verificables, namespacing/aislamiento de persistencia, permisos mínimos, flujo de incorporación, pruebas y decisiones abiertas.
+- No se cambió el comportamiento de la extensión por esta propuesta. No se declaró multiámbito como arquitectura vigente ni se activaron dominios adicionales.
+- Esta parte no esencial queda como diseño candidato sujeto al FT de Metacanon correspondiente; ninguna decisión material de permisos, almacenamiento o privacidad se considera aprobada por el mero hecho de documentarla.
+
+### Orden de ejecución conservado
+
+1. **Esencial primero:** integrar, probar y aceptar la primera entrega E2E de ChatGPT, recuperar un runner de CI real, resolver la identidad RDC y validar la carpeta única en el equipo autorizado.
+2. **No esencial después:** revisar/ratificar la propuesta multiámbito; refinar UX y métricas con evidencias reales.
+3. **Optimización al final:** después de aceptar E2E y tener línea base, comparar CPU, RAM, latencia y cobertura; no ejecutar optimizaciones que puedan reducir fidelidad.
+
+### Estado de cierre del ciclo
+
+- Captura multi-pestaña: corrección esencial presente en PR #333; verificación estática/aislada en §23; no hay aceptación runtime.
+- CI: los últimos runs `Harmonia validation` `39710596780` y `CI` `39710596811` para head `8b537bc96da32f601e56755fc16f480174ebed02` siguen en fallo con `runner_id=0`, pasos y artefactos vacíos; no hay logs con causa. Las suites Node no están certificadas como ejecutadas.
+- Descarga al Escritorio: no realizada. El inventario RDC vivo y el registro global muestran UUID distintos bajo el mismo nombre visible; falta confirmar cuál identidad se autoriza para Harmonia. No usar ni modificar un equipo por semejanza de nombre.
+- E2E esencial: **ABIERTO**. No reportar terminado, instalado ni aceptado.
+- Trabajo no esencial: **propuesta documental multiámbito creada y releída**; implementación posterior condicionada a ratificación formal y a no comprometer los esenciales.
