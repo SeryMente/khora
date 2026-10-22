@@ -113,3 +113,20 @@ Los fallos de Vercel/Netlify de preview para repositorio privado/plan Hobby se d
 - Ninguna regresión de cobertura, privacidad, orden de eventos, persistencia ni coordinación multi-pestaña.
 
 **Estado actual:** solo se crea la propuesta documental en la rama revisable. No se implementaron estos cambios ni se ejecutaron mediciones de rendimiento. La optimización continúa diferida hasta que la primera entrega E2E sea aceptada.
+
+## 8. Primer refinamiento UX implementado en la candidata
+
+En la rama revisable se añadió al dashboard una guía accesible y desplegable que explica la semántica de:
+- índice combinado/documentación versus precisión de captura;
+- superficies únicas versus cantidad de barridos;
+- completitud regional versus región sin catálogo;
+- revisión remota consultada versus código realmente instalado.
+
+La guía usa `<details>/<summary>` nativos, sin JavaScript adicional para expandir/contraer, y un estilo de foco visible por teclado. El validador estático ahora exige que la guía y el texto que evita confundir mapeo con precisión permanezcan en el HTML.
+
+Huellas verificadas por lectura de vuelta:
+- `extension/dashboard.html`: `ea8cdd453b98780bbc8928b1fc0ecf42148b7bcd`.
+- `extension/dashboard.css`: `19c50217f6f8b3f5a36ba00bf4164412433006d9`.
+- `scripts/validate-source.js`: `4b8101cb57751738d84aa43e0acc86fa8ec40c6b`.
+
+Esta es una mejora UX documental y de presentación de bajo riesgo; no altera el contrato de captura, no añade telemetría, no cambia permisos ni implementa la política de métricas propuesta. El renderizado y la accesibilidad deben verificarse en Chrome al desbloquear E2E. El resto de la propuesta continúa pendiente; no se han tomado mediciones de rendimiento ni se han ejecutado optimizaciones.
