@@ -14,6 +14,7 @@ Estado: implementación inicial en rama aislada; pendiente de CI, prueba visual 
 - Esta implementación intenta leer IPv4 desde encabezados expuestos por el alojamiento (x-real-ip o x-vercel-forwarded-for) y registra hora de recepción.
 - Lee, cuando se exponen, ciudad/región/país/zona horaria aproximados (x-vercel-ip-*). La disponibilidad depende del proveedor; no se promete geolocalización exacta.
 - No recopila GPS, cookies, credenciales, identificadores de hardware ni huella persistente. No se maximiza la identificación del dispositivo por defecto.
+- Cuando GROQ_API_KEY está configurada, el texto de la crónica se envía a Groq para análisis. Esta ruta no persiste el texto ni los metadatos; el tratamiento/retención del proveedor externo depende de sus políticas y configuración. La UI debe informar de este envío.
 - El endpoint no persiste metadatos ni crónicas. La adquisición transversal a todos los canales es un frente arquitectónico pendiente; añadir el checklist a Ingreso no equivale a completarlo.
 
 ## Verificación pendiente
