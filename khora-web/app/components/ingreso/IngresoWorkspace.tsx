@@ -14,6 +14,7 @@ import { CHECKPOINT_IDLE_MS, CHECKPOINT_MAX_MS, AUDIO_CHECKPOINT_MS, LOCAL_CHECK
 
 import { useSearchParams } from "next/navigation";
 import { DictadoExperiencePanel } from "./DictadoExperiencePanel";
+import { CronicaPersonalChecklist } from "./CronicaPersonalChecklist";
 import { IngresoIngestaPanel } from "./IngresoIngestaPanel";
 import { ensamblarParrafos, Fragmento } from "../../../lib/transcripcion/ensamblar";
 import { reconciliarSegmentos, type SegmentoReconciliado } from "../../../lib/transcripcion/reconciliar";
@@ -1648,6 +1649,7 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
       }}
       />
       <div className={studioStyles.experience}><DictadoExperiencePanel texto={texto} busy={estado === "dictando" || editando || guardando || adjuntandoAudio || retranscribiendo || recuperando} /></div>
+      <div className="mx-auto w-full max-w-4xl px-3"><CronicaPersonalChecklist text={texto} busy={estado === "dictando" || editando || guardando || adjuntandoAudio || retranscribiendo || recuperando} /></div>
       {recoveryOpen&&<RecoveryDrawer items={recoveryItems} nextCursor={recoveryCursor} loading={recoveryLoading} error={recoveryError} busy={recuperando} onClose={()=>setRecoveryOpen(false)} onMore={()=>void cargarRecuperaciones(true)} onRecover={recuperarElegida}/>}
     </>
   );
