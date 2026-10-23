@@ -11,6 +11,7 @@ let autoEnabled=true;
 let eventCount=0;
 let lastError=null;
 let collector=false;
+let collectorHealth=null;
 let knownFingerprints=new Set();
 let regionCoverage={};
 let regionLeaders={};
@@ -46,9 +47,13 @@ function regionFor(url){return HarmoniaRegionPolicy.classifyRegion(url);}
 function privacyContract(){return {visibleMessageTextCaptured:true,composerTextCaptured:false,fieldValuesCaptured:false,hrefsCaptured:false,imageUrlsCaptured:false,hiddenReasoningCaptured:false,menusExcluded:true,consoleValuesRedacted:true};}
 function safePageUrl(raw){try{const u=new URL(raw);return u.origin+u.pathname.replace(/\/c\/[^/]+/,'/c/[conversation]').replace(/\/g\/[^/]+/,'/g/[gpt]');}catch{return 'https://chatgpt.com/';}}
 async function checkHealth(){
-  if(!TOKEN){collector=false;lastError='Falta la credencial local de Harmonia.';return false;}
-  try{const response=await fetch(`${COLLECTOR}/health`,{headers:headers(),cache:'no-store'});collector=response.ok;lastError=response.ok?null:`Colector respondió HTTP ${response.status}`;}
-  catch(error){collector=false;lastError=String(error.message||error);}
+  if(!TOKEN){collector=false;collectorHealth=null;lastError='Falta la credencial local de Harmonia.';return false;}
+  try{
+    const response=await fetch(COLLECTOR+'/health',{headers:headers(),cache:'no-store'});
+    collectorHealth=response.ok?await response.json():null;
+    collector=!!(response.ok&&collectorHealth&&collectorHealth.ok);
+    lastError=collector?null:'Colector HTTP '+response.status;
+  }catch(error){collector=false;collectorHealth=null;lastError=String(error.message||error);}
   return collector;
 }
 function compareVersions(a,b){
@@ -331,7 +336,7 @@ chrome.runtime.onMessage.addListener((message,sender,respond)=>{
    if(collector){try{const response=await fetch(`${COLLECTOR}/coverage`,{headers:headers(),cache:'no-store'});if(response.ok)coverage=await response.json();else throw new Error(`Colector HTTP ${response.status}`);}catch(error){lastError=String(error.message||error);}}
    return {version:'0.4.0',autoEnabled,active:autoEnabled&&Object.keys(sessions).length>0,activeTabs:Object.keys(sessions).length,
     sessions:Object.entries(sessions).map(([tabId,session])=>({tabId,startedAt:session.startedAt,lastAt:session.lastAt,events:session.events,regionKey:session.regionKey})),
-    regionCoverage,regionLeaders,collector,lastError,events:eventCount,coverage,repositorySync:syncData[STORE.repositorySync]||null};
+    regionCoverage,regionLeaders,collector,collectorHealth:collectorHealth?{updatedAt:collectorHealth.updatedAt,totalBytes:collectorHealth.totalBytes,uniqueSurfaces:collectorHealth.uniqueSurfaces,sessions:collectorHealth.sessions}:null,lastError,events:eventCount,coverage,repositorySync:syncData[STORE.repositorySync]||null};
   }
   if(message.kind==='harmonia:set-auto')return setAutoEnabled(message.enabled);
   if(message.kind==='harmonia:event'&&sender.tab?.id)return onObservedEvent(message,sender);
