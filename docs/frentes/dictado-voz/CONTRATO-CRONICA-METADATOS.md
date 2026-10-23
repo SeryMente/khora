@@ -22,3 +22,11 @@ Estado: implementación inicial en rama aislada; pendiente de CI, prueba visual 
 - Probar Groq con clave y fallback sin clave, texto vacío, respuesta malformada, cancelación y encabezados de IP ausentes.
 - Revisar contraste, lector de pantalla, movimiento reducido y móvil.
 - No desplegar a producción ni declarar U06 aceptado hasta revisar resultados.
+
+
+## Controles adicionales de la reconstrucción C033
+- El endpoint exige una sesión autenticada antes de procesar el cuerpo o llamar a Groq, reduciendo el riesgo de abuso de la clave del proveedor.
+- Las instrucciones del modelo y el texto de la crónica se envían como mensajes separados; el texto se trata como dato no confiable.
+- La ruta descarta estado `resolved` si no incluye una evidencia literal presente en el texto. Para fecha/hora exige además señales explícitas de fecha y hora. Es una validación conservadora, no un parser exhaustivo de fechas en lenguaje natural.
+- La interfaz respeta `prefers-reduced-motion` mediante clases de movimiento reducido; la transición es deliberadamente discreta.
+- Tests unitarios actuales verifican la barrera de autenticación; todavía no están ejecutados. Los casos de integración autenticada y respuesta real/mock de Groq siguen pendientes.
