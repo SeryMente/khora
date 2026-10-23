@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "../../../auth";
-import { esMomentoPredefinido, MOMENTOS_PREDEFINIDOS } from "../../../lib/contracts/cronica-momento";
+import { esMomentoPredefinido } from "../../../lib/contracts/cronica-momento";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
