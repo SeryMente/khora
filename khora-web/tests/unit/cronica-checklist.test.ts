@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { NextRequest } from "next/server";
 import { POST } from "../../app/api/cronica/checklist/route";
+import { esMomentoPredefinido, MOMENTOS_PREDEFINIDOS, normalizarMomento } from "../../lib/contracts/cronica-momento";
 
 test("checklist returns safe fallback when Groq is not configured", async () => {
  const previous = process.env.GROQ_API_KEY;
@@ -59,4 +60,12 @@ test("oversized declared request body is rejected before JSON parsing", async ()
  assert.equal(response.status, 413);
  const body = await response.json();
  assert.equal(body.error, "cuerpo_demasiado_grande");
+});
+
+test("Momento taxonomy has three categories and normalizes accents/case", () => {
+ assert.deepEqual(Object.keys(MOMENTOS_PREDEFINIDOS), ["general", "concreto", "especializado"]);
+ assert.equal(esMomentoPredefinido("Mañana"), true);
+ assert.equal(esMomentoPredefinido("HORA AZUL"), true);
+ assert.equal(normalizarMomento("  Hora   Dorada "), "hora dorada");
+ assert.equal(esMomentoPredefinido("la hora de la tormenta"), false);
 });
