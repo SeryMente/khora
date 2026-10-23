@@ -1358,3 +1358,5 @@ GitHub Actions, ejecución 38967613218, no inició trabajos: `The job was not st
 
 
 **Checkpoint C033 · endurecimiento posterior al primer PR:** el endpoint ahora exige sesión autenticada antes de leer/procesar el cuerpo o invocar Groq; separa el texto de usuario de las instrucciones del sistema; valida que los criterios resueltos incluyan evidencia literal y que Fecha/hora tenga indicios de fecha Y hora; endurece la validación de IPv4. La UI respeta movimiento reducido y explica el envío a Groq. La suite focal contiene tres casos para fallback, IPv4 inválida y JSON malformado. Estos cambios fueron leídos de vuelta desde GitHub, pero no ejecutados localmente ni en CI. PR #334 sigue abierto en borrador. No hay aceptación, merge ni despliegue.
+
+**Checkpoint C033 · control de entrada:** se añadió límite de 64 KiB para el tamaño declarado de la solicitud antes de parsear JSON, con respuesta 413. La prueba focal cubre ahora cuatro casos previstos: fallback sin Groq, IPv4 inválida, JSON malformado y cuerpo declarado demasiado grande. Siguen sin ejecutarse por el bloqueo de CI.
