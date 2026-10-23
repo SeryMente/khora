@@ -1347,3 +1347,6 @@ GitHub Actions, ejecución 38967613218, no inició trabajos: `The job was not st
 
 **Pendientes inmediatos:** inspección de seguridad/tipado de ruta y componente; ejecutar tipos, UI review, contrato de navegación, suite unitaria y build; revisar los nuevos tests; validar visualmente escritorio/móvil y movimiento reducido; endurecer evidencia para que el modelo no resuelva criterios sin respaldo literal suficiente; revisar el vocabulario Momento y sus excepciones; diseñar persistencia/consentimiento y adquisición transversal sin exagerar la identificación. Crear PR de borrador solo después de comprobar la política de workflows; no fusionar ni desplegar sin aceptación explícita.
 
+
+
+**Actualización C033 · pruebas y transparencia:** se añadió `khora-web/tests/unit/cronica-checklist.test.ts` con tres casos previstos (fallback sin Groq, IPv4 inválida y JSON malformado). Estos tests siguen NO EJECUTADOS por el bloqueo de Actions. La interfaz informa ahora que el texto se envía a Groq cuando la clave está configurada y aclara que esta ruta no persiste el texto/metadatos; el proveedor externo tiene tratamiento propio. Lectura de vuelta de componentes, ruta y test realizada. No equivale a validación de TypeScript o ejecución. Último cambio documental del contrato: `ba5cb6a25b3a6b7fb867925ba3b94103f1b68c85`.
