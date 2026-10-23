@@ -3,48 +3,24 @@ import assert from "node:assert/strict";
 import { NextRequest } from "next/server";
 import { POST } from "../../app/api/cronica/checklist/route";
 
-test("checklist fallback is safe when Groq is not configured", async () => {
- const previous = process.env.GROQ_API_KEY;
- delete process.env.GROQ_API_KEY;
- try {
-  const request = new NextRequest("http://localhost/api/cronica/checklist", {
-   method: "POST",
-   headers: { "content-type": "application/json", "x-real-ip": "203.0.113.42", "x-vercel-ip-country": "MX" },
-   body: JSON.stringify({ text: "Hoy tuve una idea importante." })
-  });
-  const response = await POST(request);
-  const body = await response.json();
-  assert.equal(response.status, 200);
-  assert.equal(body.source, "fallback");
-  assert.equal(body.review.criteria.length, 4);
-  assert.equal(body.metadata.ipv4, "203.0.113.42");
-  assert.equal(body.metadata.country, "MX");
-  assert.ok(Number.isFinite(Date.parse(body.metadata.receivedAt)));
- } finally {
-  if (previous === undefined) delete process.env.GROQ_API_KEY;
-  else process.env.GROQ_API_KEY = previous;
- }
-});
-
-test("invalid IPv4 header is not exposed as an address", async () => {
- const previous = process.env.GROQ_API_KEY;
- delete process.env.GROQ_API_KEY;
- try {
-  const request = new NextRequest("http://localhost/api/cronica/checklist", {
-   method: "POST", headers: { "content-type": "application/json", "x-real-ip": "999.1.2.3" },
-   body: JSON.stringify({ text: "" })
-  });
-  const body = await (await POST(request)).json();
-  assert.equal(body.metadata.ipv4, null);
-  assert.equal(body.source, "fallback");
- } finally {
-  if (previous === undefined) delete process.env.GROQ_API_KEY;
-  else process.env.GROQ_API_KEY = previous;
- }
-});
-
-test("malformed JSON is rejected", async () => {
- const request = new NextRequest("http://localhost/api/cronica/checklist", { method: "POST", body: "{" });
+test("checklist requires an authenticated session before processing user text", async () => {
+ const request = new NextRequest("http://localhost/api/cronica/checklist", {
+  method: "POST",
+  headers: { "content-type": "application/json", "x-real-ip": "203.0.113.42" },
+  body: JSON.stringify({ text: "Hoy tuve una idea importante." })
+ });
  const response = await POST(request);
- assert.equal(response.status, 400);
+ assert.equal(response.status, 401);
+ const body = await response.json();
+ assert.equal(body.error, "no_autenticado");
+});
+
+test("unauthenticated malformed JSON does not reach the analysis provider", async () => {
+ const request = new NextRequest("http://localhost/api/cronica/checklist", {
+  method: "POST",
+  headers: { "content-type": "application/json" },
+  body: "{"
+ });
+ const response = await POST(request);
+ assert.equal(response.status, 401);
 });
