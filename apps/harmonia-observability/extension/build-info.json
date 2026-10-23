@@ -27,7 +27,14 @@
   },
   "ui": {
     "compactPopup": true,
-    "dedicatedDashboardTab": true
+    "dedicatedDashboardTab": true,
+    "compactSummaryDashboard": true,
+    "perRegionCompletionReadiness": true
   },
-  "generatedBy": "Harmonia source repository; sourceRevision pins the exact reviewed candidate branch HEAD immediately before this metadata-only update."
+  "generatedBy": "Harmonia source repository; sourceRevision pins the exact reviewed candidate branch HEAD immediately before this metadata-only update.",
+  "observationPersistence": {
+    "localJSONLAndIndex": true,
+    "remoteGitHubWritesImplemented": false,
+    "metadataReadIsNotObservationPersistence": true
+  }
 }
