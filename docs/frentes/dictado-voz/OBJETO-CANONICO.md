@@ -1350,3 +1350,8 @@ GitHub Actions, ejecución 38967613218, no inició trabajos: `The job was not st
 
 
 **Actualización C033 · pruebas y transparencia:** se añadió `khora-web/tests/unit/cronica-checklist.test.ts` con tres casos previstos (fallback sin Groq, IPv4 inválida y JSON malformado). Estos tests siguen NO EJECUTADOS por el bloqueo de Actions. La interfaz informa ahora que el texto se envía a Groq cuando la clave está configurada y aclara que esta ruta no persiste el texto/metadatos; el proveedor externo tiene tratamiento propio. Lectura de vuelta de componentes, ruta y test realizada. No equivale a validación de TypeScript o ejecución. Último cambio documental del contrato: `ba5cb6a25b3a6b7fb867925ba3b94103f1b68c85`.
+
+
+**Checkpoint C033 posterior a la integración · 2026-10-23 03:45 UTC:** PR de borrador creado: [#334 — Reconstruct U06 — progressive chronicle checklist](https://github.com/SeryMente/khora/pull/334), base `main`, rama de trabajo `feat/dictado-u06-reconstruccion-20261022`. PR abierto, draft=true, no fusionado. La creación del PR no equivale a aceptación.
+
+**Reintento de verificación:** nuevos eventos push dispararon CI y volvieron a finalizar inmediatamente con `failure`; los tres jobs no publican pasos y los logs responden `BlobNotFound`. Por tanto, el entorno no ofrece evidencia ejecutable del fallo interno ni un runner que podamos inspeccionar. No se puede realizar typecheck, pruebas unitarias, UI contract, build o E2E desde esta vía en este momento. Mantener el PR en borrador y no activar mecanismos de fusión.
