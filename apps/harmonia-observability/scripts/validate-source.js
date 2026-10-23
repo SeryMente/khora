@@ -27,7 +27,7 @@ assert.equal(build.version,manifest.version);
 assert.equal(build.catalogVersion,catalog.version);
 assert.equal(build.regionPolicyVersion,'1.0.0');
 assert.match(build.sourceRevision,/^[0-9a-f]{40}$/);
-for(const rel of ['extension/dashboard.html','extension/dashboard.css','extension/dashboard.js','extension/region-policy.js','extension/build-info.json','tests/region-policy.test.js','tests/collector.integration.test.js']){
+for(const rel of ['extension/dashboard.html','extension/dashboard.css','extension/dashboard.js','extension/dashboard-model.js','extension/region-policy.js','extension/build-info.json','tests/region-policy.test.js','tests/collector.integration.test.js','tests/dashboard-model.test.js']){
  assert.ok(fs.statSync(path.join(root,rel)).isFile(),'missing required source file: '+rel);
 }
 assert.match(content,/\$\$\('\[data-message-author-role="user"\],\[data-message-author-role="assistant"\]'/);
@@ -56,10 +56,20 @@ assert.match(collector,/regionExploration:index\.coverage/);
 assert.match(collector,/hiddenReasoningCaptured:false/);
 assert.match(popup,/id="openDashboard"/);
 assert.match(popupJs,/harmonia:open-dashboard/);
-assert.match(dashboard,/id="regions"/);
-assert.match(dashboard,/id="metricsGuideTitle"/);
-assert.match(dashboard,/<details>/);
-assert.match(dashboard,/índice combinado[\s\S]*mapeo, no una precisión de captura/);
+assert.match(dashboard,/id="regionRows"/);
+assert.match(dashboard,/id="documentationValue"/);
+assert.match(dashboard,/id="observationValue"/);
+assert.match(dashboard,/id="lastScanValue"/);
+assert.match(dashboard,/id="repoPersistValue"/);
+assert.match(dashboard,/dashboard-model\.js/);
+assert.match(dashboard,/La escritura remota de eventos no está implementada/i);
+assert.match(dashboard,/no tienen todavía medición regional independiente/i);
+assert.doesNotMatch(dashboard,/id="syncNow"|metrics-guide|metricsGuideTitle/);
+assert.match(dashboardJs,/HarmoniaDashboardModel\.summarize/);
+assert.match(worker,/collectorHealth:collectorHealth/);
+const dashboardModel=read('extension/dashboard-model.js');
+assert.match(dashboardModel,/Nunca · escritura remota no implementada/);
+assert.match(dashboardModel,/No existe un catálogo regional verificable/);
 assert.match(dashboardJs,/setInterval\(\(\)=>void refresh\(\),5000\)/);
 assert.match(dashboardJs,/document\.hidden/);
 console.log('HARMONIA_SOURCE_CONTRACT_OK');
