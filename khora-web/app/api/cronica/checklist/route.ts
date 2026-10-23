@@ -14,6 +14,43 @@ const FALLBACK: Review = { criteria: [
  { id: "que_pasa", status: "pending", label: "Qué pasa", detail: "Cuenta qué sucede, sin limitar la crónica a una acción." }
 ], summary: "Análisis semántico no disponible; puedes seguir dictando o escribiendo." };
 
+const MAX_CHECKLIST_BODY_BYTES = 65_536;
+type LimitedJson = { kind: "ok"; value: unknown } | { kind: "too_large" } | { kind: "invalid" };
+
+async function readLimitedJson(request: NextRequest): Promise<LimitedJson> {
+ const reader = request.body?.getReader();
+ if (!reader) return { kind: "invalid" };
+ const chunks: Uint8Array[] = [];
+ let totalBytes = 0;
+ try {
+  while (true) {
+   const { done, value } = await reader.read();
+   if (done) break;
+   totalBytes += value.byteLength;
+   if (totalBytes > MAX_CHECKLIST_BODY_BYTES) {
+    void reader.cancel().catch(() => undefined);
+    return { kind: "too_large" };
+   }
+   chunks.push(value);
+  }
+ } catch {
+  return { kind: "invalid" };
+ } finally {
+  reader.releaseLock();
+ }
+ const bytes = new Uint8Array(totalBytes);
+ let offset = 0;
+ for (const chunk of chunks) {
+  bytes.set(chunk, offset);
+  offset += chunk.byteLength;
+ }
+ try {
+  return { kind: "ok", value: JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes)) };
+ } catch {
+  return { kind: "invalid" };
+ }
+}
+
 function trustedRequestMetadata(request: NextRequest) {
  const h = request.headers;
  const ip = h.get("x-real-ip") || h.get("x-vercel-forwarded-for")?.split(",")[0]?.trim() || null;
@@ -24,9 +61,11 @@ export async function POST(request: NextRequest) {
  const session = await auth();
  if (!session?.user?.email) return NextResponse.json({ error: "no_autenticado" }, { status: 401, headers: { "Cache-Control": "no-store" } });
  const contentLength = Number(request.headers.get("content-length") || "0");
- if (Number.isFinite(contentLength) && contentLength > 65536) return NextResponse.json({ error: "cuerpo_demasiado_grande" }, { status: 413, headers: { "Cache-Control": "no-store" } });
- let body: { text?: unknown };
- try { body = await request.json(); } catch { return NextResponse.json({ error: "JSON inválido." }, { status: 400 }); }
+ if (Number.isFinite(contentLength) && contentLength > MAX_CHECKLIST_BODY_BYTES) return NextResponse.json({ error: "cuerpo_demasiado_grande" }, { status: 413, headers: { "Cache-Control": "no-store" } });
+ const parsedBody = await readLimitedJson(request);
+ if (parsedBody.kind === "too_large") return NextResponse.json({ error: "cuerpo_demasiado_grande" }, { status: 413, headers: { "Cache-Control": "no-store" } });
+ if (parsedBody.kind !== "ok") return NextResponse.json({ error: "JSON inválido." }, { status: 400 });
+ const body = parsedBody.value && typeof parsedBody.value === "object" && !Array.isArray(parsedBody.value) ? parsedBody.value as { text?: unknown } : {};
  const text = typeof body.text === "string" ? body.text.slice(0, 12000).trim() : "";
  const metadata = trustedRequestMetadata(request);
  if (!text) return NextResponse.json({ review: FALLBACK, metadata, source: "fallback" }, { headers: { "Cache-Control": "no-store" } });

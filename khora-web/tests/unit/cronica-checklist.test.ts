@@ -62,6 +62,18 @@ test("oversized declared request body is rejected before JSON parsing", async ()
  assert.equal(body.error, "cuerpo_demasiado_grande");
 });
 
+test("actual body bytes are limited even when content-length understates the size", async () => {
+ const request = new NextRequest("http://localhost/api/cronica/checklist", {
+  method: "POST",
+  headers: { "content-type": "application/json", "content-length": "1" },
+  body: JSON.stringify({ text: "x".repeat(70000) })
+ });
+ const response = await POST(request);
+ assert.equal(response.status, 413);
+ const body = await response.json();
+ assert.equal(body.error, "cuerpo_demasiado_grande");
+});
+
 test("Momento uses a simple flat everyday vocabulary", () => {
  assert.deepEqual(MOMENTOS_HABITUALES, ["madrugada", "mañana", "mediodía", "tarde", "atardecer", "noche", "amanecer", "anochecer", "medianoche"]);
  assert.equal(esMomentoPredefinido("Mañana"), true);
