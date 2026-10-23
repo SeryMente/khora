@@ -3,7 +3,7 @@
   "version": "0.4.0",
   "generatedAt": null,
   "purpose": "Local ChatGPT observation: rendered user/assistant text deltas, DOM/CSS structure and redacted page console; automatic multi-tab region coordination; dedicated dashboard tab.",
-  "source": "SeryMente/khora main",
+  "source": "SeryMente/khora candidate PR #333; branch feat/harmonia-e2e-20261021",
   "trackedFiles": [
     "CONSULTAR-HARMONIA.cmd",
     "DETENER-HARMONIA-HEADLESS.ps1",
