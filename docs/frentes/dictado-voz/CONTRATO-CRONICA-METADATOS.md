@@ -39,3 +39,12 @@ La taxonomía inicial vive en `khora-web/lib/contracts/cronica-momento.ts` y sep
 - **Especializado:** hora azul, hora dorada y crepúsculos civil, náutico y astronómico.
 
 La comparación normaliza mayúsculas, acentos y espacios. Una sugerencia IA que coincide con un término predefinido no se presenta como término nuevo. Esta taxonomía es una primera propuesta funcional que requiere validación editorial y pruebas con relatos reales; no sustituye la revisión del vocabulario completo de U06.
+
+
+## Taxonomía inicial de Momento
+La taxonomía inicial vive en `khora-web/lib/contracts/cronica-momento.ts` y separa:
+- **General:** madrugada, mañana, mediodía, tarde, noche.
+- **Concreto:** alba, amanecer, atardecer, anochecer, medianoche.
+- **Especializado:** hora azul, hora dorada y crepúsculos civil, náutico y astronómico.
+
+La comparación normaliza mayúsculas, acentos y espacios. Una sugerencia IA que coincide con un término predefinido no se presenta como término nuevo. Esta taxonomía es una primera propuesta funcional que requiere validación editorial y pruebas con relatos reales; no sustituye la revisión del vocabulario completo de U06.
