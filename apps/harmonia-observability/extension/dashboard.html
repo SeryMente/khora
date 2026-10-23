@@ -1,61 +1,33 @@
 <!doctype html>
 <html lang="es">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Harmonia · Panel de observabilidad</title>
-  <link rel="stylesheet" href="dashboard.css">
-</head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Harmonia · Resumen de observabilidad</title><link rel="stylesheet" href="dashboard.css"></head>
 <body>
-  <header class="top">
-    <div class="brand"><div class="mark" aria-hidden="true">H</div><div><h1>Harmonia</h1><p>Panel de observabilidad · v0.4.0</p></div></div>
-    <div class="headActions"><span id="updatedAt" class="muted">Consultando estado…</span><button id="refresh">Actualizar</button></div>
-  </header>
-  <main>
-    <section class="hero" aria-live="polite">
-      <span id="statusDot" class="dot"></span>
-      <div><h2 id="headline">Consultando colector…</h2><p id="summary">La observación es automática al abrir pestañas de chatgpt.com, cuando Chrome tiene cargada la extensión y el colector local está disponible.</p></div>
-      <button id="toggle" disabled>Comprobando…</button>
-    </section>
-    <section class="grid">
-      <article class="panel"><h2>Estado operativo</h2><dl id="operational"></dl></article>
-      <article class="panel"><h2>Sincronización del repositorio</h2><dl id="repository"></dl><p id="syncPolicy" class="muted"></p><button id="syncNow" class="secondary">Consultar main</button></article>
-    </section>
-    <section class="panel">
-      <div class="sectionHead"><div><h2>Regiones y coordinación de pestañas</h2><p class="muted">Una región no se considera completa hasta superar los criterios explícitos del catálogo. Las regiones no mapeadas no se declaran completas.</p></div></div>
-      <div id="regions" class="regions"><p class="muted">Cargando regiones…</p></div>
-    </section>
-    <section class="grid">
-      <article class="panel"><h2>Cobertura de la conversación</h2><dl id="coverage"></dl><p id="coverageNote" class="muted"></p></article>
-      <article class="panel"><h2>Pestañas observadas</h2><div id="sessions" class="sessions"><p class="muted">Esperando sesiones…</p></div></article>
-    </section>
-    <section class="panel metrics-guide" aria-labelledby="metricsGuideTitle">
-      <h2 id="metricsGuideTitle">Cómo interpretar los indicadores</h2>
-      <details>
-        <summary>Índice combinado y cobertura documental</summary>
-        <p>El índice combinado combina capacidades documentadas con observaciones naturales de interfaz. Es una medida de mapeo, no una precisión de captura, no un porcentaje de conversaciones cubiertas y no una garantía de exhaustividad.</p>
-      </details>
-      <details>
-        <summary>Superficies únicas y barridos</summary>
-        <p>Las superficies únicas cuentan huellas estructurales distintas; los barridos cuentan observaciones. Una superficie repetida puede seguir aportando un nuevo avistamiento sin volver a almacenar su estructura completa.</p>
-      </details>
-      <details>
-        <summary>Exploración completa y regiones sin catálogo</summary>
-        <p>Una región solo puede figurar como completa si su catálogo y sus umbrales verificables se han satisfecho. Sin catálogo suficiente, el estado correcto es “sin catálogo de completitud”; no se infiere completitud por analogía.</p>
-      </details>
-      <details>
-        <summary>Versión local y sincronización del repositorio</summary>
-        <p>La versión remota es metadato consultado del repositorio, no prueba de que ese código esté instalado. Harmonia no ejecuta JavaScript remoto para actualizarse automáticamente. Compara hashes y valida el paquete antes de sustituir archivos.</p>
-      </details>
-    </section>
-    <section class="panel privacy">
-      <h2>Contrato de observación y privacidad</h2>
-      <p>Se registran la estructura visible, metadatos de controles, HTML estructural resumido, resumen CSS/consola y el texto visible de mensajes del usuario y del asistente, incluidos cambios parciales observables. No se leen borradores del compositor, valores de campos, enlaces completos, URLs de imágenes ni razonamiento oculto. La redacción de consola es heurística y no garantiza detectar toda información sensible; evita usar conversaciones con datos sensibles durante la prueba.</p>
-      <p>La captura continua no significa que haya un modelo atendiendo continuamente. La completitud regional es una condición de exploración del catálogo, no un certificado de calidad o exhaustividad universal.</p>
-    </section>
-    <footer>Datos locales del colector · sin publicación externa de eventos por este panel.</footer>
-  </main>
-  <script src="region-policy.js"></script>
-  <script src="dashboard.js"></script>
-</body>
-</html>
+<header class="top">
+ <div class="brand"><div class="mark" aria-hidden="true">H</div><div><h1>Harmonia</h1><p id="versionLine">Resumen de observabilidad</p></div></div>
+ <div class="topActions"><div class="statusLine" aria-live="polite"><span id="statusDot" class="dot"></span><strong id="headline">Comprobando colector…</strong><span id="updatedAt" class="muted">Sin actualizar</span></div><div class="buttons"><button id="toggle" disabled>Pausar</button><button id="refresh" class="secondary">Actualizar</button></div></div>
+</header>
+<main>
+ <p id="summary" class="scope">Objetivo: mapear la interfaz primaria visible de ChatGPT. No incluye configuración/perfil, borradores ni razonamiento oculto.</p>
+ <section class="metrics" aria-label="Resumen de observabilidad">
+  <article class="metric"><span>Documentación verificada</span><strong id="documentationValue">—</strong><small id="documentationDetail">Catálogo local</small></article>
+  <article class="metric"><span>Observación natural</span><strong id="observationValue">—</strong><small id="observationDetail">Datos reales persistidos</small></article>
+  <article class="metric"><span>Último barrido persistido localmente</span><strong id="lastScanValue">Nunca</strong><small id="lastScanDetail">Aún no hay evidencia de exploración</small></article>
+  <article class="metric"><span>Observaciones persistidas en GitHub</span><strong id="repoPersistValue">Nunca</strong><small id="repoPersistDetail">La escritura remota de eventos no está implementada</small></article>
+ </section>
+ <div id="errorNotice" class="errorNotice" role="alert" hidden></div>
+ <section class="panel" aria-labelledby="regionsTitle">
+  <div class="sectionHead"><div><h2 id="regionsTitle">Regiones de ChatGPT</h2><p class="muted">El porcentaje es de capacidades observadas frente al catálogo vigente; estar al 100 % no basta si faltan superficies o sesiones mínimas.</p></div><span id="regionSummary" class="regionSummary">Consultando…</span></div>
+  <div class="tableWrap"><table><thead><tr><th scope="col">Región</th><th scope="col">Estado</th><th scope="col">Completitud</th><th scope="col">Evidencia / uso</th></tr></thead><tbody id="regionRows"><tr><td colspan="4" class="empty">Cargando estado regional…</td></tr></tbody></table></div>
+  <p id="regionPolicyNote" class="footnote">Para Conversación se exige el catálogo completo, 5 superficies estructurales distintas, 2 sesiones diferentes y versiones de catálogo/política coincidentes. El resto no recibe un porcentaje inventado: aún requiere catálogo y/o instrumentación. Solo cuentan observaciones naturales persistidas; los fixtures sintéticos nunca elevan la completitud.</p>
+ </section>
+ <details class="technical">
+  <summary>Datos complementarios</summary><dl id="technicalInfo"></dl><div id="lastErrorDetail" class="technicalError" hidden></div>
+  <details class="scopeDetails"><summary>Taxonomía y privacidad</summary>
+   <p>La taxonomía solicitada incluye navegación y panel lateral abierto/contraído; Inicio y conversación (cabecera, mensajes, compositor y acciones); menús contextuales, popovers, diálogos, confirmaciones y avisos; Proyectos, GPTs, Búsqueda y vistas compartidas. En esta candidata, panel lateral y menús/diálogos no tienen todavía medición regional independiente, por lo que aparecen como no instrumentados.</p>
+   <p>Se observa estructura visible y mensajes renderizados; no borradores, valores de campos, URLs completas ni razonamiento privado. Los menús y diálogos solo deben capturarse cuando aparezcan en navegación natural. La redacción de consola es heurística, no una garantía de que todos los secretos se detecten.</p>
+  </details>
+ </details>
+ <footer>Datos locales de Harmonia · la consulta del repositorio no implica sincronización de observaciones.</footer>
+</main>
+<script src="region-policy.js"></script><script src="dashboard-model.js"></script><script src="dashboard.js"></script>
+</body></html>
