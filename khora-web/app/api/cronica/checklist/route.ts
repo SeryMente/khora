@@ -22,6 +22,8 @@ function trustedRequestMetadata(request: NextRequest) {
 export async function POST(request: NextRequest) {
  const session = await auth();
  if (!session?.user?.email) return NextResponse.json({ error: "no_autenticado" }, { status: 401, headers: { "Cache-Control": "no-store" } });
+ const contentLength = Number(request.headers.get("content-length") || "0");
+ if (Number.isFinite(contentLength) && contentLength > 65536) return NextResponse.json({ error: "cuerpo_demasiado_grande" }, { status: 413, headers: { "Cache-Control": "no-store" } });
  let body: { text?: unknown };
  try { body = await request.json(); } catch { return NextResponse.json({ error: "JSON inválido." }, { status: 400 }); }
  const text = typeof body.text === "string" ? body.text.slice(0, 12000).trim() : "";
