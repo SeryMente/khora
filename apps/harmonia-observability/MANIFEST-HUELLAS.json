@@ -28,7 +28,9 @@
     "extension/service-worker.js",
     "scripts/validate-source.js",
     "tests/collector.integration.test.js",
-    "tests/region-policy.test.js"
+    "tests/region-policy.test.js",
+    "extension/dashboard-model.js",
+    "tests/dashboard-model.test.js"
   ],
   "excludedLocalArtifacts": [
     "extension/local-auth.js",
