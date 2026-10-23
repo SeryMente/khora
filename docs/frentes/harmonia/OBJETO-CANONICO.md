@@ -394,3 +394,8 @@ Control de responsabilidad actualizado en este OCP v0.10: generación **2**, fol
 **Dictamen general:** el trabajo tiene avances funcionales en el código, pero el cumplimiento integral sigue pendiente. Las prioridades son restablecer la coherencia entre extensión y colector, terminar el mecanismo de sincronización, formalizar la arquitectura multiámbito en las notas temporales del OCP y ejecutar las pruebas de aceptación.
 ```
 
+
+
+## UI compacta por regiones y persistencia de observaciones · 2026-10-23
+
+Instrucciones verbatim de la revisión: `docs/frentes/harmonia/originales/HARMONIA-UI-RESUMEN-SES-20261023.jsonl`. La UI prioriza regiones, porcentaje de capacidades observadas, evidencia real mínima para habilitar datos, último barrido persistido localmente y estado explícito de persistencia remota. En la candidata v0.4.0 solo Conversación cuenta con catálogo de completitud; Inicio, Proyectos, GPTs, Búsqueda, Compartido y otras rutas quedan en N/D hasta disponer de catálogos regionales verificables. Navegación/panel lateral y menús/popovers/diálogos figuran como no instrumentados por separado. No atribuir completitud a fixtures sintéticos. La escritura de observaciones a GitHub no está implementada: una consulta de metadatos no es persistencia de eventos, por lo que el UI debe informar último envío remoto como «Nunca» hasta que exista y se pruebe un canal de escritura gobernado.
