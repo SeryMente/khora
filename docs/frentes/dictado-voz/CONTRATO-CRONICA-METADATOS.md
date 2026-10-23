@@ -7,7 +7,7 @@ Estado: implementación inicial en rama aislada; pendiente de CI, prueba visual 
 - Análisis con Groq tras una pausa de 900 ms, con cancelación de peticiones obsoletas y fallback si falta la clave, falla la red o el modelo devuelve contenido inválido.
 - Criterios: Fecha y hora, Lugar, Momento y Qué pasa. Fecha/hora queda activa si el texto no contiene evidencia explícita; la hora de recepción del servidor se distingue del momento narrado.
 - Lugar solo se resuelve semánticamente si el relato aporta evidencia. La IP y los encabezados de geolocalización son contexto aproximado, no prueba de dónde ocurrió el suceso.
-- Momento requiere evidencia y normalización a general/concreto/especializado. Un término nuevo requiere que sea mejor que los valores usuales y una justificación explícita.
+- Momento usa una lista plana de términos cotidianos (madrugada, mañana, mediodía, tarde, atardecer, noche, amanecer, anochecer y medianoche), sin categorías artificiales. Un término nuevo solo se sugiere si los habituales no expresan adecuadamente lo narrado y la IA aporta una justificación explícita.
 - «Qué pasa» permite hechos, observaciones, sentimientos, ideas y acontecimientos; no presupone una acción.
 
 ## Metadatos y límites de privacidad
@@ -48,3 +48,7 @@ La taxonomía inicial vive en `khora-web/lib/contracts/cronica-momento.ts` y sep
 - **Especializado:** hora azul, hora dorada y crepúsculos civil, náutico y astronómico.
 
 La comparación normaliza mayúsculas, acentos y espacios. Una sugerencia IA que coincide con un término predefinido no se presenta como término nuevo. Esta taxonomía es una primera propuesta funcional que requiere validación editorial y pruebas con relatos reales; no sustituye la revisión del vocabulario completo de U06.
+
+
+## Corrección de diseño · 2026-10-23
+Se retiró la categoría «especializado» y la jerarquía general/concreto/especializado por no estar sustentadas en una necesidad de uso demostrada. El contrato usa ahora un vocabulario plano y cotidiano. Esta decisión reduce complejidad; la propuesta de términos sigue abierta a validación funcional.
