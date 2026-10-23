@@ -48,3 +48,15 @@ test("malformed JSON is rejected after session check", async () => {
  const response = await POST(request);
  assert.equal(response.status, 400);
 });
+
+test("oversized declared request body is rejected before JSON parsing", async () => {
+ const request = new NextRequest("http://localhost/api/cronica/checklist", {
+  method: "POST",
+  headers: { "content-type": "application/json", "content-length": "70000" },
+  body: "{}"
+ });
+ const response = await POST(request);
+ assert.equal(response.status, 413);
+ const body = await response.json();
+ assert.equal(body.error, "cuerpo_demasiado_grande");
+});
