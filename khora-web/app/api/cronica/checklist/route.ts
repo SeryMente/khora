@@ -33,8 +33,19 @@ export async function POST(request: NextRequest) {
   const payload = await response.json(), raw = payload?.choices?.[0]?.message?.content, parsed = JSON.parse(raw);
   const ids = new Set(["fecha_hora", "lugar", "momento", "que_pasa"]);
   const returned = Array.isArray(parsed.criteria) ? parsed.criteria.filter((c: any) => ids.has(c?.id) && ["resolved", "active", "pending"].includes(c?.status)).slice(0, 4) : [];
-  const byId = new Map(returned.map((c: Criterion) => [c.id, c]));
-  const review: Review = { criteria: FALLBACK.criteria.map(f => ({ ...f, ...(byId.get(f.id) || {}) })), summary: typeof parsed.summary === "string" ? parsed.summary.slice(0, 240) : FALLBACK.summary, moment: parsed.moment && typeof parsed.moment.value === "string" && ["general", "concreto", "especializado"].includes(parsed.moment.category) && typeof parsed.moment.justification === "string" ? parsed.moment : null };
+  const byId = new Map(returned.map((c: any) => {
+   const fallback = FALLBACK.criteria.find(f => f.id === c.id)!;
+   const evidence = typeof c.evidence === "string" ? c.evidence.trim() : "";
+   let status = c.status as Criterion["status"];
+   if (status === "resolved" && (!evidence || !text.includes(evidence))) status = fallback.status;
+   if (c.id === "fecha_hora" && status === "resolved") {
+    const hasDate = /\b(?:\d{4}-\d{2}-\d{2}|\d{1,2}[/-]\d{1,2}[/-]\d{2,4}|\d{1,2}\s+de\s+(?:enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre))\b/i.test(text);
+    const hasTime = /\b(?:[01]?\d|2[0-3]):[0-5]\d\b|\b(?:a las|a la)\s+(?:[01]?\d|2[0-3])(?:\s*(?:en punto|de la mañana|de la tarde|de la noche))?\b/i.test(text);
+    if (!hasDate || !hasTime) status = "active";
+   }
+   return [c.id, { ...fallback, ...c, status, evidence: status === "resolved" ? evidence.slice(0, 180) : undefined }];
+  }));
+  const review: Review = { criteria: FALLBACK.criteria.map(f => ({ ...f, ...(byId.get(f.id) || {}) })), summary: typeof parsed.summary === "string" ? parsed.summary.slice(0, 240) : FALLBACK.summary, moment: parsed.moment && typeof parsed.moment.value === "string" && ["general", "concreto", "especializado"].includes(parsed.moment.category) && typeof parsed.moment.justification === "string" && parsed.moment.justification.trim().length >= 12 ? parsed.moment : null };
   return NextResponse.json({ review, metadata, source: "groq" }, { headers: { "Cache-Control": "no-store" } });
  } catch { return NextResponse.json({ review: FALLBACK, metadata, source: "fallback" }, { headers: { "Cache-Control": "no-store" } }); }
 }
