@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "../../../auth";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -19,6 +20,8 @@ function trustedRequestMetadata(request: NextRequest) {
  return { receivedAt: new Date().toISOString(), ipv4, ipSource: ipv4 ? (h.has("x-real-ip") ? "x-real-ip" : "x-vercel-forwarded-for") : null, city: h.get("x-vercel-ip-city"), region: h.get("x-vercel-ip-country-region"), country: h.get("x-vercel-ip-country"), timezone: h.get("x-vercel-ip-timezone") };
 }
 export async function POST(request: NextRequest) {
+ const session = await auth();
+ if (!session?.user?.email) return NextResponse.json({ error: "no_autenticado" }, { status: 401, headers: { "Cache-Control": "no-store" } });
  let body: { text?: unknown };
  try { body = await request.json(); } catch { return NextResponse.json({ error: "JSON inválido." }, { status: 400 }); }
  const text = typeof body.text === "string" ? body.text.slice(0, 12000).trim() : "";
