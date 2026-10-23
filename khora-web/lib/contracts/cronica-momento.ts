@@ -1,10 +1,14 @@
-export type MomentoCategoria = "general" | "concreto" | "especializado";
-
-export const MOMENTOS_PREDEFINIDOS: Readonly<Record<MomentoCategoria, readonly string[]>> = {
-  general: ["madrugada", "mañana", "mediodía", "tarde", "noche"],
-  concreto: ["alba", "amanecer", "atardecer", "anochecer", "medianoche"],
-  especializado: ["hora azul", "hora dorada", "crepúsculo civil", "crepúsculo náutico", "crepúsculo astronómico"],
-};
+export const MOMENTOS_HABITUALES: readonly string[] = [
+  "madrugada",
+  "mañana",
+  "mediodía",
+  "tarde",
+  "atardecer",
+  "noche",
+  "amanecer",
+  "anochecer",
+  "medianoche",
+];
 
 export function normalizarMomento(value: string): string {
   return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLocaleLowerCase("es").replace(/\s+/g, " ");
@@ -12,7 +16,5 @@ export function normalizarMomento(value: string): string {
 
 export function esMomentoPredefinido(value: string): boolean {
   const normalized = normalizarMomento(value);
-  return Object.values(MOMENTOS_PREDEFINIDOS).some((items) =>
-    items.some((item) => normalizarMomento(item) === normalized),
-  );
+  return MOMENTOS_HABITUALES.some((item) => normalizarMomento(item) === normalized);
 }
