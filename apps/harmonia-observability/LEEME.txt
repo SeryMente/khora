@@ -20,8 +20,9 @@ Se mantiene una sesión por pestaña. Una región conversacional solo se declara
 Actualmente solo la región de conversación tiene catálogo de completitud. Inicio, proyectos, GPTs, búsqueda, compartido y otras rutas permanecen no mapeadas: no se declaran completas ni se apagan basándose en una señal falsa.
 
 INTERFAZ
-El popup al hacer clic en el icono se limita a estado, pausa/reanudación y apertura del panel completo. El panel principal se abre en una pestaña propia y reutiliza una ya abierta. Refresca el estado cada cinco segundos solo mientras está visible.
-
+El panel dedicado muestra primero un resumen compacto: documentación verificada, observación natural, última superficie persistida localmente y persistencia de observaciones en GitHub. La tabla enumera las regiones URL (Inicio, Conversación, Proyectos, GPTs, Búsqueda, Compartido y otras rutas) y dos ámbitos transversales conservados por la taxonomía verbatim (navegación/panel lateral y menús/popovers/diálogos).
+Solo Conversación tiene catálogo y criterios de completitud verificables en esta candidata. Su porcentaje es capacidades observadas / capacidades del catálogo actual. Para habilitar "LISTO PARA USO" se exigen todas las capacidades, cinco huellas estructurales distintas, dos sesiones y versiones compatibles de catálogo/política. Las regiones sin catálogo se muestran como N/D, nunca se les asigna un porcentaje estimado. Fixtures sintéticos no cuentan como exploración natural.
+El panel distingue la última exploración persistida en el índice local de la última consulta de metadatos de GitHub. La escritura/remisión de eventos de observación a GitHub no está implementada en esta candidata; por tanto el último envío remoto se informa como "Nunca", no se infiere de una consulta de main.
 DESEMPEÑO Y GARANTÍAS
 Los barridos responden a mutaciones y filtros de relevancia; los cambios de texto también disparan observación. Las superficies repetidas se compactan, sin suprimir el evento de avistamiento. CPU, RAM, latencia y cobertura deben medirse frente a una referencia no optimizada antes de declarar éxito. Los tests aislados no prueban que Chrome haya cargado la extensión ni que la captura real funcione.
 
