@@ -1324,3 +1324,26 @@ El proyecto Vercel usa un Build Command propio que no invoca npm prebuild. Para 
 
 ### Controles externos no ejecutados
 GitHub Actions, ejecución 38967613218, no inició trabajos: `The job was not started because recent account payments have failed or your spending limit needs to be increased.` Los estados Vercel de integración GitHub también señalan restricción de repositorio privado de organización en plan Hobby. No se modifican facturación, plan, visibilidad, permisos ni protecciones. Las comprobaciones ejecutadas directamente y el build Vercel son evidencia independiente, no equivalencia a Actions verde. La integración solo puede usar merge normal, sin anulación administrativa de controles.
+
+
+### C033 · Reconstrucción remota de U06 · 2026-10-22/23
+
+**Instrucción operativa directa:** «Sí, aprovecha la noche y vamos haciendo las cosas con mucha calidad. Resuelve y avísame si hay progreso o si hay algún bloqueo.» Custodia literal en [INSTRUCCIONES-TRABAJO-NOCHE-C033-20261022.jsonl](originales/INSTRUCCIONES-TRABAJO-NOCHE-C033-20261022.jsonl). La instrucción U06 original permanece sin reescritura en [INSTRUCCIONES-VERBATIM-TAIL-C032-20261022.jsonl](originales/INSTRUCCIONES-VERBATIM-TAIL-C032-20261022.jsonl).
+
+**Base y aislamiento:** rama `feat/dictado-u06-reconstruccion-20261022`, creada desde `main` al iniciar este ciclo. No se han modificado `main`, credenciales, configuración de Vercel ni producción. Se optó por una reconstrucción remota limpia, sin reutilizar cambios locales no publicados.
+
+**Cambios iniciales incorporados en la rama:**
+- `khora-web/app/components/ingreso/CronicaPersonalChecklist.tsx`: componente visual de cuatro criterios (Fecha y hora, Lugar, Momento, Qué pasa), progreso y transición breve de resolución.
+- `khora-web/app/api/cronica/checklist/route.ts`: endpoint POST con análisis Groq opcional, timeout, fallback, hora de recepción y lectura condicionada de metadatos de red que exponga el alojamiento.
+- `khora-web/app/components/ingreso/IngresoWorkspace.tsx`: montaje del checklist bajo la superficie de captura.
+- `khora-web/tests/unit/cronica-checklist.test.ts`: pruebas de fallback, IPv4 inválida y JSON malformado, añadidas pero todavía no ejecutadas.
+- `CONTRATO-CRONICA-METADATOS.md`: contrato inicial, alcance y límites de privacidad.
+
+**Estado técnico:** IMPLEMENTACIÓN INICIAL; NO ACEPTADA. Se han leído de vuelta los archivos escritos en la rama. La lectura de vuelta confirma persistencia en GitHub, no compilación ni corrección funcional.
+
+**Bloqueo de verificación:** GitHub Actions ejecutó CI para el commit `d928b825e09663f42faa142ccb494609a23aa17a`; los trabajos `khora-web-gate`, `api-tests` y `calidad` terminaron en fallo en aproximadamente dos segundos y sus objetos de job no exponen pasos. No se atribuye el fallo al código ni se declara CI aprobado. El historial del frente registra restricciones de gasto/ejecución de Actions; no se ha recuperado una causa específica de esta ejecución. Hay que resolver el runner o ejecutar verificaciones en otro entorno autorizado.
+
+**Límites de la implementación actual:** el endpoint no persiste crónicas ni metadatos; por tanto, la adquisición transversal a todos los canales sigue pendiente. La hora de recepción no equivale a la fecha/hora del suceso. Los encabezados IP/geográficos dependen del alojamiento y no demuestran la ubicación del hecho. El texto se envía a Groq cuando la clave está configurada; se añadió una explicación en UI. No se recopila GPS ni huella persistente de hardware.
+
+**Pendientes inmediatos:** inspección de seguridad/tipado de ruta y componente; ejecutar tipos, UI review, contrato de navegación, suite unitaria y build; revisar los nuevos tests; validar visualmente escritorio/móvil y movimiento reducido; endurecer evidencia para que el modelo no resuelva criterios sin respaldo literal suficiente; revisar el vocabulario Momento y sus excepciones; diseñar persistencia/consentimiento y adquisición transversal sin exagerar la identificación. Crear PR de borrador solo después de comprobar la política de workflows; no fusionar ni desplegar sin aceptación explícita.
+
