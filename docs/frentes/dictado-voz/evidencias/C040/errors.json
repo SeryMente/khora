@@ -1,0 +1,51 @@
+[
+  {
+    "operation": "baseline git inspection",
+    "symptom": "fatal: not a git repository (or any of the parent directories): .git",
+    "cause": "historical source fixture is not a Git checkout",
+    "state": "read only; no mutation",
+    "correction": "use verified MCP revision and explicit file delta",
+    "verification": "cdc74b3 and blobs read by MCP",
+    "prevention": "test .git before git commands"
+  },
+  {
+    "operation": "strict ES2017 bank",
+    "symptom": "TS2688: Cannot find type definition file for node",
+    "cause": "typeRoots pointed to React-only tool bank",
+    "correction": "use existing test-tools/@types",
+    "verification": "next run reached TS2550, Node types resolved",
+    "prevention": "resolve package before tsc"
+  },
+  {
+    "operation": "browser launch",
+    "symptom": "executable doesn't exist at /usr/bin/chromium",
+    "cause": "hard-coded executable instead of environment lookup",
+    "correction": "resolve command -v chromium",
+    "verification": "Chromium21/21, route20 assertions, unit21/21 and strict ES2017 focal exit0; not full build",
+    "prevention": "execFileSync which chromium"
+  },
+  {
+    "operation": "strict ES2017 test",
+    "symptom": "TS2550: Property 'at' does not exist",
+    "cause": "new test used ES2022 helper under ES2017 configuration",
+    "correction": "units[units.length-1] preserves exact assertion",
+    "verification": "Chromium21/21, route20 assertions, unit21/21 and strict ES2017 focal exit0; not full build",
+    "prevention": "run actual target before publishing"
+  },
+  {
+    "operation": "Chromium negative decision bank",
+    "symptom": "Timeout waiting for Elegiste no publicar",
+    "cause": "Successful No removes received negative rows from pending panel by existing design; test waited for unmounted node",
+    "correction": "Assert actual encrypted durable negative receipt and zero positive requests",
+    "verification": "Chromium21/21, route20 assertions, unit21/21 and strict ES2017 focal exit0; not full build",
+    "prevention": "Verify terminal persistence rather than transient nodes"
+  },
+  {
+    "operation": "negative browser receipt assertion",
+    "symptom": "AssertionError: 0 !== 1",
+    "cause": "Test observed local decision before waiting for its HTTP response; fixture timing race",
+    "correction": "Install waitForResponse before click; then verify persisted receipt",
+    "verification": "21 Chromium assertions passed, no fixed sleep",
+    "prevention": "wait for explicit causal response, not transient node or delays"
+  }
+]

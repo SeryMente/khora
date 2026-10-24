@@ -1,0 +1,124 @@
+{
+  "cycle": "C031",
+  "base": "b5e7009de137db30c26ecc5f4ddbb34789f453f2",
+  "branch": "feat/ingreso-autobiografico-20261019",
+  "state": "draft; not merged, deployed or production-migrated",
+  "unitTests": 12,
+  "unitPassed": 12,
+  "browserArchiveScenarios": [
+    {
+      "scenario": "manual archive, encrypted intent reload, normative failure, exact text preview, public audio requirement blocks Yes",
+      "classification": true,
+      "implicitConsent": false,
+      "errors": []
+    },
+    {
+      "scenario": "reject forged hash receipt",
+      "classification": true,
+      "implicitConsent": false,
+      "errors": []
+    },
+    {
+      "scenario": "No before preview and without normative token",
+      "classification": true,
+      "implicitConsent": false,
+      "errors": []
+    }
+  ],
+  "normalScenarios": [
+    {
+      "scenario": "normal stop latency",
+      "instantFeedback": true,
+      "events": [
+        "DICTADO_INICIO_SOLICITADO",
+        "SOLICITUD_MICROFONO",
+        "MICROFONO_PERMITIDO",
+        "RECONOCEDOR_CONSTRUIDO",
+        "DICTADO_INICIO_ACEPTADO",
+        "ERROR_RECONOCEDOR",
+        "EVENTO_FIN_RECONOCEDOR",
+        "GRABACION_INICIADA",
+        "DICTADO_DETENCION_SOLICITADA",
+        "GRABACION_PARO_SOLICITADO",
+        "GRABACION_DETENIDA",
+        "PARTE_AUDIO_SUBIDA_INICIADA",
+        "PARTE_AUDIO_SUBIDA_CONFIRMADA",
+        "TRANSCRIPCION_AUTORITATIVA_INICIADA",
+        "TRANSCRIPCION_AUTORITATIVA_COMPLETADA",
+        "DICTADO_DETENIDO",
+        "CIERRE_AUDIO_FINALIZADO"
+      ],
+      "errors": []
+    },
+    {
+      "scenario": "normal upload failure and explicit retry",
+      "instantFeedback": true,
+      "events": [
+        "DICTADO_INICIO_SOLICITADO",
+        "SOLICITUD_MICROFONO",
+        "MICROFONO_PERMITIDO",
+        "RECONOCEDOR_CONSTRUIDO",
+        "DICTADO_INICIO_ACEPTADO",
+        "ERROR_RECONOCEDOR",
+        "EVENTO_FIN_RECONOCEDOR",
+        "GRABACION_INICIADA",
+        "DICTADO_DETENCION_SOLICITADA",
+        "GRABACION_PARO_SOLICITADO",
+        "GRABACION_DETENIDA",
+        "PARTE_AUDIO_SUBIDA_INICIADA",
+        "PARTE_AUDIO_SUBIDA_FALLIDA",
+        "TRANSCRIPCION_AUTORITATIVA_INICIADA",
+        "TRANSCRIPCION_AUTORITATIVA_OMITIDA",
+        "DICTADO_DETENIDO",
+        "CIERRE_AUDIO_FINALIZADO"
+      ],
+      "errors": []
+    }
+  ],
+  "classificationSQL": [
+    "four exact types; legacy defaults; stable intent; changed text invalidates decision",
+    "additive SQL migration twice; legacy default; all 4 types; invalid type rejected",
+    "archive SQL column/parameter count and classification collision guard (structural; not archive transaction)"
+  ],
+  "productionE2E": false,
+  "actualAudioFailureCause": "unknown: HTTP detail requested",
+  "normativeHealth": {
+    "code": "NORM_GITHUB_CREDENTIAL_REJECTED",
+    "upstream": 401,
+    "correlation": "76b3c0e3-c4c0-47ce-8a20-8e06aaaabc2f"
+  },
+  "vercel": {
+    "getProject": "success",
+    "deploymentEvents": 403,
+    "newDeployment": false
+  },
+  "publicAudio": {
+    "required": true,
+    "contractImplemented": false,
+    "positiveConsentBlocked": true
+  },
+  "blogReceivedCommit": "13a15d9532931a0ff2795f5390ce2750484a1474",
+  "sourceHashes": {
+    "lib/custodia/editorial.ts": "f392f6dc24c12a14e0fc23cd78b5628310620d929b4de722674bf7f4d6dd5492",
+    "lib/custodia/transcripcion.ts": "82de9d9168de440f34c26c3315e8d3b9d75e22e8be771b585ac0722200336ae4",
+    "lib/custodia/contrato.ts": "29a363cf1d6fd22946c405d04482b2f42af54687e3c7643d1da8cee6fdbb5bac",
+    "app/components/ingreso/TipoEntradaControl.tsx": "aa60244c4176a2273a664cbfb97ec95b892037688200726d067a9e43fca811e7",
+    "app/components/shared/IngresoView.tsx": "9ab822df4effcca84a6b09e4056ae828a8ced9d81131412d2fd2b727fb9eab38",
+    "app/components/ingreso/IngresoWorkspace.tsx": "98c4ceaa8fd163ebc1cae2ea981b8618d4e188fbe520adcda8ef038c5779cb07",
+    "app/components/ingreso/DialogoPanel.tsx": "c8226d33cba1e8eb87297c4e6db59b9b144a21e1a2313f3a6ba9d5f16b0c1f42",
+    "app/api/dictado/checkpoint/route.ts": "a9f9d672d36461e17c22d247a570c3fb8d19e7b868700f250d27a2a59eb72024",
+    "app/api/dictado/route.ts": "0e19c82b4008723e7801652da75f2a587f84f0924cf8ff5be5ef7e352a665dd7",
+    "lib/server/dictado.ts": "e379b10239239dc0ef051226fd7f3be88c5f6c06987c8935f10a3b4ac77d7010",
+    "db/migrations/034_ingreso_clasificacion.sql": "be26513cb9eb0ee5411022ed23a4f448af0c983ca0c71010994da72f83582e82",
+    "lib/client/custodia-local.ts": "c03b46a78d0af40019a16314068a659bbce034ac6a39cd9c5f02c669929a688a",
+    "app/components/ingreso/PublicacionCapturaPendiente.tsx": "eb3eb9097528adf8757734ce0249d3ac6f04d3e54445ecf9afe44136836a52f8",
+    "app/components/ingreso/ingreso-studio.module.css": "6e77da2529c38ee385d25b15296b0bcd2210efd0f07b81f95628abb3ca7e74b9",
+    "tests/unit/ingreso-editorial.test.ts": "4837cbeed8a87004f79147458d11072d32738e27d30bd2b6e45e26f63284b00a",
+    "docs/CUSTODIA-DICTADOS.md": "a0f54f27c86b6bf5c7c273798d1ee10f63b5a0d2d7f49167b05891746cccd20d"
+  },
+  "deadline": {
+    "technicalCutoffUTC": "2026-10-19T17:51:13Z",
+    "humanReviewMinimumMinutes": 8
+  },
+  "nativeHistoryComplete": false
+}

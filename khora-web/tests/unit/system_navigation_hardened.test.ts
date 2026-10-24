@@ -28,7 +28,7 @@ test("ingreso is the capture surface and volcados is the downstream archive/revi
   assert.ok(entry);
   assert.equal(entry.kind, "direct");
   assert.equal(entry.href, "/sistema/ingreso");
-  assert.deepEqual(entry.coverage, ["/sistema/ingreso"]);
+  assert.deepEqual(entry.coverage, ["/sistema/ingreso", "/sistema/blog"]);
   assert.equal((entry.children ?? []).length, 0);
   assert.equal(NAVIGATION_REGISTRY.some((item) => item.id === "capturar"), false);
   assert.equal(NAVIGATION_REGISTRY.some((item) => item.id === "dictado"), false);

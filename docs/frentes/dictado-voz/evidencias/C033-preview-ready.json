@@ -1,0 +1,34 @@
+{
+  "result": {
+    "deployments": {
+      "pagination": {
+        "count": 1,
+        "next": 1792438508006,
+        "prev": 1792438508006
+      },
+      "deployments": [
+        {
+          "id": "dpl_3i1uggfnr2cGt89iRMCQvXJq2qWA",
+          "name": "khora-web",
+          "url": "khora-10mve3uo2-victorhugotorresmendez-8991s-projects.vercel.app",
+          "created": 1792438508006,
+          "state": "READY",
+          "target": null,
+          "creator": {
+            "uid": "lAl0cDLi0zdUkOxbbBwiEzqa",
+            "username": "victorhugotorresmendez-8991"
+          },
+          "meta": {
+            "githubCommitRef": "feat/ingreso-autobiografico-20261019",
+            "githubCommitSha": "bdc0255df9c9573575b25082706197a55bef7211",
+            "githubCommitMessage": "fix(ingreso): bind custody to expected audio and archive exact recovered fork; integrate Blog metadata hardening",
+            "githubRepo": "khora",
+            "githubOrg": "SeryMente"
+          },
+          "inspectorUrl": "https://vercel.com/victorhugotorresmendez-8991s-projects/khora-web/3i1uggfnr2cGt89iRMCQvXJq2qWA",
+          "isRollbackCandidate": false
+        }
+      ]
+    }
+  }
+}

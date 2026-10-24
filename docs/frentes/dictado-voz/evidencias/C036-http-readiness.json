@@ -1,0 +1,22 @@
+[
+  {
+    "url": "https://khora-gzcwtot38-victorhugotorresmendez-8991s-projects.vercel.app/api/version",
+    "status": 200,
+    "final_url": "https://vercel.com/login?next=%2Fsso-api%3Furl%3Dhttps%253A%252F%252Fkhora-gzcwtot38-victorhugotorresmendez-8991s-projects.vercel.app%252Fapi%252Fversion%26nonce%3D10f034bd2a7e1a35daf8fd25cc4788a2f558df9ca5f25cdb78ed68eebf257b25"
+  },
+  {
+    "url": "https://khora-gzcwtot38-victorhugotorresmendez-8991s-projects.vercel.app/sistema/ingreso",
+    "status": 200,
+    "final_url": "https://vercel.com/login?next=%2Fsso-api%3Furl%3Dhttps%253A%252F%252Fkhora-gzcwtot38-victorhugotorresmendez-8991s-projects.vercel.app%252Fsistema%252Fingreso%26nonce%3Dbb834fa414c953220c83a6e8e80f86e9cbc8c7fbe0d7631cf97d940194f70676"
+  },
+  {
+    "url": "https://serymente.github.io/otrogranprograma/blog/archivo.json",
+    "status": 200,
+    "final_url": "https://serymente.github.io/otrogranprograma/blog/archivo.json",
+    "json": {
+      "schema": 1,
+      "author": "Víctor Hugo Torres",
+      "entries": []
+    }
+  }
+]

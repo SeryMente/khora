@@ -1,0 +1,3 @@
+Procedencia: mensaje literal visible del operador; no exportación completa.
+
+¿Por qué tardas tanto, oye?

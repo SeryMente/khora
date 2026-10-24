@@ -1,0 +1,5 @@
+[
+  "four exact types; legacy defaults; stable intent; changed text invalidates decision",
+  "additive SQL migration twice; legacy default; all 4 types; invalid type rejected",
+  "archive SQL column/parameter count and classification collision guard (structural; not archive transaction)"
+]

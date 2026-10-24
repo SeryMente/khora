@@ -1,0 +1,87 @@
+--- a/khora-web/tests/unit/mcp_normative_gate.test.ts
++++ b/khora-web/tests/unit/mcp_normative_gate.test.ts
+@@ -1,13 +1,39 @@
+ import test from "node:test";
+ import assert from "node:assert/strict";
+ import { signJwt } from "@/lib/server/jwt";
++import { getMcpConfig } from "@/lib/server/mcp-config";
+ import { applyNormativePrinciple, assertNormativeTurnOpen, verifyNormativeTurn, sameRecordedAttempt } from "@/lib/server/mcp-normative";
+ import { REQUIRED_OUTPUT_FORMAT_VERSION, REQUIRED_PLATFORM, type NormativeRuntimeContext } from "@/lib/server/normative-runtime";
+ import { buildCycleVerificationRecord } from "@/lib/server/norm-check";
+ import { resetDbForTesting, setDbForTesting } from "@/lib/server/neon";
+
+
+-process.env.PLAYWRIGHT_TEST_RUN = "1";
++// Unit fixtures must not inherit production signing keys or canonical origins.
++// This changes only this test process, never Vercel configuration or server gates.
++const NORM_TEST_ENV: Record<string, string> = {
++  PLAYWRIGHT_TEST_RUN: "1",
++  MCP_OAUTH_CLIENT_ID: "test-client-id",
++  MCP_OAUTH_CLIENT_SECRET: "test-client-secret",
++  MCP_OAUTH_REDIRECT_URIS: "http://localhost:3000/callback",
++  MCP_JWT_SECRET: "test-jwt-secret-min-32-chars-long",
++  MCP_ALLOWED_EMAIL: "test@example.com",
++  MCP_CANONICAL_URL: "http://localhost:3000/api/mcp",
++};
++const savedTestEnv = new Map<string, string | undefined>();
++test.beforeEach(() => {
++  savedTestEnv.clear();
++  for (const [name, value] of Object.entries(NORM_TEST_ENV)) {
++    savedTestEnv.set(name, process.env[name]);
++    process.env[name] = value;
++  }
++});
++test.afterEach(() => {
++  for (const [name, value] of savedTestEnv) {
++    if (value === undefined) delete process.env[name];
++    else process.env[name] = value;
++  }
++  savedTestEnv.clear();
++});
+
+ const actor = "test@example.com";
+ const cycleId = "test-conversation/T1";
+@@ -21,7 +47,7 @@
+   output_format_version: REQUIRED_OUTPUT_FORMAT_VERSION,
+ };
+
+-function makeToken(overrides: Record<string, unknown> = {}) {
++function makeToken(overrides: Record<string, unknown> = {}, secret = NORM_TEST_ENV.MCP_JWT_SECRET) {
+   return signJwt(
+     {
+       iss: "http://localhost:3000",
+@@ -44,7 +70,7 @@
+       turn_output_format_version: REQUIRED_OUTPUT_FORMAT_VERSION,
+       ...overrides,
+     } as any,
+-    "test-jwt-secret-min-32-chars-long",
++    secret,
+   );
+ }
+
+@@ -341,3 +367,25 @@
+     false,
+   );
+ });
++
++
++test("normative test configuration is explicitly isolated from inherited host credentials", () => {
++  const config = getMcpConfig();
++  assert.ok(config);
++  assert.equal(config.jwtSecret, NORM_TEST_ENV.MCP_JWT_SECRET);
++  assert.equal(config.issuer, "http://localhost:3000");
++  assert.equal(config.canonicalUrl, NORM_TEST_ENV.MCP_CANONICAL_URL);
++  assert.equal(config.allowedEmail, actor);
++});
++
++test("normative gate still rejects a token signed with a different key", async () => {
++  setMockTurn();
++  try {
++    await assert.rejects(
++      assertNormativeTurnOpen(actor, makeToken({}, "different-synthetic-key-not-the-fixture"), runtime),
++      /TURN_TOKEN_INVALID_SIGNATURE/,
++    );
++  } finally {
++    resetDbForTesting();
++  }
++});

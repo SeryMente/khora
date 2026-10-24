@@ -1,0 +1,26 @@
+[
+  {
+    "path": "/sistema/ingreso",
+    "status": 200,
+    "final_url": "https://vercel.com/login",
+    "content_type": "text/html; charset=utf-8",
+    "deployment_protection": true,
+    "application_response_verified": false
+  },
+  {
+    "path": "/api/dictado/checkpoint?bootstrap=1",
+    "status": 200,
+    "final_url": "https://vercel.com/login",
+    "content_type": "text/html; charset=utf-8",
+    "deployment_protection": true,
+    "application_response_verified": false
+  },
+  {
+    "path": "/api/version",
+    "status": 200,
+    "final_url": "https://vercel.com/login",
+    "content_type": "text/html; charset=utf-8",
+    "deployment_protection": true,
+    "application_response_verified": false
+  }
+]

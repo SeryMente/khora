@@ -1,4 +1,5 @@
 // @l0 L0-002-R · @req FIX-DICTADO/ESPEJO-NOTION · @acr ACR-1.2 · @req TRACE-SESSION/010 · @req FIX-DICTADO/D15 · @req TITULOS-LLM/REQ-2
+import { tipoEntradaValido } from "../../../lib/custodia/editorial";
 import { after, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { guardarDictado } from "../../../lib/server/dictado";
@@ -17,6 +18,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ detail: "no autenticado" }, { status: 401 });
     }
     const c = await req.json();
+    if ((c.tipoEntrada !== undefined && !tipoEntradaValido(c.tipoEntrada)) || (c.ofuscada !== undefined && typeof c.ofuscada !== "boolean")) return NextResponse.json({detail:"clasificacion_entrada_invalida"},{status:400});
     const texto = typeof c?.texto === "string" ? c.texto : "";
     const fuenteEntrada =
       c?.fuenteEntrada === "dialogo" ? "dialogo" :
@@ -52,6 +54,7 @@ export async function POST(req: Request) {
     // 2. Persistir dictado en la BD (fuente de verdad)
     const r = await guardarDictado({
       texto,
+      tipoEntrada:c.tipoEntrada ?? "general",ofuscada:c.ofuscada ?? false,
       sessionId,
       titulo: tituloResolver,
       audioUrl: c?.audioUrl ?? null,
@@ -68,7 +71,7 @@ export async function POST(req: Request) {
     // Durable intents are already committed with the original. A callback is only an accelerator.
     after(()=>reconciliarCustodia(session.user!.email!,2).then(()=>undefined).catch(()=>undefined));
     const mp3Estado=audioPartes?.length?"pendiente":"no_aplica";
-    return NextResponse.json({ ...r, titulo: tituloResolver, mp3Estado }, { status: 201 });
+    return NextResponse.json({ ...r, version:1, tipoEntrada:c.tipoEntrada ?? "general", ofuscada:c.ofuscada ?? false, titulo: tituloResolver, mp3Estado }, { status: 201 });
   } catch (e) {
     return NextResponse.json(
       { detail: "no se pudo archivar el dictado", causa: String(e) },

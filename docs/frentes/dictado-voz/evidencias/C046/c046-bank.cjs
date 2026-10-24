@@ -1,0 +1,5 @@
+const fs=require('fs'),vm=require('vm'),assert=require('node:assert/strict'),ts=require('/data/khora-dialogo-fix/tools/node_modules/typescript');
+(async()=>{const tests=[];const source=fs.readFileSync(__dirname+'/c046-methodology.test.ts','utf8');const code=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2017,esModuleInterop:true}}).outputText;
+vm.runInNewContext(code,{exports:{},require:n=>n==='node:test'?(name,run)=>tests.push({name,run}):require(n),process:{env:{}},fetch,Response,Headers,AbortSignal,Buffer,Uint8Array,URL});
+let count=0;for(const t of tests.filter(t=>t.name.startsWith('canonical reader'))){await t.run();count++;}
+assert.equal(count,4);const result={status:'PASS',tests:count,livePrivateComparison:'not invoked; no dedicated credential provided, remains mandatory in full build',security:'pinned source/main, no redirects/cache/gh/broadtoken/skip; safe diagnostics; size/time caps'};fs.writeFileSync(__dirname+'/c046-results.json',JSON.stringify(result,null,2));console.log(JSON.stringify(result));})().catch(e=>{console.error(e);process.exit(1)});

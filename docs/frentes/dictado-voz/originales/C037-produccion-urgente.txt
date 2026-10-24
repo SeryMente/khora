@@ -1,0 +1,8 @@
+Procedencia: mensajes directos del operador en sesión central. Transcripción textual; etiquetas HTML de presentación normalizadas, sin reconstruir exportación nativa completa.
+
+No, pero ¿por qué candidata? O sea, eso no quedó bien. Necesitaba, para empezar, no cargó porque me dio error de servidor. La necesito publicar en el URL canónico de producción.
+Server error
+There is a problem with the server configuration.
+Check the server logs for more information.
+
+Primero entrégame la URL y después haces todo lo demás, documentación, etcétera, porque urge.

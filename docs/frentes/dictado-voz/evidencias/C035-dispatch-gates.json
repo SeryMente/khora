@@ -1,0 +1,24 @@
+{
+  "passed": 12,
+  "checks": [
+    "missing dispatch secret denies before normative/database",
+    "short dispatch secret is never accepted",
+    "wrong same-length secret is denied",
+    "sync flag is disabled by default",
+    "normative source failure blocks job selection",
+    "missing dedicated configuration blocks dispatch: BLOG_GITHUB_TOKEN",
+    "missing dedicated configuration blocks dispatch: BLOG_META_PAGE_TOKEN",
+    "missing dedicated configuration blocks dispatch: BLOG_META_PAGE_ID",
+    "missing dedicated configuration blocks dispatch: BLOG_META_ADMIN_VERIFIED",
+    "different Page ID cannot receive dispatch",
+    "administrative verification cannot be inferred",
+    "valid guards with empty queue never instantiate providers"
+  ],
+  "scope": "actual dispatch handler and timingSafeEqual; isolated normative/repository/provider adapters, synthetic environment strings",
+  "limits": [
+    "no real secret/token",
+    "no provider calls",
+    "no scheduler activation",
+    "no database integration"
+  ]
+}
