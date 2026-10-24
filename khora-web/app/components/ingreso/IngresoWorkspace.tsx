@@ -650,7 +650,7 @@ function IngresoContenido({onDialogo,clasificacion,onClasificacionChange}:{onDia
       command,
       sessionId: sesionIdRef.current || null,
       partStartIndex: Math.max(1, Number(partStartIndex || 1)),
-    }, "*");
+    }, window.location.origin);
   }, [observarDictado]);
 
   useEffect(() => {

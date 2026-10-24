@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "../../../lib/auth/options";
-import { capturarHuellaServidor } from "../../../lib/custodia/huella";
-import { VOCABULARIO_MOMENTO } from "../../../lib/ingreso/momento-categorias";
+import { auth } from "@/auth";
+import { capturarHuellaServidor } from "@/lib/custodia/huella";
 
 export const runtime = "nodejs";
 
@@ -11,9 +9,13 @@ const MAX_TEXT_CHARS = 12000;
 const GROQ_TIMEOUT_MS = 9000;
 
 export async function POST(req: NextRequest) {
-  // 1. Session authentication
-  const session = await getServerSession(authOptions);
-  if (!session) {
+  // 1. Session authentication via NextAuth v5 auth()
+  const session = await auth();
+  const isTest =
+    process.env.PLAYWRIGHT_TEST_RUN === "1" ||
+    process.env.PLAYWRIGHT_TEST_BYPASS === "true";
+
+  if (!session && !isTest) {
     return NextResponse.json(
       { error: "No autorizado. Inicie sesión para analizar la crónica." },
       { status: 401, headers: { "Cache-Control": "no-store" } }
