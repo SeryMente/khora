@@ -27,6 +27,13 @@ export const MCP_TOOL_SCOPES = {
   khora_norm_apply_principle: ["norm:turn"],
   khora_norm_verify_turn: ["norm:turn"],
   khora_norm_release_turn: ["norm:turn"],
+  jules_list_sources: ["jules:read"],
+  jules_list_sessions: ["jules:read"],
+  jules_get_session: ["jules:read"],
+  jules_list_activities: ["jules:read"],
+  jules_create_session: ["jules:write"],
+  jules_send_message: ["jules:write"],
+  jules_approve_plan: ["jules:write"],
 } as const;
 
 export type McpToolName = keyof typeof MCP_TOOL_SCOPES;
