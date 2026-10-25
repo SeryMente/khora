@@ -57,6 +57,22 @@ test("manual Bearer token is high-entropy, scoped, expiring and stored by hash",
     assert.equal(inserted.token_prefix, result.token.slice(0, 21));
     assert.notEqual(inserted.token_hash, result.token);
 
+    const julesReadToken = await createManualMcpToken({
+      usuario: "operador@khora.app",
+      scopes: ["jules:read"],
+      expiresInDays: 30,
+      label: "Jules read test",
+    });
+    assert.equal(julesReadToken.record.scope, "jules:read");
+
+    const julesWriteToken = await createManualMcpToken({
+      usuario: "operador@khora.app",
+      scopes: ["jules:write"],
+      expiresInDays: 30,
+      label: "Jules write test",
+    });
+    assert.equal(julesWriteToken.record.scope, "jules:write");
+
     await assert.rejects(
       createManualMcpToken({
         usuario: "operador@khora.app",
