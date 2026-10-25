@@ -8,6 +8,7 @@ import {
   listSessions as julesListSessions,
   listSources as julesListSources,
   sendMessage as julesSendMessage,
+  normalizeSourceName,
 } from "@/lib/jules/client";
 import { randomUUID } from "node:crypto";
 import { diagnosticFailure, diagnose } from "@/lib/server/mcp-diagnostics";
@@ -264,7 +265,8 @@ async function handleMcpRequest(req: NextRequest) {
       const detail = error && typeof error === "object" ? error as { status?: unknown; message?: unknown } : {};
       const status = typeof detail.status === "number" && Number.isInteger(detail.status) ? detail.status : null;
       const keyMissing = detail.message === "Jules API key is not configured.";
-      const code = keyMissing ? "JULES_API_KEY_MISSING" : status ? `JULES_HTTP_${status}` : "JULES_OPERATION_FAILED";
+      const knownCode = typeof detail.message === "string" && /^JULES_[A-Z_]+$/.test(detail.message) ? detail.message : null;
+      const code = keyMissing ? "JULES_API_KEY_MISSING" : knownCode ?? (status ? `JULES_HTTP_${status}` : "JULES_OPERATION_FAILED");
       const message = keyMissing
         ? "Falta configurar la credencial de Jules en el servidor autorizado."
         : status === 401 || status === 403
@@ -339,7 +341,7 @@ async function handleMcpRequest(req: NextRequest) {
     "jules_create_session",
     "Crea una sesión de desarrollo de Jules. Siempre fuerza requirePlanApproval=true; Jules no debe ejecutar el plan hasta su aprobación explícita.",
     {
-      source: z.string().min(1).max(512).refine((value) => value.startsWith("sources/"), { message: "La fuente debe proceder de jules_list_sources." }).describe("Nombre de fuente copiado de jules_list_sources, por ejemplo sources/github/owner/repo"),
+      source: z.string().min(1).max(512).refine((value) => { try { normalizeSourceName(value); return true; } catch { return false; } }, { message: "La fuente debe ser un recurso Jules válido devuelto por jules_list_sources." }).describe("Nombre de fuente copiado de jules_list_sources, por ejemplo sources/github/owner/repo"),
       starting_branch: z.string().min(1).max(255).describe("Rama existente verificada en el repositorio fuente"),
       prompt: z.string().trim().min(1).max(10000).describe("Prompt completo con alcance, restricciones, aceptación, pruebas y cláusula NO SIMULACIÓN"),
       title: z.string().trim().min(1).max(200).optional().describe("Título breve de la sesión"),
@@ -349,7 +351,7 @@ async function handleMcpRequest(req: NextRequest) {
       if (denied) return denied;
       return safeJulesResult("jules_create_session", () => julesCreateSession({
         prompt: args.prompt,
-        sourceContext: { source: args.source, githubRepoContext: { startingBranch: args.starting_branch } },
+        sourceContext: { source: normalizeSourceName(args.source), githubRepoContext: { startingBranch: args.starting_branch } },
         automationMode: "AUTO_CREATE_PR",
         requirePlanApproval: true,
         ...(args.title ? { title: args.title } : {}),
@@ -367,7 +369,14 @@ async function handleMcpRequest(req: NextRequest) {
     async (args: any) => {
       const denied = requireScope("jules:write");
       if (denied) return denied;
-      return safeJulesResult("jules_send_message", () => julesSendMessage(args.session_id, args.prompt));
+      return safeJulesResult("jules_send_message", async () => {
+        const session = await julesGetSession(args.session_id);
+        if (!["AWAITING_USER_FEEDBACK", "IN_PROGRESS", "PAUSED"].includes(session.state)) {
+          throw new Error("JULES_SESSION_NOT_READY_FOR_MESSAGE");
+        }
+        await julesSendMessage(args.session_id, args.prompt);
+        return { accepted: true, session_id: session.name, state_before_send: session.state, note: "El envío fue aceptado por la API; consulta las actividades posteriores para obtener la respuesta de Jules." };
+      });
     }
   );
 
@@ -380,7 +389,14 @@ async function handleMcpRequest(req: NextRequest) {
     async (args: any) => {
       const denied = requireScope("jules:write");
       if (denied) return denied;
-      return safeJulesResult("jules_approve_plan", () => julesApprovePlan(args.session_id));
+      return safeJulesResult("jules_approve_plan", async () => {
+        const session = await julesGetSession(args.session_id);
+        if (session.state !== "AWAITING_PLAN_APPROVAL") {
+          throw new Error("JULES_PLAN_NOT_AWAITING_APPROVAL");
+        }
+        await julesApprovePlan(args.session_id);
+        return { accepted: true, session_id: session.name, state_before_approval: session.state, note: "La API aceptó la aprobación del plan; consulta jules_get_session para verificar el estado posterior." };
+      });
     }
   );
 
