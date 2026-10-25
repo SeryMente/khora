@@ -1,6 +1,4 @@
-import json
-import tempfile
-import os
+import json,tempfile,os
 from pathlib import Path
 from unittest.mock import patch
 from types import SimpleNamespace as NS
@@ -10,6 +8,7 @@ from khora_kernel.contracts.proposal import *
 from khora_kernel.poblacion import _ingestar as ing
 from khora_kernel.engine import core
 from khora_kernel.engine.history import Ht,HtEvidence,save_ht
+from khora_kernel.engine.fval import FvalResult
 from khora_kernel import embeddings
 results=[]
 def add(i,expected,observed,failed):results.append(dict(id=i,expected=expected,observed=observed,verdict='FAIL' if failed else 'PASS'))

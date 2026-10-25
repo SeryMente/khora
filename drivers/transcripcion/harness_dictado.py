@@ -1,9 +1,8 @@
+import sys
 import argparse
 import os
-import sys
 
 from khora_kernel.api import ContextoDeVisibilidad, Provenance
-
 
 def main():
     parser = argparse.ArgumentParser(description="Harness de dictado real - Prueba de auditoría")
@@ -36,7 +35,7 @@ def main():
         print(f"Texto:\n{resultado.texto_completo}")
         print(f"Segmentos: {len(resultado.segmentos)}")
     except Exception as e:
-        print("\n--- Falla en la Transcripción ---")
+        print(f"\n--- Falla en la Transcripción ---")
         print(str(e))
         print("El audio ha sido rescatado de manera segura.")
         sys.exit(0)

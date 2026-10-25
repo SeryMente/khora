@@ -7,7 +7,6 @@ from khora_kernel.ports.transcripcion import (
     TranscripcionError,
 )
 
-
 class GroqTranscripcionAdapter(Transcripcion):
     """
     Adapter del puerto Transcripcion usando la API de Groq (Whisper).

@@ -10,7 +10,7 @@ from fastapi.testclient import TestClient
 
 import api.main as api_main
 
-from api.main import app
+from api.main import app, neo4j_driver
 
 # We need to set a dummy key for testing
 os.environ["KHORA_API_KEY"] = "test-key-123"

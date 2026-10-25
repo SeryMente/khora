@@ -26,7 +26,11 @@ async function readCanonicalContract(token: string | undefined, request: typeof 
   catch { throw new Error("METHODOLOGY_BUILD_RESPONSE_INVALID"); }
 }
 
-test("KHORA local contract matches the canonical Metodología contract", async () => {
+test("KHORA local contract matches the canonical Metodología contract", async (t) => {
+  if (!process.env.KHORA_NORM_GITHUB_TOKEN?.trim()) {
+    t.skip("KHORA_NORM_GITHUB_TOKEN not configured");
+    return;
+  }
   const localPath = path.resolve(process.cwd(), "contracts/FORMATO-REGISTRO-VERIFICACION-CICLO.schema.json");
   const local = JSON.parse(fs.readFileSync(localPath, "utf8"));
   const remote = await readCanonicalContract(process.env.KHORA_NORM_GITHUB_TOKEN);

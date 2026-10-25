@@ -1,11 +1,12 @@
 import typing
 from unittest.mock import MagicMock, patch
-
 import pytest
+
 from contrato.test_transcripcion import SuiteContratoTranscripcion
-from drivers.transcripcion import GroqTranscripcionAdapter
-from khora_kernel.api import ContextoDeVisibilidad, EntidadIngresada, Provenance
 from khora_kernel.ports.transcripcion import Transcripcion, TranscripcionError
+from khora_kernel.api import ContextoDeVisibilidad, EntidadIngresada, Provenance
+
+from drivers.transcripcion import GroqTranscripcionAdapter
 
 
 class MockGroqResponse:
@@ -53,8 +54,7 @@ def test_transcripcion_falla_autenticacion():
 
         assert "autenticación" in str(exc.value).lower()
         # Verify the file was created (the fallback)
-        import glob
-        import os
+        import os, glob
         fallback_files = glob.glob("audio_rescate_*.mp3")
         assert len(fallback_files) > 0
         for f in fallback_files:
