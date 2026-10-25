@@ -11,7 +11,7 @@ import {
 } from "@/lib/jules/client";
 import { registrarEventoServicio } from "@/lib/server/service-observability";
 import { randomUUID } from "node:crypto";
-import { diagnosticFailure, diagnose } from "@/lib/server/mcp-diagnostics";
+import { McpDiagnosticError, diagnosticFailure, diagnose } from "@/lib/server/mcp-diagnostics";
 import { installMcpDiagnostics, withHttpDiagnostics } from "@/lib/server/mcp-diagnostic-boundary";
 // @l0 L0-002 §4 · @req MCP-ROUTE-01/REQ-1
 import { NextRequest, NextResponse } from "next/server";
