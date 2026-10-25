@@ -1,5 +1,14 @@
 import { toolKhoraListarAudios, toolKhoraLeerAudio } from "@/lib/server/mcp-audios";
 import { registrarEventoServicio } from "@/lib/server/service-observability";
+import {
+  approvePlan as julesApprovePlan,
+  createSession as julesCreateSession,
+  getSession as julesGetSession,
+  listActivitiesPage as julesListActivitiesPage,
+  listSessions as julesListSessions,
+  listSources as julesListSources,
+  sendMessage as julesSendMessage,
+} from "@/lib/jules/client";
 import { randomUUID } from "node:crypto";
 import { diagnosticFailure, diagnose } from "@/lib/server/mcp-diagnostics";
 import { installMcpDiagnostics, withHttpDiagnostics } from "@/lib/server/mcp-diagnostic-boundary";
@@ -179,12 +188,12 @@ async function handleMcpRequest(req: NextRequest) {
   if (
     !actor ||
     !Number.isSafeInteger(tokenGeneration) ||
-    (!scopes.includes("volcados:read") && !scopes.includes("runtime:read") && !scopes.includes("norm:turn"))
+    (!scopes.includes("volcados:read") && !scopes.includes("runtime:read") && !scopes.includes("norm:turn") && !scopes.includes("jules:read") && !scopes.includes("jules:write"))
   ) {
     return makeUnauthorizedResponse(config);
   }
 
-  const requireScope = (scope: "volcados:read" | "runtime:read" | "norm:turn") =>
+  const requireScope = (scope: "volcados:read" | "runtime:read" | "norm:turn" | "jules:read" | "jules:write") =>
     scopes.includes(scope)
       ? null
       : scopeFailure(config, scope, correlation_id);
@@ -199,7 +208,7 @@ async function handleMcpRequest(req: NextRequest) {
   const mcpServer = new McpServer(
     {
       name: "khora-mcp",
-      version: "1.3.0",
+      version: "1.4.0",
     },
     {
       instructions:
@@ -245,6 +254,135 @@ async function handleMcpRequest(req: NextRequest) {
       async (args: any) => observedHandler(args, true),
     );
   };
+
+  // Jules: comunicación bidireccional por sesión, con scopes separados y puerta normativa intacta.
+  const safeJulesResult = async (operation: string, call: () => Promise<unknown>) => {
+    try {
+      const result = await call();
+      return { content: [{ type: "text" as const, text: JSON.stringify({ ok: true, result: result ?? null }) }] };
+    } catch (error) {
+      const detail = error && typeof error === "object" ? error as { status?: unknown; message?: unknown } : {};
+      const status = typeof detail.status === "number" && Number.isInteger(detail.status) ? detail.status : null;
+      const keyMissing = detail.message === "Jules API key is not configured.";
+      const code = keyMissing ? "JULES_API_KEY_MISSING" : status ? `JULES_HTTP_${status}` : "JULES_OPERATION_FAILED";
+      const message = keyMissing
+        ? "Falta configurar la credencial de Jules en el servidor autorizado."
+        : status === 401 || status === 403
+          ? "Jules rechazó la credencial o los permisos. Verifica la configuración del servidor sin exponer la clave."
+          : status === 429
+            ? "Jules alcanzó un límite de solicitudes; reintenta respetando el backoff."
+            : "La operación con Jules falló. Revisa el registro saneado del servicio.";
+      return {
+        isError: true,
+        content: [{ type: "text" as const, text: JSON.stringify({ ok: false, operation, code, status, message }) }],
+      };
+    }
+  };
+
+  gatedTool(
+    "jules_list_sources",
+    "Lista las fuentes/repositorios conectados a Jules. Solo lectura; devuelve el token de paginación para continuar.",
+    {
+      page_size: z.number().int().min(1).max(100).optional().describe("Número de fuentes (1-100; predeterminado 50)"),
+      page_token: z.string().max(4096).optional().describe("Token nextPageToken de la página anterior"),
+    },
+    async (args: any) => {
+      const denied = requireScope("jules:read");
+      if (denied) return denied;
+      return safeJulesResult("jules_list_sources", () => julesListSources(args.page_size ?? 50, args.page_token));
+    }
+  );
+
+  gatedTool(
+    "jules_list_sessions",
+    "Lista sesiones de Jules. Solo lectura; conserva nextPageToken para paginar.",
+    {
+      page_size: z.number().int().min(1).max(100).optional().describe("Número de sesiones (1-100; predeterminado 30)"),
+      page_token: z.string().max(4096).optional().describe("Token nextPageToken de la página anterior"),
+    },
+    async (args: any) => {
+      const denied = requireScope("jules:read");
+      if (denied) return denied;
+      return safeJulesResult("jules_list_sessions", () => julesListSessions(args.page_size ?? 30, args.page_token));
+    }
+  );
+
+  gatedTool(
+    "jules_get_session",
+    "Recupera el estado, enlace y outputs de una sesión Jules por ID o nombre sessions/{id}.",
+    {
+      session_id: z.string().min(1).max(256).describe("ID de sesión o nombre completo sessions/{id}; no URL"),
+    },
+    async (args: any) => {
+      const denied = requireScope("jules:read");
+      if (denied) return denied;
+      return safeJulesResult("jules_get_session", () => julesGetSession(args.session_id));
+    }
+  );
+
+  gatedTool(
+    "jules_list_activities",
+    "Recupera actividades de una sesión: mensajes del agente/usuario, plan, aprobación, progreso, finalización y fallos. Paginar hasta que no haya nextPageToken.",
+    {
+      session_id: z.string().min(1).max(256).describe("ID de sesión o nombre sessions/{id}; no URL"),
+      page_size: z.number().int().min(1).max(100).optional().describe("Número de actividades (1-100; predeterminado 50)"),
+      page_token: z.string().max(4096).optional().describe("Token nextPageToken de la página anterior"),
+    },
+    async (args: any) => {
+      const denied = requireScope("jules:read");
+      if (denied) return denied;
+      return safeJulesResult("jules_list_activities", () => julesListActivitiesPage(args.session_id, args.page_size ?? 50, args.page_token));
+    }
+  );
+
+  gatedTool(
+    "jules_create_session",
+    "Crea una sesión de desarrollo de Jules. Siempre fuerza requirePlanApproval=true; Jules no debe ejecutar el plan hasta su aprobación explícita.",
+    {
+      source: z.string().min(1).max(512).regex(/^sources\\/.+/).describe("Nombre de fuente copiado de jules_list_sources, por ejemplo sources/github/owner/repo"),
+      starting_branch: z.string().min(1).max(255).describe("Rama existente verificada en el repositorio fuente"),
+      prompt: z.string().trim().min(1).max(10000).describe("Prompt completo con alcance, restricciones, aceptación, pruebas y cláusula NO SIMULACIÓN"),
+      title: z.string().trim().min(1).max(200).optional().describe("Título breve de la sesión"),
+    },
+    async (args: any) => {
+      const denied = requireScope("jules:write");
+      if (denied) return denied;
+      return safeJulesResult("jules_create_session", () => julesCreateSession({
+        prompt: args.prompt,
+        sourceContext: { source: args.source, githubRepoContext: { startingBranch: args.starting_branch } },
+        automationMode: "AUTO_CREATE_PR",
+        requirePlanApproval: true,
+        ...(args.title ? { title: args.title } : {}),
+      }));
+    }
+  );
+
+  gatedTool(
+    "jules_send_message",
+    "Envía una respuesta o contexto adicional al agente en la misma sesión. El envío aceptado no implica que Jules ya haya respondido; consultar después jules_list_activities.",
+    {
+      session_id: z.string().min(1).max(256).describe("ID de sesión o nombre sessions/{id}; no URL"),
+      prompt: z.string().trim().min(1).max(10000).describe("Respuesta o mensaje de seguimiento para Jules"),
+    },
+    async (args: any) => {
+      const denied = requireScope("jules:write");
+      if (denied) return denied;
+      return safeJulesResult("jules_send_message", () => julesSendMessage(args.session_id, args.prompt));
+    }
+  );
+
+  gatedTool(
+    "jules_approve_plan",
+    "Aprueba explícitamente el plan generado por Jules para la sesión indicada. Esta acción habilita ejecución; invócala únicamente cuando el plan haya sido revisado y aprobado.",
+    {
+      session_id: z.string().min(1).max(256).describe("ID de sesión o nombre sessions/{id}; no URL"),
+    },
+    async (args: any) => {
+      const denied = requireScope("jules:write");
+      if (denied) return denied;
+      return safeJulesResult("jules_approve_plan", () => julesApprovePlan(args.session_id));
+    }
+  );
 
   // Herramienta 1: khora_resumen
   gatedTool(
