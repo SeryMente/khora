@@ -50,3 +50,27 @@ test("one canonical document covers the exact tool catalog and current output ve
   assert.equal(readme.split("(./khora-web/docs/normative-check.md)").length, 2);
   assert.match(document, /^# Servidor MCP de Khora — documento canónico/m);
 });
+
+
+test("Jules scopes are advertised and accepted only through the existing authorization surfaces", () => {
+  const checks: Array<[string, string]> = [
+    ["app/.well-known/oauth-authorization-server/route.ts", "jules:read"],
+    ["app/.well-known/oauth-authorization-server/route.ts", "jules:write"],
+    ["app/oauth/authorize/page.tsx", "jules:read"],
+    ["app/oauth/authorize/page.tsx", "jules:write"],
+    ["app/api/oauth/token/route.ts", "jules:read"],
+    ["app/api/oauth/token/route.ts", "jules:write"],
+    ["lib/server/mcp-config.ts", "jules:read"],
+    ["lib/server/mcp-config.ts", "jules:write"],
+    ["lib/server/mcp-manual-token.ts", "jules:read"],
+    ["lib/server/mcp-manual-token.ts", "jules:write"],
+    ["app/sistema/mcp/page.tsx", "jules:read"],
+    ["app/sistema/mcp/page.tsx", "jules:write"],
+  ];
+  for (const [relative, scope] of checks) {
+    const content = fs.readFileSync(path.join(root, relative), "utf8");
+    assert.ok(content.includes(scope), `${relative} must support ${scope}`);
+  }
+  const page = fs.readFileSync(path.join(root, "app/sistema/mcp/page.tsx"), "utf8");
+  assert.match(page, /DEFAULT_SCOPES = \["runtime:read", "volcados:read", "norm:turn"\]/);
+});
