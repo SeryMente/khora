@@ -15,7 +15,7 @@ const julesWriteTools = ["jules_create_session", "jules_send_message", "jules_ap
 
 test("MCP preserves root securitySchemes for all twenty-four tools", () => {
   assert.equal(Object.keys(MCP_TOOL_SCOPES).length, 24);
-  for (const [names, scopes] of [[runtimeTools, ["runtime:read"]], [dataTools, ["volcados:read"]], [normTools, ["norm:turn"]]] as const) {
+  for (const [names, scopes] of [[runtimeTools, ["runtime:read"]], [dataTools, ["volcados:read"]], [normTools, ["norm:turn"]], [julesReadTools, ["jules:read"]], [julesWriteTools, ["jules:write"]]] as const) {
     for (const name of names) {
       assert.deepEqual(describeMcpTool(name as McpToolName, "test", {}).securitySchemes, [{ type: "oauth2", scopes: [...scopes] }]);
     }
@@ -40,7 +40,7 @@ test("route publishes derived schemas and retains authentication and normative g
 test("one canonical document covers the exact tool catalog and current output version", () => {
   const document = fs.readFileSync(path.join(root, "docs/normative-check.md"), "utf8");
   const readme = fs.readFileSync(path.join(root, "../README.md"), "utf8");
-  const documented = [...document.matchAll(/^\| `(khora_[a-z_]+)`/gm)].map(match => match[1]);
+  const documented = [...document.matchAll(/^\| `((?:khora|jules)_[a-z_]+)`/gm)].map(match => match[1]);
   assert.equal(documented.length, 24);
   assert.deepEqual(documented.sort(), Object.keys(MCP_TOOL_SCOPES).sort());
   for (const heading of ["Conexión", "Catálogo", "Contratos", "Ciclo normativo", "Autorización y configuración", "Datos y efectos", "Diagnóstico", "Compatibilidad", "Pruebas y mantenimiento"]) {
