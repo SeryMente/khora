@@ -213,8 +213,11 @@ export async function listSessions(pageSize: number = 30, pageToken?: string): P
   return response.json();
 }
 
-export async function listSources(): Promise<ListSourcesResponse> {
-  const response = await fetchWithBackoff(`${JULES_API_BASE_URL}/sources`, {
+export async function listSources(pageSize: number = 50, pageToken?: string): Promise<ListSourcesResponse> {
+  const url = new URL(`${JULES_API_BASE_URL}/sources`);
+  url.searchParams.set("pageSize", String(Math.min(100, Math.max(1, Math.trunc(pageSize)))));
+  if (pageToken) url.searchParams.set("pageToken", pageToken);
+  const response = await fetchWithBackoff(url.toString(), {
     method: "GET",
     headers: getHeaders(),
   });
@@ -222,9 +225,11 @@ export async function listSources(): Promise<ListSourcesResponse> {
 }
 
 export async function createSession(params: {
+  prompt: string;
   sourceContext: SourceContext;
-  automationMode: AutomationMode;
+  automationMode?: AutomationMode;
   requirePlanApproval: boolean;
+  title?: string;
 }): Promise<Session> {
   const response = await fetchWithBackoff(`${JULES_API_BASE_URL}/sessions`, {
     method: "POST",
@@ -234,8 +239,17 @@ export async function createSession(params: {
   return response.json();
 }
 
+function normalizeSessionId(id: string): string {
+  const value = id.trim().replace(/^sessions\//, "");
+  if (!value || /[/?#\\\\]/.test(value) || value === "." || value === "..") {
+    throw new Error("JULES_SESSION_ID_INVALID");
+  }
+  return encodeURIComponent(value);
+}
+
 export async function getSession(id: string): Promise<Session> {
-  const response = await fetchWithBackoff(`${JULES_API_BASE_URL}/sessions/${id}`, {
+  const sessionId = normalizeSessionId(id);
+  const response = await fetchWithBackoff(`${JULES_API_BASE_URL}/sessions/${sessionId}`, {
     method: "GET",
     headers: getHeaders(),
   });
@@ -254,8 +268,27 @@ export async function listActivities(id: string, createTimeCursor?: string): Pro
   return response.json();
 }
 
+// Official list contract: pageSize (1..100) and pageToken.
+// Kept separate from the legacy createTimeCursor helper used by existing Khora polling flows.
+export async function listActivitiesPage(
+  id: string,
+  pageSize: number = 50,
+  pageToken?: string,
+): Promise<ListActivitiesResponse> {
+  const sessionId = normalizeSessionId(id);
+  const url = new URL(`${JULES_API_BASE_URL}/sessions/${sessionId}/activities`);
+  url.searchParams.set("pageSize", String(Math.min(100, Math.max(1, Math.trunc(pageSize)))));
+  if (pageToken) url.searchParams.set("pageToken", pageToken);
+  const response = await fetchWithBackoff(url.toString(), {
+    method: "GET",
+    headers: getHeaders(),
+  });
+  return response.json();
+}
+
 export async function sendMessage(id: string, prompt: string): Promise<void> {
-  await fetchWithBackoff(`${JULES_API_BASE_URL}/sessions/${id}:sendMessage`, {
+  const sessionId = normalizeSessionId(id);
+  await fetchWithBackoff(`${JULES_API_BASE_URL}/sessions/${sessionId}:sendMessage`, {
     method: "POST",
     headers: getHeaders(),
     body: JSON.stringify({ prompt }),
@@ -263,9 +296,10 @@ export async function sendMessage(id: string, prompt: string): Promise<void> {
 }
 
 export async function approvePlan(id: string): Promise<void> {
-  await fetchWithBackoff(`${JULES_API_BASE_URL}/sessions/${id}:approvePlan`, {
+  const sessionId = normalizeSessionId(id);
+  // Jules documents an empty request body for approvePlan.
+  await fetchWithBackoff(`${JULES_API_BASE_URL}/sessions/${sessionId}:approvePlan`, {
     method: "POST",
     headers: getHeaders(),
-    body: JSON.stringify({}),
   });
 }
