@@ -5,11 +5,14 @@
   "state_sources": 1,
   "method": {
     "repo": "SeryMente/metodologia",
-    "path": "METACANON-OBJETOS-CANONICOS.md",
-    "commit": "49ac40e9f6122e2d2fb339362cfa0a78128c8e37",
-    "blob": "32c7a65ff2e83b3b76752ba2160427bd6e851a8f",
-    "sha256": "1db7a16892310c505ec3002e9439e35c11a13b2e5e36dee2829efeda201e042c",
-    "version": "1.5"
+    "path": "gobernanza/METAPROMPT-CANONICO-SAMANTHA.html",
+    "ref": "main",
+    "blob": "fcbd4f050bdcf81a329a9939bc4fda4f06074379",
+    "version": "1.21",
+    "sam_version": "v341 · NX-341m",
+    "gow_version": "2.2",
+    "read_at": "2026-10-25",
+    "note": "Única fuente normativa; Metacanon y GOW están integrados en este HTML. La sección humana prevalece; la representación estructurada deriva de ella. No se usa un markdown paralelo como fuente normativa."
   },
   "original_source": {
     "repo": "SeryMente/khora",
@@ -252,9 +255,9 @@
     },
     {
       "path": "OBJETO-CANONICO.md",
-      "bytes": 194785,
-      "sha256": "092ff9b9d03e7e805f929a4daceda3b72b2fbdb5a00ee526c3b8d7d5e2bebd92",
-      "git_blob_sha": "a29ad8e3221128f2b59caa00fc8ed3ded87c89a2"
+      "bytes": 218472,
+      "sha256": "19463537ed5a76c7e969dba8bec1b3b2ffe2ca05d4d1baf811f8a8f001d888d5",
+      "git_blob_sha": "939193d33215f94bda226752ee74f2218e344b0e"
     },
     {
       "path": "evidencias/dialogo.test.ts",
@@ -348,9 +351,9 @@
     },
     {
       "path": "CONTROL-RESPONSABILIDAD.json",
-      "bytes": 2759,
-      "sha256": "89d2db6741c0e755ee23b55f5c54a683887e11e094f41dd7dde74835d725bb28",
-      "git_blob_sha": "0f0b02a5bc9cd976ac5ab8e5b3e5a8a853866adb"
+      "bytes": 3525,
+      "sha256": "52ff5303656912b4a7f05d0838a5ba8f6a32a6224a590974454f967a3cfdce68",
+      "git_blob_sha": "b4d6f60f5c21771e6434f97955a0b3231c52b46e"
     },
     {
       "path": "originales/CONTINUIDAD-C031-20261022.jsonl",
@@ -363,6 +366,12 @@
       "bytes": 6339,
       "sha256": "19179001955a3f98adfd1770f83f0de63166be549f0af75edbd5ae1e27a0bf4c",
       "git_blob_sha": "fb35dc95c877e86ac75273b7e4496b4999841e06"
+    },
+    {
+      "path": "originales/CONTINUIDAD-C041-20261025.jsonl",
+      "bytes": 4576,
+      "sha256": "8e7fd67b66312be9c24a291301eef53c35434ff1121a0ec68e7c878162c77349",
+      "git_blob_sha": "8064b97a9f0579d46ca1ea5cb9d66491b5ca2c6b"
     }
   ],
   "runtime_references": [
@@ -460,7 +469,8 @@
     "Preparacion-benchmark-y-retroalimentacion.md standalone temporary file",
     "fresh full review of every supporting technical document cited by this sprint",
     "complete native export of this ChatGPT conversation for C031; only visible user entries/commentaries were preserved",
-    "complete verbatim export of the full source conversation; C032 preserves selected closing user instructions U01–U06 only"
+    "complete verbatim export of the full source conversation; C032 preserves selected closing user instructions U01–U06 only",
+    "complete native export of this ChatGPT conversation for C041; current continuity JSONL preserves selected visible messages only"
   ],
   "privacy_review": {
     "destination_private_verified_by_tool": true,
@@ -471,12 +481,12 @@
     "no_secret_values_in_manifest": true
   },
   "current_preparation": {
-    "version": "0.6.14",
+    "version": "0.6.15",
     "baseSha": "f0dfbdcb2d79eb6289dacba272ddcc7ba2023063",
     "receipt": "evidencias/C030-release.json",
-    "state": "C032 documentary-only update: closing verbatim directives read back; checklist/Groq/metadata/Momento requirements are not implemented or production-verified"
+    "state": "C041 documentary/control update only. PR #335 is an unmerged candidate; canonical history and responsibility control remain on main. No product tests or deployment were run in C041."
   },
-  "latestEvent": "C032 — closing verbatim operator instructions U01–U06 preserved; OCP/prompts updated; documentation only; MCP-NORMATIVO disabled",
+  "latestEvent": "C041 — transfer explicitly authorized and verified; audit identifies PR #335 as open/unmerged and not synchronized with main; object/manifests refreshed; no product code/tests/deploy changes; MCP-NORMATIVO disabled",
   "latest_verified_release": {
     "sha": "f0dfbdcb2d79eb6289dacba272ddcc7ba2023063",
     "deploymentId": "dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr",
@@ -502,17 +512,45 @@
     "physicalAcceptance": false,
     "technicalPublicationVerified": true
   },
-  "latest_cycle": "C032",
-  "canonical_version": "0.6.14",
+  "latest_cycle": "C041",
+  "canonical_version": "0.6.15",
   "latest_candidate": {
-    "branch": "fix/captura-dialogo-custodia-20261018",
-    "codeCommit": "b36231bfdd719741253148d24ba0265ac8dadeb7",
-    "prebuildCommit": "06c36c9917de19eeaa0c2ea1432742294e45678e",
-    "base": "3356bfc92965503d81b06e5637c4668afbde3a52",
-    "previewDeployment": "dpl_HkHzVpp8ymTiueVnGXYs6vmvtha8",
-    "previewState": "READY",
-    "production": "verified",
-    "releaseCommit": "f0dfbdcb2d79eb6289dacba272ddcc7ba2023063"
+    "pr": 335,
+    "url": "https://github.com/SeryMente/khora/pull/335",
+    "title": "feat(ingreso): cumplir instrucciones U01-U06 del operador de extremo a extremo",
+    "state": "open",
+    "merged": false,
+    "draft": false,
+    "branch": "feat/u06-sobre-ingreso-work-1990819938695134734",
+    "head_sha": "7bd496247f116e91ff7871781a67ebface10d545",
+    "base": "main",
+    "base_sha": "b528660e16552633d232a2397cbe42441a03438c",
+    "last_updated": "2026-10-25T05:21:12Z",
+    "changed_files": 350,
+    "additions": 13577,
+    "deletions": 8213,
+    "candidate_object": {
+      "version": "0.6.35",
+      "blob_sha": "f84c9ccab2ae637918f8d9579d95b3e259d2a350",
+      "characters": 3251,
+      "utf8_bytes": 3337
+    },
+    "compare_snapshot": {
+      "status": "diverged",
+      "ahead_by": 4,
+      "behind_by": 3,
+      "checked_after_C041_documentation_commits": true
+    },
+    "sync_status": "not_synced",
+    "blockers": [
+      "The candidate replaces the historical OCP of 214809 characters with a short summary, losing most visible historical content in its diff.",
+      "The PR removes docs/frentes/dictado-voz/CONTROL-RESPONSABILIDAD.json.",
+      "The PR includes cross-front changes/deletions in apps/harmonia-observability and other docs/evidence; total 350 changed files.",
+      "TRAZABILIDAD-U01-U06.md retains FALTA/PARCIAL/SUPUESTO for material requirements while candidate OCP claims U06 verified.",
+      "Candidate OCP says the PR is draft but GitHub currently reports draft=false.",
+      "Candidate matrix says PR #334 closes without merge but GitHub reports #334 open/unmerged; PR #330 also remains open/unmerged."
+    ],
+    "decision": "Do not merge until scope, history, authoritative control, matrix evidence, and contradictory PR statuses are reconciled."
   },
   "release_history": [
     {
@@ -559,43 +597,46 @@
   },
   "latest_method": {
     "repo": "SeryMente/metodologia",
-    "path": "METACANON-OBJETOS-CANONICOS.md",
+    "path": "gobernanza/METAPROMPT-CANONICO-SAMANTHA.html",
     "ref": "main",
-    "blob": "cae8387a576ba4914d086a47bf57fe925717efca",
+    "blob": "fcbd4f050bdcf81a329a9939bc4fda4f06074379",
     "version": "1.21",
-    "read_at": "2026-10-22",
-    "note": "Commit SHA not returned by the available repository-read operation."
+    "sam_version": "v341 · NX-341m",
+    "gow_version": "2.2",
+    "read_at": "2026-10-25",
+    "note": "Adquirido en C041 desde la única fuente de gobernanza integrada."
   },
   "responsibility_control": {
     "path": "CONTROL-RESPONSABILIDAD.json",
     "full_path": "docs/frentes/dictado-voz/CONTROL-RESPONSABILIDAD.json",
-    "blob": "0f0b02a5bc9cd976ac5ab8e5b3e5a8a853866adb",
-    "commit": "42405f47abc91bf73d65ba3c32b2d19b7c0dc32c",
-    "generation": 1,
+    "blob": "b4d6f60f5c21771e6434f97955a0b3231c52b46e",
+    "commit": "9fa5a25c2f7378165ce8e9ef7bbf1472263e61cb",
+    "generation": 2,
     "status": "assigned",
-    "session_folio": "SES-20261022-C7N4M2Q8",
-    "owner_alias": "chatgpt-dictado-voz-SES-20261022-C7N4M2Q8",
+    "session_folio": "SES-20261025-H6N3Q8W2",
+    "owner_alias": "chatgpt-dictado-voz-SES-20261025-H6N3Q8W2",
     "global_uniqueness": "not_verified"
   },
   "conversation_continuity": {
-    "path": "originales/CONTINUIDAD-C031-20261022.jsonl",
-    "commit": "c5d4eaa97f0b4b63a4f203093d8ecb1ab7fda654",
-    "git_blob_sha": "afb6acb0571f2a24c3726afc55bf500e6ab4fa48",
-    "sha256": "4959c65dd69bf0ecd7eadce072b29853cc0709602b694b3f09cf93923bfe913c",
-    "bytes": 2641,
-    "user_entries_preserved_verbatim": 2,
-    "assistant_commentaries_preserved_verbatim": 3,
+    "path": "originales/CONTINUIDAD-C041-20261025.jsonl",
+    "commit": "6a183ca82221d33dca7b3bbeea654fc9a7e8ff71",
+    "git_blob_sha": "8064b97a9f0579d46ca1ea5cb9d66491b5ca2c6b",
+    "sha256": "8e7fd67b66312be9c24a291301eef53c35434ff1121a0ec68e7c878162c77349",
+    "bytes": 4576,
+    "user_entries_preserved_verbatim": 1,
+    "assistant_commentaries_preserved_verbatim": 2,
+    "assistant_visible_final_summaries_preserved": 2,
     "native_conversation_id_exposed": false,
     "complete_native_export": false,
-    "latest_prior_model_output": "not_available_not_verified"
+    "latest_prior_model_output": "visible previous reply summary preserved as record A00; full native transcript unavailable"
   },
-  "latest_product_event": "C030 — last product state remains technically published; effective global gate and human acceptance remain pending, not revalidated in C031/C032",
+  "latest_product_event": "C041 — no product changes in this cycle; last technically verified product release remains C030 (main f0dfbdcb2d79eb6289dacba272ddcc7ba2023063, deployment dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr); acceptance and global gate remain pending, not revalidated in C041.",
   "latest_object": {
-    "version": "0.6.14",
+    "version": "0.6.15",
     "ref": "main",
-    "blob_sha": "8d0466379d8e8b8356ec46001dc61dbf7839f78f",
-    "commit": "3c709828fcb84835236435e0340a1ad039a8e1fa",
-    "state": "C032 verbatim instructions documented; product state unchanged; no tests or deployment"
+    "blob_sha": "939193d33215f94bda226752ee74f2218e344b0e",
+    "commit": "f055a38574d01cdeeb42f5ddcb8be18afc747084",
+    "state": "C041 transfer and synchronization audit recorded; PR #335 remains open and is not integrated; product state unchanged; exact read-back verified"
   },
   "recent_verbatim_instruction_ingestion": {
     "path": "originales/INSTRUCCIONES-VERBATIM-TAIL-C032-20261022.jsonl",
@@ -609,6 +650,12 @@
     "latest_requested_format": "clean, ordered checklist; not a wall of text",
     "source_native_export": false,
     "historical_claim_C054_v0_6_46": "not verified in main or currently fetched feature-branch OCP",
-    "implementation_status": "documented_only"
+    "implementation_status": "documented_only",
+    "last_continuity_path": "originales/CONTINUIDAD-C041-20261025.jsonl",
+    "last_continuity_blob": "8064b97a9f0579d46ca1ea5cb9d66491b5ca2c6b",
+    "last_continuity_sha256": "8e7fd67b66312be9c24a291301eef53c35434ff1121a0ec68e7c878162c77349",
+    "last_continuity_bytes": 4576,
+    "last_continuity_date": "2026-10-25",
+    "continuity_note": "C041 preserves the explicit transfer authorization and the request to check OCP↔PR synchronization; historical U01–U06 remains at its existing verbatim source."
   }
 }
