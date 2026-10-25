@@ -201,11 +201,10 @@ function getHeaders(): HeadersInit {
 }
 
 export async function listSessions(pageSize: number = 30, pageToken?: string): Promise<ListSessionsResponse> {
+  const boundedPageSize = Math.min(100, Math.max(1, Math.trunc(pageSize)));
   const url = new URL(`${JULES_API_BASE_URL}/sessions`);
-  url.searchParams.append("pageSize", pageSize.toString());
-  if (pageToken) {
-    url.searchParams.append("pageToken", pageToken);
-  }
+  url.searchParams.set("pageSize", String(boundedPageSize));
+  if (pageToken) url.searchParams.set("pageToken", pageToken);
   const response = await fetchWithBackoff(url.toString(), {
     method: "GET",
     headers: getHeaders(),
@@ -237,6 +236,16 @@ export async function createSession(params: {
     body: JSON.stringify(params),
   });
   return response.json();
+}
+
+/** Validate a Jules source resource name before it reaches a request body. */
+export function normalizeSourceName(value: string): string {
+  const input = value.trim();
+  const match = input.match(/^sources\/([A-Za-z0-9._-]+(?:\/[A-Za-z0-9._-]+)*)$/);
+  if (!match || match[1].split("/").some(part => part === "." || part === "..")) {
+    throw new Error("JULES_SOURCE_ID_INVALID");
+  }
+  return `sources/${match[1]}`;
 }
 
 function normalizeSessionId(id: string): string {
