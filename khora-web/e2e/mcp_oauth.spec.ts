@@ -16,6 +16,8 @@ test.describe("MCP OAuth Authorization Server & Protected Resource", () => {
     expect(body.code_challenge_methods_supported).toEqual(["S256"]);
     expect(body.scopes_supported).toContain("runtime:read");
     expect(body.scopes_supported).toContain("volcados:read");
+    expect(body.scopes_supported).toContain("jules:read");
+    expect(body.scopes_supported).toContain("jules:write");
     expect(body.grant_types_supported).toEqual(["authorization_code", "refresh_token"]);
   });
 
@@ -35,6 +37,8 @@ test.describe("MCP OAuth Authorization Server & Protected Resource", () => {
     expect(body1.authorization_servers[0]).not.toContain("/api/mcp");
     expect(body1.scopes_supported).toContain("runtime:read");
     expect(body1.scopes_supported).toContain("volcados:read");
+    expect(body1.scopes_supported).toContain("jules:read");
+    expect(body1.scopes_supported).toContain("jules:write");
   });
 
   test("/api/mcp without token responds with 401 and WWW-Authenticate header", async ({ request }) => {
