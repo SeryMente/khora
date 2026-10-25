@@ -351,9 +351,9 @@
     },
     {
       "path": "CONTROL-RESPONSABILIDAD.json",
-      "bytes": 3525,
-      "sha256": "52ff5303656912b4a7f05d0838a5ba8f6a32a6224a590974454f967a3cfdce68",
-      "git_blob_sha": "b4d6f60f5c21771e6434f97955a0b3231c52b46e"
+      "bytes": 3568,
+      "sha256": "7259d08fcc6a2572112a13e07429d7d1a9ec5e305e38f8d858ebb035e8bd023e",
+      "git_blob_sha": "09b9e497abf16771827b2602308562abc4484ed2"
     },
     {
       "path": "originales/CONTINUIDAD-C031-20261022.jsonl",
@@ -486,7 +486,7 @@
     "receipt": "evidencias/C030-release.json",
     "state": "C041 documentary/control update only. PR #335 is an unmerged candidate; canonical history and responsibility control remain on main. No product tests or deployment were run in C041."
   },
-  "latestEvent": "C041 — transfer explicitly authorized and verified; audit identifies PR #335 as open/unmerged and not synchronized with main; object/manifests refreshed; no product code/tests/deploy changes; MCP-NORMATIVO disabled",
+  "latestEvent": "C041 — authorized transfer verified by canonical read-back; custody manifest reconciled to generation 2; PR #335 remains open/unmerged and not synchronized with main; product unchanged; MCP-NORMATIVO disabled",
   "latest_verified_release": {
     "sha": "f0dfbdcb2d79eb6289dacba272ddcc7ba2023063",
     "deploymentId": "dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr",
@@ -609,8 +609,8 @@
   "responsibility_control": {
     "path": "CONTROL-RESPONSABILIDAD.json",
     "full_path": "docs/frentes/dictado-voz/CONTROL-RESPONSABILIDAD.json",
-    "blob": "b4d6f60f5c21771e6434f97955a0b3231c52b46e",
-    "commit": "9fa5a25c2f7378165ce8e9ef7bbf1472263e61cb",
+    "blob": "09b9e497abf16771827b2602308562abc4484ed2",
+    "commit": "f6cc283e38da9ee3b662398acd48e041306edeb1",
     "generation": 2,
     "status": "assigned",
     "session_folio": "SES-20261025-H6N3Q8W2",
