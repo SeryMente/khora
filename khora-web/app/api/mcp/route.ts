@@ -266,19 +266,17 @@ async function handleMcpRequest(req: NextRequest) {
       const detail = error && typeof error === "object" ? error as { status?: unknown; message?: unknown } : {};
       const status = typeof detail.status === "number" && Number.isInteger(detail.status) ? detail.status : null;
       const keyMissing = detail.message === "Jules API key is not configured.";
-      const knownCode = typeof detail.message === "string" && /^JULES_[A-Z_]+$/.test(detail.message) ? detail.message : null;
-      const code = keyMissing ? "JULES_API_KEY_MISSING" : knownCode ?? (status ? `JULES_HTTP_${status}` : "JULES_OPERATION_FAILED");
-      const message = keyMissing
-        ? "Falta configurar la credencial de Jules en el servidor autorizado."
-        : status === 401 || status === 403
-          ? "Jules rechazó la credencial o los permisos. Verifica la configuración del servidor sin exponer la clave."
-          : status === 429
-            ? "Jules alcanzó un límite de solicitudes; reintenta respetando el backoff."
-            : "La operación con Jules falló. Revisa el registro saneado del servicio.";
-      return {
-        isError: true,
-        content: [{ type: "text" as const, text: JSON.stringify({ ok: false, operation, code, status, message }) }],
-      };
+      const knownCode = typeof detail.message === "string" && /^JULES_[A-Z0-9_]+$/.test(detail.message) ? detail.message : null;
+      const code = keyMissing ? "JULES_API_KEY_MISSING"
+        : knownCode
+          ? knownCode
+          : status === 401 || status === 403
+            ? "JULES_API_AUTH_REJECTED"
+            : status === 429
+              ? "JULES_RATE_LIMITED"
+              : "JULES_API_FAILED";
+      const safeError = new McpDiagnosticError(code, status ? { upstream_status: status } : {});
+      return diagnosticFailure(safeError, { operation, correlation_id });
     }
   };
 
