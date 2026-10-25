@@ -241,7 +241,7 @@ export async function createSession(params: {
 
 function normalizeSessionId(id: string): string {
   const value = id.trim().replace(/^sessions\//, "");
-  if (!value || value.includes("/") || value.includes("?") || value.includes("#") || value.includes("\\\\") || value === "." || value === "..") {
+  if (!value || value.includes("/") || value.includes("?") || value.includes("#") || value.includes("\\") || value === "." || value === "..") {
     throw new Error("JULES_SESSION_ID_INVALID");
   }
   return encodeURIComponent(value);
