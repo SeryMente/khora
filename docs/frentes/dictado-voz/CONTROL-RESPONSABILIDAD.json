@@ -49,6 +49,7 @@
     "recipient_alias": "chatgpt-dictado-voz-SES-20261025-H6N3Q8W2",
     "new_generation": 2,
     "source_main_revision": "control blob 0f0b02a5bc9cd976ac5ab8e5b3e5a8a853866adb",
-    "result": "authorized; compare-and-swap write and read-back to be verified"
+    "result": "authorized; compare-and-swap write and canonical read-back verified in C041",
+    "readback_verified": true
   }
 }
