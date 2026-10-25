@@ -17,7 +17,7 @@ Antes de ejecutar ese recorrido desde otra plataforma, resolver la identidad nor
 
 ## Catálogo
 
-`?` indica opcional; los demás campos son obligatorios. Toda herramienta sustantiva añade **`_norm_turn_token`** (mínimo 16 caracteres), **`_thinking_mode`** y **`_output_format_version`**. Modos: `THINKING`, `INSTANT`, `UNKNOWN`, `UNAVAILABLE`; no inventar una señal observada. La versión deriva de `REQUIRED_OUTPUT_FORMAT_VERSION`: **v1.7.7** en esta base. La gobernanza usa NORM-CHECK **v0.5.0**, verificador `norm-check/0.5.0`; servidor anunciado `khora-mcp` **1.3.0**. Son versiones distintas.
+`?` indica opcional; los demás campos son obligatorios. Toda herramienta sustantiva añade **`_norm_turn_token`** (mínimo 16 caracteres), **`_thinking_mode`** y **`_output_format_version`**. Modos: `THINKING`, `INSTANT`, `UNKNOWN`, `UNAVAILABLE`; no inventar una señal observada. La versión deriva de `REQUIRED_OUTPUT_FORMAT_VERSION`: **v1.7.7** en esta base. La gobernanza usa NORM-CHECK **v0.5.0**, verificador `norm-check/0.5.0`; servidor anunciado `khora-mcp` **1.4.0**. Son versiones distintas.
 
 | Herramienta / propósito | Entradas de negocio | Salida principal / límite |
 |---|---|---|
@@ -34,10 +34,17 @@ Antes de ejecutar ese recorrido desde otra plataforma, resolver la identidad nor
 | `khora_eventos_desde` / lectura incremental | `cursor?` entero ≥0, `limite?` entero 1–200, `session_id?` | `cursor_entrada`, `cursor_siguiente`, `limite`, `retornados`, `hay_mas`, `eventos`; continuar con el cursor devuelto |
 | `khora_eventos_recientes` / diagnóstico retrospectivo | `segundos?`, `limite?`, `session_id?`, `component?`, `severity?`, `outcome?`, `fase?`, `scope?`, `category?` | `ventana_segundos`, `limite`, `retornados`, `eventos`; ventana 1–86400 s (300 predeterminado), 1–200 eventos (50 predeterminado) |
 
-**Permisos efectivos:** las primeras seis herramientas requieren `volcados:read` **y** `norm:turn`; las cuatro de observabilidad, `runtime:read` **y** `norm:turn`. El permiso de negocio anunciado en `securitySchemes` se conserva; `norm:turn` es necesario para abrir/completar el ciclo, no una concesión implícita.
+**Permisos efectivos:** las ocho herramientas de contenido requieren `volcados:read` **y** `norm:turn`; las cuatro de observabilidad, `runtime:read` **y** `norm:turn`; las herramientas Jules requieren el scope `jules:read` o `jules:write` que corresponda **y** `norm:turn`. El permiso de negocio anunciado en `securitySchemes` se conserva; `norm:turn` es necesario para abrir/completar el ciclo, no una concesión implícita.
 
 | Herramienta / propósito | Entradas (sin los tres controles sustantivos) | Permiso / salida y efecto |
 |---|---|---|
+| `jules_list_sources` / listar fuentes conectadas de Jules | `page_size?` (1–100), `page_token?` | `jules:read` + `norm:turn`; devuelve fuentes y `nextPageToken`; la API key permanece solo en el servidor |
+| `jules_list_sessions` / consultar sesiones | `page_size?` (1–100), `page_token?` | `jules:read` + `norm:turn`; devuelve sesiones y token para continuar la paginación |
+| `jules_get_session` / estado de una sesión | `session_id` | `jules:read` + `norm:turn`; devuelve estado, URL, plan/output disponible y tiempos reportados por Jules |
+| `jules_list_activities` / leer retroalimentación de Jules | `session_id`, `page_size?` (1–100), `page_token?` | `jules:read` + `norm:turn`; devuelve actividades, mensajes, plan y estado; continuar mientras haya `nextPageToken` |
+| `jules_create_session` / delegar desarrollo | `source`, `starting_branch`, `prompt`, `title?` | `jules:write` + `norm:turn`; fuerza `requirePlanApproval=true` y `AUTO_CREATE_PR`; el plan necesita aprobación explícita |
+| `jules_send_message` / responder al agente | `session_id`, `prompt` | `jules:write` + `norm:turn`; el envío aceptado no implica respuesta del agente; volver a consultar actividades |
+| `jules_approve_plan` / aprobar el plan | `session_id` | `jules:write` + `norm:turn`; operación con efecto externo: requiere decisión explícita del asistente respaldada por la autorización contextual del operador |
 | `khora_mcp_health` / diagnóstico de acceso completo | `thinking_mode`, `output_format_version` | Publica los tres permisos. Informa `ok`, `status`, `full_access`, `missing_scopes`, versiones/hashes o razón de indisponibilidad. Una concesión parcial produce `DEGRADED`, no prueba caída total ni exige ampliar permisos para una tarea parcial |
 | `khora_norm_open_turn` / fijar ciclo y fuentes | `conversation_id?`, `turn_number?` entero positivo, `thinking_mode`, `output_format_version` | `norm:turn`; persiste/reutiliza turno, devuelve identidad, intento, token y snapshots; ver contrato ejecutable |
 | `khora_norm_apply_principle` / registrar siguiente principio | `turn_token`, `folio` (`P` + tres dígitos), `status` (`A`/`N`/`C`), `anchor?`, `reason_code?` | `norm:turn`; ledger persistido, secuencia, total, siguiente principio, completitud; A/C requieren anchor válido y N razón válida |
@@ -99,12 +106,13 @@ OAuth usa PKCE; los metadatos anuncian authorization_code, refresh_token y offli
 | `MCP_ALLOWED_EMAIL` | Identidad autorizada |
 | `KHORA_NORM_GITHUB_TOKEN` | Alternativa administrativa al secreto de lectura guardado en Seguridad → Bóveda; Contents: read, sin fallback amplio |
 | `KHORA_READONLY_DATABASE_URL` | Acceso de lectura; obligatorio en producción para esta ruta |
+| `JULES_API_KEY` | API key de Jules; solo en el entorno del servidor, nunca en cliente, prompt, repositorio ni logs |
 
 `getMcpConfig()` devuelve null si falta configuración obligatoria o la URL no es válida; la ruta responde 503. Los valores de fallback se limitan al modo de prueba; no activar ese modo como arreglo productivo. La configuración no demuestra por sí sola que el rol SQL tenga privilegios correctos: comprobarlos en el entorno autorizado.
 
 **Admisión:** cliente estático configurado; registro dinámico con redirecciones HTTPS en notion.com/notion.so y sus subdominios; documentos de identidad HTTPS específicos de chatgpt.com. No ampliar listas para forzar una prueba. El descubrimiento anuncia autorización en `/oauth/authorize`, tokens en `/api/oauth/token` y registro en `/api/oauth/register`; contrastar siempre metadatos del despliegue.
 
-**Bearer manual:** se emite en el Control MCP existente, una sola vez en claro; almacena hash/prefijo. Scopes no vacíos, admitidos y sin duplicados; caducidad 30/90/365 días, predeterminada 90. Puede revocarse individualmente; la generación global invalida manuales y OAuth. Autenticar actualiza `ultimo_uso_en`: no es una lectura sin efectos. La política de emisión, permisos, caducidad y revocación se conserva; se normalizan los diagnósticos de error.
+**Bearer manual:** se emite en el Control MCP existente, una sola vez en claro; almacena hash/prefijo. Scopes no vacíos, admitidos y sin duplicados; caducidad 30/90/365 días, predeterminada 90. Puede revocarse individualmente; la generación global invalida manuales y OAuth. Autenticar actualiza `ultimo_uso_en`: no es una lectura sin efectos. La política de emisión, permisos, caducidad y revocación se conserva; se normalizan los diagnósticos de error. Los scopes `jules:read` y `jules:write` están disponibles de forma explícita y no se conceden por defecto: la creación manual de tokens mantiene seleccionados únicamente los scopes anteriores hasta que el operador marque los de Jules. La ruta de autorización OAuth y el intercambio de tokens reconocen ambos scopes.
 
 ## Datos y efectos
 
@@ -115,6 +123,8 @@ OAuth usa PKCE; los metadatos anuncian authorization_code, refresh_token y offli
 | Gobernanza | Fuentes versionadas de metodología, turnos/ledger y comprobantes; lecturas históricas, caché por blob y escrituras normativas |
 | Envoltura de servicio | Eventos de llamada con operación, correlación, resultado, duración y razón; no incluir payloads/secretos. Middleware HTTP y bridge FastAPI conservan trazabilidad en los almacenes existentes |
 | Autenticación | Consulta de generación y token; actualización de uso del manual. No confundir sufijo `read` del permiso con ausencia total de escrituras |
+
+**Jules y automatización:** las herramientas MCP permiten listar fuentes/sesiones, crear una sesión, consultar actividades, recuperar mensajes de retroalimentación y responder dentro de la misma sesión. La API oficial consultada es `v1alpha`; no se supone un webhook de actividades. El seguimiento cuando ChatGPT no está invocando herramientas requiere un trabajador externo con sondeo periódico, paginación, checkpoint duradero, deduplicación, backoff y forma de detenerse. El envío de una respuesta no sustituye la lectura de las actividades posteriores. La aprobación automática ilimitada no forma parte de este contrato.
 
 **Recuperación íntegra:** conciliar inventario/páginas → resolver identificadores → consultar versiones → leer texto completo autorizado → revisar descifrado/errores → conciliar lo recibido e integridad. Historial: comprobar `completo`, `secciones_fallidas` y `diagnosticos`; un error SQL ya no equivale a vacío confirmado. Listado y búsqueda declaran cobertura de los elementos examinados e ilegibles; `completo` describe esa consulta/página, no todo el corpus. Lectura actual e histórica señalan descifrado fallido y la envoltura impide presentarlo como recuperación exitosa. No publicar dictados, HTML autobiográfico ni muestras sensibles en el repositorio. Corroborar por separado captura/transcripción → volcado: no toda captura está necesariamente en esa tabla.
 
