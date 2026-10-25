@@ -339,7 +339,7 @@ async function handleMcpRequest(req: NextRequest) {
     "jules_create_session",
     "Crea una sesión de desarrollo de Jules. Siempre fuerza requirePlanApproval=true; Jules no debe ejecutar el plan hasta su aprobación explícita.",
     {
-      source: z.string().min(1).max(512).regex(/^sources\\/.+/).describe("Nombre de fuente copiado de jules_list_sources, por ejemplo sources/github/owner/repo"),
+      source: z.string().min(1).max(512).refine((value) => value.startsWith("sources/"), { message: "La fuente debe proceder de jules_list_sources." }).describe("Nombre de fuente copiado de jules_list_sources, por ejemplo sources/github/owner/repo"),
       starting_branch: z.string().min(1).max(255).describe("Rama existente verificada en el repositorio fuente"),
       prompt: z.string().trim().min(1).max(10000).describe("Prompt completo con alcance, restricciones, aceptación, pruebas y cláusula NO SIMULACIÓN"),
       title: z.string().trim().min(1).max(200).optional().describe("Título breve de la sesión"),
