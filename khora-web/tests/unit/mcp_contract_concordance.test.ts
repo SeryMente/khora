@@ -192,6 +192,46 @@ test("real route: every substantive tool is blocked by scope or denied turn; nor
   } finally { await client.close(); await fixture.close(); }
 });
 
+test("Jules scopes are least-privilege and session creation always requires explicit plan approval", async () => {
+  const fixture = routeFixture();
+  const client = await connect(fixture);
+  try {
+    const created = await client.callTool({ name: "jules_create_session", arguments: input("jules_create_session") });
+    assert.notEqual(created.isError, true);
+    const createCall = fixture.calls.find(call => call.name === "JulesCreateSession");
+    assert.ok(createCall, "the Jules create-session client must be called");
+    assert.equal((createCall!.args as { requirePlanApproval?: boolean }).requirePlanApproval, true);
+    assert.equal((createCall!.args as { automationMode?: string }).automationMode, "AUTO_CREATE_PR");
+  } finally {
+    await client.close();
+    await fixture.close();
+  }
+
+  const readOnly = routeFixture({ scopes: ["jules:read", "norm:turn"] });
+  const readClient = await connect(readOnly);
+  try {
+    const denied = await readClient.callTool({ name: "jules_approve_plan", arguments: input("jules_approve_plan") });
+    assert.equal(denied.isError, true);
+    assert.match(JSON.stringify(denied), /insufficient_scope/);
+    assert.equal(readOnly.calls.length, 0, "jules:read must not invoke a write operation");
+  } finally {
+    await readClient.close();
+    await readOnly.close();
+  }
+
+  const writeOnly = routeFixture({ scopes: ["jules:write", "norm:turn"] });
+  const writeClient = await connect(writeOnly);
+  try {
+    const denied = await writeClient.callTool({ name: "jules_list_sources", arguments: input("jules_list_sources") });
+    assert.equal(denied.isError, true);
+    assert.match(JSON.stringify(denied), /insufficient_scope/);
+    assert.equal(writeOnly.calls.length, 0, "jules:write must not imply jules:read");
+  } finally {
+    await writeClient.close();
+    await writeOnly.close();
+  }
+});
+
 test("real route: malformed controls and numeric bounds cannot reach business services", async () => {
   const fixture = routeFixture(); const client = await connect(fixture);
   try {
