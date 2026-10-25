@@ -1,6 +1,8 @@
 from __future__ import annotations
 from pathlib import Path
-import base64,re,sys
+import base64
+import re
+import sys
 ROOT=Path(__file__).resolve().parents[1]
 errors=[]
 def require(condition,message):

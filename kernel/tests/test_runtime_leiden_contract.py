@@ -1,10 +1,13 @@
 # @l0 L0-002-R / @req KA-00/REQ-2 / @acr ACR-2.1 / @ua UA-46,UA-47
+import re
 from importlib.metadata import version
 from pathlib import Path
 from types import SimpleNamespace
-import re
+
 import networkx as nx
+
 import khora_kernel.communities as communities
+
 
 def test_projection_revision_is_independent_of_undirected_insertion_order():
     a = nx.Graph()

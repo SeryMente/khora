@@ -1,4 +1,6 @@
-import ast,json,hashlib
+import ast
+import json
+import hashlib
 from pathlib import Path
 p=Path('./source/kernel/src/khora_kernel/epistwin_audit.py');tree=ast.parse(p.read_text());names={'membership_stability','partition_membership','compare_community_ab'};body=[n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name in names];mod=ast.fix_missing_locations(ast.Module(body=[ast.ImportFrom(module='__future__',names=[ast.alias(name='annotations')],level=0)]+body,type_ignores=[]));ns={'json':json,'hashlib':hashlib};exec(compile(mod,str(p),'exec'),ns)
 x={'id':'R11','expected':'Invariancia al renombrar etiquetas; sin población común no se declara estabilidad perfecta','observed':{'same_partition_renamed':ns['membership_stability']([{'A':['x','y'],'B':['z']},{'C':['x','y'],'D':['z']}]),'disjoint_population':ns['membership_stability']([{'A':['x']},{'B':['y']}]),'ab_changed_for_renaming':ns['compare_community_ab'](None,{'A':['x','y']},{'B':['x','y']})['changed']},'verdict':'FAIL','scope':'Exact three AST-extracted pure functions; networkx unavailable locally, no graph algorithm executed; not a measured longitudinal product result'};json.dump(x,open('./metric-regressions.json','w'),indent=2);print(json.dumps(x))
