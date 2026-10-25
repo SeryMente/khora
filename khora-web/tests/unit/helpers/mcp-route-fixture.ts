@@ -44,13 +44,30 @@ export function routeFixture(options: { scopes?: string[]; revoked?: boolean; de
     if (options.failService) throw new Error("synthetic-secret-private-payload");
     return options.partial ? { completo: false, resultados: [], cobertura: { examinados: 2, ilegibles: 1 } } : { fixture: name };
   };
+  let julesGetSessionCalls = 0;
+  const mockJulesGetSession = async (args?: unknown) => {
+    const result = await business("JulesGetSession")(args) as Record<string, unknown>;
+    julesGetSessionCalls++;
+    return {
+      ...result,
+      name: "sessions/fixture-session",
+      state: julesGetSessionCalls === 3 ? "AWAITING_PLAN_APPROVAL" : "AWAITING_USER_FEEDBACK",
+    };
+  };
+  const mockNormalizeSourceName = (value: string) => {
+    if (!/^sources\\/[A-Za-z0-9._-]+(?:\\/[A-Za-z0-9._-]+)*$/.test(value) || value.split("/").some(part => part === "." || part === "..")) {
+      throw new Error("JULES_SOURCE_ID_INVALID");
+    }
+    return value;
+  };
   const modules: Record<string, unknown> = {
     "node:crypto": crypto,
     "@/lib/server/mcp-diagnostics": diagnostics,
     "@/lib/jules/client": {
       listSources: business("JulesListSources"),
       listSessions: business("JulesListSessions"),
-      getSession: business("JulesGetSession"),
+      getSession: mockJulesGetSession,
+      normalizeSourceName: mockNormalizeSourceName,
       listActivitiesPage: business("JulesListActivitiesPage"),
       createSession: business("JulesCreateSession"),
       sendMessage: business("JulesSendMessage"),
