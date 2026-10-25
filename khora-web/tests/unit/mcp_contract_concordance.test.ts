@@ -244,3 +244,37 @@ test("real route: malformed controls and numeric bounds cannot reach business se
     assert.equal(fixture.calls.length, 0);
   } finally { await client.close(); await fixture.close(); }
 });
+
+
+test("Jules plan approval is blocked unless the session is awaiting plan approval", async () => {
+  const fixture = routeFixture();
+  const client = await connect(fixture);
+  try {
+    const result = await client.callTool({
+      name: "jules_approve_plan",
+      arguments: input("jules_approve_plan"),
+    });
+    assert.equal(result.isError, true);
+    assert.match(JSON.stringify(result), /JULES_PLAN_NOT_AWAITING_APPROVAL/);
+    assert.equal(fixture.calls.some(call => call.name === "JulesApprovePlan"), false);
+  } finally {
+    await client.close();
+    await fixture.close();
+  }
+});
+
+test("invalid Jules source names cannot reach the create-session API", async () => {
+  const fixture = routeFixture();
+  const client = await connect(fixture);
+  try {
+    const result = await client.callTool({
+      name: "jules_create_session",
+      arguments: { ...input("jules_create_session"), source: "sources/../other-repo" },
+    });
+    assert.equal(result.isError, true);
+    assert.equal(fixture.calls.some(call => call.name === "JulesCreateSession"), false);
+  } finally {
+    await client.close();
+    await fixture.close();
+  }
+});
