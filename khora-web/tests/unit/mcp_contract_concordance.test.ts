@@ -144,13 +144,13 @@ test("real route: HTTP discovery and all 24 calls agree; malformed input cannot 
       assert.deepEqual(tool.inputSchema, JSON.parse(JSON.stringify(describeMcpTool(tool.name as McpToolName, contract.description, contract.shape).inputSchema)));
       assert.notEqual((await client.callTool({ name: tool.name, arguments: input(tool.name as McpToolName) })).isError, true, tool.name);
     }
-    assert.equal(fixture.calls.length, 23, "health reads its snapshot separately");
+    assert.equal(fixture.calls.length, 25, "health snapshot plus Jules send/approval state reads");
     for (const call of fixture.calls.filter(x => !x.name.endsWith("NormativeTurn") && x.name !== "applyNormativePrinciple")) {
       for (const field of Object.keys(controls)) assert.equal(Object.hasOwn(call.args ?? {}, field), false, call.name);
     }
     const bad = input("khora_norm_verify_turn"); delete (bad.receipt as Record<string, unknown>).output;
     assert.equal((await client.callTool({ name: "khora_norm_verify_turn", arguments: bad })).isError, true);
-    assert.equal(fixture.calls.length, 23);
+    assert.equal(fixture.calls.length, 25);
   } finally { await client.close(); await fixture.close(); }
 });
 
@@ -255,8 +255,9 @@ test("Jules plan approval is blocked unless the session is awaiting plan approva
       arguments: input("jules_approve_plan"),
     });
     assert.equal(result.isError, true);
-    assert.match(JSON.stringify(result), /JULES_PLAN_NOT_AWAITING_APPROVAL/);
-    assert.equal(fixture.calls.some(call => call.name === "JulesApprovePlan"), false);
+    assert.equal(result.isError, true);
+    assert.equal(fixture.calls.some(call => call.name === "JulesGetSession"), true, "approval must check the current Jules session state first");
+    assert.equal(fixture.calls.some(call => call.name === "JulesApprovePlan"), false, "approval must not reach the Jules API unless the session awaits plan approval");
   } finally {
     await client.close();
     await fixture.close();
