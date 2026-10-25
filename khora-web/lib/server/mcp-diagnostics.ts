@@ -53,6 +53,14 @@ const messages: Record<string, [string, string, string, boolean]> = {
   MCP_HISTORY_PARTIAL: ["Khora no pudo consultar una parte del historial. Lo recibido está incompleto.", "Revisa qué parte falló. Una lista vacía en esa parte no significa que no haya historial.", "database", false],
   MCP_UI_RENDER_FAILED: ["Khora no pudo generar la vista de pantalla que pediste.", "Inténtalo de nuevo más tarde. Si persiste, el administrador debe revisar el servicio que genera esa vista.", "renderer", true],
   MCP_INTERNAL_ERROR: ["Khora encontró un fallo que todavía no sabe explicar.", "El administrador debe revisar el registro con el identificador de seguimiento. No se debe adivinar la causa ni repetir cambios a ciegas.", "internal", false],
+  JULES_API_KEY_MISSING: ["Al servidor Khora le falta la credencial de Jules.", "El administrador debe configurar JULES_API_KEY en el entorno seguro del servidor. No pegar la clave en el chat, código ni registros.", "jules", false],
+  JULES_API_AUTH_REJECTED: ["Jules rechazó la credencial o los permisos del servidor.", "El administrador debe comprobar la API key y el acceso de la cuenta de Jules sin exponer la clave.", "jules", false],
+  JULES_RATE_LIMITED: ["Jules limitó temporalmente las solicitudes.", "Reintentar después respetando el tiempo de espera y sin repetir operaciones de escritura a ciegas.", "jules", true],
+  JULES_API_FAILED: ["Khora no pudo completar la solicitud a Jules.", "Revisar el estado de Jules y el registro saneado de la operación. Si se trata de una escritura, comprobar primero si ya surtió efecto.", "jules", true],
+  JULES_SOURCE_ID_INVALID: ["La fuente indicada no tiene el formato de una fuente Jules admitida.", "Selecciona un nombre literal devuelto por jules_list_sources; no inventes ni construyas una fuente.", "validation", false],
+  JULES_SESSION_ID_INVALID: ["La referencia de sesión Jules no tiene el formato esperado.", "Usa el ID o nombre de sesión devuelto por Jules, no una URL ni una ruta arbitraria.", "validation", false],
+  JULES_PLAN_NOT_AWAITING_APPROVAL: ["La sesión de Jules no está esperando aprobación de plan.", "Lee el estado y las actividades actuales. Aprueba solo después de revisar un plan real en estado AWAITING_PLAN_APPROVAL.", "jules", false],
+  JULES_SESSION_NOT_READY_FOR_MESSAGE: ["La sesión de Jules no admite un mensaje de seguimiento en su estado actual.", "Consulta el estado y las actividades. No envíes una respuesta hasta confirmar que la sesión puede recibirla.", "jules", false],
 };
 
 // Plain explanations for protected authorization logs; never expose these instead of the public access response.
