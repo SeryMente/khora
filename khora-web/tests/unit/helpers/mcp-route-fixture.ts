@@ -55,7 +55,7 @@ export function routeFixture(options: { scopes?: string[]; revoked?: boolean; de
     };
   };
   const mockNormalizeSourceName = (value: string) => {
-    if (!/^sources\\/[A-Za-z0-9._-]+(?:\\/[A-Za-z0-9._-]+)*$/.test(value) || value.split("/").some(part => part === "." || part === "..")) {
+    if (!/^sources\/[A-Za-z0-9._-]+(?:\/[A-Za-z0-9._-]+)*$/.test(value) || value.split("/").some(part => part === "." || part === "..")) {
       throw new Error("JULES_SOURCE_ID_INVALID");
     }
     return value;
