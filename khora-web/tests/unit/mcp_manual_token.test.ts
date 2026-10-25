@@ -45,14 +45,14 @@ test("manual Bearer token is high-entropy, scoped, expiring and stored by hash",
   try {
     const result = await createManualMcpToken({
       usuario: "operador@khora.app",
-      scopes: ["volcados:read", "norm:turn"],
+      scopes: ["volcados:read", "norm:turn", "jules:read", "jules:write"],
       expiresInDays: 90,
       label: "ChatGPT",
     });
 
     assert.match(result.token, /^khora_mcp_v1_[0-9a-f]{64}$/);
     assert.equal(result.bearer, "Bearer " + result.token);
-    assert.equal(result.record.scope, "volcados:read norm:turn");
+    assert.equal(result.record.scope, "volcados:read norm:turn jules:read jules:write");
     assert.equal(result.record.generacion, 7);
     assert.equal(inserted.token_prefix, result.token.slice(0, 21));
     assert.notEqual(inserted.token_hash, result.token);
