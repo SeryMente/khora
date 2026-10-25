@@ -1,6 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const envVars = "NEXT_PUBLIC_API_URL=http://127.0.0.1:3999 PLAYWRIGHT_TEST_RUN=1 PLAYWRIGHT_TEST_BYPASS=true MCP_OAUTH_CLIENT_ID=mock-client-id MCP_OAUTH_CLIENT_SECRET=mock-client-secret MCP_OAUTH_REDIRECT_URIS=http://localhost:3000/callback MCP_JWT_SECRET=mock-jwt-secret-at-least-32-chars-long MCP_ALLOWED_EMAIL=test@example.com MCP_CANONICAL_URL=http://localhost:3000/api/mcp KHORA_READONLY_DATABASE_URL=postgres://localhost:5432/mock DATABASE_URL=postgres://localhost:5432/mock KHORA_UI_REVIEW_MODE=1";
+const envVars = "NEXT_PUBLIC_API_URL=http://127.0.0.1:3999 OIDC_ISSUER_URL=http://localhost:8080/realms/mock AUTH_SECRET=mock-secret PLAYWRIGHT_TEST_RUN=1 PLAYWRIGHT_TEST_BYPASS=true MCP_OAUTH_CLIENT_ID=mock-client-id MCP_OAUTH_CLIENT_SECRET=mock-client-secret MCP_OAUTH_REDIRECT_URIS=http://localhost:3000/callback MCP_JWT_SECRET=mock-jwt-secret-at-least-32-chars-long MCP_ALLOWED_EMAIL=test@example.com MCP_CANONICAL_URL=http://localhost:3000/api/mcp KHORA_READONLY_DATABASE_URL=postgres://localhost:5432/mock DATABASE_URL=postgres://localhost:5432/mock KHORA_UI_REVIEW_MODE=1";
 
 export default defineConfig({
 	testDir: "./",
