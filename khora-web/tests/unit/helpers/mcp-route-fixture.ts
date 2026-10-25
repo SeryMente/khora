@@ -38,7 +38,7 @@ export function routeFixture(options: { scopes?: string[]; revoked?: boolean; de
   }
   const issuer = "https://khora-contract-fixture.invalid";
   const config = { issuer, canonicalUrl: issuer + "/api/mcp", jwtSecret: "synthetic-key-not-used-for-signing" };
-  const scopes = options.scopes ?? ["volcados:read", "runtime:read", "norm:turn"];
+  const scopes = options.scopes ?? ["volcados:read", "runtime:read", "norm:turn", "jules:read", "jules:write"];
   const business = (name: string) => async (args?: unknown) => {
     calls.push({ name, args });
     if (options.failService) throw new Error("synthetic-secret-private-payload");
@@ -47,6 +47,15 @@ export function routeFixture(options: { scopes?: string[]; revoked?: boolean; de
   const modules: Record<string, unknown> = {
     "node:crypto": crypto,
     "@/lib/server/mcp-diagnostics": diagnostics,
+    "@/lib/jules/client": {
+      listSources: business("JulesListSources"),
+      listSessions: business("JulesListSessions"),
+      getSession: business("JulesGetSession"),
+      listActivitiesPage: business("JulesListActivitiesPage"),
+      createSession: business("JulesCreateSession"),
+      sendMessage: business("JulesSendMessage"),
+      approvePlan: business("JulesApprovePlan"),
+    },
     "@/lib/server/mcp-diagnostic-boundary": boundary,
     "next/server": { NextRequest: Request, NextResponse: Response },
     "zod": { z },
