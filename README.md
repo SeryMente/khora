@@ -20,9 +20,9 @@ Contrato, mapa de c├│digo, garant├¡as, recuperaci├│n, audio original/
 
 OCP observados en `main` (rutas vigentes, incluidas las heredadas):
 
-- [Dictado de voz](docs/frentes/dictado-voz/OBJETO-CANONICO.md) — `docs/frentes/dictado-voz/`.
-- [Harmonia](docs/frentes/harmonia/OBJETO-CANONICO.md) — `docs/frentes/harmonia/`.
-- [Tareas automáticas](docs/frentes/tareas-automaticas/OBJETO-CANONICO.md) — `docs/frentes/tareas-automaticas/`.
-- [Custodia transversal](frentes/custodia/OBJETO-CANONICO.md) — persistencia, seguridad y recuperación de información entre canales.
+1. [Dictado de voz](docs/frentes/dictado-voz/OBJETO-CANONICO.md) — `docs/frentes/dictado-voz/`.
+2. [Harmonia](docs/frentes/harmonia/OBJETO-CANONICO.md) — `docs/frentes/harmonia/`.
+3. [Tareas automáticas](docs/frentes/tareas-automaticas/OBJETO-CANONICO.md) — `docs/frentes/tareas-automaticas/`.
+4. [Custodia transversal](frentes/custodia/OBJETO-CANONICO.md) — persistencia, seguridad y recuperación de información entre canales.
 
 Estas rutas bajo `docs/frentes/` se conservan como OCP autoritativos; no se trasladan por uniformidad nominal. El código de producto, configuración y automatizaciones comunes permanecen en sus áreas propias del repositorio, salvo que un recurso tenga un único propietario de frente demostrado. No crear una carpeta genérica de recursos compartidos sin consumidores reales identificados.
