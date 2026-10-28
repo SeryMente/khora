@@ -45,7 +45,7 @@ El paquete local referido como Harmonia v0.5.0, el destino actual y su estructur
 La autorización afirmativa literal del operador es `Si`, preservada en [U20](HARMONIA-TRANSFER-SES-20261028-P9K4R7M2.jsonl), blob `bfe29b24091e039f901592b66887336a9b8b0235`.
 
 - Frente: Harmonia · `SeryMente/khora`.
-- OCP: `docs/frentes/harmonia/OBJETO-CANONICO.md`; corte de entrada v0.26 / `HARMONIA-v0.26`.
+- OCP: `docs/frentes/harmonia/OBJETO-CANONICO.md`; versión vigente v0.27 / `HARMONIA-v0.27`, §34, persistida y leída de vuelta en este ciclo.
 - Folio nuevo: `SES-20261028-P9K4R7M2`.
 - Alias operativo: `chatgpt-harmonia-SES-20261028-P9K4R7M2`. `owner_thread=null`: la plataforma no expuso un ID nativo.
 - Generación: 7 → 8. Propietario anterior gen7 / `SES-20261022-6E3A91F7` preservado en `previous_owner` e historial.
@@ -80,4 +80,4 @@ El paquete local referido históricamente como v0.5.0 y su sincronización con l
 7. **Tiempo/ciclos:** cierre de operaciones locales/E2E NO ESTIMABLE hasta resolver la dependencia del dispositivo exacto.
 8. **Siguiente acción:** reactivar Remote Desktop Commander en el PC-14 con UUID `345f64ee-5d6a-429f-a97c-dab44f44cddb`, mediante `npx @wonderwhy-er/desktop-commander@latest remote` desde terminal elevada; obtener handshake con conectividad, usuario Windows y perfil, volver a consultar dispositivos y actuar solo cuando el mismo UUID esté Online y se verifique la cuenta/perfil.
 9. **Continuación:** no repetir pruebas históricas ni abrir mejoras de CPU/RAM, UX o arquitectura multiámbito antes de resolver la puerta esencial de captura natural y persistencia. No se ha afirmado sincronización automática.
-10. **Persistencia:** U20 y `PROCEDENCIA.md` guardados y leídos de vuelta; control gen8 CAS/read-back verificado; el OCP se actualizará a v0.27 con este checkpoint y la referencia a esta salida, y README/prompt se alinearán con el estado actual. Sin mutaciones de código ni operaciones locales en este ciclo.
+10. **Persistencia:** U20 y `PROCEDENCIA.md` guardados y leídos de vuelta; control gen8 CAS/read-back verificado; OCP v0.27 / §34 persistido y leído de vuelta; README y prompt de asistente alineados con el titular gen8 y con el DUG v353, y leídos de vuelta; crónica de este ciclo guardada y verificada. Sin mutaciones de código ni operaciones locales en este ciclo.
