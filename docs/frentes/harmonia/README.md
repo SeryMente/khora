@@ -36,7 +36,7 @@ La consulta viva de RDC de este ciclo confirma que el UUID autorizado de PC-14 `
 
 ## Estado activo · SES-20261028-P9K4R7M2
 
-- OCP canónico: `docs/frentes/harmonia/OBJETO-CANONICO.md`, v0.27 / HARMONIA-v0.27, §34; blob tras lectura de vuelta `d0fd92b7583befc2b2efb2a9fe38728730a59174`.
+- OCP canónico: `docs/frentes/harmonia/OBJETO-CANONICO.md`, v0.27 / HARMONIA-v0.27, §34; blob tras lectura de vuelta `65b75275e7772eab9f0a5acaaf537f04a6f00f3b`.
 - Titularidad vigente verificada en `CONTROL-RESPONSABILIDAD.json`: generación 8, folio `SES-20261028-P9K4R7M2`, alias operativo `chatgpt-harmonia-SES-20261028-P9K4R7M2`, blob actual `2b8e5091e621b1017ed1e55f2796cc48f9ba444b`. La autorización literal `Si` está preservada en [U20](originales/HARMONIA-TRANSFER-SES-20261028-P9K4R7M2.jsonl). El ID nativo no se expone.
 - Salida visible de este ciclo, que incluye la salida anterior literal: [HARMONIA-TRANSFER-SES-20261028-P9K4R7M2-salida.md](originales/HARMONIA-TRANSFER-SES-20261028-P9K4R7M2-salida.md), blob `14324b47502cd7363f31e02734e3d90db48543da`. Crónica del ciclo: [HARMONIA-TRANSFER-SES-20261028-P9K4R7M2.md](cronica/HARMONIA-TRANSFER-SES-20261028-P9K4R7M2.md).
 - Gobierno actual: DUG v353 / NX-353m, blob `16c93745311a5405166a31b583c2a648fda0d044`; Metacanon 1.21 y GOW v2.3 integrados en el mismo archivo.
