@@ -29,6 +29,27 @@
   "acquired_at": "2026-10-28",
   "bootstrap_scope": "Creación y custodia documental inicial del frente transversal Custodia. No autoriza cambios de código de producto, credenciales, seguridad, despliegues, contratos de proveedores, migraciones ni acceso a datos reales.",
   "enforcement": "cooperative registry; no server fencing of arbitrary writes",
-  "repository_visibility_note": "GitHub API reports SeryMente/khora as public on 2026-10-28. README.md says the repository is operated as private. The discrepancy is unresolved; no privacy guarantee is asserted.",
-  "readback_required": true
+  "repository_visibility_note": "Las consultas de metadatos de GitHub en este ciclo fueron inconsistentes: la consulta inicial antes de las escrituras devolvió public; dos consultas consecutivas posteriores a las escrituras devolvieron private, coincidiendo ahora con el README. Estado actual observado: private. No se conoce la causa ni el momento de la diferencia, y no se ha verificado si el contenido fue accesible públicamente durante algún intervalo.",
+  "readback_required": true,
+  "visibility_observations": [
+    {
+      "stage": "pre-write inspection",
+      "result": "public",
+      "source": "mcp__GitHub__get_repo"
+    },
+    {
+      "stage": "post-write verification 1",
+      "result": "private",
+      "source": "mcp__GitHub__get_repo"
+    },
+    {
+      "stage": "post-write verification 2",
+      "result": "private",
+      "source": "mcp__GitHub__get_repo"
+    }
+  ],
+  "current_visibility_observed": "private",
+  "current_visibility_confirmed_by_consecutive_reads": 2,
+  "visibility_transition_cause": "unknown",
+  "historical_public_exposure_assessment": "not_verified"
 }
