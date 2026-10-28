@@ -1169,6 +1169,6 @@ El paquete local referido como Harmonia v0.5.0, el destino actual y su estructur
 
 ### Persistencia de este ciclo
 
-- La última salida visible anterior se recuperó literalmente de `originales/HARMONIA-TRANSFER-SES-20261022-6E3A91F7-salida.md`, blob `81dc1aff77a25f09b5b65e69802f2e274af2a34c`. La salida de este ciclo la conserva íntegra al inicio, en [HARMONIA-TRANSFER-SES-20261028-P9K4R7M2-salida.md](originales/HARMONIA-TRANSFER-SES-20261028-P9K4R7M2-salida.md), blob `14324b47502cd7363f31e02734e3d90db48543da`.
+- La última salida visible anterior se recuperó literalmente de `originales/HARMONIA-TRANSFER-SES-20261022-6E3A91F7-salida.md`, blob `81dc1aff77a25f09b5b65e69802f2e274af2a34c`. La salida de este ciclo la conserva íntegra al inicio, en [HARMONIA-TRANSFER-SES-20261028-P9K4R7M2-salida.md](originales/HARMONIA-TRANSFER-SES-20261028-P9K4R7M2-salida.md), blob `c96c7333523d21361976e6b7d4f42eea4f7cc0ba`.
 - Crónica de este ciclo: [HARMONIA-TRANSFER-SES-20261028-P9K4R7M2.md](cronica/HARMONIA-TRANSFER-SES-20261028-P9K4R7M2.md), lectura de vuelta exacta confirmada. README y prompt de asistente se alinearon con el OCP v0.27 y se leyeron de vuelta; sus huellas de revisión constan en la crónica. Estas materializaciones no crean un segundo núcleo de estado.
 - No se tocó código de Harmonia ni se declaró aceptación funcional.
