@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.21; OBJECT_VERSION=0.1; OBJECT_SEAL=CUSTODIA-v0.1; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.21; OBJECT_VERSION=0.2; OBJECT_SEAL=CUSTODIA-v0.2; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · INICIAL · VIVO · NO CERTIFICADO COMO GARANTÍA DE PRODUCTO.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.1. Metacanon: 1.21 · METACANON-OBJETOS-v1.21. Gobierno general consultado: Samantha v346 · NX-346m; GOW v2.2. Corte de repositorio leído antes de la creación: ef2a6e12058f908a3cf469ab0bcdc834a4f79a6f. Este objeto funda el frente documental transversal; no prueba que las garantías descritas ya estén implementadas ni certificadas.
+> **ESTADO · VIVO · TAREAS PENDIENTES DOCUMENTADAS · NO CERTIFICADO COMO GARANTÍA DE PRODUCTO.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.2. Metacanon: 1.21 · METACANON-OBJETOS-v1.21. Gobierno general consultado en esta actualización: Samantha v348 · NX-348m; GOW v2.3. Fuente central leída desde main, blob a4c90bd8ff1cd360b1f1662ff55371bd1b56b4cd. Este objeto funda el frente documental transversal; no prueba que las garantías descritas ya estén implementadas ni certificadas.
 
 ## 1. Control e identidad
 
@@ -12,7 +12,8 @@
 - **Único núcleo operativo:** este OBJETO-CANONICO.md.
 - **Control único de responsabilidad:** [CONTROL-RESPONSABILIDAD.json](CONTROL-RESPONSABILIDAD.json). Se crea en generación 1, sin titularidad continuada asignada; el folio de creación no equivale a una transferencia de responsabilidad.
 - **Propósito literal aprobado:** [originales/PROPOSITO-OPERADOR-2026-10-28.md](originales/PROPOSITO-OPERADOR-2026-10-28.md). La sección 4 también conserva el texto aprobado íntegro para que el propósito sea visible en el núcleo.
-- **Versión y sello:** CUSTODIA-v0.1. Es la primera versión del objeto documental, no una versión del producto.
+- **Lista de tareas:** [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md), materialización auxiliar provisional de los pendientes; su diseño debe revisarse en CUSTODIA-02. No se declara todavía conforme a la metodología.
+- **Versión y sello vigentes:** CUSTODIA-v0.2. Es la segunda versión documental del objeto; no es una versión del producto.
 - **Relación con frentes existentes:** este frente es transversal. No sustituye ni duplica el objeto de Dictado de voz ([docs/frentes/dictado-voz/OBJETO-CANONICO.md](../../docs/frentes/dictado-voz/OBJETO-CANONICO.md)) ni su contrato de implementación ([khora-web/docs/CUSTODIA-DICTADOS.md](../../khora-web/docs/CUSTODIA-DICTADOS.md)).
 - **Visibilidad del repositorio:** la consulta inicial de GitHub devolvió public; dos consultas posteriores devolvieron private y coinciden con el README. El estado más reciente observado es private. El momento y la causa de la diferencia, así como una posible exposición pública anterior, no están verificados.
 
@@ -25,15 +26,16 @@
 5. No crear otro almacén principal, espejo, tablero ni contrato paralelo para resolver un fallo de custodia. Identificar primero los sistemas existentes, sus propietarios, sus datos y sus consumidores.
 6. No realizar cambios de producto, de seguridad, de credenciales, de proveedor ni de despliegue por el mero hecho de que el propósito los mencione.
 7. La consulta inicial de GitHub devolvió public y dos comprobaciones posteriores devolvieron private. Aunque el estado actual observado es private, no se verificaron la causa ni el periodo de la diferencia; no guardar secretos, credenciales ni datos personales reales en este repositorio mientras no se aclare la exposición histórica.
+8. El estado detallado de las tareas se mantiene provisionalmente en `LISTA-TAREAS-PROVISIONAL.md`, enlazada desde el núcleo. No es una plantilla metodológica aprobada: CUSTODIA-02 debe revisar si esta separación y sus campos son adecuados.
 
 ## 3. Referencia metodológica
 
-- **Fuente normativa consultada:** [METAPROMPT-CANONICO-SAMANTHA.html](https://github.com/SeryMente/metodologia/blob/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html), rama main, revisión de archivo consultada con blob bc46e261eedb270546f22d3935cd9fdadb47d75c.
-- **Versión de gobierno observada:** Samantha v346 · NX-346m.
+- **Fuente normativa consultada en este ciclo:** [METAPROMPT-CANONICO-SAMANTHA.html](https://github.com/SeryMente/metodologia/blob/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html), rama main, blob a4c90bd8ff1cd360b1f1662ff55371bd1b56b4cd.
+- **Versión de gobierno observada:** Samantha v348 · NX-348m.
 - **Metacanon:** 1.21 · METACANON-OBJETOS-v1.21.
-- **Gobierno general:** GOW v2.2.
-- **Cláusulas aplicadas:** §39 (propósito literal y lectura operativa separada); §§3 y 27 (anatomía de trece bloques); §28 (originales, crónica y cotejo al cerrar cada ciclo); §§46 y 48 (directorio para OCP nuevos y conservación de rutas heredadas); §47 (folio operativo y límites de unicidad).
-- La lectura de la fuente central acredita la versión documental observada, no una auditoría integral de todos los principios, anexos, recursos o sistemas externos.
+- **Gobierno general:** GOW v2.3.
+- **Cláusulas aplicadas a este ciclo:** §3 (pendientes ordenados dentro del estado vivo); §§27 y 46 (núcleo único y materializaciones necesarias del OCP); §28 (instrucción original, crónica, evidencia y lectura de vuelta); §§39 y 48 (conservar el propósito y la ruta canónica, sin crear controles u objetos paralelos).
+- Esta adquisición identifica la versión del canon central; no equivale a una auditoría integral de todos sus principios o anexos ni a una declaración de conformidad definitiva del diseño de lista.
 
 ## 4. Propósito y alcance
 
@@ -95,7 +97,9 @@ Custodia es el frente transversal que define, verifica y gobierna las garantías
 
 ## 8. Estado vivo
 
-**Estado del frente: INICIAL — DOCUMENTACIÓN CREADA — GARANTÍAS TRANSVERSALES NO VERIFICADAS.**
+**Estado del frente: ACTUALIZADO — DOS TAREAS PENDIENTES DOCUMENTADAS PROVISIONALMENTE — GARANTÍAS TRANSVERSALES NO VERIFICADAS.**
+
+El detalle operativo de pendientes se mantiene provisionalmente en [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md). Ese archivo es una materialización auxiliar enlazada desde el único núcleo; su diseño es objeto de la tarea CUSTODIA-02 y no se declara definitivo ni plenamente conforme al método.
 
 ### Confirmado en la fuente consultada
 
@@ -112,6 +116,8 @@ Custodia es el frente transversal que define, verifica y gobierna las garantías
 - Evidencia de restauración verificable, reconciliación de contenido, procedencia, hashes/identificadores y detección de duplicados.
 - Viabilidad, restricciones, plan de reversión y aceptación de cualquier eventual migración a Backblaze.
 - Determinar la causa y el periodo de la diferencia observada en la visibilidad del repositorio; estado actual informado por dos lecturas consecutivas: private.
+
+La tarea prioritaria CUSTODIA-01 registra el reporte del operador de que la interfaz de Cora indica 20 dictados recuperables. Esta sesión no ha inspeccionado esos elementos, no ha ejecutado su recuperación y no puede confirmar su contenido ni el funcionamiento real del mecanismo.
 
 No se declara cero pérdidas, cifrado integral, cobertura de todos los canales, migración terminada ni certificación productiva.
 
@@ -131,7 +137,7 @@ El criterio de éxito global no es «hay un archivo» ni «la petición HTTP res
 
 ## 10. Formato de ciclo
 
-Cada ciclo futuro dejará en este núcleo, dentro de la crónica, al menos:
+Cada ciclo futuro dejará en este núcleo, dentro de la crónica, al menos. El estado detallado de las tareas se materializa provisionalmente en [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md); esta separación se revisará como CUSTODIA-02 y no se tomará como diseño final hasta cerrar esa revisión:
 
 - Folio del ciclo y fecha; objetivo y autorización concreta.
 - Fuentes realmente adquiridas, rama/revisión y diferencias frente al ciclo anterior.
@@ -162,6 +168,18 @@ No se rellenan huecos con inferencias ni se da por ejecutada una prueba porque a
 - **Commits de la secuencia documental:** original 67231f6200f0c447c21838509fae986096a79d0f; control inicial 44112cf40c6c2af6f08f3564e69e13682833ca39; objeto inicial d177f6ed19cb653cdc1ecd5cbdb80ff0547b497f; enlace al índice raíz ca415160cec3b273cdc698085fe4324086b8b8b4; revisión del control de visibilidad 52dfe1f4d2918c5ec3645ab1a258e1cfbb5f5dde; reconciliación de visibilidad en este objeto d5b73f140970d68033e1f1867128fe1a0aa9c2ce.
 - **Índice raíz:** se añadió la referencia del frente al README y se verificó después de la actualización del núcleo; blob README e8194b370541acbcc8217ce295625a411230c3c4 · [lectura en GitHub](https://github.com/SeryMente/khora/blob/main/README.md).
 
+### Ciclo 2 · CUSTODIA-TASKS-SES-20261028-C8M4R7Q1-02 · 2026-10-28
+
+- **Objetivo:** incorporar provisionalmente los dos pendientes expresamente solicitados y conservar la duda metodológica del operador sobre cómo debe diseñarse una lista de tareas de FT/OCP.
+- **Instrucción original:** preservada en [originales/INSTRUCCION-PENDIENTES-2026-10-28.md](originales/INSTRUCCION-PENDIENTES-2026-10-28.md), commit inicial 443ca1826b655b068b79096ff59b01515fbc79a8.
+- **Autoridad:** instrucción directa del operador para documentar dos tareas en este frente. No implica autorización para ejecutar la recuperación de dictados en este ciclo ni para cambiar código, servicios o datos.
+- **Acción documental:** creada [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md) en estado provisional, commit inicial 2ec37a0d1e0ec024555cb54249c4215c7f9821ee. CUSTODIA-01 es P0/urgente y está pendiente de inicio; CUSTODIA-02 revisará el diseño de la propia lista conforme al Metacanon vigente.
+- **Hipótesis y corrección:** no asumir que el indicador de «20 dictados recuperables» demuestra recuperación efectiva. El número y contenido fueron reportados por el operador; esta sesión no observó la interfaz ni recuperó dictados.
+- **Resultado:** las dos tareas quedan materializadas como pendientes. No se inspeccionó contenido de dictados, no se ejecutó recuperación y no se validó el mecanismo.
+- **Gobierno adquirido:** Samantha v348 · NX-348m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3. Fuente central: blob a4c90bd8ff1cd360b1f1662ff55371bd1b56b4cd.
+- **Límite de evidencia:** el diseño de la lista está expresamente pendiente de revisión; la presencia de la lista en el repositorio no acredita que su esquema sea el óptimo o definitivo.
+- **Siguiente prueba/checkpoint:** comenzar por CUSTODIA-01: validar el listado en la interfaz y procurar la recuperación efectiva de los 20 dictados, con verificación individual, preservando datos personales y originales. Después abordar CUSTODIA-02.
+
 ### Fuentes y referencias
 
 - [Gobernanza única Samantha](https://github.com/SeryMente/metodologia/blob/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html).
@@ -174,13 +192,15 @@ No se rellenan huecos con inferencias ni se da por ejecutada una prueba porque a
 
 Instrucción para una conversación futura:
 
-> Retoma el frente transversal Custodia en SeryMente/khora, rama main. Adquiere primero frentes/custodia/OBJETO-CANONICO.md, CONTROL-RESPONSABILIDAD.json, el original del propósito y el Metacanon vigente en SeryMente/metodologia/main. Mantén separadas las garantías de propósito de la evidencia de producto. Para dictados, lee también el objeto de Dictado de voz y khora-web/docs/CUSTODIA-DICTADOS.md; no dupliques almacenes ni contratos. Antes de implementar, investiga canales, almacenes, permisos, proveedores y pruebas existentes. No cambies código, credenciales, seguridad, despliegues ni servicios sin autorización específica. No declares conservación o recuperación garantizada sin pruebas reproducibles y lectura de vuelta. La titularidad continuada no está asignada en el control actual.
+> Retoma el frente transversal Custodia en SeryMente/khora, rama main. Adquiere primero frentes/custodia/OBJETO-CANONICO.md, CONTROL-RESPONSABILIDAD.json, LISTA-TAREAS-PROVISIONAL.md, los originales del propósito y de la instrucción de tareas y el Metacanon vigente en SeryMente/metodologia/main. La lista actual es provisional y su diseño es asunto de CUSTODIA-02; antes de darla por conforme, revisa la versión vigente del canon. Prioridad inmediata: CUSTODIA-01, validar en Cora la existencia del listado que el operador reportó como 20 dictados recuperables y recuperar esos elementos con verificación individual. No digas que la interfaz o el contenido fueron comprobados antes de observarlos. Preserva datos y originales; no copies contenido sensible real al repositorio. Si para operar la interfaz o el entorno local se necesita Remote Desktop Commander, verifica primero que la conexión esté activa; si no lo está, no ejecutes la acción y pide iniciar el comando autorizado. No dupliques almacenes, controles, objetos ni contratos. No cambies código, credenciales, seguridad, despliegues ni servicios sin autorización específica. No declares conservación o recuperación garantizada sin pruebas reproducibles y lectura de vuelta. La titularidad continuada no está asignada en el control actual.
 
 ## 13. Persistencia y revisión
 
 - **Núcleo único:** frentes/custodia/OBJETO-CANONICO.md.
 - **Control único:** frentes/custodia/CONTROL-RESPONSABILIDAD.json.
 - **Original aprobado:** frentes/custodia/originales/PROPOSITO-OPERADOR-2026-10-28.md.
+- **Lista auxiliar provisional de tareas:** frentes/custodia/LISTA-TAREAS-PROVISIONAL.md.
+- **Original de la instrucción de tareas:** frentes/custodia/originales/INSTRUCCION-PENDIENTES-2026-10-28.md.
 - Las rutas de arriba no constituyen un segundo almacén de producto; son la base documental del frente.
 - Tras cada ciclo: leer de vuelta los archivos modificados; comparar el propósito con el original aprobado; verificar el JSON; registrar el SHA real del archivo y el commit real; revisar el diff; no fijar hashes autorreferentes inventados.
 - Revisar el Metacanon central y la rama main antes de cada ciclo material. Si la fuente o alguna evidencia no está disponible, declarar exactamente qué no se verificó y bloquear solo las decisiones que dependan de ello.
