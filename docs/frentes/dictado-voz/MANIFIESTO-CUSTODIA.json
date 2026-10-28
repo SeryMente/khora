@@ -255,9 +255,9 @@
     },
     {
       "path": "OBJETO-CANONICO.md",
-      "bytes": 221597,
-      "sha256": "4598238704bf0e80f0e97bbbf178a21570dd6e83dbcf40735bf3c55c3cd67492",
-      "git_blob_sha": "dc33c6eba0248a9f59f7d226d8712f496fb289e8"
+      "bytes": 222989,
+      "sha256": "25248b7b1ae70d34910893fdabbf1c2daab7e2ffaa0a34e71f60071b041d1930",
+      "git_blob_sha": "38106dc183d4fa36658fabe1507c381bcf4082cd"
     },
     {
       "path": "evidencias/dialogo.test.ts",
@@ -488,12 +488,12 @@
     "no_secret_values_in_manifest": true
   },
   "current_preparation": {
-    "version": "0.6.16",
+    "version": "0.6.17",
     "baseSha": "f0dfbdcb2d79eb6289dacba272ddcc7ba2023063",
     "receipt": "evidencias/C030-release.json",
-    "state": "C042: transferencia/control/continuidad/OCP/manifiesto actualizados y leídos de vuelta. PR #335 reconsultado: abierto, no fusionado, 350 archivos. No se modificó producto, no se ejecutaron pruebas ni despliegue; el último corte técnico sigue siendo C030 y no se revalidó en C042."
+    "state": "C042: transferencia, control, continuidad, OCP y manifiesto actualizados y leídos de vuelta. Auditoría focalizada de PR #335: elimina control de responsabilidad, índice de frentes del README y manifiesto de Harmonia; matriz U01–U06 conserva FALTA/PARCIAL/SUPUESTO. PR abierto, sin fusionar y mergeable=false. No se modificó producto, no se ejecutaron pruebas de producto ni despliegue; último corte técnico C030, no revalidado."
   },
-  "latestEvent": "C042 — transferencia de responsabilidad autorizada y verificada por compare-and-swap/read-back; OCP actualizado a v0.6.16; manifiesto reconciliado; PR #335 sigue abierto/no fusionado y no sincronizado con main; producto sin cambios; MCP-NORMATIVO desactivado.",
+  "latestEvent": "C042 — transferencia de responsabilidad autorizada y verificada por compare-and-swap/read-back; OCP actualizado a v0.6.17; manifiesto reconciliado; auditoría focalizada confirma bloqueos de alcance/historial en PR #335, que sigue abierto, no fusionado y no sincronizado con main; producto sin cambios; MCP-NORMATIVO desactivado.",
   "latest_verified_release": {
     "sha": "f0dfbdcb2d79eb6289dacba272ddcc7ba2023063",
     "deploymentId": "dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr",
@@ -520,7 +520,7 @@
     "technicalPublicationVerified": true
   },
   "latest_cycle": "C042",
-  "canonical_version": "0.6.16",
+  "canonical_version": "0.6.17",
   "latest_candidate": {
     "pr": 335,
     "url": "https://github.com/SeryMente/khora/pull/335",
@@ -639,11 +639,13 @@
   },
   "latest_product_event": "C042 — no product code/tests/deployment changes; last technically verified product release remains C030 (main f0dfbdcb2d79eb6289dacba272ddcc7ba2023063, deployment dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr); physical acceptance and global gate remain pending, not revalidated in C042.",
   "latest_object": {
-    "version": "0.6.16",
+    "version": "0.6.17",
     "ref": "main",
-    "blob_sha": "dc33c6eba0248a9f59f7d226d8712f496fb289e8",
-    "commit": "f839336ca237ce1751fae5a0ef812a173d217e45",
-    "state": "C042 transfer and continuity recorded; responsibility generation 3 verified; PR #335 remains open/unmerged and not integrated; product unchanged; exact read-back verified"
+    "blob_sha": "38106dc183d4fa36658fabe1507c381bcf4082cd",
+    "commit": "c2bf14560b77bbfad97c5f2af6ecde5d0b3faef0",
+    "bytes": 222989,
+    "sha256": "25248b7b1ae70d34910893fdabbf1c2daab7e2ffaa0a34e71f60071b041d1930",
+    "state": "C042 transfer and focused PR audit recorded; responsibility generation 3 verified; PR #335 remains open/unmerged/mergeable=false and not integrated; product unchanged; exact read-back verified"
   },
   "recent_verbatim_instruction_ingestion": {
     "path": "originales/INSTRUCCIONES-VERBATIM-TAIL-C032-20261022.jsonl",
