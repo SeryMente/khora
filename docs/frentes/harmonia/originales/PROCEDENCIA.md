@@ -13,3 +13,9 @@ SHA-256 del archivo JSONL: 8a5f2ea2ed6c2ddf76d5d4bbe3758dd6dde638df68fef026df346
 - La respuesta autorizó la transferencia concreta de Harmonia desde generación 6 / `SES-20261022-Q7M4K9V2` a generación 7 / `SES-20261022-6E3A91F7`. La pregunta, alcance, CAS, hash pre/post y comprobación se documentan en `../cronica/HARMONIA-TRANSFER-SES-20261022-6E3A91F7.md`.
 - La herramienta no expuso ID nativo de conversación; no se añade uno inferido. Se conserva únicamente el alias operativo claramente tipado en el control.
 
+## Transferencia de responsabilidad · U20 · SES-20261028-P9K4R7M2
+
+- El mensaje del operador se preserva literalmente en `HARMONIA-TRANSFER-SES-20261028-P9K4R7M2.jsonl`, registro U20: `Si`.
+- Blob del original leído de vuelta: `bfe29b24091e039f901592b66887336a9b8b0235`; el JSONL completo se cotejó con el contenido esperado, incluido el salto final de línea.
+- La respuesta autoriza la transferencia concreta de Harmonia desde generación 7 / `SES-20261022-6E3A91F7` a generación 8 / `SES-20261028-P9K4R7M2`. Alcance, CAS, huellas y lectura de vuelta: `../cronica/HARMONIA-TRANSFER-SES-20261028-P9K4R7M2.md`.
+- La plataforma no expuso ID nativo de conversación; se conserva únicamente el alias operativo tipado en el control.
