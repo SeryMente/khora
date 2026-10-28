@@ -181,6 +181,8 @@ No se rellenan huecos con inferencias ni se da por ejecutada una prueba porque a
 - **Receipts de escritura:** instrucción original `443ca1826b655b068b79096ff59b01515fbc79a8`; lista inicial `2ec37a0d1e0ec024555cb54249c4215c7f9821ee`, actualizaciones de referencia metodológica `56bd38dbcf7ff0156a025d519cc109e8dfab63c8` y `44545dfc3d5eda3c5b48bb896e1eb640aae61580`; núcleo inicial de esta actualización `4f2cc4addabf193c9fd6d1576b339325a409e017`, refresco metodológico intermedio `59cbe61a248d8f3d0095e19aeca4789e2c4c7e3b` y última referencia metodológica `5ff145e25f71dc9fe2994564bc316b1713872d35`.
 - **Verificaciones negativas explícitas:** no se inspeccionó la interfaz de Cora; no se listaron de forma independiente los 20 elementos; no se recuperó ni cotejó ningún dictado; no se validó el diseño de la lista ni la eficacia del mecanismo.
 - **Límite de evidencia:** el diseño de la lista está expresamente pendiente de revisión; la presencia de la lista en el repositorio no acredita que su esquema sea el óptimo o definitivo.
+- **Salida visible final del modelo preservada:** [originales/SALIDA-MODELO-CUSTODIA-CICLO-2-2026-10-28.md](originales/SALIDA-MODELO-CUSTODIA-CICLO-2-2026-10-28.md), commit de creación `4ec8849fb9ce53dc819e36bee24ed13570d4918f`, blob de lectura `011468232cc212b7d14d007dfb4e042706c9f228`.
+- **Lectura de vuelta antes de registrar esta referencia:** el objeto estaba en blob `d274e0919b2ae17a3d99d216e38dad5c4c327c2b`; la lista en `2af04cd0fd002cdf5adbbf22ba655345784e3f0b`; la instrucción literal en `faff139b740e88fa0a6beb20f5e646e04f53aa35`. La fuente central más reciente leída en este cierre es Samantha v352 · NX-352m, Metacanon 1.21, GOW 2.3, blob `94473eccb6fa71303d5908ce678f7efeb191c215`.
 - **Siguiente prueba/checkpoint:** comenzar por CUSTODIA-01: validar el listado en la interfaz y procurar la recuperación efectiva de los 20 dictados, con verificación individual, preservando datos personales y originales. Después abordar CUSTODIA-02.
 
 ### Fuentes y referencias
@@ -204,6 +206,7 @@ Instrucción para una conversación futura:
 - **Original aprobado:** frentes/custodia/originales/PROPOSITO-OPERADOR-2026-10-28.md.
 - **Lista auxiliar provisional de tareas:** frentes/custodia/LISTA-TAREAS-PROVISIONAL.md.
 - **Original de la instrucción de tareas:** frentes/custodia/originales/INSTRUCCION-PENDIENTES-2026-10-28.md.
+- **Salida visible del modelo de este ciclo:** frentes/custodia/originales/SALIDA-MODELO-CUSTODIA-CICLO-2-2026-10-28.md.
 - Las rutas de arriba no constituyen un segundo almacén de producto; son la base documental del frente.
 - Tras cada ciclo: leer de vuelta los archivos modificados; comparar el propósito con el original aprobado; verificar el JSON; registrar el SHA real del archivo y el commit real; revisar el diff; no fijar hashes autorreferentes inventados.
 - Revisar el Metacanon central y la rama main antes de cada ciclo material. Si la fuente o alguna evidencia no está disponible, declarar exactamente qué no se verificó y bloquear solo las decisiones que dependan de ello.
