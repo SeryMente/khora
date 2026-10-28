@@ -32,9 +32,9 @@
   "prior_generation": 7,
   "previous_blob": "636a43c6e89355bba94154f2e48f465226030396",
   "base_blob_sha": "636a43c6e89355bba94154f2e48f465226030396",
-  "transfer_method": "Sequential fetch/compare/update_file using observed current content blob SHA and generation 7; explicit user authorization received; update_file used the observed blob SHA; canonical read-back required immediately.",
+  "transfer_method": "Sequential fetch/compare/update_file using the immediately observed current content blob SHA and generation 7; explicit user authorization received; update_file used that observed blob SHA; immediate canonical read-back confirmed generation 8. Collision review scope was documented separately and does not establish global folio uniqueness.",
   "folio_collision_check": {
-    "searched_scope": "Exact folio checked using GitHub code search scoped to SeryMente; the query returned no matches. This does not exhaustively inspect every responsibility control or every repository in the organization.",
+    "searched_scope": "Exact folio checked with GitHub code search scoped to SeryMente; zero matches. A search for CONTROL-RESPONSABILIDAD.json exposed one other indexed control, docs/frentes/dictado-voz/CONTROL-RESPONSABILIDAD.json, which was fetched and inspected; this transfer's Harmonia control was also inspected. The method did not expose a complete inventory of all controls in all repositories.",
     "repositories_searched": [
       "SeryMente/khora",
       "SeryMente/serymente",
@@ -46,7 +46,11 @@
       "SeryMente/personal",
       "SeryMente/metodologia"
     ],
-    "controls_inspected": 1,
+    "controls_inspected": 2,
+    "inspected_controls": [
+      "SeryMente/khora/docs/frentes/harmonia/CONTROL-RESPONSABILIDAD.json",
+      "SeryMente/khora/docs/frentes/dictado-voz/CONTROL-RESPONSABILIDAD.json"
+    ],
     "folio": "SES-20261028-P9K4R7M2",
     "matches_found": 0,
     "global_uniqueness": "not_verified"
