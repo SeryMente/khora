@@ -6,7 +6,8 @@
 - **Frente:** Custodia.
 - **Versión de esta lista provisional:** 0.1.
 - **Última actualización:** 2026-10-28.
-- **Metodología consultada en main:** Samantha v348 · NX-348m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3. Fuente consultada: [gobernanza/METAPROMPT-CANONICO-SAMANTHA.html](https://github.com/SeryMente/metodologia/blob/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html), blob `a4c90bd8ff1cd360b1f1662ff55371bd1b56b4cd`.
+- **Metodología en la primera redacción:** Samantha v348 · NX-348m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `a4c90bd8ff1cd360b1f1662ff55371bd1b56b4cd`.
+- **Revalidación antes del cierre:** Samantha v351 · NX-351m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente actual consultada `f069d2385f47731ac9d0f0ca76bfd3cef859cdd2`. La lista sigue provisional y la tarea CUSTODIA-02 debe revisar el diseño frente al canon vigente.
 - **Alcance de esta captura:** las dos tareas enumeradas expresamente por el operador. No se afirma que constituyan un inventario exhaustivo de todas las obligaciones futuras del frente.
 - **Regla provisional de custodia de información:** no copiar a este repositorio el texto o audio de dictados reales, secretos, credenciales ni identificadores personales innecesarios. Registrar resultados mediante evidencia minimizada y sanitizada, en el soporte autorizado que corresponda.
 
