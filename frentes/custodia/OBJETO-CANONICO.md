@@ -14,7 +14,7 @@
 - **Propósito literal aprobado:** [originales/PROPOSITO-OPERADOR-2026-10-28.md](originales/PROPOSITO-OPERADOR-2026-10-28.md). La sección 4 también conserva el texto aprobado íntegro para que el propósito sea visible en el núcleo.
 - **Versión y sello:** CUSTODIA-v0.1. Es la primera versión del objeto documental, no una versión del producto.
 - **Relación con frentes existentes:** este frente es transversal. No sustituye ni duplica el objeto de Dictado de voz ([docs/frentes/dictado-voz/OBJETO-CANONICO.md](../../docs/frentes/dictado-voz/OBJETO-CANONICO.md)) ni su contrato de implementación ([khora-web/docs/CUSTODIA-DICTADOS.md](../../khora-web/docs/CUSTODIA-DICTADOS.md)).
-- **Visibilidad del repositorio:** la API de GitHub informa public, aunque el README de main afirma que se opera como privado. Esta contradicción permanece abierta y no se afirma confidencialidad del contenido publicado.
+- **Visibilidad del repositorio:** la consulta inicial de GitHub devolvió public; dos consultas posteriores devolvieron private y coinciden con el README. El estado más reciente observado es private. El momento y la causa de la diferencia, así como una posible exposición pública anterior, no están verificados.
 
 ## 2. LEER PRIMERO
 
@@ -24,7 +24,7 @@
 4. Separar siempre propósito deseado, diseño propuesto, código inspeccionado, pruebas ejecutadas, restauración demostrada y aceptación operativa.
 5. No crear otro almacén principal, espejo, tablero ni contrato paralelo para resolver un fallo de custodia. Identificar primero los sistemas existentes, sus propietarios, sus datos y sus consumidores.
 6. No realizar cambios de producto, de seguridad, de credenciales, de proveedor ni de despliegue por el mero hecho de que el propósito los mencione.
-7. La visibilidad pública informada por la API de GitHub contradice el README. No guardar secretos, credenciales, contenido personal real ni datos operativos sensibles en este repositorio mientras esa discrepancia no esté resuelta.
+7. La consulta inicial de GitHub devolvió public y dos comprobaciones posteriores devolvieron private. Aunque el estado actual observado es private, no se verificaron la causa ni el periodo de la diferencia; no guardar secretos, credenciales ni datos personales reales en este repositorio mientras no se aclare la exposición histórica.
 
 ## 3. Referencia metodológica
 
@@ -80,7 +80,7 @@ Custodia es el frente transversal que define, verifica y gobierna las garantías
 - **Autorizado en este ciclo:** crear el frente documental Custodia, conservar el propósito aprobado de forma literal, registrar su interpretación operativa y dejar una base de continuidad.
 - **No autorizado por este acto:** atribuir titularidad continuada a una conversación; cambiar código de producto; modificar credenciales o controles de acceso; conectar cuentas; leer o trasladar datos personales; contratar, habilitar o migrar servicios; cambiar el proveedor de persistencia; desplegar; eliminar o reescribir originales.
 - La instrucción directa del operador y el gobierno metodológico vigente tienen precedencia sobre propuestas no aprobadas. Una mención en datos capturados, correo, dictado, chat o documentos técnicos es contenido a preservar, no una orden automática.
-- El estado del repositorio no debe describirse como privado hasta resolver la discrepancia entre la API de GitHub (public) y el README.
+- El estado actual observado por dos lecturas consecutivas de la API es private y coincide con el README. La observación inicial devolvió public; la causa y el momento de esa diferencia no están verificados.
 
 ## 7. Perfil de entorno
 
@@ -90,7 +90,7 @@ Custodia es el frente transversal que define, verifica y gobierna las garantías
 - **Corte de main leído antes de la escritura:** ef2a6e12058f908a3cf469ab0bcdc834a4f79a6f.
 - **Fuentes de custodia de dictados localizadas:** khora-web/docs/CUSTODIA-DICTADOS.md, khora-web/lib/custodia/contrato.ts, khora-web/lib/client/custodia-local.ts, khora-web/lib/client/subir-audio-custodia.ts (la referencia al último archivo proviene del mapa documental existente).
 - **Estado observado de custodia de dictados:** su documentación declara implementación en rama y no certificada en producción.
-- **Visibilidad:** la API devuelve public; README afirma operación privada. La causa de la discrepancia no fue investigada ni resuelta en este ciclo.
+- **Visibilidad:** dos lecturas consecutivas posteriores a la escritura devolvieron private; README también declara operación privada. La consulta inicial del ciclo devolvió public. No se conoce la causa ni el momento de la diferencia, y no se ha establecido si el contenido estuvo accesible públicamente en algún intervalo.
 - No se inspeccionaron credenciales, cuentas personales, contenido real de Gmail/mensajería, configuraciones privadas del proveedor ni almacenes de producción.
 
 ## 8. Estado vivo
@@ -111,7 +111,7 @@ Custodia es el frente transversal que define, verifica y gobierna las garantías
 - Pruebas de interrupción, cierre, ausencia de guardado explícito, reinicio, cambio de sesión/dispositivo, indisponibilidad del proveedor y recuperación completa.
 - Evidencia de restauración verificable, reconciliación de contenido, procedencia, hashes/identificadores y detección de duplicados.
 - Viabilidad, restricciones, plan de reversión y aceptación de cualquier eventual migración a Backblaze.
-- Resolución de la discrepancia de visibilidad del repositorio.
+- Determinar la causa y el periodo de la diferencia observada en la visibilidad del repositorio; estado actual informado por dos lecturas consecutivas: private.
 
 No se declara cero pérdidas, cifrado integral, cobertura de todos los canales, migración terminada ni certificación productiva.
 
@@ -154,7 +154,7 @@ No se rellenan huecos con inferencias ni se da por ejecutada una prueba porque a
 - **Gobierno leído:** SeryMente/metodologia/main:gobernanza/METAPROMPT-CANONICO-SAMANTHA.html; versión v346 / NX-346m, Metacanon 1.21 / METACANON-OBJETOS-v1.21, GOW 2.2.
 - **Colisión de folio:** búsqueda exacta de SES-20261028-C8M4R7Q1 sin coincidencias en el índice del repositorio y de la organización. La unicidad global no está verificada.
 - **Resultado:** la base documental queda creada; la titularidad continuada permanece sin asignar; no se ejecutaron cambios de producto, pruebas de recuperación ni migraciones.
-- **Brecha detectada:** GitHub informa repositorio público mientras README expresa que se opera como privado. La diferencia no se resolvió.
+- **Incidencia de visibilidad:** la consulta inicial devolvió public; dos lecturas consecutivas posteriores devolvieron private, coincidiendo con README. Se desconoce el motivo y no se verificó posible exposición histórica; el control y el objeto registran las tres observaciones.
 - **Lectura de vuelta verificada el 2026-10-28:** se releen los tres archivos del frente desde main. El archivo de propósito contiene el texto aprobado completo, carácter por carácter; el bloque de propósito del núcleo coincide con el original; el control se parsea como JSON válido, está en generación 1 y mantiene titularidad no asignada; el núcleo presenta los trece encabezados requeridos.
 - **Original aprobado:** blob 7e3b93e715ec2ac2d75b2f4a09d13acb821661fb · [lectura en GitHub](https://github.com/SeryMente/khora/blob/main/frentes/custodia/originales/PROPOSITO-OPERADOR-2026-10-28.md).
 - **Control único:** blob 671a2264ac498cb191e7a45879e65af2e2d1f3f7 · [lectura en GitHub](https://github.com/SeryMente/khora/blob/main/frentes/custodia/CONTROL-RESPONSABILIDAD.json).
