@@ -1170,4 +1170,5 @@ El paquete local referido como Harmonia v0.5.0, el destino actual y su estructur
 ### Persistencia de este ciclo
 
 - La última salida visible anterior se recuperó literalmente de `originales/HARMONIA-TRANSFER-SES-20261022-6E3A91F7-salida.md`, blob `81dc1aff77a25f09b5b65e69802f2e274af2a34c`. La salida de este ciclo la conserva íntegra al inicio, en [HARMONIA-TRANSFER-SES-20261028-P9K4R7M2-salida.md](originales/HARMONIA-TRANSFER-SES-20261028-P9K4R7M2-salida.md), blob `14324b47502cd7363f31e02734e3d90db48543da`.
-- No se tocó código de Harmonia ni se declaró aceptación funcional. README y prompt de asistente deben reflejar el control gen8 y el DUG v353 de este corte.
+- Crónica de este ciclo: [HARMONIA-TRANSFER-SES-20261028-P9K4R7M2.md](cronica/HARMONIA-TRANSFER-SES-20261028-P9K4R7M2.md), blob `e493346d9a1d79855c632af191519d0279597f21`; lectura de vuelta exacta confirmada. README leído de vuelta, blob `0986c183b734b3b5074610ce7754f7819cfbe3be`; prompt de asistente leído de vuelta, blob `eb947c258b4614aa80141c91c8aa51e8d21c5d19`.
+- No se tocó código de Harmonia ni se declaró aceptación funcional.
