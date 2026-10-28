@@ -1,10 +1,10 @@
-<!-- LIST_VERSION=0.1; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.2; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Lista provisional de tareas · Frente Custodia
 
 > **ESTADO: PROVISIONAL · NO VALIDADA CONTRA EL DISEÑO METODOLÓGICO FINAL.** Se conserva aquí por instrucción expresa del operador. La tarea CUSTODIA-02 debe revisar si esta materialización, sus campos y su relación con el OCP son adecuados. Este archivo no crea un segundo objeto canónico ni otro control de responsabilidad; el núcleo único del frente sigue siendo [OBJETO-CANONICO.md](OBJETO-CANONICO.md).
 
 - **Frente:** Custodia.
-- **Versión de esta lista provisional:** 0.1.
+- **Versión de esta lista provisional:** 0.2.
 - **Última actualización:** 2026-10-28.
 - **Metodología en la primera redacción:** Samantha v348 · NX-348m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `a4c90bd8ff1cd360b1f1662ff55371bd1b56b4cd`.
 - **Revalidación antes del cierre (intermedia):** Samantha v351 · NX-351m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `f069d2385f47731ac9d0f0ca76bfd3cef859cdd2`.
@@ -65,5 +65,6 @@
 ## Registro de cambios
 
 - **2026-10-28 · Creación provisional:** se añaden únicamente las dos tareas expresamente solicitadas. CUSTODIA-01 queda primera por urgencia; CUSTODIA-02 queda pendiente para revisar el diseño de la propia lista.
+- **2026-10-28 · Revisión documental previa al cierre:** se actualizó la referencia metodológica de la lista hasta Samantha v352 y se confirmó por lectura de vuelta que el documento conserva exactamente dos tareas. Esta versión 0.2 solo registra la actualización documental; no cambia el contenido sustantivo de las tareas ni valida el diseño.
 - **Fuente del encargo literal:** [originales/INSTRUCCION-PENDIENTES-2026-10-28.md](originales/INSTRUCCION-PENDIENTES-2026-10-28.md).
 - **Estado de ejecución:** no se recuperaron ni inspeccionaron dictados como parte de esta modificación documental.
