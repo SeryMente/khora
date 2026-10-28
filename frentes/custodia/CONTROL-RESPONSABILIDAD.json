@@ -1,0 +1,34 @@
+{
+  "schema": "responsabilidad-frente/1",
+  "front": "custodia",
+  "canonical_identity": "CUSTODIA",
+  "repository": "SeryMente/khora",
+  "state_object": "frentes/custodia/OBJETO-CANONICO.md",
+  "status": "unassigned",
+  "owner_thread": null,
+  "owner_alias": null,
+  "owner_alias_type": null,
+  "instance": null,
+  "session_folio": null,
+  "generation": 1,
+  "created_by_session_folio": "SES-20261028-C8M4R7Q1",
+  "created_by_alias": "chatgpt-custodia-SES-20261028-C8M4R7Q1",
+  "creation_alias_type": "operational_alias_not_native_thread_id",
+  "authorization_ref": "Instrucción directa del operador, 2026-10-28: “Guardalo en el directorio del frente de trabajo.” El operador aprobó el propósito canónico exacto. La autorización cubre la creación documental y su persistencia en este directorio; no documenta una transferencia explícita de titularidad continuada ni autoriza cambios de producto.",
+  "authorization_event": "CUSTODIA-CREATE-SES-20261028-C8M4R7Q1",
+  "folio_collision_check": {
+    "searched_scope": "Búsqueda exacta del folio en SeryMente/khora y en el índice de búsqueda de la organización SeryMente mediante el conector GitHub; no se encontraron coincidencias. El índice no demuestra unicidad global.",
+    "repositories_searched": [
+      "SeryMente/khora",
+      "SeryMente (índice de búsqueda)"
+    ],
+    "folio": "SES-20261028-C8M4R7Q1",
+    "matches_found": 0,
+    "global_uniqueness": "not_verified"
+  },
+  "acquired_at": "2026-10-28",
+  "bootstrap_scope": "Creación y custodia documental inicial del frente transversal Custodia. No autoriza cambios de código de producto, credenciales, seguridad, despliegues, contratos de proveedores, migraciones ni acceso a datos reales.",
+  "enforcement": "cooperative registry; no server fencing of arbitrary writes",
+  "repository_visibility_note": "GitHub API reports SeryMente/khora as public on 2026-10-28. README.md says the repository is operated as private. The discrepancy is unresolved; no privacy guarantee is asserted.",
+  "readback_required": true
+}
