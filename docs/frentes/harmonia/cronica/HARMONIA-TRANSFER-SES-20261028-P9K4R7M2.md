@@ -38,7 +38,7 @@ El paquete local referido históricamente como v0.5.0 y su sincronización con `
 1. **Identidad/gobierno:** Harmonia · `SeryMente/khora` · OCP v0.27 · gen8 · `SES-20261028-P9K4R7M2`; DUG v353/NX-353m; Metacanon 1.21 y GOW v2.3 integrados; `MCP-NORMATIVO: DESACTIVADO`.
 2. **Dónde estamos:** titularidad transferida; aceptación técnica no cambia.
 3. **Delta:** gen7 → gen8; U20, OCP, README y prompt actualizados.
-4. **Evidencia:** transfer commit `604314d14a945a65d2b4f7f30f71af833123e414`, control final `2b8e5091e621b1017ed1e55f2796cc48f9ba444b`, OCP leído de vuelta `524e8759c3cef23ba90680493cfaad9f1be937d5`, README `0986c183b734b3b5074610ce7754f7819cfbe3be`, prompt `eb947c258b4614aa80141c91c8aa51e8d21c5d19`.
+4. **Evidencia:** transfer commit `604314d14a945a65d2b4f7f30f71af833123e414`, control final `2b8e5091e621b1017ed1e55f2796cc48f9ba444b`, OCP leído de vuelta `65b75275e7772eab9f0a5acaaf537f04a6f00f3b`, README `8f62eca51db63a51f9f226ac628cd3e035d5dc8d`, prompt `c706b277e7219e6a408199669c09829495d471ca`.
 5. **Pendiente:** recuperar PC-14 exacto; handshake RDC; verificar cuenta/SID/perfil; inspeccionar el paquete; captura natural, persistencia y E2E.
 6. **Viabilidad:** trabajo de repositorio posible; operaciones locales bloqueadas por PC-14 offline.
 7. **Tiempo/ciclos:** cierre local/E2E NO ESTIMABLE hasta recuperar el dispositivo exacto.
