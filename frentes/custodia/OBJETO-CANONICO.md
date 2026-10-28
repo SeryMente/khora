@@ -155,7 +155,12 @@ No se rellenan huecos con inferencias ni se da por ejecutada una prueba porque a
 - **Colisión de folio:** búsqueda exacta de SES-20261028-C8M4R7Q1 sin coincidencias en el índice del repositorio y de la organización. La unicidad global no está verificada.
 - **Resultado:** la base documental queda creada; la titularidad continuada permanece sin asignar; no se ejecutaron cambios de producto, pruebas de recuperación ni migraciones.
 - **Brecha detectada:** GitHub informa repositorio público mientras README expresa que se opera como privado. La diferencia no se resolvió.
-- **Lectura de vuelta:** queda requerida tras cada escritura; la crónica final debe añadir los SHA y enlaces devueltos por GitHub y verificar que el propósito leído sea idéntico al aprobado.
+- **Lectura de vuelta verificada el 2026-10-28:** se releen los tres archivos del frente desde main. El archivo de propósito contiene el texto aprobado completo, carácter por carácter; el bloque de propósito del núcleo coincide con el original; el control se parsea como JSON válido, está en generación 1 y mantiene titularidad no asignada; el núcleo presenta los trece encabezados requeridos.
+- **Original aprobado:** blob 7e3b93e715ec2ac2d75b2f4a09d13acb821661fb · [lectura en GitHub](https://github.com/SeryMente/khora/blob/main/frentes/custodia/originales/PROPOSITO-OPERADOR-2026-10-28.md).
+- **Control único:** blob 671a2264ac498cb191e7a45879e65af2e2d1f3f7 · [lectura en GitHub](https://github.com/SeryMente/khora/blob/main/frentes/custodia/CONTROL-RESPONSABILIDAD.json).
+- **Objeto inicial antes de registrar esta lectura de vuelta:** blob db7f8d4434281251829e28da6f927cfe27dfbe21 · [ruta canónica](https://github.com/SeryMente/khora/blob/main/frentes/custodia/OBJETO-CANONICO.md). No se incrusta un SHA autorreferente del nuevo estado de este mismo objeto.
+- **Commits de la secuencia documental:** original 67231f6200f0c447c21838509fae986096a79d0f; control 44112cf40c6c2af6f08f3564e69e13682833ca39; objeto inicial d177f6ed19cb653cdc1ecd5cbdb80ff0547b497f; enlace al índice raíz ca415160cec3b273cdc698085fe4324086b8b8b4.
+- **Índice raíz:** se añadió la referencia del frente al README; se comprobará por lectura de vuelta final junto con esta revisión del objeto.
 
 ### Fuentes y referencias
 
