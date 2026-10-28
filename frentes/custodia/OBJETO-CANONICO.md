@@ -1,7 +1,7 @@
 <!-- METACANON_VERSION=1.21; OBJECT_VERSION=0.2; OBJECT_SEAL=CUSTODIA-v0.2; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · TAREAS PENDIENTES DOCUMENTADAS · NO CERTIFICADO COMO GARANTÍA DE PRODUCTO.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.2. Metacanon: 1.21 · METACANON-OBJETOS-v1.21. Gobierno general verificado en la última lectura de main: Samantha v351 · NX-351m; GOW v2.3. Fuente central leída: blob f069d2385f47731ac9d0f0ca76bfd3cef859cdd2. Este objeto funda el frente documental transversal; no prueba que las garantías descritas ya estén implementadas ni certificadas.
+> **ESTADO · VIVO · TAREAS PENDIENTES DOCUMENTADAS · NO CERTIFICADO COMO GARANTÍA DE PRODUCTO.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.2. Metacanon: 1.21 · METACANON-OBJETOS-v1.21. Gobierno general verificado en la última lectura de main: Samantha v352 · NX-352m; GOW v2.3. Fuente central leída: blob 94473eccb6fa71303d5908ce678f7efeb191c215. Este objeto funda el frente documental transversal; no prueba que las garantías descritas ya estén implementadas ni certificadas.
 
 ## 1. Control e identidad
 
@@ -31,7 +31,7 @@
 ## 3. Referencia metodológica
 
 - **Fuente normativa consultada durante la primera actualización del ciclo:** [METAPROMPT-CANONICO-SAMANTHA.html](https://github.com/SeryMente/metodologia/blob/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html), rama main, blob a4c90bd8ff1cd360b1f1662ff55371bd1b56b4cd, Samantha v348 · NX-348m.
-- **Revalidación metodológica previa al cierre:** la lectura más reciente de `main` devuelve Samantha v351 · NX-351m, Metacanon 1.21 · METACANON-OBJETOS-v1.21, GOW v2.3; blob a nivel de archivo f069d2385f47731ac9d0f0ca76bfd3cef859cdd2.
+- **Revalidación metodológica previa al cierre:** la lectura más reciente de `main` devuelve Samantha v352 · NX-352m, Metacanon 1.21 · METACANON-OBJETOS-v1.21, GOW v2.3; blob a nivel de archivo 94473eccb6fa71303d5908ce678f7efeb191c215.
 - **Cláusulas aplicadas a este ciclo:** §3 (pendientes ordenados dentro del estado vivo); §§27 y 46 (núcleo único y materializaciones necesarias del OCP); §28 (instrucción original, crónica, evidencia y lectura de vuelta); §§39 y 48 (conservar el propósito y la ruta canónica, sin crear controles u objetos paralelos).
 - Esta adquisición identifica la versión del canon central al momento de la lectura; no equivale a una auditoría integral de todos sus principios o anexos ni a una declaración de conformidad definitiva del diseño de lista.
 
@@ -175,7 +175,8 @@ No se rellenan huecos con inferencias ni se da por ejecutada una prueba porque a
 - **Hipótesis y corrección:** no asumir que el indicador de «20 dictados recuperables» demuestra recuperación efectiva. El número y contenido fueron reportados por el operador; esta sesión no observó la interfaz ni recuperó dictados.
 - **Resultado:** las dos tareas quedan materializadas como pendientes. No se inspeccionó contenido de dictados, no se ejecutó recuperación y no se validó el mecanismo.
 - **Gobierno adquirido:** Samantha v348 · NX-348m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3. Fuente central: blob a4c90bd8ff1cd360b1f1662ff55371bd1b56b4cd.
-- **Refresco de fuente al cierre:** main volvió a consultarse y la fuente respondió Samantha v351 · NX-351m con blob f069d2385f47731ac9d0f0ca76bfd3cef859cdd2; la lista quedó etiquetada como provisional, no como diseño conforme.
+- **Refresco de fuente al cierre (intermedio):** main respondió Samantha v351 · NX-351m con blob f069d2385f47731ac9d0f0ca76bfd3cef859cdd2.
+- **Última lectura de metodología antes del cierre:** main respondió Samantha v352 · NX-352m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; blob 94473eccb6fa71303d5908ce678f7efeb191c215. La lista sigue marcada como provisional y no conforme hasta la revisión CUSTODIA-02.
 - **Límite de evidencia:** el diseño de la lista está expresamente pendiente de revisión; la presencia de la lista en el repositorio no acredita que su esquema sea el óptimo o definitivo.
 - **Siguiente prueba/checkpoint:** comenzar por CUSTODIA-01: validar el listado en la interfaz y procurar la recuperación efectiva de los 20 dictados, con verificación individual, preservando datos personales y originales. Después abordar CUSTODIA-02.
 
