@@ -7,7 +7,7 @@
 - OCP heredado: `docs/frentes/harmonia/OBJETO-CANONICO.md`, actualizado de v0.26 a v0.27 / HARMONIA-v0.27 (§34).
 - Folio: `SES-20261028-P9K4R7M2`; alias operativo: `chatgpt-harmonia-SES-20261028-P9K4R7M2`. La plataforma no expuso ID nativo; `owner_thread=null`.
 - Evento: `HARMONIA-TRANSFER-SES-20261028-P9K4R7M2`.
-- Salida del ciclo con la última salida previa reproducida íntegra: `originales/HARMONIA-TRANSFER-SES-20261028-P9K4R7M2-salida.md`, blob `14324b47502cd7363f31e02734e3d90db48543da`.
+- Salida del ciclo con la última salida previa reproducida íntegra: `originales/HARMONIA-TRANSFER-SES-20261028-P9K4R7M2-salida.md`, blob `c96c7333523d21361976e6b7d4f42eea4f7cc0ba`.
 
 ## Gobierno verificado
 
@@ -38,7 +38,7 @@ El paquete local referido históricamente como v0.5.0 y su sincronización con `
 1. **Identidad/gobierno:** Harmonia · `SeryMente/khora` · OCP v0.27 · gen8 · `SES-20261028-P9K4R7M2`; DUG v353/NX-353m; Metacanon 1.21 y GOW v2.3 integrados; `MCP-NORMATIVO: DESACTIVADO`.
 2. **Dónde estamos:** titularidad transferida; aceptación técnica no cambia.
 3. **Delta:** gen7 → gen8; U20, OCP, README y prompt actualizados.
-4. **Evidencia:** transfer commit `604314d14a945a65d2b4f7f30f71af833123e414`, control final `2b8e5091e621b1017ed1e55f2796cc48f9ba444b`, OCP leído de vuelta `65b75275e7772eab9f0a5acaaf537f04a6f00f3b`, README `8f62eca51db63a51f9f226ac628cd3e035d5dc8d`, prompt `c706b277e7219e6a408199669c09829495d471ca`.
+4. **Evidencia:** transfer commit `604314d14a945a65d2b4f7f30f71af833123e414`, control final `2b8e5091e621b1017ed1e55f2796cc48f9ba444b`, OCP leído de vuelta `1e3f687ddc1b9eb222a53992ead7b1e6aa4cda41`, README `a506dd6b62247188bf2e7e5df35e521150ac4f5a`, prompt `0723c9bc65257dfea61a46fb16f6323d6cc6cfe3`.
 5. **Pendiente:** recuperar PC-14 exacto; handshake RDC; verificar cuenta/SID/perfil; inspeccionar el paquete; captura natural, persistencia y E2E.
 6. **Viabilidad:** trabajo de repositorio posible; operaciones locales bloqueadas por PC-14 offline.
 7. **Tiempo/ciclos:** cierre local/E2E NO ESTIMABLE hasta recuperar el dispositivo exacto.
