@@ -2,7 +2,7 @@
 
 **Versión:** 0.2 provisional (la v0.1 se conserva como fotografía histórica).  
 **Corte observado:** 2026-10-29, ciclo 03; ver informe para refs, jobs y fechas exactas.  
-**Objeto rector:** [OBJETO-CANONICO.md](../OBJETO-CANONICO.md), PUBLICABILIDAD-v0.5. Esta evidencia no constituye una fuente canónica independiente.
+**Objeto rector:** [OBJETO-CANONICO.md](../OBJETO-CANONICO.md), PUBLICABILIDAD-v0.6. Esta evidencia no constituye una fuente canónica independiente.
 
 ## Propósito
 
@@ -87,15 +87,15 @@ Fuentes:
 5. Reintentar una vez solo después de descartar una ejecución en curso.
 
 ### S07 · GitHub Actions falla antes de exponer runner, steps o logs
-1. No usar workflow_dispatch a ciegas: el run Deploy to Production para el SHA actual de main falló en aproximadamente dos segundos.
-2. Consultar run y job por API; registrar runner_name vacío, steps vacíos, tiempos y URL. Solicitar logs y preservar el error exacto si está disponible.
-3. Si los logs devuelven BlobNotFound y steps siguen vacíos, clasificar provisionalmente como fallo previo a steps/asignación de runner, no como causa raíz.
-4. Pedir al propietario que revise Actions billing/usage, capacidad de runners alojados, permisos/configuración de Actions y estado del servicio en la ventana del fallo. No leer ni revelar secretos.
-5. Comparar CI, UI y despliegue, además de workflows programados. Si varios workflows fallan antes de ejecutar steps, priorizar diagnóstico del entorno de ejecución antes de cambiar código de aplicación.
-6. No corregir YAML, rotar secretos o cambiar proveedor sin evidencia diferenciadora. Tras recuperar logs, clasificar la causa y ensayar la misma ruta en un candidato no productivo.
-7. Reanudar producción solo cuando los checks relevantes puedan ejecutarse y el SHA del candidato esté aprobado.
+1. No ejecutar reruns ni `workflow_dispatch` a ciegas; primero preservar run/job IDs, SHA, tiempos y evidencia de check runs.
+2. Si `runner_id=0`, `runner_name` vacío, `steps=[]` y logs `BlobNotFound`, buscar el motivo en las anotaciones del check run. El recuento de anotaciones no sustituye el contenido.
+3. Comparar repositorios privados de la misma organización con un workflow público reciente. Si los privados fallan antes de pasos y el público sí ejecuta pasos, priorizar gate de facturación/uso/entitlement de Actions privadas; no atribuirlo a YAML ni a capacidad general de runners sin evidencia.
+4. Revisar GitHub Organization → Settings → Billing & Licensing → Plans and usage: cuota privada de Actions, consumo, budgets/spending limit y bloqueo. Revisar Payment information y, si aplica, la cuenta personal que aporta la facturación. No incrementar presupuesto ni aceptar cargos sin una decisión explícita.
+5. Si el dashboard no resuelve la causa, abrir ticket con GitHub Support y pedir las anotaciones/telemetría previas a la asignación del runner. No rotar secretos ni modificar workflows para intentar eludir un gate de cuenta.
+6. RDC solo se usa si se identifica un step/comando que pueda reproducirse localmente. Si el job nunca ejecuta pasos, una prueba local no reproduce un bloqueo de billing/entitlement de GitHub. No instalar tooling ni clonar repos por inercia.
+7. Reanudar una única prueba no productiva después de confirmar que el gate se resolvió; exigir `runner_id>0`, `Set up job`, pasos y logs. Producción continúa bloqueada hasta que se normalicen gates, SHA candidato, publicador único, migración y smoke.
 
-Ciclo 03: Deploy to Production 40807127395, CI 40807127325 y UI Quality 40807127357 fallaron rápidamente; sus jobs devolvieron runner vacío y steps vacíos. Los logs descargados por la integración devolvieron BlobNotFound. Causa raíz: NO DETERMINADA.
+Ciclo 06: KHORA CI 40913146359 (tres jobs), Metodología 40903838336 y GDP 40876634258 fallaron en repositorios privados con runner cero, pasos vacíos y BlobNotFound. Signal Interpreter, repo público de la misma organización, run 40922616949, ejecutó pasos y pasó en la misma ventana. Check runs privados registraron dos anotaciones cada uno, pero el conector no devolvió el texto. Diagnóstico: gate de billing/uso privado **altamente probable, pendiente de confirmación**.
 
 ### S08 · CLI mediante RDC
 Solo si una ruta remota no cubre el objetivo, la CLI local es necesaria y la operación está autorizada.
