@@ -3,10 +3,9 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 import { randomUUID } from 'node:crypto';
+import { AsyncLocalStorage } from 'node:async_hooks';
 import { NextRequest } from 'next/server';
 import { encode } from 'next-auth/jwt';
-import { workUnitAsyncStorage } from 'next/dist/server/app-render/work-unit-async-storage.external';
-import { workAsyncStorage } from 'next/dist/server/app-render/work-async-storage.external';
 import { setDbForTesting, resetDbForTesting } from '../../lib/server/neon';
 import { descifrarTexto, cifrarBytes, descifrarBytes } from '../../lib/server/cripto';
 async function main() {
@@ -16,6 +15,10 @@ async function main() {
  process.env.PLAYWRIGHT_TEST_RUN='1';
  process.env.AUTH_SECRET='khora-custodia-integration-test-secret-only';
  process.env.AUTH_URL='http://localhost';
+ // Next 16's async-storage adapter checks for a Node ALS global; install it only in this test process.
+ (globalThis as any).AsyncLocalStorage ??= AsyncLocalStorage;
+ const {workUnitAsyncStorage}=await import('next/dist/server/app-render/work-unit-async-storage.external');
+ const {workAsyncStorage}=await import('next/dist/server/app-render/work-async-storage.external');
  const {PGlite}=await import(pathToFileURL(entry).href);
  const pg=new PGlite();
  let checks=0;
@@ -43,7 +46,7 @@ async function main() {
  const withRequestContext=<T>(req:NextRequest,handler:(req:NextRequest)=>Promise<T>):Promise<T>=>{
   const workStore={route:'/api/dictado/checkpoint',forceStatic:false,dynamicShouldError:false};
   const workUnitStore={type:'request',headers:req.headers,asyncApiPromises:undefined};
-  return workAsyncStorage.run(workStore,()=>workUnitAsyncStorage.run(workUnitStore,()=>handler(req)));
+  return workAsyncStorage.run(workStore as any,()=>workUnitAsyncStorage.run(workUnitStore as any,()=>handler(req)));
  };
  const post=(body:any,recover=false,origin='http://localhost')=>{
   const req=new NextRequest(url+(recover?'?recover=1':''),{
