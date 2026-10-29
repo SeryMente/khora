@@ -4,7 +4,6 @@ import { readFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 import { randomUUID } from 'node:crypto';
 import { AsyncLocalStorage } from 'node:async_hooks';
-import { NextRequest } from 'next/server';
 import { encode } from 'next-auth/jwt';
 import { setDbForTesting, resetDbForTesting } from '../../lib/server/neon';
 import { descifrarTexto, cifrarBytes, descifrarBytes } from '../../lib/server/cripto';
@@ -17,6 +16,7 @@ async function main() {
  process.env.AUTH_URL='http://localhost';
  // Next 16's async-storage adapter checks for a Node ALS global; install it only in this test process.
  (globalThis as any).AsyncLocalStorage ??= AsyncLocalStorage;
+ const {NextRequest}=await import('next/server');
  const {workUnitAsyncStorage}=await import('next/dist/server/app-render/work-unit-async-storage.external');
  const {workAsyncStorage}=await import('next/dist/server/app-render/work-async-storage.external');
  const {PGlite}=await import(pathToFileURL(entry).href);
