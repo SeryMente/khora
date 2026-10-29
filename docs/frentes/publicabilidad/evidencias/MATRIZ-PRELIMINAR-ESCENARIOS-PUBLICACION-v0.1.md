@@ -172,7 +172,7 @@ Estado: objetivo futuro; runs actuales fallan en segundos.
 
 Las páginas actuales indican, entre otros, 200 proyectos; 100 deployments/día; máximo 45 minutos de build por deployment; 50 dominios/proyecto; 100 GB Fast Data Transfer; 10 GB Fast Origin Transfer; 1 millón de CDN requests; 4 CPU-hours activos; 360 GB-hours de memoria aprovisionada; 1 millón de invocaciones de funciones; 5.000 transformaciones de imagen; 300.000 lecturas y 100.000 escrituras de caché; 50.000 eventos mensuales de Web Analytics; 50.000 Workflow Events/mes. Generalmente, exceder límites Hobby puede exigir esperar hasta 30 días; deployments tiene cadencia diaria.
 
-Son topes publicados, no consumo restante. Las cifras preliminares «32 deployments/hora», «2.000 CLI/semana» y «6.000 minutos de build» no quedaron corroboradas por las páginas oficiales actuales y no deben tratarse como confirmadas.
+Son topes publicados, no consumo restante. La documentación oficial consultada sí lista 32 builds por cada 3.600 segundos, 100 deployments por cada 86.400 segundos, 2.000 deployments creados mediante CLI por semana y 6.000 minutos de ejecución de build incluidos en Hobby; también limita un build individual a 45 minutos. Son límites distintos y no deben confundirse entre sí ni con el consumo restante de la cuenta.
 
 Fuentes:
 - https://vercel.com/docs/plans/hobby
