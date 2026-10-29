@@ -206,7 +206,7 @@ No se rellenan huecos con inferencias ni se da por ejecutada una prueba porque a
 - **Acción persistente:** creado [evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md](evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md), v0.1, blob leído de vuelta b7e4f8c6770368e988f6e14d1fca018e72117aeb, commit de creación 3fa8497ab8c013f4ab43a4d9224b6dae863d21e8. El documento separa código confirmado, evidencia auxiliar local, datos del catálogo pendientes, clasificaciones unitarias, criterios de aceptación y siguiente paso. No es un segundo estado vivo.
 - **Impacto en el propósito:** la recuperabilidad de producto continúa NO CERTIFICADA. Hay un defecto de diseño que debe corregirse, pero todavía no sabemos qué porcentaje del catálogo está afectado ni si todos los objetos remotos siguen accesibles.
 - **Siguiente prueba/checkpoint:** obtener el catálogo autenticado de la UI real, enumerar las unidades sin guardar datos personales, cruzar cada una con partes de sesión y disponibilidad de objetos, clasificar sus fallos y luego planear una prueba de recuperación no destructiva por patrón antes de autorizar cualquier cambio de código.
-- **Salida visible final de este ciclo:** se preservará en [originales/SALIDA-MODELO-CUSTODIA-INVENTARIO-2026-10-28.md](originales/SALIDA-MODELO-CUSTODIA-INVENTARIO-2026-10-28.md) antes de emitirla; la lectura de vuelta se registrará al cierre.
+- **Salida visible final de este ciclo:** [originales/SALIDA-MODELO-CUSTODIA-INVENTARIO-2026-10-28.md](originales/SALIDA-MODELO-CUSTODIA-INVENTARIO-2026-10-28.md) se preservó antes de emitirse; blob leído de vuelta 1f08bf95772e20828d0dc7373bfd2c70c1747198; commit de última escritura bf5899f16e2052e3ba0141410f96102f9050cf70. El hash del archivo se registra aquí y no dentro del propio archivo, para evitar autorreferencia.
 
 ### Fuentes y referencias
 
@@ -235,7 +235,7 @@ Instrucción para una conversación futura:
 - **Salida visible previa preservada:** frentes/custodia/originales/SALIDA-MODELO-CUSTODIA-ANTERIOR-RECUPERABILIDAD-INGRESOS-2026-10-28.md (blob c5feb1e2ac4454dfe60898489f5b7612bc91646a).
 - **Original de la instrucción de tareas:** frentes/custodia/originales/INSTRUCCION-PENDIENTES-2026-10-28.md.
 - **Salida visible del ciclo 2:** frentes/custodia/originales/SALIDA-MODELO-CUSTODIA-CICLO-2-2026-10-28.md.
-- **Salida visible final del ciclo 3:** frentes/custodia/originales/SALIDA-MODELO-CUSTODIA-INVENTARIO-2026-10-28.md; conservarla antes de emitir y registrar su blob de lectura de vuelta.
+- **Salida visible final del ciclo 3:** frentes/custodia/originales/SALIDA-MODELO-CUSTODIA-INVENTARIO-2026-10-28.md; blob leído de vuelta 1f08bf95772e20828d0dc7373bfd2c70c1747198, commit de última escritura bf5899f16e2052e3ba0141410f96102f9050cf70.
 - Las rutas de arriba no constituyen un segundo almacén de producto; son la base documental del frente.
 - Tras cada ciclo: leer de vuelta los archivos modificados; comparar el propósito con el original aprobado; verificar el JSON; registrar el SHA real del archivo y el commit real; revisar el diff; no fijar hashes autorreferentes inventados.
 - Revisar el Metacanon central y la rama main antes de cada ciclo material. La fuente vigente adquirida el 2026-10-28 fue Samantha v356 · NX-356m, Metacanon 1.22, GOW v2.6, blob c364e179e8e9b6a3d566a8e690dfa1a7cce91798. Si la fuente o alguna evidencia no está disponible, declarar exactamente qué no se verificó y bloquear solo las decisiones que dependan de ello.
