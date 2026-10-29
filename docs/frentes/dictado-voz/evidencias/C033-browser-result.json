@@ -1,0 +1,100 @@
+{
+  "checks": [
+    "archive uses exact selected text and partial",
+    "title and obfuscated classification retained",
+    "later audio is not added to earlier selection",
+    "only separate child is archived",
+    "active/later input object unchanged",
+    "later checkpoint remains recoverable",
+    "both local originals survive ACK and archive",
+    "archived child hidden from recoverables",
+    "same selection retry creates no second archive",
+    "wrong fork content blocks archive",
+    "missing tail is rejected before archive",
+    "local and remote selection share the stable archive id",
+    "local earlier archive keeps later snapshot",
+    "local archive retains original encrypted audio",
+    "archive does not publish anywhere"
+  ],
+  "requests": [
+    {
+      "path": "/api/dictado/checkpoint?sessionId=11111111-1111-4111-8111-111111111111&revisionId=22222222-2222-4222-8222-222222222222"
+    },
+    {
+      "path": "/api/dictado/checkpoint",
+      "sessionId": "11111111-1111-4111-8111-111111111111"
+    },
+    {
+      "path": "/api/dictado/checkpoint?recover=1",
+      "sessionId": "a6d8c052-0fe7-54e8-bc57-1ef572f869e7"
+    },
+    {
+      "path": "/api/dictado",
+      "sessionId": "a6d8c052-0fe7-54e8-bc57-1ef572f869e7"
+    },
+    {
+      "path": "/api/dictado/checkpoint?sessionId=11111111-1111-4111-8111-111111111111&revisionId=22222222-2222-4222-8222-222222222222"
+    },
+    {
+      "path": "/api/dictado/checkpoint",
+      "sessionId": "11111111-1111-4111-8111-111111111111"
+    },
+    {
+      "path": "/api/dictado/checkpoint?recover=1",
+      "sessionId": "a6d8c052-0fe7-54e8-bc57-1ef572f869e7"
+    },
+    {
+      "path": "/api/dictado",
+      "sessionId": "a6d8c052-0fe7-54e8-bc57-1ef572f869e7"
+    },
+    {
+      "path": "/api/dictado/checkpoint?sessionId=11111111-1111-4111-8111-111111111111&revisionId=22222222-2222-4222-8222-222222222222"
+    },
+    {
+      "path": "/api/dictado/checkpoint",
+      "sessionId": "11111111-1111-4111-8111-111111111111"
+    },
+    {
+      "path": "/api/dictado/checkpoint?recover=1",
+      "sessionId": "a6d8c052-0fe7-54e8-bc57-1ef572f869e7"
+    },
+    {
+      "path": "/api/dictado/checkpoint?sessionId=11111111-1111-4111-8111-111111111111&revisionId=22222222-2222-4222-8222-222222222222"
+    },
+    {
+      "path": "/api/audio"
+    },
+    {
+      "path": "/api/dictado/checkpoint",
+      "sessionId": "11111111-1111-4111-8111-111111111111"
+    },
+    {
+      "path": "/api/dictado/checkpoint?recover=1",
+      "sessionId": "a6d8c052-0fe7-54e8-bc57-1ef572f869e7"
+    },
+    {
+      "path": "/api/dictado",
+      "sessionId": "a6d8c052-0fe7-54e8-bc57-1ef572f869e7"
+    },
+    {
+      "path": "/api/audio"
+    },
+    {
+      "path": "/api/dictado/checkpoint",
+      "sessionId": "11111111-1111-4111-8111-111111111111"
+    },
+    {
+      "path": "/api/dictado/checkpoint?recover=1",
+      "sessionId": "a6d8c052-0fe7-54e8-bc57-1ef572f869e7"
+    },
+    {
+      "path": "/api/dictado",
+      "sessionId": "a6d8c052-0fe7-54e8-bc57-1ef572f869e7"
+    }
+  ],
+  "limits": [
+    "synthetic bytes, not microphone/Chrome audio",
+    "real browser IndexedDB+WebCrypto; HTTP endpoints are fixtures",
+    "no production DB, auth, deploy or human UI acceptance"
+  ]
+}

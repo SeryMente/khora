@@ -179,6 +179,7 @@ export async function POST(req: Request) {
       }
 
     return NextResponse.json({
+      sessionId:String(sesionId).trim(),partIndex,
       url: subido.url,
       bytes: crudo.length,
       cifrado: true,

@@ -1,0 +1,8 @@
+{
+  "scope": "isolated local React/WebCrypto; synthetic HTTP API, receipts and auth/normative; NO real publication",
+  "checks": 27,
+  "apiRequests": 12,
+  "archiveRequests": 2,
+  "approvalRequests": 1,
+  "errors": []
+}

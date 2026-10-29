@@ -1,0 +1,28 @@
+{
+  "checks": [
+    "text-only does not require an audio receipt",
+    "verified text-only checkpoint can be green",
+    "unverified text never becomes green merely because audio is absent",
+    "failed text preservation remains red",
+    "later text invalidates previous custody proof",
+    "archive preserves exact text including Unicode and paragraphs",
+    "archive preserves selected title",
+    "source and Blog classification survive recovery",
+    "zero audio parts pass text-only archive",
+    "archiving selected point does not seal original parent",
+    "local and remote retries converge on one stable archive",
+    "later private checkpoint remains recoverable",
+    "no audio invented during text-only flow",
+    "custody does not invoke audio, transcription or publishing",
+    "verified archive receipt has blue meaning distinct from public delivery",
+    "altered recovered text fails closed without a new archive"
+  ],
+  "passed": 16,
+  "scope": "real Chromium IndexedDB and WebCrypto, current client modules; synthetic text and HTTP fixtures",
+  "limits": [
+    "not application UI acceptance",
+    "not real server database/auth",
+    "not GitHub/Pages/Meta publication",
+    "audio intentionally absent"
+  ]
+}

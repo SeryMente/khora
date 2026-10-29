@@ -38,7 +38,7 @@ export function routeFixture(options: { scopes?: string[]; revoked?: boolean; de
   }
   const issuer = "https://khora-contract-fixture.invalid";
   const config = { issuer, canonicalUrl: issuer + "/api/mcp", jwtSecret: "synthetic-key-not-used-for-signing" };
-  const scopes = options.scopes ?? ["volcados:read", "runtime:read", "norm:turn"];
+  const scopes = options.scopes ?? ["volcados:read", "runtime:read", "norm:turn", "blog:read"];
   const business = (name: string) => async (args?: unknown) => {
     calls.push({ name, args });
     if (options.failService) throw new Error("synthetic-secret-private-payload");
@@ -62,6 +62,10 @@ export function routeFixture(options: { scopes?: string[]; revoked?: boolean; de
     "@/lib/server/mcp-db": { isProductionEnv: () => options.production === true },
     "@/lib/server/mcp-manual-token": { MANUAL_MCP_TOKEN_PREFIX: "fixture-manual-", authenticateManualMcpToken: async () => null },
     "@/lib/server/service-observability": { registrarEventoServicio: async () => { if (options.auditFail) throw Error("synthetic audit failure"); } },
+    "@/lib/server/blog/mcp": {
+      blogChanges: (actor: string, after?: string, limit?: number) => business("BlogChanges")({ actor, after, limit }),
+      blogPublicStatus: (actor: string, publicationId: string) => business("BlogPublicStatus")({ actor, publicationId }),
+    },
     "@/lib/server/mcp-audios": { toolKhoraListarAudios: (_actor:string,args:unknown)=>business("ListarAudios")(args), toolKhoraLeerAudio: (_actor:string,args:unknown)=>business("LeerAudio")(args) },
     "@/lib/server/mcp-tools": Object.fromEntries(["Resumen", "ListarVolcados", "LeerVolcado", "BuscarVolcados", "VersionesVolcado"].map(n => ["toolKhora" + n, business(n)])),
     "@/lib/server/mcp-ui-review": { toolKhoraUiReview: business("UiReview") },

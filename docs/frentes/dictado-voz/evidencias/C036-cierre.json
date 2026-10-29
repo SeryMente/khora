@@ -1,0 +1,41 @@
+{
+  "cycle": "C036",
+  "canonical_version": "0.6.22",
+  "functional_commit": "22f0fea34b77aa69ebdc51e346a2e2d4f0cbccc9",
+  "candidate": {
+    "id": "dpl_BL7qyjtYzpqjZFqiVuVrQcz7kVzL",
+    "state": "READY",
+    "production": false
+  },
+  "readback_blob_tipo_entrada": "1b9272ada5d1c5cf0b33e72af7141c0727f00f10",
+  "tests": {
+    "causal_types": {
+      "baseline": 1,
+      "fixed": 0,
+      "scope": "focal options exact tsconfig, NOT global repo"
+    },
+    "unit": 23,
+    "unit_skipped": 0,
+    "ui_browser": 12,
+    "ui_scope": "actual components/styles, synthetic callbacks; NO microphone/auth/DB",
+    "blog_consumer": 20,
+    "blog_scope": "source report from Blog2 loaded, not central rerun"
+  },
+  "history_annex_unchanged": true,
+  "core_sections": 13,
+  "future_only": "Groq summary and uniform public length; no implementation",
+  "source_canonical_commit": "bfa0c2702034015ee3327611678d5286bc219f62",
+  "blog_canonical_commit": "482725063fa47e60186027e9abe55986affca680",
+  "screenshots_local_only": {
+    "desktop.png": "36e976417a198cbd0a77e6f9a485dcbf023cff353e6705f690277f8c2e819db8",
+    "mobile.png": "ce91142c8e67b7c665706ecf97d5c084a40c16d8815b19963a8af15379eed9f7"
+  },
+  "limits": [
+    "preview authentication not demonstrated",
+    "no merge/main/promotion",
+    "no publication",
+    "no full prebuild/Actions proof",
+    "normative credential rejected401",
+    "Meta credentials/identity and exact note approval not established"
+  ]
+}

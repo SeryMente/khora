@@ -1,0 +1,20 @@
+✔ four exact entry types, legacy never becomes a blog (1.502275ms)
+✔ classification never doubles as consent (0.153284ms)
+✔ archive intent starts without permission (9.321554ms)
+✔ stable identity across identical retry (0.818973ms)
+✔ changed content invalidates previous Yes (0.600581ms)
+✔ canonical digest sorts keys recursively without changing arrays (0.355973ms)
+✔ one confirmed destination is not both (0.264415ms)
+✔ mixed revisions cannot satisfy both (0.141426ms)
+✔ both same revision with proofs required (0.221209ms)
+✔ pending parts never report that no part exists (0.328079ms)
+✔ no verified parts is not a local-loss claim (0.134689ms)
+✔ operator-authorized text-only cut does not include audio (0.082832ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 289.198957

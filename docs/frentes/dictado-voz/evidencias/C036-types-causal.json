@@ -1,0 +1,14 @@
+{
+  "scope": "focal import closure using exact repository tsconfig compiler options, NOT full repository typecheck or Next build",
+  "typescript": "5.9.3",
+  "baseline": [
+    {
+      "code": 2339,
+      "file": "tests/unit/blog-text-workflow.test.ts",
+      "line": 44,
+      "message": "Property 'revision' does not exist on type 'never'."
+    }
+  ],
+  "fixed": [],
+  "valid": true
+}

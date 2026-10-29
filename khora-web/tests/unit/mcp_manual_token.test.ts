@@ -1,10 +1,26 @@
 // @l0 L0-002 §4 · @req MCP-MANUAL-TOKEN-01/REQ-1
-import test from "node:test";
+import test, { beforeEach, afterEach } from "node:test";
 import assert from "node:assert/strict";
 import { NextRequest } from "next/server";
 import { createManualMcpToken, authenticateManualMcpToken } from "../../lib/server/mcp-manual-token.js";
 import { setDbForTesting, resetDbForTesting } from "../../lib/server/neon.js";
 import { GET as getMcpRoute } from "../../app/api/mcp/route.js";
+
+// Isolate auth scenarios from the build host (VERCEL_ENV/NODE_ENV may be production).
+// The explicit production-503 scenario in mcp_oauth.test.ts preserves that preflight.
+const authEnvironmentKeys = ["NODE_ENV", "VERCEL_ENV", "KHORA_READONLY_DATABASE_URL"] as const;
+let authEnvironment: Array<[typeof authEnvironmentKeys[number], string | undefined]>;
+beforeEach(() => {
+  authEnvironment = authEnvironmentKeys.map(key => [key, process.env[key]]);
+  Reflect.set(process.env, "NODE_ENV", "test");
+  process.env.VERCEL_ENV = "test";
+  delete process.env.KHORA_READONLY_DATABASE_URL;
+});
+afterEach(() => {
+  for (const [key, value] of authEnvironment) {
+    if (value === undefined) Reflect.deleteProperty(process.env, key); else Reflect.set(process.env, key, value);
+  }
+});
 
 process.env.MCP_OAUTH_CLIENT_ID = "test-client-id";
 process.env.MCP_OAUTH_CLIENT_SECRET = "test-client-secret";
@@ -163,6 +179,8 @@ test("canonical MCP accepts a valid manual Bearer token and still enforces globa
     });
     const res = await getMcpRoute(req);
     assert.notEqual(res.status, 401);
+    assert.notEqual(res.status, 503);
+    assert.notEqual(res.status, 500);
 
     generation = 9;
     const revokedReq = new NextRequest("https://khora.example.com/api/mcp", {

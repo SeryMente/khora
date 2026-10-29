@@ -1,0 +1,26 @@
+[
+  {
+    "path": "/api/version",
+    "status": 200,
+    "url": "https://khora-web.vercel.app/api/version",
+    "body": "{\"commit\":\"ad685dee36c0f0ae1f6f4717439ccb7c39c90c35\",\"rama\":\"feat/ingreso-autobiografico-20261019\",\"desplegado_desde_git\":true,\"fuente_commit\":\"vercel-git\",\"entorno\":\"production\",\"rutas\":[\"/sistema/custodia\",\"/api/volcado\"],\"ahora\":\"2026-10-19T21:07:59.651Z\"}",
+    "server_configuration_error": false,
+    "signin": false
+  },
+  {
+    "path": "/api/auth/session",
+    "status": 200,
+    "url": "https://khora-web.vercel.app/api/auth/session",
+    "body": "null",
+    "server_configuration_error": false,
+    "signin": false
+  },
+  {
+    "path": "/sistema/ingreso",
+    "status": 200,
+    "url": "https://khora-web.vercel.app/auth/signin?callbackUrl=https%3A%2F%2Fkhora-web.vercel.app%2Fsistema%2Fingreso",
+    "body": null,
+    "server_configuration_error": false,
+    "signin": true
+  }
+]

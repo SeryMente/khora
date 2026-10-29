@@ -13,6 +13,7 @@ import { registrarEvento } from "../../../lib/server/eventos";
 
 type VolcadoRow = {
   estado: string;
+  tipo_entrada?: string;
   version_aprobada: number | string | null;
   sha256_aprobado: string | null;
   io_id: string | null;
@@ -313,13 +314,14 @@ export async function POST(req: Request) {
       `
         SELECT
           estado,
+          COALESCE(to_jsonb(volcado)->>'tipo_entrada','general') AS tipo_entrada,
           version_aprobada,
           sha256_aprobado,
           io_id
         FROM volcado
-        WHERE id = $1
+        WHERE id = $1 AND usuario = $2
       `,
-      [volcadoId]
+      [volcadoId, session.user.email]
     );
 
     if (vRes.rows.length === 0) {
@@ -335,6 +337,10 @@ export async function POST(req: Request) {
 
     const volcado =
       vRes.rows[0] as VolcadoRow;
+
+    if (volcado.tipo_entrada === 'interpretacion_simultanea') {
+      return NextResponse.json({error:'ENTRY_EXCLUDED_FROM_PERSONAL_GRAPH',preserved:true},{status:409});
+    }
 
     const estadosReintentables = new Set(["listo_ingesta", "fallido", "ingerido"]);
     if (!estadosReintentables.has(volcado.estado)) {

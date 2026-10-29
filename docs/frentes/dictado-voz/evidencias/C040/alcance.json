@@ -1,0 +1,14 @@
+{
+  "base": "cdc74b3fdaf33487435c34462cc016dd2e3092b2",
+  "blogCommit": "a7201394f2d1befcb3ce76c61c66f95904373dec",
+  "unit": 21,
+  "routeAssertions": 20,
+  "chromiumAssertions": 21,
+  "typescript": "5.9.3 ES2017 focal+consumer JSX zero diagnostics",
+  "fullBuild": "not verified; existing workflow triggered by branch push",
+  "deployment": "not performed; Vercel reauthentication required",
+  "realPublication": false,
+  "originalTextPreserved": true,
+  "normative": "reported401 retryablefalse fa997745-edba-4b0e-975f-b8930996614f",
+  "recordWriteFailure": "This page ancestor is in trash; not restored"
+}
