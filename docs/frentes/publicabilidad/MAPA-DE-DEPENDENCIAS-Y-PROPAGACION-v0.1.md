@@ -21,6 +21,26 @@ Un cambio se considera propagado solo cuando:
 
 Un commit, un deployment `READY`, una instalación local o una copia de un prompt no prueban por sí solos que todas las superficies derivadas estén actualizadas.
 
+## 1.1 Relación estratégica entre ámbitos y activos
+
+El operador declara la siguiente relación de programa: **Otro Gran Programa es el proyecto insignia y depende de la construcción de KHORA/CoMind y de Metodología para poder resolver su objetivo**. Esta dependencia estratégica forma parte del alcance aun cuando todavía no estén identificadas todas sus interfaces, contratos o artefactos técnicos.
+
+No confundir el proyecto/programa completo con el repositorio `SeryMente/otrogranprograma`: su README identifica ese repositorio como el **instrumento público de comunicación** del programa. Es una superficie dentro del OCP general, no prueba de que el repositorio contenga por sí solo todos los componentes del proyecto insignia.
+
+Representación conceptual actual (la arista es estratégica; las dependencias de código/datos concretas siguen pendientes):
+
+```text
+SeryMente/metodologia (gobernanza y método) ───┐
+                                               ├──> Otro Gran Programa (programa insignia)
+KHORA / CoMind (prótesis cognitiva) ────────────┘             │
+                                                             └──> SeryMente/otrogranprograma
+                                                                  (instrumento público de comunicación)
+SeryMente/serymente ──> sitio web/marketing WordPress + Divi
+Signal Interpreter / GDP ──> herramientas operativas especializadas
+```
+
+El esquema no afirma una integración técnica ya implementada entre estos componentes: expresa la relación estratégica dictada por el operador y separa lo conocido de las interfaces todavía por investigar.
+
 ## 2. Inventario inicial de repositorios identificados
 
 Una búsqueda de repositorios de GitHub con ámbito `org:SeryMente` devolvió los nueve repositorios de la tabla. Es una **primera enumeración accesible, no una certificación de exhaustividad de toda la organización**: debe contrastarse con la lista completa del propietario y con activos externos a GitHub. Los alcances abajo se derivan de la búsqueda y de los README que se pudieron leer; las incógnitas no se completan por inferencia.
