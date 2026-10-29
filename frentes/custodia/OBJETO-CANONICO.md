@@ -33,7 +33,7 @@
 ## 3. Referencia metodológica
 
 - **Fuente normativa consultada durante la primera actualización del ciclo:** [METAPROMPT-CANONICO-SAMANTHA.html](https://github.com/SeryMente/metodologia/blob/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html), rama main, blob a4c90bd8ff1cd360b1f1662ff55371bd1b56b4cd, Samantha v348 · NX-348m.
-- **Revalidación metodológica previa al cierre:** la lectura más reciente de `main` devuelve Samantha v352 · NX-352m, Metacanon 1.21 · METACANON-OBJETOS-v1.21, GOW v2.3; blob a nivel de archivo 94473eccb6fa71303d5908ce678f7efeb191c215.
+- **Última revalidación metodológica del ciclo 2 (histórica):** Samantha v352 · NX-352m, Metacanon 1.21, GOW v2.3; blob de archivo 94473eccb6fa71303d5908ce678f7efeb191c215.
 - **Cláusulas aplicadas a este ciclo:** §3 (pendientes ordenados dentro del estado vivo); §§27 y 46 (núcleo único y materializaciones necesarias del OCP); §28 (instrucción original, crónica, evidencia y lectura de vuelta); §§39 y 48 (conservar el propósito y la ruta canónica, sin crear controles u objetos paralelos).
 - **Fuente normativa actualizada para el ciclo de inventario:** Samantha v356 · NX-356m; Metacanon 1.22; GOW v2.6; blob `c364e179e8e9b6a3d566a8e690dfa1a7cce91798` de `SeryMente/metodologia/main:gobernanza/METAPROMPT-CANONICO-SAMANTHA.html`.
 - Esta adquisición identifica la versión del canon central al momento de la lectura; no equivale a una auditoría integral de todos sus principios o anexos ni a una declaración de conformidad definitiva del diseño de lista.
@@ -206,6 +206,7 @@ No se rellenan huecos con inferencias ni se da por ejecutada una prueba porque a
 - **Acción persistente:** creado [evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md](evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md), v0.1, blob leído de vuelta b7e4f8c6770368e988f6e14d1fca018e72117aeb, commit de creación 3fa8497ab8c013f4ab43a4d9224b6dae863d21e8. El documento separa código confirmado, evidencia auxiliar local, datos del catálogo pendientes, clasificaciones unitarias, criterios de aceptación y siguiente paso. No es un segundo estado vivo.
 - **Impacto en el propósito:** la recuperabilidad de producto continúa NO CERTIFICADA. Hay un defecto de diseño que debe corregirse, pero todavía no sabemos qué porcentaje del catálogo está afectado ni si todos los objetos remotos siguen accesibles.
 - **Siguiente prueba/checkpoint:** obtener el catálogo autenticado de la UI real, enumerar las unidades sin guardar datos personales, cruzar cada una con partes de sesión y disponibilidad de objetos, clasificar sus fallos y luego planear una prueba de recuperación no destructiva por patrón antes de autorizar cualquier cambio de código.
+- **Salida visible final de este ciclo:** se preservará en [originales/SALIDA-MODELO-CUSTODIA-INVENTARIO-2026-10-28.md](originales/SALIDA-MODELO-CUSTODIA-INVENTARIO-2026-10-28.md) antes de emitirla; la lectura de vuelta se registrará al cierre.
 
 ### Fuentes y referencias
 
@@ -233,7 +234,8 @@ Instrucción para una conversación futura:
 - **Original de la instrucción de inventario:** frentes/custodia/originales/INSTRUCCION-INVENTARIO-RECUPERABILIDAD-INGRESOS-2026-10-28.md (blob 357f3c1cc9081a47f47dc3fa0b838e8f8eeed5a5).
 - **Salida visible previa preservada:** frentes/custodia/originales/SALIDA-MODELO-CUSTODIA-ANTERIOR-RECUPERABILIDAD-INGRESOS-2026-10-28.md (blob c5feb1e2ac4454dfe60898489f5b7612bc91646a).
 - **Original de la instrucción de tareas:** frentes/custodia/originales/INSTRUCCION-PENDIENTES-2026-10-28.md.
-- **Salida visible del modelo de este ciclo:** frentes/custodia/originales/SALIDA-MODELO-CUSTODIA-CICLO-2-2026-10-28.md.
+- **Salida visible del ciclo 2:** frentes/custodia/originales/SALIDA-MODELO-CUSTODIA-CICLO-2-2026-10-28.md.
+- **Salida visible final del ciclo 3:** frentes/custodia/originales/SALIDA-MODELO-CUSTODIA-INVENTARIO-2026-10-28.md; conservarla antes de emitir y registrar su blob de lectura de vuelta.
 - Las rutas de arriba no constituyen un segundo almacén de producto; son la base documental del frente.
 - Tras cada ciclo: leer de vuelta los archivos modificados; comparar el propósito con el original aprobado; verificar el JSON; registrar el SHA real del archivo y el commit real; revisar el diff; no fijar hashes autorreferentes inventados.
 - Revisar el Metacanon central y la rama main antes de cada ciclo material. La fuente vigente adquirida el 2026-10-28 fue Samantha v356 · NX-356m, Metacanon 1.22, GOW v2.6, blob c364e179e8e9b6a3d566a8e690dfa1a7cce91798. Si la fuente o alguna evidencia no está disponible, declarar exactamente qué no se verificó y bloquear solo las decisiones que dependan de ello.
