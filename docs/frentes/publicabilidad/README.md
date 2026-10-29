@@ -1,8 +1,8 @@
 # Publicabilidad
 
 **Objeto Canónico de Persistencia (OCP):** [OBJETO-CANONICO.md](OBJETO-CANONICO.md)  
-**Estado:** OCP v0.7; prioridad P0: método sólido ChatGPT Free → GitHub Web → Preview Vercel → release cloud. El diagnóstico favorece una restricción de cuota/budget/entitlement para Actions de repositorios privados, aún sin confirmación directa del panel o anotación. El preflight RDC fue preparación parcial: no se ejecutó ningún test y la sesión remota dejó operaciones en timeout. Se autorizó reanudar RDC para ejecutar los jobs localmente como validación sustitutiva; falta restablecer el canal y preparar el entorno. Producción sigue bloqueada.  
-**Versión del frente:** PUBLICABILIDAD-v0.7  
+**Estado:** OCP v0.8; prioridad P0: método sólido ChatGPT Free → GitHub Web → Preview Vercel → release cloud. Los últimos runs privados de KHORA y Metodología fallaron sin runner ni steps mientras Signal Interpreter, público, pasó con runners reales; la hipótesis de gate de uso/billing privado sigue sin confirmación directa. RDC PC-4 fue restaurado y permanece como entorno de trabajo, pero no hay checkout íntegro ni autenticación GitHub en la terminal. CI local NO EJECUTADA. Producción sigue bloqueada.  
+**Versión del frente:** PUBLICABILIDAD-v0.8  
 **Metodología consultada en ciclo 06:** Documento Único de Gobernanza (DUG) de Ser y Mente · Samantha v359 · NX-359m · Metacanon 1.24 · GOW 2.8.
 
 ## Lectura y evidencia
@@ -16,14 +16,15 @@
 7. [Matriz de escenarios de propagación transversal G01–G12](evidencias/MATRIZ-ESCENARIOS-PROPAGACION-TRANSVERSAL-v0.1.md).
 8. [Diagnóstico de viabilidad ChatGPT Free → Vercel](evidencias/DIAGNOSTICO-VIABILIDAD-CHATGPT-FREE-VERCEL-2026-10-29.md).
 9. [Diagnóstico transversal billing/Actions](evidencias/DIAGNOSTICO-BLOQUEO-ACTIONS-BILLING-2026-10-29.md).
-10. [Preflight de CI local por RDC (preparación parcial; sin tests ejecutados)](evidencias/CI-LOCAL-PREFLIGHT-RDC-2026-10-29.md).
-11. [Crónica del ciclo 04 — alcance transversal](cronica/CICLO-04-ALCANCE-TRANSVERSAL.md).
-12. [Crónica del ciclo 05 — prioridad ChatGPT Free → Vercel](cronica/CICLO-05-CHATGPT-FREE-VERCEL.md).
-13. [Crónica del ciclo 06 — diagnóstico transversal de Actions](cronica/CICLO-06-DIAGNOSTICO-BILLING-ACTIONS.md).
-14. [Crónica del ciclo 06 — intento de CI local sustitutiva por RDC](cronica/CICLO-06-CI-LOCAL-RDC.md).
-15. [Crónica de instanciación](cronica/PUBLICABILIDAD-INSTANCIACION-01.md).
-16. [Control de responsabilidad](CONTROL-RESPONSABILIDAD.json).
-17. [Prompt de asistencia](prompts/ASISTENTE.md) y [prompt de construcción](prompts/CONSTRUCTOR.md).
+10. [Preflight de CI local por RDC en PC-14 (histórico; sin tests ejecutados)](evidencias/CI-LOCAL-PREFLIGHT-RDC-2026-10-29.md).
+11. [Revalidación del preflight de CI local en PC-4 (sin checkout íntegro ni tests)](evidencias/CI-LOCAL-PREFLIGHT-PC4-2026-10-29.md).
+12. [Crónica del ciclo 04 — alcance transversal](cronica/CICLO-04-ALCANCE-TRANSVERSAL.md).
+13. [Crónica del ciclo 05 — prioridad ChatGPT Free → Vercel](cronica/CICLO-05-CHATGPT-FREE-VERCEL.md).
+14. [Crónica del ciclo 06 — diagnóstico transversal de Actions](cronica/CICLO-06-DIAGNOSTICO-BILLING-ACTIONS.md).
+15. [Crónica del ciclo 06 — intento de CI local sustitutiva por RDC](cronica/CICLO-06-CI-LOCAL-RDC.md).
+16. [Crónica de instanciación](cronica/PUBLICABILIDAD-INSTANCIACION-01.md).
+17. [Control de responsabilidad](CONTROL-RESPONSABILIDAD.json).
+18. [Prompt de asistencia](prompts/ASISTENTE.md) y [prompt de construcción](prompts/CONSTRUCTOR.md).
 
 ## Alcance de esta primera entrega
 
