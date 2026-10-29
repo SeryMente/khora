@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.24; OBJECT_VERSION=0.10; OBJECT_SEAL=CUSTODIA-v0.10; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.24; OBJECT_VERSION=0.11; OBJECT_SEAL=CUSTODIA-v0.11; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · RESPONSABILIDAD TRANSFERIDA EN C009 · CONTINUACIÓN TÉCNICA C010 · INVESTIGACIÓN ABIERTA · GARANTÍAS DE PRODUCTO NO CERTIFICADAS.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.10. Metacanon: 1.24. Gobierno general verificado: Samantha v359 · NX-359m; GOW 2.8. Fuente central `SeryMente/metodologia/main`: blob `b2ff2845a5a99dc4ce3cafafc4f8e43607d48145`. Este objeto funda el frente documental transversal; no prueba que las garantías descritas ya estén implementadas ni certificadas.
+> **ESTADO · VIVO · RESPONSABILIDAD TRANSFERIDA EN C009 · CONTINUACIÓN TÉCNICA C010/C011 · INVESTIGACIÓN ABIERTA · GARANTÍAS DE PRODUCTO NO CERTIFICADAS.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.11. Metacanon: 1.24. Gobierno general verificado: Samantha v359 · NX-359m; GOW 2.8. Fuente central `SeryMente/metodologia/main`: blob `b2ff2845a5a99dc4ce3cafafc4f8e43607d48145`. Este objeto funda el frente documental transversal; no prueba que las garantías descritas ya estén implementadas ni certificadas.
 
 ## 1. Control e identidad
 
@@ -12,9 +12,9 @@
 - **Único núcleo operativo:** este OBJETO-CANONICO.md.
 - **Control único de responsabilidad:** [CONTROL-RESPONSABILIDAD.json](CONTROL-RESPONSABILIDAD.json). Titularidad transferida en generación 3 a `chatgpt-custodia-SES-20261029-C9K4M2R8`, folio `SES-20261029-C9K4M2R8`. Es un alias operativo, no el ID nativo de conversación; el relevo conserva la asignación previa y su generación en el control.
 - **Propósito literal aprobado:** [originales/PROPOSITO-OPERADOR-2026-10-28.md](originales/PROPOSITO-OPERADOR-2026-10-28.md). La sección 4 también conserva el texto aprobado íntegro para que el propósito sea visible en el núcleo.
-- **Lista de tareas:** [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md), materialización auxiliar provisional de los pendientes; versión 0.10. La tarea CUSTODIA-02 se retiró del plan activo por instrucción del operador y su identificador no se reutiliza. La lista no queda certificada metodológicamente por esa retirada.
+- **Lista de tareas:** [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md), materialización auxiliar provisional de los pendientes; versión 0.11. La tarea CUSTODIA-02 se retiró del plan activo por instrucción del operador y su identificador no se reutiliza. La lista no queda certificada metodológicamente por esa retirada.
 - **Inventario provisional de hallazgos:** [evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md](evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md), materialización de evidencia para CUSTODIA-01; no es un segundo estado vivo.
-- **Versión y sello vigentes:** CUSTODIA-v0.10. Es la décima versión documental del objeto; no es una versión del producto.
+- **Versión y sello vigentes:** CUSTODIA-v0.11. Es la undécima versión documental del objeto; no es una versión del producto.
 - **Relación con frentes existentes:** este frente es transversal. No sustituye ni duplica el objeto de Dictado de voz ([docs/frentes/dictado-voz/OBJETO-CANONICO.md](../../docs/frentes/dictado-voz/OBJETO-CANONICO.md)) ni su contrato de implementación ([khora-web/docs/CUSTODIA-DICTADOS.md](../../khora-web/docs/CUSTODIA-DICTADOS.md)).
 - **Visibilidad del repositorio:** la consulta inicial de GitHub devolvió public; dos consultas posteriores devolvieron private y coinciden con el README. El estado más reciente observado es private. El momento y la causa de la diferencia, así como una posible exposición pública anterior, no están verificados.
 
@@ -101,34 +101,34 @@ Custodia es el frente transversal que define, verifica y gobierna las garantías
 
 ## 8. Estado vivo
 
-**Estado del frente: CUSTODIA-01 EN CURSO (P0) — CUSTODIA-03 ABIERTA (P0) — CUSTODIA-04 EN CURSO (P0) — GARANTÍAS DE PRODUCTO NO CERTIFICADAS. CUSTODIA-02 RETIRADA DEL PLAN ACTIVO. RESPONSABILIDAD DOCUMENTAL TRANSFERIDA EN C009 A GENERACIÓN 3. CONTINUACIÓN TÉCNICA C010 DOCUMENTADA.**
+**Estado del frente: CUSTODIA-01 EN CURSO (P0) — CUSTODIA-03 ABIERTA (P0) — CUSTODIA-04 EN CURSO (P0) — GARANTÍAS DE PRODUCTO NO CERTIFICADAS. CUSTODIA-02 RETIRADA DEL PLAN ACTIVO. RESPONSABILIDAD DOCUMENTAL TRANSFERIDA EN C009 A GENERACIÓN 3. CONTINUACIÓN TÉCNICA DOCUMENTADA EN C010/C011.**
 
-El detalle operativo sigue en [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md) v0.10. Es una materialización auxiliar provisional, no un segundo estado vivo; su diseño metodológico no está certificado y CUSTODIA-02 no se reactiva.
+El detalle operativo sigue en [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md) v0.11. Es una materialización auxiliar provisional, no un segundo estado vivo; su diseño metodológico no está certificado y CUSTODIA-02 no se reactiva.
 
 ### Confirmado en las fuentes consultadas
 
 - El DUG central vigente leído desde `SeryMente/metodologia/main` es Samantha v359 · NX-359m, Metacanon 1.24, GOW 2.8, blob `b2ff2845a5a99dc4ce3cafafc4f8e43607d48145`.
 - El control único de responsabilidad fue releído tras el relevo: generación 3, alias operativo `chatgpt-custodia-SES-20261029-C9K4M2R8`, con autorización preservada. El alias no es un ID nativo de plataforma.
-- La propuesta de corrección de catálogo/audio sigue en la PR [#339](https://github.com/SeryMente/khora/pull/339), abierta en borrador, sin fusionar. La rama `fix/custodia-recovery-reconcile-20261028` está divergida respecto de `main`; no debe fusionarse ni desplegarse antes de reconciliarla contra la punta vigente y volver a probarla.
-- La evidencia de C008 corresponde a una punta anterior: `typecheck` pasó; la integración PostgreSQL/PGlite aislada pasó 15 comprobaciones con datos y clave sintéticos; la suite unitaria registró 549/550 por timeout TLS en la prueba de sincronización metodológica, aunque se comparó aparte el JSON local/canónico; los workflows remotos terminaron sin runner, pasos ni logs descargables. La consulta actual de los workflows para la punta registrada sigue mostrando fallos con cero pasos y sin logs utilizables; esto no es CI verde ni evidencia de que las aserciones de código fallaron. La causa de esos jobs sin pasos sigue sin determinarse.
-- El último despliegue READY observado de `khora-web` apunta a `main` en el commit `b528660e16552633d232a2397cbe42441a03438c`, anterior a la corrección propuesta. No se efectuó despliegue en C009/C010.
+- PR [#339](https://github.com/SeryMente/khora/pull/339) continúa abierta en borrador, sin fusión ni despliegue. La rama `fix/custodia-recovery-reconcile-20261028` está divergida respecto de `main`; no debe fusionarse ni desplegarse hasta corregir los casos descubiertos, reconciliarla con `main` vigente y repetir pruebas.
+- La evidencia de C008 corresponde a una punta anterior: `typecheck` pasó; la integración PostgreSQL/PGlite aislada pasó 15 comprobaciones con datos y clave sintéticos; la suite unitaria registró 549/550 por timeout TLS en la prueba de sincronización metodológica, aunque se comparó aparte el JSON local/canónico; los workflows remotos consultados siguen mostrando fallos sin pasos ni logs útiles. Esto no es CI verde ni evidencia de que fallaran las aserciones del código; la causa de esos jobs sin pasos sigue sin determinarse.
+- El despliegue READY observado de `khora-web` apunta a `main` en el commit `b528660e16552633d232a2397cbe42441a03438c`, anterior a la corrección propuesta. No se efectuó despliegue en C009–C011.
 
-### Hallazgo nuevo C010: metadatos no son lectura del objeto
+### Hallazgos de código pendientes de cierre
 
-El inventario provisional v0.8 registra F-13 y R-09. En el código vigente, `evaluarCustodiaAudio` valida índices/continuidad, bytes declarados, formato del SHA-256 persistido y estado de verificación de la fila; no descarga ni lee los bytes actuales del proveedor ni recalcula el hash sobre ellos. La propuesta #339 amplía la semántica de UI y maneja ciertos snapshots legacy sin manifiesto, pero la recuperación propuesta sigue copiando referencias de base de datos, no demostrando que el blob remoto esté disponible e íntegro. Esta es una limitación confirmada del código inspeccionado; no es evidencia de que un objeto productivo concreto esté perdido o corrupto.
+- **F-13/R-09:** el validador de audio comprueba índices/continuidad, bytes declarados, formato del SHA-256 almacenado y estado de verificación, pero no lee los bytes actuales del proveedor ni recalcula SHA-256 sobre ellos. La propuesta distingue mejor el audio legacy, pero no demuestra disponibilidad/integridad real de los objetos remotos.
+- **F-14/R-10:** en la propuesta #339, el fallback legacy solo se activa cuando no existe `corteAudio`. Si existe un objeto `corteAudio` con `hastaParte=0` y hay filas de audio, el total sigue en cero y el flujo no copia esas partes, aunque la UI candidata pueda mostrar `storedAudioParts > 0`. Es un defecto confirmado en el código candidato, no una incidencia productiva medida.
+- Por eso la propuesta no debe fusionarse tal como está. Debe cubrir tanto corte ausente como corte explícitamente vacío, conservar audio sin sincronía inventada o bloquear la acción con mensaje explícito, y comprobar lectura de vuelta. Por separado R-09 exige lectura real y hash de bytes de los objetos.
 
 ### Pendiente de evidencia productiva
 
 - Catálogo autenticado de todas las unidades de Ingresos → Dictado → Recuperación, paginación completa hasta cursor nulo, deduplicación por identidad y clasificación individual.
 - Checkpoints, acuses de recepción y referencias de objetos que permitan localizar el dictado esperado después de la última entrada visible reportada para el 2026-10-28 a las 17:08.
-- Lectura real, descifrado/decodificación y SHA-256 recalculado de los objetos de audio remotos; verificación de lectura de vuelta del destino recuperado.
+- Lectura real, descifrado/decodificación y SHA-256 recalculado de objetos remotos; lectura de vuelta del destino recuperado bajo el propietario autorizado.
 - Mapa del primer punto de persistencia por canal de adquisición, almacenes/proveedores, uso de Vercel Blob y eventual migración a Backblaze.
-- Pruebas de interrupción de checkpoint, cierre/reinicio/cambio de perfil, recuperación de texto y audio, integridad y procedencia en un entorno autorizado.
-- Resolución de CI y publicación; reconciliación de la rama #339 con `main` vigente, nueva revisión de diff y repetición de todos los controles sobre la nueva punta.
+- Pruebas de interrupción de checkpoint, cierre/reinicio/cambio de perfil, recuperación de texto y audio, integridad y procedencia.
+- Reconciliación de la rama #339 con `main` vigente y repetición de controles; resolución de CI y de la vía de publicación compatible con el repositorio privado.
 
-El código de `main` contiene un riesgo confirmado: el indicador de audio y el límite de restauración pueden derivarse del manifiesto del snapshot, aunque existan filas de partes separadas. La propuesta de PR #339 aborda parte de ese defecto, pero sigue divergida y no demuestra acceso al objeto real. La inspección auxiliar de cinco snapshots locales no sustituye el catálogo de Recovery.
-
-El catálogo autenticado no se obtuvo en C010: **0 unidades productivas cotejadas, 0 recuperaciones productivas**. El dictado reportado como ausente continúa sin localizarse; su pérdida definitiva no está demostrada. CUSTODIA-01, CUSTODIA-03 y CUSTODIA-04 permanecen abiertas según sus criterios de aceptación. No se declara recuperabilidad productiva, cobertura integral de audio ni cero pérdidas.
+El catálogo autenticado no se obtuvo en C010/C011: **0 unidades productivas cotejadas, 0 recuperaciones productivas**. El dictado reportado como ausente continúa sin localizarse; su pérdida definitiva no está demostrada. CUSTODIA-01, CUSTODIA-03 y CUSTODIA-04 permanecen abiertas según sus criterios de aceptación. No se declara recuperabilidad productiva ni cero pérdidas.
 
 ## 9. Aceptación y viabilidad
 
@@ -307,6 +307,16 @@ No se rellenan huecos con inferencias ni se da por ejecutada una prueba porque a
 - **Bloqueo material:** sin un clon autenticado ni una sesión de navegador autorizada accesible, no es posible leer de forma segura el catálogo privado desde esta conexión. No se elude la protección de otro perfil ni se copian cookies/secretos.
 - **Siguiente paso:** acceder al catálogo bajo sesión propietaria autorizada; obtener línea base y estados de checkpoint; luego reconciliar la corrección sobre la rama actual y ejecutar pruebas de regresión y lectura real de objetos antes de cualquier publicación.
 
+### Ciclo 11 · CUSTODIA-PLAN-RECUP-SES-20261029-C9K4M2R8-C011 · 2026-10-29
+
+- **Objetivo:** revisar la ruta candidata de recuperación y cubrir el caso de audio presente con un corte explícitamente vacío.
+- **Gobernanza:** Samantha v359 · NX-359m; Metacanon 1.24; GOW 2.8; blob DUG `b2ff2845a5a99dc4ce3cafafc4f8e43607d48145`.
+- **Hallazgo F-14/R-10:** el fallback de audio legacy en la PR #339 no se activa si `corteAudio` existe con `hastaParte=0`, aun cuando existan filas de audio; el total queda en cero y no se copian partes. Es un hallazgo de código candidato, no una incidencia productiva confirmada. Se registró en el inventario v0.9.
+- **Estado de PR/CI:** #339 sigue abierta en borrador y divergida de `main`. Los workflows consultados no ejecutan pasos ni tienen logs útiles; no hay CI verde demostrado. No se fusionó ni desplegó.
+- **Estado productivo:** no se obtuvo el catálogo autenticado, ni checkpoints/objetos productivos. 0 unidades cotejadas y 0 recuperaciones productivas; el dictado ausente sigue sin localizarse, sin evidencia suficiente para afirmar pérdida definitiva.
+- **Documentación:** lista provisional v0.11; inventario v0.9; salida C011 preservada; OCP actualizado a CUSTODIA-v0.11. La lista sigue provisional y CUSTODIA-02 continúa retirada.
+- **Siguiente paso:** corregir el caso F-14 en una rama reconciliada/nueva basada en `main`, agregar regresiones para corte ausente y corte con cero, leer/verificar blobs reales con hash y realizar lectura de vuelta. Mantener el original intacto; no publicar hasta superar controles y confirmar una vía de despliegue permitida para el repositorio privado.
+
 ### Fuentes y referencias
 
 - [Gobernanza única Samantha](https://github.com/SeryMente/metodologia/blob/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html).
@@ -319,24 +329,25 @@ No se rellenan huecos con inferencias ni se da por ejecutada una prueba porque a
 
 Instrucción para una conversación futura:
 
-> Retoma el frente transversal Custodia en SeryMente/khora, rama main. Adquiere primero el OCP único frentes/custodia/OBJETO-CANONICO.md, CONTROL-RESPONSABILIDAD.json, LISTA-TAREAS-PROVISIONAL.md, INVENTARIO-RECUPERABILIDAD-INGRESOS.md, el informe del incidente, los originales enlazados y el Metaprompt vigente desde SeryMente/metodologia/main. El estado vigente al C010 es CUSTODIA-v0.10; lista provisional v0.10; inventario v0.8; informe del incidente v0.6 (ABIERTO). Las tareas activas son CUSTODIA-01 (P0, recuperar/verificar unidades visibles), CUSTODIA-03 (P0, investigar capturas ausentes) y CUSTODIA-04 (P0, corregir/validar recuperabilidad sistémica); CUSTODIA-02 está retirada y su ID no se reutiliza. Secuencia: (1) obtener línea base autenticada y no destructiva de todo el catálogo hasta nextCursor=null; (2) recuperar/verificar unidades visibles mientras continúa la investigación de ausencias; (3) reconciliar la corrección con main vigente y cerrar pruebas de extremo a extremo después de contar con evidencia de CUSTODIA-01/03. PR #339 sigue en borrador y su rama fix/custodia-recovery-reconcile-20261028 está divergida de main; no fusionar ni desplegar sin rebasar/reconstruir y repetir validaciones. F-13/R-09 confirma que el validador actual comprueba metadatos pero no lee bytes actuales del objeto remoto ni recalcula SHA-256 desde ellos; la propuesta tampoco demuestra lectura del blob. Los workflows consultados terminan sin pasos/logs utilizables; no declarar CI verde. No se ha adquirido el catálogo productivo: 0 unidades cotejadas y 0 recuperaciones productivas. El dictado que el operador reportó ausente después de la última entrada visible del 2026-10-28 a las 17:08 sigue sin localizarse; su pérdida definitiva no está demostrada. No copies transcripciones, audio, cookies, credenciales, UUID reales ni URLs privadas. No cambies originales ni producción. No declares recuperabilidad garantizada sin catálogo completo, lectura real de objetos, hash de bytes, lectura de vuelta, integridad y procedencia verificadas.
+> Retoma el frente transversal Custodia en SeryMente/khora, rama main. Adquiere primero el OCP único frentes/custodia/OBJETO-CANONICO.md, CONTROL-RESPONSABILIDAD.json, LISTA-TAREAS-PROVISIONAL.md, INVENTARIO-RECUPERABILIDAD-INGRESOS.md, el informe del incidente, los originales enlazados y el Metaprompt vigente desde SeryMente/metodologia/main. El estado vigente al C011 es CUSTODIA-v0.11; lista provisional v0.11; inventario v0.9; informe del incidente v0.6 (ABIERTO). Las tareas activas son CUSTODIA-01 (P0, recuperar/verificar unidades visibles), CUSTODIA-03 (P0, investigar capturas ausentes) y CUSTODIA-04 (P0, corregir/validar recuperabilidad sistémica); CUSTODIA-02 está retirada y su ID no se reutiliza. Secuencia: (1) obtener línea base autenticada y no destructiva de todo el catálogo hasta nextCursor=null; (2) recuperar/verificar unidades visibles mientras continúa la investigación de ausencias; (3) corregir y reconciliar la propuesta con main vigente y cerrar pruebas de extremo a extremo a partir de evidencias de CUSTODIA-01/03. PR #339 sigue en borrador y su rama fix/custodia-recovery-reconcile-20261028 está divergida de main; no fusionar ni desplegar sin resolver F-14/R-10, reconciliar cambios y repetir validaciones. F-13/R-09 confirma que el validador candidato comprueba metadatos pero no lee bytes actuales ni recalcula SHA-256 desde ellos; F-14/R-10 confirma que el fallback candidato no cubre corteAudio.hastaParte=0 con partes existentes, aun cuando la UI candidata puede informar audio almacenado. Los workflows consultados terminan sin pasos/logs utilizables; no declarar CI verde. No se ha adquirido el catálogo productivo: 0 unidades cotejadas y 0 recuperaciones productivas. El dictado que el operador reportó ausente después de la última entrada visible del 2026-10-28 a las 17:08 sigue sin localizarse; su pérdida definitiva no está demostrada. No copies transcripciones, audio, cookies, credenciales, UUID reales ni URLs privadas. No cambies originales ni producción. No declares recuperabilidad garantizada sin catálogo completo, lectura real de objetos, hash de bytes, lectura de vuelta, integridad y procedencia verificadas.
 
 ## 13. Persistencia y revisión
 
-**Versión actualizada en este ciclo:** CUSTODIA-v0.10. El inventario provisional y el informe de incidente son evidencia enlazada, no un segundo estado vivo.
+**Versión actualizada en este ciclo:** CUSTODIA-v0.11. El inventario provisional y el informe de incidente son evidencia enlazada, no un segundo estado vivo.
 
 - **Núcleo único:** frentes/custodia/OBJETO-CANONICO.md.
 - **Control único:** frentes/custodia/CONTROL-RESPONSABILIDAD.json.
 - **Original aprobado:** frentes/custodia/originales/PROPOSITO-OPERADOR-2026-10-28.md.
 - **Control de responsabilidad tras el relevo C009:** frentes/custodia/CONTROL-RESPONSABILIDAD.json; blob `cc6f80b69834c64188240960f447592af0b943a8` (generación 3).
 - **Original de la autorización del relevo:** frentes/custodia/originales/INSTRUCCION-TRANSFERENCIA-RESPONSABILIDAD-2026-10-29.md; blob `240a27710d1de76fd9a5eeeb9ce97fdb6b987104`, commit `9fb5bd3a03158e1435009153c38be489c901c155`.
-- **Lista auxiliar provisional de tareas:** frentes/custodia/LISTA-TAREAS-PROVISIONAL.md (v0.10, blob `43492b55aa9f8b2dfc1e06ae4d81cd217d3760ab`).
-- **Inventario provisional de hallazgos:** frentes/custodia/evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md (v0.8, blob `45aa5fd8c0e802440060dbd292778615dbd63ef9`).
+- **Lista auxiliar provisional de tareas:** frentes/custodia/LISTA-TAREAS-PROVISIONAL.md (v0.11, blob `9bd90fb79ef767dfbe4214e35ace7150c34bc6bc`).
+- **Inventario provisional de hallazgos:** frentes/custodia/evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md (v0.9, blob `c14900bb0d594b3d07199de3963e341718f1677c`).
 - **Informe provisional del incidente de dictado ausente y conteo 40→20:** frentes/custodia/evidencias/INCIDENTE-DICTADO-AUSENTE-Y-CONTEO-40-20-2026-10-28.md (v0.6, blob `a59c32b54a9e44df2c8bc29ea30ba9d143a1a029`). El incidente sigue abierto; en C010 no se obtuvo evidencia nueva del registro productivo concreto.
 - **Salida visible del ciclo C007:** frentes/custodia/originales/SALIDA-MODELO-CUSTODIA-IMPLEMENTACION-PARCIAL-2026-10-28.md (blob `8ef201f99dc23a00e092ee5f78788bb8692f4e05`).
 - **Salida visible del ciclo C008:** frentes/custodia/originales/SALIDA-MODELO-CUSTODIA-VALIDACION-INTEGRACION-2026-10-28.md (blob `02c381efd204379913c664daf695138731ad9ebb`).
 - **Salida visible del ciclo C009:** frentes/custodia/originales/SALIDA-MODELO-CUSTODIA-REANUDACION-2026-10-29.md (blob `7938406dfb94a1f579d8a9103571f33aad3eff65`).
 - **Salida visible del ciclo C010:** frentes/custodia/originales/SALIDA-MODELO-CUSTODIA-REANUDACION-TECNICA-2026-10-29.md (blob `944f4b26239502a81b751269b6a6a4e8554b326c`).
+- **Salida visible del ciclo C011:** frentes/custodia/originales/SALIDA-MODELO-CUSTODIA-REVISION-PR-339-2026-10-29.md (blob `ad20e25da30d888dc60429b93272278a4a375074`).
 - **Instrucción original del incidente:** frentes/custodia/originales/INSTRUCCION-INCIDENTE-DICTADO-AUSENTE-2026-10-28.md (blob ea683e89590d33d5fdf32feadc00629b0d0eae20).
 - **Instrucción original de ampliación de tareas:** frentes/custodia/originales/INSTRUCCION-AMPLIACION-TAREAS-RECUPERABILIDAD-2026-10-28.md (blob 0d4edd36ef1611334e6438fe6048b590c08fc7a2).
 - **Original de la instrucción de inventario:** frentes/custodia/originales/INSTRUCCION-INVENTARIO-RECUPERABILIDAD-INGRESOS-2026-10-28.md (blob 357f3c1cc9081a47f47dc3fa0b838e8f8eeed5a5).
