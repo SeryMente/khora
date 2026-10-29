@@ -24,6 +24,6 @@ SHA-256 del archivo JSONL: 8a5f2ea2ed6c2ddf76d5d4bbe3758dd6dde638df68fef026df346
 
 - Mensaje original del operador conservado literalmente en `HARMONIA-REVISION-E2E-SES-20261028-P9K4R7M2-20261029.jsonl`, registro U21: `Revisa nueva sesion de trabajo, y resuelve de extremo a extremo lo faltante.`
 - Blob leído de vuelta: `fa55c374b504b29c2565b310b343cf081c4e7c71`; el contenido UTF-8 del JSONL coincide exactamente con el esperado, incluida la terminación LF.
-- La salida visible de este ciclo se conserva en `HARMONIA-CICLO-SES-20261028-P9K4R7M2-20261029-salida.md`, blob `db4667b49e0d799c21eafa83f04865bd58713d98`, cotejada por lectura de vuelta.
-- La crónica correspondiente está en `../cronica/HARMONIA-CICLO-SES-20261028-P9K4R7M2-20261029.md`, blob `f9efea1e6b343b2f5681f5df7babcdb8b47e18a8`, cotejada por lectura de vuelta. Conserva el entorno observado, los intentos fallidos, los límites y el siguiente checkpoint.
+- La salida visible de este ciclo se conserva en `HARMONIA-CICLO-SES-20261028-P9K4R7M2-20261029-salida.md`, blob `57ee1413b1c916b260daeb8e6c6c88bf16ceb581`, cotejada por lectura de vuelta.
+- La crónica correspondiente está en `../cronica/HARMONIA-CICLO-SES-20261028-P9K4R7M2-20261029.md`, blob `c130054921f6892250cb6713d2a373bfbc8532ba`, cotejada por lectura de vuelta. Conserva el entorno observado, los intentos fallidos, los límites y el siguiente checkpoint.
 - La salida y la crónica diferencian hechos observados de código leído, fixtures sintéticas y pruebas no ejecutadas. No contienen secretos, tokens ni razonamiento interno.
