@@ -1,8 +1,8 @@
 # Publicabilidad
 
 **Objeto Canónico de Persistencia (OCP):** [OBJETO-CANONICO.md](OBJETO-CANONICO.md)  
-**Estado:** OCP v0.6; prioridad P0: método sólido ChatGPT Free → GitHub Web → Preview Vercel → release cloud. La investigación transversal apunta con alta probabilidad a un gate de facturación/uso de Actions para repositorios privados; falta confirmarlo en Billing & Licensing o con las anotaciones/soporte. Producción sigue bloqueada. Solo documentación en esta rama.  
-**Versión del frente:** PUBLICABILIDAD-v0.6  
+**Estado:** OCP v0.7; prioridad P0: método sólido ChatGPT Free → GitHub Web → Preview Vercel → release cloud. El diagnóstico favorece una restricción de cuota/budget/entitlement para Actions de repositorios privados, aún sin confirmación directa del panel o anotación. El preflight RDC fue preparación parcial: no se ejecutó ningún test y la sesión remota dejó operaciones en timeout. Producción sigue bloqueada.  
+**Versión del frente:** PUBLICABILIDAD-v0.7  
 **Metodología consultada en ciclo 06:** Documento Único de Gobernanza (DUG) de Ser y Mente · Samantha v359 · NX-359m · Metacanon 1.24 · GOW 2.8.
 
 ## Lectura y evidencia
@@ -16,7 +16,8 @@
 7. [Matriz de escenarios de propagación transversal G01–G12](evidencias/MATRIZ-ESCENARIOS-PROPAGACION-TRANSVERSAL-v0.1.md).
 8. [Diagnóstico de viabilidad ChatGPT Free → Vercel](evidencias/DIAGNOSTICO-VIABILIDAD-CHATGPT-FREE-VERCEL-2026-10-29.md).
 9. [Diagnóstico transversal billing/Actions](evidencias/DIAGNOSTICO-BLOQUEO-ACTIONS-BILLING-2026-10-29.md).
-10. [Crónica del ciclo 04 — alcance transversal](cronica/CICLO-04-ALCANCE-TRANSVERSAL.md).
+10. [Preflight de CI local por RDC (preparación parcial; sin tests ejecutados)](evidencias/CI-LOCAL-PREFLIGHT-RDC-2026-10-29.md).
+11. [Crónica del ciclo 04 — alcance transversal](cronica/CICLO-04-ALCANCE-TRANSVERSAL.md).
 11. [Crónica del ciclo 05 — prioridad ChatGPT Free → Vercel](cronica/CICLO-05-CHATGPT-FREE-VERCEL.md).
 12. [Crónica del ciclo 06 — diagnóstico transversal de Actions](cronica/CICLO-06-DIAGNOSTICO-BILLING-ACTIONS.md).
 13. [Crónica de instanciación](cronica/PUBLICABILIDAD-INSTANCIACION-01.md).
@@ -30,7 +31,7 @@ Esta rama separa la inauguración documental de cualquier publicación de produc
 
 ## Prioridad P0 inmediata
 
-Conseguir un flujo reproducible y seguro para cambiar KHORA desde ChatGPT Free y publicar en Vercel sin terminal local. El conector GitHub de ChatGPT es de lectura en la documentación actual, por lo que se contempla un puente manual por GitHub Web; Preview automático se verifica en Vercel. La producción no se habilitará hasta confirmar y resolver el gate de Actions privado, recuperar CI, elegir una autoridad de publicación, reconciliar las migraciones, proteger el flujo de merge y unificar el smoke.
+Conseguir un flujo reproducible y seguro para cambiar KHORA desde ChatGPT Free y publicar en Vercel sin terminal local. El conector GitHub de ChatGPT es de lectura en la documentación actual, por lo que se contempla un puente manual por GitHub Web; Preview automático se verifica en Vercel. La producción no se habilitará hasta confirmar y resolver el gate de Actions privado, recuperar CI, elegir una autoridad de publicación, reconciliar las migraciones, proteger el flujo de merge y unificar el smoke. El preflight local no sustituye el check-run de GitHub ni valida todavía los tres jobs.
 
 La investigación y decisión de diseño está en [Diagnóstico ChatGPT Free → Vercel](evidencias/DIAGNOSTICO-VIABILIDAD-CHATGPT-FREE-VERCEL-2026-10-29.md). La existencia de un diseño no equivale a que el circuito de producción esté probado.
 
