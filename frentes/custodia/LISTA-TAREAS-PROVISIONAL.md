@@ -1,10 +1,10 @@
-<!-- LIST_VERSION=0.6; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.7; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Lista provisional de tareas · Frente Custodia
 
 > **ESTADO: PROVISIONAL · NO CERTIFICADA CONTRA EL DISEÑO METODOLÓGICO FINAL.** Se conserva aquí por instrucción expresa del operador. CUSTODIA-02 fue retirada de las tareas activas por instrucción del operador; no se reutiliza su identificador. Esa retirada no certifica metodológicamente esta materialización. Este archivo no crea un segundo objeto canónico ni otro control de responsabilidad; el núcleo único del frente sigue siendo [OBJETO-CANONICO.md](OBJETO-CANONICO.md).
 
 - **Frente:** Custodia.
-- **Versión de esta lista provisional:** 0.6.
+- **Versión de esta lista provisional:** 0.7.
 - **Última actualización:** 2026-10-28.
 - **Metodología en la primera redacción:** Samantha v348 · NX-348m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `a4c90bd8ff1cd360b1f1662ff55371bd1b56b4cd`.
 - **Revalidación antes del cierre (intermedia):** Samantha v351 · NX-351m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `f069d2385f47731ac9d0f0ca76bfd3cef859cdd2`.
@@ -103,9 +103,13 @@
 
 **Prioridad:** P0 · CRÍTICA · Depende de la línea base y de los hallazgos de CUSTODIA-01 y CUSTODIA-03.
 
-**Estado:** ABIERTA — objetivo incorporado; diagnóstico productivo completo, correcciones, pruebas y aceptación de extremo a extremo pendientes.
+**Estado:** EN CURSO — hay una rama de corrección aislada y una PR en borrador; la integración PostgreSQL/PGlite no se ejecutó, la suite unitaria conserva una falla ambiental y no hay validación ni despliegue productivo.
 
 **Objetivo:** concluir la investigación de las brechas de recuperabilidad identificadas y actualizar KHORA para que las unidades admisibles puedan catalogarse, recuperarse y verificarse de manera consistente. No se considera lograda la recuperabilidad por el mero hecho de modificar o compilar código.
+
+**Estado factual de ejecución (C007):** el commit `95d7bbf2cbe0bb89b6d8ff01135438152ec8201d` está en `fix/custodia-recovery-reconcile-20261028`; PR [#339](https://github.com/SeryMente/khora/pull/339) permanece en borrador, no fusionada. `typecheck`, `ui-review:check` y `ui:contract` pasaron; la suite unitaria quedó en 549/550 por `TLS handshake timeout` al consultar el contrato canónico (la comparación independiente del contenido encontró el mismo blob SHA). La prueba PostgreSQL/PGlite no se ejecutó porque `PGLITE_MODULE` no está disponible. No se recorrió catálogo autenticado ni se recuperaron dictados de producción.
+
+
 
 **Alcance mínimo**
 1. Consolidar el inventario y las causas que CUSTODIA-01 y CUSTODIA-03 hayan demostrado, separando defectos de código, incidentes productivos confirmados e hipótesis todavía abiertas.
@@ -132,8 +136,10 @@
 - **2026-10-28 · Ciclo 3, inventario de recuperabilidad:** versión 0.3. CUSTODIA-01 pasa de «PENDIENTE — NO INICIADA» a «EN CURSO» por haber ejecutado análisis estático y documentado hallazgos; el catálogo autenticado y la recuperación real siguen pendientes. Se enlaza el inventario provisional sin guardar datos reales de dictados. El OCP se actualizó a CUSTODIA-v0.3; el diseño de esta lista sigue sin certificar.
 - **2026-10-28 · CUSTODIA-INC-RECUP-SES-20261028-R6K2M9Q4-C004 · versión 0.4:** documenta el incidente del dictado ausente, el conteo reportado 40→20 y la discrepancia entre hidratación inicial/recarga, y deja explícito que el catálogo completo, la fila de checkpoint y la causa raíz siguen sin verificar.
 - **2026-10-28 · CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C005 · versión 0.5:** se formaliza CUSTODIA-03 para investigar el dictado no visible y cualquier otra captura esperada que no aparezca o parezca irrecuperable. CUSTODIA-01 y CUSTODIA-03 quedan como prioridades operativas P0; CUSTODIA-02 se registró entonces como revisión metodológica P1.
-- **2026-10-28 · CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C006 · versión 0.6:** por nueva instrucción del operador, CUSTODIA-02 se retira de la lista activa y su identificador histórico no se reutiliza. Se agrega CUSTODIA-04 para completar la investigación y actualizar el sistema; el plan define como secuencia la línea base no destructiva, la recuperación de unidades visibles junto con la investigación de ausencias, y después la corrección y validación integral del producto. La lista sigue provisional; la retirada de CUSTODIA-02 no certifica su diseño.
+- **2026-10-28 · CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C006 · versión 0.6:** por nueva instrucción del operador, CUSTODIA-02 se retira de la lista activa y su identificador histórico no se reutiliza. Se agrega CUSTODIA-04 y se define la secuencia de línea base no destructiva, recuperación paralela a la investigación de ausencias y validación sistémica.
+- **2026-10-28 · CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C007 · versión 0.7:** CUSTODIA-04 pasa a EN CURSO. Se implementa una propuesta de reconciliación local/remota y audio legacy en rama aislada, y se abre PR #339 en borrador. Se registran los controles aprobados, la falla ambiental del contrato canónico por TLS y el bloqueo para ejecutar PGlite. Sin catálogo autenticado, recuperaciones productivas, fusión o despliegue; las garantías siguen sin certificar.
 - **Fuente del encargo literal inicial:** [originales/INSTRUCCION-PENDIENTES-2026-10-28.md](originales/INSTRUCCION-PENDIENTES-2026-10-28.md).
 - **Fuente de ampliación del alcance:** [originales/INSTRUCCION-AMPLIACION-TAREAS-RECUPERABILIDAD-2026-10-28.md](originales/INSTRUCCION-AMPLIACION-TAREAS-RECUPERABILIDAD-2026-10-28.md), commit d3c84153bbdc8844e7c3147e4ab0a6375be3dc68.
 - **Nueva instrucción literal:** [originales/INSTRUCCION-REORDENAMIENTO-Y-ACTUALIZACION-RECUPERABILIDAD-2026-10-28.md](originales/INSTRUCCION-REORDENAMIENTO-Y-ACTUALIZACION-RECUPERABILIDAD-2026-10-28.md).
+- **Salida de ejecución parcial C007:** [originales/SALIDA-MODELO-CUSTODIA-IMPLEMENTACION-PARCIAL-2026-10-28.md](originales/SALIDA-MODELO-CUSTODIA-IMPLEMENTACION-PARCIAL-2026-10-28.md), commit `423115ff56c8ae10fb9abd02d0fd978eddfaf2a8`.
 - **Estado de ejecución:** no se recuperaron ni inspeccionaron dictados como parte de esta modificación documental.
