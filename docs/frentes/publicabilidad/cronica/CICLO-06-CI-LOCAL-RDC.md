@@ -16,7 +16,7 @@ En PC-14 (Windows x64, Desktop Commander 0.3.1) se observó Node.js v24.22.2 y n
 
 La conexión autorizada de GitHub proporcionó el árbol de `khora-web` en `main` SHA `e463e0c6efa857f4c4229894a96fab747a8a7574`. El package-lock con blob `987316f16dae22a60766b7354d81b34e11857960` se escribió en un directorio temporal `%LOCALAPPDATA%\Temp\khora-ci-local`. Se generaron manifests parciales de los archivos fuente, excluyendo PNG, plantillas de entorno, logs y el archivo opaco `.vercel-disparador`; no se confirmó la materialización completa.
 
-Después, llamadas de lectura/escritura de RDC quedaron en estado `pending`. El canal dejó también de responder a `get_config`; el dispositivo aparecía Online, pero `Last seen` era antiguo. No se repitieron los writes pendientes porque no está confirmado si completaron. No se ejecutó `npm ci`, typecheck, UI Review, contrato UI, unit tests, pytest, Ruff, Pyright, Docker Compose, Neo4j, migraciones ni deployments.
+Después, llamadas de lectura/escritura de RDC quedaron en estado `pending`. El canal dejó también de responder a `get_config`; el dispositivo aparecía Online, pero `Last seen` era antiguo. La consulta posterior del historial remoto marcó las operaciones implicadas como `failed` con `Timeout - no response from device`. No se repitieron los writes porque su estado parcial no está confirmado. No se ejecutó `npm ci`, typecheck, UI Review, contrato UI, unit tests, pytest, Ruff, Pyright, Docker Compose, Neo4j, migraciones ni deployments.
 
 ## Interpretación
 
