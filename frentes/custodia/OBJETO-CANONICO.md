@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.22; OBJECT_VERSION=0.4; OBJECT_SEAL=CUSTODIA-v0.4; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.23; OBJECT_VERSION=0.5; OBJECT_SEAL=CUSTODIA-v0.5; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · INVESTIGACIÓN DE RECUPERABILIDAD EN CURSO · GARANTÍAS DE PRODUCTO NO CERTIFICADAS.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.4. Metacanon: 1.22. Gobierno general verificado en este ciclo: Samantha v356 · NX-356m; GOW v2.6. Fuente central leída: blob c364e179e8e9b6a3d566a8e690dfa1a7cce91798. Este objeto funda el frente documental transversal; no prueba que las garantías descritas ya estén implementadas ni certificadas.
+> **ESTADO · VIVO · INVESTIGACIÓN DE RECUPERABILIDAD EN CURSO · GARANTÍAS DE PRODUCTO NO CERTIFICADAS.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.5. Metacanon: 1.23. Gobierno general verificado en este ciclo: Samantha v358 · NX-358m; GOW v2.7. Fuente central leída: blob 89a28e4d05f5baab9c4b86abdb9fbfc532690c75. Este objeto funda el frente documental transversal; no prueba que las garantías descritas ya estén implementadas ni certificadas.
 
 ## 1. Control e identidad
 
@@ -14,7 +14,7 @@
 - **Propósito literal aprobado:** [originales/PROPOSITO-OPERADOR-2026-10-28.md](originales/PROPOSITO-OPERADOR-2026-10-28.md). La sección 4 también conserva el texto aprobado íntegro para que el propósito sea visible en el núcleo.
 - **Lista de tareas:** [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md), materialización auxiliar provisional de los pendientes; su diseño debe revisarse en CUSTODIA-02. No se declara todavía conforme a la metodología.
 - **Inventario provisional de hallazgos:** [evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md](evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md), materialización de evidencia para CUSTODIA-01; no es un segundo estado vivo.
-- **Versión y sello vigentes:** CUSTODIA-v0.4. Es la cuarta versión documental del objeto; no es una versión del producto.
+- **Versión y sello vigentes:** CUSTODIA-v0.5. Es la quinta versión documental del objeto; no es una versión del producto.
 - **Relación con frentes existentes:** este frente es transversal. No sustituye ni duplica el objeto de Dictado de voz ([docs/frentes/dictado-voz/OBJETO-CANONICO.md](../../docs/frentes/dictado-voz/OBJETO-CANONICO.md)) ni su contrato de implementación ([khora-web/docs/CUSTODIA-DICTADOS.md](../../khora-web/docs/CUSTODIA-DICTADOS.md)).
 - **Visibilidad del repositorio:** la consulta inicial de GitHub devolvió public; dos consultas posteriores devolvieron private y coinciden con el README. El estado más reciente observado es private. El momento y la causa de la diferencia, así como una posible exposición pública anterior, no están verificados.
 
@@ -36,6 +36,7 @@
 - **Última revalidación metodológica del ciclo 2 (histórica):** Samantha v352 · NX-352m, Metacanon 1.21, GOW v2.3; blob de archivo 94473eccb6fa71303d5908ce678f7efeb191c215.
 - **Cláusulas aplicadas a este ciclo:** §3 (pendientes ordenados dentro del estado vivo); §§27 y 46 (núcleo único y materializaciones necesarias del OCP); §28 (instrucción original, crónica, evidencia y lectura de vuelta); §§39 y 48 (conservar el propósito y la ruta canónica, sin crear controles u objetos paralelos).
 - **Fuente normativa actualizada para el ciclo de inventario:** Samantha v356 · NX-356m; Metacanon 1.22; GOW v2.6; blob `c364e179e8e9b6a3d566a8e690dfa1a7cce91798` de `SeryMente/metodologia/main:gobernanza/METAPROMPT-CANONICO-SAMANTHA.html`.
+- **Fuente normativa vigente leída en el ciclo C005:** Samantha v358 · NX-358m; Metacanon 1.23; GOW v2.7; blob `89a28e4d05f5baab9c4b86abdb9fbfc532690c75` de `SeryMente/metodologia/main:gobernanza/METAPROMPT-CANONICO-SAMANTHA.html`. Revisión manual; MCP-NORMATIVO permanece desactivado.
 - Esta adquisición identifica la versión del canon central al momento de la lectura; no equivale a una auditoría integral de todos sus principios o anexos ni a una declaración de conformidad definitiva del diseño de lista.
 
 ## 4. Propósito y alcance
@@ -99,7 +100,7 @@ Custodia es el frente transversal que define, verifica y gobierna las garantías
 
 ## 8. Estado vivo
 
-**Estado del frente: ACTUALIZADO — CUSTODIA-01 EN CURSO — CUSTODIA-02 PENDIENTE — GARANTÍAS DE PRODUCTO NO CERTIFICADAS.**
+**Estado del frente: ACTUALIZADO — CUSTODIA-01 EN CURSO (P0) — CUSTODIA-03 ABIERTA (P0) — CUSTODIA-02 PENDIENTE (P1) — GARANTÍAS DE PRODUCTO NO CERTIFICADAS.**
 
 El detalle operativo de pendientes se mantiene provisionalmente en [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md). Ese archivo es una materialización auxiliar enlazada desde el único núcleo; su diseño es objeto de la tarea CUSTODIA-02 y no se declara definitivo ni plenamente conforme al método.
 
@@ -121,6 +122,8 @@ El detalle operativo de pendientes se mantiene provisionalmente en [LISTA-TAREAS
 - Determinar la causa y el periodo de la diferencia observada en la visibilidad del repositorio; estado actual informado por dos lecturas consecutivas: private.
 
 La tarea prioritaria CUSTODIA-01 está **EN CURSO**. El análisis de código confirmó un defecto lógico capaz de mostrar «Sin audio» cuando el manifiesto está vacío y de limitar a cero las partes copiadas durante la recuperación remota, aunque haya partes asociadas a la sesión. Sin embargo, el catálogo autenticado real de Ingresos → Dictado → Recuperación no se pudo adquirir; las unidades reales cotejadas individualmente siguen siendo cero. No se ha ejecutado recuperación de producción ni se ha certificado la lectura de objetos remotos. Los cinco snapshots técnicos observados en una copia local son evidencia auxiliar independiente y no sustituyen el inventario del catálogo. Los hallazgos y requisitos de cierre se mantienen en [Inventario provisional de recuperabilidad](evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md).
+
+La tarea CUSTODIA-03 se incorpora ahora como prioridad P0 paralela: investigar las capturas esperadas que no aparecen o parecen irrecuperables, establecer el alcance real de las lagunas y rescatar de forma no destructiva las unidades localizadas. No se asume que todas las capturas de interés aparezcan en el catálogo visible. CUSTODIA-01 cubre las unidades actualmente listadas; CUSTODIA-03 cubre ausencias, fuentes históricas y posible pérdida; CUSTODIA-02 mantiene su identidad histórica para la revisión metodológica de la lista y queda en P1. La lista provisional está en v0.5 y sigue sin certificación metodológica.
 
 El ciclo documental siguiente registró el [incidente de dictado ausente y conteo 40→20](evidencias/INCIDENTE-DICTADO-AUSENTE-Y-CONTEO-40-20-2026-10-28.md). La revisión confirmó en código dos problemas adicionales: la hidratación inicial combina unidades locales y remotas sin aplicar la misma deduplicación de la recarga, y la insignia refleja la longitud de la lista cargada mientras el catálogo remoto pagina en bloques de 20. Estos hallazgos hacen plausible que 40→20 sea un recuento inconsistente por solapamientos; no prueban que la diferencia esté compuesta exclusivamente por duplicados ni que haya 20 unidades perdidas. El operador reporta que el último dictado visible data del 2026-10-28 a las 17:08 y que falta una captura posterior; no se obtuvo el catálogo autenticado ni el acuse remoto de checkpoint para la sesión concreta. La captura permanece sin localizar, pero la pérdida definitiva tampoco está demostrada. El catálogo total, las entradas posteriores, las posibles capturas archivadas en Custodia y la confirmación del checkpoint siguen pendientes.
 
@@ -226,6 +229,18 @@ No se rellenan huecos con inferencias ni se da por ejecutada una prueba porque a
 
 - **Salida visible final del ciclo 4:** [originales/SALIDA-MODELO-CUSTODIA-INCIDENTE-2026-10-28.md](originales/SALIDA-MODELO-CUSTODIA-INCIDENTE-2026-10-28.md), blob f7d6e5d9819832a90e3e97d2c767a9f314b8cb91, commit 61992cdfae46ac08b84260bc2c47197fac144db4. Se verificó lectura de vuelta; el SHA queda registrado aquí, no dentro de la propia salida.
 
+### Ciclo 5 · CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C005 · 2026-10-28
+
+- **Objetivo:** ampliar formalmente el plan de trabajo de recuperabilidad a partir de la instrucción del operador: conservar la meta, mantener las dos tareas anteriores y añadir una tarea explícita para investigar los dictados no disponibles o aparentemente irrecuperables.
+- **Instrucción original:** [originales/INSTRUCCION-AMPLIACION-TAREAS-RECUPERABILIDAD-2026-10-28.md](originales/INSTRUCCION-AMPLIACION-TAREAS-RECUPERABILIDAD-2026-10-28.md), blob 0d4edd36ef1611334e6438fe6048b590c08fc7a2, commit d3c84153bbdc8844e7c3147e4ab0a6375be3dc68.
+- **Cambio de estructura de tareas:** la lista provisional v0.5 conserva CUSTODIA-01 para recuperar/verificar las unidades visibles; añade CUSTODIA-03 (P0) para investigar ausencias, cuantificar el alcance real y recuperar lo que pueda rescatarse; mantiene CUSTODIA-02 (P1) para revisión metodológica de la lista. Los identificadores históricos se preservan.
+- **Precisión de alcance:** «no aparece en Recuperación» no equivale automáticamente a «perdido». CUSTODIA-03 distingue capturas localizadas/archivadas, duplicados, parciales, no localizadas tras revisar fuentes concretas, irrecuperabilidad demostrada y casos no determinados por falta de evidencia. El contador 40→20 no representa por sí mismo veinte pérdidas.
+- **Fuente metodológica actualizada:** Samantha v358 · NX-358m; Metacanon 1.23; GOW v2.7; SeryMente/metodologia/main:gobernanza/METAPROMPT-CANONICO-SAMANTHA.html, blob 89a28e4d05f5baab9c4b86abdb9fbfc532690c75. Lectura manual; MCP-NORMATIVO desactivado.
+- **Límites de ejecución:** no se obtuvo el catálogo productivo completo, no se localizó la captura incidente, no se hicieron recuperaciones productivas ni se modificó código, datos, credenciales o despliegues. Las tres tareas permanecen abiertas o pendientes según su estado descrito en la lista.
+- **Lectura de vuelta de la lista provisional:** v0.5, blob 05b3fe93f93274fb16f32093123a276db54fd4e1 al inicio de este ciclo; la escritura actual la actualiza con CUSTODIA-03 y la referencia metodológica vigente.
+- **Siguiente acción:** continuar CUSTODIA-01 y CUSTODIA-03 mediante acceso autenticado/solo lectura autorizado. Reconciliar todas las páginas remotas, identidades local/remoto y capturas archivadas; buscar la ventana del dictado ausente; clasificar cada caso y preservar originales. Sin pruebas, mantener «NO DETERMINADO» y la garantía productiva como no certificada.
+- **Cautela:** este plan no es autorización para cambiar código, cuentas, datos productivos, seguridad, configuración ni despliegue. Esas acciones requerirán autorización concreta, pruebas y verificación de lectura de vuelta.
+
 ### Fuentes y referencias
 
 - [Gobernanza única Samantha](https://github.com/SeryMente/metodologia/blob/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html).
@@ -238,19 +253,20 @@ No se rellenan huecos con inferencias ni se da por ejecutada una prueba porque a
 
 Instrucción para una conversación futura:
 
-> Retoma el frente transversal Custodia en SeryMente/khora, rama main. Adquiere primero frentes/custodia/OBJETO-CANONICO.md, CONTROL-RESPONSABILIDAD.json, LISTA-TAREAS-PROVISIONAL.md, evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md, los originales enlazados y el Metaprompt vigente en SeryMente/metodologia/main. La lista de tareas permanece provisional y su diseño es asunto de CUSTODIA-02. El folio operativo documental activo de este estado es SES-20261028-R6K2M9Q4, generación 2; el alias no es ID nativo de plataforma. Prioridad inmediata: CUSTODIA-01, incluido el incidente abierto documentado en evidencias/INCIDENTE-DICTADO-AUSENTE-Y-CONTEO-40-20-2026-10-28.md. El código de main contiene un defecto de manifiesto/conteo, un límite de copia de audio por manifiesto y una discrepancia en el catálogo: la hidratación inicial mezcla local y remoto sin la misma deduplicación que la recarga, el contador indica las unidades cargadas y el catálogo remoto pagina de 20 en 20. El operador reporta que el último dictado visible data del 2026-10-28 a las 17:08, pero el catálogo autenticado completo y la fila de checkpoint de la captura ausente no se adquirieron; la captura no está localizada y no se ha demostrado su pérdida definitiva. No afirmes que todas las unidades comparten el defecto. Preserva datos y originales; no copies transcripciones, audio, cookies, credenciales, UUID reales ni URLs privadas al repositorio. No dupliques almacenes, controles, objetos ni contratos. No cambies código, datos de producción, credenciales, seguridad, despliegues ni servicios sin autorización específica. No declares recuperación garantizada sin lectura real, cotejo de contenido/procedencia e integridad y verificación de que el original permanece intacto.
+> Retoma el frente transversal Custodia en SeryMente/khora, rama main. Adquiere primero frentes/custodia/OBJETO-CANONICO.md, CONTROL-RESPONSABILIDAD.json, LISTA-TAREAS-PROVISIONAL.md, evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md, los originales enlazados y el Metaprompt vigente en SeryMente/metodologia/main. La lista de tareas permanece provisional v0.5. CUSTODIA-01 (P0) cubre las unidades actualmente visibles; CUSTODIA-03 (P0) investiga los dictados esperados que no aparecen o parecen irrecuperables y el alcance real de las lagunas; CUSTODIA-02 (P1) revisa la metodología de la lista. El folio operativo documental activo de este estado es SES-20261028-R6K2M9Q4, generación 2; el alias no es ID nativo de plataforma. Prioridad inmediata: CUSTODIA-01 y CUSTODIA-03, incluida la incidencia abierta en evidencias/INCIDENTE-DICTADO-AUSENTE-Y-CONTEO-40-20-2026-10-28.md. El código de main contiene un defecto de manifiesto/conteo, un límite de copia de audio por manifiesto y una discrepancia en el catálogo: la hidratación inicial mezcla local y remoto sin la misma deduplicación que la recarga, el contador indica las unidades cargadas y el catálogo remoto pagina de 20 en 20. El operador reporta que el último dictado visible data del 2026-10-28 a las 17:08, pero el catálogo autenticado completo y la fila de checkpoint de la captura ausente no se adquirieron; la captura no está localizada y no se ha demostrado su pérdida definitiva. CUSTODIA-03 debe investigar esa captura y otras ausencias sin asumir que el catálogo visible contiene todas las unidades de interés. No afirmes que todas las unidades comparten el defecto. Preserva datos y originales; no copies transcripciones, audio, cookies, credenciales, UUID reales ni URLs privadas al repositorio. No dupliques almacenes, controles, objetos ni contratos. No cambies código, datos de producción, credenciales, seguridad, despliegues ni servicios sin autorización específica. No declares recuperación garantizada sin lectura real, cotejo de contenido/procedencia e integridad y verificación de que el original permanece intacto.
 
 ## 13. Persistencia y revisión
 
-**Versión actualizada en este ciclo:** CUSTODIA-v0.4. El inventario provisional y el informe de incidente son evidencia enlazada, no un segundo estado vivo.
+**Versión actualizada en este ciclo:** CUSTODIA-v0.5. El inventario provisional y el informe de incidente son evidencia enlazada, no un segundo estado vivo.
 
 - **Núcleo único:** frentes/custodia/OBJETO-CANONICO.md.
 - **Control único:** frentes/custodia/CONTROL-RESPONSABILIDAD.json.
 - **Original aprobado:** frentes/custodia/originales/PROPOSITO-OPERADOR-2026-10-28.md.
-- **Lista auxiliar provisional de tareas:** frentes/custodia/LISTA-TAREAS-PROVISIONAL.md (v0.4, blob 09ec1648667a0f255db2833b4f5623c53216a409).
-- **Inventario provisional de hallazgos:** frentes/custodia/evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md (v0.2, blob 69233ad419b21d57f3daf7fc64912358bb01da67).
-- **Informe provisional del incidente de dictado ausente y conteo 40→20:** frentes/custodia/evidencias/INCIDENTE-DICTADO-AUSENTE-Y-CONTEO-40-20-2026-10-28.md (v0.1, blob e2be93e4a355b763f4d7e463f8daf3de927f26fc).
+- **Lista auxiliar provisional de tareas:** frentes/custodia/LISTA-TAREAS-PROVISIONAL.md (v0.5; blob tras la actualización de C005 se registra después de la lectura de vuelta).
+- **Inventario provisional de hallazgos:** frentes/custodia/evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md (v0.3; blob tras la actualización de C005 se registra después de la lectura de vuelta).
+- **Informe provisional del incidente de dictado ausente y conteo 40→20:** frentes/custodia/evidencias/INCIDENTE-DICTADO-AUSENTE-Y-CONTEO-40-20-2026-10-28.md (v0.2; blob tras la actualización de C005 se registra después de la lectura de vuelta).
 - **Instrucción original del incidente:** frentes/custodia/originales/INSTRUCCION-INCIDENTE-DICTADO-AUSENTE-2026-10-28.md (blob ea683e89590d33d5fdf32feadc00629b0d0eae20).
+- **Instrucción original de ampliación de tareas:** frentes/custodia/originales/INSTRUCCION-AMPLIACION-TAREAS-RECUPERABILIDAD-2026-10-28.md (blob 0d4edd36ef1611334e6438fe6048b590c08fc7a2).
 - **Original de la instrucción de inventario:** frentes/custodia/originales/INSTRUCCION-INVENTARIO-RECUPERABILIDAD-INGRESOS-2026-10-28.md (blob 357f3c1cc9081a47f47dc3fa0b838e8f8eeed5a5).
 - **Salida visible previa preservada:** frentes/custodia/originales/SALIDA-MODELO-CUSTODIA-ANTERIOR-RECUPERABILIDAD-INGRESOS-2026-10-28.md (blob c5feb1e2ac4454dfe60898489f5b7612bc91646a).
 - **Original de la instrucción de tareas:** frentes/custodia/originales/INSTRUCCION-PENDIENTES-2026-10-28.md.
@@ -259,6 +275,6 @@ Instrucción para una conversación futura:
 - **Salida visible final del ciclo 4:** frentes/custodia/originales/SALIDA-MODELO-CUSTODIA-INCIDENTE-2026-10-28.md; blob f7d6e5d9819832a90e3e97d2c767a9f314b8cb91; commit 61992cdfae46ac08b84260bc2c47197fac144db4.
 - Las rutas de arriba no constituyen un segundo almacén de producto; son la base documental del frente.
 - Tras cada ciclo: leer de vuelta los archivos modificados; comparar el propósito con el original aprobado; verificar el JSON; registrar el SHA real del archivo y el commit real; revisar el diff; no fijar hashes autorreferentes inventados.
-- Revisar el Metacanon central y la rama main antes de cada ciclo material. La fuente vigente adquirida el 2026-10-28 fue Samantha v356 · NX-356m, Metacanon 1.22, GOW v2.6, blob c364e179e8e9b6a3d566a8e690dfa1a7cce91798. Si la fuente o alguna evidencia no está disponible, declarar exactamente qué no se verificó y bloquear solo las decisiones que dependan de ello.
+- Revisar el Metacanon central y la rama main antes de cada ciclo material. La fuente vigente adquirida en C005 fue Samantha v358 · NX-358m, Metacanon 1.23, GOW v2.7, blob 89a28e4d05f5baab9c4b86abdb9fbfc532690c75. Si la fuente o alguna evidencia no está disponible, declarar exactamente qué no se verificó y bloquear solo las decisiones que dependan de ello.
 - No crear otros controles ni estados vivos competidores. Los originales y evidencias pueden ser artefactos congelados, no una segunda fuente de estado.
 - **Próximo paso prioritario:** obtener por la sesión autenticada el catálogo real de Ingresos → Dictado → Recuperación; registrar sin contenido personal el número de entradas y sus metadatos mínimos; cotejar por unidad los registros de partes y la lectura real de objetos. Solo después planificar la recuperación no destructiva y las correcciones. La auditoría transversal de otros canales, almacenes y proveedores (incluida la revisión de Vercel Blob/Backblaze) queda como trabajo posterior, con sus autorizaciones y accesos correspondientes.
