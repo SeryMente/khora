@@ -1,8 +1,8 @@
 # Publicabilidad
 
 **Objeto Canónico de Persistencia (OCP):** [OBJETO-CANONICO.md](OBJETO-CANONICO.md)  
-**Estado:** OCP v0.9; prioridad P0: método sólido ChatGPT Free → GitHub Web → Preview Vercel → release cloud. La autenticación GitHub en PC-4 quedó verificada y el checkout exacto de main se materializó. `npm ci`, typecheck, UI Review y contrato de navegación pasaron como evidencia auxiliar con Node 24/npm 11. `test:unit` no se ejecutó porque la invocación fue bloqueada antes de iniciar; CI completa sigue pendiente. El gate remoto privado de Actions mantiene una hipótesis de uso/billing aún no confirmada. Producción sigue bloqueada.  
-**Versión del frente:** PUBLICABILIDAD-v0.9  
+**Estado:** OCP v0.10; el fixture E2E del grafo está corregido y preservado en [PR #341](https://github.com/SeryMente/khora/pull/341). Validaciones locales: build, checks estáticos, smoke 4/4 y UI Quality 16/16 PASS. CI hospedada sigue sin ejecutar pasos (steps=[]); test:unit local fue bloqueado antes de iniciar y los jobs Python requieren un entorno compatible. Producción bloqueada. Evidencia: [preflight PC-4](evidencias/CI-LOCAL-PREFLIGHT-PC4-2026-10-29.md).  
+**Versión del frente:** PUBLICABILIDAD-v0.10  
 **Metodología verificada en la revalidación PC-4:** Documento Único de Gobernanza (DUG) de Ser y Mente · Samantha v360 · NX-360m · Metacanon 1.24 · GOW 2.9 · blob `3cda9d38db1bee76ff0ca752f3ecde8719c70d41`.
 
 ## Lectura y evidencia
