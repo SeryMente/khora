@@ -211,7 +211,7 @@ Vercel:
 - API deployments: https://vercel.com/docs/rest-api/deployments
 
 OpenAI:
-- Developer mode y MCP con acciones de escritura: https://help.openai.com/en/articles/12584461-developer-mode-and-full-mcp-connectors-in-chatgpt
+- Developer mode y MCP con acciones de escritura: https://help.openai.com/en/articles/12584461-connecting-custom-mcp-servers-in-chatgpt
 
 Estas páginas pueden cambiar; volver a leerlas antes de afirmar un límite como vigente o de tomar una decisión contractual. La consulta de la documentación no prueba la cuota restante, la configuración real de la cuenta, permisos de escritura de cualquier otra sesión de ChatGPT ni el resultado funcional del sitio.
 
