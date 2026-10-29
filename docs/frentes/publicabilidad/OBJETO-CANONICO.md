@@ -1,4 +1,4 @@
-<!-- PUBLICABILIDAD_VERSION=v0.9; PUBLICABILIDAD_SEAL=PUBLICABILIDAD-v0.9 -->
+<!-- PUBLICABILIDAD_VERSION=v0.10; PUBLICABILIDAD_SEAL=PUBLICABILIDAD-v0.10 -->
 # Objeto Canónico de Persistencia · Publicabilidad
 
 ## 1. Control e identidad
@@ -6,9 +6,9 @@
 - **Frente:** Publicabilidad.
 - **Repositorio propietario:** SeryMente/khora; el término «Cora» del enunciado se conserva en el original y se normaliza operativamente a Khora conforme al canon de Metodología.
 - **Ruta del OCP:** docs/frentes/publicabilidad/OBJETO-CANONICO.md.
-- **Versión documental:** v0.9 · objeto provisional de investigación.
-- **Sello:** PUBLICABILIDAD-v0.9.
-- **Estado:** PROVISIONAL-v0.9; prioridad P0: método sólido ChatGPT Free → GitHub Web → Vercel sin terminal local. El patrón de Actions privadas sigue sugiriendo un gate de uso/billing no confirmado. En PC-4 se restauró la sesión y se comprobó la autenticación GitHub; se obtuvo un checkout íntegro de main en SHA `42ca6e664a501f4882a187fc81d01fb99845320f`. `npm ci`, typecheck, UI Review y contrato de navegación pasaron como evidencia auxiliar bajo Node 24/npm 11; `test:unit` no se ejecutó porque el control de ejecución rechazó la llamada antes de iniciar. No es CI completa. Producción sigue bloqueada.
+- **Versión documental:** v0.10 · objeto provisional de investigación.
+- **Sello:** PUBLICABILIDAD-v0.10.
+- **Estado:** PROVISIONAL-v0.10; prioridad P0: validar CI end-to-end sin alterar main ni producción. El fixture E2E del grafo está corregido en la rama aislada fix/ci-graph-a11y-fixture-20261029 y el PR #341 permanece abierto en borrador. En PC-4 pasaron build, checks estáticos, smoke E2E 4/4 y UI Quality 16/16; la suite unitaria local fue bloqueada antes de iniciar y los jobs hospedados de GitHub finalizaron sin ejecutar pasos (steps=[]). Python/Docker local y la respuesta final de RDC siguen sin poder verificarse. Producción continúa bloqueada.
 - **Rama en la que se preparó esta entrega:** publicabilidad/inauguracion-20261028. No está integrada en main.
 - **Folio de este evento:** SES-20261028-PR8V6M2Q. Es un folio de evento/operación, no un identificador nativo de conversación.
 - **Titularidad operativa:** sin titular exclusivo asignado en CONTROL-RESPONSABILIDAD.json. La instrucción inaugura el frente, pero no se ha registrado una transferencia de responsabilidad exclusiva a esta instancia.
@@ -512,3 +512,18 @@ La documentación oficial de GitHub establece que los jobs en repositorios priva
 **No completado.** El gate web sigue incompleto por `test:unit`; tampoco se completaron `api-tests` o `calidad`, que requieren Python 3.11 y, para calidad integral, Docker Compose/Neo4j. No se ejecutó build, E2E, migración ni deployment.
 
 La autenticación y el checkout privado ya están resueltos; no deben repetirse ni solicitarse como paso pendiente. La siguiente tarea es completar la ejecución de pruebas permitida bajo un runtime fiel y registrar las limitaciones de ejecución. La causa raíz del bloqueo de runners hospedados continúa no confirmada en billing/anotaciones. No se modificó `main`, workflows, configuración de Actions, secretos, Vercel ni producción. Evidencia detallada: [preflight PC-4](evidencias/CI-LOCAL-PREFLIGHT-PC4-2026-10-29.md).
+
+
+### 21.9 Resolución E2E parcial, contrato del grafo y bloqueo de runners · 2026-10-29
+
+**Gobernanza revalidada:** DUG v360 · NX-360m; Metacanon 1.24; GOW 2.9; blob 3cda9d38db1bee76ff0ca752f3ecde8719c70d41, leído directamente de SeryMente/metodologia/main.
+
+**Defecto de test corregido y preservado.** La prueba khora-web/e2e/ui-quality.spec.ts mockeaba la respuesta heredada { nodes, edges } en /api/grafo, aunque app/grafo/page.tsx consume /api/grafos y requiere proyecciones automatic y curated; el encabezado vigente es Inspección de entidad. La corrección quedó en [PR #341](https://github.com/SeryMente/khora/pull/341), rama fix/ci-graph-a11y-fixture-20261029, commit c6ccd0bfd3c260975f7dae6253cc89484ba5aaad. La rama está un commit delante y cero detrás de main (a515d653a6822c1c7aa695617bb38824b3aa4572); el PR sigue en borrador, abierto y no fusionado.
+
+**Resultados locales en el checkout base 42ca6e664a501f4882a187fc81d01fb99845320f.** Build Next.js con webpack, typecheck, UI Review y contrato de navegación: PASS; build generó 78 páginas estáticas. Smoke E2E: 4/4. UI Quality E2E tras la corrección: 16/16 incluyendo escritorio, móvil, tema, navegación, aliases, tupla de ingestión aprobada y nueve prerenders UI Review con JavaScript deshabilitado. Contratos AppIcon (5) y Lucide, y test de tema corregido: PASS. Empaquetado Harmonia v0.3.5 validado con 59 archivos; el ZIP temporal se eliminó. Runtime local Node 24/npm 11, distinto del Node 22 fijado por el workflow.
+
+**CI oficial de la rama de corrección.** Runs [CI push](https://github.com/SeryMente/khora/actions/runs/40959788498), [CI PR](https://github.com/SeryMente/khora/actions/runs/40959796676), [UI Quality PR](https://github.com/SeryMente/khora/actions/runs/40959796180) y [khora-ok gate](https://github.com/SeryMente/khora/actions/runs/40959796413) terminaron antes de ejecutar pasos. Los tres jobs CI y los dos jobs UI Quality consultados reportaron steps=[]; el gate también terminó sin pasos. Los logs de intentos previos devolvieron BlobNotFound. Esto prueba que los runners no ejecutaron los jobs, no que las pruebas reportaran fallos. La causa precisa de la falta de runner sigue sin demostrarse y requiere intervención de GitHub Actions/entitlement. Checks Vercel siguen fallando por restricción de plan/repositorio privado; no se cambió Vercel ni billing.
+
+**Pendientes reales.** npm run test:unit se bloqueó localmente antes de iniciar por el control de ejecución; no se intentó eludirlo. Los jobs api-tests y calidad/Neo4j no se completaron localmente por ausencia inicial de Python y Docker utilizables. Se inició una descarga del instalador oficial Python 3.11.9 en Temp, pero después RDC dejó de responder; el resultado es desconocido, no se declara instalado ni fallido. PC-4 figura en línea pero no responde a operaciones RDC; no se cambió de dispositivo ni se reinició la sesión. La limpieza de la última configuración temporal de Playwright y el estado final local tampoco pudieron verificarse tras perder el canal.
+
+**Cierre:** corrección E2E implementada, validada localmente y preservada en PR; CI global todavía no verde; sin modificaciones a main, sin merge, sin despliegue, sin cambios de dependencias, secretos o configuración de billing. Evidencia detallada: [preflight PC-4](evidencias/CI-LOCAL-PREFLIGHT-PC4-2026-10-29.md).
