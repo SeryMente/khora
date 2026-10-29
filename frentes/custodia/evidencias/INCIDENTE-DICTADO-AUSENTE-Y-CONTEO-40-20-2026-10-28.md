@@ -1,4 +1,4 @@
-<!-- INCIDENT_VERSION=0.5; INCIDENT_STATUS=OPEN; NOT_A_CANONICAL_OBJECT=true -->
+<!-- INCIDENT_VERSION=0.6; INCIDENT_STATUS=OPEN; NOT_A_CANONICAL_OBJECT=true -->
 # Incidente provisional · Dictado no visible en Recuperación y contador 40→20
 
 > **ESTADO: ABIERTO · CAUSA DE LA CAPTURA AUSENTE NO CONFIRMADA · RECUPERABILIDAD PRODUCTIVA NO CERTIFICADA.** Este informe es evidencia auxiliar del frente Custodia; el único estado vivo sigue en [OBJETO-CANONICO.md](../OBJETO-CANONICO.md).
@@ -9,7 +9,8 @@
 - Fecha de investigación: 2026-10-28.
 - Instrucción literal: [INSTRUCCION-INCIDENTE-DICTADO-AUSENTE-2026-10-28.md](../originales/INSTRUCCION-INCIDENTE-DICTADO-AUSENTE-2026-10-28.md).
 - Fuente normativa en la investigación original (histórica): Samantha v356 · NX-356m; Metacanon 1.22; GOW v2.6; blob `c364e179e8e9b6a3d566a8e690dfa1a7cce91798`.
-- Fuente normativa vigente de este ciclo: Samantha v358 · NX-358m; Metacanon 1.23; GOW v2.7; blob `89a28e4d05f5baab9c4b86abdb9fbfc532690c75`.
+- Fuente normativa histórica del ciclo C005: Samantha v358 · NX-358m; Metacanon 1.23; GOW v2.7; blob `89a28e4d05f5baab9c4b86abdb9fbfc532690c75`.
+- Fuente normativa revalidada en C009: Samantha v359 · NX-359m; Metacanon 1.24; GOW 2.8; blob `b2ff2845a5a99dc4ce3cafafc4f8e43607d48145`, desde `SeryMente/metodologia/main`.
 - Límite: se inspeccionó código desde `SeryMente/khora/main`; no se obtuvo catálogo autenticado, consulta productiva de base de datos, bytes del proveedor ni correlación entre esta rama y el despliegue productivo. No se hizo ningún intento de recuperación en producción.
 
 ## 1. Relato comunicado por el operador — NO verificado de forma independiente
@@ -134,6 +135,8 @@ En la revisión de plan del ciclo C005, CUSTODIA-02 se había registrado como re
 - **Incidente:** ABIERTO. No se obtuvo catálogo autenticado, no se cotejó ninguna unidad real ni se efectuó recuperación productiva. El dictado sigue sin localizarse y la pérdida definitiva no está demostrada.
 
 ## 11. Registro de cambios
+
+- **v0.6 · 2026-10-29 · CUSTODIA-TRANSFERENCIA-SES-20261029-C9K4M2R8:** se revalida la gobernanza y se registra el relevo de responsabilidad en generación 3. La PR #339 sigue abierta en borrador y su rama diverge de `main`; no está fusionada ni desplegada. El despliegue productivo observado apunta al commit de `main` `b528660e16552633d232a2397cbe42441a03438c`, anterior a esta corrección. Sin acceso autorizado al catálogo/checkpoints y sin nueva evidencia de datos, no cambia el dictamen del incidente: la captura sigue sin localizarse y la pérdida definitiva no está demostrada.
 
 - **v0.1 · 2026-10-28 · CUSTODIA-INC-RECUP-SES-20261028-R6K2M9Q4-C004:** se documentan por separado el defecto de conteo local/remoto, el límite de página de 20, el incidente reportado y las hipótesis no verificadas. Sin acceso a producción, recuperación real ni cambios de producto.
 - **v0.2 · 2026-10-28 · CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C005:** se vincula el incidente con CUSTODIA-03, que amplía el alcance a otras capturas esperadas no disponibles; no se modifica el estado fáctico del incidente, que sigue ABIERTO.
