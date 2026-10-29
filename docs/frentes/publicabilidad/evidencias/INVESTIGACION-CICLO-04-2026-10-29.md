@@ -10,7 +10,7 @@ Publicabilidad se amplía del foco inicial en Vercel/KHORA a un sistema transver
 
 Una búsqueda `org:SeryMente` devolvió nueve repositorios: `khora`, `khora-effectif`, `metodologia`, `serymente`, `otrogranprograma`, `signal-interpreter`, `GDP`, `personal` y `tercer-ambito`. La búsqueda no se considera prueba de inventario exhaustivo; falta contrastar el catálogo completo con el propietario y mapear destinos externos. Se leyeron los README recuperados, no el código completo de cada repo.
 
-Se crearon dos documentos preliminares: un mapa de dependencias/propagación y una matriz transversal de 12 escenarios. El PSP v0.2 se conserva como subconjunto especializado de publicación Khora/Vercel. No se alteró Metodología ni ningún otro repositorio de la organización.
+Se crearon dos documentos preliminares: un mapa de dependencias/propagación y una matriz transversal de 12 escenarios. Se registra también una dependencia estratégica declarada por el operador: Otro Gran Programa, como proyecto insignia, necesita KHORA/CoMind y Metodología para resolver su objetivo. El repo `SeryMente/otrogranprograma` es el instrumento de comunicación identificado, no necesariamente todo el proyecto. La relación técnica exacta está pendiente de mapear. El PSP v0.2 se conserva como subconjunto especializado de publicación Khora/Vercel. No se alteró Metodología ni ningún otro repositorio de la organización.
 
 ## 2. Referencia normativa realmente adquirida
 
