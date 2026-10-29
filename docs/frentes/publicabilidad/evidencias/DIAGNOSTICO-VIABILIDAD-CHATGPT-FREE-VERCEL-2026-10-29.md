@@ -40,7 +40,7 @@ Fuentes oficiales:
 
 - Repositorio: `SeryMente/khora`.
 - `main`: `e463e0c6efa857f4c4229894a96fab747a8a7574`.
-- Run CI de la rama Publicabilidad: [40900763575](https://github.com/SeryMente/khora/actions/runs/40900763575), SHA `c364fea2750d4f67b3dbae41285e1835cefb5503`.
+- Run CI de la rama Publicabilidad: [40900763575](https://github.com/SeryMente/khora/actions/runs/40900763575), SHA `c364fea2750d4f67b3dbae41285e1835cefb5503`. La confirmación más reciente en el propio ciclo es [run 40912938287](https://github.com/SeryMente/khora/actions/runs/40912938287), sobre HEAD `7660e242658561711d2163ff85f4aead6029cee6`: los tres jobs (`calidad`, `khora-web-gate`, `api-tests`) fallaron en 2–3 segundos, con `runner_id=0`, runner vacío y `steps=[]`; recuperar el log del job `123585463206` volvió a devolver `BlobNotFound` a las `2026-10-29T16:35:07Z`.
 - Sus jobs `khora-web-gate`, `api-tests` y `calidad` terminaron en 1–2 segundos con `runner_id=0`, runner vacío y `steps=[]`; recuperar los logs dio `BlobNotFound`.
 - El mismo patrón aparece en cuatro workflows programados de `main`: Jules Auto-Respond (`40904382749`), Sync Todoist and Notion (`40889858840`), Board Orchestrator (`40889195532`) y Khora API Healthcheck (`40878917996`). Los jobs revisados también duran 1–2 segundos, tienen `runner_id=0`, runner vacío y `steps=[]`; sus logs dan `BlobNotFound`.
 - El snapshot del endpoint público de estado de GitHub consultado indicaba «All Systems Operational» a las `2026-10-29T15:04:55Z`, antes de los runs recientes a las 15:21Z y 15:43Z. No demuestra el estado de Actions en el momento de esos fallos.
