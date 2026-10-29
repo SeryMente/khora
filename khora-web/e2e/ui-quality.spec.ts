@@ -248,24 +248,46 @@ for (const viewport of [
     });
 
     test("el grafo mantiene interacción accesible por teclado", async ({ page }) => {
-      await page.route("**/api/grafo**", async (route) => {
+      // Current API contract returns two separately projected graphs, not the
+      // legacy { nodes, edges } envelope formerly served by /api/grafo.
+      await page.route("**/api/grafos**", async (route) => {
+        const graph = {
+          nodes: [
+            {
+              id: "node-ui-001",
+              summary: "Nodo sintético accesible",
+              community: 1,
+              communityId: "fixture-community-01",
+              communityRevision: "fixture-revision-01",
+              level: 2,
+              centrality: 3,
+              origen: "fixture-ui",
+              timestamp: "2026-10-06T00:00:00Z",
+              verificacion: "VERIFIED",
+            },
+          ],
+          edges: [],
+          communities: 1,
+        };
         await route.fulfill({
           status: 200,
           contentType: "application/json",
           body: JSON.stringify({
-            nodes: [
-              {
-                id: "node-ui-001",
-                summary: "Nodo sintético accesible",
-                community: 1,
-                level: 2,
-                centrality: 3,
-                origen: "fixture-ui",
-                timestamp: "2026-10-06T00:00:00Z",
-                verificacion: "VERIFIED",
-              },
-            ],
-            edges: [],
+            revision: "fixture-revision-01",
+            empty: false,
+            stale: false,
+            source_count: 1,
+            pending: 0,
+            pending_sources: 0,
+            pending_identity_pairs: 0,
+            completed: 1,
+            custody: { total: 1, eligible: 1, excluded: 0, policy: "synthetic-e2e" },
+            automatic: graph,
+            curated: graph,
+            proposals: [],
+            judgments: [],
+            limitations: [],
+            finished: true,
           }),
         });
       });
@@ -278,10 +300,10 @@ for (const viewport of [
       await node.focus();
       await page.keyboard.press("Enter");
 
-      await expect(page.getByRole("heading", { name: "Inspección de Comunidad", exact: true })).toBeVisible();
+      await expect(page.getByRole("heading", { name: "Inspección de entidad", exact: true })).toBeVisible();
 
       await page.getByRole("button", { name: "Cerrar inspección" }).click();
-      await expect(page.getByRole("heading", { name: "Inspección de Comunidad", exact: true })).toHaveCount(0);
+      await expect(page.getByRole("heading", { name: "Inspección de entidad", exact: true })).toHaveCount(0);
     });
 
     test("el tema cambia mediante control nativo y conserva accesibilidad", async ({ page }) => {
