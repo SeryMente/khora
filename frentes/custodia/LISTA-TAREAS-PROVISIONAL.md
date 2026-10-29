@@ -1,18 +1,24 @@
-<!-- LIST_VERSION=0.5; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.6; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Lista provisional de tareas · Frente Custodia
 
-> **ESTADO: PROVISIONAL · NO VALIDADA CONTRA EL DISEÑO METODOLÓGICO FINAL.** Se conserva aquí por instrucción expresa del operador. La tarea CUSTODIA-02 debe revisar si esta materialización, sus campos y su relación con el OCP son adecuados. Este archivo no crea un segundo objeto canónico ni otro control de responsabilidad; el núcleo único del frente sigue siendo [OBJETO-CANONICO.md](OBJETO-CANONICO.md).
+> **ESTADO: PROVISIONAL · NO CERTIFICADA CONTRA EL DISEÑO METODOLÓGICO FINAL.** Se conserva aquí por instrucción expresa del operador. CUSTODIA-02 fue retirada de las tareas activas por instrucción del operador; no se reutiliza su identificador. Esa retirada no certifica metodológicamente esta materialización. Este archivo no crea un segundo objeto canónico ni otro control de responsabilidad; el núcleo único del frente sigue siendo [OBJETO-CANONICO.md](OBJETO-CANONICO.md).
 
 - **Frente:** Custodia.
-- **Versión de esta lista provisional:** 0.5.
+- **Versión de esta lista provisional:** 0.6.
 - **Última actualización:** 2026-10-28.
 - **Metodología en la primera redacción:** Samantha v348 · NX-348m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `a4c90bd8ff1cd360b1f1662ff55371bd1b56b4cd`.
 - **Revalidación antes del cierre (intermedia):** Samantha v351 · NX-351m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `f069d2385f47731ac9d0f0ca76bfd3cef859cdd2`.
 - **Última lectura de metodología del ciclo 2 (referencia histórica):** Samantha v352 · NX-352m; Metacanon 1.21; GOW v2.3; blob `94473eccb6fa71303d5908ce678f7efeb191c215`.
 - **Última lectura metodológica histórica (ciclo 4):** Samantha v356 · NX-356m; Metacanon 1.22; GOW v2.6; blob `c364e179e8e9b6a3d566a8e690dfa1a7cce91798`.
-- **Lectura metodológica vigente de este ciclo:** Samantha v358 · NX-358m; Metacanon 1.23; GOW v2.7; blob `89a28e4d05f5baab9c4b86abdb9fbfc532690c75`. La lista sigue provisional; CUSTODIA-02 debe revisar su diseño frente a este canon vigente.
-- **Alcance actual del plan:** tres tareas documentadas hasta este ciclo: recuperar y comprobar las unidades visibles; investigar las capturas esperadas que no aparecen o parecen irrecuperables; y revisar el diseño metodológico de la lista. No se afirma que sean el inventario exhaustivo de todas las obligaciones futuras del frente.
+- **Última lectura metodológica registrada:** Samantha v358 · NX-358m; Metacanon 1.23; GOW v2.7; blob `89a28e4d05f5baab9c4b86abdb9fbfc532690c75`. La lista sigue provisional; la retirada de CUSTODIA-02 no se interpreta como validación del diseño.
+- **Alcance actual del plan:** tres tareas activas: recuperar y verificar las unidades visibles (CUSTODIA-01); investigar capturas ausentes o aparentemente irrecuperables y cuantificar las lagunas (CUSTODIA-03); completar la investigación y actualizar/certificar el sistema de recuperabilidad mediante correcciones y pruebas de extremo a extremo (CUSTODIA-04). No se afirma que sean el inventario exhaustivo de todas las obligaciones futuras del frente.
 - **Regla provisional de custodia de información:** no copiar a este repositorio el texto o audio de dictados reales, secretos, credenciales ni identificadores personales innecesarios. Registrar resultados mediante evidencia minimizada y sanitizada, en el soporte autorizado que corresponda.
+
+- **Secuencia de ejecución acordada en el ciclo C006:**
+  1. **Fase de entrada compartida (antes de recuperar o modificar):** en CUSTODIA-03 adquirir y reconciliar, de forma no destructiva y bajo sesión autorizada, el catálogo completo por paginación, las identidades local/remoto, el archivo de Custodia pertinente y los checkpoints accesibles. Esta línea base es la entrada de CUSTODIA-01 y evita confundir una ausencia de la interfaz con pérdida.
+  2. **CUSTODIA-01 y continuación de CUSTODIA-03:** una vez preservada la línea base, recuperar y verificar cada unidad visible en paralelo con la búsqueda del dictado ausente y de otras lagunas; no esperar a que la investigación histórica cierre para rescatar lo ya identificable.
+  3. **CUSTODIA-04:** consolidar las causas demostradas, corregir el producto, añadir pruebas de regresión y validar la recuperación de extremo a extremo en el entorno autorizado. Su cierre depende de la evidencia de las dos tareas anteriores y de pruebas del sistema actualizado.
+  La secuencia no autoriza a alterar originales ni a declarar recuperabilidad productiva antes de una lectura real verificada.
 
 ---
 
@@ -93,23 +99,29 @@
 
 ---
 
-## CUSTODIA-02 · Revisar si esta lista provisional está bien diseñada conforme a la metodología vigente de OCP/FT
+## CUSTODIA-04 · Completar la investigación y actualizar el sistema para restablecer la recuperabilidad comprobable
 
-**Prioridad:** P1 · Después de encaminar las dos tareas operativas P0 (CUSTODIA-01 y CUSTODIA-03).
+**Prioridad:** P0 · CRÍTICA · Depende de la línea base y de los hallazgos de CUSTODIA-01 y CUSTODIA-03.
 
-**Estado:** PENDIENTE — NO INICIADA.
+**Estado:** ABIERTA — objetivo incorporado; diagnóstico productivo completo, correcciones, pruebas y aceptación de extremo a extremo pendientes.
 
-**Motivo:** el operador ha indicado que todavía no sabe hasta qué punto el diseño de una lista de tareas de frente corresponde con el diseño metodológico de los Objetos Canónicos de Persistencia para frentes de trabajo. Por ello, su diseño se conserva provisionalmente en Custodia y debe revisarse en lugar de tratarse como una convención ya validada.
+**Objetivo:** concluir la investigación de las brechas de recuperabilidad identificadas y actualizar KHORA para que las unidades admisibles puedan catalogarse, recuperarse y verificarse de manera consistente. No se considera lograda la recuperabilidad por el mero hecho de modificar o compilar código.
 
-**Objetivo:** contrastar esta materialización y su relación con el núcleo OCP contra el Metacanon vigente, especialmente la anatomía de trece bloques, el registro verificable de cada ciclo y las reglas del directorio OCP, sus materializaciones y la ausencia de estados/control paralelos.
+**Alcance mínimo**
+1. Consolidar el inventario y las causas que CUSTODIA-01 y CUSTODIA-03 hayan demostrado, separando defectos de código, incidentes productivos confirmados e hipótesis todavía abiertas.
+2. Corregir la reconciliación de las capturas locales/remotas para que la carga inicial y la recarga compartan reglas deterministas de identidad, deduplicación y elección de la versión sin ocultar una copia local más reciente.
+3. Corregir el contrato de audio y la recuperación de capturas legacy: las partes, su orden, integridad y referencias deben comprobarse y preservarse explícitamente. No inventar alineación ni descartar audio existente por la mera ausencia de un manifiesto.
+4. Dar al contador un significado fiable y visible: total único comprobado por el servidor o etiqueta inequívoca de elementos cargados, con paginación hasta el fin del catálogo. No presentar una página de veinte como total global.
+5. Probar fallos de checkpoint, interrupción de solicitud, recarga, cierre, reinicio/cambio de perfil, recuperación parcial, duplicados, múltiples páginas y ausencia de audio/manifest. Mantener separada la copia local de la confirmación remota.
+6. Añadir/ajustar pruebas unitarias, integración y navegador con datos sintéticos; ejecutar los controles aplicables del proyecto y registrar revisión, resultados y limitaciones.
+7. Verificar la actualización efectiva en el entorno autorizado. Cuando las autorizaciones y la vía de publicación lo permitan, comprobar el despliegue/revisión correspondiente y realizar una recuperación real de prueba con lectura de vuelta; no tocar contenido personal sin autorización.
+8. Documentar qué garantías quedaron demostradas, qué brechas continúan abiertas y el siguiente paso de cada brecha. Si no hay acceso productivo autorizado o falta evidencia de lectura real, mantener explícitamente el estado sin certificar.
 
-**Preguntas que debe resolver la revisión**
-1. Si una lista separada `LISTA-TAREAS-PROVISIONAL.md` es una materialización adecuada dentro de `frentes/custodia/`, o si el detalle operativo debe ubicarse de otra manera dentro del único OCP.
-2. Qué campos mínimos necesitan las tareas para que se puedan retomar y verificar: prioridad, estado, objetivo, procedencia, criterio de cierre, evidencia/límites y siguiente acción.
-3. Cómo enlazar la lista con el estado vivo y la crónica del objeto canónico sin mantener versiones contradictorias ni crear un segundo núcleo operativo.
-4. Qué revisión del historial, de la persistencia y de la lectura de vuelta requiere el método antes de considerar esta lista conforme.
+**Criterio de cierre:** causas y alcance documentados con evidencia; defectos de código demostrados corregidos; pruebas automatizadas pertinentes aprobadas y reproducibles; inventario/contador/paginación coherentes; recuperación de referencia de texto y audio comprobada con integridad y procedencia, preservando los originales; y estado del entorno actualizado verificado. Cualquier parte que dependa de acceso productivo no disponible permanece abierta y no puede declararse garantizada.
 
-**Criterio de cierre:** revisión documentada contra la versión vigente de la metodología, con hallazgos y recomendación explícita. Cualquier reorganización posterior se hará manteniendo la historia y mediante los cambios autorizados que correspondan; esta lista no se declara conforme de antemano.
+**Dependencias:** línea base no destructiva de CUSTODIA-03; resultados y casos recuperados/verificados de CUSTODIA-01; revisión identificable de rama/despliegue; entorno de prueba y acceso productivo autorizados. La tarea puede preparar correcciones en cuanto exista evidencia suficiente de un defecto reproducible, pero su aceptación final espera la validación integrada.
+
+**Relación con las otras tareas:** CUSTODIA-04 resuelve las causas sistémicas y deja la capacidad de recuperación al corriente; no sustituye la recuperación individual de CUSTODIA-01 ni demuestra por sí misma el destino del dictado ausente investigado por CUSTODIA-03.
 
 ---
 
@@ -119,7 +131,9 @@
 - **2026-10-28 · Revisión documental previa al cierre del ciclo 2:** se actualizó la referencia metodológica hasta Samantha v352 y se confirmó por lectura de vuelta que el documento conserva exactamente dos tareas. La versión 0.2 no validaba el diseño.
 - **2026-10-28 · Ciclo 3, inventario de recuperabilidad:** versión 0.3. CUSTODIA-01 pasa de «PENDIENTE — NO INICIADA» a «EN CURSO» por haber ejecutado análisis estático y documentado hallazgos; el catálogo autenticado y la recuperación real siguen pendientes. Se enlaza el inventario provisional sin guardar datos reales de dictados. El OCP se actualizó a CUSTODIA-v0.3; el diseño de esta lista sigue sin certificar.
 - **2026-10-28 · CUSTODIA-INC-RECUP-SES-20261028-R6K2M9Q4-C004 · versión 0.4:** documenta el incidente del dictado ausente, el conteo reportado 40→20 y la discrepancia entre hidratación inicial/recarga, y deja explícito que el catálogo completo, la fila de checkpoint y la causa raíz siguen sin verificar.
-- **2026-10-28 · CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C005 · versión 0.5:** se formaliza CUSTODIA-03 para investigar el dictado no visible y cualquier otra captura esperada que no aparezca o parezca irrecuperable. CUSTODIA-01 y CUSTODIA-03 quedan como prioridades operativas P0; CUSTODIA-02 mantiene el identificador original y pasa a P1 metodológico. Se refresca la referencia normativa a Samantha v358, Metacanon 1.23, GOW v2.7.
+- **2026-10-28 · CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C005 · versión 0.5:** se formaliza CUSTODIA-03 para investigar el dictado no visible y cualquier otra captura esperada que no aparezca o parezca irrecuperable. CUSTODIA-01 y CUSTODIA-03 quedan como prioridades operativas P0; CUSTODIA-02 se registró entonces como revisión metodológica P1.
+- **2026-10-28 · CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C006 · versión 0.6:** por nueva instrucción del operador, CUSTODIA-02 se retira de la lista activa y su identificador histórico no se reutiliza. Se agrega CUSTODIA-04 para completar la investigación y actualizar el sistema; el plan define como secuencia la línea base no destructiva, la recuperación de unidades visibles junto con la investigación de ausencias, y después la corrección y validación integral del producto. La lista sigue provisional; la retirada de CUSTODIA-02 no certifica su diseño.
 - **Fuente del encargo literal inicial:** [originales/INSTRUCCION-PENDIENTES-2026-10-28.md](originales/INSTRUCCION-PENDIENTES-2026-10-28.md).
 - **Fuente de ampliación del alcance:** [originales/INSTRUCCION-AMPLIACION-TAREAS-RECUPERABILIDAD-2026-10-28.md](originales/INSTRUCCION-AMPLIACION-TAREAS-RECUPERABILIDAD-2026-10-28.md), commit d3c84153bbdc8844e7c3147e4ab0a6375be3dc68.
+- **Nueva instrucción literal:** [originales/INSTRUCCION-REORDENAMIENTO-Y-ACTUALIZACION-RECUPERABILIDAD-2026-10-28.md](originales/INSTRUCCION-REORDENAMIENTO-Y-ACTUALIZACION-RECUPERABILIDAD-2026-10-28.md).
 - **Estado de ejecución:** no se recuperaron ni inspeccionaron dictados como parte de esta modificación documental.
