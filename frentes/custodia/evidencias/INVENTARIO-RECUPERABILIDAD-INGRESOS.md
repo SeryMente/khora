@@ -1,16 +1,16 @@
-<!-- INVENTARIO_VERSION=0.7; INVENTARIO_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- INVENTARIO_VERSION=0.8; INVENTARIO_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Inventario provisional de hallazgos · Recuperabilidad en Ingresos → Dictado → Recuperación
 
 > **ESTADO: PROVISIONAL · INVESTIGACIÓN ABIERTA · RECUPERABILIDAD PRODUCTIVA NO CERTIFICADA.** Este archivo es una materialización de evidencia dentro del OCP de Custodia; no es un OCP adicional ni una segunda fuente de estado. El núcleo vivo es [OBJETO-CANONICO.md](../OBJETO-CANONICO.md).
 
 - **Frente propietario:** CUSTODIA.
-- **Versión de este inventario:** 0.7.
+- **Versión de este inventario:** 0.8.
 - **Ciclo previo:** CUSTODIA-INV-RECUP-SES-20261028-R6K2M9Q4.
 - **Ciclo de ampliación por incidente:** CUSTODIA-INC-RECUP-SES-20261028-R6K2M9Q4-C004.
 - **Ciclo de ampliación de tareas:** CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C005.
-- **Ciclos de implementación/validación parcial:** CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C007/C008; última punta consultada de la rama `fix/custodia-recovery-reconcile-20261028`, commit `cbb9efd89048daf3bd9f07cc69c2e6d7209aa55d`; PR [#339](https://github.com/SeryMente/khora/pull/339) abierta en borrador, no fusionada ni desplegada. En C009, la rama figura divergida respecto de `main`: divergida respecto de `main`; la distancia exacta debe recalcularse tras cada actualización de la rama principal.
+- **Ciclos de implementación/validación parcial:** CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C007/C008; última punta consultada de la rama `fix/custodia-recovery-reconcile-20261028`, commit `cbb9efd89048daf3bd9f07cc69c2e6d7209aa55d`; PR [#339](https://github.com/SeryMente/khora/pull/339) abierta en borrador, no fusionada ni desplegada. En C009/C010, la rama figura divergida respecto de `main`; no se registra una distancia ahead/behind estática porque cambia con cada actualización de la rama principal.
 - **Folio de los ciclos de investigación originales:** SES-20261028-R6K2M9Q4; generaciones anteriores conservadas en el control. **Folio activo C009:** SES-20261029-C9K4M2R8; control de responsabilidad en generación 3.
-- **Fecha de creación:** 2026-10-28. **Última actualización C009:** 2026-10-29.
+- **Fecha de creación:** 2026-10-28. **Última actualización C010:** 2026-10-29.
 - **Fuente normativa de los ciclos 3–4 (histórica):** Samantha v356 · NX-356m; Metacanon 1.22; GOW v2.6; blob c364e179e8e9b6a3d566a8e690dfa1a7cce91798.
 - **Fuente normativa histórica en C005:** [Metaprompt Canónico de Samantha](https://github.com/SeryMente/metodologia/blob/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html), main; Samantha v358 · NX-358m; Metacanon 1.23; GOW v2.7; blob `89a28e4d05f5baab9c4b86abdb9fbfc532690c75`.
 - **Fuente normativa revalidada en C009:** Samantha v359 · NX-359m; Metacanon 1.24; GOW 2.8; blob `b2ff2845a5a99dc4ce3cafafc4f8e43607d48145`, leído desde `SeryMente/metodologia/main` el 2026-10-29.
@@ -175,6 +175,22 @@ Esto ofrece una explicación técnica consistente para «Sin audio en este punto
 - **Riesgo:** si el checkpoint remoto no alcanzó acuse y el reinicio eliminó el perfil/datos del sitio, la copia local podría no sobrevivir. El reinicio físico por sí solo no demuestra que el perfil se haya limpiado.
 - **Qué falta:** consultar la fila de checkpoint y su hora de recepción en la sesión propietaria; verificar qué política de reinicio/perfil aplicó el cibercafé. No hay prueba de que el checkpoint específico alcanzara o no el servidor.
 
+### F-13 · La verificación de audio valida metadatos, no la lectura actual de los bytes remotos
+
+- **Clase:** CONFIRMADO EN CÓDIGO; estado de los objetos remotos en producción NO VERIFICADO.
+- **Fuentes inspeccionadas en este ciclo C010:**
+  - `khora-web/lib/audio/custodia.ts`, blob `1628a5841d26941546b58a4d62ef93d0d5e99266`.
+  - `khora-web/lib/server/custodia-recuperacion.ts`, rama `main`, blob `278a479db46e6f2bed72ea7d31f88cc373fa67d1`.
+  - `khora-web/lib/server/custodia-recuperacion.ts`, propuesta PR #339, blob `bf76dec79b34fd34d0b4e86609d99d6b9ce686f9`.
+  - `khora-web/app/components/ingreso/RecoveryDrawer.tsx`, propuesta PR #339, blob `fe2cf2e661d4395fc0f3f61fca1556af2258febb`.
+- **Observación:** `evaluarCustodiaAudio` valida índices, continuidad, duplicados, tamaño declarado positivo, formato del SHA-256 registrado y `estado_verificacion === "verificado"`; no descarga el objeto remoto ni recalcula SHA-256 contra los bytes actuales. La consulta SQL recupera metadatos y URLs de partes, y la recuperación propuesta inserta referencias a las filas existentes mediante `INSERT ... SELECT`; no lee los bytes del proveedor como parte de esa transacción.
+- **Consecuencia:** «N partes verificadas almacenadas» describe filas/metadatos de base de datos, no demuestra que todos los objetos sigan disponibles, sean legibles con las credenciales actuales ni coincidan con el hash registrado. La integración sintética PostgreSQL/PGlite tampoco ejerce la disponibilidad real de Neon/Blob.
+- **Alcance de la propuesta:** la PR #339 añade un recuento de partes verificadas y diferencia audio no manifestado de audio sincronizado. También contempla recuperar audio legacy si hay partes con índices contiguos y registros marcados verificados. Esto reduce el falso negativo del manifiesto, pero no resuelve por sí solo la lectura actual de objetos ni una validación criptográfica de sus bytes.
+- **Corrección requerida:** añadir una verificación controlada de extremo a extremo que, bajo identidad/propietario autorizado, lea cada objeto referenciado, confirme bytes no vacíos, recalcule SHA-256 y lo compare con el valor persistido; reconstruya/decodifique el conjunto cuando aplique; y verifique por lectura de vuelta el destino de recuperación sin borrar ni sobrescribir el origen. Debe distinguir explícitamente `metadata_verified`, `object_read_verified`, `hash_verified` y `recovery_readback_verified`, o estados equivalentes que el diseño existente justifique.
+- **Límite:** no se consultaron bytes ni objetos reales de producción; no se declara que algún objeto esté perdido o corrupto. La conclusión es sobre el alcance del código inspeccionado, no sobre el estado de los datos de usuario.
+
+---
+
 ## 4. Auditoría auxiliar del almacén local — no equivale al catálogo de Recuperación
 
 Esta sección preserva una evidencia técnica obtenida previamente para evitar repetir la inspección, pero **no identifica las unidades reales de la interfaz**. Se inspeccionó una copia de trabajo de IndexedDB en un perfil de Chrome distinto del perfil de mantenimiento. El archivo de origen no se sustituyó ni borró. Las reconstrucciones se generaron en un directorio temporal; no se subieron al servidor ni se usaron para modificar la aplicación.
@@ -302,6 +318,12 @@ Pruebas con datos sintéticos interrumpen la petición remota antes de la respue
 
 **Aceptación:** tras confirmación remota, el punto es recuperable en un perfil de navegador limpio y bajo el mismo propietario; ante falta de acuse o fallo de copia local, la UI hace explícita la condición y mantiene un resultado no confirmado, sin presentar un intento como persistencia demostrada.
 
+### R-09 · Lectura real, hash y lectura de vuelta de los objetos de audio
+
+Los tests sintéticos deben simular objetos accesibles, inexistentes, no autorizados, truncados y con bytes cuyo SHA-256 no coincide con el registro. Para la validación autorizada de una unidad real, leer el objeto bajo el propietario correcto, exigir bytes no vacíos, recalcular el SHA-256, validar índices/continuidad y probar decodificación/reconstrucción cuando corresponda. Después verificar que la recuperación de destino puede leerse y que conserva texto/audio/procedencia, manteniendo intacto el origen.
+
+**Aceptación:** no declarar una parte íntegra solo por `estado_verificacion`, bytes declarados o formato del hash guardado. La prueba demuestra que los bytes leídos coinciden con el SHA-256 persistido; la recuperación se lee de vuelta y se coteja. Los casos no disponibles o no autorizados quedan como bloqueados/no verificados, no como «perdidos» sin evidencia.
+
 ## 7. Bloqueos y acciones siguientes
 
 1. **Obtener el catálogo autenticado real de Recuperación.** Es el bloqueo principal para saber si hay 20, 21 u otro número de unidades y cuáles presentan el defecto. Usar la sesión/propiedad autorizada que muestra esos ítems; no sustituir esa lista por los cinco snapshots locales.
@@ -358,7 +380,7 @@ Se registró el relato literal y el análisis en [INCIDENTE-DICTADO-AUSENTE-Y-CO
 
 ## 10. Ampliación del plan de trabajo · CUSTODIA-01 / CUSTODIA-03 / CUSTODIA-04
 
-La lista provisional de tareas queda en v0.8 y conserva tres identificadores activos estables:
+La lista provisional de tareas queda en v0.9 y conserva tres identificadores activos estables:
 
 - **CUSTODIA-01 · P0:** recuperar y comprobar todas las unidades que actualmente aparecen en Recuperación, con paginación completa y reconciliación de entradas locales/remotas.
 - **CUSTODIA-03 · P0:** investigar los dictados esperados que no aparecen o parecen irrecuperables; resolver el estado del dictado reportado como ausente tras la sesión de terminal, cuantificar otros casos mediante evidencia y rescatar las unidades localizadas sin alterar sus originales.
@@ -392,9 +414,19 @@ La evidencia y los criterios técnicos están en [el informe del incidente](INCI
 - **CI GitHub Actions:** se reintentaron `UI Quality`, `CI` y `khora-ok / gate`. En el segundo intento los jobs terminaron fallidos en 2–3 segundos, sin runner asignado, sin pasos y sin logs descargables (`BlobNotFound`). La causa exacta no se determinó; no hay evidencia de que los pasos de prueba remota llegaran a ejecutarse.
 - **Límite productivo:** 0 unidades del catálogo autenticado cotejadas y 0 recuperaciones productivas. El dictado reportado como ausente sigue sin localizarse; su pérdida definitiva no está demostrada. La propuesta no está fusionada ni desplegada y la recuperabilidad productiva continúa sin certificación.
 
+### Auditoría de continuación · C010 · 2026-10-29
+
+- Se comparó el código de `main` con la propuesta de PR #339. `main` todavía calcula `audioParts` desde el manifiesto/snapshot y limita la recuperación al número declarado allí. La propuesta calcula además `storedAudioParts` desde filas con `estado_verificacion='verificado'` y contempla restaurar legacy sin manifiesto si la cadena de metadatos es contigua/verificada.
+- Se inspeccionó la función `evaluarCustodiaAudio`: valida integridad estructural y metadatos declarados, no hace lectura HTTP/SDK del objeto, no recalcula SHA-256 contra bytes actuales y no decodifica el audio. La propuesta hereda ese límite; la prueba PGlite C008 solo valida SQL sintético sin proveedores productivos.
+- La rama de PR #339 está divergida frente a `main`; CI remoto muestra ejecuciones fallidas sin pasos ni logs utilizables, y la causa no está determinada. La evidencia de C008 no se puede transferir como prueba de la punta reconciliada.
+- El entorno conectado no tiene un clon local de Khora, Git/gh ni credenciales de GitHub en el perfil RDC actual. No se accedió a la sesión de Chrome perteneciente a otro usuario. No fue posible obtener el catálogo autenticado ni la DB/objetos reales. Se mantiene 0 unidades productivas cotejadas y 0 recuperaciones productivas.
+- **Siguiente paso:** R-09, en entorno autenticado/autorizado, debe validar lectura actual y hash de bytes reales por unidad. Antes de fusionar/publicar, reaplicar/reconciliar el parche en una rama limpia sobre `main` vigente, repetir las pruebas y resolver la barrera CI/despliegue. No alterar datos originales.
+
 ## 11. Registro de cambios del inventario
 
-- **v0.7 · 2026-10-29 · CUSTODIA-TRANSFERENCIA-SES-20261029-C9K4M2R8:** relevo de responsabilidad registrado en generación 3 y fuente normativa revalidada a Samantha v359, Metacanon 1.24 y GOW 2.8. La rama de corrección se confirmó divergida de `main` divergida respecto de `main`; distancia exacta pendiente de recalcular tras las actualizaciones documentales de la rama principal; PR #339 sigue en borrador. El despliegue de producción observado apunta a `main` en `b528660e16552633d232a2397cbe42441a03438c`, anterior a los cambios de CUSTODIA; la corrección no está desplegada. No se adquirió el catálogo autenticado, no se cotejaron unidades productivas y no hubo recuperaciones de producción. La investigación continúa abierta.
+- **v0.8 · 2026-10-29 · CUSTODIA-PLAN-RECUP-SES-20261029-C9K4M2R8-C010:** añade F-13/R-09 para distinguir verificación de metadatos de lectura e integridad de los bytes reales; registra el estado actual de la PR y límites de acceso productivo.
+
+- **v0.7 · 2026-10-29 · CUSTODIA-TRANSFERENCIA-SES-20261029-C9K4M2R8:** relevo de responsabilidad registrado en generación 3 y fuente normativa revalidada a Samantha v359, Metacanon 1.24 y GOW 2.8. La rama de corrección se confirmó divergida de `main`; no se conserva una distancia ahead/behind estática porque cambia con cada actualización de la rama principal. PR #339 sigue en borrador. El despliegue de producción observado apunta a `main` en `b528660e16552633d232a2397cbe42441a03438c`, anterior a los cambios de CUSTODIA; la corrección no está desplegada. No se adquirió el catálogo autenticado, no se cotejaron unidades productivas y no hubo recuperaciones de producción. La investigación continúa abierta.
 
 - **v0.1 · 2026-10-28:** creación provisional de la matriz de hallazgos; separa código confirmado, auditoría local auxiliar y catálogo real pendiente. No declara recuperaciones de producción completadas.
 - **v0.2 · 2026-10-28 · CUSTODIA-INC-RECUP-SES-20261028-R6K2M9Q4-C004:** se añaden F-09 a F-12 para el conteo 40→20, la paginación de 20, el dictado no visible tras las 17:08 y el límite entre copia local y acuse remoto. Se añaden R-06 a R-08; el incidente sigue abierto, el total único del catálogo permanece no verificado y no se realizaron operaciones productivas.
