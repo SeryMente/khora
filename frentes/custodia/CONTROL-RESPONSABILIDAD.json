@@ -6,66 +6,76 @@
   "state_object": "frentes/custodia/OBJETO-CANONICO.md",
   "status": "assigned",
   "owner_thread": null,
-  "owner_alias": "chatgpt-custodia-SES-20261028-R6K2M9Q4",
+  "owner_alias": "chatgpt-custodia-SES-20261029-C9K4M2R8",
   "owner_alias_type": "operational_alias_not_native_thread_id",
-  "instance": "chatgpt-custodia-SES-20261028-R6K2M9Q4",
-  "session_folio": "SES-20261028-R6K2M9Q4",
-  "generation": 2,
+  "instance": "chatgpt-custodia-SES-20261029-C9K4M2R8",
+  "session_folio": "SES-20261029-C9K4M2R8",
+  "generation": 3,
   "expiry": null,
-  "authorization_ref": "Instrucción directa del operador, 2026-10-28, preservada en originales/INSTRUCCION-INVENTARIO-RECUPERABILIDAD-INGRESOS-2026-10-28.md (blob 357f3c1cc9081a47f47dc3fa0b838e8f8eeed5a5). Autoriza inventariar provisionalmente los hallazgos sobre recuperabilidad dentro del OCP; no autoriza cambios de código, alteraciones de producción ni recuperaciones que puedan sobrescribir/eliminar originales. Asignación inicial desde control sin titular previo asignado. ID nativo de conversación no expuesto.",
-  "authorization_event": "CUSTODIA-INVENTARIO-RECUPERABILIDAD-SES-20261028-R6K2M9Q4",
+  "authorization_ref": "Instrucción directa del operador: «REtoma resposnabilida ddel frente CUSTODIA, de Khora», preservada en frentes/custodia/originales/INSTRUCCION-TRANSFERENCIA-RESPONSABILIDAD-2026-10-29.md (blob 240a27710d1de76fd9a5eeeb9ce97fdb6b987104; commit 9fb5bd3a03158e1435009153c38be489c901c155). Autoriza el relevo de responsabilidad de esta sesión al alias operativo de la generación 3; no es un ID nativo de conversación. No autoriza por sí sola acciones destructivas ni cambios productivos sin las pruebas y controles pertinentes.",
+  "authorization_event": "CUSTODIA-TRANSFERENCIA-SES-20261029-C9K4M2R8",
   "previous_owner": {
-    "status": "unassigned",
+    "status": "assigned",
     "owner_thread": null,
-    "owner_alias": null,
-    "instance": null,
-    "session_folio": null,
-    "generation": 1,
-    "record_kind": "owner_previous_to_generation_2",
-    "preserved_before_assignment": true
+    "owner_alias": "chatgpt-custodia-SES-20261028-R6K2M9Q4",
+    "instance": "chatgpt-custodia-SES-20261028-R6K2M9Q4",
+    "session_folio": "SES-20261028-R6K2M9Q4",
+    "generation": 2,
+    "record_kind": "owner_previous_to_generation_3"
   },
-  "previous_authorization_ref": "No había titularidad previa asignada en el control leído.",
+  "previous_authorization_ref": "Instrucción directa del operador, 2026-10-28, preservada en originales/INSTRUCCION-INVENTARIO-RECUPERABILIDAD-INGRESOS-2026-10-28.md (blob 357f3c1cc9081a47f47dc3fa0b838e8f8eeed5a5). Autoriza inventariar provisionalmente los hallazgos sobre recuperabilidad dentro del OCP; no autoriza cambios de código, alteraciones de producción ni recuperaciones que puedan sobrescribir/eliminar originales. Asignación inicial desde control sin titular previo asignado. ID nativo de conversación no expuesto.",
   "previous_acquired_at": "2026-10-28",
-  "prior_generation": 1,
-  "previous_blob": "11dc5e21b3fcd9a64113976245b81a466b4b185b",
-  "base_blob_sha": "11dc5e21b3fcd9a64113976245b81a466b4b185b",
-  "assignment_method": "Adjudicación inicial bajo Metacanon §47.2: control leído sin titular previo; actualización condicionada por el SHA del blob observado; generación 1→2. La lectura de vuelta queda pendiente hasta releer la ruta canónica.",
+  "prior_generation": 2,
+  "previous_blob": "2da19e588e30fe3835696d22fe110a7570a8758f",
+  "base_blob_sha": "2da19e588e30fe3835696d22fe110a7570a8758f",
+  "assignment_method": "Transferencia explícita conforme a Samantha v359 P037 y Metacanon §42: se leyó el control en generación 2 y blob 2da19e588e30fe3835696d22fe110a7570a8758f; se actualiza con comparación condicional de SHA, generación 2→3, se registra el original de autorización y se requiere lectura de vuelta. Alias operativo, no ID nativo.",
   "folio_collision_check": {
-    "searched_scope": "Búsqueda exacta del folio en el índice de GitHub con alcance de la organización SeryMente: cero resultados. El índice expuso nueve repositorios accesibles para esta consulta y dos controles adicionales de otros frentes en SeryMente/khora; la enumeración de todos los controles no es completa.",
+    "searched_scope": "Búsqueda exacta del folio SES-20261029-C9K4M2R8 en commits e incidencias de SeryMente/khora: cero resultados. La consulta de otros repositorios accesibles desde la organización no garantiza inventario completo de todos los controles de responsabilidad.",
     "repositories_searched": [
-      "SeryMente/khora",
-      "SeryMente/serymente",
-      "SeryMente/otrogranprograma",
-      "SeryMente/GDP",
-      "SeryMente/khora-effectif",
-      "SeryMente/signal-interpreter",
-      "SeryMente/tercer-ambito",
-      "SeryMente/personal",
-      "SeryMente/metodologia"
+      "SeryMente/khora"
     ],
-    "controls_inspected": [
-      "SeryMente/khora/frentes/custodia/CONTROL-RESPONSABILIDAD.json",
-      "SeryMente/khora/docs/frentes/dictado-voz/CONTROL-RESPONSABILIDAD.json",
-      "SeryMente/khora/docs/frentes/harmonia/CONTROL-RESPONSABILIDAD.json"
-    ],
-    "folio": "SES-20261028-R6K2M9Q4",
+    "folio": "SES-20261029-C9K4M2R8",
     "matches_found": 0,
     "global_uniqueness": "not_verified"
   },
-  "acquired_at": "2026-10-28",
+  "acquired_at": "2026-10-29",
   "bootstrap_scope": "Responsabilidad documental del frente transversal Custodia para inventariar hallazgos de recuperabilidad en Ingresos > Dictado > Recuperación y mantener el estado del OCP. No autoriza código de producto, credenciales, seguridad, despliegues, cambios de proveedor ni recuperaciones no destructivas sin verificación/consentimiento específico.",
   "enforcement": "cooperative registry; no server fencing of arbitrary writes",
   "readback_required": true,
   "transcript_scope": "Instrucción del operador preservada en el original de este ciclo; la continuidad visible se limita a mensajes adquiridos y no es una exportación nativa exhaustiva.",
   "authorization_original": {
-    "path": "frentes/custodia/originales/INSTRUCCION-INVENTARIO-RECUPERABILIDAD-INGRESOS-2026-10-28.md",
-    "blob_sha": "357f3c1cc9081a47f47dc3fa0b838e8f8eeed5a5",
-    "commit_sha": "3290ebcad27ae140c8a51cc85f4e5e27c2058148"
+    "path": "frentes/custodia/originales/INSTRUCCION-TRANSFERENCIA-RESPONSABILIDAD-2026-10-29.md",
+    "blob_sha": "240a27710d1de76fd9a5eeeb9ce97fdb6b987104",
+    "commit_sha": "9fb5bd3a03158e1435009153c38be489c901c155"
   },
   "prior_visible_output_original": {
     "path": "frentes/custodia/originales/SALIDA-MODELO-CUSTODIA-ANTERIOR-RECUPERABILIDAD-INGRESOS-2026-10-28.md",
     "blob_sha": "c5feb1e2ac4454dfe60898489f5b7612bc91646a",
     "commit_sha": "585227304d8c9f9ca1887867125b0d7863ec6804",
     "scope": "dos fragmentos visibles anteriores, no exportación exhaustiva nativa"
-  }
+  },
+  "previous_assignment": {
+    "owner": {
+      "status": "assigned",
+      "owner_thread": null,
+      "owner_alias": "chatgpt-custodia-SES-20261028-R6K2M9Q4",
+      "instance": "chatgpt-custodia-SES-20261028-R6K2M9Q4",
+      "session_folio": "SES-20261028-R6K2M9Q4",
+      "generation": 2,
+      "record_kind": "owner_previous_to_generation_3"
+    },
+    "original_previous_owner_generation_1": {
+      "status": "unassigned",
+      "owner_thread": null,
+      "owner_alias": null,
+      "instance": null,
+      "session_folio": null,
+      "generation": 1,
+      "record_kind": "owner_previous_to_generation_2",
+      "preserved_before_assignment": true
+    },
+    "previous_authorization_ref": "Instrucción directa del operador, 2026-10-28, preservada en originales/INSTRUCCION-INVENTARIO-RECUPERABILIDAD-INGRESOS-2026-10-28.md (blob 357f3c1cc9081a47f47dc3fa0b838e8f8eeed5a5). Autoriza inventariar provisionalmente los hallazgos sobre recuperabilidad dentro del OCP; no autoriza cambios de código, alteraciones de producción ni recuperaciones que puedan sobrescribir/eliminar originales. Asignación inicial desde control sin titular previo asignado. ID nativo de conversación no expuesto."
+  },
+  "transfer_generation": 3,
+  "transfer_authority": "Samantha v359 · NX-359m; Metacanon 1.24; GOW 2.8; DUG blob b2ff2845a5a99dc4ce3cafafc4f8e43607d48145."
 }
