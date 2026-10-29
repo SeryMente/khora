@@ -1177,7 +1177,7 @@ El paquete local referido como Harmonia v0.5.0, el destino actual y su estructur
 
 ### 35.1 Identidad, mandato y procedencia
 
-- Fecha de revisión: 2026-10-29, America/Mexico_City. Solicitud literal del operador conservada como original U21 en [`HARMONIA-REVISION-E2E-SES-20261028-P9K4R7M2-20261029.jsonl`](originales/HARMONIA-REVISION-E2E-SES-20261028-P9K4R7M2-20261029.jsonl) (ruta relativa operativa: `originales/HARMONIA-REVISION-E2E-SES-20261028-P9K4R7M2-20261029.jsonl`); su blob se comprobará en el cierre de este ciclo.
+- Fecha de revisión: 2026-10-29, America/Mexico_City. Solicitud literal del operador conservada como original U21 en [`HARMONIA-REVISION-E2E-SES-20261028-P9K4R7M2-20261029.jsonl`](originales/HARMONIA-REVISION-E2E-SES-20261028-P9K4R7M2-20261029.jsonl), blob leído de vuelta `fa55c374b504b29c2565b310b343cf081c4e7c71`, cotejado exactamente.
 - Frente: Harmonia · `SeryMente/khora`, ruta heredada preservada. OCP v0.28 / HARMONIA-v0.28. Titularidad continúa siendo generación 8, folio `SES-20261028-P9K4R7M2`, alias `chatgpt-harmonia-SES-20261028-P9K4R7M2`; control leído en vivo con blob `2b8e5091e621b1017ed1e55f2796cc48f9ba444b`. No se transfirió la titularidad ni se mutó `CONTROL-RESPONSABILIDAD.json`.
 - Evento del ciclo: `HARMONIA-CICLO-SES-20261028-P9K4R7M2-20261029`. Salida visible y crónica en `originales/HARMONIA-CICLO-SES-20261028-P9K4R7M2-20261029-salida.md` y `cronica/HARMONIA-CICLO-SES-20261028-P9K4R7M2-20261029.md`. No crear núcleo, control o ruta paralelos.
 
