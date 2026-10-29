@@ -2,7 +2,7 @@
 
 **Versión:** 0.2 provisional (la v0.1 se conserva como fotografía histórica).  
 **Corte observado:** 2026-10-29, ciclo 03; ver informe para refs, jobs y fechas exactas.  
-**Objeto rector:** [OBJETO-CANONICO.md](../OBJETO-CANONICO.md), PUBLICABILIDAD-v0.3. Esta evidencia no constituye una fuente canónica independiente.
+**Objeto rector:** [OBJETO-CANONICO.md](../OBJETO-CANONICO.md), PUBLICABILIDAD-v0.5. Esta evidencia no constituye una fuente canónica independiente.
 
 ## Propósito
 
@@ -58,12 +58,13 @@ Fuentes:
 3. Usar Actions solo si la ruta única está sana; si falla, pasar a diagnóstico en S07.
 4. No saltar directamente a producción por Dashboard/CLI.
 
-### S03 · ChatGPT Free sin escritura MCP acreditada
-1. Verificar qué herramientas Git están realmente disponibles en esa sesión.
-2. Si hay escritura Git/PR autorizada: crear rama, aplicar cambio, commit y leer de vuelta el SHA; después comprobar preview y checks.
-3. Si solo hay lectura: no repetir MCP; usar una herramienta Git con escritura autorizada o interfaz GitHub.
-4. Si el cambio solo existe localmente y no hay escritura remota, evaluar RDC según S08.
-5. Bloquear producción si el workflow actual falla y no existe una ruta de release equivalente, revisada y autorizada.
+### S03 · ChatGPT Free sin escritura remota nativa acreditada
+1. No asumir que la app GitHub conectada a ChatGPT puede escribir: la guía oficial la define como lectura/búsqueda; no crea commits ni PRs.
+2. No asumir que Vercel MCP permite crear deployments desde ChatGPT Free: la escritura MCP personalizada se documenta para Business y Enterprise/Edu. Codex está incluido en Free, pero Codex Cloud no; usar la app/CLI local no cumple el requisito de publicación remota sin terminal.
+3. Para el modo gratuito sin terminal local, generar el parche completo en ChatGPT y aplicar manualmente los cambios desde GitHub Web en una rama; verificar diff y abrir PR. Declarar explícitamente que este es un puente manual, no una escritura automática del conector.
+4. Esperar Preview automático de Vercel sobre la rama y verificar SHA, deployment ID, URL, logs y pruebas pertinentes. No editar directamente `main`.
+5. Bloquear producción mientras Actions no ejecute los gates y no haya una única autoridad productiva con migración/provenance/smoke reconciliados.
+6. Referencia: [diagnóstico de viabilidad ChatGPT Free → Vercel](DIAGNOSTICO-VIABILIDAD-CHATGPT-FREE-VERCEL-2026-10-29.md).
 
 ### S04 · MCP ausente o plan/cliente sin permiso de escritura
 1. Clasificar si es plan, cliente, configuración del workspace o instalación.
