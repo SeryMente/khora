@@ -107,6 +107,16 @@ RDC se utilizó solamente para la reproducción/diagnóstico local de este bloqu
 
 No se instaló Git/gh, no se clonó el repositorio, no se inspeccionaron archivos personales ajenos y no se alteró el entorno. En un job que nunca alcanza el primer step y tiene una probable barrera de facturación/cuenta, ejecutar manualmente tests locales no reproduciría el gate de GitHub. **RDC no puede corregir por sí solo un bloqueo remoto de facturación/entitlement**, y la ausencia de clon/herramientas impide una reproducción local fiable sin preparar otro entorno. No conviene preparar ese entorno hasta verificar billing y que Actions vuelva a asignar runners.
 
+## 6.1 Revalidación después de persistir el diagnóstico · 2026-10-29T17:41Z
+
+El patrón sigue activo en los runs más recientes de esta misma ventana:
+- KHORA [run 40923486365](https://github.com/SeryMente/khora/actions/runs/40923486365), SHA `5fd2ea17b0d10cfafbc712fc7676312afa42b10f`: los jobs `123622690139`, `123622690389` y `123622690440` fallaron entre 2 y 3 segundos; runner cero, runner vacío y `steps=[]`.
+- Metodología [run 40923129660](https://github.com/SeryMente/metodologia/actions/runs/40923129660), job `123621422175`, y [run 40923129500](https://github.com/SeryMente/metodologia/actions/runs/40923129500), job `123621422242`: ambos fallaron tras aproximadamente dos segundos, sin runner ni pasos.
+- El control público de Signal Interpreter aporta además [run 40923649526](https://github.com/SeryMente/signal-interpreter/actions/runs/40923649526) iniciado a las 17:40:58Z; a las 17:41Z ya tenía `runner_id=1000046988`, pasos iniciales correctos y un paso en curso. Otro run del repositorio público, `40922616949`, ya había terminado SUCCESS a las 17:35:17Z.
+- No se volvió a ejecutar ningún workflow por iniciativa de este ciclo; son ejecuciones naturales producidas por los pushes/runs que ya estaban en el flujo.
+
+Esta actualización refuerza la distinción privado/público, pero no expone la anotación faltante ni prueba el saldo/bloqueo de facturación. La clasificación sigue siendo **alta probabilidad de gate billing/uso/entitlement para Actions privado; no confirmado directamente**.
+
 ## 7. Límites y estado de corrección
 
 - Estado de la causa: **alta probabilidad de gate billing/uso privado; no confirmación directa**. Faltan el cuerpo de la anotación de SeryMente y la pantalla de uso/facturación.
