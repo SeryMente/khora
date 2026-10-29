@@ -1,4 +1,4 @@
-<!-- INVENTARIO_VERSION=0.3; INVENTARIO_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- INVENTARIO_VERSION=0.4; INVENTARIO_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Inventario provisional de hallazgos · Recuperabilidad en Ingresos → Dictado → Recuperación
 
 > **ESTADO: PROVISIONAL · INVESTIGACIÓN ABIERTA · RECUPERABILIDAD PRODUCTIVA NO CERTIFICADA.** Este archivo es una materialización de evidencia dentro del OCP de Custodia; no es un OCP adicional ni una segunda fuente de estado. El núcleo vivo es [OBJETO-CANONICO.md](../OBJETO-CANONICO.md).
@@ -352,20 +352,27 @@ Se registró el relato literal y el análisis en [INCIDENTE-DICTADO-AUSENTE-Y-CO
 - **Acción pendiente de más prioridad:** recorrer todo el catálogo autenticado hasta cursor nulo, cotejar sesiones únicas y copias locales/remotas, revisar Custodia si hubiera archivo y, bajo acceso autorizado de solo lectura, cotejar los checkpoints de la ventana temporal. No copiar contenido personal o identificadores reales al repositorio.
 - **Cambios de producto:** no realizados. Las correcciones de reconciliación, semántica del contador y pruebas de reinicio requieren un ciclo posterior autorizado y validación de extremo a extremo.
 
-## 10. Ampliación del plan de trabajo · CUSTODIA-01 / CUSTODIA-03
+## 10. Ampliación del plan de trabajo · CUSTODIA-01 / CUSTODIA-03 / CUSTODIA-04
 
 La lista provisional de tareas queda en v0.5 y conserva tres identificadores estables:
 
 - **CUSTODIA-01 · P0:** recuperar y comprobar todas las unidades que actualmente aparecen en Recuperación, con paginación completa y reconciliación de entradas locales/remotas.
 - **CUSTODIA-03 · P0:** investigar los dictados esperados que no aparecen o parecen irrecuperables; resolver el estado del dictado reportado como ausente tras la sesión de terminal, cuantificar otros casos mediante evidencia y rescatar las unidades localizadas sin alterar sus originales.
-- **CUSTODIA-02 · P1:** revisar si la lista provisional de tareas está diseñada conforme a la metodología vigente. Se conserva su identificador histórico, pero queda detrás de las dos prioridades operativas de recuperabilidad.
+- **CUSTODIA-04 · P0:** completar la investigación y actualizar el sistema para que la recuperabilidad quede al corriente, corrigiendo los defectos demostrados y validando el recorrido completo con pruebas reproducibles y lectura de vuelta.
+
+**Secuencia registrada en el ciclo C006:** primero adquirir una línea base no destructiva y reconciliar el catálogo completo; después recuperar y verificar las unidades visibles (CUSTODIA-01) mientras continúa la investigación de capturas ausentes (CUSTODIA-03); finalmente consolidar las causas y actualizar/probar el producto (CUSTODIA-04). CUSTODIA-04 puede preparar correcciones a partir de defectos ya reproducibles, pero no se cierra hasta contar con la evidencia de las dos tareas operativas y una validación integrada.
 
 **CUSTODIA-03 no presupone una pérdida.** Cada caso se clasificará como localizado y recuperado, localizado pero bloqueado, archivado, duplicado, parcial/incompleto, no localizado tras revisar las fuentes declaradas, irrecuperabilidad demostrada o no determinado por falta de evidencia. El contador 40→20 no se traducirá en «20 dictados perdidos» sin reconciliar las identidades reales.
 
 La evidencia y los criterios técnicos están en [el informe del incidente](INCIDENTE-DICTADO-AUSENTE-Y-CONTEO-40-20-2026-10-28.md), los hallazgos de código y requisitos en este inventario, y el estado operativo vivo en el [OCP de Custodia](../OBJETO-CANONICO.md). No se han consultado registros productivos ni se han realizado recuperaciones como parte de esta ampliación documental.
 
+### Original de la última instrucción de plan
+
+- [Instrucción literal de retirada de CUSTODIA-02 e incorporación de CUSTODIA-04](../originales/INSTRUCCION-REORDENAMIENTO-Y-ACTUALIZACION-RECUPERABILIDAD-2026-10-28.md). La instrucción original se conserva como fuente congelada; este inventario sigue subordinado al OCP.
+
 ## 11. Registro de cambios del inventario
 
 - **v0.1 · 2026-10-28:** creación provisional de la matriz de hallazgos; separa código confirmado, auditoría local auxiliar y catálogo real pendiente. No declara recuperaciones de producción completadas.
 - **v0.2 · 2026-10-28 · CUSTODIA-INC-RECUP-SES-20261028-R6K2M9Q4-C004:** se añaden F-09 a F-12 para el conteo 40→20, la paginación de 20, el dictado no visible tras las 17:08 y el límite entre copia local y acuse remoto. Se añaden R-06 a R-08; el incidente sigue abierto, el total único del catálogo permanece no verificado y no se realizaron operaciones productivas.
-- **v0.3 · 2026-10-28 · CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C005:** se registra el alcance de las tres tareas: recuperar unidades visibles, investigar las capturas ausentes/no recuperables (CUSTODIA-03, P0) y revisar la estructura metodológica de la lista (CUSTODIA-02, P1). La metodología vigente se refresca a Samantha v358, Metacanon 1.23, GOW v2.7.
+- **v0.3 · 2026-10-28 · CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C005:** registra el alcance histórico de CUSTODIA-01, CUSTODIA-03 y la entonces propuesta CUSTODIA-02; la referencia normativa se refrescó a Samantha v358, Metacanon 1.23, GOW v2.7.
+- **v0.4 · 2026-10-28 · CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C006:** registra la retirada de CUSTODIA-02 de las tareas activas, sin reutilizar su ID, y la incorporación de CUSTODIA-04 para terminar la investigación, corregir el sistema y validar la recuperabilidad de extremo a extremo. Se documenta la secuencia de línea base no destructiva, recuperación de las unidades visibles/investigación en paralelo y actualización integral. No hay todavía resultados productivos nuevos por causa de esta actualización documental.
