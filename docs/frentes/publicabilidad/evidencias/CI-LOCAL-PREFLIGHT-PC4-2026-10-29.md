@@ -3,7 +3,7 @@
 **Frente:** Publicabilidad · `SeryMente/khora`  
 **Entorno RDC:** PC-4 · Desktop Commander 0.3.1 · sesión persistida restaurada a las 14:50:44 hora local según la salida del operador.  
 **Estado actualizado al cierre:** CI local parcial en PC-4. Checkout autenticado íntegro en SHA `42ca6e664a501f4882a187fc81d01fb99845320f`; `npm ci`, typecheck, UI Review y contrato de navegación completados con Node 24/npm 11 como evidencia auxiliar. `test:unit` no se ejecutó porque la invocación fue bloqueada antes de iniciar por el control de ejecución. El gate completo sigue pendiente.  
-**Fuente normativa comprobada:** `SeryMente/metodologia/main`, DUG v359 · NX-359m, Metacanon 1.24, GOW 2.8; blob `b2ff2845a5a99dc4ce3cafafc4f8e43607d48145`.
+**Fuente normativa comprobada:** `SeryMente/metodologia/main`, DUG v360 · NX-360m, Metacanon 1.24, GOW 2.9; blob `3cda9d38db1bee76ff0ca752f3ecde8719c70d41`.
 
 ## 1. Commit y workflow de referencia
 
@@ -110,3 +110,31 @@ No se ejecutó el job `test:unit`, ni se completaron los jobs `api-tests` o `cal
 **Conclusión:** la autorización de Git/GCM quedó comprobada y el checkout privado íntegro se materializó. Hay cuatro resultados favorables de preparación/chequeo web, pero ninguno constituye el gate completo exacto de GitHub Actions, porque se usó Node 24/npm 11, hubo una advertencia de scripts y el runner unitario no llegó a iniciarse. La validación sigue parcial y producción permanece bloqueada.
 
 Referencia normativa releída al actualizar esta evidencia: DUG v360 · NX-360m; Metacanon 1.24; GOW 2.9; blob `3cda9d38db1bee76ff0ca752f3ecde8719c70d41` de `SeryMente/metodologia/main`.
+
+
+## 8. Reanudación E2E, corrección del fixture y CI hospedada · 2026-10-29
+
+### 8.1 Test de grafo alineado al contrato actual
+
+La pantalla /grafo pide /api/grafos; el endpoint devuelve un par de proyecciones automatic y curated. El fixture E2E histórico usaba /api/grafo y una respuesta simple { nodes, edges }, además de afirmar un encabezado retirado (Inspección de Comunidad). El fixture y las aserciones se actualizaron al contrato actual. La corrección quedó preservada y sincronizada con la cabeza actual de main en [PR #341](https://github.com/SeryMente/khora/pull/341), commit c6ccd0bfd3c260975f7dae6253cc89484ba5aaad; el PR está abierto en borrador, sin fusionar.
+
+### 8.2 Pruebas adicionales locales
+
+- Build Next.js: código 0, 78 páginas estáticas.
+- typecheck, ui-review:check y ui:contract: código 0.
+- Smoke E2E: 4/4.
+- UI Quality E2E completo con fixture corregido: 16/16, ambos tamaños desktop/mobile; grafo accesible por teclado incluido.
+- Contratos AppIcon (5), Lucide y ThemeToggle: PASS.
+- Empaquetado Harmonia v0.3.5: ZIP validado, manifest presente y 59 archivos; el ZIP temporal se eliminó antes de que RDC dejara de responder.
+
+Las pruebas locales se ejecutaron inicialmente en checkout 42ca6e664a501f4882a187fc81d01fb99845320f, con Node 24/npm 11, no en el Node 22 fijado por el workflow. Después se comprobó en la cabeza actual de main que la página sigue consumiendo /api/grafos, el componente sigue titulando el panel Inspección de entidad y el test base sigue teniendo el fixture obsoleto.
+
+### 8.3 CI hospedada
+
+Sobre el commit más reciente del PR, los runs [CI push](https://github.com/SeryMente/khora/actions/runs/40959788498), [CI PR](https://github.com/SeryMente/khora/actions/runs/40959796676), [UI Quality PR](https://github.com/SeryMente/khora/actions/runs/40959796180) y [khora-ok gate](https://github.com/SeryMente/khora/actions/runs/40959796413) acabaron antes del primer paso. Se verificó steps=[] para todos los jobs consultados. Los logs de intentos previos no existen en el almacén de Actions (BlobNotFound). Por ello el resultado es fallo de asignación/arranque del job y no resultado de las pruebas; el motivo definitivo del runner no está confirmado.
+
+### 8.4 Límite del entorno local
+
+npm run test:unit se bloqueó antes de iniciar por el control de ejecución; no se intentó ninguna invocación equivalente para eludirlo. Los jobs Python api-tests y calidad no se completaron: en el preflight no había intérprete Python ni Docker/Neo4j utilizables. Se inició una descarga del instalador oficial Python 3.11.9 a Temp, pero el canal RDC de PC-4 dejó de responder; el resultado de la descarga/instalación es desconocido. No se cambió el dispositivo ni se reinició la sesión. La limpieza final de una configuración temporal de Playwright tampoco pudo verificarse después de la pérdida de respuesta RDC.
+
+**Cierre actualizado:** fixture corregido y preservado en PR, pruebas locales de build/UI aprobadas, CI global no verde y runners hospedados sin ejecutar pasos. main, secretos, dependencias, configuración de billing y producción permanecen sin cambios.
