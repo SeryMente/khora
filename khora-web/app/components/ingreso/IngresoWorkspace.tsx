@@ -179,7 +179,7 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
   }, []);
 
   const snapshotItem=(x:CapturaSnapshot):RecoveryItem=>({sessionId:x.sessionId,revisionId:x.revisionId,savedAt:x.clientAt,title:x.titulo,preview:textoRecuperable(x).slice(0,160),chars:textoRecuperable(x).length,duration:x.duracionSeg,audioParts:x.audioPartes?.length||0,paired:!!x.corteAudio,throughPart:x.corteAudio?.hastaParte,local:true});
-  const localCatalog=(snapshots:CapturaSnapshot[])=>{
+  const localCatalog=(snapshots:CapturaSnapshot[]):RecoveryItem[]=>{
     const groups=new Map<string,CapturaSnapshot[]>();for(const snap of snapshots){const a=groups.get(snap.sessionId)||[];a.push(snap);groups.set(snap.sessionId,a);}
     return [...groups.values()].map(rows=>{rows.sort((a,b)=>b.clientAt-a.clientAt);return {...snapshotItem(rows[0]),localVersions:rows.map(snapshotItem)};});
   };
