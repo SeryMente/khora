@@ -47,10 +47,14 @@ export async function recuperarCheckpoint(req:NextRequest,email:string){
  const original=JSON.parse(descifrarTexto(rev.rows[0].snapshot));
  if(original.sessionId!==p.sourceSessionId||original.revisionId!==p.revisionId){await c.query('ROLLBACK');return json({error:'revision_inconsistente'},409);}
  const all=(await c.query(partesSql,[p.sourceSessionId])).rows;
- // Legacy snapshots carry no synchronized cut. Preserve their recorded manifest, never invent alignment.
- const total=original.corteAudio?.hastaParte??(Array.isArray(original.audioPartes)?original.audioPartes.length:0);
+ // Prefer the explicitly saved cut/manifest. If a legacy snapshot has no audio manifest at all,
+ // preserve the verified stored parts as unpaired audio instead of silently omitting them.
+ let total=original.corteAudio?.hastaParte??(Array.isArray(original.audioPartes)?original.audioPartes.length:0);
+ const recoveredAsUnpairedLegacyAudio=!original.corteAudio&&total===0&&all.length>0;
+ if(recoveredAsUnpairedLegacyAudio)total=Math.max(0,...all.map((x:any)=>Number(x.parte)||0));
  const parts=all.filter((x:any)=>x.parte<=total);
  if(total>0&&!evaluarCustodiaAudio(parts.map((x:any)=>({part_index:x.parte,bytes:x.bytes,sha256:x.sha256,estado_verificacion:x.verificado?'verificado':'pendiente'})),total).ok){await c.query('ROLLBACK');return json({error:'audio_no_verificado'},409);}
+ if(original.corteAudio&&Number(parts.at(-1)?.end_ms)!==original.corteAudio.finMs){await c.query('ROLLBACK');return json({error:'audio_no_verificado'},409);}
  const existing=await c.query(`SELECT custodia_owner,estado FROM dictado_session WHERE session_id=$1 FOR UPDATE`,[p.sessionId]);
  if(existing.rows.length){
   if(existing.rows[0].estado==='complete'){await c.query('ROLLBACK');return json({error:'sesion_sellada'},409);}
