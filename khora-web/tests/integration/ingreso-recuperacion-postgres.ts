@@ -14,6 +14,7 @@ async function main() {
  // This integration harness uses only a deterministic synthetic auth secret and a synthetic owner.
  process.env.PLAYWRIGHT_TEST_RUN='1';
  process.env.AUTH_SECRET='khora-custodia-integration-test-secret-only';
+ process.env.X_KHORA_KEY='a'.repeat(64); // Fixed synthetic AES-256 key; test-process only.
  process.env.AUTH_URL='http://localhost';
  // Next 16's async-storage adapter checks for a Node ALS global; install it only in this test process.
  (globalThis as any).AsyncLocalStorage ??= AsyncLocalStorage;
