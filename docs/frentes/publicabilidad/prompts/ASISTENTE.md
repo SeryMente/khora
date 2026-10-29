@@ -31,3 +31,9 @@ Investiga cómo lograr que las publicaciones de Khora desde plataformas de IA se
 ## Criterio de éxito del rol
 
 Una respuesta útil debe reducir las incógnitas que bloquean la elección arquitectónica y conservar evidencia reproducible. No añadas un mecanismo paralelo por comodidad; investiga primero la tubería que ya existe y sus fallos. La recomendación solo se considera validada tras pruebas con un commit controlado y no productivo.
+
+## Obligación de investigación: Protocolo Situacional de Publicación
+
+El frente es documental. Para cada escenario material identificado, investiga y documenta la secuencia más eficiente entre rutas seguras, autorizadas y elegibles. Incluye precondiciones, pasos ordenados, fallback, condición de parada, prueba de éxito y estado de verificación. Usa evidencias/MATRIZ-PRELIMINAR-ESCENARIOS-PUBLICACION-v0.1.md como evidencia subordinada y mantén el protocolo rector en el OCP.
+
+No asumas que ChatGPT Free admite escritura MCP: la guía actual de OpenAI documenta MCP completo con escritura para Business/Enterprise/Edu y lectura/obtención para Pro; Free no está acreditado. Antes de usar cualquier ruta, comprueba plan, herramientas y permisos reales. Si MCP falla, clasifica plan/permiso, timeout ambiguo, build o cuota; no reintentes ciegamente ni saltes a producción.
