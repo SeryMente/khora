@@ -1,4 +1,4 @@
-<!-- PUBLICABILIDAD_VERSION=v0.4; PUBLICABILIDAD_SEAL=PUBLICABILIDAD-v0.4 -->
+<!-- PUBLICABILIDAD_VERSION=v0.5; PUBLICABILIDAD_SEAL=PUBLICABILIDAD-v0.5 -->
 # Objeto Canónico de Persistencia · Publicabilidad
 
 ## 1. Control e identidad
@@ -6,9 +6,9 @@
 - **Frente:** Publicabilidad.
 - **Repositorio propietario:** SeryMente/khora; el término «Cora» del enunciado se conserva en el original y se normaliza operativamente a Khora conforme al canon de Metodología.
 - **Ruta del OCP:** docs/frentes/publicabilidad/OBJETO-CANONICO.md.
-- **Versión documental:** v0.4 · objeto provisional de investigación.
-- **Sello:** PUBLICABILIDAD-v0.4.
-- **Estado:** PROVISIONAL-v0.4; se amplía el alcance a propagación/publicación transversal y se incorpora el mapa preliminar de dependencias y la matriz de escenarios G01–G12. Siguen pendientes la validación completa del inventario, pruebas no productivas y diagnóstico de CI. El frente no autoriza despliegues productivos.
+- **Versión documental:** v0.5 · objeto provisional de investigación.
+- **Sello:** PUBLICABILIDAD-v0.5.
+- **Estado:** PROVISIONAL-v0.5; el alcance transversal permanece, pero la prioridad inmediata pasa a P0: diseñar y validar un método de publicación para KHORA desde ChatGPT Free sin terminal local. Se ha documentado que el flujo enteramente nativo de escritura no está acreditado para Free; se prioriza el puente GitHub web + Preview de Vercel y el release cloud tras reparar Actions y unificar publicadores/migraciones. Producción sigue bloqueada.
 - **Rama en la que se preparó esta entrega:** publicabilidad/inauguracion-20261028. No está integrada en main.
 - **Folio de este evento:** SES-20261028-PR8V6M2Q. Es un folio de evento/operación, no un identificador nativo de conversación.
 - **Titularidad operativa:** sin titular exclusivo asignado en CONTROL-RESPONSABILIDAD.json. La instrucción inaugura el frente, pero no se ha registrado una transferencia de responsabilidad exclusiva a esta instancia.
@@ -17,7 +17,7 @@
 
 ## 2. LEER PRIMERO
 
-Este frente investiga y diseña el sistema transversal de propagación y publicación de los activos de SeryMente, incluidos los repositorios y destinos externos que dependen de ellos. No autoriza por sí mismo a publicar producción, cambiar configuración, modificar secretos, ejecutar migraciones, alterar ramas principales, comprar servicios o activar facturación. Desktop Commander Remote queda reservado para diagnosticar/reproducir fallas de GitHub/CI cuando se identifique un caso reproducible localmente; para cualquier uso distinto debe avisarse previamente y esperarse autorización expresa.
+Este frente investiga y diseña el sistema transversal de propagación y publicación de los activos de SeryMente, incluidos los repositorios y destinos externos que dependen de ellos. **Prioridad operativa vigente:** conseguir un método sólido de publicación de actualizaciones de KHORA a Vercel usando ChatGPT Free, sin terminal/RDC local. No autoriza por sí mismo a publicar producción, cambiar configuración, modificar secretos, ejecutar migraciones, alterar ramas principales, comprar servicios o activar facturación. Desktop Commander Remote queda reservado para diagnosticar/reproducir fallas de GitHub/CI cuando se identifique un caso reproducible localmente; para cualquier uso distinto debe avisarse previamente y esperarse autorización expresa.
 
 En cada ciclo:
 1. Releer la versión vigente de la Metodología desde main, confirmar su versión/blob y volver a comprobar el OCP y este control.
@@ -173,6 +173,8 @@ El frente no se considera terminado hasta que:
 - Investigación y fuentes oficiales: evidencias/INVESTIGACION-INICIAL-2026-10-28.md.
 - Investigación documental del ciclo 03: evidencias/INVESTIGACION-CICLO-03-2026-10-29.md.
 - Investigación documental del ciclo 04: evidencias/INVESTIGACION-CICLO-04-2026-10-29.md.
+- Diagnóstico de viabilidad ChatGPT Free → Vercel (prioridad P0): evidencias/DIAGNOSTICO-VIABILIDAD-CHATGPT-FREE-VERCEL-2026-10-29.md.
+- Crónica del ciclo 05 — prioridad ChatGPT Free → Vercel: cronica/CICLO-05-CHATGPT-FREE-VERCEL.md.
 - Mapa preliminar de dependencias y propagación: MAPA-DE-DEPENDENCIAS-Y-PROPAGACION-v0.1.md.
 - Matriz de escenarios de propagación transversal G01–G12: evidencias/MATRIZ-ESCENARIOS-PROPAGACION-TRANSVERSAL-v0.1.md.
 - Matriz preliminar de escenarios y secuencias: evidencias/MATRIZ-PRELIMINAR-ESCENARIOS-PUBLICACION-v0.2.md.
@@ -314,3 +316,56 @@ RDC puede usarse para una reproducción local específica de una falla GitHub/CI
 7. Automatizar checks de propagación solo después de conocer los permisos, API, contrato y mecanismo real de cada destino.
 
 **Límites:** esta ampliación es documental y preliminar. No autoriza publicación productiva, cambios de código de producto, edición de otros repositorios, modificación de secretos/configuración ni despliegues. No se cambió `main`, Vercel, WordPress, GitHub Pages, Apps Script, datos externos ni plataformas de modelos en este ciclo.
+
+
+## 19. Prioridad P0 · Método sólido de publicación desde ChatGPT Free
+
+### 19.1 Objetivo inmediato
+
+Priorizar por encima de la ampliación general del inventario un método fiable para publicar actualizaciones de KHORA a Vercel partiendo del trabajo en ChatGPT Free, sin terminal local ni intervención RDC para desplegar. El requisito debe dividirse entre escritura del cambio y ejecución del release; la plataforma gratuita no tiene una vía nativa de escritura remota acreditada para ambos pasos.
+
+### 19.2 Restricción verificada de plan
+
+La guía oficial de OpenAI establece que:
+- la app GitHub conectada a ChatGPT permite leer/buscar, pero no push ni PR;
+- Codex está incluido en los planes Free, pero Codex Cloud no está incluido en Free;
+- MCP personalizado con acciones de escritura se documenta para Business y Enterprise/Edu, no para Free.
+
+Por ello no prometer una automatización completa «ChatGPT Free → GitHub write → Vercel deploy» solo por conectar el MCP de Vercel. La alternativa que conserva Free y no exige CLI local es usar GitHub Web como puente manual, con Preview automático y release cloud después de pasar los controles. La referencia completa, incluyendo URLs oficiales, está en [diagnóstico de viabilidad ChatGPT Free → Vercel](evidencias/DIAGNOSTICO-VIABILIDAD-CHATGPT-FREE-VERCEL-2026-10-29.md).
+
+### 19.3 Flujo objetivo bajo el requisito Free
+
+1. ChatGPT produce el parche completo, archivos afectados, pruebas, riesgos y criterios de aceptación; no afirma haber creado commit.
+2. El operador crea una rama y aplica el parche en la interfaz web de GitHub, verifica el diff y abre un PR. No editar directamente `main`.
+3. La integración Git de Vercel genera Preview para la rama. Se coteja SHA, deployment ID, URL, logs y pruebas.
+4. CI y controles de release deben aprobar el mismo candidato SHA.
+5. Tras aprobar, el PR se integra a `main`; el publicador cloud elegido verifica el SHA exacto, despliega y ejecuta provenance/smoke. El cierre no ocurre hasta verificar el dominio productivo y los criterios funcionales.
+6. La edición manual por navegador es un puente explícito de la modalidad Free, no escritura automática del conector ChatGPT.
+
+### 19.4 Publicación productiva bloqueada hasta cerrar P0
+
+No ejecutar producción ahora. Se mantienen cuatro bloqueos de control:
+
+- **Actions:** cinco workflows distintos muestran jobs de 1–2 segundos, `runner_id=0`, runner vacío, `steps=[]` y logs `BlobNotFound`; la causa raíz sigue NO DETERMINADA y no existe step localmente reproducible. El snapshot de estado público de GitHub consultado precede a los runs recientes, por lo que no descarta una condición posterior.
+- **Candidato:** `main` es `e463e0c6efa857f4c4229894a96fab747a8a7574`, mientras producción sirve `b528660e16552633d232a2397cbe42441a03438c`; la comparación indica 102 commits de diferencia. No promover automáticamente el delta completo.
+- **Doble publicador/migración:** Vercel Git puede publicar commits de la rama de producción y `.github/workflows/deploy-production.yml` también despliega tras push a `main`. El Build Command observado incluye migración condicionada a producción, mientras el workflow invoca esa migración explícitamente. Debe decidirse y probarse una única autoridad y una sola invocación de migración.
+- **Gates/Smoke:** la API reporta `protected=false` para `main` y no se pudo acreditar la configuración completa de rulesets; el smoke de producción usa `khora-web.vercel.app`, otro workflow usa `khora-ten.vercel.app`. Se debe comprobar protección efectiva y unificar la URL antes de release.
+
+### 19.5 Arquitectura candidata
+
+Recomendación provisional: **GitHub Actions como único publicador de producción, Vercel Git para Preview**. Motivo: el workflow cloud existente ya incluye migración, provenance por SHA, deploy preconstruido y smoke; el usuario no necesita terminal local para que ese CLI se ejecute en un runner de GitHub. Esta es una recomendación de diseño, no una configuración aplicada.
+
+Para habilitarla habrá que:
+1. recuperar la ejecución de GitHub Actions y establecer gates efectivos antes de merge;
+2. configurar Ignored Build Step de Vercel para omitir builds Git automáticos de `main` y conservar los Previews, con prueba controlada;
+3. ajustar el Build Command para que no vuelva a ejecutar migraciones cuando el workflow ya lo hizo explícitamente;
+4. verificar branch protection/rulesets y requerir PR/checks;
+5. reconciliar el dominio smoke y probar SHA → deployment → alias → smoke.
+
+Los cambios de configuración de Vercel, workflows y reglas de GitHub requieren autorización y validación específica; no se aplican en esta fase documental.
+
+### 19.6 Siguiente orden de trabajo
+
+P0.1 recuperar evidencia/diagnóstico de Actions con los IDs de los cinco workflows afectados, sin reruns a ciegas. P0.2 confirmar el diseño de publicador único. P0.3 preparar el cambio de configuración que elimina las publicaciones/migraciones duplicadas. P0.4 autorizar y probar una transferencia manual por GitHub Web a una rama inocua y su Preview, sin tocar `main`. P0.5 solo después de superar las compuertas anteriores evaluar un release productivo autorizado.
+
+**Estado:** diseño propuesto y documentado; flujo completo de producción no probado. No se usó RDC, no se creó un deployment nuevo y no se cambió `main`, secretos ni settings de Vercel.
