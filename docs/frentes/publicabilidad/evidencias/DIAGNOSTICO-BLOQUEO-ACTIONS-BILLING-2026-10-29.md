@@ -17,9 +17,9 @@ La combinación observada es:
 - log endpoint responde `BlobNotFound`;
 - dos anotaciones registradas en cada check run consultado (`annotations_count=2`), aunque el contenido de esas anotaciones no pudo recuperarse mediante la integración disponible.
 
-Esta firma coincide muy estrechamente con reportes en los que el contenido de una anotación indicó que el trabajo no había empezado porque la cuenta estaba bloqueada por un problema de facturación. GitHub documenta oficialmente que una retención de autorización fallida puede bloquear Actions incluso en Free, y que el uso de runners alojados en repositorios privados se bloquea al agotarse la cuota incluida si no hay un método de pago válido.
+Esta firma coincide muy estrechamente con reportes en los que una anotación indica bloqueo de Actions por facturación. Como en SeryMente un workflow de repositorio público sí ejecutó y pasó después de los fallos privados, la explicación más ajustada a la evidencia es una restricción en la facturación/uso que paga los runners de repositorios privados: cuota incluida agotada, budget/spending limit, método de pago o cuenta facturadora de la organización. No prueba cuál de estos casos aplica. Un bloqueo personal por autorización fallida sigue siendo una alternativa documentada, pero el control público exitoso hace menos probable que sea un bloqueo general de toda la cuenta. GitHub documenta que los runners estándar de repositorios públicos no consumen el cómputo incluido, mientras que los de repositorios privados sí; el uso se cobra al propietario del repositorio. También documenta que la cuota privada puede quedar bloqueada al agotarse si no hay método de pago válido.
 
-**Conclusión operativa:** revisar primero la elegibilidad de Actions, los presupuestos/uso y el estado de facturación para la organización propietaria `SeryMente`, además del propietario personal de facturación cuando corresponda. No editar workflows ni instalar herramientas locales como primera respuesta. La causa raíz exacta queda sin confirmación porque no pudimos leer las anotaciones ni el dashboard de facturación mediante las herramientas autorizadas.
+**Conclusión operativa:** revisar primero el cómputo incluido/consumo de Actions de repositorios privados, el budget/spending limit y el método de pago del billing owner de `SeryMente`. Si esos indicadores están limpios, revisar la cuenta personal por autorización fallida y escalar a GitHub Support. No editar workflows ni instalar herramientas locales como primera respuesta. La causa raíz exacta queda sin confirmación porque no pudimos leer las anotaciones ni el dashboard de facturación mediante las herramientas autorizadas.
 
 ## 2. Evidencia comparativa
 
@@ -65,7 +65,7 @@ Fuentes oficiales:
 ### Reportes de la comunidad con firma equivalente
 
 1. [GitHub Community #210692](https://github.com/orgs/community/discussions/210692): jobs de `ubuntu-latest` que fallan antes de iniciar, `runner_id=0`, runner vacío, `steps=[]`, logs `BlobNotFound`; la anotación exacta expuesta en ese caso fue `The job was not started because your account is locked due to a billing issue.`
-2. [GitHub Community #208287](https://github.com/orgs/community/discussions/208287): bloqueo de facturación a nivel de cuenta confirmado por una anotación; después de corregir una autorización fallida, la ejecución privada volvió a funcionar. La resolución fue confirmada por quien publicó, pero el caso no demuestra por sí mismo que la cuenta SeryMente tenga la misma condición.
+2. [GitHub Community #208297](https://github.com/orgs/community/discussions/208297): el caso documenta una cuenta personal de GitHub Free con un bloqueo por autorización de pago fallida que impedía iniciar Actions incluso en un repositorio público. Es una alternativa documentada, pero no prueba que el billing owner de SeryMente esté bloqueado; el control público positivo de SeryMente hace preferible revisar primero la cuota/budget de Actions atribuible a los repositorios privados.
 
 Estos informes se utilizan como evidencia comparativa, no como sustituto de la anotación faltante en SeryMente.
 
