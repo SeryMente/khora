@@ -24,12 +24,17 @@ async function main() {
  const pg=new PGlite();
  let checks=0;
  const query=async(sql:string,params?:any[])=>{
-  if(!params?.length&&sql.includes(';')){
-   const r=(await pg.exec(sql)).at(-1)||{rows:[]};
+  try{
+   if(!params?.length&&sql.includes(';')){
+    const r=(await pg.exec(sql)).at(-1)||{rows:[]};
+    return {...r,rowCount:r.affectedRows??r.rows.length};
+   }
+   const r=await pg.query(sql,params);
    return {...r,rowCount:r.affectedRows??r.rows.length};
+  }catch(error){
+   console.error('[custodia pglite SQL failure]',JSON.stringify({sql,params,error:String(error)}));
+   throw error;
   }
-  const r=await pg.query(sql,params);
-  return {...r,rowCount:r.affectedRows??r.rows.length};
  };
  setDbForTesting({query,connect:async()=>({query,release(){}})});
  const now=Math.floor(Date.now()/1000);
