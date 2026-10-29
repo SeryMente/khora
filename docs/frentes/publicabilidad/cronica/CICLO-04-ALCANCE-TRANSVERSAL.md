@@ -18,7 +18,8 @@ Convertir la ampliación expresada por el operador en un marco documental verifi
 ## Hallazgos de mayor impacto
 
 1. La búsqueda `org:SeryMente` recuperó nueve repositorios, pero la lista se declara inicial y no exhaustiva hasta ser contrastada con la fuente completa del propietario.
-2. Hay destinos de publicación heterogéneos: Vercel; WordPress/Divi; GitHub Pages con recursos PWA; instalación/puente nativo de extensiones; Apps Script junto con Sheets/Drive y un helper local; superficies de trabajo de modelos.
+2. El operador declara una dependencia estratégica: Otro Gran Programa, como proyecto insignia, necesita KHORA/CoMind y Metodología; las interfaces técnicas concretas siguen pendientes. El repo `SeryMente/otrogranprograma` se identifica como instrumento de comunicación y no se equipara al programa completo.
+3. Hay destinos de publicación heterogéneos: Vercel; WordPress/Divi; GitHub Pages con recursos PWA; instalación/puente nativo de extensiones; Apps Script junto con Sheets/Drive y un helper local; superficies de trabajo de modelos.
 3. La documentación de GDP indica extensión HF33 y backend HF32/versión 12 con aceptación E2E pendiente: la propagación puede afectar varios targets y no debe declararse completa solo porque uno avanzó.
 4. La documentación consultada de Metodología aún enumera versiones anteriores frente al DUG HTML v359 leído en `main`. Se registró como delta de espejo/índice; no se editó el repositorio de Metodología.
 5. El run de CI `40900763575` sobre el HEAD previo de la rama falló en 1–2 segundos con tres jobs, `runner_id=0`, runner vacío, `steps=[]` y logs `BlobNotFound`. No hay comando local reproducible en la evidencia actual. La causa raíz permanece **NO DETERMINADA**.
