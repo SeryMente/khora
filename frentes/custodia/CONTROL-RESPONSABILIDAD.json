@@ -12,7 +12,7 @@
   "session_folio": "SES-20261028-R6K2M9Q4",
   "generation": 2,
   "expiry": null,
-  "authorization_ref": "Instrucción directa del operador en esta conversación, 2026-10-28: «Esta parte de la recuperabilidad es importante. Ve documentando de manera persistente en el OCP, en el frente, de manera provisional un documento que te permita tener inventario de todos los hallazgos en cuanto a esta investigación para que posteriormente podamos corregir todos los defectos que impiden que se garantice la recuperabilidad, tal y como te la he ido expresando que la necesito». Autoriza investigación y documentación provisional del inventario dentro del OCP; no autoriza cambios de código, alteraciones de producción ni recuperación que pueda sobrescribir/eliminar originales. Asignación inicial porque el control previo estaba unassigned, no una transferencia desde un titular anterior. El original literal se conservará en frentes/custodia/originales/INSTRUCCION-INVENTARIO-RECUPERABILIDAD-INGRESOS-2026-10-28.md. ID nativo de conversación no expuesto.",
+  "authorization_ref": "Instrucción directa del operador, 2026-10-28, preservada en originales/INSTRUCCION-INVENTARIO-RECUPERABILIDAD-INGRESOS-2026-10-28.md (blob 357f3c1cc9081a47f47dc3fa0b838e8f8eeed5a5). Autoriza inventariar provisionalmente los hallazgos sobre recuperabilidad dentro del OCP; no autoriza cambios de código, alteraciones de producción ni recuperaciones que puedan sobrescribir/eliminar originales. Asignación inicial desde control sin titular previo asignado. ID nativo de conversación no expuesto.",
   "authorization_event": "CUSTODIA-INVENTARIO-RECUPERABILIDAD-SES-20261028-R6K2M9Q4",
   "previous_owner": {
     "status": "unassigned",
@@ -56,5 +56,16 @@
   "bootstrap_scope": "Responsabilidad documental del frente transversal Custodia para inventariar hallazgos de recuperabilidad en Ingresos > Dictado > Recuperación y mantener el estado del OCP. No autoriza código de producto, credenciales, seguridad, despliegues, cambios de proveedor ni recuperaciones no destructivas sin verificación/consentimiento específico.",
   "enforcement": "cooperative registry; no server fencing of arbitrary writes",
   "readback_required": true,
-  "transcript_scope": "Instrucción del operador preservada en el original de este ciclo; la continuidad visible se limita a mensajes adquiridos y no es una exportación nativa exhaustiva."
+  "transcript_scope": "Instrucción del operador preservada en el original de este ciclo; la continuidad visible se limita a mensajes adquiridos y no es una exportación nativa exhaustiva.",
+  "authorization_original": {
+    "path": "frentes/custodia/originales/INSTRUCCION-INVENTARIO-RECUPERABILIDAD-INGRESOS-2026-10-28.md",
+    "blob_sha": "357f3c1cc9081a47f47dc3fa0b838e8f8eeed5a5",
+    "commit_sha": "3290ebcad27ae140c8a51cc85f4e5e27c2058148"
+  },
+  "prior_visible_output_original": {
+    "path": "frentes/custodia/originales/SALIDA-MODELO-CUSTODIA-ANTERIOR-RECUPERABILIDAD-INGRESOS-2026-10-28.md",
+    "blob_sha": "c5feb1e2ac4454dfe60898489f5b7612bc91646a",
+    "commit_sha": "585227304d8c9f9ca1887867125b0d7863ec6804",
+    "scope": "dos fragmentos visibles anteriores, no exportación exhaustiva nativa"
+  }
 }
