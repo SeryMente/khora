@@ -20,6 +20,7 @@ export type IngresoViewState = {
   custodiaPreparando?: boolean;
   recuperando?: boolean;
   recuperaciones?: number;
+  recuperacionesHayMas?: boolean;
   stream?: MediaStream | null;
   titulo: string;
   texto: string;
@@ -81,7 +82,7 @@ export function IngresoView({state:v,actions:a={},isReviewMode=false}:{state:Ing
  return <main data-ui-id="ingreso.container" className={s.studio}>
   <header className={s.heading}>
    <div><p className={s.eyebrow}>ESPACIO DE CAPTURA</p><h1>Ingreso</h1><p className={s.subtitle}>Dale espacio a lo que piensas.</p></div>
-   {(a.onRecuperar||isReviewMode)&&<button className={s.secondary} onClick={a.onRecuperar} disabled={busy||recording||v.editando} aria-haspopup="dialog"><I.History size={18}/><span>Recuperar capturas</span>{!!v.recuperaciones&&<span className={s.count}>{v.recuperaciones}</span>}</button>}
+   {(a.onRecuperar||isReviewMode)&&<button className={s.secondary} onClick={a.onRecuperar} disabled={busy||recording||v.editando} aria-haspopup="dialog" aria-label={`Recuperar capturas; ${v.recuperaciones||0} sesiones únicas cargadas${v.recuperacionesHayMas?"; hay más capturas anteriores":""}`} title={`${v.recuperaciones||0} sesiones únicas cargadas${v.recuperacionesHayMas?"; existen más páginas de capturas anteriores":""}`}><I.History size={18}/><span>Recuperar capturas</span>{!!v.recuperaciones&&<span className={s.count}>{v.recuperaciones}{v.recuperacionesHayMas?"+":""}</span>}</button>}
   </header>
   <section className={s.sheet} aria-label="Captura actual">
    <div className={s.capturebar}>
