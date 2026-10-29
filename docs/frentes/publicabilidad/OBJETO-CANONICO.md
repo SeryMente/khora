@@ -398,7 +398,7 @@ Fuentes:
 - [GitHub: desbloquear una cuenta bloqueada](https://docs.github.com/en/billing/how-tos/troubleshooting/locked-account)
 - [GitHub Actions: facturación y uso](https://docs.github.com/en/billing/concepts/product-billing/github-actions)
 - [Discusión pública #210692: misma firma y anotación de billing](https://github.com/orgs/community/discussions/210692)
-- [Discusión pública #208287: bloqueo de billing confirmado como causa](https://github.com/orgs/community/discussions/208287)
+- [Discusión pública #208297: bloqueo de cuenta por autorización de pago fallida](https://github.com/orgs/community/discussions/208297)
 
 ### 20.3 Uso autorizado de RDC y límite de reproducción
 
@@ -427,4 +427,4 @@ Esta frescura mantiene alta la probabilidad de un gate de Actions privado, pero 
 
 ### 20.5 Límites y estado de la causa
 
-**Estado: ALTA PROBABILIDAD, NO CONFIRMADA DIRECTAMENTE.** Falta el texto de la anotación propia de SeryMente y el estado real de Billing & Licensing. No se modificó facturación, presupuesto, settings de Actions, código, workflows, repositorios, Vercel, secretos, base de datos ni despliegues. La siguiente acción útil requiere revisión del propietario de facturación o acceso de soporte al diagnóstico interno; repetir los mismos runs no aportará evidencia diferenciadora.
+**Estado: ALTA PROBABILIDAD, NO CONFIRMADA DIRECTAMENTE.** La hipótesis mejor ajustada es cuota/uso incluido o spending limit para Actions de repositorios privados, dado que el control público de Signal Interpreter sí ejecutó después; un bloqueo de cuenta por autorización fallida sigue siendo alternativa. Faltan el texto de la anotación propia de SeryMente y el estado real del billing owner/organización en Billing & Licensing. No se modificó facturación, presupuesto, settings de Actions, código, workflows, repositorios, Vercel, secretos, base de datos ni despliegues. La siguiente acción útil requiere revisión del propietario de facturación o acceso de soporte al diagnóstico interno; repetir los mismos runs no aportará evidencia diferenciadora.
