@@ -29,20 +29,20 @@
 - No se modificó código ni se alteraron sesiones/objetos de producción. La auditoría previa de cinco snapshots locales se conserva como evidencia auxiliar y no se usa como inventario de las unidades de la UI.
 
 **Registro de lo conocido y lo desconocido**
-- El operador informó inicialmente que la interfaz indicaba **20 dictados recuperables** y luego estimó que podrían ser aproximadamente 21. El número exacto no ha sido adquirido de la interfaz en este ciclo.
+- El operador informó inicialmente que la interfaz indicaba **20 dictados recuperables** y luego estimó que podrían ser aproximadamente 21. El número exacto no ha sido adquirido de la interfaz en este ciclo; ese dato no se debe usar como denominador cerrado.
 - La unidad de inventario es el conjunto real que devuelve la sección **Ingresos → Dictado → Recuperación**; no se debe reemplazar por snapshots arbitrarios del navegador.
 - El operador aún no ha revisado qué contienen las entradas del conjunto, y este ciclo tampoco obtuvo el catálogo autenticado.
 - No se dispone todavía de una lista verificada de elementos, su contenido, sus identificadores, sus fuentes ni su estado individual.
 - No se ha intentado aquí la recuperación de esos dictados y no se afirma que alguno ya haya sido recuperado o validado.
 
-**Objetivo:** recuperar efectivamente esos 20 dictados y, después, comprobar con evidencia hasta qué punto el mecanismo de recuperabilidad está bien diseñado y funciona de manera efectiva.
+**Objetivo:** recuperar efectivamente el conjunto de unidades que aparezca en Ingresos → Dictado → Recuperación y, después, comprobar con evidencia la efectividad del mecanismo. El reporte inicial mencionó 20 unidades y una estimación posterior habló de aproximadamente 21; la cifra definitiva debe obtenerse de la interfaz autenticada y registrarse como evidencia.
 
 **Secuencia prevista**
-1. Acceder a la interfaz pertinente de Cora y comprobar el listado que el operador refiere, sin asumir que el número y estado indicados ya fueron verificados por esta sesión.
-2. Identificar los elementos que la interfaz ofrece para recuperación y registrar evidencia mínima suficiente para distinguir sus resultados, sin volcar contenido personal real a GitHub.
-3. Recuperar los dictados mediante el flujo apropiado, evitando sobrescribir, borrar o sustituir sus originales.
-4. Verificar individualmente el resultado de cada recuperación y cotejar, cuando el sistema lo permita, contenido, integridad y procedencia. No confundir el contador de elementos disponibles con la recuperación consumada.
-5. Evaluar el diseño y la efectividad observada del mecanismo, diferenciando recuperación demostrada, recuperación parcial, error, duplicado y resultado no verificable.
+1. Acceder a la interfaz autenticada de Khora, observar el conjunto completo que ofrece Recuperación y registrar su número real, fechas, procedencia y metadatos mínimos sin copiar contenido privado. El número anterior de 20/21 es solo una referencia reportada, no el denominador comprobado.
+2. Identificar cada entrada real de ese conjunto con una referencia anónima estable y registrar evidencia mínima suficiente para distinguir sus resultados, sin volcar contenido personal real a GitHub.
+3. Recuperar las unidades mediante el flujo apropiado, evitando sobrescribir, borrar o sustituir sus originales.
+4. Verificar individualmente el resultado de cada recuperación y cotejar contenido, integridad, partes de audio, disponibilidad del objeto y procedencia hasta donde el sistema lo permita. No confundir el contador de elementos disponibles con la recuperación consumada.
+5. Evaluar el diseño y la efectividad observada del mecanismo para el conjunto completo, diferenciando recuperación demostrada, recuperación parcial, error, duplicado y resultado no verificable.
 6. Documentar los resultados y brechas con evidencia sanitizada. Si algún elemento no se puede recuperar, mantenerlo explícitamente abierto y describir el impedimento; no declarar completa la tarea por haber intentado la operación.
 
 **Criterio de cierre:** se adquiere y registra el conjunto real de entradas de Recuperación; cada unidad queda clasificada y sometida al flujo de recuperación apropiado; las recuperaciones exitosas se cotejan individualmente en texto, audio, integridad y procedencia con el original intacto. El conteo objetivo será el que muestre la interfaz en la revisión autenticada registrada, no una cifra inferida. Si alguna unidad no puede recuperarse, la tarea permanece abierta para esa unidad y la limitación queda explícita.
