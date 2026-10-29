@@ -1,16 +1,17 @@
-<!-- LIST_VERSION=0.8; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.9; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Lista provisional de tareas · Frente Custodia
 
 > **ESTADO: PROVISIONAL · NO CERTIFICADA CONTRA EL DISEÑO METODOLÓGICO FINAL.** Se conserva aquí por instrucción expresa del operador. CUSTODIA-02 fue retirada de las tareas activas por instrucción del operador; no se reutiliza su identificador. Esa retirada no certifica metodológicamente esta materialización. Este archivo no crea un segundo objeto canónico ni otro control de responsabilidad; el núcleo único del frente sigue siendo [OBJETO-CANONICO.md](OBJETO-CANONICO.md).
 
 - **Frente:** Custodia.
-- **Versión de esta lista provisional:** 0.8.
-- **Última actualización:** 2026-10-28.
+- **Versión de esta lista provisional:** 0.9.
+- **Última actualización:** 2026-10-29.
 - **Metodología en la primera redacción:** Samantha v348 · NX-348m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `a4c90bd8ff1cd360b1f1662ff55371bd1b56b4cd`.
 - **Revalidación antes del cierre (intermedia):** Samantha v351 · NX-351m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `f069d2385f47731ac9d0f0ca76bfd3cef859cdd2`.
 - **Última lectura de metodología del ciclo 2 (referencia histórica):** Samantha v352 · NX-352m; Metacanon 1.21; GOW v2.3; blob `94473eccb6fa71303d5908ce678f7efeb191c215`.
 - **Última lectura metodológica histórica (ciclo 4):** Samantha v356 · NX-356m; Metacanon 1.22; GOW v2.6; blob `c364e179e8e9b6a3d566a8e690dfa1a7cce91798`.
-- **Última lectura metodológica registrada:** Samantha v358 · NX-358m; Metacanon 1.23; GOW v2.7; blob `89a28e4d05f5baab9c4b86abdb9fbfc532690c75`. La lista sigue provisional; la retirada de CUSTODIA-02 no se interpreta como validación del diseño.
+- **Última lectura metodológica histórica (C008):** Samantha v358 · NX-358m; Metacanon 1.23; GOW v2.7; blob `89a28e4d05f5baab9c4b86abdb9fbfc532690c75`.
+- **Revalidación metodológica del relevo C009:** Samantha v359 · NX-359m; Metacanon 1.24; GOW 2.8; blob `b2ff2845a5a99dc4ce3cafafc4f8e43607d48145`, adquirido de `SeryMente/metodologia/main` el 2026-10-29. La lista sigue provisional; el relevo no certifica su diseño.
 - **Alcance actual del plan:** tres tareas activas: recuperar y verificar las unidades visibles (CUSTODIA-01); investigar capturas ausentes o aparentemente irrecuperables y cuantificar las lagunas (CUSTODIA-03); completar la investigación y actualizar/certificar el sistema de recuperabilidad mediante correcciones y pruebas de extremo a extremo (CUSTODIA-04). No se afirma que sean el inventario exhaustivo de todas las obligaciones futuras del frente.
 - **Regla provisional de custodia de información:** no copiar a este repositorio el texto o audio de dictados reales, secretos, credenciales ni identificadores personales innecesarios. Registrar resultados mediante evidencia minimizada y sanitizada, en el soporte autorizado que corresponda.
 
@@ -103,13 +104,15 @@
 
 **Prioridad:** P0 · CRÍTICA · Depende de la línea base y de los hallazgos de CUSTODIA-01 y CUSTODIA-03.
 
-**Estado:** EN CURSO — hay una rama de corrección aislada y una PR en borrador; la integración PostgreSQL/PGlite no se ejecutó, la suite unitaria conserva una falla ambiental y no hay validación ni despliegue productivo.
+**Estado:** EN CURSO — la corrección permanece aislada; PR #339 sigue abierta en borrador, sin fusionar ni desplegar. En C009 se verificó que la rama `fix/custodia-recovery-reconcile-20261028` está divergida respecto de `main` (18 commits por delante y 10 por detrás). Los controles y pruebas registrados en C008 corresponden a aquella punta, no a una rama reconciliada con el `main` actual. No hay catálogo productivo cotejado ni recuperaciones de producción.
 
 **Objetivo:** concluir la investigación de las brechas de recuperabilidad identificadas y actualizar KHORA para que las unidades admisibles puedan catalogarse, recuperarse y verificarse de manera consistente. No se considera lograda la recuperabilidad por el mero hecho de modificar o compilar código.
 
 **Estado factual de ejecución (C008):** la punta de la rama `fix/custodia-recovery-reconcile-20261028` es `cbb9efd89048daf3bd9f07cc69c2e6d7209aa55d`; PR [#339](https://github.com/SeryMente/khora/pull/339) sigue en borrador y no se fusionó. `typecheck` pasó en el worktree con el arnés actualizado; `ui-review:check` y `ui:contract` habían pasado en la validación previa y después solo cambió el arnés de integración. La suite unitaria registró 549/550: una prueba de sincronización canónica agotó tiempo (`TLS handshake timeout`); el esquema local/canónico fue comparado aparte y coincide por blob SHA. La integración PostgreSQL/PGlite ya pasó **15 comprobaciones** en un motor WASM aislado, con usuario/clave sintéticos y sin servicios productivos. Los workflows de GitHub Actions fueron reintentados y terminaron fallidos en 2–3 segundos sin runner ni pasos, logs no disponibles; causa exacta no determinada. No se recorrió catálogo autenticado ni se recuperaron dictados de producción.
 
 
+
+**Estado factual de continuación (C009, 2026-10-29):** `main` observado en `e463e0c6efa857f4c4229894a96fab747a8a7574`. PR [#339](https://github.com/SeryMente/khora/pull/339) continúa abierta en borrador. El último despliegue de producción observado para `khora-web` está en estado READY, pero apunta a `main` en `b528660e16552633d232a2397cbe42441a03438c`, anterior a los cambios de este ciclo; la corrección de Custodia no está publicada. No se realizó ninguna acción de despliegue ni se accedió al catálogo autenticado. La rama no debe fusionarse en su estado divergido; primero debe reconstruirse/reaplicarse sobre `main` vigente y volver a validarse.
 
 **Alcance mínimo**
 1. Consolidar el inventario y las causas que CUSTODIA-01 y CUSTODIA-03 hayan demostrado, separando defectos de código, incidentes productivos confirmados e hipótesis todavía abiertas.
@@ -139,6 +142,7 @@
 - **2026-10-28 · CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C006 · versión 0.6:** por nueva instrucción del operador, CUSTODIA-02 se retira de la lista activa y su identificador histórico no se reutiliza. Se agrega CUSTODIA-04 y se define la secuencia de línea base no destructiva, recuperación paralela a la investigación de ausencias y validación sistémica.
 - **2026-10-28 · CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C007 · versión 0.7:** CUSTODIA-04 pasa a EN CURSO; se propone la reconciliación local/remota y la preservación de audio legacy en la PR #339 en borrador. La integración PGlite estaba pendiente y la suite unitaria tenía una falla ambiental de red.
 - **2026-10-28 · CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C008 · versión 0.8:** se ejecuta con éxito el ensayo PostgreSQL/PGlite aislado (15 comprobaciones), y `typecheck` vuelve a pasar sobre el worktree. Se documentan por separado el timeout de la prueba de contrato canónico y los fallos de los jobs remotos sin runner/pasos. La PR #339 sigue en borrador; no se ha adquirido el catálogo autenticado ni se han realizado recuperaciones productivas. Las garantías siguen sin certificar.
+- **2026-10-29 · CUSTODIA-TRANSFERENCIA-SES-20261029-C9K4M2R8 · C009 · versión 0.9:** se transfiere la responsabilidad a la sesión de alias operativo `chatgpt-custodia-SES-20261029-C9K4M2R8`, generación 3, tras autorización directa del operador. Se leyó la metodología Samantha v359 / Metacanon 1.24 / GOW 2.8. La rama de corrección se confirmó divergida de `main` (18 commits ahead, 10 behind); PR #339 permanece en borrador. El despliegue de producción comprobado corresponde a un SHA anterior; el catálogo autenticado sigue sin cotejar (0 unidades), y no hubo recuperación de producción. La continuación C009 queda documentada sin afirmar garantías no verificadas.
 - **Fuente del encargo literal inicial:** [originales/INSTRUCCION-PENDIENTES-2026-10-28.md](originales/INSTRUCCION-PENDIENTES-2026-10-28.md).
 - **Fuente de ampliación del alcance:** [originales/INSTRUCCION-AMPLIACION-TAREAS-RECUPERABILIDAD-2026-10-28.md](originales/INSTRUCCION-AMPLIACION-TAREAS-RECUPERABILIDAD-2026-10-28.md), commit d3c84153bbdc8844e7c3147e4ab0a6375be3dc68.
 - **Nueva instrucción literal:** [originales/INSTRUCCION-REORDENAMIENTO-Y-ACTUALIZACION-RECUPERABILIDAD-2026-10-28.md](originales/INSTRUCCION-REORDENAMIENTO-Y-ACTUALIZACION-RECUPERABILIDAD-2026-10-28.md).
