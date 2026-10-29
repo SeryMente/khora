@@ -178,6 +178,7 @@ El frente no se considera terminado hasta que:
 - Matriz preliminar de escenarios y secuencias: evidencias/MATRIZ-PRELIMINAR-ESCENARIOS-PUBLICACION-v0.2.md.
 - Evento de inicialización: cronica/PUBLICABILIDAD-INSTANCIACION-01.md.
 - Crónica del ciclo 02 y ampliación del alcance situacional: cronica/CICLO-02-PSP.md.
+- Crónica del ciclo 04 y ampliación transversal: cronica/CICLO-04-ALCANCE-TRANSVERSAL.md.
 - Control actual: CONTROL-RESPONSABILIDAD.json.
 - Prompts para futuras instancias: prompts/ASISTENTE.md y prompts/CONSTRUCTOR.md.
 
