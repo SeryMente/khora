@@ -99,7 +99,7 @@ Custodia es el frente transversal que define, verifica y gobierna las garantías
 
 ## 8. Estado vivo
 
-**Estado del frente: ACTUALIZADO — DOS TAREAS PENDIENTES DOCUMENTADAS PROVISIONALMENTE — GARANTÍAS TRANSVERSALES NO VERIFICADAS.**
+**Estado del frente: ACTUALIZADO — CUSTODIA-01 EN CURSO — CUSTODIA-02 PENDIENTE — GARANTÍAS DE PRODUCTO NO CERTIFICADAS.**
 
 El detalle operativo de pendientes se mantiene provisionalmente en [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md). Ese archivo es una materialización auxiliar enlazada desde el único núcleo; su diseño es objeto de la tarea CUSTODIA-02 y no se declara definitivo ni plenamente conforme al método.
 
@@ -240,4 +240,4 @@ Instrucción para una conversación futura:
 - Tras cada ciclo: leer de vuelta los archivos modificados; comparar el propósito con el original aprobado; verificar el JSON; registrar el SHA real del archivo y el commit real; revisar el diff; no fijar hashes autorreferentes inventados.
 - Revisar el Metacanon central y la rama main antes de cada ciclo material. La fuente vigente adquirida el 2026-10-28 fue Samantha v356 · NX-356m, Metacanon 1.22, GOW v2.6, blob c364e179e8e9b6a3d566a8e690dfa1a7cce91798. Si la fuente o alguna evidencia no está disponible, declarar exactamente qué no se verificó y bloquear solo las decisiones que dependan de ello.
 - No crear otros controles ni estados vivos competidores. Los originales y evidencias pueden ser artefactos congelados, no una segunda fuente de estado.
-- **Próximo paso recomendado:** inventariar de forma autorizada los canales y almacenes existentes; después, formular una matriz requisito → componente → prueba → evidencia → aceptación. La investigación de Vercel Blob/Backblaze y las pruebas reales quedan pendientes de autorización y acceso.
+- **Próximo paso prioritario:** obtener por la sesión autenticada el catálogo real de Ingresos → Dictado → Recuperación; registrar sin contenido personal el número de entradas y sus metadatos mínimos; cotejar por unidad los registros de partes y la lectura real de objetos. Solo después planificar la recuperación no destructiva y las correcciones. La auditoría transversal de otros canales, almacenes y proveedores (incluida la revisión de Vercel Blob/Backblaze) queda como trabajo posterior, con sus autorizaciones y accesos correspondientes.
