@@ -255,9 +255,9 @@
     },
     {
       "path": "OBJETO-CANONICO.md",
-      "bytes": 227912,
-      "sha256": "62f9d64a3a295be8d15099af37795ff976e204a8c33ddfab57fdbe1cab6939bd",
-      "git_blob_sha": "481c05112cfa4087e2086c1149028647eb199857"
+      "bytes": 228721,
+      "sha256": "e65a6f569d0d9da903f384d4963cfb62a1c228e9f35c26474f42087dd7a5d1eb",
+      "git_blob_sha": "2f227c572a00b1c85ab92ae3c98f5cd59ae7a60e"
     },
     {
       "path": "evidencias/dialogo.test.ts",
@@ -381,9 +381,15 @@
     },
     {
       "path": "TRAZABILIDAD-U01-U06.md",
-      "bytes": 6236,
-      "sha256": "3d161fecc0dd3918f558a9bffb92f9c1110271f3fbc3a63fb693c336a9d7f1e1",
-      "git_blob_sha": "55bf5c80e1064149c2045895b7e5ea37c68db5e0"
+      "bytes": 6468,
+      "sha256": "81fb98fdfa7254ca6f0c976a76134d21bf065c362e403e806d06290553622774",
+      "git_blob_sha": "de7b54df0d32af0b8788b7946229868d68176e8e"
+    },
+    {
+      "path": "evidencias/C043-cronica-targeted-tests.json",
+      "bytes": 2704,
+      "sha256": "86681de27d0c0c5e3e6aaa3c12d6953fcd086872083d0da911915a792aaf51fe",
+      "git_blob_sha": "dd31eb6859a6791b59354491f41d55795388b46d"
     }
   ],
   "runtime_references": [
@@ -499,7 +505,7 @@
     "receipt": "evidencias/C030-release.json",
     "state": "C042: transferencia, control, continuidad, OCP y manifiesto actualizados y leídos de vuelta. Auditoría focalizada de PR #335: elimina control de responsabilidad, índice de frentes del README y manifiesto de Harmonia; matriz U01–U06 conserva FALTA/PARCIAL/SUPUESTO. PR abierto, sin fusionar y mergeable=false. No se modificó producto, no se ejecutaron pruebas de producto ni despliegue; último corte técnico C030, no revalidado."
   },
-  "latestEvent": "C043 — candidata PR #335 reparada en rama propia, control de responsabilidad y recursos de otros frentes preservados, main actual integrado como padre de merge; PR abierto/no fusionado, sin pruebas/build ejecutados, requisitos U06 aún parciales; DUG Samantha v360 · NX-360m / Metacanon 1.24 / GOW 2.9 adquiridos.",
+  "latestEvent": "C043 — reparaciones de custodia y código acotadas en la rama de PR #335; 48/48 pruebas unitarias dirigidas de crónica/U06-03 aprobadas en copia aislada y evidencia persistida; full build/E2E sin ejecutar; Actions bloqueadas antes de pasos; PR abierto/no fusionado. DUG Samantha v360 · NX-360m / Metacanon 1.24 / GOW 2.9 adquiridos.",
   "latest_verified_release": {
     "sha": "f0dfbdcb2d79eb6289dacba272ddcc7ba2023063",
     "deploymentId": "dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr",
@@ -535,55 +541,62 @@
     "merged": false,
     "draft": false,
     "branch": "feat/u06-sobre-ingreso-work-1990819938695134734",
-    "head_sha": "03bae72d32d5d4ba85d5c4e85b7f9ebc8713b971",
+    "head_sha": "086a745c76f909cb883b476a0c02dd24ec27a88a",
     "base": "main",
-    "base_sha": "42ca6e664a501f4882a187fc81d01fb99845320f",
-    "last_updated": "2026-10-29T21:23:05Z",
-    "changed_files": 317,
-    "additions": 14246,
-    "deletions": 296,
+    "base_sha": "d54d60c3d7f36f8380cf8b685de8e335a17671d0",
+    "last_updated": "2026-10-29T21:29:43Z",
+    "changed_files": 318,
+    "additions": 14332,
+    "deletions": 297,
     "candidate_object": {
-      "version": "0.6.19",
+      "version": "0.6.20",
       "ref": "feat/u06-sobre-ingreso-work-1990819938695134734",
-      "blob_sha": "481c05112cfa4087e2086c1149028647eb199857",
-      "characters": 224118,
-      "utf8_bytes": 227912,
-      "sha256": "62f9d64a3a295be8d15099af37795ff976e204a8c33ddfab57fdbe1cab6939bd"
+      "blob_sha": "2f227c572a00b1c85ab92ae3c98f5cd59ae7a60e",
+      "characters": 224928,
+      "utf8_bytes": 228721,
+      "sha256": "e65a6f569d0d9da903f384d4963cfb62a1c228e9f35c26474f42087dd7a5d1eb"
     },
     "compare_snapshot": {
-      "status": "ahead",
-      "ahead_by": 13,
-      "behind_by": 0,
-      "compared_base_sha": "42ca6e664a501f4882a187fc81d01fb99845320f",
+      "status": "diverged",
+      "ahead_by": 18,
+      "behind_by": 2,
+      "compared_base_sha": "d54d60c3d7f36f8380cf8b685de8e335a17671d0",
       "merge_base_sha": "42ca6e664a501f4882a187fc81d01fb99845320f",
-      "files": 279,
-      "additions": 11974,
-      "deletions": 166,
+      "files": 281,
+      "additions": 12094,
+      "deletions": 201,
       "checked_at": "2026-10-29",
       "api_discrepancy": {
-        "pull_metadata_files": 317,
-        "compare_files": 279,
-        "delta_files": 38,
+        "pull_metadata_files": 318,
+        "compare_files": 281,
+        "delta_files": 37,
+        "pull_metadata_additions": 14332,
+        "compare_additions": 12094,
+        "delta_additions": 2238,
+        "pull_metadata_deletions": 297,
+        "compare_deletions": 201,
+        "delta_deletions": 96,
         "status": "unresolved"
       },
-      "note": "La comparación directa main...head confirma 0 commits behind. La metadata/lista de PR difiere en contadores de archivos y líneas; no se interpreta silenciosamente como reconciliada."
+      "note": "La comparación directa main...head confirma 0 commits behind. Metadata/listado PR y compare API discrepan en recuento de archivos/líneas; el delta se conserva sin inferir causa."
     },
     "sync_status": "main_integrated_into_candidate_branch; PR remains open/unmerged",
     "blockers": [
-      "GitHub PR metadata reports 317 changed files while direct main...head comparison reports 279; discrepancy remains unresolved.",
-      "Five GitHub Actions workflows fail before any job step runs; no tests or build result exists. Vercel checks fail with organization-private-repository plan restriction and Netlify preview is failed.",
+      "GitHub PR metadata reports 318 changed files while direct main...head comparison reports 281; addition/deletion counts also differ (14,332/297 vs 12,094/201); discrepancy unresolved.",
+      "Five GitHub Actions workflows fail before any job step runs; no remote tests/build result. Local targeted test files pass 48/48 only.",
+      "Vercel checks fail with organization-private-repository plan restriction; Netlify deploy preview also failed.",
       "PR #330 remains open/draft/unmerged and PR #334 remains open/non-draft/unmerged; scope overlap must be reconciled.",
-      "U06-02: checklist not connected to live Groq analysis; endpoint exists but end-to-end integration/evidence absent.",
+      "U06-02: checklist not connected to live Groq analysis; endpoint exists but E2E integration/evidence absent.",
       "U06-04: no demonstrated safe persistence of IPv4 with entry; review privacy and minimization.",
-      "U06-05: exhaustive device/session fingerprint remains unconfirmed and requires explicit privacy/security review.",
-      "U06-06/U06-07: taxonomy and suggestion rule logic are partial; integrated end-to-end behavior not proven.",
-      "U06-01b/U06-03/U06-08 and broader U01-U06 requirements still require executable UI/e2e validation and explicit acceptance.",
-      "Broad PR includes publishing, custody, MCP/OAuth, migration, workflows and numerous historical evidence files; exhaustive code/security audit remains incomplete."
+      "U06-05: exhaustive device/session fingerprint is unconfirmed and requires explicit privacy/security review.",
+      "U06-06/U06-07: taxonomy and suggestion rule logic are partial; integrated behavior not proven end-to-end.",
+      "U06-01b/U06-03/U06-08 and broader U01-U06 requirements still require browser/E2E validation and explicit acceptance.",
+      "Broad PR includes publishing, custody, MCP/OAuth, migrations, workflows and historical evidence; exhaustive code/security audit incomplete."
     ],
-    "decision": "Keep open; do not merge or deploy until tests/build can run and scope, counters, overlapping PRs and remaining U01-U06 requirements are reconciled.",
+    "decision": "Keep open; do not merge or deploy until full test/build gates can run, scope and PR counters are reconciled, overlapping PRs are reviewed, and remaining U01-U06 requirements are demonstrated.",
     "mergeable": true,
     "snapshot_before_manifest_sync": true,
-    "snapshot_note": "head_sha registra la cabeza observada antes de este commit de sincronización del manifiesto; este propio commit avanzará la rama.",
+    "snapshot_note": "head_sha identifica el código/documentación comprobados antes de este commit del manifiesto; este commit avanzará la rama.",
     "pr_api_base_sha_observed": "b528660e16552633d232a2397cbe42441a03438c"
   },
   "release_history": [
@@ -638,7 +651,7 @@
     "sam_version": "v360 · NX-360m",
     "gow_version": "2.9",
     "read_at": "2026-10-29",
-    "note": "Fuente canónica actual adquirida en C043. Se leyeron los principios P001/P037/P038 y Metacanon §42; MCP-NORMATIVO sigue DESACTIVADO."
+    "note": "Fuente canónica actual adquirida en C043. Se leyeron P001/P037/P038 y Metacanon §42; MCP-NORMATIVO sigue DESACTIVADO."
   },
   "responsibility_control": {
     "path": "CONTROL-RESPONSABILIDAD.json",
@@ -664,7 +677,7 @@
     "complete_native_export": false,
     "latest_prior_model_output": "The visible authorization question immediately preceding the operator's affirmative response is preserved verbatim as A01; complete native conversation export unavailable."
   },
-  "latest_product_event": "C043 — el código de producto fue modificado únicamente en la rama candidata PR #335; los workflows remotos fallaron antes de ejecutar pasos y no existe evidencia de tests/build. Main y producción no cambiaron; el último release técnicamente acreditado continúa siendo C030 (main f0dfbdcb2d79eb6289dacba272ddcc7ba2023063, deployment dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr); aceptación física y gates globales siguen pendientes.",
+  "latest_product_event": "C043 — correcciones de producto limitadas a la rama candidata PR #335; 48/48 pruebas unitarias dirigidas de cobertura de crónica/U06-03 pasan en una copia aislada y la evidencia queda registrada. Los cinco workflows remotos del head anterior fallaron antes de ejecutar pasos; no existe resultado de full build/typecheck/E2E. Main y producción no cambiaron. El último release técnicamente acreditado continúa siendo C030 (main f0dfbdcb2d79eb6289dacba272ddcc7ba2023063, deployment dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr); aceptación humana y gates globales pendientes.",
   "latest_object": {
     "version": "0.6.17",
     "ref": "main",
@@ -672,7 +685,7 @@
     "commit": "c2bf14560b77bbfad97c5f2af6ecde5d0b3faef0",
     "bytes": 222989,
     "sha256": "25248b7b1ae70d34910893fdabbf1c2daab7e2ffaa0a34e71f60071b041d1930",
-    "state": "Canon de main sin cambios: v0.6.17/C042; titularidad generación 3 verificada. La candidata C043 v0.6.19 existe solo en la rama del PR #335; no integrada ni desplegada."
+    "state": "Canon de main sin cambios: v0.6.17/C042; titularidad generación 3 verificada. La candidata C043 v0.6.20 existe solo en la rama del PR #335; no integrada ni desplegada."
   },
   "recent_verbatim_instruction_ingestion": {
     "path": "originales/INSTRUCCIONES-VERBATIM-TAIL-C032-20261022.jsonl",
