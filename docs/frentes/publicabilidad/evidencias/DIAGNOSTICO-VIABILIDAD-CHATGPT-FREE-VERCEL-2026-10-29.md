@@ -2,9 +2,9 @@
 
 **Fecha:** 2026-10-29 · America/Mexico_City  
 **Prioridad:** P0 — método de publicación sin terminal local  
-**Objeto rector:** [OCP Publicabilidad](../OBJETO-CANONICO.md), PUBLICABILIDAD-v0.5 (tras persistir este ciclo).  
+**Objeto rector:** [OCP Publicabilidad](../OBJETO-CANONICO.md), PUBLICABILIDAD-v0.6. La investigación sobre la barrera de Actions se actualiza en [Diagnóstico transversal billing/Actions](DIAGNOSTICO-BLOQUEO-ACTIONS-BILLING-2026-10-29.md).  
 **Fuente normativa realmente leída:** DUG v359 · NX-359m; Metacanon 1.24; GOW 2.8; blob `b2ff2845a5a99dc4ce3cafafc4f8e43607d48145`.  
-**Alcance ejecutado:** investigación y documentación remotas de solo lectura, más escritura documental en la rama Publicabilidad. No se creó deployment, no se usó RDC y no se modificaron configuración/secretos ni código de producto.
+**Alcance ejecutado:** el ciclo de viabilidad fue documental y no creó deployment; el seguimiento del ciclo 06 sí usó RDC de forma acotada para diagnosticar GitHub Actions. La causa más probable de los fallos privados es un gate de billing/uso de Actions, aún no confirmado por el propietario; no se modificaron configuración/secretos ni código de producto.
 
 ## 1. Conclusión ejecutiva
 
@@ -13,7 +13,7 @@ Hay que distinguir dos objetivos:
 1. **Publicación enteramente nativa y remota desde ChatGPT Free, sin intervención en GitHub/Vercel y sin máquina local.** No está acreditada por los mecanismos oficiales actuales. La app de GitHub conectada a ChatGPT es de solo lectura; MCP personalizado con escritura se ofrece a Business y Enterprise/Edu, no a Free; Codex está incluido en todos los planes, pero Codex Cloud no está incluido en Free. La aplicación de escritorio/CLI/IDE de Codex puede incluir ejecución local, pero esa modalidad no cumple el objetivo de publicar sin usar un entorno/terminal local.
 2. **Flujo sin coste adicional y sin terminal local, con transferencia manual por navegador.** Es viable como diseño: ChatGPT Free produce el parche y el plan de prueba; el operador crea una rama y aplica el cambio desde la interfaz web de GitHub; Vercel genera un Preview desde Git; después de pasar gates y resolver la autoridad productiva, se integra en `main` y el publicador cloud elegido ejecuta el release. La app de GitHub de ChatGPT no realiza la escritura; la interfaz web de GitHub es el puente manual.
 
-El objetivo inmediato es hacer este segundo flujo sólido, con el mínimo de pasos manuales y sin fingir que una publicación de producción ya está habilitada.
+El objetivo inmediato es hacer este segundo flujo sólido, con el mínimo de pasos manuales y sin fingir que una publicación de producción ya está habilitada. Antes de la prueba de Preview/release, revisar el [diagnóstico transversal de Actions](DIAGNOSTICO-BLOQUEO-ACTIONS-BILLING-2026-10-29.md): KHORA, Metodología y GDP presentan fallos pre-steps, mientras un workflow público de Signal Interpreter sí ejecutó; la causa exacta no se declara confirmada hasta revisar annotations/billing.
 
 ## 2. Límites verificados de ChatGPT Free
 
