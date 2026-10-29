@@ -462,9 +462,18 @@ La documentación oficial de GitHub establece que los jobs en repositorios priva
 
 1. Restablecer el agente remoto RDC desde la terminal de PC-14 si perdió respuesta; completar la autenticación requerida. El historial ya marca varios calls como timeout, por lo que no se repetirán las operaciones originales de forma ciega.
 2. Inspeccionar el estado actual del staging temporal tras recuperar el canal; verificar archivos/tamaños y reconstruir el staging si está incompleto, sin tocar carpetas personales ni leer secretos.
-3. Preparar checkout privado exacto de `main` SHA `e463e0c6efa857f4c4229894a96fab747a8a7574`, o un candidato de rama de prueba explícito.
+3. Preparar checkout privado exacto del `main` vigente al retomar. En la revalidación del 2026-10-29, `main` está en `734bedac6b5d25b2cf31c49b6fcb641bc4b10992`. La comparación con `e463e0c6efa857f4c4229894a96fab747a8a7574` informa 18 commits de diferencia y 9 archivos cambiados, todos en `frentes/custodia/`; no aparecen cambios bajo `khora-web/` ni `.github/workflows/` en ese delta. Aun así, usar un checkout exacto del nuevo SHA para cualquier recibo de CI.
 4. Ejecutar `khora-web-gate` con Node 22, y los otros dos jobs con Python 3.11 y Neo4j disponible; capturar salida y exit codes por job. Node 24/npm 11 solo valdría como resultado auxiliar si no se consigue el runtime fijado.
 5. A la par, el propietario debe revisar Billing & Licensing, cuotas/budget/spending limits y anotaciones de los runs privados. No elevar budget ni aceptar cargos sin una decisión expresa.
 6. No publicar a producción hasta confirmar el gate de GitHub, un publicador único, una sola invocación de migración, la protección efectiva de `main` y la URL smoke canónica.
+
+
+
+### 21.6 Revalidación de frescura · 2026-10-29T17:51Z
+
+- GitHub `main` avanzó a `734bedac6b5d25b2cf31c49b6fcb641bc4b10992`, commit `CUSTODIA: cerrar C011 con F-14/R-10 en OCP v0.11`. El compare desde `e463e0c6efa857f4c4229894a96fab747a8a7574` informa 18 commits y 9 archivos cambiados, todos bajo `frentes/custodia/`; el delta no contiene archivos de `khora-web/` ni `.github/workflows/`. Esto no convierte el snapshot parcial local en checkout válido; el siguiente intento debe usar el SHA actual exacto.
+- Run de CI más reciente leído para esta rama: [40925268855](https://github.com/SeryMente/khora/actions/runs/40925268855), sobre SHA `e113f04a48535c8cdab35aab88d7a8429bf1c8bd`. Jobs `khora-web-gate` (`123628957094`), `calidad` (`123628957632`) y `api-tests` (`123628957654`) fallaron entre 2–3 segundos; los tres devuelven `runner_id=0`, runner vacío y `steps=[]`. Por tanto, este run no demuestra que el código haya fallado en los tests: los tests no llegaron a ejecutarse.
+- RDC PC-14: última observación mostró dispositivo Online, pero `Last seen` de 14 minutos antes; las operaciones relevantes quedaron fallidas con `Timeout - no response from device`. El agente no está respondiendo a nuevas llamadas y debe ser reanudado por el operador desde su terminal. No volver a emitir los calls fallidos ni iniciar escrituras hasta reconectar.
+- La hipótesis de gate de uso/billing de Actions en repos privados continúa con alta probabilidad, no confirmada. La validación local de código sigue autorizada, pero requiere RDC operativo, checkout íntegro y toolchain; no se obtuvo ningún resultado local.
 
 **Estado de cierre de esta sección:** procedimiento y evidencia parcial documentados; CI local no ejecutado; RDC requiere reanudación; causa de Actions de alta probabilidad pero no confirmada; producción bloqueada.
