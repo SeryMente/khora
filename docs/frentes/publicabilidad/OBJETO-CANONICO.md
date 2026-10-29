@@ -272,6 +272,8 @@ La instrucción del operador amplía Publicabilidad: no se limita a subir la úl
 - repositorios auxiliares y documentales identificados o que se identifiquen posteriormente, incluidos `khora-effectif`, `personal` y `tercer-ambito`;
 - cualquier otro repositorio o destino de la organización que aparezca al completar el inventario.
 
+El operador establece además que Otro Gran Programa es el proyecto insignia y que necesita que KHORA/CoMind y Metodología se construyan para resolver su objetivo. Esto se registra como dependencia estratégica de alto nivel; las aristas técnicas concretas siguen pendientes de descubrimiento. El repositorio `SeryMente/otrogranprograma` se identifica como instrumento público de comunicación, no necesariamente como el conjunto completo de componentes del programa.
+
 La instrucción fundacional literal de §4 se conserva sin alteraciones. Esta ampliación fija el alcance sistémico alrededor de esa instrucción, no la reemplaza.
 
 ### 18.2 Regla arquitectónica: fuente canónica por activo y propagación explícita
