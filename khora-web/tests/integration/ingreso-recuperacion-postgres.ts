@@ -4,6 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 import { randomUUID } from 'node:crypto';
 import { AsyncLocalStorage } from 'node:async_hooks';
+import type { NextRequest } from 'next/server';
 import { encode } from 'next-auth/jwt';
 import { setDbForTesting, resetDbForTesting } from '../../lib/server/neon';
 import { descifrarTexto, cifrarBytes, descifrarBytes } from '../../lib/server/cripto';
@@ -45,7 +46,7 @@ async function main() {
  const url='http://localhost/api/dictado/checkpoint';
  const withRequestContext=<T>(req:NextRequest,handler:(req:NextRequest)=>Promise<T>):Promise<T>=>{
   const workStore={route:'/api/dictado/checkpoint',forceStatic:false,dynamicShouldError:false};
-  const workUnitStore={type:'request',headers:req.headers,asyncApiPromises:undefined};
+  const workUnitStore={type:'request',phase:'render',headers:req.headers,asyncApiPromises:undefined};
   return workAsyncStorage.run(workStore as any,()=>workUnitAsyncStorage.run(workUnitStore as any,()=>handler(req)));
  };
  const post=(body:any,recover=false,origin='http://localhost')=>{
