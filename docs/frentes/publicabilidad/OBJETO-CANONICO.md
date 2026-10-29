@@ -1,4 +1,4 @@
-<!-- PUBLICABILIDAD_VERSION=v0.3; PUBLICABILIDAD_SEAL=PUBLICABILIDAD-v0.3 -->
+<!-- PUBLICABILIDAD_VERSION=v0.4; PUBLICABILIDAD_SEAL=PUBLICABILIDAD-v0.4 -->
 # Objeto Canónico de Persistencia · Publicabilidad
 
 ## 1. Control e identidad
@@ -6,9 +6,9 @@
 - **Frente:** Publicabilidad.
 - **Repositorio propietario:** SeryMente/khora; el término «Cora» del enunciado se conserva en el original y se normaliza operativamente a Khora conforme al canon de Metodología.
 - **Ruta del OCP:** docs/frentes/publicabilidad/OBJETO-CANONICO.md.
-- **Versión documental:** v0.3 · objeto provisional de investigación.
-- **Sello:** PUBLICABILIDAD-v0.3.
-- **Estado:** PROVISIONAL-v0.3; auditoría documental del ciclo 03 incorporada y matriz PSP v0.2 creada; secuencias siguen pendientes de prueba no productiva. El frente tiene alcance de investigación y documentación, no de despliegue productivo.
+- **Versión documental:** v0.4 · objeto provisional de investigación.
+- **Sello:** PUBLICABILIDAD-v0.4.
+- **Estado:** PROVISIONAL-v0.4; se amplía el alcance a propagación/publicación transversal y se incorpora el mapa preliminar de dependencias y la matriz de escenarios G01–G12. Siguen pendientes la validación completa del inventario, pruebas no productivas y diagnóstico de CI. El frente no autoriza despliegues productivos.
 - **Rama en la que se preparó esta entrega:** publicabilidad/inauguracion-20261028. No está integrada en main.
 - **Folio de este evento:** SES-20261028-PR8V6M2Q. Es un folio de evento/operación, no un identificador nativo de conversación.
 - **Titularidad operativa:** sin titular exclusivo asignado en CONTROL-RESPONSABILIDAD.json. La instrucción inaugura el frente, pero no se ha registrado una transferencia de responsabilidad exclusiva a esta instancia.
@@ -17,7 +17,7 @@
 
 ## 2. LEER PRIMERO
 
-Este frente investiga y diseña el sistema de publicación de Khora. No autoriza por sí mismo a publicar producción, cambiar la configuración de Vercel, modificar secretos, ejecutar migraciones, alterar la rama principal, comprar servicios ni acceder a la máquina local por RDC.
+Este frente investiga y diseña el sistema transversal de propagación y publicación de los activos de SeryMente, incluidos los repositorios y destinos externos que dependen de ellos. No autoriza por sí mismo a publicar producción, cambiar configuración, modificar secretos, ejecutar migraciones, alterar ramas principales, comprar servicios o activar facturación. Desktop Commander Remote queda reservado para diagnosticar/reproducir fallas de GitHub/CI cuando se identifique un caso reproducible localmente; para cualquier uso distinto debe avisarse previamente y esperarse autorización expresa.
 
 En cada ciclo:
 1. Releer la versión vigente de la Metodología desde main, confirmar su versión/blob y volver a comprobar el OCP y este control.
@@ -171,6 +171,10 @@ El frente no se considera terminado hasta que:
 
 - Instrucción fundacional literal: originales/INSTRUCCION-FUNDACIONAL-2026-10-28.txt.
 - Investigación y fuentes oficiales: evidencias/INVESTIGACION-INICIAL-2026-10-28.md.
+- Investigación documental del ciclo 03: evidencias/INVESTIGACION-CICLO-03-2026-10-29.md.
+- Investigación documental del ciclo 04: evidencias/INVESTIGACION-CICLO-04-2026-10-29.md.
+- Mapa preliminar de dependencias y propagación: MAPA-DE-DEPENDENCIAS-Y-PROPAGACION-v0.1.md.
+- Matriz de escenarios de propagación transversal G01–G12: evidencias/MATRIZ-ESCENARIOS-PROPAGACION-TRANSVERSAL-v0.1.md.
 - Matriz preliminar de escenarios y secuencias: evidencias/MATRIZ-PRELIMINAR-ESCENARIOS-PUBLICACION-v0.2.md.
 - Evento de inicialización: cronica/PUBLICABILIDAD-INSTANCIACION-01.md.
 - Crónica del ciclo 02 y ampliación del alcance situacional: cronica/CICLO-02-PSP.md.
@@ -210,7 +214,7 @@ La cobertura no se afirmará como universal. Debe agrupar combinaciones con igua
 
 ## 16. Alcance provisional y condición para v1.0
 
-El OCP v0.2 sigue siendo provisional. El PSP v1.0 requiere secuencia para la contingencia «ChatGPT Free → escritura MCP no disponible → herramientas Git remotas no disponibles → RDC/CLI», con bloqueos y comprobación; runbook de CLI cotejado con la migración/runtime/provenance/smoke; diagnóstico de Actions o fuente alternativa de logs; un solo publicador productivo; y ensayos no productivos cuando estén autorizados.
+Esta sección describe un corte anterior del OCP v0.2 y se conserva como antecedente; la ampliación transversal y el estado vivo vigente se registran en las secciones añadidas al final de este documento. El PSP v1.0 requiere secuencia para la contingencia «ChatGPT Free → escritura MCP no disponible → herramientas Git remotas no disponibles → RDC/CLI», con bloqueos y comprobación; runbook de CLI cotejado con la migración/runtime/provenance/smoke; diagnóstico de Actions o fuente alternativa de logs; un solo publicador productivo; y ensayos no productivos cuando estén autorizados.
 
 Cada paso debe distinguirse como documentado, observado, probado o pendiente. Escribir una secuencia no equivale a haberla ejecutado. Publicabilidad sigue siendo de investigación y documentación.
 
@@ -252,3 +256,58 @@ Fuente normativa adquirida: Documento Único de Gobernanza (DUG) de Ser y Mente 
 - Permisos MCP en ChatGPT: https://help.openai.com/en/articles/12584461-connecting-custom-mcp-servers-in-chatgpt
 
 Límites de la observación: no se recuperaron logs legibles de Actions, no se consultó saldo Usage, no se hizo una petición HTTP anónima concluyente, no se ejecutaron build o migraciones, no se probó preview/MCP de escritura/rollback/RDC/CLI. No hubo cambios a main, secretos, variables, settings de Vercel o deployments.
+
+## 18. Ampliación expresa de alcance · ciclo 04 · 2026-10-29
+
+### 18.1 Definición transversal
+
+La instrucción del operador amplía Publicabilidad: no se limita a subir la última versión de KHORA a Vercel. Incluye los cambios que deban propagarse entre **todos los repositorios de la organización SeryMente** y las plataformas/destinos que consuman sus activos, por ejemplo:
+
+- gobernanza y método del repositorio `SeryMente/metodologia`, junto con las superficies de trabajo de modelos donde se aplican instrucciones, prompts, contexto o documentación derivada;
+- código, CI, runtime, migraciones, dominios y publicación de KHORA;
+- código personalizado y activos públicos de marketing/contenido del sitio Ser y Mente (WordPress/Divi);
+- el instrumento público de comunicación Otro Gran Programa, incluido su contenido y runtime estático/PWA;
+- extensiones y sus dependencias instalables, como Signal Interpreter y Gestor de Procesos/GDP;
+- repositorios auxiliares y documentales identificados o que se identifiquen posteriormente, incluidos `khora-effectif`, `personal` y `tercer-ambito`;
+- cualquier otro repositorio o destino de la organización que aparezca al completar el inventario.
+
+La instrucción fundacional literal de §4 se conserva sin alteraciones. Esta ampliación fija el alcance sistémico alrededor de esa instrucción, no la reemplaza.
+
+### 18.2 Regla arquitectónica: fuente canónica por activo y propagación explícita
+
+No debe imponerse una única fuente universal para todos los activos. Cada activo conserva su repositorio/OCP/plataforma canónica pertinente. Publicabilidad debe registrar las aristas entre esa fuente y cada destino dependiente, con revisión de origen, mecanismo, autorización, orden, precondiciones, señal de éxito, recuperación y lectura de vuelta.
+
+Una propagación se declara terminada únicamente cuando todos los destinos aplicables figuran como actualizados y verificados, o cuando cada excepción queda expresamente bloqueada/pendiente con impacto y responsable de resolución. No tratar un commit, una sincronización intentada, un deployment READY, una instalación preparada o una respuesta HTTP aislada como prueba universal de consistencia.
+
+### 18.3 Catálogo preliminar y cobertura conocida
+
+La búsqueda organizacional devolvió nueve repositorios: `khora`, `khora-effectif`, `metodologia`, `serymente`, `otrogranprograma`, `signal-interpreter`, `GDP`, `personal` y `tercer-ambito`. Es una enumeración inicial, no garantía de exhaustividad. El mapa específico está en [MAPA-DE-DEPENDENCIAS-Y-PROPAGACION-v0.1.md](MAPA-DE-DEPENDENCIAS-Y-PROPAGACION-v0.1.md); los escenarios se encuentran en [MATRIZ-ESCENARIOS-PROPAGACION-TRANSVERSAL-v0.1.md](evidencias/MATRIZ-ESCENARIOS-PROPAGACION-TRANSVERSAL-v0.1.md).
+
+Las rutas de WordPress/Divi, GitHub Pages/PWA, extensiones, Apps Script y plataformas de modelos no se consideran probadas hasta validar los settings, mecanismos de publicación, versiones/destinos efectivos y pruebas pertinentes. La matriz PSP de Khora/Vercel sigue siendo un subconjunto y no representa por sí sola el frente completo.
+
+### 18.4 Hecho nuevo de CI y regla de Desktop Commander Remote
+
+El run de CI `40900763575` de esta misma rama falló sobre el SHA `c364fea2750d4f67b3dbae41285e1835cefb5503`. Los jobs `khora-web-gate`, `api-tests` y `calidad` terminaron en 1–2 segundos con `runner_id=0`, nombre de runner vacío y `steps=[]`; los logs solicitados devolvieron `BlobNotFound`. No existe en la evidencia consultada un step o comando concreto para reproducir localmente esta falla. La causa raíz permanece **NO DETERMINADA** y este ciclo no usó RDC.
+
+RDC puede usarse para una reproducción local específica de una falla GitHub/CI cuando ya exista una señal/comando reproducible. No usarlo para inspección general, otros archivos personales, operaciones locales ajenas o tareas distintas. Para cualquier necesidad distinta de esa reproducción, avisar antes y esperar autorización expresa.
+
+### 18.5 Estado vivo revalidado en ciclo 04
+
+- `main` observado en `e463e0c6efa857f4c4229894a96fab747a8a7574`.
+- Rama documental al inicio del ciclo: `publicabilidad/inauguracion-20261028`, HEAD `c364fea2750d4f67b3dbae41285e1835cefb5503`; los commits de este ciclo son posteriores y permanecen en esa rama.
+- Último deployment filtrado como `target=production`: `dpl_H7ModaV6GTefp9qbjiUnpiHmxgFH`, READY, SHA `b528660e16552633d232a2397cbe42441a03438c`, creado 2026-10-24T21:59:10Z. No se ha acreditado aquí que main o la rama documental se hayan publicado.
+- El objeto del proyecto Vercel devuelve un `latestDeployment` READY `dpl_4NQWjXhtdaf9MWx2VDbVrdSZUXvm` con `target=null`; no se interpreta como producción.
+- Las lecturas actuales no demuestran cuota disponible, acceso anónimo, protección efectiva completa de main, ni la URL canónica de smoke.
+- La investigación completa del ciclo y sus límites se registra en [INVESTIGACION-CICLO-04-2026-10-29.md](evidencias/INVESTIGACION-CICLO-04-2026-10-29.md).
+
+### 18.6 Orden de trabajo resultante
+
+1. Confirmar el catálogo completo de repositorios y destinos externos con evidencia de propietario.
+2. Diagnosticar GitHub Actions; obtener logs legibles/configuración/estado de runner. Solo activar RDC cuando haya reproducción local concreta.
+3. Resolver las compuertas P0 de KHORA antes de cualquier release: autoridad única, migración, SHA candidato, URL smoke y criterios de acceso.
+4. Identificar y verificar los espejos concretos de Metodología usados en plataformas de modelos; registrar la reconciliación de la divergencia observada en su README conforme al gobierno del repositorio propietario.
+5. Confirmar los mecanismos y pruebas reales de los destinos WordPress/Divi y GitHub Pages; definir la cadena de artefactos de Signal Interpreter y GDP.
+6. Caracterizar `khora-effectif` y cualquier repositorio/activo adicional sin inferir sus funciones.
+7. Automatizar checks de propagación solo después de conocer los permisos, API, contrato y mecanismo real de cada destino.
+
+**Límites:** esta ampliación es documental y preliminar. No autoriza publicación productiva, cambios de código de producto, edición de otros repositorios, modificación de secretos/configuración ni despliegues. No se cambió `main`, Vercel, WordPress, GitHub Pages, Apps Script, datos externos ni plataformas de modelos en este ciclo.
