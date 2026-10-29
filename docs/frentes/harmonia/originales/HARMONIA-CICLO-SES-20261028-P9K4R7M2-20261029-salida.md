@@ -10,7 +10,7 @@ La puerta técnica esencial sigue abierta: no existe evidencia aceptada de captu
 
 ## 3. Actualización y delta
 
-Se leyó `main` y la candidata `feat/harmonia-e2e-20261021`. `main` tiene Manifest V3 **v0.3.0** (blob `5c2dd6d616c4ba19541d03df8fbc4abc6f0a11b6`); la rama candidata contiene **v0.4.0** (manifest blob `902968968cc121590a0d6b60fd10c06ea12f5409`). La candidata contiene captura de texto visible y pruebas del colector con entradas sintéticas, pero no se fusionó ni se aceptó. Se reintentó el workflow de Harmonia: el job `123742462625` falló sin runner, pasos, logs ni artefactos; la causa concreta **NO ESTÁ DETERMINADA**.
+Se leyó `main` y la candidata `feat/harmonia-e2e-20261021`. `main` tiene Manifest V3 **v0.3.0** (blob `5c2dd6d616c4ba19541d03df8fbc4abc6f0a11b6`); la rama candidata contiene **v0.4.0** (manifest blob `902968968cc121590a0d6b60fd10c06ea12f5409`). La PR #333 sigue abierta en borrador, no fusionada; GitHub reporta su última actualización el 2026-10-23. La candidata contiene captura de texto visible y pruebas del colector con entradas sintéticas, pero no se aceptó. Se reintentó el workflow de Harmonia: el job `123742462625` falló sin runner, pasos, logs ni artefactos; la causa concreta **NO ESTÁ DETERMINADA**.
 
 ## 4. Qué avanzó y qué no ocurrió
 
