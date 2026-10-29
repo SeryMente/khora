@@ -1,7 +1,62 @@
 /** Real SQL in isolated PostgreSQL/WASM. No production services, no concurrent-connection claim. */
-import assert from 'node:assert/strict';import {readFile} from 'node:fs/promises';import {pathToFileURL} from 'node:url';import {randomUUID} from 'node:crypto';import {NextRequest} from 'next/server';import {setDbForTesting,resetDbForTesting} from '../../lib/server/neon';import {POST,GET} from '../../app/api/dictado/checkpoint/route';import {descifrarTexto,cifrarBytes,descifrarBytes} from '../../lib/server/cripto';
-async function main(){const entry=process.env.PGLITE_MODULE;if(!entry)throw Error('PGLITE_MODULE required');const {PGlite}=await import(pathToFileURL(entry).href),pg=new PGlite();let checks=0;const query=async(sql:string,params?:any[])=>{if(!params?.length&&sql.includes(';')){const r=(await pg.exec(sql)).at(-1)||{rows:[]};return {...r,rowCount:r.affectedRows??r.rows.length};}const r=await pg.query(sql,params);return {...r,rowCount:r.affectedRows??r.rows.length};};setDbForTesting({query,connect:async()=>({query,release(){}})});const url='http://localhost/api/dictado/checkpoint',post=(body:any,recover=false,origin='http://localhost')=>POST(new NextRequest(url+(recover?'?recover=1':''),{method:'POST',body:JSON.stringify(body),headers:{origin,'content-type':'application/json'}})),get=(q:string)=>GET(new NextRequest(url+q));
-try{
+import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+import { pathToFileURL } from 'node:url';
+import { randomUUID } from 'node:crypto';
+import { NextRequest } from 'next/server';
+import { encode } from 'next-auth/jwt';
+import { workUnitAsyncStorage } from 'next/dist/server/app-render/work-unit-async-storage.external';
+import { workAsyncStorage } from 'next/dist/server/app-render/work-async-storage.external';
+import { setDbForTesting, resetDbForTesting } from '../../lib/server/neon';
+import { descifrarTexto, cifrarBytes, descifrarBytes } from '../../lib/server/cripto';
+async function main() {
+ const entry=process.env.PGLITE_MODULE;
+ if(!entry) throw Error('PGLITE_MODULE required');
+ // This integration harness uses only a deterministic synthetic auth secret and a synthetic owner.
+ process.env.PLAYWRIGHT_TEST_RUN='1';
+ process.env.AUTH_SECRET='khora-custodia-integration-test-secret-only';
+ process.env.AUTH_URL='http://localhost';
+ const {PGlite}=await import(pathToFileURL(entry).href);
+ const pg=new PGlite();
+ let checks=0;
+ const query=async(sql:string,params?:any[])=>{
+  if(!params?.length&&sql.includes(';')){
+   const r=(await pg.exec(sql)).at(-1)||{rows:[]};
+   return {...r,rowCount:r.affectedRows??r.rows.length};
+  }
+  const r=await pg.query(sql,params);
+  return {...r,rowCount:r.affectedRows??r.rows.length};
+ };
+ setDbForTesting({query,connect:async()=>({query,release(){}})});
+ const now=Math.floor(Date.now()/1000);
+ const token={email:'test@example.com',name:'Custodia Integration Test',sub:'custodia-test-owner',iat:now,exp:now+3600,jti:'custodia-integration-test'};
+ const secret=process.env.AUTH_SECRET;
+ const plainCookie='authjs.session-token';
+ const secureCookie='__Secure-authjs.session-token';
+ const [plainToken,secureToken]=await Promise.all([
+  encode({token,secret,salt:plainCookie}),
+  encode({token,secret,salt:secureCookie})
+ ]);
+ const cookie=`${plainCookie}=${plainToken}; ${secureCookie}=${secureToken}`;
+ const {POST,GET}=await import('../../app/api/dictado/checkpoint/route');
+ const url='http://localhost/api/dictado/checkpoint';
+ const withRequestContext=<T>(req:NextRequest,handler:(req:NextRequest)=>Promise<T>):Promise<T>=>{
+  const workStore={route:'/api/dictado/checkpoint',forceStatic:false,dynamicShouldError:false};
+  const workUnitStore={type:'request',headers:req.headers,asyncApiPromises:undefined};
+  return workAsyncStorage.run(workStore,()=>workUnitAsyncStorage.run(workUnitStore,()=>handler(req)));
+ };
+ const post=(body:any,recover=false,origin='http://localhost')=>{
+  const req=new NextRequest(url+(recover?'?recover=1':''),{
+   method:'POST',body:JSON.stringify(body),
+   headers:{origin,'content-type':'application/json',cookie,host:'localhost'}
+  });
+  return withRequestContext(req,POST);
+ };
+ const get=(q:string)=>{
+  const req=new NextRequest(url+q,{headers:{cookie,host:'localhost'}});
+  return withRequestContext(req,GET);
+ };
+ try{
  const base=await readFile('lib/server/volcados.ts','utf8');const ddl=base.match(/"(CREATE TABLE IF NOT EXISTS volcado \([^\n]+?)"\.replace/)![1].replace('(%ARCHIVADO%)',"'archivado'");await pg.exec(ddl);const code=await readFile('lib/server/dictado.ts','utf8');await pg.exec(code.match(/const SESSION_TABLES_SQL = `([\s\S]*?)`;/)![1]);for(const match of code.match(/const ALTERS = \[([\s\S]*?)\];/)![1].matchAll(/"([^"]+)"/g))await pg.exec(match[1]);for(const f of ['030_custodia_continua.sql','031_custodia_reconciliacion.sql'])await pg.exec(await readFile('db/migrations/'+f,'utf8'));
  const boot=await get('?bootstrap=1');assert.equal(boot.status,200);const bootstrap=await boot.json();assert.deepEqual(bootstrap,{owner:'test@example.com'});assert.ok(boot.headers.get('cache-control')?.includes('no-store'));checks++;
  const source=randomUUID(),revision=randomUUID();const parts=[1,2,3].map(parte=>({parte,bytes:1024,sha256:'a'.repeat(64),verificado:true}));const s={sessionId:source,revisionId:revision,clientAt:1000,texto:'Texto original conservado 😀',parcial:'pendiente',titulo:'Prueba',fuenteEntrada:'microfono',duracionSeg:10,audioPartes:parts.slice(0,2),corteAudio:{hastaParte:2,finMs:10000}};
