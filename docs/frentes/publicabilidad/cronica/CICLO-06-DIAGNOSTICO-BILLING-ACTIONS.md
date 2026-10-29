@@ -36,6 +36,12 @@ La acción de mayor valor es que el propietario revise `SeryMente → Settings �
 - [Diagnóstico transversal billing/Actions](../evidencias/DIAGNOSTICO-BLOQUEO-ACTIONS-BILLING-2026-10-29.md).
 - [Diagnóstico de viabilidad ChatGPT Free → Vercel](../evidencias/DIAGNOSTICO-VIABILIDAD-CHATGPT-FREE-VERCEL-2026-10-29.md).
 
+## Revalidación final del ciclo · 2026-10-29T17:41Z
+
+Tras los últimos commits documentales, KHORA CI volvió a fallar en el run [40923486365](https://github.com/SeryMente/khora/actions/runs/40923486365): jobs `123622690139`, `123622690389`, `123622690440`, runner cero, sin pasos, 2–3 segundos. Metodología volvió a fallar en los runs `40923129660` y `40923129500` con el mismo patrón. En contraste, Signal Interpreter público tuvo el run `40923649526` en curso con runner real `1000046988` y pasos ejecutándose, después del run público exitoso `40922616949`.
+
+Estos runs no los disparó este diagnóstico de forma manual: son el resultado observable del flujo de push/actividad existente. No se ejecutó rerun ni `workflow_dispatch`. La hipótesis de un gate billing/uso privado gana respaldo comparativo, pero la causa exacta sigue sin confirmación directa.
+
 ## Siguiente acción
 
 El propietario de facturación debe confirmar el estado de Actions/uso privado y resolver el gate si existe. Solo después debe observarse una ejecución controlada con runner/steps/logs y reanudarse el trabajo de configurar una autoridad única de producción. Hasta entonces, producción sigue bloqueada y no deben repetirse runs sin nueva evidencia.
