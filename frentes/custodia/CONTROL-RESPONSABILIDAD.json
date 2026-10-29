@@ -6,35 +6,35 @@
   "state_object": "frentes/custodia/OBJETO-CANONICO.md",
   "status": "assigned",
   "owner_thread": null,
-  "owner_alias": "chatgpt-custodia-SES-20261029-C9K4M2R8",
+  "owner_alias": "chatgpt-custodia-SES-20261029-K7M4Q9R2",
   "owner_alias_type": "operational_alias_not_native_thread_id",
-  "instance": "chatgpt-custodia-SES-20261029-C9K4M2R8",
-  "session_folio": "SES-20261029-C9K4M2R8",
-  "generation": 3,
+  "instance": "chatgpt-custodia-SES-20261029-K7M4Q9R2",
+  "session_folio": "SES-20261029-K7M4Q9R2",
+  "generation": 4,
   "expiry": null,
-  "authorization_ref": "Instrucción directa del operador: «REtoma resposnabilida ddel frente CUSTODIA, de Khora», preservada en frentes/custodia/originales/INSTRUCCION-TRANSFERENCIA-RESPONSABILIDAD-2026-10-29.md (blob 240a27710d1de76fd9a5eeeb9ce97fdb6b987104; commit 9fb5bd3a03158e1435009153c38be489c901c155). Autoriza el relevo de responsabilidad de esta sesión al alias operativo de la generación 3; no es un ID nativo de conversación. No autoriza por sí sola acciones destructivas ni cambios productivos sin las pruebas y controles pertinentes.",
-  "authorization_event": "CUSTODIA-TRANSFERENCIA-SES-20261029-C9K4M2R8",
+  "authorization_ref": "Instrucción directa del operador: «Si», respuesta afirmativa a la pregunta explícita de autorización para sustituir al titular registrado y asumir la responsabilidad del frente Custodia. Original literal preservado en frentes/custodia/originales/INSTRUCCION-TRANSFERENCIA-RESPONSABILIDAD-2026-10-29-C012.md (blob e267321d2cc295d4c80ac5c7c0405bc7bbfaaa15; commit 9b6fb4c014a4c5ab83f401eac85cb1f665559149). Autoriza el relevo de responsabilidad a esta sesión bajo el alias operativo de generación 4; no es un ID nativo de conversación ni autoriza por sí sola acciones destructivas o cambios productivos.",
+  "authorization_event": "CUSTODIA-TRANSFERENCIA-SES-20261029-K7M4Q9R2",
   "previous_owner": {
     "status": "assigned",
     "owner_thread": null,
-    "owner_alias": "chatgpt-custodia-SES-20261028-R6K2M9Q4",
-    "instance": "chatgpt-custodia-SES-20261028-R6K2M9Q4",
-    "session_folio": "SES-20261028-R6K2M9Q4",
-    "generation": 2,
-    "record_kind": "owner_previous_to_generation_3"
+    "owner_alias": "chatgpt-custodia-SES-20261029-C9K4M2R8",
+    "instance": "chatgpt-custodia-SES-20261029-C9K4M2R8",
+    "session_folio": "SES-20261029-C9K4M2R8",
+    "generation": 3,
+    "record_kind": "owner_previous_to_generation_4"
   },
   "previous_authorization_ref": "Instrucción directa del operador, 2026-10-28, preservada en originales/INSTRUCCION-INVENTARIO-RECUPERABILIDAD-INGRESOS-2026-10-28.md (blob 357f3c1cc9081a47f47dc3fa0b838e8f8eeed5a5). Autoriza inventariar provisionalmente los hallazgos sobre recuperabilidad dentro del OCP; no autoriza cambios de código, alteraciones de producción ni recuperaciones que puedan sobrescribir/eliminar originales. Asignación inicial desde control sin titular previo asignado. ID nativo de conversación no expuesto.",
   "previous_acquired_at": "2026-10-28",
-  "prior_generation": 2,
-  "previous_blob": "2da19e588e30fe3835696d22fe110a7570a8758f",
-  "base_blob_sha": "2da19e588e30fe3835696d22fe110a7570a8758f",
-  "assignment_method": "Transferencia explícita conforme a Samantha v359 P037 y Metacanon §42: se leyó el control en generación 2 y blob 2da19e588e30fe3835696d22fe110a7570a8758f; se actualiza con comparación condicional de SHA, generación 2→3, se registra el original de autorización y se requiere lectura de vuelta. Alias operativo, no ID nativo.",
+  "prior_generation": 3,
+  "previous_blob": "cc6f80b69834c64188240960f447592af0b943a8",
+  "base_blob_sha": "cc6f80b69834c64188240960f447592af0b943a8",
+  "assignment_method": "Transferencia explícita conforme a Samantha v359 P037 y Metacanon §42: se volvió a leer CONTROL-RESPONSABILIDAD.json en generación 3, blob cc6f80b69834c64188240960f447592af0b943a8; se verificó la autorización afirmativa y la ausencia de colisión exacta del folio dentro de las fuentes consultadas de SeryMente/khora. Actualización condicional sobre el SHA observado, generación 3→4, con lectura de vuelta obligatoria. Alias operativo, no ID nativo.",
   "folio_collision_check": {
-    "searched_scope": "Búsqueda exacta del folio SES-20261029-C9K4M2R8 en commits e incidencias de SeryMente/khora: cero resultados. La consulta de otros repositorios accesibles desde la organización no garantiza inventario completo de todos los controles de responsabilidad.",
+    "searched_scope": "Búsqueda exacta del folio SES-20261029-K7M4Q9R2 en archivos, commits e incidencias de SeryMente/khora; cero resultados previos a la asignación. La consulta no acredita ausencia de colisión en todos los repositorios/controles de la organización.",
     "repositories_searched": [
       "SeryMente/khora"
     ],
-    "folio": "SES-20261029-C9K4M2R8",
+    "folio": "SES-20261029-K7M4Q9R2",
     "matches_found": 0,
     "global_uniqueness": "not_verified"
   },
@@ -44,9 +44,9 @@
   "readback_required": true,
   "transcript_scope": "Instrucción del operador preservada en el original de este ciclo; la continuidad visible se limita a mensajes adquiridos y no es una exportación nativa exhaustiva.",
   "authorization_original": {
-    "path": "frentes/custodia/originales/INSTRUCCION-TRANSFERENCIA-RESPONSABILIDAD-2026-10-29.md",
-    "blob_sha": "240a27710d1de76fd9a5eeeb9ce97fdb6b987104",
-    "commit_sha": "9fb5bd3a03158e1435009153c38be489c901c155"
+    "path": "frentes/custodia/originales/INSTRUCCION-TRANSFERENCIA-RESPONSABILIDAD-2026-10-29-C012.md",
+    "blob_sha": "e267321d2cc295d4c80ac5c7c0405bc7bbfaaa15",
+    "commit_sha": "9b6fb4c014a4c5ab83f401eac85cb1f665559149"
   },
   "prior_visible_output_original": {
     "path": "frentes/custodia/originales/SALIDA-MODELO-CUSTODIA-ANTERIOR-RECUPERABILIDAD-INGRESOS-2026-10-28.md",
@@ -76,6 +76,6 @@
     },
     "previous_authorization_ref": "Instrucción directa del operador, 2026-10-28, preservada en originales/INSTRUCCION-INVENTARIO-RECUPERABILIDAD-INGRESOS-2026-10-28.md (blob 357f3c1cc9081a47f47dc3fa0b838e8f8eeed5a5). Autoriza inventariar provisionalmente los hallazgos sobre recuperabilidad dentro del OCP; no autoriza cambios de código, alteraciones de producción ni recuperaciones que puedan sobrescribir/eliminar originales. Asignación inicial desde control sin titular previo asignado. ID nativo de conversación no expuesto."
   },
-  "transfer_generation": 3,
+  "transfer_generation": 4,
   "transfer_authority": "Samantha v359 · NX-359m; Metacanon 1.24; GOW 2.8; DUG blob b2ff2845a5a99dc4ce3cafafc4f8e43607d48145."
 }
