@@ -2,7 +2,7 @@
 
 Fuente literal: [INSTRUCCIONES-VERBATIM-TAIL-C032-20261022.jsonl](originales/INSTRUCCIONES-VERBATIM-TAIL-C032-20261022.jsonl) (copia idéntica, blob `fb35dc95`). Las citas de esta tabla se copian de ahí sin corregir faltas.
 
-Base de trabajo: cabeza del #330 (`4fb3b7d`). El #334 se cierra sin fusionar; solo se porta lo marcado «portar».
+Base de trabajo: cabeza del #330 (`4fb3b7d`). A fecha 2026-10-29, el #330 sigue abierto (draft) y el #334 sigue abierto (no draft), ambos sin fusionar; no asumir cierre ni portabilidad por estado de PR. Solo se porta lo marcado «portar».
 
 Estados: **CUMPLE** (verificado en interfaz y prueba) · **PARCIAL** · **FALTA** · **SIN VERIFICAR** (no se ha comprobado contra la base #330) · **SUPUESTO — por confirmar** (mantenido según orden explícita del operador).
 Regla: una fila no pasa a CUMPLE sin elemento de interfaz (`data-ui-id`), archivo y prueba que falle si se pierde.
