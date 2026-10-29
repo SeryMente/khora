@@ -75,7 +75,7 @@ Instalar Python 3.11 y `kernel/[ci]`, Ruff, Pyright, pytest y pytest-mock; ejecu
 
 ## 5. Estado de RDC y siguiente acción segura
 
-Al concluir el intento, RDC mostró operaciones de lectura/escritura aún en estado `pending` y dejó de devolver respuesta a `get_config`. La conexión aparecía como Online en el registro, pero `Last seen` ya no era reciente. No se repitieron operaciones con efectos secundarios pendientes.
+Al concluir el intento, RDC dejó de devolver respuesta a `get_config`; inicialmente mostró operaciones de lectura/escritura `pending`, y la consulta posterior de historial las marcó `failed` con `Timeout - no response from device`. El dispositivo aparecía Online en el registro, pero `Last seen` ya no era reciente. No se repitieron las operaciones: el resultado de sus escrituras parciales no está confirmado.
 
 Antes de reanudar:
 1. El operador debe asegurar que el terminal de Desktop Commander Remote siga activo; si perdió la sesión, volver a iniciar `npx @wonderwhy-er/desktop-commander@latest remote` y completar su autenticación según el procedimiento del equipo.
