@@ -38,7 +38,7 @@ Obtener el catálogo real desde la sesión autenticada de Recuperación y formar
 
 ## Lectura de vuelta y revisiones
 
-- OCP de Custodia, CUSTODIA-v0.3: blob `4a84f7bd4e568d894a2375f567a4753f2e332581`.
+- OCP de Custodia, CUSTODIA-v0.3, leído inmediatamente antes de preservar esta salida: blob `4a84f7bd4e568d894a2375f567a4753f2e332581`.
 - Lista provisional de tareas, versión 0.3: blob `a7b15e9e95219be949af82544378e6ec723ed501`.
 - Inventario provisional, versión 0.1: blob `b7e4f8c6770368e988f6e14d1fca018e72117aeb`.
 - Control de responsabilidad, generación 2: blob `2da19e588e30fe3835696d22fe110a7570a8758f`.
