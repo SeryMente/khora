@@ -1,9 +1,9 @@
 # Publicabilidad
 
 **Objeto Canónico de Persistencia (OCP):** [OBJETO-CANONICO.md](OBJETO-CANONICO.md)  
-**Estado:** iniciado; OCP v0.4 amplía el frente a propagación/publicación transversal en la organización SeryMente. Solo documentación en esta rama; no se han efectuado publicaciones ni modificado credenciales/configuración.  
-**Versión del frente:** PUBLICABILIDAD-v0.4  
-**Metodología consultada en ciclo 04:** Documento Único de Gobernanza (DUG) de Ser y Mente · Samantha v359 · NX-359m · Metacanon 1.24 · GOW 2.8.
+**Estado:** OCP v0.5; prioridad P0: método sólido para publicar actualizaciones de KHORA desde ChatGPT Free a Vercel sin terminal local. El puente gratuito documentado requiere GitHub Web; producción sigue bloqueada hasta diagnosticar Actions y unificar publicadores/migraciones. Solo documentación en esta rama.  
+**Versión del frente:** PUBLICABILIDAD-v0.5  
+**Metodología consultada en ciclo 05:** Documento Único de Gobernanza (DUG) de Ser y Mente · Samantha v359 · NX-359m · Metacanon 1.24 · GOW 2.8.
 
 ## Lectura y evidencia
 
@@ -14,6 +14,7 @@
 5. [Investigación documental del ciclo 04 — alcance transversal](evidencias/INVESTIGACION-CICLO-04-2026-10-29.md).
 6. [Mapa de dependencias y propagación transversal v0.1](MAPA-DE-DEPENDENCIAS-Y-PROPAGACION-v0.1.md).
 7. [Matriz de escenarios de propagación transversal G01–G12](evidencias/MATRIZ-ESCENARIOS-PROPAGACION-TRANSVERSAL-v0.1.md).
+8. [Diagnóstico de viabilidad ChatGPT Free → Vercel](evidencias/DIAGNOSTICO-VIABILIDAD-CHATGPT-FREE-VERCEL-2026-10-29.md).
 8. [Crónica de instanciación](cronica/PUBLICABILIDAD-INSTANCIACION-01.md).
 9. [Crónica del ciclo 04 — alcance transversal](cronica/CICLO-04-ALCANCE-TRANSVERSAL.md).
 10. [Control de responsabilidad](CONTROL-RESPONSABILIDAD.json).
@@ -23,6 +24,12 @@
 
 Esta rama separa la inauguración documental de cualquier publicación de producción: el workflow de KHORA que escucha cambios en main ejecuta una migración de runtime y un despliegue. La incorporación de este frente a main deberá realizarse solo después de revisar el efecto automatizado de un merge. Esta rama no cambia el producto ni el proyecto de Vercel.
 
+
+## Prioridad P0 inmediata
+
+Conseguir un flujo reproducible y seguro para cambiar KHORA desde ChatGPT Free y publicar en Vercel sin terminal local. El conector GitHub de ChatGPT es de lectura en la documentación actual, por lo que se contempla un puente manual por GitHub Web; Preview automático se verifica en Vercel. La producción no se habilitará hasta recuperar CI, elegir una autoridad de publicación, reconciliar las migraciones, proteger el flujo de merge y unificar el smoke.
+
+La investigación y decisión de diseño está en [Diagnóstico ChatGPT Free → Vercel](evidencias/DIAGNOSTICO-VIABILIDAD-CHATGPT-FREE-VERCEL-2026-10-29.md). La existencia de un diseño no equivale a que el circuito de producción esté probado.
 
 ## Objetivo de la versión 1.0
 
