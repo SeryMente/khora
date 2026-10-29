@@ -1,13 +1,14 @@
-<!-- INVENTARIO_VERSION=0.4; INVENTARIO_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- INVENTARIO_VERSION=0.5; INVENTARIO_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Inventario provisional de hallazgos · Recuperabilidad en Ingresos → Dictado → Recuperación
 
 > **ESTADO: PROVISIONAL · INVESTIGACIÓN ABIERTA · RECUPERABILIDAD PRODUCTIVA NO CERTIFICADA.** Este archivo es una materialización de evidencia dentro del OCP de Custodia; no es un OCP adicional ni una segunda fuente de estado. El núcleo vivo es [OBJETO-CANONICO.md](../OBJETO-CANONICO.md).
 
 - **Frente propietario:** CUSTODIA.
-- **Versión de este inventario:** 0.3.
+- **Versión de este inventario:** 0.5.
 - **Ciclo previo:** CUSTODIA-INV-RECUP-SES-20261028-R6K2M9Q4.
 - **Ciclo de ampliación por incidente:** CUSTODIA-INC-RECUP-SES-20261028-R6K2M9Q4-C004.
 - **Ciclo de ampliación de tareas:** CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C005.
+- **Ciclo de ejecución parcial:** CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C007; corrección propuesta en rama `fix/custodia-recovery-reconcile-20261028`, commit `95d7bbf2cbe0bb89b6d8ff01135438152ec8201d`, PR [#339](https://github.com/SeryMente/khora/pull/339) en borrador, no fusionada ni desplegada.
 - **Folio activo:** SES-20261028-R6K2M9Q4; control en generación 2.
 - **Fecha del registro:** 2026-10-28.
 - **Fuente normativa de los ciclos 3–4 (histórica):** Samantha v356 · NX-356m; Metacanon 1.22; GOW v2.6; blob c364e179e8e9b6a3d566a8e690dfa1a7cce91798.
@@ -51,7 +52,7 @@ Esto ofrece una explicación técnica consistente para «Sin audio en este punto
 - **Unidades reales del catálogo cotejadas individualmente en este ciclo:** 0. Esto significa «ninguna entrada pudo cotejarse», no que el catálogo esté vacío.
 - **Recuperaciones reales completadas en este ciclo:** 0.
 - **Recuperaciones reales de producción certificadas por este documento:** 0.
-- **Cambio de código o despliegue ejecutado:** ninguno.
+- **Estado del código de corrección:** la propuesta CUSTODIA-04 está en rama aislada/PR de borrador; no está fusionada ni desplegada. No se cambió código, tablas, objetos, credenciales ni configuración de producción.
 - **Originales modificados/borrados durante la auditoría local anterior:** ninguno reportado.
 - **Estado de la tarea CUSTODIA-01:** EN CURSO; la inspección de código y la auditoría local son avances parciales, no el cierre de la recuperación de las unidades.
 
@@ -306,7 +307,7 @@ Pruebas con datos sintéticos interrumpen la petición remota antes de la respue
 2. **Cotejar las filas de base de datos y el estado de cada objeto remoto.** Se requiere acceso de solo lectura autorizado o la propia interfaz autenticada para enumerar, correlacionar y leer los objetos. No se obtuvo ese acceso en el intento anterior.
 3. **Probar una unidad representativa por cada patrón, sin modificar la fuente.** Primero el caso confirmado en código (manifiesto vacío con audio real asociado); después manifestación parcial, audio sin texto, audio incompleto y una captura larga.
 4. **Revisar la reconstrucción de sesiones largas.** El grupo local de 707 partes emitió avisos de DTS no monótonas; debe probarse una reconstrucción que preserve timestamps y medirse duración/cobertura antes de declarar audio íntegro.
-5. **Proponer y ejecutar correcciones de código en un ciclo posterior autorizado.** Este ciclo solo registra hallazgos y criterios. No se ha modificado código, configuración, credenciales, tablas de producción ni blobs.
+5. **Validar la propuesta de corrección antes de su aceptación.** La rama aislada implementa una función compartida de reconciliación local/remota, un indicador inequívoco de páginas pendientes y la separación entre audio declarado por el snapshot y partes almacenadas verificadas. La recuperación legacy incluye audio solo cuando la cadena es contigua y verificada, sin inventar corte sincronizado. La PR #339 sigue en borrador; falta ejecutar la integración PostgreSQL/PGlite, repetir la suite con conectividad al contrato canónico, cotejar el catálogo productivo autenticado y verificar el despliegue/lectura de vuelta.
 
 ---
 
@@ -338,6 +339,7 @@ El corte de main observado al realizar la lectura de fuentes fue a63987aefe0dd3b
 
 - [Instrucción literal del operador](../originales/INSTRUCCION-INVENTARIO-RECUPERABILIDAD-INGRESOS-2026-10-28.md).
 - [Salida visible previa conservada](../originales/SALIDA-MODELO-CUSTODIA-ANTERIOR-RECUPERABILIDAD-INGRESOS-2026-10-28.md).
+- [Salida de ejecución parcial C007](../originales/SALIDA-MODELO-CUSTODIA-IMPLEMENTACION-PARCIAL-2026-10-28.md): implementación propuesta, validación parcial y bloqueos de integración/producto.
 
 ---
 
@@ -354,13 +356,22 @@ Se registró el relato literal y el análisis en [INCIDENTE-DICTADO-AUSENTE-Y-CO
 
 ## 10. Ampliación del plan de trabajo · CUSTODIA-01 / CUSTODIA-03 / CUSTODIA-04
 
-La lista provisional de tareas queda en v0.5 y conserva tres identificadores estables:
+La lista provisional de tareas queda en v0.7 y conserva tres identificadores activos estables:
 
 - **CUSTODIA-01 · P0:** recuperar y comprobar todas las unidades que actualmente aparecen en Recuperación, con paginación completa y reconciliación de entradas locales/remotas.
 - **CUSTODIA-03 · P0:** investigar los dictados esperados que no aparecen o parecen irrecuperables; resolver el estado del dictado reportado como ausente tras la sesión de terminal, cuantificar otros casos mediante evidencia y rescatar las unidades localizadas sin alterar sus originales.
 - **CUSTODIA-04 · P0:** completar la investigación y actualizar el sistema para que la recuperabilidad quede al corriente, corrigiendo los defectos demostrados y validando el recorrido completo con pruebas reproducibles y lectura de vuelta.
 
 **Secuencia registrada en el ciclo C006:** primero adquirir una línea base no destructiva y reconciliar el catálogo completo; después recuperar y verificar las unidades visibles (CUSTODIA-01) mientras continúa la investigación de capturas ausentes (CUSTODIA-03); finalmente consolidar las causas y actualizar/probar el producto (CUSTODIA-04). CUSTODIA-04 puede preparar correcciones a partir de defectos ya reproducibles, pero no se cierra hasta contar con la evidencia de las dos tareas operativas y una validación integrada.
+
+### Implementación parcial propuesta en CUSTODIA-04 · C007
+
+- **Rama:** `fix/custodia-recovery-reconcile-20261028`; commit `95d7bbf2cbe0bb89b6d8ff01135438152ec8201d`; PR [#339](https://github.com/SeryMente/khora/pull/339), estado borrador. La rama agrupa por sesión y preserva puntos de origen locales/remotos, utiliza la reconciliación en hidratación/recarga/paginación y señaliza que pueden existir páginas pendientes.
+- **Audio legacy:** el catálogo diferencia las partes del manifiesto elegido del número de partes verificadas persistidas. Si el manifiesto está vacío, la ruta propuesta puede copiar las partes existentes únicamente si la cadena resulta contigua y verificada; no añade un `corteAudio` que no estuviera acreditado. Una cadena irregular o no verificada produce un rechazo explícito y conserva el origen.
+- **Pruebas unitarias nuevas:** cinco casos de reconciliación de sesiones, solapamientos de páginas y preservación de las variantes local/remota.
+- **Controles ejecutados en worktree aislado:** `typecheck`, `ui-review:check` y `ui:contract` PASARON. `test:unit`: 549/550 pasaron; la única falla fue `methodology_contract_sync.test.ts` debido a `TLS handshake timeout` en la consulta remota de GitHub. La comprobación independiente de contenido mediante el conector de GitHub encontró el mismo blob SHA local/canónico (`232590a1f6339e2517e67038e1b5f7e8bd1638e3`) y cero diferencias JSON.
+- **No ejecutado:** la integración PostgreSQL/PGlite ampliada, porque el entorno no tiene `PGLITE_MODULE` disponible. No se obtuvo sesión UI autenticada; unidades productivas cotejadas y recuperaciones productivas siguen en cero.
+- **Estado:** corrección propuesta, no resultado productivo. El PR no se fusionó ni se desplegó; la recuperabilidad permanece sin certificar.
 
 **CUSTODIA-03 no presupone una pérdida.** Cada caso se clasificará como localizado y recuperado, localizado pero bloqueado, archivado, duplicado, parcial/incompleto, no localizado tras revisar las fuentes declaradas, irrecuperabilidad demostrada o no determinado por falta de evidencia. El contador 40→20 no se traducirá en «20 dictados perdidos» sin reconciliar las identidades reales.
 
@@ -375,4 +386,5 @@ La evidencia y los criterios técnicos están en [el informe del incidente](INCI
 - **v0.1 · 2026-10-28:** creación provisional de la matriz de hallazgos; separa código confirmado, auditoría local auxiliar y catálogo real pendiente. No declara recuperaciones de producción completadas.
 - **v0.2 · 2026-10-28 · CUSTODIA-INC-RECUP-SES-20261028-R6K2M9Q4-C004:** se añaden F-09 a F-12 para el conteo 40→20, la paginación de 20, el dictado no visible tras las 17:08 y el límite entre copia local y acuse remoto. Se añaden R-06 a R-08; el incidente sigue abierto, el total único del catálogo permanece no verificado y no se realizaron operaciones productivas.
 - **v0.3 · 2026-10-28 · CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C005:** registra el alcance histórico de CUSTODIA-01, CUSTODIA-03 y la entonces propuesta CUSTODIA-02; la referencia normativa se refrescó a Samantha v358, Metacanon 1.23, GOW v2.7.
-- **v0.4 · 2026-10-28 · CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C006:** registra la retirada de CUSTODIA-02 de las tareas activas, sin reutilizar su ID, y la incorporación de CUSTODIA-04 para terminar la investigación, corregir el sistema y validar la recuperabilidad de extremo a extremo. Se documenta la secuencia de línea base no destructiva, recuperación de las unidades visibles/investigación en paralelo y actualización integral. No hay todavía resultados productivos nuevos por causa de esta actualización documental.
+- **v0.4 · 2026-10-28 · CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C006:** registra la retirada de CUSTODIA-02 de las tareas activas y la incorporación de CUSTODIA-04.
+- **v0.5 · 2026-10-28 · CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C007:** registra los primeros cambios de recuperación propuestos en PR #339 y los resultados de validación parcial. Distingue las pruebas aprobadas de la falla ambiental de sincronización del contrato, la integración PGlite pendiente, el acceso productivo no obtenido y la ausencia de despliegue. No se afirma que el catálogo ni el dictado ausente hayan sido recuperados.
