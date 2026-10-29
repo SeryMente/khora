@@ -22,7 +22,7 @@ Convertir la ampliación expresada por el operador en un marco documental verifi
 3. Hay destinos de publicación heterogéneos: Vercel; WordPress/Divi; GitHub Pages con recursos PWA; instalación/puente nativo de extensiones; Apps Script junto con Sheets/Drive y un helper local; superficies de trabajo de modelos.
 4. La documentación de GDP indica extensión HF33 y backend HF32/versión 12 con aceptación E2E pendiente: la propagación puede afectar varios targets y no debe declararse completa solo porque uno avanzó.
 5. La documentación consultada de Metodología aún enumera versiones anteriores frente al DUG HTML v359 leído en `main`. Se registró como delta de espejo/índice; no se editó el repositorio de Metodología.
-6. El run de CI `40900763575` sobre el HEAD previo de la rama falló en 1–2 segundos con tres jobs, `runner_id=0`, runner vacío, `steps=[]` y logs `BlobNotFound`. No hay comando local reproducible en la evidencia actual. La causa raíz permanece **NO DETERMINADA**.
+6. El run de CI `40900763575` y cuatro workflows programados de `main` (Jules Auto-Respond, Sync Todoist and Notion, Board Orchestrator y Khora API Healthcheck) muestran el mismo patrón: jobs que duran 1–2 segundos, `runner_id=0`, runner vacío, `steps=[]` y logs `BlobNotFound`. El patrón transversal eleva la prioridad de diagnóstico de Actions, pero no identifica causa raíz; no hay comando local reproducible en la evidencia actual. **NO DETERMINADA**.
 7. Vercel sigue devolviendo como último deployment con `target=production` el `dpl_H7ModaV6GTefp9qbjiUnpiHmxgFH` (SHA `b528660e16552633d232a2397cbe42441a03438c`); el estado `latestDeployment` del proyecto con `target=null` no se equipara a producción.
 
 ## Restricciones y límites
