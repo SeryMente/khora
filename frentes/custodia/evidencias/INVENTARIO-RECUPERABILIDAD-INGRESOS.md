@@ -1,11 +1,12 @@
-<!-- INVENTARIO_VERSION=0.1; INVENTARIO_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- INVENTARIO_VERSION=0.2; INVENTARIO_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Inventario provisional de hallazgos · Recuperabilidad en Ingresos → Dictado → Recuperación
 
 > **ESTADO: PROVISIONAL · INVESTIGACIÓN ABIERTA · RECUPERABILIDAD PRODUCTIVA NO CERTIFICADA.** Este archivo es una materialización de evidencia dentro del OCP de Custodia; no es un OCP adicional ni una segunda fuente de estado. El núcleo vivo es [OBJETO-CANONICO.md](../OBJETO-CANONICO.md).
 
 - **Frente propietario:** CUSTODIA.
-- **Versión de este inventario:** 0.1.
-- **Ciclo:** CUSTODIA-INV-RECUP-SES-20261028-R6K2M9Q4.
+- **Versión de este inventario:** 0.2.
+- **Ciclo previo:** CUSTODIA-INV-RECUP-SES-20261028-R6K2M9Q4.
+- **Ciclo de ampliación por incidente:** CUSTODIA-INC-RECUP-SES-20261028-R6K2M9Q4-C004.
 - **Folio activo:** SES-20261028-R6K2M9Q4; control en generación 2.
 - **Fecha del registro:** 2026-10-28.
 - **Fuente normativa leída:** [Metaprompt Canónico de Samantha](https://github.com/SeryMente/metodologia/blob/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html), main; Samantha v356 · NX-356m; Metacanon 1.22; Glosario Operativo del Workspace (GOW) v2.6; blob de la fuente central c364e179e8e9b6a3d566a8e690dfa1a7cce91798.
@@ -126,6 +127,50 @@ Esto ofrece una explicación técnica consistente para «Sin audio en este punto
 
 ---
 
+### F-09 · La hidratación inicial y la recarga forman listas distintas y pueden contar dos veces la misma sesión
+
+- **Clase:** CONFIRMADO EN CÓDIGO; correspondencia exacta con la lectura 40→20 todavía NO VERIFICADA EN CATÁLOGO REAL.
+- **Fuentes:**
+  - `khora-web/app/components/ingreso/IngresoWorkspace.tsx`, blob `d42f819c2867a678d0d45e309db8f58cad80dc0d`.
+  - `khora-web/app/components/shared/IngresoView.tsx`, blob `59ec9c2e1c7b8ee671770e26b51582fcc6868e37`.
+- **Observación:** el efecto automático inicial concatena `localCatalog(local.snapshots)` y `data.items` sin reconciliarlos. La recarga manual usa otra lógica: filtra snapshots locales para sesiones representadas en la página remota con fecha remota igual o posterior y luego recompone la lista.
+- **Observación complementaria:** la insignia en Ingreso representa `recoveryItems.length`; no consulta el total único del catálogo.
+- **Consecuencia:** el mismo dictado puede aparecer una vez como local y otra como remoto en la hidratación inicial y desaparecer de una de esas representaciones al recargar. El cambio reportado de 40 a 20 es compatible con este defecto.
+- **Límite:** no se obtuvo la lista productiva, así que no está probado que las 20 entradas de diferencia sean duplicados, ni que correspondan a capturas perdidas. Hay que cruzar identidades en el catálogo autenticado.
+- **Corrección pendiente:** usar una sola función pura y probada para fusionar/deduplicar ambas fuentes en carga inicial, recarga y paginación, sin descartar capturas locales más nuevas ni revisiones históricas.
+
+### F-10 · La insignia indica elementos cargados, no el total global de recuperables
+
+- **Clase:** CONFIRMADO EN CÓDIGO.
+- **Fuentes:**
+  - `khora-web/lib/server/custodia-recuperacion.ts`, blob `278a479db46e6f2bed72ea7d31f88cc373fa67d1`.
+  - `khora-web/app/components/ingreso/RecoveryDrawer.tsx`, blob `3a408e3712d1cbe20578fa5ae923b75b0bc74342`.
+  - `khora-web/app/components/shared/IngresoView.tsx`, blob `59ec9c2e1c7b8ee671770e26b51582fcc6868e37`.
+- **Observación:** el catálogo remoto usa `limit=20`, consulta hasta 21 para saber si hay otra página, devuelve un máximo de 20 y expresa la continuación mediante `nextCursor`. El panel ofrece «Más capturas anteriores», pero no se devuelve un total global que alimente la insignia.
+- **Consecuencia:** «20» puede representar únicamente el conjunto cargado; no prueba que el catálogo completo tenga 20. El indicador cambia además según si se han fusionado las copias locales.
+- **Corrección pendiente:** exponer un total global fiable, o renombrar el indicador para expresar exactamente cuántas capturas están cargadas y si quedan páginas.
+
+### F-11 · Dictado ausente después de la última entrada visible comunicada a las 17:08
+
+- **Clase:** INCIDENTE REPORTADO POR EL OPERADOR; existencia de la fila remota y causa raíz NO VERIFICADAS.
+- **Fuente original:** `frentes/custodia/originales/INSTRUCCION-INCIDENTE-DICTADO-AUSENTE-2026-10-28.md`.
+- **Informe de incidente:** [INCIDENTE-DICTADO-AUSENTE-Y-CONTEO-40-20-2026-10-28.md](INCIDENTE-DICTADO-AUSENTE-Y-CONTEO-40-20-2026-10-28.md).
+- **Observación reportada:** el operador esperaba recuperar un dictado hecho hacia el final de una sesión en una terminal de cibercafé; tras abandonar la terminal al finalizar su tiempo de uso y regresar después, no vio la captura en Recuperación. Informó que la última unidad visible data de 2026-10-28 a las 17:08 hora local.
+- **Hipótesis que deben distinguirse:** checkpoint remoto nunca confirmado; copia local perdida al limpiar/reiniciar el perfil; sesión bajo otro estado o filtro (incluida sesión archivada); unidad en una página aún no recorrida; fallo de captura/transcripción antes del envío.
+- **Límite:** el dato de 17:08 proviene del operador; no se leyó el catálogo real, no se obtuvo el acuse del POST del checkpoint de esa sesión y no se verificó qué datos sobrevivieron al reinicio. No declarar el dictado perdido ni recuperado.
+- **Siguiente prueba:** recorrer las páginas autenticadas hasta cursor nulo, buscar la ventana temporal del incidente y revisar Custodia por si la sesión está archivada, siempre en la cuenta propietaria.
+
+### F-12 · La confirmación de persistencia remota es una condición observable, no una garantía inferible del intento local
+
+- **Clase:** CONFIRMADO EN CÓDIGO/CONTRATO; estado de la sesión incidente NO VERIFICADO.
+- **Fuentes:**
+  - `khora-web/app/components/ingreso/IngresoWorkspace.tsx`, blob `d42f819c2867a678d0d45e309db8f58cad80dc0d`.
+  - `khora-web/lib/client/custodia-local.ts`, blob `13129ff0e03f749607631b9c0465230faebcd125`.
+  - `khora-web/lib/custodia/contrato.ts`, blob `0ea3251c1270ff2fa988c751e06de6effef4135f`.
+- **Observación:** `guardarCheckpoint` intenta conservar primero una instantánea cifrada en IndexedDB local y después ejecuta el POST remoto. Solo marca «Checkpoint confirmado en el servidor» cuando valida la respuesta. Si el POST falla, comunica «Sin confirmación remota; consulta el estado de la copia local».
+- **Riesgo:** si el checkpoint remoto no alcanzó acuse y el reinicio eliminó el perfil/datos del sitio, la copia local podría no sobrevivir. El reinicio físico por sí solo no demuestra que el perfil se haya limpiado.
+- **Qué falta:** consultar la fila de checkpoint y su hora de recepción en la sesión propietaria; verificar qué política de reinicio/perfil aplicó el cibercafé. No hay prueba de que el checkpoint específico alcanzara o no el servidor.
+
 ## 4. Auditoría auxiliar del almacén local — no equivale al catálogo de Recuperación
 
 Esta sección preserva una evidencia técnica obtenida previamente para evitar repetir la inspección, pero **no identifica las unidades reales de la interfaz**. Se inspeccionó una copia de trabajo de IndexedDB en un perfil de Chrome distinto del perfil de mantenimiento. El archivo de origen no se sustituyó ni borró. Las reconstrucciones se generaron en un directorio temporal; no se subieron al servidor ni se usaron para modificar la aplicación.
@@ -235,6 +280,24 @@ Cada fila de la interfaz debe acabar con un resultado explícito y evidencia min
 
 ---
 
+### R-06 · Fusión local/remota determinista y deduplicación por identidad
+
+La hidratación inicial, la recarga manual y la paginación usan la misma función de reconciliación. Las pruebas cubren una misma sesión presente en local y remoto, una versión local más nueva, sesiones locales sin reflejo remoto y más de una página remota.
+
+**Aceptación:** ninguna sesión se duplica por cambiar de ruta de carga; no se descarta una copia local o versión histórica solo por estar representada en otra fuente.
+
+### R-07 · Semántica exacta del contador y paginación completa
+
+El servicio devuelve un total global verificable, o el indicador comunica «N capturas cargadas» y advierte que hay más cuando `nextCursor` no es nulo. El recuento de entradas cargadas nunca se rotula ni se interpreta como total global.
+
+**Aceptación:** el conteo permanece coherente durante bootstrap, carga inicial, recarga y carga de páginas posteriores; un catálogo con más de veinte elementos se enumera hasta cursor nulo sin saltos ni duplicación.
+
+### R-08 · Resiliencia del checkpoint ante cierre y reinicio de terminal
+
+Pruebas con datos sintéticos interrumpen la petición remota antes de la respuesta, confirman su éxito y luego reinician/cambian el perfil. El estado local y el estado remoto se presentan de forma separada; el sistema no promete recuperación entre perfiles basándose solo en IndexedDB.
+
+**Aceptación:** tras confirmación remota, el punto es recuperable en un perfil de navegador limpio y bajo el mismo propietario; ante falta de acuse o fallo de copia local, la UI hace explícita la condición y mantiene un resultado no confirmado, sin presentar un intento como persistencia demostrada.
+
 ## 7. Bloqueos y acciones siguientes
 
 1. **Obtener el catálogo autenticado real de Recuperación.** Es el bloqueo principal para saber si hay 20, 21 u otro número de unidades y cuáles presentan el defecto. Usar la sesión/propiedad autorizada que muestra esos ítems; no sustituir esa lista por los cinco snapshots locales.
@@ -276,6 +339,18 @@ El corte de main observado al realizar la lectura de fuentes fue a63987aefe0dd3b
 
 ---
 
-## 9. Registro de cambios del inventario
+## 9. Incidente del 28-10-2026: dictado ausente y conteo 40→20
+
+Se registró el relato literal y el análisis en [INCIDENTE-DICTADO-AUSENTE-Y-CONTEO-40-20-2026-10-28.md](INCIDENTE-DICTADO-AUSENTE-Y-CONTEO-40-20-2026-10-28.md). La instrucción original permanece en `originales/INSTRUCCION-INCIDENTE-DICTADO-AUSENTE-2026-10-28.md`.
+
+- **Estado:** ABIERTO. No se obtuvo acceso a la interfaz autenticada, historial completo de páginas ni fila de checkpoint del dictado referido.
+- **Confirmado en código:** la hidratación automática combina local y remoto sin aplicar el mismo filtro que la recarga; la insignia cuenta `recoveryItems.length`; el catálogo pagina en grupos de 20 mediante cursor.
+- **Interpretación provisional:** 40→20 puede ser el efecto de entradas duplicadas entre las copias local y remota y no necesariamente 20 dictados ausentes. El código no prueba la composición real de las entradas que vio el operador.
+- **Dictado ausente:** el último punto que el operador dice ver data del 2026-10-28 17:08. No hay prueba disponible para afirmar que el checkpoint remoto del dictado esperado fue confirmado, que el reinicio eliminó IndexedDB o que el contenido esté perdido definitivamente.
+- **Acción pendiente de más prioridad:** recorrer todo el catálogo autenticado hasta cursor nulo, cotejar sesiones únicas y copias locales/remotas, revisar Custodia si hubiera archivo y, bajo acceso autorizado de solo lectura, cotejar los checkpoints de la ventana temporal. No copiar contenido personal o identificadores reales al repositorio.
+- **Cambios de producto:** no realizados. Las correcciones de reconciliación, semántica del contador y pruebas de reinicio requieren un ciclo posterior autorizado y validación de extremo a extremo.
+
+## 10. Registro de cambios del inventario
 
 - **v0.1 · 2026-10-28:** creación provisional de la matriz de hallazgos; separa código confirmado, auditoría local auxiliar y catálogo real pendiente. No declara recuperaciones de producción completadas.
+- **v0.2 · 2026-10-28 · CUSTODIA-INC-RECUP-SES-20261028-R6K2M9Q4-C004:** se añaden F-09 a F-12 para el conteo 40→20, la paginación de 20, el dictado no visible tras las 17:08 y el límite entre copia local y acuse remoto. Se añaden R-06 a R-08; el incidente sigue abierto, el total único del catálogo permanece no verificado y no se realizaron operaciones productivas.
