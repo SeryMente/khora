@@ -89,6 +89,8 @@ export function IngresoView({state:v,actions:a={},isReviewMode=false}:{state:Ing
  const locked=busy||!!v.archivado;
  const recording=v.estado==="dictando";
  const cronica=v.clasificacion?.tipoEntrada==="blog_personal";
+ const timestamp=Date.now();
+ const automaticDateTimeOk=Number.isFinite(timestamp)&&Number.isFinite(new Date(timestamp).getTime());
  const dualPreconfigurado=v.dialogoChrome&&(v.clasificacion?.tipoEntrada==="interpretacion_simultanea"||v.clasificacion?.tipoEntrada==="conversacion_maya");
  return <main data-ui-id="ingreso.container" className={s.studio}>
   <header className={s.heading}>
