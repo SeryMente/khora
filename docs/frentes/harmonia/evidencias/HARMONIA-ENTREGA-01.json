@@ -1,0 +1,32 @@
+{
+  "schema": "harmonia.delivery.evidence.v1",
+  "packageVersion": "0.1.0",
+  "device": {
+    "name": "PC10RCIF4EI4",
+    "user": "MantenimientoRCI",
+    "os": "Microsoft Windows 11 Pro",
+    "desktop": "C:\\Users\\MantenimientoRCI\\Desktop"
+  },
+  "target": "C:\\Users\\MantenimientoRCI\\Desktop\\Harmonia-Observabilidad-v0.1.0",
+  "gitCommits": [
+    "96efc0f736011d3a7b76f2ebd2151d1ab27e9ab4",
+    "9a1851137e1c01817febe82c87b4f24a2388a917"
+  ],
+  "manifestFiles": 11,
+  "hashes": "verified",
+  "runtime": {
+    "node": "v22.23.3",
+    "bytes": 86973768
+  },
+  "collectorTest": {
+    "events": 5,
+    "restartRecovery": "verified",
+    "originalHash": "verified",
+    "synthetic": true
+  },
+  "chrome": {
+    "path": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+    "extensionLoaded": "not_verified",
+    "chatgptTest": "not_run"
+  }
+}

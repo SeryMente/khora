@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="popup.css">
+  <title>Harmonia · Índice de completitud</title>
+</head>
+<body>
+<main>
+  <header>
+    <div class="mark" aria-hidden="true">H</div>
+    <div><h1>Harmonia</h1><p>Mapa automático de la interfaz · v0.3.0</p></div>
+  </header>
+  <section class="status" aria-live="polite">
+    <div><span class="dot" id="dot"></span><strong id="headline">Comprobando estado automático…</strong></div>
+    <p id="detail">Observa automáticamente todas las pestañas de chatgpt.com. Solo estructura y controles; no guarda el texto del chat.</p>
+  </section>
+  <section class="sync" aria-labelledby="repoTitle" aria-live="polite">
+    <div class="syncHead"><div><h2 id="repoTitle">Repositorio Harmonia</h2><p id="repoStatus">Comprobando main…</p></div><span class="repoDot" id="repoDot"></span></div>
+    <p id="repoDetail">Sincronización ligera cada seis horas. El código remoto nunca se ejecuta dentro de la extensión.</p>
+    <div class="actions"><a href="https://github.com/SeryMente/khora/tree/main/apps/harmonia-observability" target="_blank" rel="noopener noreferrer">Ver repositorio</a><button id="syncNow" class="secondary">Sincronizar ahora</button></div>
+  </section>
+  <section class="index" aria-labelledby="indexTitle">
+    <div class="indexHead"><div><h2 id="indexTitle">Índice de completitud</h2><p>Fuentes oficiales leídas + observación natural</p></div><strong class="indexValue" id="indexValue">—%</strong></div>
+    <div class="bar"><span id="overallBar"></span></div>
+    <div class="metric"><span>Documentación pública verificada</span><strong id="docsValue">—</strong></div>
+    <div class="bar sub"><span id="docsBar"></span></div>
+    <div class="metric"><span>Superficies observadas al navegar</span><strong id="observedValue">—</strong></div>
+    <div class="bar sub"><span id="observedBar"></span></div>
+    <div class="metric"><span>Funciones dentro del catálogo</span><strong id="totalValue">—</strong></div>
+    <div class="metric"><span>Controles pendientes de clasificar</span><strong id="unknownValue">—</strong></div>
+    <div class="metric"><span>Superficies estructurales únicas</span><strong id="uniqueSurfaces">—</strong></div>
+    <div class="metric"><span>Escaneos repetidos compactados</span><strong id="dedupScans">—</strong></div>
+    <p class="fine" id="lastScan">Aún no hay un barrido de la interfaz.</p>
+    <p class="caveat">El índice mide cobertura del mapa, no fidelidad de captura ni funcionamiento de cada capacidad. Los elementos sin documentación oficial o sin observación siguen pendientes.</p>
+  </section>
+  <button id="toggle" disabled>Comprobando…</button>
+  <div class="actions"><button id="refresh" class="secondary">Recalcular índice</button><span id="events">0 eventos</span></div>
+  <details>
+    <summary>Alcance y privacidad</summary>
+    <p>Incluye estructura del hilo, compositor, controles inmediatos, estados visibles, bloques de respuesta, fuentes y resultados de herramientas.</p>
+    <p>Excluye Configuración, menús de cuenta, navegación general, texto de mensajes, texto escrito en el compositor, valores de campos, URL de enlaces y URL de imágenes. Se guardan nombres accesibles de controles y estructura DOM/CSS minimizada; el observador no lee razonamiento privado.</p>
+  </details>
+  <details>
+    <summary>Documentación pública incorporada</summary>
+    <div id="sourcesList" class="sources">Cargando fuentes…</div>
+  </details>
+  <details>
+    <summary>Pendientes del índice</summary>
+    <div id="pendingList" class="sources">Calculando…</div>
+  </details>
+</main>
+<script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,610 @@
+{
+  "schema": "harmonia.coverage-catalog.v1",
+  "version": "0.1.2",
+  "reviewedAt": "2026-10-21",
+  "title": "Inventario de la superficie conversacional de ChatGPT en Chrome",
+  "purpose": "Medir el grado de mapeo de las posibilidades documentadas y de las superficies observadas durante el uso natural. No es un porcentaje de precisión ni de completitud de captura.",
+  "scope": {
+    "include": [
+      "vista principal de conversación",
+      "mensajes del usuario y del asistente",
+      "compositor y controles inmediatos",
+      "estados de generación",
+      "bloques y resultados dentro de la conversación",
+      "citas y resultados de herramientas visibles en el hilo"
+    ],
+    "exclude": [
+      "Configuración y preferencias de cuenta",
+      "menús administrativos y de perfil",
+      "inventario completo de la barra lateral",
+      "Chrome y sus menús",
+      "red interna de la plataforma",
+      "razonamiento privado no expuesto por la interfaz"
+    ]
+  },
+  "scoring": {
+    "documentationWeight": 1,
+    "naturalObservationWeight": 1,
+    "formula": "100 * (featuresWithOfficialDocumentation + featuresObservedInNaturalNavigation) / (2 * inScopeFeatures)",
+    "interpretation": "Índice de completitud del mapeo, no de la aplicación ni de la calidad de captura. Mostrar además ambos componentes y los elementos pendientes por clasificar."
+  },
+  "sources": [
+    {
+      "id": "S01",
+      "title": "The ChatGPT home page",
+      "url": "https://help.openai.com/en/articles/9125172-the-chatgpt-home-page",
+      "kind": "official-help-center",
+      "checkedAt": "2026-10-21",
+      "verificationStatus": "content-read"
+    },
+    {
+      "id": "S02",
+      "title": "Uploading files and audio to ChatGPT",
+      "url": "https://help.openai.com/en/articles/8555545-uploading-files-and-audio-to-chatgpt",
+      "kind": "official-help-center",
+      "checkedAt": "2026-10-21",
+      "verificationStatus": "content-read"
+    },
+    {
+      "id": "S03",
+      "title": "ChatGPT capabilities overview",
+      "url": "https://help.openai.com/en/articles/9260256-chatgpt-capabilities-overview",
+      "kind": "official-help-center",
+      "checkedAt": "2026-10-21",
+      "verificationStatus": "content-read"
+    },
+    {
+      "id": "S04",
+      "title": "Working with writing blocks and code blocks in ChatGPT",
+      "url": "https://help.openai.com/en/articles/20001246-working-with-writing-blocks-and-code-blocks-in-chatgpt",
+      "kind": "official-help-center",
+      "checkedAt": "2026-10-21",
+      "verificationStatus": "content-read"
+    },
+    {
+      "id": "S05",
+      "title": "Images in ChatGPT",
+      "url": "https://help.openai.com/en/articles/11084440-images-in-chatgpt",
+      "kind": "official-help-center",
+      "checkedAt": "2026-10-21",
+      "verificationStatus": "content-read"
+    },
+    {
+      "id": "S06",
+      "title": "Data analysis with ChatGPT",
+      "url": "https://help.openai.com/en/articles/8437071",
+      "kind": "official-help-center",
+      "checkedAt": "2026-10-21",
+      "verificationStatus": "content-read"
+    },
+    {
+      "id": "S07",
+      "title": "ChatGPT Voice",
+      "url": "https://help.openai.com/en/articles/20001274-chatgpt-voice",
+      "kind": "official-help-center",
+      "checkedAt": "2026-10-21",
+      "verificationStatus": "content-read"
+    },
+    {
+      "id": "S08",
+      "title": "Voice Dictation FAQ",
+      "url": "https://help.openai.com/en/articles/12168547-voice-dictation-faq",
+      "kind": "official-help-center",
+      "checkedAt": "2026-10-21",
+      "verificationStatus": "content-read"
+    },
+    {
+      "id": "S09",
+      "title": "Searching the web with ChatGPT",
+      "url": "https://help.openai.com/en/articles/9237897-chatgpt-search",
+      "kind": "official-help-center",
+      "checkedAt": "2026-10-21",
+      "verificationStatus": "content-read"
+    },
+    {
+      "id": "S10",
+      "title": "Deep research in ChatGPT",
+      "url": "https://help.openai.com/en/articles/10500283-deep-research-faq",
+      "kind": "official-help-center",
+      "checkedAt": "2026-10-21",
+      "verificationStatus": "content-read"
+    },
+    {
+      "id": "S11",
+      "title": "Projects in ChatGPT",
+      "url": "https://help.openai.com/en/articles/10169521-projects-in-chatgpt",
+      "kind": "official-help-center",
+      "checkedAt": "2026-10-21",
+      "verificationStatus": "content-read"
+    },
+    {
+      "id": "S12",
+      "title": "Connected apps in ChatGPT",
+      "url": "https://help.openai.com/en/articles/11487775-connected-apps-in-chatgpt",
+      "kind": "official-help-center",
+      "checkedAt": "2026-10-21",
+      "verificationStatus": "content-read"
+    },
+    {
+      "id": "S13",
+      "title": "ChatGPT shared links",
+      "url": "https://help.openai.com/en/articles/7925741-chatgpt-shared-links",
+      "kind": "official-help-center",
+      "checkedAt": "2026-10-21",
+      "verificationStatus": "content-read"
+    },
+    {
+      "id": "S14",
+      "title": "Troubleshooting ChatGPT error messages",
+      "url": "https://help.openai.com/en/articles/7996703-troubleshooting-chatgpt-error-messages",
+      "kind": "official-help-center",
+      "checkedAt": "2026-10-21",
+      "verificationStatus": "content-read"
+    },
+    {
+      "id": "S15",
+      "title": "Reporting Content in ChatGPT and OpenAI Platforms",
+      "url": "https://help.openai.com/en/articles/10245791-reporting-content-in-chatgpt-and-openai-platforms",
+      "kind": "official-help-center",
+      "checkedAt": "2026-10-21",
+      "verificationStatus": "content-read"
+    },
+    {
+      "id": "S16",
+      "title": "ChatGPT release notes",
+      "url": "https://help.openai.com/en/articles/6825453-chatgpt-release-notes",
+      "kind": "official-help-center",
+      "checkedAt": "2026-10-21",
+      "verificationStatus": "content-read"
+    }
+  ],
+  "features": [
+    {
+      "id": "surface.main-chat",
+      "area": "estructura",
+      "label": "Región principal de conversación",
+      "priority": "core",
+      "docs": [
+        "S01"
+      ],
+      "detector": "main-region"
+    },
+    {
+      "id": "conversation.user-message",
+      "area": "mensajes",
+      "label": "Mensaje del usuario representado",
+      "priority": "core",
+      "docs": [],
+      "detector": "user-message-role"
+    },
+    {
+      "id": "conversation.assistant-message",
+      "area": "mensajes",
+      "label": "Mensaje del asistente representado",
+      "priority": "core",
+      "docs": [
+        "S01"
+      ],
+      "detector": "assistant-message-role"
+    },
+    {
+      "id": "conversation.response-streaming",
+      "area": "generación",
+      "label": "Respuesta en generación / estado activo",
+      "priority": "core",
+      "docs": [
+        "S14"
+      ],
+      "detector": "busy-state"
+    },
+    {
+      "id": "conversation.stop-generation",
+      "area": "generación",
+      "label": "Detener generación",
+      "priority": "core",
+      "docs": [
+        "S14"
+      ],
+      "detector": "stop-control"
+    },
+    {
+      "id": "conversation.regenerate",
+      "area": "mensajes",
+      "label": "Regenerar o reintentar respuesta",
+      "priority": "core",
+      "docs": [
+        "S14"
+      ],
+      "detector": "regenerate-control"
+    },
+    {
+      "id": "conversation.edit-user-message",
+      "area": "mensajes",
+      "label": "Editar mensaje enviado",
+      "priority": "core",
+      "docs": [],
+      "detector": "edit-control"
+    },
+    {
+      "id": "conversation.copy-response",
+      "area": "mensajes",
+      "label": "Copiar respuesta o bloque",
+      "priority": "core",
+      "docs": [
+        "S04"
+      ],
+      "detector": "copy-control"
+    },
+    {
+      "id": "conversation.feedback",
+      "area": "mensajes",
+      "label": "Controles de valoración de respuesta",
+      "priority": "support",
+      "docs": [
+        "S15"
+      ],
+      "detector": "feedback-control"
+    },
+    {
+      "id": "conversation.share",
+      "area": "mensajes",
+      "label": "Compartir conversación o respuesta",
+      "priority": "support",
+      "docs": [
+        "S13"
+      ],
+      "detector": "share-control"
+    },
+    {
+      "id": "conversation.citations",
+      "area": "resultados",
+      "label": "Citas y referencias en la respuesta",
+      "priority": "core",
+      "docs": [
+        "S09",
+        "S10"
+      ],
+      "detector": "citation-links"
+    },
+    {
+      "id": "conversation.web-search-results",
+      "area": "herramientas visibles",
+      "label": "Resultados de búsqueda web en el hilo",
+      "priority": "core",
+      "docs": [
+        "S09"
+      ],
+      "detector": "search-result"
+    },
+    {
+      "id": "composer.text-entry",
+      "area": "compositor",
+      "label": "Campo para escribir el mensaje",
+      "priority": "core",
+      "docs": [
+        "S01"
+      ],
+      "detector": "composer"
+    },
+    {
+      "id": "composer.send",
+      "area": "compositor",
+      "label": "Enviar mensaje",
+      "priority": "core",
+      "docs": [
+        "S01"
+      ],
+      "detector": "send-control"
+    },
+    {
+      "id": "composer.attach-file",
+      "area": "compositor",
+      "label": "Adjuntar archivo",
+      "priority": "core",
+      "docs": [
+        "S02"
+      ],
+      "detector": "attach-control"
+    },
+    {
+      "id": "composer.image-input",
+      "area": "compositor",
+      "label": "Entrada de imágenes",
+      "priority": "core",
+      "docs": [
+        "S02",
+        "S05"
+      ],
+      "detector": "image-input"
+    },
+    {
+      "id": "composer.audio-file",
+      "area": "compositor",
+      "label": "Adjuntar audio",
+      "priority": "support",
+      "docs": [
+        "S02"
+      ],
+      "detector": "audio-input"
+    },
+    {
+      "id": "composer.dictation",
+      "area": "compositor",
+      "label": "Dictado de voz a texto",
+      "priority": "core",
+      "docs": [
+        "S08"
+      ],
+      "detector": "dictation-control"
+    },
+    {
+      "id": "composer.voice-mode",
+      "area": "compositor",
+      "label": "Modo de conversación por voz",
+      "priority": "core",
+      "docs": [
+        "S07"
+      ],
+      "detector": "voice-control"
+    },
+    {
+      "id": "composer.tool-picker",
+      "area": "compositor",
+      "label": "Selector de herramientas del compositor",
+      "priority": "core",
+      "docs": [
+        "S03"
+      ],
+      "detector": "tool-picker"
+    },
+    {
+      "id": "composer.web-search-tool",
+      "area": "compositor",
+      "label": "Activar búsqueda web",
+      "priority": "core",
+      "docs": [
+        "S09"
+      ],
+      "detector": "web-search-tool"
+    },
+    {
+      "id": "composer.deep-research-tool",
+      "area": "compositor",
+      "label": "Activar investigación profunda",
+      "priority": "core",
+      "docs": [
+        "S10"
+      ],
+      "detector": "deep-research-tool"
+    },
+    {
+      "id": "composer.data-analysis-tool",
+      "area": "compositor",
+      "label": "Activar análisis de datos",
+      "priority": "core",
+      "docs": [
+        "S06"
+      ],
+      "detector": "data-analysis-tool"
+    },
+    {
+      "id": "response.rich-text",
+      "area": "respuestas",
+      "label": "Texto enriquecido y estructura tipográfica",
+      "priority": "core",
+      "docs": [
+        "S04"
+      ],
+      "detector": "rich-text"
+    },
+    {
+      "id": "response.code-block",
+      "area": "respuestas",
+      "label": "Bloques de código",
+      "priority": "core",
+      "docs": [
+        "S04"
+      ],
+      "detector": "code-block"
+    },
+    {
+      "id": "response.code-preview-run",
+      "area": "respuestas",
+      "label": "Previsualizar o ejecutar bloque compatible",
+      "priority": "support",
+      "docs": [
+        "S04"
+      ],
+      "detector": "code-preview"
+    },
+    {
+      "id": "response.writing-block",
+      "area": "respuestas",
+      "label": "Bloque de escritura editable",
+      "priority": "support",
+      "docs": [
+        "S04"
+      ],
+      "detector": "writing-block"
+    },
+    {
+      "id": "response.image-generation",
+      "area": "respuestas",
+      "label": "Imagen generada o editable",
+      "priority": "support",
+      "docs": [
+        "S05"
+      ],
+      "detector": "generated-image"
+    },
+    {
+      "id": "response.data-table",
+      "area": "respuestas",
+      "label": "Tabla de análisis de datos",
+      "priority": "support",
+      "docs": [
+        "S06"
+      ],
+      "detector": "data-table"
+    },
+    {
+      "id": "response.data-chart",
+      "area": "respuestas",
+      "label": "Gráfico o visualización de datos",
+      "priority": "support",
+      "docs": [
+        "S06"
+      ],
+      "detector": "data-chart"
+    },
+    {
+      "id": "response.file-output",
+      "area": "respuestas",
+      "label": "Archivo generado o descargable",
+      "priority": "support",
+      "docs": [
+        "S02",
+        "S04"
+      ],
+      "detector": "file-output"
+    },
+    {
+      "id": "response.sources-panel",
+      "area": "resultados",
+      "label": "Panel o bloque de fuentes",
+      "priority": "support",
+      "docs": [
+        "S09",
+        "S10"
+      ],
+      "detector": "sources-panel"
+    },
+    {
+      "id": "response.audio-output",
+      "area": "respuestas",
+      "label": "Salida de voz o lectura en voz alta",
+      "priority": "support",
+      "docs": [
+        "S07"
+      ],
+      "detector": "audio-output"
+    },
+    {
+      "id": "conversation.project-context",
+      "area": "contexto",
+      "label": "Conversación contextualizada por proyecto",
+      "priority": "support",
+      "docs": [
+        "S11"
+      ],
+      "detector": "project-context"
+    },
+    {
+      "id": "conversation.connected-app-context",
+      "area": "contexto",
+      "label": "Contenido o acción procedente de una app conectada",
+      "priority": "support",
+      "docs": [
+        "S12"
+      ],
+      "detector": "connected-app"
+    },
+    {
+      "id": "conversation.follow-up-suggestion",
+      "area": "mensajes",
+      "label": "Sugerencias de seguimiento visibles",
+      "priority": "support",
+      "docs": [],
+      "detector": "follow-up"
+    },
+    {
+      "id": "conversation.branch",
+      "area": "mensajes",
+      "label": "Continuar desde una respuesta o bifurcar hilo",
+      "priority": "support",
+      "docs": [],
+      "detector": "branch-control"
+    },
+    {
+      "id": "conversation.partial-generation",
+      "area": "generación",
+      "label": "Respuesta parcial que se actualiza durante la generación",
+      "priority": "core",
+      "docs": [
+        "S16",
+        "S03"
+      ],
+      "detector": "busy-state"
+    },
+    {
+      "id": "conversation.agent-progress",
+      "area": "generación",
+      "label": "Progreso visible de tareas o agentes en paralelo",
+      "priority": "support",
+      "docs": [
+        "S16"
+      ],
+      "detector": "agent-progress"
+    },
+    {
+      "id": "response.interactive-widget",
+      "area": "respuestas",
+      "label": "Componente interactivo dentro de la respuesta",
+      "priority": "core",
+      "docs": [
+        "S16",
+        "S03",
+        "S12"
+      ],
+      "detector": "interactive-widget"
+    },
+    {
+      "id": "response.side-by-side-visuals",
+      "area": "respuestas",
+      "label": "Comparación o composición visual en paneles paralelos",
+      "priority": "support",
+      "docs": [
+        "S16"
+      ],
+      "detector": "side-by-side-visuals"
+    },
+    {
+      "id": "response.interactive-chart",
+      "area": "respuestas",
+      "label": "Gráfico de datos con modo interactivo",
+      "priority": "support",
+      "docs": [
+        "S06"
+      ],
+      "detector": "interactive-chart"
+    },
+    {
+      "id": "response.canvas-workspace",
+      "area": "respuestas",
+      "label": "Espacio interactivo tipo Canvas para editar contenido o código",
+      "priority": "support",
+      "docs": [
+        "S03",
+        "S04"
+      ],
+      "detector": "canvas-workspace"
+    },
+    {
+      "id": "response.slides-editor",
+      "area": "respuestas",
+      "label": "Presentación o diapositivas editables dentro de ChatGPT",
+      "priority": "support",
+      "docs": [
+        "S16"
+      ],
+      "detector": "slides-editor"
+    }
+  ],
+  "updatedAt": "2026-10-21",
+  "researchNotes": [
+    "Se revisaron páginas públicas oficiales del Centro de ayuda de OpenAI enlazadas aquí; la fecha indica lectura de contenido durante el corte, no garantía de que cada artículo cubra el 100% de los rollouts.",
+    "Las notas de lanzamiento del 7 y 16 de octubre de 2026 añaden Intelligent UI (respuestas con elementos interactivos y comparaciones), respuesta parcial durante uso de herramientas, progreso de múltiples agentes y creación/edición de slides para cuentas compatibles.",
+    "La disponibilidad de herramientas y controles varía por plan, región, configuración del espacio de trabajo, modelo, versión del cliente y despliegue gradual.",
+    "Índice de documentación significa funciones del catálogo con al menos una fuente pública oficial leída y enlazada; no representa cobertura de todos los documentos del centro de ayuda."
+  ]
+}

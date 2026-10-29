@@ -1,0 +1,69 @@
+{
+  "schema": "responsabilidad-frente/1",
+  "front": "dictado-voz",
+  "canonical_identity": "MCP-OBS-DICTADO",
+  "repository": "SeryMente/khora",
+  "state_object": "docs/frentes/dictado-voz/OBJETO-CANONICO.md",
+  "status": "assigned",
+  "owner_thread": null,
+  "owner_alias": "chatgpt-dictado-voz-SES-20261028-Q7M4N9K2",
+  "owner_alias_type": "operational_alias_not_native_thread_id",
+  "instance": "chatgpt-dictado-voz-SES-20261028-Q7M4N9K2",
+  "session_folio": "SES-20261028-Q7M4N9K2",
+  "generation": 3,
+  "expiry": null,
+  "authorization_ref": "Current conversation, 2026-10-28: operator explicitly replied “Sí.” to authorize this instance to assume Dictado de voz and replace the currently recorded titular. Native conversation ID is not exposed by available tools.",
+  "authorization_event": "DICTADO-RESPONSABILIDAD-TRANSFER-SES-20261028-Q7M4N9K2",
+  "previous_owner": "chatgpt-dictado-voz-SES-20261025-H6N3Q8W2",
+  "previous_authorization_ref": "Current conversation, 2026-10-25: explicit operator authorization: “Khora es Cora. Sí, autorizo.” Authorizes this conversation to assume dictado-voz and replace the currently recorded titular in CONTROL-RESPONSABILIDAD.json. Native conversation ID is not exposed by available tools.",
+  "previous_acquired_at": "2026-10-25",
+  "prior_generation": 2,
+  "previous_blob": "09b9e497abf16771827b2602308562abc4484ed2",
+  "base_blob_sha": "09b9e497abf16771827b2602308562abc4484ed2",
+  "assignment_method": "Explicit transfer under Metacanon §42; compare-and-swap update by the observed control blob SHA; generation increment 2→3; canonical read-back verified. Operational alias used because native conversation ID is not exposed.",
+  "authorization_original": {
+    "path": "docs/frentes/dictado-voz/originales/CONTINUIDAD-C042-20261028.jsonl",
+    "blob_sha": "f20cbdbb4c15e0bbac5975f9d42dd3a835243073"
+  },
+  "folio_collision_check": {
+    "searched_scope": "GitHub exact-folio search within SeryMente/khora and organization search index found no indexed matches; not exhaustive.",
+    "repositories_searched": [
+      "SeryMente/khora",
+      "SeryMente (search index only)"
+    ],
+    "folio": "SES-20261028-Q7M4N9K2",
+    "matches_found": 0,
+    "global_uniqueness": "not_verified"
+  },
+  "acquired_at": "2026-10-28",
+  "bootstrap_scope": "Responsibility and documentary continuity for the existing Dictado/voice front only. Does not authorize product-code changes, credential changes, deployment, security changes, or technical acceptance.",
+  "enforcement": "cooperative registry; no server fencing of arbitrary writes",
+  "transcript_scope": "Visible user instructions and assistant commentary preserved; not an exhaustive native platform export.",
+  "transfer_authorization": {
+    "verbatim": "Sí.",
+    "authorization_question": "¿Autorizas expresamente que esta instancia asuma la responsabilidad del frente Dictado de voz y sustituya la titularidad registrada, actualizando el control autoritativo a una nueva generación?",
+    "provenance": "Direct operator message in this conversation, 2026-10-28.",
+    "event_id": "DICTADO-RESPONSABILIDAD-TRANSFER-SES-20261028-Q7M4N9K2",
+    "previous_owner": "chatgpt-dictado-voz-SES-20261025-H6N3Q8W2",
+    "previous_generation": 2,
+    "previous_blob_sha": "09b9e497abf16771827b2602308562abc4484ed2",
+    "recipient_alias": "chatgpt-dictado-voz-SES-20261028-Q7M4N9K2",
+    "new_generation": 3,
+    "source_main_revision": "CONTROL-RESPONSABILIDAD.json blob 09b9e497abf16771827b2602308562abc4484ed2",
+    "result": "authorized; compare-and-swap write and canonical read-back verified.",
+    "readback_verified": true
+  },
+  "previous_transfer_authorization": {
+    "verbatim": "Khora es Cora. \n\nSí, autorizo.",
+    "provenance": "Direct operator message in current conversation, 2026-10-25",
+    "event_id": "DICTADO-RESPONSABILIDAD-TRANSFER-SES-20261025-H6N3Q8W2",
+    "previous_owner": "chatgpt-dictado-voz-SES-20261022-C7N4M2Q8",
+    "previous_generation": 1,
+    "previous_blob_sha": "0f0b02a5bc9cd976ac5ab8e5b3e5a8a853866adb",
+    "recipient_alias": "chatgpt-dictado-voz-SES-20261025-H6N3Q8W2",
+    "new_generation": 2,
+    "source_main_revision": "control blob 0f0b02a5bc9cd976ac5ab8e5b3e5a8a853866adb",
+    "result": "authorized; compare-and-swap write and canonical read-back verified in C041",
+    "readback_verified": true
+  }
+}

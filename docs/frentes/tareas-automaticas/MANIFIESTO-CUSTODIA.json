@@ -1,16 +1,17 @@
 {
-  "version": 9,
-  "object_seal": "TAREAS-v0.16",
+  "version": 11,
+  "object_seal": "TAREAS-v0.17",
   "purpose": "Inventario de integridad y procedencia; no estado vivo paralelo",
   "source_of_truth": "docs/frentes/tareas-automaticas/OBJETO-CANONICO.md",
   "owner_repo": "SeryMente/khora",
   "branch": "main",
   "migration_authority": "docs/frentes/tareas-automaticas/originales/instruccion-migracion.txt",
   "methodology": {
-    "version": "1.5",
-    "seal": "METACANON-OBJETOS-v1.5",
-    "commit": "49ac40e9f6122e2d2fb339362cfa0a78128c8e37",
-    "blob": "32c7a65ff2e83b3b76752ba2160427bd6e851a8f"
+    "version": "1.6",
+    "commit": "a466b6b46f266de6a6ccd656e071eb7a07dc0e10",
+    "blob": "8f9ad1cf0e09e5fcd7014190770a77294ff39af4",
+    "acquired": "full_text",
+    "seal": "METACANON-OBJETOS-v1.6"
   },
   "product_audit_commit": "362f8ff51a518506927e486b9d61feee4f6313da",
   "original_notion_page": "https://app.notion.com/p/159f2ff32b6a4435952ebcf89ad563d2",
@@ -174,13 +175,51 @@
     {
       "path": "OBJETO-CANONICO.md",
       "classification": "objeto_vivo",
-      "bytes": 183939,
-      "sha256": "4788dc4ad188f777b4682515af7ad2f152988fcdce01aedcee74a002f74a54d1",
-      "git_blob_sha1": "d14ef713d3fea543734a92ca081c6f1dd3009f83"
+      "bytes": 196233,
+      "sha256": "0549faf7084384933c460a3ec99004feb3a19d9a2e53032cceac0957866c37b9",
+      "git_blob_sha1": "f7dcb5df10f46e64559822903e2e37939322ac94"
+    },
+    {
+      "path": "originales/reanudacion-sesion-3fda4187.json",
+      "classification": "original_textual_con_procedencia",
+      "bytes": 1944,
+      "sha256": "e58a3247f359e03cafd55352f08b6b2a851bf666f5ce8039974e357595021c6f",
+      "git_blob_sha1": "6558c92d5c5a041223ebba32c80ee47e32c80fc7"
+    },
+    {
+      "path": "originales/conversacion-recibida-sesion-3fda4187.txt",
+      "classification": "adjunto_original_inmutable",
+      "bytes": 43954,
+      "sha256": "15c838b7f48a320df50a6c6cbd4f03d83387d922130c93395f6d736ffdf3dfa4",
+      "git_blob_sha1": "55abba9f50ea6ad5c32ec77627a72feeec23cdba"
+    },
+    {
+      "path": "originales/salida-reanudacion-3fda4187.md",
+      "classification": "salida_final_literal_congelada",
+      "bytes": 1902,
+      "sha256": "ad070257c13defe19f430493c679f7b279b4c5029f1ca20d023074e0f47460a1",
+      "git_blob_sha1": "e8cebb00741629b393b8805edb6fc7551c7f4deb"
+    },
+    {
+      "path": "evidencias/reanudacion-sesion-3fda4187.json",
+      "classification": "evidencia_congelada",
+      "bytes": 4734,
+      "sha256": "df17399d625d8d8d567a6b120047ee82aacc88891d1935e2077f5823d81da682",
+      "git_blob_sha1": "4f74857c4de46980cd2a284cc4eb052bb3a36c32"
+    },
+    {
+      "path": "evidencias/cotejo-y-restauracion-original-3fda4187.json",
+      "classification": "incidencia_y_correccion_de_custodia",
+      "bytes": 4697,
+      "sha256": "5daefb586f35d8cc5385b4ee61710de09b096e1ade5950bc551c43723ead9855",
+      "git_blob_sha1": "3148cf96b860ea4a9b49a15f1a92aee9f2f47197"
     }
   ],
   "self_integrity": "El manifiesto no se hashea a sí mismo; comprobar su blob/commit devuelto por GitHub.",
-  "previous_verified_documentation_commit": "727c55a0dbc31068b61dbb29b21c139a524e2cef",
-  "recovery_base_main": "c02f5142d7609c35d8a2dc2c549726edc4016f13",
-  "access_correction_evidence": "evidencias/verificacion-accesos-ciclo20-2026-10-17.json"
+  "previous_verified_documentation_commit": "0c0eda725565788d56c1bde13d3e825f9b10ee89",
+  "recovery_base_main": "b5e7009de137db30c26ecc5f4ddbb34789f453f2",
+  "access_correction_evidence": "evidencias/verificacion-accesos-ciclo20-2026-10-17.json",
+  "current_event": "REANUDACION-3fda4187-20261018",
+  "current_evidence": "evidencias/reanudacion-sesion-3fda4187.json",
+  "readback_correction_evidence": "evidencias/cotejo-y-restauracion-original-3fda4187.json"
 }
