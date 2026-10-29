@@ -8,7 +8,7 @@ describe('U06-03: Fecha y hora coverage behavior', () => {
     const datetimeItem = result.items.find(i => i.id === 'datetime');
     assert.ok(datetimeItem);
     assert.equal(datetimeItem.covered, true);
-    assert.equal(datetimeItem.evidence, 'Verificado automáticamente');
+    assert.equal(datetimeItem.evidence, 'Fecha/hora disponible automáticamente');
   });
 
   it('becomes ACTIVE (covered: false) if automatic verification fails', () => {
