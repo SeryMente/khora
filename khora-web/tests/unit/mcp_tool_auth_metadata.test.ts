@@ -36,7 +36,7 @@ test("route publishes derived schemas and retains authentication and normative g
 });
 
 test("one canonical document covers the exact tool catalog and current output version", () => {
-  const document = fs.readFileSync(path.join(root, "docs/normative-check.md"), "utf8");
+  const document = fs.readFileSync(path.join(root, "docs/normative-check.md"), "utf8").replace(/\r\n/g, "\n");
   const readme = fs.readFileSync(path.join(root, "../README.md"), "utf8");
   const documented = [...document.matchAll(/^\| `(khora_[a-z_]+)`/gm)].map(match => match[1]);
   assert.equal(documented.length, 17);
