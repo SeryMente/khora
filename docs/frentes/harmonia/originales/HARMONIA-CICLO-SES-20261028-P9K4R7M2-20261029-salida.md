@@ -14,7 +14,7 @@ Se leyó `main` y la candidata `feat/harmonia-e2e-20261021`. `main` tiene Manife
 
 ## 4. Qué avanzó y qué no ocurrió
 
-Se actualizó y releyó el OCP, el README y el prompt de continuidad; se guardó la solicitud literal U21. Hashes de lectura de vuelta: OCP `88c2cbaec4b0f21bc00506e78ebd2913e5679b44`; README `c2019687bc36db405bf47eea26ca216d8e9ea891`; prompt `d07c74326e1919e1432a8db26e83bef037adcef6`; original U21 `fa55c374b504b29c2565b310b343cf081c4e7c71`. No se cambió código de Harmonia, no se fusionó la candidata y no se ejecutaron pruebas locales/Node/Chrome para Harmonia en este ciclo.
+Se actualizó y releyó el OCP, el README y el prompt de continuidad; se guardó la solicitud literal U21. Hashes de lectura de vuelta: OCP `88c2cbaec4b0f21bc00506e78ebd2913e5679b44`; README `52c439ef322a11c7994caa9344d4a14a681faf70`; prompt `d07c74326e1919e1432a8db26e83bef037adcef6`; original U21 `fa55c374b504b29c2565b310b343cf081c4e7c71`. No se cambió código de Harmonia, no se fusionó la candidata y no se ejecutaron pruebas locales/Node/Chrome para Harmonia en este ciclo.
 
 ## 5. Qué falta
 
