@@ -22,3 +22,8 @@ Esta rama separa la inauguración documental de cualquier publicación de produc
 ## Objetivo de la versión 1.0
 
 Completar dentro del Objeto Canónico de Persistencia el Protocolo Situacional de Publicación: para cada escenario identificado, documentar la secuencia más eficiente que sea elegible, segura y autorizada, con precondiciones, fallback, condición de parada y verificación observable. La matriz preliminar de escenarios y la investigación detallada quedan enlazadas desde el OCP.
+
+
+## Matriz preliminar de escenarios
+
+Consulta [la matriz PSP v0.1](evidencias/MATRIZ-PRELIMINAR-ESCENARIOS-PUBLICACION-v0.1.md) y la [crónica del ciclo 02](cronica/CICLO-02-PSP.md). Estos documentos documentan hallazgos; no sustituyen al OCP.
