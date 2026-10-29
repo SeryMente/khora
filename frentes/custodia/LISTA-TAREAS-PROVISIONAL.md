@@ -1,10 +1,10 @@
-<!-- LIST_VERSION=0.7; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.8; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Lista provisional de tareas · Frente Custodia
 
 > **ESTADO: PROVISIONAL · NO CERTIFICADA CONTRA EL DISEÑO METODOLÓGICO FINAL.** Se conserva aquí por instrucción expresa del operador. CUSTODIA-02 fue retirada de las tareas activas por instrucción del operador; no se reutiliza su identificador. Esa retirada no certifica metodológicamente esta materialización. Este archivo no crea un segundo objeto canónico ni otro control de responsabilidad; el núcleo único del frente sigue siendo [OBJETO-CANONICO.md](OBJETO-CANONICO.md).
 
 - **Frente:** Custodia.
-- **Versión de esta lista provisional:** 0.7.
+- **Versión de esta lista provisional:** 0.8.
 - **Última actualización:** 2026-10-28.
 - **Metodología en la primera redacción:** Samantha v348 · NX-348m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `a4c90bd8ff1cd360b1f1662ff55371bd1b56b4cd`.
 - **Revalidación antes del cierre (intermedia):** Samantha v351 · NX-351m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `f069d2385f47731ac9d0f0ca76bfd3cef859cdd2`.
@@ -107,7 +107,7 @@
 
 **Objetivo:** concluir la investigación de las brechas de recuperabilidad identificadas y actualizar KHORA para que las unidades admisibles puedan catalogarse, recuperarse y verificarse de manera consistente. No se considera lograda la recuperabilidad por el mero hecho de modificar o compilar código.
 
-**Estado factual de ejecución (C007):** el commit `95d7bbf2cbe0bb89b6d8ff01135438152ec8201d` está en `fix/custodia-recovery-reconcile-20261028`; PR [#339](https://github.com/SeryMente/khora/pull/339) permanece en borrador, no fusionada. `typecheck`, `ui-review:check` y `ui:contract` pasaron; la suite unitaria quedó en 549/550 por `TLS handshake timeout` al consultar el contrato canónico (la comparación independiente del contenido encontró el mismo blob SHA). La prueba PostgreSQL/PGlite no se ejecutó porque `PGLITE_MODULE` no está disponible. No se recorrió catálogo autenticado ni se recuperaron dictados de producción.
+**Estado factual de ejecución (C008):** la punta de la rama `fix/custodia-recovery-reconcile-20261028` es `cbb9efd89048daf3bd9f07cc69c2e6d7209aa55d`; PR [#339](https://github.com/SeryMente/khora/pull/339) sigue en borrador y no se fusionó. `typecheck` pasó en el worktree con el arnés actualizado; `ui-review:check` y `ui:contract` habían pasado en la validación previa y después solo cambió el arnés de integración. La suite unitaria registró 549/550: una prueba de sincronización canónica agotó tiempo (`TLS handshake timeout`); el esquema local/canónico fue comparado aparte y coincide por blob SHA. La integración PostgreSQL/PGlite ya pasó **15 comprobaciones** en un motor WASM aislado, con usuario/clave sintéticos y sin servicios productivos. Los workflows de GitHub Actions fueron reintentados y terminaron fallidos en 2–3 segundos sin runner ni pasos, logs no disponibles; causa exacta no determinada. No se recorrió catálogo autenticado ni se recuperaron dictados de producción.
 
 
 
@@ -137,9 +137,11 @@
 - **2026-10-28 · CUSTODIA-INC-RECUP-SES-20261028-R6K2M9Q4-C004 · versión 0.4:** documenta el incidente del dictado ausente, el conteo reportado 40→20 y la discrepancia entre hidratación inicial/recarga, y deja explícito que el catálogo completo, la fila de checkpoint y la causa raíz siguen sin verificar.
 - **2026-10-28 · CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C005 · versión 0.5:** se formaliza CUSTODIA-03 para investigar el dictado no visible y cualquier otra captura esperada que no aparezca o parezca irrecuperable. CUSTODIA-01 y CUSTODIA-03 quedan como prioridades operativas P0; CUSTODIA-02 se registró entonces como revisión metodológica P1.
 - **2026-10-28 · CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C006 · versión 0.6:** por nueva instrucción del operador, CUSTODIA-02 se retira de la lista activa y su identificador histórico no se reutiliza. Se agrega CUSTODIA-04 y se define la secuencia de línea base no destructiva, recuperación paralela a la investigación de ausencias y validación sistémica.
-- **2026-10-28 · CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C007 · versión 0.7:** CUSTODIA-04 pasa a EN CURSO. Se implementa una propuesta de reconciliación local/remota y audio legacy en rama aislada, y se abre PR #339 en borrador. Se registran los controles aprobados, la falla ambiental del contrato canónico por TLS y el bloqueo para ejecutar PGlite. Sin catálogo autenticado, recuperaciones productivas, fusión o despliegue; las garantías siguen sin certificar.
+- **2026-10-28 · CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C007 · versión 0.7:** CUSTODIA-04 pasa a EN CURSO; se propone la reconciliación local/remota y la preservación de audio legacy en la PR #339 en borrador. La integración PGlite estaba pendiente y la suite unitaria tenía una falla ambiental de red.
+- **2026-10-28 · CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C008 · versión 0.8:** se ejecuta con éxito el ensayo PostgreSQL/PGlite aislado (15 comprobaciones), y `typecheck` vuelve a pasar sobre el worktree. Se documentan por separado el timeout de la prueba de contrato canónico y los fallos de los jobs remotos sin runner/pasos. La PR #339 sigue en borrador; no se ha adquirido el catálogo autenticado ni se han realizado recuperaciones productivas. Las garantías siguen sin certificar.
 - **Fuente del encargo literal inicial:** [originales/INSTRUCCION-PENDIENTES-2026-10-28.md](originales/INSTRUCCION-PENDIENTES-2026-10-28.md).
 - **Fuente de ampliación del alcance:** [originales/INSTRUCCION-AMPLIACION-TAREAS-RECUPERABILIDAD-2026-10-28.md](originales/INSTRUCCION-AMPLIACION-TAREAS-RECUPERABILIDAD-2026-10-28.md), commit d3c84153bbdc8844e7c3147e4ab0a6375be3dc68.
 - **Nueva instrucción literal:** [originales/INSTRUCCION-REORDENAMIENTO-Y-ACTUALIZACION-RECUPERABILIDAD-2026-10-28.md](originales/INSTRUCCION-REORDENAMIENTO-Y-ACTUALIZACION-RECUPERABILIDAD-2026-10-28.md).
 - **Salida de ejecución parcial C007:** [originales/SALIDA-MODELO-CUSTODIA-IMPLEMENTACION-PARCIAL-2026-10-28.md](originales/SALIDA-MODELO-CUSTODIA-IMPLEMENTACION-PARCIAL-2026-10-28.md), commit `423115ff56c8ae10fb9abd02d0fd978eddfaf2a8`.
+- **Salida de validación de integración C008:** [originales/SALIDA-MODELO-CUSTODIA-VALIDACION-INTEGRACION-2026-10-28.md](originales/SALIDA-MODELO-CUSTODIA-VALIDACION-INTEGRACION-2026-10-28.md), commit `ba57b98cf4045f57e841add13e5d1b9d64895d41`.
 - **Estado de ejecución:** no se recuperaron ni inspeccionaron dictados como parte de esta modificación documental.
