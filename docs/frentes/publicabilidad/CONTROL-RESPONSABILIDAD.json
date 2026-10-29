@@ -1,0 +1,28 @@
+{
+  "schema": "responsabilidad-frente/1",
+  "front": "publicabilidad",
+  "status": "unassigned",
+  "owner_thread": null,
+  "owner_alias": null,
+  "owner_alias_type": null,
+  "instance": null,
+  "session_folio": null,
+  "generation": 1,
+  "expiry": null,
+  "authorization_ref": "Solicitud expresa del operador: inaugurar el frente Publicabilidad en el repositorio Cora/Khora y conservar literalmente el propósito dictado. La autorización abarca la creación documental del frente; no se interpreta como asignación de titularidad exclusiva de largo plazo a esta conversación ni como autorización de despliegue a producción.",
+  "authorization_event": "PUBLICABILIDAD-BOOTSTRAP-SES-20261028-PR8V6M2Q",
+  "acquired_at": "2026-10-28T19:38:26-06:00",
+  "base_blob_sha": null,
+  "previous_blob": null,
+  "last_event_folio": "SES-20261028-PR8V6M2Q",
+  "record_kind": "initial_unassigned",
+  "bootstrap_scope": "Inauguración documental e investigación; sin despliegue de producción, cambios de variables/secretos/configuración, compra de servicios o modificación del producto. La rama inicial es publicabilidad/inauguracion-20261028 y no modifica main.",
+  "folio_collision_check": {
+    "searched_scope": "Búsqueda de código GitHub para SES-20261028-PR8V6M2Q dentro de la organización SeryMente al registrar el evento.",
+    "matches_found": 0,
+    "global_uniqueness": "not_verified",
+    "note": "La búsqueda no representa un inventario completo de todos los repositorios, registros y controles fuera del índice accesible."
+  },
+  "enforcement": "Registro cooperativo de titularidad; no es un cerrojo de servidor contra escritores que eludan el control.",
+  "transfer_history": []
+}
