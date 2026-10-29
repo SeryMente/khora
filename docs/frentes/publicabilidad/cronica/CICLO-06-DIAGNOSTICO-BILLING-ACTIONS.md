@@ -19,7 +19,7 @@ Resolver el bloqueo P0 de Publicabilidad que impide validar cambios de KHORA des
 
 ## Conclusión
 
-La evidencia cruzada eleva a **alta probabilidad** un bloqueo de facturación/uso/entitlement de GitHub Actions que afecta los repositorios privados de SeryMente. No es razonable continuar alterando código o YAML de KHORA como primer remedio. El hecho exacto de facturación sigue **NO CONFIRMADO**: el conector puede leer el recuento de anotaciones, pero no sus cuerpos; tampoco puede consultar las páginas privadas Billing & Licensing.
+La evidencia cruzada eleva a **alta probabilidad** una restricción de cuota incluida/budget/spending limit o entitlement para los runners de repositorios privados de SeryMente. Un bloqueo personal por autorización fallida es una alternativa documentada, pero el workflow público que sí se ejecutó después hace menos probable un bloqueo global de cuenta. No es razonable continuar alterando código o YAML de KHORA como primer remedio. El estado exacto sigue **NO CONFIRMADO**: el conector puede leer el recuento de anotaciones, pero no sus cuerpos; tampoco puede consultar las páginas privadas Billing & Licensing.
 
 La acción de mayor valor es que el propietario revise `SeryMente → Settings → Billing & Licensing → Plans and usage` y `Payment information`, incluyendo la cuota de Actions, límites de gasto, autorización de pago y bloqueo que aparezca. Si no se presenta una explicación, abrir soporte GitHub con los run/job IDs y solicitar el contenido de las anotaciones. No subir presupuesto ni aceptar cargos sin una decisión explícita.
 
