@@ -112,7 +112,7 @@ Para cada cambio material, registrar en el OCP correspondiente o su evidencia:
 
 ### Aplicación a la incidencia CI actual
 
-En el run de CI `40900763575` de esta rama, los tres jobs terminaron en 1–2 segundos, con runner vacío, `runner_id=0` y pasos vacíos; la consulta de logs devolvió `BlobNotFound`. La evidencia no expone un comando/step que se pueda reproducir localmente. Por ahora se sigue diagnosticando desde GitHub; no corresponde afirmar una reproducción local ni usar RDC para una falla todavía no reproducible.
+En el run de CI `40900763575` de esta rama, los tres jobs terminaron en 1–2 segundos, con runner vacío, `runner_id=0` y pasos vacíos; la consulta de logs devolvió `BlobNotFound`. Se observó el mismo patrón (job de 1–2 segundos, `runner_id=0`, runner vacío, `steps=[]`) en cuatro workflows programados de `main`: Jules Auto-Respond (`40904382749`), Sync Todoist and Notion (`40889858840`), Board Orchestrator (`40889195532`) y Khora API Healthcheck (`40878917996`); sus consultas de logs también devolvieron `BlobNotFound`. Esto hace prioritaria la investigación de una posible condición transversal de Actions, pero la causa raíz sigue **NO DETERMINADA**. La evidencia no expone un comando/step que se pueda reproducir localmente. Se continúa diagnosticando desde GitHub; no corresponde afirmar una reproducción local ni usar RDC para una falla todavía no reproducible.
 
 ## 6. Brechas prioritarias
 
