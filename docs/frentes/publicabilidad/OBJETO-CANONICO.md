@@ -173,6 +173,7 @@ El frente no se considera terminado hasta que:
 - Investigación y fuentes oficiales: evidencias/INVESTIGACION-INICIAL-2026-10-28.md.
 - Matriz preliminar de escenarios y secuencias: evidencias/MATRIZ-PRELIMINAR-ESCENARIOS-PUBLICACION-v0.1.md.
 - Evento de inicialización: cronica/PUBLICABILIDAD-INSTANCIACION-01.md.
+- Crónica del ciclo 02 y ampliación del alcance situacional: cronica/CICLO-02-PSP.md.
 - Control actual: CONTROL-RESPONSABILIDAD.json.
 - Prompts para futuras instancias: prompts/ASISTENTE.md y prompts/CONSTRUCTOR.md.
 
