@@ -1,0 +1,4 @@
+{
+  "checks": 20,
+  "scope": "real route/helper; auth,normative,db,provider synthetic; no publication"
+}

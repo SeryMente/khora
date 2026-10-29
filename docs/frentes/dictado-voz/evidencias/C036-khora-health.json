@@ -1,0 +1,29 @@
+{
+  "_meta": {
+    "khora/diagnostic": {
+      "code": "NORM_GITHUB_CREDENTIAL_REJECTED",
+      "message": "GitHub no aceptó la credencial con la que Khora intenta leer sus instrucciones.",
+      "recovery": "El administrador debe revisar o reemplazar esa credencial en el servidor, sin pegarla en el chat.",
+      "dependency": "github",
+      "retryable": false,
+      "stage": "github",
+      "operation": "khora_mcp_health",
+      "correlation_id": "756a1fdd-2e48-4d32-bdbe-ea59777979eb",
+      "evidence": {
+        "upstream_status": 401,
+        "authentication": "sent",
+        "upstream_operation": "SI_MAIN_FETCH"
+      }
+    },
+    "khora/audit": "PERSISTED"
+  },
+  "content": [
+    {
+      "type": "text",
+      "text": "{\"ok\":false,\"status\":\"UNAVAILABLE\",\"full_access\":false,\"missing_scopes\":[],\"reason\":\"NORM_GITHUB_CREDENTIAL_REJECTED\",\"diagnostic\":{\"code\":\"NORM_GITHUB_CREDENTIAL_REJECTED\",\"message\":\"GitHub no aceptó la credencial con la que Khora intenta leer sus instrucciones.\",\"recovery\":\"El administrador debe revisar o reemplazar esa credencial en el servidor, sin pegarla en el chat.\",\"dependency\":\"github\",\"retryable\":false,\"stage\":\"github\",\"operation\":\"khora_mcp_health\",\"correlation_id\":\"756a1fdd-2e48-4d32-bdbe-ea59777979eb\",\"evidence\":{\"upstream_status\":401,\"authentication\":\"sent\",\"upstream_operation\":\"SI_MAIN_FETCH\"}}}"
+    }
+  ],
+  "isError": true,
+  "name": "khora_mcp_health",
+  "moduleName": "Khora"
+}

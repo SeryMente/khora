@@ -1,0 +1,5 @@
+{
+  "typescript": "5.9.3",
+  "scope": "strict focal UI/analyzer/test import closure; exact target ES2017 and Bundler options; isolated CSS declaration and toolchain resolution only; NOT full repository typecheck",
+  "diagnostics": []
+}

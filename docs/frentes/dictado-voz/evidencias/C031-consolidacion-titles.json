@@ -1,0 +1,6 @@
+{
+  "titleFieldSupported": true,
+  "sessionChangeRejectsStaleReply": true,
+  "unchangedTextNotRepeated": true,
+  "scope": "Actual React hook, local browser, title provider fixture. No production Groq use."
+}

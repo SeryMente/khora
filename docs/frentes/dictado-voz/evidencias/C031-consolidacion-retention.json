@@ -1,0 +1,7 @@
+{
+  "ackRetainsAudio": true,
+  "archiveRetainsAudioAndSnapshotCiphertext": true,
+  "crossOwnerIsolated": true,
+  "manualArchiveCalls": 1,
+  "scope": "Synthetic local IndexedDB and actual recovery archive helper; archive HTTP boundary is fixture."
+}

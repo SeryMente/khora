@@ -44,8 +44,11 @@ try {
  const groups=agruparPartesAudio(captures.map(b=>Buffer.from(b)));assert.equal(groups.length,2);checks++;
  const mp3=await convertirAudioMp3(groups);assert.ok(mp3.duracionSeg>5.5 && mp3.duracionSeg<7);assert.ok(mp3.bytes.length>100);checks++;
  await page.evaluate(async()=>{const m=await import('/store.js');await m.confirmarAudioLocal('owner-A','audio-session',1);await m.cerrarSnapshotLocal('owner-A','11111111-1111-4111-8111-111111111111');});
+ // Remote ACK annotates retention; it must not erase recoverable original audio.
  const remaining=await page.evaluate(async()=>{const m=await import('/store.js');const r=await m.recuperarLocal('owner-A');return {snapshots:r.snapshots.length,audios:r.audios.length};});
- assert.deepEqual(remaining,{snapshots:0,audios:captures.length-1});checks++;
+ assert.deepEqual(remaining,{snapshots:0,audios:captures.length});checks++;
+ await page.reload();const afterReload=await page.evaluate(async()=>{const m=await import('/store.js');return (await m.recuperarLocal('owner-A')).audios.length;});assert.equal(afterReload,captures.length);checks++;
+ const retention=await page.evaluate(async()=>{const db=await new Promise((ok,no)=>{const q=indexedDB.open('khora-custodia-v1');q.onsuccess=()=>ok(q.result);q.onerror=()=>no(q.error);});try{return await new Promise((ok,no)=>{const q=db.transaction('records').objectStore('records').getAll();q.onsuccess=()=>ok(q.result.filter(x=>x.owner==='owner-A').map(x=>({kind:x.kind,ack:!!x.remoteConfirmedAt,bytes:x.data.byteLength})));q.onerror=()=>no(q.error);});}finally{db.close();}});assert.equal(retention.filter(x=>x.kind==='audio'&&x.ack).length,1);assert.equal(retention.filter(x=>x.kind==='archived_snapshot'&&x.bytes>0).length,1);checks+=2;
  console.log(JSON.stringify({status:'PASS',checks,synthetic:true,realIndexedDB:true,recordings:groups.length,parts:captures.length,mp3Seconds:mp3.duracionSeg,productionServices:false}));
  await context.close();
 } finally {if(browser)await browser.close();await new Promise(resolve=>server.close(resolve));}

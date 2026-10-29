@@ -514,3 +514,30 @@ Durante parada se muestra estado vivo `Terminando y conservando audio…` antes 
 Observabilidad de dictado normal: inicio, confirmación o fallo por parte con índice, HTTP, duración y confirmación local; cierre con duración y pendientes. Sin palabras dictadas, audio o mensajes privados del proveedor en métricas. La telemetría posterior al COMMIT no puede invalidar una parte ya conservada. Un reintento idéntico con nombre/MIME ausentes se acepta por igualdad PostgreSQL null-safe; otra huella, bytes, fuente o sesión sellada se siguen rechazando.
 
 Ver pruebas y límites en `docs/frentes/dictado-voz/evidencias/C030-pruebas.md`. La prueba aislada no certifica la infraestructura ni el micrófono físico de producción.
+
+
+## C031 · Clasificación editorial y archivo manual (borrador, no desplegado)
+
+- `tipo_entrada` = general|conversacion_maya|interpretacion_simultanea|blog_personal y `ofuscada` boolean en volcado mediante migración administrativa034. Snapshot tipoEntrada/ofuscada opcionales para legado, defecto general/false. Nunca autorización de publicación por selección o checkpoint.
+- Migración034 debe ejecutarse y verificarse antes de desplegar este cliente/servidor conjuntamente. No autodeclarar migración ni ejecutar DDL nuevo en solicitud de usuario. Exclusión global de interpretación del grafo todavía pendiente; no basta guardar tipo.
+- Archivo siempre manual. Para blog_personal se conserva intención cifrada por propietario y sesión ANTES del POST. Recibo debe coincidir en sessionId, textoSHA256, version1, tipoEntrada y ofuscada; después se sella interfaz. Journal editorial persiste tras cerrar snapshot; no guarda tokens normativos.
+- Revisión editorial estable/bytes canónicos persistidos antes de prepare; fecha, slug, publicaciónUUID y revisión no se recalculan en reintento. No usa decline_archived posterior a recibo, sin texto público ni token normativo; status reconcilia respuesta perdida.
+- NUEVA exigencia: blog incluye audio. Contrato actual solo texto NO basta: PUBLIC_AUDIO_CONTRACT_READY=false mantiene Sí bloqueado incluso con preview y exposición de ofuscada. Falta representación pública de audio íntegro archivado, reproducción preview, hash/tamaño/MIME/asociación y consentimiento de voz cubiertos por digest. No publicar URL cifrada privada ni ningún fixture.
+- Corrección diagnóstica: transcripción final distingue sesión ausente, partes pendientes y ausencia de partes verificadas; archivo informa conteos sin levantar guarda de integridad. No es prueba de reparación de falla remota. Solicitar detalleHTTP real, mantener pestaña, exportar disponible; no declarar pérdida local a partir de mensaje genérico.
+- No se cambia Ver puntos guardados. Recuperación directa, indicador único, títulos y exclusión de grafo permanecen pendientes. Pruebas dirigidas locales con proveedores/auth sustituidos no son E2E productivo. Ver único estado vivo docs/frentes/dictado-voz/OBJETO-CANONICO.md.
+
+
+### Enmienda posterior C031: texto-only autorizado por operador
+La instrucción posterior permite ESTE corte con transcripción ordenada/formateada solamente. TEXT_ONLY_PUBLICATION_AUTHORIZED=true sustituye la guarda de audio en front, no el consentimiento de ninguna entrada. Preview exacto y ofuscada obligatorios; Sí conserva turno normativo, No independiente. Audio permanece privado, no se envía a blog/Meta. App/backend Blog deben incorporar la misma autorización antes de integrar. Prepare no genera automáticamente el borrador: falta transcripción real/edición pública revisada. Sin despliegue ni Meta verificados, no afirmar resultado.
+
+
+### C031 · Consolidación posterior (candidata, no desplegada)
+- El operador reabrió los cinco frentes y retiró el corte horario como límite de continuación. Sigue sin navegador compartido; no se requiere Remote Desktop Commander ni se usa para construcción.
+- Audio local: ACK solo anota remoteConfirmedAt; el sellado solo anota archived_snapshot. No se borra ciphertext/audio. SHA local recalculado y recibo remoto ligado a sesión/parte/fuente/bytes/SHA antes de aceptar. No garantiza supervivencia frente a borrado del perfil, cuotas, pérdida física ni capturas que nunca llegaron a guardarse.
+- Archivar esta captura en panel usa exclusivamente punto elegido por dueño/revisión. Audio local se adjunta solo dentro del corte acreditado; si no hay corte, solo partes ya asociadas. Punto sin audio no inventa vinculación ni se degrada silenciosamente a texto. Ver puntos guardados y selección histórica se conservan.
+- Títulos: corrige title frente a titulo; hook periódico usa contenido suficiente, aborta cambio de sesión, evita respuestas obsoletas y nunca inventa título ante fallo. Checkpoints mantienen título de su momento, no se sobrescriben versiones antiguas.
+- Luz única: azul solo recibo íntegro de archivo; verde fingerprint exacto con audio completo; amarillo pendiente/en vuelo; rojo fallo confirmado sin prueba actual. Cambiar texto/título/clasificación/audio invalida verde antiguo. Detalle desplegable conserva diagnóstico, no alertas intrusivas por cada parte normal.
+- Integración Blog texto-only con preparación extractiva literal y guard Pages≤100 en servidor/proveedor. Ningún permiso de publicación por prellenar ni por selección de tipo. Preparación no inventa hechos, cronología ni fecha del evento; el original permanece intacto. Audio sigue privado.
+- Migraciones administrativas reales:034_ingreso_clasificacion.sql y20261019_blog_editorial.sql en runner existente, no033 duplicada, no DDL editorial por solicitud. Aplicadas dos veces solo sobre PostgreSQL aislado; producción no migrada.
+- Interpretación excluida de UI ingesta y selección paired; material conservado. No acredita importadores externos ni borra historia Neo4j. Ver GRAPH-TWINS y GRAPH-QUALITY-DRAFT.
+- Evidencia ejecutada y límites: docs/frentes/dictado-voz/evidencias/C031-consolidacion.json. Ninguna prueba sintética acredita publicación, recuperación de veinte capturas reales ni despliegue.

@@ -1,0 +1,13 @@
+Procedencia: comentarios propios visibles de este ciclo; no reconstrucción de todas las salidas históricas ni salida final aún no emitida.
+
+Continúo sobre la candidata existente, sin reiniciar el trabajo. La compilación de Vercel ya está confirmada; aún no equivale a publicación en el blog y Facebook. Sigo con las verificaciones pendientes y la siguiente función. Para las llaves de Meta, sigo esperando tu «listo» antes de leer el portapapeles; no revisaré contenido ajeno.
+
+Encontré la causa concreta de la espera en interpretación: el servidor rechaza la transcripción mientras la captura está activa y la interfaz solo la solicita al detener. Corregiré ese recorrido existente para mostrar avances desde partes de audio verificadas, sin marcarlos como captura completa ni cambiar el archivado manual. También quitaré los controles redundantes al elegir interpretación consecutiva.
+
+El ajuste de interpretación pasó las pruebas: aparecen avances durante la captura, un fallo transitorio conserva el texto anterior y «Detener» sigue disponible. La selección preconfigura Chrome y micrófono sin grabar por sí sola.
+
+Estoy subiendo la candidata para la compilación integral. PC‑14 ya no respondió; no recibí ni leí llaves de Meta. Esa conexión sigue pendiente, pero no ha detenido el trabajo de código.
+
+Los avances de interpretación ya pasaron 28 comprobaciones en Chromium, incluida la lectura de fragmentos WebM reales de ambas fuentes. También siguen pasando las regresiones editoriales.
+
+La candidata falló al ejecutar la compilación integral; todavía no tengo la causa específica porque el acceso a sus logs devuelve 403. No la promoveré a producción ni quitaré pruebas para obtener un resultado verde. Estoy dejando ese fallo y el checkpoint exacto documentados.

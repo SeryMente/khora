@@ -1,0 +1,23 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
++ actual - expected
+
+  {
++   audios: 8,
+-   audios: 7,
+    snapshots: 0
+  }
+
+    at file:///data/dictado-c040/c045-before.mjs:48:9 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: { snapshots: 0, audios: 8 },
+  expected: { snapshots: 0, audios: 7 },
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.14.1

@@ -1,0 +1,11 @@
+[
+  {
+    "operation": "Prueba Chromium texto sin audio C034",
+    "symptom": "TypeError: Cannot read properties of null (reading 'length')",
+    "cause": "El fixture suponía audioPartes=[]; cliente serializa null cuando no hay audio y la ruta real lo admite. No es fallo demostrado de aplicación.",
+    "state": "Sin mutación de repositorio ni publicación; prueba interrumpida.",
+    "correction": "Aceptar null o [] en fixture y comprobar ausencia de audio con (audioPartes??[]).length.",
+    "verification": "16/16 comprobaciones Chromium pasan tras corregir fixture, sin cambiar aplicación",
+    "prevention": "Fixtures deben reflejar contrato real de la ruta /api/dictado; audio ausente no exige array."
+  }
+]

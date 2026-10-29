@@ -1,0 +1,9 @@
+{
+  "commit": "bd90b7d094879a35d6f90c625325ec3137b244fc",
+  "pullRequest": 330,
+  "canonicalReadback": "byte-identical UTF8",
+  "canonicalSha256": "2cc3752de863c17436ee0bed086d091aa1a8b9d26973a0511f7656de247507c2",
+  "canonicalBlob": "f6cd23152063d7f51cb96d19b4fb95ba4b082dd7",
+  "state": "draft-not-production",
+  "annexPreserved": true
+}
