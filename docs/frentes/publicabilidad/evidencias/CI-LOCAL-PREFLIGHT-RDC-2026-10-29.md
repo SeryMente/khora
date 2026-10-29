@@ -36,7 +36,7 @@ La API de GitHub devolvió el árbol completo de `main` en SHA `e463e0c6efa857f4
 
 `%LOCALAPPDATA%\Temp\khora-ci-local\khora-web\package-lock.json`
 
-Se intentó materializar el resto del snapshot a partir de la conexión autorizada de GitHub en manifests temporales bajo `%LOCALAPPDATA%\Temp\khora-ci-local\source-*.jsonl`. La transferencia de las primeras partes avanzó, pero una operación grande de escritura/lectura quedó pendiente; posteriormente incluso `get_config` de RDC dejó de responder dentro de la ventana síncrona. No se confirmó que los manifests finales se hubieran escrito íntegramente, ni se ejecutó el script de extracción.
+Se intentó materializar el resto del snapshot a partir de la conexión autorizada de GitHub en manifests temporales bajo `%LOCALAPPDATA%\Temp\khora-ci-local\source-*.jsonl`. La transferencia de las primeras partes avanzó, pero una operación grande de escritura/lectura quedó pendiente; posteriormente incluso `get_config` de RDC dejó de responder dentro de la ventana síncrona. La consulta posterior del historial remoto marcó las operaciones `read_file`/`write_file` implicadas como `failed` con `Timeout - no response from device`. No se confirmó que los manifests finales se hubieran escrito íntegramente, ni se ejecutó el script de extracción. El agente no respondía a consultas nuevas al cierre de este ciclo.
 
 Por tanto:
 - no se ejecutó `npm ci`;
