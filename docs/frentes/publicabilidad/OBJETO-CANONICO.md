@@ -416,6 +416,15 @@ Conclusión RDC: no existe una reproducción local adecuada del fallo observado.
 6. Tras confirmarse la resolución, observar una ejecución de rama no productiva ya necesaria o realizar una sola prueba autorizada; verificar que `runner_id>0`, haya `Set up job`, pasos y logs antes de retomar el pipeline.
 7. No usar `workflow_dispatch` para producción, no fusionar esta rama a `main` y no intentar eludir el gate mediante Vercel MCP/RDC/CLI.
 
+### 20.5 Revalidación de frescura · 2026-10-29T17:41Z
+
+La ejecución privada sigue fallando después de persistir el diagnóstico:
+- KHORA run `40923486365`, tres jobs `123622690139`, `123622690389`, `123622690440`; fallos de 2–3 segundos, `runner_id=0`, runner vacío, `steps=[]`.
+- Metodología runs `40923129660` y `40923129500`, jobs `123621422175` y `123621422242`; fallos en ~2 segundos, runner cero y sin pasos.
+- Signal Interpreter público tuvo otro run `40923649526` en curso a las 17:41Z con runner real `1000046988` y pasos ejecutándose, además del run exitoso `40922616949` a las 17:35:17Z.
+
+Esta frescura mantiene alta la probabilidad de un gate de Actions privado, pero no confirma billing. Los IDs, evidencia comparativa, fuentes oficiales y pasos del propietario constan en [DIAGNOSTICO-BLOQUEO-ACTIONS-BILLING-2026-10-29.md](evidencias/DIAGNOSTICO-BLOQUEO-ACTIONS-BILLING-2026-10-29.md).
+
 ### 20.5 Límites y estado de la causa
 
 **Estado: ALTA PROBABILIDAD, NO CONFIRMADA DIRECTAMENTE.** Falta el texto de la anotación propia de SeryMente y el estado real de Billing & Licensing. No se modificó facturación, presupuesto, settings de Actions, código, workflows, repositorios, Vercel, secretos, base de datos ni despliegues. La siguiente acción útil requiere revisión del propietario de facturación o acceso de soporte al diagnóstico interno; repetir los mismos runs no aportará evidencia diferenciadora.
