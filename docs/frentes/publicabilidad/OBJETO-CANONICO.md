@@ -1,4 +1,4 @@
-<!-- PUBLICABILIDAD_VERSION=v0.1; PUBLICABILIDAD_SEAL=PUBLICABILIDAD-v0.1 -->
+<!-- PUBLICABILIDAD_VERSION=v0.2; PUBLICABILIDAD_SEAL=PUBLICABILIDAD-v0.2 -->
 # Objeto Canónico de Persistencia · Publicabilidad
 
 ## 1. Control e identidad
@@ -6,9 +6,9 @@
 - **Frente:** Publicabilidad.
 - **Repositorio propietario:** SeryMente/khora; el término «Cora» del enunciado se conserva en el original y se normaliza operativamente a Khora conforme al canon de Metodología.
 - **Ruta del OCP:** docs/frentes/publicabilidad/OBJETO-CANONICO.md.
-- **Versión documental:** v0.1.
-- **Sello:** PUBLICABILIDAD-v0.1.
-- **Estado:** INICIADO; auditoría inicial documentada, decisión arquitectónica y pruebas operativas pendientes.
+- **Versión documental:** v0.2 · objeto provisional de investigación.
+- **Sello:** PUBLICABILIDAD-v0.2.
+- **Estado:** PROVISIONAL-v0.2; hallazgos iniciales y matriz situacional preliminar documentados; secuencias por escenario pendientes de validar. El frente tiene alcance de investigación y documentación, no de despliegue productivo.
 - **Rama en la que se preparó esta entrega:** publicabilidad/inauguracion-20261028. No está integrada en main.
 - **Folio de este evento:** SES-20261028-PR8V6M2Q. Es un folio de evento/operación, no un identificador nativo de conversación.
 - **Titularidad operativa:** sin titular exclusivo asignado en CONTROL-RESPONSABILIDAD.json. La instrucción inaugura el frente, pero no se ha registrado una transferencia de responsabilidad exclusiva a esta instancia.
@@ -123,7 +123,7 @@ Hallazgos específicos:
 |---|---|---|---|
 | Integración Git nativa de Vercel | Sí | Preview automática por rama/PR y producción al publicar en la rama productiva configurada | Revisar rama productiva, protección, cuotas y duplicación con Actions |
 | GitHub Actions + Vercel CLI alojado | Sí | CI/release con tests, registro de deployment y verificación exacta del SHA | Depende de secretos y del estado de Actions; hoy la producción es antigua y las últimas ejecuciones fallan |
-| Vercel MCP desde ChatGPT | Sí | Orden directa de preview/prod desde una sesión conectada, inspección de estado y despliegues por fuente Git | Disponibilidad de escritura varía según plan/conector; requiere autenticación, alcance correcto, límites y guardas explícitas |
+| Vercel MCP desde ChatGPT con escritura habilitada | Sí | Inspección y preview; producción solo si lo permite el release aprobado | OpenAI documenta MCP completo con escritura para Business/Enterprise/Edu; Pro se limita a lectura/obtención. Free no está acreditado para escritura. |
 | Dashboard de Vercel con rama/SHA Git | Sí | Reintento/manual de un commit exacto bajo revisión humana | No sustituye una compuerta automatizada y puede ocultar la causa de una tubería rota |
 | Deploy Hook | Sí | Trigger limitado de una rama desde otro sistema | URL funciona como secreto portador; quien la tenga puede dispararla; no es por sí sola un control de release |
 | API/SDK con una orquestación propia | Sí | Futuro mecanismo unificado que comprueba precondiciones, registra evidencias y verifica despliegue | Mayor coste de implementación/seguridad; token y permisos mínimos; no construir hasta conocer la causa actual |
@@ -170,9 +170,45 @@ El frente no se considera terminado hasta que:
 ## 12. Crónica y persistencia
 
 - Instrucción fundacional literal: originales/INSTRUCCION-FUNDACIONAL-2026-10-28.txt.
-- Investigación: evidencias/INVESTIGACION-INICIAL-2026-10-28.md.
+- Investigación y fuentes oficiales: evidencias/INVESTIGACION-INICIAL-2026-10-28.md.
+- Matriz preliminar de escenarios y secuencias: evidencias/MATRIZ-PRELIMINAR-ESCENARIOS-PUBLICACION-v0.1.md.
 - Evento de inicialización: cronica/PUBLICABILIDAD-INSTANCIACION-01.md.
 - Control actual: CONTROL-RESPONSABILIDAD.json.
 - Prompts para futuras instancias: prompts/ASISTENTE.md y prompts/CONSTRUCTOR.md.
 
 Al cerrar cada ciclo, actualizar el OCP y su crónica, enlazar los originales y la evidencia, indicar la referencia normativa realmente adquirida y releer los archivos modificados. No se ha efectuado ningún despliegue productivo ni se han cambiado secretos/configuración de Vercel en este ciclo.
+
+
+## 13. Criterio obligatorio de eficiencia situacional
+
+La investigación debe descubrir y documentar, no suponer, la secuencia más eficiente para cada escenario material. La unidad de análisis combina las capacidades reales de la plataforma, permisos, estado de GitHub/Vercel, objetivo (preview/producción), salud de los workflows, disponibilidad de logs y presencia o ausencia de RDC.
+
+Orden de evaluación:
+1. Cumplir contrato, autorización, permisos y seguridad.
+2. Preservar calidad y trazabilidad SHA → deployment → URL → prueba.
+3. Evitar publicaciones duplicadas, efectos repetidos y carreras.
+4. Minimizar trabajo manual, latencia, reintentos, cuotas y dependencias locales.
+5. Conservar punto de parada, recuperación y éxito observable.
+
+No considerar más eficiente una secuencia que omite migraciones, pruebas, provenance o verificación. Medir pasos, transiciones, efectos, tiempos, reintentos y consumo cuando sea posible; de lo contrario, marcar «no medido».
+
+## 14. Cobertura objetivo del PSP v1.0
+
+El PSP debe cubrir los escenarios de la matriz preliminar: MCP con escritura; MCP solo lectura; ChatGPT Free sin escritura MCP acreditada; MCP ausente/permiso/OAuth; timeout ambiguo; build o cuota; Actions sano/fallando; Git con/sin preview; ausencia de escritura Git remota; RDC/CLI contingente; deployment READY con acceso público no probado; rollback; y diferencia entre cambios locales, branch remoto y main.
+
+La cobertura no se afirmará como universal. Debe agrupar combinaciones con igual procedimiento y especificar precondiciones, pasos, fallback, decisiones de continuar/reintentar/cambiar/detenerse, controles de seguridad/coste/idempotencia, éxito observable y evidencia persistida.
+
+## 15. Hechos que cambian la elección de vía
+
+- OpenAI no acredita escritura MCP para ChatGPT Free; comprobar la sesión real y cambiar de ruta si no hay escritura, sin repetir intentos.
+- Pro queda documentado como custom MCP de lectura/obtención; Business/Enterprise/Edu dispone de MCP completo sujeto a permisos del workspace.
+- Vercel Hobby está limitado a uso personal/no comercial; el uso real de Khora no se ha clasificado y Usage no está verificado.
+- Actions, CI y UI fallan rápidamente según los runs observados; la causa sigue no determinada. No usar workflow_dispatch a ciegas.
+- Al 2026-10-29T02:15:30Z, main es 4bd68f7bf72ddcd068713eb704b37339d5c25a9f; producción observada es b528660e16552633d232a2397cbe42441a03438c, delta 97 commits. No publicar el HEAD solo porque sea más reciente.
+- RDC no es el primer fallback ante MCP fallido. Clasificar si el problema es de plan, permiso, timeout, build o cuota, y verificar la conexión RDC antes de una acción local.
+
+## 16. Alcance provisional y condición para v1.0
+
+El OCP v0.2 sigue siendo provisional. El PSP v1.0 requiere secuencia para la contingencia «ChatGPT Free → escritura MCP no disponible → herramientas Git remotas no disponibles → RDC/CLI», con bloqueos y comprobación; runbook de CLI cotejado con la migración/runtime/provenance/smoke; diagnóstico de Actions o fuente alternativa de logs; un solo publicador productivo; y ensayos no productivos cuando estén autorizados.
+
+Cada paso debe distinguirse como documentado, observado, probado o pendiente. Escribir una secuencia no equivale a haberla ejecutado. Publicabilidad sigue siendo de investigación y documentación.
