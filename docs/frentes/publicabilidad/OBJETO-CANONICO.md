@@ -1,4 +1,4 @@
-<!-- PUBLICABILIDAD_VERSION=v0.5; PUBLICABILIDAD_SEAL=PUBLICABILIDAD-v0.5 -->
+<!-- PUBLICABILIDAD_VERSION=v0.6; PUBLICABILIDAD_SEAL=PUBLICABILIDAD-v0.6 -->
 # Objeto Canónico de Persistencia · Publicabilidad
 
 ## 1. Control e identidad
@@ -6,9 +6,9 @@
 - **Frente:** Publicabilidad.
 - **Repositorio propietario:** SeryMente/khora; el término «Cora» del enunciado se conserva en el original y se normaliza operativamente a Khora conforme al canon de Metodología.
 - **Ruta del OCP:** docs/frentes/publicabilidad/OBJETO-CANONICO.md.
-- **Versión documental:** v0.5 · objeto provisional de investigación.
-- **Sello:** PUBLICABILIDAD-v0.5.
-- **Estado:** PROVISIONAL-v0.5; el alcance transversal permanece, pero la prioridad inmediata pasa a P0: diseñar y validar un método de publicación para KHORA desde ChatGPT Free sin terminal local. Se ha documentado que el flujo enteramente nativo de escritura no está acreditado para Free; se prioriza el puente GitHub web + Preview de Vercel y el release cloud tras reparar Actions y unificar publicadores/migraciones. Producción sigue bloqueada.
+- **Versión documental:** v0.6 · objeto provisional de investigación.
+- **Sello:** PUBLICABILIDAD-v0.6.
+- **Estado:** PROVISIONAL-v0.6; la prioridad P0 sigue siendo un método sólido ChatGPT Free → GitHub Web → Vercel sin terminal local. El diagnóstico transversal elevó la hipótesis de gate de facturación/uso de Actions para repositorios privados a alta probabilidad: KHORA, Metodología y GDP fallan antes de pasos, mientras Signal Interpreter público ejecutó y pasó en la misma ventana. La causa exacta sigue pendiente de confirmar en las anotaciones/billing del propietario. Producción sigue bloqueada.
 - **Rama en la que se preparó esta entrega:** publicabilidad/inauguracion-20261028. No está integrada en main.
 - **Folio de este evento:** SES-20261028-PR8V6M2Q. Es un folio de evento/operación, no un identificador nativo de conversación.
 - **Titularidad operativa:** sin titular exclusivo asignado en CONTROL-RESPONSABILIDAD.json. La instrucción inaugura el frente, pero no se ha registrado una transferencia de responsabilidad exclusiva a esta instancia.
@@ -175,6 +175,8 @@ El frente no se considera terminado hasta que:
 - Investigación documental del ciclo 04: evidencias/INVESTIGACION-CICLO-04-2026-10-29.md.
 - Diagnóstico de viabilidad ChatGPT Free → Vercel (prioridad P0): evidencias/DIAGNOSTICO-VIABILIDAD-CHATGPT-FREE-VERCEL-2026-10-29.md.
 - Crónica del ciclo 05 — prioridad ChatGPT Free → Vercel: cronica/CICLO-05-CHATGPT-FREE-VERCEL.md.
+- Diagnóstico transversal de bloqueo de Actions por probable billing/uso privado: evidencias/DIAGNOSTICO-BLOQUEO-ACTIONS-BILLING-2026-10-29.md.
+- Crónica del ciclo 06 — diagnóstico transversal de Actions: cronica/CICLO-06-DIAGNOSTICO-BILLING-ACTIONS.md.
 - Mapa preliminar de dependencias y propagación: MAPA-DE-DEPENDENCIAS-Y-PROPAGACION-v0.1.md.
 - Matriz de escenarios de propagación transversal G01–G12: evidencias/MATRIZ-ESCENARIOS-PROPAGACION-TRANSVERSAL-v0.1.md.
 - Matriz preliminar de escenarios y secuencias: evidencias/MATRIZ-PRELIMINAR-ESCENARIOS-PUBLICACION-v0.2.md.
@@ -369,3 +371,51 @@ Los cambios de configuración de Vercel, workflows y reglas de GitHub requieren 
 P0.1 recuperar evidencia/diagnóstico de Actions con los IDs de los cinco workflows afectados, sin reruns a ciegas. P0.2 confirmar el diseño de publicador único. P0.3 preparar el cambio de configuración que elimina las publicaciones/migraciones duplicadas. P0.4 autorizar y probar una transferencia manual por GitHub Web a una rama inocua y su Preview, sin tocar `main`. P0.5 solo después de superar las compuertas anteriores evaluar un release productivo autorizado.
 
 **Estado:** diseño propuesto y documentado; flujo completo de producción no probado. No se usó RDC, no se creó un deployment nuevo y no se cambió `main`, secretos ni settings de Vercel.
+
+
+## 20. Diagnóstico transversal del bloqueo de Actions · ciclo 06 · 2026-10-29
+
+### 20.1 Hallazgo decisivo
+
+Se contrastaron los jobs recientes de KHORA, Metodología y GDP (repositorios privados), junto con un workflow de Signal Interpreter (repositorio público de la misma organización). Los tres repositorios privados fallan antes de ejecutar cualquier step: `runner_id=0`, `runner_name` vacío, `steps=[]`, duración de aproximadamente 1–3 segundos y log `BlobNotFound`. El workflow público de Signal Interpreter `40922616949` ejecutó pasos reales con runner `1000046885` y terminó SUCCESS el 2026-10-29T17:35:17Z.
+
+Este control cruzado cambia el diagnóstico diferencial: **alta probabilidad de un bloqueo de facturación/uso/entitlement que afecta Actions en repositorios privados**, no de un error de código/YAML de KHORA ni de una caída general de runners. GitHub documenta que una autorización de pago fallida puede bloquear Actions aun en cuentas Free y que los minutos de repositorios privados pueden bloquearse al excederse la cuota incluida si falta un método válido. La causa exacta en SeryMente sigue sin confirmarse hasta conocer el contenido de las anotaciones y verificar el panel de facturación.
+
+### 20.2 Jobs y evidencia observada
+
+- KHORA, run `40913146359`, jobs `123586201893`, `123586202374`, `123586202444`, SHA `7666a24e535f734f6e395bbe210aa3da5806b47f`: tres jobs fallidos en 2–3 segundos, runner cero/vacío y sin pasos.
+- Metodología, run `40903838336`, job `123553074772`, SHA `61f2814db07654c3576b40559411ffdca0966136`: fallo pre-steps en ~1 segundo.
+- GDP, run `40876634258`, job `123457013462`, SHA `b1d74bc63b3c0b231324459114786be0ba42feb2`: fallo pre-steps en ~2 segundos.
+- Los intentos de recuperar logs de los tres repositorios devolvieron `BlobNotFound`.
+- La API de check runs registra `annotations_count=2` para cada uno de esos jobs. El conector disponible no expone los cuerpos de las anotaciones, por lo que no se transcribe como hecho de SeryMente el mensaje de billing observado en otros repositorios.
+- Signal Interpreter, repo público, run `40922616949`, SHA `99223451ff5b815bc4ebea67fd8f45bf94171941`: runner real, pasos reales y SUCCESS en la misma ventana aproximada.
+
+Fuentes:
+- [KHORA CI](https://github.com/SeryMente/khora/actions/runs/40913146359)
+- [Metodología Actions](https://github.com/SeryMente/metodologia/actions/runs/40903838336)
+- [GDP Actions](https://github.com/SeryMente/GDP/actions/runs/40876634258)
+- [Signal Interpreter — control público positivo](https://github.com/SeryMente/signal-interpreter/actions/runs/40922616949)
+- [GitHub: desbloquear una cuenta bloqueada](https://docs.github.com/en/billing/how-tos/troubleshooting/locked-account)
+- [GitHub Actions: facturación y uso](https://docs.github.com/en/billing/concepts/product-billing/github-actions)
+- [Discusión pública #210692: misma firma y anotación de billing](https://github.com/orgs/community/discussions/210692)
+- [Discusión pública #208287: bloqueo de billing confirmado como causa](https://github.com/orgs/community/discussions/208287)
+
+### 20.3 Uso autorizado de RDC y límite de reproducción
+
+RDC se utilizó únicamente para investigar el fallo de GitHub Actions en PC-14. En las rutas comunes de proyecto/Escritorio consultadas no había clon de KHORA; `git` no estaba disponible y `gh` no estaba instalado. Node.js `v24.22.2` sí estaba disponible. No se instalaron herramientas ni se clonó el repo: los jobs remotos no ejecutan un step localizable y un test manual del código no reproduciría un gate de billing/entitlement del servicio de GitHub.
+
+Conclusión RDC: no existe una reproducción local adecuada del fallo observado. No continuar instalando herramientas o cambiando código hasta confirmar la condición de la cuenta. RDC queda autorizado para futuras reproducciones concretas de fallos GitHub/CI cuando haya comando/step reproducible; cualquier otro uso necesita aviso y autorización explícita.
+
+### 20.4 Próximo paso de resolución — propietario de facturación
+
+1. Revisar en GitHub **Organization SeryMente → Settings → Billing & Licensing → Plans and usage**: cuota de Actions de repositorios privados, consumo, spending limit/budget y bloqueos.
+2. Revisar `Payment information` para la organización; si no aparece el problema, revisar la cuenta personal que mantiene el pago/entitlement.
+3. No elevar un presupuesto ni aceptar cargos sin una decisión explícita del operador.
+4. Si existe autorización fallida/bloqueo, resolverlo por el flujo oficial de GitHub y esperar a que el estado se actualice.
+5. Si billing/usage no muestra problema, abrir ticket a GitHub Support con los run/job IDs anteriores y solicitar el contenido de las anotaciones, ya que la integración no puede leerlo.
+6. Tras confirmarse la resolución, observar una ejecución de rama no productiva ya necesaria o realizar una sola prueba autorizada; verificar que `runner_id>0`, haya `Set up job`, pasos y logs antes de retomar el pipeline.
+7. No usar `workflow_dispatch` para producción, no fusionar esta rama a `main` y no intentar eludir el gate mediante Vercel MCP/RDC/CLI.
+
+### 20.5 Límites y estado de la causa
+
+**Estado: ALTA PROBABILIDAD, NO CONFIRMADA DIRECTAMENTE.** Falta el texto de la anotación propia de SeryMente y el estado real de Billing & Licensing. No se modificó facturación, presupuesto, settings de Actions, código, workflows, repositorios, Vercel, secretos, base de datos ni despliegues. La siguiente acción útil requiere revisión del propietario de facturación o acceso de soporte al diagnóstico interno; repetir los mismos runs no aportará evidencia diferenciadora.
