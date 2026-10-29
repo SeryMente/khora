@@ -1,4 +1,4 @@
-<!-- PUBLICABILIDAD_VERSION=v0.8; PUBLICABILIDAD_SEAL=PUBLICABILIDAD-v0.8 -->
+<!-- PUBLICABILIDAD_VERSION=v0.9; PUBLICABILIDAD_SEAL=PUBLICABILIDAD-v0.9 -->
 # Objeto Canónico de Persistencia · Publicabilidad
 
 ## 1. Control e identidad
@@ -6,13 +6,13 @@
 - **Frente:** Publicabilidad.
 - **Repositorio propietario:** SeryMente/khora; el término «Cora» del enunciado se conserva en el original y se normaliza operativamente a Khora conforme al canon de Metodología.
 - **Ruta del OCP:** docs/frentes/publicabilidad/OBJETO-CANONICO.md.
-- **Versión documental:** v0.8 · objeto provisional de investigación.
-- **Sello:** PUBLICABILIDAD-v0.8.
-- **Estado:** PROVISIONAL-v0.8; prioridad P0: método sólido ChatGPT Free → GitHub Web → Vercel sin terminal local. La revalidación de Actions en 2026-10-29 mantiene alta probabilidad de un gate de uso/billing de runners privados, sin confirmación del panel ni del cuerpo de anotaciones. La sesión RDC activa es PC-4; se restauró, pero no se localizó un checkout íntegro ni autenticación GitHub utilizable en la terminal. CI local NO EJECUTADA. Producción sigue bloqueada.
+- **Versión documental:** v0.9 · objeto provisional de investigación.
+- **Sello:** PUBLICABILIDAD-v0.9.
+- **Estado:** PROVISIONAL-v0.9; prioridad P0: método sólido ChatGPT Free → GitHub Web → Vercel sin terminal local. El patrón de Actions privadas sigue sugiriendo un gate de uso/billing no confirmado. En PC-4 se restauró la sesión y se comprobó la autenticación GitHub; se obtuvo un checkout íntegro de main en SHA `42ca6e664a501f4882a187fc81d01fb99845320f`. `npm ci`, typecheck, UI Review y contrato de navegación pasaron como evidencia auxiliar bajo Node 24/npm 11; `test:unit` no se ejecutó porque el control de ejecución rechazó la llamada antes de iniciar. No es CI completa. Producción sigue bloqueada.
 - **Rama en la que se preparó esta entrega:** publicabilidad/inauguracion-20261028. No está integrada en main.
 - **Folio de este evento:** SES-20261028-PR8V6M2Q. Es un folio de evento/operación, no un identificador nativo de conversación.
 - **Titularidad operativa:** sin titular exclusivo asignado en CONTROL-RESPONSABILIDAD.json. La instrucción inaugura el frente, pero no se ha registrado una transferencia de responsabilidad exclusiva a esta instancia.
-- **Última referencia normativa realmente leída:** DUG v359 · NX-359m; Metacanon 1.24; GOW 2.8; blob del documento normativo b2ff2845a5a99dc4ce3cafafc4f8e43607d48145. Fuente: https://github.com/SeryMente/metodologia/blob/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html.
+- **Última referencia normativa realmente leída:** DUG v360 · NX-360m; Metacanon 1.24; GOW 2.9; blob del documento normativo `3cda9d38db1bee76ff0ca752f3ecde8719c70d41`. Fuente: https://github.com/SeryMente/metodologia/blob/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html.
 - **MCP-NORMATIVO:** DESACTIVADO; se consultó manualmente la fuente y las secciones pertinentes.
 
 ## 2. LEER PRIMERO
@@ -494,3 +494,21 @@ La documentación oficial de GitHub establece que los jobs en repositorios priva
 **Continuación:** conseguir un checkout privado exacto mediante autenticación autorizada; comprobar `git rev-parse HEAD`; reproducir `khora-web-gate` con Node 22 y después los jobs Python/Neo4j con sus dependencias. En paralelo, el propietario debe revisar el panel de billing de la organización. No aumentar presupuesto ni aceptar cargos sin decisión expresa; no modificar `main`, workflows, configuración, secretos, Vercel ni producción.
 
 **Cierre de esta revalidación:** diagnóstico remoto actualizado; preparación local parcial; CI local no ejecutada; causa raíz de Actions privada no confirmada.
+
+
+### 21.8 Reanudación de CI local en PC-4 · 2026-10-29
+
+**Metodología revalidada:** DUG v360 · NX-360m; Metacanon 1.24; GOW 2.9; blob `3cda9d38db1bee76ff0ca752f3ecde8719c70d41`, leído directamente de `SeryMente/metodologia/main`.
+
+**Autenticación y checkout comprobados.** La salida de RDC mostró que la sesión persistida de PC-4 se restauró; no se inició una sesión alternativa. Git Credential Manager quedó disponible como helper del sistema. `git ls-remote` al repositorio privado devolvió la referencia de main con código 0; `git fetch --depth 1` del SHA fijado y `git switch --detach FETCH_HEAD` terminaron con código 0. Checkout temporal: `C:\\Users\\PC 4\\AppData\\Local\\Temp\\khora-ci-main-42ca6e664a50`; HEAD verificado `42ca6e664a501f4882a187fc81d01fb99845320f`; árbol de `khora-web` con 640 archivos versionados. El estado de `khora-web/` y el diff de `package.json`/`package-lock.json` permanecen limpios.
+
+**Validación parcial.** Node.js portable v22.23.4 se descargó desde el archivo oficial y su SHA-256 coincidió con el valor publicado. Por las restricciones del control de ejecución, npm a través de ese runtime no llegó a ejecutarse. La instalación y los checks disponibles se hicieron con Node v24.22.2/npm v11.19.1, por lo que son auxiliares, no equivalentes al workflow que fija Node 22:
+- `npm ci`: exit 0; instaló 576 paquetes y auditó 577. Reportó 14 vulnerabilidades (4 moderadas, 9 altas, 1 crítica) y listó cinco scripts de instalación sin entrada `allowScripts`. No se ejecutó ninguna corrección de auditoría ni se modificó el manifiesto o lockfile.
+- `npm run typecheck`: exit 0.
+- `npm run ui-review:check`: exit 0.
+- `npm run ui:contract`: exit 0.
+- `npm run test:unit`: la invocación fue rechazada antes de iniciar por el control de ejecución de la plataforma; no hubo proceso ni exit code. No se presenta como fallo del código ni se intentó eludir el bloqueo con otra invocación equivalente.
+
+**No completado.** El gate web sigue incompleto por `test:unit`; tampoco se completaron `api-tests` o `calidad`, que requieren Python 3.11 y, para calidad integral, Docker Compose/Neo4j. No se ejecutó build, E2E, migración ni deployment.
+
+La autenticación y el checkout privado ya están resueltos; no deben repetirse ni solicitarse como paso pendiente. La siguiente tarea es completar la ejecución de pruebas permitida bajo un runtime fiel y registrar las limitaciones de ejecución. La causa raíz del bloqueo de runners hospedados continúa no confirmada en billing/anotaciones. No se modificó `main`, workflows, configuración de Actions, secretos, Vercel ni producción. Evidencia detallada: [preflight PC-4](evidencias/CI-LOCAL-PREFLIGHT-PC4-2026-10-29.md).
