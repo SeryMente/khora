@@ -2,7 +2,7 @@
 
 **Frente:** Publicabilidad · `SeryMente/khora`  
 **Entorno RDC:** PC-4 · Desktop Commander 0.3.1 · sesión persistida restaurada a las 14:50:44 hora local según la salida del operador.  
-**Estado:** PREPARACIÓN PARCIAL; CI local NO EJECUTADA.  
+**Estado actualizado al cierre:** CI local parcial en PC-4. Checkout autenticado íntegro en SHA `42ca6e664a501f4882a187fc81d01fb99845320f`; `npm ci`, typecheck, UI Review y contrato de navegación completados con Node 24/npm 11 como evidencia auxiliar. `test:unit` no se ejecutó porque la invocación fue bloqueada antes de iniciar por el control de ejecución. El gate completo sigue pendiente.  
 **Fuente normativa comprobada:** `SeryMente/metodologia/main`, DUG v359 · NX-359m, Metacanon 1.24, GOW 2.8; blob `b2ff2845a5a99dc4ce3cafafc4f8e43607d48145`.
 
 ## 1. Commit y workflow de referencia
@@ -68,3 +68,45 @@ No se modificaron `main`, workflows, configuración de Actions, facturación, se
 6. Mantener producción bloqueada hasta que exista una ruta reproducible, la causa del gate remoto esté resuelta y las compuertas de publicación estén verificadas.
 
 **Cierre:** investigación y preflight en PC-4 revalidados; el checkout local no está disponible y no se ejecutó CI. La hipótesis del gate de Actions privado conserva alta probabilidad, pero permanece sin confirmación directa.
+
+
+## 7. Continuación verificada en PC-4 · 2026-10-29
+
+### 7.1 Autenticación y checkout
+
+La sesión RDC persistida de PC-4 se restauró (Device ID `89864f62-e921-4353-96dc-3a471e50920d`). No se inició una sesión sustituta. Git Credential Manager está configurado como helper en la configuración del sistema de Git. La consulta autenticada de solo lectura `git ls-remote https://github.com/SeryMente/khora.git refs/heads/main` devolvió el SHA esperado y terminó con código 0.
+
+Se creó un checkout temporal con `git init`, remote `origin`, `git fetch --depth 1 origin 42ca6e664a501f4882a187fc81d01fb99845320f` (código 0) y `git switch --detach FETCH_HEAD` (código 0).
+
+- Checkout: `C:\\Users\\PC 4\\AppData\\Local\\Temp\\khora-ci-main-42ca6e664a50`
+- HEAD: `42ca6e664a501f4882a187fc81d01fb99845320f`
+- Archivos versionados en `khora-web/`: 640.
+- `git status --short -- khora-web`: sin cambios.
+- `git diff --exit-code HEAD -- khora-web/package.json khora-web/package-lock.json`: código 0.
+- El directorio raíz temporal contiene artefactos portables de Node descargados para comparar runtimes; no están bajo `khora-web/` ni se añadieron al repositorio remoto.
+
+### 7.2 Runtime y verificación del paquete
+
+El workflow de `khora-web-gate` fija Node.js 22. Se descargó el ZIP oficial portable Node.js v22.23.4 x64 desde `https://nodejs.org/dist/v22.23.4/node-v22.23.4-win-x64.zip`. Su SHA-256 real fue `cbc74b5e0982c9dbb41525fd8fb5dcd32fbee237863f7829072f4639a1ce5f20`, idéntico al valor de `SHASUMS256.txt` del mismo origen; `node.exe --version` respondió `v22.23.4`.
+
+Sin embargo, la ejecución de npm mediante el runtime portable fue bloqueada por el control de ejecución de la plataforma antes de iniciar. Por ello la instalación y los checks siguientes se ejecutaron como señal auxiliar con el Node del sistema `v24.22.2` y npm `11.19.1`; no equivalen a la ejecución exacta de GitHub Actions con Node 22.
+
+### 7.3 Resultados locales
+
+| Comando | Resultado | Calificación |
+|---|---|---|
+| `npm ci` | Código 0; instaló 576 paquetes y auditó 577 | Éxito auxiliar con Node 24/npm 11. |
+| `npm run typecheck` | Código 0 | Éxito auxiliar. |
+| `npm run ui-review:check` | Código 0; UI Review íntegro | Éxito auxiliar. |
+| `npm run ui:contract` | Código 0; contrato de navegación íntegro | Éxito auxiliar. |
+| `npm run test:unit` | El control de ejecución rechazó la llamada antes de crear un proceso; no hubo exit code | NO EJECUTADO; no es un test fallido. |
+
+La salida de `npm ci` informó 14 vulnerabilidades del árbol instalado: 4 moderadas, 9 altas y 1 crítica. No se ejecutó `npm audit fix`, no se actualizaron dependencias ni se modificaron `package.json` o `package-lock.json`. npm 11 también advirtió que cinco paquetes tenían scripts de instalación no cubiertos por `allowScripts` (`@google/genai@2.13.0`, `esbuild@0.28.2`, `ffmpeg-static@5.3.0`, `protobufjs@7.6.5`, `unrs-resolver@1.12.2`). Esta diferencia de npm limita la equivalencia con el workflow y no se alteró el allowlist local.
+
+### 7.4 Límites y conclusión
+
+No se ejecutó el job `test:unit`, ni se completaron los jobs `api-tests` o `calidad`; Python 3.11 y un runtime Docker/Neo4j reproducible siguen pendientes. No se ejecutó build, E2E, migración ni deployment.
+
+**Conclusión:** la autorización de Git/GCM quedó comprobada y el checkout privado íntegro se materializó. Hay cuatro resultados favorables de preparación/chequeo web, pero ninguno constituye el gate completo exacto de GitHub Actions, porque se usó Node 24/npm 11, hubo una advertencia de scripts y el runner unitario no llegó a iniciarse. La validación sigue parcial y producción permanece bloqueada.
+
+Referencia normativa releída al actualizar esta evidencia: DUG v360 · NX-360m; Metacanon 1.24; GOW 2.9; blob `3cda9d38db1bee76ff0ca752f3ecde8719c70d41` de `SeryMente/metodologia/main`.
