@@ -1,4 +1,4 @@
-<!-- PUBLICABILIDAD_VERSION=v0.6; PUBLICABILIDAD_SEAL=PUBLICABILIDAD-v0.6 -->
+<!-- PUBLICABILIDAD_VERSION=v0.7; PUBLICABILIDAD_SEAL=PUBLICABILIDAD-v0.7 -->
 # Objeto Canónico de Persistencia · Publicabilidad
 
 ## 1. Control e identidad
@@ -6,9 +6,9 @@
 - **Frente:** Publicabilidad.
 - **Repositorio propietario:** SeryMente/khora; el término «Cora» del enunciado se conserva en el original y se normaliza operativamente a Khora conforme al canon de Metodología.
 - **Ruta del OCP:** docs/frentes/publicabilidad/OBJETO-CANONICO.md.
-- **Versión documental:** v0.6 · objeto provisional de investigación.
-- **Sello:** PUBLICABILIDAD-v0.6.
-- **Estado:** PROVISIONAL-v0.6; la prioridad P0 sigue siendo un método sólido ChatGPT Free → GitHub Web → Vercel sin terminal local. El diagnóstico transversal elevó la hipótesis de gate de facturación/uso de Actions para repositorios privados a alta probabilidad: KHORA, Metodología y GDP fallan antes de pasos, mientras Signal Interpreter público ejecutó y pasó en la misma ventana. La causa exacta sigue pendiente de confirmar en las anotaciones/billing del propietario. Producción sigue bloqueada.
+- **Versión documental:** v0.7 · objeto provisional de investigación.
+- **Sello:** PUBLICABILIDAD-v0.7.
+- **Estado:** PROVISIONAL-v0.7; la prioridad P0 sigue siendo un método sólido ChatGPT Free → GitHub Web → Vercel sin terminal local. El diagnóstico transversal mantiene alta probabilidad de un gate de facturación/uso de Actions en repositorios privados, aún no confirmado en Billing & Licensing o anotaciones. Se autorizó CI local sustitutiva por RDC, pero el intento quedó en preflight: no se ejecutaron tests porque no había clon/herramientas completas y el canal RDC dejó operaciones pendientes. Producción sigue bloqueada.
 - **Rama en la que se preparó esta entrega:** publicabilidad/inauguracion-20261028. No está integrada en main.
 - **Folio de este evento:** SES-20261028-PR8V6M2Q. Es un folio de evento/operación, no un identificador nativo de conversación.
 - **Titularidad operativa:** sin titular exclusivo asignado en CONTROL-RESPONSABILIDAD.json. La instrucción inaugura el frente, pero no se ha registrado una transferencia de responsabilidad exclusiva a esta instancia.
@@ -176,6 +176,8 @@ El frente no se considera terminado hasta que:
 - Diagnóstico de viabilidad ChatGPT Free → Vercel (prioridad P0): evidencias/DIAGNOSTICO-VIABILIDAD-CHATGPT-FREE-VERCEL-2026-10-29.md.
 - Crónica del ciclo 05 — prioridad ChatGPT Free → Vercel: cronica/CICLO-05-CHATGPT-FREE-VERCEL.md.
 - Diagnóstico transversal de bloqueo de Actions por probable billing/uso privado: evidencias/DIAGNOSTICO-BLOQUEO-ACTIONS-BILLING-2026-10-29.md.
+- Preflight y transferencia parcial para CI local sustitutiva por RDC: evidencias/CI-LOCAL-PREFLIGHT-RDC-2026-10-29.md.
+- Crónica del ciclo 06 — intento de CI local sustitutiva: cronica/CICLO-06-CI-LOCAL-RDC.md.
 - Crónica del ciclo 06 — diagnóstico transversal de Actions: cronica/CICLO-06-DIAGNOSTICO-BILLING-ACTIONS.md.
 - Mapa preliminar de dependencias y propagación: MAPA-DE-DEPENDENCIAS-Y-PROPAGACION-v0.1.md.
 - Matriz de escenarios de propagación transversal G01–G12: evidencias/MATRIZ-ESCENARIOS-PROPAGACION-TRANSVERSAL-v0.1.md.
@@ -428,3 +430,41 @@ Esta frescura mantiene alta la probabilidad de un gate de Actions privado, pero 
 ### 20.6 Límites y estado de la causa
 
 **Estado: ALTA PROBABILIDAD, NO CONFIRMADA DIRECTAMENTE.** La hipótesis mejor ajustada es cuota/uso incluido o spending limit para Actions de repositorios privados, dado que el control público de Signal Interpreter sí ejecutó después; un bloqueo de cuenta por autorización fallida sigue siendo alternativa. Faltan el texto de la anotación propia de SeryMente y el estado real del billing owner/organización en Billing & Licensing. No se modificó facturación, presupuesto, settings de Actions, código, workflows, repositorios, Vercel, secretos, base de datos ni despliegues. La siguiente acción útil requiere revisión del propietario de facturación o acceso de soporte al diagnóstico interno; repetir los mismos runs no aportará evidencia diferenciadora.
+
+
+## 21. Intento de CI local sustitutiva mediante RDC · 2026-10-29
+
+### 21.1 Alcance autorizado y resultado
+
+El operador autorizó expresamente usar RDC para ejecutar localmente los checks de CI como validación sustitutiva. El objetivo es validar el código de KHORA sin terminal local para publicación y aportar una señal técnica mientras GitHub Actions falla antes de los steps. Esta autorización no convierte los resultados locales en checks verdes de GitHub ni autoriza a eludir gates de billing, modificar settings, cambiar `main` o publicar producción.
+
+**Resultado del intento: PREPARACIÓN PARCIAL; NO SE EJECUTÓ CI LOCAL.**
+
+### 21.2 Evidencia de entorno
+
+La inspección de PC-14 observó Windows x64, Node.js `v24.22.2`, `npm.cmd 11.19.1`. La llamada a `npm.ps1` fue bloqueada por la política de ejecución; no se modificó la política. Git, Docker, Python 3.11 y `gh` no estaban disponibles en PATH/rutas comunes. Tampoco se encontró un clon de `SeryMente/khora` en las rutas convencionales del Escritorio, Documentos y `source/Projects/workspace`.
+
+La conectividad comprobada hacia Node.js y el registro npm devolvió HTTP 200. Se recuperó el package-lock de `khora-web` desde la fuente autorizada, blob `987316f16dae22a60766b7354d81b34e11857960`, y se iniciaron manifests de código bajo `%LOCALAPPDATA%\Temp\khora-ci-local`. No se materializó un checkout íntegro; los manifests grandes y lecturas posteriores quedaron pendientes.
+
+### 21.3 Causa del bloqueo local de este intento
+
+RDC dejó operaciones `read_file`/`write_file` en estado `pending` y posteriormente no devolvió respuesta a `get_config`. La lista de dispositivos aún mostraba PC-14 Online, pero `Last seen` no era reciente. No se repitieron las operaciones que quedaron pendientes. No se ha demostrado que las escrituras parciales se completaran íntegramente.
+
+El flujo local no llegó a `npm ci` ni a ningún paso de test. Por ello, **no hay ningún resultado de CI local que pueda afirmarse como aprobado o fallido**. La bitácora detallada está en [CI-LOCAL-PREFLIGHT-RDC-2026-10-29.md](evidencias/CI-LOCAL-PREFLIGHT-RDC-2026-10-29.md).
+
+### 21.4 Qué puede y qué no puede sustituir la ejecución local
+
+Los checks locales pueden validar una revisión concreta del código. No reproducen la denegación de un runner hospedado por cuota/uso/billing, y no crean un check-run exitoso en GitHub. La evidencia cruzada entre los tres repositorios privados (KHORA, Metodología y GDP) y el workflow público de Signal Interpreter hace **alta la probabilidad** de un gate de uso/billing de Actions para repositorios privados, pero la causa exacta no se ha confirmado en el panel del propietario ni a partir del cuerpo de las anotaciones de GitHub.
+
+La documentación oficial de GitHub establece que los jobs en repositorios privados consumen su cuota/compute incluido y que el uso puede bloquearse una vez agotada la cuota si no hay un método de pago válido; también documenta locks por pagos o authorization holds fallidos que pueden afectar Actions incluso en Free. Fuentes: [GitHub Actions billing](https://docs.github.com/en/billing/concepts/product-billing/github-actions) y [Unlocking a locked account](https://docs.github.com/en/billing/how-tos/troubleshooting/locked-account). Esto apoya la hipótesis, no acredita el estado de facturación de SeryMente.
+
+### 21.5 Continuación segura
+
+1. Restablecer el agente remoto RDC si la sesión perdió respuesta; después obtener el resultado de operaciones pendientes antes de repetirlas.
+2. Verificar y limpiar/reconstruir el staging temporal según su estado real, sin tocar carpetas personales ni leer secretos.
+3. Preparar checkout privado exacto de `main` SHA `e463e0c6efa857f4c4229894a96fab747a8a7574`, o un candidato de rama de prueba explícito.
+4. Ejecutar `khora-web-gate` con Node 22, y los otros dos jobs con Python 3.11 y Neo4j disponible; capturar salida y exit codes por job. Node 24/npm 11 solo valdría como resultado auxiliar si no se consigue el runtime fijado.
+5. A la par, el propietario debe revisar Billing & Licensing, cuotas/budget/spending limits y anotaciones de los runs privados. No elevar budget ni aceptar cargos sin una decisión expresa.
+6. No publicar a producción hasta confirmar el gate de GitHub, un publicador único, una sola invocación de migración, la protección efectiva de `main` y la URL smoke canónica.
+
+**Estado de cierre de esta sección:** procedimiento y evidencia parcial documentados; CI local no ejecutado; RDC requiere reanudación; causa de Actions de alta probabilidad pero no confirmada; producción bloqueada.
