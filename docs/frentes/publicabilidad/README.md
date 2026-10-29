@@ -1,7 +1,7 @@
 # Publicabilidad
 
 **Objeto Canónico de Persistencia (OCP):** [OBJETO-CANONICO.md](OBJETO-CANONICO.md)  
-**Estado:** OCP v0.7; prioridad P0: método sólido ChatGPT Free → GitHub Web → Preview Vercel → release cloud. El diagnóstico favorece una restricción de cuota/budget/entitlement para Actions de repositorios privados, aún sin confirmación directa del panel o anotación. El preflight RDC fue preparación parcial: no se ejecutó ningún test y la sesión remota dejó operaciones en timeout. Producción sigue bloqueada.  
+**Estado:** OCP v0.7; prioridad P0: método sólido ChatGPT Free → GitHub Web → Preview Vercel → release cloud. El diagnóstico favorece una restricción de cuota/budget/entitlement para Actions de repositorios privados, aún sin confirmación directa del panel o anotación. El preflight RDC fue preparación parcial: no se ejecutó ningún test y la sesión remota dejó operaciones en timeout. Se autorizó reanudar RDC para ejecutar los jobs localmente como validación sustitutiva; falta restablecer el canal y preparar el entorno. Producción sigue bloqueada.  
 **Versión del frente:** PUBLICABILIDAD-v0.7  
 **Metodología consultada en ciclo 06:** Documento Único de Gobernanza (DUG) de Ser y Mente · Samantha v359 · NX-359m · Metacanon 1.24 · GOW 2.8.
 
@@ -18,11 +18,12 @@
 9. [Diagnóstico transversal billing/Actions](evidencias/DIAGNOSTICO-BLOQUEO-ACTIONS-BILLING-2026-10-29.md).
 10. [Preflight de CI local por RDC (preparación parcial; sin tests ejecutados)](evidencias/CI-LOCAL-PREFLIGHT-RDC-2026-10-29.md).
 11. [Crónica del ciclo 04 — alcance transversal](cronica/CICLO-04-ALCANCE-TRANSVERSAL.md).
-11. [Crónica del ciclo 05 — prioridad ChatGPT Free → Vercel](cronica/CICLO-05-CHATGPT-FREE-VERCEL.md).
-12. [Crónica del ciclo 06 — diagnóstico transversal de Actions](cronica/CICLO-06-DIAGNOSTICO-BILLING-ACTIONS.md).
-13. [Crónica de instanciación](cronica/PUBLICABILIDAD-INSTANCIACION-01.md).
-14. [Control de responsabilidad](CONTROL-RESPONSABILIDAD.json).
-15. [Prompt de asistencia](prompts/ASISTENTE.md) y [prompt de construcción](prompts/CONSTRUCTOR.md).
+12. [Crónica del ciclo 05 — prioridad ChatGPT Free → Vercel](cronica/CICLO-05-CHATGPT-FREE-VERCEL.md).
+13. [Crónica del ciclo 06 — diagnóstico transversal de Actions](cronica/CICLO-06-DIAGNOSTICO-BILLING-ACTIONS.md).
+14. [Crónica del ciclo 06 — intento de CI local sustitutiva por RDC](cronica/CICLO-06-CI-LOCAL-RDC.md).
+15. [Crónica de instanciación](cronica/PUBLICABILIDAD-INSTANCIACION-01.md).
+16. [Control de responsabilidad](CONTROL-RESPONSABILIDAD.json).
+17. [Prompt de asistencia](prompts/ASISTENTE.md) y [prompt de construcción](prompts/CONSTRUCTOR.md).
 
 ## Alcance de esta primera entrega
 
