@@ -15,10 +15,11 @@
 6. [Mapa de dependencias y propagación transversal v0.1](MAPA-DE-DEPENDENCIAS-Y-PROPAGACION-v0.1.md).
 7. [Matriz de escenarios de propagación transversal G01–G12](evidencias/MATRIZ-ESCENARIOS-PROPAGACION-TRANSVERSAL-v0.1.md).
 8. [Diagnóstico de viabilidad ChatGPT Free → Vercel](evidencias/DIAGNOSTICO-VIABILIDAD-CHATGPT-FREE-VERCEL-2026-10-29.md).
-8. [Crónica de instanciación](cronica/PUBLICABILIDAD-INSTANCIACION-01.md).
 9. [Crónica del ciclo 04 — alcance transversal](cronica/CICLO-04-ALCANCE-TRANSVERSAL.md).
-10. [Control de responsabilidad](CONTROL-RESPONSABILIDAD.json).
-11. [Prompt de asistencia](prompts/ASISTENTE.md) y [prompt de construcción](prompts/CONSTRUCTOR.md).
+10. [Crónica del ciclo 05 — prioridad ChatGPT Free → Vercel](cronica/CICLO-05-CHATGPT-FREE-VERCEL.md).
+11. [Crónica de instanciación](cronica/PUBLICABILIDAD-INSTANCIACION-01.md).
+12. [Control de responsabilidad](CONTROL-RESPONSABILIDAD.json).
+13. [Prompt de asistencia](prompts/ASISTENTE.md) y [prompt de construcción](prompts/CONSTRUCTOR.md).
 
 ## Alcance de esta primera entrega
 
