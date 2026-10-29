@@ -1,18 +1,19 @@
-<!-- INVENTARIO_VERSION=0.6; INVENTARIO_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- INVENTARIO_VERSION=0.7; INVENTARIO_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Inventario provisional de hallazgos · Recuperabilidad en Ingresos → Dictado → Recuperación
 
 > **ESTADO: PROVISIONAL · INVESTIGACIÓN ABIERTA · RECUPERABILIDAD PRODUCTIVA NO CERTIFICADA.** Este archivo es una materialización de evidencia dentro del OCP de Custodia; no es un OCP adicional ni una segunda fuente de estado. El núcleo vivo es [OBJETO-CANONICO.md](../OBJETO-CANONICO.md).
 
 - **Frente propietario:** CUSTODIA.
-- **Versión de este inventario:** 0.6.
+- **Versión de este inventario:** 0.7.
 - **Ciclo previo:** CUSTODIA-INV-RECUP-SES-20261028-R6K2M9Q4.
 - **Ciclo de ampliación por incidente:** CUSTODIA-INC-RECUP-SES-20261028-R6K2M9Q4-C004.
 - **Ciclo de ampliación de tareas:** CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C005.
-- **Ciclos de implementación/validación parcial:** CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C007/C008; punta actual de la rama `fix/custodia-recovery-reconcile-20261028`, commit `cbb9efd89048daf3bd9f07cc69c2e6d7209aa55d`; PR [#339](https://github.com/SeryMente/khora/pull/339) en borrador, no fusionada ni desplegada.
-- **Folio activo:** SES-20261028-R6K2M9Q4; control en generación 2.
-- **Fecha del registro:** 2026-10-28.
+- **Ciclos de implementación/validación parcial:** CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C007/C008; última punta consultada de la rama `fix/custodia-recovery-reconcile-20261028`, commit `cbb9efd89048daf3bd9f07cc69c2e6d7209aa55d`; PR [#339](https://github.com/SeryMente/khora/pull/339) abierta en borrador, no fusionada ni desplegada. En C009, la rama figura divergida respecto de `main`: 18 commits por delante y 13 por detrás después de las actualizaciones documentales de relevo.
+- **Folio de los ciclos de investigación originales:** SES-20261028-R6K2M9Q4; generaciones anteriores conservadas en el control. **Folio activo C009:** SES-20261029-C9K4M2R8; control de responsabilidad en generación 3.
+- **Fecha de creación:** 2026-10-28. **Última actualización C009:** 2026-10-29.
 - **Fuente normativa de los ciclos 3–4 (histórica):** Samantha v356 · NX-356m; Metacanon 1.22; GOW v2.6; blob c364e179e8e9b6a3d566a8e690dfa1a7cce91798.
-- **Fuente normativa vigente en C005:** [Metaprompt Canónico de Samantha](https://github.com/SeryMente/metodologia/blob/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html), main; Samantha v358 · NX-358m; Metacanon 1.23; GOW v2.7; blob `89a28e4d05f5baab9c4b86abdb9fbfc532690c75`.
+- **Fuente normativa histórica en C005:** [Metaprompt Canónico de Samantha](https://github.com/SeryMente/metodologia/blob/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html), main; Samantha v358 · NX-358m; Metacanon 1.23; GOW v2.7; blob `89a28e4d05f5baab9c4b86abdb9fbfc532690c75`.
+- **Fuente normativa revalidada en C009:** Samantha v359 · NX-359m; Metacanon 1.24; GOW 2.8; blob `b2ff2845a5a99dc4ce3cafafc4f8e43607d48145`, leído desde `SeryMente/metodologia/main` el 2026-10-29.
 - **Estado de acceso:** las fuentes del código en SeryMente/khora/main se leyeron por GitHub; no se obtuvo el catálogo autenticado de la interfaz ni una lectura de base de datos/objetos de producción.
 - **Privacidad:** no se guardan transcripciones, audio, UUID reales de sesiones, cookies, credenciales, URL privadas de objetos ni nombres/títulos reales de las capturas. Los datos locales se resumen por hora, tamaño y resultado técnico únicamente.
 
@@ -392,6 +393,8 @@ La evidencia y los criterios técnicos están en [el informe del incidente](INCI
 - **Límite productivo:** 0 unidades del catálogo autenticado cotejadas y 0 recuperaciones productivas. El dictado reportado como ausente sigue sin localizarse; su pérdida definitiva no está demostrada. La propuesta no está fusionada ni desplegada y la recuperabilidad productiva continúa sin certificación.
 
 ## 11. Registro de cambios del inventario
+
+- **v0.7 · 2026-10-29 · CUSTODIA-TRANSFERENCIA-SES-20261029-C9K4M2R8:** relevo de responsabilidad registrado en generación 3 y fuente normativa revalidada a Samantha v359, Metacanon 1.24 y GOW 2.8. La rama de corrección se confirmó divergida de `main` (18 ahead / 13 behind); PR #339 sigue en borrador. El despliegue de producción observado apunta a `main` en `b528660e16552633d232a2397cbe42441a03438c`, anterior a los cambios de CUSTODIA; la corrección no está desplegada. No se adquirió el catálogo autenticado, no se cotejaron unidades productivas y no hubo recuperaciones de producción. La investigación continúa abierta.
 
 - **v0.1 · 2026-10-28:** creación provisional de la matriz de hallazgos; separa código confirmado, auditoría local auxiliar y catálogo real pendiente. No declara recuperaciones de producción completadas.
 - **v0.2 · 2026-10-28 · CUSTODIA-INC-RECUP-SES-20261028-R6K2M9Q4-C004:** se añaden F-09 a F-12 para el conteo 40→20, la paginación de 20, el dictado no visible tras las 17:08 y el límite entre copia local y acuse remoto. Se añaden R-06 a R-08; el incidente sigue abierto, el total único del catálogo permanece no verificado y no se realizaron operaciones productivas.
