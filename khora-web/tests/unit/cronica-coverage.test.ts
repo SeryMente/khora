@@ -18,7 +18,7 @@ test('deletion reopens every item, no sticky state',()=>{
 });
 test('independent clauses do not inherit an earlier denial',()=>assert.deepEqual(flags('No fui al parque. Hoy trabajé en casa.'),[true,true,true,true]));
 test('contrast correction uses literal positive clause',()=>{
- const text='No fui ayer al parque, pero hoy trabajé en casa';const a=analyzeCronicaCoverage(text);assert.deepEqual(a.items.map(i=>i.covered),[true,true,true,true]);for(const i of a.items.slice(1))assert.equal(i.evidence,'hoy trabajé en casa');
+ const text='No fui ayer al parque, pero hoy trabajé en casa';const a=analyzeCronicaCoverage(text,{automaticDateTimeOk:true});assert.deepEqual(a.items.map(i=>i.covered),[true,true,true,true]);for(const i of a.items.slice(1))assert.equal(i.evidence,'hoy trabajé en casa');
 });
 test('literal evidence, no normalization/inferred date',()=>{
  const text='  Ayer   trabajé en casa.  ';for(const i of analyzeCronicaCoverage(text).items.slice(1)){assert.equal(i.evidence,'Ayer   trabajé en casa');assert.ok(text.includes(i.evidence!));}
