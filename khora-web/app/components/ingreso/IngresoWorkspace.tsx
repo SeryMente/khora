@@ -179,9 +179,9 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
   }, []);
 
   const snapshotItem=(x:CapturaSnapshot):RecoveryItem=>({sessionId:x.sessionId,revisionId:x.revisionId,savedAt:x.clientAt,title:x.titulo,preview:textoRecuperable(x).slice(0,160),chars:textoRecuperable(x).length,duration:x.duracionSeg,audioParts:x.audioPartes?.length||0,paired:!!x.corteAudio,throughPart:x.corteAudio?.hastaParte,local:true});
-  const localCatalog=(snapshots:CapturaSnapshot[]):RecoveryItem[]=>{
+  const localCatalog=(snapshots:CapturaSnapshot[],audios:Array<{sessionId:string;part:number}> = []):RecoveryItem[]=>{
     const groups=new Map<string,CapturaSnapshot[]>();for(const snap of snapshots){const a=groups.get(snap.sessionId)||[];a.push(snap);groups.set(snap.sessionId,a);}
-    return [...groups.values()].map(rows=>{rows.sort((a,b)=>b.clientAt-a.clientAt);return {...snapshotItem(rows[0]),localVersions:rows.map(snapshotItem)};});
+    return [...groups.values()].map(rows=>{rows.sort((a,b)=>b.clientAt-a.clientAt);const storedAudioParts=new Set(audios.filter(x=>x.sessionId===rows[0].sessionId).map(x=>x.part)).size;return {...snapshotItem(rows[0]),storedAudioParts,localVersions:rows.map(snap=>({...snapshotItem(snap),storedAudioParts}))};});
   };
   const cargarRecuperaciones=useCallback(async(more=false)=>{
     setRecoveryLoading(true);setRecoveryError("");
@@ -191,7 +191,7 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
       if(!data.owner||data.owner!==ownerRef.current)throw new Error();
       const local=await recuperarLocal(data.owner).catch(()=>{setRecoveryError("La copia local no está disponible; se muestran las capturas del servidor.");return {snapshots:[],audios:[]};});localRecoveriesRef.current=local;
       const rows:RecoveryItem[]=Array.isArray(data.items)?data.items:[];
-      const locals=localCatalog(local.snapshots);
+      const locals=localCatalog(local.snapshots,local.audios);
       setRecoveryItems(prev=>reconciliarCatalogoRecuperacion(more?[...prev,...rows]:[...locals,...rows]));
       setRecoveryCursor(data.nextCursor||null);
     }catch{setRecoveryError("No se pudieron consultar todas las capturas. No se modificó ni descartó contenido.");}
@@ -222,7 +222,7 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
         if(data.owner!==ownerRef.current)throw Error();
         const local=await recuperarLocal(ownerRef.current).catch(()=>{if(alive)setRecoveryError("La copia local no está disponible; se muestran las capturas del servidor.");return {snapshots:[],audios:[]};});if(!alive)return;
         localRecoveriesRef.current=local;
-        setRecoveryItems(reconciliarCatalogoRecuperacion(localCatalog(local.snapshots),Array.isArray(data.items)?data.items:[]));setRecoveryCursor(data.nextCursor||null);
+        setRecoveryItems(reconciliarCatalogoRecuperacion(localCatalog(local.snapshots,local.audios),Array.isArray(data.items)?data.items:[]));setRecoveryCursor(data.nextCursor||null);
       }catch{if(alive)setRecoveryError("El historial no está disponible ahora. Puedes iniciar una captura nueva; las anteriores no se han descartado. Reintenta desde Recuperar capturas.");}
     })();
     return()=>{alive=false;controller.abort();};
