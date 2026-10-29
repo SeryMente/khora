@@ -17,7 +17,7 @@
 
 ## 2. LEER PRIMERO
 
-Este frente investiga y diseña el sistema transversal de propagación y publicación de los activos de SeryMente, incluidos los repositorios y destinos externos que dependen de ellos. **Prioridad operativa vigente:** conseguir un método sólido de publicación de actualizaciones de KHORA a Vercel usando ChatGPT Free, sin terminal/RDC local. No autoriza por sí mismo a publicar producción, cambiar configuración, modificar secretos, ejecutar migraciones, alterar ramas principales, comprar servicios o activar facturación. Desktop Commander Remote queda reservado para diagnosticar/reproducir fallas de GitHub/CI cuando se identifique un caso reproducible localmente; para cualquier uso distinto debe avisarse previamente y esperarse autorización expresa.
+Este frente investiga y diseña el sistema transversal de propagación y publicación de los activos de SeryMente, incluidos los repositorios y destinos externos que dependen de ellos. **Prioridad operativa vigente:** conseguir un método sólido de publicación de actualizaciones de KHORA a Vercel usando ChatGPT Free sin terminal local en el flujo ordinario de publicación. Por autorización expresa del operador, RDC también puede usarse para ejecutar localmente los jobs de CI sobre un checkout exacto de KHORA como validación sustitutiva mientras GitHub Actions falla antes de los steps. Esa validación local no repara el gate del runner hospedado ni crea checks verdes en GitHub. No autoriza por sí misma a publicar producción, cambiar configuración, modificar secretos, ejecutar migraciones, alterar ramas principales, comprar servicios o activar facturación. Cualquier uso de RDC fuera del diagnóstico GitHub/CI y de la ejecución local de CI autorizada requiere aviso previo y autorización expresa.
 
 En cada ciclo:
 1. Releer la versión vigente de la Metodología desde main, confirmar su versión/blob y volver a comprobar el OCP y este control.
@@ -406,7 +406,7 @@ Fuentes:
 
 RDC se utilizó únicamente para investigar el fallo de GitHub Actions en PC-14. En las rutas comunes de proyecto/Escritorio consultadas no había clon de KHORA; `git` no estaba disponible y `gh` no estaba instalado. Node.js `v24.22.2` sí estaba disponible. No se instalaron herramientas ni se clonó el repo: los jobs remotos no ejecutan un step localizable y un test manual del código no reproduciría un gate de billing/entitlement del servicio de GitHub.
 
-Conclusión RDC: no existe una reproducción local adecuada del fallo observado. No continuar instalando herramientas o cambiando código hasta confirmar la condición de la cuenta. RDC queda autorizado para futuras reproducciones concretas de fallos GitHub/CI cuando haya comando/step reproducible; cualquier otro uso necesita aviso y autorización explícita.
+Conclusión sobre el gate: no existe una reproducción local adecuada de la denegación del runner hospedado, porque el fallo ocurre antes de los steps y se sospecha un gate de cuota/entitlement. Esto no impide usar la CI local autorizada para validar el código de un SHA concreto. No modificar código/workflows para eludir el gate ni cambiar billing/settings. La CI local puede ejecutarse después de restablecer RDC y materializar un checkout íntegro con herramientas compatibles; debe registrarse como evidencia local y no como check-run verde de GitHub.
 
 ### 20.4 Próximo paso de resolución — propietario de facturación
 
@@ -448,7 +448,7 @@ La conectividad comprobada hacia Node.js y el registro npm devolvió HTTP 200. S
 
 ### 21.3 Causa del bloqueo local de este intento
 
-RDC dejó operaciones `read_file`/`write_file` en estado `pending` y posteriormente no devolvió respuesta a `get_config`. La lista de dispositivos aún mostraba PC-14 Online, pero `Last seen` no era reciente. No se repitieron las operaciones que quedaron pendientes. No se ha demostrado que las escrituras parciales se completaran íntegramente.
+RDC dejó operaciones `read_file`/`write_file` en estado `pending`; posteriormente el historial remoto las marcó `failed` con `Timeout - no response from device`. `get_config` y una consulta posterior también dejaron de responder. El dispositivo figuraba Online, pero `Last seen` era antiguo. No se repitieron las operaciones. No se ha demostrado que las escrituras parciales se completaran íntegramente.
 
 El flujo local no llegó a `npm ci` ni a ningún paso de test. Por ello, **no hay ningún resultado de CI local que pueda afirmarse como aprobado o fallido**. La bitácora detallada está en [CI-LOCAL-PREFLIGHT-RDC-2026-10-29.md](evidencias/CI-LOCAL-PREFLIGHT-RDC-2026-10-29.md).
 
@@ -460,8 +460,8 @@ La documentación oficial de GitHub establece que los jobs en repositorios priva
 
 ### 21.5 Continuación segura
 
-1. Restablecer el agente remoto RDC si la sesión perdió respuesta; después obtener el resultado de operaciones pendientes antes de repetirlas.
-2. Verificar y limpiar/reconstruir el staging temporal según su estado real, sin tocar carpetas personales ni leer secretos.
+1. Restablecer el agente remoto RDC desde la terminal de PC-14 si perdió respuesta; completar la autenticación requerida. El historial ya marca varios calls como timeout, por lo que no se repetirán las operaciones originales de forma ciega.
+2. Inspeccionar el estado actual del staging temporal tras recuperar el canal; verificar archivos/tamaños y reconstruir el staging si está incompleto, sin tocar carpetas personales ni leer secretos.
 3. Preparar checkout privado exacto de `main` SHA `e463e0c6efa857f4c4229894a96fab747a8a7574`, o un candidato de rama de prueba explícito.
 4. Ejecutar `khora-web-gate` con Node 22, y los otros dos jobs con Python 3.11 y Neo4j disponible; capturar salida y exit codes por job. Node 24/npm 11 solo valdría como resultado auxiliar si no se consigue el runtime fijado.
 5. A la par, el propietario debe revisar Billing & Licensing, cuotas/budget/spending limits y anotaciones de los runs privados. No elevar budget ni aceptar cargos sin una decisión expresa.
