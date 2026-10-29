@@ -1,4 +1,4 @@
-<!-- PUBLICABILIDAD_VERSION=v0.2; PUBLICABILIDAD_SEAL=PUBLICABILIDAD-v0.2 -->
+<!-- PUBLICABILIDAD_VERSION=v0.3; PUBLICABILIDAD_SEAL=PUBLICABILIDAD-v0.3 -->
 # Objeto Canónico de Persistencia · Publicabilidad
 
 ## 1. Control e identidad
@@ -6,13 +6,13 @@
 - **Frente:** Publicabilidad.
 - **Repositorio propietario:** SeryMente/khora; el término «Cora» del enunciado se conserva en el original y se normaliza operativamente a Khora conforme al canon de Metodología.
 - **Ruta del OCP:** docs/frentes/publicabilidad/OBJETO-CANONICO.md.
-- **Versión documental:** v0.2 · objeto provisional de investigación.
-- **Sello:** PUBLICABILIDAD-v0.2.
-- **Estado:** PROVISIONAL-v0.2; hallazgos iniciales y matriz situacional preliminar documentados; secuencias por escenario pendientes de validar. El frente tiene alcance de investigación y documentación, no de despliegue productivo.
+- **Versión documental:** v0.3 · objeto provisional de investigación.
+- **Sello:** PUBLICABILIDAD-v0.3.
+- **Estado:** PROVISIONAL-v0.3; auditoría documental del ciclo 03 incorporada y matriz PSP v0.2 creada; secuencias siguen pendientes de prueba no productiva. El frente tiene alcance de investigación y documentación, no de despliegue productivo.
 - **Rama en la que se preparó esta entrega:** publicabilidad/inauguracion-20261028. No está integrada en main.
 - **Folio de este evento:** SES-20261028-PR8V6M2Q. Es un folio de evento/operación, no un identificador nativo de conversación.
 - **Titularidad operativa:** sin titular exclusivo asignado en CONTROL-RESPONSABILIDAD.json. La instrucción inaugura el frente, pero no se ha registrado una transferencia de responsabilidad exclusiva a esta instancia.
-- **Última referencia normativa realmente leída:** DUG v358 · NX-358m; Metacanon 1.23; GOW 2.7; blob del documento normativo 89a28e4d05f5baab9c4b86abdb9fbfc532690c75. Fuente: https://github.com/SeryMente/metodologia/blob/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html.
+- **Última referencia normativa realmente leída:** DUG v359 · NX-359m; Metacanon 1.24; GOW 2.8; blob del documento normativo b2ff2845a5a99dc4ce3cafafc4f8e43607d48145. Fuente: https://github.com/SeryMente/metodologia/blob/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html.
 - **MCP-NORMATIVO:** DESACTIVADO; se consultó manualmente la fuente y las secciones pertinentes.
 
 ## 2. LEER PRIMERO
@@ -74,7 +74,7 @@ Los roles son los roles de este frente, no afirmaciones de que el proveedor/mode
 
 - Es una instrucción expresa inaugurar e investigar el frente y preservar literalmente el propósito suministrado.
 - Se autoriza documentar hechos, opciones, diferencias, riesgos y un plan. No se autoriza un despliegue productivo ni una mutación de secretos/configuración.
-- La fuente DUG v358 consultada es la referencia normativa inicial; deberá refrescarse antes de cada ciclo material.
+- La fuente DUG v359 · NX-359m consultada en el ciclo 03 es la referencia normativa adquirida para este ciclo; deberá refrescarse antes de cada ciclo material.
 - La publicación debe conservar relación demostrable entre commit, artefacto, deployment ID, estado, dominio y prueba posterior.
 - La cuenta Hobby observada no se debe considerar apta para producción comercial hasta resolver la condición contractual de uso personal/no comercial.
 
@@ -171,7 +171,7 @@ El frente no se considera terminado hasta que:
 
 - Instrucción fundacional literal: originales/INSTRUCCION-FUNDACIONAL-2026-10-28.txt.
 - Investigación y fuentes oficiales: evidencias/INVESTIGACION-INICIAL-2026-10-28.md.
-- Matriz preliminar de escenarios y secuencias: evidencias/MATRIZ-PRELIMINAR-ESCENARIOS-PUBLICACION-v0.1.md.
+- Matriz preliminar de escenarios y secuencias: evidencias/MATRIZ-PRELIMINAR-ESCENARIOS-PUBLICACION-v0.2.md.
 - Evento de inicialización: cronica/PUBLICABILIDAD-INSTANCIACION-01.md.
 - Crónica del ciclo 02 y ampliación del alcance situacional: cronica/CICLO-02-PSP.md.
 - Control actual: CONTROL-RESPONSABILIDAD.json.
@@ -213,3 +213,42 @@ La cobertura no se afirmará como universal. Debe agrupar combinaciones con igua
 El OCP v0.2 sigue siendo provisional. El PSP v1.0 requiere secuencia para la contingencia «ChatGPT Free → escritura MCP no disponible → herramientas Git remotas no disponibles → RDC/CLI», con bloqueos y comprobación; runbook de CLI cotejado con la migración/runtime/provenance/smoke; diagnóstico de Actions o fuente alternativa de logs; un solo publicador productivo; y ensayos no productivos cuando estén autorizados.
 
 Cada paso debe distinguirse como documentado, observado, probado o pendiente. Escribir una secuencia no equivale a haberla ejecutado. Publicabilidad sigue siendo de investigación y documentación.
+
+## 17. Relectura de frescura · ciclo 03 · 2026-10-29
+
+Fuente normativa adquirida: Documento Único de Gobernanza (DUG) de Ser y Mente · Samantha v359; NX-359m; Metacanon 1.24; GOW 2.8; blob b2ff2845a5a99dc4ce3cafafc4f8e43607d48145. Fuente única: https://github.com/SeryMente/metodologia/blob/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html. Las referencias metodológicas de ciclos anteriores son antecedentes históricos.
+
+### Estado observado
+
+- GitHub main: e463e0c6efa857f4c4229894a96fab747a8a7574.
+- Producción Vercel consultada: dpl_H7ModaV6GTefp9qbjiUnpiHmxgFH, SHA b528660e16552633d232a2397cbe42441a03438c, estado READY, URL khora-ouns596t1-victorhugotorresmendez-8991s-projects.vercel.app, creada 2026-10-24T21:59:10.581Z.
+- La comparación de GitHub informa 102 commits de diferencia entre main y producción. El delta no significa que todos los cambios deban desplegarse.
+- Deploy to Production run 40807127395 falló en unos dos segundos; el job devolvió runner vacío y steps vacíos. CI 40807127325 y UI Quality 40807127357 mostraron jobs con el mismo patrón. Los logs consultados devolvieron BlobNotFound. La causa raíz sigue NO DETERMINADA; el patrón es compatible con un fallo anterior a los steps o de asignación/inicialización del runner, pero no demuestra causa.
+- GitHub reportó protected=false para main. Branch protection y rulesets devolvieron 403 a la integración; no puede afirmarse que no exista ninguna otra regla. El propietario debe verificar la configuración y política efectiva.
+- Vercel sigue reportando el proyecto khora-web vinculado a SeryMente/khora en Hobby. La última producción por target sigue siendo la identificada arriba. La API informa SSO con alcance all_except_custom_domains, pero no se probó de forma concluyente acceso anónimo al dominio. Usage/cuota restante tampoco se pudo consultar.
+- Los logs de build de la última producción muestran el comando configurado en Vercel incluyendo node scripts/migrate-runtime.mjs antes de next build --webpack; el workflow de GitHub también ejecuta explícitamente migrate-runtime.mjs antes de vercel build --prod. Es una posible doble invocación, no una ejecución doble demostrada en un mismo run. Varios SQL incluyen guardas IF NOT EXISTS, pero no se ejecutó prueba de idempotencia ni de concurrencia.
+- El workflow de producción hace smoke a khora-web.vercel.app, mientras .github/workflows/post-deploy-smoke.yml consulta khora-ten.vercel.app. La URL canónica del smoke no está reconciliada.
+- La documentación y herramientas Vercel MCP permiten crear deployments preview o production por fuente Git/archivos. Esto no prueba que todos los planes/clientes ChatGPT expongan escritura ni que una acción MCP preserve automáticamente migración, provenance, checks y smoke. Este ciclo usó solo herramientas Vercel de lectura.
+
+### Decisiones y compuertas derivadas
+
+1. Mantener bloqueada cualquier publicación productiva hasta disponer de evidencia diagnóstica razonable de Actions, seleccionar explícitamente el candidato, elegir una autoridad productiva, reconciliar el comando de migración, decidir una URL smoke y comprobar el acceso esperado.
+2. Pedir al propietario que revise Actions billing/usage, capacidad de hosted runners, permisos/configuración de Actions y estado del servicio en la ventana de los fallos. No ejecutar workflow_dispatch ni reintentos a ciegas.
+3. Confirmar en Settings la protección efectiva de main/rulesets; esta investigación no cambia la configuración.
+4. Determinar elegibilidad contractual de Hobby y consultar el saldo de Usage en dashboard; el plan por sí solo no prueba cuota disponible.
+5. Hacer prueba de acceso anónimo y un preview explícito por SHA solo cuando exista autorización para ese ensayo.
+6. No usar Vercel MCP como un segundo publicador de producción hasta resolver autoridad única y equivalencia de controles.
+
+### Evidencias primarias
+
+- Main: https://github.com/SeryMente/khora/commit/e463e0c6efa857f4c4229894a96fab747a8a7574
+- Deploy to Production fallido: https://github.com/SeryMente/khora/actions/runs/40807127395
+- CI fallido: https://github.com/SeryMente/khora/actions/runs/40807127325
+- UI Quality fallido: https://github.com/SeryMente/khora/actions/runs/40807127357
+- Workflow de producción: https://github.com/SeryMente/khora/blob/main/.github/workflows/deploy-production.yml
+- Workflow smoke: https://github.com/SeryMente/khora/blob/main/.github/workflows/post-deploy-smoke.yml
+- Vercel Hobby, límites y protección: https://vercel.com/docs/plans/hobby ; https://vercel.com/docs/limits ; https://vercel.com/docs/deployment-protection
+- Vercel MCP create deployment: https://vercel.com/docs/agent-resources/vercel-mcp/tools/deployments/create_deployment
+- Permisos MCP en ChatGPT: https://help.openai.com/en/articles/12584461-connecting-custom-mcp-servers-in-chatgpt
+
+Límites de la observación: no se recuperaron logs legibles de Actions, no se consultó saldo Usage, no se hizo una petición HTTP anónima concluyente, no se ejecutaron build o migraciones, no se probó preview/MCP de escritura/rollback/RDC/CLI. No hubo cambios a main, secretos, variables, settings de Vercel o deployments.
