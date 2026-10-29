@@ -1,4 +1,4 @@
-<!-- INVENTARIO_VERSION=0.2; INVENTARIO_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- INVENTARIO_VERSION=0.3; INVENTARIO_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Inventario provisional de hallazgos · Recuperabilidad en Ingresos → Dictado → Recuperación
 
 > **ESTADO: PROVISIONAL · INVESTIGACIÓN ABIERTA · RECUPERABILIDAD PRODUCTIVA NO CERTIFICADA.** Este archivo es una materialización de evidencia dentro del OCP de Custodia; no es un OCP adicional ni una segunda fuente de estado. El núcleo vivo es [OBJETO-CANONICO.md](../OBJETO-CANONICO.md).
@@ -7,9 +7,11 @@
 - **Versión de este inventario:** 0.2.
 - **Ciclo previo:** CUSTODIA-INV-RECUP-SES-20261028-R6K2M9Q4.
 - **Ciclo de ampliación por incidente:** CUSTODIA-INC-RECUP-SES-20261028-R6K2M9Q4-C004.
+- **Ciclo de ampliación de tareas:** CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C005.
 - **Folio activo:** SES-20261028-R6K2M9Q4; control en generación 2.
 - **Fecha del registro:** 2026-10-28.
-- **Fuente normativa leída:** [Metaprompt Canónico de Samantha](https://github.com/SeryMente/metodologia/blob/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html), main; Samantha v356 · NX-356m; Metacanon 1.22; Glosario Operativo del Workspace (GOW) v2.6; blob de la fuente central c364e179e8e9b6a3d566a8e690dfa1a7cce91798.
+- **Fuente normativa de los ciclos 3–4 (histórica):** Samantha v356 · NX-356m; Metacanon 1.22; GOW v2.6; blob c364e179e8e9b6a3d566a8e690dfa1a7cce91798.
+- **Fuente normativa vigente en C005:** [Metaprompt Canónico de Samantha](https://github.com/SeryMente/metodologia/blob/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html), main; Samantha v358 · NX-358m; Metacanon 1.23; GOW v2.7; blob `89a28e4d05f5baab9c4b86abdb9fbfc532690c75`.
 - **Estado de acceso:** las fuentes del código en SeryMente/khora/main se leyeron por GitHub; no se obtuvo el catálogo autenticado de la interfaz ni una lectura de base de datos/objetos de producción.
 - **Privacidad:** no se guardan transcripciones, audio, UUID reales de sesiones, cookies, credenciales, URL privadas de objetos ni nombres/títulos reales de las capturas. Los datos locales se resumen por hora, tamaño y resultado técnico únicamente.
 
@@ -350,7 +352,20 @@ Se registró el relato literal y el análisis en [INCIDENTE-DICTADO-AUSENTE-Y-CO
 - **Acción pendiente de más prioridad:** recorrer todo el catálogo autenticado hasta cursor nulo, cotejar sesiones únicas y copias locales/remotas, revisar Custodia si hubiera archivo y, bajo acceso autorizado de solo lectura, cotejar los checkpoints de la ventana temporal. No copiar contenido personal o identificadores reales al repositorio.
 - **Cambios de producto:** no realizados. Las correcciones de reconciliación, semántica del contador y pruebas de reinicio requieren un ciclo posterior autorizado y validación de extremo a extremo.
 
-## 10. Registro de cambios del inventario
+## 10. Ampliación del plan de trabajo · CUSTODIA-01 / CUSTODIA-03
+
+La lista provisional de tareas queda en v0.5 y conserva tres identificadores estables:
+
+- **CUSTODIA-01 · P0:** recuperar y comprobar todas las unidades que actualmente aparecen en Recuperación, con paginación completa y reconciliación de entradas locales/remotas.
+- **CUSTODIA-03 · P0:** investigar los dictados esperados que no aparecen o parecen irrecuperables; resolver el estado del dictado reportado como ausente tras la sesión de terminal, cuantificar otros casos mediante evidencia y rescatar las unidades localizadas sin alterar sus originales.
+- **CUSTODIA-02 · P1:** revisar si la lista provisional de tareas está diseñada conforme a la metodología vigente. Se conserva su identificador histórico, pero queda detrás de las dos prioridades operativas de recuperabilidad.
+
+**CUSTODIA-03 no presupone una pérdida.** Cada caso se clasificará como localizado y recuperado, localizado pero bloqueado, archivado, duplicado, parcial/incompleto, no localizado tras revisar las fuentes declaradas, irrecuperabilidad demostrada o no determinado por falta de evidencia. El contador 40→20 no se traducirá en «20 dictados perdidos» sin reconciliar las identidades reales.
+
+La evidencia y los criterios técnicos están en [el informe del incidente](INCIDENTE-DICTADO-AUSENTE-Y-CONTEO-40-20-2026-10-28.md), los hallazgos de código y requisitos en este inventario, y el estado operativo vivo en el [OCP de Custodia](../OBJETO-CANONICO.md). No se han consultado registros productivos ni se han realizado recuperaciones como parte de esta ampliación documental.
+
+## 11. Registro de cambios del inventario
 
 - **v0.1 · 2026-10-28:** creación provisional de la matriz de hallazgos; separa código confirmado, auditoría local auxiliar y catálogo real pendiente. No declara recuperaciones de producción completadas.
 - **v0.2 · 2026-10-28 · CUSTODIA-INC-RECUP-SES-20261028-R6K2M9Q4-C004:** se añaden F-09 a F-12 para el conteo 40→20, la paginación de 20, el dictado no visible tras las 17:08 y el límite entre copia local y acuse remoto. Se añaden R-06 a R-08; el incidente sigue abierto, el total único del catálogo permanece no verificado y no se realizaron operaciones productivas.
+- **v0.3 · 2026-10-28 · CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C005:** se registra el alcance de las tres tareas: recuperar unidades visibles, investigar las capturas ausentes/no recuperables (CUSTODIA-03, P0) y revisar la estructura metodológica de la lista (CUSTODIA-02, P1). La metodología vigente se refresca a Samantha v358, Metacanon 1.23, GOW v2.7.
