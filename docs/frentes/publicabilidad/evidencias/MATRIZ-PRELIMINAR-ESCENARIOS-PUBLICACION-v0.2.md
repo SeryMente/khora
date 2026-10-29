@@ -35,7 +35,7 @@ La eficiencia se evalúa solo entre rutas elegibles, seguras y autorizadas. Prim
 
 ## Capacidades MCP de ChatGPT: distinguir servidor, cliente y plan
 
-La guía actual de OpenAI documenta MCP completo con acciones de escritura para Business y Enterprise/Edu en web; Pro puede conectar MCP personalizado con permisos de lectura/obtención. La guía no acredita MCP personalizado con escritura para Free. En el PSP, el escenario Free se clasificará como escritura MCP no disponible/no verificada hasta confirmar una capacidad distinta en la cuenta real; no gastar intentos repitiendo la conexión como si fuese un fallo transitorio.
+La capacidad del servidor Vercel MCP y la capacidad de escritura expuesta por ChatGPT son dos compuertas diferentes. La guía vigente de OpenAI documenta MCP personalizado con acciones de escritura para Business y Enterprise/Edu en web; Pro se limita a lectura/obtención según esa guía. Free no tiene escritura acreditada allí. Vercel anunció compatibilidad con ChatGPT en un contexto beta de 2025 para Pro/Plus, pero ese anuncio histórico no acredita la disponibilidad de escritura en el cliente/plano actual. Para Free o Plus hay que revisar las herramientas que realmente expone la sesión. En este ciclo se usó Vercel solo para lectura y no se probó una llamada de creación.
 
 Fuentes:
 - https://help.openai.com/en/articles/12584461-connecting-custom-mcp-servers-in-chatgpt
@@ -85,15 +85,16 @@ Fuentes:
 4. Si no se ve, confirmar mediante evidencia que no fue aceptado; un filtro parcial no basta.
 5. Reintentar una vez solo después de descartar una ejecución en curso.
 
-### S07 · GitHub Actions fallando o logs inaccesibles
-1. No usar workflow_dispatch a ciegas: los runs observados de CI/UI/deploy fallan en segundos.
-2. Recuperar el error real desde Actions/Vercel; si la herramienta no devuelve logs, registrar esa limitación y usar una fuente autorizada alternativa.
-3. Clasificar con evidencia permisos/secretos, política/límite, YAML/trigger, checkout/ref, dependencia externa o fallo de ejecución.
-4. Corregir en una rama y validar.
-5. Reprobar la misma ruta en un candidato no productivo si es posible.
-6. Solo tras éxito observable usar la ruta rutinariamente.
+### S07 · GitHub Actions falla antes de exponer runner, steps o logs
+1. No usar workflow_dispatch a ciegas: el run Deploy to Production para el SHA actual de main falló en aproximadamente dos segundos.
+2. Consultar run y job por API; registrar runner_name vacío, steps vacíos, tiempos y URL. Solicitar logs y preservar el error exacto si está disponible.
+3. Si los logs devuelven BlobNotFound y steps siguen vacíos, clasificar provisionalmente como fallo previo a steps/asignación de runner, no como causa raíz.
+4. Pedir al propietario que revise Actions billing/usage, capacidad de runners alojados, permisos/configuración de Actions y estado del servicio en la ventana del fallo. No leer ni revelar secretos.
+5. Comparar CI, UI y despliegue, además de workflows programados. Si varios workflows fallan antes de ejecutar steps, priorizar diagnóstico del entorno de ejecución antes de cambiar código de aplicación.
+6. No corregir YAML, rotar secretos o cambiar proveedor sin evidencia diferenciadora. Tras recuperar logs, clasificar la causa y ensayar la misma ruta en un candidato no productivo.
+7. Reanudar producción solo cuando los checks relevantes puedan ejecutarse y el SHA del candidato esté aprobado.
 
-Estado actual: logs/steps consultados devolvieron respuestas vacías o BlobNotFound; la causa permanece NO DETERMINADA.
+Ciclo 03: Deploy to Production 40807127395, CI 40807127325 y UI Quality 40807127357 fallaron rápidamente; sus jobs devolvieron runner vacío y steps vacíos. Los logs descargados por la integración devolvieron BlobNotFound. Causa raíz: NO DETERMINADA.
 
 ### S08 · CLI mediante RDC
 Solo si una ruta remota no cubre el objetivo, la CLI local es necesaria y la operación está autorizada.
