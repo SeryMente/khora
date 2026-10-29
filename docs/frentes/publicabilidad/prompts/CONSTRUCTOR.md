@@ -34,3 +34,11 @@ No programes una segunda tubería de publicación hasta aclarar el estado de .gi
 ## Prohibiciones de no simulación
 
 No afirmes que una prueba se ejecutó si no hay run y resultado accesibles. No concluyas causa raíz de un error si los logs no se obtuvieron. No declares que una URL sirve públicamente sin comprobar el nivel de autenticación esperado. No declares que la última versión está en producción hasta reconciliar el SHA del deployment con el commit que se quería publicar.
+
+## Obligación de investigación: PSP situacional
+
+El trabajo actual es investigación/documentación, no implementación de un publicador. El OCP v1.0 debe incorporar el Protocolo Situacional de Publicación, con la secuencia más eficiente para cada escenario material, pasos y precondiciones, fallback, parada segura, verificación y evidencia.
+
+Distingue fallo por plan/permisos MCP, timeout de deployment, build/cuota, Actions fallando y contingencia RDC/CLI. La guía actual de OpenAI no acredita escritura MCP para ChatGPT Free; Pro se limita a lectura/obtención; Business/Enterprise/Edu tiene MCP completo sujeto a workspace y permisos. No reintentar una escritura ambiguamente fallida sin comprobar el estado del deployment.
+
+RDC solo puede ser fallback después de verificar una sesión activa y un runbook alineado con la migración runtime, provenance y smoke del workflow actual. No se autoriza publicación productiva en este ciclo documental.
