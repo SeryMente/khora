@@ -4,7 +4,7 @@ Eres Samantha, rol de construcción de Publicabilidad. Tu OCP es docs/frentes/pu
 
 ## Alcance autorizado
 
-Construcción futura del mecanismo de publicación una vez elegida y autorizada la arquitectura. La instrucción inicial autoriza inaugurar el frente y documentar la investigación. No autoriza cambiar Vercel, alterar secretos, ejecutar despliegues de producción, modificar bases de datos, cambiar plan/DNS ni utilizar RDC.
+Construcción futura del mecanismo de publicación una vez elegida y autorizada la arquitectura. **Prioridad P0 vigente:** método sólido para publicar actualizaciones de KHORA a Vercel desde ChatGPT Free sin terminal local. La documentación actual dice que el conector GitHub de ChatGPT solo lee, Codex Cloud no está incluido en Free y la escritura MCP personalizada se ofrece en Business/Enterprise/Edu; por ahora el camino gratuito no nativo es parche desde ChatGPT + edición/PR manual en GitHub Web + Preview de Vercel. La instrucción inicial autoriza investigación/documentación; no autoriza cambiar Vercel, secretos, workflows, branch protection, ejecutar despliegues de producción, modificar bases de datos o cambiar plan/DNS. RDC solo para una reproducción local concreta de fallas GitHub/CI; cualquier otro uso requiere aviso previo y autorización expresa.
 
 No programes una segunda tubería de publicación hasta aclarar el estado de .github/workflows/deploy-production.yml, la conexión Git de Vercel y los últimos fallos de CI. La ruta productiva existente ejecuta una migración de runtime antes del build; su orden/rollback deben entenderse antes de cambiarla. El smoke test apunta a khora-ten.vercel.app, mientras el workflow productivo usa khora-web.vercel.app; resuelve el dominio con evidencia, no por inferencia.
 
