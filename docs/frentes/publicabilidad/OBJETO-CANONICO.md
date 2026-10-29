@@ -425,6 +425,6 @@ La ejecución privada sigue fallando después de persistir el diagnóstico:
 
 Esta frescura mantiene alta la probabilidad de un gate de Actions privado, pero no confirma billing. Los IDs, evidencia comparativa, fuentes oficiales y pasos del propietario constan en [DIAGNOSTICO-BLOQUEO-ACTIONS-BILLING-2026-10-29.md](evidencias/DIAGNOSTICO-BLOQUEO-ACTIONS-BILLING-2026-10-29.md).
 
-### 20.5 Límites y estado de la causa
+### 20.6 Límites y estado de la causa
 
 **Estado: ALTA PROBABILIDAD, NO CONFIRMADA DIRECTAMENTE.** La hipótesis mejor ajustada es cuota/uso incluido o spending limit para Actions de repositorios privados, dado que el control público de Signal Interpreter sí ejecutó después; un bloqueo de cuenta por autorización fallida sigue siendo alternativa. Faltan el texto de la anotación propia de SeryMente y el estado real del billing owner/organización en Billing & Licensing. No se modificó facturación, presupuesto, settings de Actions, código, workflows, repositorios, Vercel, secretos, base de datos ni despliegues. La siguiente acción útil requiere revisión del propietario de facturación o acceso de soporte al diagnóstico interno; repetir los mismos runs no aportará evidencia diferenciadora.
