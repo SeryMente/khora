@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.23; OBJECT_VERSION=0.5; OBJECT_SEAL=CUSTODIA-v0.5; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.23; OBJECT_VERSION=0.6; OBJECT_SEAL=CUSTODIA-v0.6; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · INVESTIGACIÓN DE RECUPERABILIDAD EN CURSO · GARANTÍAS DE PRODUCTO NO CERTIFICADAS.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.5. Metacanon: 1.23. Gobierno general verificado en este ciclo: Samantha v358 · NX-358m; GOW v2.7. Fuente central leída: blob 89a28e4d05f5baab9c4b86abdb9fbfc532690c75. Este objeto funda el frente documental transversal; no prueba que las garantías descritas ya estén implementadas ni certificadas.
+> **ESTADO · VIVO · INVESTIGACIÓN DE RECUPERABILIDAD EN CURSO · GARANTÍAS DE PRODUCTO NO CERTIFICADAS.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.6. Metacanon: 1.23. Gobierno general verificado en este ciclo: Samantha v358 · NX-358m; GOW v2.7. Fuente central leída: blob 89a28e4d05f5baab9c4b86abdb9fbfc532690c75. Este objeto funda el frente documental transversal; no prueba que las garantías descritas ya estén implementadas ni certificadas.
 
 ## 1. Control e identidad
 
@@ -12,9 +12,9 @@
 - **Único núcleo operativo:** este OBJETO-CANONICO.md.
 - **Control único de responsabilidad:** [CONTROL-RESPONSABILIDAD.json](CONTROL-RESPONSABILIDAD.json). Sesión documental asignada en generación 2, folio SES-20261028-R6K2M9Q4, alias operativo chatgpt-custodia-SES-20261028-R6K2M9Q4; el ID nativo de conversación no está expuesto y el alias no se presenta como tal.
 - **Propósito literal aprobado:** [originales/PROPOSITO-OPERADOR-2026-10-28.md](originales/PROPOSITO-OPERADOR-2026-10-28.md). La sección 4 también conserva el texto aprobado íntegro para que el propósito sea visible en el núcleo.
-- **Lista de tareas:** [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md), materialización auxiliar provisional de los pendientes; su diseño debe revisarse en CUSTODIA-02. No se declara todavía conforme a la metodología.
+- **Lista de tareas:** [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md), materialización auxiliar provisional de los pendientes; versión 0.6. La tarea CUSTODIA-02 se retiró del plan activo por instrucción del operador y su identificador no se reutiliza. La lista no queda certificada metodológicamente por esa retirada.
 - **Inventario provisional de hallazgos:** [evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md](evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md), materialización de evidencia para CUSTODIA-01; no es un segundo estado vivo.
-- **Versión y sello vigentes:** CUSTODIA-v0.5. Es la quinta versión documental del objeto; no es una versión del producto.
+- **Versión y sello vigentes:** CUSTODIA-v0.6. Es la sexta versión documental del objeto; no es una versión del producto.
 - **Relación con frentes existentes:** este frente es transversal. No sustituye ni duplica el objeto de Dictado de voz ([docs/frentes/dictado-voz/OBJETO-CANONICO.md](../../docs/frentes/dictado-voz/OBJETO-CANONICO.md)) ni su contrato de implementación ([khora-web/docs/CUSTODIA-DICTADOS.md](../../khora-web/docs/CUSTODIA-DICTADOS.md)).
 - **Visibilidad del repositorio:** la consulta inicial de GitHub devolvió public; dos consultas posteriores devolvieron private y coinciden con el README. El estado más reciente observado es private. El momento y la causa de la diferencia, así como una posible exposición pública anterior, no están verificados.
 
@@ -27,7 +27,7 @@
 5. No crear otro almacén principal, espejo, tablero ni contrato paralelo para resolver un fallo de custodia. Identificar primero los sistemas existentes, sus propietarios, sus datos y sus consumidores.
 6. No realizar cambios de producto, de seguridad, de credenciales, de proveedor ni de despliegue por el mero hecho de que el propósito los mencione.
 7. La consulta inicial de GitHub devolvió public y dos comprobaciones posteriores devolvieron private. Aunque el estado actual observado es private, no se verificaron la causa ni el periodo de la diferencia; no guardar secretos, credenciales ni datos personales reales en este repositorio mientras no se aclare la exposición histórica.
-8. El estado detallado de las tareas se mantiene provisionalmente en `LISTA-TAREAS-PROVISIONAL.md`, enlazada desde el núcleo. No es una plantilla metodológica aprobada: CUSTODIA-02 debe revisar si esta separación y sus campos son adecuados.
+8. El estado detallado de las tareas se mantiene provisionalmente en `LISTA-TAREAS-PROVISIONAL.md`, enlazada desde el núcleo. Es una materialización auxiliar y no un segundo estado vivo. La lista permanece provisional; CUSTODIA-02 fue retirada del plan activo y no se presenta su retirada como aprobación metodológica.
 9. El inventario técnico y las evidencias minimizadas de CUSTODIA-01 se enlazan en `evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md`. Este archivo clasifica evidencia y límites; el estado vivo sigue en este objeto. No copiar al repositorio datos reales de dictados, audio, UUID de sesión, cookies, credenciales ni URLs privadas.
 
 ## 3. Referencia metodológica
@@ -100,9 +100,9 @@ Custodia es el frente transversal que define, verifica y gobierna las garantías
 
 ## 8. Estado vivo
 
-**Estado del frente: ACTUALIZADO — CUSTODIA-01 EN CURSO (P0) — CUSTODIA-03 ABIERTA (P0) — CUSTODIA-02 PENDIENTE (P1) — GARANTÍAS DE PRODUCTO NO CERTIFICADAS.**
+**Estado del frente: ACTUALIZADO — CUSTODIA-01 EN CURSO (P0) — CUSTODIA-03 ABIERTA (P0) — CUSTODIA-04 ABIERTA (P0) — GARANTÍAS DE PRODUCTO NO CERTIFICADAS. CUSTODIA-02 RETIRADA DEL PLAN ACTIVO.**
 
-El detalle operativo de pendientes se mantiene provisionalmente en [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md). Ese archivo es una materialización auxiliar enlazada desde el único núcleo; su diseño es objeto de la tarea CUSTODIA-02 y no se declara definitivo ni plenamente conforme al método.
+El detalle operativo de pendientes se mantiene provisionalmente en [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md) v0.6. Ese archivo es una materialización auxiliar enlazada desde el único núcleo. La retirada de CUSTODIA-02 no certifica su diseño; sigue marcado como provisional.
 
 ### Confirmado en la fuente consultada
 
@@ -123,7 +123,7 @@ El detalle operativo de pendientes se mantiene provisionalmente en [LISTA-TAREAS
 
 La tarea prioritaria CUSTODIA-01 está **EN CURSO**. El análisis de código confirmó un defecto lógico capaz de mostrar «Sin audio» cuando el manifiesto está vacío y de limitar a cero las partes copiadas durante la recuperación remota, aunque haya partes asociadas a la sesión. Sin embargo, el catálogo autenticado real de Ingresos → Dictado → Recuperación no se pudo adquirir; las unidades reales cotejadas individualmente siguen siendo cero. No se ha ejecutado recuperación de producción ni se ha certificado la lectura de objetos remotos. Los cinco snapshots técnicos observados en una copia local son evidencia auxiliar independiente y no sustituyen el inventario del catálogo. Los hallazgos y requisitos de cierre se mantienen en [Inventario provisional de recuperabilidad](evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md).
 
-La tarea CUSTODIA-03 se incorpora ahora como prioridad P0 paralela: investigar las capturas esperadas que no aparecen o parecen irrecuperables, establecer el alcance real de las lagunas y rescatar de forma no destructiva las unidades localizadas. No se asume que todas las capturas de interés aparezcan en el catálogo visible. CUSTODIA-01 cubre las unidades actualmente listadas; CUSTODIA-03 cubre ausencias, fuentes históricas y posible pérdida; CUSTODIA-02 mantiene su identidad histórica para la revisión metodológica de la lista y queda en P1. La lista provisional está en v0.5 y sigue sin certificación metodológica.
+La tarea CUSTODIA-03 es prioridad P0: investigar las capturas esperadas que no aparecen o parecen irrecuperables, establecer el alcance real de las lagunas y rescatar de forma no destructiva las unidades localizadas. No se asume que todas las capturas de interés aparezcan en el catálogo visible. CUSTODIA-01 cubre las unidades listadas; CUSTODIA-03 cubre ausencias y fuentes históricas; CUSTODIA-04 incorpora la consolidación de la investigación, las correcciones de producto y la validación de extremo a extremo para dejar la recuperabilidad al corriente. CUSTODIA-02 fue retirada de la lista activa por el operador; su ID se conserva solo en la historia documental y no se reasigna. La lista provisional está en v0.6 y no está certificada metodológicamente.
 
 El ciclo documental siguiente registró el [incidente de dictado ausente y conteo 40→20](evidencias/INCIDENTE-DICTADO-AUSENTE-Y-CONTEO-40-20-2026-10-28.md). La revisión confirmó en código dos problemas adicionales: la hidratación inicial combina unidades locales y remotas sin aplicar la misma deduplicación de la recarga, y la insignia refleja la longitud de la lista cargada mientras el catálogo remoto pagina en bloques de 20. Estos hallazgos hacen plausible que 40→20 sea un recuento inconsistente por solapamientos; no prueban que la diferencia esté compuesta exclusivamente por duplicados ni que haya 20 unidades perdidas. El operador reporta que el último dictado visible data del 2026-10-28 a las 17:08 y que falta una captura posterior; no se obtuvo el catálogo autenticado ni el acuse remoto de checkpoint para la sesión concreta. La captura permanece sin localizar, pero la pérdida definitiva tampoco está demostrada. El catálogo total, las entradas posteriores, las posibles capturas archivadas en Custodia y la confirmación del checkpoint siguen pendientes.
 
@@ -145,7 +145,7 @@ El criterio de éxito global no es «hay un archivo» ni «la petición HTTP res
 
 ## 10. Formato de ciclo
 
-Cada ciclo futuro dejará en este núcleo, dentro de la crónica, al menos. El estado detallado de las tareas se materializa provisionalmente en [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md); esta separación se revisará como CUSTODIA-02 y no se tomará como diseño final hasta cerrar esa revisión:
+Cada ciclo futuro dejará en este núcleo, dentro de la crónica, al menos. El estado detallado de las tareas se materializa provisionalmente en [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md); se conserva como materialización auxiliar, no como estado vivo paralelo. La lista permanece provisional y CUSTODIA-02 ya no es una tarea activa de revisión metodológica:
 
 - Folio del ciclo y fecha; objetivo y autorización concreta.
 - Fuentes realmente adquiridas, rama/revisión y diferencias frente al ciclo anterior.
@@ -243,6 +243,18 @@ No se rellenan huecos con inferencias ni se da por ejecutada una prueba porque a
 
 - **Salida visible final del ciclo 5:** [originales/SALIDA-MODELO-CUSTODIA-AMPLIACION-TAREAS-2026-10-28.md](originales/SALIDA-MODELO-CUSTODIA-AMPLIACION-TAREAS-2026-10-28.md), blob `3f375859b2e51af54dd53d22f998a1301e2c34f7`, commit `d74918ad111c5c3327544f61a37abbc4a1ee05f2`. Lectura de vuelta exacta verificada.
 
+### Ciclo 6 · CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C006 · 2026-10-28
+
+- **Objetivo:** retirar CUSTODIA-02 del plan activo, añadir la tarea de completar la investigación y actualizar el sistema para que la recuperabilidad quede al corriente, y elegir la secuencia de ejecución antes de continuar.
+- **Instrucción literal del operador:** [INSTRUCCION-REORDENAMIENTO-Y-ACTUALIZACION-RECUPERABILIDAD-2026-10-28.md](originales/INSTRUCCION-REORDENAMIENTO-Y-ACTUALIZACION-RECUPERABILIDAD-2026-10-28.md), blob `f44aa5588389bdf382fd1c976a7c7e6d84252db6`, commit `51cc35c72b45fc73260a0ed202e951a64c62614d`.
+- **Secuencia decidida:** (1) CUSTODIA-03 establece una línea base no destructiva: catálogo completo paginado, reconciliación local/remota, búsqueda en Custodia y comprobaciones autorizadas de checkpoint; (2) con esa base, CUSTODIA-01 recupera/verifica cada unidad visible mientras CUSTODIA-03 continúa investigando ausencias; (3) CUSTODIA-04 consolida causas, corrige defectos demostrados y valida el producto de extremo a extremo. CUSTODIA-04 puede preparar correcciones a partir de defectos ya reproducibles, pero no se cierra sin evidencia de las dos tareas operativas y validación integrada.
+- **Lista provisional v0.6:** blob `a1ed1ee94a58796f9fe47c1d00980645d4dab580`, commit `334400187e4ff5baf9fbd8ab4ba7cec3317e826b`. Incluye CUSTODIA-01, CUSTODIA-03 y CUSTODIA-04; CUSTODIA-02 se retira como tarea activa y su ID no se reasigna.
+- **Inventario provisional v0.4:** blob `7a7260053d0df71404beaec070c734b6960c6966`, commit `87f16435e5d2a27fb6a6b3104a0552aba18deebd`.
+- **Informe de incidente v0.3:** blob `5ae953c3119d25228c8696a94ed49df2d5825b14`, commit `112aa294b4cee43784fa63801801795d1e95efe7`. El dictado referido sigue sin localizar; la pérdida definitiva no está demostrada.
+- **Salida visible conservada:** [SALIDA-MODELO-CUSTODIA-REORDENAMIENTO-Y-SECUENCIA-2026-10-28.md](originales/SALIDA-MODELO-CUSTODIA-REORDENAMIENTO-Y-SECUENCIA-2026-10-28.md), blob `e54bfe9a1133c2198b522c53a2a87eda5c040e45`, commit `bc7358b8929c2b6336fa6ffe2babaedc404fc481`.
+- **Estado factual del ciclo:** cambios documentales persistidos; no se obtuvo catálogo autenticado, no se localizaron ni recuperaron dictados de producción, no se cambió código, datos de producción, credenciales ni despliegue. Las garantías de recuperación siguen sin certificación.
+- **Siguiente paso operativo:** conseguir acceso autenticado autorizado para la línea base e iniciar CUSTODIA-03; preservar la evidencia antes de que cualquier recuperación o cambio pueda alterar los estados observados.
+
 ### Fuentes y referencias
 
 - [Gobernanza única Samantha](https://github.com/SeryMente/metodologia/blob/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html).
@@ -255,18 +267,18 @@ No se rellenan huecos con inferencias ni se da por ejecutada una prueba porque a
 
 Instrucción para una conversación futura:
 
-> Retoma el frente transversal Custodia en SeryMente/khora, rama main. Adquiere primero frentes/custodia/OBJETO-CANONICO.md, CONTROL-RESPONSABILIDAD.json, LISTA-TAREAS-PROVISIONAL.md, evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md, los originales enlazados y el Metaprompt vigente en SeryMente/metodologia/main. La lista de tareas permanece provisional v0.5. CUSTODIA-01 (P0) cubre las unidades actualmente visibles; CUSTODIA-03 (P0) investiga los dictados esperados que no aparecen o parecen irrecuperables y el alcance real de las lagunas; CUSTODIA-02 (P1) revisa la metodología de la lista. El folio operativo documental activo de este estado es SES-20261028-R6K2M9Q4, generación 2; el alias no es ID nativo de plataforma. Prioridad inmediata: CUSTODIA-01 y CUSTODIA-03, incluida la incidencia abierta en evidencias/INCIDENTE-DICTADO-AUSENTE-Y-CONTEO-40-20-2026-10-28.md. El código de main contiene un defecto de manifiesto/conteo, un límite de copia de audio por manifiesto y una discrepancia en el catálogo: la hidratación inicial mezcla local y remoto sin la misma deduplicación que la recarga, el contador indica las unidades cargadas y el catálogo remoto pagina de 20 en 20. El operador reporta que el último dictado visible data del 2026-10-28 a las 17:08, pero el catálogo autenticado completo y la fila de checkpoint de la captura ausente no se adquirieron; la captura no está localizada y no se ha demostrado su pérdida definitiva. CUSTODIA-03 debe investigar esa captura y otras ausencias sin asumir que el catálogo visible contiene todas las unidades de interés. No afirmes que todas las unidades comparten el defecto. Preserva datos y originales; no copies transcripciones, audio, cookies, credenciales, UUID reales ni URLs privadas al repositorio. No dupliques almacenes, controles, objetos ni contratos. No cambies código, datos de producción, credenciales, seguridad, despliegues ni servicios sin autorización específica. No declares recuperación garantizada sin lectura real, cotejo de contenido/procedencia e integridad y verificación de que el original permanece intacto.
+> Retoma el frente transversal Custodia en SeryMente/khora, rama main. Adquiere primero frentes/custodia/OBJETO-CANONICO.md, CONTROL-RESPONSABILIDAD.json, LISTA-TAREAS-PROVISIONAL.md, evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md, el informe del incidente, los originales enlazados y el Metaprompt vigente en SeryMente/metodologia/main. La lista provisional está en v0.6. Las tareas activas son CUSTODIA-01 (P0, recuperar y verificar las unidades visibles), CUSTODIA-03 (P0, investigar las capturas ausentes y establecer el alcance real) y CUSTODIA-04 (P0, completar la investigación, actualizar el sistema y validar la recuperabilidad de extremo a extremo). Secuencia: primero línea base no destructiva y catálogo completo; después CUSTODIA-01 y continuación de CUSTODIA-03 en paralelo; finalmente correcciones y validación de CUSTODIA-04, que depende de sus evidencias. CUSTODIA-02 fue retirada del plan activo y su identificador no se reutiliza. El folio operativo documental activo de este estado es SES-20261028-R6K2M9Q4, generación 2; el alias no es ID nativo de plataforma. Prioridad inmediata: obtener acceso autenticado autorizado, reconciliar todas las páginas remotas con las entradas locales y capturas archivadas, recuperar sin alterar originales y buscar la ventana del dictado ausente. El código de main contiene defectos lógicos conocidos en audio/manifiesto, reconciliación local/remota y semántica del contador/paginación, todavía no corregidos en este ciclo. El último dictado visible reportado data del 2026-10-28 a las 17:08; la captura posterior no está localizada y su pérdida definitiva tampoco está demostrada. Preserva datos y originales; no copies transcripciones, audio, cookies, credenciales, UUID reales ni URLs privadas al repositorio. No dupliques almacenes, controles, objetos ni contratos. No infieras resultados sin pruebas y no declares recuperabilidad garantizada sin lectura real, cotejo de contenido/procedencia e integridad y verificación de que el original permanece intacto.
 
 ## 13. Persistencia y revisión
 
-**Versión actualizada en este ciclo:** CUSTODIA-v0.5. El inventario provisional y el informe de incidente son evidencia enlazada, no un segundo estado vivo.
+**Versión actualizada en este ciclo:** CUSTODIA-v0.6. El inventario provisional y el informe de incidente son evidencia enlazada, no un segundo estado vivo.
 
 - **Núcleo único:** frentes/custodia/OBJETO-CANONICO.md.
 - **Control único:** frentes/custodia/CONTROL-RESPONSABILIDAD.json.
 - **Original aprobado:** frentes/custodia/originales/PROPOSITO-OPERADOR-2026-10-28.md.
-- **Lista auxiliar provisional de tareas:** frentes/custodia/LISTA-TAREAS-PROVISIONAL.md (v0.5, blob `05b3fe93f93274fb16f32093123a276db54fd4e1`).
-- **Inventario provisional de hallazgos:** frentes/custodia/evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md (v0.3, blob `bcacf851a6b7347c0061aa76e1c190ead899bd00`).
-- **Informe provisional del incidente de dictado ausente y conteo 40→20:** frentes/custodia/evidencias/INCIDENTE-DICTADO-AUSENTE-Y-CONTEO-40-20-2026-10-28.md (v0.2, blob `1940cc77e19216bc5dbb79884517f71c5843898f`).
+- **Lista auxiliar provisional de tareas:** frentes/custodia/LISTA-TAREAS-PROVISIONAL.md (v0.6, blob `a1ed1ee94a58796f9fe47c1d00980645d4dab580`).
+- **Inventario provisional de hallazgos:** frentes/custodia/evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md (v0.4, blob `7a7260053d0df71404beaec070c734b6960c6966`).
+- **Informe provisional del incidente de dictado ausente y conteo 40→20:** frentes/custodia/evidencias/INCIDENTE-DICTADO-AUSENTE-Y-CONTEO-40-20-2026-10-28.md (v0.3, blob `5ae953c3119d25228c8696a94ed49df2d5825b14`).
 - **Instrucción original del incidente:** frentes/custodia/originales/INSTRUCCION-INCIDENTE-DICTADO-AUSENTE-2026-10-28.md (blob ea683e89590d33d5fdf32feadc00629b0d0eae20).
 - **Instrucción original de ampliación de tareas:** frentes/custodia/originales/INSTRUCCION-AMPLIACION-TAREAS-RECUPERABILIDAD-2026-10-28.md (blob 0d4edd36ef1611334e6438fe6048b590c08fc7a2).
 - **Original de la instrucción de inventario:** frentes/custodia/originales/INSTRUCCION-INVENTARIO-RECUPERABILIDAD-INGRESOS-2026-10-28.md (blob 357f3c1cc9081a47f47dc3fa0b838e8f8eeed5a5).
