@@ -9,6 +9,8 @@
 
 La unidad de análisis es una **arista** entre la fuente canónica de un activo y un destino que debe reflejarlo. Cada fila indica lo que debe investigarse antes de construir el procedimiento definitivo. «Candidato» no significa mecanismo confirmado; «pendiente» significa que no existe evidencia suficiente. Toda secuencia debe preservar permiso, autorización, trazabilidad, observabilidad y recuperación.
 
+**Relación estratégica aportada por el operador:** el proyecto insignia Otro Gran Programa necesita KHORA/CoMind y Metodología; el repo `SeryMente/otrogranprograma` se identifica como instrumento de comunicación del programa, no como su representación técnica completa. Esta relación es una dependencia estratégica conocida; las interfaces, artefactos y mecanismos técnicos concretos están pendientes.
+
 | ID / escenario | Fuente y destino | Preflight y secuencia candidata | Evidencia de éxito | Parada / fallback |
 |---|---|---|---|---|
 | G01 · Cambio de norma/gobernanza | `SeryMente/metodologia/main` → prompts, instrucciones, contextos y plataformas de modelos identificados | Leer canon vigente y registrar SHA; identificar exactamente los destinos afectados; aplicar aprobación que corresponda; cambiar primero la fuente autorizada; luego actualizar cada espejo por su mecanismo específico y leerlo de vuelta. | Versión/SHA del canon y cada destino, contenido cotejado, destinos no propagados enumerados. | Si un destino no puede leerse o actualizarse, declarar el canon verificado y el espejo pendiente/divergente; nunca elevar un espejo a fuente normativa. No modificar la fuente normativa sin autorización explícita requerida por su propia gobernanza. |
