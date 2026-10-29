@@ -53,7 +53,7 @@ Run observado: https://github.com/SeryMente/khora/actions/runs/40900763575
 
 Los jobs `khora-web-gate`, `api-tests` y `calidad` comenzaron el 2026-10-29T15:21:44Z y terminaron entre 15:21:45Z y 15:21:46Z. Los tres devuelven `runner_id=0`, nombre de runner vacío, labels `ubuntu-latest` y `steps=[]`. La recuperación de los logs de job devolvió `BlobNotFound`.
 
-También se observan otros flujos de main fallidos en la ventana: `Jules Auto-Respond Cron` (run `40904382749`, 15:43Z), `Sync Todoist and Notion` (`40889858840`, 14:16Z), `Board Orchestrator` (`40889195532`, 14:12Z) y `Khora API Healthcheck` (`40878917996`, 13:06Z). Para estos flujos, en este ciclo solo se recuperó el resumen del run/job; no se atribuye que compartan la misma causa sin recuperar los detalles y logs correspondientes.
+También se observan otros flujos de main fallidos en la ventana: `Jules Auto-Respond Cron` (run `40904382749`, 15:43Z), `Sync Todoist and Notion` (`40889858840`, 14:16Z), `Board Orchestrator` (`40889195532`, 14:12Z) y `Khora API Healthcheck` (`40878917996`, 13:06Z). En este ciclo se recuperaron resúmenes de runs y, para algunos, un resumen de jobs; no se inspeccionó el detalle completo de jobs/logs de cada uno. No se atribuye que compartan la misma causa sin recuperar la evidencia faltante.
 
 La evidencia más reciente del CI de la rama sigue siendo compatible con fallo antes de que haya un runner/step ejecutable, pero **la causa raíz permanece NO DETERMINADA**. No prueba cuotas agotadas, falta de permisos, un incidente del servicio ni un error de YAML/código.
 
