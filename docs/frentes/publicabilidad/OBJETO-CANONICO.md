@@ -97,7 +97,7 @@ Los roles son los roles de este frente, no afirmaciones de que el proveedor/mode
 - Dominio asociado/validado en la respuesta de la API: khora-web.vercel.app.
 - La respuesta del proyecto señala SSO habilitado con alcance all_except_custom_domains, y live=false; otra consulta identifica un despliegue de producción READY con el dominio khora-web.vercel.app. La accesibilidad anónima y el estado efectivo del dominio no están demostrados y requieren una comprobación sin autenticación.
 - Último despliegue de producción leído: ID dpl_H7ModaV6GTefp9qbjiUnpiHmxgFH, READY, destino production, creado 2026-10-24T21:59:10.581Z, rama main, SHA b528660e16552633d232a2397cbe42441a03438c.
-- En la comparación de commits registrada durante la investigación, main observado estaba 81 commits por delante del SHA del despliegue productivo. Revalidar el número exacto al retomar; no interpretarlo automáticamente como que todo cambio pendiente deba publicarse.
+- **Lectura de frescura posterior:** el 2026-10-29T01:40:34Z, main se observó en 4cdedc37f32446e06d1a8bede40657b7d43cba41, 86 commits por delante del SHA productivo b528660e16552633d232a2397cbe42441a03438c. El deployment productivo leído seguía siendo dpl_H7ModaV6GTefp9qbjiUnpiHmxgFH. Revalidar la diferencia al retomar; no interpretar que todo el delta deba publicarse.
 - Consumo actual y cuota restante: NO VERIFICADOS. La herramienta disponible permitió leer plan/proyectos/despliegues, no el panel de consumo restante.
 
 ## 8. Estado vivo y conclusión de la auditoría inicial
