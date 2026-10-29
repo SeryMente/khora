@@ -35,3 +35,12 @@ No se modificó código de producto ni se alteraron capturas, tablas o objetos d
 ## Siguiente paso
 
 Obtener el catálogo real desde la sesión autenticada de Recuperación y formar un inventario unitario anonimizado. Para cada entrada habrá que cotejar el snapshot, las partes registradas, la integridad de cada fragmento, la disponibilidad real de los objetos y el resultado de una recuperación no destructiva. Solo después de leer de vuelta y verificar el destino podrá una unidad clasificarse como «recuperada y verificada».
+
+## Lectura de vuelta y revisiones
+
+- OCP de Custodia, CUSTODIA-v0.3: blob `4a84f7bd4e568d894a2375f567a4753f2e332581`.
+- Lista provisional de tareas, versión 0.3: blob `a7b15e9e95219be949af82544378e6ec723ed501`.
+- Inventario provisional, versión 0.1: blob `b7e4f8c6770368e988f6e14d1fca018e72117aeb`.
+- Control de responsabilidad, generación 2: blob `2da19e588e30fe3835696d22fe110a7570a8758f`.
+- Fuente metodológica adquirida: Samantha v356 · NX-356m, Metacanon 1.22, GOW v2.6; blob `c364e179e8e9b6a3d566a8e690dfa1a7cce91798`.
+- Este archivo de salida se creó en el commit `fe21b5b5a367b81f233f5201b5cd6cfcec7dbb2e`; su blob final se registrará después de la lectura de vuelta. No se usa un hash autorreferente.
