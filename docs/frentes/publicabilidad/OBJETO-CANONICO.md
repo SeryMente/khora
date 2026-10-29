@@ -1,4 +1,4 @@
-<!-- PUBLICABILIDAD_VERSION=v0.7; PUBLICABILIDAD_SEAL=PUBLICABILIDAD-v0.7 -->
+<!-- PUBLICABILIDAD_VERSION=v0.8; PUBLICABILIDAD_SEAL=PUBLICABILIDAD-v0.8 -->
 # Objeto Canónico de Persistencia · Publicabilidad
 
 ## 1. Control e identidad
@@ -6,9 +6,9 @@
 - **Frente:** Publicabilidad.
 - **Repositorio propietario:** SeryMente/khora; el término «Cora» del enunciado se conserva en el original y se normaliza operativamente a Khora conforme al canon de Metodología.
 - **Ruta del OCP:** docs/frentes/publicabilidad/OBJETO-CANONICO.md.
-- **Versión documental:** v0.7 · objeto provisional de investigación.
-- **Sello:** PUBLICABILIDAD-v0.7.
-- **Estado:** PROVISIONAL-v0.7; la prioridad P0 sigue siendo un método sólido ChatGPT Free → GitHub Web → Vercel sin terminal local. El diagnóstico transversal mantiene alta probabilidad de un gate de facturación/uso de Actions en repositorios privados, aún no confirmado en Billing & Licensing o anotaciones. Se autorizó CI local sustitutiva por RDC, pero el intento quedó en preflight: no se ejecutaron tests porque no había clon/herramientas completas y el canal RDC dejó operaciones pendientes. Producción sigue bloqueada.
+- **Versión documental:** v0.8 · objeto provisional de investigación.
+- **Sello:** PUBLICABILIDAD-v0.8.
+- **Estado:** PROVISIONAL-v0.8; prioridad P0: método sólido ChatGPT Free → GitHub Web → Vercel sin terminal local. La revalidación de Actions en 2026-10-29 mantiene alta probabilidad de un gate de uso/billing de runners privados, sin confirmación del panel ni del cuerpo de anotaciones. La sesión RDC activa es PC-4; se restauró, pero no se localizó un checkout íntegro ni autenticación GitHub utilizable en la terminal. CI local NO EJECUTADA. Producción sigue bloqueada.
 - **Rama en la que se preparó esta entrega:** publicabilidad/inauguracion-20261028. No está integrada en main.
 - **Folio de este evento:** SES-20261028-PR8V6M2Q. Es un folio de evento/operación, no un identificador nativo de conversación.
 - **Titularidad operativa:** sin titular exclusivo asignado en CONTROL-RESPONSABILIDAD.json. La instrucción inaugura el frente, pero no se ha registrado una transferencia de responsabilidad exclusiva a esta instancia.
@@ -477,3 +477,20 @@ La documentación oficial de GitHub establece que los jobs en repositorios priva
 - La hipótesis de gate de uso/billing de Actions en repos privados continúa con alta probabilidad, no confirmada. La validación local de código sigue autorizada, pero requiere RDC operativo, checkout íntegro y toolchain; no se obtuvo ningún resultado local.
 
 **Estado de cierre de esta sección:** procedimiento y evidencia parcial documentados; CI local no ejecutado; RDC requiere reanudación; causa de Actions de alta probabilidad pero no confirmada; producción bloqueada.
+
+
+### 21.7 Revalidación de frescura y preflight en PC-4 · 2026-10-29
+
+**Metodología verificada de nuevo:** DUG v359 · NX-359m; Metacanon 1.24; GOW 2.8; blob `b2ff2845a5a99dc4ce3cafafc4f8e43607d48145`, leído de `SeryMente/metodologia/main`.
+
+**GitHub Actions.** La cabeza de `SeryMente/khora/main` consultada en este ciclo fue `42ca6e664a501f4882a187fc81d01fb99845320f`. Los runs `40951507825` (CI) y `40951507740` (Deploy to Production) fallaron antes de ejecutar steps: los jobs informan `runner_id=0`, nombre de runner vacío y cero pasos; la descarga de logs devuelve `BlobNotFound`. Metodología, también privada, tuvo el mismo patrón en los runs `40950565814` y `40950565652`. En contraste, Signal Interpreter, público, ejecutó y pasó los runs `40951100138` y `40951100093` con runners reales y 13/11 pasos. Esta comparación eleva la hipótesis de una restricción de uso/billing/entitlement de Actions para repositorios privados; **no confirma** que la facturación sea la causa. Fuentes oficiales: [Billing and usage](https://docs.github.com/en/actions/concepts/billing-and-usage), [GitHub Actions billing](https://docs.github.com/en/billing/concepts/product-billing/github-actions) y [Product usage included](https://docs.github.com/en/billing/reference/product-usage-included).
+
+**Entorno local.** La sesión persistida de PC-4 fue restaurada según la salida del operador y el dispositivo quedó Online en el servicio RDC; no se inició otra sesión. Git existe en `C:\Program Files\Git\cmd\git.exe`, versión `2.56.0.windows.3`, aunque no figura en el `PATH`. Node.js `v24.22.2` y npm están disponibles; `gh`, Docker y una instalación utilizable de Python no se encontraron en el preflight. El workflow web requiere Node 22.
+
+**Checkout y autenticación.** La carpeta temporal `%LOCALAPPDATA%\Temp\khora-ci-42ca6e664a50\khora-web` contiene solo un README de prueba, por lo que NO es un checkout válido. No se localizó un clon o staging anterior en las rutas de perfil, temporales, caché, Escritorio y Documentos examinadas. La consulta de solo lectura `git ls-remote` al repositorio privado falló porque la terminal no tiene autenticación GitHub configurada. No se completó el staging; no se instalaron herramientas ni se alteró la configuración global de Git.
+
+**Resultado:** no se ejecutaron `npm ci`, TypeScript, UI Review, contrato de navegación, pruebas unitarias, pytest, Ruff, Pyright, Docker Compose, Neo4j, migraciones ni deployments. No hay resultado de CI local que pueda marcarse como aprobado o fallido. La evidencia detallada quedó en [CI-LOCAL-PREFLIGHT-PC4-2026-10-29.md](evidencias/CI-LOCAL-PREFLIGHT-PC4-2026-10-29.md).
+
+**Continuación:** conseguir un checkout privado exacto mediante autenticación autorizada; comprobar `git rev-parse HEAD`; reproducir `khora-web-gate` con Node 22 y después los jobs Python/Neo4j con sus dependencias. En paralelo, el propietario debe revisar el panel de billing de la organización. No aumentar presupuesto ni aceptar cargos sin decisión expresa; no modificar `main`, workflows, configuración, secretos, Vercel ni producción.
+
+**Cierre de esta revalidación:** diagnóstico remoto actualizado; preparación local parcial; CI local no ejecutada; causa raíz de Actions privada no confirmada.
