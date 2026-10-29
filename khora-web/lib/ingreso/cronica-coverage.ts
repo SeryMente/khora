@@ -15,8 +15,7 @@ export type CronicaCoverageItem = {
 export type CronicaCoverageOptions = {
   /**
    * Status of automatic date/time verification.
-   * Per U06-03: Date and time start RESOLVED (automaticOk: true).
-   * They become ACTIVE (covered: false) only if automatic methods fail (automaticOk: false).
+   * Date and time are resolved only when the caller confirms that an automatic timestamp is available.
    */
   automaticDateTimeOk?: boolean;
 };
@@ -39,9 +38,9 @@ function maskQuotes(text: string): string {
   return text.replace(/"[^"]*(?:"|$)|“[^”]*(?:”|$)|«[^»]*(?:»|$)|'[^'\n]*(?:'|$)/g, part => ' '.repeat(part.length));
 }
 export function analyzeCronicaCoverage(text: string, options: CronicaCoverageOptions = {}): CronicaCoverage {
-  const autoDateTime = options.automaticDateTimeOk !== false; // Defaults to true per U06-03
+  const autoDateTime = options.automaticDateTimeOk === true;
   const items: CronicaCoverageItem[] = [
-    {id:'datetime',label:'Fecha y hora',covered:autoDateTime,evidence:autoDateTime?'Verificado automáticamente':null},
+    {id:'datetime',label:'Fecha y hora',covered:autoDateTime,evidence:autoDateTime?'Fecha/hora disponible automáticamente':null},
     {id:'when',label:'Momento o fecha (opcional)',covered:false,evidence:null},
     {id:'where',label:'Lugar general (opcional)',covered:false,evidence:null},
     {id:'what',label:'Actividad o hecho propio (opcional)',covered:false,evidence:null},

@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {analyzeCronicaCoverage} from '../../lib/ingreso/cronica-coverage';
-const flags=(s:string)=>analyzeCronicaCoverage(s).items.map(i=>i.covered);
+const flags=(s:string)=>analyzeCronicaCoverage(s,{automaticDateTimeOk:true}).items.map(i=>i.covered);
 test('stable contract and optional labels, empty remains pending',()=>{
- const a=analyzeCronicaCoverage('');assert.deepEqual(a.items.map(i=>i.id),['datetime','when','where','what']);
- assert.equal(a.items[0].covered,true);
+ const a=analyzeCronicaCoverage('',{automaticDateTimeOk:true});assert.deepEqual(a.items.map(i=>i.id),['datetime','when','where','what']);
+ assert.equal(a.items[0].covered,true);assert.equal(a.items[0].evidence,'Fecha/hora disponible automáticamente');
  for(const i of a.items.slice(1)){assert.equal(i.covered,false);assert.equal(i.evidence,null);assert.match(i.label,/opcional/);}
 });
 for (const text of ['Hoy trabajé en casa.','Ayer caminé en el parque.','El lunes escribí en la biblioteca.','El 19 de octubre de 2026 estudié en Querétaro.','2026-10-19 estuve en la oficina.']) {
@@ -50,3 +50,8 @@ test('past morning phrase is retained without guessing future',()=>assert.deepEq
 test('quoted multi-sentence narrative never becomes operator evidence',()=>assert.deepEqual(flags('Ella dijo: «Ayer descansé. Hoy trabajé en casa». '),[true,false,false,false]));
 test('unclosed multi-sentence quote stays masked during live dictation',()=>assert.deepEqual(flags('Dijo: «Ayer descansé. Hoy trabajé en casa'),[true,false,false,false]));
 test('own narrative after closed quote remains eligible',()=>assert.deepEqual(flags('«Ayer caminé». Hoy trabajé en casa.'),[true,true,true,true]));
+
+test('date/time is not marked resolved without an automatic verification result',()=>{
+ const missing=analyzeCronicaCoverage('');assert.equal(missing.items[0].covered,false);assert.equal(missing.items[0].evidence,null);
+ const verified=analyzeCronicaCoverage('',{automaticDateTimeOk:true});assert.equal(verified.items[0].covered,true);assert.equal(verified.items[0].evidence,'Fecha/hora disponible automáticamente');
+});

@@ -109,7 +109,7 @@ export function IngresoView({state:v,actions:a={},isReviewMode=false}:{state:Ing
      <button className={s.iconButton} aria-label="Más opciones de captura" aria-expanded={more} aria-controls="ingreso-options" onClick={()=>setMore(!more)}><I.Ellipsis size={21}/></button>
     </div>
    </div>
-   {cronica&&<CronicaCoverage text={v.texto} provisional={v.textoProvisional}/> }
+   {cronica&&<CronicaCoverage text={v.texto} provisional={v.textoProvisional} automaticDateTimeOk={automaticDateTimeOk}/> }
    {more&&<div className={s.options} id="ingreso-options">
     {(a.onGenerarTitulo||isReviewMode)&&<button data-ui-id="ingreso.btn-titulo-ia" className={s.secondary} disabled={locked||v.generandoTitulo||!v.texto.trim()} onClick={a.onGenerarTitulo}><I.Sparkles size={17}/>{v.generandoTitulo?"Generando…":"Título con IA"}</button>}
     {!!a.onRetranscribir&&<button data-ui-id="ingreso.btn-retranscribir" className={s.secondary} disabled={locked||recording||!v.conAudio} onClick={a.onRetranscribir}><I.RefreshCw size={17}/>{v.retranscribiendo?"Re-transcribiendo…":"Re-transcribir audio"}</button>}
