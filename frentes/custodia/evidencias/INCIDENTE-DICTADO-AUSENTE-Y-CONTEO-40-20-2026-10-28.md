@@ -1,13 +1,15 @@
-<!-- INCIDENT_VERSION=0.1; INCIDENT_STATUS=OPEN; NOT_A_CANONICAL_OBJECT=true -->
+<!-- INCIDENT_VERSION=0.2; INCIDENT_STATUS=OPEN; NOT_A_CANONICAL_OBJECT=true -->
 # Incidente provisional · Dictado no visible en Recuperación y contador 40→20
 
 > **ESTADO: ABIERTO · CAUSA DE LA CAPTURA AUSENTE NO CONFIRMADA · RECUPERABILIDAD PRODUCTIVA NO CERTIFICADA.** Este informe es evidencia auxiliar del frente Custodia; el único estado vivo sigue en [OBJETO-CANONICO.md](../OBJETO-CANONICO.md).
 
 - Frente: CUSTODIA.
-- Folio del ciclo: CUSTODIA-INC-RECUP-SES-20261028-R6K2M9Q4-C004.
+- Folio de investigación original: CUSTODIA-INC-RECUP-SES-20261028-R6K2M9Q4-C004.
+- Ciclo de formalización de tareas: CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C005.
 - Fecha de investigación: 2026-10-28.
 - Instrucción literal: [INSTRUCCION-INCIDENTE-DICTADO-AUSENTE-2026-10-28.md](../originales/INSTRUCCION-INCIDENTE-DICTADO-AUSENTE-2026-10-28.md).
-- Fuente normativa vigente consultada: Samantha v356 · NX-356m; Metacanon 1.22; GOW v2.6; blob `c364e179e8e9b6a3d566a8e690dfa1a7cce91798`.
+- Fuente normativa en la investigación original (histórica): Samantha v356 · NX-356m; Metacanon 1.22; GOW v2.6; blob `c364e179e8e9b6a3d566a8e690dfa1a7cce91798`.
+- Fuente normativa vigente de este ciclo: Samantha v358 · NX-358m; Metacanon 1.23; GOW v2.7; blob `89a28e4d05f5baab9c4b86abdb9fbfc532690c75`.
 - Límite: se inspeccionó código desde `SeryMente/khora/main`; no se obtuvo catálogo autenticado, consulta productiva de base de datos, bytes del proveedor ni correlación entre esta rama y el despliegue productivo. No se hizo ningún intento de recuperación en producción.
 
 ## 1. Relato comunicado por el operador — NO verificado de forma independiente
@@ -108,6 +110,15 @@ No hay evidencia actual para escoger una de estas hipótesis como causa raíz.
 - Revisión desplegada que estaba activa en esa terminal.
 - Resultado de búsqueda en Custodia por si la sesión se hubiera archivado.
 
-## 9. Registro de cambios
+## 10. Ampliación del alcance operativo
+
+En el ciclo CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C005, el operador pidió añadir a las dos tareas previas la investigación de los dictados que ya no aparecen o parecen no recuperables. La lista provisional formaliza esa labor como **CUSTODIA-03 · P0**, en paralelo con CUSTODIA-01. El alcance ya no se limita a la captura individual: debe buscar la captura reportada y determinar con evidencia el alcance de cualquier otra ausencia o laguna.
+
+CUSTODIA-03 exige recorrer el catálogo autenticado completo, reconciliar por identidad las fuentes local/remoto, revisar capturas archivadas en Custodia, consultar los registros de checkpoint accesibles bajo autorización y clasificar cada caso sin equiparar ausencia de la lista con pérdida definitiva. Las unidades encontradas se recuperarán sin sobrescribir originales y solo se declararán recuperadas tras lectura de vuelta y verificación de integridad/procedencia. El cambio del contador 40→20 no se interpretará como veinte pérdidas sin reconciliación real.
+
+La tercera tarea quedó persistida en [LISTA-TAREAS-PROVISIONAL.md](../LISTA-TAREAS-PROVISIONAL.md), v0.5; CUSTODIA-02 conserva su identificador y corresponde a la revisión metodológica en prioridad P1. Este cambio es documental: el acceso productivo, la localización de la sesión y la recuperación siguen pendientes.
+
+## 11. Registro de cambios
 
 - **v0.1 · 2026-10-28 · CUSTODIA-INC-RECUP-SES-20261028-R6K2M9Q4-C004:** se documentan por separado el defecto de conteo local/remoto, el límite de página de 20, el incidente reportado y las hipótesis no verificadas. Sin acceso a producción, recuperación real ni cambios de producto.
+- **v0.2 · 2026-10-28 · CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C005:** se vincula el incidente con CUSTODIA-03, que amplía el alcance a otras capturas esperadas no disponibles; no se modifica el estado fáctico del incidente, que sigue ABIERTO.
