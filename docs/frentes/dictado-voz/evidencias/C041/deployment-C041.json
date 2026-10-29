@@ -1,0 +1,11 @@
+{
+  "sha": "1ca4f69c53262c3696eb57f800ed97176aeb3d66",
+  "deployment": "dpl_C25Lc9cwoRrNh6pShnoDGrQz77KG",
+  "state": "ERROR",
+  "errorCode": "BUILD_UTILS_SPAWN_1",
+  "command": "if [ \"$VERCEL_ENV\" = \"production\" ]; then node scripts/migrate-runtime.mjs; fi && npm run build",
+  "target": "preview",
+  "specificCause": "UNKNOWN: log access403; no bypass/skip; RDC unavailable",
+  "productionPromoted": false,
+  "migrationExecuted": false
+}

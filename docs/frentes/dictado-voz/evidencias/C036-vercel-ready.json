@@ -1,0 +1,10 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"result\": {\n    \"deployment\": {\n      \"id\": \"dpl_BL7qyjtYzpqjZFqiVuVrQcz7kVzL\",\n      \"name\": \"khora-web\",\n      \"url\": \"khora-pj0dmddzv-victorhugotorresmendez-8991s-projects.vercel.app\",\n      \"type\": \"LAMBDAS\",\n      \"state\": \"READY\",\n      \"createdAt\": 1792443391331,\n      \"creator\": {\n        \"uid\": \"lAl0cDLi0zdUkOxbbBwiEzqa\",\n        \"username\": \"victorhugotorresmendez-8991\"\n      },\n      \"project\": {\n        \"id\": \"prj_hRN86BKITXYKTnNlp0ygVhaMwFfx\",\n        \"name\": \"khora-web\",\n        \"framework\": \"nextjs\"\n      },\n      \"meta\": {\n        \"githubCommitRef\": \"feat/ingreso-autobiografico-20261019\",\n        \"githubCommitSha\": \"22f0fea34b77aa69ebdc51e346a2e2d4f0cbccc9\",\n        \"githubCommitMessage\": \"feat(ingreso): add optional sufficiency guides for autobiographical dictation\",\n        \"githubRepo\": \"khora\",\n        \"githubOrg\": \"SeryMente\"\n      },\n      \"alias\": [\n        \"khora-web-git-feat-b77fdf-victorhugotorresmendez-8991s-projects.vercel.app\"\n      ],\n      \"target\": null,\n      \"regions\": [\n        \"iad1\"\n      ],\n      \"buildingAt\": 1792443392639,\n      \"ready\": 1792443481544,\n      \"readyState\": \"READY\",\n      \"aliasError\": null\n    }\n  }\n}"
+    }
+  ],
+  "name": "get_deployment",
+  "moduleName": "Vercel"
+}

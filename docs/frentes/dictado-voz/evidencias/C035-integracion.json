@@ -1,0 +1,52 @@
+{
+  "cycle": "C035",
+  "version": "0.6.21",
+  "functional_commit": "c0dcb2e26f9df31273bbf654ffc52222a7d9d887",
+  "source_blog_final": "3fcfe4cd0b186c80bfe6b55b579eb6c99a620398",
+  "branch": "feat/ingreso-autobiografico-20261019",
+  "blobs_observed_events_1152_to_1158": {
+    "khora-web/app/components/blog/BlogTextWorkspace.tsx": "ebe51ef876079b13385abef0ebada8449c6123d0",
+    "khora-web/lib/blog/text-workflow.ts": "8703abf9eae6e367d948807711e630939d44bf92",
+    "khora-web/app/api/blog/editorial/route.ts": "ef7be16e4eb22923804445e2f66bdbf388505f52",
+    "khora-web/tests/unit/blog-text-workflow.test.ts": "2262915b371770a0e82ae527e239e27443422944",
+    "khora-web/tests/browser/blog-text-workflow.local.test.mjs": "31e76c7853c08fa44fb02b8b27231190109afb11",
+    "khora-web/lib/server/blog/repository.ts": "af06eb949053b0f466bf77c55eed702c916ef8cc",
+    "khora-web/app/sistema/blog/page.tsx": "c6dad872cf68d08c46ad2d2cdb2adde9e83e502d"
+  },
+  "tests": {
+    "unit": 99,
+    "skipped": 0,
+    "browser": 27,
+    "editorial_gates": 12,
+    "dispatch_gates": 12,
+    "core_jsx_types": "5.9.3 pass; not global tests",
+    "production_e2e": false
+  },
+  "deployment": {
+    "id": "dpl_jLTALH6xrtcDqoKNd5Tc3B927TfB",
+    "url": "khora-ksuvy9tlc-victorhugotorresmendez-8991s-projects.vercel.app",
+    "state": "ERROR",
+    "code": "lint_or_type_error",
+    "logs": "403 scope-specific, no assumption whole Vercel blocked"
+  },
+  "reported_not_applied_fix": {
+    "file": "khora-web/tests/unit/blog-text-workflow.test.ts",
+    "line": 44,
+    "before": "assert.equal(next.preview,null);",
+    "after": "const initialPreview=next.preview;assert.equal(initialPreview,null);",
+    "source": "Blog message event1250; central not reproduced"
+  },
+  "milestone": "Khora Ingreso specialized Blog mold before dictation -> generated transcript -> manual archive -> exact joint consent -> GitHub Blog then Facebook, no public audio",
+  "misinterpretation": "/sistema/blog manual capture is NOT equivalent to original requested path",
+  "publication_real": false,
+  "handoff_roles": {
+    "central": "coordination plus Ingreso/lights/custody/recovery/titles",
+    "blog": "editorial/extraction/providers/publication own canon"
+  },
+  "migration_integrity": {
+    "core_sections": 13,
+    "history_annex_unchanged": true,
+    "state_verbatim_in_canon_and_prompt": true,
+    "old_sandbox_portable": false
+  }
+}

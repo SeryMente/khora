@@ -1,5 +1,5 @@
 // @l0 L0-002 §4 · @req MCP-TEST-02/REQ-1
-import test from "node:test";
+import test, { beforeEach, afterEach } from "node:test";
 import assert from "node:assert/strict";
 import { rotarRefreshToken } from "../../lib/server/oauth.js";
 import { signJwt } from "../../lib/server/jwt.js";
@@ -20,6 +20,22 @@ import {
   toolKhoraBuscarVolcados,
   toolKhoraVersionesVolcado,
 } from "../../lib/server/mcp-tools.js";
+
+// Isolate auth scenarios from the build host (VERCEL_ENV/NODE_ENV may be production).
+// The explicit production-503 scenario in mcp_oauth.test.ts preserves that preflight.
+const authEnvironmentKeys = ["NODE_ENV", "VERCEL_ENV", "KHORA_READONLY_DATABASE_URL"] as const;
+let authEnvironment: Array<[typeof authEnvironmentKeys[number], string | undefined]>;
+beforeEach(() => {
+  authEnvironment = authEnvironmentKeys.map(key => [key, process.env[key]]);
+  Reflect.set(process.env, "NODE_ENV", "test");
+  process.env.VERCEL_ENV = "test";
+  delete process.env.KHORA_READONLY_DATABASE_URL;
+});
+afterEach(() => {
+  for (const [key, value] of authEnvironment) {
+    if (value === undefined) Reflect.deleteProperty(process.env, key); else Reflect.set(process.env, key, value);
+  }
+});
 
 process.env.MCP_OAUTH_CLIENT_ID = "test-client-id";
 process.env.MCP_OAUTH_CLIENT_SECRET = "test-client-secret";
@@ -115,14 +131,14 @@ test("2. MCP_CANONICAL_URL semantics and metadata endpoints consistency", async 
   assert.equal(protectedMeta.resource, "https://khora.example.com/api/mcp");
   assert.ok(!protectedMeta.resource.includes("/api/mcp/api/mcp"));
   assert.deepEqual(protectedMeta.authorization_servers, ["https://khora.example.com"]);
-  assert.deepEqual(protectedMeta.scopes_supported, ["runtime:read", "volcados:read", "norm:turn"]);
+  assert.deepEqual(protectedMeta.scopes_supported, ["runtime:read", "volcados:read", "norm:turn", "blog:read"]);
 
   const authRes = await getAuthServerMetadata();
   const authMeta = await authRes.json();
   assert.equal(authMeta.issuer, "https://khora.example.com");
   assert.equal(authMeta.authorization_endpoint, "https://khora.example.com/oauth/authorize");
   assert.equal(authMeta.token_endpoint, "https://khora.example.com/api/oauth/token");
-  assert.deepEqual(authMeta.scopes_supported, ["runtime:read", "volcados:read", "norm:turn", "offline_access"]);
+  assert.deepEqual(authMeta.scopes_supported, ["runtime:read", "volcados:read", "norm:turn", "offline_access", "blog:read"]);
 });
 
 test("2b. PKCE S256 verification behavior", () => {
@@ -385,6 +401,8 @@ test("3. JWT validation on /api/mcp (iss, aud, scope, gen, exp)", async () => {
     });
     const res6 = await getMcpRoute(req6);
     assert.notEqual(res6.status, 401);
+    assert.notEqual(res6.status, 503);
+    assert.notEqual(res6.status, 500);
 
     // 3g. Revoked generation -> 401
     const revokedPayloadToken = signJwt({ ...validPayload, gen: 1 }, secret);
@@ -420,7 +438,8 @@ test("4. Missing KHORA_READONLY_DATABASE_URL in production returns 503", async (
     assert.ok(data.diagnostic.message.length > 20);
     assert.ok(res.headers.get("x-khora-correlation-id"));
   } finally {
-    process.env.VERCEL_ENV = originalVercelEnv;
+    if (originalVercelEnv === undefined) delete process.env.VERCEL_ENV;
+    else process.env.VERCEL_ENV = originalVercelEnv;
     if (originalReadonlyUrl) {
       process.env.KHORA_READONLY_DATABASE_URL = originalReadonlyUrl;
     } else {

@@ -1,0 +1,18 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "successfully downloaded text file (SHA: dffc402b999e74ea33d014c0517093eed7bd48c9)"
+    },
+    {
+      "type": "resource",
+      "resource": {
+        "uri": "repo://SeryMente/metodologia/sha/482725063fa47e60186027e9abe55986affca680/contents/frentes/blog-personal/evidencia/C-BLOG-008/browser-report.json",
+        "mimeType": "text/plain; charset=utf-8",
+        "text": "{\n  \"scope\": \"actual consumer + React/Chromium/IndexedDB/WebCrypto; synthetic source/receipt/HTTP; no production\",\n  \"checks\": 20,\n  \"passed\": [\n    \"existing transcript prefilled without paste\",\n    \"no audio/public file input\",\n    \"consent disabled before verified preview\",\n    \"exact original receipt forwarded\",\n    \"public transcript literal order preserved\",\n    \"transcript markup escaped\",\n    \"no implicit consent\",\n    \"approved synthetic state not declared delivered\",\n    \"status never resends consent\",\n    \"decision stored in actual IndexedDB\",\n    \"No independent of positive normative service\",\n    \"negative receipt confirmed\",\n    \"no receipt means no prepare or consent network\",\n    \"mismatched exact digest blocks approval\",\n    \"unavailable normative turn blocks positive path\",\n    \"lost acknowledgement leaves durable pending reconciliation\",\n    \"lost acknowledgement reconciled without duplicate decision\",\n    \"ofuscada requires explicit exact exposure\",\n    \"consumer never rearchives or calls dispatch\",\n    \"zero runtime/server fixture errors\"\n  ],\n  \"apiRequests\": 15,\n  \"errors\": []\n}"
+      }
+    }
+  ],
+  "name": "get_file_contents",
+  "moduleName": "GitHub"
+}

@@ -1,0 +1,47 @@
+{
+  "blog_index": {
+    "requested": "https://serymente.github.io/otrogranprograma/blog/",
+    "status": 200,
+    "final_url": "https://serymente.github.io/otrogranprograma/blog/",
+    "content_type": "text/html; charset=utf-8",
+    "bytes": 1674,
+    "sha256": "d97f263d1c65be517a4c818452f52814e7305c8a7eb5c0d204eea614cfae9e93"
+  },
+  "blog_archive": {
+    "requested": "https://serymente.github.io/otrogranprograma/blog/archivo.json",
+    "status": 200,
+    "final_url": "https://serymente.github.io/otrogranprograma/blog/archivo.json",
+    "content_type": "application/json; charset=utf-8",
+    "bytes": 75,
+    "sha256": "c22ec38fdb7362044e086660bf46b176d0e73d1aac60969c0b64e316c9d170a8",
+    "json_shape": "dict",
+    "entry_count": 0,
+    "entry_keys": [],
+    "public_text_saved": false
+  },
+  "production_version": {
+    "requested": "https://khora-web.vercel.app/api/version",
+    "status": 200,
+    "final_url": "https://khora-web.vercel.app/api/version",
+    "content_type": "application/json",
+    "bytes": 227,
+    "sha256": "bfadf4fbe991e0e748b2d7349e8fffee92b2afcf901b26cf9aab05b6aa7a19c7",
+    "version_response": {
+      "commit": "f0dfbdcb2d79eb6289dacba272ddcc7ba2023063",
+      "rama": "main",
+      "desplegado_desde_git": true,
+      "fuente_commit": "vercel-git",
+      "entorno": "production",
+      "rutas": [
+        "/sistema/custodia",
+        "/api/volcado"
+      ],
+      "ahora": "2026-10-19T20:00:59.477Z"
+    }
+  },
+  "main_head_observed": {
+    "sha": "bd29c924393fcbd9183100f66b2e50c87b791207",
+    "source": "GitHub get_commit main current",
+    "classification": "separate from production version f0dfbdcb; no claim identical"
+  }
+}

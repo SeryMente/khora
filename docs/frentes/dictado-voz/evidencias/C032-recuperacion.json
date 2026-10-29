@@ -1,0 +1,137 @@
+{
+  "cycle": "C032",
+  "session": "3fea4187-8241-805a-a526-00a99e9d743d",
+  "date": "2026-10-19",
+  "role": "assistance/coordinator",
+  "base": "1ee239c009d5c9499ac80ad93b12e8204cc61977",
+  "method_commit": "a466b6b46f266de6a6ccd656e071eb7a07dc0e10",
+  "method_blob": "8f9ad1cf0e09e5fcd7014190770a77294ff39af4",
+  "private_destination": true,
+  "pull_request": {
+    "number": 330,
+    "title": "Ingreso y Blog texto-only: consolidación, retención de audio y archivo manual recuperado",
+    "body": "## Candidata integrada — no producción ni publicación\n\nOrden posterior del operador: continuar cinco frentes sin RDC y en la medida posible; corte público SOLO TEXTO, audio privado. Reemplaza audio obligatorio y plazo vencido, no el consentimiento de una entrada.\n\nConsolidación 19b3966b6cdefc6edebea7d18e8e88acf102356b: fuente Blog PR329 7924fc7 + módulo nuevo fea4b676, sin reimportar su árbol antiguo. Mismo frente/canon v0.6.16, original histórico intacto.\n\n- Cuatro tipos/ofuscada; archivo manual y recibo propietario/sesión/versión/hash; preview exacta y consentimiento explícito en ambos destinos. No sin normativa ni texto público, cero jobs.\n- ACK de audio y sellado ya no eliminan ciphertext/audio local; SHA local y recibo fuente/sesión/parte/bytes/SHA comprobados. No garantía contra borrar perfil o pérdida física.\n- Archivar esta captura desde panel y punto elegido; Ver puntos guardados conservado. Sin audio histórico acreditado se bloquea, no inventa asociación.\n- Títulos automáticos sucesivos, corrección title/titulo y respuestas obsoletas; luz única ligada a estado exacto.\n- Preparación pública extractiva literal y límite Pages100 también servidor/proveedor; no reescritura factual ni consentimiento por prefill.\n- Interpretación simultánea bloqueada antes de UI ingesta y excluida de fuentes paired, snapshots previos invalidados. No borra Neo4j ni acredita importadores externos.\n- Runner existente añade034 y migración editorial fechada (NO033 duplicada). Producción NO migrada.\n\n## Evidencia local ejecutada\n33 unitarias Blog/custodia +12 Ingreso +13 formato/generador Python real; escenario PostgreSQL delivery;23 aserciones endpoint editorial real con DB aislada;3 escenarios navegador archivo +2 parada/reintento; retención IndexedDB, título tardío y exclusión SQL/handler. Tipos núcleo estrictos y sintaxis pasan. Auth/normativa/crypto/proveedores externos del banco son fixtures; no E2E productivo. Expediente y programas exactos: docs/frentes/dictado-voz/evidencias/C031-consolidacion.json.\n\n## Compromisos no eludidos\nNuevo workflow ejecuta npm run build con prebuild COMPLETO. Sin resultado global acreditado todavía. Sin secretos/configuración/protecciones modificados; no aprobación humana de UI/seguridad inventada.\n\nBloqueos materiales: normativa servidor401 sin reparación acreditada; Meta app/Page token/tasks/permisos no identificados; Vercel discovery parcial y logs/deploy403; ninguna migración/deploy/publicación real. Capturas reales recuperadas no inspeccionadas. Cobertura completa del chat nativo verbatim sigue NO VERIFICADA. No auto-merge ni falsa activación.",
+    "state": "open",
+    "draft": true,
+    "merged": false,
+    "mergeable_state": "unstable",
+    "html_url": "https://github.com/SeryMente/khora/pull/330",
+    "user": {
+      "login": "1interprete1",
+      "id": 269599528,
+      "profile_url": "https://github.com/1interprete1",
+      "avatar_url": "https://avatars.githubusercontent.com/u/269599528?v=4"
+    },
+    "head": {
+      "ref": "feat/ingreso-autobiografico-20261019",
+      "sha": "1ee239c009d5c9499ac80ad93b12e8204cc61977",
+      "repo": {
+        "full_name": "SeryMente/khora"
+      }
+    },
+    "base": {
+      "ref": "main",
+      "sha": "b5e7009de137db30c26ecc5f4ddbb34789f453f2",
+      "repo": {
+        "full_name": "SeryMente/khora"
+      }
+    },
+    "additions": 2964,
+    "deletions": 144,
+    "changed_files": 96,
+    "commits": 6,
+    "comments": 2,
+    "created_at": "2026-10-19T17:41:50Z",
+    "updated_at": "2026-10-19T18:24:30Z"
+  },
+  "combined_status": {
+    "state": "failure",
+    "sha": "1ee239c009d5c9499ac80ad93b12e8204cc61977",
+    "total_count": 6,
+    "statuses": [
+      {
+        "state": "failure",
+        "context": "Vercel – khora-5q7h",
+        "description": "Cannot deploy from a private GitHub organization repository on the Hobby plan",
+        "target_url": "https://vercel.com/victorhugotorresmendez-8991s-projects?upgradeToPro=github-private-org-to-hobby",
+        "created_at": "2026-10-19T18:24:11Z",
+        "updated_at": "2026-10-19T18:24:11Z"
+      },
+      {
+        "state": "failure",
+        "context": "Vercel – khora-h25r",
+        "description": "Cannot deploy from a private GitHub organization repository on the Hobby plan",
+        "target_url": "https://vercel.com/victorhugotorresmendez-8991s-projects?upgradeToPro=github-private-org-to-hobby",
+        "created_at": "2026-10-19T18:24:11Z",
+        "updated_at": "2026-10-19T18:24:11Z"
+      },
+      {
+        "state": "failure",
+        "context": "Vercel – khora-main-clean-20260820-160445",
+        "description": "Cannot deploy from a private GitHub organization repository on the Hobby plan",
+        "target_url": "https://vercel.com/victorhugotorresmendez-8991s-projects?upgradeToPro=github-private-org-to-hobby",
+        "created_at": "2026-10-19T18:24:11Z",
+        "updated_at": "2026-10-19T18:24:11Z"
+      },
+      {
+        "state": "failure",
+        "context": "Vercel – repo",
+        "description": "Cannot deploy from a private GitHub organization repository on the Hobby plan",
+        "target_url": "https://vercel.com/victorhugotorresmendez-8991s-projects?upgradeToPro=github-private-org-to-hobby",
+        "created_at": "2026-10-19T18:24:11Z",
+        "updated_at": "2026-10-19T18:24:11Z"
+      },
+      {
+        "state": "failure",
+        "context": "Vercel – khora-web",
+        "description": "Cannot deploy from a private GitHub organization repository on the Hobby plan",
+        "target_url": "https://vercel.com/victorhugotorresmendez-8991s-projects?upgradeToPro=github-private-org-to-hobby",
+        "created_at": "2026-10-19T18:24:11Z",
+        "updated_at": "2026-10-19T18:24:11Z"
+      },
+      {
+        "state": "failure",
+        "context": "netlify/fascinating-florentine-abc9fc/deploy-preview",
+        "description": "Deploy Preview failed.",
+        "target_url": "https://app.netlify.com/projects/fascinating-florentine-abc9fc/deploys/6ad6605c9023cf2be3362f06",
+        "created_at": "2026-10-19T18:24:28Z",
+        "updated_at": "2026-10-19T18:24:28Z"
+      }
+    ]
+  },
+  "source_attachment": {
+    "received_bytes": 116542,
+    "received_sha256": "1c82bbe7e266e5654cb49229f2cb4085409305090e20cf67221dd82819a3a93c",
+    "archived": "originales/C032-conversacion-recibida-saneada.txt",
+    "encoding": "UTF-8",
+    "line_endings": "CRLF preserved",
+    "omitted_values": 2,
+    "omitted_occurrences": 4,
+    "native_export_complete": false
+  },
+  "document_checks": {
+    "thirteen_blocks": true,
+    "state_three_identical_copies": true,
+    "historical_annex_unchanged": true
+  },
+  "not_executed": [
+    "product tests",
+    "RDC",
+    "browser",
+    "merge",
+    "deploy",
+    "migrations",
+    "publication",
+    "checks API retry"
+  ],
+  "readback_gate": "must compare Git returned blobs to prepared files before emitting closure",
+  "preparation_error": {
+    "operation": "local documentary preparation",
+    "symptom": "AssertionError: canon.count(oldblock)==3",
+    "cause": "core uses Markdown heading; prompts use plain label",
+    "impact": "aborted before any Git mutation",
+    "correction": "compare/replace state and tests separately, each exactly three copies",
+    "verification": "preparation assertions and Git readback gate",
+    "prevention": "normalize heading boundary, never global replacement without exact count"
+  }
+}

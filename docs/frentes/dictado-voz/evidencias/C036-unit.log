@@ -1,0 +1,31 @@
+✔ text-only archive preserves exact UTF16 original and never asks for audio (27.089967ms)
+✔ lost archive retry uses same session and source, not a second capture (4.536479ms)
+✔ changed original or classification cannot reuse session (4.886619ms)
+✔ malformed archive receipt prevents editorial preparation (1.074508ms)
+✔ journal failure aborts before any network mutation (0.743126ms)
+✔ references whitelist strips text and tokens; invalid IDs fail closed (2.336457ms)
+✔ normative upstream is a real gate, not simulated OPEN (1.660505ms)
+✔ no consent is sent by archive or prepare; exact joint preview required (2.162465ms)
+✔ unexpected server preview cannot be approved (5.983429ms)
+✔ lost prepare permits only same retry or authenticated resume (2.342437ms)
+✔ resume reconstructs private prepared revision from IDs without plaintext journal (1.630762ms)
+✔ approval response lost freezes edits; status reconciles without new POST (1.962732ms)
+✔ decline is durable and independent of normative provider before preparation (0.64727ms)
+✔ declined cancelled revision needs fresh exact preview, including unchanged text (1.623732ms)
+✔ editing public text or Facebook invalidates digest and does not alter original (1.93297ms)
+✔ obfuscated text never gains approval without explicit exposure (1.197457ms)
+✔ oversized serialized payload fails without truncation or network prepare (4.430298ms)
+✔ snapshots cannot mutate the pending exact revision (1.578476ms)
+✔ concurrent operations are serialized, not duplicate client POSTs (0.646312ms)
+✔ owner-only resume rechecks private source and returns no original/approval secrets (3.54286ms)
+✔ causal server regression: cancelled deliveries cannot silently approve inert outbox (2.009801ms)
+✔ resume route stays behind auth/origin/normative gate and no-store (1.067032ms)
+✔ rejected or locally blocked approval is never fabricated as approved receipt (1.536049ms)
+ℹ tests 23
+ℹ suites 0
+ℹ pass 23
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 295.691244

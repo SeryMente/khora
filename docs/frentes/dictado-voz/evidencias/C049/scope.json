@@ -1,0 +1,21 @@
+{
+  "base": "564652c9d5f26a3712d4970c597b1933302ef689",
+  "productionFailed": "dpl_EfcPxp8koZL6zKEQBaaRjxGra4Ue",
+  "observedSuite": {
+    "total": 726,
+    "pass": 718,
+    "fail": 6,
+    "skip": 2
+  },
+  "migrationsApplied": true,
+  "previousProductionUntouched": true,
+  "runtimeFilesChanged": false,
+  "realSecretsChangedByTestPatch": false,
+  "localCausalChecks": 6,
+  "localWholeNormativeFileExecuted": false,
+  "fullProductionBuildPending": true,
+  "actualSources": {
+    "mcp-config": "e71506bb74d1d1c98370c5ac4d49a173482793b4",
+    "jwt": "0d0ed277fdc5604aea4524c8790ff513286b887f"
+  }
+}

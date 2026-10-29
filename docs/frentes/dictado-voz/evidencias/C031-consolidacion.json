@@ -1,0 +1,52 @@
+{
+  "schema": "dictado-blog-consolidation/v1",
+  "base_main": "b5e7009de137db30c26ecc5f4ddbb34789f453f2",
+  "base_front": "b5ad2bfd6581a0a92ec302024cf846d83756a419",
+  "blog_source": "7924fc760834ea10b7d02f8548c49a95250f5257",
+  "blog_preparation": "fea4b676e6784bc5041207673ca6eb6d6155299b",
+  "private": true,
+  "scope": "Local isolated candidate, not production acceptance",
+  "tests": {
+    "blog_and_custody_units": 33,
+    "ingreso_units": 12,
+    "literal_format_and_real_python_generator": 13,
+    "postgres_delivery_scenario": 1,
+    "editorial_http_assertions": 23,
+    "browser_archive_scenarios": 3,
+    "browser_stop_retry_scenarios": 2,
+    "indexeddb_retention": true,
+    "title_hook": true,
+    "graph_exclusion": true,
+    "strict_core_types": true,
+    "full_next_build": "not locally executed: partial source checkout; full prebuild+build workflow added without bypass"
+  },
+  "changes": [
+    "Retain encrypted audio on ACK and snapshot on archive",
+    "Receipt binds source/session/part/actual bytes+SHA",
+    "Manual direct archive of exact selected recovery checkpoint",
+    "Continuous automatic titles and real API title field",
+    "One evidence-based custody light",
+    "Integrate editorial backend and literal transcript preparation; exact preview/consent unchanged",
+    "Exclude simultaneous interpretation from UI ingestion and paired source selection; no historical graph deletion"
+  ],
+  "production": {
+    "migration": false,
+    "merge": false,
+    "deploy": false,
+    "publication": false,
+    "recovered_real_captures_inspected": false
+  },
+  "blockers": [
+    "Server normative credential rejected401: no repair proven",
+    "Meta app/Page token/tasks/permissions not identified",
+    "Vercel project discovery succeeds but deployment/log scope403 and teams empty",
+    "Full candidate gates and human UI/security review not verified",
+    "Exact entry public consent unavailable while operator absent"
+  ],
+  "remaining": [
+    "Real recovered audio reconciliation/production custody verification",
+    "Global exclusion across external importers/historical Neo4j not proven",
+    "Forensic metadata human review and unknown device facts remain null",
+    "Full native conversation verbatim coverage incomplete; no reconstruction"
+  ]
+}

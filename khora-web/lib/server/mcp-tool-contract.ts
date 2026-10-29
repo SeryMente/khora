@@ -3,6 +3,8 @@ import { z } from "zod";
 // Preserve the existing per-tool OAuth metadata. Effective dependencies are
 // documented separately: substantive tools also need a norm:turn cycle.
 export const MCP_TOOL_SCOPES = {
+  khora_blog_cambios: ["blog:read"],
+  khora_blog_estado: ["blog:read"],
   khora_listar_audios: ["volcados:read"],
   khora_leer_audio: ["volcados:read"],
   khora_resumen: ["volcados:read"],

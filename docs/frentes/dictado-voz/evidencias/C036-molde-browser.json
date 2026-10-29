@@ -1,0 +1,19 @@
+{
+  "scope": "actual IngresoView/TipoEntradaControl/AudioActivity/CSS with synthetic callbacks, no microphone/auth/archive/publication test",
+  "passed": 12,
+  "checks": [
+    "general has no autobiography mold",
+    "five optional guides before dictation",
+    "mold contains no required input or operation",
+    "empty archive remains disabled independently of guides",
+    "guides remain visible during dictation",
+    "classification cannot change mid capture",
+    "free story beyond guide preserved exactly",
+    "no requirement to complete five fields",
+    "no automatic archival",
+    "mobile has no horizontal overflow",
+    "other capture types unaffected",
+    "no browser runtime errors"
+  ],
+  "errors": []
+}

@@ -13,10 +13,12 @@ export async function POST(req:NextRequest){
   if(!owner)return NextResponse.json({detail:"no_autenticado"},{status:401});
   const body=await req.json().catch(()=>null);
   if(!uuid.test(body?.sessionId||""))return NextResponse.json({detail:"sesion_invalida"},{status:400});
+  const parcial=body.parcial===true;
+  if(body.parcial!==undefined&&typeof body.parcial!=="boolean"||parcial&&(!Number.isSafeInteger(body.hastaParte)||body.hastaParte<2))return NextResponse.json({detail:"dialogo_corte_invalido"},{status:400});
   try{
-    const {pistas,manifest}=await cargarAudioDialogo(body.sessionId,owner);
+    const {pistas,manifest}=await cargarAudioDialogo(body.sessionId,owner,parcial?{parcial:true,hastaParte:body.hastaParte}:{});
     const result=await transcribirPistasDialogo(pistas,p=>transcribirAudioConGroq(Buffer.from(p.bytes),`dialogo-${p.fuente}.webm`,{verboseJson:true,language:null,preserveVerbatim:true,allowEmpty:true}));
-    return NextResponse.json({...result,textoFinal:formatearDialogo(result.turnos,manifest.etiquetas),capturaCompleta:manifest.estado==="detenido",exito:result.fuentesFallidas.length===0},{headers:{"Cache-Control":"private, no-store"}});
+    return NextResponse.json({...result,textoFinal:formatearDialogo(result.turnos,manifest.etiquetas),capturaCompleta:!parcial&&manifest.estado==="detenido",parcial,hastaParte:parcial?body.hastaParte:manifest.partesEsperadas,exito:result.fuentesFallidas.length===0},{headers:{"Cache-Control":"private, no-store"}});
   }catch(e){
     const code=e instanceof Error?e.message:"dialogo_no_procesable";
     // Do not expose database errors, credentials, URLs or provider response bodies.

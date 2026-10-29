@@ -1,0 +1,49 @@
+(node:4946) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///data/khora-ingreso-c031/integrated/khora-web/tests/unit/blog-editorial.test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /data/khora-ingreso-c031/integrated/khora-web/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ exact version approves, private identifiers never projected (2.104267ms)
+✔ unauthorized actor rejected (0.442721ms)
+✔ missing approval rejected (0.171363ms)
+✔ editing body invalidates exact approval (0.337448ms)
+✔ editing Facebook format invalidates approval (0.495687ms)
+✔ source version change rejected (0.502771ms)
+✔ exclude conversacion_maya (0.292522ms)
+✔ exclude interpretacion_simultanea (0.2273ms)
+✔ three independent decisions (0.274261ms)
+✔ obfuscation needs explicit decision, flag not exported (0.723178ms)
+✔ reject extra private fields (0.28021ms)
+✔ reject ambiguous public date (0.303087ms)
+✔ source hash integrity (0.226199ms)
+✔ anchored proposals preserve exact source and unknown date (29.258517ms)
+✔ invented metadata rejected (0.215043ms)
+✔ provider unavailable not simulated (0.407543ms)
+✔ canonical digest key order invariant (0.445376ms)
+✔ facebook requires independently confirmed blog (0.164943ms)
+✔ lost Facebook response is unknown, no blind resend (0.573855ms)
+✔ known Facebook ID reconciles without POST (0.240095ms)
+✔ GitHub existing identical entry does not write again (1.081032ms)
+✔ GitHub refuses overwrite different content (0.500006ms)
+✔ Meta Page identity not inferred from configured numeric URL (0.523603ms)
+✔ Meta discovery requires explicit content task (0.547201ms)
+✔ Meta discovery bounded cursor loop (0.728442ms)
+✔ source classification not trusted from public client (0.232107ms)
+✔ provider objects never serialize credentials (0.197938ms)
+✔ session adapter supplies neither external cycle identifier (official random turn) (22.312827ms)
+✔ explicit text-only cut removes only audio barrier and preserves authorization gates (1.931896ms)
+(node:4958) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///data/khora-ingreso-c031/integrated/khora-web/tests/unit/custodia-hardening.test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /data/khora-ingreso-c031/integrated/khora-web/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ custody light has four independently evidenced meanings (0.731536ms)
+✔ old checkpoints, buffered audio and in-flight termination never produce green (0.152629ms)
+✔ snapshot identity covers source/session/title/partial/classification/audio, not a status string (0.210128ms)
+✔ audio receipt must bind actual bytes, sha256, source, session and part (32.083063ms)
+ℹ tests 33
+ℹ suites 0
+ℹ pass 33
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 370.978042

@@ -1,0 +1,47 @@
+{
+  "before": [
+    {
+      "name": "CUSTODY-01: retrying the same session returns the sealed volcado instead of inserting a duplicate",
+      "pass": false,
+      "error": "Custodia rota: la sesión apunta a un volcado que no existe; no se creará otro automáticamente."
+    },
+    {
+      "name": "CUSTODY-02: a retry that changes text under an archived session is rejected and leaves the original untouched",
+      "pass": false,
+      "error": "The input did not match the regular expression /Conflicto de idempotencia/. Input:\n\n'Error: Custodia rota: la sesión apunta a un volcado que no existe; no se creará otro automáticamente.'\n"
+    },
+    {
+      "name": "CUSTODY-04: a stored transcript that no longer matches its sealed SHA cannot pass idempotency checks",
+      "pass": false,
+      "error": "The input did not match the regular expression /el texto archivado ya no coincide con su SHA-256 sellado/. Input:\n\n'Error: Custodia rota: la sesión apunta a un volcado que no existe; no se creará otro automáticamente.'\n"
+    },
+    {
+      "name": "CUSTODY-14: archived captures stay sealed and text-only saves receive stable session IDs",
+      "pass": false,
+      "error": "The expression evaluated to a falsy value:\n\n  ok(saveHandler.includes(\"[archivado, texto, titulo, pulidosOk, observarDictado, guardarCheckpoint]\"))\n"
+    }
+  ],
+  "after": [
+    {
+      "name": "CUSTODY-01: retrying the same session returns the sealed volcado instead of inserting a duplicate",
+      "pass": true
+    },
+    {
+      "name": "CUSTODY-02: a retry that changes text under an archived session is rejected and leaves the original untouched",
+      "pass": true
+    },
+    {
+      "name": "CUSTODY-04: a stored transcript that no longer matches its sealed SHA cannot pass idempotency checks",
+      "pass": true
+    },
+    {
+      "name": "CUSTODY-14: archived captures stay sealed and text-only saves receive stable session IDs",
+      "pass": true
+    },
+    {
+      "name": "CUSTODY-18: sealed classification cannot change under an idempotent retry",
+      "pass": true
+    }
+  ],
+  "scope": "Focal 5 cases actual current guardarDictado and actual AES-GCM; fake database/external preparation/events/jobs. New classification rejection test covers both properties. Other full-suite cases not executed here."
+}

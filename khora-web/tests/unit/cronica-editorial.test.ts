@@ -1,0 +1,18 @@
+import {test} from "node:test";
+import assert from "node:assert/strict";
+import {cronicaUnits,validateCronica} from "../../lib/ingreso/cronica-editorial";
+import {elaborarCronica} from "../../lib/server/cronica-editorial";
+const hash="a".repeat(64),source="Hoy no trabajé. Quizá mañana. Ella dijo: «no lo sé».";
+const good={parts:[{index:0,text:"Hoy no trabajé. Quizá lo haga mañana. Ella dijo que no lo sabía."}]};
+const provider=(result:unknown=good,finish="stop",status=200)=>(async()=>new Response(JSON.stringify({choices:[{finish_reason:finish,message:{content:JSON.stringify(result)}}]}),{status})) as typeof fetch;
+test("source units cover every UTF16 character without omission",()=>{for(const s of [source,"x".repeat(4001),"🙂".repeat(8000)," ".repeat(3000)+source]){const units=cronicaUnits(s);assert.equal(units.map(u=>u.quote).join(""),s);assert.equal(units[0].start,0);assert.equal(units[units.length-1].end,s.length);for(let i=1;i<units.length;i++)assert.equal(units[i-1].end,units[i].start);}});
+test("empty source is not elaborated",()=>assert.throws(()=>cronicaUnits("  "),/SOURCE_EMPTY/));
+test("proposal retains explicit source identity and requires human review",()=>{const p=validateCronica(source,hash,good);assert.equal(p.sourceHash,hash);assert.equal(p.requiresReview,true);assert.equal(p.coverage[0].quote,source);assert.equal(p.body,good.parts[0].text);});
+test("missing, repeated, reordered or blank units cannot claim full coverage",()=>{for(const parts of [[],[{index:1,text:"x"}],[{index:0,text:" "}],[{index:0,text:"x"},{index:0,text:"x"}]])assert.throws(()=>validateCronica(source,hash,{parts}),/COVERAGE_INCOMPLETE/);});
+test("invalid source hash is rejected",()=>assert.throws(()=>validateCronica(source,"wrong",good),/HASH_INVALID/));
+test("existing Groq service/model receives entire source, no publication or original write",async()=>{let calls=0;const f=(async(u:any,init:any)=>{calls++;assert.equal(u,"https://api.groq.com/openai/v1/chat/completions");const body=JSON.parse(init.body);assert.equal(JSON.parse(body.messages[1].content).units[0].text,source);assert.match(body.messages[0].content,/No resumas/);return provider()(u,init);})as typeof fetch;const p=await elaborarCronica(source,hash,"synthetic",f);assert.equal(p.requiresReview,true);assert.equal(calls,1);});
+test("missing provider is explicit; never returns raw text as success",async()=>assert.rejects(()=>elaborarCronica(source,hash,""),/UNCONFIGURED/));
+test("provider failure rejects without secrets/raw response disclosure",async()=>{await assert.rejects(()=>elaborarCronica(source,hash,"synthetic",provider(good,"stop",401)),/PROVIDER_UNAVAILABLE/);});
+test("length/content filter/missing finish cannot silently truncate",async()=>{for(const finish of ["length","content_filter",""])await assert.rejects(()=>elaborarCronica(source,hash,"synthetic",provider(good,finish)),/RESPONSE_INCOMPLETE/);});
+test("malformed response is not a proposal",async()=>assert.rejects(()=>elaborarCronica(source,hash,"synthetic",(async()=>new Response("bad"))as typeof fetch),/RESPONSE_INVALID/));
+test("long source is never silently truncated",async()=>assert.rejects(()=>elaborarCronica("x".repeat(200001),hash,"synthetic"),/SOURCE_TOO_LARGE/));

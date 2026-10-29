@@ -1,0 +1,31 @@
+name: Blog editorial isolated tests
+on:
+  pull_request:
+    paths: ['khora-web/lib/server/blog/**', 'khora-web/tests/unit/blog-*', 'khora-web/db/migrations/20261019_blog_editorial.sql', '.github/workflows/blog-editorial-tests.yml']
+  push:
+    branches: ['feat/blog-editorial-sync-20261019']
+permissions:
+  contents: read
+jobs:
+  editorial:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.14.1'
+      - name: Install isolated test tools (not production dependencies)
+        shell: bash
+        run: npm install --prefix "$RUNNER_TEMP/blog-tools" --no-audit --no-fund typescript@5.9.3 @types/node@24 @electric-sql/pglite@0.5.10
+      - name: Strict core types
+        working-directory: khora-web
+        shell: bash
+        run: '"$RUNNER_TEMP/blog-tools/node_modules/.bin/tsc" --noEmit --target es2022 --module esnext --moduleResolution bundler --strict --skipLibCheck --types node --typeRoots "$RUNNER_TEMP/blog-tools/node_modules/@types" lib/server/blog/domain.ts lib/server/blog/metadata.ts lib/server/blog/repository.ts lib/server/blog/providers.ts lib/server/blog/delivery.ts lib/server/blog/outbox.ts tests/unit/blog-editorial.test.ts tests/unit/blog-postgres.test.ts'
+      - name: Synthetic domain and transport tests
+        working-directory: khora-web
+        run: node --experimental-strip-types --import ./tests/unit/blog-register.mjs --test tests/unit/blog-editorial.test.ts
+      - name: PostgreSQL isolated transactional tests
+        working-directory: khora-web
+        shell: bash
+        run: BLOG_TEST_PGLITE_MODULE="file://$RUNNER_TEMP/blog-tools/node_modules/@electric-sql/pglite/dist/index.js" node --experimental-strip-types --import ./tests/unit/blog-register.mjs --test tests/unit/blog-postgres.test.ts
