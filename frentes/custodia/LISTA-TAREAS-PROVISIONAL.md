@@ -1,10 +1,10 @@
-<!-- LIST_VERSION=0.3; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.4; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Lista provisional de tareas · Frente Custodia
 
 > **ESTADO: PROVISIONAL · NO VALIDADA CONTRA EL DISEÑO METODOLÓGICO FINAL.** Se conserva aquí por instrucción expresa del operador. La tarea CUSTODIA-02 debe revisar si esta materialización, sus campos y su relación con el OCP son adecuados. Este archivo no crea un segundo objeto canónico ni otro control de responsabilidad; el núcleo único del frente sigue siendo [OBJETO-CANONICO.md](OBJETO-CANONICO.md).
 
 - **Frente:** Custodia.
-- **Versión de esta lista provisional:** 0.3.
+- **Versión de esta lista provisional:** 0.4.
 - **Última actualización:** 2026-10-28.
 - **Metodología en la primera redacción:** Samantha v348 · NX-348m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `a4c90bd8ff1cd360b1f1662ff55371bd1b56b4cd`.
 - **Revalidación antes del cierre (intermedia):** Samantha v351 · NX-351m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `f069d2385f47731ac9d0f0ca76bfd3cef859cdd2`.
@@ -19,7 +19,7 @@
 
 **Prioridad:** P0 · URGENTE · Primera tarea operativa.
 
-**Estado:** EN CURSO — investigación de código y documentación parciales; catálogo real y recuperaciones por unidad pendientes. La ejecución del objetivo principal no está cerrada.
+**Estado:** EN CURSO — investigación de código ampliada con defectos de conteo/paginación y un incidente de dictado ausente; catálogo real completo y recuperaciones por unidad pendientes. La ejecución del objetivo principal no está cerrada.
 
 **Avance documentado en el ciclo CUSTODIA-INV-RECUP-SES-20261028-R6K2M9Q4**
 
@@ -49,6 +49,16 @@
 
 **Siguiente acción:** obtener el catálogo autenticado real de Recuperación, registrarlo de forma sanitizada y cotejar cada entrada con las partes y objetos correspondientes. Después, definir y ejecutar una recuperación por unidad sin sobrescribir ni borrar originales; cotejar el destino antes de declararlo recuperado. Esta lista registra el estado y el criterio, pero no afirma que la recuperación se haya ejecutado.
 
+### Incidente añadido a CUSTODIA-01 · dictado ausente y contador 40→20 · 2026-10-28
+
+- El operador informa que falta un dictado realizado hacia el final de una sesión de terminal; la última entrada que ve en Recuperación fecha del 28-10-2026 a las 17:08. También informa que el contador pasa de 40 a 20 cuando termina de cargar.
+- Se inspeccionó el código: la hidratación inicial concatena copias locales y remotas sin la misma deduplicación usada por la recarga; el contador refleja `recoveryItems.length`; el catálogo remoto pagina de 20 en 20. Esto ofrece una explicación plausible para el contador, no una prueba de qué contienen las 20 diferencias.
+- Se documentó el incidente en [INCIDENTE-DICTADO-AUSENTE-Y-CONTEO-40-20-2026-10-28.md](evidencias/INCIDENTE-DICTADO-AUSENTE-Y-CONTEO-40-20-2026-10-28.md) y se preservó la instrucción literal del operador.
+- La captura ausente sigue sin localizarse: no se obtuvo catálogo autenticado, acuse del checkpoint, fila de base de datos ni estado del perfil tras el reinicio. La pérdida definitiva no está demostrada.
+- Siguiente acción dentro de CUSTODIA-01: recorrer las páginas autenticadas hasta cursor nulo, deduplicar por identidad de sesión, revisar Custodia para posibles capturas archivadas y cotejar de forma autorizada la ventana de checkpoints del incidente. No copiar texto privado/UUID reales a GitHub ni intentar acceso a otro perfil o cuenta.
+- La lista muestra ahora los defectos de código conocidos y las pruebas de cierre R-06 a R-08 en el inventario; no se ha autorizado ni realizado un cambio de producto.
+
+
 ---
 
 ## CUSTODIA-02 · Revisar si esta lista provisional está bien diseñada conforme a la metodología vigente de OCP/FT
@@ -76,5 +86,6 @@
 - **2026-10-28 · Creación provisional:** se añaden únicamente las dos tareas expresamente solicitadas. CUSTODIA-01 queda primera por urgencia; CUSTODIA-02 queda pendiente para revisar el diseño de la propia lista.
 - **2026-10-28 · Revisión documental previa al cierre del ciclo 2:** se actualizó la referencia metodológica hasta Samantha v352 y se confirmó por lectura de vuelta que el documento conserva exactamente dos tareas. La versión 0.2 no validaba el diseño.
 - **2026-10-28 · Ciclo 3, inventario de recuperabilidad:** versión 0.3. CUSTODIA-01 pasa de «PENDIENTE — NO INICIADA» a «EN CURSO» por haber ejecutado análisis estático y documentado hallazgos; el catálogo autenticado y la recuperación real siguen pendientes. Se enlaza el inventario provisional sin guardar datos reales de dictados. El OCP se actualizó a CUSTODIA-v0.3; el diseño de esta lista sigue sin certificar.
+- **2026-10-28 · CUSTODIA-INC-RECUP-SES-20261028-R6K2M9Q4-C004 · versión 0.4:** documenta el incidente del dictado ausente, el conteo reportado 40→20 y la discrepancia entre hidratación inicial/recarga, y deja explícito que el catálogo completo, la fila de checkpoint y la causa raíz siguen sin verificar.
 - **Fuente del encargo literal:** [originales/INSTRUCCION-PENDIENTES-2026-10-28.md](originales/INSTRUCCION-PENDIENTES-2026-10-28.md).
 - **Estado de ejecución:** no se recuperaron ni inspeccionaron dictados como parte de esta modificación documental.
