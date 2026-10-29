@@ -214,3 +214,16 @@ OpenAI:
 - Developer mode y MCP con acciones de escritura: https://help.openai.com/en/articles/12584461-developer-mode-and-full-mcp-connectors-in-chatgpt
 
 Estas páginas pueden cambiar; volver a leerlas antes de afirmar un límite como vigente o de tomar una decisión contractual. La consulta de la documentación no prueba la cuota restante, la configuración real de la cuenta, permisos de escritura de cualquier otra sesión de ChatGPT ni el resultado funcional del sitio.
+
+
+## 10. Criterio de eficiencia situacional
+
+El producto de la investigación será el Protocolo Situacional de Publicación (PSP). No basta listar alternativas: hay que descubrir la secuencia que el modelo debe ejecutar en cada situación, por ejemplo ChatGPT Free sin escritura MCP, MCP con fallo, Actions caída, ausencia de herramientas Git remotas o contingencia RDC.
+
+La eficiencia se evalúa entre rutas elegibles, autorizadas y seguras. Primero seguridad/permisos/contrato; luego calidad y provenance; después evitar duplicados/races; después minimizar pasos manuales, latencia, reintentos y cuota. Una ruta más corta que omite migraciones, pruebas, verificación o evidencia no es más eficiente.
+
+Matriz preliminar: [MATRIZ-PRELIMINAR-ESCENARIOS-PUBLICACION-v0.1.md](MATRIZ-PRELIMINAR-ESCENARIOS-PUBLICACION-v0.1.md). El PSP no está finalizado: secuencias CLI productiva/rollback requieren más evidencia y la causa de los workflows fallidos sigue NO DETERMINADA.
+
+## 11. Frescura GitHub/Vercel
+
+Al corte 2026-10-29T02:15:30Z: main 4bd68f7bf72ddcd068713eb704b37339d5c25a9f; producción dpl_H7ModaV6GTefp9qbjiUnpiHmxgFH, SHA b528660e16552633d232a2397cbe42441a03438c, estado READY, creado 2026-10-24T21:59:10.581Z; diferencia 97 commits. Runs recientes de CI/UI/deploy siguen en failure y sin causa raíz confirmada. Releer antes de otra decisión material.
