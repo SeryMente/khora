@@ -1,0 +1,23 @@
+{
+  "codeCommit": "19b3966b6cdefc6edebea7d18e8e88acf102356b",
+  "canonicalReadbackSha256": "4406c1a8f974bd9b80febf5fc22f57bda24bc77be8562dabd66e0cc8fa2150c9",
+  "combinedStatus": {
+    "state": "failure",
+    "context": "Vercel – khora-web",
+    "description": "Cannot deploy from a private GitHub organization repository on the Hobby plan"
+  },
+  "checks": {
+    "http": 403,
+    "description": "Resource not accessible by personal access token"
+  },
+  "notPerformed": [
+    "billing change",
+    "repository visibility change",
+    "credential scope change",
+    "merge",
+    "production migration",
+    "deployment",
+    "public post"
+  ],
+  "next": "Authorized full gates and deployment path; normative server credential repair via vault; official Meta Page integration; exact content review/consent. Independent candidate work persisted, not product completion."
+}

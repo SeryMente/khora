@@ -1,0 +1,15 @@
+{
+  "source": "explicit message from authorized Blog constructor",
+  "commit": "7924fc760834ea10b7d02f8548c49a95250f5257",
+  "pullRequest": 329,
+  "state": "draft; not merged/migrated/deployed",
+  "representation": "text_only",
+  "audioPublic": false,
+  "reportedTests": "29unit+1transaction isolated+18syntax; not fullNextbuild",
+  "blockers": [
+    "normative401",
+    "Meta app/token/permissions unknown",
+    "migration and deployment unverified"
+  ],
+  "consent": "prefill is not approval"
+}

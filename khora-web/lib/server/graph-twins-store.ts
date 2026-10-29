@@ -12,7 +12,7 @@ const SOURCE_SQL=`SELECT v.id,COALESCE(v.version_aprobada,1) AS version_aprobada
  COALESCE(v.sha256_aprobado,vv.sha256) AS sha256_aprobado,v.recibido_en,vv.texto,vv.sha256,v.sha256 AS vigente_sha256,
  CASE WHEN v.version_aprobada IS NULL AND v.sha256_aprobado IS NULL THEN 'original_unreviewed' ELSE 'custody_approved' END AS input_basis
  FROM volcado v LEFT JOIN volcado_version vv ON vv.volcado_id=v.id AND vv.version=COALESCE(v.version_aprobada,1)
- WHERE v.usuario=$1 AND (v.version_aprobada IS NOT NULL OR v.sha256_aprobado IS NOT NULL OR $2::boolean)
+ WHERE COALESCE(to_jsonb(v)->>'tipo_entrada','general') <> 'interpretacion_simultanea' AND v.usuario=$1 AND (v.version_aprobada IS NOT NULL OR v.sha256_aprobado IS NOT NULL OR $2::boolean)
  ORDER BY v.recibido_en,v.id`;
 type DbSource={id:string;version_aprobada:number;sha256_aprobado:string;recibido_en:Date|string;texto:string;sha256:string;vigente_sha256:string;input_basis:string};
 async function sources(db:PoolClient,owner:string):Promise<DbSource[]>{
@@ -22,8 +22,8 @@ async function sources(db:PoolClient,owner:string):Promise<DbSource[]>{
   if(!ok){if(r.input_basis==='original_unreviewed')continue;throw new Error("approved_source_integrity_mismatch_no_silent_omission");}valid.push(r);
  }return valid;
 }
-async function custodyStatus(db:PoolClient,owner:string,eligible:number){const r=await db.query("SELECT count(*)::int AS total FROM volcado WHERE usuario=$1",[owner]);const total=Number(r.rows[0].total);return {total,eligible,excluded:total-eligible,policy:owner===ORIGINALS_OWNER?"owner-authorized-original-v1-verified-hash-no-custody-approval":"approved-version-with-matching-hash"};}
-function sourceStamp(rows:DbSource[]){return digest(JSON.stringify(rows.map(r=>[r.id,r.version_aprobada,r.sha256_aprobado,r.input_basis])));}
+async function custodyStatus(db:PoolClient,owner:string,eligible:number){const r=await db.query("SELECT count(*)::int AS total FROM volcado WHERE usuario=$1",[owner]);const total=Number(r.rows[0].total);return {total,eligible,excluded:total-eligible,editorial_exclusion:"interpretacion_simultanea (preserved in custody, excluded from personal graph)",policy:owner===ORIGINALS_OWNER?"owner-authorized-original-v1-verified-hash-no-custody-approval":"approved-version-with-matching-hash"};}
+function sourceStamp(rows:DbSource[]){return digest(JSON.stringify(["exclude-simultaneous-interpretation-v1",rows.map(r=>[r.id,r.version_aprobada,r.sha256_aprobado,r.input_basis])]));}
 function approvedSource(r:DbSource):Source{return {volcado_id:r.id,version:Number(r.version_aprobada),sha256:r.sha256_aprobado.trim(),captured_at:new Date(r.recibido_en).toISOString()};}
 async function proposals(db:PoolClient,owner:string){
  const selected=await sources(db,owner);

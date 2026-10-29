@@ -1,0 +1,8 @@
+{
+  "passed": true,
+  "scope": "Actual ingestion handler with isolated PostgreSQL; auth/events/version provider are fixtures. Actual paired graph selection SQL executed.",
+  "excludedNeverReadOrSent": true,
+  "otherOwner404": true,
+  "selectedKinds": 3,
+  "productionGraphNotModified": true
+}

@@ -1,0 +1,1 @@
+Busca el objeto canonico para el frente de trabajo, si lo encuentras, acutalizalo si es que no lo esta al maximo. Retoma contexto y lugar del modelo, repitiendo la ultima salida. <br /><br />

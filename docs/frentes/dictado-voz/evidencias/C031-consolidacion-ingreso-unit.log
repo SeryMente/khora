@@ -1,0 +1,24 @@
+(node:6133) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///data/khora-ingreso-c031/integrated/khora-web/tests/unit/ingreso-editorial.test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /data/khora-ingreso-c031/integrated/khora-web/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ four exact entry types, legacy never becomes a blog (1.422395ms)
+✔ classification never doubles as consent (0.14267ms)
+✔ archive intent starts without permission (7.393361ms)
+✔ stable identity across identical retry (0.609524ms)
+✔ changed content invalidates previous Yes (0.616082ms)
+✔ canonical digest sorts keys recursively without changing arrays (0.368773ms)
+✔ one confirmed destination is not both (0.26461ms)
+✔ mixed revisions cannot satisfy both (0.129789ms)
+✔ both same revision with proofs required (0.191312ms)
+✔ pending parts never report that no part exists (0.332562ms)
+✔ no verified parts is not a local-loss claim (0.120169ms)
+✔ operator-authorized text-only cut does not include audio (0.073982ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 121.709867

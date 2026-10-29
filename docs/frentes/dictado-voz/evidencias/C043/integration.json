@@ -1,0 +1,16 @@
+{
+  "base": "e48aea2ad54059832ae4a36a3e3c6b0018a292c8",
+  "blogSource": "9ba66e50eb5730ec332511e0559a014b794b667f",
+  "verifiedBlogBlobs": {
+    "mcp_manual_token.test.ts": "1b09b490ee413b1ff25d08b99143f5ec2e88e933",
+    "mcp_tool_auth_metadata.test.ts": "65180986b12c91e479731be154630fcf76600e45",
+    "mcp-route-fixture.ts": "a7b0479c87bbef2d5af9561d4e438404dd667ba2",
+    "blog-postgres.test.ts": "231c5e94eaa61be0ea478b20bb896b70a855fff9",
+    "normative-check.md": "b5c8d79c1a572f48c97a3c3b514cdf393b8d7820",
+    "mcp_contract_concordance.test.ts": "b6b9872eeca4f63d18eda50a7df98fbbf3efe532",
+    "mcp_oauth.test.ts": "898526c0cedbfc84be15f327a2695aa41c85b1e8"
+  },
+  "scope": "7 Blog tests/doc +2 Central tests; no runtime/security/deployment mutation",
+  "fullBuild": "pending; previous 700pass20fail1skip",
+  "remainingPrivateMethodologyAccess": "unresolved"
+}

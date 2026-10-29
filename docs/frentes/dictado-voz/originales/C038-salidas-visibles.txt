@@ -1,0 +1,17 @@
+Voy a llamarla **«Crónica personal»**. El dictado quedará a la vista, sin el bloque explicativo; la ayuda estará escondida y los pendientes discretos desaparecerán conforme el relato los cubra, sin obligarte a completarlos ni limitar lo que quieras decir.
+
+Me coordino con Blog 2 para trabajar los mínimos de una crónica pública —no un estándar forense— y publicar el hito en el mismo dominio de producción. Objetivo: dejarlo revisable durante estos veinte minutos. **NX-332m**.
+
+---
+
+La pantalla ya está más despejada: **Crónica personal**, botón de dictado visible y ayuda bajo el icono de información. Las tres pistas —**momento, lugar y qué haces**— se retiran al detectar menciones y reaparecen si borras el texto; no bloquean el archivo.
+
+Pasaron las pruebas locales de detección, interacción y tipos, y revisé las vistas móviles y de escritorio. Ahora publico esta revisión en producción; después comprobaré el dominio canónico.
+
+---
+
+**Ya está publicada: [abrir Crónica personal en producción](https://khora-web.vercel.app/sistema/ingreso).**
+
+Comprobé que el dominio canónico sirve la revisión nueva y que el acceso sin sesión funciona sin el error de configuración. Puedes seleccionar **Crónica personal** y empezar a dictar sin abrir la ayuda; las pistas reaccionan al texto sin exigir completarlas.[^https://khora-web.vercel.app/api/version]
+
+Cierro ahora la documentación y el aviso a Blog 2. La prueba con tu micrófono y tu sesión queda para tu revisión.

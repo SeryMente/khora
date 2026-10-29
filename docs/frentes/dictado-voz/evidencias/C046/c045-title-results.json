@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "checks": 20,
+  "sourceBlob": "973123b02689bffcbe00274111e0399cf577ff65",
+  "scope": "Actual React hook in Chromium; actual IndexedDB/AES-GCM revisions retain historical titles; synthetic scheduler/network/provider, no real Groq or physical session",
+  "covered": [
+    "3000ms configured cadence",
+    "no concurrent title request",
+    "recalculate on longer source",
+    "newest successful title retained",
+    "historical checkpoint title preserved",
+    "replacement discards stale result",
+    "failed provider has no fabricated title and retries",
+    "session abort cannot overwrite",
+    "disabled/archive prevents update"
+  ]
+}

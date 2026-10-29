@@ -1,0 +1,2 @@
+c044-hooks-before.ts(7,15): error TS2540: Cannot assign to 'NODE_ENV' because it is a read-only property.
+c044-hooks-before.ts(13,72): error TS2540: Cannot assign to 'NODE_ENV' because it is a read-only property.

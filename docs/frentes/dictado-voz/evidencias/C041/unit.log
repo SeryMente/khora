@@ -1,0 +1,37 @@
+✔ source units cover every UTF16 character without omission (1.363833ms)
+✔ empty source is not elaborated (0.480629ms)
+✔ proposal retains explicit source identity and requires human review (0.36023ms)
+✔ missing, repeated, reordered or blank units cannot claim full coverage (1.202591ms)
+✔ invalid source hash is rejected (0.202442ms)
+✔ existing Groq service/model receives entire source, no publication or original write (30.896275ms)
+✔ missing provider is explicit; never returns raw text as success (0.358195ms)
+✔ provider failure rejects without secrets/raw response disclosure (0.46351ms)
+✔ length/content filter/missing finish cannot silently truncate (1.610976ms)
+✔ malformed response is not a proposal (0.947712ms)
+✔ long source is never silently truncated (0.309759ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 160.740499
+✔ full text readback reaches official Graph endpoint and confirms exact approved message (25.868466ms)
+✔ link readback confirms exact text and approved article URL (0.731779ms)
+✔ HTTP200 with another message does not confirm delivery (0.475501ms)
+✔ HTTP200 with another post ID does not confirm delivery (0.497358ms)
+✔ link to another revision or absent attachment does not confirm delivery (1.142385ms)
+✔ foreign permalink does not become a publication receipt (1.53574ms)
+✔ wrong Page post ID is rejected before any HTTP request (3.419946ms)
+✔ Graph readback failures never create a success receipt (1.718294ms)
+✔ verification is read-only and never retries a send (0.969541ms)
+✔ fixed Graph host/path protections remain despite field expansion braces (0.636909ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 148.748219

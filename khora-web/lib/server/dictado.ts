@@ -1,3 +1,4 @@
+import { tipoEntradaValido, type TipoEntrada } from "../custodia/editorial";
 import { validarArchivoDialogo } from "../dialogo/archivar";
 import { encolarTrabajosCaptura } from "./custodia-trabajos";
 // @l0 L0-002-R · @req FIX-DICTADO/D2-D8 · @req TRACE-SESSION/010 · @req REVISION-COCKPIT/REQ-1 · @req FIX-DICTADO/D13 · @req SISTEMA-MENU/E4
@@ -112,6 +113,8 @@ export type AudioParte = {
 };
 
 export type EntradaDictado = {
+  tipoEntrada?: TipoEntrada;
+  ofuscada?: boolean;
   tituloAutomatico?: boolean;
   texto: string;
   sessionId?: string | null;
@@ -364,7 +367,7 @@ async function guardarDictadoConSesion(
     const volcadoVinculado = sesionRes.rows[0].volcado_id as string | null;
     if (volcadoVinculado) {
       const existenteRes = await client.query(
-        `SELECT id, texto, texto_original, sha256, chars, audio_partes, estado, session_id
+        `SELECT id, texto, texto_original, sha256, chars, audio_partes, estado, session_id, tipo_entrada, ofuscada
          FROM volcado WHERE id = $1 FOR UPDATE`,
         [volcadoVinculado],
       );
@@ -380,6 +383,7 @@ async function guardarDictadoConSesion(
       }
       if (
         String(existente.session_id ?? "") !== sessionId ||
+        existente.tipo_entrada !== (entrada.tipoEntrada ?? "general") || existente.ofuscada !== (entrada.ofuscada ?? false) ||
         createHash("sha256").update(descifrarTexto(String(existente.texto_original ?? existente.texto ?? "")), "utf8").digest("hex") !== sha ||
         normalizarFirmaPartesAudio(existente.audio_partes) !== normalizarFirmaPartesAudio(partesRecibidas)
       ) {
@@ -408,8 +412,8 @@ async function guardarDictadoConSesion(
       }
       await client.query(
         `INSERT INTO volcado
-         (id, texto, sha256, chars, titulo, origen, driver, usuario, estado, fuente, audio_url, audio_bytes, duracion_seg, pulido_aplicado, audio_partes, session_id, estado_transcripcion)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)`,
+         (id, texto, sha256, chars, titulo, origen, driver, usuario, estado, fuente, audio_url, audio_bytes, duracion_seg, pulido_aplicado, audio_partes, session_id, estado_transcripcion, tipo_entrada, ofuscada)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)`,
         [
           idNuevo,
           cifrarTexto(entrada.texto),
@@ -428,6 +432,7 @@ async function guardarDictadoConSesion(
           entrada.audioPartes ? JSON.stringify(entrada.audioPartes) : null,
           sessionId,
           entrada.estadoTranscripcion ?? null,
+          entrada.tipoEntrada ?? "general",entrada.ofuscada ?? false,
         ],
       );
 
@@ -519,6 +524,7 @@ async function guardarDictadoConSesion(
 }
 
 export async function guardarDictado(entrada: EntradaDictado) {
+  if ((entrada.tipoEntrada !== undefined && !tipoEntradaValido(entrada.tipoEntrada)) || (entrada.ofuscada !== undefined && typeof entrada.ofuscada !== "boolean")) throw Error("clasificacion_entrada_invalida");
   await asegurarColumnasDictado();
   const db = getDb();
 

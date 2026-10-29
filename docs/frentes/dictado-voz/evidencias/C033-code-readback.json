@@ -1,0 +1,72 @@
+{
+  "commit": "bdc0255df9c9573575b25082706197a55bef7211",
+  "files": [
+    {
+      "path": "khora-web/app/api/dictado/checkpoint/route.ts",
+      "sha256": "3e1ab92f9173a3ddea826124725a80e6ab26377c8fe66766fd0c5f1ca1aadec9",
+      "blob": "f498ab2eadc3d47fbf048ac3949f8cd61f946b3d"
+    },
+    {
+      "path": "khora-web/app/components/ingreso/DialogoPanel.tsx",
+      "sha256": "78d15a22a1d78d762657769d1c041091da9db9291bc29101b351f01eca3f04fa",
+      "blob": "bf5398861565ef39c43d7fe61c903127d4917ee4"
+    },
+    {
+      "path": "khora-web/app/components/ingreso/IngresoWorkspace.tsx",
+      "sha256": "23fe9385bb85b2ee5c60351624301e38e52ef8a2518b35e23b0a8b63a8e61476",
+      "blob": "be04dc0cdb0719f9d9db85a69413ed450d23c6e7"
+    },
+    {
+      "path": "khora-web/contracts/blog-editorial-v1.md",
+      "sha256": "2c61c98b15ac9b7a5513578951b69c5be4890343d5b57a4900ef9469972a875e",
+      "blob": "26c1f2a089af29ba3e9bf7a707cae8727d4a90b2"
+    },
+    {
+      "path": "khora-web/lib/client/archivar-recuperada.ts",
+      "sha256": "aa78772a6fcd63a7b63ca846df7a08b5263c36f9882c20779a4a96981e2c4ec0",
+      "blob": "609be798ab92c4ff1e00675d9d5430c4c4055d9e"
+    },
+    {
+      "path": "khora-web/lib/custodia/archivo-recuperado.ts",
+      "sha256": "5659261e637e1c653927a16b0dfbced14ab20c8036cde85dca8c894f3537198a",
+      "blob": "51592a1b2d5078c77e432e4e3345f03b591822db"
+    },
+    {
+      "path": "khora-web/lib/custodia/contrato.ts",
+      "sha256": "17ee5bb59cc3969e1dccbd9e4fc796f8abedf4966378099396681337e6415916",
+      "blob": "81bea1523f219c97d1077d526d0cffbf2da76365"
+    },
+    {
+      "path": "khora-web/lib/custodia/estado.ts",
+      "sha256": "06b3edf3bf0a1f4528528854bbc86be0acfc54234e6c0a87e78f6580692622bc",
+      "blob": "74501894d59e3ebbca39ca34f640d78de909a60e"
+    },
+    {
+      "path": "khora-web/lib/server/blog/metadata.ts",
+      "sha256": "442035fcb189ddf75e302dd390d99e15209d5840dacedba06375be009edf1f80",
+      "blob": "63025fe7ea8ca7cba004d2d3f71921a46e54f4d3"
+    },
+    {
+      "path": "khora-web/lib/server/custodia-recuperacion.ts",
+      "sha256": "c7e7c0922fde53036a754325d87cb818e5f7280f2eca67481a5b3b509855fac6",
+      "blob": "57f4cc4ef1fa163fab20733d3ebe960122897045"
+    },
+    {
+      "path": "khora-web/tests/unit/archivo-recuperado.test.ts",
+      "sha256": "50064acf81f30836cb937373ae641428934bdd39a888709ffda9dee4b7b7c21f",
+      "blob": "ff7d4800b9fdbc5b137e959b79f7da103d31c6eb"
+    },
+    {
+      "path": "khora-web/tests/unit/blog-metadata-hardening.test.ts",
+      "sha256": "c93aa74df07c6b751dbd94539787cc173e4a3c0a1b60976a0348dc4f51736125",
+      "blob": "29194d8b258c1e25d62566a4ee18245f82fec688"
+    },
+    {
+      "path": "khora-web/tests/unit/custodia-hardening.test.ts",
+      "sha256": "5f6f9a58baf867f812e6a4ee53ee556129f10f2d520668060de312f9e70cf07d",
+      "blob": "70c5f318ca1b8886be8c9e18d16038fda7887681"
+    }
+  ],
+  "all_matched": true,
+  "method": "GitHub contents directory entries pinned to commit; returned Git blob SHA compared to exact tested bytes"
+}
