@@ -47,3 +47,14 @@ El material se ha preparado en una rama separada de main. La rama principal acti
 - Verificar acceso anónimo al dominio productivo, configuración de la rama productiva y quota/Usage actual.
 - Resolver el contrato de Hobby personal/no comercial.
 - Decidir la autoridad única de publicación y probar el camino seleccionado inicialmente en preview.
+
+
+## Lectura de frescura posterior, antes del cierre
+
+- **Fuente normativa:** DUG v358 · NX-358m, Metacanon 1.23, GOW 2.7; blob 89a28e4d05f5baab9c4b86abdb9fbfc532690c75, releída en main.
+- **main:** HEAD observado 4cdedc37f32446e06d1a8bede40657b7d43cba41, commit del 2026-10-29T01:40:34Z.
+- **Producción:** el último deployment de producción consultado seguía siendo dpl_H7ModaV6GTefp9qbjiUnpiHmxgFH, READY, SHA b528660e16552633d232a2397cbe42441a03438c; comparación en esa lectura: 86 commits de diferencia.
+- **CI/deploy:** los runs de Deploy to Production, CI y UI Quality sobre el HEAD observado continuaron fallando en pocos segundos; logs/steps no fueron recuperables. El motivo sigue sin determinarse.
+- **Vercel preview para esta rama:** no se encontró un deployment asociado al filtrar por la rama publicabilidad/inauguracion-20261028 en la lectura realizada. Esto no demuestra que no exista un proceso asíncrono o una ejecución fuera de ese filtro; se vuelve a comprobar al retomar.
+
+Esta lectura solo añade la frescura obtenida antes del cierre. No actualiza ni certifica el estado posterior del repositorio o de Vercel.

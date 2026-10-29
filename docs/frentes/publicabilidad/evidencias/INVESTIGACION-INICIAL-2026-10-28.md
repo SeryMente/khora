@@ -19,6 +19,7 @@ La configuración existente combina una conexión Git de Vercel, que produce des
 
 - Repositorio consultado: https://github.com/SeryMente/khora.
 - HEAD de main en el momento de abrir esta rama: 595a1db89daa087315ef9844b0d9fc50aa8fc5a6, commit del 2026-10-29T01:38:26Z. La rama de investigación se creó desde ese HEAD; main puede avanzar después.
+- Lectura posterior de frescura, 2026-10-29T01:40:34Z: main avanzó a 4cdedc37f32446e06d1a8bede40657b7d43cba41. El último deployment de producción seguía en b528660e16552633d232a2397cbe42441a03438c; el delta observado pasó a 86 commits. Esta actualización no cambia la base de la rama de investigación.
 - Se leyó el manifiesto khora-web/package.json, blob 9d3124a7a0cbd231d7eb5451b541c501d2b407f5. La app declara Next.js, versión 0.3.8, Node 24.x en la configuración de Vercel.
 - El script prebuild de la aplicación ejecuta typecheck, revisión UI, contrato de navegación, pruebas unitarias, preflight de experiencia y compilación de extensión. Debe comprobarse en los logs reales del build qué pasos se ejecutan, con qué resultado y si coinciden con la suite de CI/E2E requerida.
 - No se encontró khora-web/vercel.json en la revisión consultada.
@@ -37,7 +38,7 @@ La consulta del proyecto muestra SSO habilitado con alcance all_except_custom_do
 
 **Última producción observada:** deployment dpl_H7ModaV6GTefp9qbjiUnpiHmxgFH, READY, target production, creación 2026-10-24T21:59:10.581Z, branch main, commit b528660e16552633d232a2397cbe42441a03438c. El commit asociado se fechó 2026-10-22T22:48:57Z.
 
-La comparación registrada entre b528660e16552633d232a2397cbe42441a03438c y el HEAD 595a1db89daa087315ef9844b0d9fc50aa8fc5a6 informó 81 commits de diferencia. Es una diferencia de commits, no una orden automática de desplegar todos esos cambios. Hay que determinar el cambio de producto que realmente debe publicarse.
+La comparación inicial entre b528660e16552633d232a2397cbe42441a03438c y el HEAD usado para crear la rama, 595a1db89daa087315ef9844b0d9fc50aa8fc5a6, informó 81 commits de diferencia. En la última lectura de frescura del ciclo, main se observó en 4cdedc37f32446e06d1a8bede40657b7d43cba41 y el delta era de 86 commits. Es una diferencia de commits, no una orden automática de desplegar todos esos cambios. Hay que determinar el cambio de producto que realmente debe publicarse.
 
 **Cuota consumida restante:** NO VERIFICADA. El equipo y las deployments son visibles, pero las herramientas utilizadas no expusieron el panel de Usage ni los contadores restantes. La presencia del plan Hobby no equivale a disponibilidad garantizada de builds/cuota en este momento.
 
@@ -76,6 +77,12 @@ Las llamadas a GitHub Actions consultadas el 2026-10-28 local mostraron, para HE
 - UI Quality: https://github.com/SeryMente/khora/actions/runs/40801629274
 
 Las solicitudes de pasos de job devolvieron listas vacías y las de logs devolvieron BlobNotFound. La causa exacta es desconocida. No atribuir el fallo a secretos ausentes, al límite de minutos de GitHub, a Vercel ni a un error del YAML sin obtener una evidencia diferenciadora.
+
+### 2.6 Relectura de frescura antes del cierre
+
+En 2026-10-29T01:40:34Z, main era 4cdedc37f32446e06d1a8bede40657b7d43cba41. La comparación con el SHA productivo b528660e16552633d232a2397cbe42441a03438c informó 86 commits de diferencia. El proyecto Vercel aún devolvía como último deployment de producción dpl_H7ModaV6GTefp9qbjiUnpiHmxgFH, SHA b528660e16552633d232a2397cbe42441a03438c, creado 2026-10-24T21:59:10.581Z.
+
+Los workflows recientes correspondientes al HEAD de main seguían fallando al terminar en pocos segundos; los logs no estuvieron disponibles. Como ejemplo, Deploy to Production: https://github.com/SeryMente/khora/actions/runs/40801841347; CI: https://github.com/SeryMente/khora/actions/runs/40801841394; UI Quality: https://github.com/SeryMente/khora/actions/runs/40801841341. La causa continúa NO DETERMINADA. Esta lectura es una captura temporal, no garantía de que main siga en ese SHA.
 
 ## 3. Límites publicados de Vercel Hobby
 
