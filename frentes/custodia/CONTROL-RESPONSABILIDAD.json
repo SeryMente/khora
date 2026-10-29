@@ -4,52 +4,57 @@
   "canonical_identity": "CUSTODIA",
   "repository": "SeryMente/khora",
   "state_object": "frentes/custodia/OBJETO-CANONICO.md",
-  "status": "unassigned",
+  "status": "assigned",
   "owner_thread": null,
-  "owner_alias": null,
-  "owner_alias_type": null,
-  "instance": null,
-  "session_folio": null,
-  "generation": 1,
-  "created_by_session_folio": "SES-20261028-C8M4R7Q1",
-  "created_by_alias": "chatgpt-custodia-SES-20261028-C8M4R7Q1",
-  "creation_alias_type": "operational_alias_not_native_thread_id",
-  "authorization_ref": "Instrucción directa del operador, 2026-10-28: “Guardalo en el directorio del frente de trabajo.” El operador aprobó el propósito canónico exacto. La autorización cubre la creación documental y su persistencia en este directorio; no documenta una transferencia explícita de titularidad continuada ni autoriza cambios de producto.",
-  "authorization_event": "CUSTODIA-CREATE-SES-20261028-C8M4R7Q1",
+  "owner_alias": "chatgpt-custodia-SES-20261028-R6K2M9Q4",
+  "owner_alias_type": "operational_alias_not_native_thread_id",
+  "instance": "chatgpt-custodia-SES-20261028-R6K2M9Q4",
+  "session_folio": "SES-20261028-R6K2M9Q4",
+  "generation": 2,
+  "expiry": null,
+  "authorization_ref": "Instrucción directa del operador en esta conversación, 2026-10-28: «Esta parte de la recuperabilidad es importante. Ve documentando de manera persistente en el OCP, en el frente, de manera provisional un documento que te permita tener inventario de todos los hallazgos en cuanto a esta investigación para que posteriormente podamos corregir todos los defectos que impiden que se garantice la recuperabilidad, tal y como te la he ido expresando que la necesito». Autoriza investigación y documentación provisional del inventario dentro del OCP; no autoriza cambios de código, alteraciones de producción ni recuperación que pueda sobrescribir/eliminar originales. Asignación inicial porque el control previo estaba unassigned, no una transferencia desde un titular anterior. El original literal se conservará en frentes/custodia/originales/INSTRUCCION-INVENTARIO-RECUPERABILIDAD-INGRESOS-2026-10-28.md. ID nativo de conversación no expuesto.",
+  "authorization_event": "CUSTODIA-INVENTARIO-RECUPERABILIDAD-SES-20261028-R6K2M9Q4",
+  "previous_owner": {
+    "status": "unassigned",
+    "owner_thread": null,
+    "owner_alias": null,
+    "instance": null,
+    "session_folio": null,
+    "generation": 1,
+    "record_kind": "owner_previous_to_generation_2",
+    "preserved_before_assignment": true
+  },
+  "previous_authorization_ref": "No había titularidad previa asignada en el control leído.",
+  "previous_acquired_at": "2026-10-28",
+  "prior_generation": 1,
+  "previous_blob": "11dc5e21b3fcd9a64113976245b81a466b4b185b",
+  "base_blob_sha": "11dc5e21b3fcd9a64113976245b81a466b4b185b",
+  "assignment_method": "Adjudicación inicial bajo Metacanon §47.2: control leído sin titular previo; actualización condicionada por el SHA del blob observado; generación 1→2. La lectura de vuelta queda pendiente hasta releer la ruta canónica.",
   "folio_collision_check": {
-    "searched_scope": "Búsqueda exacta del folio en SeryMente/khora y en el índice de búsqueda de la organización SeryMente mediante el conector GitHub; no se encontraron coincidencias. El índice no demuestra unicidad global.",
+    "searched_scope": "Búsqueda exacta del folio en el índice de GitHub con alcance de la organización SeryMente: cero resultados. El índice expuso nueve repositorios accesibles para esta consulta y dos controles adicionales de otros frentes en SeryMente/khora; la enumeración de todos los controles no es completa.",
     "repositories_searched": [
       "SeryMente/khora",
-      "SeryMente (índice de búsqueda)"
+      "SeryMente/serymente",
+      "SeryMente/otrogranprograma",
+      "SeryMente/GDP",
+      "SeryMente/khora-effectif",
+      "SeryMente/signal-interpreter",
+      "SeryMente/tercer-ambito",
+      "SeryMente/personal",
+      "SeryMente/metodologia"
     ],
-    "folio": "SES-20261028-C8M4R7Q1",
+    "controls_inspected": [
+      "SeryMente/khora/frentes/custodia/CONTROL-RESPONSABILIDAD.json",
+      "SeryMente/khora/docs/frentes/dictado-voz/CONTROL-RESPONSABILIDAD.json",
+      "SeryMente/khora/docs/frentes/harmonia/CONTROL-RESPONSABILIDAD.json"
+    ],
+    "folio": "SES-20261028-R6K2M9Q4",
     "matches_found": 0,
     "global_uniqueness": "not_verified"
   },
   "acquired_at": "2026-10-28",
-  "bootstrap_scope": "Creación y custodia documental inicial del frente transversal Custodia. No autoriza cambios de código de producto, credenciales, seguridad, despliegues, contratos de proveedores, migraciones ni acceso a datos reales.",
+  "bootstrap_scope": "Responsabilidad documental del frente transversal Custodia para inventariar hallazgos de recuperabilidad en Ingresos > Dictado > Recuperación y mantener el estado del OCP. No autoriza código de producto, credenciales, seguridad, despliegues, cambios de proveedor ni recuperaciones no destructivas sin verificación/consentimiento específico.",
   "enforcement": "cooperative registry; no server fencing of arbitrary writes",
-  "repository_visibility_note": "Las consultas de metadatos de GitHub en este ciclo fueron inconsistentes: la consulta inicial antes de las escrituras devolvió public; dos consultas consecutivas posteriores a las escrituras devolvieron private, coincidiendo ahora con el README. Estado actual observado: private. No se conoce la causa ni el momento de la diferencia, y no se ha verificado si el contenido fue accesible públicamente durante algún intervalo.",
   "readback_required": true,
-  "visibility_observations": [
-    {
-      "stage": "pre-write inspection",
-      "result": "public",
-      "source": "mcp__GitHub__get_repo"
-    },
-    {
-      "stage": "post-write verification 1",
-      "result": "private",
-      "source": "mcp__GitHub__get_repo"
-    },
-    {
-      "stage": "post-write verification 2",
-      "result": "private",
-      "source": "mcp__GitHub__get_repo"
-    }
-  ],
-  "current_visibility_observed": "private",
-  "current_visibility_confirmed_by_consecutive_reads": 2,
-  "visibility_transition_cause": "unknown",
-  "historical_public_exposure_assessment": "not_verified"
+  "transcript_scope": "Instrucción del operador preservada en el original de este ciclo; la continuidad visible se limita a mensajes adquiridos y no es una exportación nativa exhaustiva."
 }
