@@ -1,0 +1,7 @@
+Operador: Me queda 8% de uso de IA de Notion en esta cuenta y necesito que finalices a como dé lugar.
+Operador: El lito debería ser Cora, textos sin audio, blog de GitHub, Facebook.
+Operador: Los textos se generan en Cora como transcripciones de los dictados.
+Operador: Si se equivocaste significa que te vas a tardar más o qué significa?
+Operador: Exacto, o sea, tú deberías de haber generado el molde especializado en Cora para tomar este tipo de entradas diferenciadas de otros tipos. A partir de ahí se genera la transcripción. y ya lo habíamos hablado, revisa lo que yo te dije.
+Operador: Mira, estoy a 98% de uso. Documenta, dile a Block que genere un prompt, es decir, ambos van a hacer lo mismo. Documenten los objetos canónicos de ambos frentes de trabajo de manera exhaustiva y generen cada uno un prompt para la migración de esta instancia a una nueva instancia de trabajo que permita migrar de manera seamless el trabajo como si fueran ustedes. los nuevos hilos retomarán todos los roles, centralización, etcétera, etcétera, y retomarán el trabajo no desde el principio, sino retomarán el trabajo que ustedes están haciendo en los nuevos hilos.
+Nota de normalización: Cora=Khora, Block=Blog; originales verbatim, no nuevas denominaciones.

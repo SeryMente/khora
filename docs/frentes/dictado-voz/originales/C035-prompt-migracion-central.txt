@@ -1,0 +1,21 @@
+/handoff · Khora · Central Ingreso/Dictado y coordinación Blog
+
+Retoma como SamanthaL, hilo CENTRALIZANTE y constructor de Ingreso; hereda integración, luces, custodia, recuperación y títulos. El operador ordenó migrar ambos hilos, no comenzar de nuevo. Blog conserva constructor propio; coordina con su NUEVA sesión cuando se identifique, no dependas de la antigua ni inventes su URL. Un escritor por archivo; central consolida, Blog no toca Ingreso.
+
+Lee en este orden:
+1. Metaprompt Canónico de Samantha — https://app.notion.com/p/c85a41878241830588e181f4c02fbab4 — v330 · NX-330m; verifica fuente viva.
+2. Metacanon — https://github.com/SeryMente/metodologia/blob/main/METACANON-OBJETOS-CANONICOS.md — v1.6 · METACANON-OBJETOS-v1.6; verifica delta.
+3. Objeto canónico CENTRAL — https://github.com/SeryMente/khora/blob/feat/ingreso-autobiografico-20261019/docs/frentes/dictado-voz/OBJETO-CANONICO.md — MCP-OBS-DICTADO-v0.6.21. Lee §1–13, recordatorios y C035; fuentes originales C032/C035 y evidencia C035, sin perder historia.
+4. Canon BLOG — https://github.com/SeryMente/metodologia/blob/docs/blog-editorial-sync-20261019/frentes/blog-personal/OBJETO-CANONICO.md — lee su estado más reciente, no atribuyas sus reportes como pruebas tuyas.
+
+Estado al cierre de este ciclo: C035 · MIGRACIÓN SOLICITADA POR OPERADOR AL 98% DE USO. Nuevo hilo hereda SamanthaL centralizante y construcción de Ingreso, coordinación con nuevo hilo Blog, luces, custodia, recuperación y títulos. No reiniciar el proyecto. Hito correcto: seleccionar Blog personal y usar molde orientador EN INGRESO antes/durante dictado → transcripción generada en Khora → Archivar registro manual → previa exacta y decisión conjunta → GitHub Blog → Facebook, sin publicar audio. Escribir/pegar en /sistema/blog NO sustituye este recorrido.
+Código central integrado c0dcb2e26f9df31273bbf654ffc52222a7d9d887, rama feat/ingreso-autobiografico-20261019; entrega Blog3fcfe4c integrada, siete blobs cotejados. Nueva preview dpl_jLTALH6xrtcDqoKNd5Tc3B927TfB ERROR lint_or_type_error, no READY ni producción. Blog reportó TS2339 reproducible en test44 y corrección mínima no aplicada. Siguiente paso: registrar nuevos hilos/roles, reproducir y corregir ese test con configuración global, verificar molde/captura y consumidor existentes antes de añadir código, probar recorrido real y desplegar candidata exacta. No recapturar una transcripción ya archivada.
+Pendientes materiales: revisión presencial de interfaz, normativa y proveedores reales, nota exacta aprobada y automatización efectiva. No publicación real acreditada. Luces/recuperación/títulos conservan su trabajo y pendientes históricos. No más implementación en el hilo saliente: corte de documentación y migración por orden actual.
+
+⚗️ En prueba / recién fallido:
+C035 central:99/99 unit sin skip,27 comprobaciones React/Chromium/WebCrypto con HTTP/auth/recibos sintéticos,12 gateseditorial+12gatesdispatch aislados; tipos5.9.3 núcleo+JSX exit0 EXCLUYERON testglobal. No equivalen a publicación ni buildcompleto.
+Vercel nueva candidataERROR; logs403específico. Blog halló TS2339 test44 por estrechamiento assert.equal(next.preview,null); propuesta const initialPreview=next.preview;assert.equal(initialPreview,null); reproduce1error→0 en su banco ES2017, no aplicada ni verificada central. No asumir única causa.
+
+Siguiente paso: registrar nuevos hilos/roles, reproducir y corregir ese test con configuración global, verificar molde/captura y consumidor existentes antes de añadir código, probar recorrido real y desplegar candidata exacta.
+
+El expediente Git es portable; /data del hilo antiguo NO se supone compartido. Recupera scripts/evidencias del canon. Revalida head/main/PR330 y diferencias antes de mutar; no merge/promoción por inferencia. No copiar secretos de producción a preview ni desproteger Vercel. No tocar metaprompt, facturación o permisos sin autorización específica. El original se conserva privado, ofuscada es independiente y no se descifra. Publicación exige texto exacto aprobado para ambos destinos; No conserva Custodia. Reutiliza evidencia causal vigente y entorno local cuando sea más eficiente; no repetir auditorías completas por rutina. Actualiza ESTE objeto y su manifiesto cada ciclo, sin crear otro canon. Empieza desde el checkpoint, no emitas otro handoff salvo petición.

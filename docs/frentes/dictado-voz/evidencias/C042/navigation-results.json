@@ -1,0 +1,12 @@
+{
+  "checks": 7,
+  "before": {
+    "exit": 1,
+    "error": "❌ Contrato de navegación inválido.\n  RUTA_HUERFANA: /sistema/blog"
+  },
+  "after": {
+    "exit": 0,
+    "stdout": "✅ Contrato de navegación íntegro: jerarquía, cobertura, enlaces, aliases y rutas verificadas."
+  },
+  "scope": "Unmodified real guardian, current registry, synthetic complete route fixture; not full repository scan or UI acceptance"
+}

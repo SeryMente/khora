@@ -1,0 +1,6 @@
+{
+  "scope": "Actual editorial HTTP handler, repository, domain, real isolated PostgreSQL; auth/normative upstream/crypto adapters synthetic. No production access or publication.",
+  "checks": 23,
+  "passed": true,
+  "migrationsAppliedTwice": true
+}

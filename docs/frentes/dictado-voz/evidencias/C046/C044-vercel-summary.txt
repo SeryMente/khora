@@ -1,0 +1,22 @@
+[Reading 19 new lines (total: 19 lines)]
+
+INSPECT_EXIT=1
+2026-10-20T00:54:50.977Z  > npm run typecheck && npm run ui-review:check && npm run ui:contract && npm run test:unit && node --import tsx scripts/preflight-experience.ts && node scripts/build-extension.mjs
+2026-10-20T00:56:29.486Z  ✔ approval response lost freezes edits; status reconciles without new POST (2.300564ms)
+2026-10-20T00:56:29.495Z  ✔ snapshot identity covers source/session/title/partial/classification/audio, not a status string (0.289008ms)
+2026-10-20T00:56:29.513Z  Neo4j-backed graph query error: Neo4jInalcanzableError: Neo4j no estÃ¡ disponible: offline
+2026-10-20T00:56:29.513Z  Neo4j-backed graph query error: Error: invalid Cypher
+2026-10-20T00:56:29.514Z  Neo4j-backed graph query error: Neo4jNoConfiguradoError: Credenciales de Neo4j no configuradas en las variables de entorno (NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD)
+2026-10-20T00:56:29.523Z  ✖ KHORA local contract matches the canonical Metodología contract (106.864688ms)
+2026-10-20T00:56:29.528Z  ℹ tests 722
+2026-10-20T00:56:29.528Z  ℹ pass 719
+2026-10-20T00:56:29.528Z  ℹ fail 1
+2026-10-20T00:56:29.528Z  ℹ skipped 2
+2026-10-20T00:56:29.528Z  ✖ failing tests:
+2026-10-20T00:56:29.529Z  ✖ KHORA local contract matches the canonical Metodología contract (106.864688ms)
+2026-10-20T00:56:29.529Z  Error: spawnSync gh ENOENT
+2026-10-20T00:56:29.529Z  code: 'ENOENT',
+2026-10-20T00:56:29.529Z  error: Error: spawnSync gh ENOENT
+2026-10-20T00:56:29.540Z  Error: [BUILD_UTILS_SPAWN_1] Command "if [ "$VERCEL_ENV" = "production" ]; then node scripts/migrate-runtime.mjs; fi && npm run build" exited with 1
+status	● Error
+✅ Process completed with exit code 0 (runtime: 3.46s)

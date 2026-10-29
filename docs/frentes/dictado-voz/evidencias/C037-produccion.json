@@ -1,0 +1,17 @@
+{
+  "event": "C037",
+  "commit": "ad685dee36c0f0ae1f6f4717439ccb7c39c90c35",
+  "deploymentId": "dpl_12FCcmkeXDBbLRqoi6eyd5gqKVKK",
+  "state": "READY",
+  "target": "production",
+  "alias": "khora-web.vercel.app",
+  "url": "https://khora-web.vercel.app/sistema/ingreso",
+  "rollbackDeploymentId": "dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr",
+  "technicalPublicationVerified": true,
+  "physicalAcceptance": false,
+  "authenticatedApplicationVerified": false,
+  "mergedToMain": false,
+  "editorialPublication": false,
+  "summaryImplementation": false,
+  "reportedPreviewErrorCause": "not determined"
+}

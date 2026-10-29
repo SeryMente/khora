@@ -1,0 +1,4 @@
+{
+  "checks": 26,
+  "scope": "actual AST-extracted existing Ingreso handler with synthetic closure; zero audio start invoked on selection"
+}

@@ -57,7 +57,7 @@ function makeDb(state: FakeState) {
       return { rows: state.parts.map((p) => ({ ...p })), rowCount: state.parts.length };
     }
 
-    if (normalized.includes("select id, texto, texto_original, sha256, chars, audio_partes, estado, session_id from volcado")) {
+    if (normalized.includes("select id, texto, texto_original, sha256, chars, audio_partes, estado, session_id, tipo_entrada, ofuscada from volcado")) {
       return { rows: state.volume ? [{ ...state.volume }] : [], rowCount: state.volume ? 1 : 0 };
     }
 
@@ -88,6 +88,8 @@ function makeDb(state: FakeState) {
         io_id: null,
         audio_partes: params[14],
         session_id: params[15],
+        tipo_entrada: params[17],
+        ofuscada: params[18],
         folio: 1,
         recibido_en: new Date(),
         version_aprobada: null,
@@ -203,6 +205,8 @@ function seedLinkedArchive(texto: string, sessionId = "session-archive-001") {
       audio_partes: null,
       session_id: sessionId,
       estado: "en_revision",
+      tipo_entrada: "general",
+      ofuscada: false,
     },
     versions: [{ version: 1 }],
     log: [],
@@ -482,7 +486,7 @@ test("CUSTODY-14: archived captures stay sealed and text-only saves receive stab
   assert.ok(saveHandler.includes("if (!sesionIdRef.current) sesionIdRef.current = generarSesionId()"));
   assert.ok(saveHandler.includes("setArchivado(true)"));
   assert.ok(saveHandler.includes("setAviso("));
-  assert.ok(saveHandler.includes("[archivado, texto, titulo, pulidosOk, observarDictado, guardarCheckpoint]"));
+  assert.ok(saveHandler.includes("[archivado, texto, titulo, clasificacion, pulidosOk, observarDictado, guardarCheckpoint]"));
 
   const attachStart = workspace.indexOf("const handleAdjuntarAudio");
   const cleanStart = workspace.indexOf("const limpiar", attachStart);
@@ -556,4 +560,11 @@ test("CUSTODY-17: Ingesta UI consumes the canonical pipeline digest key", () => 
   assert.ok(view.includes("selectedItem.sha256_aprobada"));
   assert.ok(!page.includes("selectedItem?.sha256_aprobado"));
   assert.ok(!view.includes("selectedItem.sha256_aprobado"));
+});
+
+test("CUSTODY-18: sealed classification cannot change under an idempotent retry", async () => {
+ for (const change of [{tipoEntrada: "blog_personal" as const}, {ofuscada: true}]) {
+  const texto="Original inmutable del operador.";const {state,sessionId}=seedLinkedArchive(texto);const originalCiphertext=state.volume.texto;setDbForTesting(makeDb(state) as any);
+  try {await assert.rejects(()=>guardarDictado({texto,sessionId,...change}),/Conflicto de idempotencia/);assert.equal(state.volumeInsertCount,0);assert.equal(state.volume.texto,originalCiphertext);assert.equal(state.volume.tipo_entrada,"general");assert.equal(state.volume.ofuscada,false);} finally{resetDbForTesting();}
+ }
 });

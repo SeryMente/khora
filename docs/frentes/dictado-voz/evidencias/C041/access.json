@@ -1,0 +1,8 @@
+{
+  "vercel": "connection2 available; unscoped exact project calls work, teamId requests and MCP logs403",
+  "github": "read/write confirmed; checkruns403, not repeated",
+  "meta": "not provided; clipboard not read; no listo confirmation",
+  "rdc": "explicit PC14 a101ad93-9e4c-4c98-a8bc-6cb58049873c ping timeout363e240f-ac54-4d1c-941d-e474b19a3800; no other device substitution",
+  "temporaryCliAuth": "cleanup/revocation unverified after device timeout; no secret in evidence",
+  "normative": "C040 reported401 retryablefalse; not retried or bypassed"
+}

@@ -10,7 +10,8 @@ import { evaluarCustodiaAudio } from "@/lib/audio/custodia";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 const Dialogo = z.object({ version:z.literal(1), organizarComoDialogo:z.boolean().optional(), estado:z.enum(["preparando","grabando","detenido","interrumpido"]), etiquetas:z.object({microphone:z.string().min(1).max(80),chrome_tab:z.string().min(1).max(80)}), partesEsperadas:z.number().int().nonnegative().max(10000), turnos:z.array(z.object({fuente:z.enum(["microphone","chrome_tab"]),start_ms:z.number().nonnegative(),end_ms:z.number().nonnegative(),texto:z.string().max(100000),solapado:z.boolean().optional()})).max(10000) });
-const Snapshot = z.object({ sessionId: z.string().uuid(), revisionId: z.string().uuid().optional(), clientAt: z.number().int().nonnegative().optional(), texto: z.string().max(2_000_000), parcial: z.string().max(100_000).default(""), titulo: z.string().max(500).default(""), fuenteEntrada: z.enum(["texto","microfono","chrome_live_caption","audio_archivo","dialogo"]).default("texto"), duracionSeg: z.number().nonnegative().default(0), audioPartes: z.array(z.unknown()).max(10000).default([]), dialogo:Dialogo.optional(), corteAudio:z.object({hastaParte:z.number().int().positive(),finMs:z.number().nonnegative()}).optional(), recuperadaDe:z.object({sessionId:z.string().uuid(),revisionId:z.string().uuid()}).optional() });
+const PublicationIntent = z.object({publicationId:z.string().uuid(),decision:z.boolean().nullable(),sourceTextSha256:z.string().regex(/^[a-f0-9]{64}$/i),state:z.enum(["awaiting_archive","awaiting_decision","awaiting_editorial_receipt","received"])});
+const Snapshot = z.object({ tipoEntrada:z.enum(["general","conversacion_maya","interpretacion_simultanea","blog_personal"]).optional(),ofuscada:z.boolean().optional(),publicationIntent:PublicationIntent.optional(), sessionId: z.string().uuid(), revisionId: z.string().uuid().optional(), clientAt: z.number().int().nonnegative().optional(), texto: z.string().max(2_000_000), parcial: z.string().max(100_000).default(""), titulo: z.string().max(500).default(""), fuenteEntrada: z.enum(["texto","microfono","chrome_live_caption","audio_archivo","dialogo"]).default("texto"), duracionSeg: z.number().nonnegative().default(0), audioPartes: z.array(z.unknown()).max(10000).default([]), audioPartesEsperadas:z.number().int().nonnegative().max(10000).optional(), dialogo:Dialogo.optional(), corteAudio:z.object({hastaParte:z.number().int().positive(),finMs:z.number().nonnegative()}).optional(), recuperadaDe:z.object({sessionId:z.string().uuid(),revisionId:z.string().uuid()}).optional() });
 export async function POST(req: NextRequest) {
   const email = (await auth())?.user?.email;
   if (!email) return NextResponse.json({ error: "no_autenticado" }, { status: 401 });
@@ -55,6 +56,15 @@ export async function GET(req: NextRequest) {
     const requested=req.nextUrl.searchParams.get("sessionId");
     if(requested){const sealed=await db.query("SELECT s.volcado_id FROM dictado_session s LEFT JOIN volcado v ON v.id=s.volcado_id WHERE s.session_id=$1 AND s.estado='complete' AND COALESCE(s.custodia_owner,s.checkpoint_usuario,v.usuario)=$2",[requested,email]);if(sealed.rows.length)return NextResponse.json({owner:email,sealed:true,id:sealed.rows[0].volcado_id,recovery:null},{headers:{"Cache-Control":"no-store"}});}
 
+    const revisionId=req.nextUrl.searchParams.get("revisionId");
+    if(requested&&revisionId){
+      const selected=await db.query("SELECT snapshot,sha256 FROM dictado_checkpoint WHERE session_id=$1 AND revision_id=$2 AND usuario=$3",[requested,revisionId,email]);
+      if(!selected.rows.length)return NextResponse.json({error:"punto_no_disponible"},{status:404});
+      const snapshot=JSON.parse(descifrarTexto(selected.rows[0].snapshot));
+      const exactText=snapshot.texto+(snapshot.parcial?"\n\n"+snapshot.parcial:"");
+      if(snapshot.sessionId!==requested||snapshot.revisionId!==revisionId||createHash("sha256").update(exactText).digest("hex")!==selected.rows[0].sha256)throw Error("integridad");
+      return NextResponse.json({owner:email,recovery:snapshot},{headers:{"Cache-Control":"private, no-store","Vary":"Cookie"}});
+    }
     const r=await db.query(`SELECT s.session_id,s.checkpoint_text,s.checkpoint_sha256,s.checkpoint_en,s.actualizado_en,c.snapshot FROM dictado_session s LEFT JOIN LATERAL(SELECT snapshot FROM dictado_checkpoint WHERE session_id=s.session_id AND usuario=$1 ORDER BY client_at DESC,creado_en DESC LIMIT 1)c ON true WHERE COALESCE(s.custodia_owner,s.checkpoint_usuario)=$1 AND s.estado<>'complete' AND ($2::text IS NULL OR s.session_id=$2) ORDER BY COALESCE(s.checkpoint_en::timestamptz,s.actualizado_en) DESC LIMIT 1`,[email,requested]);
     if(!r.rows.length) return NextResponse.json({owner:email,recovery:null},{headers:{"Cache-Control":"no-store"}});
     const row=r.rows[0]; const snapshot=row.snapshot?JSON.parse(descifrarTexto(row.snapshot)):{};

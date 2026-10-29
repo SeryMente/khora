@@ -1,0 +1,23 @@
+{
+  "passed": 12,
+  "checks": [
+    "resume requires authenticated owner before repository",
+    "foreign origin cannot resume",
+    "configured owner is enforced",
+    "malformed JSON blocked",
+    "oversized serialized body blocked before parsing",
+    "closed normative turn blocks resume before repository",
+    "invalid runtime context blocks resume",
+    "successful resume response cannot be cached",
+    "resume forwards authenticated owner and publication ID only",
+    "resume uses submitted normative token, not fabricated server OPEN",
+    "refusal remains possible without positive normative authorization",
+    "unavailable normative upstream is not replaced by fake OPEN"
+  ],
+  "scope": "actual editorial route module with Request/Response; auth/config/normative/repository adapters isolated",
+  "not_proven": [
+    "real credentials/normative upstream",
+    "PostgreSQL schema or ownership query execution",
+    "real publication"
+  ]
+}

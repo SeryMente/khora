@@ -1,0 +1,311 @@
+{
+  "source": "Vercel filter_project_envs decrypt=false, default authorized context",
+  "envs": [
+    {
+      "key": "AUTH_SECRET",
+      "target": [
+        "preview"
+      ],
+      "gitBranch": null,
+      "decrypted": false
+    },
+    {
+      "key": "VAULT_AGENT_CANONICAL_URL",
+      "target": [
+        "production"
+      ],
+      "gitBranch": null,
+      "decrypted": false
+    },
+    {
+      "key": "KHORA_UI_REVIEW_MODE",
+      "target": [
+        "production"
+      ],
+      "gitBranch": null,
+      "decrypted": false
+    },
+    {
+      "key": "AUTH_SECRET",
+      "target": [
+        "preview"
+      ],
+      "gitBranch": "fix/audio-vault-error-state",
+      "decrypted": false
+    },
+    {
+      "key": "AUTH_SECRET",
+      "target": [
+        "preview"
+      ],
+      "gitBranch": "fix/audio-player-runtime",
+      "decrypted": false
+    },
+    {
+      "key": "EP_TOKEN_TTL_SECONDS",
+      "target": [
+        "production"
+      ],
+      "gitBranch": null,
+      "decrypted": false
+    },
+    {
+      "key": "EP_ALLOWED_EMAIL",
+      "target": [
+        "production"
+      ],
+      "gitBranch": null,
+      "decrypted": false
+    },
+    {
+      "key": "EP_CANONICAL_URL",
+      "target": [
+        "production"
+      ],
+      "gitBranch": null,
+      "decrypted": false
+    },
+    {
+      "key": "EP_BOOTSTRAP_JWT_SECRET",
+      "target": [
+        "production"
+      ],
+      "gitBranch": null,
+      "decrypted": false
+    },
+    {
+      "key": "MCP_OAUTH_REDIRECT_URIS",
+      "target": [
+        "production"
+      ],
+      "gitBranch": null,
+      "decrypted": false
+    },
+    {
+      "key": "MCP_ALLOWED_EMAIL",
+      "target": [
+        "production"
+      ],
+      "gitBranch": null,
+      "decrypted": false
+    },
+    {
+      "key": "MCP_OAUTH_CLIENT_ID",
+      "target": [
+        "production"
+      ],
+      "gitBranch": null,
+      "decrypted": false
+    },
+    {
+      "key": "KHORA_READONLY_DATABASE_URL",
+      "target": [
+        "production"
+      ],
+      "gitBranch": null,
+      "decrypted": false
+    },
+    {
+      "key": "MCP_CANONICAL_URL",
+      "target": [
+        "production"
+      ],
+      "gitBranch": null,
+      "decrypted": false
+    },
+    {
+      "key": "MCP_JWT_SECRET",
+      "target": [
+        "production"
+      ],
+      "gitBranch": null,
+      "decrypted": false
+    },
+    {
+      "key": "MCP_OAUTH_CLIENT_SECRET",
+      "target": [
+        "production"
+      ],
+      "gitBranch": null,
+      "decrypted": false
+    },
+    {
+      "key": "GROQ_API_KEY",
+      "target": [
+        "production",
+        "preview",
+        "development"
+      ],
+      "gitBranch": null,
+      "decrypted": false
+    },
+    {
+      "key": "BLOB_READ_WRITE_TOKEN",
+      "target": [
+        "production",
+        "preview",
+        "development"
+      ],
+      "gitBranch": null,
+      "decrypted": false
+    },
+    {
+      "key": "NEO4J_PASSWORD",
+      "target": [
+        "production"
+      ],
+      "gitBranch": null,
+      "decrypted": false
+    },
+    {
+      "key": "NEO4J_USER",
+      "target": [
+        "production"
+      ],
+      "gitBranch": null,
+      "decrypted": false
+    },
+    {
+      "key": "NEO4J_URI",
+      "target": [
+        "production"
+      ],
+      "gitBranch": null,
+      "decrypted": false
+    },
+    {
+      "key": "X_KHORA_KEY",
+      "target": [
+        "production"
+      ],
+      "gitBranch": null,
+      "decrypted": false
+    },
+    {
+      "key": "KHORA_API_KEY",
+      "target": [
+        "production"
+      ],
+      "gitBranch": null,
+      "decrypted": false
+    },
+    {
+      "key": "NEXT_PUBLIC_API_URL",
+      "target": [
+        "production"
+      ],
+      "gitBranch": null,
+      "decrypted": false
+    },
+    {
+      "key": "KHORA_API_URL",
+      "target": [
+        "production"
+      ],
+      "gitBranch": null,
+      "decrypted": false
+    },
+    {
+      "key": "NPM_CONFIG_LEGACY_PEER_DEPS",
+      "target": [
+        "production"
+      ],
+      "gitBranch": null,
+      "decrypted": false
+    },
+    {
+      "key": "AUTH_SECRET",
+      "target": [
+        "production"
+      ],
+      "gitBranch": null,
+      "decrypted": false
+    },
+    {
+      "key": "OIDC_ISSUER_URL",
+      "target": [
+        "production"
+      ],
+      "gitBranch": null,
+      "decrypted": false
+    },
+    {
+      "key": "OIDC_CLIENT_SECRET",
+      "target": [
+        "production"
+      ],
+      "gitBranch": null,
+      "decrypted": false
+    },
+    {
+      "key": "OIDC_CLIENT_ID",
+      "target": [
+        "production"
+      ],
+      "gitBranch": null,
+      "decrypted": false
+    },
+    {
+      "key": "GITHUB_TOKEN",
+      "target": [
+        "production"
+      ],
+      "gitBranch": null,
+      "decrypted": false
+    },
+    {
+      "key": "INTERNAL_TRIGGER_SECRET",
+      "target": [
+        "production"
+      ],
+      "gitBranch": null,
+      "decrypted": false
+    },
+    {
+      "key": "GITHUB_WEBHOOK_SECRET",
+      "target": [
+        "production"
+      ],
+      "gitBranch": null,
+      "decrypted": false
+    },
+    {
+      "key": "DATABASE_URL",
+      "target": [
+        "production"
+      ],
+      "gitBranch": null,
+      "decrypted": false
+    },
+    {
+      "key": "NOTION_ROADMAP_DATABASE_ID",
+      "target": [
+        "production"
+      ],
+      "gitBranch": null,
+      "decrypted": false
+    },
+    {
+      "key": "NOTION_TOKEN",
+      "target": [
+        "production"
+      ],
+      "gitBranch": null,
+      "decrypted": false
+    },
+    {
+      "key": "JULES_API_KEY",
+      "target": [
+        "production"
+      ],
+      "gitBranch": null,
+      "decrypted": false
+    }
+  ],
+  "hiddenProductionEnvCount": 0,
+  "limits": [
+    "project-level metadata only; no values decrypted",
+    "shared environment variables/deployment overrides not enumerated",
+    "presence is not validity or permission verification"
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "base": "8925bfafd826fd06ebc940f2227f0f6b5981e0cf",
+  "deployment": "dpl_64Jki33bFA1Bc1y2XRR9indFkKCr",
+  "actualFullUnit": {
+    "total": 722,
+    "pass": 719,
+    "fail": 1,
+    "skip": 2
+  },
+  "newPatchFullBuild": "NOT_RUN_PENDING_DEDICATED_ACCESS",
+  "retentionChecks": 11,
+  "titleChecks": 20,
+  "nativeReaderTests": 4,
+  "publication": false,
+  "production": false,
+  "secretValuesRead": false,
+  "localBanks": "controlled fixture paths, not portable fullrepo CI",
+  "cleanup": "pending"
+}
