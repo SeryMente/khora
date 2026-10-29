@@ -2,7 +2,7 @@
 
 **Fecha local:** 2026-10-29 · America/Mexico_City  
 **Prioridad:** P0 — desbloquear publicación KHORA desde ChatGPT Free → GitHub → Vercel  
-**Estado de causa raíz:** **ALTA PROBABILIDAD: gate de facturación/entitlement de Actions en repositorios privados; aún NO CONFIRMADO**.  
+**Estado de causa raíz:** **ALTA PROBABILIDAD: gate de facturación/uso/entitlement de runners hospedados para repositorios privados (cuota incluida, spending limit o billing owner); aún NO CONFIRMADO**.  
 **OCP rector:** [OBJETO-CANONICO.md](../OBJETO-CANONICO.md), PUBLICABILIDAD-v0.6 al completar este ciclo.  
 **Referencia normativa leída:** DUG de SeryMente v359 · NX-359m; Metacanon 1.24; GOW 2.8; blob `b2ff2845a5a99dc4ce3cafafc4f8e43607d48145`.  
 **Modalidad:** solo consulta remota de GitHub, revisión documental y diagnóstico acotado con RDC. Ninguna mutación de facturación/configuración, rerun, `workflow_dispatch` o deployment.
