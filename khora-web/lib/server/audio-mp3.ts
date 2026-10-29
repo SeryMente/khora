@@ -1,5 +1,5 @@
 /** Original -> verified encrypted MP3 derivative. Never replaces the original. */
-import { createHash, randomUUID } from "node:crypto";
+import { randomUUID } from "node:crypto";
 import { mkdtemp, writeFile, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -7,23 +7,11 @@ import { spawn } from "node:child_process";
 import ffmpegPath from "ffmpeg-static";
 import { put } from "@vercel/blob";
 import { getDb } from "./neon";
-import { cifrarBytes, descifrarBytes } from "./cripto";
+import { cifrarBytes } from "./cripto";
 import { asegurarCustodiaContinua } from "./custodia-schema";
 import { evaluarCustodiaAudio } from "../audio/custodia";
-export const MAX_AUDIO_BYTES=128*1024*1024;
-export const hashAudio=(b:Buffer)=>createHash("sha256").update(b).digest("hex");
-export async function leerBlobVerificado(url:string,bytes:number,sha:string):Promise<Buffer>{
-  const u=new URL(url);
-  if(u.protocol!=="https:"||!u.hostname.endsWith(".blob.vercel-storage.com"))throw new Error("blob_host_no_permitido");
-  if(!Number.isSafeInteger(bytes)||bytes<=0||bytes>MAX_AUDIO_BYTES||!/^[a-f0-9]{64}$/i.test(sha))throw new Error("audio_manifest_invalido");
-  const r=await fetch(u,{cache:"no-store",signal:AbortSignal.timeout(30000),redirect:"error"});
-  if(!r.ok||!r.body)throw new Error("blob_inaccesible");
-  const reader=r.body.getReader();const chunks:Buffer[]=[];let total=0;
-  try {while(true){const {done,value}=await reader.read();if(done)break;total+=value.length;if(total>MAX_AUDIO_BYTES+1024){await reader.cancel();throw new Error("audio_demasiado_grande");}chunks.push(Buffer.from(value));}}finally{reader.releaseLock();}
-  const clear=descifrarBytes(Buffer.concat(chunks));
-  if(clear.length!==bytes||hashAudio(clear)!==sha.toLowerCase())throw new Error("audio_integridad_rota");
-  return clear;
-}
+import { MAX_AUDIO_BYTES, hashAudio, leerBlobVerificado } from "./audio-blob-verificado";
+export { MAX_AUDIO_BYTES, hashAudio, leerBlobVerificado } from "./audio-blob-verificado";
 async function ffmpeg(args:string[]):Promise<number>{
   const executable=ffmpegPath;
   if(!executable)throw new Error("ffmpeg_no_disponible");

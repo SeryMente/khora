@@ -3,6 +3,7 @@ import studioStyles from "./ingreso-studio.module.css";
 import { DialogoPanel } from "./DialogoPanel";
 import { RecoveryDrawer, type RecoveryItem } from "./RecoveryDrawer";
 import { evaluarAudioRecuperado, maximoIndiceConocido } from "@/lib/custodia/recuperacion";
+import { reconciliarCatalogoRecuperacion } from "@/lib/custodia/catalogo-recuperacion";
 import { verificarCierreCaptura } from "@/lib/audio/custodia";
 // @l0 L0-002-R · @req UI-04/INGRESO-INTEGRADO
 
@@ -177,10 +178,10 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
     if (!w.SpeechRecognition && !w.webkitSpeechRecognition) setSoportado(false);
   }, []);
 
-  const snapshotItem=(x:CapturaSnapshot):RecoveryItem=>({sessionId:x.sessionId,revisionId:x.revisionId,savedAt:x.clientAt,title:x.titulo,preview:textoRecuperable(x).slice(0,160),chars:textoRecuperable(x).length,duration:x.duracionSeg,audioParts:x.audioPartes?.length||0,paired:!!x.corteAudio,throughPart:x.corteAudio?.hastaParte,local:true});
-  const localCatalog=(snapshots:CapturaSnapshot[])=>{
+  const snapshotItem=(x:CapturaSnapshot):RecoveryItem=>({sessionId:x.sessionId,revisionId:x.revisionId,savedAt:x.clientAt,title:x.titulo,preview:textoRecuperable(x).slice(0,160),chars:textoRecuperable(x).length,duration:x.duracionSeg,audioParts:x.audioPartes?.length||0,paired:(x.corteAudio?.hastaParte||0)>0,throughPart:(x.corteAudio?.hastaParte||0)>0?x.corteAudio?.hastaParte:null,local:true});
+  const localCatalog=(snapshots:CapturaSnapshot[],audios:Array<{sessionId:string;part:number}> = []):RecoveryItem[]=>{
     const groups=new Map<string,CapturaSnapshot[]>();for(const snap of snapshots){const a=groups.get(snap.sessionId)||[];a.push(snap);groups.set(snap.sessionId,a);}
-    return [...groups.values()].map(rows=>{rows.sort((a,b)=>b.clientAt-a.clientAt);return {...snapshotItem(rows[0]),localVersions:rows.map(snapshotItem)};});
+    return [...groups.values()].map(rows=>{rows.sort((a,b)=>b.clientAt-a.clientAt);const storedAudioParts=new Set(audios.filter(x=>x.sessionId===rows[0].sessionId).map(x=>x.part)).size;return {...snapshotItem(rows[0]),storedAudioParts,localVersions:rows.map(snap=>({...snapshotItem(snap),storedAudioParts}))};});
   };
   const cargarRecuperaciones=useCallback(async(more=false)=>{
     setRecoveryLoading(true);setRecoveryError("");
@@ -190,8 +191,8 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
       if(!data.owner||data.owner!==ownerRef.current)throw new Error();
       const local=await recuperarLocal(data.owner).catch(()=>{setRecoveryError("La copia local no está disponible; se muestran las capturas del servidor.");return {snapshots:[],audios:[]};});localRecoveriesRef.current=local;
       const rows:RecoveryItem[]=Array.isArray(data.items)?data.items:[];
-      const locals=localCatalog(local.snapshots).filter(x=>!rows.some(y=>y.sessionId===x.sessionId&&Number(new Date(y.savedAt))>=Number(x.savedAt)));
-      setRecoveryItems(prev=>{const all=more?[...prev,...rows]:[...locals,...rows];return [...new Map(all.map(x=>[x.sessionId+":"+!!x.local,x])).values()];});
+      const locals=localCatalog(local.snapshots,local.audios);
+      setRecoveryItems(prev=>reconciliarCatalogoRecuperacion(more?[...prev,...rows]:[...locals,...rows]));
       setRecoveryCursor(data.nextCursor||null);
     }catch{setRecoveryError("No se pudieron consultar todas las capturas. No se modificó ni descartó contenido.");}
     finally{setRecoveryLoading(false);}
@@ -221,7 +222,7 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
         if(data.owner!==ownerRef.current)throw Error();
         const local=await recuperarLocal(ownerRef.current).catch(()=>{if(alive)setRecoveryError("La copia local no está disponible; se muestran las capturas del servidor.");return {snapshots:[],audios:[]};});if(!alive)return;
         localRecoveriesRef.current=local;
-        setRecoveryItems([...localCatalog(local.snapshots),...(Array.isArray(data.items)?data.items:[])]);setRecoveryCursor(data.nextCursor||null);
+        setRecoveryItems(reconciliarCatalogoRecuperacion(localCatalog(local.snapshots,local.audios),Array.isArray(data.items)?data.items:[]));setRecoveryCursor(data.nextCursor||null);
       }catch{if(alive)setRecoveryError("El historial no está disponible ahora. Puedes iniciar una captura nueva; las anteriores no se han descartado. Reintenta desde Recuperar capturas.");}
     })();
     return()=>{alive=false;controller.abort();};
@@ -442,7 +443,7 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
         const localKey=item.sessionId+":"+item.revisionId;
         if(recoveryAttemptRef.current?.key!==localKey)recoveryAttemptRef.current={key:localKey,target:generarSesionId(),revision:generarSesionId()};
         const revision={...snapshot,revisionId:recoveryAttemptRef.current.revision,clientAt:snapshot.clientAt,audioPartes:parts.sort((a,b)=>a.parte-b.parte)};
-        if(snapshot.corteAudio)revision.audioPartes=revision.audioPartes.filter(x=>x.parte<=snapshot.corteAudio!.hastaParte);
+        if((snapshot.corteAudio?.hastaParte||0)>0)revision.audioPartes=revision.audioPartes.filter(x=>x.parte<=snapshot.corteAudio!.hastaParte);
         const saved=await fetch("/api/dictado/checkpoint",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(revision),signal:AbortSignal.timeout(15000)});
         const receipt=await saved.json();if(!saved.ok||receipt.revisionId!==revision.revisionId)throw Error("No se confirmó el punto local en el servidor. El original sigue en este dispositivo.");
         sourceRevision=revision.revisionId;
@@ -1598,7 +1599,7 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
       <IngresoView
       state={{
         archivado,finalizando,audioPendiente,custodiaDetalle,
-        custodiaEstado,custodiaReady:!!custodiaOwner,custodiaPreparando,recuperando,recuperaciones:recoveryItems.length,stream:streamAudio,
+        custodiaEstado,custodiaReady:!!custodiaOwner,custodiaPreparando,recuperando,recuperaciones:recoveryItems.length,recuperacionesHayMas:!!recoveryCursor,stream:streamAudio,
         titulo,
         texto,
         estado,
