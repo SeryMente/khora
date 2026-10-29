@@ -1,9 +1,9 @@
 # Publicabilidad
 
 **Objeto Canónico de Persistencia (OCP):** [OBJETO-CANONICO.md](OBJETO-CANONICO.md)  
-**Estado:** OCP v0.8; prioridad P0: método sólido ChatGPT Free → GitHub Web → Preview Vercel → release cloud. Los últimos runs privados de KHORA y Metodología fallaron sin runner ni steps mientras Signal Interpreter, público, pasó con runners reales; la hipótesis de gate de uso/billing privado sigue sin confirmación directa. RDC PC-4 fue restaurado y permanece como entorno de trabajo, pero no hay checkout íntegro ni autenticación GitHub en la terminal. CI local NO EJECUTADA. Producción sigue bloqueada.  
-**Versión del frente:** PUBLICABILIDAD-v0.8  
-**Metodología consultada en ciclo 06:** Documento Único de Gobernanza (DUG) de Ser y Mente · Samantha v359 · NX-359m · Metacanon 1.24 · GOW 2.8.
+**Estado:** OCP v0.9; prioridad P0: método sólido ChatGPT Free → GitHub Web → Preview Vercel → release cloud. La autenticación GitHub en PC-4 quedó verificada y el checkout exacto de main se materializó. `npm ci`, typecheck, UI Review y contrato de navegación pasaron como evidencia auxiliar con Node 24/npm 11. `test:unit` no se ejecutó porque la invocación fue bloqueada antes de iniciar; CI completa sigue pendiente. El gate remoto privado de Actions mantiene una hipótesis de uso/billing aún no confirmada. Producción sigue bloqueada.  
+**Versión del frente:** PUBLICABILIDAD-v0.9  
+**Metodología verificada en la revalidación PC-4:** Documento Único de Gobernanza (DUG) de Ser y Mente · Samantha v360 · NX-360m · Metacanon 1.24 · GOW 2.9 · blob `3cda9d38db1bee76ff0ca752f3ecde8719c70d41`.
 
 ## Lectura y evidencia
 
