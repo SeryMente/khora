@@ -1,4 +1,4 @@
-<!-- INCIDENT_VERSION=0.3; INCIDENT_STATUS=OPEN; NOT_A_CANONICAL_OBJECT=true -->
+<!-- INCIDENT_VERSION=0.4; INCIDENT_STATUS=OPEN; NOT_A_CANONICAL_OBJECT=true -->
 # Incidente provisional · Dictado no visible en Recuperación y contador 40→20
 
 > **ESTADO: ABIERTO · CAUSA DE LA CAPTURA AUSENTE NO CONFIRMADA · RECUPERABILIDAD PRODUCTIVA NO CERTIFICADA.** Este informe es evidencia auxiliar del frente Custodia; el único estado vivo sigue en [OBJETO-CANONICO.md](../OBJETO-CANONICO.md).
@@ -88,7 +88,7 @@ No hay evidencia actual para escoger una de estas hipótesis como causa raíz.
 - Catálogo autenticado completo recorrido: **NO**.
 - Total de unidades reales verificado: **NO**.
 - Diferencia 40→20: defecto de consistencia de carga/contador confirmado en el código; número de unidades únicas y contribución exacta al incidente no determinados.
-- Código, datos productivos, claves, credenciales, configuración y despliegue modificados: **NO**.
+- Código de producción, datos productivos, claves, credenciales, configuración y despliegue modificados: **NO**. Hay una propuesta de corrección en una rama aislada; no está fusionada ni desplegada.
 
 ## 7. Plan de verificación y corrección
 
@@ -118,8 +118,17 @@ CUSTODIA-03 exige recorrer el catálogo autenticado completo, reconciliar por id
 
 En la revisión de plan del ciclo C005, CUSTODIA-02 se había registrado como revisión metodológica P1. **Ese estado es histórico y quedó supersedido por una instrucción posterior del operador:** CUSTODIA-02 se retiró de las tareas activas, no se reutiliza su identificador y se incorporó CUSTODIA-04 para completar la investigación y actualizar el sistema. Este informe no cambia el estado fáctico del incidente: el acceso productivo, la localización de la sesión y la recuperación siguen pendientes.
 
+### Estado de implementación en CUSTODIA-04 · C007
+
+- **Rama propuesta:** `fix/custodia-recovery-reconcile-20261028`, commit `95d7bbf2cbe0bb89b6d8ff01135438152ec8201d`; PR [#339](https://github.com/SeryMente/khora/pull/339), en borrador, no fusionada.
+- **Cambios propuestos:** reconciliación común de sesiones local/remotas, contador con indicación de más páginas, distinción entre manifiesto de audio y partes verificadas persistidas, y rescate de audio legacy solo si la cadena es contigua/verificada y sin inventar sincronía.
+- **Validación:** `typecheck`, `ui-review:check` y `ui:contract` pasaron. `test:unit` reportó 549/550; la única falla fue un `TLS handshake timeout` al consultar GitHub durante la prueba de sincronización metodológica. El esquema local/canónico fue cotejado aparte mediante el conector de GitHub: blob SHA idéntico `232590a1f6339e2517e67038e1b5f7e8bd1638e3`, sin diferencias JSON. La integración PostgreSQL/PGlite ampliada no se ejecutó porque `PGLITE_MODULE` no está configurado/instalado en el entorno.
+- **Bloqueo vigente:** no se adquirió la lista de Recuperación autenticada, no se cotejó ninguna unidad real ni se hizo recuperación productiva. La PR no está fusionada/desplegada; Vercel ha reportado bloqueo de despliegue del repositorio privado de la organización en plan Hobby.
+- **Estado del incidente:** ABIERTO. El dictado sigue sin localizarse y la pérdida definitiva sigue sin demostrarse.
+
 ## 11. Registro de cambios
 
 - **v0.1 · 2026-10-28 · CUSTODIA-INC-RECUP-SES-20261028-R6K2M9Q4-C004:** se documentan por separado el defecto de conteo local/remoto, el límite de página de 20, el incidente reportado y las hipótesis no verificadas. Sin acceso a producción, recuperación real ni cambios de producto.
 - **v0.2 · 2026-10-28 · CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C005:** se vincula el incidente con CUSTODIA-03, que amplía el alcance a otras capturas esperadas no disponibles; no se modifica el estado fáctico del incidente, que sigue ABIERTO.
-- **v0.3 · 2026-10-28 · CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C006:** se actualiza la referencia al plan vigente: CUSTODIA-02 deja de estar activa; CUSTODIA-04 asume el trabajo de consolidar la investigación, corregir los defectos demostrados y validar el sistema actualizado. Sin nueva evidencia productiva: el dictado sigue sin localizar y su pérdida definitiva no está demostrada.
+- **v0.3 · 2026-10-28 · CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C006:** se actualiza la referencia al plan vigente: CUSTODIA-02 deja de estar activa; CUSTODIA-04 asume el trabajo de consolidar la investigación y actualizar el sistema. Sin nueva evidencia productiva: el dictado sigue sin localizar y su pérdida definitiva no está demostrada.
+- **v0.4 · 2026-10-28 · CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C007:** se registra la PR #339 en borrador con correcciones propuestas, validación local parcial, una falla de red en la prueba de contrato y la integración PGlite pendiente. El incidente permanece ABIERTO; no se obtuvo catálogo autenticado ni se recuperó el dictado ausente.
