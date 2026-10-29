@@ -91,7 +91,7 @@ Fuente principal de límites y elegibilidad:
 - https://vercel.com/docs/limits
 - https://vercel.com/legal/terms
 
-En la documentación consultada figuran, entre otros, estos límites generales del plan Hobby: hasta 200 proyectos; hasta 100 deployments al día; una referencia de rate limit de 32 deployments por hora; hasta 2.000 despliegues mediante CLI por semana; un build concurrente y un tiempo máximo de build de 45 minutos; 6.000 minutos de build; 1 millón de invocaciones de funciones; y límites de transferencia, CPU y memoria aprovisionada. Son cuotas publicadas, no el consumo efectivo de esta cuenta; el detalle exacto y la cadencia de cada límite deben revisarse en la página oficial vigente y en Usage antes de diseñar una guarda.
+La documentación oficial consultada presenta, entre otros, estos límites de Hobby: 200 proyectos; 100 deployments por día; 32 builds por cada 3.600 segundos; hasta 2.000 deployments creados mediante CLI por semana; máximo de 45 minutos por build individual; 6.000 minutos de ejecución de build incluidos; y 1 millón de invocaciones de funciones, además de límites específicos de transferencia, CPU y memoria. Son topes publicados distintos entre sí, no el consumo o saldo restante de esta cuenta; la cuota efectiva se debe consultar en Usage. Fuentes: https://vercel.com/docs/limits y https://vercel.com/docs/plans/hobby.
 
 La documentación también señala que Hobby es para uso personal/no comercial. Esa condición es una compuerta arquitectónica y contractual, no solo una diferencia de cuota. No se ha afirmado que Khora sea comercial ni no comercial: el operador debe resolver la clasificación aplicable antes de decidir la permanencia de Hobby.
 
@@ -123,7 +123,7 @@ La documentación oficial de Vercel describe un MCP remoto en https://mcp.vercel
 
 Esta ruta responde directamente a la pregunta de publicación desde una plataforma de IA: puede evitar RDC y CLI local siempre que el conector esté autorizado, el proyecto Git esté conectado y la acción acepte la fuente/ref deseada. Debe probarse primero con preview, fijando equipo, proyecto, rama/SHA y comprobando el resultado. La disponibilidad en esta sesión no garantiza que todos los usuarios, planes y workspaces de ChatGPT dispongan de las mismas acciones.
 
-La ayuda oficial de OpenAI distingue entre lectura y acciones de escritura para MCP; el soporte de las acciones de escritura varía por plan/workspace y evolución del despliegue de la función. El plan del operador no se verificó. Fuente: https://help.openai.com/en/articles/12584461-developer-mode-and-full-mcp-connectors-in-chatgpt
+La ayuda oficial de OpenAI distingue entre lectura y acciones de escritura para MCP; el soporte de las acciones de escritura varía por plan/workspace y evolución del despliegue de la función. El plan del operador no se verificó. Fuente: https://help.openai.com/en/articles/12584461-connecting-custom-mcp-servers-in-chatgpt
 
 ### D. Dashboard de Vercel
 
