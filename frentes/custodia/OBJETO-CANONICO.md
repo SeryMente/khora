@@ -241,6 +241,8 @@ No se rellenan huecos con inferencias ni se da por ejecutada una prueba porque a
 - **Siguiente acción:** continuar CUSTODIA-01 y CUSTODIA-03 mediante acceso autenticado/solo lectura autorizado. Reconciliar todas las páginas remotas, identidades local/remoto y capturas archivadas; buscar la ventana del dictado ausente; clasificar cada caso y preservar originales. Sin pruebas, mantener «NO DETERMINADO» y la garantía productiva como no certificada.
 - **Cautela:** este plan no es autorización para cambiar código, cuentas, datos productivos, seguridad, configuración ni despliegue. Esas acciones requerirán autorización concreta, pruebas y verificación de lectura de vuelta.
 
+- **Salida visible final del ciclo 5:** [originales/SALIDA-MODELO-CUSTODIA-AMPLIACION-TAREAS-2026-10-28.md](originales/SALIDA-MODELO-CUSTODIA-AMPLIACION-TAREAS-2026-10-28.md), blob `3f375859b2e51af54dd53d22f998a1301e2c34f7`, commit `d74918ad111c5c3327544f61a37abbc4a1ee05f2`. Lectura de vuelta exacta verificada.
+
 ### Fuentes y referencias
 
 - [Gobernanza única Samantha](https://github.com/SeryMente/metodologia/blob/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html).
@@ -273,6 +275,7 @@ Instrucción para una conversación futura:
 - **Salida visible del ciclo 2:** frentes/custodia/originales/SALIDA-MODELO-CUSTODIA-CICLO-2-2026-10-28.md.
 - **Salida visible final del ciclo 3:** frentes/custodia/originales/SALIDA-MODELO-CUSTODIA-INVENTARIO-2026-10-28.md; blob leído de vuelta 1f08bf95772e20828d0dc7373bfd2c70c1747198, commit de última escritura bf5899f16e2052e3ba0141410f96102f9050cf70.
 - **Salida visible final del ciclo 4:** frentes/custodia/originales/SALIDA-MODELO-CUSTODIA-INCIDENTE-2026-10-28.md; blob f7d6e5d9819832a90e3e97d2c767a9f314b8cb91; commit 61992cdfae46ac08b84260bc2c47197fac144db4.
+- **Salida visible final del ciclo 5:** frentes/custodia/originales/SALIDA-MODELO-CUSTODIA-AMPLIACION-TAREAS-2026-10-28.md; blob `3f375859b2e51af54dd53d22f998a1301e2c34f7`; commit `d74918ad111c5c3327544f61a37abbc4a1ee05f2`.
 - Las rutas de arriba no constituyen un segundo almacén de producto; son la base documental del frente.
 - Tras cada ciclo: leer de vuelta los archivos modificados; comparar el propósito con el original aprobado; verificar el JSON; registrar el SHA real del archivo y el commit real; revisar el diff; no fijar hashes autorreferentes inventados.
 - Revisar el Metacanon central y la rama main antes de cada ciclo material. La fuente vigente adquirida en C005 fue Samantha v358 · NX-358m, Metacanon 1.23, GOW v2.7, blob 89a28e4d05f5baab9c4b86abdb9fbfc532690c75. Si la fuente o alguna evidencia no está disponible, declarar exactamente qué no se verificó y bloquear solo las decisiones que dependan de ello.
