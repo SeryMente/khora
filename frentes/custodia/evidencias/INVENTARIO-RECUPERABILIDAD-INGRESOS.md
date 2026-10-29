@@ -1,16 +1,16 @@
-<!-- INVENTARIO_VERSION=0.8; INVENTARIO_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- INVENTARIO_VERSION=0.9; INVENTARIO_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Inventario provisional de hallazgos · Recuperabilidad en Ingresos → Dictado → Recuperación
 
 > **ESTADO: PROVISIONAL · INVESTIGACIÓN ABIERTA · RECUPERABILIDAD PRODUCTIVA NO CERTIFICADA.** Este archivo es una materialización de evidencia dentro del OCP de Custodia; no es un OCP adicional ni una segunda fuente de estado. El núcleo vivo es [OBJETO-CANONICO.md](../OBJETO-CANONICO.md).
 
 - **Frente propietario:** CUSTODIA.
-- **Versión de este inventario:** 0.8.
+- **Versión de este inventario:** 0.9.
 - **Ciclo previo:** CUSTODIA-INV-RECUP-SES-20261028-R6K2M9Q4.
 - **Ciclo de ampliación por incidente:** CUSTODIA-INC-RECUP-SES-20261028-R6K2M9Q4-C004.
 - **Ciclo de ampliación de tareas:** CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C005.
 - **Ciclos de implementación/validación parcial:** CUSTODIA-PLAN-RECUP-SES-20261028-R6K2M9Q4-C007/C008; última punta consultada de la rama `fix/custodia-recovery-reconcile-20261028`, commit `cbb9efd89048daf3bd9f07cc69c2e6d7209aa55d`; PR [#339](https://github.com/SeryMente/khora/pull/339) abierta en borrador, no fusionada ni desplegada. En C009/C010, la rama figura divergida respecto de `main`; no se registra una distancia ahead/behind estática porque cambia con cada actualización de la rama principal.
-- **Folio de los ciclos de investigación originales:** SES-20261028-R6K2M9Q4; generaciones anteriores conservadas en el control. **Folio activo C009:** SES-20261029-C9K4M2R8; control de responsabilidad en generación 3.
-- **Fecha de creación:** 2026-10-28. **Última actualización C010:** 2026-10-29.
+- **Folio de los ciclos de investigación originales:** SES-20261028-R6K2M9Q4; generaciones anteriores conservadas en el control. **Folio activo de responsabilidad:** SES-20261029-C9K4M2R8; control de responsabilidad en generación 3. **Ciclo documental actual:** CUSTODIA-PLAN-RECUP-SES-20261029-C9K4M2R8-C011.
+- **Fecha de creación:** 2026-10-28. **Última actualización C011:** 2026-10-29.
 - **Fuente normativa de los ciclos 3–4 (histórica):** Samantha v356 · NX-356m; Metacanon 1.22; GOW v2.6; blob c364e179e8e9b6a3d566a8e690dfa1a7cce91798.
 - **Fuente normativa histórica en C005:** [Metaprompt Canónico de Samantha](https://github.com/SeryMente/metodologia/blob/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html), main; Samantha v358 · NX-358m; Metacanon 1.23; GOW v2.7; blob `89a28e4d05f5baab9c4b86abdb9fbfc532690c75`.
 - **Fuente normativa revalidada en C009:** Samantha v359 · NX-359m; Metacanon 1.24; GOW 2.8; blob `b2ff2845a5a99dc4ce3cafafc4f8e43607d48145`, leído desde `SeryMente/metodologia/main` el 2026-10-29.
@@ -191,6 +191,18 @@ Esto ofrece una explicación técnica consistente para «Sin audio en este punto
 
 ---
 
+### F-14 · El fallback de audio legacy no cubre un corte explícitamente vacío
+
+- **Clase:** CONFIRMADO EN EL CÓDIGO PROPUESTO EN PR #339; no desplegado ni validado en producción.
+- **Fuente:** `khora-web/lib/server/custodia-recuperacion.ts`, rama `fix/custodia-recovery-reconcile-20261028`, blob `bf76dec79b34fd34d0b4e86609d99d6b9ce686f9`; interfaz candidata `khora-web/app/components/ingreso/RecoveryDrawer.tsx`, blob `fe2cf2e661d4395fc0f3f61fca1556af2258febb`.
+- **Observación:** la propuesta calcula `total` usando `original.corteAudio?.hastaParte ?? ...`. Si `corteAudio` existe y `hastaParte` vale `0`, el total permanece en cero. El fallback `recoveredAsUnpairedLegacyAudio` exige `!original.corteAudio`, por lo que no se activa aunque haya filas de audio. El filtro `parte <= total` selecciona cero partes y la recuperación omite su inserción.
+- **Inconsistencia de interfaz:** la tarjeta candidata puede mostrar `storedAudioParts > 0` y decir que hay audio guardado sin sincronía acreditada, mientras que la acción «Recuperar esta captura» no copiaría esas partes en este caso. El resultado puede ser una recuperación textual que sigue sin contener el audio presente en origen.
+- **Corrección requerida:** cubrir ambos casos, ausencia de `corteAudio` y corte explícito vacío/cero, como escenarios de audio no sincronizado: validar la cadena disponible, preservarla en el destino sin fabricar un corte/alineación, marcar la sincronía como desconocida y dejar el original intacto. Si no puede hacerlo con seguridad, la ruta debe bloquear la recuperación con un mensaje inequívoco; nunca mostrar audio almacenado como si la acción genérica lo fuese a restaurar cuando no lo copia.
+- **Pruebas requeridas:** corte ausente; `corteAudio` presente con `hastaParte=0`; manifiesto `audioPartes=[]`; filas contiguas válidas, huecos, índices duplicados, hash/objeto inválidos. Verificar el contenido del destino después de la transacción y que la interfaz indique el resultado exacto.
+- **Límite:** es un hallazgo estático de la rama de PR, no un defecto medido en producción. La PR no está fusionada ni desplegada y no se obtuvieron filas/objetos productivos.
+
+---
+
 ## 4. Auditoría auxiliar del almacén local — no equivale al catálogo de Recuperación
 
 Esta sección preserva una evidencia técnica obtenida previamente para evitar repetir la inspección, pero **no identifica las unidades reales de la interfaz**. Se inspeccionó una copia de trabajo de IndexedDB en un perfil de Chrome distinto del perfil de mantenimiento. El archivo de origen no se sustituyó ni borró. Las reconstrucciones se generaron en un directorio temporal; no se subieron al servidor ni se usaron para modificar la aplicación.
@@ -324,6 +336,12 @@ Los tests sintéticos deben simular objetos accesibles, inexistentes, no autoriz
 
 **Aceptación:** no declarar una parte íntegra solo por `estado_verificacion`, bytes declarados o formato del hash guardado. La prueba demuestra que los bytes leídos coinciden con el SHA-256 persistido; la recuperación se lee de vuelta y se coteja. Los casos no disponibles o no autorizados quedan como bloqueados/no verificados, no como «perdidos» sin evidencia.
 
+### R-10 · Recuperación de audio no sincronizado cuando existe un corte vacío
+
+Las pruebas sintéticas deben cubrir tanto la ausencia de `corteAudio` como un objeto `corteAudio` presente con `hastaParte=0`, mientras la tabla de partes contiene audio. También deben cubrir `audioPartes=[]` y manifiestos contradictorios.
+
+**Aceptación:** cuando hay audio real disponible y verificable pero no existe un corte temporal acreditado, el flujo lo conserva como audio no sincronizado y no crea un vínculo artificial con la transcripción; si no puede conservarlo con garantías, bloquea la recuperación y explica la razón. La acción de recuperar nunca debe anunciar/promover audio almacenado si el destino solo va a incluir texto. Debe leer de vuelta el destino y mantener intacto el origen. R-10 complementa R-09: la prueba de metadatos/índices no sustituye la lectura actual de bytes y hash.
+
 ## 7. Bloqueos y acciones siguientes
 
 1. **Obtener el catálogo autenticado real de Recuperación.** Es el bloqueo principal para saber si hay 20, 21 u otro número de unidades y cuáles presentan el defecto. Usar la sesión/propiedad autorizada que muestra esos ítems; no sustituir esa lista por los cinco snapshots locales.
@@ -380,7 +398,7 @@ Se registró el relato literal y el análisis en [INCIDENTE-DICTADO-AUSENTE-Y-CO
 
 ## 10. Ampliación del plan de trabajo · CUSTODIA-01 / CUSTODIA-03 / CUSTODIA-04
 
-La lista provisional de tareas queda en v0.9 y conserva tres identificadores activos estables:
+La lista provisional de tareas queda en v0.11 y conserva tres identificadores activos estables:
 
 - **CUSTODIA-01 · P0:** recuperar y comprobar todas las unidades que actualmente aparecen en Recuperación, con paginación completa y reconciliación de entradas locales/remotas.
 - **CUSTODIA-03 · P0:** investigar los dictados esperados que no aparecen o parecen irrecuperables; resolver el estado del dictado reportado como ausente tras la sesión de terminal, cuantificar otros casos mediante evidencia y rescatar las unidades localizadas sin alterar sus originales.
@@ -422,7 +440,16 @@ La evidencia y los criterios técnicos están en [el informe del incidente](INCI
 - El entorno conectado no tiene un clon local de Khora, Git/gh ni credenciales de GitHub en el perfil RDC actual. No se accedió a la sesión de Chrome perteneciente a otro usuario. No fue posible obtener el catálogo autenticado ni la DB/objetos reales. Se mantiene 0 unidades productivas cotejadas y 0 recuperaciones productivas.
 - **Siguiente paso:** R-09, en entorno autenticado/autorizado, debe validar lectura actual y hash de bytes reales por unidad. Antes de fusionar/publicar, reaplicar/reconciliar el parche en una rama limpia sobre `main` vigente, repetir las pruebas y resolver la barrera CI/despliegue. No alterar datos originales.
 
+### Auditoría de continuación · C011 · 2026-10-29
+
+- La revisión estática de la rama candidata detectó F-14: el fallback para audio legacy solo se activa si falta por completo `corteAudio`. Si el objeto existe con `hastaParte=0`, las filas de audio quedan fuera del total y no se copian, aunque la interfaz pueda reportar `storedAudioParts > 0`. La propuesta sigue sin fusionar ni desplegar.
+- R-10 exige tratar ese caso como audio no sincronizado, preservarlo en destino sin inventar alineación —o bloquear con mensaje explícito si la preservación no es segura— y probar lectura de vuelta. R-09 sigue exigiendo lectura real de objetos y hash recalculado.
+- No hubo consulta al catálogo, DB ni objetos reales de producción. Sigue habiendo 0 unidades productivas cotejadas y 0 recuperaciones productivas; no se modifica el dictamen del dictado ausente.
+- La rama de PR #339 permanece divergida respecto de `main`; no debe fusionarse hasta corregir el caso, reconciliar cambios y ejecutar regresión sobre una punta actualizada.
+
 ## 11. Registro de cambios del inventario
+
+- **v0.9 · 2026-10-29 · CUSTODIA-PLAN-RECUP-SES-20261029-C9K4M2R8-C011:** añade F-14/R-10 para el caso de corte explícitamente vacío que evita el fallback de audio legacy en la propuesta #339. Queda como hallazgo de código candidato, no como incidencia productiva confirmada.
 
 - **v0.8 · 2026-10-29 · CUSTODIA-PLAN-RECUP-SES-20261029-C9K4M2R8-C010:** añade F-13/R-09 para distinguir verificación de metadatos de lectura e integridad de los bytes reales; registra el estado actual de la PR y límites de acceso productivo.
 
