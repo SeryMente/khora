@@ -121,7 +121,7 @@ const BASE_DELAY_MS = 500;
 export function sanitizeJulesRouteForLog(url: string): string {
   try {
     return new URL(url).pathname
-      .replace(/\/sources\/[^/?#]+/g, "/sources/:id")
+      .replace(/\/sources\/.+$/g, "/sources/:id")
       .replace(/\/sessions\/[^/?#]+/g, "/sessions/:id")
       .slice(0, 240);
   } catch {

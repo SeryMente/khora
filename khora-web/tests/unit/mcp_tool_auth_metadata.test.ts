@@ -41,16 +41,17 @@ test("route publishes derived schemas and retains authentication and normative g
 
 test("one canonical document covers the exact tool catalog and current output version", () => {
   const document = fs.readFileSync(path.join(root, "docs/normative-check.md"), "utf8");
+  const normalizedDocument = document.replace(/\r\n?/g, "\n");
   const readme = fs.readFileSync(path.join(root, "../README.md"), "utf8");
   const documented = [...document.matchAll(/^\| `((?:khora|jules)_[a-z_]+)`/gm)].map(match => match[1]);
   assert.equal(documented.length, 24);
   assert.deepEqual(documented.sort(), Object.keys(MCP_TOOL_SCOPES).sort());
   for (const heading of ["Conexión", "Catálogo", "Contratos", "Ciclo normativo", "Autorización y configuración", "Datos y efectos", "Diagnóstico", "Compatibilidad", "Pruebas y mantenimiento"]) {
-    assert.equal(document.split("\n## " + heading + "\n").length, 2, heading);
+    assert.equal(normalizedDocument.split("\n## " + heading + "\n").length, 2, heading);
   }
   assert.ok(document.includes("**" + REQUIRED_OUTPUT_FORMAT_VERSION + "**"));
   assert.equal(readme.split("(./khora-web/docs/normative-check.md)").length, 2);
-  assert.match(document, /^# Servidor MCP de Khora — documento canónico/m);
+  assert.match(normalizedDocument, /^# Servidor MCP de Khora — documento canónico\n/m);
 });
 
 
@@ -74,5 +75,5 @@ test("Jules scopes flow through OAuth metadata, consent, token exchange, manual 
     assert.ok(content.includes(scope), `${relative} must support ${scope}`);
   }
   const page = fs.readFileSync(path.join(root, "app/sistema/mcp/page.tsx"), "utf8");
-  assert.match(page, /DEFAULT_SCOPES = ["runtime:read", "volcados:read", "norm:turn"]/);
+  assert.ok(page.includes('const DEFAULT_SCOPES = ["runtime:read", "volcados:read", "norm:turn"] as const;'));
 });
