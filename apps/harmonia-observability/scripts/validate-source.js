@@ -87,7 +87,8 @@ for(const [name,script] of [['start',startScript],['stop',stopScript],['finalize
 }
 assert.match(queryScript,/\[string\]\$DataRoot/);
 assert.match(queryScript,/Win32_UserProfile/);
-assert.ok(queryScript.includes('surface-index-v0.4.0\\\\data'),'query must resolve the v0.4.0 profile data root');
+assert.ok(queryScript.includes('Join-Path $windowsProfile.LocalPath'),'query must resolve data root from the current Windows profile');
+assert.ok(queryScript.includes('surface-index-v0.4.0'),'query must use the v0.4.0 data store');
 assert.ok(!queryScript.toLowerCase().includes('fila4'),'query must not hardcode a user profile');
 assert.match(startScript,/PREPARAR-RUNTIME\.ps1/,'startup must provision the pinned portable runtime');
 assert.match(startScript,/v22\.23\.4/);
