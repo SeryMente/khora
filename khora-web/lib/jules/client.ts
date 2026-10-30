@@ -259,6 +259,18 @@ export async function listActivitiesPage(
   return response.json();
 }
 
+/** Backwards-compatible time-filtered reader for existing internal Jules jobs. */
+export async function listActivities(id: string, createTimeCursor?: string): Promise<ListActivitiesResponse> {
+  const sessionId = normalizeSessionId(id);
+  const url = new URL(`${JULES_API_BASE_URL}/sessions/${sessionId}/activities`);
+  if (createTimeCursor) url.searchParams.set("createTime", createTimeCursor);
+  const response = await fetchWithBackoff(url.toString(), {
+    method: "GET",
+    headers: getHeaders(),
+  });
+  return response.json();
+}
+
 export async function sendMessage(id: string, prompt: string): Promise<void> {
   const sessionId = normalizeSessionId(id);
   await fetchWithBackoff(`${JULES_API_BASE_URL}/sessions/${sessionId}:sendMessage`, {
