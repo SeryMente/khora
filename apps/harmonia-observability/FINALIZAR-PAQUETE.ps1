@@ -97,7 +97,7 @@ try {
       schema = 'harmonia.package.v1'
       version = $manifest.version
       generatedAt = [DateTime]::UtcNow.ToString('o')
-      source = 'SeryMente/khora candidate PR #333; branch feat/harmonia-e2e-20261021; local token file intentionally excluded'
+      source = 'SeryMente/khora candidate branch feat/harmonia-e2e-20261021; local authentication file intentionally excluded'
       runtime = [ordered]@{ version = (& $node --version).Trim(); architecture='win-x64'; nodeZipSha256='cbc74b5e0982c9dbb41525fd8fb5dcd32fbee237863f7829072f4639a1ce5f20'; nodeExeSha256=$exeHash }
       files = $hashes
     }
