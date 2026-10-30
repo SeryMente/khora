@@ -57,6 +57,8 @@ test("catalog pages the complete owner session universe and excludes content", a
   const pageQuery = db.calls.find(call => call.sql.includes("SELECT s.session_id"))!.sql;
   assert.match(pageQuery, /LEFT JOIN LATERAL/);
   assert.match(pageQuery, /LEFT JOIN dictado_mp3/);
+  assert.match(pageQuery, /COALESCE\\(s\\.creado_en/);
+  assert.doesNotMatch(pageQuery, /COALESCE\\(s\\.actualizado_en/);
   const serialized = JSON.stringify(result);
   for (const secret of ["private-title", "private-preview", "private-transcript", "blob.vercel-storage.com", "snapshot-ciphertext"]) {
     assert.equal(serialized.includes(secret), false, secret);
@@ -117,12 +119,13 @@ test("integrity reads actual objects, returns sanitized states and clears decryp
   const digest = "a".repeat(64);
   const db = mockDb((sql) => {
     if (sql.includes("SELECT s.session_id FROM dictado_session")) return { rows: [{ session_id: "session-1" }] };
-    if (sql.includes("SELECT count(*)::int AS total FROM dictado_audio_parte")) return { rows: [{ total: 3 }] };
+    if (sql.includes("SELECT count(*)::int AS total FROM dictado_audio_parte")) return { rows: [{ total: 4 }] };
     if (sql.includes("SELECT part_index,bytes,sha256,blob_url")) return {
       rows: [
         { part_index: 1, bytes: decrypted.length, sha256: digest, blob_url: "https://private.blob.vercel-storage.com/object-1" },
         { part_index: 2, bytes: 10, sha256: digest, blob_url: "" },
         { part_index: 3, bytes: 10, sha256: digest, blob_url: "https://private.blob.vercel-storage.com/object-3" },
+        { part_index: 4, bytes: 10, sha256: digest, blob_url: "https://private.blob.vercel-storage.com/object-4" },
       ],
     };
     return { rows: [] };
@@ -133,13 +136,16 @@ test("integrity reads actual objects, returns sanitized states and clears decryp
     async (url) => {
       readUrls.push(url);
       if (url.endsWith("object-3")) throw new Error("audio_integridad_rota");
+      if (url.endsWith("object-4")) throw new Error("blob_no_encontrado");
       return decrypted;
     },
   );
   assert.equal(result.items[0].status, "VERIFIED");
   assert.equal(result.items[1].status, "MISSING");
   assert.equal(result.items[2].status, "MISMATCH");
-  assert.deepEqual(readUrls, ["https://private.blob.vercel-storage.com/object-1", "https://private.blob.vercel-storage.com/object-3"]);
+  assert.equal(result.items[3].status, "MISSING");
+  assert.equal(result.items[3].reason, "BLOB_NOT_FOUND");
+  assert.deepEqual(readUrls, ["https://private.blob.vercel-storage.com/object-1", "https://private.blob.vercel-storage.com/object-3", "https://private.blob.vercel-storage.com/object-4"]);
   assert.ok(decrypted.every(byte => byte === 0));
   const serialized = JSON.stringify(result);
   assert.equal(serialized.includes("blob.vercel-storage.com"), false);
