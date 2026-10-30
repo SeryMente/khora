@@ -44,8 +44,8 @@ export async function toolKhoraObservacionInstantanea(args?: { session_id?: stri
     ),
     db.query(
       `SELECT count(*)::int AS total,
-              count(*) FILTER (WHERE estado = 'FAIL' OR outcome = 'FAILURE' OR detalle->'observation'->>'severity' IN ('ERROR','CRITICAL'))::int AS failures,
-              count(*) FILTER (WHERE detalle->'observation'->>'severity' = 'WARN')::int AS warnings,
+              count(*) FILTER (WHERE estado = 'FAIL' OR outcome = 'FAILURE' OR COALESCE(detalle->>'severity', detalle->'observation'->>'severity') IN ('ERROR','CRITICAL'))::int AS failures,
+              count(*) FILTER (WHERE COALESCE(detalle->>'severity', detalle->'observation'->>'severity') = 'WARN')::int AS warnings,
               count(DISTINCT session_id)::int AS sessions,
               max(servidor_en) AS last_server_event_at,
               max(cliente_en) AS last_client_event_at
@@ -60,7 +60,7 @@ export async function toolKhoraObservacionInstantanea(args?: { session_id?: stri
               correlacion_id, cliente_en, servidor_en, detalle, metrics
        FROM eventos_sistema
        WHERE servidor_en >= NOW() - INTERVAL '60 minutes'
-         AND (estado = 'FAIL' OR detalle->'observation'->>'severity' IN ('ERROR','CRITICAL') OR outcome = 'FAILURE')
+         AND (estado = 'FAIL' OR COALESCE(detalle->>'severity', detalle->'observation'->>'severity') IN ('ERROR','CRITICAL') OR outcome = 'FAILURE')
        ${args?.session_id ? "AND session_id = $1" : ""}
        ORDER BY id DESC
        LIMIT 20`,
@@ -74,6 +74,7 @@ export async function toolKhoraObservacionInstantanea(args?: { session_id?: stri
               active, visible, focused, release_sha, source, state
        FROM khora_runtime_state
        WHERE updated_at >= NOW() - INTERVAL '15 minutes'
+       ${args?.session_id ? "AND session_id = $1" : ""}
        ORDER BY updated_at DESC
        LIMIT 20`,
     ),
@@ -163,7 +164,7 @@ export async function toolKhoraEventosRecientes(args: {
   }
   if (args.severity) {
     params.push(args.severity);
-    where.push(`detalle->'observation'->>'severity' = $${params.length}`);
+    where.push(`COALESCE(detalle->>'severity', detalle->'observation'->>'severity') = ${params.length}`);
   }
   if (args.outcome) {
     params.push(args.outcome);
@@ -175,11 +176,11 @@ export async function toolKhoraEventosRecientes(args: {
   }
   if (args.scope) {
     params.push(args.scope);
-    where.push(`detalle->'observation'->>'scope' = $${params.length}`);
+    where.push(`COALESCE(detalle->>'scope', detalle->'observation'->>'scope') = ${params.length}`);
   }
   if (args.category) {
     params.push(args.category);
-    where.push(`detalle->'observation'->>'category' = $${params.length}`);
+    where.push(`COALESCE(detalle->>'category', detalle->'observation'->>'category') = ${params.length}`);
   }
 
   params.push(limite);
