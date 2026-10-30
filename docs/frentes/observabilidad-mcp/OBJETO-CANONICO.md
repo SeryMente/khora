@@ -2,8 +2,8 @@
 
 ## 1. Control e identidad
 - Frente: **Observabilidad MCP**; identidad canónica `OBSERVABILIDAD-MCP`.
-- Repositorio `SeryMente/khora`, main; OCP `docs/frentes/observabilidad-mcp/`.
-- Versión v0.2.0; control independiente, generación 2, estado `assigned`; titular operativo temporal `chatgpt-khora-mcp-SES-20261030-01A18DCB`; folio `SES-20261030-01A18DCB`; blob del control `93d7ec6fd51dd57c20b8818cfe34ba9bd14e08c3`.
+- Repositorio `SeryMente/khora`; OCP único `docs/frentes/observabilidad-mcp/`, conservado en su ruta heredada. Versión v0.3.0 en la rama General; `main` conserva v0.1.0 hasta una integración autorizada.
+- Control independiente, generación 2, estado `assigned`; titular operativo temporal `chatgpt-khora-mcp-SES-20261030-01A18DCB`; folio `SES-20261030-01A18DCB`; blob del control `93d7ec6fd51dd57c20b8818cfe34ba9bd14e08c3`.
 - `MCP-OBS-DICTADO` es identidad histórica del objeto agregado anterior, no la identidad vigente de este frente.
 
 ## 2. LEER PRIMERO
@@ -18,8 +18,9 @@ Leer README, DUG, este OCP y `CONTROL-RESPONSABILIDAD.json`. El control está ad
 **Interpretación operativa separada:** el contexto técnico documentado en `SeryMente/khora` denomina MCP al servidor/protocolo y a sus herramientas de observabilidad; por eso «MSP» se interpreta aquí como MCP, sin alterar la cita. El propósito es que modelos/agentes MCP autorizados consulten registros de observabilidad suficientes para reconstruir el contexto causal. El primer caso de uso era diagnosticar un defecto de Dictado; corregir la pantalla/captura/transcripción pertenece al OCP Dictado.
 
 ## 3. Referencia metodológica
-- DUG v363 · NX-363m; Metacanon 1.25; GOW 2.12.
-- Fuente `SeryMente/metodologia/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html`; blob `501f7f6ec8bfd0a8289eb0c1e3897c19a0281be7`; commit `b4bc9f8ef4485e44973e9c17f6c4f9a1119d698d`; leído 2026-10-30.
+- DUG v368 · NX-368m; Metacanon 1.26; GOW 2.14.
+- Fuente canónica `SeryMente/metodologia/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html`; blob `2ba096f565807d7c19df0a9a8cab9e8410110a15`, verificado también en el commit `1412057878829b71b5c262879d6341cbceac1fb4`.
+- La categoría A identifica la pertenencia al CNP sin ordinales adicionales; los decimales solo ordenan la preponderancia relativa dentro de A. Se conserva la revisión manual de los principios aplicables y del GOW.
 - MCP-NORMATIVO: DESACTIVADO. Es distinto del servidor MCP de producto Khora.
 
 ## 4. Propósito y alcance
@@ -131,6 +132,40 @@ El servicio `khora-web/lib/server/mcp-custodia.ts` es específico de las herrami
 - Pruebas ejecutadas en PC-14 (Windows 11; Node 26.13.0; directorio temporal reconstruido): `mcp_custodia.test.ts` 6/6, `mcp_tool_auth_metadata.test.ts` 4/4, `mcp_contract_concordance.test.ts` 10/10 y `mcp_diagnostics.test.ts` 30/30; total **50 aprobadas, 0 fallidas**. La concordancia ejecutó el código real de la ruta y el transporte HTTP Streamable MCP con el SDK; las fronteras externas (Next Response, identidad, base de datos, almacenamiento y servicios de negocio) fueron simuladas. Diagnóstico ejercitó redacciones, autorización, consultas y clasificación de fallos con fixtures. El harness usó copias exactas de los archivos relevantes de esta rama y dependencias mínimas (`tsx`, `pg`, `zod`, SDK MCP y TypeScript). En las pruebas de servicio Custodia, `audio-mp3.ts` fue un stub porque se inyecta el lector Blob; no se probó lectura real de Blob ni OAuth/PostgreSQL productivos. También pasó `tsc --noEmit --strict --skipLibCheck --target ES2022 --module ESNext --moduleResolution Bundler --types node,pg` sobre `mcp_custodia.test.ts`, `mcp-custodia.ts`, `mcp-db.ts`, `cripto.ts` y el stub `audio-mp3.ts`; el primer intento reveló `any[]` en el cursor y se corrigió a tupla `[string,string]` antes del pase final.
 - Límites de validación: no se ejecutaron la suite integral `npm run test:unit`, `typecheck`, build, pruebas de integración con PostgreSQL, OAuth real, `tools/list` autenticado, Blob productivo ni E2E. PC-14 no tenía sesión `gh` autenticada; `git ls-remote` no respondió y se terminó, por lo que no se clonó el repositorio ni se supuso persistencia local. La prueba no tocó servicios ni datos productivos.
 - No se fusionó la rama, no se abrió merge y no se desplegó.
+
+## 15. Reanudación PC-14 y validación actualizada — 2026-10-30
+
+### 15.1 Gobierno y control
+
+- DUG vigente leído desde SeryMente/metodologia/main: v368 · NX-368m; Metacanon 1.26; GOW 2.14; blob del documento 2ba096f565807d7c19df0a9a8cab9e8410110a15.
+- La modificación autorizada del control generación 1→2 ya constaba persistida antes de esta reanudación. El control fue leído de nuevo: blob 93d7ec6fd51dd57c20b8818cfe34ba9bd14e08c3, generación 2, estado assigned, titular operativo chatgpt-khora-mcp-SES-20261030-01A18DCB, folio SES-20261030-01A18DCB. No se repitió la escritura ni se incrementó la generación.
+- El OCP v0.3.0 se registra únicamente en la rama General. main conserva el OCP v0.1.0, blob a3b1335c7b3b13d5ce3e1cbf4ea50f8c0866cd36. No hay un segundo OCP ni un segundo control.
+
+### 15.2 Rama y reconciliación
+
+- Rama work/obs-mcp-custodia-tools-20261030-01a18dcb; último commit de código verificado antes de este checkpoint documental: 70669594c6b706ffcd9fc4670ff222ceafa3a754.
+- Base y merge-base: d6c9911615a3633f6ce38c1b8a2459f1e4823df5. main observado: 8f9b98b61d58aa5c1dd1afee0c128c7ed4592ff7.
+- Comparación inmediatamente anterior a este checkpoint: rama 39 commits adelante y 6 detrás. Los seis commits posteriores de main modifican únicamente docs/frentes/harmonia/**; no hay solapamiento por ruta con los 18 archivos del diff General.
+- No se hizo rebase, merge, PR ni despliegue. La búsqueda de PR por la rama no devolvió solicitudes. La coordinación efectiva con el otro hilo Jules sigue sin verificarse; la modificación de superficies compartidas debe esperar ese cotejo.
+- No hay modificaciones en frentes/custodia/** ni docs/frentes/custodia/**. No se ejecutaron escrituras ni recuperaciones productivas.
+
+### 15.3 Validación repetida en PC-14
+
+- Entorno observado: PC-14, Windows, Node.js 26.13.0, npm 11.20.0. No existe clon local de Khora; se utilizó el harness aislado en C:\Users\PC 13\AppData\Local\Temp\khora-general-validation.
+- Se cotejaron hashes Git-blob de 14 archivos locales contra la rama remota: 13/14 coinciden exactamente. El único distinto es audio-mp3.ts, sustituido intencionalmente por un stub en el harness para inyectar el lector Blob. Por eso la prueba no certifica el helper Blob real.
+- Suite focalizada repetida: mcp_custodia.test.ts 6/6; mcp_tool_auth_metadata.test.ts 4/4; mcp_contract_concordance.test.ts 10/10; mcp_diagnostics.test.ts 30/30. Total: 50 aprobadas, 0 fallidas.
+- La concordancia ejercita la ruta MCP real y el transporte HTTP Streamable MCP con el SDK; la fixture sustituye fronteras externas y registra servicios de negocio simulados. Las pruebas de servicio Custodia ejecutan el módulo real con base de datos simulada, snapshots cifrados de prueba e inyector Blob. No se ejecutó PostgreSQL ni Blob real.
+- tsc --noEmit --strict --skipLibCheck --target ES2022 --module ESNext --moduleResolution Bundler --types node,pg pasó sobre mcp_custodia.test.ts, mcp-custodia.ts, mcp-db.ts, cripto.ts y el stub audio-mp3.ts. Fue necesario instalar @types/node y @types/pg sin guardar dependencias ni modificar el lockfile del harness.
+- No se ejecutaron npm run test:unit integral, typecheck del repositorio completo, build, E2E, OAuth productivo, conexión PostgreSQL real, Blob real ni tools/list contra el endpoint productivo.
+
+### 15.4 Disponibilidad y siguiente compuerta
+
+- Las herramientas y scopes están implementados en la rama, no en producción.
+- khora_custodia_catalogo y khora_custodia_revisiones requieren custodia:metadata:read y el gate operativo norm:turn.
+- khora_custodia_verificar_integridad requiere custodia:integrity:verify y norm:turn. volcados:read no sustituye ninguno de los scopes especializados.
+- El catálogo utiliza paginación por cursor estable; el máximo de página es 100. Revisiones usan cursor estable y máximo 100. Integridad verifica Blob por partes, con máximo 50 por llamada y continuación mediante despues_de_parte.
+- Para que Custodia pueda empezar una investigación con evidencia productiva, todavía se requiere una autorización independiente para integrar/desplegar, además de coordinación con Jules sobre superficies compartidas. Hasta entonces, la rama no habilita el endpoint productivo ni debe presentarse como disponible.
+- Estado de aceptación: IMPLEMENTADO EN RAMA Y VALIDADO CON PRUEBAS AISLADAS; NO DISPONIBLE EN PRODUCCIÓN; NO ACEPTADO INTEGRALMENTE.
 
 Al cierre de General, actualizar este mismo OCP y leerlo de vuelta; después liberar o transferir la titularidad temporal en el control existente conforme al procedimiento aplicable. La tarea Jules conserva su continuidad en el mismo OCP y no requiere un objeto documental paralelo.
 
