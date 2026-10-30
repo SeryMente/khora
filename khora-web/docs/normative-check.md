@@ -43,7 +43,7 @@ Antes de ejecutar ese recorrido desde otra plataforma, resolver la identidad nor
 | `jules_send_message` / responder a Jules | `session_id`, `prompt` | `jules:write` + `norm:turn`; el POST aceptado no prueba que Jules ya haya respondido |
 | `jules_approve_plan` / aprobar plan | `session_id`, `plan_id`, `plan_sha256` | `jules:write` + `norm:turn`; relee sesión/plan dos veces y exige ID/huella actuales + estado `AWAITING_PLAN_APPROVAL`; el API upstream no ofrece precondición atómica, por lo que T22 conserva un residual TOCTOU |
 
-**Permisos efectivos:** las ocho herramientas de contenido requieren `volcados:read` **y** `norm:turn`; las cuatro de observabilidad, `runtime:read` **y** `norm:turn`; las siete herramientas Jules requieren el scope `jules:read` o `jules:write` que corresponda **y** `norm:turn`. El permiso de negocio anunciado en `securitySchemes` se conserva; `norm:turn` es necesario para abrir/completar el ciclo, no una concesión implícita.
+**Permisos efectivos:** las ocho herramientas de contenido requieren `volcados:read` **y** `norm:turn`; las cuatro de observabilidad, `runtime:read` **y** `norm:turn`; las siete herramientas Jules requieren el scope `jules:read` o `jules:write` que corresponda **y** `norm:turn`. El permiso de negocio anunciado en `securitySchemes` se conserva; `norm:turn` es necesario para abrir/completar el ciclo, no una concesión implícita. La respuesta `tools/list` también oculta herramientas cuyos scopes o dependencia `norm:turn` no estén concedidos en el Bearer.
 
 | Herramienta / propósito | Entradas (sin los tres controles sustantivos) | Permiso / salida y efecto |
 |---|---|---|

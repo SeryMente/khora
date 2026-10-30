@@ -133,6 +133,30 @@ async function connect(fixture: ReturnType<typeof routeFixture>) {
   return client;
 }
 
+test("tools/list exposes only granted business scopes and the normative dependency", async () => {
+  const fixture = routeFixture({ scopes: ["jules:read", "norm:turn"] });
+  const client = await connect(fixture);
+  try {
+    const listed = await client.listTools();
+    const names = listed.tools.map(tool => tool.name).sort();
+    assert.deepEqual(names, [
+      "jules_get_session", "jules_list_activities", "jules_list_sessions", "jules_list_sources",
+      "khora_norm_apply_principle", "khora_norm_open_turn", "khora_norm_release_turn", "khora_norm_verify_turn",
+    ].sort());
+    assert.equal(names.includes("jules_create_session"), false);
+    assert.equal(names.includes("jules_send_message"), false);
+    assert.equal(names.includes("jules_approve_plan"), false);
+    assert.equal(names.includes("khora_leer_volcado"), false);
+  } finally { await client.close(); await fixture.close(); }
+
+  const incomplete = routeFixture({ scopes: ["jules:read"] });
+  const incompleteClient = await connect(incomplete);
+  try {
+    const listed = await incompleteClient.listTools();
+    assert.equal(listed.tools.some(tool => tool.name.startsWith("jules_")), false);
+  } finally { await incompleteClient.close(); await incomplete.close(); }
+});
+
 test("real route: HTTP discovery and all 24 calls agree; malformed input cannot reach service", async () => {
   const fixture = routeFixture(); const client = await connect(fixture);
   try {

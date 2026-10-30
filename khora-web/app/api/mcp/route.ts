@@ -781,7 +781,13 @@ async function handleMcpRequest(req: NextRequest) {
 
   // Publish schemas derived from the exact shapes registered above.
   mcpServer.server.setRequestHandler(ListToolsRequestSchema, async () => ({
-    tools: toolsList,
+    tools: toolsList.filter((tool) => {
+      const requiredScopes = tool.securitySchemes.flatMap((scheme) => scheme.scopes ?? []);
+      const properties = (tool.inputSchema as { properties?: Record<string, unknown> }).properties ?? {};
+      const requiresNormativeTurn = Object.hasOwn(properties, "_norm_turn_token");
+      return requiredScopes.every((scope) => scopes.includes(scope)) &&
+        (!requiresNormativeTurn || scopes.includes("norm:turn"));
+    }),
   }));
 
   const transport = new WebStandardStreamableHTTPServerTransport({

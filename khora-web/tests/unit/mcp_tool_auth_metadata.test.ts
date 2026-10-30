@@ -33,6 +33,8 @@ test("route publishes derived schemas and retains authentication and normative g
   assert.match(route, /mcp\/www_authenticate/);
   assert.match(route, /error="insufficient_scope"/);
   assert.match(route, /await assertNormativeTurnOpen/);
+  assert.match(route, /requiredScopes\.every\(\(scope\) => scopes\.includes\(scope\)\)/);
+  assert.match(route, /requiresNormativeTurn \|\| scopes\.includes\("norm:turn"\)/);
   assert.match(route, /tokenGeneration !== currentGen/);
   assert.doesNotMatch(route, /const toolsList = \[/);
 });
