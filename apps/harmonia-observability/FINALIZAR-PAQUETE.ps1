@@ -10,8 +10,9 @@ if (-not $windowsProfile -or [string]::IsNullOrWhiteSpace($windowsProfile.LocalP
 $data = Join-Path $windowsProfile.LocalPath 'AppData\Local\Harmonia\surface-index-v0.4.0\data'
 $node = Join-Path $root 'runtime\node.exe'
 $authFile = Join-Path $root 'extension\local-auth.js'
+$transcriptStarted = $false
 try {
-    Start-Transcript -LiteralPath $log -Force | Out-Null
+    try { Start-Transcript -LiteralPath $log -Force -ErrorAction Stop | Out-Null; $transcriptStarted = $true } catch { Write-Output ('TRANSCRIPT=UNAVAILABLE ' + $_.Exception.Message) }
     $required = @(
       'CONSULTAR-HARMONIA.cmd','INICIAR-HARMONIA.cmd','INICIAR-HARMONIA-HEADLESS.ps1','DETENER-HARMONIA-HEADLESS.ps1','FINALIZAR-PAQUETE.ps1','PREPARAR-RUNTIME.ps1','LEEME.txt','coverage-catalog.json','extension\coverage-catalog.json',
       'collector\query.ps1','collector\server.js','extension\build-info.json','extension\content.js','extension\dashboard.css','extension\dashboard.html','extension\dashboard.js','extension\dashboard-model.js','extension\manifest.json','extension\popup.css','extension\popup.html','extension\popup.js','extension\region-policy.js','extension\service-worker.js',
@@ -111,5 +112,5 @@ try {
     'AUTO_CAPTURE_STATUS=OPERATOR_CHROME_USE_REQUIRED'
     'NATURAL_COVERAGE=AWAITING_POST_RELOAD_SCAN'
 } finally {
-    Stop-Transcript | Out-Null
+    if ($transcriptStarted) { try { Stop-Transcript -ErrorAction Stop | Out-Null } catch { Write-Output ('TRANSCRIPT_STOP=WARNING ' + $_.Exception.Message) } }
 }

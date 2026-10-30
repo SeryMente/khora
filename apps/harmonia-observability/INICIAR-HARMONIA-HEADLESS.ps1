@@ -15,7 +15,9 @@ $authFile = Join-Path $root 'extension\local-auth.js'
 $stdout = Join-Path $logsDir 'collector.stdout.log'
 $stderr = Join-Path $logsDir 'collector.stderr.log'
 $pidFile = Join-Path $collectorDir 'service.pid'
+$transcriptStarted = $false
 try {
+    try { Start-Transcript -LiteralPath $log -Force -ErrorAction Stop | Out-Null; $transcriptStarted = $true } catch { Write-Output ('TRANSCRIPT=UNAVAILABLE ' + $_.Exception.Message) }
     if (-not (Test-Path -LiteralPath (Join-Path $root 'extension\manifest.json'))) { throw 'No existe el manifiesto de Harmonia.' }
     if (-not (Test-Path -LiteralPath (Join-Path $root 'coverage-catalog.json'))) { throw 'No existe coverage-catalog.json.' }
     if (-not (Test-Path -LiteralPath $node -PathType Leaf)) {
@@ -78,5 +80,5 @@ try {
     'CATALOG_FEATURES=' + @($catalog.features).Count
     'CATALOG_SOURCES=' + @($catalog.sources).Count
 } finally {
-    Stop-Transcript | Out-Null
+    if ($transcriptStarted) { try { Stop-Transcript -ErrorAction Stop | Out-Null } catch { Write-Output ('TRANSCRIPT_STOP=WARNING ' + $_.Exception.Message) } }
 }
