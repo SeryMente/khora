@@ -30,10 +30,20 @@ export interface Session {
   updateTime: string;
 }
 
+export interface GitHubBranch { displayName: string }
+
+export interface GitHubRepo {
+  owner: string;
+  repo: string;
+  isPrivate?: boolean;
+  defaultBranch?: GitHubBranch;
+  branches?: GitHubBranch[];
+}
+
 export interface Source {
   name: string;
   id: string;
-  githubRepo?: any;
+  githubRepo?: GitHubRepo;
 }
 
 export interface Activity {
@@ -67,6 +77,25 @@ export interface ListActivitiesResponse {
   nextPageToken?: string;
 }
 
+/** Validate a concrete Jules source resource name before sending it to the API. */
+export function normalizeSourceName(value: string): string {
+  const input = value.trim();
+  const match = input.match(/^sources\/([A-Za-z0-9._-]+(?:\/[A-Za-z0-9._-]+)*)$/);
+  if (!match || match[1].split("/").some(part => part === "." || part === "..")) {
+    throw new Error("JULES_SOURCE_ID_INVALID");
+  }
+  return `sources/${match[1]}`;
+}
+
+/** Accept a Jules session ID or sessions/{id}, never an arbitrary URL/path. */
+function normalizeSessionId(id: string): string {
+  const value = id.trim().replace(/^sessions\//, "");
+  if (!value || value.includes("/") || value.includes("?") || value.includes("#") || value.includes("\\") || value === "." || value === "..") {
+    throw new Error("JULES_SESSION_ID_INVALID");
+  }
+  return encodeURIComponent(value);
+}
+
 export class JulesApiError extends Error {
   public status: number;
   public data: any;
@@ -88,107 +117,64 @@ async function delay(ms: number) {
 const MAX_RETRIES = 3;
 const BASE_DELAY_MS = 500;
 
-async function fetchWithBackoff(
-  url: string,
-  options: RequestInit = {}
-): Promise<Response> {
-  let attempt = 0;
-  const startedAt = Date.now();
-  let pathname = "unknown";
+/** Redact complete repository/source paths and session IDs before observability. */
+export function sanitizeJulesRouteForLog(url: string): string {
   try {
-    pathname = new URL(url).pathname
-      .replace(/\/(sessions|sources)\/[^/]+/g, "/$1/:id")
+    return new URL(url).pathname
+      .replace(/\/sources\/.+$/g, "/sources/:id")
+      .replace(/\/sessions\/[^/?#]+/g, "/sessions/:id")
       .slice(0, 240);
   } catch {
-    // Safe placeholder.
+    return "unknown";
   }
-
+}
+async function fetchWithBackoff(url: string, options: RequestInit = {}): Promise<Response> {
+  const method = (options.method || "GET").toUpperCase();
+  const retrySafe = method === "GET" || method === "HEAD";
+  let attempt = 0;
+  const startedAt = Date.now();
+  const pathname = sanitizeJulesRouteForLog(url);
   while (true) {
     let response: Response;
-
     try {
       response = await fetch(url, options);
     } catch (error) {
+      if (!retrySafe) {
+        emitirEventoServicio({ service: "jules", operation: "http.dependency", method, provider: "google-jules", dependency: "jules.googleapis.com", route: pathname, outcome: "FAILURE", severity: "ERROR", durationMs: Date.now() - startedAt, reasonCode: "WRITE_RESULT_AMBIGUOUS" });
+        throw new JulesApiError("JULES_WRITE_RESULT_AMBIGUOUS", 0, null);
+      }
       if (attempt >= MAX_RETRIES) {
-        emitirEventoServicio({
-          service: "jules",
-          operation: "http.dependency",
-          method: options.method || "GET",
-          provider: "google-jules",
-          dependency: "jules.googleapis.com",
-          route: pathname,
-          outcome: "FAILURE",
-          severity: "ERROR",
-          durationMs: Date.now() - startedAt,
-          reasonCode: error instanceof Error ? error.name.slice(0, 64) : "NETWORK_ERROR",
-        });
+        emitirEventoServicio({ service: "jules", operation: "http.dependency", method, provider: "google-jules", dependency: "jules.googleapis.com", route: pathname, outcome: "FAILURE", severity: "ERROR", durationMs: Date.now() - startedAt, reasonCode: error instanceof Error ? error.name.slice(0, 64) : "NETWORK_ERROR" });
         throw error;
       }
       attempt++;
-      const sleepTime = BASE_DELAY_MS * Math.pow(2, attempt - 1) + Math.random() * 200;
-      await delay(sleepTime);
+      await delay(BASE_DELAY_MS * Math.pow(2, attempt - 1) + Math.random() * 200);
       continue;
     }
-
     if (response.ok) {
-      emitirEventoServicio({
-        service: "jules",
-        operation: "http.dependency",
-        method: options.method || "GET",
-        provider: "google-jules",
-        dependency: "jules.googleapis.com",
-        route: pathname,
-        statusCode: response.status,
-        outcome: "SUCCESS",
-        durationMs: Date.now() - startedAt,
-      });
+      emitirEventoServicio({ service: "jules", operation: "http.dependency", method, provider: "google-jules", dependency: "jules.googleapis.com", route: pathname, statusCode: response.status, outcome: "SUCCESS", durationMs: Date.now() - startedAt });
       return response;
     }
-
-    if (response.status === 429 && attempt < MAX_RETRIES) {
+    if (retrySafe && response.status === 429 && attempt < MAX_RETRIES) {
       attempt++;
-      const sleepTime = BASE_DELAY_MS * Math.pow(2, attempt - 1) + Math.random() * 200;
-      await delay(sleepTime);
+      await delay(BASE_DELAY_MS * Math.pow(2, attempt - 1) + Math.random() * 200);
       continue;
     }
-
-    if (response.status >= 500 && response.status < 600 && attempt < 1) { // 1 retry on 5xx
+    if (retrySafe && response.status >= 500 && response.status < 600 && attempt < 1) {
       attempt++;
-      const sleepTime = BASE_DELAY_MS + Math.random() * 200;
-      await delay(sleepTime);
+      await delay(BASE_DELAY_MS + Math.random() * 200);
       continue;
     }
-
-    emitirEventoServicio({
-      service: "jules",
-      operation: "http.dependency",
-      method: options.method || "GET",
-      provider: "google-jules",
-      dependency: "jules.googleapis.com",
-      route: pathname,
-      statusCode: response.status,
-      outcome: "FAILURE",
-      severity: response.status >= 500 ? "ERROR" : "WARN",
-      durationMs: Date.now() - startedAt,
-      reasonCode: "HTTP_" + response.status,
-    });
-
-    // Unrecoverable error or max retries reached
-    let errorData = null;
+    emitirEventoServicio({ service: "jules", operation: "http.dependency", method, provider: "google-jules", dependency: "jules.googleapis.com", route: pathname, statusCode: response.status, outcome: "FAILURE", severity: response.status >= 500 ? "ERROR" : "WARN", durationMs: Date.now() - startedAt, reasonCode: !retrySafe && response.status >= 500 ? "WRITE_RESULT_AMBIGUOUS" : "HTTP_" + response.status });
+    if (!retrySafe && response.status >= 500) throw new JulesApiError("JULES_WRITE_RESULT_AMBIGUOUS", response.status, null);
+    let errorData: unknown = null;
     try {
-      const text = await response.text();
-      try {
-        errorData = JSON.parse(text);
-      } catch (e) {
-        errorData = text;
-      }
-    } catch (e) {
-      errorData = "Unable to parse error response";
-    }
-    throw new JulesApiError(`Jules API request failed with status ${response.status}`, response.status, errorData);
+      const body = await response.text();
+      try { errorData = JSON.parse(body); } catch { errorData = body; }
+    } catch { errorData = "Unable to parse error response"; }
+    throw new JulesApiError(response.status === 429 ? "JULES_RATE_LIMITED" : "Jules API request failed with status " + response.status, response.status, errorData);
   }
 }
-
 function getHeaders(): HeadersInit {
   const apiKey = process.env.JULES_API_KEY;
   if (!apiKey) {
@@ -201,11 +187,10 @@ function getHeaders(): HeadersInit {
 }
 
 export async function listSessions(pageSize: number = 30, pageToken?: string): Promise<ListSessionsResponse> {
+  const boundedPageSize = Math.min(100, Math.max(1, Math.trunc(pageSize)));
   const url = new URL(`${JULES_API_BASE_URL}/sessions`);
-  url.searchParams.append("pageSize", pageSize.toString());
-  if (pageToken) {
-    url.searchParams.append("pageToken", pageToken);
-  }
+  url.searchParams.set("pageSize", String(boundedPageSize));
+  if (pageToken) url.searchParams.set("pageToken", pageToken);
   const response = await fetchWithBackoff(url.toString(), {
     method: "GET",
     headers: getHeaders(),
@@ -213,17 +198,30 @@ export async function listSessions(pageSize: number = 30, pageToken?: string): P
   return response.json();
 }
 
-export async function listSources(): Promise<ListSourcesResponse> {
-  const response = await fetchWithBackoff(`${JULES_API_BASE_URL}/sources`, {
+export async function listSources(pageSize: number = 50, pageToken?: string): Promise<ListSourcesResponse> {
+  const boundedPageSize = Math.min(100, Math.max(1, Math.trunc(pageSize)));
+  const url = new URL(`${JULES_API_BASE_URL}/sources`);
+  url.searchParams.set("pageSize", String(boundedPageSize));
+  if (pageToken) url.searchParams.set("pageToken", pageToken);
+  const response = await fetchWithBackoff(url.toString(), {
     method: "GET",
     headers: getHeaders(),
   });
   return response.json();
 }
 
+/** Read an exact source resource using the documented Jules sources.get endpoint. */
+export async function getSource(name: string): Promise<Source> {
+  const sourceName = normalizeSourceName(name);
+  const encodedPath = sourceName.split("/").map(encodeURIComponent).join("/");
+  const response = await fetchWithBackoff(JULES_API_BASE_URL + "/" + encodedPath, { method: "GET", headers: getHeaders() });
+  return response.json();
+}
 export async function createSession(params: {
+  prompt: string;
   sourceContext: SourceContext;
-  automationMode: AutomationMode;
+  title?: string;
+  automationMode?: AutomationMode;
   requirePlanApproval: boolean;
 }): Promise<Session> {
   const response = await fetchWithBackoff(`${JULES_API_BASE_URL}/sessions`, {
@@ -235,18 +233,37 @@ export async function createSession(params: {
 }
 
 export async function getSession(id: string): Promise<Session> {
-  const response = await fetchWithBackoff(`${JULES_API_BASE_URL}/sessions/${id}`, {
+  const sessionId = normalizeSessionId(id);
+  const response = await fetchWithBackoff(`${JULES_API_BASE_URL}/sessions/${sessionId}`, {
     method: "GET",
     headers: getHeaders(),
   });
   return response.json();
 }
 
+// Official Jules API contract: pageSize (1..100) and pageToken.
+export async function listActivitiesPage(
+  id: string,
+  pageSize: number = 50,
+  pageToken?: string,
+): Promise<ListActivitiesResponse> {
+  const sessionId = normalizeSessionId(id);
+  const boundedPageSize = Math.min(100, Math.max(1, Math.trunc(pageSize)));
+  const url = new URL(`${JULES_API_BASE_URL}/sessions/${sessionId}/activities`);
+  url.searchParams.set("pageSize", String(boundedPageSize));
+  if (pageToken) url.searchParams.set("pageToken", pageToken);
+  const response = await fetchWithBackoff(url.toString(), {
+    method: "GET",
+    headers: getHeaders(),
+  });
+  return response.json();
+}
+
+/** Backwards-compatible time-filtered reader for existing internal Jules jobs. */
 export async function listActivities(id: string, createTimeCursor?: string): Promise<ListActivitiesResponse> {
-  const url = new URL(`${JULES_API_BASE_URL}/sessions/${id}/activities`);
-  if (createTimeCursor) {
-    url.searchParams.append("createTime", createTimeCursor);
-  }
+  const sessionId = normalizeSessionId(id);
+  const url = new URL(`${JULES_API_BASE_URL}/sessions/${sessionId}/activities`);
+  if (createTimeCursor) url.searchParams.set("createTime", createTimeCursor);
   const response = await fetchWithBackoff(url.toString(), {
     method: "GET",
     headers: getHeaders(),
@@ -255,7 +272,8 @@ export async function listActivities(id: string, createTimeCursor?: string): Pro
 }
 
 export async function sendMessage(id: string, prompt: string): Promise<void> {
-  await fetchWithBackoff(`${JULES_API_BASE_URL}/sessions/${id}:sendMessage`, {
+  const sessionId = normalizeSessionId(id);
+  await fetchWithBackoff(`${JULES_API_BASE_URL}/sessions/${sessionId}:sendMessage`, {
     method: "POST",
     headers: getHeaders(),
     body: JSON.stringify({ prompt }),
@@ -263,7 +281,8 @@ export async function sendMessage(id: string, prompt: string): Promise<void> {
 }
 
 export async function approvePlan(id: string): Promise<void> {
-  await fetchWithBackoff(`${JULES_API_BASE_URL}/sessions/${id}:approvePlan`, {
+  const sessionId = normalizeSessionId(id);
+  await fetchWithBackoff(`${JULES_API_BASE_URL}/sessions/${sessionId}:approvePlan`, {
     method: "POST",
     headers: getHeaders(),
     body: JSON.stringify({}),

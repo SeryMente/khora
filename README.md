@@ -28,20 +28,6 @@ OCP observados en `main` (rutas vigentes, incluidas las heredadas):
 5. [Custodia transversal](frentes/custodia/OBJETO-CANONICO.md) — persistencia, seguridad y recuperación entre canales.
 
 **Fronteras:** Dictado y Observabilidad MCP tienen OCP/controles independientes. Custodia conserva su titularidad transversal. Benchmark/feedback, Diálogo multipista, Ingreso general/crónica/metadatos, voz/síntomas y publicación editorial permanecen fuera de Dictado y pendientes de adjudicación; su clasificación está en el OCP Dictado §4.
-## Documentos canónicos
-
-| Documento | Contenido |
-|---|---|
-| [Servidor MCP de Khora](./khora-web/docs/normative-check.md) | Contrato técnico del servidor MCP. |
-| [Dictado](./docs/frentes/dictado-voz/OBJETO-CANONICO.md) | Pantalla de dictado, captura de voz, transcripción, edición y continuidad. No incluye Observabilidad MCP. |
-| [Observabilidad MCP](./docs/frentes/observabilidad-mcp/OBJETO-CANONICO.md) | Acceso autenticado a registros de observabilidad mediante MCP; control independiente. |
-| [Custodia continua de dictados](./khora-web/docs/CUSTODIA-DICTADOS.md) | Contratos transversales de persistencia, recuperación y audio. |
-| [PREPARACION-VOLCADOS.md](./PREPARACION-VOLCADOS.md) | Protocolos de Custodia, Fidelidad y Legibilidad de volcados. |
-| [UI_REVIEW.md](./UI_REVIEW.md) | Cómo ver la interfaz vigente de Khora. |
-| [ep-medio-architectura.md](./ep-medio-architectura.md) | Entorno Persistente Medio v1.0. |
-### Custodia continua de dictados
-
-Contrato, mapa de c├│digo, garant├¡as, recuperaci├│n, audio original/MP3, herramientas y pruebas: [Custodia continua de dictados](./khora-web/docs/CUSTODIA-DICTADOS.md). Lectura obligatoria para cambios futuros; el documento distingue implementaci├│n de certificaci├│n productiva y enumera las brechas a├║n abiertas.
 
 ## Organización de frentes y recursos
 

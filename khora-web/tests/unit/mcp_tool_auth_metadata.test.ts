@@ -10,10 +10,12 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..")
 const runtimeTools = ["khora_observacion_instantanea", "khora_eventos_desde", "khora_estado_vivo", "khora_eventos_recientes"] as const;
 const dataTools = ["khora_resumen", "khora_listar_volcados", "khora_leer_volcado", "khora_buscar_volcados", "khora_versiones_volcado", "khora_ui_review", "khora_listar_audios", "khora_leer_audio"] as const;
 const normTools = ["khora_norm_open_turn", "khora_norm_apply_principle", "khora_norm_verify_turn", "khora_norm_release_turn"] as const;
+const julesReadTools = ["jules_list_sources", "jules_list_sessions", "jules_get_session", "jules_list_activities"] as const;
+const julesWriteTools = ["jules_create_session", "jules_send_message", "jules_approve_plan"] as const;
 
-test("MCP preserves root securitySchemes for all seventeen tools", () => {
-  assert.equal(Object.keys(MCP_TOOL_SCOPES).length, 17);
-  for (const [names, scopes] of [[runtimeTools, ["runtime:read"]], [dataTools, ["volcados:read"]], [normTools, ["norm:turn"]]] as const) {
+test("MCP preserves root securitySchemes for all twenty-four tools", () => {
+  assert.equal(Object.keys(MCP_TOOL_SCOPES).length, 24);
+  for (const [names, scopes] of [[runtimeTools, ["runtime:read"]], [dataTools, ["volcados:read"]], [normTools, ["norm:turn"]], [julesReadTools, ["jules:read"]], [julesWriteTools, ["jules:write"]]] as const) {
     for (const name of names) {
       assert.deepEqual(describeMcpTool(name as McpToolName, "test", {}).securitySchemes, [{ type: "oauth2", scopes: [...scopes] }]);
     }
@@ -31,20 +33,50 @@ test("route publishes derived schemas and retains authentication and normative g
   assert.match(route, /mcp\/www_authenticate/);
   assert.match(route, /error="insufficient_scope"/);
   assert.match(route, /await assertNormativeTurnOpen/);
+  assert.match(route, /requiredScopes\.every\(\(scope\) => scopes\.includes\(scope\)\)/);
+  assert.match(route, /requiresNormativeTurn \|\| scopes\.includes\("norm:turn"\)/);
   assert.match(route, /tokenGeneration !== currentGen/);
   assert.doesNotMatch(route, /const toolsList = \[/);
 });
 
 test("one canonical document covers the exact tool catalog and current output version", () => {
   const document = fs.readFileSync(path.join(root, "docs/normative-check.md"), "utf8");
+  const normalizedDocument = document.replace(/\r\n?/g, "\n");
   const readme = fs.readFileSync(path.join(root, "../README.md"), "utf8");
-  const documented = [...document.matchAll(/^\| `(khora_[a-z_]+)`/gm)].map(match => match[1]);
-  assert.equal(documented.length, 17);
+  const documented = [...document.matchAll(/^\| `((?:khora|jules)_[a-z_]+)`/gm)].map(match => match[1]);
+  assert.equal(documented.length, 24);
   assert.deepEqual(documented.sort(), Object.keys(MCP_TOOL_SCOPES).sort());
   for (const heading of ["Conexión", "Catálogo", "Contratos", "Ciclo normativo", "Autorización y configuración", "Datos y efectos", "Diagnóstico", "Compatibilidad", "Pruebas y mantenimiento"]) {
-    assert.equal(document.split("\n## " + heading + "\n").length, 2, heading);
+    assert.equal(normalizedDocument.split("\n## " + heading + "\n").length, 2, heading);
   }
   assert.ok(document.includes("**" + REQUIRED_OUTPUT_FORMAT_VERSION + "**"));
   assert.equal(readme.split("(./khora-web/docs/normative-check.md)").length, 2);
-  assert.match(document, /^# Servidor MCP de Khora — documento canónico/m);
+  assert.match(normalizedDocument, /^# Servidor MCP de Khora — documento canónico\n/m);
+});
+
+
+test("Jules scopes flow through OAuth metadata, consent, token exchange, manual tokens and UI", () => {
+  const checks: Array<[string, string]> = [
+    ["app/.well-known/oauth-authorization-server/route.ts", "jules:read"],
+    ["app/.well-known/oauth-authorization-server/route.ts", "jules:write"],
+    ["app/oauth/authorize/page.tsx", "jules:read"],
+    ["app/oauth/authorize/page.tsx", "jules:write"],
+    ["app/api/oauth/token/route.ts", "jules:read"],
+    ["app/api/oauth/token/route.ts", "jules:write"],
+    ["lib/server/mcp-config.ts", "jules:read"],
+    ["lib/server/mcp-config.ts", "jules:write"],
+    ["lib/server/mcp-manual-token.ts", "jules:read"],
+    ["lib/server/mcp-manual-token.ts", "jules:write"],
+    ["app/sistema/mcp/page.tsx", "jules:read"],
+    ["app/sistema/mcp/page.tsx", "jules:write"],
+  ];
+  for (const [relative, scope] of checks) {
+    const content = fs.readFileSync(path.join(root, relative), "utf8");
+    assert.ok(content.includes(scope), `${relative} must support ${scope}`);
+  }
+  const page = fs.readFileSync(path.join(root, "app/sistema/mcp/page.tsx"), "utf8");
+  assert.ok(page.includes('const DEFAULT_SCOPES = ["runtime:read", "volcados:read", "norm:turn", "jules:read", "jules:write"] as const;'));
+  const route = fs.readFileSync(path.join(root, "app/api/mcp/route.ts"), "utf8");
+  assert.match(route, /const julesTool = \(/);
+  assert.doesNotMatch(route, /gatedTool\("jules_/);
 });

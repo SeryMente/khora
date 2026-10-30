@@ -10,12 +10,12 @@
   "owner_alias_type": "operational_alias_not_native_thread_id",
   "instance": "chatgpt-khora-mcp-SES-20261030-01A18DCB",
   "session_folio": "SES-20261030-01A18DCB",
-  "generation": 2,
+  "generation": 3,
   "expiry": null,
-  "authorization_ref": "Autorización explícita del operador en esta conversación, 2026-10-30: adjudicar el control existente de Khora MCP / OBSERVABILIDAD-MCP de generación 1 a 2 al titular operativo chatgpt-khora-mcp-SES-20261030-01A18DCB; autoriza implementar khora_custodia_catalogo, khora_custodia_revisiones y khora_custodia_verificar_integridad, scopes especializados e integración MCP en una rama propia basada en main verificado. UUIDv7 de continuidad conservado solo localmente, no es ID nativo ni se persiste aquí. Excluye cualquier modificación al frente Custodia, escritura/recuperación productiva, credenciales productivas, sustitución por volcados:read, merge y despliegue.",
-  "authorization_event": "OBSERVABILIDAD-MCP-ADJUDICACION-SES-20261030-01A18DCB",
+  "authorization_ref": "Autorización expresa del operador en esta conversación, 2026-10-30: «Inciso A, tienes autorización», en respuesta a la ampliación propuesta para incorporar Jules al mismo frente MCP, incluidas herramientas de escritura, migración ACL productiva y publicación posterior, preservando permisos separados de lectura/escritura. Autorización de B: investigar mediante RDC una ruta legítima compatible con las funciones realmente habilitadas; no eludir restricciones de cuenta/plataforma ni extraer cookies, tokens de sesión o secretos.",
+  "authorization_event": "OBSERVABILIDAD-MCP-AMPLIACION-JULES-20261030",
   "acquired_at": "2026-10-30",
-  "bootstrap_scope": "Authorized for this intervention only: implement the three read-only Custodia MCP tools, specialized scopes and existing MCP integration in a dedicated branch descended from the verified main baseline; run and document available tests. No changes to Custodia OCP/control/tasks/data; no production writes or recovery; no productive credentials; do not substitute volcados:read for specialized scopes; do not merge/open a merge or deploy. Release or explicitly transfer this temporary ownership at intervention closure.",
+  "bootstrap_scope": "Authorized for this intervention: continue the single OBSERVABILIDAD-MCP front on feat/mcp-jules-clean-main-20261030-r1; implement and validate the seven Jules tools, separate jules:read/jules:write plus norm:turn, resource-level fail-closed ACL, apply the narrowly scoped ACL migration to Neon production, prepare/merge the code after validation and deploy Production. Keep provisional General/Jules tasks inside this one front. Do not create a parallel OCP/front/control. No unrelated Custodia data/task changes; no global or guessed source grants; no secret/session extraction; no claims that RDC bypasses account entitlement. ChatGPT-native MCP availability must be tested against the actual account; a local MCP client used through authorized RDC is a distinct fallback, not native ChatGPT Free integration.",
   "enforcement": "cooperative registry; no server fencing of arbitrary writes",
   "folio_collision_check": {
     "searched_scope": "GitHub code search scoped to org SeryMente for the exact folio and alias, plus repository-scoped review in SeryMente/khora. Zero matches returned. Search indexing and exposed repository coverage are not a complete inventory of every control.",
@@ -41,9 +41,43 @@
   },
   "previous_authorization_ref": "OCP created for discovery only under C044 request to separate and name non-dictation work. No authorization to assign this conversation/another instance as owner.",
   "previous_acquired_at": "2026-10-30",
-  "prior_generation": 1,
-  "previous_blob": "e710b17cb5f6d793846a1ac692ec78103ed111d7",
-  "base_blob_sha": "e710b17cb5f6d793846a1ac692ec78103ed111d7",
-  "base_main_sha": "e36c0ad75546f0647e56ea396dd6adeb4454d419",
-  "transfer_method": "GitHub Contents API update_file on main using the immediately revalidated control blob SHA as the compare-and-swap precondition; current control generation 1 and OCP blob SHA were checked immediately before the write. Immediate read-back is required."
+  "prior_generation": 2,
+  "previous_blob": "93d7ec6fd51dd57c20b8818cfe34ba9bd14e08c3",
+  "base_blob_sha": "93d7ec6fd51dd57c20b8818cfe34ba9bd14e08c3",
+  "base_main_sha": "1ff2cba461e6aeea11febee86a09934851209571",
+  "transfer_method": "Generation 3 scope expansion recorded on the same intervention branch. Source control blob was fetched immediately before update; update uses compare-and-swap blob SHA. Do not regard branch control as canonical until branch merges to main. Preserve generation 2 record in previous_control_generation.",
+  "previous_control_generation": {
+    "generation": 2,
+    "blob_sha": "93d7ec6fd51dd57c20b8818cfe34ba9bd14e08c3",
+    "authorization_ref": "Autorización explícita del operador en esta conversación, 2026-10-30: adjudicar el control existente de Khora MCP / OBSERVABILIDAD-MCP de generación 1 a 2 al titular operativo chatgpt-khora-mcp-SES-20261030-01A18DCB; autoriza implementar khora_custodia_catalogo, khora_custodia_revisiones y khora_custodia_verificar_integridad, scopes especializados e integración MCP en una rama propia basada en main verificado. UUIDv7 de continuidad conservado solo localmente, no es ID nativo ni se persiste aquí. Excluye cualquier modificación al frente Custodia, escritura/recuperación productiva, credenciales productivas, sustitución por volcados:read, merge y despliegue.",
+    "bootstrap_scope": "Authorized for this intervention only: implement the three read-only Custodia MCP tools, specialized scopes and existing MCP integration in a dedicated branch descended from the verified main baseline; run and document available tests. No changes to Custodia OCP/control/tasks/data; no production writes or recovery; no productive credentials; do not substitute volcados:read for specialized scopes; do not merge/open a merge or deploy. Release or explicitly transfer this temporary ownership at intervention closure."
+  },
+  "updated_at": "2026-10-30",
+  "scope_expansion": {
+    "task_model": "General and Jules are provisional tasks within the same MCP front; no additional front/OCP/control.",
+    "jules_tools": [
+      "jules_list_sources",
+      "jules_list_sessions",
+      "jules_get_session",
+      "jules_list_activities",
+      "jules_create_session",
+      "jules_send_message",
+      "jules_approve_plan"
+    ],
+    "read_scope": "jules:read",
+    "write_scope": "jules:write",
+    "normative_scope": "norm:turn",
+    "acl": "khora_private.jules_source_acl keyed by exact subject/source/branch; fail-closed",
+    "database_change": "033_jules_source_acl schema only; grant only USAGE and SELECT to khora_lector; no data-row grants without verified identity/resource authorization",
+    "publication": "authorized after review, test evidence and verified security",
+    "owner_access_policy": {
+      "authorization_ref": "Clarificación expresa del operador en esta conversación, 2026-10-30: «soy el único usuario del sistema y soy desarrollador» y «no necesito ponerme bloqueantes innecesarios».",
+      "owner_identity": "Authenticated OAuth sub or manual-token owner must match configured MCP_ALLOWED_EMAIL, case-insensitively.",
+      "read_scope": "jules:read",
+      "write_scope": "jules:write",
+      "resource_boundary": "The owner can act only on sources and branches returned by the Jules account configured through JULES_API_KEY; source/branch existence and session context are still validated against Jules. No ACL rows or manual per-repository grants are needed for this single owner.",
+      "additional_subjects": "Every other subject remains subject/source/branch/capability exact and fail-closed in khora_private.jules_source_acl.",
+      "normative_gate": "Jules tools require their own read/write scopes but do not require norm:turn; Khora normative tools retain their existing norm:turn contract."
+    }
+  }
 }

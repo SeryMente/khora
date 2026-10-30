@@ -21,7 +21,8 @@ interface ManualToken {
 }
 
 const MCP_ENDPOINT = "https://khora-web.vercel.app/api/mcp";
-const SUPPORTED_SCOPES = ["runtime:read", "volcados:read", "norm:turn"] as const;
+const SUPPORTED_SCOPES = ["runtime:read", "volcados:read", "norm:turn", "jules:read", "jules:write"] as const;
+const DEFAULT_SCOPES = ["runtime:read", "volcados:read", "norm:turn", "jules:read", "jules:write"] as const;
 
 function formatDate(value: string | null) {
   return value ? new Date(value).toLocaleString("es-MX") : "Nunca";
@@ -30,7 +31,7 @@ function formatDate(value: string | null) {
 export default function PaginaMcpRevocacion() {
   const [info, setInfo] = useState<RevocationInfo | null>(null);
   const [tokens, setTokens] = useState<ManualToken[]>([]);
-  const [selectedScopes, setSelectedScopes] = useState<string[]>([...SUPPORTED_SCOPES]);
+  const [selectedScopes, setSelectedScopes] = useState<string[]>([...DEFAULT_SCOPES]);
   const [expiresInDays, setExpiresInDays] = useState(90);
   const [label, setLabel] = useState("ChatGPT");
   const [issuedToken, setIssuedToken] = useState<{ token: string; bearer: string; expiresAt: string } | null>(null);
