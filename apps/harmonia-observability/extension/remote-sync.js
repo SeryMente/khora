@@ -114,4 +114,5 @@
   };
  }
  root.HarmoniaRemoteSync={buildObservationBatch,buildMetrics};
+ if(typeof module!=='undefined'&&module.exports)module.exports=root.HarmoniaRemoteSync;
 })(typeof globalThis!=='undefined'?globalThis:this);
