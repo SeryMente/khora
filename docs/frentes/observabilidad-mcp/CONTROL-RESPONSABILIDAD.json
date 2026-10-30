@@ -122,6 +122,15 @@
         "npm_install": "576 packages; audit reports 14 advisories (4 moderate, 9 high, 1 critical), not remediated here",
         "real_authenticated_jules_calls": "PENDING operator provisioning of the single Khora Bearer",
         "review_gate": "PR pending; no merge or Production deploy authorized before the operator reviews the owner auto-plan-approval diff"
+      },
+      "pull_request": {
+        "number": 347,
+        "url": "https://github.com/SeryMente/khora/pull/347",
+        "state": "open",
+        "merged": false,
+        "review_required": "Operator security review of owner auto-plan-approval policy and Windows DPAPI launcher before merge.",
+        "base_main_sha": "9570247339c99cf194c434d2b726493d8abd69b4",
+        "branch_head_at_open": "9ce965a8169a8cd932b176f4ecd92fb7bf9e17d8"
       }
     }
   }
