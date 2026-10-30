@@ -68,6 +68,14 @@ async function paint(){
   setBar('#overallBar',totalPct);setBar('#docsBar',docPct);setBar('#observedBar',naturalPct);
   $('#lastScan').textContent=formatDate(coverage.lastScanAt);
   $('#events').textContent=(state.events||0)+' eventos aceptados · '+(coverage.scanCount||0)+' barridos · '+(state.activeTabs||0)+' pestañas';
+  const remote=state.remoteSync||{};
+  const pending=Number(remote.pending||0),accepted=Number(remote.accepted||0),localOnly=Number(remote.local_only||0);
+  $('#coraStatus').textContent=remote.error?'Cola remota no disponible':pending?pending+' observaciones pendientes · '+accepted+' confirmadas':'Sin pendientes · '+accepted+' confirmadas';
+  $('#coraDot').className=remote.error?'repoDot off':pending?'repoDot':'repoDot live';
+  $('#coraDetail').textContent=remote.error
+   ?remote.error
+   :'Cora almacena solo telemetría estructural anonimizada. '+(pending?'Abre Cora e inicia sesión para vaciar la cola. ':'La cola está vacía. ')+(localOnly?localOnly+' eventos adicionales permanecen solo en el archivo local por límite de cola. ':'')+'Los JSONL y las superficies completas nunca se transmiten.';
+
   $('#dot').className=state.autoEnabled?(state.collector?'dot live':'dot off'):'dot';
   $('#headline').textContent=!state.collector?'Colector no disponible':state.autoEnabled?'Captura automática '+(state.activeTabs?'activa':'habilitada'):'Captura automática pausada';
   $('#detail').textContent=!state.collector?(state.lastError||'Ejecuta INICIAR-HARMONIA.cmd.'):state.autoEnabled
@@ -93,4 +101,16 @@ toggle.addEventListener('click',async()=>{
  await paint();
 });
 $('#refresh').addEventListener('click',()=>void paint());
+$('#openCora').addEventListener('click',async()=>{
+ const response=await call('harmonia:open-khora');
+ if(!response.ok)alert(response.error||'No se pudo abrir Cora.');
+});
+$('#syncCora').addEventListener('click',async()=>{
+ const button=$('#syncCora');button.disabled=true;
+ const response=await call('harmonia:remote-sync');
+ if(!response.ok)alert(response.error||'No se pudo sincronizar la cola.');
+ else if(response.value?.needsKhora)alert('Abre Cora e inicia sesión. La cola local permanecerá intacta hasta que Cora esté disponible.');
+ else if(!response.value?.ok&&response.value?.error)alert(response.value.error);
+ await paint();button.disabled=false;
+});
 void paint();
