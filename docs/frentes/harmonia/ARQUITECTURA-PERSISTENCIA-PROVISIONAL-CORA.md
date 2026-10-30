@@ -81,6 +81,15 @@ La retirada de esta solución provisional exige completar, como mínimo:
 
 La fusión/publicación no equivale a aceptación. Antes de declarar operativo el flujo deberán verificarse: pruebas del colector y del conversor, autenticación real en Cora, lote sintético persistido, consulta de lectura de vuelta en Neon, reintento idempotente, recuperación con outbox pendiente tras reinicio, ausencia de campos prohibidos en el lote remoto, y sincronización natural desde la extensión cargada en Chrome. La aceptación física en Chrome requiere la comprobación del operador; no se presume a partir de pruebas sintéticas.
 
+
+## 10. Validación local de la ruta de sincronización · 2026-10-30
+
+La PR #346 incorporó la prueba automatizada `tests/service-worker-remote-sync.test.js`. En PC-14 mediante RDC, con el runtime oficial Node.js v22.23.4 x64 cuya descarga y binario fueron verificados por SHA-256, se ejecutaron las cuatro comprobaciones sintácticas del workflow y la suite completa: **7/7 PASS**. La prueba usa el colector HTTP real y el service worker/conversor reales; simula Cora con respuestas 401 y 200 para comprobar retención de outbox, reintento con UUID estable, filtrado de campos privados y ACK tras confirmación.
+
+Esta evidencia es una integración local controlada, no una prueba real de navegador ni de persistencia remota. El endpoint productivo devolvió 401 al recibir una solicitud sin sesión, y no se realizó una escritura de prueba. Las huellas de la ruta, del contrato v2.0 y del adaptador en producción coinciden con las de `main` en el corte inspeccionado. Sigue pendiente una sesión Cora autenticada en Chrome, una inserción positiva y lectura de vuelta en Neon, y la navegación natural con la extensión cargada por el operador.
+
+Los workflows de GitHub asociados al head actual continúan finalizando sin pasos ejecutados, con causa subyacente no determinada. Los estados de Vercel/Netlify también muestran fallos externos; los resultados locales no se usan como sustituto de esos gates. La rama de esta PR está dos commits detrás de `main` y no se rebasó ni fusionó.
+
 ## 9. Estado del trabajo al corte
 
 Se creó una rama aislada desde `main`: `feat/harmonia-cora-provisional-persistence-20261030`. El código de integración y esta documentación se encuentran en esa rama. La aplicación local v0.4.1 de la rama candidata histórica de Harmonia es divergente respecto de `main`; esta implementación sobre la línea canónica v0.3.x no se materializa automáticamente en ese paquete local. La PR #333 permanece cerrada y no fusionada. No se ha modificado `main`, no se ha desplegado Harmonia ni se ha alterado Chrome en este ciclo.
