@@ -2,7 +2,7 @@
 
 ## 1. Control e identidad
 - Frente: **Observabilidad MCP**; identidad canónica `OBSERVABILIDAD-MCP`.
-- Repositorio `SeryMente/khora`; OCP único `docs/frentes/observabilidad-mcp/`, conservado en su ruta heredada. Versión v0.3.0 en la rama General; `main` conserva v0.1.0 hasta una integración autorizada.
+- Repositorio `SeryMente/khora`; OCP único `docs/frentes/observabilidad-mcp/`, conservado en su ruta heredada. Versión v0.3.1 en la rama General; `main` conserva v0.1.0 hasta una integración autorizada.
 - Control independiente, generación 2, estado `assigned`; titular operativo temporal `chatgpt-khora-mcp-SES-20261030-01A18DCB`; folio `SES-20261030-01A18DCB`; blob del control `93d7ec6fd51dd57c20b8818cfe34ba9bd14e08c3`.
 - `MCP-OBS-DICTADO` es identidad histórica del objeto agregado anterior, no la identidad vigente de este frente.
 
@@ -153,6 +153,7 @@ El servicio `khora-web/lib/server/mcp-custodia.ts` es específico de las herrami
 
 - Entorno observado: PC-14, Windows, Node.js 26.13.0, npm 11.20.0. No existe clon local de Khora; se utilizó el harness aislado en C:\Users\PC 13\AppData\Local\Temp\khora-general-validation.
 - Se cotejaron hashes Git-blob de 14 archivos locales contra la rama remota: 13/14 coinciden exactamente. El único distinto es audio-mp3.ts, sustituido intencionalmente por un stub en el harness para inyectar el lector Blob. Por eso la prueba no certifica el helper Blob real.
+- Smoke test SQL adicional: **9 aserciones aprobadas** en PGlite contra las funciones reales del servicio y un esquema sintético mínimo que refleja las columnas/tipos comprobados en el esquema fuente de Khora. Cubrió catálogo de tres tipos de sesión (propietario directo, checkpoint heredado y archivo vinculado) en dos páginas; exclusión de otra cuenta; revisiones sin exposición de snapshot; integridad en dos páginas; rechazo de acceso cruzado. Datos ficticios y lector Blob inyectado. No fue conexión Neon, lectura Blob real ni ejecución integral de migraciones.
 - Suite focalizada repetida: mcp_custodia.test.ts 6/6; mcp_tool_auth_metadata.test.ts 4/4; mcp_contract_concordance.test.ts 10/10; mcp_diagnostics.test.ts 30/30. Total: 50 aprobadas, 0 fallidas.
 - La concordancia ejercita la ruta MCP real y el transporte HTTP Streamable MCP con el SDK; la fixture sustituye fronteras externas y registra servicios de negocio simulados. Las pruebas de servicio Custodia ejecutan el módulo real con base de datos simulada, snapshots cifrados de prueba e inyector Blob. No se ejecutó PostgreSQL ni Blob real.
 - tsc --noEmit --strict --skipLibCheck --target ES2022 --module ESNext --moduleResolution Bundler --types node,pg pasó sobre mcp_custodia.test.ts, mcp-custodia.ts, mcp-db.ts, cripto.ts y el stub audio-mp3.ts. Fue necesario instalar @types/node y @types/pg sin guardar dependencias ni modificar el lockfile del harness.
