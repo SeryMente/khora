@@ -77,6 +77,7 @@ export async function toolKhoraObservacionInstantanea(args?: { session_id?: stri
        ${args?.session_id ? "AND session_id = $1" : ""}
        ORDER BY updated_at DESC
        LIMIT 20`,
+      sessionParams,
     ),
   ]);
 
