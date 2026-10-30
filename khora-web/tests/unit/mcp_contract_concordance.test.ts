@@ -149,7 +149,7 @@ test("real route: HTTP discovery and all 20 calls agree; malformed input cannot 
     }
     const bad = input("khora_norm_verify_turn"); delete (bad.receipt as Record<string, unknown>).output;
     assert.equal((await client.callTool({ name: "khora_norm_verify_turn", arguments: bad })).isError, true);
-    assert.equal(fixture.calls.length, 16);
+    assert.equal(fixture.calls.length, 19);
   } finally { await client.close(); await fixture.close(); }
 });
 
