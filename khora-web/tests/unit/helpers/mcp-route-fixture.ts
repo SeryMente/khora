@@ -55,7 +55,7 @@ export function routeFixture(options: { scopes?: string[]; revoked?: boolean; de
       ...(options.sessionContextValid === false ? {} : { sourceContext: { source: "sources/github/owner/repo", githubRepoContext: { startingBranch: "main" } } }),
     };
   };
-  const sourceFixture = { name: "sources/github/owner/repo", id: "github/owner/repo", githubRepo: { owner: "owner", repo: "repo", isPrivate: true, defaultBranch: { displayName: "main" }, branches: [{ displayName: "main" }, { displayName: "restricted" }] } };
+  const sourceFixture = { name: "sources/github/owner/repo", id: "github/owner/repo", githubRepo: { owner: "owner", repo: "repo", isPrivate: true, defaultBranch: { displayName: "main" }, branches: [{ displayName: "restricted" }] } };
   const mockNormalizeSourceName = (value: string) => {
     if (!/^sources\/[A-Za-z0-9._-]+(?:\/[A-Za-z0-9._-]+)*$/.test(value) || value.split("/").some(part => part === "." || part === "..")) {
       throw new Error("JULES_SOURCE_ID_INVALID");

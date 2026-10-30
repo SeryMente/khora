@@ -144,13 +144,13 @@ test("real route: HTTP discovery and all 24 calls agree; malformed input cannot 
       assert.deepEqual(tool.inputSchema, JSON.parse(JSON.stringify(describeMcpTool(tool.name as McpToolName, contract.description, contract.shape).inputSchema)));
       assert.notEqual((await client.callTool({ name: tool.name, arguments: input(tool.name as McpToolName) })).isError, true, tool.name);
     }
-    assert.equal(fixture.calls.length, 25, "Jules message and approval tools preflight session state");
+    assert.equal(fixture.calls.length, 27, "Jules message and approval tools preflight session state");
     for (const call of fixture.calls.filter(x => !x.name.endsWith("NormativeTurn") && x.name !== "applyNormativePrinciple")) {
       for (const field of Object.keys(controls)) assert.equal(Object.hasOwn(call.args ?? {}, field), false, call.name);
     }
     const bad = input("khora_norm_verify_turn"); delete (bad.receipt as Record<string, unknown>).output;
     assert.equal((await client.callTool({ name: "khora_norm_verify_turn", arguments: bad })).isError, true);
-    assert.equal(fixture.calls.length, 25);
+    assert.equal(fixture.calls.length, 27);
   } finally { await client.close(); await fixture.close(); }
 });
 

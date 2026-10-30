@@ -301,9 +301,13 @@ async function handleMcpRequest(req: NextRequest) {
         const allowed = new Set(grants.filter(g => g.source === source.name).map(g => g.branch));
         if (!allowed.size || !source.githubRepo) return [];
         const upstream = Array.isArray(source.githubRepo.branches) ? source.githubRepo.branches : [];
-        const branches = upstream.filter((b: any) => typeof b?.displayName === "string" && allowed.has(b.displayName));
+        const available = new Map<string, any>();
+        for (const branch of [...upstream, ...(source.githubRepo.defaultBranch ? [source.githubRepo.defaultBranch] : [])]) {
+          if (typeof branch?.displayName === "string") available.set(branch.displayName, branch);
+        }
+        const branches = [...available.values()].filter((b: any) => allowed.has(b.displayName));
         if (!branches.length) return [];
-        const defaultBranch = source.githubRepo.defaultBranch && allowed.has(source.githubRepo.defaultBranch.displayName) && branches.some((b: any) => b.displayName === source.githubRepo.defaultBranch.displayName) ? source.githubRepo.defaultBranch : undefined;
+        const defaultBranch = source.githubRepo.defaultBranch && allowed.has(source.githubRepo.defaultBranch.displayName) ? available.get(source.githubRepo.defaultBranch.displayName) : undefined;
         return [{ ...source, githubRepo: { ...source.githubRepo, branches, ...(defaultBranch ? { defaultBranch } : { defaultBranch: undefined }) } }];
       });
       return { ...page, sources };
