@@ -1,7 +1,7 @@
 {
   "schema": "harmonia.repository-build.v1",
   "version": "0.4.1",
-  "sourceRevision": "99e2a1c3b7d1d1245cee4e9b5db863693573c3f6",
+  "sourceRevision": "3017dd00df31573c09e28b7782381216f8dd6844",
   "catalogVersion": "0.1.2",
   "regionPolicyVersion": "1.0.0",
   "releaseChannel": "candidate",
@@ -37,7 +37,7 @@
     "desktopFileWatchAutoReload": true,
     "scopesIndependentStatus": true
   },
-  "generatedBy": "Harmonia candidate v0.4.1; sourceRevision pins the status/watch implementation commit.",
+  "generatedBy": "Harmonia candidate v0.4.1; sourceRevision pins the finalized tab/global indicators and reinjection implementation.",
   "observationPersistence": {
     "localJSONLAndIndex": true,
     "remoteGitHubWritesImplemented": false,
