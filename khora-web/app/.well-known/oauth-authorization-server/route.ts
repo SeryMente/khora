@@ -16,7 +16,7 @@ export async function GET() {
     code_challenge_methods_supported: ["S256"],
     authorization_response_iss_parameter_supported: true,
     client_id_metadata_document_supported: true,
-    scopes_supported: ["runtime:read", "volcados:read", "norm:turn", "offline_access"],
+    scopes_supported: ["runtime:read", "volcados:read", "norm:turn", "jules:read", "jules:write", "offline_access"],
     grant_types_supported: ["authorization_code", "refresh_token"],
     response_types_supported: ["code"],
     token_endpoint_auth_methods_supported: ["none", "client_secret_post"],
