@@ -1,0 +1,160 @@
+{
+  "schema": "harmonia.cora-provisional-persistence-evidence.v1",
+  "observedAt": "2026-10-30T23:13:38Z",
+  "repository": "SeryMente/khora",
+  "branch": "feat/harmonia-cora-provisional-persistence-20261030",
+  "pullRequest": 346,
+  "baseCommit": "c6860f1501419239b4eef540150f934a5e20f2a3",
+  "snapshotCommit": "e6bd69d0b48e9d268e8cbc372b48646ecc264cb9",
+  "treeSha": "79d1ea8b7839a18516c1be738a271222c11e6a38",
+  "readback": {
+    "pathsExpected": 14,
+    "filesFoundInTree": 14,
+    "fileReadsFromGitHub": 14,
+    "blobShaMatchedTree": true,
+    "treeTruncated": false
+  },
+  "files": [
+    {
+      "path": ".github/workflows/harmonia-cora-persistence.yml",
+      "sha": "addf702b856eb130575e7dada9b476ac7975dd1f",
+      "bytes": 1051
+    },
+    {
+      "path": "apps/harmonia-observability/LEEME.txt",
+      "sha": "5c58ad982a4547759008269ca3ff7de89a706a59",
+      "bytes": 6998
+    },
+    {
+      "path": "apps/harmonia-observability/collector/server.js",
+      "sha": "9dde272a3a2e52d08a8363848970f4b27ed75c3c",
+      "bytes": 25034
+    },
+    {
+      "path": "apps/harmonia-observability/extension/manifest.json",
+      "sha": "ccbb6d408d9395204228ee31d6bc1651e64c7280",
+      "bytes": 1052
+    },
+    {
+      "path": "apps/harmonia-observability/extension/popup.css",
+      "sha": "deb6f84679ec8fb09d188cdb208c002a51e55a82",
+      "bytes": 4417
+    },
+    {
+      "path": "apps/harmonia-observability/extension/popup.html",
+      "sha": "673994e14d5b055c0a5b26040f04a61d328756c3",
+      "bytes": 4386
+    },
+    {
+      "path": "apps/harmonia-observability/extension/popup.js",
+      "sha": "2ac2d59c617900050d22870c536bf32395b7b08d",
+      "bytes": 7520
+    },
+    {
+      "path": "apps/harmonia-observability/extension/remote-sync.js",
+      "sha": "bacc76511f4905a1660b24e790626a89438d1984",
+      "bytes": 5339
+    },
+    {
+      "path": "apps/harmonia-observability/extension/service-worker.js",
+      "sha": "c66a05c977eaec53fbc0b205b1f78b7df37d60be",
+      "bytes": 22067
+    },
+    {
+      "path": "apps/harmonia-observability/tests/collector-remote-sync.integration.test.js",
+      "sha": "96d1ba91ce4c93fce7346fde4af94778391c2b98",
+      "bytes": 5287
+    },
+    {
+      "path": "apps/harmonia-observability/tests/remote-sync.test.js",
+      "sha": "db7c8c4200c4872eccf060b0c39a3004364663d8",
+      "bytes": 3410
+    },
+    {
+      "path": "docs/frentes/harmonia/ARQUITECTURA-PERSISTENCIA-PROVISIONAL-CORA.md",
+      "sha": "579a3551149a93fc6fb95ae6b3b6fd10a39e887b",
+      "bytes": 8074
+    },
+    {
+      "path": "docs/frentes/harmonia/OBJETO-CANONICO.md",
+      "sha": "83d87edee43cdfd03fe79a8e5cbe9ce848081f2f",
+      "bytes": 230752
+    },
+    {
+      "path": "docs/frentes/harmonia/README.md",
+      "sha": "868af5a80659dd846ec8e2f90198bd20f52a7b2a",
+      "bytes": 8402
+    }
+  ],
+  "automation": {
+    "observedHead": "e6bd69d0b48e9d268e8cbc372b48646ecc264cb9",
+    "workflows": [
+      {
+        "name": "Harmonia · provisional Cora persistence",
+        "runId": 41143181960,
+        "jobId": 124362049703,
+        "conclusion": "failure",
+        "runnerId": 0,
+        "runnerName": "",
+        "steps": 0
+      },
+      {
+        "name": "UI Quality",
+        "runId": 41143181982,
+        "jobIds": [
+          124362050055,
+          124362050476
+        ],
+        "conclusion": "failure",
+        "runnerIds": [
+          0,
+          0
+        ],
+        "steps": [
+          0,
+          0
+        ]
+      },
+      {
+        "name": "khora-ok / gate",
+        "runId": 41143181990,
+        "jobId": 124362050060,
+        "conclusion": "failure",
+        "runnerId": 0,
+        "runnerName": "",
+        "steps": 0
+      },
+      {
+        "name": "CI",
+        "runId": 41143182031,
+        "jobIds": [
+          124362049709,
+          124362050123,
+          124362050181
+        ],
+        "conclusion": "failure",
+        "runnerIds": [
+          0,
+          0,
+          0
+        ],
+        "steps": [
+          0,
+          0,
+          0
+        ]
+      }
+    ],
+    "logs": "The workflow job log download returned BlobNotFound. The underlying reason a runner was not assigned is undetermined.",
+    "testExecution": "NOT_EXECUTED_NO_RUNNER_ASSIGNED"
+  },
+  "production": {
+    "changed": false,
+    "coraApplicationChanged": false,
+    "neonSchemaChanged": false,
+    "environmentVariablesChanged": false,
+    "productionWriteTestPerformed": false,
+    "chromeE2EPerformed": false
+  },
+  "state": "CANDIDATE_NOT_MERGED_NOT_DEPLOYED_NOT_ACCEPTED"
+}
