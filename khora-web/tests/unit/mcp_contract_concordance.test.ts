@@ -299,6 +299,7 @@ test("configured developer owner gets full Jules-account access without ACL or n
     const createCall = fixture.calls.find(x => x.name === "JulesCreateSession");
     assert.ok(createCall);
     assert.equal((createCall!.args as any).sourceContext.githubRepoContext.startingBranch, "restricted");
+    assert.equal((createCall!.args as any).requirePlanApproval, false, "single configured owner has no unnecessary plan-approval gate");
     assert.deepEqual(fixture.aclSubjects, [], "configured owner does not need per-repository ACL rows");
   } finally { await client.close(); await fixture.close(); }
 });
@@ -331,7 +332,7 @@ test("Jules create validates exact write grant and live source branch before cre
     const result = await client.callTool({ name: "jules_create_session", arguments: input("jules_create_session") });
     assert.notEqual(result.isError, true);
     const create = allowed.calls.find(x => x.name === "JulesCreateSession"); assert.ok(create);
-    assert.equal((create!.args as any).requirePlanApproval, true);
+    assert.equal((create!.args as any).requirePlanApproval, true, "additional subjects retain manual plan approval");
     assert.equal((create!.args as any).automationMode, "AUTO_CREATE_PR");
     const sourceContext = (create!.args as any).sourceContext;
     assert.equal(sourceContext.source, "sources/github/owner/repo");
