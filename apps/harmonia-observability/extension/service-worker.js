@@ -1,5 +1,9 @@
 try { importScripts('local-auth.js'); } catch {}
+importScripts('remote-sync.js');
 const COLLECTOR='http://127.0.0.1:47321';
+const KHORA_URL='https://khora-web.vercel.app/';
+const KHORA_ORIGIN='https://khora-web.vercel.app';
+const REMOTE_SYNC_ALARM='harmonia-cora-provisional-sync';
 const TOKEN=String(globalThis.HARMONIA_TOKEN||'');
 const STORE={sessions:'harmoniaAutoSessions',enabled:'harmoniaAutoEnabled',events:'harmoniaEventCount',fingerprints:'harmoniaKnownSurfaceFingerprints',repositorySync:'harmoniaRepositorySync'};
 const REPO_BUILD_INFO='https://raw.githubusercontent.com/SeryMente/khora/main/apps/harmonia-observability/extension/build-info.json';
@@ -12,6 +16,7 @@ let lastError=null;
 let collector=false;
 let knownFingerprints=new Set();
 let surfaceQueue=Promise.resolve();
+let remoteSyncRunning=false;
 const ready=(async()=>{
   const saved=await chrome.storage.local.get([STORE.sessions,STORE.enabled,STORE.events,STORE.fingerprints]);
   sessions=saved[STORE.sessions]||{};
@@ -26,6 +31,7 @@ const ready=(async()=>{
   await refreshKnownFingerprints();
   await syncRepository();
   chrome.alarms.create(REPO_SYNC_ALARM,{delayInMinutes:1,periodInMinutes:360});
+  chrome.alarms.create(REMOTE_SYNC_ALARM,{delayInMinutes:1,periodInMinutes:1});
 })();
 let storageQueue=Promise.resolve();
 function saveSessions(){
@@ -42,6 +48,73 @@ async function checkHealth(){
   try{const response=await fetch(`${COLLECTOR}/health`,{headers:headers(),cache:'no-store'});collector=response.ok;lastError=response.ok?null:`Colector respondió HTTP ${response.status}`;}
   catch(error){collector=false;lastError=String(error.message||error);}
   return collector;
+}
+async function readRemoteStatus(){
+ try{
+  const response=await fetch(`${COLLECTOR}/sync/status`,{headers:headers(),cache:'no-store'});
+  if(!response.ok)throw new Error(`Colector HTTP ${response.status}`);
+  return await response.json();
+ }catch(error){return {ok:false,pending:0,accepted:0,local_only:0,error:String(error.message||error)};}
+}
+async function syncRemoteObservations(){
+ if(remoteSyncRunning)return {ok:false,busy:true};
+ remoteSyncRunning=true;
+ try{
+  if(!await checkHealth())return {ok:false,error:lastError||'Colector local no disponible.'};
+  const khoraTabs=await chrome.tabs.query({url:KHORA_URL+'*'});
+  const khoraTab=khoraTabs.find(tab=>tab.id&&tab.status==='complete')||khoraTabs.find(tab=>tab.id);
+  if(!khoraTab)return {ok:false,needsKhora:true,status:await readRemoteStatus()};
+  let acceptedThisCall=0,batches=0;
+  for(;batches<5;batches++){
+   const pendingResponse=await fetch(`${COLLECTOR}/sync/pending?limit=50`,{headers:headers(),cache:'no-store'});
+   if(!pendingResponse.ok)throw new Error(`No se pudo leer la cola local (HTTP ${pendingResponse.status}).`);
+   const pending=await pendingResponse.json();
+   if(!Array.isArray(pending.events)||pending.events.length===0)break;
+   const batch=HarmoniaRemoteSync.buildObservationBatch(pending.events,{
+    extensionVersion:chrome.runtime.getManifest().version,
+    online:typeof navigator==='undefined'?true:navigator.onLine!==false
+   });
+   const injected=await chrome.scripting.executeScript({
+    target:{tabId:khoraTab.id},
+    world:'MAIN',
+    func:async observationBatch=>{
+     try{
+      const response=await fetch('/api/observaciones/runtime',{
+       method:'POST',credentials:'include',
+       headers:{'content-type':'application/json','x-khora-observation-source':'harmonia-extension'},
+       body:JSON.stringify(observationBatch)
+      });
+      let body={};try{body=await response.json();}catch{}
+      return {status:response.status,ok:response.ok,body};
+     }catch(error){return {status:0,ok:false,body:{error:String(error&&error.message||error)}};}
+    },
+    args:[batch]
+   });
+   const result=injected&&injected[0]&&injected[0].result;
+   const runtime=result&&result.body&&result.body.runtime;
+   if(!result||result.status!==200||result.body?.ok!==true||runtime?.persisted!==true||
+      runtime.accepted+runtime.duplicates!==batch.events.length||runtime.rejected!==0){
+    const reason=result?.body?.error||result?.body?.runtime?.error||`Cora no confirmó persistencia (HTTP ${result?.status||'sin respuesta'}).`;
+    throw new Error(String(reason));
+   }
+   const ackResponse=await fetch(`${COLLECTOR}/sync/ack`,{
+    method:'POST',headers:headers({'content-type':'application/json'}),
+    body:JSON.stringify({batch_id:batch.batch_id,event_uuids:batch.events.map(event=>event.event_uuid)})
+   });
+   if(!ackResponse.ok)throw new Error(`Cora persistió el lote, pero el acuse local falló (HTTP ${ackResponse.status}); se reintentará de forma idempotente.`);
+   const ack=await ackResponse.json();
+   if(ack.ok!==true||ack.acknowledged+ack.alreadyAcknowledged!==batch.events.length)
+    throw new Error('El acuse de persistencia no coincide con los eventos confirmados.');
+   acceptedThisCall+=batch.events.length;
+   if(!pending.has_more) {
+    const remaining=await readRemoteStatus();
+    if(!remaining.pending)break;
+   }
+  }
+  return {ok:true,acceptedThisCall,batches,status:await readRemoteStatus()};
+ }catch(error){
+  return {ok:false,error:String(error.message||error),status:await readRemoteStatus()};
+ }finally{remoteSyncRunning=false;}
 }
 function compareVersions(a,b){
  const pa=String(a||'0.0.0').split('.').map(x=>Number.parseInt(x,10)||0),pb=String(b||'0.0.0').split('.').map(x=>Number.parseInt(x,10)||0);
@@ -219,14 +292,21 @@ chrome.runtime.onMessage.addListener((message,sender,respond)=>{
   await ready;
   if(message.kind==='harmonia:auto-settings')return {enabled:autoEnabled};
   if(message.kind==='harmonia:sync-repository')return syncRepository();
+  if(message.kind==='harmonia:remote-sync')return syncRemoteObservations();
+  if(message.kind==='harmonia:open-khora'){
+   const tabs=await chrome.tabs.query({url:KHORA_URL+'*'});
+   if(tabs[0]?.id){await chrome.tabs.update(tabs[0].id,{active:true});return {opened:false,existing:true,tabId:tabs[0].id};}
+   const created=await chrome.tabs.create({url:KHORA_URL,active:true});return {opened:true,existing:false,tabId:created.id};
+  }
   if(message.kind==='harmonia:get'){
    await checkHealth();
    const syncData=await chrome.storage.local.get([STORE.repositorySync]);
+   const remoteSync=await readRemoteStatus();
    let coverage=null;
    if(collector){try{const response=await fetch(`${COLLECTOR}/coverage`,{headers:headers(),cache:'no-store'});if(response.ok)coverage=await response.json();else throw new Error(`Colector HTTP ${response.status}`);}catch(error){lastError=String(error.message||error);}}
    return {version:'0.3.0',autoEnabled,active:autoEnabled&&Object.keys(sessions).length>0,activeTabs:Object.keys(sessions).length,
     sessions:Object.entries(sessions).map(([tabId,session])=>({tabId,startedAt:session.startedAt,lastAt:session.lastAt,events:session.events})),
-    collector,lastError,events:eventCount,coverage,repositorySync:syncData[STORE.repositorySync]||null};
+    collector,lastError,events:eventCount,coverage,repositorySync:syncData[STORE.repositorySync]||null,remoteSync};
   }
   if(message.kind==='harmonia:set-auto')return setAutoEnabled(message.enabled);
   if(message.kind==='harmonia:event'&&sender.tab?.id)return onObservedEvent(message,sender);
@@ -237,11 +317,14 @@ chrome.runtime.onMessage.addListener((message,sender,respond)=>{
 chrome.tabs.onRemoved.addListener(tabId=>{void ready.then(()=>stopSession(tabId,'tab-closed'));});
 chrome.tabs.onUpdated.addListener((tabId,changeInfo,tab)=>{
  void ready.then(async()=>{
-  if(!autoEnabled)return;
-  if(tab?.url&&!valid(tab.url))await stopSession(tabId,'tab-left-chatgpt');
+  if(autoEnabled&&tab?.url&&!valid(tab.url))await stopSession(tabId,'tab-left-chatgpt');
+  if(tab?.url?.startsWith(KHORA_ORIGIN)&&changeInfo.status==='complete')void syncRemoteObservations();
  });
 });
 void ready.then(async()=>{if(autoEnabled)await injectExistingTabs(await chrome.tabs.query({url:'https://chatgpt.com/*'}));});
-chrome.alarms.onAlarm.addListener(alarm=>{if(alarm.name===REPO_SYNC_ALARM)void syncRepository();});
+chrome.alarms.onAlarm.addListener(alarm=>{
+ if(alarm.name===REPO_SYNC_ALARM)void syncRepository();
+ if(alarm.name===REMOTE_SYNC_ALARM)void syncRemoteObservations();
+});
 chrome.runtime.onInstalled.addListener(()=>{void ready.then(async()=>{chrome.alarms.create(REPO_SYNC_ALARM,{delayInMinutes:1,periodInMinutes:360});await syncRepository();if(autoEnabled)await injectExistingTabs(await chrome.tabs.query({url:'https://chatgpt.com/*'}));});});
 chrome.runtime.onStartup.addListener(()=>{void ready.then(async()=>{chrome.alarms.create(REPO_SYNC_ALARM,{delayInMinutes:1,periodInMinutes:360});await syncRepository();if(autoEnabled)await injectExistingTabs(await chrome.tabs.query({url:'https://chatgpt.com/*'}));});});
