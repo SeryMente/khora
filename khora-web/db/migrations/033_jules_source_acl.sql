@@ -30,6 +30,7 @@ CREATE INDEX IF NOT EXISTS jules_source_acl_subject_active
 REVOKE ALL ON TABLE khora_private.jules_source_acl FROM PUBLIC;
 REVOKE ALL ON SEQUENCE khora_private.jules_source_acl_id_seq FROM PUBLIC;
 
--- The deployment owner must grant USAGE on khora_private and SELECT on this table
--- only to the verified role used by KHORA_READONLY_DATABASE_URL. No API role or
--- application write role receives access from this migration.
+-- Runtime ACL lookup runs exclusively through KHORA_READONLY_DATABASE_URL.
+-- The deployed URL must authenticate as the verified, least-privilege role.
+GRANT USAGE ON SCHEMA khora_private TO khora_lector;
+GRANT SELECT ON TABLE khora_private.jules_source_acl TO khora_lector;
