@@ -30,10 +30,20 @@ export interface Session {
   updateTime: string;
 }
 
+export interface GitHubBranch { displayName: string }
+
+export interface GitHubRepo {
+  owner: string;
+  repo: string;
+  isPrivate?: boolean;
+  defaultBranch?: GitHubBranch;
+  branches?: GitHubBranch[];
+}
+
 export interface Source {
   name: string;
   id: string;
-  githubRepo?: any;
+  githubRepo?: GitHubRepo;
 }
 
 export interface Activity {
@@ -107,107 +117,56 @@ async function delay(ms: number) {
 const MAX_RETRIES = 3;
 const BASE_DELAY_MS = 500;
 
-async function fetchWithBackoff(
-  url: string,
-  options: RequestInit = {}
-): Promise<Response> {
+async function fetchWithBackoff(url: string, options: RequestInit = {}): Promise<Response> {
+  const method = (options.method || "GET").toUpperCase();
+  const retrySafe = method === "GET" || method === "HEAD";
   let attempt = 0;
   const startedAt = Date.now();
   let pathname = "unknown";
   try {
-    pathname = new URL(url).pathname
-      .replace(/\/(sessions|sources)\/[^/]+/g, "/$1/:id")
-      .slice(0, 240);
-  } catch {
-    // Safe placeholder.
-  }
-
+    pathname = new URL(url).pathname.replace(/\/(sessions|sources)\/[^/]+/g, "/$1/:id").slice(0, 240);
+  } catch { /* safe placeholder */ }
   while (true) {
     let response: Response;
-
     try {
       response = await fetch(url, options);
     } catch (error) {
+      if (!retrySafe) {
+        emitirEventoServicio({ service: "jules", operation: "http.dependency", method, provider: "google-jules", dependency: "jules.googleapis.com", route: pathname, outcome: "FAILURE", severity: "ERROR", durationMs: Date.now() - startedAt, reasonCode: "WRITE_RESULT_AMBIGUOUS" });
+        throw new JulesApiError("JULES_WRITE_RESULT_AMBIGUOUS", 0, null);
+      }
       if (attempt >= MAX_RETRIES) {
-        emitirEventoServicio({
-          service: "jules",
-          operation: "http.dependency",
-          method: options.method || "GET",
-          provider: "google-jules",
-          dependency: "jules.googleapis.com",
-          route: pathname,
-          outcome: "FAILURE",
-          severity: "ERROR",
-          durationMs: Date.now() - startedAt,
-          reasonCode: error instanceof Error ? error.name.slice(0, 64) : "NETWORK_ERROR",
-        });
+        emitirEventoServicio({ service: "jules", operation: "http.dependency", method, provider: "google-jules", dependency: "jules.googleapis.com", route: pathname, outcome: "FAILURE", severity: "ERROR", durationMs: Date.now() - startedAt, reasonCode: error instanceof Error ? error.name.slice(0, 64) : "NETWORK_ERROR" });
         throw error;
       }
       attempt++;
-      const sleepTime = BASE_DELAY_MS * Math.pow(2, attempt - 1) + Math.random() * 200;
-      await delay(sleepTime);
+      await delay(BASE_DELAY_MS * Math.pow(2, attempt - 1) + Math.random() * 200);
       continue;
     }
-
     if (response.ok) {
-      emitirEventoServicio({
-        service: "jules",
-        operation: "http.dependency",
-        method: options.method || "GET",
-        provider: "google-jules",
-        dependency: "jules.googleapis.com",
-        route: pathname,
-        statusCode: response.status,
-        outcome: "SUCCESS",
-        durationMs: Date.now() - startedAt,
-      });
+      emitirEventoServicio({ service: "jules", operation: "http.dependency", method, provider: "google-jules", dependency: "jules.googleapis.com", route: pathname, statusCode: response.status, outcome: "SUCCESS", durationMs: Date.now() - startedAt });
       return response;
     }
-
-    if (response.status === 429 && attempt < MAX_RETRIES) {
+    if (retrySafe && response.status === 429 && attempt < MAX_RETRIES) {
       attempt++;
-      const sleepTime = BASE_DELAY_MS * Math.pow(2, attempt - 1) + Math.random() * 200;
-      await delay(sleepTime);
+      await delay(BASE_DELAY_MS * Math.pow(2, attempt - 1) + Math.random() * 200);
       continue;
     }
-
-    if (response.status >= 500 && response.status < 600 && attempt < 1) { // 1 retry on 5xx
+    if (retrySafe && response.status >= 500 && response.status < 600 && attempt < 1) {
       attempt++;
-      const sleepTime = BASE_DELAY_MS + Math.random() * 200;
-      await delay(sleepTime);
+      await delay(BASE_DELAY_MS + Math.random() * 200);
       continue;
     }
-
-    emitirEventoServicio({
-      service: "jules",
-      operation: "http.dependency",
-      method: options.method || "GET",
-      provider: "google-jules",
-      dependency: "jules.googleapis.com",
-      route: pathname,
-      statusCode: response.status,
-      outcome: "FAILURE",
-      severity: response.status >= 500 ? "ERROR" : "WARN",
-      durationMs: Date.now() - startedAt,
-      reasonCode: "HTTP_" + response.status,
-    });
-
-    // Unrecoverable error or max retries reached
-    let errorData = null;
+    emitirEventoServicio({ service: "jules", operation: "http.dependency", method, provider: "google-jules", dependency: "jules.googleapis.com", route: pathname, statusCode: response.status, outcome: "FAILURE", severity: response.status >= 500 ? "ERROR" : "WARN", durationMs: Date.now() - startedAt, reasonCode: !retrySafe && response.status >= 500 ? "WRITE_RESULT_AMBIGUOUS" : "HTTP_" + response.status });
+    if (!retrySafe && response.status >= 500) throw new JulesApiError("JULES_WRITE_RESULT_AMBIGUOUS", response.status, null);
+    let errorData: unknown = null;
     try {
-      const text = await response.text();
-      try {
-        errorData = JSON.parse(text);
-      } catch (e) {
-        errorData = text;
-      }
-    } catch (e) {
-      errorData = "Unable to parse error response";
-    }
-    throw new JulesApiError(`Jules API request failed with status ${response.status}`, response.status, errorData);
+      const body = await response.text();
+      try { errorData = JSON.parse(body); } catch { errorData = body; }
+    } catch { errorData = "Unable to parse error response"; }
+    throw new JulesApiError(response.status === 429 ? "JULES_RATE_LIMITED" : "JULES_API_HTTP_" + response.status, response.status, errorData);
   }
 }
-
 function getHeaders(): HeadersInit {
   const apiKey = process.env.JULES_API_KEY;
   if (!apiKey) {
@@ -243,6 +202,13 @@ export async function listSources(pageSize: number = 50, pageToken?: string): Pr
   return response.json();
 }
 
+/** Read an exact source resource using the documented Jules sources.get endpoint. */
+export async function getSource(name: string): Promise<Source> {
+  const sourceName = normalizeSourceName(name);
+  const encodedPath = sourceName.split("/").map(encodeURIComponent).join("/");
+  const response = await fetchWithBackoff(JULES_API_BASE_URL + "/" + encodedPath, { method: "GET", headers: getHeaders() });
+  return response.json();
+}
 export async function createSession(params: {
   prompt: string;
   sourceContext: SourceContext;
@@ -266,20 +232,6 @@ export async function getSession(id: string): Promise<Session> {
   });
   return response.json();
 }
-
-export async function listActivities(id: string, createTimeCursor?: string): Promise<ListActivitiesResponse> {
-  const sessionId = normalizeSessionId(id);
-  const url = new URL(`${JULES_API_BASE_URL}/sessions/${sessionId}/activities`);
-  if (createTimeCursor) {
-    url.searchParams.append("createTime", createTimeCursor);
-  }
-  const response = await fetchWithBackoff(url.toString(), {
-    method: "GET",
-    headers: getHeaders(),
-  });
-  return response.json();
-}
-
 
 // Official Jules API contract: pageSize (1..100) and pageToken.
 export async function listActivitiesPage(
