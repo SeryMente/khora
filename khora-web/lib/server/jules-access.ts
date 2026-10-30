@@ -1,8 +1,16 @@
 import { getMcpReadOnlyDb } from "@/lib/server/mcp-db";
+import { getMcpConfig } from "./mcp-config";
 import { McpDiagnosticError } from "@/lib/server/mcp-diagnostics";
 
 export type JulesAccessMode = "read" | "write";
 export interface JulesSourceGrant { source: string; branch: string }
+
+/** The configured MCP account is the single product owner/developer. */
+export function isJulesDeveloperSubject(subject: string): boolean {
+  const allowedEmail = getMcpConfig()?.allowedEmail;
+  return validSubject(subject) && typeof allowedEmail === "string" &&
+    subject.trim().toLowerCase() === allowedEmail.trim().toLowerCase();
+}
 
 function validSubject(value: string): boolean {
   return typeof value === "string" && value.trim().length > 0 && value.length <= 320;
@@ -38,6 +46,7 @@ export async function requireJulesSourceGrant(subject: string, source: string, b
   if (!validSubject(subject) || !validResource(source, branch)) {
     throw new McpDiagnosticError("JULES_RESOURCE_CONTEXT_INVALID");
   }
+  if (isJulesDeveloperSubject(subject)) return;
   const grants = await listJulesSourceGrants(subject, mode);
   if (!grants.some(grant => grant.source === source && grant.branch === branch)) {
     throw new McpDiagnosticError("JULES_ACCESS_DENIED");
