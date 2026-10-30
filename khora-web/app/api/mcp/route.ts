@@ -290,7 +290,11 @@ async function handleMcpRequest(req: NextRequest) {
     return session;
   };
   const stableJson = (value: any): string => {
-    if (value === null || typeof value !== "object") return JSON.stringify(value);
+    if (value === null || typeof value !== "object") {
+      const serialized = JSON.stringify(value);
+      if (serialized === undefined) throw new McpDiagnosticError("JULES_PLAN_NOT_FOUND");
+      return serialized;
+    }
     if (Array.isArray(value)) return "[" + value.map(stableJson).join(",") + "]";
     return "{" + Object.keys(value).sort().map(key => JSON.stringify(key) + ":" + stableJson(value[key])).join(",") + "}";
   };
