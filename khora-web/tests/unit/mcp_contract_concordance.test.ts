@@ -250,7 +250,7 @@ test("Jules source catalogue exposes only exact ACL branches and retains provide
   const fixture = routeFixture(); const client = await connect(fixture);
   try {
     const result = await client.callTool({ name: "jules_list_sources", arguments: input("jules_list_sources") });
-    assert.equal(result.isError, false);
+    assert.notEqual(result.isError, true);
     const payload = parseToolPayload(result);
     assert.deepEqual(payload.result.sources[0].githubRepo.branches.map((x: any) => x.displayName), ["main"]);
     assert.equal(payload.result.nextPageToken, "fixture-next");
@@ -272,7 +272,7 @@ test("Jules create validates exact write grant and live source branch before cre
   const allowed = routeFixture(); const client = await connect(allowed);
   try {
     const result = await client.callTool({ name: "jules_create_session", arguments: input("jules_create_session") });
-    assert.equal(result.isError, false);
+    assert.notEqual(result.isError, true);
     const create = allowed.calls.find(x => x.name === "JulesCreateSession"); assert.ok(create);
     assert.equal((create!.args as any).requirePlanApproval, true);
     assert.equal((create!.args as any).automationMode, "AUTO_CREATE_PR");
@@ -288,7 +288,7 @@ test("Jules ACL without an active grant does not call provider listings or sessi
   const fixture = routeFixture({ readAllowed: false, writeAllowed: false }); const client = await connect(fixture);
   try {
     for (const name of ["jules_list_sources", "jules_list_sessions"] as const) {
-      const result = await client.callTool({ name, arguments: input(name) }); assert.equal(result.isError, false);
+      const result = await client.callTool({ name, arguments: input(name) }); assert.notEqual(result.isError, true);
       const payload = parseToolPayload(result);
       assert.equal(name === "jules_list_sources" ? payload.result.sources.length : payload.result.sessions.length, 0);
     }
@@ -373,7 +373,7 @@ test("Jules approval requires the exact current plan id and fingerprint returned
     assert.equal(generated.plan.id, "fixture-plan-1");
     assert.match(generated.plan_sha256, /^[0-9a-f]{64}$/);
     const approved = await client.callTool({ name: "jules_approve_plan", arguments: { ...input("jules_approve_plan"), plan_id: generated.plan.id, plan_sha256: generated.plan_sha256 } });
-    assert.equal(approved.isError, false, JSON.stringify(approved));
+    assert.notEqual(approved.isError, true, JSON.stringify(approved));
     assert.equal(fixture.calls.filter(x => x.name === "JulesListActivitiesPage").length, 5, "one visible page plus two fully paginated preflight reads");
     assert.equal(fixture.calls.filter(x => x.name === "JulesApprovePlan").length, 1);
   } finally { await client.close(); await fixture.close(); }
@@ -422,13 +422,13 @@ test("Jules ACL uses the authenticated OAuth subject, never a caller-supplied id
   const readFixture = routeFixture(); const readClient = await connect(readFixture);
   try {
     const read = await readClient.callTool({ name: "jules_list_sources", arguments: input("jules_list_sources") });
-    assert.equal(read.isError, false);
+    assert.notEqual(read.isError, true);
     assert.deepEqual(readFixture.aclSubjects, ["fixture-actor"]);
   } finally { await readClient.close(); await readFixture.close(); }
   const writeFixture = routeFixture(); const writeClient = await connect(writeFixture);
   try {
     const write = await writeClient.callTool({ name: "jules_create_session", arguments: input("jules_create_session") });
-    assert.equal(write.isError, false);
+    assert.notEqual(write.isError, true);
     assert.deepEqual(writeFixture.aclSubjects, ["fixture-actor"]);
   } finally { await writeClient.close(); await writeFixture.close(); }
 });
