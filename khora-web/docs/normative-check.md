@@ -28,6 +28,10 @@ Antes de ejecutar ese recorrido desde otra plataforma, resolver la identidad nor
 | `khora_versiones_volcado` / conciliar versiones | `volcado_id` | Identidad, estado, versión/aprobación, `versiones`, `auditoria`; no sustituye la lectura de cada versión |
 | `khora_listar_audios` / inventariar audio | `limite?` (1–100), `offset?` | Capturas del propietario, incluidas abiertas; partes y estado del MP3. El índice no certifica los bytes. Requiere `volcados:read` y ciclo normativo. |
 | `khora_leer_audio` / recuperar bytes | `id` (sesión, UUID o folio), `formato?` (`original`/`mp3`), `parte?`, `offset_bytes?`, `limite_bytes?` (1–262144) | Bytes Base64 tras relectura, descifrado y comprobación de tamaño/SHA-256; `siguiente_offset` hasta null. Original por parte ordenada; MP3 derivado completo. No genera voz ni muta datos. Solo propietario. |
+
+| `khora_custodia_catalogo` / inventariar sesiones de custodia | `limite?` (1–100), `cursor?` | Sesiones propias paginadas, incluidas abiertas, selladas vinculadas a volcado y sesiones sin checkpoint/partes. Solo metadatos; no títulos, previews, texto, snapshots ni URLs Blob. `custodia:metadata:read` + ciclo normativo. |
+| `khora_custodia_revisiones` / conciliar revisiones | `session_id`, `limite?` (1–100), `cursor?` | Fechas de servidor/cliente, partes declaradas/almacenadas/verificadas y `syncStatus`; excluye título, preview, texto y snapshot. Solo propietario; `custodia:metadata:read` + ciclo normativo. |
+| `khora_custodia_verificar_integridad` / comprobar objetos Blob | `session_id`, `limite?` (1–50), `despues_de_parte?` | Lee el Blob actual, descifra internamente y compara bytes/SHA-256. Devuelve `VERIFIED`, `MISSING`, `MISMATCH` o `UNVERIFIABLE`; nunca bytes, Base64 ni URL. `custodia:integrity:verify` + ciclo normativo. |
 | `khora_ui_review` / revisar representación | `pantalla?`, `volcado?`, `solo_metadatos?` | Inventario o HTML con corpus real; controles sin respuesta. Pantallas: ingreso, archivo, revision, aprobacion, ingesta, registro, grafo |
 | `khora_observacion_instantanea` / estado observado | `session_id?` | `runtime`, actividad de cinco minutos, última observación, sesiones, fallos, `event_cursor`, almacenamiento e interpretación; umbral de estado obsoleto 15 000 ms |
 | `khora_estado_vivo` / consulta de estado unificada | Ninguna | Reutiliza la observación instantánea sin filtro; no es una fuente distinta |
@@ -70,7 +74,7 @@ El comprobante `receipt` se comparte con el verificador mediante [normative-rece
 
 Los extras permitidos no sustituyen campos obligatorios ni se convierten silenciosamente. `cycle.id` solo blanco, fechas inválidas y encabezados blancos se rechazan semánticamente aunque un JSON Schema estructural pueda admitirlos. Los tipos públicos exportados se conservan; un campo auxiliar presente con tipo inválido no se repara.
 
-**Ejemplos válidos sin secretos:** `input(name)` y `receipt()` en [mcp_contract_concordance.test.ts](../tests/unit/mcp_contract_concordance.test.ts) generan entradas completas para las quince herramientas y se prueban contra publicación y registro reales. Son fixtures sintéticos ejecutables en aislamiento: sus tokens/hashes no autorizan uso productivo ni acreditan un ciclo verificado. La estructura exacta evoluciona en el esquema, no en copias de JSON en guías.
+**Ejemplos válidos sin secretos:** `input(name)` y `receipt()` en [mcp_contract_concordance.test.ts](../tests/unit/mcp_contract_concordance.test.ts) generan entradas completas para las veinte herramientas y se prueban contra publicación y registro reales. Son fixtures sintéticos ejecutables en aislamiento: sus tokens/hashes no autorizan uso productivo ni acreditan un ciclo verificado. La estructura exacta evoluciona en el esquema, no en copias de JSON en guías.
 
 ## Ciclo normativo
 
@@ -80,7 +84,7 @@ Los extras permitidos no sustituyen campos obligatorios ni se convierten silenci
 4. **VERIFY:** bloquea turno, coteja ledger completo/ordenado con receipt, calcula hashes y valida fuentes históricas, cobertura (faltantes, duplicados, desconocidos), encabezados y salida. Solo `VERIFIED` cierra; `INVALID/INCOMPLETE` conserva el intento y prepara el siguiente. No reutilizar token de intento anterior/cerrado.
 5. **RELEASE:** solo tras verificación consistente libera salida/hash, orden y comprobante; emite `VERIFIED_RELEASE` y token de liberación de cinco minutos. No es permiso para saltar verificación en otro ciclo.
 
-**Persistencia:** `normative_turns` mantiene turno/ledger; `normative_receipts`, intentos. `(cycle_id, attempt)` es único: no sobrescribir rechazos; existe respuesta idempotente para intentos ya guardados. El bootstrap/migraciones existentes se conservan; no se aplica ninguna migración por esta propuesta.
+**Persistencia:** `normative_turns` mantiene turno/ledger; `normative_receipts`, intentos. `(cycle_id, attempt)` es único: no sobrescribir rechazos; existe respuesta idempotente para intentos ya guardados. El bootstrap/migraciones existentes se conservan; las herramientas de Custodia no aplican DDL ni mutaciones. No se incorpora ninguna migración.
 
 **Registro de salida:** `verification_record` es una proyección de `normative_receipts`, no otra fuente persistida. `schema = cycle-verification/v1`; incluye `cycle_id`, `attempt`, `status`, `evidence_sha256`, `si_version`, `si_git_commit_sha`, `si_sha256`, `manifest_sha256`, `methodology_version`, `methodology_git_commit_sha`, `order_verified`, `application_log_sha256`, `verifier_version`, `recorded_at`, `receipt_id` (nullable). Primer almacenamiento y respuesta idempotente lo conservan. Contrato: [norm-check.ts](../lib/server/norm-check.ts), `buildCycleVerificationRecord`.
 
@@ -88,7 +92,7 @@ Los extras permitidos no sustituyen campos obligatorios ni se convierten silenci
 
 ## Autorización y configuración
 
-OAuth usa PKCE; los metadatos anuncian authorization_code, refresh_token y offline_access. La renovación depende también del cliente. `KHORA_API_KEY` es compatibilidad servidor-a-servidor, no credencial de usuario/modelo. Los Bearer de OAuth validan firma, issuer, audiencia, actor, scopes y generación; los manuales validan hash, recurso, vigencia, revocación individual y generación. No basta que un token tenga formato correcto. El challenge inicial anuncia runtime:read; no representa el conjunto mínimo efectivo de todas las herramientas.
+OAuth usa PKCE; los metadatos anuncian authorization_code, refresh_token y offline_access. La renovación depende también del cliente. `KHORA_API_KEY` es compatibilidad servidor-a-servidor, no credencial de usuario/modelo. Los Bearer de OAuth validan firma, issuer, audiencia, actor, scopes y generación; los manuales validan hash, recurso, vigencia, revocación individual y generación. Scopes específicos de Custodia: `custodia:metadata:read` (catálogo y revisiones) y `custodia:integrity:verify` (lectura/verificación real de Blob). Ninguno se concede por defecto ni se reemplaza con `volcados:read`; las herramientas siguen requiriendo el ciclo `norm:turn`. No basta que un token tenga formato correcto. El challenge inicial anuncia runtime:read; no representa el conjunto mínimo efectivo de todas las herramientas.
 
 | Configuración del servidor | Uso; valores nunca incluidos en este documento |
 |---|---|
@@ -104,14 +108,14 @@ OAuth usa PKCE; los metadatos anuncian authorization_code, refresh_token y offli
 
 **Admisión:** cliente estático configurado; registro dinámico con redirecciones HTTPS en notion.com/notion.so y sus subdominios; documentos de identidad HTTPS específicos de chatgpt.com. No ampliar listas para forzar una prueba. El descubrimiento anuncia autorización en `/oauth/authorize`, tokens en `/api/oauth/token` y registro en `/api/oauth/register`; contrastar siempre metadatos del despliegue.
 
-**Bearer manual:** se emite en el Control MCP existente, una sola vez en claro; almacena hash/prefijo. Scopes no vacíos, admitidos y sin duplicados; caducidad 30/90/365 días, predeterminada 90. Puede revocarse individualmente; la generación global invalida manuales y OAuth. Autenticar actualiza `ultimo_uso_en`: no es una lectura sin efectos. La política de emisión, permisos, caducidad y revocación se conserva; se normalizan los diagnósticos de error.
+**Bearer manual:** se emite en el Control MCP existente, una sola vez en claro; almacena hash/prefijo. Scopes no vacíos, admitidos y sin duplicados, incluidos los dos scopes especializados de Custodia cuando se seleccionen expresamente; los scopes especializados no están preseleccionados. Caducidad 30/90/365 días, predeterminada 90. Puede revocarse individualmente; la generación global invalida manuales y OAuth. Autenticar actualiza `ultimo_uso_en`: no es una lectura sin efectos. La política de emisión, permisos, caducidad y revocación se conserva; se normalizan los diagnósticos de error.
 
 ## Datos y efectos
 
 | Familia | Fuente y efectos que deben distinguirse |
 |---|---|
 | Contenido/revisión | `volcado`, versiones y auditoría; descifrado de texto/HTML real autorizado. Lectura del corpus, no prueba de cobertura de toda captura/dictado |
-| Observabilidad | `khora_runtime_state` y `eventos_sistema`; tiempos, sesiones y eventos persistidos, no telemetría privada de la mente/ventana del modelo |
+| Observabilidad | `khora_runtime_state` y `eventos_sistema`; tiempos, sesiones y eventos persistidos, no telemetría privada de la mente/ventana del modelo |\n| Custodia (metadatos/integridad) | `dictado_session`, `dictado_checkpoint`, `dictado_audio_parte`, `dictado_mp3` y Blob actual; consultas de solo lectura por propietario. La verificación lee/descifra bytes en memoria y los descarta; no devuelve contenido ni modifica estado |
 | Gobernanza | Fuentes versionadas de metodología, turnos/ledger y comprobantes; lecturas históricas, caché por blob y escrituras normativas |
 | Envoltura de servicio | Eventos de llamada con operación, correlación, resultado, duración y razón; no incluir payloads/secretos. Middleware HTTP y bridge FastAPI conservan trazabilidad en los almacenes existentes |
 | Autenticación | Consulta de generación y token; actualización de uso del manual. No confundir sufijo `read` del permiso con ausencia total de escrituras |
@@ -173,7 +177,7 @@ Los diez accesos normativos comparten un helper: solo `api.github.com/repos/Sery
 
 Las rutas HTTP de MCP, intercambio/registro OAuth, tokens manuales y revocación normalizan errores con `diagnostic`, `x-khora-correlation-id`, `x-khora-audit` y no-store; preservan estado, error OAuth/challenge y código/id JSON-RPC. Los cuerpos exitosos con credenciales no se leen ni transforman. La denegación del consentimiento ya no revela cuenta activa ni esperada en el redirect; la validación de identidad se conserva. Las páginas de consentimiento, metadatos y endpoints legados no se convierten por ello en superficies exhaustivamente probadas; son parte de la aceptación integral pendiente.
 
-**Evidencia y límites:** 47 pruebas dirigidas aprobadas, cero fallidas, tipos dirigidos aprobados en fixture parcial. Incluyen las quince herramientas por la ruta/transporte SDK reales con dependencias externas sustituidas, excepciones de los quince servicios, las cuatro reproducciones causales corregidas, fallos HTTP/GitHub, tiempo/tamaño, datos parciales, registros fallidos y secretos sintéticos. No equivalen a ejecución real de todas las ramas OAuth/SQL/criptografía ni a build/suite integrales, permisos efectivos del secreto o compatibilidad productiva. La aceptación sigue abierta hasta cubrir esas ramas y pruebas autenticadas sin omitir resultados conocidos. No se cambiaron scopes, políticas de admisión, identidad ChatGPT, ledger ni compuertas; la fusión fue autorizada expresamente y ejecutada; despliegue manual y cambios de identidad siguen pendientes de autorización.
+**Evidencia y límites:** 47 pruebas dirigidas aprobadas, cero fallidas, tipos dirigidos aprobados en fixture parcial. Incluyen las veinte herramientas por la ruta/transporte SDK reales con dependencias externas sustituidas, excepciones de los quince servicios, las cuatro reproducciones causales corregidas, fallos HTTP/GitHub, tiempo/tamaño, datos parciales, registros fallidos y secretos sintéticos. No equivalen a ejecución real de todas las ramas OAuth/SQL/criptografía ni a build/suite integrales, permisos efectivos del secreto o compatibilidad productiva. La aceptación sigue abierta hasta cubrir esas ramas y pruebas autenticadas sin omitir resultados conocidos. No se cambiaron scopes, políticas de admisión, identidad ChatGPT, ledger ni compuertas; la fusión fue autorizada expresamente y ejecutada; despliegue manual y cambios de identidad siguen pendientes de autorización.
 
 
 ## Compatibilidad
