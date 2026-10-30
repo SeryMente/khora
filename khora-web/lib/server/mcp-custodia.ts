@@ -39,7 +39,7 @@ export async function toolKhoraCustodiaCatalogo(actor:string,args:{limite?:numbe
    ORDER BY ${activity} DESC,s.session_id DESC LIMIT $4`,[actor,cursor?.[0]??null,cursor?.[1]??null,limit+1])
  ]);
  const hasMore=page.rows.length>limit,rows=page.rows.slice(0,limit),last=rows.at(-1);
- return {owner:actor,items:rows.map((r:any)=>({
+ return {items:rows.map((r:any)=>({
   sessionId:String(r.session_id),state:String(r.estado),createdAt:iso(r.creado_en),updatedAt:iso(r.actualizado_en),closedAt:iso(r.cerrado_en),
   archive:r.volcado_id?{id:String(r.volcado_id),folio:r.folio==null?null:String(r.folio)}:null,
   latestRevision:r.revision_id?{revisionId:String(r.revision_id),savedAt:iso(r.revision_en)}:null,revisionCount:Number(r.revisiones||0),
@@ -51,7 +51,7 @@ export async function toolKhoraCustodiaCatalogo(actor:string,args:{limite?:numbe
 }
 function declaredParts(s:any):number|null{if(!s||typeof s!=="object"||Array.isArray(s))return null;const n=s.corteAudio&&typeof s.corteAudio==="object"?Number(s.corteAudio.hastaParte):Array.isArray(s.audioPartes)?s.audioPartes.length:0;return Number.isSafeInteger(n)&&n>=0?n:null;}
 function syncStatus(n:number|null,parts:any[]):string{
- if(n===null)return "UNVERIFIABLE";if(n===0)return parts.length?"SYNCED":"NO_AUDIO";const prefix=parts.filter(p=>Number(p.part_index)<=n),indices=new Set(prefix.map(p=>Number(p.part_index)));
+ if(n===null)return "UNVERIFIABLE";if(n===0)return "NO_AUDIO";const prefix=parts.filter(p=>Number(p.part_index)<=n),indices=new Set(prefix.map(p=>Number(p.part_index)));
  for(let i=1;i<=n;i++)if(!indices.has(i))return "PENDING_UPLOAD";
  return prefix.filter(p=>p.estado_verificacion==="verificado").length===n?"SYNCED":"INTEGRITY_PENDING";
 }
@@ -71,7 +71,7 @@ export async function toolKhoraCustodiaRevisiones(actor:string,args:{session_id:
    storedParts:n===null?null:prefix.length,verifiedParts:n===null?null:prefix.filter((p:any)=>p.estado_verificacion==="verificado").length,syncStatus:syncStatus(n,parts.rows)};
  });
  const last=rows.at(-1);
- return {owner:actor,sessionId:id,items,page:{limit,totalItems:Number(count.rows[0]?.total||0),hasMore,nextCursor:hasMore&&last?encode([iso(last.creado_en)||new Date(0).toISOString(),String(last.revision_id)]):null},
+ return {sessionId:id,items,page:{limit,totalItems:Number(count.rows[0]?.total||0),hasMore,nextCursor:hasMore&&last?encode([iso(last.creado_en)||new Date(0).toISOString(),String(last.revision_id)]):null},
   excludes:["title","preview","text","snapshot","blob_url","audio_bytes","credentials"]};
 }
 function integrityReason(code:string){switch(code){
@@ -96,7 +96,7 @@ export async function toolKhoraCustodiaVerificarIntegridad(actor:string,args:{se
   finally{clear?.fill(0);}
  }
  const last=rows.at(-1);
- return {owner:actor,sessionId:id,checkedAt:new Date().toISOString(),items,
+ return {sessionId:id,checkedAt:new Date().toISOString(),items,
   page:{limit,totalParts:Number(count.rows[0]?.total||0),afterPart:after,hasMore,nextAfterPart:hasMore&&last?Number(last.part_index):null},
   legend:{VERIFIED:"Blob leído, descifrado y longitud/SHA-256 coincidentes",MISSING:"Referencia Blob no registrada",
    MISMATCH:"Bytes actuales no coinciden con longitud o SHA-256 declarados",UNVERIFIABLE:"No se pudo demostrar integridad; incluye fallos transitorios o metadatos inválidos"},
