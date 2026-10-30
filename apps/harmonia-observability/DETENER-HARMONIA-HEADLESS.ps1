@@ -3,10 +3,15 @@ $root = $PSScriptRoot
 $logsDir = Join-Path $root 'logs'
 New-Item -ItemType Directory -Path $logsDir -Force | Out-Null
 $log = Join-Path $logsDir 'DETENER-HARMONIA-HEADLESS.log'
-Start-Transcript -LiteralPath $log -Force | Out-Null
+$identity = [Security.Principal.WindowsIdentity]::GetCurrent()
+$sid = $identity.User.Value
+$windowsProfile = Get-CimInstance -ClassName Win32_UserProfile | Where-Object { $_.SID -eq $sid -and -not $_.Special } | Select-Object -First 1
+if (-not $windowsProfile -or [string]::IsNullOrWhiteSpace($windowsProfile.LocalPath)) { throw 'No se pudo resolver el perfil Windows activo por SID.' }
+$data = Join-Path $windowsProfile.LocalPath 'AppData\\Local\\Harmonia\\surface-index-v0.4.0\\data'
 $authFile = Join-Path $root 'extension\local-auth.js'
 $pidFile = Join-Path $root 'collector\service.pid'
 try {
+    Start-Transcript -LiteralPath $log -Force | Out-Null
     if (-not (Test-Path -LiteralPath $authFile -PathType Leaf)) { throw 'No existe la credencial local de Harmonia.' }
     $auth = Get-Content -LiteralPath $authFile -Raw
     $match = [regex]::Match($auth, "HARMONIA_TOKEN\s*=\s*'([0-9a-f]{64})'")

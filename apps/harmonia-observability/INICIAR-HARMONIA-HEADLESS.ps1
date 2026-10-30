@@ -3,7 +3,6 @@ $root = $PSScriptRoot
 $logsDir = Join-Path $root 'logs'
 New-Item -ItemType Directory -Path $logsDir -Force | Out-Null
 $log = Join-Path $logsDir 'INICIAR-HARMONIA-HEADLESS.log'
-Start-Transcript -LiteralPath $log -Force | Out-Null
 $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
 $sid = $identity.User.Value
 $windowsProfile = Get-CimInstance -ClassName Win32_UserProfile | Where-Object { $_.SID -eq $sid -and -not $_.Special } | Select-Object -First 1

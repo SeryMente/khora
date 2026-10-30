@@ -80,7 +80,7 @@ test('collector en HTTP local: auth, CORS, deltas visibles, redacción, persiste
  // The same eventId must remain idempotent after a real collector process restart.
  const originalDay=new Date().toISOString().slice(0,10);
  const originalFile=path.join(data,'originals',originalDay,session1+'.jsonl');
- const linesBeforeRestart=fs.readFileSync(originalFile,'utf8').trim().split(/\\r?\\n/);
+ const linesBeforeRestart=fs.readFileSync(originalFile,'utf8').trim().split(String.fromCharCode(10));
  assert.equal(linesBeforeRestart.filter(line=>JSON.parse(line).eventId===visibleEvent.eventId).length,1);
  await stopCollector(base,child);
  child=spawn(process.execPath,[serverPath],{env:{...process.env,HARMONIA_TOKEN:token,HARMONIA_PORT:String(port),HARMONIA_DATA:data},stdio:['ignore','pipe','pipe']});
@@ -90,7 +90,7 @@ test('collector en HTTP local: auth, CORS, deltas visibles, redacción, persiste
  assert.equal(replayResponse.status,200,'el replay tras reinicio debe responder como duplicado');
  const replayBody=await replayResponse.json();
  assert.equal(replayBody.duplicate,true);
- const linesAfterRestart=fs.readFileSync(originalFile,'utf8').trim().split(/\\r?\\n/);
+ const linesAfterRestart=fs.readFileSync(originalFile,'utf8').trim().split(String.fromCharCode(10));
  assert.equal(linesAfterRestart.filter(line=>JSON.parse(line).eventId===visibleEvent.eventId).length,1);
 
  const appendedText=initialText+' y continuación';

@@ -78,17 +78,17 @@ assert.match(dashboardJs,/setInterval\(\(\)=>void refresh\(\),5000\)/);
 assert.match(dashboardJs,/document\.hidden/);
 
 assert.match(collector,/HARMONIA_DATA is required/,'collector must fail closed when the data root is absent');
-assert.doesNotMatch(collector,/C:\\\\Users\\\\fila4/,'collector must not hardcode a Windows profile');
+assert.ok(!collector.toLowerCase().includes('fila4'),'collector must not hardcode a Windows profile');
 for(const [name,script] of [['start',startScript],['stop',stopScript],['finalize',finalizeScript]]){
  assert.match(script,/Win32_UserProfile/,'lifecycle '+name+' must resolve the Windows profile by SID');
  assert.match(script,/WindowsIdentity/,'lifecycle '+name+' must use the active Windows SID');
- assert.doesNotMatch(script,/C:\\\\Users\\\\fila4/,'lifecycle '+name+' must not hardcode a user profile');
+ assert.ok(!script.toLowerCase().includes('fila4'),'lifecycle '+name+' must not hardcode a user profile');
  assert.match(script,/Join-Path \$root 'logs'/,'lifecycle '+name+' must keep logs inside the package');
 }
 assert.match(queryScript,/\[string\]\$DataRoot/);
 assert.match(queryScript,/Win32_UserProfile/);
-assert.match(queryScript,/surface-index-v0\.4\.0\\\\data/);
-assert.doesNotMatch(queryScript,/C:\\\\Users\\\\fila4/);
+assert.ok(queryScript.includes('surface-index-v0.4.0\\\\data'),'query must resolve the v0.4.0 profile data root');
+assert.ok(!queryScript.toLowerCase().includes('fila4'),'query must not hardcode a user profile');
 assert.match(startScript,/PREPARAR-RUNTIME\.ps1/,'startup must provision the pinned portable runtime');
 assert.match(startScript,/v22\.23\.4/);
 assert.match(finalizeScript,/PREPARAR-RUNTIME\.ps1/);

@@ -3,7 +3,6 @@ $root = $PSScriptRoot
 $logsDir = Join-Path $root 'logs'
 New-Item -ItemType Directory -Path $logsDir -Force | Out-Null
 $log = Join-Path $logsDir 'FINALIZAR-PAQUETE.log'
-Start-Transcript -LiteralPath $log -Force | Out-Null
 $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
 $sid = $identity.User.Value
 $windowsProfile = Get-CimInstance -ClassName Win32_UserProfile | Where-Object { $_.SID -eq $sid -and -not $_.Special } | Select-Object -First 1
@@ -12,6 +11,7 @@ $data = Join-Path $windowsProfile.LocalPath 'AppData\Local\Harmonia\surface-inde
 $node = Join-Path $root 'runtime\node.exe'
 $authFile = Join-Path $root 'extension\local-auth.js'
 try {
+    Start-Transcript -LiteralPath $log -Force | Out-Null
     $required = @(
       'CONSULTAR-HARMONIA.cmd','INICIAR-HARMONIA.cmd','INICIAR-HARMONIA-HEADLESS.ps1','DETENER-HARMONIA-HEADLESS.ps1','FINALIZAR-PAQUETE.ps1','PREPARAR-RUNTIME.ps1','LEEME.txt','coverage-catalog.json','extension\coverage-catalog.json',
       'collector\query.ps1','collector\server.js','extension\build-info.json','extension\content.js','extension\dashboard.css','extension\dashboard.html','extension\dashboard.js','extension\dashboard-model.js','extension\manifest.json','extension\popup.css','extension\popup.html','extension\popup.js','extension\region-policy.js','extension\service-worker.js',
