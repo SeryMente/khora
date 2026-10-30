@@ -3,7 +3,7 @@
 ## 1. Identidad y control
 - Frente único: **Observabilidad MCP**; identidad canónica `OBSERVABILIDAD-MCP`.
 - Repositorio: `SeryMente/khora`; OCP: `docs/frentes/observabilidad-mcp/OBJETO-CANONICO.md`.
-- OCP: **v0.2.2**. Control: generación 3, titular operativo conservado del control anterior.
+- OCP: **v0.2.3**. Control: generación 3, titular operativo conservado del control anterior.
 - Las tareas provisionales «General» y «Jules» pertenecen a este mismo frente; no crean OCP, frente ni control paralelos.
 - `MCP-OBS-DICTADO` permanece como identidad histórica del objeto agregado anterior, no como otro frente activo.
 
@@ -81,9 +81,9 @@ La publicación de código queda sujeta a pruebas y a los pasos de integración 
 - Proyecto Neon: `khora`; base `neondb`, PostgreSQL 17; rama `main`.
 - `KHORA_READONLY_DATABASE_URL` y `JULES_API_KEY` constan como variables sensibles de Production en Vercel; sus valores no se leen ni se exponen.
 - `khora_private.jules_source_acl` existe en Neon Production. La lectura de tabla con rol `khora_lector` fue comprobada; la tabla está vacía. No se ha verificado todavía que la URL secreta de Vercel se conecte efectivamente como ese rol.
-- Vercel Preview compiló el commit final de la rama con estado READY. Los endpoints MCP/OAuth de Preview devolvieron 503 por configuración de OAuth solo en Production; no se duplicaron secretos en Preview.
+- Vercel Preview `dpl_2EWpm1hwXRQhqM1kYDBWGr18YNfW` permanece READY para el SHA de código anterior `2452d8c8498eeb0338e4efaed9d13eef70fb7f84`. La rama avanzó después con cambios de código y documentación hasta `fd266c6d818902eaa120d1b5afd3592e80bcb51c`; ese corte de código no está desplegado en Preview. El build local del corte sí terminó correctamente; no se hizo despliegue a Preview ni Production. Los endpoints MCP/OAuth de Preview habían devuelto 503 por configuración OAuth ausente en Preview; no se duplicaron secretos.
 - La URL Production existente responde en metadata OAuth, pero sigue sirviendo el código previo a la integración Jules mientras la rama no se integre.
-- CI reportó jobs fallidos sin pasos ni logs de ejecución: no constituye prueba de suite ejecutada ni de tests fallidos.
+- En el head anterior se verificó que los jobs CI/UI Quality fallaban sin runner (`runner_id=0`, `runner_name` vacío). En el head `fd266c6`, seis jobs de CI/UI Quality/khora-ok terminaron `failure` y el detalle de cada job devuelve `steps=[]`; no hay evidencia de ejecución de pruebas remotas. La suite local sí fue ejecutada y está documentada en §15. No reintentar Actions sin cambio causal de infraestructura.
 
 ## 8. Seguridad y privacidad
 - Scopes de lectura y escritura separados, más `norm:turn` donde aplica.
@@ -105,7 +105,7 @@ El frente solo se considera aceptado cuando:
 7. Se documentan los resultados y el cliente usado: ChatGPT nativo o cliente local por RDC, sin confundirlos.
 8. Se verifica saneamiento de datos y se conserva el residual T22.
 
-Estado actual: **IMPLEMENTACIÓN EN RAMA; ACL PRODUCTIVA APLICADA Y VACÍA; ACEPTACIÓN END-TO-END PENDIENTE**.
+Estado actual: **IMPLEMENTACIÓN EN RAMA; VALIDACIÓN LOCAL COMPLETA; ACL PRODUCTIVA APLICADA Y VACÍA; ACEPTACIÓN END-TO-END PENDIENTE**. La validación local no sustituye CI remoto, revisión visual del operador ni prueba Jules real.
 
 ## 10. Formato de ciclo
 Registrar titularidad/generación, DUG/Metacanon/GOW, SHA base y resultado, diferencia de rama, migración/read-back, tests, entorno y URL, identidad/scopes, aceptación, límites y siguiente acción. Distinguir propuesto, autorizado, intentado, ejecutado, verificado y aceptado.
@@ -120,13 +120,17 @@ Se adjudicó el control de generación 2 para tres herramientas Custodia de solo
 ### C003 — ampliación Jules y ACL — 2026-10-30
 El operador autorizó ampliar el mismo frente para integrar siete herramientas Jules con scopes separados, ACL por subject/source/branch y posterior publicación. Se creó y probó la migración sobre una rama temporal Neon; el primer ensayo se canceló y eliminó. La versión ajustada se aplicó a Neon `main`: tabla ACL creada, solo `khora_lector` obtuvo `USAGE` y `SELECT`, read-back como ese rol correcto, 0 filas. No se han concedido grants de fuentes/ramas.
 
+### C004 — autenticación, clon y validación local — 2026-10-30
+Se autenticó GitHub CLI mediante el flujo interactivo del dispositivo PC-14 como `1interprete1`, sin exponer el token. Se materializó el clon en `C:\Users\PC 13\Desktop\Khora\khora-main`, directamente en la rama de intervención. La revisión local detectó y corrigió una fuga de segmentos propietario/repositorio en las rutas de observabilidad Jules y tres defectos de aserción de pruebas; también se retiró del README una segunda copia idéntica del índice de documentos canónicos. Todos los cambios se publicaron en la rama de la PR, nunca en `main`. La validación local de las pruebas focalizadas terminó 35/35; la suite unitaria completa 568/568; TypeScript, UI Review y navegación pasaron; `npm run build` terminó con código 0 usando un `AUTH_SECRET` aleatorio efímero de proceso, sin archivo `.env` ni `.env.local`. Next.js generó 78/78 páginas; permanecen warnings de APIs Edge y deprecación de middleware. La CI remota no ejecutó pasos; la PR sigue abierta y no se ha desplegado.
 ## 12. Reinstanciación
 Continuar en el OCP y control únicos `docs/frentes/observabilidad-mcp/`. Leer el control generación vigente, comprobar SHA de `main`, rama/PR, estado de Neon/Vercel y evidencia de aceptación. No crear OCP paralelo para Jules ni asumir grant por defecto. No confundir uso de RDC con integración nativa ChatGPT.
 
 ## 13. Persistencia y revisión
 Este documento en `main` es el objeto canónico único del frente. El control independiente reside en `CONTROL-RESPONSABILIDAD.json`. Las tareas provisionales General/Jules no tienen autoridad para crear objetos canónicos separados. La metodología general de `SeryMente/metodologia` prevalece en definiciones transversales.
 
-## 14. Estado vivo — reinstanciación RDC PC-14 · 2026-10-30
+## 14. Primer corte de reinstanciación RDC PC-14 — histórico · 2026-10-30
+
+> Este corte conserva el estado observado inmediatamente tras reiniciar Windows. Sus afirmaciones de ausencia de clon y de autenticación se sustituyeron en la verificación posterior de §15.
 
 - Se reconectó Remote Desktop Commander después de un nuevo inicio de Windows. El dispositivo activo devuelto por el inventario es PC-14, Device ID `308d583f-ac72-430f-91d4-95d22d9f33b9`. El ID `47d52d2e-1a6a-4f71-ba5d-baf8b660a88f` del handoff está Offline y no se usó.
 - Perfil Windows inspeccionado: `C:\Users\PC 13`; las raíces de proyecto esperadas en el Escritorio no existen todavía. No se presupone persistencia del clon anterior.
@@ -139,3 +143,20 @@ Este documento en `main` es el objeto canónico único del frente. El control in
 - Se actualizó la referencia metodológica de este OCP a DUG v366 / NX-366m, Metacanon 1.26 y GOW 2.13. La fuente normativa sigue siendo `SeryMente/metodologia/main`.
 
 **Cierre de reinstanciación:** conexión RDC nueva identificada y verificada; clones locales ausentes, autenticación CLI ausente y no se afirma ejecución local de tests. La continuidad de código permanece recuperable desde la rama y PR persistentes.
+## 15. Estado vivo — PC-14 autenticado y validado — 2026-10-30
+
+- **Dispositivo:** PC-14 Online, Device ID `308d583f-ac72-430f-91d4-95d22d9f33b9`. El ID previo `47d52d2e-1a6a-4f71-ba5d-baf8b660a88f` sigue sin ser el dispositivo activo.
+- **GitHub CLI:** autenticación interactiva verificada como `1interprete1`, HTTPS, scopes reportados `gist`, `read:org`, `repo`. No se extrajo ni se compartió el token.
+- **Clon:** `C:\Users\PC 13\Desktop\Khora\khora-main`; rama `feat/mcp-jules-clean-main-20261030-r1`; working tree limpio; `git diff --check` limpio.
+- **Estado Git en el corte de código:** head `fd266c6d818902eaa120d1b5afd3592e80bcb51c`; comparación con la base verificada `8f9b98b61d58aa5c1dd1afee0c128c7ed4592ff7`: **11 commits ahead, 0 behind**. `main` no fue modificado.
+- **Toolchain:** Node.js v26.13.0, Git 2.56.0, GitHub CLI 2.103.3, npm 11.20.0. El binario local FFmpeg 6.1.1 existe en `node_modules`; dependencias locales no se incorporan al repositorio.
+- **Pruebas focalizadas:** Jules retry, concordancia MCP/Jules y metadata OAuth/UI: **35/35 pass**.
+- **Suite unitaria completa:** `npm run test:unit`, **568/568 pass**, 0 fail, 0 skipped.
+- **Validaciones:** `npm run typecheck`, `npm run ui-review:check` y `npm run ui:contract` terminaron con código 0.
+- **Build:** `npm run build` terminó con código 0. El build requirió un `AUTH_SECRET` aleatorio y efímero definido solo en el proceso local; el proceso lo eliminó al finalizar. No existe `.env` ni `.env.local`, y la verificación posterior del entorno no encontró la variable activa. Next.js compiló, pasó TypeScript, generó **78/78** páginas y terminó la optimización/trazas. Warnings pendientes: convención `middleware` deprecada y APIs de ciertas dependencias no compatibles con Edge Runtime; no bloquearon el build.
+- **Cambios correctivos en esta rama:** redacción completa del sufijo de rutas `/sources/...` en observabilidad Jules; aserciones alineadas con `isError` opcional del SDK MCP; normalización CRLF en prueba documental; validación estructural de `sourceContext`; retirada de la segunda copia del bloque «Documentos canónicos» en README. Commits correctivos `348f3776e9854a484aea535ea541e4c1dd1e3245` y `fd266c6d818902eaa120d1b5afd3592e80bcb51c`.
+- **GitHub Actions:** en el head `fd266c6`, CI, UI Quality y `khora-ok` terminaron failure; seis jobs sin pasos registrados (`steps=[]`). En el head anterior se constató `runner_id=0` y runner vacío. No se repitieron trabajos sin cambio causal.
+- **PR:** [#345](https://github.com/SeryMente/khora/pull/345), abierta, mergeable, no mergeada; base `8f9b98b61d58aa5c1dd1afee0c128c7ed4592ff7`, head de código validado `fd266c6d818902eaa120d1b5afd3592e80bcb51c`.
+- **Preview/Production:** Preview existente continúa en SHA anterior `2452d8c8498eeb0338e4efaed9d13eef70fb7f84`; no refleja el corte de código validado. No se hizo nuevo deploy a Preview ni Production.
+- **Seguridad/aceptación pendiente:** ACL productiva continúa vacía; no se conoce un subject OAuth Jules, source ni branch reales verificadas; no hay grants ni llamada real a Jules. La conexión de `KHORA_READONLY_DATABASE_URL` con el rol efectivo sigue sin comprobarse. No se revisó visualmente la UI: RDC conectado expone terminal/archivos/procesos, no captura de pantalla ni control de navegador. La revisión visual personal del operador exigida por doble control sigue pendiente.
+- **Cierre de estado:** implementación y validación local verificadas; integración CI/identidad Jules, revisión visual del operador, prueba end-to-end, merge y despliegue siguen pendientes. No se declara aceptación.
