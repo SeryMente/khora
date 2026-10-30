@@ -3,7 +3,7 @@
 ## 1. Identidad y control
 - Frente único: **Observabilidad MCP**; identidad canónica `OBSERVABILIDAD-MCP`.
 - Repositorio: `SeryMente/khora`; OCP: `docs/frentes/observabilidad-mcp/OBJETO-CANONICO.md`.
-- OCP: **v0.3.1**. Control: generación 3, titular operativo conservado del control anterior.
+- OCP: **v0.3.2**. Control: generación 3, titular operativo conservado del control anterior.
 - Las tareas provisionales «General» y «Jules» pertenecen a este mismo frente; no crean OCP, frente ni control paralelos.
 - `MCP-OBS-DICTADO` permanece como identidad histórica del objeto agregado anterior, no como otro frente activo.
 
@@ -52,7 +52,7 @@ Cualquier otro sujeto permanece sujeto a la combinación exacta subject + source
 La creación de sesión exige aprobación de plan y usa `AUTO_CREATE_PR`. La aprobación exige `plan_id` y `plan_sha256`, y relee sesión/actividades antes de actuar. Jules no ofrece una aprobación condicional atómica que elimine completamente la carrera entre comprobación y aprobación; el residual T22 queda documentado. No se oculta ni se presenta como garantía transaccional.
 
 ### 4.3 ChatGPT web — requisito de plataforma
-La conexión MCP personalizada desde ChatGPT web, con compatibilidad completa y acciones de escritura/modificación, requiere un espacio ChatGPT Business o Enterprise/Edu. La documentación oficial consultada el 2026-10-30 confirma estos planes; no se ha comprobado el plan ni los permisos de esta cuenta: https://help.openai.com/en/articles/12584461-connecting-custom-mcp-servers-in-chatgpt.
+La conexión MCP personalizada con acciones de escritura/modificación requiere ChatGPT Business o Enterprise/Edu en la web. Pro admite conexión MCP con lectura/obtención, no acciones de escritura. Algunos clientes pueden crear un espacio Business nuevo con una sola licencia de pago (disponibilidad limitada; depende de la opción mostrada en el checkout); si no aparece, se aplica el mínimo estándar de dos licencias. Fuentes oficiales consultadas el 2026-10-30: https://help.openai.com/en/articles/12584461-connecting-custom-mcp-servers-in-chatgpt y https://help.openai.com/en/articles/20001624-chatgpt-business-single-seat-configuration. El plan/espacio de esta cuenta no se ha comprobado.
 
 Khora no puede cambiar ni eludir el plan, RBAC o los permisos de ChatGPT. La disponibilidad de un endpoint MCP y un build Vercel READY no prueban que el conector pueda instalarse ni que ChatGPT ejecute acciones de escritura.
 
@@ -222,5 +222,5 @@ Se verificó la fuente canónica actual de Metodología: DUG v368 · NX-368m, Me
 - **Preview:** `dpl_BDuQ2DTFZ8SaydkqeHZFm5qKrNN1` está READY para el corte de aplicación `0282cd42d9fb7a11d087ebed397c91f131676708`; Next.js 16.4.0, TypeScript y 78/78 páginas terminaron correctamente. Ese Preview no tiene las variables MCP/OAuth configuradas y por ello los endpoints de metadata devuelven 503. No se copiaron secretos a Preview.
 - **Production — metadatos de configuración:** Vercel confirma variables sensibles con destino `production` para `MCP_OAUTH_CLIENT_ID`, `MCP_OAUTH_CLIENT_SECRET`, `MCP_OAUTH_REDIRECT_URIS`, `MCP_JWT_SECRET`, `MCP_ALLOWED_EMAIL`, `MCP_CANONICAL_URL`, `KHORA_READONLY_DATABASE_URL` y `JULES_API_KEY`. No se descifraron ni leyeron valores. La ruta MCP mantiene su comprobación de presencia de `KHORA_READONLY_DATABASE_URL`; para el propietario el acceso Jules evita la consulta ACL.
 - **GitHub Actions:** CI, UI Quality y `khora-ok` para el head `c63daa5d54ae4a2c35ecbaecfc231feab431aa60` terminaron con failure; sus jobs no reportaron pasos de ejecución. No es un resultado de tests ni se repitieron sin corrección causal de runner.
-- **ChatGPT web:** la elegibilidad depende del plan/espacio de trabajo. La documentación oficial consultada establece que Pro admite MCP personalizado de lectura/consulta, mientras la escritura/modificación requiere Business o Enterprise/Edu. Business exige al menos dos asientos de pago. No se ha inspeccionado el plan efectivo del operador.
+- **ChatGPT web:** la elegibilidad depende del plan/espacio de trabajo. La documentación oficial consultada establece que Pro admite MCP personalizado de lectura/consulta, mientras la escritura/modificación requiere Business o Enterprise/Edu. la configuración Business de una sola licencia está disponible solo para algunos clientes nuevos; cuando no aparece en checkout, rige el mínimo estándar de dos licencias. No se ha inspeccionado el plan efectivo ni la elegibilidad de este operador.
 - **Publicación y aceptación:** PR #345 sigue abierta, mergeable y no mergeada. `main` no se modificó; Production no se desplegó. No hubo autorización OAuth real desde ChatGPT ni llamadas reales a Jules. Antes de declarar completada la integración nativa se requiere conectar el cliente real y verificar lectura y una escritura controlada; la cuenta debe permitir MCP de escritura.
