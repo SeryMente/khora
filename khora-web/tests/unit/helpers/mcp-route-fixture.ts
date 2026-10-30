@@ -24,6 +24,7 @@ const code = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTa
 export function routeFixture(options: { scopes?: string[]; revoked?: boolean; denyTurn?: boolean; production?: boolean; configured?: boolean; failService?: boolean; healthError?: boolean; partial?: boolean; auditFail?: boolean; readAllowed?: boolean; writeAllowed?: boolean; sourceBranchExists?: boolean; sessionContextValid?: boolean; aclUnavailable?: boolean; sessionSource?: string; sessionBranch?: string; planApprovalReady?: boolean; currentPlanId?: string; planSecondId?: string; planSecondStepDescription?: string; activityPagination?: boolean } = {}) {
   const schemas = new Map<contracts.McpToolName, { description: string; shape: z.ZodRawShape }>();
   const calls: Array<{ name: string; args: unknown }> = [];
+  const aclSubjects: string[] = [];
   const servers: McpServer[] = [];
   class RecordingServer extends McpServer {
     constructor(...args: ConstructorParameters<typeof McpServer>) {
@@ -67,8 +68,8 @@ export function routeFixture(options: { scopes?: string[]; revoked?: boolean; de
     "node:crypto": crypto,
     "@/lib/server/mcp-diagnostics": diagnostics,
     "@/lib/server/jules-access": {
-      listJulesSourceGrants: async (_subject: string, mode: "read" | "write") => { if (options.aclUnavailable) throw new diagnostics.McpDiagnosticError("JULES_ACL_UNAVAILABLE"); const allowed = mode === "read" ? options.readAllowed !== false : options.writeAllowed !== false; return allowed ? [{ source: "sources/github/owner/repo", branch: "main" }] : []; },
-      requireJulesSourceGrant: async (_subject: string, source: string, branch: string, mode: "read" | "write") => { if (options.aclUnavailable) throw new diagnostics.McpDiagnosticError("JULES_ACL_UNAVAILABLE"); const allowed = mode === "read" ? options.readAllowed !== false : options.writeAllowed !== false; if (!allowed || source !== "sources/github/owner/repo" || branch !== "main") throw new diagnostics.McpDiagnosticError("JULES_ACCESS_DENIED"); },
+      listJulesSourceGrants: async (_subject: string, mode: "read" | "write") => { aclSubjects.push(_subject); if (options.aclUnavailable) throw new diagnostics.McpDiagnosticError("JULES_ACL_UNAVAILABLE"); const allowed = mode === "read" ? options.readAllowed !== false : options.writeAllowed !== false; return allowed ? [{ source: "sources/github/owner/repo", branch: "main" }] : []; },
+      requireJulesSourceGrant: async (_subject: string, source: string, branch: string, mode: "read" | "write") => { aclSubjects.push(_subject); if (options.aclUnavailable) throw new diagnostics.McpDiagnosticError("JULES_ACL_UNAVAILABLE"); const allowed = mode === "read" ? options.readAllowed !== false : options.writeAllowed !== false; if (!allowed || source !== "sources/github/owner/repo" || branch !== "main") throw new diagnostics.McpDiagnosticError("JULES_ACCESS_DENIED"); },
     },
     "@/lib/server/mcp-diagnostic-boundary": boundary,
     "next/server": { NextRequest: Request, NextResponse: Response },
@@ -132,7 +133,7 @@ export function routeFixture(options: { scopes?: string[]; revoked?: boolean; de
     return modules[name];
   } }, { timeout: 1000, filename: "mcp-route-fixture.cjs" });
   return {
-    schemas, calls, url: config.canonicalUrl,
+    schemas, calls, aclSubjects, url: config.canonicalUrl,
     fetch: async (input: string | URL | Request, init?: RequestInit) => {
       const request = new Request(input, init);
       return exported[request.method === "GET" ? "GET" : "POST"](request);

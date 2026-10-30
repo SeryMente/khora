@@ -410,3 +410,17 @@ test("Jules approval rejects a changed plan fingerprint even when the plan id st
     assert.equal(fixture.calls.some(x => x.name === "JulesApprovePlan"), false);
   } finally { await client.close(); await fixture.close(); }
 });
+test("Jules ACL uses the authenticated OAuth subject, never a caller-supplied identity", async () => {
+  const readFixture = routeFixture(); const readClient = await connect(readFixture);
+  try {
+    const read = await readClient.callTool({ name: "jules_list_sources", arguments: input("jules_list_sources") });
+    assert.equal(read.isError, false);
+    assert.deepEqual(readFixture.aclSubjects, ["fixture-actor"]);
+  } finally { await readClient.close(); await readFixture.close(); }
+  const writeFixture = routeFixture(); const writeClient = await connect(writeFixture);
+  try {
+    const write = await writeClient.callTool({ name: "jules_create_session", arguments: input("jules_create_session") });
+    assert.equal(write.isError, false);
+    assert.deepEqual(writeFixture.aclSubjects, ["fixture-actor"]);
+  } finally { await writeClient.close(); await writeFixture.close(); }
+});
