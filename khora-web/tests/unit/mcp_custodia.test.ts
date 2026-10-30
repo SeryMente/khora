@@ -57,8 +57,8 @@ test("catalog pages the complete owner session universe and excludes content", a
   const pageQuery = db.calls.find(call => call.sql.includes("SELECT s.session_id"))!.sql;
   assert.match(pageQuery, /LEFT JOIN LATERAL/);
   assert.match(pageQuery, /LEFT JOIN dictado_mp3/);
-  assert.match(pageQuery, /COALESCE\\(s\\.creado_en/);
-  assert.doesNotMatch(pageQuery, /COALESCE\\(s\\.actualizado_en/);
+  assert.match(pageQuery, /COALESCE\(s\.creado_en/);
+  assert.doesNotMatch(pageQuery, /COALESCE\(s\.actualizado_en/);
   const serialized = JSON.stringify(result);
   for (const secret of ["private-title", "private-preview", "private-transcript", "blob.vercel-storage.com", "snapshot-ciphertext"]) {
     assert.equal(serialized.includes(secret), false, secret);
@@ -132,7 +132,7 @@ test("integrity reads actual objects, returns sanitized states and clears decryp
   });
   const readUrls: string[] = [];
   const result = await toolKhoraCustodiaVerificarIntegridad(
-    "owner@example.test", { session_id: "session-1", limite: 3 }, db,
+    "owner@example.test", { session_id: "session-1", limite: 4 }, db,
     async (url) => {
       readUrls.push(url);
       if (url.endsWith("object-3")) throw new Error("audio_integridad_rota");
