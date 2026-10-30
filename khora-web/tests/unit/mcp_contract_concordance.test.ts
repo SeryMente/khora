@@ -288,3 +288,47 @@ test("Jules ACL without an active grant does not call provider listings or sessi
     assert.equal(fixture.calls.some(x => ["JulesListSources", "JulesListSessions", "JulesGetSource", "JulesCreateSession"].includes(x.name)), false);
   } finally { await client.close(); await fixture.close(); }
 });
+test("Jules read tools deny sessions and activities before provider lookup without a read grant", async () => {
+  for (const name of ["jules_get_session", "jules_list_activities"] as const) {
+    const fixture = routeFixture({ readAllowed: false }); const client = await connect(fixture);
+    try {
+      const result = await client.callTool({ name, arguments: input(name) });
+      assert.equal(result.isError, true);
+      assert.match(JSON.stringify(result), /JULES_ACCESS_DENIED/);
+      assert.equal(fixture.calls.some(x => x.name === "JulesGetSession" || x.name === "JulesListActivitiesPage"), false);
+    } finally { await client.close(); await fixture.close(); }
+  }
+});
+
+test("Jules write tools deny messages and approvals before provider lookup without a write grant", async () => {
+  for (const name of ["jules_send_message", "jules_approve_plan"] as const) {
+    const fixture = routeFixture({ writeAllowed: false }); const client = await connect(fixture);
+    try {
+      const result = await client.callTool({ name, arguments: input(name) });
+      assert.equal(result.isError, true);
+      assert.match(JSON.stringify(result), /JULES_ACCESS_DENIED/);
+      assert.equal(fixture.calls.some(x => x.name === "JulesGetSession" || x.name === "JulesSendMessage" || x.name === "JulesApprovePlan"), false);
+    } finally { await client.close(); await fixture.close(); }
+  }
+});
+
+test("Jules ACL outages fail closed before any provider access for reads or writes", async () => {
+  const fixture = routeFixture({ aclUnavailable: true }); const client = await connect(fixture);
+  try {
+    const cases = [
+      ["jules_list_sources", input("jules_list_sources")],
+      ["jules_list_sessions", input("jules_list_sessions")],
+      ["jules_get_session", input("jules_get_session")],
+      ["jules_list_activities", input("jules_list_activities")],
+      ["jules_create_session", input("jules_create_session")],
+      ["jules_send_message", input("jules_send_message")],
+      ["jules_approve_plan", input("jules_approve_plan")],
+    ] as const;
+    for (const [name, args] of cases) {
+      const result = await client.callTool({ name, arguments: args });
+      assert.equal(result.isError, true, name);
+      assert.match(JSON.stringify(result), /JULES_ACL_UNAVAILABLE/, name);
+    }
+    assert.equal(fixture.calls.some(x => x.name.startsWith("Jules")), false);
+  } finally { await client.close(); await fixture.close(); }
+});

@@ -280,9 +280,13 @@ async function handleMcpRequest(req: NextRequest) {
     } catch { throw new McpDiagnosticError("JULES_RESOURCE_CONTEXT_INVALID"); }
   };
   const requireSessionAccess = async (sessionId: string, mode: JulesAccessMode) => {
+    const grants = await listJulesSourceGrants(actor, mode);
+    if (!grants.length) throw new McpDiagnosticError("JULES_ACCESS_DENIED");
     const session = await julesGetSession(sessionId);
     const resource = sessionResource(session);
-    await requireJulesSourceGrant(actor, resource.source, resource.branch, mode);
+    if (!grants.some(grant => grant.source === resource.source && grant.branch === resource.branch)) {
+      throw new McpDiagnosticError("JULES_ACCESS_DENIED");
+    }
     return session;
   };
   const isSessionAllowed = (session: any, grants: JulesSourceGrant[]) => {
