@@ -20,7 +20,7 @@ import { getMcpConfig } from "@/lib/server/mcp-config";
 import { verifyJwtDetailed } from "@/lib/server/jwt";
 import { obtenerGeneracionRevocacion } from "@/lib/server/oauth";
 import { isProductionEnv } from "@/lib/server/mcp-db";
-import { listJulesSourceGrants, requireJulesSourceGrant, type JulesAccessMode, type JulesSourceGrant } from "@/lib/server/jules-access";
+import { isJulesDeveloperSubject, listJulesSourceGrants, requireJulesSourceGrant, type JulesAccessMode, type JulesSourceGrant } from "@/lib/server/jules-access";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import { ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
@@ -258,8 +258,16 @@ async function handleMcpRequest(req: NextRequest) {
     );
   };
 
+  // Jules has its own scopes; the single configured developer owner does not need a normative-turn token for routine development actions.
+  const julesTool = (name: McpToolName, description: string, inputSchema: z.ZodRawShape, handler: (args: any) => Promise<any>) => {
+    toolsList.push(describeMcpTool(name, description, inputSchema));
+    return mcpServer.tool(name, description, inputSchema, async (args: any) => {
+      try { return await handler(args); }
+      catch (error) { return diagnosticFailure(error, { operation: name, correlation_id }); }
+    });
+  };
 
-  // Jules: herramientas bidireccionales sujetas a ACL exacta por sujeto, fuente y rama.
+  // Jules: herramientas bidireccionales sujetas a scopes propios y, para usuarios adicionales, ACL exacta por sujeto, fuente y rama.
   const safeJulesResult = async (operation: string, call: () => Promise<unknown>) => {
     try { const result = await call(); return { content: [{ type: "text" as const, text: JSON.stringify({ ok: true, result: result ?? null }) }] }; }
     catch (error) {
@@ -280,11 +288,12 @@ async function handleMcpRequest(req: NextRequest) {
     } catch { throw new McpDiagnosticError("JULES_RESOURCE_CONTEXT_INVALID"); }
   };
   const requireSessionAccess = async (sessionId: string, mode: JulesAccessMode) => {
-    const grants = await listJulesSourceGrants(actor, mode);
-    if (!grants.length) throw new McpDiagnosticError("JULES_ACCESS_DENIED");
+    const developerOwner = isJulesDeveloperSubject(actor);
+    const grants = developerOwner ? [] : await listJulesSourceGrants(actor, mode);
+    if (!developerOwner && !grants.length) throw new McpDiagnosticError("JULES_ACCESS_DENIED");
     const session = await julesGetSession(sessionId);
     const resource = sessionResource(session);
-    if (!grants.some(grant => grant.source === resource.source && grant.branch === resource.branch)) {
+    if (!developerOwner && !grants.some(grant => grant.source === resource.source && grant.branch === resource.branch)) {
       throw new McpDiagnosticError("JULES_ACCESS_DENIED");
     }
     return session;
@@ -328,48 +337,52 @@ async function handleMcpRequest(req: NextRequest) {
     try { const resource = sessionResource(session); return grants.some(g => g.source === resource.source && g.branch === resource.branch); }
     catch { return false; }
   };
-  gatedTool("jules_list_sources", "Lista únicamente fuentes y ramas Jules autorizadas para el sujeto autenticado.", {
+  julesTool("jules_list_sources", "El propietario desarrollador consulta las fuentes y ramas disponibles en su cuenta Jules; otros sujetos se limitan a concesiones ACL.", {
     page_size: z.number().int().min(1).max(100).optional().describe("Número de fuentes (1-100; predeterminado 50)"),
     page_token: z.string().max(4096).optional().describe("Token nextPageToken de la página anterior"),
   }, async (args: any) => {
     const denied = requireScope("jules:read"); if (denied) return denied;
     return safeJulesResult("jules_list_sources", async () => {
-      const grants = await listJulesSourceGrants(actor, "read"); if (!grants.length) return { sources: [] };
+      const developerOwner = isJulesDeveloperSubject(actor);
+      const grants = developerOwner ? [] : await listJulesSourceGrants(actor, "read");
+      if (!developerOwner && !grants.length) return { sources: [] };
       const page = await julesListSources(args.page_size ?? 50, args.page_token);
       const sources = (page.sources ?? []).flatMap((source: any) => {
         const allowed = new Set(grants.filter(g => g.source === source.name).map(g => g.branch));
-        if (!allowed.size || !source.githubRepo) return [];
+        if ((!developerOwner && !allowed.size) || !source.githubRepo) return [];
         const upstream = Array.isArray(source.githubRepo.branches) ? source.githubRepo.branches : [];
         const available = new Map<string, any>();
         for (const branch of [...upstream, ...(source.githubRepo.defaultBranch ? [source.githubRepo.defaultBranch] : [])]) {
           if (typeof branch?.displayName === "string") available.set(branch.displayName, branch);
         }
-        const branches = [...available.values()].filter((b: any) => allowed.has(b.displayName));
+        const branches = [...available.values()].filter((b: any) => developerOwner || allowed.has(b.displayName));
         if (!branches.length) return [];
-        const defaultBranch = source.githubRepo.defaultBranch && allowed.has(source.githubRepo.defaultBranch.displayName) ? available.get(source.githubRepo.defaultBranch.displayName) : undefined;
+        const defaultBranch = source.githubRepo.defaultBranch && (developerOwner || allowed.has(source.githubRepo.defaultBranch.displayName)) ? available.get(source.githubRepo.defaultBranch.displayName) : undefined;
         return [{ ...source, githubRepo: { ...source.githubRepo, branches, ...(defaultBranch ? { defaultBranch } : { defaultBranch: undefined }) } }];
       });
       return { ...page, sources };
     });
   });
-  gatedTool("jules_list_sessions", "Lista únicamente sesiones de fuentes y ramas autorizadas; conserva nextPageToken.", {
+  julesTool("jules_list_sessions", "Lista únicamente sesiones de fuentes y ramas autorizadas; conserva nextPageToken.", {
     page_size: z.number().int().min(1).max(100).optional().describe("Número de sesiones (1-100; predeterminado 30)"),
     page_token: z.string().max(4096).optional().describe("Token nextPageToken de la página anterior"),
   }, async (args: any) => {
     const denied = requireScope("jules:read"); if (denied) return denied;
     return safeJulesResult("jules_list_sessions", async () => {
-      const grants = await listJulesSourceGrants(actor, "read"); if (!grants.length) return { sessions: [] };
+      const developerOwner = isJulesDeveloperSubject(actor);
+      const grants = developerOwner ? [] : await listJulesSourceGrants(actor, "read");
+      if (!developerOwner && !grants.length) return { sessions: [] };
       const page = await julesListSessions(args.page_size ?? 30, args.page_token);
-      return { ...page, sessions: (page.sessions ?? []).filter((session: any) => isSessionAllowed(session, grants)) };
+      return { ...page, sessions: developerOwner ? (page.sessions ?? []).filter((session: any) => { try { sessionResource(session); return true; } catch { return false; } }) : (page.sessions ?? []).filter((session: any) => isSessionAllowed(session, grants)) };
     });
   });
-  gatedTool("jules_get_session", "Recupera una sesión solo cuando su fuente y rama exactas están autorizadas.", {
+  julesTool("jules_get_session", "Recupera una sesión solo cuando su fuente y rama exactas están autorizadas.", {
     session_id: z.string().trim().min(1).max(256).describe("ID de sesión o nombre completo sessions/{id}; no URL"),
   }, async (args: any) => {
     const denied = requireScope("jules:read"); if (denied) return denied;
     return safeJulesResult("jules_get_session", () => requireSessionAccess(args.session_id, "read"));
   });
-  gatedTool("jules_list_activities", "Lee actividades solo después de verificar ACL de lectura de fuente y rama.", {
+  julesTool("jules_list_activities", "Lee actividades solo después de verificar ACL de lectura de fuente y rama.", {
     session_id: z.string().trim().min(1).max(256).describe("ID de sesión o nombre completo sessions/{id}; no URL"),
     page_size: z.number().int().min(1).max(100).optional().describe("Número de actividades (1-100; predeterminado 50)"),
     page_token: z.string().max(4096).optional().describe("Token nextPageToken de la página anterior"),
@@ -385,7 +398,7 @@ async function handleMcpRequest(req: NextRequest) {
       return { ...page, activities };
     });
   });
-  gatedTool("jules_create_session", "Crea una sesión solo para fuente y rama existentes y autorizadas; fuerza aprobación del plan y AUTO_CREATE_PR.", {
+  julesTool("jules_create_session", "Crea una sesión solo para fuente y rama existentes y autorizadas; fuerza aprobación del plan y AUTO_CREATE_PR.", {
     source: z.string().trim().min(1).max(512).refine((v) => { try { normalizeSourceName(v); return true; } catch { return false; } }, { message: "La fuente debe ser un recurso Jules válido." }).describe("Nombre literal sources/... devuelto por Jules"),
     starting_branch: z.string().trim().min(1).max(255).describe("Rama exacta devuelta por sources.get y autorizada para este sujeto"),
     prompt: z.string().trim().min(1).max(10000).describe("Prompt completo con alcance, restricciones, aceptación, pruebas y cláusula NO SIMULACIÓN"),
@@ -402,7 +415,7 @@ async function handleMcpRequest(req: NextRequest) {
       return julesCreateSession({ prompt: args.prompt, sourceContext: { source: sourceName, githubRepoContext: { startingBranch: args.starting_branch } }, automationMode: "AUTO_CREATE_PR", requirePlanApproval: true, ...(args.title ? { title: args.title } : {}) });
     });
   });
-  gatedTool("jules_send_message", "Envía seguimiento a sesión autorizada en la misma fuente y rama; escritura ambigua no se reintenta.", {
+  julesTool("jules_send_message", "Envía seguimiento a sesión autorizada en la misma fuente y rama; escritura ambigua no se reintenta.", {
     session_id: z.string().trim().min(1).max(256).describe("ID de sesión o nombre completo sessions/{id}; no URL"),
     prompt: z.string().trim().min(1).max(10000).describe("Respuesta o mensaje de seguimiento para Jules"),
   }, async (args: any) => {
@@ -414,7 +427,7 @@ async function handleMcpRequest(req: NextRequest) {
       return { accepted: true, session_id: session.name, state_before_send: session.state, note: "El envío fue aceptado; consulta actividades posteriores para comprobar la respuesta." };
     });
   });
-  gatedTool("jules_approve_plan", "Aprueba únicamente el plan cuyo plan_id y SHA-256 se recibieron en las actividades y siguen vigentes. La herramienta relee estado y plan dos veces; el proveedor no expone un precondicionamiento atómico por plan, por lo que puede persistir una ventana de carrera remota.", {
+  julesTool("jules_approve_plan", "Aprueba únicamente el plan cuyo plan_id y SHA-256 se recibieron en las actividades y siguen vigentes. La herramienta relee estado y plan dos veces; el proveedor no expone un precondicionamiento atómico por plan, por lo que puede persistir una ventana de carrera remota.", {
     session_id: z.string().trim().min(1).max(256).describe("ID de sesión o nombre completo sessions/{id}; no URL"),
     plan_id: z.string().trim().min(1).max(256).describe("ID exacto del último planGenerated.plan.id mostrado en jules_list_activities"),
     plan_sha256: z.string().regex(/^[0-9a-f]{64}$/).describe("SHA-256 exacto planGenerated.plan_sha256 devuelto por jules_list_activities; confirma el contenido revisado"),
