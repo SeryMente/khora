@@ -3,6 +3,7 @@
 Entrada única de estado: [OBJETO-CANONICO.md](OBJETO-CANONICO.md). El OCP conserva estado vivo, decisiones, notas temporales, pruebas, historial breve y paquete de traspaso; no se debe crear una fuente de estado competidora.
 
 - [Arquitectura de persistencia provisional en Cora](ARQUITECTURA-PERSISTENCIA-PROVISIONAL-CORA.md): alcance autorizado, datos permitidos, autenticación, cola/reintentos, límites de aislamiento y criterios obligatorios para sustituirla.
+- [Evidencia de lectura de vuelta PR #346](evidencias/HARMONIA-CORA-PERSISTENCIA-PROVISIONAL-PR346.json): snapshot de 14 archivos, árbol Git y SHAs de blob cotejados; estados de CI observados y límites de verificación.
 
 - [Asistente · instancia fresca / traspaso v1.2](prompts/ASISTENTE.md): entrada, adquisición de gobierno, compuerta de titularidad y secuencia E2E.
 - [Constructor · no instanciado](prompts/CONSTRUCTOR.md): ejecutar únicamente bajo su régimen y no utilizar Remote Desktop Commander.
