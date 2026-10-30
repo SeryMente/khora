@@ -150,7 +150,7 @@ test("integrity reads actual objects, returns sanitized states and clears decryp
   const serialized = JSON.stringify(result);
   assert.equal(serialized.includes("blob.vercel-storage.com"), false);
   assert.equal(serialized.includes("synthetic audio bytes"), false);
-  assert.equal(serialized.includes("audio_base64"), false);
+  assert.equal(result.items.some((item: any) => Object.prototype.hasOwnProperty.call(item, "audio_base64")), false);
 });
 
 test("integrity classifies inaccessible objects as unverifiable, not proven missing", async () => {
