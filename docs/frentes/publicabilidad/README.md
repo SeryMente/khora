@@ -19,7 +19,7 @@ ChatGPT lee el SHA exacto de main, valida que no exista ya un deployment equival
 - Dominio de producción asociado y verificado: khora-web.vercel.app.
 - Último deployment productivo leído: dpl_H7ModaV6GTefp9qbjiUnpiHmxgFH, READY, SHA b528660e16552633d232a2397cbe42441a03438c.
 - El conector Vercel de esta sesión pudo obtener fuente privada de GitHub y construir un deployment Preview para un SHA exacto. **La llamada con target production aún no se ha ejecutado; el primer uso real requiere una instrucción explícita de publicación.**
-- GitHub Actions seguía concluyendo sus jobs antes de ejecutar steps. La causa raíz del runner no está demostrada.
+- En main, los runs CI #40959059770, UI Quality #40959059776 y Deploy to Production #40959059940 finalizaron en failure; las seis jobs consultadas devolvieron steps=[] (ningún step ejecutado). La causa raíz del runner no está demostrada.
 - El proyecto conserva un workflow Deploy to Production disparado al hacer push a main; por ello el protocolo inspecciona concurrencia y deployments existentes antes de crear uno desde ChatGPT.
 
 ## Archivos del frente
