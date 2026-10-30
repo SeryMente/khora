@@ -51,6 +51,7 @@ function input(name: McpToolName): Record<string, unknown> {
   if (name === "jules_create_session") return { source: "sources/github/owner/repo", starting_branch: "main", prompt: "Fixture prompt with acceptance criteria and NO SIMULATION", title: "Contract test" };
   if (name === "jules_send_message") return { session_id: "fixture-session", prompt: "Fixture response" };
   if (name === "jules_approve_plan") return { session_id: "fixture-session", plan_id: "fixture-plan-1", plan_sha256: "7a898feea085c3699a9c15295c5c53d361f6f10bd2847d2bb54f12b863969346" };
+  if (name === "jules_list_sources" || name === "jules_list_sessions") return {};
   const business = (name === "khora_leer_volcado" || name === "khora_leer_audio") ? { id: "1" } : name === "khora_buscar_volcados" ? { busqueda: "fixture" } : name === "khora_versiones_volcado" ? { volcado_id: "1" } : {};
   return { ...controls, ...business };
 }
