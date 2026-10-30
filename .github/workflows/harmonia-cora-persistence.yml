@@ -1,0 +1,28 @@
+name: Harmonia · provisional Cora persistence
+on:
+  pull_request:
+    paths:
+      - 'apps/harmonia-observability/**'
+      - '.github/workflows/harmonia-cora-persistence.yml'
+  push:
+    branches:
+      - feat/harmonia-cora-provisional-persistence-20261030
+    paths:
+      - 'apps/harmonia-observability/**'
+      - '.github/workflows/harmonia-cora-persistence.yml'
+jobs:
+  validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Parse extension and collector JavaScript
+        run: |
+          node --check apps/harmonia-observability/collector/server.js
+          node --check apps/harmonia-observability/extension/service-worker.js
+          node --check apps/harmonia-observability/extension/remote-sync.js
+          node --check apps/harmonia-observability/extension/popup.js
+      - name: Run Cora persistence contract and collector integration tests
+        run: node --test apps/harmonia-observability/tests/*.test.js
