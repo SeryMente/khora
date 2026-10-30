@@ -21,7 +21,8 @@ interface ManualToken {
 }
 
 const MCP_ENDPOINT = "https://khora-web.vercel.app/api/mcp";
-const SUPPORTED_SCOPES = ["runtime:read", "volcados:read", "norm:turn"] as const;
+const SUPPORTED_SCOPES = ["runtime:read", "volcados:read", "norm:turn", "custodia:metadata:read", "custodia:integrity:verify"] as const;
+const DEFAULT_SELECTED_SCOPES = ["runtime:read", "volcados:read", "norm:turn"] as const;
 
 function formatDate(value: string | null) {
   return value ? new Date(value).toLocaleString("es-MX") : "Nunca";
@@ -30,7 +31,7 @@ function formatDate(value: string | null) {
 export default function PaginaMcpRevocacion() {
   const [info, setInfo] = useState<RevocationInfo | null>(null);
   const [tokens, setTokens] = useState<ManualToken[]>([]);
-  const [selectedScopes, setSelectedScopes] = useState<string[]>([...SUPPORTED_SCOPES]);
+  const [selectedScopes, setSelectedScopes] = useState<string[]>([...DEFAULT_SELECTED_SCOPES]);
   const [expiresInDays, setExpiresInDays] = useState(90);
   const [label, setLabel] = useState("ChatGPT");
   const [issuedToken, setIssuedToken] = useState<{ token: string; bearer: string; expiresAt: string } | null>(null);
@@ -255,7 +256,7 @@ export default function PaginaMcpRevocacion() {
 
           <div className="space-y-2">
             <span className="text-xs uppercase opacity-60">Scopes del token</span>
-            <div className="grid gap-2 sm:grid-cols-3">
+            <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3">
               {SUPPORTED_SCOPES.map((scope) => (
                 <label
                   key={scope}
