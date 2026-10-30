@@ -114,7 +114,7 @@ test("real SDK validation errors are sanitized before being returned to the clie
   try { const result = await client.callTool({ name: "khora_resumen", arguments: { ...controls, _thinking_mode: "synthetic-secret" } }); assert.equal(result.isError, true); assert.ok(!JSON.stringify(result).includes("synthetic-secret")); assert.equal((result._meta as any)["khora/diagnostic"].code, "MCP_INPUT_INVALID"); assert.equal(fixture.calls.length, 0); }
   finally { await client.close(); await fixture.close(); }
 });
-test("all fifteen tools sanitize unexpected exceptions; health retains upstream evidence", async () => {
+test("all twenty tools sanitize unexpected exceptions; health retains upstream evidence", async () => {
   const fixture = routeFixture({ failService: true, healthError: true }), client = await connect(fixture);
   try {
     for (const name of Object.keys(MCP_TOOL_SCOPES)) {
