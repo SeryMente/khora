@@ -31,14 +31,14 @@ Antes de ejecutar ese recorrido desde otra plataforma, resolver la identidad nor
 
 | `khora_custodia_catalogo` / inventariar sesiones de custodia | `limite?` (1–100), `cursor?` | Sesiones propias paginadas, incluidas abiertas, selladas vinculadas a volcado y sesiones sin checkpoint/partes. Solo metadatos; no títulos, previews, texto, snapshots ni URLs Blob. `custodia:metadata:read` + ciclo normativo. |
 | `khora_custodia_revisiones` / conciliar revisiones | `session_id`, `limite?` (1–100), `cursor?` | Fechas de servidor/cliente, partes declaradas/almacenadas/verificadas y `syncStatus`; excluye título, preview, texto y snapshot. Solo propietario; `custodia:metadata:read` + ciclo normativo. |
-| `khora_custodia_verificar_integridad` / comprobar objetos Blob | `session_id`, `limite?` (1–50), `despues_de_parte?` | Lee el Blob actual, descifra internamente y compara bytes/SHA-256. Devuelve `VERIFIED`, `MISSING`, `MISMATCH` o `UNVERIFIABLE`; nunca bytes, Base64 ni URL. `custodia:integrity:verify` + ciclo normativo. |
+| `khora_custodia_verificar_integridad` / comprobar objetos Blob | `session_id`, `limite?` (1–50), `despues_de_parte?` | Lee el Blob actual, descifra internamente y compara bytes/SHA-256. Devuelve `VERIFIED`, `MISSING` (referencia ausente o Blob HTTP 404), `MISMATCH` o `UNVERIFIABLE` (fallo de acceso/transitorio o metadata no demostrable); nunca bytes, Base64 ni URL. `custodia:integrity:verify` + ciclo normativo. |
 | `khora_ui_review` / revisar representación | `pantalla?`, `volcado?`, `solo_metadatos?` | Inventario o HTML con corpus real; controles sin respuesta. Pantallas: ingreso, archivo, revision, aprobacion, ingesta, registro, grafo |
 | `khora_observacion_instantanea` / estado observado | `session_id?` | `runtime`, actividad de cinco minutos, última observación, sesiones, fallos, `event_cursor`, almacenamiento e interpretación; umbral de estado obsoleto 15 000 ms |
 | `khora_estado_vivo` / consulta de estado unificada | Ninguna | Reutiliza la observación instantánea sin filtro; no es una fuente distinta |
 | `khora_eventos_desde` / lectura incremental | `cursor?` entero ≥0, `limite?` entero 1–200, `session_id?` | `cursor_entrada`, `cursor_siguiente`, `limite`, `retornados`, `hay_mas`, `eventos`; continuar con el cursor devuelto |
 | `khora_eventos_recientes` / diagnóstico retrospectivo | `segundos?`, `limite?`, `session_id?`, `component?`, `severity?`, `outcome?`, `fase?`, `scope?`, `category?` | `ventana_segundos`, `limite`, `retornados`, `eventos`; ventana 1–86400 s (300 predeterminado), 1–200 eventos (50 predeterminado) |
 
-**Permisos efectivos:** las primeras seis herramientas requieren `volcados:read` **y** `norm:turn`; las cuatro de observabilidad, `runtime:read` **y** `norm:turn`. El permiso de negocio anunciado en `securitySchemes` se conserva; `norm:turn` es necesario para abrir/completar el ciclo, no una concesión implícita.
+**Permisos efectivos:** las herramientas de contenido/archivo/audio requieren `volcados:read` **y** `norm:turn`; las cuatro de observabilidad requieren `runtime:read` **y** `norm:turn`. `khora_custodia_catalogo` y `khora_custodia_revisiones` requieren `custodia:metadata:read` **y** `norm:turn`; `khora_custodia_verificar_integridad` requiere `custodia:integrity:verify` **y** `norm:turn`. Los scopes especializados no se sustituyen con `volcados:read`. El permiso de negocio anunciado en `securitySchemes` se conserva; `norm:turn` es necesario para abrir/completar el ciclo, no una concesión implícita.
 
 | Herramienta / propósito | Entradas (sin los tres controles sustantivos) | Permiso / salida y efecto |
 |---|---|---|
@@ -79,7 +79,7 @@ Los extras permitidos no sustituyen campos obligatorios ni se convierten silenci
 ## Ciclo normativo
 
 1. **OPEN:** `khora_norm_open_turn` fija SI (Sistema de Instrucciones) y metodología de `SeryMente/metodologia`, contrastando H1 → lectura → H2; solo acepta snapshot estable. Emite identidad de ciclo, intento, nonce, token, manifiesto y encabezados. Token de turno: 12 horas según la implementación.
-2. **TAREA:** las diez herramientas sustantivas verifican actor, ciclo, intento, nonce, snapshot y contexto de runtime antes de invocar el servicio. Los tres controles se retiran antes de pasar argumentos al manejador de negocio.
+2. **TAREA:** cada herramienta sustantiva verifica actor, ciclo, intento, nonce, snapshot y contexto de runtime antes de invocar el servicio. Los tres controles se retiran antes de pasar argumentos al manejador de negocio.
 3. **APLICACIÓN:** `khora_norm_apply_principle` persiste el siguiente folio en el orden canónico; no admite saltos/reordenación. A=aplicado, N=no aplicable, C=conflicto resuelto. Las condiciones de anchor/razón también se comprueban en el servicio.
 4. **VERIFY:** bloquea turno, coteja ledger completo/ordenado con receipt, calcula hashes y valida fuentes históricas, cobertura (faltantes, duplicados, desconocidos), encabezados y salida. Solo `VERIFIED` cierra; `INVALID/INCOMPLETE` conserva el intento y prepara el siguiente. No reutilizar token de intento anterior/cerrado.
 5. **RELEASE:** solo tras verificación consistente libera salida/hash, orden y comprobante; emite `VERIFIED_RELEASE` y token de liberación de cinco minutos. No es permiso para saltar verificación en otro ciclo.
@@ -115,7 +115,8 @@ OAuth usa PKCE; los metadatos anuncian authorization_code, refresh_token y offli
 | Familia | Fuente y efectos que deben distinguirse |
 |---|---|
 | Contenido/revisión | `volcado`, versiones y auditoría; descifrado de texto/HTML real autorizado. Lectura del corpus, no prueba de cobertura de toda captura/dictado |
-| Observabilidad | `khora_runtime_state` y `eventos_sistema`; tiempos, sesiones y eventos persistidos, no telemetría privada de la mente/ventana del modelo |\n| Custodia (metadatos/integridad) | `dictado_session`, `dictado_checkpoint`, `dictado_audio_parte`, `dictado_mp3` y Blob actual; consultas de solo lectura por propietario. La verificación lee/descifra bytes en memoria y los descarta; no devuelve contenido ni modifica estado |
+| Observabilidad | `khora_runtime_state` y `eventos_sistema`; tiempos, sesiones y eventos persistidos, no telemetría privada de la mente/ventana del modelo |
+| Custodia (metadatos/integridad) | `dictado_session`, `dictado_checkpoint`, `dictado_audio_parte`, `dictado_mp3` y Blob actual; consultas de solo lectura por propietario. La verificación lee/descifra bytes en memoria y los descarta; no devuelve contenido ni modifica estado |
 | Gobernanza | Fuentes versionadas de metodología, turnos/ledger y comprobantes; lecturas históricas, caché por blob y escrituras normativas |
 | Envoltura de servicio | Eventos de llamada con operación, correlación, resultado, duración y razón; no incluir payloads/secretos. Middleware HTTP y bridge FastAPI conservan trazabilidad en los almacenes existentes |
 | Autenticación | Consulta de generación y token; actualización de uso del manual. No confundir sufijo `read` del permiso con ausencia total de escrituras |
