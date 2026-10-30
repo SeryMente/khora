@@ -29,11 +29,11 @@ Los barridos responden a mutaciones y filtros de relevancia; los cambios de text
 COLECTOR LOCAL
 Endpoint: http://127.0.0.1:47321
 Credencial local: extension/local-auth.js, excluida de Git y de evidencia compartible. No copiarla al repositorio, crónica ni prompts.
-Datos: C:\Users\fila4\AppData\Local\Harmonia\surface-index-v0.3.0\data. Se conserva esta ruta histórica para no dividir el índice al actualizar a v0.4.0.
-Scripts: INICIAR-HARMONIA-HEADLESS.ps1 inicia y verifica el colector; DETENER-HARMONIA-HEADLESS.ps1 solicita cierre autenticado; FINALIZAR-PAQUETE.ps1 valida el paquete. El registro PowerShell se escribe en C:\Users\fila4\Desktop\log.txt y se sobrescribe.
+Datos: %LOCALAPPDATA%\Harmonia\surface-index-v0.4.0\data. Los scripts resuelven el perfil activo por SID y Win32_UserProfile; no hay rutas de usuario codificadas.
+Scripts: PREPARAR-RUNTIME.ps1 descarga Node.js v22.23.4 x64 y verifica SHA-256 antes de extraerlo; INICIAR-HARMONIA-HEADLESS.ps1 provisiona el runtime cuando falta, inicia y verifica el colector; DETENER-HARMONIA-HEADLESS.ps1 solicita cierre autenticado; FINALIZAR-PAQUETE.ps1 valida el paquete. Los logs se aíslan en la carpeta logs\ del paquete; no se comparten ni sobrescriben registros ajenos.
 
 ENTREGA EN ESCRITORIO
-La única carpeta acordada es C:\Users\fila4\Desktop\Harmonia. La preparación debe hacerse fuera del Escritorio, validarse y después sincronizar solo archivos gestionados. No borrar archivos/carpetas ajenos al proyecto. Esta disposición no se ha aplicado físicamente porque el ID RDC aún no está reconciliado.
+La única carpeta acordada es C:\Users\fila4\Desktop\Harmonia. El destino único es C:\Users\PC 8\Desktop\Harmonia. No borrar archivos/carpetas ajenos al proyecto. La materialización física se debe confirmar con lectura de vuelta antes de cargar la extensión.
 
 VALIDACIÓN
 Pruebas: tests/region-policy.test.js y tests/collector.integration.test.js. Validador de fuente: scripts/validate-source.js. CI: .github/workflows/harmonia-validation.yml. Las pruebas locales pueden verificar contratos y persistencia del colector, pero no la captura real en Chrome.
@@ -42,8 +42,8 @@ PENDIENTES DE ACEPTACIÓN
 1. Ejecutar CI y reparar sus fallos.
 2. Verificar integridad, replay, persistencia/reinicio y concurrencia del colector.
 3. Revisar el cambio en PR; no mezclar en main a ciegas porque main activa el flujo de publicación de Khora.
-4. Reconciliar identidad RDC.
-5. En el equipo autorizado, mantener una única carpeta Desktop\Harmonia, iniciar el colector, cargar/recargar la extensión y ejecutar la prueba multi-pestaña en Chrome.
+4. Recuperar el canal RDC autorizado y confirmar lectura de vuelta del paquete.
+5. El asistente debe confirmar una única carpeta Desktop\Harmonia, runtime, token local, colector y lectura de vuelta; el operador únicamente carga/usa Harmonia desde su Chrome habitual para la aceptación natural.
 6. Medir CPU, RAM, latencia y completitud frente a la referencia no optimizada.
 
 No confundir versión, compilación, commit, PR o prueba aislada con instalación, sincronización local o aceptación E2E.

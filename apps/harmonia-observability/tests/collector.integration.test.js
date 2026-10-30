@@ -24,6 +24,16 @@ async function freePort(){
 async function request(base,route,options={}){
  return fetch(base+route,{...options,signal:AbortSignal.timeout(2000)});
 }
+async function stopCollector(base,child){
+ const response=await request(base,'/shutdown',{method:'POST',headers:{'x-harmonia-token':token}});
+ assert.equal(response.status,200,'el colector debe aceptar el cierre autenticado');
+ await new Promise(resolve=>{
+  if(child.exitCode!==null)return resolve();
+  const timer=setTimeout(resolve,3000);timer.unref();
+  child.once('exit',()=>{clearTimeout(timer);resolve();});
+ });
+ if(child.exitCode===null)child.kill('SIGTERM');
+}
 async function waitReady(base,child){
  const deadline=Date.now()+7000;
  while(Date.now()<deadline){
@@ -39,7 +49,7 @@ async function waitReady(base,child){
 test('collector en HTTP local: auth, CORS, deltas visibles, redacción, persistencia y completitud regional',async t=>{
  const data=fs.mkdtempSync(path.join(os.tmpdir(),'harmonia-e2e-'));
  const port=await freePort(),base='http://127.0.0.1:'+port;
- const child=spawn(process.execPath,[serverPath],{env:{...process.env,HARMONIA_TOKEN:token,HARMONIA_PORT:String(port),HARMONIA_DATA:data},stdio:['ignore','pipe','pipe']});
+ let child=spawn(process.execPath,[serverPath],{env:{...process.env,HARMONIA_TOKEN:token,HARMONIA_PORT:String(port),HARMONIA_DATA:data},stdio:['ignore','pipe','pipe']});
  let stdout='',stderr='';child.stdout.on('data',d=>stdout+=d);child.stderr.on('data',d=>stderr+=d);
  t.after(async()=>{
   try{await request(base,'/shutdown',{method:'POST',headers:{'x-harmonia-token':token}});}catch{}
@@ -66,6 +76,23 @@ test('collector en HTTP local: auth, CORS, deltas visibles, redacción, persiste
  const visibleResponse=await request(base,'/events',{method:'POST',headers:{'content-type':'application/json','x-harmonia-token':token},body:JSON.stringify(visibleEvent)});
  assert.equal(visibleResponse.status,201);
  let visibleBody=await visibleResponse.json();assert.equal(visibleBody.storedType,'conversation.visible.delta');
+
+ // The same eventId must remain idempotent after a real collector process restart.
+ const originalDay=new Date().toISOString().slice(0,10);
+ const originalFile=path.join(data,'originals',originalDay,session1+'.jsonl');
+ const linesBeforeRestart=fs.readFileSync(originalFile,'utf8').trim().split(/\\r?\\n/);
+ assert.equal(linesBeforeRestart.filter(line=>JSON.parse(line).eventId===visibleEvent.eventId).length,1);
+ await stopCollector(base,child);
+ child=spawn(process.execPath,[serverPath],{env:{...process.env,HARMONIA_TOKEN:token,HARMONIA_PORT:String(port),HARMONIA_DATA:data},stdio:['ignore','pipe','pipe']});
+ child.stdout.on('data',d=>stdout+=d);child.stderr.on('data',d=>stderr+=d);
+ await waitReady(base,child);
+ const replayResponse=await request(base,'/events',{method:'POST',headers:{'content-type':'application/json','x-harmonia-token':token},body:JSON.stringify(visibleEvent)});
+ assert.equal(replayResponse.status,200,'el replay tras reinicio debe responder como duplicado');
+ const replayBody=await replayResponse.json();
+ assert.equal(replayBody.duplicate,true);
+ const linesAfterRestart=fs.readFileSync(originalFile,'utf8').trim().split(/\\r?\\n/);
+ assert.equal(linesAfterRestart.filter(line=>JSON.parse(line).eventId===visibleEvent.eventId).length,1);
+
  const appendedText=initialText+' y continuación';
  const appendEvent={...visibleEvent,eventId:uuid(),payload:{...visiblePayload,operation:'append',delta:' y continuación',text:'',contentSha256:crypto.createHash('sha256').update(appendedText).digest('hex'),streaming:true,chunkIndex:0,chunkCount:1}};
  const appendResponse=await request(base,'/events',{method:'POST',headers:{'content-type':'application/json','x-harmonia-token':token},body:JSON.stringify(appendEvent)});

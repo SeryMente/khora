@@ -1,14 +1,19 @@
 $ErrorActionPreference = 'Stop'
-$desktop = 'C:\Users\fila4\Desktop'
 $root = $PSScriptRoot
-$data = 'C:\Users\fila4\AppData\Local\Harmonia\surface-index-v0.3.0\data'
+$logsDir = Join-Path $root 'logs'
+New-Item -ItemType Directory -Path $logsDir -Force | Out-Null
+$log = Join-Path $logsDir 'FINALIZAR-PAQUETE.log'
+Start-Transcript -LiteralPath $log -Force | Out-Null
+$identity = [Security.Principal.WindowsIdentity]::GetCurrent()
+$sid = $identity.User.Value
+$windowsProfile = Get-CimInstance -ClassName Win32_UserProfile | Where-Object { $_.SID -eq $sid -and -not $_.Special } | Select-Object -First 1
+if (-not $windowsProfile -or [string]::IsNullOrWhiteSpace($windowsProfile.LocalPath)) { throw 'No se pudo resolver el perfil Windows activo por SID.' }
+$data = Join-Path $windowsProfile.LocalPath 'AppData\Local\Harmonia\surface-index-v0.4.0\data'
 $node = Join-Path $root 'runtime\node.exe'
 $authFile = Join-Path $root 'extension\local-auth.js'
-$log = Join-Path $desktop 'log.txt'
-Start-Transcript -LiteralPath $log -Force | Out-Null
 try {
     $required = @(
-      'CONSULTAR-HARMONIA.cmd','INICIAR-HARMONIA.cmd','INICIAR-HARMONIA-HEADLESS.ps1','DETENER-HARMONIA-HEADLESS.ps1','FINALIZAR-PAQUETE.ps1','LEEME.txt','coverage-catalog.json','extension\coverage-catalog.json',
+      'CONSULTAR-HARMONIA.cmd','INICIAR-HARMONIA.cmd','INICIAR-HARMONIA-HEADLESS.ps1','DETENER-HARMONIA-HEADLESS.ps1','FINALIZAR-PAQUETE.ps1','PREPARAR-RUNTIME.ps1','LEEME.txt','coverage-catalog.json','extension\coverage-catalog.json',
       'collector\query.ps1','collector\server.js','extension\build-info.json','extension\content.js','extension\dashboard.css','extension\dashboard.html','extension\dashboard.js','extension\dashboard-model.js','extension\manifest.json','extension\popup.css','extension\popup.html','extension\popup.js','extension\region-policy.js','extension\service-worker.js',
       'runtime\node.exe','runtime\NODE-LICENSE.txt','extension\local-auth.js'
     )
@@ -73,7 +78,7 @@ try {
         'CORS_WEB_ORIGIN=REJECTED_403'
     }
     $allowed = @(
-      'CONSULTAR-HARMONIA.cmd','INICIAR-HARMONIA.cmd','INICIAR-HARMONIA-HEADLESS.ps1','DETENER-HARMONIA-HEADLESS.ps1','FINALIZAR-PAQUETE.ps1','LEEME.txt','coverage-catalog.json',
+      'CONSULTAR-HARMONIA.cmd','INICIAR-HARMONIA.cmd','INICIAR-HARMONIA-HEADLESS.ps1','DETENER-HARMONIA-HEADLESS.ps1','FINALIZAR-PAQUETE.ps1','PREPARAR-RUNTIME.ps1','LEEME.txt','coverage-catalog.json',
       'collector\query.ps1','collector\server.js','extension\build-info.json','extension\content.js','extension\coverage-catalog.json','extension\dashboard.css','extension\dashboard.html','extension\dashboard.js','extension\dashboard-model.js','extension\manifest.json','extension\popup.css','extension\popup.html','extension\popup.js','extension\region-policy.js','extension\service-worker.js','runtime\NODE-LICENSE.txt'
     )
     $hashes = [ordered]@{}
@@ -100,9 +105,10 @@ try {
     'CATALOG_FEATURES=' + @($catalog.features).Count
     'CATALOG_SOURCES=' + @($catalog.sources).Count
     'DESTINATION=' + $root
+    'LOGS_ROOT=' + $logsDir
     'DATA_ROOT=' + $data
     'SERVICE_PID=' + (Get-Content -LiteralPath (Join-Path $root 'collector\service.pid') -Raw).Trim()
-    'AUTO_CAPTURE_STATUS=RELOAD_REQUIRED_NOT_VERIFIED'
+    'AUTO_CAPTURE_STATUS=OPERATOR_CHROME_USE_REQUIRED'
     'NATURAL_COVERAGE=AWAITING_POST_RELOAD_SCAN'
 } finally {
     Stop-Transcript | Out-Null

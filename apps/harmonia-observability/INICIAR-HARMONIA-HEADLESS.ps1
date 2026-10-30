@@ -1,19 +1,33 @@
 $ErrorActionPreference = 'Stop'
-$desktop = 'C:\Users\fila4\Desktop'
 $root = $PSScriptRoot
-$data = 'C:\Users\fila4\AppData\Local\Harmonia\surface-index-v0.3.0\data'
+$logsDir = Join-Path $root 'logs'
+New-Item -ItemType Directory -Path $logsDir -Force | Out-Null
+$log = Join-Path $logsDir 'INICIAR-HARMONIA-HEADLESS.log'
+Start-Transcript -LiteralPath $log -Force | Out-Null
+$identity = [Security.Principal.WindowsIdentity]::GetCurrent()
+$sid = $identity.User.Value
+$windowsProfile = Get-CimInstance -ClassName Win32_UserProfile | Where-Object { $_.SID -eq $sid -and -not $_.Special } | Select-Object -First 1
+if (-not $windowsProfile -or [string]::IsNullOrWhiteSpace($windowsProfile.LocalPath)) { throw 'No se pudo resolver el perfil Windows activo por SID.' }
+$profileRoot = $windowsProfile.LocalPath
+$data = Join-Path $profileRoot 'AppData\Local\Harmonia\surface-index-v0.4.0\data'
 $node = Join-Path $root 'runtime\node.exe'
 $collectorDir = Join-Path $root 'collector'
 $authFile = Join-Path $root 'extension\local-auth.js'
-$stdout = Join-Path $collectorDir 'service.stdout.log'
-$stderr = Join-Path $collectorDir 'service.stderr.log'
+$stdout = Join-Path $logsDir 'collector.stdout.log'
+$stderr = Join-Path $logsDir 'collector.stderr.log'
 $pidFile = Join-Path $collectorDir 'service.pid'
-$log = Join-Path $desktop 'log.txt'
-Start-Transcript -LiteralPath $log -Force | Out-Null
 try {
     if (-not (Test-Path -LiteralPath (Join-Path $root 'extension\manifest.json'))) { throw 'No existe el manifiesto de Harmonia.' }
     if (-not (Test-Path -LiteralPath (Join-Path $root 'coverage-catalog.json'))) { throw 'No existe coverage-catalog.json.' }
-    if (-not (Test-Path -LiteralPath $node -PathType Leaf)) { throw 'No existe runtime\node.exe.' }
+    if (-not (Test-Path -LiteralPath $node -PathType Leaf)) {
+        $runtimeBootstrap = Join-Path $root 'PREPARAR-RUNTIME.ps1'
+        if (-not (Test-Path -LiteralPath $runtimeBootstrap -PathType Leaf)) { throw 'No existe PREPARAR-RUNTIME.ps1.' }
+        & $runtimeBootstrap
+    }
+    if (-not (Test-Path -LiteralPath $node -PathType Leaf)) { throw 'El bootstrap no dejó runtime\node.exe disponible.' }
+    $nodeVersion = (& $node --version).Trim()
+    $nodeArchitecture = (& $node -p 'process.arch').Trim()
+    if ($nodeVersion -ne 'v22.23.4' -or $nodeArchitecture -ne 'x64') { throw "Runtime incompatible: $nodeVersion / $nodeArchitecture." }
     $catalog = Get-Content -LiteralPath (Join-Path $root 'coverage-catalog.json') -Raw | ConvertFrom-Json
     if ($catalog.schema -ne 'harmonia.coverage-catalog.v1' -or @($catalog.features).Count -lt 20) { throw 'El catálogo de cobertura no es válido o está incompleto.' }
     if (-not (Test-Path -LiteralPath $authFile -PathType Leaf)) {
@@ -28,6 +42,7 @@ try {
     if (-not $match.Success) { throw 'La credencial local tiene un formato inesperado; no se inicia el colector.' }
     $token = $match.Groups[1].Value
     if (-not (Test-Path -LiteralPath $data)) { New-Item -ItemType Directory -Path $data -Force | Out-Null }
+    if (-not [IO.Path]::IsPathRooted($data)) { throw 'La raíz de datos debe ser absoluta.' }
     $listeners = @(Get-NetTCPConnection -LocalPort 47321 -State Listen -ErrorAction SilentlyContinue)
     if ($listeners.Count -gt 0) {
         try {

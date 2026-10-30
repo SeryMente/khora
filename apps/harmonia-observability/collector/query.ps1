@@ -1,7 +1,14 @@
-param([string]$Session,[string]$Type,[string]$Since,[int]$Limit=100,[switch]$Coverage)
+param([string]$Session,[string]$Type,[string]$Since,[int]$Limit=100,[string]$DataRoot,[switch]$Coverage)
 $ErrorActionPreference='Stop'
-$root = $env:HARMONIA_DATA
-if (-not $root) { $root = 'C:\Users\fila4\AppData\Local\Harmonia\surface-index-v0.3.0\data' }
+$root = $DataRoot
+if (-not $root) { $root = $env:HARMONIA_DATA }
+if (-not $root) {
+  $sid = [Security.Principal.WindowsIdentity]::GetCurrent().User.Value
+  $windowsProfile = Get-CimInstance -ClassName Win32_UserProfile | Where-Object { $_.SID -eq $sid -and -not $_.Special } | Select-Object -First 1
+  if (-not $windowsProfile -or [string]::IsNullOrWhiteSpace($windowsProfile.LocalPath)) { throw 'No se pudo resolver el perfil Windows activo por SID.' }
+  $root = Join-Path $windowsProfile.LocalPath 'AppData\Local\Harmonia\surface-index-v0.4.0\data'
+}
+$root = [IO.Path]::GetFullPath($root)
 $indexPath = Join-Path $root 'index.json'
 if (-not (Test-Path -LiteralPath $indexPath)) { throw "Índice no disponible: $indexPath" }
 $idx = Get-Content -LiteralPath $indexPath -Raw | ConvertFrom-Json

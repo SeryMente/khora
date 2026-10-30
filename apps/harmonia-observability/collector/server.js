@@ -7,7 +7,9 @@ const HOST='127.0.0.1',PORT=Number(process.env.HARMONIA_PORT||47321),MAX=1024**3
 const TOKEN=String(process.env.HARMONIA_TOKEN||'');
 if(!TOKEN)throw new Error('HARMONIA_TOKEN is required; load the local auth config first.');
 if(!Number.isInteger(PORT)||PORT<1||PORT>65535)throw new Error('HARMONIA_PORT must be a valid TCP port.');
-const root=process.env.HARMONIA_DATA||'C:\\Users\\fila4\\AppData\\Local\\Harmonia\\surface-index-v0.3.0\\data';
+const configuredRoot=String(process.env.HARMONIA_DATA||'').trim();
+if(!configuredRoot)throw new Error('HARMONIA_DATA is required; refusing to use a user-specific fallback path.');
+const root=path.resolve(configuredRoot);
 fs.mkdirSync(root,{recursive:true});
 const idxPath=path.join(root,'index.json'),surfacesDir=path.join(root,'surfaces'),originalsDir=path.join(root,'originals');
 fs.mkdirSync(surfacesDir,{recursive:true});fs.mkdirSync(originalsDir,{recursive:true});

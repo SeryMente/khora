@@ -4,3 +4,11 @@
 /collector/service.stderr.log
 /runtime/
 *.jsonl
+runtime/node.exe
+runtime/NODE-LICENSE.txt
+runtime/node-v*.zip
+extension/local-auth.js
+collector/service.pid
+collector/*.log
+logs/*.log
+index.json
