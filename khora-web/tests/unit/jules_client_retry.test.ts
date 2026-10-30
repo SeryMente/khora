@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { createSession, listSources, JulesApiError } from "../../lib/jules/client";
+import { approvePlan, createSession, listSources, JulesApiError, sendMessage } from "../../lib/jules/client";
 
 const originalFetch = globalThis.fetch;
 const originalKey = process.env.JULES_API_KEY;
@@ -53,5 +53,24 @@ test("Jules POST 5xx is surfaced as ambiguous without automatic replay", async (
   } finally {
     globalThis.fetch = originalFetch;
     if (originalKey === undefined) delete process.env.JULES_API_KEY; else process.env.JULES_API_KEY = originalKey;
+  }
+});
+test("Jules POST create, message and approval never retry 429 responses", async () => {
+  const calls = [
+    () => createSession({ prompt: "synthetic", sourceContext: { source: "sources/github/owner/repo", githubRepoContext: { startingBranch: "main" } }, requirePlanApproval: true }),
+    () => sendMessage("fixture-session", "synthetic"),
+    () => approvePlan("fixture-session"),
+  ];
+  for (const call of calls) {
+    let attempts = 0;
+    process.env.JULES_API_KEY = "synthetic-unit-test-key";
+    globalThis.fetch = (async () => { attempts++; return new Response("synthetic rate limit", { status: 429 }); }) as typeof fetch;
+    try {
+      await assert.rejects(call(), (error: unknown) => error instanceof JulesApiError && error.message === "JULES_RATE_LIMITED" && error.status === 429);
+      assert.equal(attempts, 1);
+    } finally {
+      globalThis.fetch = originalFetch;
+      if (originalKey === undefined) delete process.env.JULES_API_KEY; else process.env.JULES_API_KEY = originalKey;
+    }
   }
 });
