@@ -3,7 +3,7 @@
 ## 1. Identidad y control
 - Frente único: **Observabilidad MCP**; identidad canónica `OBSERVABILIDAD-MCP`.
 - Repositorio: `SeryMente/khora`; OCP: `docs/frentes/observabilidad-mcp/OBJETO-CANONICO.md`.
-- OCP: **v0.3.4**. Control: generación 3, titular operativo conservado del control anterior.
+- OCP: **v0.3.5**. Control: generación 3, titular operativo conservado del control anterior.
 - Las tareas provisionales «General» y «Jules» pertenecen a este mismo frente; no crean OCP, frente ni control paralelos.
 - `MCP-OBS-DICTADO` permanece como identidad histórica del objeto agregado anterior, no como otro frente activo.
 
@@ -277,10 +277,10 @@ El puente usa un Bearer manual de Khora limitado exclusivamente a jules:read y j
 ### 21.5 Validación y aceptación
 
 - PC-14: Node --check bridge.mjs PASS; parser PowerShell 5.1 PASS; ocho casos de contrato del adaptador local PASS; comprobación DPAPI + ACL mediante clave ficticia PASS, archivo de prueba eliminado; prueba de bearer falso contra Production rechazada como MCP_AUTH_REJECTED sin reflejar el valor.
-- npm run typecheck PASS; pruebas focalizadas MCP/Jules/token 34/34 PASS; suite unitaria 568/568 PASS (82 archivos, excepto methodology_contract_sync.test.ts, que requiere gh autenticado en el equipo).
+- npm run typecheck PASS; pruebas focalizadas MCP/Jules/token 35/35 PASS; suite unitaria 569/569 PASS (82 archivos, excepto methodology_contract_sync.test.ts, que requiere gh autenticado en el equipo).
 - npm ci: 576 paquetes instalados; auditoría reportó 14 advisories (4 moderate, 9 high, 1 critical); no se aplicaron cambios automáticos de dependencias.
-- Estado de la rama del puente en el checkpoint: feat/jules-rdc-local-bridge-20261030, 6 commits ahead / 0 behind del main 9570247339c99cf194c434d2b726493d8abd69b4.
-- La PR de revisión aún no se ha creado en este punto del registro; el cambio del propietario que elimina aprobación manual debe revisarse antes de incorporarse a main conforme al doble control.
+- Estado de la rama del puente en el checkpoint previo a la ficha final: feat/jules-rdc-local-bridge-20261030, 11 commits ahead / 0 behind del main 9570247339c99cf194c434d2b726493d8abd69b4. Head verificado antes del último registro: 9ce965a8169a8cd932b176f4ecd92fb7bf9e17d8.
+- PR #347 abierta para revisión: https://github.com/SeryMente/khora/pull/347; head al abrirla 9ce965a8169a8cd932b176f4ecd92fb7bf9e17d8. Tras la apertura, se añadieron los recibos finales OCP/control; el head actual debe leerse directamente de la PR. Sigue sin merge. El cambio del propietario que elimina aprobación manual y el lanzador DPAPI requieren revisión personal del operador antes de incorporarse a main, conforme al doble control.
 - No verificado / pendiente de aceptación real: no se ha provisionado el Bearer definitivo, no se ha conectado una sesión autenticada del puente a Production, no se ha ejecutado sources/sessions con la cuenta real y no se ha creado una tarea Jules real desde RDC. Las pruebas actuales demuestran contrato y transporte negativo, no la aceptación end-to-end con credencial real.
 
 ### 21.6 Primer uso por el operador
