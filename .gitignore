@@ -71,3 +71,6 @@ secrets/env-vault.enc.json.pre-restore-*
 
 .vercel
 .env*
+
+# Runtime local provisional de puentes RDC; secretos DPAPI nunca se versionan
+.khora-local/
