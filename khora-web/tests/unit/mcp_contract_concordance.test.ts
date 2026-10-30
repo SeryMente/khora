@@ -203,3 +203,29 @@ test("real route: malformed controls and numeric bounds cannot reach business se
     assert.equal(fixture.calls.length, 0);
   } finally { await client.close(); await fixture.close(); }
 });
+
+test("Custodia tools require their specialized scopes; volcados:read is not a substitute", async () => {
+  const cases = [
+    ["khora_custodia_catalogo", "custodia:metadata:read"],
+    ["khora_custodia_revisiones", "custodia:metadata:read"],
+    ["khora_custodia_verificar_integridad", "custodia:integrity:verify"],
+  ] as const;
+  for (const [name, specializedScope] of cases) {
+    const deniedFixture = routeFixture({ scopes: ["volcados:read", "norm:turn"] });
+    const deniedClient = await connect(deniedFixture);
+    try {
+      const denied = await deniedClient.callTool({ name, arguments: input(name) });
+      assert.equal(denied.isError, true, name);
+      assert.match(JSON.stringify(denied), /insufficient_scope/);
+      assert.equal(deniedFixture.calls.length, 0, name);
+    } finally { await deniedClient.close(); await deniedFixture.close(); }
+
+    const allowedFixture = routeFixture({ scopes: [specializedScope, "norm:turn"] });
+    const allowedClient = await connect(allowedFixture);
+    try {
+      const allowed = await allowedClient.callTool({ name, arguments: input(name) });
+      assert.notEqual(allowed.isError, true, name);
+      assert.equal(allowedFixture.calls.length, 1, name);
+    } finally { await allowedClient.close(); await allowedFixture.close(); }
+  }
+});
