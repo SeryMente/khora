@@ -1,73 +1,14 @@
-﻿# Python
-__pycache__/
-*.py[cod]
-*.egg-info/
-build/
-dist/
-
-# Entornos y caches
-.venv/
-.pytest_cache/
-.ruff_cache/
-# Sistema
-.DS_Store
-# basura recurrente del agente
-from __future__ import annotations.py
-khora.db
-khora-web/public/downloads/*.zip
-.jules_activity_log.jsonl
-INSTRUCCIONES_JULES.md
-FETCH_HEAD
-
-node_modules/
-
-# Artefactos JS compilados (usamos tsx sobre .ts)
-khora-web/lib/utils/*.js
-khora-web/tests/*.js
-.neon
-.vercel
-.env*
-.env.local
-
-# Playwright artifacts
-test-results/
-khora-web/test-results/
-khora-web/playwright/.auth/
-
+/extension/local-auth.js
+/collector/service.pid
+/collector/service.stdout.log
+/collector/service.stderr.log
+/runtime/
+*.jsonl
+runtime/node.exe
+runtime/NODE-LICENSE.txt
+runtime/node-v*.zip
+extension/local-auth.js
+collector/service.pid
+collector/*.log
 logs/*.log
-
-# --- anti-recaida: andamiaje de Jules ---
-patch*.diff
-patch_*.py
-*.py.orig
-desc.txt
-pr_body.txt
-report*.txt
-report_pr.md
-cli_output.txt
-dependency_decision.txt
-docker_status.txt
-run_local_mock.py
-test_neo4j_local.py
-test_empty_dependencies.py
-update_header.py
-
-# --- anti-fragmentacion: monolitos khora-v*.ps1 ---
-scripts/khora/khora-v*.ps1
-
-*.bak_*
-.vercel
-.env*
-scripts/khora/config.json
-scripts/khora/logs/
-scripts/khora/versions/
-
-# Backups locales de la bóveda canónica (nunca versionar)
-secrets/env-vault.enc.json.bak-*
-secrets/env-vault.enc.json.pre-restore-*
-
-.vercel
-.env*
-
-.vercel
-.env*
+index.json
