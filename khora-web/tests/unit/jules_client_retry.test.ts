@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { approvePlan, createSession, listSources, JulesApiError, sendMessage } from "../../lib/jules/client";
+import { approvePlan, createSession, listActivities, listSources, JulesApiError, sanitizeJulesRouteForLog, sendMessage } from "../../lib/jules/client";
 
 const originalFetch = globalThis.fetch;
 const originalKey = process.env.JULES_API_KEY;
@@ -74,6 +74,25 @@ test("Jules POST create, message and approval never retry 429 responses", async 
     }
   }
 });
+test("legacy Jules activity reader preserves createTime cursor semantics", async () => {
+  let requestedUrl = "";
+  process.env.JULES_API_KEY = "synthetic-unit-test-key";
+  globalThis.fetch = (async (input: string | URL | Request) => {
+    requestedUrl = String(input);
+    return Response.json({ activities: [] });
+  }) as typeof fetch;
+  try {
+    const result = await listActivities("sessions/fixture-session", "2026-10-30T10:00:00Z");
+    assert.equal(result.activities.length, 0);
+    const parsed = new URL(requestedUrl);
+    assert.equal(parsed.pathname, "/v1alpha/sessions/fixture-session/activities");
+    assert.equal(parsed.searchParams.get("createTime"), "2026-10-30T10:00:00Z");
+  } finally {
+    globalThis.fetch = originalFetch;
+    if (originalKey === undefined) delete process.env.JULES_API_KEY; else process.env.JULES_API_KEY = originalKey;
+  }
+});
+
 test("Jules observability redacts complete source paths and session identifiers", () => {
   const source = sanitizeJulesRouteForLog("https://jules.googleapis.com/v1alpha/sources/github/private-org/secret-repo");
   assert.equal(source, "/v1alpha/sources/:id");
