@@ -4,7 +4,7 @@
 ## 1. Control e identidad
 
 - Nombre normalizado: **Harmonia**, extensión compañera de **Khora**; «Armonía» y «Cora» de los dictados se conservan literalmente en originales. No renombrar producto o repositorio por transcripción.
-- Identificador del frente: harmonia. Versión del objeto **0.32**; sello **HARMONIA-v0.32**; corte de estado **2026-10-30**. §37 registra la transferencia autorizada y verificada a generación 9, paquete local v0.4.1, 27/27 hashes y 13/13 pruebas Node aprobadas, colector/watcher activos y tarea de arranque automático verificada. La aceptación natural en Chrome continúa pendiente. Regla permanente §36.1-36.2: la única aceptación local es el uso real del operador; el asistente ejecuta todo lo demás.
+- Identificador del frente: harmonia. Versión del objeto **0.33**; sello **HARMONIA-v0.33**; corte de estado **2026-10-30**. §37 registra la transferencia autorizada y verificada a generación 9, paquete local v0.4.1, 27/27 hashes y 13/13 pruebas Node aprobadas, colector/watcher activos y tarea de arranque automático verificada. La aceptación natural en Chrome continúa pendiente. Regla permanente §36.1-36.2: la única aceptación local es el uso real del operador; el asistente ejecuta todo lo demás.
 - Repositorio propietario: `SeryMente/khora`, rama `main`; objeto canónico en `docs/frentes/harmonia/OBJETO-CANONICO.md`. El blob de la versión anterior v0.4 fue `9a186ea789ea5aacab8dd06cf9f6edf364b89531`. Primera publicación del estado completo: commit `892adad897d6bd36c797ec2343ff7f4893b853bf`; lectura de vuelta en `main` confirmada y blob verificado `03ec5d127e0913dfe1f61e8588ba53b8abaa8e5f`. El recibo se refiere al contenido integral v0.5. Corte v0.6: commit inicial `3cb7901c2223cd41773185b93f17133e459e7a69`, blob `d1f524c383cc71c13f89e8d3aa3886ac3533fcdb`. Corte v0.7: commit inicial `55c2e8ba053265c219b2d941665c5cb3730107de`, blob `bbd08e2da15be17486e7515fd11eda7df57fca2b`; lectura de vuelta y corrección del catálogo documentadas. Nunca anticipar un SHA.
 - Fuente de código vigente: `apps/harmonia-observability/` en `main`, con la extensión de observabilidad y captura automática en evolución (rama `main`, versión de código en revisión E2E), `coverage-catalog.json` y scripts/validador. No inferir que el código fuente, el paquete local y el runtime ejecutado están sincronizados sin prueba de huellas. El paquete materializado en el Escritorio se reconstruyó desde esos archivos y contiene solo el runtime portable y una credencial local excluidos del repositorio; su manifiesto local de huellas se regeneró tras las validaciones.
 - Frente permanente por creación expresa del operador. El paquete local usado anteriormente está en `C:\\Users\\fila4\\Desktop\\Harmonia-Observabilidad-v0.2.0`; su sincronización con las últimas versiones de `main` **NO VERIFICADA**. El runtime debe considerarse desincronizado hasta comparar huellas y reiniciar con el colector actualizado. La versión 0.3.0 del código fuente no está aceptada funcionalmente en Chrome; no hereda pruebas de v0.1.0 ni de validaciones anteriores.
@@ -1335,3 +1335,72 @@ El paquete local referido como Harmonia v0.5.0, el destino actual y su estructur
 - El paquete está verificado contra su manifiesto local; no se afirma equivalencia completa de cada archivo con main. La candidata no está fusionada.
 - Siguiente hito: recarga inicial de Harmonia por el operador y uso natural. Tras la primera actividad, consulta técnica del almacén y diagnóstico a cargo del asistente. No pedir al operador ejecutar scripts, revisar logs ni realizar pruebas técnicas.
 - Persistencia de este checkpoint: control de responsabilidad actualizado y releído en `main`; este OCP se actualiza en este commit. README y prompt de asistente quedan como espejos por alinear en el siguiente pase breve. Sin cambios en código remoto, main de la aplicación ni Metodología.
+
+
+## 38. Entorno persistente, materialización por sesión Windows y observabilidad local-first · 2026-10-30
+
+### 38.1 Instrucción original y autoridad
+
+- Original literal preservado en `originales/HARMONIA-EP-LOCAL-FIRST-SES-20261030-Q8M4R2K9.jsonl`, registro `HARMONIA-EP-LOCAL-FIRST-SES-20261030-Q8M4R2K9`; blob releído: `e957955974ee5ed01a551ac2643c730e64941eec`.
+- La instrucción distingue el Entorno Persistente (EP), que origina la sesión principal, de la sesión Windows, que puede cambiar entre dispositivos. La carpeta local de trabajo pertenece al Escritorio del perfil Windows activo de la sesión EP actual; no debe suponerse que el Escritorio o sus archivos sobreviven al cambio de dispositivo.
+- Esta instrucción autoriza configurar el flujo operativo descrito en este frente. No autoriza sobrescribir una versión local más nueva con una revisión anterior de `main`, ni publicar datos en un repositorio distinto del privado `SeryMente/khora`.
+
+### 38.2 Contrato de materialización por sesión RDC
+
+En cada sesión Windows/RDC que corresponda al EP activo:
+
+1. Consultar el inventario RDC y seleccionar el UUID exacto del dispositivo autorizado; verificar identidad, SID, perfil Windows y Escritorio. No elegir por el nombre visible del dispositivo.
+2. Resolver el Escritorio desde el perfil Windows del SID activo, no desde el perfil del proceso RDC ni desde una ruta de otro dispositivo.
+3. Comprobar `Desktop\Harmonia`. Si no existe, materializarlo desde la última versión aprobada y verificable disponible del repositorio, preservando la estructura de proyecto única. La raíz cargable en Chrome es `Desktop\Harmonia\extension`, que contiene `manifest.json`; la carpeta de trabajo `Harmonia` contiene también colector, runtime, scripts y datos.
+4. Si la carpeta ya existe, comparar versión, revisión de origen y huellas antes de sustituir archivos. Nunca degradar la instalación ni borrar datos locales. Preparar en staging y aplicar sustitución solo después de validar manifiesto y huellas.
+5. La disponibilidad de RDC no implica que exista una credencial GitHub en Windows. Materialización remota y autorización del repositorio son dependencias distintas.
+
+### 38.3 Persistencia local prioritaria
+
+- La extensión entrega los eventos primero al colector local autenticado en `127.0.0.1:47321`. La confirmación HTTP del colector debe preceder a cualquier intento de sincronización remota.
+- Destino local canónico solicitado: `Desktop\Harmonia\observability\data\`, separado de `extension\`, scripts y credenciales. Ahí deben persistir el índice, superficies y originales JSONL. La escritura local es inmediata, durable, atómica/idempotente y no depende de GitHub ni de conectividad externa.
+- Una interrupción de GitHub o de red no debe detener la observación ni descartar eventos ya aceptados localmente. Debe dejar un outbox/cursor local pendiente, con IDs de evento y hashes, para reintentar.
+- `extension/local-auth.js`, credenciales, datos de autenticación y secretos nunca se suben al repositorio ni se incorporan a manifiestos o huellas compartibles.
+- **Estado observado en este ciclo:** el colector de PC-14 todavía declara como raíz efectiva `C:\Users\PC 13\AppData\Local\Harmonia\surface-index-v0.4.0\data`, no el destino solicitado dentro de Desktop. La migración íntegra al nuevo destino y su lectura de vuelta **SIGUEN PENDIENTES**; no se han movido ni borrado datos en este ciclo. El listener local 47321 existe, pero la comprobación sin cabecera de autenticación respondió HTTP 401, que no constituye una prueba de salud autenticada.
+
+### 38.4 Sincronización local → repositorio
+
+- La secuencia obligatoria es: evento observado → persistencia local confirmada → encolado local → sincronización asíncrona con el repositorio privado → lectura de vuelta y cotejo de IDs/huellas/cursor. La captura local nunca espera a GitHub.
+- La sincronización remota debe ser por lotes, idempotente, reintentable y append-only; nunca sobrescribir evidencia ya aceptada ni crear commits por cada mutación de DOM. Registrar revisión de origen, intervalo temporal, número de eventos, hashes, resultado y cursor. Si no hay autorización/red, conservar la cola local.
+- La extensión v0.4.1 actual no implementa escritura de observabilidad hacia GitHub: `build-info.json` declara `remoteGitHubWritesImplemented=false`. **LOCAL → REPO: NO IMPLEMENTADO** en este checkpoint.
+- El repositorio `SeryMente/khora` fue verificado como privado. La futura sincronización debe limitarse a ese destino y respetar la exclusión de secretos; la lectura de credenciales locales no se registra ni se comparte.
+
+### 38.5 Sincronización de código main → carpeta local → Chrome
+
+- Objetivo: cuando una versión aprobada se publique en `main`, un sincronizador autorizado descarga sus archivos a staging en el dispositivo Windows activo, verifica manifiesto, versión, revisión y SHA-256, y promueve la nueva carpeta `extension\` solo si es posterior o compatible con la instalada. Después el watcher local detecta el cambio y solicita a Chrome una recarga de la extensión.
+- La recarga de la extensión sigue ocurriendo internamente mediante `chrome.runtime.reload()`. La promesa operativa es **sin clic manual del operador**, no ausencia de reinicio del contexto MV3. El reinicio puede producir una breve interrupción; el worker debe restaurar observadores de pestañas existentes y reanudar desde el último estado persistido sin perder eventos confirmados por el colector.
+- **Watcher local → Chrome:** implementado en la candidata local v0.4.1. El colector observa `extension\` mediante `fs.watch`; el service worker consulta `/dev-version` cada 30 segundos y, ante una revisión nueva, invoca `chrome.runtime.reload()`. Esto cubre archivos ya modificados en Desktop; no obtiene por sí mismo cambios de GitHub.
+- **Main → Desktop:** NO IMPLEMENTADO. El `syncRepository()` de v0.4.1 solo consulta `build-info.json` y `coverage-catalog.json`; no descarga ni reemplaza archivos JavaScript. El PC-14 no tiene `git.exe` ni `gh.exe` disponibles en PATH, ni una sesión GitHub CLI autenticada que pueda utilizar el sincronizador.
+- **No degradación observada:** el `manifest.json` actual de `apps/harmonia-observability/extension` en `main` declara v0.3.0; la carpeta local declara v0.4.1 y sourceRevision `fbbe347fca92272b1d00e3724ea8398b22e28b12`. La PR #333 está cerrada, en borrador y sin fusionar (`merged=false`), con cabeza `996e39ead4225cde2bd8c76f020ac65c46f53407`. Por ello, **no copiar main sobre la extensión local**: actualmente supondría un downgrade.
+- Para habilitar el sincronizador completo falta incorporar y aprobar la versión vigente en `main`, y disponer de una vía autenticada de lectura de ese repositorio privado en el Windows activo. No se insertará un PAT ni una credencial GitHub dentro de la extensión.
+
+### 38.6 Estado del contrato
+
+| Componente | Estado |
+|---|---|
+| Separación EP / sesión Windows | Definida y autorizada |
+| Carpeta única `Desktop\Harmonia` en PC-14 | Existe y verificada |
+| Raíz cargable `Desktop\Harmonia\extension` | Existe; el operador informa que ya cargó la extensión |
+| Materialización automática/manual por RDC cuando falta la carpeta | Procedimiento definido; no se probó una segunda máquina en este ciclo |
+| Captura primero al colector local | Implementada en v0.4.1 |
+| Datos dentro de `Desktop\Harmonia\observability\data` | Pendiente; hoy están en AppData |
+| Persistencia local sin dependencia de red | Implementada en colector; debe verificarse tras migración de ruta |
+| Sincronización local → repo | No implementada |
+| Sincronización main → Desktop | No implementada |
+| Watcher Desktop → recarga automática Chrome | Código implementado en v0.4.1; aceptación natural pendiente |
+| E2E de captura y continuidad tras recarga | Abierto; requiere observación natural del operador y análisis posterior del asistente |
+
+### 38.7 Siguiente secuencia mínima
+
+1. Migrar íntegramente el almacén actual desde AppData a `Desktop\Harmonia\observability\data`, deteniendo el colector de forma controlada, copiando, comparando conteos/bytes/huellas, cambiando la configuración y reiniciando; conservar la copia origen hasta lectura de vuelta satisfactoria.
+2. Añadir al paquete un sincronizador main → Desktop con autenticación de repositorio privada, staging, verificación anti-downgrade y promoción atómica. La autorización local de GitHub debe almacenarse fuera de la extensión, usando el almacén seguro de Windows.
+3. Implementar el outbox local → repo por lotes, con cursores, hashes, reintentos y confirmaciones; primero persistir siempre local.
+4. Publicar y fusionar una versión canónica posterior en `main` solo después de reconciliar la rama candidata y validar CI. Después probar la cadena main → Desktop → watcher → recarga automática, sin exigir clic manual.
+5. El operador solo realiza uso natural de Chrome; el asistente ejecuta ingeniería, migración, sincronización, pruebas automatizadas, diagnóstico y lectura de evidencias. No declarar E2E aceptada por headless ni por fixtures.
+
+**Límite de esta actualización:** queda canonizado el contrato y se preservó el mensaje literal. No se afirma que la migración de almacenamiento ni los dos sentidos de sincronización ya estén ejecutados. No se modificó el código de la extensión, la rama principal de la aplicación ni la Metodología en este ciclo.
