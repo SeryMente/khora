@@ -106,13 +106,13 @@ La publicación de código queda sujeta a pruebas y a los pasos de integración 
 El frente solo se considera aceptado cuando:
 1. El código de `main` coincide con el SHA de la implementación aprobada.
 2. Migración y privilegios ACL se verifican en la base productiva; `KHORA_READONLY_DATABASE_URL` conecta como rol mínimo esperado.
-3. Subject OAuth, fuentes Jules y ramas reales se identifican sin adivinar, y los grants aprobados se insertan y leen de vuelta.
+3. El sujeto OAuth del propietario se verifica contra MCP_ALLOWED_EMAIL y las fuentes/ramas se consultan a Jules sin adivinarlas; solo para sujetos adicionales se insertan y leen de vuelta grants exactos aprobados.
 4. OAuth metadata, scopes, `tools/list` y handlers concuerdan en Production.
 5. Suite automatizada y tests de contrato pasan; CI incluye evidencia de ejecución real.
 6. La cuenta ChatGPT/espacio de trabajo permite conexión MCP personalizada con escritura; la aplicación se registra por OAuth y tools/list descubre las siete herramientas Jules.
 7. Un cliente MCP compatible ejecuta lectura y escritura en la cuenta Jules configurada y verifica los límites/denegaciones.
 8. Se documenta el cliente efectivamente usado: ChatGPT web nativo, o alternativa local/API claramente diferenciada.
-8. Se verifica saneamiento de datos y se conserva el residual T22.
+9. Se verifica saneamiento de datos y se conserva el residual T22.
 
 Estado actual: **IMPLEMENTACIÓN Y BUILD DE PREVIEW VERIFICADOS; CAMBIO DE ACCESO DEL PROPIETARIO INCORPORADO A LA RAMA; ACEPTACIÓN CHATGPT/JULES END-TO-END PENDIENTE**. El build de Preview no sustituye la conexión OAuth real desde ChatGPT ni una llamada real a Jules.
 
