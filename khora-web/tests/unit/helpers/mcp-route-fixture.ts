@@ -21,7 +21,7 @@ const code = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTa
 // Execute the whole real route and SDK HTTP transport. Only external boundaries
 // (Next response class, identity, storage and business services) are substituted.
 // This is not proof of cryptography, OAuth, database effects or deployment.
-export function routeFixture(options: { scopes?: string[]; revoked?: boolean; denyTurn?: boolean; production?: boolean; configured?: boolean; failService?: boolean; healthError?: boolean; partial?: boolean; auditFail?: boolean } = {}) {
+export function routeFixture(options: { scopes?: string[]; revoked?: boolean; denyTurn?: boolean; production?: boolean; configured?: boolean; failService?: boolean; healthError?: boolean; partial?: boolean; auditFail?: boolean; readAllowed?: boolean; writeAllowed?: boolean; sourceBranchExists?: boolean; sessionContextValid?: boolean } = {}) {
   const schemas = new Map<contracts.McpToolName, { description: string; shape: z.ZodRawShape }>();
   const calls: Array<{ name: string; args: unknown }> = [];
   const servers: McpServer[] = [];
@@ -51,9 +51,11 @@ export function routeFixture(options: { scopes?: string[]; revoked?: boolean; de
     return {
       ...result,
       name: "sessions/fixture-session",
-      state: julesGetSessionCalls === 3 ? "AWAITING_PLAN_APPROVAL" : "AWAITING_USER_FEEDBACK",
+      state: julesGetSessionCalls === 4 ? "AWAITING_PLAN_APPROVAL" : "AWAITING_USER_FEEDBACK",
+      ...(options.sessionContextValid === false ? {} : { sourceContext: { source: "sources/github/owner/repo", githubRepoContext: { startingBranch: "main" } } }),
     };
   };
+  const sourceFixture = { name: "sources/github/owner/repo", id: "github/owner/repo", githubRepo: { owner: "owner", repo: "repo", isPrivate: true, defaultBranch: { displayName: "main" }, branches: [{ displayName: "main" }, { displayName: "restricted" }] } };
   const mockNormalizeSourceName = (value: string) => {
     if (!/^sources\/[A-Za-z0-9._-]+(?:\/[A-Za-z0-9._-]+)*$/.test(value) || value.split("/").some(part => part === "." || part === "..")) {
       throw new Error("JULES_SOURCE_ID_INVALID");
@@ -63,6 +65,10 @@ export function routeFixture(options: { scopes?: string[]; revoked?: boolean; de
   const modules: Record<string, unknown> = {
     "node:crypto": crypto,
     "@/lib/server/mcp-diagnostics": diagnostics,
+    "@/lib/server/jules-access": {
+      listJulesSourceGrants: async (_subject: string, mode: "read" | "write") => { const allowed = mode === "read" ? options.readAllowed !== false : options.writeAllowed !== false; return allowed ? [{ source: "sources/github/owner/repo", branch: "main" }] : []; },
+      requireJulesSourceGrant: async (_subject: string, source: string, branch: string, mode: "read" | "write") => { const allowed = mode === "read" ? options.readAllowed !== false : options.writeAllowed !== false; if (!allowed || source !== "sources/github/owner/repo" || branch !== "main") throw new diagnostics.McpDiagnosticError("JULES_ACCESS_DENIED"); },
+    },
     "@/lib/server/mcp-diagnostic-boundary": boundary,
     "next/server": { NextRequest: Request, NextResponse: Response },
     "zod": { z },
@@ -79,9 +85,14 @@ export function routeFixture(options: { scopes?: string[]; revoked?: boolean; de
     "@/lib/server/mcp-manual-token": { MANUAL_MCP_TOKEN_PREFIX: "fixture-manual-", authenticateManualMcpToken: async () => null },
     "@/lib/server/service-observability": { registrarEventoServicio: async () => { if (options.auditFail) throw Error("synthetic audit failure"); } },
     "@/lib/jules/client": {
-      listSources: business("JulesListSources"),
-      listSessions: business("JulesListSessions"),
+      listSources: async (pageSize?: number, pageToken?: string) => { await business("JulesListSources")({ pageSize, pageToken }); return { sources: [sourceFixture], nextPageToken: "fixture-next" }; },
+      listSessions: async (pageSize?: number, pageToken?: string) => { await business("JulesListSessions")({ pageSize, pageToken }); return { sessions: [
+        { name: "sessions/fixture-session", sourceContext: { source: "sources/github/owner/repo", githubRepoContext: { startingBranch: "main" } } },
+        { name: "sessions/restricted-session", sourceContext: { source: "sources/github/owner/repo", githubRepoContext: { startingBranch: "restricted" } } },
+        { name: "sessions/other-source", sourceContext: { source: "sources/github/other/repo", githubRepoContext: { startingBranch: "main" } } },
+      ], nextPageToken: "fixture-sessions-next" }; },
       getSession: mockJulesGetSession,
+      getSource: async (_name: string) => { await business("JulesGetSource")(_name); return options.sourceBranchExists === false ? { ...sourceFixture, githubRepo: { ...sourceFixture.githubRepo, defaultBranch: undefined, branches: [] } } : sourceFixture; },
       listActivitiesPage: business("JulesListActivitiesPage"),
       createSession: business("JulesCreateSession"),
       sendMessage: business("JulesSendMessage"),

@@ -238,3 +238,53 @@ test("real route: malformed controls and numeric bounds cannot reach business se
     assert.equal(fixture.calls.length, 0);
   } finally { await client.close(); await fixture.close(); }
 });
+test("Jules source catalogue exposes only exact ACL branches and retains provider pagination", async () => {
+  const fixture = routeFixture(); const client = await connect(fixture);
+  try {
+    const result = await client.callTool({ name: "jules_list_sources", arguments: input("jules_list_sources") });
+    assert.equal(result.isError, false);
+    const payload = JSON.parse((result.content?.[0] as any).text);
+    assert.deepEqual(payload.result.sources[0].githubRepo.branches.map((x: any) => x.displayName), ["main"]);
+    assert.equal(payload.result.nextPageToken, "fixture-next");
+  } finally { await client.close(); await fixture.close(); }
+});
+test("Jules sessions are filtered by subject/source/branch ACL and unauthorized detail is denied", async () => {
+  const fixture = routeFixture(); const client = await connect(fixture);
+  try {
+    const result = await client.callTool({ name: "jules_list_sessions", arguments: input("jules_list_sessions") });
+    const payload = JSON.parse((result.content?.[0] as any).text);
+    assert.deepEqual(payload.result.sessions.map((x: any) => x.name), ["sessions/fixture-session"]);
+    assert.equal(payload.result.nextPageToken, "fixture-sessions-next");
+  } finally { await client.close(); await fixture.close(); }
+  const denied = routeFixture({ readAllowed: false }); const deniedClient = await connect(denied);
+  try { const result = await deniedClient.callTool({ name: "jules_get_session", arguments: input("jules_get_session") }); assert.equal(result.isError, true); assert.match(JSON.stringify(result), /JULES_ACCESS_DENIED/); }
+  finally { await deniedClient.close(); await denied.close(); }
+});
+test("Jules create validates exact write grant and live source branch before creating", async () => {
+  const allowed = routeFixture(); const client = await connect(allowed);
+  try {
+    const result = await client.callTool({ name: "jules_create_session", arguments: input("jules_create_session") });
+    assert.equal(result.isError, false);
+    const create = allowed.calls.find(x => x.name === "JulesCreateSession"); assert.ok(create);
+    assert.equal((create!.args as any).requirePlanApproval, true);
+    assert.equal((create!.args as any).automationMode, "AUTO_CREATE_PR");
+    assert.deepEqual((create!.args as any).sourceContext, { source: "sources/github/owner/repo", githubRepoContext: { startingBranch: "main" } });
+  } finally { await client.close(); await allowed.close(); }
+  for (const options of [{ writeAllowed: false }, { sourceBranchExists: false }]) {
+    const denied = routeFixture(options); const deniedClient = await connect(denied);
+    try { const result = await deniedClient.callTool({ name: "jules_create_session", arguments: input("jules_create_session") }); assert.equal(result.isError, true); assert.equal(denied.calls.some(x => x.name === "JulesCreateSession"), false); }
+    finally { await deniedClient.close(); await denied.close(); }
+  }
+});
+test("Jules ACL without an active grant does not call provider listings or session creation", async () => {
+  const fixture = routeFixture({ readAllowed: false, writeAllowed: false }); const client = await connect(fixture);
+  try {
+    for (const name of ["jules_list_sources", "jules_list_sessions"] as const) {
+      const result = await client.callTool({ name, arguments: input(name) }); assert.equal(result.isError, false);
+      const payload = JSON.parse((result.content?.[0] as any).text);
+      assert.equal(name === "jules_list_sources" ? payload.result.sources.length : payload.result.sessions.length, 0);
+    }
+    const create = await client.callTool({ name: "jules_create_session", arguments: input("jules_create_session") }); assert.equal(create.isError, true);
+    assert.equal(fixture.calls.some(x => ["JulesListSources", "JulesListSessions", "JulesGetSource", "JulesCreateSession"].includes(x.name)), false);
+  } finally { await client.close(); await fixture.close(); }
+});
