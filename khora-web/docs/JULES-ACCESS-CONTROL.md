@@ -69,3 +69,6 @@ WHERE id = <grant-id> AND revoked_at IS NULL;
 ```
 
 No copies el contenido de secretos a la tabla ni uses comodines de source/rama. Las concesiones se administran con la conexión propietaria; el runtime MCP solo necesita SELECT y nunca tiene una herramienta de escritura de ACL.
+## Observabilidad y redacción
+
+El cliente sanea la ruta antes de emitir eventos: en los endpoints `sources/**` se reemplaza el recurso fuente completo por `/sources/:id`, evitando filtrar owner/repository; en `sessions/{id}` se reemplaza el ID por `/sessions/:id`, conservando el sufijo funcional como `/activities`. La ruta inválida se registra como `unknown`. No registrar nombres de repositorios privados, IDs de sesión, payloads ni claves.

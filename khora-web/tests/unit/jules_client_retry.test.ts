@@ -74,3 +74,10 @@ test("Jules POST create, message and approval never retry 429 responses", async 
     }
   }
 });
+test("Jules observability redacts complete source paths and session identifiers", () => {
+  const source = sanitizeJulesRouteForLog("https://jules.googleapis.com/v1alpha/sources/github/private-org/secret-repo");
+  assert.equal(source, "/v1alpha/sources/:id");
+  const activities = sanitizeJulesRouteForLog("https://jules.googleapis.com/v1alpha/sessions/secret-session-id/activities");
+  assert.equal(activities, "/v1alpha/sessions/:id/activities");
+  assert.equal(sanitizeJulesRouteForLog("not a url"), "unknown");
+});

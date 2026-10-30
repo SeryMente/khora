@@ -117,15 +117,23 @@ async function delay(ms: number) {
 const MAX_RETRIES = 3;
 const BASE_DELAY_MS = 500;
 
+/** Redact complete repository/source paths and session IDs before observability. */
+export function sanitizeJulesRouteForLog(url: string): string {
+  try {
+    return new URL(url).pathname
+      .replace(/\/sources\/[^/?#]+/g, "/sources/:id")
+      .replace(/\/sessions\/[^/?#]+/g, "/sessions/:id")
+      .slice(0, 240);
+  } catch {
+    return "unknown";
+  }
+}
 async function fetchWithBackoff(url: string, options: RequestInit = {}): Promise<Response> {
   const method = (options.method || "GET").toUpperCase();
   const retrySafe = method === "GET" || method === "HEAD";
   let attempt = 0;
   const startedAt = Date.now();
-  let pathname = "unknown";
-  try {
-    pathname = new URL(url).pathname.replace(/\/(sessions|sources)\/[^/]+/g, "/$1/:id").slice(0, 240);
-  } catch { /* safe placeholder */ }
+  const pathname = sanitizeJulesRouteForLog(url);
   while (true) {
     let response: Response;
     try {
