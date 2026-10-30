@@ -1,4 +1,5 @@
 import { toolKhoraListarAudios, toolKhoraLeerAudio } from "@/lib/server/mcp-audios";
+import { toolKhoraCustodiaCatalogo, toolKhoraCustodiaRevisiones, toolKhoraCustodiaVerificarIntegridad } from "@/lib/server/mcp-custodia";
 import { registrarEventoServicio } from "@/lib/server/service-observability";
 import { randomUUID } from "node:crypto";
 import { diagnosticFailure, diagnose } from "@/lib/server/mcp-diagnostics";
@@ -179,12 +180,12 @@ async function handleMcpRequest(req: NextRequest) {
   if (
     !actor ||
     !Number.isSafeInteger(tokenGeneration) ||
-    (!scopes.includes("volcados:read") && !scopes.includes("runtime:read") && !scopes.includes("norm:turn"))
+    (!scopes.includes("volcados:read") && !scopes.includes("runtime:read") && !scopes.includes("norm:turn") && !scopes.includes("custodia:metadata:read") && !scopes.includes("custodia:integrity:verify"))
   ) {
     return makeUnauthorizedResponse(config);
   }
 
-  const requireScope = (scope: "volcados:read" | "runtime:read" | "norm:turn") =>
+  const requireScope = (scope: "volcados:read" | "runtime:read" | "norm:turn" | "custodia:metadata:read" | "custodia:integrity:verify") =>
     scopes.includes(scope)
       ? null
       : scopeFailure(config, scope, correlation_id);
@@ -337,6 +338,34 @@ async function handleMcpRequest(req: NextRequest) {
   gatedTool("khora_leer_audio", "Obtiene bytes auténticos verificados de un original o MP3 en bloques Base64. No crea audio ni altera datos. Continuar con siguiente_offset y sha256_esperado fijado al sha256 recibido hasta null. Una captura abierta devuelve un prefijo identificado, no una grabación completa.", {
     id:z.string().describe("Sesión, UUID de volcado o folio"),formato:z.enum(["original","mp3"]).optional(),parte:z.number().int().positive().optional(),offset_bytes:z.number().int().nonnegative().optional(),limite_bytes:z.number().int().min(1).max(262144).optional(),sha256_esperado:z.string().regex(/^[a-f0-9]{64}$/i).optional(),
   },async(args:any)=>{const denied=requireScope("volcados:read");if(denied)return denied;return {content:[{type:"text",text:JSON.stringify(await toolKhoraLeerAudio(actor,args))}]};});
+
+  // Custodia: lectura de inventario, revisiones e integridad remota. No expone contenido ni escribe datos.
+  gatedTool("khora_custodia_catalogo", "Catálogo completo y paginado de sesiones propias, incluidas sesiones selladas, incompletas y sesiones sin checkpoint/partes. Solo metadatos; sin títulos, previews, texto ni direcciones Blob.", {
+    limite: z.number().int().min(1).max(100).optional(),
+    cursor: z.string().max(2048).optional(),
+  }, async (args: any) => {
+    const denied = requireScope("custodia:metadata:read");
+    if (denied) return denied;
+    return { content: [{ type: "text", text: JSON.stringify(await toolKhoraCustodiaCatalogo(actor, args), null, 2) }] };
+  });
+  gatedTool("khora_custodia_revisiones", "Revisiones paginadas de una sesión propia. Devuelve fechas, conteos declarados/almacenados/verificados y estado de sincronización; nunca snapshots, títulos, previews ni texto.", {
+    session_id: z.string().min(1).max(200),
+    limite: z.number().int().min(1).max(100).optional(),
+    cursor: z.string().max(2048).optional(),
+  }, async (args: any) => {
+    const denied = requireScope("custodia:metadata:read");
+    if (denied) return denied;
+    return { content: [{ type: "text", text: JSON.stringify(await toolKhoraCustodiaRevisiones(actor, args), null, 2) }] };
+  });
+  gatedTool("khora_custodia_verificar_integridad", "Lee y verifica objetos Blob reales de una sesión propia contra bytes y SHA-256 registrados. Devuelve solo estados saneados; nunca bytes, Base64 ni URLs.", {
+    session_id: z.string().min(1).max(200),
+    limite: z.number().int().min(1).max(50).optional(),
+    despues_de_parte: z.number().int().nonnegative().optional(),
+  }, async (args: any) => {
+    const denied = requireScope("custodia:integrity:verify");
+    if (denied) return denied;
+    return { content: [{ type: "text", text: JSON.stringify(await toolKhoraCustodiaVerificarIntegridad(actor, args), null, 2) }] };
+  });
 
   // Herramienta 6: khora_ui_review
   gatedTool(
