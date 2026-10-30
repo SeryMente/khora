@@ -34,7 +34,16 @@ Antes de ejecutar ese recorrido desde otra plataforma, resolver la identidad nor
 | `khora_eventos_desde` / lectura incremental | `cursor?` entero ≥0, `limite?` entero 1–200, `session_id?` | `cursor_entrada`, `cursor_siguiente`, `limite`, `retornados`, `hay_mas`, `eventos`; continuar con el cursor devuelto |
 | `khora_eventos_recientes` / diagnóstico retrospectivo | `segundos?`, `limite?`, `session_id?`, `component?`, `severity?`, `outcome?`, `fase?`, `scope?`, `category?` | `ventana_segundos`, `limite`, `retornados`, `eventos`; ventana 1–86400 s (300 predeterminado), 1–200 eventos (50 predeterminado) |
 
-**Permisos efectivos:** las primeras seis herramientas requieren `volcados:read` **y** `norm:turn`; las cuatro de observabilidad, `runtime:read` **y** `norm:turn`. El permiso de negocio anunciado en `securitySchemes` se conserva; `norm:turn` es necesario para abrir/completar el ciclo, no una concesión implícita.
+
+| `jules_list_sources` / fuentes conectadas a Jules | `page_size?` (1–100), `page_token?` | `jules:read` + `norm:turn`; devuelve fuentes y `nextPageToken` |
+| `jules_list_sessions` / sesiones Jules | `page_size?` (1–100), `page_token?` | `jules:read` + `norm:turn`; devuelve sesiones y token de paginación |
+| `jules_get_session` / estado de sesión | `session_id` | `jules:read` + `norm:turn`; devuelve estado, URL, outputs y tiempos reportados por Jules |
+| `jules_list_activities` / mensajes y retroalimentación | `session_id`, `page_size?` (1–100), `page_token?` | `jules:read` + `norm:turn`; mensajes del agente/usuario, plan, progreso, terminación y fallos |
+| `jules_create_session` / delegar desarrollo | `source`, `starting_branch`, `prompt`, `title?` | `jules:write` + `norm:turn`; fuerza `requirePlanApproval=true` y `AUTO_CREATE_PR` |
+| `jules_send_message` / responder a Jules | `session_id`, `prompt` | `jules:write` + `norm:turn`; el POST aceptado no prueba que Jules ya haya respondido |
+| `jules_approve_plan` / aprobar plan | `session_id` | `jules:write` + `norm:turn`; solo se acepta con estado `AWAITING_PLAN_APPROVAL` |
+
+**Permisos efectivos:** las ocho herramientas de contenido requieren `volcados:read` **y** `norm:turn`; las cuatro de observabilidad, `runtime:read` **y** `norm:turn`; las siete herramientas Jules requieren el scope `jules:read` o `jules:write` que corresponda **y** `norm:turn`. El permiso de negocio anunciado en `securitySchemes` se conserva; `norm:turn` es necesario para abrir/completar el ciclo, no una concesión implícita.
 
 | Herramienta / propósito | Entradas (sin los tres controles sustantivos) | Permiso / salida y efecto |
 |---|---|---|
@@ -98,6 +107,7 @@ OAuth usa PKCE; los metadatos anuncian authorization_code, refresh_token y offli
 | `MCP_JWT_SECRET` | Firma/verificación; jamás sustituir con claves de ejemplo |
 | `MCP_ALLOWED_EMAIL` | Identidad autorizada |
 | `KHORA_NORM_GITHUB_TOKEN` | Alternativa administrativa al secreto de lectura guardado en Seguridad → Bóveda; Contents: read, sin fallback amplio |
+| `JULES_API_KEY` | Clave de Jules, solo en el entorno del servidor; nunca en código, cliente, prompts o logs |
 | `KHORA_READONLY_DATABASE_URL` | Acceso de lectura; obligatorio en producción para esta ruta |
 
 `getMcpConfig()` devuelve null si falta configuración obligatoria o la URL no es válida; la ruta responde 503. Los valores de fallback se limitan al modo de prueba; no activar ese modo como arreglo productivo. La configuración no demuestra por sí sola que el rol SQL tenga privilegios correctos: comprobarlos en el entorno autorizado.
@@ -223,3 +233,16 @@ La misma sección permite introducir credenciales por uso, sin crear un gestor p
 ## Custodia de audio
 
 Contrato y mantenimiento: [Custodia continua de dictados](./CUSTODIA-DICTADOS.md). Las dos herramientas de audio usan la conexión autenticada existente y `volcados:read`; no publican direcciones Blob, no incluyen credenciales y no omiten el ciclo normativo. No conceder automáticamente permisos nuevos. El contenido Base64 es privado: consumirlo como archivo, nunca copiarlo al registro de eventos. Un MP3 pendiente o fallido no es un audio disponible. Las capturas históricas sin propietario comprobable no se adjudican por inferencia.
+
+
+## Candidato · MCP Jules · 2026-10-25
+
+**Estado de esta rama:** `feat/mcp-jules-mvp-20261025-a71c9e2`. Las siete herramientas nuevas y sus cambios de autorización están en una rama candidata; no se afirma merge, despliegue, credencial real validada ni conexión desde ChatGPT.
+
+**Contrato:** `jules_list_sources`, `jules_list_sessions`, `jules_get_session`, `jules_list_activities`, `jules_create_session`, `jules_send_message` y `jules_approve_plan`. El servidor existente se amplía; no se crea un segundo endpoint MCP. `jules:read` protege cuatro herramientas de lectura; `jules:write` protege tres herramientas de escritura. OAuth, metadatos, tokens manuales y la interfaz de Control MCP reconocen los scopes. Los tokens manuales nuevos conservan por defecto únicamente los scopes preexistentes hasta que el operador seleccione explícitamente los de Jules.
+
+**Guardas:** todas las herramientas sustantivas conservan el ciclo normativo existente. Se fuerza `requirePlanApproval=true` al crear una sesión. La aprobación solo se acepta si Jules informa `AWAITING_PLAN_APPROVAL`; los mensajes de seguimiento solo se envían en `AWAITING_USER_FEEDBACK`, `IN_PROGRESS` o `PAUSED`. La fuente se valida como recurso Jules, los identificadores de sesión se normalizan antes de construir rutas y los errores externos se devuelven saneados sin el cuerpo de respuesta del proveedor.
+
+**Automatización:** el contrato permite consultar actividades paginadas y responder en la misma sesión. El sondeo persistente cuando ChatGPT no invoca herramientas no forma parte del delta mínimo; exige trabajador externo, checkpoint durable, deduplicación, backoff, límites y mecanismo de apagado. No se declara webhook de Jules porque no está documentado en la referencia REST consultada.
+
+**Evidencia actual:** tests y checks estáticos añadidos en la rama, pero todavía sin salida de ejecución en este ciclo. Estado de tests: **PENDIENTE DE EJECUCIÓN**. También están pendientes el test autenticado contra Jules con `JULES_API_KEY`, la revisión de CI, el despliegue y la conexión real desde ChatGPT. No convertir la escritura de código o la apertura de un PR en aceptación productiva.

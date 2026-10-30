@@ -38,11 +38,27 @@ export function routeFixture(options: { scopes?: string[]; revoked?: boolean; de
   }
   const issuer = "https://khora-contract-fixture.invalid";
   const config = { issuer, canonicalUrl: issuer + "/api/mcp", jwtSecret: "synthetic-key-not-used-for-signing" };
-  const scopes = options.scopes ?? ["volcados:read", "runtime:read", "norm:turn"];
+  const scopes = options.scopes ?? ["volcados:read", "runtime:read", "norm:turn", "jules:read", "jules:write"];
   const business = (name: string) => async (args?: unknown) => {
     calls.push({ name, args });
     if (options.failService) throw new Error("synthetic-secret-private-payload");
     return options.partial ? { completo: false, resultados: [], cobertura: { examinados: 2, ilegibles: 1 } } : { fixture: name };
+  };
+  let julesGetSessionCalls = 0;
+  const mockJulesGetSession = async (args?: unknown) => {
+    const result = await business("JulesGetSession")(args) as Record<string, unknown>;
+    julesGetSessionCalls++;
+    return {
+      ...result,
+      name: "sessions/fixture-session",
+      state: julesGetSessionCalls === 3 ? "AWAITING_PLAN_APPROVAL" : "AWAITING_USER_FEEDBACK",
+    };
+  };
+  const mockNormalizeSourceName = (value: string) => {
+    if (!/^sources\/[A-Za-z0-9._-]+(?:\/[A-Za-z0-9._-]+)*$/.test(value) || value.split("/").some(part => part === "." || part === "..")) {
+      throw new Error("JULES_SOURCE_ID_INVALID");
+    }
+    return value;
   };
   const modules: Record<string, unknown> = {
     "node:crypto": crypto,
@@ -62,6 +78,16 @@ export function routeFixture(options: { scopes?: string[]; revoked?: boolean; de
     "@/lib/server/mcp-db": { isProductionEnv: () => options.production === true },
     "@/lib/server/mcp-manual-token": { MANUAL_MCP_TOKEN_PREFIX: "fixture-manual-", authenticateManualMcpToken: async () => null },
     "@/lib/server/service-observability": { registrarEventoServicio: async () => { if (options.auditFail) throw Error("synthetic audit failure"); } },
+    "@/lib/jules/client": {
+      listSources: business("JulesListSources"),
+      listSessions: business("JulesListSessions"),
+      getSession: mockJulesGetSession,
+      listActivitiesPage: business("JulesListActivitiesPage"),
+      createSession: business("JulesCreateSession"),
+      sendMessage: business("JulesSendMessage"),
+      approvePlan: business("JulesApprovePlan"),
+      normalizeSourceName: mockNormalizeSourceName,
+    },
     "@/lib/server/mcp-audios": { toolKhoraListarAudios: (_actor:string,args:unknown)=>business("ListarAudios")(args), toolKhoraLeerAudio: (_actor:string,args:unknown)=>business("LeerAudio")(args) },
     "@/lib/server/mcp-tools": Object.fromEntries(["Resumen", "ListarVolcados", "LeerVolcado", "BuscarVolcados", "VersionesVolcado"].map(n => ["toolKhora" + n, business(n)])),
     "@/lib/server/mcp-ui-review": { toolKhoraUiReview: business("UiReview") },

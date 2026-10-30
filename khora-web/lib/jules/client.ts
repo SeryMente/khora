@@ -67,6 +67,25 @@ export interface ListActivitiesResponse {
   nextPageToken?: string;
 }
 
+/** Validate a concrete Jules source resource name before sending it to the API. */
+export function normalizeSourceName(value: string): string {
+  const input = value.trim();
+  const match = input.match(/^sources\/([A-Za-z0-9._-]+(?:\/[A-Za-z0-9._-]+)*)$/);
+  if (!match || match[1].split("/").some(part => part === "." || part === "..")) {
+    throw new Error("JULES_SOURCE_ID_INVALID");
+  }
+  return `sources/${match[1]}`;
+}
+
+/** Accept a Jules session ID or sessions/{id}, never an arbitrary URL/path. */
+function normalizeSessionId(id: string): string {
+  const value = id.trim().replace(/^sessions\//, "");
+  if (!value || value.includes("/") || value.includes("?") || value.includes("#") || value.includes("\\") || value === "." || value === "..") {
+    throw new Error("JULES_SESSION_ID_INVALID");
+  }
+  return encodeURIComponent(value);
+}
+
 export class JulesApiError extends Error {
   public status: number;
   public data: any;
@@ -201,11 +220,10 @@ function getHeaders(): HeadersInit {
 }
 
 export async function listSessions(pageSize: number = 30, pageToken?: string): Promise<ListSessionsResponse> {
+  const boundedPageSize = Math.min(100, Math.max(1, Math.trunc(pageSize)));
   const url = new URL(`${JULES_API_BASE_URL}/sessions`);
-  url.searchParams.append("pageSize", pageSize.toString());
-  if (pageToken) {
-    url.searchParams.append("pageToken", pageToken);
-  }
+  url.searchParams.set("pageSize", String(boundedPageSize));
+  if (pageToken) url.searchParams.set("pageToken", pageToken);
   const response = await fetchWithBackoff(url.toString(), {
     method: "GET",
     headers: getHeaders(),
@@ -213,8 +231,12 @@ export async function listSessions(pageSize: number = 30, pageToken?: string): P
   return response.json();
 }
 
-export async function listSources(): Promise<ListSourcesResponse> {
-  const response = await fetchWithBackoff(`${JULES_API_BASE_URL}/sources`, {
+export async function listSources(pageSize: number = 50, pageToken?: string): Promise<ListSourcesResponse> {
+  const boundedPageSize = Math.min(100, Math.max(1, Math.trunc(pageSize)));
+  const url = new URL(`${JULES_API_BASE_URL}/sources`);
+  url.searchParams.set("pageSize", String(boundedPageSize));
+  if (pageToken) url.searchParams.set("pageToken", pageToken);
+  const response = await fetchWithBackoff(url.toString(), {
     method: "GET",
     headers: getHeaders(),
   });
@@ -222,8 +244,10 @@ export async function listSources(): Promise<ListSourcesResponse> {
 }
 
 export async function createSession(params: {
+  prompt: string;
   sourceContext: SourceContext;
-  automationMode: AutomationMode;
+  title?: string;
+  automationMode?: AutomationMode;
   requirePlanApproval: boolean;
 }): Promise<Session> {
   const response = await fetchWithBackoff(`${JULES_API_BASE_URL}/sessions`, {
@@ -235,7 +259,8 @@ export async function createSession(params: {
 }
 
 export async function getSession(id: string): Promise<Session> {
-  const response = await fetchWithBackoff(`${JULES_API_BASE_URL}/sessions/${id}`, {
+  const sessionId = normalizeSessionId(id);
+  const response = await fetchWithBackoff(`${JULES_API_BASE_URL}/sessions/${sessionId}`, {
     method: "GET",
     headers: getHeaders(),
   });
@@ -243,7 +268,8 @@ export async function getSession(id: string): Promise<Session> {
 }
 
 export async function listActivities(id: string, createTimeCursor?: string): Promise<ListActivitiesResponse> {
-  const url = new URL(`${JULES_API_BASE_URL}/sessions/${id}/activities`);
+  const sessionId = normalizeSessionId(id);
+  const url = new URL(`${JULES_API_BASE_URL}/sessions/${sessionId}/activities`);
   if (createTimeCursor) {
     url.searchParams.append("createTime", createTimeCursor);
   }
@@ -254,8 +280,28 @@ export async function listActivities(id: string, createTimeCursor?: string): Pro
   return response.json();
 }
 
+
+// Official Jules API contract: pageSize (1..100) and pageToken.
+export async function listActivitiesPage(
+  id: string,
+  pageSize: number = 50,
+  pageToken?: string,
+): Promise<ListActivitiesResponse> {
+  const sessionId = normalizeSessionId(id);
+  const boundedPageSize = Math.min(100, Math.max(1, Math.trunc(pageSize)));
+  const url = new URL(`${JULES_API_BASE_URL}/sessions/${sessionId}/activities`);
+  url.searchParams.set("pageSize", String(boundedPageSize));
+  if (pageToken) url.searchParams.set("pageToken", pageToken);
+  const response = await fetchWithBackoff(url.toString(), {
+    method: "GET",
+    headers: getHeaders(),
+  });
+  return response.json();
+}
+
 export async function sendMessage(id: string, prompt: string): Promise<void> {
-  await fetchWithBackoff(`${JULES_API_BASE_URL}/sessions/${id}:sendMessage`, {
+  const sessionId = normalizeSessionId(id);
+  await fetchWithBackoff(`${JULES_API_BASE_URL}/sessions/${sessionId}:sendMessage`, {
     method: "POST",
     headers: getHeaders(),
     body: JSON.stringify({ prompt }),
@@ -263,7 +309,8 @@ export async function sendMessage(id: string, prompt: string): Promise<void> {
 }
 
 export async function approvePlan(id: string): Promise<void> {
-  await fetchWithBackoff(`${JULES_API_BASE_URL}/sessions/${id}:approvePlan`, {
+  const sessionId = normalizeSessionId(id);
+  await fetchWithBackoff(`${JULES_API_BASE_URL}/sessions/${sessionId}:approvePlan`, {
     method: "POST",
     headers: getHeaders(),
     body: JSON.stringify({}),
