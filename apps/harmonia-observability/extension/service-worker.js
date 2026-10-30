@@ -214,7 +214,7 @@ async function ensureSession(tab){
  sessionInitializers[key]=(async()=>{
   const session={id:crypto.randomUUID(),startedAt:new Date().toISOString(),lastAt:null,events:0,url:safePageUrl(tab.url),regionKey};
   sessions[key]=session;await saveSessions();await setTabIndicator(tab.id,'observing');
-  await postEvent(tab.id,session,'capture.started',{url:session.url,version:'0.4.0',mode:'automatic-interface-observation',regionKey,privacy:privacyContract()});
+  await postEvent(tab.id,session,'capture.started',{url:session.url,version:'0.4.1',mode:'automatic-interface-observation',regionKey,privacy:privacyContract()});
   return session;
  })();
  try{return await sessionInitializers[key];}finally{delete sessionInitializers[key];}
@@ -348,6 +348,7 @@ async function injectTab(tab,force=false){
  if(!autoEnabled||!tab?.id||!valid(tab.url))return;
  const structureObserver=force?true:await canObserveTab(tab);
  try{
+  try{await chrome.tabs.sendMessage(tab.id,{kind:'harmonia:stop'});}catch{}
   await chrome.scripting.executeScript({target:{tabId:tab.id},world:'MAIN',func:installConsoleBridgeMainWorld});
   await chrome.scripting.executeScript({target:{tabId:tab.id},files:['region-policy.js','content.js']});
   await chrome.tabs.sendMessage(tab.id,{kind:'harmonia:configure',automatic:true,regionKey:regionFor(tab.url),structureObserver});
@@ -380,7 +381,7 @@ chrome.runtime.onMessage.addListener((message,sender,respond)=>{
    const syncData=await chrome.storage.local.get([STORE.repositorySync]);
    let coverage=null;
    if(collector){try{const response=await fetch(`${COLLECTOR}/coverage`,{headers:headers(),cache:'no-store'});if(response.ok)coverage=await response.json();else throw new Error(`Colector HTTP ${response.status}`);}catch(error){lastError=String(error.message||error);}}
-   return {version:'0.4.0',autoEnabled,active:autoEnabled&&Object.keys(sessions).length>0,activeTabs:Object.keys(sessions).length,
+   return {version:'0.4.1',autoEnabled,active:autoEnabled&&Object.keys(sessions).length>0,activeTabs:Object.keys(sessions).length,
     sessions:Object.entries(sessions).map(([tabId,session])=>({tabId,startedAt:session.startedAt,lastAt:session.lastAt,events:session.events,regionKey:session.regionKey})),
     regionCoverage,regionLeaders,collector,collectorHealth:collectorHealth?{updatedAt:collectorHealth.updatedAt,totalBytes:collectorHealth.totalBytes,uniqueSurfaces:collectorHealth.uniqueSurfaces,sessions:collectorHealth.sessions}:null,lastError,events:eventCount,coverage,areaHealth,indicator,repositorySync:syncData[STORE.repositorySync]||null};
   }
