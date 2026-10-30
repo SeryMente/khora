@@ -3,7 +3,7 @@
 ## 1. Identidad y control
 - Frente único: **Observabilidad MCP**; identidad canónica `OBSERVABILIDAD-MCP`.
 - Repositorio: `SeryMente/khora`; OCP: `docs/frentes/observabilidad-mcp/OBJETO-CANONICO.md`.
-- OCP: **v0.2.5**. Control: generación 3, titular operativo conservado del control anterior.
+- OCP: **v0.3.0**. Control: generación 3, titular operativo conservado del control anterior.
 - Las tareas provisionales «General» y «Jules» pertenecen a este mismo frente; no crean OCP, frente ni control paralelos.
 - `MCP-OBS-DICTADO` permanece como identidad histórica del objeto agregado anterior, no como otro frente activo.
 
@@ -19,7 +19,7 @@ Leer README, DUG vigente, este OCP y `CONTROL-RESPONSABILIDAD.json`. La titulari
 **Interpretación operativa separada:** el repositorio denomina MCP al servidor/protocolo y herramientas de Khora; «MSP» se conserva en la cita original. El frente cubre el acceso de modelos/agentes autorizados a observabilidad y la integración controlada con Jules.
 
 ## 3. Referencia metodológica
-- DUG consultado en `SeryMente/metodologia/main`: **v368 · NX-368m**; HTML canónico SHA `2ba096f565807d7c19df0a9a8cab9e8410110a15`; último commit de `main` verificado `c90a9f84143089c3c02208fd27b3625f3e9f1e08` (`2026-10-30T21:47:15Z`).
+- DUG consultado en `SeryMente/metodologia/main`: **v369 · NX-369m**; HTML canónico SHA `ea1eefd62a092079fa2cfdfa546cb739b63450eb`; último commit de `main` verificado `be621a72f653f5b908c500fd5ec3aedfae3effd4` (`2026-10-30T22:36:34Z`).
 - Metacanon **1.26**; GOW **2.14**.
 - CNP vigente (categoría A): P001, P004, P005, P038 y P043; consideración explícita en cada turno. MCP normativo: DESACTIVADO.
 - Fuente normativa: `SeryMente/metodologia/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html`.
@@ -43,13 +43,20 @@ La implementación de esta intervención expone siete herramientas:
 6. `jules_send_message`
 7. `jules_approve_plan`
 
-Las cuatro primeras son de lectura y requieren `jules:read`; las tres últimas producen efectos en Jules y requieren `jules:write`. Todas las acciones protegidas por el contrato normativo deben aportar `norm:turn`. `tools/list` filtra las herramientas no autorizadas según los scopes concedidos: no basta con esconder controles en la interfaz.
+Las cuatro primeras herramientas requieren jules:read; las tres últimas requieren jules:write. Las siete herramientas Jules usan sus scopes propios y NO requieren norm:turn; el gate norm:turn permanece para las herramientas normativas de Khora. tools/list publica cada acción según el scope autenticado.
 
-El permiso se evalúa por combinación exacta de **subject + source + branch**, mediante `khora_private.jules_source_acl`. La ACL es fail-closed, sin permisos implícitos ni concesión global. `khora_lector` solo recibe `USAGE` de ese esquema y `SELECT` de la tabla; no recibe permisos DML. La concesión de filas ACL exige identidad OAuth confirmada, identificador real de fuente y rama, alcance aprobado y atribución verificable del otorgante.
+Propietario/desarrollador único: el sujeto autenticado debe coincidir, sin distinguir mayúsculas/minúsculas, con MCP_ALLOWED_EMAIL. Este propietario puede consultar y operar todas las fuentes y ramas que la cuenta conectada mediante JULES_API_KEY exponga en Jules, sin filas ACL ni altas manuales por repositorio. El servidor sigue validando contra Jules la existencia de la fuente, la rama y el contexto de cada sesión. Esta excepción no concede permisos adicionales en Google Jules ni en GitHub.
+
+Cualquier otro sujeto permanece sujeto a la combinación exacta subject + source + branch + capability, mediante khora_private.jules_source_acl; ACL fail-closed, sin permisos implícitos ni concesión global. khora_lector solo recibe USAGE del esquema y SELECT de la tabla, no permisos DML. Las filas de otros sujetos requieren identidad, recurso y autorización comprobados.
 
 La creación de sesión exige aprobación de plan y usa `AUTO_CREATE_PR`. La aprobación exige `plan_id` y `plan_sha256`, y relee sesión/actividades antes de actuar. Jules no ofrece una aprobación condicional atómica que elimine completamente la carrera entre comprobación y aprobación; el residual T22 queda documentado. No se oculta ni se presenta como garantía transaccional.
 
-### 4.3 Entorno y uso con RDC
+### 4.3 ChatGPT web — requisito de plataforma
+La conexión MCP personalizada desde ChatGPT web, con compatibilidad completa y acciones de escritura/modificación, requiere un espacio ChatGPT Business o Enterprise/Edu. La documentación oficial consultada el 2026-10-30 confirma estos planes; no se ha comprobado el plan ni los permisos de esta cuenta: https://help.openai.com/en/articles/12584461-connecting-custom-mcp-servers-in-chatgpt.
+
+Khora no puede cambiar ni eludir el plan, RBAC o los permisos de ChatGPT. La disponibilidad de un endpoint MCP y un build Vercel READY no prueban que el conector pueda instalarse ni que ChatGPT ejecute acciones de escritura.
+
+### 4.4 Entorno y uso con RDC
 RDC puede operar en un equipo autorizado y ejecutar un cliente local que hable MCP cuando dicho cliente esté instalado y autenticado. La superficie de Desktop Commander efectivamente conectada en esta sesión expone terminal, archivos y procesos; no expone captura de pantalla ni interacción con la interfaz del navegador. Por ello, esta conexión no permite afirmar que se inspeccionó o configuró visualmente ChatGPT. Esto permite preparar un cliente local como vía operativa separada cuando exista; no modifica permisos de la cuenta, no convierte el cliente local en integración nativa de ChatGPT y no autoriza extraer cookies, tokens de sesión ni secretos del navegador.
 
 La verificación de B debe distinguir:
@@ -57,7 +64,7 @@ La verificación de B debe distinguir:
 - **Cliente MCP local operado mediante RDC:** alternativa legítima para invocar Khora desde un cliente compatible instalado/autorizado en el equipo; no equivale a que ChatGPT Free tenga herramientas MCP nativas.
 - **Handoff manual ChatGPT ↔ cliente local:** viable como asistencia humana, pero no se etiqueta como integración ni ejecución autónoma de ChatGPT.
 
-### 4.4 Exclusiones
+### 4.5 Exclusiones
 No incluye la pantalla/micrófono, transcripción o reparación UX de Dictado; cambios al frente/ACL/datos de Custodia; creación de un segundo almacén autoritativo; exposición de audio, transcripciones, secretos o payloads sensibles; permisos globales; administración general de Jules; cambios de credenciales no aprobados; ni escrituras de base de datos fuera de la migración ACL y sus concesiones expresamente autorizadas.
 
 ## 5. Roles y colaboración
@@ -86,8 +93,9 @@ La publicación de código queda sujeta a pruebas y a los pasos de integración 
 - En el head anterior se verificó que los jobs CI/UI Quality fallaban sin runner (`runner_id=0`, `runner_name` vacío). En el head `fd266c6`, seis jobs de CI/UI Quality/khora-ok terminaron `failure` y el detalle de cada job devuelve `steps=[]`; no hay evidencia de ejecución de pruebas remotas. La suite local sí fue ejecutada y está documentada en §15. No reintentar Actions sin cambio causal de infraestructura.
 
 ## 8. Seguridad y privacidad
-- Scopes de lectura y escritura separados, más `norm:turn` donde aplica.
-- ACL por subject/source/branch; ausencia de grant implica denegación.
+- Scopes de lectura y escritura separados (jules:read / jules:write); las herramientas Jules no requieren norm:turn.
+- Propietario autenticado MCP_ALLOWED_EMAIL: todas las fuentes/ramas disponibles en su cuenta Jules; ningún grant manual por repositorio.
+- ACL por subject/source/branch/capacidad para cualquier sujeto adicional; ausencia de grant implica denegación.
 - Herramientas de escritura no deben anunciarse a clientes sin los scopes necesarios.
 - No registrar ni devolver API keys, OAuth secrets, refresh tokens, cookies o payloads privados.
 - Operaciones Jules POST no idempotentes no se reintentan automáticamente ante resultado ambiguo.
@@ -101,11 +109,12 @@ El frente solo se considera aceptado cuando:
 3. Subject OAuth, fuentes Jules y ramas reales se identifican sin adivinar, y los grants aprobados se insertan y leen de vuelta.
 4. OAuth metadata, scopes, `tools/list` y handlers concuerdan en Production.
 5. Suite automatizada y tests de contrato pasan; CI incluye evidencia de ejecución real.
-6. Un cliente MCP compatible se conecta y prueba lectura/escritura con autorización y denegación explícitas.
-7. Se documentan los resultados y el cliente usado: ChatGPT nativo o cliente local por RDC, sin confundirlos.
+6. La cuenta ChatGPT/espacio de trabajo permite conexión MCP personalizada con escritura; la aplicación se registra por OAuth y tools/list descubre las siete herramientas Jules.
+7. Un cliente MCP compatible ejecuta lectura y escritura en la cuenta Jules configurada y verifica los límites/denegaciones.
+8. Se documenta el cliente efectivamente usado: ChatGPT web nativo, o alternativa local/API claramente diferenciada.
 8. Se verifica saneamiento de datos y se conserva el residual T22.
 
-Estado actual: **IMPLEMENTACIÓN EN RAMA; VALIDACIÓN LOCAL COMPLETA; ACL PRODUCTIVA APLICADA Y VACÍA; ACEPTACIÓN END-TO-END PENDIENTE**. La validación local no sustituye CI remoto, revisión visual del operador ni prueba Jules real.
+Estado actual: **IMPLEMENTACIÓN Y BUILD DE PREVIEW VERIFICADOS; CAMBIO DE ACCESO DEL PROPIETARIO INCORPORADO A LA RAMA; ACEPTACIÓN CHATGPT/JULES END-TO-END PENDIENTE**. El build de Preview no sustituye la conexión OAuth real desde ChatGPT ni una llamada real a Jules.
 
 ## 10. Formato de ciclo
 Registrar titularidad/generación, DUG/Metacanon/GOW, SHA base y resultado, diferencia de rama, migración/read-back, tests, entorno y URL, identidad/scopes, aceptación, límites y siguiente acción. Distinguir propuesto, autorizado, intentado, ejecutado, verificado y aceptado.
@@ -188,3 +197,16 @@ Se verificó la fuente canónica actual de Metodología: DUG v368 · NX-368m, Me
 - **Preview/Production:** Preview existente permanece en el SHA anterior `2452d8c8498eeb0338e4efaed9d13eef70fb7f84`; no refleja el head probado ni el merge de sincronización. No se hizo deploy a Preview ni Production.
 - **Bloqueos restantes:** revisión visual personal del operador; rol efectivo de `KHORA_READONLY_DATABASE_URL`; identidad OAuth Jules, source y branch reales; grant exacto; prueba de cliente MCP autorizado. ACL Production sigue vacía; no se han ejecutado llamadas reales a Jules.
 - **Estado:** base de rama reconciliada, UI local disponible, pruebas locales aprobadas; revisión personal y aceptación end-to-end pendientes. No mergear ni desplegar.
+
+
+## 18. Simplificación del propietario y despliegue de revisión — 2026-10-30
+
+- Autorización del operador: confirmó ser el único usuario/desarrollador y pidió acceso directo a ámbitos de desarrollo Jules sin altas manuales. La pantalla Control MCP fue aprobada visualmente por el operador el 2026-10-30.
+- Política de propietario: MCP_ALLOWED_EMAIL identifica al sujeto autenticado único; este accede a las fuentes y ramas que la cuenta vinculada por JULES_API_KEY devuelve. Se eliminaron para Jules los pasos redundantes de grant individual y norm:turn; continúan obligatorios autenticación, scope de lectura/escritura correcto y comprobaciones de estado, fuente y rama contra el proveedor. Ningún permiso adicional se crea en Google Jules/GitHub. Los sujetos distintos del propietario conservan ACL exacta y fail-closed.
+- Código/branch: PR #345, rama feat/mcp-jules-clean-main-20261030-r1, head 79df82884ff5bc4189da6581be0cd00169920e38; base c6860f1501419239b4eef540150f934a5e20f2a3. La PR sigue abierta y sin merge. Los cambios de aplicación y tests fueron incorporados antes del commit documental del OCP/control.
+- Build Vercel Preview: deployment dpl_BDuQ2DTFZ8SaydkqeHZFm5qKrNN1, URL https://khora-3iswbayev-victorhugotorresmendez-8991s-projects.vercel.app, READY para commit 0282cd42d9fb7a11d087ebed397c91f131676708. El build remoto compiló Next.js 16.4.0, TypeScript y generó 78/78 páginas. Warnings: convención middleware deprecada y APIs de algunas dependencias no compatibles con Edge Runtime. No es Production y no incluye los últimos cambios documentales posteriores.
+- Pruebas: la última suite completa acreditada (568/568) y las 35 pruebas focalizadas son anteriores a esta modificación de propietario. El build remoto verifica compilación y TypeScript, no ejecuta la suite unitaria. La regresión nueva está añadida al test de contrato, pero su ejecución real sigue pendiente.
+- Actions: los workflows CI/UI Quality/khora-ok del commit inicial de esta simplificación terminaron sin pasos de runner acreditados; no interpretar esos resultados como pruebas de código.
+- Base de datos: migración 033_jules_source_acl y permisos mínimos permanecen; la ACL sigue vacía, deliberadamente, porque el propietario no necesita una fila por fuente. No se concedieron accesos a otros sujetos.
+- ChatGPT web: OpenAI documenta la compatibilidad completa MCP personalizada con acciones de escritura para Business y Enterprise/Edu. El plan/permisos efectivos de la cuenta del operador no se han comprobado. Véase §4.3 y la documentación oficial enlazada allí. Sin la habilitación del plan, el servidor por sí solo no permite utilizar acciones de escritura en ChatGPT web.
+- Pendiente terminal: confirmar elegibilidad MCP del espacio/cuenta ChatGPT, instalar y autorizar la app OAuth, descubrir tools/list, comprobar lectura real desde Jules y realizar una acción de escritura controlada. No hacer merge ni desplegar Production antes de superar esas comprobaciones y actualizar la evidencia.
