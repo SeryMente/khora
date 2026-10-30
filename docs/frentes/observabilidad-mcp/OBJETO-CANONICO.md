@@ -111,7 +111,7 @@ Los siguientes archivos son superficies compartidas que pueden ser necesarias pa
 - `khora-web/lib/server/mcp-manual-token.ts`: scopes admitidos por tokens manuales.
 - `khora-web/lib/server/mcp-config.ts` y `khora-web/app/.well-known/oauth-authorization-server/route.ts`: metadatos OAuth/protected-resource.
 - `khora-web/app/api/oauth/token/route.ts` y `khora-web/app/oauth/authorize/page.tsx`: intercambio y consentimiento de scopes.
-- `khora-web/app/sistema/mcp/page.tsx`: interfaz de emisión y selección de scopes.
+- `khora-web/app/sistema/mcp/page.tsx`: interfaz de emisión y selección de scopes.\n- `khora-web/lib/server/audio-mp3.ts`: helper compartido de lectura/descifrado/validación Blob; cualquier cambio afecta también la lectura de audio existente.\n- `khora-web/docs/normative-check.md`: catálogo y contrato documental único del servidor.\n- `khora-web/tests/unit/mcp_tool_auth_metadata.test.ts`, `mcp_contract_concordance.test.ts`, `mcp_diagnostics.test.ts`: pruebas de contrato/transporte compartidas; `mcp_custodia.test.ts` añade cobertura de la capacidad específica General.
 
 El servicio `khora-web/lib/server/mcp-custodia.ts` es específico de las herramientas de metadatos/integridad de Custodia de esta actividad General; no es infraestructura Jules ni cambia los objetos del frente Custodia.
 
@@ -124,8 +124,8 @@ El servicio `khora-web/lib/server/mcp-custodia.ts` es específico de las herrami
 - Control de responsabilidad existente: generación 2, estado `assigned`, alias General arriba indicado; blob leído `93d7ec6fd51dd57c20b8818cfe34ba9bd14e08c3`. No se creó otro control.
 - OCP: esta actualización se realiza en la rama de trabajo, sobre el archivo canónico existente; el blob de origen verificado antes de la escritura fue `a3b1335c7b3b13d5ce3e1cbf4ea50f8c0866cd36`. La copia en `main` permanece sin modificar hasta una integración autorizada.
 - Rama General: `work/obs-mcp-custodia-tools-20261030-01a18dcb`, creada desde `d6c9911615a3633f6ce38c1b8a2459f1e4823df5`. En la consulta de 2026-10-30, `main` había avanzado dos commits posteriores, identificados como cambios exclusivamente de Harmonia; no se incorporaron ni se hizo rebase.
-- Implementación General en curso: servicio de consulta Custodia, tres herramientas MCP y scopes especializados. La implementación y el registro en esta rama no equivalen a merge, despliegue ni aceptación productiva.
-- Pruebas de código: pendientes de ejecución en un entorno reconstruido para esta sesión. No declarar cobertura validada hasta ejecutar comandos y registrar resultados.
+- Implementación General en curso: servicio de consulta Custodia, tres herramientas MCP y scopes especializados; el catálogo usa cursor por fecha de creación estable y la lectura de Blob distingue HTTP 404 de fallos de acceso/transitorios. Pruebas unitarias añadidas para catálogo, revisiones, aislamiento, saneamiento y estados de integridad, todavía no ejecutadas. La implementación y el registro en esta rama no equivalen a merge, despliegue ni aceptación productiva.
+- Pruebas de código: archivos de prueba incorporados, ejecución pendiente en entorno reconstruido para esta sesión. Se intentó crear sandbox efímero con clon de la rama, pero el proveedor devolvió `git clone failed`; no quedó sandbox disponible y no se ejecutó ningún comando de pruebas. No declarar cobertura validada hasta ejecutar comandos y registrar resultados.
 - Protección: no se modificaron objetos, controles, tareas ni datos de Custodia; no se realizaron escrituras/recuperaciones productivas; no se copiaron credenciales productivas.
 - No se fusionó la rama, no se abrió merge y no se desplegó.
 
