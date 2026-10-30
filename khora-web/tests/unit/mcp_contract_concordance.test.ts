@@ -292,7 +292,11 @@ test("Jules create validates exact write grant and live source branch before cre
     const create = allowed.calls.find(x => x.name === "JulesCreateSession"); assert.ok(create);
     assert.equal((create!.args as any).requirePlanApproval, true);
     assert.equal((create!.args as any).automationMode, "AUTO_CREATE_PR");
-    assert.deepEqual((create!.args as any).sourceContext, { source: "sources/github/owner/repo", githubRepoContext: { startingBranch: "main" } });
+    const sourceContext = (create!.args as any).sourceContext;
+    assert.equal(sourceContext.source, "sources/github/owner/repo");
+    assert.equal(sourceContext.githubRepoContext?.startingBranch, "main");
+    assert.deepEqual(Object.keys(sourceContext).sort(), ["githubRepoContext", "source"]);
+    assert.deepEqual(Object.keys(sourceContext.githubRepoContext).sort(), ["startingBranch"]);
   } finally { await client.close(); await allowed.close(); }
   for (const options of [{ writeAllowed: false }, { sourceBranchExists: false }]) {
     const denied = routeFixture(options); const deniedClient = await connect(denied);
