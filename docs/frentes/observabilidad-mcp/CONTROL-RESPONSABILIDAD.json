@@ -116,11 +116,12 @@
         "bridge_contract_cases": "8/8 PASS",
         "dpapi_acl_dummy_roundtrip": "PASS; fake credential removed",
         "invalid_bearer_production_negative": "Expected MCP_AUTH_REJECTED",
-        "typecheck": "PASS",
-        "focused_mcp_jules_token_tests": "34/34 PASS",
-        "unit_tests": "568/568 PASS; excludes methodology_contract_sync.test.ts requiring locally authenticated gh",
+        "typecheck": "PASS on the current implementation branch",
+        "focused_mcp_jules_token_tests": "35/35 PASS",
+        "unit_tests": "569/569 PASS; 82 files; methodology_contract_sync.test.ts excluded because the current local instance lacks authenticated gh",
         "npm_install": "576 packages; audit reports 14 advisories (4 moderate, 9 high, 1 critical), not remediated here",
-        "real_authenticated_jules_calls": "PENDING operator provisioning of the single Khora Bearer"
+        "real_authenticated_jules_calls": "PENDING operator provisioning of the single Khora Bearer",
+        "review_gate": "PR pending; no merge or Production deploy authorized before the operator reviews the owner auto-plan-approval diff"
       }
     }
   }
