@@ -3,7 +3,7 @@
 ## 1. Identidad y control
 - Frente único: **Observabilidad MCP**; identidad canónica `OBSERVABILIDAD-MCP`.
 - Repositorio: `SeryMente/khora`; OCP: `docs/frentes/observabilidad-mcp/OBJETO-CANONICO.md`.
-- OCP: **v0.2.1**. Control: generación 3, titular operativo conservado del control anterior.
+- OCP: **v0.2.2**. Control: generación 3, titular operativo conservado del control anterior.
 - Las tareas provisionales «General» y «Jules» pertenecen a este mismo frente; no crean OCP, frente ni control paralelos.
 - `MCP-OBS-DICTADO` permanece como identidad histórica del objeto agregado anterior, no como otro frente activo.
 
@@ -50,7 +50,7 @@ El permiso se evalúa por combinación exacta de **subject + source + branch**, 
 La creación de sesión exige aprobación de plan y usa `AUTO_CREATE_PR`. La aprobación exige `plan_id` y `plan_sha256`, y relee sesión/actividades antes de actuar. Jules no ofrece una aprobación condicional atómica que elimine completamente la carrera entre comprobación y aprobación; el residual T22 queda documentado. No se oculta ni se presenta como garantía transaccional.
 
 ### 4.3 Entorno y uso con RDC
-RDC puede operar en un equipo autorizado y ejecutar un cliente local que hable MCP, además de abrir/navegar la interfaz web disponible. Esto permite una vía operativa alternativa cuando el cliente ChatGPT no expone una capacidad. No modifica por sí mismo los permisos de la cuenta, no convierte una conexión MCP local en una integración nativa de ChatGPT y no debe usarse para extraer cookies, tokens de sesión o secretos del navegador.
+RDC puede operar en un equipo autorizado y ejecutar un cliente local que hable MCP cuando dicho cliente esté instalado y autenticado. La superficie de Desktop Commander efectivamente conectada en esta sesión expone terminal, archivos y procesos; no expone captura de pantalla ni interacción con la interfaz del navegador. Por ello, esta conexión no permite afirmar que se inspeccionó o configuró visualmente ChatGPT. Esto permite preparar un cliente local como vía operativa separada cuando exista; no modifica permisos de la cuenta, no convierte el cliente local en integración nativa de ChatGPT y no autoriza extraer cookies, tokens de sesión ni secretos del navegador.
 
 La verificación de B debe distinguir:
 - **Integración nativa ChatGPT:** solo se acepta si la interfaz y el plan de la cuenta permiten agregar y ejecutar este servidor MCP con los permisos requeridos.
