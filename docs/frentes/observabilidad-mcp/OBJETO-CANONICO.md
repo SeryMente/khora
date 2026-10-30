@@ -111,7 +111,8 @@ Los siguientes archivos son superficies compartidas que pueden ser necesarias pa
 - `khora-web/lib/server/mcp-manual-token.ts`: scopes admitidos por tokens manuales.
 - `khora-web/lib/server/mcp-config.ts` y `khora-web/app/.well-known/oauth-authorization-server/route.ts`: metadatos OAuth/protected-resource.
 - `khora-web/app/api/oauth/token/route.ts` y `khora-web/app/oauth/authorize/page.tsx`: intercambio y consentimiento de scopes.
-- `khora-web/app/sistema/mcp/page.tsx`: interfaz de emisión y selección de scopes.\n- `khora-web/lib/server/audio-mp3.ts`: helper compartido de lectura/descifrado/validación Blob; cualquier cambio afecta también la lectura de audio existente.
+- `khora-web/app/sistema/mcp/page.tsx`: interfaz de emisión y selección de scopes.
+- `khora-web/lib/server/audio-mp3.ts`: helper compartido de lectura/descifrado/validación Blob; cualquier cambio afecta también la lectura de audio existente.
 - `khora-web/docs/normative-check.md`: catálogo y contrato documental único del servidor.
 - `khora-web/tests/unit/mcp_tool_auth_metadata.test.ts`, `mcp_contract_concordance.test.ts`, `mcp_diagnostics.test.ts`: pruebas de contrato/transporte compartidas; `mcp_custodia.test.ts` añade cobertura de la capacidad específica General.
 
