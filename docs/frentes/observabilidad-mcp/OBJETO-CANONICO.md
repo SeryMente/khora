@@ -3,7 +3,7 @@
 ## 1. Identidad y control
 - Frente único: **Observabilidad MCP**; identidad canónica `OBSERVABILIDAD-MCP`.
 - Repositorio: `SeryMente/khora`; OCP: `docs/frentes/observabilidad-mcp/OBJETO-CANONICO.md`.
-- OCP: **v0.3.0**. Control: generación 3, titular operativo conservado del control anterior.
+- OCP: **v0.3.1**. Control: generación 3, titular operativo conservado del control anterior.
 - Las tareas provisionales «General» y «Jules» pertenecen a este mismo frente; no crean OCP, frente ni control paralelos.
 - `MCP-OBS-DICTADO` permanece como identidad histórica del objeto agregado anterior, no como otro frente activo.
 
@@ -105,8 +105,8 @@ La publicación de código queda sujeta a pruebas y a los pasos de integración 
 ## 9. Aceptación
 El frente solo se considera aceptado cuando:
 1. El código de `main` coincide con el SHA de la implementación aprobada.
-2. Migración y privilegios ACL se verifican en la base productiva; `KHORA_READONLY_DATABASE_URL` conecta como rol mínimo esperado.
-3. El sujeto OAuth del propietario se verifica contra MCP_ALLOWED_EMAIL y las fuentes/ramas se consultan a Jules sin adivinarlas; solo para sujetos adicionales se insertan y leen de vuelta grants exactos aprobados.
+2. Migración y privilegios ACL se verifican en la base productiva; `KHORA_READONLY_DATABASE_URL` está configurada. El rol efectivo se verifica al habilitar sujetos adicionales que consulten ACL; el propietario evita esa consulta.
+3. El `sub` OAuth del propietario se coteja con `MCP_ALLOWED_EMAIL`, y la cuenta Jules configurada publica fuentes/ramas reales; grants exactos solo para sujetos adicionales.
 4. OAuth metadata, scopes, `tools/list` y handlers concuerdan en Production.
 5. Suite automatizada y tests de contrato pasan; CI incluye evidencia de ejecución real.
 6. La cuenta ChatGPT/espacio de trabajo permite conexión MCP personalizada con escritura; la aplicación se registra por OAuth y tools/list descubre las siete herramientas Jules.
@@ -210,3 +210,17 @@ Se verificó la fuente canónica actual de Metodología: DUG v368 · NX-368m, Me
 - Base de datos: migración 033_jules_source_acl y permisos mínimos permanecen; la ACL sigue vacía, deliberadamente, porque el propietario no necesita una fila por fuente. No se concedieron accesos a otros sujetos.
 - ChatGPT web: OpenAI documenta la compatibilidad completa MCP personalizada con acciones de escritura para Business y Enterprise/Edu. El plan/permisos efectivos de la cuenta del operador no se han comprobado. Véase §4.3 y la documentación oficial enlazada allí. Sin la habilitación del plan, el servidor por sí solo no permite utilizar acciones de escritura en ChatGPT web.
 - Pendiente terminal: confirmar elegibilidad MCP del espacio/cuenta ChatGPT, instalar y autorizar la app OAuth, descubrir tools/list, comprobar lectura real desde Jules y realizar una acción de escritura controlada. No hacer merge ni desplegar Production antes de superar esas comprobaciones y actualizar la evidencia.
+
+
+## 19. Revalidación del acceso de propietario y configuración de despliegue — 2026-10-30
+
+- **Autorización y alcance:** el operador confirmó que es el único usuario/desarrollador, aprobó visualmente la pantalla Control MCP y solicitó retirar altas manuales por repositorio. La política de propietario se conserva en el control de generación 3.
+- **Código:** la rama `feat/mcp-jules-clean-main-20261030-r1` incorpora el sujeto propietario por coincidencia de `MCP_ALLOWED_EMAIL`; el propietario opera todas las fuentes/ramas que la API de la cuenta `JULES_API_KEY` devuelva. Las siete herramientas Jules requieren únicamente `jules:read` o `jules:write`; no `norm:turn`. Las herramientas normativas conservan su gate. Los demás sujetos continúan sujetos a ACL exacta y fail-closed.
+- **UI:** los ámbitos `jules:read` y `jules:write` están incluidos por defecto al crear un Bearer manual para el desarrollador.
+- **Validación PC-14:** `npm run typecheck` terminó con código 0. Las pruebas focalizadas MCP/Jules/token: **34/34 PASS**. Suite unitaria: **568/568 PASS**, 0 fallos, 0 omitidas, ejecutada sobre 82 archivos de prueba excepto `methodology_contract_sync.test.ts`, que requiere GitHub CLI autenticado y no se ejecutó en este equipo. Esa prueba no se declara aprobada ni fallida.
+- **Dependencias:** `npm ci` instaló 576 paquetes y reportó 14 advisories (4 moderate, 9 high, 1 critical). No se ejecutó `npm audit fix` ni se elevaron dependencias; clasificar/remediar esos advisories queda como trabajo separado antes de una auditoría de seguridad completa.
+- **Preview:** `dpl_BDuQ2DTFZ8SaydkqeHZFm5qKrNN1` está READY para el corte de aplicación `0282cd42d9fb7a11d087ebed397c91f131676708`; Next.js 16.4.0, TypeScript y 78/78 páginas terminaron correctamente. Ese Preview no tiene las variables MCP/OAuth configuradas y por ello los endpoints de metadata devuelven 503. No se copiaron secretos a Preview.
+- **Production — metadatos de configuración:** Vercel confirma variables sensibles con destino `production` para `MCP_OAUTH_CLIENT_ID`, `MCP_OAUTH_CLIENT_SECRET`, `MCP_OAUTH_REDIRECT_URIS`, `MCP_JWT_SECRET`, `MCP_ALLOWED_EMAIL`, `MCP_CANONICAL_URL`, `KHORA_READONLY_DATABASE_URL` y `JULES_API_KEY`. No se descifraron ni leyeron valores. La ruta MCP mantiene su comprobación de presencia de `KHORA_READONLY_DATABASE_URL`; para el propietario el acceso Jules evita la consulta ACL.
+- **GitHub Actions:** CI, UI Quality y `khora-ok` para el head `c63daa5d54ae4a2c35ecbaecfc231feab431aa60` terminaron con failure; sus jobs no reportaron pasos de ejecución. No es un resultado de tests ni se repitieron sin corrección causal de runner.
+- **ChatGPT web:** la elegibilidad depende del plan/espacio de trabajo. La documentación oficial consultada establece que Pro admite MCP personalizado de lectura/consulta, mientras la escritura/modificación requiere Business o Enterprise/Edu. Business exige al menos dos asientos de pago. No se ha inspeccionado el plan efectivo del operador.
+- **Publicación y aceptación:** PR #345 sigue abierta, mergeable y no mergeada. `main` no se modificó; Production no se desplegó. No hubo autorización OAuth real desde ChatGPT ni llamadas reales a Jules. Antes de declarar completada la integración nativa se requiere conectar el cliente real y verificar lectura y una escritura controlada; la cuenta debe permitir MCP de escritura.
