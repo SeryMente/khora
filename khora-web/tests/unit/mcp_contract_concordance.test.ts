@@ -277,6 +277,9 @@ test("configured developer owner gets full Jules-account access without ACL or n
       "jules_list_activities", "jules_create_session", "jules_send_message",
       "jules_approve_plan",
     ]) assert.ok(names.includes(name), name);
+    for (const tool of tools.tools.filter(item => item.name.startsWith("jules_"))) {
+      assert.equal(Object.hasOwn((tool.inputSchema as any).properties ?? {}, "_norm_turn_token"), false, tool.name);
+    }
     assert.equal(names.some(name => name.startsWith("khora_norm_")), false);
 
     const sources = await client.callTool({ name: "jules_list_sources", arguments: input("jules_list_sources") });
