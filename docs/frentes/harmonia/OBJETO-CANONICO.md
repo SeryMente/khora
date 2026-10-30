@@ -4,11 +4,11 @@
 ## 1. Control e identidad
 
 - Nombre normalizado: **Harmonia**, extensión compañera de **Khora**; «Armonía» y «Cora» de los dictados se conservan literalmente en originales. No renombrar producto o repositorio por transcripción.
-- Identificador del frente: harmonia. Versión del objeto **0.31**; sello **HARMONIA-v0.31**; corte de estado **2026-10-30**. §36.7 registra la nueva sesión RDC PC-14, reconstrucción verificada del paquete local v0.4.0, colector activo y validación con Node portable; CI de GitHub sigue sin ejecutar pasos y la aceptación natural continúa pendiente. La regla permanente de §36.1-36.2 sigue vigente: la única aceptación local es el uso real del operador; el asistente se encarga de todo lo demás. La titularidad continúa en generación 8 / `SES-20261028-P9K4R7M2`; no se cambió.
+- Identificador del frente: harmonia. Versión del objeto **0.32**; sello **HARMONIA-v0.32**; corte de estado **2026-10-30**. §37 registra la transferencia autorizada y verificada a generación 9, paquete local v0.4.1, 27/27 hashes y 13/13 pruebas Node aprobadas, colector/watcher activos y tarea de arranque automático verificada. La aceptación natural en Chrome continúa pendiente. Regla permanente §36.1-36.2: la única aceptación local es el uso real del operador; el asistente ejecuta todo lo demás.
 - Repositorio propietario: `SeryMente/khora`, rama `main`; objeto canónico en `docs/frentes/harmonia/OBJETO-CANONICO.md`. El blob de la versión anterior v0.4 fue `9a186ea789ea5aacab8dd06cf9f6edf364b89531`. Primera publicación del estado completo: commit `892adad897d6bd36c797ec2343ff7f4893b853bf`; lectura de vuelta en `main` confirmada y blob verificado `03ec5d127e0913dfe1f61e8588ba53b8abaa8e5f`. El recibo se refiere al contenido integral v0.5. Corte v0.6: commit inicial `3cb7901c2223cd41773185b93f17133e459e7a69`, blob `d1f524c383cc71c13f89e8d3aa3886ac3533fcdb`. Corte v0.7: commit inicial `55c2e8ba053265c219b2d941665c5cb3730107de`, blob `bbd08e2da15be17486e7515fd11eda7df57fca2b`; lectura de vuelta y corrección del catálogo documentadas. Nunca anticipar un SHA.
 - Fuente de código vigente: `apps/harmonia-observability/` en `main`, con la extensión de observabilidad y captura automática en evolución (rama `main`, versión de código en revisión E2E), `coverage-catalog.json` y scripts/validador. No inferir que el código fuente, el paquete local y el runtime ejecutado están sincronizados sin prueba de huellas. El paquete materializado en el Escritorio se reconstruyó desde esos archivos y contiene solo el runtime portable y una credencial local excluidos del repositorio; su manifiesto local de huellas se regeneró tras las validaciones.
 - Frente permanente por creación expresa del operador. El paquete local usado anteriormente está en `C:\\Users\\fila4\\Desktop\\Harmonia-Observabilidad-v0.2.0`; su sincronización con las últimas versiones de `main` **NO VERIFICADA**. El runtime debe considerarse desincronizado hasta comparar huellas y reiniciar con el colector actualizado. La versión 0.3.0 del código fuente no está aceptada funcionalmente en Chrome; no hereda pruebas de v0.1.0 ni de validaciones anteriores.
-- Control exclusivo vigente: `CONTROL-RESPONSABILIDAD.json`, generación **8**, folio activo `SES-20261028-P9K4R7M2`, alias `chatgpt-harmonia-SES-20261028-P9K4R7M2`; `owner_thread=null` porque no se expuso un ID nativo. Transferencia desde gen7 mediante CAS con prelectura `636a43c6e89355bba94154f2e48f465226030396`, commit `604314d14a945a65d2b4f7f30f71af833123e414`, y lectura de vuelta final `2b8e5091e621b1017ed1e55f2796cc48f9ba444b` tras documentar el alcance de búsqueda (commit `2aecc0c2af69623ea9b24649093b653be20d354a`). El titular anterior gen7 / `SES-20261022-6E3A91F7` se conserva en `previous_owner` e historial. Búsqueda exacta del folio sin coincidencias; dos controles inspeccionados y nueve repositorios enumerados, no exhaustivo. Unicidad global **NO VERIFICADA**. La titularidad no sustituye el handshake RDC ni acredita aceptación E2E.
+- Control exclusivo vigente: `CONTROL-RESPONSABILIDAD.json`, generación **9**, folio activo `SES-20261030-Q8M4R2K9`, alias `chatgpt-harmonia-SES-20261030-Q8M4R2K9`; `owner_thread=null` porque no se expuso ID nativo. Transferencia desde gen8 mediante escritura condicionada al SHA leído `2b8e5091e621b1017ed1e55f2796cc48f9ba444b`, commit `6204100f06ec3e6fafed689e49c653d880fd1c2a`, lectura de vuelta SHA `50ac9fbdde395b06db1fbfdc7efb5df89802338c`. La autorización afirmativa del operador quedó registrada en el evento `HARMONIA-TRANSFER-SES-20261030-Q8M4R2K9`; el titular anterior gen8 / `SES-20261028-P9K4R7M2` se conserva en `previous_owner` e historial. El folio se cotejó contra el control observado y el maestro disponible; la unicidad global permanece **NO VERIFICADA**. La responsabilidad no acredita aceptación E2E.
 
 - Destino de paquete comprobado y usado mediante ruta física explícita: `C:\Users\fila4\Desktop\Harmonia-Observabilidad-v0.1.0`. Datos locales: `C:\Users\fila4\AppData\Local\Harmonia\data`. No usar rutas derivadas del perfil del proceso RDC para resolver estos destinos.
 
@@ -1291,3 +1291,47 @@ El paquete local referido como Harmonia v0.5.0, el destino actual y su estructur
 - CI: Harmonia run `41084464878`, intento 2 job `124163941848`, failure con `steps=[]`; intento previo job `124161839622`, misma condición. CI general `41084465135` falló también con jobs `calidad`, `api-tests` y `khora-web-gate` sin pasos. Sin logs recuperables ni evidencia de ejecución de Actions. Las pruebas locales con Node v22 son las pruebas de ingeniería disponibles; CI se mantiene NO VERIFICADA.
 - Dictamen: paquete físico, runtime, hashes y colector **VERIFICADOS**; extensión cargada en Chrome **NO VERIFICADA**; uso natural del operador **PENDIENTE**; aceptación E2E **ABIERTA / NO ACEPTADA**. La aceptación local seguirá siendo únicamente el uso real del operador según §36.1-36.2.
 - Siguiente trabajo del asistente: mantener el colector disponible, resolver cualquier error observado tras la carga natural y revisar JSONL/índice, sesiones, cobertura, orden temporal, deduplicación, recuperación y hashes. No trasladar al operador diagnósticos ni pruebas técnicas; solo su uso normal.
+
+
+## 37. Transferencia generación 9 y checkpoint v0.4.1 · 2026-10-30
+
+### 37.1 Titularidad y autorización
+
+- Entrada literal de autorización en este ciclo: «Si pero no tarde suna hora en adjudicar la metodologia, necfesito acvanzar con esto. Rapido.» La respuesta afirmativa autoriza la transferencia de Harmonia desde el titular anterior a esta conversación; no autoriza modificación normativa de Metodología.
+- UUIDv7 local de esta conversación: `01a18de7-2e03-775e-9159-649f4ecb913c`. No es ID nativo de ChatGPT.
+- Folio operativo de sesión: `SES-20261030-Q8M4R2K9`; alias `chatgpt-harmonia-SES-20261030-Q8M4R2K9`; evento `HARMONIA-TRANSFER-SES-20261030-Q8M4R2K9`.
+- Control en `main`: generación 8 → 9; SHA base leído `2b8e5091e621b1017ed1e55f2796cc48f9ba444b`; commit `6204100f06ec3e6fafed689e49c653d880fd1c2a`; SHA de contenido y read-back `50ac9fbdde395b06db1fbfdc7efb5df89802338c`. La lectura de vuelta cotejó generación 9, folio, alias, evento y preservación del titular gen8.
+- La cobertura global del folio no está certificada. El registro FOL1 de Metodología permanece `PREPARADO_PENDIENTE_ACTIVACION_IPZ`, generación 1, sin asignaciones; no se asignan folios globales CV/CY/A/B ni se modifica el registro normativo. El folio SES se conserva como identificador operativo del control heredado.
+
+### 37.2 Gobernanza adquirida
+
+- Metodología `main`: DUG **v364 / NX-364m**, blob `e934de6d848042837032691674563a2a6e3a3382`; Metacanon **1.26**; GOW **2.12**. `INICIO.md` blob `805c4d8b2ef58ec1cabf5b660b91e92982233c69`. Adquiridos §ARR y vocabulario de entrada; revisión manual de P001, P035, P037 y P042, además de Metacanon §§42, 46 y 47. `MCP-NORMATIVO: DESACTIVADO`. No se modificó `SeryMente/metodologia`.
+- P001 fija la cascada; P035 obliga continuidad y lectura de vuelta; P037 y Metacanon §42 habilitan la transferencia ya autorizada y condicionada; P042 remite la foliación jerárquica al maestro. La activación FOL1 está pendiente de la nueva IPZ.
+
+### 37.3 Entorno local y paquete
+
+- Dispositivo RDC: PC-14, UUID `0ec103d6-0e8a-4d3f-986b-4114a52f7740`, online. Identidad Windows `PC-14\\PC 13`; SID `S-1-5-21-1094932887-1468116028-2730151477-1002`; perfil cargado `C:\\Users\\PC 13`.
+- Paquete en `C:\\Users\\PC 13\\Desktop\\Harmonia`; raíz cargable `extension\\manifest.json`; Manifest V3 **v0.4.1**.
+- `MANIFEST-HUELLAS.json`: 27 archivos declarados, 27 comprobados, cero discrepancias. Node portable v22.23.4 x64: SHA-256 esperado/observado `dccc52de28d8df2ee22d2062424f8c563070d95d8ad70c54c4bf01d590dec14f`.
+- Suite local con Node portable: **13/13 PASS**, cero fallos. Esto es evidencia de ingeniería, no aceptación E2E.
+- La fuente remota candidata declara build-info v0.4.1, sourceRevision `fbbe347fca92272b1d00e3724ea8398b22e28b12`; PR #333 está abierta, en borrador y sin fusionar. La comparación reportó rama divergida respecto de main (100 commits ahead reportados por el límite de comparación y 257 behind); no hacer merge automático ni activar despliegue productivo.
+
+### 37.4 Colector, vigilancia y arranque automático
+
+- Colector escuchando en `127.0.0.1:47321`, PID/listener 2204, raíz `C:\\Users\\PC 13\\AppData\\Local\\Harmonia\\surface-index-v0.4.0\\data`; /health autenticado OK.
+- Endpoint `/dev-version`: enabled=true, error=null. `fs.watch` vigila recursivamente solo `extension\\`; el service worker consulta cada 30 segundos y ejecuta `chrome.runtime.reload()` cuando cambia la revisión. No descarga/ejecuta código remoto.
+- Tarea programada `Harmonia Collector - PC13` creada para el inicio de sesión de `PC-14\\PC 13`; ejecución manual de comprobación terminó con `LastTaskResult=0`, colector OK, raíz correcta y watcher enabled. No se creó servicio Windows adicional.
+- Los cambios en `collector\\` y scripts requieren reinicio/validación del colector; los cambios de `extension\\` usan hot reload tras la activación inicial.
+
+### 37.5 Estado del almacén y aceptación humana
+
+- Índice local leído: 19 sesiones, 707 eventos, 678 `console.observed`, 19 `capture.started`, 10 `capture.stopped`; cero superficies/fingerprints estructurales y ningún `conversation.visible.delta` en el resumen leído. El almacén no se borró ni se sustituyó.
+- Chrome no se abrió, recargó ni manipuló durante este ciclo. La extensión cargada/recargada en el perfil habitual sigue **NO VERIFICADA**; el uso natural del operador está **PENDIENTE** y la aceptación E2E sigue **ABIERTA / NO ACEPTADA**.
+- Única intervención humana para activar la versión preparada: en `chrome://extensions`, pulsar una vez **Recargar** en Harmonia (o cargar descomprimida desde `C:\\Users\\PC 13\\Desktop\\Harmonia\\extension` si aún no está registrada). Después, el operador usa ChatGPT normalmente, sin tareas de diagnóstico. El asistente revisa índice/JSONL, capturas, pestañas/sesiones, mensajes visibles, superficies, cobertura, deduplicación, reinicio y huellas.
+
+### 37.6 Límites y siguiente checkpoint
+
+- CI de GitHub: ejecuciones anteriores fallaron sin runner/pasos/logs recuperables; estado **NO VERIFICADO**, causa exacta **NO DETERMINADA**. No se atribuye a código ni se marca PASS.
+- El paquete está verificado contra su manifiesto local; no se afirma equivalencia completa de cada archivo con main. La candidata no está fusionada.
+- Siguiente hito: recarga inicial de Harmonia por el operador y uso natural. Tras la primera actividad, consulta técnica del almacén y diagnóstico a cargo del asistente. No pedir al operador ejecutar scripts, revisar logs ni realizar pruebas técnicas.
+- Persistencia de este checkpoint: control de responsabilidad actualizado y releído en `main`; este OCP se actualiza en este commit. README y prompt de asistente quedan como espejos por alinear en el siguiente pase breve. Sin cambios en código remoto, main de la aplicación ni Metodología.
