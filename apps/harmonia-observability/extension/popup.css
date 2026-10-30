@@ -63,3 +63,6 @@ details p{margin:8px 0 0}
 .repoDot.off{background:#e56458;border-color:#fce9e7}
 .actions a{color:#5f4bb6;font-size:12px;text-decoration:none}
 .actions a:hover{text-decoration:underline}
+
+#coraDetail{font-size:12px;line-height:1.45;color:#67645f;margin:5px 0 8px}
+@media(prefers-color-scheme:dark){#coraDetail{color:rgba(255,255,255,.65)}}
