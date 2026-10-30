@@ -47,10 +47,10 @@ function input(name: McpToolName): Record<string, unknown> {
   if (name === "khora_norm_apply_principle") return { turn_token: controls._norm_turn_token, folio: "P001", status: "A", anchor: "ContractTest" };
   if (name === "khora_norm_verify_turn") return { turn_token: controls._norm_turn_token, receipt: receipt() };
   if (name === "khora_norm_release_turn") return { turn_token: controls._norm_turn_token };
-  if (name === "jules_get_session" || name === "jules_list_activities") return { ...controls, session_id: "fixture-session" };
-  if (name === "jules_create_session") return { ...controls, source: "sources/github/owner/repo", starting_branch: "main", prompt: "Fixture prompt with acceptance criteria and NO SIMULATION", title: "Contract test" };
-  if (name === "jules_send_message") return { ...controls, session_id: "fixture-session", prompt: "Fixture response" };
-  if (name === "jules_approve_plan") return { ...controls, session_id: "fixture-session", plan_id: "fixture-plan-1", plan_sha256: "7a898feea085c3699a9c15295c5c53d361f6f10bd2847d2bb54f12b863969346" };
+  if (name === "jules_get_session" || name === "jules_list_activities") return { session_id: "fixture-session" };
+  if (name === "jules_create_session") return { source: "sources/github/owner/repo", starting_branch: "main", prompt: "Fixture prompt with acceptance criteria and NO SIMULATION", title: "Contract test" };
+  if (name === "jules_send_message") return { session_id: "fixture-session", prompt: "Fixture response" };
+  if (name === "jules_approve_plan") return { session_id: "fixture-session", plan_id: "fixture-plan-1", plan_sha256: "7a898feea085c3699a9c15295c5c53d361f6f10bd2847d2bb54f12b863969346" };
   const business = (name === "khora_leer_volcado" || name === "khora_leer_audio") ? { id: "1" } : name === "khora_buscar_volcados" ? { busqueda: "fixture" } : name === "khora_versiones_volcado" ? { volcado_id: "1" } : {};
   return { ...controls, ...business };
 }
@@ -133,28 +133,26 @@ async function connect(fixture: ReturnType<typeof routeFixture>) {
   return client;
 }
 
-test("tools/list exposes only granted business scopes and the normative dependency", async () => {
-  const fixture = routeFixture({ scopes: ["jules:read", "norm:turn"] });
-  const client = await connect(fixture);
+test("tools/list exposes Jules read and write actions through their own scopes without norm:turn", async () => {
+  const readFixture = routeFixture({ scopes: ["jules:read"] });
+  const readClient = await connect(readFixture);
   try {
-    const listed = await client.listTools();
+    const listed = await readClient.listTools();
     const names = listed.tools.map(tool => tool.name).sort();
     assert.deepEqual(names, [
       "jules_get_session", "jules_list_activities", "jules_list_sessions", "jules_list_sources",
-      "khora_norm_apply_principle", "khora_norm_open_turn", "khora_norm_release_turn", "khora_norm_verify_turn",
     ].sort());
-    assert.equal(names.includes("jules_create_session"), false);
-    assert.equal(names.includes("jules_send_message"), false);
-    assert.equal(names.includes("jules_approve_plan"), false);
-    assert.equal(names.includes("khora_leer_volcado"), false);
-  } finally { await client.close(); await fixture.close(); }
+    assert.equal(names.some(name => name.startsWith("khora_norm_")), false);
+  } finally { await readClient.close(); await readFixture.close(); }
 
-  const incomplete = routeFixture({ scopes: ["jules:read"] });
-  const incompleteClient = await connect(incomplete);
+  const writeFixture = routeFixture({ scopes: ["jules:write"] });
+  const writeClient = await connect(writeFixture);
   try {
-    const listed = await incompleteClient.listTools();
-    assert.equal(listed.tools.some(tool => tool.name.startsWith("jules_")), false);
-  } finally { await incompleteClient.close(); await incomplete.close(); }
+    const listed = await writeClient.listTools();
+    const names = listed.tools.map(tool => tool.name).sort();
+    assert.deepEqual(names, ["jules_approve_plan", "jules_create_session", "jules_send_message"].sort());
+    assert.equal(names.some(name => name.startsWith("khora_norm_")), false);
+  } finally { await writeClient.close(); await writeFixture.close(); }
 });
 
 test("real route: HTTP discovery and all 24 calls agree; malformed input cannot reach service", async () => {
@@ -197,7 +195,7 @@ test("real route: missing/revoked auth and missing configuration fail before ser
 });
 
 test("real route: every substantive tool is blocked by scope or denied turn; norm opening requires scope", async () => {
-  const substantive = Object.keys(MCP_TOOL_SCOPES).filter(n => n !== "khora_mcp_health" && !n.startsWith("khora_norm_")) as McpToolName[];
+  const substantive = Object.keys(MCP_TOOL_SCOPES).filter(n => n !== "khora_mcp_health" && !n.startsWith("khora_norm_") && !n.startsWith("jules_")) as McpToolName[];
   for (const options of [{ scopes: ["norm:turn"] }, { denyTurn: true }]) {
     const fixture = routeFixture(options); const client = await connect(fixture);
     try {
