@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { approvePlan, createSession, listSources, JulesApiError, sendMessage } from "../../lib/jules/client";
+import { approvePlan, createSession, listSources, JulesApiError, sanitizeJulesRouteForLog, sendMessage } from "../../lib/jules/client";
 
 const originalFetch = globalThis.fetch;
 const originalKey = process.env.JULES_API_KEY;
