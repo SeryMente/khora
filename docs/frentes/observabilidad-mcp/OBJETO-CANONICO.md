@@ -3,7 +3,7 @@
 ## 1. Identidad y control
 - Frente único: **Observabilidad MCP**; identidad canónica `OBSERVABILIDAD-MCP`.
 - Repositorio: `SeryMente/khora`; OCP: `docs/frentes/observabilidad-mcp/OBJETO-CANONICO.md`.
-- OCP: **v0.2.0**. Control: generación 3, titular operativo conservado del control anterior.
+- OCP: **v0.2.1**. Control: generación 3, titular operativo conservado del control anterior.
 - Las tareas provisionales «General» y «Jules» pertenecen a este mismo frente; no crean OCP, frente ni control paralelos.
 - `MCP-OBS-DICTADO` permanece como identidad histórica del objeto agregado anterior, no como otro frente activo.
 
@@ -19,8 +19,9 @@ Leer README, DUG vigente, este OCP y `CONTROL-RESPONSABILIDAD.json`. La titulari
 **Interpretación operativa separada:** el repositorio denomina MCP al servidor/protocolo y herramientas de Khora; «MSP» se conserva en la cita original. El frente cubre el acceso de modelos/agentes autorizados a observabilidad y la integración controlada con Jules.
 
 ## 3. Referencia metodológica
-- DUG consultado: **v364 · NX-364m**.
-- Metacanon **1.26**; GOW **2.12** (valores declarados por la representación estructurada del DUG consultado).
+- DUG consultado en `SeryMente/metodologia/main`: **v366 · NX-366m**; commit del archivo normativo `b9493d50ce1d89b2f73c2bc2626f5acfcc276d19`.
+- Metacanon **1.26**; GOW **2.13**.
+- CNP vigente (categoría A): P001, P004, P005, P038 y P043; consideración explícita en cada turno. MCP normativo: DESACTIVADO.
 - Fuente normativa: `SeryMente/metodologia/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html`.
 - MCP-NORMATIVO: **DESACTIVADO**. No debe confundirse con el servidor MCP de producto Khora.
 - Ante cambios transversales, prevalece Metodología; las propuestas no son canónicas hasta incorporarse a su repositorio.
@@ -124,3 +125,17 @@ Continuar en el OCP y control únicos `docs/frentes/observabilidad-mcp/`. Leer e
 
 ## 13. Persistencia y revisión
 Este documento en `main` es el objeto canónico único del frente. El control independiente reside en `CONTROL-RESPONSABILIDAD.json`. Las tareas provisionales General/Jules no tienen autoridad para crear objetos canónicos separados. La metodología general de `SeryMente/metodologia` prevalece en definiciones transversales.
+
+## 14. Estado vivo — reinstanciación RDC PC-14 · 2026-10-30
+
+- Se reconectó Remote Desktop Commander después de un nuevo inicio de Windows. El dispositivo activo devuelto por el inventario es PC-14, Device ID `308d583f-ac72-430f-91d4-95d22d9f33b9`. El ID `47d52d2e-1a6a-4f71-ba5d-baf8b660a88f` del handoff está Offline y no se usó.
+- Perfil Windows inspeccionado: `C:\Users\PC 13`; las raíces de proyecto esperadas en el Escritorio no existen todavía. No se presupone persistencia del clon anterior.
+- Node.js v26.13.0, Git 2.56.0 y GitHub CLI 2.103.3 están instalados. `gh auth status` devuelve que no hay sesión GitHub autenticada; no se extrajeron credenciales del navegador ni se inició login interactivo.
+- El conector GitHub conserva acceso al repositorio: PR #345 sigue abierto, mergeable, head `2452d8c8498eeb0338e4efaed9d13eef70fb7f84`, base `8f9b98b61d58aa5c1dd1afee0c128c7ed4592ff7`; la rama está 7 commits ahead y 0 behind. No se ha mergeado ni desplegado a Production.
+- Preview Vercel `dpl_2EWpm1hwXRQhqM1kYDBWGr18YNfW` permanece READY para el head anterior indicado.
+- CI y UI Quality no llegaron a ejecutar pasos: los jobs terminan casi inmediatamente con `runner_id=0`, `runner_name=""`, `steps=[]`. El fallo no representa un resultado de tests; indica que no se asignó runner. No repetir reintentos sin cambio causal.
+- Neon Production mantiene `khora_private.jules_source_acl`; lectura de privilegios en esta sesión confirma `khora_lector` con USAGE+SELECT y sin INSERT/UPDATE/DELETE. La tabla sigue sin concesiones.
+- Bloqueos actuales: autenticación GitHub CLI local para clonar y ejecutar pruebas en este Windows; runner GitHub Actions no asignado; ausencia de identidad/fuente/rama Jules verificadas para un grant. La rama/PR usa el conector GitHub hasta resolver la CLI. No crear permisos globales ni tratar RDC como integración nativa de ChatGPT.
+- Se actualizó la referencia metodológica de este OCP a DUG v366 / NX-366m, Metacanon 1.26 y GOW 2.13. La fuente normativa sigue siendo `SeryMente/metodologia/main`.
+
+**Cierre de reinstanciación:** conexión RDC nueva identificada y verificada; clones locales ausentes, autenticación CLI ausente y no se afirma ejecución local de tests. La continuidad de código permanece recuperable desde la rama y PR persistentes.
