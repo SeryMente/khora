@@ -3,7 +3,7 @@
 ## 1. Identidad y control
 - Frente único: **Observabilidad MCP**; identidad canónica `OBSERVABILIDAD-MCP`.
 - Repositorio: `SeryMente/khora`; OCP: `docs/frentes/observabilidad-mcp/OBJETO-CANONICO.md`.
-- OCP: **v0.2.4**. Control: generación 3, titular operativo conservado del control anterior.
+- OCP: **v0.2.5**. Control: generación 3, titular operativo conservado del control anterior.
 - Las tareas provisionales «General» y «Jules» pertenecen a este mismo frente; no crean OCP, frente ni control paralelos.
 - `MCP-OBS-DICTADO` permanece como identidad histórica del objeto agregado anterior, no como otro frente activo.
 
@@ -174,3 +174,17 @@ Se verificó la fuente canónica actual de Metodología: DUG v368 · NX-368m, Me
 - **Código y despliegue:** head `1959abfef713cef7a85f31fc524aa6be0f65b9fc`; PR #345 sigue abierta/no mergeada. No cambió `main`, no se desplegó Preview/Production.
 - **Pendientes terminales:** revisión visual del operador; identificar subject/source/branch Jules; verificar rol efectivo de `KHORA_READONLY_DATABASE_URL`; ejecutar cliente MCP real autorizado y probar lectura/escritura/denegaciones; CI remoto sigue sin ejecutar pasos. ACL productiva sigue vacía.
 - **Estado:** pantalla local disponible para inspección humana; no aprobada; implementación validada localmente; aceptación end-to-end pendiente.
+
+## 17. Estado vivo — sincronización con main y corte final de revisión — 2026-10-30
+
+- **Metodología:** DUG v368 · NX-368m; Metacanon 1.26; GOW 2.14. Último commit Metodología `main`: `c90a9f84143089c3c02208fd27b3625f3e9f1e08`, `2026-10-30T21:47:15Z`. A las 22:31:49Z su edad era 0.0.44. MCP normativo DESACTIVADO.
+- **Khora main:** último commit `c6860f1501419239b4eef540150f934a5e20f2a3`, `2026-10-30T22:15:39Z`; edad a las 22:31:49Z: 0.0.16. Actualiza únicamente `docs/frentes/harmonia/OBJETO-CANONICO.md` de Harmonia v0.34 a v0.35 y documenta el PC-14 activo; no toca el código ni el OCP Observabilidad MCP.
+- **Sincronización de rama:** se integró el único commit nuevo de `main` mediante merge commit de dos padres `d832edae2fb894625fb4924d9a4770a675daab79` (22:31:10Z), padres ordenados: rama anterior `709aa27013b2b9bbbb7ccfd991dd1061fcb724fa` y `main` `c6860f1501419239b4eef540150f934a5e20f2a3`. Tree `6df344199b30ca0519d73fe964ce070a24e6c994`; se cambió solo `docs/frentes/harmonia/OBJETO-CANONICO.md`. La rama vuelve a estar **14 commits ahead / 0 behind** respecto de `main`.
+- **Clon local:** `C:\Users\PC 13\Desktop\Khora\khora-main`; HEAD `d832edae2fb894625fb4924d9a4770a675daab79`; rama remota sincronizada; working tree limpio y `git diff --check` limpio. El `FETCH_HEAD` local puede apuntar a la última rama descargada, no interpretarlo como alias permanente de `main`.
+- **Código validado:** último head con código funcional probado `fd266c6d818902eaa120d1b5afd3592e80bcb51c`. Los commits posteriores `1959abf`, `709aa27` y `d832eda` son documentales/merge de un documento Harmonia; no alteran archivos de aplicación ni pruebas. Se conserva evidencia: 35/35 focalizadas, 568/568 unitarias, typecheck/UI Review/navegación y build de producción local código 0.
+- **Actions:** el merge commit nuevo generó CI, UI Quality y `khora-ok`; seis jobs terminaron failure y cada consulta de pasos devolvió cero pasos (`steps=[]`). No hay ejecución remota acreditada. No reintentar sin corrección causal de infraestructura.
+- **Revisión visual local:** Edge abierto en `http://127.0.0.1:4173/sistema/mcp`, servidor PID npm `20032`, listener solo `127.0.0.1:4173`. Captura después de hidratación completa en TEMP PC-14: `khora-mcp-visual-review-afterwait.png`, 90.172 bytes, SHA-256 `B64B6270CEAC8B11BADA6A9602A48E3BB2FADA127BB25A7B668B0CFD1D7908EB`. La ruta renderiza; los GET a endpoints locales de estado reciben 401 por ausencia deliberada de sesión/credenciales local, y la pantalla muestra ese error. No hubo emisión/revocación ni acceso a Neon Production. La presencia personal B/C del operador permanece **PENDIENTE**.
+- **PR:** #345 sigue abierta, mergeable, no mergeada; head `d832edae2fb894625fb4924d9a4770a675daab79`, base `c6860f1501419239b4eef540150f934a5e20f2a3`. No se fusionó la PR.
+- **Preview/Production:** Preview existente permanece en el SHA anterior `2452d8c8498eeb0338e4efaed9d13eef70fb7f84`; no refleja el head probado ni el merge de sincronización. No se hizo deploy a Preview ni Production.
+- **Bloqueos restantes:** revisión visual personal del operador; rol efectivo de `KHORA_READONLY_DATABASE_URL`; identidad OAuth Jules, source y branch reales; grant exacto; prueba de cliente MCP autorizado. ACL Production sigue vacía; no se han ejecutado llamadas reales a Jules.
+- **Estado:** base de rama reconciliada, UI local disponible, pruebas locales aprobadas; revisión personal y aceptación end-to-end pendientes. No mergear ni desplegar.
