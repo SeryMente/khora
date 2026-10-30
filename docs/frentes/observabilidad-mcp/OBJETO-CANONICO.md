@@ -66,3 +66,68 @@ Nueva instancia: leer README, DUG, este OCP, control y manifiesto. El control es
 
 ## 13. Persistencia y revisión
 Este OCP en main es el estado único de Observabilidad MCP; su control independiente permanece en `CONTROL-RESPONSABILIDAD.json`. El original de propósito y procedencia están en §2. No crear OCP/control paralelos ni afirmar ejecución MCP/aceptación sin evidencia.
+
+## 14. Coordinación provisional de tareas MCP — 2026-10-30
+
+Esta delimitación es organizativa y provisional. No modifica la taxonomía de frentes de Metodología, la identidad canónica `OBSERVABILIDAD-MCP`, el OCP ni el control existentes. El producto conserva un solo frente MCP y este documento sigue siendo su único OCP.
+
+### 14.1 Tarea provisional: General
+
+**Titular de esta actividad:** la intervención registrada en el control de este frente, generación 2, alias operativo `chatgpt-khora-mcp-SES-20261030-01A18DCB`. El alias no es un ID nativo de conversación; `owner_thread` permanece null. La titularidad corresponde solo a la intervención y deberá cerrarse o transferirse mediante el control existente al terminar; no se presume indefinida.
+
+**Responsabilidad provisional General:**
+- Arquitectura general del servidor y componentes compartidos.
+- Infraestructura compartida, transporte y despacho de herramientas.
+- Autenticación y autorización compartidas.
+- Contratos generales MCP, observabilidad y diagnóstico transversal.
+- Seguridad e infraestructura de ejecución.
+- Despliegue y mantenimiento general, sujetos a autorización independiente para cada operación.
+- Integración de capacidades no específicas de Jules.
+- En esta intervención: herramientas de consulta de Custodia autorizadas en la solicitud de adjudicación, sin mutar el frente Custodia ni datos productivos.
+
+### 14.2 Tarea provisional: Jules
+
+**Responsabilidad reservada a otro hilo de trabajo, no asumida por General:**
+- Integración con la API de Google Jules.
+- Creación y seguimiento de sesiones.
+- Recuperación de planes, actividades y mensajes.
+- Aprobación explícita de planes.
+- Recuperación y respuesta a solicitudes de retroalimentación.
+- Herramientas MCP especializadas de Jules.
+- ACL y permisos específicos de Jules.
+- Validación de repositorios y ramas.
+- Gestión de errores y continuidad de sesiones.
+- Pruebas y aceptación de la integración Jules.
+- Habilitación del ciclo bidireccional ChatGPT–Jules.
+
+General no implementará ni alterará componentes específicos de Jules sin coordinación expresa con el hilo responsable.
+
+### 14.3 Componentes compartidos y protocolo de colisión
+
+Los siguientes archivos son superficies compartidas que pueden ser necesarias para registrar cualquier herramienta MCP, aplicar scopes o publicar OAuth. No pertenecen en exclusiva a Jules ni a General:
+
+- `khora-web/app/api/mcp/route.ts`: servidor, autenticación, despacho, registro y compuerta normativa.
+- `khora-web/lib/server/mcp-tool-contract.ts`: catálogo y contratos de herramientas.
+- `khora-web/lib/server/mcp-manual-token.ts`: scopes admitidos por tokens manuales.
+- `khora-web/lib/server/mcp-config.ts` y `khora-web/app/.well-known/oauth-authorization-server/route.ts`: metadatos OAuth/protected-resource.
+- `khora-web/app/api/oauth/token/route.ts` y `khora-web/app/oauth/authorize/page.tsx`: intercambio y consentimiento de scopes.
+- `khora-web/app/sistema/mcp/page.tsx`: interfaz de emisión y selección de scopes.
+
+El servicio `khora-web/lib/server/mcp-custodia.ts` es específico de las herramientas de metadatos/integridad de Custodia de esta actividad General; no es infraestructura Jules ni cambia los objetos del frente Custodia.
+
+**Reglas de serialización:** identificar la superficie compartida antes de cada modificación; no escribir simultáneamente el mismo archivo desde ramas/tareas diferentes; coordinar previamente cambios de ruta, tipos, permisos, contratos, OAuth, pruebas o documentación que puedan alterar el comportamiento de la otra tarea. Una integración posterior deberá reconciliar commits y huellas de ambas líneas sin sobreescribir cambios ajenos. La mera existencia de ramas separadas no acredita que no haya colisiones.
+
+**Límite de conocimiento de este asiento:** esta intervención no inspeccionó la rama, commits ni archivos de trabajo del hilo Jules. Por tanto, no afirma conocer su estado ni que la coordinación entre hilos ya haya ocurrido. Los componentes listados constituyen el inventario inicial de puntos compartidos para esa coordinación.
+
+### 14.4 Estado de esta intervención y continuidad
+
+- Control de responsabilidad existente: generación 2, estado `assigned`, alias General arriba indicado; blob leído `93d7ec6fd51dd57c20b8818cfe34ba9bd14e08c3`. No se creó otro control.
+- OCP: esta actualización se realiza en la rama de trabajo, sobre el archivo canónico existente; el blob de origen verificado antes de la escritura fue `a3b1335c7b3b13d5ce3e1cbf4ea50f8c0866cd36`. La copia en `main` permanece sin modificar hasta una integración autorizada.
+- Rama General: `work/obs-mcp-custodia-tools-20261030-01a18dcb`, creada desde `d6c9911615a3633f6ce38c1b8a2459f1e4823df5`. En la consulta de 2026-10-30, `main` había avanzado dos commits posteriores, identificados como cambios exclusivamente de Harmonia; no se incorporaron ni se hizo rebase.
+- Implementación General en curso: servicio de consulta Custodia, tres herramientas MCP y scopes especializados. La implementación y el registro en esta rama no equivalen a merge, despliegue ni aceptación productiva.
+- Pruebas de código: pendientes de ejecución en un entorno reconstruido para esta sesión. No declarar cobertura validada hasta ejecutar comandos y registrar resultados.
+- Protección: no se modificaron objetos, controles, tareas ni datos de Custodia; no se realizaron escrituras/recuperaciones productivas; no se copiaron credenciales productivas.
+- No se fusionó la rama, no se abrió merge y no se desplegó.
+
+Al cierre de General, actualizar este mismo OCP y leerlo de vuelta; después liberar o transferir la titularidad temporal en el control existente conforme al procedimiento aplicable. La tarea Jules conserva su continuidad en el mismo OCP y no requiere un objeto documental paralelo.
+
