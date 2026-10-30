@@ -1,282 +1,428 @@
-(()=> {
-  if (globalThis.__harmoniaObserver?.version==='0.4.0') return;
-  const H = globalThis.__harmoniaObserver = { version:'0.4.0', active:false, structureStandby:false, lastFingerprint:null, lastSentAt:0, droppedScans:0, lastMessages:new Map(), regionKey:null, consoleQueue:[], consoleFlushTimer:null, consoleFlushBusy:false };
-  let observer=null, timer=null, messageTimer=null, sessionId=null;
-
-  const $ = (sel, root=document) => root.querySelector(sel);
-  const $$ = (sel, root=document) => [...root.querySelectorAll(sel)];
-  const visible = el => {
-    if (!el?.isConnected) return false;
-    const s=getComputedStyle(el), r=el.getBoundingClientRect();
-    return s.display!=='none' && s.visibility!=='hidden' && Number(s.opacity)!==0 && r.width>0 && r.height>0;
-  };
-  const excluded = el => !!el?.closest('nav,aside,[role="menu"],[role="dialog"],[role="listbox"],[aria-modal="true"],[data-radix-popper-content-wrapper]');
-  const safe = (value, max=90) => String(value||'').replace(/[\r\n\t]+/g,' ').replace(/\s+/g,' ').replace(/\b[0-9a-f]{8}-[0-9a-f-]{27,}\b/gi,'[id]').replace(/\b\d{5,}\b/g,'[n]').trim().slice(0,max);
-  const classes = el => [...(el.classList||[])].filter(x=>x.length<50).slice(0,5);
-  const attr = (el,name,max=90) => safe(el.getAttribute(name),max);
-  const composer = () => $('#prompt-textarea,[contenteditable="true"][data-lexical-editor="true"],textarea');
-  const mainRegion = () => $('main,[role="main"]');
-  function controlsIn(root) {
-    if (!root) return [];
-    return $$('button,[role="button"],input,textarea,[contenteditable="true"],[role="combobox"],select,a,[role="switch"]',root)
-      .filter(el=>visible(el)&&!excluded(el)).slice(0,100).map(el=>{
-        const tag=el.tagName.toLowerCase(), role=attr(el,'role',40);
-        const label=attr(el,'aria-label',90), testId=attr(el,'data-testid',70);
-        const placeholder=['INPUT','TEXTAREA'].includes(el.tagName)?safe(el.getAttribute('placeholder'),80):'';
-        const type=attr(el,'type',24);
-        return {tag,role,label,testId,placeholder,type,disabled:!!el.disabled,expanded:attr(el,'aria-expanded',10),signature:[tag,role,testId,label,placeholder,type].join('|')};
-      });
-  }
-  function featureIds(root, composerEl, controls) {
-    const ids=new Set(), hay=controls.map(c=>[c.label,c.testId,c.placeholder,c.type,c.role].join(' ').toLowerCase()).join(' ');
-    if (root) ids.add('surface.main-chat');
-    if (composerEl && visible(composerEl)) ids.add('composer.text-entry');
-    if (root && $$('[data-message-author-role="user"],[data-testid*="user-message"]',root).length) ids.add('conversation.user-message');
-    const assistants=root?$$('[data-message-author-role="assistant"],[data-testid*="assistant-message"]',root):[];
-    if (assistants.length) ids.add('conversation.assistant-message');
-    if (root && $$('article p,[data-message-author-role="assistant"] p',root).length) ids.add('response.rich-text');
-    if (root && $$('pre code,pre,[data-testid*="code-block"]',root).length) ids.add('response.code-block');
-    if (root && $$('table,[role="table"]',root).length) ids.add('response.data-table');
-    if (root && $$('svg.recharts-surface,canvas,[data-testid*="chart"],[aria-label*="chart" i]',root).length) ids.add('response.data-chart');
-    if (root && $('[data-message-author-role="assistant"] img,article img',root).some(el=>{const r=el.getBoundingClientRect();return r.width>=128&&r.height>=80&&!el.closest('button,[role="button"]');})) ids.add('response.image-generation');
-    if (root && $$('a[href^="http"]',root).some(el=>el.closest('[data-message-author-role="assistant"],article'))) ids.add('conversation.citations');
-    if (root && $$('a[download],[data-testid*="download"],[data-testid*="file-card"],[data-testid*="artifact"]',root).length) ids.add('response.file-output');
-    if (root && $$('[data-testid*="artifact"],[data-testid*="canvas"],[data-testid*="writing-block"]',root).length) ids.add('response.writing-block');
-    if (root && $('[aria-busy="true"],[data-is-streaming="true"],[data-testid*="stop"]',root).length) { ids.add('conversation.response-streaming'); ids.add('conversation.partial-generation'); }
-    if (root && $('[data-testid*="agent-progress"],[data-testid*="agent-run"],[data-testid*="task-progress"],[data-testid*="subagent"]',root).length) ids.add('conversation.agent-progress');
-    if (root && $('[data-testid*="interactive-widget"],[data-testid*="interactive-ui"],[role="application"],[data-testid*="calculator"],[data-testid*="bill-split"],[data-testid*="game-widget"]',root).some(el=>visible(el)&&!excluded(el))) ids.add('response.interactive-widget');
-    if (root && $('[data-message-author-role="assistant"] [class*="grid-cols-2"],[data-message-author-role="assistant"] [class*="grid-cols-3"],[data-testid*="side-by-side"],[data-testid*="comparison-panel"]',root).some(el=>visible(el)&&!excluded(el))) ids.add('response.side-by-side-visuals');
-    if (root && $('[data-testid*="interactive-chart"],button[aria-label*="interactive chart" i],button[aria-label*="gráfico interactivo" i]',root).some(el=>visible(el)&&!excluded(el))) ids.add('response.interactive-chart');
-    if (root && $('[data-testid*="canvas"]',root).some(el=>visible(el)&&!excluded(el))) ids.add('response.canvas-workspace');
-    if (root && $('[data-testid*="slide"],[data-testid*="presentation"]',root).some(el=>visible(el)&&!excluded(el))) ids.add('response.slides-editor');
-
-    const has=(re)=>re.test(hay);
-    if (has(/send-button|send message|send prompt|enviar mensaje|enviar prompt/)) ids.add('composer.send');
-    if (has(/stop-generating|stop generation|detener generaci[oó]n|stop-button/)) ids.add('conversation.stop-generation');
-    if (has(/regenerate|retry|try again|regenerar|intentar de nuevo/)) ids.add('conversation.regenerate');
-    if (has(/edit.*message|edit-turn|editar mensaje|editar pregunta/)) ids.add('conversation.edit-user-message');
-    if (has(/copy.*(response|message|code)|copy-button|copiar respuesta|copiar c[oó]digo|copiar mensaje/)) ids.add('conversation.copy-response');
-    if (has(/thumbs.?up|thumbs.?down|good response|bad response|buena respuesta|mala respuesta|feedback/)) ids.add('conversation.feedback');
-    if (has(/share.*(chat|conversation|message)|compartir conversaci[oó]n|compartir respuesta/)) ids.add('conversation.share');
-    if (has(/attach|upload|file-upload|paperclip|adjuntar|subir archivo|add files|agregar archivos/)) ids.add('composer.attach-file');
-    if (has(/microphone|dictat|record audio|voice input|dictado|micr[oó]fono|grabar audio/)) ids.add('composer.dictation');
-    if (has(/voice mode|start voice|talk|modo voz|iniciar voz|voz en tiempo real/)) ids.add('composer.voice-mode');
-    if (has(/tools menu|tool-picker|more tools|herramientas/)) ids.add('composer.tool-picker');
-    if (has(/search the web|web search|buscar en la web|b[uú]squeda web/)) ids.add('composer.web-search-tool');
-    if (has(/deep research|investigaci[oó]n profunda/)) ids.add('composer.deep-research-tool');
-    if (has(/data analysis|analyze data|an[aá]lisis de datos/)) ids.add('composer.data-analysis-tool');
-    if (has(/branch.*chat|branch in new chat|ramificar|continuar en un nuevo chat/)) ids.add('conversation.branch');
-    if (has(/read aloud|listen|leer en voz alta|escuchar/)) ids.add('response.audio-output');
-    if (has(/source|citation|sources|fuente|cita|referencias/)) ids.add('response.sources-panel');
-    if (root && $$('[data-testid*="search-result"],[data-testid*="web-search"]',root).length) ids.add('conversation.web-search-results');
-    if (root && $$('[data-testid*="followup"],[data-testid*="suggested-reply"]',root).length) ids.add('conversation.follow-up-suggestion');
-    if (root && $$('[data-testid*="project"],[data-project-id]',root).length) ids.add('conversation.project-context');
-    if (root && $$('[data-testid*="connector"],[data-testid*="connected-app"]',root).length) ids.add('conversation.connected-app-context');
-    if (root && $$('button,[role="button"]',root).some(el=>/preview|run code|previsualizar|ejecutar/i.test([attr(el,'aria-label',70),attr(el,'data-testid',70)].join(' ')))) ids.add('response.code-preview-run');
-    if (root && $$('[data-testid*="audio"],audio',root).length) ids.add('response.audio-output');
-    if (root && $$('input[type="file"],button[aria-label*="image" i],[data-testid*="image-upload"]',composerEl?.parentElement||root).length) ids.add('composer.image-input');
-    if (root && $$('input[type="file"],button[aria-label*="audio" i],[data-testid*="audio-upload"]',composerEl?.parentElement||root).length) ids.add('composer.audio-file');
-    return [...ids].sort();
-  }
-  function styleSummary(el) {
-    if(!el) return null;
-    const s=getComputedStyle(el), r=el.getBoundingClientRect();
-    return {tag:el.tagName.toLowerCase(),role:attr(el,'role',30),testId:attr(el,'data-testid',70),classes:classes(el),display:s.display,position:s.position,flexDirection:s.flexDirection,overflow:s.overflow,fontSize:s.fontSize,width:Math.round(r.width),height:Math.round(r.height)};
-  }
-  function structure(root, controls) {
-    if(!root) return {nodes:[],total:0,truncated:false};
-    const nodes=[];
-    const walk=(el,depth)=>{
-      if(!el||nodes.length>=280||excluded(el)||depth>18)return;
-      nodes.push({depth,tag:el.tagName.toLowerCase(),role:attr(el,'role',40),testId:attr(el,'data-testid',70),classes:classes(el),messageRole:attr(el,'data-message-author-role',20),ariaLive:attr(el,'aria-live',30),ariaBusy:attr(el,'aria-busy',10),childElements:el.children?.length||0});
-      for(const child of el.children){if(nodes.length>=280)break;walk(child,depth+1);}
-    };
-    walk(root,0);
-    const total=root.querySelectorAll('*').length+1;
-    return {nodes,total,truncated:total>nodes.length};
-  }
-  function styleSheets() {
-    return [...document.styleSheets].slice(0,80).map((s,i)=>{
-      let rules=null,error=false;
-      try{rules=s.cssRules?.length??null;}catch{error=true;}
-      let path=s.href?'stylesheet':'inline-style';
-      if(s.href){try{const u=new URL(s.href);path=u.origin+u.pathname;}catch{path='external-stylesheet';}}
-      return {index:i,path,crossOriginOrInaccessible:error,ruleCount:rules};
-    });
-  }
-  async function fingerprintOf(value){
-    const bytes=new TextEncoder().encode(value);
-    const digest=await crypto.subtle.digest('SHA-256',bytes);
-    return [...new Uint8Array(digest)].map(byte=>byte.toString(16).padStart(2,'0')).join('');
-  }
-  function regionKey(){return globalThis.HarmoniaRegionPolicy?.classifyRegion(location.href)||'conversation';}
-  function streamActive(root){return !!root?.querySelector('[aria-busy="true"],[data-is-streaming="true"],[data-testid*="stop"]');}
-  const MAX_MESSAGE_CHARS=2000000, MESSAGE_CHUNK_CHARS=80000;
-  async function snapshotVisibleMessages(){
-    if(!H.active)return;
-    const root=mainRegion();if(!root)return;
-    const currentRegion=regionKey();
-    if(H.regionKey&&H.regionKey!==currentRegion)H.lastMessages.clear();
-    H.regionKey=currentRegion;
-    const isStreaming=streamActive(root);
-    const elements=$$('[data-message-author-role="user"],[data-message-author-role="assistant"]',root).filter(el=>visible(el)&&!excluded(el)).slice(0,200);
-    const liveKeys=new Set();
-    for(let index=0;index<elements.length;index++){
-      const el=elements[index],role=attr(el,'data-message-author-role',12);
-      if(role!=='user'&&role!=='assistant')continue;
-      const key=role+':'+index;liveKeys.add(key);
-      const fullText=String(el.innerText||'').replace(/\r\n?/g,'\n');
-      if(!fullText)continue;
-      const truncated=fullText.length>MAX_MESSAGE_CHARS;
-      const visibleText=fullText.slice(0,MAX_MESSAGE_CHARS);
-      const sha=await fingerprintOf(visibleText),previous=H.lastMessages.get(key);
-      const messageStreaming=role==='assistant'&&isStreaming&&index===elements.length-1;
-      const wasStreaming=!!previous?.streaming;
-      if(previous?.sha===sha){
-        if(wasStreaming&&!messageStreaming){
-          const result=await chrome.runtime.sendMessage({kind:'harmonia:event',event:{type:'conversation.visible.delta',payload:{
-            regionKey:currentRegion,messageKey:key,role,index,operation:'complete',delta:'',text:'',contentSha256:sha,
-            visible:true,streaming:false,truncated:visibleText.length>=MAX_MESSAGE_CHARS,hiddenReasoningCaptured:false,
-            chunkIndex:0,chunkCount:1}}}).catch(()=>null);
-          if(result?.ok&&result.value===true)H.lastMessages.set(key,{text:visibleText,sha,streaming:false});
-        }else H.lastMessages.set(key,{text:visibleText,sha,streaming:messageStreaming});
-        continue;
-      }
-      let operation='replace',remaining=visibleText,completedOnly=false;
-      if(previous&&visibleText.startsWith(previous.text)&&visibleText.length>previous.text.length){operation='append';remaining=visibleText.slice(previous.text.length);}
-      let offset=0,failed=false;
-      do{
-        const chunk=remaining.slice(offset,offset+MESSAGE_CHUNK_CHARS);
-        const chunkOperation=completedOnly?'complete':(operation==='replace'&&offset===0?'replace':'append');
-        const payload={regionKey:currentRegion,messageKey:key,role,index,operation:chunkOperation,
-          delta:chunkOperation==='append'?chunk:'',text:chunkOperation==='replace'?chunk:'',
-          contentSha256:sha,visible:true,streaming:messageStreaming,truncated,hiddenReasoningCaptured:false,
-          chunkIndex:Math.floor(offset/MESSAGE_CHUNK_CHARS),chunkCount:completedOnly?1:Math.max(1,Math.ceil(remaining.length/MESSAGE_CHUNK_CHARS))};
-        const result=await chrome.runtime.sendMessage({kind:'harmonia:event',event:{type:'conversation.visible.delta',payload}}).catch(()=>null);
-        if(!result?.ok||result.value!==true){failed=true;break;}
-        if(completedOnly)break;
-        offset+=chunk.length;
-      }while(offset<remaining.length);
-      if(!failed)H.lastMessages.set(key,{text:visibleText,sha,streaming:messageStreaming});
-    }
-    for(const key of H.lastMessages.keys())if(!liveKeys.has(key))H.lastMessages.delete(key);
-  }
-  function scheduleMessageSnapshot(){if(!H.active||messageTimer)return;messageTimer=setTimeout(()=>{messageTimer=null;void snapshotVisibleMessages();},350);}
-  function scheduleConsoleFlush(delay=150){
-    if(H.consoleFlushTimer||!H.active)return;
-    H.consoleFlushTimer=setTimeout(()=>{H.consoleFlushTimer=null;void flushConsoleQueue();},delay);
-  }
-  async function flushConsoleQueue(){
-    if(H.consoleFlushBusy||!H.active||!H.consoleQueue.length)return;
-    H.consoleFlushBusy=true;
-    const batch=H.consoleQueue.splice(0,50);
-    const result=await chrome.runtime.sendMessage({kind:'harmonia:event',event:{type:'console.observed',payload:{
-      regionKey:regionKey(),level:'log',entries:batch,observedAt:new Date().toISOString(),source:'page-console-bridge',batched:true
-    }}}).catch(()=>null);
-    const ok=!!(result?.ok&&result.value===true);
-    if(!ok)H.consoleQueue.unshift(...batch);
-    H.consoleFlushBusy=false;
-    if(H.active&&H.consoleQueue.length)scheduleConsoleFlush(ok?50:1000);
-  }
-  function consoleEvent(event){
-    if(!H.active||!event?.detail||typeof event.detail!=='object')return;
-    let detail;try{detail=JSON.parse(JSON.stringify(event.detail));}catch{return;}
-    const level=safe(detail.level,16)||'log';
-    const entries=Array.isArray(detail.entries)?detail.entries.slice(0,10):[];
-    for(const item of entries){
-      H.consoleQueue.push({type:level+'/'+safe(item?.type,24),value:String(item?.value??'').slice(0,1000)});
-    }
-    scheduleConsoleFlush();
-  }
-  let lastControls='';
-  async function scanOnce(force=false) {
-    if(!H.active||H.structureStandby)return;
-    const root=mainRegion(), comp=composer();
-    if(!root&&!comp)return;
-    const roots=[...new Set([root,comp?.closest('form')||comp?.parentElement].filter(Boolean))];
-    const controls=roots.flatMap(r=>controlsIn(r)).filter((c,i,a)=>a.findIndex(x=>x.signature===c.signature)===i).slice(0,100);
-    const features=featureIds(root,comp,controls);
-    const struct=structure(root||comp?.closest('form')||comp,controls);
-    const viewport={width:innerWidth,height:innerHeight,devicePixelRatio:window.devicePixelRatio||1};
-    const sheetSummary=styleSheets();
-    const currentRegion=regionKey();
-    const signature=JSON.stringify({regionKey:currentRegion,features,controls:controls.map(c=>c.signature),structureNodes:struct.nodes,styles:sheetSummary.map(s=>[s.path,s.ruleCount,s.crossOriginOrInaccessible]),viewport});
-    const fingerprint=await fingerprintOf(signature);
-    const now=Date.now();
-    if(!force&&fingerprint===H.lastFingerprint)return;
-    if(!force&&now-H.lastSentAt<4000){H.droppedScans++;return;}
-    H.lastFingerprint=fingerprint;H.lastSentAt=now;
-    const payload={
-      catalogVersion:'0.1.2',fingerprint,features,controls:controls.map(({signature,...c})=>c),
-      structure:struct,stylesheets:sheetSummary,viewport,
-      layout:{main:styleSummary(root),composer:styleSummary(comp),assistant:styleSummary(root?.querySelector('[data-message-author-role="assistant"]'))},
-      counts:{controls:controls.length,userMessages:root?$$('[data-message-author-role="user"]',root).length:0,assistantMessages:root?$$('[data-message-author-role="assistant"]',root).length:0,styleSheets:document.styleSheets.length},
-      regionKey:currentRegion,
-      privacy:{visibleMessageTextCaptured:true,composerTextCaptured:false,fieldValuesCaptured:false,hrefsCaptured:false,imageUrlsCaptured:false,hiddenReasoningCaptured:false,menusExcluded:true},
-      droppedScans:H.droppedScans
-    };
-    await chrome.runtime.sendMessage({kind:'harmonia:event',event:{type:'ui.surface.scan',payload}}).catch(()=>{});
-  }
-  let scanInFlight=false,rescanPending=false;
-  async function scan(force=false){
-    if(!H.active||H.structureStandby)return;
-    if(scanInFlight){rescanPending=true;return;}
-    scanInFlight=true;
-    try{
-      do{rescanPending=false;await scanOnce(force);force=false;}while(rescanPending&&H.active);
-    }finally{scanInFlight=false;}
-  }
-  function scheduleScan(){if(!H.active||H.structureStandby)return;if(timer)clearTimeout(timer);timer=setTimeout(()=>{timer=null;void scan(false);},1600);}
-  function setStructureStandby(value){
-    const wasStandby=H.structureStandby;
-    H.structureStandby=!!value;
-    if(H.structureStandby){if(timer)clearTimeout(timer);timer=null;}
-    else if(H.active&&wasStandby){void scan(true);}
-  }
-  function start(message){
-    const structureStandby=message?.structureObserver===false;
-    if(H.active){setStructureStandby(structureStandby);return;}
-    H.active=true;H.structureStandby=structureStandby;sessionId=message?.sessionId||null;scheduleConsoleFlush(0);
-    window.addEventListener('resize',scheduleScan,{passive:true});
-    window.addEventListener('popstate',scheduleScan,true);
-    window.addEventListener('hashchange',scheduleScan,true);
-    window.addEventListener('harmonia:console-observed',consoleEvent,false);
-    if(!H.structureStandby)void scan(true);scheduleMessageSnapshot();
-    observer=new MutationObserver(records=>{
-      const relevant=records.some(record=>{
-        const target=record.target?.nodeType===1?record.target:record.target?.parentElement;
-        if(!target||excluded(target))return false;
-        if(record.type==='attributes'||record.type==='characterData')return true;
-        if(record.type==='childList')return [...record.addedNodes,...record.removedNodes].some(node=>node.nodeType===1&&!excluded(node));
-        return false;
-      });
-      if(relevant){if(!H.structureStandby)scheduleScan();scheduleMessageSnapshot();}
-    });
-    const root=mainRegion()||document.body;
-    observer.observe(root,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['class','role','aria-label','aria-live','aria-busy','data-testid','data-message-author-role','disabled','data-state']});
-    const comp=composer();
-    if(comp&&!root?.contains(comp))observer.observe(comp.closest('form')||comp.parentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['class','role','aria-label','aria-live','aria-busy','data-testid','disabled','data-state']});
-    // Sin sondeo periódico: las mutaciones estructurales y el viewport activan el barrido.
-  }
-  function stop(){
-    if(!H.active)return;
-    H.active=false;
-    if(observer)observer.disconnect();observer=null;
-    if(timer)clearTimeout(timer);timer=null;
-    if(messageTimer)clearTimeout(messageTimer);messageTimer=null;
-    H.periodic=null;H.lastMessages.clear();
-    window.removeEventListener('resize',scheduleScan);
-    window.removeEventListener('popstate',scheduleScan,true);
-    window.removeEventListener('hashchange',scheduleScan,true);
-    window.removeEventListener('harmonia:console-observed',consoleEvent,false);
-  }
-  chrome.runtime.onMessage.addListener(message=>{
-    if(message?.kind==='harmonia:start')start(message);
-    if(message?.kind==='harmonia:standby-structure')setStructureStandby(true);
-    if(message?.kind==='harmonia:observe-structure')setStructureStandby(false);
-    if(message?.kind==='harmonia:stop'){if(H.consoleFlushTimer)clearTimeout(H.consoleFlushTimer);H.consoleFlushTimer=null;stop();}
-  });
-  chrome.runtime.sendMessage({kind:'harmonia:auto-settings'}).then(response=>{
-    if(response?.ok&&response.value?.enabled)start({automatic:true,structureObserver:response.value?.observe!==false});
-  }).catch(()=>{});
+try { importScripts('local-auth.js'); } catch {}
+importScripts('region-policy.js');
+const COLLECTOR='http://127.0.0.1:47321';
+const TOKEN=String(globalThis.HARMONIA_TOKEN||'');
+const STORE={sessions:'harmoniaAutoSessions',enabled:'harmoniaAutoEnabled',events:'harmoniaEventCount',fingerprints:'harmoniaKnownSurfaceFingerprints',repositorySync:'harmoniaRepositorySync',regionCoverage:'harmoniaRegionCoverage',regionLeaders:'harmoniaRegionLeaders',areaHealth:'harmoniaAreaHealth',devReloadVersion:'harmoniaDevReloadVersion'};
+const DEV_RELOAD_ALARM='harmonia-dev-reload';
+const CHATGPT_AREA='observabilidad.arquitectura.chatgpt';
+const REPO_BUILD_INFO='https://raw.githubusercontent.com/SeryMente/khora/main/apps/harmonia-observability/extension/build-info.json';
+const REPO_CATALOG='https://raw.githubusercontent.com/SeryMente/khora/main/apps/harmonia-observability/coverage-catalog.json';
+const REPO_SYNC_ALARM='harmonia-repository-sync';
+let sessions={};
+let autoEnabled=true;
+let eventCount=0;
+let lastError=null;
+let collector=false;
+let collectorHealth=null;
+let knownFingerprints=new Set();
+let regionCoverage={};
+let regionLeaders={};
+let surfaceQueue=Promise.resolve();
+let areaHealth={};
+let devReloadVersion=null;
+const ready=(async()=>{
+  const saved=await chrome.storage.local.get([STORE.sessions,STORE.enabled,STORE.events,STORE.fingerprints,STORE.regionCoverage,STORE.regionLeaders,STORE.areaHealth,STORE.devReloadVersion]);
+  sessions=saved[STORE.sessions]||{};
+  autoEnabled=saved[STORE.enabled]!==false;
+  eventCount=Number(saved[STORE.events]||0);
+  knownFingerprints=new Set(Array.isArray(saved[STORE.fingerprints])?saved[STORE.fingerprints]:[]);
+  regionCoverage=saved[STORE.regionCoverage]&&typeof saved[STORE.regionCoverage]==='object'?saved[STORE.regionCoverage]:{};
+  regionLeaders=saved[STORE.regionLeaders]&&typeof saved[STORE.regionLeaders]==='object'?saved[STORE.regionLeaders]:{};
+  areaHealth=saved[STORE.areaHealth]&&typeof saved[STORE.areaHealth]==='object'?saved[STORE.areaHealth]:{};
+  devReloadVersion=typeof saved[STORE.devReloadVersion]==='string'?saved[STORE.devReloadVersion]:null;
+  await chrome.storage.local.set({[STORE.enabled]:autoEnabled});
+  const tabs=await chrome.tabs.query({url:'https://chatgpt.com/*'});
+  const live=new Set(tabs.filter(tab=>tab.id&&valid(tab.url)).map(tab=>String(tab.id)));
+  for(const key of Object.keys(sessions))if(!live.has(key))delete sessions[key];
+  await saveSessions();
+  await refreshKnownFingerprints();
+  await refreshRegionCoverage();
+  await syncRepository();
+  await checkHealth();
+  chrome.alarms.create(REPO_SYNC_ALARM,{delayInMinutes:1,periodInMinutes:360});
+  chrome.alarms.create(DEV_RELOAD_ALARM,{delayInMinutes:0.5,periodInMinutes:0.5});
 })();
+async function setTabIndicator(tabId,status){
+ try{await chrome.tabs.sendMessage(tabId,{kind:'harmonia:tab-indicator',status});}catch{}
+}
+async function refreshActionIndicator(){
+ const entries=Object.values(areaHealth);
+ const areaError=entries.some(item=>item?.status==='error');
+ const areaWarning=entries.some(item=>item?.status==='warning');
+ const fatal=!!lastError||!collector||!TOKEN||areaError;
+ const warning=areaWarning||!autoEnabled;
+ const text=fatal||warning?'!':'●';
+ const color=fatal?'#c83d42':warning?'#d39a2d':'#2e9d62';
+ const title=fatal?'Harmonia · error: '+(lastError||'revisa el colector o el ámbito activo'):
+  warning?'Harmonia · atención: '+(areaWarning?'hay una alerta de ámbito':'observación pausada'):
+  'Harmonia · funcionamiento correcto';
+ try{await chrome.action.setBadgeText({text});await chrome.action.setBadgeBackgroundColor({color});await chrome.action.setTitle({title});}catch{}
+ return {status:fatal?'error':warning?'warning':'ok',text,color,title};
+}
+async function setAreaHealth(areaId,status,detail=''){
+ if(typeof areaId!=='string'||!/^[a-z0-9][a-z0-9._-]{1,100}$/i.test(areaId))throw new Error('Identificador de ámbito no válido.');
+ if(!['ok','warning','error'].includes(status))throw new Error('Estado de ámbito no válido.');
+ areaHealth[areaId]={status,detail:String(detail||'').slice(0,240),updatedAt:new Date().toISOString()};
+ await chrome.storage.local.set({[STORE.areaHealth]:areaHealth});
+ await refreshActionIndicator();
+ return areaHealth[areaId];
+}
+let storageQueue=Promise.resolve();
+function saveSessions(){
+ const snapshot=Object.fromEntries(Object.entries(sessions).map(([key,session])=>[key,{...session}]));
+ const state={[STORE.sessions]:snapshot,[STORE.enabled]:autoEnabled,[STORE.events]:eventCount,[STORE.regionCoverage]:regionCoverage,[STORE.regionLeaders]:regionLeaders};
+ storageQueue=storageQueue.then(()=>chrome.storage.local.set(state));
+ return storageQueue;
+}
+function headers(extra={}){return {...extra,'x-harmonia-token':TOKEN};}
+function valid(url=''){try{const u=new URL(url);return u.protocol==='https:'&&u.hostname==='chatgpt.com';}catch{return false;}}
+function regionFor(url){return HarmoniaRegionPolicy.classifyRegion(url);}
+function privacyContract(){return {visibleMessageTextCaptured:true,composerTextCaptured:false,fieldValuesCaptured:false,hrefsCaptured:false,imageUrlsCaptured:false,hiddenReasoningCaptured:false,menusExcluded:true,consoleValuesRedacted:true};}
+function safePageUrl(raw){try{const u=new URL(raw);return u.origin+u.pathname.replace(/\/c\/[^/]+/,'/c/[conversation]').replace(/\/g\/[^/]+/,'/g/[gpt]');}catch{return 'https://chatgpt.com/';}}
+async function checkHealth(){
+  if(!TOKEN){collector=false;collectorHealth=null;lastError='Falta la credencial local de Harmonia.';await refreshActionIndicator();return false;}
+  try{
+    const response=await fetch(COLLECTOR+'/health',{headers:headers(),cache:'no-store'});
+    collectorHealth=response.ok?await response.json():null;
+    collector=!!(response.ok&&collectorHealth&&collectorHealth.ok);
+    lastError=collector?null:'Colector HTTP '+response.status;
+  }catch(error){collector=false;collectorHealth=null;lastError=String(error.message||error);}
+  await refreshActionIndicator();
+  return collector;
+}
+function compareVersions(a,b){
+ const pa=String(a||'0.0.0').split('.').map(x=>Number.parseInt(x,10)||0),pb=String(b||'0.0.0').split('.').map(x=>Number.parseInt(x,10)||0);
+ for(let i=0;i<3;i++){if((pa[i]||0)>(pb[i]||0))return 1;if((pa[i]||0)<(pb[i]||0))return -1;}
+ return 0;
+}
+async function syncRepository(){
+ const checkedAt=new Date().toISOString();
+ const saved=await chrome.storage.local.get([STORE.repositorySync]);
+ const previous=saved[STORE.repositorySync]||{};
+ try{
+  const [localResponse,remoteBuildResponse,remoteCatalogResponse]=await Promise.all([
+   fetch(chrome.runtime.getURL('build-info.json'),{cache:'no-store'}),
+   fetch(REPO_BUILD_INFO,{cache:'no-store',headers:{'Accept':'application/json'}}),
+   fetch(REPO_CATALOG,{cache:'no-store',headers:{'Accept':'application/json'}})
+  ]);
+  if(!localResponse.ok||!remoteBuildResponse.ok||!remoteCatalogResponse.ok)throw new Error('No se pudieron leer los metadatos y el catálogo desde main.');
+  const [localBuild,remoteBuild,remoteCatalog]=await Promise.all([localResponse.json(),remoteBuildResponse.json(),remoteCatalogResponse.json()]);
+  if(localBuild.schema!=='harmonia.repository-build.v1'||remoteBuild.schema!=='harmonia.repository-build.v1'||typeof remoteBuild.sourceRevision!=='string'||!/^([0-9a-f]{7,40})$/i.test(remoteBuild.sourceRevision))throw new Error('Los metadatos de versión del repositorio no superaron la validación.');
+  if(remoteCatalog.schema!=='harmonia.coverage-catalog.v1'||!Array.isArray(remoteCatalog.features)||!Array.isArray(remoteCatalog.sources))throw new Error('El catálogo del repositorio tiene un esquema inesperado.');
+  const manifest=chrome.runtime.getManifest();
+  const localVersion=String(manifest.version||localBuild.version||'0.0.0');
+  const remoteVersion=String(remoteBuild.version||'0.0.0');
+  const codeUpdateAvailable=compareVersions(remoteVersion,localVersion)>0||String(remoteBuild.sourceRevision)!==String(localBuild.sourceRevision);
+  const catalogUpdateAvailable=String(remoteCatalog.version)!==String(localBuild.catalogVersion||'')||JSON.stringify(remoteCatalog)!==JSON.stringify(previous.catalog||null);
+  const status=codeUpdateAvailable?'update-available':catalogUpdateAvailable?'catalog-updated':'current';
+  const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(remoteCatalog)));
+  const catalogSha256=[...new Uint8Array(digest)].map(byte=>byte.toString(16).padStart(2,'0')).join('');
+  const state={schema:'harmonia.repository-sync.v1',repository:'SeryMente/khora',branch:'main',sourcePath:'apps/harmonia-observability',
+   status,checkedAt,lastSuccessfulSyncAt:checkedAt,localVersion,remoteVersion,localRevision:String(localBuild.sourceRevision),remoteRevision:String(remoteBuild.sourceRevision),
+   updateAvailable:codeUpdateAvailable,catalogVersion:String(remoteCatalog.version||''),catalogSha256,catalog:remoteCatalog,error:null,
+   policy:'Solo sincroniza metadatos y catálogo JSON validados; nunca descarga ni ejecuta JavaScript remoto.'};
+  await chrome.storage.local.set({[STORE.repositorySync]:state});
+  return state;
+ }catch(error){
+  const state={...previous,schema:'harmonia.repository-sync.v1',repository:'SeryMente/khora',branch:'main',status:'error',checkedAt,
+   lastSuccessfulSyncAt:previous.lastSuccessfulSyncAt||null,error:String(error.message||error),
+   policy:'Solo sincroniza metadatos y catálogo JSON validados; nunca descarga ni ejecuta JavaScript remoto.'};
+  await chrome.storage.local.set({[STORE.repositorySync]:state});
+  return state;
+ }
+}
+async function refreshKnownFingerprints(){
+ if(!TOKEN)return;
+ try{
+  const response=await fetch(`${COLLECTOR}/fingerprints`,{headers:headers(),cache:'no-store'});
+  if(!response.ok)throw new Error(`Colector HTTP ${response.status}`);
+  const data=await response.json();
+  knownFingerprints=new Set(Array.isArray(data.fingerprints)?data.fingerprints.filter(fp=>/^[0-9a-f]{64}$/.test(fp)):[]);
+  await chrome.storage.local.set({[STORE.fingerprints]:[...knownFingerprints]});
+ }catch(error){
+  knownFingerprints=new Set();
+  await chrome.storage.local.set({[STORE.fingerprints]:[]});
+  lastError='No se pudo restaurar el índice de superficies: '+String(error.message||error);
+ }
+}
+async function rememberFingerprint(fingerprint){
+ knownFingerprints.delete(fingerprint);knownFingerprints.add(fingerprint);
+ while(knownFingerprints.size>5000)knownFingerprints.delete(knownFingerprints.values().next().value);
+ await chrome.storage.local.set({[STORE.fingerprints]:[...knownFingerprints]});
+}
+async function postEvent(tabId,session,type,payload={},source='extension'){
+ const event={schema:'harmonia.event.v1',eventId:crypto.randomUUID(),sessionId:session.id,conversation:`tab-${tabId}`,type,source,capturedAt:new Date().toISOString(),payload};
+ if(!TOKEN){collector=false;lastError='No existe credencial local; evento no enviado.';await refreshActionIndicator();return {ok:false};}
+ try{
+  const response=await fetch(`${COLLECTOR}/events`,{method:'POST',headers:headers({'content-type':'application/json'}),body:JSON.stringify(event)});
+  if(!response.ok)throw new Error(`Colector HTTP ${response.status}`);
+  const ack=await response.json();
+  collector=true;lastError=null;eventCount++;session.events=(session.events||0)+1;session.lastAt=event.capturedAt;
+  await saveSessions();await refreshActionIndicator();
+  return {ok:true,storedType:ack.storedType||type,deduplicated:!!ack.deduplicated,eventId:event.eventId,regionExploration:ack.regionExploration||null};
+ }catch(error){collector=false;lastError=String(error.message||error);await refreshActionIndicator();return {ok:false,error:lastError};}
+}
+const sessionInitializers={};
+async function refreshRegionCoverage(){
+ if(!TOKEN)return regionCoverage;
+ try{const response=await fetch(`${COLLECTOR}/coverage`,{headers:headers(),cache:'no-store'});if(!response.ok)throw new Error(`Colector HTTP ${response.status}`);
+  const coverage=await response.json();regionCoverage=coverage.regions&&typeof coverage.regions==='object'?coverage.regions:{};
+  await chrome.storage.local.set({[STORE.regionCoverage]:regionCoverage});
+ }catch(error){lastError='No se pudo actualizar el estado de exploración regional: '+String(error.message||error);}
+ return regionCoverage;
+}
+function regionStatus(key){
+ const state=regionCoverage[key];
+ if(!state)return HarmoniaRegionPolicy.getRegionDescriptor(key).completionSupported?'exploring':'unmapped';
+ if(state.status==='complete'&&state.policyVersion===HarmoniaRegionPolicy.POLICY_VERSION&&state.catalogVersion==='0.1.2')return 'complete';
+ return state.status||'exploring';
+}
+async function ensureRegionLeader(regionKey,preferredTabId){
+ if(regionStatus(regionKey)!=='complete')return null;
+ const tabs=(await chrome.tabs.query({url:'https://chatgpt.com/*'})).filter(t=>regionFor(t.url)===regionKey);
+ const candidate=HarmoniaRegionPolicy.chooseLeader(tabs,regionLeaders[regionKey],preferredTabId);
+ if(candidate===null){delete regionLeaders[regionKey];await chrome.storage.local.set({[STORE.regionLeaders]:regionLeaders});return null;}
+ if(regionLeaders[regionKey]!==candidate){regionLeaders[regionKey]=candidate;await chrome.storage.local.set({[STORE.regionLeaders]:regionLeaders});}
+ return candidate;
+}
+async function canObserveTab(tab){
+ if(!autoEnabled||!tab?.id||!valid(tab.url))return false;
+ const key=regionFor(tab.url);if(regionStatus(key)!=='complete')return true;
+ return (await ensureRegionLeader(key,tab.id))===tab.id;
+}
+async function reconcileRegionLeaders(regionKey,preferredTabId,refresh=false){
+ if(!regionKey)return;if(refresh)await refreshRegionCoverage();
+ if(regionStatus(regionKey)!=='complete'){
+  delete regionLeaders[regionKey];await chrome.storage.local.set({[STORE.regionLeaders]:regionLeaders});
+  return;
+ }
+ const tabs=(await chrome.tabs.query({url:'https://chatgpt.com/*'})).filter(t=>regionFor(t.url)===regionKey);
+ const leader=HarmoniaRegionPolicy.chooseLeader(tabs,regionLeaders[regionKey],preferredTabId);
+ if(leader===null){delete regionLeaders[regionKey];await chrome.storage.local.set({[STORE.regionLeaders]:regionLeaders});return;}
+ regionLeaders[regionKey]=leader;await chrome.storage.local.set({[STORE.regionLeaders]:regionLeaders});
+ for(const tab of tabs){if(!tab.id)continue;if(tab.id===leader){if(autoEnabled)await injectTab(tab,true);continue;}
+  try{await chrome.tabs.sendMessage(tab.id,{kind:'harmonia:standby-structure'});}catch{}
+ }
+}
+
+async function ensureSession(tab){
+ const key=String(tab.id),regionKey=regionFor(tab.url);
+ if(sessionInitializers[key])return sessionInitializers[key];
+ if(!autoEnabled||!tab?.id||!valid(tab.url))return null;
+ if(sessions[key]&&sessions[key].regionKey===regionKey)return sessions[key];
+ if(sessions[key])await stopSession(tab.id,'region-navigation');
+ sessionInitializers[key]=(async()=>{
+  const session={id:crypto.randomUUID(),startedAt:new Date().toISOString(),lastAt:null,events:0,url:safePageUrl(tab.url),regionKey};
+  sessions[key]=session;await saveSessions();await setTabIndicator(tab.id,'observing');
+  await postEvent(tab.id,session,'capture.started',{url:session.url,version:'0.4.0',mode:'automatic-interface-observation',regionKey,privacy:privacyContract()});
+  return session;
+ })();
+ try{return await sessionInitializers[key];}finally{delete sessionInitializers[key];}
+}
+function boundedString(value,max=90){return typeof value==='string'?value.slice(0,max):'';}
+function sanitizeControl(control){
+ return {tag:boundedString(control?.tag,24),role:boundedString(control?.role,40),label:boundedString(control?.label,90),testId:boundedString(control?.testId,70),placeholder:boundedString(control?.placeholder,80),type:boundedString(control?.type,24),disabled:!!control?.disabled,expanded:boundedString(control?.expanded,10)};
+}
+function sanitizeStructure(structure){
+ const nodes=Array.isArray(structure?.nodes)?structure.nodes.slice(0,280).map(node=>({
+  depth:Number(node?.depth||0),tag:boundedString(node?.tag,24),role:boundedString(node?.role,40),testId:boundedString(node?.testId,70),
+  classes:Array.isArray(node?.classes)?node.classes.filter(x=>typeof x==='string').slice(0,5).map(x=>x.slice(0,50)):[],
+  messageRole:boundedString(node?.messageRole,20),ariaLive:boundedString(node?.ariaLive,30),ariaBusy:boundedString(node?.ariaBusy,10),childElements:Number(node?.childElements||0)
+ })): [];
+ return {nodes,total:Number(structure?.total||0),truncated:!!structure?.truncated};
+}
+function sanitizeScan(p){
+ const controls=Array.isArray(p.controls)?p.controls.slice(0,100).map(sanitizeControl):[];
+ const stylesheets=Array.isArray(p.stylesheets)?p.stylesheets.slice(0,80).map(sheet=>({index:Number(sheet?.index||0),path:boundedString(sheet?.path,180),crossOriginOrInaccessible:!!sheet?.crossOriginOrInaccessible,ruleCount:sheet?.ruleCount??null})):[];
+ const layout=p.layout&&typeof p.layout==='object'?p.layout:{},sanitizedLayout={};
+ for(const key of ['main','composer','assistant']){
+  const value=layout[key];if(!value||typeof value!=='object')continue;
+  sanitizedLayout[key]={tag:boundedString(value.tag,24),role:boundedString(value.role,30),testId:boundedString(value.testId,70),
+   classes:Array.isArray(value.classes)?value.classes.slice(0,5).map(x=>boundedString(x,50)):[],
+   display:boundedString(value.display,24),position:boundedString(value.position,24),flexDirection:boundedString(value.flexDirection,24),overflow:boundedString(value.overflow,24),
+   fontSize:boundedString(value.fontSize,16),width:Number(value.width||0),height:Number(value.height||0)};
+ }
+ return {catalogVersion:boundedString(p.catalogVersion,24),fingerprint:boundedString(p.fingerprint,64),
+  regionKey:['conversation','home','project','gpt','search','share','other'].includes(p.regionKey)?p.regionKey:'other',
+  regionPolicyVersion:boundedString(p.regionPolicyVersion,24),
+  features:Array.isArray(p.features)?p.features.filter(x=>typeof x==='string'&&x.length<120).slice(0,100):[],controls,
+  structure:sanitizeStructure(p.structure),stylesheets,
+  viewport:p.viewport&&typeof p.viewport==='object'?{width:Number(p.viewport.width||0),height:Number(p.viewport.height||0),devicePixelRatio:Number(p.viewport.devicePixelRatio||1)}:null,
+  layout:sanitizedLayout,
+  counts:{controls:controls.length,userMessages:Number(p.counts?.userMessages||0),assistantMessages:Number(p.counts?.assistantMessages||0),styleSheets:Number(p.counts?.styleSheets||stylesheets.length)},
+  privacy:{visibleMessageTextCaptured:true,composerTextCaptured:false,fieldValuesCaptured:false,hrefsCaptured:false,imageUrlsCaptured:false,hiddenReasoningCaptured:false,menusExcluded:true}};
+}
+function compactSurface(sanitized){
+ return {catalogVersion:sanitized.catalogVersion,fingerprint:sanitized.fingerprint,regionKey:sanitized.regionKey,
+  regionPolicyVersion:sanitized.regionPolicyVersion,features:sanitized.features,
+  controlCount:sanitized.controls.length,nodeCount:sanitized.structure.total,stylesheetCount:sanitized.stylesheets.length,viewport:sanitized.viewport,
+  privacy:{visibleMessageTextCaptured:true,composerTextCaptured:false,fieldValuesCaptured:false,hrefsCaptured:false,imageUrlsCaptured:false,hiddenReasoningCaptured:false,menusExcluded:true}};
+}
+async function processSurfaceScan(tab,session,payload){
+ if(!(await canObserveTab(tab)))return false;
+ payload.regionKey=regionFor(tab.url);payload.regionPolicyVersion=HarmoniaRegionPolicy.POLICY_VERSION;
+ const sanitized=sanitizeScan(payload);
+ if(!/^[0-9a-f]{64}$/.test(sanitized.fingerprint))throw new Error('La firma estructural no es válida.');
+ const alreadyKnown=knownFingerprints.has(sanitized.fingerprint),type=alreadyKnown?'ui.surface.reused':'ui.surface.scan';
+ const response=await postEvent(tab.id,session,type,alreadyKnown?compactSurface(sanitized):sanitized,'page-observer');
+ if(!response.ok)return false;
+ await rememberFingerprint(sanitized.fingerprint);
+ if(response.regionExploration&&typeof response.regionExploration==='object'){
+  const key=payload.regionKey||regionFor(tab.url);regionCoverage[key]=response.regionExploration;
+  await chrome.storage.local.set({[STORE.regionCoverage]:regionCoverage});await reconcileRegionLeaders(key,tab.id);
+ }
+ return true;
+}
+async function onObservedEvent(message,sender){
+ const tab=sender.tab;if(!autoEnabled||!tab?.id||!valid(tab.url))return false;
+ const type=String(message?.event?.type||'');
+ if(!['ui.surface.scan','conversation.visible.delta','console.observed'].includes(type))return false;
+ const session=await ensureSession(tab);if(!session)return false;
+ const payload=message.event.payload||{},regionKey=regionFor(tab.url);
+ if(type==='console.observed'&&payload.level==='error'){
+  await setAreaHealth(CHATGPT_AREA,'warning','ChatGPT reportó uno o más errores en la consola de la página.');
+  await setTabIndicator(tab.id,'warning');
+ }
+ const isStructuralObserver=type==='ui.surface.scan'?await canObserveTab(tab):false;
+ if(!HarmoniaRegionPolicy.canObserveEvent(regionStatus(regionKey),isStructuralObserver,type)){
+  if(type==='ui.surface.scan'){try{await chrome.tabs.sendMessage(tab.id,{kind:'harmonia:standby-structure'});}catch{}}
+  return false;
+ }
+ if(type==='ui.surface.scan'){
+  const next=surfaceQueue.then(()=>processSurfaceScan(tab,session,payload),()=>processSurfaceScan(tab,session,payload));
+  surfaceQueue=next.catch(error=>{lastError=String(error.message||error);void refreshActionIndicator();});return next;
+ }
+ payload.regionKey=regionKey;
+ const accepted=(await postEvent(tab.id,session,type,payload,'page-observer')).ok;
+ if(!accepted){await setTabIndicator(tab.id,'error');await refreshActionIndicator();return false;}
+ if(type!=='console.observed'||payload.level!=='error')await setTabIndicator(tab.id,'observing');
+ return true;
+}
+async function stopSession(tabId,reason){
+ const key=String(tabId),session=sessions[key];if(!session)return;
+ await postEvent(tabId,session,'capture.stopped',{reason,durationMs:Date.now()-Date.parse(session.startedAt)});
+ await setTabIndicator(tabId,'idle');delete sessions[key];await saveSessions();
+}
+function installConsoleBridgeMainWorld(){
+ if(window.__harmoniaConsoleBridgeV1?.installed)return;
+ const originals={},handlers=[];
+ const redact=value=>String(value||'').slice(0,4000)
+  .replace(/\bBearer\s+[^\s]+/gi,'Bearer [REDACTED]')
+  .replace(/\bsk-[A-Za-z0-9_-]{12,}\b/g,'[REDACTED_KEY]')
+  .replace(/\beyJ[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b/g,'[REDACTED_JWT]')
+  .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi,'[REDACTED_EMAIL]')
+  .replace(/([?&](?:token|key|auth|code|session|password|secret)=)[^&#\s]+/gi,'$1[REDACTED]');
+ const emit=(level,entries)=>{try{window.dispatchEvent(new CustomEvent('harmonia:console-observed',{detail:{level,entries:entries.slice(0,10),observedAt:Date.now()}}));}catch{}};
+ const summarize=value=>{
+  if(value instanceof Error)return {type:'Error',value:redact(value.name+': '+value.message+' '+String(value.stack||'')).slice(0,2000)};
+  if(typeof value==='string')return {type:'string',value:redact(value).slice(0,1000)};
+  if(value===null)return {type:'null',value:'null'};
+  if(['number','boolean','undefined','bigint','symbol'].includes(typeof value))return {type:typeof value,value:redact(value).slice(0,120)};
+  if(typeof value==='object')return {type:Array.isArray(value)?'array':'object',value:'keys='+Object.keys(value).slice(0,20).join(',')};
+  return {type:typeof value,value:''};
+ };
+ for(const level of ['log','info','warn','error','debug']){
+  if(typeof console[level]!=='function')continue;
+  originals[level]=console[level];const original=console[level].bind(console);
+  console[level]=function(...args){emit(level,args.slice(0,10).map(summarize));return original(...args);};
+ }
+ const onError=event=>emit('error',[{type:'uncaught-error',value:redact(event?.message||'Uncaught page error').slice(0,2000)}]);
+ const onRejection=event=>{
+  const reason=event?.reason;
+  const value=reason instanceof Error?reason.name+': '+reason.message:(typeof reason==='string'?reason:(reason&&typeof reason==='object'?'Promise rejection object keys='+Object.keys(reason).slice(0,20).join(','):String(reason)));
+  emit('error',[{type:'unhandled-rejection',value:redact(value).slice(0,2000)}]);
+ };
+ window.addEventListener('error',onError);handlers.push(['error',onError]);
+ window.addEventListener('unhandledrejection',onRejection);handlers.push(['unhandledrejection',onRejection]);
+ Object.defineProperty(window,'__harmoniaConsoleBridgeV1',{configurable:true,value:{installed:true,originals,handlers}});
+}
+async function removeConsoleBridge(tabId){
+ try{await chrome.scripting.executeScript({target:{tabId},world:'MAIN',func:function(){
+  const bridge=window.__harmoniaConsoleBridgeV1;if(!bridge)return;
+  for(const [level,original] of Object.entries(bridge.originals||{}))try{console[level]=original;}catch{}
+  for(const [name,handler] of bridge.handlers||[])try{window.removeEventListener(name,handler);}catch{}
+  try{delete window.__harmoniaConsoleBridgeV1;}catch{}
+ }});}catch{}
+}
+async function injectTab(tab,force=false){
+ if(!autoEnabled||!tab?.id||!valid(tab.url))return;
+ const structureObserver=force?true:await canObserveTab(tab);
+ try{
+  await chrome.scripting.executeScript({target:{tabId:tab.id},world:'MAIN',func:installConsoleBridgeMainWorld});
+  await chrome.scripting.executeScript({target:{tabId:tab.id},files:['region-policy.js','content.js']});
+  await chrome.tabs.sendMessage(tab.id,{kind:'harmonia:configure',automatic:true,regionKey:regionFor(tab.url),structureObserver});
+  await setTabIndicator(tab.id,'observing');await refreshActionIndicator();
+ }catch(error){lastError='No se pudo activar observación en una pestaña: '+String(error.message||error);await setTabIndicator(tab.id,'error');await refreshActionIndicator();}
+}
+async function injectExistingTabs(tabs){for(const tab of tabs||[]){if(valid(tab.url))await injectTab(tab);}}
+async function setAutoEnabled(value){
+ await ready;autoEnabled=!!value;await chrome.storage.local.set({[STORE.enabled]:autoEnabled});
+ const tabs=await chrome.tabs.query({url:'https://chatgpt.com/*'});
+ if(autoEnabled)await injectExistingTabs(tabs);
+ else for(const tab of tabs){if(!tab.id)continue;try{await chrome.tabs.sendMessage(tab.id,{kind:'harmonia:stop'});}catch{}await stopSession(tab.id,'automatic-capture-paused');await removeConsoleBridge(tab.id);}
+ return {autoEnabled,activeTabs:Object.keys(sessions).length};
+}
+chrome.runtime.onMessage.addListener((message,sender,respond)=>{
+ (async()=>{
+  await ready;
+  if(message.kind==='harmonia:auto-settings')return {enabled:autoEnabled,observe:autoEnabled?await canObserveTab(sender.tab):false,regionKey:sender.tab?.url?regionFor(sender.tab.url):null};
+  if(message.kind==='harmonia:open-dashboard'){
+   const url=chrome.runtime.getURL('dashboard.html'),tabs=await chrome.tabs.query({url});
+   if(tabs[0]?.id){await chrome.tabs.update(tabs[0].id,{active:true});return {opened:true,reused:true,tabId:tabs[0].id};}
+   const tab=await chrome.tabs.create({url});return {opened:true,reused:false,tabId:tab.id};
+  }
+  if(message.kind==='harmonia:sync-repository')return syncRepository();
+  if(message.kind==='harmonia:area-health')return setAreaHealth(message.areaId,message.status,message.detail||'');
+  if(message.kind==='harmonia:tab-indicator'&&sender.tab?.id){await setTabIndicator(sender.tab.id,message.status);return {updated:true};}
+  if(message.kind==='harmonia:get'){
+   await checkHealth();await refreshRegionCoverage();
+   const indicator=await refreshActionIndicator();
+   const syncData=await chrome.storage.local.get([STORE.repositorySync]);
+   let coverage=null;
+   if(collector){try{const response=await fetch(`${COLLECTOR}/coverage`,{headers:headers(),cache:'no-store'});if(response.ok)coverage=await response.json();else throw new Error(`Colector HTTP ${response.status}`);}catch(error){lastError=String(error.message||error);}}
+   return {version:'0.4.0',autoEnabled,active:autoEnabled&&Object.keys(sessions).length>0,activeTabs:Object.keys(sessions).length,
+    sessions:Object.entries(sessions).map(([tabId,session])=>({tabId,startedAt:session.startedAt,lastAt:session.lastAt,events:session.events,regionKey:session.regionKey})),
+    regionCoverage,regionLeaders,collector,collectorHealth:collectorHealth?{updatedAt:collectorHealth.updatedAt,totalBytes:collectorHealth.totalBytes,uniqueSurfaces:collectorHealth.uniqueSurfaces,sessions:collectorHealth.sessions}:null,lastError,events:eventCount,coverage,areaHealth,indicator,repositorySync:syncData[STORE.repositorySync]||null};
+  }
+  if(message.kind==='harmonia:set-auto')return setAutoEnabled(message.enabled);
+  if(message.kind==='harmonia:event'&&sender.tab?.id)return onObservedEvent(message,sender);
+  throw new Error('Mensaje no reconocido.');
+ })().then(value=>respond({ok:true,value})).catch(error=>respond({ok:false,error:String(error.message||error)}));
+ return true;
+});
+async function pollDevReload(){
+ try{
+  const response=await fetch(COLLECTOR+'/dev-version',{headers:headers(),cache:'no-store'});
+  if(!response.ok)throw new Error('Observador local HTTP '+response.status);
+  const data=await response.json();if(!data.enabled)return;
+  const version=String(data.revision||'');if(!version)return;
+  if(devReloadVersion===null){devReloadVersion=version;await chrome.storage.local.set({[STORE.devReloadVersion]:version});return;}
+  if(version!==devReloadVersion){
+   devReloadVersion=version;await chrome.storage.local.set({[STORE.devReloadVersion]:version});
+   setTimeout(()=>chrome.runtime.reload(),350);
+  }
+ }catch(error){lastError='No se pudo consultar la actualización local: '+String(error.message||error);await refreshActionIndicator();}
+}
+chrome.alarms.onAlarm.addListener(alarm=>{
+ if(alarm.name===REPO_SYNC_ALARM)void syncRepository();
+ if(alarm.name===DEV_RELOAD_ALARM)void pollDevReload();
+});
+chrome.tabs.onRemoved.addListener(tabId=>{void ready.then(async()=>{
+ const previous=sessions[String(tabId)],regionKey=previous?.regionKey;await stopSession(tabId,'tab-closed');if(regionKey)await reconcileRegionLeaders(regionKey,undefined,true);
+});});
+chrome.tabs.onUpdated.addListener((tabId,changeInfo,tab)=>{void ready.then(async()=>{
+ if(!changeInfo.url||!tab?.url)return;
+ const previous=sessions[String(tabId)],oldRegion=previous?.regionKey;
+ if(!valid(tab.url)){await stopSession(tabId,'tab-left-chatgpt');await removeConsoleBridge(tabId);if(oldRegion)await reconcileRegionLeaders(oldRegion,undefined,true);return;}
+ const nextRegion=regionFor(tab.url);
+ if(oldRegion&&oldRegion!==nextRegion)await stopSession(tabId,'region-navigation');
+ if(autoEnabled)await injectTab(tab);
+ if(oldRegion&&oldRegion!==nextRegion)await reconcileRegionLeaders(oldRegion,undefined,true);
+ await reconcileRegionLeaders(nextRegion,tabId,true);
+});});
+void ready.then(async()=>{if(autoEnabled){const tabs=await chrome.tabs.query({url:'https://chatgpt.com/*'});await injectExistingTabs(tabs);for(const key of Object.keys(regionCoverage))await reconcileRegionLeaders(key);}});
+/* Both periodic alarms are handled above. */
+chrome.runtime.onInstalled.addListener(()=>{void ready.then(async()=>{chrome.alarms.create(REPO_SYNC_ALARM,{delayInMinutes:1,periodInMinutes:360});chrome.alarms.create(DEV_RELOAD_ALARM,{delayInMinutes:0.5,periodInMinutes:0.5});await syncRepository();if(autoEnabled)await injectExistingTabs(await chrome.tabs.query({url:'https://chatgpt.com/*'}));});});
+chrome.runtime.onStartup.addListener(()=>{void ready.then(async()=>{chrome.alarms.create(REPO_SYNC_ALARM,{delayInMinutes:1,periodInMinutes:360});chrome.alarms.create(DEV_RELOAD_ALARM,{delayInMinutes:0.5,periodInMinutes:0.5});await syncRepository();if(autoEnabled)await injectExistingTabs(await chrome.tabs.query({url:'https://chatgpt.com/*'}));});});
+
+void ready.then(()=>refreshActionIndicator());

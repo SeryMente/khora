@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Harmonia · Observabilidad del trabajo con IA",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Observabilidad local automática y multi-pestaña de ChatGPT: estructura, consola y texto visible de mensajes; no captura borradores ni razonamiento oculto.",
   "permissions": [
     "scripting",
@@ -17,12 +17,22 @@
   "background": {
     "service_worker": "service-worker.js"
   },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Harmonia · estado y panel"
+    "default_title": "Harmonia · estado y panel",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
   },
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'"
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' http://127.0.0.1:47321"
   },
   "content_scripts": [
     {
