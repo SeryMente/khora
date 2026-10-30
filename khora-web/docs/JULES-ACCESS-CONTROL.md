@@ -2,21 +2,27 @@
 
 ## Regla de autorización
 
-Los scopes OAuth/manuales `jules:read` y `jules:write` habilitan las herramientas correspondientes, pero no autorizan por sí solos ningún repositorio. Cada operación sustantiva exige una concesión activa exacta:
+Los scopes `jules:read` y `jules:write` habilitan por separado las herramientas de lectura y escritura.
 
-`subject + source + branch + capability`
+- **Propietario/desarrollador único:** el sujeto autenticado coincide exactamente (sin distinguir mayúsculas/minúsculas) con `MCP_ALLOWED_EMAIL`. Puede operar sobre todas las fuentes y ramas que la cuenta configurada en `JULES_API_KEY` tenga disponibles. No necesita altas manuales en la ACL por repositorio o rama. Este acceso no amplía los permisos reales de la cuenta Jules del proveedor.
+- **Cualquier sujeto adicional:** requiere concesión activa exacta `subject + source + branch + capability` en `khora_private.jules_source_acl`; sin fila, con contexto incompleto, consulta fallida o discrepancia, se deniega.
 
-- `subject`: identidad autenticada por KHORA, tomada de `sub` OAuth o del propietario del token manual; coincidencia exacta.
+- Para el propietario, `sub` OAuth o el propietario del token manual se compara con `MCP_ALLOWED_EMAIL`; esta es una identidad de aplicación ya autenticada, no un campo proporcionado por el argumento de la herramienta.
+- Para cualquier otro sujeto: `subject` se obtiene de `sub` OAuth o del propietario del token manual; coincidencia exacta.
 - `source`: nombre de recurso literal de Jules, por ejemplo `sources/github/owner/repo`.
 - `branch`: nombre de rama exacto, sensible a la grafía y sin normalización.
 - `read_allowed` / `write_allowed`: capacidades separadas. El permiso de escritura no se deduce del de lectura ni viceversa.
-- Solo las filas con `revoked_at IS NULL` participan. Sin fila, con contexto incompleto, consulta fallida o discrepancia: denegar.
+- Solo las filas con `revoked_at IS NULL` participan para sujetos no propietarios. Sin fila, con contexto incompleto, consulta fallida o discrepancia: denegar.
 
 ## Almacenamiento y autoridad
 
-La migración `033_jules_source_acl.sql` crea `khora_private.jules_source_acl`, fuera del esquema público/API. Las concesiones las administra un principal de base de datos autorizado mediante un procedimiento de gobernanza; el servidor MCP no contiene herramientas para emitirlas ni modificarlas.
+La migración `033_jules_source_acl.sql` crea `khora_private.jules_source_acl`, fuera del esquema público/API. La ACL se conserva para sujetos adicionales; el servidor MCP no contiene herramientas para emitir ni modificar concesiones. La cuenta propietaria configurada es una excepción explícita de desarrollo y no requiere filas ACL.
 
 El rol configurado en `KHORA_READONLY_DATABASE_URL` debe recibir únicamente `USAGE` sobre `khora_private` y `SELECT` sobre `khora_private.jules_source_acl`. No se debe suponer el nombre del rol, crearlo automáticamente, conceder permisos a `PUBLIC`, `anon` o `authenticated`, ni usar el pool de escritura para leer ACL. La asignación de permisos se realiza solo después de verificar el rol real que usa esa variable en el entorno autorizado. La migración no se aplica automáticamente.
+
+## Uso directo del propietario/desarrollador
+
+El propietario autenticado puede consultar fuentes, ramas, sesiones y actividades y crear sesiones, enviar mensajes y aprobar planes, siempre que el scope correspondiente esté presente. La fuente y la rama de creación se vuelven a comprobar contra `sources.get` de Jules. Para sesiones existentes se valida el contexto devuelto por el proveedor. Las herramientas Jules no requieren `norm:turn`; sus controles son `jules:read` o `jules:write`, identidad autenticada y reglas propias de la operación. `norm:turn` se reserva para las herramientas normativas Khora.
 
 ## Aplicación por herramienta
 
@@ -40,7 +46,7 @@ El cliente debe pasar el `plan_id` y `plan_sha256` que recibe en `planGenerated`
 
 ## Límites de prueba
 
-Los tests del route fixture verifican el filtrado de herramientas, el bloqueo del proveedor con ACL fallida y el rechazo de un plan cuyo ID/huella cambian entre lecturas sintéticas. No prueban los privilegios del rol productivo ni la migración aplicada. La lectura real de ACL, el read-back del grant y la llamada a Jules siguen siendo pruebas de entorno independiente.
+Los tests del route fixture verifican el filtrado de herramientas, el bloqueo del proveedor con ACL fallida para sujetos adicionales, la excepción de propietario sin ACL ni `norm:turn` y el rechazo de un plan cuyo ID/huella cambian entre lecturas sintéticas. No prueban los privilegios del rol productivo ni la llamada real a Jules.
 ## Provisioning administrative (fuera de MCP)
 
 Antes de emitir concesiones, verifica qué identidad exacta aparece en el claim `sub` del Bearer autorizado y qué rol Postgres usa realmente `KHORA_READONLY_DATABASE_URL`. Tras confirmar el rol, el propietario de la base puede conceder exclusivamente lectura del esquema privado:
