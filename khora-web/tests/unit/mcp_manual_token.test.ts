@@ -56,6 +56,14 @@ test("manual Bearer token is high-entropy, scoped, expiring and stored by hash",
     assert.equal(result.record.generacion, 7);
     assert.equal(inserted.token_prefix, result.token.slice(0, 21));
     assert.notEqual(inserted.token_hash, result.token);
+    const custodiaToken = await createManualMcpToken({
+      usuario: "operador@khora.app",
+      scopes: ["custodia:metadata:read", "custodia:integrity:verify", "norm:turn"],
+      expiresInDays: 30,
+      label: "Custodia",
+    });
+    assert.equal(custodiaToken.record.scope, "norm:turn custodia:metadata:read custodia:integrity:verify");
+
 
     await assert.rejects(
       createManualMcpToken({
