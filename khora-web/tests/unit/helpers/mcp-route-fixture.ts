@@ -45,6 +45,7 @@ export function routeFixture(options: { scopes?: string[]; revoked?: boolean; de
     return options.partial ? { completo: false, resultados: [], cobertura: { examinados: 2, ilegibles: 1 } } : { fixture: name };
   };
   let julesGetSessionCalls = 0;
+  let fullPlanReadCalls = 0;
   const mockJulesGetSession = async (args?: unknown) => {
     const result = await business("JulesGetSession")(args) as Record<string, unknown>;
     julesGetSessionCalls++;
@@ -95,12 +96,12 @@ export function routeFixture(options: { scopes?: string[]; revoked?: boolean; de
       getSource: async (_name: string) => { await business("JulesGetSource")(_name); return options.sourceBranchExists === false ? { ...sourceFixture, githubRepo: { ...sourceFixture.githubRepo, defaultBranch: undefined, branches: [] } } : sourceFixture; },
       listActivitiesPage: async (sessionId: string, pageSize?: number, pageToken?: string) => {
         await business("JulesListActivitiesPage")({ sessionId, pageSize, pageToken });
-        const planId = options.planSecondId && pageToken === "fixture-next-page" ? options.planSecondId : options.currentPlanId ?? "fixture-plan-1";
+        if (pageSize === 100 && !pageToken) fullPlanReadCalls++;
+        const changedDuringSecondRead = options.planSecondId && pageSize === 100 && fullPlanReadCalls >= 2;
+        const planId = changedDuringSecondRead ? options.planSecondId! : options.currentPlanId ?? "fixture-plan-1";
         const plan = { id: planId, createTime: "2026-10-30T10:00:00Z", steps: [{ id: "step-1", index: 0, title: "Implement guarded change", description: "Synthetic plan description" }] };
         const activities = [{ name: "sessions/fixture-session/activities/plan-activity", id: "plan-activity", originator: "agent", createTime: "2026-10-30T10:00:00Z", planGenerated: { plan } }];
-        return options.planSecondId && !pageToken
-          ? { activities: [], nextPageToken: "fixture-next-page" }
-          : { activities, nextPageToken: undefined };
+        return { activities, nextPageToken: undefined };
       },
       createSession: business("JulesCreateSession"),
       sendMessage: business("JulesSendMessage"),
