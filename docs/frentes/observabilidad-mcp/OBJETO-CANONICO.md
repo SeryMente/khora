@@ -3,7 +3,7 @@
 ## 1. Identidad y control
 - Frente único: **Observabilidad MCP**; identidad canónica `OBSERVABILIDAD-MCP`.
 - Repositorio: `SeryMente/khora`; OCP: `docs/frentes/observabilidad-mcp/OBJETO-CANONICO.md`.
-- OCP: **v0.2.3**. Control: generación 3, titular operativo conservado del control anterior.
+- OCP: **v0.2.4**. Control: generación 3, titular operativo conservado del control anterior.
 - Las tareas provisionales «General» y «Jules» pertenecen a este mismo frente; no crean OCP, frente ni control paralelos.
 - `MCP-OBS-DICTADO` permanece como identidad histórica del objeto agregado anterior, no como otro frente activo.
 
@@ -19,8 +19,8 @@ Leer README, DUG vigente, este OCP y `CONTROL-RESPONSABILIDAD.json`. La titulari
 **Interpretación operativa separada:** el repositorio denomina MCP al servidor/protocolo y herramientas de Khora; «MSP» se conserva en la cita original. El frente cubre el acceso de modelos/agentes autorizados a observabilidad y la integración controlada con Jules.
 
 ## 3. Referencia metodológica
-- DUG consultado en `SeryMente/metodologia/main`: **v366 · NX-366m**; commit del archivo normativo `b9493d50ce1d89b2f73c2bc2626f5acfcc276d19`.
-- Metacanon **1.26**; GOW **2.13**.
+- DUG consultado en `SeryMente/metodologia/main`: **v368 · NX-368m**; HTML canónico SHA `2ba096f565807d7c19df0a9a8cab9e8410110a15`; último commit de `main` verificado `c90a9f84143089c3c02208fd27b3625f3e9f1e08` (`2026-10-30T21:47:15Z`).
+- Metacanon **1.26**; GOW **2.14**.
 - CNP vigente (categoría A): P001, P004, P005, P038 y P043; consideración explícita en cada turno. MCP normativo: DESACTIVADO.
 - Fuente normativa: `SeryMente/metodologia/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html`.
 - MCP-NORMATIVO: **DESACTIVADO**. No debe confundirse con el servidor MCP de producto Khora.
@@ -160,3 +160,17 @@ Este documento en `main` es el objeto canónico único del frente. El control in
 - **Preview/Production:** Preview existente continúa en SHA anterior `2452d8c8498eeb0338e4efaed9d13eef70fb7f84`; no refleja el corte de código validado. No se hizo nuevo deploy a Preview ni Production.
 - **Seguridad/aceptación pendiente:** ACL productiva continúa vacía; no se conoce un subject OAuth Jules, source ni branch reales verificadas; no hay grants ni llamada real a Jules. La conexión de `KHORA_READONLY_DATABASE_URL` con el rol efectivo sigue sin comprobarse. No se revisó visualmente la UI: RDC conectado expone terminal/archivos/procesos, no captura de pantalla ni control de navegador. La revisión visual personal del operador exigida por doble control sigue pendiente.
 - **Cierre de estado:** implementación y validación local verificadas; integración CI/identidad Jules, revisión visual del operador, prueba end-to-end, merge y despliegue siguen pendientes. No se declara aceptación.
+
+### C005 — UI local y actualización metodológica — 2026-10-30
+Se verificó la fuente canónica actual de Metodología: DUG v368 · NX-368m, Metacanon 1.26 y GOW 2.14. Se leyó §ARR y se revisó el conjunto de 43 principios y sus remisiones; el CNP conserva P001, P004, P005, P038 y P043 con categoría A; MCP normativo continúa DESACTIVADO. El commit más reciente de Metodología `main` es `c90a9f84143089c3c02208fd27b3625f3e9f1e08` (21:47:15Z). Para la revisión de UX/UI se levantó el build local en PC-14, ligado exclusivamente a `127.0.0.1:4173`, con bypass de autenticación limitado a entorno de prueba. `/sistema/mcp` respondió HTTP 200 y renderizó la pantalla real. La interfaz fue abierta en Edge y se capturó una imagen local. Los GET de `/api/mcp/revocacion` y `/api/mcp/manual-token` respondieron 401 por ausencia deliberada de sesión/credenciales locales; no se conectó Neon Production, no se creó/revocó token y la pantalla muestra un error de estado local. La inspección automatizada no sustituye la revisión personal del operador. El servidor local permanece activo para esa revisión.
+## 16. Estado vivo — revisión visual local y DUG v368 — 2026-10-30
+
+- **DUG/GOW vigentes:** DUG v368 · NX-368m; Metacanon 1.26; GOW 2.14. HTML canónico SHA `2ba096f565807d7c19df0a9a8cab9e8410110a15`. El último commit de Metodología `main` es `c90a9f84143089c3c02208fd27b3625f3e9f1e08`, fechado `2026-10-30T21:47:15Z`; a las 22:27:52Z su edad era 0.0.40. `main` es la fuente normativa.
+- **Adquisición:** §ARR fue leído antes del resto de instrucciones; se revisaron los 43 principios del DUG en su orden publicado y el vocabulario inicial de 26 términos. CNP: P001, P004, P005, P038 y P043 (categoría A). MCP normativo: DESACTIVADO.
+- **Servidor de revisión local:** build de la rama servido en `http://127.0.0.1:4173/sistema/mcp`, PID npm `20032`, listener limitado a `127.0.0.1:4173`. `PLAYWRIGHT_TEST_RUN=1` y `KHORA_UI_REVIEW_MODE=1` se establecieron solo en el proceso local. Edge se abrió en esa URL. No existe exposición a red externa por el listener.
+- **Render:** HTTP 200; título `Khora`; H1 `Control MCP & Revocación`. La captura automatizada fue guardada en el TEMP del PC-14, `khora-mcp-visual-review-afterwait.png`; captura anterior SHA-256 `4515982540FAFEE086A8C922F3C208284D4AE82E9238A272A16838DC9AB640FD` (tomada antes de esperar hidratación completa).
+- **Límite local:** los GET locales `/api/mcp/revocacion` y `/api/mcp/manual-token` devolvieron 401; la página muestra `Error al cargar el estado MCP`. Es consecuencia de no tener una sesión/credenciales locales y no describe el estado Productivo. No se creó ni revocó ningún token; no se hicieron escrituras.
+- **Doble control:** el diseño puede inspeccionarse, pero la revisión personal B/C del operador permanece **PENDIENTE**. No se convierte la captura automatizada en aprobación. Edge y el servidor local permanecen abiertos hasta la revisión.
+- **Código y despliegue:** head `1959abfef713cef7a85f31fc524aa6be0f65b9fc`; PR #345 sigue abierta/no mergeada. No cambió `main`, no se desplegó Preview/Production.
+- **Pendientes terminales:** revisión visual del operador; identificar subject/source/branch Jules; verificar rol efectivo de `KHORA_READONLY_DATABASE_URL`; ejecutar cliente MCP real autorizado y probar lectura/escritura/denegaciones; CI remoto sigue sin ejecutar pasos. ACL productiva sigue vacía.
+- **Estado:** pantalla local disponible para inspección humana; no aprobada; implementación validada localmente; aceptación end-to-end pendiente.
