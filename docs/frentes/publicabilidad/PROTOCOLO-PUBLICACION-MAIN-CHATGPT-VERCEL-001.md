@@ -61,7 +61,7 @@ Aplicar la siguiente decisión:
 | Workflow falló después de iniciar build/migración, o el resultado es ambiguo | Detenerse; inspeccionar jobs, deployments y logs antes de decidir |
 | No hay workflow activo ni deployment para el SHA | Continuar por el conector Vercel de ChatGPT |
 
-Un estado failure no prueba por sí solo que no se haya publicado: debe cotejarse con deployments y pasos/logs. Actualmente los runs examinados de Actions finalizan antes de ejecutar los steps; la causa raíz del runner sigue sin demostrarse.
+Un estado failure no prueba por sí solo que no se haya publicado: debe cotejarse con deployments y pasos/logs. En main, los runs CI #40959059770, UI Quality #40959059776 y Deploy to Production #40959059940 concluyeron en failure; las seis jobs consultadas devolvieron steps=[] (ningún step ejecutado). Esto acredita que esos jobs no ejecutaron su secuencia; la causa raíz del runner sigue sin demostrarse.
 
 ### Paso C — última lectura de main
 
