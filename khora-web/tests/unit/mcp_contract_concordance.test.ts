@@ -47,13 +47,16 @@ function input(name: McpToolName): Record<string, unknown> {
   if (name === "khora_norm_apply_principle") return { turn_token: controls._norm_turn_token, folio: "P001", status: "A", anchor: "ContractTest" };
   if (name === "khora_norm_verify_turn") return { turn_token: controls._norm_turn_token, receipt: receipt() };
   if (name === "khora_norm_release_turn") return { turn_token: controls._norm_turn_token };
+  if (name === "khora_custodia_catalogo") return { ...controls, limite: 20 };
+  if (name === "khora_custodia_revisiones") return { ...controls, session_id: "fixture-session", limite: 20 };
+  if (name === "khora_custodia_verificar_integridad") return { ...controls, session_id: "fixture-session", limite: 20 };
   const business = (name === "khora_leer_volcado" || name === "khora_leer_audio") ? { id: "1" } : name === "khora_buscar_volcados" ? { busqueda: "fixture" } : name === "khora_versiones_volcado" ? { volcado_id: "1" } : {};
   return { ...controls, ...business };
 }
 
-test("all 17 real registration shapes generate valid schemas and accept advertised examples", async () => {
+test("all 20 real registration shapes generate valid schemas and accept advertised examples", async () => {
   const contracts = await routeContracts();
-  assert.equal(contracts.length, 17);
+  assert.equal(contracts.length, 20);
   assert.deepEqual(contracts.map(x => x.name).sort(), Object.keys(MCP_TOOL_SCOPES).sort());
   const validator = new AjvJsonSchemaValidator();
   for (const contract of contracts) {
@@ -129,18 +132,18 @@ async function connect(fixture: ReturnType<typeof routeFixture>) {
   return client;
 }
 
-test("real route: HTTP discovery and all 17 calls agree; malformed input cannot reach service", async () => {
+test("real route: HTTP discovery and all 20 calls agree; malformed input cannot reach service", async () => {
   const fixture = routeFixture(); const client = await connect(fixture);
   try {
     const listed = await client.listTools();
-    assert.equal(listed.tools.length, 17);
+    assert.equal(listed.tools.length, 20);
     assert.deepEqual(listed.tools.map(x => x.name).sort(), Object.keys(MCP_TOOL_SCOPES).sort());
     for (const tool of listed.tools) {
       const contract = fixture.schemas.get(tool.name as McpToolName)!;
       assert.deepEqual(tool.inputSchema, JSON.parse(JSON.stringify(describeMcpTool(tool.name as McpToolName, contract.description, contract.shape).inputSchema)));
       assert.notEqual((await client.callTool({ name: tool.name, arguments: input(tool.name as McpToolName) })).isError, true, tool.name);
     }
-    assert.equal(fixture.calls.length, 16, "health reads its snapshot separately");
+    assert.equal(fixture.calls.length, 19, "health reads its snapshot separately");
     for (const call of fixture.calls.filter(x => !x.name.endsWith("NormativeTurn") && x.name !== "applyNormativePrinciple")) {
       for (const field of Object.keys(controls)) assert.equal(Object.hasOwn(call.args ?? {}, field), false, call.name);
     }
