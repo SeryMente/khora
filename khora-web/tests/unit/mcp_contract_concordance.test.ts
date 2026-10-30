@@ -262,6 +262,45 @@ test("real route: malformed controls and numeric bounds cannot reach business se
     assert.equal(fixture.calls.length, 0);
   } finally { await client.close(); await fixture.close(); }
 });
+test("configured developer owner gets full Jules-account access without ACL or norm-turn provisioning", async () => {
+  const fixture = routeFixture({
+    developerSubject: true,
+    aclUnavailable: true,
+    scopes: ["jules:read", "jules:write"],
+  });
+  const client = await connect(fixture);
+  try {
+    const tools = await client.listTools();
+    const names = tools.tools.map(tool => tool.name);
+    for (const name of [
+      "jules_list_sources", "jules_list_sessions", "jules_get_session",
+      "jules_list_activities", "jules_create_session", "jules_send_message",
+      "jules_approve_plan",
+    ]) assert.ok(names.includes(name), name);
+    assert.equal(names.some(name => name.startsWith("khora_norm_")), false);
+
+    const sources = await client.callTool({ name: "jules_list_sources", arguments: input("jules_list_sources") });
+    assert.notEqual(sources.isError, true);
+    const sourcePayload = JSON.parse(((sources as any).content?.[0] as any).text);
+    assert.deepEqual(sourcePayload.result.sources[0].githubRepo.branches.map((x: any) => x.displayName).sort(), ["main", "restricted"]);
+
+    const sessions = await client.callTool({ name: "jules_list_sessions", arguments: input("jules_list_sessions") });
+    assert.notEqual(sessions.isError, true);
+    const sessionPayload = JSON.parse(((sessions as any).content?.[0] as any).text);
+    assert.equal(sessionPayload.result.sessions.length, 3);
+
+    const created = await client.callTool({
+      name: "jules_create_session",
+      arguments: { ...input("jules_create_session"), starting_branch: "restricted" },
+    });
+    assert.notEqual(created.isError, true, JSON.stringify(created));
+    const createCall = fixture.calls.find(x => x.name === "JulesCreateSession");
+    assert.ok(createCall);
+    assert.equal((createCall!.args as any).sourceContext.githubRepoContext.startingBranch, "restricted");
+    assert.deepEqual(fixture.aclSubjects, [], "configured owner does not need per-repository ACL rows");
+  } finally { await client.close(); await fixture.close(); }
+});
+
 test("Jules source catalogue exposes only exact ACL branches and retains provider pagination", async () => {
   const fixture = routeFixture(); const client = await connect(fixture);
   try {
