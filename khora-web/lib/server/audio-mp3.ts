@@ -17,6 +17,7 @@ export async function leerBlobVerificado(url:string,bytes:number,sha:string):Pro
   if(u.protocol!=="https:"||!u.hostname.endsWith(".blob.vercel-storage.com"))throw new Error("blob_host_no_permitido");
   if(!Number.isSafeInteger(bytes)||bytes<=0||bytes>MAX_AUDIO_BYTES||!/^[a-f0-9]{64}$/i.test(sha))throw new Error("audio_manifest_invalido");
   const r=await fetch(u,{cache:"no-store",signal:AbortSignal.timeout(30000),redirect:"error"});
+  if(r.status===404)throw new Error("blob_no_encontrado");
   if(!r.ok||!r.body)throw new Error("blob_inaccesible");
   const reader=r.body.getReader();const chunks:Buffer[]=[];let total=0;
   try {while(true){const {done,value}=await reader.read();if(done)break;total+=value.length;if(total>MAX_AUDIO_BYTES+1024){await reader.cancel();throw new Error("audio_demasiado_grande");}chunks.push(Buffer.from(value));}}finally{reader.releaseLock();}
