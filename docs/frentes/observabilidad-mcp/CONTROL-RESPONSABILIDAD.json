@@ -1,0 +1,24 @@
+{
+  "schema": "responsabilidad-frente/1",
+  "front": "observabilidad-mcp",
+  "canonical_identity": "OBSERVABILIDAD-MCP",
+  "repository": "SeryMente/khora",
+  "state_object": "docs/frentes/observabilidad-mcp/OBJETO-CANONICO.md",
+  "status": "unassigned",
+  "owner_thread": null,
+  "owner_alias": null,
+  "owner_alias_type": null,
+  "instance": null,
+  "session_folio": null,
+  "generation": 1,
+  "expiry": null,
+  "authorization_ref": "OCP created for discovery only under C044 request to separate and name non-dictation work. No authorization to assign this conversation/another instance as owner.",
+  "authorization_event": "OBSERVABILIDAD-MCP-CREATE-C044",
+  "acquired_at": "2026-10-30",
+  "bootstrap_scope": "Documentary recognition only; unassigned until a new session is adjudicated. No product, scopes, credentials, security or production authorization.",
+  "enforcement": "cooperative registry; no server fencing of arbitrary writes",
+  "folio_collision_check": {
+    "searched_scope": "No session folio assigned.",
+    "global_uniqueness": "not_applicable"
+  }
+}

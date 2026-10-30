@@ -7,12 +7,12 @@
     "repo": "SeryMente/metodologia",
     "path": "gobernanza/METAPROMPT-CANONICO-SAMANTHA.html",
     "ref": "main",
-    "blob": "16c93745311a5405166a31b583c2a648fda0d044",
-    "version": "1.21",
-    "sam_version": "v353 · NX-353m",
-    "gow_version": "2.3",
-    "read_at": "2026-10-28",
-    "note": "Única fuente normativa; Metacanon y GOW están integrados en este HTML. Se adquirió y revisó en C042."
+    "blob": "501f7f6ec8bfd0a8289eb0c1e3897c19a0281be7",
+    "version": "1.25",
+    "sam_version": "v363 · NX-363m",
+    "gow_version": "2.12",
+    "read_at": "2026-10-30",
+    "main_commit": "b4bc9f8ef4485e44973e9c17f6c4f9a1119d698d"
   },
   "original_source": {
     "repo": "SeryMente/khora",
@@ -255,9 +255,9 @@
     },
     {
       "path": "OBJETO-CANONICO.md",
-      "bytes": 222989,
-      "sha256": "25248b7b1ae70d34910893fdabbf1c2daab7e2ffaa0a34e71f60071b041d1930",
-      "git_blob_sha": "38106dc183d4fa36658fabe1507c381bcf4082cd"
+      "bytes": 171135,
+      "sha256": "6971d5b59246ca5566cfcb4172c6f51c2f6547f34cd42fb914ae905853c0295a",
+      "git_blob_sha": "5a83c8ca417191a37adcfc4a7e8216e0f16be06d"
     },
     {
       "path": "evidencias/dialogo.test.ts",
@@ -351,9 +351,9 @@
     },
     {
       "path": "CONTROL-RESPONSABILIDAD.json",
-      "bytes": 4359,
-      "sha256": "84bebf80a25f688d4136ec2bdb0bd4fd35f56987b8e555dbcedd1d7fb38703cf",
-      "git_blob_sha": "ff3a148420e547323717a620c1c5b695a4fa79e5"
+      "bytes": 4680,
+      "sha256": "64ebacecc7bf42b648613778c705f80095163fb392e91dd4af5ecb49c334b719",
+      "git_blob_sha": "a954353055ef30770aae0b5ca40e1f61cfc3d8dd"
     },
     {
       "path": "originales/CONTINUIDAD-C031-20261022.jsonl",
@@ -378,6 +378,12 @@
       "bytes": 972,
       "sha256": "2a91d036448cc1c4a85571ebfe5c75e62d24e853d719a81525bd0ba4d089c3bd",
       "git_blob_sha": "a041efbaabc5e7c38e4103762f679a3aaa4e8332"
+    },
+    {
+      "path": "originales/CONTINUIDAD-C044-20261030.jsonl",
+      "bytes": 1040,
+      "sha256": "c8c72b628608521f92c9e292f49ac5505ef459191f094c9bf70b82fc783610a3",
+      "git_blob_sha": "d53571b2e01c9d9f64c3949d0d4531a40eae59c3"
     }
   ],
   "runtime_references": [
@@ -488,12 +494,12 @@
     "no_secret_values_in_manifest": true
   },
   "current_preparation": {
-    "version": "0.6.17",
+    "version": "0.6.18",
     "baseSha": "f0dfbdcb2d79eb6289dacba272ddcc7ba2023063",
     "receipt": "evidencias/C030-release.json",
-    "state": "C042: transferencia, control, continuidad, OCP y manifiesto actualizados y leídos de vuelta. Auditoría focalizada de PR #335: elimina control de responsabilidad, índice de frentes del README y manifiesto de Harmonia; matriz U01–U06 conserva FALTA/PARCIAL/SUPUESTO. PR abierto, sin fusionar y mergeable=false. No se modificó producto, no se ejecutaron pruebas de producto ni despliegue; último corte técnico C030, no revalidado."
+    "state": "C044: Dictado limited to dictation UI/voice capture/transcription/editing/continuation; Observabilidad MCP moved to distinct OCP; no product code/tests/deploys."
   },
-  "latestEvent": "C042 — transferencia de responsabilidad autorizada y verificada por compare-and-swap/read-back; OCP actualizado a v0.6.17; manifiesto reconciliado; auditoría focalizada confirma bloqueos de alcance/historial en PR #335, que sigue abierto, no fusionado y no sincronizado con main; producto sin cambios; MCP-NORMATIVO desactivado.",
+  "latestEvent": "C044 — Dictado transferido a generación 4; Observabilidad MCP separado con control propio sin titular; paquetes no dictados excluidos del alcance y preservados; sin cambios de producto ni pruebas.",
   "latest_verified_release": {
     "sha": "f0dfbdcb2d79eb6289dacba272ddcc7ba2023063",
     "deploymentId": "dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr",
@@ -519,8 +525,8 @@
     "physicalAcceptance": false,
     "technicalPublicationVerified": true
   },
-  "latest_cycle": "C042",
-  "canonical_version": "0.6.17",
+  "latest_cycle": "C044",
+  "canonical_version": "0.6.18",
   "latest_candidate": {
     "pr": 335,
     "url": "https://github.com/SeryMente/khora/pull/335",
@@ -533,9 +539,9 @@
     "base": "main",
     "base_sha": "b528660e16552633d232a2397cbe42441a03438c",
     "last_updated": "2026-10-25T05:21:12Z",
-    "changed_files": 350,
-    "additions": 13577,
-    "deletions": 8213,
+    "changed_files": 321,
+    "additions": 14523,
+    "deletions": 306,
     "candidate_object": {
       "version": "0.6.35",
       "blob_sha": "f84c9ccab2ae637918f8d9579d95b3e259d2a350",
@@ -557,7 +563,10 @@
       "Candidate OCP says the PR is draft but GitHub currently reports draft=false.",
       "Candidate matrix says PR #334 closes without merge but GitHub reports #334 open/unmerged; PR #330 also remains open/unmerged."
     ],
-    "decision": "Do not merge until scope, history, authoritative control, matrix evidence, and contradictory PR statuses are reconciled."
+    "decision": "Do not merge until scope, history, authoritative control, matrix evidence, and contradictory PR statuses are reconciled.",
+    "mergeable": true,
+    "last_observed": "2026-10-30",
+    "classification": "Broad Ingreso U01-U06 candidate; not exclusively owned by Dictado."
   },
   "release_history": [
     {
@@ -606,46 +615,45 @@
     "repo": "SeryMente/metodologia",
     "path": "gobernanza/METAPROMPT-CANONICO-SAMANTHA.html",
     "ref": "main",
-    "blob": "16c93745311a5405166a31b583c2a648fda0d044",
-    "version": "1.21",
-    "sam_version": "v353 · NX-353m",
-    "gow_version": "2.3",
-    "read_at": "2026-10-28",
-    "note": "Metodología adquirida en C042 desde SeryMente/metodologia/main; revisión vigente verificada."
+    "blob": "501f7f6ec8bfd0a8289eb0c1e3897c19a0281be7",
+    "version": "1.25",
+    "sam_version": "v363 · NX-363m",
+    "gow_version": "2.12",
+    "read_at": "2026-10-30",
+    "main_commit": "b4bc9f8ef4485e44973e9c17f6c4f9a1119d698d"
   },
   "responsibility_control": {
     "path": "CONTROL-RESPONSABILIDAD.json",
     "full_path": "docs/frentes/dictado-voz/CONTROL-RESPONSABILIDAD.json",
-    "blob": "ff3a148420e547323717a620c1c5b695a4fa79e5",
-    "commit": "3e0061606a4f8f46ceff415df22135abcc9e69fb",
-    "generation": 3,
+    "blob": "a954353055ef30770aae0b5ca40e1f61cfc3d8dd",
+    "commit": null,
+    "generation": 4,
     "status": "assigned",
-    "session_folio": "SES-20261028-Q7M4N9K2",
-    "owner_alias": "chatgpt-dictado-voz-SES-20261028-Q7M4N9K2",
+    "session_folio": "SES-20261030-97109848",
+    "owner_alias": "chatgpt-dictado-ses-20261030-97109848",
+    "local_conversation_uuidv7": "01a18d84-31e0-7dca-b0f7-90e4b3c58f12",
     "global_uniqueness": "not_verified"
   },
   "conversation_continuity": {
-    "path": "originales/CONTINUIDAD-C042-20261028.jsonl",
-    "commit": "2bf9d96e145a4ca0d635ae2bdbdc261473974417",
-    "git_blob_sha": "a041efbaabc5e7c38e4103762f679a3aaa4e8332",
-    "sha256": "2a91d036448cc1c4a85571ebfe5c75e62d24e853d719a81525bd0ba4d089c3bd",
-    "bytes": 972,
+    "path": "originales/CONTINUIDAD-C044-20261030.jsonl",
+    "commit": null,
+    "git_blob_sha": "d53571b2e01c9d9f64c3949d0d4531a40eae59c3",
+    "sha256": "c8c72b628608521f92c9e292f49ac5505ef459191f094c9bf70b82fc783610a3",
+    "bytes": 1040,
     "user_entries_preserved_verbatim": 1,
     "assistant_commentaries_preserved_verbatim": 1,
-    "assistant_visible_final_summaries_preserved": 0,
     "native_conversation_id_exposed": false,
-    "complete_native_export": false,
-    "latest_prior_model_output": "The visible authorization question immediately preceding the operator's affirmative response is preserved verbatim as A01; complete native conversation export unavailable."
+    "complete_native_export": false
   },
   "latest_product_event": "C042 — no product code/tests/deployment changes; last technically verified product release remains C030 (main f0dfbdcb2d79eb6289dacba272ddcc7ba2023063, deployment dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr); physical acceptance and global gate remain pending, not revalidated in C042.",
   "latest_object": {
-    "version": "0.6.17",
+    "version": "0.6.18",
     "ref": "main",
-    "blob_sha": "38106dc183d4fa36658fabe1507c381bcf4082cd",
-    "commit": "c2bf14560b77bbfad97c5f2af6ecde5d0b3faef0",
-    "bytes": 222989,
-    "sha256": "25248b7b1ae70d34910893fdabbf1c2daab7e2ffaa0a34e71f60071b041d1930",
-    "state": "C042 transfer and focused PR audit recorded; responsibility generation 3 verified; PR #335 remains open/unmerged/mergeable=false and not integrated; product unchanged; exact read-back verified"
+    "blob_sha": "5a83c8ca417191a37adcfc4a7e8216e0f16be06d",
+    "commit": null,
+    "bytes": 171135,
+    "sha256": "6971d5b59246ca5566cfcb4172c6f51c2f6547f34cd42fb914ae905853c0295a",
+    "state": "C044 scope separation and responsibility transfer; final GitHub read-back required."
   },
   "recent_verbatim_instruction_ingestion": {
     "path": "originales/INSTRUCCIONES-VERBATIM-TAIL-C032-20261022.jsonl",
@@ -666,5 +674,25 @@
     "last_continuity_bytes": 4576,
     "last_continuity_date": "2026-10-25",
     "continuity_note": "C041 preserves the explicit transfer authorization and the request to check OCP↔PR synchronization; historical U01–U06 remains at its existing verbatim source."
+  },
+  "scope_separation": {
+    "event": "C044",
+    "dictado_scope": [
+      "dictation screen",
+      "explicit voice capture",
+      "transcription",
+      "transcript editing",
+      "dictation continuation"
+    ],
+    "observability_mcp_ocp": "docs/frentes/observabilidad-mcp/OBJETO-CANONICO.md",
+    "unassigned_observability_control": "docs/frentes/observabilidad-mcp/CONTROL-RESPONSABILIDAD.json",
+    "excluded_material": [
+      "benchmark and feedback",
+      "dialogue multi-track capture",
+      "general Ingreso/chronicle/metadata",
+      "voice/symptom proposal",
+      "editorial publishing"
+    ],
+    "notes": "All historical source/evidence remains in place; no deletion, reassignment or unapproved new OCP creation."
   }
 }

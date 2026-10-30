@@ -1,250 +1,144 @@
-# Sprint KHORA · Acceso MCP a observabilidad y diagnóstico del dictado
+# Dictado — ingreso por voz, captura y transcripción en Khora
 
 ## 1. Control e identidad
 
-- Identidad conservada: `MCP-OBS-DICTADO`; extensión documental de dictado, benchmark, retroalimentación y propuesta de voz/síntomas.
-- Versión: **v0.6.17**; sello **MCP-OBS-DICTADO-v0.6.17**. Objeto canónico de estado documental; no equivale a release de producto. Objeto permanente por encargo V010; no declara permanente ninguna propuesta clínica.
-- Estado: **CANÓNICO EN MAIN · C042 TRANSFERENCIA AUTORIZADA Y VERIFICADA · GENERACIÓN 3 · PR #335 ABIERTO Y NO FUSIONADO · DESARROLLO Y MAIN NO SINCRONIZADOS**.
-- Último corte técnico aceptado (histórico): C030, solicitud 326 integrada normalmente y main f0dfbdc publicado; READY/alias/versión pública cotejados a las 21:24 UTC del 2026-10-18. Aceptación humana y transcriptor real pendientes, sin degradar ese criterio. C041 verifica que PR #335 no se ha integrado y no es equivalente al estado canónico de main.
-- Repositorio propietario: `SeryMente/khora`, privado comprobado con herramienta en este ciclo. `SeryMente/metodologia` también privado: aporta el método, no recibe datos del frente.
-- Carpeta contenedora: `docs/frentes/dictado-voz/`; elemento único de estado: `OBJETO-CANONICO.md`. Carpeta y elemento no se confunden.
-- Revisión de origen del objeto: `1697ee2693ed3217523ffc1d1be9b6541d7d849d`, blob `e98a956c375ce48b791b5f0563ad0ae03c2616dd`.
-- Control único de responsabilidad/sesión: [`CONTROL-RESPONSABILIDAD.json`](CONTROL-RESPONSABILIDAD.json), generación **3**, folio activo **SES-20261028-Q7M4N9K2**, alias operativo `chatgpt-dictado-voz-SES-20261028-Q7M4N9K2`. Transferencia autorizada el 2026-10-28 y verificada mediante lectura de vuelta condicionada por SHA; la identidad nativa no se expone y no se inventa.
-- Original de continuidad C031: [`originales/CONTINUIDAD-C031-20261022.jsonl`](originales/CONTINUIDAD-C031-20261022.jsonl), con U01/U02 y tres comentarios visibles del asistente; no es una exportación nativa exhaustiva.
-- Original de continuidad C041: [`originales/CONTINUIDAD-C041-20261025.jsonl`](originales/CONTINUIDAD-C041-20261025.jsonl), con autorización de transferencia, solicitud de sincronización y salidas visibles relevantes; read-back exacto, no es una exportación nativa exhaustiva.
-- Original de continuidad C042: [`originales/CONTINUIDAD-C042-20261028.jsonl`](originales/CONTINUIDAD-C042-20261028.jsonl), blob `a041efbaabc5e7c38e4103762f679a3aaa4e8332`; preserva literalmente la autorización «Sí.» y la pregunta de autorización, con read-back exacto. No es una exportación nativa exhaustiva.
-- Instrucciones verbatim del tramo final: [`originales/INSTRUCCIONES-VERBATIM-TAIL-C032-20261022.jsonl`](originales/INSTRUCCIONES-VERBATIM-TAIL-C032-20261022.jsonl). Contiene U01–U06; U06 es la instrucción prioritaria sobre checklist, Fecha/Hora, Lugar, adquisición de metadatos, Momento y crónica personal libre. Se conserva como original literal, separada de la interpretación operativa.
-- Migración documental: mismo objeto e historia, no segundo tablero. Las rutas antiguas quedan como enlaces sin estado operativo. La rama documental no equivale a integración en main, publicación o aprobación de código.
-- Recuperación: README del repo → esta carpeta → este objeto. Contrato técnico y originales son anexos de custodia, no otra fuente de estado.
+- Frente canónico: **Dictado**.
+- Identidad canónica: `DICTADO`; `MCP-OBS-DICTADO` queda como identidad agregada histórica.
+- Repositorio: `SeryMente/khora`, rama `main`.
+- OCP heredado: `docs/frentes/dictado-voz/`.
+- Versión: **v0.6.18 · DICTADO-v0.6.18**, no es versión de producto.
+- Estado: C044 · responsabilidad transferida · alcance separado · producto no revalidado.
+- Control: generación **4**, folio `SES-20261030-97109848`, alias operativo `chatgpt-dictado-ses-20261030-97109848`.
+- UUIDv7 local de esta conversación: `01a18d84-31e0-7dca-b0f7-90e4b3c58f12`; no es ID nativo de plataforma.
+- Frente independiente relacionado: Observabilidad MCP en `docs/frentes/observabilidad-mcp/`, con control propio sin titular asignado.
+- Custodia transversal conserva su propio OCP/titularidad; Dictado solo integra sus contratos.
+- Material fuera del alcance estricto se conserva en la crónica y queda clasificado en §4; no se borra ni reasigna automáticamente.
 
 ## 2. LEER PRIMERO
 
-Modo: asistencia del frente y reconstrucción local del endurecimiento expresamente solicitada; sin otro constructor ni subagente. El nombre de esta conversación es Samantha por personalización del operador; el nombre no fija un rol técnico. No inventar otra conversación, un agente delegado, una persona ni recepción de prompts.
+Este OCP gobierna exclusivamente la experiencia de ingreso por dictado de voz en Khora: la pantalla donde se dicta, la captura iniciada explícitamente por el operador, la recepción de audio, la transcripción a texto, la edición del texto transcrito y la continuidad para seguir dictando sin perder el contenido confirmado.
 
-**Retoma C042 · 2026-10-28.** El operador autorizó explícitamente «Sí.» a la sustitución de titularidad de este frente. El control autoritativo confirma generación 3, folio activo `SES-20261028-Q7M4N9K2` y alias operativo `chatgpt-dictado-voz-SES-20261028-Q7M4N9K2`; la escritura condicionada por el blob observado y la lectura de vuelta están verificadas. La autorización y la pregunta se conservan en `originales/CONTINUIDAD-C042-20261028.jsonl`. No se expone un ID nativo de conversación; el alias no se presenta como tal.
+**No es el OCP de Observabilidad MCP.** Para acceso de modelos a registros, OAuth/scopes, filtros, cursores, salud y diagnóstico MCP, consultar `docs/frentes/observabilidad-mcp/OBJETO-CANONICO.md`. Ambos frentes tienen OCP y control independientes.
 
-**Última salida visible previa a C041:** el resumen de revisión canónica de la respuesta anterior se conservó como registro `A00` en `originales/CONTINUIDAD-C041-20261025.jsonl`. La cobertura sigue limitada a los mensajes visibles archivados; no es una exportación nativa completa.
+**C044 · titularidad:** el operador autorizó a esta conversación a sustituir la titularidad anterior y asumir únicamente Dictado. La transferencia no concede permisos de código, credenciales, proveedores, seguridad, despliegue ni aceptación funcional.
 
-En C041 el alcance autorizado es la transferencia de responsabilidad y la verificación de sincronización entre el OCP y el último PR del frente. Se actualizan control, objeto, original de continuidad y manifiesto para reflejar el resultado; no se autorizó ni ejecutó código de producto, pruebas de producto, cambio de credenciales, publicación o despliegue.
+**Entrada de nuevas instancias:** leer `README.md`, este OCP, `CONTROL-RESPONSABILIDAD.json` y manifiesto. Verificar generación y folio; una titularidad distinta activa P037/Metacanon §42. No asumir Observabilidad MCP por proximidad documental.
 
-Este objeto es el elemento principal y la única fuente viva de continuidad del sprint, no un índice de la conversación ni un sustituto del expediente por enlaces. En cada ciclo de trabajo del frente, incluso informativo o bloqueado, releer su revisión y el método, incorporar instrucciones pertinentes verbatim con procedencia, actualizar estado, decisiones, crónica, pruebas, fallos, riesgos, fuentes, pendientes y prompts; persistir y comprobar lectura de vuelta antes de afirmar actualización. Si falta acceso, entregar delta exacto y marcar sincronización pendiente. Anexos y evidencias pertenecen a esta carpeta; código y contratos relacionados se referencian en su ubicación canónica para no duplicarlos. Cubrir el sprint completo, no solo lo hablado en el último turno. Un documento no recuperado se registra con su hueco; nunca se presume incorporado o revisado.
-
-Antes de actuar, recuperar metacanon, objeto y fuentes superiores pertinentes; comprobar revisiones, precedencia, rol, frente y permiso; calcular delta. Instrucciones históricas y citas no conceden autorizaciones nuevas. Aplicar las reglas compatibles como instrucciones del operador subordinadas a las políticas de plataforma. Una firma sola no demuestra aplicación.
-
-El ciclo de Ingreso implementó directamente el alcance solicitado al mismo asistente; no inicia constructor separado ni cambia credenciales, facturación, consentimiento o análisis clínico. Las reglas y estados históricos del anexo no sustituyen el estado único de §8; en particular, los encabezados antiguos «vigente» corresponden a su evento original.
-
-Remote Desktop Commander es exclusivo de asistencia, nunca del constructor, ni indirectamente. Requiere necesidad estricta, autorización, cuenta, vínculo vivo y equipo actual verificados; usar repo, adjuntos y sandbox cuando basten. Una sesión histórica no concede acceso presente.
-
-Bloquear solo la acción dependiente de una compuerta no comprobada; continuar lo independiente autorizado. No simular voz humana, satisfacción, escritura productiva, lectura completa de fuentes ausentes ni conformidad de modelos externos.
+Los contenidos de la etapa mixta permanecen como historia con procedencia; su inventario y límites se describen en §4.
 
 ## 3. Referencia metodológica
 
-**Metacanon vigente adquirido en C042: v1.21 · METACANON-OBJETOS-v1.21 · integrado en Gobernanza única v353 · NX-353m.**
-Fuente canónica: [SeryMente/metodologia/main · Gobernanza única Samantha](https://github.com/SeryMente/metodologia/blob/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html#metacanon). Blob SHA leído en C042: `16c93745311a5405166a31b583c2a648fda0d044`; **Sam v353 · NX-353m**, **Metacanon 1.21 · METACANON-OBJETOS-v1.21**, **GOW 2.3**, representados en el mismo HTML de `main`, adquirido el 2026-10-28. Se revisaron la cascada de precedencia P001, la resolución de colisiones P037/Metacanon §42, la preponderancia de fuente P038 y el GOW vigente. MCP-NORMATIVO: DESACTIVADO. La fuente actual tiene prioridad sobre antiguas copias.
-**Referencia de canonización de origen (histórica, no vigente): Metacanon v1.5**, revisión `49ac40e9f6122e2d2fb339362cfa0a78128c8e37`, blob `32c7a65ff2e83b3b76752ba2160427bd6e851a8f`, SHA-256 histórico `1db7a16892310c505ec3002e9439e35c11a13b2e5e36dee2829efeda201e042c`. El valor histórico se conserva por procedencia; gobierna C031 la revisión vigente de `main`.
+Fuente: `SeryMente/metodologia/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html`.
+- **DUG:** Samantha v363 · NX-363m.
+- **Metacanon:** 1.25.
+- **GOW:** 2.12.
+- **Blob:** `501f7f6ec8bfd0a8289eb0c1e3897c19a0281be7`; commit main `b4bc9f8ef4485e44973e9c17f6c4f9a1119d698d`.
+- **Lectura:** 2026-10-30.
+- **MCP-NORMATIVO:** DESACTIVADO.
 
-Delta adquirido: carpeta canónica, trece bloques ordenados, originales separados de interpretación, herencia verificable, salida con versión visible, doble revisión y límites del acceso remoto. No modifica el metacanon central, el Sistema de Instrucciones, otros frentes o el producto.
-
-| Fuente/regla | Aplicación en este objeto/prompts | Evidencia o bloqueo | Resultado |
-|---|---|---|---|
-| §4–§5/§23/§26 y C021, actualización por ciclo | §2, §8, §10–§13 y ambos prompts | estado/pruebas reconciliados; recibo incorporado; fuentes ausentes explícitas | aplicada documentalmente en v0.6.2 |
-| §1–§5, autoridad/frescura | §1–§6 y §13; ambos prompts | fuente y blobs recuperados; escritura en rama propia | adoptada documentalmente |
-| §3/§27, molde único | §1–§13 en ese orden; historia después | cotejo estructural y semántico en §13 | adoptada; no afirma obediencia universal |
-| §7/§19, dos revisiones | §13, manifiesto y recibo de revisión | revisión local + lectura remota obligatoria antes de decir guardado | compuerta de entrega |
-| §12/§24, perfil/remoto | §2/§7/§12; solo asistencia | privacidad verificada con lectura de metadatos; no nuevas misiones remotas para documentar | adoptada; no revalida host |
-| §13, comando heredado | §7; ambos prompts remiten inequívocamente a §7 | literal y prerrequisitos presentes; no se ejecuta | adoptada |
-| §14/§20, originales/carpeta | §11, originales y manifiesto dentro de carpeta | adjunto íntegro y V001–V010 con hash; privacidad verificada | custodia documental |
-| §15–§16, viabilidad/persistencia | §8/§9/§13 | propuesto/implementado/probado/aceptado separados | adoptada |
-| §22–§23/§26, gobierno | §2/§3/§10/§12 | versión y frescura visibles; permiso por acción | adoptada documentalmente |
-| §25, recepción del constructor | §5/§10/§12 | no se recibió otra salida de constructor en este ciclo | regla heredada; ejecución no observada |
-| regla superior de no-simulación y límites sensibles | §4/§6/§9 | sin diagnóstico ni inferencia de salud/ánimo desde biometría vocal | aplicada al alcance |
+Se revisaron P001, P004, P005, P037, P038; Metacanon §§39, 42, 47, 48 y 51; y el vocabulario inicial/GOW. El propósito original del nuevo frente Observabilidad MCP está preservado verbatim en su OCP con interpretación separada. El MCP-NORMATIVO del DUG es distinto del servidor MCP de producto de Khora.
 
 ## 4. Propósito y alcance
 
-**De dónde viene:** defecto de continuidad al editar y seguir dictando; corrección original reportada satisfactoria por el operador en V000. Evoluciona a evaluar utilidad, fluidez y experiencia agradable, no solo contar errores.
+### Propósito
+Mantener una experiencia fiable para introducir contenido hablando en Khora: abrir la pantalla de dictado, iniciar la captura de voz explícitamente, recibir la transcripción, corregirla y continuar dictando sobre el texto sin perder lo previamente confirmado.
 
-**Dónde está:** C030 integrado y publicado técnicamente en main f0dfbdc, despliegue dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr READY y alias khora-web.vercel.app/versión pública coincidentes. El reporte humano motivó la corrección causal, no queda sustituido por audio sintético. Ver evidencia y límites en §8.
+### Incluido
+1. Pantalla y controles específicos de dictado.
+2. Inicio/detención explícitos y estado visible del micrófono/captura.
+3. Recepción del audio capturado para dictado.
+4. Transcripción a texto y estados de procesamiento/error.
+5. Edición de la transcripción y continuidad al reanudar.
+6. Persistencia y recuperación mediante contratos de Custodia, sin absorber su propiedad.
+7. Pruebas específicas de pantalla, captura, transcripción, edición y continuidad.
 
-**A dónde va:** terminar la validación real consentida y completar cobertura técnica. V009 abre una intención adicional de voz y síntomas: se documenta, no se disfraza de capacidad ya creada.
+### Fuera de alcance — paquetes separados y pendientes de adjudicación
+- **Observabilidad MCP:** acceso a registros, scopes, filtros, paginación y diagnósticos; ahora tiene OCP independiente.
+- **Evaluación y retroalimentación:** benchmark, métricas de experiencia, encuestas y feedback (`CONTRATO-DICTADO-EXPERIENCE.md`, `khora-web/docs/dictado-experience.md`).
+- **Captura multipista / Diálogo:** audio de Chrome + micrófono y transcripción por fuente (`originales/DIALOGO-C022.md`, `originales/DIALOGO-INTEGRADO-C027.md`).
+- **Ingreso general, crónica y metadatos:** categorías de entrada, checklist U01–U06, Fecha/Hora/Lugar/Momento, crónica personal y metadatos. Compartir la ruta `Ingreso` no los convierte en Dictado.
+- **Voz y síntomas:** propuesta histórica no implementada; no autoriza inferencias de salud, ánimo o capacidad laboral.
+- **Publicación editorial:** preparación, revisión, consentimiento y publicación de contenido.
+- **Custodia transversal:** pertenece al OCP Custodia; Dictado solo integra sus contratos.
+- **Instrumentación transversal:** `khora-web/docs/observability-services.md` permanece compartida, sin duplicar almacén.
+- Cambios de credenciales, seguridad, proveedores, gasto, despliegue y producción requieren autorización independiente.
 
-**Qué cambió en C022:** dos grabadoras continuas, una por fuente, reloj común, originales cifrados mediante custodia existente y segmentos de diálogo ordenados sin deducir personas por idioma. Se rechaza procesar fuentes mezcladas como dictado/MP3 secuencial. Sin cambiar proveedor, metacanon, credenciales, facturación, Entorno Persistente o diagnóstico.
-
-Incluido ahora: continuidad documental, contrato del dictado, benchmark reproducible, métricas técnicas acotadas, encuesta/opinión manual, privacidad, evidencia y plan de validación. C022 añade captura simultánea de audio de pestaña y micrófono, transcripción posterior por fuente con el mismo proveedor/modelo configurado y exportación de originales separados; sin extracción de Live Caption.
-
-Propuesta de ampliación aún no implementada: (a) calidad técnica del archivo, como ruido, saturación y cortes; (b) síntomas que el usuario decide declarar; (c) beneficio funcional autodeclarado/observado en tareas definidas. Separar esas fuentes y no presentar asociación como causalidad.
-
-Excluido: clasificar ánimo, enfermedad, capacidad laboral o «autoridad moral» a partir de la voz; detector general de «suena enfermo»; evaluación clínica automática; escucha permanente; unión tácita de correo/mensajería/audio; envío automático de datos de salud a modelos; cambios de seguridad, gasto o arquitectura sin revisión material.
-
-La frase «autoridad moral» y «medición de área» de V009 permanece ambigua; no se normaliza como autorización para un veredicto clínico o laboral. Comercialización y finalidad médica requieren definición, revisión especializada y evaluación regulatoria del mercado de destino antes de formular promesas.
+Los originales y evidencias previos permanecen en sus ubicaciones; no se crea un frente nuevo por cada paquete sin propósito dictado conforme a Metacanon §39.
 
 ## 5. Roles y colaboración
 
-- Operador: dueño del propósito, consentimiento, decisiones materiales y experiencia humana; no se suple su voz ni valoración.
-- Asistencia actual (Samantha; nombre personalizado SamanthaL en este chat): mantiene continuidad, coteja fuentes/evidencia, informa delta, prepara siguiente acción y revisa salidas. Ningún constructor externo está confirmado.
-- Construcción C022: el operador encarga directamente a esta agente implementar el modo Diálogo; un escritor en sandbox, sin constructor externo ni subagentes. Implementaciones históricas de esta conversación y PR 298 constan como antecedentes; en este ciclo el operador solicita directamente a Samantha generar el endurecimiento local; no hay escritor externo. No se crea ni se invoca un subagente con este documento.
-- Separación futura: si el operador asigna asistencia/construcción a dos hilos, un escritor de código y consolidación secuencial; entregarles sus prompts de §12. La excepción metodológica de hilo único no se importa a Khora. Asignación ambigua bloquea una nueva implementación, no esta documentación.
-- Una salida del constructor que entregue el operador tiene prioridad: leerla, contrastarla, sintetizar efecto/pendientes/viabilidad y emitir prompt completo de continuidad; luego reanudar auxiliares útiles sin colisiones.
+- Operador: dueño del propósito, consentimiento, decisiones materiales y aceptación humana.
+- Asistencia responsable actual: esta instancia, control gen. 4 y folio `SES-20261030-97109848`; alias operativo `chatgpt-dictado-ses-20261030-97109848`.
+- Constructor independiente: no asignado en C044; no inventar roles.
+- Observabilidad MCP: frente independiente sin titular asignado en C044.
+- Custodia: mantiene su titularidad transversal; Dictado consume sus contratos.
+- Escritura: un escritor por cambio lógico; cualquier cambio de producto conserva autorización y validación propias.
 
 ## 6. Autoridad
 
-| Decisión | Origen → lectura normalizada → evidencia | Alcance/autorización/aceptación |
+| Decisión | Estado | Límite |
 |---|---|---|
-| D01, benchmark y experiencia | V001/V002 → medir y mejorar dictado → PR 298/artefacto | implementación histórica autorizada; no prueba clínica |
-| D02, entrada manual | V003 → comentario opcional, incluso sin valoración → contrato/pruebas | implementada; no fabricar respuestas humanas |
-| D03, pruebas locales | V004 → ejecutar comprobaciones disponibles si Actions no inicia | no repara facturación ni vuelve verde Actions; no saltar protecciones |
-| D04, siguiente hito | V005–V008 → sesión real y observación por conexión existente | no autoriza inventar credenciales ni usar una captura simulada como humana |
-| D05, voz/síntomas | V009 → registrar intención y evaluar viabilidad separada | sin audio recibido ni síntoma inicial seleccionado; código/consentimiento sensible pendientes |
-| D06, canonización | V010 → documentar este frente con metacanon central | migración documental en rama propia; no cambiar método central ni tratar PR como fusionado |
-| D09, integración actual | instrucción C016 → localizar, verificar y fusionar main de extremo a extremo | fusión normal autorizada; no saltar protecciones ni afirmar despliegue por merge |
-| D08, reconstrucción local | instrucción actual → reconstruir endurecimiento en copia aislada | Samantha implementa y prueba; no autoriza push ni despliegue; sin ampliación clínica ni consentimiento |
-| D10, Ingreso y recuperación | instrucciones posteriores al uso real y aprobación de diseño general → pantalla nueva, selección de versiones, audio conservado y onda real | implementación, pruebas, fusión normal y publicación dentro del alcance; satisfacción humana pendiente; sin ampliar captura, consentimiento ni salud |
-| D11, objeto principal por ciclo | instrucción directa C021 → continuidad del sprint completo, además del chat | actualización documental autorizada; fuentes ausentes explícitas; sin permiso nuevo de producto o método central |
-| D12, modo Diálogo | C022 y originales/DIALOGO-C022.md → aprobación explícita de Chrome + micrófono simultáneos y transcripción existente | implementar, probar y persistir en rama; autorización de captura para este flujo; no escucha oculta, integración de Maya, proveedor nuevo ni beneficio clínico certificado |
-| D13, cierre hasta producción | C023 y originales/PUBLICACION-C023.md → completar integración, fusión normal y publicación del modo Diálogo en Vercel | publicación autorizada de este corte; no cambio de plan, visibilidad, seguridad, claves ni elusión de restricciones; compuertas de build y verificación real obligatorias |
-| D14, equipo actual | C024 y originales/EQUIPO-C024.md → PC 14 es el equipo actual elegido por el operador | asistencia remota mínima para comprobar publicación; no autoriza otros perfiles, cambios de seguridad ni guardar secretos fuera del entorno protegido |
-| D15, operación sin Entorno Persistente | C025 y originales/SIN-EP-C025.md → en PC-14 solo hay Remote Desktop Commander y no Entorno Persistente | no exigir una llave ausente por defecto; asistencia prepara herramientas aisladas y autenticación estándar de proveedores, sin alterar seguridad global, otros perfiles, claves existentes o facturación |
-| D16, Diálogo integrado y volcado | C027 y originales/DIALOGO-INTEGRADO-C027.md → eliminar ventana adicional, subfunción dentro de Escuchar a Chrome, audio Chrome + micrófono, diálogo y archivo para ingesta | implementación/revisión dentro de lo pedido; reutilizar editor y circuito de archivo; no ingesta automática ni captura oculta. Reporte negativo no se sustituye por prueba sintética. Publicación histórica C029 acreditada; nueva corrección C030 expresamente autorizada con compuertas, no condicionada artificialmente a PC-14 si otras herramientas bastan |
-| D17, reanudar publicación o local | C028 → «Publiuca a vercel o local rdc» y conexión nueva PC-14 | autoriza asistencia en dispositivo d62c57f2-c34c-4075-8adf-29d3f2c81b56, preparación aislada y autenticación normal; no suprime compuertas ni inventa servidor/publicación |
-| D18, publicación confirmada | C029 → «Listo publcia» tras autorizaciones → pruebas completas y main exacto | publica este corte en proyecto existente, sin saltar protecciones; no equivale a aceptación física |
-| D07, límites de plataforma | instrucción superior → no inferir atributos sensibles de biometría vocal | prevalece; conservar original sin ejecutar esa parte |
+| Separar Dictado y Observabilidad MCP | Autorizada por instrucción directa C044 | Dos OCP y controles independientes. |
+| Transferir Dictado gen. 3→4 | Autorizada por respuesta afirmativa directa | Exclusivamente Dictado. |
+| Limitar Dictado a captura/transcripción/UI | Instrucción directa C044 | Benchmark, Diálogo, Ingreso general, MCP y publicación quedan fuera. |
+| Integración con Custodia | Contrato transversal existente | No transferir titularidad de Custodia. |
+| PR #335 | Candidato amplio de Ingreso U01–U06 | No se atribuye íntegramente a Dictado ni se fusiona por C044. |
+| Código/seguridad/despliegue | No autorizados por este traspaso | Requieren compuertas propias. |
+| Aceptación funcional | Pendiente | No inferir de evidencia histórica. |
 
-Toda decisión de interfaz, acceso, cifrado, salud, nuevos proveedores o captura adicional exige aprobación material según las compuertas aplicables. Guardar un documento no implica permiso nuevo de fusión o despliegue. No restaurar páginas en papelera ni cambiar credenciales para fabricar continuidad.
+La etapa mixta se conserva en la crónica y el Anexo A; sus citas no reactivan autorizaciones previas.
 
 ## 7. Perfil de entorno
 
-Perfil técnico del último corte C030 (no revalidado como entorno de producto en C031): GitHub conexión 3 con lectura/escritura e integración normal comprobadas; Vercel inspección y creación de despliegues funcionan sin scope explícito, pero logs/checks detallados estaban bloqueados por 403. Sandbox propio sin CLI Vercel autenticada; no buscar secretos para evitarlo. PC-14 d62c57f2-c34c-4075-8adf-29d3f2c81b56 desconectado, ningún otro equipo utilizado. Los perfiles que siguen son antecedentes, no acceso vigente.
-
-C031 documental: el conector GitHub permitió crear y releer desde `main` el original de continuidad y el control de responsabilidad; el OCP/manifiesto se actualizarán con el mismo medio y lectura de vuelta. No se usó RDC ni se inspeccionó el entorno local; no se consultó Vercel y no se ejecutaron pruebas o cambios de producto.
-
-Perfil histórico de ejecución de Ingreso: PC10RCIF4EI4, cuenta MantenimientoRCI, conexión autorizada en aquel ciclo. C021 es documental mediante GitHub y sandbox: Remote Desktop Commander no utilizado; no necesario ni revalidado. Worktree aislado source/repos/khora-ingreso-redesign-20261017, remoto SeryMente/khora, base 362f8ff51a518506927e486b9d61feee4f6313da. Dependencias compartidas por junction con la integración previa, sin cambiar package.json ni lockfile; no copiar secretos. PostgreSQL/PGlite instalado únicamente fuera del árbol del producto para ensayos aislados.
-
-Conexiones comprobadas en el ciclo previo de acceso: GitHub (2) y Desktop Commander Remote disponibles; Khora expone herramientas pero su health devolvió `NORM_GITHUB_CREDENTIAL_MISSING`; Vercel MCP requiere reautenticación. No extrapolarlo indefinidamente ni reintentar un bloqueo no reintentable sin nueva evidencia.
-
-El lector normativo busca una credencial dedicada para `SeryMente/metodologia` en `KHORA_NORM_GITHUB_TOKEN` o en la bóveda con propósito `norm`; no reutilizar el token general ni el Bearer de dictado. No hay valores secretos en este objeto. Revisiones de código: `lib/server/normative-github.ts` y `github-credentials.ts` en `1697ee2693ed3217523ffc1d1be9b6541d7d849d`.
-
-Comando heredado obligatorio, solo si asistencia demuestra necesidad de una sesión nueva en el equipo actual autorizado:
-
-```text
-npx @wonderwhy-er/desktop-commander@latest remote --no-persist-session
-```
-
-Comprobar Node/npx, fuente oficial y runtime antes; en Windows el npx.cmd oficial no cambia el agente. Resolver un prerrequisito no autoriza cambiar PATH/políticas ni instalar globalmente por reflejo. Ejecutar en el equipo verificado del operador, nunca el sandbox del modelo. `Device ready` más cuenta/dispositivo/vínculo vivo acreditados son requisitos, no promesas. No reemparejar una sesión válida ni hacer descubrimiento por rutina. Constructor: nunca utilizar esa herramienta, directamente ni mediante intermediarios.
-
-
-C023: GitHub y Remote Desktop Commander disponibles; no hay conexión Vercel en esta sesión. Metadatos remotos devolvieron dos equipos en línea, PC10RCIF4EI4 y PC-14. El histórico no prueba cuál es el equipo actual: ninguna lectura de archivos ni ejecución remota realizada. Sandbox propio contiene únicamente fuentes parciales de la rama y carece de checkout completo/credencial Vercel; no se presenta como entorno de publicación. Arquitectura ep-medio-architectura.md v1.0.4 (blob 382e4a929a984a96926fd6f9080f80bedd109a0b) consultada, sin alterar el Entorno Persistente. El anexo de gobernanza Vercel v1.2.0 (blob eaa8ed342b229987986d81b775c06abc3431b6da) exige cierre remoto cuando se pide live y prohíbe elusión de límites mediante otra identidad/proyecto/configuración. La existencia histórica de publicación manual no prueba su disponibilidad o admisibilidad actual.
-
-C024: operador confirma PC 14; cuenta remota existente verificada y dispositivo en línea 03c24074-36e4-40b1-b2dc-da50be07d340 con ping 2026-10-18T18:29:06.726Z. Host medido PC-14, sesión PC-14\PC 13, perfil C:\Users\PC 13; no se infiere acceso a fila4 ni MantenimientoRCI. Node en Program Files y npm presentes, Git/gh/Vercel no resueltos. source/repos y repos del perfil no existen; sin búsqueda recursiva ni descubrimiento de secretos. C: fijo y E: óptico son los únicos discos lógicos devueltos; ningún volumen adicional del Entorno Persistente observado, sin afirmar ausencia absoluta de un archivo VHDX o montaje por carpeta. VERCEL_TOKEN ausente; tres ubicaciones estándar de auth.json Vercel no presentes (solo existencia, no valores). C025 corrige esa conclusión: el operador declara que no usa Entorno Persistente aquí; se permite preparación aislada y autenticación normal en el perfil actual, no el cruce de perfiles ni la exposición de secretos. No pedir conectar una llave por defecto.
-
-C025, perfil operativo vigente: solo Remote Desktop Commander sobre PC-14, según declaración expresa; sin Entorno Persistente. Carpeta de sesión creada con nombre único bajo LOCALAPPDATA/KhoraSession, ACL exclusiva del usuario actual y SYSTEM; no cambios de PATH, políticas de ejecución o instalaciones globales. MinGit y GitHub CLI descargados de releases oficiales ancladas, SHA-256 comprobado antes de extraer. Vercel CLI 64.5.0 instalado en subcarpeta aislada con npm, scripts de instalación deshabilitados, sin modificar dependencias del producto. Node/npm existentes reutilizados. Versiones medidas y códigos de salida 0.
-
-Autenticación C025: dos flujos estándar por dispositivo, autorizados en navegador del operador, sin solicitar secretos por chat. Vercel completó; whoami, teams ls y project inspect completaron con código 0. Proyecto prj_hRN86BKITXYKTnNlp0ygVhaMwFfx, Root Directory khora-web, Node 24.x, Next.js; comando de build existente ejecuta migrate-runtime.mjs si VERCEL_ENV=production antes de next build --webpack. No se ejecutó ese build ni migración; revisar efectos antes de publicarlo. GitHub completó: cuenta 1interprete1 verificada mediante API; autenticación de sesión protegida con DPAPI y configuración gh desconectada después de proteger el token, sin revocación del consentimiento. Credenciales aisladas: contenedor cifrado Windows DPAPI bajo identidad actual; auth.json solo recreado durante invocación CLI y eliminado en finally, ni token como argumento de comando ni contenido en recibos. Limpieza final pendiente; no confundir carpeta temporal/ACL con cifrado de audio de producto ni garantizar borrado físico.
+- Repositorio privado `SeryMente/khora`; acceso GitHub de lectura/escritura verificado.
+- Rama `main`; base C044 `43ff0ad2bed21b375c658ac80e865d92aa7fd87b`.
+- RDC y entorno local no utilizados en este ciclo.
+- Producción no consultada ni modificada.
+- Último release técnico histórico C030: main `f0dfbdcb2d79eb6289dacba272ddcc7ba2023063`, deployment `dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr`, observado 2026-10-18; no revalidado.
+- Antes de cambios en audio/captura/checkpoints/recuperación, leer `khora-web/docs/CUSTODIA-DICTADOS.md`.
+- C044 es una separación documental; no altera código de producto.
 
 ## 8. Estado vivo
 
-### 🔄 Estado vivo
+### C044 · transferencia y separación
+Control anterior: blob `ff3a148420e547323717a620c1c5b695a4fa79e5`, generación 3, titular `chatgpt-dictado-voz-SES-20261028-Q7M4N9K2`, folio `SES-20261028-Q7M4N9K2`. El operador autorizó sustituir exclusivamente esa titularidad. Se registra generación 4, folio `SES-20261030-97109848`, alias `chatgpt-dictado-ses-20261030-97109848`, UUIDv7 local `01a18d84-31e0-7dca-b0f7-90e4b3c58f12` y evento `DICTADO-TRANSFER-C044-SES-20261030-97109848`. La declaración de transferencia se considera completada tras cotejar la lectura de vuelta.
 
-C042 de transferencia (2026-10-28): control leído antes de la escritura con blob `09b9e497abf16771827b2602308562abc4484ed2`, generación 2 y folio `SES-20261025-H6N3Q8W2`. El operador autorizó explícitamente la sustitución. El control quedó en generación 3, folio `SES-20261028-Q7M4N9K2`, alias operativo `chatgpt-dictado-voz-SES-20261028-Q7M4N9K2`, evento `DICTADO-RESPONSABILIDAD-TRANSFER-SES-20261028-Q7M4N9K2`; compare-and-swap y lectura de vuelta verificados. La autorización literal y la pregunta se conservan en `docs/frentes/dictado-voz/originales/CONTINUIDAD-C042-20261028.jsonl`. El folio no tuvo coincidencias en las búsquedas indexadas de este repositorio y de SeryMente; la unicidad global sigue NO VERIFICADA.
+Observabilidad MCP dispone de OCP/control independientes; su control inicia `unassigned` y sin folio. Los paquetes heredados no dictado se listan en §4, preservando sus fuentes.
 
-**Sincronización con desarrollo GitHub: NO SINCRONIZADA.** La lectura del PR #335 en este ciclo confirma estado `open`, `merged=false`, `draft=false`, rama `feat/u06-sobre-ingreso-work-1990819938695134734`, head `7bd496247f116e91ff7871781a67ebface10d545` y 350 archivos cambiados; la API informa última actualización el 2026-10-25. Main conserva el historial del OCP; la candidata declara v0.6.35 y no está integrada. No se fusionó ni se ejecutó producto en C042.
+### Estado GitHub observado 2026-10-30
+- **PR #335:** abierto, no fusionado, no draft; 321 archivos, 14.523 adiciones y 306 eliminaciones. Candidato amplio de Ingreso U01–U06; no atribuir íntegramente a Dictado.
+- **PR #342:** abierto, draft; 2 archivos, 547 adiciones; handoff documental MCP.
+- **PR #343:** abierto, draft; 2 archivos, 113 adiciones y 6 eliminaciones; corrección de filtros/aislamiento MCP. Su descripción declara 2 pruebas focalizadas, no suite integral ni CI.
+- Los tres siguen abiertos/no fusionados; no se integran por esta separación.
 
-Los riesgos de alcance e historial documentados en C041 se corroboraron con revisión focalizada de archivos del PR #335 en C042. El parche elimina por completo `docs/frentes/dictado-voz/CONTROL-RESPONSABILIDAD.json` (49 líneas); elimina de `README.md` la sección `Organización de frentes y recursos` y sus enlaces de Dictado/Harmonia/Tareas; y elimina `apps/harmonia-observability/MANIFEST-HUELLAS.json`. La matriz añadida `TRAZABILIDAD-U01-U06.md` conserva estados `FALTA`, `PARCIAL` y `SUPUESTO` para requisitos U06 mientras el OCP candidato afirma «U06 IMPLEMENTADO Y VERIFICADO EN CÓDIGO». El OCP candidato pesa 3.251 caracteres/41 líneas frente a los más de 200 KB de historial canónico; su manifiesto declara `canonical_version=0.6.34` y apunta al Metacanon markdown 1.8, mientras el propio OCP declara v0.6.35 y la metodología vigente es el DUG v353/Metacanon 1.21/GOW 2.3. GitHub devuelve `mergeable=false`, `draft=false`, `open`, `merged=false` y 350 archivos modificados. La inspección cubrió los nombres cambiados y parches focalizados de OCP, control, manifiesto, matriz, README y manifiesto Harmonia; no es auditoría completa de los 350 archivos. La contradicción de PR #334/#330 registrada en C041 también queda pendiente. No se promueve una rama a fuente canónica solo por ser más nueva.
-
-**Conclusión vigente:** responsabilidad transferida y custodia documental actualizada. El objeto principal de `main` no declara el desarrollo candidato sincronizado: PR #335 sigue abierto y sin integrar. El último corte técnico del producto que consta verificado es C030; no fue revalidado en C042. Próxima acción: reconciliar historial del OCP, control y alcance/evidencia del PR antes de considerar fusión normal; no tocar código, credenciales ni despliegue con esta autorización, que solo transfiere responsabilidad. MCP-NORMATIVO: DESACTIVADO.
-
-C032 documental (2026-10-22): la lectura minuciosa del tramo final de `Texto pegado(6).txt` identificó seis entradas directas del operador relevantes para continuidad. Se preservaron en `originales/INSTRUCCIONES-VERBATIM-TAIL-C032-20261022.jsonl`; la lectura de vuelta coincide exactamente. **La entrada prioritaria U06** es la instrucción larga situada bajo `October 21 at 11:01 AM`, que culmina con «Dame un checklist ordenado, limpio, amigable, no una pared de texto para saber donde3 estmos y que falta.» Se mantienen sus faltas y su formulación original; la interpretación técnica se registra por separado.
-
-U01/U02 apuntan a una organización por hitos basada en veintidós elementos; el fragmento confirma que esa estructura se mencionó, pero los cinco hitos y su correspondencia numérica disponible en el adjunto son una síntesis del asistente, no una cita íntegra del operador. U03 exige que el microblog aclare el campo ambiguo Momento sin exigir hacerlo explícito en el relato. U04 pide preparar el audio con Backblaze como almacenamiento de datos de usuario. U05 pide retomar una conexión y terminar de extremo a extremo. U06 define el checklist dinámico y visual, suficiencia en vivo con Groq, Fecha/Hora provisionalmente resueltas y activables ante falta de verificación, intento de obtener IPv4 para Lugar, metadatos exhaustivos para todas las entradas, Momento jerárquico y ampliable con reglas de normalización/excepción y una crónica personal que no se limite a una actividad.
-
-La conversación adjunta incluye una respuesta del asistente que afirma haber registrado este mensaje en C054/v0.6.46. Esa versión no se pudo verificar en el OCP de `main`; la versión actualmente recuperable de `feat/ingreso-autobiografico-20261019` reporta otro corte (v0.6.34) y no contiene las frases clave. Se conserva la afirmación C054/v0.6.46 como antecedente no verificado, no como versión canónica.
-
-La petición de metadatos exhaustivos se conserva verbatim, pero no se convierte en permiso ilimitado para rastreo encubierto ni recolección indiscriminada. La implementación de IPv4, huella de dispositivo/sesión, ubicación u otros metadatos requiere revisión explícita de privacidad, minimización, consentimiento, seguridad y retención. Una IPv4 por sí sola no demuestra ubicación física, y la hora de captura no prueba cuándo sucedió lo narrado. Estos son límites de implementación, no correcciones del original.
-
-**Estado de ejecución:** C032 es documental. El checklist visual, la evaluación de suficiencia en vivo con Groq, la resolución condicional de Fecha/Hora/Lugar/Momento, los metadatos de adquisición, la integración de audio con Backblaze y el cierre de extremo a extremo no quedan implementados ni verificados en producción por esta actualización. No se declara cobertura completa de todas las instrucciones históricas; se documenta el tramo final señalado por el operador.
-
-Continuidad documental C031 (2026-10-22): OCP **v0.6.13 · MCP-OBS-DICTADO-v0.6.13**; control único `docs/frentes/dictado-voz/CONTROL-RESPONSABILIDAD.json`, generación 1, folio activo `SES-20261022-C7N4M2Q8`, alias `chatgpt-dictado-voz-SES-20261022-C7N4M2Q8`; read-back del control comprobado. Las instrucciones U01/U02 y tres comentarios visibles del asistente están en `originales/CONTINUIDAD-C031-20261022.jsonl`, con read-back exacto. No se localizó una salida previa del modelo completa que pueda reproducirse: **NO DISPONIBLE / NO VERIFICADA**; no se reconstruyó. Unicidad global del folio: **NO VERIFICADA** fuera del conjunto de repositorios y controles accesibles. No hubo cambios de producto ni pruebas técnicas en C031. MCP-NORMATIVO: DESACTIVADO.
-
-Último estado técnico acreditado (C030; no revalidado en C031): funcional integrado mediante solicitud 326 y publicado: main f0dfbdcb2d79eb6289dacba272ddcc7ba2023063, despliegue dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr READY, alias khora-web.vercel.app y /api/version coincidentes. No equivale a extremo a extremo certificado. El comando propio omite npm prebuild; el preview posterior con compuertas efectivas falló y no fue promovido. Recibos C030-release.json y C030-gate-blocker.json.
-Siguiente paso técnico de C030 (histórico; supersedido para la continuidad inmediata por C041): obtener por acceso autorizado el log de dpl_252P53oY97VyHAvWKdEbzo2tqP8X. La conexión Vercel devuelve 403 para ese scope; CLI autenticada no disponible en sandbox y PC-14 desconectado. No reintentar sin cambio de acceso ni adivinar causa. Solicitar log o aprobación de revisión por navegador. En paralelo puede acompañarse aceptación humana voluntaria de la versión funcional publicada.
-Siguiente paso de construcción de C030 (histórico y no activado por C041): con el log autorizado, identificar y corregir únicamente el fallo de la compuerta, repetir prueba causal y publicar configuración endurecida solo tras build aprobado; reutilizar candidato inactivo evidencias/C030-vercel-gates-candidate.json. No debilitar compuertas ni cambiar seguridad, proveedores, facturación o dispositivos. No abrir Maya/síntesis ni grafo.
-Pendientes: compuertas globales efectivas bloqueadas por build ERROR sin logs legibles; sesión humana micrófono/pestaña, transcriptor real, custodia/archivo/reapertura autenticados. 15 unitarias dirigidas, tipos estrictos dirigidos, PostgreSQL aislado y ambos arneses portables aprobados; no sustituir por ello extremo a extremo real. Configuración fallida retirada del path activo, conservada íntegra como evidencia; producción funcional permanece. Archivo histórico íntegro y documento paralelo ausente no acreditados. Conservar recordatorios históricos.
-
-### ⚗️ En prueba / recién fallido
-
-C030: 15 unitarias dirigidas aprobadas; tipos estrictos dirigidos y ensayos portables aprobados. PostgreSQL aislado reproduce reintento NULL rechazado y verifica corrección sin aceptar conflictos. Build funcional READY omite prebuild por comando propio; ensayo con compuerta efectiva posterior ERROR, logs 403, causa concreta NO VERIFICADA.
-C030: Chromium, audio sintético/Opus e IndexedDB cifrado reales; red/proveedor sustituidos. Captura diálogo/plana sobrevive su URL, incluye finales, recarga sin reanudar y archiva tras fallo incierto con payload inmutable y dos originales retenidos. Dictado normal: parada visible inmediata, HTTP 503 agregado/reintento y eventos sin texto. No prueba permisos físicos, proveedor real, comodidad ni beneficio terapéutico.
-
-### 🔔 Recordatorios latentes
-
-- No declarar cerrado el sprint por compilación, prueba controlada, HTTP 200 o archivo guardado.
-- No se ha probado aquí micrófono físico, identidad humana nueva, comodidad ni fidelidad vocal.
-- Cobertura parcial: conservación al detener y estabilidad visual completa; fidelidad sin referencia conocida.
-- Provisional al detener y semántica del evento Escape siguen requiriendo cotejo específico. «Re-transcribir audio» queda conectado al flujo existente en este corte; eso no certifica el reconocimiento externo real.
-- Mantener fuentes voluntaria y muestreada separadas; ausencia de respuesta no significa neutralidad.
-- Consentimiento por navegador/perfil, inicialmente apagado; no habilitarlo tácitamente para otros dispositivos o salud.
-- Retención física al acceder, no purga periódica garantizada; pendientes de envío/borradores solo en memoria en v1.
-- No cambiar claves, visibilidad, facturación, protecciones ni alcance de proveedores.
-- La solicitud 298 acredita cierre técnico histórico; el acta no sustituye frescura de despliegues posteriores.
-- El bloqueo del antiguo registro se conserva como hecho histórico. En esta reconstrucción el registro separado 8a786f44318b8235a67e8156fd50a98d admite escritura; se registran quoting de Node y contrato de tipos del doble de proceso. No se restauró ninguna página.
-- Integración documental #302 acreditada en c9147557. Para el nuevo endurecimiento, consultar solicitud y hashes del recibo de integración; no usar el estado local anterior como estado remoto ni confundir merge con publicación.
-- No borrar estos recordatorios por silencio; liberación positiva o decisión expresa.
+### Producto
+C044 no modifica código, datos, configuración, credenciales, scopes, seguridad, workflows, producción ni despliegue; tampoco ejecuta pruebas. Último corte técnico histórico C030, no revalidado. La separación documental no demuestra que el defecto de Dictado esté resuelto.
 
 ## 9. Aceptación y viabilidad
 
-C030: corrección funcional publicada y pruebas dirigidas aprobadas. Compuertas globales efectivas NO APROBADAS: ensayo detenido y sin log autorizado. No declarar extremo a extremo certificado ni aceptación humana; §8 conserva el bloqueo exacto. Los recuentos C029 de abajo son históricos.
+La aceptación funcional exige evidencia actual de que: (1) el operador abre la pantalla específica e inicia/detiene el micrófono explícitamente; (2) la captura alimenta la transcripción y expone estados/errores veraces; (3) el texto aparece y puede editarse; (4) reanudar conserva texto confirmado y continúa según el contrato; (5) audio/texto se conservan y recuperan mediante Custodia; (6) el recorrido terminal se prueba en navegador y micrófono real y la aceptación humana se registra por separado.
 
-### C027 · Criterio terminal de la corrección
-
-1. Desde Ingreso, Escuchar a Chrome visible sin enlace especial; casilla de micrófono dentro de esa función, sin otra pantalla ni pérdida de borrador.
-2. Compartir pestaña con audio y conceder micrófono; falta de pista/permiso visible y sin grabación ficticia. Señales de ambas fuentes y partes locales/remotas comprobadas, sin confundirlas con texto reconocido.
-3. Detener espera originales finales de ambas fuentes y transcribe automáticamente en el mismo editor; cero bytes o fuente ausente no invoca proveedor ni se declara diálogo completo. Fallo del proveedor conserva originales y ofrece reintento.
-4. Archivar como volcado usa la custodia normal, propietario, manifiesto persistido y recibo ID/sessionId/SHA; reintento incierto congela texto/sesión y evita otro borrador. Revisar/aprobar/ingerir siguen siendo pasos explícitos de Custodia.
-5. C029 acredita tipos/contratos/regresión/build completos, 545 unitarias, fusión normal y publicación READY/version/alias; queda pendiente la prueba física real con reapertura del volcado. Las pruebas controladas no sustituyen esos requisitos humanos.
-
-
-### C022 · criterios de modo Diálogo
-
-| Requisito | Resultado/evidencia actual | Pendiente terminal |
-|---|---|---|
-| Dos fuentes simultáneas sin Live Caption | Dos grabadoras reales en Chromium con audio sintético; controlador único de diálogo | Pestaña real de Maya + micrófono físico, con permisos explícitos |
-| Misma transcripción de Khora | Adaptador al proveedor/modelo existentes; lenguaje automático y verbatim solo en diálogo; dictado español conserva defaults | Petición autenticada real al proveedor y cotejo bilingüe |
-| Orden por tiempo y atribución honesta | Segmentos ordenados, repeticiones preservadas y solapamientos marcados; fuente no equivale a persona | Fidelidad humana y diarización de varios hablantes no implementada |
-| Custodia y recuperación | IndexedDB cifrado y checkpoints/partes existentes; verifica dueño, cantidad y lector de huellas; separación de exportaciones | Ensayo con servidor/almacén reales, cierre abrupto y otro dispositivo |
-| Evitar mezcla destructiva | Modo mono y MP3 secuencial rechazan fuentes mezcladas; integración/tipos/build globales C029 aprobados | Ensayo físico de originales separados; sin mezcla MP3 nueva |
-| Publicación | C029: main 77d8ee0, despliegue READY y dominio/version coincidentes; sin cambiar plan/proyecto/privacidad | Aceptación humana no suplida por rutas protegidas 307/401 |
-
-Viabilidad: se ofrece transcripción posterior al detener, no captions de diálogo en vivo. Un reloj común no certifica timing palabra por palabra. Límite preventivo de 18 MB por fuente; originales no se sustituyen por MP3 ni se ingieren automáticamente. Pruebas clínicas y eficacia terapéutica fuera de este encargo. Hito técnico de publicación cerrado en C029. Próximo hito: sesión humana voluntaria y revisión del volcado; tiempo/ciclos dependen de disponibilidad del operador y resultado real, no se fabrica un plazo.
-
-
-| Requisito | Resultado demostrado y entorno | Falta para cerrar |
-|---|---|---|
-| Corrección original de continuidad | V000 conserva «Quedó bien» del operador | no extender esa aceptación a nuevas funciones o versiones |
-| Benchmark visible y entrada manual | código/PR 298; artefacto `passed`; fuente probada `11fde5a7da7aec46b9873103ddf13213ba1c6c4f` | versión pública acreditada por observación de este ciclo; vista autenticada y datos reales pendientes |
-| Contratos/regresiones | acta histórica: 20 dirigidas, 15 navegador, 402 unitarias; build/tipos/interfaz aprobados | no afirmar ejecución nueva de esas pruebas en este ciclo documental |
-| Persistencia real | acta PR 298: escritura+cifrado+lectura+borrado con propietario sintético en Vercel | opinión y sesión reales del operador, lectura y efecto persistido vinculados |
-| Acceso MCP | conexión configurada y health invocado, no acceso completo | credencial normativa dedicada si sigue faltando; respetar ciclo normativo del servidor |
-| Conservación | comprobaciones de prefijo confirmado implementadas | cubrir otras transiciones sin contar cero observaciones como éxito |
-| Fidelidad | ausencia de referencia declarada | referencia y protocolo de evaluación aprobados; no inferir error a partir de cualquier edición |
-| Respuesta | tiempos técnicos recepción→oportunidad de pintado y reanudación | línea base real; no llamarlo latencia voz→pantalla |
-| Estabilidad visual | cobertura incompleta declarada y motivo de opinión | cursor/desplazamiento/parpadeo con pruebas pertinentes |
-| Experiencia agradable | encuesta y manual disponibles por contrato | respuestas humanas; no inferir experiencia ni ánimo de la voz |
-| Audio técnico/síntomas autodeclarados | propuesta delimitada, sin archivo recibido | finalidad y primer reporte definidos, consentimiento separado y revisión de interfaz/seguridad antes de código |
-| Detección clínica comercial | no implementada ni validada | no ofrecer; requerir definición de uso, evaluación clínica/regulatoria pertinente y límites de plataforma |
-| Canonización portable | objeto único y núcleo de trece bloques; #302 y #312 integradas; adjunto de 51233 bytes preservado | actualizar cada ciclo; recuperar fuentes ausentes sin inventar cobertura total |
-| Micrófono tras #309 | #312 fusionada y publicada c02f514; 502 unitarias, build y guardias verificadas en el recibo | arranque/parada y recuperación con la voz y sesión reales del operador |
-
-**Protocolo de sesión real, aún no ejecutado:** (1) acreditar versión y acceso, confirmar consentimiento; (2) una sesión de voz voluntaria de al menos 60 s, edición y confirmación/reanudación/parada; (3) recoger opinión real en formulario —si no sale encuesta, usar manual y mantener `voluntary`—; (4) consultar el registro del mismo propietario, correlacionar identificador/versión/acuse y resumen persistido; (5) conservar solo evidencia saneada, no texto/audio/comentarios privados en Git. No forzar la muestra ni fabricar `sampled`. Comprobar exportación/borrado con datos de prueba separados, nunca borrar la sesión real sin permiso.
-
-Mínimo viable demostrado: regresión controlada + captura opcional de experiencia + persistencia sintética real. Mínimo viable todavía no demostrado: circuito humano completo y beneficio longitudinal. La oferta comercial o clínica no se deduce de ninguno.
-
-Estimación: canonización, un ciclo documental si las lecturas y escritura permanecen accesibles; cierre humano, no estimable hasta resolver acceso/versión y disponer del participante. Después requiere una sesión real más verificación de persistencia; no prometer que el muestreo invite en la primera sesión. Completar indicadores o línea sensible requiere alcance específico antes de estimar. No se ha calculado porcentaje de avance.
+**Estado:** NO REVALIDADO EN C044. Evidencia histórica o sintética no sustituye uso físico ni aceptación del operador.
 
 ## 10. Formato de ciclo
 
-Toda salida conserva diez campos, agrupables sin ocultarlos: (1) proyecto/rol/sello y **Metacanon adquirido: versión/sello, revisión y frescura**; (2) dónde estamos; (3) delta metodológico y del frente; (4) avance con evidencia/entorno y no tocado; (5) pendientes/bloqueos; (6) viabilidad contra intención y aceptación; (7) tiempo/ciclos con supuestos o dependencia no estimable; (8) siguiente acción por rol y mínima intervención material; (9) continuidad/prompt ante salida de constructor, sin fingir recepción; (10) persistencia verificada o pendiente.
+Toda salida conserva: identidad Dictado/OCP/folio/generación y versiones DUG/Sam/Metacanon/GOW; última salida previa recuperable; delta de fuente/frente; avances con evidencia/entorno; pendientes/bloqueos; viabilidad contra propósito/aceptación; dependencias/estimación; siguiente acción; continuidad/prompts de roles existentes; persistencia con SHA/revisión/read-back.
 
-No llamar «sin cambios» a una fuente inaccesible; no convertir calidad científica o clínica en semáforo por pruebas de software. Si no hay constructor nuevo asignado, decirlo y no inventar trabajo en segundo plano.
+No afirmar sincronización, titularidad, aceptación, pruebas, despliegue o lectura sin evidencia. Si la fuente central no puede verificarse: `METODOLOGÍA NO VERIFICADA`. MCP-NORMATIVO: DESACTIVADO.
 
 ## 11. Crónica y fuentes
+
+### C044 — Separación de Dictado y Observabilidad MCP; transferencia — 2026-10-30
+
+- Instrucción del operador preservada verbatim: «Si, y deja todo listo en github para que se reconzcan los frentes ya correctamente en instancias nue4vas». Procedencia directa de esta conversación; no es exportación nativa.
+- Gobernanza adquirida: DUG v363 · NX-363m; Metacanon 1.25; GOW 2.12; blob `501f7f6ec8bfd0a8289eb0c1e3897c19a0281be7`, commit `b4bc9f8ef4485e44973e9c17f6c4f9a1119d698d`. Revisados P001/P004/P005/P037/P038 y §§39/42/47/48/51. MCP-NORMATIVO: DESACTIVADO.
+- Control previo: `ff3a148420e547323717a620c1c5b695a4fa79e5`, gen. 3, folio `SES-20261028-Q7M4N9K2`, titular `chatgpt-dictado-voz-SES-20261028-Q7M4N9K2`. Autorización expresa para asumir Dictado únicamente.
+- Nuevo folio `SES-20261030-97109848`, alias `chatgpt-dictado-ses-20261030-97109848`, UUIDv7 local `01a18d84-31e0-7dca-b0f7-90e4b3c58f12`, evento `DICTADO-TRANSFER-C044-SES-20261030-97109848`. Alias/UUID no son IDs nativos de plataforma.
+- Dictado queda limitado a pantalla/captura/transcripción/edición/continuidad. Observabilidad MCP adquiere OCP propio y control sin titular asignado.
+- Benchmark/feedback, Diálogo multipista, Ingreso general/crónica/metadatos, voz/síntomas y publicación editorial se preservan fuera del alcance de Dictado.
+- PR #335 sigue candidato amplio de Ingreso; PR #342/#343 se relacionan con Observabilidad MCP. Todos permanecen abiertos y sin fusionar.
+- No hubo cambios de producto ni pruebas en C044; aceptación física pendiente.
+
 
 ### C042 — Transferencia autorizada y verificable de titularidad — 2026-10-28
 
@@ -539,95 +433,21 @@ El operador reporta botón desactivado con rótulo de espera. Se confirma depend
 
 ## 12. Reinstanciación
 
-Estos prompts son material de continuidad, no prueban que otra conversación haya sido creada o los haya recibido. Al actualizar §8 deben sincronizarse literalmente. La asignación de un escritor de código debe constar antes de usar el prompt de construcción.
+### Prompt de asistencia — Dictado
 
-### Prompt de asistencia
+Eres la instancia de asistencia del frente **Dictado** de Khora. Tu alcance exclusivo es pantalla de dictado, captura de voz iniciada por el operador, transcripción, edición y continuidad. Lee `README.md`, DUG vigente, este OCP, control, manifiesto y última crónica. Verifica generación/folio. Si aparece otro titular, aplica P037/§42. No asumas Observabilidad MCP: tiene OCP/control independientes. No incorpores benchmark, feedback, Diálogo multipista, Ingreso general, crónica ni publicación. Antes de cambios de audio/captura, lee `khora-web/docs/CUSTODIA-DICTADOS.md`. Responsabilidad documental no autoriza cambios de producto, credenciales o producción.
 
-````text
-Retoma MCP-OBS-DICTADO. Adquiere primero INICIO.md, el Metaprompt Canónico de Samantha, Metacanon y GOW desde SeryMente/metodologia/main. Después relee el control único https://github.com/SeryMente/khora/blob/main/docs/frentes/dictado-voz/CONTROL-RESPONSABILIDAD.json y el OCP https://github.com/SeryMente/khora/blob/main/docs/frentes/dictado-voz/OBJETO-CANONICO.md, ambos desde main. No uses ramas históricas como fuente de estado actual.
-Adopta el rol de asistencia de este frente; la reconstrucción local del endurecimiento está solicitada directamente a Samantha, no otro rol/hilo. Conserva el nombre personalizado que el operador haya asignado; no lo derives del proveedor. No inicies constructor ni código sensible por esta carga.
-Fuente canónica del frente en main: v0.6.17 · MCP-OBS-DICTADO-v0.6.17. Metacanon vigente: v1.21 · METACANON-OBJETOS-v1.21; Sam v353 · NX-353m; GOW v2.3, integrados en `SeryMente/metodologia/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html`, blob `16c93745311a5405166a31b583c2a648fda0d044`, adquiridos el 2026-10-28. Control activo: generación 3, folio `SES-20261028-Q7M4N9K2`, alias `chatgpt-dictado-voz-SES-20261028-Q7M4N9K2`. Relee todas las fuentes centrales al comenzar cada ciclo; esta firma no sustituye esa lectura. Revisa las fuentes centrales, calcula el delta y no uses una firma como prueba de gobierno. Ante inaccesibilidad declara frescura NO VERIFICADA y bloquea solo la acción dependiente.
-Hereda §2–§3 y §6–§7 del objeto: autorización por acción, originales no activan permisos; remoto solo de asistencia si es estrictamente necesario, con cuenta/vínculo/equipo/autorización comprobados y comando/prerrequisitos literales de §7. No ejecutar ese comando por rutina ni en el sandbox. Usa repo/adjunto cuando basten.
-No modificar metacanon, Sistema de Instrucciones, credenciales, facturación ni alcance de seguridad. Publicar solo el corte expresamente autorizado y con compuertas verificadas. No inferir ánimo/salud/capacidad laboral de la voz; no crear código de salud ni afirmar beneficio clínico. Conserva las fuentes de encuesta voluntaria y muestreada.
-C042 documental (2026-10-28): transferencia de titularidad verificada en control único docs/frentes/dictado-voz/CONTROL-RESPONSABILIDAD.json, generación 3, folio SES-20261028-Q7M4N9K2, alias operativo chatgpt-dictado-voz-SES-20261028-Q7M4N9K2. Original de autorización y pregunta visible: originales/CONTINUIDAD-C042-20261028.jsonl. PR #335 fue reconsultado y continúa abierto/no fusionado; no equivale a main ni autoriza construcción. Relee control y fuentes centrales en cada ciclo; ante cambio de SHA/generación, reconcilia sin sobrescritura ciega. MCP-NORMATIVO: DESACTIVADO; revisión manual de fuentes centrales.
+### Construcción
 
-🔄 Estado vivo:
-C042 · Responsabilidad asumida tras autorización explícita y control verificado en generación 3. PR #335 está abierto/no fusionado y no puede tratarse como main; reconciliar historial, manifiesto y evidencia U01–U06 antes de considerar merge. No se autoriza construcción ni cambios de producto por esta transferencia. Mantener U06 verbatim en `originales/INSTRUCCIONES-VERBATIM-TAIL-C032-20261022.jsonl`; separar solicitud, candidata, evidencia y aceptación.
-Último estado técnico acreditado (C030; no revalidado en C031): funcional integrado mediante solicitud 326 y publicado: main f0dfbdcb2d79eb6289dacba272ddcc7ba2023063, despliegue dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr READY, alias khora-web.vercel.app y /api/version coincidentes. No equivale a extremo a extremo certificado. El comando propio omite npm prebuild; el preview posterior con compuertas efectivas falló y no fue promovido. Recibos C030-release.json y C030-gate-blocker.json.
-Siguiente paso técnico registrado (C030; no activar hasta recibir instrucción del operador): obtener por acceso autorizado el log de dpl_252P53oY97VyHAvWKdEbzo2tqP8X. La conexión Vercel devuelve 403 para ese scope; CLI autenticada no disponible en sandbox y PC-14 desconectado. No reintentar sin cambio de acceso ni adivinar causa. Solicitar log o aprobación de revisión por navegador. En paralelo puede acompañarse aceptación humana voluntaria de la versión funcional publicada.
-Siguiente paso de construcción (solo si se asigna explícitamente y tras autorización del operador): con el log autorizado, identificar y corregir únicamente el fallo de la compuerta, repetir prueba causal y publicar configuración endurecida solo tras build aprobado; reutilizar candidato inactivo evidencias/C030-vercel-gates-candidate.json. No debilitar compuertas ni cambiar seguridad, proveedores, facturación o dispositivos. No abrir Maya/síntesis ni grafo.
-Pendientes técnicos heredados de C030 (no revalidados en C031): compuertas globales efectivas bloqueadas por build ERROR sin logs legibles; sesión humana micrófono/pestaña, transcriptor real, custodia/archivo/reapertura autenticados. 15 unitarias dirigidas, tipos estrictos dirigidos, PostgreSQL aislado y ambos arneses portables aprobados; no sustituir por ello extremo a extremo real. Configuración fallida retirada del path activo, conservada íntegra como evidencia; producción funcional permanece. Archivo histórico íntegro y documento paralelo ausente no acreditados. Conservar recordatorios históricos.
-⚗️ En prueba / recién fallido:
-C030: 15 unitarias dirigidas aprobadas; tipos estrictos dirigidos y ensayos portables aprobados. PostgreSQL aislado reproduce reintento NULL rechazado y verifica corrección sin aceptar conflictos. Build funcional READY omite prebuild por comando propio; ensayo con compuerta efectiva posterior ERROR, logs 403, causa concreta NO VERIFICADA.
-C030: Chromium, audio sintético/Opus e IndexedDB cifrado reales; red/proveedor sustituidos. Captura diálogo/plana sobrevive su URL, incluye finales, recarga sin reanudar y archiva tras fallo incierto con payload inmutable y dos originales retenidos. Dictado normal: parada visible inmediata, HTTP 503 agregado/reintento y eventos sin texto. No prueba permisos físicos, proveedor real, comodidad ni beneficio terapéutico.
-Conserva íntegros los recordatorios latentes del objeto. Reutiliza evidencia válida, no repitas pruebas sin cambio causal. Recibir una salida del constructor tiene prioridad; asistencia la contrasta y devuelve síntesis y prompt de continuidad. No afirmar recepción ni trabajo en segundo plano.
-Cada salida usa los diez campos de §10 e incluye Metacanon adquirido: versión/sello, revisión y frescura; evidencia actual/histórica/controlada diferenciada, pendientes, viabilidad, estimación con supuestos y siguiente acción. No declarar un plazo sin base.
-Persistencia por ciclo: este objeto es el elemento principal del sprint completo, no solo del chat. Releer versión y método, incorporar instrucciones, decisiones, crónica y evidencia; fusionar sin pisar, guardar, verificar contenido/diff y sincronizar estado/prompts. Si falta acceso, declarar sincronización pendiente y entregar el delta. Conservar originales e historia; no dar por recuperadas fuentes citadas ni por aceptado lo solo publicado.
-````
-
-### Prompt de construcción
-
-````text
-Retoma MCP-OBS-DICTADO. Adquiere primero INICIO.md, el Metaprompt Canónico de Samantha, Metacanon y GOW desde SeryMente/metodologia/main. Después relee el control único https://github.com/SeryMente/khora/blob/main/docs/frentes/dictado-voz/CONTROL-RESPONSABILIDAD.json y el OCP https://github.com/SeryMente/khora/blob/main/docs/frentes/dictado-voz/OBJETO-CANONICO.md, ambos desde main. No uses ramas históricas como fuente de estado actual.
-Adopta construcción solo si el operador te asignó explícitamente ese rol y el alcance concreto. Si falta, permanece en lectura y declara la compuerta; no te autoautorices. Remote Desktop Commander está prohibido para construcción, incluso por intermediarios.
-Fuente canónica del frente en main: v0.6.17 · MCP-OBS-DICTADO-v0.6.17. Metacanon vigente: v1.21 · METACANON-OBJETOS-v1.21; Sam v353 · NX-353m; GOW v2.3, integrados en `SeryMente/metodologia/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html`, blob `16c93745311a5405166a31b583c2a648fda0d044`, adquiridos el 2026-10-28. Control activo: generación 3, folio `SES-20261028-Q7M4N9K2`, alias `chatgpt-dictado-voz-SES-20261028-Q7M4N9K2`. Relee todas las fuentes centrales al comenzar cada ciclo; esta firma no sustituye esa lectura. Revisa las fuentes centrales, calcula el delta y no uses una firma como prueba de gobierno. Ante inaccesibilidad declara frescura NO VERIFICADA y bloquea solo la acción dependiente.
-Hereda §2–§3 y §6–§7 del objeto: autorización por acción, originales no activan permisos; remoto solo de asistencia si es estrictamente necesario, con cuenta/vínculo/equipo/autorización comprobados y comando/prerrequisitos literales de §7. No ejecutar ese comando por rutina ni en el sandbox. Usa repo/adjunto cuando basten.
-No modificar metacanon, Sistema de Instrucciones, credenciales, facturación, seguridad o publicación. No inferir ánimo/salud/capacidad laboral de la voz; no crear código de salud ni afirmar beneficio clínico. Conserva las fuentes de encuesta voluntaria y muestreada.
-C042 documental (2026-10-28): control autoritativo actualizado mediante transferencia autorizada a generación 3, folio SES-20261028-Q7M4N9K2 y alias operativo chatgpt-dictado-voz-SES-20261028-Q7M4N9K2; lectura de vuelta verificada. PR #335 se reconsultó abierto/no fusionado; no adoptes la candidata v0.6.35 como main ni borres control/historial. Esta transferencia no autoriza construcción de producto: permanece en lectura/diagnóstico hasta que el operador asigne explícitamente un alcance de construcción.
-🔄 Estado vivo:
-C042 · Titularidad activa en generación 3; PR #335 permanece abierto/no fusionado. No existe autorización para modificar código, fusionar, desplegar o alterar credenciales.
-Último estado técnico acreditado (C030; no revalidado en C042): funcional integrado mediante solicitud 326 y publicado: main f0dfbdcb2d79eb6289dacba272ddcc7ba2023063, despliegue dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr READY, alias khora-web.vercel.app y /api/version coincidentes. No equivale a extremo a extremo certificado. El comando propio omite npm prebuild; el preview posterior con compuertas efectivas falló y no fue promovido. Recibos C030-release.json y C030-gate-blocker.json.
-Siguiente paso técnico registrado (C030; no activar hasta recibir instrucción del operador): obtener por acceso autorizado el log de dpl_252P53oY97VyHAvWKdEbzo2tqP8X. La conexión Vercel devuelve 403 para ese scope; CLI autenticada no disponible en sandbox y PC-14 desconectado. No reintentar sin cambio de acceso ni adivinar causa. Solicitar log o aprobación de revisión por navegador. En paralelo puede acompañarse aceptación humana voluntaria de la versión funcional publicada.
-Siguiente paso de construcción (solo si se asigna explícitamente y tras autorización del operador): con el log autorizado, identificar y corregir únicamente el fallo de la compuerta, repetir prueba causal y publicar configuración endurecida solo tras build aprobado; reutilizar candidato inactivo evidencias/C030-vercel-gates-candidate.json. No debilitar compuertas ni cambiar seguridad, proveedores, facturación o dispositivos. No abrir Maya/síntesis ni grafo.
-Pendientes técnicos heredados de C030 (no revalidados en C031): compuertas globales efectivas bloqueadas por build ERROR sin logs legibles; sesión humana micrófono/pestaña, transcriptor real, custodia/archivo/reapertura autenticados. 15 unitarias dirigidas, tipos estrictos dirigidos, PostgreSQL aislado y ambos arneses portables aprobados; no sustituir por ello extremo a extremo real. Configuración fallida retirada del path activo, conservada íntegra como evidencia; producción funcional permanece. Archivo histórico íntegro y documento paralelo ausente no acreditados. Conservar recordatorios históricos.
-⚗️ En prueba / recién fallido:
-C030: 15 unitarias dirigidas aprobadas; tipos estrictos dirigidos y ensayos portables aprobados. PostgreSQL aislado reproduce reintento NULL rechazado y verifica corrección sin aceptar conflictos. Build funcional READY omite prebuild por comando propio; ensayo con compuerta efectiva posterior ERROR, logs 403, causa concreta NO VERIFICADA.
-C030: Chromium, audio sintético/Opus e IndexedDB cifrado reales; red/proveedor sustituidos. Captura diálogo/plana sobrevive su URL, incluye finales, recarga sin reanudar y archiva tras fallo incierto con payload inmutable y dos originales retenidos. Dictado normal: parada visible inmediata, HTTP 503 agregado/reintento y eventos sin texto. No prueba permisos físicos, proveedor real, comodidad ni beneficio terapéutico.
-Conserva íntegros los recordatorios latentes del objeto. Reutiliza evidencia válida, no repitas pruebas sin cambio causal. Recibir una salida del constructor tiene prioridad; asistencia la contrasta y devuelve síntesis y prompt de continuidad. No afirmar recepción ni trabajo en segundo plano.
-Cada salida usa los diez campos de §10 e incluye Metacanon adquirido: versión/sello, revisión y frescura; evidencia actual/histórica/controlada diferenciada, pendientes, viabilidad, estimación con supuestos y siguiente acción. No declarar un plazo sin base.
-Persistencia por ciclo: este objeto es el elemento principal del sprint completo, no solo del chat. Releer versión y método, incorporar instrucciones, decisiones, crónica y evidencia; fusionar sin pisar, guardar, verificar contenido/diff y sincronizar estado/prompts. Si falta acceso, declarar sincronización pendiente y entregar el delta. Conservar originales e historia; no dar por recuperadas fuentes citadas ni por aceptado lo solo publicado.
-````
+No hay constructor independiente asignado en C044. No inventar agente ni emitir un prompt ejecutable hasta que el operador asigne ese rol.
 
 ## 13. Persistencia y revisión
 
-- C041: transferencia autorizada y verificada mediante CAS y lectura de vuelta; original de continuidad C041 creado y cotejado; PR #335 se identificó como último candidato del frente, abierto y no fusionado, con OCP/control/historial divergentes y contradicciones internas en trazabilidad. No se tocó código ni despliegue; sincronización sigue pendiente.
-
-- C032: objeto actualizado a v0.6.14; extracto verbatim U01–U06 creado y releído exactamente; U06 contiene la especificación larga del checklist, metadatos y Momento y la petición de un checklist claro. El estado C054/v0.6.46 referido en la conversación no pudo verificarse en las fuentes recuperables. Actualización documental únicamente; no hubo pruebas ni despliegues.
-
-- C031: objeto actualizado a v0.6.13; control de responsabilidad creado por asignación inicial create-only y comprobado mediante read-back; originales U01/U02 + comentarios visibles preservados en `docs/frentes/dictado-voz/originales/CONTINUIDAD-C031-20261022.jsonl`; prompts de reinstanciación sincronizados con Metacanon v1.21, Sam v339 y GOW v2.2; manifiesto actualizado después de la lectura de vuelta del OCP. La última salida previa del modelo sigue NO DISPONIBLE / NO VERIFICADA; no se reconstruyó. El estado técnico de producto permanece en C030 y no hubo pruebas ni despliegues en C031.
-
-- C030 cierre documental: v0.6.12, release main f0dfbdc/READY/alias/versión y límites documentados; recibo, estados literales y manifiesto sincronizados. Esta escritura posterior conserva el release probado, no inventa otro build ni aceptación.
-
-- C030: mismo objeto y carpeta, instrucciones nuevas literales, pruebas portables y registro central actualizado. Commit funcional b36231 y prebuild 06c36c; preview READY acreditado. Producción nueva pendiente; readback antes de integración.
-
-- C029: publicación técnica comprobada y credenciales temporales retiradas; actualización documental posterior al release, sin cambiar runtime ni fabricar aceptación humana.
-
-- C027: reporte negativo conservado, diseño corregido en rama con evidencia controlada; no fusión ni deploy nuevos. Bloqueo remoto limita solo las compuertas dependientes.
-
-- C026: release verificado por commit/READY/alias/versión pública, aceptación física pendiente; los cambios documentales posteriores no son un nuevo build de código.
-
-- C025: v0.6.8 corrige el requisito artificial de Entorno Persistente, conserva literalmente la aclaración del operador y registra herramientas/autenticación Vercel medidas, con GitHub pendiente. No se elimina la crónica C024 ni se presenta autenticación como despliegue.
-
-- C024: misma rama, objeto principal v0.6.3; identificación actual de equipo sustituyó el bloqueo de vínculo por compuerta material de entorno/credenciales, sin borrar los hechos históricos. Original y recibo añadidos, manifiesto/ambos prompts sincronizados.
-
-- C023: actualización documental autorizada en la misma rama; originales de publicación y recibo externo preservados. No producto nuevo, fusión, despliegue, sesión remota ni cambio de método. Estado público observado no se confunde con la implementación de esta rama.
-
-- C022: misma carpeta/objeto, rama feat/dialogo-chrome-microfono-20261018 desde 4dca2133866421105f077bbd7079576c588d1169. Comparación de blobs comprobada antes de escritura; manifiesto actualizado con originales, recibo y pruebas. Revisión local no sustituye lectura remota ni fusión. Fuentes citadas pero no recuperadas siguen marcadas como ausentes.
-
-- Autorización de la migración original: V010. Reconstrucción actual: solicitud directa conservada en C015. Carpeta y custodia dentro del propietario del frente; originales privados nunca al método central.
-- Rama documental de C021: `docs/dictado-estado-v053-20261017`, basada en main `2012e2389deb732568a5bd384817c19499fb910c`; objeto y manifiesto contrastados antes de escribir. Rama original de canonización conservada en la crónica histórica. Si main cambia, comparar el archivo pertinente; preservar ambos deltas o parar solo la escritura en conflicto.
-- Original histórico conservado íntegro al final de este objeto, SHA-256 `2cd79db40b1786521df63f1b87d80d595c2df9a48bb202bf93a40ff16cce1810`; no se borran decisiones ni se reactivan permisos. Contrato anterior y adjunto tienen hashes independientes en el manifiesto.
-- Pasada 1: cotejar V000–V010 → D01–D07/aceptación, trece bloques ordenados, originales/historia conservados, privacidad, referencias y estado literal en ambos prompts. Corregir antes de escribir.
-- Pasada 2: recuperar el archivo guardado y metadatos de custodia, comparar hashes/contenido/diff, verificar enlaces y que las rutas antiguas no mantengan otro estado. Solo después afirmar persistido. El recibo del ciclo identifica revisión y pruebas de esa lectura; no usar una PR abierta como prueba de integración.
-- Cotejos negativos documentales: fuente caída → frescura NO VERIFICADA; carrera → fusionar o bloquear; rol/host ambiguo → no ejecutar; dictado ambiguo → preservar y preguntar solo lo material; propuesta no aprobada → no código; proveedor/plan indisponible → no fabricar garantía ni cuota. No son pruebas empíricas de obediencia de modelos.
-- No hay migración efectiva de otras conversaciones, otros objetos ni servidores. No crear otro validador, tablero o infraestructura para cumplir este molde.
-- Marco temporal: preparar futura exportación íntegra de originales/decisiones/crónica/estado/fuentes y verificar recepción/restauración en destino autorizado antes de archivar. Ningún plazo autoriza borrar.
-
----
-
-### Recibo operativo del corte de Ingreso
-
-El estado único está actualizado en §8. La fusión/publicación c02f514 se acredita en [recibo incorporado](evidencias/CIERRE-MICROFONO-PUBLICADO-20261017.md), procedente de https://github.com/SeryMente/khora/pull/312#issuecomment-6242006627. El recibo prueba ese evento, no mantiene otro estado vivo. Solo #312 pertenece a este corte; otras ramas no quedan acreditadas. La sesión física y aceptación humana permanecen pendientes.
+- **C044:** transferencia de Dictado gen. 3→4; Observabilidad MCP separado a su OCP/control; límites de material heredado documentados en §4; README e inventario central actualizados; originales e historia preservados.
+- Leer de vuelta control, objeto v0.6.18, manifiesto, nuevo OCP/control, README e inventario; verificar commit efectivo.
+- No borrar ni trasladar originales; otro FT exige propósito dictado directamente por el operador y control propio conforme a Metacanon §39.
+- Producto no modificado ni probado en C044; último corte técnico histórico C030 no revalidado.
+- Ante generación/SHA concurrente, detener y reconciliar; nunca sobrescribir una revisión distinta.
 
 # Anexo A · Historia íntegra anterior a la canonización v0.2.0
 
