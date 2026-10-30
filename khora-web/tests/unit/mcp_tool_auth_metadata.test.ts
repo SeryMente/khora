@@ -13,9 +13,9 @@ const normTools = ["khora_norm_open_turn", "khora_norm_apply_principle", "khora_
 const custodiaMetadataTools = ["khora_custodia_catalogo", "khora_custodia_revisiones"] as const;
 const custodiaIntegrityTools = ["khora_custodia_verificar_integridad"] as const;
 
-test("MCP preserves root securitySchemes for all seventeen tools", () => {
-  assert.equal(Object.keys(MCP_TOOL_SCOPES).length, 17);
-  for (const [names, scopes] of [[runtimeTools, ["runtime:read"]], [dataTools, ["volcados:read"]], [normTools, ["norm:turn"]]] as const) {
+test("MCP preserves specialized root securitySchemes for all twenty tools", () => {
+  assert.equal(Object.keys(MCP_TOOL_SCOPES).length, 20);
+  for (const [names, scopes] of [[runtimeTools, ["runtime:read"]], [dataTools, ["volcados:read"]], [normTools, ["norm:turn"]], [custodiaMetadataTools, ["custodia:metadata:read"]], [custodiaIntegrityTools, ["custodia:integrity:verify"]]] as const) {
     for (const name of names) {
       assert.deepEqual(describeMcpTool(name as McpToolName, "test", {}).securitySchemes, [{ type: "oauth2", scopes: [...scopes] }]);
     }
