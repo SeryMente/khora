@@ -21,7 +21,7 @@ const code = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTa
 // Execute the whole real route and SDK HTTP transport. Only external boundaries
 // (Next response class, identity, storage and business services) are substituted.
 // This is not proof of cryptography, OAuth, database effects or deployment.
-export function routeFixture(options: { scopes?: string[]; revoked?: boolean; denyTurn?: boolean; production?: boolean; configured?: boolean; failService?: boolean; healthError?: boolean; partial?: boolean; auditFail?: boolean; readAllowed?: boolean; writeAllowed?: boolean; sourceBranchExists?: boolean; sessionContextValid?: boolean; aclUnavailable?: boolean; sessionSource?: string; sessionBranch?: string; planApprovalReady?: boolean; currentPlanId?: string; planSecondId?: string } = {}) {
+export function routeFixture(options: { scopes?: string[]; revoked?: boolean; denyTurn?: boolean; production?: boolean; configured?: boolean; failService?: boolean; healthError?: boolean; partial?: boolean; auditFail?: boolean; readAllowed?: boolean; writeAllowed?: boolean; sourceBranchExists?: boolean; sessionContextValid?: boolean; aclUnavailable?: boolean; sessionSource?: string; sessionBranch?: string; planApprovalReady?: boolean; currentPlanId?: string; planSecondId?: string; planSecondStepDescription?: string; activityPagination?: boolean } = {}) {
   const schemas = new Map<contracts.McpToolName, { description: string; shape: z.ZodRawShape }>();
   const calls: Array<{ name: string; args: unknown }> = [];
   const servers: McpServer[] = [];
@@ -97,10 +97,12 @@ export function routeFixture(options: { scopes?: string[]; revoked?: boolean; de
       listActivitiesPage: async (sessionId: string, pageSize?: number, pageToken?: string) => {
         await business("JulesListActivitiesPage")({ sessionId, pageSize, pageToken });
         if (pageSize === 100 && !pageToken) fullPlanReadCalls++;
-        const changedDuringSecondRead = options.planSecondId && pageSize === 100 && fullPlanReadCalls >= 2;
-        const planId = changedDuringSecondRead ? options.planSecondId! : options.currentPlanId ?? "fixture-plan-1";
-        const plan = { id: planId, createTime: "2026-10-30T10:00:00Z", steps: [{ id: "step-1", index: 0, title: "Implement guarded change", description: "Synthetic plan description" }] };
+        const changedDuringSecondRead = (options.planSecondId || options.planSecondStepDescription) && pageSize === 100 && fullPlanReadCalls >= 2;
+        const planId = changedDuringSecondRead && options.planSecondId ? options.planSecondId : options.currentPlanId ?? "fixture-plan-1";
+        const plan = { id: planId, createTime: "2026-10-30T10:00:00Z", steps: [{ id: "step-1", index: 0, title: "Implement guarded change", description: changedDuringSecondRead && options.planSecondStepDescription ? options.planSecondStepDescription : "Synthetic plan description" }] };
         const activities = [{ name: "sessions/fixture-session/activities/plan-activity", id: "plan-activity", originator: "agent", createTime: "2026-10-30T10:00:00Z", planGenerated: { plan } }];
+        if (options.activityPagination && pageSize === 100 && !pageToken) return { activities: [], nextPageToken: "fixture-next-page" };
+        if (pageToken === "fixture-next-page") return { activities, nextPageToken: undefined };
         return { activities, nextPageToken: undefined };
       },
       createSession: business("JulesCreateSession"),
