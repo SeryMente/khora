@@ -1,4 +1,4 @@
-HARMONIA · MAPA DE LA INTERFAZ CONVERSACIONAL · v0.3.0
+HARMONIA · MAPA DE LA INTERFAZ CONVERSACIONAL · v0.3.1
 
 OBJETIVO
 Primera fase: reunir un inventario empírico y documental de la superficie conversacional de ChatGPT accesible desde Chrome. El índice mide cobertura del mapeo, no la completitud funcional de la extensión. Configuración, menús de cuenta y navegación general quedan fuera del alcance.
@@ -27,6 +27,12 @@ No captura cookies, contraseñas, borradores ni otras pestañas. No accede a raz
 DATOS Y CUSTODIA
 Los originales quedan fuera de Git en %LOCALAPPDATA%\Harmonia\surface-index-v0.3.0\data. El servicio escucha únicamente en 127.0.0.1:47321 y detiene escrituras al alcanzar 1 GiB sin borrar datos. El objeto coverage-index vive en index.json y puede consultarse con CONSULTAR-HARMONIA.cmd -Coverage.
 El archivo extension\local-auth.js contiene una credencial local; no subirlo ni compartirlo. Los cambios de código se mantienen en SeryMente/khora; el directorio runtime y logs también se excluyen de Git.
+
+PERSISTENCIA PROVISIONAL EN CORA · v0.3.1
+La extensión puede replicar a Cora únicamente resúmenes técnicos estructurales clasificados como ANONYMIZED_TELEMETRY. El destino es https://khora-web.vercel.app/api/observaciones/runtime y utiliza la sesión normal autenticada de Cora; no se incorpora una API key ni una credencial de Cora a la extensión. Para habilitar el envío, abra Cora en una pestaña de Chrome e inicie sesión. La extensión vacía la cola local automáticamente cuando detecta esa pestaña y también permite solicitar una sincronización desde el popup.
+Los archivos JSONL originales y las superficies completas permanecen en %LOCALAPPDATA%\Harmonia\surface-index-v0.3.0\data. Solo se envían UUID aleatorios de evento/sesión, marcas temporales, nombres de eventos de una lista fija, huellas SHA-256, IDs de capacidades del catálogo y conteos numéricos permitidos. No se envían etiquetas de controles, placeholders, estructura DOM completa, hojas CSS, URLs, texto de conversación, borradores, contenido de páginas, identificadores de cuenta ni credenciales. Los eventos anteriores a esta versión no se suben automáticamente.
+Cora valida el contrato OBSERVATION-BATCH v2.0 y persiste en Neon como telemetría anonimizada compartida, no asociada a la cuenta autenticada. Por tanto, esta vía NO es un almacén de datos personales por usuario ni un respaldo completo del archivo local. Si Cora no está abierta/autenticada o falla la red/validación, los lotes permanecen en la cola local y se reintentan. La cola remota tiene un límite operativo de 20 000 eventos; al alcanzarlo, los eventos nuevos siguen guardándose localmente y el popup informa cuántos no entraron a la cola remota. No borre originales hasta verificar una migración permanente.
+Esta arquitectura es EXPRESAMENTE PROVISIONAL. Su sustitución requiere definir un proveedor permanente, reproducir el contrato de datos, migrar y reconciliar UUID/cantidades, validar SHA/read-back y recuperación, y mantener el archivo local hasta la aceptación del nuevo flujo.
 
 FUENTES DOCUMENTALES
 El catálogo coverage-catalog.json contiene 44 capacidades, sus detectores heurísticos y 16 fuentes del Centro de ayuda y notas de lanzamiento de OpenAI verificadas el 2026-10-21. La documentación pública incluye capacidades recientes de Intelligent UI, resultados interactivos, creación de imágenes, gráficos interactivos, tareas de investigación, voz y creación/edición de slides; su disponibilidad depende de plan, región, modelo, espacio de trabajo y despliegue. Las capacidades sin fuente leída o sin observación natural permanecen pendientes. No se declara que la lista documentada sea exhaustiva para todos los planes o despliegues.
