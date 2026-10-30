@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { createSession, listSources, JulesApiError } from "../lib/jules/client";
+import { createSession, listSources, JulesApiError } from "../../lib/jules/client";
 
 const originalFetch = globalThis.fetch;
 const originalKey = process.env.JULES_API_KEY;
