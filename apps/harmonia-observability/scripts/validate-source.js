@@ -81,7 +81,7 @@ assert.match(worker,/DEV_RELOAD_ALARM/);
 assert.match(worker,/chrome\.runtime\.reload\(\)/);
 assert.match(worker,/harmonia:tab-indicator/);
 assert.match(worker,/harmonia:stop/);
-assert.match(worker,/version:'0\\.4\\.1'/);
+assert.ok(worker.includes("version:'0.4.1'"));
 assert.match(content,/harmonia-observation-indicator/);
 assert.match(content,/setTabIndicator\('observing'\)/);
 assert.match(content,/harmonia:configure/);
