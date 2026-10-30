@@ -43,6 +43,8 @@ try {
     if (-not $match.Success) { throw 'La credencial local tiene un formato inesperado; no se inicia el colector.' }
     $token = $match.Groups[1].Value
     if (-not (Test-Path -LiteralPath $data)) { New-Item -ItemType Directory -Path $data -Force | Out-Null }
+    $env:HARMONIA_DEV_RELOAD = '1'
+    $env:HARMONIA_EXTENSION_ROOT = Join-Path $root 'extension'
     if (-not [IO.Path]::IsPathRooted($data)) { throw 'La raíz de datos debe ser absoluta.' }
     $listeners = @(Get-NetTCPConnection -LocalPort 47321 -State Listen -ErrorAction SilentlyContinue)
     if ($listeners.Count -gt 0) {
@@ -61,6 +63,7 @@ try {
         Start-Sleep -Seconds 2
         $health = Invoke-RestMethod -Uri 'http://127.0.0.1:47321/health' -Headers @{ 'x-harmonia-token' = $token } -TimeoutSec 5
         if (-not $health.ok -or $health.root -ne $data) { throw 'La salud del colector no coincide con la raíz de datos autorizada.' }
+            if (-not $health.devReloadEnabled) { throw 'El observador local de archivos no está activo; no se declara lista la actualización automática.' }
         'SERVICE=STARTED'
         'PID=' + $process.Id
     }
@@ -74,6 +77,8 @@ try {
         'AUTH_NO_TOKEN=REJECTED_401'
     }
     'HEALTH=OK'
+    'DEV_RELOAD=WATCHING'
+    'DEV_RELOAD_ERROR=' + [string]$health.devReloadError
     'DATA_ROOT=' + $health.root
     'DATA_BYTES=' + $health.totalBytes
     'STORAGE_STOPPED=' + $health.stopped

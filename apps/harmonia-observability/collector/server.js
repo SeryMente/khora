@@ -5,6 +5,26 @@ const crypto=require('crypto');
 const regionPolicy=require('../extension/region-policy.js');
 const HOST='127.0.0.1',PORT=Number(process.env.HARMONIA_PORT||47321),MAX=1024**3,MAX_REQUEST=1_000_000,MAX_SEEN_EVENTS=20000,MAX_INDEXED_SURFACES=5000;
 const TOKEN=String(process.env.HARMONIA_TOKEN||'');
+const EXTENSION_ROOT=String(process.env.HARMONIA_EXTENSION_ROOT||'').trim();
+const DEV_RELOAD_REQUESTED=process.env.HARMONIA_DEV_RELOAD==='1'&&!!EXTENSION_ROOT;
+let devReloadWatcher=null,devReloadTimer=null,devReloadError=null;
+let devReloadRevision=Date.now().toString(36),devReloadChangedAt=new Date().toISOString();
+function startExtensionWatcher(){
+ if(!DEV_RELOAD_REQUESTED)return;
+ const extensionRoot=path.resolve(EXTENSION_ROOT);
+ try{
+  if(!fs.existsSync(extensionRoot)||!fs.statSync(extensionRoot).isDirectory())throw new Error('extension root does not exist or is not a directory');
+  devReloadWatcher=fs.watch(extensionRoot,{recursive:true},(eventType,filename)=>{
+   const name=filename?String(filename).replace(/\\/g,'/').toLowerCase():'';
+   if(!name||name==='local-auth.js'||name.endsWith('/local-auth.js')||name.endsWith('.log')||name.endsWith('.tmp'))return;
+   if(devReloadTimer)clearTimeout(devReloadTimer);
+   devReloadTimer=setTimeout(()=>{devReloadRevision=Date.now().toString(36);devReloadChangedAt=new Date().toISOString();devReloadError=null;},1200);
+  });
+  devReloadWatcher.on('error',error=>{devReloadError=String(error.message||error);});
+ }catch(error){devReloadError=String(error.message||error);devReloadWatcher=null;}
+}
+startExtensionWatcher();
+
 if(!TOKEN)throw new Error('HARMONIA_TOKEN is required; load the local auth config first.');
 if(!Number.isInteger(PORT)||PORT<1||PORT>65535)throw new Error('HARMONIA_PORT must be a valid TCP port.');
 const configuredRoot=String(process.env.HARMONIA_DATA||'').trim();
@@ -205,14 +225,15 @@ function pruneSeenEventIds(){const ids=Object.keys(index.seenEventIds);if(ids.le
 const server=http.createServer((req,res)=>{
  const origin=req.headers.origin;if(!originOK(origin))return reply(req,res,403,{error:'origin-not-allowed'});
  if(req.method==='OPTIONS'){if(!origin||req.headers['access-control-request-method']!=='POST')return reply(req,res,403,{error:'preflight-not-allowed'});return reply(req,res,204,{});}
- if(req.method==='GET'&&['/health','/index','/coverage','/fingerprints'].includes(req.url)){
+ if(req.method==='GET'&&['/health','/index','/coverage','/fingerprints','/dev-version'].includes(req.url)){
   if(!authOK(req))return reply(req,res,401,{error:'unauthorized'});
-  if(req.url==='/health')return reply(req,res,200,{ok:true,root,maxBytes:MAX,totalBytes:index.totalBytes,stopped:index.stopped,updatedAt:index.updatedAt,sessions:Object.keys(index.sessions).length,uniqueSurfaces:index.uniqueSurfaceCount});
+  if(req.url==='/health')return reply(req,res,200,{ok:true,root,maxBytes:MAX,totalBytes:index.totalBytes,stopped:index.stopped,updatedAt:index.updatedAt,sessions:Object.keys(index.sessions).length,uniqueSurfaces:index.uniqueSurfaceCount,devReloadEnabled:!!(DEV_RELOAD_REQUESTED&&devReloadWatcher&&!devReloadError),devReloadError});
+  if(req.url==='/dev-version')return reply(req,res,200,{enabled:!!(DEV_RELOAD_REQUESTED&&devReloadWatcher&&!devReloadError),revision:devReloadRevision,changedAt:devReloadChangedAt,error:devReloadError});
   if(req.url==='/coverage')return reply(req,res,200,index.coverage||{schema:'harmonia.coverage-index.v1',observedFeatureIds:[],unknownControls:[],scanCount:0,uniqueSurfaceCount:index.uniqueSurfaceCount});
   if(req.url==='/fingerprints')return reply(req,res,200,{fingerprints:Object.keys(index.surfaceFingerprints),count:index.uniqueSurfaceCount});
   return reply(req,res,200,index);
  }
- if(req.method==='POST'&&req.url==='/shutdown'){if(!authOK(req))return reply(req,res,401,{error:'unauthorized'});persist();reply(req,res,200,{ok:true,stopping:true});setTimeout(()=>server.close(()=>console.log('HARMONIA_COLLECTOR_STOPPED')),80);return;}
+ if(req.method==='POST'&&req.url==='/shutdown'){if(!authOK(req))return reply(req,res,401,{error:'unauthorized'});persist();try{devReloadWatcher?.close();}catch{}if(devReloadTimer)clearTimeout(devReloadTimer);reply(req,res,200,{ok:true,stopping:true});setTimeout(()=>server.close(()=>console.log('HARMONIA_COLLECTOR_STOPPED')),80);return;}
  if(req.method!=='POST'||req.url!=='/events')return reply(req,res,404,{error:'not-found'});
  if(!authOK(req))return reply(req,res,401,{error:'unauthorized'});
  if(index.stopped)return reply(req,res,507,{error:'storage-limit-stop-no-deletion'});

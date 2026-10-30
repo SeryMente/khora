@@ -25,8 +25,9 @@ try {
       "JS_SYNTAX_OK=$rel"
     }
     $manifest = Get-Content -LiteralPath (Join-Path $root 'extension\manifest.json') -Raw | ConvertFrom-Json
-    if ($manifest.manifest_version -ne 3 -or $manifest.version -ne '0.4.0') { throw 'Versión o tipo de manifiesto inesperado.' }
+    if ($manifest.manifest_version -ne 3 -or $manifest.version -ne '0.4.1') { throw 'Versión o tipo de manifiesto inesperado.' }
     if (-not ($manifest.host_permissions -contains 'https://chatgpt.com/*') -or -not ($manifest.host_permissions -contains 'http://127.0.0.1:47321/*')) { throw 'Los permisos de host no coinciden con el alcance mínimo esperado.' }
+    foreach ($size in @('16','48','128')) { if ($manifest.icons.$size -ne ('icons/icon' + $size + '.png') -or $manifest.action.default_icon.$size -ne ('icons/icon' + $size + '.png')) { throw "Falta el icono de Khora $size en el manifiesto." } }
     if (-not ($manifest.content_scripts | Where-Object { $_.matches -contains 'https://chatgpt.com/*' -and $_.js -contains 'region-policy.js' -and $_.js -contains 'content.js' -and $_.run_at -eq 'document_idle' })) { throw 'Falta la inyección automática de region-policy.js y content.js en chatgpt.com.' }
     if ($manifest.permissions -contains 'debugger') { throw 'El modo automático no debe solicitar el permiso debugger.' }
     'AUTO_CONTENT_SCRIPT=VALID'
@@ -56,6 +57,9 @@ try {
     $health = Invoke-RestMethod -Uri 'http://127.0.0.1:47321/health' -Headers @{ 'x-harmonia-token' = $token } -TimeoutSec 5
     if (-not $health.ok -or $health.root -ne $data -or $health.stopped) { throw 'La salud del colector no coincide con el almacén local configurado.' }
     'SERVICE_HEALTH=OK'
+    $devReload = Invoke-RestMethod -Uri 'http://127.0.0.1:47321/dev-version' -Headers @{ 'x-harmonia-token' = $token } -TimeoutSec 3
+    if (-not $devReload.enabled) { throw 'El observador de archivos de la extensión no está activo.' }
+    'DEV_RELOAD=WATCHING'
     try {
         Invoke-RestMethod -Uri 'http://127.0.0.1:47321/health' -TimeoutSec 3 | Out-Null
         throw 'El colector aceptó una petición sin credencial.'
@@ -79,6 +83,7 @@ try {
         'CORS_WEB_ORIGIN=REJECTED_403'
     }
     $allowed = @(
+      'extension\icons\icon16.png','extension\icons\icon48.png','extension\icons\icon128.png',
       'CONSULTAR-HARMONIA.cmd','INICIAR-HARMONIA.cmd','INICIAR-HARMONIA-HEADLESS.ps1','DETENER-HARMONIA-HEADLESS.ps1','FINALIZAR-PAQUETE.ps1','PREPARAR-RUNTIME.ps1','LEEME.txt','coverage-catalog.json',
       'collector\query.ps1','collector\server.js','extension\build-info.json','extension\content.js','extension\coverage-catalog.json','extension\dashboard.css','extension\dashboard.html','extension\dashboard.js','extension\dashboard-model.js','extension\manifest.json','extension\popup.css','extension\popup.html','extension\popup.js','extension\region-policy.js','extension\service-worker.js','runtime\NODE-LICENSE.txt'
     )
@@ -98,7 +103,7 @@ try {
     }
     $package | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $root 'MANIFEST-HUELLAS.json') -Encoding UTF8
     $readback = Get-Content -LiteralPath (Join-Path $root 'MANIFEST-HUELLAS.json') -Raw | ConvertFrom-Json
-    if ($readback.version -ne '0.4.0' -or $readback.runtime.nodeExeSha256 -ne $exeHash) { throw 'Falló la lectura de vuelta del manifiesto de huellas.' }
+    if ($readback.version -ne '0.4.1' -or $readback.runtime.nodeExeSha256 -ne $exeHash) { throw 'Falló la lectura de vuelta del manifiesto de huellas.' }
     'HASH_MANIFEST=VALID'
     'HASHED_FILES=' + $hashes.Count
     'NODE_VERSION=' + (& $node --version).Trim()
@@ -109,6 +114,7 @@ try {
     'LOGS_ROOT=' + $logsDir
     'DATA_ROOT=' + $data
     'SERVICE_PID=' + (Get-Content -LiteralPath (Join-Path $root 'collector\service.pid') -Raw).Trim()
+    'DEV_RELOAD_REVISION=' + $devReload.revision
     'AUTO_CAPTURE_STATUS=OPERATOR_CHROME_USE_REQUIRED'
     'NATURAL_COVERAGE=AWAITING_POST_RELOAD_SCAN'
 } finally {
