@@ -3,7 +3,7 @@
 ## 1. Identidad y control
 - Frente único: **Observabilidad MCP**; identidad canónica `OBSERVABILIDAD-MCP`.
 - Repositorio: `SeryMente/khora`; OCP: `docs/frentes/observabilidad-mcp/OBJETO-CANONICO.md`.
-- OCP: **v0.3.3**. Control: generación 3, titular operativo conservado del control anterior.
+- OCP: **v0.3.4**. Control: generación 3, titular operativo conservado del control anterior.
 - Las tareas provisionales «General» y «Jules» pertenecen a este mismo frente; no crean OCP, frente ni control paralelos.
 - `MCP-OBS-DICTADO` permanece como identidad histórica del objeto agregado anterior, no como otro frente activo.
 
@@ -235,3 +235,59 @@ Se verificó la fuente canónica actual de Metodología: DUG v368 · NX-368m, Me
 - **Validación:** `npm run typecheck` PASS; 34/34 pruebas focalizadas MCP/Jules/token PASS; 568/568 unitarias PASS en 82 archivos salvo la única prueba `methodology_contract_sync.test.ts` dependiente de GitHub CLI autenticado, no disponible en la instancia. La build de Production completó correctamente. GitHub Actions del head de intervención no llegó a ejecutar pasos; no se presenta como CI aprobada.
 - **Limitaciones pendientes:** no se completó OAuth desde la interfaz de ChatGPT, no se ha cotejado el claim `sub` de una sesión real contra `MCP_ALLOWED_EMAIL`, ni se ha realizado una llamada autenticada a Jules. La disponibilidad de escritura depende de que el espacio ChatGPT sea Business o Enterprise/Edu. Pro admite solo MCP de lectura/obtención. La opción Business con una licencia se ofrece de forma limitada a algunos clientes nuevos; verificar checkout antes de asumir dos asientos.
 - **Estado:** servidor MCP de Khora publicado en Production y metadatos verificados; herramientas Jules preparadas con scopes directos; integración nativa ChatGPT/Jules **pendiente de conectar y probar con una cuenta elegible**. Fuentes de requisitos: https://help.openai.com/en/articles/12584461-connecting-custom-mcp-servers-in-chatgpt y https://help.openai.com/en/articles/20001624-chatgpt-business-single-seat-configuration.
+
+
+## 21. Puente provisional Jules para ChatGPT Free mediante RDC — 2026-10-30
+
+### 21.1 Instrucción original del operador
+
+> Por lo que veo no vamos a poder utilizarlo en la versión gratuita, ¿verdad? Si es así, que funcione con RDC. Existe un ámbito de la metodología llamado entorno persistente, que va a permitir disponer de carpetas de trabajo canónicas en el escritorio o la carpeta escritorio de la sesión del usuario de la sesión de Windows de la sesión de entorno persistente actual. Esas carpetas de trabajo pueden servir para que construyas alguna suerte de MSP local que pueda ser accedido mediante RDC para que podamos circunnavegar las limitaciones de la versión gratuita de ChatGPT que nos impiden conectarnos directamente al MSP de Jules. Si esa es la opción que tenemos que tener por no tener una versión pagada de ChatGPT, entonces resuelve e implementa de extremo a extremo, a menos que tengas una mejor idea. Hazlo con agilidad, ya que este frente es el cuello de botella para todo el proyecto general.
+
+> Una aclaración. Entorno persistente es un ámbito que no está todavía funcionando y no puede ser utilizado como si lo estuviese para resolver este frente urgente. El arreglo que te dije, tómalo en cuenta y establécelo de manera provisional desde el frente de trabajo, de forma que sea compatible con entorno persistente cuando ya quede implementado ese ámbito de la metodología.
+
+### 21.2 Decisión técnica provisional
+
+Se adopta un cliente MCP local de transporte estándar por stdin/stdout, controlado mediante la conexión RDC autorizada. No se levanta otro servidor MCP local ni se abre un puerto. El cliente se conecta por HTTPS al MCP ya publicado en https://khora-web.vercel.app/api/mcp; la clave JULES_API_KEY permanece en Vercel Production y no se materializa en Windows.
+
+Flujo:
+
+ChatGPT → RDC → PowerShell + bridge.mjs → HTTPS Khora MCP Production → Jules API
+
+El puente usa un Bearer manual de Khora limitado exclusivamente a jules:read y jules:write. La identidad del propietario sigue comprobándose en Khora contra MCP_ALLOWED_EMAIL; sus recursos se limitan a las fuentes y ramas que la cuenta de Jules conectada al servidor exponga. El propietario no requiere grants ACL por repositorio ni norm:turn. Para cualquier otro sujeto persisten ACL exacta y fail-closed, aprobación manual de plan y restricciones existentes.
+
+### 21.3 Workspace provisional y compatibilidad futura con OEP
+
+- Host observado por RDC: PC-14, Windows PC-14\PC 13; perfil C:\Users\PC 13; Escritorio descubierto mediante Environment.GetFolderPath("Desktop").
+- Workspace provisional materializado: C:\Users\PC 13\Desktop\Khora\khora-main.
+- Código del puente: khora-web\tools\jules-rdc-bridge\.
+- Credencial efímera local excluida de Git: .khora-local\jules-rdc-bridge\bearer.dpapi, protegida con DPAPI CurrentUser y ACL local para el SID del usuario y SYSTEM.
+- /.khora-local/ queda en .gitignore. La credencial no se incluye en comandos, argumentos, salida, logs o archivos del repositorio.
+- Esta materialización es provisional y pertenece a este único frente. No crea un frente OEP ni declara que OEP esté operativo.
+- Cuando OEP esté implementado, se podrá trasladar la carpeta de trabajo completa al workspace canónico cifrado Desktop\EP\KHORA; las rutas internas relativas del repositorio y puente permanecen iguales. DPAPI CurrentUser depende del perfil Windows, por lo que cambiar de perfil/host requiere provisionar de nuevo el Bearer.
+- En el host actual C: está totalmente descifrado, Protection Off y sin protectores; no hay VHDX ni Desktop\EP. Los archivos del workspace no tienen el cifrado integral del futuro OEP. No se instaló BitLocker, no se creó un VHDX y no se creó una carpeta EP ficticia. DPAPI protege únicamente el Bearer local.
+
+### 21.4 Capacidades implementadas
+
+- bridge.mjs: cliente HTTP Streamable MCP; valida tools/list para las siete herramientas Jules; lee órdenes JSON delimitadas por línea desde stdin; entrega una respuesta JSON por orden y no abre interfaces TCP locales.
+- jules.ps1: operaciones Setup, Start, Status, Remove y Help; la provisión introduce la credencial mediante entrada oculta SecureString, la protege con DPAPI CurrentUser, restringe ACL de la carpeta y comprueba lectura de vuelta. Start transfiere el secreto solo al entorno del proceso Node y lo elimina al cerrar.
+- Operaciones: listar fuentes, listar sesiones, consultar sesión, listar actividades, crear sesión, enviar mensaje y aprobar plan con plan_id y plan_sha256 verificados por el MCP remoto.
+- El plan del propietario se autoaprueba al crear sesión y Jules conserva AUTO_CREATE_PR; los demás sujetos mantienen aprobación manual. Los POST no idempotentes no se reintentan automáticamente ante resultado ambiguo.
+- No existe una clave Jules local, servidor local, puerto abierto ni bypass de autorización de Google/Jules/Khora.
+
+### 21.5 Validación y aceptación
+
+- PC-14: Node --check bridge.mjs PASS; parser PowerShell 5.1 PASS; ocho casos de contrato del adaptador local PASS; comprobación DPAPI + ACL mediante clave ficticia PASS, archivo de prueba eliminado; prueba de bearer falso contra Production rechazada como MCP_AUTH_REJECTED sin reflejar el valor.
+- npm run typecheck PASS; pruebas focalizadas MCP/Jules/token 34/34 PASS; suite unitaria 568/568 PASS (82 archivos, excepto methodology_contract_sync.test.ts, que requiere gh autenticado en el equipo).
+- npm ci: 576 paquetes instalados; auditoría reportó 14 advisories (4 moderate, 9 high, 1 critical); no se aplicaron cambios automáticos de dependencias.
+- Estado de la rama del puente en el checkpoint: feat/jules-rdc-local-bridge-20261030, 6 commits ahead / 0 behind del main 9570247339c99cf194c434d2b726493d8abd69b4.
+- La PR de revisión aún no se ha creado en este punto del registro; el cambio del propietario que elimina aprobación manual debe revisarse antes de incorporarse a main conforme al doble control.
+- No verificado / pendiente de aceptación real: no se ha provisionado el Bearer definitivo, no se ha conectado una sesión autenticada del puente a Production, no se ha ejecutado sources/sessions con la cuenta real y no se ha creado una tarea Jules real desde RDC. Las pruebas actuales demuestran contrato y transporte negativo, no la aceptación end-to-end con credencial real.
+
+### 21.6 Primer uso por el operador
+
+1. En Khora Production, abrir /sistema/mcp, emitir un Bearer etiquetado Jules-RDC, expiración 90 días y seleccionar únicamente jules:read + jules:write.
+2. En PowerShell local, ejecutar jules.ps1 -Action Setup y pegar el token en el prompt oculto. No compartirlo con ChatGPT.
+3. Arrancar jules.ps1 -Action Start en la sesión Windows que permanecerá conectada por RDC. ChatGPT enviará y recibirá órdenes JSON por el proceso remoto.
+4. Revocar el Bearer desde Control MCP cuando ya no se requiera. -Action Remove borra solo la copia local; no sustituye la revocación remota.
+
+Estado al cierre: la arquitectura provisional, carpeta de trabajo, cliente y lanzador están materializados y sus comprobaciones locales pasan. La integración de lectura/escritura real por RDC queda PENDIENTE del único acto de provisión del Bearer por el operador y de un smoke test autenticado. OEP sigue siendo futuro y no fue simulado.
