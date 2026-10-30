@@ -1,7 +1,7 @@
 {
   "schema": "harmonia.repository-build.v1",
-  "version": "0.4.0",
-  "sourceRevision": "7e405a7be004c7df80886a7a38387e539465d426",
+  "version": "0.4.1",
+  "sourceRevision": "99e2a1c3b7d1d1245cee4e9b5db863693573c3f6",
   "catalogVersion": "0.1.2",
   "regionPolicyVersion": "1.0.0",
   "releaseChannel": "candidate",
@@ -16,7 +16,8 @@
     "formFieldValues": false,
     "fullUrls": false,
     "imageUrls": false,
-    "hiddenReasoning": false
+    "hiddenReasoning": false,
+    "allObservedTabsRemainActiveAfterRegionCompletion": true
   },
   "regionCompletion": {
     "onlyRegionsWithCatalogCanComplete": true,
@@ -29,9 +30,14 @@
     "compactPopup": true,
     "dedicatedDashboardTab": true,
     "compactSummaryDashboard": true,
-    "perRegionCompletionReadiness": true
+    "perRegionCompletionReadiness": true,
+    "globalToolbarIndicator": true,
+    "perTabFaviconIndicator": true,
+    "khoraIconSet": true,
+    "desktopFileWatchAutoReload": true,
+    "scopesIndependentStatus": true
   },
-  "generatedBy": "Harmonia source repository; sourceRevision pins the exact reviewed candidate branch HEAD immediately before this metadata-only update.",
+  "generatedBy": "Harmonia candidate v0.4.1; sourceRevision pins the status/watch implementation commit.",
   "observationPersistence": {
     "localJSONLAndIndex": true,
     "remoteGitHubWritesImplemented": false,

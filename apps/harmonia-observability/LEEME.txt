@@ -47,3 +47,11 @@ PENDIENTES DE ACEPTACIÓN
 6. Medir CPU, RAM, latencia y completitud frente a la referencia no optimizada.
 
 No confundir versión, compilación, commit, PR o prueba aislada con instalación, sincronización local o aceptación E2E.
+
+
+CONTINUACIÓN DE IMPLEMENTACIÓN · v0.4.1
+Taxonomía: Ámbito Observabilidad; Subámbito Arquitectura; objeto observado: arquitectura accesible de ChatGPT.
+Cada pestaña observada muestra un punto discreto en su favicon (verde capturando, ámbar advertencia, rojo error). El icono de Harmonia adopta el símbolo Khora y un estado global (verde correcto, ámbar advertencia/pausa, rojo error). La salud es transversal: todos los ámbitos presentes y futuros pueden publicar estado con el contrato genérico harmonia:area-health; el icono resume la condición más grave.
+El marcador por pestaña no depende de la completitud regional. Al completarse una región, el líder conserva los barridos estructurales; las demás pestañas pasan a standby estructural pero siguen capturando mensajes visibles y consola, por lo que el marcador permanece.
+El colector vigila recursivamente el directorio extension mediante fs.watch. El service worker consulta /dev-version autenticado cada 30 segundos y recarga la extensión con chrome.runtime.reload() al detectar cambios. Después reinserta los observadores en las pestañas ChatGPT ya abiertas. Se requiere una única recarga inicial desde chrome://extensions para activar el watcher; después no se necesita recarga manual para cambios dentro de extension. Cambios en collector o scripts requieren reiniciar/revalidar el servicio. local-auth.js se excluye de la vigilancia y nunca se publica.
+Paquete PC-14: C:\Users\PC 13\Desktop\Harmonia. Raíz cargable: extension. Versión candidata 0.4.1. La prueba del watcher utiliza un directorio temporal aislado y no cuenta como aceptación: la única aceptación funcional sigue siendo el uso natural del operador en Chrome.

@@ -48,16 +48,32 @@ async function waitReady(base,child){
 }
 test('collector en HTTP local: auth, CORS, deltas visibles, redacción, persistencia y completitud regional',async t=>{
  const data=fs.mkdtempSync(path.join(os.tmpdir(),'harmonia-e2e-'));
+ const extensionRoot=fs.mkdtempSync(path.join(os.tmpdir(),'harmonia-watch-'));
+ fs.writeFileSync(path.join(extensionRoot,'manifest.json'),'{}');
  const port=await freePort(),base='http://127.0.0.1:'+port;
- let child=spawn(process.execPath,[serverPath],{env:{...process.env,HARMONIA_TOKEN:token,HARMONIA_PORT:String(port),HARMONIA_DATA:data},stdio:['ignore','pipe','pipe']});
+ let child=spawn(process.execPath,[serverPath],{env:{...process.env,HARMONIA_TOKEN:token,HARMONIA_PORT:String(port),HARMONIA_DATA:data,HARMONIA_DEV_RELOAD:'1',HARMONIA_EXTENSION_ROOT:extensionRoot},stdio:['ignore','pipe','pipe']});
  let stdout='',stderr='';child.stdout.on('data',d=>stdout+=d);child.stderr.on('data',d=>stderr+=d);
  t.after(async()=>{
   try{await request(base,'/shutdown',{method:'POST',headers:{'x-harmonia-token':token}});}catch{}
   if(child.exitCode===null){child.kill('SIGTERM');}
   await new Promise(resolve=>{if(child.exitCode!==null)return resolve();child.once('exit',resolve);setTimeout(()=>{if(child.exitCode===null)child.kill('SIGKILL');resolve();},1500).unref();});
   fs.rmSync(data,{recursive:true,force:true});
+  fs.rmSync(extensionRoot,{recursive:true,force:true});
  });
  await waitReady(base,child);
+ const watcherResponse=await request(base,'/dev-version',{headers:{'x-harmonia-token':token}});
+ assert.equal(watcherResponse.status,200);
+ const initialWatcher=await watcherResponse.json();
+ assert.equal(initialWatcher.enabled,true,'el colector debe observar el directorio local de extensión');
+ fs.writeFileSync(path.join(extensionRoot,'popup.js'),'// updated from desktop');
+ let changedWatcher=null;
+ for(let i=0;i<30;i++){
+  await new Promise(resolve=>setTimeout(resolve,100));
+  const check=await request(base,'/dev-version',{headers:{'x-harmonia-token':token}});
+  changedWatcher=await check.json();
+  if(changedWatcher.revision!==initialWatcher.revision)break;
+ }
+ assert.notEqual(changedWatcher.revision,initialWatcher.revision,'un cambio local debe avanzar la revisión observada');
 
  const noAuth=await request(base,'/health');
  assert.equal(noAuth.status,401);
