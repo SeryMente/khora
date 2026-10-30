@@ -14,7 +14,7 @@ const ARCHIVE = `LEFT JOIN LATERAL (
 function limitOf(v:unknown,max=MAX):number { if(v===undefined||v===null)return PAGE;const n=Number(v);if(!Number.isSafeInteger(n)||n<1||n>max)throw Error("limite_invalido");return n; }
 function cursorOf(raw:unknown,uuid=false):[string,string]|null {
  if(raw===undefined||raw===null||raw==="")return null;if(typeof raw!=="string"||raw.length>2048)throw Error("cursor_invalido");
- try{const a=JSON.parse(Buffer.from(raw,"base64url").toString("utf8"));if(!Array.isArray(a)||a.length!==2||typeof a[0]!=="string"||!Number.isFinite(Date.parse(a[0]))||typeof a[1]!=="string"||!a[1]||(uuid&&!UUID.test(a[1])))throw 0;return a;}catch{throw Error("cursor_invalido");}
+ try{const a=JSON.parse(Buffer.from(raw,"base64url").toString("utf8"));if(!Array.isArray(a)||a.length!==2||typeof a[0]!=="string"||!Number.isFinite(Date.parse(a[0]))||typeof a[1]!=="string"||!a[1]||(uuid&&!UUID.test(a[1])))throw 0;return [a[0],a[1]];}catch{throw Error("cursor_invalido");}
 }
 function encode(a:[string,string]){return Buffer.from(JSON.stringify(a)).toString("base64url");}
 function iso(v:unknown):string|null{if(v==null)return null;const d=v instanceof Date?v:new Date(String(v));return Number.isNaN(d.getTime())?null:d.toISOString();}
