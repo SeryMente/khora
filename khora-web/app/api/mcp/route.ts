@@ -11,7 +11,7 @@ import {
   sendMessage as julesSendMessage,
 } from "@/lib/jules/client";
 import { registrarEventoServicio } from "@/lib/server/service-observability";
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { McpDiagnosticError, diagnosticFailure, diagnose } from "@/lib/server/mcp-diagnostics";
 import { installMcpDiagnostics, withHttpDiagnostics } from "@/lib/server/mcp-diagnostic-boundary";
 // @l0 L0-002 §4 · @req MCP-ROUTE-01/REQ-1
@@ -289,6 +289,37 @@ async function handleMcpRequest(req: NextRequest) {
     }
     return session;
   };
+  const stableJson = (value: any): string => {
+    if (value === null || typeof value !== "object") return JSON.stringify(value);
+    if (Array.isArray(value)) return "[" + value.map(stableJson).join(",") + "]";
+    return "{" + Object.keys(value).sort().map(key => JSON.stringify(key) + ":" + stableJson(value[key])).join(",") + "}";
+  };
+  const planSha256 = (plan: unknown): string => createHash("sha256").update(stableJson(plan)).digest("hex");
+  const readCurrentPlan = async (sessionId: string) => {
+    const activities: any[] = [];
+    const seenTokens = new Set<string>();
+    let pageToken: string | undefined;
+    for (let pageIndex = 0; pageIndex < 100; pageIndex++) {
+      const page = await julesListActivitiesPage(sessionId, 100, pageToken);
+      activities.push(...(Array.isArray(page.activities) ? page.activities : []));
+      const next = page.nextPageToken;
+      if (!next) break;
+      if (seenTokens.has(next)) throw new McpDiagnosticError("JULES_PLAN_ACTIVITY_PAGINATION_FAILED");
+      seenTokens.add(next);
+      pageToken = next;
+      if (pageIndex === 99) throw new McpDiagnosticError("JULES_PLAN_ACTIVITY_PAGINATION_FAILED");
+    }
+    const plans = activities.flatMap(activity => {
+      const plan = activity?.planGenerated?.plan;
+      if (!plan || typeof plan.id !== "string" || !plan.id) return [];
+      const timestamp = Date.parse(plan.createTime ?? activity.createTime ?? "");
+      if (!Number.isFinite(timestamp)) return [];
+      return [{ plan, timestamp }];
+    }).sort((a, b) => a.timestamp - b.timestamp);
+    const latest = plans.at(-1)?.plan;
+    if (!latest) throw new McpDiagnosticError("JULES_PLAN_NOT_FOUND");
+    return { plan_id: latest.id as string, plan_sha256: planSha256(latest), plan: latest, activities };
+  };
   const isSessionAllowed = (session: any, grants: JulesSourceGrant[]) => {
     try { const resource = sessionResource(session); return grants.some(g => g.source === resource.source && g.branch === resource.branch); }
     catch { return false; }
@@ -342,7 +373,12 @@ async function handleMcpRequest(req: NextRequest) {
     const denied = requireScope("jules:read"); if (denied) return denied;
     return safeJulesResult("jules_list_activities", async () => {
       await requireSessionAccess(args.session_id, "read");
-      return julesListActivitiesPage(args.session_id, args.page_size ?? 50, args.page_token);
+      const page = await julesListActivitiesPage(args.session_id, args.page_size ?? 50, args.page_token);
+      const activities = (page.activities ?? []).map((activity: any) => {
+        const plan = activity?.planGenerated?.plan;
+        return plan ? { ...activity, planGenerated: { ...activity.planGenerated, plan_sha256: planSha256(plan) } } : activity;
+      });
+      return { ...page, activities };
     });
   });
   gatedTool("jules_create_session", "Crea una sesión solo para fuente y rama existentes y autorizadas; fuerza aprobación del plan y AUTO_CREATE_PR.", {
@@ -374,15 +410,23 @@ async function handleMcpRequest(req: NextRequest) {
       return { accepted: true, session_id: session.name, state_before_send: session.state, note: "El envío fue aceptado; consulta actividades posteriores para comprobar la respuesta." };
     });
   });
-  gatedTool("jules_approve_plan", "Aprueba un plan solo en sesión autorizada y estado AWAITING_PLAN_APPROVAL.", {
+  gatedTool("jules_approve_plan", "Aprueba únicamente el plan cuyo plan_id y SHA-256 se recibieron en las actividades y siguen vigentes. La herramienta relee estado y plan dos veces; el proveedor no expone un precondicionamiento atómico por plan, por lo que puede persistir una ventana de carrera remota.", {
     session_id: z.string().trim().min(1).max(256).describe("ID de sesión o nombre completo sessions/{id}; no URL"),
+    plan_id: z.string().trim().min(1).max(256).describe("ID exacto del último planGenerated.plan.id mostrado en jules_list_activities"),
+    plan_sha256: z.string().regex(/^[0-9a-f]{64}$/).describe("SHA-256 exacto planGenerated.plan_sha256 devuelto por jules_list_activities; confirma el contenido revisado"),
   }, async (args: any) => {
     const denied = requireScope("jules:write"); if (denied) return denied;
     return safeJulesResult("jules_approve_plan", async () => {
-      const session = await requireSessionAccess(args.session_id, "write");
-      if (session.state !== "AWAITING_PLAN_APPROVAL") throw new McpDiagnosticError("JULES_PLAN_NOT_AWAITING_APPROVAL");
+      const firstSession = await requireSessionAccess(args.session_id, "write");
+      if (firstSession.state !== "AWAITING_PLAN_APPROVAL") throw new McpDiagnosticError("JULES_PLAN_NOT_AWAITING_APPROVAL");
+      const firstPlan = await readCurrentPlan(args.session_id);
+      if (firstPlan.plan_id !== args.plan_id || firstPlan.plan_sha256 !== args.plan_sha256) throw new McpDiagnosticError("JULES_PLAN_CHANGED");
+      const secondSession = await requireSessionAccess(args.session_id, "write");
+      if (secondSession.state !== "AWAITING_PLAN_APPROVAL") throw new McpDiagnosticError("JULES_PLAN_NOT_AWAITING_APPROVAL");
+      const secondPlan = await readCurrentPlan(args.session_id);
+      if (secondPlan.plan_id !== firstPlan.plan_id || secondPlan.plan_sha256 !== firstPlan.plan_sha256) throw new McpDiagnosticError("JULES_PLAN_CHANGED");
       await julesApprovePlan(args.session_id);
-      return { accepted: true, session_id: session.name, state_before_approval: session.state, note: "La aprobación fue aceptada; consulta jules_get_session para comprobar el estado posterior." };
+      return { accepted: true, session_id: secondSession.name, plan_id: secondPlan.plan_id, plan_sha256: secondPlan.plan_sha256, preflight_reads: 2, note: "El proveedor aceptó approvePlan sobre el plan que coincidió en dos lecturas previas. La API de Jules no acepta un plan_id/etag condicional; existe una ventana de carrera remota entre la última lectura y el POST. Reconsulta las actividades y verifica planApproved.planId." };
     });
   });
 // Herramienta 1: khora_resumen

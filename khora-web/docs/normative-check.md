@@ -41,7 +41,7 @@ Antes de ejecutar ese recorrido desde otra plataforma, resolver la identidad nor
 | `jules_list_activities` / mensajes y retroalimentación | `session_id`, `page_size?` (1–100), `page_token?` | `jules:read` + `norm:turn`; mensajes del agente/usuario, plan, progreso, terminación y fallos |
 | `jules_create_session` / delegar desarrollo | `source`, `starting_branch`, `prompt`, `title?` | `jules:write` + `norm:turn`; fuerza `requirePlanApproval=true` y `AUTO_CREATE_PR` |
 | `jules_send_message` / responder a Jules | `session_id`, `prompt` | `jules:write` + `norm:turn`; el POST aceptado no prueba que Jules ya haya respondido |
-| `jules_approve_plan` / aprobar plan | `session_id` | `jules:write` + `norm:turn`; solo se acepta con estado `AWAITING_PLAN_APPROVAL` |
+| `jules_approve_plan` / aprobar plan | `session_id`, `plan_id`, `plan_sha256` | `jules:write` + `norm:turn`; relee sesión/plan dos veces y exige ID/huella actuales + estado `AWAITING_PLAN_APPROVAL`; el API upstream no ofrece precondición atómica, por lo que T22 conserva un residual TOCTOU |
 
 **Permisos efectivos:** las ocho herramientas de contenido requieren `volcados:read` **y** `norm:turn`; las cuatro de observabilidad, `runtime:read` **y** `norm:turn`; las siete herramientas Jules requieren el scope `jules:read` o `jules:write` que corresponda **y** `norm:turn`. El permiso de negocio anunciado en `securitySchemes` se conserva; `norm:turn` es necesario para abrir/completar el ciclo, no una concesión implícita.
 

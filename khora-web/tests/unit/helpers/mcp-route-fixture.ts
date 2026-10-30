@@ -21,7 +21,7 @@ const code = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTa
 // Execute the whole real route and SDK HTTP transport. Only external boundaries
 // (Next response class, identity, storage and business services) are substituted.
 // This is not proof of cryptography, OAuth, database effects or deployment.
-export function routeFixture(options: { scopes?: string[]; revoked?: boolean; denyTurn?: boolean; production?: boolean; configured?: boolean; failService?: boolean; healthError?: boolean; partial?: boolean; auditFail?: boolean; readAllowed?: boolean; writeAllowed?: boolean; sourceBranchExists?: boolean; sessionContextValid?: boolean; aclUnavailable?: boolean; sessionSource?: string; sessionBranch?: string } = {}) {
+export function routeFixture(options: { scopes?: string[]; revoked?: boolean; denyTurn?: boolean; production?: boolean; configured?: boolean; failService?: boolean; healthError?: boolean; partial?: boolean; auditFail?: boolean; readAllowed?: boolean; writeAllowed?: boolean; sourceBranchExists?: boolean; sessionContextValid?: boolean; aclUnavailable?: boolean; sessionSource?: string; sessionBranch?: string; planApprovalReady?: boolean; currentPlanId?: string; planSecondId?: string } = {}) {
   const schemas = new Map<contracts.McpToolName, { description: string; shape: z.ZodRawShape }>();
   const calls: Array<{ name: string; args: unknown }> = [];
   const servers: McpServer[] = [];
@@ -51,7 +51,7 @@ export function routeFixture(options: { scopes?: string[]; revoked?: boolean; de
     return {
       ...result,
       name: "sessions/fixture-session",
-      state: julesGetSessionCalls === 4 ? "AWAITING_PLAN_APPROVAL" : "AWAITING_USER_FEEDBACK",
+      state: options.planApprovalReady === true || julesGetSessionCalls >= 4 ? "AWAITING_PLAN_APPROVAL" : "AWAITING_USER_FEEDBACK",
       ...(options.sessionContextValid === false ? {} : { sourceContext: { source: options.sessionSource ?? "sources/github/owner/repo", githubRepoContext: { startingBranch: options.sessionBranch ?? "main" } } }),
     };
   };
@@ -93,7 +93,15 @@ export function routeFixture(options: { scopes?: string[]; revoked?: boolean; de
       ], nextPageToken: "fixture-sessions-next" }; },
       getSession: mockJulesGetSession,
       getSource: async (_name: string) => { await business("JulesGetSource")(_name); return options.sourceBranchExists === false ? { ...sourceFixture, githubRepo: { ...sourceFixture.githubRepo, defaultBranch: undefined, branches: [] } } : sourceFixture; },
-      listActivitiesPage: business("JulesListActivitiesPage"),
+      listActivitiesPage: async (sessionId: string, pageSize?: number, pageToken?: string) => {
+        await business("JulesListActivitiesPage")({ sessionId, pageSize, pageToken });
+        const planId = options.planSecondId && pageToken === "fixture-next-page" ? options.planSecondId : options.currentPlanId ?? "fixture-plan-1";
+        const plan = { id: planId, createTime: "2026-10-30T10:00:00Z", steps: [{ id: "step-1", index: 0, title: "Implement guarded change", description: "Synthetic plan description" }] };
+        const activities = [{ name: "sessions/fixture-session/activities/plan-activity", id: "plan-activity", originator: "agent", createTime: "2026-10-30T10:00:00Z", planGenerated: { plan } }];
+        return options.planSecondId && !pageToken
+          ? { activities: [], nextPageToken: "fixture-next-page" }
+          : { activities, nextPageToken: undefined };
+      },
       createSession: business("JulesCreateSession"),
       sendMessage: business("JulesSendMessage"),
       approvePlan: business("JulesApprovePlan"),

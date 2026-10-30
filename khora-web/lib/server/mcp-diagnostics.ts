@@ -66,6 +66,9 @@ const messages: Record<string, [string, string, string, boolean]> = {
   JULES_SOURCE_ID_INVALID: ["La fuente indicada no tiene el formato de una fuente Jules admitida.", "Selecciona un nombre literal devuelto por jules_list_sources; no inventes ni construyas una fuente.", "validation", false],
   JULES_SESSION_ID_INVALID: ["La referencia de sesión Jules no tiene el formato esperado.", "Usa el ID o nombre de sesión devuelto por Jules, no una URL ni una ruta arbitraria.", "validation", false],
   JULES_PLAN_NOT_AWAITING_APPROVAL: ["La sesión de Jules no está esperando aprobación de plan.", "Lee el estado y las actividades actuales. Aprueba solo después de revisar un plan real en estado AWAITING_PLAN_APPROVAL.", "jules", false],
+  JULES_PLAN_NOT_FOUND: ["Jules no devolvió un plan vigente para la sesión.", "Consulta las actividades actuales; no apruebes un plan ausente o no verificable.", "jules", false],
+  JULES_PLAN_CHANGED: ["El plan actual de Jules ya no coincide con el plan exacto que se revisó.", "Vuelve a leer y revisar el plan vigente antes de confirmar otra aprobación.", "jules", false],
+  JULES_PLAN_ACTIVITY_PAGINATION_FAILED: ["Khora no pudo completar la lectura paginada de los planes de Jules.", "No apruebes con una actividad parcial; reintenta la lectura después de comprobar el servicio.", "jules", true],
   JULES_SESSION_NOT_READY_FOR_MESSAGE: ["La sesión de Jules no admite un mensaje de seguimiento en su estado actual.", "Consulta el estado y las actividades. No envíes una respuesta hasta confirmar que la sesión puede recibirla.", "jules", false],
 };
 

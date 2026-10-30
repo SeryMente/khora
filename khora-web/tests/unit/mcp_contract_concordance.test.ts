@@ -50,7 +50,7 @@ function input(name: McpToolName): Record<string, unknown> {
   if (name === "jules_get_session" || name === "jules_list_activities") return { ...controls, session_id: "fixture-session" };
   if (name === "jules_create_session") return { ...controls, source: "sources/github/owner/repo", starting_branch: "main", prompt: "Fixture prompt with acceptance criteria and NO SIMULATION", title: "Contract test" };
   if (name === "jules_send_message") return { ...controls, session_id: "fixture-session", prompt: "Fixture response" };
-  if (name === "jules_approve_plan") return { ...controls, session_id: "fixture-session" };
+  if (name === "jules_approve_plan") return { ...controls, session_id: "fixture-session", plan_id: "fixture-plan-1", plan_sha256: "0".repeat(64) };
   const business = (name === "khora_leer_volcado" || name === "khora_leer_audio") ? { id: "1" } : name === "khora_buscar_volcados" ? { busqueda: "fixture" } : name === "khora_versiones_volcado" ? { volcado_id: "1" } : {};
   return { ...controls, ...business };
 }
@@ -354,5 +354,46 @@ test("Jules cannot create a session for a different branch even when the subject
     assert.equal(result.isError, true);
     assert.match(JSON.stringify(result), /JULES_ACCESS_DENIED/);
     assert.equal(fixture.calls.some(x => x.name === "JulesGetSource" || x.name === "JulesCreateSession"), false);
+  } finally { await client.close(); await fixture.close(); }
+});
+test("Jules approval requires the exact current plan id and fingerprint returned by activities", async () => {
+  const options = { planApprovalReady: true }; const fixture = routeFixture(options); const client = await connect(fixture);
+  try {
+    const activities = await client.callTool({ name: "jules_list_activities", arguments: input("jules_list_activities") });
+    const payload = JSON.parse((activities.content?.[0] as any).text);
+    const generated = payload.result.activities[0].planGenerated;
+    assert.equal(generated.plan.id, "fixture-plan-1");
+    assert.match(generated.plan_sha256, /^[0-9a-f]{64}$/);
+    const approved = await client.callTool({ name: "jules_approve_plan", arguments: { ...input("jules_approve_plan"), plan_id: generated.plan.id, plan_sha256: generated.plan_sha256 } });
+    assert.equal(approved.isError, false, JSON.stringify(approved));
+    assert.equal(fixture.calls.filter(x => x.name === "JulesListActivitiesPage").length, 3, "one visible activities page plus two full preflight reads");
+    assert.equal(fixture.calls.filter(x => x.name === "JulesApprovePlan").length, 1);
+  } finally { await client.close(); await fixture.close(); }
+});
+
+test("Jules approval blocks when the plan id changes after it was shown", async () => {
+  const options = { planApprovalReady: true }; const fixture = routeFixture(options); const client = await connect(fixture);
+  try {
+    const activities = await client.callTool({ name: "jules_list_activities", arguments: input("jules_list_activities") });
+    const payload = JSON.parse((activities.content?.[0] as any).text);
+    const generated = payload.result.activities[0].planGenerated;
+    options.currentPlanId = "fixture-plan-replaced";
+    const result = await client.callTool({ name: "jules_approve_plan", arguments: { ...input("jules_approve_plan"), plan_id: generated.plan.id, plan_sha256: generated.plan_sha256 } });
+    assert.equal(result.isError, true);
+    assert.match(JSON.stringify(result), /JULES_PLAN_CHANGED/);
+    assert.equal(fixture.calls.some(x => x.name === "JulesApprovePlan"), false);
+  } finally { await client.close(); await fixture.close(); }
+});
+
+test("Jules approval detects a plan change between the two immediate preflight reads", async () => {
+  const options = { planApprovalReady: true, planSecondId: "fixture-plan-replaced" }; const fixture = routeFixture(options); const client = await connect(fixture);
+  try {
+    const activities = await client.callTool({ name: "jules_list_activities", arguments: input("jules_list_activities") });
+    const payload = JSON.parse((activities.content?.[0] as any).text);
+    const generated = payload.result.activities[0].planGenerated;
+    const result = await client.callTool({ name: "jules_approve_plan", arguments: { ...input("jules_approve_plan"), plan_id: generated.plan.id, plan_sha256: generated.plan_sha256 } });
+    assert.equal(result.isError, true);
+    assert.match(JSON.stringify(result), /JULES_PLAN_CHANGED/);
+    assert.equal(fixture.calls.some(x => x.name === "JulesApprovePlan"), false);
   } finally { await client.close(); await fixture.close(); }
 });

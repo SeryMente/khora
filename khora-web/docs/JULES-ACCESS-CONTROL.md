@@ -28,7 +28,7 @@ El rol configurado en `KHORA_READONLY_DATABASE_URL` debe recibir únicamente `US
 | `jules_list_activities` | Exige grant de lectura antes de listar actividades. |
 | `jules_create_session` | Exige grant de escritura, consulta `sources.get`, valida el nombre y confirma la rama en `branches` o `defaultBranch` antes de crear. |
 | `jules_send_message` | Relee la sesión, exige grant de escritura exacto y valida estado elegible. |
-| `jules_approve_plan` | Relee la sesión, exige grant de escritura exacto y exige `AWAITING_PLAN_APPROVAL`. |
+| `jules_approve_plan` | Relee sesión y plan dos veces; exige `plan_id` y `plan_sha256` coincidentes con el plan actual y `AWAITING_PLAN_APPROVAL`. El endpoint upstream solo aprueba el plan pendiente actual, sin parámetro condicional; la última lectura y el POST no son atómicos. |
 
 ## Escrituras ambiguas
 
@@ -36,11 +36,11 @@ Los reintentos automáticos se limitan a GET/HEAD. Los POST de creación, mensaj
 
 ## Operación y revocación
 
-Las concesiones se registran y revocan por el administrador de datos con el principal propietario autorizado. Para revocar se fija `revoked_at` y `revoked_by`; no se borran sesiones ni artefactos ya creados. Una revocación no invalida automáticamente otras fuentes/ramas ni modifica los grants OAuth del sujeto.
+El cliente debe pasar el `plan_id` y `plan_sha256` que recibe en `planGenerated` a `jules_approve_plan`. El servidor vuelve a leer todas las páginas de actividades, comprueba ID y huella, relee sesión y plan por segunda vez y bloquea cualquier discrepancia. Jules documenta `approvePlan` como un POST de cuerpo vacío que aprueba el plan pendiente de la sesión; no documenta `plan_id`, ETag o condición `If-Match` en la solicitud. Por ello permanece una ventana de carrera entre la última lectura y el POST que solo el proveedor podría cerrar con una API condicional. Hasta disponer de esa garantía, T22 no se marca PASS. Para revocar se fija `revoked_at` y `revoked_by`; no se borran sesiones ni artefactos ya creados. Una revocación no invalida automáticamente otras fuentes/ramas ni modifica los grants OAuth del sujeto.
 
 ## Límites de prueba
 
-Los tests del route fixture verifican el filtrado de herramientas y el bloqueo de proveedor con concesiones sintéticas. No prueban los privilegios del rol productivo ni la migración aplicada. La lectura real de ACL, el read-back del grant y la llamada a Jules siguen siendo pruebas de entorno independiente.
+Los tests del route fixture verifican el filtrado de herramientas, el bloqueo del proveedor con ACL fallida y el rechazo de un plan cuyo ID/huella cambian entre lecturas sintéticas. No prueban los privilegios del rol productivo ni la migración aplicada. La lectura real de ACL, el read-back del grant y la llamada a Jules siguen siendo pruebas de entorno independiente.
 ## Provisioning administrative (fuera de MCP)
 
 Antes de emitir concesiones, verifica qué identidad exacta aparece en el claim `sub` del Bearer autorizado y qué rol Postgres usa realmente `KHORA_READONLY_DATABASE_URL`. Tras confirmar el rol, el propietario de la base puede conceder exclusivamente lectura del esquema privado:
