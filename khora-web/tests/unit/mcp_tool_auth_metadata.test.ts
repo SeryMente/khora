@@ -50,3 +50,21 @@ test("one canonical document covers the exact tool catalog and current output ve
   assert.equal(readme.split("(./khora-web/docs/normative-check.md)").length, 2);
   assert.match(document, /^# Servidor MCP de Khora — documento canónico/m);
 });
+test("Custodia scopes are advertised end-to-end and remain opt-in", () => {
+  const read = (file: string) => fs.readFileSync(path.join(root, file), "utf8");
+  const manual = read("lib/server/mcp-manual-token.ts");
+  const protectedResource = read("lib/server/mcp-config.ts");
+  const authorizationMetadata = read("app/.well-known/oauth-authorization-server/route.ts");
+  const tokenRoute = read("app/api/oauth/token/route.ts");
+  const consent = read("app/oauth/authorize/page.tsx");
+  const control = read("app/sistema/mcp/page.tsx");
+  for (const source of [manual, protectedResource, authorizationMetadata, tokenRoute, consent, control]) {
+    assert.ok(source.includes("custodia:metadata:read"));
+    assert.ok(source.includes("custodia:integrity:verify"));
+  }
+  assert.match(manual, /MANUAL_MCP_SCOPES/);
+  assert.match(tokenRoute, /DEFAULT_SCOPE = "volcados:read"/);
+  assert.match(control, /DEFAULT_SELECTED_SCOPES = \["runtime:read", "volcados:read", "norm:turn"\]/);
+  assert.match(control, /useState<string\[]>\(\[\.\.\.DEFAULT_SELECTED_SCOPES\]\)/);
+  assert.doesNotMatch(control.match(/const DEFAULT_SELECTED_SCOPES = \[([^\]]+)\]/)?.[1] ?? "", /custodia:/);
+});
