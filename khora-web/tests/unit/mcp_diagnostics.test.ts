@@ -122,7 +122,7 @@ test("all fifteen tools sanitize unexpected exceptions; health retains upstream 
         : name === "khora_norm_apply_principle" ? { turn_token: controls._norm_turn_token, folio: "P001", status: "N", reason_code: "TEST" }
         : name === "khora_norm_release_turn" ? { turn_token: controls._norm_turn_token }
         : name === "khora_norm_verify_turn" ? { turn_token: controls._norm_turn_token, receipt: receipt() }
-        : { ...controls, ...(name === "khora_leer_volcado" ? { id: "1" } : name === "khora_buscar_volcados" ? { busqueda: "test" } : name === "khora_versiones_volcado" ? { volcado_id: "1" } : {}) };
+        : { ...controls, ...(name === "khora_leer_volcado" ? { id: "1" } : name === "khora_buscar_volcados" ? { busqueda: "test" } : name === "khora_versiones_volcado" ? { volcado_id: "1" } : name === "khora_custodia_revisiones" || name === "khora_custodia_verificar_integridad" ? { session_id: "fixture-session", limite: 20 } : name === "khora_custodia_catalogo" ? { limite: 20 } : {}) };
       const result = await client.callTool({ name, arguments: args }); assert.equal(result.isError, true, name); assert.ok(!JSON.stringify(result).includes("synthetic-secret"), name);
       if (name === "khora_mcp_health") { const d = (result._meta as any)["khora/diagnostic"]; assert.equal(d.code, "NORM_GITHUB_NOT_FOUND_OR_INACCESSIBLE"); assert.equal(d.evidence.upstream_status, 404); }
     }
