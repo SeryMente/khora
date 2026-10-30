@@ -5,6 +5,9 @@ import { z } from "zod";
 export const MCP_TOOL_SCOPES = {
   khora_listar_audios: ["volcados:read"],
   khora_leer_audio: ["volcados:read"],
+  khora_custodia_catalogo: ["custodia:metadata:read"],
+  khora_custodia_revisiones: ["custodia:metadata:read"],
+  khora_custodia_verificar_integridad: ["custodia:integrity:verify"],
   khora_resumen: ["volcados:read"],
   khora_listar_volcados: ["volcados:read"],
   khora_leer_volcado: ["volcados:read"],
