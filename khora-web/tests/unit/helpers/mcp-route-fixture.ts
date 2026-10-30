@@ -21,7 +21,7 @@ const code = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTa
 // Execute the whole real route and SDK HTTP transport. Only external boundaries
 // (Next response class, identity, storage and business services) are substituted.
 // This is not proof of cryptography, OAuth, database effects or deployment.
-export function routeFixture(options: { scopes?: string[]; revoked?: boolean; denyTurn?: boolean; production?: boolean; configured?: boolean; failService?: boolean; healthError?: boolean; partial?: boolean; auditFail?: boolean; readAllowed?: boolean; writeAllowed?: boolean; sourceBranchExists?: boolean; sessionContextValid?: boolean; aclUnavailable?: boolean } = {}) {
+export function routeFixture(options: { scopes?: string[]; revoked?: boolean; denyTurn?: boolean; production?: boolean; configured?: boolean; failService?: boolean; healthError?: boolean; partial?: boolean; auditFail?: boolean; readAllowed?: boolean; writeAllowed?: boolean; sourceBranchExists?: boolean; sessionContextValid?: boolean; aclUnavailable?: boolean; sessionSource?: string; sessionBranch?: string } = {}) {
   const schemas = new Map<contracts.McpToolName, { description: string; shape: z.ZodRawShape }>();
   const calls: Array<{ name: string; args: unknown }> = [];
   const servers: McpServer[] = [];
@@ -52,7 +52,7 @@ export function routeFixture(options: { scopes?: string[]; revoked?: boolean; de
       ...result,
       name: "sessions/fixture-session",
       state: julesGetSessionCalls === 4 ? "AWAITING_PLAN_APPROVAL" : "AWAITING_USER_FEEDBACK",
-      ...(options.sessionContextValid === false ? {} : { sourceContext: { source: "sources/github/owner/repo", githubRepoContext: { startingBranch: "main" } } }),
+      ...(options.sessionContextValid === false ? {} : { sourceContext: { source: options.sessionSource ?? "sources/github/owner/repo", githubRepoContext: { startingBranch: options.sessionBranch ?? "main" } } }),
     };
   };
   const sourceFixture = { name: "sources/github/owner/repo", id: "github/owner/repo", githubRepo: { owner: "owner", repo: "repo", isPrivate: true, defaultBranch: { displayName: "main" }, branches: [{ displayName: "restricted" }] } };

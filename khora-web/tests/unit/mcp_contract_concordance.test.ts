@@ -332,3 +332,27 @@ test("Jules ACL outages fail closed before any provider access for reads or writ
     assert.equal(fixture.calls.some(x => x.name.startsWith("Jules")), false);
   } finally { await client.close(); await fixture.close(); }
 });
+test("Jules session access requires exact source and branch match, and denies missing context", async () => {
+  for (const [options, expected] of [
+    [{ sessionBranch: "restricted" }, /JULES_ACCESS_DENIED/],
+    [{ sessionSource: "sources/github/other/repo" }, /JULES_ACCESS_DENIED/],
+    [{ sessionContextValid: false }, /JULES_RESOURCE_CONTEXT_INVALID/],
+  ] as const) {
+    const fixture = routeFixture(options); const client = await connect(fixture);
+    try {
+      const result = await client.callTool({ name: "jules_get_session", arguments: input("jules_get_session") });
+      assert.equal(result.isError, true);
+      assert.match(JSON.stringify(result), expected);
+    } finally { await client.close(); await fixture.close(); }
+  }
+});
+
+test("Jules cannot create a session for a different branch even when the subject has another grant", async () => {
+  const fixture = routeFixture(); const client = await connect(fixture);
+  try {
+    const result = await client.callTool({ name: "jules_create_session", arguments: { ...input("jules_create_session"), starting_branch: "restricted" } });
+    assert.equal(result.isError, true);
+    assert.match(JSON.stringify(result), /JULES_ACCESS_DENIED/);
+    assert.equal(fixture.calls.some(x => x.name === "JulesGetSource" || x.name === "JulesCreateSession"), false);
+  } finally { await client.close(); await fixture.close(); }
+});
