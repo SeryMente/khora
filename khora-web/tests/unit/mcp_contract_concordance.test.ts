@@ -50,7 +50,7 @@ function input(name: McpToolName): Record<string, unknown> {
   if (name === "jules_get_session" || name === "jules_list_activities") return { ...controls, session_id: "fixture-session" };
   if (name === "jules_create_session") return { ...controls, source: "sources/github/owner/repo", starting_branch: "main", prompt: "Fixture prompt with acceptance criteria and NO SIMULATION", title: "Contract test" };
   if (name === "jules_send_message") return { ...controls, session_id: "fixture-session", prompt: "Fixture response" };
-  if (name === "jules_approve_plan") return { ...controls, session_id: "fixture-session", plan_id: "fixture-plan-1", plan_sha256: "0".repeat(64) };
+  if (name === "jules_approve_plan") return { ...controls, session_id: "fixture-session", plan_id: "fixture-plan-1", plan_sha256: "7a898feea085c3699a9c15295c5c53d361f6f10bd2847d2bb54f12b863969346" };
   const business = (name === "khora_leer_volcado" || name === "khora_leer_audio") ? { id: "1" } : name === "khora_buscar_volcados" ? { busqueda: "fixture" } : name === "khora_versiones_volcado" ? { volcado_id: "1" } : {};
   return { ...controls, ...business };
 }
@@ -144,13 +144,13 @@ test("real route: HTTP discovery and all 24 calls agree; malformed input cannot 
       assert.deepEqual(tool.inputSchema, JSON.parse(JSON.stringify(describeMcpTool(tool.name as McpToolName, contract.description, contract.shape).inputSchema)));
       assert.notEqual((await client.callTool({ name: tool.name, arguments: input(tool.name as McpToolName) })).isError, true, tool.name);
     }
-    assert.equal(fixture.calls.length, 27, "Jules message and approval tools preflight session state");
+    assert.equal(fixture.calls.length, 30, "Jules message and approval tools preflight session state");
     for (const call of fixture.calls.filter(x => !x.name.endsWith("NormativeTurn") && x.name !== "applyNormativePrinciple")) {
       for (const field of Object.keys(controls)) assert.equal(Object.hasOwn(call.args ?? {}, field), false, call.name);
     }
     const bad = input("khora_norm_verify_turn"); delete (bad.receipt as Record<string, unknown>).output;
     assert.equal((await client.callTool({ name: "khora_norm_verify_turn", arguments: bad })).isError, true);
-    assert.equal(fixture.calls.length, 27);
+    assert.equal(fixture.calls.length, 30);
   } finally { await client.close(); await fixture.close(); }
 });
 
