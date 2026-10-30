@@ -22,7 +22,7 @@ function clientIso(v:unknown):string|null{const n=Number(v);return Number.isSafe
 async function owns(db:Db,actor:string,id:string){if(typeof id!=="string"||!id||id.length>200)throw Error("sesion_invalida");const r=await db.query(`SELECT s.session_id FROM dictado_session s ${ARCHIVE} WHERE s.session_id=$1 AND COALESCE(s.custodia_owner,s.checkpoint_usuario,v.usuario)=$2 LIMIT 1`,[id,actor]);return r.rows.length===1;}
 
 export async function toolKhoraCustodiaCatalogo(actor:string,args:{limite?:number;cursor?:string},db:Db=getMcpReadOnlyDb()){
- const limit=limitOf(args.limite),cursor=cursorOf(args.cursor),activity="COALESCE(s.actualizado_en,s.creado_en,to_timestamp(0))",owner="COALESCE(s.custodia_owner,s.checkpoint_usuario,v.usuario)=$1";
+ const limit=limitOf(args.limite),cursor=cursorOf(args.cursor),activity="COALESCE(s.creado_en,to_timestamp(0))",owner="COALESCE(s.custodia_owner,s.checkpoint_usuario,v.usuario)=$1";
  const [total,page]=await Promise.all([
   db.query(`SELECT count(*)::int AS total FROM dictado_session s ${ARCHIVE} WHERE ${owner}`,[actor]),
   db.query(`SELECT s.session_id,s.estado,s.total_partes,s.creado_en,s.actualizado_en,s.cerrado_en,v.id AS volcado_id,v.folio,
@@ -51,7 +51,7 @@ export async function toolKhoraCustodiaCatalogo(actor:string,args:{limite?:numbe
 }
 function declaredParts(s:any):number|null{if(!s||typeof s!=="object"||Array.isArray(s))return null;const n=s.corteAudio&&typeof s.corteAudio==="object"?Number(s.corteAudio.hastaParte):Array.isArray(s.audioPartes)?s.audioPartes.length:0;return Number.isSafeInteger(n)&&n>=0?n:null;}
 function syncStatus(n:number|null,parts:any[]):string{
- if(n===null)return "UNVERIFIABLE";if(n===0)return "NO_AUDIO";const prefix=parts.filter(p=>Number(p.part_index)<=n),indices=new Set(prefix.map(p=>Number(p.part_index)));
+ if(n===null)return "UNVERIFIABLE";if(n===0)return parts.length===0?"NO_AUDIO":"UNEXPECTED_STORED_PARTS";const prefix=parts.filter(p=>Number(p.part_index)<=n),indices=new Set(prefix.map(p=>Number(p.part_index)));
  for(let i=1;i<=n;i++)if(!indices.has(i))return "PENDING_UPLOAD";
  return prefix.filter(p=>p.estado_verificacion==="verificado").length===n?"SYNCED":"INTEGRITY_PENDING";
 }
@@ -77,7 +77,7 @@ export async function toolKhoraCustodiaRevisiones(actor:string,args:{session_id:
 function integrityReason(code:string){switch(code){
  case "audio_integridad_rota":return "SHA256_OR_LENGTH_MISMATCH";case "blob_host_no_permitido":return "BLOB_HOST_NOT_ALLOWED";
  case "audio_manifest_invalido":return "METADATA_INVALID";case "audio_demasiado_grande":return "OBJECT_EXCEEDS_VERIFICATION_LIMIT";
- case "blob_inaccesible":return "BLOB_ACCESS_UNAVAILABLE_OR_TRANSIENT";default:return "BLOB_READ_FAILED";}}
+ case "blob_no_encontrado":return "BLOB_NOT_FOUND";case "blob_inaccesible":return "BLOB_ACCESS_UNAVAILABLE_OR_TRANSIENT";default:return "BLOB_READ_FAILED";}}
 export async function toolKhoraCustodiaVerificarIntegridad(actor:string,args:{session_id:string;limite?:number;despues_de_parte?:number},db:Db=getMcpReadOnlyDb(),readBlob:typeof leerBlobVerificado=leerBlobVerificado){
  const id=args.session_id;if(!(await owns(db,actor,id)))throw Error("sesion_no_encontrada_o_no_autorizada");const limit=limitOf(args.limite,50),after=args.despues_de_parte===undefined?0:Number(args.despues_de_parte);
  if(!Number.isSafeInteger(after)||after<0)throw Error("cursor_invalido");
@@ -92,13 +92,13 @@ export async function toolKhoraCustodiaVerificarIntegridad(actor:string,args:{se
   if(!Number.isSafeInteger(bytes)||bytes<=0||!sha||!SHA.test(sha)){items.push({partIndex,expectedBytes:Number.isFinite(bytes)?bytes:null,expectedSha256:sha,status:"UNVERIFIABLE",reason:"METADATA_INVALID"});continue;}
   let clear:Buffer|null=null;
   try{clear=await readBlob(p.blob_url,bytes,sha);items.push({partIndex,expectedBytes:bytes,expectedSha256:sha,status:"VERIFIED",reason:null});}
-  catch(e){const code=e instanceof Error?e.message:"";items.push({partIndex,expectedBytes:bytes,expectedSha256:sha,status:code==="audio_integridad_rota"?"MISMATCH":"UNVERIFIABLE",reason:integrityReason(code)});}
+  catch(e){const code=e instanceof Error?e.message:"";items.push({partIndex,expectedBytes:bytes,expectedSha256:sha,status:code==="audio_integridad_rota"?"MISMATCH":code==="blob_no_encontrado"?"MISSING":"UNVERIFIABLE",reason:integrityReason(code)});}
   finally{clear?.fill(0);}
  }
  const last=rows.at(-1);
  return {sessionId:id,checkedAt:new Date().toISOString(),items,
   page:{limit,totalParts:Number(count.rows[0]?.total||0),afterPart:after,hasMore,nextAfterPart:hasMore&&last?Number(last.part_index):null},
-  legend:{VERIFIED:"Blob leído, descifrado y longitud/SHA-256 coincidentes",MISSING:"Referencia Blob no registrada",
+  legend:{VERIFIED:"Blob leído, descifrado y longitud/SHA-256 coincidentes",MISSING:"Referencia Blob no registrada o el origen respondió 404",
    MISMATCH:"Bytes actuales no coinciden con longitud o SHA-256 declarados",UNVERIFIABLE:"No se pudo demostrar integridad; incluye fallos transitorios o metadatos inválidos"},
   excludes:["blob_url","clear_bytes","audio_base64","credentials"]};
 }
