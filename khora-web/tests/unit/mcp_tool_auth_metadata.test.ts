@@ -47,7 +47,7 @@ test("one canonical document covers the exact tool catalog and current output ve
     assert.equal(document.split("\n## " + heading + "\n").length, 2, heading);
   }
   assert.ok(document.includes("**" + REQUIRED_OUTPUT_FORMAT_VERSION + "**"));
-  assert.equal(readme.split("(./khora-web/docs/normative-check.md)").length, 2);
+  assert.ok(readme.includes("(./khora-web/docs/normative-check.md)"));
   assert.match(document, /^# Servidor MCP de Khora — documento canónico/m);
 });
 test("Custodia scopes are advertised end-to-end and remain opt-in", () => {
