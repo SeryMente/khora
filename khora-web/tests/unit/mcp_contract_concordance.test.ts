@@ -55,6 +55,14 @@ function input(name: McpToolName): Record<string, unknown> {
   return { ...controls, ...business };
 }
 
+function parseToolPayload(result: unknown): any {
+  const content = (result as { content?: unknown } | null)?.content;
+  if (!Array.isArray(content)) throw new Error("MCP tool result has no content array");
+  const first = content[0] as { text?: unknown } | undefined;
+  if (typeof first?.text !== "string") throw new Error("MCP tool result has no text payload");
+  return JSON.parse(first.text);
+}
+
 test("all 24 real registration shapes generate valid schemas and accept advertised examples", async () => {
   const contracts = await routeContracts();
   assert.equal(contracts.length, 24);
@@ -243,7 +251,7 @@ test("Jules source catalogue exposes only exact ACL branches and retains provide
   try {
     const result = await client.callTool({ name: "jules_list_sources", arguments: input("jules_list_sources") });
     assert.equal(result.isError, false);
-    const payload = JSON.parse((result.content?.[0] as any).text);
+    const payload = parseToolPayload(result);
     assert.deepEqual(payload.result.sources[0].githubRepo.branches.map((x: any) => x.displayName), ["main"]);
     assert.equal(payload.result.nextPageToken, "fixture-next");
   } finally { await client.close(); await fixture.close(); }
@@ -252,7 +260,7 @@ test("Jules sessions are filtered by subject/source/branch ACL and unauthorized 
   const fixture = routeFixture(); const client = await connect(fixture);
   try {
     const result = await client.callTool({ name: "jules_list_sessions", arguments: input("jules_list_sessions") });
-    const payload = JSON.parse((result.content?.[0] as any).text);
+    const payload = parseToolPayload(result);
     assert.deepEqual(payload.result.sessions.map((x: any) => x.name), ["sessions/fixture-session"]);
     assert.equal(payload.result.nextPageToken, "fixture-sessions-next");
   } finally { await client.close(); await fixture.close(); }
@@ -281,7 +289,7 @@ test("Jules ACL without an active grant does not call provider listings or sessi
   try {
     for (const name of ["jules_list_sources", "jules_list_sessions"] as const) {
       const result = await client.callTool({ name, arguments: input(name) }); assert.equal(result.isError, false);
-      const payload = JSON.parse((result.content?.[0] as any).text);
+      const payload = parseToolPayload(result);
       assert.equal(name === "jules_list_sources" ? payload.result.sources.length : payload.result.sessions.length, 0);
     }
     const create = await client.callTool({ name: "jules_create_session", arguments: input("jules_create_session") }); assert.equal(create.isError, true);
@@ -360,7 +368,7 @@ test("Jules approval requires the exact current plan id and fingerprint returned
   const options = { planApprovalReady: true, activityPagination: true }; const fixture = routeFixture(options); const client = await connect(fixture);
   try {
     const activities = await client.callTool({ name: "jules_list_activities", arguments: input("jules_list_activities") });
-    const payload = JSON.parse((activities.content?.[0] as any).text);
+    const payload = parseToolPayload(activities);
     const generated = payload.result.activities[0].planGenerated;
     assert.equal(generated.plan.id, "fixture-plan-1");
     assert.match(generated.plan_sha256, /^[0-9a-f]{64}$/);
@@ -372,10 +380,10 @@ test("Jules approval requires the exact current plan id and fingerprint returned
 });
 
 test("Jules approval blocks when the plan id changes after it was shown", async () => {
-  const options = { planApprovalReady: true }; const fixture = routeFixture(options); const client = await connect(fixture);
+  const options: { planApprovalReady: boolean; currentPlanId?: string } = { planApprovalReady: true }; const fixture = routeFixture(options); const client = await connect(fixture);
   try {
     const activities = await client.callTool({ name: "jules_list_activities", arguments: input("jules_list_activities") });
-    const payload = JSON.parse((activities.content?.[0] as any).text);
+    const payload = parseToolPayload(activities);
     const generated = payload.result.activities[0].planGenerated;
     options.currentPlanId = "fixture-plan-replaced";
     const result = await client.callTool({ name: "jules_approve_plan", arguments: { ...input("jules_approve_plan"), plan_id: generated.plan.id, plan_sha256: generated.plan_sha256 } });
@@ -389,7 +397,7 @@ test("Jules approval detects a plan change between the two immediate preflight r
   const options = { planApprovalReady: true, planSecondId: "fixture-plan-replaced" }; const fixture = routeFixture(options); const client = await connect(fixture);
   try {
     const activities = await client.callTool({ name: "jules_list_activities", arguments: input("jules_list_activities") });
-    const payload = JSON.parse((activities.content?.[0] as any).text);
+    const payload = parseToolPayload(activities);
     const generated = payload.result.activities[0].planGenerated;
     const result = await client.callTool({ name: "jules_approve_plan", arguments: { ...input("jules_approve_plan"), plan_id: generated.plan.id, plan_sha256: generated.plan_sha256 } });
     assert.equal(result.isError, true);
@@ -402,7 +410,7 @@ test("Jules approval rejects a changed plan fingerprint even when the plan id st
   const fixture = routeFixture(options); const client = await connect(fixture);
   try {
     const activities = await client.callTool({ name: "jules_list_activities", arguments: input("jules_list_activities") });
-    const payload = JSON.parse((activities.content?.[0] as any).text);
+    const payload = parseToolPayload(activities);
     const generated = payload.result.activities[0].planGenerated;
     const result = await client.callTool({ name: "jules_approve_plan", arguments: { ...input("jules_approve_plan"), plan_id: generated.plan.id, plan_sha256: generated.plan_sha256 } });
     assert.equal(result.isError, true);
