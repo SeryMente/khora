@@ -21,7 +21,7 @@ const code = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTa
 // Execute the whole real route and SDK HTTP transport. Only external boundaries
 // (Next response class, identity, storage and business services) are substituted.
 // This is not proof of cryptography, OAuth, database effects or deployment.
-export function routeFixture(options: { scopes?: string[]; revoked?: boolean; denyTurn?: boolean; production?: boolean; configured?: boolean; failService?: boolean; healthError?: boolean; partial?: boolean; auditFail?: boolean; readAllowed?: boolean; writeAllowed?: boolean; sourceBranchExists?: boolean; sessionContextValid?: boolean; aclUnavailable?: boolean; sessionSource?: string; sessionBranch?: string; planApprovalReady?: boolean; currentPlanId?: string; planSecondId?: string; planSecondStepDescription?: string; activityPagination?: boolean } = {}) {
+export function routeFixture(options: { scopes?: string[]; revoked?: boolean; denyTurn?: boolean; production?: boolean; configured?: boolean; failService?: boolean; healthError?: boolean; partial?: boolean; auditFail?: boolean; readAllowed?: boolean; writeAllowed?: boolean; sourceBranchExists?: boolean; sessionContextValid?: boolean; aclUnavailable?: boolean; sessionSource?: string; sessionBranch?: string; planApprovalReady?: boolean; currentPlanId?: string; planSecondId?: string; planSecondStepDescription?: string; activityPagination?: boolean; developerSubject?: boolean } = {}) {
   const schemas = new Map<contracts.McpToolName, { description: string; shape: z.ZodRawShape }>();
   const calls: Array<{ name: string; args: unknown }> = [];
   const aclSubjects: string[] = [];
@@ -38,7 +38,7 @@ export function routeFixture(options: { scopes?: string[]; revoked?: boolean; de
     }
   }
   const issuer = "https://khora-contract-fixture.invalid";
-  const config = { issuer, canonicalUrl: issuer + "/api/mcp", jwtSecret: "synthetic-key-not-used-for-signing" };
+  const config = { issuer, canonicalUrl: issuer + "/api/mcp", jwtSecret: "synthetic-key-not-used-for-signing", allowedEmail: "developer@example.test" };
   const scopes = options.scopes ?? ["volcados:read", "runtime:read", "norm:turn", "jules:read", "jules:write"];
   const business = (name: string) => async (args?: unknown) => {
     calls.push({ name, args });
@@ -68,8 +68,9 @@ export function routeFixture(options: { scopes?: string[]; revoked?: boolean; de
     "node:crypto": crypto,
     "@/lib/server/mcp-diagnostics": diagnostics,
     "@/lib/server/jules-access": {
+      isJulesDeveloperSubject: (subject: string) => options.developerSubject === true && subject.toLowerCase() === config.allowedEmail.toLowerCase(),
       listJulesSourceGrants: async (_subject: string, mode: "read" | "write") => { aclSubjects.push(_subject); if (options.aclUnavailable) throw new diagnostics.McpDiagnosticError("JULES_ACL_UNAVAILABLE"); const allowed = mode === "read" ? options.readAllowed !== false : options.writeAllowed !== false; return allowed ? [{ source: "sources/github/owner/repo", branch: "main" }] : []; },
-      requireJulesSourceGrant: async (_subject: string, source: string, branch: string, mode: "read" | "write") => { aclSubjects.push(_subject); if (options.aclUnavailable) throw new diagnostics.McpDiagnosticError("JULES_ACL_UNAVAILABLE"); const allowed = mode === "read" ? options.readAllowed !== false : options.writeAllowed !== false; if (!allowed || source !== "sources/github/owner/repo" || branch !== "main") throw new diagnostics.McpDiagnosticError("JULES_ACCESS_DENIED"); },
+      requireJulesSourceGrant: async (_subject: string, source: string, branch: string, mode: "read" | "write") => { if (options.developerSubject === true && _subject.toLowerCase() === config.allowedEmail.toLowerCase()) return; aclSubjects.push(_subject); if (options.aclUnavailable) throw new diagnostics.McpDiagnosticError("JULES_ACL_UNAVAILABLE"); const allowed = mode === "read" ? options.readAllowed !== false : options.writeAllowed !== false; if (!allowed || source !== "sources/github/owner/repo" || branch !== "main") throw new diagnostics.McpDiagnosticError("JULES_ACCESS_DENIED"); },
     },
     "@/lib/server/mcp-diagnostic-boundary": boundary,
     "next/server": { NextRequest: Request, NextResponse: Response },
@@ -81,7 +82,7 @@ export function routeFixture(options: { scopes?: string[]; revoked?: boolean; de
     "@/lib/server/normative-receipt-schema": receipt,
     "@/lib/server/normative-runtime": runtime,
     "@/lib/server/mcp-config": { getMcpConfig: () => options.configured === false ? null : config },
-    "@/lib/server/jwt": { verifyJwtDetailed: (token: string) => token === "fixture-access" ? { ok: true, payload: { iss: issuer, aud: config.canonicalUrl, sub: "fixture-actor", gen: 1, scope: scopes.join(" ") } } : { ok: false, error: "invalid_format" } },
+    "@/lib/server/jwt": { verifyJwtDetailed: (token: string) => token === "fixture-access" ? { ok: true, payload: { iss: issuer, aud: config.canonicalUrl, sub: options.developerSubject ? config.allowedEmail : "fixture-actor", gen: 1, scope: scopes.join(" ") } } : { ok: false, error: "invalid_format" } },
     "@/lib/server/oauth": { obtenerGeneracionRevocacion: async () => options.revoked ? 2 : 1 },
     "@/lib/server/mcp-db": { isProductionEnv: () => options.production === true },
     "@/lib/server/mcp-manual-token": { MANUAL_MCP_TOKEN_PREFIX: "fixture-manual-", authenticateManualMcpToken: async () => null },
