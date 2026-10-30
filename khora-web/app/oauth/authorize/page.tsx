@@ -60,7 +60,7 @@ export default async function AuthorizePage(props: {
   const allowedRedirect = redirect_uri === "https://chatgpt.com/connector_platform_oauth_redirect" ||
     config.redirectUris.includes(redirect_uri || "") || isDynamicClient;
 
-  const supportedScopes = new Set(["volcados:read", "runtime:read", "norm:turn", "offline_access"]);
+  const supportedScopes = new Set(["volcados:read", "runtime:read", "norm:turn", "custodia:metadata:read", "custodia:integrity:verify", "offline_access"]);
   const requestedScopes = requestedScope.split(/\s+/).filter(Boolean);
 
   // 1. Validar client_id
