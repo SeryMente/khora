@@ -9,9 +9,10 @@ async function paint(){
  const response=await call('harmonia:get');
  if(!response.ok){$('#dot').className='dot off';$('#headline').textContent='Estado no disponible';$('#detail').textContent=response.error||'No se pudo leer el estado.';$('#toggle').disabled=true;return;}
  const state=response.value||{};
- $('#dot').className='dot'+(state.collector&&state.autoEnabled?' live':state.collector?'':' off');
- $('#headline').textContent=!state.collector?'Colector local no disponible':state.autoEnabled?'Observación automática activa':'Observación pausada';
- $('#detail').textContent=!state.collector?(state.lastError||'Inicia el colector local.'):(state.activeTabs||0)+' pestañas observadas · '+(state.events||0)+' eventos aceptados';
+ const status=state.indicator?.status||(!state.collector?'error':state.autoEnabled?'ok':'warning');
+ $('#dot').className='dot '+(status==='ok'?'live':status==='warning'?'warn':'off');
+ $('#headline').textContent=status==='error'?'Harmonia detectó un error':status==='warning'?'Harmonia requiere atención':'Harmonia funciona correctamente';
+ $('#detail').textContent=state.lastError||((state.activeTabs||0)+' pestañas observadas · '+(state.events||0)+' eventos aceptados'+(status==='warning'?' · revisa la alerta del ámbito':''));
  $('#toggle').textContent=state.autoEnabled?'Pausar observación':'Reanudar observación';$('#toggle').disabled=!state.collector;
 }
 $('#toggle').addEventListener('click',async()=>{

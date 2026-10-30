@@ -4,6 +4,7 @@ const COLLECTOR='http://127.0.0.1:47321';
 const TOKEN=String(globalThis.HARMONIA_TOKEN||'');
 const STORE={sessions:'harmoniaAutoSessions',enabled:'harmoniaAutoEnabled',events:'harmoniaEventCount',fingerprints:'harmoniaKnownSurfaceFingerprints',repositorySync:'harmoniaRepositorySync',regionCoverage:'harmoniaRegionCoverage',regionLeaders:'harmoniaRegionLeaders',areaHealth:'harmoniaAreaHealth',devReloadVersion:'harmoniaDevReloadVersion'};
 const DEV_RELOAD_ALARM='harmonia-dev-reload';
+const HEALTH_ALARM='harmonia-health-check';
 const CHATGPT_AREA='observabilidad.arquitectura.chatgpt';
 const REPO_BUILD_INFO='https://raw.githubusercontent.com/SeryMente/khora/main/apps/harmonia-observability/extension/build-info.json';
 const REPO_CATALOG='https://raw.githubusercontent.com/SeryMente/khora/main/apps/harmonia-observability/coverage-catalog.json';
@@ -41,6 +42,7 @@ const ready=(async()=>{
   await checkHealth();
   chrome.alarms.create(REPO_SYNC_ALARM,{delayInMinutes:1,periodInMinutes:360});
   chrome.alarms.create(DEV_RELOAD_ALARM,{delayInMinutes:0.5,periodInMinutes:0.5});
+  chrome.alarms.create(HEALTH_ALARM,{delayInMinutes:1,periodInMinutes:1});
 })();
 async function setTabIndicator(tabId,status){
  try{await chrome.tabs.sendMessage(tabId,{kind:'harmonia:tab-indicator',status});}catch{}
@@ -407,6 +409,7 @@ async function pollDevReload(){
 chrome.alarms.onAlarm.addListener(alarm=>{
  if(alarm.name===REPO_SYNC_ALARM)void syncRepository();
  if(alarm.name===DEV_RELOAD_ALARM)void pollDevReload();
+ if(alarm.name===HEALTH_ALARM)void checkHealth();
 });
 chrome.tabs.onRemoved.addListener(tabId=>{void ready.then(async()=>{
  const previous=sessions[String(tabId)],regionKey=previous?.regionKey;await stopSession(tabId,'tab-closed');if(regionKey)await reconcileRegionLeaders(regionKey,undefined,true);
@@ -423,7 +426,7 @@ chrome.tabs.onUpdated.addListener((tabId,changeInfo,tab)=>{void ready.then(async
 });});
 void ready.then(async()=>{if(autoEnabled){const tabs=await chrome.tabs.query({url:'https://chatgpt.com/*'});await injectExistingTabs(tabs);for(const key of Object.keys(regionCoverage))await reconcileRegionLeaders(key);}});
 /* Both periodic alarms are handled above. */
-chrome.runtime.onInstalled.addListener(()=>{void ready.then(async()=>{chrome.alarms.create(REPO_SYNC_ALARM,{delayInMinutes:1,periodInMinutes:360});chrome.alarms.create(DEV_RELOAD_ALARM,{delayInMinutes:0.5,periodInMinutes:0.5});await syncRepository();if(autoEnabled)await injectExistingTabs(await chrome.tabs.query({url:'https://chatgpt.com/*'}));});});
-chrome.runtime.onStartup.addListener(()=>{void ready.then(async()=>{chrome.alarms.create(REPO_SYNC_ALARM,{delayInMinutes:1,periodInMinutes:360});chrome.alarms.create(DEV_RELOAD_ALARM,{delayInMinutes:0.5,periodInMinutes:0.5});await syncRepository();if(autoEnabled)await injectExistingTabs(await chrome.tabs.query({url:'https://chatgpt.com/*'}));});});
+chrome.runtime.onInstalled.addListener(()=>{void ready.then(async()=>{chrome.alarms.create(REPO_SYNC_ALARM,{delayInMinutes:1,periodInMinutes:360});chrome.alarms.create(DEV_RELOAD_ALARM,{delayInMinutes:0.5,periodInMinutes:0.5});chrome.alarms.create(HEALTH_ALARM,{delayInMinutes:1,periodInMinutes:1});await syncRepository();if(autoEnabled)await injectExistingTabs(await chrome.tabs.query({url:'https://chatgpt.com/*'}));});});
+chrome.runtime.onStartup.addListener(()=>{void ready.then(async()=>{chrome.alarms.create(REPO_SYNC_ALARM,{delayInMinutes:1,periodInMinutes:360});chrome.alarms.create(DEV_RELOAD_ALARM,{delayInMinutes:0.5,periodInMinutes:0.5});chrome.alarms.create(HEALTH_ALARM,{delayInMinutes:1,periodInMinutes:1});await syncRepository();if(autoEnabled)await injectExistingTabs(await chrome.tabs.query({url:'https://chatgpt.com/*'}));});});
 
 void ready.then(()=>refreshActionIndicator());

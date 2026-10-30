@@ -3,6 +3,6 @@
 header{display:flex;align-items:center;gap:11px;margin-bottom:16px}.mark{height:38px;width:38px;border-radius:11px;border:1px solid #d9d5fb;display:grid;place-items:center;background:#efedff;color:#5747a3;font-size:18px;font-weight:800;flex:none}
 h1{font-size:17px;margin:0;line-height:1.25}header p{font-size:11px;color:#77736e;margin:3px 0 0}
 .status{display:flex;align-items:flex-start;gap:10px;border:1px solid #e3e1dd;border-radius:11px;padding:12px;margin-bottom:12px}.status strong{font-size:13px}.status p{font-size:11px;color:#67645f;line-height:1.45;margin:5px 0 0;overflow-wrap:anywhere}
-.dot{width:10px;height:10px;border-radius:50%;background:#be8c45;margin-top:3px;flex:none}.dot.live{background:#359667}.dot.off{background:#c94a4a}
+.dot{width:10px;height:10px;border-radius:50%;background:#be8c45;margin-top:3px;flex:none}.dot.live{background:#359667}.dot.warn{background:#d39a2d}.dot.off{background:#c94a4a}
 button{display:block;width:100%;border:0;border-radius:8px;padding:10px 12px;background:#5747a3;color:#fff;font:inherit;font-size:12px;cursor:pointer;margin:8px 0}button.secondary{background:#ebe9f7;color:#30276e}button:disabled{opacity:.5;cursor:default}
 .privacy{font-size:10px;color:#6c6a65;line-height:1.5;margin:13px 2px 0}
