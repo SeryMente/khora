@@ -41,3 +41,31 @@ Las concesiones se registran y revocan por el administrador de datos con el prin
 ## Límites de prueba
 
 Los tests del route fixture verifican el filtrado de herramientas y el bloqueo de proveedor con concesiones sintéticas. No prueban los privilegios del rol productivo ni la migración aplicada. La lectura real de ACL, el read-back del grant y la llamada a Jules siguen siendo pruebas de entorno independiente.
+## Provisioning administrative (fuera de MCP)
+
+Antes de emitir concesiones, verifica qué identidad exacta aparece en el claim `sub` del Bearer autorizado y qué rol Postgres usa realmente `KHORA_READONLY_DATABASE_URL`. Tras confirmar el rol, el propietario de la base puede conceder exclusivamente lectura del esquema privado:
+
+```sql
+-- Sustituye el rol solo después de verificar current_user en la conexión MCP.
+GRANT USAGE ON SCHEMA khora_private TO verified_mcp_read_role;
+GRANT SELECT ON TABLE khora_private.jules_source_acl TO verified_mcp_read_role;
+```
+
+Para una concesión inicial, el propietario registra el sujeto, el nombre literal de source, la rama exacta, capacidades independientes y quién concede:
+
+```sql
+INSERT INTO khora_private.jules_source_acl
+  (subject, source, branch, read_allowed, write_allowed, granted_by)
+VALUES
+  ('<exact-oauth-subject>', 'sources/github/owner/repo', 'main', TRUE, FALSE, '<authorized-grantor>');
+```
+
+Para revocar, actualiza la fila activa y conserva su historial:
+
+```sql
+UPDATE khora_private.jules_source_acl
+SET revoked_at = now(), revoked_by = '<authorized-revoker>'
+WHERE id = <grant-id> AND revoked_at IS NULL;
+```
+
+No copies el contenido de secretos a la tabla ni uses comodines de source/rama. Las concesiones se administran con la conexión propietaria; el runtime MCP solo necesita SELECT y nunca tiene una herramienta de escritura de ACL.

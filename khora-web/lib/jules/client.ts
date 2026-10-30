@@ -164,7 +164,7 @@ async function fetchWithBackoff(url: string, options: RequestInit = {}): Promise
       const body = await response.text();
       try { errorData = JSON.parse(body); } catch { errorData = body; }
     } catch { errorData = "Unable to parse error response"; }
-    throw new JulesApiError(response.status === 429 ? "JULES_RATE_LIMITED" : "JULES_API_HTTP_" + response.status, response.status, errorData);
+    throw new JulesApiError(response.status === 429 ? "JULES_RATE_LIMITED" : "Jules API request failed with status " + response.status, response.status, errorData);
   }
 }
 function getHeaders(): HeadersInit {
