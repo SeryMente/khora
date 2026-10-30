@@ -5,6 +5,19 @@
 **IMPORTANT PERMANENT RULE**:
 REGLA PERMANENTE (v7): El único punto de entrada es khora.ps1 (gate). PROHIBIDO crear scripts de entrada paralelos o copias khora-v*.ps1. Un componente = un archivo en modules/; el orden de carga lo define khora.barrel.ps1. Toda modificación sube $SCRIPT_VERSION en el mismo commit.
 Está ESTRICTAMENTE PROHIBIDO crear archivos `khora-v*.ps1` paralelos. Esta regla existe de forma permanente debido a que tareas aisladas en el pasado produjeron 10 fragmentos divergentes y generaron regresiones masivas.
+
+## Descubrimiento de frentes canónicos de Khora (Cora)
+
+Antes de trabajar en una capacidad de producto, lee el `README.md` y selecciona el OCP exacto; no trates todo el repositorio como un único frente.
+
+- El repositorio canónico del producto es `SeryMente/khora`; el operador también lo denomina Cora.
+- **Dictado** (`docs/frentes/dictado-voz/`) se limita a pantalla de dictado, captura de voz iniciada explícitamente, transcripción, edición y continuidad.
+- **Observabilidad MCP** (`docs/frentes/observabilidad-mcp/`) es independiente: acceso autenticado a registros MCP, herramientas, filtros, sesiones, paginación y diagnóstico. Tiene control propio.
+- **Custodia transversal** (`frentes/custodia/`) conserva su titularidad sobre persistencia, seguridad y recuperación; Dictado solo integra sus contratos.
+- Harmonia y Tareas automáticas conservan sus OCP.
+- Benchmark/feedback, Diálogo multipista, Ingreso general/crónica/metadatos, voz/síntomas y publicación editorial quedan fuera de Dictado y pendientes de adjudicación; no asignarles propietario por inferencia.
+
+Antes de asumir un frente, lee su `CONTROL-RESPONSABILIDAD.json`, verifica generación/folio y aplica DUG P037 + Metacanon §§42/47. Una autorización para Dictado no concede titularidad de Observabilidad MCP ni de otros frentes. Reconsulta los PR y sus diffs actuales; no uses estados históricos como si fueran vigentes.
 ## EP-ARCHITECTURE — CONTEXTO CANÓNICO DEL ENTORNO PERSISTENTE
 
 ep-medio-architectura.md es un componente del propio Entorno Persistente de KHORA y constituye su **definición estructural canónica y vigente**.
