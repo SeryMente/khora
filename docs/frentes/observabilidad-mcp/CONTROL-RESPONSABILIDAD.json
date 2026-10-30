@@ -69,6 +69,15 @@
     "normative_scope": "norm:turn",
     "acl": "khora_private.jules_source_acl keyed by exact subject/source/branch; fail-closed",
     "database_change": "033_jules_source_acl schema only; grant only USAGE and SELECT to khora_lector; no data-row grants without verified identity/resource authorization",
-    "publication": "authorized after review, test evidence and verified security"
+    "publication": "authorized after review, test evidence and verified security",
+    "owner_access_policy": {
+      "authorization_ref": "Clarificación expresa del operador en esta conversación, 2026-10-30: «soy el único usuario del sistema y soy desarrollador» y «no necesito ponerme bloqueantes innecesarios».",
+      "owner_identity": "Authenticated OAuth sub or manual-token owner must match configured MCP_ALLOWED_EMAIL, case-insensitively.",
+      "read_scope": "jules:read",
+      "write_scope": "jules:write",
+      "resource_boundary": "The owner can act only on sources and branches returned by the Jules account configured through JULES_API_KEY; source/branch existence and session context are still validated against Jules. No ACL rows or manual per-repository grants are needed for this single owner.",
+      "additional_subjects": "Every other subject remains subject/source/branch/capability exact and fail-closed in khora_private.jules_source_acl.",
+      "normative_gate": "Jules tools require their own read/write scopes but do not require norm:turn; Khora normative tools retain their existing norm:turn contract."
+    }
   }
 }
