@@ -164,7 +164,7 @@ export async function toolKhoraEventosRecientes(args: {
   }
   if (args.severity) {
     params.push(args.severity);
-    where.push(`COALESCE(detalle->>'severity', detalle->'observation'->>'severity') = ${params.length}`);
+    where.push("COALESCE(detalle->>'severity', detalle->'observation'->>'severity') = $" + params.length);
   }
   if (args.outcome) {
     params.push(args.outcome);
@@ -176,11 +176,11 @@ export async function toolKhoraEventosRecientes(args: {
   }
   if (args.scope) {
     params.push(args.scope);
-    where.push(`COALESCE(detalle->>'scope', detalle->'observation'->>'scope') = ${params.length}`);
+    where.push("COALESCE(detalle->>'scope', detalle->'observation'->>'scope') = $" + params.length);
   }
   if (args.category) {
     params.push(args.category);
-    where.push(`COALESCE(detalle->>'category', detalle->'observation'->>'category') = ${params.length}`);
+    where.push("COALESCE(detalle->>'category', detalle->'observation'->>'category') = $" + params.length);
   }
 
   params.push(limite);
