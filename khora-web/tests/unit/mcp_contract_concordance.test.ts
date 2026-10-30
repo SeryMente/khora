@@ -9,7 +9,6 @@ import { describeMcpTool, MCP_TOOL_SCOPES, type McpToolName } from "../../lib/se
 import { isNormativeReceipt, normativeReceiptSchema } from "../../lib/server/normative-receipt-schema";
 import { REQUIRED_OUTPUT_FORMAT_VERSION, REQUIRED_PLATFORM } from "../../lib/server/normative-runtime";
 import { verifyNormativeReceipt } from "../../lib/server/norm-check";
-// @ts-expect-error The RDC bridge is intentionally plain Node ESM and is not transpiled.
 import { buildToolCall as buildRdcBridgeToolCall, EXPECTED_TOOLS as RDC_BRIDGE_TOOLS } from "../../tools/jules-rdc-bridge/bridge.mjs";
 
 const controls = {
