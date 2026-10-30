@@ -47,7 +47,7 @@ La ruta cotidiana documentada usa **ChatGPT → Vercel MCP → Git source SHA �
 
 Hechos que condicionan esa decisión:
 1. El conector Vercel de esta sesión ofrece lectura y creación de deployments y ya construyó desde GitHub privado un deployment Preview para un SHA exacto. La construcción remota por Git source está demostrada; la primera ejecución con target production todavía no.
-2. Las ejecuciones recientes de GitHub Actions para CI, UI Quality y Deploy to Production finalizaron antes de ejecutar los steps. Los jobs no llegaron a lanzar runner; la causa raíz exacta no quedó demostrada.
+2. En main, CI #40959059770, UI Quality #40959059776 y Deploy to Production #40959059940 concluyeron en failure; las seis jobs consultadas devolvieron steps=[] (ningún step ejecutado). Esto acredita que esos jobs no ejecutaron su secuencia, pero el detalle del motivo del runner no está disponible y la causa raíz exacta no quedó demostrada.
 3. .github/workflows/deploy-production.yml escucha push a main y workflow_dispatch. Si los runners se recuperan, puede convertirse en un segundo publicador de producción. El procedimiento verifica su ejecución para el SHA candidato y jamás inicia un segundo deployment mientras ese publicador esté activo o ya haya terminado correctamente.
 4. La integración Git automática de Vercel con repositorios privados de organizaciones tiene restricciones en Hobby documentadas por Vercel. No se cambia plan, propiedad ni visibilidad. La ruta MCP se apoya en la autorización Git de servidor del conector Vercel y en el proyecto existente; su primera publicación a producción debe acreditar que ese caso concreto supera las restricciones de la cuenta.
 
