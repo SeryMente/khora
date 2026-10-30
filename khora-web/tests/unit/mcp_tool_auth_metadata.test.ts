@@ -75,5 +75,8 @@ test("Jules scopes flow through OAuth metadata, consent, token exchange, manual 
     assert.ok(content.includes(scope), `${relative} must support ${scope}`);
   }
   const page = fs.readFileSync(path.join(root, "app/sistema/mcp/page.tsx"), "utf8");
-  assert.ok(page.includes('const DEFAULT_SCOPES = ["runtime:read", "volcados:read", "norm:turn"] as const;'));
+  assert.ok(page.includes('const DEFAULT_SCOPES = ["runtime:read", "volcados:read", "norm:turn", "jules:read", "jules:write"] as const;'));
+  const route = fs.readFileSync(path.join(root, "app/api/mcp/route.ts"), "utf8");
+  assert.match(route, /const julesTool = \(/);
+  assert.doesNotMatch(route, /gatedTool\("jules_/);
 });
