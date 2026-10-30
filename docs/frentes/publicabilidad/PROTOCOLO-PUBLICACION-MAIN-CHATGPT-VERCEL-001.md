@@ -105,6 +105,8 @@ Consultar mcp__Vercel__get_deployment hasta estado terminal. Para aceptar el res
 - El alias asignado contiene khora-web.vercel.app.
 - No hay aliasError.
 
+Vercel documenta que los dominios configurados en el proyecto se aplican automáticamente a deployments de producción creados por distintas fuentes. La comprobación de la lista de alias sigue siendo obligatoria; no se debe crear un segundo paso de asignación manual.
+
 Leer eventos del build con mcp__Vercel__list_deployment_events. El resultado READY sin cotejo de SHA y alias no se declara como publicación completa.
 
 ### Paso F — smoke y cierre
@@ -161,6 +163,7 @@ No se ejecutan reintentos ciegos, migraciones manuales, cambios de facturación,
 
 - [Vercel MCP — integración y clientes admitidos](https://vercel.com/docs/agent-resources/vercel-mcp)
 - [Despliegues desde referencias Git y SHA](https://vercel.com/docs/git)
+- [Asignación automática de dominios de proyecto a deployments](https://vercel.com/docs/cli/alias)
 - [Métodos de despliegue](https://vercel.com/docs/deployments)
 - [Restricción Hobby para repositorios privados de organizaciones](https://vercel.com/docs/deployments/troubleshoot-project-collaboration)
 - [Límites Vercel](https://vercel.com/docs/limits)
