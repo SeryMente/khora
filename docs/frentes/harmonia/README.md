@@ -2,6 +2,8 @@
 
 Entrada única de estado: [OBJETO-CANONICO.md](OBJETO-CANONICO.md). El OCP conserva estado vivo, decisiones, notas temporales, pruebas, historial breve y paquete de traspaso; no se debe crear una fuente de estado competidora.
 
+- [Arquitectura de persistencia provisional en Cora](ARQUITECTURA-PERSISTENCIA-PROVISIONAL-CORA.md): alcance autorizado, datos permitidos, autenticación, cola/reintentos, límites de aislamiento y criterios obligatorios para sustituirla.
+
 - [Asistente · instancia fresca / traspaso v1.2](prompts/ASISTENTE.md): entrada, adquisición de gobierno, compuerta de titularidad y secuencia E2E.
 - [Constructor · no instanciado](prompts/CONSTRUCTOR.md): ejecutar únicamente bajo su régimen y no utilizar Remote Desktop Commander.
 - [Control exclusivo](CONTROL-RESPONSABILIDAD.json): actualmente asignado a la instancia y generación que constan en el JSON; no es un bootstrap sin propietario. Preparar el traspaso no transfiere la titularidad.
