@@ -497,7 +497,7 @@
     "version": "0.6.18",
     "baseSha": "f0dfbdcb2d79eb6289dacba272ddcc7ba2023063",
     "receipt": "evidencias/C030-release.json",
-    "state": "C044: Dictado limited to dictation UI/voice capture/transcription/editing/continuation; Observabilidad MCP moved to distinct OCP; no product code/tests/deploys."
+    "state": "C044 committed to main at 016203fab19807e7c2068742a65323cec3b0a135; Dictado OCP/control and discovery indexes read back. No product code, tests, credentials, deployment or acceptance changes."
   },
   "latestEvent": "C044 — Dictado transferido a generación 4; Observabilidad MCP separado con control propio sin titular; paquetes no dictados excluidos del alcance y preservados; sin cambios de producto ni pruebas.",
   "latest_verified_release": {
@@ -626,7 +626,7 @@
     "path": "CONTROL-RESPONSABILIDAD.json",
     "full_path": "docs/frentes/dictado-voz/CONTROL-RESPONSABILIDAD.json",
     "blob": "a954353055ef30770aae0b5ca40e1f61cfc3d8dd",
-    "commit": null,
+    "commit": "016203fab19807e7c2068742a65323cec3b0a135",
     "generation": 4,
     "status": "assigned",
     "session_folio": "SES-20261030-97109848",
@@ -650,10 +650,10 @@
     "version": "0.6.18",
     "ref": "main",
     "blob_sha": "5a83c8ca417191a37adcfc4a7e8216e0f16be06d",
-    "commit": null,
+    "commit": "016203fab19807e7c2068742a65323cec3b0a135",
     "bytes": 171135,
     "sha256": "6971d5b59246ca5566cfcb4172c6f51c2f6547f34cd42fb914ae905853c0295a",
-    "state": "C044 scope separation and responsibility transfer; final GitHub read-back required."
+    "state": "C044: separation and ownership transfer committed in main and verified by canonical read-back. No product changes or functional acceptance."
   },
   "recent_verbatim_instruction_ingestion": {
     "path": "originales/INSTRUCCIONES-VERBATIM-TAIL-C032-20261022.jsonl",
@@ -693,6 +693,10 @@
       "voice/symptom proposal",
       "editorial publishing"
     ],
-    "notes": "All historical source/evidence remains in place; no deletion, reassignment or unapproved new OCP creation."
+    "notes": "All historical source/evidence remains in place; no deletion, reassignment or unapproved new OCP creation.",
+    "observability_mcp_object_blob": "a3b1335c7b3b13d5ce3e1cbf4ea50f8c0866cd36",
+    "observability_mcp_control_blob": "e710b17cb5f6d793846a1ac692ec78103ed111d7",
+    "dictation_object_blob": "5a83c8ca417191a37adcfc4a7e8216e0f16be06d",
+    "readback_verified": true
   }
 }
