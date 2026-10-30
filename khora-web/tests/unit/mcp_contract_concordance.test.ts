@@ -9,6 +9,8 @@ import { describeMcpTool, MCP_TOOL_SCOPES, type McpToolName } from "../../lib/se
 import { isNormativeReceipt, normativeReceiptSchema } from "../../lib/server/normative-receipt-schema";
 import { REQUIRED_OUTPUT_FORMAT_VERSION, REQUIRED_PLATFORM } from "../../lib/server/normative-runtime";
 import { verifyNormativeReceipt } from "../../lib/server/norm-check";
+// @ts-expect-error The RDC bridge is intentionally plain Node ESM and is not transpiled.
+import { buildToolCall as buildRdcBridgeToolCall, EXPECTED_TOOLS as RDC_BRIDGE_TOOLS } from "../../tools/jules-rdc-bridge/bridge.mjs";
 
 const controls = {
   _norm_turn_token: "test-token-not-a-real-credential",
@@ -133,6 +135,19 @@ async function connect(fixture: ReturnType<typeof routeFixture>) {
   }));
   return client;
 }
+
+test("RDC Jules bridge maps all seven actions and rejects malformed resources locally", () => {
+  assert.equal(RDC_BRIDGE_TOOLS.length, 7);
+  assert.equal(buildRdcBridgeToolCall({ action: "sources" }).name, "jules_list_sources");
+  assert.equal(buildRdcBridgeToolCall({ action: "sessions" }).name, "jules_list_sessions");
+  assert.equal(buildRdcBridgeToolCall({ action: "get", session_id: "sessions/123" }).name, "jules_get_session");
+  assert.equal(buildRdcBridgeToolCall({ action: "activities", session_id: "123" }).name, "jules_list_activities");
+  assert.equal(buildRdcBridgeToolCall({ action: "create", source: "sources/github/owner/repo", starting_branch: "main", prompt: "test" }).name, "jules_create_session");
+  assert.equal(buildRdcBridgeToolCall({ action: "message", session_id: "123", prompt: "follow-up" }).name, "jules_send_message");
+  assert.equal(buildRdcBridgeToolCall({ action: "approve", session_id: "123", plan_id: "p", plan_sha256: "a".repeat(64) }).name, "jules_approve_plan");
+  assert.throws(() => buildRdcBridgeToolCall({ action: "create", source: "https://example.com", starting_branch: "main", prompt: "test" }), /SOURCE_INVALID/);
+  assert.throws(() => buildRdcBridgeToolCall({ action: "approve", session_id: "123", plan_id: "p", plan_sha256: "invalid" }), /PLAN_SHA256_INVALID/);
+});
 
 test("tools/list exposes Jules read and write actions through their own scopes without norm:turn", async () => {
   const readFixture = routeFixture({ scopes: ["jules:read"] });
