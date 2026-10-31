@@ -1,5 +1,6 @@
 // @l0 L0-002-R · @req TRACE-SESSION/010 · @req FORENSIC-REC/01
 import { list } from "@vercel/blob";
+import { listB2Objects } from "./object-storage";
 import { getDb } from "./neon";
 import { asegurarColumnasDictado } from "./dictado";
 import * as fs from "fs";
@@ -61,20 +62,45 @@ export async function ejecutarReconciliacionForense(modo: "DRY_RUN" | "APPLY" = 
   );
   const partesList = partesRes.rows;
 
-  // 4. Listar Blobs físicos en Vercel Blob
+  // 4. Enumerar todas las páginas de Blob y B2; nunca inferir exhaustividad desde una sola página.
   let blobsFisicos: { url: string; pathname: string; size: number; uploadedAt: Date }[] = [];
+  const physicalUrls = new Set<string>();
   try {
     if (process.env.BLOB_READ_WRITE_TOKEN) {
-      const blobResult = await list();
-      blobsFisicos = blobResult.blobs.map((b) => ({
-        url: b.url,
-        pathname: b.pathname,
-        size: b.size,
-        uploadedAt: b.uploadedAt,
-      }));
+      let cursor: string | undefined;
+      let hasMore = true;
+      let pages = 0;
+      while (hasMore) {
+        const page = await list({ cursor, limit: 1000 });
+        for (const b of page.blobs) {
+          if (!physicalUrls.has(b.url)) {
+            physicalUrls.add(b.url);
+            blobsFisicos.push({ url: b.url, pathname: b.pathname, size: b.size, uploadedAt: b.uploadedAt });
+          }
+        }
+        pages += 1;
+        if (pages > 100 || (page.hasMore && (!page.cursor || page.cursor === cursor))) {
+          throw new Error("vercel_blob_listing_incomplete");
+        }
+        hasMore = page.hasMore;
+        cursor = page.hasMore ? page.cursor : undefined;
+      }
     }
   } catch (err) {
-    console.warn("No se pudo listar Vercel Blob directamente (se utilizará la metadata registrada):", String(err));
+    console.warn("No se pudo completar el inventario Vercel Blob:", String(err));
+  }
+  try {
+    if (process.env.KHORA_B2_BUCKET_NAME && process.env.KHORA_B2_KEY_ID) {
+      const b2Objects = await listB2Objects("khora/");
+      for (const b of b2Objects) {
+        if (!physicalUrls.has(b.url)) {
+          physicalUrls.add(b.url);
+          blobsFisicos.push(b);
+        }
+      }
+    }
+  } catch (err) {
+    console.warn("No se pudo completar el inventario Backblaze B2:", String(err));
   }
 
   // Indexar blobs por sessionId extraído del pathname (e.g., dictado/<sessionId>/<parte>.webm...)
