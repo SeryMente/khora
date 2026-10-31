@@ -1,9 +1,12 @@
-# Observabilidad MCP y acciones autorizadas de Jules — Khora
+# Khora MCP — interfaz de capacidades, observabilidad e integración Jules
 
 ## 1. Identidad y control
-- Frente único: **Observabilidad MCP**; identidad canónica `OBSERVABILIDAD-MCP`.
-- Repositorio: `SeryMente/khora`; OCP: `docs/frentes/observabilidad-mcp/OBJETO-CANONICO.md`.
-- OCP: **v0.3.3**. Control: generación 3, titular operativo conservado del control anterior.
+- Frente único vigente: **Khora MCP**; identidad canónica `KHORA-MCP`.
+- Nombre e identidad histórica: **Observabilidad MCP** / `OBSERVABILIDAD-MCP`. La ruta heredada `docs/frentes/observabilidad-mcp/` se conserva; no se migra ni duplica el OCP o su control.
+- Repositorio: `SeryMente/khora`; OCP único: `docs/frentes/observabilidad-mcp/OBJETO-CANONICO.md`; control único: `docs/frentes/observabilidad-mcp/CONTROL-RESPONSABILIDAD.json`.
+- OCP: **v0.3.4**. Control de responsabilidad: **generación 4**, titular operativo `chatgpt-khora-mcp-01a18f79-2078-7501-bc18-5ce14475d245`.
+- La plataforma no expuso un identificador nativo de conversación: `owner_thread` permanece `null`. UUIDv7 local de continuidad: `01a18f79-2078-7501-bc18-5ce14475d245`; no es un ID nativo.
+- Folio nuevo de conversación: **PENDIENTE / NO ASIGNADO**; FOL1 no ha sido cotejado ni activado. Se conserva el folio anterior en la generación archivada.
 - Las tareas provisionales «General» y «Jules» pertenecen a este mismo frente; no crean OCP, frente ni control paralelos.
 - `MCP-OBS-DICTADO` permanece como identidad histórica del objeto agregado anterior, no como otro frente activo.
 
@@ -19,7 +22,7 @@ Leer README, DUG vigente, este OCP y `CONTROL-RESPONSABILIDAD.json`. La titulari
 **Interpretación operativa separada:** el repositorio denomina MCP al servidor/protocolo y herramientas de Khora; «MSP» se conserva en la cita original. El frente cubre el acceso de modelos/agentes autorizados a observabilidad y la integración controlada con Jules.
 
 ## 3. Referencia metodológica
-- DUG consultado en `SeryMente/metodologia/main`: **v369 · NX-369m**; HTML canónico SHA `ea1eefd62a092079fa2cfdfa546cb739b63450eb`; último commit de `main` verificado `be621a72f653f5b908c500fd5ec3aedfae3effd4` (`2026-10-30T22:36:34Z`).
+- DUG consultado en `SeryMente/metodologia/main`: **Samantha v372 · NX-372m**; HTML canónico Blob SHA `28d0f255cdb3371a60310b0da45ca049dea05fdb`; último commit de `main` verificado `77fa4ecbbfcef3db3887545aa9eb581265d2772d` (`2026-10-31T00:57:55Z`, UTC; `2026-10-30 18:57:55` America/Mexico_City). Metacanon **1.26**; GOW **2.14**.
 - Metacanon **1.26**; GOW **2.14**.
 - CNP vigente (categoría A): P001, P004, P005, P038 y P043; consideración explícita en cada turno. MCP normativo: DESACTIVADO.
 - Fuente normativa: `SeryMente/metodologia/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html`.
@@ -28,7 +31,13 @@ Leer README, DUG vigente, este OCP y `CONTROL-RESPONSABILIDAD.json`. La titulari
 
 ## 4. Propósito y alcance
 
-**Propósito:** proporcionar un único servidor MCP de Khora para que clientes compatibles y autorizados consulten observabilidad y ejecuten acciones acotadas sobre Jules, con identidad, scopes, permisos por recurso, privacidad, trazabilidad y controles fail-closed.
+**Propósito:** administrar la interfaz programática única mediante la cual clientes, modelos y agentes compatibles y autorizados descubren y utilizan las capacidades que Khora ofrece externamente, con identidad, scopes, permisos por recurso, privacidad, trazabilidad y controles fail-closed.
+
+**Alcance funcional vigente (decisión del operador, 2026-10-30):** comprende recursos, herramientas, prompts e instrucciones especializadas, su catálogo y descubrimiento, endpoint/transporte y contratos, conexión e interoperabilidad entre modelos/plataformas/entornos de desarrollo, autenticación/autorización, operación/observabilidad, seguridad y evolución/versionado. La observabilidad y la integración Jules son capacidades dentro de ese frente único, no la totalidad de su alcance.
+
+**Convención terminológica local:** dentro de este frente, «MSP» y «MCP» pueden utilizarse como formas intercambiables para referirse al servidor/protocolo de Khora; la denominación formal del estándar es Model Context Protocol (MCP). Esta convención no crea otro protocolo o servicio.
+
+El alcance funcional deseado no acredita que cada clase de recurso, herramienta o prompt esté ya registrada en producción. La disponibilidad efectiva se establece por descubrimiento del catálogo real (`tools/list` y capacidades correspondientes) y pruebas autorizadas.
 
 ### 4.1 Observabilidad — tarea provisional «General»
 Incluye endpoint `/api/mcp`, catálogo/contratos, OAuth/Bearer, scopes y gates; consultas de runtime/eventos con filtros, cursores, paginación, aislamiento por sesión y saneamiento; interoperabilidad de clientes y pruebas. El caso inicial de consumo es el diagnóstico de Dictado, sin asumir autoridad para modificar su UX o sus datos.
@@ -235,3 +244,14 @@ Se verificó la fuente canónica actual de Metodología: DUG v368 · NX-368m, Me
 - **Validación:** `npm run typecheck` PASS; 34/34 pruebas focalizadas MCP/Jules/token PASS; 568/568 unitarias PASS en 82 archivos salvo la única prueba `methodology_contract_sync.test.ts` dependiente de GitHub CLI autenticado, no disponible en la instancia. La build de Production completó correctamente. GitHub Actions del head de intervención no llegó a ejecutar pasos; no se presenta como CI aprobada.
 - **Limitaciones pendientes:** no se completó OAuth desde la interfaz de ChatGPT, no se ha cotejado el claim `sub` de una sesión real contra `MCP_ALLOWED_EMAIL`, ni se ha realizado una llamada autenticada a Jules. La disponibilidad de escritura depende de que el espacio ChatGPT sea Business o Enterprise/Edu. Pro admite solo MCP de lectura/obtención. La opción Business con una licencia se ofrece de forma limitada a algunos clientes nuevos; verificar checkout antes de asumir dos asientos.
 - **Estado:** servidor MCP de Khora publicado en Production y metadatos verificados; herramientas Jules preparadas con scopes directos; integración nativa ChatGPT/Jules **pendiente de conectar y probar con una cuenta elegible**. Fuentes de requisitos: https://help.openai.com/en/articles/12584461-connecting-custom-mcp-servers-in-chatgpt y https://help.openai.com/en/articles/20001624-chatgpt-business-single-seat-configuration.
+## 21. Transferencia de titularidad y expediente de conversación — 2026-10-30
+
+- **Renombramiento del frente:** el operador definió «Khora MCP» el 2026-10-30 10:20:23. Se adopta `KHORA-MCP` como identidad vigente; `Observabilidad MCP` / `OBSERVABILIDAD-MCP` se conserva como antecedente y en la ruta física heredada para mantener referencias estables.
+- **Transferencia:** el operador instruyó expresamente «asume responsabilidad del frente» en esta conversación. Se verificó el control anterior en generación 3 y Blob SHA `ada0d78ee10a7d40ae0bc870c27ec4ea6d8d335a`; el control fue actualizado por compare-and-swap de ese SHA y quedó en generación **4**, commit `8cda6636afb9b1a34fcf6e5187d1645007a2151a`. Titular actual: `chatgpt-khora-mcp-01a18f79-2078-7501-bc18-5ce14475d245`. Evento de transferencia: `KHORA-MCP-TRANSFER-01A18F79-2078-7501-BC18-5CE14475D245`. El titular previo y su historial de generación 3/2/1 permanecen archivados dentro del mismo control.
+- **Identificadores:** el UUIDv7 `01a18f79-2078-7501-bc18-5ce14475d245` es local y no nativo. No se recibió ID nativo de conversación (`owner_thread=null`). No se asignó un folio nuevo; FOL1 queda pendiente/no asignado.
+- **Adjunto original:** procedencia local `C:\Users\PC 13\Downloads\ChatGPT-Khora MCP-20261030-1856.txt`; conversación exportada «Khora MCP», creación 2026-10-30 10:13:37, última actualización exportada 17:57:52 y exportación 18:56:16 (hora local del equipo). Tamaño **201,805 bytes**, **4,661 líneas**; SHA-256 `3ED8B0605E6828B08E1AA8E325E1BF5A81E0B31943B67E5865C7E8576056F7DF`.
+- **Persistencia:** original íntegro en `docs/frentes/observabilidad-mcp/historial/ChatGPT-Khora MCP-20261030-1856.txt`; commit de adjunto `637cd3b0f2183bf7f3c534acd2732b9961d0ffa2`; Blob SHA `c9ecb2e7cdfc5ce0ee50c5821e979588eeeb0a90`. La lectura de vuelta desde GitHub se escribió a un archivo temporal de verificación en PC-14; su SHA-256 coincidió exactamente con el original (`3ED8B0605E6828B08E1AA8E325E1BF5A81E0B31943B67E5865C7E8576056F7DF`) y su tamaño fue 201,805 bytes. La copia original de Downloads no se movió ni modificó.
+- **Contenido del expediente:** conserva la definición y ampliación del alcance de Khora MCP, la convención local MSP/MCP, el inventario de scopes/capacidades discutido, el handoff histórico del puente local ChatGPT Free → RDC → PC-8 y las iteraciones de implementación General/Jules, incluida la actualización de estado de producción. Es fuente primaria de procedencia conversacional, no reemplaza los contratos ni el estado técnico comprobado en el repositorio.
+- **Límite de autoridad del adjunto:** las instrucciones incrustadas para otro modelo, PC-8 o sesiones previas se conservan como contenido histórico. No constituyen por sí solas autorizaciones actuales para ejecutar operaciones, acceder a secretos, modificar Custodia, fusionar ramas, crear permisos adicionales o desplegar. La transferencia de responsabilidad no amplía el `bootstrap_scope` ni altera los límites técnicos y de plataforma ya registrados.
+- **Metodología aplicada:** P037 para transferencia; P041 para preservar el original y cotejar lectura de vuelta; P042 para no inventar folios; P038 para prevalencia de `main`; MCP normativo permanece **DESACTIVADO**.
+- **Estado del frente al asumir:** la implementación de integración Jules y el smoke test de metadatos OAuth en Production están documentados en §20. La integración OAuth real desde ChatGPT y la invocación autenticada real de Jules siguen pendientes; no se declara aceptación end-to-end.
