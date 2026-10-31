@@ -27,3 +27,13 @@ SHA-256 del archivo JSONL: 8a5f2ea2ed6c2ddf76d5d4bbe3758dd6dde638df68fef026df346
 - La salida visible de este ciclo se conserva en `HARMONIA-CICLO-SES-20261028-P9K4R7M2-20261029-salida.md`, blob `57ee1413b1c916b260daeb8e6c6c88bf16ceb581`, cotejada por lectura de vuelta.
 - La crónica correspondiente está en `../cronica/HARMONIA-CICLO-SES-20261028-P9K4R7M2-20261029.md`, blob `c130054921f6892250cb6713d2a373bfbc8532ba`, cotejada por lectura de vuelta. Conserva el entorno observado, los intentos fallidos, los límites y el siguiente checkpoint.
 - La salida y la crónica diferencian hechos observados de código leído, fixtures sintéticas y pruebas no ejecutadas. No contienen secretos, tokens ni razonamiento interno.
+
+
+## Exportación de conversación · ChatGPT-HARMONIA-20261030-1915.txt
+
+- Original recuperado por RDC del dispositivo PC-14, UUID `f28d6a64-9e51-4ef2-8071-9145a43f7680`, ruta local `C:\\Users\\PC 13\\Downloads\\ChatGPT-HARMONIA-20261030-1915.txt`. El inventario RDC identificó el dispositivo por UUID. Windows informó usuario `PC 13` y perfil `C:\\Users\\PC 13`; SID **NO VERIFICADO**.
+- Metadatos del encabezado del exportador: conversación HARMONIA; creada `2026-10-30 11:31:55`, actualizada `2026-10-30 19:14:28`, exportada `2026-10-30 19:15:45`; liga de origen `https://chatgpt.com/c/6ae4d48b-5a6c-83e8-8dc6-bfd364a71a5f`. Estos datos se atribuyen al exportador y no constituyen verificación independiente de acceso al hilo.
+- Archivo local: 196,509 bytes; 3,928 líneas; SHA-256 `076D8B11BBCA127D537FD4B79011878D9BBECBE58DEC835AA211CCBEC558F27B`. Git blob SHA-1 calculado directamente sobre los bytes locales: `70663c69e8431e95b3550573f2cf7f968c673d98`.
+- Ubicación canónica en `main`: `docs/frentes/harmonia/originales/ChatGPT-HARMONIA-20261030-1915.txt`; commit de incorporación `97c4e5c56e6db0cef144cfdf0542138efd67f7a6`; blob Git SHA-1 de lectura de vuelta `70663c69e8431e95b3550573f2cf7f968c673d98`. El blob coincide con el SHA-1 del archivo binario original: **transferencia byte a byte verificada**. La lectura de vuelta también dio 3,928 líneas, 188,883 caracteres y coincidencia textual exacta.
+- El mismo original se conserva también en la rama de trabajo de la PR #346 para evitar divergencias al revisar esa rama; el hash Git del objeto es idéntico. La referencia canónica es esta ruta en `main`.
+- Naturaleza: original documental de conversación para continuidad del frente; no es telemetría, no es fuente normativa y no sustituye el OCP. Se conservan las entradas y salidas visibles exportadas como antecedentes; las afirmaciones de trabajo del modelo requieren su propia evidencia canónica antes de considerarse estado actual.
