@@ -1,5 +1,6 @@
+import { fetchStoredObject } from "@/lib/server/object-storage";
 // @l0 L0-002-R · @req FIX-DICTADO/D2-D8 · @req TRACE-SESSION/010
-import { put } from "@vercel/blob";
+import { putEncryptedObject as put } from "@/lib/server/object-storage";
 import { NextResponse } from "next/server";
 import { createHash } from "crypto";
 import { cifrarBytes, descifrarBytes } from "../../../lib/server/cripto";
@@ -77,7 +78,7 @@ export async function POST(req: Request) {
     // Tras escribir el blob, una falla de verificación lo deja en cuarentena:
     // se conserva el localizador, pero nunca se declara ni registra como verificado.
     try {
-      const verificacion = await fetch(subido.url, { cache: "no-store" });
+      const verificacion = await fetchStoredObject(subido.url, { cache: "no-store" });
       if (!verificacion.ok) {
         return NextResponse.json(
           {
@@ -179,6 +180,7 @@ export async function POST(req: Request) {
       }
 
     return NextResponse.json({
+      sessionId:String(sesionId).trim(),partIndex,
       url: subido.url,
       bytes: crudo.length,
       cifrado: true,
