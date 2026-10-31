@@ -172,7 +172,21 @@
     "authorization_ref": "Autorización expresa del operador en esta conversación, 2026-10-30: «ChatGPT-Khora MCP-20261030-1856.txt usa rdc local para ir a downloads y adjuntar este texto a persistencia documental de frente Khora MCP, y asume repsonsabilidad del frente».",
     "source_control_blob_sha": "ada0d78ee10a7d40ae0bc870c27ec4ea6d8d335a",
     "attachment_commit_sha": "637cd3b0f2183bf7f3c534acd2732b9961d0ffa2",
-    "result": "transfer update submitted; read-back pending",
-    "authorization_scope": "Responsibility transfer for the single Khora MCP front. Does not broaden existing product, infrastructure, deployment, or third-party permissions."
+    "result": "VERIFIED: generación 4, titular nuevo, titular previo archivado y ausencia de ID nativo comprobados mediante lectura de vuelta desde main.",
+    "authorization_scope": "Responsibility transfer for the single Khora MCP front. Does not broaden existing product, infrastructure, deployment, or third-party permissions.",
+    "verification": {
+      "verified_at_local": "2026-10-30T19:03:48-06:00",
+      "transfer_commit": "8cda6636afb9b1a34fcf6e5187d1645007a2151a",
+      "readback_blob_sha": "a649c007ee3ffd38660e11883fdd5f4fd5277e8e",
+      "confirmed": [
+        "generation=4",
+        "owner_alias",
+        "owner_thread=null",
+        "uuidv7_local",
+        "previous_owner generation 3",
+        "previous_control_generation archive",
+        "folio_status=PENDIENTE/NO ASIGNADO"
+      ]
+    }
   }
 }
