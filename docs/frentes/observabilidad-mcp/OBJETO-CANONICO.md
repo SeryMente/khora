@@ -4,7 +4,7 @@
 - Frente único vigente: **Khora MCP**; identidad canónica `KHORA-MCP`.
 - Nombre e identidad histórica: **Observabilidad MCP** / `OBSERVABILIDAD-MCP`. La ruta heredada `docs/frentes/observabilidad-mcp/` se conserva; no se migra ni duplica el OCP o su control.
 - Repositorio: `SeryMente/khora`; OCP único: `docs/frentes/observabilidad-mcp/OBJETO-CANONICO.md`; control único: `docs/frentes/observabilidad-mcp/CONTROL-RESPONSABILIDAD.json`.
-- OCP: **v0.3.7**. Control de responsabilidad: **generación 4**, titular operativo `chatgpt-khora-mcp-01a18f79-2078-7501-bc18-5ce14475d245`.
+- OCP: **v0.3.8**. Control de responsabilidad: **generación 4**, titular operativo `chatgpt-khora-mcp-01a18f79-2078-7501-bc18-5ce14475d245`.
 - La plataforma no expuso un identificador nativo de conversación: `owner_thread` permanece `null`. UUIDv7 local de continuidad: `01a18f79-2078-7501-bc18-5ce14475d245`; no es un ID nativo.
 - Folio nuevo de conversación: **PENDIENTE / NO ASIGNADO**; FOL1 no ha sido cotejado ni activado. Se conserva el folio anterior en la generación archivada.
 - Las tareas provisionales «General» y «Jules» pertenecen a este mismo frente; no crean OCP, frente ni control paralelos.
@@ -22,7 +22,7 @@ Leer README, DUG vigente, este OCP y `CONTROL-RESPONSABILIDAD.json`. La titulari
 **Interpretación operativa separada:** el repositorio denomina MCP al servidor/protocolo y herramientas de Khora; «MSP» se conserva en la cita original. El frente cubre el acceso de modelos/agentes autorizados a observabilidad y la integración controlada con Jules.
 
 ## 3. Referencia metodológica
-- DUG consultado en `SeryMente/metodologia/main`: **Samantha v372 · NX-372m**; HTML canónico Blob SHA `28d0f255cdb3371a60310b0da45ca049dea05fdb`; último commit de `main` verificado `f225fc521b4c7ba77db7570dd3c3a035438ea9b9` (`2026-10-31T01:02:35Z`, UTC; `2026-10-30 19:02:35` America/Mexico_City). Metacanon **1.26**; GOW **2.14**.
+- DUG consultado en `SeryMente/metodologia/main`: **Samantha v373 · NX-373m**; HTML canónico Blob SHA `cac4525de77d4f47a8a59c25201968ecf2056b90`; commit metodológico más reciente observado `f74082148d28b575c232e8fc291607bef8861794` (`2026-10-31T02:52:13Z`, UTC). Metacanon **1.26**; GOW **2.14**. §ARR releído en esta sesión.
 - CNP vigente (categoría A): P001, P004, P005, P038 y P043; consideración explícita en cada turno. MCP normativo: DESACTIVADO.
 - Fuente normativa: `SeryMente/metodologia/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html`.
 - MCP-NORMATIVO: **DESACTIVADO**. No debe confundirse con el servidor MCP de producto Khora.
@@ -255,57 +255,85 @@ Se verificó la fuente canónica actual de Metodología: DUG v368 · NX-368m, Me
 - **Metodología aplicada:** P037 para transferencia; P041 para preservar el original y cotejar lectura de vuelta; P042 para no inventar folios; P038 para prevalencia de `main`; MCP normativo permanece **DESACTIVADO**.
 - **Estado del frente al asumir:** la implementación de integración Jules y el smoke test de metadatos OAuth en Production están documentados en §20. La integración OAuth real desde ChatGPT y la invocación autenticada real de Jules siguen pendientes; no se declara aceptación end-to-end.
 
+## 22. Puente local Jules por RDC con OAuth de Khora — actualización 2026-10-31
 
-## 22. General — cierre técnico de herramientas MCP para Custodia — 2026-10-30
+### 22.1 Instrucciones directas del operador
 
-**Alcance de la intervención:** completar en la tarea provisional General la infraestructura MCP necesaria para CUSTODIA-01, CUSTODIA-03 y CUSTODIA-04. Khora MCP conserva la responsabilidad de la interfaz, contratos y autorización MCP; no asume la titularidad de Custodia ni modifica su OCP, control, tareas, sesiones, checkpoints o blobs.
+> Por lo que veo no vamos a poder utilizarlo en la versión gratuita, ¿verdad? Si es así, que funcione con RDC. Existe un ámbito de la metodología llamado entorno persistente, que va a permitir disponer de carpetas de trabajo canónicas en el escritorio o la carpeta escritorio de la sesión del usuario de la sesión de Windows de la sesión de entorno persistente actual. Esas carpetas de trabajo pueden servir para que construyas alguna suerte de MSP local que pueda ser accedido mediante RDC para que podamos circunnavegar las limitaciones de la versión gratuita de ChatGPT que nos impiden conectarnos directamente al MSP de Jules. Si esa es la opción que tenemos que tener por no tener una versión pagada de ChatGPT, entonces resuelve e implementa de extremo a extremo, a menos que tengas una mejor idea. Hazlo con agilidad, ya que este frente es el cuello de botella para todo el proyecto general.
 
-### Reconstrucción y reconciliación
+> Una aclaración. Entorno persistente es un ámbito que no está todavía funcionando y no puede ser utilizado como si lo estuviese para resolver este frente urgente. El arreglo que te dije, tómalo en cuenta y establécelo de manera provisional desde el frente de trabajo, de forma que sea compatible con entorno persistente cuando ya quede implementado ese ámbito de la metodología.
 
-- Repositorio: SeryMente/khora. Rama General existente: work/obs-mcp-custodia-tools-20261030-01a18dcb. Head recibido: 55908ab78b4b6f70096d24878a6ddba8ae8dd494.
-- main reconstruido antes de la integración local: d82952a17192787f49b4c804b4ae3ca7847288e0. Merge-base: d6c9911615a3633f6ce38c1b8a2459f1e4823df5. Divergencia inicial recalculada: 41 commits exclusivos de General y 16 exclusivos de main; el handoff 41/7 y SHA c6860f... eran antecedentes obsoletos.
-- Se descargó un clon temporal completo en PC-14, separado del clon concurrente Jules (feat/mcp-jules-clean-main-20261030). Se reconcilió localmente main dentro de General. En los conflictos compartidos se preservó la versión de main para ruta MCP, OAuth, UI, contratos y fixtures de Jules; se mantuvo el módulo Custodia de General y se reinsertaron sus tres registros. Las siete herramientas, política de propietario y ACL Jules de main no se sustituyeron.
-- Merge commit local en General: `e0e044af77eb1470a8c6fa01bf83778876e73c41`; padres `55908ab78b4b6f70096d24878a6ddba8ae8dd494` (General) y `d82952a17192787f49b4c804b4ae3ca7847288e0` (main). La rama queda 42 commits ahead / 0 behind respecto de `origin/main`, con merge-base `d82952a17192787f49b4c804b4ae3ca7847288e0`.
-- El head remoto de General fue cotejado antes de publicar y permanecía en `55908ab78b4b6f70096d24878a6ddba8ae8dd494`; el avance local es fast-forward. La publicación se limita a esta misma rama. No se abrió PR, no se fusionó en main, no se desplegó y no se ejecutaron escrituras productivas. El clon original Jules no se modificó.
+> La sesión local activa de RDC es la única disponible y es la que debes usar. Cualquier trabajo previo local se habrá perdido.
 
-### Implementación de las tres herramientas
+> El paso de obtener el bearer debe de ser hecho que no sea manual, yo no debo de tener que hacer eso, si una plataforma tiene acceso MCP a Khora, debe de poder obtener acceso al ámbito de Jules del MCP para desarrollo, para eso le di el acceso.
 
-1. khora_custodia_catalogo: universo paginado por COALESCE(custodia_owner, checkpoint_usuario, linked_archive_owner) comparado con el sujeto autenticado. La consulta de cada página calcula en una sola sentencia su total, página y huella del universo. El cursor HMAC se vincula a tipo, actor, clave de orden y huella; un cambio entre solicitudes detiene la continuación con error explícito. La detección de deriva no se presenta como una transacción/snapshot que abarque varias solicitudes. Incluye sesiones incompletas, enlazadas a volcado, sin checkpoint y sin partes; excluye contenido privado.
-2. khora_custodia_revisiones: comprueba primero la pertenencia de la sesión; pagina por creado_en y revision_id; distingue savedAt (persistencia del servidor) y clientAt (reloj del cliente). Resume manifiesto, filas, índices faltantes y marcas de verificación almacenadas; no devuelve snapshots ni transcripciones. recordedVerifiedParts no equivale a verificación física actual.
-3. khora_custodia_verificar_integridad: usa el manifiesto explícito corteAudio.hastaParte para recorrer índices 1-based y hacer LEFT JOIN contra las filas reales. Detecta ABSENT_FROM_TABLE; distingue referencia Blob ausente, 404, mismatch de longitud/SHA-256 y errores no verificables. Para snapshots históricos sin manifiesto, informa LEGACY_INFERRED cuando procede o deja el universo declarado como desconocido. despues_de_parte continúa por índice; extras/índices anómalos quedan señalados. No entrega URL Blob ni bytes.
-- leerBlobVerificado() restringe HTTPS/host Blob permitido, rechaza redirects, aplica timeout y límite de tamaño, descifra, verifica bytes/SHA-256 y limpia buffers temporales también en caminos de error. La respuesta no incluye audio, Base64, snapshots, texto dictado ni secretos.
+> Nunca usaré comandos manuales, para eso tienes RDC.
 
-### Autorización e integración con el servidor único
+### 22.2 Decisión vigente
 
-- Se conservan 27 herramientas: 16 Khora existentes, siete Jules y tres Custodia; las herramientas Jules y su contrato actual permanecen intactos.
-- khora_custodia_catalogo y khora_custodia_revisiones requieren custodia:metadata:read; khora_custodia_verificar_integridad requiere custodia:integrity:verify. Las tres requieren adicionalmente norm:turn mediante gatedTool. Ninguno de los scopes Custodia se incorpora a DEFAULT_SCOPES.
-- Los dos scopes se admiten en tools/list/schemas, metadata OAuth, consentimiento, token endpoint, tokens manuales y selector de UI. tools/list oculta la capacidad si falta scope especializado o norm:turn; las pruebas negativas verifican esa compuerta.
-- Se agregó db/migrations/034_custodia_mcp_read_contract.sql y se registró en scripts/migrate-runtime.mjs. La migración idempotente asegura las tablas base de sesión/partes, checkpoint y MP3, además de las columnas extendidas de audio, incluida estado_verificacion. Prepara la compatibilidad de instalaciones que no hayan ejecutado antes la inicialización dinámica de Dictado. La migración solo está escrita en esta rama; no se aplicó a Neon ni Production.
+Se adopta un cliente MCP local de transporte estándar por stdin/stdout, iniciado y operado por ChatGPT mediante la sesión RDC autorizada. El cliente se autentica ante Khora Production mediante OAuth 2.1 Authorization Code + PKCE, usando la identidad real del propietario. No crea un segundo servidor MCP local, no abre un puerto de escucha permanente y no copia credenciales del navegador.
 
-### Evidencia local del corte
+Se descarta como flujo vigente la provisión manual de un Bearer. El diseño inicial de PR #347 que pedía generar un token manual, copiarlo, pegarlo en PowerShell y ejecutar Setup no cumple las instrucciones del operador. Se conserva como antecedente del historial, no como procedimiento de instalación.
 
-- Clon temporal PC-14: C:\Temp\khora-general-mcp-custodia-20261030-full; el clon de Jules C:\Users\PC 13\Desktop\Khora\khora-main permanece sin modificar.
-- Pruebas focalizadas MCP/Custodia/Jules/OAuth/migración: 58/58 PASS, 0 fallos, 0 omitidas.
+La cuenta propietaria admitida por MCP_ALLOWED_EMAIL recibe jules:read y jules:write directamente desde la política de Khora, sin grants manuales por repositorio ni por rama y sin requerir norm:turn como permiso auxiliar para las herramientas Jules. La autorización sigue vinculada a la identidad autenticada y a la cuenta Jules configurada en el servidor; no concede acceso a otra cuenta ni amplía los recursos que Jules realmente expone. Los demás sujetos conservan ACL exacta y fail-closed.
+
+Consentimiento OAuth: el cliente puede registrar dinámicamente su cliente público y abrir automáticamente el navegador local en la pantalla oficial de autorización de Khora. El propietario debe confirmar expresamente el consentimiento mostrado por Khora para jules:read y jules:write; si no hay sesión, se usa el login normal. Esta confirmación en navegador es la única intervención humana inicial de seguridad. No se solicita al operador crear, transportar, revelar ni pegar tokens, ni ejecutar comandos manuales.
+
+### 22.3 Arquitectura y ciclo de autorización
+
+Flujo:
+
+ChatGPT → RDC → cliente MCP local stdio → OAuth Khora Production → /api/mcp → herramientas Jules → Jules API
+
+1. El cliente crea un servidor HTTP efímero ligado exclusivamente a 127.0.0.1, en un puerto aleatorio no privilegiado, y registra en Khora un cliente público con redirect URI exacta /oauth/callback.
+2. Genera state, code_verifier y code_challenge S256 localmente; abre el navegador a la ruta OAuth de Khora. No lee cookies ni reutiliza credenciales fuera de OAuth.
+3. Khora coteja la sesión autenticada contra MCP_ALLOWED_EMAIL y presenta el consentimiento de los scopes. El callback verifica el peer loopback, Host, ruta, state, issuer y código de un solo uso.
+4. El intercambio de código se realiza en /api/oauth/token con PKCE S256 y el resource canónico https://khora-web.vercel.app/api/mcp.
+5. El refresh token rotatorio se cifra con DPAPI CurrentUser. El access token permanece solo en memoria y se renueva antes de expirar; la nueva copia del refresh token se guarda y relee antes de utilizar el access token renovado.
+6. Tras conectar, el cliente verifica tools/list y solo declara ready si están presentes las siete herramientas Jules. ChatGPT envía las solicitudes en JSON por stdin y recibe los resultados por stdout a través de RDC.
+
+La excepción DCR para clientes nativos acepta solamente http://127.0.0.1:<puerto>/oauth/callback, con puerto 1024–65535, sin credenciales, query ni fragmento. Rechaza localhost, IPv6 loopback, LAN, formas numéricas/hexadecimales alternativas de IPv4, puertos privilegiados y rutas diferentes. El servidor temporal no acepta tráfico desde LAN ni permanece abierto después del callback.
+
+### 22.4 Workspace y custodia local provisional
+
+- Sesión RDC observada: PC-14, Windows PC-14\PC 13; workspace provisional recién materializado en C:\Users\PC 13\Desktop\Khora\khora-main.
+- El estado local anterior se considera perdido según la instrucción del operador; esta ruta es la única copia de trabajo local de este ciclo.
+- Cliente: khora-web\tools\jules-rdc-bridge\bridge.mjs.
+- Lanzador controlado por RDC: khora-web\tools\jules-rdc-bridge\jules.ps1; el usuario no tiene que ejecutar comandos.
+- Custodia del refresh token: .khora-local\jules-rdc-bridge\oauth-refresh.dpapi, excluida de Git, cifrada con DPAPI CurrentUser y ACL restringida a la cuenta Windows activa y SYSTEM. La escritura realiza lectura de vuelta del ciphertext y cotejo del JSON descifrado.
+- Los access tokens no se guardan en archivo ni se emiten a stdout/stderr; solo se mantienen en memoria. La credencial DPAPI contiene client ID público y refresh token OAuth, nunca JULES_API_KEY.
+- JULES_API_KEY permanece exclusivamente en Khora Production. El cliente local no consulta ni extrae secretos del navegador, Vercel, GitHub o Khora.
+- Cambiar de perfil Windows o equipo invalida la capacidad de descifrar el refresh token; se requerirá un nuevo consentimiento OAuth.
+- Esta ubicación es provisional y no declara operativo OEP/Entorno Persistente. Cuando OEP se implemente se podrá reubicar el workspace conforme a su contrato, sin presentar esta carpeta como entorno cifrado integral.
+
+### 22.5 Capacidades y límites del puente
+
+- Siete herramientas MCP: jules_list_sources, jules_list_sessions, jules_get_session, jules_list_activities, jules_create_session, jules_send_message y jules_approve_plan.
+- Paginación, límites de tamaño, validación de identificadores, rutas de fuentes, rama inicial y SHA-256 del plan antes de la aprobación.
+- El cliente no introduce otra API key Jules, no crea ACL por repositorio para el propietario, no repite automáticamente POST no idempotentes con resultado ambiguo y no inicia trabajos Jules hasta recibir una petición válida del operador.
+- La aprobación del plan sigue limitada por la API Jules: el proveedor no ofrece precondición atómica plan_id/ETag/If-Match; el doble preflight no se anuncia como transacción ni elimina completamente la ventana de carrera (T22 parcial).
+- RDC es un canal de operación local autorizado, no un bypass de políticas de OpenAI. No convierte el MCP remoto en conector nativo con permisos de escritura para una cuenta ChatGPT que no los tenga; es una vía de cliente local distinta.
+- La disponibilidad, los scopes y las fuentes reales solo se declaran tras consentimiento OAuth, respuesta autenticada de /api/mcp, descubrimiento de las siete herramientas y lectura real de fuentes Jules.
+
+### 22.6 Verificaciones realizadas en PC-14
+
+- Workspace Khora clonado y sincronizado inicialmente con PR #347; merge de dos padres incorporó el main observado y preservó el historial de la sección anterior de este OCP. La rama local es feat/jules-rdc-local-bridge-20261030.
+- npm ci --no-audit --no-fund: PASS, 576 paquetes instalados.
+- node --check tools/jules-rdc-bridge/bridge.mjs: PASS.
+- Parser PowerShell 5.1 para jules.ps1 y credential.ps1: PASS.
 - npm run typecheck: PASS.
 - npm run ui-review:check: PASS.
 - npm run ui:contract: PASS.
-- npm run test:unit: 585 PASS / 586 total. Único caso no ejecutable: methodology_contract_sync.test.ts, que invoca gh api; el proceso terminó spawnSync gh ENOENT porque GitHub CLI no está instalado/disponible en el entorno. No se registra como prueba aprobada ni como fallo funcional de Custodia.
-- Build local directo Next.js 16.4.0 next build --webpack: código 0, TypeScript completado y 78/78 páginas generadas. Usó AUTH_SECRET efímero solo en el proceso local. Advertencias no bloqueantes ya observadas en el proyecto: middleware deprecado y APIs Edge Runtime en dependencias (process.cwd, CompressionStream/DecompressionStream).
-- npm ci: 576 paquetes instalados; auditoría informó 29 advisories (19 moderate, 9 high, 1 critical). No se ejecutó npm audit fix, no se elevaron dependencias y no se aprobaron scripts pendientes de instalación.
-- Las lecturas Blob de tests usan bytes cifrados sintéticos y mocks HTTP; las pruebas MCP utilizan el servicio local/fixture SQL. No se conectó a DB/Blob de producción ni se hizo prueba autenticada productiva.
+- npm run test:unit: 572/572 PASS.
+- Callback DCR: pruebas de allowlist loopback y rechazos de alias, IPv6, LAN, IP numérica/hexadecimal, puertos privilegiados, path/query y metadatos alterados: PASS.
+- DPAPI con refresh token exclusivamente sintético: almacenamiento, descifrado, read-back y Status PASS; archivo de prueba eliminado. No se guardó una credencial real.
+- .khora-local está excluido por .gitignore.
+- npm run build local: PASS, Next.js 16.4.0 compiló y generó 78/78 páginas; el prebuild ejecutó typecheck, UI Review, contrato de navegación y 572/572 unitarias. El primer intento sin AUTH_SECRET se detuvo al recopilar rutas; el build completo posterior usó únicamente una clave aleatoria efímera de prueba en el entorno del proceso, no persistida ni desplegada, y la variable fue eliminada al terminar. No se descargaron ni copiaron secretos de Vercel Production; los archivos temporales de entorno se eliminaron.
+- Vercel reconoce el proyecto khora-web (prj_hRN86BKITXYKTnNlp0ygVhaMwFfx) en el team victorhugotorresmendez-8991s-projects. La rama debe validarse mediante un Preview construido en el entorno remoto de Vercel, que posee sus variables de entorno, antes de fusionar/desplegar.
+- No se realizó autorización OAuth real, no existe refresh token de operador en DPAPI, no se ha confirmado tools/list con credencial real, no se ha consultado aún el catálogo real de fuentes Jules y no se ha creado una sesión Jules.
 
-### Estado de integración y aceptación
+### 22.7 Estado y siguiente compuerta
 
-- Implementado localmente en la rama General: sí.
-- Probado localmente: sí, dentro de la evidencia anterior y con el caso externo gh expresamente pendiente.
-- Listo para revisión técnica de integración: sí, sujeto a esa limitación y a la revisión de esta iteración.
-- Integrado en main: no.
-- Migración 034 ejecutada en DB: no.
-- Desplegado / descubierto por tools/list en Production: no verificado; no afirmar disponibilidad productiva.
-- Invocable desde un cliente autenticado real: no verificado.
-- Aceptado por Custodia: no; corresponde a su titular evaluar y ejecutar las consultas con sus propios controles.
-- Datos de producción: sin modificaciones ni lecturas de audio/snapshot/blob en este ciclo.
+Implementación local, 572/572 pruebas y build de producción local con 78/78 páginas: PASS. Preview remoto de la rama: PENDIENTE; no se ha desplegado Production ni realizado consentimiento OAuth real o aceptación end-to-end.
 
-El incidente reportado después de la última entrada visible del 28 de octubre de 2026 a las 17:08 se mantiene literalmente, sin zona horaria inferida. Ninguna de estas pruebas permite declarar que una captura se recuperó o se perdió definitivamente.
-
-**Siguiente compuerta prioritaria:** terminar la reconciliación local, revisar el diff final, publicar únicamente la actualización de la rama General (sin PR ni merge a main) tras comprobar que su referencia remota no cambió; después solicitar revisión técnica de ChatGPT/Custodia antes de otra iteración.
+Siguiente secuencia controlada por ChatGPT mediante RDC y herramientas conectadas: terminar la verificación de diff/OCP; publicar la rama y actualizar PR #347; generar Preview remoto con la configuración real de Vercel; comprobar build y endpoints OAuth/DCR; integrar a main y desplegar Production solo tras el Preview correcto; iniciar el puente por RDC; obtener consentimiento OAuth del propietario en el navegador; verificar tools/list y una lectura real de fuentes/sesiones Jules. La autorización humana no se reemplaza por extracción de sesión ni por emisión manual de Bearer. No se crea ni aprueba una tarea Jules real durante el smoke test de lectura.

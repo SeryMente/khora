@@ -155,6 +155,60 @@
       "resource_boundary": "The owner can act only on sources and branches returned by the Jules account configured through JULES_API_KEY; source/branch existence and session context are still validated against Jules. No ACL rows or manual per-repository grants are needed for this single owner.",
       "additional_subjects": "Every other subject remains subject/source/branch/capability exact and fail-closed in khora_private.jules_source_acl.",
       "normative_gate": "Jules tools require their own read/write scopes but do not require norm:turn; Khora normative tools retain their existing norm:turn contract."
+    },
+    "rdc_bridge": {
+      "authorization_ref": "Instrucciones expresas del operador en esta conversación, 2026-10-30: habilitar Jules desde ChatGPT Free mediante RDC y materializar el arreglo provisional en el workspace del frente, compatible con OEP futuro; aclaración expresa de que OEP todavía no opera y no debe usarse como si estuviera activo.",
+      "implementation_branch": "feat/jules-rdc-local-bridge-20261030",
+      "workspace_current_windows_profile": "Desktop/Khora/khora-main",
+      "workspace_future_oep_destination": "Desktop/EP/KHORA",
+      "current_ep_status": "NOT_MATERIALIZED; do not claim VHDX, BitLocker or EP cleanup",
+      "transport": "RDC-controlled local stdio MCP client over HTTPS to https://khora-web.vercel.app/api/mcp; no local listener or port",
+      "runtime_files": [
+        "khora-web/tools/jules-rdc-bridge/bridge.mjs",
+        "khora-web/tools/jules-rdc-bridge/jules.ps1",
+        "khora-web/tools/jules-rdc-bridge/README.md"
+      ],
+      "scopes": [
+        "jules:read",
+        "jules:write"
+      ],
+      "jules_api_key_location": "Vercel Production only; never materialize JULES_API_KEY on the Windows host",
+      "local_credential": ".khora-local/jules-rdc-bridge/bearer.dpapi",
+      "credential_protection": "Windows DPAPI CurrentUser, directory ACL restricted to the current Windows SID and SYSTEM; .khora-local/ gitignored; profile/host change requires re-provision",
+      "tool_actions": [
+        "sources",
+        "sessions",
+        "get",
+        "activities",
+        "create",
+        "message",
+        "approve",
+        "shutdown"
+      ],
+      "owner_policy": "MCP_ALLOWED_EMAIL owner receives Jules read/write and automatic plan approval for created sessions; all additional subjects retain exact ACL, fail-closed and manual plan approval",
+      "no_bypass": "No ChatGPT plan entitlement bypass, no Google/Jules/GitHub permission escalation, no local service listener, no session cookie or provider API key extraction",
+      "validation": {
+        "node_syntax": "PASS",
+        "powershell_51_parse": "PASS",
+        "bridge_contract_cases": "8/8 PASS",
+        "dpapi_acl_dummy_roundtrip": "PASS; fake credential removed",
+        "invalid_bearer_production_negative": "Expected MCP_AUTH_REJECTED",
+        "typecheck": "PASS on the current implementation branch",
+        "focused_mcp_jules_token_tests": "35/35 PASS",
+        "unit_tests": "569/569 PASS; 82 files; methodology_contract_sync.test.ts excluded because the current local instance lacks authenticated gh",
+        "npm_install": "576 packages; audit reports 14 advisories (4 moderate, 9 high, 1 critical), not remediated here",
+        "real_authenticated_jules_calls": "PENDING operator provisioning of the single Khora Bearer",
+        "review_gate": "PR pending; no merge or Production deploy authorized before the operator reviews the owner auto-plan-approval diff"
+      },
+      "pull_request": {
+        "number": 347,
+        "url": "https://github.com/SeryMente/khora/pull/347",
+        "state": "open",
+        "merged": false,
+        "review_required": "Operator security review of owner auto-plan-approval policy and Windows DPAPI launcher before merge.",
+        "base_main_sha": "9570247339c99cf194c434d2b726493d8abd69b4",
+        "branch_head_at_open": "9ce965a8169a8cd932b176f4ecd92fb7bf9e17d8"
+      }
     }
   },
   "legacy_identity": "OBSERVABILIDAD-MCP",

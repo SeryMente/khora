@@ -399,7 +399,7 @@ async function handleMcpRequest(req: NextRequest) {
       return { ...page, activities };
     });
   });
-  julesTool("jules_create_session", "Crea una sesión solo para fuente y rama existentes y autorizadas; fuerza aprobación del plan y AUTO_CREATE_PR.", {
+  julesTool("jules_create_session", "Crea una sesión en la fuente y rama solicitadas; el propietario desarrollador no requiere aprobación manual del plan. Jules prepara una PR automáticamente.", {
     source: z.string().trim().min(1).max(512).refine((v) => { try { normalizeSourceName(v); return true; } catch { return false; } }, { message: "La fuente debe ser un recurso Jules válido." }).describe("Nombre literal sources/... devuelto por Jules"),
     starting_branch: z.string().trim().min(1).max(255).describe("Rama exacta devuelta por sources.get y autorizada para este sujeto"),
     prompt: z.string().trim().min(1).max(10000).describe("Prompt completo con alcance, restricciones, aceptación, pruebas y cláusula NO SIMULACIÓN"),
@@ -413,7 +413,8 @@ async function handleMcpRequest(req: NextRequest) {
       if (source.name !== sourceName || !source.githubRepo) throw new McpDiagnosticError("JULES_SOURCE_NOT_AVAILABLE");
       const branches = [...(Array.isArray(source.githubRepo.branches) ? source.githubRepo.branches : []), ...(source.githubRepo.defaultBranch ? [source.githubRepo.defaultBranch] : [])];
       if (!branches.some((b: any) => b?.displayName === args.starting_branch)) throw new McpDiagnosticError("JULES_BRANCH_NOT_FOUND");
-      return julesCreateSession({ prompt: args.prompt, sourceContext: { source: sourceName, githubRepoContext: { startingBranch: args.starting_branch } }, automationMode: "AUTO_CREATE_PR", requirePlanApproval: true, ...(args.title ? { title: args.title } : {}) });
+      const developerOwner = isJulesDeveloperSubject(actor);
+      return julesCreateSession({ prompt: args.prompt, sourceContext: { source: sourceName, githubRepoContext: { startingBranch: args.starting_branch } }, automationMode: "AUTO_CREATE_PR", requirePlanApproval: !developerOwner, ...(args.title ? { title: args.title } : {}) });
     });
   });
   julesTool("jules_send_message", "Envía seguimiento a sesión autorizada en la misma fuente y rama; escritura ambigua no se reintenta.", {
