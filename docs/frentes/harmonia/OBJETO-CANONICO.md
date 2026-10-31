@@ -4,7 +4,7 @@
 ## 1. Control e identidad
 
 - Nombre normalizado: **Harmonia**, extensión compañera de **Khora**; «Armonía» y «Cora» de los dictados se conservan literalmente en originales. No renombrar producto o repositorio por transcripción.
-- Identificador del frente: harmonia. Versión del objeto **0.36**; sello **HARMONIA-v0.36**; corte de estado **2026-10-30**. §37 conserva el checkpoint histórico del dispositivo anterior; §39 documenta el entorno efímero inicialmente inspeccionado y §40 registra la materialización local-first del candidato. §41 conserva la persistencia provisional anonimizada Harmonia → Cora y los límites de aceptación de PR #346. §42 registra la transferencia a generación 10 y el original de conversación archivado en `main`. La tarea de inicio automático no se creó; Chrome permanece intacto y la aceptación natural continúa pendiente. Regla permanente §36.1-36.2: la única aceptación local es el uso real del operador; el asistente ejecuta todo lo demás.
+- Identificador del frente: harmonia. Versión del objeto **0.36**; sello **HARMONIA-v0.36**; corte de estado **2026-10-30**. §37 conserva el checkpoint histórico del dispositivo anterior; §39 documenta el entorno efímero inicialmente inspeccionado y §40 registra la materialización local-first del candidato. §41 conserva la persistencia provisional anonimizada Harmonia → Cora y los límites de aceptación de PR #346. §42 registra la transferencia a generación 10 y el original de conversación archivado en `main`. §43 conserva la nueva reproducción local con Node 22, el estado de CI/planes externos y la fusión local RDC pendiente de read-back. La tarea de inicio automático no se creó; Chrome permanece intacto y la aceptación natural continúa pendiente. Regla permanente §36.1-36.2: la única aceptación local es el uso real del operador; el asistente ejecuta todo lo demás.
 - Repositorio propietario: `SeryMente/khora`, rama `main`; objeto canónico en `docs/frentes/harmonia/OBJETO-CANONICO.md`. El blob de la versión anterior v0.4 fue `9a186ea789ea5aacab8dd06cf9f6edf364b89531`. Primera publicación del estado completo: commit `892adad897d6bd36c797ec2343ff7f4893b853bf`; lectura de vuelta en `main` confirmada y blob verificado `03ec5d127e0913dfe1f61e8588ba53b8abaa8e5f`. El recibo se refiere al contenido integral v0.5. Corte v0.6: commit inicial `3cb7901c2223cd41773185b93f17133e459e7a69`, blob `d1f524c383cc71c13f89e8d3aa3886ac3533fcdb`. Corte v0.7: commit inicial `55c2e8ba053265c219b2d941665c5cb3730107de`, blob `bbd08e2da15be17486e7515fd11eda7df57fca2b`; lectura de vuelta y corrección del catálogo documentadas. Nunca anticipar un SHA.
 - Fuente de código vigente: `apps/harmonia-observability/` en `main`, con la extensión de observabilidad y captura automática en evolución (rama `main`, versión de código en revisión E2E), `coverage-catalog.json` y scripts/validador. No inferir que el código fuente, el paquete local y el runtime ejecutado están sincronizados sin prueba de huellas. El paquete materializado en el Escritorio se reconstruyó desde esos archivos y contiene solo el runtime portable y una credencial local excluidos del repositorio; su manifiesto local de huellas se regeneró tras las validaciones.
 - Frente permanente por creación expresa del operador. El paquete local usado anteriormente está en `C:\\Users\\fila4\\Desktop\\Harmonia-Observabilidad-v0.2.0`; su sincronización con las últimas versiones de `main` **NO VERIFICADA**. El runtime debe considerarse desincronizado hasta comparar huellas y reiniciar con el colector actualizado. La versión 0.3.0 del código fuente no está aceptada funcionalmente en Chrome; no hereda pruebas de v0.1.0 ni de validaciones anteriores.
@@ -1549,4 +1549,45 @@ En cada sesión Windows/RDC que corresponda al EP activo:
 - Dispositivo actual observado por UUID: PC-14 `f28d6a64-9e51-4ef2-8071-9145a43f7680`; Node global `v26.13.0`. El workspace temporal histórico `C:\\Users\\PC 13\\AppData\\Local\\Temp\\Harmonia-E2E-PR346-117287d` no existía en esta reentrada. Se observaron 27 procesos de Chrome; no se inspeccionaron ni modificaron perfiles, pestañas o sesiones. No se repitieron pruebas del código sin necesidad, dado que el ciclo actual solo cambió documentación y control.
 - Último punto técnico conservado: suite local 7/7 PASS y E2E simulado; autenticación de sesión Chrome, escritura positiva de prueba, lectura de vuelta Neon, workflows CI y aceptación productiva permanecen pendientes según §41.
 - Continuar la validación de PR #346 desde un workspace temporal nuevo basado en la rama, sin asumir que el workspace anterior persiste. Reconciliar la divergencia de rama antes de merge; preservar datos locales; no enviar contenido conversacional. No declarar aceptación ni release hasta cerrar los gates explícitos de §41.
+
+
+
+## 43. Reentrada RDC, reproducción de CI y diagnóstico de gates · 2026-10-30/31
+
+### 43.1 Identidad y aislamiento del entorno
+
+- Inventario RDC: PC-14 UUID `f28d6a64-9e51-4ef2-8071-9145a43f7680` Online; los demás PC-14 visibles tienen UUID distintos y no se seleccionaron.
+- Identidad Windows verificada en este ciclo: `PC-14\\PC 13`; SID `S-1-5-21-1094932887-1468116028-2730151477-1002`; perfil `C:\\Users\\PC 13`; Escritorio `C:\\Users\\PC 13\\Desktop`.
+- Git `2.56.0.windows.4`; Node global `v26.13.0`. El clon `C:\\Users\\PC 13\\Desktop\\Khora\\khora-main` pertenece a la rama `feat/jules-rdc-local-bridge`, HEAD `cda38145fd74b109703be24b6e3eda4c0998b15a`, limpio y con cambios ajenos. Se dejó intacto.
+- Se creó un clon temporal aislado en `C:\\Users\\PC 13\\AppData\\Local\\Temp\\Harmonia-RDC-G10-PR346`, rama `feat/harmonia-cora-provisional-persistence-20261030`, HEAD `4ef43b4dacb9d230c62f31fe09ee419c3d9d12ae`, exacto a `origin` y limpio en la inspección inicial.
+- Se verificó que `origin/main` avanzó a `4530e03a33c5e1743ab9646eb6c862b3c458c605`; merge-base `c6860f1501419239b4eef540150f934a5e20f2a3`; el compare reportó 37 commits de la rama y 16 commits que faltan desde main. Los commits de main incluyen cambios de Khora MCP/Jules y Custodia; los archivos compartidos en conflicto potencial son principalmente `AGENTS.md`, `README.md` y el núcleo documental de Harmonia, además de cambios de otros frentes.
+
+### 43.2 Reproducción local equivalente a CI
+
+- Runtime portable oficial Node.js `v22.23.4` descargado a `<workspace>\\.runtime\\node-v22.23.4-win-x64`; no se reemplazó Node global.
+- SHA-256 ZIP `cbc74b5e0982c9dbb41525fd8fb5dcd32fbee237863f7829072f4639a1ce5f20`; SHA-256 `node.exe` `dccc52de28d8df2ee22d2062424f8c563070d95d8ad70c54c4bf01d590dec14f`. Ambos cotejados antes de ejecutar.
+- Cuatro archivos principales superaron `node --check`: colector, service worker, remote-sync y popup (**4/4 PASS**).
+- Tres archivos de prueba ejecutados con `node --test --test-reporter=spec apps/harmonia-observability/tests/*.test.js`: **7 tests, 7 PASS, 0 FAIL, 0 SKIP**, exit code 0. Reproducción adicional con Node `v26.13.0`: también 7/7 PASS.
+- La prueba de orquestación usó el service worker y remote-sync reales con Cora simulada: respuesta 401 conserva la outbox, segundo intento 200 permite ACK, UUID estable entre intentos y campos privados fuera del lote remoto. Esto **no** es una escritura de producción ni lectura de Neon.
+
+### 43.3 GitHub Actions y checks externos en el HEAD de la PR
+
+- HEAD consultado `4ef43b4dacb9d230c62f31fe09ee419c3d9d12ae`. Runs recientes: UI Quality `41155242608`, CI `41155242552`, Harmonia persistence `41155242601`, khora-ok gate `41155242563`; todos `failure`.
+- Los siete jobs consultados devuelven listas de pasos vacías; descarga de logs para cada uno devuelve `BlobNotFound`. Las suites no llegaron a ejecutarse en Actions. Causa de falta de runner **NO DETERMINADA**; no atribuir a cuota gratuita sin evidencia.
+- Los cinco contexts Vercel fallidos se vinculan a la cuenta/equipo `victorhugotorresmendez-8991s-projects`, plan **Hobby**. `get_git_deployment_context` identifica `khora-web` enlazado al repositorio privado `SeryMente/khora`; el listado Vercel no devuelve preview para el branch/head consultado. El equipo/proyecto no se cambió: resolverlo exige decisión del titular de cuenta sobre plan/propiedad/conexión de Git.
+- El check Netlify `netlify/fascinating-florentine-abc9fc/deploy-preview` sigue en `failure`. No hay conector Netlify visible en el descubrimiento de plugins y el URL del deployment no es accesible desde la lectura web; causa exacta **NO VERIFICADA**. No asumir que coincide con el bloqueo Vercel.
+
+### 43.4 Reconciliación de rama: estado inconcluso
+
+- Se inició en el clon temporal una operación local de respaldo de rama `backup/harmonia-gen10-pr346-before-main-sync` seguida de `git merge --no-commit --no-ff --no-edit origin/main`.
+- La llamada RDC agotó el tiempo y devolvió resultado indeterminado. Una consulta posterior de sesiones quedó pendiente en el canal remoto. **No se pudo verificar** si el respaldo local se creó, si la fusión empezó, si hay `MERGE_HEAD` o archivos en conflicto. No se invocó push; no hay evidencia de publicación de una fusión.
+- Regla de reentrada: antes de cualquier nueva acción de escritura en ese workspace, comprobar `git status --short --branch`, `git rev-parse -q --verify MERGE_HEAD`, la existencia de la rama backup y `git diff --name-only --diff-filter=U`. No repetir el merge sin resolver primero su estado. El clon principal de Khora y Chrome no se tocaron.
+- PR #346 permanece abierta, `draft=true`, sin merge; HEAD remoto consultado sigue siendo `4ef43b4dacb9d230c62f31fe09ee419c3d9d12ae`. No se actualizaron ni publicaron cambios de la fusión local.
+
+### 43.5 Compuertas aún abiertas
+
+- No se cargó ni recargó la extensión en el Chrome habitual; se observaron 27 procesos de Chrome y se evitó manipular perfiles/sesiones.
+- No se hizo POST positivo autenticado a Cora ni lectura de vuelta de Neon. Se requiere autorización explícita para escribir un evento sintético en producción, dado que `eventos_sistema` es telemetría compartida.
+- La aceptación funcional final requiere navegación natural del operador con la extensión en Chrome; no se sustituye por el harness simulado.
+- Conclusión: la suite local equivalente a CI está reproducida y aprobada. Integración de la rama, gates de proveedor, escritura de Neon y aceptación Chrome siguen pendientes. No merge ni release.
 
