@@ -439,7 +439,7 @@ Después de los cherry-picks, y antes de este último registro OCP, el grafo loc
 
 **Gates remotos y evidencia productiva pendientes**
 
-- Vercel/GitHub: los cinco contextos del commit `370a874ba8253f68cfbf2a11bb44badeb727b035` aparecen en failure y sus destinos apuntan al requisito de upgrade de cuenta `github-private-org-to-hobby`. Este resultado remoto no contradice el éxito del TypeScript ni de las pruebas locales; tampoco acredita Preview/CI aprobado.
+- Vercel/GitHub: los cinco contextos del commit técnico `821784087388e7bb687f642a97dbe421f7940c9e` aparecen en failure y sus destinos apuntan al requisito de upgrade de cuenta `github-private-org-to-hobby`. Este resultado remoto no contradice el éxito del TypeScript ni de las pruebas locales; tampoco acredita Preview/CI aprobado.
 - OAuth real end-to-end: PENDIENTE.
 - Identidad/privilegios efectivos de `KHORA_READONLY_DATABASE_URL` en entorno autorizado: PENDIENTE; no se leyó su valor ni se usó credencial productiva.
 - Neon Production, ejecución de 034 y consultas de datos Custodia: PENDIENTES y no realizadas.
@@ -448,10 +448,10 @@ Después de los cherry-picks, y antes de este último registro OCP, el grafo loc
 
 ### 24.5 Diff, simulación de merge y límite de autorización
 
-- Rama aislada: `work/obs-mcp-custodia-tools-20261030-01a18dcb`; ref observado al inicio `370a874ba8253f68cfbf2a11bb44badeb727b035`; `main` `a99784b9ae49b946d48318f0f0f8fb115e43c8cc`; merge-base `d82952a17192787f49b4c804b4ae3ca7847288e0`.
+- Rama aislada: `work/obs-mcp-custodia-tools-20261030-01a18dcb`; ref al inicio de la revisión `370a874ba8253f68cfbf2a11bb44badeb727b035`; commit técnico publicado y validado `821784087388e7bb687f642a97dbe421f7940c9e`; `main` `a99784b9ae49b946d48318f0f0f8fb115e43c8cc`; merge-base `d82952a17192787f49b4c804b4ae3ca7847288e0`.
 - `git diff --name-status $(git merge-base origin/main HEAD) HEAD -- frentes/custodia/CONTROL-RESPONSABILIDAD.json frentes/custodia/OBJETO-CANONICO.md` no devuelve rutas: la rama no contribuye cambios a esos objetos.
 - El diff directo `origin/main` ↔ rama sí muestra el snapshot anterior de ambos objetos en la rama. No confundir esa diferencia de árbol heredada con modificaciones de la rama en esta iteración.
-- `git merge-tree --write-tree origin/main HEAD` produjo el árbol candidato `01166dcc92c169d5ee01aedf49483326fadf8d52` y un único conflicto textual en `docs/frentes/observabilidad-mcp/OBJETO-CANONICO.md`. No se aplicó el árbol candidato.
+- Repetida sobre el HEAD publicado `821784087388e7bb687f642a97dbe421f7940c9e`, la simulación `git merge-tree --write-tree origin/main HEAD` detectó un único conflicto de contenido en `docs/frentes/observabilidad-mcp/OBJETO-CANONICO.md`; las rutas de código MCP y configuración se auto-mergean. El conflicto documental corresponde a la versión/continuidad de §1 y a las secciones agregadas por esta rama. No se aplicó el árbol candidato ni se creó merge commit.
 - En ese árbol candidato, los blobs de Custodia son exactamente los de main: control `1917f056e8fc084f2f6f023ebf73e167e8a41467`; OCP Custodia `c4f715f0fd91905f5d380b5d3e8dbf677ce7b813`. El cotejo de árbol contra `origin/main` para esas dos rutas retorna igualdad.
 - No se creó PR, merge commit ni deployment. El conflicto pendiente pertenece al OCP de Khora MCP y exige conservar el contenido válido de §22/§23/§24 sin tocar los objetos canónicos de Custodia.
 
