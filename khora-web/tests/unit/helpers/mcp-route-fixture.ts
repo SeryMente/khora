@@ -21,9 +21,10 @@ const code = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTa
 // Execute the whole real route and SDK HTTP transport. Only external boundaries
 // (Next response class, identity, storage and business services) are substituted.
 // This is not proof of cryptography, OAuth, database effects or deployment.
-export function routeFixture(options: { scopes?: string[]; revoked?: boolean; denyTurn?: boolean; production?: boolean; configured?: boolean; failService?: boolean; healthError?: boolean; partial?: boolean; auditFail?: boolean } = {}) {
+export function routeFixture(options: { scopes?: string[]; revoked?: boolean; denyTurn?: boolean; production?: boolean; configured?: boolean; failService?: boolean; healthError?: boolean; partial?: boolean; auditFail?: boolean; readAllowed?: boolean; writeAllowed?: boolean; sourceBranchExists?: boolean; sessionContextValid?: boolean; aclUnavailable?: boolean; sessionSource?: string; sessionBranch?: string; planApprovalReady?: boolean; currentPlanId?: string; planSecondId?: string; planSecondStepDescription?: string; activityPagination?: boolean; developerSubject?: boolean } = {}) {
   const schemas = new Map<contracts.McpToolName, { description: string; shape: z.ZodRawShape }>();
   const calls: Array<{ name: string; args: unknown }> = [];
+  const aclSubjects: string[] = [];
   const servers: McpServer[] = [];
   class RecordingServer extends McpServer {
     constructor(...args: ConstructorParameters<typeof McpServer>) {
@@ -37,16 +38,40 @@ export function routeFixture(options: { scopes?: string[]; revoked?: boolean; de
     }
   }
   const issuer = "https://khora-contract-fixture.invalid";
-  const config = { issuer, canonicalUrl: issuer + "/api/mcp", jwtSecret: "synthetic-key-not-used-for-signing" };
-  const scopes = options.scopes ?? ["volcados:read", "runtime:read", "norm:turn", "custodia:metadata:read", "custodia:integrity:verify"];
+  const config = { issuer, canonicalUrl: issuer + "/api/mcp", jwtSecret: "synthetic-key-not-used-for-signing", allowedEmail: "developer@example.test" };
+  const scopes = options.scopes ?? ["volcados:read", "runtime:read", "norm:turn", "jules:read", "jules:write", "custodia:metadata:read", "custodia:integrity:verify"];
   const business = (name: string) => async (args?: unknown) => {
     calls.push({ name, args });
     if (options.failService) throw new Error("synthetic-secret-private-payload");
     return options.partial ? { completo: false, resultados: [], cobertura: { examinados: 2, ilegibles: 1 } } : { fixture: name };
   };
+  let julesGetSessionCalls = 0;
+  let fullPlanReadCalls = 0;
+  const mockJulesGetSession = async (args?: unknown) => {
+    const result = await business("JulesGetSession")(args) as Record<string, unknown>;
+    julesGetSessionCalls++;
+    return {
+      ...result,
+      name: "sessions/fixture-session",
+      state: options.planApprovalReady === true || julesGetSessionCalls >= 4 ? "AWAITING_PLAN_APPROVAL" : "AWAITING_USER_FEEDBACK",
+      ...(options.sessionContextValid === false ? {} : { sourceContext: { source: options.sessionSource ?? "sources/github/owner/repo", githubRepoContext: { startingBranch: options.sessionBranch ?? "main" } } }),
+    };
+  };
+  const sourceFixture = { name: "sources/github/owner/repo", id: "github/owner/repo", githubRepo: { owner: "owner", repo: "repo", isPrivate: true, defaultBranch: { displayName: "main" }, branches: [{ displayName: "restricted" }] } };
+  const mockNormalizeSourceName = (value: string) => {
+    if (!/^sources\/[A-Za-z0-9._-]+(?:\/[A-Za-z0-9._-]+)*$/.test(value) || value.split("/").some(part => part === "." || part === "..")) {
+      throw new Error("JULES_SOURCE_ID_INVALID");
+    }
+    return value;
+  };
   const modules: Record<string, unknown> = {
     "node:crypto": crypto,
     "@/lib/server/mcp-diagnostics": diagnostics,
+    "@/lib/server/jules-access": {
+      isJulesDeveloperSubject: (subject: string) => options.developerSubject === true && subject.toLowerCase() === config.allowedEmail.toLowerCase(),
+      listJulesSourceGrants: async (_subject: string, mode: "read" | "write") => { aclSubjects.push(_subject); if (options.aclUnavailable) throw new diagnostics.McpDiagnosticError("JULES_ACL_UNAVAILABLE"); const allowed = mode === "read" ? options.readAllowed !== false : options.writeAllowed !== false; return allowed ? [{ source: "sources/github/owner/repo", branch: "main" }] : []; },
+      requireJulesSourceGrant: async (_subject: string, source: string, branch: string, mode: "read" | "write") => { if (options.developerSubject === true && _subject.toLowerCase() === config.allowedEmail.toLowerCase()) return; aclSubjects.push(_subject); if (options.aclUnavailable) throw new diagnostics.McpDiagnosticError("JULES_ACL_UNAVAILABLE"); const allowed = mode === "read" ? options.readAllowed !== false : options.writeAllowed !== false; if (!allowed || source !== "sources/github/owner/repo" || branch !== "main") throw new diagnostics.McpDiagnosticError("JULES_ACCESS_DENIED"); },
+    },
     "@/lib/server/mcp-diagnostic-boundary": boundary,
     "next/server": { NextRequest: Request, NextResponse: Response },
     "zod": { z },
@@ -57,13 +82,38 @@ export function routeFixture(options: { scopes?: string[]; revoked?: boolean; de
     "@/lib/server/normative-receipt-schema": receipt,
     "@/lib/server/normative-runtime": runtime,
     "@/lib/server/mcp-config": { getMcpConfig: () => options.configured === false ? null : config },
-    "@/lib/server/jwt": { verifyJwtDetailed: (token: string) => token === "fixture-access" ? { ok: true, payload: { iss: issuer, aud: config.canonicalUrl, sub: "fixture-actor", gen: 1, scope: scopes.join(" ") } } : { ok: false, error: "invalid_format" } },
+    "@/lib/server/jwt": { verifyJwtDetailed: (token: string) => token === "fixture-access" ? { ok: true, payload: { iss: issuer, aud: config.canonicalUrl, sub: options.developerSubject ? config.allowedEmail : "fixture-actor", gen: 1, scope: scopes.join(" ") } } : { ok: false, error: "invalid_format" } },
     "@/lib/server/oauth": { obtenerGeneracionRevocacion: async () => options.revoked ? 2 : 1 },
     "@/lib/server/mcp-db": { isProductionEnv: () => options.production === true },
     "@/lib/server/mcp-manual-token": { MANUAL_MCP_TOKEN_PREFIX: "fixture-manual-", authenticateManualMcpToken: async () => null },
     "@/lib/server/service-observability": { registrarEventoServicio: async () => { if (options.auditFail) throw Error("synthetic audit failure"); } },
+    "@/lib/jules/client": {
+      listSources: async (pageSize?: number, pageToken?: string) => { await business("JulesListSources")({ pageSize, pageToken }); return { sources: [sourceFixture], nextPageToken: "fixture-next" }; },
+      listSessions: async (pageSize?: number, pageToken?: string) => { await business("JulesListSessions")({ pageSize, pageToken }); return { sessions: [
+        { name: "sessions/fixture-session", sourceContext: { source: "sources/github/owner/repo", githubRepoContext: { startingBranch: "main" } } },
+        { name: "sessions/restricted-session", sourceContext: { source: "sources/github/owner/repo", githubRepoContext: { startingBranch: "restricted" } } },
+        { name: "sessions/other-source", sourceContext: { source: "sources/github/other/repo", githubRepoContext: { startingBranch: "main" } } },
+      ], nextPageToken: "fixture-sessions-next" }; },
+      getSession: mockJulesGetSession,
+      getSource: async (_name: string) => { await business("JulesGetSource")(_name); return options.sourceBranchExists === false ? { ...sourceFixture, githubRepo: { ...sourceFixture.githubRepo, defaultBranch: undefined, branches: [] } } : sourceFixture; },
+      listActivitiesPage: async (sessionId: string, pageSize?: number, pageToken?: string) => {
+        await business("JulesListActivitiesPage")({ sessionId, pageSize, pageToken });
+        if (pageSize === 100 && !pageToken) fullPlanReadCalls++;
+        const changedDuringSecondRead = (options.planSecondId || options.planSecondStepDescription) && pageSize === 100 && fullPlanReadCalls >= 2;
+        const planId = changedDuringSecondRead && options.planSecondId ? options.planSecondId : options.currentPlanId ?? "fixture-plan-1";
+        const plan = { id: planId, createTime: "2026-10-30T10:00:00Z", steps: [{ id: "step-1", index: 0, title: "Implement guarded change", description: changedDuringSecondRead && options.planSecondStepDescription ? options.planSecondStepDescription : "Synthetic plan description" }] };
+        const activities = [{ name: "sessions/fixture-session/activities/plan-activity", id: "plan-activity", originator: "agent", createTime: "2026-10-30T10:00:00Z", planGenerated: { plan } }];
+        if (options.activityPagination && pageSize === 100 && !pageToken) return { activities: [], nextPageToken: "fixture-next-page" };
+        if (pageToken === "fixture-next-page") return { activities, nextPageToken: undefined };
+        return { activities, nextPageToken: undefined };
+      },
+      createSession: business("JulesCreateSession"),
+      sendMessage: business("JulesSendMessage"),
+      approvePlan: business("JulesApprovePlan"),
+      normalizeSourceName: mockNormalizeSourceName,
+    },
     "@/lib/server/mcp-audios": { toolKhoraListarAudios: (_actor:string,args:unknown)=>business("ListarAudios")(args), toolKhoraLeerAudio: (_actor:string,args:unknown)=>business("LeerAudio")(args) },
-    "@/lib/server/mcp-custodia": { toolKhoraCustodiaCatalogo: (_actor:string,args:unknown)=>business("CustodiaCatalogo")(args), toolKhoraCustodiaRevisiones: (_actor:string,args:unknown)=>business("CustodiaRevisiones")(args), toolKhoraCustodiaVerificarIntegridad: (_actor:string,args:unknown)=>business("CustodiaVerificarIntegridad")(args) },
+    "@/lib/server/mcp-custodia": { toolKhoraCustodiaCatalogo: (actor:string,args:unknown)=>business("CustodiaCatalogo")({actor,args}), toolKhoraCustodiaRevisiones: (actor:string,args:unknown)=>business("CustodiaRevisiones")({actor,args}), toolKhoraCustodiaVerificarIntegridad: (actor:string,args:unknown)=>business("CustodiaVerificarIntegridad")({actor,args}) },
     "@/lib/server/mcp-tools": Object.fromEntries(["Resumen", "ListarVolcados", "LeerVolcado", "BuscarVolcados", "VersionesVolcado"].map(n => ["toolKhora" + n, business(n)])),
     "@/lib/server/mcp-ui-review": { toolKhoraUiReview: business("UiReview") },
     "@/lib/server/mcp-observability": Object.fromEntries(["EstadoVivo", "EventosRecientes", "ObservacionInstantanea", "EventosDesde"].map(n => ["toolKhora" + n, business(n)])),
@@ -85,7 +135,7 @@ export function routeFixture(options: { scopes?: string[]; revoked?: boolean; de
     return modules[name];
   } }, { timeout: 1000, filename: "mcp-route-fixture.cjs" });
   return {
-    schemas, calls, url: config.canonicalUrl,
+    schemas, calls, aclSubjects, url: config.canonicalUrl,
     fetch: async (input: string | URL | Request, init?: RequestInit) => {
       const request = new Request(input, init);
       return exported[request.method === "GET" ? "GET" : "POST"](request);

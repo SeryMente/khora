@@ -3,7 +3,7 @@ import { getDb } from "./neon";
 import { getMcpConfig } from "./mcp-config";
 
 export const MANUAL_MCP_TOKEN_PREFIX = "khora_mcp_v1_";
-export const MANUAL_MCP_SCOPES = ["runtime:read", "volcados:read", "norm:turn", "custodia:metadata:read", "custodia:integrity:verify"] as const;
+export const MANUAL_MCP_SCOPES = ["runtime:read", "volcados:read", "norm:turn", "jules:read", "jules:write", "custodia:metadata:read", "custodia:integrity:verify"] as const;
 export const MANUAL_MCP_DEFAULT_EXPIRY_DAYS = 90;
 
 type ManualScope = (typeof MANUAL_MCP_SCOPES)[number];

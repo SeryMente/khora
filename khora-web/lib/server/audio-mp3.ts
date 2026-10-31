@@ -20,9 +20,9 @@ export async function leerBlobVerificado(url:string,bytes:number,sha:string):Pro
   if(r.status===404)throw new Error("blob_no_encontrado");
   if(!r.ok||!r.body)throw new Error("blob_inaccesible");
   const reader=r.body.getReader();const chunks:Buffer[]=[];let total=0;
-  try {while(true){const {done,value}=await reader.read();if(done)break;total+=value.length;if(total>MAX_AUDIO_BYTES+1024){await reader.cancel();throw new Error("audio_demasiado_grande");}chunks.push(Buffer.from(value));}}finally{reader.releaseLock();}
-  const clear=descifrarBytes(Buffer.concat(chunks));
-  if(clear.length!==bytes||hashAudio(clear)!==sha.toLowerCase())throw new Error("audio_integridad_rota");
+  try {while(true){const {done,value}=await reader.read();if(done)break;total+=value.length;if(total>MAX_AUDIO_BYTES+1024){await reader.cancel();throw new Error("audio_demasiado_grande");}chunks.push(Buffer.from(value));}}catch(error){for(const chunk of chunks)chunk.fill(0);throw error;}finally{reader.releaseLock();}
+  const encrypted=Buffer.concat(chunks);for(const chunk of chunks)chunk.fill(0);let clear:Buffer;try{clear=descifrarBytes(encrypted);}finally{encrypted.fill(0);}
+  if(clear.length!==bytes||hashAudio(clear)!==sha.toLowerCase()){clear.fill(0);throw new Error("audio_integridad_rota");}
   return clear;
 }
 async function ffmpeg(args:string[]):Promise<number>{

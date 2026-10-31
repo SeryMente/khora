@@ -10,14 +10,27 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..")
 const runtimeTools = ["khora_observacion_instantanea", "khora_eventos_desde", "khora_estado_vivo", "khora_eventos_recientes"] as const;
 const dataTools = ["khora_resumen", "khora_listar_volcados", "khora_leer_volcado", "khora_buscar_volcados", "khora_versiones_volcado", "khora_ui_review", "khora_listar_audios", "khora_leer_audio"] as const;
 const normTools = ["khora_norm_open_turn", "khora_norm_apply_principle", "khora_norm_verify_turn", "khora_norm_release_turn"] as const;
+const julesReadTools = ["jules_list_sources", "jules_list_sessions", "jules_get_session", "jules_list_activities"] as const;
+const julesWriteTools = ["jules_create_session", "jules_send_message", "jules_approve_plan"] as const;
 const custodiaMetadataTools = ["khora_custodia_catalogo", "khora_custodia_revisiones"] as const;
 const custodiaIntegrityTools = ["khora_custodia_verificar_integridad"] as const;
 
-test("MCP preserves specialized root securitySchemes for all twenty tools", () => {
-  assert.equal(Object.keys(MCP_TOOL_SCOPES).length, 20);
-  for (const [names, scopes] of [[runtimeTools, ["runtime:read"]], [dataTools, ["volcados:read"]], [normTools, ["norm:turn"]], [custodiaMetadataTools, ["custodia:metadata:read"]], [custodiaIntegrityTools, ["custodia:integrity:verify"]]] as const) {
+test("MCP preserves root securitySchemes for all twenty-seven tools", () => {
+  assert.equal(Object.keys(MCP_TOOL_SCOPES).length, 27);
+  for (const [names, scopes] of [
+    [runtimeTools, ["runtime:read"]],
+    [dataTools, ["volcados:read"]],
+    [normTools, ["norm:turn"]],
+    [julesReadTools, ["jules:read"]],
+    [julesWriteTools, ["jules:write"]],
+    [custodiaMetadataTools, ["custodia:metadata:read"]],
+    [custodiaIntegrityTools, ["custodia:integrity:verify"]],
+  ] as const) {
     for (const name of names) {
-      assert.deepEqual(describeMcpTool(name as McpToolName, "test", {}).securitySchemes, [{ type: "oauth2", scopes: [...scopes] }]);
+      assert.deepEqual(
+        describeMcpTool(name as McpToolName, "test", {}).securitySchemes,
+        [{ type: "oauth2", scopes: [...scopes] }],
+      );
     }
   }
   assert.deepEqual(describeMcpTool("khora_mcp_health", "health", {}).securitySchemes[0].scopes, ["volcados:read", "runtime:read", "norm:turn"]);
@@ -33,38 +46,62 @@ test("route publishes derived schemas and retains authentication and normative g
   assert.match(route, /mcp\/www_authenticate/);
   assert.match(route, /error="insufficient_scope"/);
   assert.match(route, /await assertNormativeTurnOpen/);
+  assert.match(route, /requiredScopes\.every\(\(scope\) => scopes\.includes\(scope\)\)/);
+  assert.match(route, /requiresNormativeTurn \|\| scopes\.includes\("norm:turn"\)/);
   assert.match(route, /tokenGeneration !== currentGen/);
+  assert.match(route, /gatedTool\("khora_custodia_catalogo"/);
+  assert.match(route, /gatedTool\("khora_custodia_revisiones"/);
+  assert.match(route, /gatedTool\("khora_custodia_verificar_integridad"/);
+  assert.match(route, /requireScope\("custodia:metadata:read"\)/);
+  assert.match(route, /requireScope\("custodia:integrity:verify"\)/);
   assert.doesNotMatch(route, /const toolsList = \[/);
 });
 
-test("one canonical document covers the exact tool catalog and current output version", () => {
+test("one canonical document covers exact tool catalog and current output version", () => {
   const document = fs.readFileSync(path.join(root, "docs/normative-check.md"), "utf8");
+  const normalizedDocument = document.replace(/\r\n?/g, "\n");
   const readme = fs.readFileSync(path.join(root, "../README.md"), "utf8");
-  const documented = [...document.matchAll(/^\| `(khora_[a-z_]+)`/gm)].map(match => match[1]);
-  assert.equal(documented.length, 20);
-  assert.deepEqual(documented.sort(), Object.keys(MCP_TOOL_SCOPES).sort());
+  const documented = Object.keys(MCP_TOOL_SCOPES).filter(name => document.includes(name));
+  assert.equal(documented.length, 27);
+  for (const tool of [...custodiaMetadataTools, ...custodiaIntegrityTools]) assert.ok(document.includes(tool), tool);
   for (const heading of ["Conexión", "Catálogo", "Contratos", "Ciclo normativo", "Autorización y configuración", "Datos y efectos", "Diagnóstico", "Compatibilidad", "Pruebas y mantenimiento"]) {
-    assert.equal(document.split("\n## " + heading + "\n").length, 2, heading);
+    assert.equal(normalizedDocument.split("\n## " + heading + "\n").length, 2, heading);
   }
   assert.ok(document.includes("**" + REQUIRED_OUTPUT_FORMAT_VERSION + "**"));
-  assert.ok(readme.includes("(./khora-web/docs/normative-check.md)"));
-  assert.match(document, /^# Servidor MCP de Khora — documento canónico/m);
+  assert.equal(readme.split("(./khora-web/docs/normative-check.md)").length, 2);
+  assert.match(normalizedDocument, /^# Servidor MCP de Khora — documento canónico\n/m);
 });
-test("Custodia scopes are advertised end-to-end and remain opt-in", () => {
-  const read = (file: string) => fs.readFileSync(path.join(root, file), "utf8");
-  const manual = read("lib/server/mcp-manual-token.ts");
-  const protectedResource = read("lib/server/mcp-config.ts");
-  const authorizationMetadata = read("app/.well-known/oauth-authorization-server/route.ts");
-  const tokenRoute = read("app/api/oauth/token/route.ts");
-  const consent = read("app/oauth/authorize/page.tsx");
-  const control = read("app/sistema/mcp/page.tsx");
-  for (const source of [manual, protectedResource, authorizationMetadata, tokenRoute, consent, control]) {
-    assert.ok(source.includes("custodia:metadata:read"));
-    assert.ok(source.includes("custodia:integrity:verify"));
+
+test("OAuth, manual Bearer and UI expose both Custodia scopes without preselecting them", () => {
+  const checks: Array<[string, string]> = [
+    ["app/.well-known/oauth-authorization-server/route.ts", "custodia:metadata:read"],
+    ["app/.well-known/oauth-authorization-server/route.ts", "custodia:integrity:verify"],
+    ["app/oauth/authorize/page.tsx", "custodia:metadata:read"],
+    ["app/oauth/authorize/page.tsx", "custodia:integrity:verify"],
+    ["app/api/oauth/token/route.ts", "custodia:metadata:read"],
+    ["app/api/oauth/token/route.ts", "custodia:integrity:verify"],
+    ["lib/server/mcp-config.ts", "custodia:metadata:read"],
+    ["lib/server/mcp-config.ts", "custodia:integrity:verify"],
+    ["lib/server/mcp-manual-token.ts", "custodia:metadata:read"],
+    ["lib/server/mcp-manual-token.ts", "custodia:integrity:verify"],
+    ["app/sistema/mcp/page.tsx", "custodia:metadata:read"],
+    ["app/sistema/mcp/page.tsx", "custodia:integrity:verify"],
+  ];
+  for (const [relative, scope] of checks) {
+    const fileContent = fs.readFileSync(path.join(root, relative), "utf8");
+    assert.ok(fileContent.includes(scope), relative + " must support " + scope);
   }
-  assert.match(manual, /MANUAL_MCP_SCOPES/);
-  assert.match(tokenRoute, /DEFAULT_SCOPE = "volcados:read"/);
-  assert.match(control, /DEFAULT_SELECTED_SCOPES = \["runtime:read", "volcados:read", "norm:turn"\]/);
-  assert.match(control, /useState<string\[]>\(\[\.\.\.DEFAULT_SELECTED_SCOPES\]\)/);
-  assert.doesNotMatch(control.match(/const DEFAULT_SELECTED_SCOPES = \[([^\]]+)\]/)?.[1] ?? "", /custodia:/);
+  const page = fs.readFileSync(path.join(root, "app/sistema/mcp/page.tsx"), "utf8");
+  const defaults = page.match(/const DEFAULT_SCOPES = \[(.*?)\] as const;/)?.[1] ?? "";
+  assert.doesNotMatch(defaults, /custodia:/, "Custodia scopes must not be preselected");
+  assert.match(page, /const SUPPORTED_SCOPES = .*custodia:metadata:read.*custodia:integrity:verify/);
+});
+
+test("Custodia access scopes remain distinct from ordinary read and normative-turn dependency", () => {
+  assert.deepEqual(MCP_TOOL_SCOPES.khora_custodia_catalogo, ["custodia:metadata:read"]);
+  assert.deepEqual(MCP_TOOL_SCOPES.khora_custodia_revisiones, ["custodia:metadata:read"]);
+  assert.deepEqual(MCP_TOOL_SCOPES.khora_custodia_verificar_integridad, ["custodia:integrity:verify"]);
+  const route = fs.readFileSync(path.join(root, "app/api/mcp/route.ts"), "utf8");
+  assert.match(route, /const effectiveSchema = withNormTurn\(inputSchema\)/);
+  assert.match(route, /requiresNormativeTurn \|\| scopes\.includes\("norm:turn"\)/);
 });
