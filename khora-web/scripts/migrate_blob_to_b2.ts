@@ -254,8 +254,8 @@ async function updateReferences(
     }
     if (existing.rows[0] && (
       existing.rows[0].source_url !== item.url
-      || existing.rows[0].source_clear_sha256 !== item.sha256
-      || existing.rows[0].source_encrypted_sha256 !== encryptedHash
+      || (existing.rows[0].source_clear_sha256 && existing.rows[0].source_clear_sha256 !== item.sha256)
+      || (existing.rows[0].source_encrypted_sha256 && existing.rows[0].source_encrypted_sha256 !== encryptedHash)
     )) throw new Error("migration_ledger_source_conflict");
 
     await db.query(
@@ -266,6 +266,10 @@ async function updateReferences(
         VALUES ($1,$2,$3,$4,$5,$6,$7,'copied_verified',$8,1,NULL,now())
         ON CONFLICT (source_url_sha256) DO UPDATE SET
           destination_url=EXCLUDED.destination_url,
+          source_clear_sha256=EXCLUDED.source_clear_sha256,
+          source_clear_bytes=EXCLUDED.source_clear_bytes,
+          source_encrypted_sha256=EXCLUDED.source_encrypted_sha256,
+          source_encrypted_bytes=EXCLUDED.source_encrypted_bytes,
           state='copied_verified',
           reference_occurrences=EXCLUDED.reference_occurrences,
           attempts=custodia_blob_b2_migration.attempts+1,
