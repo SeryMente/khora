@@ -1,7 +1,8 @@
+import { fetchStoredObject } from "@/lib/server/object-storage";
 // @l0 L0-002-R · @req FIX-DICTADO/D14
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
-import { put } from "@vercel/blob";
+import { putEncryptedObject as put } from "@/lib/server/object-storage";
 import { createHash, randomUUID } from "crypto";
 import { cifrarBytes, descifrarBytes } from "../../../../lib/server/cripto";
 import { registrarParteAudio } from "../../../../lib/server/dictado";
@@ -75,7 +76,7 @@ export async function POST(req: NextRequest) {
 
     // La parte adjunta no se marca custodiada hasta releer, descifrar y verificarla.
     try {
-      const verificacion = await fetch(subido.url, { cache: "no-store" });
+      const verificacion = await fetchStoredObject(subido.url, { cache: "no-store" });
       if (!verificacion.ok) {
         return NextResponse.json(
           {
