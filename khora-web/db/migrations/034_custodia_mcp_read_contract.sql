@@ -97,3 +97,77 @@ ALTER TABLE dictado_mp3
   ADD COLUMN IF NOT EXISTS source_parts INTEGER,
   ADD COLUMN IF NOT EXISTS captura_completa BOOLEAN NOT NULL DEFAULT false,
   ADD COLUMN IF NOT EXISTS siguiente_intento TIMESTAMPTZ NOT NULL DEFAULT now();
+
+-- Read contract: khora_lector is an externally provisioned, non-login group role.
+DO $khora_reader_role$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_catalog.pg_roles
+    WHERE rolname = 'khora_lector'
+      AND NOT rolcanlogin
+      AND NOT rolsuper
+      AND NOT rolbypassrls
+      AND NOT rolcreatedb
+      AND NOT rolcreaterole
+      AND NOT rolreplication
+  ) THEN
+    RAISE EXCEPTION 'khora_lector must exist as a non-login, non-privileged group role';
+  END IF;
+END
+$khora_reader_role$;
+
+REVOKE ALL ON TABLE public.dictado_session, public.dictado_audio_parte,
+  public.dictado_checkpoint, public.dictado_mp3 FROM PUBLIC;
+REVOKE ALL ON TABLE public.dictado_session, public.dictado_audio_parte,
+  public.dictado_checkpoint, public.dictado_mp3, public.volcado FROM khora_lector;
+
+-- Clear any prior column grants as well as table-level grants before applying
+-- the narrowly scoped read contract. This is idempotent on new and old schemas.
+DO $khora_reader_columns$
+DECLARE
+  item RECORD;
+BEGIN
+  FOR item IN
+    SELECT c.relname AS table_name, a.attname AS column_name
+    FROM pg_catalog.pg_attribute a
+    JOIN pg_catalog.pg_class c ON c.oid = a.attrelid
+    JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+    WHERE n.nspname = 'public'
+      AND c.relname IN (
+        'dictado_session', 'dictado_audio_parte', 'dictado_checkpoint',
+        'dictado_mp3', 'volcado'
+      )
+      AND a.attnum > 0
+      AND NOT a.attisdropped
+  LOOP
+    EXECUTE format(
+      'REVOKE ALL (%I) ON TABLE public.%I FROM khora_lector',
+      item.column_name,
+      item.table_name
+    );
+    IF item.table_name <> 'volcado' THEN
+      EXECUTE format(
+        'REVOKE ALL (%I) ON TABLE public.%I FROM PUBLIC',
+        item.column_name,
+        item.table_name
+      );
+    END IF;
+  END LOOP;
+END
+$khora_reader_columns$;
+
+GRANT SELECT (
+  session_id, volcado_id, estado, total_partes, creado_en, actualizado_en,
+  cerrado_en, custodia_owner, checkpoint_usuario
+) ON TABLE public.dictado_session TO khora_lector;
+GRANT SELECT (
+  session_id, part_index, bytes, sha256, blob_url, estado_verificacion
+) ON TABLE public.dictado_audio_parte TO khora_lector;
+GRANT SELECT (
+  revision_id, session_id, usuario, creado_en, client_at, sha256, snapshot
+) ON TABLE public.dictado_checkpoint TO khora_lector;
+GRANT SELECT (
+  session_id, estado, captura_completa, source_parts, actualizado_en
+) ON TABLE public.dictado_mp3 TO khora_lector;
+GRANT SELECT (id, folio, usuario, session_id)
+  ON TABLE public.volcado TO khora_lector;

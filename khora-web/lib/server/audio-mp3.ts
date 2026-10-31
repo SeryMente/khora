@@ -12,17 +12,87 @@ import { asegurarCustodiaContinua } from "./custodia-schema";
 import { evaluarCustodiaAudio } from "../audio/custodia";
 export const MAX_AUDIO_BYTES=128*1024*1024;
 export const hashAudio=(b:Buffer)=>createHash("sha256").update(b).digest("hex");
-export async function leerBlobVerificado(url:string,bytes:number,sha:string):Promise<Buffer>{
-  const u=new URL(url);
-  if(u.protocol!=="https:"||!u.hostname.endsWith(".blob.vercel-storage.com"))throw new Error("blob_host_no_permitido");
-  if(!Number.isSafeInteger(bytes)||bytes<=0||bytes>MAX_AUDIO_BYTES||!/^[a-f0-9]{64}$/i.test(sha))throw new Error("audio_manifest_invalido");
-  const r=await fetch(u,{cache:"no-store",signal:AbortSignal.timeout(30000),redirect:"error"});
-  if(r.status===404)throw new Error("blob_no_encontrado");
-  if(!r.ok||!r.body)throw new Error("blob_inaccesible");
-  const reader=r.body.getReader();const chunks:Buffer[]=[];let total=0;
-  try {while(true){const {done,value}=await reader.read();if(done)break;total+=value.length;if(total>MAX_AUDIO_BYTES+1024){await reader.cancel();throw new Error("audio_demasiado_grande");}chunks.push(Buffer.from(value));}}catch(error){for(const chunk of chunks)chunk.fill(0);throw error;}finally{reader.releaseLock();}
-  const encrypted=Buffer.concat(chunks);for(const chunk of chunks)chunk.fill(0);let clear:Buffer;try{clear=descifrarBytes(encrypted);}finally{encrypted.fill(0);}
-  if(clear.length!==bytes||hashAudio(clear)!==sha.toLowerCase()){clear.fill(0);throw new Error("audio_integridad_rota");}
+export type LeerBlobOptions = {
+  maxResponseBytes?: number;
+  timeoutMs?: number;
+  onBytesRead?: (bytes: number) => void;
+};
+
+export async function leerBlobVerificado(
+  url: string,
+  bytes: number,
+  sha: string,
+  options: LeerBlobOptions = {},
+): Promise<Buffer> {
+  const u = new URL(url);
+  if (u.protocol !== "https:" || !u.hostname.endsWith(".blob.vercel-storage.com")) {
+    throw new Error("blob_host_no_permitido");
+  }
+  if (!Number.isSafeInteger(bytes) || bytes <= 0 || bytes > MAX_AUDIO_BYTES || !/^[a-f0-9]{64}$/i.test(sha)) {
+    throw new Error("audio_manifest_invalido");
+  }
+
+  const maxResponseBytes = options.maxResponseBytes ?? MAX_AUDIO_BYTES + 1024;
+  const timeoutMs = options.timeoutMs ?? 30000;
+  if (!Number.isSafeInteger(maxResponseBytes) || maxResponseBytes < 1 || maxResponseBytes > MAX_AUDIO_BYTES + 1024) {
+    throw new Error("audio_custodia_byte_budget_invalid");
+  }
+  if (!Number.isSafeInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 30000) {
+    throw new Error("audio_custodia_time_budget_invalid");
+  }
+  if (bytes > maxResponseBytes) throw new Error("audio_custodia_byte_budget_exceeded");
+
+  const r = await fetch(u, {
+    cache: "no-store",
+    signal: AbortSignal.timeout(timeoutMs),
+    redirect: "error",
+  });
+  if (r.status === 404) throw new Error("blob_no_encontrado");
+  if (!r.ok || !r.body) throw new Error("blob_inaccesible");
+  const contentLength = r.headers.get("content-length");
+  if (contentLength && /^\d+$/.test(contentLength) && Number(contentLength) > maxResponseBytes) {
+    try { await r.body.cancel(); } catch { /* best-effort stream cancellation */ }
+    throw new Error(options.maxResponseBytes === undefined
+      ? "audio_demasiado_grande"
+      : "audio_custodia_byte_budget_exceeded");
+  }
+
+  const reader = r.body.getReader();
+  const chunks: Buffer[] = [];
+  let total = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      total += value.length;
+      options.onBytesRead?.(value.length);
+      if (total > maxResponseBytes) {
+        try { await reader.cancel(); } catch { /* best-effort stream cancellation */ }
+        throw new Error(options.maxResponseBytes === undefined
+          ? "audio_demasiado_grande"
+          : "audio_custodia_byte_budget_exceeded");
+      }
+      chunks.push(Buffer.from(value));
+    }
+  } catch (error) {
+    for (const chunk of chunks) chunk.fill(0);
+    throw error;
+  } finally {
+    reader.releaseLock();
+  }
+
+  const encrypted = Buffer.concat(chunks);
+  for (const chunk of chunks) chunk.fill(0);
+  let clear: Buffer;
+  try {
+    clear = descifrarBytes(encrypted);
+  } finally {
+    encrypted.fill(0);
+  }
+  if (clear.length !== bytes || hashAudio(clear) !== sha.toLowerCase()) {
+    clear.fill(0);
+    throw new Error("audio_integridad_rota");
+  }
   return clear;
 }
 async function ffmpeg(args:string[]):Promise<number>{

@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import {
+  CUSTODIA_BLOB_READ_BUDGET,
   toolKhoraCustodiaCatalogo,
   toolKhoraCustodiaRevisiones,
   toolKhoraCustodiaVerificarIntegridad,
@@ -25,6 +26,8 @@ function mockDb(handler: (sql: string, params?: any[]) => any) {
     calls,
     query: async (sql: string, params?: any[]) => {
       calls.push({ sql, params });
+      if (sql.includes("custodia_readonly_role_guard")) return { rows: [{ is_superuser: false, bypasses_rls: false, has_unsafe_role_attributes: false, member_of_lector: true, lector_role_safe: true, has_required_select: true, has_no_extra_select: true, has_no_dml: true }] };
+      if (sql.includes("SELECT s.session_id FROM dictado_session") && params?.[1] === ACTOR) return { rows: [sessionOwnerRow()] };
       return (await handler(sql, params)) ?? { rows: [] };
     },
   };
@@ -110,13 +113,13 @@ test("catalog pages owner universe with signed actor-bound cursor and drift fing
   assert.equal(second.items[0].sessionId, "session-b");
   assert.equal(second.page.hasMore, false);
   assert.equal(second.page.nextCursor, null);
-  const query = db.calls[0].sql;
+  const query = db.calls.find((call) => call.sql.includes("WITH owned AS"))!.sql;
   assert.match(query, /COALESCE\(s\.custodia_owner,s\.checkpoint_usuario,v\.usuario\)=\$1/);
   assert.match(query, /WITH owned AS/);
   assert.match(query, /summary AS/);
   assert.match(query, /page AS/);
   assert.match(query, /ORDER BY actividad DESC,session_id DESC/);
-  assert.equal(db.calls.length, 2);
+  assert.equal(db.calls.filter((call) => !call.sql.includes("custodia_readonly_role_guard")).length, 2);
 });
 
 test("catalog rejects a cursor tampered or transferred to another actor before database access", async () => {
@@ -219,7 +222,10 @@ test("revision page cursors bind to actor and session and detect a changed revis
 test("revisions deny session belonging to another actor without reading its snapshots", async () => {
   const db = mockDb((_sql, params) => params?.[1] === ACTOR ? { rows: [sessionOwnerRow()] } : { rows: [] });
   await assert.rejects(toolKhoraCustodiaRevisiones("other@example.test", { session_id: SESSION }, db), /sesion_no_encontrada_o_no_autorizada/);
-  assert.equal(db.calls.length, 1);
+  const ownershipCheck = db.calls.find((call) => call.sql.includes("SELECT s.session_id FROM dictado_session"))!;
+  assert.deepEqual(ownershipCheck.params, [SESSION, "other@example.test"]);
+  assert.match(ownershipCheck.sql, /COALESCE\(s\.custodia_owner,s\.checkpoint_usuario,v\.usuario\)=\$2/);
+  assert.equal(db.calls.filter((call) => !call.sql.includes("custodia_readonly_role_guard")).length, 1);
 });
 
 test("integrity compares the declared 1-based manifest with table rows and verifies actual Blob bytes", async () => {
@@ -229,9 +235,9 @@ test("integrity compares the declared 1-based manifest with table rows and verif
     if (sql.includes("SELECT s.session_id FROM dictado_session")) return { rows: [sessionOwnerRow()] };
     if (sql.includes("SELECT revision_id::text,creado_en,snapshot")) return { rows: [checkpoint({ corteAudio: { hastaParte: 4 } })] };
     if (sql.includes("WITH expected AS")) {
-      const start = params?.[1];
-      const end = params?.[2];
-      const rows: any[] = [{ stored_total: 3, invalid_indexes: 0, extra_parts: 0 }];
+      const start = params?.[2];
+      const end = params?.[3];
+      const rows: any[] = [{ owner_rows: 1, stored_total: 3, invalid_indexes: 0, extra_parts: 0 }];
       for (let index = start; index <= end; index++) {
         if (index === 1) rows.push({ stored_total: 3, invalid_indexes: 0, extra_parts: 0, part_index: 1, stored_part_index: 1, bytes: payload1.length, sha256: createHash("sha256").update(payload1).digest("hex"), blob_url: "https://one.blob.vercel-storage.com/o", estado_verificacion: "verificado" });
         else if (index === 2) rows.push({ stored_total: 3, invalid_indexes: 0, extra_parts: 0, part_index: 2, stored_part_index: null, bytes: null, sha256: null, blob_url: null, estado_verificacion: null });
@@ -282,7 +288,7 @@ test("integrity distinguishes transient Blob failures from missing and mismatche
     if (sql.includes("SELECT s.session_id FROM dictado_session")) return { rows: [sessionOwnerRow()] };
     if (sql.includes("SELECT revision_id::text,creado_en,snapshot")) return { rows: [checkpoint({ corteAudio: { hastaParte: 1 } })] };
     if (sql.includes("WITH expected AS")) return { rows: [
-      { stored_total: 1, invalid_indexes: 0, extra_parts: 0, part_index: 1, stored_part_index: 1, bytes: 10, sha256: "c".repeat(64), blob_url: "https://one.blob.vercel-storage.com/o", estado_verificacion: "pendiente" },
+      { owner_rows: 1, stored_total: 1, invalid_indexes: 0, extra_parts: 0, part_index: 1, stored_part_index: 1, bytes: 10, sha256: "c".repeat(64), blob_url: "https://one.blob.vercel-storage.com/o", estado_verificacion: "pendiente" },
     ] };
     return { rows: [] };
   });
@@ -292,14 +298,91 @@ test("integrity distinguishes transient Blob failures from missing and mismatche
   assert.equal(result.items[0].blobRead, "FAILED");
 });
 
+test("integrity applies one cumulative Blob byte budget across all parts in a page", async () => {
+  assert.deepEqual(CUSTODIA_BLOB_READ_BUDGET, { maxBytes: 32 * 1024 * 1024, maxMs: 45_000 });
+  const clear = Buffer.from("x");
+  const sha = createHash("sha256").update(clear).digest("hex");
+  const db = mockDb((sql) => {
+    if (sql.includes("SELECT revision_id::text,creado_en,snapshot")) {
+      return { rows: [checkpoint({ corteAudio: { hastaParte: 2 } })] };
+    }
+    if (sql.includes("WITH expected AS")) {
+      return { rows: [
+        { owner_rows: 1, stored_total: 2, invalid_indexes: 0, extra_parts: 0 },
+        partRow(1, { bytes: clear.length, sha256: sha, blob_url: "https://one.blob.vercel-storage.com/o" }),
+        partRow(2, { bytes: clear.length, sha256: sha, blob_url: "https://two.blob.vercel-storage.com/o" }),
+      ] };
+    }
+    return { rows: [] };
+  });
+  const seen: string[] = [];
+  const result = await toolKhoraCustodiaVerificarIntegridad(
+    ACTOR,
+    { session_id: SESSION, limite: 2 },
+    db,
+    async (url, _bytes, _sha, options) => {
+      seen.push(url);
+      options?.onBytesRead?.(8);
+      return Buffer.from(clear);
+    },
+    { maxBytes: 8, maxMs: 10_000 },
+  );
+  assert.deepEqual(seen, ["https://one.blob.vercel-storage.com/o"]);
+  assert.equal(result.items[0].status, "VERIFIED");
+  assert.equal(result.items[1].status, "UNVERIFIABLE");
+  assert.equal(result.items[1].reason, "CUMULATIVE_BLOB_BYTE_BUDGET_EXCEEDED");
+  assert.equal(result.items[1].blobRead, "NOT_ATTEMPTED");
+  assert.equal(result.summary.blobReadBudget.responseBytesRead, 8);
+  assert.equal(result.summary.blobReadBudget.maxResponseBytes, 8);
+  clear.fill(0);
+});
+
+test("integrity applies one cumulative Blob wall-clock budget across all parts in a page", async () => {
+  const clear = Buffer.from("x");
+  const sha = createHash("sha256").update(clear).digest("hex");
+  const db = mockDb((sql) => {
+    if (sql.includes("SELECT revision_id::text,creado_en,snapshot")) {
+      return { rows: [checkpoint({ corteAudio: { hastaParte: 2 } })] };
+    }
+    if (sql.includes("WITH expected AS")) {
+      return { rows: [
+        { owner_rows: 1, stored_total: 2, invalid_indexes: 0, extra_parts: 0 },
+        partRow(1, { bytes: clear.length, sha256: sha, blob_url: "https://one.blob.vercel-storage.com/o" }),
+        partRow(2, { bytes: clear.length, sha256: sha, blob_url: "https://two.blob.vercel-storage.com/o" }),
+      ] };
+    }
+    return { rows: [] };
+  });
+  const seen: string[] = [];
+  const result = await toolKhoraCustodiaVerificarIntegridad(
+    ACTOR,
+    { session_id: SESSION, limite: 2 },
+    db,
+    async (url, _bytes, _sha, options) => {
+      seen.push(url);
+      options?.onBytesRead?.(1);
+      await new Promise((resolve) => setTimeout(resolve, 1100));
+      return Buffer.from(clear);
+    },
+    { maxBytes: 1024, maxMs: 1000 },
+  );
+  assert.deepEqual(seen, ["https://one.blob.vercel-storage.com/o"]);
+  assert.equal(result.items[0].status, "UNVERIFIABLE");
+  assert.equal(result.items[0].reason, "CUMULATIVE_BLOB_TIME_BUDGET_EXCEEDED");
+  assert.equal(result.items[1].reason, "CUMULATIVE_BLOB_TIME_BUDGET_EXCEEDED");
+  assert.equal(result.items[1].blobRead, "NOT_ATTEMPTED");
+  assert.ok(result.summary.blobReadBudget.elapsedMs >= 1000);
+  clear.fill(0);
+});
+
 test("integrity will not invent declared part count when snapshot is unreadable", async () => {
   const db = mockDb((sql) => {
     if (sql.includes("SELECT s.session_id FROM dictado_session")) return { rows: [sessionOwnerRow()] };
     if (sql.includes("SELECT revision_id::text,creado_en,snapshot")) return { rows: [{ snapshot: "khc1.corrupt" }] };
-    if (sql.includes("SELECT part_index,part_index AS stored_part_index")) return { rows: [
+    if (sql.includes("SELECT p.part_index,p.part_index AS stored_part_index")) return { rows: [
       { part_index: 1, stored_part_index: 1, bytes: 10, sha256: "d".repeat(64), blob_url: "https://one.blob.vercel-storage.com/o", estado_verificacion: "verificado", total_rows: 1 },
     ] };
-    if (sql.includes("SELECT count(*) FILTER(WHERE part_index<1)")) return { rows: [{ invalid_indexes: 0 }] };
+    if (sql.includes("SELECT count(p.part_index) FILTER(WHERE p.part_index<1)")) return { rows: [{ invalid_indexes: 0 }] };
     return { rows: [] };
   });
   const result = await toolKhoraCustodiaVerificarIntegridad(ACTOR, { session_id: SESSION }, db, async () => { throw new Error("blob_inaccesible"); });
@@ -335,6 +418,51 @@ test("Blob reader validates host, redirect policy, decrypts and verifies SHA-256
     assert.equal(options.redirect, "error");
     assert.equal(options.cache, "no-store");
     result.fill(0);
+  } finally {
+    globalThis.fetch = originalFetch;
+    encrypted.fill(0);
+    clear.fill(0);
+  }
+});
+
+test("Blob reader enforces per-call response-byte caps before decrypting", async () => {
+  const originalFetch = globalThis.fetch;
+  const clear = Buffer.from("synthetic oversized Blob");
+  const encrypted = cifrarBytes(clear);
+  const sha = createHash("sha256").update(clear).digest("hex");
+  try {
+    let bytesRead = 0;
+    globalThis.fetch = (async () => new Response(Buffer.from(encrypted), {
+      status: 200,
+      headers: { "content-length": String(encrypted.length) },
+    })) as typeof fetch;
+    await assert.rejects(
+      leerBlobVerificado(
+        "https://file.blob.vercel-storage.com/oversized",
+        clear.length,
+        sha,
+        { maxResponseBytes: encrypted.length - 1, onBytesRead: (bytes) => { bytesRead += bytes; } },
+      ),
+      /audio_custodia_byte_budget_exceeded/,
+    );
+    assert.equal(bytesRead, 0, "known oversize response must be rejected before body bytes are read");
+
+    globalThis.fetch = (async () => new Response(new ReadableStream({
+      start(controller) {
+        controller.enqueue(new Uint8Array(encrypted));
+        controller.close();
+      },
+    }), { status: 200 })) as typeof fetch;
+    await assert.rejects(
+      leerBlobVerificado(
+        "https://file.blob.vercel-storage.com/chunked",
+        clear.length,
+        sha,
+        { maxResponseBytes: encrypted.length - 1, onBytesRead: (bytes) => { bytesRead += bytes; } },
+      ),
+      /audio_custodia_byte_budget_exceeded/,
+    );
+    assert.equal(bytesRead, encrypted.length, "an oversized delivered chunk is accounted before stream cancellation");
   } finally {
     globalThis.fetch = originalFetch;
     encrypted.fill(0);

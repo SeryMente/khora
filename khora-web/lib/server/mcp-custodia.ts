@@ -1,7 +1,7 @@
 import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 import { getMcpReadOnlyDb } from "./mcp-db";
 import { descifrarTexto } from "./cripto";
-import { leerBlobVerificado } from "./audio-mp3";
+import { leerBlobVerificado, type LeerBlobOptions } from "./audio-mp3";
 
 type Db = { query: (sql: string, params?: any[]) => Promise<{ rows: any[] }> };
 type CursorKind = "catalog" | "revisions";
@@ -26,6 +26,9 @@ const MAX = 100;
 const MAX_INTEGRITY_PAGE = 50;
 const MAX_PART_METADATA_ROWS = 10000;
 const MAX_DECLARED_PARTS = 2147483647;
+export const CUSTODIA_BLOB_READ_BUDGET = Object.freeze({ maxBytes: 32 * 1024 * 1024, maxMs: 45_000 });
+type BlobBudgetLimits = { maxBytes: number; maxMs: number };
+type BlobBudgetState = BlobBudgetLimits & { startedAt: number; bytesRead: number };
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const SHA = /^[0-9a-f]{64}$/i;
 const ARCHIVE = "LEFT JOIN LATERAL (" +
@@ -34,6 +37,90 @@ const ARCHIVE = "LEFT JOIN LATERAL (" +
   " ORDER BY (v.id=s.volcado_id) DESC, v.id DESC LIMIT 1" +
   ") v ON TRUE";
 const OWNER = "COALESCE(s.custodia_owner,s.checkpoint_usuario,v.usuario)=$1";
+const OWNER_SESSION = "COALESCE(s.custodia_owner,s.checkpoint_usuario,v.usuario)=$2";
+
+const CUSTODIA_READONLY_ROLE_CHECK = [
+  "SELECT /* custodia_readonly_role_guard */ current_user AS effective_role,",
+  "r.rolsuper AS is_superuser,r.rolbypassrls AS bypasses_rls,",
+  "(r.rolcreatedb OR r.rolcreaterole OR r.rolreplication) AS has_unsafe_role_attributes,",
+  "(current_user='khora_lector' OR pg_catalog.pg_has_role(current_user,'khora_lector','USAGE')) AS member_of_lector,",
+  "(SELECT NOT l.rolcanlogin AND NOT l.rolsuper AND NOT l.rolbypassrls AND NOT l.rolcreatedb AND NOT l.rolcreaterole AND NOT l.rolreplication FROM pg_catalog.pg_roles l WHERE l.rolname='khora_lector') AS lector_role_safe,",
+  "(",
+  " pg_catalog.has_column_privilege(current_user,'public.dictado_session','session_id','SELECT')",
+  " AND pg_catalog.has_column_privilege(current_user,'public.dictado_session','volcado_id','SELECT')",
+  " AND pg_catalog.has_column_privilege(current_user,'public.dictado_session','estado','SELECT')",
+  " AND pg_catalog.has_column_privilege(current_user,'public.dictado_session','total_partes','SELECT')",
+  " AND pg_catalog.has_column_privilege(current_user,'public.dictado_session','creado_en','SELECT')",
+  " AND pg_catalog.has_column_privilege(current_user,'public.dictado_session','actualizado_en','SELECT')",
+  " AND pg_catalog.has_column_privilege(current_user,'public.dictado_session','cerrado_en','SELECT')",
+  " AND pg_catalog.has_column_privilege(current_user,'public.dictado_session','custodia_owner','SELECT')",
+  " AND pg_catalog.has_column_privilege(current_user,'public.dictado_session','checkpoint_usuario','SELECT')",
+  " AND pg_catalog.has_column_privilege(current_user,'public.dictado_audio_parte','session_id','SELECT')",
+  " AND pg_catalog.has_column_privilege(current_user,'public.dictado_audio_parte','part_index','SELECT')",
+  " AND pg_catalog.has_column_privilege(current_user,'public.dictado_audio_parte','bytes','SELECT')",
+  " AND pg_catalog.has_column_privilege(current_user,'public.dictado_audio_parte','sha256','SELECT')",
+  " AND pg_catalog.has_column_privilege(current_user,'public.dictado_audio_parte','blob_url','SELECT')",
+  " AND pg_catalog.has_column_privilege(current_user,'public.dictado_audio_parte','estado_verificacion','SELECT')",
+  " AND pg_catalog.has_column_privilege(current_user,'public.dictado_checkpoint','revision_id','SELECT')",
+  " AND pg_catalog.has_column_privilege(current_user,'public.dictado_checkpoint','session_id','SELECT')",
+  " AND pg_catalog.has_column_privilege(current_user,'public.dictado_checkpoint','usuario','SELECT')",
+  " AND pg_catalog.has_column_privilege(current_user,'public.dictado_checkpoint','creado_en','SELECT')",
+  " AND pg_catalog.has_column_privilege(current_user,'public.dictado_checkpoint','client_at','SELECT')",
+  " AND pg_catalog.has_column_privilege(current_user,'public.dictado_checkpoint','sha256','SELECT')",
+  " AND pg_catalog.has_column_privilege(current_user,'public.dictado_checkpoint','snapshot','SELECT')",
+  " AND pg_catalog.has_column_privilege(current_user,'public.dictado_mp3','session_id','SELECT')",
+  " AND pg_catalog.has_column_privilege(current_user,'public.dictado_mp3','estado','SELECT')",
+  " AND pg_catalog.has_column_privilege(current_user,'public.dictado_mp3','captura_completa','SELECT')",
+  " AND pg_catalog.has_column_privilege(current_user,'public.dictado_mp3','source_parts','SELECT')",
+  " AND pg_catalog.has_column_privilege(current_user,'public.dictado_mp3','actualizado_en','SELECT')",
+  " AND pg_catalog.has_column_privilege(current_user,'public.volcado','id','SELECT')",
+  " AND pg_catalog.has_column_privilege(current_user,'public.volcado','folio','SELECT')",
+  " AND pg_catalog.has_column_privilege(current_user,'public.volcado','usuario','SELECT')",
+  " AND pg_catalog.has_column_privilege(current_user,'public.volcado','session_id','SELECT')",
+  ") AS has_required_select,",
+  "(",
+  " NOT pg_catalog.has_table_privilege(current_user,'public.dictado_session','SELECT')",
+  " AND NOT pg_catalog.has_table_privilege(current_user,'public.dictado_audio_parte','SELECT')",
+  " AND NOT pg_catalog.has_table_privilege(current_user,'public.dictado_checkpoint','SELECT')",
+  " AND NOT pg_catalog.has_table_privilege(current_user,'public.dictado_mp3','SELECT')",
+  " AND NOT pg_catalog.has_table_privilege(current_user,'public.volcado','SELECT')",
+  " AND NOT EXISTS (",
+  "  SELECT 1 FROM (",
+  "   SELECT 'public.dictado_session'::regclass AS relid, ARRAY['session_id','volcado_id','estado','total_partes','creado_en','actualizado_en','cerrado_en','custodia_owner','checkpoint_usuario']::name[] AS allowed_cols",
+  "   UNION ALL SELECT 'public.dictado_audio_parte'::regclass, ARRAY['session_id','part_index','bytes','sha256','blob_url','estado_verificacion']::name[]",
+  "   UNION ALL SELECT 'public.dictado_checkpoint'::regclass, ARRAY['revision_id','session_id','usuario','creado_en','client_at','sha256','snapshot']::name[]",
+  "   UNION ALL SELECT 'public.dictado_mp3'::regclass, ARRAY['session_id','estado','captura_completa','source_parts','actualizado_en']::name[]",
+  "   UNION ALL SELECT 'public.volcado'::regclass, ARRAY['id','folio','usuario','session_id']::name[]",
+  "  ) scope JOIN pg_catalog.pg_attribute a ON a.attrelid=scope.relid AND a.attnum>0 AND NOT a.attisdropped",
+  "  WHERE NOT (a.attname = ANY(scope.allowed_cols))",
+  "    AND pg_catalog.has_column_privilege(current_user,scope.relid,a.attname,'SELECT')",
+  " )",
+  ") AS has_no_extra_select,",
+  "NOT (",
+  " pg_catalog.has_table_privilege(current_user,'public.dictado_session','INSERT') OR pg_catalog.has_table_privilege(current_user,'public.dictado_session','UPDATE') OR pg_catalog.has_table_privilege(current_user,'public.dictado_session','DELETE') OR pg_catalog.has_table_privilege(current_user,'public.dictado_session','TRUNCATE') OR pg_catalog.has_any_column_privilege(current_user,'public.dictado_session','INSERT') OR pg_catalog.has_any_column_privilege(current_user,'public.dictado_session','UPDATE') OR",
+  " pg_catalog.has_table_privilege(current_user,'public.dictado_audio_parte','INSERT') OR pg_catalog.has_table_privilege(current_user,'public.dictado_audio_parte','UPDATE') OR pg_catalog.has_table_privilege(current_user,'public.dictado_audio_parte','DELETE') OR pg_catalog.has_table_privilege(current_user,'public.dictado_audio_parte','TRUNCATE') OR pg_catalog.has_any_column_privilege(current_user,'public.dictado_audio_parte','INSERT') OR pg_catalog.has_any_column_privilege(current_user,'public.dictado_audio_parte','UPDATE') OR",
+  " pg_catalog.has_table_privilege(current_user,'public.dictado_checkpoint','INSERT') OR pg_catalog.has_table_privilege(current_user,'public.dictado_checkpoint','UPDATE') OR pg_catalog.has_table_privilege(current_user,'public.dictado_checkpoint','DELETE') OR pg_catalog.has_table_privilege(current_user,'public.dictado_checkpoint','TRUNCATE') OR pg_catalog.has_any_column_privilege(current_user,'public.dictado_checkpoint','INSERT') OR pg_catalog.has_any_column_privilege(current_user,'public.dictado_checkpoint','UPDATE') OR",
+  " pg_catalog.has_table_privilege(current_user,'public.dictado_mp3','INSERT') OR pg_catalog.has_table_privilege(current_user,'public.dictado_mp3','UPDATE') OR pg_catalog.has_table_privilege(current_user,'public.dictado_mp3','DELETE') OR pg_catalog.has_table_privilege(current_user,'public.dictado_mp3','TRUNCATE') OR pg_catalog.has_any_column_privilege(current_user,'public.dictado_mp3','INSERT') OR pg_catalog.has_any_column_privilege(current_user,'public.dictado_mp3','UPDATE') OR",
+  " pg_catalog.has_table_privilege(current_user,'public.volcado','INSERT') OR pg_catalog.has_table_privilege(current_user,'public.volcado','UPDATE') OR pg_catalog.has_table_privilege(current_user,'public.volcado','DELETE') OR pg_catalog.has_table_privilege(current_user,'public.volcado','TRUNCATE') OR pg_catalog.has_any_column_privilege(current_user,'public.volcado','INSERT') OR pg_catalog.has_any_column_privilege(current_user,'public.volcado','UPDATE')",
+  ") AS has_no_dml",
+  "FROM pg_catalog.pg_roles r WHERE r.rolname=current_user",
+].join(" ");
+export async function assertCustodiaReadOnlyRole(db: Db): Promise<void> {
+  let row: any;
+  try {
+    const result = await db.query(CUSTODIA_READONLY_ROLE_CHECK);
+    row = result.rows[0];
+  } catch {
+    throw new Error("custodia_readonly_role_invalid");
+  }
+  if (!row || row.is_superuser !== false || row.bypasses_rls !== false ||
+      row.has_unsafe_role_attributes !== false || row.member_of_lector !== true ||
+      row.lector_role_safe !== true || row.has_required_select !== true ||
+      row.has_no_extra_select !== true || row.has_no_dml !== true) {
+    throw new Error("custodia_readonly_role_invalid");
+  }
+}
+
 
 function limitOf(value: unknown, fallback = PAGE, maximum = MAX): number {
   if (value === undefined || value === null) return fallback;
@@ -130,7 +217,7 @@ async function owns(db: Db, actor: string, sessionId: string): Promise<boolean> 
   }
   const result = await db.query(
     "SELECT s.session_id FROM dictado_session s " + ARCHIVE +
-    " WHERE s.session_id=$1 AND " + OWNER + " LIMIT 1",
+    " WHERE s.session_id=$1 AND " + OWNER_SESSION + " LIMIT 1",
     [sessionId, actor],
   );
   return result.rows.length === 1;
@@ -221,6 +308,7 @@ export async function toolKhoraCustodiaCatalogo(
 ) {
   const limit = limitOf(args.limite);
   const cursor = decodeCursor(args.cursor, "catalog", actor);
+  await assertCustodiaReadOnlyRole(db);
   const activity = "COALESCE(s.creado_en,to_timestamp(0))";
   const sql =
     "WITH owned AS (" +
@@ -331,9 +419,10 @@ export async function toolKhoraCustodiaRevisiones(
   db: Db = getMcpReadOnlyDb(),
 ) {
   const sessionId = args.session_id;
-  if (!(await owns(db, actor, sessionId))) throw new Error("sesion_no_encontrada_o_no_autorizada");
   const limit = limitOf(args.limite);
   const cursor = decodeCursor(args.cursor, "revisions", actor, sessionId);
+  await assertCustodiaReadOnlyRole(db);
+  if (!(await owns(db, actor, sessionId))) throw new Error("sesion_no_encontrada_o_no_autorizada");
   const sql =
     "WITH revisions AS (" +
     " SELECT revision_id::text,creado_en,client_at,sha256 FROM dictado_checkpoint WHERE session_id=$1 AND usuario=$2" +
@@ -347,8 +436,11 @@ export async function toolKhoraCustodiaRevisiones(
   const [revisionResult, partResult] = await Promise.all([
     db.query(sql, [sessionId, actor, cursor?.savedAt ?? null, cursor?.revisionId ?? null, limit + 1]),
     db.query(
-      "SELECT part_index,estado_verificacion,count(*) OVER() AS total_rows FROM dictado_audio_parte WHERE session_id=$1 ORDER BY part_index LIMIT $2",
-      [sessionId, MAX_PART_METADATA_ROWS + 1],
+      "SELECT p.part_index,p.estado_verificacion,count(*) OVER() AS total_rows " +
+      "FROM dictado_audio_parte p JOIN dictado_session s ON s.session_id=p.session_id " + ARCHIVE +
+      " WHERE s.session_id=$1 AND " + OWNER_SESSION +
+      " ORDER BY p.part_index LIMIT $3",
+      [sessionId, actor, MAX_PART_METADATA_ROWS + 1],
     ),
   ]);
   const meta = revisionResult.rows[0] || {};
@@ -417,6 +509,7 @@ function integrityReason(code: string): string {
     case "blob_host_no_permitido": return "BLOB_HOST_NOT_ALLOWED";
     case "audio_manifest_invalido": return "METADATA_INVALID";
     case "audio_demasiado_grande": return "OBJECT_EXCEEDS_VERIFICATION_LIMIT";
+    case "audio_custodia_byte_budget_exceeded": return "CUMULATIVE_BLOB_BYTE_BUDGET_EXCEEDED";
     case "blob_no_encontrado": return "BLOB_NOT_FOUND";
     case "blob_inaccesible": return "BLOB_ACCESS_UNAVAILABLE_OR_TRANSIENT";
     default: return "BLOB_READ_FAILED_OR_REDIRECT_REJECTED";
@@ -427,62 +520,84 @@ async function verifyRegisteredPart(
   partIndex: number,
   row: any,
   readBlob: typeof leerBlobVerificado,
+  budget: BlobBudgetState,
 ) {
   const storedVerificationState = typeof row?.estado_verificacion === "string" ? row.estado_verificacion : null;
   const bytes = safeCount(row?.bytes);
   const sha = typeof row?.sha256 === "string" ? row.sha256.toLowerCase() : null;
   if (typeof row?.blob_url !== "string" || !row.blob_url.trim()) {
     return {
-      partIndex,
-      registration: "REGISTERED_WITHOUT_BLOB_REFERENCE",
-      storedVerificationState,
-      expectedBytes: bytes,
-      expectedSha256: sha,
-      status: "MISSING",
-      reason: "BLOB_REFERENCE_MISSING",
-      blobRead: "NOT_ATTEMPTED",
+      partIndex, registration: "REGISTERED_WITHOUT_BLOB_REFERENCE", storedVerificationState,
+      expectedBytes: bytes, expectedSha256: sha, status: "MISSING",
+      reason: "BLOB_REFERENCE_MISSING", blobRead: "NOT_ATTEMPTED",
     };
   }
   if (bytes === null || bytes <= 0 || !sha || !SHA.test(sha)) {
     return {
-      partIndex,
-      registration: "REGISTERED",
-      storedVerificationState,
-      expectedBytes: bytes,
-      expectedSha256: sha,
-      status: "UNVERIFIABLE",
-      reason: "METADATA_INVALID",
-      blobRead: "NOT_ATTEMPTED",
+      partIndex, registration: "REGISTERED", storedVerificationState,
+      expectedBytes: bytes, expectedSha256: sha, status: "UNVERIFIABLE",
+      reason: "METADATA_INVALID", blobRead: "NOT_ATTEMPTED",
     };
   }
+
+  const remainingMs = budget.maxMs - (Date.now() - budget.startedAt);
+  const remainingBytes = budget.maxBytes - budget.bytesRead;
+  if (remainingMs <= 0) {
+    return {
+      partIndex, registration: "REGISTERED", storedVerificationState,
+      expectedBytes: bytes, expectedSha256: sha, status: "UNVERIFIABLE",
+      reason: "CUMULATIVE_BLOB_TIME_BUDGET_EXCEEDED", blobRead: "NOT_ATTEMPTED",
+    };
+  }
+  if (remainingBytes <= 0 || bytes > remainingBytes) {
+    return {
+      partIndex, registration: "REGISTERED", storedVerificationState,
+      expectedBytes: bytes, expectedSha256: sha, status: "UNVERIFIABLE",
+      reason: "CUMULATIVE_BLOB_BYTE_BUDGET_EXCEEDED", blobRead: "NOT_ATTEMPTED",
+    };
+  }
+
   let clear: Buffer | null = null;
   try {
-    clear = await readBlob(String(row.blob_url), bytes, sha);
+    const options: LeerBlobOptions = {
+      maxResponseBytes: remainingBytes,
+      timeoutMs: Math.min(30000, remainingMs),
+      onBytesRead: (readBytes) => {
+        if (Number.isSafeInteger(readBytes) && readBytes > 0) budget.bytesRead += readBytes;
+      },
+    };
+    clear = await readBlob(String(row.blob_url), bytes, sha, options);
+    if (Date.now() - budget.startedAt > budget.maxMs) {
+      return {
+        partIndex, registration: "REGISTERED", storedVerificationState,
+        expectedBytes: bytes, expectedSha256: sha, status: "UNVERIFIABLE",
+        reason: "CUMULATIVE_BLOB_TIME_BUDGET_EXCEEDED", blobRead: "COMPLETED",
+      };
+    }
     const actualSha = createHash("sha256").update(clear).digest("hex");
     if (clear.length !== bytes || actualSha !== sha) {
       return {
-        partIndex,
-        registration: "REGISTERED",
-        storedVerificationState,
-        expectedBytes: bytes,
-        expectedSha256: sha,
-        status: "MISMATCH",
-        reason: "SHA256_OR_LENGTH_MISMATCH",
-        blobRead: "COMPLETED",
+        partIndex, registration: "REGISTERED", storedVerificationState,
+        expectedBytes: bytes, expectedSha256: sha, status: "MISMATCH",
+        reason: "SHA256_OR_LENGTH_MISMATCH", blobRead: "COMPLETED",
       };
     }
     return {
-      partIndex,
-      registration: "REGISTERED",
-      storedVerificationState,
-      expectedBytes: bytes,
-      expectedSha256: sha,
-      status: "VERIFIED",
-      reason: null,
-      blobRead: "COMPLETED",
+      partIndex, registration: "REGISTERED", storedVerificationState,
+      expectedBytes: bytes, expectedSha256: sha, status: "VERIFIED",
+      reason: null, blobRead: "COMPLETED",
     };
   } catch (error) {
     const code = error instanceof Error ? error.message : "";
+    const isTimeout = error instanceof Error && error.name === "TimeoutError";
+    const cumulativeTimeExpired = Date.now() - budget.startedAt >= budget.maxMs;
+    const reason = code === "audio_custodia_byte_budget_exceeded"
+      ? "CUMULATIVE_BLOB_BYTE_BUDGET_EXCEEDED"
+      : isTimeout && cumulativeTimeExpired
+        ? "CUMULATIVE_BLOB_TIME_BUDGET_EXCEEDED"
+        : isTimeout
+          ? "BLOB_READ_TIMEOUT"
+          : integrityReason(code);
     return {
       partIndex,
       registration: "REGISTERED",
@@ -490,7 +605,7 @@ async function verifyRegisteredPart(
       expectedBytes: bytes,
       expectedSha256: sha,
       status: code === "audio_integridad_rota" ? "MISMATCH" : code === "blob_no_encontrado" ? "MISSING" : "UNVERIFIABLE",
-      reason: integrityReason(code),
+      reason,
       blobRead: "FAILED",
     };
   } finally {
@@ -503,7 +618,19 @@ export async function toolKhoraCustodiaVerificarIntegridad(
   args: { session_id: string; limite?: number; despues_de_parte?: number },
   db: Db = getMcpReadOnlyDb(),
   readBlob: typeof leerBlobVerificado = leerBlobVerificado,
+  budgetLimits: BlobBudgetLimits = CUSTODIA_BLOB_READ_BUDGET,
 ) {
+  if (!Number.isSafeInteger(budgetLimits.maxBytes) || budgetLimits.maxBytes < 1 ||
+      !Number.isSafeInteger(budgetLimits.maxMs) || budgetLimits.maxMs < 1) {
+    throw new Error("custodia_blob_budget_invalid");
+  }
+  const budget: BlobBudgetState = {
+    maxBytes: budgetLimits.maxBytes,
+    maxMs: budgetLimits.maxMs,
+    startedAt: 0,
+    bytesRead: 0,
+  };
+  await assertCustodiaReadOnlyRole(db);
   const sessionId = args.session_id;
   if (!(await owns(db, actor, sessionId))) throw new Error("sesion_no_encontrada_o_no_autorizada");
   const limit = limitOf(args.limite, 20, MAX_INTEGRITY_PAGE);
@@ -528,20 +655,23 @@ export async function toolKhoraCustodiaVerificarIntegridad(
     const start = after + 1;
     const end = Math.min(declared, after + limit);
     const query = await db.query(
-      "WITH expected AS (SELECT generate_series($2::int,$3::int) AS part_index)," +
+      "WITH expected AS (SELECT generate_series($3::int,$4::int) AS part_index)," +
       " stats AS (" +
-      "  SELECT count(*)::int AS stored_total," +
-      "   count(*) FILTER(WHERE part_index<1)::int AS invalid_indexes," +
-      "   count(*) FILTER(WHERE part_index>$4::int)::int AS extra_parts" +
-      "  FROM dictado_audio_parte WHERE session_id=$1" +
-      " ) SELECT stats.stored_total,stats.invalid_indexes,stats.extra_parts,expected.part_index AS part_index,p.part_index AS stored_part_index," +
-      " p.bytes,p.sha256,p.blob_url,p.estado_verificacion" +
+      "  SELECT count(DISTINCT s.session_id)::int AS owner_rows,count(p.part_index)::int AS stored_total," +
+      "   count(p.part_index) FILTER(WHERE p.part_index<1)::int AS invalid_indexes," +
+      "   count(p.part_index) FILTER(WHERE p.part_index>$5::int)::int AS extra_parts" +
+      "  FROM dictado_session s " + ARCHIVE +
+      "  LEFT JOIN dictado_audio_parte p ON p.session_id=s.session_id" +
+      "  WHERE s.session_id=$1 AND " + OWNER_SESSION +
+      " ) SELECT stats.owner_rows,stats.stored_total,stats.invalid_indexes,stats.extra_parts," +
+      " expected.part_index AS part_index,p.part_index AS stored_part_index,p.bytes,p.sha256,p.blob_url,p.estado_verificacion" +
       " FROM stats LEFT JOIN expected ON TRUE" +
-      " LEFT JOIN dictado_audio_parte p ON p.session_id=$1 AND p.part_index=expected.part_index" +
+      " LEFT JOIN dictado_audio_parte p ON p.session_id=$1 AND p.part_index=expected.part_index AND stats.owner_rows=1" +
       " ORDER BY expected.part_index",
-      [sessionId, start, end, declared],
+      [sessionId, actor, start, end, declared],
     );
     const meta = query.rows[0] || {};
+    if (safeCount(meta.owner_rows) !== 1) throw new Error("sesion_no_encontrada_o_no_autorizada");
     registeredPartsTotal = safeCount(meta.stored_total) ?? 0;
     invalidPartIndexes = safeCount(meta.invalid_indexes) ?? 0;
     unexpectedStoredParts = safeCount(meta.extra_parts) ?? 0;
@@ -550,9 +680,12 @@ export async function toolKhoraCustodiaVerificarIntegridad(
     nextAfterPart = hasMore ? end : null;
   } else {
     const query = await db.query(
-      "SELECT part_index,part_index AS stored_part_index,bytes,sha256,blob_url,estado_verificacion,count(*) OVER() AS total_rows" +
-      " FROM dictado_audio_parte WHERE session_id=$1 AND part_index>$2 ORDER BY part_index LIMIT $3",
-      [sessionId, after, limit + 1],
+      "SELECT p.part_index,p.part_index AS stored_part_index,p.bytes,p.sha256,p.blob_url,p.estado_verificacion,count(*) OVER() AS total_rows" +
+      " FROM dictado_session s " + ARCHIVE +
+      " JOIN dictado_audio_parte p ON p.session_id=s.session_id" +
+      " WHERE s.session_id=$1 AND " + OWNER_SESSION + " AND p.part_index>$3" +
+      " ORDER BY p.part_index LIMIT $4",
+      [sessionId, actor, after, limit + 1],
     );
     const total = safeCount(query.rows[0]?.total_rows);
     const all = query.rows;
@@ -563,14 +696,18 @@ export async function toolKhoraCustodiaVerificarIntegridad(
     nextAfterPart = hasMore && last ? Number(last.part_index) : null;
     if (total !== null) {
       const anomalies = await db.query(
-        "SELECT count(*) FILTER(WHERE part_index<1)::int AS invalid_indexes FROM dictado_audio_parte WHERE session_id=$1",
-        [sessionId],
+        "SELECT count(p.part_index) FILTER(WHERE p.part_index<1)::int AS invalid_indexes" +
+        " FROM dictado_session s " + ARCHIVE +
+        " LEFT JOIN dictado_audio_parte p ON p.session_id=s.session_id" +
+        " WHERE s.session_id=$1 AND " + OWNER_SESSION,
+        [sessionId, actor],
       );
       invalidPartIndexes = safeCount(anomalies.rows[0]?.invalid_indexes) ?? 0;
     }
   }
 
   const items: any[] = [];
+  budget.startedAt = Date.now();
   for (const row of rows) {
     const partIndex = Number(row.part_index);
     if (pageBasis === "declared_manifest" && (row.stored_part_index === null || row.stored_part_index === undefined)) {
@@ -598,7 +735,7 @@ export async function toolKhoraCustodiaVerificarIntegridad(
         blobRead: "NOT_ATTEMPTED",
       });
     } else {
-      items.push(await verifyRegisteredPart(partIndex, row, readBlob));
+      items.push(await verifyRegisteredPart(partIndex, row, readBlob, budget));
     }
   }
 
@@ -608,6 +745,7 @@ export async function toolKhoraCustodiaVerificarIntegridad(
     acc[item.status] = (acc[item.status] || 0) + 1;
     return acc;
   }, {});
+  const elapsedMs = Math.max(0, Date.now() - budget.startedAt);
   const currentPageEnd = pageBasis === "declared_manifest" ? Math.min(declared ?? 0, after + limit) : null;
   return {
     sessionId,
@@ -625,6 +763,13 @@ export async function toolKhoraCustodiaVerificarIntegridad(
       unexpectedStoredParts,
       currentPageStatusCounts: statuses,
       recordedVerificationIsNotCurrentVerification: true,
+      blobReadBudget: {
+        maxResponseBytes: budget.maxBytes,
+        responseBytesRead: budget.bytesRead,
+        maxElapsedMs: budget.maxMs,
+        elapsedMs,
+        exhausted: elapsedMs >= budget.maxMs || budget.bytesRead >= budget.maxBytes,
+      },
     },
     page: {
       limit,
@@ -639,7 +784,7 @@ export async function toolKhoraCustodiaVerificarIntegridad(
       VERIFIED: "Blob leído/descifrado y longitud/SHA-256 comprobados en esta llamada",
       MISSING: "Parte declarada sin fila en tabla, referencia Blob ausente o proveedor respondió 404; el motivo distingue el caso",
       MISMATCH: "La lectura actual produjo bytes cuya longitud o SHA-256 no coincide con el manifiesto",
-      UNVERIFIABLE: "No fue posible demostrar integridad; incluye errores de red, acceso, redirect, descifrado o metadata inválida",
+      UNVERIFIABLE: "No fue posible demostrar integridad; incluye errores de red, acceso, redirect, descifrado, metadata inválida o presupuesto de lectura agotado",
       SYNCED: "No se usa como resultado de esta herramienta: una marca almacenada no sustituye la verificación física actual",
     },
     excludes: ["blob_url", "clear_bytes", "audio_base64", "snapshot", "transcript", "credentials"],

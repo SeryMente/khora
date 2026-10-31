@@ -22,7 +22,7 @@ try {
     const sql = await fs.readFile(path.join(process.cwd(), "db/migrations", file), "utf8");
     await pool.query(sql);
   }
-  console.log("Migraciones 023-029 de runtime, OAuth, evidencia normativa, Bearer manual y ledger de orden aplicadas.");
+  console.log("Migraciones de runtime aplicadas: 023-029, 032 (grafo) y 034 (contrato de lectura Custodia).");
 } catch (error) {
   console.error("Error aplicando migraciones de runtime:", error);
   process.exitCode = 1;
