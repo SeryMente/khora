@@ -175,7 +175,7 @@ export async function deleteStagedObject(value: string, sessionId: string) {
 }
 
 export async function listB2Objects(prefix = "khora/dictado/") {
-  if (!b2Enabled()) return [];
+
   const location = storageLocation();
   const client = createB2Client();
   const objects: { url: string; pathname: string; size: number; uploadedAt: Date }[] = [];
