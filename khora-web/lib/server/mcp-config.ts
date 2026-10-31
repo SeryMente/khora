@@ -134,8 +134,19 @@ export function isAllowedDynamicRedirect(uri: string): boolean {
   try {
     const url = new URL(uri);
     const host = url.hostname.toLowerCase();
-    return url.protocol === "https:" &&
+    const notionHttps = url.protocol === "https:" &&
       (host === "notion.com" || host.endsWith(".notion.com") || host === "notion.so" || host.endsWith(".notion.so"));
+    if (notionHttps && !url.username && !url.password) return true;
+
+    // Native desktop clients may use only an exact IPv4 loopback callback.
+    // No localhost aliases, LAN addresses, custom paths, query, fragment or credentials.
+    return url.protocol === "http:" &&
+      uri.toLowerCase().startsWith("http://127.0.0.1:") &&
+      host === "127.0.0.1" &&
+      !url.username && !url.password &&
+      Number(url.port) >= 1024 && Number(url.port) <= 65535 &&
+      url.pathname === "/oauth/callback" &&
+      url.search === "" && url.hash === "";
   } catch {
     return false;
   }
