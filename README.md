@@ -8,7 +8,7 @@ El subsistema Entorno Persistente Medio v1.0 se especifica en [`ep-medio-archite
 |---|---|
 | [Servidor MCP de Khora](./khora-web/docs/normative-check.md) | Contrato técnico del servidor MCP. |
 | [Dictado](./docs/frentes/dictado-voz/OBJETO-CANONICO.md) | Pantalla de dictado, captura de voz, transcripción, edición y continuidad. No incluye Observabilidad MCP. |
-| [Observabilidad MCP](./docs/frentes/observabilidad-mcp/OBJETO-CANONICO.md) | Acceso autenticado a registros de observabilidad mediante MCP; control independiente. |
+| [Khora MCP](./docs/frentes/observabilidad-mcp/OBJETO-CANONICO.md) | Interfaz de capacidades MCP de Khora: recursos, herramientas, prompts, acceso, observabilidad e integración Jules; OCP y control únicos. |
 | [Custodia continua de dictados](./khora-web/docs/CUSTODIA-DICTADOS.md) | Contratos transversales de persistencia, recuperación y audio. |
 | [PREPARACION-VOLCADOS.md](./PREPARACION-VOLCADOS.md) | Protocolos de Custodia, Fidelidad y Legibilidad de volcados. |
 | [UI_REVIEW.md](./UI_REVIEW.md) | Cómo ver la interfaz vigente de Khora. |
@@ -22,7 +22,7 @@ Contrato, mapa de c├│digo, garant├¡as, recuperaci├│n, audio original/
 OCP observados en `main` (rutas vigentes, incluidas las heredadas):
 
 1. [Dictado](docs/frentes/dictado-voz/OBJETO-CANONICO.md) — ingreso por voz, pantalla de dictado, captura, transcripción, edición y continuidad.
-2. [Observabilidad MCP](docs/frentes/observabilidad-mcp/OBJETO-CANONICO.md) — acceso autenticado a registros, filtros, sesiones, paginación y diagnóstico MCP.
+2. [Khora MCP](docs/frentes/observabilidad-mcp/OBJETO-CANONICO.md) — interfaz de capacidades externas, recursos, herramientas, prompts, seguridad, observabilidad e integración Jules.
 3. [Harmonia](docs/frentes/harmonia/OBJETO-CANONICO.md).
 4. [Tareas automáticas](docs/frentes/tareas-automaticas/OBJETO-CANONICO.md).
 5. [Custodia transversal](frentes/custodia/OBJETO-CANONICO.md) — persistencia, seguridad y recuperación entre canales.
