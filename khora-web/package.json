@@ -18,7 +18,8 @@
     "repair:volcados": "tsx scripts/repair_volcados.ts",
     "migrate:ep": "node scripts/migrate-ep.mjs",
     "migrate:runtime": "node scripts/migrate-runtime.mjs",
-    "ui:contract": "tsx scripts/check_navigation_contract.ts"
+    "ui:contract": "tsx scripts/check_navigation_contract.ts",
+    "migrate:blob-to-b2": "tsx scripts/migrate_blob_to_b2.ts"
   },
   "dependencies": {
     "@aflsolutions/graphology-communities-leiden": "1.1.1",
