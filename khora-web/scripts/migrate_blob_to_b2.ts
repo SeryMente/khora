@@ -202,7 +202,7 @@ async function copyAndVerify(
   const location = storageLocation();
   const sourceUrlHash = hash(item.url);
   const encryptedHash = hash(sourceEncrypted);
-  const key = safeObjectKey("khora/migrated/vercel-blob/" + sourceUrlHash + ".khc");
+  const key = safeObjectKey("khora/dictado/migrated/vercel-blob/" + sourceUrlHash + ".khc");
   let exists = false;
   try {
     const head = await client.send(new HeadObjectCommand({ Bucket: location.bucket, Key: key }));
