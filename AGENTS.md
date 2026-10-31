@@ -12,7 +12,7 @@ Antes de trabajar en una capacidad de producto, lee el `README.md` y selecciona 
 
 - El repositorio canónico del producto es `SeryMente/khora`; el operador también lo denomina Cora.
 - **Dictado** (`docs/frentes/dictado-voz/`) se limita a pantalla de dictado, captura de voz iniciada explícitamente, transcripción, edición y continuidad.
-- **Observabilidad MCP** (`docs/frentes/observabilidad-mcp/`) es independiente: acceso autenticado a registros MCP, herramientas, filtros, sesiones, paginación y diagnóstico. Tiene control propio.
+- **Khora MCP** (`docs/frentes/observabilidad-mcp/`) es el frente de capacidades externas MCP de Khora: recursos, herramientas, prompts, autenticación, autorización, interoperabilidad, observabilidad y evolución. Conserva la ruta histórica `observabilidad-mcp/` y su control único.
 - **Custodia transversal** (`frentes/custodia/`) conserva su titularidad sobre persistencia, seguridad y recuperación; Dictado solo integra sus contratos.
 - Harmonia y Tareas automáticas conservan sus OCP.
 - Benchmark/feedback, Diálogo multipista, Ingreso general/crónica/metadatos, voz/síntomas y publicación editorial quedan fuera de Dictado y pendientes de adjudicación; no asignarles propietario por inferencia.
