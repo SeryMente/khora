@@ -30,7 +30,7 @@ async function handlePOST(req: NextRequest) {
   const responseTypes = Array.isArray(body.response_types) ? body.response_types.map(String) : ["code"];
 
   if (redirectUris.length === 0 || redirectUris.length > 10 || !redirectUris.every(isAllowedDynamicRedirect)) {
-    return NextResponse.json({ error: "invalid_redirect_uri", error_description: "Only HTTPS Notion redirect URIs are allowed" }, { status: 400 });
+    return NextResponse.json({ error: "invalid_redirect_uri", error_description: "Only HTTPS Notion redirects or an exact 127.0.0.1 loopback OAuth callback are allowed" }, { status: 400 });
   }
   if (tokenMethod !== "none" || !grantTypes.includes("authorization_code") || !responseTypes.includes("code")) {
     return NextResponse.json({ error: "invalid_client_metadata", error_description: "PKCE public clients using authorization_code are required" }, { status: 400 });
